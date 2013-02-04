@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Haiku Inc. All rights reserved.
+ * Copyright 2008-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -37,16 +37,14 @@ enum {
 	MSG_SIZE_TEXTCONTROL		= 'stct'
 };
 
+static const uint32 kMegaByte = 0x100000;
+
 
 CreateParametersPanel::CreateParametersPanel(BWindow* window,
 	BPartition* partition, off_t offset, off_t size)
 	:
 	AbstractParametersPanel(window)
 {
-	// Scale offset, and size from bytes to megabytes (2^20)
-	// so that we do not run over a signed int32.
-	offset /= kMegaByte;
-	size /= kMegaByte;
 	_CreateViewControls(partition, offset, size);
 
 	Init(B_CREATE_PARAMETER_EDITOR, "", partition);
@@ -65,8 +63,8 @@ CreateParametersPanel::Go(off_t& offset, off_t& size, BString& name,
 	// The object will be deleted in Go(), so we need to get the values before
 
 	// Return the value back as bytes.
-	size = (off_t)fSizeSlider->Size() * kMegaByte;
-	offset = (off_t)fSizeSlider->Offset() * kMegaByte;
+	size = fSizeSlider->Size();
+	offset = fSizeSlider->Offset();
 
 	// get name
 	name.SetTo(fNameTextControl->Text());
@@ -102,9 +100,9 @@ CreateParametersPanel::MessageReceived(BMessage* message)
 
 		case MSG_SIZE_TEXTCONTROL:
 		{
-			int32 size = atoi(fSizeTextControl->Text());
+			off_t size = atoi(fSizeTextControl->Text()) * kMegaByte;
 			if (size >= 0 && size <= fSizeSlider->MaxPartitionSize())
-				fSizeSlider->SetValue(size + fSizeSlider->Offset());
+				fSizeSlider->SetSize(size);
 			else
 				_UpdateSizeTextControl();
 			break;
@@ -147,8 +145,10 @@ CreateParametersPanel::_CreateViewControls(BPartition* parent, off_t offset,
 	off_t size)
 {
 	// Setup the controls
+	// TODO: use a lower granularity for smaller disks -- but this would
+	// require being able to parse arbitrary size strings with unit
 	fSizeSlider = new SizeSlider("Slider", B_TRANSLATE("Partition size"), NULL,
-		offset, offset + size);
+		offset, size, kMegaByte);
 	fSizeSlider->SetPosition(1.0);
 	fSizeSlider->SetModificationMessage(new BMessage(MSG_SIZE_SLIDER));
 
@@ -191,6 +191,6 @@ void
 CreateParametersPanel::_UpdateSizeTextControl()
 {
 	BString sizeString;
-	sizeString << fSizeSlider->Value() - fSizeSlider->Offset();
+	sizeString << fSizeSlider->Size() / kMegaByte;
 	fSizeTextControl->SetText(sizeString.String());
 }

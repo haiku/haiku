@@ -1,12 +1,13 @@
 /*
- * Copyright 2002-2012 Haiku Inc. All rights reserved.
+ * Copyright 2002-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
- *		Erik Jaesler <ejakowatz@users.sourceforge.net>
  *		Ithamar R. Adema <ithamar@unet.nl>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Axel Dörfler, axeld@pinc-software.de.
  *		Bryce Groff <bgroff@hawaii.edu>
+ *		Erik Jaesler <ejakowatz@users.sourceforge.net>
  */
 
 
@@ -22,6 +23,10 @@
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Support"
+
+
+static const int32 kMaxSliderLimit = 0x7fffff80;
+	// this is the maximum value that BSlider seem to work with fine
 
 
 void
@@ -94,23 +99,36 @@ SpaceIDMap::SpaceIDFor(partition_id parentID, off_t spaceOffset)
 }
 
 
+// #pragma mark -
+
+
 SizeSlider::SizeSlider(const char* name, const char* label,
-		BMessage* message, int32 minValue, int32 maxValue)
+		BMessage* message, off_t offset, off_t size, uint32 minGranularity)
 	:
-	BSlider(name, label, message, minValue, maxValue,
-	B_HORIZONTAL, B_TRIANGLE_THUMB),
-	fStartOffset(minValue),
-	fEndOffset(maxValue),
-	fMaxPartitionSize(maxValue - minValue)
+	BSlider(name, label, message, 0, kMaxSliderLimit, B_HORIZONTAL,
+		B_TRIANGLE_THUMB),
+	fStartOffset(offset),
+	fEndOffset(offset + size),
+	fMaxPartitionSize(size),
+	fGranularity(minGranularity)
 {
 	rgb_color fillColor = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
 	UseFillColor(true, &fillColor);
+
+	// Lazy loop to get a power of two granularity
+	while (size / fGranularity > kMaxSliderLimit)
+		fGranularity *= 2;
+
+	SetKeyIncrementValue(int32(1024 * 1024 * 1.0 * kMaxSliderLimit
+		/ ((MaxPartitionSize() - 1) / fGranularity) + 0.5));
+
+	char buffer[64];
 	char minString[64];
 	char maxString[64];
-	snprintf(minString, sizeof(minString), B_TRANSLATE("Offset: %ld MB"),
-		fStartOffset);
-	snprintf(maxString, sizeof(maxString), B_TRANSLATE("End: %ld MB"),
-		fEndOffset);
+	snprintf(minString, sizeof(minString), B_TRANSLATE("Offset: %s"),
+		string_for_size(fStartOffset, buffer, sizeof(buffer)));
+	snprintf(maxString, sizeof(maxString), B_TRANSLATE("End: %s"),
+		string_for_size(fEndOffset, buffer, sizeof(buffer)));
 	SetLimitLabels(minString, maxString);
 }
 
@@ -120,35 +138,54 @@ SizeSlider::~SizeSlider()
 }
 
 
+void
+SizeSlider::SetValue(int32 value)
+{
+	BSlider::SetValue(value);
+
+	fSize = (off_t(1.0 * (MaxPartitionSize() - 1) * Value()
+		/ kMaxSliderLimit + 0.5) / fGranularity) * fGranularity;
+}
+
+
 const char*
 SizeSlider::UpdateText() const
 {
-	// TODO: Perhaps replace with string_for_size, but it looks like
-	// Value() and fStartOffset are always in MiB.
-	snprintf(fStatusLabel, sizeof(fStatusLabel), B_TRANSLATE("%ld MiB"),
-		Value() - fStartOffset);
-
-	return fStatusLabel;
+	return string_for_size(Size(), fStatusLabel, sizeof(fStatusLabel));
 }
 
 
-int32
-SizeSlider::Size()
+off_t
+SizeSlider::Size() const
 {
-	return Value() - fStartOffset;
+	return fSize;
 }
 
 
-int32
-SizeSlider::Offset()
+void
+SizeSlider::SetSize(off_t size)
+{
+	if (size == fSize)
+		return;
+
+	SetValue(int32(1.0 * kMaxSliderLimit / fGranularity * size
+		/ ((MaxPartitionSize() - 1) / fGranularity) + 0.5));
+	fSize = size;
+	UpdateTextChanged();
+}
+
+
+off_t
+SizeSlider::Offset() const
 {
 	// TODO: This should be the changed offset once a double
 	// headed slider is implemented.
 	return fStartOffset;
 }
 
-int32
-SizeSlider::MaxPartitionSize()
+
+off_t
+SizeSlider::MaxPartitionSize() const
 {
 	return fMaxPartitionSize;
 }
