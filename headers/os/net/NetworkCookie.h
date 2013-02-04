@@ -54,7 +54,7 @@ public:
 
 			bool				IsHostOnly() const;
 			bool				IsSessionCookie() const;
-			bool				IsValid(bool strict = false) const;
+			bool				IsValid() const;
 			bool				IsValidForUrl(const BUrl& url) const;
 			bool				IsValidForDomain(const BString& domain) const;
 			bool				IsValidForPath(const BString& path) const;

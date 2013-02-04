@@ -378,16 +378,18 @@ BNetworkCookie::IsSessionCookie() const
 
 
 bool
-BNetworkCookie::IsValid(bool strict) const
+BNetworkCookie::IsValid() const
 {
-	return HasName() && HasValue();
+	return HasName() && HasDomain() && HasPath();
 }
 
 
 bool
 BNetworkCookie::IsValidForUrl(const BUrl& url) const
 {
-	// TODO: Take secure attribute into account
+	if (IsSecure() && url.Protocol() != "https")
+		return false;
+
 	BString urlHost = url.Host();
 	BString urlPath = url.Path();
 
@@ -398,20 +400,53 @@ BNetworkCookie::IsValidForUrl(const BUrl& url) const
 bool
 BNetworkCookie::IsValidForDomain(const BString& domain) const
 {
-	if (fDomain.Length() > domain.Length())
+	// TODO: canonicalize both domains
+	const BString& cookieDomain = Domain();
+
+	int32 difference = domain.Length() - cookieDomain.Length();
+	// If the cookie domain is longer than the domain string it cannot
+	// be valid.
+	if (difference < 0)
 		return false;
 
-	return domain.FindLast(fDomain) == (domain.Length() - fDomain.Length());
+	// If the cookie is host-only the domains must match exactly.
+	if (IsHostOnly())
+		return domain == cookieDomain;
+
+	// Otherwise, the domains must match exactly, or the cookie domain
+	// must be a suffix with the preceeding character being a dot.
+	const char* suffix = domain.String() + difference;
+	if (strcmp(suffix, cookieDomain.String()) == 0) {
+		if (difference == 0)
+			return true;
+		else if (domain[difference - 1] == '.')
+			return true;
+	}
+
+	return false;
 }
 
 
 bool
 BNetworkCookie::IsValidForPath(const BString& path) const
 {
-	if (fPath.Length() > path.Length())
+	const BString& cookiePath = Path();
+	if (path.Length() < cookiePath.Length())
 		return false;
 
-	return path.FindFirst(fPath) == 0;
+	// The cookie path must be a prefix of the path string
+	if (path.Compare(cookiePath, cookiePath.Length()) != 0)
+		return false;
+
+	// The paths match if they are identical, or if the last
+	// character of the prefix is a slash, or if the character
+	// after the prefix is a slash.
+	if (path.Length() == cookiePath.Length()
+			|| cookiePath[cookiePath.Length() - 1] == '/'
+			|| path[cookiePath.Length()] == '/')
+		return true;
+
+	return false;
 }
 
 
