@@ -38,6 +38,7 @@ Preference Time
 DoCatalogs Time :
 	x-vnd.Haiku-Time
 	:
+	ClockView.cpp
 	DateTimeView.cpp
 	NetworkTimeView.cpp
 	ntp.cpp
