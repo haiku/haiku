@@ -189,17 +189,36 @@ PeerAddress::InAddrSize() const
 }
 
 
+AddressResolver::AddressResolver(const char* name)
+	:
+	fHead(NULL),
+	fCurrent(NULL),
+	fForcedPort(htons(NFS4_PORT)),
+	fForcedProtocol(IPPROTO_TCP)
+{
+	fStatus = ResolveAddress(name);
+}
+
+
+AddressResolver::~AddressResolver()
+{
+	freeaddrinfo(fHead);
+}
+
+
 status_t
-PeerAddress::ResolveName(const char* name, PeerAddress* address)
+AddressResolver::ResolveAddress(const char* name)
 {
 	ASSERT(name != NULL);
-	ASSERT(address != NULL);
 
-	address->fProtocol = IPPROTO_TCP;
+	if (fHead != NULL) {
+		freeaddrinfo(fHead);
+		fHead = NULL;
+		fCurrent = NULL;
+	}
 
 	// getaddrinfo() is very expensive when called from kernel, so we do not
 	// want to call it unless there is no other choice.
-
 	struct sockaddr_in addr;
 	memset(&addr, 0, sizeof(addr));
 	if (inet_aton(name, &addr.sin_addr) == 1) {
@@ -207,35 +226,74 @@ PeerAddress::ResolveName(const char* name, PeerAddress* address)
 		addr.sin_family = AF_INET;
 		addr.sin_port = htons(NFS4_PORT);
 
-		memcpy(&address->fAddress, &addr, sizeof(addr));
+		memcpy(&fAddress.fAddress, &addr, sizeof(addr));
+		fAddress.fProtocol = IPPROTO_TCP;
 		return B_OK;
 	}
 
-	addrinfo* ai;
-	status_t result = getaddrinfo(name, NULL, NULL, &ai);
-	if (result != B_OK)
-		return result;
+	status_t result = getaddrinfo(name, NULL, NULL, &fHead);
+	fCurrent = fHead;
 
-	addrinfo* current = ai;
-	while (current != NULL) {
-		if (current->ai_family == AF_INET) {
-			memcpy(&address->fAddress, current->ai_addr, sizeof(sockaddr_in));
+	return result;
+}
+
+
+void
+AddressResolver::ForceProtocol(const char* protocol)
+{
+	ASSERT(protocol != NULL);
+
+	if (strcmp(protocol, "tcp") == 0)
+		fForcedProtocol = IPPROTO_TCP;
+	else if (strcmp(protocol, "udp") == 0)
+		fForcedProtocol = IPPROTO_UDP;
+
+	fAddress.SetProtocol(protocol);
+}
+
+
+void
+AddressResolver::ForcePort(uint16 port)
+{
+	fForcedPort = htons(port);
+	fAddress.SetPort(port);
+}
+
+
+status_t
+AddressResolver::GetNextAddress(PeerAddress* address)
+{
+	ASSERT(address != NULL);
+
+	if (fStatus != B_OK)
+		return fStatus;
+
+	if (fHead == NULL) {
+		*address = fAddress;
+		fStatus = B_NAME_NOT_FOUND;
+		return B_OK;
+	}
+
+	address->fProtocol = fForcedProtocol;
+
+	while (fCurrent != NULL) {
+		if (fCurrent->ai_family == AF_INET) {
+			memcpy(&address->fAddress, fCurrent->ai_addr, sizeof(sockaddr_in));
 			reinterpret_cast<sockaddr_in*>(&address->fAddress)->sin_port
-				= htons(NFS4_PORT);
-		} else if (current->ai_family == AF_INET6) {
-			memcpy(&address->fAddress, current->ai_addr, sizeof(sockaddr_in6));
+				= fForcedPort;
+		} else if (fCurrent->ai_family == AF_INET6) {
+			memcpy(&address->fAddress, fCurrent->ai_addr, sizeof(sockaddr_in6));
 			reinterpret_cast<sockaddr_in6*>(&address->fAddress)->sin6_port
-				= htons(NFS4_PORT);
+				= fForcedPort;
 		} else {
-			current = current->ai_next;
+			fCurrent = fCurrent->ai_next;
 			continue;
 		}
 
-		freeaddrinfo(ai);
+		fCurrent = fCurrent->ai_next;
 		return B_OK;
 	}
 
-	freeaddrinfo(ai);
 	return B_NAME_NOT_FOUND;
 }
 

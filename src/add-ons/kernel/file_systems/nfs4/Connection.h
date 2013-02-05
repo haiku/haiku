@@ -38,9 +38,33 @@ struct PeerAddress {
 
 			const void*			InAddr() const;
 			size_t				InAddrSize() const;
+};
 
-	static	status_t			ResolveName(const char* name,
-									PeerAddress* address);
+struct addrinfo;
+
+class AddressResolver {
+public:
+								AddressResolver(const char* name);
+								~AddressResolver();
+
+			status_t			GetNextAddress(PeerAddress* address);
+
+			void				ForceProtocol(const char* protocol);
+			void				ForcePort(uint16 port);
+
+protected:
+			status_t			ResolveAddress(const char* name);
+
+private:
+			addrinfo*			fHead;
+			addrinfo*			fCurrent;
+
+			PeerAddress			fAddress;
+
+			uint16				fForcedPort;
+			int					fForcedProtocol;
+
+			status_t			fStatus;
 };
 
 class ConnectionBase {

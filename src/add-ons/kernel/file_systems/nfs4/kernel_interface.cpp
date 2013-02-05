@@ -72,7 +72,7 @@ CreateNFS4Server(RPC::Server* serv)
 //	port=X		- connect to port X (default: 2049)
 //	proto=X		- user transport protocol X (default: tcp)
 static status_t
-ParseArguments(const char* _args, PeerAddress* address, char** _path,
+ParseArguments(const char* _args, AddressResolver** address, char** _path,
 	MountConfiguration* conf)
 {
 	if (_args == NULL)
@@ -92,13 +92,15 @@ ParseArguments(const char* _args, PeerAddress* address, char** _path,
 		return B_MISMATCHED_VALUES;
 	*path++ = '\0';
 
-	status_t result = PeerAddress::ResolveName(args, address);
-	if (result != B_OK)
-		return result;
+	*address = new AddressResolver(args);
+	if (*address == NULL)
+		return B_NO_MEMORY;
 
 	*_path = strdup(path);
-	if (*_path == NULL)
+	if (*_path == NULL) {
+		delete *address;
 		return B_NO_MEMORY;
+	}
 
 	conf->fHard = false;
 	conf->fRetryLimit = 5;
@@ -127,10 +129,10 @@ ParseArguments(const char* _args, PeerAddress* address, char** _path,
 			conf->fEmulateNamedAttrs = true;
 		else if (strncmp(options, "port=", 5) == 0) {
 			options += strlen("port=");
-			address->SetPort(atoi(options));
+			(*address)->ForcePort(atoi(options));
 		} else if (strncmp(options, "proto=", 6) == 0) {
 			options += strlen("proto=");
-			address->SetProtocol(options);
+			(*address)->ForceProtocol(options);
 		}
 
 		options = optionsEnd;
@@ -165,16 +167,17 @@ nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 	}
 	locker.Unlock();
 
-	PeerAddress address;
+	AddressResolver* resolver;
 	MountConfiguration config;
 	char* path;
-	result = ParseArguments(args, &address, &path, &config);
+	result = ParseArguments(args, &resolver, &path, &config);
 	if (result != B_OK)
 		return result;
 	MemoryDeleter pathDeleter(path);
 
 	RPC::Server* server;
-	result = gRPCServerManager->Acquire(&server, address, CreateNFS4Server);
+	result = gRPCServerManager->Acquire(&server, resolver, CreateNFS4Server);
+	delete resolver;
 	if (result != B_OK)
 		return result;
 	

@@ -312,7 +312,24 @@ ServerManager::~ServerManager()
 
 
 status_t
-ServerManager::Acquire(Server** _server, const PeerAddress& address,
+ServerManager::Acquire(Server** _server, AddressResolver* resolver,
+	ProgramData* (*createPrivateData)(Server*))
+{
+	PeerAddress address;
+	status_t result;
+
+	while ((result = resolver->GetNextAddress(&address)) == B_OK) {
+		result = _Acquire(_server, address, createPrivateData);
+		if (result == B_OK)
+			break;
+	}
+
+	return result;
+}
+
+
+status_t
+ServerManager::_Acquire(Server** _server, const PeerAddress& address,
 	ProgramData* (*createPrivateData)(Server*))
 {
 	ASSERT(_server != NULL);

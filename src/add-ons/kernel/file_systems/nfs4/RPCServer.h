@@ -171,11 +171,13 @@ public:
 						ServerManager();
 						~ServerManager();
 
-			status_t	Acquire(Server** _server, const PeerAddress& address,
+			status_t	Acquire(Server** _server, AddressResolver* resolver,
 								ProgramData* (*createPrivateData)(Server*));
 			void		Release(Server* server);
 
 private:
+			status_t	_Acquire(Server** _server, const PeerAddress& address,
+								ProgramData* (*createPrivateData)(Server*));
 
 			ServerNode*	_Find(const PeerAddress& address);
 			void		_Delete(ServerNode* node);

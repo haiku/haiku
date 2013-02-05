@@ -257,14 +257,11 @@ FileSystem::Migrate(const RPC::Server* serv)
 		= reinterpret_cast<FSLocations*>(values[0].fData.fLocations);
 
 	RPC::Server* server = fServer;
-	PeerAddress addr = fServer->ID();
 	for (uint32 i = 0; i < locs->fCount; i++) {
 		for (uint32 j = 0; j < locs->fLocations[i].fCount; j++) {
-			if (PeerAddress::ResolveName(locs->fLocations[i].fLocations[j],
-				&addr) != B_OK)
-				continue;
+			AddressResolver resolver(locs->fLocations[i].fLocations[j]);
 
-			if (gRPCServerManager->Acquire(&fServer, addr,
+			if (gRPCServerManager->Acquire(&fServer, &resolver,
 					CreateNFS4Server) == B_OK) {
 
 				free(const_cast<char*>(fPath));
