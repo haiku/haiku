@@ -1714,6 +1714,9 @@ ShowImageView::_DoImageOperation(ImageProcessor::operation op, bool quiet)
 	_DeleteBitmap();
 	fBitmap = bm;
 
+	if (fBitmap->ColorSpace() == B_RGBA32)
+		fDisplayBitmap = compose_checker_background(fBitmap);
+
 	if (!quiet) {
 		// remove selection
 		_SetHasSelection(false);
