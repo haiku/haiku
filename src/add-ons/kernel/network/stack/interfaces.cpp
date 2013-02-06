@@ -933,6 +933,11 @@ Interface::SetDown()
 	if ((flags & IFF_UP) == 0)
 		return;
 
+	// TODO: We acquire also the net_interfaces lock here
+	// to avoid a lock inversion in the ipv6 protocol implementation
+	// (see ticket #9377).
+	// A better solution would be to avoid locking the interface lock (fLock)
+	// when calling the lower layers.
 	RecursiveLocker interfacesLocker(sLock);
 	RecursiveLocker locker(fLock);
 
