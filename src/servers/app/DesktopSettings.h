@@ -47,7 +47,16 @@ public:
 
 			mode_mouse			MouseMode() const;
 			mode_focus_follows_mouse FocusFollowsMouseMode() const;
-			bool				FocusFollowsMouse() const;
+
+			bool				NormalMouse() const
+									{ return MouseMode() == B_NORMAL_MOUSE; }
+			bool				FocusFollowsMouse() const
+									{ return MouseMode()
+										== B_FOCUS_FOLLOWS_MOUSE; }
+			bool				ClickToFocusMouse() const
+									{ return MouseMode()
+										== B_CLICK_TO_FOCUS_MOUSE; }
+
 			bool				AcceptFirstClick() const;
 
 			bool				ShowAllDraggers() const;
