@@ -13,7 +13,7 @@
 /*!
 	\file Locker.h
 	\ingroup support
-	\ingroup libroot
+	\ingroup libbe
 	\brief Provides locking class BLocker.
 */
 
@@ -21,7 +21,7 @@
 /*!
 	\class BLocker
 	\ingroup support
-	\ingroup libroot
+	\ingroup libbe
 	\brief Semaphore-type class for thread safety.
 
 	The BLocker interface is not merely a wrapper around a semaphore, but it

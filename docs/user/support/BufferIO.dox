@@ -15,7 +15,7 @@
 /*!
 	\file BufferIO.h
 	\ingroup support
-	\ingroup libroot
+	\ingroup libbe
 	\brief Provides the BBufferIO class.
 */
 
@@ -23,7 +23,7 @@
 /*!
 	\class BBufferIO
 	\ingroup support
-	\ingroup libroot
+	\ingroup libbe
 	\brief A buffered adapter for BPositionIO objects.
 
 	This class differs from other classes derived from BPositionIO in a sense

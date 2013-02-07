@@ -14,7 +14,7 @@
 /*!
 	\file MessageFilter.h
 	\ingroup app
-	\ingroup libroot
+	\ingroup libbe
 	\brief Provides BMessageFilter class.
 */
 
@@ -143,7 +143,7 @@
 /*!
 	\class BMessageFilter
 	\ingroup app
-	\ingroup libroot
+	\ingroup libbe
 	\brief Describes a message filter for BLooper and BHandler.
 
 	Objects of this class serve as a description of properties that incoming

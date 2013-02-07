@@ -16,7 +16,7 @@
 /*!
 	\file String.h
 	\ingroup support
-	\ingroup libroot
+	\ingroup libbe
 	\brief Defines the BString class and global operators and functions for
 		handling strings.
 */
@@ -24,7 +24,7 @@
 /*!
 	\class BString String.h
 	\ingroup support
-	\ingroup libroot
+	\ingroup libbe
 	\brief String class supporting common string operations.
 
 	BString is a string allocation and manipulation class. The object

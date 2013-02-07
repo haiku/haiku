@@ -18,7 +18,7 @@
  /*!
 	\file BlockCache.h
 	\ingroup support
-	\ingroup libroot
+	\ingroup libbe
 	\brief Implements a mechanism to store and retrieve memory blocks.
 */
 
@@ -40,7 +40,7 @@
 /*!
 	\class BBlockCache
 	\ingroup support
-	\ingroup libroot
+	\ingroup libbe
 	\brief A class that creates and maintains a pool of memory blocks.
 
 	In some performance critical code there might come a time where you require

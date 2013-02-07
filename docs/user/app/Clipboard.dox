@@ -15,7 +15,7 @@
 /*!
 	\file Clipboard.h
 	\ingroup app
-	\ingroup libroot
+	\ingroup libbe
 	\brief Provides the BClipboard class.
 */
 
@@ -29,7 +29,7 @@
 /*!
 	\class BClipboard
 	\ingroup app
-	\ingroup libroot
+	\ingroup libbe
 	\brief Used for short-term data storage between documents and
 		applications via copy and paste operations.
 

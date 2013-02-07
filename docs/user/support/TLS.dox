@@ -13,7 +13,7 @@
 /*!
 	\file TLS.h
 	\ingroup support
-	\ingroup libroot
+	\ingroup libbe
 	\brief Functions to use Thread Local Storage.
 
 	The Thread Local Storage API provides convenient methods to transform global

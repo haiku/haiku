@@ -13,7 +13,7 @@
 /*!
 	\file MessageQueue.h
 	\ingroup app
-	\ingroup libroot
+	\ingroup libbe
 	\brief Provides the BMessageQueue class.
 */
 
@@ -21,7 +21,7 @@
 /*!
 	\class BMessageQueue
 	\ingroup app
-	\ingroup libroot
+	\ingroup libbe
 	\brief A container that maintains a queue of messages.
 
 	This class is used by BLooper to maintain a queue of messages that need to

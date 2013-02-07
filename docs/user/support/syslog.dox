@@ -14,7 +14,7 @@
 /*!
 	\file syslog.h
 	\ingroup support
-	\ingroup libroot
+	\ingroup libbe
 	\brief System logging capabilities
 
 	The functions described here are interacting with the syslog_daemon, a server

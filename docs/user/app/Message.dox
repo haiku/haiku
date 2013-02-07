@@ -14,11 +14,13 @@
 /*!
 	\file Message.h
 	\ingroup app
-	\ingroup libroot
+	\ingroup libbe
 	\brief Provides the BMessage class.
 */
 
+
 ///// Name lengths and Scripting specifiers /////
+
 
 /*!
 	\def B_FIELD_NAME_LENGTH
@@ -92,7 +94,7 @@
 /*!
 	\class BMessage
 	\ingroup app
-	\ingroup libroot
+	\ingroup libbe
 	\brief A container that can be send and received using the Haiku messaging
 		subsystem.
 

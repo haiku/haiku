@@ -13,7 +13,7 @@
 /*!
 	\file Looper.h
 	\ingroup app
-	\ingroup libroot
+	\ingroup libbe
 	\brief Provides the BLooper class.
 */
 
@@ -27,7 +27,7 @@
 /*!
 	\class BLooper
 	\ingroup app
-	\ingroup libroot
+	\ingroup libbe
 	\brief Receive and process messages in a separate thread.
 	
 	When an object of this class is created, the message loop can be started

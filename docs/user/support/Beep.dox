@@ -19,7 +19,7 @@
 /*!
 	\file Beep.h
 	\ingroup support
-	\ingroup libroot
+	\ingroup libbe
 	\brief Functions to generate sounds from the computer.
 */
 

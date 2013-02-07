@@ -14,7 +14,7 @@
 /*!
 	\file Cursor.h
 	\ingroup app
-	\ingroup libroot
+	\ingroup libbe
 	\brief Provides the BCursor class.
 */
 
@@ -202,7 +202,7 @@
 /*!
 	\class BCursor
 	\ingroup app
-	\ingroup libroot
+	\ingroup libbe
 	\brief BCursor describes a view-wide or application-wide cursor.
 
 	\note As BeOS only supports 16x16 monochrome cursors, to see a nice

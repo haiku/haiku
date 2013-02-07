@@ -13,7 +13,7 @@
 /*!
 	\file TypeConstants.h
 	\ingroup support
-	\ingroup libroot
+	\ingroup libbe
 	\brief Represents typecodes that are used in various part of the Haiku API.
 
 	The type codes all refer to a specified type, except one. B_ANY_TYPE can

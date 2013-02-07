@@ -14,7 +14,7 @@
 /*!
 	\file Application.h
 	\ingroup app
-	\ingroup libroot
+	\ingroup libbe
 	\brief Provides the BApplication class.
 */
 
@@ -22,7 +22,7 @@
 /*!
 	\class BApplication
 	\ingroup app
-	\ingroup libroot
+	\ingroup libbe
 	\brief A container object for an application.
 
 	A BApplication establishes a connection between the application and the

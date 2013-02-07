@@ -13,7 +13,7 @@
 /*!
 	\file Autolock.h
 	\ingroup support
-	\ingroup libroot
+	\ingroup libbe
 	\brief Implements a handy locking utility.
 */
 
@@ -21,7 +21,7 @@
 /*!
 	\class BAutolock
 	\ingroup support
-	\ingroup libroot
+	\ingroup libbe
 	\brief Convenient utility to make parts of your code thread-safe easily.
 
 	The autolocker uses a BLooper or a BLocker in order to protect a part

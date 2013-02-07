@@ -13,7 +13,7 @@
 /*!
 	\file Handler.h
 	\ingroup app
-	\ingroup libroot
+	\ingroup libbe
 	\brief Provides the BHandler class.
 */
 
@@ -55,7 +55,7 @@
 /*!
 	\class BHandler
 	\ingroup app
-	\ingroup libroot
+	\ingroup libbe
 	\brief Handles messages that are passed on by a BLooper.
 
 	The BHandler class implements two important pieces of functionality. It

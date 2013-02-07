@@ -19,7 +19,7 @@
 /*!
 	\file List.h
 	\ingroup support
-	\ingroup libroot
+	\ingroup libbe
 	\brief Defines the BList class.
 */
 
@@ -27,7 +27,7 @@
 /*!
 	\class BList
 	\ingroup support
-	\ingroup libroot
+	\ingroup libbe
 	\brief An ordered container that is designed to hold generic \c void* 
 		objects.
 

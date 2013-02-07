@@ -19,7 +19,7 @@
 /*!
 	\file Archivable.h
 	\ingroup support
-	\ingroup libroot
+	\ingroup libbe
 	\brief Provides the BArchivable interface and declares the BArchiver and
 		BUnarchiver classes.
 */
@@ -28,7 +28,7 @@
 /*!
 	\class BArchivable
 	\ingroup support
-	\ingroup libroot
+	\ingroup libbe
 	\brief Interface for objects that can be archived into a BMessage.
 
 	BArchivable provides an interface for objects that can be put into message

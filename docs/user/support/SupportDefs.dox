@@ -13,7 +13,7 @@
 /*!
 	\file SupportDefs.h
 	\ingroup support
-	\ingroup libroot
+	\ingroup libbe
 	\brief Defines basic types and definitions for the Haiku API.
 */
 

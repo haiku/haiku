@@ -14,7 +14,7 @@
 /*!
 	\file StopWatch.h
 	\ingroup support
-	\ingroup libroot
+	\ingroup libbe
 	\brief Provides the BStopWatch class.
 */
 
@@ -22,7 +22,7 @@
 /*!
 	\class BStopWatch
 	\ingroup support
-	\ingroup libroot
+	\ingroup libbe
 	\brief A timer class.
 
 	This class provides method to time events. The interface is designed to 

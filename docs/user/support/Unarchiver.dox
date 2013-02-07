@@ -14,7 +14,7 @@
 /*!
 	\file Archivable.h
 	\ingroup support
-	\ingroup libroot
+	\ingroup libbe
 	\brief Contains BUnarchiver class used to simplify the unarchiving of
 		   complicated BArchivable hierarchies.
 */
@@ -23,7 +23,7 @@
 /*!
 	\class BUnarchiver
 	\ingroup support
-	\ingroup libroot
+	\ingroup libbe
 	\brief A class that simplifies the unarchiving of complicated BArchivable
 		   hierarchies.
 
