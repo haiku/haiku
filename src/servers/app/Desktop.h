@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku.
+ * Copyright 2001-2013, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -265,7 +265,8 @@ private:
 			void				_UpdateBack();
 			void				_UpdateFront(bool updateFloating = true);
 			void				_UpdateFronts(bool updateFloating = true);
-			bool				_WindowHasModal(Window* window);
+			bool				_WindowHasModal(Window* window) const;
+			bool				_WindowCanHaveFocus(Window* window) const;
 
 			void				_WindowChanged(Window* window);
 			void				_WindowRemoved(Window* window);
