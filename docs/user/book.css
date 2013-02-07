@@ -282,6 +282,17 @@ div.contents div.dynheader {
 	margin-bottom: 16px;
 }
 
+div.contents div.dyncontent {
+	width: 100%;
+	border: 1px solid #c7c7c7; /* silver */
+	overflow: auto;
+}
+
+div.contents div.dyncontent div.center {
+	text-align: center;
+	margin: 16px;
+}
+
 div.contents span.keycap, div.contents span.keysym {
 	-webkit-border-radius: 3px;
 	-khtml-border-radius: 3px;	
