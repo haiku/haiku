@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Haiku Inc. All rights reserved.
+ * Copyright 2010-2013 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _B_NETWORK_COOKIE_JAR_H_
@@ -24,7 +24,7 @@ public:
 			class UrlIterator;
 			struct PrivateIterator;
 			struct PrivateHashMap;
-	
+
 public:
 								BNetworkCookieJar();
 								BNetworkCookieJar(
@@ -34,16 +34,15 @@ public:
 								BNetworkCookieJar(BMessage* archive);
 	virtual						~BNetworkCookieJar();
 
-			bool				AddCookie(const BNetworkCookie& cookie);
-			bool				AddCookie(BNetworkCookie* cookie);			
-			bool				AddCookies(
-									const BNetworkCookieList& cookies);
+			status_t			AddCookie(const BNetworkCookie& cookie);
+			status_t			AddCookie(BNetworkCookie* cookie);
+			status_t			AddCookies(const BNetworkCookieList& cookies);
 
 			uint32				DeleteOutdatedCookies();
 			uint32				PurgeForExit();
 
 	// BArchivable members
-	virtual	status_t			Archive(BMessage* into, 
+	virtual	status_t			Archive(BMessage* into,
 									bool deep = true) const;
 	static	BArchivable*		Instantiate(BMessage* archive);
 
@@ -54,20 +53,20 @@ public:
 	virtual	status_t			Flatten(void* buffer, ssize_t size)
 									const;
 	virtual	bool				AllowsTypeCode(type_code code) const;
-	virtual	status_t			Unflatten(type_code code, 
+	virtual	status_t			Unflatten(type_code code,
 									const void* buffer, ssize_t size);
 
 	// Iterators
 			Iterator			GetIterator() const;
 			UrlIterator			GetUrlIterator(const BUrl& url) const;
-			
+
 private:
 			void				_DoFlatten() const;
-	
+
 private:
 	friend	class Iterator;
 	friend	class UrlIterator;
-	
+
 			PrivateHashMap*		fCookieHashMap;
 	mutable	BString				fFlattened;
 };
@@ -117,7 +116,7 @@ private:
 								UrlIterator(const BNetworkCookieJar* map,
 									const BUrl& url);
 
-			bool				_SupDomain();
+			bool				_SuperDomain();
 			void 				_FindNext();
 			void				_FindDomain();
 			bool				_FindPath();
@@ -131,10 +130,10 @@ private:
 			BNetworkCookieList* fLastList;
 			BNetworkCookie*		fElement;
 			BNetworkCookie*		fLastElement;
-			
+
 			int32				fIndex;
 			int32				fLastIndex;
-			
+
 			BUrl				fUrl;
 };
 

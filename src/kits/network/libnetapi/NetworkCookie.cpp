@@ -100,14 +100,15 @@ BNetworkCookie::ParseCookieStringFromUrl(const BString& string,
 
 	// Parse the name and value of the cookie
 	index = _ExtractNameValuePair(string, name, value, index);
-	// The set-cookie-string is not valid
-	if (index == -1)
+	if (index == -1) {
+		// The set-cookie-string is not valid
 		return *this;
+	}
 
 	SetName(name);
 	SetValue(value);
 
-	// Parse the remaining cookie attributes
+	// Parse the remaining cookie attributes.
 	while (index < string.Length()) {
 		ASSERT(string[index] == ';');
 		index++;
@@ -119,12 +120,12 @@ BNetworkCookie::ParseCookieStringFromUrl(const BString& string,
 		else if (name.ICompare("httponly") == 0)
 			SetHttpOnly(true);
 
-		// The following attributes require a value
+		// The following attributes require a value.
 		if (value.IsEmpty())
 			continue;
 
 		if (name.ICompare("max-age") == 0) {
-			// Validate the max-age value
+			// Validate the max-age value.
 			char* end = NULL;
 			long maxAge = strtol(value.String(), &end, 10);
 			if (*end == '\0')
@@ -132,20 +133,31 @@ BNetworkCookie::ParseCookieStringFromUrl(const BString& string,
 		} else if (name.ICompare("expires") == 0) {
 			BHttpTime date(value);
 			SetExpirationDate(date.Parse());
-		} else if (name.ICompare("domain") == 0)
+		} else if (name.ICompare("domain") == 0) {
 			SetDomain(value);
-		else if (name.ICompare("path") == 0)
+		} else if (name.ICompare("path") == 0) {
 			SetPath(value);
+		}
 	}
 
-	// If no domain was specified, we set a host-only domain from the URL
+	// If no domain was specified, we set a host-only domain from the URL.
 	if (!HasDomain()) {
 		SetDomain(url.Host());
 		fHostOnly = true;
+	} else {
+		// Otherwise the setting URL must domain-match the domain it set.
+		if (!IsValidForDomain(url.Host())) {
+			// Invalidate the cookie.
+			_Reset();
+			return *this;
+		}
+		// We should also reject cookies with domains that match public
+		// suffixes.
 	}
 
-	// If no path was specified we compute the default path from the URL
-	if (!HasPath())
+	// If no path was specified or the path is invalid, we compute the default
+	// path from the URL.
+	if (!HasPath() || Path()[0] != '/')
 		SetPath(_DefaultPathForUrl(url));
 
 	return *this;
@@ -187,6 +199,7 @@ BNetworkCookie::SetValue(const BString& value)
 BNetworkCookie&
 BNetworkCookie::SetPath(const BString& path)
 {
+	// TODO: canonicalize the path
 	fPath = path;
 	fRawFullCookieValid = false;
 	return *this;
@@ -196,12 +209,9 @@ BNetworkCookie::SetPath(const BString& path)
 BNetworkCookie&
 BNetworkCookie::SetDomain(const BString& domain)
 {
+	// TODO: canonicalize the domain
 	fDomain = domain;
 	fHostOnly = false;
-
-	//  We always use pre-dotted domains for tail matching
-	if (fDomain.ByteAt(0) != '.')
-		fDomain.Prepend(".");
 
 	fRawFullCookieValid = false;
 	return *this;
@@ -387,13 +397,10 @@ BNetworkCookie::IsValid() const
 bool
 BNetworkCookie::IsValidForUrl(const BUrl& url) const
 {
-	if (IsSecure() && url.Protocol() != "https")
+	if (Secure() && url.Protocol() != "https")
 		return false;
 
-	BString urlHost = url.Host();
-	BString urlPath = url.Path();
-
-	return IsValidForDomain(urlHost) && IsValidForPath(urlPath);
+	return IsValidForDomain(url.Host()) && IsValidForPath(url.Path());
 }
 
 
