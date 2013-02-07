@@ -22,7 +22,7 @@
 /*!
 	\class BApplication
 	\ingroup app
-	\ingroup libbe
+	\ingroup libroot
 	\brief A container object for an application.
 
 	A BApplication establishes a connection between the application and the

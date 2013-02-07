@@ -23,7 +23,7 @@
 /*!
 	\class BUnarchiver
 	\ingroup support
-	\ingroup libbe
+	\ingroup libroot
 	\brief A class that simplifies the unarchiving of complicated BArchivable
 		   hierarchies.
 

@@ -15,7 +15,7 @@
 /*!
 	\file DataIO.h
 	\ingroup support
-	\ingroup libbe
+	\ingroup libroot
 	\brief Defines abstract BDataIO and BPositionIO and the derived BMallocIO and BMemoryIO classes.
 
 	Pure virtual BDataIO and BPositioIO classes provide
@@ -32,7 +32,7 @@
 /*!
 	\class BDataIO
 	\ingroup support
-	\ingroup libbe
+	\ingroup libroot
 	\brief Abstract interface for objects that provide read and write access to 
 		   data.
 

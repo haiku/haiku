@@ -27,7 +27,7 @@
 /*!
 	\class BLooper
 	\ingroup app
-	\ingroup libbe
+	\ingroup libroot
 	\brief Receive and process messages in a separate thread.
 	
 	When an object of this class is created, the message loop can be started

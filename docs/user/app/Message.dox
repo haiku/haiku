@@ -92,7 +92,7 @@
 /*!
 	\class BMessage
 	\ingroup app
-	\ingroup libbe
+	\ingroup libroot
 	\brief A container that can be send and received using the Haiku messaging
 		subsystem.
 

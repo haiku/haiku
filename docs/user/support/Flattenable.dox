@@ -14,7 +14,7 @@
 /*!
 	\file Flattenable.h
 	\ingroup support
-	\ingroup libbe
+	\ingroup libroot
 	\brief Provides the BFlattenable interface
 */
 
@@ -22,7 +22,7 @@
 /*!
 	\class BFlattenable
 	\ingroup support
-	\ingroup libbe
+	\ingroup libroot
 	\brief Interface for classes that can flatten and unflatten themselves to
 		   a stream of bytes.
 

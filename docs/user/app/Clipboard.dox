@@ -29,7 +29,7 @@
 /*!
 	\class BClipboard
 	\ingroup app
-	\ingroup libbe
+	\ingroup libroot
 	\brief Used for short-term data storage between documents and
 		applications via copy and paste operations.
 

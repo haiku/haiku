@@ -202,7 +202,7 @@
 /*!
 	\class BCursor
 	\ingroup app
-	\ingroup libbe
+	\ingroup libroot
 	\brief BCursor describes a view-wide or application-wide cursor.
 
 	\note As BeOS only supports 16x16 monochrome cursors, to see a nice

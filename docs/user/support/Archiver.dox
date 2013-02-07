@@ -14,7 +14,7 @@
 /*!
 	\file Archivable.h
 	\ingroup support
-	\ingroup libbe
+	\ingroup libroot
 	\brief Contains BArchiver class.
 */
 
@@ -22,7 +22,7 @@
 /*!
 	\class BArchiver
 	\ingroup support
-	\ingroup libbe
+	\ingroup libroot
 	\brief A class that simplifies the archiving of complicated BArchivable
 		hierarchies.
 

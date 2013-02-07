@@ -13,14 +13,15 @@
 /*!
 	\file Locker.h
 	\ingroup support
-	\ingroup libbe
+	\ingroup libroot
 	\brief Provides locking class BLocker.
 */
+
 
 /*!
 	\class BLocker
 	\ingroup support
-	\ingroup libbe
+	\ingroup libroot
 	\brief Semaphore-type class for thread safety.
 
 	The BLocker interface is not merely a wrapper around a semaphore, but it
@@ -29,10 +30,10 @@
 	because before it uses the internal semaphore, it first checks against a
 	variable that is only operated on with atomic operations. Setting a variable
 	is a lot more efficient than acquiring a semaphore, thus this type of locking
-	is much prefered. 
+	is much preferred.
 
 	It basically works as follows. Whenever you newly created BLocker object
-	recieves a locking request, it atomically sets the benaphore variable to 
+	receives a locking request, it atomically sets the benaphore variable to
 	\c 1. Then only additional calls from different threads will utilize the
 	semaphore. You can imagine that in many cases where you protect
 	of data that \em might be accessed by two or more concurrent threads, but
@@ -42,7 +43,7 @@
 	The other feature of BLocker that improves basic semaphore handling is that
 	it allows for recursive locks. The following piece of code works with a
 	BLocker, but block inevitably with a semaphore. Let's pretend I call
- \c Water():
+	\c Water():
 
 \code
 status_t
@@ -76,12 +77,13 @@ Flower::Water(int amount)
 	pair every Lock() with an Unlock() though, or you'll create a deadlock.
 */
 
+
 /*!
 	\fn BLocker::BLocker()
 	\brief Constructor.
 
-	Create a new BLocker with the default name of <tt>some BLocker</tt>. This
-	BLocker will use the benaphore-style locking. 
+	Create a new BLocker with the default name of some BLocker. This
+	BLocker will use the benaphore-style locking.
 
 	\note For debugging purposes, it's extremely convenient to actually give a
     name to the object. In case of a deadlock, it's easier to track down which
@@ -89,6 +91,7 @@ Flower::Water(int amount)
 
 	\see BLocker(const char* name, bool benaphoreStyle) for all the options.
 */
+
 
 /*!
 	\fn BLocker::BLocker(const char* name)
@@ -103,6 +106,7 @@ Flower::Water(int amount)
 
 	\see BLocker(const char* name, bool benaphoreStyle) for all the options.
 */
+
 
 /*!
 	\fn BLocker::BLocker(bool benaphoreStyle)
@@ -123,6 +127,7 @@ Flower::Water(int amount)
 		 to set a name.
 */
 
+
 /*!
 	\fn BLocker::BLocker(const char* name, bool benaphoreStyle)
 	\brief Constructor.
@@ -137,26 +142,29 @@ Flower::Water(int amount)
 		   for its functioning.
 */
 
+
 /*!
 	\fn virtual BLocker::~BLocker()
 	\brief Destructor.
 
 	Release the internal semaphore. Because of this, any pending Lock() calls
 	from other threads be cancelled. The return code will be \c false for 
-	those calls. 
+	those calls.
 */
+
 
 /*!
 	\fn bool BLocker::Lock()
 	\brief Add a lock request and block on it until we get it.
 
-	\retval true Lock acquired succesfully.
+	\retval true Lock acquired successfully.
 	\retval false Failed to acquire the lock. Most probable cause is that the
 			object is deleted. This frees the semaphore and releases the
 			pending Lock() requests.
 
 	\see LockWithTimeout(bigtime_t timeout), Unlock()
 */
+
 
 /*!
 	\fn status_t BLocker::LockWithTimeout(bigtime_t timeout)
@@ -168,16 +176,19 @@ Flower::Water(int amount)
 	\see Lock(), Unlock()
 */
 
+
 /*!
 	\fn void BLocker::Unlock(void)
 	\brief Release the lock that's currently held.
 */
+
 
 /*!
 	\fn thread_id BLocker::LockingThread(void) const
 	\brief Return the \c thread_id of the thread that's currently holding the 
 		   lock.
 */
+
 
 /*!
 	\fn bool BLocker::IsLocked(void) const
@@ -188,15 +199,18 @@ Flower::Water(int amount)
 	\retval false The object is unlocked or the lock is held by another thread.
 */
 
+
 /*!
 	\fn int32 BLocker::CountLocks(void) const
 	\brief Return the number of recursive locks that are currently held.
 */
 
+
 /*!
 	\fn nt32 BLocker::CountLockRequests(void) const
 	\brief Return the number of threads with a pending lock request.
 */
+
 
 /*!
 	\fn sem_id BLocker::Sem(void) const

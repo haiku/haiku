@@ -143,7 +143,7 @@
 /*!
 	\class BMessageFilter
 	\ingroup app
-	\ingroup libbe
+	\ingroup libroot
 	\brief Describes a message filter for BLooper and BHandler.
 
 	Objects of this class serve as a description of properties that incoming
@@ -334,4 +334,3 @@ looper->AddCommonFilter(filter);
 	\fn BLooper *BMessageFilter::Looper() const
 	\brief Return the looper this filter is associated with.
 */
-
