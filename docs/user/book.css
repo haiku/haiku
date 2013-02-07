@@ -279,7 +279,12 @@ div.contents code {
 }
 
 div.contents div.dynheader {
-	margin-bottom: 16px;
+	color: #0c3762; /* madison */
+	font-size: 1.3em;
+	font-weight: normal;
+	border-bottom: dotted thin #c0c0c0; /* silver */
+	margin-top: 1em;
+	margin-bottom: 1em;
 }
 
 div.contents div.dyncontent {
