@@ -13,7 +13,7 @@
 /*!
 	\file parsedate.h
 	\ingroup support
-	\ingroup libbe
+	\ingroup libroot
 	\brief Date parsing functions
 
 	This is a set a functions for parsing date strings in various formats.

@@ -3,18 +3,17 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *	Axel Dörfler
- *	Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *		Axel Dörfler
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  *
  * Corresponds to:
- *	headers/posix/syslog.h	rev 6684
+ *		headers/posix/syslog.h	rev 6684
  */
 
 
 /*!
 	\file syslog.h
-	\ingroup support
-	\ingroup libbe
+	\ingroup libroot
 	\brief System logging capabilities
 
 	The functions described here are interacting with the syslog_daemon, a server
@@ -280,7 +279,8 @@
 //! @}
 
 
-/*!	\name Priorities for syslog(), log_team() and log_thread()
+/*!
+	\name Priorities for syslog(), log_team() and log_thread()
 */
 
 

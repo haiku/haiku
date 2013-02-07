@@ -639,6 +639,7 @@ INPUT                  = . \
                          media \
                          midi \
                          midi2 \
+                         posix \
                          storage \
                          support \
                          translation \
