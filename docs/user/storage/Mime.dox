@@ -23,7 +23,6 @@
 /*!
 	\enum icon_size
 	\ingroup storage
-	\ingroup libbe
 	\brief Legacy BeOS icon size constants.
 */
 

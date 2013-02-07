@@ -22,7 +22,6 @@
 /*!
 	\enum border_style
 	\ingroup interface
-	\ingroup libbe
 
 	Collection of flags that determine the border style drawn around a BBox.
 */

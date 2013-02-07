@@ -22,7 +22,6 @@
 /*!
 	\enum file_panel_mode
 	\ingroup storage
-	\ingroup libbe
 	\brief Whether the file panel is a save or open panel.
 */
 
@@ -44,7 +43,6 @@
 /*!
 	\enum file_panel_button
 	\ingroup storage
-	\ingroup libbe
 	\brief List of buttons used by the file panel
 */
 

@@ -54,7 +54,6 @@
 /*!
 	\enum font_direction
 	\ingroup interface
-	\ingroup libbe
 
 	Determines the direction of the text rendered by the font,
 	left-to-right or right-to-left.
@@ -305,7 +304,6 @@
 /*!
 	\enum font_file_format
 	\ingroup interface
-	\ingroup libbe
 
 	Font file format, TrueType™ or PostScript™ Type1.
 

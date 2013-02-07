@@ -22,7 +22,6 @@
 /*!
 	\enum color_control_layout
 	\ingroup interface
-	\ingroup libbe
 
 	Enumeration of the color control layout options.
 */

@@ -22,7 +22,6 @@
 /*!
 	\enum alert_type
 	\ingroup interface
-	\ingroup libbe
 
 	Determines which icon (if any) is displayed in the alert dialog.
 	Choose one option. If the constructor doesn't include an
@@ -70,7 +69,6 @@
 /*!
 	\enum button_spacing
 	\ingroup interface
-	\ingroup libbe
 
 	Determines how the buttons on the alert dialog are spaced relative
 	to each other. Choose one option. If the constructor doesn't include a

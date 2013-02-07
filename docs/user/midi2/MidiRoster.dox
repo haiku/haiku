@@ -9,7 +9,6 @@
 /*!
 	\enum BMidiOp
 	\ingroup midi2
-	\ingroup libbe
 	\brief Defines the status codes for MIDI Server notification messages.
 
 	These codes are used when you request notification as in
