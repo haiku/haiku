@@ -6,6 +6,7 @@
 #define BASIC_TERMINAL_BUFFER_H
 
 #include <limits.h>
+#include <stack>
 
 #include "HistoryBuffer.h"
 #include "TermPos.h"
@@ -223,7 +224,7 @@ protected:
 
 			// cursor position (origin: (0, 0))
 			TermPos				fCursor;
-			TermPos				fSavedCursor;
+			std::stack<TermPos>	fSavedCursors;
 			bool				fSoftWrappedCursor;
 
 			bool				fOverwriteMode;	// false for insert
