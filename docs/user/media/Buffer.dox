@@ -1,24 +1,28 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		John Scipione, jscipione@gmail.com
  * 
  * Corresponds to:
- *		/trunk/headers/os/media/Buffer.h	 rev 42274
- *		/trunk/src/kits/media/Buffer.cpp	 rev 42274
+ *		headers/os/media/Buffer.h	 rev 42274
+ *		src/kits/media/Buffer.cpp	 rev 42274
  */
 
 
 /*!
 	\file Buffer.h
+	\ingroup media
+	\ingroup libbe
 	\brief Defines the buffer_clone_info struct and BBuffer class.
 */
 
 
 /*!
 	\struct buffer_clone_info
+	\ingroup media
+	\ingroup libbe
 	\brief A struct that stores where in memory a BBuffer object is in memory
 		as well as the buffer flags.
 */
@@ -27,8 +31,9 @@
 /*!
 	\class BBuffer
 	\ingroup media
+	\ingroup libbe
 	\brief A reference to a chunk of memory useful for sharing media data
-		between applications and nodes.
+		   between applications and nodes.
 */
 
 

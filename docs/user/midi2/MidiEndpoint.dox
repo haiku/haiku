@@ -1,0 +1,322 @@
+/*!
+	\file MidiEndpoint.h
+	\ingroup midi2
+	\ingroup libbe
+	\brief Defines the Baseclass of all MIDI consumers and producers.
+*/
+
+
+/*!
+	\class BMidiEndpoint
+	\ingroup midi2
+	\ingroup libmidi2
+	\ingroup libbe
+	\brief Base class for all MIDI endpoints.
+
+	BMidiEndpoint is the abstract base class that represents either a
+	producer or consumer endpoint. It may be used to obtain the state, name,
+	properties, or system-wide ID of the object. BMidiEndpoint also provides
+	the ability to change the name and properties of endpoints that were
+	created locally.
+
+	Remember, you cannot call the destructor of BMidiEndpoint and its
+	subclasses directly. Endpoint objects are destructed automatically when
+	their reference count drops to zero. If necessary, the destructor of a
+	local endpoint first breaks off any connections and Unregister()'s the
+	endpoint before it is deleted. However, for good style and bonus points
+	you should really \link BMidiProducer::Disconnect() Disconnect() \endlink
+	and Unregister() the object yourself and not rely on the destructor to
+	do this.
+*/
+
+/*!
+	\fn const char* BMidiEndpoint::Name() const
+	\brief Returns the name of the endpoint.
+
+	The function never returns NULL. If you created a local endpoint by
+	passing a \c NULL name into its constructor (or passing no name,
+	which is the same thing), then Name() will return an empty string,
+	not \c NULL.
+
+	\sa SetName()
+*/
+
+/*!
+	\fn void BMidiEndpoint::SetName(const char* name)
+	\brief Changes the name of the endpoint.
+
+	Names don't have to be unique, but it is recommended that you give any
+	endpoints you publish meaningful and unique names, so users can easily
+	recognize what each endpoint does. There is no limit to the size of
+	endpoint names.
+
+	Even though you can call this function on both remote and local objects,
+	you are only allowed to change the names of local endpoints; SetName()
+	calls on remote endpoints are ignored.
+
+	\param name The new name. If you pass \c NULL the name won't be changed.
+
+	\sa Name()
+*/
+
+/*!
+	\fn int32 BMidiEndpoint::ID() const
+	\brief Returns the ID of the endpoint
+
+	An ID uniquely identifies an endpoint in the system. The ID is a signed
+	32-bit number that is assigned by the Midi Server when the endpoint is
+	created. (So even if a local endpoint is not published, it still has a
+	unique ID.) Valid IDs range from 1 to 0x7FFFFFFF, the largest value an
+	int32 can have. 0 and negative values are <b>not</b> valid IDs.
+*/
+
+
+/*!
+	\fn bool BMidiEndpoint::IsProducer() const
+	\brief Determines whether this endpoint is a BMidiProducer
+
+	If it is, you can use a dynamic_cast to convert this object into a
+	producer:
+
+\code
+if (endp->IsProducer())
+{
+    BMidiProducer* prod = dynamic_cast<BMidiProducer*>(endp);
+
+    ....
+
+}
+\endcode
+
+*/
+
+
+/*!
+	\fn bool BMidiEndpoint::IsConsumer() const
+	\brief Determines whether this endpoint is a BMidiConsumer
+
+	If it is, you can use a dynamic_cast to convert this object into a consumer:
+
+\code
+if (endp->IsConsumer())
+{
+    BMidiConsumer* cons = dynamic_cast<BMidiConsumer*>(endp);
+
+    ....
+
+}
+\endcode
+
+*/
+
+
+/*!
+	\fn bool BMidiEndpoint::IsRemote() const
+	\brief Determines whether this endpoint is a proxy for a remote object.
+
+	An endpoint is "remote" when it is created by another application.
+	Obviously, the remote object is Register()'ed as well, otherwise you would
+	not be able to see it.
+*/
+
+
+/*!
+	\fn bool BMidiEndpoint::IsLocal() const
+	\brief Determines whether this endpoint represents a local object
+
+	An endpoint is "local" when it is created by this application; in other
+	words, a BMidiLocalConsumer or BMidiLocalProducer.
+*/
+
+
+/*!
+	\fn bool BMidiEndpoint::IsPersistent() const
+	\brief Not used.
+
+	The purpose of this function is unclear, and as a result it doesn't do
+	anything in the Haiku Midi Kit implementation.
+
+	\return \c false always.
+*/
+
+
+/*!
+	\fn bool BMidiEndpoint::IsValid() const
+	\brief Determines whether the endpoint still exists.
+
+	Suppose you obtained a proxy object for a remote endpoint by querying the
+	BMidiRoster. What if the application that published this endpoint quits,
+	or less drastically, Unregister()'s that endpoint? Even though you still
+	have a BMidiEndpoint proxy object, the real endpoint no longer exists.
+	You can use IsValid() to check for this.
+
+	Don't worry, operations on invalid objects, such as GetProperties(), will
+	return an error code (typically B_ERROR), but not cause a crash. Local
+	objects are always are considered to be valid, even if you did not
+	Register() them. (The only time a local endpoint is not valid is when there
+	was a problem constructing it.)
+
+	If the application that created the remote endpoint crashes, then there is
+	no guarantee that the Midi Server immediately recognizes this. In that
+	case, IsValid() may still return true. Eventually, the stale endpoint will
+	be removed from the roster, though. From then on, IsValid() correctly
+	returns \c false.
+*/
+
+
+/*!
+	\fn status_t BMidiEndpoint::Acquire()
+	\brief Increments the endpoint's reference count
+
+	Each BMidiEndpoint has a reference count associated with it, so that
+	BMidiRoster can do proper bookkeeping. Acquire() increments this reference
+	count, and Release() decrements it. Once the count reaches zero, the
+	endpoint is deleted.
+
+	When you are done with the endpoint, whether local or remote, you should
+	always Release() it!
+
+	Upon construction, local endpoints start with a reference count of 1. Any
+	objects you obtain from BMidiRoster using the NextXXX() or FindXXX()
+	functions have their reference counts incremented in the process. If you
+	forget to call  Release(), the objects won't be properly cleaned up and
+	you'll make a fool out of yourself.
+
+	After you Release() an object, you are advised not to use it any further.
+	If you do, your app will probably crash. That also happens if you Release()
+	an object too many times.
+
+	Typically, you don't need to call Acquire(), unless you have two disparate
+	parts of your application working with the same endpoint, and you don't
+	want to have to keep track of who needs to Release() the endpoint. Now you
+	simply have both of them release it.
+
+	\return Always returns B_OK
+
+	\sa Release()
+*/
+
+/*!
+	\fn status_t BMidiEndpoint::Release()
+	\brief Decrements the endpoint's reference count.
+
+	\return Always returns B_OK
+
+	\sa Acquire()
+*/
+
+/*!
+	\fn status_t BMidiEndpoint::Register()
+	\brief Publishes the endpoint on the roster
+
+	MIDI objects created by an application are invisible to other applications
+	until they are published. To publish an object use the Register() method.
+	The corresponding Unregister() method will cause an object to once again
+	become invisible to remote applications.
+
+	BMidiRoster also has Register() and Unregister() methods. You may also use
+	those methods  to publish or hide your endpoints; both do the same thing.
+
+	Although it is considered bad style, calling Register() on local endpoints
+	that are already registered won't mess things up. The Midi Server will
+	simply ignore your request. Likewise for Unregister()'ing more than once.
+	Attempts to Register() or Unregister() remote endpoints will fail, of
+	course.
+
+	If you are \link BMidiRoster::StartWatching() watching \endlink, you will
+	<b>not</b> receive notifications for any local endpoints you register or
+	unregister. Of course, other applications <I>will</I> be notified about
+	your endpoints.
+
+	Existing connections will not be broken when an object is unregistered,
+	but future remote connections will be denied. When objects are destroyed,
+	they automatically become unregistered.
+
+	\returns B_OK on success, or an error code (typically \c B_ERROR) if
+			 something went wrong.
+
+	\sa Unregister()
+*/
+
+/*!
+	\fn status_t BMidiEndpoint::Unregister()
+	\brief Hides the endpoint from the roster/
+
+	\sa Register()
+*/
+
+/*!
+	\fn status_t BMidiEndpoint::SetProperties(const BMessage* props)
+	\brief Changes the properties of the endpoint
+
+	Endpoints can have properties, which is any kind of information that
+	might be useful to associate with a MIDI object. The properties are
+	stored in a BMessage.
+
+	Usage example:
+
+\code
+BMessage props;
+if (endpoint->GetProperties(&props) == B_OK)
+{
+    ...add data to the message...
+    endpoint->SetProperties(&props);
+} 
+\endcode
+
+	You are only allowed to call SetProperties() on a local object.
+
+	Properties should follow a protocol, so different applications will know
+	how to read each other's properties. The current protocol is very limited
+	-- it only allows you to associate icons with your endpoints. Be planned
+	to publish a more complete protocol that included additional information,
+	such as vendor/model names, copyright/version info, category, etc., but
+	they never got around to it.
+
+	<TABLE BORDER="1">
+	<TR><TD>property</TD><TD>Vector icon (raw data)</TD></TR>
+	<TR><TD>field name</TD><TD>"icon"</TD></TR>
+	<TR><TD>field type</TD><TD>'VICN'</TD></TR>
+	</TABLE>
+
+	This vector icon is available under Haiku only, and comes as raw data,
+	not a BBitmap. Before being able to display it, you first must render
+	the vector icon in the size of your choice.
+
+	<TABLE BORDER="1">
+	<TR><TD>property</TD><TD>Large (32x32) icon</TD></TR>
+	<TR><TD>field name</TD><TD>"be:large_icon"</TD></TR>
+	<TR><TD>field type</TD><TD>'ICON'</TD></TR>
+	</TABLE>
+
+	<TABLE BORDER="1">
+	<TR><TD>property</TD><TD>Small (16x16) icon</TD></TR>
+	<TR><TD>field name</TD><TD>"be:mini_icon"</TD></TR>
+	<TR><TD>field type</TD><TD>'MICN'</TD></TR>
+	</TABLE>
+
+	The MidiUtil package (downloadable from the OpenBeOS website) contains a
+	number of convenient functions to associate icons with endpoints, so you
+	don't have to write that code all over again.
+
+	\sa GetProperties()
+*/
+
+/*!
+	\fn status_t BMidiEndpoint::GetProperties(BMessage* props) const
+	\brief Reads the properties of the endpoint
+
+	Usage example:
+
+\code
+BMessage props;
+if (endpoint->GetProperties(&props) == B_OK) 
+{
+    ...examine the contents of the message...
+}
+\endcode
+
+	Note that GetProperties() overwrites the contents of your BMessage.
+
+	\sa SetProperties()
+*/

@@ -1,26 +1,30 @@
 /*
- * Copyright 2011, Haiku inc.
- * Distributed under the terms of the MIT Licence.
+ * Copyright 2011 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  *
- * Documentation by:
- *		Adrien Destugues <pulkomandy@pulkomandy.ath.cx>
- *		John Scipione <jscipione@gmail.com>
- *		Oliver Tappe <zooey@hirschkaefer.de>
+ * Authors:
+ *		Adrien Destugues, pulkomandy@pulkomandy.ath.cx
+ *		John Scipione, jscipione@gmail.com
+ *		Oliver Tappe, zooey@hirschkaefer.de
+ *
  * Corresponds to:
- *		/trunk/headers/os/locale/TimeZone.h	 rev 42274
- *		/trunk/src/kits/locale/TimeZone.cpp	 rev 42274
+ *		headers/os/locale/TimeZone.h	 rev 42274
+ *		src/kits/locale/TimeZone.cpp	 rev 42274
  */
 
 
 /*!
 	\file TimeZone.h
-	\brief Provides for the BTimeZone class.
+	\ingroup locale
+	\ingroup libbe
+	\brief Provides the BTimeZone class.
 */
 
 
 /*!
 	\class BTimeZone
 	\ingroup locale
+	\ingroup libbe
 	\brief Provides information about time zones.
 */
 

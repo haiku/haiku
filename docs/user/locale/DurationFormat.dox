@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku. All rights reserved.
+ * Copyright 2011 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,9 +7,17 @@
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		/trunk/headers/os/locale/DurationFormat.h	 hrev45084
- *		/trunk/src/kits/locale/DurationFormat.cpp	 hrev45084
+ *		headers/os/locale/DurationFormat.h	 hrev45084
+ *		src/kits/locale/DurationFormat.cpp	 hrev45084
  */
+
+
+/*!
+	\file DurationFormat.h
+	\ingroup locale
+	\ingroup libbe
+	\brief Contains BDurationFormat class, a time interval formatter.
+*/
 
 
 /*!

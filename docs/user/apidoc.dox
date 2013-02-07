@@ -1,9 +1,12 @@
 /*
  * Copyright 2007 Niels Sascha Reedijk. All rights reserved.
+ * Copyright 2008-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *		John Scipione, jscipione@gmail.com
+ *
  * Proofreaders:
  *		Alan Smale, ajsmale@gmail.com
  */
@@ -67,8 +70,8 @@
 			not only means that they get the same name, but also that the order
 			of the methods, variables, functions, etc. will have to be the same.
 		-# The root directory of the public API headers is at \c
-			/trunk/headers/os. In a similar vein, the root of the documentation
-			files is at \c /trunk/docs/user. The subdirectory
+			headers/os. In a similar vein, the root of the documentation
+			files is at \c docs/user. The subdirectory
 			structure, or the division of kits, will also be replicated.
 		-# The name of the files is the same as the base of the header files,
 			with the \c dox extension. So \c Something.h becomes \c
@@ -80,41 +83,52 @@
 	copyright block, with a reference to the author(s) and against which
 	revision the documentation was written.
 
-	\verbatim
+\verbatim
 /*
-* Copyright 2007 Niels Sascha Reedijk. All rights reserved.
-* Distributed under the terms of the MIT License.
-*
-* Authors:
-*		Niels Sascha Reedijk, niels.reedijk@gmail.com
-* Proofreaders:
-*		Alan Smale, ajsmale@gmail.com
-* Corresponds to:
-*		/trunk/headers/os/support/String.h  rev 19731
-*		/trunk/src/kits/support/String.cpp  rev 19731
-*/
-	\endverbatim
+ * Copyright 2007-2013 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *      Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *
+ * Proofreaders:
+ *      Alan Smale, ajsmale@gmail.com
+ *
+ * Corresponds to:
+ *      headers/os/support/String.h  rev 19731
+ *      src/kits/support/String.cpp  rev 19731
+ */
+\endverbatim
 
 	The example above has a few elements that you should take note of:
-	-# The header is put in a standard C comment, which is enclosed between \c
-		/* and \c *\/.
-	-# Every line starts with a whitespace and an asterix, followed by another
+	-# The header is put in a standard C comment, which is enclosed between
+\verbatim
+/*
+\endverbatim
+	and 
+\verbatim
+*/
+\endverbatim
+	-# Every line starts with a whitespace and an asterisk followed by another
 		space. If the text is part of a category, such as <tt>Authors</tt>, put
 		three spaces after the delimiter. 
 	-# The first line is empty, then we get to the copyright notice. You may
 		either retain the copyright yourself, or you can attribute to to Haiku
-		Inc. It's your choice. The next line is the \e MIT licence notice,
+		Inc. It's your choice. The next line is the \e MIT License notice,
 		followed by an empty line.
 	-# Then there is a label <tt>Authors:</tt>, which is followed by
 		lines with names and email addresses. The latter one is optional, but
-		recommended. Each author is preceeded by two tabs after the asterix.
+		recommended. Each author is proceeded by two tabs after the asterisk.
 	-# In the same vein there is the label <tt>Proofreaders:</tt> in case the
 		file has been proofread.
 	-# The final part is underneath the label <tt>Corresponds to:</tt>.
 		Underneath there is a list of files and their svn revisions that the
 		current documentation is known to correspond with.
-	-# The header block ends with the \c *\/, where the asterix is aligned with
-		the ones above it.
+	-# The header block ends with the
+\verbatim
+*/
+\endverbatim
+		where the asterisk is aligned with the ones above it.
 
 	\subsection formalrequirements_blocks Blocks
 	
@@ -126,27 +140,34 @@
 	we need to reproduce them in our \c dox files.
 
 	Blocks should adhere to the following standards:
-	-# All blocks open with \c /*! and close with \c * /
+	-# All blocks open with
+\verbatim
+/*!
+\endverbatim
+		and close with
+\verbatim
+*/
+\endverbatim
 	-# The documentation is placed in between these markers.
 	-# All the contents in between the markers is indented by tabs. The tab
 		length should be four.
 	-# Between blocks, there should be two empty lines.
-	-# The maximum width of the contents between blocks is 80 columns. <em>Try
-		not to cross this limit</em>, because it will severely limit
+	-# The maximum width of the contents between blocks is 80 columns. <b>Try
+		not to cross this limit</b>, because it will severely limit
 		readability.
-	
+
 	Example:
-	\verbatim
+\verbatim
 /*!
-	\fn bool BList::AddItem(void *item)
-	\brief Append an item to the list.
-	
-	\param item The item to add.
-	\retval true The item was appended.
-	\retval false Item was not appended, since resizing the list failed.
-	\sa AddItem(void *item, int32 index)
+    \fn bool BList::AddItem(void *item)
+    \brief Append an item to the list.
+
+    \param item The item to add.
+    \retval true The item was appended.
+    \retval false Item was not appended, since resizing the list failed.
+    \sa AddItem(void *item, int32 index)
 */
-	\endverbatim
+\endverbatim
 	
 	\note Doxygen also allows the use of single line comments, starting with 
 		\c //!, however, we won't use these \b except for group markers, which
@@ -253,7 +274,6 @@
 	There are also a number of things that can be used in pages and member
 	documentation. See the style section to find out the appropriate situations
 	in which to use them.
-
 	- \c \\note {text}
 	- \c \\attention {text}
 	- \c \\warning {text}
@@ -312,7 +332,7 @@
 	same arguments as \c \\page, namely the \c \<name\> and the
 	<tt>(title)</tt>. If you need a deeper hierarchy you may use \c \\subsection
 	and \c \\subsubsection, again, both with the same syntax. If you need to
-	distinguish between sections in subsubsections, you are able to use 
+	distinguish between sections in sub-sub-sections, you are able to use
 	\c \\paragraph, which takes the same arguments.
 
 	\note Before and after each of the commands above, you need to have an empty
@@ -349,17 +369,20 @@
 
 \verbatim
 /*!
-	\\name Appending Methods
-	
-	These methods append things to the object.
+    \name Appending Methods
+
+    These methods append things to the object.
 */
 
 
 //! \@{
 
-... names of the methods ...
+
+... methods ...
+
 
 //! \@}
+
 \endverbatim
 
 	The block preceding the block opening marker, <tt>//! \@{</tt>, contains a
@@ -401,7 +424,7 @@
 	Modules are defined in the main book, and you can add classes to them by
 	using the \c \\ingroup command. This commands adds the class to the module
 	and groups it on a separate page. At this moment, the group handling has yet
-	to be finalised. For now, add the classes to the kit they belong in. In the
+	to be finalized. For now, add the classes to the kit they belong in. In the
 	future this might change.
 
 	Finally, it is a good idea to link between parts of the documentation. There
@@ -431,10 +454,10 @@
 		here, which means you should use the right names. So use \b method
 		instead of function, and data member instead of variable (where
 		appropriate). 
-	- Avoid informalism. Avoid constructs like 'if you want to
+	- Avoid in-formalism. Avoid constructs like 'if you want to
 		disconnect the object', but rather use 'to disconnect the object'. Avoid
-		familiarisms, or jokes.
-	
+		familiarizes, or jokes.
+
 	\remarks It isn't the goal to create dry, legal-style documentation. Just
 		try to find a balance. Read through documentation that's already been
 		approved to get a hint of what you should be aiming for.
@@ -497,15 +520,15 @@
 
 \verbatim
 /*!
-	\file String.h
-	\brief Defines the BString class and global operators and functions for 
-		handling strings.
+    \file String.h
+    \brief Defines the BString class and global operators and functions for
+           handling strings.
 */
 
 
 /*!
-	\file SupportDefs.h
-	\brief Defines basic types and definitions for the Haiku API.
+    \file SupportDefs.h
+    \brief Defines basic types and definitions for the Haiku API.
 */ 
 \endverbatim
 
@@ -619,15 +642,15 @@
 	They are a short phrase that mention what the variable contains. Example:
 
 \verbatim
-	/*!
-	\var char* BString::fPrivateData
-	\brief BString's storage for data.
-	
-	This member is deprecated and might even become \c private in future
-	releases.
-	
-	If you are planning to derive from this object and you want to manipulate
-	the raw string data, please have a look at LockBuffer() and UnlockBuffer().
+/*!
+    \var char* BString::fPrivateData
+    \brief BString's storage for data.
+
+    This member is deprecated and might even become \c private in future
+    releases.
+
+    If you are planning to derive from this object and you want to manipulate
+    the raw string data, please have a look at LockBuffer() and UnlockBuffer().
 */
 \endverbatim
 
@@ -667,18 +690,18 @@
 	documentation belongs to the class description, not to the enumeration.
 
 	\subsection style_groups Groups
-	
+
 	If you subdivide members of classes into groups, you have the ability to
 	apply some general information that will be listed above the listing of the
 	members in that group. See the section \ref commands_grouping on how to
 	define groups. This section is on what to put in the header block.
-	
+
 	First of all, it's probably a good idea to give your group a name. This name
 	will be printed as a title and will enhance the clarity of what the group
 	contains. If you put the \c \\name command as the first command of a group,
 	the rest of the words on that line will be used as the title. You should
 	choose simple titles of no more than three words.
-	
+
 	It's possible to add one or two paragraphs of information. These paragraphs
 	should contain some quick notes on which of the members in that group to use
 	for what purpose. See it as a quick subdivision that a developer could use
@@ -688,17 +711,18 @@
 
 \verbatim
 /*!
-	\name Comparison Methods
-	
-	There are two different comparison methods. First of all there is the whole
-	range of operators that return a boolean value, secondly there are methods
-	that return an integer value, both case sensitive and case insensitive.
-	
-	There are also global comparison operators and global compare functions.
-	You might need these in case you have a sort routine that takes a generic
-	comparison function, such as BList::SortItems().
-	See the String.h documentation file to see the specifics, as they are
-	basically the same as implemented in this class.
+    \name Comparison Methods
+
+    There are two different comparison methods. First of all there is the whole
+    range of operators that return a boolean value, secondly there are methods
+    that return an integer value, both case sensitive and case insensitive.
+
+    There are also global comparison operators and global compare functions.
+    You might need these in case you have a sort routine that takes a generic
+    comparison function, such as BList::SortItems().
+
+    See the String.h documentation file to see the specifics, as they are
+    basically the same as implemented in this class.
 */
 \endverbatim
 
@@ -706,5 +730,4 @@
 	the members up into two groups and refers to other functions the developer
 	might be looking for. The hard limit is two (short) paragraphs. Using more
 	will not improve clarity.
-
 */

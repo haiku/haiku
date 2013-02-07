@@ -1,114 +1,121 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation by:
- *  Niels Sascha Reedijk <niels.reedijk@gmail.com>
+ * Authors:
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *
  * Corresponds to:
- *   /trunk/headers/os/support/Autolock.h rev 19972
+ *		headers/os/support/Autolock.h	rev 19972
  */
 
+
 /*!
-  \file Autolock.h
-  \brief Implements a handy locking utility.
+	\file Autolock.h
+	\ingroup support
+	\ingroup libbe
+	\brief Implements a handy locking utility.
 */
 
+
 /*!
-  \class BAutolock
-  \ingroup support
-  \ingroup libbe
-  \brief Convenient utility to make parts of your code thread-safe easily.
+	\class BAutolock
+	\ingroup support
+	\ingroup libbe
+	\brief Convenient utility to make parts of your code thread-safe easily.
 
-  The autolocker uses a BLooper or a BLocker in order to protect a part
-  of your code. This class is usually used in combination with a BLocker
-  that protects a certain part of your code and data that are being
-  accessed by multiple threads. While BAutolock does not add any features
-  to locking, it provides a mechanism to easily lock and protect a part of your
-  code. 
+	The autolocker uses a BLooper or a BLocker in order to protect a part
+	of your code. This class is usually used in combination with a BLocker
+	that protects a certain part of your code and data that are being
+	accessed by multiple threads. While BAutolock does not add any features
+	to locking, it provides a mechanism to easily lock and protect a part of your
+	code. 
 
-  Normally, when you need to protect data, you would have to make sure that
-  all your locks are paired with unlocks. Below is a simple example, but you
-  can imagine that there are more complex situations where you might spend a
-  lot of time debugging a hang because you didn't pair all the Lock()s with an
-  Unlock(). See the example:
+	Normally, when you need to protect data, you would have to make sure that
+	all your locks are paired with unlocks. Below is a simple example, but you
+	can imagine that there are more complex situations where you might spend a
+	lot of time debugging a hang because you didn't pair all the Lock()s with an
+	Unlock(). See the example:
 
 \code
 status_t
 Receiver::HandleCall(Call *call)
 {
-  ... work on call data ...
-
-  fDataLocker->Lock()
-
-  ... perform changes ...
-
-  if (!success)
-  {
-    fDataLocker->Unlock();
-    return B_ERROR;
-  }
-    
-  fDataLocker->Unlock()
-  return B_OK;
+	... work on call data ...
+	 fDataLocker->Lock()
+	 ... perform changes ...
+	 if (!success)
+	{
+	  fDataLocker->Unlock();
+	  return B_ERROR;
+	}
+	  
+	fDataLocker->Unlock()
+	return B_OK;
 }
 \endcode
-
-  With the BAutolock this example can be rewritten as follows:
+	With the BAutolock this example can be rewritten as follows:
 
 \code
 status_t
 Receiver::HandleCall(Call *call)
 {
-  ... work on call data ...
-  
-  BAutolock autolock(fDataLocker);
-  
-  ... perform changes ...
-  
-  if (!success)
-    return B_ERROR;
-  
-  return B_OK;
+	... work on call data ...
+	
+	BAutolock autolock(fDataLocker);
+	
+	... perform changes ...
+	
+	if (!success)
+	  return B_ERROR;
+	
+	return B_OK;
 }
 \endcode
 
-  Since the object is created on stack, it is destroyed as soon as we leave
-  the function. Because the destruction of the object causes it to unlock
-  the BLocker or BLooper, you don't have to manually make sure that every
-  exit from the function is properly unlocked.
+	Since the object is created on stack, it is destroyed as soon as we leave
+	the function. Because the destruction of the object causes it to unlock
+	the BLocker or BLooper, you don't have to manually make sure that every
+	exit from the function is properly unlocked.
 */
 
+
 /*!
-  \fn BAutolock::BAutolock(BLooper *looper)
-  \brief Create an object and lock the BLooper
+	\fn BAutolock::BAutolock(BLooper *looper)
+	\brief Create an object and lock the BLooper
 */
 
+
 /*!
-  \fn BAutolock::BAutolock(BLocker *locker)
-  \brief Create an object and lock the BLocker
+	\fn BAutolock::BAutolock(BLocker *locker)
+	\brief Create an object and lock the BLocker
 */
 
+
 /*!
-  \fn BAutolock::BAutolock(BLocker &locker)
-  \brief Create an object and lock the BLocker
+	\fn BAutolock::BAutolock(BLocker &locker)
+	\brief Create an object and lock the BLocker
 */
 
+
 /*!
-  \fn BAutolock::~BAutolock()
-  \brief Destroy the object and unlock the associated BLocker or BLooper
+	\fn BAutolock::~BAutolock()
+	\brief Destroy the object and unlock the associated BLocker or BLooper
 */
 
+
 /*!
-  \fn bool BAutolock::IsLocked(void)
-  \brief Verify whether the  associated BLocker or BLooper are actually locked.
+	\fn bool BAutolock::IsLocked(void)
+	\brief Verify whether the  associated BLocker or BLooper are actually
+		locked.
 
-  Basically you may assume that when the object is created, you are
-  almost always sure the actual locking succeeds. It might fail if the
-  BLocker or BLooper are destroyed though. The semaphore will be
-  released and the Lock() call will fail. 
+	Basically you may assume that when the object is created, you are
+	almost always sure the actual locking succeeds. It might fail if the
+	BLocker or BLooper are destroyed though. The semaphore will be
+	released and the Lock() call will fail.
 
-  If you expect this to happen, you can use this method to help you
-  protect yourself from any harm.
-  \retval true The lock was acquired.
-  \retval false Failed to acquire the lock.
+	If you expect this to happen, you can use this method to help you
+	protect yourself from any harm.
+	\retval true The lock was acquired.
+	\retval false Failed to acquire the lock.
 */

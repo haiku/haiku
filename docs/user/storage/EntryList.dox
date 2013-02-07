@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,13 +7,15 @@
  *		John Scipione, jscipione@gmail.com
  * 
  * Corresponds to:
- *		/trunk/headers/os/storage/EntryList.h	 rev 42794
- *		/trunk/src/kits/storage/EntryList.cpp	 rev 42794
+ *		headers/os/storage/EntryList.h	 rev 42794
+ *		src/kits/storage/EntryList.cpp	 rev 42794
  */
 
 
 /*!
 	\file EntryList.h
+	\ingroup storage
+	\ingroup libbe
 	\brief Defines the BEntryList class.
 */
 

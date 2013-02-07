@@ -1,22 +1,24 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- * 		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  *
  * Proofreading:
- * 		David Weizades, ddewbofh@hotmail.com
+ *		David Weizades, ddewbofh@hotmail.com
  *		Thom Holwerda, slakje@quicknet.nl
- * 
+ *
  * Corresponds to:
- *		/trunk/headers/os/support/BlockCache.h  rev 19972
- *		/trunk/src/kits/support/BlockCache.cpp  rev 4568
+ *		headers/os/support/BlockCache.h  rev 19972
+ *		src/kits/support/BlockCache.cpp  rev 4568
  */
 
 
  /*!
 	\file BlockCache.h
+	\ingroup support
+	\ingroup libbe
 	\brief Implements a mechanism to store and retrieve memory blocks.
 */
 

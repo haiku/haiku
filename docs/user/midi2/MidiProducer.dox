@@ -1,0 +1,359 @@
+/*!
+	\file MidiProducer.h
+	\ingroup midi2
+	\ingroup libbe
+	\brief Defines producer classes for the MIDI Kit.
+*/
+
+
+/*!
+	\class BMidiProducer MidiProducer.h
+	\ingroup midi2
+	\ingroup libmidi2
+	\ingroup libbe
+	\brief Streams MIDI events to connected consumers.
+
+	A producer is an object that generate a stream of MIDI events. Each
+	producer has a list of BMidiConsumer objects to which it is connected,
+	and may be asked to connect to or disconnect from a BMidiConsumer. A
+	producer can spray its  events to multiple consumers at the same time.
+	A BMidiProducer either represents a local producer, i.e. a class extending
+	from BMidiLocalProducer, or is a proxy for a remote object published by
+	another app.
+*/
+
+
+/*!
+	\fn status_t BMidiProducer::Connect(BMidiConsumer* cons)
+	\brief Connects a consumer to this producer.
+
+	Establishes a connection between this producer and the specified consumer
+	endpoint. From now on, any events that this producer sprays will be sent 
+	to that consumer. You may connect multiple consumers to a producer.
+
+	\return B_OK on success, or an error code when the connection could not be
+		established. If the consumer is a proxy for a remote object and that
+		object no longer exists, Connect() returns B_ERROR. It also returns
+		\c B_ERROR if you try to connect the same producer and consumer more
+		than once.
+
+	\sa Disconnect()
+*/
+
+
+/*!
+	\fn status_t BMidiProducer::Disconnect(BMidiConsumer* cons)
+	\brief Disconnects a consumer from this producer.
+
+	Terminates the connection between this producer and the specified consumer
+	endpoint. From now on, any events that this producer sprays no longer go
+	to that consumer.
+
+	\return B_OK on success, or an error code if there was no connection to break
+	\sa Connect()
+*/
+
+
+/*!
+	\fn bool BMidiProducer::IsConnected(BMidiConsumer* cons) const
+	\brief Determines whether a consumer is connected to this producer.
+
+	\sa Connect()
+	\sa Disconnect()
+*/
+
+
+/*!
+	\fn BList* BMidiProducer::Connections() const
+	\brief Returns a list with all connected consumers.
+
+	Returns a BList with pointers to BMidiEndpoint objects for all consumers
+	that are connected to this producer. You can examine the contents of the
+	list as follows:
+\code
+BList* list = prod->Connections();
+for (int32 t = 0; t < list->CountItems(); ++t)
+{
+    BMidiEndpoint* endp = (BMidiEndpoint*) list->ItemAt(t);
+    ...do stuff...
+    endp->Release();  // yes, here too!
+}
+delete list;
+\endcode
+	Every time you call this function, a new BList is allocated. The caller
+	(that is you) is responsible for freeing this list. The BMidiEndpoint
+	objects in the list have their reference counts bumped, so you need to
+	Release() them before you delete the list or they will go all leaky on
+	you.
+*/
+
+
+/*!
+	\class BMidiLocalProducer MidiProducer.h
+	\ingroup midi2
+	\ingroup libmidi2
+	\ingroup libbe
+	\brief A producer endpoint that is created by your own application.
+
+	You create a BMidiLocalProducer if you want your application to send MIDI
+	events. You use the various spray functions to send events to all connected
+	consumers. If no consumers are connected to the producer, any calls to the
+	spray functions are ignored.
+
+	Most spray functions accept a channel argument. Even though MIDI channels are
+	really numbered 1 through 16, the spray functions work with channels 0 through
+	15. You can also specify the performance time for the event using the time
+	argument. Specify 0 (or any time in the past) to perform the event "now", i.e.
+	as soon as possible. You can also schedule events to be performed in the
+	future, by passing a time such as system_time() + 5000000, which means 5
+	seconds from now.
+
+	Unlike BMidiLocalConsumer, which should be subclassed almost always, you hardly
+	ever need to derive a class from BMidiLocalProducer. The only reason for
+	subclassing is when you need to know when the producer gets connected or
+	disconnected.
+
+	Also unlike consumers, local producers have no thread of control directly
+	associated with them. If you want to send out the MIDI events from a different
+	thread, you will have to create one yourself.
+*/
+
+
+/*!
+	\fn BMidiLocalProducer::BMidiLocalProducer(const char *name = NULL)
+	\brief Creates a new local producer endpoint.
+
+	The new endpoint is not visible to other applications until you Register() it.
+	You can tell the constructor what the name of the new producer will be. If you
+	pass NULL (or use the default argument), then the producer's name will be an
+	empty string. It won't be NULL, since endpoint names cannot be NULL.
+	There is no guarantee that the endpoint will be successfully created. For
+	example, the Midi Server may not be running. Therefore, you should always call
+	IsValid() after creating a new endpoint to make sure that everything went okay.
+	If not, Release() the object to reclaim memory and abort gracefully.
+\code
+BMidiLocalProducer* prod = new BMidiLocalProducer(...);
+if (!prod->IsValid())
+{
+    prod->Release();
+    ...exit gracefully...
+}
+\endcode
+*/
+
+
+/*!
+	\fn void BMidiLocalProducer::Connected(BMidiConsumer* cons)
+	\brief Invoked when a new consumer is connected to this producer
+
+	Although typical notifications (i.e. from BMidiRoster's "watching" facility)
+	are only sent if it is some other app that is performing the operation,
+	Connected() is also called if you are making the connection yourself.
+	If you override this hook, you don't have to call the default implementation,
+	because that does nothing.
+
+	\param cons The newly connected consumer. The reference count of the
+		consumer object is not increased, so you should not Release() it.
+		However, if you want to keep track of the consumer beyond this
+		function, you should first Acquire() it, and Release() it when you
+		are done.
+
+	\sa Disconnected()
+*/
+
+
+/*!
+	\fn void BMidiLocalProducer::Disconnected(BMidiConsumer* cons)
+	\brief Invoked when a consumer is disconnected from this producer.
+
+	\sa Connected()
+*/
+
+
+/*!
+	\fn void BMidiLocalProducer::SprayData(void* data, size_t length,
+		bool atomic = false, bigtime_t time = 0) const
+	\brief Sends raw MIDI data downstream to all connected consumers.
+
+	Typically you won't have to call SprayData(); the other spray functions
+	will do just fine. If you do call it, remember that you retain ownership
+	of the data and that you are responsible for freeing it at some point.
+	(Even though data is not declared const, the function does not change it.)
+	With atomic set to false, you can send a MIDI message in segments (perhaps
+	for a large sysex dump). However, when you do this, you are on your own.
+	The Midi Kit only tags the data as being non-atomic, but offers no]
+	additional support.
+
+	The default implementation of BMidiLocalConsumer completely ignores such
+	events. To handle non-atomic MIDI data, you should override the
+	BMidiLocalConsumer::Data() hook and process the MIDI event yourself. All of
+	BMidiLocalProducer's other spray functions always send atomic data.
+
+	\param data the MIDI event data.
+	\param length byte size of the data buffer.
+	\param atomic whether the data buffer contains a single complete
+		   MIDI event.
+	\param time the required performance time of the event.
+
+	\sa BMidiLocalConsumer::Data()
+*/
+
+
+/*!
+	\fn void BMidiLocalProducer::SprayNoteOff(uchar channel, uchar note,
+		uchar velocity, bigtime_t time = 0) const
+	\brief Sends a Note Off event to all connected consumers.
+
+	\sa BMidiLocalConsumer::NoteOff()
+*/
+
+
+/*!
+	\fn void BMidiLocalProducer::SprayNoteOn(uchar channel, uchar note,
+		uchar velocity, bigtime_t time = 0) const
+	\brief Sends a Note On event to all connected consumers.
+
+	\sa BMidiLocalConsumer::NoteOn()
+*/
+
+
+/*!
+	\fn void BMidiLocalProducer::SprayKeyPressure(uchar channel, uchar note,
+		uchar pressure, bigtime_t time = 0) const
+	\brief Sends a Polyphonic Pressure (Aftertouch) event to all connected
+		   consumers.
+
+	\sa BMidiLocalConsumer::KeyPressure()
+*/
+
+
+/*!
+	\fn void BMidiLocalProducer::SprayControlChange(uchar channel,
+		uchar controlNumber, uchar controlValue, bigtime_t time = 0) const
+	\brief Sends a Controller Change event to all connected consumers.
+
+	\sa Midi2Defs.h
+	\sa BMidiLocalConsumer::ControlChange()
+*/
+
+
+/*!
+	\fn void BMidiLocalProducer::SprayProgramChange(uchar channel,
+		uchar programNumber, bigtime_t time = 0) const
+	\brief Sends a Program Change event to all connected consumers.
+
+	\sa BMidiLocalConsumer::ProgramChange()
+*/
+
+
+/*!
+	\fn void BMidiLocalProducer::SprayChannelPressure(uchar channel,
+		uchar pressure, bigtime_t time = 0) const
+	\brief Sends a Channel Pressure event to all connected consumers.
+
+	\sa BMidiLocalConsumer::ChannelPressure()
+*/
+
+
+/*!
+	\fn void BMidiLocalProducer::SprayPitchBend(uchar channel, uchar lsb,
+		uchar msb, bigtime_t time = 0) const
+	\brief Sends a Pitch Bend event to all connected consumers.
+
+	\sa BMidiLocalConsumer::PitchBend()
+*/
+
+
+/*!
+	\fn void BMidiLocalProducer::SpraySystemExclusive(void* data,
+		size_t length, bigtime_t time = 0) const
+	\brief Sends a System Exclusive event to all connected consumers.
+
+	You retain ownership of the data and are responsible for freeing it. Even
+	though data is not declared const, the function does not change it. Even
+	though the amount of data may be quite large, this function always sends
+	sysex messages as an atomic block of data.
+
+	\sa BMidiLocalConsumer::SystemExclusive()
+*/
+
+
+/*!
+	\fn void BMidiLocalProducer::SpraySystemCommon(uchar status,\
+		uchar data1, uchar data2, bigtime_t time = 0) const
+	\brief Sends a System Common event to the connected consumers.
+
+	The status byte must be one of the following:
+	<table border="1">
+		<tr>
+			<td>0xF1</td>
+			<td>\c B_MIDI_TIME_CODE</td>
+			<td>data1 only</td>
+		</tr>
+		<tr>
+			<td>0xF2</td>
+			<td>\c B_SONG_POSITION</td>
+			<td>data1 and data2</td>
+		</tr>
+		<tr>
+			<td>0xF3</td>
+			<td>\c B_SONG_SELECT</td>
+			<td>data1 only</td>
+		</tr>
+		<tr>
+			<td>0xF5</td>
+			<td>\c B_CABLE_MESSAGE</td>
+			<td>data1 only</td>
+		</tr>
+		<tr>
+			<td>0xF6</td>
+			<td>\c B_TUNE_REQUEST</td>
+			<td>no data</td>
+		</tr>
+		<tr>
+			<td>0xF7</td>
+			<td>\c B_SYS_EX_END</td>
+			<td>no data</td>
+		</tr>
+	</table>
+
+	\sa BMidiLocalConsumer::SystemCommon()
+*/
+
+
+/*!
+	\fn void BMidiLocalProducer::SpraySystemRealTime(uchar status,
+		bigtime_t time = 0) const
+	\brief Sends a Real Time event to the connected consumers.
+
+	The status byte must be one of the following:
+	<table border="1">
+		<tr><td>0xf8</td><td>\c B_TIMING_CLOCK</td></tr>
+		<tr><td>0xfa</td><td>\c B_START</td></tr>
+		<tr><td>0xfb</td><td>\c B_CONTINUE</td></tr>
+		<tr><td>0xfc</td><td>\c B_STOP</td></tr>
+		<tr><td>0xfe</td><td>\c B_ACTIVE_SENSING</td></tr>
+		<tr><td>0xff</td><td>\c B_SYSTEM_RESET</td></tr>
+	</table>
+
+	Because of their high priority, the MIDI specification allows real time
+	messages to "interleave" with other MIDI messages. A large sysex dump, for
+	example, may be interrupted by a real time event. The Midi Kit, however,
+	doesn't care. If you (or another producer) have just sent a big system
+	exclusive to a consumer, any following real time message will simply have
+	to wait until the consumer has dealt with the sysex.
+
+	\sa BMidiLocalConsumer::SystemRealTime()
+*/
+
+
+/*!
+	\fn void BMidiLocalProducer::SprayTempoChange(int32 bpm,
+		bigtime_t time = 0) const
+	\brief Sends a Tempo Change event to the connected consumers.
+
+	This kind of Tempo Change event is not really part of the MIDI spec,
+	rather it is an extension from the SMF (Standard MIDI File) format.
+
+	\sa BMidiLocalConsumer::TempoChange()
+*/

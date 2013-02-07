@@ -1,10 +1,10 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- * 		Niels Sascha Reedijk, niels.reedijk@gmail.com
- * 
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *
  * Corresponds to:
  *		/trunk/headers/os/app/MessageQueue.h  rev 19956
  *		/trunk/src/kits/app/MessageQueue.cpp  rev 19956
@@ -12,6 +12,8 @@
 
 /*!
 	\file MessageQueue.h
+	\ingroup app
+	\ingroup libroot
 	\brief Provides the BMessageQueue class.
 */
 

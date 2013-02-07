@@ -1,21 +1,21 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation by:
- *		Niels Sascha Reedijk <niels.reedijk@gmail.com>
+ * Authors:
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  */
 
 
 /*!
 	\page app_intro Introduction to the Application Kit.
-  
+
 	The Application Kit should be your starting point if you want to write
 	native Haiku applications with a GUI. The application kit does
 	exactly as its name suggests; it is the basis for Haiku	applications.  You
 	should read through this document and the documents referenced here before
 	moving on to any other part of the API. 
-  
+
 	The Application Kit classes can be divided into two groups: the "messaging"
 	classes and the "system interaction" classes.  The larger group contains
 	the messaging classes. Have a look at the \link app_messaging
@@ -29,7 +29,7 @@
 	- BMessageQueue
 	- BMessageRunner
 	- BMessenger
-  
+
 	The second group is the system interaction classes. These classes
 	provide hooks for your application to interact with the rest of the system.
 	The most important class is BApplication. This is a list of all the

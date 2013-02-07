@@ -1,90 +1,91 @@
 /*
- * Copyright 2007-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2010 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation by:
- *  Niels Sascha Reedijk <niels.reedijk@gmail.com>
- *  Nicolas de Leon <insdel@haqr.net>
+ * Authors:
+ *		Nicolas de Leon, insdel@haqr.net
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  */
 
+
 /*!
-  \page support_intro Introduction to the Support Kit
+	\page support_intro Introduction to the Support Kit
 
-  The Support Kit provides a handy set of classes that you can use in your
-  applications. These classes provide:
-  
-  - \b Thread \b Safety. Haiku can execute multiple threads of an application
-    in parallel, letting certain parts of an application continue when one part
-	is stalled, as well as letting an application process multiple pieces of
-	data at the same time on multicore or multiprocessor systems. However,
-	there are times when multiple threads desire to work on the same piece of
-	data at the same time, potentially causing a conflict where variables or
-	pointers are changed by one thread causing another to execute incorrectly.
-	To prevent this, Haiku implements a \"locking\" mechanism, allowing one
-	thread to \"lock out\" other threads from executing code that might modify
-	the same data.
-  - \b Archiving \b and \b IO. These classes allow a programmer to convert
-    objects into a form that can more easily be transferred to other
-	applications or stored to disk, as well as performing basic input and
-	output operations.
-  - \b Memory \b Allocation. This class allows a programmer to hand off some of
-    the duties of memory accounting and management.
-  - \b Common \b Datatypes. To avoid unnecessary duplication of code and to
-    make life easier for programmers, Haiku includes classes that handle
-	management of ordered lists and strings.
-  
-  There are also a number of utility functions to time actions, play system
-  alert sounds, compare strings, and atomically manipulate integers. Have a
-  look at the overview, or go straight to the complete
-  \link support list of components \endlink of this kit.
+	The Support Kit provides a handy set of classes that you can use in your
+	applications. These classes provide:
+	- \b Thread \b Safety. Haiku can execute multiple threads of an application
+		in parallel, letting certain parts of an application continue when one part
+		is stalled, as well as letting an application process multiple pieces of
+		data at the same time on multicore or multiprocessor systems. However,
+		there are times when multiple threads desire to work on the same piece of
+		data at the same time, potentially causing a conflict where variables or
+		pointers are changed by one thread causing another to execute incorrectly.
+		To prevent this, Haiku implements a \"locking\" mechanism, allowing one
+		thread to \"lock out\" other threads from executing code that might modify
+		the same data.
+	- \b Archiving \b and \b IO. These classes allow a programmer to convert
+		objects into a form that can more easily be transferred to other
+		applications or stored to disk, as well as performing basic input and
+		output operations.
+	- \b Memory \b Allocation. This class allows a programmer to hand off some of
+		the duties of memory accounting and management.
+	- \b Common \b Datatypes. To avoid unnecessary duplication of code and to
+		make life easier for programmers, Haiku includes classes that handle
+		management of ordered lists and strings.
 
-  \section Overview
-  - Thread Safety:
-    - BLocker provides a semaphore-like locking mechanism allowing for
-	  recursive locks.
-      - BAutolock provides a simple method of automatically removing a lock
-	    when a function ends.
-    - \ref TLS.h "Thread Local Storage" allows a global variable\'s content to
-	  be sensitive to thread context.
-  - Archiving and IO:
-    - BArchivable provides an interface for \"archiving\" objects so that they
-	  may be sent to other applications where an identical copy will be
-	  recreated.
-      - BArchiver simplifies archiving of BArchivable hierarchies.
-      - BUnarchiver simplifies unarchiving hierarchies that have been archived
-	    using BArchiver.
-    - BFlattenable provides an interface for \"flattening\" objects so that
-	  they may be easily stored to disk.
-    - BDataIO provides an interface for generalized read/write streams.
-      - BPositionIO extends BDataIO to allow seeking within the data.
-        - BBufferIO creates a buffer and attaches it to a BPositionIO stream,
-		  allowing for reduced load on the underlying stream.
-        - BMemoryIO allows operation on an already-existing buffer.
-        - BMallocIO creates and allows operation on a buffer.
-  - Memory Allocation:
-    - BBlockCache allows an application to allocate a \"pool\" of memory blocks
-	  that the application can fetch and dispose of as it pleases, letting the
-	  application make only a few large memory allocations, instead of many
-	  expensive small allocations.
-  - Common Datatypes:
-    - BList allows simple ordered lists and provides common access,
-	  modification, and comparison functions.
-    - BString allows strings and provides common access, modification, and
-	  comparison functions.
-  - BStopWatch allows an application to measure the time an action takes.
-  - \ref support_globals "Global functions"
-  - \ref TypeConstants.h "Common types and constants"
-  - Error codes for all kits
+	There are also a number of utility functions to time actions, play system
+	alert sounds, compare strings, and atomically manipulate integers. Have a
+	look at the overview, or go straight to the complete
+	\link support list of components \endlink of this kit.
+
+	\section Overview
+	- Thread Safety:
+		- BLocker provides a semaphore-like locking mechanism allowing for
+			recursive locks.
+			- BAutolock provides a simple method of automatically removing a lock
+				when a function ends.
+		- \ref TLS.h "Thread Local Storage" allows a global variable\'s content to
+			be sensitive to thread context.
+	- Archiving and IO:
+		- BArchivable provides an interface for \"archiving\" objects so that they
+			may be sent to other applications where an identical copy will be
+			recreated.
+			- BArchiver simplifies archiving of BArchivable hierarchies.
+			- BUnarchiver simplifies unarchiving hierarchies that have been archived
+				using BArchiver.
+		- BFlattenable provides an interface for \"flattening\" objects so that
+		    they may be easily stored to disk.
+		- BDataIO provides an interface for generalized read/write streams.
+			- BPositionIO extends BDataIO to allow seeking within the data.
+				- BBufferIO creates a buffer and attaches it to a BPositionIO stream,
+					allowing for reduced load on the underlying stream.
+				- BMemoryIO allows operation on an already-existing buffer.
+				- BMallocIO creates and allows operation on a buffer.
+	- Memory Allocation:
+		- BBlockCache allows an application to allocate a \"pool\" of memory blocks
+			that the application can fetch and dispose of as it pleases, letting the
+			application make only a few large memory allocations, instead of many
+			expensive small allocations.
+	- Common Datatypes:
+		- BList allows simple ordered lists and provides common access,
+			modification, and comparison functions.
+		- BString allows strings and provides common access, modification, and
+			comparison functions.
+	- BStopWatch allows an application to measure the time an action takes.
+	- \ref support_globals "Global functions"
+	- \ref TypeConstants.h "Common types and constants"
+	- Error codes for all kits
 */
+
 
 // Short listing of documents that belong to this module so that people can
 // find these from the module overview. 
 // This should become standardized in Doxygen though. There is an item on
 // the todo list on this.
 
+
 /*!
-  \addtogroup support
+	\addtogroup support
 
-  For a better overview, have a look at \ref support_intro .
+	For a better overview, have a look at \ref support_intro .
 */
-

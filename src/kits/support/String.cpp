@@ -398,6 +398,7 @@ BString::SetTo(char c, int32 count)
 
 	if (_MakeWritable(count, false) == B_OK)
 		memset(fPrivateData, c, count);
+
 	return *this;
 }
 

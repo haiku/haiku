@@ -26,7 +26,6 @@
 		consider using one of the layout-related convenience classes (eg.
 		BGroupView for BGroupLayout).
 
-
 	\section layout_layout_tips BLayout Tips
 
 	\li It is generally better to add BViews and BLayoutItems directly to the

@@ -5,8 +5,10 @@
  * Authors:
  *		Christopher ML Zumwalt May, zummy@users.sf.net
  *		Omri Barak
+ *
  * Proofreaders:
  *		John Scipione, jscipione@gmail.com
+ *
  * Corresponds to:
  *		src/kits/game/GameProducer.h    rev 43514
  *		src/kits/game/GameProducer.cpp  rev 43514
@@ -15,6 +17,8 @@
 
 /*!
 	\file GameProducer.h
+	\ingroup game
+	\ingroup libbe
 	\brief Provides the GameProducer class.
 */
 
