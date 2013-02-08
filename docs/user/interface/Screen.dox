@@ -8,8 +8,8 @@
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		/trunk/headers/os/interface/Screen.h	rev 42759
- *		/trunk/src/kits/interface/Screen.cpp	rev 42759
+ *		headers/os/interface/Screen.h	rev 42759
+ *		src/kits/interface/Screen.cpp	rev 42759
  */
 
 

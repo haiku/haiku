@@ -7,8 +7,8 @@
  *		Ingo Weinhold, bonefish@cs.tu-berlin.de
  * 
  * Corresponds to:
- *		/trunk/headers/os/interface/GroupLayoutBuilder.h	 rev 42274
- *		/trunk/src/kits/interface/GroupLayoutBuilder.cpp	 rev 42274
+ *		headers/os/interface/GroupLayoutBuilder.h	 rev 42274
+ *		src/kits/interface/GroupLayoutBuilder.cpp	 rev 42274
  */
 
 

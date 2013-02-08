@@ -6,8 +6,8 @@
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		/trunk/headers/os/interface/Alert.h	 rev 42274
- *		/trunk/src/kits/interface/Alert.cpp	 rev 42274
+ *		headers/os/interface/Alert.h	 rev 42274
+ *		src/kits/interface/Alert.cpp	 rev 42274
  */
 
 

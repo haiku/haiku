@@ -6,8 +6,8 @@
  *		Adrien Destugues, pulkomandy@pulkomandy.ath.cx
  *
  * Corresponds to:
- *		/trunk/headers/os/storage/FindDirectory.h	 rev 42600
- *		/trunk/src/kits/storage/FindDirectory.cpp	 rev 42600
+ *		headers/os/storage/FindDirectory.h	 rev 42600
+ *		src/kits/storage/FindDirectory.cpp	 rev 42600
  */
 
 
