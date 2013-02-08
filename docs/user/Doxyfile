@@ -639,6 +639,7 @@ INPUT                  = . \
                          media \
                          midi \
                          midi2 \
+                         posix \
                          storage \
                          support \
                          translation \
@@ -738,10 +739,10 @@ EXAMPLE_RECURSIVE      = NO
 # the \image command).
 
 IMAGE_PATH             = . \
-                         interface \
+                         interface/images \
                          keyboard \
-                         midi2 \
-                         storage
+                         midi2/images \
+                         storage/images
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program

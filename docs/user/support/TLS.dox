@@ -3,122 +3,140 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *   Niels Sascha Reedijk <niels.reedijk@gmail.com>
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *
  * Corresponds to:
- *   /trunk/headers/os/support/TLS.h  rev 19972
+ *		headers/os/support/TLS.h	rev 19972
  */
- 
+
+
 /*!
-  \file TLS.h
-  \ingroup support
-  \brief Functions to use Thread Local Storage.
-  
-  The Thread Local Storage API provides convenient methods to transform global
-  variables in to thread-context sensetive variables. Some applications rely on
-  global variables as a way of intercommunicating between functions and
-  objects, but one of your demands might be that the contents of that variable
-  differs between threads.
-  
-  The following example demonstrates how an imaginary thread manager that
-  stores per thread data would function. The constructor of this 
-  \c ThreadManager allocates the TLS variables using tls_allocate(). This only
-  has to be done once, and not in every spawned thread! Then, every spawned
-  thread that interacts with this thread manager, should call the
-  \c InitThread() function. This one associates the supplied thread data with
-  the TLS index using tls_set(). Each thread can get their associated data with
-  \c GetCurrentThreadData(), which uses tls_get() to retrieve the associated
-  thread data at the provided index.
-  
-  \code
+	\file TLS.h
+	\ingroup support
+	\ingroup libbe
+	\brief Functions to use Thread Local Storage.
+
+	The Thread Local Storage API provides convenient methods to transform global
+	variables in to thread-context sensitive variables. Some applications rely on
+	global variables as a way of intercommunicating between functions and
+	objects, but one of your demands might be that the contents of that variable
+	differs between threads.
+
+	The following example demonstrates how an imaginary thread manager that
+	stores per thread data would function. The constructor of this 
+	\c ThreadManager allocates the TLS variables using tls_allocate(). This only
+	has to be done once, and not in every spawned thread! Then, every spawned
+	thread that interacts with this thread manager, should call the
+	\c InitThread() function. This one associates the supplied thread data with
+	the TLS index using tls_set(). Each thread can get their associated data with
+	\c GetCurrentThreadData(), which uses tls_get() to retrieve the associated
+	thread data at the provided index.
+
+\code
 int32 gThreadName;
 int32 gThreadData;
 
 class ThreadManager
 {
 public:
-	// General initialisation
-	ThreadManager() {
-		gThreadName = tls_allocate();
-		gThreadStatus = tls_allocate();
-	};
-	
-	// Called from the thread entry function 
-	void InitThread(const char *name, void *data) {
-		tls_set(gThreadName, (void *)name);
-		tls_set(gThreadData, data);
-	};
-	
-	// Can be called from any of the threads. The returned data will be that
-	// which the thread explicitly set in the InitThread() function
-	void *GetCurrentThreadData() {
-		printf("Thread %s asked for its data.\n", (const char*)tls_get(gThreadName));
-		return tls_get(gThreadData);
-	};
+    // General initialisation
+    ThreadManager() {
+        gThreadName = tls_allocate();
+        gThreadStatus = tls_allocate();
+    };
+
+    // Called from the thread entry function 
+    void InitThread(const char *name, void *data) {
+        tls_set(gThreadName, (void *)name);
+        tls_set(gThreadData, data);
+    };
+
+    // Can be called from any of the threads. The returned data will be that
+    // which the thread explicitly set in the InitThread() function
+    void *GetCurrentThreadData() {
+        printf("Thread %s asked for its data.\n",
+            (const char*)tls_get(gThreadName));
+        return tls_get(gThreadData);
+    };
 };
-  \endcode
+\endcode
 
-  \note
-    -# It is impossible to get data other than from your thread.
-    -# There is a limit to the number of TLS variables you can allocate. This
-      limit is define by #TLS_MAX_KEYS, but do realize that you share this
-      limit with all the libraries your application is linked to.
-    -# The actual global variables, in the example \c gThreadName and
-      \c gThreadData, are only indexes. You cannot use these variables to
-	access data without the TLS API.
+	\note
+	-# It is impossible to get data other than from your thread.
+	-# There is a limit to the number of TLS variables you can allocate. This
+		limit is define by #TLS_MAX_KEYS, but do realize that you share this
+			limit with all the libraries your application is linked to.
+	-# The actual global variables, in the example \c gThreadName and
+		\c gThreadData, are only indexes. You cannot use these variables to
+		access data without the TLS API.
 */
 
-/*!
-  \def TLS_MAX_KEYS
-  \brief The maximum number of thread local storage variables. This number is
-    process wide.
-*/
 
 /*!
-  \fn int32 tls_allocate(void)
-  \brief Allocate a unique index to use for storing variables. 
-  
-  You should only have to do this once to allocate the global index, which you
-  can reuse in every thread.
-  
-  \return A unique index to which you can associate per thread data. If we
-    overrun the maximum number of keys, as defined by #TLS_MAX_KEYS, the
-    function will return \c B_NO_MEMORY.
-  
-  \see tls_get(), tls_set(), tls_address()
+	\def TLS_MAX_KEYS
+	\brief The maximum number of thread local storage variables. This number is
+		   process wide.
 */
 
-/*!
-  \fn void *tls_get(int32 index)
-  \brief Retrieve the data stored for this thread at the provided \a index.
-  
-  \param index The \a index that you retrieved with tls_allocate().
-  \return The data you set using tls_set() for this thread, or \c NULL if there
-    is no data set, or the \a index is invalid.
-  \see tls_allocate(), tls_set()
-*/
 
 /*!
-  \fn void **tls_address(int32 index)
-  \brief Retrieve the pointer that refers to the data of this thread at the
+	\fn int32 tls_allocate(void)
+	\brief Allocate a unique index to use for storing variables.
+
+	You should only have to do this once to allocate the global index, which
+	you can reuse in every thread.
+
+	\return A unique index to which you can associate per thread data. If we
+		    overrun the maximum number of keys, as defined by #TLS_MAX_KEYS,
+		    the function will return \c B_NO_MEMORY.
+
+	\sa tls_get()
+	\sa tls_set()
+	\sa tls_address()
+*/
+
+
+/*!
+	\fn void *tls_get(int32 index)
+	\brief Retrieve the data stored for this thread at the provided \a index.
+
+	\param index The \a index that you retrieved with tls_allocate().
+
+	\return The data you set using tls_set() for this thread, or \c NULL if there
+			is no data set, or the \a index is invalid.
+
+	\sa tls_allocate()
+	\sa tls_set()
+*/
+
+
+/*!
+	\fn void **tls_address(int32 index)
+	\brief Retrieve the pointer that refers to the data of this thread at the
     provided \a index.
-  
-  You can use this pointer to directly manipulate your thread data.
-  
-  \param index The \a index that you retrieved with tls_allocate().
-  \return The pointer to where your thread's data is, or \c NULL if the index
-    is invalid.
-  \see tls_allocate(), tls_set(), tls_get()
+
+	You can use this pointer to directly manipulate your thread data.
+
+	\param index The \a index that you retrieved with tls_allocate().
+	\return The pointer to where your thread's data is, or \c NULL if the index
+			is invalid.
+	\sa tls_allocate()
+	\sa tls_set()
+	\sa tls_get()
 */
 
+
 /*!
-  \fn void tls_set(int32 index, void *value)
-  \brief Set the data of this thread at the provided \a index.
-  
-  It is up to you to make sure the \a index is valid. Any invalid indeces can
-  lead to unpredicable results.
-  
-  \param index The \a index that you retrieved with tls_allocate().
-  \param value The data that should be associated with the index for this
-    thread.
-  \see tls_allocate(), tls_get()
+	\fn void tls_set(int32 index, void *value)
+	\brief Set the data of this thread at the provided \a index.
+
+	It is up to you to make sure the \a index is valid. Any invalid indices can
+	lead to unpredictable results.
+
+	\param index The \a index that you retrieved with tls_allocate().
+	\param value The data that should be associated with the index for this
+    	   thread.
+
+	\sa tls_allocate()
+	\sa tls_get()
 */

@@ -115,6 +115,7 @@ private:
 			BMenu*				fSlideShowDelayMenu;
 			BMenu*				fRatingMenu;
 			ToolBarView*		fToolBarView;
+			bool				fToolBarVisible;
 			BScrollView*		fScrollView;
 			BScrollBar*			fVerticalScrollBar;
 			ShowImageView*		fImageView;

@@ -1,9 +1,9 @@
 /*
- * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation by:
- *		Alex Wilson <yourpalal2@gmail.com>
+ * Authors:
+ *		Alex Wilson, yourpalal2@gmail.com
  */
 
 
@@ -13,7 +13,8 @@
 	Haiku's Layout API is centered around the BLayoutItem and BLayout classes.
 	The BLayoutItem class represents thing that can be managed by a BLayout,
 	which is itself a BLayoutItem. Before we go any further, it is a good idea
-	to familiarize yourself with the different BLayouts available in Haiku:
+	to familiarize yourself with the different BLayout classes available in
+	Haiku:
 		\li BGroupLayout
 		\li BGridLayout
 		\li BCardLayout
@@ -21,14 +22,14 @@
 
 	You'll notice that BSplitView is not actually a BLayout, but a BView. The
 	BSplitView class uses a custom BLayout behind the scenes, but because it
-	must also be able to draw, a BView is required. Other BLayouts have
-	BViews that can be used for convenience.
+	must also be able to draw, a BView is required. Other BLayout objects have
+	BView objects that can be used for convenience.
 		\li BGroupLayout : BGroupView
 		\li BGridLayout : BGridView
 		\li BCardLayout : BTabView (also provides on-screen tabs)
 
 	Although it is not necessary to use these classes to make use of the
-	coresponding layouts, it does make things easier.
+	corresponding layouts, it does make things easier.
 
 	Once you have an understanding of what each BLayout does, you can start
 	designing an interface with them. Let's consider a very simple window,
@@ -39,8 +40,7 @@
 	So, let's review the BGroupLayout constructor:
 
 \code
-BGroupLayout(enum orientation orientation, float spacing
-		= B_USE_DEFAULT_SPACING)
+BGroupLayout(enum orientation orientation, float spacing = B_USE_DEFAULT_SPACING)
 \endcode
 
 	Because we only have one item in this layout, \c orientation and \c spacing
@@ -67,17 +67,17 @@ group->AddView(MakeStringView("Haiku rocks!"));
 
 	That does it! Now we've got a BWindow with a horizontal BGroupLayout holding
 	a single BView. However, if we want to ensure that our BStringView is always
-	centered in the window, we should give it an explict BAlignment. So that
+	centered in the window, we should give it an explicit BAlignment. So the
 	last line becomes:
 
 \code
 BLayoutItem* stringView = group->AddView(MakeStringView("Haiku rocks!"));
 stringView->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER,
-		B_ALIGN_VERTICAL_CENTER);
+	B_ALIGN_VERTICAL_CENTER);
 \endcode
 
 	Now our BStringView will always be right in the middle of the space
-	alloted to it, which at the moment is the whole of \c window.
+	allotted to it, which at the moment is the whole of \c window.
 
 	Now let's take things one step further, and add a BMenuBar into the mix.
 
@@ -118,8 +118,8 @@ group->AddItem(grid);
 \endcode
 
 	You'll notice that we've added \c grid directly to \c group. This means that
-	any BViews we add to \c grid will become children of \c window, but will be
-	positioned by \c grid.
+	any BView objects we add to \c grid will become children of \c window, but
+	will be positioned by \c grid.
 
 \code
 grid->AddView(MakeSmallButton(), 0, 0);
@@ -128,7 +128,7 @@ grid->AddView(MakeBigButton(), 0, 1, 2, 1);
 grid->AddView(MakeSmallButton(), 1, 2);
 \endcode
 
-	Now we've got a nice grid of BButtons, let's go over it quickly:
+	Now we've got a nice grid of BButton objects, let's go over it quickly:
 		\li \c grid has two columns and three rows.
 		\li The cells (0, 0), (1, 0), and (1, 2) hold small buttons
 		\li The cells (0, 1) and (1, 1) hold a single button that spans both
@@ -156,6 +156,4 @@ BLayoutBuilder::Group<>(window, B_VERTICAL)
 	This is only one way that you could build this layout, but it is probably
 	the most succinct. Functionally, this is equivalent to all the previous
 	code in this introduction.
-
 */
-

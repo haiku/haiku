@@ -1,9 +1,7 @@
 /*!
-\page drivers Drivers
+	\page drivers Drivers
 
-\section topics Topics
-
-- \ref fs_modules
-- \ref usb_modules
-
+	\section topics Topics
+	- \ref fs_modules
+	- \ref usb_modules
 */

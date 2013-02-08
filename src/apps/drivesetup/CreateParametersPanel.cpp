@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Haiku Inc. All rights reserved.
+ * Copyright 2008-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -37,19 +37,17 @@ enum {
 	MSG_SIZE_TEXTCONTROL		= 'stct'
 };
 
+static const uint32 kMegaByte = 0x100000;
+
 
 CreateParametersPanel::CreateParametersPanel(BWindow* window,
 	BPartition* partition, off_t offset, off_t size)
 	:
 	AbstractParametersPanel(window)
 {
-	Init(B_CREATE_PARAMETER_EDITOR, "", partition);
-
-	// Scale offset, and size from bytes to megabytes (2^20)
-	// so that we do not run over a signed int32.
-	offset /= kMegaByte;
-	size /= kMegaByte;
 	_CreateViewControls(partition, offset, size);
+
+	Init(B_CREATE_PARAMETER_EDITOR, "", partition);
 }
 
 
@@ -65,8 +63,8 @@ CreateParametersPanel::Go(off_t& offset, off_t& size, BString& name,
 	// The object will be deleted in Go(), so we need to get the values before
 
 	// Return the value back as bytes.
-	size = (off_t)fSizeSlider->Size() * kMegaByte;
-	offset = (off_t)fSizeSlider->Offset() * kMegaByte;
+	size = fSizeSlider->Size();
+	offset = fSizeSlider->Offset();
 
 	// get name
 	name.SetTo(fNameTextControl->Text());
@@ -81,68 +79,6 @@ CreateParametersPanel::Go(off_t& offset, off_t& size, BString& name,
 	}
 
 	return AbstractParametersPanel::Go(parameters);
-}
-
-
-void
-CreateParametersPanel::AddControls(BLayoutBuilder::Group<>& builder,
-	BView* editorView)
-{
-	builder
-		.Add(fSizeSlider)
-		.Add(fSizeTextControl)
-		.AddGrid(0.0, 5.0)
-			.Add(fNameTextControl->CreateLabelLayoutItem(), 0, 0)
-			.Add(fNameTextControl->CreateTextViewLayoutItem(), 1, 0)
-			.Add(fTypeMenuField->CreateLabelLayoutItem(), 0, 1)
-			.Add(fTypeMenuField->CreateMenuBarLayoutItem(), 1, 1)
-		.End()
-		.Add(editorView);
-}
-
-
-void
-CreateParametersPanel::_CreateViewControls(BPartition* parent, off_t offset,
-	off_t size)
-{
-	// Setup the controls
-	fSizeSlider = new SizeSlider("Slider", B_TRANSLATE("Partition size"), NULL,
-		offset, offset + size);
-	fSizeSlider->SetPosition(1.0);
-	fSizeSlider->SetModificationMessage(new BMessage(MSG_SIZE_SLIDER));
-
-	fSizeTextControl = new BTextControl("Size Control", "", "", NULL);
-	for(int32 i = 0; i < 256; i++)
-		fSizeTextControl->TextView()->DisallowChar(i);
-	for(int32 i = '0'; i <= '9'; i++)
-		fSizeTextControl->TextView()->AllowChar(i);
-	_UpdateSizeTextControl();
-	fSizeTextControl->SetModificationMessage(
-		new BMessage(MSG_SIZE_TEXTCONTROL));
-
-	fNameTextControl = new BTextControl("Name Control",
-		B_TRANSLATE("Partition name:"),	"", NULL);
-	if (!parent->SupportsChildName())
-		fNameTextControl->SetEnabled(false);
-
-	fTypePopUpMenu = new BPopUpMenu("Partition Type");
-
-	int32 cookie = 0;
-	BString supportedType;
-	while (parent->GetNextSupportedChildType(&cookie, &supportedType) == B_OK) {
-		BMessage* message = new BMessage(MSG_PARTITION_TYPE);
-		message->AddString("type", supportedType);
-		BMenuItem* item = new BMenuItem(supportedType, message);
-		fTypePopUpMenu->AddItem(item);
-
-		if (strcmp(supportedType, kPartitionTypeBFS) == 0)
-			item->SetMarked(true);
-	}
-
-	fTypeMenuField = new BMenuField(B_TRANSLATE("Partition type:"),
-		fTypePopUpMenu);
-
-	fOkButton->SetLabel(B_TRANSLATE("Create"));
 }
 
 
@@ -164,9 +100,9 @@ CreateParametersPanel::MessageReceived(BMessage* message)
 
 		case MSG_SIZE_TEXTCONTROL:
 		{
-			int32 size = atoi(fSizeTextControl->Text());
+			off_t size = atoi(fSizeTextControl->Text()) * kMegaByte;
 			if (size >= 0 && size <= fSizeSlider->MaxPartitionSize())
-				fSizeSlider->SetValue(size + fSizeSlider->Offset());
+				fSizeSlider->SetSize(size);
 			else
 				_UpdateSizeTextControl();
 			break;
@@ -179,9 +115,82 @@ CreateParametersPanel::MessageReceived(BMessage* message)
 
 
 void
+CreateParametersPanel::AddControls(BLayoutBuilder::Group<>& builder,
+	BView* editorView)
+{
+	builder
+		.Add(fSizeSlider)
+		.Add(fSizeTextControl);
+
+	if (fSupportsName || fSupportsType) {
+		BLayoutBuilder::Group<>::GridBuilder gridBuilder
+			= builder.AddGrid(0.0, B_USE_DEFAULT_SPACING);
+
+		if (fSupportsName) {
+			gridBuilder.Add(fNameTextControl->CreateLabelLayoutItem(), 0, 0)
+				.Add(fNameTextControl->CreateTextViewLayoutItem(), 1, 0);
+		}
+		if (fSupportsType) {
+			gridBuilder.Add(fTypeMenuField->CreateLabelLayoutItem(), 0, 1)
+				.Add(fTypeMenuField->CreateMenuBarLayoutItem(), 1, 1);
+		}
+	}
+
+	builder.Add(editorView);
+}
+
+
+void
+CreateParametersPanel::_CreateViewControls(BPartition* parent, off_t offset,
+	off_t size)
+{
+	// Setup the controls
+	// TODO: use a lower granularity for smaller disks -- but this would
+	// require being able to parse arbitrary size strings with unit
+	fSizeSlider = new SizeSlider("Slider", B_TRANSLATE("Partition size"), NULL,
+		offset, size, kMegaByte);
+	fSizeSlider->SetPosition(1.0);
+	fSizeSlider->SetModificationMessage(new BMessage(MSG_SIZE_SLIDER));
+
+	fSizeTextControl = new BTextControl("Size Control", "", "", NULL);
+	for(int32 i = 0; i < 256; i++)
+		fSizeTextControl->TextView()->DisallowChar(i);
+	for(int32 i = '0'; i <= '9'; i++)
+		fSizeTextControl->TextView()->AllowChar(i);
+	_UpdateSizeTextControl();
+	fSizeTextControl->SetModificationMessage(
+		new BMessage(MSG_SIZE_TEXTCONTROL));
+
+	fNameTextControl = new BTextControl("Name Control",
+		B_TRANSLATE("Partition name:"),	"", NULL);
+	fSupportsName = parent->SupportsChildName();
+
+	fTypePopUpMenu = new BPopUpMenu("Partition Type");
+
+	int32 cookie = 0;
+	BString supportedType;
+	while (parent->GetNextSupportedChildType(&cookie, &supportedType) == B_OK) {
+		BMessage* message = new BMessage(MSG_PARTITION_TYPE);
+		message->AddString("type", supportedType);
+		BMenuItem* item = new BMenuItem(supportedType, message);
+		fTypePopUpMenu->AddItem(item);
+
+		if (strcmp(supportedType, kPartitionTypeBFS) == 0)
+			item->SetMarked(true);
+	}
+
+	fTypeMenuField = new BMenuField(B_TRANSLATE("Partition type:"),
+		fTypePopUpMenu);
+	fSupportsType = fTypePopUpMenu->CountItems() != 0;
+
+	fOkButton->SetLabel(B_TRANSLATE("Create"));
+}
+
+
+void
 CreateParametersPanel::_UpdateSizeTextControl()
 {
 	BString sizeString;
-	sizeString << fSizeSlider->Value() - fSizeSlider->Offset();
+	sizeString << fSizeSlider->Size() / kMegaByte;
 	fSizeTextControl->SetText(sizeString.String());
 }

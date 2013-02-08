@@ -7,6 +7,7 @@
  *		Ingo Weinhold, bonefish@users.sf.net
  *		Axel Dörfler, axeld@pinc-software.de
  *		John Scipione, jscipione@gmail.com
+ *
  * Corresponds to:
  *		headers/os/storage/MimeType.h  hrev43528
  *		src/kits/storage/MimeType.cpp  hrev43528
@@ -15,6 +16,8 @@
 
 /*!
 	\file MimeType.h
+	\ingroup storage
+	\ingroup libbe
 	\brief Provides the BMimeType class.
 */
 

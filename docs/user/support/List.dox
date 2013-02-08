@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,13 +11,15 @@
  *		John Drinkwater, jdrinkwater@gmail.com
  *
  * Corresponds to:
- *		/trunk/headers/os/support/List.h  rev 19972
- *		/trunk/src/kits/support/List.cpp  rev 18649
+ *		headers/os/support/List.h	rev 19972
+ *		src/kits/support/List.cpp	rev 18649
  */
 
 
 /*!
 	\file List.h
+	\ingroup support
+	\ingroup libbe
 	\brief Defines the BList class.
 */
 
@@ -28,37 +30,36 @@
 	\ingroup libbe
 	\brief An ordered container that is designed to hold generic \c void* 
 		objects.
-	
+
 	This class is designed to be used for a variety of tasks. Unlike similar
 	implementations in other libraries, this class is not based on templates
 	and as such is inherently not typed. So it will be the job of the programmer
 	to make sure proper data is entered since the compiler cannot check this by
 	itself.
-	
+
 	BList contains a list of items that will grow and shrink depending on how
 	many items are in it. So you will not have to do any of the memory
 	management nor any ordering. These properties makes it useful in a whole
 	range of situations such as the interface kit within the BListView class.
-	
+
 	A note on the ownership of the objects might come in handy. BList never
 	assumes ownership of the objects. As such, removing items from the list will
 	only remove the entries from the list; it will not delete the items
 	themselves. Similarly, you should also make sure that before you might
 	delete an object that is in a list, you will have to remove it from the list
 	first.
-	
+
 	\warning This class is not thread-safe.
-	
+
 	The class implements methods to add, remove, reorder, retrieve, and query
 	items as well as some advanced methods which let you perform a task on all
 	the items in the list.
 */
 
-
 /*!
 	\fn BList::BList(int32 count = 20)
 	\brief Create a new list with a number of empty slots.
-	
+
 	The memory management of this class allocates new memory per block. The
 	\c count parameter can be tweaked to determine the size of these blocks.
 	In general, if you know your list is only going to contain a certain number
@@ -68,49 +69,43 @@
 	large number of items, choose a higher value. Every time the memory is full,
 	all the items have to be copied into a new piece of allocated memory, which
 	is an expensive operation.
-	
+
 	If you are unsure, you do not have to worry too much. Just make sure you do
 	not use a lot of lists, and as long as the list is not used in one of the
 	performance critical parts of the code, you are safe to go with the default
 	values.
-	
+
 	\param count The size of the blocks allocated in memory.
 */
-
 
 /*!
 	\fn BList::BList(const BList& anotherList)
 	\brief Copy constructor. Copy a complete list into this one.
 */
 
-
 /*!
 	\fn BList::~BList()
 	\brief Destroy the list.
-	
+
 	Please note that as BList does not assume ownership of the objects,
 	only the list will be freed, not the objects that are held in it.
 */
-
 
 /*!
 	\fn BList& BList::operator=(const BList &list)
 	\brief Copy another list into this object.
 */
 
-
 /*!
 	\name Adding and Removing Items
 */
 
-
 //! @{
-
 
 /*!
 	\fn bool BList::AddItem(void *item, int32 index)
 	\brief Add an item at a certain position.
-	
+
 	\param item The item to add.
 	\param index The place in the list.
 	\retval true The item was added.
@@ -119,25 +114,23 @@
 	\see AddItem(void *item)
 */
 
-
 /*!
 	\fn bool BList::AddItem(void *item)
 	\brief Append an item to the list.
-	
+
 	\param item The item to add.
 	\retval true The item was appended.
 	\retval false Item was not appended, since resizing the list failed.
 	\see AddItem(void *item, int32 index)
 */
 
-
 /*!
 	\fn bool BList::AddList(const BList *list, int32 index)
 	\brief Add items from another list to this list at a certain position.
-	
+
 	Note that the \a list parameter is \c const, so the original list will not
 	be altered.
-	
+
 	\param list The list to be added.
 	\param index The position in the current list where the new item(s) should
 		be put.
@@ -147,14 +140,13 @@
 	\see AddList(const BList *list)
 */
 
-
 /*!
 	\fn bool BList::AddList(const BList *list)
 	\brief Append a list to this list.
-	
+
 	Note that the \a list parameter is a \c const, so the original list will not
 	be altered.
-	
+
 	\param list The list to be appended.
 	\retval true The list was appended. 
 	\retval false Failed to append the list, due to the fact that resizing of
@@ -162,159 +154,141 @@
 	\see AddList(const BList *list, int32 index)
 */
 
-
 /*!
 	\fn bool BList::RemoveItem(void *item)
 	\brief Remove an item from the list.
-	
+
 	\param item The item that should be removed.
 	\retval true The item was found and removed.
 	\retval false The item was not in this list and thus not removed.
 	\see RemoveItem(int32 index)
 */
 
-
 /*!
 	\fn void * BList::RemoveItem(int32 index)
 	\brief Remove the item at \a index from the list.
-	
+
 	\param index The item that should be removed.
 	\return The pointer to the item that was removed, or \c NULL in case the
 		index was invalid.
 	\see RemoveItem(void *item)
 */
 
-
 /*!
 	\fn bool BList::RemoveItems(int32 index, int32 count)
 	\brief Remove a number of items starting at a certain position.
-	
+
 	If the count parameter is larger than the number of items in the list,
 	all the items from the offset to the end will be removed.
-	
+
 	\param index The offset in the list where removal should start.
 	\param count The number of items to remove.
 	\retval true Removal succeeded.
 	\retval false Failed to remove the items because the index was invalid.
 */
 
-
 /*!
 	\fn bool BList::ReplaceItem(int32 index, void *newItem)
 	\brief Replace an item with another one.
-	
+
 	\param index The offset in the list where to put the item.
 	\param newItem The new item to put in the list.
 	\retval true Item replaced.
 	\retval false The index was invalid.
 */
 
-
 /*!
 	\fn void BList::MakeEmpty()
 	\brief Clear all the items from the list.
-	
+
 	Please note that this does not free the items. 
 */
 
-
 //! @}
-
 
 /*!
 	\name Reordering Items
 */
 
-
 //! @{
-
 
 /*!
 	\fn void BList::SortItems(int (*compareFunc)(const void *, const void *))
 	\brief Sort the items with the use of a supplied comparison function.
-	
+
 	The function should take two \c const pointers as arguments and should
 	return an integer.
-	
+
 	For an example, see the Compare(const BString *, const BString *) function.
 */
-
 
 /*!
 	\fn bool BList::SwapItems(int32 indexA, int32 indexB)
 	\brief Swap two items.
-	
+
 	\param indexA The first item.
 	\param indexB The second item.
 	\retval true Swap succeeded.
 	\retval false Swap failed because one of the indexes was invalid.
 */
 
-
 /*!
 	\fn bool BList::MoveItem(int32 fromIndex, int32 toIndex)
 	\brief Move an item to a new place
-	
+
 	This moves a list item from position A to position B, moving the appropriate
 	block of list elements to make up for the move. For example, in the array:
 	\verbatim
 A B C D E F G H I J
 	\endverbatim
-	
+
 	Moving 1(B)->6(G) would result in this:
 	\verbatim
 A C D E F G B H I J
 	\endverbatim
-	
+
 	\param fromIndex The original location.
 	\param toIndex The new location.
 	\retval true Move succeeded.
 	\retval false Move failed due to the indexes being invalid.
 */
 
-
 //! @}
-
 
 /*!
 	\name Retrieving Items
 */
 
-
 //! @{
-
 
 /*!
 	\fn void *BList::ItemAt(int32 index) const
 	\brief Get an item.
-	
+
 	\param index The item to retrieve.
 	\return A pointer to the item in that position, or \c NULL if the index is
 	out of bounds.
 	\see ItemAtFast(int32 index) const
 */
 
-
 /*!
 	\fn void *BList::FirstItem() const
 	\brief Get the first item.
-	
+
 	\return A pointer to the first item or \c NULL if the list is empty.
 	\see LastItem() const
 */
 
-
 /*!
 	\fn void *BList::ItemAtFast(int32 index) const
 	\brief Get an item.
-	
+
 	This method does not perform any boundary checks when it retrieves an item.
 	Use this method in a performance critical area of your program where you are
 	sure you will not get an invalid item.
-	
+
 	\return A pointer to the item.
 */
-
 
 /*!
 	\fn void *BList::LastItem() const
@@ -323,18 +297,17 @@ A C D E F G B H I J
 	\see FirstItem() const
 */
 
-
 /*!
 	\fn void *BList::Items() const
 	\brief Return the internal list of objects.
-	
+
 	This method will return a pointer to the internal pointer list. This means
 	that you should be careful what you are doing, since you are working with
 	the internals of the class directly.
-	
+
 	It is not a good idea to make any changes to the list, since that will mess
 	up the internal consistency.
-	
+
 	\warning If there is anything you want, for which you need the list of
 		objects, please realize that that probably means that what you want to
 		do is a bad idea to begin with and that you should avoid this method.
@@ -343,81 +316,68 @@ A C D E F G B H I J
 	\return The internal list of pointers.
 */
 
-
 //! @}
-
 
 /*!
 	\name Querying for Items
 */
 
-
 //! @{
-
 
 /*!
 	\fn bool BList::HasItem(void *item) const
 	\brief Check if an item is in the list.
 */
 
-
 /*!
 	\fn int32 BList::IndexOf(void *item) const
 	\brief Get the index of an item.
-	
+
 	\return The index of the item, or -1 when the item is not in the list.
 */
-
 
 /*!
 	\fn int32 BList::CountItems() const
 	\brief Get the number of items in the list.
 */
 
-
 /*!
 	\fn bool BList::IsEmpty() const
 	\brief Check if there are items in the list.
 */
 
-
 //! @}
-
 
 /*!
 	\name Iterating over the List
 */
 
-
 //! @{
-
 
 /*!
 	\fn void BList::DoForEach(bool (*func)(void* item))
 	\brief Perform an action on every item in the list.
-	
+
 	If one of the actions on the items fails it means that the \a func function
 	returned \c false and the processing of the list will be stopped.
-	
+
 	\param func A function that takes a \c void* argument and returns a
 		boolean.
 	\see DoForEach(bool (*func)(void* item, void* arg2), void *arg2)
 */
 
-
 /*!
 	\fn void BList::DoForEach(bool (*func)(void* item, void* arg2), void *arg2)
 	\brief Perform an action on every item in the list with an argument.
-	
+
 	If one of the actions on the items fails it means that the \a func function
 	returned \c false and the processing of the list will be stopped.
-	
+
 	\param func A function with the first \c void* argument being the item
 		and the second \c void* being the argument that you supply. It should
 		return a boolean value on whether it succeeded or not.
 	\param arg2 An argument to supply to \a func.
 	\see DoForEach(bool (*func)(void* item))
 */
-
 
 //! @}

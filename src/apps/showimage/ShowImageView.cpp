@@ -347,12 +347,13 @@ ShowImageView::SetImage(const BMessage* message)
 		|| message->FindRef("ref", &ref) != B_OK || bitmap == NULL)
 		return B_ERROR;
 
-	status_t status = SetImage(&ref, bitmap);
+	BitmapOwner* bitmapOwner;
+	message->FindPointer("bitmapOwner", (void**)&bitmapOwner);
+
+	status_t status = SetImage(&ref, bitmap, bitmapOwner);
 	if (status == B_OK) {
 		fFormatDescription = message->FindString("type");
 		fMimeType = message->FindString("mime");
-
-		message->FindPointer("bitmapOwner", (void**)&fBitmapOwner);
 	}
 
 	return status;
@@ -360,7 +361,8 @@ ShowImageView::SetImage(const BMessage* message)
 
 
 status_t
-ShowImageView::SetImage(const entry_ref* ref, BBitmap* bitmap)
+ShowImageView::SetImage(const entry_ref* ref, BBitmap* bitmap,
+		BitmapOwner* bitmapOwner)
 {
 	// Delete the old one, and clear everything
 	fUndo.Clear();
@@ -369,6 +371,7 @@ ShowImageView::SetImage(const entry_ref* ref, BBitmap* bitmap)
 	_DeleteBitmap();
 
 	fBitmap = bitmap;
+	fBitmapOwner = bitmapOwner;
 	if (ref == NULL)
 		fCurrentRef.device = -1;
 	else
@@ -1710,6 +1713,9 @@ ShowImageView::_DoImageOperation(ImageProcessor::operation op, bool quiet)
 	// set new bitmap
 	_DeleteBitmap();
 	fBitmap = bm;
+
+	if (fBitmap->ColorSpace() == B_RGBA32)
+		fDisplayBitmap = compose_checker_background(fBitmap);
 
 	if (!quiet) {
 		// remove selection

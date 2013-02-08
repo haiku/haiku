@@ -44,6 +44,11 @@ BUrlProtocol::BUrlProtocol(const BUrl& url, BUrlProtocolListener* listener,
 }
 
 
+BUrlProtocol::~BUrlProtocol()
+{
+}
+
+
 // #pragma mark URL protocol thread management
 
 

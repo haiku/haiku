@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,18 +11,22 @@
  *		Thom Holwerda, slakje@quicknet.nl
  *
  * Corresponds to:
- *		/trunk/headers/os/support/Archivable.h rev 37751 
- *		/trunk/src/kits/support/Archivable.cpp rev 37751
+ *		headers/os/support/Archivable.h rev 37751
+ *		src/kits/support/Archivable.cpp rev 37751
  */
 
 
-/*!	\file Archivable.h
+/*!
+	\file Archivable.h
+	\ingroup support
+	\ingroup libbe
 	\brief Provides the BArchivable interface and declares the BArchiver and
 		BUnarchiver classes.
 */
 
 
-/*!	\class BArchivable
+/*!
+	\class BArchivable
 	\ingroup support
 	\ingroup libbe
 	\brief Interface for objects that can be archived into a BMessage.
@@ -37,8 +41,8 @@
 	disk. The objective of this interface, however, is to store objects that
 	will later be restored as new (but identical) objects. To illustrate this
 	point, BArchivable objects can be restored automatically to the correct
-	class, whereas BFlattenables have a data type which you need to map to
-	classes manually.
+	class, whereas BFlattenable objects have a data type which you need to map
+	to classes manually.
 
 	Archiving is done with the Archive() method. If your class supports it, the
 	caller can request it to store into a deep archive, meaning that all child
@@ -65,12 +69,12 @@
 
 /*!
 	\fn BArchivable::BArchivable(BMessage* from)
-	\brief Constructor. Does important behind-the-scenes work in the unarchiving
-		process.
-	
+	\brief Constructor. Does important behind-the-scenes work in the
+		   unarchiving process.
+
 	If you inherit this interface you should provide at least one constructor
-	that takes one BMessage argument. In that constructor, you should call your
-	parent class' archive constructor (even if your parent class is
+	that takes one BMessage argument. In that constructor, you should call 
+	your parent class' archive constructor (even if your parent class is
 	BArchivable).
 */
 
@@ -130,7 +134,7 @@
 /*!
 	\fn virtual status_t BArchivable::Perform(perform_code d, void* arg)
 	\brief Perform some action (Internal method defined for binary
-		compatibility purposes).
+		   compatibility purposes).
 
 	\internal This method is defined for binary compatibility purposes, it is
 		used to ensure that the correct AllUnarchived() and AllArchived()
@@ -184,13 +188,18 @@
 
 
 ///// Global methods /////
+
+
 /*!
 	\addtogroup support_globals
-	@{
 */
 
 
-/*!	\typedef typedef BArchivable* (*instantiation_func)(BMessage*)
+//! @{
+
+
+/*!
+	\typedef typedef BArchivable* (*instantiation_func)(BMessage*)
 	\brief Internal definition of a function that can instantiate objects that
 		have been created with the BArchivable API.
 */

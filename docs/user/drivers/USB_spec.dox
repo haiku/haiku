@@ -1,296 +1,358 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation by:
- *  Niels Sascha Reedijk <niels.reedijk@gmail.com>
+ * Authors:
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *
  * Corresponds to:
- * /trunk/headers/os/drivers/USB_spec.h rev 19915
+ *		headers/os/drivers/USB_spec.h rev 19915
  */
- 
-/*!
-  \file USB_spec.h
-  \brief General definitions as defined by the USB standard.
-*/
+
 
 /*!
-  \name Request Types: targets and direction
-  
-  These request types can be used in the usb_module_info::send_request()
-  and usb_module_info::queue_request() methods. They specifiy both the type
-  of interface and the direction of the transfer.
-  
-  These are usually combined with a category (found on this page).
+	\file USB_spec.h
+	\ingroup drivers
+	\ingroup libbe
+	\brief General definitions as defined by the USB standard.
 */
+
+
+/*!
+	\name Request Types: targets and direction
+
+	These request types can be used in the usb_module_info::send_request()
+	and usb_module_info::queue_request() methods. They specifiy both the type
+	of interface and the direction of the transfer.
+
+	These are usually combined with a category (found on this page).
+*/
+
 
 //! @{
+
 
 /*! 
-  \def USB_REQTYPE_DEVICE_IN
-  \brief Device. In. 
+	\def USB_REQTYPE_DEVICE_IN
+	\brief Device. In.
 */
+
 
 /*!
-  \def USB_REQTYPE_DEVICE_OUT
-  \brief Device. Out.
+	\def USB_REQTYPE_DEVICE_OUT
+	\brief Device. Out.
 */
+
 
 /*!
-  \def USB_REQTYPE_INTERFACE_IN
-  \brief Interface. In.
+	\def USB_REQTYPE_INTERFACE_IN
+	\brief Interface. In.
 */
+
 
 /*!
-  \def USB_REQTYPE_INTERFACE_OUT
-  \brief Interface. Out.
+	\def USB_REQTYPE_INTERFACE_OUT
+	\brief Interface. Out.
 */
 
-/*! 
-  \def USB_REQTYPE_ENDPOINT_IN
-  \brief Endpoint. In.
-*/
 
 /*!
-  \def USB_REQTYPE_ENDPOINT_OUT
-  \brief Endpoint. Out.
+	\def USB_REQTYPE_ENDPOINT_IN
+	\brief Endpoint. In.
 */
 
-/*!
-  \def USB_REQTYPE_OTHER_OUT 
-  \brief Other. Out.
-*/
 
 /*!
-  \def USB_REQTYPE_OTHER_IN
-  \brief Other. In.
+	\def USB_REQTYPE_ENDPOINT_OUT
+	\brief Endpoint. Out.
 */
+
+
+/*!
+	\def USB_REQTYPE_OTHER_OUT 
+	\brief Other. Out.
+*/
+
+
+/*!
+	\def USB_REQTYPE_OTHER_IN
+	\brief Other. In.
+*/
+
 
 //! @}
 
-/*! 
-  \name Request Types: categories
-  
-  These request types can be used in the usb_module_info::send_request()
-  and usb_module_info::queue_request() methods. They specifiy the category
-  of the transfer.
-  
-  These are usually combined with a target and direction (found on this page).
+
+/*!
+	\name Request Types: categories
+
+	These request types can be used in the usb_module_info::send_request()
+	and usb_module_info::queue_request() methods. They specifiy the category
+	of the transfer.
+
+	These are usually combined with a target and direction (found on this page).
 */
+
 
 //! @{
 
-/*! 
-  \def USB_REQTYPE_STANDARD
-  \brief Request that adheres to the USB specifications.
-*/
 
 /*!
-  \def USB_REQTYPE_CLASS
-  \brief Request that adheres to the specifications of the class.
+	\def USB_REQTYPE_STANDARD
+	\brief Request that adheres to the USB specifications.
 */
 
-/*!
-  \def USB_REQTYPE_VENDOR
-  \brief Request that is defined by the specifications of the vendor.
-*/
 
 /*!
-  \def USB_REQTYPE_RESERVED
-  \brief Reserved for special implementations.
+	\def USB_REQTYPE_CLASS
+	\brief Request that adheres to the specifications of the class.
 */
 
+
 /*!
-  \def USB_REQTYPE_MASK
-  \brief Constant that can be used as mask over the requesttype field.
+	\def USB_REQTYPE_VENDOR
+	\brief Request that is defined by the specifications of the vendor.
 */
+
+
+/*!
+	\def USB_REQTYPE_RESERVED
+	\brief Reserved for special implementations.
+*/
+
+
+/*!
+	\def USB_REQTYPE_MASK
+	\brief Constant that can be used as mask over the requesttype field.
+*/
+
 
 //! @}
 
+
 /*!
-  \name Standard Request Values
-  
-  These request values are defined by the USB standard. You can use these
-  constants in both the usb_module_info::send_request() and
-  usb_module_info::queue_request() methods.
-  
-  \warning The stack handles most of these standard requests for you. Use the
-  supplied convenience functions the the usb_module_info interface rather than
-  doing the requests yourself. Some of these request may actually interfere
-  with the inner workings of the USB stack!
+	\name Standard Request Values
+
+	These request values are defined by the USB standard. You can use these
+	constants in both the usb_module_info::send_request() and
+	usb_module_info::queue_request() methods.
+
+	\warning The stack handles most of these standard requests for you. Use the
+	supplied convenience functions the the usb_module_info interface rather than
+	doing the requests yourself. Some of these request may actually interfere
+	with the inner workings of the USB stack!
 */
+
 
 //! @{
 
-/*!
-  \def USB_REQUEST_GET_STATUS
-  \brief Get the status of a device.
-*/
 
 /*!
-  \def USB_REQUEST_CLEAR_FEATURE 
-  \brief Clear a feature.
+	\def USB_REQUEST_GET_STATUS
+	\brief Get the status of a device.
 */
 
-/*!
-  \def USB_REQUEST_SET_FEATURE 
-  \brief Set a feature.
-*/
 
 /*!
-  \def USB_REQUEST_SET_ADDRESS
-  \brief Set the device address.
+	\def USB_REQUEST_CLEAR_FEATURE 
+	\brief Clear a feature.
 */
 
-/*!
-  \def USB_REQUEST_GET_DESCRIPTOR 
-  \brief Get a descriptor.
-*/
 
 /*!
-  \def USB_REQUEST_SET_DESCRIPTOR 
-  \brief Update a descriptor to a supplied one.
+	\def USB_REQUEST_SET_FEATURE 
+	\brief Set a feature.
 */
 
-/*!
-  \def USB_REQUEST_GET_CONFIGURATION
-  \brief Get a configuration.
-*/
 
 /*!
-  \def USB_REQUEST_SET_CONFIGURATION 
-  \brief Set the configuration.
+	\def USB_REQUEST_SET_ADDRESS
+	\brief Set the device address.
 */
 
-/*!
-  \def USB_REQUEST_GET_INTERFACE
-  \brief Request an interface descriptor.
-*/
 
 /*!
-  \def USB_REQUEST_SET_INTERFACE
-  \brief Set a specific interface.
+	\def USB_REQUEST_GET_DESCRIPTOR 
+	\brief Get a descriptor.
 */
 
+
 /*!
-  \def USB_REQUEST_SYNCH_FRAME
-  \brief Synchronize a frame.
+	\def USB_REQUEST_SET_DESCRIPTOR 
+	\brief Update a descriptor to a supplied one.
 */
+
+
+/*!
+	\def USB_REQUEST_GET_CONFIGURATION
+	\brief Get a configuration.
+*/
+
+
+/*!
+	\def USB_REQUEST_SET_CONFIGURATION 
+	\brief Set the configuration.
+*/
+
+
+/*!
+	\def USB_REQUEST_GET_INTERFACE
+	\brief Request an interface descriptor.
+*/
+
+
+/*!
+	\def USB_REQUEST_SET_INTERFACE
+	\brief Set a specific interface.
+*/
+
+
+/*!
+	\def USB_REQUEST_SYNCH_FRAME
+	\brief Synchronize a frame.
+*/
+
 
 //! @}
 
+
 /*!
-  \name Descriptor Constants
-  
-  These constants refer to a specific descriptor. They can be used when
-  building a standard USB request for a descriptor, or in the
-  usb_module_info::get_descriptor() method.
+	\name Descriptor Constants
+
+	These constants refer to a specific descriptor. They can be used when
+	building a standard USB request for a descriptor, or in the
+	usb_module_info::get_descriptor() method.
 */
+
 
 //! @{
 
-/*!
-  \def USB_DESCRIPTOR_DEVICE
-  \brief Constant for the device descriptor.
-*/
 
 /*!
-  \def USB_DESCRIPTOR_CONFIGURATION
-  \brief Constant for a configuration descriptor.
+	\def USB_DESCRIPTOR_DEVICE
+	\brief Constant for the device descriptor.
 */
 
-/*!
-  \def USB_DESCRIPTOR_STRING
-  \brief Constant for a string descriptor.
-*/
 
 /*!
-  \def USB_DESCRIPTOR_INTERFACE
-  \brief Constant for an interface descriptor.
+	\def USB_DESCRIPTOR_CONFIGURATION
+	\brief Constant for a configuration descriptor.
 */
 
+
 /*!
-  \def USB_DESCRIPTOR_ENDPOINT
-  \brief Constant for an endpoint descriptor.
+	\def USB_DESCRIPTOR_STRING
+	\brief Constant for a string descriptor.
 */
+
+
+/*!
+	\def USB_DESCRIPTOR_INTERFACE
+	\brief Constant for an interface descriptor.
+*/
+
+
+/*!
+	\def USB_DESCRIPTOR_ENDPOINT
+	\brief Constant for an endpoint descriptor.
+*/
+
 
 //! @}
 
+
 /*!
-  \name Feature Requests
-  
-  These constants refer to standard feature requests. You can use these using
-  the convenient usb_module_info::set_feature() and 
-  usb_module_info::clear_feature() methods.
+	\name Feature Requests
+
+	These constants refer to standard feature requests. You can use these
+	using the convenient usb_module_info::set_feature() and 
+	usb_module_info::clear_feature() methods.
 */
+
 
 //! @{
 
-/*!
-  \def USB_FEATURE_DEVICE_REMOTE_WAKEUP
-  \brief Request a device to wakeup from remote calls.
-*/
 
 /*!
-  \def USB_FEATURE_ENDPOINT_HALT
-  \brief Request for a specific endpoint to halt.
+	\def USB_FEATURE_DEVICE_REMOTE_WAKEUP
+	\brief Request a device to wakeup from remote calls.
 */
+
+
+/*!
+	\def USB_FEATURE_ENDPOINT_HALT
+	\brief Request for a specific endpoint to halt.
+*/
+
 
 //! @}
 
+
 /*!
-  \name Endpoint Attributes
-  
-  These constants refer to values in the usb_endpoint_descriptor::attributes
-  field.
+	\name Endpoint Attributes
+
+	These constants refer to values in the usb_endpoint_descriptor::attributes
+	field.
 */
+
 
 //! @{
 
-/*!
-  \def USB_ENDPOINT_ATTR_CONTROL
-  \brief Endpoint facilitates control transfers.
-*/
 
 /*!
-  \def USB_ENDPOINT_ATTR_ISOCHRONOUS
-  \brief Endpoint facilitates isochronous transfers.
+	\def USB_ENDPOINT_ATTR_CONTROL
+	\brief Endpoint facilitates control transfers.
 */
 
-/*!
-  \def USB_ENDPOINT_ATTR_BULK
-  \brief Endpoint facilitates bulk transfers.
-*/
 
 /*!
-  \def USB_ENDPOINT_ATTR_INTERRUPT
-  \brief Endpoint facilitates interrupt transfers.
+	\def USB_ENDPOINT_ATTR_ISOCHRONOUS
+	\brief Endpoint facilitates isochronous transfers.
 */
 
+
 /*!
-  \def USB_ENDPOINT_ATTR_MASK
-  \brief Constant to mask out transfer types.
+	\def USB_ENDPOINT_ATTR_BULK
+	\brief Endpoint facilitates bulk transfers.
 */
+
+
+/*!
+	\def USB_ENDPOINT_ATTR_INTERRUPT
+	\brief Endpoint facilitates interrupt transfers.
+*/
+
+
+/*!
+	\def USB_ENDPOINT_ATTR_MASK
+	\brief Constant to mask out transfer types.
+*/
+
 
 //! @}
 
+
 /*!
-  \name Endpoint Address
-  
-  These constants refer to the direction that is embedded in the
-  usb_endpoint_descriptor::address field.
+	\name Endpoint Address
+
+	These constants refer to the direction that is embedded in the
+	usb_endpoint_descriptor::address field.
 */
+
 
 //! @{
 
-/*!
-  \def USB_ENDPOINT_ADDR_DIR_IN
-  \brief The endpoint provides data for the driver.
-*/
 
 /*!
-  \def USB_ENDPOINT_ADDR_DIR_OUT	
-  \brief The endpoint accepts data from the host.
+	\def USB_ENDPOINT_ADDR_DIR_IN
+	\brief The endpoint provides data for the driver.
 */
+
+
+/*!
+	\def USB_ENDPOINT_ADDR_DIR_OUT	
+	\brief The endpoint accepts data from the host.
+*/
+
 
 //! @}
-

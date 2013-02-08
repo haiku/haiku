@@ -1,22 +1,24 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- * 		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  *
  * Proofreading:
- * 		David Weizades, ddewbofh@hotmail.com
+ *		David Weizades, ddewbofh@hotmail.com
  *		Thom Holwerda, slakje@quicknet.nl
- * 
+ *
  * Corresponds to:
- *		/trunk/headers/os/support/BlockCache.h  rev 19972
- *		/trunk/src/kits/support/BlockCache.cpp  rev 4568
+ *		headers/os/support/BlockCache.h  rev 19972
+ *		src/kits/support/BlockCache.cpp  rev 4568
  */
 
 
  /*!
 	\file BlockCache.h
+	\ingroup support
+	\ingroup libbe
 	\brief Implements a mechanism to store and retrieve memory blocks.
 */
 
@@ -40,14 +42,14 @@
 	\ingroup support
 	\ingroup libbe
 	\brief A class that creates and maintains a pool of memory blocks.
-	
+
 	In some performance critical code there might come a time where you require
 	a lot of little blocks of memory that you want to access and dispose of
 	continuously. Since allocating and freeing memory are 'expensive'
 	operations, it is better to have a pool of memory blocks at your disposal.
 	Luckily, the Haiku API provides a class that will act as the administrator
 	of your memory pool, so you will not have to reinvent the wheel every time.
-	
+
 	The principle is easy. The constructor takes the number of blocks you
 	want to create beforehand, the size of the blocks, and the method of
 	allocation. This can either be #B_OBJECT_CACHE or #B_MALLOC_CACHE.
@@ -55,14 +57,14 @@
 	one uses \c malloc() and \c free(). Unless you have specific demands on
 	performance or you want to take care of freeing the objects yourself, either
 	way works fine.
-	
+
 	As soon as you have the memory pool, you can Get() blocks. If the
 	pre-allocated memory blocks run out, BBlockCache will allocate new ones, so
 	you will not have to worry about availability. As soon as you are done you
 	can Save() the memory back into the pool. BBlockCache will make sure that no
 	more blocks will be saved than the initial number you requested when you
 	created the object, so be aware of that.
-	
+
 	As soon as you got a pointer from the Get() method, you own that block of
 	memory; this means that you have the liberty to dispose of it yourself. It
 	also means that when you delete your BBlockCache instance, any blocks of
@@ -73,7 +75,7 @@
 	note that it defeats the purpose of this class if your are going to free all
 	the objects yourself since it basically means that when the pool runs out,
 	Get() will be allocating the objects by itself.
-	
+
 	\note BBlockCache is thread-safe.
 */
 
@@ -82,7 +84,7 @@
 	\fn BBlockCache::BBlockCache(uint32 blockCount, size_t blockSize, uint32
 		allocationType)
 	\brief Allocate a new memory pool.
-	
+
 	\param blockCount The number of free memory blocks you want to allocate
 		initially. This number is also used as the maximum number of free blocks
 		that will be kept.
@@ -95,7 +97,7 @@
 /*!
 	\fn BBlockCache::~BBlockCache()
 	\brief Destroy the empty blocks in the free list.
-	
+
 	Note that the blocks you checked out with Get() and not checked back in with
 	Save() will not be freed, since ownership belongs to you. Make sure you
 	clean up after yourself.
@@ -105,12 +107,12 @@
 /*!
 	\fn void *BBlockCache::Get(size_t blockSize)
 	\brief Get a block from the pool of free blocks.
-	
+
 	If the pool runs out of free blocks, a new one will be allocated. Please
 	note that if the size given in the \c blockSize parameter is different from
 	the size given in the constructor, a new block of memory will be created.
 	Only sizes that match the blocks in the memory pool will come from the pool.
-	
+
 	\param blockSize The required size of the memory block.
 	\return Returns a pointer to a memory block, or \c NULL if locking the
 		object failed.
@@ -120,12 +122,12 @@
 /*!
 	\fn void BBlockCache::Save(void *pointer, size_t blockSize)
 	\brief Save a block of memory to the memory pool.
-	
+
 	The block of memory will only be added to the pool if the \c blockSize is
 	equal to the size the object was created with and if the maximum number of
 	free blocks in the list will not be exceeded. If not, the memory will be
 	freed.
-	
+
 	Note that it is perfectly valid to pass objects other than those you got
 	from Get(), but please note that the way it was created conforms to the way
 	memory is allocated and freed in this pool. Therefore, only feed blocks that

@@ -1,171 +1,188 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation written by:
- *   Niels Sascha Reedijk <niels.reedijk@gmail.com>
+ * Authors:
+ *		Niels Sascha Reedijk <niels.reedijk@gmail.com>
+ *
  * Corresponds to:
- *   /trunk/headers/os/support/Flattenable.h rev 19972
- *   /trunk/src/kits/support/Flattenable.cpp rev 12963
+ *		headers/os/support/Flattenable.h	rev 19972
+ *		src/kits/support/Flattenable.cpp	rev 12963
  */
 
-/*!
-  \file Flattenable.h
-  \brief Provides the BFlattenable interface
-*/
 
 /*!
-  \class BFlattenable
-  \ingroup support
-  \ingroup libbe
-  \brief Interface for classes that can flatten and unflatten themselves to
-    a stream of bytes.
-   
-  It is convenient that objects can be stored as a flat stream of bytes. In
-  this way, they can be written to disk, exchanged between applications or send
-  over networks. This ability, which is known in many other programming
-  languages as marshalling, is not native in C++. The Haiku API has created a
-  universal interface that classes have if they are able to be flattened. This
-  class defines the interface. This class does nothing on its own, and
-  therefore contains pure virtuals. By inheriting this class and inmplementing
-  the methods in your own class, you will be able to use your objects as
-  flattenable objects throughout the Haiku API.
-  
-  Flattened objects can be used for example when sending messages within an
-  application or between applications. The BMessage class uses the interface
-  to store and transmit custom classes. 
-  
-  If you want to be able to flatten your objects, you will need to implement
-  various methods. Flatten() and Unflatten() are where the magic happen. These
-  methods handle the actual flattening and unflattening. To identify flattened
-  data in for example BMessage, the object has a type_code. Type codes are
-  four byte long integers. You can choose to flatten to one of the existing
-  types, if you are certain that you are compatible to those, but you'll
-  usually define your own type. Your best option is by using a multicharacter
-  constant, such as 'STRI'. Implement TypeCode() to return the type you
-  support. Implement FlattenedSize() to make sure that other objects can
-  provide the right buffers. Implement IsFixedSize() to return whether your
-  objects always store to a fixed size.
-  
-  See the following example:
-  \code
+	\file Flattenable.h
+	\ingroup support
+	\ingroup libbe
+	\brief Provides the BFlattenable interface
+*/
+
+
+/*!
+	\class BFlattenable
+	\ingroup support
+	\ingroup libbe
+	\brief Interface for classes that can flatten and unflatten themselves to
+		   a stream of bytes.
+
+	It is convenient that objects can be stored as a flat stream of bytes. In
+	this way, they can be written to disk, exchanged between applications or send
+	over networks. This ability, which is known in many other programming
+	languages as marshalling, is not native in C++. The Haiku API has created a
+	universal interface that classes have if they are able to be flattened. This
+	class defines the interface. This class does nothing on its own, and
+	therefore contains pure virtuals. By inheriting this class and inmplementing
+	the methods in your own class, you will be able to use your objects as
+	flattenable objects throughout the Haiku API.
+
+	Flattened objects can be used for example when sending messages within an
+	application or between applications. The BMessage class uses the interface
+	to store and transmit custom classes. 
+
+	If you want to be able to flatten your objects, you will need to implement
+	various methods. Flatten() and Unflatten() are where the magic happen. These
+	methods handle the actual flattening and unflattening. To identify flattened
+	data in for example BMessage, the object has a type_code. Type codes are
+	four byte long integers. You can choose to flatten to one of the existing
+	types, if you are certain that you are compatible to those, but you'll
+	usually define your own type. Your best option is by using a multicharacter
+	constant, such as 'STRI'. Implement TypeCode() to return the type you
+	support. Implement FlattenedSize() to make sure that other objects can
+	provide the right buffers. Implement IsFixedSize() to return whether your
+	objects always store to a fixed size.
+
+	See the following example:
+\code
 type_code CUSTOM_STRING_TYPE = 'CUST';
 
 class CustomString : public BFlattenable
 {
 public:
-  char data[100];
+    char data[100];
 
-  // From BFlattenable
-  bool IsFixedSize() const { return false; };
-  type_code TypeCode() const { return CUSTOM_STRING_TYPE; };
-  ssize_t FlattenedSize() const { return strlen(data); };
-  
-  status_t Flatten(void* buffer, ssize_t size) const
-  {
-    if ((strlen(data) + 1) < size)
-      return B_BAD_VALUE;
-    memcpy(buffer, data, size);
-    return B_OK;
-  };
-  
-  status_t Unflatten(type_code code, const void* buffer, ssize_t size)
-  {
-    if (code != CUSTOM_STRING_TYPE)
-      return B_BAD_TYPE;
-    if (size > 100)
-      return B_NO_MEMORY;
-    memcpy(data, buffer, size);
-    return B_OK;
-  };
+    // From BFlattenable
+    bool IsFixedSize() const { return false; };
+    type_code TypeCode() const { return CUSTOM_STRING_TYPE; };
+    ssize_t FlattenedSize() const { return strlen(data); };
+
+    status_t Flatten(void* buffer, ssize_t size) const
+    {
+        if ((strlen(data) + 1) < size)
+            return B_BAD_VALUE;
+        memcpy(buffer, data, size);
+        return B_OK;
+    };
+
+    status_t Unflatten(type_code code, const void* buffer, ssize_t size)
+    {
+        if (code != CUSTOM_STRING_TYPE)
+            return B_BAD_TYPE;
+        if (size > 100)
+            return B_NO_MEMORY;
+        memcpy(data, buffer, size);
+        return B_OK;
+    };
 };
-  \endcode
-  
-  Have a look at TypeConstants.h for a list of all the types that the Haiku
-  API defines. 
-  
-  The Haiku API has a second interface for storing objects, which is with
-  BArchivable. BArchivable is for more complex cases. Instead of one flat
-  datastream, it stores an object in a BMessage. In that way you can reflect
-  internals of a class better. It also provides an interface for instantiating
-  objects, that is, for objects to restore themselves from a BMessage. In
-  essence, BArchivable is more suitable for objects that are alive. In short
-  BFlattenable is for data objects, BArchivable is for 'live' objects.
-  
-  Other classes in the API that support flattening and unflattening are for
-  example BMessage, which enables you to conveniently write flattened data
-  to disk. Another example is BPath. Because of that you can store paths and
-  send them over via messages. Throughout the Haiku API you will find classes
-  that provide the flattening interface.
+\endcode
+
+	Have a look at TypeConstants.h for a list of all the types that the Haiku
+	API defines.
+
+	The Haiku API has a second interface for storing objects, which is with
+	BArchivable. BArchivable is for more complex cases. Instead of one flat
+	datastream, it stores an object in a BMessage. In that way you can reflect
+	internals of a class better. It also provides an interface for instantiating
+	objects, that is, for objects to restore themselves from a BMessage. In
+	essence, BArchivable is more suitable for objects that are alive. In short
+	BFlattenable is for data objects, BArchivable is for 'live' objects.
+
+	Other classes in the API that support flattening and unflattening are for
+	example BMessage, which enables you to conveniently write flattened data
+	to disk. Another example is BPath. Because of that you can store paths and
+	send them over via messages. Throughout the Haiku API you will find classes
+	that provide the flattening interface.
 */
 
-/*!
-  \fn virtual bool BFlattenable::IsFixedSize() const = 0
-  \brief Pure virtual that should return whether or not flattened objects of 
-    this type always have a fixed size. 
-*/
 
 /*!
-  \fn virtual type_code BFlattenable::TypeCode() const = 0
-  \brief Pure virtual that should return which type_code this class flattens 
-    to.
-  
-  \return Either one of the existing typecodes, found in TypeConstants.h, 
-  <em>if your class actually is compatible to those formats</em>, or a custom
-  four byte integer constant.
+	\fn virtual bool BFlattenable::IsFixedSize() const
+	\brief Pure virtual that should return whether or not flattened objects of 
+		   this type always have a fixed size.
 */
 
-/*!
-  \fn virtual ssize_t BFlattenable::FlattenedSize() const = 0
-  \brief Pure virtual that should return the size of the flattened object in
-    bytes.
-*/
 
 /*!
-  \fn virtual	status_t BFlattenable::Flatten(void* buffer, ssize_t size) const = 0
-  \brief Pure virtual that should flatten the object into the supplied 
-    \a buffer.
-  
-  Please make sure that you check that the supplied buffer is not a \c NULL
-  pointer. Also make sure that the size of the flattened object does isn't
-  larger than the size of the buffer. 
-  
-  \param buffer The buffer to flatten in.
-  \param size The size of the buffer.
-  \retval B_OK The object was flattened.
-  \retval B_NO_MEMORY The buffer was smaller than required.
-  \retval B_BAD_VALUE The buffer was a \c NULL pointer.
+	\fn virtual type_code BFlattenable::TypeCode() const
+	\brief Pure virtual that returns the type_code this class flattens to.
+
+	\return Either one of the existing typecodes found in TypeConstants.h
+		if your class actually is compatible to those formats, or a
+		custom four-byte integer constant if not.
 */
 
-/*!
-  \fn bool BFlattenable::AllowsTypeCode(type_code code) const
-  \brief Return whether or not the supplied type_code is supported.
-  
-  This default implementation checks the \a code argument against the type_code
-  returned by TypeCode().
-  
-  \param code The type_code constant you want to check for.
-  \retval true The type_code is supported.
-  \retval false The type_code is not supported.
-*/
 
 /*!
-  \fn virtual status_t BFlattenable::Unflatten(type_code code, const void* buffer, ssize_t size) = 0
-  \brief Pure virtual that should unflatten the buffer and put the contents
-    into the current object.
-    
-  Make sure that the supplied buffer is not \c NULL and that you actually
-  support the typecode.
-  
-  \param code The type_code this data is.
-  \param buffer The buffer to unflatten the data from.
-  \param size The size of the data.
-  \retval B_OK The object is unflattened.
-  \retval B_BAD_VALUE The \a buffer pointer is \c NULL or the data is invalid.
-  \retval B_BAD_TYPE You don't support data with this \a code. 
+	\fn virtual ssize_t BFlattenable::FlattenedSize() const
+	\brief Pure virtual that should return the size of the flattened object in
+		   bytes.
 */
 
+
 /*!
-  \fn virtual BFlattenable::~BFlattenable()
-  \brief Destructor. Does nothing.
+	\fn virtual status_t BFlattenable::Flatten(void* buffer, ssize_t size) const
+	\brief Pure virtual that should flatten the object into the supplied
+		   \a buffer.
+
+	Please make sure that you check that the supplied buffer is not a \c NULL
+	pointer. Also make sure that the size of the flattened object does isn't
+	larger than the size of the buffer.
+
+	\param buffer The buffer to flatten in.
+	\param size The size of the buffer.
+
+	\retval B_OK The object was flattened.
+	\retval B_NO_MEMORY The buffer was smaller than required.
+	\retval B_BAD_VALUE The buffer was a \c NULL pointer.
+*/
+
+
+/*!
+	\fn bool BFlattenable::AllowsTypeCode(type_code code) const
+	\brief Get whether or not the supplied type_code is supported.
+
+	This default implementation checks the \a code argument against the type_code
+	returned by TypeCode().
+
+	\param code The type_code constant you want to check for.
+
+	\returns Whether or not the supplied type_code is supported.
+	\retval true The type_code is supported.
+	\retval false The type_code is not supported.
+*/
+
+
+/*!
+	\fn virtual status_t BFlattenable::Unflatten(type_code code,
+		const void* buffer, ssize_t size)
+	\brief Pure virtual that should unflatten the buffer and put the contents
+		   into the current object.
+
+	Make sure that the supplied buffer is not \c NULL and that you actually
+	support the typecode.
+
+	\param code The type_code this data is.
+	\param buffer The buffer to unflatten the data from.
+	\param size The size of the data.
+
+	\returns A status code.
+	\retval B_OK The object is unflattened.
+	\retval B_BAD_VALUE The \a buffer pointer is \c NULL or the data is invalid.
+	\retval B_BAD_TYPE You don't support data with this \a code. 
+*/
+
+
+/*!
+	\fn virtual BFlattenable::~BFlattenable()
+	\brief Destructor. Does nothing.
 */

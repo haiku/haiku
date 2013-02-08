@@ -13,42 +13,50 @@
 
 /*!
 	\file FilePanel.h
+	\ingroup storage
+	\ingroup libbe
 	\brief Provides the BFilePanel and BRefFilter classes and support enums.
 */
 
 
 /*!
 	\enum file_panel_mode
-	Whether the file panel is a save or open panel.
+	\ingroup storage
+	\brief Whether the file panel is a save or open panel.
 */
 
 
 /*!
 	\var file_panel_mode B_OPEN_PANEL
+
 	Open panel
 */
 
 
 /*!
 	\var file_panel_mode B_SAVE_PANEL
+
 	Save panel
 */
 
 
 /*!
 	\enum file_panel_button
-	List of buttons used by the file panel
+	\ingroup storage
+	\brief List of buttons used by the file panel
 */
 
 
 /*!
 	\var file_panel_button B_CANCEL_BUTTON
+
 	Cancel button
 */
 
 
 /*!
 	\var file_panel_button B_DEFAULT_BUTTON
+
 	Default button
 */
 

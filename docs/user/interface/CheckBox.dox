@@ -1,18 +1,22 @@
 /*
- * Copyright 2011, Haiku inc.
- * Distributed under the terms of the MIT Licence.
+ * Copyright 2011 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  *
- * Documentation by:
+ * Authors:
  *		Stephan Aßmus, superstippi@gmx.de
  *		Marc Flerackers, mflerackers@androme.be
  *		John Scipione, jscipione@gmail.com
+ *
  * Corresponds to:
  *		/trunk/headers/os/interface/CheckBox.h	 rev 42794
  *		/trunk/src/kits/interface/CheckBox.cpp	 rev 42794
  */
 
+
 /*!
 	\file CheckBox.h
+	\ingroup interface
+	\ingroup libbe
 	\brief Defines the BCheckBox class
 */
 

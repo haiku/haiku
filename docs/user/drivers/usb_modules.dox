@@ -1,101 +1,103 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation by:
- *  Niels Sascha Reedijk <niels.reedijk@gmail.com>
+ * Authors:
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  */
 
+
 /*!
-  \page usb_modules Writing drivers for USB devices
+	\page usb_modules Writing drivers for USB devices
 
-  The introduction of USB standardized the way many devices connected to a
-  whole range of different computers and operating systems. It introduced a
-  standard that was capable of getting rid of all the legacy systems, such as
-  the LPT, the PS/2 and serial ports. The plug and play nature of the standard
-  were revolutional at the time of it's introduction, and it changed the way
-  in which operating systems interacted with devices.
-  
-  With the grand standard that USB has become, Haiku has an implementation
-  of it. It supports both the USB 1.1 and USB 2.0 specifications, and when
-  Haiku R1 is released, it will support the three host controller standards:
-  UHCI, OHCI and EHCI. The modularized design of Haiku's USB stack also paves
-  the way for easy implementation of any future specifications, such as
-  Wireless USB.
-  
-  \section usb_modules_scope The Scope of this Document
-  
-  This document is written for driver developers that need to interact with
-  USB devices. The USB specification standardizes the communication between
-  the host controller and the devices, and how devices should transfer data,
-  but it does not prescribe a standard environment that Operating Systems
-  should provide to the driver interfaces. As such, every operating system has
-  it's own interface for drivers, and so does Haiku.
-  
-  This document will point driver developers to relevant parts of the USB
-  module API and give a general impression of the workings of the USB stack.
-  This document will not give information on the basics of writing drivers, or
-  on how to use modules. Have a look elsewhere in this documentation for that.
-  This document also assumes a basic knowledge of the USB specification, and on
-  how you are supposed to interact with devices. See \ref usb_modules_resources
-  for tutorials on the web if you are looking for a basic introduction on
-  communication with the USB protocol.
-  
-  \section usb_modules_structure Structure of the Stack
-  
-  This section will outline how Haiku's USB stack is structured, and how you
-  can interact with this stack.
-  
-  The goal of the USB stack is to provide a few basic features for drivers
-  interacting with USB devices. It is important that the stack maintains a
-  continually updated device grid, so that the driver modules are always
-  aware of the latest status. The stack should also facilitate communication
-  between drivers and the devices, by abstracting the actual transfering of
-  bits via the host controller hardware in the computer. The stack therefore
-  should implement a inituitive interface to give driver developers access to
-  all features and possibilities the USB specification offers, and at the same
-  time it should abstract many of the small requirements and peculiarities of
-  that specification.
-  
-  The stack internally can be divided into two parts. The first part is the
-  core module. This module, called \c usb_busmanager, performs all the
-  operations required by the USB specification. For example, it performs the
-  necessary lowlevel initialization when new devices are connected, or all the
-  requirements when it comes to performing transfers. The core module also
-  is the module that provides the abstractions to driver developers. The other
-  part of the USB stack are the individual modules that control the different
-  host controllers. Haiku supports the three types in existence: UHCI, OHCI
-  and EHCI. These modules perform the communication between the core module
-  and the hardware. As driver developer, you won't have to interact with these
-  modules: the core module provides all the abstractions you need.
-  
-  Thus, as a driver developer you are interfacing with the \c usb_busmanager
-  module. On Haiku, this module implements two API's. The \c v2 API, identical
-  to the API offered by BeOS R5, can be found in the \c USB2.h file. However,
-  for new drivers, or for ports, the recomended API is the \c v3 API, defined
-  in the USB3.h file. This API is identical to the one provided by Zeta. The
-  \c v2 API should be considered to be deprecated.
-  
-  \section usb_modules_registration Initial Steps: Driver Registration
-  
-  In order to be able to start using the USB stack to communicate with your
-  devices, you will need to perform some actions. This section will outline
-  those actions and will point you to their appropriate locations. 
-  
-  \note The code examples are based on the \c usb_hid driver written by
-    Jerome Duval. Have a look at this driver for a complete working example.
+	The introduction of USB standardized the way many devices connected to a
+	whole range of different computers and operating systems. It introduced a
+	standard that was capable of getting rid of all the legacy systems, such as
+	the LPT, the PS/2 and serial ports. The plug and play nature of the standard
+	was revolutionary at the time of its introduction, and it changed the way
+	which operating systems interacted with devices.
 
-  The following example gives an overview of the requirements to open the 
-  USB module, and to start your driver registration in order to receive
-  connect and disconnect events. 
-  
-  \code
+	With the grand standard that USB has become, Haiku has an implementation
+	of it. It supports both the USB 1.1 and USB 2.0 specifications, and when
+	Haiku R1 is released, it will support the three host controller standards:
+	UHCI, OHCI and EHCI. The modularized design of Haiku's USB stack also paves
+	the way for easy implementation of any future specifications, such as
+	Wireless USB.
+
+	\section usb_modules_scope The Scope of this Document
+
+	This document is written for driver developers that need to interact with
+	USB devices. The USB specification standardizes the communication between
+	the host controller and the devices, and how devices should transfer data,
+	but it does not prescribe a standard environment that Operating Systems
+	should provide to the driver interfaces. As such, every operating system has
+	it's own interface for drivers, and so does Haiku.
+
+	This document will point driver developers to relevant parts of the USB
+	module API and give a general impression of the workings of the USB stack.
+	This document will not give information on the basics of writing drivers, or
+	on how to use modules. Have a look elsewhere in this documentation for that.
+	This document also assumes a basic knowledge of the USB specification, and on
+	how you are supposed to interact with devices. See \ref usb_modules_resources
+	for tutorials on the web if you are looking for a basic introduction on
+	communication with the USB protocol.
+
+	\section usb_modules_structure Structure of the Stack
+
+	This section will outline how Haiku's USB stack is structured, and how you
+	can interact with this stack.
+
+	The goal of the USB stack is to provide a few basic features for drivers
+	interacting with USB devices. It is important that the stack maintains a
+	continually updated device grid, so that the driver modules are always
+	aware of the latest status. The stack should also facilitate communication
+	between drivers and the devices, by abstracting the actual transferring of
+	bits via the host controller hardware in the computer. The stack therefore
+	should implement a intuitive interface to give driver developers access to
+	all features and possibilities the USB specification offers, and at the same
+	time it should abstract many of the small requirements and peculiarities of
+	that specification.
+
+	The stack internally can be divided into two parts. The first part is the
+	core module. This module, called \c usb_busmanager, performs all the
+	operations required by the USB specification. For example, it performs the
+	necessary low-level initialization when new devices are connected, or all the
+	requirements when it comes to performing transfers. The core module also
+	is the module that provides the abstractions to driver developers. The other
+	part of the USB stack are the individual modules that control the different
+	host controllers. Haiku supports the three types in existence: UHCI, OHCI
+	and EHCI. These modules perform the communication between the core module
+	and the hardware. As driver developer, you won't have to interact with these
+	modules: the core module provides all the abstractions you need.
+
+	Thus, as a driver developer you are interfacing with the \c usb_busmanager
+	module. On Haiku, this module implements two API's. The \c v2 API, identical
+	to the API offered by BeOS R5, can be found in the \c USB2.h file. However,
+	for new drivers, or for ports, the recommended API is the \c v3 API, defined
+	in the USB3.h file. This API is identical to the one provided by Zeta. The
+	\c v2 API should be considered to be deprecated.
+
+	\section usb_modules_registration Initial Steps: Driver Registration
+
+	In order to be able to start using the USB stack to communicate with your
+	devices, you will need to perform some actions. This section will outline
+	those actions and will point you to their appropriate locations. 
+
+	\note The code examples are based on the \c usb_hid driver written by
+		Jerome Duval. Have a look at this driver for a complete working
+		example.
+
+	The following example gives an overview of the requirements to open the 
+	USB module, and to start your driver registration in order to receive
+	connect and disconnect events. 
+
+\code
 // Global variables and constants
 usb_module_info *gUsb;
 const char *kDriverName = "usb_hid";
 
 static usb_support_descriptor sSupportedDevices[1] = {
-	{ USB_HID_DEVICE_CLASS, 0, 0, 0, 0 },
+    { USB_HID_DEVICE_CLASS, 0, 0, 0, 0 },
 };
 
 // Prototype for the hooks that are called when devices are added or removed
@@ -111,276 +113,275 @@ static usb_notify_hooks sNotifyHooks = {
 status_t 
 init_driver(void)
 {
-	if (get_module(B_USB_MODULE_NAME, (module_info **)&gUsb) != B_OK)
-		return B_ERROR;
+    if (get_module(B_USB_MODULE_NAME, (module_info **)&gUsb) != B_OK)
+        return B_ERROR;
 
-	gUsb->register_driver(kDriverName, sSupportedDevices, 
-		1, NULL);
-	gUsb->install_notify(kDriverName, &sNotifyHooks);
+    gUsb->register_driver(kDriverName, sSupportedDevices, 
+        1, NULL);
+    gUsb->install_notify(kDriverName, &sNotifyHooks);
 
-	return B_OK;
+    return B_OK;
 }
-  \endcode
-  
-  Basically, this boils down to three steps. The first step is to acquire the
-  usb_module_info module. This struct contains a set of function pointers that
-  you use to communicate with the stack. You can retrieve it like you would
-  retrieve any other module.
-  
-  As soon as you have done that you can start registering your driver in the
-  stack. What you do is you pass a unique identifier to identify your driver,
-  zero or more \link usb_support_descriptor support descriptors \endlink
-  to provide the stack with information on which devices you support, and the
-  number of support descriptors you provided. The stack is very flexible with
-  what patterns it accepts, so even the most complex driver will be able to
-  pass it's credentials. Have a look at the \c usb_support_descriptor struct
-  and the \c usb_module_info::register_driver() call for all the details.
-  
-  The last step in initialization is to provide the stack with notification
-  hooks. These are functions in your driver that the stack should call as soon
-  as a device is attached or removed. Please perform this call after your
-  internal driver data structures are initialized, because as soon as you
-  perform this call, the usb stack will start searching for already attached
-  devices that match the credentials. Have a look at
-  \c usb_module_info::install_notify() and the structure \c usb_notify_hooks
-  for the details on the signatures of your hooks.
-  
-  \section usb_modules_changes Handling Device Changes
-  
-  The USB stack will notify you of device connects and disconnects when they
-  occur. You will receive notifications as soon as you have supplied the hooks
-  to the stack, using \c usb_module_info::install_notify() . This section will
-  explain some of the details when it comes to handling device changes.
-  
-  When a device is added, your supplied usb_notify_hooks::device_added() hook
-  will be called if its credentials matches one of your support descriptors.
-  Because the stack runs through all the registered drivers, it could be that
-  two or more drivers operate on the same device. The stack does not provide
-  a locking mechanism to prevent two conflicting drivers to get in each others
-  way. It is up to the device maker to have supplied such a mechanism.
-  
-  \note In reality, it is very likely that your device will match at least one
-    other driver, because Haiku supplies the \c usb_raw driver. This driver
-    provides userland access to the usb devices and therefore it has a blank
-    support descriptor that matches everything. The \c usb_raw driver will
-    not conflict with your device interaction though (except when there is an
-    userland application that tries to meddle with your device).
-    
-  If your driver is willing to accept the supplied device, and your 
-  device_added() hook returns B_OK, the USB stack will ask the kernel to reload
-  your published devices, so that your device is visible in userspace in the
-  \c /dev tree.
-  
-  The other event that the stack reports, device disconnection, should be
-  handled by your \c usb_notify_hooks::device_removed() hook. Because "plug and
-  play" also means "unplug and leave", you should make sure your driver is 
-  capable of cleaning up in the likely event that the user removes their
-  device, even during transfers. In your hook function, you have the ability to
-  do clean up whatever there is to clean up, however, make sure that you cancel
-  all the pending transfers. Use the usb_module_info::cancel_queued_transfers()
-  call for that end. Also, don't forget to free the cookie you supplied in your
-  device_added() hook. 
-  
-  \section usb_modules_standard Standard USB Operations
-  
-  One of the many conveniences of the Haiku USB API is the fact that many of
-  the standard operations can be performed by simple function calls. As such,
-  you won't have to build many of the standard requests the USB specification
-  defines by hand. This section will outline all the different conveniences and
-  will point you to where to look if you do need something more advanced.
-  
-  \subsection usb_modules_standard_descriptors Configurations, Interfaces and Descriptors
-  
-  Many standard USB operations have to do with configurations, interfaces and
-  descriptors. All these operations are accessible by convenience functions.
-  
-  The device descriptor is one of the first things you will be interested in if
-  you want to check out a device. The device descriptor can be retrieved quite
-  easily using the \c usb_module_info::get_device_descriptor() call. The
-  retrieved descriptor complies to the one dictated by the USB standard.
-  
-  Also important are configurations. Since every device has at least one
-  configuration, you should be able to retrieve and manipulate configurations.
-  You can use \c usb_module_info::get_nth_configuration() to get them. To set
-  a configuration, you should use \c usb_module_info::set_configuration(). To
-  get the active configuration, use \c usb_module_info::get_configuration().
-  
-  \attention By default, Haiku's stack will set the configuration at offset
-    zero, which is according to the standard, the default configuration.
-    Do not rely on that if you first get the device, that the currently active
-    configuration is the default configuration though. Another driver might
-    have manipulated this device already.
-  
-  Every configuration has associated interfaces. To make life easier, the stack
-  automatically gets the interface descriptors (and their associated
-  endpoints), and stores them in the \c usb_configuration_info structure. This
-  structure has a member called \link usb_configuration_info::interface
-  \c interface \endlink which is of the type \c usb_interface_list. That object
-  containts all the interfaces, including a pointer to the interface that is
-  currently active. Each interface is described as a \c usb_interface_info,
-  which is a container for the interface, its associated endpoints and any
-  unparsed descriptors. In order to change the active interface, you can use
-  the stack's \c usb_module_info::set_alt_interface() call. 
-  
-  Endpoints, the basic units with which you can communicate, are stored as
-  \c usb_endpoint_info structures. Each of these structures carries the actual
-  endpoint descriptor, and the accompanying usb_pipe handle that you can use to
-  actually send and receive data.
-  
-  The last point of interest are descriptors. As you have seen, Haiku caches
-  all the relevant descriptors itself, however, you might want to retrieve any
-  other type of descriptor that could be relevant for your device. The
-  convenience function to use in such a case is the 
-  \c usb_module_info::get_descriptor() call. This function takes all the
-  parameters needed to build the actual descriptor, and performs the request
-  over the default control pipe.
-  
-  \subsection usb_modules_standard_features Features
-  
-  Another one of the building blocks of USB are features. Every device should
-  provide for a number of standard features, but the USB specification also
-  leaves the option to using custom device specific features. Feature requests
-  can be performed on devices, interfaces and pipes (which are tied to
-  endpoints). 
-  
-  To set a feature, you can use the \c usb_module_info::set_feature() call. To
-  clear a feature, use the \c usb_module_info::clear_feature() call. One of the
-  most used feature calls is the call to clear a \c USB_FEATURE_ENDPOINT_HALT .
-  
-  \subsection usb_modules_standard_other Other Standard Calls
-  
-  To get the status of a device, an interface or an endpoint, you can use the
-  \c usb_module_info::get_status() call.
-  
-  If you are using isochronous transfers, you can use the
-  \c usb_module_info::set_pipe_policy() to set the properties of the
-  isochronous pipe. 
-  
-  \section usb_modules_transfers Data Transfers
-  
-  Transfering data is one of the basic building blocks of the USB protocol.
-  This section will demonstrate how to perform transfers via the four different
-  protocols the USB stack offers.
-  
-  But first it is essential to show how to perform the transfers using the
-  \c usb_module_info interface. The interface provides five \c queue_*
-  functions, with the asterix being one of the following: \c bulk, \c bulk_v
-  (bulk transfers using a vector), \c interrupt, \c isochronous or \c request
-  (over the standard control pipe). These five functions work asynchronously,
-  which means that your driver is called back from a different thread when your
-  transfer is finished. 
-  
-  The five functions share some arguments. The first argument is always the
-  pipe that is associated with the endpoint (except for control transfers,
-  these only work on the device in general). All of the functions accept a data
-  buffer, and the length of that   buffer. All of the functions require a
-  \c #usb_callback_func, a function in your driver that can be called in case a
-  transfer is finished. The functions also require a cookie that is provided to
-  the callback function. 
-  
-  The working order is as follows: first you queue a transfer, then you handle
-  the result in the callback function when it's done. The callback function
-  will be called with a \a status argument, in which you can check whether or
-  not the transfer actually succeeded. See this \link #usb_callback_func 
-  description \endlink for how your callback function should behave and what
-  kind of status there might have been.
-  
-  Finally, before going into the different transfer types, a note on buffer
-  ownership. The usb stack keeps the internal buffers tidy, but the buffer you
-  provide to the \c queue_* functions are yours. You are responsible for
-  allocating and freeing them, and you may do with them whatever you like,
-  \e except between queueing your transfer and the callback. During that period
-  you should consider the USB stack the owner of the buffer.
-  
-  \subsection usb_modules_transfers_control Control Requests
-  
-  Control requests are done over the device wide control pipe which is provided
-  by every device. Haiku's stack has two functions that you can use to perform
-  custom requests (opposed to many of the \ref usb_modules_standard
-  "standard operations"). Control transfers are the only transfers that you can
-  perform synchronously as well as asynchronously. The functions you can use
-  are \c usb_module_info::send_request() for synchronous requests and
-  \c usb_module_info::queue_request() for asynchronous requests. 
-  
-  Many of the constants that you should use when performing can be found in
-  the USB_spec.h file which is automatically included if you include the main
-  USB header. Have a look of how to use these constants in the following
-  example:
-  
-  \code
-  // Send a request that is defined by the standard of this class. We retrieve
-  // a report from the device on one of its interfaces.
-  // This request is specified by the HID specification.
-  
-	status = usb->send_request(dev,
-		USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_CLASS,
-		USB_REQUEST_HID_GET_REPORT,
-		0x0100 | report_id, interfaceNumber, device->total_report_size,
-		device->buffer, &actual);
-  \endcode
-  
-  \warning Both the \link usb_module_info::send_request() \a send_request()
-    \endlink and \link usb_module_info::queue_request() \a queue_request()
-    \endlink functions can be used to perform standard usb requests. Avoid
-    low-level operations, because the stack needs to keep its internal
-    data structures consistent. If you need to perform one of the 
-    \ref usb_modules_standard "standard operations", use the provided
-    convenience functions.
-  
-  \subsection usb_modules_transfers_interrupt Interrupt
-  
-  Interrupt transfers apply to endpoints that receive data, or that can be
-  polled in several instances of time. The intervals are determined by the
-  endpoint descriptor.
-  
-  To schedule a transfer, use usb_module_info::queue_interrupt(). You only have
-  to supply a buffer, the stack schedule the transfer in such a way that it
-  will be performed within a certain timeframe. To create a continuous
-  interrupt system, you should queue the next transfer in the callback function
-  of the previous. The stack will make sure that the new transfer will be
-  performed exactly after the required interval. 
-  
-  \subsection usb_modules_transfers_bulk Bulk
-  
-  Bulk transfers are very similar to control transfers. They will be performed
-  as soon as possible without stalling other transfers, and they transfer data.
-  Bulk transfers are designed to transfer up to large amounts of data as
-  efficiently as possible. Performing bulk transfers isn't difficult, you
-  merely supply a buffer and the endpoint that should execute the request, and
-  you're set. 
-  
-  Bulk transfers come in two flavours. The first is 
-  usb_module_info::queue_bulk(), which takes a standard data buffer. The second
-  flavour is the usb_module_info::queue_bulk_v() function, which is designed to
-  operate on (an array of) POSIX vectors. These functions only differ in the
-  buffer they accept, they function in exactly the same way.
-  
-  \subsection usb_modules_transfers_isochronous Isochronous
-  
-  Isochronous transfers are not implemented on Haiku yet. As soon as they are,
-  this section should contain information on how to queue them.
-  
-  \section usb_modules_cleanup Cleaning Up
-  
-  This section describes how to gracefully leave the stack after your driver is
-  requested to shut down.
-  
-  There are truely only two simple actions to perform. The first is to
-  uninstall your notification hooks, using 
-  \c usb_module_info::uninstall_notify(). The second action is to 'put' the
-  module.
-  
-  \code
+\endcode
+
+	Basically, this boils down to three steps. The first step is to acquire the
+	usb_module_info module. This struct contains a set of function pointers that
+	you use to communicate with the stack. You can retrieve it like you would
+	retrieve any other module.
+
+	As soon as you have done that you can start registering your driver in the
+	stack. What you do is you pass a unique identifier to identify your driver,
+	zero or more \link usb_support_descriptor support descriptors \endlink
+	to provide the stack with information on which devices you support, and the
+	number of support descriptors you provided. The stack is very flexible with
+	what patterns it accepts, so even the most complex driver will be able to
+	pass it's credentials. Have a look at the \c usb_support_descriptor struct
+	and the \c usb_module_info::register_driver() call for all the details.
+
+	The last step in initialization is to provide the stack with notification
+	hooks. These are functions in your driver that the stack should call as soon
+	as a device is attached or removed. Please perform this call after your
+	internal driver data structures are initialized, because as soon as you
+	perform this call, the usb stack will start searching for already attached
+	devices that match the credentials. Have a look at
+	\c usb_module_info::install_notify() and the structure \c usb_notify_hooks
+	for the details on the signatures of your hooks.
+
+	\section usb_modules_changes Handling Device Changes
+
+	The USB stack will notify you of device connects and disconnects when they
+	occur. You will receive notifications as soon as you have supplied the hooks
+	to the stack, using \c usb_module_info::install_notify() . This section will
+	explain some of the details when it comes to handling device changes.
+
+	When a device is added, your supplied usb_notify_hooks::device_added() hook
+	will be called if its credentials matches one of your support descriptors.
+	Because the stack runs through all the registered drivers, it could be that
+	two or more drivers operate on the same device. The stack does not provide
+	a locking mechanism to prevent two conflicting drivers to get in each others
+	way. It is up to the device maker to have supplied such a mechanism.
+
+	\note In reality, it is very likely that your device will match at least one
+	other driver, because Haiku supplies the \c usb_raw driver. This driver
+	provides userland access to the usb devices and therefore it has a blank
+	support descriptor that matches everything. The \c usb_raw driver will
+	not conflict with your device interaction though (except when there is an
+	userland application that tries to meddle with your device).
+
+	If your driver is willing to accept the supplied device, and your 
+	device_added() hook returns B_OK, the USB stack will ask the kernel to reload
+	your published devices, so that your device is visible in userspace in the
+	\c /dev tree.
+
+	The other event that the stack reports, device disconnection, should be
+	handled by your \c usb_notify_hooks::device_removed() hook. Because "plug and
+	play" also means "unplug and leave", you should make sure your driver is 
+	capable of cleaning up in the likely event that the user removes their
+	device, even during transfers. In your hook function, you have the ability to
+	do clean up whatever there is to clean up, however, make sure that you cancel
+	all the pending transfers. Use the usb_module_info::cancel_queued_transfers()
+	call for that end. Also, don't forget to free the cookie you supplied in your
+	device_added() hook. 
+
+	\section usb_modules_standard Standard USB Operations
+
+	One of the many conveniences of the Haiku USB API is the fact that many of
+	the standard operations can be performed by simple function calls. As such,
+	you won't have to build many of the standard requests the USB specification
+	defines by hand. This section will outline all the different conveniences and
+	will point you to where to look if you do need something more advanced.
+
+	\subsection usb_modules_standard_descriptors Configurations, Interfaces and Descriptors
+
+	Many standard USB operations have to do with configurations, interfaces and
+	descriptors. All these operations are accessible by convenience functions.
+
+	The device descriptor is one of the first things you will be interested in if
+	you want to check out a device. The device descriptor can be retrieved quite
+	easily using the \c usb_module_info::get_device_descriptor() call. The
+	retrieved descriptor complies to the one dictated by the USB standard.
+
+	Also important are configurations. Since every device has at least one
+	configuration, you should be able to retrieve and manipulate configurations.
+	You can use \c usb_module_info::get_nth_configuration() to get them. To set
+	a configuration, you should use \c usb_module_info::set_configuration(). To
+	get the active configuration, use \c usb_module_info::get_configuration().
+
+	\attention By default, Haiku's stack will set the configuration at offset
+	zero, which is according to the standard, the default configuration.
+	Do not rely on that if you first get the device, that the currently active
+	configuration is the default configuration though. Another driver might
+	have manipulated this device already.
+
+	Every configuration has associated interfaces. To make life easier, the stack
+	automatically gets the interface descriptors (and their associated
+	endpoints), and stores them in the \c usb_configuration_info structure. This
+	structure has a member called \link usb_configuration_info::interface
+	\c interface \endlink which is of the type \c usb_interface_list. That object
+	containts all the interfaces, including a pointer to the interface that is
+	currently active. Each interface is described as a \c usb_interface_info,
+	which is a container for the interface, its associated endpoints and any
+	unparsed descriptors. In order to change the active interface, you can use
+	the stack's \c usb_module_info::set_alt_interface() call. 
+
+	Endpoints, the basic units with which you can communicate, are stored as
+	\c usb_endpoint_info structures. Each of these structures carries the actual
+	endpoint descriptor, and the accompanying usb_pipe handle that you can use to
+	actually send and receive data.
+
+	The last point of interest are descriptors. As you have seen, Haiku caches
+	all the relevant descriptors itself, however, you might want to retrieve any
+	other type of descriptor that could be relevant for your device. The
+	convenience function to use in such a case is the 
+	\c usb_module_info::get_descriptor() call. This function takes all the
+	parameters needed to build the actual descriptor, and performs the request
+	over the default control pipe.
+
+	\subsection usb_modules_standard_features Features
+
+	Another one of the building blocks of USB are features. Every device should
+	provide for a number of standard features, but the USB specification also
+	leaves the option to using custom device specific features. Feature requests
+	can be performed on devices, interfaces and pipes (which are tied to
+	endpoints). 
+
+	To set a feature, you can use the \c usb_module_info::set_feature() call. To
+	clear a feature, use the \c usb_module_info::clear_feature() call. One of the
+	most used feature calls is the call to clear a \c USB_FEATURE_ENDPOINT_HALT .
+
+	\subsection usb_modules_standard_other Other Standard Calls
+
+	To get the status of a device, an interface or an endpoint, you can use the
+	\c usb_module_info::get_status() call.
+
+	If you are using isochronous transfers, you can use the
+	\c usb_module_info::set_pipe_policy() to set the properties of the
+	isochronous pipe. 
+
+	\section usb_modules_transfers Data Transfers
+
+	Transfering data is one of the basic building blocks of the USB protocol.
+	This section will demonstrate how to perform transfers via the four different
+	protocols the USB stack offers.
+
+	But first it is essential to show how to perform the transfers using the
+	\c usb_module_info interface. The interface provides five \c queue_*
+	functions, with the asterix being one of the following: \c bulk, \c bulk_v
+	(bulk transfers using a vector), \c interrupt, \c isochronous or \c request
+	(over the standard control pipe). These five functions work asynchronously,
+	which means that your driver is called back from a different thread when your
+	transfer is finished. 
+
+	The five functions share some arguments. The first argument is always the
+	pipe that is associated with the endpoint (except for control transfers,
+	these only work on the device in general). All of the functions accept a data
+	buffer, and the length of that   buffer. All of the functions require a
+	\c #usb_callback_func, a function in your driver that can be called in case a
+	transfer is finished. The functions also require a cookie that is provided to
+	the callback function. 
+
+	The working order is as follows: first you queue a transfer, then you handle
+	the result in the callback function when it's done. The callback function
+	will be called with a \a status argument, in which you can check whether or
+	not the transfer actually succeeded. See this \link #usb_callback_func 
+	description \endlink for how your callback function should behave and what
+	kind of status there might have been.
+
+	Finally, before going into the different transfer types, a note on buffer
+	ownership. The usb stack keeps the internal buffers tidy, but the buffer you
+	provide to the \c queue_* functions are yours. You are responsible for
+	allocating and freeing them, and you may do with them whatever you like,
+	\e except between queueing your transfer and the callback. During that period
+	you should consider the USB stack the owner of the buffer.
+
+	\subsection usb_modules_transfers_control Control Requests
+
+	Control requests are done over the device wide control pipe which is provided
+	by every device. Haiku's stack has two functions that you can use to perform
+	custom requests (opposed to many of the \ref usb_modules_standard
+	"standard operations"). Control transfers are the only transfers that you can
+	perform synchronously as well as asynchronously. The functions you can use
+	are \c usb_module_info::send_request() for synchronous requests and
+	\c usb_module_info::queue_request() for asynchronous requests. 
+
+	Many of the constants that you should use when performing can be found in
+	the USB_spec.h file which is automatically included if you include the main
+	USB header. Have a look of how to use these constants in the following
+	example:
+
+\code
+    // Send a request that is defined by the standard of this class. We retrieve
+    // a report from the device on one of its interfaces.
+    // This request is specified by the HID specification.
+
+    status = usb->send_request(dev,
+        USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_CLASS,
+        USB_REQUEST_HID_GET_REPORT, 0x0100 | report_id,
+        interfaceNumber, device->total_report_size,
+        device->buffer, &actual);
+\endcode
+
+	\warning Both the \link usb_module_info::send_request() \a send_request()
+	\endlink and \link usb_module_info::queue_request() \a queue_request()
+	\endlink functions can be used to perform standard usb requests. Avoid
+	low-level operations, because the stack needs to keep its internal
+	data structures consistent. If you need to perform one of the 
+	\ref usb_modules_standard "standard operations", use the provided
+	convenience functions.
+
+	\subsection usb_modules_transfers_interrupt Interrupt
+
+	Interrupt transfers apply to endpoints that receive data, or that can be
+	polled in several instances of time. The intervals are determined by the
+	endpoint descriptor.
+
+	To schedule a transfer, use usb_module_info::queue_interrupt(). You only have
+	to supply a buffer, the stack schedule the transfer in such a way that it
+	will be performed within a certain timeframe. To create a continuous
+	interrupt system, you should queue the next transfer in the callback function
+	of the previous. The stack will make sure that the new transfer will be
+	performed exactly after the required interval. 
+
+	\subsection usb_modules_transfers_bulk Bulk
+
+	Bulk transfers are very similar to control transfers. They will be performed
+	as soon as possible without stalling other transfers, and they transfer data.
+	Bulk transfers are designed to transfer up to large amounts of data as
+	efficiently as possible. Performing bulk transfers isn't difficult, you
+	merely supply a buffer and the endpoint that should execute the request, and
+	you're set. 
+
+	Bulk transfers come in two flavours. The first is 
+	usb_module_info::queue_bulk(), which takes a standard data buffer. The second
+	flavour is the usb_module_info::queue_bulk_v() function, which is designed to
+	operate on (an array of) POSIX vectors. These functions only differ in the
+	buffer they accept, they function in exactly the same way.
+
+	\subsection usb_modules_transfers_isochronous Isochronous
+
+	Isochronous transfers are not implemented on Haiku yet. As soon as they are,
+	this section should contain information on how to queue them.
+
+	\section usb_modules_cleanup Cleaning Up
+
+	This section describes how to gracefully leave the stack after your driver is
+	requested to shut down.
+
+	There are truely only two simple actions to perform. The first is to
+	uninstall your notification hooks, using 
+	\c usb_module_info::uninstall_notify(). The second action is to 'put' the
+	module.
+
+\code
 void
 uninit_driver(void)
 {
-	usb->uninstall_notify(kDriverName);
-
-	put_module(B_USB_MODULE_NAME);
+    usb->uninstall_notify(kDriverName);
+    put_module(B_USB_MODULE_NAME);
 }
-  \endcode
+\endcode
 
-  \section usb_modules_resources More Resources
-  
-  This section should list more resources on the web.
+	\section usb_modules_resources More Resources
+
+	This section should list more resources on the web.
 */

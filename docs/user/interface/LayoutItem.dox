@@ -1,18 +1,22 @@
 /*
- * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation by:
- *   Alex Wilson <yourpalal2@gmail.com>
+ * Authors:
+ *		Alex Wilson, yourpalal2@gmail.com
+ *
  * Corresponds to:
- *   /trunk/headers/os/interface/LayoutItem.h  rev 38207
- *   /trunk/src/kits/interface/LayoutItem.cpp  rev 38207
+ *		headers/os/interface/LayoutItem.h  rev 38207
+ *		src/kits/interface/LayoutItem.cpp  rev 38207
  */
 
 
 /*!
 	\file LayoutItem.h
-	\brief Describes the BLayoutItem class
+	\ingroup interface
+	\ingroup layout
+	\ingroup libbe
+	\brief Describes the BLayoutItem class.
 */
 
 
@@ -21,7 +25,6 @@
 	\ingroup interface
 	\ingroup layout
 	\ingroup libbe
-
 	\brief Abstract class representing things that are positionable and
 		resizable by objects of the BLayout class.
 
@@ -98,7 +101,7 @@
 	\fn bool BLayoutItem::HasHeightForWidth()
 	\brief Returns whether or not this BLayoutItem&apos;s height constraints are
 		dependent on its width.
-	
+
 	\note By default, this method returns \c false.
 */
 

@@ -1,19 +1,22 @@
 /*
- * Copyright 2002-2013 Haiku Inc.
+ * Copyright 2002-2013 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation by:
- *		John Scipione <jscipione@gmail.com>
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
  *		Travis Smith
  *		Michael Wilber
+ *
  * Corresponds to:
- *		/trunk/headers/os/translation/BitmapStream.h	 hrev45181
- *		/trunk/src/kits/translation/BitmapStream.cpp	 hrev45181
+ *		headers/os/translation/BitmapStream.h	 hrev45181
+ *		src/kits/translation/BitmapStream.cpp	 hrev45181
  */
 
 
 /*!
 	\file BitmapStream.h
+	\ingroup translation
+	\ingroup libbe
 	\brief BBitmapStream class definition.
 */
 

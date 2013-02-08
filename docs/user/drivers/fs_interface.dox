@@ -14,6 +14,7 @@
 /*!
 	\file fs_interface.h
 	\ingroup drivers
+	\ingroup libbe
 	\brief Provides an interface for file system modules.
 
 	See the \ref fs_modules "introduction to file system modules" for a guide on

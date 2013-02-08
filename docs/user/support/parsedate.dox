@@ -1,188 +1,199 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation by:
- *   Axel Dörfler
+ * Authors:
+ *		Axel Dörfler
+ *
  * Corresponds to:
- *   /trunk/headers/os/support/parsedate.h rev 19972
+ *		headers/os/support/parsedate.h rev 19972
  */
 
+
 /*!
-  \file parsedate.h
-  \ingroup support
-  \ingroup libroot
-  \brief Date parsing functions
+	\file parsedate.h
+	\ingroup support
+	\ingroup libroot
+	\brief Date parsing functions
 
-  This is a set a functions for parsing date strings in various formats.
-  It's mostly tailored for parsing user given data, although originally,
-  it was developed to parse the date strings found in usenet messages.
+	This is a set a functions for parsing date strings in various formats.
+	It's mostly tailored for parsing user given data, although originally,
+	it was developed to parse the date strings found in usenet messages.
 
-  The given date will be parsed relative to the specified time, and using
-  a predefined set of time/date formats.
+	The given date will be parsed relative to the specified time, and using
+	a predefined set of time/date formats.
 
-  \par Valid Input Strings
+	\par Valid Input Strings
 
-  The internal formats allow parsedate() to understand a wide range of
-  input strings. The format list is ought to be compiled from the Date: 
-  line of 80.000 usenet messages.
+	The internal formats allow parsedate() to understand a wide range of
+	input strings. The format list is ought to be compiled from the Date: 
+	line of 80.000 usenet messages.
 
-  But since this function is also used in end-user applications like the
-  Tracker's find panel, it's helpful to know what this function accepts
-  and what not.
+	But since this function is also used in end-user applications like the
+	Tracker's find panel, it's helpful to know what this function accepts
+	and what not.
 
-  Here are some examples of input strings that parsedate() will be able
-  to convert along with some notes:
-    - "last friday", "this wednesday", "next July"
-      "last", "next", and "this" refer to the week or year (depending
-      on the context). So "last friday" means last week's friday.
-      "This wednesday" is referring to this week's wednesday, no matter
-      if it has already passed or not.
-      "Next July" refers to next year's July. All of these dates are
-      parsed relative to the specified time (usually "now"), and will
-      be set to the first moment of that time span: "next monday" is
-      monday, 0:00:00, midnight.
-    - "now" just returns the time all calculations are relative to.
-    - "next 5 minutes", "5 minutes", "+5 mins" all mean the same thing,
-      that is, current time plus exactly 5 minutes.
-    - "5 weeks" means in 5 weeks from now on.
-    - "8/5/2003", "5.8.2003", "2003-08-05" are all referring to August
-      5th, 2003, again at 0:00 midnight.
-    - "Thursday 3:00" means this week's thursday, at 3 o'clock.
+	Here are some examples of input strings that parsedate() will be able
+	to convert along with some notes:
+	- "last friday", "this wednesday", "next July"
+		"last", "next", and "this" refer to the week or year (depending
+		on the context). So "last friday" means last week's friday.
+		"This wednesday" is referring to this week's wednesday, no matter
+		if it has already passed or not.
+		"Next July" refers to next year's July. All of these dates are
+		parsed relative to the specified time (usually "now"), and will
+		be set to the first moment of that time span: "next monday" is
+		monday, 0:00:00, midnight.
+	- "now" just returns the time all calculations are relative to.
+	- "next 5 minutes", "5 minutes", "+5 mins" all mean the same thing,
+		that is, current time plus exactly 5 minutes.
+	- "5 weeks" means in 5 weeks from now on.
+	- "8/5/2003", "5.8.2003", "2003-08-05" are all referring to August
+		5th, 2003, again at 0:00 midnight.
+	- "Thursday 3:00" means this week's thursday, at 3 o'clock.
 
-  \anchor parsedateFormats 
-  \par Format Specifier
+	\anchor parsedateFormats 
+	\par Format Specifier
 
-  While the get_dateformats() function allow you to retrieve the built-in
-  formats, you can also define your own and use set_dateformats() to let
-  parsedate() use them in all subsequent calls.
+	While the get_dateformats() function allow you to retrieve the built-in
+	formats, you can also define your own and use set_dateformats() to let
+	parsedate() use them in all subsequent calls.
 
-  The following is a list valid format specifiers and their meanings.
+	The following is a list valid format specifiers and their meanings:
+	- \b a/A weekday (Sunday, Monday, ...)
+	- \b d day of month (1-31)
+	- \b b/B month name (January, February, ...)
+	- \b month (1-12)
+	- \b y/Y year
+	- \b H/I hours (1-24)
+	- \b M minutes (0-60)
+	- \b S seconds (0-60)
+	- \b p meridian (am/pm)
+	- \b z/Z time zone (i.e. GMT)
+	- \b T time unit, like "last friday", "next 5 minutes", "-15 hours", etc.
+	- \b - dash or slash
 
-    - \b a/A weekday (Sunday, Monday, ...)
-    - \b d day of month (1-31)
-    - \b b/B month name (January, February, ...)
-    - \b month (1-12)
-    - \b y/Y year
-    - \b H/I hours (1-24)
-    - \b M minutes (0-60)
-    - \b S seconds (0-60)
-    - \b p meridian (am/pm)
-    - \b z/Z time zone (i.e. GMT)
-    - \b T time unit, like "last friday", "next 5 minutes", "-15 hours", etc.
-    - \b - dash or slash
+	Any of ",.:" is allowed and will be expected in the input string as is.
+	You can enclose a \b single field with "[]" to mark it as being optional.
+	A blank stands for white space. No other character is allowed.
+	An invalid format string won't do any harm, but of course, no input string
+	will ever match that format.
 
-  Any of ",.:" is allowed and will be expected in the input string as is.
-  You can enclose a \b single field with "[]" to mark it as being optional.
-  A blank stands for white space. No other character is allowed.
-  An invalid format string won't do any harm, but of course, no input string
-  will ever match that format.
+	For example, "H:M [p]" will match against "21:33", "4:12 am", but not
+	"30:30 pm" (hours out of range), "15:16 GMT" (this time zone is certainly
+	not a valid meridian specifier), or "4:66" (minutes out of range).
 
-  For example, "H:M [p]" will match against "21:33", "4:12 am", but not
-  "30:30 pm" (hours out of range), "15:16 GMT" (this time zone is certainly
-  not a valid meridian specifier), or "4:66" (minutes out of range).
-
-  \par Note:
-  At the time of this writing, the parsedate() functions are not localized and
-  will only recognize English time specifications following the examples above.
+	\note At the time of this writing, the parsedate() functions are not
+		localized and will only recognize English time specifications
+		following the examples above.
 */
 
-/*!
-  \def PARSEDATE_RELATIVE_TIME
-  \brief relative time
 
-  The time value was computed relative to the specified time.
+/*!
+	\def PARSEDATE_RELATIVE_TIME
+	\brief relative time
+
+	The time value was computed relative to the specified time.
 */
 
-/*!
-  \def PARSEDATE_DAY_RELATIVE_TIME
-  \brief day relative time
 
-  The time value was computed relative to the specified time, and it would vary
-  with every day passed in the specified time.
+/*!
+	\def PARSEDATE_DAY_RELATIVE_TIME
+	\brief day relative time
+
+	The time value was computed relative to the specified time, and it would vary
+	with every day passed in the specified time.
 */
 
-/*!
-  \def PARSEDATE_MINUTE_RELATIVE_TIME
-  \brief minute relative time
 
-  The time value was computed relative to the specified time, and it would
-  vary with every minute passed in the specified time.
+/*!
+	\def PARSEDATE_MINUTE_RELATIVE_TIME
+	\brief minute relative time
+
+	The time value was computed relative to the specified time, and it would
+	vary with every minute passed in the specified time.
 */
 
-/*!
-  \def PARSEDATE_INVALID_DATE
-  \brief invalid date string
 
-  This flag will be set if the specified date string could not be parsed
-  correctly. For example, this may happen if there are some unknown words in
-  that string.
+/*!
+	\def PARSEDATE_INVALID_DATE
+	\brief invalid date string
+
+	This flag will be set if the specified date string could not be parsed
+	correctly. For example, this may happen if there are some unknown words in
+	that string.
 */
 
+
 /*!
-  \fn time_t parsedate(const char *dateString, time_t relativeTo)
-  \brief Parses \a dateString relative to \a relativeTo
+	\fn time_t parsedate(const char *dateString, time_t relativeTo)
+	\brief Parses \a dateString relative to \a relativeTo
 
-  Parses the given \a dateString relative to the time 
-  specified by \a relativeTo using the internal formats 
-  table.
+	Parses the given \a dateString relative to the time 
+	specified by \a relativeTo using the internal formats 
+	table.
 
-  \param dateString the date that should be parsed, i.e. "next thursday".
-  \param relativeTo all relative dates will be relative to this time, if -1
+	\param dateString the date that should be parsed, i.e. "next thursday".
+	\param relativeTo all relative dates will be relative to this time, if -1
     is passed, the current time will be used.
-  \return the parsed time value or -1 if the \a dateString
+	\return the parsed time value or -1 if the \a dateString
     could not be parsed.
 */
 
-/*!
-  \fn time_t parsedate_etc(const char *dateString, time_t relativeTo, int *_storedFlags) 
-  \brief Parses <span class="var">dateString</span> relative to <span class="var">relativeTo</span>
 
-  This does basically the same as parsedate(), but will set the following 
-  flags in <span class="var">_storedFlags</span>:
-  \htmlonly
-    <table border=1>
-  <!-- ToDo: this certainly is a hack -->
-      <tr><th bgcolor="#eeeeee">Constant</th><th bgcolor="#eeeeee">Meaning</th></tr>
-      <tr><td class="mdname1">PARSEDATE_RELATIVE_TIME</td>
-        <td>\endhtmlonly \copydoc PARSEDATE_RELATIVE_TIME \htmlonly
-        </td></tr>
-      <tr><td class="mdname1">PARSEDATE_DAY_RELATIVE_TIME</td>
-        <td>\endhtmlonly \copydoc PARSEDATE_DAY_RELATIVE_TIME \htmlonly
-        </td></tr>
-      <tr><td class="mdname1">PARSEDATE_MINUTE_RELATIVE_TIME</td>
-        <td>\endhtmlonly \copydoc PARSEDATE_MINUTE_RELATIVE_TIME \htmlonly
-        </td></tr>
-      <tr><td class="mdname1">PARSEDATE_INVALID_DATE</td>
-        <td>
-          \endhtmlonly \copydoc PARSEDATE_INVALID_DATE \htmlonly
-          This flag will only be set if the function returns -1.
-        </td></tr>
-    </table>
-  \endhtmlonly
+/*!
+	\fn time_t parsedate_etc(const char *dateString, time_t relativeTo,
+		int *_storedFlags)
+	\brief Parses <span class="var">dateString</span> relative to
+		   <span class="var">relativeTo</span>
+
+	This does basically the same as parsedate(), but will set the following 
+	flags in <span class="var">_storedFlags</span>:
+	\htmlonly
+	<table border=1>
+		<!-- ToDo: this certainly is a hack -->
+		<tr><th bgcolor="#eeeeee">Constant</th><th bgcolor="#eeeeee">Meaning</th></tr>
+		<tr><td class="mdname1">PARSEDATE_RELATIVE_TIME</td>
+			<td>\endhtmlonly \copydoc PARSEDATE_RELATIVE_TIME \htmlonly
+		</td></tr>
+		<tr><td class="mdname1">PARSEDATE_DAY_RELATIVE_TIME</td>
+			<td>\endhtmlonly \copydoc PARSEDATE_DAY_RELATIVE_TIME \htmlonly
+		</td></tr>
+		<tr><td class="mdname1">PARSEDATE_MINUTE_RELATIVE_TIME</td>
+			<td>\endhtmlonly \copydoc PARSEDATE_MINUTE_RELATIVE_TIME \htmlonly
+		</td></tr>
+		<tr><td class="mdname1">PARSEDATE_INVALID_DATE</td>
+		<td>
+		\endhtmlonly \copydoc PARSEDATE_INVALID_DATE \htmlonly
+			This flag will only be set if the function returns -1.
+		</td></tr>
+	</table>
+	\endhtmlonly
 */
 
-/*!
-  \fn void set_dateformats(const char *formatTable[])
-  \brief sets the internal format table for parsedate()
 
-  This function let you set the format table which is used by parsedate().
-  When <span class="var">formatTable</span> is NULL, the standard built-in format table will be set again.
-  \param formatTable the NULL terminated formats list. This list must stay
+/*!
+	\fn void set_dateformats(const char *formatTable[])
+	\brief sets the internal format table for parsedate()
+
+	This function let you set the format table which is used by parsedate().
+	When <span class="var">formatTable</span> is NULL, the standard built-in format table will be set again.
+	\param formatTable the NULL terminated formats list. This list must stay
     valid when using parsedate() - it is not copied, but directly used.
-  \see 
-    \ref parsedateFormats Format!
+
+	\see 
+		\ref parsedateFormats Format!
 */
+
 
 /*!
-  \fn const char **get_dateformats(void)
-  \brief returns the internal format table currently used by parsedate()
+	\fn const char **get_dateformats(void)
+	\brief returns the internal format table currently used by parsedate()
 
-  Returns the internal format table currently used by parsedate() - this is
-  either a pointer to the built-in one, or one that you have previously
-  set using set_dateformats().
+	Returns the internal format table currently used by parsedate() - this is
+	either a pointer to the built-in one, or one that you have previously
+	set using set_dateformats().
 
-  \see
-    \ref set_dateformats()
+	\see
+		\ref set_dateformats()
 */
-

@@ -136,7 +136,15 @@ BUrlRequest::Identify()
 	fUrlProtocol = NULL;
 	
 	if (fUrl.Protocol() == "http") {
-		fUrlProtocol = new(std::nothrow) BUrlProtocolHttp(fUrl, fListener, fContext, &fResult);
+		fUrlProtocol = new(std::nothrow) BUrlProtocolHttp(fUrl, false, "HTTP", 
+			                                              fListener, fContext, 
+														  &fResult);
+		fReady = true;
+		return B_OK;
+	} else if (fUrl.Protocol() == "https") {
+		fUrlProtocol = new(std::nothrow) BUrlProtocolHttp(fUrl, true, "HTTPS", 
+			                                              fListener, fContext, 
+														  &fResult);
 		fReady = true;
 		return B_OK;
 	}

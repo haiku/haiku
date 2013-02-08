@@ -17,7 +17,6 @@
 	a simple mechanism for one-time module initializations. The same module is
 	used for accessing any volume of that FS type.
 
-
 	\section objects File System Objects
 
 	There are several types of objects a FS module has to deal with directly or

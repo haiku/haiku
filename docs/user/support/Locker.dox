@@ -1,203 +1,222 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation by:
- *  Niels Sascha Reedijk <niels.reedijk@gmail.com>
+ * Authors:
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *
  * Corresponds to:
- * /trunk/headers/os/support/Locker.h rev 19972
- * /trunk/src/kits/support/Locker.cpp rev 13826
+ *		headers/os/support/Locker.h rev 19972
+ *		src/kits/support/Locker.cpp rev 13826
  */
 
 /*!
-  \file Locker.h
-  \brief Provides locking class BLocker.
+	\file Locker.h
+	\ingroup support
+	\ingroup libbe
+	\brief Provides locking class BLocker.
 */
 
+
 /*!
-  \class BLocker
-  \ingroup support
-  \ingroup libbe
-  \brief Semaphore-type class for thread safety.
+	\class BLocker
+	\ingroup support
+	\ingroup libbe
+	\brief Semaphore-type class for thread safety.
 
-  The BLocker interface is not merely a wrapper around a semaphore, but it
-  also has two advantages. First of all, it implements a benaphore. 
-  A benaphore is in some ways more speed efficient,
-  because before it uses the internal semaphore, it first checks against a
-  variable that is only operated on with atomic operations. Setting a variable
-  is a lot more efficient than acquiring a semaphore, thus this type of locking
-  is much prefered. 
+	The BLocker interface is not merely a wrapper around a semaphore, but it
+	also has two advantages. First of all, it implements a benaphore. 
+	A benaphore is in some ways more speed efficient,
+	because before it uses the internal semaphore, it first checks against a
+	variable that is only operated on with atomic operations. Setting a variable
+	is a lot more efficient than acquiring a semaphore, thus this type of locking
+	is much preferred.
 
-  It basically works as follows. Whenever you newly created BLocker object
-  recieves a locking request, it atomically sets the benaphore variable to 
-  \c 1. Then only additional calls from different threads will utilize the
-  semaphore. You can imagine that in many cases where you protect
-  of data that \em might be accessed by two or more concurrent threads, but
-  the chances of it happening being very small, the benaphore benefits the
-  most from it's speed. 
+	It basically works as follows. Whenever you newly created BLocker object
+	receives a locking request, it atomically sets the benaphore variable to
+	\c 1. Then only additional calls from different threads will utilize the
+	semaphore. You can imagine that in many cases where you protect
+	of data that \em might be accessed by two or more concurrent threads, but
+	the chances of it happening being very small, the benaphore benefits the
+	most from it's speed. 
 
-  The other feature of BLocker that improves basic semaphore handling is that
-  it allows for recursive locks. The following piece of code works with a
-  BLocker, but block inevitably with a semaphore. Let's pretend I call
- \c Water():
+	The other feature of BLocker that improves basic semaphore handling is that
+	it allows for recursive locks. The following piece of code works with a
+	BLocker, but block inevitably with a semaphore. Let's pretend I call
+	\c Water():
 
-  \code
-  status_t
-  Flower::Grow(int length)
-  {
+\code
+status_t
+Flower::Grow(int length)
+{
     if (fLock->Lock()) {
-      fLength += length;
-      fLock->Unlock();
-      return B_OK;
+        fLength += length;
+        fLock->Unlock();
+        return B_OK;
     } else {
-      return B_ERROR;
+        return B_ERROR;
     }
-  }
+}
 
-  status_t
-  Flower::Water(int amount)
-  {
+status_t
+Flower::Water(int amount)
+{
     if (fLock->Lock()) {
-      status_t status = Grow(amount * 2);
-      fLock->Unlock();
-      return status;
+        status_t status = Grow(amount * 2);
+        fLock->Unlock();
+        return status;
     } else {
-      return B_ERROR;
+        return B_ERROR;
     }
-  }
-  \endcode
+}
+\endcode
 
-  This code would work because BLocker keeps track of the amount of lock
-  requests from the same thread. A normal semaphore would block in \c Grow()
-  because the semaphore would be acquired already. Please do make sure you
-  pair every Lock() with an Unlock() though, or you'll create a deadlock.
+	This code would work because BLocker keeps track of the amount of lock
+	requests from the same thread. A normal semaphore would block in \c Grow()
+	because the semaphore would be acquired already. Please do make sure you
+	pair every Lock() with an Unlock() though, or you'll create a deadlock.
 */
 
-/*!
-  \fn BLocker::BLocker()
-  \brief Constructor.
 
-  Create a new BLocker with the default name of <tt>some BLocker</tt>. This
-  BLocker will use the benaphore-style locking. 
-  
-  \note For debugging purposes, it's extremely convenient to actually give a
+/*!
+	\fn BLocker::BLocker()
+	\brief Constructor.
+
+	Create a new BLocker with the default name of some BLocker. This
+	BLocker will use the benaphore-style locking.
+
+	\note For debugging purposes, it's extremely convenient to actually give a
     name to the object. In case of a deadlock, it's easier to track down which
     BLocker object might have caused the problems.
-  
-  \see BLocker(const char* name, bool benaphoreStyle) for all the options.
+
+	\see BLocker(const char* name, bool benaphoreStyle) for all the options.
 */
 
-/*!
-  \fn BLocker::BLocker(const char* name)
-  \brief Constructor.
-  
-  Create a new BLocker with benaphore-style locking.
-  
-  \param name A NULL-terminated string that contains the name of the semaphore.
-    Note that the length of the names are limited to B_OS_NAME_LENGTH constant,
-    which includes the \c \\0 character.
-  
-  \see BLocker(const char* name, bool benaphoreStyle) for all the options.
-*/
 
 /*!
-  \fn BLocker::BLocker(bool benaphoreStyle)
-  \brief Constructor.
-  
-  Creates a BLocker with the default name of <tt>some BLocker</tt>.
-  
-  \note For debugging purposes, it's extremely convenient to actually give a
-    name to the object. In case of a deadlock, it's easier to track down which
-    BLocker object might have caused the problems.
-  
-  \param benaphoreStyle If you pass \c true, the locker will be in benaphore
-    style (which is the default option for other constructors). If you pass
-    \c false, the object will completely rely on semaphores for it's
-    functioning. 
-  
-  \see BLocker(const char* name, bool benaphoreStyle) if you also want to set a
-    name.
+	\fn BLocker::BLocker(const char* name)
+	\brief Constructor.
+
+	Create a new BLocker with benaphore-style locking.
+
+	\param name A NULL-terminated string that contains the name of the
+				semaphore. Note that the length of the names are limited to
+				\c B_OS_NAME_LENGTH constant, which includes the \c \\0
+				character.
+
+	\see BLocker(const char* name, bool benaphoreStyle) for all the options.
 */
 
-/*!
-  \fn BLocker::BLocker(const char* name, bool benaphoreStyle)
-  \brief Constructor.
-  
-  \param name A NULL-terminated string that contains the name of the semaphore.
-    Note that the length of the names are limited to B_OS_NAME_LENGTH constant,
-    which includes the \c \\0 character.
-  \param benaphoreStyle If you pass \c true, the locker will be in benaphore
-    style (which is the default option for other constructors). If you pass
-    \c false, the object will completely rely on semaphores for it's
-    functioning.   
-*/
 
 /*!
-  \fn virtual BLocker::~BLocker()
-  \brief Destructor.
-  
-  Release the internal semaphore. Because of this, any pending Lock() calls
-  from other threads be cancelled. The return code will be \c false for 
-  those calls. 
+	\fn BLocker::BLocker(bool benaphoreStyle)
+	\brief Constructor.
+
+	Creates a BLocker with the default name of <tt>some BLocker</tt>.
+
+	\note For debugging purposes, it's extremely convenient to actually give a
+		name to the object. In case of a deadlock, it's easier to track down
+		which BLocker object might have caused the problems.
+
+	\param benaphoreStyle If you pass \c true, the locker will be in benaphore
+		   style (which is the default option for other constructors). If you
+		   pass \c false, the object will completely rely on semaphores for
+		   it's functioning. 
+
+	\see BLocker(const char* name, bool benaphoreStyle) if you also want
+		 to set a name.
 */
 
-/*!
-  \fn bool BLocker::Lock()
-  \brief Add a lock request and block on it until we get it.
-  
-  \retval true Lock acquired succesfully.
-  \retval false Failed to acquire the lock. Most probable cause is that the
-    object is deleted. This frees the semaphore and releases the pending Lock()
-    requests.
-  
-  \see LockWithTimeout(bigtime_t timeout), Unlock()
-*/
 
 /*!
-  \fn status_t BLocker::LockWithTimeout(bigtime_t timeout)
-  \brief Add a lock request and block until we get it or until it times out.
-  
-  \param timeout This is a timeout in microseconds (one millionth of a second),
-    \e relative from now. 
-  
-  \see Lock(), Unlock()
+	\fn BLocker::BLocker(const char* name, bool benaphoreStyle)
+	\brief Constructor.
+
+	\param name A NULL-terminated string that contains the name of the
+		   semaphore. Note that the length of the names are limited to
+		   \c B_OS_NAME_LENGTH constant, which includes the \c \\0
+		   character.
+	\param benaphoreStyle If you pass \c true, the locker will be in benaphore
+		   style (which is the default option for other constructors). If
+		   you pass \c false, the object will completely rely on semaphores
+		   for its functioning.
 */
 
-/*!
-  \fn void BLocker::Unlock(void)
-  \brief Release the lock that's currently held.
-*/
 
 /*!
-  \fn thread_id BLocker::LockingThread(void) const
-  \brief Return the \c thread_id of the thread that's currently holding the 
-    lock.
+	\fn virtual BLocker::~BLocker()
+	\brief Destructor.
+
+	Release the internal semaphore. Because of this, any pending Lock() calls
+	from other threads be cancelled. The return code will be \c false for 
+	those calls.
 */
 
+
 /*!
-  \fn bool BLocker::IsLocked(void) const
-  \brief Check if the calling thread is actually holding the lock.
-  
-  \retval true The thread from which this method is called from is currently
+	\fn bool BLocker::Lock()
+	\brief Add a lock request and block on it until we get it.
+
+	\retval true Lock acquired successfully.
+	\retval false Failed to acquire the lock. Most probable cause is that the
+			object is deleted. This frees the semaphore and releases the
+			pending Lock() requests.
+
+	\see LockWithTimeout(bigtime_t timeout), Unlock()
+*/
+
+
+/*!
+	\fn status_t BLocker::LockWithTimeout(bigtime_t timeout)
+	\brief Add a lock request and block until we get it or until it times out.
+
+	\param timeout This is a timeout in microseconds (one millionth of a
+		   second) relative to now.
+
+	\see Lock(), Unlock()
+*/
+
+
+/*!
+	\fn void BLocker::Unlock(void)
+	\brief Release the lock that's currently held.
+*/
+
+
+/*!
+	\fn thread_id BLocker::LockingThread(void) const
+	\brief Return the \c thread_id of the thread that's currently holding the 
+		   lock.
+*/
+
+
+/*!
+	\fn bool BLocker::IsLocked(void) const
+	\brief Check if the calling thread is actually holding the lock.
+
+	\retval true The thread from which this method is called from is currently
     holding the lock.
-  \retval false The object is unlocked or the lock is held by another thread.
+	\retval false The object is unlocked or the lock is held by another thread.
 */
 
-/*!
-  \fn int32 BLocker::CountLocks(void) const
-  \brief Return the number of recursive locks that are currently held.
-*/
 
 /*!
-  \fn nt32 BLocker::CountLockRequests(void) const
-  \brief Return the number of threads with a pending lock request.
+	\fn int32 BLocker::CountLocks(void) const
+	\brief Return the number of recursive locks that are currently held.
 */
 
+
 /*!
-  \fn sem_id BLocker::Sem(void) const
-  \brief Return the sem_id of the semaphore this object holds.
-  
-  \warning Like any other internal objects that the Haiku API might expose,
+	\fn nt32 BLocker::CountLockRequests(void) const
+	\brief Return the number of threads with a pending lock request.
+*/
+
+
+/*!
+	\fn sem_id BLocker::Sem(void) const
+	\brief Return the sem_id of the semaphore this object holds.
+
+	\warning Like any other internal objects that the Haiku API might expose,
     this semaphore id should in general be left alone. You should not use any
     of the public low-level semaphore functions on this semaphore, because it
     will harm the internal consistency of the object.

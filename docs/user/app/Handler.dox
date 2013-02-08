@@ -1,21 +1,25 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  * 		Niels Sascha Reedijk, niels.reedijk@gmail.com
  * 
  * Corresponds to:
- *		/trunk/headers/os/app/Handler.h  rev 22577
- *		/trunk/src/kits/app/Handler.cpp  rev 21332
+ *		headers/os/app/Handler.h	rev 22577
+ *		src/kits/app/Handler.cpp	rev 21332
  */
 
 /*!
 	\file Handler.h
+	\ingroup app
+	\ingroup libbe
 	\brief Provides the BHandler class.
 */
 
+
 ///// Globals /////
+
 
 /*!
 	\def B_OBSERVE_WHAT_CHANGE
@@ -51,6 +55,7 @@
 /*!
 	\class BHandler
 	\ingroup app
+	\ingroup libbe
 	\brief Handles messages that are passed on by a BLooper.
 
 	The BHandler class implements two important pieces of functionality. It

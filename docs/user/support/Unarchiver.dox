@@ -1,14 +1,23 @@
 /*
- * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Author:
  *		Alex Wilson, yourpalal2@gmail.com
  *
  * Corresponds to:
- *		/trunk/headers/os/support/Archivable.h rev 37751 
- *		/trunk/src/kits/support/Archivable.cpp rev 37751
+ *		headers/os/support/Archivable.h rev 37751 
+ *		src/kits/support/Archivable.cpp rev 37751
  */
+
+
+/*!
+	\file Archivable.h
+	\ingroup support
+	\ingroup libbe
+	\brief Contains BUnarchiver class used to simplify the unarchiving of
+		   complicated BArchivable hierarchies.
+*/
 
 
 /*!
@@ -16,7 +25,7 @@
 	\ingroup support
 	\ingroup libbe
 	\brief A class that simplifies the unarchiving of complicated BArchivable
-		hierarchies.
+		   hierarchies.
 
 	The BUnarchiver class is a small class used to recover BArchivable objects
 	that have been archived with the BArchiver class. It also provides ownership
@@ -71,6 +80,8 @@
 		instantiated.
 
 	\param token the object \a token
+
+	\returns A status code.
 */
 
 
@@ -82,6 +93,8 @@
 
 	\param name The archive \a name.
 	\param index The archive \a index.
+
+	\returns A status code.
 */
 
 
@@ -90,7 +103,9 @@
 	\brief Checks whether the object represented by \c token has been
 		instantiated in this session.
 
-	\param token The object \a token
+	\param token The object \a token.
+
+	\returns \c true if instantiated, \c false otherwise
 */
 
 
@@ -101,7 +116,9 @@
 
 	\param name The archive \a name.
 	\param index The arcive \a token.
- */
+
+	\returns \c true if instantiated, \c false otherwise.
+*/
 
 
 /*!
@@ -123,6 +140,7 @@
 		retrieved object.
 	\param object Return parameter for the retrieved object of type T.
 
+	\returns A status code.
 	\retval B_OK The object retrieved was of type T.
 	\retval B_BAD_TYPE The object retrieved was not of type T.
 */
@@ -141,6 +159,7 @@
 		BArchiver::GetTokenForArchivable() during archival.
 	\param object The return parameter for the retrieved object of type T.
 
+	\returns A status code.
 	\retval B_OK The object retrieved was of type T.
 	\retval B_BAD_TYPE The object retrieved was not of type T.
 */
@@ -170,6 +189,7 @@
 		retrieved object.
 	\param object Return parameter for the retrieved object of type T.
 
+	\returns A status code.
 	\retval B_OK The object retrieved was of type T.
 	\retval B_BAD_TYPE The object retrieved was not of type T.
 */
@@ -189,6 +209,7 @@
 		like #BMessage::FindData().
 	\param object Return parameter for the retrieved object of type T.
 
+	\returns A status code.
 	\retval B_OK The object retrieved was of type T.
 	\retval B_BAD_TYPE The object retrieved was not of type T.
 */
@@ -210,6 +231,7 @@
 		retrieved object.
 	\param object Return parameter for the retrieved object of type T.
 
+	\returns A status code.
 	\retval B_OK The object retrieved was of type T.
 	\retval B_BAD_TYPE The object retrieved was not of type T.
 */
@@ -230,6 +252,7 @@
 		adding this object.
 	\param object Return parameter for the retrieved \a object of type T.
 
+	\returns A status code.
 	\retval B_OK The \a object retrieved was of type T.
 	\retval B_BAD_TYPE The \a object retrieved was not of type T.
 */
@@ -282,21 +305,22 @@
 	Here is an example of how you might use this method. Note that you
 	must still call PrepareArchive(archive) either way.
 
-	\code
+\code
 MyArchivableClas::MyArchivableClass(BMessage* archive)
-	:
-	BArchivable(BUnarchiver::PrepareArchive(archive))
+    :
+    BArchivable(BUnarchiver::PrepareArchive(archive))
 {
-	BUnarchiver unarchiver(archive);
+    BUnarchiver unarchiver(archive);
 
-	if (BUnarchiver::IsArchiveManaged(archive)) {
-		// ... calls to FindObject() or GetObject() here ...
-	} else {
-		// ... calls to BMessage::FindMessage() here ...
-	}
+    if (BUnarchiver::IsArchiveManaged(archive)) {
+        // ... calls to FindObject() or GetObject() here ...
+    } else {
+        // ... calls to BMessage::FindMessage() here ...
+    }
 }
-	\endcode
+\endcode
 
+	\returns Whether \a archive was managed by a BArchiver object.
 	\retval true if \a archive was managed by a BArchiver object.
 	\retval false otherwise.
 */
@@ -314,14 +338,14 @@ MyArchivableClas::MyArchivableClass(BMessage* archive)
 		archive constructor of your parent class.
 
 	Notice the use of this method in the example provided below.
-	\code
+\code
 MyArchivableClas::MyArchivableClas(BMessage* archive)
-	:
-	BArchivable(BUnarchiver::PrepareArchive(archive))
+    :
+    BArchivable(BUnarchiver::PrepareArchive(archive))
 {
-	// ...
+    // ...
 }
-	\endcode
+\endcode
 
 	\param archive The archive you wish to have prepared.
 
@@ -364,6 +388,7 @@ MyArchivableClas::MyArchivableClas(BMessage* archive)
 	\param from The #BMessage to instantiate from.
 	\param object Return parameter for the retrieved object of type T.
 
+	\returns A status code.
 	\retval B_OK The object retrieved was of type T.
 	\retval B_BAD_TYPE The object retrieved was not of type T.
 */

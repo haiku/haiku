@@ -12,17 +12,22 @@
 #include <HttpAuthentication.h>
 #include <HttpForm.h>
 #include <HttpHeaders.h>
-#include <NetEndpoint.h>
 #include <NetBuffer.h>
+#include <NetworkAddress.h>
 #include <UrlProtocol.h>
+
+
+class BAbstractSocket;
 
 
 class BUrlProtocolHttp : public BUrlProtocol {
 public:
-								BUrlProtocolHttp(BUrl& url, 
+								BUrlProtocolHttp(BUrl& url, bool ssl = false,
+									const char *protocolName = "HTTP",
 									BUrlProtocolListener* listener = NULL,
 									BUrlContext* context = NULL,
 									BUrlResult* result = NULL);
+	virtual						~BUrlProtocolHttp();
 
 	virtual	status_t			SetOption(uint32 option, void* value);
 	
@@ -56,8 +61,9 @@ private:
 			
 			
 private:
-			BNetEndpoint		fSocket;
-			BNetAddress			fRemoteAddr;
+			BAbstractSocket*	fSocket;
+			BNetworkAddress		fRemoteAddr;
+			bool				fSSL;
 			
 			int8				fRequestMethod;
 			int8				fHttpVersion;

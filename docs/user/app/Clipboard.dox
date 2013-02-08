@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,13 +7,15 @@
  *		John Scipione, jscipione@gmail.com
  * 
  * Corresponds to:
- *		/trunk/headers/os/app/Clipboard.h	 rev 42274
- *		/trunk/src/kits/app/Clipboard.cpp	 rev 42274
+ *		headers/os/app/Clipboard.h	 rev 42274
+ *		src/kits/app/Clipboard.cpp	 rev 42274
  */
 
 
 /*!
 	\file Clipboard.h
+	\ingroup app
+	\ingroup libbe
 	\brief Provides the BClipboard class.
 */
 
@@ -27,6 +29,7 @@
 /*!
 	\class BClipboard
 	\ingroup app
+	\ingroup libbe
 	\brief Used for short-term data storage between documents and
 		applications via copy and paste operations.
 

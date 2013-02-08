@@ -1,185 +1,227 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation by:
- *  Niels Sascha Reedijk <niels.reedijk@gmail.com>
+ * Authors:
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *
  * Corresponds to:
- * /trunk/headers/os/support/TypeConstants.h rev 20212
+ *		headers/os/support/TypeConstants.h	rev 20212
  */
 
-/*!
-  \file TypeConstants.h
-  \ingroup support
-  \brief Represents typecodes that are used in various part of the Haiku API.
-
-  The type codes all refer to a specified type, except one. B_ANY_TYPE can
-  refer to literaly any type. This type could be used in case you send or receive
-  data of which you don't know the type, but you want to send or receive it
-  anyway.
-*/
 
 /*!
-  \var B_ANY_TYPE
-  \brief General type when the exact contents is not yet known.
+	\file TypeConstants.h
+	\ingroup support
+	\ingroup libbe
+	\brief Represents typecodes that are used in various part of the Haiku API.
+
+	The type codes all refer to a specified type, except one. B_ANY_TYPE can
+	refer to literaly any type. This type could be used in case you send or receive
+	data of which you don't know the type, but you want to send or receive it
+	anyway.
 */
 
-/*!
-  \var B_ATOM_TYPE
-  \brief Reference to a BAtomic class that was going to be in BeOS R6. Unused in Haiku. 
-*/
 
 /*!
-  \var B_ATOMREF_TYPE
-  \brief Reference to a BAtomic class that was going to be in BeOS R6. Unused in Haiku. 
+	\var B_ANY_TYPE
+	\brief General type when the exact contents is not yet known.
 */
 
-/*!
-  \var B_BOOL_TYPE
-  \brief Boolean value.
-*/
 
 /*!
-  \var B_CHAR_TYPE
-  \brief Represents the \c char type.
+	\var B_ATOM_TYPE
+	\brief Reference to a BAtomic class that was going to be in BeOS R6.
+
+	Unused in Haiku.
 */
 
-/*!
-  \var B_COLOR_8_BIT_TYPE
-  \brief Represents a one-byte colour.
-*/
 
 /*!
-  \var B_DOUBLE_TYPE
-  \brief Represents the \c double type.
+	\var B_ATOMREF_TYPE
+	\brief Reference to a BAtomic class that was going to be in BeOS R6.
+
+	Unused in Haiku.
 */
 
-/*!
-  \var B_FLOAT_TYPE
-  \brief Represents the \c float type.
-*/
 
 /*!
-  \var B_GRAYSCALE_8_BIT_TYPE
-  \brief Represents a byte-long grayscale value.
+	\var B_BOOL_TYPE
+	\brief Boolean value.
 */
 
-/*!
-  \var B_INT16_TYPE
-  \brief Represents a \c short type.
-*/
 
 /*!
-  \var B_INT32_TYPE
-  \brief Represents a \c long type.
+	\var B_CHAR_TYPE
+	\brief Represents the \c char type.
 */
 
-/*!
-  \var B_INT64_TYPE
-  \brief Represents a \c long \c long type.
-*/
 
 /*!
-  \var B_INT8_TYPE
-  \brief Represents a \c char type used for integer storage.
+	\var B_COLOR_8_BIT_TYPE
+	\brief Represents a one-byte color.
 */
 
-/*!
-  \var B_LARGE_ICON_TYPE
-  \brief Represents a large icon.
-*/
 
 /*!
-  \var B_MEDIA_PARAMETER_GROUP_TYPE
-  \brief Represents the BParameterGroup type from the media kit.
+	\var B_DOUBLE_TYPE
+	\brief Represents the \c double type.
 */
 
-/*!
-  \var B_MEDIA_PARAMETER_TYPE
-  \brief Represents the BParameter type from the media kit.
-*/
 
 /*!
-  \var B_MEDIA_PARAMETER_WEB_TYPE
-  \brief Represents the BParameterWeb type from the media kit.
+	\var B_FLOAT_TYPE
+	\brief Represents the \c float type.
 */
 
-/*!
-  \var B_MESSAGE_TYPE
-  \brief Represents a BMessage type.
-*/
 
 /*!
-  \var B_MESSENGER_TYPE
-  \brief Represents a BMessenger type.
+	\var B_GRAYSCALE_8_BIT_TYPE
+	\brief Represents a byte-long grayscale value.
 */
+
+
+/*!
+	\var B_INT16_TYPE
+	\brief Represents a \c short type.
+*/
+
+
+/*!
+	\var B_INT32_TYPE
+	\brief Represents a \c long type.
+*/
+
+
+/*!
+	\var B_INT64_TYPE
+	\brief Represents a \c long \c long type.
+*/
+
+
+/*!
+	\var B_INT8_TYPE
+	\brief Represents a \c char type used for integer storage.
+*/
+
+
+/*!
+	\var B_LARGE_ICON_TYPE
+	\brief Represents a large icon.
+*/
+
+
+/*!
+	\var B_MEDIA_PARAMETER_GROUP_TYPE
+	\brief Represents the BParameterGroup type from the media kit.
+*/
+
+
+/*!
+	\var B_MEDIA_PARAMETER_TYPE
+	\brief Represents the BParameter type from the media kit.
+*/
+
+
+/*!
+	\var B_MEDIA_PARAMETER_WEB_TYPE
+	\brief Represents the BParameterWeb type from the media kit.
+*/
+
+
+/*!
+	\var B_MESSAGE_TYPE
+	\brief Represents a BMessage type.
+*/
+
+
+/*!
+	\var B_MESSENGER_TYPE
+	\brief Represents a BMessenger type.
+*/
+
 
 // Todo: the rest of the types
 
-/*! 
-\name System-wide MIME types for handling URLs
+
+/*!
+	\name System-wide MIME types for handling URLs
 */
+
 
 //! @{
 
-/*!
-  \var B_URL_HTTP
-  \brief application/x-vnd.Be.URL.http
-*/
 
 /*!
-  \var B_URL_HTTPS
-  \brief application/x-vnd.Be.URL.https
+	\var B_URL_HTTP
+	\brief application/x-vnd.Be.URL.http
 */
 
-/*!
-  \var B_URL_FTP
-  \brief application/x-vnd.Be.URL.ftp
-*/
 
 /*!
-  \var B_URL_GOPHER
-  \brief application/x-vnd.Be.URL.gopher
+	\var B_URL_HTTPS
+	\brief application/x-vnd.Be.URL.https
 */
 
-/*!
-  \var B_URL_MAILTO
-  \brief application/x-vnd.Be.URL.mailto
-*/
 
 /*!
-  \var B_URL_NEWS
-  \brief application/x-vnd.Be.URL.news
+	\var B_URL_FTP
+	\brief application/x-vnd.Be.URL.ftp
 */
 
-/*!
-  \var B_URL_NNTP
-  \brief application/x-vnd.Be.URL.nntp
-*/
 
 /*!
-  \var B_URL_TELNET
-  \brief application/x-vnd.Be.URL.telnet
+	\var B_URL_GOPHER
+	\brief application/x-vnd.Be.URL.gopher
 */
 
-/*!
-  \var B_URL_RLOGIN
-  \brief application/x-vnd.Be.URL.rlogin
-*/
 
 /*!
-  \var B_URL_TN3270
-  \brief application/x-vnd.Be.URL.tn3270
+	\var B_URL_MAILTO
+	\brief application/x-vnd.Be.URL.mailto
 */
 
-/*!
-  \var B_URL_WAIS
-  \brief application/x-vnd.Be.URL.wais
-*/
 
 /*!
-  \var B_URL_FILE
-  \brief application/x-vnd.Be.URL.file
+	\var B_URL_NEWS
+	\brief application/x-vnd.Be.URL.news
 */
+
+
+/*!
+	\var B_URL_NNTP
+	\brief application/x-vnd.Be.URL.nntp
+*/
+
+
+/*!
+	\var B_URL_TELNET
+	\brief application/x-vnd.Be.URL.telnet
+*/
+
+
+/*!
+	\var B_URL_RLOGIN
+	\brief application/x-vnd.Be.URL.rlogin
+*/
+
+
+/*!
+	\var B_URL_TN3270
+	\brief application/x-vnd.Be.URL.tn3270
+*/
+
+
+/*!
+	\var B_URL_WAIS
+	\brief application/x-vnd.Be.URL.wais
+*/
+
+
+/*!
+	\var B_URL_FILE
+	\brief application/x-vnd.Be.URL.file
+*/
+
 
 //! @}

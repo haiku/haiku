@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2009, Haiku.
+ * Copyright 2005-2013, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -578,13 +578,6 @@ DesktopSettingsPrivate::AcceptFirstClick() const
 }
 
 
-bool
-DesktopSettingsPrivate::FocusFollowsMouse() const
-{
-	return MouseMode() == B_FOCUS_FOLLOWS_MOUSE;
-}
-
-
 void
 DesktopSettingsPrivate::SetShowAllDraggers(bool show)
 {
@@ -813,13 +806,6 @@ mode_focus_follows_mouse
 DesktopSettings::FocusFollowsMouseMode() const
 {
 	return fSettings->FocusFollowsMouseMode();
-}
-
-
-bool
-DesktopSettings::FocusFollowsMouse() const
-{
-	return fSettings->FocusFollowsMouse();
 }
 
 

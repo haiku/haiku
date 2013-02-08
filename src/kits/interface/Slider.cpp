@@ -1,11 +1,11 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2013 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Marc Flerackers (mflerackers@androme.be)
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Marc Flerackers (mflerackers@androme.be)
  */
 
 
@@ -758,11 +758,11 @@ void
 BSlider::SetPosition(float position)
 {
 	if (position <= 0.0f)
-		BControl::SetValue(fMinValue);
+		SetValue(fMinValue);
 	else if (position >= 1.0f)
-		BControl::SetValue(fMaxValue);
+		SetValue(fMaxValue);
 	else
-		BControl::SetValue((int32)(position * (fMaxValue - fMinValue) + fMinValue));
+		SetValue((int32)(position * (fMaxValue - fMinValue) + fMinValue));
 }
 
 

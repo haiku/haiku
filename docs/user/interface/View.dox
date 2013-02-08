@@ -1,18 +1,21 @@
 /*
- * Copyright 2011, Haiku inc.
+ * Copyright 2011 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation by:
+ * Authors:
  *		John Scipione, jscipione@gmail.com
+ *
  * Corresponds to:
- *		/trunk/headers/os/interface/View.h	 rev 42794
- *		/trunk/src/kits/interface/View.cpp	 rev 42794
+ *		headers/os/interface/View.h	 rev 42794
+ *		src/kits/interface/View.cpp	 rev 42794
  */
 
 
 /*!
 	\file View.h
-	\brief BView class definition and support enums.
+	\ingroup interface
+	\ingroup libbe
+	\brief BView class definition and support data structures.
 */
 
 
@@ -20,7 +23,6 @@
 	\class BView
 	\ingroup interface
 	\ingroup libbe
-
 	\brief View base class.
 */
 

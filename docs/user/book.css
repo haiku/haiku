@@ -1,13 +1,13 @@
 /*
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		François Revol <revol@free.fr>
- *		Stephan Aßmus <superstippi@gmx.de>
- *		Braden Ewing <brewin@gmail.com>
- *		Humdinger <humdingerb@gmail.com>
- *		John Scipione <jscipione@gmail.com>
+ *		François Revol, revol@free.fr
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		Braden Ewing, brewin@gmail.com
+ *		Humdinger, humdingerb@gmail.com
+ *		John Scipione, jscipione@gmail.com
  */
 
 /* color names provided by: http://chir.ag/projects/name-that-color */
@@ -279,7 +279,23 @@ div.contents code {
 }
 
 div.contents div.dynheader {
-	margin-bottom: 16px;
+	color: #0c3762; /* madison */
+	font-size: 1.3em;
+	font-weight: normal;
+	border-bottom: dotted thin #c0c0c0; /* silver */
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+
+div.contents div.dyncontent {
+	width: 100%;
+	border: 1px solid #c7c7c7; /* silver */
+	overflow: auto;
+}
+
+div.contents div.dyncontent div.center {
+	text-align: center;
+	margin: 16px;
 }
 
 div.contents span.keycap, div.contents span.keysym {

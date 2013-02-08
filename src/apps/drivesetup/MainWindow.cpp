@@ -102,8 +102,8 @@ private:
 			off_t offset;
 			off_t size;
 			for (int32 i = 0;
-				info.GetPartitionableSpaceAt(i, &offset, &size) >= B_OK;
-				i++) {
+					info.GetPartitionableSpaceAt(i, &offset, &size) >= B_OK;
+					i++) {
 				// TODO: remove again once Disk Device API is fixed
 				if (!is_valid_partitionable_space(size))
 					continue;

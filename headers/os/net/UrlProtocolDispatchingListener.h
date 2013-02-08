@@ -36,6 +36,7 @@ public:
 									BHandler* handler);
 								BUrlProtocolDispatchingListener(
 									const BMessenger& messenger);
+	virtual						~BUrlProtocolDispatchingListener();
 
 	virtual	void				ConnectionOpened(BUrlProtocol* caller);
 	virtual void				HostnameResolved(BUrlProtocol* caller,

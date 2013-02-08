@@ -6,6 +6,7 @@
  *		Tyler Dauwalder
  *		Simon Cusack, scusack@users.sf.net
  *		John Scipione, jscipione@gmail.com
+ *
  * Corresponds to:
  *		headers/os/storage/Entry.h  hrev43528
  *		src/kits/storage/Entry.cpp  hrev43528
@@ -14,12 +15,16 @@
 
 /*!
 	\file Entry.h
+	\ingroup storage
+	\ingroup libbe
 	\brief Provides the BEntry class and entry_ref implementations.
 */
 
 
 /*!
 	\struct entry_ref
+	\ingroup storage
+	\ingroup libbe
 	\brief A filesystem entry represented as a name in a concrete directory.
 
 	entry_refs may refer to pre-existing (concrete) files, as well as
@@ -120,20 +125,23 @@
 
 /*!
 	\var dev_t entry_ref::device
-	\brief The device id of the storage device on which the entry resides
+
+	The device id of the storage device on which the entry resides.
 
 */
 
 
 /*!
 	\var ino_t entry_ref::directory
-	\brief The inode number of the directory in which the entry resides
+
+	The inode number of the directory in which the entry resides.
 */
 
 
 /*!
 	\var char *entry_ref::name
-	\brief The leaf name of the entry
+
+	The leaf name of the entry
 */
 
 
@@ -162,10 +170,10 @@ BEntry entry("/boot/home/fido");
 
 	Should be followed by a call to one of the SetTo() methods, or an
 	assignment.
-		- SetTo(const BDirectory*, const char*, bool)
-		- SetTo(const entry_ref*, bool)
-		- SetTo(const char*, bool)
-		- operator=(const BEntry&)
+	- SetTo(const BDirectory*, const char*, bool)
+	- SetTo(const entry_ref*, bool)
+	- SetTo(const char*, bool)
+	- operator=(const BEntry&)
 */
 
 
@@ -250,7 +258,7 @@ BEntry entry("/boot/home/fido");
 	\fn bool BEntry::Exists() const
 	\brief Returns whether or not the entry exists in the filesystem.
 
-	\returns \c true if the entry exists, \c false if the entry does not exist.
+	\returns \c true if the entry exists, \c false if not.
 */
 
 

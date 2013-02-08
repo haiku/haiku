@@ -1,20 +1,29 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the OpenBeOS License.
  *
  * Authors:
- *		Axel Dörfler <axeld@pinc-software.de>
- *		John Scipione <jscipione@gmail.com>
- * 
+ *		Axel DÃ¶rfler, axeld@pinc-software.de
+ *		John Scipione, jscipione@gmail.com
+ *
  * Corresponds to:
- *		/trunk/headers/os/locale/UnicodeChar.h	 rev 42274
- *		/trunk/src/kits/locale/UnicodeChar.cpp	 rev 42274
+ *		headers/os/locale/UnicodeChar.h	 rev 42274
+ *		src/kits/locale/UnicodeChar.cpp	 rev 42274
  */
+
+
+/*!
+	\file UnicodeChar.h
+	\ingroup locale
+	\ingroup libbe
+	\brief Provides the BUnicodeChar class.
+*/
+
 
 /*!
 	\class BUnicodeChar
 	\ingroup locale
-
+	\ingroup libbe
 	\brief Management of all information about characters.
 
 	This class provide a set of tools for managing the whole set of characters
@@ -27,10 +36,11 @@
 	instantiate it. You can call one of the methods passing in the character
 	that you want to be examined.
 
-	Note all the function work with chars encoded in utf-32. This is not the
+	Note all the function work with chars encoded in UTF-32. This is not the
 	most usual way to handle characters, but it is the fastest. To convert an
-	utf-8 string to an utf-32 character use the FromUTF8() method.
+	UTF-8 string to an UTF-32 character use the FromUTF8() method.
 */
+
 
 /*!
 	\fn static bool BUnicodeChar::IsAlpha(uint32 c)
@@ -40,6 +50,7 @@
 		alphabetic character.
 */
 
+
 /*!
 	\fn static bool BUnicodeChar::IsAlNum(uint32 c)
 	\brief Determine if \a c is alphanumeric.
@@ -47,6 +58,7 @@
 	\returns \c true if the specified unicode character is a
 		alphabetic or numeric character.
 */
+
 
 /*!
 	\fn static bool BUnicodeChar::IsDigit(uint32 c)
@@ -56,6 +68,7 @@
 		number character.
 */
 
+
 /*!
 	\fn static bool BUnicodeChar::IsHexDigit(uint32 c)
 	\brief Determine if \a c is a hexadecimal digit.
@@ -63,6 +76,7 @@
 	\returns \c true if the specified unicode character is a
 		hexadecimal number character.
 */
+
 
 /*!
 	\fn static bool BUnicodeChar::IsUpper(uint32 c)
@@ -72,6 +86,7 @@
 		uppercase character.
 */
 
+
 /*!
 	\fn static bool BUnicodeChar::IsLower(uint32 c)
 	\brief Determine if \a c is lowercase.
@@ -79,6 +94,7 @@
 	\returns \c true if the specified unicode character is a
 		lowercase character.
 */
+
 
 /*!
 	\fn static bool BUnicodeChar::IsSpace(uint32 c)
@@ -94,6 +110,7 @@
 	\sa IsWhitespace()
 */
 
+
 /*!
 	\fn static bool BUnicodeChar::IsWhitespace(uint32 c)
 	\brief Determine if \a c is whitespace.
@@ -106,6 +123,7 @@
 
 	\sa IsSpace()
 */
+
 
 /*!
 	\fn static bool BUnicodeChar::IsControl(uint32 c)
@@ -120,6 +138,7 @@
 	\sa IsPrintable()
 */
 
+
 /*!
 	\fn static bool BUnicodeChar::IsPunctuation(uint32 c)
 	\brief Determine if \a c is punctuation character.
@@ -127,6 +146,7 @@
 	\returns \c true if the specified unicode character is a
 		punctuation character.
 */
+
 
 /*!
 	\fn static bool BUnicodeChar::IsPrintable(uint32 c)
@@ -140,6 +160,7 @@
 	\sa IsControl()
 */
 
+
 /*!
 	\fn static bool BUnicodeChar::IsTitle(uint32 c)
 	\brief Determine if \a c is title case.
@@ -149,6 +170,7 @@
 	\returns \c true if the specified unicode character is a title case
 		character.
 */
+
 
 /*!
 	\fn static bool BUnicodeChar::IsDefined(uint32 c)
@@ -160,6 +182,7 @@
 	\returns \c true if the specified unicode character is defined.
 */
 
+
 /*!
 	\fn static bool BUnicodeChar::IsBase(uint32 c)
 	\brief Determine if \a c can be used with a diacritic.
@@ -170,12 +193,14 @@
 		form character that can be used with a diacritic.
 */
 
+
 /*!
 	\fn static int8 BUnicodeChar::Type(uint32 c)
 	\brief Gets the type of a character.
 
 	\returns A member of the \c unicode_char_category enum.
 */
+
 
 /*!
 	\fn uint32  BUnicodeChar::ToLower(uint32 c)
@@ -184,12 +209,14 @@
 	\returns The lowercase version of the specified unicode character.
 */
 
+
 /*!
 	\fn uint32 BUnicodeChar::ToUpper(uint32 c)
 	\brief Transforms \a c to uppercase.
 
 	\returns The uppercase version of the specified unicode character.
 */
+
 
 /*!
 	\fn uint32 BUnicodeChar::ToTitle(uint32 c)
@@ -198,6 +225,7 @@
 	\returns The title case version of the specified unicode character.
 */
 
+
 /*!
 	\fn int32 BUnicodeChar::DigitValue(uint32 c)
 	\brief Gets the numeric value \a c.
@@ -205,32 +233,36 @@
 	\returns The numeric version of the specified unicode character.
 */
 
+
 /*!
 	\fn void BUnicodeChar::ToUTF8(uint32 c, char **out)
-	\brief Transform a character to utf-8 encoding.
+	\brief Transform a character to UTF-8 encoding.
 
-	\returns The utf-8 encoding of the specified unicode character.
+	\returns The UTF-8 encoding of the specified unicode character.
 */
+
 
 /*!
 	\fn uint32 BUnicodeChar::FromUTF8(const char **in)
-	\brief Transform a utf-8 string to an utf-32 character.
+	\brief Transform a UTF-8 string to an UTF-32 character.
 
 	If the string contains multiple characters, only the fist one is used.
 	This function updates the in pointer so that it points on the next
 	character for the following call.
 
-	\returns The utf-32 encoded version of \a in.
+	\returns The UTF-32 encoded version of \a in.
 */
+
 
 /*!
 	\fn size_t BUnicodeChar::UTF8StringLength(const char *str)
 	\brief Counts the characters in the given \c NUL terminated string.
 
-	\returns the number of utf-8 characters in the \c NUL terminated string.
+	\returns the number of UTF-8 characters in the \c NUL terminated string.
 
 	\sa BString::CountChars()
 */
+
 
 /*!
 	\fn size_t BUnicodeChar::UTF8StringLength(const char *str, size_t maxLength)
@@ -240,6 +272,6 @@
 	The string does not need to be \c NUL terminated if you specify a
 	\a maxLength that is shorter than the maximum length of the string.
 
-	\returns the number of utf-8 characters in the \c NUL terminated string
+	\returns the number of UTF-8 characters in the \c NUL terminated string
 		up to \a maxLength characters.
 */

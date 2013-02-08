@@ -13,30 +13,38 @@
 
 /*!
 	\file DirectWindow.h
+	\ingroup game
+	\ingroup libbe
 	\brief Provides the DirectWindow class.
 */
 
 
 /*!
 	\enum direct_buffer_state
+
 	Direct buffer state constants
 */
 
 
 /*!
 	\enum direct_driver_state
+
 	Direct driver state constants
 */
 
 
 /*!
 	\struct direct_buffer_info
+	\ingroup game
+	\ingroup libbe
+
 	Direct butter info struct
 */
 
 
 /*!
 	\var direct_buffer_info::buffer_state
+
 	State of the direct buffer access privileges.
 	It can have one of the following values:
 	- \c B_DIRECT_MODE_MASK
@@ -52,81 +60,103 @@
 
 /*!
 	\var direct_buffer_info::driver_state
+
 	State of the graphics card on which your direct window is displayed.
 	There are two possible values:
-	- \c B_MODE_CHANGED The resolution or color depth has changed.
-	- \c B_DRIVER_CHANGED The window was moved onto another monitor.
+		- \c B_MODE_CHANGED The resolution or color depth has changed.
+		- \c B_DRIVER_CHANGED The window was moved onto another monitor.
 */
 
 
 /*!
 	\var direct_buffer_info::bits
+
 	Pointer to the frame buffer in your team's memory space.
 */
 
 
 /*!
 	\var direct_buffer_info::pci_bits
+
 	Pointer to the frame buffer in the PCI memory space. This value is
 	typically needed to control DMA.
 */
 
 /*!
 	\var direct_buffer_info::bytes_per_row
+
 	Number of bytes used to represent a single row of pixels in the frame buffer.
 */
 
 
 /*!
 	\var direct_buffer_info::bits_per_pixel
-	number of bits actually used to store a single pixel, including reserved,
+
+	Number of bits actually used to store a single pixel, including reserved,
 	unused, or alpha channel bits. This value is usually a multiple of eight.
 */
 
 
 /*!
 	\var direct_buffer_info::pixel_format
+
 	The format used to encode a pixel as defined by the \c color_space type.
 */
 
+
 /*!
 	\var direct_buffer_info::layout
+
 	Reserved for future use.
 */
+
 
 /*!
 	\var direct_buffer_info::orientation
+
 	Reserved for future use.
 */
+
 
 /*!
 	\var direct_buffer_info::_reserved[9]
+
 	Reserved for future use.
 */
+
 
 /*!
 	\var direct_buffer_info::_dd_type_
+
 	Reserved for future use.
 */
+
 
 /*!
 	\var direct_buffer_info::_dd_token_
+
 	Reserved for future use.
 */
 
+
 /*!
 	\var direct_buffer_info::clip_list_count
+
 	Number of rectangles in \c clip_list.
 */
 
+
 /*!
 	\var direct_buffer_info::window_bounds
+
 	Rectangle that defines the full content area of the window in screen
 	coordinates.
 */
 
+
 /*!
 	\var direct_buffer_info::clip_bounds
+
 	Bounding rectangle of the visible part of the content area of the window
 	in screen coordinates.
 */
@@ -134,6 +164,7 @@
 
 /*!
 	\var direct_buffer_info::clip_list
+
 	List of rectangles that together define the visible region of the content
 	area of the window in screen coordinates.
 */

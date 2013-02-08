@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,13 +8,15 @@
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		/trunk/headers/os/locale/Collator.h	 rev 42274
- *		/trunk/src/kits/locale/Collator.cpp	 rev 42274
+ *		headers/os/locale/Collator.h	 rev 42274
+ *		src/kits/locale/Collator.cpp	 rev 42274
  */
 
 
 /*!
 	\file Collator.h
+	\ingroup locale
+	\ingroup libbe
 	\brief Provides the BCollator class.
 */
 
@@ -22,6 +24,7 @@
 /*!
 	\class BCollator
 	\ingroup locale
+	\ingroup libbe
 	\brief Class for handling locale-aware collation (sorting) of strings.
 
 	BCollator is designed to handle collation (sorting) of strings. Unlike

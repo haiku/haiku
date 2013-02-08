@@ -13,6 +13,8 @@
 
 /*!
 	\file FileGameSound.h
+	\ingroup game
+	\ingroup libbe
 	\brief Provides the BFileGameSound class.
 */
 

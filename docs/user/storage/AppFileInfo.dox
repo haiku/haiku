@@ -1,18 +1,21 @@
 /*
- * Copyright 2011, Haiku inc.
- * Distributed under the terms of the MIT Licence.
+ * Copyright 2011 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  *
- * Documentation by:
- *		John Scipione <jscipione@gmail.com>
- *		Ingo Weinhold <bonefish@users.sf.net>
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *		Ingo Weinhold, bonefish@users.sf.net
+ *
  * Corresponds to:
- *		/trunk/headers/os/storage/AppFileInfo.h	 rev 42274
- *		/trunk/src/kits/storage/AppFileInfo.cpp	 rev 42274
+ *		headers/os/storage/AppFileInfo.h	 rev 42274
+ *		src/kits/storage/AppFileInfo.cpp	 rev 42274
  */
 
 
 /*!
 	\file AppFileInfo.h
+	\ingroup storage
+	\ingroup libbe
 	\brief Provides the BAppFileInfo class.
 */
 
@@ -20,6 +23,7 @@
 /*!
 	\class BAppFileInfo
 	\ingroup storage
+	\ingroup libbe
 	\brief Provides access to the metadata associated with executables,
 		   libraries and add-ons.
 
