@@ -8,8 +8,8 @@
  *		Ingo Weinhold, bonefish@users.sf.net
  *
  * Corresponds to:
- *		headers/os/app/NodeInfo.h	hrev45253
- *		src/kits/app/NodeInfo.cpp	hrev45253
+ *		headers/os/storage/NodeInfo.h	hrev45253
+ *		src/kits/storage/NodeInfo.cpp	hrev45253
  */
 
 
