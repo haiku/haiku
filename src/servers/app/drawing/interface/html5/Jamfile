@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src servers app drawing html5 ;
+SubDir HAIKU_TOP src servers app drawing interface html5 ;
 
 UseLibraryHeaders agg ;
 UsePrivateHeaders app graphics interface kernel shared ;

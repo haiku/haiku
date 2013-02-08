@@ -5,6 +5,9 @@ UsePrivateHeaders app graphics input interface kernel shared storage support ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing interface local ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing interface remote ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing interface html5 ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app stackandtile ] ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app decorator ] ;
@@ -92,8 +95,8 @@ Server app_server :
 	# libraries
 	:
 	libtranslation.so libbe.so libbnetapi.so
-	libasdrawing.a $(BROKEN_64)libasremote.a $(BROKEN_64)libashtml5.a 
-	libpainter.a libagg.a $(HAIKU_FREETYPE_LIB)
+	libaslocal.a $(BROKEN_64)libasremote.a $(BROKEN_64)libashtml5.a 
+	libasdrawing.a libpainter.a libagg.a $(HAIKU_FREETYPE_LIB)
 	libstackandtile.a liblinprog.a libtextencoding.so libshared.a
 	$(TARGET_LIBSTDC++)
 

@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src servers app drawing remote ;
+SubDir HAIKU_TOP src servers app drawing interface remote ;
 
 UseLibraryHeaders agg ;
 UsePrivateHeaders app graphics interface kernel shared ;
