@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Haiku Inc. All rights reserved.
+ * Copyright 2003-2013 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -92,132 +92,145 @@
 
 	\internal Implementation detail. Not in Be Book.
 
-	Flag for watch_node(). Subscribe to watching when a file is written to.
+	To avoid a flood of messages for small and frequent write operations on an
+	open file the file system can limit the number of notifications and mark
+	them with the \c B_WATCH_INTERIM_STAT flag.
 */
 
 
 /*!
 	\def B_ENTRY_CREATED
 
-	\c B_NODE_MONITOR notification message "opcode", entry created.
+	\c B_NODE_MONITOR notification message "opcode" is set when entry is
+	created.
 */
 
 
 /*!
 	\def B_ENTRY_REMOVED
 
-	\c B_NODE_MONITOR notification message "opcode", entry removed.
+	\c B_NODE_MONITOR notification message "opcode" is set when entry is
+	removed.
 */
 
 
 /*!
 	\def B_ENTRY_MOVED
 
-	\c B_NODE_MONITOR notification message "opcode", entry moved.
+	\c B_NODE_MONITOR notification message "opcode" is set when entry is
+	moved.
 */
 
 
 /*!
 	\def B_STAT_CHANGED
 
-	\c B_NODE_MONITOR notification message "opcode", stat changed.
+	\c B_NODE_MONITOR notification message "opcode" set when stat info
+	changes. More information can be found in the "fields" field.
 */
 
 
 /*!
 	\def B_ATTR_CHANGED
 
-	\c B_NODE_MONITOR notification message "opcode", attribute changed.
+	\c B_NODE_MONITOR notification message "opcode" set when attribute
+	changes. More information can be found in the "cause" field.
 */
 
 
 /*!
 	\def B_DEVICE_MOUNTED
 
-	\c B_NODE_MONITOR notification message "opcode", device mounted.
+	\c B_NODE_MONITOR notification message "opcode" set when device is
+	mounted.
 */
 
 
 /*!
 	\def B_DEVICE_UNMOUNTED
 
-	\c B_NODE_MONITOR notification message "opcode", device unmounted.
+	\c B_NODE_MONITOR notification message "opcode" set when device is
+	unmounted.
 */
 
 
 /*!
 	\def B_ATTR_CREATED
 
-	\c B_ATTR_CHANGED notification message "cause", attribute created.
-	(Haiku only)
+	\c B_ATTR_CHANGED notification message "cause" set when attribute is
+	created. (Haiku only)
 */
 
 
 /*!
 	\def B_ATTR_REMOVED
 
-	\c B_ATTR_CHANGED notification message "cause", attribute removed.
-	(Haiku only)
+	\c B_ATTR_CHANGED notification message "cause" set when attribute is
+	removed. (Haiku only)
 */
 
 
 /*!
 	\var B_STAT_MODE
 
-	\c B_STAT_CHANGED notification messages "fields" flag, mode changed.
+	\c B_STAT_CHANGED notification messages "fields" flag set when stat mode
+	changes.
 */
 
 
 /*!
 	\var B_STAT_UID
 
-	\c B_STAT_CHANGED notification messages "fields" flag, UID changed.
+	\c B_STAT_CHANGED notification messages "fields" flag set when UID
+	changes.
 */
 
 
 /*!
 	\var B_STAT_GID
 
-	\c B_STAT_CHANGED notification messages "fields" flag, GID changed.
+	\c B_STAT_CHANGED notification messages "fields" flag set when GID
+	changes.
 */
 
 
 /*!
 	\var B_STAT_SIZE
 
-	\c B_STAT_CHANGED notification messages "fields" flag, stat size changed.
+	\c B_STAT_CHANGED notification messages "fields" flag set when stat size
+	changes.
 */
 
 
 /*!
 	\var B_STAT_ACCESS_TIME
 
-	\c B_STAT_CHANGED notification messages "fields" flag, access time
-	changed.
+	\c B_STAT_CHANGED notification messages "fields" flag set when access time
+	changes.
 */
 
 
 /*!
 	\var B_STAT_MODIFICATION_TIME
 
-	\c B_STAT_CHANGED notification messages "fields" flag, modification time
-	changed.
+	\c B_STAT_CHANGED notification messages "fields" flag set when
+	modification time changes.
 */
 
 
 /*!
 	\var B_STAT_CREATION_TIME
 
-	\c B_STAT_CHANGED notification messages "fields" flag, creation time
-	changed.
+	\c B_STAT_CHANGED notification messages "fields" flag set when creation
+	time changes.
 */
 
 
 /*!
 	\var B_STAT_CHANGE_TIME
 
-	\c B_STAT_CHANGED notification messages "fields" flag, time information
-	changed.
+	\c B_STAT_CHANGED notification messages "fields" flag set when access,
+	modification or creation time changes.
 */
 
 
@@ -226,7 +239,8 @@
 
 	\internal Implementation detail. Not in Be Book.
 
-	\c B_STAT_CHANGED notification messages "fields" flag, file is written to.
+	\c B_STAT_CHANGED notification messages "fields" flag set when file is
+	written to.
 */
 
 
