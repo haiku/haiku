@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	2580969822
+1	swedish	x-vnd.Haiku-libtracker	1610004061
 common	B_COMMON_DIRECTORY		gemensam
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Ikonvy
@@ -394,7 +394,6 @@ Icon view	DeskWindow		Ikonvy
 Select all	QueryContainerWindow		Markera allt
 Files cannot be moved or deleted from a read-only volume.	PoseView		Filer kan inte flyttas eller tas bort från en volym som endast är läsbar.
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Kunde inte ersätta "%name". Filen kan vara öppen eller upptaget.
-You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		Du kan inte flytta Papperskorgen, din hemkatalog eller Skrivbord till Papperskorgen.
 Owner	FilePermissionsView		Ägare
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Det gick inte att spara i mappen. Vänligen prova en annan mapp.
 Restore	ContainerWindow		Återställ

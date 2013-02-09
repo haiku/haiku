@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-libtracker	1862651090
+1	hindi	x-vnd.Haiku-libtracker	891685329
 common	B_COMMON_DIRECTORY		सामान्य
 OK	WidgetAttributeText		ठीक है
 Icon view	VolumeWindow		चिह्न दृश्य
@@ -372,7 +372,6 @@ Icon view	DeskWindow		आइकन का दृश्य
 Select all	QueryContainerWindow		सभी चुनें
 Files cannot be moved or deleted from a read-only volume.	PoseView		केवल पढ़ने के लिए संस्करणों में फाइले कॉपी या हटाए नहीं जा सकती .
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		वहां एक तरह से बदलने की कोशिश कर समस्या थी \"%name\". आइटम खोलें या व्यस्त हो सकता है.
-You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		आप रद्दी, घर या डेस्कटॉप निर्देशिका रद्दी में नहीं डाल सकते.
 Owner	FilePermissionsView		मालिक
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		आपके द्वारा निर्दिष्ट फ़ोल्डर में सहेजने मे समस्या थी.एक और  प्रयास करें.
 Restore	ContainerWindow		पुनर्स्थापित करें

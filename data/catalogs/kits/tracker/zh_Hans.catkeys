@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	3779634732
+1	english	x-vnd.Haiku-libtracker	2808668971
 common	B_COMMON_DIRECTORY		常用
 OK	WidgetAttributeText		确定
 Icon view	VolumeWindow		图标视图
@@ -392,7 +392,6 @@ Icon view	DeskWindow		图标视图
 Select all	QueryContainerWindow		全选
 Files cannot be moved or deleted from a read-only volume.	PoseView		无法从只读卷中移动或删除文件。
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		试图替换 \"%name\" 失败。该项目可能为空或者处于忙碌状态。
-You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		您无法将 Trash，home或者Desktop目录放置到垃圾箱。
 Owner	FilePermissionsView		拥有者
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		试图保存到指定目录失败。请尝试其他目录。
 Restore	ContainerWindow		恢复

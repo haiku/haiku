@@ -1,9 +1,11 @@
-1	french	x-vnd.Haiku-MediaConverter	2955071341
+1	french	x-vnd.Haiku-MediaConverter	2722282283
 Video using parameters form settings	MediaConverter		La vidéo utilise les paramètres de réglages
 Video encoding:	MediaConverter		Encodage vidéo :
+Error read audio frame %lld	MediaConverter		Erreur de lecture de l'échantillon audio %lld
 No audio	Audio codecs list		Pas de son
 Error	MediaConverter		Erreur
 Error loading a file	MediaConverter		Erreur au chargement d'un fichier
+Error read video frame %lld	MediaConverter		Erreur de lecture de l'image vidéo %lld
 File Error	MediaConverter-FileInfo		Erreur Fichier
 Open…	Menu		Ouvrir…
 Start [ms]: 	MediaConverter		Début [ms] : 
@@ -22,6 +24,8 @@ Audio:	MediaConverter-FileInfo		Audio :
 OK	MediaConverter-FileInfo		OK
  seconds	MediaFileInfo		 secondes
 Source files	MediaConverter		Fichiers sources
+Error writing video frame %lld	MediaConverter		Erreur d'écriture de la trame vidéo %lld
+Error writing audio frame %lld	MediaConverter		Erreur d'écriture de l'échantillon audio %lld
 Cancelling	MediaConverter		Annulation
 %d byte 	MediaFileInfo		%d octets 
 Error loading files	MediaConverter		Erreur de chargement des fichiers

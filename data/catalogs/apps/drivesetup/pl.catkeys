@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-DriveSetup	1372142450
+1	polish	x-vnd.Haiku-DriveSetup	644135944
 DriveSetup	System name		DriveSetup
 Delete	MainWindow		Usuń
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Na pewno chcesz zapisać zmiany na dysk?\n\nWszystkie dane na wybranej partycji bedą bezpowrotnie utracone!
@@ -6,21 +6,17 @@ Rescan	MainWindow		Przeskanuj
 OK	MainWindow		OK
 Could not aquire partitioning information.	MainWindow		Nie można uzyskać informacji na temat partycji.
 There's no space on the partition where a child partition could be created.	MainWindow		Brak miejsca na partycji, gdzie można by utworzyć zagnieżdzoną partycje.
-%ld MiB	Support		%ld MiB
 <empty>	PartitionList		<pusty>
 Unable to find the selected partition by ID.	MainWindow		Nie można znaleźć wybranej partycji po ID.
 Select a partition from the list below.	DiskView		Proszę wybrać partycje z listy poniżej.
 No disk devices have been recognized.	DiskView		Nie rozpoznano żadnych dysków twardych.
 Failed to initialize the disk %s!\n	MainWindow		Błąd podczas inicjalizacji partycji %s!\n
 The selected disk is read-only.	MainWindow		Wybrany dysk jest w trybie tylko do odczytu.
-Partition name:	CreateParamsPanel		Nazwa partycji:
-Initialize	InitParamsPanel		Inicjalizacja
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Czy jesteś pewien, że chcesz sformatować tę partycję \\"%s\"? Zostaniesz zapytany o to ponownie, zanim zmiany zostaną zapisane na dysku.
 Could not mount partition %s.	MainWindow		Nie można zamontować partycji %s.
 The partition %s has been successfully formatted.\n	MainWindow		Partycja %s została poprawnie sformatowana.\n
 The partition %s is already unmounted.	MainWindow		Partycja %s została już odmontowana.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Błąd podczas usuwaniu partycji. Żadne zmiany nie zostały zapisane na dysk.
-Partition type:	CreateParamsPanel		Typ partycji:
 Could not delete the selected partition.	MainWindow		Nie można usunąć wybranej partycji.
 Initialize	MainWindow		Inicjalizacja
 Error: 	MainWindow	in any error alert	Błąd: 
@@ -33,7 +29,6 @@ There was an error acquiring the partition row.	MainWindow		Wystąpił błąd po
 You need to select a partition entry from the list.	MainWindow		Musisz wybrać partycję docelową z listy.
 The currently selected partition does not have a parent partition.	MainWindow		Wybrana partycja nie posiada partycji nadrzędnej.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Na pewno chcesz zapisać zmiany na dysk?\n\nWszystkie dane na wybranym dysku bedą bezpowrotnie utracone!
-Offset: %ld MB	Support		Przesunięcie: %ld MB
 Write changes	MainWindow		Zapisz zmiany
 There was an error preparing the disk for modifications.	MainWindow		Wystąpił błąd podczas przygotowywania dysku do modyfikacji.
 The partition %s is already mounted.	MainWindow		Partycja %s jest już zamontowana.
@@ -46,7 +41,6 @@ The disk has been successfully initialized.\n	MainWindow		Dysk został poprawnie
 Could not unmount partition %s.	MainWindow		Nie można odmontować partycji %s.
 Failed to format the partition %s!\n	MainWindow		Błąd podczas formatowania partycji %s!\n
 Mount	MainWindow		Montuj
-Create	CreateParamsPanel		Utwórz
 Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Czy jesteś pewien, że chcesz sformatować do surowej partycji RAW (większość ludzi najpierw inicjalizuje dysk z jakimś systemem partycjonowania)? Zostaniesz zapytany ponownie o to, zanim zmiany zostaną zapisane na dysku.
 Device	PartitionList		Urządzenie
 Disk	MainWindow		Dysk
@@ -59,7 +53,6 @@ Cannot delete the selected partition.	MainWindow		Nie mozna usunąć wybranej pa
 Mount all	MainWindow		Zamontuj wszystko
 Cancel	MainWindow		Anuluj
 Delete partition	MainWindow		Usuń partycję
-End: %ld MB	Support		Koniec: %ld MB
 Eject	MainWindow		Wysuń
 Partition	MainWindow		Partycja
 File system	PartitionList		System plików
@@ -70,10 +63,7 @@ Validation of the given initialization parameters failed.	MainWindow		Sprawdzeni
 The selected partition does not contain a partitioning system.	MainWindow		Wybrana partycja nie posiada systemu partycjonowania.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Czy na pewno chcesz zapisać zmiany na dysk?\n\nWszystkie dane na partycji %s zostaną utracone!
 The partition %s is currently mounted.	MainWindow		Partycja %s jest już zamontowana.
-Partition size	CreateParamsPanel		Rozmiar partycji
 Surface test (not implemented)	MainWindow		Test powierzchni (nie zaimplementowano)
-Cancel	InitParamsPanel		Anuluj
-Cancel	CreateParamsPanel		Anuluj
 Format	MainWindow		Format
 Parameters	PartitionList		Parametry
 Creation of the partition has failed.	MainWindow		Próba utworzenia partycji nie powiodła się.

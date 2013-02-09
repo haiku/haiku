@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-Notifications	3631903554
+1	hindi	x-vnd.Haiku-Notifications	814394708
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		एक त्रुटि हो गई,वरीयताओं को सहेजने मे.\nयह संभव है आपकी डिस्क स्पेस खत्म हो गयी है
 Notifications	GeneralView		सूचनाएँ
 seconds of inactivity	GeneralView		निष्क्रियता के सेकेंड
@@ -8,7 +8,6 @@ Enable notifications	GeneralView		अधिसूचना सक्रिय �
 Error	NotificationView		त्रुटि
 OK	GeneralView		ठीक है
 Events are not notified	GeneralView		घटनाक्रम नहीं अधिसूचित कर रहे हैं
-Save	PrefletWin		सुरक्षित करना
 Type	NotificationView		टाइप
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		सूचनाएं नहीं रोकी जा सकती है,क्योंकि सर्वर तक पहुँचा नहीं जा सका.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		सूचनाएँ सक्षम नहीं कर सकते क्योंकि सर्वर नहीं पाया जा सका है.\nइसका मतलब यह है कि आपकी जानकारी पॉपर की स्थापना सफलतापूर्वक पूरी नहीं की गयी थी.

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	2960613375
+1	japanese	x-vnd.Haiku-libtracker	1989647614
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		アイコン表示
 Add-ons	FilePanelPriv		アドオン
@@ -389,7 +389,6 @@ Icon view	DeskWindow		アイコン表示
 Select all	QueryContainerWindow		すべて選択
 Files cannot be moved or deleted from a read-only volume.	PoseView		読み取り専用パーティションへの移動やファイルの削除はできません。
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		\"%name\"を置き換えようとしたら不具合が発生しました。項目は開いた状態か使用中かもしれません。
-You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		ごみ箱、ホームおよびデスクトップフォルダーをごみ箱に捨てることはできません。
 Owner	FilePermissionsView		所有者
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		指定されたフォルダーへの保存に失敗しました。別のフォルダーを指定してみてください。
 Restore	ContainerWindow		復元

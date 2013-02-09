@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Notifications	3631903554
+1	russian	x-vnd.Haiku-Notifications	814394708
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Произошла ошибка при сохранении настроек\nВозможно, что закончилось свободное место на диске.
 Notifications	GeneralView		Уведомления
 seconds of inactivity	GeneralView		секунд бездействия
@@ -8,7 +8,6 @@ Enable notifications	GeneralView		Включить уведомления
 Error	NotificationView		Ошибка
 OK	GeneralView		ОК
 Events are not notified	GeneralView		События не уведомляются
-Save	PrefletWin		Сохранить
 Type	NotificationView		Тип
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Невозможно остановить уведомления, потому что сервер уведомлений недоступен.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Невозможно включить уведомления, потому что сервер уведомлений не найден.\nЭто означает, что сервер уведомлений может быть поврежден.

@@ -26,7 +26,7 @@ Output	MultiAudio		Kimenet
 Video	MultiAudio		Videó
 Line	MultiAudio		Vonalbemenet
 Mic	MultiAudio		Mikrofon
- frequency:	MultiAudio		 frekvencia:
+ frequency:	MultiAudio		i frekvencia:
 Enable	MultiAudio		Engedélyezés
 Mute	MultiAudio		Némítás
 Wave	MultiAudio		Hanghullám

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Notifications	3631903554
+1	belarusian	x-vnd.Haiku-Notifications	814394708
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Адбылася памылка пры захаванні наладак.\nМагчыма, не хапае месца на дыску.
 Notifications	GeneralView		Паведамленні
 seconds of inactivity	GeneralView		секунд прастою
@@ -8,7 +8,6 @@ Enable notifications	GeneralView		Уключыць паведамленні
 Error	NotificationView		Памылка
 OK	GeneralView		ОК
 Events are not notified	GeneralView		Пра падзеі не паведамляецца
-Save	PrefletWin		Захаваць
 Type	NotificationView		Тып
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Немагчыма спыніць Notifications, бо сервер недаступны.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Немагчыма уключыць паедамленні, бо сервер не знойдзены.\nГэта сведчыць аб няўдалай усталёўцы InfoPopper.
