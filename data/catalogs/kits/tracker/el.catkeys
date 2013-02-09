@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	3419853098
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	2448887337
 common	B_COMMON_DIRECTORY		κοινό
 OK	WidgetAttributeText		Εντάξει
 Icon view	VolumeWindow		Προβολή εικονιδίου
@@ -369,7 +369,6 @@ Icon view	DeskWindow		Προβολή εικονιδίου
 Select all	QueryContainerWindow		Επιλογή όλων
 Files cannot be moved or deleted from a read-only volume.	PoseView		Τα αρχεία δεν μπορούν να μετακινηθούν ή να διαγραφούν από ένα τόμο μόνο προς ανάγνωση.
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Υπήρξε κάποιο πρόβλημα κατά την προσπάθεια αντικατάστασης του \"%name\". Το αντικείμενο μπορεί να είναι ήδη ανοιχτό ή απασχολημένο.
-You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		Δε μπορείτε να τοποθετήσετε τα Απορρίματα, τον αρχικό κατάλογο ή τον κατάλογο της Επιφάνειας Εργασίας στα απορρίματα.
 Owner	FilePermissionsView		Ιδιοκτήτης
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Υπήρξε κάποιο πρόβλημα κατά την προσπάθεια αποθήκευσης στο φάκελο που προσδιορίσατε. Παρακαλώ προσπαθήστε με έναν άλλο.
 Restore	ContainerWindow		Επαναφορά

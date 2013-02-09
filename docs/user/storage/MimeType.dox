@@ -280,9 +280,9 @@
 
 
 /*!
-	\fn status_t BMimeType::GetPreferredApp(char *signature, app_verb verb)
-		const
-	\brief Fetches the signature of the MIME type's preferred application from
+	\fn status_t BMimeType::GetPreferredApp(char *signature,
+		app_verb verb) const
+	\brief Fetches the signature of the preferred application from
 		the MIME database.
 
 	The preferred app is the application that's used to access a file when,

@@ -1,0 +1,406 @@
+/*
+ * Copyright 2003-2013 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		John Scipione, jscipione@gmail.com
+ *		Ingo Weinhold, bonefish@users.sf.net
+ *		Clemens Zeidler, haiku@clemens-zeidler.de
+ *
+ * Corresponds to:
+ *		headers/os/storage/NodeMonitor.h	hrev45253
+ *		src/kits/storage/NodeMonitor.cpp	hrev45253
+ */
+
+
+/*!
+	\file NodeMonitor.h
+	\ingroup storage
+	\ingroup libbe
+	\brief Provides functions and constants for monitoring changes to a node.
+
+	The are three main node monitoring functions are watch_volume(),
+	watch_node() and stop_watching().
+	- watch_volume() starts watching a volume and sends a message
+	  when a requested event occurs.
+	- watch_node() starts or stops watching a node, or watches for volumes
+	  to be mounted and unmounted, and sends a message when an event occurs.
+	- stop_watching() stops monitoring a node or volume and no longer sends
+	  messages.
+*/
+
+
+/*!
+	\var B_STOP_WATCHING
+
+	Flag for watch_node(). Unsubscribe from watching a node.
+*/
+
+
+/*!
+	\var B_WATCH_NAME
+
+	Flag for watch_volume() and watch_node(). Subscribe to watching for
+	change to the name of a node.
+*/
+
+
+/*!
+	\var B_WATCH_STAT
+
+	Flag for watch_volume() and watch_node(). Subscribe to watching for
+	changes to the stat information of a node.
+*/
+
+
+/*!
+	\var B_WATCH_ATTR
+
+	Flag for watch_volume() and watch_node(). Subscribe to watching for
+	changes to the attributes of a node.
+*/
+
+
+/*!
+	\var B_WATCH_DIRECTORY
+
+	Flag for watch_node(). Subscribe to watching for changes to the contents
+	of a directory.
+*/
+
+
+/*!
+	\var B_WATCH_ALL
+
+	Flag for watch_node(). Subscribe to watching for changes to all
+	information of a node except \c B_WATCH_MOUNT.
+*/
+
+
+/*!
+	\var B_WATCH_MOUNT
+
+	Flag for watch_node(). Subscribe to watching for when a volume is mounted
+	or unmounted. You may prefer to use BVolumeRoster for volume watching
+	instead.
+*/
+
+
+/*!
+	\var B_WATCH_INTERIM_STAT
+
+	\internal Implementation detail. Not in Be Book.
+
+	To avoid a flood of messages for small and frequent write operations on an
+	open file the file system can limit the number of notifications and mark
+	them with the \c B_WATCH_INTERIM_STAT flag.
+*/
+
+
+/*!
+	\def B_ENTRY_CREATED
+
+	\c B_NODE_MONITOR notification message "opcode" is set when entry is
+	created.
+*/
+
+
+/*!
+	\def B_ENTRY_REMOVED
+
+	\c B_NODE_MONITOR notification message "opcode" is set when entry is
+	removed.
+*/
+
+
+/*!
+	\def B_ENTRY_MOVED
+
+	\c B_NODE_MONITOR notification message "opcode" is set when entry is
+	moved.
+*/
+
+
+/*!
+	\def B_STAT_CHANGED
+
+	\c B_NODE_MONITOR notification message "opcode" set when stat info
+	changes. More information can be found in the "fields" field.
+*/
+
+
+/*!
+	\def B_ATTR_CHANGED
+
+	\c B_NODE_MONITOR notification message "opcode" set when attribute
+	changes. More information can be found in the "cause" field.
+*/
+
+
+/*!
+	\def B_DEVICE_MOUNTED
+
+	\c B_NODE_MONITOR notification message "opcode" set when device is
+	mounted.
+*/
+
+
+/*!
+	\def B_DEVICE_UNMOUNTED
+
+	\c B_NODE_MONITOR notification message "opcode" set when device is
+	unmounted.
+*/
+
+
+/*!
+	\def B_ATTR_CREATED
+
+	\c B_ATTR_CHANGED notification message "cause" set when attribute is
+	created. (Haiku only)
+*/
+
+
+/*!
+	\def B_ATTR_REMOVED
+
+	\c B_ATTR_CHANGED notification message "cause" set when attribute is
+	removed. (Haiku only)
+*/
+
+
+/*!
+	\var B_STAT_MODE
+
+	\c B_STAT_CHANGED notification messages "fields" flag set when stat mode
+	changes.
+*/
+
+
+/*!
+	\var B_STAT_UID
+
+	\c B_STAT_CHANGED notification messages "fields" flag set when UID
+	changes.
+*/
+
+
+/*!
+	\var B_STAT_GID
+
+	\c B_STAT_CHANGED notification messages "fields" flag set when GID
+	changes.
+*/
+
+
+/*!
+	\var B_STAT_SIZE
+
+	\c B_STAT_CHANGED notification messages "fields" flag set when stat size
+	changes.
+*/
+
+
+/*!
+	\var B_STAT_ACCESS_TIME
+
+	\c B_STAT_CHANGED notification messages "fields" flag set when access time
+	changes.
+*/
+
+
+/*!
+	\var B_STAT_MODIFICATION_TIME
+
+	\c B_STAT_CHANGED notification messages "fields" flag set when
+	modification time changes.
+*/
+
+
+/*!
+	\var B_STAT_CREATION_TIME
+
+	\c B_STAT_CHANGED notification messages "fields" flag set when creation
+	time changes.
+*/
+
+
+/*!
+	\var B_STAT_CHANGE_TIME
+
+	\c B_STAT_CHANGED notification messages "fields" flag set when access,
+	modification or creation time changes.
+*/
+
+
+/*!
+	\var B_STAT_INTERIM_UPDATE
+
+	\internal Implementation detail. Not in Be Book.
+
+	\c B_STAT_CHANGED notification messages "fields" flag set when file is
+	written to.
+*/
+
+
+/*!
+	\fn status_t watch_volume(dev_t volume, uint32 flags, BMessenger target)
+	\brief Subscribes \a target to watch node changes on \a volume.
+
+	Depending of \a flags the action performed by this function varies:
+	- \a flags contains at least one of \c B_WATCH_NAME, \c B_WATCH_STAT,
+	  or <tt>B_WATCH_ATTR</tt>: The target is subscribed to watching the specified
+	  aspects of any node on the volume.
+
+	\a flags may include:
+	- \c B_WATCH_NAME
+	- \c B_WATCH_STAT
+	- \c B_WATCH_ATTR
+
+	\c B_WATCH_VOLUME flag is assumed.
+
+	\param volume dev_t referring to the volume to be watched.
+	\param flags Flags indicating the actions to be performed.
+	\param target Messenger referring to the target. Must be valid.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \a flags did not include one of \c B_WATCH_NAME,
+	        \c B_WATCH_STAT, or \c B_WATCH_ATTR.
+*/
+
+
+/*!
+	\fn status_t watch_volume(dev_t volume, uint32 flags,
+		const BHandler *handler, const BLooper *looper)
+	\brief Subscribes \a handler or \a looper to watch node changes on
+	       \a volume.
+
+	Depending of \a flags the action performed by this function varies:
+	- \a flags contains at least one of \c B_WATCH_NAME, \c B_WATCH_STAT,
+	  or <tt>B_WATCH_ATTR</tt>: The target is subscribed to watching the specified
+	  aspects of any node on the volume.
+
+	\a flags may include:
+	- \c B_WATCH_NAME
+	- \c B_WATCH_STAT
+	- \c B_WATCH_ATTR
+
+	\c B_WATCH_VOLUME flag is assumed.
+
+	\param volume dev_t referring to the volume to be watched.
+	\param flags Flags indicating the actions to be performed.
+	\param handler The target \a handler. May be \c NULL, if \a looper is not
+	       \c NULL. Then the preferred handler of the looper is targeted.
+	\param looper The target \a looper. May be \c NULL, if \a handler is not
+	       \c NULL. Then the handler's looper is the target looper.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \a flags did not include one of \c B_WATCH_NAME,
+	        \c B_WATCH_STAT, or \c B_WATCH_ATTR.
+*/
+
+
+/*!
+	\fn status_t watch_node(const node_ref *node, uint32 flags,
+		BMessenger target)
+	\brief Subscribes or unsubscribes \a target to node and/or mount watching.
+
+	Depending of \a flags the action performed by this function varies:
+	- \a flags is 0: The target is unsubscribed from watching the node.
+	  \a node must not be \c NULL in this case.
+	- \a flags contains \c B_WATCH_MOUNT: The target is subscribed to mount
+	  watching.
+	- \a flags contains at least one of \c B_WATCH_NAME, \c B_WATCH_STAT,
+	  \c B_WATCH_ATTR, or <tt>B_WATCH_DIRECTORY</tt>: The target is subscribed to
+	  watching the specified aspects of the node. \a node must not be \c NULL
+	  in this case.
+
+	\a flags may include:
+	- \c B_STOP_WATCHING
+
+	or one or more of the following:
+	- \c B_WATCH_NAME
+	- \c B_WATCH_STAT
+	- \c B_WATCH_ATTR
+	- \c B_WATCH_DIRECTORY
+	- \c B_WATCH_ALL
+	- \c B_WATCH_MOUNT
+
+	Note, that the latter two cases are not mutual exclusive, i.e. mount and
+	node watching can be requested with a single call.
+
+	\param node node_ref referring to the node to be watched. May be \c NULL,
+	       if only mount watching is requested.
+	\param flags Flags indicating the actions to be performed.
+	\param target Messenger referring to the target. Must be valid.
+
+	\return \c B_OK if everything went fine, an error code otherwise.
+*/
+
+
+/*!
+	\fn status_t watch_node(const node_ref *node, uint32 flags,
+		const BHandler *handler, const BLooper *looper)
+	\brief Subscribes or unsubscribes \a handler or \a looper to node and/or
+	       mount watching.
+
+	Depending of \a flags the action performed by this function varies:
+	- \a flags is 0: The target is unsubscribed from watching the node.
+	  \a node must not be \c NULL in this case.
+	- \a flags contains \c B_WATCH_MOUNT: The target is subscribed to mount
+	  watching.
+	- \a flags contains at least one of \c B_WATCH_NAME, \c B_WATCH_STAT,
+	  \c B_WATCH_ATTR, or <tt>B_WATCH_DIRECTORY</tt>: The target is subscribed to
+	  watching the specified aspects of the node. \a node must not be \c NULL
+	  in this case.
+
+	\a flags may include:
+	- \c B_STOP_WATCHING
+
+	or one or more of the following:
+	- \c B_WATCH_NAME
+	- \c B_WATCH_STAT
+	- \c B_WATCH_ATTR
+	- \c B_WATCH_DIRECTORY
+	- \c B_WATCH_ALL
+	- \c B_WATCH_MOUNT
+
+	Note, that the latter two cases are not mutual exlusive, i.e. mount and
+	node watching can be requested with a single call.
+
+	\param node node_ref referring to the node to be watched. May be \c NULL,
+	       if only mount watching is requested.
+	\param flags Flags indicating the actions to be performed.
+	\param handler The target handler. May be \c NULL, if \a looper is not
+	       \c NULL. Then the preferred handler of the looper is targeted.
+	\param looper The target looper. May be \c NULL, if \a handler is not
+	       \c NULL. Then the handler's looper is the target looper.
+
+	\return \c B_OK if everything went fine, an error code otherwise.
+*/
+
+
+/*!
+	\fn status_t stop_watching(BMessenger target)
+	\brief Unsubscribes \a target from node and mount monitoring.
+
+	\param target Messenger referring to the target. Must be valid.
+
+	\return \c B_OK if everything went fine, an error code otherwise.
+*/
+
+
+/*!
+	\fn status_t stop_watching(const BHandler *handler, const BLooper *looper)
+	\brief Unsubscribes \a target from node and mount monitoring.
+
+	\param handler The target handler. May be \c NULL, if \a looper is not
+	       \c NULL. Then the preferred handler of the looper is targeted.
+	\param looper The target looper. May be \c NULL, if \a handler is not
+	       \c NULL. Then the handler's looper is the target looper.
+
+	\return \c B_OK if everything went fine, an error code otherwise.
+*/

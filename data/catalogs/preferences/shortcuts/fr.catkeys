@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Shortcuts	3397621807
+1	french	x-vnd.Haiku-Shortcuts	341885426
 Error, NULL state description?\n	ShortcutsSpec		Erreur : description d'état NULL ?\n
 MoveMouse	ShortcutsSpec		BougerSouris
 OK	ShortcutsWindow		OK
@@ -20,6 +20,7 @@ Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Raccourcis n'a pa
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi « *BougerSourisEn 100% 0 » « *BoutonSouris 1 »
 SendMessage	ShortcutsSpec		EnvoiMessage
 MoveMouseTo	ShortcutsSpec		BougerSourisEn
+Option	ShortcutsSpec	Name for modifier on keyboard	Option
 Save	ShortcutsWindow		Enregistrer
 *MouseButton 1	ShortcutsWindow		*BoutonSouris 1
 *MoveMouse +20 +0	ShortcutsWindow		*BougeSouris +20 +0

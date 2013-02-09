@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-StyledEdit	94944799
+1	french	x-vnd.Haiku-StyledEdit	3208803155
 StyledEdit	System name		Éditeur stylé
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ce fichier est en lecture seule. Voulez-vous sauvegarder les modifications dans le document « %s » ? 
 Paste	Menus		Coller
@@ -42,6 +42,7 @@ Default	Open_and_SaveAsPanel		Défaut
 Replace next	Menus		Remplacer le suivant
 \"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		« %s » a des modifications en suspens.\nVoulez-vous rétablir la dernière version sauvegardée ? 
 Cancel	FindandReplaceWindow		Annuler
+Text encoding	Menus		Encodage du texte
 Close	Menus		Fermer
 Save	SaveAlert		Sauvegarder
 Words:	Statistics		Mots :
@@ -55,6 +56,7 @@ OK	QuitAlert		OK
 Open…	Menus		Ouvrir…
 Center	Menus		Centré
 Blue	Menus		Bleu
+Unable to unlock file\n\t%s	QuitAlert		Impossible de déverrouiller le fichier\n\t%s
 Cyan	Menus		Cyan
 line %d, column %d	StatusView		ligne %d, colonne %d
 OK	Statistics		OK
@@ -67,13 +69,17 @@ Find:	FindandReplaceWindow		Chercher :
 Error saving \"%s\":\n%s	SaveAlert		Erreur à l'enregistrement de « %s » :\n%s
 Copy	Menus		Copier
 Cut	Menus		Couper
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Le fichier « %file% » a été modifié par une autre application, voulez-vous le recharger ?
 Replace	FindandReplaceWindow		Remplacer
 Find again	Menus		Chercher encore
 Cancel	QuitAlert		Annuler
 Find…	Menus		Chercher…
 Select all	Menus		Selectionner tout
 Don't save	SaveAlert		Ne pas enregistrer
+Recover	NodeMonitorAlerts		Récupérer
 Error loading \"%s\":\n\t%s	LoadAlert		Erreur au de chargement de « %s » :\n\t%s
+Ignore	NodeMonitorAlerts		Ignorer
+Read-only	StatusView		Lecture seule
 Undo typing	QuitAlert		Annuler la saisie
 Black	Menus		Noir
 Untitled 	StyledEditWindow		Sans titre
@@ -83,5 +89,6 @@ Encoding	Open_and_SaveAsPanel		Encodage
 Characters:	Statistics		Caractères :
 Save as…	Menus		Enregistrer sous…
 Redo typing	QuitAlert		Rétablir la saisie
+Reload…	Menus		Recharger…
 Replace…	Menus		Remplacer…
 Right	Menus		À droite

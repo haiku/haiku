@@ -8,7 +8,7 @@ Positioning	DeviceClass		Pozicionálás
 Rendering	DeviceClass		Renderelés
 Phone	DeviceClass		Telefon
 17-33% utilized	DeviceClass		17-33% kihasznált
-#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Not Valid name
+#ServerNotReady#Not Valid name	RemoteDevice		#AKiszolgálóNincsKész# Érvénytelen név
 Combo keyboard/pointing device	DeviceClass		Billentyűzet/mutató eszköz
 Controller	DeviceClass		Vezérlő
 No service available	DeviceClass		Nincs elérhető szolgáltatás
@@ -60,19 +60,19 @@ Networking	DeviceClass		Hálózat
 Portable audio	DeviceClass		Hordozható audio
 Device conforms to the headset profile	DeviceClass		Az eszköz megfelel a fejhallgató profilnak
 Hands-free	DeviceClass		Szabadkézi
-#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Not Valid name
+#CommandFailed#Not Valid name	RemoteDevice		#SikertelenParancs# Érvénytelen név
 Vehicle	DeviceClass		Jármű
 Palm	DeviceClass	A palm-held device	Palm
 Video display and loudspeaker	DeviceClass		Kijelző hangszórókkal
 Peripheral	DeviceClass		Periféria
-#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Not Valid name
+#NoOwnerError#Not Valid name	RemoteDevice		#TulajdonosHiba# Érvénytelen név
 Wired modem or voice gateway	DeviceClass		Kábelmodem vagy VOIP átjáró
 Jacket	DeviceClass		Jacket
 Unspecified	DeviceClass		Nem meghatározható
 Fully available	DeviceClass		Teljesen elérhető
 67-83% utilized	DeviceClass		67-83% kihasznált
 Not implemented	RemoteDevice		Nincs implementálva
-#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Not Valid name
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NemTeljesítettKérés# Érvénytelen név
 Server	DeviceClass		Kiszolgáló
 Video conferencing	DeviceClass		Videókonferencia
 Video camera	DeviceClass		Videókamera

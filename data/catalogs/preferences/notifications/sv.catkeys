@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Notifications	3631903554
+1	swedish	x-vnd.Haiku-Notifications	814394708
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Ett fel uppstod när inställningarna skulle sparas.\nDet är möjligt att hårddiskutrymmet håller på att ta slut.
 Notifications	GeneralView		Aviseringar
 seconds of inactivity	GeneralView		sekunder av inaktivitet
@@ -8,7 +8,6 @@ Enable notifications	GeneralView		Aktivera aviseringar
 Error	NotificationView		Fel
 OK	GeneralView		OK
 Events are not notified	GeneralView		Händelser aviseras ej
-Save	PrefletWin		Spara
 Type	NotificationView		Typ
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Aviseringarna kunde inte stoppas eftersom servern inte kunde nås.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Kan inte aktivera aviseringar eftersom servern inte kunde hittas.\Det betyder att din InfoPopper-installation inte avslutades korrekt.

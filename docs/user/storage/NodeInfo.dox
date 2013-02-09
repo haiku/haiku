@@ -1,0 +1,431 @@
+/*
+ * Copyright 2013 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		John Scipione, jscipione@gmail.com
+ *		Ingo Weinhold, bonefish@users.sf.net
+ *
+ * Corresponds to:
+ *		headers/os/storage/NodeInfo.h	hrev45253
+ *		src/kits/storage/NodeInfo.cpp	hrev45253
+ */
+
+
+/*!
+	\file NodeInfo.h
+	\ingroup storage
+	\ingroup libbe
+	\brief Provides the BNodeInfo class.
+*/
+
+
+/*!
+	\class BNodeInfo
+	\ingroup storage
+	\ingroup libbe
+	\brief Provides access to file type meta data on a node.
+
+	BNodeInfo provides a nice wrapper to all sorts of useful meta data such as
+	the MIME-type, the file's icon and the application that will open
+	the file.
+*/
+
+
+/*!
+	\fn BNodeInfo::BNodeInfo()
+	\brief Creates an uninitialized BNodeInfo object.
+
+	After created a BNodeInfo with this, you should call SetTo().
+
+	\see SetTo(BNode *node)
+*/
+
+
+/*!
+	\fn BNodeInfo::BNodeInfo(BNode *node)
+	\brief Creates a BNodeInfo object and initializes it to the supplied
+	       \a node.
+
+	\param node The \a node to gather information on.
+*/
+
+
+/*!
+	\fn BNodeInfo::~BNodeInfo()
+	\brief Frees the object and associated resources.
+
+	The internal BNode object is not deleted.
+*/
+
+
+/*!
+	\name Constructor helper methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BNodeInfo::SetTo(BNode *node)
+	\brief Initializes the BNodeInfo to the supplied \a node.
+
+	The BNodeInfo object does not copy the supplied \a node object, it uses it
+	directly instead. You must not delete the supply \a node while the
+	BNodeInfo object exists. The BNodeInfo does not take over ownership of the
+	\a node and it doesn't delete it on destruction either.
+
+	\param node The \a node to gather information on.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE The node was not properly initialized.
+*/
+
+
+/*!
+	\fn status_t BNodeInfo::InitCheck() const
+	\brief Checks whether or not the object has been properly initialized.
+
+	\returns A status code.
+	\retval B_OK The object was properly initialized.
+	\retval B_BAD_VALUE The object was \b not properly initialized.
+*/
+
+
+//! @}
+
+
+/*!
+	\name MIME-type methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BNodeInfo::GetType(char *type) const
+	\brief Writes the MIME-type of the node into \a type.
+
+	The source of the type information is the \c BEOS:TYPE attribute of the
+	node. The \a type buffer should be pre-allocated before it is passed into
+	GetType(), it should be at least \c B_MIME_TYPE_LENGTH in length.
+
+	\param type A pointer to a pre-allocated char buffer of at least
+	       \c B_MIME_TYPE_LENGTH length into which the MIME-type of the
+	       node is written.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_INIT The object is not properly initialized.
+	\retval B_BAD_VALUE \c NULL \a type or the type string stored in the
+	        attribute is longer than \c B_MIME_TYPE_LENGTH.
+	\retval B_BAD_TYPE The stored type string attribute has the wrong type.
+	\retval B_ENTRY_NOT_FOUND No type is set on the node.
+*/
+
+
+/*!
+	\fn status_t BNodeInfo::SetType(const char *type)
+	\brief Sets the MIME-type of the node. If \a type is \c NULL the
+	       \c BEOS:TYPE attribute is removed instead.
+
+	The \a type string is written into the \c BEOS:TYPE attribute of the node.
+	If \a type is \c NULL, the \c BEOS:TYPE attribute is removed instead. The
+	\a type parameter may not by longer than \c B_MIME_TYPE_LENGTH in length
+	including the terminating \c NUL character.
+
+	\param type The MIME-type to be assigned to the \a node. Must not be
+	       longer than \c B_MIME_TYPE_LENGTH (including the terminating
+	       \c NUL). May be \c NULL to remove the attribute.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_INIT The object was not properly initialized.
+	\retval B_BAD_VALUE \a type is longer than \c B_MIME_TYPE_LENGTH.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Icon methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BNodeInfo::GetIcon(BBitmap *icon, icon_size k) const
+	\brief Gets the icon of the node.
+
+	The icon stored in the \c BEOS:L:STD_ICON attribute (large) or
+	\c BEOS:M:STD_ICON attribute (mini) is retrieved.
+
+	\param icon A pointer to a pre-allocated BBitmap object of the correct
+		   dimension to store the requested icon: 16x16 for the mini or
+		   32x32 for the large icon.
+	\param k The size of the icon to be retrieved: \c B_MINI_ICON for a 16x16
+	       icon and \c B_LARGE_ICON for a 32x32 icon.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_INIT The object was not properly initialized.
+	\retval B_BAD_VALUE \c NULL \a icon, unsupported icon size \a k or bitmap
+		    dimensions (\a icon) and icon size (\a k) do not match.
+*/
+
+
+/*!
+	\fn status_t BNodeInfo::SetIcon(const BBitmap *icon, icon_size k)
+	\brief Sets the icon of the node. If \a icon is \c NULL, the attribute is
+		   removed instead.
+
+	The icon is stored in the \c BEOS:L:STD_ICON attribute (large) or
+	\c BEOS:M:STD_ICON attribute (mini). If \a icon is \c NULL the respective
+	attribute is removed instead.
+
+	\param icon A pointer to a BBitmap object containing the icon to be set.
+		   May be \c NULL.
+	\param k The size of the icon to be set: \c B_MINI_ICON for the mini or
+	       \c B_LARGE_ICON for the large icon.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_INIT The object is not properly initialized.
+	\retval B_BAD_VALUE Unknown icon size \a k or bitmap dimensions (\a icon)
+		    and icon size (\a k) do not match.
+*/
+
+
+/*!
+	\fn status_t BNodeInfo::GetIcon(uint8** data, size_t* size,
+		type_code* type) const
+	\brief Gets the icon of the node.
+
+	The icon stored in the \c BEOS:ICON attribute of the node is retrieved.
+	The caller is responsible to <tt>delete[]</tt> the data if the icon was
+	retrieved.
+
+	\param data A pointer in which a pointer to the icon data
+		   will be returned.
+	\param size A pointer in which the size of the found icon data
+		   will be returned.
+	\param type A pointer in which the type of the found icon data
+		   will be returned.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_INIT The object was not properly initialized.
+	\retval B_BAD_VALUE \c NULL \a data, \c NULL \a size or \c NULL \a type.
+	\retval B_NO_MEMORY No memory to allocate the \a data buffer.
+*/
+
+
+/*!
+	\fn status_t BNodeInfo::SetIcon(const uint8* data, size_t size)
+	\brief Sets the node icon of the node. If \a data is \c NULL or \a size
+	       is 0, the \c BEOS:ICON attribute is removed instead.
+
+	The icon is stored in the \c BEOS:ICON attribute of the node.
+
+	\param data A pointer to valid icon data. May be \c NULL.
+	\param size The size of the provided data buffer. May be 0.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_INIT The object was not properly initialized.
+*/
+
+
+/*!
+	\fn status_t BNodeInfo::GetTrackerIcon(BBitmap *icon,
+		icon_size iconSize) const
+	\brief Gets the icon displayed by Tracker for the icon.
+
+	This method tries really hard to find an icon for the node:
+	- If the node has no type this method returns the icon for
+	  \c B_FILE_MIME_TYPE if it's a regular file or
+	  \c B_DIRECTORY_MIME_TYPE if it's a directory, even if the node has its
+	  own icon!
+	- Next it will ask GetIcon() for an icon.
+	- If this fails it will get the preferred application and ask the MIME
+	  database if the application has an icon for the file type of the
+	  node.
+	- Next it will ask the MIME database whether there is an icon for the file
+	  type of the node.
+	- Then it will ask the MIME database for the preferred application for
+	  the file type of the node and whether this application has a special
+	  icon for the type.
+	- Finally it will return a generic icon for whatever type of file type
+	  (file/dir/etc.) the node is from the MIME database.
+
+	The first action that provides an icon is used. In the case that none of
+	them yield an icon this method fails, this is very unlikely though.
+
+	\remarks You can set \a iconSize to get a scaled icon instead of using
+	         a predefined icon_size constant, pass in an integer casted
+	         to icon_size. For example to get a 64x64 icon pass in:
+\code
+(icon_size)64
+\endcode
+
+	\param icon A pointer to a pre-allocated BBitmap of the correct dimension
+		   to store the requested icon (16x16 for the mini and 32x32 for the
+		   large icon).
+	\param iconSize The size of the icon to be retrieved: \c B_MINI_ICON
+		   for a 16x16 icon or \c B_LARGE_ICON for a 32x32 icon.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_INIT The object was not properly initialized.
+	\retval B_BAD_VALUE \c NULL \a icon, unsupported icon size \a iconSize
+	        or bitmap dimensions (\a icon) and icon size (\a iconSize) do
+	        not match.
+*/
+
+
+/*!
+	\fn status_t BNodeInfo::GetTrackerIcon(const entry_ref *ref,
+		BBitmap *icon, icon_size iconSize)
+	\brief Gets the icon displayed by Tracker for the node referred to by
+	       \a ref.
+
+	This methods works similarly to the non-static version but \a ref
+	identifies the node. \a icon must be pre-allocated to the size requested
+	using \a iconSize before being passed to this method.
+
+	\param ref An entry_ref referring to the node for which the icon is
+	       retrieved.
+	\param icon A pointer to a pre-allocated BBitmap object of the correct
+	       dimension to store the requested icon (16x16 for the mini and 32x32
+	       for the large icon).
+	\param iconSize The size of the icon to be retrieved: \c B_MINI_ICON
+	       for a 16x16 icon or \c B_LARGE_ICON for a 32x32 icon.
+
+	\returns A status code.
+	\retval B_OK: Everything went fine.
+	\retval B_NO_INIT: The object is not properly initialized.
+	\retval B_BAD_VALUE: \c NULL ref or \a icon, unsupported icon size
+	        \a iconSize or bitmap dimensions (\a icon) and icon size
+	        (\a iconSize) do not match.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Preferred application methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BNodeInfo::GetPreferredApp(char *signature,
+		app_verb verb) const
+	\brief Gets the preferred application of the node.
+
+	Writes the contents of the \c BEOS:PREF_APP attribute into the
+	\a signature buffer. The preferred application can be identified by its
+	signature. \a signature should be at least \c B_MIME_TYPE_LENGTH or
+	longer and pre-allocated before it is passed into this method.
+
+	\param signature A pointer to a pre-allocated character buffer of size
+	       \c B_MIME_TYPE_LENGTH or larger into which the MIME-type of the
+	       preferred application is written.
+	\param verb The type of access the preferred application is requested.
+	       Currently \c B_OPEN is the only meaningful option.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_INIT The object was not properly initialized.
+	\retval B_BAD_VALUE \c NULL \a signature or bad app_verb.
+*/
+
+
+/*!
+	\fn status_t BNodeInfo::SetPreferredApp(const char *signature,
+		app_verb verb)
+	\brief Sets the preferred application of the node. If \a signature is
+	       \c NULL, the \c BEOS:PREF_APP attribute is removed instead.
+
+	The supplied string is written into the \c BEOS:PREF_APP attribute of the
+	node. If \a signature is \c NULL, the respective attribute is removed
+	instead. \a signature must not be longer than \c B_MIME_TYPE_LENGTH
+	       (including the terminating \c NUL).
+
+	\param signature The signature of the preferred application to be set.
+	       May be \c NULL.
+	\param verb The type of access set to the preferred application.
+	       Currently only \c B_OPEN is meaningful.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_INIT The object is not properly initialized.
+	\retval B_BAD_VALUE \c NULL \a signature, \a signature is longer than
+	        \c B_MIME_TYPE_LENGTH or bad app_verb.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Application hint methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BNodeInfo::GetAppHint(entry_ref *ref) const
+	\brief Fills out \a ref with a pointer to a hint about the application
+	       that will open this node.
+
+	The path contained in the \c BEOS:PPATH attribute of the node is converted
+	into an entry_ref and returned. \a ref should be pre-allocated before being
+	passed into this method.
+
+	\param ref A pointer to a pre-allocated entry_ref into which the app hint
+	       is written.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_DATA Attribute size greater than \c B_PATH_NAME_LENGTH.
+	\retval B_BAD_TYPE The stored type string attribute has the wrong type.
+	\retval B_BAD_VALUE The \a ref object passed in was \c NULL.
+	\retval B_ERROR Unable to read \c BEOS:PPATH attribute.
+	\retval B_NO_INIT The object was not properly initialized.
+*/
+
+
+/*!
+	\fn status_t BNodeInfo::SetAppHint(const entry_ref *ref)
+	\brief Sets the application that will open the file type of the node. If
+	       \a ref is \c NULL, the \c BEOS:PPATH attribute is removed instead.
+
+	\a ref is converted into a path and stored in the \c BEOS:PPATH attribute
+	of the node. If \a ref is NULL \c BEOS:PPATH is removed instead.
+
+	\param ref A pointer to an entry_ref referring to the application.
+	       May be \c NULL.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE The \a ref object passed in was \c NULL.
+	\retval B_ENTRY_NOT_FOUND \c BEOS:PPATH attribute not found.
+	\retval B_ERROR Unable to write \c BEOS:PPATH attribute.
+	\retval B_NO_INIT The object was not properly initialized.
+*/
+
+
+//! @}

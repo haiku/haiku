@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	3235013733
+1	romanian	x-vnd.Haiku-libtracker	2264047972
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Vizualizare pictogramă
 Add-ons	FilePanelPriv		Module
@@ -309,7 +309,6 @@ Copy	FilePanelPriv		Copiază
 Icon view	DeskWindow		Vizualizare pictogramă
 Select all	QueryContainerWindow		Selectează tot
 Files cannot be moved or deleted from a read-only volume.	PoseView		Fișierele nu pot fi mutate sau șterse dintr-un volum protejat la scriere.
-You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		Nu puteți să plasați dosarul gunoi, personal sau desktop în gunoi.
 Owner	FilePermissionsView		Posesor
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		A apărut o problemă la încercarea de a salva în dosarul pe care l-ați specificat. Încercați altul.
 Restore	ContainerWindow		Restaurează

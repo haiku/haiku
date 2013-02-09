@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	1125041885
+1	russian	x-vnd.Haiku-libtracker	154076124
 common	B_COMMON_DIRECTORY		Общие
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Большие значки
@@ -392,7 +392,6 @@ Icon view	DeskWindow		Большие значки
 Select all	QueryContainerWindow		Выделить все
 Files cannot be moved or deleted from a read-only volume.	PoseView		Невозможно перемещать с раздела в режиме \"только для чтения\".
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Ошибка при замене \"%name\". Возможно файл открыт или занят.
-You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		Вы не можете переместить папки Trash, home или Desktop в корзину.
 Owner	FilePermissionsView		Владелец
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Возникла проблема при сохранении в указанную папку. Пожалуйста, выберите другую.
 Restore	ContainerWindow		Восстановить

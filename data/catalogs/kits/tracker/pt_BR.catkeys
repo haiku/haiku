@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-libtracker	2580969822
+1	portuguese (brazil)	x-vnd.Haiku-libtracker	1610004061
 common	B_COMMON_DIRECTORY		comum
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Em ícones
@@ -394,7 +394,6 @@ Icon view	DeskWindow		Visualização de ícone
 Select all	QueryContainerWindow		Selecionar tudo
 Files cannot be moved or deleted from a read-only volume.	PoseView		Arquivos não podem ser movidos ou excluídos de um volume em modo somente leitura.
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Ocorreu um problema tentando substituir \"%name\". O item deve estar aberto ou ocupado.
-You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		Não é possível colocar a Lixeira ou os diretórios home ou Desktop no lixo.
 Owner	FilePermissionsView		Proprietário
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Ocorreu um problema tentando salvar na pasta especificada. Por favor tente com outra.
 Restore	ContainerWindow		Recuperar

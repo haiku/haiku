@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	3779634732
+1	lithuanian	x-vnd.Haiku-libtracker	2808668971
 common	B_COMMON_DIRECTORY		Bendra
 OK	WidgetAttributeText		Gerai
 Icon view	VolumeWindow		Rodyti piktogramas
@@ -392,7 +392,6 @@ Icon view	DeskWindow		Rodyti piktogramas
 Select all	QueryContainerWindow		Pažymėti viską
 Files cannot be moved or deleted from a read-only volume.	PoseView		Perkelti ar šalinti objektų iš tomų, prijungtų tik skaitymui, negalima.
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Iškilo nesklandumų bandant pakeisti „%name“. Gali būti, jog objektas atvertas arba užimtas.
-You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		Šiukšlinės, Namų ir Darbalaukio aplankų į Šiukšlinę išmesti negalima.
 Owner	FilePermissionsView		Savininkas
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Iškilo nesklandumų bandant rašyti į nurodytą aplanką. Pabandykite nurodyti kitą.
 Restore	ContainerWindow		Atkurti

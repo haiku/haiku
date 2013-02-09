@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-DriveSetup	1372142450
+1	slovak	x-vnd.Haiku-DriveSetup	644135944
 DriveSetup	System name		Nastavenie diskových oblastí
 Delete	MainWindow		Zmazať
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Ste si istí, že chcete tieto zmeny teraz zapísať na disk?\n\nAk tak urobíte, všetky údaje na vybranej diskovej oblasti budú nenávratne stratené!
@@ -6,21 +6,17 @@ Rescan	MainWindow		Znovu preskúmať
 OK	MainWindow		OK
 Could not aquire partitioning information.	MainWindow		Nepodarilo sa získať informácie o diskových oblastiach.
 There's no space on the partition where a child partition could be created.	MainWindow		Na oblasti nie je miesto, kde by bolo možné vytvoriť podriadenú oblasť.
-%ld MiB	Support		%ld MiB
 <empty>	PartitionList		<prázdne>
 Unable to find the selected partition by ID.	MainWindow		Nebolo možné nájsť vybranú oblasť podľa ID.
 Select a partition from the list below.	DiskView		Vyberte oblasť zo zoznamu dolu.
 No disk devices have been recognized.	DiskView		Neboli rozpoznané žiadne diskové zariadenia.
 Failed to initialize the disk %s!\n	MainWindow		Nepodarilo sa inicializovať disk %s!\n
 The selected disk is read-only.	MainWindow		Vybraný disk je len na čítanie.
-Partition name:	CreateParamsPanel		Názov oblasti:
-Initialize	InitParamsPanel		Inicializovať
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Ste si istí, že chcete naformátovať oblasť „%s“? Pred zapísaním zmien na disk sa vás program znova spýta.
 Could not mount partition %s.	MainWindow		Nepodarilo sa pripojiť oblasť %s.
 The partition %s has been successfully formatted.\n	MainWindow		Oblasť %s bola úspešne naformátovaná.\n
 The partition %s is already unmounted.	MainWindow		Oblasť %s je už odpojená.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Nepodarilo sa zmazať oblasť. Žiadne zmeny neboli zapísané na disk.
-Partition type:	CreateParamsPanel		Typ oblasti:
 Could not delete the selected partition.	MainWindow		Nepodarilo sa zmazať vybranú oblasť.
 Initialize	MainWindow		Inicializovať
 Error: 	MainWindow	in any error alert	Chyba: 
@@ -33,7 +29,6 @@ There was an error acquiring the partition row.	MainWindow		Vyskytla sa chyba pr
 You need to select a partition entry from the list.	MainWindow		Musíte vybrať záznam oblasti zo zoznamu.
 The currently selected partition does not have a parent partition.	MainWindow		Momentálne vybraná oblasť nemá nadradenú oblasť.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Ste si istí, že chcete tieto zmeny teraz zapísať na disk?\n\nAk tak urobíte, všetky údaje na vybranom disku budú nenávratne stratené!
-Offset: %ld MB	Support		Ofset: %ld MB
 Write changes	MainWindow		Zapísať zmeny
 There was an error preparing the disk for modifications.	MainWindow		Vyskytla sa chyba pri pripravovaní disku na zmeny.
 The partition %s is already mounted.	MainWindow		Oblasť %s je už pripojená.
@@ -46,7 +41,6 @@ The disk has been successfully initialized.\n	MainWindow		Disk bol úspešne ini
 Could not unmount partition %s.	MainWindow		Nepodarilo sa odpojiť oblasť %s.
 Failed to format the partition %s!\n	MainWindow		Nepodarilo sa naformátovať oblasť %s!\n
 Mount	MainWindow		Pripojiť
-Create	CreateParamsPanel		Vytvoriť
 Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Ste si istí, že chcete naformátovať neformátovaný disk? (väčšina ľudí najskôr disk inicializuje pomocou systému na rozdelenie disku) Pred zapísaním zmien na disk sa vás program znova spýta.
 Device	PartitionList		Zariadenie
 Disk	MainWindow		Disk
@@ -59,7 +53,6 @@ Cannot delete the selected partition.	MainWindow		Nie je možné zmazať vybran�
 Mount all	MainWindow		Pripojiť všetky
 Cancel	MainWindow		Zrušiť
 Delete partition	MainWindow		Zmazať oblasť
-End: %ld MB	Support		Koniec: %ld MB
 Eject	MainWindow		Vysunúť
 Partition	MainWindow		Oblasť
 File system	PartitionList		Súborový systém
@@ -70,10 +63,7 @@ Validation of the given initialization parameters failed.	MainWindow		Overenie z
 The selected partition does not contain a partitioning system.	MainWindow		Zdá sa, že vybraná disková oblasť neobsahuje systém oblastí.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Ste si istí, že chcete tieto zmeny teraz zapísať na disk?\n\nAk tak urobíte, všetky údaje na diskovej oblasti %s budú nenávratne stratené!
 The partition %s is currently mounted.	MainWindow		Oblasť %s je momentálne pripojená.
-Partition size	CreateParamsPanel		Veľkosť oblasti
 Surface test (not implemented)	MainWindow		Test povrchu disku (neimplementované)
-Cancel	InitParamsPanel		Zrušiť
-Cancel	CreateParamsPanel		Zrušiť
 Format	MainWindow		Naformátovať
 Parameters	PartitionList		Parametre
 Creation of the partition has failed.	MainWindow		Vytvorenie diskovej oblasti zlyhalo.

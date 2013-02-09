@@ -1914,8 +1914,10 @@ Desktop::SetFocusWindow(Window* nextFocus)
 			// If the last window having focus is a window that cannot make it
 			// to the front, we use that as the next focus
 			Window* lastFocus = fFocusList.LastWindow();
-			if (!lastFocus->SupportsFront() && _WindowCanHaveFocus(lastFocus))
+			if (lastFocus != NULL && !lastFocus->SupportsFront()
+				&& _WindowCanHaveFocus(lastFocus)) {
 				nextFocus = lastFocus;
+			}
 		}
 	}
 

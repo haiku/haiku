@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	1125041885
+1	dutch; flemish	x-vnd.Haiku-libtracker	154076124
 common	B_COMMON_DIRECTORY		algemeen
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Icoonweergave
@@ -392,7 +392,6 @@ Icon view	DeskWindow		Icoonweergave
 Select all	QueryContainerWindow		Alles selecteren
 Files cannot be moved or deleted from a read-only volume.	PoseView		Bestanden van een alleen-lezen-gegevensdrager laten zich niet verwijderen of verplaatsen.
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Er was een probleem bij het vervangen van \"%name\". Mogelijk is het item geopend of bezig.
-You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		U kunt Prullenbak, de home-map of de Bureaubladmap niet in de prullenbak stoppen.
 Owner	FilePermissionsView		Eigenaar
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Er was een probleem bij het opslaan naar de gespecifieerde map. Kies alstublieft een andere.
 Restore	ContainerWindow		Herstellen

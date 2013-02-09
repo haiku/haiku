@@ -8,8 +8,8 @@
  *		Oliver Tappe, zooey@hirschkaefer.de.
  *
  * Corresponds to:
- *		/trunk/headers/os/locale/Locale.h	 rev 43095
- *		/trunk/src/kits/locale/Locale.cpp	 rev 43095
+ *		headers/os/locale/Locale.h	 rev 43095
+ *		src/kits/locale/Locale.cpp	 rev 43095
  */
 
 

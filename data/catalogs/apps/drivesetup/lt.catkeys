@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-DriveSetup	1372142450
+1	lithuanian	x-vnd.Haiku-DriveSetup	644135944
 DriveSetup	System name		Diskų ženklintuvas
 Delete	MainWindow		Šalinti
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Ar tikrai norite pakeitimus dabar įrašyti į diską?\n\nJei tęsite toliau – visi duomenys, esantys pasirinktame skaidinyje, bus negrįžtamai prarasti!
@@ -6,21 +6,17 @@ Rescan	MainWindow		Peržvalgyti
 OK	MainWindow		Gerai
 Could not aquire partitioning information.	MainWindow		Duomenų apie skaidinius nerasta.
 There's no space on the partition where a child partition could be created.	MainWindow		Skaidinyje nepakanka vietos loginiam diskui sukurti.
-%ld MiB	Support		%ld MiB
 <empty>	PartitionList		<tuščia>
 Unable to find the selected partition by ID.	MainWindow		Pasirinkto skaidinio pagal ID rasti nepavyko.
 Select a partition from the list below.	DiskView		Pasirinkite skaidinį iš žemiau esančio sąrašo.
 No disk devices have been recognized.	DiskView		Neatpažintas nė vienas disko įtaisas.
 Failed to initialize the disk %s!\n	MainWindow		Nepavyko suženklinti disko „%s“!\n
 The selected disk is read-only.	MainWindow		Pasirinktas diskas pasiekiamas tik skaitymui.
-Partition name:	CreateParamsPanel		Skaidinio pavadinimas:
-Initialize	InitParamsPanel		Ženklinti
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Ar tikrai norite suženklinti skaidinį „%s“? Prieš įrašant pakeitimus į diską, Jūsų bus paklausta dar kartą.
 Could not mount partition %s.	MainWindow		Skaidinio „%s“ prijungti nepavyko.
 The partition %s has been successfully formatted.\n	MainWindow		Skaidinys „%s“ sėkmingai suženklintas.\n
 The partition %s is already unmounted.	MainWindow		Skaidinys „%s“ jau atjungtas.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Skaidinio pašalinti nepavyko. Pakeitimai į diską neįrašyti.
-Partition type:	CreateParamsPanel		Skaidinio tipas:
 Could not delete the selected partition.	MainWindow		Pasirinkto skaidinio pašalinti nepavyko.
 Initialize	MainWindow		Ženklinti
 Error: 	MainWindow	in any error alert	Klaida: 
@@ -33,7 +29,6 @@ There was an error acquiring the partition row.	MainWindow		Klaida gaunant skaid
 You need to select a partition entry from the list.	MainWindow		Būtina iš sąrašo pasirinkti skaidinį.
 The currently selected partition does not have a parent partition.	MainWindow		Pasirinkas skaidinys nėra loginis diskas kitame skaidinyje.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Ar tikrai norite pakeitimus dabar įrašyti į diską?\n\nJei tęsite toliau – visi duomenys, esantys pasirinktame diske, bus negrįžtamai prarasti!
-Offset: %ld MB	Support		Poslinkis: %ld MB
 Write changes	MainWindow		Įrašyti pakeitimus
 There was an error preparing the disk for modifications.	MainWindow		Parengiant diską pakeitimams, įvyko klaida.
 The partition %s is already mounted.	MainWindow		Skaidinys „%s“ jau yra prijungtas.
@@ -46,7 +41,6 @@ The disk has been successfully initialized.\n	MainWindow		Diskas sėkmingai suž
 Could not unmount partition %s.	MainWindow		Skaidinio „%s“ atjungti nepavyko.
 Failed to format the partition %s!\n	MainWindow		Skaidinio „%s“ suženklinti nepavyko!\n
 Mount	MainWindow		Prijungti
-Create	CreateParamsPanel		Kurti
 Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Ar tikrai norite suženklinti neskaidytą diską? Dažniausiai, prieš suženklinant, diske sukuriama skaidinių lentelė. Prieš įrašant pakeitimus į diską, Jūsų bus paklausta dar kartą.
 Device	PartitionList		Įrenginys
 Disk	MainWindow		Diskas
@@ -59,7 +53,6 @@ Cannot delete the selected partition.	MainWindow		Pasirinkto skaidinio pašalint
 Mount all	MainWindow		Prijungti visus
 Cancel	MainWindow		Atsisakyti
 Delete partition	MainWindow		Šalinti skaidinį
-End: %ld MB	Support		Pabaiga: %ld MiB
 Eject	MainWindow		Išimti
 Partition	MainWindow		Skaidinys
 File system	PartitionList		Failų sistema
@@ -70,10 +63,7 @@ Validation of the given initialization parameters failed.	MainWindow		Nurodyti n
 The selected partition does not contain a partitioning system.	MainWindow		Pasirinktame skaidinyje nėra skaidinių lentelės.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Ar tikrai norite pakeitimus dabar įrašyti į diską?\n\nJei tęsite toliau – visi duomenys, esantys skaidinyje „%s“, bus negrįžtamai prarasti!
 The partition %s is currently mounted.	MainWindow		Skaidinys „%s“ jau yra prijungtas.
-Partition size	CreateParamsPanel		Skaidinio dydis
 Surface test (not implemented)	MainWindow		Patikrinti paviršių (dar nerealizuota)
-Cancel	InitParamsPanel		Atsisakyti
-Cancel	CreateParamsPanel		Atsisakyti
 Format	MainWindow		Ženklinti
 Parameters	PartitionList		Parametrai
 Creation of the partition has failed.	MainWindow		Nepavyko sukurti skaidinio.

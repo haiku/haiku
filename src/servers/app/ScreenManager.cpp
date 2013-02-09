@@ -14,8 +14,8 @@
 #include "Screen.h"
 #include "ServerConfig.h"
 
-#include "remote/RemoteHWInterface.h"
-#include "html5/HTML5HWInterface.h"
+#include "RemoteHWInterface.h"
+#include "HTML5HWInterface.h"
 
 #include <Autolock.h>
 #include <Entry.h>

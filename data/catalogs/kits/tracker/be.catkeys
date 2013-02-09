@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	2580969822
+1	belarusian	x-vnd.Haiku-libtracker	1610004061
 common	B_COMMON_DIRECTORY		агульны
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Від іконак
@@ -394,7 +394,6 @@ Icon view	DeskWindow		Від іконак
 Select all	QueryContainerWindow		Выбраць усё
 Files cannot be moved or deleted from a read-only volume.	PoseView		Нельга выдаляць або перамяшчаць файла з тома толькі для чытання.
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Адбылася памылка пры замене \"%name\". Элемент можа быць заняты або адкрыты.
-You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		Нельга запіхнуць Сметніцу, Рабочы Стол або хатні каталог у саму Сметніцу.
 Owner	FilePermissionsView		Валадар
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Адбылася памылка пры захаванні ў пазначаную папку. Калі ласка, паспрабуйце іншую.
 Restore	ContainerWindow		Аднавіць

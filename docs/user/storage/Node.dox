@@ -8,8 +8,8 @@
  *		Ingo Weinhold, bonefish@users.sf.net
  *
  * Corresponds to:
- *		/trunk/headers/os/app/Node.h	rev 42803
- *		/trunk/src/kits/app/Node.cpp	rev 42803
+ *		headers/os/storage/Node.h	rev 42803
+ *		src/kits/storage/Node.cpp	rev 42803
  */
 
 

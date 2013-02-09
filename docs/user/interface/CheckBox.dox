@@ -8,8 +8,8 @@
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		/trunk/headers/os/interface/CheckBox.h	 rev 42794
- *		/trunk/src/kits/interface/CheckBox.cpp	 rev 42794
+ *		headers/os/interface/CheckBox.h	 rev 42794
+ *		src/kits/interface/CheckBox.cpp	 rev 42794
  */
 
 

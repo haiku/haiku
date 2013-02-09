@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Be-MAIL	694056289
+1	swedish	x-vnd.Be-MAIL	233997769
 View	Mail		Visa
 %d - Date	Mail		%d - Datum
 Attach attributes:	Mail		Bifoga attribut:
@@ -33,6 +33,7 @@ There is no installed handler for URL links.	Mail		Det finns ingen behandlare in
 Signature	Mail		Signatur
 Find again	Mail		Sök igen
 Bcc:	Mail		Blindkopia:
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Din text innehåller %ld tecken som inte kan hanteras. En annan teckenuppsättning kanske skulle fungera bättre? Klicka Skicka för att skicka det ändå (Ersättnings tecken kommer att användas till de tecken som inte kunde översättas), eller välj avbryt och försök att fixa felet.
 Signature:	Mail		Signatur:
 Save changes to this signature?	Mail		Spara ändringar till denna signatur?
 Cc:	Mail		Kopia:
@@ -51,6 +52,7 @@ Include file attributes in attachments	Mail		Inkludera fil attribut i bifogade f
 OK	Mail		OK
 Send	Mail		Skicka
 Show icons only	Mail		Visa iconer bara
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Att ta bort bilaga från ett mail som skickats vidare är inte implementerat än!\nDet kommer inte att fungera som det ska.
 Hide	Mail		Dölj
 Forward without attachments	Mail		Vidarebefordra utan bifigade filer
 Previous	Mail		Föregående
@@ -58,26 +60,33 @@ Redo	Mail		Upprepa
 Add enclosure…	Mail		Lägg till område…
 Mail	System name		E-post
 Print…	Mail		Skriv ut…
+Warn unencodable:	Mail		Varna för tecken som inte gick att översätta:
 Quit	Mail		Avsluta
 %n - Full name	Mail		%n - Hela namnet
  Read 	Mail		 Läs 
 UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
 Trash	Mail		Papperskorg
+Default account:	Mail		Standardkonto:
 Size:	Mail		Storlek:
+Account from mail	Mail		Konto från mail
 Edit signatures…	Mail		Redigera signaturer…
 New	Mail		Nytt
 Attachments: 	Mail		Bilagor: 
 On	Mail		På
 Set to %s	Mail		Ställ in %s
 Forward	Mail		Vidarebefordra
+E-mail draft could not be saved!	Mail		Mailet kunde inte sparas!
 %e wrote:\\n	Mail		%e skrev:\\n
 To:	Mail		Till:
+Only files can be added as attachments.	Mail		Endast filer kan läggas till som bilaga.
 Previous message	Mail		Föregående meddelande
 Attachments:	Mail		Bilagor:
 Title:	Mail		Titel:
+<no account found>	Mail		<inget konto hittades>
 Find…	Mail		Sök...
 Accounts…	Mail		Konto…
 Mail preferences	Mail		E-postinställningar
+Initial spell check mode:	Mail		Initiala rättstavningsmetoden:
 Leave same	Mail		Lämna samma
 Page setup…	Mail		Sidinställningar…
 Text wrapping:	Mail		Textradbrytning:
@@ -85,14 +94,20 @@ Revert	Mail		Återgå
 File	Mail		Arkiv
 mail	B_USER_DIRECTORY/mail		e-post
 None	Mail		Ingen
+(Name unavailable)	Mail		(Namnet kunde inte nås)
+Copy link location	Mail		Kopiera länkplats
 out	B_USER_DIRECTORY/mail/out		ut
 Show header	Mail		Visa header
 %e - E-mail address	Mail		%e - E-postadress
+Resend	Mail		Skicka igen
 Show raw message	Mail		Visa meddelande
 \\n - Newline	Mail		\\n - Ny rad
 Start now	Mail		Starta nu
 Close	Mail		Stäng
 No matches	Mail		Inga träffar
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		mail_daemon körs inte. Meddelandet är satt på kö och kommer att skickas så fort mail_daemon startats.
+Really delete this signature? This cannot be undone.	Mail		Vill du verkligen ta bort signaturen? Det kan inte ångras.
+Save this message as a draft before closing?	Mail		Spara meddelandet som utkast innan programmet stängs?
 Open	Mail		Öppna
 draft	B_USER_DIRECTORY/mail/draft		utkast
 Quote	Mail		Citat
@@ -101,26 +116,50 @@ Next message	Mail		Nästa meddelande
 User interface	Mail		Användargränssnitt
 Cancel	Mail		Avbryt
 Send message	Mail		Skicka meddelande
+Remove enclosure	Mail		Ta bort bilaga
 Account:	Mail		Konto:
 Decoding:	Mail		Avkodar:
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Kunde inte hitta en applikation som supporterar 'Person' datatypen.
 Delete	Mail		Ta bort
+Don't send	Mail		Skicka inte
 Leave as '%s'	Mail		Lämna som '%s'
 Copy	Mail		Kopiera
+Mail couldn't find its dictionary.	Mail		Mail kunde inte hitta arbetskatalogen.
+Reply preamble:	Mail		Skriv Inledning:
 Signatures	Mail		Signaturer
 Next	Mail		Nästa
+Set to…	Mail		Satt till...
 Use default account	Mail		Använd standardkonto
+Sorry	Mail		Tyvärr
 Encoding:	Mail		Kodning:
 Font:	Mail		Typsnitt:
+(Address unavailable)	Mail		(Adresser kunde inte nås)
 Save address	Mail		Spara adress
 Queries	Mail		Sökningar
+Send this message before closing?	Mail		Skicka meddelandet innan programmet stängs?
 Save	Mail		Spara
+Random	Mail		Slumpmässigt
+Close and 	Mail		Stäng och 
+Save as draft	Mail		Spara som utkast
+The mail_daemon could not be started:\n\t	Mail		mail_daemon kunde inte startas:\n\t
+Open attachment	Mail		Öppna bilaga
+sent	B_USER_DIRECTORY/mail/sent		skickat
+(Date unavailable)	Mail		(Datum inte tillgänglig)
+Put your favorite e-mail queries and query templates in this folder.	Mail		Lägg din e-post fråga och frågemall i denna folder.
+Reply	Mail		Svara
 From:	Mail		Från:
+Couldn't open this signature. Sorry.	Mail		Kunde inte öppna denna signatur.
+Open draft	Mail		Öppna utkast
 Cut	Mail		Klipp ut
 Check spelling	Mail		Kontrollera stavning
 Set to Saved	Mail		Set till Sparad
 Open this link	Mail		Öppna denna länk
 Auto signature:	Mail		Autosignatur:
 Add signature	Mail		Lägg till signatur
+Need Tracker to move items to trash	Mail		Tracker behöver flytta objekt till papperskorgen
+Mailing	Mail		e-post
 Unread	Mail		Oläst
+Remove quote	Mail		Ta bort citationstecken
 Move to trash	Mail		Flytta till papperskorg
 Select all	Mail		Markera alla
+An error occurred trying to save this signature.	Mail		Ett fel uppstod när signaturen skulle sparas.

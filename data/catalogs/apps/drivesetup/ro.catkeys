@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-DriveSetup	2908539543
+1	romanian	x-vnd.Haiku-DriveSetup	2180533037
 DriveSetup	System name		ConfigurareDiscuri
 Delete	MainWindow		Șterge
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe partiția selectată vor fi pierdute fără posibilitatea de a le recupera dacă faceți acest lucru!
@@ -6,18 +6,14 @@ Rescan	MainWindow		Rescanează
 OK	MainWindow		Bine
 Could not aquire partitioning information.	MainWindow		Nu s-au putut obține infomațiile de partiționare.
 There's no space on the partition where a child partition could be created.	MainWindow		Nu mai există spațiu liber pe partiția unde se poate crea o partiție secundară.
-%ld MiB	Support		%ld MiB
 <empty>	PartitionList		<liber>
 Unable to find the selected partition by ID.	MainWindow		Nu s-a putut găsi partiția selectată după ID.
 Select a partition from the list below.	DiskView		Selectați o partiție din lista de mai jos.
 No disk devices have been recognized.	DiskView		Nu au fost recunoscute dispozitivele de disc.
 The selected disk is read-only.	MainWindow		Discul selectat este protejat la scriere.
-Partition name:	CreateParamsPanel		Nume partiție:
-Initialize	InitParamsPanel		Inițializează
 Could not mount partition %s.	MainWindow		Nu s-a putut monta partiția %s.
 The partition %s is already unmounted.	MainWindow		Partiția %s este deja demontată.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Ștergerea partiției a eșuat. Nu s-au scris modificări pe disc.
-Partition type:	CreateParamsPanel		Tip de partiție:
 Could not delete the selected partition.	MainWindow		Nu s-a putut șterge partiția selectată.
 Initialize	MainWindow		Inițializează
 Error: 	MainWindow	in any error alert	Eroare:
@@ -30,7 +26,6 @@ There was an error acquiring the partition row.	MainWindow		A apărut o eroare l
 You need to select a partition entry from the list.	MainWindow		Trebuie să selectați o intrare de partiție din listă.
 The currently selected partition does not have a parent partition.	MainWindow		Partiția selectată curent nu are o partiție superioară.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe discul selectat vor fi pierdute fără posibilitatea de a le recupera dacă faceți acest lucru!
-Offset: %ld MB	Support		Decalaj: %ld MiB
 Write changes	MainWindow		Scrie modificări
 There was an error preparing the disk for modifications.	MainWindow		A apărut o eroare la pregătirea discului pentru modificări.
 The partition %s is already mounted.	MainWindow		Partiția %s este deja montată.
@@ -40,7 +35,6 @@ Create…	MainWindow		Crează...
 Disk system \"%s\"\" not found!	MainWindow		Sistemul de disc „%s\”\” nu a fost găsit!
 Could not unmount partition %s.	MainWindow		Nu se poate demonta partiția %s.
 Mount	MainWindow		Montează
-Create	CreateParamsPanel		Crează
 Device	PartitionList		Dispozitiv
 Disk	MainWindow		Disc
 Device	DiskView		Dispozitiv
@@ -51,7 +45,6 @@ Cannot delete the selected partition.	MainWindow		Nu se poate șterge partiția 
 Mount all	MainWindow		Montează tot
 Cancel	MainWindow		Anulează
 Delete partition	MainWindow		Șterge partiție
-End: %ld MB	Support		Final: %ld MiB
 Eject	MainWindow		Scoate
 Partition	MainWindow		Partiție
 File system	PartitionList		Sistem de fișiere
@@ -61,10 +54,7 @@ Validation of the given initialization parameters failed.	MainWindow		Validarea 
 The selected partition does not contain a partitioning system.	MainWindow		Partiția selectată nu conține un sistem de partiționare.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe partiția %s vor fi pierdute fără posibilitatea de a le recupera dacă faceți acest lucru!
 The partition %s is currently mounted.	MainWindow		Partiția %s este montantă curent.
-Partition size	CreateParamsPanel		Dimensiune partiție
 Surface test (not implemented)	MainWindow		Test de suprafață (nu este implementat)
-Cancel	InitParamsPanel		Anulează
-Cancel	CreateParamsPanel		Anulează
 Parameters	PartitionList		Parametri
 Creation of the partition has failed.	MainWindow		Crearea partiției a eșuat.
 The currently selected partition is not empty.	MainWindow		Partiția curentă selectată nu este liberă.

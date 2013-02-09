@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	4052752235
+1	slovak	x-vnd.Haiku-libtracker	3081786474
 common	B_COMMON_DIRECTORY		spoločné
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Zobrazenie ikon
@@ -391,7 +391,6 @@ Icon view	DeskWindow		Zobrazenie ikon
 Select all	QueryContainerWindow		Vybrať všetky
 Files cannot be moved or deleted from a read-only volume.	PoseView		Súbory nemožno presunúť alebo zmazať na zväzku, ktorý je len na čítanie.
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Vyskytol sa problém pri pokuse nahradiť „%name“. Položka môže byť otvorená alebo sa používa.
-You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		Nemôžete dať Kôš, domovský adresár alebo Plochu do Koša.
 Owner	FilePermissionsView		Vlastník
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Vyskytol sa problém pri pokuse ukladať do uvedeného priečinka. Prosím, skúste iný.
 Restore	ContainerWindow		Obnoviť

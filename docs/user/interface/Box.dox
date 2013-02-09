@@ -8,8 +8,8 @@
  *		John Scipione <jscipione@gmail.com>
  *
  * Corresponds to:
- *		/trunk/headers/os/interface/Box.h	 rev 42274
- *		/trunk/src/kits/interface/Box.cpp	 rev 42274
+ *		headers/os/interface/Box.h	 rev 42274
+ *		src/kits/interface/Box.cpp	 rev 42274
 
 
 /*!

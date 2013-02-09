@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Notifications	3631903554
+1	romanian	x-vnd.Haiku-Notifications	814394708
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		A apărut o eroare la salvarea preferințelor.\nEste posibil să fi rămas fără spațiu pe disc.
 Notifications	GeneralView		Înștiințări
 seconds of inactivity	GeneralView		secunde de inactivitate
@@ -8,7 +8,6 @@ Enable notifications	GeneralView		Activează înștiințări
 Error	NotificationView		Eroare
 OK	GeneralView		OK
 Events are not notified	GeneralView		Evenimentele nu sunt înștiințate
-Save	PrefletWin		Salvează
 Type	NotificationView		Tip
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Înștiințările nu pot fi oprite, deoarece serverul nu poate fi contactat.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Nu se pot activa înștiințările deoarece serverul nu poate fi găsit.\nÎnseamnă că instalarea InfoPopper nu a fost completată cu succes.

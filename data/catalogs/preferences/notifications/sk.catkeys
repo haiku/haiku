@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Notifications	3631903554
+1	slovak	x-vnd.Haiku-Notifications	814394708
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Vyskytla sa chyba pri ukladaní nastavení.\nJe možné, že vám dochádza miesto na disku.
 Notifications	GeneralView		Oznamy
 seconds of inactivity	GeneralView		sekundách nečinnosti
@@ -8,7 +8,6 @@ Enable notifications	GeneralView		Zapnúť upozornenia
 Error	NotificationView		Chyba
 OK	GeneralView		OK
 Events are not notified	GeneralView		Udalosti sa neoznamujú
-Save	PrefletWin		Uložiť
 Type	NotificationView		Typ
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Oznámenia nemožno zastaviť, pretože server nebolo možné kontaktovať.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Oznámenia nemožno zapnúť, pretože server nebol nájdený.\nTo znamená, že vaša inštalácia InfoPopper nebola úspešne dokončená.

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Notifications	3631903554
+1	japanese	x-vnd.Haiku-Notifications	814394708
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		設定ファイルの保存中にエラーが発生しました。\nおそらく、ディスク容量が不足しています。
 Notifications	GeneralView		通知
 seconds of inactivity	GeneralView		秒後に画面から隠されます。
@@ -8,7 +8,6 @@ Enable notifications	GeneralView		通知を有効にする
 Error	NotificationView		エラー
 OK	GeneralView		OK
 Events are not notified	GeneralView		イベントは通知されません
-Save	PrefletWin		保存
 Type	NotificationView		タイプ
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		サーバーと通信できないので通知を止めることができません。
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		サーバーが見つからないので通知を有効にできません。\nこれは、InfoPopper のインストールがうまく完了していないことを示しています。

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-DriveSetup	1372142450
+1	belarusian	x-vnd.Haiku-DriveSetup	644135944
 DriveSetup	System name		Рэдыктар дыскаў
 Delete	MainWindow		Выдаліць
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Сапрўды жадаеце запісаць змены на дыск?\n\nУсе данные на абраным падзеле будуць беззваротна згублены!
@@ -6,21 +6,17 @@ Rescan	MainWindow		Перасканіраваць
 OK	MainWindow		ОК
 Could not aquire partitioning information.	MainWindow		Не ўдалося атрымаць інфармацыю аб падзелах.
 There's no space on the partition where a child partition could be created.	MainWindow		Няма мечца на падзеле для стварэння даччынага падзела.
-%ld MiB	Support		%ld МіБ
 <empty>	PartitionList		<пуста>
 Unable to find the selected partition by ID.	MainWindow		Не ўдалося знайсці абраны падзел па ID.
 Select a partition from the list below.	DiskView		Абярыце падзел са спісу нішэй.
 No disk devices have been recognized.	DiskView		Не знойдзена ніякіх дыскавых прыладаў.
 Failed to initialize the disk %s!\n	MainWindow		Не ўдалося ініцыялізіраваць падзел %s!\n
 The selected disk is read-only.	MainWindow		Абраны дыск толькі для чытання.
-Partition name:	CreateParamsPanel		Імя падзелу:
-Initialize	InitParamsPanel		Ініцыялізаваць
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Вы упэўнены, што жадаеце фарматаваць падзел \"%s\"? Дадатковае пацвержанне спатрэбіцца і непасрэдна перад запісам на дыск.
 Could not mount partition %s.	MainWindow		Не ўдалося змантаваць падзел %s.
 The partition %s has been successfully formatted.\n	MainWindow		Падзел %s паспяхова фарматаваны.\n
 The partition %s is already unmounted.	MainWindow		Падзел %s ужо змантаваны.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Не ўдалося выдаліць падзел. Змены не былі запісаны на дыск.
-Partition type:	CreateParamsPanel		Тып падзелу:
 Could not delete the selected partition.	MainWindow		Немагчыма выдаліць абраны падзел.
 Initialize	MainWindow		Ініцыялізіраваць
 Error: 	MainWindow	in any error alert	Памылка: 
@@ -33,7 +29,6 @@ There was an error acquiring the partition row.	MainWindow		Адбылася п�
 You need to select a partition entry from the list.	MainWindow		Вам патрэбна абраць падзел са спісу.
 The currently selected partition does not have a parent partition.	MainWindow		Абраны падзел не мае бацькоўскага падзелу.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Сапрўды жадаеце запісаць змены на дыск?\n\nУсе данные на абраным падзеле будуць беззваротна згублены!
-Offset: %ld MB	Support		Адступ: %ld MB
 Write changes	MainWindow		Запісаць змены
 There was an error preparing the disk for modifications.	MainWindow		Адбылася памылка пры падрыхтоўцы дыску да мадыфікацый.
 The partition %s is already mounted.	MainWindow		Падзел %s ужо змантаваны.
@@ -46,7 +41,6 @@ The disk has been successfully initialized.\n	MainWindow		Дыск быў пас
 Could not unmount partition %s.	MainWindow		Не ўдалося змантаваць падзел %s.
 Failed to format the partition %s!\n	MainWindow		Не ўдалося фарматаваць падзел %s!\n
 Mount	MainWindow		Змантаваць
-Create	CreateParamsPanel		Стварыць
 Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Вы упэўнены, што жадаеце фарматаваць ўвесь дыск? (у большасці выпадкаў на дыску ствараюць сыстэму падзелаў) Дадатковае пацвержанне спатрэбіцца і непасрэдна перад запісам на дыск.
 Device	PartitionList		Прылада
 Disk	MainWindow		Дыск
@@ -59,7 +53,6 @@ Cannot delete the selected partition.	MainWindow		Немагчыма выдал�
 Mount all	MainWindow		Зманатаваць усё
 Cancel	MainWindow		Адмяніць
 Delete partition	MainWindow		Выдаліць падзел
-End: %ld MB	Support		Канец %ld MB
 Eject	MainWindow		Выцягнуць
 Partition	MainWindow		Падзел
 File system	PartitionList		Файлавая сістэма
@@ -70,10 +63,7 @@ Validation of the given initialization parameters failed.	MainWindow		Не уд�
 The selected partition does not contain a partitioning system.	MainWindow		Абраны падзел не мае сістымы дзялення.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Сапрўды жадаеце запісаць змены на дыск?\n\nУсе данные на абраным падзеле %s будуць беззваротна згублены!
 The partition %s is currently mounted.	MainWindow		Падзел %s зараз змантаваны.
-Partition size	CreateParamsPanel		Памер падзелу
 Surface test (not implemented)	MainWindow		Тэст паверхні (не ажыццявіма)
-Cancel	InitParamsPanel		Адмяніць
-Cancel	CreateParamsPanel		Адмяніць
 Format	MainWindow		Фарматаваць
 Parameters	PartitionList		Параметры
 Creation of the partition has failed.	MainWindow		Не удалося стварыць падзел.

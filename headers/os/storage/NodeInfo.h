@@ -18,11 +18,6 @@ class BBitmap;
 class BResources;
 
 
-/*!	\brief BNodeInfo provides file type information
-	BNodeInfo provides a nice wrapper to all sorts of usefull meta data. 
-	Like it's mime type, the files icon and the application which will load
-	the file.
-*/
 class BNodeInfo {
 public:
 								BNodeInfo();

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	3504476946
+1	ukrainian	x-vnd.Haiku-libtracker	2533511185
 common	B_COMMON_DIRECTORY		common
 OK	WidgetAttributeText		Гаразд
 Icon view	VolumeWindow		У вигляді іконок
@@ -374,7 +374,6 @@ Icon view	DeskWindow		У вигляді іконок
 Select all	QueryContainerWindow		Вибрати все
 Files cannot be moved or deleted from a read-only volume.	PoseView		Неможливо видалити або перемістити файл з тому тільки для читання.
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Виникла проблема при спробі перемістити \"%name\". Елемент може бути відкритим або зайнятим.
-You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		Ви не можете покласти Кошик, home або Робочий стіл в кошик.
 Owner	FilePermissionsView		Власник
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Виникла проблема збереження у визначену папку. Будь-ласка спробуйте іншу.
 Restore	ContainerWindow		Відновити

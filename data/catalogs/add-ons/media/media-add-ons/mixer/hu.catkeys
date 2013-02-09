@@ -14,7 +14,7 @@ Refuse input format changes	AudioMixer		Bemeneti formátum változtatásainak vi
 Drop/repeat samples	AudioMixer		Minták átugrása/ismétlése
 Output channel sources	AudioMixer		Kimeneti csatorna forrásai
 dB	AudioMixer		dB
-Gain controls	AudioMixer		Előerősítés beállításai
+Gain controls	AudioMixer		Erősítő vezérlői
 Input mapping	AudioMixer		Bemenet leképezése
 Mute	AudioMixer		Némítás
 Input channel destinations	AudioMixer		Bemeneti csatornák céljai

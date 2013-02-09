@@ -6,8 +6,8 @@
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		/trunk/headers/os/interface/Font.h	 hrev45178
- *		/trunk/src/kits/interface/Font.cpp	 hrev45178
+ *		headers/os/interface/Font.h	 hrev45178
+ *		src/kits/interface/Font.cpp	 hrev45178
  */
 
 

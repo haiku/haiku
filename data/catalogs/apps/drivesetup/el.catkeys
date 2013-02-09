@@ -1,22 +1,18 @@
-1	greek, modern (1453-)	x-vnd.Haiku-DriveSetup	2952850782
+1	greek, modern (1453-)	x-vnd.Haiku-DriveSetup	2224844276
 DriveSetup	System name		Εγκατάσταση Οδηγού
 Delete	MainWindow		Διαγραφή
 Rescan	MainWindow		Επανάληψη σάρωσης
 OK	MainWindow		Εντάξει
 Could not aquire partitioning information.	MainWindow		Αδυναμία απόκτησης πληροφορίας διαμέρισης.
 There's no space on the partition where a child partition could be created.	MainWindow		Δεν υπάρχει χώρος στη κατάτμηση, όπου θα μπορούσε να δημιουργηθεί νέα κατάτμηση.
-%ld MiB	Support		%ld MiB
 <empty>	PartitionList		<άδειο>
 Unable to find the selected partition by ID.	MainWindow		Αδύνατο να βρεθεί η επιλεγμένη κατάτμηση ID.
 Select a partition from the list below.	DiskView		Επιλέξτε μία κατάτμηση από την παρακάτω λίστα.
 No disk devices have been recognized.	DiskView		Καμία συσκευή δίσκου δεν έχει αναγνωριστεί.
 The selected disk is read-only.	MainWindow		Ο επιλεγμένος δίσκος είναι μόνο για ανάγνωση.
-Partition name:	CreateParamsPanel		Όνομα κατάτμησης:
-Initialize	InitParamsPanel		Αρχικοποίηση
 Could not mount partition %s.	MainWindow		Αδυναμία προσάρτησης της κατάτμησης %s.
 The partition %s is already unmounted.	MainWindow		Η κατάτμηση %s είναι ήδη αποπροσαρτημένη
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Αποτυχία διαγραφής της κατάτμησης. Καμία τροποποίηση δεν έχει γραφτεί στο δίσκο.
-Partition type:	CreateParamsPanel		Τύπος κατάτμησης:
 Could not delete the selected partition.	MainWindow		Αδυναμία διαγραφής της επιλεγμένης κατάτμησης.
 Initialize	MainWindow		Αρχικοποίηση
 Error: 	MainWindow	in any error alert	Σφάλμα:
@@ -27,7 +23,6 @@ Mounted at	PartitionList		Προσαρτήθηκε στο
 There was an error acquiring the partition row.	MainWindow		Υπήρξε ένα σφάλμα κατά την απόκτηση της σειράς κατάτμησης.
 You need to select a partition entry from the list.	MainWindow		Θα χρειαστεί να επιλέξετε μια καταχωρημένη κατάτμηση από τη λίστα.
 The currently selected partition does not have a parent partition.	MainWindow		Η τρέχουσα επιλεγμένη κατάτμηση δεν έχει κατάτμηση γονέα.
-Offset: %ld MB	Support		Μετατόπιση: %ld MB
 Write changes	MainWindow		Εγγραφή αλλαγών
 There was an error preparing the disk for modifications.	MainWindow		Υπήρξε ένα σφάλμα κατά την προετοιμασία του δίσκου για τροποποιήσεις.
 The partition %s is already mounted.	MainWindow		Η κατάτμηση %s είναι ήδη προσαρτημένη.
@@ -37,7 +32,6 @@ Create…	MainWindow		Δημιουργία...
 Disk system \"%s\"\" not found!	MainWindow		Ο δίσκος συστήματος \"%s\"\" δεν βρέθηκε!
 Could not unmount partition %s.	MainWindow		Αδυναμία αποπροσάρτησης της κατάτμησης %s.
 Mount	MainWindow		Προσάρτηση
-Create	CreateParamsPanel		Δημιουργία
 Device	PartitionList		Συσκευή
 Disk	MainWindow		Δίσκος
 Device	DiskView		Συσκευή
@@ -48,7 +42,6 @@ Cannot delete the selected partition.	MainWindow		Δεν μπορείτε να �
 Mount all	MainWindow		Προσάρτηση όλων
 Cancel	MainWindow		Άκυρο
 Delete partition	MainWindow		Διαγραφή κατάτμησης
-End: %ld MB	Support		Τέλος: %ld MB
 Eject	MainWindow		Εξαγωγή
 Partition	MainWindow		Κατάτμηση
 Validation of the given creation parameters failed.	MainWindow		Η επικύρωση των δοθέντων παραμέτρων δημιουργίας απέτυχε.
@@ -56,10 +49,7 @@ Size	PartitionList		Μέγεθος
 Validation of the given initialization parameters failed.	MainWindow		Η επικύρωση των δοθέντων παραμέτρων αρχικοποίησης απέτυχε.
 The selected partition does not contain a partitioning system.	MainWindow		Η επιλεγμένη κατάτμηση δεν περιέχει σύστημα διαμέρισης.
 The partition %s is currently mounted.	MainWindow		Η κατάτμηση %s είναι τώρα προσαρτημένη.
-Partition size	CreateParamsPanel		Μέγεθος κατάτμησης
 Surface test (not implemented)	MainWindow		Έλεγχος επιφάνειας (δεν υλοποιήθηκε)
-Cancel	InitParamsPanel		Άκυρο
-Cancel	CreateParamsPanel		Άκυρο
 Parameters	PartitionList		Παράμετροι
 Creation of the partition has failed.	MainWindow		Η δημιουργία της κατάτμησης έχει αποτύχει.
 The currently selected partition is not empty.	MainWindow		Η τρέχουσα επιλεγμένη κατάτμηση δεν είναι άδεια.

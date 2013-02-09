@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Notifications	3631903554
+1	french	x-vnd.Haiku-Notifications	814394708
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Une erreur est survenue lors de la sauvegarde des préférences.\nVous n'avez peut-être plus suffisamment d'espace libre sur votre disque.
 Notifications	GeneralView		Notifications
 seconds of inactivity	GeneralView		secondes d'inactivités
@@ -8,7 +8,6 @@ Enable notifications	GeneralView		Activer les notifications
 Error	NotificationView		Erreur
 OK	GeneralView		OK
 Events are not notified	GeneralView		Les événements ne sont pas notifiés
-Save	PrefletWin		Enregistrer
 Type	NotificationView		Type
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Les notifications ne peuvent pas être arrêtées, parce qu'il est impossible d'atteindre le serveur.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Impossible d'activer les notifications, car le serveur est introuvable.\nCela signifie que votre installation d'InfoPopper ne s'est par terminée correctement.

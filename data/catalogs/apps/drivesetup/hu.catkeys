@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-DriveSetup	1387045579
+1	hungarian	x-vnd.Haiku-DriveSetup	659039073
 DriveSetup	System name		Lemezkezelő
 Delete	MainWindow		Törlés
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Biztosan jóváhagyja az adatok felírását a lemezre?\n\nEz esetben a partíció teljes tartalma visszavonhatatlanul meg fog semmisülni.
@@ -6,21 +6,17 @@ Rescan	MainWindow		Frissítés
 OK	MainWindow		Rendben
 Could not aquire partitioning information.	MainWindow		A partíciók állapotát nem lehetett lekérdezni.
 There's no space on the partition where a child partition could be created.	MainWindow		Nincs hely már a partíción, ahol alpartíciót kellene létrehozni.
-%ld MiB	Support		%ld MB
 <empty>	PartitionList		<üres>
 Unable to find the selected partition by ID.	MainWindow		Nincs ilyen azonosítójú partíció.
 Select a partition from the list below.	DiskView		Válasszon partíciót a lenti listából!
 No disk devices have been recognized.	DiskView		Nem található tárolóeszköz.
 Failed to initialize the disk %s!\n	MainWindow		Nem sikerült előkészíteni a partíciót: „%s”.\n
 The selected disk is read-only.	MainWindow		A kiválasztott lemez nem írható.
-Partition name:	CreateParamsPanel		Partíció neve:
-Initialize	InitParamsPanel		Előkészítés
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Biztosan meg akarja formázni a partíciót (%s)? A végleleges művelet előtt még egyszer meg kell ezt erősítenie.
 Could not mount partition %s.	MainWindow		A partíció (%s) nem csatolható.
 The partition %s has been successfully formatted.\n	MainWindow		A partíció (%s) hiba nélkül elő lett készítve.\n
 The partition %s is already unmounted.	MainWindow		A partíció (%s) már le van választva!
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Nem sikerült törölni a partíciót, a lemez tartalma érintetlen maradt.
-Partition type:	CreateParamsPanel		Partíció típusa:
 Could not delete the selected partition.	MainWindow		A kiválasztott partíció nem törölhető.
 Initialize	MainWindow		Előkészítés
 Error: 	MainWindow	in any error alert	Hiba: 
@@ -33,7 +29,6 @@ There was an error acquiring the partition row.	MainWindow		Hiba történt a par
 You need to select a partition entry from the list.	MainWindow		Válasszon egyet az alábbi partíciók közül!
 The currently selected partition does not have a parent partition.	MainWindow		A kiválasztott partíciónak nincs főpartíciója.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Biztosan lemezre szeretné írni a kijelölt változtatásokat?\n\nEz esetben a lemez teljes tartalma visszavonhatatlanul meg fog semmisülni.
-Offset: %ld MB	Support		Kezdete: %ld MB
 Write changes	MainWindow		Írás a lemezre
 There was an error preparing the disk for modifications.	MainWindow		Hiba történt a változtatások lemezre írása közben.
 The partition %s is already mounted.	MainWindow		A partíció (%s) már csatolva van.
@@ -46,8 +41,7 @@ The disk has been successfully initialized.\n	MainWindow		A partíció (%s) hiba
 Could not unmount partition %s.	MainWindow		Nem lehet leválasztani a partíciót (%s).
 Failed to format the partition %s!\n	MainWindow		Nem sikerült előkészíteni a partíciót: „%s”.\n
 Mount	MainWindow		Csatol
-Partition type	PartitionList		Partíció típusa:
-Create	CreateParamsPanel		Létrehoz
+Partition type	PartitionList		Partíció típusa
 Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Biztosan formázni szeretné a nyers lemezt? (A legtöbb esetben elő szokták készíteni a lemezt formázás előtt.) Ezt még egyszer meg kell majd erősítenie.
 Device	PartitionList		Eszköz
 Disk	MainWindow		Lemez
@@ -60,7 +54,6 @@ Cannot delete the selected partition.	MainWindow		A kijelölt partíció nem tö
 Mount all	MainWindow		Összes csatolása
 Cancel	MainWindow		Mégse
 Delete partition	MainWindow		Partíció törlése
-End: %ld MB	Support		Vége: %ld MB
 Eject	MainWindow		Kiadás
 Partition	MainWindow		Partíció
 File system	PartitionList		Fájlrendszer
@@ -71,10 +64,7 @@ Validation of the given initialization parameters failed.	MainWindow		Az előké
 The selected partition does not contain a partitioning system.	MainWindow		A kiválasztott partíción nincs particionálási séma.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Biztosan a lemezre szeretné írni a kijelölt változtatásokat?\n\nEz esetben a(z) „%s” partíció teljes tartalma visszavonhatatlanul meg fog semmisülni.
 The partition %s is currently mounted.	MainWindow		A partíció (%s) csatolva van.
-Partition size	CreateParamsPanel		A partíció mérete
 Surface test (not implemented)	MainWindow		Felületellenőrzés (még nem működik)
-Cancel	InitParamsPanel		Mégse
-Cancel	CreateParamsPanel		Mégse
 Format	MainWindow		Formázás
 Parameters	PartitionList		Paraméterek
 Creation of the partition has failed.	MainWindow		Nem sikerült létrehozni a partíciót.

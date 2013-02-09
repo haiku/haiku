@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Notifications	3631903554
+1	dutch; flemish	x-vnd.Haiku-Notifications	814394708
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Er ontstond een fout tijdens het opslaan van de voorkeuren.\nHet is mogelijk dat uw schijfruimte opraakt.
 Notifications	GeneralView		Aankondigingen
 seconds of inactivity	GeneralView		seconden inactief
@@ -8,7 +8,6 @@ Enable notifications	GeneralView		Aankondigingen aanzetten
 Error	NotificationView		Fout
 OK	GeneralView		Oké
 Events are not notified	GeneralView		Gebeurtenissen worden niet aangekondigd
-Save	PrefletWin		Opslaan
 Type	NotificationView		Soort
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Aankondigingen kan niet worden gestopt, omdat de server niet bereikt kan worden.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Kan aankondigingen niet aanzetten omdat de server niet gevonden kan worden.\nDit betekent dat uw InfoPopper-installatie niet succesvol werd afgerond.

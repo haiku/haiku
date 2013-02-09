@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	628096147
+1	polish	x-vnd.Haiku-libtracker	3952097682
 common	B_COMMON_DIRECTORY		common
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Widok ikon
@@ -386,7 +386,6 @@ Icon view	DeskWindow		Widok ikon
 Select all	QueryContainerWindow		Zaznacz wszystko
 Files cannot be moved or deleted from a read-only volume.	PoseView		Pliki nie mogą zostać przeniesione do woluminu tylko do odczytu.
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Pojawił się problem przy modyfikowaniu \"%name\". Plik może być zajęty lub otwarty przez inny proces.
-You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		Nie możesz przenieść Kosza, folderu domowego, lub Pulpitu do kosza.
 Owner	FilePermissionsView		Właściciel
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Pojawił się problem przy zapisywaniu we wskazanej lokalizacji. Proszę podać inną lokalizację.
 Restore	ContainerWindow		Przywróć

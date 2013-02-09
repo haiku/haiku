@@ -7,8 +7,8 @@
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		/trunk/headers/os/storage/Mime.h	 hrev45224
- *		/trunk/src/kits/storage/Mime.cpp	 hrev45224
+ *		headers/os/storage/Mime.h	 hrev45224
+ *		src/kits/storage/Mime.cpp	 hrev45224
  */
 
 
