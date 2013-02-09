@@ -14,7 +14,7 @@
 
 
 /*!
-	\file Node.h
+	\file NodeInfo.h
 	\ingroup storage
 	\ingroup libbe
 	\brief Provides the BNodeInfo class.
