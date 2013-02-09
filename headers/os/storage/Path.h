@@ -76,7 +76,9 @@ private:
 			uint32			_reserved[4];
 
 			char*			fName;
+								// Pointer to the path string of the object.
 			status_t		fCStatus;
+								// The initialization status of the object.
 };
 
 #endif	// _PATH_H
