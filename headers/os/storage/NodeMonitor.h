@@ -9,11 +9,10 @@
 #include <StorageDefs.h>
 
 
-/* Flags for the watch_node() call.
- *
- * Note that B_WATCH_MOUNT is NOT included in B_WATCH_ALL.
- * You may prefer to use BVolumeRoster for volume watching.
- */
+// Flags for the watch_node() call.
+
+// Note that B_WATCH_MOUNT is NOT included in B_WATCH_ALL.
+// You may prefer to use BVolumeRoster for volume watching.
 
 enum {
 	B_STOP_WATCHING			= 0x0000,
@@ -28,11 +27,10 @@ enum {
 };
 
 
-/* The "opcode" field of the B_NODE_MONITOR notification message you get.
- *
- * The presence and meaning of the other fields in that message specifying what
- * exactly caused the notification depend on this value.
- */
+// The "opcode" field of the B_NODE_MONITOR notification message you get.
+
+// The presence and meaning of the other fields in that message specifying what
+// exactly caused the notification depend on this value.
 
 #define	B_ENTRY_CREATED		1
 #define	B_ENTRY_REMOVED		2
@@ -67,11 +65,10 @@ enum {
 };
 
 
-/* C++ callable Prototypes
- *
- * Since you are not able to parse BMessages from plain C, there is no
- * API exported.
- */
+// C++ callable Prototypes
+
+// Since you are not able to parse BMessages from plain C, there is no
+// API exported.
 
 #if defined(__cplusplus) && !defined(_KERNEL_MODE)
 
@@ -95,6 +92,6 @@ extern status_t watch_node(const node_ref *node, uint32 flags,
 extern status_t stop_watching(BMessenger target);
 extern status_t stop_watching(const BHandler *handler, const BLooper *looper = NULL);
 
-#endif	/* __cplusplus && !_KERNEL_MODE */
+#endif	// __cplusplus && !_KERNEL_MODE
 
-#endif	/* _NODE_MONITOR_H*/
+#endif	// _NODE_MONITOR_H
