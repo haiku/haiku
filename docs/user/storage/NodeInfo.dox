@@ -25,10 +25,10 @@
 	\class BNodeInfo
 	\ingroup storage
 	\ingroup libbe
-	\brief Provides meta data about a file type.
+	\brief Provides access to file type meta data on a node.
 
-	BNodeInfo provides a nice wrapper to all sorts of useful meta data
-	like it's mime type, the files icon and the application which will load
+	BNodeInfo provides a nice wrapper to all sorts of useful meta data such as
+	the MIME-type, the file's icon and the application that will open
 	the file.
 */
 
@@ -45,17 +45,16 @@
 
 /*!
 	\fn BNodeInfo::BNodeInfo(BNode *node)
-	\brief Creates a BNodeInfo object and initializes it to the supplied node.
+	\brief Creates a BNodeInfo object and initializes it to the supplied
+	       \a node.
 
-	\param node The node to gather information on.
-
-	\see SetTo(BNode *node)
+	\param node The \a node to gather information on.
 */
 
 
 /*!
 	\fn BNodeInfo::~BNodeInfo()
-	\brief Frees all resources associated with this object.
+	\brief Frees the object and associated resources.
 
 	The internal BNode object is not deleted.
 */
@@ -73,12 +72,12 @@
 	\fn status_t BNodeInfo::SetTo(BNode *node)
 	\brief Initializes the BNodeInfo to the supplied \a node.
 
-	The BNodeInfo object does not copy the supplied object, but uses it
-	directly. You must not delete the object you supply while the BNodeInfo
-	does exist. The BNodeInfo does not take over ownership of the \a and
-	it doesn't delete it on destruction.
+	The BNodeInfo object does not copy the supplied \a node object, it uses it
+	directly instead. You must not delete the supply \a node while the
+	BNodeInfo object exists. The BNodeInfo does not take over ownership of the
+	\a node and it doesn't delete it on destruction either.
 
-	\param node The node to gather information on.
+	\param node The \a node to gather information on.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
@@ -88,11 +87,11 @@
 
 /*!
 	\fn status_t BNodeInfo::InitCheck() const
-	\brief Determines whether or not the object has been properly initialized.
+	\brief Checks whether or not the object has been properly initialized.
 
 	\returns A status code.
 	\retval B_OK The object was properly initialized.
-	\retval B_BAD_VALUE The object was <b>not</b> properly initialized.
+	\retval B_BAD_VALUE The object was \b not properly initialized.
 */
 
 
@@ -116,16 +115,15 @@
 	GetType(), it should be at least \c B_MIME_TYPE_LENGTH in length.
 
 	\param type A pointer to a pre-allocated char buffer of at least
-		   \c B_MIME_TYPE_LENGTH length into which the MIME-type of the
-		   node is written.
+	       \c B_MIME_TYPE_LENGTH length into which the MIME-type of the
+	       node is written.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
 	\retval B_BAD_VALUE \c NULL \a type or the type string stored in the
 	        attribute is longer than \c B_MIME_TYPE_LENGTH.
-	\retval B_BAD_TYPE The attribute the type string is stored in has the
-	        wrong type.
+	\retval B_BAD_TYPE The stored type string attribute has the wrong type.
 	\retval B_ENTRY_NOT_FOUND No type is set on the node.
 */
 
@@ -133,20 +131,20 @@
 /*!
 	\fn status_t BNodeInfo::SetType(const char *type)
 	\brief Sets the MIME-type of the node. If \a type is \c NULL the
-		   \c BEOS:TYPE attribute is removed instead.
+	       \c BEOS:TYPE attribute is removed instead.
 
 	The \a type string is written into the \c BEOS:TYPE attribute of the node.
 	If \a type is \c NULL, the \c BEOS:TYPE attribute is removed instead. The
 	\a type parameter may not by longer than \c B_MIME_TYPE_LENGTH in length
 	including the terminating \c NUL character.
 
-	\param type The MIME-type to be assigned to the node. Must not be longer
-		   than \c B_MIME_TYPE_LENGTH (including the terminating \c NUL).
-		   May be \c NULL to remove the attribute.
+	\param type The MIME-type to be assigned to the \a node. Must not be
+	       longer than \c B_MIME_TYPE_LENGTH (including the terminating
+	       \c NUL). May be \c NULL to remove the attribute.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
-	\retval B_NO_INIT The node object was not properly initialized.
+	\retval B_NO_INIT The object was not properly initialized.
 	\retval B_BAD_VALUE \a type is longer than \c B_MIME_TYPE_LENGTH.
 */
 
@@ -177,7 +175,7 @@
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
-	\retval B_NO_INIT The node object was not properly initialized.
+	\retval B_NO_INIT The object was not properly initialized.
 	\retval B_BAD_VALUE \c NULL \a icon, unsupported icon size \a k or bitmap
 		    dimensions (\a icon) and icon size (\a k) do not match.
 */
@@ -223,9 +221,9 @@
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
-	\retval B_NO_INIT The node object was not properly initialized.
-	\retval B_BAD_VALUE \c NULL \a data, \c NULL size or \c NULL \a type.
-	\retval B_NO_MEMORY No memory to allocate the data buffer.
+	\retval B_NO_INIT The object was not properly initialized.
+	\retval B_BAD_VALUE \c NULL \a data, \c NULL \a size or \c NULL \a type.
+	\retval B_NO_MEMORY No memory to allocate the \a data buffer.
 */
 
 
@@ -241,7 +239,7 @@
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
-	\retval B_NO_INIT The node object was not properly initialized.
+	\retval B_NO_INIT The object was not properly initialized.
 */
 
 
@@ -257,15 +255,15 @@
 	  own icon!
 	- Next it will ask GetIcon() for an icon.
 	- If this fails it will get the preferred application and ask the MIME
-	  database if the application has a special icon for the file type of the
+	  database if the application has an icon for the file type of the
 	  node.
 	- Next it will ask the MIME database whether there is an icon for the file
 	  type of the node.
 	- Then it will ask the MIME database for the preferred application for
 	  the file type of the node and whether this application has a special
 	  icon for the type.
-	- Finally it will return the icon for whatever type of node
-	  (file/dir/etc.) from the MIME database.
+	- Finally it will return a generic icon for whatever type of file type
+	  (file/dir/etc.) the node is from the MIME database.
 
 	The first action that provides an icon is used. In the case that none of
 	them yield an icon this method fails, this is very unlikely though.
@@ -285,7 +283,7 @@
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
-	\retval B_NO_INIT The node object was not properly initialized.
+	\retval B_NO_INIT The object was not properly initialized.
 	\retval B_BAD_VALUE \c NULL \a icon, unsupported icon size \a iconSize
 	        or bitmap dimensions (\a icon) and icon size (\a iconSize) do
 	        not match.
@@ -303,12 +301,12 @@
 	using \a iconSize before being passed to this method.
 
 	\param ref An entry_ref referring to the node for which the icon is
-		   retrieved.
-	\param icon A pointer to a pre-allocated BBitmap of the correct dimension
-		   to store the requested icon (16x16 for the mini and 32x32 for the
-		   large icon).
+	       retrieved.
+	\param icon A pointer to a pre-allocated BBitmap object of the correct
+	       dimension to store the requested icon (16x16 for the mini and 32x32
+	       for the large icon).
 	\param iconSize The size of the icon to be retrieved: \c B_MINI_ICON
-		   for a 16x16 icon or \c B_LARGE_ICON for a 32x32 icon.
+	       for a 16x16 icon or \c B_LARGE_ICON for a 32x32 icon.
 
 	\returns A status code.
 	\retval B_OK: Everything went fine.
@@ -333,7 +331,7 @@
 /*!
 	\fn status_t BNodeInfo::GetPreferredApp(char *signature,
 		app_verb verb) const
-	\brief Gets the preferred application for the node.
+	\brief Gets the preferred application of the node.
 
 	Writes the contents of the \c BEOS:PREF_APP attribute into the
 	\a signature buffer. The preferred application can be identified by its
@@ -341,15 +339,15 @@
 	longer and pre-allocated before it is passed into this method.
 
 	\param signature A pointer to a pre-allocated character buffer of size
-		   \c B_MIME_TYPE_LENGTH or larger into which the MIME-type of the
-		   preferred application is written.
+	       \c B_MIME_TYPE_LENGTH or larger into which the MIME-type of the
+	       preferred application is written.
 	\param verb The type of access the preferred application is requested.
 	       Currently \c B_OPEN is the only meaningful option.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
-	\retval B_NO_INIT The node object was not properly initialized.
-	\retval B_BAD_VALUE \c NULL \a signature or bad app_verb \a verb.
+	\retval B_NO_INIT The object was not properly initialized.
+	\retval B_BAD_VALUE \c NULL \a signature or bad app_verb.
 */
 
 
@@ -357,7 +355,7 @@
 	\fn status_t BNodeInfo::SetPreferredApp(const char *signature,
 		app_verb verb)
 	\brief Sets the preferred application of the node. If \a signature is
-		   \c NULL, the \c BEOS:PREF_APP attribute is removed instead.
+	       \c NULL, the \c BEOS:PREF_APP attribute is removed instead.
 
 	The supplied string is written into the \c BEOS:PREF_APP attribute of the
 	node. If \a signature is \c NULL, the respective attribute is removed
@@ -373,7 +371,7 @@
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
 	\retval B_BAD_VALUE \c NULL \a signature, \a signature is longer than
-	        \c B_MIME_TYPE_LENGTH or bad app_verb \a verb.
+	        \c B_MIME_TYPE_LENGTH or bad app_verb.
 */
 
 
@@ -391,37 +389,42 @@
 /*!
 	\fn status_t BNodeInfo::GetAppHint(entry_ref *ref) const
 	\brief Fills out \a ref with a pointer to a hint about the application
-		   that will open this node.
+	       that will open this node.
 
 	The path contained in the \c BEOS:PPATH attribute of the node is converted
 	into an entry_ref and returned. \a ref should be pre-allocated before being
 	passed into this method.
 
-	\param ref A pointer to a pre-allocated entry_ref into which the requested
-		   app hint shall be written.
+	\param ref A pointer to a pre-allocated entry_ref into which the app hint
+	       is written.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
-	\retval B_NO_INIT The node object was not properly initialized.
+	\retval B_BAD_DATA Attribute size greater than \c B_PATH_NAME_LENGTH.
+	\retval B_BAD_TYPE The stored type string attribute has the wrong type.
 	\retval B_BAD_VALUE The \a ref object passed in was \c NULL.
+	\retval B_ERROR Unable to read \c BEOS:PPATH attribute.
+	\retval B_NO_INIT The object was not properly initialized.
 */
 
 
 /*!
 	\fn status_t BNodeInfo::SetAppHint(const entry_ref *ref)
-	\brief Sets the app hint of the node. If \a ref is \c NULL, the
-		   \c BEOS:PPATH attribute is removed instead.
+	\brief Sets the application that will open the file type of the node. If
+	       \a ref is \c NULL, the \c BEOS:PPATH attribute is removed instead.
 
 	\a ref is converted into a path and stored in the \c BEOS:PPATH attribute
 	of the node. If \a ref is NULL \c BEOS:PPATH is removed instead.
 
 	\param ref A pointer to an entry_ref referring to the application.
-		   May be \c NULL.
+	       May be \c NULL.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
-	\retval B_NO_INIT The node object was not properly initialized.
 	\retval B_BAD_VALUE The \a ref object passed in was \c NULL.
+	\retval B_ENTRY_NOT_FOUND \c BEOS:PPATH attribute not found.
+	\retval B_ERROR Unable to write \c BEOS:PPATH attribute.
+	\retval B_NO_INIT The object was not properly initialized.
 */
 
 
