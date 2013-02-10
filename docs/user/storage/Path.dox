@@ -406,7 +406,7 @@
 
 /*!
 	\fn type_code BPath::TypeCode() const
-	\brief Implements BFlattenable::TypeCode() Always returns \c B_REF_TYPE.
+	\brief Implements BFlattenable::TypeCode(). Always returns \c B_REF_TYPE.
 
 	\return \c B_REF_TYPE
 */
@@ -414,7 +414,7 @@
 
 /*!
 	\fn ssize_t BPath::FlattenedSize() const
-	\brief Implements BFlattenable::FlattenedSize() Gets the size of the
+	\brief Implements BFlattenable::FlattenedSize(). Gets the size of the
 	       flattened entry_ref struct that represents the path in bytes.
 
 	\return The size of the flattened entry_ref struct that represents the
