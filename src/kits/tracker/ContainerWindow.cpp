@@ -604,7 +604,7 @@ BContainerWindow::BContainerWindow(LockingList<BWindow>* list,
 		app->StartWatching(this, kWindowsShowFullPathChanged);
 		app->StartWatching(this, kSingleWindowBrowseChanged);
 		app->StartWatching(this, kShowNavigatorChanged);
-		app->StartWatching(this, kMoveFilesToTrashChanged);
+		app->StartWatching(this, kDontMoveFilesToTrashChanged);
 		app->Unlock();
 	}
 
@@ -625,7 +625,7 @@ BContainerWindow::~BContainerWindow()
 		app->StopWatching(this, kWindowsShowFullPathChanged);
 		app->StopWatching(this, kSingleWindowBrowseChanged);
 		app->StopWatching(this, kShowNavigatorChanged);
-		app->StopWatching(this, kMoveFilesToTrashChanged);
+		app->StopWatching(this, kDontMoveFilesToTrashChanged);
 		app->Unlock();
 	}
 
@@ -1687,10 +1687,10 @@ BContainerWindow::MessageReceived(BMessage* message)
 							settings.SingleWindowBrowse());
 						break;
 
-					case kMoveFilesToTrashChanged:
+					case kDontMoveFilesToTrashChanged:
 						{
 							bool dontMoveToTrash
-								= settings.MoveFilesToTrash();
+								= settings.DontMoveFilesToTrash();
 
 							BMenuItem* item
 								= fFileContextMenu->FindItem(kMoveToTrash);
@@ -1934,8 +1934,8 @@ BContainerWindow::AddFileMenu(BMenu* menu)
 		menu->AddItem(new BMenuItem(B_TRANSLATE("Duplicate"),
 			new BMessage(kDuplicateSelection), 'D'));
 
-		menu->AddItem(new BMenuItem(TrackerSettings().MoveFilesToTrash()
-			? B_TRANSLATE("Move to Trash")	: B_TRANSLATE("Delete"),
+		menu->AddItem(new BMenuItem(TrackerSettings().DontMoveFilesToTrash()
+			? B_TRANSLATE("Delete")	: B_TRANSLATE("Move to Trash"),
 			new BMessage(kMoveToTrash), 'T'));
 
 		menu->AddSeparatorItem();
@@ -2758,8 +2758,8 @@ BContainerWindow::AddFileContextMenus(BMenu* menu)
 	}
 
 	if (!IsTrash() && !InTrash()) {
-		menu->AddItem(new BMenuItem(TrackerSettings().MoveFilesToTrash()
-			? B_TRANSLATE("Move to Trash")	: B_TRANSLATE("Delete"),
+		menu->AddItem(new BMenuItem(TrackerSettings().DontMoveFilesToTrash()
+			? B_TRANSLATE("Delete")	: B_TRANSLATE("Move to Trash"),
 			new BMessage(kMoveToTrash), 'T'));
 
 		// add separator for copy to/move to items (navigation items)
