@@ -118,8 +118,8 @@ class TrackerSettings {
 		bool ClockIs24Hr();
 		void SetClockTo24Hr(bool);
 
-		bool MoveFilesToTrash();
-		void SetMoveFilesToTrash(bool);
+		bool DontMoveFilesToTrash();
+		void SetDontMoveFilesToTrash(bool);
 		bool AskBeforeDeleteFile();
 		void SetAskBeforeDeleteFile(bool);
 

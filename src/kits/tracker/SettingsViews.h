@@ -163,33 +163,6 @@ class SpaceBarSettingsView : public SettingsView {
 		typedef SettingsView _inherited;
 };
 
-
-class TrashSettingsView : public SettingsView {
-	public:
-		TrashSettingsView();
-
-		virtual void MessageReceived(BMessage* message);
-		virtual void AttachedToWindow();
-
-		virtual void SetDefaults();
-		virtual bool IsDefaultable() const;
-		virtual void Revert();
-		virtual void ShowCurrentSettings();
-		virtual void RecordRevertSettings();
-		virtual bool IsRevertable() const;
-
-	private:
-		void _SendNotices();
-
-		BCheckBox* fMoveFilesToTrashCheckBox;
-		BCheckBox* fAskBeforeDeleteFileCheckBox;
-
-		bool fMoveFilesToTrash;
-		bool fAskBeforeDeleteFile;
-
-		typedef SettingsView _inherited;
-};
-
 } // namespace BPrivate
 
 using namespace BPrivate;

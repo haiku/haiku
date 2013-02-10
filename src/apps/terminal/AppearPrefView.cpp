@@ -73,12 +73,12 @@ AppearancePrefView::AppearancePrefView(const char* name,
 	fTerminalMessenger(messenger)
 {
 	const char* kColorTable[] = {
-		B_TRANSLATE("Text"),
-		B_TRANSLATE("Background"),
-		B_TRANSLATE("Cursor"),
-		B_TRANSLATE("Text under cursor"),
-		B_TRANSLATE("Selected text"),
-		B_TRANSLATE("Selected background"),
+		B_TRANSLATE_MARK("Text"),
+		B_TRANSLATE_MARK("Background"),
+		B_TRANSLATE_MARK("Cursor"),
+		B_TRANSLATE_MARK("Text under cursor"),
+		B_TRANSLATE_MARK("Selected text"),
+		B_TRANSLATE_MARK("Selected background"),
 		NULL
 	};
 
@@ -272,11 +272,14 @@ AppearancePrefView::MessageReceived(BMessage* msg)
 
 		case MSG_COLOR_CHANGED:
 		{
-			rgb_color oldColor = PrefHandler::Default()->getRGB(
-				fColorField->Menu()->FindMarked()->Label());
+			const BMessage* itemMessage
+				= fColorField->Menu()->FindMarked()->Message();
+			const char* label = NULL;
+			if (itemMessage->FindString("label", &label) != B_OK)
+				break;
+			rgb_color oldColor = PrefHandler::Default()->getRGB(label);
 			if (oldColor != fColorControl->ValueAsColor()) {
-				PrefHandler::Default()->setRGB(
-					fColorField->Menu()->FindMarked()->Label(),
+				PrefHandler::Default()->setRGB(label,
 					fColorControl->ValueAsColor());
 				modified = true;
 			}
@@ -300,9 +303,12 @@ AppearancePrefView::MessageReceived(BMessage* msg)
 		}
 
 		case MSG_COLOR_FIELD_CHANGED:
-			fColorControl->SetValue(PrefHandler::Default()->getRGB(
-				fColorField->Menu()->FindMarked()->Label()));
+		{
+			const char* label = NULL;
+			if (msg->FindString("label", &label) == B_OK)
+				fColorControl->SetValue(PrefHandler::Default()->getRGB(label));
 			break;
+		}
 
 		case MSG_BLINK_CURSOR_CHANGED:
 			if (PrefHandler::Default()->getBool(PREF_BLINK_CURSOR)
@@ -514,22 +520,20 @@ AppearancePrefView::_MakeMenu(uint32 msg, const char** items,
 {
 	BPopUpMenu* menu = new BPopUpMenu("");
 
-	int32 i = 0;
 	while (*items) {
 		if (strcmp((*items), "") == 0)
 			menu->AddSeparatorItem();
 		else {
 			BMessage* message = new BMessage(msg);
-			menu->AddItem(new BMenuItem((*items), message));
+			message->AddString("label", *items);
+			BMenuItem* item = new BMenuItem(B_TRANSLATE(*items), message);
+			menu->AddItem(item);
+			if (strcmp(*items, defaultItemName) == 0)
+				item->SetMarked(true);
 		}
 
 		items++;
-		i++;
 	}
-
-	BMenuItem* defaultItem = menu->FindItem(defaultItemName);
-	if (defaultItem)
-		defaultItem->SetMarked(true);
 
 	return menu;
 }

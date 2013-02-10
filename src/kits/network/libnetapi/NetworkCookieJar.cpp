@@ -1,63 +1,68 @@
 /*
- * Copyright 2010 Haiku Inc. All rights reserved.
+ * Copyright 2010-2013 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Christophe Huriaux, c.huriaux@gmail.com
+ *		Hamish Morrison, hamishm53@gmail.com
  */
 
-
-#include <new>
 
 #include <Debug.h>
 #include <HashMap.h>
 #include <HashString.h>
 #include <Message.h>
 #include <NetworkCookieJar.h>
+
+#include <new>
+
 #include "NetworkCookieJarPrivate.h"
 
-const char* kArchivedCookieMessageName	=	"be:cookie";
+
+const char* kArchivedCookieMessageName = "be:cookie";
 
 
 BNetworkCookieJar::BNetworkCookieJar()
-	: 
-	fCookieHashMap(new PrivateHashMap)
+	:
+	fCookieHashMap(new PrivateHashMap())
 {
 }
 
 
 BNetworkCookieJar::BNetworkCookieJar(const BNetworkCookieJar&)
-	: 
-	BArchivable(),
-	fCookieHashMap(new PrivateHashMap)
+	:
+	fCookieHashMap(new PrivateHashMap())
 {
 	// TODO
 }
 
 
 BNetworkCookieJar::BNetworkCookieJar(const BNetworkCookieList& otherList)
-	: 
-	fCookieHashMap(new PrivateHashMap)
+	:
+	fCookieHashMap(new PrivateHashMap())
 {
 	AddCookies(otherList);
 }
 
 
 BNetworkCookieJar::BNetworkCookieJar(BMessage* archive)
-	: 
-	fCookieHashMap(new PrivateHashMap)
+	:
+	fCookieHashMap(new PrivateHashMap())
 {
 	BMessage extractedCookie;
-	
-	for (int32 i = 0;
-		archive->FindMessage(kArchivedCookieMessageName, i, &extractedCookie)
-			== B_OK;
-		i++) {
-		BNetworkCookie* heapCookie 
+
+	for (int32 i = 0; archive->FindMessage(kArchivedCookieMessageName, i,
+			&extractedCookie) == B_OK; i++) {
+		BNetworkCookie* heapCookie
 			= new(std::nothrow) BNetworkCookie(&extractedCookie);
-		
-		if (heapCookie == NULL || !AddCookie(heapCookie))
+
+		if (heapCookie == NULL)
 			break;
+
+		if (!AddCookie(heapCookie)) {
+			delete heapCookie;
+			continue;
+		}
 	}
 }
 
@@ -65,8 +70,8 @@ BNetworkCookieJar::BNetworkCookieJar(BMessage* archive)
 BNetworkCookieJar::~BNetworkCookieJar()
 {
 	BNetworkCookie* cookiePtr;
-	
-	for (Iterator it(GetIterator()); (cookiePtr = it.Next()); )
+
+	for (Iterator it = GetIterator(); (cookiePtr = it.Next()) != NULL;)
 		delete it.Remove();
 }
 
@@ -74,64 +79,72 @@ BNetworkCookieJar::~BNetworkCookieJar()
 // #pragma mark Add cookie to cookie jar
 
 
-bool
+status_t
 BNetworkCookieJar::AddCookie(const BNetworkCookie& cookie)
 {
 	BNetworkCookie* heapCookie = new(std::nothrow) BNetworkCookie(cookie);
-	
-	if (!AddCookie(heapCookie)) {
+	if (heapCookie == NULL)
+		return B_NO_MEMORY;
+
+	status_t result = AddCookie(heapCookie);
+	if (result != B_OK) {
 		delete heapCookie;
-		return false;
+		return result;
 	}
-	
-	return true;
+
+	return B_OK;
 }
 
 
-bool
+status_t
 BNetworkCookieJar::AddCookie(BNetworkCookie* cookie)
 {
-	if (cookie != NULL) {
-		HashString key(cookie->Domain());
-		
-		if (!fCookieHashMap->fHashMap.ContainsKey(key))
-			fCookieHashMap->fHashMap.Put(key, new BList);
-			
-		BNetworkCookieList* list = fCookieHashMap->fHashMap.Get(key);
-		
-		for (int32 i = 0; i < list->CountItems(); i++) {
-			BNetworkCookie* c
-				= reinterpret_cast<BNetworkCookie*>(list->ItemAt(i));
-				
-			if (c->Name() == cookie->Name()) {
-				list->RemoveItem(i);
-				break;
-			}
-		}
-		
-		// Discard the cookie if it's to be deleted
-		if (!cookie->ShouldDeleteNow())
-			list->AddItem(cookie);
+	if (cookie == NULL)
+		return B_BAD_VALUE;
+
+	HashString key(cookie->Domain());
+
+	BNetworkCookieList* list = fCookieHashMap->fHashMap.Get(key);
+	if (list == NULL) {
+		list = new(std::nothrow) BNetworkCookieList();
+		if (list == NULL || fCookieHashMap->fHashMap.Put(key, list) != B_OK)
+			return B_NO_MEMORY;
 	}
-	
-	return true;
+
+	for (int32 i = 0; i < list->CountItems(); i++) {
+		BNetworkCookie* c
+			= reinterpret_cast<BNetworkCookie*>(list->ItemAt(i));
+
+		if (c->Name() == cookie->Name() && c->Path() == cookie->Path()) {
+			list->RemoveItem(i);
+			break;
+		}
+	}
+
+	if (cookie->ShouldDeleteNow())
+		delete cookie;
+	else
+		list->AddItem(cookie);
+
+	return B_OK;
 }
 
 
-bool
+status_t
 BNetworkCookieJar::AddCookies(const BNetworkCookieList& cookies)
 {
 	for (int32 i = 0; i < cookies.CountItems(); i++) {
-		BNetworkCookie* cookiePtr 
+		BNetworkCookie* cookiePtr
 			= reinterpret_cast<BNetworkCookie*>(cookies.ItemAt(i));
-		
+
 		// Using AddCookie by reference in order to avoid multiple
 		// cookie jar share the same cookie pointers
-		if (!AddCookie(*cookiePtr))
-			return false;
+		status_t result = AddCookie(*cookiePtr);
+		if (result != B_OK)
+			return result;
 	}
-	
-	return true;
+
+	return B_OK;
 }
 
 
@@ -143,8 +156,8 @@ BNetworkCookieJar::DeleteOutdatedCookies()
 {
 	int32 deleteCount = 0;
 	BNetworkCookie* cookiePtr;
-	
-	for (Iterator it(GetIterator()); (cookiePtr = it.Next()); ) {			
+
+	for (Iterator it = GetIterator(); (cookiePtr = it.Next()) != NULL;) {
 		if (cookiePtr->ShouldDeleteNow()) {
 			delete it.Remove();
 			deleteCount++;
@@ -160,8 +173,8 @@ BNetworkCookieJar::PurgeForExit()
 {
 	int32 deleteCount = 0;
 	BNetworkCookie* cookiePtr;
-	
-	for (Iterator it(GetIterator()); (cookiePtr = it.Next()); ) {			
+
+	for (Iterator it = GetIterator(); (cookiePtr = it.Next()) != NULL;) {
 		if (cookiePtr->ShouldDeleteAtExit()) {
 			delete it.Remove();
 			deleteCount++;
@@ -182,10 +195,10 @@ BNetworkCookieJar::Archive(BMessage* into, bool deep) const
 
 	if (error == B_OK) {
 		BNetworkCookie* cookiePtr;
-	
-		for (Iterator it(GetIterator()); (cookiePtr = it.Next()); ) {
+
+		for (Iterator it = GetIterator(); (cookiePtr = it.Next()) != NULL;) {
 			BMessage subArchive;
-			
+
 			error = cookiePtr->Archive(&subArchive, deep);
 			if (error != B_OK)
 				return error;
@@ -205,7 +218,7 @@ BNetworkCookieJar::Instantiate(BMessage* archive)
 {
 	if (archive->HasMessage(kArchivedCookieMessageName))
 		return new(std::nothrow) BNetworkCookieJar(archive);
-		
+
 	return NULL;
 }
 
@@ -242,11 +255,11 @@ BNetworkCookieJar::Flatten(void* buffer, ssize_t size) const
 {
 	if (FlattenedSize() > size)
 		return B_ERROR;
-		
-	fFlattened.CopyInto(reinterpret_cast<char*>(buffer), 0, 
+
+	fFlattened.CopyInto(reinterpret_cast<char*>(buffer), 0,
 		fFlattened.Length());
 	reinterpret_cast<char*>(buffer)[fFlattened.Length()] = 0;
-		
+
 	return B_OK;
 }
 
@@ -262,13 +275,13 @@ BNetworkCookieJar::AllowsTypeCode(type_code) const
 status_t
 BNetworkCookieJar::Unflatten(type_code, const void* buffer, ssize_t size)
 {
-	BString flattenedCookies;	
+	BString flattenedCookies;
 	flattenedCookies.SetTo(reinterpret_cast<const char*>(buffer), size);
-	
-	while (flattenedCookies.Length() > 0) {		
+
+	while (flattenedCookies.Length() > 0) {
 		BNetworkCookie tempCookie;
 		BString tempCookieLine;
-		
+
 		int32 endOfLine = flattenedCookies.FindFirst('\n', 0);
 		if (endOfLine == -1)
 			tempCookieLine = flattenedCookies;
@@ -276,11 +289,11 @@ BNetworkCookieJar::Unflatten(type_code, const void* buffer, ssize_t size)
 			flattenedCookies.MoveInto(tempCookieLine, 0, endOfLine);
 			flattenedCookies.Remove(0, 1);
 		}
-		
+
 		if (tempCookieLine.Length() != 0 && tempCookieLine[0] != '#') {
 			for (int32 field = 0; field < 7; field++) {
 				BString tempString;
-				
+
 				int32 endOfField = tempCookieLine.FindFirst('\t', 0);
 				if (endOfField == -1)
 					tempString = tempCookieLine;
@@ -288,42 +301,42 @@ BNetworkCookieJar::Unflatten(type_code, const void* buffer, ssize_t size)
 					tempCookieLine.MoveInto(tempString, 0, endOfField);
 					tempCookieLine.Remove(0, 1);
 				}
-				
+
 				switch (field) {
 					case 0:
 						tempCookie.SetDomain(tempString);
 						break;
-					
+
 					case 1:
 						// TODO: Useless field ATM
 						break;
-						
+
 					case 2:
 						tempCookie.SetPath(tempString);
 						break;
-						
+
 					case 3:
 						tempCookie.SetSecure(tempString == "TRUE");
 						break;
-						
+
 					case 4:
 						tempCookie.SetExpirationDate(atoi(tempString));
 						break;
-						
+
 					case 5:
 						tempCookie.SetName(tempString);
 						break;
-					
+
 					case 6:
 						tempCookie.SetValue(tempString);
 						break;
 				} // switch
 			} // for loop
-			
+
 			AddCookie(tempCookie);
 		}
-	}	
-	
+	}
+
 	return B_OK;
 }
 
@@ -346,7 +359,7 @@ BNetworkCookieJar::GetUrlIterator(const BUrl& url) const
 		copy.SetPath("/");
 		return BNetworkCookieJar::UrlIterator(this, copy);
 	}
-	
+
 	return BNetworkCookieJar::UrlIterator(this, url);
 }
 
@@ -357,10 +370,10 @@ BNetworkCookieJar::_DoFlatten() const
 	fFlattened.Truncate(0);
 
 	BNetworkCookie* cookiePtr;
-	for (Iterator it(GetIterator()); (cookiePtr = it.Next()); ) {
-		fFlattened 	<< cookiePtr->Domain() << '\t' << "TRUE" << '\t' 
-			<< cookiePtr->Path() << '\t' 
-			<< (cookiePtr->Secure()?"TRUE":"FALSE") << '\t' 
+	for (Iterator it = GetIterator(); (cookiePtr = it.Next()) != NULL;) {
+		fFlattened 	<< cookiePtr->Domain() << '\t' << "TRUE" << '\t'
+			<< cookiePtr->Path() << '\t'
+			<< (cookiePtr->Secure()?"TRUE":"FALSE") << '\t'
 			<< (int32)cookiePtr->ExpirationDate() << '\t'
 			<< cookiePtr->Name() << '\t' << cookiePtr->Value() << '\n';
 	}
@@ -395,7 +408,7 @@ BNetworkCookieJar::Iterator::Iterator(const BNetworkCookieJar* cookieJar)
 {
 	fIterator = new(std::nothrow) PrivateIterator(
 		fCookieJar->fCookieHashMap->fHashMap.GetIterator());
-	
+
 	// Locate first cookie
 	_FindNext();
 }
@@ -419,7 +432,7 @@ BNetworkCookieJar::Iterator::Next()
 {
 	if (!fElement)
 		return NULL;
-		
+
 	BNetworkCookie* result = fElement;
 	_FindNext();
 	return result;
@@ -431,18 +444,18 @@ BNetworkCookieJar::Iterator::NextDomain()
 {
 	if (!fElement)
 		return NULL;
-	
+
 	BNetworkCookie* result = fElement;
-		
+
 	if (!fIterator->fCookieMapIterator.HasNext()) {
 		fElement = NULL;
 		return NULL;
 	}
-		
-	fList = *(fIterator->fCookieMapIterator.NextValue());
+
+	fList = *fIterator->fCookieMapIterator.NextValue();
 	fIndex = 0;
 	fElement = reinterpret_cast<BNetworkCookie*>(fList->ItemAt(fIndex));
-	
+
 	return result;
 }
 
@@ -452,7 +465,7 @@ BNetworkCookieJar::Iterator::Remove()
 {
 	if (!fLastElement)
 		return NULL;
-		
+
 	BNetworkCookie* result = fLastElement;
 
 	if (fIndex == 0) {
@@ -463,10 +476,10 @@ BNetworkCookieJar::Iterator::Remove()
 		else
 			fLastList->RemoveItem(fLastList->CountItems() - 1);
 	} else {
-		fList->RemoveItem(fIndex-1);
 		fIndex--;
+		fList->RemoveItem(fIndex);
 	}
-	
+
 	fLastElement = NULL;
 	return result;
 }
@@ -476,12 +489,18 @@ BNetworkCookieJar::Iterator&
 BNetworkCookieJar::Iterator::operator=(const BNetworkCookieJar::Iterator& other)
 {
 	fCookieJar = other.fCookieJar;
-	fIterator = other.fIterator;
 	fLastList = other.fLastList;
 	fList = other.fList;
 	fElement = other.fElement;
 	fLastElement = other.fLastElement;
 	fIndex = other.fIndex;
+
+	fIterator = new(std::nothrow) PrivateIterator(*other.fIterator);
+	if (fIterator == NULL) {
+		// Make the iterator unusable.
+		fElement = NULL;
+		fLastElement = NULL;
+	}
 	return *this;
 }
 
@@ -490,18 +509,18 @@ void
 BNetworkCookieJar::Iterator::_FindNext()
 {
 	fLastElement = fElement;
-	
+
 	fIndex++;
 	if (fList && fIndex < fList->CountItems()) {
 		fElement = reinterpret_cast<BNetworkCookie*>(fList->ItemAt(fIndex));
 		return;
 	}
-	
+
 	if (!fIterator->fCookieMapIterator.HasNext()) {
 		fElement = NULL;
 		return;
 	}
-	
+
 	fLastList = fList;
 	fList = *(fIterator->fCookieMapIterator.NextValue());
 	fIndex = 0;
@@ -529,25 +548,22 @@ BNetworkCookieJar::UrlIterator::UrlIterator(const BNetworkCookieJar* cookieJar,
 	fLastElement(NULL),
 	fIndex(0),
 	fLastIndex(0),
-	fUrl(const_cast<BUrl&>(url))
+	fUrl(url)
 {
-	BString domain(url.Host());
+	BString domain = url.Host();
 
 	if (!domain.Length())
 		return;
 
-	if (domain[0] != '.')
-		domain.Prepend(".");
-		
-	//  Prepending another dot since _FindNext is going to
-	// call _SupDomain()
-	domain.Prepend(".");
-	
 	fIterator = new(std::nothrow) PrivateIterator(
 		fCookieJar->fCookieHashMap->fHashMap.GetIterator());
-	fIterator->fKey.SetTo(domain, domain.Length());
 
-	_FindNext();
+	if (fIterator != NULL) {
+		// Prepending a dot since _FindNext is going to call _SupDomain()
+		domain.Prepend(".");
+		fIterator->fKey.SetTo(domain, domain.Length());
+		_FindNext();
+	}
 }
 
 
@@ -569,7 +585,7 @@ BNetworkCookieJar::UrlIterator::Next()
 {
 	if (!fElement)
 		return NULL;
-		
+
 	BNetworkCookie* result = fElement;
 	_FindNext();
 	return result;
@@ -581,15 +597,15 @@ BNetworkCookieJar::UrlIterator::Remove()
 {
 	if (!fLastElement)
 		return NULL;
-		
+
 	BNetworkCookie* result = fLastElement;
 
 	fLastList->RemoveItem(fLastIndex);
 
 	if (fLastList->CountItems() == 0) {
-		HashString lastKey(fLastElement->Domain(), 
+		HashString lastKey(fLastElement->Domain(),
 			fLastElement->Domain().Length());
-		
+
 		delete fCookieJar->fCookieHashMap->fHashMap.Remove(lastKey);
 	}
 
@@ -609,23 +625,28 @@ BNetworkCookieJar::UrlIterator::operator=(
 	fLastElement = other.fLastElement;
 	fIndex = other.fIndex;
 	fLastIndex = other.fLastIndex;
-	fUrl = other.fUrl;
-	fIterator = other.fIterator;
+
+	fIterator = new(std::nothrow) PrivateIterator(*other.fIterator);
+	if (fIterator == NULL) {
+		// Make the iterator unusable.
+		fElement = NULL;
+		fLastElement = NULL;
+	}
+
 	return *this;
 }
 
 
 bool
-BNetworkCookieJar::UrlIterator::_SupDomain()
+BNetworkCookieJar::UrlIterator::_SuperDomain()
 {
-	BString domain(fIterator->fKey.GetString());
-	int32 nextDot = domain.FindFirst('.', 1);
-		
-	if (nextDot == -1)
+	const char* domain = fIterator->fKey.GetString();
+	const char* nextDot = strchr(domain, '.');
+
+	if (nextDot == NULL)
 		return false;
-	
-	domain.Remove(0, nextDot);
-	fIterator->fKey.SetTo(domain.String(), domain.Length());
+
+	fIterator->fKey.SetTo(nextDot + 1);
 	return true;
 }
 
@@ -635,19 +656,16 @@ BNetworkCookieJar::UrlIterator::_FindNext()
 {
 	fLastIndex = fIndex;
 	fLastElement = fElement;
-	
-	if (_FindPath())
-		return;
-	
 	fLastList = fList;
-	do {
-		if (!_SupDomain()) {
+
+	while (!_FindPath()) {
+		if (!_SuperDomain()) {
 			fElement = NULL;
 			return;
 		}
-		
+
 		_FindDomain();
-	} while (!_FindPath());
+	}
 }
 
 
@@ -655,10 +673,10 @@ void
 BNetworkCookieJar::UrlIterator::_FindDomain()
 {
 	fList = fCookieJar->fCookieHashMap->fHashMap.Get(fIterator->fKey);
-	
+
 	if (fList == NULL)
 		fElement = NULL;
-	
+
 	fIndex = -1;
 }
 
@@ -667,17 +685,14 @@ bool
 BNetworkCookieJar::UrlIterator::_FindPath()
 {
 	fIndex++;
-	if (fList && fIndex < fList->CountItems()) {
-		do {
-			fElement 
-				= reinterpret_cast<BNetworkCookie*>(fList->ItemAt(fIndex));
-			
-			if (fElement->IsValidForPath(fUrl.Path()))				
-				return true;
-				
-			fIndex++;
-		} while (fList && fIndex < fList->CountItems());
+	while (fList && fIndex < fList->CountItems()) {
+		fElement = reinterpret_cast<BNetworkCookie*>(fList->ItemAt(fIndex));
+
+		if (fElement->IsValidForPath(fUrl.Path()))
+			return true;
+
+		fIndex++;
 	}
-	
+
 	return false;
 }
