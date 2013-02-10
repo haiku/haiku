@@ -16,6 +16,7 @@
 
 
 class AboutView;
+class BBitmap;
 class BPoint;
 class BHandler;
 
@@ -36,6 +37,15 @@ class BAboutWindow : public BWindow {
 			void			AddSpecialThanks(const char** thanks);
 			void			AddVersionHistory(const char** history);
 			void			AddExtraInfo(const char* extraInfo);
+
+			BBitmap*		Icon();
+			void			SetIcon(BBitmap* icon);
+
+			const char*		Name();
+			void			SetName(const char* name);
+
+			const char*		Version();
+			void			SetVersion(const char* version);
 
  private:
 			AboutView*		fAboutView;
