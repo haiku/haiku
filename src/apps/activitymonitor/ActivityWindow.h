@@ -31,6 +31,8 @@ public:
 			bigtime_t	RefreshInterval() const;
 
 private:
+			BMenuItem*	fAlwaysOnTop;
+
 			status_t	_OpenSettings(BFile& file, uint32 mode);
 			status_t	_LoadSettings(BMessage& settings);
 			status_t	_SaveSettings();

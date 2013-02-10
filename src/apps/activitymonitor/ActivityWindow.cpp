@@ -31,6 +31,7 @@
 
 static const uint32 kMsgAddView = 'advw';
 static const uint32 kMsgShowSettings = 'shst';
+static const uint32 kMsgAlwaysOnTop = 'alot';
 
 
 ActivityWindow::ActivityWindow()
@@ -131,6 +132,9 @@ ActivityWindow::ActivityWindow()
 	menu = new BMenu(B_TRANSLATE("Settings"));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgShowSettings)));
+	menu->AddSeparatorItem();
+	fAlwaysOnTop = new BMenuItem(B_TRANSLATE("Always on top"), new BMessage(kMsgAlwaysOnTop));
+	menu->AddItem(fAlwaysOnTop);
 	menu->SetTargetForItems(this);
 	menuBar->AddItem(menu);
 }
@@ -198,6 +202,13 @@ ActivityWindow::MessageReceived(BMessage* message)
 
 				fSettingsWindow = window;
 			}
+			break;
+		}
+		
+		case kMsgAlwaysOnTop:
+		{
+			SetFeel(this->IsFloating() ? B_NORMAL_WINDOW_FEEL : B_FLOATING_ALL_WINDOW_FEEL);
+			fAlwaysOnTop->SetMarked(!fAlwaysOnTop->IsMarked());
 			break;
 		}
 
