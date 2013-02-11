@@ -442,7 +442,7 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 	fFindCaseSensitiveCheckBox = new BCheckBox(B_TRANSLATE("Match case"));
 	BGroupLayout* findGroup = BLayoutBuilder::Group<>(B_VERTICAL, 0.0)
 		.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, kElementSpacing)
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 			.Add(fFindCloseButton)
 			.Add(fFindTextControl)
 			.Add(fFindPreviousButton)
