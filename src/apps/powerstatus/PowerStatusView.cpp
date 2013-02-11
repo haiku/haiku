@@ -77,7 +77,7 @@ PowerStatusView::PowerStatusView(BMessage* archive)
 
 PowerStatusView::~PowerStatusView()
 {
-	if (fAboutWindow != NULL)
+	if (fAboutWindow != NULL && fAboutWindow->Lock())
 		fAboutWindow->Quit();
 }
 
