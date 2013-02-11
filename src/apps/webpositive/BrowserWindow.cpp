@@ -39,6 +39,7 @@
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <Clipboard.h>
+#include <ControlLook.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
@@ -56,6 +57,7 @@
 #include <Roster.h>
 #include <Screen.h>
 #include <SeparatorView.h>
+#include <Size.h>
 #include <SpaceLayoutItem.h>
 #include <StatusBar.h>
 #include <StringView.h>
@@ -424,6 +426,12 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 	const float kElementSpacing = 5;
 
 	// Find group
+	fFindCloseButton = new BButton("\xc3\x97", // multiplication sign
+		new BMessage(EDIT_HIDE_FIND_GROUP));
+	fFindCloseButton->SetExplicitMinSize(
+		BSize(be_control_look->DefaultItemSpacing() * 3, B_SIZE_UNSET));
+	fFindCloseButton->SetExplicitMaxSize(
+		BSize(be_control_look->DefaultItemSpacing() * 3, B_SIZE_UNSET));
 	fFindTextControl = new BTextControl("find", B_TRANSLATE("Find:"), "",
 		new BMessage(EDIT_FIND_NEXT));
 	fFindTextControl->SetModificationMessage(new BMessage(FIND_TEXT_CHANGED));
@@ -431,18 +439,15 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 		new BMessage(EDIT_FIND_PREVIOUS));
 	fFindNextButton = new BButton(B_TRANSLATE("Next"),
 		new BMessage(EDIT_FIND_NEXT));
-	fFindCloseButton = new BButton(B_TRANSLATE("Close"),
-		new BMessage(EDIT_HIDE_FIND_GROUP));
 	fFindCaseSensitiveCheckBox = new BCheckBox(B_TRANSLATE("Match case"));
 	BGroupLayout* findGroup = BLayoutBuilder::Group<>(B_VERTICAL, 0.0)
 		.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL, kElementSpacing)
+			.Add(fFindCloseButton)
 			.Add(fFindTextControl)
 			.Add(fFindPreviousButton)
 			.Add(fFindNextButton)
 			.Add(fFindCaseSensitiveCheckBox)
-			.Add(BSpaceLayoutItem::CreateGlue())
-			.Add(fFindCloseButton)
 			.SetInsets(kInsetSpacing, kInsetSpacing,
 				kInsetSpacing, kInsetSpacing)
 		)
@@ -2332,5 +2337,3 @@ BrowserWindow::_HandlePageSourceResult(const BMessage* message)
 		alert->Go(NULL);
 	}
 }
-
-
