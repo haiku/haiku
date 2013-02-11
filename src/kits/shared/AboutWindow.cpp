@@ -20,7 +20,10 @@
 #include <Font.h>
 #include <GroupLayoutBuilder.h>
 #include <GroupView.h>
+#include <InterfaceDefs.h>
 #include <LayoutBuilder.h>
+#include <Message.h>
+#include <MessageFilter.h>
 #include <Point.h>
 #include <Roster.h>
 #include <Screen.h>
@@ -40,6 +43,46 @@ using BPrivate::gSystemCatalog;
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "AboutWindow"
+
+
+class EscapeFilter : public BMessageFilter {
+ public:
+							EscapeFilter(BWindow* target)
+								:
+								BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
+								fTarget(target)
+							{
+							}
+	virtual					~EscapeFilter()
+							{
+							}
+	virtual					filter_result
+							Filter(BMessage* message, BHandler** target)
+							{
+								filter_result result = B_DISPATCH_MESSAGE;
+								switch (message->what) {
+									case B_KEY_DOWN:
+									case B_UNMAPPED_KEY_DOWN: {
+										uint32 key;
+										if (message->FindInt32("raw_char",
+												(int32*)&key) >= B_OK) {
+											if (key == B_ESCAPE) {
+												result = B_SKIP_MESSAGE;
+												fTarget->PostMessage(
+													B_QUIT_REQUESTED);
+											}
+										}
+										break;
+									}
+									default:
+										break;
+								}
+
+								return result;
+							}
+ private:
+ 			BWindow*		fTarget;
+};
 
 
 class StripeView : public BView {
@@ -366,6 +409,8 @@ BAboutWindow::BAboutWindow(const char* appName, const char* signature)
 	AddChild(fAboutView);
 
 	MoveTo(AboutPosition(Frame().Width(), Frame().Height()));
+
+	AddCommonFilter(new EscapeFilter(this));
 }
 
 
