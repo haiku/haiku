@@ -395,9 +395,6 @@ TTeamMenuItem::DrawContent()
 		menu->MovePenTo(drawLoc);
 	}
 
-	// set the pen to black so that either method will draw in the same color
-	// low color is set in inherited::DrawContent, override makes sure its
-	// what we want
 	if (fDrawLabel) {
 		menu->SetDrawingMode(B_OP_OVER);
 		menu->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
@@ -512,6 +509,11 @@ TTeamMenuItem::DrawContentLabel()
 			B_HIGHLIGHT_BACKGROUND_TINT));
 	else
 		menu->SetLowColor(menu->LowColor());
+
+	if (IsSelected())
+		menu->SetHighColor(ui_color(B_MENU_SELECTED_ITEM_TEXT_COLOR));
+	else
+		menu->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
 
 	menu->DrawString(label);
 

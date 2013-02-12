@@ -133,7 +133,6 @@ TBarMenuTitle::DrawContent()
 	rgb_color menuColor = menu->LowColor();
 	rgb_color dark = tint_color(menuColor, B_DARKEN_1_TINT);
 	rgb_color light = tint_color(menuColor, B_LIGHTEN_2_TINT);
-	rgb_color black = {0, 0, 0, 255};
 
 	bool inExpandoMode = dynamic_cast<TExpandoMenuBar*>(menu) != NULL;
 
@@ -161,7 +160,10 @@ TBarMenuTitle::DrawContent()
 		frame.InsetBy(1, 1);
 		menu->SetHighColor(menuColor);
 		menu->FillRect(frame);
-		menu->SetHighColor(black);
+		if (IsSelected())
+			menu->SetHighColor(ui_color(B_MENU_SELECTED_ITEM_TEXT_COLOR));
+		else
+			menu->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
 		frame.InsetBy(-1, -1);
 		if (inExpandoMode)
 			frame.top -= 1;
@@ -177,7 +179,10 @@ TBarMenuTitle::DrawContent()
 			menu->StrokeLine(frame.LeftTop(), frame.LeftBottom());
 		}
 
-		menu->SetHighColor(black);
+		if (IsSelected())
+			menu->SetHighColor(ui_color(B_MENU_SELECTED_ITEM_TEXT_COLOR));
+		else
+			menu->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
 	}
 
 	menu->SetDrawingMode(B_OP_ALPHA);
