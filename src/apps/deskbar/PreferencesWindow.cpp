@@ -284,6 +284,18 @@ PreferencesWindow::QuitRequested()
 
 
 void
+PreferencesWindow::Show()
+{
+	if (IsHidden()) {
+		// move to current workspace
+		SetWorkspaces(B_CURRENT_WORKSPACE);
+	}
+
+	BWindow::Show();
+}
+
+
+void
 PreferencesWindow::WindowActivated(bool active)
 {
 	if (!active && IsMinimized())
