@@ -60,25 +60,25 @@ status_t
 CreateParametersPanel::Go(off_t& offset, off_t& size, BString& name,
 	BString& type, BString& parameters)
 {
-	// The object will be deleted in Go(), so we need to get the values before
+	// The object will be deleted in Go(), so we need to get the values via
+	// a BMessage
+
+	BMessage storage;
+	status_t status = AbstractParametersPanel::Go(parameters, storage);
+	if (status != B_OK)
+		return status;
 
 	// Return the value back as bytes.
-	size = fSizeSlider->Size();
-	offset = fSizeSlider->Offset();
+	size = storage.GetInt64("size", 0);
+	offset = storage.GetInt64("offset", 0);
 
 	// get name
-	name.SetTo(fNameTextControl->Text());
+	name.SetTo(storage.GetString("name", NULL));
 
 	// get type
-	if (BMenuItem* item = fTypeMenuField->Menu()->FindMarked()) {
-		const char* _type;
-		BMessage* message = item->Message();
-		if (!message || message->FindString("type", &_type) < B_OK)
-			_type = kPartitionTypeBFS;
-		type << _type;
-	}
+	type.SetTo(storage.GetString("type", NULL));
 
-	return AbstractParametersPanel::Go(parameters);
+	return B_OK;
 }
 
 
@@ -114,6 +114,41 @@ CreateParametersPanel::MessageReceived(BMessage* message)
 }
 
 
+bool
+CreateParametersPanel::NeedsEditor() const
+{
+	return false;
+}
+
+
+status_t
+CreateParametersPanel::ParametersReceived(const BString& parameters,
+	BMessage& storage)
+{
+	// Return the value back as bytes.
+	status_t status = storage.SetInt64("size", fSizeSlider->Size());
+	if (status == B_OK)
+		status = storage.SetInt64("offset", fSizeSlider->Offset());
+
+	// get name
+	if (status == B_OK)
+		status = storage.SetString("name", fNameTextControl->Text());
+
+	// get type
+	if (BMenuItem* item = fTypeMenuField->Menu()->FindMarked()) {
+		const char* type;
+		BMessage* message = item->Message();
+		if (!message || message->FindString("type", &type) != B_OK)
+			type = kPartitionTypeBFS;
+
+		if (status == B_OK)
+			status = storage.SetString("type", type);
+	}
+
+	return status;
+}
+
+
 void
 CreateParametersPanel::AddControls(BLayoutBuilder::Group<>& builder,
 	BView* editorView)
@@ -136,7 +171,8 @@ CreateParametersPanel::AddControls(BLayoutBuilder::Group<>& builder,
 		}
 	}
 
-	builder.Add(editorView);
+	if (editorView != NULL)
+		builder.Add(editorView);
 }
 
 

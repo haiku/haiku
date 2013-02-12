@@ -33,6 +33,9 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 
 protected:
+	virtual bool				NeedsEditor() const;
+	virtual status_t			ParametersReceived(const BString& parameters,
+									BMessage& storage);
 	virtual	void				AddControls(BLayoutBuilder::Group<>& builder,
 									BView* editorView);
 
