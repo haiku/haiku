@@ -98,16 +98,6 @@ PartitionMapAddOn::CanInitialize(const BMutablePartition* partition)
 
 
 status_t
-PartitionMapAddOn::GetInitializationParameterEditor(
-	const BMutablePartition* partition, BPartitionParameterEditor** editor)
-{
-	// Nothing to edit, really.
-	*editor = NULL;
-	return B_OK;
-}
-
-
-status_t
 PartitionMapAddOn::ValidateInitialize(const BMutablePartition* partition,
 	BString* name, const char* parameters)
 {
