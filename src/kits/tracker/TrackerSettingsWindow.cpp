@@ -70,11 +70,11 @@ const uint32 kRevertButtonPressed = 'Rebp';
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "TrackerSettingsWindow"
 
+
 TrackerSettingsWindow::TrackerSettingsWindow()
 	:
 	BWindow(BRect(80, 80, 450, 350), B_TRANSLATE("Tracker preferences"),
 		B_TITLED_WINDOW, B_NOT_MINIMIZABLE | B_NOT_RESIZABLE
-		| B_NO_WORKSPACE_ACTIVATION	| B_NOT_ANCHORED_ON_ACTIVATE
 		| B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
 		| B_AUTO_UPDATE_SIZE_LIMITS)
 {
@@ -184,6 +184,12 @@ TrackerSettingsWindow::Show()
 
 		Unlock();
 	}
+
+	if (IsHidden()) {
+		// move to current workspace
+		SetWorkspaces(B_CURRENT_WORKSPACE);
+	}
+
 	_inherited::Show();
 }
 
