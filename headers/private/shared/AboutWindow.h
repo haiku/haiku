@@ -27,6 +27,7 @@ class BAboutWindow : public BWindow {
 	virtual					~BAboutWindow();
 
 	virtual	bool			QuitRequested();
+	virtual	void			Show();
 
 			BPoint			AboutPosition(float width, float height);
 			void			AddDescription(const char* description);

@@ -434,6 +434,18 @@ BAboutWindow::QuitRequested()
 }
 
 
+void
+BAboutWindow::Show()
+{
+	if (IsHidden()) {
+		// move to current workspace
+		SetWorkspaces(B_CURRENT_WORKSPACE);
+	}
+
+	BWindow::Show();
+}
+
+
 //	#pragma mark - BAboutWindow public methods
 
 
