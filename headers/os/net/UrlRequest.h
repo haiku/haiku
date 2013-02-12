@@ -22,36 +22,34 @@ enum {
 class BUrlRequest {
 public:
 									BUrlRequest(const BUrl& url,
-										BUrlProtocolListener* listener);
-									BUrlRequest(const BUrl& url);
+										BUrlProtocolListener* listener = NULL,
+										BUrlContext* context = NULL);
 									BUrlRequest(const BUrlRequest& other);
-	virtual							~BUrlRequest() { };
+	virtual							~BUrlRequest();
 
 	// Request parameters modification
 			status_t				SetUrl(const BUrl& url);
 			void					SetContext(BUrlContext* context);
 			void					SetProtocolListener(
 										BUrlProtocolListener* listener);
-			bool					SetProtocolOption(int32 option, 
+			bool					SetProtocolOption(int32 option,
 										void* value);
 	// Request parameters access
 			const BUrlProtocol*		Protocol();
 			const BUrlResult&		Result();
 			const BUrl&				Url();
-			
+
 	// Request control
-			status_t				Identify();
-	virtual	status_t				Perform();
-		// TODO: Rename to Run() perhaps? "Perform" is used for FBC stuff.
+	virtual	status_t				Start();
 	virtual status_t				Pause();
 	virtual status_t				Resume();
 	virtual status_t				Abort();
-			
+
 	// Request informations
-	virtual	bool					InitCheck() const;
+	virtual	status_t				InitCheck() const;
 			bool					IsRunning() const;
 			status_t				Status() const;
-			
+
 	// Overloaded members
 			BUrlRequest&			operator=(const BUrlRequest& other);
 
@@ -62,7 +60,10 @@ protected:
 			BUrlResult				fResult;
 			BUrlContext*			fContext;
 			BUrl					fUrl;
-			bool					fReady;
+			status_t				fInitStatus;
+
+private:
+			status_t				_SetupProtocol();
 };
 
 #endif // _B_URL_REQUEST_H_

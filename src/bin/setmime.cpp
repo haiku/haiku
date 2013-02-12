@@ -222,8 +222,11 @@ struct MimeAttribute
 
 				MimeAttribute(BMessage& msg, int32 index);
 				MimeAttribute(TUserArgs& args);
+				MimeAttribute(const MimeAttribute& src);
 
 	status_t	InitCheck() { return fStatus; }
+
+	MimeAttribute& operator=(const MimeAttribute& src);
 
 	void		Dump();
 	void		SyncWith(TUserArgs& args) throw(Error);
@@ -288,9 +291,40 @@ MimeAttribute::MimeAttribute(BMessage& msg, int32 index)
 
 
 MimeAttribute::MimeAttribute(TUserArgs& args)
+		:
+		fStatus(B_NO_INIT),
+		fType('CSTR'),
+		fViewable(true),
+		fEditable(false),
+		fExtra(false),
+		fWidth(0),
+		fAlignment(0)
 {
 	SyncWith(args);
 	fStatus = B_OK;
+}
+
+
+MimeAttribute::MimeAttribute(const MimeAttribute& src)
+{
+	*this = src;
+}
+
+
+MimeAttribute&
+MimeAttribute::operator=(const MimeAttribute& src)
+{
+	fStatus = src.fStatus;
+	fName = src.fName;
+	fPublicName = src.fPublicName;
+	fType = src.fType;
+	fViewable = src.fViewable;
+	fEditable = src.fEditable;
+	fExtra = src.fExtra;
+	fWidth = src.fWidth;
+	fAlignment = src.fAlignment;
+
+	return *this;
 }
 
 
@@ -609,7 +643,7 @@ MimeType::_Init(char** argv) throw (Error)
 						throw Error("'%s' allowed only after the '%s' <name>",
 								name, kAttribute);
 
-					if (!*++arg)
+					if (!*++arg || **arg == '-')
 						throw Error("'%s', argument should be specified", name);
 
 					TUserArgsI A = fUserAttributes.back().find(key);

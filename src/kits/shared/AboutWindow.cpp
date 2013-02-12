@@ -20,7 +20,10 @@
 #include <Font.h>
 #include <GroupLayoutBuilder.h>
 #include <GroupView.h>
+#include <InterfaceDefs.h>
 #include <LayoutBuilder.h>
+#include <Message.h>
+#include <MessageFilter.h>
 #include <Point.h>
 #include <Roster.h>
 #include <Screen.h>
@@ -42,12 +45,55 @@ using BPrivate::gSystemCatalog;
 #define B_TRANSLATION_CONTEXT "AboutWindow"
 
 
+class EscapeFilter : public BMessageFilter {
+ public:
+							EscapeFilter(BWindow* target)
+								:
+								BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
+								fTarget(target)
+							{
+							}
+	virtual					~EscapeFilter()
+							{
+							}
+	virtual					filter_result
+							Filter(BMessage* message, BHandler** target)
+							{
+								filter_result result = B_DISPATCH_MESSAGE;
+								switch (message->what) {
+									case B_KEY_DOWN:
+									case B_UNMAPPED_KEY_DOWN: {
+										uint32 key;
+										if (message->FindInt32("raw_char",
+												(int32*)&key) >= B_OK) {
+											if (key == B_ESCAPE) {
+												result = B_SKIP_MESSAGE;
+												fTarget->PostMessage(
+													B_QUIT_REQUESTED);
+											}
+										}
+										break;
+									}
+									default:
+										break;
+								}
+
+								return result;
+							}
+ private:
+ 			BWindow*		fTarget;
+};
+
+
 class StripeView : public BView {
  public:
 							StripeView(BBitmap* icon);
 	virtual					~StripeView();
 
 	virtual	void			Draw(BRect updateRect);
+
+			BBitmap*		Icon() const { return fIcon; };
+			void			SetIcon(BBitmap* icon);
 
  private:
 			BBitmap*		fIcon;
@@ -62,14 +108,24 @@ class AboutView : public BGroupView {
 
 			BTextView*		InfoView() const { return fInfoView; };
 
+			BBitmap*		Icon();
+			status_t		SetIcon(BBitmap* icon);
+
+			const char*		Name();
+			status_t		SetName(const char* name);
+
+			const char*		Version();
+			status_t		SetVersion(const char* version);
+
  protected:
-			const char*		AppVersion(const char* signature);
-			BBitmap*		AppIcon(const char* signature);
+			const char*		_GetVersionFromSignature(const char* signature);
+			BBitmap*		_GetIconFromSignature(const char* signature);
 
  private:
 			BStringView*	fNameView;
 			BStringView*	fVersionView;
 			BTextView*		fInfoView;
+			StripeView*		fStripeView;
 };
 
 
@@ -81,13 +137,14 @@ StripeView::StripeView(BBitmap* icon)
 	BView("StripeView", B_WILL_DRAW),
 	fIcon(icon)
 {
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
 	float width = 0.0f;
 	if (icon != NULL)
 		width += icon->Bounds().Width() + 32.0f;
 
 	SetExplicitMinSize(BSize(width, B_SIZE_UNSET));
 	SetExplicitPreferredSize(BSize(width, B_SIZE_UNLIMITED));
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
 
@@ -116,7 +173,24 @@ StripeView::Draw(BRect updateRect)
 }
 
 
-//	#pragma mark -
+void
+StripeView::SetIcon(BBitmap* icon)
+{
+	if (fIcon != NULL)
+		delete fIcon;
+
+	fIcon = icon;
+
+	float width = 0.0f;
+	if (icon != NULL)
+		width += icon->Bounds().Width() + 32.0f;
+
+	SetExplicitMinSize(BSize(width, B_SIZE_UNSET));
+	SetExplicitPreferredSize(BSize(width, B_SIZE_UNLIMITED));
+};
+
+
+//	#pragma mark - AboutView
 
 
 AboutView::AboutView(const char* appName, const char* signature)
@@ -131,7 +205,8 @@ AboutView::AboutView(const char* appName, const char* signature)
 	fNameView->SetFont(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE
 		| B_FONT_FLAGS);
 
-	fVersionView = new BStringView("version", AppVersion(signature));
+	fVersionView = new BStringView("version",
+		_GetVersionFromSignature(signature));
 
 	fInfoView = new BTextView("info", B_WILL_DRAW);
 	fInfoView->SetExplicitMinSize(BSize(210.0, 160.0));
@@ -145,10 +220,12 @@ AboutView::AboutView(const char* appName, const char* signature)
 		"infoViewScroller", fInfoView, B_WILL_DRAW | B_FRAME_EVENTS,
 		false, true, B_PLAIN_BORDER);
 
+	fStripeView = new StripeView(_GetIconFromSignature(signature));
+
 	GroupLayout()->SetSpacing(0);
 	BLayoutBuilder::Group<>(this)
 		.AddGroup(B_HORIZONTAL, 0)
-			.Add(new StripeView(AppIcon(signature)))
+			.Add(fStripeView)
 			.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
 				.SetInsets(0, B_USE_DEFAULT_SPACING,
 					B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
@@ -166,8 +243,11 @@ AboutView::~AboutView()
 }
 
 
+//	#pragma mark - AboutView protected methods
+
+
 const char*
-AboutView::AppVersion(const char* signature)
+AboutView::_GetVersionFromSignature(const char* signature)
 {
 	if (signature == NULL)
 		return NULL;
@@ -228,7 +308,7 @@ AboutView::AppVersion(const char* signature)
 
 
 BBitmap*
-AboutView::AppIcon(const char* signature)
+AboutView::_GetIconFromSignature(const char* signature)
 {
 	if (signature == NULL)
 		return NULL;
@@ -251,7 +331,64 @@ AboutView::AppIcon(const char* signature)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - AboutView public methods
+
+
+const char*
+AboutView::Name()
+{
+	return fNameView->Text();
+}
+
+
+status_t
+AboutView::SetName(const char* name)
+{
+	fNameView->SetText(name);
+
+	return B_OK;
+}
+
+
+const char*
+AboutView::Version()
+{
+	return fVersionView->Text();
+}
+
+
+status_t
+AboutView::SetVersion(const char* version)
+{
+	fVersionView->SetText(version);
+
+	return B_OK;
+}
+
+
+BBitmap*
+AboutView::Icon()
+{
+	if (fStripeView == NULL)
+		return NULL;
+
+	return fStripeView->Icon();
+}
+
+
+status_t
+AboutView::SetIcon(BBitmap* icon)
+{
+	if (fStripeView == NULL)
+		return B_NO_INIT;
+
+	fStripeView->SetIcon(icon);
+
+	return B_OK;
+}
+
+
+//	#pragma mark - BAboutWindow
 
 
 BAboutWindow::BAboutWindow(const char* appName, const char* signature)
@@ -272,6 +409,8 @@ BAboutWindow::BAboutWindow(const char* appName, const char* signature)
 	AddChild(fAboutView);
 
 	MoveTo(AboutPosition(Frame().Width(), Frame().Height()));
+
+	AddCommonFilter(new EscapeFilter(this));
 }
 
 
@@ -283,6 +422,9 @@ BAboutWindow::~BAboutWindow()
 }
 
 
+//	#pragma mark - BAboutWindow virtual methods
+
+
 bool
 BAboutWindow::QuitRequested()
 {
@@ -292,7 +434,19 @@ BAboutWindow::QuitRequested()
 }
 
 
-//	#pragma mark -
+void
+BAboutWindow::Show()
+{
+	if (IsHidden()) {
+		// move to current workspace
+		SetWorkspaces(B_CURRENT_WORKSPACE);
+	}
+
+	BWindow::Show();
+}
+
+
+//	#pragma mark - BAboutWindow public methods
 
 
 BPoint
@@ -462,4 +616,46 @@ BAboutWindow::AddExtraInfo(const char* extraInfo)
 	extra << appExtraInfo;
 
 	fAboutView->InfoView()->Insert(extra.String());
+}
+
+
+const char*
+BAboutWindow::Name()
+{
+	return fAboutView->Name();
+}
+
+
+void
+BAboutWindow::SetName(const char* name)
+{
+	fAboutView->SetName(name);
+}
+
+
+const char*
+BAboutWindow::Version()
+{
+	return fAboutView->Version();
+}
+
+
+void
+BAboutWindow::SetVersion(const char* version)
+{
+	fAboutView->SetVersion(version);
+}
+
+
+BBitmap*
+BAboutWindow::Icon()
+{
+	return fAboutView->Icon();
+}
+
+
+void
+BAboutWindow::SetIcon(BBitmap* icon)
+{
+	fAboutView->SetIcon(icon);
 }

@@ -35,6 +35,7 @@ public:
 
 	virtual	void			MessageReceived(BMessage* message);
 	virtual	bool			QuitRequested();
+	virtual	void			Show();
 	virtual	void			WindowActivated(bool active);
 
 			void			UpdateRecentCounts();
