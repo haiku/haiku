@@ -40,6 +40,7 @@
 
 #include <tracker_private.h>
 
+#include "ChangeParametersPanel.h"
 #include "CreateParametersPanel.h"
 #include "DiskView.h"
 #include "InitParametersPanel.h"
@@ -49,6 +50,23 @@
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "MainWindow"
+
+
+enum {
+	MSG_MOUNT_ALL				= 'mnta',
+	MSG_MOUNT					= 'mnts',
+	MSG_UNMOUNT					= 'unmt',
+	MSG_FORMAT					= 'frmt',
+	MSG_CREATE					= 'crtp',
+	MSG_CHANGE					= 'chgp',
+	MSG_INITIALIZE				= 'init',
+	MSG_DELETE					= 'delt',
+	MSG_EJECT					= 'ejct',
+	MSG_SURFACE_TEST			= 'sfct',
+	MSG_RESCAN					= 'rscn',
+
+	MSG_PARTITION_ROW_SELECTED	= 'prsl',
+};
 
 
 class ListPopulatorVisitor : public BDiskDeviceVisitor {
@@ -96,8 +114,8 @@ private:
 
 		// add any available space on it
 		BPartitioningInfo info;
-		status_t ret = partition->GetPartitioningInfo(&info);
-		if (ret >= B_OK) {
+		status_t status = partition->GetPartitioningInfo(&info);
+		if (status >= B_OK) {
 			partition_id parentID = partition->ID();
 			off_t offset;
 			off_t size;
@@ -162,32 +180,16 @@ public:
 	}
 	status_t CommitModifications()
 	{
-		status_t ret = fDisk->CommitModifications();
-		if (ret == B_OK)
+		status_t status = fDisk->CommitModifications();
+		if (status == B_OK)
 			fModificationStatus = B_ERROR;
 
-		return ret;
+		return status;
 	}
 
 private:
 	BDiskDevice*	fDisk;
 	status_t		fModificationStatus;
-};
-
-
-enum {
-	MSG_MOUNT_ALL				= 'mnta',
-	MSG_MOUNT					= 'mnts',
-	MSG_UNMOUNT					= 'unmt',
-	MSG_FORMAT					= 'frmt',
-	MSG_CREATE					= 'crtp',
-	MSG_INITIALIZE				= 'init',
-	MSG_DELETE					= 'delt',
-	MSG_EJECT					= 'ejct',
-	MSG_SURFACE_TEST			= 'sfct',
-	MSG_RESCAN					= 'rscn',
-
-	MSG_PARTITION_ROW_SELECTED	= 'prsl',
 };
 
 
@@ -217,6 +219,9 @@ MainWindow::MainWindow()
 
 	fCreateMenuItem = new BMenuItem(B_TRANSLATE("Create" B_UTF8_ELLIPSIS),
 		new BMessage(MSG_CREATE), 'C');
+	fChangeMenuItem = new BMenuItem(
+		B_TRANSLATE("Change parameters" B_UTF8_ELLIPSIS),
+		new BMessage(MSG_CHANGE));
 	fDeleteMenuItem = new BMenuItem(B_TRANSLATE("Delete"),
 		new BMessage(MSG_DELETE), 'D');
 
@@ -249,6 +254,7 @@ MainWindow::MainWindow()
 	fFormatMenu = new BMenu(B_TRANSLATE("Format"));
 	fPartitionMenu->AddItem(fFormatMenu);
 
+	fPartitionMenu->AddItem(fChangeMenuItem);
 	fPartitionMenu->AddItem(fDeleteMenuItem);
 
 	fPartitionMenu->AddSeparatorItem();
@@ -284,10 +290,10 @@ MainWindow::MainWindow()
 	fListView->SetTarget(this);
 	fListView->MakeFocus(true);
 
-	status_t ret = fDDRoster.StartWatching(BMessenger(this));
-	if (ret != B_OK) {
+	status_t status = fDiskDeviceRoster.StartWatching(BMessenger(this));
+	if (status != B_OK) {
 		fprintf(stderr, "Failed to start watching for device changes: %s\n",
-			strerror(ret));
+			strerror(status));
 	}
 
 	// visit all disks in the system and show their contents
@@ -323,10 +329,9 @@ MainWindow::MessageReceived(BMessage* message)
 			printf("MSG_FORMAT\n");
 			break;
 
-		case MSG_CREATE: {
+		case MSG_CREATE:
 			_Create(fCurrentDisk, fCurrentPartitionID);
 			break;
-		}
 
 		case MSG_INITIALIZE: {
 			BString diskSystemName;
@@ -335,6 +340,10 @@ MainWindow::MessageReceived(BMessage* message)
 			_Initialize(fCurrentDisk, fCurrentPartitionID, diskSystemName);
 			break;
 		}
+
+		case MSG_CHANGE:
+			_ChangeParameters(fCurrentDisk, fCurrentPartitionID);
+			break;
 
 		case MSG_DELETE:
 			_Delete(fCurrentDisk, fCurrentPartitionID);
@@ -476,7 +485,7 @@ MainWindow::_ScanDrives()
 	fSpaceIDMap.Clear();
 	int32 diskCount = 0;
 	ListPopulatorVisitor driveVisitor(fListView, diskCount, fSpaceIDMap);
-	fDDRoster.VisitEachPartition(&driveVisitor);
+	fDiskDeviceRoster.VisitEachPartition(&driveVisitor);
 	fDiskView->SetDiskCount(diskCount);
 
 	// restore selection
@@ -541,9 +550,9 @@ MainWindow::_SetToDiskAndPartition(partition_id disk, partition_id partition,
 		fCurrentDisk = NULL;
 		if (disk >= 0) {
 			BDiskDevice* newDisk = new BDiskDevice();
-			status_t ret = newDisk->SetTo(disk);
-			if (ret < B_OK) {
-				printf("error switching disks: %s\n", strerror(ret));
+			status_t status = newDisk->SetTo(disk);
+			if (status != B_OK) {
+				printf("error switching disks: %s\n", strerror(status));
 				delete newDisk;
 			} else
 				fCurrentDisk = newDisk;
@@ -597,12 +606,13 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 		bool prepared = disk->PrepareModifications() == B_OK;
 		fFormatMenu->SetEnabled(prepared);
 		fDeleteMenuItem->SetEnabled(prepared);
+		fChangeMenuItem->SetEnabled(prepared);
 
 		BPartition* partition = disk->FindDescendant(selectedPartition);
 
 		BDiskSystem diskSystem;
-		fDDRoster.RewindDiskSystems();
-		while (fDDRoster.GetNextDiskSystem(&diskSystem) == B_OK) {
+		fDiskDeviceRoster.RewindDiskSystems();
+		while (fDiskDeviceRoster.GetNextDiskSystem(&diskSystem) == B_OK) {
 			if (!diskSystem.SupportsInitializing())
 				continue;
 
@@ -630,18 +640,20 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 
 		// Mount items
 		if (partition != NULL) {
-			fFormatMenu->SetEnabled(!partition->IsMounted()
+			bool notMountedAndWritable = !partition->IsMounted()
 				&& !partition->IsReadOnly()
-				&& partition->Device()->HasMedia()
+				&& partition->Device()->HasMedia();
+
+			fFormatMenu->SetEnabled(notMountedAndWritable
 				&& fFormatMenu->CountItems() > 0);
 
-			fDiskInitMenu->SetEnabled(!partition->IsMounted()
-				&& !partition->IsReadOnly()
-				&& partition->Device()->HasMedia()
+			fDiskInitMenu->SetEnabled(notMountedAndWritable
 				&& partition->IsDevice()
 				&& fDiskInitMenu->CountItems() > 0);
 
-			fDeleteMenuItem->SetEnabled(!partition->IsMounted()
+			fChangeMenuItem->SetEnabled(notMountedAndWritable);
+
+			fDeleteMenuItem->SetEnabled(notMountedAndWritable
 				&& !partition->IsDevice());
 
 			fMountMenuItem->SetEnabled(!partition->IsMounted());
@@ -660,6 +672,7 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 			fUnmountMenuItem->SetEnabled(unMountable);
 		} else {
 			fDeleteMenuItem->SetEnabled(false);
+			fChangeMenuItem->SetEnabled(false);
 			fMountMenuItem->SetEnabled(false);
 			fFormatMenu->SetEnabled(false);
 			fDiskInitMenu->SetEnabled(false);
@@ -672,6 +685,7 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 	}
 	if (selectedPartition < 0) {
 		fDeleteMenuItem->SetEnabled(false);
+		fChangeMenuItem->SetEnabled(false);
 		fMountMenuItem->SetEnabled(false);
 	}
 }
@@ -727,10 +741,10 @@ MainWindow::_Mount(BDiskDevice* disk, partition_id selectedPartition)
 	}
 
 	if (!partition->IsMounted()) {
-		status_t ret = partition->Mount();
-		if (ret < B_OK) {
-			_DisplayPartitionError(
-				B_TRANSLATE("Could not mount partition %s."), partition, ret);
+		status_t status = partition->Mount();
+		if (status != B_OK) {
+			_DisplayPartitionError(B_TRANSLATE("Could not mount partition %s."),
+				partition, status);
 		} else {
 			// successful mount, adapt to the changes
 			_ScanDrives();
@@ -761,11 +775,11 @@ MainWindow::_Unmount(BDiskDevice* disk, partition_id selectedPartition)
 	if (partition->IsMounted()) {
 		BPath path;
 		partition->GetMountPoint(&path);
-		status_t ret = partition->Unmount();
-		if (ret < B_OK) {
+		status_t status = partition->Unmount();
+		if (status != B_OK) {
 			_DisplayPartitionError(
 				B_TRANSLATE("Could not unmount partition %s."),
-				partition, ret);
+				partition, status);
 		} else {
 			if (dev_for_path(path.Path()) == dev_for_path("/"))
 				rmdir(path.Path());
@@ -784,7 +798,7 @@ void
 MainWindow::_MountAll()
 {
 	MountAllVisitor visitor;
-	fDDRoster.VisitEachPartition(&visitor);
+	fDiskDeviceRoster.VisitEachPartition(&visitor);
 }
 
 
@@ -821,9 +835,9 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	}
 
 	BDiskSystem diskSystem;
-	fDDRoster.RewindDiskSystems();
+	fDiskDeviceRoster.RewindDiskSystems();
 	bool found = false;
-	while (fDDRoster.GetNextDiskSystem(&diskSystem) == B_OK) {
+	while (fDiskDeviceRoster.GetNextDiskSystem(&diskSystem) == B_OK) {
 		if (diskSystem.SupportsInitializing()) {
 			if (diskSystemName == diskSystem.PrettyName()) {
 				found = true;
@@ -874,10 +888,10 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 		return;
 
 	ModificationPreparer modificationPreparer(disk);
-	status_t ret = modificationPreparer.ModificationStatus();
-	if (ret != B_OK) {
+	status_t status = modificationPreparer.ModificationStatus();
+	if (status != B_OK) {
 		_DisplayPartitionError(B_TRANSLATE("There was an error preparing the "
-			"disk for modifications."), NULL, ret);
+			"disk for modifications."), NULL, status);
 		return;
 	}
 
@@ -890,21 +904,22 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 
 	bool supportsName = diskSystem.SupportsContentName();
 	BString validatedName(name);
-	ret = partition->ValidateInitialize(diskSystem.PrettyName(),
+	status = partition->ValidateInitialize(diskSystem.PrettyName(),
 		supportsName ? &validatedName : NULL, parameters.String());
-	if (ret != B_OK) {
+	if (status != B_OK) {
 		_DisplayPartitionError(B_TRANSLATE("Validation of the given "
-			"initialization parameters failed."), partition, ret);
+			"initialization parameters failed."), partition, status);
 		return;
 	}
 
 	BString previousName = partition->ContentName();
 
-	ret = partition->Initialize(diskSystem.PrettyName(),
+	status = partition->Initialize(diskSystem.PrettyName(),
 		supportsName ? validatedName.String() : NULL, parameters.String());
-	if (ret != B_OK) {
+	if (status != B_OK) {
 		_DisplayPartitionError(B_TRANSLATE("Initialization of the partition "
-			"%s failed. (Nothing has been written to disk.)"), partition, ret);
+			"%s failed. (Nothing has been written to disk.)"), partition,
+			status);
 		return;
 	}
 
@@ -947,13 +962,13 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 		return;
 
 	// commit
-	ret = modificationPreparer.CommitModifications();
+	status = modificationPreparer.CommitModifications();
 
 	// The partition pointer is toast now! Use the partition ID to
 	// retrieve it again.
 	partition = disk->FindDescendant(selectedPartition);
 
-	if (ret == B_OK) {
+	if (status == B_OK) {
 		if (diskSystem.IsFileSystem()) {
 			_DisplayPartitionError(B_TRANSLATE("The partition %s has been "
 				"successfully formatted.\n"), partition);
@@ -964,10 +979,10 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	} else {
 		if (diskSystem.IsFileSystem()) {
 			_DisplayPartitionError(B_TRANSLATE("Failed to format the "
-				"partition %s!\n"), partition, ret);
+				"partition %s!\n"), partition, status);
 		} else {
 			_DisplayPartitionError(B_TRANSLATE("Failed to initialize the "
-				"disk %s!\n"), partition, ret);
+				"disk %s!\n"), partition, status);
 		}
 	}
 
@@ -1011,10 +1026,10 @@ MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition)
 	}
 
 	ModificationPreparer modificationPreparer(disk);
-	status_t ret = modificationPreparer.ModificationStatus();
-	if (ret != B_OK) {
+	status_t status = modificationPreparer.ModificationStatus();
+	if (status != B_OK) {
 		_DisplayPartitionError(B_TRANSLATE("There was an error preparing the "
-			"disk for modifications."), NULL, ret);
+			"disk for modifications."), NULL, status);
 		return;
 	}
 
@@ -1040,15 +1055,21 @@ MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition)
 
 	CreateParametersPanel* panel = new CreateParametersPanel(this, parent,
 		offset, size);
-	if (panel->Go(offset, size, name, type, parameters) != B_OK)
+	status = panel->Go(offset, size, name, type, parameters);
+	if (status != B_OK) {
+		if (status != B_CANCELED) {
+			_DisplayPartitionError(B_TRANSLATE("The panel could not return "
+				"successfully."), NULL, status);
+		}
 		return;
+	}
 
-	ret = parent->ValidateCreateChild(&offset, &size, type.String(),
+	status = parent->ValidateCreateChild(&offset, &size, type.String(),
 		&name, parameters.String());
 
-	if (ret != B_OK) {
+	if (status != B_OK) {
 		_DisplayPartitionError(B_TRANSLATE("Validation of the given creation "
-			"parameters failed."));
+			"parameters failed."), NULL, status);
 		return;
 	}
 
@@ -1064,27 +1085,27 @@ MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition)
 	if (choice == 1)
 		return;
 
-	ret = parent->CreateChild(offset, size, type.String(),
-		name.String(), parameters.String());
+	status = parent->CreateChild(offset, size, type.String(), name.String(),
+		parameters.String());
 
-	if (ret != B_OK) {
+	if (status != B_OK) {
 		_DisplayPartitionError(B_TRANSLATE("Creation of the partition has "
-			"failed."), NULL, ret);
+			"failed."), NULL, status);
 		return;
 	}
 
 	// commit
-	ret = modificationPreparer.CommitModifications();
+	status = modificationPreparer.CommitModifications();
 
-	if (ret != B_OK) {
+	if (status != B_OK) {
 		_DisplayPartitionError(B_TRANSLATE("Failed to format the "
-			"partition. No changes have been written to disk."), NULL, ret);
+			"partition. No changes have been written to disk."), NULL, status);
 		return;
 	}
 
 	// The disk layout has changed, update disk information
 	bool updated;
-	ret = disk->Update(&updated);
+	status = disk->Update(&updated);
 
 	_ScanDrives();
 	fDiskView->ForceUpdate();
@@ -1120,10 +1141,10 @@ MainWindow::_Delete(BDiskDevice* disk, partition_id selectedPartition)
 	}
 
 	ModificationPreparer modificationPreparer(disk);
-	status_t ret = modificationPreparer.ModificationStatus();
-	if (ret != B_OK) {
+	status_t status = modificationPreparer.ModificationStatus();
+	if (status != B_OK) {
 		_DisplayPartitionError(B_TRANSLATE("There was an error preparing the "
-			"disk for modifications."), NULL, ret);
+			"disk for modifications."), NULL, status);
 		return;
 	}
 
@@ -1145,18 +1166,112 @@ MainWindow::_Delete(BDiskDevice* disk, partition_id selectedPartition)
 	if (choice == 1)
 		return;
 
-	ret = parent->DeleteChild(partition->Index());
-	if (ret != B_OK) {
-		_DisplayPartitionError(
-			B_TRANSLATE("Could not delete the selected partition."), NULL, ret);
+	status = parent->DeleteChild(partition->Index());
+	if (status != B_OK) {
+		_DisplayPartitionError(B_TRANSLATE("Could not delete the selected "
+			"partition."), NULL, status);
 		return;
 	}
 
-	ret = modificationPreparer.CommitModifications();
+	status = modificationPreparer.CommitModifications();
 
-	if (ret != B_OK) {
+	if (status != B_OK) {
 		_DisplayPartitionError(B_TRANSLATE("Failed to delete the partition. "
-			"No changes have been written to disk."), NULL, ret);
+			"No changes have been written to disk."), NULL, status);
+		return;
+	}
+
+	_ScanDrives();
+	fDiskView->ForceUpdate();
+}
+
+
+void
+MainWindow::_ChangeParameters(BDiskDevice* disk, partition_id selectedPartition)
+{
+	if (disk == NULL || selectedPartition < 0) {
+		_DisplayPartitionError(B_TRANSLATE("You need to select a partition "
+			"entry from the list."));
+		return;
+	}
+
+	if (disk->IsReadOnly()) {
+		_DisplayPartitionError(B_TRANSLATE("The selected disk is read-only."));
+		return;
+	}
+
+	BPartition* partition = disk->FindDescendant(selectedPartition);
+	if (partition == NULL) {
+		_DisplayPartitionError(B_TRANSLATE("Unable to find the selected "
+			"partition by ID."));
+		return;
+	}
+
+	ModificationPreparer modificationPreparer(disk);
+	status_t status = modificationPreparer.ModificationStatus();
+	if (status != B_OK) {
+		_DisplayPartitionError(B_TRANSLATE("There was an error preparing the "
+			"disk for modifications."), NULL, status);
+		return;
+	}
+
+	ChangeParametersPanel* panel = new ChangeParametersPanel(this, partition);
+
+	BString name, type, parameters;
+	status = panel->Go(name, type, parameters);
+	if (status != B_OK) {
+		if (status != B_CANCELED) {
+			_DisplayPartitionError(B_TRANSLATE("The panel experienced a "
+				"problem!"), NULL, status);
+		}
+		// TODO: disk systems without an editor and support for name/type
+		// changing will return B_CANCELED here -- we need to check this
+		// before, and disable the menu entry instead
+		return;
+	}
+
+	if (partition->CanSetType())
+		status = partition->ValidateSetType(type.String());
+	if (status == B_OK && partition->CanSetName())
+		status = partition->ValidateSetName(&name);
+	if (status != B_OK) {
+		_DisplayPartitionError(B_TRANSLATE("Validation of the given parameters "
+			"failed."));
+		return;
+	}
+
+	// Warn the user one more time...
+	BAlert* alert = new BAlert("final notice", B_TRANSLATE("Are you sure you "
+		"want to change parameters of the selected partition?\n\n"
+		"The partition may no longer be recognized by other operating systems "
+		"anymore!"), B_TRANSLATE("Change parameters"), B_TRANSLATE("Cancel"),
+		NULL, B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
+	alert->SetShortcut(1, B_ESCAPE);
+	int32 choice = alert->Go();
+
+	if (choice == 1)
+		return;
+
+	if (partition->CanSetType())
+		status = partition->SetType(type.String());
+	if (status == B_OK && partition->CanSetName())
+		status = partition->SetName(name.String());
+	if (status == B_OK && partition->CanEditParameters())
+		status = partition->SetParameters(parameters.String());
+
+	if (status != B_OK) {
+		_DisplayPartitionError(
+			B_TRANSLATE("Could not change the parameters of the selected "
+				"partition."), NULL, status);
+		return;
+	}
+
+	status = modificationPreparer.CommitModifications();
+
+	if (status != B_OK) {
+		_DisplayPartitionError(B_TRANSLATE("Failed to change the parameters "
+			"of the partition. No changes have been written to disk."), NULL,
+			status);
 		return;
 	}
 

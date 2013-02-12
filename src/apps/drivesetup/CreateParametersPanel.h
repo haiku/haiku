@@ -11,16 +11,13 @@
 #define CREATE_PARAMS_PANEL_H
 
 
-#include "AbstractParametersPanel.h"
+#include "ChangeParametersPanel.h"
 
 
-class BMenuField;
-class BPopUpMenu;
-class BTextControl;
 class SizeSlider;
 
 
-class CreateParametersPanel : public AbstractParametersPanel {
+class CreateParametersPanel : public ChangeParametersPanel {
 public:
 								CreateParametersPanel(BWindow* window,
 									BPartition* parent, off_t offset,
@@ -40,19 +37,14 @@ protected:
 									BView* editorView);
 
 private:
-			void 				_CreateViewControls(BPartition* parent,
+			void 				_CreateCreateControls(BPartition* parent,
 									off_t offset, off_t size);
 
 			void				_UpdateSizeTextControl();
 
 private:
-			BPopUpMenu*			fTypePopUpMenu;
-			BMenuField*			fTypeMenuField;
-			BTextControl*		fNameTextControl;
 			SizeSlider*			fSizeSlider;
 			BTextControl*		fSizeTextControl;
-			bool				fSupportsName;
-			bool				fSupportsType;
 };
 
 

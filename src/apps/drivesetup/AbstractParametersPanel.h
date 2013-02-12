@@ -40,6 +40,7 @@ protected:
 			status_t			Go(BString& parameters, BMessage& storage);
 
 	virtual bool				NeedsEditor() const;
+	virtual bool				ValidWithoutEditor() const;
 	virtual status_t			ParametersReceived(const BString& parameters,
 									BMessage& storage);
 	virtual	void				AddControls(BLayoutBuilder::Group<>& builder,

@@ -43,9 +43,9 @@ static const uint32 kMegaByte = 0x100000;
 CreateParametersPanel::CreateParametersPanel(BWindow* window,
 	BPartition* partition, off_t offset, off_t size)
 	:
-	AbstractParametersPanel(window)
+	ChangeParametersPanel(window)
 {
-	_CreateViewControls(partition, offset, size);
+	_CreateCreateControls(partition, offset, size);
 
 	Init(B_CREATE_PARAMETER_EDITOR, "", partition);
 }
@@ -64,19 +64,14 @@ CreateParametersPanel::Go(off_t& offset, off_t& size, BString& name,
 	// a BMessage
 
 	BMessage storage;
-	status_t status = AbstractParametersPanel::Go(parameters, storage);
+	status_t status = ChangeParametersPanel::Go(name, type, parameters,
+		storage);
 	if (status != B_OK)
 		return status;
 
 	// Return the value back as bytes.
 	size = storage.GetInt64("size", 0);
 	offset = storage.GetInt64("offset", 0);
-
-	// get name
-	name.SetTo(storage.GetString("name", NULL));
-
-	// get type
-	type.SetTo(storage.GetString("type", NULL));
 
 	return B_OK;
 }
@@ -86,14 +81,6 @@ void
 CreateParametersPanel::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case MSG_PARTITION_TYPE:
-			if (fEditor != NULL) {
-				const char* type;
-				if (message->FindString("type", &type) == B_OK)
-					fEditor->ParameterChanged("type", BVariant(type));
-			}
-			break;
-
 		case MSG_SIZE_SLIDER:
 			_UpdateSizeTextControl();
 			break;
@@ -109,7 +96,7 @@ CreateParametersPanel::MessageReceived(BMessage* message)
 		}
 
 		default:
-			AbstractParametersPanel::MessageReceived(message);
+			ChangeParametersPanel::MessageReceived(message);
 	}
 }
 
@@ -130,22 +117,10 @@ CreateParametersPanel::ParametersReceived(const BString& parameters,
 	if (status == B_OK)
 		status = storage.SetInt64("offset", fSizeSlider->Offset());
 
-	// get name
-	if (status == B_OK)
-		status = storage.SetString("name", fNameTextControl->Text());
+	if (status != B_OK)
+		return status;
 
-	// get type
-	if (BMenuItem* item = fTypeMenuField->Menu()->FindMarked()) {
-		const char* type;
-		BMessage* message = item->Message();
-		if (!message || message->FindString("type", &type) != B_OK)
-			type = kPartitionTypeBFS;
-
-		if (status == B_OK)
-			status = storage.SetString("type", type);
-	}
-
-	return status;
+	return ChangeParametersPanel::ParametersReceived(parameters, storage);
 }
 
 
@@ -157,27 +132,12 @@ CreateParametersPanel::AddControls(BLayoutBuilder::Group<>& builder,
 		.Add(fSizeSlider)
 		.Add(fSizeTextControl);
 
-	if (fSupportsName || fSupportsType) {
-		BLayoutBuilder::Group<>::GridBuilder gridBuilder
-			= builder.AddGrid(0.0, B_USE_DEFAULT_SPACING);
-
-		if (fSupportsName) {
-			gridBuilder.Add(fNameTextControl->CreateLabelLayoutItem(), 0, 0)
-				.Add(fNameTextControl->CreateTextViewLayoutItem(), 1, 0);
-		}
-		if (fSupportsType) {
-			gridBuilder.Add(fTypeMenuField->CreateLabelLayoutItem(), 0, 1)
-				.Add(fTypeMenuField->CreateMenuBarLayoutItem(), 1, 1);
-		}
-	}
-
-	if (editorView != NULL)
-		builder.Add(editorView);
+	ChangeParametersPanel::AddControls(builder, editorView);
 }
 
 
 void
-CreateParametersPanel::_CreateViewControls(BPartition* parent, off_t offset,
+CreateParametersPanel::_CreateCreateControls(BPartition* parent, off_t offset,
 	off_t size)
 {
 	// Setup the controls
@@ -197,27 +157,7 @@ CreateParametersPanel::_CreateViewControls(BPartition* parent, off_t offset,
 	fSizeTextControl->SetModificationMessage(
 		new BMessage(MSG_SIZE_TEXTCONTROL));
 
-	fNameTextControl = new BTextControl("Name Control",
-		B_TRANSLATE("Partition name:"),	"", NULL);
-	fSupportsName = parent->SupportsChildName();
-
-	fTypePopUpMenu = new BPopUpMenu("Partition Type");
-
-	int32 cookie = 0;
-	BString supportedType;
-	while (parent->GetNextSupportedChildType(&cookie, &supportedType) == B_OK) {
-		BMessage* message = new BMessage(MSG_PARTITION_TYPE);
-		message->AddString("type", supportedType);
-		BMenuItem* item = new BMenuItem(supportedType, message);
-		fTypePopUpMenu->AddItem(item);
-
-		if (strcmp(supportedType, kPartitionTypeBFS) == 0)
-			item->SetMarked(true);
-	}
-
-	fTypeMenuField = new BMenuField(B_TRANSLATE("Partition type:"),
-		fTypePopUpMenu);
-	fSupportsType = fTypePopUpMenu->CountItems() != 0;
+	CreateChangeControls(parent);
 
 	fOkButton->SetLabel(B_TRANSLATE("Create"));
 }

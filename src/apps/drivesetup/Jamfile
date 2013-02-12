@@ -6,6 +6,7 @@ UsePrivateHeaders interface shared storage tracker ;
 
 Preference DriveSetup :
 	AbstractParametersPanel.cpp
+	ChangeParametersPanel.cpp
 	CreateParametersPanel.cpp
 	DiskView.cpp
 	DriveSetup.cpp
@@ -23,6 +24,7 @@ DoCatalogs DriveSetup :
 	x-vnd.Haiku-DriveSetup
 	:
 	AbstractParametersPanel.cpp
+	ChangeParametersPanel.cpp
 	CreateParametersPanel.cpp
 	DiskView.cpp
 	InitParametersPanel.cpp

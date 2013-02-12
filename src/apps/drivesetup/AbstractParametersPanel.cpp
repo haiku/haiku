@@ -200,7 +200,7 @@ AbstractParametersPanel::Go(BString& parameters, BMessage& storage)
 	// Without an editor, we cannot change anything, anyway
 	if (fEditor == NULL && NeedsEditor()) {
 		parameters = "";
-		if (fReturnStatus == B_CANCELED)
+		if (ValidWithoutEditor() && fReturnStatus == B_CANCELED)
 			fReturnStatus = B_OK;
 
 		if (!Lock())
@@ -256,6 +256,12 @@ AbstractParametersPanel::NeedsEditor() const
 	return true;
 }
 
+
+bool
+AbstractParametersPanel::ValidWithoutEditor() const
+{
+	return true;
+}
 
 status_t
 AbstractParametersPanel::ParametersReceived(const BString& parameters,

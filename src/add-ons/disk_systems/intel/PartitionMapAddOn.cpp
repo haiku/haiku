@@ -298,7 +298,8 @@ PartitionMapHandle::GetParameterEditor(B_PARAMETER_EDITOR_TYPE type,
 	BPartitionParameterEditor** editor)
 {
 	*editor = NULL;
-	if (type == B_CREATE_PARAMETER_EDITOR) {
+	if (type == B_CREATE_PARAMETER_EDITOR
+		|| type == B_PROPERTIES_PARAMETER_EDITOR) {
 		try {
 			*editor = new PrimaryPartitionEditor();
 		} catch (std::bad_alloc) {

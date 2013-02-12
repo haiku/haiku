@@ -71,9 +71,11 @@ private:
 									partition_id selectedPartition);
 			void				_Delete(BDiskDevice* disk,
 									partition_id selectedPartition);
+			void				_ChangeParameters(BDiskDevice* disk,
+									partition_id selectedPartition);
 
-
-			BDiskDeviceRoster	fDDRoster;
+private:
+			BDiskDeviceRoster	fDiskDeviceRoster;
 			BDiskDevice*		fCurrentDisk;
 			partition_id		fCurrentPartitionID;
 
@@ -94,6 +96,7 @@ private:
 			BMenuItem*			fRescanMenuItem;
 
 			BMenuItem*			fCreateMenuItem;
+			BMenuItem*			fChangeMenuItem;
 			BMenuItem*			fDeleteMenuItem;
 			BMenuItem*			fMountMenuItem;
 			BMenuItem*			fUnmountMenuItem;
