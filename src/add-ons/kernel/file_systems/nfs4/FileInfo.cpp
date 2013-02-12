@@ -13,8 +13,6 @@
 #include "Request.h"
 
 
-// TODO: This function probably needs more strict checking against incorrect
-// paths. Correct handling of '..' and '.' also may be useful.
 status_t
 FileInfo::ParsePath(RequestBuilder& req, uint32& count, const char* _path)
 {
@@ -33,8 +31,13 @@ FileInfo::ParsePath(RequestBuilder& req, uint32& count, const char* _path)
 			*pathEnd = '\0';
 
 		if (pathEnd != pathStart) {
-			req.LookUp(pathStart);
-			count++;
+			if (!strcmp(pathStart, "..")) {
+				req.LookUpUp();
+				count++;
+			} else if (strcmp(pathStart, ".")) {
+				req.LookUp(pathStart);
+				count++;
+			}
 		}
 
 		if (pathEnd != NULL && pathEnd[1] != '\0')
