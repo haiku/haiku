@@ -465,7 +465,8 @@ TermWindow::_SetupMenu()
 
 	BLayoutBuilder::Menu<>(fMenuBar = new BMenuBar(Bounds(), "mbar"))
 		// Terminal
-		.AddMenu(B_TRANSLATE("Terminal"))
+		.AddMenu(B_TRANSLATE_COMMENT("Terminal", "The title for the main window"
+				" menubar entry related to terminal sessions"))
 			.AddItem(B_TRANSLATE("Switch Terminals"), MENU_SWITCH_TERM, B_TAB)
 				.GetItem(fSwitchTerminalsMenuItem)
 			.AddItem(B_TRANSLATE("New Terminal"), MENU_NEW_TERM, 'N')
