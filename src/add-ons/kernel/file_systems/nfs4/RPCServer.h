@@ -41,6 +41,9 @@ public:
 
 private:
 			mutex		fLock;
+
+			// Neither SinglyLinkedList nor DoublyLinkedList is what we want
+			// here. And DoublyLinkedQueue is not even a queue.
 			Request*	fQueueHead;
 			Request*	fQueueTail;
 
@@ -72,8 +75,8 @@ public:
 
 			status_t				Repair();
 
-	inline	const PeerAddress&	ID() const;
-	inline	PeerAddress			LocalID() const;
+	inline	const PeerAddress&		ID() const;
+	inline	PeerAddress				LocalID() const;
 
 	inline	ProgramData*			PrivateData();
 	inline	void					SetPrivateData(ProgramData* privateData);
@@ -94,7 +97,7 @@ private:
 
 			RequestManager			fRequests;
 			Connection*				fConnection;
-			const PeerAddress*	fAddress;
+			const PeerAddress*		fAddress;
 
 			ProgramData*			fPrivateData;
 

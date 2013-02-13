@@ -46,6 +46,7 @@ RequestManager::AddRequest(Request* request)
 	else 
 		fQueueHead = request;
 	fQueueTail = request;
+	request->fNext = NULL;
 }
 
 
