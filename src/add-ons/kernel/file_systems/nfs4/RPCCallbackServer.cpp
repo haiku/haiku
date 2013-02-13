@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Haiku, Inc. All rights reserved.
+ * Copyright 2012-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,22 +13,25 @@
 #include "RPCCallback.h"
 #include "RPCCallbackReply.h"
 #include "RPCCallbackRequest.h"
+#include "RPCServer.h"
 
 
 using namespace RPC;
 
 
 CallbackServer* gRPCCallbackServer		= NULL;
+CallbackServer* gRPCCallbackServer6		= NULL;
 
 
-CallbackServer::CallbackServer()
+CallbackServer::CallbackServer(int networkFamily)
 	:
 	fConnectionList(NULL),
 	fListener(NULL),
 	fThreadRunning(false),
 	fCallbackArray(NULL),
 	fArraySize(0),
-	fFreeSlot(-1)
+	fFreeSlot(-1),
+	fNetworkFamily(networkFamily)
 {
 	mutex_init(&fConnectionLock, NULL);
 	mutex_init(&fThreadLock, NULL);
@@ -45,6 +48,47 @@ CallbackServer::~CallbackServer()
 	mutex_destroy(&fThreadLock);
 	mutex_destroy(&fConnectionLock);
 }
+
+
+CallbackServer*
+CallbackServer::Get(Server* server)
+{
+	ASSERT(server != NULL);
+
+	int family = server->ID().Family();
+	ASSERT(family == AF_INET || family == AF_INET6);
+
+	int idx;
+	switch (family) {
+		case AF_INET:
+			idx = 0;
+			break;
+		case AF_INET6:
+			idx = 1;
+			break;
+		default:
+			return NULL;
+	}
+
+	MutexLocker _(fServerCreationLock);
+	if (fServers[idx] == NULL)
+		fServers[idx] = new CallbackServer(family);
+	return fServers[idx];
+}
+
+
+void
+CallbackServer::ShutdownAll()
+{
+	MutexLocker _(fServerCreationLock);
+	for (unsigned int i = 0; i < sizeof(fServers) / sizeof(fServers[0]); i++)
+		delete fServers[i];
+	memset(&fServers, 0, sizeof(fServers));
+}
+
+
+mutex			CallbackServer::fServerCreationLock = MUTEX_INITIALIZER(NULL);
+CallbackServer*	CallbackServer::fServers[2] = { NULL, NULL };
 
 
 status_t
@@ -82,6 +126,7 @@ CallbackServer::RegisterCallback(Callback* callback)
 
 	fCallbackArray[id].fCallback = callback;
 	callback->SetID(id);
+	callback->SetCBServer(this);
 
 	return B_OK;
 }
@@ -91,6 +136,7 @@ status_t
 CallbackServer::UnregisterCallback(Callback* callback)
 {
 	ASSERT(callback != NULL);
+	ASSERT(callback->CBServer() == this);
 
 	int32 id = callback->ID();
 
@@ -98,6 +144,7 @@ CallbackServer::UnregisterCallback(Callback* callback)
 	fCallbackArray[id].fNext = fFreeSlot;
 	fFreeSlot = id;
 
+	callback->SetCBServer(NULL);
 	return B_OK;
 }
 
@@ -109,7 +156,7 @@ CallbackServer::StartServer()
 	if (fThreadRunning)
 		return B_OK;
 
-	status_t result = ConnectionListener::Listen(&fListener);
+	status_t result = ConnectionListener::Listen(&fListener, fNetworkFamily);
 	if (result != B_OK)
 		return result;
 

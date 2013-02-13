@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Haiku, Inc. All rights reserved.
+ * Copyright 2012-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -61,6 +61,26 @@ PeerAddress::PeerAddress()
 }
 
 
+PeerAddress::PeerAddress(int networkFamily)
+	:
+	fProtocol(0)
+{
+	ASSERT(networkFamily == AF_INET || networkFamily == AF_INET6);
+
+	memset(&fAddress, 0, sizeof(fAddress));
+
+	fAddress.ss_family = networkFamily;
+	switch (networkFamily) {
+		case AF_INET:
+			fAddress.ss_len = sizeof(sockaddr_in);
+			break;
+		case AF_INET6:
+			fAddress.ss_len = sizeof(sockaddr_in6);
+			break;
+	}
+}
+
+
 const char*
 PeerAddress::ProtocolString() const
 {
@@ -94,13 +114,11 @@ PeerAddress::SetProtocol(const char* protocol)
 char*
 PeerAddress::UniversalAddress() const
 {
-	const sockaddr* address = reinterpret_cast<const sockaddr*>(&fAddress);
-
 	char* uAddr = reinterpret_cast<char*>(malloc(INET6_ADDRSTRLEN + 16));
 	if (uAddr == NULL)
 		return NULL;
 
-	if (inet_ntop(address->sa_family, InAddr(), uAddr, AddressSize()) == NULL)
+	if (inet_ntop(fAddress.ss_family, InAddr(), uAddr, AddressSize()) == NULL)
 		return NULL;
 
 	char port[16];
@@ -114,7 +132,7 @@ PeerAddress::UniversalAddress() const
 socklen_t
 PeerAddress::AddressSize() const
 {
-	switch (reinterpret_cast<const sockaddr*>(&fAddress)->sa_family) {
+	switch (Family()) {
 		case AF_INET:
 			return sizeof(sockaddr_in);
 		case AF_INET6:
@@ -130,7 +148,7 @@ PeerAddress::Port() const
 {
 	uint16 port;
 
-	switch (reinterpret_cast<const sockaddr*>(&fAddress)->sa_family) {
+	switch (Family()) {
 		case AF_INET:
 			port = reinterpret_cast<const sockaddr_in*>(&fAddress)->sin_port;
 			break;
@@ -150,7 +168,7 @@ PeerAddress::SetPort(uint16 port)
 {
 	port = htons(port);
 
-	switch (reinterpret_cast<sockaddr*>(&fAddress)->sa_family) {
+	switch (Family()) {
 		case AF_INET:
 			reinterpret_cast<sockaddr_in*>(&fAddress)->sin_port = port;
 			break;
@@ -160,11 +178,10 @@ PeerAddress::SetPort(uint16 port)
 	}
 }
 
-
 const void*
 PeerAddress::InAddr() const
 {
-	switch (reinterpret_cast<const sockaddr*>(&fAddress)->sa_family) {
+	switch (Family()) {
 		case AF_INET:
 			return &reinterpret_cast<const sockaddr_in*>(&fAddress)->sin_addr;
 		case AF_INET6:
@@ -178,7 +195,7 @@ PeerAddress::InAddr() const
 size_t
 PeerAddress::InAddrSize() const
 {
-	switch (reinterpret_cast<const sockaddr*>(&fAddress)->sa_family) {
+	switch (Family()) {
 		case AF_INET:
 			return sizeof(in_addr);
 		case AF_INET6:
@@ -723,21 +740,23 @@ ConnectionBase::Disconnect()
 
 
 status_t
-ConnectionListener::Listen(ConnectionListener** listener, uint16 port)
+ConnectionListener::Listen(ConnectionListener** listener, int networkFamily,
+	uint16 port)
 {
 	ASSERT(listener != NULL);
+	ASSERT(networkFamily == AF_INET || networkFamily == AF_INET6);
 
-	int sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	int sock = socket(networkFamily, SOCK_STREAM, IPPROTO_TCP);
 	if (sock < 0)
 		return errno;
 
-	sockaddr_in addr;
-	memset(&addr, 0, sizeof(addr));
-	addr.sin_len = sizeof(addr);
-	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = INADDR_ANY;
-	addr.sin_port = htons(port);
-	if (bind(sock, (struct sockaddr*)&addr, sizeof(addr)) != B_OK) {
+	PeerAddress address(networkFamily);
+	address.SetPort(port);
+	address.fProtocol = IPPROTO_TCP;
+
+	status_t result = bind(sock, (sockaddr*)&address.fAddress,
+		address.AddressSize());
+	if (result != B_OK) {
 		close(sock);
 		return errno;
 	}
@@ -747,17 +766,12 @@ ConnectionListener::Listen(ConnectionListener** listener, uint16 port)
 		return errno;
 	}
 
-	PeerAddress address;
-	address.fProtocol = IPPROTO_TCP;
-	memset(&address.fAddress, 0, sizeof(address.fAddress));
-
 	*listener = new(std::nothrow) ConnectionListener(address);
 	if (*listener == NULL) {
 		close(sock);
 		return B_NO_MEMORY;
 	}
 
-	status_t result;
 	if ((*listener)->fWaitCancel < B_OK) {
 		result = (*listener)->fWaitCancel;
 		close(sock);

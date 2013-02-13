@@ -1367,14 +1367,6 @@ nfs4_init()
 		return B_NO_MEMORY;
 	}
 
-	gRPCCallbackServer = new(std::nothrow) RPC::CallbackServer;
-	if (gRPCCallbackServer == NULL) {
-		mutex_destroy(&gIdMapperLock);
-		delete gWorkQueue;
-		delete gRPCServerManager;
-		return B_NO_MEMORY;
-	}
-
 	return B_OK;
 }
 
@@ -1382,7 +1374,8 @@ nfs4_init()
 status_t
 nfs4_uninit()
 {
-	delete gRPCCallbackServer;
+	RPC::CallbackServer::ShutdownAll();
+
 	delete gIdMapper;
 	delete gWorkQueue;
 	delete gRPCServerManager;

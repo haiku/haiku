@@ -14,6 +14,7 @@
 
 namespace RPC {
 
+class CallbackServer;
 class CallbackRequest;
 class Server;
 
@@ -24,10 +25,14 @@ public:
 	inline	void		SetID(int32 id);
 	inline	int32		ID();
 
+	inline	void		SetCBServer(CallbackServer* server);
+	inline	CallbackServer*	CBServer();
+
 			status_t	EnqueueRequest(CallbackRequest* request,
 							Connection* connection);
 
 private:
+			CallbackServer* fCBServer;
 			Server*		fServer;
 			int32		fID;
 };
@@ -44,6 +49,20 @@ inline int32
 Callback::ID()
 {
 	return fID;
+}
+
+
+inline void
+Callback::SetCBServer(CallbackServer* server)
+{
+	fCBServer = server;
+}
+
+
+inline CallbackServer*
+Callback::CBServer()
+{
+	return fCBServer;
 }
 
 

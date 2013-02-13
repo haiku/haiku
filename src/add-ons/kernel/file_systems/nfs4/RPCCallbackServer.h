@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Haiku, Inc. All rights reserved.
+ * Copyright 2012-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -17,6 +17,7 @@
 namespace RPC {
 
 class Callback;
+class Server;
 
 struct ConnectionEntry {
 	Connection*			fConnection;
@@ -33,13 +34,16 @@ union CallbackSlot {
 
 class CallbackServer {
 public:
-							CallbackServer();
+							CallbackServer(int networkFamily);
 							~CallbackServer();
+
+	static	CallbackServer*	Get(Server* server);
+	static	void			ShutdownAll();
 
 			status_t		RegisterCallback(Callback* callback);
 			status_t		UnregisterCallback(Callback* callback);
 
-	inline	PeerAddress	LocalID();
+	inline	PeerAddress		LocalID();
 
 protected:
 			status_t		StartServer();
@@ -57,6 +61,9 @@ protected:
 	inline	Callback*		GetCallback(int32 id);
 
 private:
+	static	mutex			fServerCreationLock;
+	static	CallbackServer*	fServers[2];
+
 			mutex			fConnectionLock;
 			ConnectionEntry*	fConnectionList;
 			ConnectionListener*	fListener;
@@ -69,6 +76,8 @@ private:
 			CallbackSlot*	fCallbackArray;
 			uint32			fArraySize;
 			int32			fFreeSlot;
+
+			int				fNetworkFamily;
 };
 
 
@@ -76,6 +85,8 @@ inline PeerAddress
 CallbackServer::LocalID()
 {
 	PeerAddress address;
+
+	ASSERT(fListener != NULL);
 	fListener->GetLocalAddress(&address);
 	return address;
 }
@@ -92,10 +103,6 @@ CallbackServer::GetCallback(int32 id)
 
 
 }		// namespace RPC
-
-
-extern RPC::CallbackServer* gRPCCallbackServer;
-
 
 #endif	// RPCCALLBACKSERVER_H
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Haiku, Inc. All rights reserved.
+ * Copyright 2012-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -25,6 +25,9 @@ struct PeerAddress {
 			PeerAddress&		operator=(const PeerAddress& address);
 
 								PeerAddress();
+								PeerAddress(int networkFamily);
+
+	inline	int					Family() const;
 
 			const char*			ProtocolString() const;
 			void				SetProtocol(const char* protocol);
@@ -39,6 +42,14 @@ struct PeerAddress {
 			const void*			InAddr() const;
 			size_t				InAddrSize() const;
 };
+
+
+inline int
+PeerAddress::Family() const
+{
+	return fAddress.ss_family;
+}
+
 
 struct addrinfo;
 
@@ -122,7 +133,8 @@ public:
 
 class ConnectionListener : public ConnectionBase {
 public:
-	static	status_t	Listen(ConnectionListener** listener, uint16 port = 0);
+	static	status_t	Listen(ConnectionListener** listener, int networkFamily,
+							uint16 port = 0);
 
 			status_t	AcceptConnection(Connection** connection);
 

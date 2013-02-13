@@ -97,7 +97,7 @@ Server::Server(Connection* connection, PeerAddress* address)
 Server::~Server()
 {
 	if (fCallback != NULL)
-		gRPCCallbackServer->UnregisterCallback(fCallback);
+		fCallback->CBServer()->UnregisterCallback(fCallback);
 	delete fCallback;
 	mutex_destroy(&fCallbackLock);
 	mutex_destroy(&fRepairLock);
@@ -235,9 +235,22 @@ Callback*
 Server::GetCallback()
 {
 	MutexLocker _(fCallbackLock);
+
 	if (fCallback == NULL) {
 		fCallback = new(std::nothrow) Callback(this);
-		gRPCCallbackServer->RegisterCallback(fCallback);
+		if (fCallback == NULL)
+			return NULL;
+
+		CallbackServer* server = CallbackServer::Get(this);
+		if (server == NULL) {
+			delete fCallback;
+			return NULL;
+		}
+
+		if (server->RegisterCallback(fCallback) != B_OK) {
+			delete fCallback;
+			return NULL;
+		}
 	}
 
 	return fCallback;

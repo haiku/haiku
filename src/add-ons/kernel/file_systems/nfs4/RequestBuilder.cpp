@@ -671,21 +671,29 @@ RequestBuilder::SetClientID(RPC::Server* server)
 
 	fRequest->Stream().AddUInt(0x40000000);
 
-	uint32 id = server->GetCallback()->ID();
+	if (server->GetCallback() != NULL) {
+		ASSERT(server->GetCallback()->CBServer() != NULL);
 
-	PeerAddress local = gRPCCallbackServer->LocalID();
-	PeerAddress servAddr = server->LocalID();
-	servAddr.SetPort(local.Port());
+		uint32 id = server->GetCallback()->ID();
 
-	fRequest->Stream().AddString(local.ProtocolString());
+		PeerAddress local = server->GetCallback()->CBServer()->LocalID();
+		PeerAddress servAddr = server->LocalID();
+		servAddr.SetPort(local.Port());
 
-	char* uAddr = servAddr.UniversalAddress();
-	if (uAddr == NULL)
-		return B_NO_MEMORY;
-	fRequest->Stream().AddString(uAddr);
-	free(uAddr);
+		fRequest->Stream().AddString(local.ProtocolString());
 
-	fRequest->Stream().AddUInt(id);
+		char* uAddr = servAddr.UniversalAddress();
+		if (uAddr == NULL)
+			return B_NO_MEMORY;
+		fRequest->Stream().AddString(uAddr);
+		free(uAddr);
+
+		fRequest->Stream().AddUInt(id);
+	} else {
+		fRequest->Stream().AddString("");
+		fRequest->Stream().AddString("");
+		fRequest->Stream().AddUInt(0);
+	}
 
 	fOpCount++;
 
