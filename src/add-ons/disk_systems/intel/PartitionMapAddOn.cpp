@@ -4,7 +4,6 @@
  */
 
 
-#include "CreationParameterEditor.h"
 #include "PartitionMapAddOn.h"
 
 #include <new>
@@ -17,6 +16,7 @@
 #include <AutoDeleter.h>
 
 #include "IntelDiskSystem.h"
+#include "PrimaryParameterEditor.h"
 
 
 //#define TRACE_PARTITION_MAP_ADD_ON
