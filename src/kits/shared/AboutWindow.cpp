@@ -45,46 +45,6 @@ using BPrivate::gSystemCatalog;
 #define B_TRANSLATION_CONTEXT "AboutWindow"
 
 
-class EscapeFilter : public BMessageFilter {
- public:
-							EscapeFilter(BWindow* target)
-								:
-								BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
-								fTarget(target)
-							{
-							}
-	virtual					~EscapeFilter()
-							{
-							}
-	virtual					filter_result
-							Filter(BMessage* message, BHandler** target)
-							{
-								filter_result result = B_DISPATCH_MESSAGE;
-								switch (message->what) {
-									case B_KEY_DOWN:
-									case B_UNMAPPED_KEY_DOWN: {
-										uint32 key;
-										if (message->FindInt32("raw_char",
-												(int32*)&key) >= B_OK) {
-											if (key == B_ESCAPE) {
-												result = B_SKIP_MESSAGE;
-												fTarget->PostMessage(
-													B_QUIT_REQUESTED);
-											}
-										}
-										break;
-									}
-									default:
-										break;
-								}
-
-								return result;
-							}
- private:
- 			BWindow*		fTarget;
-};
-
-
 class StripeView : public BView {
  public:
 							StripeView(BBitmap* icon);
@@ -394,7 +354,7 @@ AboutView::SetIcon(BBitmap* icon)
 BAboutWindow::BAboutWindow(const char* appName, const char* signature)
 	:	BWindow(BRect(0.0, 0.0, 200.0, 200.0), appName, B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
-			| B_AUTO_UPDATE_SIZE_LIMITS)
+			| B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE)
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
@@ -409,8 +369,6 @@ BAboutWindow::BAboutWindow(const char* appName, const char* signature)
 	AddChild(fAboutView);
 
 	MoveTo(AboutPosition(Frame().Width(), Frame().Height()));
-
-	AddCommonFilter(new EscapeFilter(this));
 }
 
 
