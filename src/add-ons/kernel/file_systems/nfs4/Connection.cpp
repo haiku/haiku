@@ -636,15 +636,12 @@ Connection::SetTo(Connection **_connection, int socket,
 status_t
 Connection::Connect()
 {
-	const sockaddr& address
-		= *reinterpret_cast<const sockaddr*>(&fPeerAddress);
-
 	switch (fPeerAddress.fProtocol) {
 		case IPPROTO_TCP:
-			fSocket = socket(address.sa_family, SOCK_STREAM, IPPROTO_TCP);
+			fSocket = socket(fPeerAddress.Family(), SOCK_STREAM, IPPROTO_TCP);
 			break;
 		case IPPROTO_UDP:
-			fSocket = socket(address.sa_family, SOCK_DGRAM, IPPROTO_UDP);
+			fSocket = socket(fPeerAddress.Family(), SOCK_DGRAM, IPPROTO_UDP);
 			break;
 		default:
 			return B_BAD_VALUE;
@@ -655,21 +652,7 @@ Connection::Connect()
 	status_t result;
 	uint16 port, attempt = 0;
 
-	sockaddr_in addr;
-	sockaddr_in6 addr6;
-	switch (address.sa_family) {
-		case AF_INET:
-			memset(&addr, 0, sizeof(addr));
-			addr.sin_len = sizeof(addr);
-			addr.sin_family = AF_INET;
-			addr.sin_addr.s_addr = INADDR_ANY;
-			break;
-		case AF_INET6:
-			memset(&addr6, 0, sizeof(addr6));
-			addr6.sin6_len = sizeof(addr6);
-			addr6.sin6_family = AF_INET6;
-			break;
-	}
+	PeerAddress address(fPeerAddress.Family());
 
 	do {
 		port = rand() % (IPPORT_RESERVED - NFS_MIN_PORT);
@@ -679,19 +662,9 @@ Connection::Connect()
 			port = 0;
 		attempt++;
 
-		switch (address.sa_family) {
-			case AF_INET:
-				addr.sin_port = htons(port);
-				result = bind(fSocket, (struct sockaddr*)&addr, sizeof(addr));
-				break;
-			case AF_INET6:
-				addr6.sin6_port = htons(port);
-				result = bind(fSocket, (struct sockaddr*)&addr6, sizeof(addr6));
-				break;
-			default:
-				result = EAFNOSUPPORT;
-				break;
-		}
+		address.SetPort(port);
+		result = bind(fSocket, (sockaddr*)&address.fAddress,
+			address.AddressSize());
 	} while (attempt <= 10 && result != B_OK);
 
 	if (attempt > 10) {
@@ -699,19 +672,8 @@ Connection::Connect()
 		return result;
 	}
 
-	socklen_t addressSize;
-	switch (address.sa_family) {
-		case AF_INET:
-			addressSize = sizeof(sockaddr_in);
-			break;
-		case AF_INET6:
-			addressSize = sizeof(sockaddr_in6);
-			break;
-		default:
-			return B_BAD_VALUE;
-	}
-
-	result = connect(fSocket, &address, addressSize);
+	result = connect(fSocket, (sockaddr*)&fPeerAddress.fAddress,
+		fPeerAddress.AddressSize());
 	if (result != 0) {
 		result = errno;
 		close(fSocket);
