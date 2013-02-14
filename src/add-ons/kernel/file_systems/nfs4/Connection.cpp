@@ -435,7 +435,7 @@ ConnectionStream::Receive(void** _buffer, uint32* _size)
 	void* buffer = NULL;
 
 	uint32 record_size;
-	bool last_one;
+	bool last_one = false;
 
 	object_wait_info object[2];
 	object[0].object = fWaitCancel;
@@ -687,6 +687,9 @@ Connection::Connect()
 			case AF_INET6:
 				addr6.sin6_port = htons(port);
 				result = bind(fSocket, (struct sockaddr*)&addr6, sizeof(addr6));
+				break;
+			default:
+				result = EAFNOSUPPORT;
 				break;
 		}
 	} while (attempt <= 10 && result != B_OK);
