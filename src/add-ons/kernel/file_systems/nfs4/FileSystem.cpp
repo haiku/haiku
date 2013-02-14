@@ -220,8 +220,7 @@ FileSystem::GetInode(ino_t id, Inode** _inode)
 
 	FileInfo fi;
 	status_t result = fInoIdMap.GetFileInfo(&fi, id);
-	if (result == B_ENTRY_NOT_FOUND)
-		dprintf("NFS4: unknown inode: %llu\n", id);
+	ASSERT(result != B_ENTRY_NOT_FOUND);
 
 	if (result != B_OK)
 		return result;
