@@ -67,7 +67,8 @@ PRIVATE_SYSTEM_LIBS =
 
 SYSTEM_SERVERS = app_server cddb_daemon debug_server input_server midi_server
 	mount_server net_server notification_server power_daemon print_server
-	print_addon_server registrar syslog_daemon
+	print_addon_server registrar syslog_daemon dns_resolver_server
+	nfs4_idmapper_server
 ;
 
 SYSTEM_NETWORK_DEVICES = ethernet loopback ;
@@ -104,7 +105,7 @@ SYSTEM_ADD_ONS_DRIVERS_NET = 3com atheros813x ar81xx attansic_l1 attansic_l2
 SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
 	ata@ata pci ps2 isa scsi config_manager usb
 ] ;
-SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs iso9660 attribute_overlay write_overlay ;
+SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs iso9660 nfs4 attribute_overlay write_overlay ;
 
 # modules
 AddFilesToHaikuImage system add-ons kernel bus_managers
@@ -398,6 +399,7 @@ AddFilesToHaikuImage system add-ons input_server devices
 	: <input>keyboard <input>mouse <input>tablet <input>wacom ;
 AddFilesToHaikuImage system add-ons kernel network
 	: <net>notifications stack ;
+AddFilesToHaikuImage system add-ons kernel network : dns_resolver ;
 AddFilesToHaikuImage system add-ons kernel network devices
 	: $(SYSTEM_NETWORK_DEVICES) ;
 AddFilesToHaikuImage system add-ons kernel network datalink_protocols
