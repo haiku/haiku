@@ -230,8 +230,6 @@ class TWindow : public BWindow {
 		void			SetPixelSize(bool);
 		int32			PixelSize();
 
-		void			ShowHelp();
-
 		bool			IsActive();
 
 	private:
