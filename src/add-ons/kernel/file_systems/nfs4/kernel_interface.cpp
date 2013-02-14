@@ -636,11 +636,16 @@ nfs4_rename(fs_volume* volume, fs_vnode* fromDir, const char* fromName,
 	if (result != B_OK)
 		return result;
 
-	Inode* child;
-	result = get_vnode(volume, id, reinterpret_cast<void**>(&child));
+	VnodeToInode* vti;
+	result = get_vnode(volume, id, reinterpret_cast<void**>(&vti));
 	if (result == B_OK) {
-		unremove_vnode(volume, id);
+		Inode* child = vti->Get();
+		if (child == NULL) {
+			put_vnode(volume, id);
+			return B_ENTRY_NOT_FOUND;
+		}
 
+		unremove_vnode(volume, id);
 		child->fInfo.fParent = toInode->fInfo.fHandle;
 		child->fInfo.CreateName(toInode->fInfo.fPath, toName);
 		put_vnode(volume, id);
