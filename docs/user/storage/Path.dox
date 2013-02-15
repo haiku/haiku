@@ -81,7 +81,6 @@
 	       - The presence of "." or ".." ("/boot/ltj/../ltj/./gwar")
 	       - Redundant slashes ("/boot//ltj")
 	       - A trailing slash ("/boot/ltj/")
-	
 */
 
 
@@ -106,7 +105,7 @@
 
 /*!
 	\fn BPath::~BPath()
-	\brief Destroys the BPath object and frees any of its associated resources.
+	\brief Destroys the BPath object and frees any associated resources.
 */
 
 
@@ -456,7 +455,7 @@
 	The type code must be set to \c B_REF_TYPE.
 
 	\param code The type code of the flattened data, must be \c B_REF_TYPE.
-	\param buf A pointer to the flattened data.
+	\param buffer A pointer to a buffer containing the flattened data.
 	\param size The size of \a buffer in bytes.
 
 	\returns A status code.
