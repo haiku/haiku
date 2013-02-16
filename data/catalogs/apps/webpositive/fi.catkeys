@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-WebPositive	1513721873
+1	finnish	x-vnd.Haiku-WebPositive	233049275
 Show home button	Settings Window		Näytä aloitussivupainike
 Username:	Authentication Panel		Käyttäjätunnus:
 Copy URL to clipboard	Download Window		Kopioi verkko-osoite leikepöydälle
@@ -74,7 +74,6 @@ Show tabs if only one page is open	Settings Window		Näytä välilehdet vain kun
 About	WebPositive Window		Ohjelmasta
 Finish: 	Download Window	Finishing time	Valmis: 
 Fonts	Settings Window		Kirjasimet
-Close	WebPositive Window		Sulje
 OK	Download Window		Valmis
 Page source error	WebPositive Window		Sivulähdevirhe
 Open blank page	Settings Window		Avaa tyhjä sivu

@@ -29,9 +29,9 @@ Error writing audio frame %lld	MediaConverter		オーディオフレーム %lld 
 Cancelling	MediaConverter		キャンセル中
 %d byte 	MediaFileInfo		%d バイト
 Error loading files	MediaConverter		ファイルのロード中にエラーが発生しました
-Cancel	MediaConverter		キャンセル
+Cancel	MediaConverter		中止
 None available	Video codecs		利用できません
-Conversion cancelled	MediaConverter		変換はキャンセルされました
+Conversion cancelled	MediaConverter		変換は中止されました
 No file selected	MediaConverter-FileInfo		ファイルが選択されていません
 Select this folder	MediaConverter		このフォルダーを選択
 Continue	MediaConverter		続ける
@@ -41,7 +41,7 @@ Video:	MediaConverter-FileInfo		ビデオ：
 %d bit 	MediaFileInfo		%d ビット
 Error creating '%filename'	MediaConverter		'%filename' の作成中にエラーが発生しました
 Video quality not supported	MediaConverter		ビデオ品質はサポートされていません
-Cancelling…	MediaConverter		キャンセル中…
+Cancelling…	MediaConverter		中止中…
 File details	MediaConverter		ファイルの詳細
 Select	MediaConverter		選択
 Writing video track: %ld%% complete	MediaConverter		ビデオトラックの書き込み: %ld%% 完了

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Terminal	2672618809
+1	romanian	x-vnd.Haiku-Terminal	4173005440
 Not found.	Terminal TermWindow		Nu a fost găsit.
 Switch Terminals	Terminal TermWindow		Comută terminale
 Change directory	Terminal TermView		Modifică dosar
@@ -53,7 +53,6 @@ Text not found.	Terminal TermWindow		Nu s-a găsit textul.
 Find…	Terminal TermWindow		Caută...
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Procesul „%1” încă rulează.\nDacă închideți Terminalul, procesul va fi oprit.
 Move here	Terminal TermView		Mută aici
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDosarul curent al procesuui activ în\n\t\t\ttabul curent. Poate fi specificat numărul maxim de componente ale căii. Ex: „%2d” pentru cel mult două componente.\n\t%i\t-\tIndicele de fereastră.\n\t%p\t-\tNumele procesului activ din tabul curent.\n\t%t\t-\tTitlul tabului curent.\n\t%%\t-\tCaracterul „%”.
 Error!	Terminal getString		Eroare!
 New tab	Terminal TermWindow		Tab nou
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Tiparul care specifică titlurile tabului curent. Următoarele marcaje\npot fi utilizate:\n

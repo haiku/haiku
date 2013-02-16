@@ -15,7 +15,7 @@ Show window border	LaunchBox		ウィンドウ枠を表示
 Pad	LaunchBox		パッド
 Icon size	LaunchBox		アイコンサイズ
 Bummer	LaunchBox		失敗
-Cancel	LaunchBox		キャンセル
+Cancel	LaunchBox		中止
 Remove button	LaunchBox		ボタンを削除
 Horizontal layout	LaunchBox		水平配置
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nアプリケーション (シグネチャ '%2') の起動に失敗しました。\n\nエラー:

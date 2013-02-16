@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Time	3544635877
+1	german	x-vnd.Haiku-Time	3259467657
 GMT (UNIX compatible)	Time		GMT (Unix-kompatibel)
 OK	Time		OK
 Asia	Time		Asien
@@ -11,6 +11,7 @@ Preview time:	Time		Vorschau-Zeit:
 Synchronize	Time		Synchronisieren
 Revert	Time		Anfangswerte
 Pacific	Time		Pazifik
+Show day of week	Time		Wochentag anzeigen
 Add	Time		Hinzu
 Date and time	Time		Datum und Zeit
 about	Time		über
@@ -26,6 +27,7 @@ Time	Time		Time - Datum & Zeit
 Indian	Time		Indischer Ozean
 Sending request failed	Time		Sendeanfrage fehlgeschlagen
 Arctic	Time		Arktis
+Display time with seconds	Time		Zeit sekundengenau anzeigen
 Time	System name		Datum & Zeit
 America	Time		Amerika
 Reset	Time		Reset
@@ -33,6 +35,8 @@ Synchronize at boot	Time		Synchronisieren beim Hochfahren
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Datum & Zeit\n\nvon\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Received invalid time	Time		Ungültige Zeit erhalten
 Antarctica	Time		Antarktis
+Show time zone	Time		Zeitzone anzeigen
+Show clock in Deskbar	Time		Uhr in Deskbar anzeigen
 The following error occured while synchronizing:r\n%s: %s	Time		Beim Synchronisieren trat folgender Fehler auf:r\n%s: %s
 <Other>	Time		<Andere>
 Current time:	Time		Aktuelle Zeit:

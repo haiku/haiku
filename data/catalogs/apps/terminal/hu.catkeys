@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Terminal	3561344903
+1	hungarian	x-vnd.Haiku-Terminal	766764238
 Not found.	Terminal TermWindow		Nem található.
 Switch Terminals	Terminal TermWindow		Terminálok közti váltás
 Change directory	Terminal TermView		Mappa váltása
@@ -61,7 +61,6 @@ Text not found.	Terminal TermWindow		Nem található a szöveg.
 Find…	Terminal TermWindow		Keresés…
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		A folyamat (%1) még fut.\nHa bezárja a Terminált, a folyamat megszakad.
 Move here	Terminal TermView		Mozgatás
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAz a mappa amiben a jelenlegi fül az aktív folyamata\n\t\t\tfut épp.Meg lehet adni az elérési út\n\t\t\tkomponenseinek számát. Pl. '%2d' maximum két komponenshez.\n\t%i\t-\tAz ablak indexe.\n\t%p\t-\tA jelenlegi fülben futó folyamat neve.\n\t%t\t-\tA jelenlegi fül címe.\n\t%%\t-\tEgy '%' karakter.
 Retro	Terminal colors scheme		Retro
 Error!	Terminal getString		Hiba!
 New tab	Terminal TermWindow		Új lap

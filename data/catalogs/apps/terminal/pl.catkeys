@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Terminal	1935314925
+1	polish	x-vnd.Haiku-Terminal	3435701556
 Not found.	Terminal TermWindow		Nie znaleziono.
 Switch Terminals	Terminal TermWindow		Przełącz Terminal
 Change directory	Terminal TermView		Zmień folder
@@ -61,7 +61,6 @@ Text not found.	Terminal TermWindow		Tekst nie znaleziony.
 Find…	Terminal TermWindow		Znajdź…
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Proces \"%1\" jest wciąż w użyciu.\nJeśli zamkniesz terminal, proces zostanie zatrzymany.
 Move here	Terminal TermView		Przenieś tutaj
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tŚcieżka dostępu do aktywnych procesów w\n\t\t\taktywnej karcie. Opcjonalnie maksymalna liczba komponentów ścieżek która\n\t\t\tmoże zostać ustalona. Np. '%2d' dla maksymalnie dwóch komponentów.\n\t%i\t-\tIndeks okna.\n\t%p\t-\tNazwa aktywnego procesu w aktywnej karcie.\n\t%t\t-\tNazwa aktywnej karty.\n\t%%\t-\tZnak '%'.
 Retro	Terminal colors scheme		Retro
 Error!	Terminal getString		Błąd!
 New tab	Terminal TermWindow		Nowa karta

@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-WebPositive	1513721873
+1	lithuanian	x-vnd.Haiku-WebPositive	233049275
 Show home button	Settings Window		Rodyti Namų mygtuką
 Username:	Authentication Panel		Naudotojo vardas:
 Copy URL to clipboard	Download Window		Kopijuoti URL adresą į iškarpinę
@@ -74,7 +74,6 @@ Show tabs if only one page is open	Settings Window		Rodyti korteles net kai jų 
 About	WebPositive Window		Apie
 Finish: 	Download Window	Finishing time	Numatoma pabaiga: 
 Fonts	Settings Window		Šriftai
-Close	WebPositive Window		Užverti
 OK	Download Window		Gerai
 Page source error	WebPositive Window		Tinklapio pirminio teksto klaida
 Open blank page	Settings Window		Atverti tuščią tinklapį

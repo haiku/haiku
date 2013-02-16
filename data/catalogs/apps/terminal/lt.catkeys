@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Terminal	2178478404
+1	lithuanian	x-vnd.Haiku-Terminal	3678865035
 Not found.	Terminal TermWindow		Nerasta.
 Switch Terminals	Terminal TermWindow		Pereiti į kitą terminalą
 Change directory	Terminal TermView		Keisti aplanką
@@ -61,7 +61,6 @@ Text not found.	Terminal TermWindow		Ieškotas tekstas nerastas.
 Find…	Terminal TermWindow		Ieškoti…
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Užduotis „%1“ dar vykdoma.\nUžvėrus langą, jos darbas bus nutrauktas.
 Move here	Terminal TermView		Perkelti čia
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAktyvioje kortelėje vydomos aktyvios užduoties veikiamasis \t\t\taplankas. Taip pat galima nurodyti didžiausią kelio komponenčių\n\t\t\tskaičių. Pavyzdžiui, „%2d“ reikš ne daugiau kaip dvi komponentes.\n\t%i\t-\tLango eilės numeris.\n\t%p\t-\tAktyvioje kortelėje vykdomos aktyvios užduoties pavadinimas.\n\t%t\t-\tAktyvios kortelės antraštė.\n\t%%\t-\tSimbolis „%“.
 Retro	Terminal colors scheme		Retro
 Error!	Terminal getString		Klaida!
 New tab	Terminal TermWindow		Nauja kortelė

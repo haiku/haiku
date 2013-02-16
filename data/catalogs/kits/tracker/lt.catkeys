@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	2808668971
+1	lithuanian	x-vnd.Haiku-libtracker	3375521561
 common	B_COMMON_DIRECTORY		Bendra
 OK	WidgetAttributeText		Gerai
 Icon view	VolumeWindow		Rodyti piktogramas
@@ -256,7 +256,6 @@ TiB	WidgetAttributeText		TiB
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Paskirties aplanke jau yra failas „%name“. Ar norite jį pakeisti?
 Cancel	ContainerWindow		Atsisakyti
 Only the boot disk	AutoMounterSettings		Tik paleidimo tomą
-Trash	TrackerSettingsWindow		Šiukšlinė
 If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jeigu %ifYouDoAction konfigūracijos aplanką, „%osName“ sistemos elgesys taps nenuspėjamas!\n\nAr tikrai norite tai atlikti?
 Unmount	ContainerWindow		Atjungti
 Copy layout	ContainerWindow		Kopijuoti išdėstymą

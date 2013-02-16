@@ -4,7 +4,7 @@ The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess
 OK	ShutdownProcess		OK
 System is shut down	ShutdownProcess		システムがシャットダウンされました
 It's now safe to turn off the computer.	ShutdownProcess		コンピューターの電源を切断しても安全です。 
-Cancel	ShutdownProcess		キャンセル
+Cancel	ShutdownProcess		中止
 Do you really want to shut down the system?	ShutdownProcess		本当にシステムをシャットダウンしてよいですか?
 Asking other processes to quit.	ShutdownProcess		プロセスに終了を要求しています。
 Asking \"%appName%\" to quit.	ShutdownProcess		\"%appName%\"に終了を要求しています。

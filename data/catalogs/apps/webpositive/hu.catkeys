@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-WebPositive	1513721873
+1	hungarian	x-vnd.Haiku-WebPositive	233049275
 Show home button	Settings Window		Kezdőlap-gomb megjelenítése
 Username:	Authentication Panel		Felhasználónév:
 Copy URL to clipboard	Download Window		Cím másolása a vágólapra
@@ -74,7 +74,6 @@ Show tabs if only one page is open	Settings Window		A fülek megjelenítése, ha
 About	WebPositive Window		Névjegy
 Finish: 	Download Window	Finishing time	Befejezés:
 Fonts	Settings Window		Betűtípusok
-Close	WebPositive Window		Bezárás
 OK	Download Window		Rendben
 Page source error	WebPositive Window		Hiba az oldal forrásában
 Open blank page	Settings Window		Üres oldal megnyitása

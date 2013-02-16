@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-WebPositive	1513721873
+1	slovak	x-vnd.Haiku-WebPositive	233049275
 Show home button	Settings Window		Zobraziť tlačidlo Domov
 Username:	Authentication Panel		Používateľské meno:
 Copy URL to clipboard	Download Window		Kopírovať URL do schránky
@@ -74,7 +74,6 @@ Show tabs if only one page is open	Settings Window		Zobrazovať karty, aj ak je 
 About	WebPositive Window		O aplikácii
 Finish: 	Download Window	Finishing time	Koniec:
 Fonts	Settings Window		Písma
-Close	WebPositive Window		Zatvoriť
 OK	Download Window		OK
 Page source error	WebPositive Window		Chyba zdrojového kódu stránky
 Open blank page	Settings Window		Otvoriť prázdnu stránku

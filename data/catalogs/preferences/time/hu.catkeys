@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Time	3544635877
+1	hungarian	x-vnd.Haiku-Time	3259467657
 GMT (UNIX compatible)	Time		GMT (UNIX kompatibilis)
 OK	Time		Rendben
 Asia	Time		Ázsia
@@ -11,6 +11,7 @@ Preview time:	Time		Idő előnézete:
 Synchronize	Time		Szinkronizálás
 Revert	Time		Visszaállít
 Pacific	Time		Csendes-óceán
+Show day of week	Time		A hét napjának megjelenítése
 Add	Time		Hozzáadás
 Date and time	Time		Dátum és idő
 about	Time		névjegy
@@ -26,6 +27,7 @@ Time	Time		Idő
 Indian	Time		India
 Sending request failed	Time		Sikertelen kérelemküldés
 Arctic	Time		Arktisz
+Display time with seconds	Time		Másodpercek megjelenítése
 Time	System name		Dátum és idő
 America	Time		Amerika
 Reset	Time		Visszaállítás
@@ -33,6 +35,8 @@ Synchronize at boot	Time		Szinkronizálás indításkor
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Dátum és idő, készítette:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\n Copyright 2004-2012, Haiku.
 Received invalid time	Time		Érvénytelen idő érkezett
 Antarctica	Time		Antarktisz
+Show time zone	Time		Időzóna megjelenítése
+Show clock in Deskbar	Time		Óra az Asztalsávon
 The following error occured while synchronizing:r\n%s: %s	Time		A következő hiba történt szinkronizálás közben:r\n%s: %s
 <Other>	Time		<Egyéb>
 Current time:	Time		Jelenlegi idő:

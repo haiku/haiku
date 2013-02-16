@@ -1,11 +1,14 @@
-1	german	x-vnd.Haiku-DriveSetup	659039073
+1	german	x-vnd.Haiku-DriveSetup	2311878791
 DriveSetup	System name		Datenträgerverwaltung
+Cancel	AbstractParametersPanel		Abbrechen
 Delete	MainWindow		Löschen
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Soll die Änderungen jetzt auf den Datenträger geschrieben werden?\n\nAlle Daten auf der gewählten Partition gehen dabei unwiderruflich verloren!
 Rescan	MainWindow		Aktualisieren
 OK	MainWindow		OK
 Could not aquire partitioning information.	MainWindow		Partitionierungsinformationen konnten nicht ermittelt werden.
 There's no space on the partition where a child partition could be created.	MainWindow		Es gibt keinen Platz auf der Partition, in der eine Tochterpartition angelegt werden könnte.
+Initialize	InitializeParametersPanel		Initialisieren
+OK	AbstractParametersPanel		OK
 <empty>	PartitionList		<leer>
 Unable to find the selected partition by ID.	MainWindow		Die ausgewählte Partition konnte anhand ihrer ID nicht gefunden werden.
 Select a partition from the list below.	DiskView		Bitte eine Partition aus der unten stehenden Liste wählen.
@@ -46,22 +49,26 @@ Are you sure you want to format a raw disk? (most people initialize the disk wit
 Device	PartitionList		Gerät
 Disk	MainWindow		Datenträger
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Soll der ausgewählte Datenträger wirklich formatiert werden? Alle Daten werden verloren gehen. Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.\n
+Partition size	CreateParametersPanel		Partitionsgröße
 Device	DiskView		Gerät
 Active	PartitionList		Aktiv
 Volume name	PartitionList		Datenträgername
 Continue	MainWindow		Weiter
 Cannot delete the selected partition.	MainWindow		Gewählte Partition konnte nicht gelöscht werden.
 Mount all	MainWindow		Alle einhängen
+End: %s	Support		Ende: %s
 Cancel	MainWindow		Abbrechen
 Delete partition	MainWindow		Partition löschen
 Eject	MainWindow		Auswerfen
 Partition	MainWindow		Partition
+Create	CreateParametersPanel		Anlegen
 File system	PartitionList		Dateisystem
 Validation of the given creation parameters failed.	MainWindow		Die Überprüfung der zum Anlegen angegebenen Parameter ist fehlgeschlagen.
 Size	PartitionList		Größe
 Wipe (not implemented)	MainWindow		Löschen (nicht implementiert)
 Validation of the given initialization parameters failed.	MainWindow		Die Überprüfung der zum Initialisieren angegebenen Parameter ist fehlgeschlagen.
 The selected partition does not contain a partitioning system.	MainWindow		Die ausgewählte Partition enthält kein Partitionierungssystem.
+Offset: %s	Support		Versatz: %s
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf der Partition \"%s\" gehen dabei unwiderruflich verloren!
 The partition %s is currently mounted.	MainWindow		Die Partition \"%s\" ist momentan eingehangen.
 Surface test (not implemented)	MainWindow		Oberflächentest (nicht implementiert)

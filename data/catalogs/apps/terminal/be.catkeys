@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Terminal	3561344903
+1	belarusian	x-vnd.Haiku-Terminal	766764238
 Not found.	Terminal TermWindow		Не знойдзена.
 Switch Terminals	Terminal TermWindow		Пераключыць Тэрміналы
 Change directory	Terminal TermView		Змяніць дырэкторыю
@@ -61,7 +61,6 @@ Text not found.	Terminal TermWindow		Тэкст не знойдзены.
 Find…	Terminal TermWindow		Пошук…
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Працэс \"%1\" яшчэ актыўны.\nКалі вы закрыеце Тэрмінал, працэс будзе забіты.
 Move here	Terminal TermView		Перамясціць сюды
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tРабочы каталог актыўнага працэсу\n\t\t\tў цякучай укладцы.Дадаткова можна ўказаць макісмальную колькасць кампанентаў пуці.\n\t\t\t Напрыклад, '%2d' - не больша за два кампаненты.\n\t%i\t-\tІндэкс вакна.\n\t%p\t-\tІмя актыўнага працэсу ў цякучай укладцы.\n\t%t\t-\tІмя цякучай укладкі.\n\t%%\t-\tСімвал '%'.
 Retro	Terminal colors scheme		Даўніна
 Error!	Terminal getString		Памылка!
 New tab	Terminal TermWindow		Новая ўкладка

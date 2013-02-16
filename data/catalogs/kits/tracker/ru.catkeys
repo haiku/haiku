@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	154076124
+1	russian	x-vnd.Haiku-libtracker	720928714
 common	B_COMMON_DIRECTORY		Общие
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Большие значки
@@ -256,7 +256,6 @@ TiB	WidgetAttributeText		ТБ
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Файл \"%name\" уже существует в указанной папке. Вы хотите заменить его?
 Cancel	ContainerWindow		Отмена
 Only the boot disk	AutoMounterSettings		Только загрузочный диск
-Trash	TrackerSettingsWindow		Корзина
 If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Если вы %ifYouDoAction папку config, %osName может начать работать некорректно!\n\nВы уверены, что хотите сделать это?
 Unmount	ContainerWindow		Отключить
 Copy layout	ContainerWindow		Копировать вид папки

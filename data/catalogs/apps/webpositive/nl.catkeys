@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-WebPositive	1513721873
+1	dutch; flemish	x-vnd.Haiku-WebPositive	233049275
 Show home button	Settings Window		Thuisknop tonen
 Username:	Authentication Panel		Gebruikersnaam:
 Copy URL to clipboard	Download Window		URL naar klembord kopiëren
@@ -74,7 +74,6 @@ Show tabs if only one page is open	Settings Window		Tabbladen ook tonen als slec
 About	WebPositive Window		Over
 Finish: 	Download Window	Finishing time	Voltooien:
 Fonts	Settings Window		Lettertypen
-Close	WebPositive Window		Sluiten
 OK	Download Window		Ok
 Page source error	WebPositive Window		Paginabronfout
 Open blank page	Settings Window		Lege pagina openen

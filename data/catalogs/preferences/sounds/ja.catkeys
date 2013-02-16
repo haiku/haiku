@@ -7,7 +7,7 @@ OK	HEventList		OK
 OK	HWindow		OK
 This is not an audio file.	HWindow		オーディオファイルではありません。
 Stop	HWindow		停止
-About Sounds	SoundsHApp		Soundsについて
+About Sounds	SoundsHApp		サウンドについて
 Sound	HEventList		サウンド
 Event	HEventList		イベント
 <none>	HEventList		<サウンド無し>

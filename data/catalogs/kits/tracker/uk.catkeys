@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	2533511185
+1	ukrainian	x-vnd.Haiku-libtracker	3100363775
 common	B_COMMON_DIRECTORY		common
 OK	WidgetAttributeText		Гаразд
 Icon view	VolumeWindow		У вигляді іконок
@@ -244,7 +244,6 @@ TiB	WidgetAttributeText		TiB
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Файл \"%name\" вже існує в цій папці. Ви хочете його замінити?
 Cancel	ContainerWindow		Відміна
 Only the boot disk	AutoMounterSettings		Тільки загрузочний диск
-Trash	TrackerSettingsWindow		Кошик
 Unmount	ContainerWindow		Відмонтувати
 Copy layout	ContainerWindow		Копіювати макет
 label too long	PoseView		Мітка занадто довга

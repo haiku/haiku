@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Notifications	814394708
+1	japanese	x-vnd.Haiku-Notifications	2177286129
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		設定ファイルの保存中にエラーが発生しました。\nおそらく、ディスク容量が不足しています。
 Notifications	GeneralView		通知
 seconds of inactivity	GeneralView		秒後に画面から隠されます。
@@ -17,6 +17,7 @@ Cannot disable notifications because the server can't be reached.	GeneralView		�
 Progress	NotificationView		進行状況
 Last Received	NotificationView		最終受信時刻
 General	PrefletView		一般設定
+Apply	PrefletWin		適用
 Display	PrefletView		表示設定
 Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		起動時に通知を有効にできませんでした。おそらく、boot settings ディレクトリの書き込み権限がありません。
 Search:	NotificationView		検索:

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-WebPositive	1513721873
+1	german	x-vnd.Haiku-WebPositive	233049275
 Show home button	Settings Window		Home-Symbol anzeigen
 Username:	Authentication Panel		Benutzername:
 Copy URL to clipboard	Download Window		Adresse kopieren
@@ -74,7 +74,6 @@ Show tabs if only one page is open	Settings Window		Reiter immer anzeigen
 About	WebPositive Window		Über
 Finish: 	Download Window	Finishing time	Fertig:
 Fonts	Settings Window		Schriftarten
-Close	WebPositive Window		Schließen
 OK	Download Window		OK
 Page source error	WebPositive Window		Fehler im Quellcode der Seite
 Open blank page	Settings Window		Leere Seite öffnen

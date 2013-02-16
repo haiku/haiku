@@ -1,11 +1,14 @@
-1	swedish	x-vnd.Haiku-DriveSetup	659039073
+1	swedish	x-vnd.Haiku-DriveSetup	2311878791
 DriveSetup	System name		DiskHanterare
+Cancel	AbstractParametersPanel		Avbryt
 Delete	MainWindow		Ta bort
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill skriva ändringar tillbaka till disken ny?\n\nAlla data på den valda partitionen kommer att raderas om du gör så!
 Rescan	MainWindow		Uppdatera
 OK	MainWindow		OK
 Could not aquire partitioning information.	MainWindow		Kunde inte läsa partitionsinformation.
 There's no space on the partition where a child partition could be created.	MainWindow		Det finns inget utrymme för en underpartition på partitionen.
+Initialize	InitializeParametersPanel		Initiera
+OK	AbstractParametersPanel		OK
 <empty>	PartitionList		<tom>
 Unable to find the selected partition by ID.	MainWindow		Kunde inte hitta den valda partitionen via ID.
 Select a partition from the list below.	DiskView		Välj en partition från listan nedan.
@@ -46,22 +49,26 @@ Are you sure you want to format a raw disk? (most people initialize the disk wit
 Device	PartitionList		Enhet
 Disk	MainWindow		Disk
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Är du säker att du vill initiera den valda disken? All data kommer att förloras. Du kommet att få frågan igen innan ändringarna skrivs till disk.\n
+Partition size	CreateParametersPanel		Partitionsstorlek
 Device	DiskView		Enhet
 Active	PartitionList		Aktiv
 Volume name	PartitionList		Volymnamn
 Continue	MainWindow		Fortsätt
 Cannot delete the selected partition.	MainWindow		Kan inte radera den valda partitionen.
 Mount all	MainWindow		Montera alla
+End: %s	Support		Slutar: %s
 Cancel	MainWindow		Avbryt
 Delete partition	MainWindow		Radera partition
 Eject	MainWindow		Mata ut
 Partition	MainWindow		Partition
+Create	CreateParametersPanel		Skapa
 File system	PartitionList		Filsystem
 Validation of the given creation parameters failed.	MainWindow		Utvärdering av den givna parametern misslyckades.
 Size	PartitionList		Storlek
 Wipe (not implemented)	MainWindow		Formatera (inte implementerat)
 Validation of the given initialization parameters failed.	MainWindow		Utvärdering av de givna initialiseringsparametrarna misslyckades.
 The selected partition does not contain a partitioning system.	MainWindow		Den valda partitionen innehåller inget partitionssystem.
+Offset: %s	Support		Avstånd: %s
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill skriva ändringarna till disken?\n\nAll data på partitionen %s kommer att gå förlorad!
 The partition %s is currently mounted.	MainWindow		Partitionen %s är monterad.
 Surface test (not implemented)	MainWindow		Yttest (inte implementerat)

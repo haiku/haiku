@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Terminal	3561344903
+1	slovak	x-vnd.Haiku-Terminal	766764238
 Not found.	Terminal TermWindow		Nenájdené.
 Switch Terminals	Terminal TermWindow		Prepnúť terminály
 Change directory	Terminal TermView		Zmeniť adresár
@@ -61,7 +61,6 @@ Text not found.	Terminal TermWindow		Text nenájdený.
 Find…	Terminal TermWindow		Nájsť…
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Proces „%1“ ešte stále beží.\nAk zatvoríte Terminál, proces bude zabitý.
 Move here	Terminal TermView		Presunúť sem
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAktuálny adresár aktívneho procesu\n\t\t\tv aktuálnej karte. Nepovinne je možné určiť maximálny počet\n\t\t\tzložiek cesty. Napr. „%2d“ pre najviac dve zložky.\n\t%i\t-\tIndex okna.\n\t%p\t-\tNázov aktívneho procesu v aktuálnej karte.\n\t%t\t-\tTitulok aktuálnej karty.\n\t%%\t-\tZnak „%“.
 Retro	Terminal colors scheme		Retro
 Error!	Terminal getString		Chyba!
 New tab	Terminal TermWindow		Nová karta

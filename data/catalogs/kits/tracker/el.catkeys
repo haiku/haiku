@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	2448887337
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	3015739927
 common	B_COMMON_DIRECTORY		κοινό
 OK	WidgetAttributeText		Εντάξει
 Icon view	VolumeWindow		Προβολή εικονιδίου
@@ -242,7 +242,6 @@ TiB	WidgetAttributeText		TiB
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		το αρχείο \"%name\" υπάρχει ήδη στον προσδιορισμένο φάκελο. Θέλετε σίγουρα να το αντικαταστήσετε;
 Cancel	ContainerWindow		Άκυρο
 Only the boot disk	AutoMounterSettings		Μόνο ο δίσκος εκκίνησης
-Trash	TrackerSettingsWindow		Απορρίματα
 Unmount	ContainerWindow		Αποπροσάρτηση
 Copy layout	ContainerWindow		Αντιγραφή διάταξης
 label too long	PoseView		ετικέτα πολύ μεγάλη

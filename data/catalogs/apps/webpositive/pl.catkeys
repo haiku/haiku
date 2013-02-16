@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-WebPositive	3680831920
+1	polish	x-vnd.Haiku-WebPositive	2400159322
 Show home button	Settings Window		Pokaż przycisk domowy
 Username:	Authentication Panel		Nazwa użytkownika:
 Copy URL to clipboard	Download Window		Kopiuj adres URL do schowka
@@ -73,7 +73,6 @@ Show tabs if only one page is open	Settings Window		Pokaż karty, nawet jeśli t
 About	WebPositive Window		O programie
 Finish: 	Download Window	Finishing time	Do zakończenia:
 Fonts	Settings Window		Czcionki
-Close	WebPositive Window		Zamknij
 OK	Download Window		OK
 Page source error	WebPositive Window		Błąd strony źródłowej
 Open blank page	Settings Window		Otwórz pustą stronę

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	3561344903
+1	french	x-vnd.Haiku-Terminal	766764238
 Not found.	Terminal TermWindow		Non trouvé.
 Switch Terminals	Terminal TermWindow		Inverser les Terminaux
 Change directory	Terminal TermView		Changer de répertoire
@@ -61,7 +61,6 @@ Text not found.	Terminal TermWindow		Texte non trouvé.
 Find…	Terminal TermWindow		Rechercher…
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		L'application « %1 » fonctionne encore.\nSi vous fermez le Terminal, l'application sera interrompue.
 Move here	Terminal TermView		Déplacer ici
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tLe répertoire de travail courant du processus actif dans l'onglet\n\t\t\tcourant. Optionnellement, le nombre maximum d'élément peut-être\n\t\t\tspécifié. E.g. '%2d' pour au plus 2 éléments.\n\t%i\t-\tL'index de la fenêtre.\n\t%p\t-\tLe nom du processus actif dans l'onglet courant.\n\t%t\t-\tLe titre de l'onglet courant.\n\t%%\t-\tLe caractère '%'.
 Retro	Terminal colors scheme		Rétro
 Error!	Terminal getString		Erreur !
 New tab	Terminal TermWindow		Nouvel onglet

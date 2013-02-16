@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	1610004061
+1	finnish	x-vnd.Haiku-libtracker	3375521561
 common	B_COMMON_DIRECTORY		yhteinen
 OK	WidgetAttributeText		Valmis
 Icon view	VolumeWindow		Kuvakenäkymä
@@ -81,7 +81,6 @@ Decrease size	DeskWindow		Pienennä kokoa
 Size	ContainerWindow		Koko
 All disks	AutoMounterSettings		Kaikki levyt
 Would you like to find some other suitable application?	FSUtils		Haluaisitko etsiä jonkun toisen sopivan sovelluksen?
-Ask before deleting for good	SettingsView		Kysy ennen kuin poistetaan pysyvästi
 Finish: %time - %finishtime left	StatusWindow		Loppuu: %time - %finishtime jäljellä
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Asiakirjan ”%document” avaus sovelluksella ”%app” epäonnistui (Puuttuvat kirjastot: %library). \n
 no items	CountView		ei kohteita
@@ -102,7 +101,6 @@ New folder	FilePanelPriv		Uusi kansio
 %name info	InfoWindow	InfoWindow Title	%name-tiedot
 Favorites	FavoritesMenu		Suosikit
 Add-ons	VolumeWindow		Lisäosat
-Move deleted files to Trash first	SettingsView		Siirrä poistetut tiedostot ensin Roskakoriin
 Sorry, you can't copy items to the Trash.	PoseView		Et voi kopioida kohteita roskakoriin.
 List view	VolumeWindow		Luettelonäkymä
 matches wildcard expression	SelectionWindow		täsmää jokerilausekkeeseen
@@ -258,7 +256,6 @@ TiB	WidgetAttributeText		tebitavua
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Tiedosto ”%name” on jo olemassa määritellyssä kansiossa. Haluatko korvata sen?
 Cancel	ContainerWindow		Peru
 Only the boot disk	AutoMounterSettings		Vain alkulatauslevy
-Trash	TrackerSettingsWindow		Roskakori
 If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jos kohdistat toiminnon ”%ifYouDoAction” asetuskansioon, ”%osName” ei ehkä toimi oikein!\n\nOletko varma, että haluat tehdä tämän?
 Unmount	ContainerWindow		Irrota
 Copy layout	ContainerWindow		Kopioi sijoittelu
