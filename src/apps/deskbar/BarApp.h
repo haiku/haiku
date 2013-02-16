@@ -77,6 +77,7 @@ struct desk_settings {
 	bool top;
 	uint32 state;
 	float width;
+	bool showClock;
 	BPoint switcherLoc;
 	int32 recentAppsCount;
 	int32 recentDocsCount;

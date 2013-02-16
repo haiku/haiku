@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	2808668971
+1	english	x-vnd.Haiku-libtracker	3375521561
 common	B_COMMON_DIRECTORY		常用
 OK	WidgetAttributeText		确定
 Icon view	VolumeWindow		图标视图
@@ -256,7 +256,6 @@ TiB	WidgetAttributeText		TiB
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		指定目录中已经存在 \"%name\" 文件。您确定要将其替换吗？
 Cancel	ContainerWindow		取消
 Only the boot disk	AutoMounterSettings		仅引导磁盘
-Trash	TrackerSettingsWindow		垃圾箱
 If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		如果您 %ifYouDoAction config 目录, %osName 可能无法正常执行！\n\n您确定要执行此操作？
 Unmount	ContainerWindow		卸载
 Copy layout	ContainerWindow		复制布局

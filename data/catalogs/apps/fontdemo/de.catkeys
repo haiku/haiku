@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-FontDemo	1300625863
+1	german	x-vnd.Haiku-FontDemo	3522850500
 Outline:	ControlView		Kontur:
 Size: 50	ControlView		Größe: 50
 Stop cycling	ControlView		Schriftwechsel anhalten
@@ -14,6 +14,7 @@ Rotation: 0	ControlView		Drehung: 0
 Drawing mode:	ControlView		Zeichenmodus:
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Bedienelemente
+FontDemo	System name		SchriftartDemo
 Outline: %d	ControlView		Kontur: %d
 Text:	ControlView		Text:
 Antialiased text	ControlView		Text-Antialiasing

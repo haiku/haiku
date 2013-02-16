@@ -3,8 +3,8 @@
  * Copyright 2009, Bryce Groff, brycegroff@gmail.com.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _CREATION_PARAMETER_EDITOR
-#define _CREATION_PARAMETER_EDITOR
+#ifndef _PRIMARY_PARAMETER_EDITOR
+#define _PRIMARY_PARAMETER_EDITOR
 
 
 #include <PartitionParameterEditor.h>
@@ -32,4 +32,4 @@ private:
 };
 
 
-#endif // _CREATION_PARAMETER_EDITOR
+#endif // _PRIMARY_PARAMETER_EDITOR

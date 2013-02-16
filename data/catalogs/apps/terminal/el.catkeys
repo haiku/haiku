@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Terminal	2672618809
+1	greek, modern (1453-)	x-vnd.Haiku-Terminal	4173005440
 Not found.	Terminal TermWindow		Δε βρέθηκε.
 Switch Terminals	Terminal TermWindow		Εναλλαγή Τερματικών
 Change directory	Terminal TermView		Αλλαγή καταλόγου
@@ -53,7 +53,6 @@ Text not found.	Terminal TermWindow		Το κείμενο δεν βρέθηκε.
 Find…	Terminal TermWindow		Εύρεση...
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Η διεργασία \"%1\" ακόμη εκτελείται.\nΕαν κλείσετε τοτερματικό, η διεργασία θα τερματιστεί.
 Move here	Terminal TermView		Μετακίνηση εδώ
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tΟ τρέχων κατάλογος της ενεργού διεργασίας.\n\t\t\tΠροαιρετικά ο μέγιστος αριθμός στοιχείων της διαδρομής μπορεί να\n\t\t\tπροσδιοριστεί. Π.χ. '%2d' για το πολύ δύο τμήματα.\n\t%i\t-\tΟ κατάλογος περιεχομένων του παραθύρου.\n\t%p\t-\tΤο όνομα της ενεργού διεργασίας στην τρέχουσα καρτέλα..\n\t%t\t-\tΟ τίτλος της τρέχουσας καρτέλας.\t%%\t-\tΟ χαρακτήρας '%'.
 Error!	Terminal getString		Σφάλμα!
 New tab	Terminal TermWindow		Νέα καρτέλα
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Το σχέδιο που προσδιορίζει τους τρέχοντες τίτλους καρτέλας. Τα παρακάτω σύμβολα \nμπορούν να χρησιμοποιηθούν:\n

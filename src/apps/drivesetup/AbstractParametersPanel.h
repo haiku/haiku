@@ -37,7 +37,12 @@ protected:
 			void				Init(B_PARAMETER_EDITOR_TYPE type,
 									const BString& diskSystem,
 									BPartition* partition);
+			status_t			Go(BString& parameters, BMessage& storage);
 
+	virtual bool				NeedsEditor() const;
+	virtual bool				ValidWithoutEditor() const;
+	virtual status_t			ParametersReceived(const BString& parameters,
+									BMessage& storage);
 	virtual	void				AddControls(BLayoutBuilder::Group<>& builder,
 									BView* editorView);
 

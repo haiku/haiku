@@ -11,16 +11,13 @@
 #define CREATE_PARAMS_PANEL_H
 
 
-#include "AbstractParametersPanel.h"
+#include "ChangeParametersPanel.h"
 
 
-class BMenuField;
-class BPopUpMenu;
-class BTextControl;
 class SizeSlider;
 
 
-class CreateParametersPanel : public AbstractParametersPanel {
+class CreateParametersPanel : public ChangeParametersPanel {
 public:
 								CreateParametersPanel(BWindow* window,
 									BPartition* parent, off_t offset,
@@ -33,23 +30,21 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 
 protected:
+	virtual bool				NeedsEditor() const;
+	virtual status_t			ParametersReceived(const BString& parameters,
+									BMessage& storage);
 	virtual	void				AddControls(BLayoutBuilder::Group<>& builder,
 									BView* editorView);
 
 private:
-			void 				_CreateViewControls(BPartition* parent,
+			void 				_CreateCreateControls(BPartition* parent,
 									off_t offset, off_t size);
 
 			void				_UpdateSizeTextControl();
 
 private:
-			BPopUpMenu*			fTypePopUpMenu;
-			BMenuField*			fTypeMenuField;
-			BTextControl*		fNameTextControl;
 			SizeSlider*			fSizeSlider;
 			BTextControl*		fSizeTextControl;
-			bool				fSupportsName;
-			bool				fSupportsType;
 };
 
 

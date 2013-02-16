@@ -136,54 +136,8 @@ AbstractParametersPanel::MessageReceived(BMessage* message)
 status_t
 AbstractParametersPanel::Go(BString& parameters)
 {
-	// Without an editor, we cannot change anything, anyway
-	if (fEditor == NULL) {
-		parameters = "";
-		if (fReturnStatus == B_CANCELED)
-			fReturnStatus = B_OK;
-
-		if (!Lock())
-			return B_ERROR;
-	} else {
-		// run the window thread, to get an initial layout of the controls
-		Hide();
-		Show();
-		if (!Lock())
-			return B_CANCELED;
-
-		// center the panel above the parent window
-		CenterIn(fWindow->Frame());
-
-		Show();
-		Unlock();
-
-		// block this thread now, but keep the window repainting
-		while (true) {
-			status_t status = acquire_sem_etc(fExitSemaphore, 1,
-				B_CAN_INTERRUPT | B_RELATIVE_TIMEOUT, 50000);
-			if (status != B_TIMED_OUT && status != B_INTERRUPTED)
-				break;
-			fWindow->UpdateIfNeeded();
-		}
-
-		if (!Lock())
-			return B_CANCELED;
-
-		if (fReturnStatus == B_OK) {
-			if (fEditor->ValidateParameters()) {
-				status_t err = fEditor->GetParameters(parameters);
-				if (err != B_OK)
-					fReturnStatus = err;
-			}
-		}
-	}
-
-	status_t status = fReturnStatus;
-
-	Quit();
-		// NOTE: this object is toast now!
-
-	return status;
+	BMessage storage;
+	return Go(parameters, storage);
 }
 
 
@@ -237,6 +191,83 @@ AbstractParametersPanel::Init(B_PARAMETER_EDITOR_TYPE type,
 
 	fEditor->SetTo(partition);
 	fEditor->SetModificationMessage(new BMessage(kParameterChanged));
+}
+
+
+status_t
+AbstractParametersPanel::Go(BString& parameters, BMessage& storage)
+{
+	// Without an editor, we cannot change anything, anyway
+	if (fEditor == NULL && NeedsEditor()) {
+		parameters = "";
+		if (ValidWithoutEditor() && fReturnStatus == B_CANCELED)
+			fReturnStatus = B_OK;
+
+		if (!Lock())
+			return B_ERROR;
+	} else {
+		// run the window thread, to get an initial layout of the controls
+		Hide();
+		Show();
+		if (!Lock())
+			return B_CANCELED;
+
+		// center the panel above the parent window
+		CenterIn(fWindow->Frame());
+
+		Show();
+		Unlock();
+
+		// block this thread now, but keep the window repainting
+		while (true) {
+			status_t status = acquire_sem_etc(fExitSemaphore, 1,
+				B_CAN_INTERRUPT | B_RELATIVE_TIMEOUT, 50000);
+			if (status != B_TIMED_OUT && status != B_INTERRUPTED)
+				break;
+			fWindow->UpdateIfNeeded();
+		}
+
+		if (!Lock())
+			return B_CANCELED;
+
+		if (fReturnStatus == B_OK) {
+			if (fEditor != NULL && fEditor->ValidateParameters()) {
+				status_t status = fEditor->GetParameters(parameters);
+				if (status != B_OK)
+					fReturnStatus = status;
+			}
+			if (fReturnStatus == B_OK)
+				fReturnStatus = ParametersReceived(parameters, storage);
+		}
+	}
+
+	status_t status = fReturnStatus;
+
+	Quit();
+		// NOTE: this object is toast now!
+
+	return status;
+}
+
+
+bool
+AbstractParametersPanel::NeedsEditor() const
+{
+	return true;
+}
+
+
+bool
+AbstractParametersPanel::ValidWithoutEditor() const
+{
+	return true;
+}
+
+status_t
+AbstractParametersPanel::ParametersReceived(const BString& parameters,
+	BMessage& storage)
+{
+	return B_OK;
 }
 
 

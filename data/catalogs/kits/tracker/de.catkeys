@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	1610004061
+1	german	x-vnd.Haiku-libtracker	4167158175
 common	B_COMMON_DIRECTORY		Allgemein
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Icon-Ansicht
@@ -74,6 +74,7 @@ Arrange by	ContainerWindow		Icons ordnen nach
 Mount server error	AutoMounterSettings		Mountserver-Fehler
 Search	FindPanel		Suchen
 Preparing to empty Trash…	StatusWindow		Leeren des Papierkorbs wird vorbereitet…
+You cannot put the selected item(s) into the trash.	FSUtils		Die ausgewählten Objekte können nicht in den Papierkorb verschoben werden.
 Disks	Model		Datenträger
 Create link	ContainerWindow		Verknüpfung erstellen
 develop	B_COMMON_DEVELOP_DIRECTORY		Programmierung
@@ -81,7 +82,6 @@ Decrease size	DeskWindow		Verkleinern
 Size	ContainerWindow		Größe
 All disks	AutoMounterSettings		Alle Datenträger
 Would you like to find some other suitable application?	FSUtils		Soll eine andere passende Anwendung gesucht werden?
-Ask before deleting for good	SettingsView		Vor dem endgültigen Löschen nachfragen
 Finish: %time - %finishtime left	StatusWindow		Fertig: %time - Noch %finishtime
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		\"%document\" konnte nicht mit der Anwendung \"%app\" geöffnet werden (fehlende Bibliothek: %library.). \n
 no items	CountView		keine
@@ -102,7 +102,6 @@ New folder	FilePanelPriv		Neuer Ordner
 %name info	InfoWindow	InfoWindow Title	%name Info
 Favorites	FavoritesMenu		Favoriten
 Add-ons	VolumeWindow		Add-ons
-Move deleted files to Trash first	SettingsView		Gelöschte Dateien erst in den Papierkorb verschieben
 Sorry, you can't copy items to the Trash.	PoseView		Objekte können leider nicht in den Papierkorb kopiert werden.
 List view	VolumeWindow		Listenansicht
 matches wildcard expression	SelectionWindow		entspricht Platzhalter-Ausdruck
@@ -258,7 +257,6 @@ TiB	WidgetAttributeText		TiB
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Die Datei \"%name\" existiert bereits in diesem Ordner. Soll sie ersetzt werden?
 Cancel	ContainerWindow		Abbrechen
 Only the boot disk	AutoMounterSettings		Nur das Boot-Laufwerk
-Trash	TrackerSettingsWindow		Papierkorb
 If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Wird der Konfiguration-Ordner %ifYouDoAction, kann %osName vielleicht nicht mehr fehlerfrei arbeiten!
 Unmount	ContainerWindow		Aushängen
 Copy layout	ContainerWindow		Anordnung kopieren

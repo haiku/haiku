@@ -100,16 +100,6 @@ GPTDiskAddOn::CanInitialize(const BMutablePartition* partition)
 
 
 status_t
-GPTDiskAddOn::GetInitializationParameterEditor(
-	const BMutablePartition* partition, BPartitionParameterEditor** editor)
-{
-	// Nothing to edit, really.
-	*editor = NULL;
-	return B_OK;
-}
-
-
-status_t
 GPTDiskAddOn::ValidateInitialize(const BMutablePartition* partition,
 	BString* name, const char* parameters)
 {

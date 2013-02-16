@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-WebPositive	1513721873
+1	french	x-vnd.Haiku-WebPositive	233049275
 Show home button	Settings Window		Afficher le bouton de la page d'accueil
 Username:	Authentication Panel		Utilisateur :
 Copy URL to clipboard	Download Window		Copier l'URL dans le presse-papiers
@@ -74,7 +74,6 @@ Show tabs if only one page is open	Settings Window		Afficher les onglets même s
 About	WebPositive Window		À propos
 Finish: 	Download Window	Finishing time	Fin : 
 Fonts	Settings Window		Polices
-Close	WebPositive Window		Fermer
 OK	Download Window		OK
 Page source error	WebPositive Window		Erreur dans la page source
 Open blank page	Settings Window		Ouvrir une page blanche

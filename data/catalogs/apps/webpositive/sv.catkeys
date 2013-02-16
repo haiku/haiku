@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-WebPositive	1513721873
+1	swedish	x-vnd.Haiku-WebPositive	233049275
 Show home button	Settings Window		Visa hem-knappen
 Username:	Authentication Panel		Användarnamn:
 Copy URL to clipboard	Download Window		Kopiera URL till urklipp
@@ -74,7 +74,6 @@ Show tabs if only one page is open	Settings Window		Visa fliar när endast en si
 About	WebPositive Window		Om
 Finish: 	Download Window	Finishing time	Färdig: 
 Fonts	Settings Window		Teckensnitt
-Close	WebPositive Window		Stäng
 OK	Download Window		OK
 Page source error	WebPositive Window		Fel på sidan
 Open blank page	Settings Window		Öppna blank sida

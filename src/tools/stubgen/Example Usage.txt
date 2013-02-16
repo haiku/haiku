@@ -1,0 +1,3 @@
+Example usage for Haiku project:
+
+stubgen -s -g -a *.h

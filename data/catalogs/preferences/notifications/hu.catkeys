@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Notifications	814394708
+1	hungarian	x-vnd.Haiku-Notifications	2177286129
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Hiba történt a beállítások mentése során.\nLehet hogy elfogyott a hely a lemezen.
 Notifications	GeneralView		Értesítések
 seconds of inactivity	GeneralView		másodpercnyi inaktivitás után
@@ -17,6 +17,7 @@ Cannot disable notifications because the server can't be reached.	GeneralView		N
 Progress	NotificationView		Folyamat
 Last Received	NotificationView		Legutóbbi fogadott
 General	PrefletView		Általános
+Apply	PrefletWin		Alkalmaz
 Display	PrefletView		Kijelző
 Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Nem lehet engedélyezni az értesítéseket indításkor, valószínűleg nem rendelkezik írási jogosultságokkal a boot beállításmappájához.
 Search:	NotificationView		Keresés:

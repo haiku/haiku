@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-libtracker	891685329
+1	hindi	x-vnd.Haiku-libtracker	1458537919
 common	B_COMMON_DIRECTORY		सामान्य
 OK	WidgetAttributeText		ठीक है
 Icon view	VolumeWindow		चिह्न दृश्य
@@ -242,7 +242,6 @@ TiB	WidgetAttributeText		ती बी
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		फ़ाइल \"%name\"पहले से निर्दिष्ट फ़ोल्डर में मौजूद है. क्या आप इसे बदलना चाहते हैं?
 Cancel	ContainerWindow		रद्द करें
 Only the boot disk	AutoMounterSettings		केवल बूट डिस्क
-Trash	TrackerSettingsWindow		रद्दी
 Unmount	ContainerWindow		अनमाउंट
 Copy layout	ContainerWindow		लेआउट की नकल करें
 label too long	PoseView		लेबल बहुत लंबा हैं

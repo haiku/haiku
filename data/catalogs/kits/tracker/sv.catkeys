@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	1610004061
+1	swedish	x-vnd.Haiku-libtracker	4167158175
 common	B_COMMON_DIRECTORY		gemensam
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Ikonvy
@@ -74,6 +74,7 @@ Arrange by	ContainerWindow		Sortera efter
 Mount server error	AutoMounterSettings		Monteringsfel
 Search	FindPanel		Sök
 Preparing to empty Trash…	StatusWindow		Förbereder inför tömning av Papperskorgen...
+You cannot put the selected item(s) into the trash.	FSUtils		Du kan inte lägga de valda objekten i papperskorgen.
 Disks	Model		Volymer
 Create link	ContainerWindow		Skapa länk
 develop	B_COMMON_DEVELOP_DIRECTORY		utvecklare
@@ -81,7 +82,6 @@ Decrease size	DeskWindow		Minska storleken
 Size	ContainerWindow		Storlek
 All disks	AutoMounterSettings		Alla diskar
 Would you like to find some other suitable application?	FSUtils		Vill du söka efter ett annat program?
-Ask before deleting for good	SettingsView		Fråga innan det tasbort permanent
 Finish: %time - %finishtime left	StatusWindow		Klar: %time - %finishtime kvar
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Kunde inte öppna "%document" med programmet "%app" (Saknar bibliotek: %library). \n
 no items	CountView		inga objekt
@@ -102,7 +102,6 @@ New folder	FilePanelPriv		Ny mapp
 %name info	InfoWindow	InfoWindow Title	%name information
 Favorites	FavoritesMenu		Favoriter
 Add-ons	VolumeWindow		Tillägg
-Move deleted files to Trash first	SettingsView		Flytta borttagna filer till papperskorgen först
 Sorry, you can't copy items to the Trash.	PoseView		Du kan inte kopiera filer till Papperskorgen.
 List view	VolumeWindow		Listvy
 matches wildcard expression	SelectionWindow		matchar jokeruttryck
@@ -258,7 +257,6 @@ TiB	WidgetAttributeText		TiB
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Filen "%name" finns redan i den valda katalogen. Vill du ersätta den?
 Cancel	ContainerWindow		Avbryt
 Only the boot disk	AutoMounterSettings		Bara uppstartsdisken
-Trash	TrackerSettingsWindow		Papperskorgen
 If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Om du %ifYouDoAction config foldern, %osName kommer kanske inte att fungera som den ska!\n \n Är du säker på att du vill göra detta?
 Unmount	ContainerWindow		Avmontera
 Copy layout	ContainerWindow		Kopiera layout

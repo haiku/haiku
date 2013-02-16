@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Terminal	3561344903
+1	finnish	x-vnd.Haiku-Terminal	766764238
 Not found.	Terminal TermWindow		Ei löytynyt.
 Switch Terminals	Terminal TermWindow		Vaihda pääteikkunoita
 Change directory	Terminal TermView		Vaihda hakemistoa
@@ -61,7 +61,6 @@ Text not found.	Terminal TermWindow		Tekstiä ei löydy.
 Find…	Terminal TermWindow		Etsi...
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Prosessia ”%1” suoritetaan yhä.\nJos suljet Pääteikkunan, prosessi tapetaan.
 Move here	Terminal TermView		Siirrä tänne
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tKäynnissä olevan prosessin nykyinen työhakemisto\n\t\t\tnykyisessä välilehdessä. Valinnaisesti määriteltävien polkukomponenttien\n\t\t\tenimmäismäärä. Esim.: ’%2d’ kahdelle yleisimmälle komponentille.\n\t%i\t-\tIkkunan indeksi.\n\t%p\t-\tKäynnissä olevan prosessin nimi nykyisessä välilehdessä.\n\t%t\t-\tNykyisen välilehden otsikko.\n\t%%\t-\tMerkki ’%’.
 Retro	Terminal colors scheme		Retro
 Error!	Terminal getString		Virhe!
 New tab	Terminal TermWindow		Uusi välilehti

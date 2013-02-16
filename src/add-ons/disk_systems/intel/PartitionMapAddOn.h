@@ -21,9 +21,6 @@ public:
 
 	virtual	bool				CanInitialize(
 									const BMutablePartition* partition);
-	virtual	status_t			GetInitializationParameterEditor(
-									const BMutablePartition* partition,
-									BPartitionParameterEditor** editor);
 	virtual	status_t			ValidateInitialize(
 									const BMutablePartition* partition,
 									BString* name, const char* parameters);

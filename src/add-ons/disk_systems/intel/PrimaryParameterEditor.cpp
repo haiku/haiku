@@ -5,7 +5,7 @@
  */
 
 
-#include "CreationParameterEditor.h"
+#include "PrimaryParameterEditor.h"
 
 #include <Catalog.h>
 #include <DiskDeviceTypes.h>

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Terminal	2672618809
+1	ukrainian	x-vnd.Haiku-Terminal	4173005440
 Not found.	Terminal TermWindow		Не знайдено.
 Switch Terminals	Terminal TermWindow		Перемкнути термінали
 Change directory	Terminal TermView		Змінити каталог
@@ -53,7 +53,6 @@ Text not found.	Terminal TermWindow		Текст не знайдено.
 Find…	Terminal TermWindow		Знайти…
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Процес \"%1\" надалі запущено.\nЯкщо Ви закриєте Terminal, процес буде вбито.
 Move here	Terminal TermView		Перемістити сюди
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tПоточний каталог активного процесу\n\t\t\tв поточній вкладці. Додатково можна вказати максимальну кількість компонентів шляху\n\t\t\t Наприклад '%2d' ніж 2 компоненти.\n\t%i\t-\tіндекс вікна.\n\t%p\t-\tІм'я активного процесу поточної вкладки.\n\t%%\t-\tІм'я поточної вкладки.\n\t%%\t-\tСимвол '%'.
 Error!	Terminal getString		Помилка!
 New tab	Terminal TermWindow		Нова вкладка
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Шаблон для імен вікон. Наступні заповнювачі\nможуть бути використані:\n

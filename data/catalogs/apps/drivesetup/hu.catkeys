@@ -1,11 +1,14 @@
-1	hungarian	x-vnd.Haiku-DriveSetup	659039073
+1	hungarian	x-vnd.Haiku-DriveSetup	2311878791
 DriveSetup	System name		Lemezkezelő
+Cancel	AbstractParametersPanel		Mégse
 Delete	MainWindow		Törlés
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Biztosan jóváhagyja az adatok felírását a lemezre?\n\nEz esetben a partíció teljes tartalma visszavonhatatlanul meg fog semmisülni.
 Rescan	MainWindow		Frissítés
 OK	MainWindow		Rendben
 Could not aquire partitioning information.	MainWindow		A partíciók állapotát nem lehetett lekérdezni.
 There's no space on the partition where a child partition could be created.	MainWindow		Nincs hely már a partíción, ahol alpartíciót kellene létrehozni.
+Initialize	InitializeParametersPanel		Előkészítés
+OK	AbstractParametersPanel		Rendben
 <empty>	PartitionList		<üres>
 Unable to find the selected partition by ID.	MainWindow		Nincs ilyen azonosítójú partíció.
 Select a partition from the list below.	DiskView		Válasszon partíciót a lenti listából!
@@ -46,22 +49,26 @@ Are you sure you want to format a raw disk? (most people initialize the disk wit
 Device	PartitionList		Eszköz
 Disk	MainWindow		Lemez
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Biztosan elő szeretné készíteni a megadott lemezt? Az összes adat el fog veszni. Ezt majd mégegyszer meg kell erősítenie.
+Partition size	CreateParametersPanel		A partíció mérete
 Device	DiskView		Eszköz
 Active	PartitionList		Aktív
 Volume name	PartitionList		Lemez neve
 Continue	MainWindow		Folytatás
 Cannot delete the selected partition.	MainWindow		A kijelölt partíció nem törölhető.
 Mount all	MainWindow		Összes csatolása
+End: %s	Support		Vége: %s
 Cancel	MainWindow		Mégse
 Delete partition	MainWindow		Partíció törlése
 Eject	MainWindow		Kiadás
 Partition	MainWindow		Partíció
+Create	CreateParametersPanel		Létrehoz
 File system	PartitionList		Fájlrendszer
 Validation of the given creation parameters failed.	MainWindow		A létrehozáshoz megadott paramétereket nem sikerült érvényesíteni.
 Size	PartitionList		Méret
 Wipe (not implemented)	MainWindow		Formázás (még nem működik)
 Validation of the given initialization parameters failed.	MainWindow		Az előkészítéshez megadott paramétereket nem sikerült érvényesíteni.
 The selected partition does not contain a partitioning system.	MainWindow		A kiválasztott partíción nincs particionálási séma.
+Offset: %s	Support		Kezdete: %s
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Biztosan a lemezre szeretné írni a kijelölt változtatásokat?\n\nEz esetben a(z) „%s” partíció teljes tartalma visszavonhatatlanul meg fog semmisülni.
 The partition %s is currently mounted.	MainWindow		A partíció (%s) csatolva van.
 Surface test (not implemented)	MainWindow		Felületellenőrzés (még nem működik)

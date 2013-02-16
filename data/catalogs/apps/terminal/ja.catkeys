@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Terminal	3561344903
+1	japanese	x-vnd.Haiku-Terminal	766764238
 Not found.	Terminal TermWindow		これ以上見つかりません。
 Switch Terminals	Terminal TermWindow		ターミナルを切替える
 Change directory	Terminal TermView		ディレクトリを変更
@@ -61,7 +61,6 @@ Text not found.	Terminal TermWindow		検索テキストが見つかりません�
 Find…	Terminal TermWindow		検索…
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		プロセス \"%1\" がまだ実行中です。\nTerminalを閉じると強制終了されます。
 Move here	Terminal TermView		カレントディレクトリへ移動
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\t現在のタブへの実行中プロセスのカレントワーキングディレクトリ\n\t\t\tの表示。オプションでパス要素の最大値を\n\t\t\t指定できます。 例. '%2d' 最大 2 要素。\n\t%i\t-\tThe index of the window.\n\t%p\t-\t実行中プロセス名の現在のタプへの表示。\n\t%t\t-\t現在のタブのタイトル。\n\t%%\t-\t文字 '%' 。
 Retro	Terminal colors scheme		レトロ
 Error!	Terminal getString		エラー!
 New tab	Terminal TermWindow		新しいタブ

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Terminal	3561344903
+1	german	x-vnd.Haiku-Terminal	766764238
 Not found.	Terminal TermWindow		Nicht gefunden.
 Switch Terminals	Terminal TermWindow		Terminals wechseln
 Change directory	Terminal TermView		Zum Ordner wechseln
@@ -61,7 +61,6 @@ Text not found.	Terminal TermWindow		Der Suchbegriff wurde nicht gefunden.
 Find…	Terminal TermWindow		Suchen...
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Der Prozess \"%1\" läuft noch.\nWird das Terminal geschlossen, wird auch dieser Prozess abgebrochen.
 Move here	Terminal TermView		Hierher verschieben
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDas aktuelle Arbeitsverzeichnis des aktiven Prozesses\n\t\t\t in diesem Reiter. Optional kann die maximale Anzahl von Pfad-Komponenten\n\t\t\t angegeben werden, z.B. '%2d' für maximal zwei Komponenten.\n\t%i\t-\tDer Index des Fensters.\n\t%p\t-\tDer Titel dieses Reiters.\n\t%%\t-\tDas %-Zeichen.
 Retro	Terminal colors scheme		Retro
 Error!	Terminal getString		Fehler!
 New tab	Terminal TermWindow		Neuer Reiter

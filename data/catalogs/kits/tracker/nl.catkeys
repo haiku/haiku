@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	154076124
+1	dutch; flemish	x-vnd.Haiku-libtracker	720928714
 common	B_COMMON_DIRECTORY		algemeen
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Icoonweergave
@@ -256,7 +256,6 @@ TiB	WidgetAttributeText		TiB
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Het bestand met de naam \"%name\" bestaat al in de gespecifieerde map. Wilt u het vervangen?
 Cancel	ContainerWindow		Annuleren
 Only the boot disk	AutoMounterSettings		Alleen de opstartschijf
-Trash	TrackerSettingsWindow		Prullenbak
 If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Als u %ifYouDoAction de config map, dan kan %osName wellicht niet meer correct functioneren!\n\nWeet u zeker dat u dit wilt doen?
 Unmount	ContainerWindow		Onttrekken
 Copy layout	ContainerWindow		Indeling kopiëren

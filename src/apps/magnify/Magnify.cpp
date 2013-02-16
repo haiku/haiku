@@ -40,7 +40,6 @@
 #define B_TRANSLATION_CONTEXT "Magnify-Main"
 
 
-const int32 msg_help = 'help';
 const int32 msg_update_info = 'info';
 const int32 msg_show_info = 'show';
 const int32 msg_toggle_grid = 'grid';
@@ -131,11 +130,6 @@ static void
 BuildInfoMenu(BMenu *menu)
 {
 	BMenuItem* menuItem;
-	menuItem = new BMenuItem(B_TRANSLATE("Help"),
-		new BMessage(msg_help));
-	menu->AddItem(menuItem);
-	menu->AddSeparatorItem();
-
 	menuItem = new BMenuItem(B_TRANSLATE("Save image"),
 		new BMessage(msg_save),'S');
 	menu->AddItem(menuItem);
@@ -256,10 +250,6 @@ TWindow::MessageReceived(BMessage* m)
 	bool active = fFatBits->Active();
 
 	switch (m->what) {
-		case msg_help:
-			ShowHelp();
-			break;
-
 		case msg_show_info:
 			if (active)
 				ShowInfo(!fShowInfo);
@@ -748,82 +738,6 @@ int32
 TWindow::PixelSize()
 {
 	return fPixelSize;
-}
-
-
-#undef B_TRANSLATION_CONTEXT
-#define B_TRANSLATION_CONTEXT "Magnify-Help"
-
-
-void
-TWindow::ShowHelp()
-{
-	BRect r(0, 0, 450, 240);
-	BWindow* w = new BWindow(r, B_TRANSLATE("Magnify help"), B_TITLED_WINDOW,
-		B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_RESIZABLE);
-
-	r.right -= B_V_SCROLL_BAR_WIDTH;
-	r.bottom -= B_H_SCROLL_BAR_HEIGHT;
-	BRect r2(r);
-	r2.InsetBy(4, 4);
-	BTextView* text = new BTextView(r, "text", r2, B_FOLLOW_ALL, B_WILL_DRAW);
-	text->MakeSelectable(false);
-	text->MakeEditable(false);
-
-	BScrollView* scroller = new BScrollView("", text, B_FOLLOW_ALL, 0, true, true);
-	w->AddChild(scroller);
-
-	text->Insert(B_TRANSLATE(
-		"General:\n"
-		"  32 x 32 - the top left numbers are the number of visible\n"
-		"    pixels (width x height)\n"
-		"  8 pixels/pixel - represents the number of pixels that are\n"
-		"    used to magnify a pixel\n"
-		"  R:152 G:52 B:10 -  the RGB values for the pixel under\n"
-		"    the red square\n"));
-	text->Insert("\n\n");
-	text->Insert(B_TRANSLATE(
-		"Copy/Save:\n"
-		"  copy - copies the current image to the clipboard\n"
-		"  save - prompts the user for a file to save to and writes out\n"
-		"    the bits of the image\n"));
-	text->Insert("\n\n");
-	text->Insert(B_TRANSLATE(
-		"Info:\n"
-		"  hide/show info - hides/shows all these new features\n"
-		"    note: when showing, a red square will appear which signifies\n"
-		"      which pixel's rgb values will be displayed\n"
-		"  add/remove crosshairs - 2 crosshairs can be added (or removed)\n"
-		"    to aid in the alignment and placement of objects.\n"
-		"    The crosshairs are represented by blue squares and blue lines.\n"
-		"  hide/show grid - hides/shows the grid that separates each pixel\n"
-		));
-	text->Insert("\n\n");
-	text->Insert(B_TRANSLATE(
-		"  freeze - freezes/unfreezes magnification of whatever the\n"
-		"    cursor is currently over\n"));
-	text->Insert("\n\n");
-	text->Insert(B_TRANSLATE(
-		"Sizing/Resizing:\n"
-		"  make square - sets the width and the height to the larger\n"
-		"    of the two making a square image\n"
-		"  increase/decrease window size - grows or shrinks the window\n"
-		"    size by 4 pixels.\n"
-		"    note: this window can also be resized to any size via the\n"
-		"      resizing region of the window\n"
-		"  increase/decrease pixel size - increases or decreases the number\n"
-		"    of pixels used to magnify a 'real' pixel. Range is 1 to 16.\n"));
-	text->Insert("\n\n");
-	text->Insert(B_TRANSLATE(
-		"Navigation:\n"
-		"  arrow keys - move the current selection "
-		"(rgb indicator or crosshair)\n"
-		"    around 1 pixel at a time\n"
-		"  option-arrow key - moves the mouse location 1 pixel at a time\n"
-		"  x marks the selection - the current selection has an 'x' in it\n"));
-
-	w->CenterOnScreen();
-	w->Show();
 }
 
 

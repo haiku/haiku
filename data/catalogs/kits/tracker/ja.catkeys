@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	1989647614
+1	japanese	x-vnd.Haiku-libtracker	251834432
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		アイコン表示
 Add-ons	FilePanelPriv		アドオン
@@ -27,11 +27,11 @@ Sorry, you can't save things at the root of your system.	FilePanelPriv		シス�
 Show shared volumes on Desktop	SettingsView		共有ディスクをデスクトップに表示する
 Paste links	ContainerWindow		リンクを貼り付ける
 Name	OpenWithWindow		名前
-Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		\"%app\" はごみ箱に捨てられたため、\"%document\" を開けません。
+Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		\"%app\" はごみ箱にあるため、\"%document\" を開けません。
 File	ContainerWindow		ファイル
 Handles any %type	OpenWithWindow		すべての%typeに対応
 Delete	ContainerWindow		削除
-32 x 32	ContainerWindow		32 × 32
+32 x 32	ContainerWindow		32 x 32
 Cannot unmount the boot volume \"%name\".	FSUtils		起動ボリューム \"%name\" をマウント解除できません。
 Open with…	ContainerWindow		指定アプリケーションで開く…
 Write	FilePermissionsView		書き込み
@@ -72,15 +72,15 @@ Arrange by	ContainerWindow		並べ換え
 Mount server error	AutoMounterSettings		マウントサーバーエラー
 Search	FindPanel		検索
 Preparing to empty Trash…	StatusWindow		ごみ箱を空にする準備をしています…
+You cannot put the selected item(s) into the trash.	FSUtils		選択した項目をごみ箱に移動できません
 Disks	Model		ディスク
 Create link	ContainerWindow		リンクの作成
 Decrease size	DeskWindow		サイズを小さく
 Size	ContainerWindow		サイズ
 All disks	AutoMounterSettings		全パーティション
 Would you like to find some other suitable application?	FSUtils		他に適切なアプリケーションを検索しますか？
-Ask before deleting for good	SettingsView		完全に削除する前に尋ねる
 Finish: %time - %finishtime left	StatusWindow		終了: %time - 残り %finishtime
-Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		%libraryライブラリーがインストールされてないため、\"%app\" を使って \"%document\" を開くことはできませんでした。
+Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		%libraryライブラリがインストールされてないため、\"%app\" を使って \"%document\" を開くことはできませんでした。
 no items	CountView		0 項目
 Ignore case	SelectionWindow		大文字/小文字を区別しない
 is not	FindPanel		除く
@@ -99,7 +99,6 @@ New folder	FilePanelPriv		新規フォルダー
 %name info	InfoWindow	InfoWindow Title	%name の情報
 Favorites	FavoritesMenu		お気に入り
 Add-ons	VolumeWindow		アドオン
-Move deleted files to Trash first	SettingsView		削除されたファイルを最初にごみ箱に移動する
 Sorry, you can't copy items to the Trash.	PoseView		ごみ箱にコピーすることはできません。
 List view	VolumeWindow		一覧表示
 matches wildcard expression	SelectionWindow		ワイルドカード表現と一致
@@ -118,7 +117,7 @@ rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzube
 home	B_USER_DIRECTORY		ホーム
 Select…	ContainerWindow		選択…
 Copy to	ContainerWindow		指定先にコピー
-Move to Trash	ContainerWindow		ごみ箱に捨てる
+Move to Trash	ContainerWindow		ごみ箱に移動
 Move to	ContainerWindow		指定先に移動
 Create %s clipping	PoseView		%s クリップを作成
 Set new link target	InfoWindow		リンク先を変更
@@ -198,16 +197,16 @@ of %items	StatusWindow		/ %items
 Description:	InfoWindow		説明：
 New	DeskWindow		新規作成
 Open	InfoWindow		開く
-64 x 64	ContainerWindow		64 × 64
+64 x 64	ContainerWindow		64 x 64
 Replace all	FSUtils		すべて置換
 Preparing to restore items…	StatusWindow		復元の準備をしています…
 Replace other file	WidgetAttributeText		既存の項目を置き換える
-Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		いくつかの選択項目はごみ箱に捨てられません。完全に削除してもよろしいですか？元に戻せませんので、ご注意ください。
+Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		いくつかの選択項目はごみ箱に移動できません。完全に削除してもよろしいですか？元に戻せませんので、ご注意ください。
 You cannot create a link to the root directory.	FSUtils		ルートフォルダーにはリンクを作成できません。
-48 x 48	ContainerWindow		48 × 48
+48 x 48	ContainerWindow		48 x 48
 Resize to fit	VolumeWindow		最適な表示サイズに変更
 Could not find application \"%appname\"	OpenWithWindow		アプリケーション \"%appname\" が見つかりませんでした
-The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		選択した項目をごみ箱に捨てることはできません。完全に削除しても良いでしょうか？元は戻せませんので、ご注意ください。
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		選択した項目をごみ箱に移動できません。完全に削除しても良いでしょうか？元は戻せませんので、ご注意ください。
 Invert	SelectionWindow		反転
 Save Query as template…	FindPanel		クエリテンプレートとして保存…
 rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	名前の変更
@@ -219,7 +218,7 @@ Select	SelectionWindow		選択
 Or	FindPanel		または
 The Tracker must be running to see set the default printer.	PoseView		デフォルトプリンタを設定するには、 Tracker が実行されている必要があります。
 by formula	FindPanel		式で検索
-40 x 40	DeskWindow		40 × 40
+40 x 40	DeskWindow		40 x 40
 Name	PoseView		名前
 Group	FilePermissionsView		グループ
 Version:	InfoWindow		バージョン：
@@ -249,11 +248,10 @@ Paste	ContainerWindow		貼り付け
 Modified:	InfoWindow		更新日時：
 Error moving \"%name\".	FSUtils		\"%name\"を移動中にエラーが発生しました。
 TiB	WidgetAttributeText		TiB
-40 x 40	ContainerWindow		40 × 40
+40 x 40	ContainerWindow		40 x 40
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		指定のフォルダーに\"%name\"というファイルがすでに存在します。置き換えますか？
 Cancel	ContainerWindow		中止
 Only the boot disk	AutoMounterSettings		起動ディスクのみ
-Trash	TrackerSettingsWindow		ごみ箱
 If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		config フォルダーを%ifYouDoAction した場合、%osName が正常に動作しなくなる可能性があります!\n\n本当に続けますか?
 Unmount	ContainerWindow		マウント解除
 Copy layout	ContainerWindow		レイアウトをコピー
@@ -264,7 +262,7 @@ Sorry, you cannot edit that attribute.	WidgetAttributeText		この属性は編�
 Name	ContainerWindow		名前
 Disk mount settings	AutoMounterSettings		ディスクマウント設定
 Reverse order	ContainerWindow		逆順にする
-48 x 48	DeskWindow		48 × 48
+48 x 48	DeskWindow		48 x 48
 OK	OpenWithWindow		OK
 Add current folder	FilePanelPriv		このフォルダーを追加
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" を \"%app\" で開けませんでした  (シンボル %symbol が見つかりません)。\n
@@ -310,7 +308,7 @@ Cancel	PoseView		中止
 You can't move or copy items to read-only volumes.	FSUtils		読み取り専用パーティションへファイルまたはフォルダーを移動やコピーはできません。
 Unknown	FilePermissionsView		不明
 All files and folders	FindPanel		すべてのファイルとフォルダー
-Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		%libraryライブラリーがインストールされてないため、\"%document\" を開けませんでした。\n
+Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		%libraryライブラリがインストールされてないため、\"%document\" を開けませんでした。\n
 The Tracker must be running to see Info windows.	PoseView		情報ウィンドウを表示するには、Trackerが実行されている必要があります。
 Other	FilePermissionsView		その他
 Query name:	FindPanel		クエリ名：
@@ -339,7 +337,7 @@ You can't move a folder into itself or any of its own sub-folders.	FSUtils		フ�
 List view	ContainerWindow		一覧表示
 Handles any file	OpenWithWindow		すべてのファイルに対応
 Get info	FilePanelPriv		詳細情報…
-32 x 32	DeskWindow		32 × 32
+32 x 32	DeskWindow		32 x 32
 Cancel	FilePanelPriv		中止
 The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		アプリケーション \"%appname\"  は開こうとしているドキュメントタイプをサポートしていません。\n本当に進めても良いですか?\n\n アプリケーションがサポートすることがわかっている場合は、アプリケーションの製作元にドキュメントタイプをサポートに加えるように問い合わせてください。
 Disks	DirMenu		ディスク
@@ -372,7 +370,7 @@ Favorites	FilePanelPriv		お気に入り
 Name	QueryPoseView		名前
 Delete	FSUtils		削除
 Modified	FindPanel		更新日時
-Error moving \"%name\" to Trash. (%error)	FSUtils		\"%name\" をごみ箱に捨てようとしたら、エラーが発生しました。(%error)
+Error moving \"%name\" to Trash. (%error)	FSUtils		\"%name\" をごみ箱に移動しようとしたら、エラーが発生しました。(%error)
 You can't replace a folder with one of its sub-folders.	FSUtils		サブフォルダーを同名のフォルダーと置き換えられません。
 <No recent items>	FavoritesMenu		<最近使った項目はありません>
 Preferences…	ContainerWindow		設定…
@@ -425,7 +423,7 @@ ends with	FindPanel		指定文字列で終わる
 New	ContainerWindow		新規
 Name matches wildcard expression:###	SelectionWindow		ファイル名がワイルドカード表現と一致： ###
 less than	FindPanel		より小さい
-64 x 64	DeskWindow		64 × 64
+64 x 64	DeskWindow		64 x 64
 Modified	ContainerWindow		更新日時
 Edit Query template	FindPanel		クエリテンプレートを編集
 Prompt	FSUtils		プロンプト

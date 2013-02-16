@@ -174,14 +174,16 @@ TReplicantTray::AttachedToWindow()
 
 	Window()->SetPulseRate(1000000);
 
-	// Set clock settings
-	clock_settings* settings = ((TBarApp*)be_app)->ClockSettings();
-	fTime->SetShowSeconds(settings->showSeconds);
-	fTime->SetShowDayOfWeek(settings->showDayOfWeek);
-	fTime->SetShowTimeZone(settings->showTimeZone);
+	clock_settings* clock = ((TBarApp*)be_app)->ClockSettings();
+	fTime->SetShowSeconds(clock->showSeconds);
+	fTime->SetShowDayOfWeek(clock->showDayOfWeek);
+	fTime->SetShowTimeZone(clock->showTimeZone);
 
 	AddChild(fTime);
 	fTime->MoveTo(Bounds().right - fTime->Bounds().Width() - 1, 2);
+
+	if (!((TBarApp*)be_app)->Settings()->showClock)
+		fTime->Hide();
 
 #ifdef DB_ADDONS
 	// load addons and rehydrate archives
@@ -439,10 +441,15 @@ TReplicantTray::ShowHideTime()
 	RealignReplicants();
 	AdjustPlacement();
 
-	// message Time preferences to update it's show time setting
+	bool showClock = !fTime->IsHidden();
+
+	// Update showClock setting that gets saved to disk on quit
+	((TBarApp*)be_app)->Settings()->showClock = showClock;
+
+	// Send a message to Time preferences telling it to update
 	BMessenger messenger("application/x-vnd.Haiku-Time");
 	BMessage* message = new BMessage(kShowHideTime);
-	message->AddBool("showClock", !fTime->IsHidden());
+	message->AddBool("showClock", showClock);
 	messenger.SendMessage(message);
 }
 

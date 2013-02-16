@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	1610004061
+1	hungarian	x-vnd.Haiku-libtracker	4167158175
 common	B_COMMON_DIRECTORY		Közös
 OK	WidgetAttributeText		Rendben
 Icon view	VolumeWindow		Ikon nézet
@@ -74,6 +74,7 @@ Arrange by	ContainerWindow		Rendezés
 Mount server error	AutoMounterSettings		Csatolási hiba
 Search	FindPanel		Keresés
 Preparing to empty Trash…	StatusWindow		Felkészülés a Szemetes ürítésére…
+You cannot put the selected item(s) into the trash.	FSUtils		A kijelölt elem(ek) nem rakható(k) a Szemetesbe.
 Disks	Model		Lemezek
 Create link	ContainerWindow		Hivatkozás készítése
 develop	B_COMMON_DEVELOP_DIRECTORY		Fejlesztés
@@ -81,7 +82,6 @@ Decrease size	DeskWindow		Méret csökkentése
 Size	ContainerWindow		Méret
 All disks	AutoMounterSettings		Összes lemez
 Would you like to find some other suitable application?	FSUtils		Szeretne keresni egy másik megfelelő programot?
-Ask before deleting for good	SettingsView		Törlés előtt kérdezzen
 Finish: %time - %finishtime left	StatusWindow		Befejezés: %time - %finishtime maradt
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Nem sikerült megnyitni a dokumentumot (%document) a programmal (%app).\n\tHiányzó funkciótár: %library. \n
 no items	CountView		nincs elem
@@ -102,7 +102,6 @@ New folder	FilePanelPriv		Új mappa
 %name info	InfoWindow	InfoWindow Title	%name
 Favorites	FavoritesMenu		Kedvencek
 Add-ons	VolumeWindow		Kiegészítők
-Move deleted files to Trash first	SettingsView		A törölt fájlok először a Szemetesbe kerüljenek
 Sorry, you can't copy items to the Trash.	PoseView		Sajnáljuk, de nem lehet a Szemetesbe másolni.
 List view	VolumeWindow		Lista nézet
 matches wildcard expression	SelectionWindow		megfelel a helyettesítő kifejezésnek
@@ -258,7 +257,6 @@ TiB	WidgetAttributeText		TB
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		A megadott mappában már létezik egy ilyen nevű fájl: %name. Szeretné felülírni?
 Cancel	ContainerWindow		Mégse
 Only the boot disk	AutoMounterSettings		Csak a rendszer lemezt
-Trash	TrackerSettingsWindow		Szemetes
 If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Ha %ifYouDoAction a konfigurációs mappát, akkor lehet, hogy a %osName nem fog megfelelően működni!\n\nBiztosan folytatni akarja?
 Unmount	ContainerWindow		Leválasztás
 Copy layout	ContainerWindow		Elrendezés másolása

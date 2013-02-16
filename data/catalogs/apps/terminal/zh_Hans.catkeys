@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Terminal	3561344903
+1	english	x-vnd.Haiku-Terminal	766764238
 Not found.	Terminal TermWindow		未找到。  
 Switch Terminals	Terminal TermWindow		切换终端
 Change directory	Terminal TermView		更改目录
@@ -61,7 +61,6 @@ Text not found.	Terminal TermWindow		文本未搜索到。
 Find…	Terminal TermWindow		查找…
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		\"%1\" 进程仍在运行。\n如果关闭终端，该进程将被杀死。
 Move here	Terminal TermView		移动到此
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\t当前标签中，活动进程的当前工作目录。\n\t\t组件可以指定的最大路径数量。例如，'%2d'，可以指定至多两个组件。\n\t%i\t-\t窗口的索引。\n\t%p\t-\t当前标签中的活动进程。\n\t%t\t-\t当前标签的标题。\n\t%%\t-\t字符 '%'。
 Retro	Terminal colors scheme		复古主题
 Error!	Terminal getString		错误！
 New tab	Terminal TermWindow		新建标签

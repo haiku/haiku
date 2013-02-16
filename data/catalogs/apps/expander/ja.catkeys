@@ -18,7 +18,7 @@ Creating listing for '%s'	ExpanderWindow		'%s' のリストを作成中
 Continue	ExpanderWindow		続ける
 Destination folder	ExpanderPreferences		解凍先フォルダー
 Other	ExpanderPreferences		その他
-Cancel	ExpanderPreferences		キャンセル
+Cancel	ExpanderPreferences		中止
 Expansion	ExpanderPreferences		解凍
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		書庫ファイルの解凍はまだ完了していません。それでも中止しますか？
 Select	DirectoryFilePanel		選択

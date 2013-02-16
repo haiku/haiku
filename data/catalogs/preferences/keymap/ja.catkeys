@@ -5,7 +5,7 @@ Tilde trigger	Keymap window		チルダのトリガー
 Grave trigger	Keymap window		グレイヴアクセントのトリガー
 Role	Modifier keys window	As in the role of a modifier key	役割
 Select dead keys	Keymap window		デッドキーの選択
-Cancel	Modifier keys window		キャンセル
+Cancel	Modifier keys window		中止
 Quit	Keymap window		終了
 Switch shortcut keys to Haiku mode	Keymap window		ショートカットキースイッチを Haiku モードにする
 Circumflex trigger	Keymap window		サーカムフレックスのトリガー

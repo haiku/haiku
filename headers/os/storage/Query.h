@@ -40,17 +40,6 @@ typedef enum {
 } query_op;
 
 
-/*!
-	\class BQuery
-	\brief Represents a live or non-live file system query
-
-	Provides an interface for creating file system queries. Implements
-	the BEntryList for iterating through the found entries.
-
-	\author <a href='mailto:bonefish@users.sf.net'>Ingo Weinhold</a>
-
-	\version 0.0.0
-*/
 class BQuery : public BEntryList {
 public:
 							BQuery();

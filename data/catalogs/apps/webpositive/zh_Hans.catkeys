@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-WebPositive	1513721873
+1	english	x-vnd.Haiku-WebPositive	233049275
 Show home button	Settings Window		显示 home 按钮
 Username:	Authentication Panel		用户名：
 Copy URL to clipboard	Download Window		复制 URL 到剪贴板
@@ -74,7 +74,6 @@ Show tabs if only one page is open	Settings Window		只有单页则显示标签�
 About	WebPositive Window		关于
 Finish: 	Download Window	Finishing time	完成：
 Fonts	Settings Window		字体
-Close	WebPositive Window		关闭
 OK	Download Window		确定
 Page source error	WebPositive Window		页面源码出错
 Open blank page	Settings Window		打开空白页

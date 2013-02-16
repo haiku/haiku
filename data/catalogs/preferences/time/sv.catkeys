@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Time	3544635877
+1	swedish	x-vnd.Haiku-Time	3259467657
 GMT (UNIX compatible)	Time		GMT (UNIX kompatibel)
 OK	Time		OK
 Asia	Time		Asien
@@ -11,6 +11,7 @@ Preview time:	Time		Förhandsvisa tid:
 Synchronize	Time		Synkronisera
 Revert	Time		Återställ
 Pacific	Time		Stilla havet
+Show day of week	Time		Visa veckodag
 Add	Time		Lägg till
 Date and time	Time		Datum och tid
 about	Time		om
@@ -26,6 +27,7 @@ Time	Time		Tid
 Indian	Time		Indien
 Sending request failed	Time		Misslyckades att skicka förfrågan
 Arctic	Time		Arktis
+Display time with seconds	Time		Visa tid med sekunder
 Time	System name		Tid
 America	Time		Amerika
 Reset	Time		Återställ
@@ -33,6 +35,8 @@ Synchronize at boot	Time		Synkronisera vid uppstart
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date, Skriven av:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Received invalid time	Time		Tog emot en ogiltig tid
 Antarctica	Time		Antarktis
+Show time zone	Time		Ange tidzon
+Show clock in Deskbar	Time		Visa klockan i deskbaren
 The following error occured while synchronizing:r\n%s: %s	Time		Följande fel uppstod vid synkronisering:r\n%s: %s
 <Other>	Time		<Annan>
 Current time:	Time		Aktuell tid:

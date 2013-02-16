@@ -208,7 +208,7 @@ TBarApp::SaveSettings()
 		storedSettings.AddBool("top", fSettings.top);
 		storedSettings.AddInt32("state", fSettings.state);
 		storedSettings.AddFloat("width", fSettings.width);
-
+		storedSettings.AddBool("showClock", fSettings.showClock);
 		storedSettings.AddPoint("switcherLoc", fSettings.switcherLoc);
 		storedSettings.AddInt32("recentAppsCount", fSettings.recentAppsCount);
 		storedSettings.AddInt32("recentDocsCount", fSettings.recentDocsCount);
@@ -261,6 +261,7 @@ TBarApp::InitSettings()
 	settings.top = true;
 	settings.state = kExpandoState;
 	settings.width = 0;
+	settings.showClock = true;
 	settings.switcherLoc = BPoint(5000, 5000);
 	settings.recentAppsCount = 10;
 	settings.recentDocsCount = 10;
@@ -328,6 +329,10 @@ TBarApp::InitSettings()
 			}
 			if (storedSettings.FindFloat("width", &settings.width) != B_OK)
 				settings.width = 0;
+			if (storedSettings.FindBool("showClock", &settings.showClock)
+					!= B_OK) {
+				settings.showClock = true;
+			}
 			if (storedSettings.FindPoint("switcherLoc", &settings.switcherLoc)
 					!= B_OK) {
 				settings.switcherLoc = BPoint(5000, 5000);

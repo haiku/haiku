@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	3081786474
+1	slovak	x-vnd.Haiku-libtracker	3648639064
 common	B_COMMON_DIRECTORY		spoločné
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Zobrazenie ikon
@@ -255,7 +255,6 @@ TiB	WidgetAttributeText		TiB
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Súbor „%name“ už existuje v uvedenom priečinku. Chcete ho nahradiť?
 Cancel	ContainerWindow		Zrušiť
 Only the boot disk	AutoMounterSettings		Iba zavádzací disk
-Trash	TrackerSettingsWindow		Kôš
 If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Ak %ifYouDoAction priečinok „config“, %osName sa nemusí chovať správne!\n\nSte si istí, že to chcete urobiť?
 Unmount	ContainerWindow		Odpojiť
 Copy layout	ContainerWindow		Kopírovať rozloženie

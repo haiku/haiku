@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	2264047972
+1	romanian	x-vnd.Haiku-libtracker	2830900562
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Vizualizare pictogramă
 Add-ons	FilePanelPriv		Module
@@ -202,7 +202,6 @@ TiB	WidgetAttributeText		TiB
 40 x 40	ContainerWindow		40 x 40
 Cancel	ContainerWindow		Anulează
 Only the boot disk	AutoMounterSettings		Numai discul de boot
-Trash	TrackerSettingsWindow		Gunoi
 Unmount	ContainerWindow		Demontează
 Copy layout	ContainerWindow		Copiază aranjament
 label too long	PoseView		etichetă prea lungă

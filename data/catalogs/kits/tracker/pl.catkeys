@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	3952097682
+1	polish	x-vnd.Haiku-libtracker	223982976
 common	B_COMMON_DIRECTORY		common
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Widok ikon
@@ -253,7 +253,6 @@ TiB	WidgetAttributeText		TiB
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Plik o nazwie \"%name\" już istnieje w tej lokalizacji. Czy chcesz go zamienić?
 Cancel	ContainerWindow		Anuluj
 Only the boot disk	AutoMounterSettings		Tylko dysk bootujący
-Trash	TrackerSettingsWindow		Kosz
 Unmount	ContainerWindow		Odmontuj
 Copy layout	ContainerWindow		Kopiuj motyw
 label too long	PoseView		opis zbyt długi
