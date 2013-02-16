@@ -1,20 +1,16 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//  Copyright (c) 2001-2003, OpenBeOS
-//
-//  This software is part of the OpenBeOS distribution and is covered
-//  by the OpenBeOS license.
-//
-//
-//  File:        tty.c
-//  Author:      Daniel Reinhold (danielre@users.sf.net)
-//  Description: prints the file name of the user's terminal
-//
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright 2001-2013 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *				Daniel Reinhold, danielre@users.sf.net
+ */
 
-#include <OS.h>
+
 #include <stdio.h>
 #include <unistd.h>
+
+#include <OS.h>
 
 
 void
