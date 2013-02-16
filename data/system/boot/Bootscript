@@ -117,8 +117,8 @@ if [ "$SAFEMODE" != "yes" ]; then
 fi
 
 # Now ask the user if he wants to run the Installer or continue to the Desktop.
-freshInstallIndicator=/boot/common/settings/fresh_install
-if [ "$isReadOnly" = "yes" -o -e $freshInstallIndicator ]; then
+localeSettings=/boot/home/config/settings/Locale\ settings
+if [ "$isReadOnly" = "yes" -o ! -e "$localeSettings" ]; then
 	/bin/FirstBootPrompt
 	if [ $? -eq 0 ]; then
 		launchscript $SCRIPTS/Bootscript.cd
@@ -190,6 +190,7 @@ if [ "$SAFEMODE" != "yes" ]; then
 fi
 
 # Check for fresh install and run post install scripts.
+freshInstallIndicator=/boot/common/settings/fresh_install
 postInstallDir=/boot/common/boot/post_install
 if [ -e $freshInstallIndicator ]; then
 	# wait a moment for things to calm down a bit
