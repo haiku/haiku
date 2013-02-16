@@ -171,7 +171,7 @@ BootPromptWindow::BootPromptWindow()
 	fKeymapsMenuField = new BMenuField("", "", new BMenu(""));
 	fKeymapsMenuField->Menu()->SetLabelFromMarked(true);
 
-	_InitCatalog(false);
+	_InitCatalog(true);
 	_PopulateLanguages();
 	_PopulateKeymaps();
 
