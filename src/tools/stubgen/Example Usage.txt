@@ -1,3 +1,3 @@
-Example usage for OpenBeOS project:
+Example usage for Haiku project:
 
 stubgen -s -g -a *.h
