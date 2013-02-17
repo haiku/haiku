@@ -341,6 +341,14 @@ PadView::DisplayMenu(BPoint where, LaunchButton* button) const
 		item = new BMenuItem(B_TRANSLATE("Remove button"), message);
 		item->SetTarget(window);
 		menu->AddItem(item);
+		// Open containing folder button
+		if (button->Ref() != NULL) {	
+			message = new BMessage(MSG_OPEN_CONTAINING_FOLDER);
+			message->AddPointer("be:source", (void*)button);
+			item = new BMenuItem(B_TRANSLATE("Open containing folder"), message);
+			item->SetTarget(window);
+			menu->AddItem(item);
+		}
 		// set button description
 		if (button->Ref()) {
 			message = new BMessage(MSG_SET_DESCRIPTION);
