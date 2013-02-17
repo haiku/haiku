@@ -15,6 +15,13 @@ extern "C" {
 #include <libfdt_env.h>
 };
 
+#define TRACE_OF
+#ifdef TRACE_OF
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
 
 // FIXME: HACK: until we support multiple platforms at once in the kernel.
 
@@ -92,7 +99,8 @@ of_finddevice(const char *device)
 		name = fdt_get_alias(gFDT, device);
 
 	node = fdt_path_offset(gFDT, name);
-dprintf("of_finddevice('%s') name='%s' node=%d ret=%d\n", device, name, node, fdt2of(node));
+	TRACE(("of_finddevice('%s') name='%s' node=%d ret=%d\n", device, name, node,
+		fdt2of(node)));
 	return fdt2of(node);
 }
 
@@ -152,11 +160,15 @@ of_instance_to_package(int instance)
 int
 of_getprop(int package, const char *property, void *buffer, int bufferSize)
 {
-int oldSize = bufferSize;
+	int oldSize = bufferSize;
 	const void *p = fdt_getprop(gFDT, package, property, &bufferSize);
-dprintf("of_getprop(%d, '%s', , %d) =%p sz=%d ret=%d\n", package, property, oldSize, p, bufferSize, fdt2of(bufferSize));
+
+	TRACE(("of_getprop(%d, '%s', , %d) =%p sz=%d ret=%d\n", package, property,
+		oldSize, p, bufferSize, fdt2of(bufferSize)));
+
 	if (p == NULL)
 		return fdt2of(bufferSize);
+
 	memcpy(buffer, p, bufferSize);
 	return bufferSize;
 }
