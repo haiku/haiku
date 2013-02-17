@@ -346,7 +346,7 @@ if $(TARGET_ARCH) = x86 {
 	if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		HAIKU_MESA_FILE = mesa-9.0.2-x86-gcc4-2013-02-17.zip ;
 	} else {
-		HAIKU_MESA_FILE = mesa-7.8.2-x86-gcc2-2012-01-17.zip ;
+		HAIKU_MESA_FILE = mesa-7.8.2-x86-gcc2-2013-02-17.zip ;
 	}
 
 	zipFile = [ DownloadFile $(HAIKU_MESA_FILE)
