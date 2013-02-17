@@ -81,7 +81,7 @@ check_cpu_features()
 	// if we have an FDT...
 	// XXX: use it only as fallback?
 	if (gFDT != NULL/* && pvr_unknown*/) {
-		// TODO: for MP support we must checn /chosen/cpu first
+		// TODO: for MP support we must check /chosen/cpu first
 		int node = fdt_path_offset(gFDT, "/cpus/cpu@0");
 		int len;
 
