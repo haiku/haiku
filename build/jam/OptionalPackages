@@ -669,12 +669,12 @@ if [ IsOptionalHaikuImagePackageAdded Development ] {
 		# autotools
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				autoconf-2.68-r1a4-x86-gcc4-2012-08-28.zip
-				: $(baseURL)/autoconf-2.68-r1a4-x86-gcc4-2012-08-28.zip
+				autoconf-2.69-x86-gcc4-2013-02-16.zip
+				: $(baseURL)/autoconf-2.69-x86-gcc4-2013-02-16.zip
 				: : true ;
 			InstallOptionalHaikuImagePackage
-				automake-1.11.1-r1a4-x86-gcc4-2012-08-28.zip
-				: $(baseURL)/automake-1.11.1-r1a4-x86-gcc4-2012-08-28.zip
+				automake-1.13.1-x86-gcc4-2013-02-16.zip
+				: $(baseURL)/automake-1.13.1-x86-gcc4-2013-02-16.zip
 				: : true ;
 			InstallOptionalHaikuImagePackage
 				libtool-2.4-r1a4-x86-gcc4-2012-08-28.zip
@@ -686,12 +686,12 @@ if [ IsOptionalHaikuImagePackageAdded Development ] {
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				autoconf-2.68-r1a4-x86-gcc2-2012-08-26.zip
-				: $(baseURL)/autoconf-2.68-r1a4-x86-gcc2-2012-08-26.zip
+				autoconf-2.69-x86-gcc2-2013-02-17.zip
+				: $(baseURL)/autoconf-2.69-x86-gcc2-2013-02-17.zip
 				: : true ;
 			InstallOptionalHaikuImagePackage
-				automake-1.11.1-r1a4-x86-gcc2-2012-08-26.zip
-				: $(baseURL)/automake-1.11.1-r1a4-x86-gcc2-2012-08-26.zip
+				automake-1.13.1-x86-gcc2-2013-02-17.zip
+				: $(baseURL)/automake-1.13.1-x86-gcc2-2013-02-17.zip
 				: : true ;
 			InstallOptionalHaikuImagePackage
 				libtool-2.4-r1a4-x86-gcc2-2012-08-26.zip
@@ -706,12 +706,12 @@ if [ IsOptionalHaikuImagePackageAdded Development ] {
 		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/system/apps/Debugger : Debugger ;
 		InstallOptionalHaikuImagePackage
-			autoconf-2.69-x86_64-2012-08-17.zip
-			: $(baseURL)/autoconf-2.69-x86_64-2012-08-17.zip
+			autoconf-2.69-x86_64-2013-02-16.zip
+			: $(baseURL)/autoconf-2.69-x86_64-2013-02-16.zip
 			: : true ;
 		InstallOptionalHaikuImagePackage
-			automake-1.12.2-x86_64-2012-08-17.zip
-			: $(baseURL)/automake-1.12.2-x86_64-2012-08-17.zip
+			automake-1.13.1-x86_64-2013-02-16.zip
+			: $(baseURL)/automake-1.13.1-x86_64-2013-02-16.zip
 			: : true ;
 		InstallOptionalHaikuImagePackage
 			libtool-2.4.2-x86_64-2012-08-17.zip
