@@ -56,6 +56,9 @@ static int fdt2of(int err)
 status_t
 of_init(int (*openFirmwareEntry)(void *))
 {
+	if (gFDT == NULL)
+		return OF_FAILED;
+
 	gChosen = fdt2of(fdt_path_offset(gFDT, "/chosen"));
 
 	if (gChosen == OF_FAILED)
