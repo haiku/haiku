@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DriveSetup	2311878791
+1	german	x-vnd.Haiku-DriveSetup	3977871021
 DriveSetup	System name		Datenträgerverwaltung
 Cancel	AbstractParametersPanel		Abbrechen
 Delete	MainWindow		Löschen
@@ -18,6 +18,7 @@ The selected disk is read-only.	MainWindow		Vom ausgewählten Datenträger ist s
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition \"%s\" wirklich formatiert werden? Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.
 Could not mount partition %s.	MainWindow		Die Partition \"%s\" konnte nicht eingehangen werden.
 The partition %s has been successfully formatted.\n	MainWindow		Die Partition \"%s\" wurde erfolgreich formatiert.\n
+Change parameters	MainWindow		Parameter ändern
 The partition %s is already unmounted.	MainWindow		Die Partition \"%s\" ist bereits ausgehangen.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Das Löschen der Partition ist fehlgeschlagen. Der Datenträger blieb unverändert.
 Could not delete the selected partition.	MainWindow		Die gewählte Partition konnte nicht gelöscht werden.
@@ -36,16 +37,21 @@ Write changes	MainWindow		Änderungen schreiben
 There was an error preparing the disk for modifications.	MainWindow		Beim Vorbereiten der Änderungen trat ein interner Fehler auf.
 The partition %s is already mounted.	MainWindow		Die Partition \"%s\" ist bereits eingehangen.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition \"%s\" wirklich formatiert werden? Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.
+Partition name:	ChangeParametersPanel		Partitionsname:
+Change	ChangeParametersPanel		Ändern
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf dem Medium \"%s\" gehen dabei unwiderruflich verloren!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sollen die gewählte Partition wirklich gelöscht werden?\n\nAlle dort vorhandenen Daten gehen dabei unwiderruflich verloren!
 Create…	MainWindow		Anlegen…
 Disk system \"%s\"\" not found!	MainWindow		Medienschema \"%s\"\" nicht gefunden!
 The disk has been successfully initialized.\n	MainWindow		Der Datenträger wurde erfolgreich initialisiert.\n
 Could not unmount partition %s.	MainWindow		Partition \"%s\" konnte nicht ausgehangen werden.
+Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Die Parameter der Partition konnten nicht geändert werden. Es wurde nichts auf die Disk geschrieben.
 Failed to format the partition %s!\n	MainWindow		Formatierung der Partition \"%s\" fehlgeschlagen!\n
 Mount	MainWindow		Einhängen
 Partition type	PartitionList		Partitionstyp:
 Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Soll der leere Datenträger wirklich formatiert werden (üblicherweise wird zuerst eine Partitionstabelle angelegt)? Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.
+The panel experienced a problem!	MainWindow		Es gab ein Problem mit dem Panel!
+Change parameters…	MainWindow		Parameter ändern…
 Device	PartitionList		Gerät
 Disk	MainWindow		Datenträger
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Soll der ausgewählte Datenträger wirklich formatiert werden? Alle Daten werden verloren gehen. Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.\n
@@ -59,11 +65,14 @@ Mount all	MainWindow		Alle einhängen
 End: %s	Support		Ende: %s
 Cancel	MainWindow		Abbrechen
 Delete partition	MainWindow		Partition löschen
+Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Sollen die Parameter der ausgewählten Partition wirklich geändert werden?\n\nAndere Betriebssysteme können die Partition unter Umständen nicht mehr erkennen!
 Eject	MainWindow		Auswerfen
 Partition	MainWindow		Partition
+Validation of the given parameters failed.	MainWindow		Die Überprüfung der angegebenen Parameter ist fehlgeschlagen.
 Create	CreateParametersPanel		Anlegen
 File system	PartitionList		Dateisystem
 Validation of the given creation parameters failed.	MainWindow		Die Überprüfung der zum Anlegen angegebenen Parameter ist fehlgeschlagen.
+Partition type:	ChangeParametersPanel		Partitionstyp:
 Size	PartitionList		Größe
 Wipe (not implemented)	MainWindow		Löschen (nicht implementiert)
 Validation of the given initialization parameters failed.	MainWindow		Die Überprüfung der zum Initialisieren angegebenen Parameter ist fehlgeschlagen.
@@ -73,6 +82,7 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 The partition %s is currently mounted.	MainWindow		Die Partition \"%s\" ist momentan eingehangen.
 Surface test (not implemented)	MainWindow		Oberflächentest (nicht implementiert)
 Format	MainWindow		Formatieren
+Could not change the parameters of the selected partition.	MainWindow		Die Parameter der ausgewählten Partition konnten nicht geändert werden.
 Parameters	PartitionList		Parameter
 Creation of the partition has failed.	MainWindow		Anlegen der Parition schlug fehl.
 The currently selected partition is not empty.	MainWindow		Die gewählte Partition ist nicht leer.

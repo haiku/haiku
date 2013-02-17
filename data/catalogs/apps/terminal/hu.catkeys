@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Terminal	766764238
+1	hungarian	x-vnd.Haiku-Terminal	2645209895
 Not found.	Terminal TermWindow		Nem található.
 Switch Terminals	Terminal TermWindow		Terminálok közti váltás
 Change directory	Terminal TermView		Mappa váltása
@@ -21,6 +21,7 @@ Font:	Terminal AppearancePrefView		Betűtípus:
 Copy here	Terminal TermView		Másolás
 Really close?	Terminal TermWindow		Biztos bezárja?
 Copy	Terminal TermWindow		Másolás
+Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminál
 Color scheme:	Terminal AppearancePrefView		Színösszeállítás:
 Window title:	Terminal TermWindow		Ablak címe:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Ismeretlen beállítás: %s\n
@@ -61,6 +62,7 @@ Text not found.	Terminal TermWindow		Nem található a szöveg.
 Find…	Terminal TermWindow		Keresés…
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		A folyamat (%1) még fut.\nHa bezárja a Terminált, a folyamat megszakad.
 Move here	Terminal TermView		Mozgatás
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAz aktuális fülön belül épp futó folyamat munka-mappája.\n\t\t\tTovábbá az útvonal elemeinek a maximális száma is megadható.\n\t\t\tPéldául '%2d' maximum 2 elem megjelenítéséhez.\n\t%T\t-\tA Terminál program neve az aktuális nyelven.\n\t%i\t-\tAz ablak sorszáma.\n\t%p\t-\tA fülön futtatott folyamat neve.\n\t%t\t-\tAz aktuális fül címe.\n\t%%\t-\t'%' karakter.
 Retro	Terminal colors scheme		Retro
 Error!	Terminal getString		Hiba!
 New tab	Terminal TermWindow		Új lap

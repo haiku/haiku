@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-DriveSetup	2311878791
+1	hungarian	x-vnd.Haiku-DriveSetup	3775412465
 DriveSetup	System name		Lemezkezelő
 Cancel	AbstractParametersPanel		Mégse
 Delete	MainWindow		Törlés
@@ -18,6 +18,7 @@ The selected disk is read-only.	MainWindow		A kiválasztott lemez nem írható.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Biztosan meg akarja formázni a partíciót (%s)? A végleleges művelet előtt még egyszer meg kell ezt erősítenie.
 Could not mount partition %s.	MainWindow		A partíció (%s) nem csatolható.
 The partition %s has been successfully formatted.\n	MainWindow		A partíció (%s) hiba nélkül elő lett készítve.\n
+Change parameters	MainWindow		Paraméterek módosítása
 The partition %s is already unmounted.	MainWindow		A partíció (%s) már le van választva!
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Nem sikerült törölni a partíciót, a lemez tartalma érintetlen maradt.
 Could not delete the selected partition.	MainWindow		A kiválasztott partíció nem törölhető.
@@ -36,16 +37,21 @@ Write changes	MainWindow		Írás a lemezre
 There was an error preparing the disk for modifications.	MainWindow		Hiba történt a változtatások lemezre írása közben.
 The partition %s is already mounted.	MainWindow		A partíció (%s) már csatolva van.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Biztosan formázza a partíciót? Ezt mégegyszer meg kell majd erősítenie a tényleges művelet előtt.
+Partition name:	ChangeParametersPanel		Partíció neve:
+Change	ChangeParametersPanel		Módosítás
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Biztosan lemezre szeretné írni a kijelölt változtatásokat?\n\nEz esetben a „%s” lemez teljes tartalma visszavonhatatlanul meg fog semmisülni.
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Biztosan törölni szeretné a kiválasztott partíciót?\n\nEz esetben a partíció teljes tartalma visszavonhatatlanul meg fog semmisülni.
 Create…	MainWindow		Létrehozás…
 Disk system \"%s\"\" not found!	MainWindow		„%s” rendszerlemez nem található!
 The disk has been successfully initialized.\n	MainWindow		A partíció (%s) hiba nélkül elő lett készítve.\n
 Could not unmount partition %s.	MainWindow		Nem lehet leválasztani a partíciót (%s).
+Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Nem sikerült megváltoztatni a partíció paramétereit. A lemezen nem történt változás.
 Failed to format the partition %s!\n	MainWindow		Nem sikerült előkészíteni a partíciót: „%s”.\n
 Mount	MainWindow		Csatol
 Partition type	PartitionList		Partíció típusa
 Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Biztosan formázni szeretné a nyers lemezt? (A legtöbb esetben elő szokták készíteni a lemezt formázás előtt.) Ezt még egyszer meg kell majd erősítenie.
+The panel experienced a problem!	MainWindow		A panel hibát okozott!
+Change parameters…	MainWindow		Paraméterek módosítása…
 Device	PartitionList		Eszköz
 Disk	MainWindow		Lemez
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Biztosan elő szeretné készíteni a megadott lemezt? Az összes adat el fog veszni. Ezt majd mégegyszer meg kell erősítenie.
@@ -57,13 +63,17 @@ Continue	MainWindow		Folytatás
 Cannot delete the selected partition.	MainWindow		A kijelölt partíció nem törölhető.
 Mount all	MainWindow		Összes csatolása
 End: %s	Support		Vége: %s
+The panel could not return successfully.	MainWindow		A panel sikertelenül tért vissza.
 Cancel	MainWindow		Mégse
 Delete partition	MainWindow		Partíció törlése
+Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Biztosan módosítani szeretné a kijelölt partíció paramétereit?\n\nLehetséges, hogy a módosítás hatására a partíció nem lesz többé felismerhető a többi operációs rendszer számára!
 Eject	MainWindow		Kiadás
 Partition	MainWindow		Partíció
+Validation of the given parameters failed.	MainWindow		A megadott paramétereket nem sikerült érvényesíteni.
 Create	CreateParametersPanel		Létrehoz
 File system	PartitionList		Fájlrendszer
 Validation of the given creation parameters failed.	MainWindow		A létrehozáshoz megadott paramétereket nem sikerült érvényesíteni.
+Partition type:	ChangeParametersPanel		Partíció típusa:
 Size	PartitionList		Méret
 Wipe (not implemented)	MainWindow		Formázás (még nem működik)
 Validation of the given initialization parameters failed.	MainWindow		Az előkészítéshez megadott paramétereket nem sikerült érvényesíteni.
@@ -73,6 +83,7 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 The partition %s is currently mounted.	MainWindow		A partíció (%s) csatolva van.
 Surface test (not implemented)	MainWindow		Felületellenőrzés (még nem működik)
 Format	MainWindow		Formázás
+Could not change the parameters of the selected partition.	MainWindow		Nem lehet módosítani a megadott partíció paramétereit.
 Parameters	PartitionList		Paraméterek
 Creation of the partition has failed.	MainWindow		Nem sikerült létrehozni a partíciót.
 The currently selected partition is not empty.	MainWindow		A kijelölt partíció nem üres.
