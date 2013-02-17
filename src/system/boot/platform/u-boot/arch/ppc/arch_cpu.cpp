@@ -22,8 +22,16 @@
 
 #include <string.h>
 
+extern "C" {
+#include <fdt.h>
+#include <libfdt.h>
+#include <libfdt_env.h>
+};
 
-//#define TRACE_CPU
+
+extern void *gFDT;
+
+#define TRACE_CPU
 #ifdef TRACE_CPU
 #	define TRACE(x) dprintf x
 #else
@@ -44,17 +52,67 @@ static status_t
 check_cpu_features()
 {
 	uint32 msr;
+	uint32 pvr;
+	bool is_440 = false;
+	bool is_460 = false;
+	bool pvr_unknown = false;
+	bool fdt_unknown = true;
+	const char *fdt_model = NULL;
 
-#if BOARD_CPU_TYPE_PPC440
-	// the FPU is implemented as an Auxiliary Processing Unit,
-	// so we must enable transfers by setting the DAPUIB bit to 0
-	asm volatile(
-		"mfccr0 %%r3\n"
-		"\tlis %%r4,~(1<<(20-16))\n"
-		"\tand %%r3,%%r3,%%r4\n"
-		"\tmtccr0 %%r3"
-		: : : "r3", "r4");
-#endif
+	// attempt to detect processor version, either from PVR or FDT
+	// TODO:someday we'll support other things than 440/460...
+
+	// read the Processor Version Register
+	pvr = get_pvr();
+	uint16 version = (uint16)(pvr >> 16);
+	uint16 revision = (uint16)(pvr & 0xffff);
+
+	switch (version) {
+		case AMCC440EP:
+			is_440 = true;
+			break;
+		case AMCC460EX:
+			is_460 = true;
+			break;
+		default:
+			pvr_unknown = true;
+	}
+
+	// if we have an FDT...
+	// XXX: use it only as fallback?
+	if (gFDT != NULL/* && pvr_unknown*/) {
+		// TODO: for MP support we must checn /chosen/cpu first
+		int node = fdt_path_offset(gFDT, "/cpus/cpu@0");
+		int len;
+
+		fdt_model = (const char *)fdt_getprop(gFDT, node, "model", &len);
+		// TODO: partial match ? "PowerPC,440" && isalpha(next char) ?
+		if (fdt_model) {
+			if (!strcmp(fdt_model, "PowerPC,440EP")) {
+				is_440 = true;
+				fdt_unknown = false;
+			} else if (!strcmp(fdt_model, "PowerPC,460EX")) {
+				is_460 = true;
+				fdt_unknown = false;
+			}
+		}
+	}
+
+	if (is_460)
+		is_440 = true;
+
+	// some cpu-dependent tweaking
+
+	if (is_440) {
+		// the FPU is implemented as an Auxiliary Processing Unit,
+		// so we must enable transfers by setting the DAPUIB bit to 0
+		asm volatile(
+			"mfccr0 %%r3\n"
+			"\tlis %%r4,~(1<<(20-16))\n"
+			"\tand %%r3,%%r3,%%r4\n"
+			"\tmtccr0 %%r3"
+			: : : "r3", "r4");
+	}
 
 	// we do need an FPU for vsnprintf to work
 	// on Sam460ex at least U-Boot doesn't enable the FPU for us
@@ -67,6 +125,11 @@ check_cpu_features()
 		panic("no FPU!");
 		return B_ERROR;
 	}
+
+	TRACE(("CPU detection:\n"));
+	TRACE(("PVR revision %sknown: 0x%8lx\n", pvr_unknown ? "un" : "", pvr));
+	TRACE(("FDT model %sknown: %s\n", fdt_unknown ? "un" : "", fdt_model));
+	TRACE(("flags: %s440 %s460\n", is_440 ? "" : "!", is_460 ? "" : "!"));
 
 	return B_OK;
 }
@@ -103,6 +166,7 @@ boot_arch_cpu_init(void)
 
 	gKernelArgs.num_cpus = 1;
 		// this will eventually be corrected later on
+		// TODO:iterate on /cpus/*
 
 	return B_OK;
 }
