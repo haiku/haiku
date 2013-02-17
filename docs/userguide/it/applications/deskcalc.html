@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009, Haiku. All rights reserved.
+ * Copyright 2009-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -43,6 +43,7 @@
 <li><a href="../../sk/applications/deskcalc.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../hu/applications/deskcalc.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_BR/applications/deskcalc.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../ca/applications/deskcalc.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/applications/deskcalc.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -54,6 +55,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">La traduzione di questa pagina non è stata completata. Per questo motivo le parti non tradotte sono visibili in inglese.</div>
 
 <h2><img src="../../images/apps-images/deskcalc-icon_64.png" alt="deskcalc-icon_64.png" width="64" height="64" />DeskCalc</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -65,18 +67,22 @@
 <p>Sebbene non si noti a prima vista, DeskCalc è una semplice calcolatrice dotata di caratteristiche interessanti.</p>
 <img src="../images/apps-images/deskcalc.png" alt="deskcalc.png" />
 <ul>
-<li><p>DeskCalc comprende molto più di quanto il tastierino suggerisca.<br />
-Oltre gli operatori <tt>+</tt>, <tt>-</tt>, <tt>*</tt>, <tt>/</tt>, <tt>%</tt>, <tt>^</tt> e le costanti <tt>pi</tt> ed <tt>e</tt> sono supportate le seguenti funzioni matematiche:<br />
-<tt>acos</tt>, <tt>asin</tt>, <tt>atan</tt>, <tt>atan2</tt>, <tt>ceil</tt>, <tt>cos</tt>, <tt>cosh</tt>, <tt>exp</tt>, <tt>floor</tt>, <tt>log</tt>, <tt>log10</tt>, <tt>pow</tt>, <tt>sin</tt>, <tt>sinh</tt>, <tt>sqrt</tt>, <tt>tan</tt>, <tt>tanh</tt>.</p></li>
-<li><p>Quando viene immesso dell'input, DeskCalc è piuttosto tollerante:<br />
-<tt>/</tt>, <tt>:</tt>, <tt>\</tt> vengono tutti interpretati come operatori di divisione,<br />
-<tt>*</tt>, <tt>x</tt> sono simboli validi per le moltiplicazioni.<br />
-Bisogna fare attenzione nell'uso di <tt>.</tt> e di <tt>,</tt> che vengono entrambi interpretati come separatori delle cifre decimali, ma questo implica che non è possibile usarli per la suddivisione in migliaia.</p></li>
-<li><p>Cliccando col tasto destro vengono offerte le seguenti opzioni:</p>
+<li><p>DeskCalc understands much more than its simple keypad suggests.<br />
+Besides the operators <tt> </tt>, <tt>-</tt>, <tt>*</tt>, <tt>/</tt>, <tt>%</tt>, <tt>^</tt> and the constants <tt>pi</tt> and <tt>e</tt> the following math functions are supported:<br />
+<tt>!</tt>, <tt>acos</tt>, <tt>asin</tt>, <tt>atan</tt>, <tt>atan2</tt>, <tt>cbrt</tt>, <tt>ceil</tt>, <tt>cos</tt>, <tt>cosh</tt>, <tt>exp</tt>, <tt>floor</tt>, <tt>log</tt>, <tt>log10</tt>, <tt>pow</tt>, <tt>sin</tt>, <tt>sinh</tt>, <tt>sqrt</tt>, <tt>tan</tt>, <tt>tanh</tt>.</p></li>
+
+<li><p>Right-clicking offers these options:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Attiva il Bloc Num all'avvio</span></td><td style="width:15px;"></td><td>attiva automaticamente il Bloc Num non appena viene avviato DeskCalc</td></tr>
-<tr><td><span class="menu">Mostra il tastierino</span></td><td></td><td>nasconde il tastierino se disattivato</td></tr>
+<tr><td colspan="2"><span class="menu">Enable Num Lock on start up</span></td><td style="width:15px;"></td><td>Automatically activates the number block when launching DeskCalc.</td></tr>
+<tr><td colspan="2"><span class="menu">Radiants/Degrees</span></td><td></td><td>Switch between "rad" and "deg" as unit for angular measure.</td></tr>
+<tr><td><span class="menu">Compact</span></td><td><span class="key">ALT</span> <span class="key">0</span></td><td></td><td>A minimal view mode that hides the keypad.</td></tr>
+<tr><td><span class="menu">Basic</span></td><td><span class="key">ALT</span> <span class="key">1</span></td><td></td><td>The standard look of DeskCalc.</td></tr>
+<tr><td><span class="menu">Scientific</span></td><td><span class="key">ALT</span> <span class="key">2</span></td><td></td><td>Show additional buttons for advanced calculations.</td></tr>
 </table></li>
+<li><p>When it comes to user input, DeskCalc is quite tolerant:<br />
+<tt>/</tt>, <tt>:</tt>, <tt>\</tt> are all interpreted as division operators,<br />
+<tt>*</tt>, <tt>x</tt> are valid symbols for multiplication.<br />
+Also, be aware that <tt>.</tt> and <tt>,</tt> are both considered floating points, which means you mustn't use them as 1000-separators.</p></li>
 <li><p>È possibile ridimensionare a piacimento la finestra della calcolatrice e poi posizionarla come <a href="../gui.html#replicants">Replicante</a> sul Desktop trascinando il simbolo nell'angolo in basso a destra. È necessario assicurarsi che <span class="menu">Mostra Replicanti</span> sia attivato nella Deskbar.</p></li>
 <li><p>Il tastierino può essere colorato semplicemente trascinandovi sopra qualsiasi colore, preso per esempio da <span class="app">Icon-O-Matic</span>.</p></li>
 <li><p>È possibile muoversi nella cronologia dei calcoli svolti con <span class="key">↑</span> e <span class="key">↓</span>.</p></li>
@@ -84,9 +90,10 @@ Bisogna fare attenzione nell'uso di <tt>.</tt> e di <tt>,</tt> che vengono entra
 <p>Diversamente, è possibile anche l'inverso:<br />
 Creare dei ritagli di testo come descritto nei vari passaggi del calcolo e trascinarli in DeskCalc.<br />
 È anche possibile trascinare in DeskCalc dei calcoli contenuti in una email.</p></li>
-<li><p>DeskCalc può essere utilizzata all'interno del Terminale. Basta racchiudere l'espressione tra le virgolette doppie come mostrato qui di seguito:</p>
+<li><p>DeskCalc can be used in Terminal. Just put the expression in double quotes, like this:</p>
 <pre class="terminal">~&gt; DeskCalc "sin(45)*(cos(12)+3.45)"
-3.6536554673202546181795194727005826674359494735820338441084848</pre></li>
+3.65365546732025461817951947270058</pre>
+<p>Note: Used in the Terminal, DeskCalc will always use radians as unit for these trigonometric functions.</p></li>
 </ul>
 
 </div>

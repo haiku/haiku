@@ -10,12 +10,14 @@
  * Authors:
  *		Maciej Bałuta  (Google Code-In student)
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Adriano Duarte
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>NetworkStatus</title>
+	<title>Estado da Rede</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -41,39 +43,39 @@
 <li><a href="../../fi/desktop-applets/networkstatus.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sk/desktop-applets/networkstatus.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../hu/desktop-applets/networkstatus.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../ca/desktop-applets/networkstatus.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/desktop-applets/networkstatus.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="launchbox.html">LaunchBox</a> 
+ «  <a href="launchbox.html">Caixa de Lançamento</a> 
 ::  <a href="../desktop-applets.html" class="uplink">Miniaplicativos da Área de Trabalho</a> 
-::  <a href="powerstatus.html">PowerStatus</a>  »
+::  <a href="powerstatus.html">Estado de Energia</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">A tradução desta página ainda não está completa. Até lá, partes incompletas mostrarão o original em inglês.</div>
 
-<h2><img src="../../images/desktop-applets-images/networkstatus-icon_64.png" alt="networkstatus-icon_64.png" width="64" height="64" />NetworkStatus</h2>
+<h2><img src="../../images/desktop-applets-images/networkstatus-icon_64.png" alt="networkstatus-icon_64.png" width="64" height="64" />Estado da Rede</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Miniaplicativos da área de trabalho</span></td></tr>
 <tr><td>Localização:</td><td></td><td><span class="path">/boot/system/apps/NetworkStatus</span></td></tr>
 <tr><td>Configurações:</td><td></td><td><i>nenhuma</i></td></tr>
 </table>
-<p>NetworkStatus shows the status of your network connections. If not yet running, launching the applet will ask if it should open in window mode or live in the Deskbar. In window mode you're able to resize the icon by resizing the window and use the <a href="../gui.html#replicants">Replicant</a> handle to drag it to the Desktop.<br />
-Wherever installed, it's operated via a right-click context menu.</p>
+<p>O Estado de Rede exibe o estado de suas conexões de rede. Se ainda não estiver executando, carregar o miniaplicativo irá perguntar se deve abrir em modo de janela ou como ícone na Deskbar. No modo de janela, é possível redimensionar o ícone redimensionando a janela e utilizar a alça do  <a href="../gui.html#replicants">Replicante</a> para arrastá-lo para a Área de Trabalho.<br />
+Onde quer que esteja instalado, é operado via menu de contexto acionado por um clique com o botão direito do mouse.</p>
 <p><img src="../images/networkstatus-images/applet.png" alt="NetworkStatus applet" /><br />
-The first section contains all network devices' names and their state. Clicking on such an entry brings up a window showing its IP, broadcast and netmask address.<br />
-Below is a list of all wireless networks found by the first wireless adapter and an indicator of their signal strength. Have a look at the <a href="..\workshop-wlan.html">Workshop: Wireless networking</a> for more information on how to set up a connection.<br />
-Lastly, you can <span class="menu">Open network preferences...</span> to change your <a href="../preferences/network.html">network configuration</a> or <span class="menu">Quit</span> the applet.</p>
+A primeira seção contém os nomes de todos os dispositivos de rede e seus estados. Clicar em cada entrada apresenta uma janela exibindo seu IP, broadcast e endereço da máscara de rede.<br />
+Abaixo está uma lista de todas as redes sem fio encontradas pelo primeiro adaptador sem fio e um indicador da força dos seus sinais. Dê uma olhada em <a href="..\workshop-wlan.html">Oficina: Redes sem fio</a> para maiores informações sobre como configurar uma conexão.<br />
+Finalmente, pode-se <span class="menu">Abrir preferências de rede...</span> alterar sua <a href="../preferences/network.html">configuração de rede</a> ou <span class="menu">Fechar</span> o miniaplicativo.</p>
 
-<h2>Status icons</h2>
+<h2>Ícones de estado</h2>
 <table summary="status icons" border="0" cellspacing="0" cellpadding="2">
-	<tr><td><img src="../images/networkstatus-images/icon-ready.png" /></td><td style="width:15px;"></td><td>Ready</td><td>Link is established.</td></tr>
-	<tr><td><img src="../images/networkstatus-images/icon-connecting.png" /></td><td></td><td>Configuring</td><td>Connecting in progress.</td></tr>
-	<tr><td><img src="../images/networkstatus-images/icon-nosettings.png" /></td><td></td><td>No stateful configuration</td><td>Some settings are missing (check <a href="../preferences/network.html">IP configuration</a>).</td></tr>
-	<tr><td><img src="../images/networkstatus-images/icon-noconnection.png" /></td><td></td><td>No link</td><td>There is no physical connection (probably the network cable is not connected and wireless networks are unavailable).</td></tr>
-	<tr><td><img src="../images/networkstatus-images/icon-nodevices.png" /></td><td></td><td>-</td><td>There are no network adapters available (if you are sure that at least one is connected, there are probably no drivers yet).</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-ready.png" /></td><td style="width:15px;"></td><td>Pronto</td><td>O vínculo está estabelecido.</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-connecting.png" /></td><td></td><td>Configurando</td><td>Conexão em progresso.</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-nosettings.png" /></td><td></td><td>Nenhuma configuração estabelecida</td><td>Algumas definições estão perdidas (check <a href="../preferences/network.html">Configuração IP</a>).</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-noconnection.png" /></td><td></td><td>Nenhum vínculo</td><td>Não existe conexão física (provavelmente o cabo da rede não está conectado e redes sem fio estão indisponíveis).</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-nodevices.png" /></td><td></td><td>-</td><td>Não existem adaptadores de rede disponíveis (se está seguro de que ao menos um está conectado, provavelmente não há drivers ainda).</td></tr>
 </table>
 
 </div>
@@ -81,9 +83,9 @@ Lastly, you can <span class="menu">Open network preferences...</span> to change 
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="launchbox.html">LaunchBox</a> 
+ «  <a href="launchbox.html">Caixa de Lançamento</a> 
 ::  <a href="../desktop-applets.html" class="uplink">Miniaplicativos da Área de Trabalho</a> 
-::  <a href="powerstatus.html">PowerStatus</a>  »
+::  <a href="powerstatus.html">Estado de Energia</a>  »
 </span></div>
 </div>
 

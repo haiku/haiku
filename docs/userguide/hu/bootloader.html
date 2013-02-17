@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,6 +42,7 @@
 <li><a href="../fi/bootloader.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../sk/bootloader.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../pt_BR/bootloader.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../ca/bootloader.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -63,30 +64,40 @@ Ez akkor is hasznos lehet, ha valamely telepített összetevő miatt a rendszer 
 <p><br /></p>
 <p>A rendszertöltő elindulása után az alábbi menük/lehetőségek tárulnak elénk:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
-<tr><td><b>Select boot volume</b><br />Rendszer kiválasztása</td><td> </td><td>Az indítandó Haiku kiválasztása.</td></tr>
+<tr><td><b>Select boot volume</b><br />Rendszer kiválasztása</td><td> </td><td>Az indítandó Haiku kiválasztása.</td></tr>
 <tr><td><b>Select safe mode options</b><br />Biztonsági opciók
-</td><td> </td><td>A következő opciók hibakereséskor lehetnek hasznunkra. Az opciók kijelölésekor a képernyő alján egy rövid leírást olvashatunk a hatásukról.
-<p><i>- Safe mode (biztonsági mód)</i><br />
-<i>- Disable user add-ons (felhasználói kiegészítők tiltása)</i><br />
-<i>- Disable IDE DMA (DMA tiltása)</i><br />
-<i>- Use fail-safe video mode (biztonsági videó mód)</i><br />
-<i>- Disable IO-APIC (IO-APIC tiltása)</i><br />
-<i>- Disable LOCAL APIC (helyi APIC tiltása)</i><br />
-<i>- Don't call the BIOS (BIOS hívások tiltása)</i><br />
-<i>- Disable APM (APM tiltása)</i><br />
-<i>- Disable ACPI (ACPI tiltása)</i>
-</p></td></tr>
+</td><td> </td><td>A következő opciók hibakereséskor lehetnek hasznunkra. Az opciók kijelölésekor a képernyő alján egy rövid leírást olvashatunk a hatásukról.</td></tr>
+<tr><td></td><td></td><td>
+	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><i>- Safe mode</i></td><td width="15"></td><td>biztonsági mód</td></tr>
+	<tr><td><i>- Disable user add-ons</i></td><td></td><td>felhasználói kiegészítők tiltása</td></tr>
+	<tr><td><i>- Disable IDE DMA</i></td><td></td><td>DMA tiltása</td></tr>
+	<tr><td class="onelinetop"><i>- Use fail-safe video mode</i></td><td></td><td>biztonsági videó mód</td></tr>
+	<tr><td><i>- Don't call the BIOS</i></td><td></td><td>BIOS hívások tiltása</td></tr>
+	<tr><td><i>- Disable APM</i></td><td></td><td>APM tiltása</td></tr>
+	<tr><td><i>- Disable ACPI</i></td><td></td><td>ACPI tiltása</td></tr>
+	</table>
+</td></tr>
 <tr><td><b>Select debug options</b><br />Hibakereső opciók
-</td><td> </td><td>Az alábbi opciók segítséghetnek a hiba keresésben illetve a hiba jelentésében. Szintén kapunk egy kis leírást a képernyő alján ha kiválasztunk egy opciót.
-<p><i>- Enable serial debug output (sorosporti hibakeresés engedélyezése)</i><br />
-<i>- Enable on screen debug output (képernyőn történő hibakeresés engedélyezése)</i><br />
-<i>- Enable debug syslog (hibakereső naplózás engedélyezése)</i>
-</p>
-<p>Ha a "debug syslog" (hibakereső naplózás) engedélyezve van, hiba utáni újraindítás esetén a következő opciók is megjelennek:</p>
-<p><i>- Display syslog from previous session (a legutóbbi napló megjelenítése)</i><br />
-<i>- Save syslog from previous session (a legutóbbi napló elmentése)</i>
-</p></td></tr>
-<tr><td class="onelinetop"><b>Select fail safe video mode</b><br />Biztonsági videó mód választása</td><td> </td><td>Ha bejelöljük a <i>Use fail-safe video mode</i>-ot (biztonsági videó mód), akkor kiválaszthatjuk a felbontást és a színmélységet.</td></tr>
+</td><td> </td><td>Az alábbi opciók segítséghetnek a hiba keresésben illetve a hiba <a href="../welcome/hu/bugreports.html">jelentésében</a>. Szintén kapunk egy kis leírást a képernyő alján ha kiválasztunk egy opciót.</td></tr>
+<tr><td></td><td></td><td>
+	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><i>- Enable serial debug output</i></td><td width="15"></td><td>sorosporti hibakeresés engedélyezése</td></tr>
+	<tr><td><i>- Enable on screen debug output</i></td><td></td><td>képernyőn történő hibakeresés engedélyezése</td></tr>
+	<tr><td><i>- Disable on screen paging</i></td><td></td><td>lapozás tiltása a képernyőn</td></tr>
+	<tr><td><i>- Enable debug syslog</i></td><td></td><td>hibakereső naplózás engedélyezése</td></tr>
+	<tr><td class="onelinetop"><i>- Display current boot loader log</i></td><td></td><td>jelenlegi rendszertöltő napló megjelenítése (kilépés a <span class="key">Q</span> lenyomásával)</td></tr>
+	<tr><td><i>- Add advanced debug option</i></td><td></td><td>további hibakereső opciók</td></tr>
+</table>
+</td></tr>
+<tr><td></td><td></td><td>Ha az "Enable debug syslog" engedélyezve van, hiba utáni újraindítás esetén a következő opciók is megjelennek:</td></tr>
+<tr><td></td><td></td><td>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td class="onelinetop"><i>- Display syslog from previous session</i></td><td></td><td>a legutóbbi napló megjelenítése</td></tr>
+	<tr><td><i>- Save syslog from previous session</i></td><td></td><td>a legutóbbi napló mentése</td></tr>
+</table>
+</td></tr>
+<tr><td class="onelinetop"><b>Select fail safe video mode</b><br />Biztonsági videó mód választása</td><td> </td><td>Ha bejelöljük a <i>Use fail-safe video mode</i>-ot (biztonsági videó mód), akkor kiválaszthatjuk a felbontást és a színmélységet.</td></tr>
 </table>
 <p><br /></p>
 <p>Ha bejelöltük a megfelelő opciókat, utána térjünk vissza a főmenübe, majd folytassuk a betöltést. Ez a következő képernyőt eredményezi:</p>

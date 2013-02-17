@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -44,6 +44,7 @@
 <li><a href="../../sk/applications/cli-apps.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../hu/applications/cli-apps.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_BR/applications/cli-apps.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../ca/applications/cli-apps.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/applications/cli-apps.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 
@@ -55,6 +56,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">La traduzione di questa pagina non è stata completata. Per questo motivo le parti non tradotte sono visibili in inglese.</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Applicazioni su riga di comando specifiche per Haiku</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -103,16 +105,19 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
 		<td><p><span class="cli">checkfs</span> è un'applicazione importante per verificare la presenza di errori nel filesystem. Basta aggiungere il nome del volume o del dispositivo e il programma esaminerà ogni file e correrreggerà eventuali inconsistenze dove possibile.</p></td></tr>
-<tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">open</span> è un'applicazione semplice ma anche molto pratica. Permette di aprire qualsiasi file con la sua applicazione preferita o avviare uno specifico programma a partire dalla sua firma senza la necessità di conoscerne l'esatto percorso. Il comando funziona anche con gli URL e con le cartelle "virtuali" (<tt>.</tt> indica la cartella corrente e <tt>..</tt> indica la cartella superiore) aprendo la cartella direttamente nel Tracker.</p></td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">desklink</span> può aggiungere un'icona per qualsiasi file, cartella, query o applicazione da mostrare nella Deskbar. Offre anche un'opzione che permette di mostrare un menù contestuale quando, per eseguire azioni speciali, si fa clic con il tasto destro su un'icona. Per esempio, digitate nel terminale quanto segue per aggiungere alla Deskbar il programma su riga di comando <span class="app">screenshot</span> con le varie opzioni (il "<tt>\</tt>" nella prima riga serve semplicemente per segnalare l'andata a capo al Terminale):</p>
 <pre class="terminal"> desklink "cmd=Active window (2s):/bin/screenshot --window --border --delay 2" \
 "cmd=Remove replicant:desklink --remove=screenshot" /bin/screenshot
 </pre>
 <p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>
-</td></tr></table>
-
+</td></tr>
+<tr><td><p><span class="cli">diskimage</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">diskimage</span> lets you register a regular file as disk device. For example, you can register a Haiku anyboot image, mount it in Tracker and copy, edit or remove files there before using it as source in the Installer.</p>
+</td></tr>
+<tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">open</span> è un'applicazione semplice ma anche molto pratica. Permette di aprire qualsiasi file con la sua applicazione preferita o avviare uno specifico programma a partire dalla sua firma senza la necessità di conoscerne l'esatto percorso. Il comando funziona anche con gli URL e con le cartelle "virtuali" (<tt>.</tt> indica la cartella corrente e <tt>..</tt> indica la cartella superiore) aprendo la cartella direttamente nel Tracker.</p></td></tr>
+</table>
 </div>
 </div>
 

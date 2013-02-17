@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009, Haiku. All rights reserved.
+ * Copyright 2009-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,6 +42,7 @@
 <li><a href="../../fi/applications/diskusage.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sk/applications/diskusage.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../pt_BR/applications/diskusage.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../ca/applications/diskusage.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/applications/diskusage.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -63,9 +64,10 @@
 <p><br /></p>
 <p>A program grafikonon jeleníti meg a lemez kihasználtságát.<br />
 Ez egy remek program, ami választ adhat a kérdésre: "<i>Hová tűnt a szabad hely a gépen?</i>".</p>
+<p>Indítás után a program csupán egy fehér ablakot jelenít meg, amiben az összes csatolt lemez külön fülön jelenik meg. Ekkor csak ki kell választanunk azt a lemezt, amit elemezni szeretnénk, majd az <span class="button">Elemzés</span> gombra kattintva a program megvizsgálja azt. Nagyobb méretű lemezek esetében ez hosszabb időt vehet igénybe... Mialatt várakozunk, nyugodtan navigálhatunk egy másik lemezen, vagy azt is elemezhetjük.<br />
+Nem ajánlott azonban sok elemzést egyszerre elindítani azonos fizikai lemezen, ugyanis ez jelentősen megnövelheti a várakozási időt.</p>
 <p><img id="diskusage" src="../images/apps-images/diskusage.png" alt="diskusage.png" /></p>
 <p>A koncentrikus körök jelképezik a különböző szinteket a fájrendszer szerkezetében. A felső képen a középső kör jelzi a <span class="path">/boot/home</span> mappát. A gyűrű minden egyes szelete közvetlenül a körön kívül egy fájl vagy mappa a <span class="path">/boot/home</span> mappában. Minden egyes szelet egy szinttel mélyebbre visz minket a fájlrendszerben. Az ablakot lehet, hogy át kell méretezni, ha nagyon mélyre akarunk menni.</p>
-<p>A grafikon felett találunk füleket, amivel választhatunk a csatolt lemezek közül. Mielőtt a lemezhasználat megjelenítésre kerül, a programnak elemeznie kell a lemezt. Bár ez nagy méretű lemezek esetében elég sokáig is eltarthat, közben nyugodtan használhatunk egy másik lemezt, ugyanis az elemzés a háttérben zajlik.</p>
 <div class="box-info"><ul>
 <li>Ha az adott fájl vagy mappa méretének megfelelő körcikk 2°-nál kisebb, akkor az nem jelenik meg.</li>
 <li>A mappáknál megjelenített fájlok száma tartalmazza az almappákban lévő fájlokat is. Továbbá a mappák is fájlnak számítanak.</li>
@@ -76,6 +78,7 @@ Ez egy remek program, ami választ adhat a kérdésre: "<i>Hová tűnt a szabad 
 A bal gombbal kattintva a fájl/mappa középre kerül.<br />
 A középső körön pedig bal gomb hatására egy szinttel fejjebb lépünk.</p>
 <p>A program ablakából bárhová dobhatunk fájlt vagy mappát, akár egy programba, akár az Asztalra, vagy a Nyomkövetőbe. Ugyanakkor a program ablakába dobva egy fájlt vagy mappát azonnal oda ugrik a grafikon, vagyis az kerül a kör közepébe.</p>
+<p>A Nyomkövető kiegészítői közül kiválasztva a Lemezhasználatot a program a jelenlegi mappát veszi alapul induláskor.</p>
 
 </div>
 </div>

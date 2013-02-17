@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009, Haiku. All rights reserved.
+ * Copyright 2009-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,11 +42,13 @@
 <li><a href="../../sk/applications/deskcalc.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../hu/applications/deskcalc.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_BR/applications/deskcalc.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../ca/applications/deskcalc.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/applications/deskcalc.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
  «  <a href="codycam.html">摄像头</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">应用程序
+</a> 
 ::  <a href="diskprobe.html">磁盘扫描器</a>  »
 </span></div>
 </div>
@@ -65,17 +67,21 @@
 <img src="../images/apps-images/deskcalc.png" alt="deskcalc.png" />
 <ul>
 <li><p>计算器不仅仅能够识别出面板键盘上的输入符号。<br />
-除了 <tt>+</tt>， <tt>-</tt>， <tt>*</tt>， <tt>/</tt>， <tt>%</tt>， <tt>^</tt> 和常量  <tt>pi</tt> 与 <tt>e</tt> ，它还支持下面的数学函数：<br />
-<tt>acos</tt>， <tt>asin</tt>， <tt>atan</tt>， <tt>atan2</tt>， <tt>ceil</tt>， <tt>cos</tt>， <tt>cosh</tt>， <tt>exp</tt>， <tt>floor</tt>， <tt>log</tt>， <tt>log10</tt>， <tt>pow</tt>， <tt>sin</tt>， <tt>sinh</tt>， <tt>sqrt</tt>， <tt>tan</tt>， <tt>tanh</tt>。</p></li>
+除了 <tt> </tt>, <tt>-</tt>, <tt>*</tt>, <tt>/</tt>, <tt>%</tt>, <tt>^</tt> 和常量  <tt>pi</tt> 与 <tt>e</tt> ，它还支持下面的数学函数：<br />
+<tt>!</tt>, <tt>acos</tt>, <tt>asin</tt>, <tt>atan</tt>, <tt>atan2</tt>, <tt>cbrt</tt>, <tt>ceil</tt>, <tt>cos</tt>, <tt>cosh</tt>, <tt>exp</tt>, <tt>floor</tt>, <tt>log</tt>, <tt>log10</tt>, <tt>pow</tt>, <tt>sin</tt>, <tt>sinh</tt>, <tt>sqrt</tt>, <tt>tan</tt>, <tt>tanh</tt>.</p></li>
+
+<li><p>右键点击提供了以下选项：</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">Enable Num Lock on start up</span></td><td style="width:15px;"></td><td>在启动计算器后，自动激活数字区域。</td></tr>
+<tr><td colspan="2"><span class="menu">Radiants/Degrees</span></td><td></td><td>切换角度计算单位 "rad" 和 "deg" 。</td></tr>
+<tr><td><span class="menu">Compact</span></td><td><span class="key">ALT</span> <span class="key">0</span></td><td></td><td>隐藏了键盘的迷你显示模式。</td></tr>
+<tr><td><span class="menu">Basic</span></td><td><span class="key">ALT</span> <span class="key">1</span></td><td></td><td>桌面计算器的标准外观。</td></tr>
+<tr><td><span class="menu">Scientific</span></td><td><span class="key">ALT</span> <span class="key">2</span></td><td></td><td>显示高级计算功能的额外按键。</td></tr>
+</table></li>
 <li><p>对于用户输入，计算器是非常宽容的。<br />
 <tt>/</tt>， <tt>:</tt>， <tt>\</tt> 都被认为是除法操作符。<br />
 <tt>*</tt>， <tt>x</tt> 都是有效的乘法操作符。<br />
 而且，需要注意的是 <tt>.</tt> 和 <tt>,</tt> 都被认为是浮点数的小数点，这也就意味着您不能够把它们用作千分符。</p></li>
-<li><p>右键点击提供了以下选项：</p>
-<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Enable Num Lock on start up</span></td><td style="width:15px;"></td><td>在启动计算器后，自动激活数字区域。</td></tr>
-<tr><td><span class="menu">Show Keypad</span></td><td></td><td>在计算器停止活动时，隐藏键盘面板。</td></tr>
-</table></li>
 <li><p>您可以根据自己的需要对计算器的大小进行调节，然后通过拖拽窗口右下角符号将其放置在桌面上作为 <a href="../gui.html#replicants">Replicant</a> 。但是您必须保证 桌面栏中的 <span class="menu">Show Replicants</span> 处于激活状态。</p></li>
 <li><p>键盘面板可以通过选色板来添加颜色，例如： <span class="app">Icon-O-Matic</span>。</p></li>
 <li><p>您可以使用 <span class="key">↑</span> 和 <span class="key">↓</span> 键来查看计算器的历史计算内容。</p></li>
@@ -83,9 +89,10 @@
 <p>更有意思的是，您也可以执行相反的操作：<br />
 依据上面的方法创建一个描述了您的计算步骤的剪报，然后将它们拖拽到计算器中进行运算。<br />
 或者您也可以直接从邮件中拖拽一个计算表达式到计算其中进行运算。</p></li>
-<li><p>该软件也可以在终端中进行使用。只需要把表达式放在双引号之间即可，如下所示：</p>
+<li><p>DeskCalc 可以在终端中使用。只在其后双引号中输入如下内容：</p>
 <pre class="terminal">~&gt; DeskCalc "sin(45)*(cos(12)+3.45)"
-3.6536554673202546181795194727005826674359494735820338441084848</pre></li>
+3.65365546732025461817951947270058</pre>
+<p>备注：在终端中使用时，桌面计算器需要使用圆括号来作为三角函数的计算单元。</p></li>
 </ul>
 
 </div>
@@ -94,7 +101,8 @@
 <div class="nav">
 <div class="inner"><span>
  «  <a href="codycam.html">摄像头</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">应用程序
+</a> 
 ::  <a href="diskprobe.html">磁盘扫描器</a>  »
 </span></div>
 </div>

@@ -11,12 +11,13 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		tiagoms
+ *		Adriano Duarte
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>TextSearch</title>
+	<title>Pesquisa de Texto</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -42,51 +43,52 @@
 <li><a href="../../fi/applications/textsearch.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sk/applications/textsearch.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../hu/applications/textsearch.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../ca/applications/textsearch.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/applications/textsearch.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
  «  <a href="terminal.html">Terminal</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos
+</a> 
 ::  <a href="tv.html">TV</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">A tradução desta página ainda não está completa. Até lá, partes incompletas mostrarão o original em inglês.</div>
 
-<h2><img src="../../images/apps-images/textsearch-icon_64.png" alt="textsearch-icon_64.png" width="64" height="64" />TextSearch</h2>
+<h2><img src="../../images/apps-images/textsearch-icon_64.png" alt="textsearch-icon_64.png" width="64" height="64" />Pesquisa de Texto</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><i>No entry, normally launched via Tracker Add-on</i></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><i>Nenhuma entrada, normalmente carregado via Adicional do Rastreador</i></td></tr>
 <tr><td>Localização:</td><td></td><td><span class="path">/boot/system/apps/TextSearch</span></td></tr>
 <tr><td>Configurações:</td><td></td><td><span class="path">~/config/settings/TextSearch</span></td></tr>
 </table>
 <p><br /></p>
-<p>TextSearch procura por uma string em arquivos de texto. Tipicamente é invocado do menu de contexto <a href="../tracker-add-ons.html">Tracker's Add-on</a> na seleção de arquivos ou pastas em que você deseja procurar.</p>
+<p>A Pesquisa de Texto procura por uma sequeência em arquivos de texto. Tipicamente é chamado a partir do menu de contexto <a href="../tracker-add-ons.html">Adicional do Rastreador</a>, na seleção de arquivos ou pastas em que deseje pesquisar.</p>
 
 <img src="../images/apps-images/textsearch.png" alt="textsearch.png" />
 
-<p>You enter a search string in the text box on top and hit <span class="key">RETURN</span> or click <span class="button">Search</span> to start. If <span class="menu">Show lines</span> is checked, the hits are automatically expanded to show the lines of the file containing the search string.</p>
+<p>Entre com uma sequência de pesquisa na caixa de texto no topo e aperte <span class="key">RETURN</span> ou clique <span class="button">Pesquisar</span> para começar. Se <span class="menu">Exibir linhas</span> está marcado, os resultados são automaticamente expandidos para exibir as linhas do arquivo contendo a sequência de pesquisa.</p>
 
-<p>Only a few words on some of the otherwise self-explaining menu items:</p>
+<p>Apenas umas poucas palavras sobre alguns dos itens de menu não tão autoexplicativos:</p>
 <table summary="menus" border="0" cellpadding="2" cellspacing="0">
-<tr><td colspan="5"><h3>File menu</h3></td></tr>
-<tr><td class="onelinetop"><span class="menu">New window</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Opens a new window where you can enter another string and search through the same files/folders.
+<tr><td colspan="5"><h3>Menu arquivo</h3></td></tr>
+<tr><td class="onelinetop"><span class="menu">Nova janela</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Abre uma nova janela onde pode-se inserir uma outra sequência e pesquisar através dos mesmos arquivos/diretórios.
 </td></tr>
-<tr><td><span class="menu">Set target...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Lets you choose a new set of files and folders to search through.</td></tr>
-<tr><td colspan="5"><h3>Action menu</h3></td></tr>
-<tr><td><span class="menu">Trim selection</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Removes all entries from the list that are not currently selected.</td></tr>
-<tr><td><span class="menu">Open selection</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>Opens the currently selected files with their preferred application (same as a double-click). If it's a text editor supporting it (like Pe), you can jump to the exact line the search string was found.</td></tr>
-<tr><td><span class="menu">Open files in Tracker</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Opens the location of the currently selected files in Tracker.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Copy text to clipboard</span></td><td></td><td><span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Copies the current selection to the clipboard.</td></tr>
-<tr><td colspan="5"><h3>Settings menu</h3></td></tr>
-<tr><td colspan="3" class="onelinetop"><span class="menu">Skip folders starting with a dot</span></td><td> </td><td>This is useful when working in a "unixy" environment, where often administrative files are hidden inside "<tt>.folders/</tt>". Source versioning systems like SVN and CVS are examples of applications using this and are also widely used in Haiku.</td></tr>
-<tr><td colspan="3"><span class="menu">Escape search text</span></td><td> </td><td>TextSearch uses the command line tool <span class="cli">grep</span>. For it, special characters like <tt>'"*\$?!</tt> and spaces have to be escaped with a <tt>\</tt>. Deactivating this setting means you have to do this yourself, but in exchange grants you the power of <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">regular expressions</a>.</td></tr>
-<tr><td colspan="3"><span class="menu">Text files only</span></td><td> </td><td>TextSearch is currently only useful for finding strings in plain text files. Deactivating this setting will have it look through any kind of file anyway.</td></tr>
-<tr><td colspan="5"><h3>History menu</h3></td></tr>
-<tr><td colspan="4"></td><td>Contains recently used search strings.</td></tr>
-<tr><td colspan="5"><h3>Encoding menu</h3></td></tr>
-<tr><td colspan="4"></td><td>Lets you choose different character encodings if needed.</td></tr>
+<tr><td><span class="menu">Definir alvo...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Permite escolher um novo conjunto de arquivos e pastas para pesquisar.</td></tr>
+<tr><td colspan="5"><h3>Menu ação</h3></td></tr>
+<tr><td><span class="menu">Restringir seleção</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Remove todas a entradas da lista que não está selecionada atualmente.</td></tr>
+<tr><td><span class="menu">Abrir seleção</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>Abre os arquivos atualmente selecionados com seus aplicativos preferidos (o mesmo que um duplo clique). Se for um editor de texto que suporte (como o Pe), pode-se pular para a linha exata em que a sequência pesquisada foi encontrada.</td></tr>
+<tr><td><span class="menu">Abrir arquivos no Rastreador</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Abre o local dos arquivos atualmente selecionados no Rastreador.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Copiar texto para a área de trabalho</span></td><td></td><td><span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Copia a seleção atual para a área de transferência.</td></tr>
+<tr><td colspan="5"><h3>Menu definições</h3></td></tr>
+<tr><td colspan="3" class="onelinetop"><span class="menu">Saltar pastas iniciando com um ponto</span></td><td> </td><td>Isto é útil quando trabalhando num ambiente "unixy", onde geralmente arquivos administrativos são ocultos dentro de "<tt>.pastas/</tt>". Sistemas de versionamento de código-fonte como SVN e CVS são exemplos de aplicativos que utilizam isto e são também largamente utilizados no Haiku.</td></tr>
+<tr><td colspan="3"><span class="menu">Escapar pesquisa de texto</span></td><td> </td><td>A Pesquisa de Texto utiliza a ferramenta de linha de comando <span class="cli">grep</span>. Para ele, caracteres especiais como <tt>'"*\$?!</tt> e espaços tem que ser escapados com uma <tt>\</tt>. Desativar esta definição significa que é preciso fazer isto manualmente, mas em troca garante o poder das <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">expressões regulares</a>.</td></tr>
+<tr><td colspan="3"><span class="menu">Somente arquivos de texto</span></td><td> </td><td>A Pesquisa de Texto é atualmente apenas útil para encontrar sequências em arquivos de texto simples. Desativar esta definição a fará procurar através de qualquer tipo de arquivo.</td></tr>
+<tr><td colspan="5"><h3>Menu Histórico</h3></td></tr>
+<tr><td colspan="4"></td><td>Contém sequências de pesquisa recentemente usadas.</td></tr>
+<tr><td colspan="5"><h3>Menu Codificação</h3></td></tr>
+<tr><td colspan="4"></td><td>Permite escolher diferentes codificações de caracteres se necessário.</td></tr>
 </table>
 </div>
 </div>
@@ -94,7 +96,8 @@
 <div class="nav">
 <div class="inner"><span>
  «  <a href="terminal.html">Terminal</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos
+</a> 
 ::  <a href="tv.html">TV</a>  »
 </span></div>
 </div>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,6 +42,7 @@
 <li><a href="../sk/bootloader.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../hu/bootloader.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pt_BR/bootloader.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../ca/bootloader.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -62,30 +63,40 @@
 <p><br /></p>
 <p>进入选项之后，出现了下面四个菜单：</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
-<tr><td><b>Select boot volume</b></td><td> </td><td>选择Haiku的安装介质。</td></tr>
+<tr><td><b>Select boot volume</b></td><td> </td><td>选择Haiku的安装介质。</td></tr>
 <tr><td><b>Select safe mode options</b><br />
-</td><td> </td><td>在系统引导中遇到硬件问题时，可以尝试下面的几个选项。当选择条移动到某个选项时，在屏幕底部会显示相应的简短说明。
-<p><i>- Safe mode</i><br />
-<i>- Disable user add-ons</i><br />
-<i>- Disable IDE DMA</i><br />
-<i>- Use fail-safe video mode</i><br />
-<i>- Disable IO-APIC</i><br />
-<i>- Disable LOCAL APIC</i><br />
-<i>- Don't call the BIOS</i><br />
-<i>- Disable APM</i><br />
-<i>- Disable ACPI</i>
-</p></td></tr>
+</td><td> </td><td>在系统引导中遇到硬件问题时，可以尝试下面的几个选项。当选择条移动到某个选项时，在屏幕底部会显示相应的简短说明。</td></tr>
+<tr><td></td><td></td><td>
+	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><i>- Safe mode</i></td><td width="15"></td><td></td></tr>
+	<tr><td><i>- Disable user add-ons</i></td><td></td><td></td></tr>
+	<tr><td><i>- Disable IDE DMA</i></td><td></td><td></td></tr>
+	<tr><td class="onelinetop"><i>- Use fail-safe video mode</i></td><td></td><td></td></tr>
+	<tr><td><i>- Don't call the BIOS</i></td><td></td><td></td></tr>
+	<tr><td><i>- Disable APM</i></td><td></td><td></td></tr>
+	<tr><td><i>- Disable ACPI</i></td><td></td><td></td></tr>
+	</table>
+</td></tr>
 <tr><td><b>Select debug options</b><br />
-</td><td> </td><td>在这里，你会发现几个选项，它们用于调试或者获取错误报告的详细情况。同时，对于每个选项，在屏幕底部也都会出现相关的说明。
-<p><i>- Enable serial debug output</i><br />
-<i>- Enable on screen debug output</i><br />
-<i>- Enable debug syslog</i>
-</p>
-<p>如果使用了 “debug syslog” 选项，在崩溃，重启之后，系统会显示下面的附加选项：</p>
-<p><i>- Display syslog from previous session</i><br />
-<i>- Save syslog from previous session</i>
-</p></td></tr>
-<tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td>如果你启动了 <i>Use fail-safe video mode</i> 选项， 您可以设置屏幕的分辨率和颜色深度。</td></tr>
+</td><td> </td><td>在这里，你会发现几个选项，它们用于调试或者获取<a href="../welcome/en/bugreports.html">错误报告</a>的详细情况。同时，对于每个选项，在屏幕底部也都会出现相关的说明。</td></tr>
+<tr><td></td><td></td><td>
+	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><i>- Enable serial debug output</i></td><td width="15"></td><td></td></tr>
+	<tr><td><i>- Enable on screen debug output</i></td><td></td><td></td></tr>
+	<tr><td><i>- Disable on screen paging</i></td><td></td><td></td></tr>
+	<tr><td><i>- Enable debug syslog</i></td><td></td><td></td></tr>
+	<tr><td class="onelinetop"><i>- Display current boot loader log</i></td><td></td><td>(Press <span class="key">Q</span> to exit the log)</td></tr>
+	<tr><td><i>- Add advanced debug option</i></td><td></td><td></td></tr>
+</table>
+</td></tr>
+<tr><td></td><td></td><td>如果激活了 "Enable debug syslog" ，那么在系统崩溃，重启后会显示如下选项：</td></tr>
+<tr><td></td><td></td><td>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td class="onelinetop"><i>- Display syslog from previous session</i></td><td></td><td></td></tr>
+	<tr><td><i>- Save syslog from previous session</i></td><td></td><td></td></tr>
+</table>
+</td></tr>
+<tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td>如果你启动了 <i>Use fail-safe video mode</i> 选项， 您可以设置屏幕的分辨率和颜色深度。</td></tr>
 </table>
 <p><br /></p>
 <p>在激活几个选项之后，返回主菜单，继续系统引导。开机界面如下：</p>

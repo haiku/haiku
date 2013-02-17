@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -43,6 +43,7 @@
 <li><a href="../sk/deskbar.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../hu/deskbar.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pt_BR/deskbar.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../ca/deskbar.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../en/deskbar.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -54,6 +55,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>索引</td></tr>
@@ -84,43 +86,42 @@
 <li><p><b>Deskbar Preferences...</b> - 打开桌面栏的首选项面板（详情见下面的介绍）。</p></li>
 <li><p><b>Shutdown</b> - 提供了<span class="menu">重启</span> 和 <span class="menu">关机</span> 选项。</p></li>
 <li><p><b>Recent Documents, Folders, Applications</b> - 显示最近打开的文档，文件夹和应用程序 (详情见下面的 <span class="menu">桌面栏首选项</span> 介绍)。</p></li>
-<li><p><b>Applications, Demos, Deskbar Applets, Preferences</b> - 分别列出了所有安装的应用程序，演示程序，小程序和首选项（详情见下面的 <span class="menu">桌面栏首选项</span> 介绍）。</p></li>
+<li><p><b>Applications, Demos, Deskbar Applets, Preferences</b> - 分别列出了所有安装的应用程序，演示程序，小程序和首选项。
+<br />您也可以把其他的程序（或者任何其他的目录，文档，查询等。） 放置到 <span class="path">~/config/settings/deskbar</span> ，将它们显示到菜单栏。</p></li>
 </ul>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>桌面栏首选项</h3>
-<img src="images/deskbar-images/configure.png" alt="configure.png" />
-<ul>
-<li><p><b>菜单</b><br />
-在这里您可以设置桌面栏菜单中最新的文档，文件夹和程序的数量，或者您可以选择查看所有的最新信息。<br />
-<span class="button">Edit Menu...</span> 按钮用于打开文件夹 <span class="path">/boot/home/config/be/</span> 。在该文件夹下，您可以看到桌面栏中出现的所有文件和文件夹。默认设置下，这些包括： <span class="menu">应用程序</span>，<span class="menu">程序演示</span>，<span class="menu">桌面栏小程序</span>，以及 <span class="menu">首选项</span> 。<br />
+<h4>菜单</h4>
+<p>尽管菜单栏顶端的一些菜单项是固定的，但是您可以定制那些位于 <span class="menu">关闭系统...</span> 下的菜单项。</p>
+<img src="images/deskbar-images/prefs-menu.png" alt="prefs-menu.png" />
+<p>在这里您可以设置桌面栏菜单中最新的文档，文件夹和程序的数量，或者您可以选择查看所有的最新信息。<br />
+<span class="button">Edit Menu...</span> 按钮用于打开文件夹 <span class="path">~/config/settings/deskbar</span> 。在该文件夹下，您可以看到桌面栏中出现的所有文件和文件夹。默认设置下，这些包括： <span class="menu">应用程序</span>，<span class="menu">程序演示</span>，<span class="menu">桌面栏小程序</span>，以及 <span class="menu">首选项</span> 。<br />
 您可以通过向这些文件夹复制或者删除程序快捷式，文档，甚至查询来添加或者删除有关的入口。</p>
-<p>您甚至可以简单的将文件，文件夹，或者保存的查询直接拖拽到桌面栏中的某个位置。</p></li>
-<li><p><b>窗口</b></p>
+<p>甚至，您也可以直接将文件，目录，或者保存的查询拖放到桌面栏。</p>
+
+<h4>应用程序
+</h4>
+<p>下面的设置并不会对您所安装的程序有任何影响，而将会改变所运行应用程序列表的行为和外观。</p>
+<img src="images/deskbar-images/prefs-apps.png" alt="prefs-apps.png" />
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">总是置顶</span></td><td> </td><td>桌面栏将会总是置顶放置。</td></tr>
-<tr><td><span class="menu">自动弹出</span></td><td> </td><td>鼠标点击之后，桌面栏在前端显示。</td></tr>
+<tr><td><span class="menu">排列运行程序</span></td><td> </td><td>按字母顺序排列运行程序列表。</td></tr>
+<tr><td><span class="menu">文件浏览器置首位</span></td><td> </td><td>即使按字母排序，文件浏览器总是位于列表首位。</td></tr>
+<tr><td class="onelinetop"><span class="menu">显示程序扩展</span></td><td> </td><td>在桌面栏程序图标下方提供小控件用于直接显示/隐藏程序所有窗口。</td></tr>
+<tr><td><span class="menu">展开新程序</span></td><td> </td><td>新启动程序在桌面栏上起图标下方自动显示其所有扩展窗口。</td></tr>
+<tr><td><span class="menu">隐藏程序名称</span></td><td> </td><td>移除运行程序的文本标签。</td></tr>
+<tr><td><span class="menu">图标大小</span></td><td> </td><td>调整运行程序图标大小。</td></tr>
+</table>
 
-<tr><td><span class="menu">自动隐藏</span></td><td> </td><td>桌面栏缩减为几个像素，当鼠标点击时才会弹出。</td></tr>
-
-
-
-
-</table></li>
-<li><p><b>应用程序</b></p>
+<h4>窗口
+</h4>
+<p>The last tab contains the preferences for the Deskbar window.</p>
+<img src="images/deskbar-images/prefs-window.png" alt="prefs-window.png" />
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">运行程序排序</span></td><td> </td><td>按字母排序运行中程序的列表。</td></tr>
-<tr><td><span class="menu">首要显示Tracker</span></td><td> </td><td>即使按字母排序，Tracker 仍总是放置在列表的首部。</td></tr>
-<tr><td class="onelinetop"><span class="menu">显示应用扩展</span></td><td> </td><td>提供一个微控件来显示/隐藏桌面栏中程序入口下的所有窗口。</td></tr>
-<tr><td><span class="menu">展开新应用</span></td><td> </td><td>最新启动的程序在桌面栏中程序入口下自动展开其窗口。</td></tr>
-</table></li>
-<li><p><b>时钟</b></p>
-<table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">秒钟</span></td><td> </td><td>为时钟添加秒的显示。</td></tr>
-<tr><td><span class="menu">星期</span></td><td> </td><td>时钟显示日期星期缩写。</td></tr>
-</table></li>
-</ul>
-
+<tr><td><span class="menu">置顶</span></td><td> </td><td>桌面栏位于所有窗口之上。</td></tr>
+<tr><td><span class="menu">自动提升</span></td><td> </td><td>如果桌面栏被鼠标点击，则置顶。</td></tr>
+<tr><td><span class="menu">自动隐藏</span></td><td> </td><td>桌面栏自动隐藏，受到鼠标点击则弹出。</td></tr>
+</table>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tray" name="tray">系统托盘</a></h2>

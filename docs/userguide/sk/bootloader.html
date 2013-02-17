@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,6 +42,7 @@
 <li><a href="../fi/bootloader.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../hu/bootloader.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pt_BR/bootloader.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../ca/bootloader.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -54,6 +55,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Preklad tejto stránky zatiaľ nie je dokončený. Dovtedy sa nedokončené časti zobrazia v anglickom origináli.</div>
 
 <h1>Zavádzač systému</h1>
 
@@ -63,30 +65,38 @@ Tiež sa hodí potom ako nainštalujete softvérový komponent, ktorý robí pro
 <p><br /></p>
 <p>Po jeho zobrazení vám ponúkne štyri menu:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
-<tr><td><b>Vyberte zavádzací zväzok</b></td><td> </td><td>Vyberte, ktorú inštaláciu Haiku chcete spustiť.</td></tr>
-<tr><td><b>Vyberte voľby bezpečného režimu</b><br />
-</td><td> </td><td>V prípade problémov súvisiacim s hardvérom existuje niekoľko volieb, ktoré môžete skúsiť. Pri označení každej z volieb sa zobrazí na spodku obrazovky jej krátky popis.
-<p><i>- Bezpečný režim</i><br />
-<i>- Vypnúť používateľské doplnky</i><br />
-<i>- Vypnúť IDE DMA</i><br />
-<i>- Použiť bezpečný grafický režim</i><br />
-<i>- Vypnúť IO-APIC</i><br />
-<i>- Vypnúť LOCAL APIC</i><br />
-<i>- Nevolať BIOS</i><br />
-<i>- Vypnúť APM</i><br />
-<i>- Vypnúť ACPI</i>
-</p></td></tr>
-<tr><td><b>Vyberte voľby ladenia</b><br />
-</td><td> </td><td>Tu nájdete niekoľko volieb, ktoré pomáhajú pri ladení alebo získavaní podrobností do hlásenia chyby. Dolu má opäť každá voľba krátke vysvetlenie.
-<p><i>- Zapnúť výstup ladenia na sériový port</i><br />
-<i>- Zapnúť výstup ladenia na obrazovku</i><br />
-<i>- Zapnúť výstup ladenia do syslog</i>
-</p>
-<p>Ak je voľba „Zapnúť výstup ladenia do syslog“zapnutá, teplý reštart po havárii zobrazí naviac tieto ďalšie voľby:</p>
-<p><i>- Zoraziť syslog z predošlej relácie</i><br />
-<i>- Uložiť syslog z predošlej relácie</i>
-</p></td></tr>
-<tr><td class="onelinetop"><b>Vyberte bezpečný grafický režim</b></td><td> </td><td>Ak ste museli aktivovať voľbu <i>Použiť bezpečný grafický režim</i>, tu môžete nastaviť rozlíšenie a farebnú hĺbku.</td></tr>
+<tr><td><b>Vyberte zavádzací zväzok</b></td><td> </td><td>Vyberte, ktorú inštaláciu Haiku chcete spustiť.</td></tr>
+<tr><td><b>Select safe mode options</b></td><td> </td><td>There are several options to try in case of hardware related trouble or if the system becomes unstable or unbootable because of a misbehaving add-on. When moving the selection bar to an option, a short explanation appears at the bottom of the screen.</td></tr>
+<tr><td></td><td></td><td>
+	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><i>- Safe mode</i></td><td width="15"></td><td></td></tr>
+	<tr><td><i>- Disable user add-ons</i></td><td></td><td></td></tr>
+	<tr><td><i>- Disable IDE DMA</i></td><td></td><td></td></tr>
+	<tr><td class="onelinetop"><i>- Use fail-safe video mode</i></td><td></td><td></td></tr>
+	<tr><td><i>- Don't call the BIOS</i></td><td></td><td></td></tr>
+	<tr><td><i>- Disable APM</i></td><td></td><td></td></tr>
+	<tr><td><i>- Disable ACPI</i></td><td></td><td></td></tr>
+	</table>
+</td></tr>
+<tr><td><b>Select debug options</b></td><td> </td><td>Here you'll find several options that help with debugging or getting details for a <a href="../welcome/en/bugreports.html">bug report</a>. Again, a short explanation for each option is displayed at the bottom.</td></tr>
+<tr><td></td><td></td><td>
+	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><i>- Enable serial debug output</i></td><td width="15"></td><td></td></tr>
+	<tr><td><i>- Enable on screen debug output</i></td><td></td><td></td></tr>
+	<tr><td><i>- Disable on screen paging</i></td><td></td><td></td></tr>
+	<tr><td><i>- Enable debug syslog</i></td><td></td><td></td></tr>
+	<tr><td class="onelinetop"><i>- Display current boot loader log</i></td><td></td><td>(Press <span class="key">Q</span> to exit the log)</td></tr>
+	<tr><td><i>- Add advanced debug option</i></td><td></td><td></td></tr>
+</table>
+</td></tr>
+<tr><td></td><td></td><td>If "Enable debug syslog" is activated, a warm reboot after a crash shows these additional options:</td></tr>
+<tr><td></td><td></td><td>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td class="onelinetop"><i>- Display syslog from previous session</i></td><td></td><td></td></tr>
+	<tr><td><i>- Save syslog from previous session</i></td><td></td><td></td></tr>
+</table>
+</td></tr>
+<tr><td class="onelinetop"><b>Vyberte bezpečný grafický režim</b></td><td> </td><td>Ak ste museli aktivovať voľbu <i>Použiť bezpečný grafický režim</i>, tu môžete nastaviť rozlíšenie a farebnú hĺbku.</td></tr>
 </table>
 <p><br /></p>
 <p>Po aktivovaní jednej alebo viacerých volieb sa vrátite do hlavného menu a môžete pokračovať v zavádzaní systému, ktoré sa nachádza na tejto obrazovke:</p>

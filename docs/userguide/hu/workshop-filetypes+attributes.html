@@ -42,6 +42,7 @@
 <li><a href="../fi/workshop-filetypes+attributes.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../sk/workshop-filetypes+attributes.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../pt_BR/workshop-filetypes+attributes.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../ca/workshop-filetypes+attributes.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../en/workshop-filetypes+attributes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -78,8 +79,10 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="preparations" name="preparations">Előkészítés</a></h2>
-<p>Elsőként el kell dönteni, hogy milyen típusú fájlra és milyen jellemzőkre van szükségünk. Használhatunk <span class="app">WebPositive</span> könyvjelzőket, amik már úgyis tartalmazzák a film IMDB címét, de most inkább a film borítóképét vegyük alapul.<br />
-Ehhez a képhez pedig több jellemzőt is hozzá kell adni.
+<p>Elsőként el kell dönteni, hogy milyen típusú fájlra és milyen jellemzőkre van szükségünk. 
+Eredetileg azt terveztem, hogy könyvjelző fájlt fogok használni egy hivatkozással a film IMDB-s oldalára. Mivel azonban a Haiku nem rendelkezik "könyvjelzőzhető" böngészővel, mint például BeOS esetében a <span class="app">NetPositive</span>, ezért a következő megoldást választottam: a fájl maga egy JPEG kép lesz, amit majd a film borítójaként fogok használni.
+A <span class="app">WebPositive</span> használatával a Haiku mostmár rendelkezik egy könyvjelző fájlokat támogató böngészővel, így már használhatunk könyjlező fájlokat is alap típusként a kép helyett.<br />
+Ehhez a fájlhoz képhez pedig több jellemzőt is hozzá kell adni.
 Itt most el kell düntenünk, hogy milyen adatot is tároljunk az adatbázisban, és azoknak milyen legyen a típusa. Kereséskor a számokkal (int, float) kicsit eltérően tudunk dolgozni, mint a szöveggel (&lt;/=/&gt; szám esetében, és egyenlő/tartalmaz/eleje szöveg esetében).</p>
 <p>Az alábbi jellemzőket szeretném látni a DVD filmjeimhez:</p>
 <ul>

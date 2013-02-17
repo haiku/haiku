@@ -43,6 +43,7 @@
 <li><a href="../sk/workshop-wlan.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../hu/workshop-wlan.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pt_BR/workshop-wlan.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../ca/workshop-wlan.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../en/workshop-wlan.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 
@@ -70,7 +71,7 @@
 <h1>操作练习：无线网络</h1>
 
 <p>在目前永久网络连接条件下，网络的运行就显得尤为必要。对于小的项目来说，对日新月异的硬件提供驱动支持基本上是不可能的，Haiku 目前基于 <a href="http://www.freebsd.org">FreeBSD</a> 兼容层提供网络驱动的支持。<br />
-尽管并没有提供 100% 硬件的支持，但是保证了对大量硬件的支持。更多硬件支持信息请查阅 <a href="https://www.haiku-os.org/guides/daily-tasks/wireless#hardware-notes">在线列表</a> 或者 <a href="http://www.freebsd.org/releases/9.0R/hardware.html#WLAN">FreeBSD 9 硬件发布声明</a>。</p>
+尽管并没有提供 100% 硬件的支持，但是保证了对大量硬件的支持。更多硬件支持信息请查阅 <a href="https://www.haiku-os.org/guides/daily-tasks/wireless#hardware-notes">在线列表</a> 或者 <a href="http://www.freebsd.org/releases/9.1R/hardware.html#WLAN">FreeBSD 9.1 硬件发布声明</a>。</p>
 <div class="box-info">目前只有 PCI, PCI-X, PCI-Express, Mini PCI, and Mini PCI-Express 设备能够很好运行。<br />
 PCMCIA, CardBus, ExpressCard, USB and ISA 设备仍需要一些功能完善。</div>
 
@@ -119,13 +120,13 @@ ArcorInternet123                 00:20:12:a4:29:e1        15  WPA</pre>
 		- <a href="http://www.haiku-files.org/files/wifi-firmwares/b43/fwcutter/b43-fwcutter-012.tar.bz2">http://www.haiku-files.org/files/wifi-firmwares/b43/fwcutter/b43-fwcutter-012.tar.bz2</a><br />
 		- <a href="http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc/string/byteswap.h">http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc/string/byteswap.h</a></p>
 </li>
-<li><p>复制下面文件到 <span class="path">/boot/system/data/firmware/broadcom43xx/b43-fwcutter/bits</span>；<br />
+<li><p>复制下述文件到 <span class="path">/boot/system/data/firmware/broadcom43xx/b43-fwcutter/bits</span>；<br />
 		- <a href="http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc/include/arch/x86/bits/byteswap.h">http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc/include/arch/x86/bits/byteswap.h</a></p>
 </li>
-<li><p>复制下面文件到 <span class="path">/boot/system/data/firmware/broadcom43xx/</span>；<br />
+<li><p>复制下述文件到 <span class="path">/boot/system/data/firmware/broadcom43xx/</span>；<br />
 		- <a href="http://www.haiku-files.org/files/wifi-firmwares/b43/wl_apsta-3.130.20.0.o">http://www.haiku-files.org/files/wifi-firmwares/b43/wl_apsta-3.130.20.0.o</a></p>
 </li>
-<li><p>复制下面文件到 <span class="path">/boot/system/data/firmware/marvell88w8335/</span>；<br />
+<li><p>复制下述文件到 <span class="path">/boot/system/data/firmware/marvell88w8335/</span>；<br />
 		- <a href="http://www.haiku-files.org/files/wifi-firmwares/marvell/malo-firmware-1.4.tgz">http://www.haiku-files.org/files/wifi-firmwares/marvell/malo-firmware-1.4.tgz</a></p>
 </li>
 </ul>
@@ -140,7 +141,8 @@ ArcorInternet123                 00:20:12:a4:29:e1        15  WPA</pre>
 <div class="inner"><span>
  «  <a href="workshop-email.html">操作练习：邮件管理</a> 
 ::  <a href="contents.html" class="uplink">内容</a> 
-::  <a href="applications.html">应用程序</a>  »
+::  <a href="applications.html">应用程序
+</a>  »
 </span></div>
 </div>
 

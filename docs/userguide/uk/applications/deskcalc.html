@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009, Haiku. All rights reserved.
+ * Copyright 2009-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,6 +42,7 @@
 <li><a href="../../sk/applications/deskcalc.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../hu/applications/deskcalc.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_BR/applications/deskcalc.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../ca/applications/deskcalc.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/applications/deskcalc.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -53,6 +54,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/deskcalc-icon_64.png" alt="deskcalc-icon_64.png" width="64" height="64" />Калькулятор (DeskCalc)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -64,18 +66,22 @@
 <p>DeskCalc - простий калькулятор, що не позбавлений деяких корисних функцій, як може видатися спочатку.</p>
 <img src="../images/apps-images/deskcalc.png" alt="deskcalc.png" />
 <ul>
-<li><p>DeskCalc розуміє значно більше команд ніж дозволяє його скромна клавіатура.<br />
-Окрім операторів <tt>+</tt>, <tt>-</tt>, <tt>*</tt>, <tt>/</tt>, <tt>%</tt>, <tt>^</tt> і констант <tt>pi</tt> and <tt>e</tt> він підтримує наступнв функції:<br />
-<tt>acos</tt>, <tt>asin</tt>, <tt>atan</tt>, <tt>atan2</tt>, <tt>ceil</tt>, <tt>cos</tt>, <tt>cosh</tt>, <tt>exp</tt>, <tt>floor</tt>, <tt>log</tt>, <tt>log10</tt>, <tt>pow</tt>, <tt>sin</tt>, <tt>sinh</tt>, <tt>sqrt</tt>, <tt>tan</tt>, <tt>tanh</tt>.</p></li>
-<li><p>DeskCalc дуже толерантний до дій користувача:<br />
-<tt>/</tt>, <tt>:</tt>, <tt>\</tt> - інтерпритуються як оператори ділення,<br />
-<tt>*</tt>, <tt>x</tt> - символи множення.<br />
-Одначе слід пам'ятати, що <tt>.</tt> і <tt>,</tt> рахуються знаками позначення дробової частини і використовувати їх для позначення розрядів не можна .</p></li>
-<li><p>Меню по правому кліку робить доступними наступні опції:</p>
+<li><p>DeskCalc understands much more than its simple keypad suggests.<br />
+Besides the operators <tt> </tt>, <tt>-</tt>, <tt>*</tt>, <tt>/</tt>, <tt>%</tt>, <tt>^</tt> and the constants <tt>pi</tt> and <tt>e</tt> the following math functions are supported:<br />
+<tt>!</tt>, <tt>acos</tt>, <tt>asin</tt>, <tt>atan</tt>, <tt>atan2</tt>, <tt>cbrt</tt>, <tt>ceil</tt>, <tt>cos</tt>, <tt>cosh</tt>, <tt>exp</tt>, <tt>floor</tt>, <tt>log</tt>, <tt>log10</tt>, <tt>pow</tt>, <tt>sin</tt>, <tt>sinh</tt>, <tt>sqrt</tt>, <tt>tan</tt>, <tt>tanh</tt>.</p></li>
+
+<li><p>Right-clicking offers these options:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Включити режим Num Lock при старті (Enable Num Lock on start up)</span></td><td style="width:15px;"></td><td>автоматично активує цифровий блок при пуску DeskCalc</td></tr>
-<tr><td><span class="menu">Відобразити Клавіатуру (Show Keypad)</span></td><td></td><td>налаштовує відображення клавіатури</td></tr>
+<tr><td colspan="2"><span class="menu">Enable Num Lock on start up</span></td><td style="width:15px;"></td><td>Automatically activates the number block when launching DeskCalc.</td></tr>
+<tr><td colspan="2"><span class="menu">Radiants/Degrees</span></td><td></td><td>Switch between "rad" and "deg" as unit for angular measure.</td></tr>
+<tr><td><span class="menu">Compact</span></td><td><span class="key">ALT</span> <span class="key">0</span></td><td></td><td>A minimal view mode that hides the keypad.</td></tr>
+<tr><td><span class="menu">Basic</span></td><td><span class="key">ALT</span> <span class="key">1</span></td><td></td><td>The standard look of DeskCalc.</td></tr>
+<tr><td><span class="menu">Scientific</span></td><td><span class="key">ALT</span> <span class="key">2</span></td><td></td><td>Show additional buttons for advanced calculations.</td></tr>
 </table></li>
+<li><p>When it comes to user input, DeskCalc is quite tolerant:<br />
+<tt>/</tt>, <tt>:</tt>, <tt>\</tt> are all interpreted as division operators,<br />
+<tt>*</tt>, <tt>x</tt> are valid symbols for multiplication.<br />
+Also, be aware that <tt>.</tt> and <tt>,</tt> are both considered floating points, which means you mustn't use them as 1000-separators.</p></li>
 <li><p>Ви можете змінити розмір калькулятора до потрібного і розташувати його у вигляді репліканта <a href="../gui.html#replicants">Replicant</a> якщо перетягнути за символ у правому нижньому кутку. Але слід впевнитись, що настройка <span class="menu">Показувати репліканти (Show Replicants)</span> активована для Deskbar'у.</p></li>
 <li><p>Клавіатуру можна розмалювати способом перетягування кольорів  з будь-якої програми, що має палітру, наприклад, з <span class="app">Icon-O-Matic</span>.</p></li>
 <li><p>Ви можете пролистати історію своїх обчислень рухаючись <span class="key">↑</span> і <span class="key">↓</span>.</p></li>
@@ -83,9 +89,10 @@
 <p>А  ще краще, що можлива зворотня дія :<br />
 Створення фрагментів, які описують різні стадії ваших обчислень і переміщення їх у вікно DeskCalc.<br />
 Або переміщення варіантів з листа просто у DeskCalc.</p></li>
-<li><p>DeskCalc можна запустити із терміналу Terminal. Просто візьміть стрічку з діями у подвійні лапки як тут:</p>
+<li><p>DeskCalc can be used in Terminal. Just put the expression in double quotes, like this:</p>
 <pre class="terminal">~&gt; DeskCalc "sin(45)*(cos(12)+3.45)"
-3.6536554673202546181795194727005826674359494735820338441084848</pre></li>
+3.65365546732025461817951947270058</pre>
+<p>Note: Used in the Terminal, DeskCalc will always use radians as unit for these trigonometric functions.</p></li>
 </ul>
 
 </div>

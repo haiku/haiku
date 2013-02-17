@@ -42,6 +42,7 @@
 <li><a href="../sk/gui.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../hu/gui.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pt_BR/gui.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../ca/gui.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../en/gui.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -66,29 +67,29 @@
 <h1>Haikun graafinen käyttöliittymä</h1>
 
 <p>Haikun graafinen käyttöliittymä on järjestelmän kiinteä osa. Toisin kuin Unix-perustaisissa järjestelmissä, ei ole mitään erillistä ikkunahallintaa eikä alkulataus vain komentorivikuoreen ei ole mahdollista. Haikun kohdistuu työpöytäkäyttäjiin, ja komentorivikuoreen käynnistymistä ei ole pidetty tarpeellisena.</p>
-<p>Koska sinulla on luultavasti kokemuksia muista graafisista ympäristöistä, hypätään standardien, kuten valikoiden, hiiren oikealla painikkeella näkyviin saatavan asiayhteysvalikon, vedä ja raahaa -toiminnon jne. ylitse. Tutustutaan sen sijaan muutamaan Haikun ainutlaatuiseen puoleen.</p>
+<p>Koska sinulla on luultavasti kokemuksia muista graafisista ympäristöistä, hypätään standardien, kuten valikoiden, hiiren kakkospainikkeella näkyviin saatavan asiayhteysvalikon, vedä ja raahaa -toiminnon jne. ylitse. Tutustutaan sen sijaan muutamaan Haikun ainutlaatuiseen puoleen.</p>
 <img src="images/gui-images/gui.png" alt="gui.png" />
 <p>Haikun graafisessa käyttöliittymässä on vain muutamia asioita, jotka eivät ole itsestään selviä ja ansaitsevat selityksen.</p>
 <ol>
-<li><p>Työpöytäpalkki on Haikuns "Käynnistä"-valikko ja tehtäväpakki, jos niin haluat. Katso aihetta <a href="deskbar.html">Työpöytäpalkki</a>.</p></li>
+<li><p>Työpöytäpalkki on Haikun "Käynnistä"-valikko ja tehtäväpalkki, jos niin haluat. Katso aihetta <a href="deskbar.html">Työpöytäpalkki</a>.</p></li>
 <li>Keltainen välilehti tarjoaa muutakin kuin vain ohjelman nimen tai asiakirjan tiedostonimen:
-<ul><li>Voit siirtää ikkunaa pitämällä <span class="key">VAIHTO</span>-näppäimen alhaalla raahatessasi sitä toiseen paikkaan, ottaen käyttöön lukuisien ikkunoiden pinoamisen ja pääset kätevästi käsiksi niihin niiden nimetyn välilehden kautta.</li>
+<ul><li>Voit siirtää ikkunaa pitämällä <span class="key">VAIHTO</span>-näppäimen alhaalla raahatessasi sitä toiseen paikkaan, ottaen käyttöön useiden ikkunoiden pinoamisen ja pääset kätevästi käsiksi niihin niiden nimetyn välilehden kautta.</li>
 <li>Muutat ikkunan minimikokoiseksi kaksoisnapsauttamalla sen välilehteä (tai <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span> -näppäimillä). Sellainen piilotettu ikkuna voidaan kutsua valitsemalla sen valikkorivi <a href="deskbar.html">Työpöytäpalkissa</a> tai <a href="twitcher.html">Vaihtaja</a>-ohjelmassa.</li>
-<li>Voit lähettää ikkunan taustalle napsauttamalla sen välilehteä (tai sen reunaa) hiiren oikealla painikkeella.</li></ul></li>
+<li>Voit lähettää ikkunan taustalle napsauttamalla sen välilehteä (tai sen reunaa) hiiren kakkospainikkeella.</li></ul></li>
 <li><p>Sulje-painike.</p></li>
-<li><p>Laajentamispainike (tai <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). useimmissa sovelluksissa, laajentaa ikkunan maksimikokoon. Sen ei kuintenkaan tarvitse tehdä sitä. Seuraaja-ikkunat esimerkiksi muuttavat kokoaan parhaiten sisältöön sopivaan kokoon.</p></li>
-<li><p>Ikkunan reuna. Raahaaminen hiiren vasemmalla painikkeella siirtää ikkunan, raahaaminen hiiren oikealla painikkeella muuttaa ikkunan kokoa.</p></li>
+<li><p>Laajentamispainike (tai <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). useimmissa sovelluksissa, laajentaa ikkunan maksimikokoon. Sen ei kuitenkaan tarvitse tehdä sitä. Seuraaja-ikkunat esimerkiksi muuttavat kokoaan parhaiten sisältöön sopivaan kokoon.</p></li>
+<li><p>Ikkunan reuna. Raahaaminen hiiren vasemmalla painikkeella siirtää ikkunan, raahaaminen hiiren kakkospainikkeella muuttaa ikkunan kokoa.</p></li>
 <li><p>Koon muuttamiskulma.</p></li>
 </ol>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="move-resize" name="move-resize">Nopea tapa siirtää tai muuttaa ikkunan kokoa</a></h2>
-<p>Ikkunoiden siirtäminen ja koon muuttaminen on laaja osa vuorovaikutuksesta useiden samanaikaisesti suoritettavien sovellusten välillä. Sen sijaan, että yritettäisiin osua pieneen keltaiseen otsikkovälilehteen tai vielä ohuempaan reurnaviivaan, ikkunoiden siirtämiseksi on kätevämpi tapa. Koon muuttamisnurkalla on pienen koon lisäksi myös toinen rajoitus. Se sallii koon muuttamisen vain oikean alakulman suuntaan ja siitä keskustaan päin.<br />Raahaaminen hiiren oikealla painikkeella toimii, mutta sinun on tähdättävä huolellisesti.</p>
+<p>Ikkunoiden siirtäminen ja koon muuttaminen on laaja osa vuorovaikutuksesta useiden samanaikaisesti suoritettavien sovellusten välillä. Sen sijaan, että yritettäisiin osua pieneen keltaiseen otsikkovälilehteen tai vielä ohuempaan reunaviivaan, ikkunoiden siirtämiseksi on kätevämpi tapa. Koon muuttamisnurkalla on pienen koon lisäksi myös toinen rajoitus. Se sallii koon muuttamisen vain oikean alakulman suuntaan ja siitä keskustaan päin.<br />Raahaaminen hiiren kakkospainikkeella toimii, mutta sinun on tähdättävä huolellisesti.</p>
 <p>Näiden asioiden ratkaisemiseksi Haiku tarjoaa näppärän ratkaisun ikkunahallintaan käyttämällä näppäinyhdistelmää <span class="key">CTRL</span> <span class="key">ALT</span> ja hiirtä. Katso myös ikkunahallintaan liittyviä lisätietoja kappaleesta <a href="keyboard-shortcuts.html#general">Pikanäppäimet ja näppäinyhdistelmät</a>.</p>
 <img src="images/gui-images/resizing.png" alt="resizing.png" />
-<p>Pitämällä alhaalla näppäimet <span class="key">CTRL</span> <span class="key">ALT</span> korostetaan ikkunareuna, joka sijaitsee lähimpänä hiiren kohdistinta. Siirrä hiirtä toiseen suuntaan ja toinen raja vaihtuu kohteeksi. Napsautamalla ja raahaaminen <i>hiiren oikealla painikkeella</i> voi muuttaa ikkunan kokoa korostetun reunan kohdalta.</p>
-<p>Pidä alhaalla näppäimet <span class="key">CTRL</span> <span class="key">ALT</span> ja napsauta sekä raahaa <i>hiiren vasemmalla painikkeella</i> kaikkialle ja ikkuna siirtyy mukana. Nopea napsautus <i>hiiren oikealla painikkeella</i> lähettää sen takaisin.</p>
+<p>Pitämällä alhaalla näppäimiä <span class="key">CTRL</span> <span class="key">ALT</span> korostetaan ikkunareuna, joka sijaitsee lähimpänä hiiren kohdistinta. Siirrä hiirtä toiseen suuntaan ja toinen raja vaihtuu kohteeksi. Napsauttamalla ja raahaamalla <i>hiiren kakkospainikkeella</i> voit muuttaa ikkunan kokoa korostetun reunan kohdalta.</p>
+<p>Pidä alhaalla näppäimiä <span class="key">CTRL</span> <span class="key">ALT</span> ja napsauta sekä raahaa <i>hiiren ykköspainikkeella</i> kaikkialle ja ikkuna siirtyy mukana. Nopea napsautus <i>hiiren kakkospainikkeella</i> lähettää sen takaisin.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -98,7 +99,7 @@ Alla olevassa esimerkissä, Seuraaja-ikkuna kirjanmerkillä on laatoitettu WebPo
 <img src="images/gui-images/gui-s+t.gif" alt="gui-s+t.gif" />
 <p>Tällä tavalla yhdistetty ikkunoiden ryhmää voidaan siirtää ja sen kokoa voidaan muuttaa yhdessä - näppärä järjestely työskenneltäessä hankekeskeisemmässä ympäristössä. Oikean selainikkunan etsimisen sijasta dokumentaatio, editori ja seuraajaikkunat ja ehkä hankkeeseen liittyvät sähköpostiviestit voidaan vain pinota ja laatoittaa yhteen.</p>
 <p>Ikkunoiden todellisen järjestelyn tekeminen on helppoa. Pidä alhaalla <span class="key">Alt Gr/OPT</span>-näppäintä samalla kun raahaat ikkunaa välilehdestä toisen ikkunan välilehden tai reunan viereen, kunnes se korostuu ja vapauta sitten hiiren painike.</p>
-<p>Pino ja laatoitus sisältää kaksi asiaan littyvää osaa.</p>
+<p>Pino ja laatoitus sisältää kaksi asiaan liittyvää osaa.</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><img src="images/gui-images/gui-stacking.png" alt="gui-stacking.png" /></td><td width="10"></td>
 <td><p>"<i>Pinoaminen</i>" on ikkunoiden laittamista toistensa päälle, jolloin keltaiset välilehdet siirtyvät automaattisesti oikeaan paikkaan.<br />
@@ -115,12 +116,12 @@ Pidä taas alhaalla painiketta <span class="key">Alt Gr/OPT</span>, ja ne reunat
 <p>Kun avataan tai tallennetaan tiedostoa mistä tahansa sovelluksesta, avautuu tämän näköinen paneeli:</p>
 <img src="images/gui-images/open-save.png" alt="open-save.png" />
 <p>Siinä on kaikki tavalliset asiat: Nykyisen kansion tiedostoluettelo, josta voi valita tiedoston, tiedoston tallennustapauksessa tekstikenttä tiedostonimen kirjoittamista varten ja ponnahdusvalikko eri tiedostomuotoja ja niiden asetuksia varten.<br />Voit siirtyä äitihakemistoon ponnahdusvalikosta tiedostoluettelon yläpuolelta.</p>
-<p>Jos sinulla on jo Seuraaja-ikkuna tiedoston avaussijainnissa, voit yksinkertaisesti raahata minkä tahansa tiedoston tai kainsio-esityksen (toisin sanoen symbolin valikkopalkin oikealla puolella) paneeliin. Tämä vaihtaa paneelin uuteen paikkaa.</p>
+<p>Jos sinulla on jo Seuraaja-ikkuna tiedoston avaussijainnissa, voit yksinkertaisesti raahata minkä tahansa tiedoston tai kansio-esityksen (toisin sanoen symbolin valikkopalkin oikealla puolella) paneeliin. Tämä vaihtaa paneelin uuteen paikkaa.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="open-save-shortcuts" name="open-save-shortcuts">Näppäimistön pikanäppäimet</a></h3>
-<p>Monet pikanäppäinmäärittelyt avaus- ja sulkemispaneelissa ovat samat kuin Seuraajassa käytetyt. Sitäpaitsi komennoissa, jotka ovat myös käytettävissä <span class="menu">Tiedosto</span>-valikion kautta, on muutamia jotka eivät ole itsestäänselviä:</p>
+<p>Monet pikanäppäinmäärittelyt avaus- ja sulkemispaneelissa ovat samat kuin Seuraajassa käytetyt. Sitäpaitsi komennoissa, jotka ovat myös käytettävissä <span class="menu">Tiedosto</span>-valikon kautta, on muutamia jotka eivät ole itsestäänselviä:</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td> Luo uuden kansion.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td> Sallii sinun nimetä uudelleen valitun kohteen.</td></tr>
@@ -132,8 +133,8 @@ Pidä taas alhaalla painiketta <span class="key">Alt Gr/OPT</span>, ja ne reunat
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="favorites-recent" name="favorites-recent">Suosikit ja äskettäiset kansiot</a></h3>
-<p><span class="menu">Suosikit</span>-valikko avaus- ja sulkemispaneelissa tarjoaa äskettäin vieraillut kansiot ja suosikkisijainnit, jotka voit asettaa itse. Kuten pienellä nuolella ilmaistaan, voit käyttää myös näitä sijainteja navigoidaksesi kauemmas alaspäin alivalikkojen hierarkkiassa.</p>
+<a id="favorites-recent" name="favorites-recent">Suosikit ja äskeiset kansiot</a></h3>
+<p><span class="menu">Suosikit</span>-valikko avaus- ja sulkemispaneelissa tarjoaa äskettäin vieraillut kansiot ja suosikkisijainnit, jotka voit asettaa itse. Kuten pienellä nuolella ilmaistaan, voit käyttää myös näitä sijainteja navigoidaksesi kauemmas alaspäin alivalikkojen hierarkiassa.</p>
 <img src="images/gui-images/favorites.png" alt="favorites.png" />
 <p>Suosikin lisäämiseksi navigoit yksinkertaisesti haluamaasi kohteeseen ja valitset <span class="menu">Suosikit | Lisää nykyinen kansio</span>. Tästä alkaen se esiintyy jokaisessa avaus- ja tallentamispaneelissa. Suosikin poistamiseksi valitse <span class="menu">Suosikit | Aseta suosikit...</span> ja poista haluamasi suosikkirivi.<br />Kaikki suosikit pidetään kansiossa <span class="path">/boot/home/config/settings/Tracker/Go/</span>. Joten pystyisit myös lisäämään ja poistamaan linkkejä tiedostoihin ja kansioihin suoraan sieltä.</p>
 
@@ -142,7 +143,7 @@ Pidä taas alhaalla painiketta <span class="key">Alt Gr/OPT</span>, ja ne reunat
 <a id="replicants" name="replicants">Kopiot</a></h2>
 <p>Kopiot ovat pieniä itsensä sisältäviä sovellusosia, jotka on integroitu toisiin sovelluksiin. Edellyttäen, että Seuraajan valitsin <span class="menu">Näytä  kopiot</span> on aktivoitu, tunnistat sovelluksen kopio-osan pienestä kahvasta, joka on normaalisti oikeassa alakulmassa:</p>
 <img src="../images/gui-images/replicant.png" alt="replicant.png" />
-<p>Huomioonherättävin paikka, joka hyväksyy Kopiot on Työpöytä. Yksinkertaisesti rahaat ja pudotat pienen kahvan sille. Siitä alkaen se on osa Työpöytää ja sovellus, josta Kopio on lähtöisin, ei tarvitse käynnistyä toimiakseen.<br />Hiiren oikean painikkeen painallus Kopiokahvassa tarjoaa asiayhteysvalikon, joka näyttää alkuperäsovelluksen <span class="menu">Ohjelmasta</span>-ikkunan ja <span class="menu">Poista kopio</span>-valikon.</p>
+<p>Huomioonherättävin paikka, joka hyväksyy Kopiot on Työpöytä. Yksinkertaisesti rahaat ja pudotat pienen kahvan sille. Siitä alkaen se on osa Työpöytää ja sovellus, josta Kopio on lähtöisin, ei tarvitse käynnistyä toimiakseen.<br />Hiiren kakkospainikkeen painallus Kopiokahvassa tarjoaa asiayhteysvalikon, joka näyttää alkuperäsovelluksen <span class="menu">Ohjelmasta</span>-ikkunan ja <span class="menu">Poista kopio</span>-valikon.</p>
 <div class="box-info">Jos koet vaikeuksia Kopion kanssa Työpöydällä ja et pääse niistä eroon, poista <span class="path">~/config/settings/Tracker/tracker_shelf</span>. Valitettavasti tämä poistaa <i>kaikki</i> Kopiot Työpöydältä.</div>
 <p>Esimerkkejä kopioitavista sovelluksista ovat  <a href="applications/activitymonitor.html">Aktiviteettivalvonta</a>-ohjelman graafit, <a href="workspaces.html">Työtilat-sovelma</a> tai <a href="applications/deskcalc.html">Työpöytälaskin</a>.</p>
 </div>

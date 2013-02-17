@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009, Haiku. All rights reserved.
+ * Copyright 2009-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,17 +42,20 @@
 <li><a href="../../sk/applications/diskusage.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../hu/applications/diskusage.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_BR/applications/diskusage.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../ca/applications/diskusage.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/applications/diskusage.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
  «  <a href="diskprobe.html">磁盘扫描器</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">应用程序
+</a> 
 ::  <a href="drivesetup.html">磁盘管理器</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
+<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <h2><img src="../../images/apps-images/diskusage-icon_64.png" alt="diskusage-icon_64.png" width="64" height="64" />磁盘查看器</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -63,9 +66,10 @@
 <p><br /></p>
 <p>磁盘查看器以图形的形式显示了您的磁盘卷的空间利用情况。<br />
 一个非常好用的工具，它回答了下面的问题，“<i>我的磁盘空间哪儿去了啊？</i>”。</p>
+<p>After launching, DiskUsage shows only a white window with all mounted volumes as tabs at the top. You'll have to choose the one you're interested in and click <span class="button">Scan</span> to start chugging through the disk. For larger disks this can take some time... While you wait, you may switch to a different tab and start exploring that volume or begin the scan process there as well.<br />
+It's not recommended to start several concurrent scan processes on the same physical disk, as the constant repositioning of the heads of the drive will only extend the wait.</p>
 <p><img id="diskusage" src="../images/apps-images/diskusage.png" alt="diskusage.png" /></p>
 <p>不同层次的同心圆代表了文件系统中的不同等级。 在上图中，圆环中心代表了 <span class="path">/boot/home/</span> 文件夹。而圆环外的每个图块都代表了 <span class="path">/boot/home/</span> 文件夹下的一个文件或者文件夹。而更外层的图块则代表了更深一层等级的文件层次。当然，您可能需要调节窗口的大小来容纳深层地的文件夹。</p>
-<p>在图形的上方是一个弹出式菜单，它用于在所有挂载的磁卷之间进行转换。在显示磁卷的利用情况之前，该磁卷需要进行一次完全的扫描。对于大一点的磁卷，这可能需要比较长的时间，但是在此期间，您可以检查其他磁卷的利用情况，而磁卷的扫描将在后台运行。</p>
 <div class="box-info"><ul>
 <li>如果代表一个文件或者文件夹的扇形图块的角度小于圆环的2° ，那么它在图形中将无法显示出来。
 </li>
@@ -73,10 +77,11 @@
 <li>磁盘查看器会忽略符号链接。</li>
 </ul></div>
 <p>在您的鼠标移动到一个图块上时，关于该文件或者文件夹的信息将会呈现在底部的状态栏里。</p>
-<p>右键点击一个图块将会显示一个右键菜单 <span class="menu">Get Info</span>, <span class="menu">Open</span> （ 在Tracker 中打开），<span class="menu">Open With</span> 其他的应用程序或者 <span class="menu">Rescan（浏览）</span> 此文件夹。<br />
-左键点击一个图块将会使其所代表的文件或者文件夹位于圆环的中央。<br />
-左键点击中央的圆环将会使您到达上一级的文件夹。</p>
+<p>Right-clicking a segment offers a context menu to <span class="menu">Get info</span>, <span class="menu">Open</span> (with Tracker), <span class="menu">Open with</span> another suitable application or <span class="menu">Rescan</span> that particular folder.<br />
+Left-clicking a segment makes that file/folder the center circle.<br />
+Left-clicking the center circle moves you up one level.</p>
 <p>您可以从磁盘查看器中拖拽文件或者文件夹到其他的程序，桌面或者其他的Tracker窗口完成复制。反之，如果把磁卷或者文件夹拖拽至磁盘查看器窗口将会把他们放置在圆环的中央进行显示。</p>
+<p>You can also use the Tracker add-on from the context menu of any folder to start DiskUsage with that particular location.</p>
 
 </div>
 </div>
@@ -84,7 +89,8 @@
 <div class="nav">
 <div class="inner"><span>
  «  <a href="diskprobe.html">磁盘扫描器</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">应用程序
+</a> 
 ::  <a href="drivesetup.html">磁盘管理器</a>  »
 </span></div>
 </div>

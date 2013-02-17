@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009, Haiku. All rights reserved.
+ * Copyright 2009-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -44,6 +44,7 @@
 <li><a href="../../sk/applications/deskcalc.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../hu/applications/deskcalc.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_BR/applications/deskcalc.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../ca/applications/deskcalc.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/applications/deskcalc.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -68,16 +69,20 @@
 <ul>
 <li><p>電卓はそのシンプルなキーパッドに表示されている以上のいろいろな数式を理解します。<br />
 演算子  <tt>+</tt>、<tt>-</tt>、<tt>*</tt>、<tt>/</tt>、<tt>%</tt>、<tt>^</tt>、および定数 <tt>pi</tt> と <tt>e</tt> に加えて、次の関数がサポートされています。<br />
-<tt>acos</tt>、<tt>asin</tt>、<tt>atan</tt>、<tt>atan2</tt>、<tt>ceil</tt>、<tt>cos</tt>、<tt>cosh</tt>、<tt>exp</tt>、<tt>floor</tt>、<tt>log</tt>、<tt>log10</tt>、<tt>pow</tt>、<tt>sin</tt>、<tt>sinh</tt>、<tt>sqrt</tt>、<tt>tan</tt>、<tt>tanh</tt>、</p></li>
+<tt>!</tt>, <tt>acos</tt>, <tt>asin</tt>, <tt>atan</tt>, <tt>atan2</tt>, <tt>cbrt</tt>, <tt>ceil</tt>, <tt>cos</tt>, <tt>cosh</tt>, <tt>exp</tt>, <tt>floor</tt>, <tt>log</tt>, <tt>log10</tt>, <tt>pow</tt>, <tt>sin</tt>, <tt>sinh</tt>, <tt>sqrt</tt>, <tt>tan</tt>, <tt>tanh</tt></p></li>
+
+<li><p>右クリックでこれらのオプションが表示されます。Right-clicking offers these options:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td colspan="2"><span class="menu">起動時に Num Lock を有効にする (Enable Num Lock on start up)</span></td><td style="width:15px;"></td><td>電卓が起動する時、自動的に Numlock をオンにします。</td></tr>
+<tr><td colspan="2"><span class="menu">ラジアン/度 (Radiants/Degrees)</span></td><td></td><td>角度の単位として、"ラジアン" と "度" を切りかえますｙ。</td></tr>
+<tr><td><span class="menu">コンパクトモード (Compact)</span></td><td><span class="key">ALT</span> <span class="key">0</span></td><td></td><td>最良源の表示モードとなり、キーパッドを隠します。</td></tr>
+<tr><td><span class="menu">基本モード (Basic)</span></td><td><span class="key">ALT</span> <span class="key">1</span></td><td></td><td>電卓の標準表示です。</td></tr>
+<tr><td><span class="menu">関数モード (Scientific)</span></td><td><span class="key">ALT</span> <span class="key">2</span></td><td></td><td>高度な計算のための追加のボタンを表示します。</td></tr>
+</table></li>
 <li><p>ユーザーの入力に関して、電卓はかなりの柔軟性があります。<br />
 <tt>/</tt>、<tt>:</tt>、<tt>\</tt> はすべて除算演算子として解釈されます。<br />
 <tt>*</tt>、<tt>x</tt> は乗算の有効な記号です。<br />
 また、<tt>.</tt> と <tt>,</tt> は両方とも小数点とみなされることに注意してください。つまり、これらを 1000 の区切りとして使用できないことを意味します。</p></li>
-<li><p>右クリックでこれらのオプションがあります。</p>
-<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">起動時に Num Lock を有効にする (Enable Num Lock on start up)</span></td><td style="width:15px;"></td><td>電卓が起動する時、自動的に Numlock をオンにします。</td></tr>
-<tr><td><span class="menu">キーパッドを表示する (Show keypad)</span></td><td></td><td>電卓が選択されていない時、キーパッドを隠します。</td></tr>
-</table></li>
 <li><p>必要な大きさまでリサイズでき、右下のシンボルをドラッグ＆ドロップすることで、<a href="../gui.html#replicants">レプリカント</a>として、デスクトップ上に置くことができます。Deskbar の<span class="menu">レプリカントを表示する (Show replicants)</span> が有効になっていることを確認してください。</p></li>
 <li><p>キーパッドは任意のカラーウェルからドラッグ＆ドロップで色を付けることができます。たとえば、<span class="app">Icon-O-Matic</span> から。</p></li>
 <li><p><span class="key">↑</span> キーと <span class="key">↓</span> キーを使って、過去の計算履歴を行き来できます。</p></li>
@@ -87,7 +92,8 @@
 または、計算を電子メールから直接電卓にドラッグ＆ドロップできます。</p></li>
 <li><p>電卓はターミナル中でも使用できます。次のように、式をダブルクオートで囲むだけです。</p>
 <pre class="terminal">~&gt; DeskCalc "sin(45)*(cos(12)+3.45)"
-3.6536554673202546181795194727005826674359494735820338441084848</pre></li>
+3.6536554673202546181795194727005826674359494735820338441084848</pre>
+<p>注意: ターミナル中で使用するとき、電卓は三角関数に関して常にラジアンを単位として用います。</p></li>
 </ul>
 
 </div>

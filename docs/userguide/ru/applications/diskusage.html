@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009, Haiku. All rights reserved.
+ * Copyright 2009-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -43,6 +43,7 @@
 <li><a href="../../sk/applications/diskusage.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../hu/applications/diskusage.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_BR/applications/diskusage.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../ca/applications/diskusage.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/applications/diskusage.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -54,6 +55,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <h2><img src="../../images/apps-images/diskusage-icon_64.png" alt="diskusage-icon_64.png" width="64" height="64" />Использование диска (DiskUsage)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -64,19 +66,21 @@
 <p><br /></p>
 <p>Использование диска графически отображает дисковое пространство на ваших разделах.
 Полезный инструмент для ответа на вопрос: "Куда подевалось свободное место на диске"?</p>
+<p>After launching, DiskUsage shows only a white window with all mounted volumes as tabs at the top. You'll have to choose the one you're interested in and click <span class="button">Scan</span> to start chugging through the disk. For larger disks this can take some time... While you wait, you may switch to a different tab and start exploring that volume or begin the scan process there as well.<br />
+It's not recommended to start several concurrent scan processes on the same physical disk, as the constant repositioning of the heads of the drive will only extend the wait.</p>
 <p><img id="diskusage" src="../images/apps-images/diskusage.png" alt="diskusage.png" /></p>
 <p>Концентрические круги представляют собой различные уровни в иерархии файловой системы. Над центральным кругом изображена папка <span class="path">/boot/home/</span>. Каждый сегмент окружности над ней - файл или папка, находящиеся в <span class="path">/boot/home/</span>. Каждый дальнейший сегмент отображает на один уровень вглубь файловой иерархии. Возможно придется изменить размеры окна, чтобы папки с большой степенью вложенности смогли вместиться в него.</p>
-<p>Над окном с графикой имеется выпадающее меню, в котором можно переключаться между всеми доступными разделами. Прежде чем использование диска отобразится, произойдёт сканирование раздела. Для разделов большого объёма это может занять довольно много времени, в течение которого можно просмотреть другой, менее загруженный раздел, запустив вторую копию приложения.</p>
 <div class="box-info"><ul>
 <li>Если графическое представление файла или папки умещается меньше, чем в 2° круга, то оно не отображается.</li>
 <li>Количество файлов, сообщённое для папки, включает также файлы во вложенных папках. Папка подсчитывается также как файл.</li>
 <li>Использование диска игнорирует симлинки.</li>
 </ul></div>
 <p>Наведя мышь на определённый сегмент, вы получите информацию об этом файле или папке снизу в строке состояния.</p>
-<p>Клик правой кнопкой мыши по сегменту выведет контекстное меню для доступа к окну <span class="menu">Информации</span>, <span class="menu">Открытия</span> (в Tracker-е), <span class="menu">Открытия в</span> другогом подходящем приложении или <span class="menu">пересканирования</span> папки этого сегмента.<br />
-Клик левой кнопкой мыши по сегменту перенесёт этот файл или папку в центр круга.<br />
-Клик левой кнопкой мыши по центру круга перемещает на один уровень вверх.</p>
+<p>Right-clicking a segment offers a context menu to <span class="menu">Get info</span>, <span class="menu">Open</span> (with Tracker), <span class="menu">Open with</span> another suitable application or <span class="menu">Rescan</span> that particular folder.<br />
+Left-clicking a segment makes that file/folder the center circle.<br />
+Left-clicking the center circle moves you up one level.</p>
 <p>Вы можете перетаскивать файлы и папки из DiskUsage в другие приложения, на рабочий стол или на другое окно Tracker-а для копирования. Если же наоборот перетащить раздел или папку на окно DiskUsage, то размер окна "подгонится" под них, сделав их новым центральным кругом.</p>
+<p>You can also use the Tracker add-on from the context menu of any folder to start DiskUsage with that particular location.</p>
 
 </div>
 </div>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,6 +42,7 @@
 <li><a href="../../sk/applications/cli-apps.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../hu/applications/cli-apps.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_BR/applications/cli-apps.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../ca/applications/cli-apps.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/applications/cli-apps.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 
@@ -101,17 +102,20 @@ Haluaisitko linkittää sen?" "Työpöydälle" "Työpöytäpalkkiin" "Ei kiitos"
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
 		<td><p><span class="cli">checkfs</span> on tärkeä työkalu tarkistamaan tiedostojärjestelmäsi virheet. Lisää yksinkertaisesti taltio tai laitenimi ja ohjelma käy lävitse jokaisen tiedoston ja korjaa epäyhtenäisyydet missä mahdollista.</p>
 </td></tr>
-<tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">open</span> on hyvin kätevä pieni työkalu. Sillä voi avata minkä tahansa tiedoston sen parhaimmaksi katsotulla sovelluksella, tai käynnistää tietyn sovelluksen sen tunnisteen avulla tietämättä sen tarkkaa polkua. Se toimii myös verkko-osoitteiden ja vieläpä "virtuaali"-kansioiden kanssa <tt>.</tt> nykyiselle kansiolle ja  <tt>..</tt> äitikansiolle, avaten kansion Seuraajassa.</p>
-</td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">desklink</span> voi asentaa kuvakkeen mille tahansa tiedostolle, kansiolle, kyselylle tai sovellukselle Työpöytäpalkin tarjottimelle. Se tarjoaa myös mahdollisuuden tiettyjen toimintojen suorittamiseen kontekstivalikosta napsauttamalla hiiren oikealla painikkeella kuvaketta. Esimerkkinä, yritä tätä lisäämällä komentorivisovellus <span class="app">screenshot</span> eri valitsimilla ("<tt>\</tt>" ensimmäisellä rivillä on vain rivinvaihto Pääteikkunassa):</p>
 <pre class="terminal"> desklink "cmd=Aktivoi ikkuna (2s):/bin/screenshot --window --border --delay 2" \
 "cmd=Poista kopio:desklink --remove=screenshot" /bin/screenshot
 </pre>
 <p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>
-</td></tr></table>
-
+</td></tr>
+<tr><td><p><span class="cli">diskimage</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">diskimage</span> sallii sinun rekisteröidä tavallisen tiedoston levylaitteena. Voit esimerkiksi rekisteröidä Haiku anyboot-levyvedoksen, liittää se Seuraajassa ja kopoida, muokata tai poistaa siitä tiedostoja käyttäen sitä Asennusohjelman lähteenä.</p>
+</td></tr>
+<tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">open</span> on hyvin kätevä pieni työkalu. Sillä voi avata minkä tahansa tiedoston sen parhaimmaksi katsotulla sovelluksella, tai käynnistää tietyn sovelluksen sen tunnisteen avulla tietämättä sen tarkkaa polkua. Se toimii myös verkko-osoitteiden ja vieläpä "virtuaali"-kansioiden kanssa <tt>.</tt> nykyiselle kansiolle ja  <tt>..</tt> äitikansiolle, avaten kansion Seuraajassa.</p>
+</td></tr>
+</table>
 </div>
 </div>
 

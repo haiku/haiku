@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,6 +42,7 @@
 <li><a href="../sk/bootloader.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../hu/bootloader.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pt_BR/bootloader.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../ca/bootloader.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -62,30 +63,38 @@
 <p><br /></p>
 <p>Kun olet päässyt sinne, näkyviin tulee neljä valikkoa:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
-<tr><td><b>Valitse alkulatauslevy</b></td><td> </td><td>Valitse, minkä Haiku-asennuksen käynnistät.</td></tr>
-<tr><td><b>Valitse turvatilavalitsimet</b><br />
-</td><td> </td><td>Laitteistopulmien tapahtuessa voit kokeilla useita valitsimia. Kun valintapalkin siirtää valitsimelle, niin näytön alalaiteen ilmaantuu lyhyt selite.
-<p><i>- Turvatila</i><br />
-<i>- Ota käyttäjälisäosat pois käytöstä</i><br />
-<i>- Ota pois käytöstä IDE DMA</i><br />
-<i>- Käytä vikaturvallista videotilaa</i><br />
-<i>- Ota pois käytöstä IO-APIC</i><br />
-<i>- Ota pois käytöstä LOCAL APIC</i><br />
-<i>- Älä kutsu BIOS:ia</i><br />
-<i>- Ota pois käytöstä APM</i><br />
-<i>- Ota pois käytöstä ACPI</i>
-</p></td></tr>
-<tr><td><b>Valitse vianjäljitysvalitsimet</b><br />
-</td><td> </td><td>Tästä löydät useita valitsimia, jotka opastavat vianjäljityksessä tai yksityiskohtien hakemisessa vikailmoitukseen. Taas näytön alalaidassa näytetään lyhyt selite.
-<p><i>- Ota käyttöön vianjäljitystuloste sarjaväylän kautta</i><br />
-<i>- Ota käyttöön vianjäljitystuloste näytölle</i><br />
-<i>- Ota käyttöön vianjäljitys syslog-tiedostoon</i>
-</p>
-<p>Jos valitsin "debug syslog" on käytössä, uudelleenkäynnistyminen kaatumisen jälkeen näyttää nämä lisävalitsimet:</p>
-<p><i>- Näytä syslog-tiedosto edellisestä istunnosta</i><br />
-<i>- Tallenna syslog-tiedosto edellisestä istunnosta</i>
-</p></td></tr>
-<tr><td class="onelinetop"><b>Valitse vikaturvallinen videotila</b></td><td> </td><td>Jos sinun oli aktivoitava valitsin <i>Käytä vikaturvallista videotila</i>a, voit asettaa resoluution ja värisyvyyden.</td></tr>
+<tr><td><b>Valitse alkulatauslevy</b></td><td> </td><td>Valitse, minkä Haiku-asennuksen käynnistät.</td></tr>
+<tr><td><b>Valitse turvatilavalitsimet</b>
+</td><td> </td><td>Laitteistopulmien tapahtuessa voit kokeilla useita valitsimia tai jos järjestelmä tulee epästabiiliksi tai sitä ei pysty alkulataamaan huonosti käyttäytyvän lisäosan vuoksi. Kun valintapalkin siirtää valitsimelle, niin näytön alalaiteen ilmaantuu lyhyt selite.</td></tr>
+<tr><td></td><td></td><td>
+	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><i>- Turvatila</i></td><td width="15"></td><td></td></tr>
+	<tr><td><i>- Ota käyttäjälisäosat pois käytöstä</i></td><td></td><td></td></tr>
+	<tr><td><i>- Ota pois käytöstä IDE DMA</i></td><td></td><td></td></tr>
+	<tr><td class="onelinetop"><i>- Käytä vikaturvallista videotilaa</i></td><td></td><td></td></tr>
+	<tr><td><i>- Älä kutsu BIOS:ia</i></td><td></td><td></td></tr>
+	<tr><td><i>- Ota pois käytöstä APM</i></td><td></td><td></td></tr>
+	<tr><td><i>- Ota pois käytöstä ACPI</i></td><td></td><td></td></tr>
+	</table></td></tr>
+<tr><td><b>Valitse vianjäljitysvalitsimet</b>
+</td><td> </td><td>Tästä löydät useita valitsimia, jotka opastavat vianjäljityksessä tai yksityiskohtien hakemisessa <a href="../welcome/fi/bugreports.html">vikailmoitukseen</a>. Taas näytön alalaidassa näytetään lyhyt selite.</td></tr>
+<tr><td></td><td></td><td>
+	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><i>- Ota käyttöön vianjäljitystuloste sarjaväylän kautta</i></td><td width="15"></td><td></td></tr>
+	<tr><td><i>- Ota käyttöön vianjäljitystuloste näytölle</i></td><td></td><td></td></tr>
+	<tr><td><i>- Ota pois käytöstä näytön sivutus</i></td><td></td><td></td></tr>
+	<tr><td><i>- Ota käyttöön vianjäljitys syslog-tiedostoon</i></td><td></td><td></td></tr>
+	<tr><td class="onelinetop"><i>- Näytä nykyinen alkulatausloki</i></td><td></td><td>(Paina näppäintä <span class="key">Q</span> lokista poistumiseksi)</td></tr>
+	<tr><td><i>- Lisää lisävikajäljitysvalitsin</i></td><td></td><td></td></tr>
+</table></td></tr>
+<tr><td></td><td></td><td>Jos valitsin "Ota käyttöön vianjäljitys syslog-tiedostoon" on aktivoitu, uudelleenkäynnistyminen kaatumisen jälkeen näyttää nämä lisävalitsimet:</td></tr>
+<tr><td></td><td></td><td>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td class="onelinetop"><i>- Näytä syslog-tiedosto edellisestä istunnosta</i></td><td></td><td></td></tr>
+	<tr><td><i>- Tallenna syslog-tiedosto edellisestä istunnosta</i></td><td></td><td></td></tr>
+</table>
+</td></tr>
+<tr><td class="onelinetop"><b>Valitse vikaturvallinen videotila</b></td><td> </td><td>Jos sinun oli aktivoitava valitsin <i>Käytä vikaturvallista videotila</i>a, voit asettaa resoluution ja värisyvyyden.</td></tr>
 </table>
 <p><br /></p>
 <p>Yhden tai useamman valitsimen aktivoinnin jälkeen palaat päävalikkoon ja jatkat alkulatausta, mikä esittää sinulle tämän alkulatausnäytön:</p>

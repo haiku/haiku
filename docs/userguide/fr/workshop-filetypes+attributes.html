@@ -43,6 +43,7 @@
 <li><a href="../sk/workshop-filetypes+attributes.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../hu/workshop-filetypes+attributes.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pt_BR/workshop-filetypes+attributes.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../ca/workshop-filetypes+attributes.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../en/workshop-filetypes+attributes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -54,6 +55,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Cette page n'est pas encore entièrement traduite. Les parties non encore traduites seront en anglais.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -79,8 +81,9 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="preparations" name="preparations">Préparations</a></h2>
-<p>Décidons d’abord du type de fichiers et des attributs dont nous allons nous servir. Au départ, je voulais utiliser pour chaque film un fichier lien vers sa description sur le site web IMdB, mais Haiku ne dispose pas encore de navigateur supportant ces liens, contrairement à BeOS qui avait <span class="app">NetPositive</span>, donc j’ai choisi de conserver des fichiers d’image JPEG de la boîte du DVD.<br />
-Nous allons également ajouter quelques attributs. Nous devons décider ici de ceux qui serviront à faire des requêtes (et que nous devrons ajouter à l’index) et si besoin est, quel type d’attribut utiliser. Les nombres (entiers ou flottants) sont en effet comparés différemment du texte (&lt;/=/&gt; au lieu de est/contient/commence par).</p>
+<p>Let's first decide what filetype and attributes would serve our needs. Originally, I planned to use a bookmark file with a link to the movie's IMdB page, but since Haiku didn't have a "bookmarkable" browser like BeOS' <span class="app">NetPositive</span> at that time, I came up with this: The file itself will be a JPEG image for the movie cover.<br />
+With <span class="app">WebPositive</span>, Haiku now has a browser using bookmark files again, so you could as well use a bookmark file instead of an image as basic filetype for our database files.<br />
+In any case, to these files we add a couple of attributes. Here we have to decide if we want to query it later (then we have to add it to the index) and if so, what type of attribute it should be. Numbers (int, float) can be evaluated differently than text (&lt;/=/&gt; vs. is/contains/starts with).</p>
 <p>Voici donc les attributs que je voudrais utliser pour mes DVD :</p>
 <ul>
 <li>Titre du film</li>

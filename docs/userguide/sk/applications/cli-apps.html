@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -43,6 +43,7 @@
 <li><a href="../../fi/applications/cli-apps.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../hu/applications/cli-apps.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_BR/applications/cli-apps.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../ca/applications/cli-apps.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/applications/cli-apps.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 
@@ -54,6 +55,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Preklad tejto stránky zatiaľ nie je dokončený. Dovtedy sa nedokončené časti zobrazia v anglickom origináli.</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Aplikácie príkazového riadka špecifické pre Haiku</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -102,17 +104,20 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
 		<td><p><span class="cli">checkfs</span> je dôležity nástroj na hľadanie chýb vo vašom súborovom systéme. Jednoducho pridajte názov zväzku alebo zariadenia a systém prebehne každý súbor a opraví možné nezrovnalosti.</p>
 </td></tr>
-<tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">open</span> je veľmi užitočný nástroj. Môžete ním otvoriť ľubovoľný súbor v jeho preferovanej aplikácii alebo spustiť konkrétnu aplikáciu podľa jej podpisu bez potreby poznať jej presnú cestu. Príkaz funguje aj na odkazoch URL a dokonca aj na „virtuálnych“ priečinkoch - <tt>.</tt> pre aktuálny priečinok a <tt>..</tt> pre nadradený otvorí priečinok v Trackeri.</p>
-</td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">desklink</span> dokáže priradiť ikonu ľubovolnému súboru, priečinku, požiadavke alebo aplikácii v oznamovacej oblasti Panela. Taktiež ponúka možnosť poskytnúť kontextové menu po kliknutí na ikonu pravým tlačidlom na vykonanie špeciálnych operácií. Ako príklad môžete skúsiť pridať aplikáciu príkazového riadka <span class="app">screenshot</span> s rôznymi možnosťami pomocou tohto kódu (znak „<tt>\</tt>“ v prvom riadku je na zalomenie riadka v Termináli):</p>
 <pre class="terminal"> desklink "cmd=Active window (2s):/bin/screenshot --window --border --delay 2" \
 "cmd=Remove replicant:desklink --remove=screenshot" /bin/screenshot
 </pre>
 <p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>
-</td></tr></table>
-
+</td></tr>
+<tr><td><p><span class="cli">diskimage</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">diskimage</span> lets you register a regular file as disk device. For example, you can register a Haiku anyboot image, mount it in Tracker and copy, edit or remove files there before using it as source in the Installer.</p>
+</td></tr>
+<tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">open</span> je veľmi užitočný nástroj. Môžete ním otvoriť ľubovoľný súbor v jeho preferovanej aplikácii alebo spustiť konkrétnu aplikáciu podľa jej podpisu bez potreby poznať jej presnú cestu. Príkaz funguje aj na odkazoch URL a dokonca aj na „virtuálnych“ priečinkoch - <tt>.</tt> pre aktuálny priečinok a <tt>..</tt> pre nadradený otvorí priečinok v Trackeri.</p>
+</td></tr>
+</table>
 </div>
 </div>
 

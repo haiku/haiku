@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -46,6 +46,7 @@
 <li><a href="../sk/deskbar.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../hu/deskbar.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pt_BR/deskbar.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../ca/deskbar.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../en/deskbar.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -57,6 +58,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>インデックス</td></tr>
@@ -87,40 +89,39 @@
 <li><p><b>Deskbar の設定 (Deskbar Preferences)</b> - Deskbar を設定するためのパネルを開きます。(下を参照してください)</p></li>
 <li><p><b>シャットダウン… (Shutdown...)</b> - <span class="menu">システムを再起動 (Restart System)</span> か <span class="menu">電源を切る (Power Off)</span> を選んで実行します。</p></li>
 <li><p><b>最近使ったドキュメント、フォルダー、アプリケーション (Recent Documents, Folders, Applications)</b> - 最近利用したドキュメント、フォルダー、アプリケーションの一覧です (下の <span class="menu"> Deskbar の設定</span> を参照してください)。</p></li>
-<li><p><b>Applications、Demos、Deskbar Applets、Preferences</b> - インストール済みのアプリケーション、デモ、アプレットと設定の一覧です。（下の <span class="menu"> Deskbar の設定</span> を参照してください）</p></li>
+<li><p><b>Applications, Demos, Deskbar applets, Preferences</b> - List of installed applications, demos, applets and preferences.<br />You can add links to other programs (or any folder, document, query etc.) by putting them into <span class="path">~/config/settings/deskbar</span>.</p></li>
 </ul>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>Deskbar の設定</h3>
-<img src="images/deskbar-images/configure.png" alt="configure.png" />
-<ul>
-<li><p><b>メニュー (Menu)</b><br />
-Deskbar のメニューに表示する最近利用したドキュメント、フォルダー、アプリケーションの数を指定、あるいはすべて表示するように設定できます。 <br />
-<span class="button">メニューの編集… (Edit Menu...)</span>  ボタンは <span class="path">/boot/home/config/be/</span> フォルダーを開きます。フォルダーには Deskbar で表示されるファイルとフォルダーが置かれています。初期設定では <span class="menu">Applications</span>、<span class="menu">Demos</span>、<span class="menu">Deskbar Applets</span>、および <span class="menu">Preferences</span> になっています。<br />
-このファイルにアプリケーションへのリンクやドキュメント、クエリをコピー、削除することで、項目を追加または削除できます。</p>
-<p>単にファイルやフォルダーをドラッグして、Deskbar 内の配置したい位置にドロップすることもできます。</p></li>
-<li><p><b>Window  (ウィンドウ)</b></p>
-<table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">常に手前に (Always on top)</span></td><td> </td><td>Deskbar は常に最前面にいます。</td></tr>
-<tr><td><span class="menu">マウスオーバーで手前に (Auto-raise)</span></td><td> </td><td>Deskbar にマウスポインターが触れると前面に来ます。</td></tr>
-<tr><td><span class="menu">自動的に隠す (Auto-hide)</span></td><td> </td><td>Deskbar は数ピクセルに縮小し、マウスポインタがタッチした時だけ現れます。</td></tr>
-</table></li>
-<li><p><b>Applications (アプリケーション)</b></p>
-<table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">実行中のアプリケーションを名前順に並び換える (Sort running applications)</span></td><td> </td><td>実行中のアプリケーションの一覧をアルファベット順に並べ替えます。</td></tr>
-<tr><td><span class="menu">Tracker を常時先頭に表示 (Tracker always first)</span></td><td> </td><td>アルファベット順に並べ替えた後も、トラッカーの項目を常に一覧の先頭に配置します。</td></tr>
-<tr><td class="onelinetop"><span class="menu">エキスパンダーを表示 (Show application expander)</span></td><td> </td><td>指定プログラムの全ウィンドウを表示 / 非表示にする、小さなウィジェットを提供します。</td></tr>
-<tr><td><span class="menu">新しいアプリケーションを展開表示 (Expand new applications)</span></td><td> </td><td>新しく起動したプログラムのウィンドウを自動的に開きます。</td></tr>
-<tr><td><span class="menu">アプリケーション名を隠す</span></td><td> </td><td>実行中アプリケーションからテキストラベルを除きます。</td></tr>
-<tr><td><span class="menu">アイコンサイズ</span></td><td> </td><td>実行中アプリケーションのアイコンサイズを調整します。</td></tr>
-</table></li>
-<li><p><b>日付と時刻 (Clock)</b></p>
-<table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">時刻に秒を表示 (Show seconds)</span></td><td> </td><td>時計に秒を表示します。</td></tr>
-<tr><td><span class="menu">曜日を表示する</span></td><td> </td><td>曜日の省略形を時計に追加します。</td></tr>
-</table><p><b></b></p></li>
-</ul>
+<h4>メニュー (Menu)</h4>
+<p>While the first couple of menu items of the Deskbar are fixed, you can customized the ones below <span class="menu">Shutdown...</span>.</p>
+<img src="images/deskbar-images/prefs-menu.png" alt="prefs-menu.png" />
+<p>Here you can set the number of recent documents, folders and applications that are shown in their menu in the Deskbar, or if you want to see them at all.<br />
+The button <span class="button">Edit menu...</span> opens the folder <span class="path">~/config/settings/deskbar</span>. In it you'll find the files and folders that appear in the Deskbar, by default these are <span class="menu">Applications</span>, <span class="menu">Demos</span>, <span class="menu">Deskbar applets</span>, and <span class="menu">Preferences</span>.<br />
+You can delete or add entries like links to applications, documents or even queries by simply copying/deleting them to/from this folder.</p>
+<p>It's even easier to simply drag a file, folder or saved query and drop it where you want it into the Deskbar.</p>
 
+<h4>Applications</h4>
+<p>The following settings don't apply to your installed applications, but to the behavior and visuals of the list of running applications.</p>
+<img src="images/deskbar-images/prefs-apps.png" alt="prefs-apps.png" />
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Sort running applications</span></td><td> </td><td>Sorts the list of running programs alphabetically.</td></tr>
+<tr><td><span class="menu">Tracker always first</span></td><td> </td><td>Even if you sort alphabetically, the Tracker entry always stays first in the list.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Show application expander</span></td><td> </td><td>Provides a small widget to show/hide all windows of a program directly under its entry in the Deskbar.</td></tr>
+<tr><td><span class="menu">Expand new applications</span></td><td> </td><td>Newly launched programs have their windows automatically expanded under their entry in the Deskbar.</td></tr>
+<tr><td><span class="menu">Hide application names</span></td><td> </td><td>Removes the text labels of running applications.</td></tr>
+<tr><td><span class="menu">Icon size</span></td><td> </td><td>Adjusts the icon size of running applications. </td></tr>
+</table>
+
+<h4>Window</h4>
+<p>The last tab contains the preferences for the Deskbar window.</p>
+<img src="images/deskbar-images/prefs-window.png" alt="prefs-window.png" />
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Always on top</span></td><td> </td><td>The Deskbar always stays above all other windows.</td></tr>
+<tr><td><span class="menu">Auto-raise</span></td><td> </td><td>The Deskbar pops to the front if the mouse pointer touches it.</td></tr>
+<tr><td><span class="menu">Auto-hide</span></td><td> </td><td>The Deskbar is reduced to only a few pixels and only pops up if the mouse pointer touches them.</td></tr>
+</table>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tray" name="tray">トレイ</a></h2>

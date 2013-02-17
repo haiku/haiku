@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -43,6 +43,7 @@
 <li><a href="../sk/bootloader.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../hu/bootloader.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pt_BR/bootloader.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../ca/bootloader.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -55,6 +56,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Cette page n'est pas encore entièrement traduite. Les parties non encore traduites seront en anglais.</div>
 
 <h1>Chargeur de démarrage</h1>
 
@@ -66,30 +68,39 @@ Si Haiku est le seul système d'exploitation de votre machine, Vous pouvez comme
 <p><br /></p>
 <p>Ceci fait, vous aurez accès à quatre menus :</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
-<tr><td><b>Select boot volume</b></td><td> </td><td>Vous permet de sélectionner l'installation de Haiku à démarrer.</td></tr>
-<tr><td><b>Select safe mode options</b><br />
-</td><td> </td><td>Ces options sont utiles en cas de problème relatif au support matériel. Si vous placez le curseur de sélection sur une option, une courte description de celle-ci s'affichera en bas de l'écran.
-<p><i>- Safe mode</i> (Mode de démarrage minimal)<br />
-<i>- Disable user add-ons</i> (Désactiver les extensions utilisateur)<br />
-<i>- Disable IDE DMA</i> (Désactiver l'optimisation DMA du bus IDE)<br />
-<i>- Use fail-safe video mode</i> (Mode vidéo sans échec)<br />
-<i>- Disable IO-APIC</i> (Désactiver le gestionnaire d'interruptions IO-APIC)<br />
-<i>- Disable LOCAL APIC</i><br />
-<i>- Don't call the BIOS</i> (Eviter les appels au BIOS)<br />
-<i>- Disable APM</i> (Désactiver la gestion d'énergie APM)<br />
-<i>- Disable ACPI</i> (Désactiver la gestion d'énergie avancée ACPI)
-</p></td></tr>
-<tr><td><b>Select debug options</b><br />
-</td><td> </td><td>Ici, vous trouverez plusieurs options qui vous aideront à déboguer ou à récuperer le détail pour un rapport de bogue.
-Encore une fois, une courte explication pour chaque option est affichée en bas.
-<p><i>- Enable serial debug output</i> (Envoyer les messages de déboguage sur le port série)<br />
-<i>- Enable on screen debug output</i> (Afficher les traces à l'écran)<br />
-<i>- Enable debug syslog</i> (Activer les traces systèmes)</p>
-<p>Si  "syslog debug" est activé, un redémarrage à chaud après un plantage montre les options supplémentaires suivantes :</p>
-<p><i>- Display syslog from previous session</i> (Afficher les traces de la session précédente)<br />
-<i>- Save syslog from previous session</i> (Enregistrer les traces de la session précédente)
-</p></td></tr>
-<tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td>Si vous avez activé l'option <i>Use fail-safe video mode</i>, vous pouvez utiliser ce menu pour choisir une résolution et une profondeur de couleur.</td></tr>
+<tr><td><b>Select boot volume</b></td><td> </td><td>Vous permet de sélectionner l'installation de Haiku à démarrer.</td></tr>
+<tr><td><b>Select safe mode options</b></td><td> </td><td>Il y a plusieurs options à essayer en cas de problème lié au matériel, ou si le système devient instable ou incapable de démarrer à cause d'un mauvais pilote. Lorsque vous déplacez la barre de sélection d'une option, une brève explication s'affiche en bas de l'écran.</td></tr>
+<tr><td></td><td></td><td><table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><i>- Safe mode</i> (Mode de démarrage minimal)</td><td width="15"></td><td></td></tr>
+	<tr><td><i>- Disable user add-ons</i> (Désactiver les extensions utilisateur)<br /></td><td></td><td></td></tr>
+	<tr><td><i>- Disable IDE DMA</i> (Désactiver l'optimisation DMA du bus IDE)</td><td></td><td></td></tr>
+	<tr><td class="onelinetop"><i>- Use fail-safe video mode</i> (Mode vidéo sans échec)</td><td></td><td></td></tr>
+	<tr><td><i>- Don't call the BIOS</i> (Éviter les appels au BIOS)</td><td></td><td></td></tr>
+	<tr><td><i>- Disable APM</i> (Désactiver la gestion d'énergie APM)</td><td></td><td></td></tr>
+	<tr><td><i>- Disable ACPI</i> (Désactiver la gestion d'énergie avancée ACPI)</td><td></td><td></td></tr>
+	</table>
+</td></tr>
+<tr><td><b>Select debug options</b></td><td> </td><td>Ici, vous trouverez plusieurs options qui vous aideront à déboguer ou à récuperer le détail pour un <a href="../welcome/en/bugreports.html">rapport de bogue</a>.
+Voici, une courte explication pour chaque option affichée ci-dessous.</td></tr>
+<tr><td></td><td></td><td>
+	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><i>- Enable serial debug output</i></td><td width="15"></td><td></td></tr>
+	<tr><td><i>- Enable on screen debug output</i></td><td></td><td></td></tr>
+	<tr><td><i>- Disable on screen paging</i></td><td></td><td></td></tr>
+	<tr><td><i>- Enable debug syslog</i></td><td></td><td></td></tr>
+	<tr><td class="onelinetop"><i>- Display current boot loader log</i></td><td></td><td>(Press <span class="key">Q</span> to exit the log)</td></tr>
+	<tr><td><i>- Add advanced debug option</i></td><td></td><td></td></tr>
+</table>
+</td></tr>
+<tr><td></td><td></td><td>Si  "syslog debug" est activé, un redémarrage à chaud après un plantage montre les options supplémentaires suivantes :
+</td></tr>
+<tr><td></td><td></td><td>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td class="onelinetop"><i>- Display syslog from previous session</i> (Afficher les traces de la session précédente)</td><td></td><td></td></tr>
+	<tr><td><i>- Save syslog from previous session</i> (Enregistrer les traces de la session précédente)</td><td></td><td></td></tr>
+</table>
+</td></tr>
+<tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td>Si vous avez activé l'option <i>Use fail-safe video mode</i>, vous pouvez utiliser ce menu pour choisir une résolution et une profondeur de couleur.</td></tr>
 </table>
 <p><br /></p>
 <p>Après avoir activé une ou plusieurs options, vous pourrez retourner au menu principal et continuer le démarrage. Pendant celui-ci, un écran de démarrage sera affiché :</p>

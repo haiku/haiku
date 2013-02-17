@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009, Haiku. All rights reserved.
+ * Copyright 2009-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,11 +42,13 @@
 <li><a href="../../fi/applications/deskcalc.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sk/applications/deskcalc.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../hu/applications/deskcalc.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../ca/applications/deskcalc.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/applications/deskcalc.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
  «  <a href="codycam.html">CodyCam</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos
+</a> 
 ::  <a href="diskprobe.html">Analisador de Disco</a>  »
 </span></div>
 </div>
@@ -54,7 +56,7 @@
 <div id="content">
 <div>
 
-<h2><img src="../../images/apps-images/deskcalc-icon_64.png" alt="deskcalc-icon_64.png" width="64" height="64" />DeskCalc</h2>
+<h2><img src="../../images/apps-images/deskcalc-icon_64.png" alt="deskcalc-icon_64.png" width="64" height="64" />Calculadora de Mesa</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplicativos</span></td></tr>
 <tr><td>Localização:</td><td></td><td><span class="path">/boot/system/apps/DeskCalc</span></td></tr>
@@ -64,18 +66,22 @@
 <p>DeskCalc é uma calculadora simples que não obstante tem algumas funcionalidades interessantes que não são aparentes à primeira vista.</p>
 <img src="../images/apps-images/deskcalc.png" alt="deskcalc.png" />
 <ul>
-<li><p>DeskCalc entende muito mais do que seu simples teclado sugere.<br />
-Além dos operadores <tt>+</tt>, <tt>-</tt>, <tt>*</tt>, <tt>/</tt>, <tt>%</tt>, <tt>^</tt> e das constantes <tt>pi</tt> e <tt>e</tt> as seguintes funções matemáticas são suportadas:<br />
-<tt>acos</tt>, <tt>asin</tt>, <tt>atan</tt>, <tt>atan2</tt>, <tt>ceil</tt>, <tt>cos</tt>, <tt>cosh</tt>, <tt>exp</tt>, <tt>floor</tt>, <tt>log</tt>, <tt>log10</tt>, <tt>pow</tt>, <tt>sin</tt>, <tt>sinh</tt>, <tt>sqrt</tt>, <tt>tan</tt>, <tt>tanh</tt>.</p></li>
-<li><p>Quando se trata da entrada de dados do usuário, o DeskCalc é bastante tolerante:<br />
-<tt>/</tt>, <tt>:</tt>, <tt>\</tt> são todos interpretados como operadores de divisão,<br />
-<tt>*</tt>, <tt>x</tt> são símbolos válidos para multiplicação.<br />
-Além disso, esteja ciente que <tt>.</tt> e <tt>,</tt> são ambos considerados pontos flutuantes, o que significa que não devem ser usados como separadores de 1000 (milhar).</p></li>
+<li><p>A Calculadora de Mesa entende muito mais do que seu simples teclado sugere.<br />
+Além dos operadores <tt> </tt>, <tt>-</tt>, <tt>*</tt>, <tt>/</tt>, <tt>%</tt>, <tt>^</tt> e das constantes <tt>pi</tt> e <tt>e</tt> as seguintes funções matemáticas são suportadas:<br />
+<tt>acos</tt>, <tt>asin</tt>, <tt>atan</tt>, <tt>atan2</tt>, <tt>cbrt</tt>,<tt>ceil</tt>, <tt>cos</tt>, <tt>cosh</tt>, <tt>exp</tt>, <tt>floor</tt>, <tt>log</tt>, <tt>log10</tt>, <tt>pow</tt>, <tt>sin</tt>, <tt>sinh</tt>, <tt>sqrt</tt>, <tt>tan</tt>, <tt>tanh</tt>.</p></li>
+
 <li><p>Clicar com o botão direito do mouse oferece estas opções:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Habilitar Num Lock ao iniciar</span></td><td style="width:15px;"></td><td>automaticamente ativa o bloqueio de número quando carregar o DeskCalc</td></tr>
-<tr><td><span class="menu">Exibir teclado</span></td><td></td><td>oculta o teclado quando desativado</td></tr>
+<tr><td><span class="menu">Habilitar Num Lock ao iniciar</span></td><td style="width:15px;"></td><td>Automaticamente ativa o bloqueio de número quando carregar a Calculadora de Mesa.</td></tr>
+<tr><td colspan="2"><span class="menu">Radianos/Graus</span></td><td></td><td>Alterna entre "rad" e "deg" como unidade de medida angular.</td></tr>
+<tr><td><span class="menu">Compacto</span></td><td><span class="key">ALT</span> <span class="key">0</span></td><td></td><td>Um modo de visão mínimo que oculta o teclado.</td></tr>
+<tr><td><span class="menu">Básico</span></td><td><span class="key">ALT</span> <span class="key">1</span></td><td></td><td>O visual padrão da Calculadora de Mesa.</td></tr>
+<tr><td><span class="menu">Científico</span></td><td><span class="key">ALT</span> <span class="key">2</span></td><td></td><td>Mostra botões adicionais para cálculos avançados.</td></tr>
 </table></li>
+<li><p>Quando se trata da entrada de dados do usuário, a Calculadora de Mesa é bastante tolerante:<br />
+<tt>/</tt>, <tt>:</tt>, <tt>\</tt> são todos interpretados como operadores de divisão,<br />
+<tt>*</tt>, <tt>x</tt> são símbolos válidos para multiplicação.<br />
+Além disso, esteja ciente que <tt>.</tt> e <tt>,</tt> são ambos considerados pontos flutuantes, o que significa que não devem ser usados como separadores de 1000.</p></li>
 <li><p>É possível redimensionar a calculadora até que atenda as suas necessidades e então colocá-la como um <a href="../gui.html#replicants">Replicante</a> para o Desktop via arrastar e soltar do símbolo no canto inferior direito. Certifique-se de que a opção <span class="menu">Exibir replicantes</span> está ativada no Deskbar.</p></li>
 <li><p>O teclado pode ser colorido com o arrastar e soltar de qualquer fonte de cor, por exemplo do <span class="app">Icon-O-Matic</span>.</p></li>
 <li><p>Pode-se mover para cima e para baixo no histórico de cálculos anteriores com <span class="key">↑</span> e <span class="key">↓</span>.</p></li>
@@ -85,7 +91,8 @@ Criar recortes como descrito em vários estágios do cálculo, voltar a eles pel
 Ou arrastar e soltar um cálculo diretamente de um correio eletrônico para o DeskCalc.</p></li>
 <li><p>DeskCalc pode ser usado no Terminal. Apenas ponha a expressão em aspas duplas, como aqui:</p>
 <pre class="terminal">~&gt; DeskCalc "sin(45)*(cos(12)+3.45)"
-3.6536554673202546181795194727005826674359494735820338441084848</pre></li>
+3.6536554673202546181795194727005826674359494735820338441084848</pre>
+<p>Nota: Usada no Terminal, a Calculadora de Mesa irá sempre usar radianos como unidade para as funções trigonométricas.</p></li>
 </ul>
 
 </div>
@@ -94,7 +101,8 @@ Ou arrastar e soltar um cálculo diretamente de um correio eletrônico para o De
 <div class="nav">
 <div class="inner"><span>
  «  <a href="codycam.html">CodyCam</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos
+</a> 
 ::  <a href="diskprobe.html">Analisador de Disco</a>  »
 </span></div>
 </div>
