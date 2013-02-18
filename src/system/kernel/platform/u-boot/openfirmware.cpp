@@ -116,8 +116,6 @@ of_get_next_device(int *_cookie, int root, const char *type, char *path,
 	int err;
 
 	int startoffset = *_cookie ? *_cookie : -1;
-//	if (startoffset < 0 && root != 0)
-//		startoffset = root;
 
 	// iterate by property value
 	next = fdt_node_offset_by_prop_value(gFDT, startoffset, "device_type",
