@@ -165,12 +165,12 @@ class TInfoView : public BBox {
 		virtual void	AttachedToWindow();
 		virtual void	Draw(BRect updateRect);
 		virtual void	FrameResized(float width, float height);
-		virtual void	GetPreferredSize(float* _width, float* height);
+		virtual void	GetPreferredSize(float* _width, float* _height);
 
 		void			AddMenu();
 		void			SetMagView(TMagnify* magView);
 		void			SetInfoTextVisible(bool visible);
-		bool			isInfoTextVisible();
+		bool			IsInfoTextVisible();
 
 	private:
 		float	 		fFontHeight;

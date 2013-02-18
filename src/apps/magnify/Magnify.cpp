@@ -662,8 +662,8 @@ TWindow::UpdateInfoBarOnResize()
 	float infoWidth, infoHeight;
 	fInfo->GetPreferredSize(&infoWidth, &infoHeight);
 
-	if (infoWidth > Bounds().Width() ||
-		infoHeight > Bounds().Height()) {
+	if (infoWidth > Bounds().Width()
+		|| infoHeight > Bounds().Height()) {
 		ShowInfo(false);
 	} else {
 		ShowInfo(true);
@@ -844,9 +844,8 @@ TInfoView::Draw(BRect updateRect)
 	FillRect(invalRect);
 	SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 	strcpy(fInfoStr, dimensionsInfo);
-	if (fInfoTextVisible) {
+	if (fInfoTextVisible)
 		DrawString(fInfoStr);
-	}
 
 	rgb_color color = { 0, 0, 0, 255 };
 	if (fMagView)
@@ -861,9 +860,8 @@ TInfoView::Draw(BRect updateRect)
 	FillRect(invalRect);
 	SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 	strcpy(fRGBStr,str);
-	if (fInfoTextVisible) {
+	if (fInfoTextVisible)
 		DrawString(fRGBStr);
-	}
 
 	bool ch1Showing, ch2Showing;
 	dynamic_cast<TWindow*>(Window())->CrossHairsShowing(&ch1Showing, &ch2Showing);
@@ -882,9 +880,8 @@ TInfoView::Draw(BRect updateRect)
 			FillRect(invalRect);
 			SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 			strcpy(fCH2Str,str);
-			if (fInfoTextVisible) {
+			if (fInfoTextVisible)
 				DrawString(fCH2Str);
-			}
 		}
 
 		if (ch1Showing && ch2Showing) {
@@ -896,9 +893,8 @@ TInfoView::Draw(BRect updateRect)
 			FillRect(invalRect);
 			SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 			strcpy(fCH1Str,str);
-			if (fInfoTextVisible) {
+			if (fInfoTextVisible)
 				DrawString(fCH1Str);
-			}
 		} else if (ch1Showing) {
 			MovePenTo(10, h-10);
 			sprintf(str, "x: %li  y: %li", (int32)pt1.x, (int32)pt1.y);
@@ -907,9 +903,8 @@ TInfoView::Draw(BRect updateRect)
 			FillRect(invalRect);
 			SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 			strcpy(fCH1Str,str);
-			if (fInfoTextVisible) {
+			if (fInfoTextVisible)
 				DrawString(fCH1Str);
-			}
 		}
 	}
 
@@ -1001,7 +996,7 @@ TMenu::AttachedToWindow()
 void
 TInfoView::GetPreferredSize(float* _width, float* _height)
 {
-	if(_width) {
+	if (_width) {
 		float str1Width = StringWidth(fCH1Str)
 			+ StringWidth(fCH2Str)
 			+ StringWidth(fRGBStr)
@@ -1010,14 +1005,13 @@ TInfoView::GetPreferredSize(float* _width, float* _height)
 		*_width = str1Width > str2Width ? str1Width : str2Width;
 	}
 
-	if(_height) {
+	if (_height)
 		*_height = fFontHeight * 2 + 10;
-	}
 }
 
 
 bool
-TInfoView::isInfoTextVisible()
+TInfoView::IsInfoTextVisible()
 {
 	return fInfoTextVisible;
 }
