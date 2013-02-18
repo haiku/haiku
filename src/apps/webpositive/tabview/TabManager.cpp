@@ -636,7 +636,6 @@ void WebTabView::_DrawCloseButton(BView* owner, BRect& frame,
 		be_control_look->DrawButtonBackground(owner, buttonRect, updateRect,
 			base, BControlLook::B_ACTIVATED);
 		tint *= 1.2;
-		closeRect.OffsetBy(1, 1);
 	}
 
 	base = tint_color(base, tint);
