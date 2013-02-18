@@ -19,9 +19,12 @@
 #include <arch/ppc/arch_cpu.h>
 #include <arch_kernel.h>
 #include <arch_system_info.h>
+#include <platform/openfirmware/devices.h>
+#include <platform/openfirmware/openfirmware.h>
 
 #include <string.h>
 
+// TODO: try to move remaining FDT code to OF calls
 extern "C" {
 #include <fdt.h>
 #include <libfdt.h>
@@ -38,13 +41,112 @@ extern void *gFDT;
 #	define TRACE(x) ;
 #endif
 
-//uint32 gTimeConversionFactor;
 
-
-static void
-calculate_cpu_conversion_factor()
+static status_t
+enumerate_cpus(void)
 {
-	#warning U-Boot:TODO!
+	// iterate through the "/cpus" node to find all CPUs
+	int cpus = of_finddevice("/cpus");
+	if (cpus == OF_FAILED) {
+		printf("enumerate_cpus(): Failed to open \"/cpus\"!\n");
+		return B_ERROR;
+	}
+
+	char cpuPath[256];
+	int cookie = 0;
+	int cpuCount = 0;
+	while (of_get_next_device(&cookie, cpus, "cpu", cpuPath,
+			sizeof(cpuPath)) == B_OK) {
+		TRACE(("found CPU: %s\n", cpuPath));
+
+		// For the first CPU get the frequencies of CPU, bus, and time base.
+		// We assume they are the same for all CPUs.
+		if (cpuCount == 0) {
+			int cpu = of_finddevice(cpuPath);
+			if (cpu == OF_FAILED) {
+				printf("enumerate_cpus: Failed get CPU device node!\n");
+				return B_ERROR;
+			}
+
+			// TODO: Does encode-int really encode quadlet (32 bit numbers)
+			// only?
+			int32 clockFrequency;
+			if (of_getprop(cpu, "clock-frequency", &clockFrequency, 4)
+					== OF_FAILED) {
+				printf("enumerate_cpus: Failed to get CPU clock "
+					"frequency!\n");
+				return B_ERROR;
+			}
+			int32 busFrequency = 0;
+			if (of_getprop(cpu, "bus-frequency", &busFrequency, 4)
+					== OF_FAILED) {
+				//printf("enumerate_cpus: Failed to get bus clock "
+				//	"frequency!\n");
+				//return B_ERROR;
+			}
+			int32 timeBaseFrequency;
+			if (of_getprop(cpu, "timebase-frequency", &timeBaseFrequency, 4)
+					== OF_FAILED) {
+				printf("enumerate_cpus: Failed to get time base "
+					"frequency!\n");
+				return B_ERROR;
+			}
+
+			gKernelArgs.arch_args.cpu_frequency = clockFrequency;
+			gKernelArgs.arch_args.bus_frequency = busFrequency;
+			gKernelArgs.arch_args.time_base_frequency = timeBaseFrequency;
+
+			TRACE(("  CPU clock frequency: %ld\n", clockFrequency));
+			//TRACE(("  bus clock frequency: %ld\n", busFrequency));
+			TRACE(("  time base frequency: %ld\n", timeBaseFrequency));
+		}
+
+		cpuCount++;
+	}
+
+	if (cpuCount == 0) {
+		printf("enumerate_cpus(): Found no CPUs!\n");
+		return B_ERROR;
+	}
+
+	gKernelArgs.num_cpus = cpuCount;
+
+	// FDT doesn't list bus frequency on the cpu node but on the plb node
+	if (gKernelArgs.arch_args.bus_frequency == 0) {
+		int plb = of_finddevice("/plb");
+
+		int32 busFrequency = 0;
+		if (of_getprop(plb, "clock-frequency", &busFrequency, 4)
+				== OF_FAILED) {
+			printf("enumerate_cpus: Failed to get bus clock "
+				"frequency!\n");
+			return B_ERROR;
+		}
+		gKernelArgs.arch_args.bus_frequency = busFrequency;
+	}
+	TRACE(("  bus clock frequency: %ld\n", gKernelArgs.arch_args.bus_frequency));
+
+#if 0
+//XXX:Classic
+	// allocate the kernel stacks (the memory stuff is already initialized
+	// at this point)
+	addr_t stack = (addr_t)arch_mmu_allocate((void*)0x80000000,
+		cpuCount * (KERNEL_STACK_SIZE + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE),
+		B_READ_AREA | B_WRITE_AREA, false);
+	if (!stack) {
+		printf("enumerate_cpus(): Failed to allocate kernel stack(s)!\n");
+		return B_NO_MEMORY;
+	}
+
+	for (int i = 0; i < cpuCount; i++) {
+		gKernelArgs.cpu_kstack[i].start = stack;
+		gKernelArgs.cpu_kstack[i].size = KERNEL_STACK_SIZE
+			+ KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE;
+		stack += KERNEL_STACK_SIZE + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE;
+	}
+#endif
+
+	return B_OK;
 }
 
 
@@ -155,6 +257,8 @@ arch_spin(bigtime_t microseconds)
 extern "C" status_t
 boot_arch_cpu_init(void)
 {
+	// first check some features
+	// including some necessary for dprintf()...
 	status_t err = check_cpu_features();
 
 	if (err != B_OK) {
@@ -162,11 +266,8 @@ boot_arch_cpu_init(void)
 		return err;
 	}
 
-	calculate_cpu_conversion_factor();
-
-	gKernelArgs.num_cpus = 1;
-		// this will eventually be corrected later on
-		// TODO:iterate on /cpus/*
+	// now enumerate correctly all CPUs and get system frequencies
+	enumerate_cpus();
 
 	return B_OK;
 }
