@@ -4,11 +4,6 @@ SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-# For GCC2
-if $(HAIKU_GCC_VERSION[1]) < 3 {
-	SubDirC++Flags --no-warnings ;
-}
-
 local sources =
 	FPS.cpp
 	GLObject.cpp
