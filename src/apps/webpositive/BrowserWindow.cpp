@@ -252,12 +252,6 @@ public:
 		SetExplicitMaxSize(BSize(15, 15));
 	}
 
-	virtual void AttachedToWindow()
-	{
-		SetToolTip(B_TRANSLATE("Close find bar"));
-		BButton::AttachedToWindow();
-	}
-
 	virtual void Draw(BRect updateRect)
 	{
 		BRect frame = Bounds();
@@ -506,13 +500,21 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 
 	// Find group
 	fFindCloseButton = new CloseButton(new BMessage(EDIT_HIDE_FIND_GROUP));
+	fFindCloseButton->SetToolTip(B_TRANSLATE_COMMENT("Close find bar",
+		"find bar close button tooltip"));
 	fFindTextControl = new BTextControl("find", B_TRANSLATE("Find:"), "",
 		new BMessage(EDIT_FIND_NEXT));
 	fFindTextControl->SetModificationMessage(new BMessage(FIND_TEXT_CHANGED));
 	fFindPreviousButton = new BButton(B_TRANSLATE("Previous"),
 		new BMessage(EDIT_FIND_PREVIOUS));
+	fFindPreviousButton->SetToolTip(
+		B_TRANSLATE_COMMENT("Find previous occurrence of search terms",
+			"find bar previous button tooltip"));
 	fFindNextButton = new BButton(B_TRANSLATE("Next"),
 		new BMessage(EDIT_FIND_NEXT));
+	fFindNextButton->SetToolTip(
+		B_TRANSLATE_COMMENT("Find next occurrence of search terms",
+			"find bar next button tooltip"));
 	fFindCaseSensitiveCheckBox = new BCheckBox(B_TRANSLATE("Match case"));
 	BGroupLayout* findGroup = BLayoutBuilder::Group<>(B_VERTICAL, 0.0)
 		.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
