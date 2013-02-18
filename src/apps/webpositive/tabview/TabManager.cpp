@@ -36,6 +36,7 @@
 #include <Button.h>
 #include <CardLayout.h>
 #include <ControlLook.h>
+#include <Catalog.h>
 #include <GroupView.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -46,6 +47,10 @@
 
 #include "TabContainerView.h"
 #include "TabView.h"
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Tab Manager"
 
 
 const static BString kEmptyString;
@@ -579,9 +584,13 @@ WebTabView::MouseMoved(BPoint where, uint32 transit,
 			fOverCloseRect = overCloseRect;
 			ContainerView()->Invalidate(closeRect);
 		}
-	}
-
-	fController->SetToolTip(Label());
+		// Set the Tooltip
+		if (overCloseRect)
+			fController->SetToolTip(B_TRANSLATE("Close tab"));
+		else
+			fController->SetToolTip(Label());
+	} else
+		fController->SetToolTip(Label());
 
 	TabView::MouseMoved(where, transit, dragMessage);
 }

@@ -252,6 +252,11 @@ public:
 		SetExplicitMaxSize(BSize(15, 15));
 	}
 
+	virtual void AttachedToWindow()
+	{
+		SetToolTip(B_TRANSLATE("Close find bar"));
+	}
+
 	virtual void Draw(BRect updateRect)
 	{
 		BRect frame = Bounds();
