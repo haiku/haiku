@@ -112,7 +112,38 @@ status_t
 of_get_next_device(int *_cookie, int root, const char *type, char *path,
 	size_t pathSize)
 {
-	return B_ERROR;
+	int next;
+	int err;
+
+	int startoffset = *_cookie ? *_cookie : -1;
+//	if (startoffset < 0 && root != 0)
+//		startoffset = root;
+
+	// iterate by property value
+	next = fdt_node_offset_by_prop_value(gFDT, startoffset, "device_type",
+		type, strlen(type) + 1);
+	TRACE(("of_get_next_device(c:%d, %d, '%s', %p, %zd) soffset=%d next=%d\n",
+		*_cookie, root, type, path, pathSize, startoffset, fdt2of(next)));
+	if (next < 0)
+		return B_ENTRY_NOT_FOUND;
+
+	// make sure root is the parent
+	int parent = next;
+	while (root && parent) {
+		parent = fdt_parent_offset(gFDT, parent);
+		if (parent == root)
+			break;
+		if (parent <= 0)
+			return B_ENTRY_NOT_FOUND;
+	}
+
+	*_cookie = next;
+
+	err = fdt_get_path(gFDT, next, path, pathSize);
+	if (err < 0)
+		return B_ERROR;
+
+	return B_OK;
 }
 
 
