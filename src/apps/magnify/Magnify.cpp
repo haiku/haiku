@@ -135,7 +135,7 @@ BuildInfoMenu(BMenu *menu)
 	menu->AddItem(menuItem);
 //	menuItem = new BMenuItem(B_TRANSLATE("Save selection"), new BMessage(msg_save),'S');
 //	menu->AddItem(menuItem);
-	menuItem = new BMenuItem(B_TRANSLATE("Copy image"), 
+	menuItem = new BMenuItem(B_TRANSLATE("Copy image"),
 		new BMessage(msg_copy_image),'C');
 	menu->AddItem(menuItem);
 	menu->AddSeparatorItem();
@@ -1506,7 +1506,7 @@ TMagnify::CopyImage()
 
 	BMessage *message = be_clipboard->Data();
 	if (!message) {
-		printf(B_TRANSLATE_CONTEXT("no clip msg\n", 
+		printf(B_TRANSLATE_CONTEXT("no clip msg\n",
 			"In console, when clipboard is empty after clicking Copy image"));
 		return;
 	}
@@ -2044,7 +2044,7 @@ main(int argc, char* argv[])
 
 	if (argc > 2) {
 		printf(B_TRANSLATE_CONTEXT(
-			"usage: magnify [size] (magnify size * size pixels)\n", 
+			"usage: magnify [size] (magnify size * size pixels)\n",
 			"Console"));
 		exit(1);
 	} else {
@@ -2053,17 +2053,17 @@ main(int argc, char* argv[])
 
 			if ((pixelCount > 100) || (pixelCount < 4)) {
 				printf(B_TRANSLATE_CONTEXT(
-					"usage: magnify [size] (magnify size * size pixels)\n", 
+					"usage: magnify [size] (magnify size * size pixels)\n",
 					"Console"));
 				printf(B_TRANSLATE_CONTEXT(
-					"  size must be > 4 and a multiple of 4\n", 
+					"  size must be > 4 and a multiple of 4\n",
 					"Console"));
 				exit(1);
 			}
 
 			if (pixelCount % 4) {
 				printf(B_TRANSLATE_CONTEXT(
-					"magnify: size must be a multiple of 4\n", 
+					"magnify: size must be a multiple of 4\n",
 					"Console"));
 				exit(1);
 			}
