@@ -255,6 +255,7 @@ public:
 	virtual void AttachedToWindow()
 	{
 		SetToolTip(B_TRANSLATE("Close find bar"));
+		BButton::AttachedToWindow();
 	}
 
 	virtual void Draw(BRect updateRect)
