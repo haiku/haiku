@@ -86,6 +86,7 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "WebPositive Window"
 
+
 enum {
 	OPEN_LOCATION								= 'open',
 	GO_BACK										= 'goba',
@@ -236,6 +237,78 @@ private:
 	BString		fURLInputContents;
 	int32		fURLInputSelectionStart;
 	int32		fURLInputSelectionEnd;
+};
+
+
+class CloseButton : public BButton {
+public:
+	CloseButton(BMessage* message)
+		:
+		BButton("close button", NULL, message),
+		fOverCloseRect(false)
+	{
+		// Button is 16x16 regardless of font size
+		SetExplicitMinSize(BSize(15, 15));
+		SetExplicitMaxSize(BSize(15, 15));
+	}
+
+	virtual void Draw(BRect updateRect)
+	{
+		BRect frame = Bounds();
+		BRect closeRect(frame.InsetByCopy(4, 4));
+		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+		float tint = B_DARKEN_1_TINT;
+
+		if (fOverCloseRect)
+			tint *= 1.2;
+
+		if (Value() == B_CONTROL_ON && fOverCloseRect) {
+			// Draw the button frame
+			be_control_look->DrawButtonFrame(this, frame, updateRect,
+				base, base, BControlLook::B_ACTIVATED
+					| BControlLook::B_BLEND_FRAME);
+			be_control_look->DrawButtonBackground(this, frame,
+				updateRect, base, BControlLook::B_ACTIVATED);
+			tint *= 1.2;
+		} else {
+			SetHighColor(base);
+			FillRect(updateRect);
+		}
+
+		// Draw the ×
+		base = tint_color(base, tint);
+		SetHighColor(base);
+		SetPenSize(2);
+		StrokeLine(closeRect.LeftTop(), closeRect.RightBottom());
+		StrokeLine(closeRect.LeftBottom(), closeRect.RightTop());
+		SetPenSize(1);
+	}
+
+	virtual void MouseMoved(BPoint where, uint32 transit,
+		const BMessage* dragMessage)
+	{
+		switch (transit) {
+			case B_ENTERED_VIEW:
+				fOverCloseRect = true;
+				Invalidate();
+				break;
+			case B_EXITED_VIEW:
+				fOverCloseRect = false;
+				Invalidate();
+				break;
+			case B_INSIDE_VIEW:
+				fOverCloseRect = true;
+				break;
+			case B_OUTSIDE_VIEW:
+				fOverCloseRect = false;
+				break;
+		}
+
+		BButton::MouseMoved(where, transit, dragMessage);
+	}
+
+private:
+	bool fOverCloseRect;
 };
 
 
@@ -426,12 +499,7 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 	const float kElementSpacing = 5;
 
 	// Find group
-	fFindCloseButton = new BButton("\xc3\x97", // multiplication sign
-		new BMessage(EDIT_HIDE_FIND_GROUP));
-	fFindCloseButton->SetExplicitMinSize(
-		BSize(be_control_look->DefaultItemSpacing() * 3, B_SIZE_UNSET));
-	fFindCloseButton->SetExplicitMaxSize(
-		BSize(be_control_look->DefaultItemSpacing() * 3, B_SIZE_UNSET));
+	fFindCloseButton = new CloseButton(new BMessage(EDIT_HIDE_FIND_GROUP));
 	fFindTextControl = new BTextControl("find", B_TRANSLATE("Find:"), "",
 		new BMessage(EDIT_FIND_NEXT));
 	fFindTextControl->SetModificationMessage(new BMessage(FIND_TEXT_CHANGED));
@@ -442,7 +510,7 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 	fFindCaseSensitiveCheckBox = new BCheckBox(B_TRANSLATE("Match case"));
 	BGroupLayout* findGroup = BLayoutBuilder::Group<>(B_VERTICAL, 0.0)
 		.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL, B_USE_SMALL_SPACING)
 			.Add(fFindCloseButton)
 			.Add(fFindTextControl)
 			.Add(fFindPreviousButton)
