@@ -191,6 +191,9 @@ start_raw(int argc, const char **argv)
 
 	serial_init(gFDT);
 	console_init();
+	// initialize the OpenFirmware wrapper
+	of_init(NULL);
+
 	cpu_init();
 
 	if (args.platform.fdt_data) {
@@ -223,9 +226,6 @@ start_raw(int argc, const char **argv)
 			args.platform.boot_tgz_data, args.platform.boot_tgz_size);
 			}
 		}
-
-		// also initialize the OpenFirmware wrapper
-		of_init(NULL);
 	}
 
 	// if we get passed a uimage, try to find the second blob
