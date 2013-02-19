@@ -635,6 +635,8 @@ void WebTabView::_DrawCloseButton(BView* owner, BRect& frame,
 	}
 
 	if (fOverCloseRect)
+		tint *= 1.4;
+	else
 		tint *= 1.2;
 
 	if (fClicked && fOverCloseRect) {

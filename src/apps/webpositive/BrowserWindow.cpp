@@ -260,6 +260,8 @@ public:
 		float tint = B_DARKEN_1_TINT;
 
 		if (fOverCloseRect)
+			tint *= 1.4;
+		else
 			tint *= 1.2;
 
 		if (Value() == B_CONTROL_ON && fOverCloseRect) {
