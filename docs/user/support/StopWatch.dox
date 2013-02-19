@@ -47,9 +47,9 @@
 	This method creates a new BStopWatch object. As soon as the object is
 	created the timer starts ticking away.
 
-	If you are profiling your code with this class, pass \c true to the
-	\a silent parameter. Doing so causes elapsed time information to be
-	streamed to standard output when when the object is destroyed.
+	If you are profiling your code with this class pass \c false to the
+	\a silent parameter to cause the elapsed time information to be
+	streamed to standard output when the object is destroyed.
 
 	\param name The name of the stop watch. You may pass \c NULL to create an
 	       anonymous stop watch.
