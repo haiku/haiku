@@ -1,17 +1,33 @@
 /*
- * Copyright 2004-2011 Haiku, Inc. All rights reserved.
+ * Copyright 2004-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *      Alexander von Gluck, kallisti5@unixzen.com
+ *		John Scipione, jscipione@gmail.com
  */
 
 
 #include "InterfaceHardwareView.h"
 #include "NetworkSettings.h"
 
+#include <Catalog.h>
+#include <ControlLook.h>
 #include <LayoutBuilder.h>
+#include <MenuField.h>
 #include <MenuItem.h>
+#include <NetworkAddress.h>
+#include <Screen.h>
+#include <Size.h>
+#include <StringView.h>
+#include <TextControl.h>
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "IntefaceHardwareView"
+
+
+// #pragma mark - InterfaceHardwareView
 
 
 InterfaceHardwareView::InterfaceHardwareView(BRect frame,
@@ -24,22 +40,34 @@ InterfaceHardwareView::InterfaceHardwareView(BRect frame,
 
 	// TODO : Small graph of throughput?
 
-	// TODO : Use strings instead of TextControls
-	fStatusField = new BTextControl("Status:", NULL, NULL);
-	fStatusField->SetEnabled(false);
-	fMACField = new BTextControl("MAC Address:", NULL, NULL);
-	fMACField->SetEnabled(false);
-	fSpeedField = new BTextControl("Link Speed:", NULL, NULL);
-	fSpeedField->SetEnabled(false);
+	float minimumWidth = be_control_look->DefaultItemSpacing() * 16;
 
-	RevertFields();
-		// Do the initial field population
+	BStringView* status = new BStringView("status label", B_TRANSLATE("Status:"));
+	status->SetAlignment(B_ALIGN_RIGHT);
+	fStatusField = new BStringView("status field", "");
+	fStatusField->SetExplicitMinSize(BSize(minimumWidth, B_SIZE_UNSET));
+	BStringView* macAddress = new BStringView("mac address label",
+		B_TRANSLATE("MAC address:"));
+	macAddress->SetAlignment(B_ALIGN_RIGHT);
+	fMacAddressField = new BStringView("mac address field", "");
+	fMacAddressField->SetExplicitMinSize(BSize(minimumWidth, B_SIZE_UNSET));
+	BStringView* linkSpeed = new BStringView("link speed label",
+		B_TRANSLATE("Link speed:"));
+	linkSpeed->SetAlignment(B_ALIGN_RIGHT);
+	fLinkSpeedField = new BStringView("link speed field", "");
+	fLinkSpeedField->SetExplicitMinSize(BSize(minimumWidth, B_SIZE_UNSET));
+
+	Revert();
+		// Populate the fields
 
 	BLayoutBuilder::Group<>(this)
 		.AddGrid()
-			.AddTextControl(fStatusField, 0, 0, B_ALIGN_RIGHT)
-			.AddTextControl(fMACField, 0, 1, B_ALIGN_RIGHT)
-			.AddTextControl(fSpeedField, 0, 2, B_ALIGN_RIGHT)
+			.Add(status, 0, 0)
+			.Add(fStatusField, 1, 0)
+			.Add(macAddress, 0, 1)
+			.Add(fMacAddressField, 1, 1)
+			.Add(linkSpeed, 0, 2)
+			.Add(fLinkSpeedField, 1, 2)
 		.End()
 		.AddGlue()
 		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
@@ -51,6 +79,9 @@ InterfaceHardwareView::~InterfaceHardwareView()
 {
 
 }
+
+
+// #pragma mark - InterfaceHardwareView virtual methods
 
 
 void
@@ -70,26 +101,29 @@ InterfaceHardwareView::MessageReceived(BMessage* message)
 }
 
 
+// #pragma mark - InterfaceHardwareView public methods
+
+
 status_t
-InterfaceHardwareView::RevertFields()
+InterfaceHardwareView::Revert()
 {
 	// Populate fields with current settings
 	if (fSettings->HasLink())
-		fStatusField->SetText("connected");
+		fStatusField->SetText(B_TRANSLATE("connected"));
 	else
-		fStatusField->SetText("disconnected");
+		fStatusField->SetText(B_TRANSLATE("disconnected"));
+
+	fMacAddressField->SetText(fSettings->HardwareAddress());
 
 	// TODO : Find how to get link speed
-	fSpeedField->SetText("100 Mb/s");
+	fLinkSpeedField->SetText("100 Mb/s");
 
 	return B_OK;
 }
 
 
 status_t
-InterfaceHardwareView::SaveFields()
+InterfaceHardwareView::Save()
 {
-
 	return B_OK;
 }
-

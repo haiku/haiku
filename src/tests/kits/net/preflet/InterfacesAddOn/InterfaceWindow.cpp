@@ -1,55 +1,59 @@
 /*
- * Copyright 2004-2011 Haiku, Inc. All rights reserved.
+ * Copyright 2004-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *      Alexander von Gluck, kallisti5@unixzen.com
+ *		John Scipione, jscipione@gmail.com
  */
 
 
 #include "InterfaceWindow.h"
 
 #include <Application.h>
-
-#include <stdio.h>
+#include <Button.h>
+#include <Catalog.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
+#include <TabView.h>
 
 
 #undef B_TRANSLATION_CONTEXT
-#define B_TRANSLATION_CONTEXT "NetworkSetupWindow"
+#define B_TRANSLATION_CONTEXT "InterfaceWindow"
 
 
 InterfaceWindow::InterfaceWindow(NetworkSettings* settings)
 	:
 	BWindow(BRect(50, 50, 370, 350), "Interface Settings",
-		B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
-		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE,
-		B_CURRENT_WORKSPACE)
+		B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
+			| B_AUTO_UPDATE_SIZE_LIMITS, B_CURRENT_WORKSPACE)
 {
 	fNetworkSettings = settings;
 
 	fTabView = new BTabView("settings_tabs");
-
-	fApplyButton = new BButton("save", B_TRANSLATE("Save"),
-		new BMessage(MSG_IP_SAVE));
+	fTabView->SetTabWidth(B_WIDTH_FROM_LABEL);
 
 	fRevertButton = new BButton("revert", B_TRANSLATE("Revert"),
 		new BMessage(MSG_IP_REVERT));
 
-	fTabView->SetResizingMode(B_FOLLOW_ALL);
-		// ensure tab container matches window size
+	fApplyButton = new BButton("save", B_TRANSLATE("Save"),
+		new BMessage(MSG_IP_SAVE));
+	SetDefaultButton(fApplyButton);
 
 	_PopulateTabs();
 
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, B_USE_SMALL_SPACING)
 		.Add(fTabView)
-		.AddGroup(B_HORIZONTAL, 5)
-			.AddGlue()
+		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 			.Add(fRevertButton)
+			.AddGlue()
 			.Add(fApplyButton)
 		.End()
-		.SetInsets(10, 10, 10, 10)
+		.SetInsets(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING,
+			B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
 	);
 }
 
@@ -65,21 +69,20 @@ InterfaceWindow::MessageReceived(BMessage* message)
 	protocols* supportedFamilies = fNetworkSettings->ProtocolVersions();
 
 	switch (message->what) {
+		
 		case MSG_IP_REVERT:
-			for (int index = 0; index < MAX_PROTOCOLS; index++)
-			{
+			for (int index = 0; index < MAX_PROTOCOLS; index++) {
 				if (supportedFamilies[index].present) {
 					int inet_id = supportedFamilies[index].inet_id;
-					fTabIPView[inet_id]->RevertFields();
+					fTabIPView[inet_id]->Revert();
 				}
 			}
 			break;
 		case MSG_IP_SAVE:
-			for (int index = 0; index < MAX_PROTOCOLS; index++)
-			{
+			for (int index = 0; index < MAX_PROTOCOLS; index++) {
 				if (supportedFamilies[index].present) {
 					int inet_id = supportedFamilies[index].inet_id;
-					fTabIPView[inet_id]->SaveFields();
+					fTabIPView[inet_id]->Save();
 				}
 			}
 			this->Quit();
@@ -97,15 +100,15 @@ InterfaceWindow::_PopulateTabs()
 	BRect frame = fTabView->Bounds();
 	protocols* supportedFamilies = fNetworkSettings->ProtocolVersions();
 
-	BTab* hardwaretab = new BTab;
+	BTab* hardwareTab = new BTab;
 	fTabHardwareView = new InterfaceHardwareView(frame,
 		fNetworkSettings);
-	fTabView->AddTab(fTabHardwareView, hardwaretab);
+	fTabView->AddTab(fTabHardwareView, hardwareTab);
 
 	if (fNetworkSettings->IsEthernet())
-		hardwaretab->SetLabel("Wired");
+		hardwareTab->SetLabel(B_TRANSLATE("Wired"));
 	else
-		hardwaretab->SetLabel("Wirless");
+		hardwareTab->SetLabel(B_TRANSLATE("Wirless"));
 
 	for (int index = 0; index < MAX_PROTOCOLS; index++)
 	{
@@ -128,4 +131,3 @@ InterfaceWindow::QuitRequested()
 {
 	return true;
 }
-
