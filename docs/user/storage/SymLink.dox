@@ -1,0 +1,159 @@
+/*
+ * Copyright 2002-2013 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ *		John Scipione, jscipione@gmail.com
+ *		Ingo Weinhold, bonefish@users.sf.net
+ *
+ * Corresponds to:
+ *		headers/os/storage/Symlink.h	hrev45306
+ *		src/kits/storage/Symlink.cpp	hrev45306
+ */
+
+
+/*!
+	\file Symlink.h
+	\ingroup storage
+	\ingroup libbe
+	\brief Provides the BSymLink class.
+*/
+
+
+/*!
+	\class BSymLink
+	\ingroup storage
+	\ingroup libbe
+	\brief Provides an interface for creating, manipulating, and accessing
+	       the contents of symbolic links.
+*/
+
+
+/*!
+	\fn BSymLink::BSymLink()
+	\brief Creates an uninitialized BSymLink object.
+*/
+
+
+/*!
+	\fn BSymLink::BSymLink(const BSymLink &link)
+	\brief Creates a copy of the supplied BSymLink object.
+
+	\param link The BSymLink object to be copied.
+*/
+
+
+/*!
+	\fn BSymLink::BSymLink(const entry_ref *ref)
+	\brief Creates a BSymLink object and initializes it to the symbolic link
+	       referred to by the supplied entry_ref.
+
+	\param ref the entry_ref referring to the symbolic link.
+*/
+
+
+/*!
+	\fn BSymLink::BSymLink(const BEntry *entry)
+	\brief Creates a BSymLink object and initializes it to the symbolic link
+	       referred to by the supplied BEntry.
+
+	\param entry The BEntry referring to the symbolic link.
+*/
+
+
+/*!
+	\fn BSymLink::BSymLink(const char *path)
+	\brief Creates a BSymLink object and initializes it to the symbolic link
+	       referred to by the supplied path name.
+
+	\param path The path of the symbolic link.
+*/
+
+
+/*!
+	\fn BSymLink::BSymLink(const BDirectory *dir, const char *path)
+	\brief Creates a BSymLink object and initializes it to the symbolic link
+	       referred to by the supplied path name relative to the specified
+	       BDirectory.
+
+	\param dir The base BDirectory.
+	\param path The path of the symbolic link relative to \a dir.
+*/
+
+
+/*!
+	\fn BSymLink::~BSymLink()
+	\brief Destroys the object and frees all allocated resources.
+
+	If the BSymLink was properly initialized, the file descriptor of the
+	symbolic link is also closed.
+*/
+
+
+/*!
+	\fn ssize_t BSymLink::ReadLink(char *buffer, size_t size)
+	\brief Reads the contents of the symbolic link into \a buffer.
+
+	The string written to the buffer is guaranteed to be \c NULL terminated.
+
+	\param buffer The buffer to read the symlink's contents into.
+	\param size The size of \a buffer.
+
+	\return The number of bytes written into the buffer or an error code.
+	\retval B_BAD_VALUE \a buf was \c NULL or the object didn't refer to a
+	        symbolic link.
+	\retval B_FILE_ERROR The object was not initialized.
+*/
+
+
+/*!
+	\fn ssize_t BSymLink::MakeLinkedPath(const char *dirPath, BPath *path)
+	\brief Combines a directory path and the contents of this symbolic link to
+	       form an absolute path.
+
+	\param dirPath The base directory path to combine with the symbolic link.
+	\param path The BPath object to be set to the resulting absolute path.
+
+	\return The length of the resulting path name or an error code.
+	\retval B_BAD_VALUE \a dirPath or \a path was \c NULL or the object didn't
+	        refer to a symbolic link.
+	\retval B_FILE_ERROR The object was not initialized.
+	\retval B_NAME_TOO_LONG The resulting path name was too long to fit.
+*/
+
+
+/*!
+	\fn ssize_t BSymLink::MakeLinkedPath(const BDirectory *dir, BPath *path)
+	\brief Combines a directory path and the contents of this symbolic link to
+	       form an absolute path.
+
+	\param dir The base BDirectory object to combine with the symbolic link.
+	\param path the BPath object to be set to the resulting absolute path.
+
+	\return The length of the resulting path name or an error code.
+	\retval B_BAD_VALUE \a dir or \a path was \c NULL or the object didn't
+	        refer to a symbolic link.
+	\retval B_FILE_ERROR The object was not initialized.
+	\retval B_NAME_TOO_LONG The resulting path name was too long to fit.
+*/
+
+
+/*!
+	\fn bool BSymLink::IsAbsolute()
+	\brief Returns whether or not the object refers to an absolute path.
+
+	/return \c true if the object is properly initialized and the symbolic
+	        link refers to an absolute path, \c false otherwise.
+*/
+
+
+/*!
+	\fn int BSymLink::get_fd() const
+	\brief Returns the file descriptor of the BSymLink.
+
+	This method should be used instead of accessing the private \c fFd member
+	of the BNode directly.
+
+	\return The object's file descriptor, or -1 if not properly initialized.
+*/
