@@ -17,7 +17,7 @@
 	\file Resources.h
 	\ingroup storage
 	\ingroup libbe
-	Provides the BResources class.
+	\brief Provides the BResources class.
 */
 
 

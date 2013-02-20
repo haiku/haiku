@@ -17,8 +17,7 @@
 	\file Statable.h
 	\ingroup storage
 	\ingroup libbe
-
-	Provides the BStatable abstract class.
+	\brief Provides the BStatable abstract class.
 */
 
 
