@@ -474,8 +474,8 @@ mmu_allocate(void *virtualAddress, size_t size)
 		addr_t address = (addr_t)virtualAddress;
 
 		// is the address within the valid range?
-		if (address < KERNEL_BASE
-			|| address + size >= KERNEL_BASE + kMaxKernelSize) {
+		if (address < KERNEL_BASE || address + size * B_PAGE_SIZE
+			>= KERNEL_BASE + kMaxKernelSize) {
 			TRACE(("mmu_allocate in illegal range\n address: %" B_PRIx32
 				"  KERNELBASE: %" B_PRIx32 " KERNEL_BASE + kMaxKernelSize: %"
 				B_PRIx32 "  address + size : %" B_PRIx32 "\n", (uint32)address,

@@ -339,7 +339,8 @@ mmu_allocate(void *virtualAddress, size_t size)
 		addr_t address = (addr_t)virtualAddress;
 
 		// is the address within the valid range?
-		if (address < KERNEL_BASE || address + size >= KERNEL_BASE + kMaxKernelSize)
+		if (address < KERNEL_BASE || address + size * B_PAGE_SIZE
+			>= KERNEL_BASE + kMaxKernelSize)
 			return NULL;
 
 		for (uint32 i = 0; i < size; i++) {
