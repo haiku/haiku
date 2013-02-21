@@ -584,13 +584,10 @@ WebTabView::MouseMoved(BPoint where, uint32 transit,
 			fOverCloseRect = overCloseRect;
 			ContainerView()->Invalidate(closeRect);
 		}
-		// Set the Tooltip
-		if (overCloseRect)
-			fController->SetToolTip(B_TRANSLATE("Close tab"));
-		else
-			fController->SetToolTip(Label());
-	} else
-		fController->SetToolTip(Label());
+	}
+
+	// Set the tool tip
+	fController->SetToolTip(Label());
 
 	TabView::MouseMoved(where, transit, dragMessage);
 }
@@ -640,15 +637,18 @@ void WebTabView::_DrawCloseButton(BView* owner, BRect& frame,
 		tint *= 1.2;
 
 	if (fClicked && fOverCloseRect) {
+		// Draw the button frame
 		BRect buttonRect(closeRect.InsetByCopy(-4, -4));
 		be_control_look->DrawButtonFrame(owner, buttonRect, updateRect,
 			base, base,
 			BControlLook::B_ACTIVATED | BControlLook::B_BLEND_FRAME);
 		be_control_look->DrawButtonBackground(owner, buttonRect, updateRect,
 			base, BControlLook::B_ACTIVATED);
+		closeRect.OffsetBy(1, 1);
 		tint *= 1.2;
 	}
 
+	// Draw the ×
 	base = tint_color(base, tint);
 	owner->SetHighColor(base);
 	owner->SetPenSize(2);

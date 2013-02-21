@@ -271,6 +271,7 @@ public:
 					| BControlLook::B_BLEND_FRAME);
 			be_control_look->DrawButtonBackground(this, frame,
 				updateRect, base, BControlLook::B_ACTIVATED);
+			closeRect.OffsetBy(1, 1);
 			tint *= 1.2;
 		} else {
 			SetHighColor(base);
@@ -502,8 +503,6 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 
 	// Find group
 	fFindCloseButton = new CloseButton(new BMessage(EDIT_HIDE_FIND_GROUP));
-	fFindCloseButton->SetToolTip(B_TRANSLATE_COMMENT("Close find bar",
-		"find bar close button tooltip"));
 	fFindTextControl = new BTextControl("find", B_TRANSLATE("Find:"), "",
 		new BMessage(EDIT_FIND_NEXT));
 	fFindTextControl->SetModificationMessage(new BMessage(FIND_TEXT_CHANGED));
