@@ -1,0 +1,131 @@
+/*
+ * Copyright 2002-2013 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Vincent Dominguez
+ *		John Scipione, jscipione@gmail.com
+ *		Ingo Weinhold, bonefish@users.sf.net
+ *
+ * Corresponds to:
+ *		headers/os/storage/VolumeRoster.h	hrev45306
+ *		src/kits/storage/VolumeRoster.cpp	hrev45306
+ */
+
+
+/*!
+	\file VolumeRoster.h
+	\ingroup storage
+	\ingroup libbe
+	\brief Provides the BVolumeRoster class.
+*/
+
+
+/*!
+	\class BVolumeRoster
+	\ingroup storage
+	\ingroup libbe
+	\brief Provides an interface for iterating through available volumes
+	       and watching for mounting/unmounting.
+
+	This class wraps the next_dev() function for iterating through the
+	list of available volumes and watch_node()/stop_watching() for
+	watching volumes.
+*/
+
+
+/*!
+	\fn BVolumeRoster::BVolumeRoster()
+	\brief Creates a BVolumeRoster object. The object is ready to be used.
+*/
+
+
+/*!
+	\fn BVolumeRoster::~BVolumeRoster()
+	\brief Deletes the volume roster and frees all associated resources.
+
+	If a watch was activated (by StartWatching()), it is deactivated.
+*/
+
+
+
+/*!
+	\fn status_t BVolumeRoster::GetNextVolume(BVolume *volume)
+	\brief Fills out the passed in BVolume object with the next available
+	       volume.
+
+	\param volume A pointer to a pre-allocated BVolume object to be
+	       initialized to the next available volume.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE The last volume in the list was already returned.
+*/
+
+
+/*!
+	\fn void BVolumeRoster::Rewind()
+	\brief Rewinds the list of available volumes back to the first item.
+
+	The next call to GetNextVolume() will return the first available volume.
+*/
+
+
+/*!
+	\fn status_t BVolumeRoster::GetBootVolume(BVolume *volume)
+	\brief Fills out the passed in BVolume object with the boot volume.
+
+	Currently, this method looks for the volume that is mounted at "/boot".
+	The only way to fool the system into thinking that there is not a boot
+	volume is to rename "/boot" -- but, please refrain from doing this.
+
+	\param volume A pointer to a pre-allocated BVolume to be initialized to
+		   refer to the boot volume.
+
+	\return A status code, \c B_OK if everything went fine or an error code
+	        otherwise.
+*/
+
+
+/*!
+	\fn status_t BVolumeRoster::StartWatching(BMessenger messenger)
+	\brief Starts watching the available volumes for changes.
+
+	Notifications are sent to the specified target whenever a volume is
+	mounted or unmounted. The format of the notification messages is
+	described under watch_node(). Actually BVolumeRoster just provides a
+	more convenient interface for it.
+
+	If StartWatching() has been called before with another target and no
+	StopWatching() since, StopWatching() is called first, so that the former
+	target won't receive any notifications anymore.
+
+	When the object is destroyed all watching ends as well.
+
+	\param messenger The target which the notification messages are sent.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE The supplied BMessenger was invalid.
+	\retval B_NO_MEMORY There was insufficient memory to carry out this
+	        operation.
+
+	\see watch_node()
+*/
+
+
+/*!
+	\fn void BVolumeRoster::StopWatching()
+	\brief Stops watching volumes initiated by StartWatching().
+
+	\see stop_watching()
+*/
+
+
+/*!
+	\fn BMessenger BVolumeRoster::Messenger() const
+	\brief Returns the messenger currently watching the volume list.
+
+	\return A messenger to the target currently watching the volume list, or
+			an invalid messenger if not watching.
+*/
