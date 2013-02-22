@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -43,6 +43,7 @@
 <li><a href="../../sk/applications/cli-apps.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../hu/applications/cli-apps.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_BR/applications/cli-apps.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../ca/applications/cli-apps.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/applications/cli-apps.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 
@@ -103,17 +104,20 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
 		<td><p><span class="cli">checkfs</span> is an important tool to check for errors in your file system. Simply add the volume or device name and it'll run through every file and correct inconsistencies where possible.</p>
 </td></tr>
-<tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">open</span> is a very handy little tool. With it you open any file with its preferred application, or start a specific application by its signature without the need to know its exact path. It also works with URLs and even with the "virtual" directories <tt>.</tt> for the current directory and <tt>..</tt> for the parent, opening the folder in Tracker.</p>
-</td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">desklink</span> can install an icon for any file, folder, query or application in the Deskbar tray. It also offers the option to provide a context menu when right-clicking an icon to execute special actions. As an example, try this to add the commandline app <span class="app">screenshot</span> with various options (the "<tt>\</tt>" in the first line is just for the line break in Terminal):</p>
 <pre class="terminal"> desklink "cmd=Active window (2s):/bin/screenshot --window --border --delay 2" \
 "cmd=Remove replicant:desklink --remove=screenshot" /bin/screenshot
 </pre>
 <p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>
-</td></tr></table>
-
+</td></tr>
+<tr><td><p><span class="cli">diskimage</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">diskimage</span> lets you register a regular file as disk device. For example, you can register a Haiku anyboot image, mount it in Tracker and copy, edit or remove files there before using it as source in the Installer.</p>
+</td></tr>
+<tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">open</span> is a very handy little tool. With it you open any file with its preferred application, or start a specific application by its signature without the need to know its exact path. It also works with URLs and even with the "virtual" directories <tt>.</tt> for the current directory and <tt>..</tt> for the parent, opening the folder in Tracker.</p>
+</td></tr>
+</table>
 </div>
 </div>
 

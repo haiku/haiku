@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -41,6 +41,7 @@
 <li><a href="../sk/bootloader.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../hu/bootloader.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pt_BR/bootloader.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../ca/bootloader.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 </ul>
 <span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
@@ -61,30 +62,38 @@ It's also handy after you installed a software component that acts up and preven
 <p><br /></p>
 <p>Once it's there, you're offered four menus:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
-<tr><td><b>Select boot volume</b></td><td> </td><td>Choose which Haiku installation to start.</td></tr>
-<tr><td><b>Select safe mode options</b><br />
-</td><td> </td><td>There are several options to try in case of hardware related trouble. When moving the selection bar to an option, a short explanation appears at the bottom of the screen.
-<p><i>- Safe mode</i><br />
-<i>- Disable user add-ons</i><br />
-<i>- Disable IDE DMA</i><br />
-<i>- Use fail-safe video mode</i><br />
-<i>- Disable IO-APIC</i><br />
-<i>- Disable LOCAL APIC</i><br />
-<i>- Don't call the BIOS</i><br />
-<i>- Disable APM</i><br />
-<i>- Disable ACPI</i>
-</p></td></tr>
-<tr><td><b>Select debug options</b><br />
-</td><td> </td><td>Here you'll find several options that help with debugging or getting details for a bug report. Again, a short explanation for each option is displayed at the bottom.
-<p><i>- Enable serial debug output</i><br />
-<i>- Enable on screen debug output</i><br />
-<i>- Enable debug syslog</i>
-</p>
-<p>If "debug syslog" is enabled, a warm reboot after a crash shows these additional options:</p>
-<p><i>- Display syslog from previous session</i><br />
-<i>- Save syslog from previous session</i>
-</p></td></tr>
-<tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td>If you had to activate the option <i>Use fail-safe video mode</i>, you can set resolution and color depth.</td></tr>
+<tr><td><b>Select boot volume</b></td><td> </td><td>Choose which Haiku installation to start.</td></tr>
+<tr><td><b>Select safe mode options</b></td><td> </td><td>There are several options to try in case of hardware related trouble or if the system becomes unstable or unbootable because of a misbehaving add-on. When moving the selection bar to an option, a short explanation appears at the bottom of the screen.</td></tr>
+<tr><td></td><td></td><td>
+	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><i>- Safe mode</i></td><td width="15"></td><td></td></tr>
+	<tr><td><i>- Disable user add-ons</i></td><td></td><td></td></tr>
+	<tr><td><i>- Disable IDE DMA</i></td><td></td><td></td></tr>
+	<tr><td class="onelinetop"><i>- Use fail-safe video mode</i></td><td></td><td></td></tr>
+	<tr><td><i>- Don't call the BIOS</i></td><td></td><td></td></tr>
+	<tr><td><i>- Disable APM</i></td><td></td><td></td></tr>
+	<tr><td><i>- Disable ACPI</i></td><td></td><td></td></tr>
+	</table>
+</td></tr>
+<tr><td><b>Select debug options</b></td><td> </td><td>Here you'll find several options that help with debugging or getting details for a <a href="../welcome/en/bugreports.html">bug report</a>. Again, a short explanation for each option is displayed at the bottom.</td></tr>
+<tr><td></td><td></td><td>
+	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><i>- Enable serial debug output</i></td><td width="15"></td><td></td></tr>
+	<tr><td><i>- Enable on screen debug output</i></td><td></td><td></td></tr>
+	<tr><td><i>- Disable on screen paging</i></td><td></td><td></td></tr>
+	<tr><td><i>- Enable debug syslog</i></td><td></td><td></td></tr>
+	<tr><td class="onelinetop"><i>- Display current boot loader log</i></td><td></td><td>(Press <span class="key">Q</span> to exit the log)</td></tr>
+	<tr><td><i>- Add advanced debug option</i></td><td></td><td></td></tr>
+</table>
+</td></tr>
+<tr><td></td><td></td><td>If "Enable debug syslog" is activated, a warm reboot after a crash shows these additional options:</td></tr>
+<tr><td></td><td></td><td>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td class="onelinetop"><i>- Display syslog from previous session</i></td><td></td><td></td></tr>
+	<tr><td><i>- Save syslog from previous session</i></td><td></td><td></td></tr>
+</table>
+</td></tr>
+<tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td>If you had to activate the option <i>Use fail-safe video mode</i>, you can set resolution and color depth.</td></tr>
 </table>
 <p><br /></p>
 <p>After activating one or more options, you return to the main menu and continue booting, which presents you with this boot screen:</p>

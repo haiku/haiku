@@ -74,5 +74,5 @@ Application WebPositive :
 DoCatalogs WebPositive :
 	x-vnd.Haiku-WebPositive
 	:
-        $(sources)
+	$(sources)
 ;

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009, Haiku. All rights reserved.
+ * Copyright 2009-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,6 +42,7 @@
 <li><a href="../../sk/applications/diskusage.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../hu/applications/diskusage.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_BR/applications/diskusage.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../ca/applications/diskusage.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/applications/diskusage.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -53,6 +54,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">La traduzione di questa pagina non è stata completata. Per questo motivo le parti non tradotte sono visibili in inglese.</div>
 
 <h2><img src="../../images/apps-images/diskusage-icon_64.png" alt="diskusage-icon_64.png" width="64" height="64" />DiskUsage</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -63,19 +65,21 @@
 <p><br /></p>
 <p>DiskUsage si occupa di mostrare graficamente come è utilizzato lo spazio sui volumi.<br />
 Un'applicazione piuttosto utile per rispondere alla domanda, "<i>Che fine ha fatto tutto lo spazio libero sul disco?</i>".</p>
+<p>After launching, DiskUsage shows only a white window with all mounted volumes as tabs at the top. You'll have to choose the one you're interested in and click <span class="button">Scan</span> to start chugging through the disk. For larger disks this can take some time... While you wait, you may switch to a different tab and start exploring that volume or begin the scan process there as well.<br />
+It's not recommended to start several concurrent scan processes on the same physical disk, as the constant repositioning of the heads of the drive will only extend the wait.</p>
 <p><img id="diskusage" src="../images/apps-images/diskusage.png" alt="diskusage.png" /></p>
 <p>I cerchi concentrici rappresentano i diversi livelli nella gerarchia del filesystem. Nell'immagine qui sopra, il cerchio centrale rappresenta la cartella <span class="path">/boot/home/</span>. Ogni segmento dell'anello immediatamente successivo a quello centrale è un file o una cartella presente sotto <span class="path">/boot/home/</span>. Ogni segmento sempre più esterno rappresenta un livello inferiore nella gerarchia dei file. È possibile ridimensionare la finestra in modo che vengano mostrate anche le cartelle dei livelli più bassi.</p>
-<p>Sopra il grafico è visibile un menù a tendina che permette di spostarsi tra i vari volumi montati. È necessario scansionare un volume prima di poterne visualizzare l'utilizzo. Dal momento che questa procedura è più lunga per i dischi più capienti, è possibile analizzare un altro volume mentre ne viene effettuata la scansione.</p>
 <div class="box-info"><ul>
 <li>Se la rappresentazione grafica di un file o cartella è resa con meno di 2° circa, sarà tralasciata nella visualizzazione.</li>
 <li>Il numero dei file che sono riportati all'interno di una cartella, include anche i file nelle sottocartelle. Le cartelle contano come file.</li>
 <li>DiskUsage ignora i link simbolici.</li>
 </ul></div>
 <p>Spostando il mouse su un segmento, è possibile visualizzare nella barra di stato in basso informazioni su quel file o cartella.</p>
-<p>Cliccando col tasto destro su un segmento, apparirà un menù contestuale con <span class="menu">Get Info</span>, <span class="menu">Open</span> (col Tracker), <span class="menu">Open With</span> un'altra applicazione adatta o <span class="menu">Rescan</span> quella cartella in particolare.<br />
-Cliccando col tasto sinistro su un segmento, il cerchio centrale sarà dato da quel file o cartella.<br />
-Cliccando col tasto sinistro il cerchio centrale, si passerà al livello superiore.</p>
+<p>Right-clicking a segment offers a context menu to <span class="menu">Get info</span>, <span class="menu">Open</span> (with Tracker), <span class="menu">Open with</span> another suitable application or <span class="menu">Rescan</span> that particular folder.<br />
+Left-clicking a segment makes that file/folder the center circle.<br />
+Left-clicking the center circle moves you up one level.</p>
 <p>È possibile trascinare file e cartelle da DiskUsage su altre applicazioni o sul Desktop o in altre finestre del Tracker per copiarle. Al contrario, trascinando volumi e cartelle nella finestra di DiskUsage si passerà direttamente a loro rendendoli il cerchio centrale.</p>
+<p>You can also use the Tracker add-on from the context menu of any folder to start DiskUsage with that particular location.</p>
 
 </div>
 </div>

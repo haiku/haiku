@@ -48,5 +48,8 @@ extern const char* kDefaultSearchPageURL;
 extern const char* kSettingsKeyUseProxy;
 extern const char* kSettingsKeyProxyAddress;
 extern const char* kSettingsKeyProxyPort;
+extern const char* kSettingsKeyUseProxyAuth;
+extern const char* kSettingsKeyProxyUsername;
+extern const char* kSettingsKeyProxyPassword;
 
 #endif	// SETTINGS_KEYS_H

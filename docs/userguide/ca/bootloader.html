@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2012, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Paco Rivière
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Carregador d'Arrencada</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Manual d'usuari</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/ca.png" alt="" /> Català</li>
+<li><a href="../fr/bootloader.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/bootloader.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/bootloader.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/bootloader.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/bootloader.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/bootloader.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/bootloader.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/bootloader.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/bootloader.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/bootloader.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/bootloader.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/bootloader.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../hu/bootloader.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../pt_BR/bootloader.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">Contingut</a> 
+::  <a href="filesystem-layout.html">Filesystem layout</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<div class="box-info">La traducció d'aquesta pàgina encara no està acabada. Fins que ho sigui, algunes part correspondrà a la versió anglesa.</div>
+
+<h1>Carregador d'Arrencada</h1>
+
+<p>El Carregador d'Arrencada del Haiku us pot ajudar si teniu experiència amb problemes del maquinari o voleu triar una opció per instal·lar el Haiku, si en teniu més d'una (potser una instal·lació amb un CD o amb un llapis USB).<br />
+També pot ser útil després que hagueu instal·lat un component de programari que no us permet arrencar el sistema, i per això la voleu eliminar. L'opció <i>Inhabilita les extensions de l'usuari</i> indicada a continuació, permet arrencar el Haiku sense els components instal·lats per l'usuari, per exemple, un connector.</p>
+<p>Per accedir a les opcions del Carregador, heu de mantenir premuda la tecla <span class="key">Majúscules</span> abans de començar el procés de càrrega del Haiku. Si hi ha un carregador instal·lat, podeu començar mantenint premuda la tecla <span class="key">Majúscules</span> abans de lleçar el procés de càrrega del Haiku. Si l'únic sistema operatiu del sistema és el Haiku, podeu començar mantenint premuda la tecla i veure al mateix temps els missatges de l'arrencada de la BIOS.</p>
+<p><br /></p>
+<p>Un cop aquí se us ofereixen quatre menús:</p>
+<table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
+<tr><td><b>Selecció del volum d'arrencada</b></td><td> </td><td>Trieu la instal·lació del Haiku que voleu executar.</td></tr>
+<tr><td><b>Select safe mode options</b></td><td> </td><td>There are several options to try in case of hardware related trouble or if the system becomes unstable or unbootable because of a misbehaving add-on. When moving the selection bar to an option, a short explanation appears at the bottom of the screen.</td></tr>
+<tr><td></td><td></td><td>
+	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><i>- Safe mode</i></td><td width="15"></td><td></td></tr>
+	<tr><td><i>- Disable user add-ons</i></td><td></td><td></td></tr>
+	<tr><td><i>- Disable IDE DMA</i></td><td></td><td></td></tr>
+	<tr><td class="onelinetop"><i>- Use fail-safe video mode</i></td><td></td><td></td></tr>
+	<tr><td><i>- Don't call the BIOS</i></td><td></td><td></td></tr>
+	<tr><td><i>- Disable APM</i></td><td></td><td></td></tr>
+	<tr><td><i>- Disable ACPI</i></td><td></td><td></td></tr>
+	</table>
+</td></tr>
+<tr><td><b>Select debug options</b></td><td> </td><td>Here you'll find several options that help with debugging or getting details for a <a href="../welcome/en/bugreports.html">bug report</a>. Again, a short explanation for each option is displayed at the bottom.</td></tr>
+<tr><td></td><td></td><td>
+	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><i>- Enable serial debug output</i></td><td width="15"></td><td></td></tr>
+	<tr><td><i>- Enable on screen debug output</i></td><td></td><td></td></tr>
+	<tr><td><i>- Disable on screen paging</i></td><td></td><td></td></tr>
+	<tr><td><i>- Enable debug syslog</i></td><td></td><td></td></tr>
+	<tr><td class="onelinetop"><i>- Display current boot loader log</i></td><td></td><td>(Press <span class="key">Q</span> to exit the log)</td></tr>
+	<tr><td><i>- Add advanced debug option</i></td><td></td><td></td></tr>
+</table>
+</td></tr>
+<tr><td></td><td></td><td>If "Enable debug syslog" is activated, a warm reboot after a crash shows these additional options:</td></tr>
+<tr><td></td><td></td><td>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td class="onelinetop"><i>- Display syslog from previous session</i></td><td></td><td></td></tr>
+	<tr><td><i>- Save syslog from previous session</i></td><td></td><td></td></tr>
+</table>
+</td></tr>
+<tr><td class="onelinetop"><b>Selecció del mode de vídeo segur</b></td><td> </td><td>Si heu activat l'opció <i>Usa el mode de vídeo segur</i>, podeu indicar la resolució i la profunditat de color.</td></tr>
+</table>
+<p><br /></p>
+<p>Després d'activar qualsevol opció, tornareu al menú principal i el sistema continuarà amb el procés d'arrencada, que mostrarà aquesta pantalla:</p>
+<img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
+
+<p>Si tot funciona correctament, apareixeran successivament uns símbols.<br />
+Els símbols corresponent aproximadament a aquestes etapes del procés d'arrencada:</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>S'estàn iniciant els mòduls.</td></tr>
+	<tr><td><b>Disc + lupa</b></td><td> </td><td>S'estàn creant el guió rootfs (<span class="path">/</span>) i muntant el fitxers devfs (<span class="path">/dev</span>).</td></tr>
+	<tr><td><b>Targeta d'ampliació</b></td><td> </td><td>S'està iniciant el gestor de dispositius.</td></tr>
+	<tr><td><b>Disc d'arrencada</b></td><td> </td><td>S'està muntant el disc d'arrencada.</td></tr>
+	<tr><td><b>Xip</b></td><td> </td><td>S'estàn carregant els mòduls de la CPU.</td></tr>
+	<tr><td><b>Carpeta</b></td><td> </td><td>S'han iniciat tots els subsistemes.</td></tr>
+	<tr><td><b>Coet</b></td><td> </td><td>El guió d'arrencada està engegant el sistema.</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">Contingut</a> 
+::  <a href="filesystem-layout.html">Filesystem layout</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

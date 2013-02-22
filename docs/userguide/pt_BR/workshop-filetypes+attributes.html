@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Adriano Duarte
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Workshop: Filetypes, Attributes, Index and Queries</title>
+	<title>Oficina: Tipos de arquivos, Atributos, Indexação e Consultas</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -40,12 +42,14 @@
 <li><a href="../fi/workshop-filetypes+attributes.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../sk/workshop-filetypes+attributes.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../hu/workshop-filetypes+attributes.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../ca/workshop-filetypes+attributes.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../en/workshop-filetypes+attributes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="queries.html">Queries</a> 
+ «  <a href="queries.html">Consultas</a> 
 ::  <a href="contents.html" class="uplink">Conteúdo</a> 
-::  <a href="applications.html">Aplicativos</a>  »
+::  <a href="applications.html">Aplicativos
+</a>  »
 </span></div>
 </div>
 
@@ -70,15 +74,16 @@
 </td></tr>
 </table>
 
-<h1>Workshop: Filetypes, Attributes, Index and Queries</h1>
+<h1>Oficina: Tipos de arquivos, Atributos, Indexação e Consultas</h1>
 
 <p>This is a workshop to show the use of <a href="attributes.html">Attributes</a>, <a href="queries.html">Queries</a>, the <a href="index.html">Index</a> and custom <a href="filetypes.html">Filetypes</a>. As an example, we build a database to keep track of our DVD library.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="preparations" name="preparations">Preparations</a></h2>
-<p>Let's first decide what filetype and attributes would serve our needs. Originally, I wanted to use a Bookmark file with a link to the movie's IMdB page, but Haiku doesn't have a "bookmarkable" browser like BeOS' <span class="app">NetPositive</span> at the moment, so I came up with this: The file itself will be a JPEG image for the movie cover.<br />
-To that we add a couple of attributes. Here we have to decide if we want to query it later (then we have to add it to the index) and if so, what type of attribute it should be. Numbers (int, float) can be evaluated differently than text (&lt;/=/&gt; vs. is/contains/starts with).</p>
+<a id="preparations" name="preparations">Preparativos</a></h2>
+<p>Let's first decide what filetype and attributes would serve our needs. Originally, I planned to use a bookmark file with a link to the movie's IMdB page, but since Haiku didn't have a "bookmarkable" browser like BeOS' <span class="app">NetPositive</span> at that time, I came up with this: The file itself will be a JPEG image for the movie cover.<br />
+With <span class="app">WebPositive</span>, Haiku now has a browser using bookmark files again, so you could as well use a bookmark file instead of an image as basic filetype for our database files.<br />
+In any case, to these files we add a couple of attributes. Here we have to decide if we want to query it later (then we have to add it to the index) and if so, what type of attribute it should be. Numbers (int, float) can be evaluated differently than text (&lt;/=/&gt; vs. is/contains/starts with).</p>
 <p>Here are the attributes I'd like to see for my DVDs:</p>
 <ul>
 <li>Movie title</li>
@@ -122,8 +127,8 @@ To that we add a couple of attributes. Here we have to decide if we want to quer
 <a id="pref_app" name="pref_app">Preferred Application</a></h3>
 <p>This pop-up menu shows a list of all applications that can handle this particular filetype. From here you can choose which program should open this specific file when it's double-clicked.</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="button">Select...</span></td><td> </td><td>opens a file dialog where you choose the application to open with this filetype. Here, we set <span class="app">ShowImage</span> to display the DVD's cover.</td></tr>
-<tr><td class="onelinetop"><span class="button">Same as...</span></td><td> </td><td>opens a file dialog where you choose any file that already has the preferred application set that you're looking for.</td></tr>
+<tr><td><span class="button">Selecionar...</span></td><td> </td><td>opens a file dialog where you choose the application to open with this filetype. Here, we set <span class="app">ShowImage</span> to display the DVD's cover.</td></tr>
+<tr><td class="onelinetop"><span class="button">O mesmo que...</span></td><td> </td><td>opens a file dialog where you choose any file that already has the preferred application set that you're looking for.</td></tr>
 </table>
 
 <h3>
@@ -220,9 +225,10 @@ Open the folder containing your DVDdb files and arrange the attributes how you'd
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="queries.html">Queries</a> 
+ «  <a href="queries.html">Consultas</a> 
 ::  <a href="contents.html" class="uplink">Conteúdo</a> 
-::  <a href="applications.html">Aplicativos</a>  »
+::  <a href="applications.html">Aplicativos
+</a>  »
 </span></div>
 </div>
 

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -16,7 +16,7 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>快速启动</title>
+	<title>快速启动栏</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -42,6 +42,7 @@
 <li><a href="../../sk/desktop-applets/launchbox.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../hu/desktop-applets/launchbox.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_BR/desktop-applets/launchbox.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../ca/desktop-applets/launchbox.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/desktop-applets/launchbox.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -53,7 +54,7 @@
 <div id="content">
 <div>
 
-<h2><img src="../../images/desktop-applets-images/launchbox-icon_64.png" alt="launchbox-icon_64.png" width="64" height="64" />快速启动</h2>
+<h2><img src="../../images/desktop-applets-images/launchbox-icon_64.png" alt="launchbox-icon_64.png" width="64" height="64" />快速启动栏</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>桌面栏：</td><td style="width:15px;"></td><td><span class="menu">桌面小程序</span></td></tr>
 <tr><td>位置：</td><td></td><td><span class="path">/boot/system/apps/LaunchBox</span></td></tr>
@@ -63,16 +64,17 @@
 <img src="../images/desktop-applets-images/launchbox.png" alt="launchbox.png" />
 <p>所有的选项都可以从右键菜单中进行设置：</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Add Button Here</span></td><td style="width:10px;"> </td><td>添加一个空按钮。</td></tr>
-<tr><td><span class="menu">Clear Button</span></td><td> </td><td>清空一个按钮。</td></tr>
-<tr><td><span class="menu">Remove Button</span></td><td> </td><td>删除一个按钮。</td></tr>
-<tr><td class="onelinetop"><span class="menu">Settings</span><br />
-<span class="menu">- Horizontal Layout</span><br />
-<span class="menu">- Icon size</span><br />
-<span class="menu">- Ignore Double-click</span><br />
-<span class="menu">- Show Window Border</span><br />
-<span class="menu">- Auto Raise</span><br />
-<span class="menu">- Show On All Workspaces</span></td><td> </td><td class="onelinetop"><br />
+<tr><td><span class="menu">在此处添加按钮</span></td><td style="width:10px;"> </td><td>添加一个空按钮。</td></tr>
+<tr><td><span class="menu">清除按钮</span></td><td> </td><td>清空一个按钮。</td></tr>
+<tr><td><span class="menu">删除按钮</span></td><td> </td><td>删除一个按钮。</td></tr>
+<tr><td><span class="menu">设置描述...</span></td><td> </td><td>将鼠标悬停在图标上将会显示小的提示框，显示文件名称，对于应用程序，如果它与起名称不同，则将会显示起简短描述（详情见 <a href="../filetypes.html#settings-apps">文件类型</a>）。使用该菜单项，您可以定制该提示的描述内容。</td></tr>
+<tr><td class="onelinetop"><span class="menu">设置</span><br />
+<span class="menu">- 水平布局</span><br />
+<span class="menu">- 图标大小</span><br />
+<span class="menu">- 忽略双击</span><br />
+<span class="menu">- 显示窗口边界</span><br />
+<span class="menu">- 自动提升</span><br />
+<span class="menu">- 在所有工作区显示</span></td><td> </td><td class="onelinetop"><br />
 横向排列程序按钮。
 <br />
 设置图标尺寸，从16像素到64像素。
@@ -81,24 +83,21 @@
 <br />
 显示窗口边缘。
 <br />
-鼠标靠近屏幕边缘时，弹出快速启动。
+鼠标靠近屏幕边缘时，弹出快速启动栏。
 <br />
-在所有工作区中显示快速启动。</td></tr>
-<tr><td><span class="menu">Pad</span><br />
-<span class="menu">- New</span><br />
-<span class="menu">- Clone</span><br />
-<span class="menu">- Close</span></td><td> </td><td><br />
-新建一个快速启动面板。
+在所有工作区中显示快速启动栏。</td></tr>
+<tr><td><span class="menu">面板</span><br />
+<span class="menu">- 新建</span><br />
+<span class="menu">- 复制</span><br />
+<span class="menu">- 关闭</span></td><td> </td><td><br />
+新建一个快速启动栏面板。
 <br />
-复制当前快速启动面板。
+复制当前快速启动栏面板。
 <br />
-关闭当前快速启动面板。</td></tr>
-<tr><td><span class="menu">LaunchBox</span><br />
-<span class="menu">- About...</span><br />
-<span class="menu">- Quit</span></td><td> </td><td><br />
-显示简介窗口。
-<br />
-退出快速启动</td><td> </td></tr>
+关闭当前快速启动栏面板。</td></tr>
+<tr><td><span class="menu">快速启动栏</span><br />
+<span class="menu">- 退出</span></td><td> </td><td><br />
+退出所有快速启动栏面板。</td><td> </td></tr>
 </table>
 
 </div>

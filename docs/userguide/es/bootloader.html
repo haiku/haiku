@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -44,6 +44,7 @@
 <li><a href="../sk/bootloader.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../hu/bootloader.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pt_BR/bootloader.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../ca/bootloader.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -56,6 +57,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">La traducción de esta página no está completa aún. Hasta que esté, las partes sin terminar vienen en su inglés original.</div>
 
 <h1>Cargador de arranque</h1>
 
@@ -65,30 +67,38 @@ También viene muy bien para cuando ha instalado algún componente de software q
 <p><br /></p>
 <p>Una vez allí, se le ofrecerán tres menús:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
-<tr><td><b>Seleccionar volumen de arranque</b></td><td> </td><td>Elija qué instalación de Haiku desea iniciar.</td></tr>
-<tr><td><b>Seleccionar opciones de modo seguro</b><br />
-</td><td> </td><td>Existen muchas opciones para probarse en caso de que tenga un problema de hardware. Al mover la barra de selección a una opción, una pequeña explicación aparecerá en la parte inferior de la pantalla.
-<p><i>- Modo seguro</i><br />
-<i>- Deshabilitar extensiones (add-ons) de usuario</i><br />
-<i>- Deshabilitar DMA IDE</i><br />
-<i>- Utilizar modo de vídeo a prueba de fallos</i><br />
-<i>- Deshabilitar IO-APIC</i><br />
-<i>- Deshabilitar LOCAL APIC</i><br />
-<i>- No llamar a la BIOS</i><br />
-<i>- Deshabilitar APM</i><br />
-<i>- Deshabilitar ACPI</i><br />
-</p></td></tr>
-<tr><td><b>Selección de opciones de depuración</b><br />
-</td><td> </td><td>Aquí encontrará bastantes opciones que le ayudarán con la depuración o en obtener detalles para un reporte de fallo. De nuevo, una explicación corta de cada opción se despliega abajo.
-<p><i>- Habilitar la salida de depuración serial</i><br />
-<i>- Habilitar la salida de depuración en la pantalla</i><br />
-<i>- Habilitar el historial de eventos ("debug syslog") de sistema de depuración</i>
-</p>
-<p>Si se habilita "historial de eventos de sistema de depuración ("debug syslog"), un reinicio "en caliente" después de un fallo mostrará estas opciones adicionales:</p>
-<p><i>- Desplegar el historial de eventos (syslog) de la sesión previa</i><br />
-<i>- Guardar el historial de eventos del sistema de la sesión previa</i>
-</p></td></tr>
-<tr><td class="onelinetop"><b>Seleccionar modo de vídeo a prueba de fallos</b></td><td> </td><td>Si activó la opción <i>Utilizar modo de vídeo a prueba de fallos</i>, puede configurarse la resolución y la profundidad de color.</td></tr>
+<tr><td><b>Seleccionar volumen de arranque</b></td><td> </td><td>Elija qué instalación de Haiku desea iniciar.</td></tr>
+<tr><td><b>Select safe mode options</b></td><td> </td><td>There are several options to try in case of hardware related trouble or if the system becomes unstable or unbootable because of a misbehaving add-on. When moving the selection bar to an option, a short explanation appears at the bottom of the screen.</td></tr>
+<tr><td></td><td></td><td>
+	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><i>- Safe mode</i></td><td width="15"></td><td></td></tr>
+	<tr><td><i>- Disable user add-ons</i></td><td></td><td></td></tr>
+	<tr><td><i>- Disable IDE DMA</i></td><td></td><td></td></tr>
+	<tr><td class="onelinetop"><i>- Use fail-safe video mode</i></td><td></td><td></td></tr>
+	<tr><td><i>- Don't call the BIOS</i></td><td></td><td></td></tr>
+	<tr><td><i>- Disable APM</i></td><td></td><td></td></tr>
+	<tr><td><i>- Disable ACPI</i></td><td></td><td></td></tr>
+	</table>
+</td></tr>
+<tr><td><b>Select debug options</b></td><td> </td><td>Here you'll find several options that help with debugging or getting details for a <a href="../welcome/en/bugreports.html">bug report</a>. Again, a short explanation for each option is displayed at the bottom.</td></tr>
+<tr><td></td><td></td><td>
+	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><i>- Enable serial debug output</i></td><td width="15"></td><td></td></tr>
+	<tr><td><i>- Enable on screen debug output</i></td><td></td><td></td></tr>
+	<tr><td><i>- Disable on screen paging</i></td><td></td><td></td></tr>
+	<tr><td><i>- Enable debug syslog</i></td><td></td><td></td></tr>
+	<tr><td class="onelinetop"><i>- Display current boot loader log</i></td><td></td><td>(Press <span class="key">Q</span> to exit the log)</td></tr>
+	<tr><td><i>- Add advanced debug option</i></td><td></td><td></td></tr>
+</table>
+</td></tr>
+<tr><td></td><td></td><td>If "Enable debug syslog" is activated, a warm reboot after a crash shows these additional options:</td></tr>
+<tr><td></td><td></td><td>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td class="onelinetop"><i>- Display syslog from previous session</i></td><td></td><td></td></tr>
+	<tr><td><i>- Save syslog from previous session</i></td><td></td><td></td></tr>
+</table>
+</td></tr>
+<tr><td class="onelinetop"><b>Seleccionar modo de vídeo a prueba de fallos</b></td><td> </td><td>Si activó la opción <i>Utilizar modo de vídeo a prueba de fallos</i>, puede configurarse la resolución y la profundidad de color.</td></tr>
 </table>
 <p><br /></p>
 <p>Tras activar una o más opciones, puede regresar de nuevo al menú principal y continuará iniciando, lo cual se presentará con esta pantalla de arranque:</p>

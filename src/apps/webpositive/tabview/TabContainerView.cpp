@@ -227,6 +227,7 @@ TabContainerView::AddTab(TabView* tab, int32 index)
 	_ValidateTabVisibility();
 }
 
+
 TabView*
 TabContainerView::RemoveTab(int32 index)
 {
@@ -330,9 +331,8 @@ TabContainerView::SelectTab(TabView* tab)
 		if (fSelectedTab != NULL)
 			index = GroupLayout()->IndexOfItem(tab->LayoutItem());
 
-		if (!tab->LayoutItem()->IsVisible()) {
+		if (!tab->LayoutItem()->IsVisible())
 			SetFirstVisibleTabIndex(index);
-		}
 
 		fController->TabSelected(index);
 	}
@@ -539,4 +539,3 @@ TabContainerView::_SendFakeMouseMoved()
 	if (Bounds().Contains(where))
 		_MouseMoved(where, B_INSIDE_VIEW, NULL);
 }
-

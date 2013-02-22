@@ -150,7 +150,7 @@ get_next_virtual_address(size_t size)
 
 
 static addr_t
-get_next_virtual_address_alligned(size_t size, uint32 mask)
+get_next_virtual_address_aligned(size_t size, uint32 mask)
 {
 	addr_t address = (sNextVirtualAddress) & mask;
 	sNextVirtualAddress = address + size;
@@ -170,7 +170,7 @@ get_next_physical_address(size_t size)
 
 
 static addr_t
-get_next_physical_address_alligned(size_t size, uint32 mask)
+get_next_physical_address_aligned(size_t size, uint32 mask)
 {
 	addr_t address = sNextPhysicalAddress & mask;
 	sNextPhysicalAddress = address + size;
@@ -182,14 +182,14 @@ get_next_physical_address_alligned(size_t size, uint32 mask)
 static addr_t
 get_next_virtual_page(size_t pagesize)
 {
-	return get_next_virtual_address_alligned(pagesize, 0xffffffc0);
+	return get_next_virtual_address_aligned(pagesize, 0xffffffc0);
 }
 
 
 static addr_t
 get_next_physical_page(size_t pagesize)
 {
-	return get_next_physical_address_alligned(pagesize, 0xffffffc0);
+	return get_next_physical_address_aligned(pagesize, 0xffffffc0);
 }
 
 
@@ -276,7 +276,7 @@ get_next_page_table(uint32 type)
 		sNextPageTableAddress += size;
 	else {
 		TRACE(("page table allocation outside of pagetable region!\n"));
-		address = get_next_physical_address_alligned(size, 0xffffffc0);
+		address = get_next_physical_address_aligned(size, 0xffffffc0);
 	}
 
 	uint32 *pageTable = (uint32 *)address;
@@ -474,8 +474,8 @@ mmu_allocate(void *virtualAddress, size_t size)
 		addr_t address = (addr_t)virtualAddress;
 
 		// is the address within the valid range?
-		if (address < KERNEL_BASE
-			|| address + size >= KERNEL_BASE + kMaxKernelSize) {
+		if (address < KERNEL_BASE || address + size * B_PAGE_SIZE
+			>= KERNEL_BASE + kMaxKernelSize) {
 			TRACE(("mmu_allocate in illegal range\n address: %" B_PRIx32
 				"  KERNELBASE: %" B_PRIx32 " KERNEL_BASE + kMaxKernelSize: %"
 				B_PRIx32 "  address + size : %" B_PRIx32 "\n", (uint32)address,

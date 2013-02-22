@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009, Haiku. All rights reserved.
+ * Copyright 2009-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,6 +42,7 @@
 <li><a href="../../sk/applications/deskcalc.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../hu/applications/deskcalc.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_BR/applications/deskcalc.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../ca/applications/deskcalc.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/applications/deskcalc.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -61,27 +62,34 @@
 <tr><td>Asetukset</td><td></td><td><span class="path">~/config/settings/DeskCalc_settings</span></td></tr>
 </table>
 <p><br /></p>
-<p>Työpöytälaskin on yksinkertainen laskin, jossa on siitä huolimatta näppäriä ominaisuuksia, joita ei huomaa ensisilmäyksellä.</p>
+<p>Työpöytälaskin on yksinkertainen laskin, jossa on yksinkertaisuudesta huolimatta näppäriä ominaisuuksia, joita ei huomaa ensisilmäyksellä.</p>
 <img src="../images/apps-images/deskcalc.png" alt="deskcalc.png" />
 <ul>
-<li><p>Työpöytälaskin ymmärtää paljon enemmän kuin sen yksinkertainen näppäimistö antaa ymmärtää.<br />Operaattorien <tt>+</tt>, <tt>-</tt>, <tt>*</tt>, <tt>/</tt>, <tt>%</tt>, <tt>^</tt> sekä vakioiden <tt>pi</tt> ja <tt>e</tt> lisäksi tuettuja ovat seuraavat matemaattiset funktiot:<br /><tt>acos</tt>, <tt>asin</tt>, <tt>atan</tt>, <tt>atan2</tt>, <tt>ceil</tt>, <tt>cos</tt>, <tt>cosh</tt>, <tt>exp</tt>, <tt>floor</tt>, <tt>log</tt>, <tt>log10</tt>, <tt>pow</tt>, <tt>sin</tt>, <tt>sinh</tt>, <tt>sqrt</tt>, <tt>tan</tt>, <tt>tanh</tt>.</p></li>
+<li><p>Työpöytälaskin ymmärtää paljon enemmän kuin sen yksinkertainen näppäimistö antaa ymmärtää.<br />Operaattorien <tt> </tt>, <tt>-</tt>, <tt>*</tt>, <tt>/</tt>, <tt>%</tt>, <tt>^</tt> sekä vakioiden <tt>pi</tt> and <tt>e</tt> lisäksi tuettuja ovat seuraavat matemaattiset funktiot:<br />
+<tt>!</tt>, <tt>acos</tt>, <tt>asin</tt>, <tt>atan</tt>, <tt>atan2</tt>, <tt>cbrt</tt>, <tt>ceil</tt>, <tt>cos</tt>, <tt>cosh</tt>, <tt>exp</tt>, <tt>floor</tt>, <tt>log</tt>, <tt>log10</tt>, <tt>pow</tt>, <tt>sin</tt>, <tt>sinh</tt>, <tt>sqrt</tt>, <tt>tan</tt>, <tt>tanh</tt>.</p></li>
+
+<li><p>Hiiren kakkospainike tarjoaa nämä valitsimet:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td colspan="2"><span class="menu">Ota käyttöön Num Lock käynnistyksen yhteydessä</span></td><td style="width:15px;"></td><td>Aktivoi automaattisesti näppäimiston numerolohkon Työpöytälaskinta käynnistettäessä</td></tr>
+<tr><td colspan="2"><span class="menu">Radiaanit/Asteet</span></td><td></td><td>Vaihda asetusten "radiaanit" ja "asteet" välillä kulmamittauksen yksikkönä</td></tr>
+<tr><td><span class="menu">Tiivistetty</span></td><td><span class="key">ALT</span> <span class="key">0</span></td><td></td><td>Miniminäkymätila, joka piilottaa näppäimistön numerolohkon</td></tr>
+<tr><td><span class="menu">Perus</span></td><td><span class="key">ALT</span> <span class="key">1</span></td><td></td><td>Työpöytälaskimen vakionäyttö.</td></tr>
+<tr><td><span class="menu">Tieteellinen</span></td><td><span class="key">ALT</span> <span class="key">2</span></td><td></td><td>Näytä lisäpainikkeita tieteislaskennalle.</td></tr>
+</table>
+</li>
 <li><p>Mitä tulee käyttäjäsyöttöön, Työpöytälaskin on melko suvaitsevainen:<br />
 <tt>/</tt>, <tt>:</tt>, <tt>\</tt> tulkitaan kaikki jako-operaattoriksi,<br />
 <tt>*</tt>, <tt>x</tt> ovat kelvollisia kertolaskun merkkejä.<br />
 Ole myös tietoinen, että <tt>.</tt> ja <tt>,</tt> ovat molemmat desimaalipilkkuja, joten et saa käyttää niitä 1000-lukujen erottajina.</p></li>
-<li><p>Hiiren oikeanpuoleinen painike tarjoaa nämä valitsimet:</p>
-<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Ota käyttöön Num Lock käynnistyksen yhteydessä</span></td><td style="width:15px;"></td><td>aktivoi automaattisesti näppäimiston numerolohkon Työpöytälaskinta käynnistettäessä</td></tr>
-<tr><td><span class="menu">Näytä numeronäppäimistö</span></td><td></td><td>piilottaa numeronäppäimistön, kun aktivointi poistetaan</td></tr>
-</table></li>
-<li><p>Voit muuttaa laskimen kokoa kunnes se sopii tarkoituksiisi ja laittaa se <a href="../gui.html#replicants">Replikanttina</a> työpöydälle raahaamalla ja pudottamalla se oikean alakulman symbolista. Varmista, että <span class="menu">Näytä replikantit</span> on aktivoitu työpöytäpalkissa.</p></li>
+<li><p>Voit muuttaa laskimen kokoa kunnes se sopii tarkoituksiisi ja laittaa se <a href="../gui.html#replicants">Kopiona</a> työpöydälle raahaamalla ja pudottamalla se oikean alakulman symbolista. Varmista, että <span class="menu">Näytä kopiot</span> on aktivoitu työpöytäpalkissa.</p></li>
 <li><p>Näppäimistö voidaan värittää raahaa ja pudota -toiminnolla mistä värilähteestä tahansa, esimerkiksi <span class="app">Kuvakemaatista</span>.</p></li>
 <li><p>Voit siirtyä ylös ja alas entisten laskutoimitusten historiassa näppäimillä <span class="key">↑</span> ja <span class="key">↓</span>.</p></li>
 <li><p>Voit valita Työpöytälaskimen sisällön ja raahata ja pudottaa sen mihin tahansa sovellukseen. Tai pudotat sen Seuraaja-ikkunaan tai työpöydälle ja tekstitiedosto laskimen sisällöllä luodaan siihen.</p>
 <p>Vielä parempaa, myös käänteinen toiminto on mahdollinen:<br />Luo katkelmia kuten on kuvattu laskelmiesi eri vaiheissa ja siirry takaisin niihin raahaamalla ja pudottamalla ne takaisin Työpöytälaskimeen.<br />Tai voit raahata ja pudottaa laskelman suoraan sähköpostista Työpöytälaskimeen.</p></li>
 <li><p>Työpöytälaskinta voidaan käyttää Pääteikkunassa. Laita vain lauseke kaksimerkkisten sulkumerkkien sisään, kuten tässä esimerkissä:</p>
 <pre class="terminal">~&gt; DeskCalc "sin(45)*(cos(12)+3.45)"
-3.6536554673202546181795194727005826674359494735820338441084848</pre></li>
+3.65365546732025461817951947270058</pre>
+<p>Huomaa: Pääteikkunassa käytettäessä Työpöytälaskin käyttää aina radiaaneja yksikkönä näissä trigonometriafunktioissa.</p></li>
 </ul>
 
 </div>

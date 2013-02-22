@@ -36,6 +36,7 @@
 #include <Button.h>
 #include <CardLayout.h>
 #include <ControlLook.h>
+#include <Catalog.h>
 #include <GroupView.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -46,6 +47,10 @@
 
 #include "TabContainerView.h"
 #include "TabView.h"
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Tab Manager"
 
 
 const static BString kEmptyString;
@@ -581,6 +586,7 @@ WebTabView::MouseMoved(BPoint where, uint32 transit,
 		}
 	}
 
+	// Set the tool tip
 	fController->SetToolTip(Label());
 
 	TabView::MouseMoved(where, transit, dragMessage);
@@ -626,19 +632,23 @@ void WebTabView::_DrawCloseButton(BView* owner, BRect& frame,
 	}
 
 	if (fOverCloseRect)
+		tint *= 1.4;
+	else
 		tint *= 1.2;
 
 	if (fClicked && fOverCloseRect) {
+		// Draw the button frame
 		BRect buttonRect(closeRect.InsetByCopy(-4, -4));
 		be_control_look->DrawButtonFrame(owner, buttonRect, updateRect,
 			base, base,
 			BControlLook::B_ACTIVATED | BControlLook::B_BLEND_FRAME);
 		be_control_look->DrawButtonBackground(owner, buttonRect, updateRect,
 			base, BControlLook::B_ACTIVATED);
-		tint *= 1.2;
 		closeRect.OffsetBy(1, 1);
+		tint *= 1.2;
 	}
 
+	// Draw the ×
 	base = tint_color(base, tint);
 	owner->SetHighColor(base);
 	owner->SetPenSize(2);

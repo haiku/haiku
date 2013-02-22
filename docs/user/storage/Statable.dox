@@ -1,0 +1,242 @@
+/*
+ * Copyright 2002-2013 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ *		John Scipione, jscipione@gmail.com
+ *		Ingo Weinhold, bonefish@users.sf.net
+ *
+ * Corresponds to:
+ *		headers/os/storage/Statable.h	hrev45306
+ *		src/kits/storage/Statable.cpp	hrev45306
+ */
+
+
+/*!
+	\file Statable.h
+	\ingroup storage
+	\ingroup libbe
+	\brief Provides the BStatable abstract class.
+*/
+
+
+/*!
+	\class BStatable
+	\ingroup storage
+	\ingroup libbe
+	\brief Pure abstract class that provides a wrapper interface to the POSIX®
+	       stat() function.
+
+	BStatable provides common functionality for the BEntry and BNode classes.
+	You can use this class to:
+	- Get the stat struct of a node with the GetStat() method.
+	- Identify a node as a file, directory, or symbolic link with the
+	  IsFile(), IsDirectory(), and IsSymLink() methods.
+	- Get and set the UID (GetOwner() and SetOwner()), GID (GetGroup() and
+	  SetGroup()), and permissions (GetPermissions() and SetPermissions()) of
+	  a node.
+	- Get the size of a node's data (not counting attributes) with the
+	  GetSize() method.
+	- Get and set a node's modification time (GetModificationTime() and
+	  SetModificationTime()), creation time (GetCreationTime() and
+	  SetCreationTime()), and access time (GetAccessTime() and
+	  SetAccessTime()).
+	- Get a pointer to the BVolume object that a node lives on via the
+	  GetVolume() method.
+	- Get a node_ref of a node to pass into watch_node() via the GetNodeRef()
+	  method.
+*/
+
+
+/*!
+	\fn status_t BStatable::GetStat(struct stat *st) const
+	\brief Fills out the stat structure for the node.
+
+	This method may be used to access the stat structure of a node directly.
+
+	\param st The stat structure to be filled in.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_MEMORY Could not allocate enough memory.
+	\retval B_BAD_VALUE The node does not exist.
+	\retval B_NOT_ALLOWED Node or volume was read only.
+*/
+
+
+/*!
+	\fn bool BStatable::IsFile() const
+	\brief Returns whether or not the node is a file.
+
+	\return \c true, if the node is properly initialized and is a file,
+	        \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BStatable::IsDirectory() const
+	\brief Returns whether or not the node is a directory.
+
+	\return \c true, if the node is properly initialized and is a directory,
+	        \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BStatable::IsSymLink() const
+	\brief Returns whether or not the node is a symbolic link.
+
+	\return \c true, if the node is properly initialized and is a symlink,
+	        \c false otherwise.
+*/
+
+
+/*!
+	\fn status_t BStatable::GetNodeRef(node_ref *ref) const
+	\brief Fills out \a ref with the \c node_ref of the node.
+
+	\param ref the node_ref to be set.
+
+	\see GetStat() for return codes.
+*/
+
+
+/*!
+	\fn status_t BStatable::GetOwner(uid_t *owner) const
+	\brief Fills out the node's UID into \a owner.
+
+	\param owner A pointer to a \c uid_t to be set.
+
+	\see GetStat() for return codes.
+*/
+
+
+/*!
+	\fn status_t BStatable::SetOwner(uid_t owner)
+	\brief Sets the node's UID to \a owner.
+
+	\param owner The UID to set the node to.
+
+	\see GetStat() for return codes.
+*/
+
+
+/*!
+	\fn status_t BStatable::GetGroup(gid_t *group) const
+	\brief Fills out the node's GID into \a group.
+
+	\param group a pointer to a \c gid_t variable to be set.
+
+	\see GetStat() for return codes.
+*/
+
+
+/*!
+	\fn status_t BStatable::SetGroup(gid_t group)
+	\brief Sets the node's GID to \a group.
+
+	\param group The GID to set the node to.
+
+	\see GetStat() for return codes.
+*/
+
+
+/*!
+	\fn status_t BStatable::GetPermissions(mode_t *perms) const
+	\brief Fills out \a perms with the permissions of the node.
+
+	\param perms A pointer to a \c mode_t variable to be set.
+
+	\see GetStat() for return codes.
+*/
+
+
+/*!
+	\fn status_t BStatable::SetPermissions(mode_t perms)
+	\brief Sets the node's permissions to \a perms.
+
+	\param perms The permissions to set the node to.
+
+	\see GetStat() for return codes.
+*/
+
+
+/*!
+	\fn status_t BStatable::GetSize(off_t *size) const
+	\brief Fills out the size of the node's data (not counting attributes)
+	       into \a size.
+
+	\param size A pointer to a \c off_t variable to be set.
+
+	\see GetStat() for return codes.
+*/
+
+
+/*!
+	\fn status_t BStatable::GetModificationTime(time_t *mtime) const
+	\brief Fills out \a mtime with the last modification time of the node.
+
+	\param mtime A pointer to a \c time_t variable to be set.
+
+	\see GetStat() for return codes.
+*/
+
+
+/*!
+	\fn status_t BStatable::SetModificationTime(time_t mtime)
+	\brief Sets the node's last modification time to \a mtime.
+
+	\param mtime The modification time to set the node to.
+
+	\see GetStat() for return codes.
+*/
+
+
+/*!
+	\fn status_t BStatable::GetCreationTime(time_t *ctime) const
+	\brief Fills out \a ctime with the creation time of the node.
+
+	\param ctime A pointer to a \c time_t variable to be set.
+
+	\see GetStat() for return codes.
+*/
+
+
+/*!
+	\fn status_t BStatable::SetCreationTime(time_t ctime)
+	\brief Sets the node's creation time to \a ctime.
+
+	\param ctime The creation time to set the node to.
+
+	\see GetStat() for return codes.
+*/
+
+
+/*!
+	\fn status_t BStatable::GetAccessTime(time_t *atime) const
+	\brief Fills out \a atime with the access time of the node.
+
+	\see GetModificationTime()
+	\see GetStat() for return codes.
+*/
+
+
+/*!
+	\fn status_t BStatable::SetAccessTime(time_t atime)
+	\brief Sets the node's access time to \a atime.
+
+	\see GetModificationTime()
+	\see GetStat() for return codes.
+*/
+
+
+/*!
+	\fn status_t BStatable::GetVolume(BVolume *vol) const
+	\brief Fills out \a vol with the the volume that the node lives on.
+
+	\param vol A pointer to a BVolume object to be set.
+
+	\see BVolume
+	\see GetStat() for return codes.
+*/

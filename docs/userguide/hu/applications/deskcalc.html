@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009, Haiku. All rights reserved.
+ * Copyright 2009-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,6 +42,7 @@
 <li><a href="../../fi/applications/deskcalc.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sk/applications/deskcalc.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../pt_BR/applications/deskcalc.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../ca/applications/deskcalc.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/applications/deskcalc.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -66,16 +67,19 @@
 <ul>
 <li><p>A Számológép többet nyújt, mint amit elsőre sugall.<br />
 Az alapvető műveleteken kívül (<tt>+</tt>, <tt>-</tt>, <tt>*</tt>, <tt>/</tt>, <tt>%</tt>, <tt>^</tt>) a <tt>pi</tt>, az <tt>e</tt> és az alábbi funkciók használhatóak:<br />
-<tt>acos</tt>, <tt>asin</tt>, <tt>atan</tt>, <tt>atan2</tt>, <tt>ceil</tt>, <tt>cos</tt>, <tt>cosh</tt>, <tt>exp</tt>, <tt>floor</tt>, <tt>log</tt>, <tt>log10</tt>, <tt>pow</tt>, <tt>sin</tt>, <tt>sinh</tt>, <tt>sqrt</tt>, <tt>tan</tt>, <tt>tanh</tt>.</p></li>
+<tt>!</tt>, <tt>acos</tt>, <tt>asin</tt>, <tt>atan</tt>, <tt>atan2</tt>, <tt>cbrt</tt>, <tt>ceil</tt>, <tt>cos</tt>, <tt>cosh</tt>, <tt>exp</tt>, <tt>floor</tt>, <tt>log</tt>, <tt>log10</tt>, <tt>pow</tt>, <tt>sin</tt>, <tt>sinh</tt>, <tt>sqrt</tt>, <tt>tan</tt>, <tt>tanh</tt>.</p></li>
+
+<li><p>A jobb egérgomb lenyomásával a következő lehetőségeket kapjuk:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td colspan="2"><span class="menu">Radián/Fok</span></td><td></td><td>a "radián" és a "fok" között válthatunk</td></tr>
+<tr><td><span class="menu">Kompakt</span></td><td><span class="key">ALT</span> <span class="key">0</span></td><td></td><td>minimális méret, ahol nem látszik a billentyűzet.</td></tr>
+<tr><td><span class="menu">Alap</span></td><td><span class="key">ALT</span> <span class="key">1</span></td><td></td><td>a Számológép alap megjelenése</td></tr>
+<tr><td><span class="menu">Tudományos</span></td><td><span class="key">ALT</span> <span class="key">2</span></td><td></td><td>további billentyűk megjelenítése bonyolultabb számolásokhoz</td></tr>
+</table></li>
 <li><p>A Számológép eléggé toleráns a bevitellel kapcsolatban. Néhány műveletet több módon is bevihetünk:<br />
 Osztás: <tt>/</tt>, <tt>:</tt>, <tt>\</tt><br />
 Szorzás: <tt>*</tt>, <tt>x</tt><br />
 Ugyanakkor mind a <tt>.</tt>, mind a <tt>,</tt> tizedes értéket jelölnek, ezért ne használjuk ezres-tagolásra (például: 1,230.00).</p></li>
-<li><p>A jobb egérgomb lenyomásával a következő lehetőségeket kapjuk:</p>
-<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Numerikus billentyűzet bekapcsolása indításkor</span></td><td style="width:15px;"></td><td>automatikusan aktiválja a numerikus billentyűzetet indításkor</td></tr>
-<tr><td><span class="menu">Billentyűzet megjelenítése</span></td><td></td><td>az ablak elhagyásakor a billentyűzet elrejtése</td></tr>
-</table></li>
 <li><p>A számológép izlés szerint átméretezhető mindaddig, amíg nem használjuk <a href="../gui.html#replicants">Replikáns</a>ként. Replikánsként való használat esetén be kell jelölni a <span class="menu">Replikánsok megjelenítése</span> menüpontot az Asztalsávon.</p></li>
 <li><p>A Számológép színe is módosítható, csak egy színt kell az ablakra dobni, például az <span class="app">Icon-O-Matic</span>-ból.</p></li>
 <li><p>A számolási előzmények a <span class="key">↑</span> és a <span class="key">↓</span> billentyűkkel előhozhatóak.</p></li>
@@ -85,7 +89,8 @@ Készítsünk egy-egy kivágást az előbb leírt módon a számolás szakaszair
 Persze, számolás is bedobható a Számológép ablakba.</p></li>
 <li><p>A Számológép a Terminálból is használható. Ehhez csak annyit kell tennünk, hogy idézőjel közé téve paraméterként adjuk meg a képletet, amit ki akarunk számolni:</p>
 <pre class="terminal">~&gt; DeskCalc "sin(45)*(cos(12)+3.45)"
-3.6536554673202546181795194727005826674359494735820338441084848</pre></li>
+3.6536554673202546181795194727005826674359494735820338441084848</pre>
+<p>Megjegyzés: a Terminálban használva a Számológépet a szögfüggvények minden esetben radiánban adják meg az eredményt.</p></li>
 </ul>
 
 </div>

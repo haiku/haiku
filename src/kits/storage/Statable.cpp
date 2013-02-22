@@ -7,10 +7,6 @@
  *		Ingo Weinhold, bonefish@users.sf.net
  */
 
-/*!
-	\file Statable.cpp
-	BStatable implementation.
-*/
 
 #include <Statable.h>
 
@@ -48,21 +44,7 @@ BStatable::~BStatable()
 #endif
 
 
-/*!	\fn status_t GetStat(struct stat *st) const
-	\brief Returns the stat stucture for the node.
-	\param st the stat structure to be filled in.
-	\return
-	- \c B_OK: Worked fine
-	- \c B_NO_MEMORY: Could not allocate the memory for the call.
-	- \c B_BAD_VALUE: The current node does not exist.
-	- \c B_NOT_ALLOWED: Read only node or volume.
-*/
-
-
-/*!	\brief Returns if the current node is a file.
-	\return \c true, if the BNode is properly initialized and is a file,
-			\c false otherwise.
-*/
+// Returns whether or not the current node is a file.
 bool
 BStatable::IsFile() const
 {
@@ -73,10 +55,8 @@ BStatable::IsFile() const
 		return false;
 }
 
-/*!	\brief Returns if the current node is a directory.
-	\return \c true, if the BNode is properly initialized and is a file,
-			\c false otherwise.
-*/
+
+// Returns whether or not the current node is a directory.
 bool
 BStatable::IsDirectory() const
 {
@@ -87,10 +67,8 @@ BStatable::IsDirectory() const
 		return false;
 }
 
-/*!	\brief Returns if the current node is a symbolic link.
-	\return \c true, if the BNode is properly initialized and is a symlink,
-			\c false otherwise.
-*/
+
+// Returns whether or not the current node is a symbolic link.
 bool
 BStatable::IsSymLink() const
 {
@@ -101,10 +79,8 @@ BStatable::IsSymLink() const
 		return false;
 }
 
-/*!	\brief Returns a node_ref for the current node.
-	\param ref the node_ref structure to be filled in
-	\see GetStat() for return codes
-*/
+
+// Fills out ref with the node_ref of the node.
 status_t
 BStatable::GetNodeRef(node_ref *ref) const
 {
@@ -119,10 +95,8 @@ BStatable::GetNodeRef(node_ref *ref) const
 	return error;
 }
 
-/*!	\brief Returns the owner of the node.
-	\param owner a pointer to a uid_t variable to be set to the result
-	\see GetStat() for return codes
-*/
+
+// Fills out the node's UID into owner.
 status_t
 BStatable::GetOwner(uid_t *owner) const
 {
@@ -135,10 +109,8 @@ BStatable::GetOwner(uid_t *owner) const
 	return error;
 }
 
-/*!	\brief Sets the owner of the node.
-	\param owner the new owner
-	\see GetStat() for return codes
-*/
+
+// Sets the node's UID to owner.
 status_t
 BStatable::SetOwner(uid_t owner)
 {
@@ -147,10 +119,8 @@ BStatable::SetOwner(uid_t owner)
 	return set_stat(statData, B_STAT_UID);
 }
 
-/*!	\brief Returns the group owner of the node.
-	\param group a pointer to a gid_t variable to be set to the result
-	\see GetStat() for return codes
-*/
+
+// Fills out the node's GID into group.
 status_t
 BStatable::GetGroup(gid_t *group) const
 {
@@ -163,10 +133,8 @@ BStatable::GetGroup(gid_t *group) const
 	return error;
 }
 
-/*!	\brief Sets the group owner of the node.
-	\param group the new group
-	\see GetStat() for return codes
-*/
+
+// Sets the node's GID to group.
 status_t
 BStatable::SetGroup(gid_t group)
 {
@@ -175,10 +143,8 @@ BStatable::SetGroup(gid_t group)
 	return set_stat(statData, B_STAT_GID);
 }
 
-/*!	\brief Returns the permissions of the node.
-	\param perms a pointer to a mode_t variable to be set to the result
-	\see GetStat() for return codes
-*/
+
+// Fills out perms with the node's permissions.
 status_t
 BStatable::GetPermissions(mode_t *perms) const
 {
@@ -191,10 +157,8 @@ BStatable::GetPermissions(mode_t *perms) const
 	return error;
 }
 
-/*!	\brief Sets the permissions of the node.
-	\param perms the new permissions
-	\see GetStat() for return codes
-*/
+
+// Sets the node's permissions to perms.
 status_t
 BStatable::SetPermissions(mode_t perms)
 {
@@ -205,10 +169,8 @@ BStatable::SetPermissions(mode_t perms)
 	return set_stat(statData, B_STAT_MODE);
 }
 
-/*!	\brief Get the size of the node's data (not counting attributes).
-	\param size a pointer to a variable to be set to the result
-	\see GetStat() for return codes
-*/
+
+// Fills out the size of the node's data (not counting attributes) into size.
 status_t
 BStatable::GetSize(off_t *size) const
 {
@@ -221,10 +183,8 @@ BStatable::GetSize(off_t *size) const
 	return error;
 }
 
-/*!	\brief Returns the last time the node was modified.
-	\param mtime a pointer to a variable to be set to the result
-	\see GetStat() for return codes
-*/
+
+// Fills out mtime with the last modification time of the node.
 status_t
 BStatable::GetModificationTime(time_t *mtime) const
 {
@@ -237,10 +197,8 @@ BStatable::GetModificationTime(time_t *mtime) const
 	return error;
 }
 
-/*!	\brief Sets the last time the node was modified.
-	\param mtime the new modification time
-	\see GetStat() for return codes
-*/
+
+// Sets the node's last modification time to mtime.
 status_t
 BStatable::SetModificationTime(time_t mtime)
 {
@@ -249,10 +207,8 @@ BStatable::SetModificationTime(time_t mtime)
 	return set_stat(statData, B_STAT_MODIFICATION_TIME);
 }
 
-/*!	\brief Returns the time the node was created.
-	\param ctime a pointer to a variable to be set to the result
-	\see GetStat() for return codes
-*/
+
+// Fills out ctime with the creation time of the node
 status_t
 BStatable::GetCreationTime(time_t *ctime) const
 {
@@ -265,10 +221,8 @@ BStatable::GetCreationTime(time_t *ctime) const
 	return error;
 }
 
-/*!	\brief Sets the time the node was created.
-	\param ctime the new creation time
-	\see GetStat() for return codes
-*/
+
+// Sets the node's creation time to ctime.
 status_t
 BStatable::SetCreationTime(time_t ctime)
 {
@@ -277,11 +231,8 @@ BStatable::SetCreationTime(time_t ctime)
 	return set_stat(statData, B_STAT_CREATION_TIME);
 }
 
-/*!	\brief Returns the time the node was accessed.
-	Not used.
-	\see GetModificationTime()
-	\see GetStat() for return codes
-*/
+
+// Fills out atime with the access time of the node.
 status_t
 BStatable::GetAccessTime(time_t *atime) const
 {
@@ -294,11 +245,8 @@ BStatable::GetAccessTime(time_t *atime) const
 	return error;
 }
 
-/*!	\brief Sets the time the node was accessed.
-	Not used.
-	\see GetModificationTime()
-	\see GetStat() for return codes
-*/
+
+// Sets the node's access time to atime.
 status_t
 BStatable::SetAccessTime(time_t atime)
 {
@@ -307,11 +255,8 @@ BStatable::SetAccessTime(time_t atime)
 	return set_stat(statData, B_STAT_ACCESS_TIME);
 }
 
-/*!	\brief Returns the volume the node lives on.
-	\param vol a pointer to a variable to be set to the result
-	\see BVolume
-	\see GetStat() for return codes
-*/
+
+// Fills out vol with the the volume that the node lives on.
 status_t
 BStatable::GetVolume(BVolume *vol) const
 {

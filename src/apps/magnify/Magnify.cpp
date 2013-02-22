@@ -135,7 +135,7 @@ BuildInfoMenu(BMenu *menu)
 	menu->AddItem(menuItem);
 //	menuItem = new BMenuItem(B_TRANSLATE("Save selection"), new BMessage(msg_save),'S');
 //	menu->AddItem(menuItem);
-	menuItem = new BMenuItem(B_TRANSLATE("Copy image"), 
+	menuItem = new BMenuItem(B_TRANSLATE("Copy image"),
 		new BMessage(msg_copy_image),'C');
 	menu->AddItem(menuItem);
 	menu->AddSeparatorItem();
@@ -222,6 +222,7 @@ TWindow::TWindow(int32 pixelCount)
 	fInfo->SetMagView(fFatBits);
 
 	ResizeWindow(fHPixelCount, fVPixelCount);
+	UpdateInfoBarOnResize();
 
 	AddShortcut('S', B_COMMAND_KEY, new BMessage(msg_save));
 	AddShortcut('C', B_COMMAND_KEY, new BMessage(msg_copy_image));
@@ -251,8 +252,10 @@ TWindow::MessageReceived(BMessage* m)
 
 	switch (m->what) {
 		case msg_show_info:
-			if (active)
+			if (active) {
+				fInfoBarState = !fInfoBarState;
 				ShowInfo(!fShowInfo);
+			}
 			break;
 
 		case msg_toggle_grid:
@@ -440,6 +443,7 @@ ALMOST_DONE:	//	clean up and try to position the window
 DONE:
 	fShowGrid = showGrid;
 	fShowInfo = showInfo;
+	fInfoBarState = showInfo;
 	fHPixelCount = (overridePixelCount == -1) ? hPixelCount : overridePixelCount;
 	fVPixelCount = (overridePixelCount == -1) ? vPixelCount : overridePixelCount;
 	fPixelSize = pixelSize;
@@ -487,6 +491,7 @@ TWindow::FrameResized(float w, float h)
 {
 	CalcViewablePixels();
 	fFatBits->InitBuffers(fHPixelCount, fVPixelCount, fPixelSize, ShowGrid());
+	UpdateInfoBarOnResize();
 }
 
 
@@ -633,6 +638,7 @@ TWindow::ShowInfo(bool i)
 
 	fFatBits->SetSelection(fShowInfo);
 	ResizeWindow(fHPixelCount, fVPixelCount);
+	fInfo->SetInfoTextVisible(i);
 }
 
 
@@ -647,6 +653,21 @@ void
 TWindow::UpdateInfo()
 {
 	fInfo->Invalidate();
+}
+
+
+void
+TWindow::UpdateInfoBarOnResize()
+{
+	float infoWidth, infoHeight;
+	fInfo->GetPreferredSize(&infoWidth, &infoHeight);
+
+	if (infoWidth > Bounds().Width()
+		|| infoHeight > Bounds().Height()) {
+		ShowInfo(false);
+	} else {
+		ShowInfo(true);
+	}
 }
 
 
@@ -771,6 +792,8 @@ TInfoView::TInfoView(BRect frame)
 	fRGBStr[0] = 0;
 	fCH1Str[0] = 0;
 	fCH2Str[0] = 0;
+
+	fInfoTextVisible = true;
 }
 
 
@@ -821,7 +844,8 @@ TInfoView::Draw(BRect updateRect)
 	FillRect(invalRect);
 	SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 	strcpy(fInfoStr, dimensionsInfo);
-	DrawString(fInfoStr);
+	if (fInfoTextVisible)
+		DrawString(fInfoStr);
 
 	rgb_color color = { 0, 0, 0, 255 };
 	if (fMagView)
@@ -836,7 +860,8 @@ TInfoView::Draw(BRect updateRect)
 	FillRect(invalRect);
 	SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 	strcpy(fRGBStr,str);
-	DrawString(fRGBStr);
+	if (fInfoTextVisible)
+		DrawString(fRGBStr);
 
 	bool ch1Showing, ch2Showing;
 	dynamic_cast<TWindow*>(Window())->CrossHairsShowing(&ch1Showing, &ch2Showing);
@@ -855,7 +880,8 @@ TInfoView::Draw(BRect updateRect)
 			FillRect(invalRect);
 			SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 			strcpy(fCH2Str,str);
-			DrawString(fCH2Str);
+			if (fInfoTextVisible)
+				DrawString(fCH2Str);
 		}
 
 		if (ch1Showing && ch2Showing) {
@@ -867,7 +893,8 @@ TInfoView::Draw(BRect updateRect)
 			FillRect(invalRect);
 			SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 			strcpy(fCH1Str,str);
-			DrawString(fCH1Str);
+			if (fInfoTextVisible)
+				DrawString(fCH1Str);
 		} else if (ch1Showing) {
 			MovePenTo(10, h-10);
 			sprintf(str, "x: %li  y: %li", (int32)pt1.x, (int32)pt1.y);
@@ -876,7 +903,8 @@ TInfoView::Draw(BRect updateRect)
 			FillRect(invalRect);
 			SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 			strcpy(fCH1Str,str);
-			DrawString(fCH1Str);
+			if (fInfoTextVisible)
+				DrawString(fCH1Str);
 		}
 	}
 
@@ -962,6 +990,38 @@ TMenu::AttachedToWindow()
 		menuItem->SetEnabled(state);
 
 	BMenu::AttachedToWindow();
+}
+
+
+void
+TInfoView::GetPreferredSize(float* _width, float* _height)
+{
+	if (_width) {
+		float str1Width = StringWidth(fCH1Str)
+			+ StringWidth(fCH2Str)
+			+ StringWidth(fRGBStr)
+			+ 30;
+		float str2Width = StringWidth(fInfoStr) + 30;
+		*_width = str1Width > str2Width ? str1Width : str2Width;
+	}
+
+	if (_height)
+		*_height = fFontHeight * 2 + 10;
+}
+
+
+bool
+TInfoView::IsInfoTextVisible()
+{
+	return fInfoTextVisible;
+}
+
+
+void
+TInfoView::SetInfoTextVisible(bool visible)
+{
+	fInfoTextVisible = visible;
+	Draw(Bounds());
 }
 
 
@@ -1440,7 +1500,7 @@ TMagnify::CopyImage()
 
 	BMessage *message = be_clipboard->Data();
 	if (!message) {
-		printf(B_TRANSLATE_CONTEXT("no clip msg\n", 
+		printf(B_TRANSLATE_CONTEXT("no clip msg\n",
 			"In console, when clipboard is empty after clicking Copy image"));
 		return;
 	}
@@ -1978,7 +2038,7 @@ main(int argc, char* argv[])
 
 	if (argc > 2) {
 		printf(B_TRANSLATE_CONTEXT(
-			"usage: magnify [size] (magnify size * size pixels)\n", 
+			"usage: magnify [size] (magnify size * size pixels)\n",
 			"Console"));
 		exit(1);
 	} else {
@@ -1987,17 +2047,17 @@ main(int argc, char* argv[])
 
 			if ((pixelCount > 100) || (pixelCount < 4)) {
 				printf(B_TRANSLATE_CONTEXT(
-					"usage: magnify [size] (magnify size * size pixels)\n", 
+					"usage: magnify [size] (magnify size * size pixels)\n",
 					"Console"));
 				printf(B_TRANSLATE_CONTEXT(
-					"  size must be > 4 and a multiple of 4\n", 
+					"  size must be > 4 and a multiple of 4\n",
 					"Console"));
 				exit(1);
 			}
 
 			if (pixelCount % 4) {
 				printf(B_TRANSLATE_CONTEXT(
-					"magnify: size must be a multiple of 4\n", 
+					"magnify: size must be a multiple of 4\n",
 					"Console"));
 				exit(1);
 			}

@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Adriano Duarte
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Tracker Add-Ons</title>
+	<title>Adicionais do Rastreador</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -40,6 +42,7 @@
 <li><a href="../fi/tracker-add-ons.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../sk/tracker-add-ons.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../hu/tracker-add-ons.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../ca/tracker-add-ons.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../en/tracker-add-ons.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -51,35 +54,34 @@
 
 <div id="content">
 <div>
-<div class="box-info">A tradução desta página ainda não está completa. Até lá, partes incompletas mostrarão o original em inglês.</div>
 
-<h1>Tracker Add-Ons</h1>
+<h1>Adicionais do Rastreador</h1>
 
-<p>Applications can install add-ons so they can be invoked easily on a selection of files from Tracker. Only the add-ons that can handle a specific filetype are presented under <span class="menu">Add-Ons</span> from the context menu or the <span class="menu">File</span> menu of a Tracker window. Some add-ons don't necessarily need a file to work on and are thus always present.</p>
-<p>Tracker Add-Ons, or links to applications that can act as add-ons, can be installed in three different locations (see topic <a href="filesystem-layout.html">Filesystem layout</a>):</p>
+<p>Aplicativos podem instalar adicionais assim podem ser chamados facilmente numa seleção de arquivos a partir do Rastreador. Apenas os adicionais que podem manusear um tipo de arquivo específico são apresentados sob <span class="menu">Adicionais</span> a partir do menu de contexto ou do menu <span class="menu">Arquivo</span> de uma janela do Rastreador. Alguns adicionais não necessariamente precisam de um arquivo para funcionar e são, assim, sempre presentes.</p>
+<p>Adicionais do Rastreador, ou vínculos para aplicativos que podem agir como adicionais, podem ser instalados em três diferentes locais (veja o tópico <a href="filesystem-layout.html">Disposição do Sistema de Arquivos</a>):</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/add-ons/Tracker/</span></td><td>   </td><td> for system provided add-ons.</td></tr>
-<tr><td><span class="path">/boot/common/add-ons/Tracker/</span></td><td>   </td><td> for add-ons available to every user.</td></tr>
-<tr><td><span class="path">/boot/home/config/add-ons/Tracker/</span></td><td>   </td><td> for add-ons only available to yourself.</td></tr>
+<tr><td><span class="path">/boot/system/add-ons/Tracker/</span></td><td>   </td><td> para adicionais providos pelo sistema.</td></tr>
+<tr><td><span class="path">/boot/common/add-ons/Tracker/</span></td><td>   </td><td> para adicionais disponíveis para todos os usuários.</td></tr>
+<tr><td><span class="path">/boot/home/config/add-ons/Tracker/</span></td><td>   </td><td> para adicionais disponíveis apenas para você mesmo.</td></tr>
 </table>
-<p>The file name of an add-on can be suffixed with a dash and capital letter, and is then available via keyboard shortcut. For example, <span class="app">Open Target Folder-O</span> opens with <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">O</span>.<br />
-Of course, you have to take care of possible shortcut collisions when deciding on a shortcut. You can't have the same for different add-ons.</p>
+<p>O nome de arquivo de um adicional pode ser sufixado com um travessão e uma letra maiúscula e é então disponbilizado através de tecla de atalho. Por exemplo, <span class="app">Abrir Pasta Alvo-O</span> abre com <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">O</span>.<br />
+Naturalmente, deve-se ter cuidado com possíveis conflitos de atalhos quando decidir por um atalho. Não se pode ter o mesmo para diferentes adicionais.</p>
 
-<h2><a id="system-add-ons" name="system-add-ons">Haiku's Tracker Add-Ons</a></h2>
-<p>These Tracker Add-Ons come with every Haiku installation:</p>
+<h2><a id="system-add-ons" name="system-add-ons">Adicionais do Rastreador do Haiku</a></h2>
+<p>Estes Adicionais do Rastreador vêm com toda instalação Haiku:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="4"> 
-	<tr><td class="onelinetop"><b>Background</b><i>-B</i></td>
-		<td valign="top">Opens the <a href="preferences/backgrounds.html">Background</a> preferences to change the color or image of the Desktop or any folder. Invoked on an image file the Background panel is launched with that image already loaded as a potential background.</td></tr>
-	<tr><td class="onelinetop"><b>DiskUsage</b><i>-I</i></td>
-		<td valign="top">Starts the <a href="applications/diskusage.html">DiskUsage</a> application with the according folder as basis.</td></tr>
-	<tr><td class="onelinetop"><b>FileType</b><i>-F</i></td>
-		<td valign="top">Invoked on a file, opens its specific <a href="filetypes.html">FileType</a> panel, otherwise the general FileTypes preferences are launched.</td></tr>
-	<tr><td class="onelinetop"><b>Open Target Folder</b><i>-O</i></td>
-		<td valign="top">Can only be used on a linked file and opens the folder that file lives in.</td></tr>
-	<tr><td class="onelinetop"><b>TextSearch</b><i>-G</i></td>
-		<td valign="top">Starts the <a href="applications/textsearch.html">TextSearch</a> application to look for a string in the selected folder (and its subfolders).</td></tr>
-	<tr><td class="onelinetop"><b>ZipOMatic</b><i>-Z</i></td>
-		<td valign="top">A selection of files will be added to a zip archive, invoked without a selection opens a panel to create an archive via drag&amp;drop.</td></tr>
+	<tr><td class="onelinetop"><b>Fundo</b><i>-B</i></td>
+		<td valign="top">Abre as preferências de <a href="preferences/backgrounds.html">Fundo</a> para alterar a cor ou imagem da Área de Trabalho ou de qualquer pasta. Chamado num arquivo de imagem, a janela de diálogo do Fundo é carregada com aquela imagem já carregada como um fundo potencial.</td></tr>
+	<tr><td class="onelinetop"><b>Uso do Disco</b><i>-I</i></td>
+		<td valign="top">Inicia o aplicativo <a href="applications/diskusage.html">Uso do Disco</a> com a pasta atual como base.</td></tr>
+	<tr><td class="onelinetop"><b>Tipo de Arquivo</b><i>-F</i></td>
+		<td valign="top">Chamado sobre um arquivo, abre sua janela de diálogo <a href="filetypes.html">Tipo de Arquivo</a> específica, do contrário as preferências gerais do Tipos de Arquivos são carregadas.</td></tr>
+	<tr><td class="onelinetop"><b>Abrir Pasta Alvo</b><i>-O</i></td>
+		<td valign="top">Pode apenas ser utilizado em um arquivo vinculado e abrir a pasta onde fica aquele arquivo.</td></tr>
+	<tr><td class="onelinetop"><b>Pesquisa de Texto</b><i>-G</i></td>
+		<td valign="top">Inicia o aplicativo <a href="applications/textsearch.html">Pesqusia de Texto</a> para procurar uma sequência na pasta selecionada (e suas subpastas).</td></tr>
+	<tr><td class="onelinetop"><b>ZipOMático</b><i>-Z</i></td>
+		<td valign="top">Uma seleção de arquivos será adicionada a um arquivo compactado zip, chamado sem uma seleção abre uma janela de diálogo para criar um arquivo compactado via arrastar e soltar.</td></tr>
 </table>
 
 </div>

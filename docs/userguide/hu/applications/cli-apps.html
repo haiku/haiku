@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,6 +42,7 @@
 <li><a href="../../fi/applications/cli-apps.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sk/applications/cli-apps.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../pt_BR/applications/cli-apps.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../ca/applications/cli-apps.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/applications/cli-apps.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 
@@ -102,17 +103,20 @@ További információk az <a href="../index.html">Indexek</a> fejezetben.</p>
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
 		<td><p>A <span class="cli">checkfs</span> egy fontos program, ami a fájlrendszer hibáit ellenőrzi. Egyszerűen csak adjuk meg a lemez nevét, és az összes fájlt le fogja ellenőrizni.</p>
 </td></tr>
-<tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p>Az <span class="cli">open</span> egy hasznos kis program. Használatával bármilyen fájl megnyitható a hozzárendelt programmal, vagy megadhatjuk neki egy program azonosítóját, így anélkül is indíthatunk programot, hogy tudnánk az útvonalát. Ugyan úgy működik internet címekkel is és "virtuális" mappákkal: <tt>.</tt> a jelenlegi mappa és <tt>..</tt> a szülő mappa, melyek a Nyomkövetőben nyílnak meg.</p>
-</td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p>A <span class="cli">desklink</span> lehetőséget ad arra, hogy bármilyen fájlt, mappát, lekérdezést vagy programot az Asztalsávra, a Polcra helyezzünk. Továbbá lehetőségünk van helyi menüvel is ellátni azt. Az alábbi példa a <span class="app">screenshot</span> programot használja néhány opcióval (a "<tt>\</tt>" az első sor végén a sortörést jelzi a Terminálban):</p>
 <pre class="terminal">desklink "cmd=Aktív ablak (2mp):/bin/screenshot --window --border --delay 2" \
 "cmd=Replikáns törlése:desklink --remove=screenshot" /bin/screenshot
 </pre>
 <p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>
-</td></tr></table>
-
+</td></tr>
+<tr><td><p><span class="cli">diskimage</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p>A <span class="cli">diskimage</span> lehetővé teszi, hogy egy fájlt lemezként regisztráljunk. Például, a Haiku "anyboot" képfájlt regisztrálva azt csatolhatjuk a Nyomkövetőben, és szerkeszthetünk, másolhatunk illetve törölhetünk róla fájlokat mielőtt a Telepítőt használnánk.</p>
+</td></tr>
+<tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p>Az <span class="cli">open</span> egy hasznos kis program. Használatával bármilyen fájl megnyitható a hozzárendelt programmal, vagy megadhatjuk neki egy program azonosítóját, így anélkül is indíthatunk programot, hogy tudnánk az útvonalát. Ugyan úgy működik internet címekkel is és "virtuális" mappákkal: <tt>.</tt> a jelenlegi mappa és <tt>..</tt> a szülő mappa, melyek a Nyomkövetőben nyílnak meg.</p>
+</td></tr>
+</table>
 </div>
 </div>
 

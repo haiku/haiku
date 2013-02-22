@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Adriano Duarte
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Filetypes</title>
+	<title>Tipos de Arquivos</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -40,6 +42,7 @@
 <li><a href="../fi/filetypes.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../sk/filetypes.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../hu/filetypes.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../ca/filetypes.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../en/filetypes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -51,62 +54,61 @@
 
 <div id="content">
 <div>
-<div class="box-info">A tradução desta página ainda não está completa. Até lá, partes incompletas mostrarão o original em inglês.</div>
 
-<h1>Filetypes</h1>
+<h1>Tipos de Arquivos</h1>
 
-<p>Other than Windows, Haiku doesn't rely on the 3-letter file extension for a file type (e.g. .txt, .jpg, .mp3). This method is only a last resort fallback. Haiku uses <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> types just like it's custom on the internet.</p>
-<div class="box-info">While there's no reason to use file extensions in Haiku, remember to add them to files you want to share with users of other operating systems, e.g. over email, uploading to a server or via exchange of an USB drive. Otherwise their system may not recognize the file type.</div>
+<p>Diferentemente do Windows, o Haiku não conta com a extensão de arquivos de 3 letras para o tipo de arquivo (por exemplo, .txt, .jpg, .mp3). Este método é apenas um último recurso. O Haiku usa tipos <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> exatamente como é costume na internet.</p>
+<div class="box-info">Ainda que não exista razão para usar extensões de arquivo no Haiku, lembre-se de adicioná-los a arquivos que deseje compartilhar com usuários de outros sistemas operacionais, por exemplo por correio, enviando um arquivo para um servidor ou por troca via dispositivo USB. Caso contrário o sistema deles pode não reconhecer o tipo de arquivo.</div>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="specific-file" name="specific-file">Setting the filetype of a specific file</a></h2>
-<p>You can change the type of a specific file, its icon and the associated application. Select the file and invoke the <span class="menu">Add-Ons | Filetype add-on</span> from the right-click context menu.</p>
+<a id="specific-file" name="specific-file">Definindo o tipo de arquivo de um arquivo específico</a></h2>
+<p>Pode-se mudar o tipo de um arquivo específico, seu ícone e o aplicativo associado. Selecione o arquivo e chame através do clique com o botão direito do mouse, <span class="menu">Adicionais | Adicional de tipo de arquivo</span>, a partir do menu de contexto.</p>
 <img src="images/filetypes-images/filetype-addon.png" alt="filetype-addon.png" />
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="filetype" id="filetype">The File Type</a></h3>
-<p>The above is a PNG file, it's MIME string image/png. Let's say you definitely know that it's not a PNG but a GIF. You can change that either by entering the correct MIME string by hand or with one of the two buttons below the textbox:</p>
+<a name="filetype" id="filetype">O Tipo de Arquivo</a></h3>
+<p>Acima temos um arquivo PNG, é uma sequência MIME image/png. Digamos que você definitivamente sabe que não é um PNG mas um GIF. Pode-se mudar isso também entrando com a sequência MIME correta à mão ou com um dos dois botões abaixo da caixa de texto:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">Select...</span></td><td> </td><td>shows a hierarchical list of filetypes where you navigate to <tt>image | GIF Image</tt>.</td></tr>
-<tr><td><span class="button">Same as...</span></td><td> </td><td>opens a file dialog where you choose any file that already has the filetype you're looking for.</td></tr>
+<tr><td><span class="button">Selecionar...</span></td><td> </td><td>exibe uma lista hierárquica de tipos de arquivo onde pode navegar para <tt>image | GIF Image</tt>.</td></tr>
+<tr><td><span class="button">O mesmo que...</span></td><td> </td><td>abre uma caixa de diálogo onde pode-se escolher qualquer arquivo que já tenha o tipo de arquivo que esteja procurando.</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="preferred-app" name="preferred-app">The Preferred Application</a></h3>
-<p>This pop-up menu shows a list of all applications that can handle this particular filetype. From here you can choose which program should open this specific file when it's double-clicked. You could, for example, change a HTML file's preferred application from the browser to a text editor while you're working on it. Every other HTML file still opens in the browser, only this particular one starts in your text editor.</p>
+<a id="preferred-app" name="preferred-app">O Aplicativo Preferido</a></h3>
+<p>Este menu pop-up exibe uma lista de todos os aplicativos que podem manipular este tipo de arquivo em particular. A partir daqui pode-se escolher qual programa deveria abrir este arquivo específico quando é executado o duplo clique sobre ele. Pode-se, por exemplo, mudar o aplicativo preferido de arquivo HTML do navegador para um editor de texto enquanto se está trabalhando nele. Todos os outros arquivos HTML ainda abrem no navegador, apenas este em particular inicia em seu editor de texto.</p>
 
-<p>The <span class="menu">Default application</span> is the one that's set globally for that filetype. If you don't find the program you want to associate with this file in the pop-up menu, you'll again find the buttons <span class="button">Select...</span> and <span class="button">Same as...</span> which do the similar thing described under "The File Type" above.</p>
+<p>O <span class="menu">Aplicativo padrão</span> é aquele que é definido globalmente para aquele tipo de arquivo. Se não encontrar o programa que deseja associar com este arquivo no menu pop-up, poderá novamente encontrar os botões <span class="button">Selecionar...</span> e <span class="button">O mesmo que...</span> que fazem a mesma coisa descrita em "O Tipo de Arquivo" acima.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="icon" name="icon">The Icon</a></h3>
-<p>If you're wondering why the icon well on the top right is empty: Icons are normally inherited from the system default for that filetype. You can open the <span class="app">Filetype add-on</span> of a file that contains an icon and drag&amp;drop it into your file's icon well. Or you double-click the icon well and create or edit your own icon. For more info on icons and how to create your own, see topic <a href="applications/icon-o-matic.html">Icon-O-Matic</a>.</p>
+<a id="icon" name="icon">O Ícone</a></h3>
+<p>Se está imaginando o porquê da fonte de ícone na primeira imagem estar vazia: Ícones são normalmente herdados do sistema padrão para aquele tipo de arquivo. Pode-se abrir o <span class="app">Adicional de tipo de arquivo</span> de um arquivo que contenha um ícone e arrastar e soltá-lo dentro da sua fonte de ícone de arquivo. Ou dê um clique duplo na fonte de ícone e crie ou edite seu próprio ícone. Para mais informações sobre ícones e como criar o seu próprio, veja o tópico <a href="applications/icon-o-matic.html">Icon-O-Mático</a>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="settings-apps" name="settings-apps">Special settings for applications</a></h2>
-<p>If you invoke the <span class="app">Filetype add-on</span> on an executable (here: <span class="app">StyledEdit</span>), you'll get a different dialog:</p>
+<a id="settings-apps" name="settings-apps">Definições especiais para aplicativos</a></h2>
+<p>Se chamar o <span class="app">Adicional de tipo de arquivo</span> em um executável (aqui: <span class="app">StyledEdit</span>), obterá um diálogo diferente:</p>
 <img src="images/filetypes-images/filetype-addon-stylededit.png" alt="filetype-addon-stylededit.png" />
-<p>On top, you'll see, instead of a standardized MIME string, the unique application signature. With it, the system finds the program wherever it's installed.</p>
-<p>Below it are several flags, controlling the app's behaviour:</p>
+<p>No topo verá, ao invés de uma sequência MIME padronizada, a assinatura única da aplicação. Com ela, o sistema encontra o programa onde quer que esteja instalado.</p>
+<p>Abaixo dele estão vários flags, controlando o comportamento do aplicativo:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Single launch</span></td><td> </td><td>Only one instance of the app can be running per executable file. If you have two copies of that app, however, they can run side by side.</td></tr>
-<tr><td><span class="menu">Multiple launch</span></td><td> </td><td>Many instances of the app can run simultaneously.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Exclusive launch</span></td><td> </td><td>Really only one instance with that app's signature is allowed to run at a time.</td></tr>
-<tr><td><span class="menu">Args only</span></td><td> </td><td>Indicates the app doesn't respond to messages.</td></tr>
-<tr><td><span class="menu">Background app</span></td><td> </td><td>The app won't appear in <a href="twitcher.html">Twitcher</a> or the list of running apps of the Deskbar.</td></tr>
+<tr><td><span class="menu">Lançamento único</span></td><td> </td><td>Apenas uma instância do aplicativo pode ser executado por arquivo executável. Se possuir duas cópias daquele aplicativo, entretanto, eles poderão executar lado a lado.</td></tr>
+<tr><td><span class="menu">Lançamento múltiplo</span></td><td> </td><td>Muitas instâncias do aplicativo podem executar simultaneamente.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Lançamento exclusivo</span></td><td> </td><td>Verdadeiramente a apenas uma instância com aquela assintaura de aplicativo é permitido executar por vez.</td></tr>
+<tr><td><span class="menu">Apenas argumentos</span></td><td> </td><td>Indica ao aplicativo não responder a mensagens.</td></tr>
+<tr><td><span class="menu">Aplicação em segundo plano</span></td><td> </td><td>O aplicativo não irá aparecer no <a href="twitcher.html">Twitcher</a> ou na lista de aplicativos em execução da Deskbar.</td></tr>
 </table>
-<p>Then there's the list of supported filetypes. You can add (and remove) filetypes if you think the application can handle them. As a consequence, the app will appear in the menu for preferred applications or Tracker's <span class="menu">Open with...</span> context menu when you right-click on a file of that type.</p>
-<p>At the bottom are version and copyright information. Like the application signature, they are filled in by the app's author and shouldn't be altered.</p>
+<p>Então surge a lista de tipos de arquivos suportados. Pode-se adicionar (e remover) tipos de arquivos se considerar que o aplicativo pode manuseá-los. Como consequencia, o aplicativo aparecerá no menu de aplicativos preferidos ou no menu de contexto <span class="menu">Abrir com...</span> do Rastreador quando clicar com o botão direito do mouse em um arquivo daquele tipo.</p>
+<p>Na base está a informação de versão e direitos autorais. Como a assinatura de aplicativo, eles são preenchidos pelo autor do aplicativo e não deverão ser alterados.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="filetypes-preferences" name="filetypes-preferences">Global settings with the FileTypes Preferences</a></h2>
-<p>The <span class="app">FileTypes</span> preferences don't deal with individual files but with global settings of filetypes. You can change default icons and preferred applications or add, remove, or alter attributes of whole filetypes. You can even create your own filetype from scratch.</p>
-<p>All filetypes and their configurations are stored in <span class="path">/boot/home/config/settings/beos_mime/</span>. Before you start experimenting, it may be prudent to make a backup of that folder...</p>
-<p>To learn more about the <span class="app">FileTypes</span> preferences see the workshop: <a href="workshop-filetypes+attributes.html">Filetypes, Attributes, Index and Queries</a>.</p>
+<a id="filetypes-preferences" name="filetypes-preferences">Definições globais com as Preferências de Tipos de Arquivos</a></h2>
+<p>As preferências dos <span class="app">Tipos de Arquivos</span> não lidam com arquivos individuais mas com definições globais de tipos de arquivos. Pode-se mudar ícones padrão e aplicativos preferidos ou adicionar, remover ou alterar atributos de tipos de arquivos inteiros. Pode-se ainda criar seu próprio tipo de arquivo do zero.</p>
+<p>Todos os tipos de arquivos e suas configurações estão armazenadas em <span class="path">/boot/home/config/settings/beos_mime/</span>. Antes de começar a experimentar, seria prudente fazer um backup daquela pasta...</p>
+<p>Para aprender mais sobre as preferências dos <span class="app">Tipos de Arquivos</span> veja a oficina: <a href="workshop-filetypes+attributes.html">Tipos de arquivos, Atributos, Indexação e Consultas</a>.</p>
 
 </div>
 </div>

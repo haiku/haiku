@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -43,6 +43,7 @@
 <li><a href="../../sk/applications/cli-apps.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../hu/applications/cli-apps.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_BR/applications/cli-apps.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../ca/applications/cli-apps.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/applications/cli-apps.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 
@@ -101,17 +102,20 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
 		<td><p><span class="cli">checkfs</span> はファイルシステムのエラーをチェックするための重要なツールです。実行は単にボリューム名またはデバイス名を追加するだけです。すると、すべてのファイルを走査して、可能な場合は不整合を修復します。</p>
 </td></tr>
-<tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">open</span> は非常に便利な小さいツールです。このコマンドを使うと任意のファイルを適切なアプリケーションで開くことや、シグネチャーを用いることで正確なパスを知ることなしにアプリケーションを起動できます。このコマンドは URL や「仮想的な」ディレクトリを用いることさえできます。ディレクトリの場合は <tt>.</tt> でカレントディレクトリを、<tt>..</tt> で親ディレクトリを表すことができ、Tracker でそのフォルダーを開けます。</p>
-</td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">desklink</span> を使用すると、任意のファイルやフォルダー、クエリ、アプリケーションのアイコンを Deskbar トレイにインストールできます。特別なアクションを実行するためにアイコンを右クリックしたときに表示されるコンテキストメニューを定義するためのオプションもあります。例として、次のようにいろいろなオプション (1 行目の "<tt>/</tt>" はターミナルでの改行を表します) を付けて、<span class="app">スクリーンショット (screenshot) </span> を Deskbar に追加してみましょう:</p>
 <pre class="terminal">desklink "cmd=Active window (2s):/bin/screenshot --window --border --delay 2" \
 "cmd=Remove replicant:desklink --remove=screenshot" /bin/screenshot
 </pre>
 <p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>
-</td></tr></table>
-
+</td></tr>
+<tr><td><p><span class="cli">diskimage</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">diskimage</span> は、普通のファイルをディスクデバイスとして登録します。たとえば、 Haiku anyboot イメージを登録して、Tracker 中にマウントし、インストーラーのソースとして使う前にそこにあるファイルを編集、コピーまたは削除できます。</p>
+</td></tr>
+<tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">open</span> は非常に便利な小さいツールです。このコマンドを使うと任意のファイルを適切なアプリケーションで開くことや、シグネチャーを用いることで正確なパスを知ることなしにアプリケーションを起動できます。このコマンドは URL や「仮想的な」ディレクトリを用いることさえできます。ディレクトリの場合は <tt>.</tt> でカレントディレクトリを、<tt>..</tt> で親ディレクトリを表すことができ、Tracker でそのフォルダーを開けます。</p>
+</td></tr>
+</table>
 </div>
 </div>
 

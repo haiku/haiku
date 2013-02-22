@@ -86,6 +86,9 @@ enum {
 	MSG_USE_PROXY_CHANGED						= 'upsc',
 	MSG_PROXY_ADDRESS_CHANGED					= 'psac',
 	MSG_PROXY_PORT_CHANGED						= 'pspc',
+	MSG_USE_PROXY_AUTH_CHANGED					= 'upsa',
+	MSG_PROXY_USERNAME_CHANGED					= 'psuc',
+	MSG_PROXY_PASSWORD_CHANGED					= 'pswc',
 };
 
 static const int32 kDefaultFontSize = 14;
@@ -212,6 +215,9 @@ SettingsWindow::MessageReceived(BMessage* message)
 		case MSG_USE_PROXY_CHANGED:
 		case MSG_PROXY_ADDRESS_CHANGED:
 		case MSG_PROXY_PORT_CHANGED:
+		case MSG_USE_PROXY_AUTH_CHANGED:
+		case MSG_PROXY_USERNAME_CHANGED:
+		case MSG_PROXY_PASSWORD_CHANGED:
 			// TODO: Some settings could change live, some others not?
 			_ValidateControlsEnabledStatus();
 			break;
@@ -465,6 +471,28 @@ SettingsWindow::_CreateProxyPage(float spacing)
 	fProxyPortControl->SetText(
 		fSettings->GetValue(kSettingsKeyProxyAddress, ""));
 
+	fUseProxyAuthCheckBox = new BCheckBox("use authentication",
+		B_TRANSLATE("Proxy server requires authentication"),
+		new BMessage(MSG_USE_PROXY_AUTH_CHANGED));
+	fUseProxyAuthCheckBox->SetValue(B_CONTROL_ON);
+
+	fProxyUsernameControl = new BTextControl("proxy username",
+		B_TRANSLATE("Proxy username:"), "",
+		new BMessage(MSG_PROXY_USERNAME_CHANGED));
+	fProxyUsernameControl->SetModificationMessage(
+		new BMessage(MSG_PROXY_USERNAME_CHANGED));
+	fProxyUsernameControl->SetText(
+		fSettings->GetValue(kSettingsKeyProxyUsername, ""));
+
+	fProxyPasswordControl = new BTextControl("proxy password",
+		B_TRANSLATE("Proxy password:"), "",
+		new BMessage(MSG_PROXY_PASSWORD_CHANGED));
+	fProxyPasswordControl->SetModificationMessage(
+		new BMessage(MSG_PROXY_PASSWORD_CHANGED));
+	fProxyPasswordControl->TextView()->HideTyping(true);
+	fProxyPasswordControl->SetText(
+		fSettings->GetValue(kSettingsKeyProxyPassword, ""));
+
 	BView* view = BGroupLayoutBuilder(B_VERTICAL, spacing / 2)
 		.Add(fUseProxyCheckBox)
 		.Add(BGridLayoutBuilder(spacing / 2, spacing / 2)
@@ -473,6 +501,14 @@ SettingsWindow::_CreateProxyPage(float spacing)
 
 			.Add(fProxyPortControl->CreateLabelLayoutItem(), 0, 1)
 			.Add(fProxyPortControl->CreateTextViewLayoutItem(), 1, 1)
+		)
+		.Add(fUseProxyAuthCheckBox)
+		.Add(BGridLayoutBuilder(spacing / 2, spacing / 2)
+			.Add(fProxyUsernameControl->CreateLabelLayoutItem(), 0, 0)
+			.Add(fProxyUsernameControl->CreateTextViewLayoutItem(), 1, 0)
+
+			.Add(fProxyPasswordControl->CreateLabelLayoutItem(), 0, 1)
+			.Add(fProxyPasswordControl->CreateTextViewLayoutItem(), 1, 1)
 		)
 		.Add(BSpaceLayoutItem::CreateGlue())
 
@@ -601,6 +637,15 @@ SettingsWindow::_CanApplySettings() const
 	canApply = canApply || (_ProxyPort()
 		!= fSettings->GetValue(kSettingsKeyProxyPort, (uint32)0));
 
+	canApply = canApply || ((fUseProxyAuthCheckBox->Value() == B_CONTROL_ON)
+		!= fSettings->GetValue(kSettingsKeyUseProxyAuth, false));
+
+	canApply = canApply || (strcmp(fProxyUsernameControl->Text(),
+		fSettings->GetValue(kSettingsKeyProxyUsername, "")) != 0);
+
+	canApply = canApply || (strcmp(fProxyPasswordControl->Text(),
+		fSettings->GetValue(kSettingsKeyProxyPassword, "")) != 0);
+
 	return canApply;
 }
 
@@ -649,6 +694,12 @@ SettingsWindow::_ApplySettings()
 		fProxyAddressControl->Text());
 	uint32 proxyPort = _ProxyPort();
 	fSettings->SetValue(kSettingsKeyProxyPort, proxyPort);
+	fSettings->SetValue(kSettingsKeyUseProxyAuth,
+		fUseProxyAuthCheckBox->Value() == B_CONTROL_ON);
+	fSettings->SetValue(kSettingsKeyProxyUsername,
+		fProxyUsernameControl->Text());
+	fSettings->SetValue(kSettingsKeyProxyPassword,
+		fProxyPasswordControl->Text());
 
 	fSettings->Save();
 
@@ -661,8 +712,14 @@ SettingsWindow::_ApplySettings()
 	BWebSettings::Default()->SetDefaultFixedFontSize(fixedFontSize);
 
 	if (fUseProxyCheckBox->Value() == B_CONTROL_ON) {
-		BWebSettings::Default()->SetProxyInfo(fProxyAddressControl->Text(),
-			proxyPort, B_PROXY_TYPE_HTTP, "", "");
+		if (fUseProxyAuthCheckBox->Value() == B_CONTROL_ON) {
+			BWebSettings::Default()->SetProxyInfo(fProxyAddressControl->Text(),
+				proxyPort, B_PROXY_TYPE_HTTP, fProxyUsernameControl->Text(),
+				fProxyPasswordControl->Text());
+		} else {
+			BWebSettings::Default()->SetProxyInfo(fProxyAddressControl->Text(),
+				proxyPort, B_PROXY_TYPE_HTTP, "", "");
+		}
 	} else
 		BWebSettings::Default()->SetProxyInfo();
 
@@ -761,6 +818,12 @@ SettingsWindow::_RevertSettings()
 	text = "";
 	text << fSettings->GetValue(kSettingsKeyProxyPort, (uint32)0);
 	fProxyPortControl->SetText(text.String());
+	fUseProxyAuthCheckBox->SetValue(fSettings->GetValue(kSettingsKeyUseProxyAuth,
+		false));
+	fProxyUsernameControl->SetText(fSettings->GetValue(kSettingsKeyProxyUsername,
+		""));
+	fProxyPasswordControl->SetText(fSettings->GetValue(kSettingsKeyProxyPassword,
+		""));
 
 	_ValidateControlsEnabledStatus();
 }
@@ -779,6 +842,10 @@ SettingsWindow::_ValidateControlsEnabledStatus()
 	bool useProxy = fUseProxyCheckBox->Value() == B_CONTROL_ON;
 	fProxyAddressControl->SetEnabled(useProxy);
 	fProxyPortControl->SetEnabled(useProxy);
+	fUseProxyAuthCheckBox->SetEnabled(useProxy);
+	bool useProxyAuth = useProxy && fUseProxyAuthCheckBox->Value() == B_CONTROL_ON;
+	fProxyUsernameControl->SetEnabled(useProxyAuth);
+	fProxyPasswordControl->SetEnabled(useProxyAuth);
 }
 
 

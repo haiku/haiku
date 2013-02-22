@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -44,6 +44,7 @@
 <li><a href="../sk/deskbar.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../hu/deskbar.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pt_BR/deskbar.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../ca/deskbar.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../en/deskbar.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -85,40 +86,41 @@
 <li><p><b>Deskbar-Einstellungen...</b> - öffnet ein Dialogfenster um die Deskbar anzupassen (siehe unten).</p></li>
 <li><p><b>Herunterfahren...</b> - bietet die Möglichkeit zum <span class="menu">Neustart</span> oder <span class="menu">Ausschalten</span> des Systems.</p></li>
 <li><p><b>Letzte Dokumente, Ordner, Anwendungen</b> - eine Liste der kürzlich geöffneten Programme, Dateien und Ordner (siehe <span class="menu">Deskbar-Einstellungen</span> weiter unten).</p></li>
-<li><p><b><acronym title="Applications">Anwendungen</acronym>, Demos, <acronym title="Desktop applets">Desktop-Apps</acronym>, <acronym title="Preferences">Einstellungen</acronym></b> - eine Liste aller installierten Programme, der Demo-Programme und der System-Einstellungen (siehe <span class="menu">Deskbar-Einstellungen</span> weiter unten).</p></li>
+<li><p><b><acronym title="Applications">Anwendungen</acronym>, Demos, <acronym title="Desktop applets">Desktop-Apps</acronym>, <acronym title="Preferences">Einstellungen</acronym></b> - eine Liste aller installierten Programme, der Demo-Programme und der System-Einstellungen.<br />
+Einträge wie Verküpfungen zu Anwendungen, Dokumenten oder sogar Query-Suchen können hinzugefügt werden, indem man sie im Ordner <span class="path"><acronym title="/boot/home/config/settings/deskbar">/boot/Benutzer/Konfiguration/settings/deskbar</acronym></span> ablegt.</p></li>
 </ul>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>Deskbar-Einstellungen</h3>
-<img src="images/deskbar-images/configure.png" alt="configure.png" />
-<ul>
-<li><p><b>Menü</b><br />
-Hier lässt sich die Anzahl der kürzlich geöffneten Dokumente, Ordner und Anwendungen einstellen, die in den entsprechenden Menüs der Deskbar erscheinen.<br />
+<h4>Menü</h4>
+<p>Während die ersten paar Menüpunkte der Deskbar unveränderlich sind, lassen sich diejenigen unter <span class="menu">Herunterfahren...</span> anpassen.</p>
+<img src="images/deskbar-images/prefs-menu.png" alt="prefs-menu.png" />
+<p>Hier lässt sich die Anzahl der kürzlich geöffneten Dokumente, Ordner und Anwendungen einstellen, die in den entsprechenden Menüs der Deskbar erscheinen.<br />
 <span class="button">Menü bearbeiten...</span> öffnet den Ordner <span class="path"><acronym title="/boot/home/config/be/">/boot/Benutzer/Konfiguration/be</acronym></span>. Hier befinden sich die Dateien und Ordner aus der Deskbar, standardmäßig <span class="menu"><acronym title="Applications">Anwendungen</acronym></span>, <span class="menu">Demos</span>, <span class="menu"><acronym title="Desktop applets">Desktop-Apps</acronym></span> und <span class="menu"><acronym title="Preferences">Einstellungen</acronym></span>.<br />
 Einträge wie Verküpfungen zu Anwendungen, Dokumenten oder sogar Query-Suchen können hinzugefügt und wieder gelöscht werden, indem man sie einfach in diesem Ordner ablegt bzw. entfernt.</p>
-<p>Noch einfacher geht das, indem man eine Datei, Ordner oder gespeicherte Query einfach an die gewünschte Position in die Deskbar zieht.</p></li>
-<li><p><b>Fenster</b></p>
+<p>Noch einfacher geht das, indem man eine Datei, Ordner oder gespeicherte Query einfach an die gewünschte Position in die Deskbar zieht.</p>
+
+<h4>Anwendungen</h4>
+<p>Folgende Einstellungen betreffen nicht etwa installierte Anwendungen, sondern Verhalten und Erscheinungsbild der Liste der gerade laufenden Anwendungen.</p>
+<img src="images/deskbar-images/prefs-apps.png" alt="prefs-apps.png" />
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Immer im Vordergrund</span></td><td> </td><td>Die Deskbar bleibt immer im Vordergrund über allen anderen Fenstern.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Automatisch nach vorn holen</span></td><td> </td><td>Wird die Deskbar vom Mauszeiger berührt, springt sie automatisch in den Vordergrund.</td></tr>
-<tr><td><span class="menu">Automatisch ausblenden</span></td><td> </td><td>Die Deskbar wird auf eine Größe von wenigen Pixeln verkleinert und nur beim Berühren mit dem Mauszeiger aufgeklappt.</td></tr>
-</table></li>
-<li><p><b>Anwendungen</b></p>
-<table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td class="onelinetop"><span class="menu">Laufende Anwendungen sortieren</span></td><td> </td><td>Ordnet die Liste laufender Programme alphabetisch.</td></tr>
+<tr><td><span class="menu">Laufende Anwendungen sortieren</span></td><td> </td><td>Ordnet die Liste laufender Programme alphabetisch.</td></tr>
 <tr><td><span class="menu">Tracker immer zuerst</span></td><td> </td><td>Selbst wenn alphabetisch sortiert wird, bleibt Tracker immer erster in der Liste.</td></tr>
-<tr><td><span class="menu">Expander anzeigen</span></td><td> </td><td>Über ein kleines Symbol lassen sich die Fenster eines Programms direkt unter seinem Eintrag in der Deskbar ein- und ausklappen.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Expander anzeigen</span></td><td> </td><td>Über ein kleines Symbol lassen sich die Fenster eines Programms direkt unter seinem Eintrag in der Deskbar ein- und ausklappen.</td></tr>
 <tr><td><span class="menu">Neue Anwendungen aufklappen</span></td><td> </td><td>Fenster neu gestarteter Programme werden automatisch unter deren Eintrag in der Deskbar ausgeklappt.</td></tr>
 <tr><td><span class="menu">Anwendungsamen ausblenden</span></td><td> </td><td>Es werden nur noch die Icons der laufenden Anwendungen angezeigt.</td></tr>
 <tr><td><span class="menu">Icon-Größe</span></td><td> </td><td>Ändert die Icon-Größe der laufenden Anwendungen.</td></tr>
-</table></li>
-<li><p><b>Uhr</b></p>
-<table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Sekunden anzeigen</span></td><td> </td><td>Blendet die Sekundenanzeige ein.</td></tr>
-<tr><td><span class="menu">Wochentag anzeigen</span></td><td> </td><td>Blendet den abgekürzten Wochentag ein.</td></tr>
-</table></li>
-</ul>
+</table>
 
+<h4>Fenster</h4>
+<p>Der letzte Reiter zeigt die Einstellungen für das Deskbar-Fenster.</p>
+<img src="images/deskbar-images/prefs-window.png" alt="prefs-window.png" />
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">
+Immer im Vordergrund</span></td><td> </td><td>Die Deskbar bleibt immer im Vordergrund über allen anderen Fenstern.</td></tr>
+<tr><td><span class="menu">Automatisch nach vorn holen</span></td><td> </td><td>Wird die Deskbar vom Mauszeiger berührt, springt sie automatisch in den Vordergrund.</td></tr>
+<tr><td><span class="menu">Automatisch ausblenden</span></td><td> </td><td>Die Deskbar wird auf eine Größe von wenigen Pixeln verkleinert und nur beim Berühren mit dem Mauszeiger aufgeklappt.</td></tr>
+</table>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tray" name="tray">Das Tray</a></h2>

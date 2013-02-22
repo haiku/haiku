@@ -4,17 +4,19 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Adriano Duarte
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>LaunchBox</title>
+	<title>Caixa de Lançamento</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -40,56 +42,55 @@
 <li><a href="../../fi/desktop-applets/launchbox.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sk/desktop-applets/launchbox.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../hu/desktop-applets/launchbox.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../ca/desktop-applets/launchbox.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/desktop-applets/launchbox.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
     <a href="../desktop-applets.html" class="uplink">Miniaplicativos da Área de Trabalho</a> 
-::  <a href="networkstatus.html">NetworkStatus</a>  »
+::  <a href="networkstatus.html">Estado da Rede</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">A tradução desta página ainda não está completa. Até lá, partes incompletas mostrarão o original em inglês.</div>
 
-<h2><img src="../../images/desktop-applets-images/launchbox-icon_64.png" alt="launchbox-icon_64.png" width="64" height="64" />LaunchBox</h2>
+<h2><img src="../../images/desktop-applets-images/launchbox-icon_64.png" alt="launchbox-icon_64.png" width="64" height="64" />Caixa de Lançamento</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Miniaplicativos da área de trabalho</span></td></tr>
 <tr><td>Localização:</td><td></td><td><span class="path">/boot/system/apps/LaunchBox</span></td></tr>
 <tr><td>Configurações:</td><td></td><td><span class="path">~/config/settings/LaunchBox/*</span></td></tr>
 </table>
-<p>One or more LaunchBox applets can be started to organize shortcuts to your favorite applications or documents. You decide if each is shown on all or just the current workspace. They can also serve to quickly open a document in a specific application. For example, you could drag&amp;drop a HTML file onto a text editor in a LaunchBox to open it in the editor instead of its preferred application, the browser.</p>
+<p>Um ou mais miniaplicativos da Caixa de Lançamento pode ser iniciado para organizar atalhos aos seus aplicativos ou documentos favoritos. Decida se cada um é mostrado no todo ou apenas o espaço de trabalho atual. Eles podem também servir para rapidamente abrir um documento em um aplicativo específico. Por exemplo, pode-se arrastar e soltar uma arquivo HTML para um editor de texto numa Caixa de Lançamento para abrí-lo no editor ao invés de seu aplicativo preferido, o navegador.</p>
 <img src="../images/desktop-applets-images/launchbox.png" alt="launchbox.png" />
-<p>All options are reached from the context menu:</p>
+<p>Todas as opções são acessadas através do menu de contexto:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Add button here</span></td><td style="width:10px;"> </td><td>Adds an empty button.</td></tr>
-<tr><td><span class="menu">Clear button</span></td><td> </td><td>Empties a button.</td></tr>
-<tr><td><span class="menu">Remove button</span></td><td> </td><td>Removes a button.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Settings</span><br />
-<span class="menu">- Horizontal layout</span><br />
-<span class="menu">- Icon size</span><br />
-<span class="menu">- Ignore double-click</span><br />
-<span class="menu">- Show window border</span><br />
-<span class="menu">- Auto raise</span><br />
-<span class="menu">- Show on all workspaces</span></td><td> </td><td class="onelinetop"><br />
-Aligns the buttons horizontally.<br />
-Sets the icon size between 16 and 64 pixel.<br />
-Launches the object only once, even when you (accidentally) double-click.<br />
-Shows the window border.<br />
-LaunchBox pops up if the mouse is near the screen edge.<br />
-Shows the LaunchBox on every workspace.</td></tr>
-<tr><td><span class="menu">Pad</span><br />
-<span class="menu">- New</span><br />
-<span class="menu">- Clone</span><br />
-<span class="menu">- Close</span></td><td> </td><td><br />
-Add a new pad.<br />
-Duplicate the current pad.<br />
-Close the current pad.</td></tr>
-<tr><td><span class="menu">LaunchBox</span><br />
-<span class="menu">- About...</span><br />
-<span class="menu">- Quit</span></td><td> </td><td><br />
-Shows the About window.<br />
-Quits all LaunchBox pads.</td><td> </td></tr>
+<tr><td><span class="menu">Adicionar botão aqui</span></td><td style="width:10px;"> </td><td>Adiciona um botão vazio.</td></tr>
+<tr><td><span class="menu">Limpar botão</span></td><td> </td><td>Esvazia um botão.</td></tr>
+<tr><td><span class="menu">Remover botão</span></td><td> </td><td>Remove um botão.</td></tr>
+<tr><td><span class="menu">Definir descrição...</span></td><td> </td><td>Pairando o mouse sobre um ícone exibe uma dica com o nome do arquivo e, no caso de um aplicativo, uma descrição curta caso difira do seu nome (veja o tópico <a href="../filetypes.html#settings-apps">Tipos de Arquivo</a>). Com este item de menu pode-se customizar a descrição nesta dica.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Definições</span><br />
+<span class="menu">- Disposição horizontal</span><br />
+<span class="menu">- Tamanho do ícone</span><br />
+<span class="menu">- Ignorar duplo clique</span><br />
+<span class="menu">- Exibir borda da janela</span><br />
+<span class="menu">- Auto levantar</span><br />
+<span class="menu">- Exibir em todos os espaços de trabalho</span></td><td> </td><td class="onelinetop"><br />
+Alinha os botões horizontalmente.<br />
+Define o tamanho do ícone entre 16 e 64 pixels.<br />
+Lança o objeto apenas uma vez, mesmo quando clica duas vezes (acidentalmente).<br />
+Exibe a borda da janela.<br />
+A Caixa de Lançamento aparece se o mouse está próximo do canto da tela.<br />
+Exibe a Caixa de Lançamento em todos os espaços de trabalho.</td></tr>
+<tr><td><span class="menu">Plataforma</span><br />
+<span class="menu">- Nova</span><br />
+<span class="menu">- Clonar</span><br />
+<span class="menu">- Fechar</span></td><td> </td><td><br />
+Adiciona uma nova plataforma.<br />
+Duplica a plataforma atual.<br />
+Fecha a plataforma atual.</td></tr>
+<tr><td><span class="menu">Caixa de Lançamento</span><br />
+<span class="menu">- Sair</span></td><td> </td><td><br />
+Fecha todas as plataformas da Caixa de Lançamento.</td><td> </td></tr>
 </table>
 
 </div>
@@ -98,7 +99,7 @@ Quits all LaunchBox pads.</td><td> </td></tr>
 <div class="nav">
 <div class="inner"><span>
     <a href="../desktop-applets.html" class="uplink">Miniaplicativos da Área de Trabalho</a> 
-::  <a href="networkstatus.html">NetworkStatus</a>  »
+::  <a href="networkstatus.html">Estado da Rede</a>  »
 </span></div>
 </div>
 

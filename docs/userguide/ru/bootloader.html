@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -44,6 +44,7 @@
 <li><a href="../sk/bootloader.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../hu/bootloader.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pt_BR/bootloader.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../ca/bootloader.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -56,6 +57,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <h1>Загрузчик (Boot Loader)</h1>
 
@@ -65,30 +67,38 @@
 <p><br /></p>
 <p>Вы увидите три пункта меню:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
-<tr><td><b>Выбор загрузочного раздела <br />(Select boot volume)</b></td><td> </td><td>Выбрать с какого раздела запустить Haiku.</td></tr>
-<tr><td><b>Выбор опций безопасного режима <br />(Select safe mode options)</b><br />
-</td><td> </td><td>Здесь находится несколько опций, которые могут решить аппаратные проблемы. При выборе опций в нижней части экрана отображается краткое описание.
-<p><i>- Safe mode</i><br />
-<i>- Disable user add-ons</i><br />
-<i>- Disable IDE DMA</i><br />
-<i>- Use fail-safe video mode</i><br />
-<i>- Disable IO-APIC</i><br />
-<i>- Disable local APIC</i><br />
-<i>- Don't call the BIOS</i><br />
-<i>- Disable APM</i><br />
-<i>- Disable ACPI</i>
-</p></td></tr>
-<tr><td><b>Выбор опций отладки (Select debug options)</b><br />
-</td><td> </td><td>Здесь вы найдете несколько опций, которые помогут вам при поиске неисправностей или при получении дополнительных сведений при составлении отчета об ошибке. Опять же внизу отображается короткое описание для каждой опции.
-<p><i>- Enable serial debug output</i><br />
-<i>- Enable on screen debug output</i><br />
-<i>- Enable debug syslog</i>
-</p>
-<p>Если активировать меню "debug syslog", то после горячей перезагрузки (например после краха системы) появятся эти дополнительные опции:</p>
-<p><i>- Display syslog from previous session</i><br />
-<i>- Save syslog from previous session</i>
-</p></td></tr>
-<tr><td class="onelinetop"><b>Выбор безопасного видео-режима <br />(Select fail safe video mode)</b></td><td> </td><td>Если вы активировали опцию <i>Use fail-safe video mode</i>, то сможете выбрать разрешение экрана и глубину цвета.</td></tr>
+<tr><td><b>Выбор загрузочного раздела <br />(Select boot volume)</b></td><td> </td><td>Выбрать с какого раздела запустить Haiku.</td></tr>
+<tr><td><b>Select safe mode options</b></td><td> </td><td>There are several options to try in case of hardware related trouble or if the system becomes unstable or unbootable because of a misbehaving add-on. When moving the selection bar to an option, a short explanation appears at the bottom of the screen.</td></tr>
+<tr><td></td><td></td><td>
+	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><i>- Safe mode</i></td><td width="15"></td><td></td></tr>
+	<tr><td><i>- Disable user add-ons</i></td><td></td><td></td></tr>
+	<tr><td><i>- Disable IDE DMA</i></td><td></td><td></td></tr>
+	<tr><td class="onelinetop"><i>- Use fail-safe video mode</i></td><td></td><td></td></tr>
+	<tr><td><i>- Don't call the BIOS</i></td><td></td><td></td></tr>
+	<tr><td><i>- Disable APM</i></td><td></td><td></td></tr>
+	<tr><td><i>- Disable ACPI</i></td><td></td><td></td></tr>
+	</table>
+</td></tr>
+<tr><td><b>Select debug options</b></td><td> </td><td>Here you'll find several options that help with debugging or getting details for a <a href="../welcome/en/bugreports.html">bug report</a>. Again, a short explanation for each option is displayed at the bottom.</td></tr>
+<tr><td></td><td></td><td>
+	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><i>- Enable serial debug output</i></td><td width="15"></td><td></td></tr>
+	<tr><td><i>- Enable on screen debug output</i></td><td></td><td></td></tr>
+	<tr><td><i>- Disable on screen paging</i></td><td></td><td></td></tr>
+	<tr><td><i>- Enable debug syslog</i></td><td></td><td></td></tr>
+	<tr><td class="onelinetop"><i>- Display current boot loader log</i></td><td></td><td>(Press <span class="key">Q</span> to exit the log)</td></tr>
+	<tr><td><i>- Add advanced debug option</i></td><td></td><td></td></tr>
+</table>
+</td></tr>
+<tr><td></td><td></td><td>If "Enable debug syslog" is activated, a warm reboot after a crash shows these additional options:</td></tr>
+<tr><td></td><td></td><td>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td class="onelinetop"><i>- Display syslog from previous session</i></td><td></td><td></td></tr>
+	<tr><td><i>- Save syslog from previous session</i></td><td></td><td></td></tr>
+</table>
+</td></tr>
+<tr><td class="onelinetop"><b>Выбор безопасного видео-режима <br />(Select fail safe video mode)</b></td><td> </td><td>Если вы активировали опцию <i>Use fail-safe video mode</i>, то сможете выбрать разрешение экрана и глубину цвета.</td></tr>
 </table>
 <p><br /></p>
 <p>После активации одной или более опций вернитесь в главное меню и продолжите загрузку. Далее вы увидите загрузочный экран:</p>

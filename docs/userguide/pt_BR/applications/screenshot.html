@@ -11,12 +11,13 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		tiagoms
+ *		Adriano Duarte
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Screenshot</title>
+	<title>Captura de Tela</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -42,20 +43,21 @@
 <li><a href="../../fi/applications/screenshot.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sk/applications/screenshot.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../hu/applications/screenshot.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../ca/applications/screenshot.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/applications/screenshot.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
  «  <a href="poorman.html">Pobre Homem</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos
+</a> 
 ::  <a href="showimage.html">Showimage</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">A tradução desta página ainda não está completa. Até lá, partes incompletas mostrarão o original em inglês.</div>
 
-<h2><img src="../../images/apps-images/screenshot-icon_64.png" alt="screenshot-icon_64.png" width="64" height="64" />Screenshot</h2>
+<h2><img src="../../images/apps-images/screenshot-icon_64.png" alt="screenshot-icon_64.png" width="64" height="64" />Captura de Tela</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplicativos</span></td></tr>
 <tr><td>Localização:</td><td></td><td><span class="path">/boot/system/apps/Screenshot</span><br />
@@ -63,21 +65,21 @@
 <tr><td>Configurações:</td><td></td><td><span class="path">~/config/settings/screenshot</span></td></tr>
 </table>
 <p><br /></p>
-<p>Screenshots are taken by either starting the Screenshot application or by pressing the <span class="key">PRINT</span> key,</p>
+<p>Capturas de tela são obtidas tanto ao iniciar o aplicativo Captura de Tela como pressionando a tecla <span class="key">PRINT</span>,</p>
 <p><img id="sreenshot" src="../images/apps-images/screenshot.png" alt="screenshot.png" /></p>
-<p>In the Screenshot panel you can toggle between taking the whole screen or just the active window and decide if the window border and mouse pointer should be included. You can also enter a delay before a screenshot is taken.</p>
-<p>Below that you set the name, format and location for the screenshot that will be used when you click <span class="button">Save</span>. Instead of saving the file to disk you can also decide to <span class="button">Copy to clipboard</span> to be able to paste the shot directly into another application, or take a <span class="button">New screenshot</span>.</p>
-<p>All settings are remembered the next time you take a screenshot, enabling these convenient keyboard shortcuts:</p>
+<p>Na janela de diálogo da Captura de Tela pode-se alternar entre obter a tela inteira ou apenas a janela ativa e decidir se o borda da janela e o ponteiro do mouse devem ser incluídos. Pode-se também inserir um atraso antes de obter uma captura.</p>
+<p>Abaixo defina o nome, formato e local para a captura, que será usado quando clicar em  <span class="button">Salvar</span>. Ao invés de salvar o arquivo no disco, pode-se decidir por <span class="button">Copiar para a área de transferência</span> para ser capaz de colar a captura diretamente em outro aplicativo, ou obter uma <span class="button">Nova captura de tela</span>.</p>
+<p>Todas as definições são lembradas na próxima vez que obter uma captura, habilitando estas convenientes teclas de atalho:</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="key">PRINT</span></td><td style="width:15px;"></td><td>Takes a screenshot with zero delay and launches the Screenshot panel.</td></tr>
-<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">PRINT</span></td><td></td><td>Takes a screenshot silently (without opening the panel), while still respecting the last used settings.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">PRINT</span></td><td></td><td>Also takes a screenshot silently with the saved settings, but instead of saving it as a file, it's just copied to the clipboard.</td></tr>
+<tr><td><span class="key">PRINT</span></td><td style="width:15px;"></td><td>Obtém uma captura de tela com atraso zero e carrega a janela de diálogo da Captura de Tela.</td></tr>
+<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">PRINT</span></td><td></td><td>Obtém uma captura de tela silenciosamente  (sem abrir a janela de diálogo), enquanto ainda respeita as últimas definições utilizadas.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">PRINT</span></td><td></td><td>Também obtém uma captura de tela silenciosamente com as definições salvas, mas ao invés de salvá-la como um arquivo, apenas copia para a área de transferência.</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Taking a screenshot from Terminal</h2>
-<p>There's a special <span class="cli">screenshot</span> application to be used from Terminal or a script.<br />
-<span class="cli">screenshot --help</span> shows the familiar options as parameters:</p>
+Obtendo uma captura de tela a partir do Terminal</h2>
+<p>Existe um aplicativo especial <span class="cli">screenshot</span> para ser utilizado a partir do Terminal ou de um script.<br />
+<span class="cli">screenshot --help</span> exibe as conhecidas opções como parâmetros:</p>
 
 <pre class="terminal">~&gt; screenshot --help
 
@@ -109,7 +111,8 @@ Note: OPTION -b, --border takes only effect when used with -w, --window
 <div class="nav">
 <div class="inner"><span>
  «  <a href="poorman.html">Pobre Homem</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos
+</a> 
 ::  <a href="showimage.html">Showimage</a>  »
 </span></div>
 </div>

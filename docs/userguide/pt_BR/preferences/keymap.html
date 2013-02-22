@@ -43,6 +43,7 @@
 <li><a href="../../fi/preferences/keymap.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sk/preferences/keymap.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../hu/preferences/keymap.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../ca/preferences/keymap.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/preferences/keymap.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -54,7 +55,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">A tradução desta página ainda não está completa. Até lá, partes incompletas mostrarão o original em inglês.</div>
 
 <h2><img src="../../images/prefs-images/keymap-icon_64.png" alt="keymap-icon_64.png" width="64" height="64" />Mapa de Teclado</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
@@ -68,32 +68,32 @@
 <p>À direita, a janela do Mapa de Teclas mostra uma representação do seu teclado. Quando você pressiona uma tecla, o botão correspondente a esta tecla é escurecido e seu respectivo símbolo é inserido no campo de texto <i>Sample and Clipboard</i> na parte inferior. A partir daí, você também pode copiar e colar esse texto em um documento.<br />
 Assim, as preferências do Mapa de Teclas além de servirem para configurações locais de seu teclado, também são úteis na hora de procurar um símbolo especial usado em outros idiomas. Por exemplo, você pode trocar o mapa de teclas para tcheco ("Czech"), encontrar o "č", e copiá-lo para um e-mail ou um documento. (Embora você possa achar este caractere também em outros mapas de teclas...)</p>
 <p>Ao pressionar teclas modificadoras como <span class="key">SHIFT</span>, <span class="key">CONTROL</span> ou <span class="key">OPTION</span>, temos uma mudança no teclado exibido conforme a tecla modificadora.</p>
-<p>Then there are the keys that are marked with a blue background. These keys are called <i>Dead Keys</i> that can change the key you press after that. If you click on such a blue key with your mouse, those changeable keys light up yellow. Click again and everything's back to normal. Examples are é, ñ, ó or ë.</p>
-<p>Below the keyboard representation are two more options:</p>
+<p>Então existem as teclas que são marcadas com um fundo azul. Estas teclas são chamadas <i>Teclas Mortas</i> que podem alterar a tecla que pressionar depois dela. Se clicar com o mouse sobre uma tecla azul, aquelas teclas modificáveis ficam amarelas. Clique novamente e tudo volta ao normal. Exemplos são é, ñ, ó ou ë.</p>
+<p>Abaixo da representação do teclado estão mais duas opções:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Select dead keys</span></td><td> </td><td>for setting the above mentioned blue keys.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Switch shortcut key...</span></td><td> </td><td>for using the shortcut key in Windows/Linux mode, i.e. <span class="key">CONTROL</span> (normally <span class="key">CTRL</span>) or Haiku mode, i.e. <span class="key">COMMAND</span> (normally <span class="key">ALT</span>).</td></tr>
+<tr><td><span class="menu">Selecionar teclas mortas</span></td><td> </td><td>para definir as teclas azuis mencionadas acima.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Alterar tecla de atalho...</span></td><td> </td><td>para utilizar a tecla de atalho em modo  Windows/Linux, ou seja <span class="key">CONTROL</span> (normalmente <span class="key">CTRL</span>) ou modo Haiku, ou seja <span class="key">COMMAND</span> (normalmente <span class="key">ALT</span>).</td></tr>
 </table>
-<p>The lists on the left offer the available pre-configured keymaps of the system, and below that, if available, user-defined maps. You can change a keymap via drag&amp;drop in the keyboard representation: a left-click-drag copies a key, a right-click-drag exchanges the two keys.<br />
-When you're done you can save the result from the menu <span class="menu">File | Save...</span>. Your modified map will only appear in the user-defined list if it's stored in <span class="path">~/config/settings/Keymap/</span>. Otherwise you'll have to manually load it via <span class="menu">File | Open...</span>.</p>
-<p>To better match the Keymap panel to your physical keyboard, there are several different settings available from the <span class="menu">Layout</span> menu.</p>
-<p>The font used in the keyboard representation is set from the <span class="menu">Font</span> menu. Note, that it may or may not contain all symbols for a specific keymap.</p>
-<p>Finally, there's a <span class="button">Revert</span> button to bring back the settings that were active when you started the Keymap preferences.</p>
+<p>As listas à esquerda oferecem os mapas de teclado pré-configurados disponíveis do sistema e, abaixo, se disponível, mapas definidos pelo usuário. Pode-se alterar um mapa de teclado através de arrastar e soltar na representação de teclado: arrastar com o botão esquerdo do mouse pressionado copia uma tecla, arrastar como botão direito do mouse pressionado permuta entre duas teclas.<br />
+Ao concluir pode-se salvar o resultado a partir do menu <span class="menu">Arquivo | Salvar...</span>. Seu mapa modificado apenas aparecerá na lista de definidos pelo usuário se armazenado em <span class="path">~/config/settings/Keymap/</span>. Do contrário, deverá ser carregado manualmente via <span class="menu">Arquivo | Abrir...</span>.</p>
+<p>Para melhor combinar o painel do Mapa de Teclado com seu teclado físico, existem muitas diferentes definições disponíveis a partir do menu <span class="menu">Disposição</span>.</p>
+<p>A fonte utilizada na representação do teclado é definida a partir do menu <span class="menu">Fonte</span>. Observe que ela pode ou não conter todos os símbolos para um teclado específico.</p>
+<p>Finalmente, existe um botão <span class="button">Reverter</span> para trazer de volta as definições que estavam ativas quando iniciou as preferências do Mapa de Teclado.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="advanced-keymapping" name="advanced-keymapping">Manipulação avançada de mapa de teclado</a></h2>
-<p>There's another method to customize your keymap besides the Keymap preference panel. It involves editing a text file containing loads of hex values, which may appear daunting on first sight, but isn't really that impossible to grasp.</p>
-<p>You can dump the current keymap with a command in Terminal:</p>
+<p>existe outro método para personalizar seu mapa de teclado além do painel de preferências do Mapa de Teclado. Ele envolve editar um arquivo de texto contendo valores hexadecimais, os quais podem parecer assustadores à primeira vista, mas não são realmente impossíveis de compreender.</p>
+<p>Pode-se desabilitar o mapa de teclado atual com um comando no Terminal:</p>
 <pre class="terminal">keymap -d &gt; MyKeymap</pre>
-<p>The generated text file can then be opened in a text editor. Make sure to use a fixed font in that editor or you'll never grok that file...<br />
-At the beginning of that file, you'll find a legend of a stylized keyboard with the hex value corresponding to each key. Below that are the actual assignments of every value. You can do all the customizing that's also available from the Keymap preference panel, and then some. If you happen to have some special keys on your keyboard, you may be able to activate them. That is, use them as ordinary keys or like an option or control key. You won't be able to, for example, have your multimedia keys de/increase the volume or start some application. For this you can use e.g. <a href="http://www.haikuware.com/directory/view-details/utilities/desktop-accessories/spicykeys" class="noprinturl">SpicyKeys</a>.</p>
-<p>When you're finished, you'll save the file and have your system load the modified keymap with this command:</p>
+<p>O arquivo de texto gerado pode então ser aberto em um editor de texto. Certifique-se de utilizar uma fonte fixa no editor ou você nunca entenderá o arquivo...<br />
+No início do arquivo, encontrará uma legenda de um teclado estilizado com o valor hexadecimal correspondente para cada tecla. Abaixo estão as atribuições atuais de todos os valores. Pode-se fazer todas as personalizações disponíveis a partir do painel de preferências do Mapa de Teclado, e alguns mais. Se acontecer de ter alguma teclas especiais no seu teclado, será capaz de ativá-las.  Isto é, use-as como teclas ordinárias ou como uma tecla de opção ou controle. Não será capaz, por exemplo, de fazer suas teclas multimídia aumentarem/diminuirem o volume ou iniciar algum aplicativo. Para isto pode-se utilizar por exemplo <a href="http://www.haikuware.com/directory/view-details/utilities/desktop-accessories/spicykeys" class="noprinturl">SpicyKeys</a>.</p>
+<p>Ao terminar, salve o arquivo e faça seu sistema carregar o mapa de teclado modificado com este comando:</p>
 <pre class="terminal">keymap -s &lt; MyKeymap</pre>
-<p>If you'd like to import this keymap into the Keymap panel, you have to compile it first to a binary format:</p>
+<p>Se gostaria de importar este mapa de teclado para o painel do Mapa de Teclado, terá que compilá-lo primeiro para um formato binário:</p>
 <pre class="terminal">keymap -c &lt; MyKeymap</pre>
-<p>This will produce a file <span class="cli">keymap.out</span> which you can load into Keymap via its <span class="menu">Open...</span> menu. By the way, the keymap command is able to load this binary format as well: <span class="cli">keymap -l &lt; keymap.out</span></p>
-<p>This is the dumped file (the rightmost keys of the stylized keyboard are cut-off for a nicer display on this page):</p>
+<p>Isto irá produzir um arquivo <span class="cli">keymap.out</span> o qual pode ser carregado para o Mapa de Teclado pelo seu menu <span class="menu">Abrir...</span>. A propósito, o comando keymap também é capaz de carregar seu formato binário: <span class="cli">keymap -l &lt; keymap.out</span></p>
+<p>Este é o arquivo carregado (as teclas mais à direita do teclado estilizado foram cortadas para uma melhor exibição nesta página):</p>
 
 <pre>#!/bin/keymap -s
 #

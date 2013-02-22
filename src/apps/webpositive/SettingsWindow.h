@@ -108,6 +108,9 @@ private:
 			BCheckBox*			fUseProxyCheckBox;
 			BTextControl*		fProxyAddressControl;
 			BTextControl*		fProxyPortControl;
+			BCheckBox*			fUseProxyAuthCheckBox;
+			BTextControl*		fProxyUsernameControl;
+			BTextControl*		fProxyPasswordControl;
 
 			BButton*			fApplyButton;
 			BButton*			fCancelButton;

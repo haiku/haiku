@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009, Haiku. All rights reserved.
+ * Copyright 2009-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -44,6 +44,7 @@
 <li><a href="../../sk/applications/deskcalc.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../hu/applications/deskcalc.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_BR/applications/deskcalc.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../ca/applications/deskcalc.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/applications/deskcalc.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -55,6 +56,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <h2><img src="../../images/apps-images/deskcalc-icon_64.png" alt="deskcalc-icon_64.png" width="64" height="64" />Калькулятор (DeskCalc)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -66,26 +68,31 @@
 <p>DeskCalc - простой калькулятор, который не лишен некоторых полезных функций, возможно неочевидных на первый взгляд.</p>
 <img src="../images/apps-images/deskcalc.png" alt="deskcalc.png" />
 <ul>
-<li><p>DeskCalc понимает гораздо больше команд, чем позволяет ввести его скромная клавиатура.<br />
-Помимо операторов <tt>+</tt>, <tt>-</tt>, <tt>*</tt>, <tt>/</tt>, <tt>%</tt>, <tt>^</tt> и констант <tt>pi</tt> и <tt>e</tt>, поддерживаются следующий функции:<br />
-<tt>acos</tt>, <tt>asin</tt>, <tt>atan</tt>, <tt>atan2</tt>, <tt>ceil</tt>, <tt>cos</tt>, <tt>cosh</tt>, <tt>exp</tt>, <tt>floor</tt>, <tt>log</tt>, <tt>log10</tt>, <tt>pow</tt>, <tt>sin</tt>, <tt>sinh</tt>, <tt>sqrt</tt>, <tt>tan</tt>, <tt>tanh</tt>.</p></li>
-<li><p>DeskCalc очень толерантен по отношению к вводу пользователя:<br />
-<tt>/</tt>, <tt>:</tt>, <tt>\</tt> - интерпретируются как операторы деления.<br />
-<tt>*</tt>, <tt>x</tt> - символы умножения.<br />
-Однако следует помнить, что <tt>.</tt> и <tt>,</tt> считаются знаками обозначения дробной части, и использовать их для выделения разрядов нельзя.</p></li>
-<li><p>Меню по правому клику делает доступными следующие опции:</p>
+<li><p>DeskCalc understands much more than its simple keypad suggests.<br />
+Besides the operators <tt> </tt>, <tt>-</tt>, <tt>*</tt>, <tt>/</tt>, <tt>%</tt>, <tt>^</tt> and the constants <tt>pi</tt> and <tt>e</tt> the following math functions are supported:<br />
+<tt>!</tt>, <tt>acos</tt>, <tt>asin</tt>, <tt>atan</tt>, <tt>atan2</tt>, <tt>cbrt</tt>, <tt>ceil</tt>, <tt>cos</tt>, <tt>cosh</tt>, <tt>exp</tt>, <tt>floor</tt>, <tt>log</tt>, <tt>log10</tt>, <tt>pow</tt>, <tt>sin</tt>, <tt>sinh</tt>, <tt>sqrt</tt>, <tt>tan</tt>, <tt>tanh</tt>.</p></li>
+
+<li><p>Right-clicking offers these options:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Включать Num Lock при запуске</span></td><td style="width:15px;"></td><td>автоматически включает цифровую клавиатуру при запуске DeskCalc</td></tr>
-<tr><td><span class="menu">Показать клавиатуру</span></td><td></td><td>Включает отображение клавиатуры</td></tr>
+<tr><td colspan="2"><span class="menu">Enable Num Lock on start up</span></td><td style="width:15px;"></td><td>Automatically activates the number block when launching DeskCalc.</td></tr>
+<tr><td colspan="2"><span class="menu">Radiants/Degrees</span></td><td></td><td>Switch between "rad" and "deg" as unit for angular measure.</td></tr>
+<tr><td><span class="menu">Compact</span></td><td><span class="key">ALT</span> <span class="key">0</span></td><td></td><td>A minimal view mode that hides the keypad.</td></tr>
+<tr><td><span class="menu">Basic</span></td><td><span class="key">ALT</span> <span class="key">1</span></td><td></td><td>The standard look of DeskCalc.</td></tr>
+<tr><td><span class="menu">Scientific</span></td><td><span class="key">ALT</span> <span class="key">2</span></td><td></td><td>Show additional buttons for advanced calculations.</td></tr>
 </table></li>
+<li><p>When it comes to user input, DeskCalc is quite tolerant:<br />
+<tt>/</tt>, <tt>:</tt>, <tt>\</tt> are all interpreted as division operators,<br />
+<tt>*</tt>, <tt>x</tt> are valid symbols for multiplication.<br />
+Also, be aware that <tt>.</tt> and <tt>,</tt> are both considered floating points, which means you mustn't use them as 1000-separators.</p></li>
 <li><p>Вы можете изменить размер калькулятора до нужного и расположить его в качестве <a href="../gui.html#replicants">репликанта</a>, перетащив его на рабочий стол за символ в правом нижнем углу. Убедитесь, что <span class="menu">Отображать репликанты</span> активировано в настройках Deskbar.</p></li>
 <li><p>Клавиатура может быть раскрашена перетаскиванием нужного цвета из любой программы, в которой есть палитра, например <span class="app">Icon-O-Matic</span>.</p></li>
 <li><p>Вы можете пролистывать историю ваших прошлых вычислений нажимая <span class="key">↑</span> и <span class="key">↓</span>.</p></li>
 <li><p>Вы можете выделить и перетащить методом drag&amp;drop содержимое DeskCalc в любое приложение.</p>
 <p>Что еще лучше, обратное действие так же возможно.</p></li>
-<li><p>Наконец, DeskCalc можно использовать и в Терминале. Просто заключите выражение в двойные кавычки, как показано здесь:</p>
+<li><p>DeskCalc can be used in Terminal. Just put the expression in double quotes, like this:</p>
 <pre class="terminal">~&gt; DeskCalc "sin(45)*(cos(12)+3.45)"
-3.6536554673202546181795194727005826674359494735820338441084848</pre></li>
+3.65365546732025461817951947270058</pre>
+<p>Note: Used in the Terminal, DeskCalc will always use radians as unit for these trigonometric functions.</p></li>
 </ul>
 
 </div>

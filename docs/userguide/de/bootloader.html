@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -44,6 +44,7 @@
 <li><a href="../sk/bootloader.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../hu/bootloader.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pt_BR/bootloader.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../ca/bootloader.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -64,30 +65,40 @@
 <p><br /></p>
 <p>Im Boot Loader hat man vier Auswahlmöglichkeiten:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
-<tr><td><b>Select boot volume</b></td><td> </td><td>Hier wird eine Auswahl an bootfähigen Haiku-Installationen angezeigt.</td></tr>
+<tr><td><b>Select boot volume</b></td><td> </td><td>Hier wird eine Auswahl an bootfähigen Haiku-Installationen angezeigt.</td></tr>
 <tr><td><b>Select safe mode options</b><br />
-</td><td> </td><td>Es gibt mehrere Möglichkeiten, Haiku im Falle hardware-bezogener Probleme zum Booten zu bringen, indem man verschiedene Komponenten deaktiviert. Wenn man über die Pfeiltasten eine Option auswählt, wird am unteren Bildschirmrand eine kurze Erklärung angezeigt.
-<p><i>- Safe mode</i><br />
-<i>- Disable user add-ons</i><br />
-<i>- Disable IDE DMA</i><br />
-<i>- Use fail-safe video mode</i><br />
-<i>- Disable IO-APIC</i><br />
-<i>- Disable LOCAL APIC</i><br />
-<i>- Don't call the BIOS</i><br />
-<i>- Disable APM</i><br />
-<i>- Disable ACPI</i>
-</p></td></tr>
-<tr><td><b>Select debug options</b><br />
-</td><td> </td><td>Hier befinden sich einige hilfreiche Optionen zum Debuggen bzw. um Details für einen Bugreport zu erhalten. Auch hier wird bei jeder Option unten erklärender Text eingeblendet.
-<p><i>- Enable serial debug output</i><br />
-<i>- Enable on screen debug output</i><br />
-<i>- Enable debug syslog</i>
-</p>
-<p>Ist "debug syslog" aktiviert, werden nach einem Warmstart nach einem Crash noch weitere Optionen angeboten:</p>
-<p><i>- Display syslog from previous session</i><br />
-<i>- Save syslog from previous session</i>
-</p></td></tr>
-<tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td>Falls die Option <i>Use fail-safe video mode</i> gewählt werden muss, um Haiku zu starten, kann man hier die Bildschirmauflösung und Farbtiefe auswählen.</td></tr>
+</td><td> </td><td>Es gibt mehrere Möglichkeiten Haiku bei hardware-bezogenen Problemen zum Booten zu bringen, oder falls das System durch ein installiertes Add-On instabil wurde, indem man verschiedene Komponenten deaktiviert. Wird über die Pfeiltasten eine Option auswählt, wird am unteren Bildschirmrand eine kurze Erklärung angezeigt.</td></tr>
+<tr><td></td><td></td><td>
+	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><i>- Safe mode</i></td><td width="15"></td><td>Abgesicherter Modus</td></tr>
+	<tr><td><i>- Disable user add-ons</i></td><td></td><td>Benutzer Add-Ons deaktivieren</td></tr>
+	<tr><td><i>- Disable IDE DMA</i></td><td></td><td>IDE DMA deaktivieren</td></tr>
+	<tr><td><i>- Use fail-safe video mode</i></td><td></td><td>Gesicherten Videomodus benutzen</td></tr>
+	<tr><td><i>- Don't call the BIOS</i></td><td></td><td>Keine BIOS-Funktionen aufrufen</td></tr>
+	<tr><td><i>- Disable APM</i></td><td></td><td>APM deaktivieren</td></tr>
+	<tr><td><i>- Disable ACPI</i></td><td></td><td>ACPI deaktivieren</td></tr>
+	</table>
+</td></tr>
+<tr><td><b>Select debug options</b>
+</td><td> </td><td>Hier befinden sich einige hilfreiche Optionen zum Debuggen bzw. um Details für einen <a href="../welcome/de/bugreports.html">Bugreport</a> zu erhalten. Auch hier wird bei jeder Option unten erklärender Text eingeblendet.</td></tr>
+<tr><td></td><td></td><td>
+	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><i>- Enable serial debug output</i></td><td width="15"></td><td>Debug-Ausgabe über die serielle Schnittstelle aktivieren</td></tr>
+	<tr><td><i>- Enable on screen debug output</i></td><td></td><td>Debug-Ausgabe auf dem Bildschirm aktivieren</td></tr>
+	<tr><td><i>- Disable on screen paging</i></td><td></td><td>Seitenweise Ausgabe ausschalten</td></tr>
+	<tr><td><i>- Enable debug syslog</i></td><td></td><td>Debug Syslog aktivieren</td></tr>
+	<tr><td><i>- Display current boot loader log</i></td><td></td><td>Aktuelles Boot Loader Log anzeigen (<span class="key">Q</span> kehrt zurück aus dem Log)</td></tr>
+	<tr><td><i>- Add advanced debug option</i></td><td></td><td>Weitere Debug-Optionen eingeben</td></tr>
+</table>
+</td></tr>
+<tr><td></td><td></td><td>Ist "Enable debug syslog" aktiviert, werden beim folgenden Warmstart nach einem Crash noch weitere Optionen angeboten:</td></tr>
+<tr><td></td><td></td><td>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><i>- Display syslog from previous session</i></td><td></td><td>Syslog der letzten Sitzung anzeigen</td></tr>
+	<tr><td><i>- Save syslog from previous session</i></td><td></td><td>Syslog der letzten Sitzung speichern (auf FAT32 formatieren USB-Stick)</td></tr>
+</table>
+</td></tr>
+<tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td>Falls die Option <i>Use fail-safe video mode</i> gewählt werden muss, um Haiku zu starten, kann man hier die Bildschirmauflösung und Farbtiefe auswählen.</td></tr>
 </table>
 <p><br /></p>
 <p>Nach der Auswahl einer oder mehrerer Optionen kann man über das Hauptmenü den eigentlichen Boot-Vorgang starten. Es erscheint daraufhin folgender Bildschirm:</p>
@@ -97,7 +108,7 @@
 Die unterschiedlichen Symbole repräsentieren die verschiedenen Phasen des Boot-Vorganges:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>Die einzelnen Kernel-Module werden geladen.</td></tr>
-	<tr><td><b>Laufwerk + Lupe</b></td><td> </td><td>Die Boot-Partition wird gesucht und spezielle Dateisysteme angelegt (rootfs: <span class="path">/</span> und <span class="path">/dev</span>).</td></tr>
+	<tr><td><b>Laufwerk/Lupe</b></td><td> </td><td>Die Boot-Partition wird gesucht und spezielle Dateisysteme angelegt (rootfs: <span class="path">/</span> und <span class="path">/dev</span>).</td></tr>
 	<tr><td><b>Steckkarte</b></td><td> </td><td>Der Geräte-Manager, der sich um die Zuteilung von Systemressourcen an die einzelnen Hardware-Komponenten kümmert, wird geladen.</td></tr>
 	<tr><td><b>Boot-Laufwerk</b></td><td> </td><td>Die vorher gefundene Boot-Partition wird in das Dateisystem eingebunden.</td></tr>
 	<tr><td><b>Chip</b></td><td> </td><td>Spezielle Hauptprozessor-Module werden geladen.</td></tr>

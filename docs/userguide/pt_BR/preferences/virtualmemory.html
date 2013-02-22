@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Adriano Duarte
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>VirtualMemory</title>
+	<title>Memória Virtual</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -40,6 +42,7 @@
 <li><a href="../../fi/preferences/virtualmemory.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sk/preferences/virtualmemory.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../hu/preferences/virtualmemory.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../ca/preferences/virtualmemory.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/preferences/virtualmemory.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -50,23 +53,22 @@
 
 <div id="content">
 <div>
-<div class="box-info">A tradução desta página ainda não está completa. Até lá, partes incompletas mostrarão o original em inglês.</div>
 
-<h2><img src="../../images/prefs-images/virtualmemory-icon_64.png" alt="virtualmemory-icon_64.png" width="64" height="64" />VirtualMemory</h2>
+<h2><img src="../../images/prefs-images/virtualmemory-icon_64.png" alt="virtualmemory-icon_64.png" width="64" height="64" />Memória Virtual</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferências</span></td></tr>
 <tr><td>Localização:</td><td></td><td><span class="path">/boot/system/preferences/VirtualMemory</span></td></tr>
 <tr><td>Configurações:</td><td></td><td><span class="path">~/config/settings/kernel/drivers/virtual_memory</span><br />
-<span class="path">~/config/settings/VM_data</span> - Stores the panel's window position.</td></tr>
+<span class="path">~/config/settings/VM_data</span> - Armazena a posição da janela da caixa de diálogo.</td></tr>
 </table>
-<p>Virtual memory let's the system swap out memory to harddisk, if the RAM can be used more sensibly for other things. So, even if you have lots of RAM, providing virtual memory is never a bad idea.</p>
+<p>A memória virtual permite ao sistema parmutar memória para o disco rígido, se a RAM puder ser utilizada mais inteligentemente para outras coisas. Assim, ainda que tenha muita RAM, determinar memória virtual nunca é uma má ideia.</p>
 <img src="../images/prefs-images/virtualmemory.png" alt="virtualmemory.png" />
-<p>You can set the size to even more than your physical memory size if needed. With today's huge harddisks, assigning the physical memory size shouldn't be a problem. Still, you can quickly adjust the size if your free space ever runs low. In that case you should also have a look at <a href="../applications/diskusage.html">DiskUsage</a> to find out what's eating up your diskspace.</p>
-<p>Normally, the swap file's written to your boot partition. If you often run into disk thrashing due to the virtual memory system swapping memory in and out, you can try to use a separate harddisk for you swap file. Simply another partition on the same harddisk with your system/data won't help.<br />
-Upgrading your RAM is of course the most effective way to go...</p>
+<p>Pode-se definir o tamanho para algo maior do que sua memória física se necessário. Com os grandes discos dos dias de hoje, atribuir o tamanho da memória física não deveria ser um problema. Todavia, pode-se rapidamente ajustar o tamanho se seu espaço livre ainda for pouco. Neste caso deve-se também dar uma olhada no <a href="../applications/diskusage.html">Uso do Disco</a> para encontrar o que está devorando seu espaço em disco.</p>
+<p>Normalmente, o arquivo de troca é gravado na sua partição de inicialização. Se frequentemente executar no disco destrói diretamente o sistema de memória virtual transferindo memória para dentro e para fora, pode-se tentar utilizar um disco rígido separado para seu arquivo de troca. Simplesmente outra partição no mesmo disco rígido do seu sistema/dados não irá ajudar.<br />
+Aumentar a sua RAM é naturalmente o mais efetivo caminho a seguir...</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="button">Padrão</span></td><td> </td><td>redefine tudo para os valores padrão.</td></tr>
-<tr><td><span class="button">Reverter</span></td><td> </td><td>brings back the settings that were active when you started the VirtualMemory preferences.</td></tr>
+<tr><td><span class="button">Reverter</span></td><td> </td><td>traz de volta as definições que estavam ativas quando iniciou as preferências da Memória Virtual.</td></tr>
 </table>
 
 </div>

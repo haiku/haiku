@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,6 +42,7 @@
 <li><a href="../fi/bootloader.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../sk/bootloader.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../hu/bootloader.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../ca/bootloader.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -63,30 +64,42 @@ Ele também é útil para remover um componente de software que, após ter sido 
 <p><br /></p>
 <p>Uma vez lá, são oferecidos quatro menus:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
-<tr><td><b>Selecionar volume de inicialização</b></td><td> </td><td>Escolha qual instalação do Haiku a iniciar.</td></tr>
+<tr><td><b>Selecionar volume de inicialização</b></td><td> </td><td>Escolha qual instalação do Haiku a iniciar.</td></tr>
 <tr><td><b>Selecionar opções de modo seguro</b><br />
-</td><td> </td><td>Existem muitas opções a tentar no caso de problemas com o hardware. Quando deslocando a barra de seleção para uma opção, uma explicação curta aparece na base da tela.
-<p><i>- Modo seguro</i><br />
-<i>- Desabilitar adicionais de usuário</i><br />
-<i>- Desabilitar IDE DMA</i><br />
-<i>- Usar modo de vídeo livre de falhas</i><br />
-<i>- Desabilltar IO-APIC</i><br />
-<i>- Desabilitar LOCAL APIC</i><br />
-<i>- Não chamar a BIOS</i><br />
-<i>- Desabilitar APM</i><br />
-<i>- Desabilitar ACPI</i>
-</p></td></tr>
+</td><td> </td><td>Existem muitas opções a tentar no caso de problemas com o hardware. Ao deslocar a barra de seleção para uma opção, uma explicação curta aparece na base da tela.
+</td></tr>
+<tr><td></td><td></td><td>
+	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><i>- Modo de segurança</i></td><td width="15"></td><td></td></tr>
+	<tr><td><i>- Desabilitar adicionais de usuário</i></td><td></td><td></td></tr>
+	<tr><td><i>- Desabilitar IDE DMA</i></td><td></td><td></td></tr>
+	<tr><td class="onelinetop"><i>- Usar modo de vídeo livre de falhas</i></td><td></td><td></td></tr>
+	<tr><td><i>- Não chamar a BIOS</i></td><td></td><td></td></tr>
+	<tr><td><i>- Desabilitar APM</i></td><td></td><td></td></tr>
+	<tr><td><i>- Desabilitar ACPI</i></td><td></td><td></td></tr>
+	</table>
+</td></tr>
 <tr><td><b>Selecionar opções de depuração</b><br />
-</td><td> </td><td>Aqui encontram-se diversas opções que ajudam a depurar ou obter detalhes para um relatório de erros. Novamente, uma explanação curta para cada opção é mostrada na base da tela.
-<p><i>- Habilitar saída serial de depuração</i><br />
-<i>- Habilitar saída de depuração na tela</i><br />
-<i>- Habilitar relatório de sistema da depuração</i>
-</p>
-<p>Se o "relatório de sistema da depuração" é habilitado, uma reinicialização a quente após um erro mostra estas opções adicionais:</p>
-<p><i>- Mostrar relatório de sistema de uma sessão prévia</i><br />
-<i>- Salvar relatório de sistema de uma sessão prévia</i>
-</p></td></tr>
-<tr><td class="onelinetop"><b>Selecionar modo de vídeo livre de falhas</b></td><td> </td><td>Se tiver ativado a opção <i>Usar modo de vídeo livre de falhas</i>, poderá definir resolução e profundidade de cor.</td></tr>
+</td><td> </td><td>Aqui encontram-se diversas opções que ajudam a depurar ou obter detalhes para um <a href="../welcome/en/bugreports.html">relatório de erros</a>. Novamente, uma explanação curta para cada opção é mostrada na base da tela.
+</td></tr>
+<tr><td></td><td></td><td>
+	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><i>- Habilitar saída serial de depuração</i></td><td width="15"></td><td></td></tr>
+	<tr><td><i>- Habilitar saída da depuração na tela</i></td><td></td><td></td></tr>
+	<tr><td><i>- Desabilitar paginação na tela</i></td><td></td><td></td></tr>
+	<tr><td><i>- Habilitar syslog da depuração</i></td><td></td><td></td></tr>
+	<tr><td class="onelinetop"><i>- Mostrar log do carregador de inicialização atual</i></td><td></td><td>(Pressione <span class="key">Q</span> para sair do log)</td></tr>
+	<tr><td><i>- Adicionar opção avançada de depuração</i></td><td></td><td></td></tr>
+</table>
+</td></tr>
+<tr><td></td><td></td><td>Se "Habilitar syslog da depuração" está ativada, uma reinicialização a quente após um travamento mostra estas opções adicionais:</td></tr>
+<tr><td></td><td></td><td>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+	<tr><td class="onelinetop"><i>- Mostrar syslog da sessão anterior</i></td><td></td><td></td></tr>
+	<tr><td><i>- Salvar syslog da sessão anterior</i></td><td></td><td></td></tr>
+</table>
+</td></tr>
+<tr><td class="onelinetop"><b>Selecionar modo de vídeo livre de falhas</b></td><td> </td><td>Se tiver ativado a opção <i>Usar modo de vídeo livre de falhas</i>, poderá definir resolução e profundidade de cor.</td></tr>
 </table>
 <p><br /></p>
 <p>Após ativar uma ou mais opções, retorne ao menu principal e continue a inicialização, que apresentará esta tela:</p>

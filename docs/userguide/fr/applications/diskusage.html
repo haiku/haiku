@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009, Haiku. All rights reserved.
+ * Copyright 2009-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,6 +42,7 @@
 <li><a href="../../sk/applications/diskusage.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../hu/applications/diskusage.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_BR/applications/diskusage.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../ca/applications/diskusage.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/applications/diskusage.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -53,6 +54,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Cette page n'est pas encore entièrement traduite. Les parties non encore traduites seront en anglais.</div>
 
 <h2><img src="../../images/apps-images/diskusage-icon_64.png" alt="diskusage-icon_64.png" width="64" height="64" />DiskUsage</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -63,24 +65,24 @@
 <p><br /></p>
 <p>DiskUsage montre graphiquement l'occupation de vos disque.<br />
 Cet outil vous sera utile pour visualiser "<i>où est passé tout votre espace disque</i>".</p>
+<p>After launching, DiskUsage shows only a white window with all mounted volumes as tabs at the top. You'll have to choose the one you're interested in and click <span class="button">Scan</span> to start chugging through the disk. For larger disks this can take some time... While you wait, you may switch to a different tab and start exploring that volume or begin the scan process there as well.<br />
+It's not recommended to start several concurrent scan processes on the same physical disk, as the constant repositioning of the heads of the drive will only extend the wait.</p>
 <p><img id="diskusage" src="../images/apps-images/diskusage.png" alt="diskusage.png" /></p>
 <p>Les cercles concentriques représentent différents niveaux dans la hiérarchie du système de fichiers. Ci-dessus, le cercle au centre représente le dossier <span class="path">/boot/home/</span>. Chaque segment de l'anneau immédiatement à l'extérieur de ce cercle est un fichier ou un dossier contenu dans <span class="path">/boot/home/</span>. 
 plus les cercles sont à l'extérieur, plus la hiérarchie des dossiers est profonde.
 Vous aurez peut-être besoins de redimensionner la fenêtre pour que celle ci puisse s'accommoder de dossiers très profonds.</p>
-<p>Au-dessus du graphique, une liste déroulante vous permet de basculer entre tous les volumes montés. 
-Avant de pouvoir afficher le taux d'utilisation d'un volume, celui si doit être balayé.
-Comme cela peut prendre un certain temps pour les volumes importants, vous pouvez examiner un autre volume pendant que le balayage est effectué en tâche de fond.</p>
 <div class="box-info"><ul>
 <li>Si la représentation graphique d'un fichier ou un dossier représente moins de 2° d'un cercle, il est omis du graphique.</li>
 <li>Le nombre de fichiers rapporté pour un dossier comprend aussi les fichiers des sous-dossiers. Un dossier étant considéré comme un fichier.</li>
 <li>DiskUsage ignore les liens symboliques.</li>
 </ul></div>
 <p>Lorsque vous déplacez la souris sur un segment, les informations de ce fichier ou de ce dossier apparaissent dans la barre d'état en bas.</p>
-<p>Un clic droit sur un segment, vous proposera un menu contextuel avec les options <span class="menu">Get Info</span> pour visualiser les information sur le fichier, <span class="menu">Open</span> pour l'ouvrir dans le Tracker, <span class="menu">Open With</span> pour l'ouvrir avec un autre application adéquat, ou <span class="menu">Rescan</span> pour balayer à nouveau ce dossier là.<br />
-Un clic gauche sur un segment fera de ce fichier ou dossier, le nouveau centre du cercle.<br />
-En cliquant au centre du cercle vous remontrez d'un niveau.</p>
+<p>Right-clicking a segment offers a context menu to <span class="menu">Get info</span>, <span class="menu">Open</span> (with Tracker), <span class="menu">Open with</span> another suitable application or <span class="menu">Rescan</span> that particular folder.<br />
+Left-clicking a segment makes that file/folder the center circle.<br />
+Left-clicking the center circle moves you up one level.</p>
 <p>Vous pouvez faire glisser des fichiers et des dossiers à partir de DiskUsage vers d'autres applications comme la Deskbar ou le Tracker, pour les copier.
 Vice versa, déplacer un volume ou un dossier vers DiskUsage zoomera directement sur eux, faisant d'eux le nouveau centre du cercle.</p>
+<p>vous pouvez aussi utiliser l'extension du Tracker à partir du menu contextuel de n'importe quel dossier pour démarrer DiskUsage dans cet emplacement particulier.</p>
 
 </div>
 </div>

@@ -42,12 +42,14 @@
 <li><a href="../sk/workshop-filetypes+attributes.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../hu/workshop-filetypes+attributes.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pt_BR/workshop-filetypes+attributes.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../ca/workshop-filetypes+attributes.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../en/workshop-filetypes+attributes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
  «  <a href="queries.html">查询</a> 
 ::  <a href="contents.html" class="uplink">内容</a> 
-::  <a href="applications.html">应用程序</a>  »
+::  <a href="applications.html">应用程序
+</a>  »
 </span></div>
 </div>
 
@@ -81,8 +83,9 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="preparations" name="preparations">准备工作</a></h2>
-<p>首先确定适合需要的文件类型和属性，最初，我想使用一个书签文件来链接到电影的网络电影数据库页面，但是Haiku暂时没有类似于“BeOS”的支持“书签”的<span class="app">NetPositive</span>浏览器，所以我使用了下面的方法：该文件是一个JPEG格式图像，并且作为电影的封面。<br />
-为此，我们需要添加一些属性。那么我们必须决定将来是否对其进行查询（然后，把它添加到索引），如果这样做，它是什么类型的属性，数字（int, float）的评比效果将会与文本具有很大不同（&lt; ，=，和&gt; 对比 is，contains，和starts with）。</p>
+<p>首先确定能够满足我们需要的文件类型和属性，最初，我想使用一个书签文件来链接到电影的网络电影数据库页面，但是Haiku暂时没有类似于“BeOS”的支持“书签”的<span class="app">NetPositive</span>浏览器，所以我使用了下面的方法：该文件是一个JPEG格式图像，并且作为电影的封面。<br />
+现在有了 <span class="app">WebPositive</span>，Haiku 有课可以使用书签文件的浏览器，所以您可以使用书签文件来替换图像来作为我们数据库文件的基本文件类型。<br />
+总之，我们为这些文件添加一些属性。那么接下来我们需要确定是否会再次进行查询（之后我们将其添加到索引），如果这样，那么需要使用何种类型的属性。数值 (int, float) 不同于文本，可以进行计算 (&lt;/=/&gt; vs. is/contains/starts with)。</p>
 <p>我希望可以把下面的属性用于DVD文件：</p>
 <ul>
 <li>Movie title（电影标题）</li>
@@ -227,7 +230,8 @@ mkindex -t int DVDdb:rating</pre>
 <div class="inner"><span>
  «  <a href="queries.html">查询</a> 
 ::  <a href="contents.html" class="uplink">内容</a> 
-::  <a href="applications.html">应用程序</a>  »
+::  <a href="applications.html">应用程序
+</a>  »
 </span></div>
 </div>
 
