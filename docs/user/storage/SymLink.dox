@@ -8,13 +8,13 @@
  *		Ingo Weinhold, bonefish@users.sf.net
  *
  * Corresponds to:
- *		headers/os/storage/Symlink.h	hrev45306
- *		src/kits/storage/Symlink.cpp	hrev45306
+ *		headers/os/storage/SymLink.h	hrev45306
+ *		src/kits/storage/SymLink.cpp	hrev45306
  */
 
 
 /*!
-	\file Symlink.h
+	\file SymLink.h
 	\ingroup storage
 	\ingroup libbe
 	\brief Provides the BSymLink class.
