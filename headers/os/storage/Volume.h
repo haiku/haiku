@@ -13,6 +13,7 @@
 #include <StorageDefs.h>
 #include <SupportDefs.h>
 
+
 class BDirectory;
 class BBitmap;
 
@@ -66,8 +67,12 @@ private:
 	virtual void			_TurnUpTheVolume8();
 
 			dev_t			fDevice;
+								// The device ID of the volume.
 			status_t		fCStatus;
+								// The initialization status of the object.
 			int32			_reserved[8];
+								// FBC
 };
+
 
 #endif	// _VOLUME_H
