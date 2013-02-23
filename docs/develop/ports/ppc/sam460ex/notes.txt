@@ -12,6 +12,15 @@ tftpboot 0xc000000 192.168.4.2:sam460ex.dtb
 fdt addr 0xc000000
 fdt header
 bootm 0x4000000 0x8000000 0xc000000 plop
+** for environment:
+setenv booth1 'setenv ipaddr 192.168.4.100; tftpboot 0x4000000 192.168.4.2:haiku_loader_linux.ub'
+setenv booth2 'tftpboot 0x8000000 192.168.4.2:haiku_initrd.ub'
+setenv booth3 'tftpboot 0xc000000 192.168.4.2:sam460ex.dtb'
+setenv booth4 'bootm 0x4000000 0x8000000 0xc000000 plop'
+setenv booth 'run booth1; run booth2; run booth3; run booth4'
+saveenv
+run booth
+
 
 * TODO U-Boot API?
 ** TODO move Partenope hack to proper official U-Boot API?
