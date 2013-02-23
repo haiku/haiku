@@ -37,6 +37,8 @@ All rights reserved.
 #include "TimeView.h"
 
 #include <string.h>
+#include <stdint.h>
+	// for INT16_MIN and INT16_MAX
 
 #include <Application.h>
 #include <Catalog.h>
@@ -69,6 +71,7 @@ TTimeView::TTimeView(float maxWidth, float height)
 	fMaxWidth(maxWidth),
 	fHeight(height),
 	fOrientation(true),
+	fShowLevel(0),
 	fShowSeconds(false),
 	fShowDayOfWeek(false),
 	fShowTimeZone(false)
@@ -116,10 +119,11 @@ status_t
 TTimeView::Archive(BMessage* data, bool deep) const
 {
 	BView::Archive(data, deep);
+	data->AddBool("orientation", fOrientation);
+	data->AddInt16("showLevel", fShowLevel);
 	data->AddBool("showSeconds", fShowSeconds);
 	data->AddBool("showDayOfWeek", fShowDayOfWeek);
 	data->AddBool("showTimeZone", fShowTimeZone);
-	data->AddBool("orientation", fOrientation);
 	data->AddInt32("deskbar:private_align", B_ALIGN_RIGHT);
 
 	return B_OK;
@@ -180,6 +184,17 @@ TTimeView::GetPreferredSize(float* width, float* height)
 	*width = fOrientation ?
 		min_c(fMaxWidth - kHMargin, kHMargin + StringWidth(fCurrentTimeStr))
 		: kHMargin + StringWidth(fCurrentTimeStr);
+}
+
+
+void
+TTimeView::Hide()
+{
+	// Prevent overflow
+	if (fShowLevel < INT16_MAX)
+		++fShowLevel;
+
+	BView::Hide();
 }
 
 
@@ -289,6 +304,17 @@ TTimeView::ResizeToPreferred()
 		MoveBy(oldWidth - width, 0);
 		fNeedToUpdate = true;
 	}
+}
+
+
+void
+TTimeView::Show()
+{
+	// Prevent underflow
+	if (fShowLevel > INT16_MIN)
+		--fShowLevel;
+
+	BView::Show();
 }
 
 

@@ -88,10 +88,13 @@ public:
 				void			Draw(BRect update);
 				void			FrameMoved(BPoint);
 				void			GetPreferredSize(float* width, float* height);
+				void			Hide();
+				bool			IsHidden() const { return fShowLevel > 0; };
 				void			MessageReceived(BMessage*);
 				void			MouseDown(BPoint where);
 				void			Pulse();
 				void			ResizeToPreferred();
+				void			Show();
 
 				bool			Orientation() const;
 				void			SetOrientation(bool o);
@@ -133,15 +136,13 @@ private:
 
 				float			fMaxWidth;
 				float			fHeight;
-				bool			fOrientation; // vertical = true
+				bool			fOrientation;
+									// vertical = true
+				int16			fShowLevel;
 
-				bool			fOverrideLocale;
-				bool			fUse24HourClock;
 				bool			fShowSeconds;
 				bool			fShowDayOfWeek;
 				bool			fShowTimeZone;
-
-				BString			fTimeFormat;
 
 				BPoint			fTimeLocation;
 				BPoint			fDateLocation;
