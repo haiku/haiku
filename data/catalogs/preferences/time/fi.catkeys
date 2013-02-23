@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Time	3544635877
+1	finnish	x-vnd.Haiku-Time	3259467657
 GMT (UNIX compatible)	Time		Greenwichin aika (UNIX-yhteensopiva)
 OK	Time		Valmis
 Asia	Time		Aasia
@@ -11,6 +11,7 @@ Preview time:	Time		Esikatseluaika:
 Synchronize	Time		Synkronoi
 Revert	Time		Palauta
 Pacific	Time		Tyyni valtameri
+Show day of week	Time		Näytä viikonpäivä
 Add	Time		Lisää
 Date and time	Time		Päivämäärä ja aika
 about	Time		Ohjelmasta
@@ -26,6 +27,7 @@ Time	Time		Aika
 Indian	Time		Intia
 Sending request failed	Time		Pyynnön lähettäminen epäonnistui
 Arctic	Time		Pohjoinen napaseutu
+Display time with seconds	Time		Näytä aika sekunteina
 Time	System name		Aika-asetukset
 America	Time		Amerikka
 Reset	Time		Nollaa
@@ -33,6 +35,8 @@ Synchronize at boot	Time		Synkronoi alkulatauksen yhteydessä
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date, tekijät:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Received invalid time	Time		Vastaanotettiin virheellinen aika
 Antarctica	Time		Etelänapamanner
+Show time zone	Time		Näytä aikavyöhyke
+Show clock in Deskbar	Time		Näytä kello työpöytäpalkissa
 The following error occured while synchronizing:r\n%s: %s	Time		Seuraava virhe tapahtui synkronoinnin aikana:r\n%s: %s
 <Other>	Time		<Muut>
 Current time:	Time		Nykyinen aika:

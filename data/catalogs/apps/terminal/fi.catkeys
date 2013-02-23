@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Terminal	766764238
+1	finnish	x-vnd.Haiku-Terminal	2645209895
 Not found.	Terminal TermWindow		Ei löytynyt.
 Switch Terminals	Terminal TermWindow		Vaihda pääteikkunoita
 Change directory	Terminal TermView		Vaihda hakemistoa
@@ -21,6 +21,7 @@ Font:	Terminal AppearancePrefView		Kirjasintyyppi:
 Copy here	Terminal TermView		Kopioi tänne
 Really close?	Terminal TermWindow		Suljetaanko todella?
 Copy	Terminal TermWindow		Kopioi
+Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Pääteikkuna
 Color scheme:	Terminal AppearancePrefView		Väriteema:
 Window title:	Terminal TermWindow		Ikkunaotsikko:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Tunnistamaton valitsin ”%s”\n
@@ -61,6 +62,7 @@ Text not found.	Terminal TermWindow		Tekstiä ei löydy.
 Find…	Terminal TermWindow		Etsi...
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Prosessia ”%1” suoritetaan yhä.\nJos suljet Pääteikkunan, prosessi tapetaan.
 Move here	Terminal TermView		Siirrä tänne
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAktiivin prosessin nykyinen työhakemisto on nykyisessä\n\t\t\tvälilehdessä. Valinnaisesti voidaan määritellä polkukomponenttien\n\t\t\tenimmäismäärä. Esim.: '%2d' vähintään kahdelle komponentille.\n\t%T\t-\tPääteikkunan nimi nykyisillä paikallisasetuksilla.\n\t%i\t-\tIkkunaindeksi.\n\t%p\t-\tAktiivin prosessin nimi nykyisessä välilehdessä.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tMerkki '%'.
 Retro	Terminal colors scheme		Retro
 Error!	Terminal getString		Virhe!
 New tab	Terminal TermWindow		Uusi välilehti

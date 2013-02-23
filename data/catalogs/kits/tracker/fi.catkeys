@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	3375521561
+1	finnish	x-vnd.Haiku-libtracker	4167158175
 common	B_COMMON_DIRECTORY		yhteinen
 OK	WidgetAttributeText		Valmis
 Icon view	VolumeWindow		Kuvakenäkymä
@@ -74,6 +74,7 @@ Arrange by	ContainerWindow		Järjestä:
 Mount server error	AutoMounterSettings		Liittämispalvelinvirhe
 Search	FindPanel		Haku
 Preparing to empty Trash…	StatusWindow		Valmistaudutaan tyhjentämään roskakori...
+You cannot put the selected item(s) into the trash.	FSUtils		Et voi laittaa valittuja kohteita roskakoriin.
 Disks	Model		Levyt
 Create link	ContainerWindow		Luo linkki
 develop	B_COMMON_DEVELOP_DIRECTORY		kehitys
