@@ -15,8 +15,8 @@ Preference Appearance :
 	FontView.cpp
 	APRView.cpp
 	APRWindow.cpp
+	ColorPreview.cpp
 	ColorSet.cpp
-	ColorWell.cpp
 	ColorWhichItem.cpp
 
 	# These are currently disabled while everything else is being worked on
@@ -38,11 +38,10 @@ DoCatalogs Appearance :
 	AntialiasingSettingsView.cpp
 	APRView.cpp
 	APRWindow.cpp
+	ColorPreview.cpp
 	ColorSet.cpp
-	ColorWell.cpp
 	ColorWhichItem.cpp
 	LookAndFeelSettingsView.cpp
 	FontView.cpp
 	FontSelectionView.cpp
 ;
-
