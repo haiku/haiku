@@ -340,9 +340,9 @@ BMenuBar::MouseDown(BPoint where)
 
 	uint32 buttons;
 	GetMouse(&where, &buttons);
- 
-  	BWindow* window = Window();
-  	if (!window->IsActive() || !window->IsFront()) {
+
+	BWindow* window = Window();
+	if (!window->IsActive() || !window->IsFront()) {
 		if ((mouse_mode() == B_FOCUS_FOLLOWS_MOUSE)
 			|| ((mouse_mode() == B_CLICK_TO_FOCUS_MOUSE)
 				&& ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0))) {
@@ -500,8 +500,8 @@ BMenuBar::StartMenuBar(int32 menuIndex, bool sticky, bool showMenu,
 	fMenuSem = create_sem(0, "window close sem");
 	_set_menu_sem_(window, fMenuSem);
 
-	fTrackingPID = spawn_thread(_TrackTask, "menu_tracking", B_DISPLAY_PRIORITY,
-		NULL);
+	fTrackingPID = spawn_thread(_TrackTask, "menu_tracking",
+		B_DISPLAY_PRIORITY, NULL);
 	if (fTrackingPID >= 0) {
 		menubar_data data;
 		data.menuBar = this;
@@ -699,7 +699,6 @@ BMenuBar::_Track(int32* action, int32 startIndex, bool showMenu)
 		*action = fState;
 
 	return fChosenItem;
-
 }
 
 
