@@ -195,6 +195,14 @@ TExpandoMenuBar::DetachedFromWindow()
 	if (sMonThread != B_ERROR) {
 		sDoMonitor = false;
 
+		if (Window()->IsLocked()) {
+			// If window is locked by the menu_tracking thread kill it
+			// to prevent a deadlock. See ticket #8539.
+			thread_id menu_tracking = find_thread("menu_tracking");
+			if (menu_tracking != B_NAME_NOT_FOUND)
+				kill_thread(menu_tracking);
+		}
+
 		status_t returnCode;
 		wait_for_thread(sMonThread, &returnCode);
 
