@@ -241,29 +241,6 @@ detect_crt_ranges(uint32 crtid)
 }
 
 
-static void
-remove_dup_displays(uint32 displayIndex, uint32 id)
-{
-	/* hack for both digital and analog interfaces active */
-	if ((displayIndex > 0) && gDisplay[displayIndex]->attached) {
-		if (gConnector[id-1]->encoder.type == VIDEO_ENCODER_TMDS) {
-			int gpioID1 = gConnector[id-1]->gpioID;
-			int gpioID2 = gConnector[id]->gpioID;
-			edid1_info* edid = &gDisplay[displayIndex-1]->edidData;
-
-			if ((gGPIOInfo[gpioID1]->hwPin == gGPIOInfo[gpioID2]->hwPin) &&
-					edid->display.input_type)
-				// give preference to digital display when both are present
-				// and other display indicates it is digital
-				TRACE("%s: skipping connector %" B_PRIu32
-						": giving preference to digital "
-						"connector %d\n", __func__, id, id-1);
-				gDisplay[displayIndex]->attached = 0;
-		}
-	}
-}
-
-
 status_t
 detect_displays()
 {
@@ -332,45 +309,36 @@ detect_displays()
 			gDisplay[displayIndex]->attached
 				= connector_read_edid(id, &gDisplay[displayIndex]->edidData);
 
-			// Since DVI-I shows up as two connectors, and there is only one
-			// edid channel, we have to make *sure* the edid data received is
-			// valid for the connector.
-
 			// Found EDID data?
 			if (gDisplay[displayIndex]->attached) {
 				TRACE("%s: connector(%" B_PRIu32 "): found EDID data.\n",
 					__func__, id);
 
-				bool analogEncoder
-					= gConnector[id]->encoder.type == VIDEO_ENCODER_TVDAC
-					|| gConnector[id]->encoder.type == VIDEO_ENCODER_DAC;
+				if (gConnector[id]->type == VIDEO_CONNECTOR_DVII
+					|| gConnector[id]->type == VIDEO_CONNECTOR_HDMIB) {
+					// These connectors can share gpio pins for data
+					// communication between digital and analog encoders
+					// (DVI-I is most common)
+					edid1_info* edid = &gDisplay[displayIndex]->edidData;
 
-				edid1_info* edid = &gDisplay[displayIndex]->edidData;
-				if (!edid->display.input_type && analogEncoder) {
-					// If non-digital EDID + the encoder is analog...
-					TRACE("%s: connector(%" B_PRIu32 "): has non-digital EDID "
-						"and a analog encoder.\n", __func__, id);
-					gDisplay[displayIndex]->attached
-						= encoder_analog_load_detect(id);
-					remove_dup_displays(displayIndex, id);
-				} else if (edid->display.input_type && !analogEncoder) {
-					// If EDID is digital, we make an assumption here.
-					TRACE("%s: connector(%" B_PRIu32 "): has digital EDID "
-						"and is not a analog encoder.\n", __func__, id);
-				} else {
-					// This generally means the monitor is of poor design
-					// Since we *know* there is no load on the analog encoder
-					// we assume that it is a digital display.
-					// This can also occur when a display has both DVI and VGA
-					// inputs and the graphics board has a DVI-I connector
-					// (reported as both digital and analog connectors) and the
-					// analog connection is the one in use. In that case, we
-					// get here when checking the digital connector and want
-					// to disable that display in favor of the analog one.
-					TRACE("%s: connector(%" B_PRIu32 "): Warning: monitor has "
-						"false digital EDID flag + unloaded analog encoder!\n",
-						__func__, id);
-					gDisplay[displayIndex]->attached = false;
+					bool analogEncoder
+						= gConnector[id]->encoder.type == VIDEO_ENCODER_TVDAC
+						|| gConnector[id]->encoder.type == VIDEO_ENCODER_DAC;
+					bool digitalEncoder
+						= gConnector[id]->encoder.type == VIDEO_ENCODER_TMDS;
+
+					bool digitalEdid = edid->display.input_type ? true : false;
+
+					if (digitalEdid && analogEncoder) {
+						// Digital EDID + analog encoder? Lets try a load test
+						gDisplay[displayIndex]->attached
+							= encoder_analog_load_detect(id);
+					} else if (!digitalEdid && digitalEncoder) {
+						// non-digital EDID + digital encoder? Nope.
+						gDisplay[displayIndex]->attached = false;
+					}
+
+					// Else... everything aligns as it should and attached = 1
 				}
 			}
 		}
