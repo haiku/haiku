@@ -337,66 +337,66 @@ TExpandoMenuBar::MouseDown(BPoint where)
 	BMenuItem* menuItem;
 	TTeamMenuItem* item = TeamItemAtPoint(where, &menuItem);
 
-	// check for three finger salute, a.k.a. Vulcan Death Grip
-	if (message != NULL && item != NULL && !fBarView->Dragging()) {
-		int32 modifiers = 0;
-		message->FindInt32("modifiers", &modifiers);
-
-		if ((modifiers & B_COMMAND_KEY) != 0
-			&& (modifiers & B_CONTROL_KEY) != 0
-			&& (modifiers & B_SHIFT_KEY) != 0) {
-			const BList* teams = item->Teams();
-			int32 teamCount = teams->CountItems();
-
-			team_id teamID;
-			for (int32 team = 0; team < teamCount; team++) {
-				teamID = (addr_t)teams->ItemAt(team);
-				kill_team(teamID);
-				// remove the team immediately from display
-				RemoveTeam(teamID, false);
-			}
-
-			return;
-		}
-
-		// control click - show all/hide all shortcut
-		if ((modifiers & B_CONTROL_KEY) != 0) {
-			// show/hide item's teams
-			BMessage showMessage((modifiers & B_SHIFT_KEY) != 0
-				? kMinimizeTeam : kBringTeamToFront);
-			showMessage.AddInt32("itemIndex", IndexOf(item));
-			Window()->PostMessage(&showMessage, this);
-			return;
-		}
-
-		// Check the bounds of the expand Team icon
-		if (fShowTeamExpander && fVertical) {
-			BRect expanderRect = item->ExpanderBounds();
-			if (expanderRect.Contains(where)) {
-				// Let the update thread wait...
-				BAutolock locker(sMonLocker);
-
-				// Toggle the item
-				item->ToggleExpandState(true);
-				item->Draw();
-
-				// Absorb the message.
-				return;
-			}
-		}
-
-		// double-click on an item brings the team to front
-		int32 clicks;
-		if (message->FindInt32("clicks", &clicks) == B_OK && clicks > 1
-			&& item == menuItem && item == fLastClickItem) {
-			// activate this team
-			be_roster->ActivateApp((addr_t)item->Teams()->ItemAt(0));
-			return;
-		}
-
-		fLastClickItem = item;
+	if (message == NULL || item == NULL || fBarView->Dragging()) {
+		BMenuBar::MouseDown(where);
+		return;
 	}
 
+	int32 modifiers = 0;
+	message->FindInt32("modifiers", &modifiers);
+
+	// check for three finger salute, a.k.a. Vulcan Death Grip
+	if ((modifiers & B_COMMAND_KEY) != 0
+		&& (modifiers & B_CONTROL_KEY) != 0
+		&& (modifiers & B_SHIFT_KEY) != 0) {
+		const BList* teams = item->Teams();
+		int32 teamCount = teams->CountItems();
+		team_id teamID;
+		for (int32 team = 0; team < teamCount; team++) {
+			teamID = (addr_t)teams->ItemAt(team);
+			kill_team(teamID);
+			RemoveTeam(teamID, false);
+				// remove the team from display immediately
+		}
+		return;
+			// absorb the message
+	}
+
+	// control click - show all/hide all shortcut
+	if ((modifiers & B_CONTROL_KEY) != 0) {
+		// show/hide item's teams
+		BMessage showMessage((modifiers & B_SHIFT_KEY) != 0
+			? kMinimizeTeam : kBringTeamToFront);
+		showMessage.AddInt32("itemIndex", IndexOf(item));
+		Window()->PostMessage(&showMessage, this);
+		return;
+			// absorb the message
+	}
+
+	// Check the bounds of the expand Team icon
+	if (fVertical && fShowTeamExpander) {
+		if (item->ExpanderBounds().Contains(where)) {
+			BAutolock locker(sMonLocker);
+				// let the update thread wait...
+			item->ToggleExpandState(true);
+				// toggle the item
+			item->Draw();
+			return;
+				// absorb the message
+		}
+	}
+
+	// double-click on an item brings the team to front
+	int32 clicks;
+	if (message->FindInt32("clicks", &clicks) == B_OK && clicks > 1
+		&& item == menuItem && item == fLastClickItem) {
+		be_roster->ActivateApp((addr_t)item->Teams()->ItemAt(0));
+			// activate this team
+		return;
+			// absorb the message
+	}
+
+	fLastClickItem = item;
 	BMenuBar::MouseDown(where);
 }
 
