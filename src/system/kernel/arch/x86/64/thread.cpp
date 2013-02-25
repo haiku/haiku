@@ -197,6 +197,14 @@ arch_thread_dump_info(void* info)
 }
 
 
+static addr_t
+arch_randomize_stack_pointer(addr_t value)
+{
+	value -= rand() & (B_PAGE_SIZE - 1);
+	return value & ~0xful;
+}
+
+
 /*!	Sets up initial thread context and enters user space
 */
 status_t
@@ -207,6 +215,8 @@ arch_thread_enter_userspace(Thread* thread, addr_t entry, void* args1,
 
 	TRACE("arch_thread_enter_userspace: entry %#lx, args %p %p, "
 		"stackTop %#lx\n", entry, args1, args2, stackTop);
+
+	stackTop = arch_randomize_stack_pointer(stackTop);
 
 	// Copy the little stub that calls exit_thread() when the thread entry
 	// function returns.
