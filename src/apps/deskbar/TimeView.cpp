@@ -188,17 +188,6 @@ TTimeView::GetPreferredSize(float* width, float* height)
 
 
 void
-TTimeView::Hide()
-{
-	// Prevent overflow
-	if (fShowLevel < INT16_MAX)
-		++fShowLevel;
-
-	BView::Hide();
-}
-
-
-void
 TTimeView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
@@ -304,17 +293,6 @@ TTimeView::ResizeToPreferred()
 		MoveBy(oldWidth - width, 0);
 		fNeedToUpdate = true;
 	}
-}
-
-
-void
-TTimeView::Show()
-{
-	// Prevent underflow
-	if (fShowLevel > INT16_MIN)
-		--fShowLevel;
-
-	BView::Show();
 }
 
 
