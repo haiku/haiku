@@ -29,6 +29,15 @@
 #endif
 
 
+#ifdef B_HAIKU_64_BIT
+const addr_t VMUserAddressSpace::kMaxRandomize			=  0x8000000000ul;
+const addr_t VMUserAddressSpace::kMaxInitialRandomize	= 0x20000000000ul;
+#else
+const addr_t VMUserAddressSpace::kMaxRandomize			=  0x800000ul;
+const addr_t VMUserAddressSpace::kMaxInitialRandomize	= 0x2000000ul;
+#endif
+
+
 /*!	Verifies that an area with the given aligned base and size fits into
 	the spot defined by base and limit and checks for overflows.
 */
@@ -37,6 +46,26 @@ is_valid_spot(addr_t base, addr_t alignedBase, addr_t size, addr_t limit)
 {
 	return (alignedBase >= base && alignedBase + (size - 1) > alignedBase
 		&& alignedBase + (size - 1) <= limit);
+}
+
+
+/* http://graphics.stanford.edu/~seander/bithacks.html */
+static inline int
+log2(uint32_t v)
+{
+	static const int multiply_debruijn_bit_position[32] =
+	{
+		0, 9, 1, 10, 13, 21, 2, 29, 11, 14, 16, 18, 22, 25, 3, 30,
+		8, 12, 20, 28, 15, 17, 24, 7, 19, 27, 23, 6, 26, 5, 4, 31
+	};
+
+	v |= v >> 1;
+	v |= v >> 2;
+	v |= v >> 4;
+	v |= v >> 8;
+	v |= v >> 16;
+
+	return multiply_debruijn_bit_position[(uint32_t)(v * 0x07c4acddu) >> 27];
 }
 
 
@@ -137,6 +166,7 @@ VMUserAddressSpace::InsertArea(VMArea* _area, size_t size,
 			break;
 
 		case B_BASE_ADDRESS:
+		case B_RANDOMIZED_BASE_ADDRESS:
 			searchBase = (addr_t)addressRestrictions->address;
 			searchEnd = fEndAddress;
 			break;
@@ -371,6 +401,41 @@ VMUserAddressSpace::Dump() const
 }
 
 
+addr_t
+VMUserAddressSpace::_RandomizeAddress(addr_t start, addr_t end, bool initial)
+{
+	if (start == end)
+		return start;
+
+	const int kRandShift = log2(RAND_MAX) + 1;
+	int shift = 0;
+#ifdef B_HAIKU_64_BIT
+	uint64_t random = 0;
+	while (shift < 64) {
+		random |= (uint64_t)rand() << shift;
+		shift += kRandShift;
+	}
+#else
+	uint32_t random = 0;
+	while (shift < 32) {
+		random |= (uint32_t)rand() << shift;
+		shift += kRandShift;
+	}
+#endif
+
+	addr_t range = end - start;
+	if (initial)
+		range = min_c(range, kMaxInitialRandomize);
+	else
+		range = min_c(range, kMaxRandomize);
+
+	random %= range;
+	random &= ~addr_t(B_PAGE_SIZE - 1);
+
+	return start + random;
+}
+
+
 /*!	Finds a reserved area that covers the region spanned by \a start and
 	\a size, inserts the \a area into that region and makes sure that
 	there are reserved regions for the remaining parts.
@@ -459,6 +524,7 @@ VMUserAddressSpace::_InsertAreaSlot(addr_t start, addr_t size, addr_t end,
 	VMUserArea* last = NULL;
 	VMUserArea* next;
 	bool foundSpot = false;
+	addr_t originalStart = 0;
 
 	TRACE(("VMUserAddressSpace::_InsertAreaSlot: address space %p, start "
 		"0x%lx, size %ld, end 0x%lx, addressSpec %" B_PRIu32 ", area %p\n",
@@ -487,6 +553,11 @@ VMUserAddressSpace::_InsertAreaSlot(addr_t start, addr_t size, addr_t end,
 		// align the memory to the next power of two of the size
 		while (alignment < size)
 			alignment <<= 1;
+	}
+
+	if (addressSpec == B_RANDOMIZED_BASE_ADDRESS) {
+		originalStart = start;
+		start = _RandomizeAddress(start, end - size, true);
 	}
 
 	start = ROUNDUP(start, alignment);
@@ -614,6 +685,7 @@ second_chance:
 		}
 
 		case B_BASE_ADDRESS:
+		case B_RANDOMIZED_BASE_ADDRESS:
 		{
 			// find a hole big enough for a new area beginning with "start"
 			if (last == NULL) {
@@ -646,15 +718,33 @@ second_chance:
 				foundSpot = true;
 				if (lastEnd < start)
 					area->SetBase(start);
-				else
-					area->SetBase(lastEnd + 1);
+				else {
+					start = lastEnd + 1;
+					if (addressSpec == B_RANDOMIZED_BASE_ADDRESS) {
+						addr_t spaceEnd = end;
+						if (next != NULL)
+							spaceEnd = next->Base();
+
+						start = _RandomizeAddress(lastEnd + 1, spaceEnd - size,
+							false);
+					}
+
+					area->SetBase(start);
+				}
 				break;
 			}
 
 			// we didn't find a free spot in the requested range, so we'll
 			// try again without any restrictions
-			start = fBase;
-			addressSpec = B_ANY_ADDRESS;
+			if (addressSpec != B_RANDOMIZED_BASE_ADDRESS
+				|| originalStart == 0) {
+				start = fBase;
+				addressSpec = B_ANY_ADDRESS;
+			} else {
+				start = originalStart;
+				originalStart = 0;
+			}
+
 			last = NULL;
 			goto second_chance;
 		}

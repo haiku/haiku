@@ -1219,6 +1219,7 @@ vm_create_anonymous_area(team_id team, const char *name, addr_t size,
 		case B_BASE_ADDRESS:
 		case B_ANY_KERNEL_ADDRESS:
 		case B_ANY_KERNEL_BLOCK_ADDRESS:
+		case B_RANDOMIZED_BASE_ADDRESS:
 			break;
 
 		default:
