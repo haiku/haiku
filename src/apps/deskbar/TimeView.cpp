@@ -37,8 +37,6 @@ All rights reserved.
 #include "TimeView.h"
 
 #include <string.h>
-#include <stdint.h>
-	// for INT16_MIN and INT16_MAX
 
 #include <Application.h>
 #include <Catalog.h>
