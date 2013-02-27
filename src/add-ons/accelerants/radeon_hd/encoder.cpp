@@ -324,9 +324,6 @@ encoder_mode_set(uint8 crtcID)
 		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
 		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
-			// already handled by virue of setting DPMS_OFF before
-			// getting here
-#if 0
 			if ((info.chipsetFlags & CHIP_APU) != 0
 				|| info.dceMajor >= 5) {
 				// Setup DIG encoder
@@ -359,7 +356,6 @@ encoder_mode_set(uint8 crtcID)
 				transmitter_dig_setup(connectorIndex, pixelClock, 0, 0,
 					ATOM_TRANSMITTER_ACTION_ENABLE);
 			}
-#endif
 			break;
 		case ENCODER_OBJECT_ID_INTERNAL_DDI:
 		case ENCODER_OBJECT_ID_INTERNAL_DVO1:
