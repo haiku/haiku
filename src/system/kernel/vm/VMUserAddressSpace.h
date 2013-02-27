@@ -54,7 +54,7 @@ public:
 
 private:
 	static	addr_t				_RandomizeAddress(addr_t start, addr_t end,
-									bool initial);
+									size_t alignment, bool initial = false);
 
 			status_t			_InsertAreaIntoReservedRegion(addr_t start,
 									size_t size, VMUserArea* area,

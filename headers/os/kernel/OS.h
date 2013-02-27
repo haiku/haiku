@@ -79,7 +79,7 @@ typedef struct area_info {
 #define B_CLONE_ADDRESS				3
 #define	B_ANY_KERNEL_ADDRESS		4
 /* B_ANY_KERNEL_BLOCK_ADDRESS		5 */
-/* B_RANDOMIZED_ANY_ADDRESS			6 */
+#define B_RANDOMIZED_ANY_ADDRESS	6
 #define B_RANDOMIZED_BASE_ADDRESS	7
 
 /* area protection */
