@@ -99,12 +99,12 @@ __init_heap(void)
 	// size of the heap is guaranteed until the space is really needed.
 	sHeapBase = (void *)kHeapReservationBase;
 	status_t status = _kern_reserve_address_range((addr_t *)&sHeapBase,
-		B_EXACT_ADDRESS, kHeapReservationSize);
+		B_RANDOMIZED_BASE_ADDRESS, kHeapReservationSize);
 	if (status != B_OK)
 		sHeapBase = NULL;
 
 	sHeapArea = create_area("heap", (void **)&sHeapBase,
-		status == B_OK ? B_EXACT_ADDRESS : B_BASE_ADDRESS,
+		status == B_OK ? B_EXACT_ADDRESS : B_RANDOMIZED_BASE_ADDRESS,
 		kInitialHeapSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (sHeapArea < B_OK)
 		return sHeapArea;
@@ -271,8 +271,8 @@ hoardSbrk(long size)
 		// allocation.
 		if (area < 0) {
 			base = (void*)(sFreeHeapBase + sHeapAreaSize);
-			area = create_area("heap", &base, B_BASE_ADDRESS, newHeapSize,
-				B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+			area = create_area("heap", &base, B_RANDOMIZED_BASE_ADDRESS,
+				newHeapSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 		}
 
 		if (area < 0) {
