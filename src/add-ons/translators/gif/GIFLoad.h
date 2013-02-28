@@ -86,7 +86,7 @@ class GIFLoad {
 		int fPass, fRow, fWidth, fHeight;
 		
 		unsigned char fOldCode[4096];
-		int fOldCodeLength;
+		unsigned int fOldCodeLength;
 		short fNewCode;
 		int fBits, fMaxCode, fCodeSize;
 		short fClearCode, fEndCode, fNextCode;
