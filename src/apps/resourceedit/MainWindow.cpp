@@ -759,8 +759,8 @@ MainWindow::_Load()
 				continue;
 			}
 		} else if (t_state == T_STATE_STRING) {
-			if (in[i] == '\\' && escChars[in[i]] != ~(char)0) {
-				buffer += escChars[in[i]];
+			if (in[i] == '\\' && escChars[(int)in[i]] != ~(char)0) {
+				buffer += escChars[(int)in[i]];
 				i++;
 				continue;
 			}
