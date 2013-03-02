@@ -1,22 +1,27 @@
-1	japanese	x-vnd.Haiku-Network	365183238
+1	japanese	x-vnd.Haiku-Network	1341378870
 Choose automatically	EthernetSettingsView		自動選択
 Gateway:	EthernetSettingsView		ゲートウェイ:
 Netmask:	EthernetSettingsView		サブネットマスク:
 DHCP	EthernetSettingsView		自動 (DHCP)
 DNS #2:	EthernetSettingsView		セカンダリ DNS サーバー:
 Apply	EthernetSettingsView		適用
+Netmask is invalid	EthernetSettingsView		ネットマスクが正しくありません
 OK	EthernetSettingsView		Ok
 DNS #1:	EthernetSettingsView		プライマリ DNS サーバー:
 IP address:	EthernetSettingsView		IP アドレス:
 Adapter:	EthernetSettingsView		ネットワークアダプター:
 Domain:	EthernetSettingsView		ドメイン:
+Gateway is invalid	EthernetSettingsView		ゲートウェイが正しくありません
+DNS #1 is invalid	EthernetSettingsView		DNS #1 が正しくありません
 Revert	EthernetSettingsView		元に戻す
 <no wireless networks found>	EthernetSettingsView		<ワイヤレスネットワークが見つかりません>
 Network	System name		ネットワーク
 Mode:	EthernetSettingsView		モード:
+IP address is invalid	EthernetSettingsView		IP アドレスが正しくありません
 Network:	EthernetSettingsView		ネットワーク:
 The net_server needs to run for the auto configuration!	EthernetSettingsView		自動設定するには net_server が起動している必要があります！
 Disabled	EthernetSettingsView		無効
 Auto-configuring failed: 	EthernetSettingsView		自動設定に失敗しました:
 Static	EthernetSettingsView		固定 IP
+DNS #2 is invalid	EthernetSettingsView		DNS #2 が正しくありません
 <no adapter>	EthernetSettingsView		<アダプターがありません>

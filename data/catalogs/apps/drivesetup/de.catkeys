@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DriveSetup	3977871021
+1	german	x-vnd.Haiku-DriveSetup	3775412465
 DriveSetup	System name		Datenträgerverwaltung
 Cancel	AbstractParametersPanel		Abbrechen
 Delete	MainWindow		Löschen
@@ -63,6 +63,7 @@ Continue	MainWindow		Weiter
 Cannot delete the selected partition.	MainWindow		Gewählte Partition konnte nicht gelöscht werden.
 Mount all	MainWindow		Alle einhängen
 End: %s	Support		Ende: %s
+The panel could not return successfully.	MainWindow		Das Fenster meldete sich nicht mehr zurück.
 Cancel	MainWindow		Abbrechen
 Delete partition	MainWindow		Partition löschen
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Sollen die Parameter der ausgewählten Partition wirklich geändert werden?\n\nAndere Betriebssysteme können die Partition unter Umständen nicht mehr erkennen!

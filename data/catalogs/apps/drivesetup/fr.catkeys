@@ -1,11 +1,14 @@
-1	french	x-vnd.Haiku-DriveSetup	659039073
+1	french	x-vnd.Haiku-DriveSetup	1767229522
 DriveSetup	System name		Gestionnaire de disque
+Cancel	AbstractParametersPanel		Annuler
 Delete	MainWindow		Supprimer
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Êtes-vous sûr de vouloir écrire les changements sur le disque ?\n\nToutes les données de la partition sélectionnée seront effacées si vous le faites !
 Rescan	MainWindow		Analyser
 OK	MainWindow		OK
 Could not aquire partitioning information.	MainWindow		Impossible de récupérer les informations sur les partitions.
 There's no space on the partition where a child partition could be created.	MainWindow		Il n'y a pas de place dans cette partition pour créer une partition fille.
+Initialize	InitializeParametersPanel		Initialiser
+OK	AbstractParametersPanel		OK
 <empty>	PartitionList		<vide>
 Unable to find the selected partition by ID.	MainWindow		Impossible de trouver la partition sélectionnée par son ID.
 Select a partition from the list below.	DiskView		Sélectionnez une partition dans la liste ci-dessous.

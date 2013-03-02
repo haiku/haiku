@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-LaunchBox	3016105370
+1	swedish	x-vnd.Haiku-LaunchBox	3692177981
 New	LaunchBox		Ny
 Set description…	LaunchBox		Ange beskrivning...
 Vertical layout	LaunchBox		Vertikal utformning
@@ -6,6 +6,7 @@ OK	LaunchBox		OK
 Pad 1	LaunchBox		Block 1
 last chance	LaunchBox		sista chansen
 Quit	LaunchBox		Avsluta
+Open containing folder	LaunchBox		Öppna innehållande mapp
 Clear button	LaunchBox		Rensa knapp
 LaunchBox	System name		StartBlock
 Ignore double-click	LaunchBox		Ignorera dubbelklick

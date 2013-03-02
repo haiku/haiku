@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-LaunchBox	3016105370
+1	japanese	x-vnd.Haiku-LaunchBox	3692177981
 New	LaunchBox		新規作成
 Set description…	LaunchBox		説明の作成…
 Vertical layout	LaunchBox		垂直配置
@@ -6,6 +6,7 @@ OK	LaunchBox		OK
 Pad 1	LaunchBox		パッド 1
 last chance	LaunchBox		最後のチャンス
 Quit	LaunchBox		終了
+Open containing folder	LaunchBox		フォルダーを開く
 Clear button	LaunchBox		ボタンを消去
 LaunchBox	System name		ランチャー
 Ignore double-click	LaunchBox		ダブルクリックを無視する
