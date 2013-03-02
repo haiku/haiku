@@ -1803,9 +1803,9 @@ BScrollBar::_DrawArrowButton(int32 direction, bool doubleArrows, BRect r,
 			tri3.Set(r.right, r.bottom + 1);
 			break;
 		case ARROW_RIGHT:
-			tri1.Set(r.left, r.bottom + 1);
-			tri2.Set(r.left + r.Width() / 1.33, (r.top + r.bottom + 1) / 2);
-			tri3.Set(r.left, r.top);
+			tri1.Set(r.left + 1, r.bottom + 1);
+			tri2.Set(r.left + 1 + r.Width() / 1.33, (r.top + r.bottom + 1) / 2);
+			tri3.Set(r.left + 1, r.top);
 			break;
 		case ARROW_UP:
 			tri1.Set(r.left, r.bottom);
@@ -1813,9 +1813,9 @@ BScrollBar::_DrawArrowButton(int32 direction, bool doubleArrows, BRect r,
 			tri3.Set(r.right + 1, r.bottom);
 			break;
 		default:
-			tri1.Set(r.left, r.top);
-			tri2.Set((r.left + r.right + 1) / 2, r.top + r.Height() / 1.33);
-			tri3.Set(r.right + 1, r.top);
+			tri1.Set(r.left, r.top + 1);
+			tri2.Set((r.left + r.right + 1) / 2, r.top + 1 + r.Height() / 1.33);
+			tri3.Set(r.right + 1, r.top + 1);
 			break;
 	}
 	// offset triangle if down
