@@ -46,6 +46,7 @@ All rights reserved.
 #include "TimeView.h"
 
 
+const float kDragWidth = 4.0f;
 const float kMaxReplicantHeight = 16.0f;
 const float kMaxReplicantWidth = 16.0f;
 const int32 kMinimumReplicantCount = 6;
@@ -56,12 +57,13 @@ const int32 kDragRegionWidth = 6;
 // 1 pixel for left gutter
 // space for replicant tray (6 items)
 // 6 pixel drag region
-const float kMinimumTrayWidth = kIconGap
-		+ (kMinimumReplicantCount * kIconGap)
-		+ (kMinimumReplicantCount * kMaxReplicantWidth) + kGutter;
+const float kMinimumTrayWidth = kIconGap + kMaxReplicantWidth
+	+ (kMinimumReplicantCount * kIconGap)
+	+ (kMinimumReplicantCount * kMaxReplicantWidth) + kGutter;
 const float kMinimumTrayHeight = kGutter + kMaxReplicantHeight + kGutter;
 
 extern float gMinimumWindowWidth;
+extern float gMaximumWindowWidth;
 
 #ifdef DB_ADDONS
 struct DeskbarItemInfo {
@@ -193,12 +195,11 @@ enum {
 
 class TDragRegion : public BControl {
 public:
-	TDragRegion(TBarView*, BView*);
+	TDragRegion(TBarView* barView, BView* child);
 
 	virtual void AttachedToWindow();
 	virtual void GetPreferredSize(float*, float*);
 	virtual void Draw(BRect);
-	virtual void FrameMoved(BPoint);
 	virtual void MouseDown(BPoint);
 	virtual void MouseUp(BPoint);
 	virtual void MouseMoved(BPoint, uint32, const BMessage*);
@@ -212,13 +213,30 @@ public:
 	int32 DragRegionLocation() const;
 	void SetDragRegionLocation(int32);
 
-	bool IsDragging() {return IsTracking();}
+	bool IsDragging() { return IsTracking(); };
 
 private:
 	TBarView* fBarView;
 	BView* fChild;
 	BPoint fPreviousPosition;
 	int32 fDragLocation;
+};
+
+class TResizeControl : public BControl {
+public:
+	TResizeControl(TBarView* barView);
+	virtual	~TResizeControl();
+
+	virtual void AttachedToWindow();
+	virtual void Draw(BRect);
+	virtual void MouseDown(BPoint);
+	virtual void MouseUp(BPoint);
+	virtual void MouseMoved(BPoint, uint32, const BMessage*);
+
+	bool IsResizing() { return IsTracking(); };
+
+private:
+	TBarView* fBarView;
 };
 
 

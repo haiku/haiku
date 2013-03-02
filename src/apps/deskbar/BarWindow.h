@@ -47,14 +47,15 @@ class TBarWindow : public BWindow {
 public:
 								TBarWindow();
 
-	virtual void				MenusBeginning();
-	virtual void				MenusEnded();
+	virtual	void				MenusBeginning();
+	virtual	void				MenusEnded();
 	virtual	bool				QuitRequested();
-	virtual void				WorkspaceActivated(int32 workspace,
+	virtual	void				WorkspaceActivated(int32 workspace,
 									bool activate);
-	virtual void				ScreenChanged(BRect size, color_space depth);
-	virtual void				MessageReceived(BMessage* message);
-	virtual void				Minimize(bool minimize);
+	virtual	void				ScreenChanged(BRect size, color_space depth);
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	void				Minimize(bool minimize);
+	virtual	void				FrameResized(float width, float height);
 
 			void				SaveSettings();
 			TBarView*			BarView() const { return fBarView; };

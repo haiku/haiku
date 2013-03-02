@@ -72,6 +72,7 @@ class TBarMenuBar;
 class TExpandoMenuBar;
 class TReplicantTray;
 class TDragRegion;
+class TResizeControl;
 class TInlineScrollView;
 class TTeamMenuItem;
 
@@ -187,6 +188,7 @@ private:
 
 			int32			fTrayLocation;
 			TDragRegion*	fDragRegion;
+			TResizeControl*	fResizeControl;
 			TReplicantTray*	fReplicantTray;
 
 			bool			fVertical : 1;

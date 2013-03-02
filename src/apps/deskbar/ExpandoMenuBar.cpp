@@ -894,7 +894,7 @@ void
 TExpandoMenuBar::SetMaxItemWidth()
 {
 	if (fVertical)
-		SetMaxContentWidth(gMinimumWindowWidth);
+		SetMaxContentWidth(static_cast<TBarApp*>(be_app)->Settings()->width);
 	else {
 		// Make more room for the icon in horizontal mode
 		int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
@@ -1094,13 +1094,13 @@ TExpandoMenuBar::_FinishedDrag(bool invoke)
 
 
 void
-TExpandoMenuBar::_DoneTracking(BPoint point)
+TExpandoMenuBar::_DoneTracking(BPoint where)
 {
 	TTeamMenuItem* lastItem = dynamic_cast<TTeamMenuItem*>(fLastClickedItem);
 	if (lastItem == NULL)
 		return;
 
-	if (!lastItem->ExpanderBounds().Contains(point))
+	if (!lastItem->ExpanderBounds().Contains(where))
 		return;
 
 	lastItem->ToggleExpandState(true);
@@ -1113,13 +1113,13 @@ TExpandoMenuBar::_DoneTracking(BPoint point)
 
 
 void
-TExpandoMenuBar::_Track(BPoint point, uint32)
+TExpandoMenuBar::_Track(BPoint where, uint32)
 {
 	TTeamMenuItem* lastItem = dynamic_cast<TTeamMenuItem*>(fLastClickedItem);
 	if (lastItem == NULL)
 		return;
 
-	if (lastItem->ExpanderBounds().Contains(point))
+	if (lastItem->ExpanderBounds().Contains(where))
 		lastItem->SetArrowDirection(BControlLook::B_RIGHT_DOWN_ARROW);
 	else {
 		lastItem->SetArrowDirection(lastItem->IsExpanded()

@@ -167,6 +167,9 @@ TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
 	if (fTrayLocation != 0)
 		AddChild(fDragRegion);
 
+	fResizeControl = new TResizeControl(this);
+	fReplicantTray->AddChild(fResizeControl);
+
 	// create and add the application menubar
 	fExpandoMenuBar = new TExpandoMenuBar(this, fVertical);
 	fInlineScrollView = new TInlineScrollView(fExpandoMenuBar,
@@ -291,6 +294,8 @@ TBarView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 	if (transit == B_ENTERED_VIEW && EventMask() == 0)
 		SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 
+	BPoint whereScreen = ConvertToScreen(where);
+
 	desk_settings* settings = fBarApp->Settings();
 	bool alwaysOnTop = settings->alwaysOnTop;
 	bool autoRaise = settings->autoRaise;
@@ -305,11 +310,12 @@ TBarView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 	bool isTopMost = Window()->Feel() == B_FLOATING_ALL_WINDOW_FEEL;
 
 	// Auto-Raise
-	where = ConvertToScreen(where);
 	BRect screenFrame = (BScreen(Window())).Frame();
-	if ((where.x == screenFrame.left || where.x == screenFrame.right
-			|| where.y == screenFrame.top || where.y == screenFrame.bottom)
-		&& Window()->Frame().Contains(where)) {
+	if ((whereScreen.x == screenFrame.left
+			|| whereScreen.x == screenFrame.right
+			|| whereScreen.y == screenFrame.top
+			|| whereScreen.y == screenFrame.bottom)
+		&& Window()->Frame().Contains(whereScreen)) {
 		// cursor is on a screen edge within the window frame
 
 		if (!alwaysOnTop && autoRaise && !isTopMost)
@@ -317,7 +323,6 @@ TBarView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 
 		if (autoHide && IsHidden())
 			HideDeskbar(false);
-
 	} else {
 		TBarWindow* window = (TBarWindow*)Window();
 		if (window->IsShowingMenu())
@@ -327,7 +332,7 @@ TBarView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 		BRect preventHideArea = Window()->Frame().InsetByCopy(
 			-kMaxPreventHidingDist, -kMaxPreventHidingDist);
 
-		if (preventHideArea.Contains(where))
+		if (preventHideArea.Contains(whereScreen))
 			return;
 
 		// cursor to bar distance above threshold
@@ -345,13 +350,13 @@ TBarView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 void
 TBarView::MouseDown(BPoint where)
 {
-	where = ConvertToScreen(where);
+	BPoint whereScreen = ConvertToScreen(where);
 
-	if (Window()->Frame().Contains(where)) {
+	if (Window()->Frame().Contains(whereScreen)) {
 		Window()->Activate();
 
 		if ((modifiers() & (B_CONTROL_KEY | B_COMMAND_KEY | B_OPTION_KEY
-					| B_SHIFT_KEY)) == (B_CONTROL_KEY | B_COMMAND_KEY)) {
+				| B_SHIFT_KEY)) == (B_CONTROL_KEY | B_COMMAND_KEY)) {
 			// The window key was pressed - enter dragging code
 			fDragRegion->MouseDown(fDragRegion->DragRegion().LeftTop());
 			return;
@@ -376,12 +381,29 @@ TBarView::MouseDown(BPoint where)
 void
 TBarView::PlaceDeskbarMenu()
 {
-	float height;
-	height = fVertical ? kMenuBarHeight : fBarApp->IconSize() + 4;
+	float width = 0;
+	float height = 0;
+
+	// Calculate the size of the deskbar menu
+	BRect menuFrame(Bounds());
+	if (fVertical) {
+		width = static_cast<TBarApp*>(be_app)->Settings()->width;
+		height = kMenuBarHeight;
+		menuFrame.bottom = menuFrame.top + height;
+	} else {
+		width = gMinimumWindowWidth;
+		height = fBarApp->IconSize() + 4;
+		menuFrame.bottom = menuFrame.top + height;
+	}
+
+	if (fBarMenuBar == NULL) {
+		// create the Be menu
+		fBarMenuBar = new TBarMenuBar(menuFrame, "BarMenuBar", this);
+		AddChild(fBarMenuBar);
+	} else
+		fBarMenuBar->SmartResize(-1, -1);
 
 	BPoint loc(B_ORIGIN);
-	float width = gMinimumWindowWidth;
-
 	if (fState == kFullState) {
 		fBarMenuBar->RemoveTeamMenu();
 		fBarMenuBar->RemoveSeperatorItem();
@@ -418,6 +440,7 @@ TBarView::PlaceTray(bool vertSwap, bool leftSwap)
 		statusLoc.y = fBarMenuBar->Frame().bottom + 1;
 		statusLoc.x = 0;
 		fDragRegion->MoveTo(statusLoc);
+		fDragRegion->Invalidate();
 
 		if (!fReplicantTray->IsHidden())
 			fReplicantTray->Hide();
@@ -433,20 +456,33 @@ TBarView::PlaceTray(bool vertSwap, bool leftSwap)
 		fReplicantTray->RealignReplicants();
 		fDragRegion->ResizeToPreferred();
 
+		fResizeControl->ResizeTo(kDragWidth, fDragRegion->Bounds().Height());
+
 		if (fVertical) {
-			statusLoc.y = fBarMenuBar->Frame().bottom + 1;
+			if (fResizeControl->IsHidden())
+				fResizeControl->Show();
+			// move replicant tray past dragger width on left
+			// also down 1 pixel so that it won't cover the border
+			fReplicantTray->MoveTo(fLeft ? kDragWidth + kGutter : 0, kGutter);
 			statusLoc.x = 0;
-			if (fLeft && fVertical)
-				fReplicantTray->MoveTo(5, 2);
-			else
-				fReplicantTray->MoveTo(2, 2);
+			statusLoc.y = fBarMenuBar->Frame().bottom + 1;
 		} else {
+			if (!fResizeControl->IsHidden())
+				fResizeControl->Hide();
 			BRect screenFrame = (BScreen(Window())).Frame();
 			statusLoc.x = screenFrame.right - fDragRegion->Bounds().Width();
 			statusLoc.y = -1;
 		}
 
 		fDragRegion->MoveTo(statusLoc);
+		fDragRegion->Invalidate();
+
+		if (fVertical && fLeft)
+			fResizeControl->MoveTo(fReplicantTray->Bounds().right - 3, 0);
+		else
+			fResizeControl->MoveTo(0, 0);
+
+		fResizeControl->Invalidate();
 	}
 }
 
@@ -471,12 +507,19 @@ TBarView::PlaceApplicationBar()
 	BRect expandoFrame(0, 0, 0, 0);
 	if (fVertical) {
 		// left or right
-		expandoFrame.top = fTrayLocation != 0 ? fDragRegion->Frame().bottom + 1
-			: fBarMenuBar->Frame().bottom + 1;
-		expandoFrame.left = fDragRegion->Frame().left;
-		expandoFrame.right = expandoFrame.left + gMinimumWindowWidth;
-		expandoFrame.bottom = fState == kFullState ? screenFrame.bottom
-			: expandoFrame.top + 1;
+		if (fTrayLocation != 0) {
+			expandoFrame.left = fDragRegion->Frame().left;
+			expandoFrame.top = fDragRegion->Frame().bottom + 1;
+		} else {
+			expandoFrame.left = fDragRegion->Frame().left;
+			expandoFrame.top = fBarMenuBar->Frame().bottom + 1;
+		}
+
+		expandoFrame.right = expandoFrame.left + (Window() != NULL
+			? Window()->Frame().Width() : fBarApp->Settings()->width);
+		expandoFrame.bottom = fState == kFullState
+			? screenFrame.bottom
+			: expandoFrame.top;
 	} else {
 		// top or bottom
 		expandoFrame.top = 0;
@@ -522,7 +565,7 @@ void
 TBarView::GetPreferredWindowSize(BRect screenFrame, float* width, float* height)
 {
 	float windowHeight = 0;
-	float windowWidth = gMinimumWindowWidth;
+	float windowWidth = fBarApp->Settings()->width;
 	bool setToHiddenSize = fBarApp->Settings()->autoHide && IsHidden()
 		&& !fDragRegion->IsDragging();
 
@@ -623,7 +666,6 @@ TBarView::SaveSettings()
 	settings->left = fLeft;
 	settings->top = fTop;
 	settings->state = fState;
-	settings->width = 0;
 
 	fReplicantTray->SaveTimeSettings();
 }

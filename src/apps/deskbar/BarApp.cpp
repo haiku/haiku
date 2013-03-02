@@ -236,7 +236,7 @@ TBarApp::InitSettings()
 	settings.left = fDefaultSettings.left = false;
 	settings.top = fDefaultSettings.top = true;
 	settings.state = fDefaultSettings.state = kExpandoState;
-	settings.width = fDefaultSettings.width = 0;
+	settings.width = fDefaultSettings.width = gMinimumWindowWidth;
 	settings.switcherLoc = fDefaultSettings.switcherLoc = BPoint(5000, 5000);
 	settings.showClock = fDefaultSettings.showClock = true;
 	// applications

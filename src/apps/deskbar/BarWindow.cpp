@@ -57,6 +57,7 @@ All rights reserved.
 #include "BarView.h"
 #include "DeskbarUtils.h"
 #include "DeskbarMenu.h"
+#include "ExpandoMenuBar.h"
 #include "StatusView.h"
 
 #include "tracker_private.h"
@@ -93,8 +94,8 @@ TBarWindow::TBarWindow()
 	BWindow(BRect(-1000.0f, -1000.0f, -1000.0f, -1000.0f),
 		B_TRANSLATE_SYSTEM_NAME("Deskbar"), B_BORDERED_WINDOW,
 		B_WILL_ACCEPT_FIRST_CLICK | B_NOT_ZOOMABLE | B_NOT_CLOSABLE
-		| B_NOT_MINIMIZABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE
-		| B_AVOID_FRONT | B_ASYNCHRONOUS_CONTROLS,
+			| B_NOT_MINIMIZABLE | B_NOT_MOVABLE | B_NOT_V_RESIZABLE
+			| B_AVOID_FRONT | B_ASYNCHRONOUS_CONTROLS,
 		B_ALL_WORKSPACES),
 	fShowingMenu(false)
 {
@@ -221,6 +222,39 @@ TBarWindow::Minimize(bool minimize)
 	// Don't allow the Deskbar to be minimized
 	if (!minimize)
 		BWindow::Minimize(false);
+}
+
+
+void
+TBarWindow::FrameResized(float width, float height)
+{
+	if (!fBarView->Vertical())
+		return BWindow::FrameResized(width, height);
+
+	bool setToHiddenSize = static_cast<TBarApp*>(be_app)->Settings()->autoHide
+		&& fBarView->IsHidden() && !fBarView->DragRegion()->IsDragging();
+	if (!setToHiddenSize) {
+		// constrain within limits
+		float newWidth;
+		if (width < gMinimumWindowWidth)
+			newWidth = gMinimumWindowWidth;
+		else if (width > gMaximumWindowWidth)
+			newWidth = gMaximumWindowWidth;
+		else
+			newWidth = width;
+
+		// update width setting
+		static_cast<TBarApp*>(be_app)->Settings()->width = newWidth;
+	}
+
+	if (Lock()) {
+		fBarView->ResizeTo(width, fBarView->Bounds().Height());
+		if (fBarView->Vertical() && fBarView->ExpandoState())
+			fBarView->ExpandoMenuBar()->SetMaxContentWidth(width);
+
+		fBarView->UpdatePlacement();
+		Unlock();
+	}
 }
 
 
