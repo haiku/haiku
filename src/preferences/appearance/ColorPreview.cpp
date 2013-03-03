@@ -45,25 +45,39 @@ ColorPreview::Draw(BRect update)
 
 	if (is_rect) {
 		if (is_enabled) {
-			BRect r(Bounds());
-			SetHighColor(184, 184, 184);
-			StrokeRect(r);
+			rgb_color background = ui_color(B_PANEL_BACKGROUND_COLOR);
+			rgb_color shadow = tint_color(background, B_DARKEN_1_TINT);
+			rgb_color darkShadow = tint_color(background, B_DARKEN_3_TINT);
+			rgb_color light = tint_color(background, B_LIGHTEN_MAX_TINT);
 
-			SetHighColor(255, 255, 255);
-			StrokeLine(BPoint(r.right, r.top + 1), r.RightBottom());
+			BRect bounds(Bounds());
 
-			r.InsetBy(1, 1);
+			BeginLineArray(4);
+			AddLine(BPoint(bounds.left, bounds.bottom),
+			BPoint(bounds.left, bounds.top), shadow);
+			AddLine(BPoint(bounds.left + 1.0, bounds.top),
+			BPoint(bounds.right, bounds.top), shadow);
+			AddLine(BPoint(bounds.right, bounds.top + 1.0),
+			BPoint(bounds.right, bounds.bottom), light);
+			AddLine(BPoint(bounds.right - 1.0, bounds.bottom),
+			BPoint(bounds.left + 1.0, bounds.bottom), light);
+			EndLineArray();
+			bounds.InsetBy(1.0, 1.0);
 
-			SetHighColor(216, 216, 216);
-			StrokeLine(r.RightTop(), r.RightBottom());
+			BeginLineArray(4);
+			AddLine(BPoint(bounds.left, bounds.bottom),
+			BPoint(bounds.left, bounds.top), darkShadow);
+			AddLine(BPoint(bounds.left + 1.0, bounds.top),
+			BPoint(bounds.right, bounds.top), darkShadow);
+			AddLine(BPoint(bounds.right, bounds.top + 1.0),
+			BPoint(bounds.right, bounds.bottom), background);
+			AddLine(BPoint(bounds.right - 1.0, bounds.bottom),
+			BPoint(bounds.left + 1.0, bounds.bottom), background);
+			EndLineArray();
+			bounds.InsetBy(1.0, 1.0);
 
-			SetHighColor(96, 96, 96);
-			StrokeLine(r.LeftTop(), r.RightTop());
-			StrokeLine(r.LeftTop(), r.LeftBottom());
-
-			r.InsetBy(1, 1);
 			SetHighColor(color);
-			FillRect(r);
+			FillRect(bounds);
 		} else {
 			SetHighColor(color);
 			FillRect(Bounds());
