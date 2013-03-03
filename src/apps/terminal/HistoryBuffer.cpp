@@ -88,7 +88,11 @@ HistoryBuffer::GetTerminalLineAt(int32 index, TerminalLine* buffer) const
 	for (int32 i = 0; i < line->byteLength;) {
 		// get attributes
 		if (charCount == nextAttributesAt) {
-			if (attributesRunCount > 0) {
+			if (charCount < attributesRun->offset) {
+				// the "hole" in attributes run
+				attributes = 0;
+				nextAttributesAt = attributesRun->offset;
+			} else if (attributesRunCount > 0) {
 				attributes = attributesRun->attributes;
 				nextAttributesAt = attributesRun->offset
 					+ attributesRun->length;
