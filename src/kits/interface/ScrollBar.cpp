@@ -859,21 +859,17 @@ BScrollBar::Draw(BRect updateRect)
 	bool enabled = fPrivateData->fEnabled && fMin < fMax
 		&& fProportion < 1.0 && fProportion >= 0.0;
 
-	rgb_color light, light1, dark, dark1, dark2, dark4;
+	rgb_color light, dark, dark1, dark2;
 	if (enabled) {
 		light = tint_color(normal, B_LIGHTEN_MAX_TINT);
-		light1 = tint_color(normal, B_LIGHTEN_1_TINT);
 		dark = tint_color(normal, B_DARKEN_3_TINT);
 		dark1 = tint_color(normal, B_DARKEN_1_TINT);
 		dark2 = tint_color(normal, B_DARKEN_2_TINT);
-		dark4 = tint_color(normal, B_DARKEN_4_TINT);
 	} else {
 		light = tint_color(normal, B_LIGHTEN_MAX_TINT);
-		light1 = normal;
 		dark = tint_color(normal, B_DARKEN_2_TINT);
 		dark1 = tint_color(normal, B_LIGHTEN_2_TINT);
 		dark2 = tint_color(normal, B_LIGHTEN_1_TINT);
-		dark4 = tint_color(normal, B_DARKEN_3_TINT);
 	}
 
 	SetDrawingMode(B_OP_OVER);
