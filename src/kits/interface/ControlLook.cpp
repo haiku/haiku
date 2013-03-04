@@ -777,6 +777,8 @@ BControlLook::DrawArrowShape(BView* view, BRect& rect, const BRect& updateRect,
 	float penSize = view->PenSize();
 	drawing_mode mode = view->DrawingMode();
 
+	view->MovePenTo(BPoint(0, 0));
+
 	view->SetPenSize(ceilf(hInset / 2.0));
 	view->SetDrawingMode(B_OP_OVER);
 	view->StrokeShape(&arrowShape);
