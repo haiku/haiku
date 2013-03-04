@@ -158,6 +158,9 @@ static int32 sUsedTeams = 1;
 
 static TeamNotificationService sNotificationService;
 
+static const size_t kTeamUserDataReservedSize	= 128 * B_PAGE_SIZE;
+static const size_t kTeamUserDataInitialSize	= 4 * B_PAGE_SIZE;
+
 
 // #pragma mark - TeamListIterator
 
@@ -1324,23 +1327,40 @@ remove_team_from_group(Team* team)
 
 
 static status_t
-create_team_user_data(Team* team)
+create_team_user_data(Team* team, void* exactAddress = NULL)
 {
 	void* address;
-	size_t size = 4 * B_PAGE_SIZE;
+	uint32 addressSpec;
+
+	if (exactAddress != NULL) {
+		address = exactAddress;
+		addressSpec = B_EXACT_ADDRESS;
+	} else
+		addressSpec = B_RANDOMIZED_BASE_ADDRESS;
+
+	status_t result = vm_reserve_address_range(team->id, &address, addressSpec,
+		kTeamUserDataReservedSize, RESERVED_AVOID_BASE);
+
 	virtual_address_restrictions virtualRestrictions = {};
-	virtualRestrictions.address = (void*)KERNEL_USER_DATA_BASE;
-	virtualRestrictions.address_specification = B_BASE_ADDRESS;
+	if (result == B_OK || exactAddress != NULL) {
+		if (exactAddress != NULL)
+			virtualRestrictions.address = exactAddress;
+		else
+			virtualRestrictions.address = address;
+		virtualRestrictions.address_specification = B_EXACT_ADDRESS;
+	} else
+		virtualRestrictions.address_specification = B_RANDOMIZED_ANY_ADDRESS;
+
 	physical_address_restrictions physicalRestrictions = {};
-	team->user_data_area = create_area_etc(team->id, "user area", size,
-		B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA, 0, 0, &virtualRestrictions,
-		&physicalRestrictions, &address);
+	team->user_data_area = create_area_etc(team->id, "user area",
+		kTeamUserDataInitialSize, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA, 0, 0,
+		&virtualRestrictions, &physicalRestrictions, &address);
 	if (team->user_data_area < 0)
 		return team->user_data_area;
 
 	team->user_data = (addr_t)address;
 	team->used_user_data = 0;
-	team->user_data_size = size;
+	team->user_data_size = kTeamUserDataInitialSize;
 	team->free_user_threads = NULL;
 
 	return B_OK;
@@ -1352,6 +1372,9 @@ delete_team_user_data(Team* team)
 {
 	if (team->user_data_area >= 0) {
 		vm_delete_area(team->id, team->user_data_area, true);
+		vm_unreserve_address_range(team->id, (void*)team->user_data,
+			kTeamUserDataReservedSize);
+
 		team->user_data = 0;
 		team->used_user_data = 0;
 		team->user_data_size = 0;
@@ -2035,7 +2058,7 @@ fork_team(void)
 	while (get_next_area_info(B_CURRENT_TEAM, &areaCookie, &info) == B_OK) {
 		if (info.area == parentTeam->user_data_area) {
 			// don't clone the user area; just create a new one
-			status = create_team_user_data(team);
+			status = create_team_user_data(team, info.address);
 			if (status != B_OK)
 				break;
 
@@ -3360,7 +3383,7 @@ team_allocate_user_thread(Team* team)
 
 	while (true) {
 		// enough space left?
-		size_t needed = ROUNDUP(sizeof(user_thread), 8);
+		size_t needed = ROUNDUP(sizeof(user_thread), 128);
 		if (team->user_data_size - team->used_user_data < needed) {
 			// try to resize the area
 			if (resize_area(team->user_data_area,
