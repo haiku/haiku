@@ -107,7 +107,7 @@ class TExpandoMenuBar : public BMenuBar {
 
 		TTeamMenuItem* 		fPreviousDragTargetItem;
 
-		TTeamMenuItem*		fLastMousedOverItem;
+		BMenuItem*			fLastMousedOverItem;
 		BMenuItem*			fLastClickItem;
 
 		static bool			sDoMonitor;
