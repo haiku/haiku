@@ -244,13 +244,16 @@ ShowImageView::Pulse()
 	}
 
 	if (fHideCursor && !fHasSelection && !fShowingPopUpMenu && fIsActiveWin) {
-		if (fHideCursorCountDown <= 0) {
+		if (fHideCursorCountDown == 0) {
+			// Go negative so this isn't triggered again
+			fHideCursorCountDown--;
+
 			BPoint mousePos;
 			uint32 buttons;
 			GetMouse(&mousePos, &buttons, false);
 			if (Bounds().Contains(mousePos))
 				be_app->ObscureCursor();
-		} else
+		} else if (fHideCursorCountDown > 0)
 			fHideCursorCountDown--;
 	}
 
