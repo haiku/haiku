@@ -17,7 +17,6 @@ Application ShowImage :
 	ShowImageApp.cpp
 	ShowImageSettings.cpp
 	ShowImageStatusView.cpp
-	ShowImageUndo.cpp
 	ShowImageView.cpp
 	ShowImageWindow.cpp
 	ToolBarIcons.cpp

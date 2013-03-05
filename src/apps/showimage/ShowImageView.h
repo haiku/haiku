@@ -24,7 +24,6 @@
 
 #include "Filter.h"
 #include "SelectionBox.h"
-#include "ShowImageUndo.h"
 
 
 class BitmapOwner;
@@ -82,7 +81,6 @@ public:
 			void				SetSelectionMode(bool selectionMode);
 			bool				IsSelectionModeEnabled() const
 									{ return fSelectionMode; }
-			void				Undo();
 			void				SelectAll();
 			void				ClearSelection();
 
@@ -182,7 +180,6 @@ private:
 			void				_ShowToolBarIfEnabled(bool show);
 
 private:
-			ShowImageUndo		fUndo;
 			entry_ref			fCurrentRef;
 
 			BitmapOwner*		fBitmapOwner;

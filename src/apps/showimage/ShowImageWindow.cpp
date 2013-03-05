@@ -418,8 +418,6 @@ ShowImageWindow::_AddMenus(BMenuBar* bar)
 	bar->AddItem(menu);
 
 	menu = new BMenu(B_TRANSLATE("Edit"));
-	_AddItemMenu(menu, B_TRANSLATE("Undo"), B_UNDO, 'Z', 0, this, false);
-	menu->AddSeparatorItem();
 	_AddItemMenu(menu, B_TRANSLATE("Copy"), B_COPY, 'C', 0, this, false);
 	menu->AddSeparatorItem();
 	_AddItemMenu(menu, B_TRANSLATE("Selection mode"), MSG_SELECTION_MODE, 0, 0,
@@ -766,18 +764,6 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			}
 			break;
 		}
-
-		case MSG_UNDO_STATE:
-		{
-			bool enable;
-			if (message->FindBool("can_undo", &enable) == B_OK)
-				_EnableMenuItem(fBar, B_UNDO, enable);
-			break;
-		}
-
-		case B_UNDO:
-			fImageView->Undo();
-			break;
 
 		case B_COPY:
 			fImageView->CopySelectionToClipboard();
