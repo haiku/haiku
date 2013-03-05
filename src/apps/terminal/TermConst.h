@@ -105,6 +105,7 @@ static const uint32 MSG_SAVE_WINDOW_POSITION			= 'swps';
 static const uint32 MSG_MOVE_TAB_LEFT					= 'mvtl';
 static const uint32 MSG_MOVE_TAB_RIGHT					= 'mvtr';
 static const uint32 MSG_ACTIVATE_TERM					= 'msat';
+static const uint32 MSG_SET_CURSOR_STYLE				= 'mscs';
 
 
 // Preference Read/Write Keys
@@ -153,6 +154,7 @@ static const char* const PREF_TEXT_ENCODING = "Text encoding";
 
 static const char* const PREF_BLINK_CURSOR = "Blinking cursor";
 static const char* const PREF_WARN_ON_EXIT = "Warn on exit";
+static const char* const PREF_CURSOR_STYLE = "Cursor style";
 
 static const char* const PREF_TAB_TITLE = "Tab title";
 static const char* const PREF_WINDOW_TITLE = "Window title";
@@ -168,6 +170,15 @@ enum {
   SELECTION_FOREGROUND_COLOR,
   SELECTION_BACKGROUND_COLOR
 };
+
+
+// Cursor shape
+enum {
+	BLOCK_CURSOR,
+	UNDERLINE_CURSOR,
+	IBEAM_CURSOR
+};
+
 
 // Preference Folder and setting path
 

@@ -694,6 +694,12 @@ TermParse::EscParse()
 						param[nparam++] = DEFAULT;
 					break;
 
+				case CASE_CSI_SP: // ESC [N q 
+					// part of change cursor style DECSCUSR
+					if (nparam < NPARAM)
+						param[nparam++] = ' ';
+					break;
+
 				case CASE_DEC_STATE:
 					/* enter dec mode */
 					parsestate = gDecTable;
@@ -985,6 +991,34 @@ TermParse::EscParse()
 					if (bottom > top)
 						fBuffer->SetScrollRegion(top, bottom);
 
+					parsestate = groundtable;
+					break;
+
+				case CASE_DECSCUSR_ETC:
+				// DECSCUSR - set cursor style VT520
+					if (nparam == 2 && param[1] == ' ') {
+						bool blinking = (param[0] & 0x01) != 0;
+						int style = -1;
+						switch (param[0]) {
+							case 0:
+								blinking = true;
+							case 1:
+							case 2:
+								style = BLOCK_CURSOR;
+								break;
+							case 3:
+							case 4:
+								style = UNDERLINE_CURSOR;
+								break;
+							case 5:
+							case 6:
+								style = IBEAM_CURSOR;
+								break;
+						}
+
+						if (style != -1)
+							fBuffer->SetCursorStyle(style, blinking);
+					}
 					parsestate = groundtable;
 					break;
 
@@ -1344,11 +1378,11 @@ TermParse::_DecPrivateModeSet(int value)
 			break;
 		case 12:
 			// Start Blinking Cursor.
-			// Not supported yet.
+			fBuffer->SetCursorBlinking(true);
 			break;
 		case 25:
 			// Show Cursor.
-			// Not supported yet.
+			fBuffer->SetCursorHidden(false);
 			break;
 		case 47:
 			// Use Alternate Screen Buffer.
@@ -1419,11 +1453,11 @@ TermParse::_DecPrivateModeReset(int value)
 			break;
 		case 12:
 			// Stop Blinking Cursor.
-			// Not supported yet.
+			fBuffer->SetCursorBlinking(false);
 			break;
 		case 25:
 			// Hide Cursor
-			// Not supported yet.
+			fBuffer->SetCursorHidden(true);
 			break;
 		case 47:
 			// Use Normal Screen Buffer.

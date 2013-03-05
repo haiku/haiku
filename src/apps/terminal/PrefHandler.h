@@ -26,6 +26,11 @@ struct pref_defaults {
 #define PREF_TRUE "true"
 #define PREF_FALSE "false"
 
+#define PREF_BLOCK_CURSOR "block"
+#define PREF_IBEAM_CURSOR "ibeam"
+#define PREF_UNDERLINE_CURSOR "underline"
+
+
 class BMessage;
 class BEntry;
 
@@ -49,6 +54,7 @@ class PrefHandler {
 		const char* getString(const char *key);
 		bool        getBool(const char *key);
 		rgb_color   getRGB(const char *key);
+		int			getCursor(const char *key);
 
 		void        setInt32(const char *key, int32 data);
 		void        setFloat(const char *key, float data);

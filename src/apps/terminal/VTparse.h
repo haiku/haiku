@@ -125,3 +125,5 @@
 #define CASE_ECH 	91	/* erase characters */
 
 #define CASE_PRINT_GRA 92
+#define CASE_DECSCUSR_ETC 93
+#define CASE_CSI_SP 94

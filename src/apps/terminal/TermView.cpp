@@ -300,7 +300,9 @@ TermView::_InitObject(const ShellParameters& shellParameters)
 	fResizeViewDisableCount = 0;
 	fLastActivityTime = 0;
 	fCursorState = 0;
-	fCursorHeight = 0;
+	fCursorStyle = BLOCK_CURSOR;
+	fCursorBlinking = true;
+	fCursorHidden = false;
 	fCursor = TermPos(0, 0);
 	fTextBuffer = NULL;
 	fVisibleTextBuffer = NULL;
@@ -748,7 +750,9 @@ TermView::SetTermFont(const BFont *font)
 	fFontAscent = font_ascent;
 	fFontHeight = font_ascent + font_descent + font_leading + 1;
 
-	fCursorHeight = fFontHeight;
+	fCursorStyle = PrefHandler::Default() == NULL ? BLOCK_CURSOR
+		: PrefHandler::Default()->getCursor(PREF_CURSOR_STYLE);
+	fCursorBlinking = PrefHandler::Default()->getBool(PREF_BLINK_CURSOR);
 
 	_ScrollTo(0, false);
 	if (fScrollBar != NULL)
@@ -882,17 +886,29 @@ TermView::_DetachShell()
 
 
 void
+TermView::_SwitchCursorBlinking(bool blinkingOn)
+{
+	if (blinkingOn) {
+		if (fCursorBlinkRunner == NULL) {
+			BMessage blinkMessage(kBlinkCursor);
+			fCursorBlinkRunner = new (std::nothrow) BMessageRunner(
+				BMessenger(this), &blinkMessage, kCursorBlinkInterval);
+		}
+	} else {
+		// make sure the cursor becomes visible
+		fCursorState = 0;
+		_InvalidateTextRect(fCursor.x, fCursor.y, fCursor.x, fCursor.y);
+		delete fCursorBlinkRunner;
+		fCursorBlinkRunner = NULL;
+	}
+}
+
+
+void
 TermView::_Activate()
 {
-	bool blinkCursor = PrefHandler::Default()->getBool(PREF_BLINK_CURSOR);
-
 	fActive = true;
-
-	if (fCursorBlinkRunner == NULL && blinkCursor) {
-		BMessage blinkMessage(kBlinkCursor);
-		fCursorBlinkRunner = new (std::nothrow) BMessageRunner(
-			BMessenger(this), &blinkMessage, kCursorBlinkInterval);
-	}
+	_SwitchCursorBlinking(fCursorBlinking);
 }
 
 
@@ -902,8 +918,8 @@ TermView::_Deactivate()
 	// make sure the cursor becomes visible
 	fCursorState = 0;
 	_InvalidateTextRect(fCursor.x, fCursor.y, fCursor.x, fCursor.y);
-	delete fCursorBlinkRunner;
-	fCursorBlinkRunner = NULL;
+
+	_SwitchCursorBlinking(false);
 
 	fActive = false;
 }
@@ -987,7 +1003,7 @@ TermView::_DrawCursor()
 {
 	BRect rect(fFontWidth * fCursor.x, _LineOffset(fCursor.y), 0, 0);
 	rect.right = rect.left + fFontWidth - 1;
-	rect.bottom = rect.top + fCursorHeight - 1;
+	rect.bottom = rect.top + fFontHeight - 1;
 	int32 firstVisible = _LineAt(0);
 
 	UTF8Char character;
@@ -995,9 +1011,24 @@ TermView::_DrawCursor()
 
 	bool cursorVisible = _IsCursorVisible();
 
+	if (cursorVisible) {
+		switch (fCursorStyle) {
+			case UNDERLINE_CURSOR:
+				rect.top = rect.bottom - 2;
+				break;
+			case IBEAM_CURSOR:
+				rect.right = rect.left + 1;
+				break;
+			case BLOCK_CURSOR:
+			default:
+				break;
+		}
+	}
+
 	bool selected = _CheckSelectedRegion(TermPos(fCursor.x, fCursor.y));
 	if (fVisibleTextBuffer->GetChar(fCursor.y - firstVisible, fCursor.x,
-			character, attr) == A_CHAR) {
+			character, attr) == A_CHAR
+			&& (fCursorStyle == BLOCK_CURSOR || !cursorVisible)) {
 		int32 width;
 		if (IS_WIDTH(attr))
 			width = 2;
@@ -1042,7 +1073,7 @@ TermView::_DrawCursor()
 bool
 TermView::_IsCursorVisible() const
 {
-	return fCursorState < kCursorVisibleIntervals;
+	return !fCursorHidden && fCursorState < kCursorVisibleIntervals;
 }
 
 
@@ -1861,6 +1892,23 @@ TermView::MessageReceived(BMessage *msg)
 					SetTermColor(index, fTermColorTable[index], dynamic);
 			}
 			
+			break;
+		}
+		case MSG_SET_CURSOR_STYLE:
+		{
+			int32 style = BLOCK_CURSOR;
+			if (msg->FindInt32("style", &style) == B_OK)
+				fCursorStyle = style;
+
+			bool blinking = fCursorBlinking;
+			if (msg->FindBool("blinking", &blinking) == B_OK) {
+				fCursorBlinking = blinking;
+				_SwitchCursorBlinking(fCursorBlinking);
+			}
+
+			bool hidden = fCursorHidden;
+			if (msg->FindBool("hidden", &hidden) == B_OK)
+				fCursorHidden = hidden;
 			break;
 		}
 		case MSG_REPORT_MOUSE_EVENT:

@@ -31,6 +31,10 @@ public:
 									int32 count = 1, bool dynamic = false);
 			void				ResetColors(uint8* indexes,
 									int32 count = 1, bool dynamic = false);
+			void				SetCursorStyle(int32 style, bool blinking);
+			void				SetCursorBlinking(bool blinking);
+			void				SetCursorHidden(bool hidden);
+
 			void				NotifyQuit(int32 reason);
 
 	virtual	status_t			ResizeTo(int32 width, int32 height);

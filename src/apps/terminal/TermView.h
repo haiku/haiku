@@ -160,6 +160,7 @@ private:
 
 			void				_Activate();
 			void				_Deactivate();
+			void				_SwitchCursorBlinking(bool blinkingOn);
 
 			void				_DrawLinePart(int32 x1, int32 y1, uint32 attr,
 									char* buffer, int32 width, bool mouse,
@@ -241,7 +242,9 @@ private:
 			// Cursor Blinking, draw flag.
 			bigtime_t			fLastActivityTime;
 			int32				fCursorState;
-			int					fCursorHeight;
+			int					fCursorStyle;
+			bool				fCursorBlinking;
+			bool				fCursorHidden;
 
 			// Cursor position.
 			TermPos				fCursor;

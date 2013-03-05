@@ -27,7 +27,6 @@
 #include <NodeInfo.h>
 #include <Path.h>
 
-#include "PrefHandler.h"
 #include "TermConst.h"
 
 
@@ -81,6 +80,7 @@ static const pref_defaults kTermDefaults[] = {
 	{ PREF_WINDOW_TITLE,		"%T %i: %t" },
 	{ PREF_BLINK_CURSOR,		PREF_TRUE },
 	{ PREF_WARN_ON_EXIT,		PREF_TRUE },
+	{ PREF_CURSOR_STYLE,		PREF_BLOCK_CURSOR },
 
 	{ NULL, NULL},
 };
@@ -259,6 +259,20 @@ PrefHandler::getBool(const char *key)
 		return false;
 
 	return strcmp(value, PREF_TRUE) == 0;
+}
+
+
+int
+PrefHandler::getCursor(const char *key)
+{
+	const char *value = fContainer.FindString(key);
+	if (value != NULL && strcmp(value, PREF_BLOCK_CURSOR) != 0) {
+		if (strcmp(value, PREF_UNDERLINE_CURSOR) == 0)
+			return UNDERLINE_CURSOR;
+		if (strcmp(value, PREF_IBEAM_CURSOR) == 0)
+			return IBEAM_CURSOR;
+	}
+	return BLOCK_CURSOR;
 }
 
 

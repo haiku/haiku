@@ -178,6 +178,40 @@ TerminalBuffer::ResetColors(uint8* indexes, int32 count, bool dynamic)
 
 
 void
+TerminalBuffer::SetCursorStyle(int32 style, bool blinking)
+{
+	if (fListenerValid) {
+		BMessage message(MSG_SET_CURSOR_STYLE);
+		message.AddInt32("style", style);
+		message.AddBool("blinking", blinking);
+		fListener.SendMessage(&message);
+	}
+}
+
+
+void
+TerminalBuffer::SetCursorBlinking(bool blinking)
+{
+	if (fListenerValid) {
+		BMessage message(MSG_SET_CURSOR_STYLE);
+		message.AddBool("blinking", blinking);
+		fListener.SendMessage(&message);
+	}
+}
+
+
+void
+TerminalBuffer::SetCursorHidden(bool hidden)
+{
+	if (fListenerValid) {
+		BMessage message(MSG_SET_CURSOR_STYLE);
+		message.AddBool("hidden", hidden);
+		fListener.SendMessage(&message);
+	}
+}
+
+
+void
 TerminalBuffer::NotifyQuit(int32 reason)
 {
 	if (fListenerValid) {
