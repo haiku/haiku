@@ -277,7 +277,7 @@ arch_arm_data_abort(struct iframe *frame)
 
 	enable_interrupts();
 
-	vm_page_fault(far, frame->pc, isWrite, isUser, &newip);
+	vm_page_fault(far, frame->pc, isWrite, false, isUser, &newip);
 
 	if (newip != 0) {
 		// the page fault handler wants us to modify the iframe to set the

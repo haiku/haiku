@@ -267,7 +267,7 @@ static cache_info* sCacheInfoTable;
 static void delete_area(VMAddressSpace* addressSpace, VMArea* area,
 	bool addressSpaceCleanup);
 static status_t vm_soft_fault(VMAddressSpace* addressSpace, addr_t address,
-	bool isWrite, bool isUser, vm_page** wirePage,
+	bool isWrite, bool isExecute, bool isUser, vm_page** wirePage,
 	VMAreaWiredRange* wiredRange = NULL);
 static status_t map_backing_store(VMAddressSpace* addressSpace,
 	VMCache* cache, off_t offset, const char* areaName, addr_t size, int wiring,
@@ -315,6 +315,7 @@ enum {
 	PAGE_FAULT_ERROR_KERNEL_ONLY,
 	PAGE_FAULT_ERROR_WRITE_PROTECTED,
 	PAGE_FAULT_ERROR_READ_PROTECTED,
+	PAGE_FAULT_ERROR_EXECUTE_PROTECTED,
 	PAGE_FAULT_ERROR_KERNEL_BAD_USER_MEMORY,
 	PAGE_FAULT_ERROR_NO_ADDRESS_SPACE
 };
@@ -345,6 +346,10 @@ public:
 				break;
 			case PAGE_FAULT_ERROR_READ_PROTECTED:
 				out.Print("page fault error: area: %ld, read protected", fArea);
+				break;
+			case PAGE_FAULT_ERROR_EXECUTE_PROTECTED:
+				out.Print("page fault error: area: %ld, execute protected",
+					fArea);
 				break;
 			case PAGE_FAULT_ERROR_KERNEL_BAD_USER_MEMORY:
 				out.Print("page fault error: kernel touching bad user memory");
@@ -3994,8 +3999,8 @@ forbid_page_faults(void)
 
 
 status_t
-vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
-	addr_t* newIP)
+vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isExecute,
+	bool isUser, addr_t* newIP)
 {
 	FTRACE(("vm_page_fault: page fault at 0x%lx, ip 0x%lx\n", address,
 		faultAddress));
@@ -4038,8 +4043,8 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 	}
 
 	if (status == B_OK) {
-		status = vm_soft_fault(addressSpace, pageAddress, isWrite, isUser,
-			NULL);
+		status = vm_soft_fault(addressSpace, pageAddress, isWrite, isExecute,
+			isUser, NULL);
 	}
 
 	if (status < B_OK) {
@@ -4074,8 +4079,8 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 				"\"%s\" (%" B_PRId32 ") tried to %s address %#lx, ip %#lx "
 				"(\"%s\" +%#lx)\n", thread->name, thread->id,
 				thread->team->Name(), thread->team->id,
-				isWrite ? "write" : "read", address, faultAddress,
-				area ? area->name : "???", faultAddress - (area ?
+				isWrite ? "write" : (isExecute ? "execute" : "read"), address,
+				faultAddress, area ? area->name : "???", faultAddress - (area ?
 					area->Base() : 0x0));
 
 			// We can print a stack trace of the userland thread here.
@@ -4364,7 +4369,8 @@ fault_get_page(PageFaultContext& context)
 */
 static status_t
 vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
-	bool isWrite, bool isUser, vm_page** wirePage, VMAreaWiredRange* wiredRange)
+	bool isWrite, bool isExecute, bool isUser, vm_page** wirePage,
+	VMAreaWiredRange* wiredRange)
 {
 	FTRACE(("vm_soft_fault: thid 0x%" B_PRIx32 " address 0x%" B_PRIxADDR ", "
 		"isWrite %d, isUser %d\n", thread_get_current_thread_id(),
@@ -4419,7 +4425,16 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 				VMPageFaultTracing::PAGE_FAULT_ERROR_WRITE_PROTECTED));
 			status = B_PERMISSION_DENIED;
 			break;
-		} else if (!isWrite && (protection
+		} else if (isExecute && (protection
+				& (B_EXECUTE_AREA
+					| (isUser ? 0 : B_KERNEL_EXECUTE_AREA))) == 0) {
+			dprintf("instruction fetch attempted on execute-protected area 0x%"
+				B_PRIx32 " at %p\n", area->id, (void*)originalAddress);
+			TPF(PageFaultError(area->id,
+				VMPageFaultTracing::PAGE_FAULT_ERROR_EXECUTE_PROTECTED));
+			status = B_PERMISSION_DENIED;
+			break;
+		} else if (!isWrite && !isExecute && (protection
 				& (B_READ_AREA | (isUser ? 0 : B_KERNEL_READ_AREA))) == 0) {
 			dprintf("read access attempted on read-protected area 0x%" B_PRIx32
 				" at %p\n", area->id, (void*)originalAddress);
@@ -4756,7 +4771,8 @@ vm_set_area_memory_type(area_id id, phys_addr_t physicalBase, uint32 type)
 
 
 /*!	This function enforces some protection properties:
-	 - if B_WRITE_AREA is set, B_WRITE_KERNEL_AREA is set as well
+	 - if B_WRITE_AREA is set, B_KERNEL_WRITE_AREA is set as well
+	 - if B_EXECUTE_AREA is set, B_KERNEL_EXECUTE_AREA is set as well
 	 - if only B_READ_AREA has been set, B_KERNEL_READ_AREA is also set
 	 - if no protection is specified, it defaults to B_KERNEL_READ_AREA
 	   and B_KERNEL_WRITE_AREA.
@@ -4770,6 +4786,8 @@ fix_protection(uint32* protection)
 			*protection |= B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
 		else
 			*protection |= B_KERNEL_READ_AREA;
+		if ((*protection & B_EXECUTE_AREA) != 0)
+			*protection |= B_KERNEL_EXECUTE_AREA;
 	}
 }
 
@@ -5222,8 +5240,8 @@ vm_wire_page(team_id team, addr_t address, bool writable,
 		cacheChainLocker.Unlock();
 		addressSpaceLocker.Unlock();
 
-		error = vm_soft_fault(addressSpace, pageAddress, writable, isUser,
-			&page, &info->range);
+		error = vm_soft_fault(addressSpace, pageAddress, writable, false,
+			isUser, &page, &info->range);
 
 		if (error != B_OK) {
 			// The page could not be mapped -- clean up.
@@ -5401,7 +5419,7 @@ lock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 				addressSpaceLocker.Unlock();
 
 				error = vm_soft_fault(addressSpace, nextAddress, writable,
-					isUser, &page, range);
+					false, isUser, &page, range);
 
 				addressSpaceLocker.Lock();
 				cacheChainLocker.SetTo(vm_area_get_locked_cache(area));

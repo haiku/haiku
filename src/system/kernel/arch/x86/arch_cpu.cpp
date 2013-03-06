@@ -605,10 +605,12 @@ detect_cpu(int currentCPU)
 	get_current_cpuid(&cpuid, 1);
 	cpu->arch.feature[FEATURE_COMMON] = cpuid.eax_1.features; // edx
 	cpu->arch.feature[FEATURE_EXT] = cpuid.eax_1.extended_features; // ecx
-	if (cpu->arch.vendor == VENDOR_AMD) {
+	if (cpu->arch.vendor == VENDOR_AMD || cpu->arch.vendor == VENDOR_INTEL) {
 		get_current_cpuid(&cpuid, 0x80000001);
 		cpu->arch.feature[FEATURE_EXT_AMD] = cpuid.regs.edx; // edx
 	}
+	if (cpu->arch.vendor == VENDOR_INTEL)
+		cpu->arch.feature[FEATURE_EXT_AMD] &= IA32_FEATURES_INTEL_EXT;
 	get_current_cpuid(&cpuid, 6);
 	cpu->arch.feature[FEATURE_6_EAX] = cpuid.regs.eax;
 	cpu->arch.feature[FEATURE_6_ECX] = cpuid.regs.ecx;

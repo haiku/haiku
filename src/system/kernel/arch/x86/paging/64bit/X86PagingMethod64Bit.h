@@ -96,6 +96,8 @@ public:
 									uint32 memoryType);
 
 private:
+	static	void				_EnableExecutionDisable(void* dummy, int cpu);
+
 			phys_addr_t			fKernelPhysicalPML4;
 			uint64*				fKernelVirtualPML4;
 
