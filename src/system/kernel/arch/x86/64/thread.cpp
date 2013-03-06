@@ -218,20 +218,11 @@ arch_thread_enter_userspace(Thread* thread, addr_t entry, void* args1,
 
 	stackTop = arch_randomize_stack_pointer(stackTop);
 
-	// Copy the little stub that calls exit_thread() when the thread entry
-	// function returns.
-	// TODO: This will become a problem later if we want to support execute
-	// disable, the stack shouldn't really be executable.
-	size_t codeSize = (addr_t)x86_end_userspace_thread_exit
-		- (addr_t)x86_userspace_thread_exit;
-	stackTop -= codeSize;
-	if (user_memcpy((void*)stackTop, (const void*)&x86_userspace_thread_exit,
-			codeSize) != B_OK)
-		return B_BAD_ADDRESS;
-
-	// Copy the address of the stub to the top of the stack to act as the
-	// return address.
-	addr_t codeAddr = stackTop;
+	// Copy the address of the stub that calls exit_thread() when the thread
+	// entry function returns to the top of the stack to act as the return
+	// address. The stub is inside commpage.
+	addr_t codeAddr = *(addr_t*)(USER_COMMPAGE_ADDR
+		+ COMMPAGE_ENTRY_X86_THREAD_EXIT * sizeof(addr_t));
 	stackTop -= sizeof(codeAddr);
 	if (user_memcpy((void*)stackTop, (const void*)&codeAddr, sizeof(codeAddr))
 			!= B_OK)

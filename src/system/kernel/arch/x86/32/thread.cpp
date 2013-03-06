@@ -13,6 +13,7 @@
 
 #include <arch/user_debugger.h>
 #include <arch_cpu.h>
+#include <commpage.h>
 #include <cpu.h>
 #include <debug.h>
 #include <kernel.h>
@@ -215,8 +216,6 @@ arch_thread_enter_userspace(Thread* thread, addr_t entry, void* args1,
 	void* args2)
 {
 	addr_t stackTop = thread->user_stack_base + thread->user_stack_size;
-	uint32 codeSize = (addr_t)x86_end_userspace_thread_exit
-		- (addr_t)x86_userspace_thread_exit;
 	uint32 args[3];
 
 	TRACE(("arch_thread_enter_userspace: entry 0x%lx, args %p %p, "
@@ -224,14 +223,11 @@ arch_thread_enter_userspace(Thread* thread, addr_t entry, void* args1,
 
 	stackTop = arch_randomize_stack_pointer(stackTop);
 
-	// copy the little stub that calls exit_thread() when the thread entry
-	// function returns, as well as the arguments of the entry function
-	stackTop -= codeSize;
-
-	if (user_memcpy((void *)stackTop, (const void *)&x86_userspace_thread_exit, codeSize) < B_OK)
-		return B_BAD_ADDRESS;
-
-	args[0] = stackTop;
+	// Copy the address of the stub that calls exit_thread() when the thread
+	// entry function returns to the top of the stack to act as the return
+	// address. The stub is inside commpage.
+	args[0] = *(addr_t*)(USER_COMMPAGE_ADDR
+		+ COMMPAGE_ENTRY_X86_THREAD_EXIT * sizeof(addr_t));
 	args[1] = (uint32)args1;
 	args[2] = (uint32)args2;
 	stackTop -= sizeof(args);
