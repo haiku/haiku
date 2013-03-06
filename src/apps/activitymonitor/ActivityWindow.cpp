@@ -204,7 +204,7 @@ ActivityWindow::MessageReceived(BMessage* message)
 			}
 			break;
 		}
-		
+
 		case kMsgAlwaysOnTop:
 		{
 			SetFeel(this->IsFloating() ? B_NORMAL_WINDOW_FEEL : B_FLOATING_ALL_WINDOW_FEEL);
