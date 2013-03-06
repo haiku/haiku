@@ -12,6 +12,7 @@
 
 #include <ctype.h>
 
+#include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
 #include <CheckBox.h>
@@ -26,7 +27,6 @@
 #include <Roster.h>
 #include <SeparatorView.h>
 #include <Slider.h>
-#include <TabView.h>
 #include <TextControl.h>
 #include <View.h>
 
@@ -164,34 +164,10 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fWindowAutoRaise->SetTarget(be_app);
 	fWindowAutoHide->SetTarget(be_app);
 
-	// Layout
-	BView* menuSettingsView = BLayoutBuilder::Group<>()
-		.AddGroup(B_VERTICAL, 0)
-			.AddGroup(B_HORIZONTAL, 0)
-				.AddGroup(B_VERTICAL, 0)
-					.Add(fMenuRecentDocuments)
-					.Add(fMenuRecentFolders)
-					.Add(fMenuRecentApplications)
-					.End()
-				.AddGroup(B_VERTICAL, 0)
-					.Add(fMenuRecentDocumentCount)
-					.Add(fMenuRecentFolderCount)
-					.Add(fMenuRecentApplicationCount)
-					.End()
-				.End()
-			.AddGroup(B_VERTICAL, 0)
-				.SetInsets(0, B_USE_DEFAULT_SPACING, 0, 0)
-				.Add(new BButton(B_TRANSLATE("Edit menu" B_UTF8_ELLIPSIS),
-					new BMessage(kEditMenuInTracker)))
-				.End()
-			.AddGlue()
-			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
-			.End()
-		.View();
-	menuSettingsView->SetName(B_TRANSLATE("Menu"));
-
-	BView* applicationsSettingsView = BLayoutBuilder::Group<>()
+	// Applications
+	BBox* appsSettingsBox = new BBox("applications");
+	appsSettingsBox->SetLabel(B_TRANSLATE("Applications"));
+	appsSettingsBox->AddChild(BLayoutBuilder::Group<>()
 		.AddGroup(B_VERTICAL, 0)
 			.Add(fAppsSort)
 			.Add(fAppsSortTrackerFirst)
@@ -209,10 +185,36 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.End()
-		.View();
-	applicationsSettingsView->SetName(B_TRANSLATE("Applications"));
+		.View());
 
-	BView* windowSettingsView = BLayoutBuilder::Group<>()
+	// Recent items
+	BBox* recentItemsBox = new BBox("recent items");
+	recentItemsBox->SetLabel(B_TRANSLATE("Recent items"));
+	recentItemsBox->AddChild(BLayoutBuilder::Group<>()
+		.AddGroup(B_VERTICAL, 0)
+			.AddGroup(B_HORIZONTAL, 0)
+				.AddGroup(B_VERTICAL, 0)
+					.Add(fMenuRecentDocuments)
+					.Add(fMenuRecentFolders)
+					.Add(fMenuRecentApplications)
+					.End()
+				.AddGroup(B_VERTICAL, 0)
+					.Add(fMenuRecentDocumentCount)
+					.Add(fMenuRecentFolderCount)
+					.Add(fMenuRecentApplicationCount)
+					.End()
+				.End()
+			//.Add(new BButton(B_TRANSLATE("Edit menu" B_UTF8_ELLIPSIS),
+			//	new BMessage(kEditMenuInTracker)))
+			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
+				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
+			.End()
+		.View());
+
+	// Window
+	BBox* windowSettingsBox = new BBox("window");
+	windowSettingsBox->SetLabel(B_TRANSLATE("Window"));
+	windowSettingsBox->AddChild(BLayoutBuilder::Group<>()
 		.AddGroup(B_VERTICAL, 0)
 			.Add(fWindowAlwaysOnTop)
 			.Add(fWindowAutoRaise)
@@ -221,16 +223,16 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.End()
-		.View();
-	windowSettingsView->SetName(B_TRANSLATE("Window"));
+		.View());
 
-	BTabView* tabView = new BTabView("tabview", B_WIDTH_FROM_LABEL);
-	tabView->AddTab(menuSettingsView);
-	tabView->AddTab(applicationsSettingsView);
-	tabView->AddTab(windowSettingsView);
-
+	// Layout
 	BLayoutBuilder::Group<>(this)
-		.Add(tabView)
+		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
+			.Add(appsSettingsBox)
+			.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
+				.Add(recentItemsBox)
+				.Add(windowSettingsBox)
+			.End()
 		.SetInsets(B_USE_DEFAULT_SPACING)
 		.End();
 
