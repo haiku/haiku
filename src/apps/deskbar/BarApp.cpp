@@ -485,6 +485,8 @@ TBarApp::MessageReceived(BMessage* message)
 				fSettings.recentDocsCount = count;
 			if (message->FindBool("documentsEnabled", &enabled) == B_OK)
 				fSettings.recentDocsEnabled = enabled && count > 0;
+
+			fPreferencesWindow->PostMessage(kUpdatePreferences);
 			break;
 
 		case B_SOME_APP_LAUNCHED:
@@ -530,12 +532,14 @@ TBarApp::MessageReceived(BMessage* message)
 			fSettings.alwaysOnTop = !fSettings.alwaysOnTop;
 			fBarWindow->SetFeel(fSettings.alwaysOnTop ?
 				B_FLOATING_ALL_WINDOW_FEEL : B_NORMAL_WINDOW_FEEL);
-			fPreferencesWindow->PostMessage(kStateChanged);
+			fPreferencesWindow->PostMessage(kUpdatePreferences);
 			break;
 
 		case kAutoRaise:
 			fSettings.autoRaise = fSettings.alwaysOnTop ? false :
 				!fSettings.autoRaise;
+
+			fPreferencesWindow->PostMessage(kUpdatePreferences);
 			break;
 
 		case kAutoHide:
@@ -544,6 +548,8 @@ TBarApp::MessageReceived(BMessage* message)
 			fBarWindow->Lock();
 			fBarView->HideDeskbar(fSettings.autoHide);
 			fBarWindow->Unlock();
+
+			fPreferencesWindow->PostMessage(kUpdatePreferences);
 			break;
 
 		case kTrackerFirst:
@@ -552,6 +558,8 @@ TBarApp::MessageReceived(BMessage* message)
 			fBarWindow->Lock();
 			fBarView->PlaceApplicationBar();
 			fBarWindow->Unlock();
+
+			fPreferencesWindow->PostMessage(kUpdatePreferences);
 			break;
 
 		case kSortRunningApps:
@@ -560,6 +568,8 @@ TBarApp::MessageReceived(BMessage* message)
 			fBarWindow->Lock();
 			fBarView->PlaceApplicationBar();
 			fBarWindow->Unlock();
+
+			fPreferencesWindow->PostMessage(kUpdatePreferences);
 			break;
 
 		case kUnsubscribe:
@@ -576,6 +586,8 @@ TBarApp::MessageReceived(BMessage* message)
 			fBarWindow->Lock();
 			fBarView->PlaceApplicationBar();
 			fBarWindow->Unlock();
+
+			fPreferencesWindow->PostMessage(kUpdatePreferences);
 			break;
 
 		case kExpandNewTeams:
@@ -584,6 +596,8 @@ TBarApp::MessageReceived(BMessage* message)
 			fBarWindow->Lock();
 			fBarView->PlaceApplicationBar();
 			fBarWindow->Unlock();
+
+			fPreferencesWindow->PostMessage(kUpdatePreferences);
 			break;
 
 		case kHideLabels:
@@ -592,6 +606,8 @@ TBarApp::MessageReceived(BMessage* message)
 			fBarWindow->Lock();
 			fBarView->PlaceApplicationBar();
 			fBarWindow->Unlock();
+
+			fPreferencesWindow->PostMessage(kUpdatePreferences);
 			break;
 
 		case kResizeTeamIcons:
@@ -620,6 +636,8 @@ TBarApp::MessageReceived(BMessage* message)
 				fBarView->UpdatePlacement();
 
 			fBarWindow->Unlock();
+
+			fPreferencesWindow->PostMessage(kUpdatePreferences);
 			break;
 		}
 

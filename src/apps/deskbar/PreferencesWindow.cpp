@@ -48,6 +48,10 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	BWindow(frame, B_TRANSLATE("Deskbar preferences"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE)
 {
+	// Set the default and intial settings used by default and revert buttons
+	_SetDefaultSettings();
+	_SetInitialSettings();
+
 	// Menu controls
 	fMenuRecentDocuments = new BCheckBox(B_TRANSLATE("Recent documents:"),
 		new BMessage(kUpdateRecentCounts));
@@ -75,7 +79,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fAppsHideLabels = new BCheckBox(B_TRANSLATE("Hide application names"),
 		new BMessage(kHideLabels));
 	fAppsIconSizeSlider = new BSlider("icon_size", B_TRANSLATE("Icon size"),
-		NULL, kMinimumIconSize / kIconSizeInterval,
+		new BMessage(kResizeTeamIcons), kMinimumIconSize / kIconSizeInterval,
 		kMaximumIconSize / kIconSizeInterval, B_HORIZONTAL);
 	fAppsIconSizeSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fAppsIconSizeSlider->SetHashMarkCount((kMaximumIconSize - kMinimumIconSize)
@@ -91,10 +95,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 		new BMessage(kAutoRaise));
 	fWindowAutoHide = new BCheckBox(B_TRANSLATE("Auto-hide"),
 		new BMessage(kAutoHide));
-
-	// Get settings from BarApp
-	TBarApp* barApp = static_cast<TBarApp*>(be_app);
-	desk_settings* settings = barApp->Settings();
 
 	// Menu settings
 	BTextView* docTextView = fMenuRecentDocumentCount->TextView();
@@ -113,18 +113,18 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	appTextView->SetMaxBytes(4);
 	folderTextView->SetMaxBytes(4);
 
-	int32 docCount = settings->recentDocsCount;
-	int32 appCount = settings->recentAppsCount;
-	int32 folderCount = settings->recentFoldersCount;
+	int32 docCount = fInitialSettings.recentDocsCount;
+	int32 appCount = fInitialSettings.recentAppsCount;
+	int32 folderCount = fInitialSettings.recentFoldersCount;
 
-	fMenuRecentDocuments->SetValue(settings->recentDocsEnabled);
-	fMenuRecentDocumentCount->SetEnabled(settings->recentDocsEnabled);
+	fMenuRecentDocuments->SetValue(fInitialSettings.recentDocsEnabled);
+	fMenuRecentDocumentCount->SetEnabled(fInitialSettings.recentDocsEnabled);
 
-	fMenuRecentApplications->SetValue(settings->recentAppsEnabled);
-	fMenuRecentApplicationCount->SetEnabled(settings->recentAppsEnabled);
+	fMenuRecentApplications->SetValue(fInitialSettings.recentAppsEnabled);
+	fMenuRecentApplicationCount->SetEnabled(fInitialSettings.recentAppsEnabled);
 
-	fMenuRecentFolders->SetValue(settings->recentFoldersEnabled);
-	fMenuRecentFolderCount->SetEnabled(settings->recentFoldersEnabled);
+	fMenuRecentFolders->SetValue(fInitialSettings.recentFoldersEnabled);
+	fMenuRecentFolderCount->SetEnabled(fInitialSettings.recentFoldersEnabled);
 
 	BString docString;
 	BString appString;
@@ -139,23 +139,25 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fMenuRecentFolderCount->SetText(folderString.String());
 
 	// Applications settings
-	fAppsSort->SetValue(settings->sortRunningApps);
-	fAppsSortTrackerFirst->SetValue(settings->trackerAlwaysFirst);
-	fAppsShowExpanders->SetValue(settings->superExpando);
-	fAppsExpandNew->SetValue(settings->expandNewTeams);
-	fAppsHideLabels->SetValue(settings->hideLabels);
-	fAppsIconSizeSlider->SetValue(settings->iconSize / kIconSizeInterval);
+	fAppsSort->SetValue(fInitialSettings.sortRunningApps);
+	fAppsSortTrackerFirst->SetValue(fInitialSettings.trackerAlwaysFirst);
+	fAppsShowExpanders->SetValue(fInitialSettings.superExpando);
+	fAppsExpandNew->SetValue(fInitialSettings.expandNewTeams);
+	fAppsHideLabels->SetValue(fInitialSettings.hideLabels);
+	fAppsIconSizeSlider->SetValue(fInitialSettings.iconSize
+		/ kIconSizeInterval);
 
 	// Window settings
-	fWindowAlwaysOnTop->SetValue(settings->alwaysOnTop);
-	fWindowAutoRaise->SetValue(settings->autoRaise);
-	fWindowAutoHide->SetValue(settings->autoHide);
+	fWindowAlwaysOnTop->SetValue(fInitialSettings.alwaysOnTop);
+	fWindowAutoRaise->SetValue(fInitialSettings.autoRaise);
+	fWindowAutoHide->SetValue(fInitialSettings.autoHide);
 
-	EnableDisableDependentItems();
+	_EnableDisableDependentItems();
 
 	// Targets
 	fAppsSort->SetTarget(be_app);
 	fAppsSortTrackerFirst->SetTarget(be_app);
+	fAppsShowExpanders->SetTarget(be_app);
 	fAppsExpandNew->SetTarget(be_app);
 	fAppsHideLabels->SetTarget(be_app);
 	fAppsIconSizeSlider->SetTarget(be_app);
@@ -204,8 +206,8 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 					.Add(fMenuRecentApplicationCount)
 					.End()
 				.End()
-			//.Add(new BButton(B_TRANSLATE("Edit menu" B_UTF8_ELLIPSIS),
-			//	new BMessage(kEditMenuInTracker)))
+				//.Add(new BButton(B_TRANSLATE("Open in Tracker" B_UTF8_ELLIPSIS),
+				//	new BMessage(kOpenInTracker)))
 			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.End()
@@ -225,16 +227,29 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 			.End()
 		.View());
 
+	// Action Buttons
+	fRevertButton = new BButton(B_TRANSLATE("Revert"),
+		new BMessage(kRevert));
+	fDefaultsButton = new BButton(B_TRANSLATE("Defaults"),
+		new BMessage(kDefaults));
+
 	// Layout
 	BLayoutBuilder::Group<>(this)
-		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
-			.Add(appsSettingsBox)
-			.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
-				.Add(recentItemsBox)
-				.Add(windowSettingsBox)
+		.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING)
+			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
+				.Add(appsSettingsBox)
+				.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
+					.Add(recentItemsBox)
+					.Add(windowSettingsBox)
+				.End()
 			.End()
-		.SetInsets(B_USE_DEFAULT_SPACING)
-		.End();
+			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
+				.Add(fRevertButton)
+				.AddGlue()
+				.Add(fDefaultsButton)
+				.End()
+			.SetInsets(B_USE_DEFAULT_SPACING)
+			.End();
 
 	CenterOnScreen();
 }
@@ -242,7 +257,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 
 PreferencesWindow::~PreferencesWindow()
 {
-	UpdateRecentCounts();
+	_UpdateRecentCounts();
 }
 
 
@@ -250,21 +265,30 @@ void
 PreferencesWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case kEditMenuInTracker:
+		case kOpenInTracker:
 			OpenWithTracker(B_USER_DESKBAR_DIRECTORY);
 			break;
 
-		case kUpdateRecentCounts:
-			UpdateRecentCounts();
+		case kUpdatePreferences:
+			_EnableDisableDependentItems();
+			_UpdateButtons();
 			break;
 
-		case kSuperExpando:
-			EnableDisableDependentItems();
-			be_app->PostMessage(message);
+		case kUpdateRecentCounts:
+			_UpdateRecentCounts();
+			_UpdateButtons();
 			break;
 
 		case kStateChanged:
-			EnableDisableDependentItems();
+			_EnableDisableDependentItems();
+			break;
+
+		case kRevert:
+			_UpdatePreferences(fInitialSettings);
+			break;
+
+		case kDefaults:
+			_UpdatePreferences(fDefaultSettings);
 			break;
 
 		default:
@@ -289,8 +313,11 @@ void
 PreferencesWindow::Show()
 {
 	if (IsHidden()) {
-		// move to current workspace
 		SetWorkspaces(B_CURRENT_WORKSPACE);
+			// move to current workspace
+		_SetInitialSettings();
+		_UpdateButtons();
+			// update initial settings for revert
 	}
 
 	BWindow::Show();
@@ -305,8 +332,228 @@ PreferencesWindow::WindowActivated(bool active)
 }
 
 
+//	#pragma mark - private methods
+
+
 void
-PreferencesWindow::UpdateRecentCounts()
+PreferencesWindow::_EnableDisableDependentItems()
+{
+	TBarApp* barApp = static_cast<TBarApp*>(be_app);
+	if (barApp->BarView()->Vertical()
+		&& barApp->BarView()->ExpandoState()) {
+		fAppsShowExpanders->SetEnabled(true);
+		fAppsExpandNew->SetEnabled(fAppsShowExpanders->Value());
+	} else {
+		fAppsShowExpanders->SetEnabled(false);
+		fAppsExpandNew->SetEnabled(false);
+	}
+
+	fMenuRecentDocumentCount->SetEnabled(
+		fMenuRecentDocuments->Value() != B_CONTROL_OFF);
+	fMenuRecentFolderCount->SetEnabled(
+		fMenuRecentFolders->Value() != B_CONTROL_OFF);
+	fMenuRecentApplicationCount->SetEnabled(
+		fMenuRecentApplications->Value() != B_CONTROL_OFF);
+
+	fWindowAutoRaise->SetEnabled(
+		fWindowAlwaysOnTop->Value() == B_CONTROL_OFF);
+}
+
+
+bool
+PreferencesWindow::_IsDefaultable()
+{
+	desk_settings* settings = static_cast<TBarApp*>(be_app)->Settings();
+
+	return fDefaultSettings.sortRunningApps != settings->sortRunningApps
+		|| fDefaultSettings.trackerAlwaysFirst != settings->trackerAlwaysFirst
+		|| fDefaultSettings.superExpando != settings->superExpando
+		|| fDefaultSettings.expandNewTeams != settings->expandNewTeams
+		|| fDefaultSettings.hideLabels != settings->hideLabels
+		|| fDefaultSettings.iconSize != settings->iconSize
+		|| fDefaultSettings.recentAppsEnabled != settings->recentAppsEnabled
+		|| fDefaultSettings.recentDocsEnabled != settings->recentDocsEnabled
+		|| fDefaultSettings.recentFoldersEnabled
+			!= settings->recentFoldersEnabled
+		|| fDefaultSettings.recentAppsCount != settings->recentAppsCount
+		|| fDefaultSettings.recentDocsCount != settings->recentDocsCount
+		|| fDefaultSettings.recentFoldersCount != settings->recentFoldersCount
+		|| fDefaultSettings.alwaysOnTop != settings->alwaysOnTop
+		|| fDefaultSettings.autoRaise != settings->autoRaise
+		|| fDefaultSettings.autoHide != settings->autoHide;
+}
+
+
+bool
+PreferencesWindow::_IsRevertable()
+{
+	desk_settings* settings = static_cast<TBarApp*>(be_app)->Settings();
+
+	return fInitialSettings.sortRunningApps != settings->sortRunningApps
+		|| fInitialSettings.trackerAlwaysFirst != settings->trackerAlwaysFirst
+		|| fInitialSettings.superExpando != settings->superExpando
+		|| fInitialSettings.expandNewTeams != settings->expandNewTeams
+		|| fInitialSettings.hideLabels != settings->hideLabels
+		|| fInitialSettings.iconSize != settings->iconSize
+		|| fInitialSettings.recentAppsEnabled != settings->recentAppsEnabled
+		|| fInitialSettings.recentDocsEnabled != settings->recentDocsEnabled
+		|| fInitialSettings.recentFoldersEnabled
+			!= settings->recentFoldersEnabled
+		|| fInitialSettings.recentAppsCount != settings->recentAppsCount
+		|| fInitialSettings.recentDocsCount != settings->recentDocsCount
+		|| fInitialSettings.recentFoldersCount != settings->recentFoldersCount
+		|| fInitialSettings.alwaysOnTop != settings->alwaysOnTop
+		|| fInitialSettings.autoRaise != settings->autoRaise
+		|| fInitialSettings.autoHide != settings->autoHide;
+}
+
+
+void
+PreferencesWindow::_SetDefaultSettings()
+{
+	// applications
+	fDefaultSettings.sortRunningApps = false;
+	fDefaultSettings.trackerAlwaysFirst = false;
+	fDefaultSettings.superExpando = false;
+	fDefaultSettings.expandNewTeams = false;
+	fDefaultSettings.hideLabels = false;
+	fDefaultSettings.iconSize = kMinimumIconSize;
+
+	// recent items
+	fDefaultSettings.recentAppsEnabled = true;
+	fDefaultSettings.recentDocsEnabled = true;
+	fDefaultSettings.recentFoldersEnabled = true;
+	fDefaultSettings.recentAppsCount = 10;
+	fDefaultSettings.recentDocsCount = 10;
+	fDefaultSettings.recentFoldersCount = 10;
+
+	// window
+	fDefaultSettings.alwaysOnTop = false;
+	fDefaultSettings.autoRaise = false;
+	fDefaultSettings.autoHide = false;
+}
+
+
+void
+PreferencesWindow::_SetInitialSettings()
+{
+	desk_settings* settings = static_cast<TBarApp*>(be_app)->Settings();
+
+	// applications
+	fInitialSettings.sortRunningApps = settings->sortRunningApps;
+	fInitialSettings.trackerAlwaysFirst = settings->trackerAlwaysFirst;
+	fInitialSettings.superExpando = settings->superExpando;
+	fInitialSettings.expandNewTeams = settings->expandNewTeams;
+	fInitialSettings.hideLabels = settings->hideLabels;
+	fInitialSettings.iconSize = settings->iconSize;
+
+	// recent items
+	fInitialSettings.recentAppsEnabled = settings->recentAppsEnabled;
+	fInitialSettings.recentDocsEnabled = settings->recentDocsEnabled;
+	fInitialSettings.recentFoldersEnabled = settings->recentFoldersEnabled;
+	fInitialSettings.recentAppsCount = settings->recentAppsCount;
+	fInitialSettings.recentDocsCount = settings->recentDocsCount;
+	fInitialSettings.recentFoldersCount = settings->recentFoldersCount;
+
+	// window
+	fInitialSettings.alwaysOnTop = settings->alwaysOnTop;
+	fInitialSettings.autoRaise = settings->autoRaise;
+	fInitialSettings.autoHide = settings->autoHide;
+}
+
+
+
+void
+PreferencesWindow::_UpdateButtons()
+{
+	fRevertButton->SetEnabled(_IsRevertable());
+	fDefaultsButton->SetEnabled(_IsDefaultable());
+}
+
+
+void
+PreferencesWindow::_UpdatePreferences(pref_settings prefs)
+{
+	desk_settings* settings = static_cast<TBarApp*>(be_app)->Settings();
+	bool updateRecentCounts = false;
+
+	if (settings->sortRunningApps != prefs.sortRunningApps) {
+		fAppsSort->SetValue(prefs.sortRunningApps);
+		fAppsSort->Invoke();
+	}
+	if (settings->trackerAlwaysFirst != prefs.trackerAlwaysFirst) {
+		fAppsSortTrackerFirst->SetValue(prefs.trackerAlwaysFirst);
+		fAppsSortTrackerFirst->Invoke();
+	}
+	if (settings->superExpando != prefs.superExpando) {
+		fAppsShowExpanders->SetValue(prefs.superExpando);
+		fAppsShowExpanders->Invoke();
+	}
+	if (settings->expandNewTeams != prefs.expandNewTeams) {
+		fAppsExpandNew->SetValue(prefs.expandNewTeams);
+		fAppsExpandNew->Invoke();
+	}
+	if (settings->hideLabels != prefs.hideLabels) {
+		fAppsHideLabels->SetValue(prefs.hideLabels);
+		fAppsHideLabels->Invoke();
+	}
+	if (settings->iconSize != prefs.iconSize) {
+		fAppsIconSizeSlider->SetValue(prefs.iconSize / kIconSizeInterval);
+		fAppsIconSizeSlider->Invoke();
+	}
+	if (settings->recentDocsEnabled != prefs.recentDocsEnabled) {
+		fMenuRecentDocuments->SetValue(prefs.recentDocsEnabled
+			? B_CONTROL_ON : B_CONTROL_OFF);
+		updateRecentCounts = true;
+	}
+	if (settings->recentFoldersEnabled != prefs.recentFoldersEnabled) {
+		fMenuRecentFolders->SetValue(prefs.recentFoldersEnabled
+			? B_CONTROL_ON : B_CONTROL_OFF);
+		updateRecentCounts = true;
+	}
+	if (settings->recentAppsEnabled != fDefaultSettings.recentAppsEnabled) {
+		fMenuRecentApplications->SetValue(prefs.recentAppsEnabled
+			? B_CONTROL_ON : B_CONTROL_OFF);
+		updateRecentCounts = true;
+	}
+	if (settings->recentDocsCount != prefs.recentDocsCount) {
+		BString docString;
+		docString << prefs.recentDocsCount;
+		fMenuRecentDocumentCount->SetText(docString.String());
+		updateRecentCounts = true;
+	}
+	if (settings->recentFoldersCount != prefs.recentFoldersCount) {
+		BString folderString;
+		folderString << prefs.recentFoldersCount;
+		fMenuRecentFolderCount->SetText(folderString.String());
+		updateRecentCounts = true;
+	}
+	if (settings->recentAppsCount != prefs.recentAppsCount) {
+		BString appString;
+		appString << prefs.recentAppsCount;
+		fMenuRecentApplicationCount->SetText(appString.String());
+		updateRecentCounts = true;
+	}
+	if (settings->alwaysOnTop != prefs.alwaysOnTop) {
+		fWindowAlwaysOnTop->SetValue(prefs.alwaysOnTop);
+		fWindowAlwaysOnTop->Invoke();
+	}
+	if (settings->autoRaise != prefs.autoRaise) {
+		fWindowAutoRaise->SetValue(prefs.autoRaise);
+		fWindowAutoRaise->Invoke();
+	}
+	if (settings->autoHide != prefs.autoHide) {
+		fWindowAutoHide->SetValue(prefs.autoHide);
+		fWindowAutoHide->Invoke();
+	}
+
+	if (updateRecentCounts)
+		_UpdateRecentCounts();
+}
+
+
+void
+PreferencesWindow::_UpdateRecentCounts()
 {
 	BMessage message(kUpdateRecentCounts);
 
@@ -324,30 +571,5 @@ PreferencesWindow::UpdateRecentCounts()
 
 	be_app->PostMessage(&message);
 
-	EnableDisableDependentItems();
-}
-
-
-void
-PreferencesWindow::EnableDisableDependentItems()
-{
-	TBarApp* barApp = static_cast<TBarApp*>(be_app);
-	if (barApp->BarView()->Vertical()
-		&& barApp->BarView()->ExpandoState()) {
-		fAppsShowExpanders->SetEnabled(true);
-		fAppsExpandNew->SetEnabled(fAppsShowExpanders->Value());
-	} else {
-		fAppsShowExpanders->SetEnabled(false);
-		fAppsExpandNew->SetEnabled(false);
-	}
-
-	fMenuRecentDocumentCount->SetEnabled(
-		fMenuRecentDocuments->Value() != B_CONTROL_OFF);
-	fMenuRecentApplicationCount->SetEnabled(
-		fMenuRecentApplications->Value() != B_CONTROL_OFF);
-	fMenuRecentFolderCount->SetEnabled(
-		fMenuRecentFolders->Value() != B_CONTROL_OFF);
-
-	fWindowAutoRaise->SetEnabled(
-		fWindowAlwaysOnTop->Value() == B_CONTROL_OFF);
+	_EnableDisableDependentItems();
 }

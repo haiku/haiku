@@ -11,7 +11,7 @@
 
 const uint32 kConfigShow			= 'show';
 const uint32 kUpdateRecentCounts	= 'upct';
-const uint32 kEditMenuInTracker		= 'mtrk';
+const uint32 kOpenInTracker			= 'otrk';
 
 const uint32 kTrackerFirst			= 'TkFt';
 const uint32 kSortRunningApps		= 'SAps';
@@ -21,6 +21,32 @@ const uint32 kHideLabels			= 'hLbs';
 const uint32 kResizeTeamIcons		= 'RTIs';
 const uint32 kAutoRaise				= 'AtRs';
 const uint32 kAutoHide				= 'AtHd';
+
+const uint32 kDefaults				= 'dflt';
+const uint32 kRevert				= 'rvrt';
+
+
+struct pref_settings {
+	// applications
+	bool trackerAlwaysFirst;
+	bool sortRunningApps;
+	bool superExpando;
+	bool expandNewTeams;
+	bool hideLabels;
+	int32 iconSize;
+	// recent items
+	int32 recentAppsCount;
+	int32 recentDocsCount;
+	int32 recentFoldersCount;
+	bool recentAppsEnabled;
+	bool recentDocsEnabled;
+	bool recentFoldersEnabled;
+	// window
+	bool alwaysOnTop;
+	bool autoRaise;
+	bool autoHide;
+};
+
 
 class BCheckBox;
 class BRadioButton;
@@ -38,8 +64,18 @@ public:
 	virtual	void			Show();
 	virtual	void			WindowActivated(bool active);
 
-			void			UpdateRecentCounts();
-			void			EnableDisableDependentItems();
+private:
+			void			_EnableDisableDependentItems();
+
+			bool			_IsDefaultable();
+			bool			_IsRevertable();
+
+			void			_SetDefaultSettings();
+			void			_SetInitialSettings();
+
+			void			_UpdateButtons();
+			void			_UpdatePreferences(pref_settings prefs);
+			void			_UpdateRecentCounts();
 
 private:
 			BCheckBox*		fMenuRecentDocuments;
@@ -60,6 +96,13 @@ private:
 			BCheckBox*		fWindowAlwaysOnTop;
 			BCheckBox*		fWindowAutoRaise;
 			BCheckBox*		fWindowAutoHide;
+
+			BButton*		fRevertButton;
+			BButton*		fDefaultsButton;
+
+private:
+			pref_settings	fDefaultSettings;
+			pref_settings	fInitialSettings;
 };
 
 
