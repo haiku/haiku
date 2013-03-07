@@ -12,9 +12,6 @@
 #include <OutlineListView.h>
 
 
-class BTextToolTip;
-
-
 class TimeZoneListView : public BOutlineListView {
 public:
 								TimeZoneListView(void);
@@ -22,9 +19,6 @@ public:
 
 protected:
 	virtual	bool				GetToolTipAt(BPoint point, BToolTip** _tip);
-
-private:
-			BTextToolTip*		fToolTip;
 };
 
 

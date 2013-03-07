@@ -26,16 +26,13 @@
 
 TimeZoneListView::TimeZoneListView(void)
 	:
-	BOutlineListView("cityList", B_SINGLE_SELECTION_LIST),
-	fToolTip(NULL)
+	BOutlineListView("cityList", B_SINGLE_SELECTION_LIST)
 {
 }
 
 
 TimeZoneListView::~TimeZoneListView()
 {
-	if (fToolTip != NULL)
-		fToolTip->ReleaseReference();
 }
 
 
@@ -62,15 +59,9 @@ TimeZoneListView::GetToolTipAt(BPoint point, BToolTip** _tip)
 			<< B_TRANSLATE("\nNow: ") << nowInTimeZone
 			<< " (" << dateInTimeZone << ')';
 
-	if (fToolTip != NULL)
-		fToolTip->SetText(toolTip.String());
-	else {
-		fToolTip = new (std::nothrow) BTextToolTip(toolTip.String());
-		if (fToolTip == NULL)
-			return false;
-	}
+	SetToolTip(toolTip.String());
 
-	*_tip = fToolTip;
+	*_tip = ToolTip();
 
 	return true;
 }
