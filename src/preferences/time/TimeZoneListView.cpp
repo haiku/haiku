@@ -63,10 +63,12 @@ TimeZoneListView::GetToolTipAt(BPoint point, BToolTip** _tip)
 			<< " (" << dateInTimeZone << ')';
 
 	if (fToolTip != NULL)
-		fToolTip->ReleaseReference();
-	fToolTip = new (std::nothrow) BTextToolTip(toolTip.String());
-	if (fToolTip == NULL)
-		return false;
+		fToolTip->SetText(toolTip.String());
+	else {
+		fToolTip = new (std::nothrow) BTextToolTip(toolTip.String());
+		if (fToolTip == NULL)
+			return false;
+	}
 
 	*_tip = fToolTip;
 
