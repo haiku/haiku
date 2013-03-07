@@ -31,19 +31,20 @@ public:
 			bigtime_t	RefreshInterval() const;
 
 private:
-			BMenuItem*	fAlwaysOnTop;
-
 			status_t	_OpenSettings(BFile& file, uint32 mode);
 			status_t	_LoadSettings(BMessage& settings);
 			status_t	_SaveSettings();
 
 			void		_AddDefaultView();
 			void		_MessageDropped(BMessage *message);
+			void		_SetAlwaysOnTop(bool alwaysOnTop);
 
+	BMenuItem*			fAlwaysOnTop;
 #ifdef __HAIKU__
-	BGroupLayout*	fLayout;
+	BGroupLayout*		fLayout;
 #endif
-	BMessenger		fSettingsWindow;
+	BMessenger			fSettingsWindow;
+
 };
 
 static const uint32 kMsgRemoveView = 'rmvw';

@@ -29,9 +29,10 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "ActivityWindow"
 
+
 static const uint32 kMsgAddView = 'advw';
-static const uint32 kMsgShowSettings = 'shst';
 static const uint32 kMsgAlwaysOnTop = 'alot';
+static const uint32 kMsgShowSettings = 'shst';
 
 
 ActivityWindow::ActivityWindow()
@@ -132,9 +133,14 @@ ActivityWindow::ActivityWindow()
 	menu = new BMenu(B_TRANSLATE("Settings"));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgShowSettings)));
+
 	menu->AddSeparatorItem();
 	fAlwaysOnTop = new BMenuItem(B_TRANSLATE("Always on top"), new BMessage(kMsgAlwaysOnTop));
+	bool alwaysOnTop = false;
+	if (settings.FindBool("always on top", &alwaysOnTop) == B_OK)
+		_SetAlwaysOnTop(alwaysOnTop);
 	menu->AddItem(fAlwaysOnTop);
+
 	menu->SetTargetForItems(this);
 	menuBar->AddItem(menu);
 }
@@ -207,8 +213,7 @@ ActivityWindow::MessageReceived(BMessage* message)
 
 		case kMsgAlwaysOnTop:
 		{
-			SetFeel(this->IsFloating() ? B_NORMAL_WINDOW_FEEL : B_FLOATING_ALL_WINDOW_FEEL);
-			fAlwaysOnTop->SetMarked(!fAlwaysOnTop->IsMarked());
+			_SetAlwaysOnTop(!fAlwaysOnTop->IsMarked());
 			break;
 		}
 
@@ -311,6 +316,10 @@ ActivityWindow::_SaveSettings()
 	if (status != B_OK)
 		return status;
 
+	status = settings.AddBool("always on top", fAlwaysOnTop->IsMarked());
+	if (status != B_OK)
+		return status;
+
 #ifdef __HAIKU__
 	BView* top = fLayout->View();
 #else
@@ -377,5 +386,13 @@ ActivityWindow::_MessageDropped(BMessage* message)
 	if (message->FindRef("refs", &ref) != B_OK) {
 		// TODO: If app, then launch it, and add ActivityView for this one?
 	}
+}
+
+
+void
+ActivityWindow::_SetAlwaysOnTop(bool alwaysOnTop)
+{
+	SetFeel(alwaysOnTop ? B_FLOATING_ALL_WINDOW_FEEL : B_NORMAL_WINDOW_FEEL);
+	fAlwaysOnTop->SetMarked(alwaysOnTop);
 }
 
