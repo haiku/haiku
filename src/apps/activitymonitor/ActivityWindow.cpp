@@ -136,9 +136,7 @@ ActivityWindow::ActivityWindow()
 
 	menu->AddSeparatorItem();
 	fAlwaysOnTop = new BMenuItem(B_TRANSLATE("Always on top"), new BMessage(kMsgAlwaysOnTop));
-	bool alwaysOnTop = false;
-	if (settings.FindBool("always on top", &alwaysOnTop) == B_OK)
-		_SetAlwaysOnTop(alwaysOnTop);
+	_SetAlwaysOnTop(settings.GetBool("always on top", false));
 	menu->AddItem(fAlwaysOnTop);
 
 	menu->SetTargetForItems(this);
@@ -316,7 +314,7 @@ ActivityWindow::_SaveSettings()
 	if (status != B_OK)
 		return status;
 
-	status = settings.AddBool("always on top", fAlwaysOnTop->IsMarked());
+	status = settings.SetBool("always on top", fAlwaysOnTop->IsMarked());
 	if (status != B_OK)
 		return status;
 
