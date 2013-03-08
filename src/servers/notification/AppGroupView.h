@@ -29,6 +29,7 @@ public:
 			void				Draw(BRect updateRect);
 
 			bool				HasChildren();
+			int32				ChildrenCount();
 
 			void				AddInfo(NotificationView* view);
 

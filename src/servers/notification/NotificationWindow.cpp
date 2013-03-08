@@ -376,11 +376,11 @@ NotificationWindow::SetPosition()
 			break;
 		case B_DESKBAR_RIGHT_TOP:
 			x = frame.left - width - rightOffset;
-			y = frame.top - topOffset;
+			y = frame.top - topOffset + 1;
 			break;
 		case B_DESKBAR_LEFT_TOP:
 			x = frame.right + leftOffset;
-			y = frame.top - topOffset;
+			y = frame.top - topOffset + 1;
 			break;
 		case B_DESKBAR_RIGHT_BOTTOM:
 			y = frame.bottom - height + bottomOffset;
