@@ -892,17 +892,20 @@ TermParse::EscParse()
 
 							case 38:
 							{
-								if (nparam == 3 && param[1] == 5) {
-									attributes &= ~FORECOLOR;
-									attributes |= FORECOLORED(param[2]);
-									attributes |= FORESET;
+								int color = -1;
+								if (nparam == 3 && param[1] == 5)
+									color = param[2];
+								else if (nparam == 5 && param[1] == 2)
+									color = fBuffer->GuessPaletteColor(
+										param[2], param[3], param[4]);
 
-								} else if (nparam == 5) {
-									// TODO lookup
+								if (color >= 0) {
+									attributes &= ~FORECOLOR;
+									attributes |= FORECOLORED(color);
+									attributes |= FORESET;
 								}
 
 								row = nparam; // force exit of the parsing
-
 								break;
 							}
 
@@ -934,17 +937,20 @@ TermParse::EscParse()
 
 							case 48:
 							{
-								if (nparam == 3 && param[1] == 5) {
-									attributes &= ~BACKCOLOR;
-									attributes |= BACKCOLORED(param[2]);
-									attributes |= BACKSET;
+								int color = -1;
+								if (nparam == 3 && param[1] == 5)
+									color = param[2];
+								else if (nparam == 5 && param[1] == 2)
+									color = fBuffer->GuessPaletteColor(
+										param[2], param[3], param[4]);
 
-								} else if (nparam == 5) {
-									// TODO lookup
+								if (color >= 0) {
+									attributes &= ~BACKCOLOR;
+									attributes |= BACKCOLORED(color);
+									attributes |= BACKSET;
 								}
 
 								row = nparam; // force exit of the parsing
-
 								break;
 							}
 

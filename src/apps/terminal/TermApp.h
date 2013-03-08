@@ -37,6 +37,7 @@
 #include <File.h>
 #include <String.h>
 
+#include "Colors.h"
 
 class Arguments;
 class BRect;
@@ -48,6 +49,8 @@ public:
 								TermApp();
 	virtual						~TermApp();
 
+	static const rgb_color*		DefaultPalette()
+									{ return fDefaultPalette; }
 protected:
 	virtual	void				ReadyToRun();
 	virtual bool				QuitRequested();
@@ -64,13 +67,14 @@ private:
 	static	status_t			_ChildCleanupThread(void* data);
 
 			void				_Usage(char *name);
-
+			void				_InitDefaultPalette();
 private:
 			bool				fStartFullscreen;
 			BString				fWindowTitle;
 
 			BWindow*			fTermWindow;
 			Arguments*			fArgs;
+	static	rgb_color			fDefaultPalette[kTermColorCount];
 };
 
 

@@ -58,6 +58,7 @@
 #include "PrefHandler.h"
 #include "Shell.h"
 #include "ShellParameters.h"
+#include "TermApp.h"
 #include "TermConst.h"
 #include "TerminalBuffer.h"
 #include "TerminalCharClassifier.h"
@@ -180,7 +181,6 @@ TermView::TermView(BRect frame, const ShellParameters& shellParameters,
 	fRows(ROWS_DEFAULT),
 	fEncoding(M_UTF8),
 	fActive(false),
-	fTermColorTable(NULL),
 	fScrBufSize(historySize),
 	fReportX10MouseEvent(false),
 	fReportNormalMouseEvent(false),
@@ -204,7 +204,6 @@ TermView::TermView(int rows, int columns,
 	fRows(rows),
 	fEncoding(M_UTF8),
 	fActive(false),
-	fTermColorTable(NULL),
 	fScrBufSize(historySize),
 	fReportX10MouseEvent(false),
 	fReportNormalMouseEvent(false),
@@ -238,7 +237,6 @@ TermView::TermView(BMessage* archive)
 	fRows(ROWS_DEFAULT),
 	fEncoding(M_UTF8),
 	fActive(false),
-	fTermColorTable(NULL),
 	fScrBufSize(1000),
 	fReportX10MouseEvent(false),
 	fReportNormalMouseEvent(false),
@@ -335,17 +333,13 @@ TermView::_InitObject(const ShellParameters& shellParameters)
 	if (fVisibleTextBuffer == NULL)
 		return B_NO_MEMORY;
 	
-	status_t error = _InitColorTable();
-	if (error != B_OK)
-		return error;
-
 	// TODO: Make the special word chars user-settable!
 	fCharClassifier = new(std::nothrow) CharClassifier(
 		kDefaultSpecialWordChars);
 	if (fCharClassifier == NULL)
 		return B_NO_MEMORY;
 
-	error = fTextBuffer->Init(fColumns, fRows, fScrBufSize);
+	status_t error = fTextBuffer->Init(fColumns, fRows, fScrBufSize);
 	if (error != B_OK)
 		return error;
 	fTextBuffer->SetEncoding(fEncoding);
@@ -394,7 +388,6 @@ TermView::~TermView()
 	delete fAutoScrollRunner;
 	delete fCharClassifier;
 	delete fVisibleTextBuffer;
-	delete[] fTermColorTable;
 	delete fTextBuffer;
 	delete shell;
 }
@@ -657,7 +650,7 @@ TermView::SetTermColor(uint index, rgb_color color, bool dynamic)
 {
 	if (!dynamic) {
 		if (index < kTermColorCount)
-			fTermColorTable[index] = color;
+			fTextBuffer->SetPaletteColor(index, color);
 		return;
 	}
 	
@@ -670,12 +663,12 @@ TermView::SetTermColor(uint index, rgb_color color, bool dynamic)
 			SetLowColor(fTextBackColor);
 			break;
 		case 110:
-			fTextForeColor =
-				PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR);
+			fTextForeColor = PrefHandler::Default()->getRGB(
+								PREF_TEXT_FORE_COLOR);
 			break;
 		case 111:
-			fTextBackColor =
-				PrefHandler::Default()->getRGB(PREF_TEXT_BACK_COLOR);
+			fTextBackColor = PrefHandler::Default()->getRGB(
+								PREF_TEXT_BACK_COLOR);
 			SetLowColor(fTextBackColor);
 			break;
 		default:
@@ -951,9 +944,9 @@ TermView::_DrawLinePart(int32 x1, int32 y1, uint32 attr, char *buf,
 	int backcolor = IS_BACKCOLOR(attr);
 	
 	if (IS_FORESET(attr))
-		rgb_fore = fTermColorTable[forecolor];
+		rgb_fore = fTextBuffer->PaletteColor(forecolor);
 	if (IS_BACKSET(attr))
-		rgb_back = fTermColorTable[backcolor];
+		rgb_back = fTextBuffer->PaletteColor(backcolor);
 
 //	printf("DLP:[%03x %03x %03x]; [%03x %03x %03x];\n",
 //			rgb_fore.red, rgb_fore.green, rgb_fore.blue, rgb_back.red, rgb_back.green, rgb_back.blue);
@@ -1064,7 +1057,7 @@ TermView::_DrawCursor()
 						fCursor.y - firstVisible);
 
 			if (IS_BACKSET(attr))
-				rgb_back = fTermColorTable[IS_BACKCOLOR(attr)];
+				rgb_back = fTextBuffer->PaletteColor(IS_BACKCOLOR(attr));
 			SetHighColor(rgb_back);
 		}
 
@@ -1272,7 +1265,8 @@ TermView::Draw(BRect updateRect)
 						? fSelectBackColor : fTextBackColor;
 
 					if (fTextBuffer->IsAlternateScreenActive()) {
-						// alternate screen uses cell attributes beyond the line ends
+						// alternate screen uses cell attributes
+						// beyond the line ends
 						uint32 count = 0;
 						fTextBuffer->GetCellAttributes(j, i, attr, count);
 						rect.right = rect.left + fFontWidth * count - 1;
@@ -1280,8 +1274,11 @@ TermView::Draw(BRect updateRect)
 					} else
 						attr = fVisibleTextBuffer->GetLineColor(j - firstVisible);
 
-					if (IS_BACKSET(attr))
-						rgb_back = fTermColorTable[IS_BACKCOLOR(attr)];
+					if (IS_BACKSET(attr)) {
+						int backcolor = IS_BACKCOLOR(attr);
+						rgb_back = fTextBuffer->PaletteColor(backcolor);
+					}
+
 					SetHighColor(rgb_back);
 					rgb_back = HighColor();
 					FillRect(rect);
@@ -1893,7 +1890,8 @@ TermView::MessageReceived(BMessage *msg)
 					break;
 
 				if (index < kTermColorCount)
-					SetTermColor(index, fTermColorTable[index], dynamic);
+					SetTermColor(index,
+						TermApp::DefaultPalette()[index], dynamic);
 			}
 			
 			break;
@@ -3229,51 +3227,6 @@ TermView::_CancelInputMethod()
 	delete inlineInput;
 }
 
-
-status_t
-TermView::_InitColorTable()
-{
-	fTermColorTable = new(std::nothrow) rgb_color[kTermColorCount];
-	if (fTermColorTable == NULL)
-		return B_NO_MEMORY;
-
-	// 0 - 15 are system ANSI colors
-	const char * keys[kANSIColorCount] = {
-		PREF_ANSI_BLACK_COLOR,
-		PREF_ANSI_RED_COLOR,
-		PREF_ANSI_GREEN_COLOR,
-		PREF_ANSI_YELLOW_COLOR,
-		PREF_ANSI_BLUE_COLOR,
-		PREF_ANSI_MAGENTA_COLOR,
-		PREF_ANSI_CYAN_COLOR,
-		PREF_ANSI_WHITE_COLOR,
-		PREF_ANSI_BLACK_HCOLOR,
-		PREF_ANSI_RED_HCOLOR,
-		PREF_ANSI_GREEN_HCOLOR,
-		PREF_ANSI_YELLOW_HCOLOR,
-		PREF_ANSI_BLUE_HCOLOR,
-		PREF_ANSI_MAGENTA_HCOLOR,
-		PREF_ANSI_CYAN_HCOLOR,
-		PREF_ANSI_WHITE_HCOLOR
-	};
-
-	rgb_color* color = fTermColorTable;
-	PrefHandler* handler = PrefHandler::Default();
-	for (uint i = 0; i < kANSIColorCount; i++)	
-		*color++ = handler->getRGB(keys[i]);
-
-	// 16 - 231 are 6x6x6 color "cubes" in xterm color model
-	for (uint red = 0; red < 256; red += (red == 0) ? 95 : 40)
-		for (uint green = 0; green < 256; green += (green == 0) ? 95 : 40)
-			for (uint blue = 0; blue < 256; blue += (blue == 0) ? 95 : 40)
-				(*color++).set_to(red, green, blue);
-
-	// 232 - 255 are grayscale ramp in xterm color model
-	for (uint gray = 8; gray < 240; gray += 10)
-		(*color++).set_to(gray, gray, gray);
-
-	return B_OK;
-}
 
 // #pragma mark - Listener
 

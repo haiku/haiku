@@ -153,7 +153,6 @@ private:
 
 			status_t			_InitObject(
 									const ShellParameters& shellParameters);
-			status_t			_InitColorTable();
 
 			status_t			_AttachShell(Shell* shell);
 			void				_DetachShell();
@@ -273,8 +272,6 @@ private:
 			rgb_color			fCursorBackColor;
 			rgb_color			fSelectForeColor;
 			rgb_color			fSelectBackColor;
-
-			rgb_color*			fTermColorTable;
 
 			// Scroll Region
 			float				fScrollOffset;

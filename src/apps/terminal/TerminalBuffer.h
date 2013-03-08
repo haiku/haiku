@@ -34,6 +34,9 @@ public:
 			void				SetCursorStyle(int32 style, bool blinking);
 			void				SetCursorBlinking(bool blinking);
 			void				SetCursorHidden(bool hidden);
+			void				SetPaletteColor(uint8 index, rgb_color color);
+			rgb_color			PaletteColor(uint8 index);
+			int					GuessPaletteColor(int red, int green, int blue);
 
 			void				NotifyQuit(int32 reason);
 
@@ -61,6 +64,7 @@ private:
 			TerminalLine**		fAlternateScreen;
 			HistoryBuffer*		fAlternateHistory;
 			int32				fAlternateScreenOffset;
+			rgb_color*			fColorsPalette;
 
 			// listener/dirty region management
 			BMessenger			fListener;

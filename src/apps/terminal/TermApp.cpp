@@ -37,6 +37,7 @@
 static bool sUsageRequested = false;
 //static bool sGeometryRequested = false;
 
+rgb_color TermApp::fDefaultPalette[kTermColorCount];
 
 int
 main()
@@ -57,6 +58,8 @@ TermApp::TermApp()
 	fArgs(NULL)
 {
 	fArgs = new Arguments(0, NULL);
+
+	_InitDefaultPalette();
 }
 
 
@@ -307,5 +310,45 @@ TermApp::_Usage(char *name)
 		//"  -geom,  --geometry           set window geometry\n"
 		//"                               An example of geometry is \"80x25+100+100\"\n"
 		);
+}
+
+
+void
+TermApp::_InitDefaultPalette()
+{
+	// 0 - 15 are system ANSI colors
+	const char * keys[kANSIColorCount] = {
+		PREF_ANSI_BLACK_COLOR,
+		PREF_ANSI_RED_COLOR,
+		PREF_ANSI_GREEN_COLOR,
+		PREF_ANSI_YELLOW_COLOR,
+		PREF_ANSI_BLUE_COLOR,
+		PREF_ANSI_MAGENTA_COLOR,
+		PREF_ANSI_CYAN_COLOR,
+		PREF_ANSI_WHITE_COLOR,
+		PREF_ANSI_BLACK_HCOLOR,
+		PREF_ANSI_RED_HCOLOR,
+		PREF_ANSI_GREEN_HCOLOR,
+		PREF_ANSI_YELLOW_HCOLOR,
+		PREF_ANSI_BLUE_HCOLOR,
+		PREF_ANSI_MAGENTA_HCOLOR,
+		PREF_ANSI_CYAN_HCOLOR,
+		PREF_ANSI_WHITE_HCOLOR
+	};
+
+	rgb_color* color = fDefaultPalette;
+	PrefHandler* handler = PrefHandler::Default();
+	for (uint i = 0; i < kANSIColorCount; i++)
+		*color++ = handler->getRGB(keys[i]);
+
+	// 16 - 231 are 6x6x6 color "cubes" in xterm color model
+	for (uint red = 0; red < 256; red += (red == 0) ? 95 : 40)
+		for (uint green = 0; green < 256; green += (green == 0) ? 95 : 40)
+			for (uint blue = 0; blue < 256; blue += (blue == 0) ? 95 : 40)
+				(*color++).set_to(red, green, blue);
+
+	// 232 - 255 are grayscale ramp in xterm color model
+	for (uint gray = 8; gray < 240; gray += 10)
+		(*color++).set_to(gray, gray, gray);
 }
 

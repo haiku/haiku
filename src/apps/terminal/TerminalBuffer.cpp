@@ -9,6 +9,8 @@
 
 #include <Message.h>
 
+#include "Colors.h"
+#include "TermApp.h"
 #include "TermConst.h"
 
 
@@ -22,6 +24,7 @@ TerminalBuffer::TerminalBuffer()
 	fAlternateScreen(NULL),
 	fAlternateHistory(NULL),
 	fAlternateScreenOffset(0),
+	fColorsPalette(NULL),
 	fListenerValid(false)
 {
 }
@@ -31,6 +34,7 @@ TerminalBuffer::~TerminalBuffer()
 {
 	delete fAlternateScreen;
 	delete fAlternateHistory;
+	delete[] fColorsPalette;
 }
 
 
@@ -46,6 +50,13 @@ TerminalBuffer::Init(int32 width, int32 height, int32 historySize)
 
 	for (int32 i = 0; i < height; i++)
 		fAlternateScreen[i]->Clear();
+
+	fColorsPalette = new(std::nothrow) rgb_color[kTermColorCount];
+	if (fColorsPalette == NULL)
+		return B_NO_MEMORY;
+
+	memcpy(fColorsPalette, TermApp::DefaultPalette(),
+			sizeof(rgb_color) * kTermColorCount);
 
 	return BasicTerminalBuffer::Init(width, height, historySize);
 }
@@ -208,6 +219,42 @@ TerminalBuffer::SetCursorHidden(bool hidden)
 		message.AddBool("hidden", hidden);
 		fListener.SendMessage(&message);
 	}
+}
+
+
+void
+TerminalBuffer::SetPaletteColor(uint8 index, rgb_color color)
+{
+	if (index < kTermColorCount)
+		fColorsPalette[index] = color;
+}
+
+
+rgb_color
+TerminalBuffer::PaletteColor(uint8 index)
+{
+	return fColorsPalette[min_c(index, kTermColorCount - 1)];
+}
+
+
+int
+TerminalBuffer::GuessPaletteColor(int red, int green, int blue)
+{
+	int distance = 255 * 100;
+	int index = -1;
+	for (int i = 0; i < kTermColorCount && distance > 0; i++) {
+		rgb_color color = fColorsPalette[i];
+		int r = 30 * abs(color.red - red);
+		int g = 59 * abs(color.green - green);
+		int b = 11 * abs(color.blue - blue);
+		int d = r + g + b;
+		if (distance > d) {
+			index = i;
+			distance = d;
+		}
+	}
+
+	return min_c(index, kTermColorCount - 1);
 }
 
 
