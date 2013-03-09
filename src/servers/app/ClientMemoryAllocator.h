@@ -10,6 +10,7 @@
 
 
 #include <Locker.h>
+#include <Referenceable.h>
 
 #include <util/DoublyLinkedList.h>
 
@@ -34,7 +35,7 @@ typedef DoublyLinkedList<block> block_list;
 typedef DoublyLinkedList<chunk> chunk_list;
 
 
-class ClientMemoryAllocator {
+class ClientMemoryAllocator : public BReferenceable {
 public:
 								ClientMemoryAllocator(ServerApp* application);
 								~ClientMemoryAllocator();

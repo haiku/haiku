@@ -105,7 +105,7 @@ ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
 	fViewCursor(NULL),
 	fCursorHideLevel(0),
 	fIsActive(false),
-	fMemoryAllocator(this)
+	fMemoryAllocator(new ClientMemoryAllocator(this))
 {
 	if (fSignature == "")
 		fSignature = "application/no-signature";
@@ -194,7 +194,7 @@ ServerApp::~ServerApp()
 		fWindowListLock.Lock();
 	}
 
-	fMemoryAllocator.Detach();
+	fMemoryAllocator->Detach();
 	fMapLocker.Lock();
 
 	while (!fBitmapMap.empty())
@@ -204,6 +204,7 @@ ServerApp::~ServerApp()
 		fPictureMap.begin()->second->SetOwner(NULL);
 
 	fDesktop->GetCursorManager().DeleteCursors(fClientTeam);
+	fMemoryAllocator->ReleaseReference();
 
 	STRACE(("ServerApp %s::~ServerApp(): Exiting\n", Signature()));
 }
@@ -565,7 +566,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 
 		case AS_DUMP_ALLOCATOR:
-			fMemoryAllocator.Dump();
+			fMemoryAllocator->Dump();
 			break;
 		case AS_DUMP_BITMAPS:
 		{
@@ -727,7 +728,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (link.Read<int32>(&screenID) == B_OK) {
 				// TODO: choose the right HWInterface with regards to the
 				// screenID
-				bitmap = gBitmapManager->CreateBitmap(&fMemoryAllocator,
+				bitmap = gBitmapManager->CreateBitmap(fMemoryAllocator,
 					*fDesktop->HWInterface(), frame, colorSpace, flags,
 					bytesPerRow, screenID, &allocationFlags);
 			}

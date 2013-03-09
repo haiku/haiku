@@ -316,6 +316,7 @@ ClientMemoryAllocator::_AllocateChunk(size_t size, bool& newArea)
 
 ClientMemory::ClientMemory()
 	:
+	fAllocator(NULL),
 	fBlock(NULL)
 {
 }
@@ -325,6 +326,8 @@ ClientMemory::~ClientMemory()
 {
 	if (fBlock != NULL)
 		fAllocator->Free(fBlock);
+	if (fAllocator != NULL)
+		fAllocator->ReleaseReference();
 }
 
 
@@ -333,6 +336,8 @@ ClientMemory::Allocate(ClientMemoryAllocator* allocator, size_t size,
 	bool& newArea)
 {
 	fAllocator = allocator;
+	fAllocator->AcquireReference();
+
 	return fAllocator->Allocate(size, &fBlock, newArea);
 }
 

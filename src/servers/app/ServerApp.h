@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2012, Haiku.
+ * Copyright 2001-2013, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -37,6 +37,7 @@ class ServerWindow;
 namespace BPrivate {
 	class PortLink;
 };
+
 
 class ServerApp : public MessageLooper {
 public:
@@ -156,7 +157,8 @@ private:
 
 			bool				fIsActive;
 
-			ClientMemoryAllocator fMemoryAllocator;
+			ClientMemoryAllocator* fMemoryAllocator;
 };
+
 
 #endif	// SERVER_APP_H
