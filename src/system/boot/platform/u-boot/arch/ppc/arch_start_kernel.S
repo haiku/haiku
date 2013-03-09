@@ -3,7 +3,8 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-#define FUNCTION(x) .global x; .type x,@function; x
+#include <asm_defs.h>
+
 
 /*	status_t arch_start_kernel(struct kernel_args *kernelArgs,
 		addr_t kernelEntry, addr_t kernelStackTop);
@@ -46,4 +47,5 @@ FUNCTION(arch_start_kernel):
 	mtlr	%r0
 	addi	%r1, %r1, 32
 	blr
+FUNCTION_END(arch_start_kernel)
 
