@@ -207,8 +207,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 					.Add(fMenuRecentApplicationCount)
 					.End()
 				.End()
-				//.Add(new BButton(B_TRANSLATE("Open in Tracker" B_UTF8_ELLIPSIS),
-				//	new BMessage(kOpenInTracker)))
 			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.End()
@@ -248,6 +246,8 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 				.Add(fDefaultsButton)
 				.Add(fRevertButton)
 				.AddGlue()
+				.Add(new BButton(B_TRANSLATE("Open menu in Tracker"
+					B_UTF8_ELLIPSIS), new BMessage(kOpenInTracker)))
 				.End()
 			.SetInsets(B_USE_DEFAULT_SPACING)
 			.End();
