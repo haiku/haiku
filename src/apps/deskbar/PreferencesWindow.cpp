@@ -68,7 +68,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 		new BMessage(kUpdateRecentCounts));
 
 	// Applications controls
-	fAppsSort = new BCheckBox(B_TRANSLATE("Sort running applications"),
+	fAppsSort = new BCheckBox(B_TRANSLATE("Sort applications by name"),
 		new BMessage(kSortRunningApps));
 	fAppsSortTrackerFirst = new BCheckBox(B_TRANSLATE("Tracker always first"),
 		new BMessage(kTrackerFirst));
