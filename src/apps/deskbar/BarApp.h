@@ -159,6 +159,8 @@ private:
 			void					SaveSettings();
 
 			void					ShowPreferencesWindow();
+			void					QuitPreferencesWindow();
+
 			void					ResizeTeamIcons();
 			void					FetchAppIcon(const char* signature,
 										BBitmap* icon);

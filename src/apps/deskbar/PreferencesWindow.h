@@ -9,7 +9,8 @@
 #include <Window.h>
 
 
-const uint32 kConfigShow			= 'show';
+const uint32 kConfigShow			= 'PrSh';
+const uint32 kConfigQuit			= 'PrQt';
 const uint32 kUpdateRecentCounts	= 'upct';
 const uint32 kOpenInTracker			= 'otrk';
 
@@ -62,7 +63,6 @@ public:
 	virtual	void			MessageReceived(BMessage* message);
 	virtual	bool			QuitRequested();
 	virtual	void			Show();
-	virtual	void			WindowActivated(bool active);
 
 private:
 			void			_EnableDisableDependentItems();

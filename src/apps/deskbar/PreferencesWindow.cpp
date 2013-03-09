@@ -301,10 +301,8 @@ PreferencesWindow::MessageReceived(BMessage* message)
 bool
 PreferencesWindow::QuitRequested()
 {
-	if (IsHidden())
-		return true;
+	be_app->PostMessage(kConfigQuit);
 
-	Hide();
 	return false;
 }
 
@@ -312,23 +310,12 @@ PreferencesWindow::QuitRequested()
 void
 PreferencesWindow::Show()
 {
-	if (IsHidden()) {
+	if (IsHidden())
 		SetWorkspaces(B_CURRENT_WORKSPACE);
-			// move to current workspace
-		_SetInitialSettings();
-		_UpdateButtons();
-			// update initial settings for revert
-	}
+
+	_UpdateButtons();
 
 	BWindow::Show();
-}
-
-
-void
-PreferencesWindow::WindowActivated(bool active)
-{
-	if (!active && IsMinimized())
-		PostMessage(B_QUIT_REQUESTED);
 }
 
 
@@ -460,7 +447,6 @@ PreferencesWindow::_SetInitialSettings()
 	fInitialSettings.autoRaise = settings->autoRaise;
 	fInitialSettings.autoHide = settings->autoHide;
 }
-
 
 
 void

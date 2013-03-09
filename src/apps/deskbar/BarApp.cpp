@@ -172,21 +172,10 @@ TBarApp::~TBarApp()
 bool
 TBarApp::QuitRequested()
 {
-	// don't allow user quitting
+	// don't allow the user to quit
 	if (CurrentMessage() && CurrentMessage()->FindBool("shortcut")) {
-		// but allow quitting to hide fPreferencesWindow
-		int32 index = 0;
-		BWindow* window = NULL;
-		while ((window = WindowAt(index++)) != NULL) {
-			if (window == fPreferencesWindow) {
-				if (fPreferencesWindow->Lock()) {
-					if (fPreferencesWindow->IsActive())
-						fPreferencesWindow->PostMessage(B_QUIT_REQUESTED);
-					fPreferencesWindow->Unlock();
-				}
-				break;
-			}
-		}
+		// but close the preferences window
+		QuitPreferencesWindow();
 		return false;
 	}
 
@@ -449,8 +438,13 @@ TBarApp::MessageReceived(BMessage* message)
 			ShowPreferencesWindow();
 			break;
 
+		case kConfigQuit:
+			QuitPreferencesWindow();
+			break;
+
 		case kStateChanged:
-			fPreferencesWindow->PostMessage(kStateChanged);
+			if (fPreferencesWindow != NULL)
+				fPreferencesWindow->PostMessage(kStateChanged);
 			break;
 
 		case kShowDeskbarMenu:
@@ -486,7 +480,8 @@ TBarApp::MessageReceived(BMessage* message)
 			if (message->FindBool("documentsEnabled", &enabled) == B_OK)
 				fSettings.recentDocsEnabled = enabled && count > 0;
 
-			fPreferencesWindow->PostMessage(kUpdatePreferences);
+			if (fPreferencesWindow != NULL)
+				fPreferencesWindow->PostMessage(kUpdatePreferences);
 			break;
 
 		case B_SOME_APP_LAUNCHED:
@@ -532,14 +527,16 @@ TBarApp::MessageReceived(BMessage* message)
 			fSettings.alwaysOnTop = !fSettings.alwaysOnTop;
 			fBarWindow->SetFeel(fSettings.alwaysOnTop ?
 				B_FLOATING_ALL_WINDOW_FEEL : B_NORMAL_WINDOW_FEEL);
-			fPreferencesWindow->PostMessage(kUpdatePreferences);
+			if (fPreferencesWindow != NULL)
+				fPreferencesWindow->PostMessage(kUpdatePreferences);
 			break;
 
 		case kAutoRaise:
 			fSettings.autoRaise = fSettings.alwaysOnTop ? false :
 				!fSettings.autoRaise;
 
-			fPreferencesWindow->PostMessage(kUpdatePreferences);
+			if (fPreferencesWindow != NULL)
+				fPreferencesWindow->PostMessage(kUpdatePreferences);
 			break;
 
 		case kAutoHide:
@@ -549,7 +546,8 @@ TBarApp::MessageReceived(BMessage* message)
 			fBarView->HideDeskbar(fSettings.autoHide);
 			fBarWindow->Unlock();
 
-			fPreferencesWindow->PostMessage(kUpdatePreferences);
+			if (fPreferencesWindow != NULL)
+				fPreferencesWindow->PostMessage(kUpdatePreferences);
 			break;
 
 		case kTrackerFirst:
@@ -559,7 +557,8 @@ TBarApp::MessageReceived(BMessage* message)
 			fBarView->PlaceApplicationBar();
 			fBarWindow->Unlock();
 
-			fPreferencesWindow->PostMessage(kUpdatePreferences);
+			if (fPreferencesWindow != NULL)
+				fPreferencesWindow->PostMessage(kUpdatePreferences);
 			break;
 
 		case kSortRunningApps:
@@ -569,7 +568,8 @@ TBarApp::MessageReceived(BMessage* message)
 			fBarView->PlaceApplicationBar();
 			fBarWindow->Unlock();
 
-			fPreferencesWindow->PostMessage(kUpdatePreferences);
+			if (fPreferencesWindow != NULL)
+				fPreferencesWindow->PostMessage(kUpdatePreferences);
 			break;
 
 		case kUnsubscribe:
@@ -587,7 +587,8 @@ TBarApp::MessageReceived(BMessage* message)
 			fBarView->PlaceApplicationBar();
 			fBarWindow->Unlock();
 
-			fPreferencesWindow->PostMessage(kUpdatePreferences);
+			if (fPreferencesWindow != NULL)
+				fPreferencesWindow->PostMessage(kUpdatePreferences);
 			break;
 
 		case kExpandNewTeams:
@@ -597,7 +598,8 @@ TBarApp::MessageReceived(BMessage* message)
 			fBarView->PlaceApplicationBar();
 			fBarWindow->Unlock();
 
-			fPreferencesWindow->PostMessage(kUpdatePreferences);
+			if (fPreferencesWindow != NULL)
+				fPreferencesWindow->PostMessage(kUpdatePreferences);
 			break;
 
 		case kHideLabels:
@@ -607,7 +609,8 @@ TBarApp::MessageReceived(BMessage* message)
 			fBarView->PlaceApplicationBar();
 			fBarWindow->Unlock();
 
-			fPreferencesWindow->PostMessage(kUpdatePreferences);
+			if (fPreferencesWindow != NULL)
+				fPreferencesWindow->PostMessage(kUpdatePreferences);
 			break;
 
 		case kResizeTeamIcons:
@@ -637,7 +640,8 @@ TBarApp::MessageReceived(BMessage* message)
 
 			fBarWindow->Unlock();
 
-			fPreferencesWindow->PostMessage(kUpdatePreferences);
+			if (fPreferencesWindow != NULL)
+				fPreferencesWindow->PostMessage(kUpdatePreferences);
 			break;
 		}
 
@@ -911,14 +915,33 @@ TBarApp::ShowPreferencesWindow()
 	if (fPreferencesWindow == NULL) {
 		fPreferencesWindow = new PreferencesWindow(BRect(0, 0, 320, 240));
 		fPreferencesWindow->Show();
-	} else {
-		if (fPreferencesWindow->Lock()) {
-			if (fPreferencesWindow->IsHidden())
-				fPreferencesWindow->Show();
-			else
-				fPreferencesWindow->Activate();
+	} else if (fPreferencesWindow->Lock()) {
+		if (fPreferencesWindow->IsHidden())
+			fPreferencesWindow->Show();
+		else
+			fPreferencesWindow->Activate();
 
-			fPreferencesWindow->Unlock();
+		fPreferencesWindow->Unlock();
+	}
+}
+
+
+void
+TBarApp::QuitPreferencesWindow()
+{
+	if (fPreferencesWindow == NULL)
+		return;
+
+	int32 index = 0;
+	BWindow* window = NULL;
+	while ((window = WindowAt(index++)) != NULL) {
+		if (window == fPreferencesWindow) {
+			if (fPreferencesWindow->Lock()) {
+				fPreferencesWindow->Quit();
+					// Quit() destroys the window so don't unlock
+				fPreferencesWindow = NULL;
+			}
+			break;
 		}
 	}
 }
