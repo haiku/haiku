@@ -38,6 +38,9 @@ All rights reserved.
 
 #include <Application.h>
 
+#include "BarSettings.h"
+
+
 /* ------------------------------------ */
 // Private app_server defines that I need to use
 
@@ -74,40 +77,6 @@ const uint32 kUpdatePreferences = 'Pref';
 
 /* --------------------------------------------- */
 
-struct desk_settings {
-	bool vertical;
-	bool left;
-	bool top;
-	uint32 state;
-	float width;
-	bool showClock;
-	BPoint switcherLoc;
-	int32 recentAppsCount;
-	int32 recentDocsCount;
-	bool timeShowSeconds;
-	int32 recentFoldersCount;
-	bool alwaysOnTop;
-	bool timeFullDate;
-	bool trackerAlwaysFirst;
-	bool sortRunningApps;
-	bool superExpando;
-	bool expandNewTeams;
-	bool hideLabels;
-	int32 iconSize;
-	bool autoRaise;
-	bool autoHide;
-	bool recentAppsEnabled;
-	bool recentDocsEnabled;
-	bool recentFoldersEnabled;
-};
-
-struct clock_settings {
-	bool showSeconds;
-	bool showDayOfWeek;
-	bool showTimeZone;
-};
-
-
 class BFile;
 class BList;
 class BBitmap;
@@ -139,6 +108,8 @@ public:
 	virtual	void					RefsReceived(BMessage* refs);
 
 			desk_settings*			Settings() { return &fSettings; }
+			desk_settings*			DefaultSettings()
+										{ return &fDefaultSettings; }
 			clock_settings*			ClockSettings() { return &fClockSettings; }
 
 			TBarView*				BarView() const { return fBarView; }
@@ -166,6 +137,8 @@ private:
 										BBitmap* icon);
 
 			BRect					IconRect();
+
+private:
 			TBarWindow*				fBarWindow;
 			TBarView*				fBarView;
 			BMessenger				fSwitcherMessenger;
@@ -173,6 +146,7 @@ private:
 			BFile*					fSettingsFile;
 			BFile*					fClockSettingsFile;
 			desk_settings			fSettings;
+			desk_settings			fDefaultSettings;
 			clock_settings			fClockSettings;
 			PreferencesWindow*		fPreferencesWindow;
 
@@ -182,4 +156,4 @@ private:
 };
 
 
-#endif	/* BAR_APP_H */
+#endif	// BAR_APP_H

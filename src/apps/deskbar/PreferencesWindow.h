@@ -8,6 +8,8 @@
 
 #include <Window.h>
 
+#include "BarSettings.h"
+
 
 const uint32 kConfigShow			= 'PrSh';
 const uint32 kConfigQuit			= 'PrQt';
@@ -25,28 +27,6 @@ const uint32 kAutoHide				= 'AtHd';
 
 const uint32 kDefaults				= 'dflt';
 const uint32 kRevert				= 'rvrt';
-
-
-struct pref_settings {
-	// applications
-	bool trackerAlwaysFirst;
-	bool sortRunningApps;
-	bool superExpando;
-	bool expandNewTeams;
-	bool hideLabels;
-	int32 iconSize;
-	// recent items
-	int32 recentAppsCount;
-	int32 recentDocsCount;
-	int32 recentFoldersCount;
-	bool recentAppsEnabled;
-	bool recentDocsEnabled;
-	bool recentFoldersEnabled;
-	// window
-	bool alwaysOnTop;
-	bool autoRaise;
-	bool autoHide;
-};
 
 
 class BCheckBox;
@@ -70,11 +50,10 @@ private:
 			bool			_IsDefaultable();
 			bool			_IsRevertable();
 
-			void			_SetDefaultSettings();
 			void			_SetInitialSettings();
 
 			void			_UpdateButtons();
-			void			_UpdatePreferences(pref_settings prefs);
+			void			_UpdatePreferences(desk_settings* settings);
 			void			_UpdateRecentCounts();
 
 private:
@@ -101,9 +80,8 @@ private:
 			BButton*		fDefaultsButton;
 
 private:
-			pref_settings	fDefaultSettings;
-			pref_settings	fInitialSettings;
+			desk_settings	fSettings;
 };
 
 
-#endif	/* _PREFERENCES_WINDOW_H */
+#endif	// _PREFERENCES_WINDOW_H
