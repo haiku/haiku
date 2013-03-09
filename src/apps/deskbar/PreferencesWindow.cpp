@@ -229,10 +229,10 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 		.View());
 
 	// Action Buttons
-	fRevertButton = new BButton(B_TRANSLATE("Revert"),
-		new BMessage(kRevert));
 	fDefaultsButton = new BButton(B_TRANSLATE("Defaults"),
 		new BMessage(kDefaults));
+	fRevertButton = new BButton(B_TRANSLATE("Revert"),
+		new BMessage(kRevert));
 
 	// Layout
 	BLayoutBuilder::Group<>(this)
@@ -245,9 +245,9 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 				.End()
 			.End()
 			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
+				.Add(fDefaultsButton)
 				.Add(fRevertButton)
 				.AddGlue()
-				.Add(fDefaultsButton)
 				.End()
 			.SetInsets(B_USE_DEFAULT_SPACING)
 			.End();
@@ -401,8 +401,8 @@ PreferencesWindow::_IsRevertable()
 void
 PreferencesWindow::_UpdateButtons()
 {
-	fRevertButton->SetEnabled(_IsRevertable());
 	fDefaultsButton->SetEnabled(_IsDefaultable());
+	fRevertButton->SetEnabled(_IsRevertable());
 }
 
 

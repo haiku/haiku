@@ -76,8 +76,8 @@ private:
 			BCheckBox*		fWindowAutoRaise;
 			BCheckBox*		fWindowAutoHide;
 
-			BButton*		fRevertButton;
 			BButton*		fDefaultsButton;
+			BButton*		fRevertButton;
 
 private:
 			desk_settings	fSettings;
