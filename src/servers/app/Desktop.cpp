@@ -1592,7 +1592,7 @@ Desktop::SetWindowWorkspaces(Window* window, uint32 workspaces)
 
 
 /*!	\brief Adds the window to the desktop.
-	At this point, the window is still hidden and must be shown explicetly
+	At this point, the window is still hidden and must be shown explicitly
 	via ShowWindow().
 */
 void
@@ -2117,7 +2117,7 @@ Desktop::RedrawBackground()
 	BRegion redraw;
 
 	Window* window = CurrentWindows().FirstWindow();
-	if (window->Feel() == kDesktopWindowFeel) {
+	if (window != NULL && window->Feel() == kDesktopWindowFeel) {
 		redraw = window->VisibleContentRegion();
 
 		// look for desktop background view, and update its background color
@@ -2126,7 +2126,7 @@ Desktop::RedrawBackground()
 		if (view != NULL)
 			view = view->FirstChild();
 
-		while (view) {
+		while (view != NULL) {
 			if (view->IsDesktopBackground()) {
 				view->SetViewColor(fWorkspaces[fCurrentWorkspace].Color());
 				break;
