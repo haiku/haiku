@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-BluetoothPrefs	3926935355
+1	polish	x-vnd.Haiku-BluetoothPrefs	1628593228
 About Bluetooth…	Window		O aplikacji Bluetooth…
 Handheld	Settings view		Handheld
 Default inquiry time:	Settings view		Domyślny czas zapytania:
@@ -36,7 +36,6 @@ Identify us as...	Settings view		Identyfikuj nas jako...
 As blocked	Remote devices		Jako zablokowany
 Bluetooth	System name		Bluetooth
 Disconnect	Remote devices		Rozłączony
-Pick LocalDevice...	Settings view		Wybierz urządzenie lokalne...
 Defaults	Window		Domyślne
 Inquiry	Inquiry panel		Zapytaj
 Desktop	Settings view		Pulpit

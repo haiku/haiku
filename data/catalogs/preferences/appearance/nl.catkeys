@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Appearance	1428480647
+1	dutch; flemish	x-vnd.Haiku-Appearance	2849124868
 Plain font:	Font view		Standaardlettertype:
 Control highlight	Colors tab		Keuze-accent
 Control border	Colors tab		Keuzerand
@@ -13,7 +13,6 @@ Off	AntialiasingSettingsView		Uit
 Choose Decorator	DecorSettingsView		Decorator kiezen
 Success	Colors tab		Gelukt
 Inactive window tab text	Colors tab		Tabtekst niet-actief venster
-About Decorator	DecorSettingsView		Over decorator
 Failure	Colors tab		Mislukt
 Hinting menu	AntialiasingSettingsView		Hinting-menu
 Document background	Colors tab		Achtergrond document
@@ -27,7 +26,6 @@ Window border	Colors tab		Vensterrand
 Window tab text	Colors tab		Tekst venstertab
 Document text	Colors tab		Tekst document
 Navigation pulse	Colors tab		Puls navigatie
-Window decorator:	DecorSettingsView		Vensterdecorator:
 Selected menu item text	Colors tab		Tekst geselecteerd menu-item
 Menu background	Colors tab		Achtergrond menu
 OK	DecorSettingsView		OK

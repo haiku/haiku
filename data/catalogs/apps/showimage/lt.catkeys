@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-ShowImage	886873119
+1	lithuanian	x-vnd.Haiku-ShowImage	4011843330
 Use as background…	Menus		Naudoti kaip darbalaukio foną…
 File	Menus		Failas
 Slide delay	Menus		Skaidrių keitimo dažnis
@@ -25,7 +25,6 @@ The document '%s' (page %d) has been changed. Do you want to close the document?
 Leave full screen	Menus		Normalioji veiksena
 Close	Menus		Užverti
 Close	ClosePrompt		Užverti
-Undo	Menus		Atšaukti
 Resize to (in 1/72 inches):	PrintOptionsWindow		Keisti dydį (po 1/72 colio):
 Rating	Menus		Įvertinimas
 Flip left to right	Menus		Apversti horizontaliai

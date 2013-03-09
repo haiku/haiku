@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-BluetoothPrefs	3926935355
+1	hungarian	x-vnd.Haiku-BluetoothPrefs	1628593228
 About Bluetooth…	Window		A Bluetooth-ról…
 Handheld	Settings view		Mobiltelefon
 Default inquiry time:	Settings view		Alapértelmezett lekérdezési időkorlát:
@@ -36,7 +36,6 @@ Identify us as...	Settings view		Azonosítása mint…
 As blocked	Remote devices		Blokkoltként
 Bluetooth	System name		Bluetooth
 Disconnect	Remote devices		Kapcsolatbontás
-Pick LocalDevice...	Settings view		Helyi eszköz kiválasztása…
 Defaults	Window		Alapértelmezés
 Inquiry	Inquiry panel		Lekérdezés
 Desktop	Settings view		Asztal

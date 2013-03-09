@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-ShowImage	886873119
+1	french	x-vnd.Haiku-ShowImage	4011843330
 Use as background…	Menus		Utiliser comme fond d'écran…
 File	Menus		Fichier
 Slide delay	Menus		Délai de diaporama
@@ -25,7 +25,6 @@ The document '%s' (page %d) has been changed. Do you want to close the document?
 Leave full screen	Menus		Sortie du plein écran
 Close	Menus		Fermer
 Close	ClosePrompt		Fermer
-Undo	Menus		Annuler
 Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionner (en 1/72 pouces) :
 Rating	Menus		Évaluation
 Flip left to right	Menus		Mirroir vertical

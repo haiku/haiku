@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Appearance	2950529393
+1	french	x-vnd.Haiku-Appearance	76206318
 Plain font:	Font view		Police simple :
 Control highlight	Colors tab		Mise en valeur de contrôle
 Control border	Colors tab		Bordure des contrôles
@@ -13,7 +13,6 @@ Off	AntialiasingSettingsView		Désactivé
 Choose Decorator	DecorSettingsView		Choisir un décorateur
 Success	Colors tab		Réussite
 Inactive window tab text	Colors tab		Texte des titres de fenêtres inactives
-About Decorator	DecorSettingsView		À propos du Décorateur
 Failure	Colors tab		Échec
 Hinting menu	AntialiasingSettingsView		Menu ajustement
 Document background	Colors tab		Arrière plan du document
@@ -29,7 +28,6 @@ Double:	DecorSettingsView		Double :
 Window tab text	Colors tab		Texte des titres de fenêtres
 Document text	Colors tab		Texte du document
 Navigation pulse	Colors tab		Pulsation de navigation
-Window decorator:	DecorSettingsView		Décorateur de fenêtre :
 Selected menu item text	Colors tab		Texte de l'élément sélectionné dans le menu
 Menu background	Colors tab		Arrière plan de menu
 List background	Colors tab		Arrière-plan de la liste

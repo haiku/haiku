@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-ShowImage	886873119
+1	slovak	x-vnd.Haiku-ShowImage	4011843330
 Use as background…	Menus		Použiť ako pozadie…
 File	Menus		Súbor
 Slide delay	Menus		Oneskorenie snímku
@@ -25,7 +25,6 @@ The document '%s' (page %d) has been changed. Do you want to close the document?
 Leave full screen	Menus		Opustiť celoobrazovkový režim
 Close	Menus		Zatvoriť
 Close	ClosePrompt		Zatvoriť
-Undo	Menus		Vrátiť späť
 Resize to (in 1/72 inches):	PrintOptionsWindow		Zmeniť veľkosť na (v 1/72 palca):
 Rating	Menus		Hodnotenie
 Flip left to right	Menus		Obrátiť zľava doprava

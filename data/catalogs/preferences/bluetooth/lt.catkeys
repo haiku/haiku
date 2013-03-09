@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-BluetoothPrefs	3926935355
+1	lithuanian	x-vnd.Haiku-BluetoothPrefs	1628593228
 About Bluetooth…	Window		Apie…
 Handheld	Settings view		delninukas
 Default inquiry time:	Settings view		Numatytasis žvalgymo laikas:
@@ -36,7 +36,6 @@ Identify us as...	Settings view		pasirinkite…
 As blocked	Remote devices		Kaip blokuotas
 Bluetooth	System name		Bluetooth
 Disconnect	Remote devices		Atsijungti
-Pick LocalDevice...	Settings view		pasirinkite vietinį įrenginį…
 Defaults	Window		Numatytai
 Inquiry	Inquiry panel		Žvalgyti
 Desktop	Settings view		stalinis kompiuteris

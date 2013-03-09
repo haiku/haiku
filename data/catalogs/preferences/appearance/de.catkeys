@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Appearance	2950529393
+1	german	x-vnd.Haiku-Appearance	76206318
 Plain font:	Font view		Normal:
 Control highlight	Colors tab		Steuerelement - Ausgewählt
 Control border	Colors tab		Steuerelement - Rahmen
@@ -13,7 +13,6 @@ Off	AntialiasingSettingsView		Aus
 Choose Decorator	DecorSettingsView		Dekorator wählen
 Success	Colors tab		Erfolg
 Inactive window tab text	Colors tab		Reiter - Text (inaktiv)
-About Decorator	DecorSettingsView		Über Dekorator
 Failure	Colors tab		Fehler
 Hinting menu	AntialiasingSettingsView		Hinting-Menü
 Document background	Colors tab		Dokument - Hintergrund
@@ -29,7 +28,6 @@ Double:	DecorSettingsView		Doppelt:
 Window tab text	Colors tab		Reiter - Text
 Document text	Colors tab		Dokument - Text
 Navigation pulse	Colors tab		Navigation - Leuchtfarbe
-Window decorator:	DecorSettingsView		Fenster-Dekorator:
 Selected menu item text	Colors tab		Menü - Text (ausgewählt)
 Menu background	Colors tab		Menü - Hintergrund
 List background	Colors tab		Liste - Hintergrund

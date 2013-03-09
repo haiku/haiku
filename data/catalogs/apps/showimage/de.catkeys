@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ShowImage	886873119
+1	german	x-vnd.Haiku-ShowImage	4011843330
 Use as background…	Menus		Als Hintergrund verwenden…
 File	Menus		Datei
 Slide delay	Menus		Verzögerung
@@ -25,7 +25,6 @@ The document '%s' (page %d) has been changed. Do you want to close the document?
 Leave full screen	Menus		Vollbild verlassen
 Close	Menus		Schließen
 Close	ClosePrompt		Schließen
-Undo	Menus		Rückgängig
 Resize to (in 1/72 inches):	PrintOptionsWindow		Größe ändern zu (in 1/72 Zoll):
 Rating	Menus		Bewertung
 Flip left to right	Menus		Horizontal spiegeln

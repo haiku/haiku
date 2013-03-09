@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ShowImage	886873119
+1	ukrainian	x-vnd.Haiku-ShowImage	4011843330
 Use as background…	Menus		Використати як тло…
 File	Menus		Файл
 Slide delay	Menus		Затримка слайда
@@ -25,7 +25,6 @@ The document '%s' (page %d) has been changed. Do you want to close the document?
 Leave full screen	Menus		Вийти з повноекранного режиму
 Close	Menus		Закрити
 Close	ClosePrompt		Закрити
-Undo	Menus		Відмінити
 Resize to (in 1/72 inches):	PrintOptionsWindow		Змінити розмір (в 1/72 дюйма):
 Rating	Menus		Оцінка
 Flip left to right	Menus		Пересунути горизонтально

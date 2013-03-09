@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-BluetoothPrefs	3926935355
+1	russian	x-vnd.Haiku-BluetoothPrefs	1628593228
 About Bluetooth…	Window		О программе…
 Handheld	Settings view		Переносной
 Default inquiry time:	Settings view		Время запроса по умолчанию:
@@ -36,7 +36,6 @@ Identify us as...	Settings view		Идентифицировать нас как�
 As blocked	Remote devices		Как блокированный
 Bluetooth	System name		Bluetooth
 Disconnect	Remote devices		Отключить
-Pick LocalDevice...	Settings view		Выбор локального устройства…
 Defaults	Window		По умолчанию
 Inquiry	Inquiry panel		Запрос
 Desktop	Settings view		Рабочий стол

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Appearance	2950529393
+1	english	x-vnd.Haiku-Appearance	76206318
 Plain font:	Font view		常规字体
 Control highlight	Colors tab		控件亮度
 Control border	Colors tab		控件边界
@@ -13,7 +13,6 @@ Off	AntialiasingSettingsView		关闭
 Choose Decorator	DecorSettingsView		选择装饰
 Success	Colors tab		成功
 Inactive window tab text	Colors tab		激活窗口标签
-About Decorator	DecorSettingsView		关于 Decorator
 Failure	Colors tab		失败
 Hinting menu	AntialiasingSettingsView		提示菜单
 Document background	Colors tab		文档背景
@@ -29,7 +28,6 @@ Double:	DecorSettingsView		双行：
 Window tab text	Colors tab		窗口标签文本
 Document text	Colors tab		文件文本
 Navigation pulse	Colors tab		导航引导
-Window decorator:	DecorSettingsView		窗口装饰：
 Selected menu item text	Colors tab		选择菜单文本
 Menu background	Colors tab		菜单背景
 List background	Colors tab		列表背景

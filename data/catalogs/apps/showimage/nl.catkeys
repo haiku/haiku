@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-ShowImage	886873119
+1	dutch; flemish	x-vnd.Haiku-ShowImage	4011843330
 Use as background…	Menus		Gebruik als achtergrond…
 File	Menus		Bestand
 Slide delay	Menus		Dia-vertraging
@@ -25,7 +25,6 @@ The document '%s' (page %d) has been changed. Do you want to close the document?
 Leave full screen	Menus		Volledig scherm verlaten
 Close	Menus		Sluiten
 Close	ClosePrompt		Sluit
-Undo	Menus		Ongedaan maken
 Resize to (in 1/72 inches):	PrintOptionsWindow		Omvormen naar (in eenheden van 1/72 inch):
 Rating	Menus		Waardering
 Flip left to right	Menus		Omklappen van links naar rechts

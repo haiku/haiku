@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Appearance	1492316509
+1	greek, modern (1453-)	x-vnd.Haiku-Appearance	963859935
 Control highlight	Colors tab		Έλεγχος φωτεινότητας
 Control border	Colors tab		Έλεγχος περιγράμματος
 Antialiasing type:	AntialiasingSettingsView		Τύπος εξομάλυνσης:
@@ -12,7 +12,6 @@ Off	AntialiasingSettingsView		Κλειστό
 Choose Decorator	DecorSettingsView		Επιλέξετε Διακοσμητή
 Success	Colors tab		Επιτυχία
 Inactive window tab text	Colors tab		Κείμενο της αδρανής καρτέλας παράθυρου
-About Decorator	DecorSettingsView		Σχετικά Με Τον Διακοσμητή
 Failure	Colors tab		Αποτυχία
 Hinting menu	AntialiasingSettingsView		Μενού υποδείξεων
 Document background	Colors tab		Φόντο εγγράφου

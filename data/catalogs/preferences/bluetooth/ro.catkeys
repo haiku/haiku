@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-BluetoothPrefs	2526531136
+1	romanian	x-vnd.Haiku-BluetoothPrefs	228189009
 About Bluetooth…	Window		Despre Bluetooth...
 Handheld	Settings view		Calculator de buzunar
 Default inquiry time:	Settings view		Timp implicit de întrebare:
@@ -35,7 +35,6 @@ Identify us as...	Settings view		Identificare ca...
 As blocked	Remote devices		Ca blocat
 Bluetooth	System name		Bluetooth
 Disconnect	Remote devices		Deconectează
-Pick LocalDevice...	Settings view		Selectează dispozitiv local...
 Defaults	Window		Implicite
 Inquiry	Inquiry panel		Întrebare
 Desktop	Settings view		Desktop

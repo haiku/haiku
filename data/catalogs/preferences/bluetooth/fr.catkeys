@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-BluetoothPrefs	3926935355
+1	french	x-vnd.Haiku-BluetoothPrefs	1628593228
 About Bluetooth…	Window		À propos de Bluetooth…
 Handheld	Settings view		Appareil de poche
 Default inquiry time:	Settings view		Temps de requête par défaut :
@@ -36,7 +36,6 @@ Identify us as...	Settings view		S'identifier comme…
 As blocked	Remote devices		Comme bloqué
 Bluetooth	System name		Bluetooth
 Disconnect	Remote devices		Déconnexion
-Pick LocalDevice...	Settings view		Choisir un appareil local…
 Defaults	Window		Défauts
 Inquiry	Inquiry panel		Examiner
 Desktop	Settings view		Bureau

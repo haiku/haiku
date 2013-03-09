@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Appearance	3266657197
+1	russian	x-vnd.Haiku-Appearance	392334122
 Plain font:	Font view		Простой шрифт:
 Control highlight	Colors tab		Подсветка элемента
 Control border	Colors tab		Граница элемента
@@ -13,7 +13,6 @@ Off	AntialiasingSettingsView		Выключить
 Choose Decorator	DecorSettingsView		Выберите декоратор
 Success	Colors tab		Успех
 Inactive window tab text	Colors tab		Текст заголовка неактивного окна
-About Decorator	DecorSettingsView		Об этом декораторе
 Failure	Colors tab		Неудача
 Hinting menu	AntialiasingSettingsView		Корректировка (хинтинг)
 Document background	Colors tab		Фон документа
@@ -29,7 +28,6 @@ Double:	DecorSettingsView		Двойной:
 Window tab text	Colors tab		Текст заголовка окна
 Document text	Colors tab		Текст документа
 Navigation pulse	Colors tab		Навигационная пульсация
-Window decorator:	DecorSettingsView		Оконный декоратор:
 Selected menu item text	Colors tab		Текст выделенного пункта меню
 Menu background	Colors tab		Фон меню
 OK	DecorSettingsView		ОК

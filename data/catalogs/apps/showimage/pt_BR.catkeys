@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-ShowImage	886873119
+1	portuguese (brazil)	x-vnd.Haiku-ShowImage	4011843330
 Use as background…	Menus		Utilizar como plano de fundo…
 File	Menus		Arquivo
 Slide delay	Menus		Atraso de deslizamento
@@ -25,7 +25,6 @@ The document '%s' (page %d) has been changed. Do you want to close the document?
 Leave full screen	Menus		Sair da tela cheia
 Close	Menus		Fechar
 Close	ClosePrompt		Fechar
-Undo	Menus		Desfazer
 Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionar para (em 1/72 polegadas):
 Rating	Menus		Classificação
 Flip left to right	Menus		Inverter da esquerda para direita

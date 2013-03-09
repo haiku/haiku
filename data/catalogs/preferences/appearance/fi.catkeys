@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Appearance	2950529393
+1	finnish	x-vnd.Haiku-Appearance	76206318
 Plain font:	Font view		Pelkkä kirjasin:
 Control highlight	Colors tab		Kontrollin korostus
 Control border	Colors tab		Kontrollin reuna
@@ -13,7 +13,6 @@ Off	AntialiasingSettingsView		Pois päältä
 Choose Decorator	DecorSettingsView		Valitse koristelu
 Success	Colors tab		Onnistuminen
 Inactive window tab text	Colors tab		Epäaktiivisen ikkunavälilehden tekstin väri
-About Decorator	DecorSettingsView		Koristeluohjelmasta
 Failure	Colors tab		Epäonnistuminen
 Hinting menu	AntialiasingSettingsView		Vinkkausvalikko
 Document background	Colors tab		Dokumentin tausta
@@ -29,7 +28,6 @@ Double:	DecorSettingsView		Kaksikko:
 Window tab text	Colors tab		Ikkunavälilehden teksti
 Document text	Colors tab		Dokumentin teksti
 Navigation pulse	Colors tab		Navigoinnin välke
-Window decorator:	DecorSettingsView		Ikkunan kehystäjä:
 Selected menu item text	Colors tab		Valitun valikkovalinnan teksti
 Menu background	Colors tab		Valikon tausta
 List background	Colors tab		Luettelotausta

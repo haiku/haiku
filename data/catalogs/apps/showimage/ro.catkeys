@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-ShowImage	2010609106
+1	romanian	x-vnd.Haiku-ShowImage	840612021
 Use as background…	Menus		Utilizează ca fundal...
 File	Menus		Fișier
 Slide delay	Menus		Întârziere imagine
@@ -21,7 +21,6 @@ Could not load image! Either the file or an image translator for it does not exi
 First page	Menus		Prima pagină
 Close	Menus		Închide
 Close	ClosePrompt		Închide
-Undo	Menus		Refă
 Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionează la (în 1/72 țoli):
 Flip left to right	Menus		Inversează stânga cu dreapta
 Show caption in full screen mode	Menus		Afișează legendă în modul ecran complet
