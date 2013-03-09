@@ -25,9 +25,9 @@
 
 #include "APRWindow.h"
 #include "defs.h"
-#include "ColorWell.h"
-#include "ColorWhichItem.h"
+#include "ColorPreview.h"
 #include "ColorSet.h"
+#include "ColorWhichItem.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -87,8 +87,8 @@ APRView::APRView(const char* name)
 	}
 
 	BRect wellrect(0, 0, 50, 50);
-	fColorWell = new ColorWell(wellrect, new BMessage(COLOR_DROPPED), 0);
-	fColorWell->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER,
+	fColorPreview = new ColorPreview(wellrect, new BMessage(COLOR_DROPPED), 0);
+	fColorPreview->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER,
 		B_ALIGN_BOTTOM));
 
 	fPicker = new BColorControl(B_ORIGIN, B_CELLS_32x8, 8.0,
@@ -100,14 +100,14 @@ APRView::APRView(const char* name)
 		.Add(fScrollView)
 		.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
-			.Add(fColorWell)
+			.Add(fColorPreview)
 			.Add(BSpaceLayoutItem::CreateHorizontalStrut(5))
 			.Add(fPicker)
 		)
 		.SetInsets(10, 10, 10, 10)
 	);
 
-	fColorWell->Parent()->SetExplicitMaxSize(
+	fColorPreview->Parent()->SetExplicitMaxSize(
 		BSize(B_SIZE_UNSET, fPicker->Bounds().Height()));
 	fAttrList->SetSelectionMessage(new BMessage(ATTRIBUTE_CHOSEN));
 }
@@ -123,7 +123,7 @@ APRView::AttachedToWindow()
 {
 	fPicker->SetTarget(this);
 	fAttrList->SetTarget(this);
-	fColorWell->SetTarget(this);
+	fColorPreview->SetTarget(this);
 
 	fAttrList->Select(0);
 }
@@ -257,8 +257,8 @@ APRView::_UpdateControls()
 	}
 
 	fPicker->SetValue(color);
-	fColorWell->SetColor(color);
-	fColorWell->Invalidate();
+	fColorPreview->SetColor(color);
+	fColorPreview->Invalidate();
 }
 
 

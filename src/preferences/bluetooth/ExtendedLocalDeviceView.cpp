@@ -72,7 +72,7 @@ ExtendedLocalDeviceView::SetLocalDevice(LocalDevice* lDevice)
 		fDevice = lDevice;
 		SetName(lDevice->GetFriendlyName().String());
 		fDeviceView->SetBluetoothDevice(lDevice);
-		
+
 		ClearDevice();
 
 		int value = fDevice->GetDiscoverable();
@@ -110,12 +110,12 @@ void
 ExtendedLocalDeviceView::MessageReceived(BMessage* message)
 {
 	printf("ExtendedLocalDeviceView::MessageReceived\n");
-	
+
 	if (fDevice == NULL) {
 		printf("ExtendedLocalDeviceView::Device missing\n");
 		return;
 	}
-	
+
 	if (message->WasDropped()) {
 
 	}
@@ -157,7 +157,7 @@ void
 ExtendedLocalDeviceView::SetEnabled(bool value)
 {
 	printf("ExtendedLocalDeviceView::SetEnabled\n");
-	
+
 	fVisible->SetEnabled(value);
 	fAuthentication->SetEnabled(value);
 	fDiscoverable->SetEnabled(value);
@@ -168,7 +168,7 @@ void
 ExtendedLocalDeviceView::ClearDevice()
 {
 	printf("ExtendedLocalDeviceView::ClearDevice\n");
-	
+
 	fVisible->SetValue(false);
 	fAuthentication->SetValue(false);
 	fDiscoverable->SetValue(false);

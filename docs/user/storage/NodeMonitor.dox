@@ -35,6 +35,9 @@
 	\var B_STOP_WATCHING
 
 	Flag for watch_node(). Unsubscribe from watching a node.
+
+	\attention \c B_STOP_WATCHING does not apply to volume watching, you must
+	           call stop_watching() instead.
 */
 
 
@@ -329,13 +332,13 @@
 	- \c B_WATCH_ALL
 	- \c B_WATCH_MOUNT
 
-	Note, that the latter two cases are not mutual exclusive, i.e. mount and
+	Note that the latter two cases are not mutual exclusive, i.e. mount and
 	node watching can be requested with a single call.
 
 	\param node node_ref referring to the node to be watched. May be \c NULL,
 	       if only mount watching is requested.
 	\param flags Flags indicating the actions to be performed.
-	\param target Messenger referring to the target. Must be valid.
+	\param target BMessenger object referring to the \a target.
 
 	\return \c B_OK if everything went fine, an error code otherwise.
 */
@@ -368,7 +371,7 @@
 	- \c B_WATCH_ALL
 	- \c B_WATCH_MOUNT
 
-	Note, that the latter two cases are not mutual exlusive, i.e. mount and
+	Note that the latter two cases are not mutual exclusive, i.e. mount and
 	node watching can be requested with a single call.
 
 	\param node node_ref referring to the node to be watched. May be \c NULL,
@@ -387,20 +390,41 @@
 	\fn status_t stop_watching(BMessenger target)
 	\brief Unsubscribes \a target from node and mount monitoring.
 
-	\param target Messenger referring to the target. Must be valid.
+	You may still receive notification messages after calling stop_watching()
+	because while node monitoring is asynchronous and all changes are atomic,
+	message sending is not atomic so there is a lag time from when you
+	stop monitoring and when the message is received in your message receiving
+	thread. You can check the timestamp of the message to determine if
+	it was sent after stop_watching() was called.
 
-	\return \c B_OK if everything went fine, an error code otherwise.
+	\param target BMessenger object referring to the \a target.
+
+	\return A status code.
+	\retval B_OK Stopped sending notification messages to the \a target.
+	\retval B_BAD_VALUE \a target was invalid.
+	\retval B_ENTRY_NOT_FOUND Node not found.
 */
 
 
 /*!
 	\fn status_t stop_watching(const BHandler *handler, const BLooper *looper)
-	\brief Unsubscribes \a target from node and mount monitoring.
+	\brief Unsubscribes \a handler or \a looper target from node and mount
+	       monitoring.
 
-	\param handler The target handler. May be \c NULL, if \a looper is not
-	       \c NULL. Then the preferred handler of the looper is targeted.
-	\param looper The target looper. May be \c NULL, if \a handler is not
-	       \c NULL. Then the handler's looper is the target looper.
+	You may still receive notification messages after calling stop_watching()
+	because while node monitoring is asynchronous and all changes are atomic,
+	message sending is not atomic so there is a lag time from when you
+	stop monitoring and when the message is received in your message receiving
+	thread. You can check the timestamp of the message to determine if
+	it was sent after stop_watching() was called.
 
-	\return \c B_OK if everything went fine, an error code otherwise.
+	\param handler The target handler, may be \c NULL. If \a looper is not
+	       \c NULL then the looper's preferred handler is targeted.
+	\param looper The target looper, may be \c NULL. If \a handler is not
+	       \c NULL then the handler's looper is targeted.
+
+	\return A status code.
+	\retval B_OK Stopped sending notification messages to the target.
+	\retval B_BAD_VALUE Target from \a handler or \a looper was invalid.
+	\retval B_ENTRY_NOT_FOUND Node not found.
 */

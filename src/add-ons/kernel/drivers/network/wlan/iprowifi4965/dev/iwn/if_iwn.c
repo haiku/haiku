@@ -89,6 +89,7 @@ static const struct iwn_ident iwn_ident_table[] = {
 	{ 0x8086, 0x008b, "Intel Centrino Wireless-N 1030"		},
 	{ 0x8086, 0x0090, "Intel Centrino Advanced-N 6230"		},
 	{ 0x8086, 0x0091, "Intel Centrino Advanced-N 6230"		},
+	{ 0x8086, 0x088e, "Intel Centrino Advanced-N 6235"		},
 	{ 0x8086, 0x0885, "Intel Centrino Wireless-N + WiMAX 6150"	},
 	{ 0x8086, 0x0886, "Intel Centrino Wireless-N + WiMAX 6150"	},
 	{ 0x8086, 0x0896, "Intel Centrino Wireless-N 130"		},

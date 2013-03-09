@@ -69,6 +69,7 @@ TTimeView::TTimeView(float maxWidth, float height)
 	fMaxWidth(maxWidth),
 	fHeight(height),
 	fOrientation(true),
+	fShowLevel(0),
 	fShowSeconds(false),
 	fShowDayOfWeek(false),
 	fShowTimeZone(false)
@@ -116,10 +117,11 @@ status_t
 TTimeView::Archive(BMessage* data, bool deep) const
 {
 	BView::Archive(data, deep);
+	data->AddBool("orientation", fOrientation);
+	data->AddInt16("showLevel", fShowLevel);
 	data->AddBool("showSeconds", fShowSeconds);
 	data->AddBool("showDayOfWeek", fShowDayOfWeek);
 	data->AddBool("showTimeZone", fShowTimeZone);
-	data->AddBool("orientation", fOrientation);
 	data->AddInt32("deskbar:private_align", B_ALIGN_RIGHT);
 
 	return B_OK;

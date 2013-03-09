@@ -340,9 +340,9 @@ BMenuBar::MouseDown(BPoint where)
 
 	uint32 buttons;
 	GetMouse(&where, &buttons);
- 
-  	BWindow* window = Window();
-  	if (!window->IsActive() || !window->IsFront()) {
+
+	BWindow* window = Window();
+	if (!window->IsActive() || !window->IsFront()) {
 		if ((mouse_mode() == B_FOCUS_FOLLOWS_MOUSE)
 			|| ((mouse_mode() == B_CLICK_TO_FOCUS_MOUSE)
 				&& ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0))) {
@@ -500,8 +500,8 @@ BMenuBar::StartMenuBar(int32 menuIndex, bool sticky, bool showMenu,
 	fMenuSem = create_sem(0, "window close sem");
 	_set_menu_sem_(window, fMenuSem);
 
-	fTrackingPID = spawn_thread(_TrackTask, "menu_tracking", B_DISPLAY_PRIORITY,
-		NULL);
+	fTrackingPID = spawn_thread(_TrackTask, "menu_tracking",
+		B_DISPLAY_PRIORITY, NULL);
 	if (fTrackingPID >= 0) {
 		menubar_data data;
 		data.menuBar = this;
@@ -557,24 +557,22 @@ BMenuBar::_Track(int32* action, int32 startIndex, bool showMenu)
 {
 	// TODO: Cleanup, merge some "if" blocks if possible
 	fChosenItem = NULL;
-
-	BWindow* window = Window();
 	fState = MENU_STATE_TRACKING;
 
 	BPoint where;
 	uint32 buttons;
-	if (window->Lock()) {
+	if (LockLooper()) {
 		if (startIndex != -1) {
 			be_app->ObscureCursor();
 			_SelectItem(ItemAt(startIndex), true, false);
 		}
 		GetMouse(&where, &buttons);
-		window->Unlock();
+		UnlockLooper();
 	}
 
 	while (fState != MENU_STATE_CLOSED) {
 		bigtime_t snoozeAmount = 40000;
-		if (Window() == NULL || !window->Lock())
+		if (!LockLooper())
 			break;
 
 		BMenuItem* menuItem = NULL;
@@ -587,7 +585,7 @@ BMenuBar::_Track(int32* action, int32 startIndex, bool showMenu)
 			// call _Track() from the selected sub-menu when the mouse cursor
 			// is over its window
 			BMenu* menu = fSelected->Submenu();
-			window->Unlock();
+			UnlockLooper();
 			snoozeAmount = 30000;
 			bool wasSticky = _IsStickyMode();
 			menu->_SetStickyMode(wasSticky);
@@ -602,9 +600,9 @@ BMenuBar::_Track(int32* action, int32 startIndex, bool showMenu)
 			// where to store the current mouse position ?
 			// (Or just use the BView mouse hooks)
 			BPoint newWhere;
-			if (window->Lock()) {
+			if (LockLooper()) {
 				GetMouse(&newWhere, &buttons);
-				window->Unlock();
+				UnlockLooper();
 			}
 
 			// This code is needed to make menus
@@ -619,7 +617,7 @@ BMenuBar::_Track(int32* action, int32 startIndex, bool showMenu)
 				} else
 					fState = MENU_STATE_CLOSED;
 			}
-			if (!window->Lock())
+			if (!LockLooper())
 				break;
 		} else if (menuItem != NULL) {
 			if (menuItem->Submenu() != NULL && menuItem != fSelected) {
@@ -642,7 +640,7 @@ BMenuBar::_Track(int32* action, int32 startIndex, bool showMenu)
 			fState = MENU_STATE_TRACKING;
 		}
 
-		window->Unlock();
+		UnlockLooper();
 
 		if (fState != MENU_STATE_CLOSED) {
 			// If user doesn't move the mouse, loop here,
@@ -680,14 +678,14 @@ BMenuBar::_Track(int32* action, int32 startIndex, bool showMenu)
 		}
 	}
 
-	if (window->Lock()) {
+	if (LockLooper()) {
 		if (fSelected != NULL)
 			_SelectItem(NULL);
 
 		if (fChosenItem != NULL)
 			fChosenItem->Invoke();
 		_RestoreFocus();
-		window->Unlock();
+		UnlockLooper();
 	}
 
 	if (_IsStickyMode())
@@ -699,7 +697,6 @@ BMenuBar::_Track(int32* action, int32 startIndex, bool showMenu)
 		*action = fState;
 
 	return fChosenItem;
-
 }
 
 

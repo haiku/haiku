@@ -1,22 +1,27 @@
-1	swedish	x-vnd.Haiku-Network	365183238
+1	swedish	x-vnd.Haiku-Network	1341378870
 Choose automatically	EthernetSettingsView		Välj automatiskt
 Gateway:	EthernetSettingsView		Gateway:
 Netmask:	EthernetSettingsView		Nätmask:
 DHCP	EthernetSettingsView		DHCP
 DNS #2:	EthernetSettingsView		Sekundär DNS:
 Apply	EthernetSettingsView		Använd
+Netmask is invalid	EthernetSettingsView		Nätmasken är felaktig
 OK	EthernetSettingsView		Ok
 DNS #1:	EthernetSettingsView		Primär DNS:
 IP address:	EthernetSettingsView		IP-adress:
 Adapter:	EthernetSettingsView		Nätverkskort:
 Domain:	EthernetSettingsView		Domän:
+Gateway is invalid	EthernetSettingsView		Gateway är ogiltig
+DNS #1 is invalid	EthernetSettingsView		DNS #1 är ogiltig
 Revert	EthernetSettingsView		Återställ
 <no wireless networks found>	EthernetSettingsView		<inga trådlösa nätverk funna>
 Network	System name		Nätverk
 Mode:	EthernetSettingsView		Konfiguration:
+IP address is invalid	EthernetSettingsView		IP-adressen är felaktig
 Network:	EthernetSettingsView		Nätverk:
 The net_server needs to run for the auto configuration!	EthernetSettingsView		Automatisk konfiguration kan inte ske utan att net_server körs!
 Disabled	EthernetSettingsView		Inaktiverad
 Auto-configuring failed: 	EthernetSettingsView		Automatisk konfiguration misslyckades:
 Static	EthernetSettingsView		Statisk
+DNS #2 is invalid	EthernetSettingsView		DNS #2 är ogiltig
 <no adapter>	EthernetSettingsView		<Ingen enhet>

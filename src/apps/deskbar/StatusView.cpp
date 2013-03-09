@@ -433,7 +433,9 @@ TReplicantTray::ShowHideTime()
 	if (fTime == NULL)
 		return;
 
-	if (fTime->IsHidden())
+	// Check from the point of view of fTime because we need to ignore
+	// whether or not the parent window is hidden.
+	if (fTime->IsHidden(fTime))
 		fTime->Show();
 	else
 		fTime->Hide();
@@ -441,7 +443,8 @@ TReplicantTray::ShowHideTime()
 	RealignReplicants();
 	AdjustPlacement();
 
-	bool showClock = !fTime->IsHidden();
+	// Check from the point of view of fTime ignoring parent's state.
+	bool showClock = !fTime->IsHidden(fTime);
 
 	// Update showClock setting that gets saved to disk on quit
 	((TBarApp*)be_app)->Settings()->showClock = showClock;

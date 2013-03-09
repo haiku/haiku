@@ -133,15 +133,13 @@ private:
 
 				float			fMaxWidth;
 				float			fHeight;
-				bool			fOrientation; // vertical = true
+				bool			fOrientation;
+									// vertical = true
+				int16			fShowLevel;
 
-				bool			fOverrideLocale;
-				bool			fUse24HourClock;
 				bool			fShowSeconds;
 				bool			fShowDayOfWeek;
 				bool			fShowTimeZone;
-
-				BString			fTimeFormat;
 
 				BPoint			fTimeLocation;
 				BPoint			fDateLocation;

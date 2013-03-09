@@ -1,11 +1,12 @@
 /*
- * Copyright 2006-2011, Haiku. All rights reserved.
+ * Copyright 2006-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
- *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
- * 		John Scipione <jscipione@gmail.com>
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		John Scipione, jscipione@gmail.com
+ *		Ingo Weinhold, bonefish@cs.tu-berlin.de
  */
 
 
@@ -97,6 +98,70 @@ scale_bilinear(uint8* bits, int32 srcWidth, int32 srcHeight, int32 dstWidth,
 			d -= 4;
 		}
 		dst += bpr;
+	}
+}
+
+
+static void
+scale_down(const uint8* srcBits, uint8* dstBits, int32 srcWidth, int32 srcHeight,
+	int32 dstWidth, int32 dstHeight)
+{
+	int32 l;
+	int32 c;
+	float t;
+	float u;
+	float tmp;
+	float d1, d2, d3, d4;
+		// coefficients
+	uint32 p1, p2, p3, p4;
+		// nearby pixels
+	uint8 red, green, blue, alpha;
+		// color components
+
+	for (int32 i = 0; i < dstHeight; i++) {
+		for (int32 j = 0; j < dstWidth; j++) {
+			tmp = (float)(i) / (float)(dstHeight - 1) * (srcHeight - 1);
+			l = (int32)floorf(tmp);
+			if (l < 0)
+				l = 0;
+			else if (l >= srcHeight - 1)
+				l = srcHeight - 2;
+			u = tmp - l;
+
+			tmp = (float)(j) / (float)(dstWidth - 1) * (srcWidth - 1);
+			c = (int32)floorf(tmp);
+			if (c < 0)
+				c = 0;
+			else if (c >= srcWidth - 1)
+				c = srcWidth - 2;
+			t = tmp - c;
+
+			// coefficients
+			d1 = (1 - t) * (1 - u);
+			d2 = t * (1 - u);
+			d3 = t * u;
+			d4 = (1 - t) * u;
+
+			// nearby pixels
+			p1 = *((uint32*)srcBits + (l * srcWidth) + c);
+			p2 = *((uint32*)srcBits + (l * srcWidth) + c + 1);
+			p3 = *((uint32*)srcBits + ((l + 1)* srcWidth) + c + 1);
+			p4 = *((uint32*)srcBits + ((l + 1)* srcWidth) + c);
+
+			// color components
+			blue = (uint8)p1 * d1 + (uint8)p2 * d2 + (uint8)p3 * d3
+				+ (uint8)p4 * d4;
+			green = (uint8)(p1 >> 8) * d1 + (uint8)(p2 >> 8) * d2
+				+ (uint8)(p3 >> 8) * d3 + (uint8)(p4 >> 8) * d4;
+			red = (uint8)(p1 >> 16) * d1 + (uint8)(p2 >> 16) * d2
+				+ (uint8)(p3 >> 16) * d3 + (uint8)(p4 >> 16) * d4;
+			alpha = (uint8)(p1 >> 24) * d1 + (uint8)(p2 >> 24) * d2
+				+ (uint8)(p3 >> 24) * d3 + (uint8)(p4 >> 24) * d4;
+
+			// destination RGBA pixel
+			*((uint32*)dstBits + (i * dstWidth) + j)
+				= (alpha << 24) | (red << 16) | (green << 8) | (blue);
+		}
 	}
 }
 
@@ -576,13 +641,32 @@ BIconUtils::ConvertFromCMAP8(const uint8* src, uint32 width, uint32 height,
 	uint32 dstWidth = result->Bounds().IntegerWidth() + 1;
 	uint32 dstHeight = result->Bounds().IntegerHeight() + 1;
 
-	if (dstWidth < width || dstHeight < height) {
-		// TODO: implement down scaling
-		return B_ERROR;
-	}
-
 	uint8* dst = (uint8*)result->Bits();
 	uint32 dstBPR = result->BytesPerRow();
+
+	// check for downscaling or integer multiple scaling
+	if (dstWidth < width || dstHeight < height
+		|| dstWidth == 2 * width && dstHeight == 2 * height
+		|| dstWidth == 3 * width && dstHeight == 3 * height
+		|| dstWidth == 4 * width && dstHeight == 4 * height) {
+		BBitmap* converted = new BBitmap(BRect(0, 0, width - 1, height - 1),
+			result->ColorSpace());
+		converted->ImportBits(src, height * srcBPR, srcBPR, 0, B_CMAP8);
+		uint8* convertedBits = (uint8*)converted->Bits();
+		int32 convertedBPR = converted->BytesPerRow();
+
+		if (dstWidth < width || dstHeight < height)
+			scale_down(convertedBits, dst, width, height, dstWidth, dstHeight);
+		else if (dstWidth == 2 * width && dstHeight == 2 * height)
+			scale2x(convertedBits, dst, width, height, convertedBPR, dstBPR);
+		else if (dstWidth == 3 * width && dstHeight == 3 * height)
+			scale3x(convertedBits, dst, width, height, convertedBPR, dstBPR);
+		else if (dstWidth == 4 * width && dstHeight == 4 * height)
+			scale4x(convertedBits, dst, width, height, convertedBPR, dstBPR);
+
+		delete converted;
+		return B_OK;
+	}
 
 	const rgb_color* colorMap = system_colors()->color_list;
 	if (colorMap == NULL)
@@ -591,6 +675,7 @@ BIconUtils::ConvertFromCMAP8(const uint8* src, uint32 width, uint32 height,
 	const uint8* srcStart = src;
 	uint8* dstStart = dst;
 
+	// convert from B_CMAP8 to B_RGB(A)32 without scaling
 	for (uint32 y = 0; y < height; y++) {
 		uint32* d = (uint32*)dst;
 		const uint8* s = src;
@@ -605,35 +690,56 @@ BIconUtils::ConvertFromCMAP8(const uint8* src, uint32 width, uint32 height,
 		dst += dstBPR;
 	}
 
+	if (width == dstWidth && height == dstHeight)
+		return B_OK;
+
 	// reset src and dst back to their original locations
 	src = srcStart;
 	dst = dstStart;
 
-	if ((dstWidth == 2 * width && dstHeight == 2 * height)
-		|| (dstWidth == 3 * width && dstHeight == 3 * height)
-		|| (dstWidth == 4 * width && dstHeight == 4 * height)) {
-		// we can do some special scaling here
-
-		// first convert to B_RGBA32
-		BBitmap* converted
-			= new BBitmap(BRect(0, 0, width - 1, height - 1),
-				result->ColorSpace());
-		converted->ImportBits(src, height * srcBPR, srcBPR, 0, B_CMAP8);
-		uint8* convertedBits = (uint8*)converted->Bits();
-		int32 convertedBPR = converted->BytesPerRow();
-
-		// scale using the scale2x/scale3x/scale4x algorithm
-		if (dstWidth == 2 * width && dstHeight == 2 * height)
-			scale2x(convertedBits, dst, width, height, convertedBPR, dstBPR);
-		else if (dstWidth == 3 * width && dstHeight == 3 * height)
-			scale3x(convertedBits, dst, width, height, convertedBPR, dstBPR);
-		else if (dstWidth == 4 * width && dstHeight == 4 * height)
-			scale4x(convertedBits, dst, width, height, convertedBPR, dstBPR);
-
-		// cleanup
-		delete converted;
+	if (dstWidth > width && dstHeight > height
+		&& dstWidth < 2 * width && dstHeight < 2 * height) {
+		// scale2x then downscale
+		BBitmap* temp = new BBitmap(BRect(0, 0, width * 2 - 1, height * 2 - 1),
+			result->ColorSpace());
+		uint8* tempBits = (uint8*)temp->Bits();
+		uint32 tempBPR = temp->BytesPerRow();
+		scale2x(dst, tempBits, width, height, dstBPR, tempBPR);
+		scale_down(tempBits, dst, width * 2, height * 2, dstWidth, dstHeight);
+		delete temp;
+	} else if (dstWidth > 2 * width && dstHeight > 2 * height
+		&& dstWidth < 3 * width && dstHeight < 3 * height) {
+		// scale3x then downscale
+		BBitmap* temp = new BBitmap(BRect(0, 0, width * 3 - 1, height * 3 - 1),
+			result->ColorSpace());
+		uint8* tempBits = (uint8*)temp->Bits();
+		uint32 tempBPR = temp->BytesPerRow();
+		scale3x(dst, tempBits, width, height, dstBPR, tempBPR);
+		scale_down(tempBits, dst, width * 3, height * 3, dstWidth, dstHeight);
+		delete temp;
+	} else if (dstWidth > 3 * width && dstHeight > 3 * height
+		&& dstWidth < 4 * width && dstHeight < 4 * height) {
+		// scale4x then downscale
+		BBitmap* temp = new BBitmap(BRect(0, 0, width * 4 - 1, height * 4 - 1),
+			result->ColorSpace());
+		uint8* tempBits = (uint8*)temp->Bits();
+		uint32 tempBPR = temp->BytesPerRow();
+		scale4x(dst, tempBits, width, height, dstBPR, tempBPR);
+		scale_down(tempBits, dst, width * 3, height * 3, dstWidth, dstHeight);
+		delete temp;
+	} else if (dstWidth > 4 * width && dstHeight > 4 * height) {
+		// scale4x then bilinear
+		BBitmap* temp = new BBitmap(BRect(0, 0, width * 4 - 1, height * 4 - 1),
+			result->ColorSpace());
+		uint8* tempBits = (uint8*)temp->Bits();
+		uint32 tempBPR = temp->BytesPerRow();
+		scale4x(dst, tempBits, width, height, dstBPR, tempBPR);
+		result->ImportBits(tempBits, height * tempBPR, tempBPR, 0,
+			temp->ColorSpace());
+		scale_bilinear(dst, width, height, dstWidth, dstHeight, dstBPR);
+		delete temp;
 	} else {
-		// bilinear scaling
+		// fall back to bilinear scaling
 		scale_bilinear(dst, width, height, dstWidth, dstHeight, dstBPR);
 	}
 

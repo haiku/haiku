@@ -37,11 +37,14 @@ private:
 
 			void		_AddDefaultView();
 			void		_MessageDropped(BMessage *message);
+			void		_SetAlwaysOnTop(bool alwaysOnTop);
 
+	BMenuItem*			fAlwaysOnTop;
 #ifdef __HAIKU__
-	BGroupLayout*	fLayout;
+	BGroupLayout*		fLayout;
 #endif
-	BMessenger		fSettingsWindow;
+	BMessenger			fSettingsWindow;
+
 };
 
 static const uint32 kMsgRemoveView = 'rmvw';

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-LaunchBox	3016105370
+1	hungarian	x-vnd.Haiku-LaunchBox	3692177981
 New	LaunchBox		Új
 Set description…	LaunchBox		Leírás…
 Vertical layout	LaunchBox		Függőleges elrendezés
@@ -6,6 +6,7 @@ OK	LaunchBox		Rendben
 Pad 1	LaunchBox		1. tálca
 last chance	LaunchBox		utolsó esély
 Quit	LaunchBox		Kilépés
+Open containing folder	LaunchBox		Tartalmazó mappa megnyitása
 Clear button	LaunchBox		Gomb kiürítése
 LaunchBox	System name		Indítósáv
 Ignore double-click	LaunchBox		Dupla kattintás figyelmen kívül hagyása

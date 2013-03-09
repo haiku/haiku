@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Notifications	814394708
+1	finnish	x-vnd.Haiku-Notifications	2177286129
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Tapahtui virhe tallennettaessa asetuksia.\nOn mahdollista, että levytila on loppunut.
 Notifications	GeneralView		Ilmoitukset
 seconds of inactivity	GeneralView		joutilaisuussekunnit
@@ -17,6 +17,7 @@ Cannot disable notifications because the server can't be reached.	GeneralView		I
 Progress	NotificationView		Edistyminen
 Last Received	NotificationView		Viimeksi vastaanotettu
 General	PrefletView		Yleistä
+Apply	PrefletWin		Käytä
 Display	PrefletView		Näyttö
 Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Ilmoitusten ottaminen käyttöön käynnistysaikana epäonnistui. Sinulla ei luultavasti ole kirjoitusoikeutta alkulatausasetushakemistoon.
 Search:	NotificationView		Etsintä:

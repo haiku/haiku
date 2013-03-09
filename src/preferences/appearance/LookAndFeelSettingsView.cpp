@@ -74,7 +74,7 @@ LookAndFeelSettingsView::LookAndFeelSettingsView(const char* name)
 	// Decorator menu
 	_BuildDecorMenu();
 	fDecorMenuField = new BMenuField("decorator",
-		B_TRANSLATE("Window decorator:"), fDecorMenu);
+		B_TRANSLATE("Decorator:"), fDecorMenu);
 
 	fDecorInfoButton = new BButton(B_TRANSLATE("About"),
 		new BMessage(kMsgDecorInfo));
@@ -179,13 +179,14 @@ LookAndFeelSettingsView::MessageReceived(BMessage *msg)
 				break;
 
 			BString authorsText(decor->Authors().String());
-			authorsText.ReplaceAll(", ", "\n    ");
+			authorsText.ReplaceAll(", ", "\n\t");
 
-			BString infoText("Name: %decorName\n"
-				"Authors:\n    %decorAuthors\n"
+			BString infoText(B_TRANSLATE("%decorName\n\n"
+				"Authors:\n\t%decorAuthors\n\n"
 				"URL: %decorURL\n"
-				"License: %decorLic\n"
-				"Description:\n    %decorDesc\n");
+				"License: %decorLic\n\n"
+				"%decorDesc\n"));
+
 
 			infoText.ReplaceFirst("%decorName", decor->Name().String());
 			infoText.ReplaceFirst("%decorAuthors", authorsText.String());
@@ -193,7 +194,7 @@ LookAndFeelSettingsView::MessageReceived(BMessage *msg)
 			infoText.ReplaceFirst("%decorURL", decor->SupportURL().String());
 			infoText.ReplaceFirst("%decorDesc", decor->ShortDescription().String());
 
-			BAlert *infoAlert = new BAlert(B_TRANSLATE("About Decorator"),
+			BAlert *infoAlert = new BAlert(B_TRANSLATE("About decorator"),
 				infoText.String(), B_TRANSLATE("OK"));
 			infoAlert->SetFlags(infoAlert->Flags() | B_CLOSE_ON_ESCAPE);
 			infoAlert->Go();

@@ -23,7 +23,7 @@
 #include "NotificationView.h"
 
 
-static const int kHeaderSize = 20;
+static const int kHeaderSize = 23;
 
 
 AppGroupView::AppGroupView(NotificationWindow* win, const char* label)
@@ -61,13 +61,15 @@ AppGroupView::Draw(BRect updateRect)
 
 	// Draw the buttons
 	fCollapseRect.top = (kHeaderSize - kExpandSize) / 2;
-	fCollapseRect.left = kEdgePadding * 2;
+	fCollapseRect.left = kEdgePadding * 3;
 	fCollapseRect.right = fCollapseRect.left + 1.5 * kExpandSize;
 	fCollapseRect.bottom = fCollapseRect.top + kExpandSize;
 
 	fCloseRect = bounds;
-	fCloseRect.top = (kHeaderSize - kExpandSize) / 2;
-	fCloseRect.right -= kEdgePadding * 2;
+	fCloseRect.top = (kHeaderSize - kCloseSize) / 2;
+	// Take off the 1 to line this up with the close button on the
+	// notification view
+	fCloseRect.right -= kEdgePadding * 3 - 1;
 	fCloseRect.left = fCloseRect.right - kCloseSize;
 	fCloseRect.bottom = fCloseRect.top + kCloseSize;
 
@@ -88,9 +90,13 @@ AppGroupView::Draw(BRect updateRect)
 		label << " (" << fInfo.size() << ")";
 
 	SetFont(be_bold_font);
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+	float y = (bounds.top + bounds.bottom - ceilf(fontHeight.ascent)
+		- ceilf(fontHeight.descent)) / 2.0 + ceilf(fontHeight.ascent);
 
-	DrawString(label.String(), BPoint(fCollapseRect.right + 2 * kEdgePadding,
-				fCloseRect.bottom));
+	DrawString(label.String(),
+		BPoint(fCollapseRect.right + 4 * kEdgePadding, y));
 }
 
 
@@ -98,11 +104,7 @@ void
 AppGroupView::_DrawCloseButton(const BRect& updateRect)
 {
 	PushState();
-	BRect closeRect = Bounds();
-
-	closeRect.InsetBy(7, 7);
-	closeRect.left = closeRect.right - kCloseSize;
-	closeRect.bottom = closeRect.top + kCloseSize;
+	BRect closeRect = fCloseRect;
 
 	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 	float tint = B_DARKEN_2_TINT;
@@ -225,6 +227,13 @@ AppGroupView::AddInfo(NotificationView* view)
 		}
 	}
 
+	// Invalidate all children to show or hide the close buttons in the
+	// notification view
+	int32 children = fInfo.size();
+	for (int32 i = 0; i < children; i++) {
+		fInfo[i]->Invalidate();
+	}
+
 	if (!found) {
 		fInfo.push_back(view);
 	}
@@ -248,4 +257,11 @@ bool
 AppGroupView::HasChildren()
 {
 	return !fInfo.empty();
+}
+
+
+int32
+AppGroupView::ChildrenCount()
+{
+	return fInfo.size();
 }

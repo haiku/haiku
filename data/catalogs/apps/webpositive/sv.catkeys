@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-WebPositive	233049275
+1	swedish	x-vnd.Haiku-WebPositive	3577331897
 Show home button	Settings Window		Visa hem-knappen
 Username:	Authentication Panel		Användarnamn:
 Copy URL to clipboard	Download Window		Kopiera URL till urklipp
@@ -16,6 +16,7 @@ Start page:	Settings Window		Start sida:
 History	WebPositive Window		Historik
 Error opening downloads folder	Download Window		Fel vid öppnande av nerladdnings foldern
 Paste	WebPositive Window		Klistra in
+Proxy username:	Settings Window		Proxyanvändarnamn:
 Settings	Settings Window		Inställningar
 %seconds seconds left	Download Window		%seconds secunder kvar
 Confirmation	WebPositive Window		Bekräftelse
@@ -41,6 +42,7 @@ Quit	WebPositive Window		Avsluta
 Full screen	WebPositive Window		Helskärm
 Open download error	Download Window		Öppna nerladdnings error
 Standard font:	Settings Window		Standardtypsnitt:
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Sök föregående förekomst av söktermerna
 Restart	Download Window		Starta om
 Proxy server	Settings Window		Proxyserver
 Open containing folder	Download Window		Öppna innehållande mapp
@@ -58,6 +60,7 @@ Cut	WebPositive Window		Klipp ut
 Bookmark this page	WebPositive Window		Spara sidan som bokmärke
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Problem att visa Bokmärkes mappen.\n\nFel: %error
 Open downloads folder	Download Window		Öppna nerladdningsmapp
+Proxy password:	Settings Window		Proxylösenord:
 Number of days to keep links in History menu:	Settings Window		Antal dagar att bevara länkar i Historia menyn:
 Hide	Download Window		Dölj
 Reset size	WebPositive Window		Återställ storlek
@@ -67,6 +70,7 @@ There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive 
 Over 1 day left	Download Window		Över 1 dag kvar
 Downloads	WebPositive Window		Nerladdningar
 Requesting %url	WebPositive Window		Begär %url
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Sök nästa förekomst av söktermerna
 Apply	Settings Window		Tillämpa
 Bookmark info	WebPositive Window		Bokmärksinformation
 Size:	Font Selection view		Storlek:
@@ -80,6 +84,7 @@ Open blank page	Settings Window		Öppna blank sida
 New tabs:	Settings Window		Ny flik
 Cancel	WebPositive Window		Avbryt
 Open all	WebPositive Window		Öppna alla
+Proxy server requires authentication	Settings Window		Proxyservern kräver behörighetskontroll
 Clear	URL Bar		Töm
 Cut	URL Bar		Klipp ut
 Clear	WebPositive Window		Töm

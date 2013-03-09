@@ -6,8 +6,13 @@ UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
 UsePrivateHeaders app shared interface graphics ;
 UseLibraryHeaders agg ;
+UsePrivateHeaders kernel ;
 
 AddResources ClassicBe : resources.rdef ;
+
+#TODO: See #8716, hrev44313 for ft2build.h: No such file or directory
+#Includes [ FGristFiles BeDecorator.cpp ]
+#	: $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
 
 Addon ClassicBe :
 	BeDecorator.cpp

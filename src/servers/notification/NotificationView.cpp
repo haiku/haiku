@@ -29,6 +29,7 @@
 #include <Roster.h>
 #include <StatusBar.h>
 
+#include "AppGroupView.h"
 #include "NotificationWindow.h"
 
 
@@ -273,7 +274,9 @@ NotificationView::Draw(BRect updateRect)
 	rgb_color detailCol = ui_color(B_CONTROL_BORDER_COLOR);
 	detailCol = tint_color(detailCol, B_LIGHTEN_2_TINT);
 
-	_DrawCloseButton(updateRect);
+	AppGroupView* groupView = dynamic_cast<AppGroupView*>(Parent());
+	if (groupView != NULL && groupView->ChildrenCount() > 1)
+		_DrawCloseButton(updateRect);
 
 	SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
 	BPoint left(Bounds().left, Bounds().top);

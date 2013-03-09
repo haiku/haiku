@@ -36,8 +36,16 @@ private:
 
 private:
 			int32				fCookie;
+									// The iteration cookie for next_dev()
+									// Initialized to 0
 			BMessenger*			fTarget;
+									// BMessenger referring to the target to
+									// which the watching notification
+									// messages are sent. The object is
+									// allocated and owned by the roster,
+									// or NULL if not watching.
 			uint32				_reserved[3];
+									// FBC
 };
 
 

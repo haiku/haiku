@@ -77,7 +77,7 @@ BluetoothApplication::MessageReceived(BMessage* message)
 				BMessageRunner::StartSending(be_app_messenger,
 					new BMessage('Xtmp'), 2 * 1000000, 1);
 			} else {
-				fWindow = new BluetoothWindow(BRect(100, 100, 550, 420));
+				fWindow = new BluetoothWindow(BRect(100, 100, 750, 420));
 				fWindow->Show();
 			}
 			break;

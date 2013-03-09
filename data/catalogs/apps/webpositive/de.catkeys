@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-WebPositive	233049275
+1	german	x-vnd.Haiku-WebPositive	3577331897
 Show home button	Settings Window		Home-Symbol anzeigen
 Username:	Authentication Panel		Benutzername:
 Copy URL to clipboard	Download Window		Adresse kopieren
@@ -16,6 +16,7 @@ Start page:	Settings Window		Startseite:
 History	WebPositive Window		Verlauf
 Error opening downloads folder	Download Window		Fehler beim Öffnen des Download-Ordners
 Paste	WebPositive Window		Einfügen
+Proxy username:	Settings Window		Proxy-Nutzername:
 Settings	Settings Window		Einstellungen
 %seconds seconds left	Download Window		Noch %seconds Sekunden
 Confirmation	WebPositive Window		Bestätigung
@@ -41,6 +42,7 @@ Quit	WebPositive Window		Beenden
 Full screen	WebPositive Window		Vollbild
 Open download error	Download Window		Fehler beim Öffnen
 Standard font:	Settings Window		Standardschrift:
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Vorheriger Treffer
 Restart	Download Window		Neustart
 Proxy server	Settings Window		Proxy-Server
 Open containing folder	Download Window		Speicherort öffnen
@@ -58,6 +60,7 @@ Cut	WebPositive Window		Ausschneiden
 Bookmark this page	WebPositive Window		Lesezeichen für diese Seite anlegen
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Der Lesezeichen-Ordner kann nicht angezeigt werden.\n\nFehler: %error
 Open downloads folder	Download Window		Download-Ordner öffnen
+Proxy password:	Settings Window		Proxy-Passwort:
 Number of days to keep links in History menu:	Settings Window		Anzahl der Tage im Verlauf-Menü:
 Hide	Download Window		Ausblenden
 Reset size	WebPositive Window		Größe zurücksetzen
@@ -67,6 +70,7 @@ There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive 
 Over 1 day left	Download Window		Noch über einen Tag
 Downloads	WebPositive Window		Downloads
 Requesting %url	WebPositive Window		%url wird angefordert
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Nächster Treffer
 Apply	Settings Window		Anwenden
 Bookmark info	WebPositive Window		Lesezeichen Info
 Size:	Font Selection view		Größe:
@@ -80,6 +84,7 @@ Open blank page	Settings Window		Leere Seite öffnen
 New tabs:	Settings Window		Neue Reiter:
 Cancel	WebPositive Window		Abbrechen
 Open all	WebPositive Window		Alle öffnen
+Proxy server requires authentication	Settings Window		Der Proxy-Server verlangt eine Authentifizierung
 Clear	URL Bar		Leeren
 Cut	URL Bar		Ausschneiden
 Clear	WebPositive Window		Leeren

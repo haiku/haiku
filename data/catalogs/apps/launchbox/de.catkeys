@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-LaunchBox	3016105370
+1	german	x-vnd.Haiku-LaunchBox	3692177981
 New	LaunchBox		Neu
 Set description…	LaunchBox		Beschreibung ändern…
 Vertical layout	LaunchBox		Vertikale Anordnung
@@ -6,6 +6,7 @@ OK	LaunchBox		OK
 Pad 1	LaunchBox		Block 1
 last chance	LaunchBox		letzte Chance
 Quit	LaunchBox		Beenden
+Open containing folder	LaunchBox		Speicherort öffnen
 Clear button	LaunchBox		Feld leeren
 LaunchBox	System name		LaunchBox
 Ignore double-click	LaunchBox		Doppelklick ignorieren

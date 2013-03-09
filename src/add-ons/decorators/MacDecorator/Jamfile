@@ -8,8 +8,12 @@ UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app font ] ;
 UsePrivateHeaders app shared interface graphics ;
 UseLibraryHeaders agg ;
+UsePrivateHeaders kernel ;
 
 AddResources MacDecorator : resources.rdef ;
+
+Includes [ FGristFiles MacDecorator.cpp ]
+	: $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
 
 Addon MacDecorator :
 	MacDecorator.cpp

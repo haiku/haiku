@@ -1,11 +1,18 @@
 /*
- * Copyright 2008-09, Oliver Ruiz Dorantes, <oliver.ruiz.dorantes_at_gmail.com>
+ * Copyright 2008-2009, Oliver Ruiz Dorantes <oliver.ruiz.dorantes@gmail.com>
+ * Copyright 2012-2013, Tri-Edge AI, <triedgeai@gmail.com>
+ *
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+
 #include "BluetoothSettingsView.h"
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "defs.h"
+#include "BluetoothSettings.h"
+#include "BluetoothWindow.h"
+#include "ExtendedLocalDeviceView.h"
+
+#include <bluetooth/LocalDevice.h>
 
 #include <Box.h>
 #include <Catalog.h>
@@ -19,12 +26,8 @@
 #include <String.h>
 #include <TextView.h>
 
-#include <bluetooth/LocalDevice.h>
-#include "ExtendedLocalDeviceView.h"
-
-#include "defs.h"
-#include "BluetoothWindow.h"
-
+#include <stdio.h>
+#include <stdlib.h>
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Settings view"
@@ -45,13 +48,15 @@ static const char* kLaptopLabel = B_TRANSLATE_MARK("Laptop");
 static const char* kHandheldLabel = B_TRANSLATE_MARK("Handheld");
 static const char* kPhoneLabel = B_TRANSLATE_MARK("Smart phone");
 
-
 //	#pragma mark -
 
 BluetoothSettingsView::BluetoothSettingsView(const char* name)
-	: BView(name, 0),
+	:
+	BView(name, 0),
 	fLocalDevicesMenu(NULL)
 {
+	fSettings.Load();
+
 	_BuildConnectionPolicy();
 	fPolicyMenuField = new BMenuField("policy",
 		B_TRANSLATE("Incoming connections policy:"), fPolicyMenu);
@@ -65,10 +70,7 @@ BluetoothSettingsView::BluetoothSettingsView(const char* name)
 	fInquiryTimeControl->SetHashMarkCount(255 / 15);
 	fInquiryTimeControl->SetEnabled(true);
 
-	// hinting menu
-	_BuildClassMenu();
-	fClassMenuField = new BMenuField("class", B_TRANSLATE("Identify host as:"),
-		fClassMenu);
+	fExtDeviceView = new ExtendedLocalDeviceView(BRect(0, 0, 5, 5), NULL);
 
 	// localdevices menu
 	_BuildLocalDevicesMenu();
@@ -76,13 +78,25 @@ BluetoothSettingsView::BluetoothSettingsView(const char* name)
 		B_TRANSLATE("Local devices found on system:"),
 		fLocalDevicesMenu);
 
-	fExtDeviceView = new ExtendedLocalDeviceView(BRect(0, 0, 5, 5), NULL);
-
 	SetLayout(new BGroupLayout(B_VERTICAL));
+
+	if (ActiveLocalDevice != NULL) {
+		fExtDeviceView->SetLocalDevice(ActiveLocalDevice);
+		fExtDeviceView->SetEnabled(true);
+
+		DeviceClass rememberedClass = ActiveLocalDevice->GetDeviceClass();
+
+		if (!rememberedClass.IsUnknownDeviceClass())
+			fSettings.Data.LocalDeviceClass = rememberedClass;
+	}
+
+	// hinting menu
+	_BuildClassMenu();
+	fClassMenuField = new BMenuField("class", B_TRANSLATE("Identify host as:"),
+		fClassMenu);
 
 	// controls pane
 	AddChild(BGridLayoutBuilder(10, 10)
-
 		.Add(fClassMenuField->CreateLabelLayoutItem(), 0, 0)
 		.Add(fClassMenuField->CreateMenuBarLayoutItem(), 1, 0)
 
@@ -107,7 +121,7 @@ BluetoothSettingsView::BluetoothSettingsView(const char* name)
 
 BluetoothSettingsView::~BluetoothSettingsView()
 {
-
+	fSettings.Save();
 }
 
 
@@ -133,44 +147,52 @@ BluetoothSettingsView::MessageReceived(BMessage* message)
 		case kMsgLocalSwitched:
 		{
 			LocalDevice* lDevice;
-			if (message->FindPointer("LocalDevice", (void**) &lDevice) == B_OK) {
-				// Device integrity should be rechecked
-				fExtDeviceView->SetLocalDevice(lDevice);
-				fExtDeviceView->SetEnabled(true);
-				ActiveLocalDevice = lDevice;
+
+			if (message->FindPointer("LocalDevice",
+				(void**)&lDevice) == B_OK) {
+
+				_MarkLocalDevice(lDevice);
 			}
+
+			break;
 		}
-		break;
-/*
-		To be fixed :)
+		// TODO: To be fixed. :)
+
+		/*
 		case kMsgSetConnectionPolicy:
 		{
 			//uint8 Policy;
 			//if (message->FindInt8("Policy", (int8*)&Policy) == B_OK)
 			break;
 		}
-		
+
 		case kMsgSetInquiryTime:
 		{
 			break;
-		}*/
-
+		}
+		*/
 		case kMsgSetDeviceClass:
 		{
 			uint8 deviceClass;
-			if (message->FindInt8("DeviceClass", (int8*)&deviceClass) == B_OK) {
+
+			if (message->FindInt8("DeviceClass",
+				(int8*)&deviceClass) == B_OK) {
+
 				if (deviceClass == 5)
 					_SetDeviceClass(2, 3, 0x72);
 				else
 					_SetDeviceClass(1, deviceClass, 0x72);
 			}
+
 			break;
 		}
-
 		case kMsgRefresh:
+		{
 			_BuildLocalDevicesMenu();
 			fLocalDevicesMenu->SetTargetForItems(this);
-		break;
+
+			break;
+		}
 		default:
 			BView::MessageReceived(message);
 	}
@@ -178,17 +200,18 @@ BluetoothSettingsView::MessageReceived(BMessage* message)
 
 
 bool
-BluetoothSettingsView::_SetDeviceClass(uint8 major, uint8 minor, uint16 service)
+BluetoothSettingsView::_SetDeviceClass(uint8 major, uint8 minor,
+	uint16 service)
 {
 	bool haveRun = true;
-	
-	DeviceClass devClass;
-	devClass.SetRecord(major, minor, service);
+
+	fSettings.Data.LocalDeviceClass.SetRecord(major, minor, service);
+
 	if (ActiveLocalDevice != NULL)
-		ActiveLocalDevice->SetDeviceClass(devClass);
+		ActiveLocalDevice->SetDeviceClass(fSettings.Data.LocalDeviceClass);
 	else
 		haveRun = false;
-		
+
 	return haveRun;
 }
 
@@ -217,11 +240,9 @@ BluetoothSettingsView::_BuildConnectionPolicy()
 	fPolicyMenu->AddItem(item);
 }
 
-
 void
 BluetoothSettingsView::_BuildClassMenu()
 {
-	
 	BMessage* message = NULL;
 	BMenuItem* item = NULL;
 
@@ -232,25 +253,45 @@ BluetoothSettingsView::_BuildClassMenu()
 	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kDesktopLabel), message);
 	fClassMenu->AddItem(item);
 
+	if (fSettings.Data.LocalDeviceClass.MajorDeviceClass() == 1 &&
+		fSettings.Data.LocalDeviceClass.MinorDeviceClass() == 1)
+			item->SetMarked(true);
+
 	message = new BMessage(kMsgSetDeviceClass);
 	message->AddInt8("DeviceClass", 2);
 	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kServerLabel), message);
 	fClassMenu->AddItem(item);
+
+	if (fSettings.Data.LocalDeviceClass.MajorDeviceClass() == 1 &&
+		fSettings.Data.LocalDeviceClass.MinorDeviceClass() == 2)
+			item->SetMarked(true);
 
 	message = new BMessage(kMsgSetDeviceClass);
 	message->AddInt8("DeviceClass", 3);
 	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kLaptopLabel), message);
 	fClassMenu->AddItem(item);
 
+	if (fSettings.Data.LocalDeviceClass.MajorDeviceClass() == 1 &&
+		fSettings.Data.LocalDeviceClass.MinorDeviceClass() == 3)
+			item->SetMarked(true);
+
 	message = new BMessage(kMsgSetDeviceClass);
 	message->AddInt8("DeviceClass", 4);
 	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kHandheldLabel), message);
 	fClassMenu->AddItem(item);
 
+	if (fSettings.Data.LocalDeviceClass.MajorDeviceClass() == 1 &&
+		fSettings.Data.LocalDeviceClass.MinorDeviceClass() == 4)
+			item->SetMarked(true);
+
 	message = new BMessage(kMsgSetDeviceClass);
 	message->AddInt8("DeviceClass", 5);
 	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kPhoneLabel), message);
 	fClassMenu->AddItem(item);
+
+	if (fSettings.Data.LocalDeviceClass.MajorDeviceClass() == 2 &&
+		fSettings.Data.LocalDeviceClass.MinorDeviceClass() == 3)
+			item->SetMarked(true);
 }
 
 
@@ -260,20 +301,47 @@ BluetoothSettingsView::_BuildLocalDevicesMenu()
 	LocalDevice* lDevice;
 
 	if (!fLocalDevicesMenu)
-		fLocalDevicesMenu = new BPopUpMenu(B_TRANSLATE("Pick LocalDevice..."));
+		fLocalDevicesMenu = new BPopUpMenu(B_TRANSLATE("Pick device..."));
 
-	for (uint32 index = 0; index < LocalDevice::GetLocalDeviceCount(); index++) {
+	while (fLocalDevicesMenu->CountItems() > 0) {
+		BMenuItem* item = fLocalDevicesMenu->RemoveItem(0L);
 
+		if (item != NULL) {
+			delete item;
+		}
+	}
+
+	ActiveLocalDevice = NULL;
+
+	for (uint32 i = 0; i < LocalDevice::GetLocalDeviceCount(); i++) {
 		lDevice = LocalDevice::GetLocalDevice();
-		if (lDevice != NULL) {
 
-			// TODO Check if they already exists
+		if (lDevice != NULL) {
 			BMessage* message = new BMessage(kMsgLocalSwitched);
 			message->AddPointer("LocalDevice", lDevice);
 
-			BMenuItem* item = new BMenuItem((lDevice->GetFriendlyName().String()),
-				message);
+			BMenuItem* item = new BMenuItem(
+				(lDevice->GetFriendlyName().String()), message);
+
+			if (bdaddrUtils::Compare(lDevice->GetBluetoothAddress(),
+				fSettings.Data.PickedDevice)) {
+
+				item->SetMarked(true);
+				ActiveLocalDevice = lDevice;
+			}
+
 			fLocalDevicesMenu->AddItem(item);
 		}
 	}
+}
+
+void
+BluetoothSettingsView::_MarkLocalDevice(LocalDevice* lDevice)
+{
+	// TODO: Device integrity should be rechecked.
+
+	fExtDeviceView->SetLocalDevice(lDevice);
+	fExtDeviceView->SetEnabled(true);
+	ActiveLocalDevice = lDevice;
+	fSettings.Data.PickedDevice = lDevice->GetBluetoothAddress();
 }

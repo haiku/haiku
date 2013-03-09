@@ -99,16 +99,16 @@ FakeScrollBar::Draw(BRect updateRect)
 		BRect buttonFrame(bounds.left, bounds.top,
 			bounds.left + bounds.Height(), bounds.bottom);
 
-		_DrawArrowButton(ARROW_LEFT, fDoubleArrows, buttonFrame, updateRect);
+		_DrawArrowButton(ARROW_LEFT, buttonFrame, updateRect);
 
 		if (fDoubleArrows) {
 			buttonFrame.OffsetBy(bounds.Height() + 1, 0.0);
-			_DrawArrowButton(ARROW_RIGHT, fDoubleArrows, buttonFrame,
+			_DrawArrowButton(ARROW_RIGHT, buttonFrame,
 				updateRect);
 
 			buttonFrame.OffsetTo(bounds.right - ((bounds.Height() * 2) + 1),
 				bounds.top);
-			_DrawArrowButton(ARROW_LEFT, fDoubleArrows, buttonFrame,
+			_DrawArrowButton(ARROW_LEFT, buttonFrame,
 				updateRect);
 
 			thumbBG.left += bounds.Height() * 2 + 2;
@@ -119,7 +119,7 @@ FakeScrollBar::Draw(BRect updateRect)
 		}
 
 		buttonFrame.OffsetTo(bounds.right - bounds.Height(), bounds.top);
-		_DrawArrowButton(ARROW_RIGHT, fDoubleArrows, buttonFrame, updateRect);
+		_DrawArrowButton(ARROW_RIGHT, buttonFrame, updateRect);
 
 		SetDrawingMode(B_OP_COPY);
 
@@ -261,63 +261,21 @@ FakeScrollBar::SetFromScrollBarInfo(const scroll_bar_info &info)
 
 
 void
-FakeScrollBar::_DrawArrowButton(int32 direction, bool doubleArrows, BRect r,
+FakeScrollBar::_DrawArrowButton(int32 direction, BRect rect,
 	const BRect& updateRect)
 {
-	if (!updateRect.Intersects(r))
+	if (!updateRect.Intersects(rect))
 		return;
 
-	rgb_color c = ui_color(B_PANEL_BACKGROUND_COLOR);
-	rgb_color light = tint_color(c, B_LIGHTEN_MAX_TINT);
-	rgb_color dark = tint_color(c, B_DARKEN_1_TINT);
-	rgb_color darker = tint_color(c, B_DARKEN_2_TINT);
-	rgb_color normal = c;
-	rgb_color arrow = tint_color(c,
-		(B_DARKEN_MAX_TINT + B_DARKEN_4_TINT) / 2.0);
+	uint32 flags = 0;
 
-	BPoint tri1, tri2, tri3;
-	float hInset = r.Width() / 3;
-	float vInset = r.Height() / 3;
-	r.InsetBy(hInset, vInset);
+	rgb_color baseColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		B_LIGHTEN_1_TINT);
 
-	switch (direction) {
-		case ARROW_LEFT:
-			tri1.Set(r.right, r.top);
-			tri2.Set(r.right - r.Width() / 1.33, (r.top + r.bottom + 1) / 2);
-			tri3.Set(r.right, r.bottom + 1);
-			break;
+	be_control_look->DrawButtonBackground(this, rect, updateRect, baseColor,
+		flags, BControlLook::B_ALL_BORDERS, B_HORIZONTAL);
 
-		case ARROW_RIGHT:
-			tri1.Set(r.left, r.bottom + 1);
-			tri2.Set(r.left + r.Width() / 1.33, (r.top + r.bottom + 1) / 2);
-			tri3.Set(r.left, r.top);
-			break;
-
-		case ARROW_UP:
-			tri1.Set(r.left, r.bottom);
-			tri2.Set((r.left + r.right + 1) / 2, r.bottom - r.Height() / 1.33);
-			tri3.Set(r.right + 1, r.bottom);
-			break;
-
-		default:
-			tri1.Set(r.left, r.top);
-			tri2.Set((r.left + r.right + 1) / 2, r.top + r.Height() / 1.33);
-			tri3.Set(r.right + 1, r.top);
-			break;
-	}
-
-	r.InsetBy(-(hInset - 1), -(vInset - 1));
-	BRect temp(r.InsetByCopy(-1, -1));
-	be_control_look->DrawButtonBackground(this, temp, updateRect,
-		normal, 0, BControlLook::B_ALL_BORDERS, B_HORIZONTAL);
-
-	BShape arrowShape;
-	arrowShape.MoveTo(tri1);
-	arrowShape.LineTo(tri2);
-	arrowShape.LineTo(tri3);
-
-	SetHighColor(arrow);
-	SetPenSize(ceilf(hInset / 2.0));
-	StrokeShape(&arrowShape);
-	SetPenSize(1.0);
+	rect.InsetBy(-1, -1);
+	be_control_look->DrawArrowShape(this, rect, updateRect,
+		baseColor, direction, flags, B_DARKEN_MAX_TINT);
 }

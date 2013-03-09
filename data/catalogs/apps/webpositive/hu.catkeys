@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-WebPositive	233049275
+1	hungarian	x-vnd.Haiku-WebPositive	3577331897
 Show home button	Settings Window		Kezdőlap-gomb megjelenítése
 Username:	Authentication Panel		Felhasználónév:
 Copy URL to clipboard	Download Window		Cím másolása a vágólapra
@@ -16,6 +16,7 @@ Start page:	Settings Window		Kezdőlap:
 History	WebPositive Window		Előzmény
 Error opening downloads folder	Download Window		Hiba történt a letöltések mappa megnyitásakor
 Paste	WebPositive Window		Beillesztés
+Proxy username:	Settings Window		Felhasználónév a proxyhoz:
 Settings	Settings Window		Beállítások
 %seconds seconds left	Download Window		%seconds másodperc van hátra
 Confirmation	WebPositive Window		Megerősítés
@@ -41,6 +42,7 @@ Quit	WebPositive Window		Kilépés
 Full screen	WebPositive Window		Teljes képernyő
 Open download error	Download Window		A letöltés nem nyitható meg
 Standard font:	Settings Window		Normál betűtípus:
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Előző találat
 Restart	Download Window		Újraindítás
 Proxy server	Settings Window		Proxy
 Open containing folder	Download Window		Tartalmazó mappa megnyitása
@@ -58,6 +60,7 @@ Cut	WebPositive Window		Kivágás
 Bookmark this page	WebPositive Window		Könyvjelző az oldalhoz
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Hiba történt a Könyvjelzők mappa megjelenítésekor.\n\nHiba: %error
 Open downloads folder	Download Window		A letöltési mappa megnyitása
+Proxy password:	Settings Window		Jelszó a proxyhoz:
 Number of days to keep links in History menu:	Settings Window		Előzmények megtartásának ideje (nap):
 Hide	Download Window		Elrejtés
 Reset size	WebPositive Window		Méret visszaállítása
@@ -67,6 +70,7 @@ There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive 
 Over 1 day left	Download Window		Több, mint 1 nap van hátra
 Downloads	WebPositive Window		Letöltések
 Requesting %url	WebPositive Window		%url megnyitása
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Következő találat
 Apply	Settings Window		Alkalmaz
 Bookmark info	WebPositive Window		Könyvjelző információi
 Size:	Font Selection view		Méret:
@@ -80,6 +84,7 @@ Open blank page	Settings Window		Üres oldal megnyitása
 New tabs:	Settings Window		Új fülek:
 Cancel	WebPositive Window		Mégse
 Open all	WebPositive Window		Az összes megnyitása
+Proxy server requires authentication	Settings Window		A proxy hitelesítést kér
 Clear	URL Bar		Törlés
 Cut	URL Bar		Kivágás
 Clear	WebPositive Window		Törlés

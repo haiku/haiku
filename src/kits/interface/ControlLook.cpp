@@ -740,14 +740,14 @@ BControlLook::DrawArrowShape(BView* view, BRect& rect, const BRect& updateRect,
 		case B_LEFT_ARROW:
 			tri1.Set(rect.right, rect.top);
 			tri2.Set(rect.right - rect.Width() / 1.33,
-				(rect.top + rect.bottom + 1) /2 );
+				(rect.top + rect.bottom + 1) / 2);
 			tri3.Set(rect.right, rect.bottom + 1);
 			break;
 		case B_RIGHT_ARROW:
-			tri1.Set(rect.left, rect.bottom + 1);
-			tri2.Set(rect.left + rect.Width() / 1.33,
+			tri1.Set(rect.left + 1, rect.bottom + 1);
+			tri2.Set(rect.left + 1 + rect.Width() / 1.33,
 				(rect.top + rect.bottom + 1) / 2);
-			tri3.Set(rect.left, rect.top);
+			tri3.Set(rect.left + 1, rect.top);
 			break;
 		case B_UP_ARROW:
 			tri1.Set(rect.left, rect.bottom);
@@ -757,17 +757,12 @@ BControlLook::DrawArrowShape(BView* view, BRect& rect, const BRect& updateRect,
 			break;
 		case B_DOWN_ARROW:
 		default:
-			tri1.Set(rect.left, rect.top);
+			tri1.Set(rect.left, rect.top + 1);
 			tri2.Set((rect.left + rect.right + 1) / 2,
-				rect.top + rect.Height() / 1.33);
-			tri3.Set(rect.right + 1, rect.top);
+				rect.top + 1 + rect.Height() / 1.33);
+			tri3.Set(rect.right + 1, rect.top + 1);
 			break;
 	}
-	// offset triangle if down
-	if ((flags & B_ACTIVATED) != 0)
-		view->MovePenTo(BPoint(1, 1));
-	else
-		view->MovePenTo(BPoint(0, 0));
 
 	BShape arrowShape;
 	arrowShape.MoveTo(tri1);
@@ -781,6 +776,8 @@ BControlLook::DrawArrowShape(BView* view, BRect& rect, const BRect& updateRect,
 
 	float penSize = view->PenSize();
 	drawing_mode mode = view->DrawingMode();
+
+	view->MovePenTo(BPoint(0, 0));
 
 	view->SetPenSize(ceilf(hInset / 2.0));
 	view->SetDrawingMode(B_OP_OVER);
