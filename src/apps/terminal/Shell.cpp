@@ -1,11 +1,15 @@
 /*
- * Copyright 2007-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2013, Haiku, Inc. All rights reserved.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
  * Distributed under the terms of the MIT license.
  *
+ * Authors:
+ *		Kian Duffy, myob@users.sourceforge.net
+ *		Daniel Furrer, assimil8or@users.sourceforge.net
+ *		Siarzhuk Zharski, zharik@gmx.li
  */
 
 
@@ -71,7 +75,6 @@
 // TODO: should extract from /etc/passwd instead???
 const char *kDefaultShell = "/bin/sh";
 const char *kTerminalType = "xterm-256color";
-//const char *kTerminalType = "xterm";
 
 /*
  * Set environment variable.
@@ -381,6 +384,7 @@ initialize_termios(struct termios &tio)
 	tio.c_cc[VSTOP]  = CSTOP;		/* '^Q' */
 	tio.c_cc[VSUSP]  = CSUSP;		/* '^Z' */
 }
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Terminal Shell"

@@ -1,6 +1,10 @@
 /*
- * Copyright 2010-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2010-2013, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Stefano Ceccherini, stefano.ceccherini@gmail.com
+ *		Siarzhuk Zharski, zharik@gmx.li
  */
 
 
@@ -8,7 +12,6 @@
 
 #include <ctype.h>
 #include <stdio.h>
-#include <string.h>
 
 #include <Application.h>
 #include <Catalog.h>
@@ -128,7 +131,8 @@ XColorsTable::XColorsTable()
 
 XColorsTable::~XColorsTable()
 {
-	// fTable is owned by BApplication - no need to free it.
+	// fTable as result of LoadResource call and owned
+	// by BApplication so no need to free it explicitly
 	fTable = NULL;
 	fCount = 0;
 }
@@ -180,9 +184,9 @@ status_t
 XColorsTable::_LoadXColorsTable()
 {
 	BResources* res = BApplication::AppResources();
-	if (res == NULL) 
+	if (res == NULL)
 		return B_ERROR;
-	
+
 	size_t size = 0;
 	fTable = (_XColorEntry*)res->LoadResource(B_RAW_TYPE, "XColorsTable", &size);
 	if (fTable == NULL || size < sizeof(_XColorEntry)) {
@@ -191,16 +195,6 @@ XColorsTable::_LoadXColorsTable()
 	}
 
 	fCount = size / sizeof(_XColorEntry);
-
-//	printf("%ld; sizeof:%ld\n", fCount, sizeof(_XColorEntry));
-
-	for (size_t i = 0; i < fCount; i++) {
-		printf("%ld:%#010lx -> %d/%d/%d %d\n", 
-				i, fTable[i].hash, fTable[i].color.red,
-				fTable[i].color.green, fTable[i].color.blue,
-				fTable[i].color.alpha);
-	}
-
 	return B_OK;
 }
 

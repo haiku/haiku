@@ -1,6 +1,11 @@
 /*
+ * Copyright 2013, Haiku, Inc. All rights reserved.
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
+ *		Siarzhuk Zharski, zharik@gmx.li
  */
 #ifndef BASIC_TERMINAL_BUFFER_H
 #define BASIC_TERMINAL_BUFFER_H
@@ -114,8 +119,8 @@ public:
 			// snapshots and data capture for debugging
 			void				MakeLinesSnapshots(time_t timeStamp,
 									const char* fileName);
-			void				RestartDebugCapture();
-	/*inline*/	void				CaptureChar(char ch);
+			void				StartStopDebugCapture();
+			void				CaptureChar(char ch);
 
 			// insert chars/lines
 	inline	void				InsertChar(UTF8Char c);
@@ -183,7 +188,7 @@ protected:
 
 	static	TerminalLine**		_AllocateLines(int32 width, int32 count);
 	static	void				_FreeLines(TerminalLine** lines, int32 count);
-			void				_ClearLines(int32 first, int32 last/*, uint32 attr = 0*/); //TODO attr
+			void				_ClearLines(int32 first, int32 last);
 
 			status_t			_ResizeHistory(int32 width,
 									int32 historyCapacity);
@@ -272,7 +277,7 @@ BasicTerminalBuffer::SetAttributes(uint32 attributes)
 void
 BasicTerminalBuffer::PreserveAttributes(bool store)
 {
-	if (store) 
+	if (store)
 		fSavedAttributes = fAttributes;
 	else
 		fAttributes = fSavedAttributes;
@@ -306,17 +311,20 @@ BasicTerminalBuffer::EraseChars(int32 numChars)
 	EraseCharsFrom(fCursor.x, numChars);
 }
 
+
 void
 BasicTerminalBuffer::DeleteColumns()
 {
 	DeleteColumnsFrom(fCursor.x);
 }
 
+
 void
 BasicTerminalBuffer::SetCursor(int32 x, int32 y)
 {
 	_SetCursor(x, y, false);
 }
+
 
 void
 BasicTerminalBuffer::SetCursorX(int32 x)

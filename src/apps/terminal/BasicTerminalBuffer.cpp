@@ -1,6 +1,11 @@
 /*
+ * Copyright 2013, Haiku, Inc. All rights reserved.
  * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
+ *		Siarzhuk Zharski, zharik@gmx.li
  */
 
 #include "BasicTerminalBuffer.h"
@@ -265,7 +270,6 @@ BasicTerminalBuffer::SynchronizeWith(const BasicTerminalBuffer* other,
 				destLine->softBreak = sourceLine->softBreak;
 				if (destLine->length > 0) {
 					memcpy(destLine->cells, sourceLine->cells,
-//						destLine->length * sizeof(TerminalCell));
 						fWidth * sizeof(TerminalCell));
 				}
 			} else {
@@ -309,6 +313,7 @@ BasicTerminalBuffer::GetChar(int32 row, int32 column, UTF8Char& character,
 	return A_CHAR;
 }
 
+
 void
 BasicTerminalBuffer::GetCellAttributes(int32 row, int32 column,
 	uint32& attributes, uint32& count) const
@@ -319,16 +324,14 @@ BasicTerminalBuffer::GetCellAttributes(int32 row, int32 column,
 	if (line == NULL || column < 0)
 		return;
 
-	uint32 c = column;
+	int32 c = column;
 	for (; c < fWidth; c++) {
 		TerminalCell& cell = line->cells[c];
-		if (c > column && attributes != cell.attributes) {
+		if (c > column && attributes != cell.attributes)
 			break;
-		}
 		attributes = cell.attributes;
 	}
 	count = c - column;
-//	printf("r:%d c:%d count:%d a:%x\n", row, column, count, attributes);
 }
 
 
@@ -496,6 +499,7 @@ BasicTerminalBuffer::GetLineColor(int32 index) const
 	TerminalLine* line = _HistoryLineAt(index, lineBuffer);
 	return line != NULL ? line->attributes : 0;
 }
+
 
 bool
 BasicTerminalBuffer::Find(const char* _pattern, const TermPos& start,
@@ -728,7 +732,7 @@ BasicTerminalBuffer::InsertTab()
 	if (x != fCursor.x) {
 		TerminalLine* line = _LineAt(fCursor.y);
 		for (int32 i = fCursor.x; i <= x; i++) {
-			line->cells[i].character = ' ';		
+			line->cells[i].character = ' ';
 			line->cells[i].attributes = fAttributes;
 		}
 		fCursor.x = x;
@@ -784,35 +788,27 @@ void
 BasicTerminalBuffer::EraseCharsFrom(int32 first, int32 numChars)
 {
 	TerminalLine* line = _LineAt(fCursor.y);
-	
-/*	if (IsAlternateScreenActive())*/ {
-		int32 end = min_c(first + numChars, fWidth);
-		for (int32 i = first; i < end; i++)
-			line->cells[i].attributes = fAttributes;
-	}
-	
+
+	int32 end = min_c(first + numChars, fWidth);
+	for (int32 i = first; i < end; i++)
+		line->cells[i].attributes = fAttributes;
+
 	line->attributes = fAttributes;
-
-	_Invalidate(fCursor.y, fCursor.y);
-
-//	if (fCursor.x >= line->length)
-//		return;
 
 	fSoftWrappedCursor = false;
 
-	int32 end = min_c(first + numChars, line->length);
-//	printf("%d:%d - %d|", fCursor.y, first, end);
+	end = min_c(first + numChars, line->length);
 	if (first > 0 && IS_WIDTH(line->cells[first - 1].attributes))
 		first--;
 	if (end > 0 && IS_WIDTH(line->cells[end - 1].attributes))
 		end++;
 
-//	printf("%d - %d\n", first, end);
 	for (int32 i = first; i < end; i++) {
 		line->cells[i].character = kSpaceChar;
 		line->cells[i].attributes = fAttributes;
 	}
 
+	_Invalidate(fCursor.y, fCursor.y);
 }
 
 
@@ -886,8 +882,6 @@ BasicTerminalBuffer::DeleteChars(int32 numChars)
 			// remove all remaining chars
 			line->length = fCursor.x;
 		}
-
-//		line->attributes = fAttributes;
 
 		_Invalidate(fCursor.y, fCursor.y);
 	}
@@ -1331,7 +1325,7 @@ BasicTerminalBuffer::_ResizeRewrap(int32 width, int32 height,
 				sourceLine->cells + sourceX, toCopy * sizeof(TerminalCell));
 			destLine->length += toCopy;
 		}
-		
+
 		destLine->attributes = sourceLine->attributes;
 
 		bool nextDestLine = false;
@@ -1572,12 +1566,9 @@ void
 BasicTerminalBuffer::_PadLineToCursor()
 {
 	TerminalLine* line = _LineAt(fCursor.y);
-	if (line->length < fCursor.x) {
-		for (int32 i = line->length; i < fCursor.x; i++) {
+	if (line->length < fCursor.x)
+		for (int32 i = line->length; i < fCursor.x; i++)
 			line->cells[i].character = kSpaceChar;
-//			line->cells[i].attributes = line->attributes;
-		}
-	}
 }
 
 
@@ -1716,7 +1707,7 @@ BasicTerminalBuffer::MakeLinesSnapshots(time_t timeStamp, const char* fileName)
 			break;
 		}
 
-		size_t countLines = dumpHistory ? fHistory->Size() : fHeight;
+		int countLines = dumpHistory ? fHistory->Size() : fHeight;
 		fprintf(fileOut, "> %s lines dump begin <\n",
 					dumpHistory ? "History" : "Terminal");
 
@@ -1727,11 +1718,11 @@ BasicTerminalBuffer::MakeLinesSnapshots(time_t timeStamp, const char* fileName)
 					: fScreen[_LineIndex(i)];
 
 			if (line == NULL) {
-				fprintf(fileOut, "line: %ld is NULL!!!\n", i);
+				fprintf(fileOut, "line: %d is NULL!!!\n", i);
 				continue;
 			}
 
-			fprintf(fileOut, "%02d:%02d:%08lx:\n",
+			fprintf(fileOut, "%02" B_PRId16 ":%02" B_PRId16 ":%08" B_PRIx32 ":\n",
 					i, line->length, line->attributes);
 			for (int j = 0; j < line->length; j++)
 				fprintf(fileOut, "%c", line->cells[j].character.bytes[0]);
@@ -1739,7 +1730,7 @@ BasicTerminalBuffer::MakeLinesSnapshots(time_t timeStamp, const char* fileName)
 			fprintf(fileOut, "\n");
 			for (int s = 28; s >= 0; s -= 4) {
 				for (int j = 0; j < fWidth; j++)
-					fprintf(fileOut, "%01lx",
+					fprintf(fileOut, "%01" B_PRIx32,
 						(line->cells[j].attributes >> s) & 0x0F);
 
 				fprintf(fileOut, "\n");
@@ -1751,14 +1742,15 @@ BasicTerminalBuffer::MakeLinesSnapshots(time_t timeStamp, const char* fileName)
 		fprintf(fileOut, "> %s lines dump finished <\n",
 					dumpHistory ? "History" : "Terminal");
 
-	} while (dumpHistory = !dumpHistory);
+		dumpHistory = !dumpHistory;
+	} while (dumpHistory);
 
 	fclose(fileOut);
 }
 
 
 void
-BasicTerminalBuffer::RestartDebugCapture()
+BasicTerminalBuffer::StartStopDebugCapture()
 {
 	if (fCaptureFile >= 0) {
 		close(fCaptureFile);

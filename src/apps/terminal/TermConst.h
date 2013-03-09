@@ -1,32 +1,13 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2013, Haiku.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files or portions
- * thereof (the "Software"), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject
- * to the following conditions:
+ * Distributed under the terms of the MIT License.
  *
- *  * Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- *  * Redistributions in binary form must reproduce the above copyright notice
- *    in the  binary, as well as this list of conditions and the following
- *    disclaimer in the documentation and/or other materials provided with
- *    the distribution.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
+ * Authors:
+ *		Kian Duffy, myob@users.sourceforge.net
+ *		Siarzhuk Zharski, zharik@gmx.li
  */
 #ifndef TERMCONST_H_INCLUDED
 #define TERMCONST_H_INCLUDED
@@ -164,16 +145,8 @@ static const char* const PREF_WINDOW_TITLE = "Window title";
 extern const char* const kTooTipSetTabTitlePlaceholders;
 extern const char* const kTooTipSetWindowTitlePlaceholders;
 
-// Color type
-enum {
-  TEXT_FOREGROUND_COLOR,
-  TEXT_BACKGROUND_COLOR,
-  SELECTION_FOREGROUND_COLOR,
-  SELECTION_BACKGROUND_COLOR
-};
 
-
-// Cursor shape
+// Cursor style
 enum {
 	BLOCK_CURSOR,
 	UNDERLINE_CURSOR,
@@ -188,12 +161,6 @@ static const int32 DEFAULT = -1;
 // Font Width
 static const int  HALF_WIDTH = 1;
 static const int  FULL_WIDTH = 2;
-
-// Scroll direction flag
-enum{
-  SCRUP,
-  SCRDOWN
-};
 
 #define M_UTF8 -1
 

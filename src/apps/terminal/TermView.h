@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku, Inc.
+ * Copyright 2001-2013, Haiku, Inc.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
@@ -8,6 +8,7 @@
  *		Stefano Ceccherini, stefano.ceccherini@gmail.com
  *		Kian Duffy, myob@users.sourceforge.net
  *		Ingo Weinhold, ingo_weinhold@gmx.de
+ *		Siarzhuk Zharski, zharik@gmx.li
  */
 #ifndef TERMVIEW_H
 #define TERMVIEW_H
@@ -91,7 +92,7 @@ public:
 			void				SetMouseClipboard(BClipboard *);
 
 			void				MakeDebugSnapshots();
-			void				RestartDebugCapture();
+			void				StartStopDebugCapture();
 
 			// edit functions
 			void				Copy(BClipboard* clipboard);

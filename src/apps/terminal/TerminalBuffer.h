@@ -1,6 +1,11 @@
 /*
+ * Copyright 2013, Haiku, Inc. All rights reserved.
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
+ *		Siarzhuk Zharski, zharik@gmx.li
  */
 #ifndef TERMINAL_BUFFER_H
 #define TERMINAL_BUFFER_H

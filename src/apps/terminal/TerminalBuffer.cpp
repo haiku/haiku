@@ -1,6 +1,11 @@
 /*
+ * Copyright 2013, Haiku, Inc. All rights reserved.
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
+ *		Siarzhuk Zharski, zharik@gmx.li
  */
 
 #include "TerminalBuffer.h"
@@ -242,7 +247,7 @@ TerminalBuffer::GuessPaletteColor(int red, int green, int blue)
 {
 	int distance = 255 * 100;
 	int index = -1;
-	for (int i = 0; i < kTermColorCount && distance > 0; i++) {
+	for (uint32 i = 0; i < kTermColorCount && distance > 0; i++) {
 		rgb_color color = fColorsPalette[i];
 		int r = 30 * abs(color.red - red);
 		int g = 59 * abs(color.green - green);
@@ -254,7 +259,7 @@ TerminalBuffer::GuessPaletteColor(int red, int green, int blue)
 		}
 	}
 
-	return min_c(index, kTermColorCount - 1);
+	return min_c(index, int(kTermColorCount - 1));
 }
 
 

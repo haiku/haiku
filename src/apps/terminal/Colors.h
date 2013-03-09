@@ -1,6 +1,10 @@
 /*
- * Copyright 2010-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2010-2013, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Stefano Ceccherini, stefano.ceccherini@gmail.com
+ *		Siarzhuk Zharski, zharik@gmx.li
  */
 #ifndef _COLORS_H
 #define _COLORS_H
@@ -28,8 +32,8 @@ const uint kTermColorCount = 256;
 
 
 // Helper class handling XColorName/rgb:xxx/xxx/xxx -> rgb_color conversions.
-// The source of XColorNames is wide available rgb.txt for X11 System. 
-// It is stored in "XColorsTable" application resource as array of 
+// The source of XColorNames is wide available rgb.txt for X11 System.
+// It is stored in "XColorsTable" application resource as array of
 // "hash <-> rgb_color" pairs. The table is loaded only on demand.
 // Name hashes must be sorted to let lookup procedure work properly
 class XColorsTable {
@@ -39,7 +43,7 @@ class XColorsTable {
 		rgb_color	color;
 	};
 
-public:	
+public:
 							XColorsTable();
 							~XColorsTable();
 

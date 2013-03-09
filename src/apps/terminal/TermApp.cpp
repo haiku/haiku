@@ -1,9 +1,13 @@
 /*
- * Copyright 2001-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2013, Haiku, Inc. All rights reserved.
  * Copyright (c) 2003-2004 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
  * Distributed unter the terms of the MIT license.
+ *
+ * Authors:
+ *		Kian Duffy, myob@users.sourceforge.net
+ *		Siarzhuk Zharski, zharik@gmx.li
  */
 
 
@@ -292,7 +296,6 @@ TermApp::_ChildCleanupThread(void* data)
 }
 
 
-
 void
 TermApp::_Usage(char *name)
 {
@@ -351,4 +354,3 @@ TermApp::_InitDefaultPalette()
 	for (uint gray = 8; gray < 240; gray += 10)
 		(*color++).set_to(gray, gray, gray);
 }
-

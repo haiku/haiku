@@ -1,8 +1,12 @@
 /*
- * Copyright 2001-2010, Haiku, Inc.
+ * Copyright 2001-2013, Haiku, Inc.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Kian Duffy, myob@users.sourceforge.net
+ *		Siarzhuk Zharski, zharik@gmx.li
  */
 
 
@@ -176,7 +180,7 @@ TermParse::_InitPtyReader()
 
 	fReaderThread = spawn_thread(_ptyreader_thread, "PtyReader",
 		B_NORMAL_PRIORITY, this);
-  	if (fReaderThread < 0) {
+	if (fReaderThread < 0) {
 		delete_sem(fReaderSem);
 		fReaderSem = -1;
 		delete_sem(fReaderLocker);
@@ -485,40 +489,40 @@ TermParse::EscParse()
 					/* "Special characters and line drawing" enabled by \E(0 */
 					switch (c) {
 						case 'a':
-							fBuffer->InsertChar("\xE2\x96\x92",3);
+							fBuffer->InsertChar("\xE2\x96\x92", 3);
 							break;
 						case 'j':
-							fBuffer->InsertChar("\xE2\x94\x98",3);
+							fBuffer->InsertChar("\xE2\x94\x98", 3);
 							break;
 						case 'k':
-							fBuffer->InsertChar("\xE2\x94\x90",3);
+							fBuffer->InsertChar("\xE2\x94\x90", 3);
 							break;
 						case 'l':
-							fBuffer->InsertChar("\xE2\x94\x8C",3);
+							fBuffer->InsertChar("\xE2\x94\x8C", 3);
 							break;
 						case 'm':
-							fBuffer->InsertChar("\xE2\x94\x94",3);
+							fBuffer->InsertChar("\xE2\x94\x94", 3);
 							break;
 						case 'n':
-							fBuffer->InsertChar("\xE2\x94\xBC",3);
+							fBuffer->InsertChar("\xE2\x94\xBC", 3);
 							break;
 						case 'q':
-							fBuffer->InsertChar("\xE2\x94\x80",3);
+							fBuffer->InsertChar("\xE2\x94\x80", 3);
 							break;
 						case 't':
-							fBuffer->InsertChar("\xE2\x94\x9C",3);
+							fBuffer->InsertChar("\xE2\x94\x9C", 3);
 							break;
 						case 'u':
-							fBuffer->InsertChar("\xE2\x94\xA4",3);
+							fBuffer->InsertChar("\xE2\x94\xA4", 3);
 							break;
 						case 'v':
-							fBuffer->InsertChar("\xE2\x94\xB4",3);
+							fBuffer->InsertChar("\xE2\x94\xB4", 3);
 							break;
 						case 'w':
-							fBuffer->InsertChar("\xE2\x94\xAC",3);
+							fBuffer->InsertChar("\xE2\x94\xAC", 3);
 							break;
 						case 'x':
-							fBuffer->InsertChar("\xE2\x94\x82",3);
+							fBuffer->InsertChar("\xE2\x94\x82", 3);
 							break;
 						default:
 							fBuffer->InsertChar((char)c);
@@ -694,7 +698,7 @@ TermParse::EscParse()
 						param[nparam++] = DEFAULT;
 					break;
 
-				case CASE_CSI_SP: // ESC [N q 
+				case CASE_CSI_SP: // ESC [N q
 					// part of change cursor style DECSCUSR
 					if (nparam < NPARAM)
 						param[nparam++] = ' ';
@@ -1136,14 +1140,13 @@ TermParse::EscParse()
 										break;
 									}
 								default:
-									if (!isprint(params[i] & 0x7f)) {
+									if (!isprint(params[i] & 0x7f))
 										break;
-									}
 									continue;
 							}
 							params[i] = '\0';
 						}
-						
+
 						if (isParsed)
 							_ProcessOperatingSystemControls(params);
 
@@ -1546,7 +1549,7 @@ TermParse::_ProcessOperatingSystemControls(uchar* params)
 		case 104: // reset colors (0 - 255)
 			{
 				bool reset = (mode / 100) == 1;
-				
+
 				// colors can be in "idx1:name1;...;idxN:nameN;" sequence too!
 				uint32 count = 0;
 				char* p = strtok((char*)params, ";");
@@ -1558,16 +1561,14 @@ TermParse::_ProcessOperatingSystemControls(uchar* params)
 						if (p == NULL)
 							break;
 
-						if (gXColorsTable.LookUpColor(p, &colors[count]) == B_OK) {
+						if (gXColorsTable.LookUpColor(p, &colors[count]) == B_OK)
 							count++;
-						}
-					} else {
+					} else
 						count++;
-					}
 
 					p = strtok(NULL, ";");
-				} while(p != NULL && count < kTermColorCount);
-				
+				} while (p != NULL && count < kTermColorCount);
+
 				if (count > 0) {
 					if (!reset)
 						fBuffer->SetColors(indexes, colors, count);
@@ -1588,13 +1589,13 @@ TermParse::_ProcessOperatingSystemControls(uchar* params)
 						// dyna-colors are pos-sensitive - no chance to continue
 						break;
 					}
-				   
+
 					indexes[count] = 10 + offset + count;
 					count++;
-					
 					p = strtok(NULL, ";");
-				} while(p != NULL && (offset + count) < 10);
-			
+
+				} while (p != NULL && (offset + count) < 10);
+
 				if (count > 0) {
 					fBuffer->SetColors(indexes, colors, count, true);
 				}
@@ -1609,8 +1610,7 @@ TermParse::_ProcessOperatingSystemControls(uchar* params)
 			}
 			break;
 		default:
-			printf("%d -> %s\n", mode, params);
+		//	printf("%d -> %s\n", mode, params);
 			break;
 	}
 }
-

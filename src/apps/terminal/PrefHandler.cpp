@@ -1,10 +1,15 @@
 /*
- * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2013, Haiku, Inc. All Rights Reserved.
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (c) 1998,99 Kazuho Okui and Takashi Murai.
  *
  * Distributed unter the terms of the MIT License.
+ *
+ * Authors:
+ *		Kian Duffy, myob@users.sourceforge.net
+ *		Daniel Furrer, assimil8or@users.sourceforge.net
+ *		Siarzhuk Zharski, zharik@gmx.li
  */
 
 
@@ -60,7 +65,7 @@ static const pref_defaults kTermDefaults[] = {
 	{ PREF_ANSI_MAGENTA_COLOR,	"115,  68, 123" },
 	{ PREF_ANSI_CYAN_COLOR,		"  6, 152, 154" },
 	{ PREF_ANSI_WHITE_COLOR,	"245, 245, 245" },
-                                                  
+
 	{ PREF_ANSI_BLACK_HCOLOR,	"128, 128, 128" },
 	{ PREF_ANSI_RED_HCOLOR,		"255,   0,   0" },
 	{ PREF_ANSI_GREEN_HCOLOR,	"  0, 255,   0" },
@@ -204,11 +209,12 @@ PrefHandler::SaveAsText(const char *path, const char *mimetype,
 			fContainer.GetInfo(B_STRING_TYPE, i, (char**)&key, &type) == B_OK;
 #endif
 			i++) {
-		int len = snprintf(buffer, sizeof(buffer), "\"%s\" , \"%s\"\n", key, getString(key));
+		int len = snprintf(buffer, sizeof(buffer), "\"%s\" , \"%s\"\n",
+				key, getString(key));
 		file.Write(buffer, len);
 	}
 
-	if (mimetype != NULL){
+	if (mimetype != NULL) {
 		BNodeInfo info(&file);
 		info.SetType(mimetype);
 		info.SetPreferredApp(signature);
@@ -236,6 +242,7 @@ PrefHandler::getFloat(const char *key)
 
 	return atof(value);
 }
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Terminal getString"
