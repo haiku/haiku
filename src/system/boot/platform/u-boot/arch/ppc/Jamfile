@@ -10,6 +10,11 @@ UseLibraryHeaders [ FDirName libfdt ] ;
 
 SubDirC++Flags -fno-rtti ;
 
+BootMergeObject boot_platform_u-boot_ppc_amcc440.o :
+	arch_mmu_amcc440.cpp
+	: -fno-pic -mcpu=440
+;
+
 BootMergeObject boot_platform_u-boot_ppc.o :
 	# must come first to have _start_* at correct locations
 	shell.S
@@ -20,6 +25,7 @@ BootMergeObject boot_platform_u-boot_ppc.o :
 	arch_cpu.cpp
 	#mmu.cpp
 	: -fno-pic
+	: boot_platform_u-boot_ppc_amcc440.o
 ;
 
 SEARCH on [ FGristFiles arch_cpu_asm.S ]

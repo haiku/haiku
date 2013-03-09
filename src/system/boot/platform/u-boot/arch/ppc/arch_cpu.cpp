@@ -42,6 +42,10 @@ extern void *gFDT;
 #endif
 
 
+// FIXME: this is ugly; introduce a cpu type in kernel args
+bool gIs440 = false;
+
+
 static status_t
 enumerate_cpus(void)
 {
@@ -203,6 +207,8 @@ check_cpu_features()
 
 	if (is_460)
 		is_440 = true;
+
+	gIs440 = is_440;
 
 	// some cpu-dependent tweaking
 
