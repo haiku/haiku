@@ -470,20 +470,20 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 
 	// Button Bar
 
+	BuildButtonBar();
+
 	float bbwidth = 0, bbheight = 0;
 
 	bool showButtonBar = fApp->ShowButtonBar();
 
 	if (showButtonBar) {
-		BuildButtonBar();
 		fButtonBar->ShowLabels(showButtonBar);
 		fButtonBar->Arrange(true);
 		fButtonBar->GetPreferredSize(&bbwidth, &bbheight);
 		fButtonBar->ResizeTo(Bounds().right, bbheight);
 		fButtonBar->MoveTo(0, height);
 		fButtonBar->Show();
-	} else
-		fButtonBar = NULL;
+	}
 
 	r.top = r.bottom = height + bbheight + 1;
 	fHeaderView = new THeaderView (r, rect, fIncoming, resending,
@@ -2169,7 +2169,7 @@ TMailWindow::Reply(entry_ref *ref, TMailWindow *window, uint32 type)
 	BString date(mail->Date());
 	if (date.Length() <= 0)
 		date = B_TRANSLATE("(Date unavailable)");
-			
+
 	preamble.ReplaceAll("%n", name);
 	preamble.ReplaceAll("%e", address);
 	preamble.ReplaceAll("%d", date);
@@ -2332,7 +2332,7 @@ TMailWindow::Send(bool now)
 						B_WARNING_ALERT);
 					alert->SetShortcut(1, B_ESCAPE);
 					userAnswer = alert->Go();
-					
+
 					if (userAnswer == 1) {
 						// Cancel was picked.
 						return -1;
@@ -2469,7 +2469,7 @@ TMailWindow::Send(bool now)
 				B_TRANSLATE("Start now"), B_TRANSLATE("OK"));
 			alert->SetShortcut(1, B_ESCAPE);
 			int32 start = alert->Go();
-			
+
 			if (start == 0) {
 				result = be_roster->Launch("application/x-vnd.Be-POST");
 				if (result == B_OK) {
@@ -2559,7 +2559,7 @@ TMailWindow::SaveAsDraft()
 				else
 					strlcpy(fileName, fHeaderView->fSubject->Text(),
 						sizeof(fileName));
-			
+
 				uint32 originalLength = strlen(fileName);
 
 				// convert /, \ and : to -
@@ -2579,7 +2579,7 @@ TMailWindow::SaveAsDraft()
 						break;
 					char appendix[B_FILE_NAME_LENGTH];
 					sprintf(appendix, " %ld", i++);
-					int32 pos = min_c(sizeof(fileName) - strlen(appendix), 
+					int32 pos = min_c(sizeof(fileName) - strlen(appendix),
 						originalLength);
 					sprintf(fileName + pos, "%s", appendix);
 				} while (status == B_FILE_EXISTS);
@@ -2612,12 +2612,12 @@ TMailWindow::SaveAsDraft()
 		WriteAttrString(&draft, B_MAIL_ATTR_CC, fHeaderView->fCc->Text());
 	if (fHeaderView->fBcc != NULL)
 		WriteAttrString(&draft, B_MAIL_ATTR_BCC, fHeaderView->fBcc->Text());
-	
+
 	// Add account
 	BMenuItem* menuItem = fHeaderView->fAccountMenu->FindMarked();
 	if (menuItem != NULL)
 		WriteAttrString(&draft, B_MAIL_ATTR_ACCOUNT, menuItem->Label());
-	
+
 	// Add encoding
 	menuItem = fHeaderView->fEncodingMenu->FindMarked();
 	if (menuItem != NULL)
@@ -2862,21 +2862,21 @@ TMailWindow::OpenMessage(const entry_ref *ref, uint32 characterSetForDecoding)
 			fHeaderView->fCc->SetText(string.String());
 		if (node.ReadAttrString(B_MAIL_ATTR_BCC, &string) == B_OK)
 			fHeaderView->fBcc->SetText(string.String());
-		
+
 		// Restore account
 		if (node.ReadAttrString(B_MAIL_ATTR_ACCOUNT, &string) == B_OK) {
 			BMenuItem* accountItem = fHeaderView->fAccountMenu->FindItem(string.String());
 			if (accountItem != NULL)
 				accountItem->SetMarked(true);
 		}
-		
+
 		// Restore encoding
 		if (node.ReadAttrString("MAIL:encoding", &string) == B_OK) {
 			BMenuItem* encodingItem = fHeaderView->fEncodingMenu->FindItem(string.String());
 			if (encodingItem != NULL)
 				encodingItem->SetMarked(true);
 		}
-		
+
 		// Restore attachments
 		if (node.ReadAttrString("MAIL:attachments", &string) == B_OK) {
 			BMessage msg(REFS_RECEIVED);
@@ -2893,7 +2893,7 @@ TMailWindow::OpenMessage(const entry_ref *ref, uint32 characterSetForDecoding)
 			}
 			AddEnclosure(&msg);
 		}
-		
+
 		// restore the reading position if available
 		PostMessage(M_READ_POS);
 
