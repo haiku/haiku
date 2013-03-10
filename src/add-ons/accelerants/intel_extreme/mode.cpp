@@ -632,6 +632,11 @@ save_lvds_mode(void)
 	// dump currently programmed mode.
 	display_mode biosMode;
 	retrieve_current_mode(biosMode, INTEL_DISPLAY_B_PLL);
+
+	sanitize_display_mode(biosMode);
+		// The BIOS mode may not be a valid mode, as LVDS output does not
+		// really care about the sync values
+
 	gInfo->lvds_panel_mode = biosMode;
 }
 
