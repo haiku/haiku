@@ -110,7 +110,7 @@ ParseArguments(const char* _args, AddressResolver** address, char** _path,
 	conf->fEmulateNamedAttrs = false;
 	conf->fCacheMetadata = true;
 
-	char* optionsEnd;
+	char* optionsEnd = NULL;
 	if (options != NULL)
 		optionsEnd = strchr(options, ' ');
 	while (options != NULL && *options != '\0') {
