@@ -7,8 +7,6 @@
  */
 
 
-#define __STDC_FORMAT_MACROS
-#include <inttypes.h>
 #include <stdio.h>
 
 #include <AutoDeleter.h>
@@ -150,7 +148,7 @@ static status_t
 nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 			const char* args, ino_t* _rootVnodeID)
 {
-	TRACE("volume = %p, device = %s, flags = %" PRIu32 ", args = %s", volume,
+	TRACE("volume = %p, device = %s, flags = %" B_PRIu32 ", args = %s", volume,
 		device, flags, args);
 
 	status_t result;
@@ -216,7 +214,7 @@ nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 
 	*_rootVnodeID = inode->ID();
 
-	TRACE("*_rootVnodeID = %" PRIi64, inode->ID());
+	TRACE("*_rootVnodeID = %" B_PRIi64, inode->ID());
 
 	return B_OK;
 }
@@ -227,7 +225,7 @@ nfs4_get_vnode(fs_volume* volume, ino_t id, fs_vnode* vnode, int* _type,
 	uint32* _flags, bool reenter)
 {
 	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
-	TRACE("volume = %p, id = %" PRIi64, volume, id);
+	TRACE("volume = %p, id = %" B_PRIi64, volume, id);
 
 	VnodeToInode* vnodeToInode = new VnodeToInode(id, fs);
 	if (vnodeToInode == NULL)
@@ -291,14 +289,15 @@ nfs4_lookup(fs_volume* volume, fs_vnode* dir, const char* name, ino_t* _id)
 	if (inode == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	TRACE("volume = %p, dir = %" PRIi64 ", name = %s", volume, vti->ID(), name);
+	TRACE("volume = %p, dir = %" B_PRIi64 ", name = %s", volume, vti->ID(),
+		name);
 
 	status_t result = inode->LookUp(name, _id);
 	if (result != B_OK)
 		return result;
 	locker.Unlock();
 
-	TRACE("*_id = %" PRIi64, *_id);
+	TRACE("*_id = %" B_PRIi64, *_id);
 
 	// If VTI holds an outdated Inode next operation performed on it will
 	// return either ERR_STALE or ERR_FHEXPIRED. Both of these error codes
@@ -319,7 +318,7 @@ nfs4_get_vnode_name(fs_volume* volume, fs_vnode* vnode, char* buffer,
 	size_t bufferSize)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
-	TRACE("volume = %p, vnode = %" PRIi64, volume, vti->ID());
+	TRACE("volume = %p, vnode = %" B_PRIi64, volume, vti->ID());
 
 	VnodeToInodeLocker _(vti);
 	Inode* inode = vti->Get();
@@ -335,7 +334,7 @@ static status_t
 nfs4_put_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
-	TRACE("volume = %p, vnode = %" PRIi64, volume, vti->ID());
+	TRACE("volume = %p, vnode = %" B_PRIi64, volume, vti->ID());
 
 	delete vti;
 	return B_OK;
@@ -347,7 +346,7 @@ nfs4_remove_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
 {
 	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
-	TRACE("volume = %p, vnode = %" PRIi64, volume, vti->ID());
+	TRACE("volume = %p, vnode = %" B_PRIi64, volume, vti->ID());
 
 	if (fs->Root() == vti->GetPointer())
 		return B_OK;
@@ -364,7 +363,7 @@ nfs4_read_pages(fs_volume* _volume, fs_vnode* vnode, void* _cookie, off_t pos,
 	const iovec* vecs, size_t count, size_t* _numBytes)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
-	TRACE("volume = %p, vnode = %" PRIi64 ", cookie = %p, pos = %" PRIi64	\
+	TRACE("volume = %p, vnode = %" B_PRIi64 ", cookie = %p, pos = %" B_PRIi64 \
 		", count = %lu, numBytes = %lu", _volume, vti->ID(), _cookie, pos,
 		count, *_numBytes);
 
@@ -408,7 +407,7 @@ nfs4_write_pages(fs_volume* _volume, fs_vnode* vnode, void* _cookie, off_t pos,
 	const iovec* vecs, size_t count, size_t* _numBytes)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
-	TRACE("volume = %p, vnode = %" PRIi64 ", cookie = %p, pos = %" PRIi64	\
+	TRACE("volume = %p, vnode = %" B_PRIi64 ", cookie = %p, pos = %" B_PRIi64 \
 		", count = %lu, numBytes = %lu", _volume, vti->ID(), _cookie, pos,
 		count, *_numBytes);
 
@@ -448,7 +447,7 @@ static status_t
 nfs4_io(fs_volume* volume, fs_vnode* vnode, void* cookie, io_request* request)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
-	TRACE("volume = %p, vnode = %" PRIi64 ", cookie = %p", volume, vti->ID(),
+	TRACE("volume = %p, vnode = %" B_PRIi64 ", cookie = %p", volume, vti->ID(),
 		cookie);
 
 	VnodeToInodeLocker _(vti);
@@ -483,7 +482,7 @@ nfs4_get_file_map(fs_volume* volume, fs_vnode* vnode, off_t _offset,
 static status_t
 nfs4_set_flags(fs_volume* volume, fs_vnode* vnode, void* _cookie, int flags)
 {
-	TRACE("volume = %p, vnode = %" PRIi64 ", cookie = %p, flags = %d", volume,
+	TRACE("volume = %p, vnode = %" B_PRIi64 ", cookie = %p, flags = %d", volume,
 		reinterpret_cast<VnodeToInode*>(vnode->private_node)->ID(), _cookie,
 		flags);
 
@@ -497,7 +496,7 @@ static status_t
 nfs4_fsync(fs_volume* volume, fs_vnode* vnode)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
-	TRACE("volume = %p, vnode = %" PRIi64, volume, vti->ID());
+	TRACE("volume = %p, vnode = %" B_PRIi64, volume, vti->ID());
 
 	VnodeToInodeLocker _(vti);
 	Inode* inode = vti->Get();
@@ -513,7 +512,7 @@ nfs4_read_symlink(fs_volume* volume, fs_vnode* link, char* buffer,
 	size_t* _bufferSize)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(link->private_node);
-	TRACE("volume = %p, link = %" PRIi64, volume, vti->ID());
+	TRACE("volume = %p, link = %" B_PRIi64, volume, vti->ID());
 
 	VnodeToInodeLocker _(vti);
 	Inode* inode = vti->Get();
@@ -529,7 +528,7 @@ nfs4_create_symlink(fs_volume* volume, fs_vnode* dir, const char* name,
 	const char* path, int mode)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(dir->private_node);
-	TRACE("volume = %p, dir = %" PRIi64 ", name = %s, path = %s, mode = %d",
+	TRACE("volume = %p, dir = %" B_PRIi64 ", name = %s, path = %s, mode = %d",
 		volume, vti->ID(), name, path, mode);
 
 	VnodeToInodeLocker _(vti);
@@ -558,8 +557,8 @@ nfs4_link(fs_volume* volume, fs_vnode* dir, const char* name, fs_vnode* vnode)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
 	VnodeToInode* dirVti = reinterpret_cast<VnodeToInode*>(dir->private_node);
-	TRACE("volume = %p, dir = %" PRIi64 ", name = %s, vnode = %" PRIi64, volume,
-		dirVti->ID(), name, vti->ID());
+	TRACE("volume = %p, dir = %" B_PRIi64 ", name = %s, vnode = %" B_PRIi64,
+		volume, dirVti->ID(), name, vti->ID());
 
 	VnodeToInodeLocker _dir(dirVti);
 	Inode* dirInode = dirVti->Get();
@@ -586,7 +585,8 @@ nfs4_unlink(fs_volume* volume, fs_vnode* dir, const char* name)
 	if (inode == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	TRACE("volume = %p, dir = %" PRIi64 ", name = %s", volume, vti->ID(), name);
+	TRACE("volume = %p, dir = %" B_PRIi64 ", name = %s", volume, vti->ID(),
+		name);
 
 	ino_t id;
 	status_t result = inode->Remove(name, NF4REG, &id);
@@ -615,7 +615,7 @@ nfs4_rename(fs_volume* volume, fs_vnode* fromDir, const char* fromName,
 	VnodeToInode* fromVti
 		= reinterpret_cast<VnodeToInode*>(fromDir->private_node);
 	VnodeToInode* toVti = reinterpret_cast<VnodeToInode*>(toDir->private_node);
-	TRACE("volume = %p, fromDir = %" PRIi64 ", toDir = %" PRIi64 ","	\
+	TRACE("volume = %p, fromDir = %" B_PRIi64 ", toDir = %" B_PRIi64 ","	\
 		" fromName = %s, toName = %s", volume, fromVti->ID(), toVti->ID(),	\
 		fromName, toName);
 
@@ -659,7 +659,7 @@ static status_t
 nfs4_access(fs_volume* volume, fs_vnode* vnode, int mode)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
-	TRACE("volume = %p, vnode = %" PRIi64 ", mode = %d", volume, vti->ID(),
+	TRACE("volume = %p, vnode = %" B_PRIi64 ", mode = %d", volume, vti->ID(),
 		mode);
 
 	VnodeToInodeLocker _(vti);
@@ -675,7 +675,7 @@ static status_t
 nfs4_read_stat(fs_volume* volume, fs_vnode* vnode, struct stat* stat)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
-	TRACE("volume = %p, vnode = %" PRIi64, volume, vti->ID());
+	TRACE("volume = %p, vnode = %" B_PRIi64, volume, vti->ID());
 
 	VnodeToInodeLocker _(vti);
 	Inode* inode = vti->Get();
@@ -691,7 +691,7 @@ nfs4_write_stat(fs_volume* volume, fs_vnode* vnode, const struct stat* stat,
 	uint32 statMask)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
-	TRACE("volume = %p, vnode = %" PRIi64 ", statMask = %" PRIu32, volume,
+	TRACE("volume = %p, vnode = %" B_PRIi64 ", statMask = %" B_PRIu32, volume,
 		vti->ID(), statMask);
 
 	VnodeToInodeLocker _(vti);
@@ -746,7 +746,7 @@ nfs4_create(fs_volume* volume, fs_vnode* dir, const char* name, int openMode,
 	*_cookie = cookie;
 
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(dir->private_node);
-	TRACE("volume = %p, dir = %" PRIi64 ", name = %s, openMode = %d,"	\
+	TRACE("volume = %p, dir = %" B_PRIi64 ", name = %s, openMode = %d,"	\
 		" perms = %d", volume, vti->ID(), name, openMode, perms);
 
 	VnodeToInodeLocker _(vti);
@@ -792,7 +792,7 @@ nfs4_create(fs_volume* volume, fs_vnode* dir, const char* name, int openMode,
 		}
 	}
 
-	TRACE("*cookie = %p, *newVnodeID = %" PRIi64, *_cookie, *_newVnodeID);
+	TRACE("*cookie = %p, *newVnodeID = %" B_PRIi64, *_cookie, *_newVnodeID);
 	return result;
 }
 
@@ -801,8 +801,8 @@ static status_t
 nfs4_open(fs_volume* volume, fs_vnode* vnode, int openMode, void** _cookie)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
-	TRACE("volume = %p, vnode = %" PRIi64 ", openMode = %d", volume, vti->ID(),
-		openMode);
+	TRACE("volume = %p, vnode = %" B_PRIi64 ", openMode = %d", volume,
+		vti->ID(), openMode);
 
 	VnodeToInodeLocker _(vti);
 	Inode* inode = vti->Get();
@@ -834,7 +834,7 @@ nfs4_close(fs_volume* volume, fs_vnode* vnode, void* _cookie)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
 
-	TRACE("volume = %p, vnode = %" PRIi64 ", cookie = %p", volume, vti->ID(),
+	TRACE("volume = %p, vnode = %" B_PRIi64 ", cookie = %p", volume, vti->ID(),
 		_cookie);
 
 	VnodeToInodeLocker _(vti);
@@ -856,7 +856,7 @@ nfs4_free_cookie(fs_volume* volume, fs_vnode* vnode, void* _cookie)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
 
-	TRACE("volume = %p, vnode = %" PRIi64 ", cookie = %p", volume, vti->ID(),
+	TRACE("volume = %p, vnode = %" B_PRIi64 ", cookie = %p", volume, vti->ID(),
 		_cookie);
 
 	VnodeToInodeLocker _(vti);
@@ -881,7 +881,7 @@ nfs4_read(fs_volume* volume, fs_vnode* vnode, void* _cookie, off_t pos,
 	void* buffer, size_t* length)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
-	TRACE("volume = %p, vnode = %" PRIi64 ", cookie = %p, pos = %" PRIi64	\
+	TRACE("volume = %p, vnode = %" B_PRIi64 ", cookie = %p, pos = %" B_PRIi64 \
 		", length = %lu", volume, vti->ID(), _cookie, pos, *length);
 
 	VnodeToInodeLocker _(vti);
@@ -906,7 +906,7 @@ nfs4_write(fs_volume* volume, fs_vnode* vnode, void* _cookie, off_t pos,
 	const void* _buffer, size_t* length)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
-	TRACE("volume = %p, vnode = %" PRIi64 ", cookie = %p, pos = %" PRIi64	\
+	TRACE("volume = %p, vnode = %" B_PRIi64 ", cookie = %p, pos = %" B_PRIi64 \
 		", length = %lu", volume, vti->ID(), _cookie, pos, *length);
 
 	VnodeToInodeLocker _(vti);
@@ -931,7 +931,7 @@ nfs4_create_dir(fs_volume* volume, fs_vnode* parent, const char* name,
 	int mode)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(parent->private_node);
-	TRACE("volume = %p, parent = %" PRIi64 ", mode = %d", volume, vti->ID(),
+	TRACE("volume = %p, parent = %" B_PRIi64 ", mode = %d", volume, vti->ID(),
 		mode);
 
 	VnodeToInodeLocker _(vti);
@@ -959,7 +959,7 @@ static status_t
 nfs4_remove_dir(fs_volume* volume, fs_vnode* parent, const char* name)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(parent->private_node);
-	TRACE("volume = %p, parent = %" PRIi64 ", name = %s", volume, vti->ID(),
+	TRACE("volume = %p, parent = %" B_PRIi64 ", name = %s", volume, vti->ID(),
 		name);
 
 	VnodeToInodeLocker _(vti);
@@ -995,7 +995,7 @@ nfs4_open_dir(fs_volume* volume, fs_vnode* vnode, void** _cookie)
 	*_cookie = cookie;
 
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
-	TRACE("volume = %p, vnode = %" PRIi64, volume, vti->ID());
+	TRACE("volume = %p, vnode = %" B_PRIi64, volume, vti->ID());
 
 	VnodeToInodeLocker _(vti);
 	Inode* inode = vti->Get();
@@ -1015,7 +1015,7 @@ nfs4_open_dir(fs_volume* volume, fs_vnode* vnode, void** _cookie)
 static status_t 
 nfs4_close_dir(fs_volume* volume, fs_vnode* vnode, void* _cookie)
 {
-	TRACE("volume = %p, vnode = %" PRIi64 ", cookie = %p", volume,
+	TRACE("volume = %p, vnode = %" B_PRIi64 ", cookie = %p", volume,
 		reinterpret_cast<VnodeToInode*>(vnode->private_node)->ID(), _cookie);
 
 	Cookie* cookie = reinterpret_cast<Cookie*>(_cookie);
@@ -1026,7 +1026,7 @@ nfs4_close_dir(fs_volume* volume, fs_vnode* vnode, void* _cookie)
 static status_t
 nfs4_free_dir_cookie(fs_volume* volume, fs_vnode* vnode, void* cookie)
 {
-	TRACE("volume = %p, vnode = %" PRIi64 ", cookie = %p", volume,
+	TRACE("volume = %p, vnode = %" B_PRIi64 ", cookie = %p", volume,
 		reinterpret_cast<VnodeToInode*>(vnode->private_node)->ID(), cookie);
 
 	delete reinterpret_cast<OpenDirCookie*>(cookie);
@@ -1040,7 +1040,7 @@ nfs4_read_dir(fs_volume* volume, fs_vnode* vnode, void* _cookie,
 {
 	OpenDirCookie* cookie = reinterpret_cast<OpenDirCookie*>(_cookie);
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
-	TRACE("volume = %p, vnode = %" PRIi64 ", cookie = %p", volume, vti->ID(),
+	TRACE("volume = %p, vnode = %" B_PRIi64 ", cookie = %p", volume, vti->ID(),
 		_cookie);
 
 	VnodeToInodeLocker _(vti);
@@ -1055,7 +1055,7 @@ nfs4_read_dir(fs_volume* volume, fs_vnode* vnode, void* _cookie,
 static status_t
 nfs4_rewind_dir(fs_volume* volume, fs_vnode* vnode, void* _cookie)
 {
-	TRACE("volume = %p, vnode = %" PRIi64 ", cookie = %p", volume,
+	TRACE("volume = %p, vnode = %" B_PRIi64 ", cookie = %p", volume,
 		reinterpret_cast<VnodeToInode*>(vnode->private_node)->ID(), _cookie);
 
 	OpenDirCookie* cookie = reinterpret_cast<OpenDirCookie*>(_cookie);
@@ -1079,7 +1079,7 @@ nfs4_open_attr_dir(fs_volume* volume, fs_vnode* vnode, void** _cookie)
 	*_cookie = cookie;
 
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
-	TRACE("volume = %p, vnode = %" PRIi64, volume, vti->ID());
+	TRACE("volume = %p, vnode = %" B_PRIi64, volume, vti->ID());
 
 	VnodeToInodeLocker _(vti);
 	Inode* inode = vti->Get();
@@ -1302,7 +1302,7 @@ nfs4_test_lock(fs_volume* volume, fs_vnode* vnode, void* _cookie,
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
 	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
-	TRACE("volume = %p, vnode = %" PRIi64 ", cookie = %p, lock = %p", volume,
+	TRACE("volume = %p, vnode = %" B_PRIi64 ", cookie = %p, lock = %p", volume,
 		vti->ID(), _cookie, lock);
 
 	VnodeToInodeLocker _(vti);
@@ -1320,7 +1320,7 @@ nfs4_acquire_lock(fs_volume* volume, fs_vnode* vnode, void* _cookie,
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
 	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
-	TRACE("volume = %p, vnode = %" PRIi64 ", cookie = %p, lock = %p", volume,
+	TRACE("volume = %p, vnode = %" B_PRIi64 ", cookie = %p, lock = %p", volume,
 		vti->ID(), _cookie, lock);
 
 
@@ -1339,7 +1339,7 @@ nfs4_release_lock(fs_volume* volume, fs_vnode* vnode, void* _cookie,
 			const struct flock* lock)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
-	TRACE("volume = %p, vnode = %" PRIi64 ", cookie = %p, lock = %p", volume,
+	TRACE("volume = %p, vnode = %" B_PRIi64 ", cookie = %p, lock = %p", volume,
 		vti->ID(), _cookie, lock);
 
 	VnodeToInodeLocker _(vti);
