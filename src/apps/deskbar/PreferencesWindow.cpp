@@ -28,6 +28,7 @@
 #include <Roster.h>
 #include <SeparatorView.h>
 #include <Slider.h>
+#include <SpaceLayoutItem.h>
 #include <TextControl.h>
 #include <View.h>
 
@@ -180,20 +181,19 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 				.Add(fAppsExpandNew)
 				.End()
 			.Add(fAppsHideLabels)
-			.AddGroup(B_HORIZONTAL, 0)
-				.SetInsets(0, B_USE_DEFAULT_SPACING, 0, 0)
-				.Add(fAppsIconSizeSlider)
-				.End()
 			.AddGlue()
+			.Add(BSpaceLayoutItem::CreateVerticalStrut(
+				B_USE_SMALL_SPACING))
+			.Add(fAppsIconSizeSlider)
 			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.End()
 		.View());
 
-	// Recent items
-	BBox* recentItemsBox = new BBox("recent items");
-	recentItemsBox->SetLabel(B_TRANSLATE("Recent items"));
-	recentItemsBox->AddChild(BLayoutBuilder::Group<>()
+	// Menu
+	BBox* menuBox = new BBox("menu");
+	menuBox->SetLabel(B_TRANSLATE("Menu"));
+	menuBox->AddChild(BLayoutBuilder::Group<>()
 		.AddGroup(B_VERTICAL, 0)
 			.AddGroup(B_HORIZONTAL, 0)
 				.AddGroup(B_VERTICAL, 0)
@@ -207,6 +207,10 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 					.Add(fMenuRecentApplicationCount)
 					.End()
 				.End()
+				.Add(BSpaceLayoutItem::CreateVerticalStrut(
+					B_USE_SMALL_SPACING))
+				.Add(new BButton(B_TRANSLATE("Open in Tracker"
+					B_UTF8_ELLIPSIS), new BMessage(kOpenInTracker)))
 			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.End()
@@ -216,10 +220,12 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	BBox* windowSettingsBox = new BBox("window");
 	windowSettingsBox->SetLabel(B_TRANSLATE("Window"));
 	windowSettingsBox->AddChild(BLayoutBuilder::Group<>()
-		.AddGroup(B_VERTICAL, 0)
-			.Add(fWindowAlwaysOnTop)
-			.Add(fWindowAutoRaise)
-			.Add(fWindowAutoHide)
+		.AddGroup(B_HORIZONTAL, 0)
+			.AddGrid(B_USE_SMALL_SPACING, 0, 1)
+				.Add(fWindowAlwaysOnTop, 0, 0)
+				.Add(fWindowAutoRaise, 0, 1)
+				.Add(fWindowAutoHide, 1, 0)
+				.End()
 			.AddGlue()
 			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
@@ -238,7 +244,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 				.Add(appsSettingsBox)
 				.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
-					.Add(recentItemsBox)
+					.Add(menuBox)
 					.Add(windowSettingsBox)
 				.End()
 			.End()
@@ -246,8 +252,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 				.Add(fDefaultsButton)
 				.Add(fRevertButton)
 				.AddGlue()
-				.Add(new BButton(B_TRANSLATE("Open menu in Tracker"
-					B_UTF8_ELLIPSIS), new BMessage(kOpenInTracker)))
 				.End()
 			.SetInsets(B_USE_DEFAULT_SPACING)
 			.End();
