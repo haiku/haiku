@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src add-ons kernel network dns_resolver kernel_add_on ;
+
+UsePrivateKernelHeaders ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
+KernelAddon dns_resolver :
+	dns_resolver.cpp
+;

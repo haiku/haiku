@@ -242,6 +242,14 @@ struct fs_vnode_ops {
 				fs_vnode* _superVnode, ino_t* _nodeID);
 	status_t (*get_super_vnode)(fs_volume* volume, fs_vnode* vnode,
 				fs_volume* superVolume, fs_vnode* superVnode);
+
+	/* lock operations */
+	status_t (*test_lock)(fs_volume* volume, fs_vnode* vnode, void* cookie,
+				struct flock* lock);
+	status_t (*acquire_lock)(fs_volume* volume, fs_vnode* vnode, void* cookie,
+				const struct flock* lock, bool wait);
+	status_t (*release_lock)(fs_volume* volume, fs_vnode* vnode, void* cookie,
+				const struct flock* lock);
 };
 
 struct file_system_module_info {
