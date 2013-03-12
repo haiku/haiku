@@ -123,122 +123,6 @@ set_i2c_signals(void* cookie, int clock, int data)
 }
 
 
-void
-set_frame_buffer_base()
-{
-	intel_shared_info &sharedInfo = *gInfo->shared_info;
-	display_mode &mode = sharedInfo.current_mode;
-	uint32 baseRegister;
-	uint32 surfaceRegister;
-
-	if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
-		baseRegister = INTEL_DISPLAY_A_BASE;
-		surfaceRegister = INTEL_DISPLAY_A_SURFACE;
-	} else {
-		baseRegister = INTEL_DISPLAY_B_BASE;
-		surfaceRegister = INTEL_DISPLAY_B_SURFACE;
-	}
-
-	if (sharedInfo.device_type.InGroup(INTEL_TYPE_96x)
-		|| sharedInfo.device_type.InGroup(INTEL_TYPE_G4x)
-		|| sharedInfo.device_type.InGroup(INTEL_TYPE_ILK)
-		|| sharedInfo.device_type.InGroup(INTEL_TYPE_SNB)
-		|| sharedInfo.device_type.InGroup(INTEL_TYPE_IVB)) {
-		write32(baseRegister, mode.v_display_start * sharedInfo.bytes_per_row
-			+ mode.h_display_start * (sharedInfo.bits_per_pixel + 7) / 8);
-		read32(baseRegister);
-		write32(surfaceRegister, sharedInfo.frame_buffer_offset);
-		read32(surfaceRegister);
-	} else {
-		write32(baseRegister, sharedInfo.frame_buffer_offset
-			+ mode.v_display_start * sharedInfo.bytes_per_row
-			+ mode.h_display_start * (sharedInfo.bits_per_pixel + 7) / 8);
-		read32(baseRegister);
-	}
-}
-
-
-/*!	Creates the initial mode list of the primary accelerant.
-	It's called from intel_init_accelerant().
-*/
-status_t
-create_mode_list(void)
-{
-	i2c_bus bus;
-	bus.cookie = (void*)INTEL_I2C_IO_A;
-	bus.set_signals = &set_i2c_signals;
-	bus.get_signals = &get_i2c_signals;
-	ddc2_init_timing(&bus);
-
-	status_t error = ddc2_read_edid1(&bus, &gInfo->edid_info, NULL, NULL);
-	if (error == B_OK) {
-		edid_dump(&gInfo->edid_info);
-		gInfo->has_edid = true;
-	} else {
-		TRACE("getting EDID on port A (analog) failed : %s. "
-			"Trying on port C (lvds)\n", strerror(error));
-		bus.cookie = (void*)INTEL_I2C_IO_C;
-		error = ddc2_read_edid1(&bus, &gInfo->edid_info, NULL, NULL);
-		if (error == B_OK) {
-			edid_dump(&gInfo->edid_info);
-			gInfo->has_edid = true;
-		} else {
-			TRACE("getting EDID on port C failed : %s\n",
-				strerror(error));
-
-			// We could not read any EDID info. Fallback to creating a list with
-			// only the mode set up by the BIOS.
-			// TODO: support lower modes via scaling and windowing
-			if ((gInfo->head_mode & HEAD_MODE_LVDS_PANEL) != 0
-					&& (gInfo->head_mode & HEAD_MODE_A_ANALOG) == 0) {
-				size_t size = (sizeof(display_mode) + B_PAGE_SIZE - 1)
-					& ~(B_PAGE_SIZE - 1);
-
-				display_mode* list;
-				area_id area = create_area("intel extreme modes",
-					(void**)&list, B_ANY_ADDRESS, size, B_NO_LOCK,
-					B_READ_AREA | B_WRITE_AREA);
-				if (area < B_OK)
-					return area;
-
-				memcpy(list, &gInfo->lvds_panel_mode, sizeof(display_mode));
-
-				gInfo->mode_list_area = area;
-				gInfo->mode_list = list;
-				gInfo->shared_info->mode_list_area = gInfo->mode_list_area;
-				gInfo->shared_info->mode_count = 1;
-				return B_OK;
-			}
-		}
-	}
-
-	// Otherwise return the 'real' list of modes
-	display_mode* list;
-	uint32 count = 0;
-	gInfo->mode_list_area = create_display_modes("intel extreme modes",
-		gInfo->has_edid ? &gInfo->edid_info : NULL, NULL, 0, NULL, 0, NULL,
-		&list, &count);
-	if (gInfo->mode_list_area < B_OK)
-		return gInfo->mode_list_area;
-
-	gInfo->mode_list = list;
-	gInfo->shared_info->mode_list_area = gInfo->mode_list_area;
-	gInfo->shared_info->mode_count = count;
-
-	return B_OK;
-}
-
-
-void
-wait_for_vblank(void)
-{
-	acquire_sem_etc(gInfo->shared_info->vblank_sem, 1, B_RELATIVE_TIMEOUT,
-		25000);
-		// With the output turned off via DPMS, we might not get any interrupts
-		// anymore that's why we don't wait forever for it.
-}
-
-
 static void
 get_pll_limits(pll_limits &limits)
 {
@@ -398,7 +282,7 @@ compute_pll_divisors(const display_mode &current, pll_divisors& divisors,
 }
 
 
-void
+static void
 retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 {
 	uint32 pll = read32(pllRegister);
@@ -551,19 +435,6 @@ retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 }
 
 
-/*! Store away panel information if identified on startup
-	(used for pipe B->lvds).
-*/
-void
-save_lvds_mode(void)
-{
-	// dump currently programmed mode.
-	display_mode biosMode;
-	retrieve_current_mode(biosMode, INTEL_DISPLAY_B_PLL);
-	gInfo->lvds_panel_mode = biosMode;
-}
-
-
 static void
 get_color_space_format(const display_mode &mode, uint32 &colorMode,
 	uint32 &bytesPerRow, uint32 &bitsPerPixel)
@@ -633,6 +504,143 @@ sanitize_display_mode(display_mode& mode)
 }
 
 
+// #pragma mark -
+
+
+void
+set_frame_buffer_base()
+{
+	intel_shared_info &sharedInfo = *gInfo->shared_info;
+	display_mode &mode = sharedInfo.current_mode;
+	uint32 baseRegister;
+	uint32 surfaceRegister;
+
+	if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
+		baseRegister = INTEL_DISPLAY_A_BASE;
+		surfaceRegister = INTEL_DISPLAY_A_SURFACE;
+	} else {
+		baseRegister = INTEL_DISPLAY_B_BASE;
+		surfaceRegister = INTEL_DISPLAY_B_SURFACE;
+	}
+
+	if (sharedInfo.device_type.InGroup(INTEL_TYPE_96x)
+		|| sharedInfo.device_type.InGroup(INTEL_TYPE_G4x)
+		|| sharedInfo.device_type.InGroup(INTEL_TYPE_ILK)
+		|| sharedInfo.device_type.InGroup(INTEL_TYPE_SNB)
+		|| sharedInfo.device_type.InGroup(INTEL_TYPE_IVB)) {
+		write32(baseRegister, mode.v_display_start * sharedInfo.bytes_per_row
+			+ mode.h_display_start * (sharedInfo.bits_per_pixel + 7) / 8);
+		read32(baseRegister);
+		write32(surfaceRegister, sharedInfo.frame_buffer_offset);
+		read32(surfaceRegister);
+	} else {
+		write32(baseRegister, sharedInfo.frame_buffer_offset
+			+ mode.v_display_start * sharedInfo.bytes_per_row
+			+ mode.h_display_start * (sharedInfo.bits_per_pixel + 7) / 8);
+		read32(baseRegister);
+	}
+}
+
+
+/*!	Creates the initial mode list of the primary accelerant.
+	It's called from intel_init_accelerant().
+*/
+status_t
+create_mode_list(void)
+{
+	i2c_bus bus;
+	bus.cookie = (void*)INTEL_I2C_IO_A;
+	bus.set_signals = &set_i2c_signals;
+	bus.get_signals = &get_i2c_signals;
+	ddc2_init_timing(&bus);
+
+	status_t error = ddc2_read_edid1(&bus, &gInfo->edid_info, NULL, NULL);
+	if (error == B_OK) {
+		edid_dump(&gInfo->edid_info);
+		gInfo->has_edid = true;
+	} else {
+		TRACE("getting EDID on port A (analog) failed : %s. "
+			"Trying on port C (lvds)\n", strerror(error));
+		bus.cookie = (void*)INTEL_I2C_IO_C;
+		error = ddc2_read_edid1(&bus, &gInfo->edid_info, NULL, NULL);
+		if (error == B_OK) {
+			edid_dump(&gInfo->edid_info);
+			gInfo->has_edid = true;
+		} else {
+			TRACE("getting EDID on port C failed : %s\n",
+				strerror(error));
+
+			// We could not read any EDID info. Fallback to creating a list with
+			// only the mode set up by the BIOS.
+			// TODO: support lower modes via scaling and windowing
+			if ((gInfo->head_mode & HEAD_MODE_LVDS_PANEL) != 0
+					&& (gInfo->head_mode & HEAD_MODE_A_ANALOG) == 0) {
+				size_t size = (sizeof(display_mode) + B_PAGE_SIZE - 1)
+					& ~(B_PAGE_SIZE - 1);
+
+				display_mode* list;
+				area_id area = create_area("intel extreme modes",
+					(void**)&list, B_ANY_ADDRESS, size, B_NO_LOCK,
+					B_READ_AREA | B_WRITE_AREA);
+				if (area < B_OK)
+					return area;
+
+				memcpy(list, &gInfo->lvds_panel_mode, sizeof(display_mode));
+
+				gInfo->mode_list_area = area;
+				gInfo->mode_list = list;
+				gInfo->shared_info->mode_list_area = gInfo->mode_list_area;
+				gInfo->shared_info->mode_count = 1;
+				return B_OK;
+			}
+		}
+	}
+
+	// Otherwise return the 'real' list of modes
+	display_mode* list;
+	uint32 count = 0;
+	gInfo->mode_list_area = create_display_modes("intel extreme modes",
+		gInfo->has_edid ? &gInfo->edid_info : NULL, NULL, 0, NULL, 0, NULL,
+		&list, &count);
+	if (gInfo->mode_list_area < B_OK)
+		return gInfo->mode_list_area;
+
+	gInfo->mode_list = list;
+	gInfo->shared_info->mode_list_area = gInfo->mode_list_area;
+	gInfo->shared_info->mode_count = count;
+
+	return B_OK;
+}
+
+
+void
+wait_for_vblank(void)
+{
+	acquire_sem_etc(gInfo->shared_info->vblank_sem, 1, B_RELATIVE_TIMEOUT,
+		25000);
+		// With the output turned off via DPMS, we might not get any interrupts
+		// anymore that's why we don't wait forever for it.
+}
+
+
+/*! Store away panel information if identified on startup
+	(used for pipe B->lvds).
+*/
+void
+save_lvds_mode(void)
+{
+	// dump currently programmed mode.
+	display_mode biosMode;
+	retrieve_current_mode(biosMode, INTEL_DISPLAY_B_PLL);
+
+	sanitize_display_mode(biosMode);
+		// The BIOS mode may not be a valid mode, as LVDS output does not
+		// really care about the sync values
+
+	gInfo->lvds_panel_mode = biosMode;
+}
+
+
 //	#pragma mark -
 
 
@@ -667,14 +675,14 @@ intel_propose_display_mode(display_mode* target, const display_mode* low,
 	// configurations.
 	for (uint32 i = 0; i < gInfo->shared_info->mode_count; i++) {
 		display_mode *mode = &gInfo->mode_list[i];
-		
+
 		// TODO: improve this, ie. adapt pixel clock to allowed values!!!
-		
+
 		if (target->virtual_width != mode->virtual_width
 		        || target->virtual_height != mode->virtual_height
 		        || target->space != mode->space)
 		        continue;
-		
+
 		*target = *mode;
 		return B_OK;
 	}

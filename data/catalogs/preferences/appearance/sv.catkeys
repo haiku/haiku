@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Appearance	2950529393
+1	swedish	x-vnd.Haiku-Appearance	76206318
 Plain font:	Font view		Vanlig font:
 Control highlight	Colors tab		Framhävd kontroll
 Control border	Colors tab		Kontrollkant
@@ -13,7 +13,6 @@ Off	AntialiasingSettingsView		Av
 Choose Decorator	DecorSettingsView		Välj dekor
 Success	Colors tab		Framgång
 Inactive window tab text	Colors tab		Fliktext för inaktiva fönster
-About Decorator	DecorSettingsView		Om Dekor
 Failure	Colors tab		Misslyckande
 Hinting menu	AntialiasingSettingsView		Betoningsmeny
 Document background	Colors tab		Dokument bakgrund
@@ -29,7 +28,6 @@ Double:	DecorSettingsView		Dubbel
 Window tab text	Colors tab		Fönsterflik text
 Document text	Colors tab		Dokument text
 Navigation pulse	Colors tab		Navigeringspuls
-Window decorator:	DecorSettingsView		Fönsterdekor:
 Selected menu item text	Colors tab		Textfärg för valt menyalternativ
 Menu background	Colors tab		Menybakgrund
 List background	Colors tab		Lista bakgrund

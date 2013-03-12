@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-BluetoothPrefs	3926935355
+1	slovak	x-vnd.Haiku-BluetoothPrefs	1628593228
 About Bluetooth…	Window		O aplikácii Bluetooth…
 Handheld	Settings view		Handheld
 Default inquiry time:	Settings view		Predvolený čas zisťovania:
@@ -36,7 +36,6 @@ Identify us as...	Settings view		Identifikovať sa ako...
 As blocked	Remote devices		Ako blokované
 Bluetooth	System name		Bluetooth
 Disconnect	Remote devices		Odpojiť
-Pick LocalDevice...	Settings view		Vybrať lokálne zariadenie...
 Defaults	Window		Predvolené
 Inquiry	Inquiry panel		Zistenie
 Desktop	Settings view		Plocha

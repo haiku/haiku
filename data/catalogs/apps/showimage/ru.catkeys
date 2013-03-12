@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ShowImage	886873119
+1	russian	x-vnd.Haiku-ShowImage	4011843330
 Use as background…	Menus		Сделать фоном рабочего стола…
 File	Menus		Файл
 Slide delay	Menus		Задержка слайд шоу
@@ -25,7 +25,6 @@ The document '%s' (page %d) has been changed. Do you want to close the document?
 Leave full screen	Menus		Выйти из полного экрана
 Close	Menus		Закрыть
 Close	ClosePrompt		Закрыть
-Undo	Menus		Вернуть
 Resize to (in 1/72 inches):	PrintOptionsWindow		Изменить размер (1/72 дюйма):
 Rating	Menus		Рейтинг
 Flip left to right	Menus		Повернуть слева направо

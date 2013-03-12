@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-BluetoothPrefs	3926935355
+1	german	x-vnd.Haiku-BluetoothPrefs	1628593228
 About Bluetooth…	Window		Über Bluetooth…
 Handheld	Settings view		Handheld
 Default inquiry time:	Settings view		Suchdauer:
@@ -36,7 +36,6 @@ Identify us as...	Settings view		Rolle...
 As blocked	Remote devices		Blockieren
 Bluetooth	System name		Bluetooth
 Disconnect	Remote devices		Trennen
-Pick LocalDevice...	Settings view		Gerät...
 Defaults	Window		Standardwerte
 Inquiry	Inquiry panel		Suchen
 Desktop	Settings view		Desktop

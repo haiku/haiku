@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Appearance	2950529393
+1	belarusian	x-vnd.Haiku-Appearance	76206318
 Plain font:	Font view		Просты шрыфт:
 Control highlight	Colors tab		Выдзяленне кнопак
 Control border	Colors tab		Аблямоўка кнопак
@@ -13,7 +13,6 @@ Off	AntialiasingSettingsView		Выкл.
 Choose Decorator	DecorSettingsView		Абраць Дэкаратар
 Success	Colors tab		Паспяхова
 Inactive window tab text	Colors tab		Тэкст неактыўнай укладкі вакна
-About Decorator	DecorSettingsView		Пра Decorator
 Failure	Colors tab		Непаспяхова
 Hinting menu	AntialiasingSettingsView		Меню хінтынгу
 Document background	Colors tab		Фон дакумента
@@ -29,7 +28,6 @@ Double:	DecorSettingsView		Падвойны:
 Window tab text	Colors tab		Тэкст загалоўку акна
 Document text	Colors tab		Тэкст дакументу
 Navigation pulse	Colors tab		Колер падсветкі навігацыі
-Window decorator:	DecorSettingsView		Дэкаратар вокнаў:
 Selected menu item text	Colors tab		Тэкст пазначанага пункту меню
 Menu background	Colors tab		Фон меню
 List background	Colors tab		Фон радкоў

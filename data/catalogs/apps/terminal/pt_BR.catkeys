@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Terminal	766764238
+1	portuguese (brazil)	x-vnd.Haiku-Terminal	2645209895
 Not found.	Terminal TermWindow		Não localizado.
 Switch Terminals	Terminal TermWindow		Alternar Terminais
 Change directory	Terminal TermView		Mudar de pasta
@@ -21,6 +21,7 @@ Font:	Terminal AppearancePrefView		Fonte:
 Copy here	Terminal TermView		Copiar aqui
 Really close?	Terminal TermWindow		Deseja realmente fechar?
 Copy	Terminal TermWindow		Copiar
+Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 Color scheme:	Terminal AppearancePrefView		Esquema de cores:
 Window title:	Terminal TermWindow		Título da janela:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Opção não reconhecida \"%s\"\n
@@ -61,6 +62,7 @@ Text not found.	Terminal TermWindow		Texto não encontrado.
 Find…	Terminal TermWindow		Localizar…
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		O processo \"%1\" ainda está executando.\nSe fechar o Terminal, o processo será morto.
 Move here	Terminal TermView		Mover aqui
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t %d\t -\t O diretório de trabalho atual do processo ativo na\n\t \t\t aba atual. Opcionalmente o número máximo de componentes do caminho\n\t \t\t pode ser especificado. Por exemplo, '%2d' para no máximo dois componentes.\n\t %T\t -\t O nome do aplicativo Terminal para a localidade atual.\n\t %i\t -\t O índice da janela.\n\t %p\t -\t O nome do processo ativo na guia atual.\n\t %t\t -\t O título da guia atual.\n\t %%\t -\t O caractere '%'.
 Retro	Terminal colors scheme		Retrô
 Error!	Terminal getString		Erro!
 New tab	Terminal TermWindow		Nova aba

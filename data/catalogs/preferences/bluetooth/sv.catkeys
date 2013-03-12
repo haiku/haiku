@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-BluetoothPrefs	3926935355
+1	swedish	x-vnd.Haiku-BluetoothPrefs	1628593228
 About Bluetooth…	Window		Om Bluetooth…
 Handheld	Settings view		Handhållen
 Default inquiry time:	Settings view		Förvald frågotid:
@@ -36,7 +36,6 @@ Identify us as...	Settings view		Identifiera som...
 As blocked	Remote devices		Som blockerad
 Bluetooth	System name		Bluetooth
 Disconnect	Remote devices		Koppla från
-Pick LocalDevice...	Settings view		Välj lokal enhet...
 Defaults	Window		Förval
 Inquiry	Inquiry panel		Förfrågan
 Desktop	Settings view		Skrivbord

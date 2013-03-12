@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-BluetoothPrefs	3926935355
+1	japanese	x-vnd.Haiku-BluetoothPrefs	1628593228
 About Bluetooth…	Window		Bluetoothについて…
 Handheld	Settings view		ハンドヘルド機器
 Default inquiry time:	Settings view		デフォルトの問い合わせ時間：
@@ -36,7 +36,6 @@ Identify us as...	Settings view		自機名…
 As blocked	Remote devices		ブロック状態
 Bluetooth	System name		Bluetooth
 Disconnect	Remote devices		切断
-Pick LocalDevice...	Settings view		ローカルデバイスの選択…
 Defaults	Window		デフォルト
 Inquiry	Inquiry panel		問い合わせ
 Desktop	Settings view		デスクトップ

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-ShowImage	886873119
+1	hungarian	x-vnd.Haiku-ShowImage	4011843330
 Use as background…	Menus		Beállítás háttérnek…
 File	Menus		Fájl
 Slide delay	Menus		Képváltás közti szünet
@@ -25,7 +25,6 @@ The document '%s' (page %d) has been changed. Do you want to close the document?
 Leave full screen	Menus		Kilépés a teljes képernyős módból
 Close	Menus		Bezárás
 Close	ClosePrompt		Bezárás
-Undo	Menus		Visszavonás
 Resize to (in 1/72 inches):	PrintOptionsWindow		Átméretezés (1/72 colban):
 Rating	Menus		Értékelés
 Flip left to right	Menus		Balról jobbra tükrözés

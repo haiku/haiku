@@ -1338,6 +1338,7 @@ if $(HAIKU_NO_WERROR) != 1 {
 	EnableWerror src add-ons kernel file_systems layers ;
 	EnableWerror src add-ons kernel file_systems netfs ;
 	EnableWerror src add-ons kernel file_systems nfs ;
+	EnableWerror src add-ons kernel file_systems nfs4 ;
 #	EnableWerror src add-ons kernel file_systems ntfs ;
 	EnableWerror src add-ons kernel file_systems packagefs ;
 	EnableWerror src add-ons kernel file_systems ramfs ;
@@ -1347,6 +1348,7 @@ if $(HAIKU_NO_WERROR) != 1 {
 	EnableWerror src add-ons kernel generic ;
 #	EnableWerror src add-ons kernel network datalink_protocols ;
 	EnableWerror src add-ons kernel network devices ;
+	EnableWerror src add-ons kernel network dns_resolver ;
 	EnableWerror src add-ons kernel network notifications ;
 	EnableWerror src add-ons kernel network ppp ;
 	EnableWerror src add-ons kernel network protocols ;

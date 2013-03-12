@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-libtracker	3375521561
+1	portuguese (brazil)	x-vnd.Haiku-libtracker	4167158175
 common	B_COMMON_DIRECTORY		comum
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Em ícones
@@ -74,6 +74,7 @@ Arrange by	ContainerWindow		Ordenar por
 Mount server error	AutoMounterSettings		Erro do servidor de montagem
 Search	FindPanel		Localizar
 Preparing to empty Trash…	StatusWindow		Preparando para limpar a Lixeira...
+You cannot put the selected item(s) into the trash.	FSUtils		Não é possível colocar o(s) item(ns) selecionados na lixeira.
 Disks	Model		Discos
 Create link	ContainerWindow		Criar atalho
 develop	B_COMMON_DEVELOP_DIRECTORY		desenvolvimento

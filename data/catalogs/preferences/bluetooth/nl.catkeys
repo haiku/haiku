@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-BluetoothPrefs	3926935355
+1	dutch; flemish	x-vnd.Haiku-BluetoothPrefs	1628593228
 About Bluetooth…	Window		Over Bluetooth…
 Handheld	Settings view		Handheld
 Default inquiry time:	Settings view		Standaard onderzoekstijd:
@@ -36,7 +36,6 @@ Identify us as...	Settings view		Identificeer ons als...
 As blocked	Remote devices		Als geblokkeerd
 Bluetooth	System name		Bluetooth
 Disconnect	Remote devices		Verbreek verbinding
-Pick LocalDevice...	Settings view		Kies een lokaal apparaat...
 Defaults	Window		Standaardwaarden
 Inquiry	Inquiry panel		Onderzoek
 Desktop	Settings view		Bureaublad

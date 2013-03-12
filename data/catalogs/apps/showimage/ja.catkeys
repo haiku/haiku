@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ShowImage	886873119
+1	japanese	x-vnd.Haiku-ShowImage	4011843330
 Use as background…	Menus		デスクトップの背景にする…
 File	Menus		ファイル
 Slide delay	Menus		スライド間隔
@@ -25,7 +25,6 @@ The document '%s' (page %d) has been changed. Do you want to close the document?
 Leave full screen	Menus		全画面表示から戻る
 Close	Menus		閉じる
 Close	ClosePrompt		閉じる
-Undo	Menus		元に戻す
 Resize to (in 1/72 inches):	PrintOptionsWindow		リサイズ (1/72 インチ)：
 Rating	Menus		評価
 Flip left to right	Menus		左右反転

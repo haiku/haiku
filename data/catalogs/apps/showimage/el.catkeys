@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-ShowImage	886873119
+1	greek, modern (1453-)	x-vnd.Haiku-ShowImage	4011843330
 Use as background…	Menus		Ορισμός ως φόντου επιφάνειας εργασίας...
 File	Menus		Αρχείο
 Slide delay	Menus		Καθυστέρηση παρουσίασης
@@ -25,7 +25,6 @@ The document '%s' (page %d) has been changed. Do you want to close the document?
 Leave full screen	Menus		Εγκατάλειψη πλήρους οθόνης
 Close	Menus		Κλείσιμο
 Close	ClosePrompt		Κλείσιμο
-Undo	Menus		Αναίρεση
 Resize to (in 1/72 inches):	PrintOptionsWindow		Αλλαγή μεγέθους σε (στο 1/72 ίντσες):
 Rating	Menus		Βαθμολογία
 Flip left to right	Menus		Οριζόντια αναστροφή

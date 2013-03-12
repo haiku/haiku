@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-BluetoothPrefs	3926935355
+1	english	x-vnd.Haiku-BluetoothPrefs	1628593228
 About Bluetooth…	Window		关于蓝牙...
 Handheld	Settings view		手持设备
 Default inquiry time:	Settings view		默认查询时间：
@@ -36,7 +36,6 @@ Identify us as...	Settings view		身份识别...
 As blocked	Remote devices		阻塞状态
 Bluetooth	System name		蓝牙
 Disconnect	Remote devices		断开连接
-Pick LocalDevice...	Settings view		选择本地设备...
 Defaults	Window		默认
 Inquiry	Inquiry panel		查询
 Desktop	Settings view		桌面电脑

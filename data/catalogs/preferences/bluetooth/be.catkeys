@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-BluetoothPrefs	3926935355
+1	belarusian	x-vnd.Haiku-BluetoothPrefs	1628593228
 About Bluetooth…	Window		Пра праграму Bluetooth…
 Handheld	Settings view		Наладоннік
 Default inquiry time:	Settings view		Час стандартнага запыту:
@@ -36,7 +36,6 @@ Identify us as...	Settings view		Ідэнтыфікаваць сябе як...
 As blocked	Remote devices		Як блакаваны
 Bluetooth	System name		Bluetooth
 Disconnect	Remote devices		Адключыцца
-Pick LocalDevice...	Settings view		Выбраць прыладу (LocalDevice)…
 Defaults	Window		Прадвызначаныя
 Inquiry	Inquiry panel		Запыт
 Desktop	Settings view		Рабочы стол

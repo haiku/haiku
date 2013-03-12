@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-BluetoothPrefs	2526531136
+1	ukrainian	x-vnd.Haiku-BluetoothPrefs	228189009
 About Bluetooth…	Window		Про Bluetooth…
 Handheld	Settings view		Переносний
 Default inquiry time:	Settings view		Час запиту по замовчуванню:
@@ -35,7 +35,6 @@ Identify us as...	Settings view		Визначити нас як…
 As blocked	Remote devices		Як заблокований
 Bluetooth	System name		Bluetooth
 Disconnect	Remote devices		Роз’єднати
-Pick LocalDevice...	Settings view		Вибір локального приладу…
 Defaults	Window		По замовчуванню
 Inquiry	Inquiry panel		Запит
 Desktop	Settings view		Робочий стіл

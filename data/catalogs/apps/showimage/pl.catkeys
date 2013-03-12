@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-ShowImage	886873119
+1	polish	x-vnd.Haiku-ShowImage	4011843330
 Use as background…	Menus		Użyj jako tapety…
 File	Menus		Plik
 Slide delay	Menus		Opóźnienie
@@ -25,7 +25,6 @@ The document '%s' (page %d) has been changed. Do you want to close the document?
 Leave full screen	Menus		Opuść pełny ekran
 Close	Menus		Zamknij
 Close	ClosePrompt		Zamknij
-Undo	Menus		Cofnij
 Resize to (in 1/72 inches):	PrintOptionsWindow		Ustaw rozmiar (w 1/72 cala):
 Rating	Menus		Ocena
 Flip left to right	Menus		Odbij z lewej na prawą

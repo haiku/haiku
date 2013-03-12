@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-LaunchBox	3016105370
+1	portuguese (brazil)	x-vnd.Haiku-LaunchBox	3692177981
 New	LaunchBox		Novo
 Set description…	LaunchBox		Editar descrição...
 Vertical layout	LaunchBox		Layout vertical
@@ -6,6 +6,7 @@ OK	LaunchBox		OK
 Pad 1	LaunchBox		Barra 1
 last chance	LaunchBox		última chance
 Quit	LaunchBox		Sair
+Open containing folder	LaunchBox		Abrir conteúdo da pasta
 Clear button	LaunchBox		Botão limpar
 LaunchBox	System name		LaunchBox
 Ignore double-click	LaunchBox		Ignorar clique duplo

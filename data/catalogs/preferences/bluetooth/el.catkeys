@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-BluetoothPrefs	2526531136
+1	greek, modern (1453-)	x-vnd.Haiku-BluetoothPrefs	228189009
 About Bluetooth…	Window		Περί Bluetooth...
 Handheld	Settings view		Φορητός
 Default inquiry time:	Settings view		Προκαθορισμένος χρόνος έρευνας:
@@ -35,7 +35,6 @@ Identify us as...	Settings view		Αναγνωρίστε μας ως...
 As blocked	Remote devices		Ως αποκλεισμένο
 Bluetooth	System name		Bluetooth
 Disconnect	Remote devices		Αποσύνδεση
-Pick LocalDevice...	Settings view		Επιλογή τοπικής συσκευής
 Defaults	Window		Προεπιλογές
 Inquiry	Inquiry panel		Αίτηση
 Desktop	Settings view		Επιφάνεια εργασίας

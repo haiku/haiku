@@ -1,0 +1,20 @@
+/*
+ * nfs4_idmapper_server.rdef
+ */
+
+resource app_signature "application/x-vnd.Haiku-nfs4_idmapper-server";
+
+resource app_flags B_EXCLUSIVE_LAUNCH | B_BACKGROUND_APP;
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	variety = B_APPV_ALPHA,
+	internal = 0,
+
+	short_info = "nfs4_idmapper_server",
+	long_info = "nfs4_idmapper_server ©2012 Haiku, Inc"
+};
+

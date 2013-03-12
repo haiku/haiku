@@ -87,7 +87,7 @@ SYSTEM_SERVERS = [ FFilterByBuildFeatures
 	app_server cddb_daemon debug_server input_server keystore_server mail_daemon
 	media_addon_server media_server midi_server mount_server net_server
 	notification_server power_daemon print_server print_addon_server registrar
-	syslog_daemon
+	syslog_daemon dns_resolver_server nfs4_idmapper_server
 ] ;
 
 SYSTEM_NETWORK_DEVICES = ethernet loopback ;
@@ -183,7 +183,7 @@ SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
 	ata@ata pci ps2@x86 isa@x86
 	ide@ide scsi config_manager agp_gart usb firewire acpi@x86
 ] ;
-SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs btrfs cdda exfat ext2 fat iso9660 nfs
+SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs btrfs cdda exfat ext2 fat iso9660 nfs nfs4
 	attribute_overlay write_overlay ntfs reiserfs udf googlefs ;
 
 # wifi firmware
@@ -663,6 +663,7 @@ AddFilesToHaikuImage system add-ons input_server filters
 	: screen_saver shortcut_catcher ;
 AddFilesToHaikuImage system add-ons kernel network
 	: <net>notifications stack ;
+AddFilesToHaikuImage system add-ons kernel network : dns_resolver ;
 AddFilesToHaikuImage system add-ons kernel network devices
 	: $(SYSTEM_NETWORK_DEVICES) ;
 AddFilesToHaikuImage system add-ons kernel network datalink_protocols

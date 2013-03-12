@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-BluetoothPrefs	3926935355
+1	finnish	x-vnd.Haiku-BluetoothPrefs	1628593228
 About Bluetooth…	Window		Bluetooth-ohjelmasta…
 Handheld	Settings view		Kädessäpidettävät
 Default inquiry time:	Settings view		Oletuskyselyn pituus:
@@ -36,7 +36,6 @@ Identify us as...	Settings view		Tunnista meidät nimellä...
 As blocked	Remote devices		Estettynä
 Bluetooth	System name		Bluetooth-asetukset
 Disconnect	Remote devices		Katkaise yhteys
-Pick LocalDevice...	Settings view		Valitse paikallinen laite...
 Defaults	Window		Oletusasetukset
 Inquiry	Inquiry panel		Tiedustelu
 Desktop	Settings view		Työpöytäasetukset

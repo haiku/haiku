@@ -1,0 +1,20 @@
+/*
+ * dns_resolver_server.rdef
+ */
+
+resource app_signature "application/x-vnd.Haiku-dns-resolver-server";
+
+resource app_flags B_EXCLUSIVE_LAUNCH | B_BACKGROUND_APP;
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	variety = B_APPV_ALPHA,
+	internal = 0,
+
+	short_info = "dns_resolver_server",
+	long_info = "dns_resolver_server ©2012 Haiku, Inc"
+};
+

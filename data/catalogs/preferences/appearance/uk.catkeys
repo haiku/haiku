@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Appearance	1492316509
+1	ukrainian	x-vnd.Haiku-Appearance	963859935
 Control highlight	Colors tab		Підсвітка елемента
 Control border	Colors tab		Межа елемента
 Antialiasing type:	AntialiasingSettingsView		Тип зглажування:
@@ -12,7 +12,6 @@ Off	AntialiasingSettingsView		Слабе
 Choose Decorator	DecorSettingsView		Вибір декоратора
 Success	Colors tab		Успіх
 Inactive window tab text	Colors tab		Текст заголовку неактивного вікна
-About Decorator	DecorSettingsView		Про Декоратор
 Failure	Colors tab		Невдача
 Hinting menu	AntialiasingSettingsView		Меню коректування
 Document background	Colors tab		Тло документа

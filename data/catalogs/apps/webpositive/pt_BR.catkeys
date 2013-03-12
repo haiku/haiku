@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-WebPositive	233049275
+1	portuguese (brazil)	x-vnd.Haiku-WebPositive	3577331897
 Show home button	Settings Window		Exibir botão home
 Username:	Authentication Panel		Nome de Usuário:
 Copy URL to clipboard	Download Window		Copiar URL para a área de transferência
@@ -16,6 +16,7 @@ Start page:	Settings Window		Página inicial:
 History	WebPositive Window		Histórico
 Error opening downloads folder	Download Window		Erro ao abrir pasta de itens baixados
 Paste	WebPositive Window		Colar
+Proxy username:	Settings Window		Nome de usuário do proxy:
 Settings	Settings Window		Definições
 %seconds seconds left	Download Window		%seconds segundos restantes
 Confirmation	WebPositive Window		Confirmação
@@ -41,6 +42,7 @@ Quit	WebPositive Window		Sair
 Full screen	WebPositive Window		Tela cheia
 Open download error	Download Window		Abrir erro de download
 Standard font:	Settings Window		Fonte padrão:
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Localizar a ocorrência anterior dos termos da pesquisa
 Restart	Download Window		Reiniciar
 Proxy server	Settings Window		Servidor proxy
 Open containing folder	Download Window		Abrir pasta de contenção
@@ -58,6 +60,7 @@ Cut	WebPositive Window		Cortar
 Bookmark this page	WebPositive Window		Marcar esta página
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Ocorreu um erro tentando exibir a pasta de marcadores.\n\nErro: %error
 Open downloads folder	Download Window		Abrir pasta de downloads
+Proxy password:	Settings Window		Senha do proxy:
 Number of days to keep links in History menu:	Settings Window		Número de dias para manter vínculos no menu Histórico:
 Hide	Download Window		Ocultar
 Reset size	WebPositive Window		Restaurar tamanho
@@ -67,6 +70,7 @@ There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive 
 Over 1 day left	Download Window		Mais de 1 dia restante
 Downloads	WebPositive Window		Itens baixados
 Requesting %url	WebPositive Window		Solicitando %url
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Localizar a próxima ocorrência dos termos da pesquisa
 Apply	Settings Window		Aplicar
 Bookmark info	WebPositive Window		Informações de marcador
 Size:	Font Selection view		Tamanho:
@@ -80,6 +84,7 @@ Open blank page	Settings Window		Abrir página em branco
 New tabs:	Settings Window		Novas guias:
 Cancel	WebPositive Window		Cancelar
 Open all	WebPositive Window		Abrir tudo
+Proxy server requires authentication	Settings Window		Servidor proxy requer autenticação
 Clear	URL Bar		Limpar
 Cut	URL Bar		Cortar
 Clear	WebPositive Window		Limpar

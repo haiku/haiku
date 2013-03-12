@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-ShowImage	886873119
+1	belarusian	x-vnd.Haiku-ShowImage	4011843330
 Use as background…	Menus		Ужыць як фон…
 File	Menus		Файл
 Slide delay	Menus		Затрымка слайду
@@ -25,7 +25,6 @@ The document '%s' (page %d) has been changed. Do you want to close the document?
 Leave full screen	Menus		Пакінуць рэжым поўнага экрана
 Close	Menus		Закрыць
 Close	ClosePrompt		Закрыць
-Undo	Menus		Адмяніць
 Resize to (in 1/72 inches):	PrintOptionsWindow		Змяніць памер (у 1/72 дзюйма):
 Rating	Menus		Рэйтынг
 Flip left to right	Menus		Адлюстраваць злева направа
