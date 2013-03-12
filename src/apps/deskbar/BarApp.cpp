@@ -126,13 +126,11 @@ TBarApp::TBarApp()
 	}
 
 	sSubscribers.MakeEmpty();
-
 	fSwitcherMessenger = BMessenger(new TSwitchManager(fSettings.switcherLoc));
-
 	fBarWindow->Show();
 
-	// Call UpdatePlacement() after the window is shown because expanded apps
-	// need to resize the window.
+	// Call UpdatePlacement() after the window is shown because expanded
+	// apps need to resize the window.
 	if (fBarWindow->Lock()) {
 		fBarView->UpdatePlacement();
 		fBarWindow->Unlock();
@@ -578,11 +576,13 @@ TBarApp::MessageReceived(BMessage* message)
 				break;
 
 			fBarWindow->Lock();
-			if (fBarView->Vertical())
-				fBarView->PlaceApplicationBar();
-			else
-				fBarView->UpdatePlacement();
-
+			if (!fBarView->Vertical()) {
+				// Must also resize the Deskbar menu and replicant tray in
+				// horizontal mode
+				fBarView->PlaceDeskbarMenu();
+				fBarView->PlaceTray(false, false);
+			}
+			fBarView->PlaceApplicationBar();
 			fBarWindow->Unlock();
 
 			if (fPreferencesWindow != NULL)

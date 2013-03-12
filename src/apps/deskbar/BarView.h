@@ -172,7 +172,7 @@ class TBarView : public BView {
 
 		TInlineScrollView* fInlineScrollView;
 		TBarMenuBar* fBarMenuBar;
-		TExpandoMenuBar* fExpando;
+		TExpandoMenuBar* fExpandoMenuBar;
 
 		int32 fTrayLocation;
 		TDragRegion* fDragRegion;
@@ -202,7 +202,7 @@ class TBarView : public BView {
 inline TExpandoMenuBar*
 TBarView::ExpandoMenuBar() const
 {
-	return fExpando;
+	return fExpandoMenuBar;
 }
 
 
