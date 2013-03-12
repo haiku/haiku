@@ -696,9 +696,13 @@ Inode::TestLock(OpenFileCookie* cookie, struct flock* lock)
 
 	LockType ltype = sGetLockType(lock->l_type, false);
 	uint64 position = lock->l_start;
-	uint64 length = lock->l_len;
-	bool conflict;
+	uint64 length;
+	if (lock->l_len + lock->l_start == OFF_MAX)
+		length = UINT64_MAX;
+	else
+		length = lock->l_len;
 
+	bool conflict;
 	result = NFS4Inode::TestLock(cookie, &ltype, &position, &length, conflict);
 	if (result != B_OK)
 		return result;

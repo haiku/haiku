@@ -234,7 +234,7 @@ ReplyInterpreter::Lock(LockInfo* linfo)
 status_t
 ReplyInterpreter::LockT(uint64* pos, uint64* len, LockType* type)
 {
-	status_t res = _OperationError(OpLockU);
+	status_t res = _OperationError(OpLockT);
 	if (res != B_WOULD_BLOCK || NFS4Error() != NFS4ERR_DENIED)
 		return res;
 
