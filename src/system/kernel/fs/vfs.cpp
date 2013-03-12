@@ -1524,36 +1524,6 @@ create_advisory_locking(struct vnode* vnode)
 }
 
 
-/*!	Retrieves the first lock that has been set by the current team.
-*/
-static status_t
-get_advisory_lock(struct vnode* vnode, struct flock* flock)
-{
-	struct advisory_locking* locking = get_advisory_locking(vnode);
-	if (locking == NULL)
-		return B_BAD_VALUE;
-
-	// TODO: this should probably get the flock by its file descriptor!
-	team_id team = team_get_current_team_id();
-	status_t status = B_BAD_VALUE;
-
-	LockList::Iterator iterator = locking->locks.GetIterator();
-	while (iterator.HasNext()) {
-		struct advisory_lock* lock = iterator.Next();
-
-		if (lock->team == team) {
-			flock->l_start = lock->start;
-			flock->l_len = lock->end - lock->start + 1;
-			status = B_OK;
-			break;
-		}
-	}
-
-	put_advisory_locking(locking);
-	return status;
-}
-
-
 /*! Returns \c true when either \a flock is \c NULL or the \a flock intersects
 	with the advisory_lock \a lock.
 */
@@ -1565,6 +1535,42 @@ advisory_lock_intersects(struct advisory_lock* lock, struct flock* flock)
 
 	return lock->start <= flock->l_start - 1 + flock->l_len
 		&& lock->end >= flock->l_start;
+}
+
+
+/*!	Tests whether acquiring a lock would block.
+*/
+static status_t
+test_advisory_lock(struct vnode* vnode, struct flock* flock)
+{
+	flock->l_type = F_UNLCK;
+
+	struct advisory_locking* locking = get_advisory_locking(vnode);
+	if (locking == NULL)
+		return B_OK;
+
+	team_id team = team_get_current_team_id();
+
+	LockList::Iterator iterator = locking->locks.GetIterator();
+	while (iterator.HasNext()) {
+		struct advisory_lock* lock = iterator.Next();
+
+		 if (lock->team != team && advisory_lock_intersects(lock, flock)) {
+			// locks do overlap
+			if (flock->l_type != F_RDLCK || !lock->shared) {
+				// collision
+				flock->l_type = lock->shared ? F_RDLCK : F_WRLCK;
+				flock->l_whence = SEEK_SET;
+				flock->l_start = lock->start;
+				flock->l_len = lock->end - lock->start + 1;
+				flock->l_pid = lock->team;
+				break;
+			}
+		}
+	}
+
+	put_advisory_locking(locking);
+	return B_OK;
 }
 
 
@@ -6018,15 +6024,34 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 
 		case F_GETLK:
 			if (vnode != NULL) {
+				struct flock normalizedLock;
+
+				memcpy(&normalizedLock, &flock, sizeof(struct flock));
+				status = normalize_flock(descriptor, &normalizedLock);
+				if (status != B_OK)
+					break;
+
 				if (HAS_FS_CALL(vnode, test_lock)) {
 					status = FS_CALL(vnode, test_lock, descriptor->cookie,
-						&flock);
+						&normalizedLock);
 				} else
-					status = get_advisory_lock(vnode, &flock);
+					status = test_advisory_lock(vnode, &normalizedLock);
 				if (status == B_OK) {
-					// copy back flock structure
-					status = user_memcpy((struct flock*)argument, &flock,
-						sizeof(struct flock));
+					if (normalizedLock.l_type == F_UNLCK) {
+						// no conflicting lock found, copy back the same struct
+						// we were given except change type to F_UNLCK
+						flock.l_type = F_UNLCK;
+						status = user_memcpy((struct flock*)argument, &flock,
+							sizeof(struct flock));
+					} else {
+						// a conflicting lock was found, copy back its range and
+						// type
+						if (normalizedLock.l_len == OFF_MAX)
+							normalizedLock.l_len = 0;
+
+						status = user_memcpy((struct flock*)argument,
+							&normalizedLock, sizeof(struct flock));
+					}
 				}
 			} else
 				status = B_BAD_VALUE;
