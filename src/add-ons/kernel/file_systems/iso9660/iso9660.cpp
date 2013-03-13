@@ -164,7 +164,7 @@ InitVolDesc(iso9660_volume *volume, char *buffer)
 
 	volume->volDescType = *(uint8 *)buffer;
 	buffer += sizeof(volume->volDescType);
-	
+
 	const size_t kStdIDStringLen = sizeof(volume->stdIDString) - 1;
 	volume->stdIDString[kStdIDStringLen] = '\0';
 	strncpy(volume->stdIDString, buffer, kStdIDStringLen);
@@ -172,7 +172,7 @@ InitVolDesc(iso9660_volume *volume, char *buffer)
 
 	volume->volDescVersion = *(uint8 *)buffer;
 	buffer += sizeof(volume->volDescVersion);
-	
+
 	buffer += sizeof(volume->unused1); // skip unused 8th byte
 
 	const size_t kSystemIDStringLen = sizeof(volume->systemIDString) - 1;
@@ -180,7 +180,7 @@ InitVolDesc(iso9660_volume *volume, char *buffer)
 	strncpy(volume->systemIDString, buffer, kSystemIDStringLen);
 	buffer += kSystemIDStringLen;
 	TRACE(("InitVolDesc - system id string is %s\n", volume->systemIDString));
-	
+
 	const size_t kVolIDStringLen = sizeof(volume->volIDString) - 1;
 	volume->volIDString[kVolIDStringLen] = '\0';
 	strncpy(volume->volIDString, buffer, kVolIDStringLen);
@@ -193,9 +193,9 @@ InitVolDesc(iso9660_volume *volume, char *buffer)
 	buffer += sizeof(volume->volSpaceSize[LSB_DATA]);
 	volume->volSpaceSize[MSB_DATA] = *(uint32 *)buffer;
 	buffer += sizeof(volume->volSpaceSize[MSB_DATA]);
-	
+
 	buffer += sizeof(volume->unused3) - 1; // skip unused 89-120 bytes
-	
+
 	volume->volSetSize[LSB_DATA] = *(uint16*)buffer;
 	buffer += sizeof(volume->volSetSize[LSB_DATA]);
 	volume->volSetSize[MSB_DATA] = *(uint16*)buffer;
@@ -242,7 +242,7 @@ InitVolDesc(iso9660_volume *volume, char *buffer)
 
 	volume->rootDirRec.id = ISO_ROOTNODE_ID;
 	buffer += ISO_ROOT_DIR_REC_SIZE;
-	
+
 	const size_t kVolSetIDStringLen = sizeof(volume->volSetIDString) - 1;
 	volume->volSetIDString[kVolSetIDStringLen] = '\0';
 	strncpy(volume->volSetIDString, buffer, kVolSetIDStringLen);
