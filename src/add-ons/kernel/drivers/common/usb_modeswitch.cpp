@@ -33,8 +33,7 @@
 
 
 enum msgType {
-	MSG_NONE = 0,
-	MSG_HUAWEI_1,
+	MSG_HUAWEI_1 = 0,
 	MSG_HUAWEI_2,
 	MSG_HUAWEI_3,
 	MSG_NOKIA_1,
@@ -42,6 +41,10 @@ enum msgType {
 	MSG_OLIVETTI_2,
 	MSG_OPTION_1,
 	MSG_ATHEROS_1,
+	MSG_ZTE_1,
+	MSG_ZTE_2,
+	MSG_ZTE_3,
+	MSG_NONE
 };
 
 
@@ -49,7 +52,7 @@ unsigned char kDevicesMsg[][31] = {
 	{ 	/* MSG_HUAWEI_1 */
 		0x55, 0x53, 0x42, 0x43, 0x12, 0x34, 0x56, 0x78,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x11,
-		0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x06, 0x20, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 	},
 	{	/* MSG_HUAWEI_2 */
@@ -58,10 +61,10 @@ unsigned char kDevicesMsg[][31] = {
 		0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 	},
-	{	/* MSG_HUAWEI_3 */
+	{ 	/* MSG_HUAWEI_3 */
 		0x55, 0x53, 0x42, 0x43, 0x12, 0x34, 0x56, 0x78,
-		0x00, 0x00, 0x00, 0x00, 0x80, 0x00, 0x06, 0x01,
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x11,
+		0x06, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 	},
 	{	/* MSG_NOKIA_1 */
@@ -93,8 +96,25 @@ unsigned char kDevicesMsg[][31] = {
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x1b,
 		0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+	},
+	{	/* MSG_ZTE_1 */
+		0x55, 0x53, 0x42, 0x43, 0x12, 0x34, 0x56, 0x78,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x1e,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+	},
+	{	/* MSG_ZTE_2 */
+		0x55, 0x53, 0x42, 0x43, 0x12, 0x34, 0x56, 0x79,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x1b,
+		0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+	},
+	{	/* MSG_ZTE_3 */
+		0x55, 0x53, 0x42, 0x43, 0x12, 0x34, 0x56, 0x70,
+		0x20, 0x00, 0x00, 0x00, 0x80, 0x00, 0x0c, 0x85,
+		0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 	}
-
 };
 
 
@@ -110,34 +130,82 @@ unsigned char kDevicesMsg[][31] = {
 
 static const struct {
 	usb_support_descriptor desc;
-	msgType type;
+	msgType type, type2, type3;
 } kDevices[] = {
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x101e}, MSG_HUAWEI_1},
 	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1446}, MSG_HUAWEI_1},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1449}, MSG_HUAWEI_1},
 	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14ad}, MSG_HUAWEI_1},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14b5}, MSG_HUAWEI_1},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14b7}, MSG_HUAWEI_1},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14ba}, MSG_HUAWEI_1},
 	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14c1}, MSG_HUAWEI_1},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14c3}, MSG_HUAWEI_1},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14c4}, MSG_HUAWEI_1},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14c5}, MSG_HUAWEI_1},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14d1}, MSG_HUAWEI_1},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14fe}, MSG_HUAWEI_1},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1505}, MSG_HUAWEI_1},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x151a}, MSG_HUAWEI_1},
 	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1520}, MSG_HUAWEI_1},
 	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1521}, MSG_HUAWEI_1},
 	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1523}, MSG_HUAWEI_1},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1526}, MSG_HUAWEI_1},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1553}, MSG_HUAWEI_1},
 	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1557}, MSG_HUAWEI_1},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x155b}, MSG_HUAWEI_1},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1c0b}, MSG_HUAWEI_1},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1c24}, MSG_HUAWEI_1},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1f11}, MSG_HUAWEI_1},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1030}, MSG_HUAWEI_2},
 	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1031}, MSG_HUAWEI_2},
-	{{ 0, 0, 0, HUAWEI_VENDOR, 0x101e}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1f01}, MSG_HUAWEI_3},
 	{{ 0, 0, 0, NOKIA_VENDOR, 0x060c}, MSG_NOKIA_1},
 	{{ 0, 0, 0, NOKIA_VENDOR, 0x0610}, MSG_NOKIA_1},
+	{{ 0, 0, 0, NOKIA_VENDOR, 0x061d}, MSG_NOKIA_1},
+	{{ 0, 0, 0, NOKIA_VENDOR, 0x0622}, MSG_NOKIA_1},
+	{{ 0, 0, 0, NOKIA_VENDOR, 0x0627}, MSG_NOKIA_1},
+	{{ 0, 0, 0, NOKIA_VENDOR, 0x062c}, MSG_NOKIA_1},
+	{{ 0, 0, 0, NOKIA_VENDOR, 0x0632}, MSG_NOKIA_1},
+	{{ 0, 0, 0, NOKIA_VENDOR, 0x0637}, MSG_NOKIA_1},
 	{{ 0, 0, 0, NOVATEL_VENDOR, 0x5010}, MSG_NOKIA_1},
 	{{ 0, 0, 0, NOVATEL_VENDOR, 0x5020}, MSG_NOKIA_1},
 	{{ 0, 0, 0, NOVATEL_VENDOR, 0x5030}, MSG_NOKIA_1},
 	{{ 0, 0, 0, NOVATEL_VENDOR, 0x5031}, MSG_NOKIA_1},
 	{{ 0, 0, 0, NOVATEL_VENDOR, 0x5041}, MSG_NOKIA_1},
+	{{ 0, 0, 0, NOVATEL_VENDOR, 0x5059}, MSG_NOKIA_1},
+	{{ 0, 0, 0, NOVATEL_VENDOR, 0x7001}, MSG_NOKIA_1},
 	{{ 0, 0, 0, ZYDAS_VENDOR, 0x2011}, MSG_NOKIA_1},
 	{{ 0, 0, 0, ZYDAS_VENDOR, 0x20ff}, MSG_NOKIA_1},
+	{{ 0, 0, 0, ZTE_VENDOR, 0x0013}, MSG_NOKIA_1},
 	{{ 0, 0, 0, ZTE_VENDOR, 0x0026}, MSG_NOKIA_1},
+	{{ 0, 0, 0, ZTE_VENDOR, 0x0031}, MSG_NOKIA_1},
 	{{ 0, 0, 0, ZTE_VENDOR, 0x0083}, MSG_NOKIA_1},
 	{{ 0, 0, 0, ZTE_VENDOR, 0x0101}, MSG_NOKIA_1},
 	{{ 0, 0, 0, ZTE_VENDOR, 0x0115}, MSG_NOKIA_1},
+	{{ 0, 0, 0, ZTE_VENDOR, 0x0120}, MSG_NOKIA_1},
+	{{ 0, 0, 0, ZTE_VENDOR, 0x0169}, MSG_NOKIA_1},
+	{{ 0, 0, 0, ZTE_VENDOR, 0x0325}, MSG_NOKIA_1},
 	{{ 0, 0, 0, ZTE_VENDOR, 0x1001}, MSG_NOKIA_1},
 	{{ 0, 0, 0, ZTE_VENDOR, 0x1007}, MSG_NOKIA_1},
 	{{ 0, 0, 0, ZTE_VENDOR, 0x1009}, MSG_NOKIA_1},
 	{{ 0, 0, 0, ZTE_VENDOR, 0x1013}, MSG_NOKIA_1},
+	{{ 0, 0, 0, ZTE_VENDOR, 0x1017}, MSG_NOKIA_1},
+	{{ 0, 0, 0, ZTE_VENDOR, 0x1171}, MSG_NOKIA_1},
+	{{ 0, 0, 0, ZTE_VENDOR, 0x1175}, MSG_NOKIA_1},
+	{{ 0, 0, 0, ZTE_VENDOR, 0x1179}, MSG_NOKIA_1},
+	{{ 0, 0, 0, ZTE_VENDOR, 0x1201}, MSG_NOKIA_1},
+	{{ 0, 0, 0, ZTE_VENDOR, 0x1523}, MSG_NOKIA_1},
+	{{ 0, 0, 0, ZTE_VENDOR, 0xffde}, MSG_NOKIA_1},
+	{{ 0, 0, 0, ZTE_VENDOR, 0x0003}, MSG_ZTE_1, MSG_ZTE_2},
+	{{ 0, 0, 0, ZTE_VENDOR, 0x0053}, MSG_ZTE_1, MSG_ZTE_2},
+	{{ 0, 0, 0, ZTE_VENDOR, 0x0103}, MSG_ZTE_1, MSG_ZTE_2},
+	{{ 0, 0, 0, ZTE_VENDOR, 0x0154}, MSG_ZTE_1, MSG_ZTE_2},
+	{{ 0, 0, 0, ZTE_VENDOR, 0x1224}, MSG_ZTE_1, MSG_ZTE_2},
+	{{ 0, 0, 0, ZTE_VENDOR, 0x1517}, MSG_ZTE_1, MSG_ZTE_2},
+	{{ 0, 0, 0, ZTE_VENDOR, 0x1542}, MSG_ZTE_1, MSG_ZTE_2},
+	{{ 0, 0, 0, ZTE_VENDOR, 0x0149}, MSG_ZTE_1, MSG_ZTE_2, MSG_ZTE_3},
+	{{ 0, 0, 0, ZTE_VENDOR, 0x2000}, MSG_ZTE_1, MSG_ZTE_2, MSG_ZTE_3},
 	{{ 0, 0, 0, OLIVETTI_VENDOR, 0xc700}, MSG_OLIVETTI_1},
 	{{ 0, 0, 0, OLIVETTI_VENDOR, 0xf000}, MSG_OLIVETTI_2},
 	{{ 0, 0, 0, OPTION_VENDOR, 0x6711}, MSG_OPTION_1},
@@ -152,6 +220,7 @@ static const struct {
 	{{ 0, 0, 0, OPTION_VENDOR, 0x7011}, MSG_OPTION_1},
 	{{ 0, 0, 0, OPTION_VENDOR, 0x7031}, MSG_OPTION_1},
 	{{ 0, 0, 0, OPTION_VENDOR, 0x7051}, MSG_OPTION_1},
+	{{ 0, 0, 0, OPTION_VENDOR, 0x7071}, MSG_OPTION_1},
 	{{ 0, 0, 0, OPTION_VENDOR, 0x7111}, MSG_OPTION_1},
 	{{ 0, 0, 0, OPTION_VENDOR, 0x7211}, MSG_OPTION_1},
 	{{ 0, 0, 0, OPTION_VENDOR, 0x7251}, MSG_OPTION_1},
@@ -164,14 +233,20 @@ static const struct {
 	{{ 0, 0, 0, OPTION_VENDOR, 0x7501}, MSG_OPTION_1},
 	{{ 0, 0, 0, OPTION_VENDOR, 0x7601}, MSG_OPTION_1},
 	{{ 0, 0, 0, OPTION_VENDOR, 0x7701}, MSG_OPTION_1},
+	{{ 0, 0, 0, OPTION_VENDOR, 0x7706}, MSG_OPTION_1},
 	{{ 0, 0, 0, OPTION_VENDOR, 0x7801}, MSG_OPTION_1},
 	{{ 0, 0, 0, OPTION_VENDOR, 0x7901}, MSG_OPTION_1},
+	{{ 0, 0, 0, OPTION_VENDOR, 0x8006}, MSG_OPTION_1},
 	{{ 0, 0, 0, OPTION_VENDOR, 0x8200}, MSG_OPTION_1},
 	{{ 0, 0, 0, OPTION_VENDOR, 0x8201}, MSG_OPTION_1},
 	{{ 0, 0, 0, OPTION_VENDOR, 0x8300}, MSG_OPTION_1},
 	{{ 0, 0, 0, OPTION_VENDOR, 0x8302}, MSG_OPTION_1},
 	{{ 0, 0, 0, OPTION_VENDOR, 0x8304}, MSG_OPTION_1},
 	{{ 0, 0, 0, OPTION_VENDOR, 0x8400}, MSG_OPTION_1},
+	{{ 0, 0, 0, OPTION_VENDOR, 0x8600}, MSG_OPTION_1},
+	{{ 0, 0, 0, OPTION_VENDOR, 0x8800}, MSG_OPTION_1},
+	{{ 0, 0, 0, OPTION_VENDOR, 0x8900}, MSG_OPTION_1},
+	{{ 0, 0, 0, OPTION_VENDOR, 0x9000}, MSG_OPTION_1},
 	{{ 0, 0, 0, OPTION_VENDOR, 0xc031}, MSG_OPTION_1},
 	{{ 0, 0, 0, OPTION_VENDOR, 0xc100}, MSG_OPTION_1},
 	{{ 0, 0, 0, OPTION_VENDOR, 0xc031}, MSG_OPTION_1},
@@ -209,7 +284,7 @@ typedef struct _my_device {
 	status_t	status;
 	size_t		actual_length;
 
-	msgType		type;
+	msgType		type[3];
 } my_device;
 
 
@@ -263,7 +338,7 @@ my_transfer_data(my_device *device, bool directionIn, void *data,
 	}
 
 	do {
-		bigtime_t timeout = directionIn ? 100000 : 100000;
+		bigtime_t timeout = directionIn ? 500000 : 500000;
 		result = acquire_sem_etc(device->notify, 1, B_RELATIVE_TIMEOUT,
 			timeout);
 		if (result == B_TIMED_OUT) {
@@ -287,7 +362,7 @@ my_transfer_data(my_device *device, bool directionIn, void *data,
 
 
 enum msgType
-my_get_msg_type(const usb_device_descriptor *desc)
+my_get_msg_type(const usb_device_descriptor *desc, int index)
 {
 	for (uint32 i = 0; i < kDevicesCount; i++) {
 		if (kDevices[i].desc.dev_class != 0x0
@@ -305,8 +380,15 @@ my_get_msg_type(const usb_device_descriptor *desc)
 		if (kDevices[i].desc.product != 0x0
 			&& kDevices[i].desc.product != desc->product_id)
 			continue;
-
-		return kDevices[i].type;
+		switch (index) {
+			case 0:
+				return kDevices[i].type;
+			case 1:
+				return kDevices[i].type2;
+			case 2:
+				return kDevices[i].type3;
+		}
+			
 	}
 
 	return MSG_NONE;
@@ -317,27 +399,33 @@ my_get_msg_type(const usb_device_descriptor *desc)
 status_t
 my_modeswitch(my_device* device)
 {
-	if (device->type == MSG_NONE)
-		return B_OK;
+	status_t err = B_OK;
+	if (device->type[0] == MSG_NONE)
+			return B_OK;
+	for (int i = 0; i < 3; i++) {
+		if (device->type[i] == MSG_NONE)
+			break;
 
-	status_t err = my_transfer_data(device, false, kDevicesMsg[device->type],
-		sizeof(kDevicesMsg[device->type]));
-	if (err != B_OK) {
-		TRACE_ALWAYS("inquire message failed\n");
-		return err;
+		err = my_transfer_data(device, false, kDevicesMsg[device->type[i]],
+			sizeof(kDevicesMsg[device->type[i]]));
+		if (err != B_OK) {
+			TRACE_ALWAYS("send message %d failed\n", i + 1);
+			return err;
+		}
+	
+		TRACE("device switched: %p\n", device);
+
+		char data[36];
+		err = my_transfer_data(device, true, data, sizeof(data));
+		if (err != B_OK) {
+			TRACE_ALWAYS("receive response %d failed 0x%lx\n",
+				i + 1, device->status);
+			return err;
+		}
+		TRACE("device switched (response length %ld)\n", device->actual_length);	
 	}
-
+	
 	TRACE("device switched: %p\n", device);
-
-	char data[36];
-	err = my_transfer_data(device, true, data, sizeof(data));
-	if (err != B_OK) {
-		TRACE_ALWAYS("inquire response failed\n");
-		return err;
-	}
-
-	TRACE("device switched: %p %.8s %.16s %.4s\n", device, data + 8, data + 16,
-		data + 32);
 
 	return B_OK;
 }
@@ -417,7 +505,9 @@ my_device_added(usb_device newDevice, void **cookie)
 		free(device);
 		return B_ERROR;
 	}
-	device->type = my_get_msg_type(descriptor);
+	for (int i = 0; i < 3; i++) {
+		device->type[i] = my_get_msg_type(descriptor, i);
+	}
 
 	mutex_init(&device->lock, DRIVER_NAME " device lock");
 
