@@ -14,7 +14,7 @@
 const uint32 kConfigShow			= 'PrSh';
 const uint32 kConfigQuit			= 'PrQt';
 const uint32 kUpdateRecentCounts	= 'upct';
-const uint32 kOpenInTracker			= 'otrk';
+const uint32 kEditInTracker			= 'etrk';
 
 const uint32 kTrackerFirst			= 'TkFt';
 const uint32 kSortRunningApps		= 'SAps';
@@ -30,6 +30,8 @@ const uint32 kRevert				= 'rvrt';
 
 
 class BCheckBox;
+class BFile;
+class BMessage;
 class BRadioButton;
 class BSlider;
 class BTextControl;
@@ -49,6 +51,10 @@ private:
 
 			bool			_IsDefaultable();
 			bool			_IsRevertable();
+
+			status_t		_InitSettingsFile(BFile* file, bool write);
+			status_t		_LoadSettings(BMessage* settings);
+			status_t		_SaveSettings(BMessage* settings);
 
 			void			_SetInitialSettings();
 

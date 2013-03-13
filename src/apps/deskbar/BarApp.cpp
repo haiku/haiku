@@ -856,7 +856,7 @@ void
 TBarApp::ShowPreferencesWindow()
 {
 	if (fPreferencesWindow == NULL) {
-		fPreferencesWindow = new PreferencesWindow(BRect(0, 0, 320, 240));
+		fPreferencesWindow = new PreferencesWindow(BRect(100, 100, 320, 240));
 		fPreferencesWindow->Show();
 	} else if (fPreferencesWindow->Lock()) {
 		if (fPreferencesWindow->IsHidden())
@@ -875,17 +875,10 @@ TBarApp::QuitPreferencesWindow()
 	if (fPreferencesWindow == NULL)
 		return;
 
-	int32 index = 0;
-	BWindow* window = NULL;
-	while ((window = WindowAt(index++)) != NULL) {
-		if (window == fPreferencesWindow) {
-			if (fPreferencesWindow->Lock()) {
-				fPreferencesWindow->Quit();
-					// Quit() destroys the window so don't unlock
-				fPreferencesWindow = NULL;
-			}
-			break;
-		}
+	if (fPreferencesWindow->Lock()) {
+		fPreferencesWindow->Quit();
+			// Quit() destroys the window so don't unlock
+		fPreferencesWindow = NULL;
 	}
 }
 

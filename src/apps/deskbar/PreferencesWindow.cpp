@@ -11,22 +11,24 @@
 #include "PreferencesWindow.h"
 
 #include <ctype.h>
-#include <stdio.h>
 
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <ControlLook.h>
+#include <File.h>
 #include <FormattingConventions.h>
 #include <GroupLayout.h>
 #include <ListView.h>
 #include <Locale.h>
 #include <LayoutBuilder.h>
 #include <OpenWithTracker.h>
+#include <Path.h>
 #include <RadioButton.h>
 #include <Roster.h>
 #include <SeparatorView.h>
+#include <Screen.h>
 #include <Slider.h>
 #include <SpaceLayoutItem.h>
 #include <TextControl.h>
@@ -39,6 +41,7 @@
 static const float kIndentSpacing
 	= be_control_look->DefaultItemSpacing() * 2.3;
 static const uint32 kSettingsViewChanged = 'Svch';
+static const char* kSettingsFileName = "Deskbar_prefs_window_settings";
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -208,8 +211,8 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 				.End()
 				.Add(BSpaceLayoutItem::CreateVerticalStrut(
 					B_USE_SMALL_SPACING))
-				.Add(new BButton(B_TRANSLATE("Open in Tracker"
-					B_UTF8_ELLIPSIS), new BMessage(kOpenInTracker)))
+				.Add(new BButton(B_TRANSLATE("Edit in Tracker"
+					B_UTF8_ELLIPSIS), new BMessage(kEditInTracker)))
 			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.End()
@@ -255,7 +258,14 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 			.SetInsets(B_USE_DEFAULT_SPACING)
 			.End();
 
-	CenterOnScreen();
+	BMessage windowSettings;
+	BPoint where;
+	if (_LoadSettings(&windowSettings) == B_OK
+		&& windowSettings.FindPoint("window_position", &where) == B_OK
+		&& BScreen(this).Frame().Contains(where)) {
+		MoveTo(where);
+	} else
+		CenterOnScreen();
 }
 
 
@@ -269,7 +279,7 @@ void
 PreferencesWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case kOpenInTracker:
+		case kEditInTracker:
 			OpenWithTracker(B_USER_DESKBAR_DIRECTORY);
 			break;
 
@@ -306,6 +316,10 @@ PreferencesWindow::MessageReceived(BMessage* message)
 bool
 PreferencesWindow::QuitRequested()
 {
+	BMessage windowSettings;
+	windowSettings.AddPoint("window_position", Frame().LeftTop());
+	_SaveSettings(&windowSettings);
+
 	be_app->PostMessage(kConfigQuit);
 
 	return false;
@@ -398,6 +412,52 @@ PreferencesWindow::_IsRevertable()
 		|| fSettings.alwaysOnTop != settings->alwaysOnTop
 		|| fSettings.autoRaise != settings->autoRaise
 		|| fSettings.autoHide != settings->autoHide;
+}
+
+
+status_t
+PreferencesWindow::_InitSettingsFile(BFile* file, bool write)
+{
+	BPath prefsPath;
+	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &prefsPath);
+	if (status != B_OK)
+		return status;
+
+	status = prefsPath.Append(kSettingsFileName);
+	if (status != B_OK)
+		return status;
+
+	if (write) {
+		status = file->SetTo(prefsPath.Path(),
+			B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY);
+	} else
+		status = file->SetTo(prefsPath.Path(), B_READ_ONLY);
+
+	return status;
+}
+
+
+status_t
+PreferencesWindow::_LoadSettings(BMessage* settings)
+{
+	BFile prefsFile;
+	status_t status = _InitSettingsFile(&prefsFile, false);
+	if (status != B_OK)
+		return status;
+
+	return settings->Unflatten(&prefsFile);
+}
+
+
+status_t
+PreferencesWindow::_SaveSettings(BMessage* settings)
+{
+	BFile prefsFile;
+	status_t status = _InitSettingsFile(&prefsFile, true);
+	if (status != B_OK)
+		return status;
+
+	return settings->Flatten(&prefsFile);
 }
 
 
