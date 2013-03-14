@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Haiku Inc. All rights reserved.
+ * Copyright 2010-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,12 +14,12 @@
 #include <cstdio>
 #define PRINT(x) printf x
 
-#ifdef OPENSSL_ENABLED
-#define HAVE_OPENSSL // Instruct md5.h to include the openssl version
-#endif
-
 extern "C" {
+#ifdef OPENSSL_ENABLED
+#include <openssl/md5.h>
+#else
 #include "md5.h"
+#endif
 };
 
 #ifndef MD5_DIGEST_LENGTH
