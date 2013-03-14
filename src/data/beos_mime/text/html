@@ -5,7 +5,8 @@ resource(1, "META:TYPE") "text/html";
 
 resource(2, "META:SNIFF_RULE") #'CSTR' array {
 	"0.40  [0:64]( -i \"<HTML\" | \"<HEAD\" | \"<TITLE\" | \""
-	"<BODY\" | \"<TABLE\" | \"<!--\" | \"<META\" | \"<CENTER\")"
+	"<BODY\" | \"<TABLE\" | \"<!--\" | \"<META\" | \"<CENTER\" | \""
+	"<!DOCTYPE HTML\")"
 };
 
 resource(3, "META:S:DESC") #'MSDC' "HTML file";
