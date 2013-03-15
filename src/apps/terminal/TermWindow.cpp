@@ -1798,7 +1798,8 @@ TermWindow::_UpdateSessionTitle(int32 index)
 
 	// evaluate the window title pattern
 	WindowTitlePlaceholderMapper windowMapper(shellInfo, activeProcessInfo,
-		fTerminalRoster.ID() + 1, sessionTitle);
+		fTerminalRoster.CountTerminals() > 1
+			? fTerminalRoster.ID() + 1 : 0, sessionTitle);
 	const BString& windowTitle = PatternEvaluator::Evaluate(fTitle.pattern,
 		windowMapper);
 

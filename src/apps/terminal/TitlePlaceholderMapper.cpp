@@ -90,7 +90,8 @@ WindowTitlePlaceholderMapper::MapPlaceholder(char placeholder, int64 number,
 		case 'i':
 			// window index
 			_string.Truncate(0);
-			_string << fWindowIndex;
+			if (fWindowIndex != 0)
+				_string << fWindowIndex;
 			return true;
 
 		case 't':
