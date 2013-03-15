@@ -105,7 +105,7 @@ PrefHandler::PrefHandler()
 	GetDefaultPath(path);
 	OpenText(path.Path());
 
-	_ConfirmFont(PREF_HALF_FONT_FAMILY, be_fixed_font);
+	_ConfirmFont(be_fixed_font);
 }
 
 
@@ -377,29 +377,34 @@ PrefHandler::IsEmpty() const
 
 
 void
-PrefHandler::_ConfirmFont(const char *key, const BFont *fallback)
+PrefHandler::_ConfirmFont(const BFont *fallbackFont)
 {
-	int32 count = count_font_families();
-	const char *font = getString(key);
-	if (font == NULL)
-		count = 0;
-
 	font_family family;
+	font_style style;
 
-	for (int32 i = 0; i < count; i++) {
-		if (get_font_family(i, &family) != B_OK)
+	const char *prefFamily = getString(PREF_HALF_FONT_FAMILY);
+	int32 familiesCount = (prefFamily != NULL) ? count_font_families() : 0;
+
+	for (int32 i = 0; i < familiesCount; i++) {
+		if (get_font_family(i, &family) != B_OK
+			|| strcmp(family, prefFamily) != 0)
 			continue;
 
-		if (strcmp(family, font) == 0) {
-			// found font family: we can safely use this font
-			return;
+		const char *prefStyle = getString(PREF_HALF_FONT_STYLE);
+		int32 stylesCount = (prefStyle != NULL) ? count_font_styles(family) : 0;
+
+		for (int32 j = 0; j < stylesCount; j++) {
+			// check style if we can safely use this font
+			if (get_font_style(family, j, &style) == B_OK
+				&& strcmp(style, prefStyle) == 0)
+				return;
 		}
 	}
 
 	// use fall-back font
-
-	fallback->GetFamilyAndStyle(&family, NULL);
-	setString(key, family);
+	fallbackFont->GetFamilyAndStyle(&family, &style);
+	setString(PREF_HALF_FONT_FAMILY, family);
+	setString(PREF_HALF_FONT_STYLE, style);
 }
 
 

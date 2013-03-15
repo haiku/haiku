@@ -72,7 +72,7 @@ class PrefHandler {
 		static status_t GetDefaultPath(BPath& path);
 
 	private:
-		void		_ConfirmFont(const char *key, const BFont *fallback);
+		void		_ConfirmFont(const BFont *fallbackFont);
 		status_t    _LoadFromDefault(const pref_defaults* defaults = NULL);
 		status_t    _LoadFromTextFile(const char * path);
 
