@@ -58,18 +58,15 @@ OpenWindow::OpenWindow()
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
-	AddChild(BLayoutBuilder::Group<>()
-		.AddGroup(B_VERTICAL)
-			.Add(field)
-			.AddGroup(B_HORIZONTAL)
-				.Add(cancelButton)
-				.Add(probeFileButton)
-				.AddGlue()
-				.Add(probeDeviceButton)
-				.End()
-			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
+	AddChild(BLayoutBuilder::Group<>(B_VERTICAL, B_USE_SMALL_SPACING)
+		.Add(field)
+		.AddGroup(B_HORIZONTAL)
+			.Add(cancelButton)
+			.Add(probeFileButton)
+			.AddGlue()
+			.Add(probeDeviceButton)
 			.End()
+		.SetInsets(B_USE_DEFAULT_SPACING)
 	);
 
 	CenterOnScreen();
