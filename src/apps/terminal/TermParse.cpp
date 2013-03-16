@@ -69,6 +69,10 @@ TermParse::_NextParseChar()
 			throw error;
 	}
 
+#ifdef USE_DEBUG_SNAPSHOTS
+	fBuffer->CaptureChar(fParserBuffer[fParserBufferOffset]);
+#endif
+
 	return fParserBuffer[fParserBufferOffset++];
 }
 
@@ -409,10 +413,6 @@ TermParse::EscParse()
 			}
 
 	//debug_printf("TermParse: char: '%c' (%d), parse state: %d\n", c, c, parsestate[c]);
-
-#ifdef USE_DEBUG_SNAPSHOTS
-			fBuffer->CaptureChar(c);
-#endif
 
 			switch (parsestate[c]) {
 				case CASE_PRINT:
