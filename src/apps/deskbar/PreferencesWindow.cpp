@@ -213,6 +213,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 					B_USE_SMALL_SPACING))
 				.Add(new BButton(B_TRANSLATE("Edit in Tracker"
 					B_UTF8_ELLIPSIS), new BMessage(kEditInTracker)))
+			.AddGlue()
 			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.End()
@@ -222,12 +223,10 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	BBox* windowSettingsBox = new BBox("window");
 	windowSettingsBox->SetLabel(B_TRANSLATE("Window"));
 	windowSettingsBox->AddChild(BLayoutBuilder::Group<>()
-		.AddGroup(B_HORIZONTAL, 0)
-			.AddGrid(B_USE_SMALL_SPACING, 0, 1)
-				.Add(fWindowAlwaysOnTop, 0, 0)
-				.Add(fWindowAutoRaise, 0, 1)
-				.Add(fWindowAutoHide, 1, 0)
-				.End()
+		.AddGroup(B_VERTICAL, 0)
+			.Add(fWindowAlwaysOnTop)
+			.Add(fWindowAutoRaise)
+			.Add(fWindowAutoHide)
 			.AddGlue()
 			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
