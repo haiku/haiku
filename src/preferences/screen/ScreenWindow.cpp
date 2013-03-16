@@ -1,16 +1,17 @@
 /*
- * Copyright 2001-2012, Haiku.
+ * Copyright 2001-2013, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Rafael Romo
- *		Stefano Ceccherini (burton666@libero.it)
+ *		Stephan Aßmus, superstippi@gmx.de
  *		Andrew Bachmann
+ *		Stefano Ceccherini, burton666@libero.it
+ *		Alexandre Deckner, alex@zappotek.com
+ *		Axel Dörfler, axeld@pinc-software.de
  *		Rene Gollent, rene@gollent.com
  *		Thomas Kurschel
- *		Axel Dörfler, axeld@pinc-software.de
- *		Stephan Aßmus <superstippi@gmx.de>
- *		Alexandre Deckner, alex@zappotek.com
+ *		Rafael Romo
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -25,6 +26,7 @@
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Directory.h>
 #include <File.h>
 #include <FindDirectory.h>
@@ -37,6 +39,7 @@
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <Screen.h>
+#include <SpaceLayoutItem.h>
 #include <String.h>
 #include <StringView.h>
 #include <Roster.h>
@@ -209,11 +212,13 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 	// box on the left with workspace count and monitor view
 
 	BBox* screenBox = new BBox("screen box");
-	BGroupLayout* layout = new BGroupLayout(B_VERTICAL, 5.0);
-	layout->SetInsets(10, 10, 10, 10);
+	BGroupLayout* layout = new BGroupLayout(B_VERTICAL, B_USE_SMALL_SPACING);
+	layout->SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
+		B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
 	screenBox->SetLayout(layout);
 
 	fMonitorInfo = new BStringView("monitor info", "");
+	fMonitorInfo->SetAlignment(B_ALIGN_CENTER);
 	screenBox->AddChild(fMonitorInfo);
 
 	fMonitorView = new MonitorView(BRect(0.0, 0.0, 80.0, 80.0),
@@ -221,22 +226,39 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 		screen.Frame().IntegerHeight() + 1);
 	screenBox->AddChild(fMonitorView);
 
+	BStringView* workspaces = new BStringView("workspaces",
+		B_TRANSLATE("Workspaces"));
+	workspaces->SetAlignment(B_ALIGN_CENTER);
+
 	fColumnsControl = new BTextControl(B_TRANSLATE("Columns:"), "0",
 		new BMessage(kMsgWorkspaceColumnsChanged));
+	fColumnsControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	fRowsControl = new BTextControl(B_TRANSLATE("Rows:"), "0",
 		new BMessage(kMsgWorkspaceRowsChanged));
+	fRowsControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 
-	screenBox->AddChild(BLayoutBuilder::Grid<>(5.0, 5.0)
-		.Add(new BStringView("", B_TRANSLATE("Workspaces")), 0, 0, 3)
-		.AddTextControl(fColumnsControl, 0, 1, B_ALIGN_RIGHT)
-		.AddGroup(B_HORIZONTAL, 0, 2, 1)
-			.Add(_CreateColumnRowButton(true, false))
-			.Add(_CreateColumnRowButton(true, true))
-			.End()
-		.AddTextControl(fRowsControl, 0, 2, B_ALIGN_RIGHT)
-		.AddGroup(B_HORIZONTAL, 0, 2, 2)
-			.Add(_CreateColumnRowButton(false, false))
-			.Add(_CreateColumnRowButton(false, true))
+	float tiny = be_control_look->DefaultItemSpacing() / 4;
+	screenBox->AddChild(BLayoutBuilder::Group<>()
+		.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
+			.Add(workspaces)
+			.AddGrid(0.0, tiny)
+				// columns
+				.Add(fColumnsControl->CreateLabelLayoutItem(), 0, 0)
+				.Add(BSpaceLayoutItem::CreateHorizontalStrut(
+					B_USE_SMALL_SPACING), 1, 0)
+				.Add(fColumnsControl->CreateTextViewLayoutItem(), 2, 0)
+				.Add(BSpaceLayoutItem::CreateHorizontalStrut(tiny), 3, 0)
+				.Add(_CreateColumnRowButton(true, false), 4, 0)
+				.Add(_CreateColumnRowButton(true, true), 5, 0)
+				// rows
+				.Add(fRowsControl->CreateLabelLayoutItem(), 0, 1)
+				.Add(BSpaceLayoutItem::CreateHorizontalStrut(
+					B_USE_SMALL_SPACING), 1, 1)
+				.Add(fRowsControl->CreateTextViewLayoutItem(), 2, 1)
+				.Add(BSpaceLayoutItem::CreateHorizontalStrut(tiny), 3, 1)
+				.Add(_CreateColumnRowButton(false, false), 4, 1)
+				.Add(_CreateColumnRowButton(false, true), 5, 1)
+				.End()
 			.End()
 		.View());
 
