@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-BluetoothPrefs	1628593228
+1	portuguese (brazil)	x-vnd.Haiku-BluetoothPrefs	3212620536
 About Bluetooth…	Window		Sobre Bluetooth…
 Handheld	Settings view		Handheld
 Default inquiry time:	Settings view		Tempo de consulta padrão:
@@ -55,6 +55,7 @@ Always ask	Settings view		Sempre perguntar
 Retrieving name of %1	Inquiry panel		Buscando nome de %1
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Verifique que as capacidades Bluetooth do seu dispositivo remoto estão ativadas. Pressione o botão 'Consulta' para iniciar a pesquisa. O tempo necessário para a obtenção dos nomes é desconhecido embora não deva demorar mais que 3 segundos para cada dispositivo. Depois você poderá adicioná-los à sua lista principal, onde poderá emparelhá-los.
 Authenticate	Extended local device view		Autenticar
+Pick device...	Settings view		Selecionar dispositivo…
 Retrieving names...	Inquiry panel		Obtendo nomes...
 Help	Window		Ajuda
 Add…	Remote devices		Adicionar…

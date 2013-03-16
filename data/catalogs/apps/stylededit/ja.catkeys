@@ -17,7 +17,7 @@ Page setup…	Menus		ページ設定…
 Print…	Menus		印刷…
 Can't undo	Menus		元に戻せません
 Save	Menus		保存
-Replace with:	FindandReplaceWindow		置換：
+Replace with:	FindandReplaceWindow		置換:
 Cancel	SaveAlert		中止
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		\"%s\" ファイルが存在しないため、読み込めませんでした。
 Case-sensitive	FindandReplaceWindow		大文字と小文字を区別する
@@ -42,11 +42,11 @@ Default	Open_and_SaveAsPanel		デフォルト
 Replace next	Menus		次を置換
 \"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" に保存されていない変更があります。\n保存された版まで戻しますか? 
 Cancel	FindandReplaceWindow		中止
-Text encoding	Menus		テキストのエンコーディング
+Text encoding	Menus		テキストエンコーディング
 Close	Menus		閉じる
 Save	SaveAlert		保存
 Words:	Statistics		単語数:
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		\"%s\" を読み込み中に不明なエラー発生：\n\tフォーマットがサポートされていません。
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		\"%s\" を読み込み中にエラーが発生しました:\n\t サポートされていないフォーマットです。
 OK	RevertToSavedAlert		Ok
 Don't save	QuitAlert		保存しない
 Align	Menus		配置
@@ -65,8 +65,8 @@ New	Menus		新規作成
 Wrap-around search	FindandReplaceWindow		ラップアラウンド検索
 Bold	Menus		太字
 Find selection	Menus		選択範囲を検索
-Find:	FindandReplaceWindow		検索：
-Error saving \"%s\":\n%s	SaveAlert		\"%s\" を保存中エラーが発生しました：\n%s
+Find:	FindandReplaceWindow		検索:
+Error saving \"%s\":\n%s	SaveAlert		\"%s\" を保存中にエラーが発生しました:\n%s
 Copy	Menus		コピー
 Cut	Menus		切り取り
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		ファイル \"%file%\" はほかのアプリケーションにより変更されています。再読み込みしますか?
@@ -77,7 +77,7 @@ Find…	Menus		検索…
 Select all	Menus		すべて選択
 Don't save	SaveAlert		保存しない
 Recover	NodeMonitorAlerts		回復
-Error loading \"%s\":\n\t%s	LoadAlert		\"%s\" を読み込み中にエラー発生：\n\t%s
+Error loading \"%s\":\n\t%s	LoadAlert		\"%s\" を読み込み中にエラーが発生しました:\n\t %s
 Ignore	NodeMonitorAlerts		無視
 Read-only	StatusView		読み込み専用
 Undo typing	QuitAlert		元に戻す

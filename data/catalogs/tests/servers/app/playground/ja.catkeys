@@ -1,7 +1,7 @@
-1	japanese	x-vnd.Haiku-Playground	3859386218
+1	japanese	x-vnd.Haiku-Playground	1375574837
 Line	Playground		直線
 Fill	Playground		塗りつぶす
-Over	Playground		上書き
+Over	Playground		最前面描画
 Quit	Playground		終了
 Rect	Playground		四角形
 Select	Playground		選択
@@ -11,18 +11,22 @@ Round rect	Playground		角丸四角形
 Alpha:	Playground		不透明度:
 Mode:	Playground		描画モード:
 Submenu	Playground		サブメニュー
-Copy	Playground		コピー
+Copy	Playground		通常描画
 Cancel	Playground		中止
 Clear	Playground		消去
-Blend	Playground		ブレンド
-Invert	Playground		反転
+Min	Playground		RGB最小値
+Blend	Playground		通常合成
+Invert	Playground		ネガの作成
 Clear all drawing objects?	Playground		オブジェクトをすべて削除しても良いですか?
 Width:	Playground		幅:
-Alpha	Playground		アルファ
+Alpha	Playground		アルファ合成
 New object	Playground		新規オブジェクト
 Test	Playground		テスト
-Add	Playground		加算
+Max	Playground		RGB最大値
+Add	Playground		RGB加算
 Playground	System name		プレイグラウンド
+Erase	Playground		排他領域描画
 File	Playground		ファイル
-Subtract	Playground		減算
+Subtract	Playground		RGB減算
+<pick>	Playground		<pick>
 Ellipse	Playground		楕円

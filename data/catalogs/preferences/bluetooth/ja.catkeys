@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-BluetoothPrefs	1628593228
+1	japanese	x-vnd.Haiku-BluetoothPrefs	3212620536
 About Bluetooth…	Window		Bluetoothについて…
 Handheld	Settings view		ハンドヘルド機器
 Default inquiry time:	Settings view		デフォルトの問い合わせ時間：
@@ -55,6 +55,7 @@ Always ask	Settings view		常に確認する
 Retrieving name of %1	Inquiry panel		%1の名前を取得しています
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		リモートデバイスの Bluetooth 機能がアクティブになっていることを確認してください。スキャンを開始するには「問い合わせ」ボタンを押してください。デバイスの名前を取得するに必要な時間は不明ですが、デバイス毎に 3 秒以内に完了すると思われます。その後一覧に追加ができて、ペアリングが可能になります。
 Authenticate	Extended local device view		認証
+Pick device...	Settings view		デバイスの選択...
 Retrieving names...	Inquiry panel		名前を取得しています…
 Help	Window		ヘルプ
 Add…	Remote devices		追加…

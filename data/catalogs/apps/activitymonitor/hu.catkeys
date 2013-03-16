@@ -1,8 +1,9 @@
-1	hungarian	x-vnd.Haiku-ActivityMonitor	3704566709
+1	hungarian	x-vnd.Haiku-ActivityMonitor	1913625522
 P-faults	DataSource		P hibák
 Media nodes	DataSource		Média csomópontok
 Threads	DataSource		Szálak
 MB	DataSource		MB
+Always on top	ActivityWindow		Mindig felül
 Add graph	ActivityWindow		Grafikon hozzáadása
 Teams	DataSource		Csapatok
 Hide legend	ActivityView		Magyarázat elrejtése

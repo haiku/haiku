@@ -9,7 +9,7 @@ This team is already gone…	ProcessController		Team はすでに終了してい
 Error saving file	ProcessController		ファイル保存中にエラーが発生しました
 Real-time priority	ProcessController		リアルタイム優先度
 Your setting file could not be saved!\n(%s)	ProcessController		設定ファイルは保存できませんでした。\n(%s)
-This thread is already gone…	ProcessController		Thread はすでに終了しています…
+This thread is already gone…	ProcessController		スレッドはすでに終了しています…
 Cancel	ProcessController		取り消し
 Display priority	ProcessController		表示優先度
 Run in window	ProcessController		ウィンドウモードで起動
@@ -20,12 +20,12 @@ This is the last active processor...\nYou can't turn it off!	ProcessController		
 Info	ProcessController		情報
 Quit application	ProcessController		アプリケーションを終了
 Low priority	ProcessController		低優先度
-What do you want to do with the thread \"%s\"?	ProcessController		次の thread に対してなにを行いますか\"%s\"?
+What do you want to do with the thread \"%s\"?	ProcessController		スレッド \"%s\" に対してなにを行いますか?
 Gone teams…	ProcessController		終了した team…
 Lowest active priority	ProcessController		最低アクティブ優先度
 Restart Tracker	ProcessController		Tracker を再起動
 Live in the Deskbar	ProcessController		Deskbar 中で実行
-Kill this thread!	ProcessController		Thread を強制終了
+Kill this thread!	ProcessController		スレッドを強制終了
 Debug this thread!	ProcessController		このスレッドをデバッグ
 Normal priority	ProcessController		通常優先度
 New Terminal	ProcessController		ターミナルを起動

@@ -1,8 +1,9 @@
-1	portuguese (brazil)	x-vnd.Haiku-ActivityMonitor	3704566709
+1	portuguese (brazil)	x-vnd.Haiku-ActivityMonitor	1913625522
 P-faults	DataSource		P-falhas
 Media nodes	DataSource		Nós de mídia
 Threads	DataSource		Processos
 MB	DataSource		Mb
+Always on top	ActivityWindow		Sempre visível
 Add graph	ActivityWindow		Adicionar grafo
 Teams	DataSource		Equipes
 Hide legend	ActivityView		Ocultar legenda
