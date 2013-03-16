@@ -181,8 +181,6 @@ BasicTerminalBuffer::Init(int32 width, int32 height, int32 historySize)
 
 	fDirtyInfo.Reset();
 
-	fSavedCursors.push(TermPos(0, 0));
-
 	return B_OK;
 }
 
@@ -926,9 +924,11 @@ BasicTerminalBuffer::SaveCursor()
 void
 BasicTerminalBuffer::RestoreCursor()
 {
+	if (fSavedCursors.size() == 0)
+		return;
+
 	_SetCursor(fSavedCursors.top().x, fSavedCursors.top().y, true);
-	if (fSavedCursors.size() > 1)
-		fSavedCursors.pop();
+	fSavedCursors.pop();
 }
 
 
