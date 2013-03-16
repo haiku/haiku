@@ -42,8 +42,11 @@ static const pref_defaults kTermDefaults[] = {
 	{ PREF_COLS,				"80" },
 	{ PREF_ROWS,				"25" },
 
-	{ PREF_HALF_FONT_FAMILY,	"Courier10 BT" },
-	{ PREF_HALF_FONT_STYLE,		"Regular" },
+//	No need for PREF_HALF_FONT_FAMILY/_STYLE defaults here,
+//	these entries will be filled with corresponding params
+//	of the current system fixed font if they are not
+//	available in the settings file
+
 	{ PREF_HALF_FONT_SIZE,		"12" },
 
 	{ PREF_TEXT_FORE_COLOR,		"  0,   0,   0" },
