@@ -322,7 +322,7 @@ TBarApp::InitSettings()
 			if (prefs.FindBool("hideLabels", &settings.hideLabels) != B_OK)
 				settings.hideLabels = fDefaultSettings.hideLabels;
 			if (prefs.FindInt32("iconSize", &settings.iconSize) != B_OK)
-				settings.hideLabels = fDefaultSettings.hideLabels;
+				settings.iconSize = fDefaultSettings.iconSize;
 			// recent items
 			if (prefs.FindBool("recentDocsEnabled",
 					&settings.recentDocsEnabled) != B_OK) {
