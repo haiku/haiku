@@ -29,6 +29,7 @@ TerminalBuffer::TerminalBuffer()
 	fAlternateScreen(NULL),
 	fAlternateHistory(NULL),
 	fAlternateScreenOffset(0),
+	fAlternateAttributes(0),
 	fColorsPalette(NULL),
 	fListenerValid(false)
 {
@@ -378,5 +379,6 @@ TerminalBuffer::_SwitchScreenBuffer()
 	std::swap(fScreen, fAlternateScreen);
 	std::swap(fHistory, fAlternateHistory);
 	std::swap(fScreenOffset, fAlternateScreenOffset);
+	std::swap(fAttributes, fAlternateAttributes);
 	fAlternateScreenActive = !fAlternateScreenActive;
 }

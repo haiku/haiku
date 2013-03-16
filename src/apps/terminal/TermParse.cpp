@@ -1106,13 +1106,13 @@ TermParse::EscParse()
 
 				case CASE_DECSC:
 					/* DECSC */
-					_DecSaveCursor();
+					fBuffer->SaveCursor();
 					parsestate = groundtable;
 					break;
 
 				case CASE_DECRC:
 					/* DECRC */
-					_DecRestoreCursor();
+					fBuffer->RestoreCursor();
 					parsestate = groundtable;
 					break;
 
@@ -1466,7 +1466,7 @@ TermParse::_DecPrivateModeSet(int value)
 		case 1049:
 			// Save cursor as in DECSC and use Alternate Screen Buffer, clearing
 			// it first.
-			_DecSaveCursor();
+			fBuffer->SaveCursor();
 			fBuffer->UseAlternateScreenBuffer(true);
 			break;
 	}
@@ -1541,27 +1541,9 @@ TermParse::_DecPrivateModeReset(int value)
 		case 1049:
 			// Use Normal Screen Buffer and restore cursor as in DECRC.
 			fBuffer->UseNormalScreenBuffer();
-			_DecRestoreCursor();
+			fBuffer->RestoreCursor();
 			break;
 	}
-}
-
-
-void
-TermParse::_DecSaveCursor()
-{
-	fBuffer->SaveCursor();
-	fBuffer->SaveOriginMode();
-	fBuffer->PreserveAttributes(true);
-}
-
-
-void
-TermParse::_DecRestoreCursor()
-{
-	fBuffer->RestoreCursor();
-	fBuffer->RestoreOriginMode();
-	fBuffer->PreserveAttributes(false);
 }
 
 

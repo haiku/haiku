@@ -114,7 +114,6 @@ public:
 
 	inline	uint32				GetAttributes();
 	inline	void				SetAttributes(uint32 attributes);
-	inline	void				PreserveAttributes(bool store);
 
 			// snapshots and data capture for debugging
 			void				MakeLinesSnapshots(time_t timeStamp,
@@ -225,7 +224,6 @@ protected:
 			HistoryBuffer*		fHistory;
 
 			uint32				fAttributes;
-			uint32				fSavedAttributes;
 
 			// cursor position (origin: (0, 0))
 			TermPos				fCursor;
@@ -271,16 +269,6 @@ void
 BasicTerminalBuffer::SetAttributes(uint32 attributes)
 {
 	fAttributes = attributes;
-}
-
-
-void
-BasicTerminalBuffer::PreserveAttributes(bool store)
-{
-	if (store)
-		fSavedAttributes = fAttributes;
-	else
-		fAttributes = fSavedAttributes;
 }
 
 

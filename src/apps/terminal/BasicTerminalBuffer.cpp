@@ -113,7 +113,6 @@ BasicTerminalBuffer::BasicTerminalBuffer()
 	fScreenOffset(0),
 	fHistory(NULL),
 	fAttributes(0),
-	fSavedAttributes(0),
 	fSoftWrappedCursor(false),
 	fOverwriteMode(false),
 	fAlternateScreenActive(false),
