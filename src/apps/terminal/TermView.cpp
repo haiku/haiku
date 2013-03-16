@@ -551,7 +551,7 @@ TermView::Columns() const
 
 //! Set number of rows and columns in terminal
 BRect
-TermView::SetTermSize(int rows, int columns)
+TermView::SetTermSize(int rows, int columns, bool notifyShell)
 {
 //debug_printf("TermView::SetTermSize(%d, %d)\n", rows, columns);
 	if (rows > 0)
@@ -591,6 +591,9 @@ TermView::SetTermSize(int rows, int columns)
 			offset + rows + 2);
 	}
 
+	if (notifyShell)
+		fFrameResized = true;
+
 	return rect;
 }
 
@@ -602,7 +605,7 @@ TermView::SetTermSize(BRect rect)
 	int columns;
 
 	GetTermSizeFromRect(rect, &rows, &columns);
-	SetTermSize(rows, columns);
+	SetTermSize(rows, columns, false);
 }
 
 
@@ -1575,9 +1578,7 @@ TermView::FrameResized(float width, float height)
 	if (fResizeViewDisableCount > 0)
 		fResizeViewDisableCount--;
 
-	SetTermSize(rows, columns);
-
-	fFrameResized = true;
+	SetTermSize(rows, columns, true);
 }
 
 

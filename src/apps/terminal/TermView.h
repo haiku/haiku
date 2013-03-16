@@ -72,7 +72,8 @@ public:
 			void				GetFontSize(int* width, int* height);
 			int					Rows() const;
 			int					Columns() const;
-			BRect				SetTermSize(int rows, int cols);
+			BRect				SetTermSize(int rows, int cols,
+									bool notifyShell);
 			void				SetTermSize(BRect rect);
 			void				GetTermSizeFromRect(const BRect &rect,
 									int *rows, int *columns);

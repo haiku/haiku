@@ -817,7 +817,7 @@ TermWindow::MessageReceived(BMessage *message)
 
 			for (int32 i = 0; i < fTabView->CountTabs(); i++) {
 				TermView* view = _TermViewAt(i);
-				view->SetTermSize(rows, columns);
+				view->SetTermSize(rows, columns, true);
 				_ResizeView(view);
 			}
 			break;
