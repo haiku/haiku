@@ -270,9 +270,11 @@ Inode::_GetTimespec(uint16 date, uint16 time, struct timespec &timespec) const
 	if (tzoffset == -1)
 		tzoffset = get_timezone_offset() / 60;
 
-	time_t days = daze[(date>>5)&15] + ((date>>9)+10)*365 + leaps((date>>9)+10,((date>>5)&15)-1)+(date&31)-1;
+	time_t days = daze[(date >> 5) & 15] + ((date >> 9) + 10) * 365
+		+ leaps((date >> 9) + 10, ((date >> 5) & 15) - 1) + (date & 31) -1;
 
-	timespec.tv_sec = ((days * 24 + (time >> 11)) * 60 + ((time>>5)&63) + tzoffset) * 60 + 2*(time&31);
+	timespec.tv_sec = ((days * 24 + (time >> 11)) * 60 + ((time >> 5) & 63)
+		- tzoffset) * 60 + 2 * (time & 31);
 	timespec.tv_nsec = 0;
 }
 
