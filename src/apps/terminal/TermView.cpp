@@ -24,6 +24,7 @@
 
 #include <algorithm>
 #include <new>
+#include <vector>
 
 #include <Alert.h>
 #include <Application.h>
@@ -144,28 +145,34 @@ restrict_value(const Type& value, const Type& min, const Type& max)
 class TermView::CharClassifier : public TerminalCharClassifier {
 public:
 	CharClassifier(const char* specialWordChars)
-		:
-		fSpecialWordChars(specialWordChars)
 	{
+		const char* p = specialWordChars;
+		while (p != NULL && *p) {
+			int count = UTF8Char::ByteCount(*p);
+			if (count <= 0 || count > 4)
+				break;
+			fSpecialWordChars.push_back(UTF8Char(p, count));
+			p += count;
+		}
 	}
 
-	virtual int Classify(const char* character)
+	virtual int Classify(const UTF8Char& character)
 	{
-		// TODO: Deal correctly with non-ASCII chars.
-		char c = *character;
-		if (UTF8Char::ByteCount(c) > 1)
+		if (character.IsSpace())
+			return CHAR_TYPE_SPACE;
+
+		if (character.IsAlNum())
 			return CHAR_TYPE_WORD_CHAR;
 
-		if (isspace(c))
-			return CHAR_TYPE_SPACE;
-		if (isalnum(c) || strchr(fSpecialWordChars, c) != NULL)
+		if (std::find(fSpecialWordChars.begin(), fSpecialWordChars.end(),
+			character) != fSpecialWordChars.end())
 			return CHAR_TYPE_WORD_CHAR;
 
 		return CHAR_TYPE_WORD_DELIMITER;
 	}
 
 private:
-	const char*	fSpecialWordChars;
+	std::vector<UTF8Char> fSpecialWordChars;
 };
 
 

@@ -421,7 +421,7 @@ BasicTerminalBuffer::FindWord(const TermPos& pos,
 		x--;
 
 	// get the char type at the given position
-	int type = classifier->Classify(line->cells[x].character.bytes);
+	int type = classifier->Classify(line->cells[x].character);
 
 	// check whether we are supposed to find words only
 	if (type != CHAR_TYPE_WORD_CHAR && !findNonWords)
@@ -444,7 +444,7 @@ BasicTerminalBuffer::FindWord(const TermPos& pos,
 		if (x > 0 && IS_WIDTH(line->cells[x - 1].attributes))
 			x--;
 
-		if (classifier->Classify(line->cells[x].character.bytes) != type)
+		if (classifier->Classify(line->cells[x].character) != type)
 			break;
 
 		start.SetTo(x, y);
@@ -467,7 +467,7 @@ BasicTerminalBuffer::FindWord(const TermPos& pos,
 				break;
 		}
 
-		if (classifier->Classify(line->cells[x].character.bytes) != type)
+		if (classifier->Classify(line->cells[x].character) != type)
 			break;
 
 		x += IS_WIDTH(line->cells[x].attributes) ? 2 : 1;
