@@ -65,4 +65,5 @@ void
 rldexport_init(void)
 {
 	gRuntimeLoader.program_args = gProgramArgs;
+	gRuntimeLoader.commpage_address = __gCommPageAddress;
 }

@@ -221,8 +221,9 @@ arch_thread_enter_userspace(Thread* thread, addr_t entry, void* args1,
 	// Copy the address of the stub that calls exit_thread() when the thread
 	// entry function returns to the top of the stack to act as the return
 	// address. The stub is inside commpage.
-	addr_t codeAddr = *(addr_t*)(USER_COMMPAGE_ADDR
-		+ COMMPAGE_ENTRY_X86_THREAD_EXIT * sizeof(addr_t));
+	addr_t commPageAddress = (addr_t)thread->team->commpage_address;
+	addr_t codeAddr = ((addr_t*)commPageAddress)[COMMPAGE_ENTRY_X86_THREAD_EXIT]
+		+ commPageAddress;
 	stackTop -= sizeof(codeAddr);
 	if (user_memcpy((void*)stackTop, (const void*)&codeAddr, sizeof(codeAddr))
 			!= B_OK)
@@ -341,8 +342,10 @@ arch_setup_signal_frame(Thread* thread, struct sigaction* action,
 
 	// Set up the iframe to execute the signal handler wrapper on our prepared
 	// stack. First argument points to the frame data.
+	addr_t* commPageAddress = (addr_t*)thread->team->commpage_address;
 	frame->user_sp = (addr_t)userStack;
-	frame->ip = ((addr_t*)USER_COMMPAGE_ADDR)[COMMPAGE_ENTRY_X86_SIGNAL_HANDLER];
+	frame->ip = commPageAddress[COMMPAGE_ENTRY_X86_SIGNAL_HANDLER]
+		+ (addr_t)commPageAddress;
 	frame->di = (addr_t)userSignalFrameData;
 
 	return B_OK;

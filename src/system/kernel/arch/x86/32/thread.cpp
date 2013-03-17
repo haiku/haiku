@@ -226,8 +226,9 @@ arch_thread_enter_userspace(Thread* thread, addr_t entry, void* args1,
 	// Copy the address of the stub that calls exit_thread() when the thread
 	// entry function returns to the top of the stack to act as the return
 	// address. The stub is inside commpage.
-	args[0] = *(addr_t*)(USER_COMMPAGE_ADDR
-		+ COMMPAGE_ENTRY_X86_THREAD_EXIT * sizeof(addr_t));
+	addr_t commPageAddress = (addr_t)thread->team->commpage_address;
+	args[0] = ((addr_t*)commPageAddress)[COMMPAGE_ENTRY_X86_THREAD_EXIT]
+		+ commPageAddress;
 	args[1] = (uint32)args1;
 	args[2] = (uint32)args2;
 	stackTop -= sizeof(args);
@@ -351,7 +352,8 @@ arch_setup_signal_frame(Thread* thread, struct sigaction* action,
 	// the prepared stack, executing the signal handler wrapper function.
 	frame->user_sp = (addr_t)userStack;
 	frame->ip = x86_get_user_signal_handler_wrapper(
-		(action->sa_flags & SA_BEOS_COMPATIBLE_HANDLER) != 0);
+		(action->sa_flags & SA_BEOS_COMPATIBLE_HANDLER) != 0,
+		thread->team->commpage_address);
 
 	return B_OK;
 }

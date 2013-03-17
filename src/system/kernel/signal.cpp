@@ -892,6 +892,10 @@ setup_signal_frame(Thread* thread, struct sigaction* action, Signal* signal,
 	memcpy(frameData.syscall_restart_parameters,
 		thread->syscall_restart.parameters,
 		sizeof(frameData.syscall_restart_parameters));
+
+	// commpage address
+	frameData.commpage_address = thread->team->commpage_address;
+
 	// syscall_restart_return_value is filled in by the architecture specific
 	// code.
 

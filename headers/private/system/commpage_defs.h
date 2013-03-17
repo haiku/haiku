@@ -19,11 +19,6 @@
 #define COMMPAGE_SIGNATURE 'COMM'
 #define COMMPAGE_VERSION 1
 
-#define USER_COMMPAGE_ADDR	ARCH_USER_COMMPAGE_ADDR
-	// set by the architecture specific implementation
-
-#define USER_COMMPAGE_TABLE	((void**)(USER_COMMPAGE_ADDR))
-
 #include <arch_commpage_defs.h>
 
 #endif	/* _SYSTEM_COMMPAGE_DEFS_H */

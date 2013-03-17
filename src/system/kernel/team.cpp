@@ -26,6 +26,7 @@
 
 #include <extended_system_info_defs.h>
 
+#include <commpage.h>
 #include <boot_device.h>
 #include <elf.h>
 #include <file_cache.h>
@@ -449,6 +450,8 @@ Team::Team(team_id id, bool kernel)
 	used_user_data = 0;
 	user_data_size = 0;
 	free_user_threads = NULL;
+
+	commpage_address = NULL;
 
 	supplementary_groups = NULL;
 	supplementary_group_count = 0;
@@ -1562,6 +1565,32 @@ team_create_thread_start_internal(void* args)
 		// the arguments are already on the user stack, we no longer need
 		// them in this form
 
+	// Clone commpage area
+	area_id commPageArea = clone_commpage_area(team->id,
+		&team->commpage_address);
+	if (commPageArea  < B_OK) {
+		TRACE(("team_create_thread_start: clone_commpage_area() failed: %s\n",
+			strerror(commPageArea)));
+		return commPageArea;
+	}
+
+	// Register commpage image
+	image_id commPageImage = get_commpage_image();
+	image_info imageInfo;
+	err = get_image_info(commPageImage, &imageInfo);
+	if (err != B_OK) {
+		TRACE(("team_create_thread_start: get_image_info() failed: %s\n",
+			strerror(err)));
+		return err;
+	}
+	imageInfo.text = team->commpage_address;
+	image_id image = register_image(team, &imageInfo, sizeof(image_info));
+	if (image < 0) {
+		TRACE(("team_create_thread_start: register_image() failed: %s\n",
+			strerror(image)));
+		return image;
+	}
+
 	// NOTE: Normally arch_thread_enter_userspace() never returns, that is
 	// automatic variables with function scope will never be destroyed.
 	{
@@ -1595,7 +1624,7 @@ team_create_thread_start_internal(void* args)
 
 	// enter userspace -- returns only in case of error
 	return thread_enter_userspace_new_team(thread, (addr_t)entry,
-		programArgs, NULL);
+		programArgs, team->commpage_address);
 }
 
 
@@ -1994,6 +2023,8 @@ fork_team(void)
 
 	team->SetName(parentTeam->Name());
 	team->SetArgs(parentTeam->Args());
+
+	team->commpage_address = parentTeam->commpage_address;
 
 	// Inherit the parent's user/group.
 	inherit_parent_user_and_group(team, parentTeam);

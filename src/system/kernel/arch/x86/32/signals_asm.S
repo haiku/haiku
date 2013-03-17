@@ -37,7 +37,8 @@ FUNCTION(x86_signal_frame_function_beos):
 	lea		SIGNAL_FRAME_DATA_context + UCONTEXT_T_uc_mcontext(%esi), %eax
 	push	%eax
 	push	%edi
-	movl	USER_COMMPAGE_ADDR + 4 * COMMPAGE_ENTRY_X86_MEMCPY, %eax
+	movl	SIGNAL_FRAME_DATA_commpage_address(%esi), %eax
+	addl	4 * COMMPAGE_ENTRY_X86_MEMCPY(%eax), %eax
 	call	*%eax
 	addl	$12, %esp
 
@@ -57,7 +58,8 @@ FUNCTION(x86_signal_frame_function_beos):
 	push	%edi
 	lea		SIGNAL_FRAME_DATA_context + UCONTEXT_T_uc_mcontext(%esi), %eax
 	push	%eax
-	movl	USER_COMMPAGE_ADDR + 4 * COMMPAGE_ENTRY_X86_MEMCPY, %eax
+	movl	SIGNAL_FRAME_DATA_commpage_address(%esi), %eax
+	addl	4 * COMMPAGE_ENTRY_X86_MEMCPY(%eax), %eax
 	call	*%eax
 	addl	$12 + VREGS_sizeof, %esp
 

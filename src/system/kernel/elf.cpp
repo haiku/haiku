@@ -23,6 +23,7 @@
 #include <algorithm>
 
 #include <AutoDeleter.h>
+#include <commpage.h>
 #include <boot/kernel_args.h>
 #include <debug.h>
 #include <image_defs.h>
@@ -1363,6 +1364,7 @@ public:
 		if (!_Read((runtime_loader_debug_area*)area->Base(), fDebugArea))
 			return B_BAD_ADDRESS;
 
+		fTeam = team;
 		return B_OK;
 	}
 
@@ -1381,8 +1383,22 @@ public:
 		// get the image for the address
 		image_t image;
 		status_t error = _FindImageAtAddress(address, image);
-		if (error != B_OK)
+		if (error != B_OK) {
+			// commpage requires special treatment since kernel stores symbol
+			// information
+			addr_t commPageAddress = (addr_t)fTeam->commpage_address;
+			if (address >= commPageAddress
+				&& address < commPageAddress + COMMPAGE_SIZE) {
+				if (*_imageName)
+					*_imageName = "commpage";
+				address -= (addr_t)commPageAddress;
+				error = elf_debug_lookup_symbol_address(address, _baseAddress,
+					_symbolName, NULL, _exactMatch);
+				if (_baseAddress)
+					*_baseAddress += (addr_t)fTeam->commpage_address;
+			}
 			return error;
+		}
 
 		strlcpy(fImageName, image.name, sizeof(fImageName));
 
@@ -1522,6 +1538,7 @@ public:
 		// gcc 2.95.3 doesn't like it defined in-place
 
 private:
+	Team*						fTeam;
 	runtime_loader_debug_area	fDebugArea;
 	char						fImageName[B_OS_NAME_LENGTH];
 	char						fSymbolName[256];

@@ -22,6 +22,7 @@
 
 
 struct user_space_program_args *gProgramArgs;
+void *__gCommPageAddress;
 
 
 static const char *
@@ -366,12 +367,13 @@ out:
 	specified by its ld-script.
 */
 int
-runtime_loader(void *_args)
+runtime_loader(void* _args, void* commpage)
 {
 	void *entry = NULL;
 	int returnCode;
 
 	gProgramArgs = (struct user_space_program_args *)_args;
+	__gCommPageAddress = commpage;
 
 	// Relocate the args and env arrays -- they are organized in a contiguous
 	// buffer which the kernel just copied into user space without adjusting the

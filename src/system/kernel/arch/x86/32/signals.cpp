@@ -89,14 +89,13 @@ register_signal_handler_function(const char* functionName, int32 commpageIndex,
 	ASSERT(expectedAddress == symbolInfo.address);
 
 	// fill in the commpage table entry
-	fill_commpage_entry(commpageIndex, (void*)symbolInfo.address,
-		symbolInfo.size);
+	addr_t position = fill_commpage_entry(commpageIndex,
+		(void*)symbolInfo.address, symbolInfo.size);
 
 	// add symbol to the commpage image
 	image_id image = get_commpage_image();
-	elf_add_memory_image_symbol(image, commpageSymbolName,
-		((addr_t*)USER_COMMPAGE_ADDR)[commpageIndex], symbolInfo.size,
-		B_SYMBOL_TYPE_TEXT);
+	elf_add_memory_image_symbol(image, commpageSymbolName, position,
+		symbolInfo.size, B_SYMBOL_TYPE_TEXT);
 }
 
 
@@ -116,10 +115,10 @@ x86_initialize_commpage_signal_handler()
 
 
 addr_t
-x86_get_user_signal_handler_wrapper(bool beosHandler)
+x86_get_user_signal_handler_wrapper(bool beosHandler, void* commPageAdddress)
 {
 	int32 index = beosHandler
 		? COMMPAGE_ENTRY_X86_SIGNAL_HANDLER_BEOS
 		: COMMPAGE_ENTRY_X86_SIGNAL_HANDLER;
-	return ((addr_t*)USER_COMMPAGE_ADDR)[index];
+	return ((addr_t*)commPageAdddress)[index] + (addr_t)commPageAdddress;
 }

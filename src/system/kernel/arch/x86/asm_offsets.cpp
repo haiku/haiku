@@ -34,7 +34,11 @@ dummy()
 	DEFINE_OFFSET_MACRO(CPU_ENT, cpu_ent, fault_handler);
 	DEFINE_OFFSET_MACRO(CPU_ENT, cpu_ent, fault_handler_stack_pointer);
 
+	// struct Team
+	DEFINE_OFFSET_MACRO(TEAM, Team, commpage_address);
+
 	// struct Thread
+	DEFINE_OFFSET_MACRO(THREAD, Thread, team);
 	DEFINE_OFFSET_MACRO(THREAD, Thread, time_lock);
 	DEFINE_OFFSET_MACRO(THREAD, Thread, kernel_time);
 	DEFINE_OFFSET_MACRO(THREAD, Thread, user_time);
@@ -88,6 +92,7 @@ dummy()
 	DEFINE_OFFSET_MACRO(SIGNAL_FRAME_DATA, signal_frame_data, user_data);
 	DEFINE_OFFSET_MACRO(SIGNAL_FRAME_DATA, signal_frame_data, handler);
 	DEFINE_OFFSET_MACRO(SIGNAL_FRAME_DATA, signal_frame_data, siginfo_handler);
+	DEFINE_OFFSET_MACRO(SIGNAL_FRAME_DATA, signal_frame_data, commpage_address);
 
 	// struct ucontext_t
 	DEFINE_OFFSET_MACRO(UCONTEXT_T, __ucontext_t, uc_mcontext);

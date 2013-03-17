@@ -9,7 +9,6 @@
 
 #include <AutoDeleter.h>
 
-#include <commpage_defs.h>
 #include <kernel.h>
 #include <util/AutoLock.h>
 #include <vm/vm.h>
@@ -256,12 +255,6 @@ BreakpointManager::CanAccessAddress(const void* _address, bool write)
 	// user addresses are always fine
 	if (IS_USER_ADDRESS(address))
 		return true;
-
-	// a commpage address can at least be read
-	if (address >= USER_COMMPAGE_ADDR
-		&& address < USER_COMMPAGE_ADDR + COMMPAGE_SIZE) {
-		return !write;
-	}
 
 	return false;
 }

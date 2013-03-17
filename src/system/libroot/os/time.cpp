@@ -24,10 +24,11 @@ static struct real_time_data* sRealTimeData;
 
 
 void
-__init_time(void)
+__init_time(addr_t commPageTable)
 {
 	sRealTimeData = (struct real_time_data*)
-		USER_COMMPAGE_TABLE[COMMPAGE_ENTRY_REAL_TIME_DATA];
+		(((addr_t*)commPageTable)[COMMPAGE_ENTRY_REAL_TIME_DATA]
+			+ commPageTable);
 
 	__arch_init_time(sRealTimeData, false);
 }

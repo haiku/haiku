@@ -864,28 +864,26 @@ arch_cpu_init_post_modules(kernel_args* args)
 	// put the optimized functions into the commpage
 	size_t memcpyLen = (addr_t)gOptimizedFunctions.memcpy_end
 		- (addr_t)gOptimizedFunctions.memcpy;
-	fill_commpage_entry(COMMPAGE_ENTRY_X86_MEMCPY,
+	addr_t memcpyPosition = fill_commpage_entry(COMMPAGE_ENTRY_X86_MEMCPY,
 		(const void*)gOptimizedFunctions.memcpy, memcpyLen);
 	size_t memsetLen = (addr_t)gOptimizedFunctions.memset_end
 		- (addr_t)gOptimizedFunctions.memset;
-	fill_commpage_entry(COMMPAGE_ENTRY_X86_MEMSET,
+	addr_t memsetPosition = fill_commpage_entry(COMMPAGE_ENTRY_X86_MEMSET,
 		(const void*)gOptimizedFunctions.memset, memsetLen);
 	size_t threadExitLen = (addr_t)x86_end_userspace_thread_exit
 		- (addr_t)x86_userspace_thread_exit;
-	fill_commpage_entry(COMMPAGE_ENTRY_X86_THREAD_EXIT,
-		(const void*)x86_userspace_thread_exit, threadExitLen);
+	addr_t threadExitPosition = fill_commpage_entry(
+		COMMPAGE_ENTRY_X86_THREAD_EXIT, (const void*)x86_userspace_thread_exit,
+		threadExitLen);
 
 	// add the functions to the commpage image
 	image_id image = get_commpage_image();
-	elf_add_memory_image_symbol(image, "commpage_memcpy",
-		((addr_t*)USER_COMMPAGE_ADDR)[COMMPAGE_ENTRY_X86_MEMCPY], memcpyLen,
-		B_SYMBOL_TYPE_TEXT);
-	elf_add_memory_image_symbol(image, "commpage_memset",
-		((addr_t*)USER_COMMPAGE_ADDR)[COMMPAGE_ENTRY_X86_MEMSET], memsetLen,
-		B_SYMBOL_TYPE_TEXT);
+	elf_add_memory_image_symbol(image, "commpage_memcpy", memcpyPosition,
+		memcpyLen, B_SYMBOL_TYPE_TEXT);
+	elf_add_memory_image_symbol(image, "commpage_memset", memsetPosition,
+		memsetLen, B_SYMBOL_TYPE_TEXT);
 	elf_add_memory_image_symbol(image, "commpage_thread_exit",
-		((addr_t*)USER_COMMPAGE_ADDR)[COMMPAGE_ENTRY_X86_THREAD_EXIT],
-		threadExitLen, B_SYMBOL_TYPE_TEXT);
+		threadExitPosition, threadExitLen, B_SYMBOL_TYPE_TEXT);
 
 	return B_OK;
 }

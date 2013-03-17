@@ -259,6 +259,8 @@ struct Team : TeamThreadIteratorEntry<team_id>, KernelReferenceable,
 	size_t			used_user_data;
 	struct free_user_thread* free_user_threads;
 
+	void*			commpage_address;
+
 	struct team_debug_info debug_info;
 
 	// protected by scheduler lock

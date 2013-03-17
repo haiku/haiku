@@ -34,7 +34,7 @@ void __init_env(const struct user_space_program_args *args);
 void __init_heap(void);
 void __init_heap_post_env(void);
 
-void __init_time(void);
+void __init_time(addr_t commPageTable);
 void __arch_init_time(struct real_time_data *data, bool setDefaults);
 bigtime_t __arch_get_system_time_offset(struct real_time_data *data);
 bigtime_t __get_system_time_offset();
