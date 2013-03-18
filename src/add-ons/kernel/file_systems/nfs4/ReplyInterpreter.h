@@ -108,6 +108,8 @@ public:
 private:
 			void		_ParseHeader();
 
+	static	const char*	_FlattenPathname(XDR::ReadStream& stream);
+
 			status_t	_DecodeAttrs(XDR::ReadStream& stream, AttrValue** attrs,
 							uint32* count);
 			status_t	_OperationError(Opcode op);

@@ -522,17 +522,17 @@ ReplyInterpreter::Write(uint32* size)
 }
 
 
-static const char*
-sFlattenPathname(XDR::ReadStream& str)
+const char*
+ReplyInterpreter::_FlattenPathname(XDR::ReadStream& stream)
 {
-	uint32 count = str.GetUInt();
+	uint32 count = stream.GetUInt();
 	char* pathname = NULL;
 	uint32 size = 0;
 	for (uint32 i = 0; i < count; i++) {
-		const char* path = str.GetString();
+		const char* path = stream.GetString();
 		size += strlen(path) + 1;
 		if (pathname == NULL) {
-			pathname = reinterpret_cast<char*>(malloc(strlen(path + 1)));
+			pathname = reinterpret_cast<char*>(malloc(strlen(path) + 1));
 			pathname[0] = '\0';
 		} else {
 			*pathname++ = '/';
@@ -657,11 +657,11 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 		values[current].fAttribute = FATTR4_FS_LOCATIONS;
 
 		FSLocations* locs = new FSLocations;
-		locs->fRootPath = sFlattenPathname(stream);
+		locs->fRootPath = _FlattenPathname(stream);
 		locs->fCount = stream.GetUInt();
 		locs->fLocations = new FSLocation[locs->fCount];
 		for (uint32 i = 0; i < locs->fCount; i++) {
-			locs->fLocations[i].fRootPath = sFlattenPathname(stream);
+			locs->fLocations[i].fRootPath = _FlattenPathname(stream);
 			locs->fLocations[i].fCount = stream.GetUInt();
 			locs->fLocations[i].fLocations
 				= new const char*[locs->fLocations[i].fCount];
