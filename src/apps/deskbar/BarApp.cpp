@@ -289,76 +289,54 @@ TBarApp::InitSettings()
 		BMessage prefs;
 		if (fSettingsFile->InitCheck() == B_OK
 			&& prefs.Unflatten(fSettingsFile) == B_OK) {
-			if (prefs.FindBool("vertical", &settings.vertical) != B_OK)
-				settings.vertical = fDefaultSettings.vertical;
-			if (prefs.FindBool("left", &settings.left) != B_OK)
-				settings.left = fDefaultSettings.left;
-			if (prefs.FindBool("top", &settings.top) != B_OK)
-				settings.top = fDefaultSettings.top;
-			if (prefs.FindUInt32("state", &settings.state) != B_OK)
-				settings.state = fDefaultSettings.state;
-			if (prefs.FindFloat("width", &settings.width) != B_OK)
-				settings.width = fDefaultSettings.width;
-			if (prefs.FindPoint("switcherLoc", &settings.switcherLoc) != B_OK)
-				settings.switcherLoc = fDefaultSettings.switcherLoc;
-			if (prefs.FindBool("showClock", &settings.showClock) != B_OK)
-				settings.showClock = fDefaultSettings.showClock;
+			settings.vertical = prefs.GetBool("vertical",
+				fDefaultSettings.vertical);
+			settings.left = prefs.GetBool("left",
+				fDefaultSettings.left);
+			settings.top = prefs.GetBool("top",
+				fDefaultSettings.top);
+			settings.state = prefs.GetUInt32("state",
+				fDefaultSettings.state);
+			settings.width = prefs.GetFloat("width",
+				fDefaultSettings.width);
+			settings.switcherLoc = prefs.GetPoint("switcherLoc",
+				fDefaultSettings.switcherLoc);
+			settings.showClock = prefs.GetBool("showClock",
+				fDefaultSettings.showClock);
 			// applications
-			if (prefs.FindBool("trackerAlwaysFirst",
-					&settings.trackerAlwaysFirst) != B_OK) {
-				settings.trackerAlwaysFirst
-					= fDefaultSettings.trackerAlwaysFirst;
-			}
-			if (prefs.FindBool("sortRunningApps",
-					&settings.sortRunningApps) != B_OK) {
-				settings.sortRunningApps = fDefaultSettings.sortRunningApps;
-			}
-			if (prefs.FindBool("superExpando", &settings.superExpando) != B_OK)
-				settings.superExpando = fDefaultSettings.superExpando;
-			if (prefs.FindBool("expandNewTeams",
-					&settings.expandNewTeams) != B_OK) {
-				settings.expandNewTeams = fDefaultSettings.expandNewTeams;
-			}
-			if (prefs.FindBool("hideLabels", &settings.hideLabels) != B_OK)
-				settings.hideLabels = fDefaultSettings.hideLabels;
-			if (prefs.FindInt32("iconSize", &settings.iconSize) != B_OK)
-				settings.iconSize = fDefaultSettings.iconSize;
+			settings.trackerAlwaysFirst = prefs.GetBool("trackerAlwaysFirst",
+				fDefaultSettings.trackerAlwaysFirst);
+			settings.sortRunningApps = prefs.GetBool("sortRunningApps",
+				fDefaultSettings.sortRunningApps);
+			settings.superExpando = prefs.GetBool("superExpando",
+				fDefaultSettings.superExpando);
+			settings.expandNewTeams = prefs.GetBool("expandNewTeams",
+				fDefaultSettings.expandNewTeams);
+			settings.hideLabels = prefs.GetBool("hideLabels",
+				fDefaultSettings.hideLabels);
+			settings.iconSize = prefs.GetInt32("iconSize",
+				fDefaultSettings.iconSize);
 			// recent items
-			if (prefs.FindBool("recentDocsEnabled",
-					&settings.recentDocsEnabled) != B_OK) {
-				settings.recentDocsEnabled
-					= fDefaultSettings.recentDocsEnabled;
-			}
-			if (prefs.FindBool("recentFoldersEnabled",
-					&settings.recentFoldersEnabled) != B_OK) {
-				settings.recentFoldersEnabled
-					= fDefaultSettings.recentFoldersEnabled;
-			}
-			if (prefs.FindBool("recentAppsEnabled",
-					&settings.recentAppsEnabled) != B_OK) {
-				settings.recentAppsEnabled
-					= fDefaultSettings.recentAppsEnabled;
-			}
-			if (prefs.FindInt32("recentDocsCount",
-					&settings.recentDocsCount) != B_OK) {
-				settings.recentDocsCount = fDefaultSettings.recentDocsCount;
-			}
-			if (prefs.FindInt32("recentFoldersCount",
-					&settings.recentFoldersCount) != B_OK) {
-				settings.recentFoldersCount
-					= fDefaultSettings.recentFoldersCount;
-			}
-			if (prefs.FindInt32("recentAppsCount",
-					&settings.recentAppsCount) != B_OK) {
-				settings.recentAppsCount = fDefaultSettings.recentAppsCount;
-			}
+			settings.recentDocsEnabled = prefs.GetBool("recentDocsEnabled",
+				fDefaultSettings.recentDocsEnabled);
+			settings.recentFoldersEnabled
+				= prefs.GetBool("recentFoldersEnabled",
+					fDefaultSettings.recentFoldersEnabled);
+			settings.recentAppsEnabled = prefs.GetBool("recentAppsEnabled",
+				fDefaultSettings.recentAppsEnabled);
+			settings.recentDocsCount = prefs.GetInt32("recentDocsCount",
+				fDefaultSettings.recentDocsCount);
+			settings.recentFoldersCount = prefs.GetInt32("recentFoldersCount",
+				fDefaultSettings.recentFoldersCount);
+			settings.recentAppsCount = prefs.GetInt32("recentAppsCount",
+				fDefaultSettings.recentAppsCount);
 			// window
-			if (prefs.FindBool("alwaysOnTop", &settings.alwaysOnTop) != B_OK)
-				settings.alwaysOnTop = fDefaultSettings.alwaysOnTop;
-			if (prefs.FindBool("autoRaise", &settings.autoRaise) != B_OK)
-				settings.autoRaise = fDefaultSettings.autoRaise;
-			if (prefs.FindBool("autoHide", &settings.autoHide) != B_OK)
-				settings.autoHide = fDefaultSettings.autoHide;
+			settings.alwaysOnTop = prefs.GetBool("alwaysOnTop",
+				fDefaultSettings.alwaysOnTop);
+			settings.autoRaise = prefs.GetBool("autoRaise",
+				fDefaultSettings.autoRaise);
+			settings.autoHide = prefs.GetBool("autoHide",
+				fDefaultSettings.autoHide);
 		}
 
 		filePath = dirPath;
@@ -372,9 +350,9 @@ TBarApp::InitSettings()
 
 		if (fClockSettingsFile->InitCheck() == B_OK
 			&& prefs.Unflatten(fClockSettingsFile) == B_OK) {
-			prefs.FindBool("showSeconds", &clock.showSeconds);
-			prefs.FindBool("showDayOfWeek", &clock.showDayOfWeek);
-			prefs.FindBool("showTimeZone", &clock.showTimeZone);
+			clock.showSeconds = prefs.GetBool("showSeconds", false);
+			clock.showDayOfWeek = prefs.GetBool("showDayOfWeek", false);
+			clock.showTimeZone = prefs.GetBool("showTimeZone", false);
 		}
 	}
 
