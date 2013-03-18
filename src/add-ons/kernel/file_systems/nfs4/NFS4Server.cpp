@@ -229,7 +229,7 @@ NFS4Server::_Renewal()
 		if (result != B_TIMED_OUT) {
 			if (result == B_OK)
 				release_sem(fWaitCancel);
-			return B_OK;
+			return result;
 		}
 
 		uint64 clientId = fClientId;
@@ -244,7 +244,9 @@ NFS4Server::_Renewal()
 
 		Request request(fServer, NULL);
 		request.Builder().Renew(clientId);
-		request.Send();
+		result = request.Send();
+		if (result != B_OK)
+			continue;
 
 		switch (request.Reply().NFS4Error()) {
 			case NFS4ERR_CB_PATH_DOWN:
