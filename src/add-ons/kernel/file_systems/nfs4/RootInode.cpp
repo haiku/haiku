@@ -135,7 +135,8 @@ RootInode::_UpdateInfo(bool force)
 		|| fFileSystem->GetConfiguration().fEmulateNamedAttrs)
 		fInfoCache.flags |= B_FS_HAS_MIME | B_FS_HAS_ATTR;
 
-	strncpy(fInfoCache.volume_name, fName, B_FILE_NAME_LENGTH);
+	strncpy(fInfoCache.volume_name, fName, sizeof(fInfoCache.volume_name));
+	fInfoCache.volume_name[sizeof(fInfoCache.volume_name) - 1] = '\0';
 
 	fInfoCacheExpire = time(NULL) + MetadataCache::kExpirationTime;
 
