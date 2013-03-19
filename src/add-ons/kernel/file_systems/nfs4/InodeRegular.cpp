@@ -74,10 +74,15 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 	cookie->fMode = mode;
 	cookie->fLocks = NULL;
 
-	OpenState* state = new OpenState;
+	OpenState* state = new(std::nothrow) OpenState;
+	if (state == NULL)
+		return B_NO_MEMORY;
+
 	status_t result = CreateState(name, mode, perms, state, data);
-	if (result != B_OK)
+	if (result != B_OK) {
+		delete state;
 		return result;
+	}
 
 	cookie->fOpenState = state;
 	cookie->fFileSystem = fFileSystem;
@@ -105,7 +110,7 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 	if (fOpenState == NULL) {
 		RevalidateFileCache();
 
-		OpenState* state = new OpenState;
+		OpenState* state = new(std::nothrow) OpenState;
 		if (state == NULL)
 			return B_NO_MEMORY;
 
@@ -113,8 +118,10 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 		state->fFileSystem = fFileSystem;
 		state->fMode = mode & O_RWMASK;
 		status_t result = OpenFile(state, mode, &data);
-		if (result != B_OK)
+		if (result != B_OK) {
+			delete state;
 			return result;
+		}
 
 		fFileSystem->AddOpenFile(state);
 		fOpenState = state;
