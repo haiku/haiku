@@ -366,7 +366,6 @@ NFS4Server::CallbackGetAttr(RequestInterpreter* request, ReplyBuilder* reply)
 	status_t result = request->GetAttr(&handle, &mask);
 	if (result != B_OK)
 		return result;
-	return B_OK;
 
 	MutexLocker locker(fFSLock);
 
