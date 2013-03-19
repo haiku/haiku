@@ -45,7 +45,7 @@ NFS4Inode::GetChangeInfo(uint64* change, bool attrDir)
 		AttrValue* values;
 		uint32 count;
 		result = reply.GetAttr(&values, &count);
-		if (result != B_OK || count < 1)
+		if (result != B_OK)
 			return result;
 
 		// FATTR4_CHANGE is mandatory
