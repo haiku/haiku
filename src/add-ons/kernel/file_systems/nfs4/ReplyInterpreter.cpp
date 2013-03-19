@@ -11,6 +11,7 @@
 
 #include <string.h>
 
+#include <AutoDeleter.h>
 #include <util/kernel_cpp.h>
 
 #include "Cookie.h"
@@ -554,6 +555,7 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 	uint32* bitmap = new(std::nothrow) uint32[bcount];
 	if (bitmap == NULL)
 		return B_NO_MEMORY;
+	ArrayDeleter<uint32> _(bitmap);
 
 	uint32 attr_count = 0;
 	for (uint32 i = 0; i < bcount; i++) {
@@ -573,10 +575,8 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 	XDR::ReadStream stream(const_cast<void*>(ptr), size);
 
 	AttrValue* values = new(std::nothrow) AttrValue[attr_count];
-	if (values == NULL) {
-		delete[] bitmap;
+	if (values == NULL)
 		return B_NO_MEMORY;
-	}
 
 	uint32 current = 0;
 
@@ -774,11 +774,13 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 		current++;
 	}
 
-	delete[] bitmap;
-
 	*count = attr_count;
 	*attrs = values;
-	return str.IsEOF() ? B_BAD_VALUE : B_OK;
+	if (str.IsEOF()) {
+		delete[] values;
+		return B_BAD_VALUE;
+	}
+	return B_OK;
 }
 
 
