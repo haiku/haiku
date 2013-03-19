@@ -427,7 +427,12 @@ ReplyInterpreter::ReadDir(uint64* cookie, uint64* cookieVerf,
 	*_count = count;
 	*dirents = entries;
 
-	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+	if (fReply->Stream().IsEOF()) {
+		delete[] entries;
+		return B_BAD_VALUE;
+	}
+
+	return B_OK;
 }
 
 

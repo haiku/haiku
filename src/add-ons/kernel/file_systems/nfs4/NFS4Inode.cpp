@@ -7,6 +7,8 @@
  */
 
 
+#include <AutoDeleter.h>
+
 #include "IdMap.h"
 #include "Inode.h"
 #include "NFS4Inode.h"
@@ -989,12 +991,14 @@ NFS4Inode::ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
 			if (result != B_OK)
 				return result;
 		}
+		ArrayDeleter<AttrValue> beforeDeleter(before);
 
 		result = reply.ReadDir(dirCookie, dirCookieVerf, dirents, count, eof);
 		if (result != B_OK) {
 			delete[] before;
 			return result;
 		}
+		ArrayDeleter<DirEntry> entriesDeleter(*dirents);
 
 		AttrValue* after;
 		result = reply.GetAttr(&after, &attrCount);
@@ -1002,6 +1006,7 @@ NFS4Inode::ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
 			delete[] before;
 			return result;
 		}
+		ArrayDeleter<AttrValue> afterDeleter(after);
 
 		if ((*change == 0
 				&& before[0].fData.fValue64 == after[0].fData.fValue64)
@@ -1010,9 +1015,7 @@ NFS4Inode::ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
 		else
 			return B_ERROR;
 
-		delete[] before;
-		delete[] after;
-
+		entriesDeleter.Detach();
 		return B_OK;
 	} while (true);
 }
