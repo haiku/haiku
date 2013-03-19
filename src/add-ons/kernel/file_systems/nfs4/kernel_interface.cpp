@@ -233,8 +233,10 @@ nfs4_get_vnode(fs_volume* volume, ino_t id, fs_vnode* vnode, int* _type,
 
 	Inode* inode;	
 	status_t result = fs->GetInode(id, &inode);
-	if (result != B_OK)
+	if (result != B_OK) {
+		delete vnodeToInode;
 		return result;
+	}
 
 	vnodeToInode->Replace(inode);
 	vnode->ops = &gNFSv4VnodeOps;
