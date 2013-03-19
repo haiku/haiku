@@ -86,7 +86,7 @@ Inode::CreateInode(FileSystem* fs, const FileInfo& fi, Inode** _inode)
 		AttrValue* values;
 		uint32 count;
 		result = reply.GetAttr(&values, &count);
-		if (result != B_OK || count < 4)
+		if (result != B_OK)
 			return result;
 
 		if (fi.fFileId == 0) {
