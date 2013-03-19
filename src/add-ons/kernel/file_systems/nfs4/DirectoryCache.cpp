@@ -334,7 +334,7 @@ DirectoryCache::NotifyChanges(DirectoryCacheSnapshot* oldSnapshot,
 	while (oldCurrent != NULL) {
 		if (fAttrDir) {
 			notify_attribute_changed(fInode->GetFileSystem()->DevId(),
-				fInode->ID(), newCurrent->fName, B_ATTR_REMOVED);
+				fInode->ID(), oldCurrent->fName, B_ATTR_REMOVED);
 		} else {
 			notify_entry_removed(fInode->GetFileSystem()->DevId(), fInode->ID(),
 				oldCurrent->fName, oldCurrent->fNode);
