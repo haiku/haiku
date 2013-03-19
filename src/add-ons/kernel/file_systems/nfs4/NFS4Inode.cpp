@@ -609,10 +609,8 @@ NFS4Inode::OpenFile(OpenState* state, int mode, OpenDelegationData* delegation)
 			}
 
 			result = reply.Verify();
-			if (result != B_OK) {
+			if (result != B_OK)
 				fFileSystem->OpenOwnerSequenceUnlock(sequence);
-				return result;
-			}
 
 			if (result != B_OK && reply.NFS4Error() == NFS4ERR_NOT_SAME)
 				return B_ENTRY_NOT_FOUND;
@@ -623,10 +621,13 @@ NFS4Inode::OpenFile(OpenState* state, int mode, OpenDelegationData* delegation)
 		reply.PutFH();
 		result = reply.Open(state->fStateID, &state->fStateSeq, &confirm,
 			delegation);
+		if (result != B_OK) {
+			fFileSystem->OpenOwnerSequenceUnlock(sequence);
+			return result;
+		}
 
 		FileHandle handle;
-		reply.GetFH(&handle);
-
+		result = reply.GetFH(&handle);
 		if (result != B_OK) {
 			fFileSystem->OpenOwnerSequenceUnlock(sequence);
 			return result;
@@ -638,7 +639,7 @@ NFS4Inode::OpenFile(OpenState* state, int mode, OpenDelegationData* delegation)
 	state->fOpened = true;
 
 	if (confirm)
-		result =  ConfirmOpen(fInfo.fHandle, state, &sequence);
+		result = ConfirmOpen(fInfo.fHandle, state, &sequence);
 
 	fFileSystem->OpenOwnerSequenceUnlock(sequence);
 	return result;
