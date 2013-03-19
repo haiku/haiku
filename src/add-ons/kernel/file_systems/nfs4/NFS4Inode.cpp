@@ -966,7 +966,7 @@ NFS4Inode::ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
 			req.GetAttr(dirAttr, sizeof(dirAttr) / sizeof(Attribute));
 
 		Attribute attr[] = { FATTR4_FSID, FATTR4_FILEID };
-		req.ReadDir(*count, *dirCookie, *dirCookieVerf, attr,
+		req.ReadDir(*dirCookie, *dirCookieVerf, attr,
 			sizeof(attr) / sizeof(Attribute));
 
 		req.GetAttr(dirAttr, sizeof(dirAttr) / sizeof(Attribute));
