@@ -117,6 +117,7 @@ Cookie::UnregisterRequest(RPC::Request* req)
 			else
 				prev->fNext = ent->fNext;
 			delete ent;
+			break;
 		}
 
 		prev = ent;
