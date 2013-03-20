@@ -66,9 +66,7 @@ public:
 
 	inline	Inode*			GetInode();
 
-	static	const bigtime_t	kExpirationTime		= 15000000;
-
-			bool			fRevalidated;
+	const	bigtime_t		fExpirationTime;
 protected:
 			void			NotifyChanges(DirectoryCacheSnapshot* oldSnapshot,
 								DirectoryCacheSnapshot* newSnapshot);
@@ -139,7 +137,7 @@ DirectoryCache::ValidateChangeInfo(uint64 change)
 	if (fTrashed || change != fChange) {
 		Trash();
 		fChange = change;
-		fExpireTime = system_time() + kExpirationTime;
+		fExpireTime = system_time() + fExpirationTime;
 		fTrashed = false;
 
 		return B_ERROR;
@@ -152,7 +150,7 @@ DirectoryCache::ValidateChangeInfo(uint64 change)
 inline void
 DirectoryCache::SetChangeInfo(uint64 change)
 {
-	fExpireTime = system_time() + kExpirationTime;
+	fExpireTime = system_time() + fExpirationTime;
 	fChange = change;
 }
 

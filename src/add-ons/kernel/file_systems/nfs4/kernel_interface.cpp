@@ -71,6 +71,8 @@ CreateNFS4Server(RPC::Server* serv)
 //	noxattr-emu	- do not emulate named attributes (default)
 //	port=X		- connect to port X (default: 2049)
 //	proto=X		- user transport protocol X (default: tcp)
+//	dirtime=X	- attempt revalidate directory cache not more often than each X
+//				  seconds
 static status_t
 ParseArguments(const char* _args, AddressResolver** address, char** _path,
 	MountConfiguration* conf)
@@ -107,6 +109,7 @@ ParseArguments(const char* _args, AddressResolver** address, char** _path,
 	conf->fRequestTimeout = sSecToBigTime(60);
 	conf->fEmulateNamedAttrs = false;
 	conf->fCacheMetadata = true;
+	conf->fDirectoryCacheTime = sSecToBigTime(5);
 
 	char* optionsEnd = NULL;
 	if (options != NULL)
@@ -133,6 +136,9 @@ ParseArguments(const char* _args, AddressResolver** address, char** _path,
 		} else if (strncmp(options, "proto=", 6) == 0) {
 			options += strlen("proto=");
 			(*address)->ForceProtocol(options);
+		} else if (strncmp(options, "dirtime=", 8) == 0) {
+			options += strlen("dirtime=");
+			conf->fDirectoryCacheTime = sSecToBigTime(atoi(options));
 		}
 
 		options = optionsEnd;

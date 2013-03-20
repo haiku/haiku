@@ -25,6 +25,8 @@ struct MountConfiguration {
 
 	bool		fEmulateNamedAttrs;
 	bool		fCacheMetadata;
+
+	bigtime_t	fDirectoryCacheTime;
 };
 
 class FileSystem : public DoublyLinkedListLinkImpl<FileSystem> {

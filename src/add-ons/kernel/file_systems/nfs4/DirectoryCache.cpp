@@ -78,7 +78,7 @@ DirectoryCacheSnapshot::~DirectoryCacheSnapshot()
 
 DirectoryCache::DirectoryCache(Inode* inode, bool attr)
 	:
-	fRevalidated(false),
+	fExpirationTime(inode->fFileSystem->GetConfiguration().fDirectoryCacheTime),
 	fDirectoryCache(NULL),
 	fInode(inode),
 	fAttrDir(attr),
@@ -100,7 +100,7 @@ void
 DirectoryCache::Reset()
 {
 	Trash();
-	fExpireTime = system_time() + kExpirationTime;
+	fExpireTime = system_time() + fExpirationTime;
 	fTrashed = false;
 }
 
@@ -232,7 +232,7 @@ DirectoryCache::_LoadSnapshot(bool trash)
 	newSnapshot->AcquireReference();
 
 	_SetSnapshot(newSnapshot);
-	fExpireTime = system_time() + kExpirationTime;
+	fExpireTime = system_time() + fExpirationTime;
 
 	fTrashed = false;
 
@@ -260,7 +260,7 @@ DirectoryCache::Revalidate()
 	}
 
 	if (change == fChange) {
-		fExpireTime = system_time() + kExpirationTime;
+		fExpireTime = system_time() + fExpirationTime;
 		return B_OK;
 	}
 
