@@ -78,6 +78,71 @@ parse_intel(const char* name)
 	buffer[outIndex] = '\0';
 	return buffer;
 }
+
+
+static const char*
+parse_amd(const char* name)
+{
+	static char buffer[49];
+
+	// ignore initial spaces
+	int index = 0;
+	for (; name[index] != '\0'; index++) {
+		if (name[index] != ' ')
+			break;
+	}
+
+	// parse model
+	int outIndex = 0;
+	bool spaceWritten = false;
+	for (; name[index] != '\0'; index++) {
+		if (!strncasecmp(&name[index], "(r)", 3)) {
+			outIndex += strlcpy(&buffer[outIndex], "®",
+				sizeof(buffer) - outIndex);
+			index += 2;
+		} else if (!strncasecmp(&name[index], "(tm)", 4)) {
+			outIndex += strlcpy(&buffer[outIndex], "™",
+				sizeof(buffer) - outIndex);
+			index += 3;
+		} else if (!strncasecmp(&name[index], "Dual core", 9)) {
+			 index += 9;
+		} else if (!strncasecmp(&name[index], "Eight-core", 10)
+			|| !strncasecmp(&name[index], "Quad-core", 9)
+			|| !strncasecmp(&name[index], "Processor", 9)
+			|| !strncasecmp(&name[index], "AMD", 3)) {
+			// Remove words
+			while (name[index] != ' ' && name[index] != '\0')
+				index++;
+
+			index--;
+		} else if (name[index] == '-') {
+			if (!spaceWritten)
+				buffer[outIndex++] = ' ';
+			spaceWritten = true;
+		} else {
+			if (name[index] == ' ') {
+				if (spaceWritten)
+					continue;
+				spaceWritten = true;
+			} else
+				spaceWritten = false;
+			buffer[outIndex++] = name[index];
+		}
+	}
+
+	// cut off trailing spaces
+	while (outIndex > 1 && buffer[outIndex - 1] == ' ')
+		outIndex--;
+
+	buffer[outIndex] = '\0';
+
+	// skip new initial spaces
+	for (outIndex = 0; buffer[outIndex] != '\0'; outIndex++) {
+		if (buffer[outIndex] != ' ')
+			break;
+	}
+	return buffer + outIndex;
+}
 #endif
 
 
@@ -405,6 +470,11 @@ get_cpu_model_string(system_info *info)
 				// Fallback to manual parsing of the model string
 				get_cpuid_model_string(cpuidName);
 				return parse_intel(cpuidName);
+			}
+			if ((info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_AMD_x86) {
+				// Fallback to manual parsing of the model string
+				get_cpuid_model_string(cpuidName);
+				return parse_amd(cpuidName);
 			}
 			return NULL;
 #endif	/* __INTEL__ || __x86_64__ */
