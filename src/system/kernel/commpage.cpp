@@ -79,8 +79,8 @@ commpage_init(void)
 	sFreeCommPageSpace = ALIGN_ENTRY(&sCommPageAddress[COMMPAGE_TABLE_ENTRIES]);
 
 	// create the image for the commpage
-	sCommPageImage = elf_create_memory_image("commpage", 0,
-		COMMPAGE_SIZE, 0, 0);
+	sCommPageImage = elf_create_memory_image("commpage", 0, COMMPAGE_SIZE, 0,
+		0);
 	elf_add_memory_image_symbol(sCommPageImage, "commpage_table",
 		0, COMMPAGE_TABLE_ENTRIES * sizeof(addr_t),
 		B_SYMBOL_TYPE_DATA);
