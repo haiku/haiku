@@ -250,7 +250,7 @@ DirectoryCache::_LoadSnapshot(bool trash)
 status_t
 DirectoryCache::Revalidate()
 {
-	if (fExpireTime < system_time())
+	if (fExpireTime > system_time())
 		return B_OK;
 
 	uint64 change;
