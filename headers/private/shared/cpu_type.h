@@ -350,7 +350,8 @@ get_cpu_model_string(system_info *info)
 			return "C-Series";
 		case B_CPU_AMD_E_SERIES:
 			return "E-Series";
-		case B_CPU_AMD_FX_SERIES:
+		case B_CPU_AMD_FX_SERIES_MODEL_1:
+		case B_CPU_AMD_FX_SERIES_MODEL_2:
 			return "FX-Series";
 
 		/* Transmeta */
