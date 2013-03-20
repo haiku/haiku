@@ -23,12 +23,15 @@ extern "C" {
 #include "extensions.h"
 #include "drivers/common/driverfuncs.h"
 #include "drivers/common/meta.h"
+#include "main/api_exec.h"
 #include "main/colormac.h"
 #include "main/cpuinfo.h"
 #include "main/buffers.h"
 #include "main/formats.h"
 #include "main/framebuffer.h"
 #include "main/renderbuffer.h"
+#include "main/version.h"
+#include "main/vtxfmt.h"
 #include "swrast/swrast.h"
 #include "swrast/s_renderbuffer.h"
 #include "swrast_setup/swrast_setup.h"
@@ -113,8 +116,8 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
 	functions.Flush = _Flush;
 
 	// create core context
-	fContext = _mesa_create_context(API_OPENGL, fVisual, NULL,
-		&functions, this);
+	fContext = _mesa_create_context(API_OPENGL_COMPAT, fVisual, NULL,
+		&functions);
 
 	if (!fContext) {
 		ERROR("%s: Failed to create Mesa context!\n", __func__);
@@ -139,6 +142,11 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
 	_mesa_enable_1_5_extensions(fContext);
 	_mesa_enable_2_0_extensions(fContext);
 	_mesa_enable_2_1_extensions(fContext);
+
+	_mesa_compute_version(fContext);
+
+	_mesa_initialize_dispatch_tables(fContext);
+	_mesa_initialize_vbo_vtxfmt(fContext);
 
 	// create core framebuffer
 	fFrameBuffer = _mesa_create_framebuffer(fVisual);
@@ -460,9 +468,13 @@ MesaSoftwareRenderer::_AllocateBitmap()
 void
 MesaSoftwareRenderer::_Error(gl_context* ctx)
 {
+	CALLED();
+	#if 0
+	// TODO: err. Mesa dropped DriverCtx
 	MesaSoftwareRenderer* mr = (MesaSoftwareRenderer*)ctx->DriverCtx;
 	if (mr && mr->GLView())
 		mr->GLView()->ErrorCallback((unsigned long)ctx->ErrorValue);
+	#endif
 }
 
 
@@ -552,13 +564,15 @@ void
 MesaSoftwareRenderer::_Flush(gl_context* ctx)
 {
 	CALLED();
-	MesaSoftwareRenderer* mr = (MesaSoftwareRenderer*)ctx->DriverCtx;
-	if ((mr->fOptions & BGL_DOUBLE) == 0) {
+	#if 0
+	// TODO: err. Mesa dropped DriverCtx
+	if ((fOptions & BGL_DOUBLE) == 0) {
 		// TODO: SwapBuffers() can call _CopyToDirect(), which should
 		// be always called with with the BGLView drawlocked.
 		// This is not always the case if called from here.
-		mr->SwapBuffers();
+		SwapBuffers();
 	}
+	#endif
 }
 
 
@@ -660,7 +674,8 @@ MesaSoftwareRenderer::_RenderBufferMap(gl_context *ctx,
 
 
 void
-MesaSoftwareRenderer::_RenderBufferDelete(struct gl_renderbuffer* rb)
+MesaSoftwareRenderer::_RenderBufferDelete(struct gl_context *ctx,
+	struct gl_renderbuffer* rb)
 {
 	CALLED();
 	if (rb != NULL) {

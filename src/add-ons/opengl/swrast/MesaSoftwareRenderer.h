@@ -55,7 +55,8 @@ private:
 								color_space colorSpace);
 
 /* Mesa callbacks */
-	static	void			_RenderBufferDelete(struct gl_renderbuffer* rb);
+	static	void			_RenderBufferDelete(struct gl_context *ctx,
+								struct gl_renderbuffer* rb);
 	static	GLboolean		_RenderBufferStorage(gl_context* ctx,
 								struct gl_renderbuffer* render,
 								GLenum internalFormat,
