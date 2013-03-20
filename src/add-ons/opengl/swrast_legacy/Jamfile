@@ -20,6 +20,8 @@ if $(TARGET_PLATFORM) != haiku {
 	} else if $(TARGET_ARCH) = sparc {
 		defines += USE_SPARC_ASM ;
 	}
+
+	SubDirC++Flags [ FDefines $(defines) ] ;
 }
 
 
