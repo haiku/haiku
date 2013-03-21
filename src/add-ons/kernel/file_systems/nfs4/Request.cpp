@@ -56,6 +56,7 @@ Request::_SendUDP(Cookie* cookie)
 			if (result != B_OK) {
 				if (cookie != NULL)
 					cookie->UnregisterRequest(rpc);
+				delete rpc;
 				return result;
 			}
 
