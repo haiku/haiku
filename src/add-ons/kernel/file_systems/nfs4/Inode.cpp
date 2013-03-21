@@ -755,8 +755,10 @@ Inode::AcquireLock(OpenFileCookie* cookie, const struct flock* lock,
 	linfo->fType = sGetLockType(lock->l_type, wait);
 
 	result = NFS4Inode::AcquireLock(cookie, linfo, wait);
-	if (result != B_OK)
+	if (result != B_OK) {
+		delete linfo;
 		return result;
+	}
 
 	MutexLocker _(state->fLocksLock);
 	state->AddLock(linfo);
