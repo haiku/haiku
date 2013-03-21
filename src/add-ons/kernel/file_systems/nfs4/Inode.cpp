@@ -642,17 +642,16 @@ Inode::WriteStat(const struct stat* st, uint32 mask, OpenAttrCookie* cookie)
 
 	if (cookie == NULL) {
 		MutexLocker stateLocker(fStateLock);
-		ASSERT(fOpenState != NULL);
+		ASSERT(fOpenState != NULL || !(mask & B_STAT_SIZE));
 		result = NFS4Inode::WriteStat(fOpenState, attr, i);
-		stateLocker.Unlock();
-
-		fMetaCache.InvalidateStat();
-		if ((mask & B_STAT_MODE) != 0 || (mask & B_STAT_UID) != 0
-			|| (mask & B_STAT_GID) != 0) {
-			fMetaCache.InvalidateAccess();
-		}
 	} else
 		result = NFS4Inode::WriteStat(cookie->fOpenState, attr, i);
+
+	fMetaCache.InvalidateStat();
+
+	const uint32 kAccessMask = B_STAT_MODE | B_STAT_UID | B_STAT_GID;
+	if ((mask & kAccessMask) != 0)
+		fMetaCache.InvalidateAccess();
 
 	return result;
 }
