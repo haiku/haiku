@@ -51,8 +51,7 @@ extern int gIesTable[];				/* ignore ESC table */
 extern int gEscIgnoreTable[];		/* ESC ignore table */
 extern int gMbcsTable[];			/* ESC $ */
 
-extern int gLineDrawTable[];		/* ESC ( 0 */
-
+extern const char* gLineDrawGraphSet[]; /* may be used for G0, G1, G2, G3 */
 
 #define DEFAULT -1
 #define NPARAM 10		// Max parameters
@@ -388,9 +387,10 @@ TermParse::EscParse()
 	int *groundtable = gUTF8GroundTable;
 	int *parsestate = gUTF8GroundTable;
 
-	/* Handle switch between G0 and G1 character sets */
-	int *alternateParseTable = gUTF8GroundTable;
-	bool shifted_in = false;
+	/* handle alternative character sets G0 - G4 */
+	const char** graphSets[4] = { NULL, NULL, NULL, NULL };
+	int curGL = 0;
+	int curGR = 0;
 
 	int32 srcLen = sizeof(cbuf);
 	int32 dstLen = sizeof(dstbuf);
@@ -416,9 +416,20 @@ TermParse::EscParse()
 
 			switch (parsestate[c]) {
 				case CASE_PRINT:
-					fBuffer->InsertChar((char)c);
+				{
+					int curGS = c < 128 ? curGL : curGR;
+					const char** curGraphSet = graphSets[curGS];
+					if (curGraphSet != NULL) {
+						int offset = c - (c < 128 ? 0x20 : 0xA0);
+						if (offset >= 0 && offset < 96
+							&& (curGraphSet[offset] != 0)) {
+							fBuffer->InsertChar(curGraphSet[offset]);
+							break;
+						}
+					}
+					fBuffer->InsertChar((char)(c));
 					break;
-
+				}
 				case CASE_PRINT_GR:
 					/* case iso8859 gr character, or euc */
 					ptr = cbuf;
@@ -483,91 +494,6 @@ TermParse::EscParse()
 					convert_to_utf8(B_EUC_CONVERSION, cbuf, &srcLen,
 							dstbuf, &dstLen, &dummyState, '?');
 					fBuffer->InsertChar(dstbuf, dstLen);
-					break;
-
-				case CASE_PRINT_GRA:
-					/* "Special characters and line drawing" enabled by \E(0 */
-					switch (c) {
-						case '`': // ACS_DIAMOND
-							fBuffer->InsertChar("\xE2\x97\x86", 3);
-							break;
-						case 'a': // ACS_CKBOARD
-							fBuffer->InsertChar("\xE2\x96\x92", 3);
-							break;
-						case 'f': // ACS_DEGREE
-							fBuffer->InsertChar("\xC2\xB0", 2);
-							break;
-						case 'g': // ACS_PLMINUS
-							fBuffer->InsertChar("\xC2\xB1", 2);
-							break;
-						case 'i': // ACS_LANTERN
-							fBuffer->InsertChar("\xE2\x98\x83", 3);
-							break;
-						case 'j': // ACS_LRCORNER
-							fBuffer->InsertChar("\xE2\x94\x98", 3);
-							break;
-						case 'k': // ACS_URCORNER
-							fBuffer->InsertChar("\xE2\x94\x90", 3);
-							break;
-						case 'l': // ACS_ULCORNER
-							fBuffer->InsertChar("\xE2\x94\x8C", 3);
-							break;
-						case 'm': // ACS_LLCORNER
-							fBuffer->InsertChar("\xE2\x94\x94", 3);
-							break;
-						case 'n': // ACS_PLUS
-							fBuffer->InsertChar("\xE2\x94\xBC", 3);
-							break;
-						case 'o': // ACS_S1
-							fBuffer->InsertChar("\xE2\x8E\xBA", 3);
-							break;
-						case 'p': // ACS_S3
-							fBuffer->InsertChar("\xE2\x8E\xBB", 3);
-							break;
-						case 'r': // ACS_S7
-							fBuffer->InsertChar("\xE2\x8E\xBC", 3);
-							break;
-						case 's': // ACS_S9
-							fBuffer->InsertChar("\xE2\x8E\xBD", 3);
-							break;
-						case 'q': // ACS_HLINE
-							fBuffer->InsertChar("\xE2\x94\x80", 3);
-							break;
-						case 't': // ACS_LTEE
-							fBuffer->InsertChar("\xE2\x94\x9C", 3);
-							break;
-						case 'u': // ACS_RTEE
-							fBuffer->InsertChar("\xE2\x94\xA4", 3);
-							break;
-						case 'v': // ACS_BTEE
-							fBuffer->InsertChar("\xE2\x94\xB4", 3);
-							break;
-						case 'w': // ACS_TTEE
-							fBuffer->InsertChar("\xE2\x94\xAC", 3);
-							break;
-						case 'x': // ACS_VLINE
-							fBuffer->InsertChar("\xE2\x94\x82", 3);
-							break;
-						case 'y': // ACS_LEQUAL
-							fBuffer->InsertChar("\xE2\x89\xA4", 3);
-							break;
-						case 'z': // ACS_GEQUAL
-							fBuffer->InsertChar("\xE2\x89\xA5", 3);
-							break;
-						case '{': // ACS_PI
-							fBuffer->InsertChar("\xCF\x80", 2);
-							break;
-						case '|': // ACS_NEQUAL
-							fBuffer->InsertChar("\xE2\x89\xA0", 3);
-							break;
-						case '}': // ACS_STERLING
-							fBuffer->InsertChar("\xC2\xA3", 2);
-							break;
-						case '~': // ACS_BULLET
-							fBuffer->InsertChar("\xC2\xB7", 2);
-						default:
-							fBuffer->InsertChar((char)c);
-					}
 					break;
 
 				case CASE_LF:
@@ -639,26 +565,40 @@ TermParse::EscParse()
 
 				case CASE_SCS_STATE:
 				{
-					char page = _NextParseChar();
+					int set = -1;
+					switch (c) {
+						case '(':
+							set = 0;
+							break;
+						case ')':
+						case '-':
+							set = 1;
+							break;
+						case '*':
+						case '.':
+							set = 2;
+							break;
+						case '+':
+						case '/':
+							set = 3;
+							break;
+						default:
+							break;
+					}
 
-					int* newTable = _GuessGroundTable(currentEncoding);
-					if (page == '0')
-						newTable = gLineDrawTable;
-
-					if (c == '(') {
-						if (shifted_in)
-							alternateParseTable = newTable;
-						else
-							groundtable = newTable;
-					} else if (c == ')') {
-						if (!shifted_in)
-							alternateParseTable = newTable;
-						else
-							groundtable = newTable;
+					if (set > -1) {
+						char page = _NextParseChar();
+						switch (page) {
+							case '0':
+								graphSets[set] = gLineDrawGraphSet;
+								break;
+							default:
+								graphSets[set] = NULL;
+								break;
+						}
 					}
 
 					parsestate = groundtable;
-
 					break;
 				}
 
@@ -698,22 +638,16 @@ TermParse::EscParse()
 					/* Ignore character */
 					break;
 
-				case CASE_SI:
-					/* shift in (to G1 charset) */
-					if (shifted_in == false) {
-						int* tmp = alternateParseTable;
-						alternateParseTable = parsestate;
-						parsestate = tmp;
-					}
+				case CASE_LS1:
+					/* select G1 into GL */
+					curGL = 1;
+					parsestate = groundtable;
 					break;
 
-				case CASE_SO:
-					/* shift out (to G0 charset) */
-					if (shifted_in == true) {
-						int* tmp = alternateParseTable;
-						alternateParseTable = parsestate;
-						parsestate = tmp;
-					}
+				case CASE_LS0:
+					/* select G0 into GL */
+					curGL = 0;
+					parsestate = groundtable;
 					break;
 
 				case CASE_SCR_STATE:	// ESC #
@@ -1199,32 +1133,32 @@ TermParse::EscParse()
 					break;
 
 				case CASE_LS2:
-					/* LS2 */
-					//      screen->curgl = 2;
+					/* select G2 into GL */
+					curGL = 2;
 					parsestate = groundtable;
 					break;
 
 				case CASE_LS3:
-					/* LS3 */
-					//      screen->curgl = 3;
+					/* select G3 into GL */
+					curGL = 3;
 					parsestate = groundtable;
 					break;
 
 				case CASE_LS3R:
-					/* LS3R */
-					//      screen->curgr = 3;
+					/* select G3 into GR */
+					curGR = 3;
 					parsestate = groundtable;
 					break;
 
 				case CASE_LS2R:
-					/* LS2R */
-					//      screen->curgr = 2;
+					/* select G2 into GR */
+					curGR = 2;
 					parsestate = groundtable;
 					break;
 
 				case CASE_LS1R:
-					/* LS1R */
-					//      screen->curgr = 1;
+					/* select G1 into GR */
+					curGR = 1;
 					parsestate = groundtable;
 					break;
 

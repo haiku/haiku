@@ -23,6 +23,11 @@ struct UTF8Char {
 		bytes[0] = c;
 	}
 
+	UTF8Char(const char* c)
+	{
+		SetTo(c, ByteCount(*c));
+	}
+
 	UTF8Char(const char* c, int32 count)
 	{
 		SetTo(c, count);

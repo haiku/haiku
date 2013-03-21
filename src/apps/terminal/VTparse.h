@@ -21,8 +21,8 @@
 #define CASE_VMOT 8
 #define CASE_TAB 9
 #define CASE_LF 10
-#define CASE_SI 11
-#define CASE_SO 12
+#define CASE_LS0 11
+#define CASE_LS1 12
 #define CASE_SP 13
 #define CASE_SCR_STATE 14
 #define CASE_SCS0_STATE 15
@@ -105,6 +105,5 @@
 #define CASE_SD		90	/* scroll screen down */
 #define CASE_ECH 	91	/* erase characters */
 
-#define CASE_PRINT_GRA 92
 #define CASE_DECSCUSR_ETC 93
 #define CASE_CSI_SP 94
