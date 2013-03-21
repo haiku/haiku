@@ -409,16 +409,16 @@ Inode::CreateObject(const char* name, const char* path, int mode, FileType type,
 	uint64 fileID;
 	FileHandle handle;
 
-	status_t result = NFS4Inode::CreateObject(name, path, mode, type, &changeInfo,
-		&fileID, &handle);
+	status_t result = NFS4Inode::CreateObject(name, path, mode, type,
+		&changeInfo, &fileID, &handle);
 	if (result != B_OK)
-		return B_OK;
+		return result;
 
 	fFileSystem->Root()->MakeInfoInvalid();
 
 	result = ChildAdded(name, fileID, handle);
 	if (result != B_OK)
-		return B_OK;
+		return result;
 
 	fCache->Lock();
 	if (fCache->Valid()) {
