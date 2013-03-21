@@ -14,7 +14,8 @@
 
 
 status_t
-FileInfo::ParsePath(RequestBuilder& req, uint32& count, const char* _path)
+FileInfo::ParsePath(RequestBuilder& req, uint32& count, const char* _path,
+	bool getFileHandle)
 {
 	ASSERT(_path != NULL);
 
@@ -36,6 +37,8 @@ FileInfo::ParsePath(RequestBuilder& req, uint32& count, const char* _path)
 				count++;
 			} else if (strcmp(pathStart, ".")) {
 				req.LookUp(pathStart);
+				if (getFileHandle)
+					req.GetFH();
 				count++;
 			}
 		}
@@ -93,15 +96,14 @@ FileInfo::UpdateFileHandles(FileSystem* fs)
 	RequestBuilder& req = request.Builder();
 
 	req.PutRootFH();
+	req.GetFH();
 
 	uint32 lookupCount = 0;
-	status_t result;
-
-	result = ParsePath(req, lookupCount, fs->Path());
+	status_t result = ParsePath(req, lookupCount, fs->Path(), true);
 	if (result != B_OK)
 		return result;
 
-	result = ParsePath(req, lookupCount, fPath);
+	result = ParsePath(req, lookupCount, fPath, true);
 	if (result != B_OK)
 		return result;
 
@@ -113,19 +115,25 @@ FileInfo::UpdateFileHandles(FileSystem* fs)
 		req.Verify(&attr, 1);
 	}
 
-	req.GetFH();
-	req.LookUpUp();
-	req.GetFH();
-
 	result = request.Send();
 	if (result != B_OK)
 		return result;
 
 	ReplyInterpreter& reply = request.Reply();
 
+	FileHandle parent;
+	FileHandle child;
+
 	reply.PutRootFH();
-	for (uint32 i = 0; i < lookupCount; i++)
+	reply.GetFH(&child);
+	parent = child;
+	for (uint32 i = 0; i < lookupCount; i++) {
 		reply.LookUp();
+		parent = child;
+		result = reply.GetFH(&child);
+		if (result !=  B_OK)
+			return result;
+	}
 
 	if (fs->IsAttrSupported(FATTR4_FILEID)) {
 		result = reply.Verify();
@@ -133,12 +141,9 @@ FileInfo::UpdateFileHandles(FileSystem* fs)
 			return result;
 	}
 
-	reply.GetFH(&fHandle);
-	if (reply.LookUpUp() == B_ENTRY_NOT_FOUND) {
-		fParent = fHandle;
-		return B_OK;
-	}
+	fHandle = child;
+	fParent = parent;
 
-	return reply.GetFH(&fParent);
+	return B_OK;
 }
 
