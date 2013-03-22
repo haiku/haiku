@@ -545,8 +545,9 @@ namespace VFSPagesIOTracing {
 class PagesIOTraceEntry : public AbstractTraceEntry {
 protected:
 	PagesIOTraceEntry(struct vnode* vnode, void* cookie, off_t pos,
-		const generic_io_vec* vecs, uint32 count, uint32 flags, generic_size_t bytesRequested,
-		status_t status, generic_size_t bytesTransferred)
+		const generic_io_vec* vecs, uint32 count, uint32 flags,
+		generic_size_t bytesRequested, status_t status,
+		generic_size_t bytesTransferred)
 		:
 		fVnode(vnode),
 		fMountID(vnode->mount->id),
@@ -559,26 +560,29 @@ protected:
 		fStatus(status),
 		fBytesTransferred(bytesTransferred)
 	{
-		fVecs = (generic_io_vec*)alloc_tracing_buffer_memcpy(vecs, sizeof(generic_io_vec) * count,
-			false);
+		fVecs = (generic_io_vec*)alloc_tracing_buffer_memcpy(vecs,
+			sizeof(generic_io_vec) * count, false);
 	}
 
 	void AddDump(TraceOutput& out, const char* mode)
 	{
-		out.Print("vfs pages io %5s: vnode: %p (%ld, %lld), cookie: %p, "
-			"pos: %lld, size: %llu, vecs: {", mode, fVnode, fMountID, fNodeID,
-			fCookie, fPos, (uint64)fBytesRequested);
+		out.Print("vfs pages io %5s: vnode: %p (%" B_PRId32 ", %" B_PRId64 "), "
+			"cookie: %p, pos: %" B_PRIdOFF ", size: %" B_PRIu64 ", vecs: {",
+			mode, fVnode, fMountID, fNodeID, fCookie, fPos,
+			(uint64)fBytesRequested);
 
 		if (fVecs != NULL) {
 			for (uint32 i = 0; i < fCount; i++) {
 				if (i > 0)
 					out.Print(", ");
-				out.Print("(%llx, %llu)", (uint64)fVecs[i].base, (uint64)fVecs[i].length);
+				out.Print("(%" B_PRIx64 ", %" B_PRIu64 ")", (uint64)fVecs[i].base,
+					(uint64)fVecs[i].length);
 			}
 		}
 
-		out.Print("}, flags: %#lx -> status: %#lx, transferred: %llu",
-			fFlags, fStatus, (uint64)fBytesTransferred);
+		out.Print("}, flags: %#" B_PRIx32 " -> status: %#" B_PRIx32 ", "
+			"transferred: %" B_PRIu64, fFlags, fStatus,
+			(uint64)fBytesTransferred);
 	}
 
 protected:
@@ -587,20 +591,21 @@ protected:
 	ino_t			fNodeID;
 	void*			fCookie;
 	off_t			fPos;
-	generic_io_vec*		fVecs;
+	generic_io_vec*	fVecs;
 	uint32			fCount;
 	uint32			fFlags;
-	generic_size_t			fBytesRequested;
+	generic_size_t	fBytesRequested;
 	status_t		fStatus;
-	generic_size_t			fBytesTransferred;
+	generic_size_t	fBytesTransferred;
 };
 
 
 class ReadPages : public PagesIOTraceEntry {
 public:
 	ReadPages(struct vnode* vnode, void* cookie, off_t pos,
-		const generic_io_vec* vecs, uint32 count, uint32 flags, generic_size_t bytesRequested,
-		status_t status, generic_size_t bytesTransferred)
+		const generic_io_vec* vecs, uint32 count, uint32 flags,
+		generic_size_t bytesRequested, status_t status,
+		generic_size_t bytesTransferred)
 		:
 		PagesIOTraceEntry(vnode, cookie, pos, vecs, count, flags,
 			bytesRequested, status, bytesTransferred)
@@ -618,8 +623,9 @@ public:
 class WritePages : public PagesIOTraceEntry {
 public:
 	WritePages(struct vnode* vnode, void* cookie, off_t pos,
-		const generic_io_vec* vecs, uint32 count, uint32 flags, generic_size_t bytesRequested,
-		status_t status, generic_size_t bytesTransferred)
+		const generic_io_vec* vecs, uint32 count, uint32 flags,
+		generic_size_t bytesRequested, status_t status,
+		generic_size_t bytesTransferred)
 		:
 		PagesIOTraceEntry(vnode, cookie, pos, vecs, count, flags,
 			bytesRequested, status, bytesTransferred)
