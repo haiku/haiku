@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2012, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -92,9 +92,17 @@ parse_amd(const char* name)
 			break;
 	}
 
-	// parse model
+	// Keep an initial "mobile"
 	int outIndex = 0;
 	bool spaceWritten = false;
+	if (!strncasecmp(&name[index], "Mobile ", 7)) {
+		strcpy(buffer, "Mobile ");
+		spaceWritten = true;
+		outIndex += 7;
+		index += 7;
+	}
+
+	// parse model
 	for (; name[index] != '\0'; index++) {
 		if (!strncasecmp(&name[index], "(r)", 3)) {
 			outIndex += strlcpy(&buffer[outIndex], "®",
@@ -104,22 +112,33 @@ parse_amd(const char* name)
 			outIndex += strlcpy(&buffer[outIndex], "™",
 				sizeof(buffer) - outIndex);
 			index += 3;
-		} else if (!strncasecmp(&name[index], "Dual core", 9)) {
-			 index += 9;
-		} else if (!strncasecmp(&name[index], "Eight-core", 10)
-			|| !strncasecmp(&name[index], "Quad-core", 9)
-			|| !strncasecmp(&name[index], "Processor", 9)
-			|| !strncasecmp(&name[index], "AMD", 3)) {
-			// Remove words
-			while (name[index] != ' ' && name[index] != '\0')
-				index++;
-
-			index--;
+		} else if (!strncmp(&name[index], "with ", 5)
+			|| !strncmp(&name[index], "/w", 2)) {
+			// Cut off the rest
+			break;
 		} else if (name[index] == '-') {
 			if (!spaceWritten)
 				buffer[outIndex++] = ' ';
 			spaceWritten = true;
 		} else {
+			const char* kWords[] = {
+				"Eight-core", "6-core", "Six-core", "Quad-core", "Dual-core",
+				"Dual core", "Processor", "APU", "AMD", "Intel", "Integrated",
+				"CyrixInstead", "Advanced Micro Devices", "Comb", "DualCore",
+				"Technology", "Mobile", "Triple-Core"
+			};
+			bool removed = false;
+			for (size_t i = 0; i < sizeof(kWords) / sizeof(kWords[0]); i++) {
+				size_t length = strlen(kWords[i]);
+				if (!strncasecmp(&name[index], kWords[i], length)) {
+					index += length - 1;
+					removed = true;
+					break;
+				}
+			}
+			if (removed)
+				continue;
+
 			if (name[index] == ' ') {
 				if (spaceWritten)
 					continue;
