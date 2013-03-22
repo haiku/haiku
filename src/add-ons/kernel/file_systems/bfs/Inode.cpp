@@ -1513,7 +1513,7 @@ Inode::FindBlockRun(off_t pos, block_run& run, off_t& offset)
 			if (data->direct[current].IsZero())
 				break;
 
-			runBlockEnd += data->direct[current].Length()
+			runBlockEnd += (uint32)data->direct[current].Length()
 				<< fVolume->BlockShift();
 			if (runBlockEnd > pos) {
 				run = data->direct[current];
