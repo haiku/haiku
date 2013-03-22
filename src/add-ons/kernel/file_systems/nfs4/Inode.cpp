@@ -311,7 +311,7 @@ Inode::Remove(const char* name, FileType type, ino_t* id)
 
 status_t
 Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName,
-	bool attribute, ino_t* id)
+	bool attribute, ino_t* id, ino_t* oldID)
 {
 	ASSERT(from != NULL);
 	ASSERT(fromName != NULL);
@@ -341,8 +341,12 @@ Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName,
 			return B_NO_MEMORY;
 	}
 
-	ChangeInfo fromChange, toChange;
+	uint64 oldFileID = 0;
+	if (!attribute)
+		to->NFS4Inode::LookUp(toName, NULL, &oldFileID, NULL);
+
 	uint64 fileID;
+	ChangeInfo fromChange, toChange;
 	status_t result = NFS4Inode::RenameNode(from, to, fromName, toName,
 		&fromChange, &toChange, &fileID, attribute);
 	if (result != B_OK)
@@ -350,32 +354,37 @@ Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName,
 
 	from->fFileSystem->Root()->MakeInfoInvalid();
 
+	if (id != NULL)
+		*id = FileIdToInoT(fileID);
+	if (oldID != NULL)
+		*oldID = FileIdToInoT(oldFileID);
+
 	DirectoryCache* cache = attribute ? from->fAttrCache : from->fCache;
 	cache->Lock();
 	if (cache->Valid()) {
-		if (fromChange.fAtomic
-			&& cache->ChangeInfo() == fromChange.fBefore) {
+		if (fromChange.fAtomic && cache->ChangeInfo() == fromChange.fBefore) {
 			cache->RemoveEntry(fromName);
+			if (to == from)
+				cache->AddEntry(toName, fileID, true);
 			cache->SetChangeInfo(fromChange.fAfter);
-		} else if (cache->ChangeInfo() != fromChange.fBefore)
+		} else
 			cache->Trash();
 	}
 	cache->Unlock();
 
-	if (id != NULL)
-		*id = FileIdToInoT(fileID);
-
-	cache = attribute ? to->fAttrCache : to->fCache;
-	cache->Lock();
-	if (cache->Valid()) {
-		if (toChange.fAtomic
-			&& cache->ChangeInfo() == toChange.fBefore) {
-			cache->AddEntry(toName, fileID, true);
-			cache->SetChangeInfo(toChange.fAfter);
-		} else if (to->fCache->ChangeInfo() != toChange.fBefore)
-			cache->Trash();
+	if (to != from) {
+		cache = attribute ? to->fAttrCache : to->fCache;
+		cache->Lock();
+		if (cache->Valid()) {
+			if (toChange.fAtomic
+				&& (cache->ChangeInfo() == toChange.fBefore)) {
+				cache->AddEntry(toName, fileID, true);
+				cache->SetChangeInfo(toChange.fAfter);
+			} else
+				cache->Trash();
+		}
+		cache->Unlock();
 	}
-	cache->Unlock();
 
 	if (attribute) {
 		notify_attribute_changed(from->fFileSystem->DevId(), from->ID(),

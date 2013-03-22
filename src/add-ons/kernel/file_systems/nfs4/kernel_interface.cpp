@@ -604,7 +604,8 @@ nfs4_unlink(fs_volume* volume, fs_vnode* dir, const char* name)
 
 	result = acquire_vnode(volume, id);
 	if (result == B_OK) {
-		ASSERT(get_vnode(volume, id, reinterpret_cast<void**>(&vti)) == B_OK);
+		result = get_vnode(volume, id, reinterpret_cast<void**>(&vti));
+		ASSERT(result == B_OK);
 		vti->Remove();
 		put_vnode(volume, id);
 		remove_vnode(volume, id);
@@ -639,12 +640,27 @@ nfs4_rename(fs_volume* volume, fs_vnode* fromDir, const char* fromName,
 		return B_ENTRY_NOT_FOUND;
 
 	ino_t id;
+	ino_t oldID;
 	status_t result = Inode::Rename(fromInode, toInode, fromName, toName, false,
-		&id);
+		&id, &oldID);
 	if (result != B_OK)
 		return result;
 
 	VnodeToInode* vti;
+
+	if (oldID != 0) {
+		// we have overriden an inode
+		result = acquire_vnode(volume, oldID);
+		if (result == B_OK) {
+			result = get_vnode(volume, oldID, reinterpret_cast<void**>(&vti));
+			ASSERT(result == B_OK);
+			vti->Remove();
+			put_vnode(volume, oldID);
+			remove_vnode(volume, oldID);
+			put_vnode(volume, oldID);
+		}
+	}
+
 	result = get_vnode(volume, id, reinterpret_cast<void**>(&vti));
 	if (result == B_OK) {
 		Inode* child = vti->Get();

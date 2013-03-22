@@ -119,9 +119,6 @@ NFS4Inode::LookUp(const char* name, uint64* change, uint64* fileID,
 	FileHandle* handle, bool parent)
 {
 	ASSERT(name != NULL);
-	ASSERT(change != NULL);
-	ASSERT(fileID != NULL);
-	ASSERT(handle != NULL);
 
 	do {
 		RPC::Server* serv = fFileSystem->Server();
@@ -143,7 +140,8 @@ NFS4Inode::LookUp(const char* name, uint64* change, uint64* fileID,
 		else
 			req.LookUp(name);
 
-		req.GetFH();
+		if (handle != NULL)
+			req.GetFH();
 
 		Attribute attr[] = { FATTR4_FSID, FATTR4_FILEID };
 		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
@@ -177,7 +175,8 @@ NFS4Inode::LookUp(const char* name, uint64* change, uint64* fileID,
 		if (result != B_OK)
 			return result;
 
-		reply.GetFH(handle);
+		if (handle != NULL)
+			reply.GetFH(handle);
 
 		result = reply.GetAttr(&values, &count);
 		if (result != B_OK)
