@@ -141,7 +141,7 @@ X86VMTranslationMap64Bit::Init(bool kernel)
 		// Assuming that only the top 2 PML4 entries are occupied for the
 		// kernel.
 		STATIC_ASSERT(KERNEL_PMAP_BASE == 0xffffff0000000000);
-		STATIC_ASSERT(KERNEL_BASE == 0xffffff8000000000);
+		STATIC_ASSERT(KERNEL_BASE == 0xffffff0000000000);
 
 		// Allocate and clear the PML4.
 		uint64* virtualPML4 = (uint64*)memalign(B_PAGE_SIZE, B_PAGE_SIZE);
@@ -603,16 +603,26 @@ X86VMTranslationMap64Bit::Query(addr_t virtualAddress,
 
 	ThreadCPUPinner pinner(thread_get_current_thread());
 
-	// Look up the page table for the virtual address.
-	uint64* pte = X86PagingMethod64Bit::PageTableEntryForAddress(
+	// This function may be called on the physical map area, so we must handle
+	// large pages here. Look up the page directory entry for the virtual
+	// address.
+	uint64* pde = X86PagingMethod64Bit::PageDirectoryEntryForAddress(
 		fPagingStructures->VirtualPML4(), virtualAddress, fIsKernelMap,
 		false, NULL, fPageMapper, fMapCount);
-	if (pte == NULL)
+	if (pde == NULL || (*pde & X86_64_PDE_PRESENT) == 0)
 		return B_OK;
 
-	uint64 entry = *pte;
-
-	*_physicalAddress = entry & X86_64_PTE_ADDRESS_MASK;
+	uint64 entry;
+	if ((*pde & X86_64_PDE_LARGE_PAGE) != 0) {
+		entry = *pde;
+		*_physicalAddress = (entry & X86_64_PDE_ADDRESS_MASK)
+			+ (virtualAddress % 0x200000);
+	} else {
+		uint64* virtualPageTable = (uint64*)fPageMapper->GetPageTableAt(
+			*pde & X86_64_PDE_ADDRESS_MASK);
+		entry = virtualPageTable[VADDR_TO_PTE(virtualAddress)];
+		*_physicalAddress = entry & X86_64_PTE_ADDRESS_MASK;
+	}
 
 	// Translate the page state flags.
 	if ((entry & X86_64_PTE_USER) != 0) {
@@ -627,8 +637,8 @@ X86VMTranslationMap64Bit::Query(addr_t virtualAddress,
 		| ((entry & X86_64_PTE_PRESENT) != 0 ? PAGE_PRESENT : 0);
 
 	TRACE("X86VMTranslationMap64Bit::Query(%#" B_PRIxADDR ") -> %#"
-		B_PRIxPHYSADDR " %#" B_PRIx32 " (pte: %p %#" B_PRIx64 ")\n",
-		virtualAddress, *_physicalAddress, *_flags, pte, entry);
+		B_PRIxPHYSADDR " %#" B_PRIx32 " (entry: %#" B_PRIx64 ")\n",
+		virtualAddress, *_physicalAddress, *_flags, entry);
 
 	return B_OK;
 }
@@ -638,42 +648,9 @@ status_t
 X86VMTranslationMap64Bit::QueryInterrupt(addr_t virtualAddress,
 	phys_addr_t* _physicalAddress, uint32* _flags)
 {
-	*_flags = 0;
-	*_physicalAddress = 0;
-
-	ThreadCPUPinner pinner(thread_get_current_thread());
-
-	// Look up the page table for the virtual address.
-	// FIXME: PageTableEntryForAddress uses GetPageTableAt() rather than
-	// InterruptGetPageTableAt(). This doesn't actually matter since in our
-	// page mapper both functions are the same, but perhaps this should be
-	// fixed for correctness.
-	uint64* pte = X86PagingMethod64Bit::PageTableEntryForAddress(
-		fPagingStructures->VirtualPML4(), virtualAddress, fIsKernelMap,
-		false, NULL, fPageMapper, fMapCount);
-	if (pte == NULL)
-		return B_OK;
-
-	uint64 entry = *pte;
-
-	*_physicalAddress = entry & X86_64_PTE_ADDRESS_MASK;
-
-	// Translate the page state flags.
-	if ((entry & X86_64_PTE_USER) != 0) {
-		*_flags |= ((entry & X86_64_PTE_WRITABLE) != 0 ? B_WRITE_AREA : 0)
-			| B_READ_AREA;
-	}
-
-	*_flags |= ((entry & X86_64_PTE_WRITABLE) != 0 ? B_KERNEL_WRITE_AREA : 0)
-		| B_KERNEL_READ_AREA
-		| ((entry & X86_64_PTE_DIRTY) != 0 ? PAGE_MODIFIED : 0)
-		| ((entry & X86_64_PTE_ACCESSED) != 0 ? PAGE_ACCESSED : 0)
-		| ((entry & X86_64_PTE_PRESENT) != 0 ? PAGE_PRESENT : 0);
-
-	TRACE("X86VMTranslationMap64Bit::QueryInterrupt(%#" B_PRIxADDR ") -> %#"
-		B_PRIxPHYSADDR ":\n", virtualAddress, *_physicalAddress);
-
-	return B_OK;
+	// With our page mapper, there is no difference in getting a page table
+	// when interrupts are enabled or disabled, so just call Query().
+	return Query(virtualAddress, _physicalAddress, _flags);
 }
 
 

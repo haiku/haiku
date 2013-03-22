@@ -30,8 +30,8 @@
 // address where the kernel is loaded to: the kernel is loaded in the top 2GB
 // of the virtual address space as required by GCC's kernel code model. The
 // whole kernel address space is the top 512GB of the address space.
-#define KERNEL_BASE				0xffffff8000000000
-#define KERNEL_SIZE				0x8000000000
+#define KERNEL_BASE				0xffffff0000000000
+#define KERNEL_SIZE				0x10000000000
 #define KERNEL_TOP  			(KERNEL_BASE + (KERNEL_SIZE - 1))
 #define KERNEL_LOAD_BASE		0xffffffff80000000
 
