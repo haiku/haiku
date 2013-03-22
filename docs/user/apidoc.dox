@@ -53,11 +53,11 @@
 	in either location, and opt for the third option Doxygen provides: to put
 	the documentation into separate files.
 
-	\note The reasons to not put the documentation in the header files are
-		twofold. First of all, it would add unnecessary cruft to the headers
-		that the compiler will needlessly have to parse. File access and speed
-		isn't BeOS and Haiku's best quality. The second reason is that the
-		system headers are included throughout the tree. It's a waste of
+	\note The reasons to not put the documentation in the header files are twofold.
+		First of all, it would add unnecessary cruft to the headers that the
+		compiler will needlessly have to parse, and developers will have a hard
+		time to find the info they are looking for. The second reason is that
+		the system headers are included throughout the tree. It's a waste of
 		electricity to have everybody recompile the entire tree if someone fixes
 		a typo in the documentation. Likewise, the reason to not put the
 		documentation in the source code is that it unnecessarily clutters up
