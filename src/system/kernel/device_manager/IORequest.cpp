@@ -992,8 +992,8 @@ void
 IORequest::OperationFinished(IOOperation* operation, status_t status,
 	bool partialTransfer, generic_size_t transferEndOffset)
 {
-	TRACE("IORequest::OperationFinished(%p, %#lx): request: %p\n", operation,
-		status, this);
+	TRACE("IORequest::OperationFinished(%p, %#" B_PRIx32 "): request: %p\n",
+		operation, status, this);
 
 	MutexLocker locker(fLock);
 

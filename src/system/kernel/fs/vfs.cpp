@@ -1025,7 +1025,7 @@ dec_vnode_ref_count(struct vnode* vnode, bool alwaysFree, bool reenter)
 
 	ASSERT_PRINT(oldRefCount > 0, "vnode %p\n", vnode);
 
-	TRACE(("dec_vnode_ref_count: vnode %p, ref now %ld\n", vnode,
+	TRACE(("dec_vnode_ref_count: vnode %p, ref now %" B_PRId32 "\n", vnode,
 		vnode->ref_count));
 
 	if (oldRefCount != 1)
@@ -1078,7 +1078,7 @@ static void
 inc_vnode_ref_count(struct vnode* vnode)
 {
 	atomic_add(&vnode->ref_count, 1);
-	TRACE(("inc_vnode_ref_count: vnode %p, ref now %ld\n", vnode,
+	TRACE(("inc_vnode_ref_count: vnode %p, ref now %" B_PRId32 "\n", vnode,
 		vnode->ref_count));
 }
 
@@ -1119,8 +1119,8 @@ static status_t
 get_vnode(dev_t mountID, ino_t vnodeID, struct vnode** _vnode, bool canWait,
 	int reenter)
 {
-	FUNCTION(("get_vnode: mountid %ld vnid 0x%Lx %p\n", mountID, vnodeID,
-		_vnode));
+	FUNCTION(("get_vnode: mountid %" B_PRId32 " vnid 0x%" B_PRIx64 " %p\n",
+		mountID, vnodeID, _vnode));
 
 	rw_lock_read_lock(&sVnodeLock);
 
@@ -1431,7 +1431,7 @@ free_unused_vnodes()
 static void
 vnode_low_resource_handler(void* /*data*/, uint32 resources, int32 level)
 {
-	TRACE(("vnode_low_resource_handler(level = %ld)\n", level));
+	TRACE(("vnode_low_resource_handler(level = %" B_PRId32 ")\n", level));
 
 	free_unused_vnodes(level);
 }
@@ -3527,7 +3527,8 @@ common_file_io_vec_pages(struct vnode* vnode, void* cookie,
 		off_t fileOffset = fileVec.offset;
 		off_t fileLeft = min_c(fileVec.length, bytesLeft);
 
-		TRACE(("FILE VEC [%lu] length %Ld\n", fileVecIndex, fileLeft));
+		TRACE(("FILE VEC [%" B_PRIu32 "] length %" B_PRIdOFF "\n", fileVecIndex,
+			fileLeft));
 
 		// process the complete fileVec
 		while (fileLeft > 0) {
@@ -3552,7 +3553,7 @@ common_file_io_vec_pages(struct vnode* vnode, void* cookie,
 					continue;
 				}
 
-				TRACE(("fill vec %ld, offset = %lu, size = %lu\n",
+				TRACE(("fill vec %" B_PRIu32 ", offset = %lu, size = %lu\n",
 					vecIndex, vecOffset, size));
 
 				// actually available bytes
@@ -3616,8 +3617,8 @@ extern "C" status_t
 new_vnode(fs_volume* volume, ino_t vnodeID, void* privateNode,
 	fs_vnode_ops* ops)
 {
-	FUNCTION(("new_vnode(volume = %p (%ld), vnodeID = %Ld, node = %p)\n",
-		volume, volume->id, vnodeID, privateNode));
+	FUNCTION(("new_vnode(volume = %p (%" B_PRId32 "), vnodeID = %" B_PRId64
+		", node = %p)\n", volume, volume->id, vnodeID, privateNode));
 
 	if (privateNode == NULL)
 		return B_BAD_VALUE;
@@ -4304,7 +4305,7 @@ vfs_get_module_path(const char* basePath, const char* moduleName,
 			return B_OK;
 		} else {
 			TRACE(("vfs_get_module_path(): something is strange here: "
-				"0x%08lx...\n", file->Type()));
+				"0x%08" B_PRIx32 "...\n", file->Type()));
 			status = B_ERROR;
 			dir = file;
 			goto err;
@@ -4504,7 +4505,7 @@ vfs_free_unused_vnodes(int32 level)
 extern "C" bool
 vfs_can_page(struct vnode* vnode, void* cookie)
 {
-	FUNCTION(("vfs_canpage: vnode 0x%p\n", vnode));
+	FUNCTION(("vfs_canpage: vnode %p\n", vnode));
 
 	if (HAS_FS_CALL(vnode, can_page))
 		return FS_CALL(vnode, can_page, cookie);
@@ -4517,8 +4518,8 @@ vfs_read_pages(struct vnode* vnode, void* cookie, off_t pos,
 	const generic_io_vec* vecs, size_t count, uint32 flags,
 	generic_size_t* _numBytes)
 {
-	FUNCTION(("vfs_read_pages: vnode %p, vecs %p, pos %Ld\n", vnode, vecs,
-		pos));
+	FUNCTION(("vfs_read_pages: vnode %p, vecs %p, pos %" B_PRIdOFF "\n", vnode,
+		vecs, pos));
 
 #if VFS_PAGES_IO_TRACING
 	generic_size_t bytesRequested = *_numBytes;
@@ -4545,8 +4546,8 @@ vfs_write_pages(struct vnode* vnode, void* cookie, off_t pos,
 	const generic_io_vec* vecs, size_t count, uint32 flags,
 	generic_size_t* _numBytes)
 {
-	FUNCTION(("vfs_write_pages: vnode %p, vecs %p, pos %Ld\n", vnode, vecs,
-		pos));
+	FUNCTION(("vfs_write_pages: vnode %p, vecs %p, pos %" B_PRIdOFF "\n", vnode,
+		vecs, pos));
 
 #if VFS_PAGES_IO_TRACING
 	generic_size_t bytesRequested = *_numBytes;
@@ -5411,8 +5412,8 @@ file_open_entry_ref(dev_t mountID, ino_t directoryID, const char* name,
 	if (name == NULL || *name == '\0')
 		return B_BAD_VALUE;
 
-	FUNCTION(("file_open_entry_ref(ref = (%ld, %Ld, %s), openMode = %d)\n",
-		mountID, directoryID, name, openMode));
+	FUNCTION(("file_open_entry_ref(ref = (%" B_PRId32 ", %" B_PRId64 ", %s), "
+		"openMode = %d)\n", mountID, directoryID, name, openMode));
 
 	bool traverse = (openMode & (O_NOTRAVERSE | O_NOFOLLOW)) == 0;
 
@@ -5516,8 +5517,8 @@ file_read(struct file_descriptor* descriptor, off_t pos, void* buffer,
 	size_t* length)
 {
 	struct vnode* vnode = descriptor->u.vnode;
-	FUNCTION(("file_read: buf %p, pos %Ld, len %p = %ld\n", buffer, pos, length,
-		*length));
+	FUNCTION(("file_read: buf %p, pos %" B_PRIdOFF ", len %p = %ld\n", buffer,
+		pos, length, *length));
 
 	if (S_ISDIR(vnode->Type()))
 		return B_IS_A_DIRECTORY;
@@ -5531,7 +5532,8 @@ file_write(struct file_descriptor* descriptor, off_t pos, const void* buffer,
 	size_t* length)
 {
 	struct vnode* vnode = descriptor->u.vnode;
-	FUNCTION(("file_write: buf %p, pos %Ld, len %p\n", buffer, pos, length));
+	FUNCTION(("file_write: buf %p, pos %" B_PRIdOFF ", len %p\n", buffer, pos,
+		length));
 
 	if (S_ISDIR(vnode->Type()))
 		return B_IS_A_DIRECTORY;
@@ -5548,7 +5550,8 @@ file_seek(struct file_descriptor* descriptor, off_t pos, int seekType)
 	struct vnode* vnode = descriptor->u.vnode;
 	off_t offset;
 
-	FUNCTION(("file_seek(pos = %Ld, seekType = %d)\n", pos, seekType));
+	FUNCTION(("file_seek(pos = %" B_PRIdOFF ", seekType = %d)\n", pos,
+		seekType));
 
 	// some kinds of files are not seekable
 	switch (vnode->Type() & S_IFMT) {
@@ -5642,8 +5645,8 @@ dir_create_entry_ref(dev_t mountID, ino_t parentID, const char* name, int perms,
 	if (name == NULL || *name == '\0')
 		return B_BAD_VALUE;
 
-	FUNCTION(("dir_create_entry_ref(dev = %ld, ino = %Ld, name = '%s', "
-		"perms = %d)\n", mountID, parentID, name, perms));
+	FUNCTION(("dir_create_entry_ref(dev = %" B_PRId32 ", ino = %" B_PRId64 ", "
+		"name = '%s', perms = %d)\n", mountID, parentID, name, perms));
 
 	status = get_vnode(mountID, parentID, &vnode, true, false);
 	if (status != B_OK)
@@ -6649,8 +6652,8 @@ attr_read(struct file_descriptor* descriptor, off_t pos, void* buffer,
 {
 	struct vnode* vnode = descriptor->u.vnode;
 
-	FUNCTION(("attr_read: buf %p, pos %Ld, len %p = %ld\n", buffer, pos, length,
-		*length));
+	FUNCTION(("attr_read: buf %p, pos %" B_PRIdOFF ", len %p = %ld\n", buffer,
+		pos, length, *length));
 
 	if (!HAS_FS_CALL(vnode, read_attr))
 		return B_UNSUPPORTED;
@@ -6665,7 +6668,9 @@ attr_write(struct file_descriptor* descriptor, off_t pos, const void* buffer,
 {
 	struct vnode* vnode = descriptor->u.vnode;
 
-	FUNCTION(("attr_write: buf %p, pos %Ld, len %p\n", buffer, pos, length));
+	FUNCTION(("attr_write: buf %p, pos %" B_PRIdOFF ", len %p\n", buffer, pos,
+		length));
+
 	if (!HAS_FS_CALL(vnode, write_attr))
 		return B_UNSUPPORTED;
 
@@ -6826,7 +6831,8 @@ index_dir_open(dev_t mountID, bool kernel)
 	struct fs_mount* mount;
 	void* cookie;
 
-	FUNCTION(("index_dir_open(mountID = %ld, kernel = %d)\n", mountID, kernel));
+	FUNCTION(("index_dir_open(mountID = %" B_PRId32 ", kernel = %d)\n", mountID,
+		kernel));
 
 	status_t status = get_mount(mountID, &mount);
 	if (status != B_OK)
@@ -6916,8 +6922,8 @@ static status_t
 index_create(dev_t mountID, const char* name, uint32 type, uint32 flags,
 	bool kernel)
 {
-	FUNCTION(("index_create(mountID = %ld, name = %s, kernel = %d)\n", mountID,
-		name, kernel));
+	FUNCTION(("index_create(mountID = %" B_PRId32 ", name = %s, kernel = %d)\n",
+		mountID, name, kernel));
 
 	struct fs_mount* mount;
 	status_t status = get_mount(mountID, &mount);
@@ -6970,8 +6976,8 @@ static status_t
 index_name_read_stat(dev_t mountID, const char* name, struct stat* stat,
 	bool kernel)
 {
-	FUNCTION(("index_remove(mountID = %ld, name = %s, kernel = %d)\n", mountID,
-		name, kernel));
+	FUNCTION(("index_remove(mountID = %" B_PRId32 ", name = %s, kernel = %d)\n",
+		mountID, name, kernel));
 
 	struct fs_mount* mount;
 	status_t status = get_mount(mountID, &mount);
@@ -6994,8 +7000,8 @@ out:
 static status_t
 index_remove(dev_t mountID, const char* name, bool kernel)
 {
-	FUNCTION(("index_remove(mountID = %ld, name = %s, kernel = %d)\n", mountID,
-		name, kernel));
+	FUNCTION(("index_remove(mountID = %" B_PRId32 ", name = %s, kernel = %d)\n",
+		mountID, name, kernel));
 
 	struct fs_mount* mount;
 	status_t status = get_mount(mountID, &mount);
@@ -7027,8 +7033,8 @@ query_open(dev_t device, const char* query, uint32 flags, port_id port,
 	struct fs_mount* mount;
 	void* cookie;
 
-	FUNCTION(("query_open(device = %ld, query = \"%s\", kernel = %d)\n", device,
-		query, kernel));
+	FUNCTION(("query_open(device = %" B_PRId32 ", query = \"%s\", kernel = %d)\n",
+		device, query, kernel));
 
 	status_t status = get_mount(device, &mount);
 	if (status != B_OK)
@@ -7128,7 +7134,8 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 	int32 layer = 0;
 	Vnode* coveredNode = NULL;
 
-	FUNCTION(("fs_mount: entry. path = '%s', fs_name = '%s'\n", path, fsName));
+	FUNCTION(("fs_mount: path = '%s', device = '%s', fs_name = '%s', flags = %#"
+		B_PRIx32 ", args = '%s'\n", path, device, fsName, flags, args));
 
 	// The path is always safe, we just have to make sure that fsName is
 	// almost valid - we can't make any assumptions about args, though.
@@ -7449,8 +7456,8 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 	struct fs_mount* mount;
 	status_t err;
 
-	FUNCTION(("fs_unmount(path '%s', dev %ld, kernel %d\n", path, mountID,
-		kernel));
+	FUNCTION(("fs_unmount(path '%s', dev %" B_PRId32 ", kernel %d\n", path,
+		mountID, kernel));
 
 	struct vnode* pathVnode = NULL;
 	if (path != NULL) {
