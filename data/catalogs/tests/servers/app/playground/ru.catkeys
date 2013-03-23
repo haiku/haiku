@@ -1,0 +1,32 @@
+1	russian	x-vnd.Haiku-Playground	1375574837
+Line	Playground		Линия
+Fill	Playground		Заполнить
+Over	Playground		Над
+Quit	Playground		Выход
+Rect	Playground		Прямоугольник
+Select	Playground		Выделение
+Click and drag to draw an object	Playground		Нажмите кнопку мыши и перемещайте курсор для рисования объекта.
+Controls	Playground		Управление
+Round rect	Playground		Закругленный прямоугольник
+Alpha:	Playground		Альфа-канал:
+Mode:	Playground		Режим:
+Submenu	Playground		Подменю
+Copy	Playground		Копия
+Cancel	Playground		Отмена
+Clear	Playground		Очистить
+Min	Playground		Мин
+Blend	Playground		Смешивание
+Invert	Playground		Инвертирование
+Clear all drawing objects?	Playground		Удалить все нарисованные объекты?
+Width:	Playground		Ширина:
+Alpha	Playground		Альфа
+New object	Playground		Новый объект
+Test	Playground		Тест
+Max	Playground		Макс
+Add	Playground		Добавление
+Playground	System name		Игровое поле
+Erase	Playground		Ластик
+File	Playground		Файл
+Subtract	Playground		Вычитание
+<pick>	Playground		<выбрать>
+Ellipse	Playground		Эллипс

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Shortcuts	1477375596
+1	russian	x-vnd.Haiku-Shortcuts	341885426
 Error, NULL state description?\n	ShortcutsSpec		Ошибка, состояние описания NULL?\n
 MoveMouse	ShortcutsSpec		MoveMouse
 OK	ShortcutsWindow		ОК
@@ -20,10 +20,12 @@ Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Не удалос
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
 SendMessage	ShortcutsSpec		SendMessage
 MoveMouseTo	ShortcutsSpec		MoveMouseTo
+Option	ShortcutsSpec	Name for modifier on keyboard	Option
 Save	ShortcutsWindow		Сохранить
 *MouseButton 1	ShortcutsWindow		*MouseButton 1
 *MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
 MouseDown	ShortcutsSpec		MouseDown
+Save changes before closing?	ShortcutsWindow		Сохранить изменения перед выходом?
 Remove selected shortcut	ShortcutsWindow		Удалить выделенную горячую клавишу
 MouseButton	ShortcutsSpec		MouseButton
 Add new shortcut	ShortcutsWindow		Добавить горячую клавишу

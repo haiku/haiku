@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Time	3249243267
+1	russian	x-vnd.Haiku-Time	3259467657
 GMT (UNIX compatible)	Time		По Гринвичу (совместимо с UNIX)
 OK	Time		ОК
 Asia	Time		Азия
@@ -11,6 +11,7 @@ Preview time:	Time		Предварительное время:
 Synchronize	Time		Синхронизировать
 Revert	Time		Вернуть
 Pacific	Time		Тихий океан
+Show day of week	Time		Показывать день недели
 Add	Time		Добавить
 Date and time	Time		Дата и время
 about	Time		о программе
@@ -26,6 +27,7 @@ Time	Time		Время
 Indian	Time		Индийский океан
 Sending request failed	Time		Не удалось отправить запрос
 Arctic	Time		Арктика
+Display time with seconds	Time		Показывать секунды
 Time	System name		Время
 America	Time		Америка
 Reset	Time		Сбросить
@@ -33,6 +35,8 @@ Synchronize at boot	Time		Синхронизировать при загрузк
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Дата & Время, разработан:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nВсе права защищены 2004-2012, Haiku.
 Received invalid time	Time		Получено неверное время
 Antarctica	Time		Антарктида
+Show time zone	Time		Установить часовой пояс
+Show clock in Deskbar	Time		Отображать часы в Deskbar
 The following error occured while synchronizing:r\n%s: %s	Time		При синхронизации произошла следующая ошибка:r\n%s: %s
 <Other>	Time		<Другой>
 Current time:	Time		Текущее время:
@@ -40,5 +44,6 @@ Try all servers	Time		Пробовать все сервера
 Time zone	Time		Часовой пояс
 Could not create socket	Time		Не удалось создать сокет
 Synchronize again	Time		Синхронизировать снова
+Clock	Time		Часы
 Network time	Time		Синхронизация времени
 Atlantic	Time		Атлантика

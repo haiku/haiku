@@ -1,5 +1,5 @@
-1	polish	x-vnd.Haiku-libtracker	223982976
-common	B_COMMON_DIRECTORY		common
+1	polish	x-vnd.Haiku-libtracker	2345639754
+common	B_COMMON_DIRECTORY		wspólny
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Widok ikon
 Add-ons	FilePanelPriv		Wtyczki
@@ -73,6 +73,7 @@ Arrange by	ContainerWindow		Ułóż według
 Mount server error	AutoMounterSettings		Błąd serwera montowania
 Search	FindPanel		Szukaj
 Preparing to empty Trash…	StatusWindow		Przygotowanie do opróżnienia Kosza…
+You cannot put the selected item(s) into the trash.	FSUtils		Nie możesz umieścić wybranych elementów w Koszu.
 Disks	Model		Dyski
 Create link	ContainerWindow		Utwórz link
 develop	B_COMMON_DEVELOP_DIRECTORY		develop
@@ -92,6 +93,7 @@ Cut	FilePanelPriv		Wytnij
 Replace	FilePanelPriv		Zastąp
 Select all	VolumeWindow		Zaznacz wszystko
 Opens with:	InfoWindow		Otwórz za pomocą:
+If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jeśli wykonasz '%ifYouDoAction' wobec ustawień MIME, %osName może się nie zachowywać właściwie!\n\nCzy jesteś pewien, że chcesz wykonać operację %ifYouDoAction?
 Open	ContainerWindow		Otwórz
 96 x 96	DeskWindow		96 x 96
 Error calculating folder size.	InfoWindow		Błąd przy obliczaniu rozmiaru folderu.
@@ -253,6 +255,7 @@ TiB	WidgetAttributeText		TiB
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Plik o nazwie \"%name\" już istnieje w tej lokalizacji. Czy chcesz go zamienić?
 Cancel	ContainerWindow		Anuluj
 Only the boot disk	AutoMounterSettings		Tylko dysk bootujący
+If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jeśli wykonasz '%ifYouDoAction' wobec katalogu konfiguracji, %osName może się nie zachowywać właściwie!\n\nCzy jesteś pewien, że chcesz wykonać operację '%ifYouDoAction'?
 Unmount	ContainerWindow		Odmontuj
 Copy layout	ContainerWindow		Kopiuj motyw
 label too long	PoseView		opis zbyt długi
@@ -339,6 +342,7 @@ Handles any file	OpenWithWindow		Wspiera każdy plik
 Get info	FilePanelPriv		Pokaż informacje
 32 x 32	DeskWindow		32 x 32
 Cancel	FilePanelPriv		Anuluj
+The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Typ dokumentu, którego zamierzasz otworzyć programem \"%appname\", nie jest przez niego obsługiwany.\nCzy jesteś pewien, że chcesz to zrobić?\n\nJeśli jesteś pewien, że program wspiera taki typ dokumentu, powinieneś skontaktować się z wydawcą programu i poprosić, żeby zaktualizowano listę wspieranych typów dokumentów.
 Disks	DirMenu		Dyski
 New folder %ld	FSUtils		Nowy folder %ld
 All BeOS disks	AutoMounterSettings		Wszystkie dyski BeOS
@@ -376,6 +380,7 @@ Preferences…	ContainerWindow		Ustawienia...
 Move	PoseView		Przenieś
 Open and make preferred	OpenWithWindow		Otwórz i zaznacz jako preferowane
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Jesteś pewien, że chcesz usunąć zaznaczone obiekty? Ta operacja nie może być cofnięta.
+If you %ifYouDoAction the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Jeśli wykonasz '%ifYouDoAction' wobec katalogu domowego, %osName może nie zachowywać się właściwie!\n\nCzy jesteś pewien, że chcesz wykonać operację '%ifYouDoAction'?\n\nJeśli pomimo wszystko wciąż chcesz wykonać '%toDoAction', to przytrzymaj klawisz Shift i kliknij \"%toConfirmAction\".
 Add-ons	DeskWindow		Wtyczki
 Name	FindPanel		Nazwa
 And	FindPanel		I

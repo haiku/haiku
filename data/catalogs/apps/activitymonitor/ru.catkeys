@@ -1,8 +1,9 @@
-1	russian	x-vnd.Haiku-ActivityMonitor	3704566709
+1	russian	x-vnd.Haiku-ActivityMonitor	1913625522
 P-faults	DataSource		Ошибки страниц
 Media nodes	DataSource		Медиа узлы
 Threads	DataSource		Потоки
 MB	DataSource		МБ
+Always on top	ActivityWindow		Поверх всех окон
 Add graph	ActivityWindow		Добавить график
 Teams	DataSource		Процессы
 Hide legend	ActivityView		Скрыть легенду

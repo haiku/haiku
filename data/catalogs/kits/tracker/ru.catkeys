@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	720928714
+1	russian	x-vnd.Haiku-libtracker	4167158175
 common	B_COMMON_DIRECTORY		Общие
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Большие значки
@@ -50,7 +50,7 @@ Delete	PoseView		Удалить
 Select all	ContainerWindow		Выделить все
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Извините, но атрибут 'Character' не может хранить многобайтовый глиф.
 Clean up	DeskWindow		Выстроить
-You cannot copy or move the root directory.	FSUtils		Вы не можете перемещать или копировать корневую папку.
+You cannot copy or move the root directory.	FSUtils		Вы не можете копировать или перемещать корневую папку.
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed из %TotalSize, %BytesPerSecond/с
 Invert selection	FilePanelPriv		Инвертировать
 Rename	InfoWindow	Button label, 'Rename' (en), 'Umbenennen' (de)	Переименовать
@@ -74,6 +74,7 @@ Arrange by	ContainerWindow		Выстроить по
 Mount server error	AutoMounterSettings		Ошибка сервера подключения дисков
 Search	FindPanel		Искать
 Preparing to empty Trash…	StatusWindow		Подготовка к очищению корзины…
+You cannot put the selected item(s) into the trash.	FSUtils		Вы не можете переместить выбранные объекты в корзину.
 Disks	Model		Диски
 Create link	ContainerWindow		Создать ссылку в
 develop	B_COMMON_DEVELOP_DIRECTORY		Разработка
@@ -448,6 +449,7 @@ Mount	DeskWindow		Подключить
 Mount	ContainerWindow		Подключить
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used занято -- %free свободно)
 Cancel	FSClipBoard		Отмена
+Restart Deskbar	DeskWindow		Перезапустить Deskbar
 Cut more	ContainerWindow		Вырезать ещё
 Deleting: 	StatusWindow		Удаление: 
 Empty Trash	InfoWindow		Очистить корзину

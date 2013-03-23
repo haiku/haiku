@@ -22,8 +22,8 @@ Driver: %driver%	PrinterListView		Sterownik: %driver%
 Black	TestPageView		Czarny
 Restart job	PrintersWindow		Zrestartuj zadanie
 Add	AddPrinterDialog		Dodaj
-Make default	PrintersWindow		Utwórz domyślny
-Transport: %transport% %transport_address%	TestPageView		Transport: %transport% %transport_address%
+Make default	PrintersWindow		Ustaw jako domyślną drukarkę
+Transport: %transport% %transport_address%	TestPageView		Transport: %transport%, adres: %transport_address%
 Cancel job	PrintersWindow		Anuluj zadanie
 Yellow	TestPageView		Żółty
 Blue	TestPageView		Niebieski

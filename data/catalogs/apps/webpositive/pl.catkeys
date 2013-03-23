@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-WebPositive	2400159322
+1	polish	x-vnd.Haiku-WebPositive	3577331897
 Show home button	Settings Window		Pokaż przycisk domowy
 Username:	Authentication Panel		Nazwa użytkownika:
 Copy URL to clipboard	Download Window		Kopiuj adres URL do schowka
@@ -16,6 +16,7 @@ Start page:	Settings Window		Strona startowa:
 History	WebPositive Window		Historia
 Error opening downloads folder	Download Window		Błąd podczas otwierania folderu pobierania
 Paste	WebPositive Window		Wklej
+Proxy username:	Settings Window		Nazwa użytkownika serwera proxy:
 Settings	Settings Window		Ustawienia
 %seconds seconds left	Download Window		Pozostało %seconds sekund 
 Confirmation	WebPositive Window		Potwierdzenie
@@ -33,6 +34,7 @@ Cancel	Authentication Panel		Anuluj
 Match case	WebPositive Window		Uwzględnij wielkość liter
 Search page:	Settings Window		Strona wyszukiwania:
 Zoom text only	WebPositive Window		Powiększaj tylko tekst
+Default fixed font size:	Settings Window		Domyślny rozmiar czcionki o stałej szerokości:
 Close tab	WebPositive Window		Zamknij kartę
 Auto-hide mouse pointer	Settings Window		Auto-chowanie  wskaźnika myszy
 Over 1 hour left	Download Window		Została ponad 1 godzina
@@ -40,6 +42,7 @@ Quit	WebPositive Window		Zakończ
 Full screen	WebPositive Window		Pełny ekran
 Open download error	Download Window		Otwórz błąd pobierania
 Standard font:	Settings Window		Czcionka standardowa:
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Wyszukuje poprzednie wystąpienie tekstu
 Restart	Download Window		Uruchom ponownie
 Proxy server	Settings Window		Serwer proxy
 Open containing folder	Download Window		Otwórz folder zawierający
@@ -57,6 +60,7 @@ Cut	WebPositive Window		Wytnij
 Bookmark this page	WebPositive Window		Dodaj zakładkę
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Wystąpił błąd podczas próby pokazania folderu zakładek.\n\nBłąd: %error
 Open downloads folder	Download Window		Otwórz folder pobierania
+Proxy password:	Settings Window		Hasło serwera proxy:
 Number of days to keep links in History menu:	Settings Window		Liczba dni przechowywania linków w historii:
 Hide	Download Window		Ukryj
 Reset size	WebPositive Window		Resetuj rozmiar
@@ -66,6 +70,7 @@ There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive 
 Over 1 day left	Download Window		Został ponad 1 dzień
 Downloads	WebPositive Window		Pobieranie
 Requesting %url	WebPositive Window		Odpytywanie %url
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Wyszukuje następne wystąpienie tekstu
 Apply	Settings Window		Zastosuj
 Bookmark info	WebPositive Window		Informacje o zakładkach
 Size:	Font Selection view		Rozmiar:
@@ -79,6 +84,7 @@ Open blank page	Settings Window		Otwórz pustą stronę
 New tabs:	Settings Window		Nowa karta:
 Cancel	WebPositive Window		Anuluj
 Open all	WebPositive Window		Otwórz wszystko
+Proxy server requires authentication	Settings Window		Serwer proxy wymaga uwierzytelnienia
 Clear	URL Bar		Wyczyść
 Cut	URL Bar		Wytnij
 Clear	WebPositive Window		Wyczyść

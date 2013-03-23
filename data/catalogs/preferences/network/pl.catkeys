@@ -1,22 +1,27 @@
-1	polish	x-vnd.Haiku-Network	365183238
+1	polish	x-vnd.Haiku-Network	1341378870
 Choose automatically	EthernetSettingsView		Wybierz automatycznie
 Gateway:	EthernetSettingsView		Brama domyślna:
 Netmask:	EthernetSettingsView		Maska sieci:
 DHCP	EthernetSettingsView		DHCP
 DNS #2:	EthernetSettingsView		DNS #2:
 Apply	EthernetSettingsView		Zastosuj
+Netmask is invalid	EthernetSettingsView		Maska sieci jest nieprawidłowa
 OK	EthernetSettingsView		OK
 DNS #1:	EthernetSettingsView		DNS #1:
 IP address:	EthernetSettingsView		Adres IP:
 Adapter:	EthernetSettingsView		Karta sieciowa:
 Domain:	EthernetSettingsView		Domena:
+Gateway is invalid	EthernetSettingsView		Adres bramy jest nieprawidłowy
+DNS #1 is invalid	EthernetSettingsView		DNS 1 jest nieprawidłowy
 Revert	EthernetSettingsView		Przywróć
 <no wireless networks found>	EthernetSettingsView		<nie znaleziono żadnych sieci bezprzewodowych>
 Network	System name		Sieć
 Mode:	EthernetSettingsView		Typ adresu:
+IP address is invalid	EthernetSettingsView		adres IP jest nieprawidłowy
 Network:	EthernetSettingsView		Sieć:
 The net_server needs to run for the auto configuration!	EthernetSettingsView		Serwer sieci (net_server) musi być uruchomiony dla automatycznej konfiguracji!
 Disabled	EthernetSettingsView		Wyłączone
 Auto-configuring failed: 	EthernetSettingsView		Automatyczna konfiguracja nie powiodła się: 
 Static	EthernetSettingsView		Statyczny
+DNS #2 is invalid	EthernetSettingsView		DNS 2 jest nieprawidłowy
 <no adapter>	EthernetSettingsView		<brak urządzenia>

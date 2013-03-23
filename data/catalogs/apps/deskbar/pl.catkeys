@@ -1,13 +1,11 @@
-1	polish	x-vnd.Be-TSKB	1566009467
+1	polish	x-vnd.Be-TSKB	1398106986
 Power off	DeskbarMenu		Wyłącz komputer
-Edit menu…	PreferencesWindow		Edytuj zawartość menu…
 Suspend	DeskbarMenu		Wstrzymaj
 Hide clock	TimeView		Ukryj zegar
 Time preferences…	TimeView		Ustawienia czasu...
 About Haiku	DeskbarMenu		O Haiku
 Recent documents:	PreferencesWindow		Ostatnio przeglądane dokumenty:
 Recent applications	DeskbarMenu		Ostatnio uruchomione aplikacje
-Sort running applications	PreferencesWindow		Sortuj uruchomione aplikacje alfabetycznie
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplikacje
 Find…	DeskbarMenu		Wyszukaj…
 Show clock	Tray		Pokaż zegar

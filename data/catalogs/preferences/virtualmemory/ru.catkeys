@@ -1,5 +1,6 @@
-1	russian	x-vnd.Haiku-VirtualMemory	4238590117
+1	russian	x-vnd.Haiku-VirtualMemory	2090796060
 Quit	SettingsWindow		Выйти
+Automatic swap management	SettingsWindow		Определять автоматически
 Turn off	SettingsWindow		Выключить
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Отключение виртуальной памяти может повлиять на стабильность системы, когда вся память будет израсходована.\nВиртуальная память не влияет на производительность системы пока она не используется.\n\nВы уверены, что хотите выключить ее?
 Requested swap file size:	SettingsWindow		Выбранный размер файла подкачки:

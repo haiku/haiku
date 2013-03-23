@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-LaunchBox	3016105370
+1	russian	x-vnd.Haiku-LaunchBox	3692177981
 New	LaunchBox		Создать
 Set description…	LaunchBox		Изменить описание…
 Vertical layout	LaunchBox		Расположить вертикально
@@ -6,6 +6,7 @@ OK	LaunchBox		ОК
 Pad 1	LaunchBox		Панель 1
 last chance	LaunchBox		последний шанс
 Quit	LaunchBox		Выход
+Open containing folder	LaunchBox		Открыть содержащую папку
 Clear button	LaunchBox		Очистить кнопку
 LaunchBox	System name		Панель запуска
 Ignore double-click	LaunchBox		Игнорировать двойной щелчок

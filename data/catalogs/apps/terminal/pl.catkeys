@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Terminal	2997644674
+1	polish	x-vnd.Haiku-Terminal	2645209895
 Not found.	Terminal TermWindow		Nie znaleziono.
 Switch Terminals	Terminal TermWindow		Przełącz Terminal
 Change directory	Terminal TermView		Zmień folder
@@ -62,6 +62,7 @@ Text not found.	Terminal TermWindow		Tekst nie znaleziony.
 Find…	Terminal TermWindow		Znajdź…
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Proces \"%1\" jest wciąż w użyciu.\nJeśli zamkniesz terminal, proces zostanie zatrzymany.
 Move here	Terminal TermView		Przenieś tutaj
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tBieżący katalog roboczy dla aktywnego procesu w danej\n\t\t\tzakładce. Opcjonalnie maksymalna liczba elementów ścieżki\n\t\t\tjaka ma być określona. Np. '%2d' dla co najwyżej dwóch elementów.\n\t%T\t-\tNazwa programu Terminala dla obecnych ustawień localizacyjnych (locale).\n\t%i\t-\tLiczba porządkowa okna (index).\n\t%p\t-\tNazwa aktywnego okna w bieżącej zakładce.\n\t%t\t-\tTytuł bieżącej zakładki.\n\t%%\t-\tZnak '%'.
 Retro	Terminal colors scheme		Retro
 Error!	Terminal getString		Błąd!
 New tab	Terminal TermWindow		Nowa karta
@@ -69,6 +70,7 @@ The pattern specifying the tab titles. The following placeholders\ncan be used:\
 Selected background	Terminal AppearancePrefView		Wybrane tło
 Slate	Terminal colors scheme		Ciemnopopielaty
 Text under cursor	Terminal AppearancePrefView		Tekst pod kursorem
+Midnight	Terminal colors scheme		O północy
 Decrease	Terminal TermWindow		Zmniejsz
 Default	Terminal colors scheme		Domyślny
 Create link here	Terminal TermView		Utwórz link tutaj

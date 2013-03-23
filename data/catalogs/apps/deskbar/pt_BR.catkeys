@@ -1,6 +1,5 @@
-1	portuguese (brazil)	x-vnd.Be-TSKB	1210725923
+1	portuguese (brazil)	x-vnd.Be-TSKB	1042823442
 Power off	DeskbarMenu		Desligar
-Edit menu…	PreferencesWindow		Editar menu...
 Suspend	DeskbarMenu		Suspender
 Hide clock	TimeView		Ocultar relógio
 Applications	PreferencesWindow		Aplicativos
@@ -8,7 +7,6 @@ Time preferences…	TimeView		Preferências de hora…
 About Haiku	DeskbarMenu		Sobre o Haiku
 Recent documents:	PreferencesWindow		Documentos recentes:
 Recent applications	DeskbarMenu		Aplicativos recentes
-Sort running applications	PreferencesWindow		Ordenar aplicativos em execução
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplicativos
 Find…	DeskbarMenu		Localizar…
 Show clock	Tray		Exibir relógio

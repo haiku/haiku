@@ -7,8 +7,8 @@ About %app%	AboutMenuItem		O %app%
 Cut	TextView		Wytnij
 Version	AboutWindow		Wersja
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nie można stworzyć replikanta dla \"%description\".\n%error
-About	AboutWindow		O…
-Copy	TextView		Skopiuj
+About	AboutWindow		O
+Copy	TextView		Kopiuj
 %3.2f KiB	StringForSize		%3.2f KiB
 %d bytes	StringForSize		%d bajtów
 alpha	AboutWindow		alfa

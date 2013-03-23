@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-FileTypes	1059171929
+1	polish	x-vnd.Haiku-FileTypes	133192727
 Application types…	FileTypes Window		Typy aplikacji…
 Description:	Application Types Window		Opis:
 Args only	Application Type Window		Tylko argumenty
@@ -49,6 +49,8 @@ Group name:	New File Type Window		Nazwa grupy:
 Preferred application	FileType Window		Preferowana aplikacja
 Progress	Application Types Window		Postęp
 Set preferred application	Preferred App Menu		Ustaw preferowaną aplikację
+Don't save	Application Type Window		Nie zapisuj
+Save changes before closing?	Application Type Window		Zapisać zmiany przed zamknięciem?
 File	Application Type Window		Plik
 Version:	Application Type Window		Wersja:
 Select…	FileTypes Window		Wybierz…

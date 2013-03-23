@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-WebPositive	233049275
+1	russian	x-vnd.Haiku-WebPositive	3577331897
 Show home button	Settings Window		Показывать кнопку Домой
 Username:	Authentication Panel		Имя пользователя:
 Copy URL to clipboard	Download Window		Копировать ссылку на загрузку
@@ -16,6 +16,7 @@ Start page:	Settings Window		Начальная страница:
 History	WebPositive Window		История
 Error opening downloads folder	Download Window		Ошибка открытия каталога загрузок
 Paste	WebPositive Window		Вставить
+Proxy username:	Settings Window		Имя пользователя прокси:
 Settings	Settings Window		Настройки
 %seconds seconds left	Download Window		осталось %seconds секунд
 Confirmation	WebPositive Window		Подтверждение
@@ -41,6 +42,7 @@ Quit	WebPositive Window		Выход
 Full screen	WebPositive Window		Полноэкранный режим
 Open download error	Download Window		Ошибка при открытии загруженного файла
 Standard font:	Settings Window		Обычный шрифт:
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Найти назад
 Restart	Download Window		Перезапустить
 Proxy server	Settings Window		Прокси-сервер
 Open containing folder	Download Window		Открыть папку с файлом
@@ -58,6 +60,7 @@ Cut	WebPositive Window		Вырезать
 Bookmark this page	WebPositive Window		Добавить в закладки
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Произошла ошибка при открытии папки с закладками.\n\nОшибка: %error
 Open downloads folder	Download Window		Открыть папку загрузок
+Proxy password:	Settings Window		Пароль прокси:
 Number of days to keep links in History menu:	Settings Window		Количество дней, которые надо держать ссылки в меню История:
 Hide	Download Window		Скрыть
 Reset size	WebPositive Window		Сбросить размер
@@ -67,6 +70,7 @@ There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive 
 Over 1 day left	Download Window		Осталось более 1 дня
 Downloads	WebPositive Window		Загрузки
 Requesting %url	WebPositive Window		Запрашивается %url
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Найти вперед
 Apply	Settings Window		Применить
 Bookmark info	WebPositive Window		Информация о закладке
 Size:	Font Selection view		Размер:
@@ -80,6 +84,7 @@ Open blank page	Settings Window		Открыть пустую страницу
 New tabs:	Settings Window		Новые вкладки:
 Cancel	WebPositive Window		Отмена
 Open all	WebPositive Window		Открыть все
+Proxy server requires authentication	Settings Window		Прокси требует проверки подлинности
 Clear	URL Bar		Очистить
 Cut	URL Bar		Вырезать
 Clear	WebPositive Window		Очистить

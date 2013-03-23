@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Notifications	814394708
+1	polish	x-vnd.Haiku-Notifications	2177286129
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Wystąpił błąd przy zapisie ustawień.\nByć może zabrakło miejsca na dysku.
 Notifications	GeneralView		Powiadomienia
 seconds of inactivity	GeneralView		sekund nieaktywności
@@ -17,6 +17,7 @@ Cannot disable notifications because the server can't be reached.	GeneralView		N
 Progress	NotificationView		Postęp
 Last Received	NotificationView		Ostatnio otrzymane
 General	PrefletView		Ogólne
+Apply	PrefletWin		Zastosuj
 Display	PrefletView		Wyświetlanie
 Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Nie można włączyć powiadomień przy starcie systemu, prawdopodobnie nie masz uprawnień zapisu do katalogu ustawień systemowych.
 Search:	NotificationView		Szukaj:
