@@ -60,7 +60,8 @@ hgl_framebuffer_validate(struct st_framebuffer_iface* stfb,
 }
 
 
-GalliumFramebuffer::GalliumFramebuffer(struct st_visual* visual)
+GalliumFramebuffer::GalliumFramebuffer(struct st_visual* visual,
+	void* privateContext)
 	:
 	fBuffer(NULL)
 {
@@ -73,6 +74,7 @@ GalliumFramebuffer::GalliumFramebuffer(struct st_visual* visual)
 	fBuffer->visual = visual;
 	fBuffer->flush_front = hgl_framebuffer_flush_front;
 	fBuffer->validate = hgl_framebuffer_validate;
+	fBuffer->st_manager_private = privateContext;
 
 	pipe_mutex_init(fMutex);
 }

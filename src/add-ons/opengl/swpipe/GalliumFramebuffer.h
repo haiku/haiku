@@ -18,7 +18,8 @@ extern "C" {
 
 class GalliumFramebuffer {
 public:
-							GalliumFramebuffer(struct st_visual* visual);
+							GalliumFramebuffer(struct st_visual* visual,
+								void* privateContext);
 							~GalliumFramebuffer();
 		status_t			Lock();
 		status_t			Unlock();

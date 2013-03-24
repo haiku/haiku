@@ -64,7 +64,7 @@ hook_winsys_displaytarget_create(struct sw_winsys* winsys,
 	unsigned textureUsage, enum pipe_format format, unsigned width,
 	unsigned height, unsigned alignment, unsigned* stride)
 {
-	CALLED();
+	TRACE("%s: %dx%d\n", __func__, width, height);
 
 	struct haiku_displaytarget* haikuDisplayTarget
 		= CALLOC_STRUCT(haiku_displaytarget);
