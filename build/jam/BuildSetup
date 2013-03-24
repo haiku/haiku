@@ -135,6 +135,15 @@ if $(HAIKU_GCC_VERSION[1]) >= 3 {
 	HAIKU_GCC_BASE_FLAGS += -fno-strict-aliasing ;
 }
 
+# disable array bounds warnings on gcc 4.6 or newer since they trigger
+# too many false positives. Coverity does a better job of this kind of analysis
+# anyways.
+if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	if $(HAIKU_GCC_VERSION[2] >= 6) {
+		HAIKU_GCC_BASE_FLAGS += -Wno-array-bounds ;
+	}
+}
+
 if $(HOST_GCC_VERSION[1]) >= 3 {
 	HOST_GCC_BASE_FLAGS += -fno-strict-aliasing ;
 }
