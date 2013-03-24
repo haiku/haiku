@@ -354,6 +354,7 @@ SoftwareRenderer::_AllocateBitmap()
 		TRACE("%s: Can't create bitmap!\n", __func__);
 		return;
 	}
+
 #if 0
 	// debug..
 	void *data = fBitmap->Bits();

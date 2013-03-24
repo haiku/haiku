@@ -51,7 +51,9 @@ hgl_viewport(struct gl_context* glContext, GLint x, GLint y,
 {
 	TRACE("%s(glContext: %p, x: %d, y: %d, width: %d, height: %d\n", __func__,
 		glContext, x, y, width, height);
-	struct hgl_context *context = (struct hgl_context*)glContext->DriverCtx;
+
+#if 0
+	struct hgl_context* context = DOWNCAST(hgl_context, gl_context, glContext);
 
 	if (!context) {
 		ERROR("%s: No context yet. bailing.\n", __func__);
@@ -72,6 +74,16 @@ hgl_viewport(struct gl_context* glContext, GLint x, GLint y,
 		if (read)
 			_mesa_resize_framebuffer(glContext, read, bitmapWidth, bitmapHeight);
 	}
+#endif
+	struct gl_framebuffer *draw = glContext->WinSysDrawBuffer;
+	struct gl_framebuffer *read = glContext->WinSysReadBuffer;
+
+	// TODO: SLOW! We need to check for changes in size here. 
+
+	if (draw)
+		_mesa_resize_framebuffer(glContext, draw, width, height);
+	if (read)
+		_mesa_resize_framebuffer(glContext, read, width, height);
 }
 
 
@@ -362,14 +374,13 @@ GalliumContext::CreateContext(Bitmap *bitmap)
 	}
 
 	// Init Gallium3D Post Processing
-	context->postProcess = pp_init(fScreen, context->postProcessEnable);
+	//context->postProcess = pp_init(fScreen, context->postProcessEnable);
 
 	assert(!context->st->st_manager_private);
 	context->st->st_manager_private = (void*)context;
 
 	struct st_context *stContext = (struct st_context*)context->st;
 	
-	stContext->ctx->DriverCtx = context;
 	stContext->ctx->Driver.Viewport = hgl_viewport;
 
 	// TODO: Closely review this next context logic...

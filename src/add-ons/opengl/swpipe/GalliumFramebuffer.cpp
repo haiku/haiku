@@ -30,8 +30,8 @@ extern "C" {
 
 
 static boolean
-hgl_framebuffer_flush_front(struct st_framebuffer_iface* stfb,
-	enum st_attachment_type statt)
+hgl_framebuffer_flush_front(struct st_context_iface *stctx,
+	struct st_framebuffer_iface* stfb, enum st_attachment_type statt)
 {
 	CALLED();
 	// TODO: I have *NO* idea how we are going to access this data...
