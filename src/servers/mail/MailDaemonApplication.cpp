@@ -40,6 +40,9 @@
 #define B_TRANSLATION_CONTEXT "MailDaemon"
 
 
+static const uint32 kMsgAutoCheck = 'moto';
+
+
 struct send_mails_info {
 	send_mails_info()
 	{
@@ -302,10 +305,8 @@ void
 MailDaemonApplication::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
-		case 'moto':
-			if (fSettingsFile.CheckOnlyIfPPPUp()) {
-				// TODO: check whether internet is up and running!
-			}
+		case kMsgAutoCheck:
+			// TODO: check whether internet is up and running!
 			// supposed to fall through
 		case kMsgCheckAndSend:	// check & send messages
 			msg->what = kMsgSendMessages;
@@ -832,8 +833,13 @@ MailDaemonApplication::_UpdateAutoCheck(bigtime_t interval)
 			fAutoCheckRunner->SetInterval(interval);
 			fAutoCheckRunner->SetCount(-1);
 		} else {
-			fAutoCheckRunner = new BMessageRunner(be_app_messenger,
-				new BMessage('moto'), interval);
+			BMessage update(kMsgAutoCheck);
+			fAutoCheckRunner = new BMessageRunner(be_app_messenger, &update,
+				interval);
+
+			// Send one right away -- the message runner will wait until the
+			// first interval has passed before sending a message
+			PostMessage(&update);
 		}
 	} else {
 		delete fAutoCheckRunner;
