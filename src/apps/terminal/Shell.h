@@ -49,6 +49,11 @@ public:
 			const ShellInfo&	Info() const
 									{ return fShellInfo; }
 
+			int					Encoding() const
+									{ return fShellInfo.Encoding(); }
+			void				SetEncoding(int encoding)
+									{ fShellInfo.SetEncoding(encoding); }
+
 			bool				HasActiveProcesses() const;
 			bool				GetActiveProcessInfo(
 									ActiveProcessInfo& _info) const;
