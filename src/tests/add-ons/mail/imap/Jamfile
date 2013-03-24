@@ -12,7 +12,7 @@ local libSources = Commands.cpp Protocol.cpp Response.cpp ;
 #IMAPStorage.cpp
 
 # use OpenSSL, if enabled
-if $(HAIKU_OPENSSL_ENABLED) {
+if $(HAIKU_BUILD_FEATURE_OPENSSL_ENABLED) {
 	SubDirC++Flags -DUSE_SSL ;
 	SubDirSysHdrs $(HAIKU_OPENSSL_HEADERS) ;
 	Includes [ FGristFiles $(sources) ] : $(HAIKU_OPENSSL_HEADERS_DEPENDENCY) ;
