@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2011-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef IMAP_CONNECTION_WORKER_H
@@ -12,13 +12,24 @@
 #include "Protocol.h"
 
 
+class IMAPProtocol;
+class Settings;
+
+
 class IMAPConnectionWorker {
 public:
-								IMAPConnectionWorker(IMAP::Protocol& protocol,
-									StringList& mailboxes);
+								IMAPConnectionWorker(IMAPProtocol& owner,
+									const Settings& settings,
+									bool main = false);
 	virtual						~IMAPConnectionWorker();
 
-			status_t			Start(bool usePush);
+			uint32				CountMailboxes() const;
+			void				AddMailbox(const BString& name);
+			void				RemoveMailbox(const BString& name);
+
+			bool				IsMain() const { return fMain; }
+
+			status_t			Start();
 			void				Stop();
 
 private:
@@ -26,12 +37,16 @@ private:
 	static	status_t			_Worker(void* self);
 
 private:
-			IMAP::Protocol&		fProtocol;
+			IMAPProtocol&		fOwner;
+			const Settings&		fSettings;
+			IMAP::Protocol		fProtocol;
 			BString				fIdleBox;
 			StringList			fOtherBoxes;
 
 			BLocker				fLocker;
 			thread_id			fThread;
+			bool				fMain;
+			bool				fStopped;
 };
 
 

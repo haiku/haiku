@@ -15,6 +15,11 @@
 
 
 class IMAPConnectionWorker;
+namespace IMAP {
+	class Protocol;
+}
+
+
 typedef std::set<BString> StringSet;
 
 
@@ -23,6 +28,9 @@ public:
 								IMAPProtocol(
 									const BMailAccountSettings& settings);
 	virtual						~IMAPProtocol();
+
+			status_t			CheckSubscribedFolders(
+									IMAP::Protocol& protocol);
 
 	virtual	status_t			SyncMessages();
 	virtual status_t			FetchBody(const entry_ref& ref);

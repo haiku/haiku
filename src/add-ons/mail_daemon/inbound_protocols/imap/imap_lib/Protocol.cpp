@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2012, Haiku Inc. All Rights Reserved.
+ * Copyright 2010-2013, Haiku Inc. All Rights Reserved.
  * Copyright 2010 Clemens Zeidler. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -118,11 +118,11 @@ Protocol::GetFolders(FolderList& folders)
 		return status;
 
 	StringList subscribedFolders;
-	status = _GetSubscribedFolders(subscribedFolders);
+	status = GetSubscribedFolders(subscribedFolders);
 	if (status != B_OK)
 		return status;
 
-	for (unsigned int i = 0; i < allFolders.size(); i++) {
+	for (size_t i = 0; i < allFolders.size(); i++) {
 		FolderEntry entry;
 		entry.folder = allFolders[i];
 		for (unsigned int a = 0; a < subscribedFolders.size(); a++) {
@@ -136,9 +136,9 @@ Protocol::GetFolders(FolderList& folders)
 	}
 
 	// you could be subscribed to a folder which not exist currently, add them:
-	for (unsigned int a = 0; a < subscribedFolders.size(); a++) {
+	for (size_t a = 0; a < subscribedFolders.size(); a++) {
 		bool isInlist = false;
-		for (unsigned int i = 0; i < allFolders.size(); i++) {
+		for (size_t i = 0; i < allFolders.size(); i++) {
 			if (subscribedFolders[a] == allFolders[i]) {
 				isInlist = true;
 				break;
@@ -154,6 +154,19 @@ Protocol::GetFolders(FolderList& folders)
 	}
 
 	return B_OK;
+}
+
+
+status_t
+Protocol::GetSubscribedFolders(StringList& folders)
+{
+	ListCommand command(NULL, true);
+	status_t status = ProcessCommand(command);
+	if (status != B_OK)
+		return status;
+
+	folders = command.FolderList();
+	return status;
 }
 
 
@@ -362,19 +375,6 @@ status_t
 Protocol::_GetAllFolders(StringList& folders)
 {
 	ListCommand command(NULL, false);
-	status_t status = ProcessCommand(command);
-	if (status != B_OK)
-		return status;
-
-	folders = command.FolderList();
-	return status;
-}
-
-
-status_t
-Protocol::_GetSubscribedFolders(StringList& folders)
-{
-	ListCommand command(NULL, true);
 	status_t status = ProcessCommand(command);
 	if (status != B_OK)
 		return status;

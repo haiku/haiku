@@ -16,8 +16,6 @@ IMAPProtocol::IMAPProtocol(const BMailAccountSettings& settings)
 	BInboundMailProtocol(settings),
 	fSettings(settings.InboundSettings())
 {
-	puts("IMAP protocol started");
-
 	BPath destination = fSettings.Destination();
 
 	status_t status = create_directory(destination.Path(), 0755);
@@ -36,10 +34,76 @@ IMAPProtocol::~IMAPProtocol()
 
 
 status_t
+IMAPProtocol::CheckSubscribedFolders(IMAP::Protocol& protocol)
+{
+	// Get list of subscribed folders
+
+	StringList folders;
+	status_t status = protocol.GetSubscribedFolders(folders);
+	if (status != B_OK)
+		return status;
+
+	// Determine how many new mailboxes we have
+
+	StringList::iterator iterator = folders.begin();
+	for (; iterator != folders.end(); iterator++) {
+		if (fKnownMailboxes.find(*iterator) != fKnownMailboxes.end())
+			iterator = folders.erase(iterator);
+	}
+
+	if (fSettings.IdleMode()) {
+		// Create connection workers as allowed
+
+		int32 totalMailboxes = fKnownMailboxes.size() + folders.size();
+
+		while (fWorkers.CountItems() < fSettings.MaxConnections()
+			&& fWorkers.CountItems() < totalMailboxes) {
+			IMAPConnectionWorker* worker = new IMAPConnectionWorker(*this,
+				fSettings);
+			if (!fWorkers.AddItem(worker)) {
+				delete worker;
+				break;
+			}
+
+			worker->Start();
+		}
+	}
+
+	// Distribute the new mailboxes to the existing workers
+
+	int32 index = 0;
+	while (!folders.empty()) {
+		BString folder = folders[0];
+		folders.erase(folders.begin());
+
+		fWorkers.ItemAt(index)->AddMailbox(folder);
+		fKnownMailboxes.insert(folder);
+
+		index = (index + 1) % fWorkers.CountItems();
+	}
+
+	return B_OK;
+}
+
+
+status_t
 IMAPProtocol::SyncMessages()
 {
 	puts("IMAP: sync");
-	return B_ERROR;
+
+	if (fWorkers.IsEmpty()) {
+		// Create main (and possibly initial) connection worker
+		IMAPConnectionWorker* worker = new IMAPConnectionWorker(*this,
+			fSettings, true);
+		if (!fWorkers.AddItem(worker)) {
+			delete worker;
+			return B_NO_MEMORY;
+		}
+
+		return worker->Start();
+	}
+
+	return B_OK;
 }
 
 
@@ -82,6 +146,10 @@ IMAPProtocol::MessageReceived(BMessage* message)
 		case B_READY_TO_RUN:
 			ReadyToRun();
 			break;
+
+		default:
+			BInboundMailProtocol::MessageReceived(message);
+			break;
 	}
 }
 
@@ -89,14 +157,9 @@ IMAPProtocol::MessageReceived(BMessage* message)
 void
 IMAPProtocol::ReadyToRun()
 {
-	// Determine how many connection workers we'll need
-	// TODO: in passive mode, this should be done on every sync
-
-	IMAP::Protocol protocol;
-	status_t status = protocol.Connect(fSettings.ServerAddress(),
-		fSettings.Username(), fSettings.Password(), fSettings.UseSSL());
-	if (status != B_OK)
-		return;
+	puts("IMAP: ready to run!");
+	if (fSettings.IdleMode())
+		SyncMessages();
 }
 
 
