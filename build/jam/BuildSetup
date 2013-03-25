@@ -131,8 +131,11 @@ if $(HAIKU_USE_GCC_PIPE) = 1 {
 # results in some broken code.
 # TODO: remove the -fno-strict-aliasing option when all code has been
 #		analyzed/fixed with regard to aliasing.
+# TODO: retest/remove the -fno-tree-vrp option as soon as we have updated our
+#		gcc4 compiler. See this discussion on some issues:
+# http://www.freelists.org/post/haiku-development/hrev45320-Yet-another-nonobvious-effect-of-ftreevrp-optimization
 if $(HAIKU_GCC_VERSION[1]) >= 3 {
-	HAIKU_GCC_BASE_FLAGS += -fno-strict-aliasing ;
+	HAIKU_GCC_BASE_FLAGS += -fno-strict-aliasing -fno-tree-vrp ;
 }
 
 # disable array bounds warnings on gcc 4.6 or newer since they trigger
@@ -145,7 +148,7 @@ if $(HAIKU_GCC_VERSION[1]) >= 4 {
 }
 
 if $(HOST_GCC_VERSION[1]) >= 3 {
-	HOST_GCC_BASE_FLAGS += -fno-strict-aliasing ;
+	HOST_GCC_BASE_FLAGS += -fno-strict-aliasing -fno-tree-vrp ;
 }
 
 # override gcc 2.95.3's header directory -- strictly necessary only when using
