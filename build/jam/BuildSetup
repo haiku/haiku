@@ -139,7 +139,7 @@ if $(HAIKU_GCC_VERSION[1]) >= 3 {
 # too many false positives. Coverity does a better job of this kind of analysis
 # anyways.
 if $(HAIKU_GCC_VERSION[1]) >= 4 {
-	if $(HAIKU_GCC_VERSION[2] >= 6) {
+	if $(HAIKU_GCC_VERSION[2]) >= 6 {
 		HAIKU_GCC_BASE_FLAGS += -Wno-array-bounds ;
 	}
 }
