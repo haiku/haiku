@@ -54,33 +54,74 @@ FileSystem::~FileSystem()
 	mutex_destroy(&fOpenOwnerLock);
 	mutex_destroy(&fCreateFileLock);
 
-	free(const_cast<char*>(fPath));
+	if (fPath != NULL) {
+		for (uint32 i = 0; fPath[i] != NULL; i++)
+			free(const_cast<char*>(fPath[i]));
+	}
+	delete[] fPath;
+
 	delete fRoot;
 }
 
 
-static const char*
-GetPath(const char* root, const char* path)
+static InodeNames*
+GetInodeNames(const char** root, const char* _path)
 {
-	ASSERT(path != NULL);
+	ASSERT(_path != NULL);
 
-	int slash = 0;
 	int i;
-	for (i = 0; path[i] != '\0'; i++) {
-		if (path[i] == '/')
-			slash = i;
+	char* path = strdup(_path);
+	if (path == NULL)
+		return NULL;
+	MemoryDeleter _(path);
 
-		if (root == NULL)
-			break;
+	if (root != NULL) {
+		for (i = 0; root[i] != NULL; i++) {
+			char* pathEnd = strchr(path, '/');
+			if (pathEnd == path) {
+				path++;
+				i--;
+				continue;
+			}
 
-		if (path[i] != root[i] || root[i] == '\0')
-			break;
+			if (pathEnd == NULL) {
+				path = NULL;
+				break;
+			} else
+				path = pathEnd + 1;
+		}
 	}
 
-	if (path[i] == '\0')
-		return NULL;
+	InodeNames* names = NULL;
+	if (path == NULL) {
+		names = new InodeNames;
+		if (names == NULL)
+			return NULL;
 
-	return path + slash;
+		names->AddName(NULL, "");
+		return names;
+	}
+
+	do {
+		char* pathEnd = strchr(path, '/');
+		if (pathEnd != NULL)
+			*pathEnd = '\0';
+
+		InodeNames* name = new InodeNames;
+		if (name == NULL) {
+			delete names;
+			return NULL;
+		}
+
+		name->AddName(names, path);
+		names = name;
+		if (pathEnd == NULL)
+			break;
+
+		path = pathEnd + 1;
+	} while (*path != '\0');
+
+	return names;
 }
 
 
@@ -103,7 +144,7 @@ FileSystem::Mount(FileSystem** _fs, RPC::Server* serv, const char* fsPath,
 	req.PutRootFH();
 
 	uint32 lookupCount = 0;
-	status_t result = FileInfo::ParsePath(req, lookupCount, fsPath);
+	status_t result = _ParsePath(req, lookupCount, fsPath);
 	if (result != B_OK)
 		return result;
 
@@ -156,30 +197,25 @@ FileSystem::Mount(FileSystem** _fs, RPC::Server* serv, const char* fsPath,
 		FSLocations* locs
 			= reinterpret_cast<FSLocations*>(values[3].fData.fLocations);
 
-		fs->fPath = strdup(locs->fRootPath);
+		fs->fPath = locs->fRootPath;
+		locs->fRootPath = NULL;
 	} else
 		fs->fPath = NULL;
 
 	FileInfo fi;
-	const char* name;
-	if (fsPath != NULL && fsPath[0] == '/')
-		fsPath++;
 
 	fs->fServer = serv;
 	fs->fDevId = id;
 	fs->fFsId = *fsid;
 
 	fi.fHandle = fh;
-	fi.fParent = fh;
-	fi.fPath = strdup(GetPath(fs->fPath, fsPath));
 
-	if (fi.fPath != NULL) {
-		name = strrchr(fi.fPath, '/');
-		if (name != NULL) {
-			name++;
-			fi.fName = strdup(name);
-		}
+	fi.fNames = GetInodeNames(fs->fPath, fsPath);
+	if (fi.fNames == NULL) {
+		delete[] values;
+		return B_NO_MEMORY;
 	}
+	fi.fNames->fHandle = fh;
 
 	delete[] values;
 
@@ -188,7 +224,7 @@ FileSystem::Mount(FileSystem** _fs, RPC::Server* serv, const char* fsPath,
 	if (result != B_OK)
 		return result;
 
-	name = strrchr(fsPath, '/');
+	char* name = strrchr(fsPath, '/');
 	if (name != NULL) {
 		name++;
 		reinterpret_cast<RootInode*>(inode)->SetName(name);
@@ -263,8 +299,14 @@ FileSystem::Migrate(const RPC::Server* serv)
 			if (gRPCServerManager->Acquire(&fServer, &resolver,
 					CreateNFS4Server) == B_OK) {
 
-				free(const_cast<char*>(fPath));
-				fPath = strdup(locs->fLocations[i].fRootPath);
+				if (fPath != NULL) {
+					for (uint32 i = 0; fPath[i] != NULL; i++)
+						free(const_cast<char*>(fPath[i]));
+				}
+				delete[] fPath;
+
+				fPath = locs->fLocations[i].fRootPath;
+				locs->fLocations[i].fRootPath = NULL;
 
 				if (fPath == NULL) {
 					gRPCServerManager->Release(fServer);
@@ -389,5 +431,43 @@ FileSystem::GetDelegation(const FileHandle& handle)
 		return NULL;
 
 	return it.Current();
+}
+
+
+status_t
+FileSystem::_ParsePath(RequestBuilder& req, uint32& count, const char* _path)
+{
+	ASSERT(_path != NULL);
+
+	char* path = strdup(_path);
+	if (path == NULL)
+		return B_NO_MEMORY;
+
+	char* pathStart = path;
+	char* pathEnd;
+
+	while (pathStart != NULL) {
+		pathEnd = strchr(pathStart, '/');
+		if (pathEnd != NULL)
+			*pathEnd = '\0';
+
+		if (pathEnd != pathStart) {
+			if (!strcmp(pathStart, "..")) {
+				req.LookUpUp();
+				count++;
+			} else if (strcmp(pathStart, ".")) {
+				req.LookUp(pathStart);
+				count++;
+			}
+		}
+
+		if (pathEnd != NULL && pathEnd[1] != '\0')
+			pathStart = pathEnd + 1;
+		else
+			pathStart = NULL;
+	}
+	free(path);
+
+	return B_OK;
 }
 

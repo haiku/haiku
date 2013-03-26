@@ -232,14 +232,7 @@ Inode::Link(Inode* dir, const char* name)
 		return result;
 
 	fFileSystem->Root()->MakeInfoInvalid();
-
-	FileInfo fi = fInfo;
-	fi.fParent = dir->fInfo.fHandle;
-	result = fi.CreateName(fInfo.fPath, name);
-	if (result != B_OK)
-		return result;
-
-	fFileSystem->InoIdMap()->AddEntry(fi, fInfo.fFileId);
+	fInfo.fNames->AddName(dir->fInfo.fNames, name);
 
 	dir->fCache->Lock();
 	if (dir->fCache->Valid()) {
@@ -875,19 +868,17 @@ Inode::ChildAdded(const char* name, uint64 fileID,
 	FileInfo fi;
 	fi.fFileId = fileID;
 	fi.fHandle = fileHandle;
-	fi.fParent = fInfo.fHandle;
-	status_t result = fi.CreateName(fInfo.fPath, name);
-	if (result != B_OK)
-		return result;
 
-	return fFileSystem->InoIdMap()->AddEntry(fi, FileIdToInoT(fileID));
+	return fFileSystem->InoIdMap()->AddName(fi, fInfo.fNames, name,
+		FileIdToInoT(fileID));
 }
 
 
 const char*
 Inode::Name() const
 {
-	return fInfo.fName;
+	ASSERT(fInfo.fNames->fNames.Head() != NULL);
+	return fInfo.fNames->fNames.Head()->fName;
 }
 
 

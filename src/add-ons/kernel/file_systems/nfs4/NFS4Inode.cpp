@@ -125,10 +125,8 @@ NFS4Inode::LookUp(const char* name, uint64* change, uint64* fileID,
 		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
-		if (parent)
-			req.PutFH(fInfo.fParent);
-		else
-			req.PutFH(fInfo.fHandle);
+		(void)parent;	// TODO: add support for named attributes
+		req.PutFH(fInfo.fHandle);
 
 		if (change != NULL) {
 			Attribute dirAttr[] = { FATTR4_CHANGE };
@@ -562,16 +560,16 @@ NFS4Inode::OpenFile(OpenState* state, int mode, OpenDelegationData* delegation)
 		// Since we are opening the file using a pair (parentFH, name) we
 		// need to check for race conditions.
 		if (fFileSystem->IsAttrSupported(FATTR4_FILEID)) {
-			req.PutFH(fInfo.fParent);
-			req.LookUp(fInfo.fName);
+			req.PutFH(fInfo.fNames->fNames.Head()->fParent->fHandle);
+			req.LookUp(fInfo.fNames->fNames.Head()->fName);
 			AttrValue attr;
 			attr.fAttribute = FATTR4_FILEID;
 			attr.fFreePointer = false;
 			attr.fData.fValue64 = fInfo.fFileId;
 			req.Verify(&attr, 1);
 		} else if (fFileSystem->ExpireType() == FH4_PERSISTENT) {
-			req.PutFH(fInfo.fParent);
-			req.LookUp(fInfo.fName);
+			req.PutFH(fInfo.fNames->fNames.Head()->fParent->fHandle);
+			req.LookUp(fInfo.fNames->fNames.Head()->fName);
 			AttrValue attr;
 			attr.fAttribute = FATTR4_FILEHANDLE;
 			attr.fFreePointer = true;
@@ -580,9 +578,10 @@ NFS4Inode::OpenFile(OpenState* state, int mode, OpenDelegationData* delegation)
 			req.Verify(&attr, 1);
 		}
 
-		req.PutFH(fInfo.fParent);
+		req.PutFH(fInfo.fNames->fNames.Head()->fParent->fHandle);
 		req.Open(CLAIM_NULL, sequence, sModeToAccess(mode), state->fClientID,
-			OPEN4_NOCREATE, fFileSystem->OpenOwner(), fInfo.fName);
+			OPEN4_NOCREATE, fFileSystem->OpenOwner(),
+			fInfo.fNames->fNames.Head()->fName);
 		req.GetFH();
 
 		result = request.Send();
@@ -796,10 +795,8 @@ NFS4Inode::CreateObject(const char* name, const char* path, int mode,
 		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
-		if (parent)
-			req.PutFH(fInfo.fParent);
-		else
-			req.PutFH(fInfo.fHandle);
+		(void)parent;	// TODO: support named attributes
+		req.PutFH(fInfo.fHandle);
 
 		uint32 i = 0;
 		AttrValue cattr[1];

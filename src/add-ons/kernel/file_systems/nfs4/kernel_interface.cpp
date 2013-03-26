@@ -322,23 +322,6 @@ nfs4_lookup(fs_volume* volume, fs_vnode* dir, const char* name, ino_t* _id)
 
 
 static status_t
-nfs4_get_vnode_name(fs_volume* volume, fs_vnode* vnode, char* buffer,
-	size_t bufferSize)
-{
-	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
-	TRACE("volume = %p, vnode = %" B_PRIi64, volume, vti->ID());
-
-	VnodeToInodeLocker _(vti);
-	Inode* inode = vti->Get();
-	if (inode == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	strncpy(buffer, inode->Name(), bufferSize);
-	return B_OK;
-}
-
-
-static status_t
 nfs4_put_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
@@ -606,10 +589,11 @@ nfs4_unlink(fs_volume* volume, fs_vnode* dir, const char* name)
 	if (result == B_OK) {
 		result = get_vnode(volume, id, reinterpret_cast<void**>(&vti));
 		ASSERT(result == B_OK);
-		vti->Remove();
-		put_vnode(volume, id);
-		remove_vnode(volume, id);
+		
+		if (vti->Unlink(inode->fInfo.fNames, name))
+			remove_vnode(volume, id);
 
+		put_vnode(volume, id);
 		put_vnode(volume, id);
 	}
 
@@ -654,9 +638,10 @@ nfs4_rename(fs_volume* volume, fs_vnode* fromDir, const char* fromName,
 		if (result == B_OK) {
 			result = get_vnode(volume, oldID, reinterpret_cast<void**>(&vti));
 			ASSERT(result == B_OK);
-			vti->Remove();
+			if (vti->Unlink(toInode->fInfo.fNames, toName))
+				remove_vnode(volume, oldID);
+
 			put_vnode(volume, oldID);
-			remove_vnode(volume, oldID);
 			put_vnode(volume, oldID);
 		}
 	}
@@ -670,8 +655,8 @@ nfs4_rename(fs_volume* volume, fs_vnode* fromDir, const char* fromName,
 		}
 
 		unremove_vnode(volume, id);
-		child->fInfo.fParent = toInode->fInfo.fHandle;
-		child->fInfo.CreateName(toInode->fInfo.fPath, toName);
+		child->fInfo.fNames->RemoveName(fromInode->fInfo.fNames, fromName);
+		child->fInfo.fNames->AddName(toInode->fInfo.fNames, toName);
 		put_vnode(volume, id);
 	}
 
@@ -998,11 +983,13 @@ nfs4_remove_dir(fs_volume* volume, fs_vnode* parent, const char* name)
 
 	result = acquire_vnode(volume, id);
 	if (result == B_OK) {
-		ASSERT(get_vnode(volume, id, reinterpret_cast<void**>(&vti)) == B_OK);
-		vti->Remove();
-		put_vnode(volume, id);
-		remove_vnode(volume, id);
+		result = get_vnode(volume, id, reinterpret_cast<void**>(&vti));
+		ASSERT(result == B_OK);
 
+		if (vti->Unlink(inode->fInfo.fNames, name))
+			remove_vnode(volume, id);
+
+		put_vnode(volume, id);
 		put_vnode(volume, id);
 	}
 
@@ -1444,7 +1431,7 @@ fs_volume_ops gNFSv4VolumeOps = {
 
 fs_vnode_ops gNFSv4VnodeOps = {
 	nfs4_lookup,
-	nfs4_get_vnode_name,
+	NULL,	// get_vnode_name()
 	nfs4_put_vnode,
 	nfs4_remove_vnode,
 

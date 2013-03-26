@@ -36,13 +36,12 @@ Inode::CreateState(const char* name, int mode, int perms, OpenState* state,
 	if (result != B_OK)
 		return result;
 
-	FileInfo fi;
-	fi.fFileId = fileID;
-	fi.fHandle = handle;
-	fi.fParent = fInfo.fHandle;
-	fi.CreateName(fInfo.fPath, name);
+	FileInfo fileInfo;
+	fileInfo.fFileId = fileID;
+	fileInfo.fHandle = handle;
 
-	fFileSystem->InoIdMap()->AddEntry(fi, FileIdToInoT(fileID));
+	fFileSystem->InoIdMap()->AddName(fileInfo, fInfo.fNames, name,
+		FileIdToInoT(fileID));
 
 	fCache->Lock();
 	if (fCache->Valid()) {
@@ -56,7 +55,7 @@ Inode::CreateState(const char* name, int mode, int perms, OpenState* state,
 	fCache->Unlock();
 
 	state->fFileSystem = fFileSystem;
-	state->fInfo = fi;
+	state->fInfo = fileInfo;
 	state->fMode = mode & O_RWMASK;
 
 	return B_OK;
@@ -253,8 +252,6 @@ Inode::OpenAttr(const char* _name, int mode, OpenAttrCookie* cookie,
 	if (state == NULL)
 		return B_NO_MEMORY;
 
-	state->fInfo.fName = strdup(name);
-	state->fInfo.fParent = fInfo.fAttrDir;
 	state->fFileSystem = fFileSystem;
 	result = NFS4Inode::OpenAttr(state, name, mode, &data, create);
 	if (result != B_OK) {

@@ -19,7 +19,12 @@
 
 FSLocation::~FSLocation()
 {
-	free(const_cast<char*>(fRootPath));
+	if (fRootPath != NULL) {
+		for (uint32 i = 0; fRootPath[i] != NULL; i++)
+			free(const_cast<char*>(fRootPath[i]));
+	}
+	delete[] fRootPath;
+	
 	for (uint32 i = 0; i < fCount; i++)
 		free(const_cast<char*>(fLocations[i]));
 	delete[] fLocations;
@@ -28,7 +33,12 @@ FSLocation::~FSLocation()
 
 FSLocations::~FSLocations()
 {
-	free(const_cast<char*>(fRootPath));
+	if (fRootPath != NULL) {
+		for (uint32 i = 0; fRootPath[i] != NULL; i++)
+			free(const_cast<char*>(fRootPath[i]));
+	}
+	delete[] fRootPath;
+	
 	delete[] fLocations;
 }
 
@@ -528,27 +538,29 @@ ReplyInterpreter::Write(uint32* size)
 }
 
 
-const char*
-ReplyInterpreter::_FlattenPathname(XDR::ReadStream& stream)
+const char**
+ReplyInterpreter::_GetPath(XDR::ReadStream& stream)
 {
 	uint32 count = stream.GetUInt();
-	char* pathname = NULL;
-	uint32 size = 0;
-	for (uint32 i = 0; i < count; i++) {
-		const char* path = stream.GetString();
-		size += strlen(path) + 1;
-		if (pathname == NULL) {
-			pathname = reinterpret_cast<char*>(malloc(strlen(path) + 1));
-			pathname[0] = '\0';
-		} else {
-			*pathname++ = '/';
-			pathname = reinterpret_cast<char*>(realloc(pathname, size));
-		}
-		strcat(pathname, path);
-		free(const_cast<char*>(path));
-	}
+	char** path = new char*[count + 1];
+	if (path == NULL)
+		return NULL;
 
-	return pathname;
+	uint32 i;
+	for (i = 0; i < count; i++) {
+		path[i] = stream.GetString();
+		if (path[i] == NULL)
+			goto out;
+	}
+	path[count] = NULL;
+
+	return const_cast<const char**>(path);
+
+out:
+	for (uint32 j = 0; j < i; j++)
+		free(path[i]);
+	delete[] path;
+	return NULL;
 }
 
 
@@ -662,11 +674,11 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 		values[current].fAttribute = FATTR4_FS_LOCATIONS;
 
 		FSLocations* locs = new FSLocations;
-		locs->fRootPath = _FlattenPathname(stream);
+		locs->fRootPath = _GetPath(stream);
 		locs->fCount = stream.GetUInt();
 		locs->fLocations = new FSLocation[locs->fCount];
 		for (uint32 i = 0; i < locs->fCount; i++) {
-			locs->fLocations[i].fRootPath = _FlattenPathname(stream);
+			locs->fLocations[i].fRootPath = _GetPath(stream);
 			locs->fLocations[i].fCount = stream.GetUInt();
 			locs->fLocations[i].fLocations
 				= new const char*[locs->fLocations[i].fCount];

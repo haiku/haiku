@@ -308,19 +308,6 @@ DirectoryCache::NotifyChanges(DirectoryCacheSnapshot* oldSnapshot,
 			} else {
 				notify_entry_created(fInode->GetFileSystem()->DevId(),
 					fInode->ID(), newCurrent->fName, newCurrent->fNode);
-
-				do {
-					FileInfo fi;
-					fi.fFileId = newCurrent->fNode;
-					fi.fParent = fInode->fInfo.fHandle;
-					status_t result = fi.CreateName(fInode->fInfo.fPath,
-						newCurrent->fName);
-					if (result != B_OK)
-						break;
-
-					fInode->GetFileSystem()->InoIdMap()->AddEntry(fi,
-						Inode::FileIdToInoT(newCurrent->fNode), true);
-				} while (false);
 			}
 		} else
 			oldSnapshot->fEntries.Remove(prev, oldCurrent);
