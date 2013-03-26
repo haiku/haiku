@@ -674,14 +674,10 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 			instructionPointer, functionInstance->Address() - fRelocationDelta,
 			subprogramEntry->Variables(), subprogramEntry->Blocks());
 
-		// TODO: re-enable once PIC and false positive issues
-		// are properly dealt with
-#if 0
 		if (returnFunctionAddress != 0) {
-			_CreateReturnValue(returnFunctionAddress, image, frame,
-				*stackFrameDebugInfo);
+			_CreateReturnValue(returnFunctionAddress, returnFunctionState,
+				image, frame, *stackFrameDebugInfo);
 		}
-#endif
 	}
 
 	_frame = frameReference.Detach();
@@ -1104,15 +1100,30 @@ DwarfImageDebugInfo::_CreateReturnValue(target_addr_t returnFunctionAddress,
 	}
 
 	status_t result = B_OK;
+	ImageDebugInfo* imageInfo = image->GetImageDebugInfo();
 	FunctionInstance* targetFunction;
 	if (returnFunctionAddress >= fPLTSectionStart
 		&& returnFunctionAddress < fPLTSectionEnd) {
-		// TODO: handle resolving PLT entries
-		// to their target function
-		return B_UNSUPPORTED;
+		// if the function in question is position-independent, the call
+		// will actually have taken us to its corresponding PLT slot.
+		// in such a case, look at the disassembled jump to determine
+		// where to find the actual function address.
+		InstructionInfo info;
+		if (fDebuggerInterface->GetArchitecture()->GetInstructionInfo(
+			returnFunctionAddress, info, returnFunctionState) != B_OK) {
+			return B_BAD_VALUE;
+		}
+
+		target_size_t addressSize = fDebuggerInterface->GetArchitecture()
+			->AddressSize();
+		ssize_t bytesRead = fDebuggerInterface->ReadMemory(info.TargetAddress(),
+			&returnFunctionAddress, addressSize);
+
+		if (bytesRead != addressSize)
+			return B_BAD_VALUE;
 	}
 
-	ImageDebugInfo* imageInfo = image->GetImageDebugInfo();
+
 	targetFunction = imageInfo->FunctionAtAddress(returnFunctionAddress);
 	if (targetFunction != NULL) {
 		DwarfFunctionDebugInfo* targetInfo =
