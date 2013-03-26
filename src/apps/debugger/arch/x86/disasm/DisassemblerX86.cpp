@@ -198,6 +198,8 @@ DisassemblerX86::GetInstructionTargetAddress(CpuState* state) const
 			targetAddress += x86State->IntRegisterValue(
 				RegisterNumberFromUdisIndex(fUdisData->operand[0].index))
 				* fUdisData->operand[0].scale;
+			if (fUdisData->operand[0].offset != 0)
+				targetAddress += fUdisData->operand[0].lval.sdword;
 		}
 		break;
 		case UD_OP_JIMM:
