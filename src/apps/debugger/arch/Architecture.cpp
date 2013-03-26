@@ -95,7 +95,8 @@ status_t
 Architecture::CreateStackTrace(Team* team,
 	ImageDebugInfoProvider* imageInfoProvider, CpuState* cpuState,
 	StackTrace*& _stackTrace, target_addr_t returnFunctionAddress,
-	int32 maxStackDepth, bool useExistingTrace, bool getFullFrameInfo)
+	CpuState* returnFunctionState, int32 maxStackDepth, bool useExistingTrace,
+	bool getFullFrameInfo)
 {
 	BReference<CpuState> cpuStateReference(cpuState);
 
@@ -163,7 +164,8 @@ Architecture::CreateStackTrace(Team* team,
 		if (function != NULL) {
 			status_t error = functionDebugInfo->GetSpecificImageDebugInfo()
 				->CreateFrame(image, function, cpuState, getFullFrameInfo,
-					nextFrame == NULL ? returnFunctionAddress : 0, frame,
+					nextFrame == NULL ? returnFunctionAddress : 0,
+					nextFrame == NULL ? returnFunctionState : 0, frame,
 					previousCpuState);
 			if (error != B_OK && error != B_UNSUPPORTED)
 				break;

@@ -523,7 +523,8 @@ status_t
 DwarfImageDebugInfo::CreateFrame(Image* image,
 	FunctionInstance* functionInstance, CpuState* cpuState,
 	bool getFullFrameInfo, target_addr_t returnFunctionAddress,
-	StackFrame*& _frame, CpuState*& _previousCpuState)
+	CpuState* returnFunctionState, StackFrame*& _frame,
+	CpuState*& _previousCpuState)
 {
 	DwarfFunctionDebugInfo* function = dynamic_cast<DwarfFunctionDebugInfo*>(
 		functionInstance->GetFunctionDebugInfo());
@@ -1091,7 +1092,8 @@ DwarfImageDebugInfo::_CreateLocalVariables(CompilationUnit* unit,
 
 status_t
 DwarfImageDebugInfo::_CreateReturnValue(target_addr_t returnFunctionAddress,
-	Image* image, StackFrame* frame, DwarfStackFrameDebugInfo& factory)
+	CpuState* returnFunctionState, Image* image, StackFrame* frame,
+	DwarfStackFrameDebugInfo& factory)
 {
 	if (!image->ContainsAddress(returnFunctionAddress)) {
 		// our current image doesn't contain the target function,

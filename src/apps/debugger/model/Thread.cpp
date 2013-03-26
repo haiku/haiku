@@ -19,6 +19,7 @@ Thread::Thread(Team* team, thread_id threadID)
 	fState(THREAD_STATE_UNKNOWN),
 	fExecutedSubroutine(false),
 	fSubroutineAddress(0),
+	fSubroutineState(NULL),
 	fStoppedReason(THREAD_STOPPED_UNKNOWN),
 	fCpuState(NULL),
 	fStackTrace(NULL)
@@ -32,6 +33,8 @@ Thread::~Thread()
 		fCpuState->ReleaseReference();
 	if (fStackTrace != NULL)
 		fStackTrace->ReleaseReference();
+	if (fSubroutineState != NULL)
+		fSubroutineState->ReleaseReference();
 }
 
 
@@ -121,3 +124,13 @@ Thread::SetExecutedSubroutine(target_addr_t address)
 	fSubroutineAddress = address;
 }
 
+
+void
+Thread::SetSubroutineCpuState(CpuState* state)
+{
+	if (fSubroutineState != NULL)
+		fSubroutineState->ReleaseReference();
+
+	fSubroutineState = state;
+	fSubroutineState->AcquireReference();
+}

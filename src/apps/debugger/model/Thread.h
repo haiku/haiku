@@ -74,6 +74,9 @@ public:
 			target_addr_t		SubroutineAddress() const
 									{ return fSubroutineAddress; }
 			void				SetExecutedSubroutine(target_addr_t address);
+			CpuState*			SubroutineCpuState() const
+									{ return fSubroutineState; }
+			void				SetSubroutineCpuState(CpuState* state);
 
 private:
 			Team*				fTeam;
@@ -82,6 +85,7 @@ private:
 			uint32				fState;
 			bool				fExecutedSubroutine;
 			target_addr_t		fSubroutineAddress;
+			CpuState*			fSubroutineState;
 			uint32				fStoppedReason;
 			BString				fStoppedReasonInfo;
 			CpuState*			fCpuState;

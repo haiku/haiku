@@ -253,7 +253,7 @@ ThreadHandler::HandleThreadAction(uint32 action)
 
 	if (stackTrace == NULL && cpuState != NULL) {
 		if (fDebuggerInterface->GetArchitecture()->CreateStackTrace(
-				fThread->GetTeam(), this, cpuState, stackTrace, 0, 1,
+				fThread->GetTeam(), this, cpuState, stackTrace, 0, NULL, 1,
 				false, false) == B_OK) {
 			stackTraceReference.SetTo(stackTrace, true);
 		}
@@ -485,6 +485,7 @@ ThreadHandler::_DoStepOver(CpuState* cpuState)
 		"%#" B_PRIx64 "\n", info.Address() + info.Size());
 
 	fThread->SetExecutedSubroutine(info.TargetAddress());
+	fThread->SetSubroutineCpuState(cpuState);
 	if (_InstallTemporaryBreakpoint(info.Address() + info.Size()) != B_OK)
 		return false;
 
@@ -566,8 +567,8 @@ ThreadHandler::_HandleBreakpointHitStep(CpuState* cpuState)
 
 			if (stackTrace == NULL && cpuState != NULL) {
 				if (fDebuggerInterface->GetArchitecture()->CreateStackTrace(
-						fThread->GetTeam(), this, cpuState, stackTrace, 0, 1,
-						false, false) == B_OK) {
+						fThread->GetTeam(), this, cpuState, stackTrace, 0,
+						NULL, 1, false, false) == B_OK) {
 					stackTraceReference.SetTo(stackTrace, true);
 				}
 			}
@@ -653,8 +654,8 @@ ThreadHandler::_HandleSingleStepStep(CpuState* cpuState)
 
 			if (stackTrace == NULL && cpuState != NULL) {
 				if (fDebuggerInterface->GetArchitecture()->CreateStackTrace(
-						fThread->GetTeam(), this, cpuState, stackTrace, 0, 1,
-						false, false) == B_OK) {
+						fThread->GetTeam(), this, cpuState, stackTrace, 0,
+						NULL, 1, false, false) == B_OK) {
 					stackTraceReference.SetTo(stackTrace, true);
 				}
 			}
@@ -686,7 +687,7 @@ ThreadHandler::_HandleSingleStepStep(CpuState* cpuState)
 				if (stackTrace == NULL && cpuState != NULL) {
 					if (fDebuggerInterface->GetArchitecture()->CreateStackTrace(
 							fThread->GetTeam(), this, cpuState, stackTrace, 0,
-							1, false, false) == B_OK) {
+							NULL, 1, false, false) == B_OK) {
 						stackTraceReference.SetTo(stackTrace, true);
 					}
 				}

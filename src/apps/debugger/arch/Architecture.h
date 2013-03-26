@@ -111,6 +111,7 @@ public:
 									CpuState* cpuState,
 									StackTrace*& _stackTrace,
 									target_addr_t returnFunctionAddress,
+									CpuState* returnFunctionState,
 									int32 maxStackDepth = -1,
 									bool useExistingTrace = false,
 									bool getFullFrameInfo = true);

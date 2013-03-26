@@ -69,7 +69,8 @@ status_t
 DebuggerImageDebugInfo::CreateFrame(Image* image,
 	FunctionInstance* functionInstance, CpuState* cpuState,
 	bool getFullFrameInfo, target_addr_t returnFunctionAddress,
-	StackFrame*& _previousFrame, CpuState*& _previousCpuState)
+	CpuState* returnFunctionState, StackFrame*& _previousFrame,
+	CpuState*& _previousCpuState)
 {
 	return B_UNSUPPORTED;
 }
