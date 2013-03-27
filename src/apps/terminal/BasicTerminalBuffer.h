@@ -286,6 +286,7 @@ BasicTerminalBuffer::InsertChar(const char* c)
 	return InsertChar(UTF8Char(c), 1);
 }
 
+
 void
 BasicTerminalBuffer::InsertChar(const char* c, int32 length)
 {
