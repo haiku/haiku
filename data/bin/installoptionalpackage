@@ -216,6 +216,21 @@ function InstallSourceArchive()
 }
 
 
+function AddDirectoryToHaikuImage()
+{
+	# AddDirectoryToHaikuImage directoryTokens : attributeFiles
+	# Wrapper for Jam rule
+	ParseFunctionArguments "\$@"
+
+	local dirTokens="/boot/\${functionArgs[0]}"
+	TrimLeadingSpace dirTokens
+	TrimEndingSpace dirTokens
+	dirTokens=\${dirTokens//' '/\/}
+
+	mkdir -p "\${dirTokens}"
+}
+
+
 function AddSymlinkToHaikuImage()
 {
 	# AddSymlinkToHaikuImage <dir tokens> : <link target> [ : <link name> ]
