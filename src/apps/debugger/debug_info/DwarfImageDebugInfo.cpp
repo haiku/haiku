@@ -1119,7 +1119,7 @@ DwarfImageDebugInfo::_CreateReturnValue(target_addr_t returnFunctionAddress,
 		ssize_t bytesRead = fDebuggerInterface->ReadMemory(info.TargetAddress(),
 			&returnFunctionAddress, addressSize);
 
-		if (bytesRead != addressSize)
+		if (bytesRead != (ssize_t)addressSize)
 			return B_BAD_VALUE;
 	}
 
