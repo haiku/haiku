@@ -1701,8 +1701,8 @@ if [ IsOptionalHaikuImagePackageAdded XZ-Utils ] {
 		Echo "No optional package XZ-Utils available for $(TARGET_ARCH)" ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			xz-utils-5.0.1-1-x86.hpkg
-			: $(hpkgBaseURL)/xz-utils-5.0.1-1-x86.hpkg
+			xz-utils-5.0.1-2-x86_gcc2.hpkg
+			: $(hpkgBaseURL)/xz-utils-5.0.1-2-x86_gcc2.hpkg
 			: common packages ;
 		AddExpanderRuleToHaikuImage "application/x-xz" : .tar.xz
 			: "tar -Jtvf \\0045s"
