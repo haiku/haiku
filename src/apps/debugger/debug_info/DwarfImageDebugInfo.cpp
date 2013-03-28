@@ -673,7 +673,7 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 			instructionPointer, functionInstance->Address() - fRelocationDelta,
 			subprogramEntry->Variables(), subprogramEntry->Blocks());
 
-		if (!returnValueInfos->IsEmpty()) {
+		if (returnValueInfos != NULL && !returnValueInfos->IsEmpty()) {
 			_CreateReturnValues(returnValueInfos, image, frame,
 				*stackFrameDebugInfo);
 		}
