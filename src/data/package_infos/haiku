@@ -30,6 +30,7 @@ provides {
 	cmd:unzip=5.50 compat>=0.0
 	cmd:wget=0.0.0
 	cmd:zip=2.32 compat>=0.0
+	lib:zlib=1.2.5 compat>=1
 }
 
 requires {
