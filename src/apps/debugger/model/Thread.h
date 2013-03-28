@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -81,7 +82,6 @@ private:
 			thread_id			fID;
 			BString				fName;
 			uint32				fState;
-			bool				fExecutedSubroutine;
 			ReturnValueInfoList*
 								fReturnValueInfos;
 			uint32				fStoppedReason;

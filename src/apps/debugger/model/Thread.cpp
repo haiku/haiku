@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -17,7 +18,6 @@ Thread::Thread(Team* team, thread_id threadID)
 	fTeam(team),
 	fID(threadID),
 	fState(THREAD_STATE_UNKNOWN),
-	fExecutedSubroutine(false),
 	fReturnValueInfos(NULL),
 	fStoppedReason(THREAD_STOPPED_UNKNOWN),
 	fCpuState(NULL),
@@ -77,7 +77,6 @@ Thread::SetState(uint32 state, uint32 reason, const BString& info)
 	if (fState != THREAD_STATE_STOPPED) {
 		SetCpuState(NULL);
 		SetStackTrace(NULL);
-		fExecutedSubroutine = false;
 		ClearReturnValueInfos();
 	}
 
@@ -128,7 +127,6 @@ Thread::AddReturnValueInfo(ReturnValueInfo* info)
 		return B_NO_MEMORY;
 
 	info->AcquireReference();
-	fExecutedSubroutine = true;
 	return B_OK;
 }
 
