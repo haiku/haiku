@@ -108,13 +108,7 @@ TTeamMenu::AttachedToWindow()
 					menu->SetTrackingHook(barview->MenuTrackingHook,
 						barview->GetTrackingHookData());
 			}
-
-			barInfo->teams = NULL;
-			barInfo->icon = NULL;
-			barInfo->name = NULL;
-			barInfo->sig = NULL;
 		}
-		delete barInfo;
 	}
 
 	if (CountItems() == 0) {

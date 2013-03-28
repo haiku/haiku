@@ -520,14 +520,7 @@ TExpandoMenuBar::BuildItems()
 					barInfo->name, barInfo->sig, itemWidth, itemHeight,
 					fDrawLabel, fVertical));
 			}
-
-			barInfo->teams = NULL;
-			barInfo->icon = NULL;
-			barInfo->name = NULL;
-			barInfo->sig = NULL;
 		}
-
-		delete barInfo;
 	}
 
 	if (CountItems() == 0) {
