@@ -18,8 +18,7 @@ Thread::Thread(Team* team, thread_id threadID)
 	fID(threadID),
 	fState(THREAD_STATE_UNKNOWN),
 	fExecutedSubroutine(false),
-	fSubroutineAddress(0),
-	fSubroutineState(NULL),
+	fReturnValueInfos(NULL),
 	fStoppedReason(THREAD_STOPPED_UNKNOWN),
 	fCpuState(NULL),
 	fStackTrace(NULL)
@@ -33,14 +32,19 @@ Thread::~Thread()
 		fCpuState->ReleaseReference();
 	if (fStackTrace != NULL)
 		fStackTrace->ReleaseReference();
-	if (fSubroutineState != NULL)
-		fSubroutineState->ReleaseReference();
+
+	ClearReturnValueInfos();
+	delete fReturnValueInfos;
 }
 
 
 status_t
 Thread::Init()
 {
+	fReturnValueInfos = new(std::nothrow) ReturnValueInfoList;
+	if (fReturnValueInfos == NULL)
+		return B_NO_MEMORY;
+
 	return B_OK;
 }
 
@@ -74,7 +78,7 @@ Thread::SetState(uint32 state, uint32 reason, const BString& info)
 		SetCpuState(NULL);
 		SetStackTrace(NULL);
 		fExecutedSubroutine = false;
-		fSubroutineAddress = 0;
+		ClearReturnValueInfos();
 	}
 
 	fTeam->NotifyThreadStateChanged(this);
@@ -117,20 +121,23 @@ Thread::SetStackTrace(StackTrace* trace)
 }
 
 
-void
-Thread::SetExecutedSubroutine(target_addr_t address)
+status_t
+Thread::AddReturnValueInfo(ReturnValueInfo* info)
 {
+	if (!fReturnValueInfos->AddItem(info))
+		return B_NO_MEMORY;
+
+	info->AcquireReference();
 	fExecutedSubroutine = true;
-	fSubroutineAddress = address;
+	return B_OK;
 }
 
 
 void
-Thread::SetSubroutineCpuState(CpuState* state)
+Thread::ClearReturnValueInfos()
 {
-	if (fSubroutineState != NULL)
-		fSubroutineState->ReleaseReference();
+	for (int32 i = 0; i < fReturnValueInfos->CountItems(); i++)
+		fReturnValueInfos->ItemAt(i)->ReleaseReference();
 
-	fSubroutineState = state;
-	fSubroutineState->AcquireReference();
+	fReturnValueInfos->MakeEmpty();
 }

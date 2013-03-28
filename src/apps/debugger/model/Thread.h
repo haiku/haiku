@@ -11,6 +11,7 @@
 #include <Referenceable.h>
 #include <util/DoublyLinkedList.h>
 
+#include "ReturnValueInfo.h"
 #include "types/Types.h"
 
 
@@ -69,14 +70,11 @@ public:
 			StackTrace*			GetStackTrace() const	{ return fStackTrace; }
 			void				SetStackTrace(StackTrace* trace);
 
-			bool				ExecutedSubroutine() const
-									{ return fExecutedSubroutine; }
-			target_addr_t		SubroutineAddress() const
-									{ return fSubroutineAddress; }
-			void				SetExecutedSubroutine(target_addr_t address);
-			CpuState*			SubroutineCpuState() const
-									{ return fSubroutineState; }
-			void				SetSubroutineCpuState(CpuState* state);
+			ReturnValueInfoList*
+								ReturnValueInfos() const
+								{ return fReturnValueInfos; }
+			status_t			AddReturnValueInfo(ReturnValueInfo* info);
+			void				ClearReturnValueInfos();
 
 private:
 			Team*				fTeam;
@@ -84,8 +82,8 @@ private:
 			BString				fName;
 			uint32				fState;
 			bool				fExecutedSubroutine;
-			target_addr_t		fSubroutineAddress;
-			CpuState*			fSubroutineState;
+			ReturnValueInfoList*
+								fReturnValueInfos;
 			uint32				fStoppedReason;
 			BString				fStoppedReasonInfo;
 			CpuState*			fCpuState;

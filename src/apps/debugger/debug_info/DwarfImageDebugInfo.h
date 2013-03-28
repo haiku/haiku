@@ -64,8 +64,7 @@ public:
 									FunctionInstance* functionInstance,
 									CpuState* cpuState,
 									bool getFullFrameInfo,
-									target_addr_t returnFunctionAddress,
-									CpuState* returnFunctionState,
+									ReturnValueInfoList* returnValueInfos,
 									StackFrame*& _frame,
 									CpuState*& _previousCpuState);
 	virtual	status_t			GetStatement(FunctionDebugInfo* function,
@@ -105,9 +104,8 @@ private:
 									const EntryListWrapper& variableEntries,
 									const EntryListWrapper& blockEntries);
 
-			status_t			_CreateReturnValue(
-									target_addr_t returnFunctionAddress,
-									CpuState* returnFunctionState,
+			status_t			_CreateReturnValues(
+									ReturnValueInfoList* returnValueInfos,
 									Image* image,
 									StackFrame* frame,
 									DwarfStackFrameDebugInfo& factory);

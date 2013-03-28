@@ -522,9 +522,8 @@ DwarfImageDebugInfo::GetAddressSectionType(target_addr_t address)
 status_t
 DwarfImageDebugInfo::CreateFrame(Image* image,
 	FunctionInstance* functionInstance, CpuState* cpuState,
-	bool getFullFrameInfo, target_addr_t returnFunctionAddress,
-	CpuState* returnFunctionState, StackFrame*& _frame,
-	CpuState*& _previousCpuState)
+	bool getFullFrameInfo, ReturnValueInfoList* returnValueInfos,
+	StackFrame*& _frame, CpuState*& _previousCpuState)
 {
 	DwarfFunctionDebugInfo* function = dynamic_cast<DwarfFunctionDebugInfo*>(
 		functionInstance->GetFunctionDebugInfo());
@@ -674,9 +673,9 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 			instructionPointer, functionInstance->Address() - fRelocationDelta,
 			subprogramEntry->Variables(), subprogramEntry->Blocks());
 
-		if (returnFunctionAddress != 0) {
-			_CreateReturnValue(returnFunctionAddress, returnFunctionState,
-				image, frame, *stackFrameDebugInfo);
+		if (!returnValueInfos->IsEmpty()) {
+			_CreateReturnValues(returnValueInfos, image, frame,
+				*stackFrameDebugInfo);
 		}
 	}
 
@@ -1087,88 +1086,94 @@ DwarfImageDebugInfo::_CreateLocalVariables(CompilationUnit* unit,
 
 
 status_t
-DwarfImageDebugInfo::_CreateReturnValue(target_addr_t returnFunctionAddress,
-	CpuState* returnFunctionState, Image* image, StackFrame* frame,
-	DwarfStackFrameDebugInfo& factory)
+DwarfImageDebugInfo::_CreateReturnValues(ReturnValueInfoList* returnValueInfos,
+	Image* image, StackFrame* frame, DwarfStackFrameDebugInfo& factory)
 {
-	if (!image->ContainsAddress(returnFunctionAddress)) {
-		// our current image doesn't contain the target function,
-		// locate the one which does.
-		image = image->GetTeam()->ImageByAddress(returnFunctionAddress);
-		if (image == NULL)
-			return B_BAD_VALUE;
-	}
-
-	status_t result = B_OK;
-	ImageDebugInfo* imageInfo = image->GetImageDebugInfo();
-	FunctionInstance* targetFunction;
-	if (returnFunctionAddress >= fPLTSectionStart
-		&& returnFunctionAddress < fPLTSectionEnd) {
-		// if the function in question is position-independent, the call
-		// will actually have taken us to its corresponding PLT slot.
-		// in such a case, look at the disassembled jump to determine
-		// where to find the actual function address.
-		InstructionInfo info;
-		if (fDebuggerInterface->GetArchitecture()->GetInstructionInfo(
-			returnFunctionAddress, info, returnFunctionState) != B_OK) {
-			return B_BAD_VALUE;
+	for (int32 i = 0; i < returnValueInfos->CountItems(); i++) {
+		ReturnValueInfo* valueInfo = returnValueInfos->ItemAt(i);
+		target_addr_t subroutineAddress = valueInfo->SubroutineAddress();
+		CpuState* subroutineState = valueInfo->State();
+		if (!image->ContainsAddress(subroutineAddress)) {
+			// our current image doesn't contain the target function,
+			// locate the one which does.
+			image = image->GetTeam()->ImageByAddress(subroutineAddress);
+			if (image == NULL) {
+				// nothing we can do, try the next entry (if any)
+				continue;
+			}
 		}
 
-		target_size_t addressSize = fDebuggerInterface->GetArchitecture()
-			->AddressSize();
-		ssize_t bytesRead = fDebuggerInterface->ReadMemory(info.TargetAddress(),
-			&returnFunctionAddress, addressSize);
-
-		if (bytesRead != (ssize_t)addressSize)
-			return B_BAD_VALUE;
-	}
-
-
-	targetFunction = imageInfo->FunctionAtAddress(returnFunctionAddress);
-	if (targetFunction != NULL) {
-		DwarfFunctionDebugInfo* targetInfo =
-			dynamic_cast<DwarfFunctionDebugInfo*>(
-				targetFunction->GetFunctionDebugInfo());
-		if (targetInfo != NULL) {
-			DIESubprogram* subProgram = targetInfo->SubprogramEntry();
-			DIEType* returnType = subProgram->ReturnType();
-			if (returnType == NULL) {
-				// check if we have a specification, and if so, if that has
-				// a return type
-				subProgram = dynamic_cast<DIESubprogram*>(subProgram->Specification());
-				if (subProgram != NULL)
-					returnType = subProgram->ReturnType();
-
-				// function doesn't return a value, we're done.
-				if (returnType == NULL)
-					return B_OK;
+		status_t result = B_OK;
+		ImageDebugInfo* imageInfo = image->GetImageDebugInfo();
+		FunctionInstance* targetFunction;
+		if (subroutineAddress >= fPLTSectionStart
+			&& subroutineAddress < fPLTSectionEnd) {
+			// if the function in question is position-independent, the call
+			// will actually have taken us to its corresponding PLT slot.
+			// in such a case, look at the disassembled jump to determine
+			// where to find the actual function address.
+			InstructionInfo info;
+			if (fDebuggerInterface->GetArchitecture()->GetInstructionInfo(
+				subroutineAddress, info, subroutineState) != B_OK) {
+				return B_BAD_VALUE;
 			}
 
-			uint32 byteSize = 0;
-			if (returnType->ByteSize() == NULL) {
-				if (dynamic_cast<DIEAddressingType*>(returnType) != NULL)
-					byteSize = fArchitecture->AddressSize();
-			} else
-				byteSize = returnType->ByteSize()->constant;
+			target_size_t addressSize = fDebuggerInterface->GetArchitecture()
+				->AddressSize();
+			ssize_t bytesRead = fDebuggerInterface->ReadMemory(
+				info.TargetAddress(), &subroutineAddress, addressSize);
 
-			ValueLocation* location;
-			result = fArchitecture->GetReturnAddressLocation(frame,
-				byteSize, location);
-			if (result != B_OK)
-				return result;
+			if (bytesRead != (ssize_t)addressSize)
+				return B_BAD_VALUE;
+		}
 
-			BReference<ValueLocation> locationReference(location, true);
-			Variable* variable = NULL;
-			BReference<FunctionID> idReference(
-				targetFunction->GetFunctionID(), true);
-			result = factory.CreateReturnValue(idReference, returnType,
-				location, variable);
-			if (result != B_OK)
-				return result;
+		targetFunction = imageInfo->FunctionAtAddress(subroutineAddress);
+		if (targetFunction != NULL) {
+			DwarfFunctionDebugInfo* targetInfo =
+				dynamic_cast<DwarfFunctionDebugInfo*>(
+					targetFunction->GetFunctionDebugInfo());
+			if (targetInfo != NULL) {
+				DIESubprogram* subProgram = targetInfo->SubprogramEntry();
+				DIEType* returnType = subProgram->ReturnType();
+				if (returnType == NULL) {
+					// check if we have a specification, and if so, if that has
+					// a return type
+					subProgram = dynamic_cast<DIESubprogram*>(
+						subProgram->Specification());
+					if (subProgram != NULL)
+						returnType = subProgram->ReturnType();
 
-			BReference<Variable> variableReference(variable, true);
-			if (!frame->AddLocalVariable(variable))
-				return B_NO_MEMORY;
+					// function doesn't return a value, we're done.
+					if (returnType == NULL)
+						return B_OK;
+				}
+
+				uint32 byteSize = 0;
+				if (returnType->ByteSize() == NULL) {
+					if (dynamic_cast<DIEAddressingType*>(returnType) != NULL)
+						byteSize = fArchitecture->AddressSize();
+				} else
+					byteSize = returnType->ByteSize()->constant;
+
+				ValueLocation* location;
+				result = fArchitecture->GetReturnAddressLocation(frame,
+					byteSize, location);
+				if (result != B_OK)
+					return result;
+
+				BReference<ValueLocation> locationReference(location, true);
+				Variable* variable = NULL;
+				BReference<FunctionID> idReference(
+					targetFunction->GetFunctionID(), true);
+				result = factory.CreateReturnValue(idReference, returnType,
+					location, variable);
+				if (result != B_OK)
+					return result;
+
+				BReference<Variable> variableReference(variable, true);
+				if (!frame->AddLocalVariable(variable))
+					return B_NO_MEMORY;
+			}
 		}
 	}
 
