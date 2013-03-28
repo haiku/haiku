@@ -104,7 +104,6 @@ AppearancePrefView::AppearancePrefView(const char* name,
 		kColorTable[0]);
 
 	fColorField = new BMenuField(B_TRANSLATE("Color:"), colorsPopUp);
-	fColorField->SetEnabled(false);
 
 	fTabTitle = new BTextControl("tabTitle", B_TRANSLATE("Tab title:"), "",
 		NULL);
@@ -151,7 +150,6 @@ AppearancePrefView::AppearancePrefView(const char* name,
 	fTabTitle->SetText(PrefHandler::Default()->getString(PREF_TAB_TITLE));
 	fWindowTitle->SetText(PrefHandler::Default()->getString(PREF_WINDOW_TITLE));
 
-	fColorControl->SetEnabled(false);
 	fColorControl->SetValue(
 		PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR));
 
@@ -219,16 +217,11 @@ AppearancePrefView::AttachedToWindow()
 		fontSizeMenu->SetTargetForItems(this);
 	}
 
-  	fColorControl->SetTarget(this);
-  	fColorField->Menu()->SetTargetForItems(this);
-  	fColorSchemeField->Menu()->SetTargetForItems(this);
+	fColorControl->SetTarget(this);
+	fColorField->Menu()->SetTargetForItems(this);
+	fColorSchemeField->Menu()->SetTargetForItems(this);
 
-  	_SetCurrentColorScheme(fColorSchemeField);
-  	bool enableCustomColors =
-		strcmp(fColorSchemeField->Menu()->FindMarked()->Label(),
-			gCustomColorScheme.name) == 0;
-
-  	_EnableCustomColors(enableCustomColors);
+	_SetCurrentColorScheme();
 }
 
 
@@ -279,6 +272,15 @@ AppearancePrefView::MessageReceived(BMessage* msg)
 				break;
 			rgb_color oldColor = PrefHandler::Default()->getRGB(label);
 			if (oldColor != fColorControl->ValueAsColor()) {
+				BMenuItem* item = fColorSchemeField->Menu()->FindMarked();
+				if (strcmp(item->Label(), gCustomColorScheme.name) != 0) {
+					item->SetMarked(false);
+					item = fColorSchemeField->Menu()->FindItem(
+						gCustomColorScheme.name);
+					if (item)
+						item->SetMarked(true);
+				}
+
 				PrefHandler::Default()->setRGB(label,
 					fColorControl->ValueAsColor());
 				modified = true;
@@ -291,11 +293,6 @@ AppearancePrefView::MessageReceived(BMessage* msg)
 			color_scheme* newScheme = NULL;
 			if (msg->FindPointer("color_scheme",
 					(void**)&newScheme) == B_OK) {
-				if (newScheme == &gCustomColorScheme)
-					_EnableCustomColors(true);
-				else
-					_EnableCustomColors(false);
-
 				_ChangeColorScheme(newScheme);
 				modified = true;
 			}
@@ -366,14 +363,6 @@ AppearancePrefView::MessageReceived(BMessage* msg)
 
 
 void
-AppearancePrefView::_EnableCustomColors(bool enable)
-{
-	fColorField->SetEnabled(enable);
-	fColorControl->SetEnabled(enable);
-}
-
-
-void
 AppearancePrefView::_ChangeColorScheme(color_scheme* scheme)
 {
 	PrefHandler* pref = PrefHandler::Default();
@@ -388,7 +377,7 @@ AppearancePrefView::_ChangeColorScheme(color_scheme* scheme)
 
 
 void
-AppearancePrefView::_SetCurrentColorScheme(BMenuField* field)
+AppearancePrefView::_SetCurrentColorScheme()
 {
 	PrefHandler* pref = PrefHandler::Default();
 
