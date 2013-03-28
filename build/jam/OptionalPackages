@@ -496,20 +496,20 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 			: : true ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			autoconf-2.68-1-x86_gcc2.hpkg
-			: $(hpkgBaseURL)/autoconf-2.68-1-x86_gcc2.hpkg
+			autoconf-2.68-2-x86_gcc2.hpkg
+			: $(hpkgBaseURL)/autoconf-2.68-2-x86_gcc2.hpkg
 			: common packages ;
 		InstallOptionalHaikuImagePackage
-			automake-1.11.1-1-x86_gcc2.hpkg
-			: $(hpkgBaseURL)/automake-1.11.1-1-x86_gcc2.hpkg
+			automake-1.11.1-2-x86_gcc2.hpkg
+			: $(hpkgBaseURL)/automake-1.11.1-2-x86_gcc2.hpkg
 			: common packages ;
 		InstallOptionalHaikuImagePackage
-			libtool-2.4-1-x86_gcc2.hpkg
-			: $(hpkgBaseURL)/libtool-2.4-1-x86_gcc2.hpkg
+			libtool-2.4-2-x86_gcc2.hpkg
+			: $(hpkgBaseURL)/libtool-2.4-2-x86_gcc2.hpkg
 			: common packages ;
 		InstallOptionalHaikuImagePackage
-			texinfo-4.13a-1-x86_gcc2.hpkg
-			: $(hpkgBaseURL)/texinfo-4.13a-1-x86_gcc2.hpkg
+			texinfo-4.13a-2-x86_gcc2.hpkg
+			: $(hpkgBaseURL)/texinfo-4.13a-2-x86_gcc2.hpkg
 			: common packages ;
 	}
 }
@@ -520,8 +520,8 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 		&& $(TARGET_ARCH) = x86 {
 	# gcc and binutils
 	if $(HAIKU_GCC_VERSION[1]) = 2 {
-		InstallOptionalHaikuImagePackage gcc-2.95.3_110711-1-x86_gcc2.hpkg
-			: $(hpkgBaseURL)/gcc-2.95.3_110711-1-x86_gcc2.hpkg
+		InstallOptionalHaikuImagePackage gcc-2.95.3_110711-2-x86_gcc2.hpkg
+			: $(hpkgBaseURL)/gcc-2.95.3_110711-2-x86_gcc2.hpkg
 			: common packages ;
 
 		# TODO: remove this when we have a mechanism to switch gcc via PATH
@@ -558,16 +558,16 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 			: $(baseURL)/make-3.82-r1a3-x86-gcc4-2011-05-23.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			bison-2.4.3-1-x86_gcc2.hpkg
-			: $(hpkgBaseURL)/bison-2.4.3-1-x86_gcc2.hpkg
+			bison-2.4.3-2-x86_gcc2.hpkg
+			: $(hpkgBaseURL)/bison-2.4.3-2-x86_gcc2.hpkg
 			: common packages ;
 		InstallOptionalHaikuImagePackage
-			m4-1.4.16-1-x86_gcc2.hpkg
-			: $(hpkgBaseURL)/m4-1.4.16-1-x86_gcc2.hpkg
+			m4-1.4.16-2-x86_gcc2.hpkg
+			: $(hpkgBaseURL)/m4-1.4.16-2-x86_gcc2.hpkg
 			: common packages ;
 		InstallOptionalHaikuImagePackage
-			flex-2.5.35-1-x86_gcc2.hpkg
-			: $(hpkgBaseURL)/flex-2.5.35-1-x86_gcc2.hpkg
+			flex-2.5.35-2-x86_gcc2.hpkg
+			: $(hpkgBaseURL)/flex-2.5.35-2-x86_gcc2.hpkg
 			: common packages ;
 		InstallOptionalHaikuImagePackage
 			jam-2.5-1-x86_gcc2.hpkg
@@ -578,8 +578,8 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 			: $(hpkgBaseURL)/mkdepend-1.7-1-x86_gcc2.hpkg
 			: common packages ;
 		InstallOptionalHaikuImagePackage
-			make-3.82-1-x86_gcc2.hpkg
-			: $(hpkgBaseURL)/make-3.82-1-x86_gcc2.hpkg
+			make-3.82-2-x86_gcc2.hpkg
+			: $(hpkgBaseURL)/make-3.82-2-x86_gcc2.hpkg
 			: common packages ;
 	}
 }
@@ -1288,8 +1288,8 @@ if [ IsOptionalHaikuImagePackageAdded Perl ] {
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				perl-5.10.1-1-x86_gcc2.hpkg
-				: $(hpkgBaseURL)/perl-5.10.1-1-x86_gcc2.hpkg
+				perl-5.10.1-2-x86_gcc2.hpkg
+				: $(hpkgBaseURL)/perl-5.10.1-2-x86_gcc2.hpkg
 				: common packages ;
 		}
 	}
