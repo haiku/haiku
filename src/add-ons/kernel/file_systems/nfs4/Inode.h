@@ -62,7 +62,8 @@ public:
 									ino_t* id = NULL);
 	static			status_t	Rename(Inode* from, Inode* to,
 									const char* fromName, const char* toName,
-									bool attribute = false, ino_t* id = NULL);
+									bool attribute = false, ino_t* id = NULL,
+									ino_t* oldID = NULL);
 
 					status_t	Stat(struct stat* st,
 									OpenAttrCookie* attr = NULL);

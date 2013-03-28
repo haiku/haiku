@@ -131,12 +131,22 @@ if $(HAIKU_USE_GCC_PIPE) = 1 {
 # results in some broken code.
 # TODO: remove the -fno-strict-aliasing option when all code has been
 #		analyzed/fixed with regard to aliasing.
+# TODO: retest/remove the -fno-tree-vrp option as soon as we have updated our
+#		gcc4 compiler. See this discussion on some issues:
+# http://www.freelists.org/post/haiku-development/hrev45320-Yet-another-nonobvious-effect-of-ftreevrp-optimization
 if $(HAIKU_GCC_VERSION[1]) >= 3 {
-	HAIKU_GCC_BASE_FLAGS += -fno-strict-aliasing ;
+	HAIKU_GCC_BASE_FLAGS += -fno-strict-aliasing -fno-tree-vrp ;
+}
+
+# disable array bounds warnings on gcc 4.6 or newer since they trigger
+# too many false positives. Coverity does a better job of this kind of analysis
+# anyways.
+if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	HAIKU_GCC_BASE_FLAGS += -Wno-array-bounds ;
 }
 
 if $(HOST_GCC_VERSION[1]) >= 3 {
-	HOST_GCC_BASE_FLAGS += -fno-strict-aliasing ;
+	HOST_GCC_BASE_FLAGS += -fno-strict-aliasing -fno-tree-vrp ;
 }
 
 # override gcc 2.95.3's header directory -- strictly necessary only when using
@@ -350,12 +360,10 @@ if $(HAIKU_GCC_VERSION[1]) >= 3 {
 if $(HAIKU_GCC_VERSION[1]) >= 4 {
 	HAIKU_C++FLAGS += -Wno-deprecated ;
 
-	if $(HAIKU_GCC_VERSION[2]) >= 3 {
-		HAIKU_KERNEL_CCFLAGS += -ffreestanding ;
-		HAIKU_KERNEL_C++FLAGS += -ffreestanding ;
-		HAIKU_BOOT_CCFLAGS += -ffreestanding ;
-		HAIKU_BOOT_C++FLAGS += -ffreestanding ;
-	}
+	HAIKU_KERNEL_CCFLAGS += -ffreestanding ;
+	HAIKU_KERNEL_C++FLAGS += -ffreestanding ;
+	HAIKU_BOOT_CCFLAGS += -ffreestanding ;
+	HAIKU_BOOT_C++FLAGS += -ffreestanding ;
 }
 
 HAIKU_KERNEL_PIC_CCFLAGS = -fno-pic ;
@@ -1249,10 +1257,8 @@ if $(HAIKU_GCC_VERSION[1]) >= 4 {
 	# -Wuninitialized gives too many false positives.
 	HAIKU_WERRORFLAGS = -Wno-error=uninitialized ;
 
-	if $(HAIKU_GCC_VERSION[2]) >= 6 {
-		# TODO: remove the -Wno-unused-but-set-variable option
-		HAIKU_WERRORFLAGS += -Wno-unused-but-set-variable ;
-	}
+	# TODO: remove the -Wno-unused-but-set-variable option
+	HAIKU_WERRORFLAGS += -Wno-unused-but-set-variable ;
 }
 
 rule EnableWerror dirTokens : scope {

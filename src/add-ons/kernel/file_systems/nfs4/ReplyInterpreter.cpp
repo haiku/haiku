@@ -11,6 +11,7 @@
 
 #include <string.h>
 
+#include <AutoDeleter.h>
 #include <util/kernel_cpp.h>
 
 #include "Cookie.h"
@@ -18,7 +19,12 @@
 
 FSLocation::~FSLocation()
 {
-	free(const_cast<char*>(fRootPath));
+	if (fRootPath != NULL) {
+		for (uint32 i = 0; fRootPath[i] != NULL; i++)
+			free(const_cast<char*>(fRootPath[i]));
+	}
+	delete[] fRootPath;
+	
 	for (uint32 i = 0; i < fCount; i++)
 		free(const_cast<char*>(fLocations[i]));
 	delete[] fLocations;
@@ -27,7 +33,12 @@ FSLocation::~FSLocation()
 
 FSLocations::~FSLocations()
 {
-	free(const_cast<char*>(fRootPath));
+	if (fRootPath != NULL) {
+		for (uint32 i = 0; fRootPath[i] != NULL; i++)
+			free(const_cast<char*>(fRootPath[i]));
+	}
+	delete[] fRootPath;
+	
 	delete[] fLocations;
 }
 
@@ -234,7 +245,7 @@ ReplyInterpreter::Lock(LockInfo* linfo)
 status_t
 ReplyInterpreter::LockT(uint64* pos, uint64* len, LockType* type)
 {
-	status_t res = _OperationError(OpLockU);
+	status_t res = _OperationError(OpLockT);
 	if (res != B_WOULD_BLOCK || NFS4Error() != NFS4ERR_DENIED)
 		return res;
 
@@ -426,7 +437,12 @@ ReplyInterpreter::ReadDir(uint64* cookie, uint64* cookieVerf,
 	*_count = count;
 	*dirents = entries;
 
-	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+	if (fReply->Stream().IsEOF()) {
+		delete[] entries;
+		return B_BAD_VALUE;
+	}
+
+	return B_OK;
 }
 
 
@@ -522,27 +538,29 @@ ReplyInterpreter::Write(uint32* size)
 }
 
 
-static const char*
-sFlattenPathname(XDR::ReadStream& str)
+const char**
+ReplyInterpreter::_GetPath(XDR::ReadStream& stream)
 {
-	uint32 count = str.GetUInt();
-	char* pathname = NULL;
-	uint32 size = 0;
-	for (uint32 i = 0; i < count; i++) {
-		const char* path = str.GetString();
-		size += strlen(path) + 1;
-		if (pathname == NULL) {
-			pathname = reinterpret_cast<char*>(malloc(strlen(path + 1)));
-			pathname[0] = '\0';
-		} else {
-			*pathname++ = '/';
-			pathname = reinterpret_cast<char*>(realloc(pathname, size));
-		}
-		strcat(pathname, path);
-		free(const_cast<char*>(path));
-	}
+	uint32 count = stream.GetUInt();
+	char** path = new char*[count + 1];
+	if (path == NULL)
+		return NULL;
 
-	return pathname;
+	uint32 i;
+	for (i = 0; i < count; i++) {
+		path[i] = stream.GetString();
+		if (path[i] == NULL)
+			goto out;
+	}
+	path[count] = NULL;
+
+	return const_cast<const char**>(path);
+
+out:
+	for (uint32 j = 0; j < i; j++)
+		free(path[i]);
+	delete[] path;
+	return NULL;
 }
 
 
@@ -554,6 +572,7 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 	uint32* bitmap = new(std::nothrow) uint32[bcount];
 	if (bitmap == NULL)
 		return B_NO_MEMORY;
+	ArrayDeleter<uint32> _(bitmap);
 
 	uint32 attr_count = 0;
 	for (uint32 i = 0; i < bcount; i++) {
@@ -573,10 +592,8 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 	XDR::ReadStream stream(const_cast<void*>(ptr), size);
 
 	AttrValue* values = new(std::nothrow) AttrValue[attr_count];
-	if (values == NULL) {
-		delete[] bitmap;
+	if (values == NULL)
 		return B_NO_MEMORY;
-	}
 
 	uint32 current = 0;
 
@@ -657,11 +674,11 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 		values[current].fAttribute = FATTR4_FS_LOCATIONS;
 
 		FSLocations* locs = new FSLocations;
-		locs->fRootPath = sFlattenPathname(stream);
+		locs->fRootPath = _GetPath(stream);
 		locs->fCount = stream.GetUInt();
 		locs->fLocations = new FSLocation[locs->fCount];
 		for (uint32 i = 0; i < locs->fCount; i++) {
-			locs->fLocations[i].fRootPath = sFlattenPathname(stream);
+			locs->fLocations[i].fRootPath = _GetPath(stream);
 			locs->fLocations[i].fCount = stream.GetUInt();
 			locs->fLocations[i].fLocations
 				= new const char*[locs->fLocations[i].fCount];
@@ -774,11 +791,13 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 		current++;
 	}
 
-	delete[] bitmap;
-
 	*count = attr_count;
 	*attrs = values;
-	return str.IsEOF() ? B_BAD_VALUE : B_OK;
+	if (str.IsEOF()) {
+		delete[] values;
+		return B_BAD_VALUE;
+	}
+	return B_OK;
 }
 
 

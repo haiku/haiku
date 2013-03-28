@@ -12,7 +12,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <lock.h>
 #include <SupportDefs.h>
+#include <util/KernelReferenceable.h>
 
 
 #define NFS4_FHSIZE	128
@@ -26,11 +28,34 @@ struct FileHandle {
 	inline	FileHandle&	operator=(const FileHandle& fh);
 
 
+	inline	bool		operator==(const FileHandle& handle) const;
 	inline	bool		operator!=(const FileHandle& handle) const;
 	inline	bool		operator>(const FileHandle& handle) const;
 	inline	bool		operator<(const FileHandle& handle) const;
 };
 
+class InodeNames;
+
+struct InodeName : public SinglyLinkedListLinkImpl<InodeName> {
+				InodeName(InodeNames* parent, const char* name);
+				~InodeName();
+
+	InodeNames*	fParent;
+	const char*	fName;
+};
+
+struct InodeNames : public KernelReferenceable {
+								InodeNames();
+								~InodeNames();
+
+	status_t					AddName(InodeNames* parent, const char* name);
+	bool						RemoveName(InodeNames* parent,
+									const char* name);
+
+	mutex						fLock;
+	SinglyLinkedList<InodeName>	fNames;
+	FileHandle					fHandle;
+};
 
 class FileSystem;
 class RequestBuilder;
@@ -42,23 +67,16 @@ struct FileInfo {
 			uint64		fFileId;
 			FileHandle	fHandle;
 
-			FileHandle	fParent;
-			const char*	fName;
-			const char*	fPath;
+			InodeNames*	fNames;
 
 			FileHandle	fAttrDir;
 
-	inline				FileInfo();
-	inline				~FileInfo();
-	inline				FileInfo(const FileInfo& fi);
-	inline	FileInfo&	operator=(const FileInfo& fi);
+						FileInfo();
+						~FileInfo();
+						FileInfo(const FileInfo& fi);
+			FileInfo&	operator=(const FileInfo& fi);
 
 			status_t	UpdateFileHandles(FileSystem* fs);
-
-	static	status_t	ParsePath(RequestBuilder& req, uint32& count,
-							const char* _path);
-
-			status_t	CreateName(const char* dirPath, const char* name);
 };
 
 struct FileSystemId {
@@ -97,11 +115,18 @@ FileHandle::operator=(const FileHandle& fh)
 
 
 inline bool
-FileHandle::operator!=(const FileHandle& handle) const
+FileHandle::operator==(const FileHandle& handle) const
 {
 	if (fSize != handle.fSize)
-		return true;
-	return memcmp(fData, handle.fData, fSize) != 0;
+		return false;
+	return memcmp(fData, handle.fData, fSize) == 0;
+}
+
+
+inline bool
+FileHandle::operator!=(const FileHandle& handle) const
+{
+	return !operator==(handle);
 }
 
 
@@ -120,53 +145,6 @@ FileHandle::operator<(const FileHandle& handle) const
 	if (fSize < handle.fSize)
 		return true;
 	return memcmp(fData, handle.fData, fSize) < 0;
-}
-
-
-inline
-FileInfo::FileInfo()
-	:
-	fFileId(0),
-	fName(NULL),
-	fPath(NULL)
-{
-}
-
-
-inline
-FileInfo::~FileInfo()
-{
-	free(const_cast<char*>(fName));
-	free(const_cast<char*>(fPath));
-}
-
-
-inline
-FileInfo::FileInfo(const FileInfo& fi)
-	:
-	fFileId(fi.fFileId),
-	fHandle(fi.fHandle),
-	fParent(fi.fParent),
-	fName(strdup(fi.fName)),
-	fPath(strdup(fi.fPath))
-{
-}
-
-
-inline FileInfo&
-FileInfo::operator=(const FileInfo& fi)
-{
-	fFileId = fi.fFileId;
-	fHandle = fi.fHandle;
-	fParent = fi.fParent;
-
-	free(const_cast<char*>(fName));
-	fName = strdup(fi.fName);
-
-	free(const_cast<char*>(fPath));
-	fPath = strdup(fi.fPath);
-
-	return *this;
 }
 
 

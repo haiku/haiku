@@ -592,7 +592,8 @@ typedef enum cpu_types {
 	B_CPU_AMD_E_SERIES					= 0x5011f2,
 
 	// Family 15h
-	B_CPU_AMD_FX_SERIES					= 0x6011f1, /* Bulldozer */
+	B_CPU_AMD_FX_SERIES_MODEL_1			= 0x6011f1, /* Bulldozer */
+	B_CPU_AMD_FX_SERIES_MODEL_2			= 0x6011f2,
 
 	/* VIA/Cyrix */
 	B_CPU_CYRIX_x86						= 0x1200,

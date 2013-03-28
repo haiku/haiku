@@ -45,6 +45,7 @@ All rights reserved.
 #include <NodeInfo.h>
 #include <Roster.h>
 #include <Screen.h>
+#include <Window.h>
 
 #include "icons.h"
 
@@ -75,18 +76,17 @@ thread_id TExpandoMenuBar::sMonThread = B_ERROR;
 BLocker TExpandoMenuBar::sMonLocker("expando monitor");
 
 
-TExpandoMenuBar::TExpandoMenuBar(TBarView* bar, BRect frame, const char* name,
-	bool vertical, bool drawLabel)
+TExpandoMenuBar::TExpandoMenuBar(BRect frame, const char* name, bool vertical)
 	:
 	BMenuBar(frame, name, B_FOLLOW_NONE,
 		vertical ? B_ITEMS_IN_COLUMN : B_ITEMS_IN_ROW),
 	fVertical(vertical),
 	fOverflow(false),
-	fDrawLabel(drawLabel),
+	fDrawLabel(!static_cast<TBarApp*>(be_app)->Settings()->hideLabels),
 	fShowTeamExpander(static_cast<TBarApp*>(be_app)->Settings()->superExpando),
 	fExpandNewTeams(static_cast<TBarApp*>(be_app)->Settings()->expandNewTeams),
 	fDeskbarMenuWidth(kMinMenuItemWidth),
-	fBarView(bar),
+	fBarView(NULL),
 	fPreviousDragTargetItem(NULL),
 	fLastClickItem(NULL)
 {
@@ -101,6 +101,13 @@ TExpandoMenuBar::TExpandoMenuBar(TBarView* bar, BRect frame, const char* name,
 			- kMinimumIconSize;
 		SetMaxContentWidth(maxContentWidth);
 	}
+
+	// top or bottom mode, add deskbar menu and sep for menubar tracking
+	// consistency
+	const BBitmap* logoBitmap = AppResSet()->FindBitmap(B_MESSAGE_TYPE,
+		R_LeafLogoBitmap);
+	if (logoBitmap != NULL)
+		fDeskbarMenuWidth = logoBitmap->Bounds().Width() + 16;
 }
 
 
@@ -115,68 +122,10 @@ TExpandoMenuBar::CompareByName(const void* first, const void* second)
 void
 TExpandoMenuBar::AttachedToWindow()
 {
-	BMessenger self(this);
-	BList teamList;
-	TBarApp::Subscribe(self, &teamList);
-	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
-	desk_settings* settings = static_cast<TBarApp*>(be_app)->Settings();
-
-	float itemWidth = -0.1f;
-	if (fVertical)
-		itemWidth = Frame().Width();
-	else {
-		itemWidth = iconSize;
-		if (fDrawLabel)
-			itemWidth += sMinimumWindowWidth - kMinimumIconSize;
-		else
-			itemWidth += kIconPadding * 2;
-	}
-	float itemHeight = -1.0f;
-
-	// top or bottom mode, add deskbar menu and sep for menubar tracking
-	// consistency
-	if (!fVertical) {
-		const BBitmap* logoBitmap = AppResSet()->FindBitmap(B_MESSAGE_TYPE,
-			R_LeafLogoBitmap);
-		if (logoBitmap != NULL)
-			fDeskbarMenuWidth = logoBitmap->Bounds().Width() + 16;
-	}
-
-	if (settings->sortRunningApps)
-		teamList.SortItems(CompareByName);
-
-	int32 count = teamList.CountItems();
-	for (int32 i = 0; i < count; i++) {
-		BarTeamInfo* barInfo = (BarTeamInfo*)teamList.ItemAt(i);
-		if ((barInfo->flags & B_BACKGROUND_APP) == 0
-			&& strcasecmp(barInfo->sig, kDeskbarSignature) != 0) {
-			if (settings->trackerAlwaysFirst
-				&& !strcmp(barInfo->sig, kTrackerSignature)) {
-				AddItem(new TTeamMenuItem(barInfo->teams, barInfo->icon,
-					barInfo->name, barInfo->sig, itemWidth, itemHeight,
-					fDrawLabel, fVertical), 0);
-			} else {
-				AddItem(new TTeamMenuItem(barInfo->teams, barInfo->icon,
-					barInfo->name, barInfo->sig, itemWidth, itemHeight,
-					fDrawLabel, fVertical));
-			}
-
-			barInfo->teams = NULL;
-			barInfo->icon = NULL;
-			barInfo->name = NULL;
-			barInfo->sig = NULL;
-		}
-
-		delete barInfo;
-	}
-
 	BMenuBar::AttachedToWindow();
 
-	if (CountItems() == 0) {
-		// If we're empty, BMenuBar::AttachedToWindow() resizes us to some
-		// weird value - we just override it again
-		ResizeTo(itemWidth, 0);
-	}
+	fBarView = static_cast<TBarWindow*>(Window())->BarView();
+	fTeamList.MakeEmpty();
 
 	if (fVertical) {
 		sDoMonitor = true;
@@ -525,6 +474,70 @@ TExpandoMenuBar::MouseUp(BPoint where)
 }
 
 
+void
+TExpandoMenuBar::BuildItems()
+{
+	BMessenger self(this);
+	TBarApp::Subscribe(self, &fTeamList);
+
+	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
+	desk_settings* settings = static_cast<TBarApp*>(be_app)->Settings();
+	fDrawLabel = !settings->hideLabels;
+	fShowTeamExpander = settings->superExpando;
+	fExpandNewTeams = settings->expandNewTeams;
+
+	float itemWidth = -0.1f;
+	if (fVertical)
+		itemWidth = Frame().Width();
+	else {
+		itemWidth = iconSize;
+		if (fDrawLabel)
+			itemWidth += sMinimumWindowWidth - kMinimumIconSize;
+		else
+			itemWidth += kIconPadding * 2;
+	}
+	float itemHeight = -1.0f;
+
+	RemoveItems(0, CountItems(), true);
+		// remove all items
+
+	if (settings->sortRunningApps)
+		fTeamList.SortItems(CompareByName);
+
+	int32 count = fTeamList.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		// add them again
+		BarTeamInfo* barInfo = (BarTeamInfo*)fTeamList.ItemAt(i);
+		if ((barInfo->flags & B_BACKGROUND_APP) == 0
+			&& strcasecmp(barInfo->sig, kDeskbarSignature) != 0) {
+			if (settings->trackerAlwaysFirst
+				&& !strcmp(barInfo->sig, kTrackerSignature)) {
+				AddItem(new TTeamMenuItem(barInfo->teams, barInfo->icon,
+					barInfo->name, barInfo->sig, itemWidth, itemHeight,
+					fDrawLabel, fVertical), 0);
+			} else {
+				AddItem(new TTeamMenuItem(barInfo->teams, barInfo->icon,
+					barInfo->name, barInfo->sig, itemWidth, itemHeight,
+					fDrawLabel, fVertical));
+			}
+
+			barInfo->teams = NULL;
+			barInfo->icon = NULL;
+			barInfo->name = NULL;
+			barInfo->sig = NULL;
+		}
+
+		delete barInfo;
+	}
+
+	if (CountItems() == 0) {
+		// If we're empty, BMenuBar::AttachedToWindow() resizes us to some
+		// weird value - we just override it again
+		ResizeTo(itemWidth, 0);
+	}
+}
+
+
 bool
 TExpandoMenuBar::InDeskbarMenu(BPoint loc) const
 {
@@ -636,7 +649,6 @@ TExpandoMenuBar::AddTeam(BList* team, BBitmap* icon, char* name,
 	}
 
 	SizeWindow(1);
-
 	Window()->UpdateIfNeeded();
 }
 
@@ -676,11 +688,8 @@ TExpandoMenuBar::RemoveTeam(team_id team, bool partial)
 #endif
 
 				RemoveItem(i);
-
 				SizeWindow(-1);
-
 				Window()->UpdateIfNeeded();
-
 				delete item;
 				return;
 			}

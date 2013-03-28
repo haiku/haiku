@@ -13,11 +13,13 @@ enum {
 };
 
 
+class UTF8Char;
+
 class TerminalCharClassifier {
 public:
 	virtual						~TerminalCharClassifier();
 
-	virtual	int					Classify(const char* character) = 0;
+	virtual	int					Classify(const UTF8Char& character) = 0;
 };
 
 

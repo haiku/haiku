@@ -1,32 +1,13 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2013, Haiku.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files or portions
- * thereof (the "Software"), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject
- * to the following conditions:
+ * Distributed under the terms of the MIT License.
  *
- *  * Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- *  * Redistributions in binary form must reproduce the above copyright notice
- *    in the  binary, as well as this list of conditions and the following
- *    disclaimer in the documentation and/or other materials provided with
- *    the distribution.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
+ * Authors:
+ *		Kian Duffy, myob@users.sourceforge.net
+ *		Siarzhuk Zharski, zharik@gmx.li
  */
 #ifndef TERMCONST_H_INCLUDED
 #define TERMCONST_H_INCLUDED
@@ -45,6 +26,15 @@
 
 #include <SupportDefs.h>
 
+
+// define to get Ctrl-Cmd-S / Ctrl-Cmd-C shortcuts
+// to get the debug buffers snapshots and control
+// sequences capture logging
+#define USE_DEBUG_SNAPSHOTS
+#ifdef USE_DEBUG_SNAPSHOTS
+const uint32 SHORTCUT_DEBUG_SNAPSHOTS	= 'sdbs';
+const uint32 SHORTCUT_DEBUG_CAPTURE		= 'srdc';
+#endif
 
 // Menu Message
 static const uint32 MENU_SWITCH_TERM	= 'MSWT';
@@ -87,13 +77,16 @@ static const uint32 SAVE_AS_DEFAULT 					= 'sadf';
 static const uint32 MSG_CHECK_CHILDREN					= 'ckch';
 static const uint32 MSG_REMOVE_RESIZE_VIEW_IF_NEEDED	= 'rmrv';
 static const uint32 MSG_TERMINAL_BUFFER_CHANGED			= 'bufc';
-static const uint32 MSG_SET_TERMNAL_TITLE				= 'sett';
+static const uint32 MSG_SET_TERMINAL_TITLE				= 'sett';
+static const uint32 MSG_SET_TERMINAL_COLORS				= 'setc';
+static const uint32 MSG_RESET_TERMINAL_COLORS			= 'rstc';
 static const uint32 MSG_QUIT_TERMNAL					= 'qutt';
 static const uint32 MSG_REPORT_MOUSE_EVENT				= 'mous';
 static const uint32 MSG_SAVE_WINDOW_POSITION			= 'swps';
 static const uint32 MSG_MOVE_TAB_LEFT					= 'mvtl';
 static const uint32 MSG_MOVE_TAB_RIGHT					= 'mvtr';
 static const uint32 MSG_ACTIVATE_TERM					= 'msat';
+static const uint32 MSG_SET_CURSOR_STYLE				= 'mscs';
 
 
 // Preference Read/Write Keys
@@ -121,6 +114,15 @@ static const char* const PREF_ANSI_MAGENTA_COLOR = "ANSI magenta color";
 static const char* const PREF_ANSI_CYAN_COLOR = "ANSI cyan color";
 static const char* const PREF_ANSI_WHITE_COLOR = "ANSI white color";
 
+static const char* const PREF_ANSI_BLACK_HCOLOR = "ANSI bright black color";
+static const char* const PREF_ANSI_RED_HCOLOR = "ANSI bright red color";
+static const char* const PREF_ANSI_GREEN_HCOLOR = "ANSI bright green color";
+static const char* const PREF_ANSI_YELLOW_HCOLOR = "ANSI bright yellow color";
+static const char* const PREF_ANSI_BLUE_HCOLOR = "ANSI bright blue color";
+static const char* const PREF_ANSI_MAGENTA_HCOLOR = "ANSI bright magenta color";
+static const char* const PREF_ANSI_CYAN_HCOLOR = "ANSI bright cyan color";
+static const char* const PREF_ANSI_WHITE_HCOLOR = "ANSI bright white color";
+
 static const char* const PREF_HISTORY_SIZE = "History size";
 static const char* const PREF_CURSOR_BLINKING = "Cursor blinking rate";
 
@@ -128,13 +130,13 @@ static const char* const PREF_IM_AWARE = "Input method aware";
 
 static const char* const PREF_COLS = "Cols";
 static const char* const PREF_ROWS = "Rows";
-static const char* const PREF_SHELL = "Shell";
 
 static const char* const PREF_TEXT_ENCODING = "Text encoding";
-static const char* const PREF_GUI_LANGUAGE = "Language";
 
 static const char* const PREF_BLINK_CURSOR = "Blinking cursor";
 static const char* const PREF_WARN_ON_EXIT = "Warn on exit";
+static const char* const PREF_CURSOR_STYLE = "Cursor style";
+static const char* const PREF_EMULATE_BOLD = "Emulate bold";
 
 static const char* const PREF_TAB_TITLE = "Tab title";
 static const char* const PREF_WINDOW_TITLE = "Window title";
@@ -143,13 +145,14 @@ static const char* const PREF_WINDOW_TITLE = "Window title";
 extern const char* const kTooTipSetTabTitlePlaceholders;
 extern const char* const kTooTipSetWindowTitlePlaceholders;
 
-// Color type
+
+// Cursor style
 enum {
-  TEXT_FOREGROUND_COLOR,
-  TEXT_BACKGROUND_COLOR,
-  SELECTION_FOREGROUND_COLOR,
-  SELECTION_BACKGROUND_COLOR
+	BLOCK_CURSOR,
+	UNDERLINE_CURSOR,
+	IBEAM_CURSOR
 };
+
 
 // Preference Folder and setting path
 
@@ -158,12 +161,6 @@ static const int32 DEFAULT = -1;
 // Font Width
 static const int  HALF_WIDTH = 1;
 static const int  FULL_WIDTH = 2;
-
-// Scroll direction flag
-enum{
-  SCRUP,
-  SCRDOWN
-};
 
 #define M_UTF8 -1
 

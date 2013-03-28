@@ -1,4 +1,4 @@
-1	polish	x-vnd.haiku-icon_o_matic	3069426771
+1	polish	x-vnd.haiku-icon_o_matic	3933520036
 Select All	Icon-O-Matic-PathManipulator		Zaznacz wszystko
 Add Style	Icon-O-Matic-AddStylesCmd		Dodanie stylu
 Color (#%02x%02x%02x)	Style name after dropping a color		Kolor (#%02x%02x%02x)
@@ -43,6 +43,7 @@ Untitled	Icon-O-Matic-Main		Bez nazwy
 Multi Set 	Multi Set (property name)		Ustaw wiele 
 any of the other lists to	Empty property list - 2nd line		listy, żeby edytować
 Save as…	Icon-O-Matic-Menu-File		Zapisz jako…
+Don't save	Icon-O-Matic-Menu-Settings		Nie zapisuj
 Change Color	Icon-O-Matic-SetColorCmd		Zmianę koloru
 Style	Icon-O-Matic-Menus		Styl
 <modify path>	Icon-O-Matic-PathCmd		<modyfikacja ścieżki>
@@ -72,6 +73,7 @@ Undo	Icon-O-Matic-Main		Cofnij
 Click on a shape above	Empty transformers list - 1st line		Kliknij na kształt powyżej,
 Add Shape	Icon-O-Matic-AddShapesCmd		Dodanie kształtu
 Contour	Transformation		Kontur
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Czy zapisać bieżącą ikonę przez zamknięciem?
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<nie ma czego powtórzyć>
 Perspective	Transformation		Perspektywa
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Przesunięcie transformatora

@@ -144,6 +144,7 @@ Application Debugger :
 	FileSourceCode.cpp
 	Image.cpp
 	ImageInfo.cpp
+	ReturnValueInfo.cpp
 	SourceCode.cpp
 	StackFrame.cpp
 	StackFrameValues.cpp
@@ -151,7 +152,6 @@ Application Debugger :
 	StackTrace.cpp
 	Statement.cpp
 	SymbolInfo.cpp
-	UserBreakpoint.cpp
 	Team.cpp
 	TeamMemory.cpp
 	TeamMemoryBlock.cpp
@@ -161,6 +161,7 @@ Application Debugger :
 	Type.cpp
 	TypeComponentPath.cpp
 	TypeLookupConstraints.cpp
+	UserBreakpoint.cpp
 	Variable.cpp
 	Watchpoint.cpp
 

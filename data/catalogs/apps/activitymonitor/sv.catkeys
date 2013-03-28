@@ -1,8 +1,9 @@
-1	swedish	x-vnd.Haiku-ActivityMonitor	3704566709
+1	swedish	x-vnd.Haiku-ActivityMonitor	1913625522
 P-faults	DataSource		P-fel
 Media nodes	DataSource		Medianoder
 Threads	DataSource		Trådar
 MB	DataSource		MB
+Always on top	ActivityWindow		Alltid överst
 Add graph	ActivityWindow		Lägg till graf
 Teams	DataSource		Processer
 Hide legend	ActivityView		Göm graftext

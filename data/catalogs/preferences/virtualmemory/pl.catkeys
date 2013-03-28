@@ -1,5 +1,6 @@
-1	polish	x-vnd.Haiku-VirtualMemory	4238590117
+1	polish	x-vnd.Haiku-VirtualMemory	2090796060
 Quit	SettingsWindow		Wyjdź
+Automatic swap management	SettingsWindow		Automatyczne zarządzanie przestrzenią wymiany
 Turn off	SettingsWindow		Wyłącz
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Wyłączenie pamięci wirtualnej może mieć niepożądany wpływ na stabilność systemu, gdy cała dostępna pamięć zostanie zużyta.\nPamięć wirtualna nie wpływa na wydajność systemu, aż do tego momentu.\n\nNa pewno chcesz ją wyłączyc?
 Requested swap file size:	SettingsWindow		Docelowy rozmiar pliku wymiany:

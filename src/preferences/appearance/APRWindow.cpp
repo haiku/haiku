@@ -71,11 +71,12 @@ APRWindow::APRWindow(BRect frame)
 		.Add(tabView)
 		.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+			.Add(fDefaultsButton)
 			.Add(fRevertButton)
 			.AddGlue()
-			.Add(fDefaultsButton)
 		)
-		.SetInsets(5, 5, 5, 5)
+		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
+			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 	);
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2013, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Support for i915 chipset and up based on the X driver,
@@ -504,6 +504,20 @@ sanitize_display_mode(display_mode& mode)
 }
 
 
+static bool
+check_and_sanitize_display_mode(display_mode* mode)
+{
+	uint16 width = mode->timing.h_display;
+	uint16 height = mode->timing.v_display;
+
+	// Only accept the mode if it is within the supported resolution
+	// TODO: sanitize_display_mode() should report resolution changes
+	// differently!
+	return !sanitize_display_mode(*mode) || (width == mode->timing.h_display
+			&& height == mode->timing.v_display);
+}
+
+
 // #pragma mark -
 
 
@@ -600,8 +614,8 @@ create_mode_list(void)
 	display_mode* list;
 	uint32 count = 0;
 	gInfo->mode_list_area = create_display_modes("intel extreme modes",
-		gInfo->has_edid ? &gInfo->edid_info : NULL, NULL, 0, NULL, 0, NULL,
-		&list, &count);
+		gInfo->has_edid ? &gInfo->edid_info : NULL, NULL, 0, NULL, 0,
+		&check_and_sanitize_display_mode, &list, &count);
 	if (gInfo->mode_list_area < B_OK)
 		return gInfo->mode_list_area;
 
@@ -670,7 +684,7 @@ intel_propose_display_mode(display_mode* target, const display_mode* low,
 
 	// first search for the specified mode in the list, if no mode is found
 	// try to fix the target mode in sanitize_display_mode
-	// TODO: Only sanitize_display_mode should be used. However, at the moments
+	// TODO: Only sanitize_display_mode should be used. However, at the moment
 	// the mode constraints are not optimal and do not work for all
 	// configurations.
 	for (uint32 i = 0; i < gInfo->shared_info->mode_count; i++) {

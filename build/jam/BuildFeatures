@@ -344,7 +344,7 @@ if $(TARGET_ARCH) = x86 {
 if $(TARGET_ARCH) = x86 {
 	local zipFile ;
 	if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		HAIKU_MESA_FILE = mesa-9.0.2-x86-gcc4-2013-02-17.zip ;
+		HAIKU_MESA_FILE = mesa-9.1.1-x86-gcc4-2013-03-20.zip ;
 	} else {
 		HAIKU_MESA_FILE = mesa-7.8.2-x86-gcc2-2013-02-17.zip ;
 	}

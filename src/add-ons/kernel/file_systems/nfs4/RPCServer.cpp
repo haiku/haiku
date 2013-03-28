@@ -161,7 +161,10 @@ Server::SendCallAsync(Call* call, Reply** reply, Request** request)
 	fRequests.AddRequest(req);
 
 	*request = req;
-	return ResendCallAsync(call, req);
+	status_t error = ResendCallAsync(call, req);
+	if (error != B_OK)
+		delete req;
+	return error;
 }
 
 
@@ -173,7 +176,6 @@ Server::ResendCallAsync(Call* call, Request* request)
 
 	if (fThreadError != B_OK && Repair() != B_OK) {
 		fRequests.FindRequest(request->fXID);
-		delete request;
 		return fThreadError;
 	}
 
@@ -181,7 +183,6 @@ Server::ResendCallAsync(Call* call, Request* request)
 	status_t result = fConnection->Send(stream.Buffer(), stream.Size());
 	if (result != B_OK) {
 		fRequests.FindRequest(request->fXID);
-		delete request;
 		return result;
 	}
 

@@ -477,7 +477,7 @@ ConnectionStream::Receive(void** _buffer, uint32* _size)
 		record_size = ntohl(record_size);
 		ASSERT(record_size > 0);
 
-		last_one = static_cast<int32>(record_size) < 0;
+		last_one = (record_size & LAST_FRAGMENT) != 0;
 		record_size &= LAST_FRAGMENT - 1;
 
 		void* ptr = realloc(buffer, size + record_size);

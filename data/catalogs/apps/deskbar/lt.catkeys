@@ -1,6 +1,5 @@
-1	lithuanian	x-vnd.Be-TSKB	1210725923
+1	lithuanian	x-vnd.Be-TSKB	1042823442
 Power off	DeskbarMenu		Išjungti
-Edit menu…	PreferencesWindow		Taisyti meniu…
 Suspend	DeskbarMenu		Pristabdyti
 Hide clock	TimeView		Nerodyti laikrodžio
 Applications	PreferencesWindow		Programos
@@ -8,7 +7,6 @@ Time preferences…	TimeView		Laiko nuostatos…
 About Haiku	DeskbarMenu		Apie „Haiku“
 Recent documents:	PreferencesWindow		Paskiausi dokumentai:
 Recent applications	DeskbarMenu		Paskiausiai leistos programos
-Sort running applications	PreferencesWindow		Rikiuoti paleistas programas
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programos
 Find…	DeskbarMenu		Ieškoti…
 Show clock	Tray		Rodyti laikrodį

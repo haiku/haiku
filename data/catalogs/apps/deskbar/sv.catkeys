@@ -1,13 +1,11 @@
-1	swedish	x-vnd.Be-TSKB	1566009467
+1	swedish	x-vnd.Be-TSKB	1398106986
 Power off	DeskbarMenu		Stäng av
-Edit menu…	PreferencesWindow		Redigera meny...
 Suspend	DeskbarMenu		Vänteläge
 Hide clock	TimeView		Dölj klockan
 Time preferences…	TimeView		Tidspreferenser
 About Haiku	DeskbarMenu		Om Haiku
 Recent documents:	PreferencesWindow		Senaste dokument:
 Recent applications	DeskbarMenu		Senaste program
-Sort running applications	PreferencesWindow		Sortera aktiva program
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Program
 Find…	DeskbarMenu		Sök...
 Show clock	Tray		Visa klockan

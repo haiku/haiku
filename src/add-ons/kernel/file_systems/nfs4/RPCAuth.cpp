@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <AutoDeleter.h>
 #include <SupportDefs.h>
 #include <util/kernel_cpp.h>
 
@@ -51,6 +52,7 @@ Auth::CreateSys()
 	Auth* auth = new(std::nothrow) Auth;
 	if (auth == NULL)
 		return NULL;
+	ObjectDeleter<Auth> authDeleter(auth);
 
 	XDR::WriteStream xdr;
 	xdr.AddUInt(time(NULL));
@@ -64,7 +66,12 @@ Auth::CreateSys()
 	xdr.AddUInt(getgid());
 
 	int count = getgroups(0, NULL);
+	if (count < B_OK)
+		return NULL;
 	gid_t* groups = (gid_t*)malloc(count * sizeof(gid_t));
+	if (groups == NULL)
+		return NULL;
+
 	int len = getgroups(count, groups);
 	if (len > 0) {
 		len = min_c(len, 16);
@@ -74,18 +81,15 @@ Auth::CreateSys()
 	} else
 		xdr.AddUInt(0);
 	free(groups);
-	if (xdr.Error() != B_OK) {
-		delete auth;
+	if (xdr.Error() != B_OK)
 		return NULL;
-	}
 
 	auth->fStream.AddInt(AUTH_SYS);
 	auth->fStream.AddOpaque(xdr);
-	if (auth->fStream.Error() != B_OK) {
-		delete auth;
+	if (auth->fStream.Error() != B_OK)
 		return NULL;
-	}
 
+	authDeleter.Detach();
 	return auth;
 }
 

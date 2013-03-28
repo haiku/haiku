@@ -216,7 +216,7 @@ usb_disk_transfer_data(disk_device *device, bool directionIn, void *data,
 	status_t result = gUSBModule->queue_bulk(directionIn ? device->bulk_in
 		: device->bulk_out, data, dataLength, usb_disk_callback, device);
 	if (result != B_OK) {
-		TRACE_ALWAYS("failed to queue data transfer\n");
+		TRACE_ALWAYS("failed to queue data transfer: %s\n", strerror(result));
 		return result;
 	}
 
@@ -235,7 +235,8 @@ usb_disk_transfer_data(disk_device *device, bool directionIn, void *data,
 	} while (result == B_INTERRUPTED);
 
 	if (result != B_OK) {
-		TRACE_ALWAYS("acquire_sem failed while waiting for data transfer\n");
+		TRACE_ALWAYS("acquire_sem failed while waiting for data transfer: %s\n",
+			strerror(result));
 		return result;
 	}
 
@@ -322,7 +323,8 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 	if (device->status != B_OK ||
 		device->actual_length != sizeof(command_block_wrapper)) {
 		// sending the command block wrapper failed
-		TRACE_ALWAYS("sending the command block wrapper failed\n");
+		TRACE_ALWAYS("sending the command block wrapper failed: %s\n",
+			strerror(device->status));
 		usb_disk_reset_recovery(device);
 		return B_ERROR;
 	}
@@ -343,7 +345,8 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 				gUSBModule->clear_feature(directionIn ? device->bulk_in
 					: device->bulk_out, USB_FEATURE_ENDPOINT_HALT);
 			} else {
-				TRACE_ALWAYS("sending or receiving of the data failed\n");
+				TRACE_ALWAYS("sending or receiving of the data failed: %s\n",
+					strerror(device->status));
 				usb_disk_reset_recovery(device);
 				return B_ERROR;
 			}
@@ -359,14 +362,16 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 	}
 
 	if (result != B_OK) {
-		TRACE_ALWAYS("receiving the command status wrapper failed\n");
+		TRACE_ALWAYS("receiving the command status wrapper failed: %s\n",
+			strerror(result));
 		usb_disk_reset_recovery(device);
 		return result;
 	}
 
 	if (status.signature != CSW_SIGNATURE || status.tag != command.tag) {
 		// the command status wrapper is not valid
-		TRACE_ALWAYS("command status wrapper is not valid\n");
+		TRACE_ALWAYS("command status wrapper is not valid: %#" B_PRIx32 "\n",
+			status.signature);
 		usb_disk_reset_recovery(device);
 		return B_ERROR;
 	}
@@ -382,7 +387,9 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 			if (dataLength != NULL) {
 				*dataLength -= residue;
 				if (transferedData < *dataLength) {
-					TRACE_ALWAYS("less data transfered than indicated\n");
+					TRACE_ALWAYS("less data transfered than indicated: %"
+						B_PRIuSIZE " vs. %" B_PRIuSIZE "\n", transferedData,
+						*dataLength);
 					*dataLength = transferedData;
 				}
 			}
@@ -396,8 +403,8 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 
 				// the operation is complete but has failed at the SCSI level
 				if (operation != SCSI_TEST_UNIT_READY_6) {
-					TRACE_ALWAYS("operation 0x%02x failed at the SCSI level\n",
-						operation);
+					TRACE_ALWAYS("operation %#" B_PRIx8
+						" failed at the SCSI level\n", operation);
 				}
 
 				result = usb_disk_request_sense(lun);
@@ -408,7 +415,7 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 		case CSW_STATUS_PHASE_ERROR:
 		{
 			// a protocol or device error occured
-			TRACE_ALWAYS("phase error in operation 0x%02x\n", operation);
+			TRACE_ALWAYS("phase error in operation %#" B_PRIx8 "\n", operation);
 			usb_disk_reset_recovery(device);
 			return B_ERROR;
 		}
@@ -437,7 +444,8 @@ usb_disk_request_sense(device_lun *lun)
 	status_t result = usb_disk_operation(lun, SCSI_REQUEST_SENSE_6, 6, 0,
 		dataLength, &parameter, &dataLength, true);
 	if (result != B_OK) {
-		TRACE_ALWAYS("getting request sense data failed\n");
+		TRACE_ALWAYS("getting request sense data failed: %s\n",
+			strerror(result));
 		return result;
 	}
 
@@ -503,7 +511,7 @@ usb_disk_mode_sense(device_lun *lun)
 		SCSI_MODE_PAGE_DEVICE_CONFIGURATION, dataLength, &parameter,
 		&dataLength, true);
 	if (result != B_OK) {
-		TRACE_ALWAYS("getting mode sense data failed\n");
+		TRACE_ALWAYS("getting mode sense data failed: %s\n", strerror(result));
 		return result;
 	}
 
@@ -553,7 +561,7 @@ usb_disk_inquiry(device_lun *lun)
 			break;
 	}
 	if (result != B_OK) {
-		TRACE_ALWAYS("getting inquiry data failed\n");
+		TRACE_ALWAYS("getting inquiry data failed: %s\n", strerror(result));
 		lun->device_type = B_DISK;
 		lun->removable = true;
 		return result;
@@ -618,7 +626,7 @@ usb_disk_update_capacity(device_lun *lun)
 	}
 
 	if (result != B_OK) {
-		TRACE_ALWAYS("failed to update capacity\n");
+		TRACE_ALWAYS("failed to update capacity: %s\n", strerror(result));
 		lun->media_present = false;
 		lun->media_changed = false;
 		usb_disk_reset_capacity(lun);
@@ -825,7 +833,8 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 	}
 
 	if (result != B_OK) {
-		TRACE_ALWAYS("failed to initialize logical units\n");
+		TRACE_ALWAYS("failed to initialize logical units: %s\n",
+			strerror(result));
 		usb_disk_free_device_and_luns(device);
 		return result;
 	}
@@ -948,7 +957,8 @@ usb_disk_prepare_partial_buffer(device_lun *lun, off_t position, size_t length,
 	status_t result = usb_disk_block_read(lun, blockPosition, blockCount,
 		blockBuffer, &blockLength);
 	if (result != B_OK) {
-		TRACE_ALWAYS("block read failed when filling partial buffer\n");
+		TRACE_ALWAYS("block read failed when filling partial buffer: %s\n",
+			strerror(result));
 		free(blockBuffer);
 		return result;
 	}
@@ -1180,7 +1190,8 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			if (result > 0)
 				result = B_OK;
 
-			TRACE_ALWAYS("got device name: \"%s\" = %s\n", name, strerror(result));
+			TRACE_ALWAYS("got device name \"%s\": %s\n", name,
+				strerror(result));
 			break;
 		}
 #endif
@@ -1237,7 +1248,7 @@ usb_disk_read(void *cookie, off_t position, void *buffer, size_t *length)
 	}
 
 	*length = 0;
-	TRACE_ALWAYS("read fails with 0x%08" B_PRIx32 "\n", result);
+	TRACE_ALWAYS("read failed: %s\n", strerror(result));
 	return result;
 }
 
@@ -1288,7 +1299,7 @@ usb_disk_write(void *cookie, off_t position, const void *buffer,
 	}
 
 	*length = 0;
-	TRACE_ALWAYS("write fails with 0x%08" B_PRIx32 "\n", result);
+	TRACE_ALWAYS("write failed: %s\n", strerror(result));
 	return result;
 }
 
@@ -1330,7 +1341,7 @@ init_driver()
 	status_t result = get_module(B_USB_MODULE_NAME,
 		(module_info **)&gUSBModule);
 	if (result < B_OK) {
-		TRACE_ALWAYS("getting module failed 0x%08" B_PRIx32 "\n", result);
+		TRACE_ALWAYS("getting module failed: %s\n", strerror(result));
 		mutex_destroy(&gDeviceListLock);
 		return result;
 	}

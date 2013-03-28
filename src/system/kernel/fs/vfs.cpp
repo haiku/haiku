@@ -545,8 +545,9 @@ namespace VFSPagesIOTracing {
 class PagesIOTraceEntry : public AbstractTraceEntry {
 protected:
 	PagesIOTraceEntry(struct vnode* vnode, void* cookie, off_t pos,
-		const generic_io_vec* vecs, uint32 count, uint32 flags, generic_size_t bytesRequested,
-		status_t status, generic_size_t bytesTransferred)
+		const generic_io_vec* vecs, uint32 count, uint32 flags,
+		generic_size_t bytesRequested, status_t status,
+		generic_size_t bytesTransferred)
 		:
 		fVnode(vnode),
 		fMountID(vnode->mount->id),
@@ -559,26 +560,29 @@ protected:
 		fStatus(status),
 		fBytesTransferred(bytesTransferred)
 	{
-		fVecs = (generic_io_vec*)alloc_tracing_buffer_memcpy(vecs, sizeof(generic_io_vec) * count,
-			false);
+		fVecs = (generic_io_vec*)alloc_tracing_buffer_memcpy(vecs,
+			sizeof(generic_io_vec) * count, false);
 	}
 
 	void AddDump(TraceOutput& out, const char* mode)
 	{
-		out.Print("vfs pages io %5s: vnode: %p (%ld, %lld), cookie: %p, "
-			"pos: %lld, size: %llu, vecs: {", mode, fVnode, fMountID, fNodeID,
-			fCookie, fPos, (uint64)fBytesRequested);
+		out.Print("vfs pages io %5s: vnode: %p (%" B_PRId32 ", %" B_PRId64 "), "
+			"cookie: %p, pos: %" B_PRIdOFF ", size: %" B_PRIu64 ", vecs: {",
+			mode, fVnode, fMountID, fNodeID, fCookie, fPos,
+			(uint64)fBytesRequested);
 
 		if (fVecs != NULL) {
 			for (uint32 i = 0; i < fCount; i++) {
 				if (i > 0)
 					out.Print(", ");
-				out.Print("(%llx, %llu)", (uint64)fVecs[i].base, (uint64)fVecs[i].length);
+				out.Print("(%" B_PRIx64 ", %" B_PRIu64 ")", (uint64)fVecs[i].base,
+					(uint64)fVecs[i].length);
 			}
 		}
 
-		out.Print("}, flags: %#lx -> status: %#lx, transferred: %llu",
-			fFlags, fStatus, (uint64)fBytesTransferred);
+		out.Print("}, flags: %#" B_PRIx32 " -> status: %#" B_PRIx32 ", "
+			"transferred: %" B_PRIu64, fFlags, fStatus,
+			(uint64)fBytesTransferred);
 	}
 
 protected:
@@ -587,20 +591,21 @@ protected:
 	ino_t			fNodeID;
 	void*			fCookie;
 	off_t			fPos;
-	generic_io_vec*		fVecs;
+	generic_io_vec*	fVecs;
 	uint32			fCount;
 	uint32			fFlags;
-	generic_size_t			fBytesRequested;
+	generic_size_t	fBytesRequested;
 	status_t		fStatus;
-	generic_size_t			fBytesTransferred;
+	generic_size_t	fBytesTransferred;
 };
 
 
 class ReadPages : public PagesIOTraceEntry {
 public:
 	ReadPages(struct vnode* vnode, void* cookie, off_t pos,
-		const generic_io_vec* vecs, uint32 count, uint32 flags, generic_size_t bytesRequested,
-		status_t status, generic_size_t bytesTransferred)
+		const generic_io_vec* vecs, uint32 count, uint32 flags,
+		generic_size_t bytesRequested, status_t status,
+		generic_size_t bytesTransferred)
 		:
 		PagesIOTraceEntry(vnode, cookie, pos, vecs, count, flags,
 			bytesRequested, status, bytesTransferred)
@@ -618,8 +623,9 @@ public:
 class WritePages : public PagesIOTraceEntry {
 public:
 	WritePages(struct vnode* vnode, void* cookie, off_t pos,
-		const generic_io_vec* vecs, uint32 count, uint32 flags, generic_size_t bytesRequested,
-		status_t status, generic_size_t bytesTransferred)
+		const generic_io_vec* vecs, uint32 count, uint32 flags,
+		generic_size_t bytesRequested, status_t status,
+		generic_size_t bytesTransferred)
 		:
 		PagesIOTraceEntry(vnode, cookie, pos, vecs, count, flags,
 			bytesRequested, status, bytesTransferred)
@@ -1025,7 +1031,7 @@ dec_vnode_ref_count(struct vnode* vnode, bool alwaysFree, bool reenter)
 
 	ASSERT_PRINT(oldRefCount > 0, "vnode %p\n", vnode);
 
-	TRACE(("dec_vnode_ref_count: vnode %p, ref now %ld\n", vnode,
+	TRACE(("dec_vnode_ref_count: vnode %p, ref now %" B_PRId32 "\n", vnode,
 		vnode->ref_count));
 
 	if (oldRefCount != 1)
@@ -1078,7 +1084,7 @@ static void
 inc_vnode_ref_count(struct vnode* vnode)
 {
 	atomic_add(&vnode->ref_count, 1);
-	TRACE(("inc_vnode_ref_count: vnode %p, ref now %ld\n", vnode,
+	TRACE(("inc_vnode_ref_count: vnode %p, ref now %" B_PRId32 "\n", vnode,
 		vnode->ref_count));
 }
 
@@ -1119,8 +1125,8 @@ static status_t
 get_vnode(dev_t mountID, ino_t vnodeID, struct vnode** _vnode, bool canWait,
 	int reenter)
 {
-	FUNCTION(("get_vnode: mountid %ld vnid 0x%Lx %p\n", mountID, vnodeID,
-		_vnode));
+	FUNCTION(("get_vnode: mountid %" B_PRId32 " vnid 0x%" B_PRIx64 " %p\n",
+		mountID, vnodeID, _vnode));
 
 	rw_lock_read_lock(&sVnodeLock);
 
@@ -1431,7 +1437,7 @@ free_unused_vnodes()
 static void
 vnode_low_resource_handler(void* /*data*/, uint32 resources, int32 level)
 {
-	TRACE(("vnode_low_resource_handler(level = %ld)\n", level));
+	TRACE(("vnode_low_resource_handler(level = %" B_PRId32 ")\n", level));
 
 	free_unused_vnodes(level);
 }
@@ -1524,36 +1530,6 @@ create_advisory_locking(struct vnode* vnode)
 }
 
 
-/*!	Retrieves the first lock that has been set by the current team.
-*/
-static status_t
-get_advisory_lock(struct vnode* vnode, struct flock* flock)
-{
-	struct advisory_locking* locking = get_advisory_locking(vnode);
-	if (locking == NULL)
-		return B_BAD_VALUE;
-
-	// TODO: this should probably get the flock by its file descriptor!
-	team_id team = team_get_current_team_id();
-	status_t status = B_BAD_VALUE;
-
-	LockList::Iterator iterator = locking->locks.GetIterator();
-	while (iterator.HasNext()) {
-		struct advisory_lock* lock = iterator.Next();
-
-		if (lock->team == team) {
-			flock->l_start = lock->start;
-			flock->l_len = lock->end - lock->start + 1;
-			status = B_OK;
-			break;
-		}
-	}
-
-	put_advisory_locking(locking);
-	return status;
-}
-
-
 /*! Returns \c true when either \a flock is \c NULL or the \a flock intersects
 	with the advisory_lock \a lock.
 */
@@ -1565,6 +1541,42 @@ advisory_lock_intersects(struct advisory_lock* lock, struct flock* flock)
 
 	return lock->start <= flock->l_start - 1 + flock->l_len
 		&& lock->end >= flock->l_start;
+}
+
+
+/*!	Tests whether acquiring a lock would block.
+*/
+static status_t
+test_advisory_lock(struct vnode* vnode, struct flock* flock)
+{
+	flock->l_type = F_UNLCK;
+
+	struct advisory_locking* locking = get_advisory_locking(vnode);
+	if (locking == NULL)
+		return B_OK;
+
+	team_id team = team_get_current_team_id();
+
+	LockList::Iterator iterator = locking->locks.GetIterator();
+	while (iterator.HasNext()) {
+		struct advisory_lock* lock = iterator.Next();
+
+		 if (lock->team != team && advisory_lock_intersects(lock, flock)) {
+			// locks do overlap
+			if (flock->l_type != F_RDLCK || !lock->shared) {
+				// collision
+				flock->l_type = lock->shared ? F_RDLCK : F_WRLCK;
+				flock->l_whence = SEEK_SET;
+				flock->l_start = lock->start;
+				flock->l_len = lock->end - lock->start + 1;
+				flock->l_pid = lock->team;
+				break;
+			}
+		}
+	}
+
+	put_advisory_locking(locking);
+	return B_OK;
 }
 
 
@@ -3521,7 +3533,8 @@ common_file_io_vec_pages(struct vnode* vnode, void* cookie,
 		off_t fileOffset = fileVec.offset;
 		off_t fileLeft = min_c(fileVec.length, bytesLeft);
 
-		TRACE(("FILE VEC [%lu] length %Ld\n", fileVecIndex, fileLeft));
+		TRACE(("FILE VEC [%" B_PRIu32 "] length %" B_PRIdOFF "\n", fileVecIndex,
+			fileLeft));
 
 		// process the complete fileVec
 		while (fileLeft > 0) {
@@ -3546,7 +3559,7 @@ common_file_io_vec_pages(struct vnode* vnode, void* cookie,
 					continue;
 				}
 
-				TRACE(("fill vec %ld, offset = %lu, size = %lu\n",
+				TRACE(("fill vec %" B_PRIu32 ", offset = %lu, size = %lu\n",
 					vecIndex, vecOffset, size));
 
 				// actually available bytes
@@ -3610,8 +3623,8 @@ extern "C" status_t
 new_vnode(fs_volume* volume, ino_t vnodeID, void* privateNode,
 	fs_vnode_ops* ops)
 {
-	FUNCTION(("new_vnode(volume = %p (%ld), vnodeID = %Ld, node = %p)\n",
-		volume, volume->id, vnodeID, privateNode));
+	FUNCTION(("new_vnode(volume = %p (%" B_PRId32 "), vnodeID = %" B_PRId64
+		", node = %p)\n", volume, volume->id, vnodeID, privateNode));
 
 	if (privateNode == NULL)
 		return B_BAD_VALUE;
@@ -4298,7 +4311,7 @@ vfs_get_module_path(const char* basePath, const char* moduleName,
 			return B_OK;
 		} else {
 			TRACE(("vfs_get_module_path(): something is strange here: "
-				"0x%08lx...\n", file->Type()));
+				"0x%08" B_PRIx32 "...\n", file->Type()));
 			status = B_ERROR;
 			dir = file;
 			goto err;
@@ -4498,7 +4511,7 @@ vfs_free_unused_vnodes(int32 level)
 extern "C" bool
 vfs_can_page(struct vnode* vnode, void* cookie)
 {
-	FUNCTION(("vfs_canpage: vnode 0x%p\n", vnode));
+	FUNCTION(("vfs_canpage: vnode %p\n", vnode));
 
 	if (HAS_FS_CALL(vnode, can_page))
 		return FS_CALL(vnode, can_page, cookie);
@@ -4511,8 +4524,8 @@ vfs_read_pages(struct vnode* vnode, void* cookie, off_t pos,
 	const generic_io_vec* vecs, size_t count, uint32 flags,
 	generic_size_t* _numBytes)
 {
-	FUNCTION(("vfs_read_pages: vnode %p, vecs %p, pos %Ld\n", vnode, vecs,
-		pos));
+	FUNCTION(("vfs_read_pages: vnode %p, vecs %p, pos %" B_PRIdOFF "\n", vnode,
+		vecs, pos));
 
 #if VFS_PAGES_IO_TRACING
 	generic_size_t bytesRequested = *_numBytes;
@@ -4539,8 +4552,8 @@ vfs_write_pages(struct vnode* vnode, void* cookie, off_t pos,
 	const generic_io_vec* vecs, size_t count, uint32 flags,
 	generic_size_t* _numBytes)
 {
-	FUNCTION(("vfs_write_pages: vnode %p, vecs %p, pos %Ld\n", vnode, vecs,
-		pos));
+	FUNCTION(("vfs_write_pages: vnode %p, vecs %p, pos %" B_PRIdOFF "\n", vnode,
+		vecs, pos));
 
 #if VFS_PAGES_IO_TRACING
 	generic_size_t bytesRequested = *_numBytes;
@@ -5405,8 +5418,8 @@ file_open_entry_ref(dev_t mountID, ino_t directoryID, const char* name,
 	if (name == NULL || *name == '\0')
 		return B_BAD_VALUE;
 
-	FUNCTION(("file_open_entry_ref(ref = (%ld, %Ld, %s), openMode = %d)\n",
-		mountID, directoryID, name, openMode));
+	FUNCTION(("file_open_entry_ref(ref = (%" B_PRId32 ", %" B_PRId64 ", %s), "
+		"openMode = %d)\n", mountID, directoryID, name, openMode));
 
 	bool traverse = (openMode & (O_NOTRAVERSE | O_NOFOLLOW)) == 0;
 
@@ -5510,8 +5523,8 @@ file_read(struct file_descriptor* descriptor, off_t pos, void* buffer,
 	size_t* length)
 {
 	struct vnode* vnode = descriptor->u.vnode;
-	FUNCTION(("file_read: buf %p, pos %Ld, len %p = %ld\n", buffer, pos, length,
-		*length));
+	FUNCTION(("file_read: buf %p, pos %" B_PRIdOFF ", len %p = %ld\n", buffer,
+		pos, length, *length));
 
 	if (S_ISDIR(vnode->Type()))
 		return B_IS_A_DIRECTORY;
@@ -5525,7 +5538,8 @@ file_write(struct file_descriptor* descriptor, off_t pos, const void* buffer,
 	size_t* length)
 {
 	struct vnode* vnode = descriptor->u.vnode;
-	FUNCTION(("file_write: buf %p, pos %Ld, len %p\n", buffer, pos, length));
+	FUNCTION(("file_write: buf %p, pos %" B_PRIdOFF ", len %p\n", buffer, pos,
+		length));
 
 	if (S_ISDIR(vnode->Type()))
 		return B_IS_A_DIRECTORY;
@@ -5542,7 +5556,8 @@ file_seek(struct file_descriptor* descriptor, off_t pos, int seekType)
 	struct vnode* vnode = descriptor->u.vnode;
 	off_t offset;
 
-	FUNCTION(("file_seek(pos = %Ld, seekType = %d)\n", pos, seekType));
+	FUNCTION(("file_seek(pos = %" B_PRIdOFF ", seekType = %d)\n", pos,
+		seekType));
 
 	// some kinds of files are not seekable
 	switch (vnode->Type() & S_IFMT) {
@@ -5636,8 +5651,8 @@ dir_create_entry_ref(dev_t mountID, ino_t parentID, const char* name, int perms,
 	if (name == NULL || *name == '\0')
 		return B_BAD_VALUE;
 
-	FUNCTION(("dir_create_entry_ref(dev = %ld, ino = %Ld, name = '%s', "
-		"perms = %d)\n", mountID, parentID, name, perms));
+	FUNCTION(("dir_create_entry_ref(dev = %" B_PRId32 ", ino = %" B_PRId64 ", "
+		"name = '%s', perms = %d)\n", mountID, parentID, name, perms));
 
 	status = get_vnode(mountID, parentID, &vnode, true, false);
 	if (status != B_OK)
@@ -6018,15 +6033,34 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 
 		case F_GETLK:
 			if (vnode != NULL) {
+				struct flock normalizedLock;
+
+				memcpy(&normalizedLock, &flock, sizeof(struct flock));
+				status = normalize_flock(descriptor, &normalizedLock);
+				if (status != B_OK)
+					break;
+
 				if (HAS_FS_CALL(vnode, test_lock)) {
 					status = FS_CALL(vnode, test_lock, descriptor->cookie,
-						&flock);
+						&normalizedLock);
 				} else
-					status = get_advisory_lock(vnode, &flock);
+					status = test_advisory_lock(vnode, &normalizedLock);
 				if (status == B_OK) {
-					// copy back flock structure
-					status = user_memcpy((struct flock*)argument, &flock,
-						sizeof(struct flock));
+					if (normalizedLock.l_type == F_UNLCK) {
+						// no conflicting lock found, copy back the same struct
+						// we were given except change type to F_UNLCK
+						flock.l_type = F_UNLCK;
+						status = user_memcpy((struct flock*)argument, &flock,
+							sizeof(struct flock));
+					} else {
+						// a conflicting lock was found, copy back its range and
+						// type
+						if (normalizedLock.l_len == OFF_MAX)
+							normalizedLock.l_len = 0;
+
+						status = user_memcpy((struct flock*)argument,
+							&normalizedLock, sizeof(struct flock));
+					}
 				}
 			} else
 				status = B_BAD_VALUE;
@@ -6624,8 +6658,8 @@ attr_read(struct file_descriptor* descriptor, off_t pos, void* buffer,
 {
 	struct vnode* vnode = descriptor->u.vnode;
 
-	FUNCTION(("attr_read: buf %p, pos %Ld, len %p = %ld\n", buffer, pos, length,
-		*length));
+	FUNCTION(("attr_read: buf %p, pos %" B_PRIdOFF ", len %p = %ld\n", buffer,
+		pos, length, *length));
 
 	if (!HAS_FS_CALL(vnode, read_attr))
 		return B_UNSUPPORTED;
@@ -6640,7 +6674,9 @@ attr_write(struct file_descriptor* descriptor, off_t pos, const void* buffer,
 {
 	struct vnode* vnode = descriptor->u.vnode;
 
-	FUNCTION(("attr_write: buf %p, pos %Ld, len %p\n", buffer, pos, length));
+	FUNCTION(("attr_write: buf %p, pos %" B_PRIdOFF ", len %p\n", buffer, pos,
+		length));
+
 	if (!HAS_FS_CALL(vnode, write_attr))
 		return B_UNSUPPORTED;
 
@@ -6801,7 +6837,8 @@ index_dir_open(dev_t mountID, bool kernel)
 	struct fs_mount* mount;
 	void* cookie;
 
-	FUNCTION(("index_dir_open(mountID = %ld, kernel = %d)\n", mountID, kernel));
+	FUNCTION(("index_dir_open(mountID = %" B_PRId32 ", kernel = %d)\n", mountID,
+		kernel));
 
 	status_t status = get_mount(mountID, &mount);
 	if (status != B_OK)
@@ -6891,8 +6928,8 @@ static status_t
 index_create(dev_t mountID, const char* name, uint32 type, uint32 flags,
 	bool kernel)
 {
-	FUNCTION(("index_create(mountID = %ld, name = %s, kernel = %d)\n", mountID,
-		name, kernel));
+	FUNCTION(("index_create(mountID = %" B_PRId32 ", name = %s, kernel = %d)\n",
+		mountID, name, kernel));
 
 	struct fs_mount* mount;
 	status_t status = get_mount(mountID, &mount);
@@ -6945,8 +6982,8 @@ static status_t
 index_name_read_stat(dev_t mountID, const char* name, struct stat* stat,
 	bool kernel)
 {
-	FUNCTION(("index_remove(mountID = %ld, name = %s, kernel = %d)\n", mountID,
-		name, kernel));
+	FUNCTION(("index_remove(mountID = %" B_PRId32 ", name = %s, kernel = %d)\n",
+		mountID, name, kernel));
 
 	struct fs_mount* mount;
 	status_t status = get_mount(mountID, &mount);
@@ -6969,8 +7006,8 @@ out:
 static status_t
 index_remove(dev_t mountID, const char* name, bool kernel)
 {
-	FUNCTION(("index_remove(mountID = %ld, name = %s, kernel = %d)\n", mountID,
-		name, kernel));
+	FUNCTION(("index_remove(mountID = %" B_PRId32 ", name = %s, kernel = %d)\n",
+		mountID, name, kernel));
 
 	struct fs_mount* mount;
 	status_t status = get_mount(mountID, &mount);
@@ -7002,8 +7039,8 @@ query_open(dev_t device, const char* query, uint32 flags, port_id port,
 	struct fs_mount* mount;
 	void* cookie;
 
-	FUNCTION(("query_open(device = %ld, query = \"%s\", kernel = %d)\n", device,
-		query, kernel));
+	FUNCTION(("query_open(device = %" B_PRId32 ", query = \"%s\", kernel = %d)\n",
+		device, query, kernel));
 
 	status_t status = get_mount(device, &mount);
 	if (status != B_OK)
@@ -7103,7 +7140,8 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 	int32 layer = 0;
 	Vnode* coveredNode = NULL;
 
-	FUNCTION(("fs_mount: entry. path = '%s', fs_name = '%s'\n", path, fsName));
+	FUNCTION(("fs_mount: path = '%s', device = '%s', fs_name = '%s', flags = %#"
+		B_PRIx32 ", args = '%s'\n", path, device, fsName, flags, args));
 
 	// The path is always safe, we just have to make sure that fsName is
 	// almost valid - we can't make any assumptions about args, though.
@@ -7424,8 +7462,8 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 	struct fs_mount* mount;
 	status_t err;
 
-	FUNCTION(("fs_unmount(path '%s', dev %ld, kernel %d\n", path, mountID,
-		kernel));
+	FUNCTION(("fs_unmount(path '%s', dev %" B_PRId32 ", kernel %d\n", path,
+		mountID, kernel));
 
 	struct vnode* pathVnode = NULL;
 	if (path != NULL) {

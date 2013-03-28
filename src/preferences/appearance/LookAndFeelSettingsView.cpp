@@ -107,7 +107,7 @@ LookAndFeelSettingsView::LookAndFeelSettingsView(const char* name)
 		B_ALIGN_VERTICAL_CENTER));
 
 	BStringView* scrollBarLabel
-		= new BStringView("scroll bar", "Scroll bar:");
+		= new BStringView("scroll bar", B_TRANSLATE("Scroll bar:"));
 	scrollBarLabel->SetExplicitAlignment(
 		BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP));
 

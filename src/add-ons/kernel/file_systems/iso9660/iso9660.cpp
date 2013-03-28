@@ -144,7 +144,7 @@ sanitize_iso_name(iso9660_inode* node, bool removeTrailingPoints)
 static int
 init_volume_date(ISOVolDate *date, char *buffer)
 {
-	memcpy(date, buffer, 17);
+	memcpy(date, buffer, ISO_VOL_DATE_SIZE);
 	return 0;
 }
 
@@ -152,7 +152,7 @@ init_volume_date(ISOVolDate *date, char *buffer)
 static int
 init_node_date(ISORecDate *date, char *buffer)
 {
-	memcpy(date, buffer, 7);
+	memcpy(date, buffer, sizeof(struct ISORecDate));
 	return 0;
 }
 
@@ -162,121 +162,138 @@ InitVolDesc(iso9660_volume *volume, char *buffer)
 {
 	TRACE(("InitVolDesc - ENTER\n"));
 
-	volume->volDescType = *(uint8 *)buffer++;
+	volume->volDescType = *(uint8 *)buffer;
+	buffer += sizeof(volume->volDescType);
 
-	volume->stdIDString[5] = '\0';
-	strncpy(volume->stdIDString, buffer, 5);
-	buffer += 5;
+	const size_t kStdIDStringLen = sizeof(volume->stdIDString) - 1;
+	volume->stdIDString[kStdIDStringLen] = '\0';
+	strncpy(volume->stdIDString, buffer, kStdIDStringLen);
+	buffer += kStdIDStringLen;
 
 	volume->volDescVersion = *(uint8 *)buffer;
-	buffer += 2; // 8th byte unused
+	buffer += sizeof(volume->volDescVersion);
 
-	volume->systemIDString[32] = '\0';
-	strncpy(volume->systemIDString, buffer, 32);
-	buffer += 32;
+	buffer += sizeof(volume->unused1); // skip unused 8th byte
+
+	const size_t kSystemIDStringLen = sizeof(volume->systemIDString) - 1;
+	volume->systemIDString[kSystemIDStringLen] = '\0';
+	strncpy(volume->systemIDString, buffer, kSystemIDStringLen);
+	buffer += kSystemIDStringLen;
 	TRACE(("InitVolDesc - system id string is %s\n", volume->systemIDString));
 
-	volume->volIDString[32] = '\0';
-	strncpy(volume->volIDString, buffer, 32);
-	buffer += (32 + 80-73 + 1);	// bytes 80-73 unused
+	const size_t kVolIDStringLen = sizeof(volume->volIDString) - 1;
+	volume->volIDString[kVolIDStringLen] = '\0';
+	strncpy(volume->volIDString, buffer, kVolIDStringLen);
+	buffer += kVolIDStringLen;
 	TRACE(("InitVolDesc - volume id string is %s\n", volume->volIDString));
 
+	buffer += sizeof(volume->unused2) - 1; // skip unused 73-80 bytes
+
 	volume->volSpaceSize[LSB_DATA] = *(uint32 *)buffer;
-	buffer += 4;
+	buffer += sizeof(volume->volSpaceSize[LSB_DATA]);
 	volume->volSpaceSize[MSB_DATA] = *(uint32 *)buffer;
-	buffer+= (4 + 120-89 + 1); 		// bytes 120-89 unused
+	buffer += sizeof(volume->volSpaceSize[MSB_DATA]);
+
+	buffer += sizeof(volume->unused3) - 1; // skip unused 89-120 bytes
 
 	volume->volSetSize[LSB_DATA] = *(uint16*)buffer;
-	buffer += 2;
+	buffer += sizeof(volume->volSetSize[LSB_DATA]);
 	volume->volSetSize[MSB_DATA] = *(uint16*)buffer;
-	buffer += 2;
+	buffer += sizeof(volume->volSetSize[MSB_DATA]);
 
 	volume->volSeqNum[LSB_DATA] = *(uint16*)buffer;
-	buffer += 2;
+	buffer += sizeof(volume->volSeqNum[LSB_DATA]);
 	volume->volSeqNum[MSB_DATA] = *(uint16*)buffer;
-	buffer += 2;
+	buffer += sizeof(volume->volSeqNum[MSB_DATA]);
 
 	volume->logicalBlkSize[LSB_DATA] = *(uint16*)buffer;
-	buffer += 2;
+	buffer += sizeof(volume->logicalBlkSize[LSB_DATA]);
 	volume->logicalBlkSize[MSB_DATA] = *(uint16*)buffer;
-	buffer += 2;
+	buffer += sizeof(volume->logicalBlkSize[MSB_DATA]);
 
 	volume->pathTblSize[LSB_DATA] = *(uint32*)buffer;
-	buffer += 4;
+	buffer += sizeof(volume->pathTblSize[LSB_DATA]);
 	volume->pathTblSize[MSB_DATA] = *(uint32*)buffer;
-	buffer += 4;
+	buffer += sizeof(volume->pathTblSize[MSB_DATA]);
 
 	volume->lPathTblLoc[LSB_DATA] = *(uint16*)buffer;
-	buffer += 2;
+	buffer += sizeof(volume->lPathTblLoc[LSB_DATA]);
 	volume->lPathTblLoc[MSB_DATA] = *(uint16*)buffer;
-	buffer += 2;
+	buffer += sizeof(volume->lPathTblLoc[MSB_DATA]);
 
 	volume->optLPathTblLoc[LSB_DATA] = *(uint16*)buffer;
-	buffer += 2;
+	buffer += sizeof(volume->optLPathTblLoc[LSB_DATA]);
 	volume->optLPathTblLoc[MSB_DATA] = *(uint16*)buffer;
-	buffer += 2;
+	buffer += sizeof(volume->optLPathTblLoc[MSB_DATA]);
 
 	volume->mPathTblLoc[LSB_DATA] = *(uint16*)buffer;
-	buffer += 2;
+	buffer += sizeof(volume->mPathTblLoc[LSB_DATA]);
 	volume->mPathTblLoc[MSB_DATA] = *(uint16*)buffer;
-	buffer += 2;
+	buffer += sizeof(volume->mPathTblLoc[MSB_DATA]);
 
 	volume->optMPathTblLoc[LSB_DATA] = *(uint16*)buffer;
-	buffer += 2;
+	buffer += sizeof(volume->optMPathTblLoc[LSB_DATA]);
 	volume->optMPathTblLoc[MSB_DATA] = *(uint16*)buffer;
-	buffer += 2;
+	buffer += sizeof(volume->optMPathTblLoc[MSB_DATA]);
 
 	// Fill in directory record.
 	volume->joliet_level = 0;
 	InitNode(volume, &volume->rootDirRec, buffer, NULL);
 
 	volume->rootDirRec.id = ISO_ROOTNODE_ID;
-	buffer += 34;
+	buffer += ISO_ROOT_DIR_REC_SIZE;
 
-	volume->volSetIDString[128] = '\0';
-	strncpy(volume->volSetIDString, buffer, 128);
-	buffer += 128;
+	const size_t kVolSetIDStringLen = sizeof(volume->volSetIDString) - 1;
+	volume->volSetIDString[kVolSetIDStringLen] = '\0';
+	strncpy(volume->volSetIDString, buffer, kVolSetIDStringLen);
+	buffer += kVolSetIDStringLen;
 	TRACE(("InitVolDesc - volume set id string is %s\n", volume->volSetIDString));
 
-	volume->pubIDString[128] = '\0';
-	strncpy(volume->pubIDString, buffer, 128);
-	buffer += 128;
+	const size_t kPubIDStringLen = sizeof(volume->pubIDString) - 1;
+	volume->pubIDString[kPubIDStringLen] = '\0';
+	strncpy(volume->pubIDString, buffer, kPubIDStringLen);
+	buffer += kPubIDStringLen;
 	TRACE(("InitVolDesc - volume pub id string is %s\n", volume->pubIDString));
 
-	volume->dataPreparer[128] = '\0';
-	strncpy(volume->dataPreparer, buffer, 128);
-	buffer += 128;
+	const size_t kDataPreparerLen = sizeof(volume->dataPreparer) - 1;
+	volume->dataPreparer[kDataPreparerLen] = '\0';
+	strncpy(volume->dataPreparer, buffer, kDataPreparerLen);
+	buffer += kDataPreparerLen;
 	TRACE(("InitVolDesc - volume dataPreparer string is %s\n", volume->dataPreparer));
 
-	volume->appIDString[128] = '\0';
-	strncpy(volume->appIDString, buffer, 128);
-	buffer += 128;
+	const size_t kAppIDStringLen = sizeof(volume->appIDString) - 1;
+	volume->appIDString[kAppIDStringLen] = '\0';
+	strncpy(volume->appIDString, buffer, kAppIDStringLen);
+	buffer += kAppIDStringLen;
 	TRACE(("InitVolDesc - volume app id string is %s\n", volume->appIDString));
 
-	volume->copyright[38] = '\0';
-	strncpy(volume->copyright, buffer, 38);
-	buffer += 38;
+	const size_t kCopyrightLen = sizeof(volume->copyright) - 1;
+	volume->copyright[kCopyrightLen] = '\0';
+	strncpy(volume->copyright, buffer, kCopyrightLen);
+	buffer += kCopyrightLen;
 	TRACE(("InitVolDesc - copyright is %s\n", volume->copyright));
 
-	volume->abstractFName[38] = '\0';
-	strncpy(volume->abstractFName, buffer, 38);
-	buffer += 38;
+	const size_t kAbstractFNameLen = sizeof(volume->abstractFName) - 1;
+	volume->abstractFName[kAbstractFNameLen] = '\0';
+	strncpy(volume->abstractFName, buffer, kAbstractFNameLen);
+	buffer += kAbstractFNameLen;
 
-	volume->biblioFName[38] = '\0';
-	strncpy(volume->biblioFName, buffer, 38);
-	buffer += 38;
+	const size_t kBiblioFNameLen = sizeof(volume->biblioFName) - 1;
+	volume->biblioFName[kBiblioFNameLen] = '\0';
+	strncpy(volume->biblioFName, buffer, kBiblioFNameLen);
+	buffer += kBiblioFNameLen;
 
 	init_volume_date(&volume->createDate, buffer);
-	buffer += 17;
+	buffer += ISO_VOL_DATE_SIZE;
 
 	init_volume_date(&volume->modDate, buffer);
-	buffer += 17;
+	buffer += ISO_VOL_DATE_SIZE;
 
 	init_volume_date(&volume->expireDate, buffer);
-	buffer += 17;
+	buffer += ISO_VOL_DATE_SIZE;
 
 	init_volume_date(&volume->effectiveDate, buffer);
-	buffer += 17;
+	buffer += ISO_VOL_DATE_SIZE;
 
 	volume->fileStructVers = *(uint8*)buffer;
 	return B_OK;

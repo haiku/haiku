@@ -35,11 +35,11 @@
  * compile-time configuration.
  */
 
-#ifndef HAVE_OPENSSL
+
+#include "md5.h"
 
 #include <string.h>
 
-#include "md5.h"
 
 /*
  * The basic MD5 functions.
@@ -291,5 +291,3 @@ void MD5_Final(unsigned char *result, MD5_CTX *ctx)
 
 	memset(ctx, 0, sizeof(*ctx));
 }
-
-#endif

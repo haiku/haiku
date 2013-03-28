@@ -14,7 +14,6 @@ extern "C" {
 #if __GNUC__ > 2
 // New Mesa
 #include "glapi_priv.h"
-#include "glapitable.h"
 #endif
 
 

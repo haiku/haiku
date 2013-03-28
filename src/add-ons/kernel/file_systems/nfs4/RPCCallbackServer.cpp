@@ -307,17 +307,17 @@ CallbackServer::ConnectionThread(ConnectionEntry* entry)
 		}
 
 		CallbackRequest* request = new CallbackRequest(buffer, size);
-		if (request == NULL || request->Error() != B_OK) {
+		if (request == NULL) {
 			free(buffer);
-			continue;
-		} else if (request != NULL && request->Error() != B_OK) {
+			continue;	
+		} else if (request->Error() != B_OK) {
 			reply = CallbackReply::Create(request->XID(), request->RPCError());
 			if (reply != NULL) {
 				connection->Send(reply->Stream().Buffer(),
 					reply->Stream().Size());
 				delete reply;
 			}
-			free(buffer);
+			delete request;
 			continue;
 		}
 
@@ -335,7 +335,7 @@ CallbackServer::ConnectionThread(ConnectionEntry* entry)
 				}
 
 			default:
-				free(buffer);
+				delete request;
 		}
 	}
 

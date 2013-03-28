@@ -36,7 +36,7 @@ public:
 									FunctionInstance* functionInstance,
 									CpuState* cpuState,
 									bool getFullFrameInfo,
-									target_addr_t returnFunctionAddress,
+									ReturnValueInfoList* returnValueInfos,
 									StackFrame*& _previousFrame,
 									CpuState*& _previousCpuState);
 	virtual	status_t			GetStatement(FunctionDebugInfo* function,

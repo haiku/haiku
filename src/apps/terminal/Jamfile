@@ -37,8 +37,9 @@ Application Terminal :
 	TitlePlaceholderMapper.cpp
 	VTKeyTbl.c
 	VTPrsTbl.c
-	: be $(HAIKU_LOCALE_LIBS) tracker textencoding $(TARGET_LIBSUPC++)
-	: Terminal.rdef
+	: be $(HAIKU_LOCALE_LIBS) tracker textencoding
+	$(TARGET_LIBSUPC++) $(TARGET_LIBSTDC++)
+	: Terminal.rdef XColors.rdef
 ;
 
 DoCatalogs Terminal :

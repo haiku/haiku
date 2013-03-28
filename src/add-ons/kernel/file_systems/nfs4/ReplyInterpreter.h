@@ -17,7 +17,8 @@
 
 
 struct FSLocation {
-	const char*			fRootPath;
+	const char**		fRootPath;
+
 	const char**		fLocations;
 	uint32				fCount;
 
@@ -25,7 +26,8 @@ struct FSLocation {
 };
 
 struct FSLocations {
-	const char*			fRootPath;
+	const char**		fRootPath;
+
 	FSLocation*			fLocations;
 	uint32				fCount;
 
@@ -107,6 +109,8 @@ public:
 
 private:
 			void		_ParseHeader();
+
+	static	const char** _GetPath(XDR::ReadStream& stream);
 
 			status_t	_DecodeAttrs(XDR::ReadStream& stream, AttrValue** attrs,
 							uint32* count);

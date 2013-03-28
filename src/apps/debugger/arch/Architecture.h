@@ -13,6 +13,7 @@
 #include <Referenceable.h>
 #include <Variant.h>
 
+#include "ReturnValueInfo.h"
 #include "Types.h"
 
 
@@ -110,7 +111,7 @@ public:
 									ImageDebugInfoProvider* imageInfoProvider,
 									CpuState* cpuState,
 									StackTrace*& _stackTrace,
-									target_addr_t returnFunctionAddress,
+									ReturnValueInfoList* returnValueInfos,
 									int32 maxStackDepth = -1,
 									bool useExistingTrace = false,
 									bool getFullFrameInfo = true);

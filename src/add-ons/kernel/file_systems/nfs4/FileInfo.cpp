@@ -13,74 +13,119 @@
 #include "Request.h"
 
 
-status_t
-FileInfo::ParsePath(RequestBuilder& req, uint32& count, const char* _path)
+InodeName::InodeName(InodeNames* parent, const char* name)
+	:
+	fParent(parent),
+	fName(strdup(name))
 {
-	ASSERT(_path != NULL);
+	if (fParent != NULL)
+		fParent->AcquireReference();
+}
 
-	char* path = strdup(_path);
-	if (path == NULL)
-		return B_NO_MEMORY;
 
-	char* pathStart = path;
-	char* pathEnd;
+InodeName::~InodeName()
+{
+	if (fParent != NULL)
+		fParent->ReleaseReference();
+	free(const_cast<char*>(fName));
+}
 
-	while (pathStart != NULL) {
-		pathEnd = strchr(pathStart, '/');
-		if (pathEnd != NULL)
-			*pathEnd = '\0';
 
-		if (pathEnd != pathStart) {
-			if (!strcmp(pathStart, "..")) {
-				req.LookUpUp();
-				count++;
-			} else if (strcmp(pathStart, ".")) {
-				req.LookUp(pathStart);
-				count++;
-			}
-		}
+InodeNames::InodeNames()
+{
+	mutex_init(&fLock, NULL);
+}
 
-		if (pathEnd != NULL && pathEnd[1] != '\0')
-			pathStart = pathEnd + 1;
-		else
-			pathStart = NULL;
-	}
-	free(path);
 
-	return B_OK;
+InodeNames::~InodeNames()
+{
+	while (!fNames.IsEmpty())
+		delete fNames.RemoveHead();
+	mutex_destroy(&fLock);
 }
 
 
 status_t
-FileInfo::CreateName(const char* dirPath, const char* name)
+InodeNames::AddName(InodeNames* parent, const char* name)
 {
-	ASSERT(name != NULL);
+	MutexLocker _(fLock);
 
-	free(const_cast<char*>(fName));
-	fName = strdup(name);
-	if (fName == NULL)
+	InodeName* current = fNames.Head();
+	while (current != NULL) {
+		if (current->fParent == parent && !strcmp(current->fName, name))
+			return B_OK;
+		current = fNames.GetNext(current);
+	}
+
+	InodeName* newName = new InodeName(parent, name);
+	if (newName == NULL)
 		return B_NO_MEMORY;
-
-	free(const_cast<char*>(fPath));
-	fPath = NULL;
-	if (dirPath != NULL) {
-		char* path = reinterpret_cast<char*>(malloc(strlen(name) + 2
-			+ strlen(dirPath)));
-		if (path == NULL)
-			return B_NO_MEMORY;
-
-		strcpy(path, dirPath);
-		strcat(path, "/");
-		strcat(path, name);
-
-		fPath = path;
-	} else
-		fPath = strdup(name);
-
-	if (fPath == NULL)
-		return B_NO_MEMORY;
-
+	fNames.Add(newName);
 	return B_OK;
+}
+
+
+bool
+InodeNames::RemoveName(InodeNames* parent, const char* name)
+{
+	MutexLocker _(fLock);
+
+	InodeName* previous = NULL;
+	InodeName* current = fNames.Head();
+	while (current != NULL) {
+		if (current->fParent == parent && !strcmp(current->fName, name)) {
+			fNames.Remove(previous, current);
+			delete current;
+			break;
+		}
+
+		previous = current;
+		current = fNames.GetNext(current);
+	}
+
+	return fNames.IsEmpty();
+}
+
+
+FileInfo::FileInfo()
+	:
+	fFileId(0),
+	fNames(NULL)
+{
+}
+
+
+FileInfo::~FileInfo()
+{
+	if (fNames != NULL)
+		fNames->ReleaseReference();
+}
+
+
+FileInfo::FileInfo(const FileInfo& fi)
+	:
+	fFileId(fi.fFileId),
+	fHandle(fi.fHandle),
+	fNames(fi.fNames)
+{
+	if (fNames != NULL)
+		fNames->AcquireReference();
+}
+
+
+FileInfo&
+FileInfo::operator=(const FileInfo& fi)
+{
+	fFileId = fi.fFileId;
+	fHandle = fi.fHandle;
+
+	if (fNames != NULL)
+		fNames->ReleaseReference();
+	fNames = fi.fNames;
+	if (fNames != NULL)
+		fNames->AcquireReference();
+
+	return *this;
 }
 
 
@@ -95,15 +140,39 @@ FileInfo::UpdateFileHandles(FileSystem* fs)
 	req.PutRootFH();
 
 	uint32 lookupCount = 0;
-	status_t result;
+	const char** path = fs->Path();
+	if (path != NULL) {
+		for (; path[lookupCount] != NULL; lookupCount++)
+			req.LookUp(path[lookupCount]);
+	}
 
-	result = ParsePath(req, lookupCount, fs->Path());
-	if (result != B_OK)
-		return result;
+	uint32 i;
+	InodeNames* names = fNames;
+	for (i = 0; names != NULL; i++)
+		names = names->fNames.Head()->fParent;
 
-	result = ParsePath(req, lookupCount, fPath);
-	if (result != B_OK)
-		return result;
+	if (i > 0) {
+		names = fNames;
+		InodeNames** pathNames = new InodeNames*[i];
+		if (pathNames == NULL)
+			return B_NO_MEMORY;
+
+		for (i = 0; names != NULL; i++) {
+			pathNames[i] = names;
+			names = names->fNames.Head()->fParent;
+		}
+
+		for (; i > 0; i--) {
+			if (!strcmp(pathNames[i - 1]->fNames.Head()->fName, ""))
+				continue;
+
+			req.LookUp(pathNames[i - 1]->fNames.Head()->fName);
+			lookupCount++;
+		}
+		delete[] pathNames;
+	}
+
+	req.GetFH();
 
 	if (fs->IsAttrSupported(FATTR4_FILEID)) {
 		AttrValue attr;
@@ -113,11 +182,7 @@ FileInfo::UpdateFileHandles(FileSystem* fs)
 		req.Verify(&attr, 1);
 	}
 
-	req.GetFH();
-	req.LookUpUp();
-	req.GetFH();
-
-	result = request.Send();
+	status_t result = request.Send();
 	if (result != B_OK)
 		return result;
 
@@ -127,18 +192,20 @@ FileInfo::UpdateFileHandles(FileSystem* fs)
 	for (uint32 i = 0; i < lookupCount; i++)
 		reply.LookUp();
 
+	FileHandle handle;
+	result = reply.GetFH(&handle);
+	if (result != B_OK)
+		return result;
+
 	if (fs->IsAttrSupported(FATTR4_FILEID)) {
 		result = reply.Verify();
 		if (result != B_OK)
 			return result;
 	}
 
-	reply.GetFH(&fHandle);
-	if (reply.LookUpUp() == B_ENTRY_NOT_FOUND) {
-		fParent = fHandle;
-		return B_OK;
-	}
+	fHandle = handle;
+	fNames->fHandle = handle;
 
-	return reply.GetFH(&fParent);
+	return B_OK;
 }
 

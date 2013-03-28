@@ -87,21 +87,21 @@ public:
 									int32 form, const char* property);
 	virtual	status_t			GetSupportedSuites(BMessage* data);
 
-			void				SetText(const char* inText,
-									const text_run_array* inRuns = NULL);
-			void				SetText(const char* inText, int32 inLength,
-									const text_run_array* inRuns = NULL);
-			void				SetText(BFile* inFile,
-									int32 startOffset, int32 inLength,
-									const text_run_array* inRuns = NULL);
+			void				SetText(const char* text,
+									const text_run_array* runs = NULL);
+			void				SetText(const char* text, int32 length,
+									const text_run_array* runs = NULL);
+			void				SetText(BFile* file, int32 offset,
+									int32 length,
+									const text_run_array* runs = NULL);
 
-			void				Insert(const char* inText,
-									const text_run_array* inRuns = NULL);
-			void				Insert(const char* inText, int32 inLength,
-									const text_run_array* inRuns = NULL);
-			void				Insert(int32 startOffset,
-									const char* inText, int32 inLength,
-									const text_run_array* inRuns = NULL);
+			void				Insert(const char* text,
+									const text_run_array* runs = NULL);
+			void				Insert(const char* text, int32 length,
+									const text_run_array* runs = NULL);
+			void				Insert(int32 offset, const char* text,
+									int32 length,
+									const text_run_array* runs = NULL);
 
 			void				Delete();
 			void				Delete(int32 startOffset, int32 endOffset);
@@ -122,42 +122,40 @@ public:
 			void				Clear();
 
 	virtual	bool				AcceptsPaste(BClipboard* clipboard);
-	virtual	bool				AcceptsDrop(const BMessage* inMessage);
+	virtual	bool				AcceptsDrop(const BMessage* message);
 
 	virtual	void				Select(int32 startOffset, int32 endOffset);
 			void				SelectAll();
-			void				GetSelection(int32* outStart,
-									int32* outEnd) const;
+			void				GetSelection(int32* _start, int32* _end) const;
 
-			void				SetFontAndColor(const BFont* inFont,
-									uint32 inMode = B_FONT_ALL,
-									const rgb_color* inColor = NULL);
+			void				SetFontAndColor(const BFont* font,
+									uint32 mode = B_FONT_ALL,
+									const rgb_color* color = NULL);
 			void				SetFontAndColor(int32 startOffset,
-									int32 endOffset, const BFont* inFont,
-									uint32 inMode = B_FONT_ALL,
-									const rgb_color* inColor = NULL);
+									int32 endOffset, const BFont* font,
+									uint32 mode = B_FONT_ALL,
+									const rgb_color* color = NULL);
 
-			void				GetFontAndColor(int32 inOffset, BFont* outFont,
-									rgb_color* outColor = NULL) const;
-			void				GetFontAndColor(BFont* outFont,
-									uint32* sameProperties,
-									rgb_color* outColor = NULL,
-									bool* sameColor = NULL) const;
+			void				GetFontAndColor(int32 offset, BFont* _font,
+									rgb_color* _color = NULL) const;
+			void				GetFontAndColor(BFont* _font, uint32* _mode,
+									rgb_color* _color = NULL,
+									bool* _sameColor = NULL) const;
 
 			void				SetRunArray(int32 startOffset, int32 endOffset,
-									const text_run_array* inRuns);
+									const text_run_array* runs);
 			text_run_array*		RunArray(int32 startOffset, int32 endOffset,
-									int32* outSize = NULL) const;
+									int32* _size = NULL) const;
 
 			int32				LineAt(int32 offset) const;
 			int32				LineAt(BPoint point) const;
-			BPoint				PointAt(int32 inOffset,
-									float* outHeight = NULL) const;
+			BPoint				PointAt(int32 offset,
+									float* _height = NULL) const;
 			int32				OffsetAt(BPoint point) const;
 			int32				OffsetAt(int32 line) const;
 
-	virtual	void				FindWord(int32	inOffset, int32* outFromOffset,
-									int32* outToOffset);
+	virtual	void				FindWord(int32 offset, int32* _fromOffset,
+									int32* _toOffset);
 
 	virtual	bool				CanEndLine(int32 offset);
 
@@ -169,7 +167,7 @@ public:
 			void				GetTextRegion(int32 startOffset,
 									int32 endOffset, BRegion* outRegion) const;
 
-	virtual	void				ScrollToOffset(int32 inOffset);
+	virtual	void				ScrollToOffset(int32 offset);
 			void				ScrollToSelection();
 
 			void				Highlight(int32 startOffset, int32 endOffset);
@@ -193,9 +191,9 @@ public:
 			bool				DoesWordWrap() const;
 			void				SetMaxBytes(int32 max);
 			int32				MaxBytes() const;
-			void				DisallowChar(uint32 aChar);
-			void				AllowChar(uint32 aChar);
-			void				SetAlignment(alignment flag);
+			void				DisallowChar(uint32 character);
+			void				AllowChar(uint32 character);
+			void				SetAlignment(alignment align);
 			alignment			Alignment() const;
 			void				SetAutoindent(bool state);
 			bool				DoesAutoindent() const;
@@ -233,15 +231,14 @@ public:
 	static	text_run_array*		CopyRunArray(const text_run_array* orig,
 									int32 countDelta = 0);
 	static	void				FreeRunArray(text_run_array* array);
-	static	void*				FlattenRunArray(const text_run_array* inArray,
-									int32* outSize = NULL);
+	static	void*				FlattenRunArray(const text_run_array* runArray,
+									int32* _size = NULL);
 	static	text_run_array*		UnflattenRunArray(const void* data,
-									int32* outSize = NULL);
+									int32* _size = NULL);
 
 protected:
-	virtual	void				InsertText(const char* inText, int32 inLength,
-									int32 inOffset,
-									const text_run_array* inRuns);
+	virtual	void				InsertText(const char* text, int32 length,
+									int32 offset, const text_run_array* runs);
 	virtual	void				DeleteText(int32 fromOffset, int32 toOffset);
 
 public:
@@ -294,10 +291,10 @@ private:
 			void				_ResetTextRect();
 
 			void				_HandleBackspace();
-			void				_HandleArrowKey(uint32 inArrowKey,
+			void				_HandleArrowKey(uint32 arrowKey,
 									bool commandKeyDown = false);
 			void				_HandleDelete();
-			void				_HandlePageKey(uint32 inPageKey,
+			void				_HandlePageKey(uint32 pageKey,
 									bool commandKeyDown = false);
 			void				_HandleAlphaKey(const char* bytes,
 									int32 numBytes);
@@ -307,21 +304,20 @@ private:
 			void				_RecalculateLineBreaks(int32* startLine,
 									int32* endLine);
 			int32				_FindLineBreak(int32 fromOffset,
-									float* outAscent, float* outDescent,
+									float* _ascent, float* _descent,
 									float* inOutWidth);
 
 			float				_StyledWidth(int32 fromOffset, int32 length,
-									float* outAscent = NULL,
-									float* outDescent = NULL) const;
+									float* _ascent = NULL,
+									float* _descent = NULL) const;
 			float				_TabExpandedStyledWidth(int32 offset,
-									int32 length, float* outAscent = NULL,
-									float* outDescent = NULL) const;
+									int32 length, float* _ascent = NULL,
+									float* _descent = NULL) const;
 
 			float				_ActualTabWidth(float location) const;
 
-			void				_DoInsertText(const char* inText,
-									int32 inLength, int32 inOffset,
-									const text_run_array* inRuns);
+			void				_DoInsertText(const char* text, int32 length,
+									int32 offset, const text_run_array* runs);
 
 			void				_DoDeleteText(int32 fromOffset,
 									int32 toOffset);
@@ -353,7 +349,7 @@ private:
 
 			void				_TrackDrag(BPoint where);
 			void				_InitiateDrag();
-			bool				_MessageDropped(BMessage* inMessage,
+			bool				_MessageDropped(BMessage* message,
 									BPoint where, BPoint offset);
 
 			void				_PerformAutoScrolling();
@@ -373,13 +369,13 @@ private:
 			void				_NormalizeFont(BFont* font);
 
 			void				_SetRunArray(int32 startOffset, int32 endOffset,
-									const text_run_array* inRuns);
+									const text_run_array* runs);
 
 			void				_ApplyStyleRange(int32 fromOffset,
 									int32 toOffset,
-									uint32 inMode = B_FONT_ALL,
-									const BFont *inFont = NULL,
-									const rgb_color *inColor = NULL,
+									uint32 mode = B_FONT_ALL,
+									const BFont* font = NULL,
+									const rgb_color* color = NULL,
 									bool syncNullStyle = true);
 
 			uint32				_CharClassification(int32 offset) const;

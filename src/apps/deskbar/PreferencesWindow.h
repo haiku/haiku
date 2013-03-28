@@ -8,10 +8,13 @@
 
 #include <Window.h>
 
+#include "BarSettings.h"
 
-const uint32 kConfigShow			= 'show';
+
+const uint32 kConfigShow			= 'PrSh';
+const uint32 kConfigQuit			= 'PrQt';
 const uint32 kUpdateRecentCounts	= 'upct';
-const uint32 kEditMenuInTracker		= 'mtrk';
+const uint32 kEditInTracker			= 'etrk';
 
 const uint32 kTrackerFirst			= 'TkFt';
 const uint32 kSortRunningApps		= 'SAps';
@@ -22,7 +25,13 @@ const uint32 kResizeTeamIcons		= 'RTIs';
 const uint32 kAutoRaise				= 'AtRs';
 const uint32 kAutoHide				= 'AtHd';
 
+const uint32 kDefaults				= 'dflt';
+const uint32 kRevert				= 'rvrt';
+
+
 class BCheckBox;
+class BFile;
+class BMessage;
 class BRadioButton;
 class BSlider;
 class BTextControl;
@@ -36,10 +45,22 @@ public:
 	virtual	void			MessageReceived(BMessage* message);
 	virtual	bool			QuitRequested();
 	virtual	void			Show();
-	virtual	void			WindowActivated(bool active);
 
-			void			UpdateRecentCounts();
-			void			EnableDisableDependentItems();
+private:
+			void			_EnableDisableDependentItems();
+
+			bool			_IsDefaultable();
+			bool			_IsRevertable();
+
+			status_t		_InitSettingsFile(BFile* file, bool write);
+			status_t		_LoadSettings(BMessage* settings);
+			status_t		_SaveSettings(BMessage* settings);
+
+			void			_SetInitialSettings();
+
+			void			_UpdateButtons();
+			void			_UpdatePreferences(desk_settings* settings);
+			void			_UpdateRecentCounts();
 
 private:
 			BCheckBox*		fMenuRecentDocuments;
@@ -60,7 +81,13 @@ private:
 			BCheckBox*		fWindowAlwaysOnTop;
 			BCheckBox*		fWindowAutoRaise;
 			BCheckBox*		fWindowAutoHide;
+
+			BButton*		fDefaultsButton;
+			BButton*		fRevertButton;
+
+private:
+			desk_settings	fSettings;
 };
 
 
-#endif	/* _PREFERENCES_WINDOW_H */
+#endif	// _PREFERENCES_WINDOW_H

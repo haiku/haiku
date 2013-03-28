@@ -1,10 +1,15 @@
 /*
- * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2013, Haiku, Inc. All Rights Reserved.
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (c) 1998,99 Kazuho Okui and Takashi Murai.
  *
  * Distributed unter the terms of the MIT License.
+ *
+ * Authors:
+ *		Kian Duffy, myob@users.sourceforge.net
+ *		Daniel Furrer, assimil8or@users.sourceforge.net
+ *		Siarzhuk Zharski, zharik@gmx.li
  */
 
 
@@ -27,7 +32,6 @@
 #include <NodeInfo.h>
 #include <Path.h>
 
-#include "PrefHandler.h"
 #include "TermConst.h"
 
 
@@ -38,8 +42,11 @@ static const pref_defaults kTermDefaults[] = {
 	{ PREF_COLS,				"80" },
 	{ PREF_ROWS,				"25" },
 
-	{ PREF_HALF_FONT_FAMILY,	"Courier10 BT" },
-	{ PREF_HALF_FONT_STYLE,		"Regular" },
+//	No need for PREF_HALF_FONT_FAMILY/_STYLE defaults here,
+//	these entries will be filled with corresponding params
+//	of the current system fixed font if they are not
+//	available in the settings file
+
 	{ PREF_HALF_FONT_SIZE,		"12" },
 
 	{ PREF_TEXT_FORE_COLOR,		"  0,   0,   0" },
@@ -53,18 +60,36 @@ static const pref_defaults kTermDefaults[] = {
 	{ PREF_IM_BACK_COLOR,		"152, 203, 255" },
 	{ PREF_IM_SELECT_COLOR,		"255, 152, 152" },
 
-	{ PREF_SHELL,				"/bin/sh -login" },
+	{ PREF_ANSI_BLACK_COLOR,	" 40,  40,  40" },
+	{ PREF_ANSI_RED_COLOR,		"204,   0,   0" },
+	{ PREF_ANSI_GREEN_COLOR,	" 78, 154,   6" },
+	{ PREF_ANSI_YELLOW_COLOR,	"218, 168,   0" },
+	{ PREF_ANSI_BLUE_COLOR,		" 51, 102, 152" },
+	{ PREF_ANSI_MAGENTA_COLOR,	"115,  68, 123" },
+	{ PREF_ANSI_CYAN_COLOR,		"  6, 152, 154" },
+	{ PREF_ANSI_WHITE_COLOR,	"245, 245, 245" },
+
+	{ PREF_ANSI_BLACK_HCOLOR,	"128, 128, 128" },
+	{ PREF_ANSI_RED_HCOLOR,		"255,   0,   0" },
+	{ PREF_ANSI_GREEN_HCOLOR,	"  0, 255,   0" },
+	{ PREF_ANSI_YELLOW_HCOLOR,	"255, 255,   0" },
+	{ PREF_ANSI_BLUE_HCOLOR,	"  0,   0, 255" },
+	{ PREF_ANSI_MAGENTA_HCOLOR,	"255,   0, 255" },
+	{ PREF_ANSI_CYAN_HCOLOR,	"  0, 255, 255" },
+	{ PREF_ANSI_WHITE_HCOLOR,	"255, 255, 255" },
+
 	{ PREF_HISTORY_SIZE,		"10000" },
 
 	{ PREF_TEXT_ENCODING,		"UTF-8" },
 
-	{ PREF_GUI_LANGUAGE,		"English"},
 	{ PREF_IM_AWARE,			"0"},
 
 	{ PREF_TAB_TITLE,			"%1d: %p" },
 	{ PREF_WINDOW_TITLE,		"%T %i: %t" },
 	{ PREF_BLINK_CURSOR,		PREF_TRUE },
 	{ PREF_WARN_ON_EXIT,		PREF_TRUE },
+	{ PREF_CURSOR_STYLE,		PREF_BLOCK_CURSOR },
+	{ PREF_EMULATE_BOLD,		PREF_FALSE },
 
 	{ NULL, NULL},
 };
@@ -83,7 +108,7 @@ PrefHandler::PrefHandler()
 	GetDefaultPath(path);
 	OpenText(path.Path());
 
-	_ConfirmFont(PREF_HALF_FONT_FAMILY, be_fixed_font);
+	_ConfirmFont(be_fixed_font);
 }
 
 
@@ -187,11 +212,12 @@ PrefHandler::SaveAsText(const char *path, const char *mimetype,
 			fContainer.GetInfo(B_STRING_TYPE, i, (char**)&key, &type) == B_OK;
 #endif
 			i++) {
-		int len = snprintf(buffer, sizeof(buffer), "\"%s\" , \"%s\"\n", key, getString(key));
+		int len = snprintf(buffer, sizeof(buffer), "\"%s\" , \"%s\"\n",
+				key, getString(key));
 		file.Write(buffer, len);
 	}
 
-	if (mimetype != NULL){
+	if (mimetype != NULL) {
 		BNodeInfo info(&file);
 		info.SetType(mimetype);
 		info.SetPreferredApp(signature);
@@ -220,6 +246,7 @@ PrefHandler::getFloat(const char *key)
 	return atof(value);
 }
 
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Terminal getString"
 
@@ -243,6 +270,20 @@ PrefHandler::getBool(const char *key)
 		return false;
 
 	return strcmp(value, PREF_TRUE) == 0;
+}
+
+
+int
+PrefHandler::getCursor(const char *key)
+{
+	const char *value = fContainer.FindString(key);
+	if (value != NULL && strcmp(value, PREF_BLOCK_CURSOR) != 0) {
+		if (strcmp(value, PREF_UNDERLINE_CURSOR) == 0)
+			return UNDERLINE_CURSOR;
+		if (strcmp(value, PREF_IBEAM_CURSOR) == 0)
+			return IBEAM_CURSOR;
+	}
+	return BLOCK_CURSOR;
 }
 
 
@@ -339,29 +380,34 @@ PrefHandler::IsEmpty() const
 
 
 void
-PrefHandler::_ConfirmFont(const char *key, const BFont *fallback)
+PrefHandler::_ConfirmFont(const BFont *fallbackFont)
 {
-	int32 count = count_font_families();
-	const char *font = getString(key);
-	if (font == NULL)
-		count = 0;
-
 	font_family family;
+	font_style style;
 
-	for (int32 i = 0; i < count; i++) {
-		if (get_font_family(i, &family) != B_OK)
+	const char *prefFamily = getString(PREF_HALF_FONT_FAMILY);
+	int32 familiesCount = (prefFamily != NULL) ? count_font_families() : 0;
+
+	for (int32 i = 0; i < familiesCount; i++) {
+		if (get_font_family(i, &family) != B_OK
+			|| strcmp(family, prefFamily) != 0)
 			continue;
 
-		if (strcmp(family, font) == 0) {
-			// found font family: we can safely use this font
-			return;
+		const char *prefStyle = getString(PREF_HALF_FONT_STYLE);
+		int32 stylesCount = (prefStyle != NULL) ? count_font_styles(family) : 0;
+
+		for (int32 j = 0; j < stylesCount; j++) {
+			// check style if we can safely use this font
+			if (get_font_style(family, j, &style) == B_OK
+				&& strcmp(style, prefStyle) == 0)
+				return;
 		}
 	}
 
 	// use fall-back font
-
-	fallback->GetFamilyAndStyle(&family, NULL);
-	setString(key, family);
+	fallbackFont->GetFamilyAndStyle(&family, &style);
+	setString(PREF_HALF_FONT_FAMILY, family);
+	setString(PREF_HALF_FONT_STYLE, style);
 }
 
 

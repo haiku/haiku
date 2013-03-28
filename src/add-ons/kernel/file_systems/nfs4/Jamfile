@@ -12,6 +12,7 @@ KernelAddon nfs4 :
 	FileSystem.cpp
 	IdMap.cpp
 	Inode.cpp
+	InodeIdMap.cpp
 	InodeDir.cpp
 	InodeRegular.cpp
 	kernel_interface.cpp

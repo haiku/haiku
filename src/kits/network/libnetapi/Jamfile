@@ -7,16 +7,20 @@ UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
 
 local sslSources ;
+local md5Sources ;
 if $(HAIKU_BUILD_FEATURE_OPENSSL_ENABLED) {
 	SubDirC++Flags -DOPENSSL_ENABLED ;
 	SubDirSysHdrs $(HAIKU_OPENSSL_HEADERS) ;
 	sslSources = SSL.cpp ;
-	Includes [ FGristFiles $(sslSources) SecureSocket.cpp ]
+	md5Sources = ;
+	Includes [ FGristFiles $(sslSources) SecureSocket.cpp HttpAuthentication.cpp ]
 		: $(HAIKU_OPENSSL_HEADERS_DEPENDENCY) ;
 		# Dependency needed to trigger downloading/unzipping the package before
 		# compiling the files.
 	SetupFeatureObjectsDir ssl ;
 } else {
+	# As we don't have md5 from ssl, use our own
+	md5Sources = md5.c ;
 	SetupFeatureObjectsDir no-ssl ;
 }
 
@@ -53,7 +57,7 @@ SharedLibrary libbnetapi.so :
 	HttpForm.cpp
 	HttpTime.cpp
 
-	md5.c
+	$(md5Sources)
 
 	Url.cpp
 	UrlContext.cpp

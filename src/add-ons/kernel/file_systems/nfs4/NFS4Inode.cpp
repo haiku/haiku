@@ -7,6 +7,8 @@
  */
 
 
+#include <AutoDeleter.h>
+
 #include "IdMap.h"
 #include "Inode.h"
 #include "NFS4Inode.h"
@@ -45,7 +47,7 @@ NFS4Inode::GetChangeInfo(uint64* change, bool attrDir)
 		AttrValue* values;
 		uint32 count;
 		result = reply.GetAttr(&values, &count);
-		if (result != B_OK || count < 1)
+		if (result != B_OK)
 			return result;
 
 		// FATTR4_CHANGE is mandatory
@@ -117,19 +119,14 @@ NFS4Inode::LookUp(const char* name, uint64* change, uint64* fileID,
 	FileHandle* handle, bool parent)
 {
 	ASSERT(name != NULL);
-	ASSERT(change != NULL);
-	ASSERT(fileID != NULL);
-	ASSERT(handle != NULL);
 
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
-		if (parent)
-			req.PutFH(fInfo.fParent);
-		else
-			req.PutFH(fInfo.fHandle);
+		(void)parent;	// TODO: add support for named attributes
+		req.PutFH(fInfo.fHandle);
 
 		if (change != NULL) {
 			Attribute dirAttr[] = { FATTR4_CHANGE };
@@ -141,7 +138,8 @@ NFS4Inode::LookUp(const char* name, uint64* change, uint64* fileID,
 		else
 			req.LookUp(name);
 
-		req.GetFH();
+		if (handle != NULL)
+			req.GetFH();
 
 		Attribute attr[] = { FATTR4_FSID, FATTR4_FILEID };
 		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
@@ -175,7 +173,8 @@ NFS4Inode::LookUp(const char* name, uint64* change, uint64* fileID,
 		if (result != B_OK)
 			return result;
 
-		reply.GetFH(handle);
+		if (handle != NULL)
+			reply.GetFH(handle);
 
 		result = reply.GetAttr(&values, &count);
 		if (result != B_OK)
@@ -561,16 +560,16 @@ NFS4Inode::OpenFile(OpenState* state, int mode, OpenDelegationData* delegation)
 		// Since we are opening the file using a pair (parentFH, name) we
 		// need to check for race conditions.
 		if (fFileSystem->IsAttrSupported(FATTR4_FILEID)) {
-			req.PutFH(fInfo.fParent);
-			req.LookUp(fInfo.fName);
+			req.PutFH(fInfo.fNames->fNames.Head()->fParent->fHandle);
+			req.LookUp(fInfo.fNames->fNames.Head()->fName);
 			AttrValue attr;
 			attr.fAttribute = FATTR4_FILEID;
 			attr.fFreePointer = false;
 			attr.fData.fValue64 = fInfo.fFileId;
 			req.Verify(&attr, 1);
 		} else if (fFileSystem->ExpireType() == FH4_PERSISTENT) {
-			req.PutFH(fInfo.fParent);
-			req.LookUp(fInfo.fName);
+			req.PutFH(fInfo.fNames->fNames.Head()->fParent->fHandle);
+			req.LookUp(fInfo.fNames->fNames.Head()->fName);
 			AttrValue attr;
 			attr.fAttribute = FATTR4_FILEHANDLE;
 			attr.fFreePointer = true;
@@ -579,9 +578,10 @@ NFS4Inode::OpenFile(OpenState* state, int mode, OpenDelegationData* delegation)
 			req.Verify(&attr, 1);
 		}
 
-		req.PutFH(fInfo.fParent);
+		req.PutFH(fInfo.fNames->fNames.Head()->fParent->fHandle);
 		req.Open(CLAIM_NULL, sequence, sModeToAccess(mode), state->fClientID,
-			OPEN4_NOCREATE, fFileSystem->OpenOwner(), fInfo.fName);
+			OPEN4_NOCREATE, fFileSystem->OpenOwner(),
+			fInfo.fNames->fNames.Head()->fName);
 		req.GetFH();
 
 		result = request.Send();
@@ -609,10 +609,8 @@ NFS4Inode::OpenFile(OpenState* state, int mode, OpenDelegationData* delegation)
 			}
 
 			result = reply.Verify();
-			if (result != B_OK) {
+			if (result != B_OK)
 				fFileSystem->OpenOwnerSequenceUnlock(sequence);
-				return result;
-			}
 
 			if (result != B_OK && reply.NFS4Error() == NFS4ERR_NOT_SAME)
 				return B_ENTRY_NOT_FOUND;
@@ -623,10 +621,13 @@ NFS4Inode::OpenFile(OpenState* state, int mode, OpenDelegationData* delegation)
 		reply.PutFH();
 		result = reply.Open(state->fStateID, &state->fStateSeq, &confirm,
 			delegation);
+		if (result != B_OK) {
+			fFileSystem->OpenOwnerSequenceUnlock(sequence);
+			return result;
+		}
 
 		FileHandle handle;
-		reply.GetFH(&handle);
-
+		result = reply.GetFH(&handle);
 		if (result != B_OK) {
 			fFileSystem->OpenOwnerSequenceUnlock(sequence);
 			return result;
@@ -638,7 +639,7 @@ NFS4Inode::OpenFile(OpenState* state, int mode, OpenDelegationData* delegation)
 	state->fOpened = true;
 
 	if (confirm)
-		result =  ConfirmOpen(fInfo.fHandle, state, &sequence);
+		result = ConfirmOpen(fInfo.fHandle, state, &sequence);
 
 	fFileSystem->OpenOwnerSequenceUnlock(sequence);
 	return result;
@@ -794,10 +795,8 @@ NFS4Inode::CreateObject(const char* name, const char* path, int mode,
 		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
-		if (parent)
-			req.PutFH(fInfo.fParent);
-		else
-			req.PutFH(fInfo.fHandle);
+		(void)parent;	// TODO: support named attributes
+		req.PutFH(fInfo.fHandle);
 
 		uint32 i = 0;
 		AttrValue cattr[1];
@@ -965,7 +964,7 @@ NFS4Inode::ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
 			req.GetAttr(dirAttr, sizeof(dirAttr) / sizeof(Attribute));
 
 		Attribute attr[] = { FATTR4_FSID, FATTR4_FILEID };
-		req.ReadDir(*count, *dirCookie, *dirCookieVerf, attr,
+		req.ReadDir(*dirCookie, *dirCookieVerf, attr,
 			sizeof(attr) / sizeof(Attribute));
 
 		req.GetAttr(dirAttr, sizeof(dirAttr) / sizeof(Attribute));
@@ -988,12 +987,14 @@ NFS4Inode::ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
 			if (result != B_OK)
 				return result;
 		}
+		ArrayDeleter<AttrValue> beforeDeleter(before);
 
 		result = reply.ReadDir(dirCookie, dirCookieVerf, dirents, count, eof);
 		if (result != B_OK) {
 			delete[] before;
 			return result;
 		}
+		ArrayDeleter<DirEntry> entriesDeleter(*dirents);
 
 		AttrValue* after;
 		result = reply.GetAttr(&after, &attrCount);
@@ -1001,6 +1002,7 @@ NFS4Inode::ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
 			delete[] before;
 			return result;
 		}
+		ArrayDeleter<AttrValue> afterDeleter(after);
 
 		if ((*change == 0
 				&& before[0].fData.fValue64 == after[0].fData.fValue64)
@@ -1009,9 +1011,7 @@ NFS4Inode::ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
 		else
 			return B_ERROR;
 
-		delete[] before;
-		delete[] after;
-
+		entriesDeleter.Detach();
 		return B_OK;
 	} while (true);
 }

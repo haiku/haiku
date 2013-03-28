@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-LaunchBox	3016105370
+1	polish	x-vnd.Haiku-LaunchBox	3692177981
 New	LaunchBox		Nowy
 Set description…	LaunchBox		Ustaw opis…
 Vertical layout	LaunchBox		Układ pionowy
@@ -6,6 +6,7 @@ OK	LaunchBox		OK
 Pad 1	LaunchBox		Pad 1
 last chance	LaunchBox		ostatnia szansa
 Quit	LaunchBox		Wyjdź
+Open containing folder	LaunchBox		Otwórz katalog docelowy
 Clear button	LaunchBox		Wyczyść przycisk
 LaunchBox	System name		LaunchBox
 Ignore double-click	LaunchBox		Ignoruj dwuklik

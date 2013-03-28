@@ -1491,11 +1491,11 @@ Inode::FindBlockRun(off_t pos, block_run& run, off_t& offset)
 					if (indirect[current].IsZero())
 						break;
 
-					runBlockEnd += indirect[current].Length()
+					runBlockEnd += (uint32)indirect[current].Length()
 						<< cached.BlockShift();
 					if (runBlockEnd > pos) {
 						run = indirect[current];
-						offset = runBlockEnd - (run.Length()
+						offset = runBlockEnd - ((uint32)run.Length()
 							<< cached.BlockShift());
 						return fVolume->ValidateBlockRun(run);
 					}
@@ -1513,7 +1513,7 @@ Inode::FindBlockRun(off_t pos, block_run& run, off_t& offset)
 			if (data->direct[current].IsZero())
 				break;
 
-			runBlockEnd += data->direct[current].Length()
+			runBlockEnd += (uint32)data->direct[current].Length()
 				<< fVolume->BlockShift();
 			if (runBlockEnd > pos) {
 				run = data->direct[current];

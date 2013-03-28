@@ -39,11 +39,15 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	Ctags					- exuberant ctags (source files indexing)
 #	Curl					- a client that groks URLs
 #	CVS						- the version control system
+#	DemoPackage_Audio		- a collection of audio files suitable for demonstrations
+#	DemoPackage_Data		- a collection of data files suitable for demonstrations
+#	DemoPackage_Image		- a collection of image files suitable for demonstrations
+#	DemoPackage_Video		- a collection of video files suitable for demonstrations
 #	Development				- more complete dev environment (including autotools)
 #	DevelopmentBase			- basic development environment (gcc, headers, libs,...)
 #	DevelopmentJava			- JamVM, a Java Virtual machine, GNU Classpath, ECJ
 #	DevelopmentMin			- development headers, libs, tools, from sources only
-#	DevelopmentPowerPC			- Cross compiling environment for PowerPC
+#	DevelopmentPowerPC		- Cross compiling environment for PowerPC
 #	Doxygen					- Generate documentation from source code
 #	Droid					- Font family from Google's Android project
 #	Expat					- XML parsing libraries
@@ -90,6 +94,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	Sed						- the ultimate stream editor
 #	SQLite					- the database implementation
 #	Subversion				- the version control system
+#	System-sounds			- a collection of system sounds
 #	TagLib					- id3 tag library
 #	Tar						- archiving utility
 #	TimGMSoundFont			- a good quality General MIDI Sound Font
@@ -2011,6 +2016,14 @@ if [ IsOptionalHaikuImagePackageAdded Subversion ] {
 	} else {
 		Echo "No optional package Subversion available for $(TARGET_ARCH)" ;
 	}
+}
+
+
+# System-sounds
+if [ IsOptionalHaikuImagePackageAdded System-sounds ] {
+	InstallOptionalHaikuImagePackage System-sounds-2013-03-12.zip
+		: $(baseURL)/System-sounds-2013-03-12.zip
+		: ;
 }
 
 

@@ -10,6 +10,7 @@
 #include <Referenceable.h>
 
 #include "AddressSectionTypes.h"
+#include "ReturnValueInfo.h"
 #include "Types.h"
 
 
@@ -56,7 +57,7 @@ public:
 									FunctionInstance* functionInstance,
 									CpuState* cpuState,
 									bool getFullFrameInfo,
-									target_addr_t returnFunctionAddress,
+									ReturnValueInfoList* returnValueInfos,
 									StackFrame*& _Frame,
 									CpuState*& _previousCpuState) = 0;
 										// returns reference to previous frame

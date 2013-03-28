@@ -1,14 +1,16 @@
-1	polish	x-vnd.Haiku-StyledEdit	1430674159
+1	polish	x-vnd.Haiku-StyledEdit	3208803155
 StyledEdit	System name		StyledEdit
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ten plik jest oznaczony jako tylko do odczytu. Czy zapisać zmiany w dokumencie \"%s\"? 
 Paste	Menus		Wklej
 OK	LoadAlert		OK
 File	Menus		Plik
 ???	LoadAlert		???
+Modified	StatusView		Zmieniony
 Lines:	Statistics		Linie:
 Italic	Menus		Kursywa
 Left	Menus		Lewo
 Search backwards	FindandReplaceWindow		Szukaj wstecz
+Unlock file	StatusView		Odblokuj plik
 Size	Menus		Rozmiar
 Save	QuitAlert		Zapisz
 Page setup…	Menus		Ustawienia strony…
@@ -32,6 +34,7 @@ Autodetect	Menus		Autodetekcja
 Document	Menus		Dokument
 Save changes to the document \"%s\"? 	QuitAlert		Zapisać zmiany w dokumencie \"%s\"? 
 Edit	Menus		Edytuj
+Revert	RevertToSavedAlert		Przywróć
 Font	Menus		Czcionka
 Replace all	FindandReplaceWindow		Zamień wszystkie
 Statistics…	Menus		Statystyki…
@@ -53,7 +56,9 @@ OK	QuitAlert		OK
 Open…	Menus		Otwórz…
 Center	Menus		Wyśrodkuj
 Blue	Menus		Niebieski
+Unable to unlock file\n\t%s	QuitAlert		Nie można odblokować pliku\n\t %s
 Cyan	Menus		Cyjan
+line %d, column %d	StatusView		wiersz %d, kolumna %d
 OK	Statistics		OK
 Magenta	Menus		Magenta
 New	Menus		Nowy
@@ -74,6 +79,7 @@ Don't save	SaveAlert		Nie zapisuj
 Recover	NodeMonitorAlerts		Odzyskaj
 Error loading \"%s\":\n\t%s	LoadAlert		Błąd podczas ładowania \"%s\":\n\t%s
 Ignore	NodeMonitorAlerts		Ignoruj
+Read-only	StatusView		Tylko do odczytu
 Undo typing	QuitAlert		Cofnij pisanie
 Black	Menus		Czarny
 Untitled 	StyledEditWindow		Bez tytułu 

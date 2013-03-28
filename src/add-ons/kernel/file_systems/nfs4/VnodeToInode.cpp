@@ -27,15 +27,27 @@ void
 VnodeToInode::Replace(Inode* newInode)
 {
 	WriteLocker _(fLock);
-	if (fInode != NULL && !IsRoot()) {
-		fInode->GetFileSystem()->InoIdMap()->MarkRemoved(fID);
+	if (fInode != NULL && !IsRoot())
 		delete fInode;
-	}
 
 	fInode = newInode;
-	if (fInode != NULL) {
-		ASSERT(fFileSystem == fInode->GetFileSystem());
-		fInode->GetFileSystem()->InoIdMap()->AddEntry(fInode->fInfo, fID);
+}
+
+
+bool
+VnodeToInode::Unlink(InodeNames* parent, const char* name)
+{
+	WriteLocker _(fLock);
+	if (fInode != NULL && !IsRoot()) {
+		bool removed = fInode->GetFileSystem()->InoIdMap()->RemoveName(fID,
+			parent, name);
+		if (removed) {
+			delete fInode;
+			fInode = NULL;
+		}
+		return removed;
 	}
+
+	return false;
 }
 

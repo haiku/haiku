@@ -379,6 +379,7 @@ TDeskbarMenu::ResetTargets()
 				case kShowSplash:
 				case kToggleDraggers:
 				case kConfigShow:
+				case kConfigQuit:
 				case kAlwaysTop:
 				case kExpandNewTeams:
 				case kHideLabels:

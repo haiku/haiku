@@ -8,6 +8,8 @@
 #include <ctype.h>
 #include <string.h>
 
+#include <UnicodeChar.h>
+
 
 struct UTF8Char {
 	char	bytes[4];
@@ -19,6 +21,11 @@ struct UTF8Char {
 	UTF8Char(char c)
 	{
 		bytes[0] = c;
+	}
+
+	UTF8Char(const char* c)
+	{
+		SetTo(c, ByteCount(*c));
 	}
 
 	UTF8Char(const char* c, int32 count)
@@ -63,17 +70,23 @@ struct UTF8Char {
 
 	bool IsSpace() const
 	{
-		// TODO: Support multi-byte chars!
-		return ByteCount() == 1 ? isspace(bytes[0]) : false;
+		return BUnicodeChar::IsSpace(BUnicodeChar::FromUTF8(bytes));
+	}
+
+	bool IsAlNum() const
+	{
+		return BUnicodeChar::IsAlNum(BUnicodeChar::FromUTF8(bytes));
 	}
 
 	UTF8Char ToLower() const
 	{
-		// TODO: Support multi-byte chars!
-		if (ByteCount() > 1)
-			return *this;
+		uint32 c = BUnicodeChar::ToLower(BUnicodeChar::FromUTF8(bytes));
 
-		return UTF8Char((char)tolower(bytes[0]));
+		UTF8Char character;
+		char* utf8 = character.bytes;
+		BUnicodeChar::ToUTF8(c, &utf8);
+
+		return character;
 	}
 
 	bool operator==(const UTF8Char& other) const

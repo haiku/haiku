@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2012, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -77,6 +77,90 @@ parse_intel(const char* name)
 
 	buffer[outIndex] = '\0';
 	return buffer;
+}
+
+
+static const char*
+parse_amd(const char* name)
+{
+	static char buffer[49];
+
+	// ignore initial spaces
+	int index = 0;
+	for (; name[index] != '\0'; index++) {
+		if (name[index] != ' ')
+			break;
+	}
+
+	// Keep an initial "mobile"
+	int outIndex = 0;
+	bool spaceWritten = false;
+	if (!strncasecmp(&name[index], "Mobile ", 7)) {
+		strcpy(buffer, "Mobile ");
+		spaceWritten = true;
+		outIndex += 7;
+		index += 7;
+	}
+
+	// parse model
+	for (; name[index] != '\0'; index++) {
+		if (!strncasecmp(&name[index], "(r)", 3)) {
+			outIndex += strlcpy(&buffer[outIndex], "®",
+				sizeof(buffer) - outIndex);
+			index += 2;
+		} else if (!strncasecmp(&name[index], "(tm)", 4)) {
+			outIndex += strlcpy(&buffer[outIndex], "™",
+				sizeof(buffer) - outIndex);
+			index += 3;
+		} else if (!strncmp(&name[index], "with ", 5)
+			|| !strncmp(&name[index], "/w", 2)) {
+			// Cut off the rest
+			break;
+		} else if (name[index] == '-') {
+			if (!spaceWritten)
+				buffer[outIndex++] = ' ';
+			spaceWritten = true;
+		} else {
+			const char* kWords[] = {
+				"Eight-core", "6-core", "Six-core", "Quad-core", "Dual-core",
+				"Dual core", "Processor", "APU", "AMD", "Intel", "Integrated",
+				"CyrixInstead", "Advanced Micro Devices", "Comb", "DualCore",
+				"Technology", "Mobile", "Triple-Core"
+			};
+			bool removed = false;
+			for (size_t i = 0; i < sizeof(kWords) / sizeof(kWords[0]); i++) {
+				size_t length = strlen(kWords[i]);
+				if (!strncasecmp(&name[index], kWords[i], length)) {
+					index += length - 1;
+					removed = true;
+					break;
+				}
+			}
+			if (removed)
+				continue;
+
+			if (name[index] == ' ') {
+				if (spaceWritten)
+					continue;
+				spaceWritten = true;
+			} else
+				spaceWritten = false;
+			buffer[outIndex++] = name[index];
+		}
+	}
+
+	// cut off trailing spaces
+	while (outIndex > 1 && buffer[outIndex - 1] == ' ')
+		outIndex--;
+
+	buffer[outIndex] = '\0';
+
+	// skip new initial spaces
+	for (outIndex = 0; buffer[outIndex] != '\0'; outIndex++) {
+		if (buffer[outIndex] != ' ')
+			break;
+	}
+	return buffer + outIndex;
 }
 #endif
 
@@ -350,7 +434,8 @@ get_cpu_model_string(system_info *info)
 			return "C-Series";
 		case B_CPU_AMD_E_SERIES:
 			return "E-Series";
-		case B_CPU_AMD_FX_SERIES:
+		case B_CPU_AMD_FX_SERIES_MODEL_1:
+		case B_CPU_AMD_FX_SERIES_MODEL_2:
 			return "FX-Series";
 
 		/* Transmeta */
@@ -404,6 +489,11 @@ get_cpu_model_string(system_info *info)
 				// Fallback to manual parsing of the model string
 				get_cpuid_model_string(cpuidName);
 				return parse_intel(cpuidName);
+			}
+			if ((info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_AMD_x86) {
+				// Fallback to manual parsing of the model string
+				get_cpuid_model_string(cpuidName);
+				return parse_amd(cpuidName);
 			}
 			return NULL;
 #endif	/* __INTEL__ || __x86_64__ */

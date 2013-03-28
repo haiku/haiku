@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Terminal	766764238
+1	russian	x-vnd.Haiku-Terminal	2645209895
 Not found.	Terminal TermWindow		Текст не найден
 Switch Terminals	Terminal TermWindow		Переключить терминалы
 Change directory	Terminal TermView		Сменить каталог
@@ -21,6 +21,7 @@ Font:	Terminal AppearancePrefView		Шрифт:
 Copy here	Terminal TermView		Копировать сюда
 Really close?	Terminal TermWindow		Действительно закрыть?
 Copy	Terminal TermWindow		Копировать
+Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Терминал
 Color scheme:	Terminal AppearancePrefView		Цветовая схема:
 Window title:	Terminal TermWindow		Заголовок окна:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Нераспознанная опция \"%s\"\n
@@ -61,6 +62,7 @@ Text not found.	Terminal TermWindow		Текст не найден
 Find…	Terminal TermWindow		Найти…
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Процесс \"%1\" все еще работает.\nЕсли вы закроете Терминал, то этот процесс будет уничтожен.
 Move here	Terminal TermView		Переместить сюда
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tТекущая директория активного процесса текущей вкладки.\n\t\t\tОпционально можно указать максимальное число отображаемых компонентов пути.\n\t\t\tНапример '%2d' отобразит последние 2 компонента.\n\t%T\t-\tИмя приложения Терминал для текущей локали.\n\t%i\t-\tНомер окна.\n\t%p\t-\tНазвание активного процесса в текущей вкладке.\n\t%t\t-\tЗаголовок текущей вкладки.\n\t%%\t-\tСимвол процента - '%'.
 Retro	Terminal colors scheme		Ретро
 Error!	Terminal getString		Ошибка!
 New tab	Terminal TermWindow		Новая вкладка

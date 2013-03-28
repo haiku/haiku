@@ -1,8 +1,12 @@
 /*
- * Copyright 2001-2010, Haiku, Inc.
+ * Copyright 2001-2013, Haiku, Inc.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Kian Duffy, myob@users.sourceforge.net
+ *		Siarzhuk Zharski, zharik@gmx.li
  */
 
 
@@ -14,6 +18,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <signal.h>
 #include <string.h>
 #include <unistd.h>
@@ -25,6 +30,7 @@
 #include <Message.h>
 #include <UTF8.h>
 
+#include "Colors.h"
 #include "TermConst.h"
 #include "TerminalBuffer.h"
 #include "VTparse.h"
@@ -45,8 +51,7 @@ extern int gIesTable[];				/* ignore ESC table */
 extern int gEscIgnoreTable[];		/* ESC ignore table */
 extern int gMbcsTable[];			/* ESC $ */
 
-extern int gLineDrawTable[];		/* ESC ( 0 */
-
+extern const char* gLineDrawGraphSet[]; /* may be used for G0, G1, G2, G3 */
 
 #define DEFAULT -1
 #define NPARAM 10		// Max parameters
@@ -63,6 +68,10 @@ TermParse::_NextParseChar()
 			throw error;
 	}
 
+#ifdef USE_DEBUG_SNAPSHOTS
+	fBuffer->CaptureChar(fParserBuffer[fParserBufferOffset]);
+#endif
+
 	return fParserBuffer[fParserBufferOffset++];
 }
 
@@ -70,8 +79,6 @@ TermParse::_NextParseChar()
 TermParse::TermParse(int fd)
 	:
 	fFd(fd),
-	fAttr(FORECOLORED(7)),
-	fSavedAttr(FORECOLORED(7)),
 	fParseThread(-1),
 	fReaderThread(-1),
 	fReaderSem(-1),
@@ -176,7 +183,7 @@ TermParse::_InitPtyReader()
 
 	fReaderThread = spawn_thread(_ptyreader_thread, "PtyReader",
 		B_NORMAL_PRIORITY, this);
-  	if (fReaderThread < 0) {
+	if (fReaderThread < 0) {
 		delete_sem(fReaderSem);
 		fReaderSem = -1;
 		delete_sem(fReaderLocker);
@@ -380,9 +387,10 @@ TermParse::EscParse()
 	int *groundtable = gUTF8GroundTable;
 	int *parsestate = gUTF8GroundTable;
 
-	/* Handle switch between G0 and G1 character sets */
-	int *alternateParseTable = gUTF8GroundTable;
-	bool shifted_in = false;
+	/* handle alternative character sets G0 - G4 */
+	const char** graphSets[4] = { NULL, NULL, NULL, NULL };
+	int curGL = 0;
+	int curGR = 0;
 
 	int32 srcLen = sizeof(cbuf);
 	int32 dstLen = sizeof(dstbuf);
@@ -390,8 +398,6 @@ TermParse::EscParse()
 
 	int width = 1;
 	BAutolock locker(fBuffer);
-
-	fAttr = fSavedAttr = FORECOLORED(7);
 
 	while (!fQuitting) {
 		try {
@@ -407,11 +413,23 @@ TermParse::EscParse()
 			}
 
 	//debug_printf("TermParse: char: '%c' (%d), parse state: %d\n", c, c, parsestate[c]);
+
 			switch (parsestate[c]) {
 				case CASE_PRINT:
-					fBuffer->InsertChar((char)c, fAttr);
+				{
+					int curGS = c < 128 ? curGL : curGR;
+					const char** curGraphSet = graphSets[curGS];
+					if (curGraphSet != NULL) {
+						int offset = c - (c < 128 ? 0x20 : 0xA0);
+						if (offset >= 0 && offset < 96
+							&& (curGraphSet[offset] != 0)) {
+							fBuffer->InsertChar(curGraphSet[offset]);
+							break;
+						}
+					}
+					fBuffer->InsertChar((char)(c));
 					break;
-
+				}
 				case CASE_PRINT_GR:
 					/* case iso8859 gr character, or euc */
 					ptr = cbuf;
@@ -463,7 +481,7 @@ TermParse::EscParse()
 								dstbuf, &dstLen, &dummyState, '?');
 					}
 
-					fBuffer->InsertChar(dstbuf, dstLen, width, fAttr);
+					fBuffer->InsertChar(dstbuf, dstLen, width);
 					break;
 
 				case CASE_PRINT_CS96:
@@ -475,51 +493,7 @@ TermParse::EscParse()
 					dstLen = sizeof(dstbuf);
 					convert_to_utf8(B_EUC_CONVERSION, cbuf, &srcLen,
 							dstbuf, &dstLen, &dummyState, '?');
-					fBuffer->InsertChar(dstbuf, dstLen, fAttr);
-					break;
-
-				case CASE_PRINT_GRA:
-					/* "Special characters and line drawing" enabled by \E(0 */
-					switch (c) {
-						case 'a':
-							fBuffer->InsertChar("\xE2\x96\x92",3,fAttr);
-							break;
-						case 'j':
-							fBuffer->InsertChar("\xE2\x94\x98",3,fAttr);
-							break;
-						case 'k':
-							fBuffer->InsertChar("\xE2\x94\x90",3,fAttr);
-							break;
-						case 'l':
-							fBuffer->InsertChar("\xE2\x94\x8C",3,fAttr);
-							break;
-						case 'm':
-							fBuffer->InsertChar("\xE2\x94\x94",3,fAttr);
-							break;
-						case 'n':
-							fBuffer->InsertChar("\xE2\x94\xBC",3,fAttr);
-							break;
-						case 'q':
-							fBuffer->InsertChar("\xE2\x94\x80",3,fAttr);
-							break;
-						case 't':
-							fBuffer->InsertChar("\xE2\x94\x9C",3,fAttr);
-							break;
-						case 'u':
-							fBuffer->InsertChar("\xE2\x94\xA4",3,fAttr);
-							break;
-						case 'v':
-							fBuffer->InsertChar("\xE2\x94\xB4",3,fAttr);
-							break;
-						case 'w':
-							fBuffer->InsertChar("\xE2\x94\xAC",3,fAttr);
-							break;
-						case 'x':
-							fBuffer->InsertChar("\xE2\x94\x82",3,fAttr);
-							break;
-						default:
-							fBuffer->InsertChar((char)c, fAttr);
-					}
+					fBuffer->InsertChar(dstbuf, dstLen);
 					break;
 
 				case CASE_LF:
@@ -527,7 +501,7 @@ TermParse::EscParse()
 					break;
 
 				case CASE_CR:
-					fBuffer->InsertCR(fAttr);
+					fBuffer->InsertCR();
 					break;
 
 				case CASE_SJIS_KANA:
@@ -537,7 +511,7 @@ TermParse::EscParse()
 					dstLen = sizeof(dstbuf);
 					convert_to_utf8(currentEncoding, cbuf, &srcLen,
 							dstbuf, &dstLen, &dummyState, '?');
-					fBuffer->InsertChar(dstbuf, dstLen, fAttr);
+					fBuffer->InsertChar(dstbuf, dstLen);
 					break;
 
 				case CASE_SJIS_INSTRING:
@@ -549,7 +523,7 @@ TermParse::EscParse()
 					dstLen = sizeof(dstbuf);
 					convert_to_utf8(currentEncoding, cbuf, &srcLen,
 							dstbuf, &dstLen, &dummyState, '?');
-					fBuffer->InsertChar(dstbuf, dstLen, fAttr);
+					fBuffer->InsertChar(dstbuf, dstLen);
 					break;
 
 				case CASE_UTF8_2BYTE:
@@ -560,7 +534,7 @@ TermParse::EscParse()
 					cbuf[1] = c;
 					cbuf[2] = '\0';
 
-					fBuffer->InsertChar(cbuf, 2, fAttr);
+					fBuffer->InsertChar(cbuf, 2);
 					break;
 
 				case CASE_UTF8_3BYTE:
@@ -575,7 +549,7 @@ TermParse::EscParse()
 						break;
 					cbuf[2] = c;
 					cbuf[3] = '\0';
-					fBuffer->InsertChar(cbuf, 3, fAttr);
+					fBuffer->InsertChar(cbuf, 3);
 					break;
 
 				case CASE_MBCS:
@@ -591,26 +565,40 @@ TermParse::EscParse()
 
 				case CASE_SCS_STATE:
 				{
-					char page = _NextParseChar();
+					int set = -1;
+					switch (c) {
+						case '(':
+							set = 0;
+							break;
+						case ')':
+						case '-':
+							set = 1;
+							break;
+						case '*':
+						case '.':
+							set = 2;
+							break;
+						case '+':
+						case '/':
+							set = 3;
+							break;
+						default:
+							break;
+					}
 
-					int* newTable = _GuessGroundTable(currentEncoding);
-					if (page == '0')
-						newTable = gLineDrawTable;
-
-					if (c == '(') {
-						if (shifted_in)
-							alternateParseTable = newTable;
-						else
-							groundtable = newTable;
-					} else if (c == ')') {
-						if (!shifted_in)
-							alternateParseTable = newTable;
-						else
-							groundtable = newTable;
+					if (set > -1) {
+						char page = _NextParseChar();
+						switch (page) {
+							case '0':
+								graphSets[set] = gLineDrawGraphSet;
+								break;
+							default:
+								graphSets[set] = NULL;
+								break;
+						}
 					}
 
 					parsestate = groundtable;
-
 					break;
 				}
 
@@ -628,7 +616,7 @@ TermParse::EscParse()
 					break;
 
 				case CASE_TAB:
-					fBuffer->InsertTab(fAttr);
+					fBuffer->InsertTab();
 					break;
 
 				case CASE_ESC:
@@ -650,22 +638,16 @@ TermParse::EscParse()
 					/* Ignore character */
 					break;
 
-				case CASE_SI:
-					/* shift in (to G1 charset) */
-					if (shifted_in == false) {
-						int* tmp = alternateParseTable;
-						alternateParseTable = parsestate;
-						parsestate = tmp;
-					}
+				case CASE_LS1:
+					/* select G1 into GL */
+					curGL = 1;
+					parsestate = groundtable;
 					break;
 
-				case CASE_SO:
-					/* shift out (to G0 charset) */
-					if (shifted_in == true) {
-						int* tmp = alternateParseTable;
-						alternateParseTable = parsestate;
-						parsestate = tmp;
-					}
+				case CASE_LS0:
+					/* select G0 into GL */
+					curGL = 0;
+					parsestate = groundtable;
 					break;
 
 				case CASE_SCR_STATE:	// ESC #
@@ -689,6 +671,12 @@ TermParse::EscParse()
 					/* semicolon in csi or dec mode */
 					if (nparam < NPARAM)
 						param[nparam++] = DEFAULT;
+					break;
+
+				case CASE_CSI_SP: // ESC [N q
+					// part of change cursor style DECSCUSR
+					if (nparam < NPARAM)
+						param[nparam++] = ' ';
 					break;
 
 				case CASE_DEC_STATE:
@@ -826,45 +814,48 @@ TermParse::EscParse()
 				case CASE_SGR:
 				{
 					/* SGR */
+					uint32 attributes = fBuffer->GetAttributes();
 					for (row = 0; row < nparam; ++row) {
 						switch (param[row]) {
 							case DEFAULT:
 							case 0: /* Reset attribute */
-								fAttr = FORECOLORED(7);
+								attributes = 0;
 								break;
 
-							case 1: /* Bright / Bold     */
-								fAttr |= FORECOLORED(8);
-								fAttr |= FORESET;
+							case 1: /* Bold     */
+							case 5:
+								attributes |= BOLD;
 								break;
 
 							case 4:	/* Underline	*/
-								fAttr |= UNDERLINE;
-								break;
-
-							case 5:
-								fAttr |= BOLD;
+								attributes |= UNDERLINE;
 								break;
 
 							case 7:	/* Inverse	*/
-								fAttr |= INVERSE;
+								attributes |= INVERSE;
 								break;
 
-							case 2:	/* Faint: decreased intensity */
-							case 21:	/* Bright/Bold: off or Underline: Double */
-							case 22:	/* Not Bold, not bright, not faint	*/
-								fAttr &= ~(FORECOLORED(8) | BOLD);
-								fAttr |= FORESET;
+							case 22:	/* Not Bold	*/
+								attributes &= ~BOLD;
 								break;
-								
+
 							case 24:	/* Not Underline	*/
-								fAttr &= ~UNDERLINE;
+								attributes &= ~UNDERLINE;
 								break;
 
 							case 27:	/* Not Inverse	*/
-								fAttr &= ~INVERSE;
+								attributes &= ~INVERSE;
 								break;
 
+							case 90:
+							case 91:
+							case 92:
+							case 93:
+							case 94:
+							case 95:
+							case 96:
+							case 97:
+								param[row] -= 60;
 							case 30:
 							case 31:
 							case 32:
@@ -873,28 +864,43 @@ TermParse::EscParse()
 							case 35:
 							case 36:
 							case 37:
-								fAttr &= ~FORECOLORED(7);
-								fAttr |= FORECOLORED(param[row] - 30);
-								fAttr |= FORESET;
+								attributes &= ~FORECOLOR;
+								attributes |= FORECOLORED(param[row] - 30);
+								attributes |= FORESET;
 								break;
 
 							case 38:
 							{
-								if (nparam != 3 || param[1] != 5)
-									break;
-								fAttr &= ~FORECOLORED(255 - 8);
-								fAttr |= FORECOLORED(param[2]);
-								fAttr |= FORESET;
+								int color = -1;
+								if (nparam == 3 && param[1] == 5)
+									color = param[2];
+								else if (nparam == 5 && param[1] == 2)
+									color = fBuffer->GuessPaletteColor(
+										param[2], param[3], param[4]);
+
+								if (color >= 0) {
+									attributes &= ~FORECOLOR;
+									attributes |= FORECOLORED(color);
+									attributes |= FORESET;
+								}
 
 								row = nparam; // force exit of the parsing
-
 								break;
 							}
 
 							case 39:
-								fAttr &= ~FORESET;
+								attributes &= ~FORESET;
 								break;
 
+							case 100:
+							case 101:
+							case 102:
+							case 103:
+							case 104:
+							case 105:
+							case 106:
+							case 107:
+								param[row] -= 60;
 							case 40:
 							case 41:
 							case 42:
@@ -903,29 +909,36 @@ TermParse::EscParse()
 							case 45:
 							case 46:
 							case 47:
-								fAttr &= ~BACKCOLOR;
-								fAttr |= BACKCOLORED(param[row] - 40);
-								fAttr |= BACKSET;
+								attributes &= ~BACKCOLOR;
+								attributes |= BACKCOLORED(param[row] - 40);
+								attributes |= BACKSET;
 								break;
 
 							case 48:
 							{
-								if (nparam != 3 || param[1] != 5)
-									break;
-								fAttr &= ~BACKCOLOR;
-								fAttr |= BACKCOLORED(param[2]);
-								fAttr |= BACKSET;
+								int color = -1;
+								if (nparam == 3 && param[1] == 5)
+									color = param[2];
+								else if (nparam == 5 && param[1] == 2)
+									color = fBuffer->GuessPaletteColor(
+										param[2], param[3], param[4]);
+
+								if (color >= 0) {
+									attributes &= ~BACKCOLOR;
+									attributes |= BACKCOLORED(color);
+									attributes |= BACKSET;
+								}
 
 								row = nparam; // force exit of the parsing
-
 								break;
 							}
 
 							case 49:
-								fAttr &= ~BACKSET;
+								attributes &= ~BACKSET;
 								break;
 						}
 					}
+					fBuffer->SetAttributes(attributes);
 					parsestate = groundtable;
 					break;
 				}
@@ -966,6 +979,34 @@ TermParse::EscParse()
 					parsestate = groundtable;
 					break;
 
+				case CASE_DECSCUSR_ETC:
+				// DECSCUSR - set cursor style VT520
+					if (nparam == 2 && param[1] == ' ') {
+						bool blinking = (param[0] & 0x01) != 0;
+						int style = -1;
+						switch (param[0]) {
+							case 0:
+								blinking = true;
+							case 1:
+							case 2:
+								style = BLOCK_CURSOR;
+								break;
+							case 3:
+							case 4:
+								style = UNDERLINE_CURSOR;
+								break;
+							case 5:
+							case 6:
+								style = IBEAM_CURSOR;
+								break;
+						}
+
+						if (style != -1)
+							fBuffer->SetCursorStyle(style, blinking);
+					}
+					parsestate = groundtable;
+					break;
+
 				case CASE_DECREQTPARM:
 					// DEXREQTPARM - request terminal parameters
 					_DecReqTermParms(param[0]);
@@ -999,13 +1040,13 @@ TermParse::EscParse()
 
 				case CASE_DECSC:
 					/* DECSC */
-					_DecSaveCursor();
+					fBuffer->SaveCursor();
 					parsestate = groundtable;
 					break;
 
 				case CASE_DECRC:
 					/* DECRC */
-					_DecRestoreCursor();
+					fBuffer->RestoreCursor();
 					parsestate = groundtable;
 					break;
 
@@ -1052,33 +1093,38 @@ TermParse::EscParse()
 				case CASE_OSC:
 					{
 						/* Operating System Command: ESC ] */
-						char string[512];
-						uint32 len = 0;
-						uchar mode_char = _NextParseChar();
-						if (mode_char != '0'
-								&& mode_char != '1'
-								&& mode_char != '2') {
-							parsestate = groundtable;
-							break;
-						}
-						uchar currentChar = _NextParseChar();
-						while ((currentChar = _NextParseChar()) != 0x7) {
-							if (!isprint(currentChar & 0x7f)
-									|| len+2 >= sizeof(string))
-								break;
-							string[len++] = currentChar;
-						}
-						if (currentChar == 0x7) {
-							string[len] = '\0';
-							switch (mode_char) {
-								case '0':
-								case '2':
-									fBuffer->SetTitle(string);
+						uchar params[512];
+						// fill the buffer until BEL, ST or something else.
+						bool isParsed = false;
+						for (uint i = 0; !isParsed && i < sizeof(params); i++) {
+							params[i] = _NextParseChar();
+							switch (params[i]) {
+								// BEL
+								case 0x07:
+									isParsed = true;
 									break;
-								case '1':
+								// 8-bit ST
+								case 0x9c:
+									isParsed = true;
 									break;
+								// 7-bit ST is "ESC \"
+								case '\\':
+								// hm... Was \x1b replaced by 0 during parsing?
+									if (i > 0 && params[i - 1] == 0) {
+										isParsed = true;
+										break;
+									}
+								default:
+									if (!isprint(params[i] & 0x7f))
+										break;
+									continue;
 							}
+							params[i] = '\0';
 						}
+
+						if (isParsed)
+							_ProcessOperatingSystemControls(params);
+
 						parsestate = groundtable;
 						break;
 					}
@@ -1087,32 +1133,32 @@ TermParse::EscParse()
 					break;
 
 				case CASE_LS2:
-					/* LS2 */
-					//      screen->curgl = 2;
+					/* select G2 into GL */
+					curGL = 2;
 					parsestate = groundtable;
 					break;
 
 				case CASE_LS3:
-					/* LS3 */
-					//      screen->curgl = 3;
+					/* select G3 into GL */
+					curGL = 3;
 					parsestate = groundtable;
 					break;
 
 				case CASE_LS3R:
-					/* LS3R */
-					//      screen->curgr = 3;
+					/* select G3 into GR */
+					curGR = 3;
 					parsestate = groundtable;
 					break;
 
 				case CASE_LS2R:
-					/* LS2R */
-					//      screen->curgr = 2;
+					/* select G2 into GR */
+					curGR = 2;
 					parsestate = groundtable;
 					break;
 
 				case CASE_LS1R:
-					/* LS1R */
-					//      screen->curgr = 1;
+					/* select G1 into GR */
+					curGR = 1;
 					parsestate = groundtable;
 					break;
 
@@ -1316,11 +1362,11 @@ TermParse::_DecPrivateModeSet(int value)
 			break;
 		case 12:
 			// Start Blinking Cursor.
-			// Not supported yet.
+			fBuffer->SetCursorBlinking(true);
 			break;
 		case 25:
 			// Show Cursor.
-			// Not supported yet.
+			fBuffer->SetCursorHidden(false);
 			break;
 		case 47:
 			// Use Alternate Screen Buffer.
@@ -1354,7 +1400,7 @@ TermParse::_DecPrivateModeSet(int value)
 		case 1049:
 			// Save cursor as in DECSC and use Alternate Screen Buffer, clearing
 			// it first.
-			_DecSaveCursor();
+			fBuffer->SaveCursor();
 			fBuffer->UseAlternateScreenBuffer(true);
 			break;
 	}
@@ -1391,11 +1437,11 @@ TermParse::_DecPrivateModeReset(int value)
 			break;
 		case 12:
 			// Stop Blinking Cursor.
-			// Not supported yet.
+			fBuffer->SetCursorBlinking(false);
 			break;
 		case 25:
 			// Hide Cursor
-			// Not supported yet.
+			fBuffer->SetCursorHidden(true);
 			break;
 		case 47:
 			// Use Normal Screen Buffer.
@@ -1429,25 +1475,99 @@ TermParse::_DecPrivateModeReset(int value)
 		case 1049:
 			// Use Normal Screen Buffer and restore cursor as in DECRC.
 			fBuffer->UseNormalScreenBuffer();
-			_DecRestoreCursor();
+			fBuffer->RestoreCursor();
 			break;
 	}
 }
 
 
 void
-TermParse::_DecSaveCursor()
+TermParse::_ProcessOperatingSystemControls(uchar* params)
 {
-	fBuffer->SaveCursor();
-	fBuffer->SaveOriginMode();
-	fSavedAttr = fAttr;
-}
+	int mode = 0;
+	for (uchar c = *params; c != ';' && c != '\0'; c = *(++params)) {
+		mode *= 10;
+		mode += c - '0';
+	}
 
+	// eat the separator
+	if (*params == ';')
+		params++;
 
-void
-TermParse::_DecRestoreCursor()
-{
-	fBuffer->RestoreCursor();
-	fBuffer->RestoreOriginMode();
-	fAttr = fSavedAttr;
+	static uint8 indexes[kTermColorCount];
+	static rgb_color colors[kTermColorCount];
+
+	switch (mode) {
+		case 0: // icon name and window title
+		case 2: // window title
+			fBuffer->SetTitle((const char*)params);
+			break;
+		case 4: // set colors (0 - 255)
+		case 104: // reset colors (0 - 255)
+			{
+				bool reset = (mode / 100) == 1;
+
+				// colors can be in "idx1:name1;...;idxN:nameN;" sequence too!
+				uint32 count = 0;
+				char* p = strtok((char*)params, ";");
+				do {
+					indexes[count] = atoi(p);
+
+					if (!reset) {
+						p = strtok(NULL, ";");
+						if (p == NULL)
+							break;
+
+						if (gXColorsTable.LookUpColor(p, &colors[count]) == B_OK)
+							count++;
+					} else
+						count++;
+
+					p = strtok(NULL, ";");
+				} while (p != NULL && count < kTermColorCount);
+
+				if (count > 0) {
+					if (!reset)
+						fBuffer->SetColors(indexes, colors, count);
+					else
+						fBuffer->ResetColors(indexes, count);
+				}
+			}
+			break;
+		// set dynamic colors (10 - 19)
+		case 10: // text foreground
+		case 11: // text background
+			{
+				int32 offset = mode - 10;
+				int32 count = 0;
+				char* p = strtok((char*)params, ";");
+				do {
+					if (gXColorsTable.LookUpColor(p, &colors[count]) != B_OK) {
+						// dyna-colors are pos-sensitive - no chance to continue
+						break;
+					}
+
+					indexes[count] = 10 + offset + count;
+					count++;
+					p = strtok(NULL, ";");
+
+				} while (p != NULL && (offset + count) < 10);
+
+				if (count > 0) {
+					fBuffer->SetColors(indexes, colors, count, true);
+				}
+			}
+			break;
+		// reset dynamic colors (10 - 19)
+		case 110: // text foreground
+		case 111: // text background
+			{
+				indexes[0] = mode;
+				fBuffer->ResetColors(indexes, 1, true);
+			}
+			break;
+		default:
+		//	printf("%d -> %s\n", mode, params);
+			break;
+	}
 }

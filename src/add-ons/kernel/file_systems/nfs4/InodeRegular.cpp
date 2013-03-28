@@ -36,13 +36,12 @@ Inode::CreateState(const char* name, int mode, int perms, OpenState* state,
 	if (result != B_OK)
 		return result;
 
-	FileInfo fi;
-	fi.fFileId = fileID;
-	fi.fHandle = handle;
-	fi.fParent = fInfo.fHandle;
-	fi.CreateName(fInfo.fPath, name);
+	FileInfo fileInfo;
+	fileInfo.fFileId = fileID;
+	fileInfo.fHandle = handle;
 
-	fFileSystem->InoIdMap()->AddEntry(fi, FileIdToInoT(fileID));
+	fFileSystem->InoIdMap()->AddName(fileInfo, fInfo.fNames, name,
+		FileIdToInoT(fileID));
 
 	fCache->Lock();
 	if (fCache->Valid()) {
@@ -56,7 +55,7 @@ Inode::CreateState(const char* name, int mode, int perms, OpenState* state,
 	fCache->Unlock();
 
 	state->fFileSystem = fFileSystem;
-	state->fInfo = fi;
+	state->fInfo = fileInfo;
 	state->fMode = mode & O_RWMASK;
 
 	return B_OK;
@@ -74,10 +73,15 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 	cookie->fMode = mode;
 	cookie->fLocks = NULL;
 
-	OpenState* state = new OpenState;
+	OpenState* state = new(std::nothrow) OpenState;
+	if (state == NULL)
+		return B_NO_MEMORY;
+
 	status_t result = CreateState(name, mode, perms, state, data);
-	if (result != B_OK)
+	if (result != B_OK) {
+		delete state;
 		return result;
+	}
 
 	cookie->fOpenState = state;
 	cookie->fFileSystem = fFileSystem;
@@ -105,7 +109,7 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 	if (fOpenState == NULL) {
 		RevalidateFileCache();
 
-		OpenState* state = new OpenState;
+		OpenState* state = new(std::nothrow) OpenState;
 		if (state == NULL)
 			return B_NO_MEMORY;
 
@@ -113,8 +117,10 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 		state->fFileSystem = fFileSystem;
 		state->fMode = mode & O_RWMASK;
 		status_t result = OpenFile(state, mode, &data);
-		if (result != B_OK)
+		if (result != B_OK) {
+			delete state;
 			return result;
+		}
 
 		fFileSystem->AddOpenFile(state);
 		fOpenState = state;
@@ -246,8 +252,6 @@ Inode::OpenAttr(const char* _name, int mode, OpenAttrCookie* cookie,
 	if (state == NULL)
 		return B_NO_MEMORY;
 
-	state->fInfo.fName = strdup(name);
-	state->fInfo.fParent = fInfo.fAttrDir;
 	state->fFileSystem = fFileSystem;
 	result = NFS4Inode::OpenAttr(state, name, mode, &data, create);
 	if (result != B_OK) {

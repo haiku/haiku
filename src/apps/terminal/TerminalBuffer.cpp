@@ -1,6 +1,11 @@
 /*
+ * Copyright 2013, Haiku, Inc. All rights reserved.
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
+ *		Siarzhuk Zharski, zharik@gmx.li
  */
 
 #include "TerminalBuffer.h"
@@ -9,6 +14,8 @@
 
 #include <Message.h>
 
+#include "Colors.h"
+#include "TermApp.h"
 #include "TermConst.h"
 
 
@@ -22,6 +29,8 @@ TerminalBuffer::TerminalBuffer()
 	fAlternateScreen(NULL),
 	fAlternateHistory(NULL),
 	fAlternateScreenOffset(0),
+	fAlternateAttributes(0),
+	fColorsPalette(NULL),
 	fListenerValid(false)
 {
 }
@@ -31,6 +40,7 @@ TerminalBuffer::~TerminalBuffer()
 {
 	delete fAlternateScreen;
 	delete fAlternateHistory;
+	delete[] fColorsPalette;
 }
 
 
@@ -46,6 +56,13 @@ TerminalBuffer::Init(int32 width, int32 height, int32 historySize)
 
 	for (int32 i = 0; i < height; i++)
 		fAlternateScreen[i]->Clear();
+
+	fColorsPalette = new(std::nothrow) rgb_color[kTermColorCount];
+	if (fColorsPalette == NULL)
+		return B_NO_MEMORY;
+
+	memcpy(fColorsPalette, TermApp::DefaultPalette(),
+			sizeof(rgb_color) * kTermColorCount);
 
 	return BasicTerminalBuffer::Init(width, height, historySize);
 }
@@ -128,10 +145,122 @@ void
 TerminalBuffer::SetTitle(const char* title)
 {
 	if (fListenerValid) {
-		BMessage message(MSG_SET_TERMNAL_TITLE);
+		BMessage message(MSG_SET_TERMINAL_TITLE);
 		message.AddString("title", title);
 		fListener.SendMessage(&message);
 	}
+}
+
+
+void
+TerminalBuffer::SetColors(uint8* indexes, rgb_color* colors,
+		int32 count, bool dynamic)
+{
+	if (fListenerValid) {
+		BMessage message(MSG_SET_TERMINAL_COLORS);
+		message.AddInt32("count", count);
+		message.AddBool("dynamic", dynamic);
+		message.AddData("index", B_UINT8_TYPE,
+					indexes, sizeof(uint8), true, count);
+		message.AddData("color", B_RGB_COLOR_TYPE,
+					colors, sizeof(rgb_color), true, count);
+
+		for (int i = 1; i < count; i++) {
+			message.AddData("index", B_UINT8_TYPE, &indexes[i], sizeof(uint8));
+			message.AddData("color", B_RGB_COLOR_TYPE, &colors[i],
+					sizeof(rgb_color));
+		}
+
+		fListener.SendMessage(&message);
+	}
+}
+
+
+void
+TerminalBuffer::ResetColors(uint8* indexes, int32 count, bool dynamic)
+{
+	if (fListenerValid) {
+		BMessage message(MSG_RESET_TERMINAL_COLORS);
+		message.AddInt32("count", count);
+		message.AddBool("dynamic", dynamic);
+		message.AddData("index", B_UINT8_TYPE,
+					indexes, sizeof(uint8), true, count);
+
+		for (int i = 1; i < count; i++)
+			message.AddData("index", B_UINT8_TYPE, &indexes[i], sizeof(uint8));
+
+		fListener.SendMessage(&message);
+	}
+}
+
+
+void
+TerminalBuffer::SetCursorStyle(int32 style, bool blinking)
+{
+	if (fListenerValid) {
+		BMessage message(MSG_SET_CURSOR_STYLE);
+		message.AddInt32("style", style);
+		message.AddBool("blinking", blinking);
+		fListener.SendMessage(&message);
+	}
+}
+
+
+void
+TerminalBuffer::SetCursorBlinking(bool blinking)
+{
+	if (fListenerValid) {
+		BMessage message(MSG_SET_CURSOR_STYLE);
+		message.AddBool("blinking", blinking);
+		fListener.SendMessage(&message);
+	}
+}
+
+
+void
+TerminalBuffer::SetCursorHidden(bool hidden)
+{
+	if (fListenerValid) {
+		BMessage message(MSG_SET_CURSOR_STYLE);
+		message.AddBool("hidden", hidden);
+		fListener.SendMessage(&message);
+	}
+}
+
+
+void
+TerminalBuffer::SetPaletteColor(uint8 index, rgb_color color)
+{
+	if (index < kTermColorCount)
+		fColorsPalette[index] = color;
+}
+
+
+rgb_color
+TerminalBuffer::PaletteColor(uint8 index)
+{
+	return fColorsPalette[min_c(index, kTermColorCount - 1)];
+}
+
+
+int
+TerminalBuffer::GuessPaletteColor(int red, int green, int blue)
+{
+	int distance = 255 * 100;
+	int index = -1;
+	for (uint32 i = 0; i < kTermColorCount && distance > 0; i++) {
+		rgb_color color = fColorsPalette[i];
+		int r = 30 * abs(color.red - red);
+		int g = 59 * abs(color.green - green);
+		int b = 11 * abs(color.blue - blue);
+		int d = r + g + b;
+		if (distance > d) {
+			index = i;
+			distance = d;
+		}
+	}
+
+	return min_c(index, int(kTermColorCount - 1));
 }
 
 
@@ -250,5 +379,6 @@ TerminalBuffer::_SwitchScreenBuffer()
 	std::swap(fScreen, fAlternateScreen);
 	std::swap(fHistory, fAlternateHistory);
 	std::swap(fScreenOffset, fAlternateScreenOffset);
+	std::swap(fAttributes, fAlternateAttributes);
 	fAlternateScreenActive = !fAlternateScreenActive;
 }

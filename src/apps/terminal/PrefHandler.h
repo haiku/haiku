@@ -1,10 +1,15 @@
 /*
- * Copyright (c) 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright (c) 2003-2013, Haiku, Inc. All Rights Reserved.
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (c) 1998,99 Kazuho Okui and Takashi Murai.
  *
  * Distributed unter the terms of the MIT License.
+ *
+ * Authors:
+ *		Kian Duffy, myob@users.sourceforge.net
+ *		Daniel Furrer, assimil8or@users.sourceforge.net
+ *		Siarzhuk Zharski, zharik@gmx.li
  */
 #ifndef PREF_HANDLER_H
 #define PREF_HANDLER_H
@@ -25,6 +30,11 @@ struct pref_defaults {
 
 #define PREF_TRUE "true"
 #define PREF_FALSE "false"
+
+#define PREF_BLOCK_CURSOR "block"
+#define PREF_IBEAM_CURSOR "ibeam"
+#define PREF_UNDERLINE_CURSOR "underline"
+
 
 class BMessage;
 class BEntry;
@@ -49,6 +59,7 @@ class PrefHandler {
 		const char* getString(const char *key);
 		bool        getBool(const char *key);
 		rgb_color   getRGB(const char *key);
+		int			getCursor(const char *key);
 
 		void        setInt32(const char *key, int32 data);
 		void        setFloat(const char *key, float data);
@@ -61,7 +72,7 @@ class PrefHandler {
 		static status_t GetDefaultPath(BPath& path);
 
 	private:
-		void		_ConfirmFont(const char *key, const BFont *fallback);
+		void		_ConfirmFont(const BFont *fallbackFont);
 		status_t    _LoadFromDefault(const pref_defaults* defaults = NULL);
 		status_t    _LoadFromTextFile(const char * path);
 

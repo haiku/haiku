@@ -1,4 +1,4 @@
-1	polish	x-vnd.Be-PEPL	3676386979
+1	polish	x-vnd.Be-PEPL	2332202134
 Edit	People		Edytuj
 Error	People		Błąd
 City	People		Miasto
@@ -21,6 +21,7 @@ Nickname	People		Pseudonim
 Quit	People		Wyjdź
 Name	People		Imię i nazwisko
 Revert	People		Przywróć
+Don't save	People		Nie zapisuj
 Undo	People		Cofnij
 E-mail	People		E-mail
 Load image…	People		Wczytaj obraz…
@@ -38,7 +39,7 @@ Person	Short mimetype description		Osoba
 New person…	People		Nowa osoba…
 Address	People		Adres
 URL	People		Adres URL
-Sorry	People		OK
+Sorry	People		Przykro nam
 Zip	People		Kod pocztowy
 Contact information for a person.	Long mimetype description		Informacje kontaktowe osoby.
 Fax	People		Faks

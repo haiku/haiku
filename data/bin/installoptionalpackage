@@ -78,17 +78,17 @@ function ParseFunctionArguments()
 	# ParseFunctionArguments <args>
 	# Parse arguments for Jam wrapper functions into an array.
 	IN="\$@"
- 	OIFS=\$IFS
- 	IFS=":"
+	OIFS=\$IFS
+	IFS=":"
 
- 	local count=0
+	local count=0
 	functionArgs=( )
 	for x in \$IN
 	do
 		functionArgs[\${count}]="\${x}"
 		((count++))
 	done
- 	IFS=\$OIFS
+	IFS=\$OIFS
 }
 
 
@@ -98,11 +98,11 @@ function TrimLeadingSpace()
 	eval local text='\$'"\$1"
 	local _outvar="\$1"
 
- 	local length=\${#text}
- 	((length--))
- 	if [ "\${text:0:1}" == ' ' ] ; then
- 		text=\${text#' '}
- 	fi
+	local length=\${#text}
+	((length--))
+	if [ "\${text:0:1}" == ' ' ] ; then
+		text=\${text#' '}
+	fi
 
 	eval \$_outvar="'\$text'"
 }
@@ -114,11 +114,11 @@ function TrimEndingSpace()
 	eval local text='\$'"\$1"
 	local _outvar="\$1"
 
- 	local length=\${#text}
- 	((length--))
- 	if [ "\${text:\$length}" == ' ' ] ; then
- 		text=\${text%' '}
- 	fi
+	local length=\${#text}
+	((length--))
+	if [ "\${text:\$length}" == ' ' ] ; then
+		text=\${text%' '}
+	fi
 
 	eval \$_outvar="'\$text'"
 }
@@ -216,23 +216,38 @@ function InstallSourceArchive()
 }
 
 
+function AddDirectoryToHaikuImage()
+{
+	# AddDirectoryToHaikuImage directoryTokens : attributeFiles
+	# Wrapper for Jam rule
+	ParseFunctionArguments "\$@"
+
+	local dirTokens="/boot/\${functionArgs[0]}"
+	TrimLeadingSpace dirTokens
+	TrimEndingSpace dirTokens
+	dirTokens=\${dirTokens//' '/\/}
+
+	mkdir -p "\${dirTokens}"
+}
+
+
 function AddSymlinkToHaikuImage()
 {
 	# AddSymlinkToHaikuImage <dir tokens> : <link target> [ : <link name> ]
 	# Wrapper for Jam rule
- 	ParseFunctionArguments "\$@"
+	ParseFunctionArguments "\$@"
 
- 	local dirTokens="/boot/\${functionArgs[0]}"
- 	TrimLeadingSpace dirTokens
+	local dirTokens="/boot/\${functionArgs[0]}"
+	TrimLeadingSpace dirTokens
 	TrimEndingSpace dirTokens
- 	dirTokens=\${dirTokens//' '/\/}
+	dirTokens=\${dirTokens//' '/\/}
 
- 	local linkTarget="\${functionArgs[1]}"
- 	TrimLeadingSpace linkTarget
+	local linkTarget="\${functionArgs[1]}"
+	TrimLeadingSpace linkTarget
 	TrimEndingSpace linkTarget
 
- 	local linkName="\${functionArgs[2]}"
- 	TrimLeadingSpace linkName
+	local linkName="\${functionArgs[2]}"
+	TrimLeadingSpace linkName
 	TrimEndingSpace linkName
 
 	mkdir -p "\${dirTokens}"
@@ -252,27 +267,27 @@ function AddUserToHaikuImage()
 	ParseFunctionArguments "\$@"
 
 	local user=\${functionArgs[0]}
- 	local uid=\${functionArgs[1]}
- 	local gid=\${functionArgs[2]}
- 	local home=\${functionArgs[3]}
- 	local shell=\${functionArgs[4]}
- 	local realName=\${functionArgs[5]}
+	local uid=\${functionArgs[1]}
+	local gid=\${functionArgs[2]}
+	local home=\${functionArgs[3]}
+	local shell=\${functionArgs[4]}
+	local realName=\${functionArgs[5]}
 
- 	passwdLine="\${user}:x:\${uid}:\${gid}:\${realName}:\${home}:\${shell}"
- 	passwdLine=\${passwdLine//' :'/':'}
- 	passwdLine=\${passwdLine//': '/':'}
+	passwdLine="\${user}:x:\${uid}:\${gid}:\${realName}:\${home}:\${shell}"
+	passwdLine=\${passwdLine//' :'/':'}
+	passwdLine=\${passwdLine//': '/':'}
 
- 	local length=\${#passwdLine}
- 	((length--))
- 	if [ "\${passwdLine:\$length}" == ' ' ] ; then
- 		passwdLine=\${passwdLine%' '}
- 	fi
+	local length=\${#passwdLine}
+	((length--))
+	if [ "\${passwdLine:\$length}" == ' ' ] ; then
+		passwdLine=\${passwdLine%' '}
+	fi
 
- 	passwdFile="\`finddir B_COMMON_ETC_DIRECTORY\`/passwd"
- 	touch \${passwdFile}
+	passwdFile="\`finddir B_COMMON_ETC_DIRECTORY\`/passwd"
+	touch \${passwdFile}
 
- 	local userExists=1
- 	while read line ; do
+	local userExists=1
+	while read line ; do
 		if [ "\${passwdLine}" == "\${line}" ] ; then
 			userExists=0
 		fi
@@ -495,7 +510,7 @@ function GeneratePackageNames()
 		local lowerCasePkg=`echo ${pkg} | tr '[A-Z]' '[a-z]'`
 		if ! ContainsSubstring "${alreadyInstalled} " "${pkg} " ; then
 			if IsPackageAndDepsOkToInstall ${pkg} ; then
-				echo "${lowerCasePkg} : ${pkg} ${nonRepeatingDeps}"  >> ${file}
+				echo "${lowerCasePkg} : ${pkg} ${nonRepeatingDeps}" >> ${file}
 			fi
 		fi
 
@@ -608,7 +623,7 @@ function BuildFinalListOfPackagesToInstall()
 	proceedWithInstallation=false
 
 	for desiredPackage in ${wantsToInstall}; do
-		if IsPackageNameValid $desiredPackage  ; then
+		if IsPackageNameValid $desiredPackage ; then
 			for item in ${availablePackages[${desiredPackage}]} ; do
 				if ! ContainsSubstring "${packagesToInstall}" "${item}" ; then
 					packagesToInstall="${packagesToInstall} ${item}"
@@ -714,7 +729,7 @@ function ConvertJamToBash()
 		line=${line/'Echo'/'echo'}
 
 		# TODO: add support for converting for loops.
-		# 		will need to introduce curly brace counting
+		#		will need to introduce curly brace counting
 		ConvertIfStatements "$line"
 		ConvertVariables "$line"
 		#ReplaceComparators "$line"
@@ -761,7 +776,7 @@ function ConvertJamToBash()
 		}
 		{
 			if($1!='InstallOptionalHaikuImagePackage' && isRule!=1 && $1!="\;")
-		 	print $0
+			print $0
 		}
 		{ isRule=0; }
 		' ${tmpDir}/optpkg.stage1 > ${tmpDir}/optpkg.stage2 2>/dev/null
@@ -823,7 +838,7 @@ function ConvertVariables()
 	# One of the Jam-to-Bash conversion functions.
 
 	# NOTE: jam's variables are normally '$(VARIABLE)'. \n
-	# 		The issue is with '(' and ')', so let's replace them globally.
+	#		The issue is with '(' and ')', so let's replace them globally.
 	if ContainsSubstring "$line" '$(' ; then
 		line=${line//'('/'{'}
 		line=${line//')'/'}'}

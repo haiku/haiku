@@ -1,10 +1,15 @@
 /*
- * Copyright 2007-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2013, Haiku, Inc. All rights reserved.
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
  * Copyright (c) 2003-2004 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
  * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Kian Duffy, myob@users.sourceforge.net
+ *		Daniel Furrer, assimil8or@users.sourceforge.net
+ *		Siarzhuk Zharski, zharik@gmx.li
  */
 
 #include "TermWindow.h"
@@ -386,7 +391,7 @@ void
 TermWindow::MenusBeginning()
 {
 	TermView* view = _ActiveTermView();
-		
+
 	// Syncronize Encode Menu Pop-up menu and Preference.
 	const BCharacterSet* charset
 		= BCharacterSetRoster::GetCharacterSetByConversionID(view->Encoding());
@@ -473,7 +478,7 @@ TermWindow::_SetupMenu()
 			.AddItem(B_TRANSLATE("New tab"), kNewTab, 'T')
 			.AddSeparator()
 			.AddItem(B_TRANSLATE("Page setup" B_UTF8_ELLIPSIS), MENU_PAGE_SETUP)
-			.AddItem(B_TRANSLATE("Print"), MENU_PRINT,'P')
+			.AddItem(B_TRANSLATE("Print"), MENU_PRINT, 'P')
 			.AddSeparator()
 			.AddItem(B_TRANSLATE("Close window"), B_QUIT_REQUESTED, 'W',
 				B_SHIFT_KEY)
@@ -483,13 +488,13 @@ TermWindow::_SetupMenu()
 
 		// Edit
 		.AddMenu(B_TRANSLATE("Edit"))
-			.AddItem(B_TRANSLATE("Copy"), B_COPY,'C')
-			.AddItem(B_TRANSLATE("Paste"), B_PASTE,'V')
+			.AddItem(B_TRANSLATE("Copy"), B_COPY, 'C')
+			.AddItem(B_TRANSLATE("Paste"), B_PASTE, 'V')
 			.AddSeparator()
 			.AddItem(B_TRANSLATE("Select all"), B_SELECT_ALL, 'A')
 			.AddItem(B_TRANSLATE("Clear all"), MENU_CLEAR_ALL, 'L')
 			.AddSeparator()
-			.AddItem(B_TRANSLATE("Find" B_UTF8_ELLIPSIS), MENU_FIND_STRING,'F')
+			.AddItem(B_TRANSLATE("Find" B_UTF8_ELLIPSIS), MENU_FIND_STRING, 'F')
 			.AddItem(B_TRANSLATE("Find previous"), MENU_FIND_PREVIOUS, 'G',
 					B_SHIFT_KEY)
 				.GetItem(fFindPreviousMenuItem)
@@ -517,6 +522,13 @@ TermWindow::_SetupMenu()
 	AddChild(fMenuBar);
 
 	_UpdateSwitchTerminalsMenuItem();
+
+#ifdef USE_DEBUG_SNAPSHOTS
+	AddShortcut('S', B_COMMAND_KEY | B_CONTROL_KEY,
+		new BMessage(SHORTCUT_DEBUG_SNAPSHOTS));
+	AddShortcut('C', B_COMMAND_KEY | B_CONTROL_KEY,
+		new BMessage(SHORTCUT_DEBUG_CAPTURE));
+#endif
 }
 
 
@@ -658,6 +670,16 @@ TermWindow::MessageReceived(BMessage *message)
 			_ActiveTermView()->Paste(be_clipboard);
 			break;
 
+#ifdef USE_DEBUG_SNAPSHOTS
+		case SHORTCUT_DEBUG_SNAPSHOTS:
+			_ActiveTermView()->MakeDebugSnapshots();
+			break;
+
+		case SHORTCUT_DEBUG_CAPTURE:
+			_ActiveTermView()->StartStopDebugCapture();
+			break;
+#endif
+
 		case B_SELECT_ALL:
 			_ActiveTermView()->SelectAll();
 			break;
@@ -693,8 +715,7 @@ TermWindow::MessageReceived(BMessage *message)
 		case MENU_PREF_OPEN:
 			if (!fPrefWindow) {
 				fPrefWindow = new PrefWindow(this);
-			}
-			else
+			} else
 				fPrefWindow->Activate();
 			break;
 
@@ -711,8 +732,7 @@ TermWindow::MessageReceived(BMessage *message)
 			if (!fFindPanel) {
 				fFindPanel = new FindWindow(this, fFindString, fFindSelection,
 					fMatchWord, fMatchCase, fForwardSearch);
-			}
-			else
+			} else
 				fFindPanel->Activate();
 			break;
 
@@ -743,7 +763,8 @@ TermWindow::MessageReceived(BMessage *message)
 			message->FindBool("forwardsearch", &fForwardSearch);
 			message->FindBool("matchcase", &fMatchCase);
 			message->FindBool("matchword", &fMatchWord);
-			findresult = _ActiveTermView()->Find(fFindString, fForwardSearch, fMatchCase, fMatchWord);
+			findresult = _ActiveTermView()->Find(fFindString, fForwardSearch,
+				fMatchCase, fMatchWord);
 
 			if (!findresult) {
 				BAlert* alert = new BAlert(B_TRANSLATE("Find failed"),
@@ -796,7 +817,7 @@ TermWindow::MessageReceived(BMessage *message)
 
 			for (int32 i = 0; i < fTabView->CountTabs(); i++) {
 				TermView* view = _TermViewAt(i);
-				view->SetTermSize(rows, columns);
+				view->SetTermSize(rows, columns, true);
 				_ResizeView(view);
 			}
 			break;
@@ -882,7 +903,7 @@ TermWindow::MessageReceived(BMessage *message)
 				fTabView->ResizeBy(0, -mbHeight);
 				fTabView->MoveBy(0, mbHeight);
 				SetLook(fSavedLook);
-				fSavedFrame = BRect(0,0,-1,-1);
+				fSavedFrame = BRect(0, 0, -1, -1);
 				SetFlags(Flags() & ~(B_NOT_RESIZABLE | B_NOT_MOVABLE));
 				fFullScreen = false;
 			}
@@ -905,7 +926,8 @@ TermWindow::MessageReceived(BMessage *message)
 		{
 			BPath path;
 			if (PrefHandler::GetDefaultPath(path) == B_OK)
-				PrefHandler::Default()->SaveAsText(path.Path(), PREFFILE_MIMETYPE);
+				PrefHandler::Default()->SaveAsText(path.Path(),
+					PREFFILE_MIMETYPE);
 			break;
 		}
 		case MENU_PAGE_SETUP:
@@ -1204,7 +1226,8 @@ TermWindow::_AddTab(Arguments* args, const BString& currentDirectory)
 		BScrollView* scrollView = new TermScrollView("scrollView",
 			containerView, view, fSessions.IsEmpty());
 		if (!fFullScreen)
-			scrollView->ScrollBar(B_VERTICAL)->ResizeBy(0, -(B_H_SCROLL_BAR_HEIGHT - 1));
+			scrollView->ScrollBar(B_VERTICAL)
+				->ResizeBy(0, -(B_H_SCROLL_BAR_HEIGHT - 1));
 
 		if (fSessions.IsEmpty())
 			fTabView->SetScrollView(scrollView);
@@ -1775,7 +1798,8 @@ TermWindow::_UpdateSessionTitle(int32 index)
 
 	// evaluate the window title pattern
 	WindowTitlePlaceholderMapper windowMapper(shellInfo, activeProcessInfo,
-		fTerminalRoster.ID() + 1, sessionTitle);
+		fTerminalRoster.CountTerminals() > 1
+			? fTerminalRoster.ID() + 1 : 0, sessionTitle);
 	const BString& windowTitle = PatternEvaluator::Evaluate(fTitle.pattern,
 		windowMapper);
 
@@ -1947,7 +1971,7 @@ TermWindow::_NewSessionIndex()
 		bool used = false;
 
 		for (int32 i = 0;
-			 Session* session = _SessionAt(i); i++) {
+			Session* session = _SessionAt(i); i++) {
 			if (id == session->index) {
 				used = true;
 				break;

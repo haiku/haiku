@@ -9,6 +9,8 @@
 #define GALLIUMCONTEXT_H
 
 
+#include <stddef.h>
+
 extern "C" {
 #include "state_tracker/st_api.h"
 #include "pipe/p_compiler.h"
@@ -21,11 +23,6 @@ extern "C" {
 
 
 #define CONTEXT_MAX 32
-
-// HACK: offsetof must be redefined before loading sp_context.h
-// in GalliumContext.cpp
-#undef offsetof
-#define offsetof( type, member ) ((size_t) &((type *)0)->member)
 
 
 typedef int64 context_id;

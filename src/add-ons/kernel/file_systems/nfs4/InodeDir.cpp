@@ -181,7 +181,7 @@ Inode::ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 		if (fFileSystem->IsAttrSupported(FATTR4_FILEID)) {
 			AttrValue* values;
 			uint32 count;
-			reply.GetAttr(&values, &count);
+			result = reply.GetAttr(&values, &count);
 			if (result != B_OK)
 				return result;
 

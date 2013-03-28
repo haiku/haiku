@@ -1,11 +1,14 @@
-1	russian	x-vnd.Haiku-DriveSetup	644135944
+1	russian	x-vnd.Haiku-DriveSetup	4139684894
 DriveSetup	System name		Разметка диска
+Cancel	AbstractParametersPanel		Отмена
 Delete	MainWindow		Удалить
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Вы уверены, что хотите записать изменения на диск прямо сейчас?\n\nЕсли вы продолжите, то все данные на выбранном разделе будут безвозвратно потеряны!
 Rescan	MainWindow		Пересканировать
 OK	MainWindow		ОК
 Could not aquire partitioning information.	MainWindow		Невозможно получить информацию о разделах.
 There's no space on the partition where a child partition could be created.	MainWindow		Недостаточно места на разделе, где можно было бы создать подраздел.
+Initialize	InitializeParametersPanel		Инициализировать
+OK	AbstractParametersPanel		ОК
 <empty>	PartitionList		<пусто>
 Unable to find the selected partition by ID.	MainWindow		Невозможно найти выбранный раздел по ID.
 Select a partition from the list below.	DiskView		Выберите раздел из списка ниже
@@ -15,6 +18,7 @@ The selected disk is read-only.	MainWindow		Выбранный диск дост
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Вы уверены, что хотите инициализировать раздел \"%s\"?\nПовторный запрос будет выдан непосредственно перед записью изменений на диск.
 Could not mount partition %s.	MainWindow		Невозможно подключить раздел %s.
 The partition %s has been successfully formatted.\n	MainWindow		Раздел %s был успешно инициализирован.\n
+Change parameters	MainWindow		Изменить параметры
 The partition %s is already unmounted.	MainWindow		Раздел %s уже отключен.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Не удалось удалить раздел. Изменения не были записаны на диск.
 Could not delete the selected partition.	MainWindow		Невозможно удалить выбранный раздел.
@@ -33,6 +37,8 @@ Write changes	MainWindow		Записать изменения
 There was an error preparing the disk for modifications.	MainWindow		Произошла ошибка при сохранении изменений на диск.
 The partition %s is already mounted.	MainWindow		Раздел %s уже отключен.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Вы уверены, что хотите инициализировать раздел?\nПовторный запрос будет выдан непосредственно перед записью изменений на диск.
+Partition name:	ChangeParametersPanel		Название раздела:
+Change	ChangeParametersPanel		Изменить
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Вы уверены, что хотите записать изменения на диск прямо сейчас?\n\nВсе данные на диске %s будут безвозвратно потеряны, если вы продолжите!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Вы уверены, что хотите удалить выбранный раздел?\n\nВсе данные на этом разделе будут безвозвратно потеряны, если вы продолжите!
 Create…	MainWindow		Создать…
@@ -41,26 +47,33 @@ The disk has been successfully initialized.\n	MainWindow		Диск был усп
 Could not unmount partition %s.	MainWindow		Невозможно отключить раздел %s.
 Failed to format the partition %s!\n	MainWindow		Не удалось инициализировать раздел %s!\n
 Mount	MainWindow		Подключить
+Partition type	PartitionList		Тип раздела
 Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Вы уверены, что хотите инициализировать весь диск? (обычно на диске создают систему разделов)\nПовторный запрос будет выдан непосредственно перед записью изменений на диск.
 Device	PartitionList		Устройство
 Disk	MainWindow		Диск
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Вы уверены, что хотите инициализировать выбранный диск? Все данные на этом диске будут потеряны.\nПовторный запрос будет выдан непосредственно перед записью изменений на диск.\n
+Partition size	CreateParametersPanel		Размер раздела
 Device	DiskView		Устройство
 Active	PartitionList		Загрузочный
 Volume name	PartitionList		Имя раздела
 Continue	MainWindow		Продолжить
 Cannot delete the selected partition.	MainWindow		Невозможно удалить выбранный раздел.
 Mount all	MainWindow		Подключить все
+End: %s	Support		Конец: %s
 Cancel	MainWindow		Отмена
 Delete partition	MainWindow		Удалить раздел
 Eject	MainWindow		Извлечь
 Partition	MainWindow		Раздел
+Validation of the given parameters failed.	MainWindow		Проверка введённых параметров не удалась.
+Create	CreateParametersPanel		Создать
 File system	PartitionList		Файловая система
 Validation of the given creation parameters failed.	MainWindow		Не удалось применить введённые при создании параметры.
+Partition type:	ChangeParametersPanel		Тип раздела:
 Size	PartitionList		Размер
 Wipe (not implemented)	MainWindow		Форматировать (еще не реализовано)
 Validation of the given initialization parameters failed.	MainWindow		Не удалось применить параметры, введенные при инициализации.
 The selected partition does not contain a partitioning system.	MainWindow		Выбранный раздел не содержит таблицу разделов.
+Offset: %s	Support		Смещение: %s
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Вы уверены, что хотите записать изменения на диск прямо сейчас?\n\nЕсли вы продолжите, то все данные на разделе %s будут безвозвратно потеряны!
 The partition %s is currently mounted.	MainWindow		Раздел %s в данный момент подключен.
 Surface test (not implemented)	MainWindow		Тест поверхности (еще не реализовано)

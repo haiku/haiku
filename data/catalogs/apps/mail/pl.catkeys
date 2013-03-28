@@ -1,4 +1,4 @@
-1	polish	x-vnd.Be-MAIL	808593564
+1	polish	x-vnd.Be-MAIL	233997769
 View	Mail		Widok
 %d - Date	Mail		%d - Data
 Attach attributes:	Mail		Dołączaj atrybuty:
@@ -82,6 +82,7 @@ Only files can be added as attachments.	Mail		Tylko pliki mogą być dodane jako
 Previous message	Mail		Poprzednia wiadomość
 Attachments:	Mail		Załączniki:
 Title:	Mail		Tytuł:
+<no account found>	Mail		<nie znaleziono konta>
 Find…	Mail		Szukaj…
 Accounts…	Mail		Konta…
 Mail preferences	Mail		Ustawienia poczty
@@ -106,6 +107,7 @@ Close	Mail		Zamknij
 No matches	Mail		Brak dopasowań
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Mail_daemon nie jest uruchomiony. Ta wiadomość została została zakolejkowana i będzie wysłana po uruchomieniu mail_daemon.
 Really delete this signature? This cannot be undone.	Mail		Czy usunąć naprawdę tę sygnaturkę? Tego nie da się cofnąć.
+Save this message as a draft before closing?	Mail		Zapisać wersję roboczą tej wiadomości?
 Open	Mail		Otwórz
 draft	B_USER_DIRECTORY/mail/draft		draft
 Quote	Mail		Cytowanie
@@ -119,6 +121,7 @@ Account:	Mail		Konto:
 Decoding:	Mail		Dekodowanie:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Przepraszamy, nie można znaleźć aplikacji która wspiera typ danych "Osoba".
 Delete	Mail		Usuń
+Don't send	Mail		Nie wysyłaj
 Leave as '%s'	Mail		Pozostaw jako '%s'
 Copy	Mail		Skopiuj
 Mail couldn't find its dictionary.	Mail		Poczta nie może znaleźć swojego słownika.
@@ -133,6 +136,7 @@ Font:	Mail		Czcionka:
 (Address unavailable)	Mail		(Adres niedostępny)
 Save address	Mail		Zapisz adres
 Queries	Mail		Zapytania
+Send this message before closing?	Mail		Czy przed zamknięciem wysłać wiadomość?
 Save	Mail		Zapisz
 Random	Mail		Losowe
 Close and 	Mail		Zamknij i

@@ -1,0 +1,556 @@
+//
+// 
+//
+resource("XColorsTable") array {
+	0x00004c2e, 0x0013458b, // saddle brown, SaddleBrown
+	0x00005654, 0x000000ff, // red
+	0x0000585e, 0x008cb4d2, // tan
+	0x00047191, 0x00ff0000, // blue
+	0x00048d5e, 0x00ffff00, // cyan
+	0x0004c404, 0x0000d7ff, // gold
+	0x0004c669, 0x00bebebe, // gray, grey
+	0x000526b9, 0x00800000, // navy
+	0x00054675, 0x003f85cd, // peru
+	0x00054e2b, 0x00cbc0ff, // pink
+	0x0005519d, 0x00dda0dd, // plum
+	0x00056571, 0x000000ff, // red1
+	0x00056572, 0x000000ee, // red2
+	0x00056573, 0x000000cd, // red3
+	0x00056574, 0x0000008b, // red4
+	0x00058347, 0x00fafaff, // snow
+	0x00058611, 0x004fa5ff, // tan1
+	0x00058612, 0x00499aee, // tan2
+	0x00058613, 0x003f85cd, // tan3
+	0x00058614, 0x002b5a8b, // tan4
+	0x000ec071, 0x00ffe2b0, // LightSkyBlue1
+	0x000ec072, 0x00eed3a4, // LightSkyBlue2
+	0x000ec073, 0x00cdb68d, // LightSkyBlue3
+	0x000ec074, 0x008b7b60, // LightSkyBlue4
+	0x0042e4c1, 0x00008cff, // dark orange, DarkOrange
+	0x0042faa4, 0x00cc3299, // dark orchid, DarkOrchid
+	0x00465db1, 0x00dcf5f5, // beige
+	0x0046fa61, 0x00fffff0, // azure
+	0x0047057b, 0x00000000, // black
+	0x00471941, 0x00ff0000, // blue1
+	0x00471942, 0x00ee0000, // blue2
+	0x00471943, 0x00cd0000, // blue3
+	0x00471944, 0x008b0000, // blue4
+	0x004774be, 0x002a2aa5, // brown
+	0x0048465c, 0x00507fff, // coral
+	0x0048d611, 0x00ffff00, // cyan1
+	0x0048d612, 0x00eeee00, // cyan2
+	0x0048d613, 0x00cdcd00, // cyan3
+	0x0048d614, 0x008b8b00, // cyan4
+	0x004c4071, 0x0000d7ff, // gold1
+	0x004c4072, 0x0000c9ee, // gold2
+	0x004c4073, 0x0000adcd, // gold3
+	0x004c4074, 0x0000758b, // gold4
+	0x004c655e, 0x0000ff00, // green
+	0x004c66c0, 0x00000000, // gray0, grey0
+	0x004c66c1, 0x00030303, // gray1, grey1
+	0x004c66c2, 0x00050505, // gray2, grey2
+	0x004c66c3, 0x00080808, // gray3, grey3
+	0x004c66c4, 0x000a0a0a, // gray4, grey4
+	0x004c66c5, 0x000d0d0d, // gray5, grey5
+	0x004c66c6, 0x000f0f0f, // gray6, grey6
+	0x004c66c7, 0x00121212, // gray7, grey7
+	0x004c66c8, 0x00141414, // gray8, grey8
+	0x004c66c9, 0x00171717, // gray9, grey9
+	0x004eb479, 0x00f0ffff, // ivory
+	0x004fc5f9, 0x008ce6f0, // khaki
+	0x0050e25e, 0x00e6f0fa, // linen
+	0x0054e2e1, 0x00c5b5ff, // pink1
+	0x0054e2e2, 0x00b8a9ee, // pink2
+	0x0054e2e3, 0x009e91cd, // pink3
+	0x0054e2e4, 0x006c638b, // pink4
+	0x00551a01, 0x00ffbbff, // plum1
+	0x00551a02, 0x00eeaeee, // plum2
+	0x00551a03, 0x00cd96cd, // plum3
+	0x00551a04, 0x008b668b, // plum4
+	0x005834a1, 0x00fafaff, // snow1
+	0x005834a2, 0x00e9e9ee, // snow2
+	0x005834a3, 0x00c9c9cd, // snow3
+	0x005834a4, 0x0089898b, // snow4
+	0x005bc564, 0x00b3def5, // wheat
+	0x005bce81, 0x00ffffff, // white
+	0x005c313e, 0x0098fb98, // pale green, PaleGreen
+	0x006ccb31, 0x00963eff, // VioletRed1
+	0x006ccb32, 0x008c3aee, // VioletRed2
+	0x006ccb33, 0x007832cd, // VioletRed3
+	0x006ccb34, 0x0052228b, // VioletRed4
+	0x0072984e, 0x007a96e9, // dark salmon, DarkSalmon
+	0x00840e91, 0x00dbefff, // AntiqueWhite1
+	0x00840e92, 0x00ccdfee, // AntiqueWhite2
+	0x00840e93, 0x00b0c0cd, // AntiqueWhite3
+	0x00840e94, 0x0078838b, // AntiqueWhite4
+	0x00867b74, 0x0020a5da, // goldenrod
+	0x00a57871, 0x00ffffbb, // PaleTurquoise1
+	0x00a57872, 0x00eeeeae, // PaleTurquoise2
+	0x00a57873, 0x00cdcd96, // PaleTurquoise3
+	0x00a57874, 0x008b8b66, // PaleTurquoise4
+	0x00aac614, 0x00d30094, // dark violet, DarkViolet
+	0x00d2c23e, 0x0071b33c, // medium sea green, MediumSeaGreen
+	0x00d71cc1, 0x00ffce87, // SkyBlue1
+	0x00d71cc2, 0x00eec07e, // SkyBlue2
+	0x00d71cc3, 0x00cda66c, // SkyBlue3
+	0x00d71cc4, 0x008b704a, // SkyBlue4
+	0x00d78ad1, 0x00f5f0ff, // LavenderBlush1
+	0x00d78ad2, 0x00e5e0ee, // LavenderBlush2
+	0x00d78ad3, 0x00c5c1cd, // LavenderBlush3
+	0x00d78ad4, 0x0086838b, // LavenderBlush4
+	0x01134481, 0x008b008b, // dark magenta, DarkMagenta
+	0x0120cb21, 0x00d4ff7f, // aquamarine1
+	0x0120cb22, 0x00c6ee76, // aquamarine2
+	0x0120cb23, 0x00aacd66, // aquamarine3
+	0x0120cb24, 0x00748b45, // aquamarine4
+	0x015b63d1, 0x00ff00ff, // magenta
+	0x015c35be, 0x0032cd32, // lime green, LimeGreen
+	0x01674441, 0x00b334ff, // maroon1
+	0x01674442, 0x00a730ee, // maroon2
+	0x01674443, 0x009029cd, // maroon3
+	0x01674444, 0x00621c8b, // maroon4
+	0x019a4db1, 0x00addeff, // NavajoWhite1
+	0x019a4db2, 0x00a1cfee, // NavajoWhite2
+	0x019a4db3, 0x008bb3cd, // NavajoWhite3
+	0x019a4db4, 0x005e798b, // NavajoWhite4
+	0x01da152e, 0x008fbc8f, // dark sea green, DarkSeaGreen
+	0x01f05901, 0x009bd3ff, // burlywood1
+	0x01f05902, 0x0091c5ee, // burlywood2
+	0x01f05903, 0x007daacd, // burlywood3
+	0x01f05904, 0x0055738b, // burlywood4
+	0x026dcbe1, 0x00f0fff0, // honeydew1
+	0x026dcbe2, 0x00e0eee0, // honeydew2
+	0x026dcbe3, 0x00c1cdc1, // honeydew3
+	0x026dcbe4, 0x00838b83, // honeydew4
+	0x026ebf81, 0x007aa0ff, // LightSalmon1
+	0x026ebf82, 0x007295ee, // LightSalmon2
+	0x026ebf83, 0x006281cd, // LightSalmon3
+	0x026ebf84, 0x0042578b, // LightSalmon4
+	0x02b32311, 0x000045ff, // OrangeRed1
+	0x02b32312, 0x000040ee, // OrangeRed2
+	0x02b32313, 0x000037cd, // OrangeRed3
+	0x02b32314, 0x0000258b, // OrangeRed4
+	0x02c214d1, 0x0070ffca, // DarkOliveGreen1
+	0x02c214d2, 0x0068eebc, // DarkOliveGreen2
+	0x02c214d3, 0x005acda2, // DarkOliveGreen3
+	0x02c214d4, 0x003d8b6e, // DarkOliveGreen4
+	0x02cb8f1e, 0x00cdfaff, // lemon chiffon, LemonChiffon
+	0x02e433be, 0x007fff00, // spring green, SpringGreen
+	0x0300ec01, 0x00face87, // light sky blue, LightSkyBlue
+	0x030a5781, 0x00eeeeaf, // pale turquoise, PaleTurquoise
+	0x037762fe, 0x00b5e4ff, // moccasin
+	0x03844151, 0x001e69d2, // chocolate
+	0x038834bd, 0x00fafff5, // mint cream, MintCream
+	0x039a7627, 0x002fffad, // green yellow, GreenYellow
+	0x039ba7a1, 0x008becff, // LightGoldenrod1
+	0x039ba7a2, 0x0082dcee, // LightGoldenrod2
+	0x039ba7a3, 0x0070becd, // LightGoldenrod3
+	0x039ba7a4, 0x004c818b, // LightGoldenrod4
+	0x0406ccb4, 0x009020d0, // violet red, VioletRed
+	0x04090521, 0x00e6f5fd, // old lace, OldLace
+	0x0426dcb7, 0x00f0fff0, // honeydew
+	0x042e4c41, 0x00007fff, // DarkOrange1
+	0x042e4c42, 0x000076ee, // DarkOrange2
+	0x042e4c43, 0x000066cd, // DarkOrange3
+	0x042e4c44, 0x0000458b, // DarkOrange4
+	0x042faa71, 0x00ff3ebf, // DarkOrchid1
+	0x042faa72, 0x00ee3ab2, // DarkOrchid2
+	0x042faa73, 0x00cd329a, // DarkOrchid3
+	0x042faa74, 0x008b2268, // DarkOrchid4
+	0x04547cc1, 0x00ffbf00, // DeepSkyBlue1
+	0x04547cc2, 0x00eeb200, // DeepSkyBlue2
+	0x04547cc3, 0x00cd9a00, // DeepSkyBlue3
+	0x04547cc4, 0x008b6800, // DeepSkyBlue4
+	0x04662b11, 0x0000a5ff, // orange1
+	0x04662b12, 0x00009aee, // orange2
+	0x04662b13, 0x000085cd, // orange3
+	0x04662b14, 0x00005a8b, // orange4
+	0x0467cd21, 0x00fa83ff, // orchid1
+	0x0467cd22, 0x00e97aee, // orchid2
+	0x0467cd23, 0x00c969cd, // orchid3
+	0x0467cd24, 0x0089478b, // orchid4
+	0x046e8691, 0x00c4e4ff, // bisque
+	0x046fa641, 0x00fffff0, // azure1
+	0x046fa642, 0x00eeeee0, // azure2
+	0x046fa643, 0x00cdcdc1, // azure3
+	0x046fa644, 0x008b8b83, // azure4
+	0x04737a8b, 0x00dcf8ff, // cornsilk
+	0x04774c11, 0x004040ff, // brown1
+	0x04774c12, 0x003b3bee, // brown2
+	0x04774c13, 0x003333cd, // brown3
+	0x04774c14, 0x0023238b, // brown4
+	0x048465f1, 0x005672ff, // coral1
+	0x048465f2, 0x00506aee, // coral2
+	0x048465f3, 0x00455bcd, // coral3
+	0x048465f4, 0x002f3e8b, // coral4
+	0x0494e631, 0x00b46eff, // HotPink1
+	0x0494e632, 0x00a76aee, // HotPink2
+	0x0494e633, 0x009060cd, // HotPink3
+	0x0494e634, 0x00623a8b, // HotPink4
+	0x04c65611, 0x0000ff00, // green1
+	0x04c65612, 0x0000ee00, // green2
+	0x04c65613, 0x0000cd00, // green3
+	0x04c65614, 0x00008b00, // green4
+	0x04c66c40, 0x001a1a1a, // gray10, grey10
+	0x04c66c41, 0x001c1c1c, // gray11, grey11
+	0x04c66c42, 0x001f1f1f, // gray12, grey12
+	0x04c66c43, 0x00212121, // gray13, grey13
+	0x04c66c44, 0x00242424, // gray14, grey14
+	0x04c66c45, 0x00262626, // gray15, grey15
+	0x04c66c46, 0x00292929, // gray16, grey16
+	0x04c66c47, 0x002b2b2b, // gray17, grey17
+	0x04c66c48, 0x002e2e2e, // gray18, grey18
+	0x04c66c49, 0x00303030, // gray19, grey19
+	0x04c66c50, 0x00333333, // gray20, grey20
+	0x04c66c51, 0x00363636, // gray21, grey21
+	0x04c66c52, 0x00383838, // gray22, grey22
+	0x04c66c53, 0x003b3b3b, // gray23, grey23
+	0x04c66c54, 0x003d3d3d, // gray24, grey24
+	0x04c66c55, 0x00404040, // gray25, grey25
+	0x04c66c56, 0x00424242, // gray26, grey26
+	0x04c66c57, 0x00454545, // gray27, grey27
+	0x04c66c58, 0x00474747, // gray28, grey28
+	0x04c66c59, 0x004a4a4a, // gray29, grey29
+	0x04c66c60, 0x004d4d4d, // gray30, grey30
+	0x04c66c61, 0x004f4f4f, // gray31, grey31
+	0x04c66c62, 0x00525252, // gray32, grey32
+	0x04c66c63, 0x00545454, // gray33, grey33
+	0x04c66c64, 0x00575757, // gray34, grey34
+	0x04c66c65, 0x00595959, // gray35, grey35
+	0x04c66c66, 0x005c5c5c, // gray36, grey36
+	0x04c66c67, 0x005e5e5e, // gray37, grey37
+	0x04c66c68, 0x00616161, // gray38, grey38
+	0x04c66c69, 0x00636363, // gray39, grey39
+	0x04c66c70, 0x00666666, // gray40, grey40
+	0x04c66c71, 0x00696969, // gray41, grey41
+	0x04c66c72, 0x006b6b6b, // gray42, grey42
+	0x04c66c73, 0x006e6e6e, // gray43, grey43
+	0x04c66c74, 0x00707070, // gray44, grey44
+	0x04c66c75, 0x00737373, // gray45, grey45
+	0x04c66c76, 0x00757575, // gray46, grey46
+	0x04c66c77, 0x00787878, // gray47, grey47
+	0x04c66c78, 0x007a7a7a, // gray48, grey48
+	0x04c66c79, 0x007d7d7d, // gray49, grey49
+	0x04c66c80, 0x007f7f7f, // gray50, grey50
+	0x04c66c81, 0x00828282, // gray51, grey51
+	0x04c66c82, 0x00858585, // gray52, grey52
+	0x04c66c83, 0x00878787, // gray53, grey53
+	0x04c66c84, 0x008a8a8a, // gray54, grey54
+	0x04c66c85, 0x008c8c8c, // gray55, grey55
+	0x04c66c86, 0x008f8f8f, // gray56, grey56
+	0x04c66c87, 0x00919191, // gray57, grey57
+	0x04c66c88, 0x00949494, // gray58, grey58
+	0x04c66c89, 0x00969696, // gray59, grey59
+	0x04c66c90, 0x00999999, // gray60, grey60
+	0x04c66c91, 0x009c9c9c, // gray61, grey61
+	0x04c66c92, 0x009e9e9e, // gray62, grey62
+	0x04c66c93, 0x00a1a1a1, // gray63, grey63
+	0x04c66c94, 0x00a3a3a3, // gray64, grey64
+	0x04c66c95, 0x00a6a6a6, // gray65, grey65
+	0x04c66c96, 0x00a8a8a8, // gray66, grey66
+	0x04c66c97, 0x00ababab, // gray67, grey67
+	0x04c66c98, 0x00adadad, // gray68, grey68
+	0x04c66c99, 0x00b0b0b0, // gray69, grey69
+	0x04c66ca0, 0x00b3b3b3, // gray70, grey70
+	0x04c66ca1, 0x00b5b5b5, // gray71, grey71
+	0x04c66ca2, 0x00b8b8b8, // gray72, grey72
+	0x04c66ca3, 0x00bababa, // gray73, grey73
+	0x04c66ca4, 0x00bdbdbd, // gray74, grey74
+	0x04c66ca5, 0x00bfbfbf, // gray75, grey75
+	0x04c66ca6, 0x00c2c2c2, // gray76, grey76
+	0x04c66ca7, 0x00c4c4c4, // gray77, grey77
+	0x04c66ca8, 0x00c7c7c7, // gray78, grey78
+	0x04c66ca9, 0x00c9c9c9, // gray79, grey79
+	0x04c66cb0, 0x00cccccc, // gray80, grey80
+	0x04c66cb1, 0x00cfcfcf, // gray81, grey81
+	0x04c66cb2, 0x00d1d1d1, // gray82, grey82
+	0x04c66cb3, 0x00d4d4d4, // gray83, grey83
+	0x04c66cb4, 0x00d6d6d6, // gray84, grey84
+	0x04c66cb5, 0x00d9d9d9, // gray85, grey85
+	0x04c66cb6, 0x00dbdbdb, // gray86, grey86
+	0x04c66cb7, 0x00dedede, // gray87, grey87
+	0x04c66cb8, 0x00e0e0e0, // gray88, grey88
+	0x04c66cb9, 0x00e3e3e3, // gray89, grey89
+	0x04c66cc0, 0x00e5e5e5, // gray90, grey90
+	0x04c66cc1, 0x00e8e8e8, // gray91, grey91
+	0x04c66cc2, 0x00ebebeb, // gray92, grey92
+	0x04c66cc3, 0x00ededed, // gray93, grey93
+	0x04c66cc4, 0x00f0f0f0, // gray94, grey94
+	0x04c66cc5, 0x00f2f2f2, // gray95, grey95
+	0x04c66cc6, 0x00f5f5f5, // gray96, grey96
+	0x04c66cc7, 0x00f7f7f7, // gray97, grey97
+	0x04c66cc8, 0x00fafafa, // gray98, grey98
+	0x04c66cc9, 0x00fcfcfc, // gray99, grey99
+	0x04e1044e, 0x0032cd9a, // yellow green, YellowGreen
+	0x04e66b44, 0x00aae8ee, // pale goldenrod, PaleGoldenrod
+	0x04eb47c1, 0x00f0ffff, // ivory1
+	0x04eb47c2, 0x00e0eeee, // ivory2
+	0x04eb47c3, 0x00c1cdcd, // ivory3
+	0x04eb47c4, 0x00838b8b, // ivory4
+	0x04edcb37, 0x00d2fafa, // light goldenrod yellow, LightGoldenrodYellow
+	0x04fc5fc1, 0x008ff6ff, // khaki1
+	0x04fc5fc2, 0x0085e6ee, // khaki2
+	0x04fc5fc3, 0x0073c6cd, // khaki3
+	0x04fc5fc4, 0x004e868b, // khaki4
+	0x04ffba31, 0x00ff82ab, // MediumPurple1
+	0x04ffba32, 0x00ee799f, // MediumPurple2
+	0x04ffba33, 0x00cd6889, // MediumPurple3
+	0x04ffba34, 0x008b475d, // MediumPurple4
+	0x0516743e, 0x006030b0, // maroon
+	0x053f2721, 0x00ff66e0, // MediumOrchid1
+	0x053f2722, 0x00ee5fd1, // MediumOrchid2
+	0x053f2723, 0x00cd52b4, // MediumOrchid3
+	0x053f2724, 0x008b377a, // MediumOrchid4
+	0x054662b1, 0x0000a5ff, // orange
+	0x05467cd4, 0x00d670da, // orchid
+	0x0553f274, 0x00d355ba, // medium orchid, MediumOrchid
+	0x055a7501, 0x00f020a0, // purple
+	0x055c602e, 0x00578b2e, // sea green, SeaGreen
+	0x05604911, 0x00b48246, // steel blue, SteelBlue
+	0x05654aab, 0x009314ff, // deep pink, DeepPink
+	0x0567c17c, 0x00eef5ff, // seashell
+	0x05727981, 0x003030ff, // firebrick1
+	0x05727982, 0x002c2cee, // firebrick2
+	0x05727983, 0x002626cd, // firebrick3
+	0x05727984, 0x001a1a8b, // firebrick4
+	0x0576123e, 0x007280fa, // salmon
+	0x057d0df6, 0x00b9daff, // peach puff, PeachPuff
+	0x057d6321, 0x002d52a0, // sienna
+	0x0587bc7e, 0x00aab220, // light sea green, LightSeaGreen
+	0x0594168f, 0x004763ff, // tomato
+	0x05a75011, 0x00ff309b, // purple1
+	0x05a75012, 0x00ee2c91, // purple2
+	0x05a75013, 0x00cd267d, // purple3
+	0x05a75014, 0x008b1a55, // purple4
+	0x05ae4064, 0x00ee82ee, // violet
+	0x05b63d51, 0x00ff00ff, // magenta1
+	0x05b63d52, 0x00ee00ee, // magenta2
+	0x05b63d53, 0x00cd00cd, // magenta3
+	0x05b63d54, 0x008b008b, // magenta4
+	0x05bc5671, 0x00bae7ff, // wheat1
+	0x05bc5672, 0x00aed8ee, // wheat2
+	0x05bc5673, 0x0096bacd, // wheat3
+	0x05bc5674, 0x00667e8b, // wheat4
+	0x05c31411, 0x009aff9a, // PaleGreen1
+	0x05c31412, 0x0090ee90, // PaleGreen2
+	0x05c31413, 0x007ccd7c, // PaleGreen3
+	0x05c31414, 0x00548b54, // PaleGreen4
+	0x05c60341, 0x009fff54, // SeaGreen1
+	0x05c60342, 0x0094ee4e, // SeaGreen2
+	0x05c60343, 0x0080cd43, // SeaGreen3
+	0x05c60344, 0x00578b2e, // SeaGreen4
+	0x05d61147, 0x0000ffff, // yellow
+	0x06046d91, 0x00ff7648, // RoyalBlue1
+	0x06046d92, 0x00ee6e43, // RoyalBlue2
+	0x06046d93, 0x00cd5f3a, // RoyalBlue3
+	0x06046d94, 0x008b4027, // RoyalBlue4
+	0x06049111, 0x00ffb863, // SteelBlue1
+	0x06049112, 0x00eeac5c, // SteelBlue2
+	0x06049113, 0x00cd944f, // SteelBlue3
+	0x06049114, 0x008b6436, // SteelBlue4
+	0x060d78a8, 0x00f5f0ff, // lavender blush, LavenderBlush
+	0x06120cb1, 0x00d4ff7f, // aquamarine
+	0x062b3234, 0x000045ff, // orange red, OrangeRed
+	0x063021f1, 0x00ff901e, // DodgerBlue1
+	0x063021f2, 0x00ee861c, // DodgerBlue2
+	0x063021f3, 0x00cd7418, // DodgerBlue3
+	0x063021f4, 0x008b4e10, // DodgerBlue4
+	0x0650dae1, 0x00f0faff, // floral white, FloralWhite
+	0x0654aab1, 0x009314ff, // DeepPink1
+	0x0654aab2, 0x008912ee, // DeepPink2
+	0x0654aab3, 0x007610cd, // DeepPink3
+	0x0654aab4, 0x00500a8b, // DeepPink4
+	0x0657279b, 0x002222b2, // firebrick
+	0x066f7511, 0x008b0000, // dark blue, DarkBlue
+	0x066f89de, 0x008b8b00, // dark cyan, DarkCyan
+	0x066fc2e9, 0x00a9a9a9, // dark grey, DarkGrey, dark gray, DarkGray
+	0x066fccf1, 0x00ab82ff, // PaleVioletRed1
+	0x066fccf2, 0x009f79ee, // PaleVioletRed2
+	0x066fccf3, 0x008968cd, // PaleVioletRed3
+	0x066fccf4, 0x005d478b, // PaleVioletRed4
+	0x067c17a1, 0x00eef5ff, // seashell1
+	0x067c17a2, 0x00dee5ee, // seashell2
+	0x067c17a3, 0x00bfc5cd, // seashell3
+	0x067c17a4, 0x0082868b, // seashell4
+	0x06836cc1, 0x00fff598, // CadetBlue1
+	0x06836cc2, 0x00eee58e, // CadetBlue2
+	0x06836cc3, 0x00cdc57a, // CadetBlue3
+	0x06836cc4, 0x008b8653, // CadetBlue4
+	0x06854991, 0x00cd5a6a, // slate blue, SlateBlue
+	0x06859e69, 0x00908070, // slate gray, SlateGray, slate grey, SlateGrey
+	0x06a62d62, 0x00fae6e6, // lavender
+	0x06a67d31, 0x00fff500, // turquoise1
+	0x06a67d32, 0x00eee500, // turquoise2
+	0x06a67d33, 0x00cdc500, // turquoise3
+	0x06a67d34, 0x008b8600, // turquoise4
+	0x06aa51f4, 0x00e22b8a, // blue violet, BlueViolet
+	0x06bd74b1, 0x00800000, // navy blue, NavyBlue
+	0x06d3faa0, 0x00d5efff, // papaya whip, PapayaWhip
+	0x06e86901, 0x00c4e4ff, // bisque1
+	0x06e86902, 0x00b7d5ee, // bisque2
+	0x06e86903, 0x009eb7cd, // bisque3
+	0x06e86904, 0x006b7d8b, // bisque4
+	0x06fc2d3e, 0x00006400, // dark green, DarkGreen
+	0x06ff8d99, 0x006bb7bd, // dark khaki, DarkKhaki
+	0x071f0594, 0x0087b8de, // burlywood
+	0x0737a8a1, 0x00dcf8ff, // cornsilk1
+	0x0737a8a2, 0x00cde8ee, // cornsilk2
+	0x0737a8a3, 0x00b1c8cd, // cornsilk3
+	0x0737a8a4, 0x0078888b, // cornsilk4
+	0x074ffba1, 0x00db7093, // medium purple, MediumPurple
+	0x07612441, 0x00698cff, // salmon1
+	0x07612442, 0x006282ee, // salmon2
+	0x07612443, 0x005470cd, // salmon3
+	0x07612444, 0x00394c8b, // salmon4
+	0x076a67d1, 0x00d0e040, // turquoise
+	0x07921611, 0x0000ff7f, // chartreuse
+	0x07d0dfc1, 0x00b9daff, // PeachPuff1
+	0x07d0dfc2, 0x00adcbee, // PeachPuff2
+	0x07d0dfc3, 0x0095afcd, // PeachPuff3
+	0x07d0dfc4, 0x0065778b, // PeachPuff4
+	0x07d63211, 0x004782ff, // sienna1
+	0x07d63212, 0x004279ee, // sienna2
+	0x07d63213, 0x003968cd, // sienna3
+	0x07d63214, 0x0026478b, // sienna4
+	0x080d71c1, 0x00ebce87, // sky blue, SkyBlue
+	0x08437c04, 0x00cdebff, // blanched almond, BlanchedAlmond
+	0x08441571, 0x00247fff, // chocolate1
+	0x08441572, 0x002176ee, // chocolate2
+	0x08441573, 0x001d66cd, // chocolate3
+	0x08441574, 0x0013458b, // chocolate4
+	0x084547c1, 0x00ffbf00, // deep sky blue, DeepSkyBlue
+	0x08549921, 0x00ff6f83, // SlateBlue1
+	0x08549922, 0x00ee677a, // SlateBlue2
+	0x08549923, 0x00cd5969, // SlateBlue3
+	0x08549924, 0x008b3c47, // SlateBlue4
+	0x0859e6a1, 0x00ffe2c6, // SlateGray1
+	0x0859e6a2, 0x00eed3b9, // SlateGray2
+	0x0859e6a3, 0x00cdb69f, // SlateGray3
+	0x0859e6a4, 0x008b7b6c, // SlateGray4
+	0x08634521, 0x00e6e0b0, // powder blue, PowderBlue
+	0x0863bf11, 0x00f5f5f5, // white smoke, WhiteSmoke
+	0x0866fcc4, 0x009370db, // pale violet red, PaleVioletRed
+	0x08670614, 0x0000008b, // dark red, DarkRed
+	0x0867b771, 0x0025c1ff, // goldenrod1
+	0x0867b772, 0x0022b4ee, // goldenrod2
+	0x0867b773, 0x001d9bcd, // goldenrod3
+	0x0867b774, 0x0014698b, // goldenrod4
+	0x086836c1, 0x00a09e5f, // cadet blue, CadetBlue
+	0x086ec931, 0x00e0ffff, // LightYellow1
+	0x086ec932, 0x00d1eeee, // LightYellow2
+	0x086ec933, 0x00b4cdcd, // LightYellow3
+	0x086ec934, 0x007a8b8b, // LightYellow4
+	0x089e4591, 0x00e1e4ff, // misty rose, MistyRose
+	0x089f73c1, 0x00fff8f8, // ghost white, GhostWhite
+	0x08c56b1e, 0x009afa00, // medium spring green, MediumSpringGreen
+	0x08c7233e, 0x00228b22, // forest green, ForestGreen
+	0x08ce8951, 0x00d8bfd8, // thistle
+	0x08d67874, 0x005c5ccd, // indian red, IndianRed
+	0x08d743fe, 0x008f8fbc, // rosy brown, RosyBrown
+	0x08e1c629, 0x00696969, // dim gray, DimGray, dim grey, DimGrey
+	0x08e4cbb4, 0x000b86b8, // dark goldenrod, DarkGoldenrod
+	0x08fe0c11, 0x00dec4b0, // light steel blue, LightSteelBlue
+	0x09216131, 0x0000ff7f, // chartreuse1
+	0x09216132, 0x0000ee76, // chartreuse2
+	0x09216133, 0x0000cd66, // chartreuse3
+	0x09216134, 0x00008b45, // chartreuse4
+	0x0926ebee, 0x007aa0ff, // light salmon, LightSalmon
+	0x09416971, 0x004763ff, // tomato1
+	0x09416972, 0x00425cee, // tomato2
+	0x09416973, 0x00394fcd, // tomato3
+	0x09416974, 0x0026368b, // tomato4
+	0x0986ec97, 0x00e0ffff, // light yellow, LightYellow
+	0x09d2229e, 0x0060a4f4, // sandy brown, SandyBrown
+	0x09e459c1, 0x00e1e4ff, // MistyRose1
+	0x09e459c2, 0x00d2d5ee, // MistyRose2
+	0x09e459c3, 0x00b5b7cd, // MistyRose3
+	0x09e459c4, 0x007b7d8b, // MistyRose4
+	0x0a5c25b1, 0x003effc0, // OliveDrab1
+	0x0a5c25b2, 0x003aeeb3, // OliveDrab2
+	0x0a5c25b3, 0x0032cd9a, // OliveDrab3
+	0x0a5c25b4, 0x00228b69, // OliveDrab4
+	0x0b385569, 0x00998877, // light slate gray, LightSlateGray,
+				  	      // light slate grey, LightSlateGrey
+	0x0b390291, 0x00ff7084, // light slate blue, LightSlateBlue
+	0x0b630211, 0x00ff901e, // dodger blue, DodgerBlue
+	0x0bd84141, 0x00e6d8ad, // light blue, LightBlue
+	0x0bd896b9, 0x00d3d3d3, // light grey, LightGrey, light gray, LightGray
+	0x0bd8dd8e, 0x00ffffe0, // light cyan, LightCyan
+	0x0bd91efb, 0x00c1b6ff, // light pink, LightPink
+	0x0c2c213e, 0x002f6b55, // dark olive green, DarkOliveGreen
+	0x0c2c353e, 0x0000fc7c, // lawn green, LawnGreen
+	0x0c66c470, 0x00ffffff, // gray100, grey100
+	0x0cb21f31, 0x00aacd66, // medium aquamarine, MediumAquamarine
+	0x0cb8f231, 0x00cdfaff, // LemonChiffon1
+	0x0cb8f232, 0x00bfe9ee, // LemonChiffon2
+	0x0cb8f233, 0x00a5c9cd, // LemonChiffon3
+	0x0cb8f234, 0x0070898b, // LemonChiffon4
+	0x0ce895c1, 0x00ffe1ff, // thistle1
+	0x0ce895c2, 0x00eed2ee, // thistle2
+	0x0ce895c3, 0x00cdb5cd, // thistle3
+	0x0ce895c4, 0x008b7b8b, // thistle4
+	0x0cecedc4, 0x008515c7, // medium violet red, MediumVioletRed
+	0x0d0840e1, 0x00d7ebfa, // antique white, AntiqueWhite
+	0x0d39ba74, 0x0082ddee, // light goldenrod, LightGoldenrod
+	0x0d494e6b, 0x00b469ff, // hot pink, HotPink
+	0x0d6046d1, 0x00e16941, // royal blue, RoyalBlue
+	0x0d6114f1, 0x0000ffff, // yellow1
+	0x0d6114f2, 0x0000eeee, // yellow2
+	0x0d6114f3, 0x0000cdcd, // yellow3
+	0x0d6114f4, 0x00008b8b, // yellow4
+	0x0d6787f1, 0x006a6aff, // IndianRed1
+	0x0d6787f2, 0x006363ee, // IndianRed2
+	0x0d6787f3, 0x005555cd, // IndianRed3
+	0x0d6787f4, 0x003a3a8b, // IndianRed4
+	0x0d744091, 0x00c1c1ff, // RosyBrown1
+	0x0d744092, 0x00b4b4ee, // RosyBrown2
+	0x0d744093, 0x009b9bcd, // RosyBrown3
+	0x0d744094, 0x0069698b, // RosyBrown4
+	0x0d753791, 0x00fff8f0, // alice blue, AliceBlue
+	0x0d834bec, 0x008080f0, // light coral, LightCoral
+	0x0d8414f1, 0x00ffefbf, // LightBlue1
+	0x0d8414f2, 0x00eedfb2, // LightBlue2
+	0x0d8414f3, 0x00cdc09a, // LightBlue3
+	0x0d8414f4, 0x008b8368, // LightBlue4
+	0x0d8968ee, 0x0090ee90, // light green, LightGreen
+	0x0d8dd9a1, 0x00ffffe0, // LightCyan1
+	0x0d8dd9a2, 0x00eeeed1, // LightCyan2
+	0x0d8dd9a3, 0x00cdcdb4, // LightCyan3
+	0x0d8dd9a4, 0x008b8b7a, // LightCyan4
+	0x0d91ef51, 0x00b9aeff, // LightPink1
+	0x0d91ef52, 0x00ada2ee, // LightPink2
+	0x0d91ef53, 0x00958ccd, // LightPink3
+	0x0d91ef54, 0x00655f8b, // LightPink4
+	0x0da15301, 0x00c1ffc1, // DarkSeaGreen1
+	0x0da15302, 0x00b4eeb4, // DarkSeaGreen2
+	0x0da15303, 0x009bcd9b, // DarkSeaGreen3
+	0x0da15304, 0x00698b69, // DarkSeaGreen4
+	0x0e2ce221, 0x00ffff97, // DarkSlateGray1
+	0x0e2ce222, 0x00eeee8d, // DarkSlateGray2
+	0x0e2ce223, 0x00cdcd79, // DarkSlateGray3
+	0x0e2ce224, 0x008b8b52, // DarkSlateGray4
+	0x0e373f3f, 0x00dcdcdc, // gainsboro
+	0x0e433c31, 0x007fff00, // SpringGreen1
+	0x0e433c32, 0x0076ee00, // SpringGreen2
+	0x0e433c33, 0x0066cd00, // SpringGreen3
+	0x0e433c34, 0x00458b00, // SpringGreen4
+	0x0e4cbbf1, 0x000fb9ff, // DarkGoldenrod1
+	0x0e4cbbf2, 0x000eadee, // DarkGoldenrod2
+	0x0e4cbbf3, 0x000c95cd, // DarkGoldenrod3
+	0x0e4cbbf4, 0x0008658b, // DarkGoldenrod4
+	0x0e6f26c1, 0x00ee687b, // medium slate blue, MediumSlateBlue
+	0x0ea48411, 0x00cd0000, // medium blue, MediumBlue
+	0x0ea5c252, 0x00238e6b, // olive drab, OliveDrab
+	0x0ec60341, 0x00701919, // midnight blue, MidnightBlue
+	0x0ee279d1, 0x008b3d48, // dark slate blue, DarkSlateBlue
+	0x0ee2ce29, 0x004f4f2f, // dark slate gray, DarkSlateGray,
+				  	      // dark slate grey, DarkSlateGrey
+	0x0f0f3791, 0x00d1ce00, // dark turquoise, DarkTurquoise
+	0x0f14e451, 0x00ed9564, // cornflower blue, CornflowerBlue
+	0x0f19a4d1, 0x00addeff, // navajo white, NavajoWhite
+	0x0f844681, 0x00ccd148, // medium turquoise, MediumTurquoise
+	0x0fe0c1c1, 0x00ffe1ca, // LightSteelBlue1
+	0x0fe0c1c2, 0x00eed2bc, // LightSteelBlue2
+	0x0fe0c1c3, 0x00cdb5a2, // LightSteelBlue3
+	0x0fe0c1c4, 0x008b7b6e  // LightSteelBlue4
+};

@@ -30,8 +30,8 @@ extern "C" {
 
 
 static boolean
-hgl_framebuffer_flush_front(struct st_framebuffer_iface* stfb,
-	enum st_attachment_type statt)
+hgl_framebuffer_flush_front(struct st_context_iface *stctx,
+	struct st_framebuffer_iface* stfb, enum st_attachment_type statt)
 {
 	CALLED();
 	// TODO: I have *NO* idea how we are going to access this data...
@@ -60,7 +60,8 @@ hgl_framebuffer_validate(struct st_framebuffer_iface* stfb,
 }
 
 
-GalliumFramebuffer::GalliumFramebuffer(struct st_visual* visual)
+GalliumFramebuffer::GalliumFramebuffer(struct st_visual* visual,
+	void* privateContext)
 	:
 	fBuffer(NULL)
 {
@@ -73,6 +74,7 @@ GalliumFramebuffer::GalliumFramebuffer(struct st_visual* visual)
 	fBuffer->visual = visual;
 	fBuffer->flush_front = hgl_framebuffer_flush_front;
 	fBuffer->validate = hgl_framebuffer_validate;
+	fBuffer->st_manager_private = privateContext;
 
 	pipe_mutex_init(fMutex);
 }

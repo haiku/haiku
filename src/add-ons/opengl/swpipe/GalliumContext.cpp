@@ -49,29 +49,18 @@ static void
 hgl_viewport(struct gl_context* glContext, GLint x, GLint y,
 	GLsizei width, GLsizei height)
 {
-	TRACE("%s(glContext: %p, x: %d, y: %d, width: %d, height: %d\n", __func__,
+	TRACE("%s(glContext: %p, x: %d, y: %d, w: %d, h: %d\n", __func__,
 		glContext, x, y, width, height);
-	struct hgl_context *context = (struct hgl_context*)glContext->DriverCtx;
 
-	if (!context) {
-		ERROR("%s: No context yet. bailing.\n", __func__);
-		return;
-	}
+	struct gl_framebuffer *draw = glContext->WinSysDrawBuffer;
+	struct gl_framebuffer *read = glContext->WinSysReadBuffer;
 
-	int32 bitmapWidth;
-	int32 bitmapHeight;
-
-	get_bitmap_size(context->bitmap, &bitmapWidth, &bitmapHeight);
-
-	if (width != bitmapWidth || height != bitmapHeight) {
-		struct gl_framebuffer *draw = glContext->WinSysDrawBuffer;
-		struct gl_framebuffer *read = glContext->WinSysReadBuffer;
-
-		if (draw)
-			_mesa_resize_framebuffer(glContext, draw, bitmapWidth, bitmapHeight);
-		if (read)
-			_mesa_resize_framebuffer(glContext, read, bitmapWidth, bitmapHeight);
-	}
+	// TODO: SLOW! We need to check for changes in bitmap vs gl_framebuffer
+	// size before doing a _mesa_resize_framebuffer.
+	if (draw)
+		_mesa_resize_framebuffer(glContext, draw, width, height);
+	if (read)
+		_mesa_resize_framebuffer(glContext, read, width, height);
 }
 
 
@@ -301,8 +290,8 @@ GalliumContext::CreateContext(Bitmap *bitmap)
 	// Convert Mesa calculated visual into state tracker visual
 	context->stVisual = hgl_fill_st_visual(glVisual);
 
-	context->draw = new GalliumFramebuffer(context->stVisual);
-	context->read = new GalliumFramebuffer(context->stVisual);
+	context->draw = new GalliumFramebuffer(context->stVisual, (void*)this);
+	context->read = new GalliumFramebuffer(context->stVisual, (void*)this);
 
 	if (!context->draw || !context->read) {
 		ERROR("%s: Problem allocating framebuffer!\n", __func__);
@@ -362,14 +351,13 @@ GalliumContext::CreateContext(Bitmap *bitmap)
 	}
 
 	// Init Gallium3D Post Processing
-	context->postProcess = pp_init(fScreen, context->postProcessEnable);
+	//context->postProcess = pp_init(fScreen, context->postProcessEnable);
 
 	assert(!context->st->st_manager_private);
-	context->st->st_manager_private = (void*)context;
+	context->st->st_manager_private = (void*)this;
 
 	struct st_context *stContext = (struct st_context*)context->st;
 	
-	stContext->ctx->DriverCtx = context;
 	stContext->ctx->Driver.Viewport = hgl_viewport;
 
 	// TODO: Closely review this next context logic...
@@ -459,7 +447,7 @@ GalliumContext::SetCurrentContext(Bitmap *bitmap, context_id contextID)
 
 	if (!bitmap) {
 		api->make_current(context->api, NULL, NULL, NULL);
-		return B_ERROR;
+		return B_OK;
 	}
 
 	// Everything seems valid, lets set the new context.

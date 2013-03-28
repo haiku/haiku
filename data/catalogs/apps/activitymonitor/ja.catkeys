@@ -1,8 +1,9 @@
-1	japanese	x-vnd.Haiku-ActivityMonitor	3704566709
+1	japanese	x-vnd.Haiku-ActivityMonitor	1913625522
 P-faults	DataSource		ページフォルト
 Media nodes	DataSource		メディアノード数
 Threads	DataSource		スレッド数
 MB	DataSource		MB
+Always on top	ActivityWindow		常に前面に
 Add graph	ActivityWindow		グラフの追加
 Teams	DataSource		チーム数
 Hide legend	ActivityView		説明を隠す

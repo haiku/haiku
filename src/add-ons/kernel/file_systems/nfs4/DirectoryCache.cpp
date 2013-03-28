@@ -78,7 +78,7 @@ DirectoryCacheSnapshot::~DirectoryCacheSnapshot()
 
 DirectoryCache::DirectoryCache(Inode* inode, bool attr)
 	:
-	fRevalidated(false),
+	fExpirationTime(inode->fFileSystem->GetConfiguration().fDirectoryCacheTime),
 	fDirectoryCache(NULL),
 	fInode(inode),
 	fAttrDir(attr),
@@ -100,7 +100,7 @@ void
 DirectoryCache::Reset()
 {
 	Trash();
-	fExpireTime = system_time() + kExpirationTime;
+	fExpireTime = system_time() + fExpirationTime;
 	fTrashed = false;
 }
 
@@ -232,7 +232,7 @@ DirectoryCache::_LoadSnapshot(bool trash)
 	newSnapshot->AcquireReference();
 
 	_SetSnapshot(newSnapshot);
-	fExpireTime = system_time() + kExpirationTime;
+	fExpireTime = system_time() + fExpirationTime;
 
 	fTrashed = false;
 
@@ -250,7 +250,7 @@ DirectoryCache::_LoadSnapshot(bool trash)
 status_t
 DirectoryCache::Revalidate()
 {
-	if (fExpireTime < system_time())
+	if (fExpireTime > system_time())
 		return B_OK;
 
 	uint64 change;
@@ -260,7 +260,7 @@ DirectoryCache::Revalidate()
 	}
 
 	if (change == fChange) {
-		fExpireTime = system_time() + kExpirationTime;
+		fExpireTime = system_time() + fExpirationTime;
 		return B_OK;
 	}
 
@@ -308,19 +308,6 @@ DirectoryCache::NotifyChanges(DirectoryCacheSnapshot* oldSnapshot,
 			} else {
 				notify_entry_created(fInode->GetFileSystem()->DevId(),
 					fInode->ID(), newCurrent->fName, newCurrent->fNode);
-
-				do {
-					FileInfo fi;
-					fi.fFileId = newCurrent->fNode;
-					fi.fParent = fInode->fInfo.fHandle;
-					status_t result = fi.CreateName(fInode->fInfo.fPath,
-						newCurrent->fName);
-					if (result != B_OK)
-						break;
-
-					fInode->GetFileSystem()->InoIdMap()->AddEntry(fi,
-						Inode::FileIdToInoT(newCurrent->fNode), true);
-				} while (false);
 			}
 		} else
 			oldSnapshot->fEntries.Remove(prev, oldCurrent);
@@ -334,7 +321,7 @@ DirectoryCache::NotifyChanges(DirectoryCacheSnapshot* oldSnapshot,
 	while (oldCurrent != NULL) {
 		if (fAttrDir) {
 			notify_attribute_changed(fInode->GetFileSystem()->DevId(),
-				fInode->ID(), newCurrent->fName, B_ATTR_REMOVED);
+				fInode->ID(), oldCurrent->fName, B_ATTR_REMOVED);
 		} else {
 			notify_entry_removed(fInode->GetFileSystem()->DevId(), fInode->ID(),
 				oldCurrent->fName, oldCurrent->fNode);

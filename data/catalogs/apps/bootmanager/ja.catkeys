@@ -1,6 +1,6 @@
 1	japanese	x-vnd.Haiku-BootManager	3014946856
 The boot manager has been successfully installed on your system.	BootManagerController		ブートマネージャーがシステムに正常にインストールされました。
-After two seconds	DefaultPartitionPage		2秒
+After two seconds	DefaultPartitionPage		あと 2 秒
 Uninstall Boot Manager	UninstallPage	Title	ブートメニューをアンインストール
 At least one partition must be selected!	BootManagerController		少なくとも１つのパーティションが選択されていなければなりません。
 The old Master Boot Record could not be saved to %s	BootManagerController		古いマスターブートレコード (MBR) を %s に保存できませんでした。
@@ -15,23 +15,23 @@ Timeout: %s	DefaultPartitionPage		待ち時間： %s
 Select	FileSelectionPage	Button	選択
 Cannot access!	DrivesPage	Cannot install	アクセスできません
 Uninstall boot manager	BootManagerController	Title	ブートマネージャーを削除
-After four seconds	DefaultPartitionPage		4秒
+After four seconds	DefaultPartitionPage		あと 4 秒
 Uninstallation of boot menu failed	BootManagerController	Title	ブートマネージャーの削除に失敗しました。
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		修復に使うマスターブートレコード (MBR) ファイルを指定してください。これはブートマネージャーが初めてインストールされた時に作成されたものです。
 Next	WizardView	Button	次へ
 Uninstallation of boot menu completed	BootManagerController	Title	ブートマネージャーの削除が完了しました
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		ブートマネージャーをインストールまたは削除するドライブを選択してください。
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		デフォルトパーティションと起動するまでの待ち時間を指定してください。\nユーザーが別のパーティションを選択しない限り、システムはデフォルトパーティションから起動します。待ち時間を「永久」にすることで、起動する度にパーティションが選択できるようになります。\n待ち時間を無効にするには、「ALT」キーを押したままシステムを起動してください。
-After one second	DefaultPartitionPage		1秒
+After one second	DefaultPartitionPage		あと 1 秒
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		起動ハードディスクのパーティションテーブルはブートマネージャーと互換性はありません。\nブートマネージャーは第一パーティションの前に 2 KB のスペースが必要です。
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		下記のパーティションが検出されました。ブートメニューに表示するパーティションにチェックを入れてください。ブートメニューに表示するパーティションの名前を入力することもできます(注意: 英数半角のみで入力してください)。
-After one minute	DefaultPartitionPage		1分
+After one minute	DefaultPartitionPage		あと 1 分
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		起動デバイス (%DISK) のマスターブートレコードは %FILE から正常に修復されました。
 Write boot menu	BootManagerController	Button	ブートメニューを書き込む
 The Master Boot Record could not be restored!	BootManagerController		マスターブートレコードは修復されませんでした。
 Uninstall	DrivesPage	Button	削除
 Default Partition	DefaultPartitionPage	Title	デフォルトパーティション
-After five seconds	DefaultPartitionPage		5秒後
+After five seconds	DefaultPartitionPage		あと 5 秒
 Back	BootManagerController	Button	戻る
 Installation of boot menu completed	BootManagerController	Title	ブートメニューのインストールが完了
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Unnamed %d
@@ -62,4 +62,4 @@ Summary	BootManagerController	Title	概要
 OK	BootManagerController	Button	OK
 Immediately	DefaultPartitionPage		すぐに
 Done	BootManagerController	Button	完了
-After three seconds	DefaultPartitionPage		3秒
+After three seconds	DefaultPartitionPage		あと 3 秒

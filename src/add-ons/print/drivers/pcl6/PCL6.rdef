@@ -1,5 +1,5 @@
 
-resource app_signature "application/x-vnd.pcl5-compatible";
+resource app_signature "application/x-vnd.pcl6-compatible";
 
 resource app_flags B_SINGLE_LAUNCH;
 

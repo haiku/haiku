@@ -25,6 +25,8 @@ struct MountConfiguration {
 
 	bool		fEmulateNamedAttrs;
 	bool		fCacheMetadata;
+
+	bigtime_t	fDirectoryCacheTime;
 };
 
 class FileSystem : public DoublyLinkedListLinkImpl<FileSystem> {
@@ -57,7 +59,7 @@ public:
 	inline	RPC::Server*		Server();
 	inline	NFS4Server*			NFSServer();
 
-	inline	const char*			Path() const;
+	inline	const char**		Path() const;
 	inline	const FileSystemId&	FsId() const;
 
 	inline	uint64				AllocFileId();
@@ -78,6 +80,9 @@ public:
 private:
 								FileSystem(const MountConfiguration& config);
 
+	static	status_t			_ParsePath(RequestBuilder& req, uint32& count,
+									const char* _path);
+
 			mutex				fCreateFileLock;
 
 			mutex				fDelegationLock;
@@ -97,7 +102,7 @@ private:
 			bool				fNamedAttrs;
 
 			FileSystemId		fFsId;
-			const char*			fPath;
+			const char**		fPath;
 
 			RootInode*			fRoot;
 
@@ -156,7 +161,7 @@ FileSystem::NFSServer()
 }
 
 
-inline const char*
+inline const char**
 FileSystem::Path() const
 {
 	ASSERT(fPath != NULL);

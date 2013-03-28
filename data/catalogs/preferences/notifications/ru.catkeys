@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Notifications	814394708
+1	russian	x-vnd.Haiku-Notifications	2177286129
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Произошла ошибка при сохранении настроек\nВозможно, что закончилось свободное место на диске.
 Notifications	GeneralView		Уведомления
 seconds of inactivity	GeneralView		секунд бездействия
@@ -17,6 +17,7 @@ Cannot disable notifications because the server can't be reached.	GeneralView		�
 Progress	NotificationView		Прогресс
 Last Received	NotificationView		Последнее полученное
 General	PrefletView		Основные
+Apply	PrefletWin		Применить
 Display	PrefletView		Отображение
 Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Невозможно добавить уведомления в автозагрузку, возможно у вас нет прав на запись в директорию настроек загрузки.
 Search:	NotificationView		Поиск:

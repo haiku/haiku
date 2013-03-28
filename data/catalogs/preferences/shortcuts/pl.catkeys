@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Shortcuts	1477375596
+1	polish	x-vnd.Haiku-Shortcuts	3397621807
 Error, NULL state description?\n	ShortcutsSpec		Błąd, brak opisu stanu?\n
 MoveMouse	ShortcutsSpec		MoveMouse
 OK	ShortcutsWindow		OK
@@ -24,6 +24,7 @@ Save	ShortcutsWindow		Zapisz
 *MouseButton 1	ShortcutsWindow		*MouseButton 1
 *MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
 MouseDown	ShortcutsSpec		MouseDown
+Save changes before closing?	ShortcutsWindow		Zapisać zmiany przed zamknięciem?
 Remove selected shortcut	ShortcutsWindow		Usuń zaznaczony skrót
 MouseButton	ShortcutsSpec		MouseButton
 Add new shortcut	ShortcutsWindow		Dodaj nowy skrót

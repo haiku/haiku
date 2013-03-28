@@ -589,8 +589,8 @@ TracingMetaData::_InitPreviousTracingData()
 		if (entry->previous_size != previousEntrySize) {
 			if (entry != fFirstEntry) {
 				dprintf("ktrace recovering: entry %p: fixing previous_size "
-					"size: %lu (should be %lu)\n", entry, entry->previous_size,
-					previousEntrySize);
+					"size: %" B_PRIu32 " (should be %" B_PRIu32 ")\n", entry,
+					entry->previous_size, previousEntrySize);
 				errorCount++;
 			}
 			entry->previous_size = previousEntrySize;
@@ -609,8 +609,8 @@ TracingMetaData::_InitPreviousTracingData()
 		}
 
 		if (entry->size > uint32(fBuffer + kBufferSize - entry)) {
-			dprintf("ktrace recovering: entry %p: size too big: %lu\n", entry,
-				entry->size);
+			dprintf("ktrace recovering: entry %p: size too big: %" B_PRIu32 "\n",
+				entry, entry->size);
 			errorCount++;
 			fAfterLastEntry = entry;
 			break;
@@ -635,7 +635,7 @@ TracingMetaData::_InitPreviousTracingData()
 
 			if (entry->size != 0) {
 				dprintf("ktrace recovering: entry %p: invalid wrap entry "
-					"size: %lu\n", entry, entry->size);
+					"size: %" B_PRIu32 "\n", entry, entry->size);
 				errorCount++;
 				entry->size = 0;
 			}
@@ -662,9 +662,10 @@ TracingMetaData::_InitPreviousTracingData()
 		fAfterLastEntry->previous_size = previousEntrySize;
 	}
 
-	dprintf("ktrace recovering: Recovered %lu entries + %lu buffer entries "
-		"from previous session. Expected %lu entries.\n", nonBufferEntryCount,
-		entryCount - nonBufferEntryCount, fEntries);
+	dprintf("ktrace recovering: Recovered %" B_PRIu32 " entries + %" B_PRIu32
+		" buffer entries from previous session. Expected %" B_PRIu32
+		" entries.\n", nonBufferEntryCount, entryCount - nonBufferEntryCount,
+		fEntries);
 	fEntries = nonBufferEntryCount;
 
 	B_INITIALIZE_SPINLOCK(&fLock);
@@ -1547,7 +1548,7 @@ dump_tracing_internal(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 			if (len > 0 && dump[len - 1] == '\n')
 				len--;
 
-			kprintf("%5ld. %.*s\n", index, len, dump);
+			kprintf("%5" B_PRId32 ". %.*s\n", index, len, dump);
 
 			if (printStackTrace) {
 				out.Clear();
@@ -1556,15 +1557,15 @@ dump_tracing_internal(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 					kputs(out.Buffer());
 			}
 		} else if (!filter)
-			kprintf("%5ld. ** uninitialized entry **\n", index);
+			kprintf("%5" B_PRId32 ". ** uninitialized entry **\n", index);
 
 		dumped++;
 	}
 
-	kprintf("printed %ld entries within range %ld to %ld (%ld of %ld total, "
-		"%ld ever)\n", dumped, firstToCheck, lastToCheck,
-		lastToCheck - firstToCheck + 1, sTracingMetaData->Entries(),
-		entriesEver);
+	kprintf("printed %" B_PRId32 " entries within range %" B_PRId32 " to %"
+		B_PRId32 " (%" B_PRId32 " of %" B_PRId32 " total, %" B_PRId32 " ever)\n",
+		dumped, firstToCheck, lastToCheck, lastToCheck - firstToCheck + 1,
+		sTracingMetaData->Entries(), entriesEver);
 
 	// store iteration state
 	_previousCount = count;

@@ -1,5 +1,5 @@
 
-resource app_signature "application/x-vnd.pcl5-compatible";
+resource app_signature "application/x-vnd.ps-compatible";
 
 resource app_flags B_SINGLE_LAUNCH;
 
@@ -11,8 +11,8 @@ resource app_version {
 	variety = B_APPV_DEVELOPMENT,
 	internal = 0,
 
-	short_info = "PCL5 Compatible",
-	long_info = "PCL5 Compatible for BeOS 5\nCopyright 1999 Y.Takagi\nCopyright 2003 Michael Pfeiffer\nAll Rights Reserved."
+	short_info = "PS Compatible",
+	long_info = "PS Compatible for BeOS 5\nCopyright 1999 Y.Takagi\nCopyright 2003 Michael Pfeiffer\nAll Rights Reserved."
 };
 
 resource vector_icon {
