@@ -466,8 +466,8 @@ if [ IsOptionalHaikuImagePackageAdded CVS ] {
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				cvs-1.12.13.1-1-x86_gcc2.hpkg
-				: $(hpkgBaseURL)/curl-7.21.6-1-x86_gcc2.hpkg
+				cvs-1.12.13.1-2-x86_gcc2.hpkg
+				: $(hpkgBaseURL)/cvs-1.12.13.1-2-x86_gcc2.hpkg
 				: common packages ;
 		}
 	}
