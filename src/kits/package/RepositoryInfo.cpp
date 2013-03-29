@@ -17,6 +17,7 @@
 #include <File.h>
 #include <Message.h>
 
+#include <AutoDeleter.h>
 #include <package/PackageInfo.h>
 
 
@@ -182,6 +183,8 @@ BRepositoryInfo::SetTo(const BEntry& entry)
 	void* settingsHandle = parse_driver_settings_string(configString.String());
 	if (settingsHandle == NULL)
 		return B_BAD_DATA;
+	CObjectDeleter<void, status_t> settingsHandleDeleter(settingsHandle,
+		&unload_driver_settings);
 
 	const char* name = get_driver_parameter(settingsHandle, "name", NULL, NULL);
 	const char* url = get_driver_parameter(settingsHandle, "url", NULL, NULL);
@@ -193,8 +196,6 @@ BRepositoryInfo::SetTo(const BEntry& entry)
 		= get_driver_parameter(settingsHandle, "priority", NULL, NULL);
 	const char* architectureString
 		= get_driver_parameter(settingsHandle, "architecture", NULL, NULL);
-
-	unload_driver_settings(settingsHandle);
 
 	if (name == NULL || *name == '\0' || url == NULL || *url == '\0'
 		|| vendor == NULL || *vendor == '\0'
