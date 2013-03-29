@@ -155,7 +155,7 @@ command_create(int argc, const char* const* argv)
 
 	// The remaining arguments are the repository info file plus one or more
 	// package files, i.e. at least two more arguments.
-	if (optind + 2 >= argc)
+	if (optind + 2 > argc)
 		print_usage_and_exit(true);
 
 	const char* repositoryInfoFileName = argv[optind++];
