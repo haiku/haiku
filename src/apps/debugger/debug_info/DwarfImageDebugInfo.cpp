@@ -1166,7 +1166,7 @@ DwarfImageDebugInfo::_CreateReturnValues(ReturnValueInfoList* returnValueInfos,
 				BReference<FunctionID> idReference(
 					targetFunction->GetFunctionID(), true);
 				result = factory.CreateReturnValue(idReference, returnType,
-					location, variable);
+					location, subroutineState, variable);
 				if (result != B_OK)
 					return result;
 

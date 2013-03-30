@@ -14,6 +14,7 @@
 
 
 class CompilationUnit;
+class CpuState;
 class DIEFormalParameter;
 class DIESubprogram;
 class DIEType;
@@ -60,6 +61,7 @@ public:
 			status_t			CreateReturnValue(FunctionID* functionID,
 									DIEType* returnType,
 									ValueLocation* location,
+									CpuState* state,
 									Variable*& _variable);
 									// returns reference
 

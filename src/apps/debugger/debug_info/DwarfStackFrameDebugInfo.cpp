@@ -11,6 +11,7 @@
 
 #include "Architecture.h"
 #include "CompilationUnit.h"
+#include "CpuState.h"
 #include "DebugInfoEntries.h"
 #include "Dwarf.h"
 #include "DwarfFile.h"
@@ -279,7 +280,8 @@ DwarfStackFrameDebugInfo::CreateLocalVariable(FunctionID* functionID,
 
 status_t
 DwarfStackFrameDebugInfo::CreateReturnValue(FunctionID* functionID,
-	DIEType* returnType, ValueLocation* location, Variable*& _variable)
+	DIEType* returnType, ValueLocation* location, CpuState* state,
+	Variable*& _variable)
 {
 	if (returnType == NULL)
 		return B_BAD_VALUE;
@@ -300,7 +302,7 @@ DwarfStackFrameDebugInfo::CreateReturnValue(FunctionID* functionID,
 	name.SetToFormat("%s returned", functionID->FunctionName().String());
 
 	Variable* variable = new(std::nothrow) Variable(id, name,
-		type, location);
+		type, location, state);
 	if (variable == NULL)
 		return B_NO_MEMORY;
 
