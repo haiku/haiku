@@ -351,9 +351,10 @@ NetServer::MessageReceived(BMessage* message)
 
 		case kMsgAddPersistentNetwork:
 		{
-			status_t result = _ConvertNetworkToSettings(*message);
+			BMessage network = *message;
+			status_t result = _ConvertNetworkToSettings(network);
 			if (result == B_OK)
-				result = fSettings.AddNetwork(*message);
+				result = fSettings.AddNetwork(network);
 
 			BMessage reply(B_REPLY);
 			reply.AddInt32("status", result);
