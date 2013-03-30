@@ -589,7 +589,8 @@ ThreadHandler::_HandleBreakpointHitStep(CpuState* cpuState)
 				}
 			}
 
-			if (fPreviousFrameAddress != 0) {
+			if (fPreviousFrameAddress != 0 && fSteppedOverFunctionAddress
+					!= cpuState->InstructionPointer()) {
 				TRACE_CONTROL("STEP_OVER: called function address %#" B_PRIx64
 					", previous frame address: %#" B_PRIx64 ", frame address: %#"
 					B_PRIx64 ", adding return info\n", fSteppedOverFunctionAddress,
