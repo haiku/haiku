@@ -91,6 +91,9 @@ private:
 			bool				_HandleBreakpointHitStep(CpuState* cpuState);
 			bool				_HandleSingleStepStep(CpuState* cpuState);
 
+			bool				_HasExitedFrame(target_addr_t framePointer)
+									const;
+
 private:
 			Thread*				fThread;
 			Worker*				fWorker;
@@ -99,6 +102,7 @@ private:
 			uint32				fStepMode;
 			Statement*			fStepStatement;
 			target_addr_t		fBreakpointAddress;
+			target_addr_t		fSteppedOverFunctionAddress;
 			target_addr_t		fPreviousInstructionPointer;
 			target_addr_t		fPreviousFrameAddress;
 			bool				fSingleStepping;

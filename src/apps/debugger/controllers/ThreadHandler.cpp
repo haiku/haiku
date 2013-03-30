@@ -52,6 +52,7 @@ ThreadHandler::ThreadHandler(Thread* thread, Worker* worker,
 	fStepMode(STEP_NONE),
 	fStepStatement(NULL),
 	fBreakpointAddress(0),
+	fSteppedOverFunctionAddress(0),
 	fPreviousInstructionPointer(0),
 	fPreviousFrameAddress(0),
 	fSingleStepping(false)
@@ -487,17 +488,8 @@ ThreadHandler::_DoStepOver(CpuState* cpuState)
 	if (_InstallTemporaryBreakpoint(info.Address() + info.Size()) != B_OK)
 		return false;
 
-	ReturnValueInfo* returnInfo = new(std::nothrow) ReturnValueInfo(
-		info.TargetAddress(), cpuState);
-	if (returnInfo == NULL)
-		return false;
+	fSteppedOverFunctionAddress = info.TargetAddress();
 
-	BReference<ReturnValueInfo> returnInfoReference(returnInfo, true);
-
-	if (fThread->AddReturnValueInfo(returnInfo) != B_OK)
-		return false;
-
-	returnInfoReference.Detach();
 	_RunThread(cpuState->InstructionPointer());
 	return true;
 }
@@ -597,6 +589,25 @@ ThreadHandler::_HandleBreakpointHitStep(CpuState* cpuState)
 				}
 			}
 
+			if (fPreviousFrameAddress != 0) {
+				TRACE_CONTROL("STEP_OVER: called function address %#" B_PRIx64
+					", previous frame address: %#" B_PRIx64 ", frame address: %#"
+					B_PRIx64 ", adding return info\n", fSteppedOverFunctionAddress,
+					fPreviousFrameAddress, stackTrace->FrameAt(0)->FrameAddress());
+				ReturnValueInfo* returnInfo = new(std::nothrow) ReturnValueInfo(
+					fSteppedOverFunctionAddress, cpuState);
+				if (returnInfo == NULL)
+					return false;
+
+				BReference<ReturnValueInfo> returnInfoReference(returnInfo, true);
+
+				if (fThread->AddReturnValueInfo(returnInfo) != B_OK)
+					return false;
+
+				returnInfoReference.Detach();
+				fSteppedOverFunctionAddress = 0;
+			}
+
 			// If we're still in the statement, we continue single-stepping,
 			// otherwise we're done.
 			if (fStepStatement->ContainsAddress(
@@ -618,6 +629,23 @@ ThreadHandler::_HandleBreakpointHitStep(CpuState* cpuState)
 			// That's the return address, so we're done in theory,
 			// unless we're a recursive function. Check if we've actually
 			// exited the previous stack frame or not
+			if (!_HasExitedFrame(cpuState->StackFramePointer())) {
+				status_t error = _InstallTemporaryBreakpoint(
+					cpuState->InstructionPointer());
+				if (error != B_OK)
+					_StepFallback();
+				else
+					_RunThread(cpuState->InstructionPointer());
+				return true;
+			}
+
+			if (fPreviousFrameAddress == 0)
+				return false;
+
+			TRACE_CONTROL("ThreadHandler::_HandleBreakpointHitStep() - "
+				"frame pointer 0x%#" B_PRIx64 ", previous: 0x%#" B_PRIx64
+				" - step out adding return value\n", cpuState
+					->StackFramePointer(), fPreviousFrameAddress);
 			ReturnValueInfo* info = new(std::nothrow) ReturnValueInfo(
 				cpuState->InstructionPointer(), cpuState);
 			if (info == NULL)
@@ -627,21 +655,6 @@ ThreadHandler::_HandleBreakpointHitStep(CpuState* cpuState)
 				return false;
 
 			infoReference.Detach();
-			target_addr_t framePointer = cpuState->StackFramePointer();
-			bool hasExitedFrame = fDebuggerInterface->GetArchitecture()
-				->StackGrowthDirection() == STACK_GROWTH_DIRECTION_POSITIVE
-					? framePointer < fPreviousFrameAddress
-					: framePointer > fPreviousFrameAddress;
-
-			if (!hasExitedFrame) {
-				status_t error = _InstallTemporaryBreakpoint(
-					cpuState->InstructionPointer());
-				if (error != B_OK)
-					_StepFallback();
-				else
-					_RunThread(cpuState->InstructionPointer());
-				return true;
-			}
 			fPreviousFrameAddress = 0;
 		}
 
@@ -709,19 +722,24 @@ ThreadHandler::_HandleSingleStepStep(CpuState* cpuState)
 					}
 				}
 
-				if (stackTrace != NULL && stackTrace->FrameAt(0)
-						->FrameAddress() != fPreviousFrameAddress) {
-					ReturnValueInfo* info = new(std::nothrow) ReturnValueInfo(
-						cpuState->InstructionPointer(), cpuState);
-					if (info == NULL)
-						return false;
-					BReference<ReturnValueInfo> infoReference(info, true);
-					if (fThread->AddReturnValueInfo(info) != B_OK)
-						return false;
 
-					infoReference.Detach();
+				if (stackTrace != NULL) {
+					if (_HasExitedFrame(stackTrace->FrameAt(0)
+						->FrameAddress())) {
+						TRACE_CONTROL("ThreadHandler::_HandleSingleStepStep() "
+							" - adding return value for STEP_OVER\n");
+						ReturnValueInfo* info = new(std::nothrow)
+							ReturnValueInfo(cpuState->InstructionPointer(),
+								cpuState);
+						if (info == NULL)
+							return false;
+						BReference<ReturnValueInfo> infoReference(info, true);
+						if (fThread->AddReturnValueInfo(info) != B_OK)
+							return false;
+
+						infoReference.Detach();
+					}
 				}
-
 				return false;
 			}
 			return _DoStepOver(cpuState);
@@ -732,4 +750,14 @@ ThreadHandler::_HandleSingleStepStep(CpuState* cpuState)
 		default:
 			return false;
 	}
+}
+
+
+bool
+ThreadHandler::_HasExitedFrame(target_addr_t framePointer) const
+{
+	return fDebuggerInterface->GetArchitecture()->StackGrowthDirection()
+			== STACK_GROWTH_DIRECTION_POSITIVE
+				? framePointer < fPreviousFrameAddress
+				: framePointer > fPreviousFrameAddress;
 }
