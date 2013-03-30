@@ -1,16 +1,19 @@
-1	russian	x-vnd.Be-TSKB	1042823442
+1	russian	x-vnd.Be-TSKB	2335730970
 Power off	DeskbarMenu		Выключить компьютер
+Sort applications by name	PreferencesWindow		Сортировать приложения по имени
 Suspend	DeskbarMenu		Приостановить
 Hide clock	TimeView		Скрыть часы
 Applications	PreferencesWindow		Приложения
 Time preferences…	TimeView		Настроить часы…
 About Haiku	DeskbarMenu		О системе Haiku
+Edit in Tracker…	PreferencesWindow		Изменить меню…
 Recent documents:	PreferencesWindow		Недавние документы:
 Recent applications	DeskbarMenu		Недавние приложения
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Приложения
 Find…	DeskbarMenu		Найти…
 Show clock	Tray		Показать часы
 Window	PreferencesWindow		Окно
+Defaults	PreferencesWindow		По умолчанию
 Menu	PreferencesWindow		Меню
 Recent documents	DeskbarMenu		Недавние документы
 Auto-hide	PreferencesWindow		Скрывать автоматически
@@ -28,6 +31,7 @@ Restart Tracker	DeskbarMenu		Перезапустить Tracker
 Close all	WindowMenu		Закрыть все
 Deskbar preferences	PreferencesWindow		Настройки Deskbar
 Mount	DeskbarMenu		Подключить
+Revert	PreferencesWindow		Вернуть
 Small	PreferencesWindow		Маленькие
 Recent applications:	PreferencesWindow		Недавние приложения:
 Shutdown…	DeskbarMenu		Завершение работы…

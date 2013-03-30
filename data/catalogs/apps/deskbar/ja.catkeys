@@ -1,15 +1,19 @@
-1	japanese	x-vnd.Be-TSKB	1398106986
+1	japanese	x-vnd.Be-TSKB	2335730970
 Power off	DeskbarMenu		電源を切る
+Sort applications by name	PreferencesWindow		アプリケーションを名前順に並び替える
 Suspend	DeskbarMenu		サスペンド
 Hide clock	TimeView		時計を隠す
+Applications	PreferencesWindow		アプリケーション
 Time preferences…	TimeView		日付と時刻の設定…
 About Haiku	DeskbarMenu		Haiku について
+Edit in Tracker…	PreferencesWindow		Tracker 中で編集…
 Recent documents:	PreferencesWindow		最近使ったドキュメント
 Recent applications	DeskbarMenu		最近使ったアプリケーション
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		アプリケーション
 Find…	DeskbarMenu		検索…
 Show clock	Tray		時計を表示
 Window	PreferencesWindow		ウィンドウ
+Defaults	PreferencesWindow		デフォルト値
 Menu	PreferencesWindow		メニュー
 Recent documents	DeskbarMenu		最近使ったドキュメント
 Auto-hide	PreferencesWindow		自動的に隠す
@@ -27,6 +31,7 @@ Restart Tracker	DeskbarMenu		Tracker を再起動
 Close all	WindowMenu		すべて閉じる
 Deskbar preferences	PreferencesWindow		Deskbar の設定
 Mount	DeskbarMenu		マウント
+Revert	PreferencesWindow		取り消し
 Small	PreferencesWindow		小
 Recent applications:	PreferencesWindow		最近使ったアプリケーション
 Shutdown…	DeskbarMenu		シャットダウン…

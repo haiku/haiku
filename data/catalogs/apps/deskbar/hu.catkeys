@@ -1,16 +1,19 @@
-1	hungarian	x-vnd.Be-TSKB	1042823442
+1	hungarian	x-vnd.Be-TSKB	2335730970
 Power off	DeskbarMenu		Kikapcsolás
+Sort applications by name	PreferencesWindow		Rendezés a program neve szerint
 Suspend	DeskbarMenu		Felfüggesztés
 Hide clock	TimeView		Óra elrejtése
 Applications	PreferencesWindow		Programok
 Time preferences…	TimeView		Idő beállítása…
 About Haiku	DeskbarMenu		Haiku névjegye
+Edit in Tracker…	PreferencesWindow		Szerkesztés a Nyomkövetőben…
 Recent documents:	PreferencesWindow		Legutóbb használt fájlok:
 Recent applications	DeskbarMenu		Legutóbbi programok
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programok
 Find…	DeskbarMenu		Keresés…
 Show clock	Tray		Óra megjelenítése
 Window	PreferencesWindow		Ablak
+Defaults	PreferencesWindow		Eredeti
 Menu	PreferencesWindow		Menü
 Recent documents	DeskbarMenu		Legutóbb használt fájlok
 Auto-hide	PreferencesWindow		Automatikus elrejtés
@@ -28,6 +31,7 @@ Restart Tracker	DeskbarMenu		Nyomkövető újraindítása
 Close all	WindowMenu		Összes bezárása
 Deskbar preferences	PreferencesWindow		Asztalsáv-beállítások
 Mount	DeskbarMenu		Csatolás
+Revert	PreferencesWindow		Visszaállítás
 Small	PreferencesWindow		Kicsi
 Recent applications:	PreferencesWindow		Legutóbbi programok:
 Shutdown…	DeskbarMenu		Leállítás…
