@@ -533,7 +533,7 @@ NetServer::_ConfigureInterface(BMessage& message)
 	}
 
 	BNetworkDevice device(name);
-	if (device.IsWireless()) {
+	if (device.IsWireless() && !device.HasLink()) {
 		const char* networkName;
 		if (message.FindString("network", &networkName) == B_OK) {
 			// join configured network
