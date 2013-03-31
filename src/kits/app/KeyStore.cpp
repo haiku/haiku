@@ -9,6 +9,7 @@
 #include <KeyStoreDefs.h>
 
 #include <Messenger.h>
+#include <Roster.h>
 
 
 using namespace BPrivate;
@@ -416,8 +417,17 @@ BKeyStore::_SendKeyMessage(BMessage& message, BMessage* reply) const
 		reply = &localReply;
 
 	BMessenger messenger(kKeyStoreServerSignature);
-	if (!messenger.IsValid())
-		return B_ERROR;
+	if (!messenger.IsValid()) {
+		// Try to start the keystore server.
+		status_t result = be_roster->Launch(kKeyStoreServerSignature);
+		if (result != B_OK && result != B_ALREADY_RUNNING)
+			return B_ERROR;
+
+		// Then re-target the messenger and check again.
+		messenger.SetTo(kKeyStoreServerSignature);
+		if (!messenger.IsValid())
+			return B_ERROR;
+	}
 
 	if (messenger.SendMessage(&message, reply) != B_OK)
 		return B_ERROR;
