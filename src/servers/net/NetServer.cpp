@@ -1160,8 +1160,48 @@ NetServer::_JoinNetwork(const BMessage& message, const char* name)
 status_t
 NetServer::_LeaveNetwork(const BMessage& message)
 {
-	// TODO: not yet implemented
-	return B_NOT_SUPPORTED;
+	const char* deviceName;
+	if (message.FindString("device", &deviceName) != B_OK)
+		return B_BAD_VALUE;
+
+	int32 reason;
+	if (message.FindInt32("reason", &reason) != B_OK)
+		reason = IEEE80211_REASON_AUTH_LEAVE;
+
+	// We always try to send the leave request to the wpa_supplicant.
+
+	BMessage leave(kMsgWPALeaveNetwork);
+	status_t status = leave.AddString("device", deviceName);
+	if (status == B_OK)
+		status = leave.AddInt32("reason", reason);
+	if (status != B_OK)
+		return status;
+
+	BMessenger wpaSupplicant(kWPASupplicantSignature);
+	status = wpaSupplicant.SendMessage(&leave);
+	if (status == B_OK)
+		return B_OK;
+
+	// The wpa_supplicant doesn't seem to be running, check if this was an open
+	// network we connected ourselves.
+	BNetworkDevice device(deviceName);
+	wireless_network network;
+
+	uint32 cookie = 0;
+	if (device.GetNextAssociatedNetwork(cookie, network) != B_OK
+		|| network.authentication_mode != B_NETWORK_AUTHENTICATION_NONE) {
+		// We didn't join ourselves, we can't do much.
+		return status;
+	}
+
+	// We joined ourselves, so we can just disassociate again.
+	ieee80211req_mlme mlmeRequest;
+	memset(&mlmeRequest, 0, sizeof(mlmeRequest));
+	mlmeRequest.im_op = IEEE80211_MLME_DISASSOC;
+	mlmeRequest.im_reason = reason;
+
+	return set_80211(deviceName, IEEE80211_IOC_MLME, &mlmeRequest,
+		sizeof(mlmeRequest));
 }
 
 
