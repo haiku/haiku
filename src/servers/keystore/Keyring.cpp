@@ -42,6 +42,11 @@ Keyring::ReadFromMessage(const BMessage& message)
 	if (result != B_OK)
 		return result;
 
+	if (message.GetBool("noData", false)) {
+		fFlatBuffer.SetSize(0);
+		return B_OK;
+	}
+
 	ssize_t size;
 	const void* data;
 	result = message.FindData("data", B_RAW_TYPE, &data, &size);
@@ -69,8 +74,12 @@ Keyring::WriteToMessage(BMessage& message)
 	if (result != B_OK)
 		return result;
 
-	result = message.AddData("data", B_RAW_TYPE, fFlatBuffer.Buffer(),
-		fFlatBuffer.BufferLength());
+	if (fFlatBuffer.BufferLength() == 0)
+		result = message.AddBool("noData", true);
+	else {
+		result = message.AddData("data", B_RAW_TYPE, fFlatBuffer.Buffer(),
+			fFlatBuffer.BufferLength());
+	}
 	if (result != B_OK)
 		return result;
 
