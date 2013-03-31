@@ -1129,14 +1129,21 @@ NetServer::_JoinNetwork(const BMessage& message, const char* name)
 
 	// Join via wpa_supplicant
 
-	status_t status = be_roster->Launch(kWPASupplicantSignature);
-	if (status != B_OK && status != B_ALREADY_RUNNING)
-		return status;
+	BMessenger wpaSupplicant(kWPASupplicantSignature);
+	if (!wpaSupplicant.IsValid()) {
+		status_t status = be_roster->Launch(kWPASupplicantSignature);
+		if (status != B_OK && status != B_ALREADY_RUNNING)
+			return status;
+
+		wpaSupplicant.SetTo(kWPASupplicantSignature);
+		if (!wpaSupplicant.IsValid())
+			return B_ERROR;
+	}
 
 	// TODO: listen to notifications from the supplicant!
 
 	BMessage join(kMsgWPAJoinNetwork);
-	status = join.AddString("device", deviceName);
+	status_t status = join.AddString("device", deviceName);
 	if (status == B_OK)
 		status = join.AddString("name", network.name);
 	if (status == B_OK)
@@ -1148,7 +1155,6 @@ NetServer::_JoinNetwork(const BMessage& message, const char* name)
 	if (status != B_OK)
 		return status;
 
-	BMessenger wpaSupplicant(kWPASupplicantSignature);
 	status = wpaSupplicant.SendMessage(&join);
 	if (status != B_OK)
 		return status;
@@ -1170,17 +1176,19 @@ NetServer::_LeaveNetwork(const BMessage& message)
 
 	// We always try to send the leave request to the wpa_supplicant.
 
-	BMessage leave(kMsgWPALeaveNetwork);
-	status_t status = leave.AddString("device", deviceName);
-	if (status == B_OK)
-		status = leave.AddInt32("reason", reason);
-	if (status != B_OK)
-		return status;
-
 	BMessenger wpaSupplicant(kWPASupplicantSignature);
-	status = wpaSupplicant.SendMessage(&leave);
-	if (status == B_OK)
-		return B_OK;
+	if (wpaSupplicant.IsValid()) {
+		BMessage leave(kMsgWPALeaveNetwork);
+		status_t status = leave.AddString("device", deviceName);
+		if (status == B_OK)
+			status = leave.AddInt32("reason", reason);
+		if (status != B_OK)
+			return status;
+
+		status = wpaSupplicant.SendMessage(&leave);
+		if (status == B_OK)
+			return B_OK;
+	}
 
 	// The wpa_supplicant doesn't seem to be running, check if this was an open
 	// network we connected ourselves.
@@ -1191,7 +1199,7 @@ NetServer::_LeaveNetwork(const BMessage& message)
 	if (device.GetNextAssociatedNetwork(cookie, network) != B_OK
 		|| network.authentication_mode != B_NETWORK_AUTHENTICATION_NONE) {
 		// We didn't join ourselves, we can't do much.
-		return status;
+		return B_ERROR;
 	}
 
 	// We joined ourselves, so we can just disassociate again.
