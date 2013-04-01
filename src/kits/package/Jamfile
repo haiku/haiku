@@ -71,6 +71,10 @@ SharedLibrary libpackage.so
 	ValidateChecksumJob.cpp
 
 	$(HPKG_SOURCES)
+
+	# hpkg, but only libpackage
+	StandardErrorOutput.cpp
+
 	:
 	libshared.a be z $(TARGET_LIBSTDC++)
 ;

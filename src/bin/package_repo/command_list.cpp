@@ -14,11 +14,11 @@
 #include <package/hpkg/PackageInfoAttributeValue.h>
 #include <package/hpkg/RepositoryContentHandler.h>
 #include <package/hpkg/RepositoryReader.h>
+#include <package/hpkg/StandardErrorOutput.h>
 #include <package/PackageInfo.h>
 #include <package/RepositoryInfo.h>
 
-#include "package.h"
-#include "StandardErrorOutput.h"
+#include "package_repo.h"
 
 
 using namespace BPackageKit::BHPKG;
@@ -287,7 +287,7 @@ command_list(int argc, const char* const* argv)
 	const char* repositoryFileName = argv[optind++];
 
 	// open repository
-	StandardErrorOutput errorOutput;
+	BStandardErrorOutput errorOutput;
 	BRepositoryReader repositoryReader(&errorOutput);
 	status_t error = repositoryReader.Init(repositoryFileName);
 	if (error != B_OK)

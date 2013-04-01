@@ -22,7 +22,6 @@
 #include "package.h"
 #include "PackageWriterListener.h"
 #include "PackageWritingUtils.h"
-#include "StandardErrorOutput.h"
 
 
 using BPackageKit::BHPKG::BPackageWriterListener;

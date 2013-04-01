@@ -30,10 +30,10 @@
 #include <package/hpkg/PackageEntry.h>
 #include <package/hpkg/PackageEntryAttribute.h>
 #include <package/hpkg/PackageReader.h>
+#include <package/hpkg/StandardErrorOutput.h>
 #include <package/BlockBufferCacheNoLock.h>
 
 #include "package.h"
-#include "StandardErrorOutput.h"
 
 
 using namespace BPackageKit::BHPKG;
@@ -688,7 +688,7 @@ command_extract(int argc, const char* const* argv)
 	const char* packageFileName = argv[optind++];
 
 	// open package
-	StandardErrorOutput errorOutput;
+	BStandardErrorOutput errorOutput;
 	BPackageReader packageReader(&errorOutput);
 	status_t error = packageReader.Init(packageFileName);
 	if (error != B_OK)

@@ -19,8 +19,7 @@
 #include <package/PackageInfo.h>
 #include <package/RepositoryInfo.h>
 
-#include "package.h"
-#include "StandardErrorOutput.h"
+#include "package_repo.h"
 
 
 using BPackageKit::BHPKG::BRepositoryWriterListener;

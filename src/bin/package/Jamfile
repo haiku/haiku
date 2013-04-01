@@ -11,7 +11,6 @@ BinCommand package :
 	package.cpp
 	PackageWriterListener.cpp
 	PackageWritingUtils.cpp
-	StandardErrorOutput.cpp
 
 	:
 	package be
