@@ -14,6 +14,9 @@
 
 #include <File.h>
 #include <Entry.h>
+#include <package/hpkg/NoErrorOutput.h>
+#include <package/hpkg/PackageReader.h>
+#include <package/PackageInfoContentHandler.h>
 
 
 namespace BPackageKit {
@@ -900,6 +903,34 @@ BPackageInfo::ReadFromConfigString(const BString& packageInfoString,
 
 	Parser parser(listener);
 	return parser.Parse(packageInfoString, this);
+}
+
+
+status_t
+BPackageInfo::ReadFromPackageFile(const char* path)
+{
+	BHPKG::BNoErrorOutput errorOutput;
+	BHPKG::BPackageReader packageReader(&errorOutput);
+	status_t error = packageReader.Init(path);
+	if (error != B_OK)
+		return error;
+	
+	BPackageInfoContentHandler handler(*this);
+	return packageReader.ParseContent(&handler);
+}
+
+
+status_t
+BPackageInfo::ReadFromPackageFile(int fd)
+{
+	BHPKG::BNoErrorOutput errorOutput;
+	BHPKG::BPackageReader packageReader(&errorOutput);
+	status_t error = packageReader.Init(fd, false);
+	if (error != B_OK)
+		return error;
+	
+	BPackageInfoContentHandler handler(*this);
+	return packageReader.ParseContent(&handler);
 }
 
 

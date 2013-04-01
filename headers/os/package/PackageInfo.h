@@ -28,9 +28,8 @@ namespace BPackageKit {
 /*
  * Keeps a list of package info elements (e.g. name, version, vendor, ...) which
  * will be converted to package attributes when creating a package. Usually,
- * these elements have been parsed from a ".PackageInfo"-file.
- * Alternatively, the package reader populates a BPackageInfo object by
- * collecting package attributes from an existing package.
+ * these elements have been parsed from a ".PackageInfo" file.
+ * Alternatively, they can be read from an existing package file.
  */
 class BPackageInfo {
 public:
@@ -52,6 +51,8 @@ public:
 			status_t			ReadFromConfigString(
 									const BString& packageInfoString,
 									ParseErrorListener* listener = NULL);
+			status_t			ReadFromPackageFile(const char* path);
+			status_t			ReadFromPackageFile(int fd);
 
 			status_t			InitCheck() const;
 
