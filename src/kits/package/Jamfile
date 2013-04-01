@@ -74,3 +74,5 @@ SharedLibrary libpackage.so
 	:
 	libshared.a be z $(TARGET_LIBSTDC++)
 ;
+
+HaikuSubInclude solver ;
