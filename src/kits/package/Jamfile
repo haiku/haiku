@@ -73,6 +73,7 @@ SharedLibrary libpackage.so
 	$(HPKG_SOURCES)
 
 	# hpkg, but only libpackage
+	NoErrorOutput.cpp
 	StandardErrorOutput.cpp
 
 	:
