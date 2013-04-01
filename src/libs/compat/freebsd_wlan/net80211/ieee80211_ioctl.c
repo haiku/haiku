@@ -1549,8 +1549,25 @@ ieee80211_ioctl_setmlme(struct ieee80211vap *vap, struct ieee80211req *ireq)
 		return error;
 	if  (vap->iv_opmode == IEEE80211_M_STA &&
 	    mlme.im_op == IEEE80211_MLME_ASSOC)
+#ifndef __HAIKU__
 		return setmlme_assoc_sta(vap, mlme.im_macaddr,
 		    vap->iv_des_ssid[0].len, vap->iv_des_ssid[0].ssid);
+#else
+		/*	The wpa_supplicant (rightfully) supplies the SSID with this request.
+			However, with the code above it gets ignored and the desired SSID,
+			as set by IEEE80211_IOC_SSID is used instead. This still works if
+			the wpa_supplicant is the only client in use and IEEE80211_IOC_SSID
+			is never used, as then the mlme.im_macaddr is used as the only
+			identifying element. If we used IEEE80211_IOC_SSID before though,
+			for example because we joined an open network from the net_server
+			directly, there will always be a mismatch between the desired SSID
+			and the one the wpa_supplicant tries to associate with using this
+			MLME request. No association is then possible. As there is no
+			obvious reason why the request supplied SSID shouldn't be used, we
+			simply do so. */
+		return setmlme_assoc_sta(vap, mlme.im_macaddr,
+		    mlme.im_ssid_len, mlme.im_ssid);
+#endif
 	else if (mlme.im_op == IEEE80211_MLME_ASSOC)
 		return setmlme_assoc_adhoc(vap, mlme.im_macaddr,
 		    mlme.im_ssid_len, mlme.im_ssid);
