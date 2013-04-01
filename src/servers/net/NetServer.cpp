@@ -80,7 +80,7 @@ private:
 			status_t			_ConfigureDevice(const char* path);
 			void				_ConfigureDevices(const char* path,
 									BMessage* suggestedInterface = NULL);
-			void				_ConfigureInterfaces(
+			void				_ConfigureInterfacesFromSettings(
 									BMessage* _missingDevice = NULL);
 			void				_ConfigureIPv6LinkLocal(const char* name);
 
@@ -268,7 +268,7 @@ NetServer::MessageReceived(BMessage* message)
 
 		case kMsgInterfaceSettingsUpdated:
 		{
-			_ConfigureInterfaces();
+			_ConfigureInterfacesFromSettings();
 			break;
 		}
 
@@ -787,7 +787,7 @@ NetServer::_ConfigureDevices(const char* startPath,
 
 
 void
-NetServer::_ConfigureInterfaces(BMessage* _missingDevice)
+NetServer::_ConfigureInterfacesFromSettings(BMessage* _missingDevice)
 {
 	BMessage interface;
 	uint32 cookie = 0;
@@ -837,7 +837,7 @@ NetServer::_BringUpInterfaces()
 	// First, we look into the settings, and try to bring everything up from there
 
 	BMessage missingDevice;
-	_ConfigureInterfaces(&missingDevice);
+	_ConfigureInterfacesFromSettings(&missingDevice);
 
 	// check configuration
 
