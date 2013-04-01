@@ -1113,24 +1113,26 @@ NetServer::_JoinNetwork(const BMessage& message, const char* name)
 		}
 	}
 
-	if (!askForConfig
-		&& network.authentication_mode == B_NETWORK_AUTHENTICATION_NONE) {
-		// we join the network ourselves
-		status_t status = set_80211(deviceName, IEEE80211_IOC_SSID,
-			network.name, strlen(network.name));
-		if (status != B_OK) {
-			fprintf(stderr, "%s: joining SSID failed: %s\n", name,
-				strerror(status));
-			return status;
-		}
-
-		return B_OK;
-	}
-
-	// Join via wpa_supplicant
+	// We always try to join via the wpa_supplicant. Even if we could join
+	// ourselves, we need to make sure that the wpa_supplicant knows about
+	// our intention, as otherwise it would interfere with it.
 
 	BMessenger wpaSupplicant(kWPASupplicantSignature);
 	if (!wpaSupplicant.IsValid()) {
+		// The wpa_supplicant isn't running yet, we may join ourselves.
+		if (!askForConfig
+			&& network.authentication_mode == B_NETWORK_AUTHENTICATION_NONE) {
+			// We can join this network ourselves.
+			status_t status = set_80211(deviceName, IEEE80211_IOC_SSID,
+				network.name, strlen(network.name));
+			if (status != B_OK) {
+				fprintf(stderr, "%s: joining SSID failed: %s\n", name,
+					strerror(status));
+				return status;
+			}
+		}
+
+		// We need the supplicant, try to launch it.
 		status_t status = be_roster->Launch(kWPASupplicantSignature);
 		if (status != B_OK && status != B_ALREADY_RUNNING)
 			return status;
