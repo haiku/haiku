@@ -214,3 +214,37 @@ if $(HAIKU_BUILD_FEATURE_TAGLIB) {
 	}
 }
 
+
+# libsolv
+
+if $(TARGET_ARCH) != x86 {
+	Echo "Libsolv not available for $(TARGET_ARCH)." ;
+} else if $(HAIKU_GCC_VERSION[1]) = 2 {
+	HAIKU_LIBSOLV_PACKAGE
+		= libsolv-0.3.0_haiku_2013_04_01-1-x86_gcc2.hpkg ;
+} else {
+	Echo "Libsolv not available for gcc4." ;
+}
+
+if $(HAIKU_LIBSOLV_PACKAGE) {
+	# download package
+	HAIKU_LIBSOLV_PACKAGE_FILE = [ DownloadFile $(HAIKU_LIBSOLV_PACKAGE)
+			: $(hpkgBaseURL)/$(HAIKU_LIBSOLV_PACKAGE) ] ;
+	HAIKU_LIBSOLV_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_LIBSOLV_PACKAGE:B) ] ;
+
+	# extract headers and libraries
+	HAIKU_LIBSOLV_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_LIBSOLV_DIR)
+		: include/ : $(HAIKU_LIBSOLV_PACKAGE_FILE) : extracted-libsolv
+	] ;
+
+	HAIKU_LIBSOLV_LIBS = [ ExtractArchive $(HAIKU_LIBSOLV_DIR)
+		:
+		lib/libsolv.so
+		lib/libsolvext.so
+		: $(HAIKU_LIBSOLV_PACKAGE_FILE)
+		: extracted-libsolv
+	] ;
+
+	HAIKU_LIBSOLV_HEADERS = [ FDirName $(HAIKU_LIBSOLV_DIR) include ] ;
+}
