@@ -130,6 +130,10 @@ AutoconfigLooper::_ReadyToRun()
 	if (interface.HasLink()) {
 		_ConfigureIPv4();
 		//_ConfigureIPv6();	// TODO: router advertisement and dhcpv6
+
+		// Also make sure we don't spuriously try to configure again from
+		// a link changed notification that might race us.
+		fLastMediaStatus |= IFM_ACTIVE;
 	}
 }
 
