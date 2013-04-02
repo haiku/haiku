@@ -1,5 +1,13 @@
 SubDir HAIKU_TOP src tools package ;
 
+# TODO: Hack to make things build on Haiku. The right solution is to build
+# libbe_build and friends on Haiku as well and use the exact same build
+# environment as on other systems.
+if $(HOST_PLATFORM) = haiku_host {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build os ] : true ;
+}
+
 UsePrivateBuildHeaders shared kernel ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin package ] ;
@@ -15,7 +23,6 @@ BuildPlatformMain <build>package :
 	package.cpp
 	PackageWriterListener.cpp
 	PackageWritingUtils.cpp
-	StandardErrorOutput.cpp
 
 	:
 	libpackage_build.so $(HOST_LIBBE) $(HOST_LIBSUPC++)
