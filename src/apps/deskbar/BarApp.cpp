@@ -719,6 +719,12 @@ TBarApp::Unsubscribe(const BMessenger &subscriber)
 void
 TBarApp::AddTeam(team_id team, uint32 flags, const char* sig, entry_ref* ref)
 {
+	if ((flags & B_BACKGROUND_APP) != 0
+		|| strcasecmp(sig, kDeskbarSignature) == 0) {
+		// it's a background app or Deskbar itself, don't add it
+		return;
+	}
+
 	BAutolock autolock(sSubscriberLock);
 	if (!autolock.IsLocked())
 		return;
@@ -761,15 +767,9 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char* sig, entry_ref* ref)
 	}
 
 	BarTeamInfo* barInfo = new BarTeamInfo(new BList(), flags, strdup(sig),
-		new BBitmap(IconRect(), kIconColorSpace), strdup(name.String()));
-
-	if ((barInfo->flags & B_BACKGROUND_APP) == 0
-		&& strcasecmp(barInfo->sig, kDeskbarSignature) != 0) {
-		FetchAppIcon(barInfo->sig, barInfo->icon);
-	}
-
+		NULL, strdup(name.String()));
+	FetchAppIcon(barInfo);
 	barInfo->teams->AddItem((void*)(addr_t)team);
-
 	sBarTeamInfoList.AddItem(barInfo);
 
 	if (fSettings.expandNewTeams)
@@ -839,9 +839,7 @@ TBarApp::ResizeTeamIcons()
 		BarTeamInfo* barInfo = (BarTeamInfo*)sBarTeamInfoList.ItemAt(i);
 		if ((barInfo->flags & B_BACKGROUND_APP) == 0
 			&& strcasecmp(barInfo->sig, kDeskbarSignature) != 0) {
-			delete barInfo->icon;
-			barInfo->icon = new BBitmap(IconRect(), kIconColorSpace);
-			FetchAppIcon(barInfo->sig, barInfo->icon);
+			FetchAppIcon(barInfo);
 		}
 	}
 }
@@ -886,26 +884,40 @@ TBarApp::QuitPreferencesWindow()
 
 
 void
-TBarApp::FetchAppIcon(const char* signature, BBitmap* icon)
+TBarApp::FetchAppIcon(BarTeamInfo* barInfo)
 {
-	app_info appInfo;
-	icon_size size = icon->Bounds().IntegerHeight() >= 31
-		? B_LARGE_ICON : B_MINI_ICON;
+	int32 width = IconSize();
+	int32 index = (width - kMinimumIconSize) / kIconSizeInterval;
 
-	if (be_roster->GetAppInfo(signature, &appInfo) == B_OK) {
+	// first look in the icon cache
+	barInfo->icon = barInfo->iconCache[index];
+	if (barInfo->icon != NULL)
+		return;
+
+	// icon wasn't in cache, get it from be_roster and cache it
+	app_info appInfo;
+	icon_size size = width >= 31 ? B_LARGE_ICON : B_MINI_ICON;
+	BBitmap* icon = new BBitmap(IconRect(), kIconColorSpace);
+	if (be_roster->GetAppInfo(barInfo->sig, &appInfo) == B_OK) {
 		// fetch the app icon
 		BFile file(&appInfo.ref, B_READ_ONLY);
 		BAppFileInfo appMime(&file);
-		if (appMime.GetIcon(icon, size) == B_OK)
+		if (appMime.GetIcon(icon, size) == B_OK) {
+			delete barInfo->iconCache[index];
+			barInfo->iconCache[index] = barInfo->icon = icon;
 			return;
+		}
 	}
 
 	// couldn't find the app icon
-	// fetch the generic 3 boxes icon
+	// fetch the generic 3 boxes icon and cache it
 	BMimeType defaultAppMime;
 	defaultAppMime.SetTo(B_APP_MIME_TYPE);
-	if (defaultAppMime.GetIcon(icon, size) == B_OK)
+	if (defaultAppMime.GetIcon(icon, size) == B_OK) {
+		delete barInfo->iconCache[index];
+		barInfo->iconCache[index] = barInfo->icon = icon;
 		return;
+	}
 
 	// couldn't find generic 3 boxes icon
 	// fill with transparent
@@ -923,6 +935,9 @@ TBarApp::FetchAppIcon(const char* signature, BBitmap* icon)
 		for (int32 i = 0; i < icon->BitsLength(); i++)
 			iconBits[i] = B_TRANSPARENT_MAGIC_CMAP8;
 	}
+
+	delete barInfo->iconCache[index];
+	barInfo->iconCache[index] = NULL;
 }
 
 
@@ -945,6 +960,8 @@ BarTeamInfo::BarTeamInfo(BList* teams, uint32 flags, char* sig, BBitmap* icon,
 		icon(icon),
 		name(name)
 {
+	for (int32 i = 0; i < kIconCacheCount; i++)
+		iconCache[i] = NULL;
 }
 
 
@@ -955,6 +972,8 @@ BarTeamInfo::BarTeamInfo(const BarTeamInfo &info)
 		icon(new BBitmap(*info.icon)),
 		name(strdup(info.name))
 {
+	for (int32 i = 0; i < kIconCacheCount; i++)
+		iconCache[i] = NULL;
 }
 
 
@@ -962,6 +981,7 @@ BarTeamInfo::~BarTeamInfo()
 {
 	delete teams;
 	free(sig);
-	delete icon;
 	free(name);
+	for (int32 i = 0; i < kIconCacheCount; i++)
+		delete iconCache[i];
 }

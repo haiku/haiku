@@ -53,11 +53,11 @@ compat_open(const char *name, uint32 flags, void **cookie)
 	if (!HAIKU_DRIVER_REQUIRES(FBSD_WLAN)) {
 		ifp->if_flags &= ~IFF_UP;
 		ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);
-	}
 
-	memset(&ifr, 0, sizeof(ifr));
-	ifr.ifr_media = IFM_MAKEWORD(IFM_ETHER, IFM_AUTO, 0, 0);
-	ifp->if_ioctl(ifp, SIOCSIFMEDIA, (caddr_t)&ifr);
+		memset(&ifr, 0, sizeof(ifr));
+		ifr.ifr_media = IFM_MAKEWORD(IFM_ETHER, IFM_AUTO, 0, 0);
+		ifp->if_ioctl(ifp, SIOCSIFMEDIA, (caddr_t)&ifr);
+	}
 
 	ifp->if_flags |= IFF_UP;
 	ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);

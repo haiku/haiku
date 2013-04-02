@@ -4,9 +4,11 @@
  */
 
 
+#include "TitlePlaceholderMapper.h"
+
 #include <Catalog.h>
 
-#include "TitlePlaceholderMapper.h"
+#include "TermConst.h"
 
 
 // #pragma mark - TitlePlaceholderMapper
@@ -36,8 +38,8 @@ TitlePlaceholderMapper::MapPlaceholder(char placeholder, int64 number,
 			if (numberGiven && number > 0) {
 				int32 index = directory.Length();
 				while (number > 0 && index > 0) {
-					 index = directory.FindLast('/', index - 1);
-					 number--;
+					index = directory.FindLast('/', index - 1);
+					number--;
 				}
 
 				if (number == 0 && index >= 0 && index + 1 < directory.Length())
@@ -47,6 +49,13 @@ TitlePlaceholderMapper::MapPlaceholder(char placeholder, int64 number,
 			_string = directory;
 			return true;
 		}
+
+		case 'e':
+			if (fShellInfo.Encoding() != M_UTF8) {
+				_string.Truncate(0);
+				_string << "[" << fShellInfo.EncodingName() << "]";
+			}
+			return true;
 
 		case 'p':
 			// process name -- use "--", if the shell is active and it is the

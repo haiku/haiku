@@ -1,35 +1,30 @@
 /*
- * Copyright 2004-2011 Haiku, Inc. All rights reserved.
+ * Copyright 2004-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Alexander von Gluck, kallisti5@unixzen.com
  *		Philippe Houdoin
  *		Fredrik Modéen
- *		Alexander von Gluck, kallisti5@unixzen.com
+ *		John Scipione, jscipione@gmail.com
  */
 #ifndef INTERFACES_LIST_VIEW_H
 #define INTERFACES_LIST_VIEW_H
 
 
-#include <net/if.h>
-#include <net/if_dl.h>
-#include <net/if_media.h>
-#include <net/if_types.h>
-
-#include <Bitmap.h>
 #include <ListView.h>
 #include <ListItem.h>
-#include <MenuItem.h>
-#include <NetworkDevice.h>
-#include <NetworkInterface.h>
-#include <PopUpMenu.h>
-#include <String.h>
 
 #include "NetworkSettings.h"
 
 
-#define ICON_SIZE 37
-
+class BBitmap;
+class BMenuItem;
+class BNetworkInterface;
+class BPoint;
+class BPopUpMenu;
+class BSeparatorItem;
+class BString;
 
 class InterfaceListItem : public BListItem {
 public:
@@ -71,13 +66,11 @@ private:
 
 class InterfacesListView : public BListView {
 public:
-								InterfacesListView(BRect rect, const char* name,
-									uint32 resizingMode
-									= B_FOLLOW_LEFT | B_FOLLOW_TOP);
-
+								InterfacesListView(const char* name);
 	virtual						~InterfacesListView();
 
 			InterfaceListItem*	FindItem(const char* name);
+			InterfaceListItem*	FindItem(BPoint where);
 			status_t			SaveItems();
 
 protected:
@@ -86,11 +79,16 @@ protected:
 	virtual	void				FrameResized(float width, float height);
 
 	virtual	void				MessageReceived(BMessage* message);
+	virtual	void				MouseDown(BPoint where);
 
 private:
+			// Context menu
+			BPopUpMenu*			fContextMenu;
+
 			status_t			_InitList();
 			status_t			_UpdateList();
 			void				_HandleNetworkMessage(BMessage* message);
 };
 
-#endif /*INTERFACES_LIST_VIEW_H*/
+
+#endif // INTERFACES_LIST_VIEW_H

@@ -1,12 +1,13 @@
 /*
- * Copyright 2004-2011 Haiku, Inc. All rights reserved.
+ * Copyright 2004-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Andre Alves Garzia, andre@andregarzia.com
  *		Axel Dörfler, axeld@pinc-software.de.
- *		Vegard Wærp, vegarwa@online.no
+ *		Andre Alves Garzia, andre@andregarzia.com
  *		Alexander von Gluck, kallisti5@unixzen.com
+ *		John Scipione, jscipione@gmail.com
+ *		Vegard Wærp, vegarwa@online.no
  */
 
 
@@ -18,19 +19,16 @@
 #include <netinet/in.h>
 #include <resolv.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/socket.h>
 #include <sys/sockio.h>
 #include <unistd.h>
 
+#include <AutoDeleter.h>
 #include <driver_settings.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <Path.h>
 #include <String.h>
-
-#include <AutoDeleter.h>
 
 
 NetworkSettings::NetworkSettings(const char* name)
@@ -352,4 +350,15 @@ NetworkSettings::RenegotiateAddresses()
 	}
 
 	return B_OK;
+}
+
+
+const char*
+NetworkSettings::HardwareAddress()
+{
+	BNetworkAddress macAddress;
+	if (fNetworkInterface->GetHardwareAddress(macAddress) == B_OK)
+		return macAddress.ToString();
+
+	return NULL;
 }

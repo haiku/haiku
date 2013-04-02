@@ -1,9 +1,10 @@
 /*
- * Copyright 2004-2011 Haiku, Inc. All rights reserved.
+ * Copyright 2004-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *      Alexander von Gluck, kallisti5@unixzen.com
+ *		John Scipione, jscipione@gmail.com
  */
 #ifndef INTERFACE_WINDOW_H
 #define INTERFACE_WINDOW_H
@@ -13,14 +14,9 @@
 #include "InterfaceAddressView.h"
 #include "InterfaceHardwareView.h"
 
-#include <Button.h>
-#include <Catalog.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
-#include <TabView.h>
-#include <Window.h>
-
 #include <map>
+
+#include <Window.h>
 
 
 enum {
@@ -32,25 +28,30 @@ enum {
 typedef std::map<int, InterfaceAddressView*> IPViewMap;
 
 
+class BButton;
+class BTabView;
+
 class InterfaceWindow : public BWindow {
 public:
-								InterfaceWindow(NetworkSettings* settings);
-	virtual						~InterfaceWindow();
-	virtual	bool				QuitRequested();
-	virtual	void				MessageReceived(BMessage* mesage);
+									InterfaceWindow(NetworkSettings* settings);
+	virtual							~InterfaceWindow();
+
+	virtual	void					MessageReceived(BMessage* mesage);
+	virtual	bool					QuitRequested();
 
 private:
-			status_t			_PopulateTabs();
+			status_t				_PopulateTabs();
 
-			NetworkSettings*	fNetworkSettings;
-			BButton*			fApplyButton;
-			BButton*			fRevertButton;
-			BTabView*			fTabView;
+			NetworkSettings*		fNetworkSettings;
 
-			IPViewMap			fTabIPView;
-			InterfaceHardwareView* fTabHardwareView;
+			BButton*				fRevertButton;
+			BButton*				fApplyButton;
+
+			BTabView*				fTabView;
+
+			IPViewMap				fTabIPView;
+			InterfaceHardwareView*	fTabHardwareView;
 };
 
 
-#endif  /* INTERFACE_WINDOW_H */
-
+#endif  // INTERFACE_WINDOW_H

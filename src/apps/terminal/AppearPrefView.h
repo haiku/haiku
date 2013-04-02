@@ -54,10 +54,8 @@ public:
 									float* _height);
 
 private:
-			void				_EnableCustomColors(bool enable);
-
 			void				_ChangeColorScheme(color_scheme* scheme);
-			void				_SetCurrentColorScheme(BMenuField* field);
+			void				_SetCurrentColorScheme();
 
 	static	BMenu*				_MakeFontMenu(uint32 command,
 									const char* defaultFamily,

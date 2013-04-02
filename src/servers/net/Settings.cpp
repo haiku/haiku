@@ -10,6 +10,7 @@
 #include "Settings.h"
 
 #include <Directory.h>
+#include <File.h>
 #include <FindDirectory.h>
 #include <fs_interface.h>
 #include <Path.h>
@@ -410,13 +411,18 @@ Settings::_ConvertToDriverSettings(const char* name,
 
 	BString settings;
 	status = _ConvertToDriverSettings(settingsTemplate, settings, message);
-	if (status == B_OK) {
-		settings.RemoveFirst("\n");
-		// TODO: actually write the settings.String() out into the file
-		printf("settings:\n%s\n", settings.String());
-	}
+	if (status != B_OK)
+		return status;
 
-	return status;
+	settings.RemoveFirst("\n");
+	BFile settingsFile(path.Path(), B_WRITE_ONLY | B_ERASE_FILE
+		| B_CREATE_FILE);
+
+	ssize_t written = settingsFile.Write(settings.String(), settings.Length());
+	if (written < 0)
+		return written;
+
+	return written == settings.Length() ? B_OK : B_ERROR;
 }
 
 

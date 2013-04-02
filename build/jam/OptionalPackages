@@ -2349,13 +2349,13 @@ if [ IsOptionalHaikuImagePackageAdded wpa_supplicant ] {
 		Echo "No optional package wpa_supplicant available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
-			wpa_supplicant-0.7.3-x86-gcc4-2012-04-03.zip
-			: $(baseURL)/wpa_supplicant-0.7.3-x86-gcc4-2012-04-03.zip
+			wpa_supplicant-2.0-x86-gcc4-2013-03-31.zip
+			: $(baseURL)/wpa_supplicant-2.0-x86-gcc4-2013-03-31.zip
 			: : : false ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			wpa_supplicant-0.7.3-x86-gcc2-2012-04-03.zip
-			: $(baseURL)/wpa_supplicant-0.7.3-x86-gcc2-2012-04-03.zip
+			wpa_supplicant-2.0-x86-gcc2-2013-03-31.zip
+			: $(baseURL)/wpa_supplicant-2.0-x86-gcc2-2013-03-31.zip
 			: : : false ;
 	}
 }

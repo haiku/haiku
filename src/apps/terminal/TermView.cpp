@@ -30,8 +30,6 @@
 #include <Application.h>
 #include <Beep.h>
 #include <Catalog.h>
-#include <CharacterSet.h>
-#include <CharacterSetRoster.h>
 #include <Clipboard.h>
 #include <Debug.h>
 #include <Directory.h>
@@ -66,8 +64,6 @@
 #include "TerminalCharClassifier.h"
 #include "VTkeymap.h"
 
-
-using namespace BPrivate ; // BCharacterSet stuff
 
 // defined in VTKeyTbl.c
 extern int function_keycode_table[];
@@ -364,10 +360,7 @@ TermView::_InitObject(const ShellParameters& shellParameters)
 
 	// set the shell parameters' encoding
 	ShellParameters modifiedShellParameters(shellParameters);
-
-	const BCharacterSet* charset
-		= BCharacterSetRoster::GetCharacterSetByConversionID(fEncoding);
-	modifiedShellParameters.SetEncoding(charset ? charset->GetName() : "UTF-8");
+	modifiedShellParameters.SetEncoding(fEncoding);
 
 	error = fShell->Open(fRows, fColumns, modifiedShellParameters);
 
@@ -699,6 +692,9 @@ void
 TermView::SetEncoding(int encoding)
 {
 	fEncoding = encoding;
+
+	if (fShell != NULL)
+		fShell->SetEncoding(fEncoding);
 
 	BAutolock _(fTextBuffer);
 	fTextBuffer->SetEncoding(fEncoding);

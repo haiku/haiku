@@ -27,15 +27,15 @@ public:
 			const BString&		CurrentDirectory() const
 									{ return fCurrentDirectory; }
 
-			void				SetEncoding(const BString& encoding);
-			const BString&		Encoding() const
+			void				SetEncoding(int encoding);
+			int					Encoding() const
 									{ return fEncoding; }
 
 private:
 			const char* const*	fArguments;
 			int					fArgumentCount;
 			BString				fCurrentDirectory;
-			BString				fEncoding;
+			int					fEncoding;
 };
 
 

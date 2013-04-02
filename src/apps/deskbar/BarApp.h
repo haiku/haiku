@@ -71,15 +71,17 @@ const uint32 kSuspendSystem = 304;
 const int32 kMinimumIconSize = 16;
 const int32 kMaximumIconSize = 96;
 const int32 kIconSizeInterval = 8;
+const int32 kIconCacheCount = (kMaximumIconSize - kMinimumIconSize)
+								/ kIconSizeInterval + 1;
 
 // update preferences message constant
 const uint32 kUpdatePreferences = 'Pref';
 
 /* --------------------------------------------- */
 
+class BBitmap;
 class BFile;
 class BList;
-class BBitmap;
 class PreferencesWindow;
 class TBarView;
 class TBarWindow;
@@ -96,6 +98,7 @@ public:
 			char*					sig;
 			BBitmap*				icon;
 			char*					name;
+			BBitmap*				iconCache[kIconCacheCount];
 };
 
 class TBarApp : public BApplication {
@@ -133,8 +136,7 @@ private:
 			void					QuitPreferencesWindow();
 
 			void					ResizeTeamIcons();
-			void					FetchAppIcon(const char* signature,
-										BBitmap* icon);
+			void					FetchAppIcon(BarTeamInfo* barInfo);
 
 			BRect					IconRect();
 

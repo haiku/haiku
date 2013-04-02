@@ -10,7 +10,7 @@ Preference NetworkSetup :
 ;
 
 SubInclude HAIKU_TOP src tests kits net preflet InterfacesAddOn ;
-SubInclude HAIKU_TOP src tests kits net preflet ServicesAddOn ;
-SubInclude HAIKU_TOP src tests kits net preflet DummyAddOn ;
-SubInclude HAIKU_TOP src tests kits net preflet MultipleAddOns ;
+#SubInclude HAIKU_TOP src tests kits net preflet ServicesAddOn ;
+#SubInclude HAIKU_TOP src tests kits net preflet DummyAddOn ;
+#SubInclude HAIKU_TOP src tests kits net preflet MultipleAddOns ;
 # SubInclude HAIKU_TOP src tests kits net preflet DialUpAddOn ;

@@ -673,7 +673,7 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 			instructionPointer, functionInstance->Address() - fRelocationDelta,
 			subprogramEntry->Variables(), subprogramEntry->Blocks());
 
-		if (!returnValueInfos->IsEmpty()) {
+		if (returnValueInfos != NULL && !returnValueInfos->IsEmpty()) {
 			_CreateReturnValues(returnValueInfos, image, frame,
 				*stackFrameDebugInfo);
 		}
@@ -1166,7 +1166,7 @@ DwarfImageDebugInfo::_CreateReturnValues(ReturnValueInfoList* returnValueInfos,
 				BReference<FunctionID> idReference(
 					targetFunction->GetFunctionID(), true);
 				result = factory.CreateReturnValue(idReference, returnType,
-					location, variable);
+					location, subroutineState, variable);
 				if (result != B_OK)
 					return result;
 

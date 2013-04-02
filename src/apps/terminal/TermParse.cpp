@@ -383,11 +383,11 @@ TermParse::EscParse()
 	int row;
 	int column;
 
-	/* default encoding system is UTF8 */
+	// default encoding system is UTF8
 	int *groundtable = gUTF8GroundTable;
 	int *parsestate = gUTF8GroundTable;
 
-	/* handle alternative character sets G0 - G4 */
+	// handle alternative character sets G0 - G4
 	const char** graphSets[4] = { NULL, NULL, NULL, NULL };
 	int curGL = 0;
 	int curGR = 0;
@@ -422,12 +422,12 @@ TermParse::EscParse()
 					if (curGraphSet != NULL) {
 						int offset = c - (c < 128 ? 0x20 : 0xA0);
 						if (offset >= 0 && offset < 96
-							&& (curGraphSet[offset] != 0)) {
+							&& curGraphSet[offset] != 0) {
 							fBuffer->InsertChar(curGraphSet[offset]);
 							break;
 						}
 					}
-					fBuffer->InsertChar((char)(c));
+					fBuffer->InsertChar((char)c);
 					break;
 				}
 				case CASE_PRINT_GR:

@@ -60,7 +60,7 @@ public:
 			bool				IsShellBusy() const;
 			bool				GetActiveProcessInfo(
 									ActiveProcessInfo& _info) const;
-			bool			GetShellInfo(ShellInfo& _info) const;
+			bool				GetShellInfo(ShellInfo& _info) const;
 
 			const char*			TerminalName() const;
 

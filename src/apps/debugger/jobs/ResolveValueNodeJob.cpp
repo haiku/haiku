@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2013, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -18,6 +18,8 @@
 #include "ValueLocation.h"
 #include "ValueNode.h"
 #include "ValueNodeContainer.h"
+#include "Variable.h"
+#include "VariableValueNodeChild.h"
 
 
 ResolveValueNodeValueJob::ResolveValueNodeValueJob(
@@ -144,9 +146,16 @@ ResolveValueNodeValueJob::_ResolveNodeValue()
 		}
 	}
 
+	CpuState* variableCpuState = NULL;
+	VariableValueNodeChild* variableChild = dynamic_cast<
+		VariableValueNodeChild*>(nodeChild);
+	if (variableChild != NULL)
+		variableCpuState = variableChild->GetVariable()->GetCpuState();
+
 	// resolve the node location and value
 	ValueLoader valueLoader(fArchitecture, fDebuggerInterface,
-		fTypeInformation, fCpuState);
+		fTypeInformation, variableCpuState != NULL ? variableCpuState
+				: fCpuState);
 	ValueLocation* location;
 	Value* value;
 	status_t error = fValueNode->ResolvedLocationAndValue(&valueLoader,

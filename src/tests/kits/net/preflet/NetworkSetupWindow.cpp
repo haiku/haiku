@@ -11,6 +11,7 @@
 
 #include <Application.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <InterfaceKit.h>
@@ -50,46 +51,43 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 
 	fPanel = new BTabView("showview_box");
 
-	// ---- Bottom globals buttons section
-	BBox *bottomDivider = new BBox(B_EMPTY_STRING);
-	bottomDivider->SetBorder(B_PLAIN_BORDER);
-
 	fApplyButton = new BButton("apply", B_TRANSLATE("Apply"),
 		new BMessage(kMsgApply));
+	SetDefaultButton(fApplyButton);
 
 	fRevertButton = new BButton("revert", B_TRANSLATE("Revert"),
 		new BMessage(kMsgRevert));
 	// fRevertButton->SetEnabled(false);
 
 	// Enable boxes resizing modes
-	fPanel->SetResizingMode(B_FOLLOW_ALL);
+	//fPanel->SetResizingMode(B_FOLLOW_ALL);
 
 	// Build the layout
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
-		.AddGroup(B_HORIZONTAL, 5)
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, B_USE_SMALL_SPACING)
+		.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
 			.Add(profilesMenuField)
 			.AddGlue()
 		.End()
 		.Add(fPanel)
-		.Add(bottomDivider)
-		.AddGroup(B_HORIZONTAL, 5)
-			.AddGlue()
+		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 			.Add(fRevertButton)
+			.AddGlue()
 			.Add(fApplyButton)
 		.End()
-		.SetInsets(10, 10, 10, 10)
+		.SetInsets(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING,
+			B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
 	);
 
 	_BuildShowTabView(kMsgAddonShow);
 
-	bottomDivider->SetExplicitMaxSize(BSize(B_SIZE_UNSET, 1));
 	fPanel->SetExplicitMinSize(BSize(fMinAddonViewRect.Width(),
 		fMinAddonViewRect.Height()));
 
 	fAddonView = NULL;
 
+	CenterOnScreen();
 }
 
 
@@ -243,7 +241,11 @@ NetworkSetupWindow::_BuildShowTabView(int32 msg_what)
 	if (!search_paths)
 		return;
 
-	fMinAddonViewRect.Set(0, 0, 375, 225);	// Minimum size
+	float minimumWidth = be_control_look->DefaultItemSpacing() * 37;
+	float minimumHight = be_control_look->DefaultItemSpacing() * 25;
+
+	fMinAddonViewRect.Set(0, 0, minimumWidth, minimumHight);
+		// Minimum size
 
 	search_paths = strdup(search_paths);
 	char* next_path_token;
@@ -287,37 +289,37 @@ NetworkSetupWindow::_BuildShowTabView(int32 msg_what)
 
 			int tabCount = 0;
 
-			if (status == B_OK) {
-				while ((fNetworkAddOnMap[fAddonCount]
-					= get_nth_addon(addon_id, tabCount)) != NULL) {
-					printf("Adding Tab: %d\n", fAddonCount);
-					BMessage* msg = new BMessage(msg_what);
-
-					BRect r(0, 0, 0, 0);
-					BView* addon_view
-						= fNetworkAddOnMap[fAddonCount]->CreateView(&r);
-					fMinAddonViewRect = fMinAddonViewRect | r;
-
-					msg->AddInt32("image_id", addon_id);
-					msg->AddString("addon_path", addon_path.Path());
-					msg->AddPointer("addon", fNetworkAddOnMap[fAddonCount]);
-					msg->AddPointer("addon_view", addon_view);
-
-					BTab *tab = new BTab;
-					fPanel->AddTab(addon_view, tab);
-					tab->SetLabel(fNetworkAddOnMap[fAddonCount]->Name());
-					fAddonCount++;
-						// Number of tab addons total
-					tabCount++;
-						// Tabs for *this* addon
-				}
+			if (status != B_OK) {
+				//  No "addon instantiate function" symbol found in this addon
+				printf("No symbol \"get_nth_addon\" found in %s addon: not a "
+					"network setup addon!\n", addon_path.Path());
+				unload_add_on(addon_id);
 				continue;
 			}
 
-			//  No "addon instantiate function" symbol found in this addon
-			printf("No symbol \"get_nth_addon\" found in %s addon: not a "
-				"network setup addon!\n", addon_path.Path());
-			unload_add_on(addon_id);
+			while ((fNetworkAddOnMap[fAddonCount]
+					= get_nth_addon(addon_id, tabCount)) != NULL) {
+				printf("Adding Tab: %d\n", fAddonCount);
+				BMessage* msg = new BMessage(msg_what);
+
+				BRect r(0, 0, 0, 0);
+				BView* addon_view
+					= fNetworkAddOnMap[fAddonCount]->CreateView(&r);
+				fMinAddonViewRect = fMinAddonViewRect | r;
+
+				msg->AddInt32("image_id", addon_id);
+				msg->AddString("addon_path", addon_path.Path());
+				msg->AddPointer("addon", fNetworkAddOnMap[fAddonCount]);
+				msg->AddPointer("addon_view", addon_view);
+
+				BTab* tab = new BTab;
+				fPanel->AddTab(addon_view, tab);
+				tab->SetLabel(fNetworkAddOnMap[fAddonCount]->Name());
+				fAddonCount++;
+					// Number of tab addons total
+				tabCount++;
+					// Tabs for *this* addon
+			}
 		}
 	}
 

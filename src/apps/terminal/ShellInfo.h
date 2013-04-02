@@ -7,6 +7,7 @@
 
 
 #include <OS.h>
+#include <String.h>
 
 
 class ShellInfo {
@@ -23,9 +24,17 @@ public:
 			void				SetDefaultShell(bool isDefault)
 									{ fIsDefaultShell = isDefault; }
 
+			int					Encoding() const
+									{ return fEncoding; }
+	const	BString&			EncodingName() const
+									{ return fEncodingName; }
+			void				SetEncoding(int encoding);
+
 private:
 			pid_t				fProcessID;
 			bool				fIsDefaultShell;
+			int					fEncoding;
+			BString				fEncodingName;
 };
 
 
