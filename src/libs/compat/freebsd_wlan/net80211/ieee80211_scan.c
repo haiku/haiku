@@ -411,6 +411,15 @@ start_scan_locked(const struct ieee80211_scanner *scan,
 		    , flags & IEEE80211_SCAN_ONCE ? ", once" : ""
 		);
 
+#ifdef __HAIKU__
+		/* We never want to join if not explicitly looking for an SSID */
+		if (nssid == 0 && (flags & IEEE80211_SCAN_NOJOIN) == 0) {
+			IEEE80211_DPRINTF(vap, IEEE80211_MSG_SCAN,
+				"%s: setting nojoin due to no configured ssid\n", __func__);
+			flags |= IEEE80211_SCAN_NOJOIN;
+		}
+#endif
+
 		scan_update_locked(vap, scan);
 		if (ss->ss_ops != NULL) {
 			if ((flags & IEEE80211_SCAN_NOSSID) == 0)
