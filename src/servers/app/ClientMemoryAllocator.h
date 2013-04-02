@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2013, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,6 +42,8 @@ public:
 			void*				Allocate(size_t size, block** _address,
 									bool& newArea);
 			void				Free(block* cookie);
+
+			void				Detach();
 
 			void				Dump();
 
