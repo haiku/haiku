@@ -30,11 +30,13 @@ private:
 			void				_RemoveClient();
 			void				_ConfigureIPv4();
 			void				_ReadyToRun();
+			void				_NetworkMonitorNotification(BMessage* message);
 
 			BMessenger			fTarget;
 			BString				fDevice;
 			AutoconfigClient*	fCurrentClient;
 			int32				fLastMediaStatus;
+			bool				fJoiningNetwork;
 };
 
 #endif	// AUTOCONFIG_LOOPER_H

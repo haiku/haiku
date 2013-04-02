@@ -88,7 +88,7 @@ private:
 			void				_StartServices();
 			status_t			_HandleDeviceMonitor(BMessage* message);
 
-			status_t			_AutoJoinNetwork(const char* name);
+			status_t			_AutoJoinNetwork(const BMessage& message);
 			status_t			_JoinNetwork(const BMessage& message,
 									const char* name = NULL);
 			status_t			_LeaveNetwork(const BMessage& message);
@@ -321,6 +321,12 @@ NetServer::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case kMsgAutoJoinNetwork:
+		{
+			_AutoJoinNetwork(*message);
+			break;
+		}
+
 		case kMsgCountPersistentNetworks:
 		{
 			BMessage reply(B_REPLY);
@@ -532,26 +538,6 @@ NetServer::_ConfigureInterface(BMessage& message)
 		}
 	}
 
-	BNetworkDevice device(name);
-	if (device.IsWireless() && !device.HasLink()) {
-		const char* networkName;
-		if (message.FindString("network", &networkName) == B_OK) {
-			// join configured network
-			status_t status = _JoinNetwork(message, networkName);
-			if (status != B_OK) {
-				fprintf(stderr, "%s: joining network \"%s\" failed: %s\n",
-					interface.Name(), networkName, strerror(status));
-			}
-		} else {
-			// auto select network to join
-			status_t status = _AutoJoinNetwork(name);
-			if (status != B_OK) {
-				fprintf(stderr, "%s: auto joining network failed: %s\n",
-					interface.Name(), strerror(status));
-			}
-		}
-	}
-
 	// Set up IPv6 Link Local address (based on MAC, if not loopback)
 	_ConfigureIPv6LinkLocal(name);
 
@@ -667,6 +653,19 @@ NetServer::_ConfigureInterface(BMessage& message)
 			if (status != B_OK) {
 				fprintf(stderr, "%s: Setting metric failed: %s\n", Name(),
 					strerror(status));
+			}
+		}
+	}
+
+	const char* networkName;
+	if (message.FindString("network", &networkName) == B_OK) {
+		// We want to join a specific network.
+		BNetworkDevice device(name);
+		if (device.IsWireless() && !device.HasLink()) {
+			status_t status = _JoinNetwork(message, networkName);
+			if (status != B_OK) {
+				fprintf(stderr, "%s: joining network \"%s\" failed: %s\n",
+					interface.Name(), networkName, strerror(status));
 			}
 		}
 	}
@@ -987,12 +986,13 @@ NetServer::_HandleDeviceMonitor(BMessage* message)
 
 
 status_t
-NetServer::_AutoJoinNetwork(const char* name)
+NetServer::_AutoJoinNetwork(const BMessage& message)
 {
-	BNetworkDevice device(name);
+	const char* name = NULL;
+	if (message.FindString("device", &name) != B_OK)
+		return B_BAD_VALUE;
 
-	BMessage message;
-	message.AddString("device", name);
+	BNetworkDevice device(name);
 
 	// Choose among configured networks
 
