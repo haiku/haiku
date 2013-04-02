@@ -236,15 +236,15 @@ rule ExtractArchive directory : entries : archiveFile : grist
 		switch $(archiveFile:S)
 		{
 			case .zip :
-				ExtractZipArchive1 $(targets) : $(directory) $(archiveFile) ;
+				ExtractZipArchive1 $(directory) : $(archiveFile) ;
 
 			case .tgz :
-				ExtractTarArchive1 $(targets) : $(directory) $(archiveFile) ;
+				ExtractTarArchive1 $(directory) : $(archiveFile) ;
 
 			case .hpkg :
-				Depends $(targets) : <build>package ;
-				ExtractHPKGArchive1 $(targets)
-					: <build>package $(directory) $(archiveFile) ;
+				Depends $(directory) : <build>package ;
+				ExtractHPKGArchive1 $(directory)
+					: <build>package $(archiveFile) ;
 
 			case * :
 				Exit "ExtractArchive: Unhandled archive extension:"
@@ -253,38 +253,31 @@ rule ExtractArchive directory : entries : archiveFile : grist
 		INITIALIZED on $(directory) = 1 ;
 	}
 
-	# Use a dummy rule so that it looks to jam like the targets are actually
-	# built from the directory target.
-	ExtractArchiveDummy $(targets) : $(directory) ;
-
 	return $(targets) ;
 }
 
 
 actions ExtractZipArchive1
 {
-	mkdir -p $(2[1])
-	unzip -q -u -o -d $(2[1]) $(2[2])
+	mkdir -p $(1)
+	unzip -q -u -o -d $(1) $(2)
 }
+
 
 actions ExtractTarArchive1
 {
-	mkdir -p $(2[1])
-	tar -C $(2[1]) -xf $(2[2])
+	mkdir -p $(1)
+	tar -C $(1) -xf $(2)
 }
 
 
 actions ExtractHPKGArchive1
 {
-	mkdir -p "$(2[2])"
+	mkdir -p "$(1)"
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-	$(2[1]) extract -C "$(2[2])" "$(2[3])"
+	$(2[1]) extract -C "$(1)" "$(2[2])"
 }
 
-
-actions ExtractArchiveDummy
-{
-}
 
 rule ObjectReference
 {
