@@ -125,8 +125,12 @@ void
 AutoconfigLooper::_ReadyToRun()
 {
 	start_watching_network(B_WATCH_NETWORK_LINK_CHANGES, this);
-	_ConfigureIPv4();
-	//_ConfigureIPv6();	// TODO: router advertisement and dhcpv6
+
+	BNetworkInterface interface(fDevice.String());
+	if (interface.HasLink()) {
+		_ConfigureIPv4();
+		//_ConfigureIPv6();	// TODO: router advertisement and dhcpv6
+	}
 }
 
 
