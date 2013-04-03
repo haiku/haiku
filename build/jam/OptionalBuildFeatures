@@ -215,7 +215,7 @@ if $(HAIKU_BUILD_FEATURE_TAGLIB) {
 }
 
 
-# libsolv
+# LibSolv
 
 if $(TARGET_ARCH) != x86 {
 	Echo "Libsolv not available for $(TARGET_ARCH)." ;

@@ -44,6 +44,7 @@
 #	LibIconv				- text encoding conversion library
 #	LibLayout				- GCC2 package needed by some BeOS apps to compile
 #	Libmng					- mng support library
+#	LibSolv					- package dependency solver library
 #	LibXML2					- the XML support library
 #	LibXSLT					- xslt library and utility
 #	Links					- the web browser
@@ -914,6 +915,18 @@ if [ IsOptionalHaikuImagePackageAdded Libmng ] {
 		InstallOptionalHaikuImagePackage
 			libmng-1.0.10-r1a3-x86-gcc2-2011-05-18.zip
 			: $(baseURL)/lib/libmng-1.0.10-r1a3-x86-gcc2-2011-05-18.zip ;
+	}
+}
+
+
+# LibSolv
+if [ IsOptionalHaikuImagePackageAdded LibSolv ] {
+	if ! $(HAIKU_LIBSOLV_PACKAGE) {
+		Echo "No optional package LibSolv available for $(TARGET_ARCH)" ;
+	} else {
+		InstallOptionalHaikuImagePackage $(HAIKU_LIBSOLV_PACKAGE)
+			: $(hpkgBaseURL)/$(HAIKU_LIBSOLV_PACKAGE)
+			: system packages ;
 	}
 }
 
