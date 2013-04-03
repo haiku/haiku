@@ -50,7 +50,9 @@ public:
 			void				SetInstalled(bool isInstalled);
 
 			BString				Name() const;
+
 			uint8				Priority() const;
+			void				SetPriority(uint8 priority);
 
 			bool				IsEmpty() const;
 			int32				CountPackages() const;

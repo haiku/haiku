@@ -209,6 +209,13 @@ BSolverRepository::Priority() const
 }
 
 
+void
+BSolverRepository::SetPriority(uint8 priority)
+{
+	fPriority = priority;
+}
+
+
 bool
 BSolverRepository::IsEmpty() const
 {
