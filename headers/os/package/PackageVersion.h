@@ -23,6 +23,8 @@ public:
 								BPackageVersion();
 								BPackageVersion(
 									const BPackageVersionData& data);
+								BPackageVersion(const BString& versionString,
+									bool releaseIsOptional = true);
 								BPackageVersion(const BString& major,
 									const BString& minor, const BString& micro,
 									const BString& preRelease, uint8 release);
@@ -41,6 +43,8 @@ public:
 			void				SetTo(const BString& major,
 									const BString& minor, const BString& micro,
 									const BString& preRelease, uint8 release);
+			status_t			SetTo(const BString& versionString,
+									bool releaseIsOptional = true);
 			void				Clear();
 
 			int					Compare(const BPackageVersion& other) const;

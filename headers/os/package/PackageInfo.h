@@ -141,6 +141,12 @@ public:
 	static	status_t			GetArchitectureByName(const BString& name,
 									BPackageArchitecture& _architecture);
 
+	static	status_t			ParseVersionString(const BString& string,
+									bool releaseIsOptional,
+									BPackageVersion& _version,
+									ParseErrorListener* listener = NULL);
+
+public:
 	static	const char*			kElementNames[];
 	static	const char*			kArchitectureNames[];
 

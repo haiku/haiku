@@ -68,6 +68,10 @@ public:
 			status_t			Parse(const BString& packageInfoString,
 									BPackageInfo* packageInfo);
 
+			status_t			ParseVersion(const BString& versionString,
+									bool releaseIsOptional,
+									BPackageVersion& _version);
+
 private:
 			struct Token;
 			struct ListElementParser;
@@ -81,6 +85,9 @@ private:
 			void				_ParseArchitectureValue(
 									BPackageArchitecture* value);
 			void				_ParseVersionValue(BPackageVersion* value,
+									bool releaseIsOptional);
+	static	void				_ParseVersionValue(Token& word,
+									BPackageVersion* value,
 									bool releaseIsOptional);
 			void				_ParseList(ListElementParser& elementParser,
 									bool allowSingleNonListElement);
@@ -194,6 +201,31 @@ BPackageInfo::Parser::Parse(const BString& packageInfoString,
 				} while (newlinePos >= 0);
 			}
 			fListener->OnError(error.message, line, column);
+		}
+		return B_BAD_DATA;
+	} catch (const std::bad_alloc& e) {
+		if (fListener != NULL)
+			fListener->OnError("out of memory", 0, 0);
+		return B_NO_MEMORY;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+BPackageInfo::Parser::ParseVersion(const BString& versionString,
+	bool releaseIsOptional, BPackageVersion& _version)
+{
+	fPos = versionString.String();
+
+	try {
+		Token token(TOKEN_WORD, fPos, versionString.Length());
+		_ParseVersionValue(token, &_version, releaseIsOptional);
+	} catch (const ParseError& error) {
+		if (fListener != NULL) {
+			int32 offset = error.pos - versionString.String();
+			fListener->OnError(error.message, 1, offset);
 		}
 		return B_BAD_DATA;
 	} catch (const std::bad_alloc& e) {
@@ -360,6 +392,14 @@ BPackageInfo::Parser::_ParseVersionValue(BPackageVersion* value,
 	bool releaseIsOptional)
 {
 	Token word = _NextToken();
+	_ParseVersionValue(word, value, releaseIsOptional);
+}
+
+
+/*static*/ void
+BPackageInfo::Parser::_ParseVersionValue(Token& word, BPackageVersion* value,
+	bool releaseIsOptional)
+{
 	if (word.type != TOKEN_WORD)
 		throw ParseError("expected word (a version)", word.pos);
 
@@ -1364,5 +1404,14 @@ BPackageInfo::GetArchitectureByName(const BString& name,
 	}
 	return B_NAME_NOT_FOUND;
 }
+
+
+/*static*/ status_t
+BPackageInfo::ParseVersionString(const BString& string, bool releaseIsOptional,
+	BPackageVersion& _version, ParseErrorListener* listener)
+{
+	return Parser(listener).ParseVersion(string, releaseIsOptional, _version);
+}
+
 
 }	// namespace BPackageKit

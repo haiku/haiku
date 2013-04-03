@@ -8,6 +8,7 @@
 
 #include <NaturalCompare.h>
 
+#include <package/PackageInfo.h>
 #include <package/hpkg/PackageInfoAttributeValue.h>
 
 
@@ -27,6 +28,13 @@ BPackageVersion::BPackageVersion()
 BPackageVersion::BPackageVersion(const BPackageVersionData& data)
 {
 	SetTo(data.major, data.minor, data.micro, data.preRelease, data.release);
+}
+
+
+BPackageVersion::BPackageVersion(const BString& versionString,
+	bool releaseIsOptional)
+{
+	SetTo(versionString, releaseIsOptional);
 }
 
 
@@ -148,6 +156,15 @@ BPackageVersion::SetTo(const BString& major, const BString& minor,
 	fMinor.ToLower();
 	fMicro.ToLower();
 	fPreRelease.ToLower();
+}
+
+
+status_t
+BPackageVersion::SetTo(const BString& versionString, bool releaseIsOptional)
+{
+	Clear();
+	return BPackageInfo::ParseVersionString(versionString, releaseIsOptional,
+		*this);
 }
 
 
