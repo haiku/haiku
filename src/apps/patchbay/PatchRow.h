@@ -1,3 +1,15 @@
+/* PatchRow.h
+ * ----------
+ *
+ * Copyright 2013, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Revisions by Pete Goodeve
+ *
+ * Copyright 1999, Be Incorporated.   All Rights Reserved.
+ * This file may be used under the terms of the Be Sample Code License.
+ */
+
 #ifndef _PatchRow_h
 #define _PatchRow_h
 
@@ -31,8 +43,8 @@ public:
 	void Disconnect(int32 consumerID);
 
 private:
-	int32 m_producerID;
-	MidiEventMeter* m_eventMeter;
+	int32 fProducerID;
+	MidiEventMeter* fEventMeter;
 };
 
 #endif /* _PatchRow_h */

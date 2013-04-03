@@ -1,11 +1,17 @@
-// EndpointInfo.h
-// --------------
-// A simple structure that describes a MIDI object.
-// Currently, it only contains icon data associated with the object.
-//
-// Copyright 1999, Be Incorporated.   All Rights Reserved.
-// This file may be used under the terms of the Be Sample Code License.
-
+/* EndpointInfo.h
+ * --------------
+ * A simple structure that describes a MIDI object.
+ * Currently, it only contains icon data associated with the object.
+ *
+ * Copyright 2013, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Revisions by Pete Goodeve
+ *
+ * Copyright 1999, Be Incorporated.   All Rights Reserved.
+ * This file may be used under the terms of the Be Sample Code License.
+ */
+ 
 #ifndef _EndpointInfo_h
 #define _EndpointInfo_h
 
@@ -28,13 +34,19 @@ public:
 	EndpointInfo& operator=(const EndpointInfo& info);
 	~EndpointInfo();
 	
-	int32 ID() const { return m_id; }
-	const BBitmap* Icon() const { return m_icon; }
+	int32 ID() const
+	{
+		return fId;
+	}
+	const BBitmap* Icon() const
+	{
+		return fIcon;
+	}
 	void UpdateProperties(const BMessage* props);
 	
 private:
-	int32 m_id;
-	BBitmap* m_icon;
+	int32 fId;
+	BBitmap* fIcon;
 };
 
 #endif /* _EndpointInfo_h */

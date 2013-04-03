@@ -1,10 +1,15 @@
-// EndpointInfo.cpp
-// ----------------
-// Implements the EndpointInfo object.
-//
-// Copyright 1999, Be Incorporated.   All Rights Reserved.
-// This file may be used under the terms of the Be Sample Code License.
-
+/* EndpointInfo.cpp
+ * ----------------
+ * Implements the EndpointInfo object.
+ *
+ * Copyright 2013, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Revisions by Pete Goodeve
+ *
+ * Copyright 1999, Be Incorporated.   All Rights Reserved.
+ * This file may be used under the terms of the Be Sample Code License.
+ */
 #include "EndpointInfo.h"
 
 #include <Bitmap.h>
@@ -16,7 +21,7 @@
 
 const char* LARGE_ICON_NAME = "be:large_icon";
 const char* MINI_ICON_NAME = "be:mini_icon";
-const char* VECTOR_ICON_NAME = "icon";   
+const char* VECTOR_ICON_NAME = "icon";
 const uint32 LARGE_ICON_TYPE = 'ICON';
 const uint32 MINI_ICON_TYPE = 'MICN';
 const uint32 VECTOR_ICON_TYPE = 'VICN';
@@ -27,12 +32,18 @@ extern const color_space ICON_COLOR_SPACE = B_CMAP8;
 
 static BBitmap* CreateIcon(const BMessage* msg, icon_size which);
 
+
 EndpointInfo::EndpointInfo()
-	: m_id(-1), m_icon(NULL)
+	:
+	fId(-1),
+	fIcon(NULL)
 {}
 
+
 EndpointInfo::EndpointInfo(int32 id)
-	: m_id(id), m_icon(NULL)
+	:
+	fId(id),
+	fIcon(NULL)
 {
 	BMidiRoster* roster = BMidiRoster::MidiRoster();
 	if (roster) {
@@ -41,68 +52,60 @@ EndpointInfo::EndpointInfo(int32 id)
 			printf("endpoint %ld = %p\n", id, endpoint);
 			BMessage msg;
 			if (endpoint->GetProperties(&msg) == B_OK) {
-				m_icon = CreateIcon(&msg, DISPLAY_ICON_SIZE);
+				fIcon = CreateIcon(&msg, DISPLAY_ICON_SIZE);
 			}
 			endpoint->Release();
 		}
 	}	
 }
 
+
 EndpointInfo::EndpointInfo(const EndpointInfo& info)
-	: m_id(info.m_id)
+	:
+	fId(info.fId)
 {
-	m_icon = (info.m_icon) ? new BBitmap(info.m_icon) : NULL;	
+	fIcon = (info.fIcon) ? new BBitmap(info.fIcon) : NULL;	
 }
 
-EndpointInfo& EndpointInfo::operator=(const EndpointInfo& info)
+
+EndpointInfo&
+EndpointInfo::operator=(const EndpointInfo& info)
 {
 	if (&info != this) {
-		m_id = info.m_id;
-		delete m_icon;
-		m_icon = (info.m_icon) ? new BBitmap(info.m_icon) : NULL;
+		fId = info.fId;
+		delete fIcon;
+		fIcon = (info.fIcon) ? new BBitmap(info.fIcon) : NULL;
 	}
 	return *this;
 }
 
+
 EndpointInfo::~EndpointInfo()
 {
-	delete m_icon;
+	delete fIcon;
 }
 
-void EndpointInfo::UpdateProperties(const BMessage* props)
+
+void
+EndpointInfo::UpdateProperties(const BMessage* props)
 {
-	delete m_icon;
-	m_icon = CreateIcon(props, DISPLAY_ICON_SIZE);
+	delete fIcon;
+	fIcon = CreateIcon(props, DISPLAY_ICON_SIZE);
 }
 
-static BBitmap* CreateIcon(const BMessage* msg, icon_size which)
+
+static BBitmap*
+CreateIcon(const BMessage* msg, icon_size which)
 {
-	float iconSize;
-	uint32 iconType;
-	const char* iconName;
-	
-	if (which == B_LARGE_ICON) {
-		iconSize = LARGE_ICON_SIZE;
-		iconType = LARGE_ICON_TYPE;
-		iconName = LARGE_ICON_NAME;
-	} else if (which == B_MINI_ICON) {
-		iconSize = MINI_ICON_SIZE;
-		iconType = MINI_ICON_TYPE;
-		iconName = MINI_ICON_NAME;
-	} else {
-		return NULL;
-	}
-							
+
 	const void* data;
 	ssize_t size;
 	BBitmap* bitmap = NULL;
 
-#ifdef __HAIKU__
-	iconSize = LARGE_ICON_SIZE;
-	
+	// See if a Haiku Vector Icon available	
 	if (msg->FindData(VECTOR_ICON_NAME, VECTOR_ICON_TYPE, &data, 
 		&size) == B_OK)  {
-		BRect r(0, 0, iconSize-1, iconSize-1);
+		BRect r(0, 0, LARGE_ICON_SIZE - 1, LARGE_ICON_SIZE - 1);
 		bitmap = new BBitmap(r, B_RGBA32);
 		if (BIconUtils::GetVectorIcon((const uint8*)data, size, 
 			bitmap) == B_OK) {
@@ -111,12 +114,29 @@ static BBitmap* CreateIcon(const BMessage* msg, icon_size which)
 		} else 
 			delete bitmap;
 	}
-#endif
 
+	// If not, look for BeOS style icon
+	float bmapSize;
+	uint32 iconType;
+	const char* iconName;
+	
+	if (which == B_LARGE_ICON) {
+		bmapSize = LARGE_ICON_SIZE - 1;
+		iconType = LARGE_ICON_TYPE;
+		iconName = LARGE_ICON_NAME;
+	} else if (which == B_MINI_ICON) {
+		bmapSize = MINI_ICON_SIZE - 1;
+		iconType = MINI_ICON_TYPE;
+		iconName = MINI_ICON_NAME;
+	} else {
+		return NULL;
+	}
+							
 	if (msg->FindData(iconName, iconType, &data, &size) == B_OK)
 	{
-		BRect r(0, 0, iconSize-1, iconSize-1);
-		bitmap = new BBitmap(r, ICON_COLOR_SPACE);
+		;
+		bitmap = new BBitmap(BRect(0, 0, bmapSize, bmapSize),
+			ICON_COLOR_SPACE);
 		ASSERT((bitmap->BitsLength() == size));
 		memcpy(bitmap->Bits(), data, size);
 	}
