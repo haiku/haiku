@@ -14,6 +14,8 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
+#include <map>
+
 #include <Entry.h>
 #include <File.h>
 #include <Path.h>
@@ -32,10 +34,13 @@
 #include "pkgman.h"
 
 
+// TODO: internationalization!
+
+
 using namespace BPackageKit;
 
 
-// TODO: internationalization!
+typedef std::map<BSolverPackage*, BString> PackagePathMap;
 
 
 static const char* kCommandUsage =
@@ -88,17 +93,24 @@ struct RepositoryBuilder {
 		const BString& errorName = BString())
 		:
 		fRepository(repository),
-		fErrorName(errorName.IsEmpty() ? name : errorName)
+		fErrorName(errorName.IsEmpty() ? name : errorName),
+		fPackagePaths(NULL)
 	{
 		status_t error = fRepository.SetTo(name);
 		if (error != B_OK)
 			DIE(error, "failed to init %s repository", fErrorName.String());
 	}
 
-	RepositoryBuilder& AddPackage(const BPackageInfo& info,
-		const char* packageErrorName = NULL)
+	RepositoryBuilder& SetPackagePathMap(PackagePathMap* packagePaths)
 	{
-		status_t error = fRepository.AddPackage(info);
+		fPackagePaths = packagePaths;
+		return *this;
+	}
+
+	RepositoryBuilder& AddPackage(const BPackageInfo& info,
+		const char* packageErrorName = NULL, BSolverPackage** _package = NULL)
+	{
+		status_t error = fRepository.AddPackage(info, _package);
 		if (error != B_OK) {
 			DIE(error, "failed to add %s to %s repository",
 				packageErrorName != NULL
@@ -109,7 +121,8 @@ struct RepositoryBuilder {
 		return *this;
 	}
 
-	RepositoryBuilder& AddPackage(const char* path)
+	RepositoryBuilder& AddPackage(const char* path,
+		BSolverPackage** _package = NULL)
 	{
 		// read a package info from the (HPKG or package info) file
 		BPackageInfo packageInfo;
@@ -130,7 +143,18 @@ struct RepositoryBuilder {
 		if (error != B_OK)
 			DIE(errno, "failed to read package info from \"%s\"", path);
 
-		return AddPackage(packageInfo, path);
+		// add the package
+		BSolverPackage* package;
+		AddPackage(packageInfo, path, &package);
+
+		// enter the package path in the path map, if given
+		if (fPackagePaths != NULL)
+			(*fPackagePaths)[package] = path;
+
+		if (_package != NULL)
+			*_package = package;
+
+		return *this;
 	}
 
 	RepositoryBuilder& AddPackages(BPackageInstallationLocation location,
@@ -193,6 +217,7 @@ struct RepositoryBuilder {
 private:
 	BSolverRepository&	fRepository;
 	BString				fErrorName;
+	PackagePathMap*		fPackagePaths;
 };
 
 
@@ -278,6 +303,7 @@ command_resolve_dependencies(int argc, const char* const* argv)
 		DIE(error, "failed to create solver");
 
 	// add repositories
+	PackagePathMap packagePaths;
 	BObjectList<BSolverRepository> repositories(10, true);
 	int32 repositoryIndex = 0;
 	for (int i = 0; i < repositoryDirectoryCount; i++, repositoryIndex++) {
@@ -298,6 +324,7 @@ command_resolve_dependencies(int argc, const char* const* argv)
 		}
 
 		RepositoryBuilder(*repository, BString("repository") << repositoryIndex)
+			.SetPackagePathMap(&packagePaths)
 			.AddPackagesDirectory(directoryPath)
 			.AddToSolver(solver);
 	}
@@ -345,16 +372,20 @@ command_resolve_dependencies(int argc, const char* const* argv)
 	// print packages
 	for (int32 i = 0; const BSolverResultElement* element = result.ElementAt(i);
 			i++) {
-		BSolverPackage* package = element->Package();
-
-// TODO: Print the path to the package/package info!
 		// skip the specified package
+		BSolverPackage* package = element->Package();
 		if (package == specifiedPackage)
 			continue;
 
-		printf("%s-%s\n",
-			package->Info().Name().String(),
-			package->Info().Version().ToString().String());
+		// resolve and print the path
+		PackagePathMap::const_iterator it = packagePaths.find(package);
+		if (it == packagePaths.end()) {
+			DIE(B_ERROR, "ugh, no package %p (%s-%s) not in package path map",
+				package,  package->Info().Name().String(),
+				package->Info().Version().ToString().String());
+		}
+
+		printf("%s\n", it->second.String());
 	}
 
 	return 0;
