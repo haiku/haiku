@@ -196,6 +196,47 @@ private:
 };
 
 
+static void
+verify_result(const BSolverResult& result, BSolverPackage* specifiedPackage)
+{
+	// create the solver
+	BSolver* solver;
+	status_t error = BSolver::Create(solver);
+	if (error != B_OK)
+		DIE(error, "failed to create solver");
+
+	// Add an installation repository and add all of the result packages save
+	// the specified package.
+	BSolverRepository installation;
+	RepositoryBuilder installationBuilder(installation, "installation");
+
+	for (int32 i = 0; const BSolverResultElement* element = result.ElementAt(i);
+			i++) {
+		BSolverPackage* package = element->Package();
+		if (package != specifiedPackage)
+			installationBuilder.AddPackage(package->Info());
+	}
+	installationBuilder.AddToSolver(solver, true);
+
+	// resolve
+	error = solver->VerifyInstallation();
+	if (error != B_OK)
+		DIE(error, "failed to verify computed package dependencies");
+
+	if (solver->HasProblems()) {
+		fprintf(stderr,
+			"Encountered problems verifying computed package dependencies:\n");
+
+		int32 problemCount = solver->CountProblems();
+		for (int32 i = 0; i < problemCount; i++) {
+			printf("  %" B_PRId32 ": %s\n", i + 1,
+				solver->ProblemAt(i)->ToString().String());
+		}
+		exit(1);
+	}
+}
+
+
 int
 command_resolve_dependencies(int argc, const char* const* argv)
 {
@@ -266,13 +307,14 @@ command_resolve_dependencies(int argc, const char* const* argv)
 	RepositoryBuilder(dummyRepository, "dummy", "specified package")
 		.AddPackage(packagePath)
 		.AddToSolver(solver);
-	BSolverPackage* package = dummyRepository.PackageAt(0);
+	BSolverPackage* specifiedPackage = dummyRepository.PackageAt(0);
 
 	// resolve
 	BSolverPackageSpecifierList packagesToInstall;
 	if (!packagesToInstall.AppendSpecifier(
 			BSolverPackageSpecifier(&dummyRepository,
-				BPackageResolvableExpression(package->Info().Name())))) {
+				BPackageResolvableExpression(
+					specifiedPackage->Info().Name())))) {
 		DIE(B_NO_MEMORY, "failed to add specified package");
 	}
 
@@ -297,14 +339,22 @@ command_resolve_dependencies(int argc, const char* const* argv)
 	if (error != B_OK)
 		DIE(error, "failed to resolve package dependencies");
 
+	// Verify that the resolved packages don't depend on the specified package.
+	verify_result(result, specifiedPackage);
+
 	// print packages
 	for (int32 i = 0; const BSolverResultElement* element = result.ElementAt(i);
 			i++) {
+		BSolverPackage* package = element->Package();
+
 // TODO: Print the path to the package/package info!
+		// skip the specified package
+		if (package == specifiedPackage)
+			continue;
+
 		printf("%s-%s\n",
-			element->Package()->Info().Name().String(),
-			element->Package()->Info().Version().ToString().String());
-// TODO: Filter out the given package!
+			package->Info().Name().String(),
+			package->Info().Version().ToString().String());
 	}
 
 	return 0;
