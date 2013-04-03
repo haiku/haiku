@@ -132,7 +132,19 @@ namespace agg
                 }
             }
         }
-          
+
+        //--------------------------------------------------------------------
+        void fill(const color_type& c)
+        {
+            unsigned y;
+            if(width())
+            {
+                for(y = 0; y < height(); y++)
+                {
+                    m_ren->blend_hline(0, y, width(), c, cover_mask);
+                }
+            }
+        }
 
         //--------------------------------------------------------------------
         void copy_pixel(int x, int y, const color_type& c)
