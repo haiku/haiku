@@ -222,6 +222,23 @@ private:
 
 
 static void
+check_problems(BSolver* solver, const char* errorContext)
+{
+	if (solver->HasProblems()) {
+		fprintf(stderr,
+			"Encountered problems %s:\n", errorContext);
+
+		int32 problemCount = solver->CountProblems();
+		for (int32 i = 0; i < problemCount; i++) {
+			printf("  %" B_PRId32 ": %s\n", i + 1,
+				solver->ProblemAt(i)->ToString().String());
+		}
+		exit(1);
+	}
+}
+
+
+static void
 verify_result(const BSolverResult& result, BSolverPackage* specifiedPackage)
 {
 	// create the solver
@@ -248,17 +265,7 @@ verify_result(const BSolverResult& result, BSolverPackage* specifiedPackage)
 	if (error != B_OK)
 		DIE(error, "failed to verify computed package dependencies");
 
-	if (solver->HasProblems()) {
-		fprintf(stderr,
-			"Encountered problems verifying computed package dependencies:\n");
-
-		int32 problemCount = solver->CountProblems();
-		for (int32 i = 0; i < problemCount; i++) {
-			printf("  %" B_PRId32 ": %s\n", i + 1,
-				solver->ProblemAt(i)->ToString().String());
-		}
-		exit(1);
-	}
+	check_problems(solver, "verifying computed package dependencies");
 }
 
 
@@ -349,17 +356,7 @@ command_resolve_dependencies(int argc, const char* const* argv)
 	if (error != B_OK)
 		DIE(error, "failed to resolve package dependencies");
 
-	if (solver->HasProblems()) {
-		fprintf(stderr,
-			"Encountered problems resolving package dependencies:\n");
-
-		int32 problemCount = solver->CountProblems();
-		for (int32 i = 0; i < problemCount; i++) {
-			printf("  %" B_PRId32 ": %s\n", i + 1,
-				solver->ProblemAt(i)->ToString().String());
-		}
-		exit(1);
-	}
+	check_problems(solver, "resolving package dependencies");
 
 	BSolverResult result;
 	error = solver->GetResult(result);
