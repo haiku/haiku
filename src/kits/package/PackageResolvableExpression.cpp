@@ -95,7 +95,7 @@ BPackageResolvableExpression::ToString() const
 	BString string = fName;
 
 	if (fVersion.InitCheck() == B_OK)
-		string << fOperator << fVersion.ToString();
+		string << kOperatorNames[fOperator] << fVersion.ToString();
 
 	return string;
 }
