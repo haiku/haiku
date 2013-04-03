@@ -33,6 +33,10 @@ static const char* kUsage =
 	"  refresh [<repo-name> ...]\n"
 	"    Refreshes all or just the given repositories.\n"
 	"\n"
+	"  resolve-build-dependencies <package> <prerequisites>\n"
+	"      <build-repository> [ <prerequisite-repository> ... ]\n"
+	"    Resolves all packages needed for building a package.\n"
+	"\n"
 	"Common Options:\n"
 	"  -h, --help   - Print this usage info.\n"
 ;
@@ -55,6 +59,9 @@ main(int argc, const char* const* argv)
 	const char* command = argv[1];
 	if (strncmp(command, "add-r", 5) == 0)
 		return command_add_repo(argc - 1, argv + 1);
+
+	if (strcmp(command, "list-build-dependency-packages") == 0)
+		return command_resolve_build_dependencies(argc - 1, argv + 1);
 
 	if (strncmp(command, "drop-r", 6) == 0)
 		return command_drop_repo(argc - 1, argv + 1);
