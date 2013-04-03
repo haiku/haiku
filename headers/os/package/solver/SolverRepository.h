@@ -6,6 +6,7 @@
 #define _PACKAGE__SOLVER_REPOSITORY_H_
 
 
+#include <ObjectList.h>
 #include <package/PackageDefs.h>
 #include <package/PackageInfoSet.h>
 #include <String.h>
@@ -16,6 +17,7 @@ namespace BPackageKit {
 
 class BPackageInfo;
 class BRepositoryConfig;
+class BSolverPackage;
 
 
 class BSolverRepository {
@@ -45,21 +47,27 @@ public:
 			status_t			InitCheck();
 
 			bool				IsInstalled() const;
+			void				SetInstalled(bool isInstalled);
 
 			BString				Name() const;
 			uint8				Priority() const;
+
+			bool				IsEmpty() const;
+			int32				CountPackages() const;
+			BSolverPackage*		PackageAt(int32 index) const;
 
 			status_t			AddPackage(const BPackageInfo& info);
 			status_t			AddPackages(
 									BPackageInstallationLocation location);
 
-			Iterator			GetIterator() const;
+private:
+			typedef BObjectList<BSolverPackage> PackageList;
 
 private:
 			BString				fName;
 			uint8				fPriority;
 			bool				fIsInstalled;
-			BPackageInfoSet		fPackages;
+			PackageList			fPackages;
 };
 
 

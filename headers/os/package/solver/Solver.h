@@ -13,28 +13,40 @@ namespace BPackageKit {
 
 
 class BSolverPackageSpecifierList;
+class BSolverProblem;
 class BSolverRepository;
+class BSolverResult;
 
 
 class BSolver {
 public:
-								BSolver();
-								~BSolver();
+	virtual						~BSolver();
 
-			status_t			Init();
+	static	status_t			Create(BSolver*& _solver);
 
-			status_t			AddRepository(BSolverRepository* repository);
+	virtual	status_t			Init() = 0;
 
-			status_t			Install(
+	virtual	status_t			AddRepository(
+									BSolverRepository* repository) = 0;
+
+	virtual	status_t			Install(
 									const BSolverPackageSpecifierList&
-										packages);
+										packages) = 0;
 
-private:
-			class Implementation;
+			bool				HasProblems() const
+									{ return CountProblems() > 0; }
+	virtual	int32				CountProblems() const = 0;
+	virtual	BSolverProblem*		ProblemAt(int32 index) const = 0;
 
-private:
-			Implementation*		fImplementation;
+	virtual	status_t			GetResult(BSolverResult& _result) = 0;
+
+protected:
+								BSolver();
 };
+
+
+// function exported by the libsolv based add-on
+extern "C" BSolver* create_solver();
 
 
 }	// namespace BPackageKit

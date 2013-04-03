@@ -101,6 +101,13 @@ BSolverPackageSpecifierList::AppendSpecifier(
 }
 
 
+void
+BSolverPackageSpecifierList::MakeEmpty()
+{
+	fSpecifiers->clear();
+}
+
+
 BSolverPackageSpecifierList&
 BSolverPackageSpecifierList::operator=(const BSolverPackageSpecifierList& other)
 {

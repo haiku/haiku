@@ -1,23 +1,20 @@
 SubDir HAIKU_TOP src kits package solver ;
 
-UsePrivateHeaders shared ;
-
-# TODO: Add properly to BuildFeatures and remove here!
-HAIKU_LIBSOLV_INSTALL_DIR ?= /Transfer/ports/libsolv-install/boot/common ;
-HAIKU_LIBSOLV_HEADERS ?= $(HAIKU_LIBSOLV_INSTALL_DIR)/include ;
-HAIKU_LIBSOLV_LIBS ?= $(HAIKU_LIBSOLV_INSTALL_DIR)/lib/libsolv.so
-	$(HAIKU_LIBSOLV_INSTALL_DIR)/lib/libsolvext.so ;
+# add-on implementing a libsolv based BSolver
 
 SubDirSysHdrs $(HAIKU_LIBSOLV_HEADERS) ;
 SubDirHdrs $(HAIKU_LIBSOLV_HEADERS)/solv ;
 
+UsePrivateHeaders shared ;
 
-SharedLibrary libpackage_solver.so
+
+SharedLibrary libpackage-add-on-libsolv.so
 	:
-	Solver.cpp
-	SolverPackageSpecifier.cpp
-	SolverPackageSpecifierList.cpp
-	SolverRepository.cpp
+	LibsolvSolver.cpp
 	:
 	package $(HAIKU_LIBSOLV_LIBS) be $(TARGET_LIBSTDC++)
 ;
+
+
+Includes [ FGristFiles LibsolvSolver.cpp ]
+	: $(HAIKU_LIBSOLV_HEADERS_DEPENDENCY) ;

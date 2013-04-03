@@ -1,0 +1,619 @@
+/*
+ * Copyright 2013, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold <ingo_weinhold@gmx.de>
+ */
+
+
+#include "LibsolvSolver.h"
+
+#include <errno.h>
+
+#include <new>
+
+#include <solv/poolarch.h>
+#include <solv/repo.h>
+#include <solv/repo_haiku.h>
+#include <solv/selection.h>
+#include <solv/solverdebug.h>
+
+#include <package/PackageResolvableExpression.h>
+#include <package/RepositoryCache.h>
+#include <package/solver/SolverPackage.h>
+#include <package/solver/SolverPackageSpecifier.h>
+#include <package/solver/SolverPackageSpecifierList.h>
+#include <package/solver/SolverProblem.h>
+#include <package/solver/SolverRepository.h>
+#include <package/solver/SolverResult.h>
+
+#include <AutoDeleter.h>
+#include <ObjectList.h>
+
+
+// TODO: libsolv doesn't have any helpful out-of-memory handling. It just just
+// abort()s. Obviously that isn't good behavior for a library.
+
+
+BSolver*
+BPackageKit::create_solver()
+{
+	return new(std::nothrow) LibsolvSolver;
+}
+
+
+struct LibsolvSolver::SolvQueue : Queue {
+	SolvQueue()
+	{
+		queue_init(this);
+	}
+
+	~SolvQueue()
+	{
+		queue_free(this);
+	}
+};
+
+
+struct LibsolvSolver::RepositoryInfo {
+	RepositoryInfo(BSolverRepository* repository)
+		:
+		fRepository(repository),
+		fSolvRepo(NULL)
+	{
+	}
+
+	BSolverRepository* Repository() const
+	{
+		return fRepository;
+	}
+
+	Repo* SolvRepo()
+	{
+		return fSolvRepo;
+	}
+
+	void SetSolvRepo(Repo* repo)
+	{
+		fSolvRepo = repo;
+	}
+
+private:
+	BSolverRepository*	fRepository;
+	Repo*				fSolvRepo;
+};
+
+
+// #pragma mark - LibsolvSolver
+
+
+LibsolvSolver::LibsolvSolver()
+	:
+	fPool(NULL),
+	fSolver(NULL),
+	fRepositoryInfos(10, true),
+	fInstalledRepository(NULL),
+	fProblems(10, true)
+{
+}
+
+
+LibsolvSolver::~LibsolvSolver()
+{
+	_Cleanup();
+}
+
+
+status_t
+LibsolvSolver::Init()
+{
+	_Cleanup();
+
+	fPool = pool_create();
+
+	// Set the system architecture. We use what uname() returns unless we're on
+	// x86 gcc2.
+	{
+		const char* arch;
+		#ifdef __HAIKU_ARCH_X86
+			#if (B_HAIKU_ABI & B_HAIKU_ABI_MAJOR) == B_HAIKU_ABI_GCC_2
+				arch = "x86_gcc2";
+			#else
+				arch = "x86";
+			#endif
+		#else
+			struct utsname info;
+			if (uname(&info) != 0)
+				return errno;
+			arch = info.machine;
+		#endif
+
+		pool_setarchpolicy(fPool, arch);
+	}
+
+	return B_OK;
+}
+
+
+status_t
+LibsolvSolver::AddRepository(BSolverRepository* repository)
+{
+	if (repository == NULL || repository->InitCheck() != B_OK)
+		return B_BAD_VALUE;
+
+	// If the repository represents installed packages, check, if we already
+	// have such a repository.
+	if (repository->IsInstalled() && fInstalledRepository != NULL)
+		return B_BAD_VALUE;
+
+	// add the repository info
+	RepositoryInfo* info = new(std::nothrow) RepositoryInfo(repository);
+	if (info == NULL)
+		return B_NO_MEMORY;
+
+	if (!fRepositoryInfos.AddItem(info)) {
+		delete info;
+		return B_NO_MEMORY;
+	}
+
+	if (repository->IsInstalled())
+		fInstalledRepository = info;
+
+	return B_OK;
+}
+
+
+status_t
+LibsolvSolver::Install(const BSolverPackageSpecifierList& packages)
+{
+	if (packages.IsEmpty())
+		return B_BAD_VALUE;
+
+// TODO: Clean up first?
+
+	// add repositories to pool
+	status_t error = _AddRepositories();
+	if (error != B_OK)
+		return error;
+
+	// prepare pool for solving
+	pool_createwhatprovides(fPool);
+
+	// add the packages to install to the job queue
+	SolvQueue jobs;
+
+	int32 packageCount = packages.CountSpecifiers();
+	for (int32 i = 0; i < packageCount; i++) {
+		const BSolverPackageSpecifier& specifier = *packages.SpecifierAt(i);
+
+		// find matching packages
+		SolvQueue matchingPackages;
+
+		int flags = SELECTION_NAME | SELECTION_PROVIDES | SELECTION_GLOB
+			| SELECTION_CANON | SELECTION_DOTARCH | SELECTION_REL;
+// TODO: All flags needed/useful?
+		/*int matchFlags =*/ selection_make(fPool, &matchingPackages,
+			specifier.Expression().Name(), flags);
+// TODO: Don't just match the name, but also the version, if given!
+		if (matchingPackages.count == 0)
+			return B_NAME_NOT_FOUND;
+
+		// restrict to the matching repository
+		if (BSolverRepository* repository = specifier.Repository()) {
+			RepositoryInfo* repositoryInfo = _GetRepositoryInfo(repository);
+			if (repositoryInfo == NULL)
+				return B_BAD_VALUE;
+
+			SolvQueue repoFilter;
+			queue_push2(&repoFilter,
+				SOLVER_SOLVABLE_REPO/* | SOLVER_SETREPO | SOLVER_SETVENDOR*/,
+				repositoryInfo->SolvRepo()->repoid);
+
+			selection_filter(fPool, &matchingPackages, &repoFilter);
+
+			if (matchingPackages.count == 0)
+				return B_NAME_NOT_FOUND;
+		}
+
+		for (int j = 0; j < matchingPackages.count; j++)
+			queue_push(&jobs, matchingPackages.elements[j]);
+	}
+
+	// add solver mode to job queue elements
+	int solverMode = SOLVER_INSTALL;
+	for (int i = 0; i < jobs.count; i += 2) {
+		jobs.elements[i] |= solverMode;
+//		if (cleandeps)
+//			jobs.elements[i] |= SOLVER_CLEANDEPS;
+//		if (forcebest)
+//			jobs.elements[i] |= SOLVER_FORCEBEST;
+	}
+
+	// create the solver and solve
+	fSolver = solver_create(fPool);
+	solver_set_flag(fSolver, SOLVER_FLAG_SPLITPROVIDES, 1);
+	solver_set_flag(fSolver, SOLVER_FLAG_BEST_OBEY_POLICY, 1);
+
+	// get the problems (if any)
+	fProblems.MakeEmpty();
+
+	int problemCount = solver_solve(fSolver, &jobs);
+	for (Id problemId = 1; problemId <= problemCount; problemId++) {
+		error = _AddProblem(problemId);
+		if (error != B_OK)
+			return error;
+	}
+
+	return B_OK;
+}
+
+
+int32
+LibsolvSolver::CountProblems() const
+{
+	return fProblems.CountItems();
+}
+
+
+BSolverProblem*
+LibsolvSolver::ProblemAt(int32 index) const
+{
+	return fProblems.ItemAt(index);
+}
+
+
+status_t
+LibsolvSolver::GetResult(BSolverResult& _result)
+{
+	if (HasProblems())
+		return B_BAD_VALUE;
+
+	_result.MakeEmpty();
+
+	Transaction* transaction = solver_create_transaction(fSolver);
+	CObjectDeleter<Transaction> transactionDeleter(transaction,
+		&transaction_free);
+
+	if (transaction->steps.count == 0)
+		return B_OK;
+
+	// Get the packages that end up in the installation. The result queue
+	// contains newPackageCount new packages to install first, followed by the
+	// kept packages.
+	SolvQueue installedPackages;
+	int newPackageCount = transaction_installedresult(transaction,
+		&installedPackages);
+
+	transaction_order(transaction, 0);
+
+	for (int i = 0; i < transaction->steps.count; i++) {
+		Id solvableId = transaction->steps.elements[i];
+		Solvable* solvable = pool_id2solvable(fPool, solvableId);
+		switch (transaction_type(transaction, solvableId,
+				SOLVER_TRANSACTION_RPM_ONLY)) {
+			case SOLVER_TRANSACTION_ERASE:
+			{
+				BSolverPackage* package = _GetPackage(solvable);
+				if (package == NULL)
+					return B_ERROR;
+
+				status_t error = _result.AppendElement(
+					BSolverResultElement(BSolverResultElement::B_TYPE_UNINSTALL,
+						package));
+				if (error != B_OK)
+					return error;
+				break;
+			}
+
+			case SOLVER_TRANSACTION_INSTALL:
+			case SOLVER_TRANSACTION_MULTIINSTALL:
+			{
+				// check, if it really is a new package
+// TODO: Is this check really necessary?
+				bool foundPackage = false;
+				for (int j = 0; j < newPackageCount; j++) {
+					if (installedPackages.elements[j] == solvableId) {
+						foundPackage = true;
+						break;
+					}
+				}
+
+				if (!foundPackage)
+					continue;
+
+				BSolverPackage* package = _GetPackage(solvable);
+				if (package == NULL)
+					return B_ERROR;
+
+				if (!_result.AppendElement(
+						BSolverResultElement(
+							BSolverResultElement::B_TYPE_INSTALL, package))) {
+					return B_NO_MEMORY;
+				}
+				break;
+			}
+
+			default:
+				break;
+		}
+	}
+
+	return B_OK;
+}
+
+
+void
+LibsolvSolver::_Cleanup()
+{
+	fProblems.MakeEmpty();
+	fSolvablePackages.clear();
+	fInstalledRepository = NULL;
+	fRepositoryInfos.MakeEmpty();
+
+	if (fSolver != NULL) {
+		solver_free(fSolver);
+		fSolver = NULL;
+	}
+
+	if (fPool != NULL) {
+		pool_free(fPool);
+		fPool = NULL;
+	}
+}
+
+
+status_t
+LibsolvSolver::_AddRepositories()
+{
+	int32 repositoryCount = fRepositoryInfos.CountItems();
+	for (int32 i = 0; i < repositoryCount; i++) {
+		RepositoryInfo* repositoryInfo = fRepositoryInfos.ItemAt(i);
+		BSolverRepository* repository = repositoryInfo->Repository();
+		Repo* repo = repo_create(fPool, repository->Name());
+		repositoryInfo->SetSolvRepo(repo);
+
+		repo->priority = 256 - repository->Priority();
+		repo->appdata = (void*)repositoryInfo;
+
+		int32 packageCount = repository->CountPackages();
+		for (int32 k = 0; k < packageCount; k++) {
+			BSolverPackage* package = repository->PackageAt(k);
+			Id solvableId = repo_add_haiku_package_info(repo, package->Info(),
+				REPO_REUSE_REPODATA | REPO_NO_INTERNALIZE);
+			Solvable* solvable = pool_id2solvable(fPool, solvableId);
+
+			try {
+				fSolvablePackages[solvable] = package;
+			} catch (std::bad_alloc&) {
+				return B_NO_MEMORY;
+			}
+		}
+
+		repo_internalize(repo);
+
+		if (repository->IsInstalled())
+			pool_set_installed(fPool, repo);
+	}
+
+	return B_OK;
+}
+
+
+LibsolvSolver::RepositoryInfo*
+LibsolvSolver::_GetRepositoryInfo(BSolverRepository* repository) const
+{
+	int32 repositoryCount = fRepositoryInfos.CountItems();
+	for (int32 i = 0; i < repositoryCount; i++) {
+		RepositoryInfo* repositoryInfo = fRepositoryInfos.ItemAt(i);
+		if (repository == repositoryInfo->Repository())
+			return repositoryInfo;
+	}
+
+	return NULL;
+}
+
+
+BSolverPackage*
+LibsolvSolver::_GetPackage(Solvable* solvable) const
+{
+	SolvableMap::const_iterator it = fSolvablePackages.find(solvable);
+	return it != fSolvablePackages.end() ? it->second : NULL;
+}
+
+
+BSolverPackage*
+LibsolvSolver::_GetPackage(Id solvableId) const
+{
+	Solvable* solvable = pool_id2solvable(fPool, solvableId);
+	return solvable != NULL ? _GetPackage(solvable) : NULL;
+}
+
+
+status_t
+LibsolvSolver::_AddProblem(Id problemId)
+{
+	enum {
+		NEED_SOURCE		= 0x1,
+		NEED_TARGET		= 0x2,
+		NEED_DEPENDENCY	= 0x4
+	};
+
+	Id ruleId = solver_findproblemrule(fSolver, problemId);
+	Id sourceId;
+	Id targetId;
+	Id dependencyId;
+	BSolverProblem::BType problemType = BSolverProblem::B_UNSPECIFIED;
+	uint32 needed = 0;
+
+	switch (solver_ruleinfo(fSolver, ruleId, &sourceId, &targetId,
+			&dependencyId)) {
+		case SOLVER_RULE_DISTUPGRADE:
+			problemType = BSolverProblem::B_NOT_IN_DISTUPGRADE_REPOSITORY;
+			needed = NEED_SOURCE;
+			break;
+		case SOLVER_RULE_INFARCH:
+			problemType = BSolverProblem::B_INFERIOR_ARCHITECTURE;
+			needed = NEED_SOURCE;
+			break;
+		case SOLVER_RULE_UPDATE:
+			problemType = BSolverProblem::B_INSTALLED_PACKAGE_PROBLEM;
+			needed = NEED_SOURCE;
+			break;
+		case SOLVER_RULE_JOB:
+			problemType = BSolverProblem::B_CONFLICTING_REQUESTS;
+			break;
+		case SOLVER_RULE_JOB_NOTHING_PROVIDES_DEP:
+			problemType = BSolverProblem::B_REQUESTED_RESOLVABLE_NOT_PROVIDED;
+			needed = NEED_DEPENDENCY;
+			break;
+		case SOLVER_RULE_JOB_PROVIDED_BY_SYSTEM:
+			problemType
+				= BSolverProblem::B_REQUESTED_RESOLVABLE_PROVIDED_BY_SYSTEM;
+			needed = NEED_DEPENDENCY;
+			break;
+		case SOLVER_RULE_RPM:
+			problemType = BSolverProblem::B_DEPENDENCY_PROBLEM;
+			break;
+		case SOLVER_RULE_RPM_NOT_INSTALLABLE:
+			problemType = BSolverProblem::B_PACKAGE_NOT_INSTALLABLE;
+			needed = NEED_SOURCE;
+			break;
+		case SOLVER_RULE_RPM_NOTHING_PROVIDES_DEP:
+			problemType = BSolverProblem::B_DEPENDENCY_NOT_PROVIDED;
+			needed = NEED_SOURCE | NEED_DEPENDENCY;
+			break;
+		case SOLVER_RULE_RPM_SAME_NAME:
+			problemType = BSolverProblem::B_PACKAGE_NAME_CLASH;
+			needed = NEED_SOURCE | NEED_TARGET;
+			break;
+		case SOLVER_RULE_RPM_PACKAGE_CONFLICT:
+			problemType = BSolverProblem::B_PACKAGE_CONFLICT;
+			needed = NEED_SOURCE | NEED_TARGET | NEED_DEPENDENCY;
+			break;
+		case SOLVER_RULE_RPM_PACKAGE_OBSOLETES:
+			problemType = BSolverProblem::B_PACKAGE_OBSOLETES_RESOLVABLE;
+			needed = NEED_SOURCE | NEED_TARGET | NEED_DEPENDENCY;
+			break;
+		case SOLVER_RULE_RPM_INSTALLEDPKG_OBSOLETES:
+			problemType
+				= BSolverProblem::B_INSTALLED_PACKAGE_OBSOLETES_RESOLVABLE;
+			needed = NEED_SOURCE | NEED_TARGET | NEED_DEPENDENCY;
+			break;
+		case SOLVER_RULE_RPM_IMPLICIT_OBSOLETES:
+			problemType
+				= BSolverProblem::B_PACKAGE_IMPLICITLY_OBSOLETES_RESOLVABLE;
+			needed = NEED_SOURCE | NEED_TARGET | NEED_DEPENDENCY;
+			break;
+		case SOLVER_RULE_RPM_PACKAGE_REQUIRES:
+			problemType = BSolverProblem::B_DEPENDENCY_NOT_INSTALLABLE;
+			needed = NEED_SOURCE | NEED_DEPENDENCY;
+			break;
+		case SOLVER_RULE_RPM_SELF_CONFLICT:
+			problemType = BSolverProblem::B_SELF_CONFLICT;
+			needed = NEED_SOURCE | NEED_DEPENDENCY;
+			break;
+		case SOLVER_RULE_UNKNOWN:
+		case SOLVER_RULE_FEATURE:
+		case SOLVER_RULE_LEARNT:
+		case SOLVER_RULE_CHOICE:
+		case SOLVER_RULE_BEST:
+			problemType = BSolverProblem::B_UNSPECIFIED;
+			break;
+	}
+
+	BSolverPackage* sourcePackage = NULL;
+	if ((needed & NEED_SOURCE) != 0) {
+		sourcePackage = _GetPackage(sourceId);
+		if (sourcePackage == NULL)
+			return B_ERROR;
+	}
+
+	BSolverPackage* targetPackage = NULL;
+	if ((needed & NEED_TARGET) != 0) {
+		targetPackage = _GetPackage(targetId);
+		if (targetPackage == NULL)
+			return B_ERROR;
+	}
+
+	BPackageResolvableExpression dependency;
+	if ((needed & NEED_DEPENDENCY) != 0) {
+		status_t error = _GetResolvableExpression(dependencyId, dependency);
+		if (error != B_OK)
+			return error;
+	}
+
+	BSolverProblem* problem = new(std::nothrow) BSolverProblem(problemType,
+		sourcePackage, targetPackage, dependency);
+	if (problem == NULL || !fProblems.AddItem(problem)) {
+		delete problem;
+		return B_NO_MEMORY;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+LibsolvSolver::_GetResolvableExpression(Id id,
+	BPackageResolvableExpression& _expression) const
+{
+	// Try to translate the libsolv ID to a resolvable expression. Generally
+	// that doesn't work, since libsolv is more expressive, but all the stuff
+	// we feed libsolv we should be able to translate back.
+
+	if (!ISRELDEP(id)) {
+		// just a string
+		_expression.SetTo(pool_id2str(fPool, id));
+		return B_OK;
+	}
+
+	// a composite -- analyze it
+	Reldep* reldep = GETRELDEP(fPool, id);
+
+	// No support for more than one level, so both name and evr must be strings.
+	if (ISRELDEP(reldep->name) || ISRELDEP(reldep->evr))
+		return B_NOT_SUPPORTED;
+
+	const char* name = pool_id2str(fPool, reldep->name);
+	const char* versionString = pool_id2str(fPool, reldep->evr);
+	if (name == NULL || versionString == NULL)
+		return B_NOT_SUPPORTED;
+
+	// get the operator -- we don't support all libsolv supports
+	BPackageResolvableOperator op;
+	switch (reldep->flags) {
+		case 1:
+			op = B_PACKAGE_RESOLVABLE_OP_GREATER;
+			break;
+		case 2:
+			op = B_PACKAGE_RESOLVABLE_OP_EQUAL;
+			break;
+		case 3:
+			op = B_PACKAGE_RESOLVABLE_OP_GREATER_EQUAL;
+			break;
+		case 4:
+			op = B_PACKAGE_RESOLVABLE_OP_LESS;
+			break;
+		case 5:
+			op = B_PACKAGE_RESOLVABLE_OP_NOT_EQUAL;
+			break;
+		case 6:
+			op = B_PACKAGE_RESOLVABLE_OP_LESS_EQUAL;
+			break;
+		default:
+			return B_NOT_SUPPORTED;
+	}
+
+	// get the version (cut off the empty epoch)
+	if (versionString[0] == ':')
+		versionString++;
+
+	BPackageVersion version;
+	status_t error = version.SetTo(versionString, true);
+	if (error != B_OK)
+		return error == B_BAD_DATA ? B_NOT_SUPPORTED : error;
+
+	_expression.SetTo(name, op, version);
+	return B_OK;
+}

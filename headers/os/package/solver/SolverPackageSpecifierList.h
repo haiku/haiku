@@ -28,6 +28,7 @@ public:
 
 			bool				AppendSpecifier(
 									const BSolverPackageSpecifier& specifier);
+			void				MakeEmpty();
 
 			BSolverPackageSpecifierList& operator=(
 									const BSolverPackageSpecifierList& other);
