@@ -481,7 +481,7 @@ TermParse::EscParse()
 								dstbuf, &dstLen, &dummyState, '?');
 					}
 
-					fBuffer->InsertChar(dstbuf, dstLen, width);
+					fBuffer->InsertChar(UTF8Char(dstbuf, dstLen));
 					break;
 
 				case CASE_PRINT_CS96:
@@ -493,7 +493,7 @@ TermParse::EscParse()
 					dstLen = sizeof(dstbuf);
 					convert_to_utf8(B_EUC_CONVERSION, cbuf, &srcLen,
 							dstbuf, &dstLen, &dummyState, '?');
-					fBuffer->InsertChar(dstbuf, dstLen);
+					fBuffer->InsertChar(UTF8Char(dstbuf, dstLen));
 					break;
 
 				case CASE_LF:
@@ -511,7 +511,7 @@ TermParse::EscParse()
 					dstLen = sizeof(dstbuf);
 					convert_to_utf8(currentEncoding, cbuf, &srcLen,
 							dstbuf, &dstLen, &dummyState, '?');
-					fBuffer->InsertChar(dstbuf, dstLen);
+					fBuffer->InsertChar(UTF8Char(dstbuf, dstLen));
 					break;
 
 				case CASE_SJIS_INSTRING:
@@ -523,7 +523,7 @@ TermParse::EscParse()
 					dstLen = sizeof(dstbuf);
 					convert_to_utf8(currentEncoding, cbuf, &srcLen,
 							dstbuf, &dstLen, &dummyState, '?');
-					fBuffer->InsertChar(dstbuf, dstLen);
+					fBuffer->InsertChar(UTF8Char(dstbuf, dstLen));
 					break;
 
 				case CASE_UTF8_2BYTE:
@@ -534,7 +534,7 @@ TermParse::EscParse()
 					cbuf[1] = c;
 					cbuf[2] = '\0';
 
-					fBuffer->InsertChar(cbuf, 2);
+					fBuffer->InsertChar(UTF8Char(cbuf, 2));
 					break;
 
 				case CASE_UTF8_3BYTE:
@@ -549,7 +549,7 @@ TermParse::EscParse()
 						break;
 					cbuf[2] = c;
 					cbuf[3] = '\0';
-					fBuffer->InsertChar(cbuf, 3);
+					fBuffer->InsertChar(UTF8Char(cbuf, 3));
 					break;
 
 				case CASE_MBCS:
@@ -1029,7 +1029,7 @@ TermParse::EscParse()
 
 				case CASE_DECALN:
 					/* DECALN */
-					fBuffer->FillScreen(UTF8Char('E'), 1, 0);
+					fBuffer->FillScreen(UTF8Char('E'), 0);
 					parsestate = groundtable;
 					break;
 

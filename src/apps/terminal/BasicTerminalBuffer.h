@@ -122,13 +122,8 @@ public:
 			void				CaptureChar(char ch);
 
 			// insert chars/lines
-	inline	void				InsertChar(UTF8Char c);
-			void				InsertChar(UTF8Char c, uint32 width);
-	inline	void				InsertChar(const char* c);
-	inline	void				InsertChar(const char* c, int32 length);
-	inline	void				InsertChar(const char* c, int32 length,
-									uint32 width);
-			void				FillScreen(UTF8Char c, uint32 width, uint32 attr);
+			void				InsertChar(UTF8Char c);
+			void				FillScreen(UTF8Char c, uint32 attr);
 
 			void				InsertCR();
 			void				InsertLF();
@@ -270,34 +265,6 @@ void
 BasicTerminalBuffer::SetAttributes(uint32 attributes)
 {
 	fAttributes = attributes;
-}
-
-
-void
-BasicTerminalBuffer::InsertChar(UTF8Char c)
-{
-	return InsertChar(c, 1);
-}
-
-
-void
-BasicTerminalBuffer::InsertChar(const char* c)
-{
-	return InsertChar(UTF8Char(c), 1);
-}
-
-
-void
-BasicTerminalBuffer::InsertChar(const char* c, int32 length)
-{
-	return InsertChar(UTF8Char(c, length), 1);
-}
-
-
-void
-BasicTerminalBuffer::InsertChar(const char* c, int32 length, uint32 width)
-{
-	return InsertChar(UTF8Char(c, length), width);
 }
 
 

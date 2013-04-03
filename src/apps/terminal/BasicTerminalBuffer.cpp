@@ -429,7 +429,8 @@ BasicTerminalBuffer::FindWord(const TermPos& pos,
 
 	// find the beginning
 	TermPos start(x, y);
-	TermPos end(x + (IS_WIDTH(line->cells[x].attributes) ? 2 : 1), y);
+	TermPos end(x + (IS_WIDTH(line->cells[x].attributes)
+				? FULL_WIDTH : HALF_WIDTH), y);
 	while (true) {
 		if (--x < 0) {
 			// Hit the beginning of the line -- continue at the end of the
@@ -470,7 +471,7 @@ BasicTerminalBuffer::FindWord(const TermPos& pos,
 		if (classifier->Classify(line->cells[x].character) != type)
 			break;
 
-		x += IS_WIDTH(line->cells[x].attributes) ? 2 : 1;
+		x += IS_WIDTH(line->cells[x].attributes) ? FULL_WIDTH : HALF_WIDTH;
 		end.SetTo(x, y);
 	}
 
@@ -606,14 +607,13 @@ BasicTerminalBuffer::Find(const char* _pattern, const TermPos& start,
 
 
 void
-BasicTerminalBuffer::InsertChar(UTF8Char c, uint32 width)
+BasicTerminalBuffer::InsertChar(UTF8Char c)
 {
 //debug_printf("BasicTerminalBuffer::InsertChar('%.*s' (%d), %#lx)\n",
 //(int)c.ByteCount(), c.bytes, c.bytes[0], attributes);
-	if ((int32)width == FULL_WIDTH)
-		fAttributes |= A_WIDTH;
+	int32 width = c.IsFullWidth() ? FULL_WIDTH : HALF_WIDTH;
 
-	if (fSoftWrappedCursor || fCursor.x + (int32)width > fWidth)
+	if (fSoftWrappedCursor || (fCursor.x + width) > fWidth)
 		_SoftBreakLine();
 	else
 		_PadLineToCursor();
@@ -625,7 +625,8 @@ BasicTerminalBuffer::InsertChar(UTF8Char c, uint32 width)
 
 	TerminalLine* line = _LineAt(fCursor.y);
 	line->cells[fCursor.x].character = c;
-	line->cells[fCursor.x].attributes = fAttributes;
+	line->cells[fCursor.x].attributes
+		= fAttributes | (width == FULL_WIDTH ? A_WIDTH : 0);
 
 	if (line->length < fCursor.x + width)
 		line->length = fCursor.x + width;
@@ -645,10 +646,13 @@ BasicTerminalBuffer::InsertChar(UTF8Char c, uint32 width)
 
 
 void
-BasicTerminalBuffer::FillScreen(UTF8Char c, uint32 width, uint32 attributes)
+BasicTerminalBuffer::FillScreen(UTF8Char c, uint32 attributes)
 {
-	if ((int32)width == FULL_WIDTH)
+	uint32 width = HALF_WIDTH;
+	if (c.IsFullWidth()) {
 		attributes |= A_WIDTH;
+		width = FULL_WIDTH;
+	}
 
 	fSoftWrappedCursor = false;
 
@@ -1724,7 +1728,9 @@ BasicTerminalBuffer::MakeLinesSnapshots(time_t timeStamp, const char* fileName)
 			fprintf(fileOut, "%02" B_PRId16 ":%02" B_PRId16 ":%08" B_PRIx32 ":\n",
 					i, line->length, line->attributes);
 			for (int j = 0; j < line->length; j++)
-				fprintf(fileOut, "%c", line->cells[j].character.bytes[0]);
+				if (line->cells[j].character.bytes[0] != 0)
+					fwrite(line->cells[j].character.bytes, 1,
+						line->cells[j].character.ByteCount(), fileOut);
 
 			fprintf(fileOut, "\n");
 			for (int s = 28; s >= 0; s -= 4) {
@@ -1762,7 +1768,8 @@ BasicTerminalBuffer::StartStopDebugCapture()
 	struct tm* ts = gmtime(&timeStamp);
 	str << ts->tm_hour << ts->tm_min << ts->tm_sec;
 	str << ".Capture.log";
-	fCaptureFile = open(str.String(), O_CREAT | O_WRONLY);
+	fCaptureFile = open(str.String(), O_CREAT | O_WRONLY,
+			S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 }
 
 
