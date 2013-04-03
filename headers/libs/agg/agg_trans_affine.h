@@ -195,14 +195,14 @@ namespace agg
 
         // Multiply current matrix to another one and return
         // the result in a separete matrix.
-        trans_affine operator * (const trans_affine& m)
+        trans_affine operator * (const trans_affine& m) const
         {
             return trans_affine(*this).multiply(m);
         }
 
         // Multiply current matrix to inverse of another one 
         // and return the result in a separete matrix.
-        trans_affine operator / (const trans_affine& m)
+        trans_affine operator / (const trans_affine& m) const
         {
             return trans_affine(*this).multiply_inv(m);
         }
