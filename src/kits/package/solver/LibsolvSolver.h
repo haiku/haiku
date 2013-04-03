@@ -36,6 +36,7 @@ public:
 	virtual	status_t			Install(
 									const BSolverPackageSpecifierList&
 										packages);
+	virtual	status_t			VerifyInstallation();
 
 	virtual	int32				CountProblems() const;
 	virtual	BSolverProblem*		ProblemAt(int32 index) const;
@@ -63,6 +64,9 @@ private:
 			status_t			_GetResolvableExpression(Id id,
 									BPackageResolvableExpression& _expression)
 									const;
+
+			status_t			_Solve(Queue& jobs);
+			void				_SetJobsSolverMode(Queue& jobs, int solverMode);
 
 private:
 			Pool*				fPool;

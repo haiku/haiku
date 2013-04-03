@@ -220,32 +220,35 @@ LibsolvSolver::Install(const BSolverPackageSpecifierList& packages)
 			queue_push(&jobs, matchingPackages.elements[j]);
 	}
 
-	// add solver mode to job queue elements
-	int solverMode = SOLVER_INSTALL;
-	for (int i = 0; i < jobs.count; i += 2) {
-		jobs.elements[i] |= solverMode;
-//		if (cleandeps)
-//			jobs.elements[i] |= SOLVER_CLEANDEPS;
-//		if (forcebest)
-//			jobs.elements[i] |= SOLVER_FORCEBEST;
-	}
+	// set jobs' solver mode and solve
+	_SetJobsSolverMode(jobs, SOLVER_INSTALL);
 
-	// create the solver and solve
-	fSolver = solver_create(fPool);
-	solver_set_flag(fSolver, SOLVER_FLAG_SPLITPROVIDES, 1);
-	solver_set_flag(fSolver, SOLVER_FLAG_BEST_OBEY_POLICY, 1);
+	return _Solve(jobs);
+}
 
-	// get the problems (if any)
-	fProblems.MakeEmpty();
 
-	int problemCount = solver_solve(fSolver, &jobs);
-	for (Id problemId = 1; problemId <= problemCount; problemId++) {
-		error = _AddProblem(problemId);
-		if (error != B_OK)
-			return error;
-	}
+status_t
+LibsolvSolver::VerifyInstallation()
+{
+	if (fInstalledRepository == NULL)
+		return B_BAD_VALUE;
 
-	return B_OK;
+	// add repositories to pool
+	status_t error = _AddRepositories();
+	if (error != B_OK)
+		return error;
+
+	// prepare pool for solving
+	pool_createwhatprovides(fPool);
+
+	// add the verify job to the job queue
+	SolvQueue jobs;
+	queue_push2(&jobs, SOLVER_SOLVABLE_ALL, 0);
+
+	// set jobs' solver mode and solve
+	_SetJobsSolverMode(jobs, SOLVER_VERIFY);
+
+	return _Solve(jobs);
 }
 
 
@@ -616,4 +619,40 @@ LibsolvSolver::_GetResolvableExpression(Id id,
 
 	_expression.SetTo(name, op, version);
 	return B_OK;
+}
+
+
+status_t
+LibsolvSolver::_Solve(Queue& jobs)
+{
+	// create the solver and solve
+	fSolver = solver_create(fPool);
+	solver_set_flag(fSolver, SOLVER_FLAG_SPLITPROVIDES, 1);
+	solver_set_flag(fSolver, SOLVER_FLAG_BEST_OBEY_POLICY, 1);
+
+	int problemCount = solver_solve(fSolver, &jobs);
+
+	// get the problems (if any)
+	fProblems.MakeEmpty();
+
+	for (Id problemId = 1; problemId <= problemCount; problemId++) {
+		status_t error = _AddProblem(problemId);
+		if (error != B_OK)
+			return error;
+	}
+
+	return B_OK;
+}
+
+
+void
+LibsolvSolver::_SetJobsSolverMode(Queue& jobs, int solverMode)
+{
+	for (int i = 0; i < jobs.count; i += 2) {
+		jobs.elements[i] |= solverMode;
+//		if (cleandeps)
+//			jobs.elements[i] |= SOLVER_CLEANDEPS;
+//		if (forcebest)
+//			jobs.elements[i] |= SOLVER_FORCEBEST;
+	}
 }

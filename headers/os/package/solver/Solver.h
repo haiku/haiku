@@ -32,6 +32,7 @@ public:
 	virtual	status_t			Install(
 									const BSolverPackageSpecifierList&
 										packages) = 0;
+	virtual	status_t			VerifyInstallation() = 0;
 
 			bool				HasProblems() const
 									{ return CountProblems() > 0; }
