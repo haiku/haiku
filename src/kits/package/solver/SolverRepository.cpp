@@ -238,13 +238,17 @@ BSolverRepository::PackageAt(int32 index) const
 
 
 status_t
-BSolverRepository::AddPackage(const BPackageInfo& info)
+BSolverRepository::AddPackage(const BPackageInfo& info,
+	BSolverPackage** _package = NULL)
 {
 	BSolverPackage* package = new(std::nothrow) BSolverPackage(this, info);
 	if (package == NULL || !fPackages.AddItem(package)) {
 		delete package;
 		return B_NO_MEMORY;
 	}
+
+	if (_package != NULL)
+		*_package = package;
 
 	return B_OK;
 }

@@ -58,7 +58,8 @@ public:
 			int32				CountPackages() const;
 			BSolverPackage*		PackageAt(int32 index) const;
 
-			status_t			AddPackage(const BPackageInfo& info);
+			status_t			AddPackage(const BPackageInfo& info,
+									BSolverPackage** _package = NULL);
 			status_t			AddPackages(
 									BPackageInstallationLocation location);
 
