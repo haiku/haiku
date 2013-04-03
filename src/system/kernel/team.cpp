@@ -1338,8 +1338,10 @@ create_team_user_data(Team* team, void* exactAddress = NULL)
 	if (exactAddress != NULL) {
 		address = exactAddress;
 		addressSpec = B_EXACT_ADDRESS;
-	} else
+	} else {
+		address = (void*)KERNEL_USER_DATA_BASE;
 		addressSpec = B_RANDOMIZED_BASE_ADDRESS;
+	}
 
 	status_t result = vm_reserve_address_range(team->id, &address, addressSpec,
 		kTeamUserDataReservedSize, RESERVED_AVOID_BASE);
@@ -1351,8 +1353,10 @@ create_team_user_data(Team* team, void* exactAddress = NULL)
 		else
 			virtualRestrictions.address = address;
 		virtualRestrictions.address_specification = B_EXACT_ADDRESS;
-	} else
-		virtualRestrictions.address_specification = B_RANDOMIZED_ANY_ADDRESS;
+	} else {
+		virtualRestrictions.address = (void*)KERNEL_USER_DATA_BASE;
+		virtualRestrictions.address_specification = B_RANDOMIZED_BASE_ADDRESS;
+	}
 
 	physical_address_restrictions physicalRestrictions = {};
 	team->user_data_area = create_area_etc(team->id, "user area",
