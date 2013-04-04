@@ -165,7 +165,7 @@ topological_sort(image_t* image, uint32 slot, image_t** initList,
 /*!	Finds the load address and address specifier of the given image region.
 */
 static void
-get_image_region_load_address(image_t* image, uint32 index, int32 lastDelta,
+get_image_region_load_address(image_t* image, uint32 index, long lastDelta,
 	bool fixed, addr_t& loadAddress, uint32& addressSpecifier)
 {
 	if (image->dynamic_ptr != 0 && !fixed) {
