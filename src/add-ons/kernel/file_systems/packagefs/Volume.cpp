@@ -660,6 +660,8 @@ Volume::Mount(const char* parameterString)
 		RETURN_ERROR(B_NO_MEMORY);
 	fRootDirectory->Init(NULL, volumeName, 0);
 	fNodes.Insert(fRootDirectory);
+	fRootDirectory->AcquireReference();
+		// one reference for the table
 
 	// get our mount point
 	error = vfs_get_mount_point(fFSVolume->id, &fMountPoint.deviceID,
