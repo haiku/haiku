@@ -32,9 +32,6 @@ public:
 			void				UpdatePackageDependencies(Package* package,
 									PackageLinksListener* listener);
 
-			void				NotifyDirectoryAdded(
-									PackageLinksListener* listener);
-
 			bool				IsEmpty() const
 									{ return fPackages.IsEmpty(); }
 
