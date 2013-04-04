@@ -14,40 +14,41 @@
 #include <String.h>
 #include <TextView.h>
 
+
 class BFile;
 class BHandler;
 class BMessenger;
 class BPositionIO;
 
-
 class StyledEditView : public BTextView {
-	public:
+public:
 						StyledEditView(BRect viewframe, BRect textframe,
 							BHandler* handler);
-		virtual			~StyledEditView();
+	virtual				~StyledEditView();
 
-		virtual void	Select(int32 start, int32 finish);
-		virtual void	DeleteText(int32 start, int32 finish);
-		virtual void	FrameResized(float width, float height);
-		virtual void	InsertText(const char* text, int32 length, int32 offset,
+	virtual	void		FrameResized(float width, float height);
+	virtual	void		DeleteText(int32 start, int32 finish);
+	virtual	void		InsertText(const char* text, int32 length,
+							int32 offset,
 							const text_run_array* runs = NULL);
+	virtual	void		Select(int32 start, int32 finish);
 
-		void		Reset();
-		void		SetSuppressChanges(bool suppressChanges);
-		status_t	GetStyledText(BPositionIO* stream,
+			void		Reset();
+			void		SetSuppressChanges(bool suppressChanges);
+			status_t	GetStyledText(BPositionIO* stream,
 							const char* forceEncoding = NULL);
-		status_t	WriteStyledEditFile(BFile* file);
+			status_t	WriteStyledEditFile(BFile* file);
 
-		void 		SetEncoding(uint32 encoding);
-		uint32 		GetEncoding() const;
+			void 		SetEncoding(uint32 encoding);
+			uint32		GetEncoding() const;
 
-	private:
-		void		_UpdateStatus();
+private:
+			void		_UpdateStatus();
 
-		BMessenger 	*fMessenger;
-		bool		fSuppressChanges;
-		BString		fEncoding;
+			BMessenger*	fMessenger;
+			bool		fSuppressChanges;
+			BString		fEncoding;
 };
 
-#endif	// STYLED_EDIT_VIEW_H
 
+#endif	// STYLED_EDIT_VIEW_H

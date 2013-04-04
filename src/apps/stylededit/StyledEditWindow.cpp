@@ -598,9 +598,8 @@ StyledEditWindow::MenusBeginning()
 		BMenu* menu = fCurrentFontItem->Submenu();
 		if (menu != NULL) {
 			BMenuItem* item = menu->FindMarked();
-			if (item != NULL) {
+			if (item != NULL)
 				item->SetMarked(false);
-			}
 		}
 	}
 
@@ -622,9 +621,10 @@ StyledEditWindow::MenusBeginning()
 	rgb_color color = BLACK;
 	bool sameColor;
 	fTextView->GetFontAndColor(&font, &sameProperties, &color, &sameColor);
+	color.alpha = 255;
 
-	if (sameColor && color.alpha == 255) {
-		// select the current color
+	if (sameColor) {
+		// mark the menu according to the current color
 		if (color.red == 0) {
 			if (color.green == 0) {
 				if (color.blue == 0) {
@@ -1086,7 +1086,7 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	textBounds.OffsetTo(B_ORIGIN);
 	textBounds.InsetBy(TEXT_INSET, TEXT_INSET);
 
-	fTextView= new StyledEditView(viewFrame, textBounds, this);
+	fTextView = new StyledEditView(viewFrame, textBounds, this);
 	fTextView->SetDoesUndo(true);
 	fTextView->SetStylable(true);
 	fTextView->SetEncoding(encoding);
@@ -1211,8 +1211,8 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	fFontColorMenu->SetRadioMode(true);
 	fFontMenu->AddItem(fFontColorMenu);
 
-	fFontColorMenu->AddItem(fBlackItem = new BMenuItem(B_TRANSLATE("Black"),
-		new BMessage(FONT_COLOR)));
+	fFontColorMenu->AddItem(fBlackItem = new ColorMenuItem(B_TRANSLATE("Black"),
+		BLACK, new BMessage(FONT_COLOR)));
 	fBlackItem->SetMarked(true);
 	fFontColorMenu->AddItem(fRedItem = new ColorMenuItem(B_TRANSLATE("Red"),
 		RED, new BMessage(FONT_COLOR)));
@@ -1222,10 +1222,12 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 		BLUE, new BMessage(FONT_COLOR)));
 	fFontColorMenu->AddItem(fCyanItem = new ColorMenuItem(B_TRANSLATE("Cyan"),
 		CYAN, new BMessage(FONT_COLOR)));
-	fFontColorMenu->AddItem(fMagentaItem = new ColorMenuItem(B_TRANSLATE("Magenta"),
-		MAGENTA, new BMessage(FONT_COLOR)));
-	fFontColorMenu->AddItem(fYellowItem = new ColorMenuItem(B_TRANSLATE("Yellow"),
-		YELLOW, new BMessage(FONT_COLOR)));
+	fFontColorMenu->AddItem(fMagentaItem
+		= new ColorMenuItem(B_TRANSLATE("Magenta"), MAGENTA,
+			new BMessage(FONT_COLOR)));
+	fFontColorMenu->AddItem(fYellowItem
+		= new ColorMenuItem(B_TRANSLATE("Yellow"), YELLOW,
+			new BMessage(FONT_COLOR)));
 	fFontMenu->AddSeparatorItem();
 
 	// "Bold" & "Italic" menu items

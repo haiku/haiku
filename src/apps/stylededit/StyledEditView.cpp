@@ -32,9 +32,13 @@ using namespace BPrivate;
 
 StyledEditView::StyledEditView(BRect viewFrame, BRect textBounds,
 	BHandler* handler)
-	: BTextView(viewFrame, "textview", textBounds, 
-		B_FOLLOW_ALL, B_FRAME_EVENTS | B_WILL_DRAW)
-{ 
+	:
+	BTextView(viewFrame, "textview", textBounds,  B_FOLLOW_ALL,
+		B_FRAME_EVENTS | B_WILL_DRAW)
+{
+	SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
+	SetLowColor(ViewColor());
+
 	fMessenger = new BMessenger(handler);
 	fSuppressChanges = false;
 }
@@ -43,6 +47,45 @@ StyledEditView::StyledEditView(BRect viewFrame, BRect textBounds,
 StyledEditView::~StyledEditView()
 {
 	delete fMessenger;
+}
+
+
+
+void
+StyledEditView::FrameResized(float width, float height)
+{
+	BTextView::FrameResized(width, height);
+
+	if (DoesWordWrap()) {
+		BRect textRect;
+		textRect = Bounds();
+		textRect.OffsetTo(B_ORIGIN);
+		textRect.InsetBy(TEXT_INSET, TEXT_INSET);
+		SetTextRect(textRect);
+	}
+}
+
+
+void
+StyledEditView::DeleteText(int32 start, int32 finish)
+{
+	if (!fSuppressChanges)
+		fMessenger-> SendMessage(TEXT_CHANGED);
+
+	BTextView::DeleteText(start, finish);
+	_UpdateStatus();
+}
+
+
+void
+StyledEditView::InsertText(const char* text, int32 length, int32 offset,
+	const text_run_array* runs)
+{
+	if (!fSuppressChanges)
+		fMessenger->SendMessage(TEXT_CHANGED);
+
+	BTextView::InsertText(text, length, offset, runs);
+	_UpdateStatus();
 }
 
 
@@ -175,44 +218,6 @@ StyledEditView::GetEncoding() const
 
 
 void
-StyledEditView::DeleteText(int32 start, int32 finish)
-{
-	if (!fSuppressChanges)
-		fMessenger-> SendMessage(TEXT_CHANGED);
-
-	BTextView::DeleteText(start, finish);
-	_UpdateStatus();
-}
-
-
-void
-StyledEditView::InsertText(const char* text, int32 length, int32 offset,
-	const text_run_array* runs)
-{
-	if (!fSuppressChanges)
-		fMessenger->SendMessage(TEXT_CHANGED);
-
-	BTextView::InsertText(text, length, offset, runs);
-	_UpdateStatus();
-}
-
-
-void
-StyledEditView::FrameResized(float width, float height)
-{
-	BTextView::FrameResized(width, height);
-
-	if (DoesWordWrap()) {
-		BRect textRect;
-		textRect = Bounds();
-		textRect.OffsetTo(B_ORIGIN);
-		textRect.InsetBy(TEXT_INSET, TEXT_INSET);
-		SetTextRect(textRect);
-	}
-}
-
-
-void
 StyledEditView::_UpdateStatus()
 {
 	int32 selStart, selFinish;
@@ -239,4 +244,3 @@ StyledEditView::_UpdateStatus()
 	message->AddString("encoding", fEncoding.String());
 	fMessenger->SendMessage(message);
 }
-
