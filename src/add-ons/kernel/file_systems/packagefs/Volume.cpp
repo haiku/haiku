@@ -1805,8 +1805,10 @@ Volume::_PublishShineThroughDirectories()
 		}
 
 		// publish the vnode, so the VFS will find it without asking us
+		directory->AcquireReference();
 		error = PublishVNode(directory);
 		if (error != B_OK) {
+			directory->ReleaseReference();
 			_RemoveNode(directory);
 			RETURN_ERROR(error);
 		}
