@@ -81,6 +81,7 @@ typedef struct area_info {
 /* B_ANY_KERNEL_BLOCK_ADDRESS		5 */
 #define B_RANDOMIZED_ANY_ADDRESS	6
 #define B_RANDOMIZED_BASE_ADDRESS	7
+#define B_RANDOMIZED_IMAGE_ADDRESS	8
 
 /* area protection */
 #define B_READ_AREA				1

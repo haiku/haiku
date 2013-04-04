@@ -173,7 +173,7 @@ get_image_region_load_address(image_t* image, uint32 index, int32 lastDelta,
 		if (index == 0) {
 			// but only the first segment gets a free ride
 			loadAddress = RLD_PROGRAM_BASE;
-			addressSpecifier = B_RANDOMIZED_BASE_ADDRESS;
+			addressSpecifier = B_RANDOMIZED_IMAGE_ADDRESS;
 		} else {
 			loadAddress = image->regions[index].vmstart + lastDelta;
 			addressSpecifier = B_EXACT_ADDRESS;
@@ -298,7 +298,7 @@ map_image(int fd, char const* path, image_t* image, bool fixed)
 	addr_t loadAddress;
 	size_t reservedSize = 0;
 	size_t length = 0;
-	uint32 addressSpecifier = B_RANDOMIZED_ANY_ADDRESS;
+	uint32 addressSpecifier = B_RANDOMIZED_IMAGE_ADDRESS;
 
 	for (uint32 i = 0; i < image->num_regions; i++) {
 		// for BeOS compatibility: if we load an old BeOS executable, we
