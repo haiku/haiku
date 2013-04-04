@@ -42,6 +42,9 @@ PackageFSRoot::PackageFSRoot(dev_t deviceID, ino_t nodeID)
 
 PackageFSRoot::~PackageFSRoot()
 {
+	if (fPackageLinksDirectory != NULL)
+		fPackageLinksDirectory->ReleaseReference();
+
 	rw_lock_destroy(&fLock);
 }
 

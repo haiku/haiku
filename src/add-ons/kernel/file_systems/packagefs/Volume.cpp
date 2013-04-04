@@ -1863,7 +1863,7 @@ Volume::_RemovePackageLinksDirectory()
 
 	if (packageLinksDirectory->Parent() == fRootDirectory) {
 		packageLinksDirectory->SetListener(NULL);
-		_RemovePackageLinksNode(packageLinksDirectory);
+		fRootDirectory->RemoveChild(packageLinksDirectory);
 		packageLinksDirectory->SetParent(NULL);
 	}
 }
