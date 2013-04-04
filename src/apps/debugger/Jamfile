@@ -139,6 +139,7 @@ Application Debugger :
 	RetrieveMemoryBlockJob.cpp
 
 	# model
+	AreaInfo.cpp
 	Breakpoint.cpp
 	DisassembledCode.cpp
 	FileSourceCode.cpp
