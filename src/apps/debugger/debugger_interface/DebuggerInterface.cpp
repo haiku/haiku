@@ -525,7 +525,7 @@ DebuggerInterface::GetAreaInfos(BObjectList<AreaInfo>& infos)
 {
 	// get the team's areas
 	area_info areaInfo;
-	int32 cookie = 0;
+	ssize_t cookie = 0;
 	while (get_next_area_info(fTeamID, &cookie, &areaInfo) == B_OK) {
 		AreaInfo* info = new(std::nothrow) AreaInfo(fTeamID, areaInfo.area,
 			areaInfo.name, (addr_t)areaInfo.address, areaInfo.size,
