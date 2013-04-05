@@ -20,6 +20,7 @@
 #include <StringForSize.h>
 
 #include "Settings.h"
+#include "Utilities.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -332,10 +333,12 @@ FolderConfigWindow::_LoadFolders()
 
 	// TODO: don't get all of them at once, but retrieve them level by level
 	fFolderList.clear();
-	fProtocol.GetFolders(fFolderList);
+	BString separator;
+	fProtocol.GetFolders(fFolderList, separator);
 	for (size_t i = 0; i < fFolderList.size(); i++) {
 		IMAP::FolderEntry& entry = fFolderList[i];
-		CheckBoxItem* item = new CheckBoxItem(entry.folder, entry.subscribed);
+		CheckBoxItem* item = new CheckBoxItem(
+			MailboxToFolderName(entry.folder, separator), entry.subscribed);
 		fFolderListView->AddItem(item);
 		item->SetListView(fFolderListView);
 	}

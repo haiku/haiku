@@ -8,6 +8,8 @@
 
 #include <Autolock.h>
 
+#include "IMAPFolder.h"
+#include "IMAPMailbox.h"
 #include "IMAPProtocol.h"
 
 
@@ -16,6 +18,7 @@ IMAPConnectionWorker::IMAPConnectionWorker(IMAPProtocol& owner,
 	:
 	fOwner(owner),
 	fSettings(settings),
+	fIdleBox(NULL),
 	fMain(main),
 	fStopped(false)
 {
@@ -27,55 +30,54 @@ IMAPConnectionWorker::~IMAPConnectionWorker()
 }
 
 
+bool
+IMAPConnectionWorker::HasMailboxes() const
+{
+	BAutolock locker(const_cast<IMAPConnectionWorker*>(this)->fLocker);
+	return !fMailboxes.empty();
+}
+
+
 uint32
 IMAPConnectionWorker::CountMailboxes() const
 {
 	BAutolock locker(const_cast<IMAPConnectionWorker*>(this)->fLocker);
-	return (fIdleBox.IsEmpty() ? 0 : 1) + fOtherBoxes.size();
+	return fMailboxes.size();
 }
 
 
 void
-IMAPConnectionWorker::AddMailbox(const BString& name)
+IMAPConnectionWorker::AddMailbox(IMAPFolder* folder)
 {
 	BAutolock locker(fLocker);
 
-	if (fSettings.IdleMode() && fIdleBox.IsEmpty()) {
-		fIdleBox = name;
-	} else if (fSettings.IdleMode() && name == "INBOX") {
-		// Prefer to have the INBOX in idle mode over other mail boxes
-		fOtherBoxes.push_back(fIdleBox);
-		fIdleBox = name;
-	} else
-		fOtherBoxes.push_back(name);
+	fMailboxes.insert(std::make_pair(folder, (IMAPMailbox*)NULL));
+
+	// Prefer to have the INBOX in idle mode over other mail boxes
+	if (fIdleBox == NULL || folder->MailboxName().ICompare("INBOX") == 0)
+		fIdleBox = folder;
 }
 
 
 void
-IMAPConnectionWorker::RemoveMailbox(const BString& name)
+IMAPConnectionWorker::RemoveAllMailboxes()
 {
 	BAutolock locker(fLocker);
 
-	if (fSettings.IdleMode() && fIdleBox == name) {
-		if (!fOtherBoxes.empty()) {
-			fIdleBox = fOtherBoxes[0];
-			fOtherBoxes.erase(fOtherBoxes.begin());
-		} else
-			fIdleBox.SetTo(NULL);
-	} else {
-		StringList::iterator iterator = fOtherBoxes.begin();
-		for (; iterator != fOtherBoxes.end(); iterator++) {
-			if (*iterator == name) {
-				fOtherBoxes.erase(iterator);
-				break;
-			}
-		}
+	// Reset listeners, and delete the mailboxes
+	MailboxMap::iterator iterator = fMailboxes.begin();
+	for (; iterator != fMailboxes.end(); iterator++) {
+		iterator->first->SetListener(NULL);
+		delete iterator->second;
 	}
+
+	fIdleBox = NULL;
+	fMailboxes.clear();
 }
 
 
 status_t
-IMAPConnectionWorker::Start()
+IMAPConnectionWorker::Run()
 {
 	fThread = spawn_thread(&_Worker, "imap connection worker",
 		B_NORMAL_PRIORITY, this);
@@ -88,7 +90,7 @@ IMAPConnectionWorker::Start()
 
 
 void
-IMAPConnectionWorker::Stop()
+IMAPConnectionWorker::Quit()
 {
 	// TODO: we'll also need to interrupt listening to the socket
 	fStopped = true;
@@ -103,6 +105,10 @@ IMAPConnectionWorker::_Worker()
 	if (status != B_OK)
 		return status;
 
+	bool idle = fSettings.IdleMode()
+		&& fProtocol.Capabilities().Contains("IDLE");
+	bool initial = true;
+
 	while (!fStopped) {
 		if (fMain) {
 			// The main worker checks the subscribed folders, and creates
@@ -112,19 +118,51 @@ IMAPConnectionWorker::_Worker()
 
 		BAutolock locker(fLocker);
 
-		if (!fIdleBox.IsEmpty())
-			printf("%p: IDLE: %s\n", this, fIdleBox.String());
-
-		StringList::iterator iterator = fOtherBoxes.begin();
-		for (; iterator != fOtherBoxes.end(); iterator++) {
-			printf("%p: check: %s\n", this, iterator->String());
+		if (!HasMailboxes()) {
+			locker.Unlock();
+			_Wait();
+			continue;
 		}
 
+		if (!initial && idle && fIdleBox != NULL) {
+			printf("%p: IDLE: %s\n", this, fIdleBox->MailboxName().String());
+			// TODO: enter IDLE mode
+		}
+
+		MailboxMap::iterator iterator = fMailboxes.begin();
+		for (; iterator != fMailboxes.end(); iterator++) {
+			IMAPFolder* folder = iterator->first;
+			if (!initial && idle && folder == fIdleBox)
+				continue;
+
+			printf("%p: check: %s\n", this, folder->MailboxName().String());
+			IMAPMailbox* mailbox = iterator->second;
+			if (mailbox == NULL) {
+				mailbox = new IMAPMailbox(fProtocol, folder->MailboxName());
+				folder->SetListener(mailbox);
+			}
+
+			IMAP::SelectCommand select(folder->MailboxName().String());
+			status_t status = fProtocol.ProcessCommand(select);
+			if (status == B_OK) {
+				folder->SetUIDValidity(select.UIDValidity());
+				// TODO: trigger download of mails until UIDNext()
+			}
+		}
+
+		initial = false;
 		// TODO: for now
 		break;
 	}
 
 	return B_OK;
+}
+
+
+void
+IMAPConnectionWorker::_Wait()
+{
+	while (acquire_sem(fOwner.FolderChangeSemaphore()) == B_INTERRUPTED);
 }
 
 

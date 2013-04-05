@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011, Haiku Inc. All Rights Reserved.
+ * Copyright 2010-2013, Haiku Inc. All Rights Reserved.
  * Copyright 2010 Clemens Zeidler. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -97,8 +97,7 @@ public:
 	virtual	BString				CommandString();
 	virtual	bool				HandleUntagged(Response& response);
 
-			void				SetTo(const char* mailboxName)
-									{ fMailboxName = mailboxName; }
+			void				SetTo(const char* mailboxName);
 			uint32				NextUID() { return fNextUID; }
 			uint32				UIDValidity() { return fUIDValidity; }
 
@@ -249,10 +248,11 @@ public:
 								ListCommand(const char* prefix,
 									bool subscribedOnly);
 
-			BString				CommandString();
-			bool				HandleUntagged(Response& response);
+	virtual	BString				CommandString();
+	virtual	bool				HandleUntagged(Response& response);
 
 	const	StringList&			FolderList();
+			const BString&		Separator() { return fSeparator; }
 
 private:
 			const char*			_Command() const;
@@ -261,6 +261,7 @@ private:
 			RFC3501Encoding		fEncoding;
 			const char*			fPrefix;
 			StringList			fFolders;
+			BString				fSeparator;
 			bool				fSubscribedOnly;
 };
 

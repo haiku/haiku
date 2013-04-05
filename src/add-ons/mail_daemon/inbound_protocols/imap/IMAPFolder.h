@@ -6,7 +6,7 @@
 #define IMAP_FOLDER_H
 
 
-#include <map>
+#include <hash_map>
 #include <sys/stat.h>
 
 #include <Entry.h>
@@ -36,11 +36,14 @@ public:
 
 class IMAPFolder : public BHandler {
 public:
-								IMAPFolder(const entry_ref& ref,
-									FolderListener& listener);
+								IMAPFolder(const BString& mailboxName,
+									const entry_ref& ref);
 	virtual						~IMAPFolder();
 
-			void				SetFolderID(const char* mailboxName, uint32 id);
+			const BString&		MailboxName() const { return fMailboxName; }
+
+			void				SetListener(FolderListener* listener);
+			void				SetUIDValidity(uint32 uidValidity);
 
 			void				StoreMessage(uint32 uid, ...);
 			void				DeleteMessage(uint32 uid);
@@ -55,13 +58,13 @@ private:
 			uint32				_ReadFlags(BNode& node);
 
 private:
-	typedef std::map<uint32, uint32> UIDToFlagsMap;
-	typedef std::map<uint32, entry_ref> UIDToRefMap;
+	typedef std::hash_map<uint32, uint32> UIDToFlagsMap;
+	typedef std::hash_map<uint32, entry_ref> UIDToRefMap;
 
 			const entry_ref		fRef;
 			BString				fMailboxName;
 			uint32				fUIDValidity;
-			FolderListener&		fListener;
+			FolderListener*		fListener;
 			UIDToRefMap			fRefMap;
 			UIDToFlagsMap		fUIDMap;
 };

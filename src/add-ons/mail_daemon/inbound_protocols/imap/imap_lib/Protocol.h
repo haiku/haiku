@@ -66,8 +66,10 @@ public:
 			ssize_t				SendData(const char* buffer, uint32 length);
 
 			// Some convenience methods
-			status_t			GetFolders(FolderList& folders);
-			status_t			GetSubscribedFolders(StringList& folders);
+			status_t			GetFolders(FolderList& folders,
+									BString& separator);
+			status_t			GetSubscribedFolders(StringList& folders,
+									BString& separator);
 			status_t			SubscribeFolder(const char* folder);
 			status_t			UnsubscribeFolder(const char* folder);
 			status_t			GetQuota(uint64& used, uint64& total);

@@ -110,7 +110,7 @@ Protocol::IsConnected()
 
 
 status_t
-Protocol::GetFolders(FolderList& folders)
+Protocol::GetFolders(FolderList& folders, BString& separator)
 {
 	StringList allFolders;
 	status_t status = _GetAllFolders(allFolders);
@@ -118,7 +118,7 @@ Protocol::GetFolders(FolderList& folders)
 		return status;
 
 	StringList subscribedFolders;
-	status = GetSubscribedFolders(subscribedFolders);
+	status = GetSubscribedFolders(subscribedFolders, separator);
 	if (status != B_OK)
 		return status;
 
@@ -158,7 +158,7 @@ Protocol::GetFolders(FolderList& folders)
 
 
 status_t
-Protocol::GetSubscribedFolders(StringList& folders)
+Protocol::GetSubscribedFolders(StringList& folders, BString& separator)
 {
 	ListCommand command(NULL, true);
 	status_t status = ProcessCommand(command);
@@ -166,6 +166,7 @@ Protocol::GetSubscribedFolders(StringList& folders)
 		return status;
 
 	folders = command.FolderList();
+	separator = command.Separator();
 	return status;
 }
 

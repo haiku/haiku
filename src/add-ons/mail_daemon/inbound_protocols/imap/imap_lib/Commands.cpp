@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc. All rights reserved.
+ * Copyright 2011-2013, Haiku, Inc. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
@@ -202,10 +202,10 @@ SelectCommand::SelectCommand()
 
 SelectCommand::SelectCommand(const char* name)
 	:
-	fMailboxName(name),
 	fNextUID(0),
 	fUIDValidity(0)
 {
+	SetTo(name);
 }
 
 
@@ -216,7 +216,6 @@ SelectCommand::CommandString()
 		return "";
 
 	BString command = "SELECT \"";
-	// TODO: properly quote the string!
 	command += fMailboxName;
 	command += "\"";
 	return command;
@@ -240,6 +239,14 @@ SelectCommand::HandleUntagged(Response& response)
 	}
 
 	return false;
+}
+
+
+void
+SelectCommand::SetTo(const char* mailboxName)
+{
+	RFC3501Encoding encoding;
+	fMailboxName = encoding.Encode(mailboxName);
 }
 
 
@@ -654,10 +661,20 @@ ListCommand::CommandString()
 bool
 ListCommand::HandleUntagged(Response& response)
 {
-	if (response.IsCommand(_Command()) && response.IsStringAt(3)) {
+	if (response.IsCommand(_Command()) && response.IsStringAt(2)
+		&& response.IsStringAt(3)) {
+		fSeparator = response.StringAt(2);
+
 		BString folder = response.StringAt(3);
+		if (folder == "")
+			return true;
+
 		try {
-			fFolders.push_back(fEncoding.Decode(folder));
+			folder = fEncoding.Decode(folder);
+			// The folder INBOX is always case insensitive
+			if (folder.ICompare("INBOX") == 0)
+				folder = "Inbox";
+			fFolders.push_back(folder);
 		} catch (ParseException& exception) {
 			// Decoding failed, just add the plain text
 			fprintf(stderr, "Decoding \"%s\" failed: %s\n", folder.String(),

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2012-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -21,10 +21,11 @@ static const char* kStateAttribute = "IMAP:state";
 static const char* kUIDAttribute = "MAIL:unique_id";
 
 
-IMAPFolder::IMAPFolder(const entry_ref& ref, FolderListener& listener)
+IMAPFolder::IMAPFolder(const BString& mailboxName, const entry_ref& ref)
 	:
 	fRef(ref),
-	fListener(listener)
+	fMailboxName(mailboxName),
+	fUIDValidity(UINT32_MAX)
 {
 	// Initialize from folder attributes
 	BNode node(&ref);
@@ -81,8 +82,16 @@ IMAPFolder::~IMAPFolder()
 
 
 void
-IMAPFolder::SetFolderID(const char* mailboxName, uint32 id)
+IMAPFolder::SetListener(FolderListener* listener)
 {
+	fListener = listener;
+}
+
+
+void
+IMAPFolder::SetUIDValidity(uint32 uidValidity)
+{
+	fUIDValidity = uidValidity;
 }
 
 
@@ -132,6 +141,7 @@ IMAPFolder::_InitializeFolderState()
 		uint32 uid = _ReadUniqueID(node);
 		uint32 flags = _ReadFlags(node);
 
+		// TODO: make sure a listener exists at this point!
 		std::set<uint32>::iterator found = lastUIDs.find(uid);
 		if (found != lastUIDs.end()) {
 			// The message is still around
@@ -141,14 +151,14 @@ IMAPFolder::_InitializeFolderState()
 			ASSERT(flagsFound != fUIDMap.end());
 			if (flagsFound->second != flags) {
 				// Its flags have changed locally, and need to be updated
-				fListener.MessageFlagsChanged(_Token(uid), ref,
+				fListener->MessageFlagsChanged(_Token(uid), ref,
 					flagsFound->second, flags);
 			}
 		} else {
 			// This is a new message
 			// TODO: the token must be the originating token!
 			// TODO: uid might be udpated from the call
-			uid = fListener.MessageAdded(_Token(uid), ref);
+			uid = fListener->MessageAdded(_Token(uid), ref);
 		}
 
 		fRefMap.insert(std::make_pair(uid, ref));

@@ -12,6 +12,8 @@
 #include "Protocol.h"
 
 
+class IMAPFolder;
+class IMAPMailbox;
 class IMAPProtocol;
 class Settings;
 
@@ -23,25 +25,29 @@ public:
 									bool main = false);
 	virtual						~IMAPConnectionWorker();
 
+			bool				HasMailboxes() const;
 			uint32				CountMailboxes() const;
-			void				AddMailbox(const BString& name);
-			void				RemoveMailbox(const BString& name);
+			void				AddMailbox(IMAPFolder* folder);
+			void				RemoveAllMailboxes();
 
 			bool				IsMain() const { return fMain; }
 
-			status_t			Start();
-			void				Stop();
+			status_t			Run();
+			void				Quit();
 
 private:
 			status_t			_Worker();
+			void				_Wait();
 	static	status_t			_Worker(void* self);
 
 private:
+	typedef std::map<IMAPFolder*, IMAPMailbox*> MailboxMap;
+
 			IMAPProtocol&		fOwner;
 			const Settings&		fSettings;
 			IMAP::Protocol		fProtocol;
-			BString				fIdleBox;
-			StringList			fOtherBoxes;
+			IMAPFolder*			fIdleBox;
+			MailboxMap			fMailboxes;
 
 			BLocker				fLocker;
 			thread_id			fThread;

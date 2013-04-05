@@ -6,7 +6,7 @@
 #define IMAP_PROTOCOL_H
 
 
-#include <set>
+#include <map>
 
 #include <MailProtocol.h>
 #include <ObjectList.h>
@@ -15,12 +15,13 @@
 
 
 class IMAPConnectionWorker;
+class IMAPFolder;
 namespace IMAP {
 	class Protocol;
 }
 
 
-typedef std::set<BString> StringSet;
+typedef std::map<BString, IMAPFolder*> FolderMap;
 
 
 class IMAPProtocol : public BInboundMailProtocol {
@@ -31,6 +32,8 @@ public:
 
 			status_t			CheckSubscribedFolders(
 									IMAP::Protocol& protocol);
+			sem_id				FolderChangeSemaphore() const
+									{ return fFolderChangeSemaphore; }
 
 	virtual	status_t			SyncMessages();
 	virtual status_t			FetchBody(const entry_ref& ref);
@@ -44,10 +47,16 @@ public:
 protected:
 			void				ReadyToRun();
 
+private:
+			IMAPFolder*			_CreateFolder(const BString& mailbox,
+									const BString& separator);
+			status_t			_CreateFolderChangeSemaphore();
+
 protected:
 			Settings			fSettings;
 			BObjectList<IMAPConnectionWorker> fWorkers;
-			StringSet			fKnownMailboxes;
+			FolderMap			fFolders;
+			sem_id				fFolderChangeSemaphore;
 };
 
 

@@ -9,6 +9,8 @@
 #include <Directory.h>
 
 #include "IMAPConnectionWorker.h"
+#include "IMAPFolder.h"
+#include "Utilities.h"
 
 
 IMAPProtocol::IMAPProtocol(const BMailAccountSettings& settings)
@@ -24,6 +26,10 @@ IMAPProtocol::IMAPProtocol(const BMailAccountSettings& settings)
 			destination.Path(), strerror(status));
 	}
 
+	status = _CreateFolderChangeSemaphore();
+	if (status != B_OK)
+		fprintf(stderr, "imap: Failed to create sem: %s\n", strerror(status));
+
 	PostMessage(B_READY_TO_RUN);
 }
 
@@ -38,51 +44,73 @@ IMAPProtocol::CheckSubscribedFolders(IMAP::Protocol& protocol)
 {
 	// Get list of subscribed folders
 
-	StringList folders;
-	status_t status = protocol.GetSubscribedFolders(folders);
+	StringList newFolders;
+	BString separator;
+	status_t status = protocol.GetSubscribedFolders(newFolders, separator);
 	if (status != B_OK)
 		return status;
 
 	// Determine how many new mailboxes we have
 
-	StringList::iterator iterator = folders.begin();
-	for (; iterator != folders.end(); iterator++) {
-		if (fKnownMailboxes.find(*iterator) != fKnownMailboxes.end())
-			iterator = folders.erase(iterator);
+	StringList::iterator folderIterator = newFolders.begin();
+	while (folderIterator != newFolders.end()) {
+		if (fFolders.find(*folderIterator) != fFolders.end())
+			folderIterator = newFolders.erase(folderIterator);
+		else
+			folderIterator++;
 	}
 
-	if (fSettings.IdleMode()) {
-		// Create connection workers as allowed
+	int32 totalMailboxes = fFolders.size() + newFolders.size();
+	int32 workersWanted = 1;
+	if (fSettings.IdleMode())
+		workersWanted = std::min(fSettings.MaxConnections(), totalMailboxes);
 
-		int32 totalMailboxes = fKnownMailboxes.size() + folders.size();
+	if (newFolders.empty() && fWorkers.CountItems() == workersWanted) {
+		// Nothing to do - we've already distributed everything
+		return B_OK;
+	}
 
-		while (fWorkers.CountItems() < fSettings.MaxConnections()
-			&& fWorkers.CountItems() < totalMailboxes) {
-			IMAPConnectionWorker* worker = new IMAPConnectionWorker(*this,
-				fSettings);
-			if (!fWorkers.AddItem(worker)) {
-				delete worker;
-				break;
-			}
+	// Remove mailboxes from workers
+	for (int32 i = 0; i < fWorkers.CountItems(); i++) {
+		fWorkers.ItemAt(i)->RemoveAllMailboxes();
+	}
 
-			worker->Start();
+	// Create/remove connection workers as allowed and needed
+	while (fWorkers.CountItems() < workersWanted) {
+		IMAPConnectionWorker* worker = new IMAPConnectionWorker(*this,
+			fSettings);
+		if (!fWorkers.AddItem(worker)) {
+			delete worker;
+			break;
 		}
+
+		worker->Run();
+	}
+	while (fWorkers.CountItems() > workersWanted) {
+		IMAPConnectionWorker* worker
+			= fWorkers.RemoveItemAt(fWorkers.CountItems() - 1);
+		worker->Quit();
 	}
 
-	// Distribute the new mailboxes to the existing workers
+	// Update known mailboxes
+	folderIterator = newFolders.begin();
+	for (; folderIterator != newFolders.end(); folderIterator++) {
+		const BString& mailbox = *folderIterator;
+		fFolders.insert(std::make_pair(mailbox,
+			_CreateFolder(mailbox, separator)));
+	}
 
+	// Distribute the mailboxes evenly to the workers
+	FolderMap::iterator iterator = fFolders.begin();
 	int32 index = 0;
-	while (!folders.empty()) {
-		BString folder = folders[0];
-		folders.erase(folders.begin());
-
-		fWorkers.ItemAt(index)->AddMailbox(folder);
-		fKnownMailboxes.insert(folder);
-
+	for (; iterator != fFolders.end(); iterator++) {
+		fWorkers.ItemAt(index)->AddMailbox(iterator->second);
 		index = (index + 1) % fWorkers.CountItems();
 	}
 
-	return B_OK;
+	// Restart waiting workers
+	delete_sem(fFolderChangeSemaphore);
+	return _CreateFolderChangeSemaphore();
 }
 
 
@@ -100,7 +128,7 @@ IMAPProtocol::SyncMessages()
 			return B_NO_MEMORY;
 		}
 
-		return worker->Start();
+		return worker->Run();
 	}
 
 	return B_OK;
@@ -160,6 +188,44 @@ IMAPProtocol::ReadyToRun()
 	puts("IMAP: ready to run!");
 	if (fSettings.IdleMode())
 		SyncMessages();
+}
+
+
+IMAPFolder*
+IMAPProtocol::_CreateFolder(const BString& mailbox, const BString& separator)
+{
+	BString name = MailboxToFolderName(mailbox, separator);
+
+	BPath path(fSettings.Destination());
+	if (path.Append(name.String()) != B_OK) {
+		fprintf(stderr, "Could not append path: %s\n", name.String());
+		return NULL;
+	}
+
+	status_t status = create_directory(path.Path(), 0755);
+	if (status != B_OK) {
+		fprintf(stderr, "Could not create path %s: %s\n", path.Path(),
+			strerror(status));
+		return NULL;
+	}
+
+	entry_ref ref;
+	status = get_ref_for_path(path.Path(), &ref);
+	if (status != B_OK) {
+		fprintf(stderr, "Could not get ref for %s: %s\n", path.Path(),
+			strerror(status));
+		return NULL;
+	}
+
+	return new IMAPFolder(mailbox, ref);
+}
+
+
+status_t
+IMAPProtocol::_CreateFolderChangeSemaphore()
+{
+	fFolderChangeSemaphore = create_sem(0, "imap folder change");
+	return fFolderChangeSemaphore < 0 ? fFolderChangeSemaphore : B_OK;
 }
 
 

@@ -16,14 +16,14 @@ UseLibraryHeaders linprog alm ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
 local sources =
-#	IMAPInboundProtocol.cpp
-#	IMAPRootInboundProtocol.cpp
 	IMAPProtocol.cpp
 	ConfigView.cpp
 	FolderConfigWindow.cpp
 	IMAPFolder.cpp
 	IMAPConnectionWorker.cpp
+	IMAPMailbox.cpp
 	Settings.cpp
+	Utilities.cpp
 
 	# imap_lib
 	Commands.cpp
