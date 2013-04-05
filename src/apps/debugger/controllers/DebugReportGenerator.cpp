@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -17,7 +17,9 @@
 #include <StringForSize.h>
 
 #include "Architecture.h"
+#include "AreaInfo.h"
 #include "CpuState.h"
+#include "DebuggerInterface.h"
 #include "Image.h"
 #include "MessageCodes.h"
 #include "Register.h"
@@ -37,11 +39,12 @@
 
 
 DebugReportGenerator::DebugReportGenerator(::Team* team,
-	UserInterfaceListener* listener)
+	UserInterfaceListener* listener, DebuggerInterface* interface)
 	:
 	BLooper("DebugReportGenerator"),
 	fTeam(team),
 	fArchitecture(team->GetArchitecture()),
+	fDebuggerInterface(interface),
 	fTeamDataSem(-1),
 	fNodeManager(NULL),
 	fListener(listener),
@@ -88,9 +91,11 @@ DebugReportGenerator::Init()
 
 
 DebugReportGenerator*
-DebugReportGenerator::Create(::Team* team, UserInterfaceListener* listener)
+DebugReportGenerator::Create(::Team* team, UserInterfaceListener* listener,
+	DebuggerInterface* interface)
 {
-	DebugReportGenerator* self = new DebugReportGenerator(team, listener);
+	DebugReportGenerator* self = new DebugReportGenerator(team, listener,
+		interface);
 
 	try {
 		self->Init();
@@ -117,6 +122,10 @@ DebugReportGenerator::_GenerateReport(const entry_ref& outputPath)
 		return result;
 
 	result = _DumpLoadedImages(output);
+	if (result != B_OK)
+		return result;
+
+	result = _DumpAreas(output);
 	if (result != B_OK)
 		return result;
 
@@ -248,6 +257,36 @@ DebugReportGenerator::_DumpLoadedImages(BString& _output)
 					buffer, sizeof(buffer)), textBase,
 				textBase + info.TextSize(), dataBase,
 				dataBase + info.DataSize());
+
+			_output << data;
+		} catch (...) {
+			return B_NO_MEMORY;
+		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
+DebugReportGenerator::_DumpAreas(BString& _output)
+{
+	BObjectList<AreaInfo> areas(20, true);
+	status_t result = fDebuggerInterface->GetAreaInfos(areas);
+	if (result != B_OK)
+		return result;
+
+	_output << "\nAreas:\n";
+	BString data;
+	AreaInfo* info;
+	for (int32 i = 0; (info = areas.ItemAt(i)) != NULL; i++) {
+		try {
+			data.SetToFormat("\t%s (%" B_PRId32 ") "
+				"Base: %#08" B_PRIx64 ", Size: %" B_PRId64
+				", RAM Size: %" B_PRId64 ", Locking: %#04" B_PRIx32
+				", Protection: %#04" B_PRIx32 "\n", info->Name().String(),
+				info->AreaID(), info->BaseAddress(), info->Size(),
+				info->RamSize(), info->Lock(), info->Protection());
 
 			_output << data;
 		} catch (...) {

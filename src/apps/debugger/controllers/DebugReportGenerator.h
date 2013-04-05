@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DEBUG_REPORT_GENERATOR_H
@@ -16,6 +16,7 @@
 class entry_ref;
 class Architecture;
 class BString;
+class DebuggerInterface;
 class StackFrame;
 class Team;
 class Thread;
@@ -30,13 +31,15 @@ class DebugReportGenerator : public BLooper, private Team::Listener,
 	private TeamMemoryBlock::Listener, private ValueNodeContainer::Listener {
 public:
 								DebugReportGenerator(::Team* team,
-									UserInterfaceListener* listener);
+									UserInterfaceListener* listener,
+									DebuggerInterface* interface);
 								~DebugReportGenerator();
 
 			status_t			Init();
 
 	static	DebugReportGenerator* Create(::Team* team,
-									UserInterfaceListener* listener);
+									UserInterfaceListener* listener,
+									DebuggerInterface* interface);
 
 	virtual void				MessageReceived(BMessage* message);
 
@@ -56,6 +59,7 @@ private:
 			status_t			_GenerateReport(const entry_ref& outputPath);
 			status_t			_GenerateReportHeader(BString& _output);
 			status_t			_DumpLoadedImages(BString& _output);
+			status_t			_DumpAreas(BString& _output);
 			status_t			_DumpRunningThreads(BString& _output);
 			status_t			_DumpDebuggedThreadInfo(BString& _output,
 									::Thread* thread);
@@ -70,6 +74,7 @@ private:
 private:
 			::Team*				fTeam;
 			Architecture*		fArchitecture;
+			DebuggerInterface*	fDebuggerInterface;
 			sem_id				fTeamDataSem;
 			ValueNodeManager*	fNodeManager;
 			UserInterfaceListener* fListener;
