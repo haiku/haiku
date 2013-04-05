@@ -13,6 +13,8 @@
 #include "Package.h"
 
 
+struct stat;
+
 class NotificationListener;
 class Volume;
 
@@ -29,7 +31,7 @@ public:
 			dev_t				DeviceID()		{ return fDeviceID; }
 			ino_t				NodeID()		{ return fNodeID; }
 
-			status_t			Init(const char* path);
+			status_t			Init(const char* path, struct stat* _st);
 			status_t			Prepare(NotificationListener* listener);
 									// takes over ownership of the listener
 

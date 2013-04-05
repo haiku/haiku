@@ -617,8 +617,8 @@ Volume::Mount(const char* parameterString)
 	CObjectDeleter<void, status_t> parameterHandleDeleter(parameterHandle,
 		&delete_driver_settings);
 
-	if (packages == NULL || packages[0] == '\0') {
-		FATAL("need package folder ('packages' parameter)!\n");
+	if (packages != NULL && packages[0] == '\0') {
+		FATAL("invalid package folder ('packages' parameter)!\n");
 		RETURN_ERROR(B_BAD_VALUE);
 	}
 
@@ -628,11 +628,22 @@ Volume::Mount(const char* parameterString)
 		RETURN_ERROR(error);
 	}
 
+	// get our mount point
+	error = vfs_get_mount_point(fFSVolume->id, &fMountPoint.deviceID,
+		&fMountPoint.nodeID);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// create initial package domain
+	PackageDomain* packageDomain = new(std::nothrow) PackageDomain(this);
+	if (packageDomain == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+	BReference<PackageDomain> packageDomainReference(packageDomain, true);
+
 	struct stat st;
-	if (stat(packages, &st) < 0) {
-		FATAL("failed to stat: \"%s\": %s\n", packages, strerror(errno));
-		RETURN_ERROR(B_ERROR);
-	}
+	error = packageDomain->Init(packages, &st);
+	if (error != B_OK)
+		RETURN_ERROR(error);
 
 	// If no volume name is given, infer it from the mount type.
 	if (volumeName == NULL) {
@@ -663,12 +674,6 @@ Volume::Mount(const char* parameterString)
 	fRootDirectory->AcquireReference();
 		// one reference for the table
 
-	// get our mount point
-	error = vfs_get_mount_point(fFSVolume->id, &fMountPoint.deviceID,
-		&fMountPoint.nodeID);
-	if (error != B_OK)
-		RETURN_ERROR(error);
-
 	// register with packagefs root
 	error = ::PackageFSRoot::RegisterVolume(this);
 	if (error != B_OK)
@@ -685,8 +690,8 @@ Volume::Mount(const char* parameterString)
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
-	// create default package domain
-	error = _AddInitialPackageDomain(packages);
+	// add initial package domain
+	error = _AddPackageDomain(packageDomain, false);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
@@ -823,7 +828,7 @@ Volume::AddPackageDomain(const char* path)
 		RETURN_ERROR(B_NO_MEMORY);
 	BReference<PackageDomain> packageDomainReference(packageDomain, true);
 
-	status_t error = packageDomain->Init(path);
+	status_t error = packageDomain->Init(path, NULL);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
@@ -929,24 +934,10 @@ Volume::_PushJob(Job* job)
 
 
 status_t
-Volume::_AddInitialPackageDomain(const char* path)
-{
-	PackageDomain* domain = new(std::nothrow) PackageDomain(this);
-	if (domain == NULL)
-		RETURN_ERROR(B_NO_MEMORY);
-	BReference<PackageDomain> domainReference(domain, true);
-
-	status_t error = domain->Init(path);
-	if (error != B_OK)
-		RETURN_ERROR(error);
-
-	return _AddPackageDomain(domain, false);
-}
-
-
-status_t
 Volume::_AddPackageDomain(PackageDomain* domain, bool notify)
 {
+	dprintf("packagefs: Adding package domain \"%s\"\n", domain->Path());
+
 	// create a directory listener
 	DomainDirectoryListener* listener = new(std::nothrow)
 		DomainDirectoryListener(this, domain);
@@ -962,7 +953,13 @@ Volume::_AddPackageDomain(PackageDomain* domain, bool notify)
 	}
 
 	// iterate through the dir and create packages
-	DIR* dir = opendir(domain->Path());
+	int fd = dup(domain->DirectoryFD());
+	if (fd < 0) {
+		ERROR("Failed to dup() package domain FD: %s\n", strerror(errno));
+		RETURN_ERROR(errno);
+	}
+
+	DIR* dir = fdopendir(fd);
 	if (dir == NULL) {
 		ERROR("Failed to open package domain directory \"%s\": %s\n",
 			domain->Path(), strerror(errno));
