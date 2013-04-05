@@ -89,14 +89,29 @@ struct AttributeIndex::TreeDefinition {
 
 	int Compare(const Key& a, const Value* b) const
 	{
-		return QueryParser::compareKeys(fType, a.data, a.length, b->data,
+		int cmp = QueryParser::compareKeys(fType, a.data, a.length, b->data,
 			b->length);
+		if (cmp != 0)
+			return cmp;
+
+		// The attribute value is the same. Since the tree value is the tree
+		// node itself, we must not return 0, though. We consider a node-less
+		// key always less than an actual tree node with the same attribute
+		// value.
+		return -1;
 	}
 
 	int Compare(const Value* a, const Value* b) const
 	{
-		return QueryParser::compareKeys(fType, a->data, a->length, b->data,
+		if (a == b)
+			return 0;
+
+		int cmp = QueryParser::compareKeys(fType, a->data, a->length, b->data,
 			b->length);
+		if (cmp != 0)
+			return cmp;
+
+		return a < b ? -1 : 1;
 	}
 
 private:
