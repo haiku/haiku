@@ -1469,11 +1469,10 @@ StyledEditWindow::_ReloadDocument(BMessage* message)
 	entry_ref ref;
 	const char* name;
 
-	if (fSaveMessage == NULL || message == NULL)
+	if (fSaveMessage == NULL || message == NULL
+		|| fSaveMessage->FindRef("directory", &ref) != B_OK
+		|| fSaveMessage->FindString("name", &name) != B_OK)
 		return;
-
-	fSaveMessage->FindRef("directory", &ref);
-	fSaveMessage->FindString("name", &name);
 
 	BDirectory dir(&ref);
 	status_t status = dir.InitCheck();
