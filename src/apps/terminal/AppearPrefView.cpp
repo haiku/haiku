@@ -399,6 +399,8 @@ AppearancePrefView::_SetCurrentColorScheme()
 	}
 
 	for (int32 i = 0; i < fColorSchemeField->Menu()->CountItems(); i++) {
+		if (currentSchemeName == NULL)
+			break;
 		BMenuItem* item = fColorSchemeField->Menu()->ItemAt(i);
 		if (strcmp(item->Label(), currentSchemeName) == 0) {
 			item->SetMarked(true);
