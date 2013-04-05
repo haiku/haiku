@@ -53,6 +53,8 @@ static ColorDescription sColorDescriptionTable[] =
 	{ B_LIST_ITEM_TEXT_COLOR, B_TRANSLATE_MARK("List item text") },
 	{ B_LIST_SELECTED_ITEM_TEXT_COLOR,
 		B_TRANSLATE_MARK("Selected list item text") },
+	{ B_SCROLL_BAR_THUMB_COLOR,
+		B_TRANSLATE_MARK("Scroll bar thumb") },
 	{ B_TOOL_TIP_BACKGROUND_COLOR, B_TRANSLATE_MARK("Tooltip background") },
 	{ B_TOOL_TIP_TEXT_COLOR, B_TRANSLATE_MARK("Tooltip text") },
 	{ B_SUCCESS_COLOR, B_TRANSLATE_MARK("Success") },

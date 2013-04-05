@@ -101,6 +101,7 @@ static const rgb_color _kDefaultColors[kNumColors] = {
 	{153, 153, 153, 255},	// B_LIST_SELECTED_BACKGROUND_COLOR
 	{0, 0, 0, 255},			// B_LIST_ITEM_TEXT_COLOR
 	{0, 0, 0, 255},			// B_LIST_SELECTED_ITEM_TEXT_COLOR
+	{216, 216, 216, 255},	// B_SCROLL_BAR_THUMB_COLOR
 	// 100...
 	{0, 255, 0, 255},		// B_SUCCESS_COLOR
 	{255, 0, 0, 255},		// B_FAILURE_COLOR
