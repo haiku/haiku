@@ -60,6 +60,7 @@ private:
 			status_t			_GenerateReportHeader(BString& _output);
 			status_t			_DumpLoadedImages(BString& _output);
 			status_t			_DumpAreas(BString& _output);
+			status_t			_DumpSemaphores(BString& _output);
 			status_t			_DumpRunningThreads(BString& _output);
 			status_t			_DumpDebuggedThreadInfo(BString& _output,
 									::Thread* thread);

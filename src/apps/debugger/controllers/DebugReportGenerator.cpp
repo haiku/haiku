@@ -23,6 +23,7 @@
 #include "Image.h"
 #include "MessageCodes.h"
 #include "Register.h"
+#include "SemaphoreInfo.h"
 #include "StackFrame.h"
 #include "StackTrace.h"
 #include "StringUtils.h"
@@ -126,6 +127,10 @@ DebugReportGenerator::_GenerateReport(const entry_ref& outputPath)
 		return result;
 
 	result = _DumpAreas(output);
+	if (result != B_OK)
+		return result;
+
+	result = _DumpSemaphores(output);
 	if (result != B_OK)
 		return result;
 
@@ -287,6 +292,34 @@ DebugReportGenerator::_DumpAreas(BString& _output)
 				", Protection: %#04" B_PRIx32 "\n", info->Name().String(),
 				info->AreaID(), info->BaseAddress(), info->Size(),
 				info->RamSize(), info->Lock(), info->Protection());
+
+			_output << data;
+		} catch (...) {
+			return B_NO_MEMORY;
+		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
+DebugReportGenerator::_DumpSemaphores(BString& _output)
+{
+	BObjectList<SemaphoreInfo> semaphores(20, true);
+	status_t result = fDebuggerInterface->GetSemaphoreInfos(semaphores);
+	if (result != B_OK)
+		return result;
+
+	_output << "\nSemaphores:\n";
+	BString data;
+	SemaphoreInfo* info;
+	for (int32 i = 0; (info = semaphores.ItemAt(i)) != NULL; i++) {
+		try {
+			data.SetToFormat("\t%s (%" B_PRId32 ") "
+				"Count: %" B_PRId32 ", Latest Holding Thread: %" B_PRId32 "\n",
+				info->Name().String(), info->SemID(), info->Count(),
+				info->LatestHolder());
 
 			_output << data;
 		} catch (...) {
