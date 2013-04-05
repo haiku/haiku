@@ -284,14 +284,19 @@ DebugReportGenerator::_DumpAreas(BString& _output)
 	_output << "\nAreas:\n";
 	BString data;
 	AreaInfo* info;
+	BString protectionBuffer;
+	char lockingBuffer[32];
 	for (int32 i = 0; (info = areas.ItemAt(i)) != NULL; i++) {
 		try {
 			data.SetToFormat("\t%s (%" B_PRId32 ") "
 				"Base: %#08" B_PRIx64 ", Size: %" B_PRId64
-				", RAM Size: %" B_PRId64 ", Locking: %#04" B_PRIx32
-				", Protection: %#04" B_PRIx32 "\n", info->Name().String(),
-				info->AreaID(), info->BaseAddress(), info->Size(),
-				info->RamSize(), info->Lock(), info->Protection());
+				", RAM Size: %" B_PRId64 ",Locking: %s, Protection: %s\n",
+				info->Name().String(), info->AreaID(), info->BaseAddress(),
+				info->Size(), info->RamSize(),
+				UiUtils::AreaLockingFlagsToString(info->Lock(), lockingBuffer,
+					sizeof(lockingBuffer)),
+				UiUtils::AreaProtectionFlagsToString(info->Protection(),
+					protectionBuffer).String());
 
 			_output << data;
 		} catch (...) {

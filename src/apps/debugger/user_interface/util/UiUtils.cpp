@@ -1,6 +1,6 @@
 /*
  * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -11,9 +11,12 @@
 #include <stdio.h>
 
 #include <DateTime.h>
+#include <KernelExport.h>
 #include <Path.h>
 #include <String.h>
 #include <Variant.h>
+
+#include <vm_defs.h>
 
 #include "FunctionInstance.h"
 #include "Image.h"
@@ -143,6 +146,100 @@ UiUtils::ImageTypeToString(image_type type, char* buffer, size_t bufferSize)
 	}
 
 	return buffer;
+}
+
+
+/*static*/ const char*
+UiUtils::AreaLockingFlagsToString(uint32 flags, char* buffer,
+	size_t bufferSize)
+{
+	switch (flags) {
+		case B_NO_LOCK:
+			snprintf(buffer, bufferSize, "None");
+			break;
+		case B_LAZY_LOCK:
+			snprintf(buffer, bufferSize, "Lazy");
+			break;
+		case B_FULL_LOCK:
+			snprintf(buffer, bufferSize, "Full");
+			break;
+		case B_CONTIGUOUS:
+			snprintf(buffer, bufferSize, "Contiguous");
+			break;
+		case B_LOMEM:
+			snprintf(buffer, bufferSize, "Lo-mem");
+			break;
+		case B_32_BIT_FULL_LOCK:
+			snprintf(buffer, bufferSize, "32-bit Full");
+			break;
+		case B_32_BIT_CONTIGUOUS:
+			snprintf(buffer, bufferSize, "32-bit Contiguous");
+			break;
+		default:
+			snprintf(buffer, bufferSize, "Unknown");
+			break;
+	}
+
+	return buffer;
+}
+
+
+/*static*/ const BString&
+UiUtils::AreaProtectionFlagsToString(uint32 protection, BString& _output)
+{
+	#undef ADD_AREA_FLAG_IF_PRESENT
+	#define ADD_AREA_FLAG_IF_PRESENT(flag, protection, name, output) \
+		if ((protection & flag) != 0) { \
+			_output += name; \
+			protection &= ~flag; \
+		}
+
+	_output.Truncate(0);
+	uint32 userFlags = protection & B_USER_PROTECTION;
+	if ((protection & B_USER_PROTECTION) != 0) {
+		ADD_AREA_FLAG_IF_PRESENT(B_READ_AREA, protection, "r", _output);
+		ADD_AREA_FLAG_IF_PRESENT(B_WRITE_AREA, protection, "w", _output);
+		ADD_AREA_FLAG_IF_PRESENT(B_EXECUTE_AREA, protection, "x", _output);
+		ADD_AREA_FLAG_IF_PRESENT(B_STACK_AREA, protection, "s", _output);
+		ADD_AREA_FLAG_IF_PRESENT(B_OVERCOMMITTING_AREA, protection, " overcommitting",
+			_output);
+		_output += ", ";
+
+		// if the user versions of these flags are present,
+		// filter out their kernel equivalents since they're implied.
+		if ((userFlags & B_READ_AREA) != 0)
+			protection &= ~B_KERNEL_READ_AREA;
+		if ((userFlags & B_WRITE_AREA) != 0)
+			protection &= ~B_KERNEL_WRITE_AREA;
+		if ((userFlags & B_EXECUTE_AREA) != 0)
+			protection &= ~B_KERNEL_EXECUTE_AREA;
+		if ((userFlags & B_STACK_AREA) != 0)
+			protection &= ~B_KERNEL_STACK_AREA;
+	}
+	if ((protection & B_KERNEL_AREA_FLAGS) != 0) {
+		_output += "kernel:";
+		ADD_AREA_FLAG_IF_PRESENT(B_KERNEL_READ_AREA, protection, "r", _output);
+		ADD_AREA_FLAG_IF_PRESENT(B_KERNEL_WRITE_AREA, protection, "w",
+			_output);
+		ADD_AREA_FLAG_IF_PRESENT(B_KERNEL_EXECUTE_AREA, protection, "x",
+			_output);
+		ADD_AREA_FLAG_IF_PRESENT(B_KERNEL_STACK_AREA, protection, "s",
+			_output);
+		ADD_AREA_FLAG_IF_PRESENT(B_USER_CLONEABLE_AREA, protection, " cloneable",
+			_output);
+		ADD_AREA_FLAG_IF_PRESENT(B_SHARED_AREA, protection, " shared", _output);
+		_output += ", ";
+	}
+
+	if (protection != 0) {
+		char buffer[32];
+		snprintf(buffer, sizeof(buffer), " Unknown (%#04" B_PRIx32 ")",
+			protection);
+		_output += buffer;
+	} else if (!_output.IsEmpty())
+		_output.Truncate(_output.Length() - 2);
+
+	return _output;
 }
 
 
