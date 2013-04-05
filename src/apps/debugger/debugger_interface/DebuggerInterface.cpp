@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -23,6 +23,7 @@
 
 #include "ArchitectureX86.h"
 #include "ArchitectureX8664.h"
+#include "AreaInfo.h"
 #include "CpuState.h"
 #include "DebugEvent.h"
 #include "ImageInfo.h"
@@ -511,6 +512,26 @@ DebuggerInterface::GetImageInfos(BObjectList<ImageInfo>& infos)
 				return B_NO_MEMORY;
 			}
 			break;
+		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
+DebuggerInterface::GetAreaInfos(BObjectList<AreaInfo>& infos)
+{
+	// get the team's areas
+	area_info areaInfo;
+	int32 cookie = 0;
+	while (get_next_area_info(fTeamID, &cookie, &areaInfo) == B_OK) {
+		AreaInfo* info = new(std::nothrow) AreaInfo(fTeamID, areaInfo.area,
+			areaInfo.name, (addr_t)areaInfo.address, areaInfo.size,
+			areaInfo.ram_size, areaInfo.lock, areaInfo.protection);
+		if (info == NULL || !infos.AddItem(info)) {
+			delete info;
+			return B_NO_MEMORY;
 		}
 	}
 

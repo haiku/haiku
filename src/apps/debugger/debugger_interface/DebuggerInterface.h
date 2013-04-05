@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DEBUGGER_INTERFACE_H
@@ -17,6 +17,7 @@
 class Architecture;
 class CpuState;
 class DebugEvent;
+class AreaInfo;
 class ImageInfo;
 class SymbolInfo;
 class ThreadInfo;
@@ -54,6 +55,7 @@ public:
 
 	virtual	status_t			GetThreadInfos(BObjectList<ThreadInfo>& infos);
 	virtual	status_t			GetImageInfos(BObjectList<ImageInfo>& infos);
+	virtual status_t			GetAreaInfos(BObjectList<AreaInfo>& infos);
 	virtual	status_t			GetSymbolInfos(team_id team, image_id image,
 									BObjectList<SymbolInfo>& infos);
 	virtual	status_t			GetSymbolInfo(team_id team, image_id image,
