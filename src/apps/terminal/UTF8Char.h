@@ -16,6 +16,7 @@ struct UTF8Char {
 
 	UTF8Char()
 	{
+		bytes[0] = 0;
 	}
 
 	UTF8Char(char c)
