@@ -32,6 +32,7 @@ SetTitleDialog::SetTitleDialog(const char* dialogTitle, const char* label,
 		B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
 	fListener(NULL),
 	fTitle(),
+	fOldTitleUserDefined(false),
 	fTitleUserDefined(false)
 {
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
