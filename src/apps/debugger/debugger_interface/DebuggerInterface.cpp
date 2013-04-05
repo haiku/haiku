@@ -27,6 +27,7 @@
 #include "CpuState.h"
 #include "DebugEvent.h"
 #include "ImageInfo.h"
+#include "SemaphoreInfo.h"
 #include "SymbolInfo.h"
 #include "ThreadInfo.h"
 
@@ -529,6 +530,25 @@ DebuggerInterface::GetAreaInfos(BObjectList<AreaInfo>& infos)
 		AreaInfo* info = new(std::nothrow) AreaInfo(fTeamID, areaInfo.area,
 			areaInfo.name, (addr_t)areaInfo.address, areaInfo.size,
 			areaInfo.ram_size, areaInfo.lock, areaInfo.protection);
+		if (info == NULL || !infos.AddItem(info)) {
+			delete info;
+			return B_NO_MEMORY;
+		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
+DebuggerInterface::GetSemaphoreInfos(BObjectList<SemaphoreInfo>& infos)
+{
+	// get the team's semaphores
+	sem_info semInfo;
+	int32 cookie = 0;
+	while (get_next_sem_info(fTeamID, &cookie, &semInfo) == B_OK) {
+		SemaphoreInfo* info = new(std::nothrow) SemaphoreInfo(fTeamID,
+			semInfo.sem, semInfo.name, semInfo.count, semInfo.latest_holder);
 		if (info == NULL || !infos.AddItem(info)) {
 			delete info;
 			return B_NO_MEMORY;
