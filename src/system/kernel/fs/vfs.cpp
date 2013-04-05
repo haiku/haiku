@@ -8069,6 +8069,9 @@ _kern_open_dir_entry_ref(dev_t device, ino_t inode, const char* name)
 int
 _kern_open_dir(int fd, const char* path)
 {
+	if (path == NULL)
+		return dir_open(fd, NULL, true);;
+
 	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
