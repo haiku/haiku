@@ -157,9 +157,18 @@ enum AX88772_BBState {
 	LINK_STATE_MDINT	= 0x08
 };
 
+// RX Control Register bits (772B)
+enum ASIX772RXControl {
+	RXCTL_HDR_TYPE_0	= 0x0000,
+	RXCTL_HDR_TYPE_1	= 0x0100,
+	RXCTL_HDR_IPALIGN	= 0x0200,
+	RXCTL_ADD_CHKSUM	= 0x0400,
+};
+
 // EEPROM Map.
 enum AX88772B_EEPROM {
-	EEPROM_772B_NODE_ID	= 0x04
+	EEPROM_772B_NODE_ID	= 0x04,
+	EEPROM_772B_PHY_PWRCFG	= 0x18
 };
 
 enum AX88772B_MFB {
@@ -511,8 +520,11 @@ AX88772Device::StartDevice()
 			TRACE_ALWAYS("Error of writing frame burst:%#010x\n", result);
 			return result;
 		}
-		
-		rxcontrol = RXCTL_USB_MFB;
+		rxcontrol = RXCTL_HDR_TYPE_1;
+	} else {
+		// TODO: FreeBSD documents this to speed up xfers, I don't
+		// have the hardware to test however.
+		//rxcontrol = RXCTL_USB_MFB_MAX;
 	}
 
 	rxcontrol |= RXCTL_START | RXCTL_BROADCAST;
