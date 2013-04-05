@@ -146,6 +146,7 @@ Application Debugger :
 	Image.cpp
 	ImageInfo.cpp
 	ReturnValueInfo.cpp
+	SemaphoreInfo.cpp
 	SourceCode.cpp
 	StackFrame.cpp
 	StackFrameValues.cpp
