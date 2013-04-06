@@ -77,6 +77,8 @@ options:
                               as first option!]
   --use-gcc-pipe              Build with GCC option -pipe. Speeds up the build
                               process, but uses more memory.
+  --use-gcc-graphite          Build with GCC Graphite engine for loop
+                              optimizations. Only for gcc 4.
   --use-32bit                 Use -m32 flag on 64bit host gcc compiler.
   --use-xattr                 Use Linux xattr support for BeOS attribute
                               emulation. Warning: Make sure your file system
