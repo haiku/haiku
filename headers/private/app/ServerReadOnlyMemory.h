@@ -13,6 +13,13 @@
 #include <InterfaceDefs.h>
 
 
+// Update this constant with the largest color constant excluding
+// B_SUCCESS_COLOR and B_FAILURE_COLOR.
+// If you add a constant with index greater than 100 you'll have to add
+// to the second operand.
+static const int32 B_COLOR_WHICH_COUNT = B_SCROLL_BAR_THUMB_COLOR + 3;
+
+
 struct server_read_only_memory {
 	rgb_color	colors[B_COLOR_WHICH_COUNT];
 };

@@ -331,12 +331,6 @@ enum color_which {
 	B_KEYBOARD_NAVIGATION_COLOR = B_NAVIGATION_BASE_COLOR,
 	B_MENU_SELECTION_BACKGROUND_COLOR = B_MENU_SELECTED_BACKGROUND_COLOR,
 
-	// Update this constant to be the largest color constant excluding
-	// B_SUCCESS_COLOR and B_FAILURE_COLOR.
-	// If you add a constant with index greater than 100 you'll have to add
-	// to the second operand below and also update ServerReadOnlyMemory.h
-	B_COLOR_WHICH_COUNT = B_SCROLL_BAR_THUMB_COLOR + 3,
-
 	// The following constants are deprecated, do not use in new code.
 	B_DESKTOP_COLOR = 5
 		// see BScreen class for B_DESKTOP_COLOR replacement
