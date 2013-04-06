@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src add-ons kernel file_systems packagefs ;
 
 UseLibraryHeaders zlib ;
 UsePrivateKernelHeaders ;
-UsePrivateHeaders shared storage ;
+UsePrivateHeaders package shared storage ;
 
 
 HAIKU_PACKAGE_FS_SOURCES =

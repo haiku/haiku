@@ -28,13 +28,13 @@ static const char*
 link_path_for_mount_type(MountType type)
 {
 	switch (type) {
-		case MOUNT_TYPE_SYSTEM:
+		case PACKAGE_FS_MOUNT_TYPE_SYSTEM:
 			return kSystemLinkPath;
-		case MOUNT_TYPE_COMMON:
+		case PACKAGE_FS_MOUNT_TYPE_COMMON:
 			return kCommonLinkPath;
-		case MOUNT_TYPE_HOME:
+		case PACKAGE_FS_MOUNT_TYPE_HOME:
 			return kHomeLinkPath;
-		case MOUNT_TYPE_CUSTOM:
+		case PACKAGE_FS_MOUNT_TYPE_CUSTOM:
 		default:
 			return "?";
 	}

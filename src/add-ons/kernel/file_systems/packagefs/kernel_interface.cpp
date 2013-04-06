@@ -284,6 +284,22 @@ packagefs_io(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 // #pragma mark - Nodes
 
 
+status_t
+packagefs_ioctl(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
+	uint32 operation, void* buffer, size_t size)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)fsNode->private_node;
+
+	FUNCTION("volume: %p, node: %p (%lld), cookie: %p, operation: %" B_PRI32u
+		", buffer: %p, size: %zu\n", volume, node, node->ID(), cookie,
+		operation, buffer, size);
+	TOUCH(cookie);
+
+	return volume->IOCtl(node, operation, buffer, size);
+}
+
+
 static status_t
 packagefs_read_symlink(fs_volume* fsVolume, fs_vnode* fsNode, char* buffer,
 	size_t* _bufferSize)
@@ -1179,7 +1195,7 @@ fs_vnode_ops gPackageFSVnodeOps = {
 
 	NULL,	// get_file_map,
 
-	NULL,	// ioctl,
+	&packagefs_ioctl,
 	NULL,	// set_flags,
 	NULL,	// select,
 	NULL,	// deselect,

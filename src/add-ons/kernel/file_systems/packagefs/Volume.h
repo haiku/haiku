@@ -14,6 +14,8 @@
 #include <util/DoublyLinkedList.h>
 #include <util/KMessage.h>
 
+#include <packagefs.h>
+
 #include "Index.h"
 #include "Node.h"
 #include "NodeListener.h"
@@ -29,12 +31,7 @@ class UnpackingNode;
 typedef IndexHashTable::Iterator IndexDirIterator;
 
 
-enum MountType {
-	MOUNT_TYPE_SYSTEM,
-	MOUNT_TYPE_COMMON,
-	MOUNT_TYPE_HOME,
-	MOUNT_TYPE_CUSTOM
-};
+typedef PackageFSMountType MountType;
 
 
 class Volume : public DoublyLinkedListLinkImpl<Volume>,
@@ -69,6 +66,9 @@ public:
 
 			Node*				FindNode(ino_t nodeID) const
 									{ return fNodes.Lookup(nodeID); }
+
+			status_t			IOCtl(Node* node, uint32 operation,
+									void* buffer, size_t size);
 
 			// node listeners -- volume must be write-locked
 			void				AddNodeListener(NodeListener* listener,

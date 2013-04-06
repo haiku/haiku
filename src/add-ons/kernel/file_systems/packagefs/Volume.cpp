@@ -648,16 +648,16 @@ Volume::Mount(const char* parameterString)
 	// If no volume name is given, infer it from the mount type.
 	if (volumeName == NULL) {
 		switch (fMountType) {
-			case MOUNT_TYPE_SYSTEM:
+			case PACKAGE_FS_MOUNT_TYPE_SYSTEM:
 				volumeName = "system";
 				break;
-			case MOUNT_TYPE_COMMON:
+			case PACKAGE_FS_MOUNT_TYPE_COMMON:
 				volumeName = "common";
 				break;
-			case MOUNT_TYPE_HOME:
+			case PACKAGE_FS_MOUNT_TYPE_HOME:
 				volumeName = "home";
 				break;
-			case MOUNT_TYPE_CUSTOM:
+			case PACKAGE_FS_MOUNT_TYPE_CUSTOM:
 			default:
 				volumeName = "Package FS";
 				break;
@@ -725,6 +725,28 @@ void
 Volume::Unmount()
 {
 	_TerminatePackageLoader();
+}
+
+
+status_t
+Volume::IOCtl(Node* node, uint32 operation, void* buffer, size_t size)
+{
+	switch (operation) {
+		case PACKAGE_FS_OPERATION_GET_VOLUME_INFO:
+		{
+			if (size != sizeof(PackageFSVolumeInfo))
+				return B_BAD_VALUE;
+
+			PackageFSVolumeInfo info;
+			info.mountType = fMountType;
+			info.rootDeviceID = fPackageFSRoot->DeviceID();
+			info.rootDirectoryID = fPackageFSRoot->NodeID();
+			return user_memcpy(buffer, &info, sizeof(info));
+		}
+
+		default:
+			return B_BAD_VALUE;
+	}
 }
 
 
@@ -1664,15 +1686,15 @@ status_t
 Volume::_InitMountType(const char* mountType)
 {
 	if (mountType == NULL)
-		fMountType = MOUNT_TYPE_CUSTOM;
+		fMountType = PACKAGE_FS_MOUNT_TYPE_CUSTOM;
 	else if (strcmp(mountType, "system") == 0)
-		fMountType = MOUNT_TYPE_SYSTEM;
+		fMountType = PACKAGE_FS_MOUNT_TYPE_SYSTEM;
 	else if (strcmp(mountType, "common") == 0)
-		fMountType = MOUNT_TYPE_COMMON;
+		fMountType = PACKAGE_FS_MOUNT_TYPE_COMMON;
 	else if (strcmp(mountType, "home") == 0)
-		fMountType = MOUNT_TYPE_HOME;
+		fMountType = PACKAGE_FS_MOUNT_TYPE_HOME;
 	else if (strcmp(mountType, "custom") == 0)
-		fMountType = MOUNT_TYPE_CUSTOM;
+		fMountType = PACKAGE_FS_MOUNT_TYPE_CUSTOM;
 	else
 		RETURN_ERROR(B_BAD_VALUE);
 
@@ -1714,16 +1736,16 @@ Volume::_CreateShineThroughDirectories(const char* shineThroughSetting)
 	if (shineThroughSetting == NULL) {
 		// nothing specified -- derive from mount type
 		switch (fMountType) {
-			case MOUNT_TYPE_SYSTEM:
+			case PACKAGE_FS_MOUNT_TYPE_SYSTEM:
 				directories = kSystemShineThroughDirectories;
 				break;
-			case MOUNT_TYPE_COMMON:
+			case PACKAGE_FS_MOUNT_TYPE_COMMON:
 				directories = kCommonShineThroughDirectories;
 				break;
-			case MOUNT_TYPE_HOME:
+			case PACKAGE_FS_MOUNT_TYPE_HOME:
 				directories = kHomeShineThroughDirectories;
 				break;
-			case MOUNT_TYPE_CUSTOM:
+			case PACKAGE_FS_MOUNT_TYPE_CUSTOM:
 				return B_OK;
 		}
 	} else if (strcmp(shineThroughSetting, "system") == 0)

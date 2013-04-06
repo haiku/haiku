@@ -96,14 +96,14 @@ PackageFSRoot::RegisterVolume(Volume* volume)
 	const char* relativeRootPath = NULL;
 
 	switch (volume->MountType()) {
-		case MOUNT_TYPE_SYSTEM:
-		case MOUNT_TYPE_COMMON:
+		case PACKAGE_FS_MOUNT_TYPE_SYSTEM:
+		case PACKAGE_FS_MOUNT_TYPE_COMMON:
 			relativeRootPath = "..";
 			break;
-		case MOUNT_TYPE_HOME:
+		case PACKAGE_FS_MOUNT_TYPE_HOME:
 			relativeRootPath = "../..";
 			break;
-		case MOUNT_TYPE_CUSTOM:
+		case PACKAGE_FS_MOUNT_TYPE_CUSTOM:
 		default:
 			break;
 	}
@@ -217,8 +217,10 @@ PackageFSRoot::_AddVolume(Volume* volume)
 	fVolumes.Add(volume);
 		// TODO: Correct order?
 
-	if (fSystemVolume == NULL && volume->MountType() == MOUNT_TYPE_SYSTEM)
+	if (fSystemVolume == NULL && volume->MountType()
+			== PACKAGE_FS_MOUNT_TYPE_SYSTEM) {
 		fSystemVolume = volume;
+	}
 
 	return B_OK;
 }
