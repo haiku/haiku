@@ -95,8 +95,7 @@ fi
 # (which apparently doesn't work reliably on all the different host 
 # configurations and changes files which in turn appear as local changes
 # to the VCS).
-find $binutilsSourceDir -name \*.info -print0 | xargs -0 touch
-find $gccSourceDir -name \*.info -print0 | xargs -0 touch
+find $binutilsSourceDir $gccSourceDir -name \*.info -print0 | xargs -0 touch
 
 # create the object and installation directories for the cross compilation tools
 installDir=$haikuOutputDir/cross-tools
@@ -113,6 +112,20 @@ mkdir -p $installDir $objDir $binutilsObjDir $gccObjDir $stdcxxObjDir \
 	$tmpIncludeDir $tmpLibDir || exit 1
 mkdir -p $installDir/lib/gcc/$haikuMachine/$gccVersion
 
+if [ "$HAIKU_USE_GCC_GRAPHITE" = 1 ]; then
+	cloogSourceDir=$buildToolsDir/cloog
+	pplSourceDir=$buildToolsDir/ppl
+	find $cloogSourceDir $pplSourceDir -name \*.info -print0 | xargs -0 touch
+	
+	pplObjDir=$objDir/ppl
+	cloogObjDir=$objDir/cloog
+	mkdir -p $pplObjDir $cloogObjDir || exit 1
+	
+	gccConfigureArgs="$gccConfigureArgs --with-cloog=$installDir \
+		--enable-cloog-backend=isl --with-ppl=$installDir \
+		--disable-cloog-version-check"
+fi
+
 # force the POSIX locale, as the build (makeinfo) might choke otherwise
 export LC_ALL=POSIX
 
@@ -126,6 +139,22 @@ $MAKE $additionalMakeArgs install || exit 1
 
 export PATH=$PATH:$installDir/bin
 
+if [ "$HAIKU_USE_GCC_GRAPHITE" = 1 ]; then
+	# build ppl
+	cd $pplObjDir
+	CFLAGS="-O2" CXXFLAGS="-O2" $pplSourceDir/configure --prefix=$installDir \
+		--disable-nls --disable-shared --disable-watchdog \
+		|| exit 1
+	$MAKE $additionalMakeArgs || exit 1
+	$MAKE $additionalMakeArgs install || exit 1
+
+	# build cloog
+	cd $cloogObjDir
+	CFLAGS="-O2" CXXFLAGS="-O2" $cloogSourceDir/configure \
+		--prefix=$installDir --disable-nls --disable-shared || exit 1
+	$MAKE $additionalMakeArgs || exit 1
+	$MAKE $additionalMakeArgs install || exit 1
+fi
 
 # build gcc
 

@@ -530,6 +530,7 @@ mkdir -p "$buildOutputDir" || exit 1
 
 # build cross tools from sources
 if [ -n "$buildCrossTools" ]; then
+	export HAIKU_USE_GCC_GRAPHITE
 	"$buildCrossToolsScript" $buildCrossToolsMachine "$sourceDir" \
 		"$buildCrossTools" "$outputDir" $buildCrossToolsJobs || exit 1
 	crossToolsPrefix="$outputDir/cross-tools/bin/${HAIKU_GCC_MACHINE}-"
