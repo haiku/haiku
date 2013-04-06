@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-PSRV	1761631281
+1	japanese	x-vnd.Be-PSRV	123334776
 Undefined	ConfigWindow		未定義
 Return the number of available transports	PrintServerApp Scripting		トランスポートの数を取得
 Return the number of available printers	PrintServerApp Scripting		プリンターの数を取得
@@ -9,6 +9,7 @@ Retrieve a specific printer	PrintServerApp Scripting		特定のプリンター�
 Page %1 to %2	ConfigWindow		ページ %1 からページ %2 まで
 Get name of the printer add-on used for this printer	Printer Scripting		このプリンターが使うプリンターアドオンを取得
 Page setup:	ConfigWindow		ページ設定：
+B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	JIS B5 (182 x 257 mm)
 OK	ConfigWindow		OK
 Cancel	ConfigWindow		中止
 Printer server	ConfigWindow		プリンターサーバー
@@ -21,7 +22,7 @@ A6	ConfigWindow	ISO 216 paper size	A6 (105 x 148 mm)
 Portrait	ConfigWindow		縦
 All pages	ConfigWindow		全ページ
 There is no default printer set up.	PrintServerApp		デフォルトプリンターが設定されていません。
-B5	ConfigWindow	ISO 216 paper size	ISO B5 (176 x 250 mm)
+B5	ConfigWindow	ISO 216 paper size	B5 (176 x 250 mm)
 A0	ConfigWindow	ISO 216 paper size	A0 (841 x 1189 mm)
 Letter	ConfigWindow	ANSI A (letter), a North American paper size	Letter (216 x 279 mm)
 Printer:	ConfigWindow		プリンター：

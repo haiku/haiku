@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Appearance	1457181689
+1	hungarian	x-vnd.Haiku-Appearance	2993758435
 Plain font:	Font view		Alap betűtípus:
 Control highlight	Colors tab		Kiválasztott vezérlőelem
 Control border	Colors tab		Vezérlőelem kerete
@@ -16,6 +16,7 @@ Success	Colors tab		Sikerült
 Inactive window tab text	Colors tab		Inaktív ablak címszövege
 Failure	Colors tab		Nem sikerült
 Hinting menu	AntialiasingSettingsView		Körvonalmenü
+Scroll bar:	DecorSettingsView		Görgetősáv:
 Document background	Colors tab		Dokumentum háttere
 Revert	APRWindow		Visszaállít
 Window tab	Colors tab		Ablakfül

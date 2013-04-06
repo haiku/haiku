@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Terminal	2645209895
+1	swedish	x-vnd.Haiku-Terminal	328707356
 Not found.	Terminal TermWindow		Hittades ej.
 Switch Terminals	Terminal TermWindow		Växla terminal
 Change directory	Terminal TermView		Byt katalog
@@ -62,7 +62,6 @@ Text not found.	Terminal TermWindow		Text hittades inte.
 Find…	Terminal TermWindow		Sök...
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Processen \"%1\" körs fortfarande.\nOm du stänger Terminalen kommer processen att termineras.
 Move here	Terminal TermView		Flytta hit
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\t Arbetskatalogen till den aktiva processen på den valda tabben\n\t\t\t eller de maximala antal sökvägs komponenter kan bli specificerade.\n\t\t\t E.g. '%2d' för att ange två komponenter.\n\t%T\t-\tTerminal applikationsnamnet för denna översättning.\n\t%i\t-\t Indexet för detta fönster.\n\t%p\t-\tNamnet på den aktiva processen io den valda tabben.\n\t%t\t-\tNamnet på den valda tabben.\n\t%%\t-\t Tecknet '%'.
 Retro	Terminal colors scheme		Retro
 Error!	Terminal getString		Fel!
 New tab	Terminal TermWindow		Ny flik

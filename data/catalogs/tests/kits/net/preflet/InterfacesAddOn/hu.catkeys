@@ -1,0 +1,12 @@
+1	hungarian	x-vnd.Haiku-InterfacesAddOn	3098348391
+Configure…	InterfacesListView		Beállítás…
+Static	IntefaceAddressView		Állandó
+None	InterfacesListView		Nincs
+IP:	InterfacesListView	IPv4 address label	IP:
+Status:	IntefaceHardwareView		Állapot:
+IPv6:	InterfacesListView	IPv6 address label	IPv6:
+Save	InterfaceWindow		Mentés
+Link speed:	IntefaceHardwareView		Kapcsolat sebessége:
+Renegotiate	InterfacesAddOn		Megújítás
+The method for obtaining an IP address	IntefaceAddressView		Az IP-cím lekérésének módja
+Wired	InterfaceWindow		Vezetékes

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-hmulti_audio.media_addon	1552557772
+1	french	x-vnd.Haiku-hmulti_audio.media_addon	1510080944
 Master	MultiAudio		Général
 SPDIF	MultiAudio		SPDIF
 Gain	MultiAudio		Gain
@@ -9,11 +9,16 @@ Phone	MultiAudio		Téléphone
 Aux	MultiAudio		Auxiliaire
 Output bass	MultiAudio		Graves
 Headphones	MultiAudio		Casque
+Beep	MultiAudio		Bip
+Output mono mix	MultiAudio		Sortie mélangeur mono
+Output stereo mix	MultiAudio		Sortie mélangeur stéréo
 Input	MultiAudio		Entrée
 Output treble	MultiAudio		Aiguës
+Mono mix	MultiAudio		Mélangeur mono
 General	MultiAudio		Général
 Input & Output	MultiAudio		Entrée & Sortie
 Enhanced Setup	MultiAudio		Réglages fins
+Stereo mix	MultiAudio		Mélangeur stéréo
 Volume	MultiAudio		Volume
 Output	MultiAudio		Sortie
 Video	MultiAudio		Vidéo

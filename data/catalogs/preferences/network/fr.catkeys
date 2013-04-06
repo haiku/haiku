@@ -1,22 +1,27 @@
-1	french	x-vnd.Haiku-Network	365183238
+1	french	x-vnd.Haiku-Network	1341378870
 Choose automatically	EthernetSettingsView		Choisir automatiquement
 Gateway:	EthernetSettingsView		Passerelle :
 Netmask:	EthernetSettingsView		Masque réseau :
 DHCP	EthernetSettingsView		DHCP
 DNS #2:	EthernetSettingsView		DNS n°2 :
 Apply	EthernetSettingsView		Appliquer
+Netmask is invalid	EthernetSettingsView		Le masque réseau est invalide
 OK	EthernetSettingsView		OK
 DNS #1:	EthernetSettingsView		DNS n°1 :
 IP address:	EthernetSettingsView		Adresse IP :
 Adapter:	EthernetSettingsView		Adaptateur :
 Domain:	EthernetSettingsView		Domaine :
+Gateway is invalid	EthernetSettingsView		La passerelle est invalide
+DNS #1 is invalid	EthernetSettingsView		Le DNS n°1 est invalide
 Revert	EthernetSettingsView		Rétablir
 <no wireless networks found>	EthernetSettingsView		<aucun réseau sans fil disponible>
 Network	System name		Réseau
 Mode:	EthernetSettingsView		Mode :
+IP address is invalid	EthernetSettingsView		L'adresse IP est invalide
 Network:	EthernetSettingsView		Réseau :
 The net_server needs to run for the auto configuration!	EthernetSettingsView		Le net_server doit être lancé pour la configuration automatique !
 Disabled	EthernetSettingsView		Désactivé
 Auto-configuring failed: 	EthernetSettingsView		Échec de la configuration automatique : 
 Static	EthernetSettingsView		Statique
+DNS #2 is invalid	EthernetSettingsView		Le DNS n°2 est invalide
 <no adapter>	EthernetSettingsView		<aucun adaptateur>

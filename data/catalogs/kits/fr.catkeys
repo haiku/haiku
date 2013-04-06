@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libbe	1916257017
+1	french	x-vnd.Haiku-libbe	672385853
 gamma	AboutWindow		gamma
 beta	AboutWindow		bêta
 %3.2f GiB	StringForSize		%3.2f Gio
@@ -37,4 +37,5 @@ About %app…	Dragger		À propos de %app…
 development	AboutWindow		développement
 Error	ZombieReplicantView		Erreur
 Blue:	ColorControl		Bleu :
+gold master	AboutWindow		finale
 Can't delete this replicant from its original application. Life goes on.	Dragger		Impossible de supprimer ce réplicant à partir de son application d'origine. La vie continue.

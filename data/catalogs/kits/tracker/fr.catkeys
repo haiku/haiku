@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	3375521561
+1	french	x-vnd.Haiku-libtracker	4167158175
 common	B_COMMON_DIRECTORY		commun
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Vue en icônes
@@ -74,6 +74,7 @@ Arrange by	ContainerWindow		Trier par
 Mount server error	AutoMounterSettings		Erreur du serveur de montage
 Search	FindPanel		Chercher
 Preparing to empty Trash…	StatusWindow		Préparation au vidage de la Corbeille…
+You cannot put the selected item(s) into the trash.	FSUtils		Vous ne pouvez pas déplacer l(es) élément(s) sélectionné(s) vers la corbeille.
 Disks	Model		Disques
 Create link	ContainerWindow		Créer un lien
 develop	B_COMMON_DEVELOP_DIRECTORY		développement
