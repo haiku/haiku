@@ -98,6 +98,8 @@ launch $SERVERS/registrar _roster_thread_	# launch registrar
 
 launch $SERVERS/debug_server				# launch debug_server
 
+launch $SERVERS/package_daemon
+
 # Init Network
 if [ "$SAFEMODE" != "yes" ]; then
 	launch $SERVERS/net_server				# launch net_server
