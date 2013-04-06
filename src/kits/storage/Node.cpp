@@ -38,7 +38,15 @@ node_ref::node_ref()
 {
 }
 
-// copy constructor
+
+node_ref::node_ref(dev_t device, ino_t node)
+	:
+	device(device),
+	node(node)
+{
+}
+
+
 node_ref::node_ref(const node_ref &ref)
 		: device((dev_t)-1),
 		  node((ino_t)-1)

@@ -16,6 +16,7 @@ struct entry_ref;
 
 struct node_ref {
 	node_ref();
+	node_ref(dev_t device, ino_t node);
 	node_ref(const node_ref &ref);
 
 	bool operator==(const node_ref &ref) const;
