@@ -79,7 +79,6 @@ private:
 				Settings*		fCurrentSettings;
 
 				int32			fStatus;
-				int				fSocket;
 };
 
 #endif /* ETHERNET_SETTINGS_VIEW_H */
