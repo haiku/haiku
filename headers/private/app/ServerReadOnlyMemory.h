@@ -13,23 +13,18 @@
 #include <InterfaceDefs.h>
 
 
-static const int32 kNumColors = 35;
-
 struct server_read_only_memory {
-	rgb_color	colors[kNumColors];
+	rgb_color	colors[B_COLOR_WHICH_COUNT];
 };
 
-
-// NOTE: these functions must be kept in sync with InterfaceDefs.h color_which!
 
 static inline int32
 color_which_to_index(color_which which)
 {
-	// NOTE: this must be kept in sync with InterfaceDefs.h color_which!
-	if (which <= B_SCROLL_BAR_THUMB_COLOR)
+	if (which <= B_COLOR_WHICH_COUNT - 3)
 		return which - 1;
 	if (which >= B_SUCCESS_COLOR && which <= B_FAILURE_COLOR)
-		return which - B_SUCCESS_COLOR + B_SCROLL_BAR_THUMB_COLOR;
+		return which - B_SUCCESS_COLOR + B_COLOR_WHICH_COUNT - 3;
 
 	return -1;
 }
@@ -38,12 +33,12 @@ color_which_to_index(color_which which)
 static inline color_which
 index_to_color_which(int32 index)
 {
-	if (index >= 0 && index < kNumColors) {
-		if ((color_which)index < B_SCROLL_BAR_THUMB_COLOR)
+	if (index >= 0 && index < B_COLOR_WHICH_COUNT) {
+		if ((color_which)index < B_COLOR_WHICH_COUNT - 3)
 			return (color_which)(index + 1);
 		else {
 			return (color_which)(index + B_SUCCESS_COLOR
-			  - B_SCROLL_BAR_THUMB_COLOR);
+				- B_COLOR_WHICH_COUNT - 3);
 		}
 	}
 

@@ -69,7 +69,7 @@ menu_info *_menu_info_ptr_;
 
 extern "C" const char B_NOTIFICATION_SENDER[] = "be:sender";
 
-static const rgb_color _kDefaultColors[kNumColors] = {
+static const rgb_color _kDefaultColors[B_COLOR_WHICH_COUNT] = {
 	{216, 216, 216, 255},	// B_PANEL_BACKGROUND_COLOR
 	{216, 216, 216, 255},	// B_MENU_BACKGROUND_COLOR
 	{255, 203, 0, 255},		// B_WINDOW_TAB_COLOR
@@ -1071,7 +1071,7 @@ rgb_color
 ui_color(color_which which)
 {
 	int32 index = color_which_to_index(which);
-	if (index < 0 || index >= kNumColors) {
+	if (index < 0 || index >= B_COLOR_WHICH_COUNT) {
 		fprintf(stderr, "ui_color(): unknown color_which %d\n", which);
 		return make_color(0, 0, 0);
 	}
@@ -1090,7 +1090,7 @@ void
 set_ui_color(const color_which &which, const rgb_color &color)
 {
 	int32 index = color_which_to_index(which);
-	if (index < 0 || index >= kNumColors) {
+	if (index < 0 || index >= B_COLOR_WHICH_COUNT) {
 		fprintf(stderr, "set_ui_color(): unknown color_which %d\n", which);
 		return;
 	}
