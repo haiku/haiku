@@ -415,8 +415,8 @@ TTeamMenuItem::DrawContent()
 			ContentLocation().y + ((frame.Height() - rect.Height()) / 2)));
 
 		if (be_control_look != NULL) {
-			uint32 arrowDirection = fExpanded
-				? BControlLook::B_UP_ARROW : BControlLook::B_DOWN_ARROW;
+			uint32 arrowDirection = fExpanded ? BControlLook::B_DOWN_ARROW
+				: BControlLook::B_RIGHT_ARROW;
 			be_control_look->DrawArrowShape(menu, rect, rect, menu->LowColor(),
 				arrowDirection, 0, B_DARKEN_3_TINT);
 		} else {
