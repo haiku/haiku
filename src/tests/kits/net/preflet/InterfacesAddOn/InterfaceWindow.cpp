@@ -108,7 +108,7 @@ InterfaceWindow::_PopulateTabs()
 	if (fNetworkSettings->IsEthernet())
 		hardwareTab->SetLabel(B_TRANSLATE("Wired"));
 	else
-		hardwareTab->SetLabel(B_TRANSLATE("Wirless"));
+		hardwareTab->SetLabel(B_TRANSLATE("Wireless"));
 
 	for (int index = 0; index < MAX_PROTOCOLS; index++)
 	{
