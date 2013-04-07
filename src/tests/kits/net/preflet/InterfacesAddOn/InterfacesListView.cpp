@@ -37,6 +37,7 @@
 #include <Resources.h>
 #include <String.h>
 #include <SeparatorItem.h>
+#include <SupportDefs.h>
 #include <Window.h>
 
 #include <AutoDeleter.h>
@@ -224,7 +225,7 @@ InterfaceListItem::Update(BView* owner, const BFont* font)
 	fSecondlineOffset = fFirstlineOffset + lineHeight;
 	fThirdlineOffset = fFirstlineOffset + (lineHeight * 2);
 
-	SetHeight(max(3 * lineHeight + 4, fIcon->Bounds().Height() + 8));
+	SetHeight(max_c(3 * lineHeight + 4, fIcon->Bounds().Height() + 8));
 		// either to the text height or icon height, whichever is taller
 }
 
