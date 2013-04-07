@@ -16,8 +16,6 @@
 #include <AutoDeleter.h>
 
 #include <fs/KPath.h>
-#include <fs/node_monitor.h>
-#include <Notifications.h>
 #include <team.h>
 #include <vfs.h>
 
@@ -29,8 +27,7 @@ PackageDomain::PackageDomain(::Volume* volume)
 	:
 	fVolume(volume),
 	fPath(NULL),
-	fDirFD(-1),
-	fListener(NULL)
+	fDirFD(-1)
 {
 }
 
@@ -38,11 +35,6 @@ PackageDomain::PackageDomain(::Volume* volume)
 PackageDomain::~PackageDomain()
 {
 	PRINT("PackageDomain::~PackageDomain()\n");
-
-	if (fListener != NULL) {
-		remove_node_listener(fDeviceID, fNodeID, *fListener);
-		delete fListener;
-	}
 
 	Package* package = fPackages.Clear(true);
 	while (package != NULL) {
@@ -123,21 +115,6 @@ PackageDomain::Init(const char* path, struct stat* _st)
 
 	if (_st != NULL)
 		*_st = st;
-
-	return B_OK;
-}
-
-
-status_t
-PackageDomain::Prepare(NotificationListener* listener)
-{
-	ObjectDeleter<NotificationListener> listenerDeleter(listener);
-
-	status_t error = add_node_listener(fDeviceID, fNodeID, B_WATCH_DIRECTORY,
-		*listener);
-	if (error != B_OK)
-		RETURN_ERROR(error);
-	fListener = listenerDeleter.Detach();
 
 	return B_OK;
 }

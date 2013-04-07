@@ -108,15 +108,10 @@ private:
 			struct Job;
 			struct AddPackageDomainJob;
 			struct DomainDirectoryEventJob;
-			struct PackageLoaderErrorOutput;
-			struct PackageLoaderContentHandler;
-			struct DomainDirectoryListener;
 			struct ShineThroughDirectory;
 			struct ActivationChangeRequest;
 
 			friend struct AddPackageDomainJob;
-			friend struct DomainDirectoryEventJob;
-			friend struct DomainDirectoryListener;
 
 			typedef DoublyLinkedList<Job> JobList;
 			typedef DoublyLinkedList<PackageDomain> PackageDomainList;
@@ -159,23 +154,6 @@ private:
 			void				_RemoveNode(Node* node);
 			void				_RemoveNodeAndVNode(Node* node);
 									// caller must hold a reference
-
-			void				_DomainListenerEventOccurred(
-									PackageDomain* domain,
-									const KMessage* event);
-			void				_DomainEntryCreated(PackageDomain* domain,
-									dev_t deviceID, ino_t directoryID,
-									ino_t nodeID, const char* name,
-									bool addContent, bool notify);
-			void				_DomainEntryRemoved(PackageDomain* domain,
-									dev_t deviceID, ino_t directoryID,
-									ino_t nodeID, const char* name,
-									bool notify);
-			void				_DomainEntryMoved(PackageDomain* domain,
-									dev_t deviceID, ino_t fromDirectoryID,
-									ino_t toDirectoryID, dev_t nodeDeviceID,
-									ino_t nodeID, const char* fromName,
-									const char* name, bool notify);
 
 	static	status_t			_LoadPackage(PackageDomain* domain,
 									const char* name, Package*& _package);

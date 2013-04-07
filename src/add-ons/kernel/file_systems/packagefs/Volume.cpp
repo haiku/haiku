@@ -23,7 +23,6 @@
 
 #include <AutoDeleter.h>
 
-#include <Notifications.h>
 #include <vfs.h>
 
 #include "AttributeIndex.h"
@@ -108,72 +107,6 @@ struct Volume::AddPackageDomainJob : Job {
 	}
 
 private:
-	PackageDomain*	fDomain;
-};
-
-
-// #pragma mark - DomainDirectoryEventJob
-
-
-struct Volume::DomainDirectoryEventJob : Job {
-	DomainDirectoryEventJob(Volume* volume, PackageDomain* domain)
-		:
-		Job(volume),
-		fDomain(domain),
-		fEvent()
-	{
-		fDomain->AcquireReference();
-	}
-
-	virtual ~DomainDirectoryEventJob()
-	{
-		fDomain->ReleaseReference();
-	}
-
-	status_t Init(const KMessage* event)
-	{
-		RETURN_ERROR(fEvent.SetTo(event->Buffer(), -1,
-			KMessage::KMESSAGE_CLONE_BUFFER));
-	}
-
-	virtual void Do()
-	{
-		fVolume->_DomainListenerEventOccurred(fDomain, &fEvent);
-	}
-
-private:
-	PackageDomain*	fDomain;
-	KMessage		fEvent;
-};
-
-
-// #pragma mark - DomainDirectoryListener
-
-
-struct Volume::DomainDirectoryListener : NotificationListener {
-	DomainDirectoryListener(Volume* volume, PackageDomain* domain)
-		:
-		fVolume(volume),
-		fDomain(domain)
-	{
-	}
-
-	virtual void EventOccurred(NotificationService& service,
-		const KMessage* event)
-	{
-// TODO: Remove!
-// 		DomainDirectoryEventJob* job = new(std::nothrow)
-// 			DomainDirectoryEventJob(fVolume, fDomain);
-// 		if (job == NULL || job->Init(event)) {
-// 			delete job;
-// 			return;
-// 		}
-// 
-// 		fVolume->_PushJob(job);
-	}
-
-private:
-	Volume*			fVolume;
 	PackageDomain*	fDomain;
 };
 
@@ -870,20 +803,6 @@ Volume::_AddPackageDomain(PackageDomain* domain, bool notify)
 {
 	dprintf("packagefs: Adding package domain \"%s\"\n", domain->Path());
 
-	// create a directory listener
-	DomainDirectoryListener* listener = new(std::nothrow)
-		DomainDirectoryListener(this, domain);
-	if (listener == NULL)
-		RETURN_ERROR(B_NO_MEMORY);
-
-	// prepare the package domain
-	status_t error = domain->Prepare(listener);
-	if (error != B_OK) {
-		ERROR("Failed to prepare package domain \"%s\": %s\n",
-			domain->Path(), strerror(errno));
-		RETURN_ERROR(errno);
-	}
-
 	// iterate through the dir and create packages
 	int fd = dup(domain->DirectoryFD());
 	if (fd < 0) {
@@ -904,9 +823,15 @@ Volume::_AddPackageDomain(PackageDomain* domain, bool notify)
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
 
-		_DomainEntryCreated(domain, domain->DeviceID(), domain->NodeID(),
-			-1, entry->d_name, false, notify);
-// TODO: -1 node ID?
+		Package* package;
+		if (_LoadPackage(domain, entry->d_name, package) != B_OK)
+			continue;
+		BReference<Package> packageReference(package, true);
+
+		VolumeWriteLocker systemVolumeLocker(_SystemVolumeIfNotSelf());
+		VolumeWriteLocker volumeLocker(this);
+		domain->AddPackage(package);
+
 	}
 
 	// add the packages to the node tree
@@ -914,7 +839,7 @@ Volume::_AddPackageDomain(PackageDomain* domain, bool notify)
 	VolumeWriteLocker volumeLocker(this);
 	for (PackageFileNameHashTable::Iterator it
 			= domain->Packages().GetIterator(); Package* package = it.Next();) {
-		error = _AddPackageContent(package, notify);
+		status_t error = _AddPackageContent(package, notify);
 		if (error != B_OK) {
 			for (it.Rewind(); Package* activePackage = it.Next();) {
 				if (activePackage == package)
@@ -1408,141 +1333,6 @@ Volume::_RemoveNodeAndVNode(Node* node)
 		RemoveVNode(node->ID());
 		PutVNode(node->ID());
 	}
-}
-
-
-void
-Volume::_DomainListenerEventOccurred(PackageDomain* domain,
-	const KMessage* event)
-{
-	int32 opcode;
-	if (event->What() != B_NODE_MONITOR
-		|| event->FindInt32("opcode", &opcode) != B_OK) {
-		return;
-	}
-
-	switch (opcode) {
-		case B_ENTRY_CREATED:
-		{
-			int32 device;
-			int64 directory;
-			int64 node;
-			const char* name;
-			if (event->FindInt32("device", &device) == B_OK
-				&& event->FindInt64("directory", &directory) == B_OK
-				&& event->FindInt64("node", &node) == B_OK
-				&& event->FindString("name", &name) == B_OK) {
-				_DomainEntryCreated(domain, device, directory, node, name,
-					true, true);
-			}
-			break;
-		}
-
-		case B_ENTRY_REMOVED:
-		{
-			int32 device;
-			int64 directory;
-			int64 node;
-			const char* name;
-			if (event->FindInt32("device", &device) == B_OK
-				&& event->FindInt64("directory", &directory) == B_OK
-				&& event->FindInt64("node", &node) == B_OK
-				&& event->FindString("name", &name) == B_OK) {
-				_DomainEntryRemoved(domain, device, directory, node, name,
-					true);
-			}
-			break;
-		}
-
-		case B_ENTRY_MOVED:
-		{
-			int32 device;
-			int64 fromDirectory;
-			int64 toDirectory;
-			int32 nodeDevice;
-			int64 node;
-			const char* fromName;
-			const char* name;
-			if (event->FindInt32("device", &device) == B_OK
-				&& event->FindInt64("from directory", &fromDirectory) == B_OK
-				&& event->FindInt64("to directory", &toDirectory) == B_OK
-				&& event->FindInt32("node device", &nodeDevice) == B_OK
-				&& event->FindInt64("node", &node) == B_OK
-				&& event->FindString("from name", &fromName) == B_OK
-				&& event->FindString("name", &name) == B_OK) {
-				_DomainEntryMoved(domain, device, fromDirectory, toDirectory,
-					nodeDevice, node, fromName, name, true);
-			}
-			break;
-		}
-
-		default:
-			break;
-	}
-}
-
-
-void
-Volume::_DomainEntryCreated(PackageDomain* domain, dev_t deviceID,
-	ino_t directoryID, ino_t nodeID, const char* name, bool addContent,
-	bool notify)
-{
-	// let's see, if things look plausible
-	if (deviceID != domain->DeviceID() || directoryID != domain->NodeID()
-		|| domain->FindPackage(name) != NULL) {
-		return;
-	}
-
-	Package* package;
-	if (_LoadPackage(domain, name, package) != B_OK)
-		return;
-	BReference<Package> packageReference(package, true);
-
-	VolumeWriteLocker systemVolumeLocker(_SystemVolumeIfNotSelf());
-	VolumeWriteLocker volumeLocker(this);
-	domain->AddPackage(package);
-
-	// add the package to the node tree
-	if (addContent) {
-		status_t error = _AddPackageContent(package, notify);
-		if (error != B_OK) {
-			domain->RemovePackage(package);
-			return;
-		}
-	}
-}
-
-
-void
-Volume::_DomainEntryRemoved(PackageDomain* domain, dev_t deviceID,
-	ino_t directoryID, ino_t nodeID, const char* name, bool notify)
-{
-	// let's see, if things look plausible
-	if (deviceID != domain->DeviceID() || directoryID != domain->NodeID())
-		return;
-
-	Package* package = domain->FindPackage(name);
-	if (package == NULL)
-		return;
-	BReference<Package> packageReference(package);
-
-	// remove the package
-	VolumeWriteLocker systemVolumeLocker(_SystemVolumeIfNotSelf());
-	VolumeWriteLocker volumeLocker(this);
-	_RemovePackageContent(package, NULL, true);
-	domain->RemovePackage(package);
-}
-
-
-void
-Volume::_DomainEntryMoved(PackageDomain* domain, dev_t deviceID,
-	ino_t fromDirectoryID, ino_t toDirectoryID, dev_t nodeDeviceID,
-	ino_t nodeID, const char* fromName, const char* name, bool notify)
-{
-	_DomainEntryRemoved(domain, deviceID, fromDirectoryID, nodeID, fromName,
-		notify);
-	_DomainEntryCreated(domain, deviceID, toDirectoryID, nodeID, name, true,
-		notify);
 }
 
 

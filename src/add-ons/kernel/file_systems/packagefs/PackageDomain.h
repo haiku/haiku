@@ -15,7 +15,6 @@
 
 struct stat;
 
-class NotificationListener;
 class Volume;
 
 
@@ -32,8 +31,6 @@ public:
 			ino_t				NodeID()		{ return fNodeID; }
 
 			status_t			Init(const char* path, struct stat* _st);
-			status_t			Prepare(NotificationListener* listener);
-									// takes over ownership of the listener
 
 			void				AddPackage(Package* package);
 			void				RemovePackage(Package* package);
@@ -49,7 +46,6 @@ private:
 			int					fDirFD;
 			dev_t				fDeviceID;
 			ino_t				fNodeID;
-			NotificationListener* fListener;
 			PackageFileNameHashTable fPackages;
 };
 
