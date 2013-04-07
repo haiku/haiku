@@ -112,6 +112,7 @@ private:
 			struct PackageLoaderContentHandler;
 			struct DomainDirectoryListener;
 			struct ShineThroughDirectory;
+			struct ActivationChangeRequest;
 
 			friend struct AddPackageDomainJob;
 			friend struct DomainDirectoryEventJob;
@@ -178,6 +179,9 @@ private:
 
 	static	status_t			_LoadPackage(PackageDomain* domain,
 									const char* name, Package*& _package);
+
+			status_t			_ChangeActivation(
+									ActivationChangeRequest& request);
 
 			status_t			_InitMountType(const char* mountType);
 			status_t			_CreateShineThroughDirectory(Directory* parent,

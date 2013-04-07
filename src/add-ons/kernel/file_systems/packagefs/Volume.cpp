@@ -10,6 +10,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <string.h>
+#include <sys/param.h>
 #include <sys/stat.h>
 
 #include <new>
@@ -58,6 +59,9 @@ const char* const kCommonShineThroughDirectories[] = {
 };
 const char* const* kHomeShineThroughDirectories
 	= kCommonShineThroughDirectories;
+
+// sanity limit for activation change request
+const size_t kMaxActivationRequestSize = 10 * 1024 * 1024;
 
 
 // #pragma mark - Job
@@ -191,6 +195,130 @@ struct Volume::ShineThroughDirectory : public Directory {
 
 private:
 	timespec	fModifiedTime;
+};
+
+
+// #pragma mark - ActivationChangeRequest
+
+
+struct Volume::ActivationChangeRequest {
+public:
+	struct Iterator {
+		Iterator()
+			:
+			fRequest(NULL),
+			fNextItem(NULL),
+			fNextIndex(0)
+		{
+		}
+
+		Iterator(PackageFSActivationChangeRequest* request)
+			:
+			fRequest(request),
+			fNextItem(NULL),
+			fNextIndex(0)
+		{
+			if (fRequest != NULL && fRequest->itemCount > 0)
+				fNextItem = fRequest->items;
+		}
+
+		bool HasNext() const
+		{
+			return fNextItem != NULL;
+		}
+
+		PackageFSActivationChangeItem* Next()
+		{
+			if (fNextItem == NULL)
+				return NULL;
+
+			PackageFSActivationChangeItem* item = fNextItem;
+			fNextIndex++;
+			fNextItem = fNextIndex < fRequest->itemCount
+				? _NextItem(fNextItem) : NULL;
+			return item;
+		}
+
+	private:
+		PackageFSActivationChangeRequest*	fRequest;
+		PackageFSActivationChangeItem*		fNextItem;
+		uint32								fNextIndex;
+	};
+
+public:
+	ActivationChangeRequest()
+		:
+		fRequest(NULL),
+		fRequestSize(0)
+	{
+	}
+
+	~ActivationChangeRequest()
+	{
+		free(fRequest);
+	}
+
+	status_t Init(const void* userRequest, size_t requestSize)
+	{
+		// copy request to kernel
+		if (requestSize > kMaxActivationRequestSize)
+			RETURN_ERROR(B_BAD_VALUE);
+
+		fRequest = (PackageFSActivationChangeRequest*)malloc(requestSize);
+		if (fRequest == NULL)
+			RETURN_ERROR(B_NO_MEMORY);
+		fRequestSize = requestSize;
+
+		status_t error = user_memcpy(fRequest, userRequest, fRequestSize);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		// check the validity of the items
+		addr_t requestEnd = (addr_t)fRequest + fRequestSize;
+		uint32 itemCount = 0;
+		PackageFSActivationChangeItem* item = fRequest->items;
+		while (itemCount < fRequest->itemCount) {
+			if ((addr_t)item + sizeof(PackageFSActivationChangeItem)
+					> requestEnd
+				|| item->nameLength > B_FILE_NAME_LENGTH
+				|| (addr_t)item->name + item->nameLength > requestEnd
+				|| item->name[item->nameLength] != '\0'
+				|| strlen(item->name) != item->nameLength) {
+				RETURN_ERROR(B_BAD_VALUE);
+			}
+
+			itemCount++;
+			item = _NextItem(item);
+		}
+
+		return B_OK;
+	}
+
+	uint32 CountItems() const
+	{
+		return fRequest->itemCount;
+	}
+
+	Iterator GetIterator() const
+	{
+		return Iterator(fRequest);
+	}
+
+private:
+	friend class Iterator;
+		// for GCC 2
+
+private:
+	static inline PackageFSActivationChangeItem* _NextItem(
+		PackageFSActivationChangeItem* item)
+	{
+		return (PackageFSActivationChangeItem*)_ALIGN(
+			(addr_t)item->name + item->nameLength);
+	}
+
+private:
+	PackageFSActivationChangeRequest*	fRequest;
+	size_t								fRequestSize;
 };
 
 
@@ -464,13 +592,65 @@ Volume::IOCtl(Node* node, uint32 operation, void* buffer, size_t size)
 		case PACKAGE_FS_OPERATION_GET_VOLUME_INFO:
 		{
 			if (size != sizeof(PackageFSVolumeInfo))
-				return B_BAD_VALUE;
+				RETURN_ERROR(B_BAD_VALUE);
+
+			VolumeReadLocker volumeReadLocker(this);
 
 			PackageFSVolumeInfo info;
 			info.mountType = fMountType;
 			info.rootDeviceID = fPackageFSRoot->DeviceID();
 			info.rootDirectoryID = fPackageFSRoot->NodeID();
-			return user_memcpy(buffer, &info, sizeof(info));
+
+			PackageDomain* domain = fPackageDomains.Head();
+			info.packagesDeviceID = domain != NULL ? domain->DeviceID() : -1;
+			info.packagesDirectoryID = domain != NULL ? domain->NodeID() : -1;
+
+			RETURN_ERROR(user_memcpy(buffer, &info, sizeof(info)));
+		}
+
+		case PACKAGE_FS_OPERATION_GET_PACKAGE_INFOS:
+		{
+			if (size < sizeof(PackageFSGetPackageInfosRequest))
+				RETURN_ERROR(B_BAD_VALUE);
+
+			PackageFSGetPackageInfosRequest* request
+				= (PackageFSGetPackageInfosRequest*)buffer;
+
+			VolumeReadLocker volumeReadLocker(this);
+
+			PackageDomain* domain = fPackageDomains.Head();
+			if (domain == NULL)
+				RETURN_ERROR(B_BAD_VALUE);
+
+			uint32 packageIndex = 0;
+			for (PackageFileNameHashTable::Iterator it
+					= domain->Packages().GetIterator(); it.HasNext();
+				packageIndex++) {
+				Package* package = it.Next();
+				PackageFSPackageInfo info;
+				info.packageDeviceID = package->DeviceID();
+				info.packageNodeID = package->NodeID();
+				PackageFSPackageInfo* userInfo = request->infos + packageIndex;
+				if (addr_t(userInfo + 1) > (addr_t)buffer + size)
+					break;
+
+				if (user_memcpy(userInfo, &info, sizeof(info)) != B_OK)
+					return B_BAD_ADDRESS;
+			}
+
+			uint32 packageCount = domain->Packages().CountElements();
+			RETURN_ERROR(user_memcpy(&request->packageCount, &packageCount,
+				sizeof(packageCount)));
+		}
+
+		case PACKAGE_FS_OPERATION_CHANGE_ACTIVATION:
+		{
+			ActivationChangeRequest request;
+			status_t error = request.Init(buffer, size);
+			if (error != B_OK)
+				RETURN_ERROR(B_BAD_VALUE);
+
+			return _ChangeActivation(request);
 		}
 
 		default:
@@ -1392,6 +1572,169 @@ Volume::_LoadPackage(PackageDomain* domain, const char* name,
 
 	_package = packageReference.Detach();
 	return B_OK;
+}
+
+
+status_t
+Volume::_ChangeActivation(ActivationChangeRequest& request)
+{
+// TODO: Would need locking, but will be irrelevant when removing the support
+// for multiple package domains.
+	PackageDomain* domain = fPackageDomains.Head();
+	if (domain == NULL)
+		RETURN_ERROR(B_BAD_VALUE);
+
+	// first check the request
+	int32 newPackageCount = 0;
+	int32 oldPackageCount = 0;
+	{
+		VolumeReadLocker volumeLocker(this);
+
+		for (ActivationChangeRequest::Iterator it = request.GetIterator();
+			it.HasNext();) {
+			PackageFSActivationChangeItem* item = it.Next();
+			if (item->parentDeviceID != domain->DeviceID()
+				|| item->parentDirectoryID != domain->NodeID()) {
+				ERROR("Volume::_ChangeActivation(): mismatching packages "
+					"domain\n");
+				RETURN_ERROR(B_BAD_VALUE);
+			}
+
+			Package* package = domain->FindPackage(item->name);
+// TODO: We should better look up the package by node_ref!
+			if (item->type == PACKAGE_FS_ACTIVATE_PACKAGE) {
+				if (package != NULL) {
+					ERROR("Volume::_ChangeActivation(): package to activate "
+						"already activated: \"%s\"\n", item->name);
+					RETURN_ERROR(B_BAD_VALUE);
+				}
+				newPackageCount++;
+			} else if (item->type == PACKAGE_FS_DEACTIVATE_PACKAGE) {
+				if (package == NULL) {
+					ERROR("Volume::_ChangeActivation(): package to deactivate "
+						"not found: \"%s\"\n", item->name);
+					RETURN_ERROR(B_BAD_VALUE);
+				}
+				oldPackageCount++;
+			} else if (item->type == PACKAGE_FS_REACTIVATE_PACKAGE) {
+				if (package == NULL) {
+					ERROR("Volume::_ChangeActivation(): package to reactivate "
+						"not found: \"%s\"\n", item->name);
+					RETURN_ERROR(B_BAD_VALUE);
+				}
+				oldPackageCount++;
+				newPackageCount++;
+			} else
+				RETURN_ERROR(B_BAD_VALUE);
+		}
+	}
+INFORM("Volume::_ChangeActivation(): %" B_PRId32 " new packages, %" B_PRId32 " old packages\n", newPackageCount, oldPackageCount);
+
+	// Things look good so far -- allocate reference arrays for the packages to
+	// add and remove.
+	BReference<Package>* newPackageReferences
+		= new(std::nothrow) BReference<Package>[newPackageCount];
+	if (newPackageReferences == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+	ArrayDeleter<BReference<Package> > newPackageReferencesDeleter(
+			newPackageReferences);
+
+	BReference<Package>* oldPackageReferences
+		= new(std::nothrow) BReference<Package>[oldPackageCount];
+	if (oldPackageReferences == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+	ArrayDeleter<BReference<Package> > oldPackageReferencesDeleter(
+			oldPackageReferences);
+
+	// load all new packages
+	int32 newPackageIndex = 0;
+	for (ActivationChangeRequest::Iterator it = request.GetIterator();
+		it.HasNext();) {
+		PackageFSActivationChangeItem* item = it.Next();
+
+		if (item->type != PACKAGE_FS_ACTIVATE_PACKAGE
+			&& item->type != PACKAGE_FS_REACTIVATE_PACKAGE) {
+			continue;
+		}
+
+		Package* package;
+		status_t error = _LoadPackage(domain, item->name, package);
+		if (error != B_OK) {
+			ERROR("Volume::_ChangeActivation(): failed to load package "
+				"\"%s\"\n", item->name);
+			RETURN_ERROR(error);
+		}
+
+		newPackageReferences[newPackageIndex++].SetTo(package, true);
+	}
+
+	// apply the changes
+	VolumeWriteLocker systemVolumeLocker(_SystemVolumeIfNotSelf());
+	VolumeWriteLocker volumeLocker(this);
+// TODO: Add a change counter to Volume, so we can easily check whether
+// everything is still the same.
+
+	// remove the old packages
+	int32 oldPackageIndex = 0;
+	for (ActivationChangeRequest::Iterator it = request.GetIterator();
+		it.HasNext();) {
+		PackageFSActivationChangeItem* item = it.Next();
+
+		if (item->type != PACKAGE_FS_DEACTIVATE_PACKAGE
+			&& item->type != PACKAGE_FS_REACTIVATE_PACKAGE) {
+			continue;
+		}
+
+		Package* package = domain->FindPackage(item->name);
+// TODO: We should better look up the package by node_ref!
+		oldPackageReferences[oldPackageIndex++].SetTo(package);
+		_RemovePackageContent(package, NULL, true);
+		domain->RemovePackage(package);
+INFORM("package \"%s\" deactivated\n", package->FileName());
+	}
+// TODO: Since package removal cannot fail, consider adding the new packages
+// first. The reactivation case may make that problematic, since two packages
+// with the same name would be active after activating the new one. Check!
+
+	// add the new packages
+	status_t error = B_OK;
+	for (newPackageIndex = 0; newPackageIndex < newPackageCount;
+		newPackageIndex++) {
+		Package* package = newPackageReferences[newPackageIndex];
+		domain->AddPackage(package);
+
+		// add the package to the node tree
+		error = _AddPackageContent(package, true);
+		if (error != B_OK) {
+			domain->RemovePackage(package);
+			break;
+		}
+INFORM("package \"%s\" activated\n", package->FileName());
+	}
+
+	// Try to roll back the changes, if an error occurred.
+	if (error != B_OK) {
+		for (int32 i = newPackageIndex - 1; i >= 0; i--) {
+			Package* package = newPackageReferences[i];
+			_RemovePackageContent(package, NULL, true);
+			domain->RemovePackage(package);
+		}
+
+		for (int32 i = oldPackageCount - 1; i >= 0; i--) {
+			Package* package = oldPackageReferences[i];
+			domain->AddPackage(package);
+
+			if (_AddPackageContent(package, true) != B_OK) {
+				// nothing we can do here
+				ERROR("Volume::_ChangeActivation(): failed to roll back "
+					"deactivation of package \"%s\" after error\n",
+		  			package->FileName());
+				domain->RemovePackage(package);
+			}
+		}
+	}
+
+	return error;
 }
 
 
