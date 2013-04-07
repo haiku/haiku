@@ -61,7 +61,11 @@ public:
 		B_LEFT_ARROW		= 0,
 		B_RIGHT_ARROW		= 1,
 		B_UP_ARROW			= 2,
-		B_DOWN_ARROW		= 3
+		B_DOWN_ARROW		= 3,
+		B_LEFT_UP_ARROW		= 4,
+		B_RIGHT_UP_ARROW	= 5,
+		B_RIGHT_DOWN_ARROW	= 6,
+		B_LEFT_DOWN_ARROW	= 7
 	};
 
 	enum {
