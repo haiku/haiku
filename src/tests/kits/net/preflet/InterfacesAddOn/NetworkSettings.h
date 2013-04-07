@@ -83,6 +83,9 @@ public:
 
 			const char*			Name()  { return fName.String(); }
 			const char*			Domain() { return fDomain.String(); }
+			status_t			Stats(ifreq_stats* ptr)
+									{ return fNetworkInterface->GetStats(*ptr); }
+
 			bool				IsDisabled() { return fDisabled; }
 
 			bool				IsWireless() {

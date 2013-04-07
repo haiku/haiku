@@ -31,6 +31,8 @@ public:
 			status_t			Save();
 
 private:
+			status_t			Update();
+
 			void				_EnableFields(bool enabled);
 
 			NetworkSettings*	fSettings;
@@ -38,6 +40,8 @@ private:
 			BStringView*		fStatusField;
 			BStringView*		fMacAddressField;
 			BStringView*		fLinkSpeedField;
+			BStringView*		fLinkTxField;
+			BStringView*		fLinkRxField;
 };
 
 
