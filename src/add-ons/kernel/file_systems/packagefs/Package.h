@@ -44,6 +44,11 @@ public:
 			status_t			SetName(const char* name);
 			const char*			Name() const		{ return fName; }
 
+			dev_t				DeviceID() const
+									{ return fDeviceID; }
+			ino_t				NodeID() const
+									{ return fNodeID; }
+
 			status_t			SetInstallPath(const char* installPath);
 			const char*			InstallPath() const	{ return fInstallPath; }
 
