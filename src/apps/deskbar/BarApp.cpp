@@ -960,8 +960,7 @@ BarTeamInfo::BarTeamInfo(BList* teams, uint32 flags, char* sig, BBitmap* icon,
 		icon(icon),
 		name(name)
 {
-	for (int32 i = 0; i < kIconCacheCount; i++)
-		iconCache[i] = NULL;
+	_Init();
 }
 
 
@@ -972,8 +971,7 @@ BarTeamInfo::BarTeamInfo(const BarTeamInfo &info)
 		icon(new BBitmap(*info.icon)),
 		name(strdup(info.name))
 {
-	for (int32 i = 0; i < kIconCacheCount; i++)
-		iconCache[i] = NULL;
+	_Init();
 }
 
 
@@ -984,4 +982,12 @@ BarTeamInfo::~BarTeamInfo()
 	free(name);
 	for (int32 i = 0; i < kIconCacheCount; i++)
 		delete iconCache[i];
+}
+
+
+void
+BarTeamInfo::_Init()
+{
+	for (int32 i = 0; i < kIconCacheCount; i++)
+		iconCache[i] = NULL;
 }

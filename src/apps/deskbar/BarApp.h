@@ -93,6 +93,10 @@ public:
 									BarTeamInfo(const BarTeamInfo &info);
 									~BarTeamInfo();
 
+private:
+			void					_Init();
+
+public:
 			BList*					teams;
 			uint32					flags;
 			char*					sig;
