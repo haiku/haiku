@@ -94,7 +94,7 @@ PackageLinkSymlink::Update(Package* package, PackageLinksListener* listener)
 		fLinkPath = package->InstallPath();
 		if (fLinkPath == NULL) {
 			fLinkPath = link_path_for_mount_type(
-				package->Domain()->Volume()->MountType());
+				package->Volume()->MountType());
 		}
 	} else
 		fLinkPath = kUnknownLinkTarget;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef VOLUME_H
@@ -19,7 +19,7 @@
 #include "Index.h"
 #include "Node.h"
 #include "NodeListener.h"
-#include "PackageDomain.h"
+#include "Package.h"
 #include "PackageLinksListener.h"
 #include "Query.h"
 
@@ -50,6 +50,8 @@ public:
 			Directory*			RootDirectory() const { return fRootDirectory; }
 
 			::MountType			MountType() const	{ return fMountType; }
+
+			int					PackagesDirectoryFD() const;
 
 			void				SetPackageFSRoot(::PackageFSRoot* root)
 									{ fPackageFSRoot = root; }
@@ -94,8 +96,6 @@ public:
 			status_t			RemoveVNode(ino_t nodeID);
 			status_t			PublishVNode(Node* node);
 
-			status_t			AddPackageDomain(const char* path);
-
 private:
 	// PackageLinksListener
 	virtual	void				PackageLinkNodeAdded(Node* node);
@@ -105,29 +105,16 @@ private:
 									const OldNodeAttributes& oldAttributes);
 
 private:
-			struct Job;
-			struct AddPackageDomainJob;
-			struct DomainDirectoryEventJob;
+			struct PackagesDirectory;
 			struct ShineThroughDirectory;
 			struct ActivationChangeRequest;
 
-			friend struct AddPackageDomainJob;
-
-			typedef DoublyLinkedList<Job> JobList;
-			typedef DoublyLinkedList<PackageDomain> PackageDomainList;
-
 private:
-	static	status_t			_PackageLoaderEntry(void* data);
-			status_t			_PackageLoader();
+			status_t			_AddInitialPackages();
 
-			void				_TerminatePackageLoader();
-
-			void				_PushJob(Job* job);
-
-			status_t			_AddInitialPackageDomain(const char* path);
-			status_t			_AddPackageDomain(PackageDomain* domain,
-									bool notify);
-			void				_RemovePackageDomain(PackageDomain* domain);
+	inline	void				_AddPackage(Package* package);
+	inline	void				_RemovePackage(Package* package);
+	inline	Package*			_FindPackage(const char* fileName) const;
 
 			status_t			_AddPackageContent(Package* package,
 									bool notify);
@@ -155,8 +142,8 @@ private:
 			void				_RemoveNodeAndVNode(Node* node);
 									// caller must hold a reference
 
-	static	status_t			_LoadPackage(PackageDomain* domain,
-									const char* name, Package*& _package);
+			status_t			_LoadPackage(const char* name,
+									Package*& _package);
 
 			status_t			_ChangeActivation(
 									ActivationChangeRequest& request);
@@ -187,8 +174,7 @@ private:
 			Directory*			fRootDirectory;
 			::PackageFSRoot*	fPackageFSRoot;
 			::MountType			fMountType;
-			thread_id			fPackageLoader;
-			PackageDomainList	fPackageDomains;
+			PackagesDirectory*	fPackagesDirectory;
 
 			struct {
 				dev_t			deviceID;
@@ -197,16 +183,11 @@ private:
 
 			NodeIDHashTable		fNodes;
 			NodeListenerHashTable fNodeListeners;
+			PackageFileNameHashTable fPackages;
 			QueryList			fQueries;
 			IndexHashTable		fIndices;
 
-			JobList				fJobQueue;
-			mutex				fJobQueueLock;
-			ConditionVariable	fJobQueueCondition;
-
 			ino_t				fNextNodeID;
-
-	volatile bool				fTerminating;
 };
 
 

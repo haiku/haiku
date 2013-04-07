@@ -99,11 +99,11 @@ PackageLinkDirectory::AddPackage(Package* package,
 
 	// Find the insertion point in the list. We sort by mount type -- the more
 	// specific the higher the priority.
-	MountType mountType = package->Domain()->Volume()->MountType();
+	MountType mountType = package->Volume()->MountType();
 	Package* otherPackage = NULL;
 	for (PackageList::Iterator it = fPackages.GetIterator();
 			(otherPackage = it.Next()) != NULL;) {
-		if (otherPackage->Domain()->Volume()->MountType() <= mountType)
+		if (otherPackage->Volume()->MountType() <= mountType)
 			break;
 	}
 

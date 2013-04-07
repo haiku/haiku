@@ -21,10 +21,10 @@
 
 #include "DebugSupport.h"
 #include "PackageDirectory.h"
-#include "PackageDomain.h"
 #include "PackageFile.h"
 #include "PackageSymlink.h"
 #include "Version.h"
+#include "Volume.h"
 
 
 using namespace BPackageKit;
@@ -300,9 +300,9 @@ private:
 // #pragma mark - Package
 
 
-Package::Package(PackageDomain* domain, dev_t deviceID, ino_t nodeID)
+Package::Package(::Volume* volume, dev_t deviceID, ino_t nodeID)
 	:
-	fDomain(domain),
+	fVolume(volume),
 	fFileName(NULL),
 	fName(NULL),
 	fInstallPath(NULL),
@@ -461,7 +461,7 @@ Package::Open()
 	}
 
 	// open the file
-	fFD = openat(fDomain->DirectoryFD(), fFileName, O_RDONLY);
+	fFD = openat(fVolume->PackagesDirectoryFD(), fFileName, O_RDONLY);
 	if (fFD < 0) {
 		ERROR("Failed to open package file \"%s\"\n", fFileName);
 		return errno;

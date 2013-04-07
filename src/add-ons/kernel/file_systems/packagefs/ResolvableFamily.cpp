@@ -17,11 +17,11 @@ ResolvableFamily::AddResolvable(Resolvable* resolvable,
 	// Find the insertion point in the list. We sort by mount type -- the more
 	// specific the higher the priority.
 	MountType mountType
-		= resolvable->Package()->Domain()->Volume()->MountType();
+		= resolvable->Package()->Volume()->MountType();
 	Resolvable* otherResolvable = NULL;
 	for (FamilyResolvableList::Iterator it = fResolvables.GetIterator();
 			(otherResolvable = it.Next()) != NULL;) {
-		if (otherResolvable->Package()->Domain()->Volume()->MountType()
+		if (otherResolvable->Package()->Volume()->MountType()
 				<= mountType) {
 			break;
 		}

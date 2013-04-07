@@ -28,7 +28,6 @@ HAIKU_PACKAGE_FS_SOURCES =
 	Query.cpp
 	Package.cpp
 	PackageDirectory.cpp
-	PackageDomain.cpp
 	PackageFile.cpp
 	PackageFSRoot.cpp
 	PackageLeafNode.cpp

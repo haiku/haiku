@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -23,6 +23,8 @@
 
 #include <AutoDeleter.h>
 
+#include <fs/KPath.h>
+#include <team.h>
 #include <vfs.h>
 
 #include "AttributeIndex.h"
@@ -63,51 +65,112 @@ const char* const* kHomeShineThroughDirectories
 const size_t kMaxActivationRequestSize = 10 * 1024 * 1024;
 
 
-// #pragma mark - Job
+// #pragma mark - ShineThroughDirectory
 
 
-struct Volume::Job : DoublyLinkedListLinkImpl<Job> {
-	Job(Volume* volume)
+struct Volume::PackagesDirectory {
+	PackagesDirectory()
 		:
-		fVolume(volume)
+		fPath(NULL),
+		fDirFD(-1)
 	{
 	}
 
-	virtual ~Job()
+
+	~PackagesDirectory()
 	{
+		if (fDirFD >= 0)
+			close(fDirFD);
+
+		free(fPath);
 	}
 
-	virtual void Do() = 0;
-
-protected:
-	Volume*	fVolume;
-};
-
-
-// #pragma mark - AddPackageDomainJob
-
-
-struct Volume::AddPackageDomainJob : Job {
-	AddPackageDomainJob(Volume* volume, PackageDomain* domain)
-		:
-		Job(volume),
-		fDomain(domain)
+	const char* Path() const
 	{
-		fDomain->AcquireReference();
+		return fPath;
 	}
 
-	virtual ~AddPackageDomainJob()
+	int DirectoryFD() const
 	{
-		fDomain->ReleaseReference();
+		return fDirFD;
 	}
 
-	virtual void Do()
+	dev_t DeviceID() const
 	{
-		fVolume->_AddPackageDomain(fDomain, true);
+		return fDeviceID;
+	}
+
+	ino_t NodeID() const
+	{
+		return fNodeID;
+	}
+
+	status_t Init(const char* path, dev_t mountPointDeviceID,
+		ino_t mountPointNodeID, struct stat& _st)
+	{
+		// Open the directory. We want the path be interpreted depending on from
+		// where it came (kernel or userland), but we always want a FD in the
+		// kernel I/O context. There's no VFS service method to do that for us,
+		// so we need to do that ourselves.
+		bool calledFromKernel
+			= team_get_current_team_id() == team_get_kernel_team_id();
+			// Not entirely correct, but good enough for now. The only
+			// alternative is to have that information passed in as well.
+
+		struct vnode* vnode;
+		status_t error;
+		if (path != NULL) {
+			error = vfs_get_vnode_from_path(path, calledFromKernel, &vnode);
+		} else {
+			// No path given -- use the "packages" directory at our mount point.
+			error = vfs_entry_ref_to_vnode(mountPointDeviceID, mountPointNodeID,
+				"packages", &vnode);
+		}
+		if (error != B_OK) {
+			ERROR("Failed to open package domain \"%s\"\n", strerror(error));
+			RETURN_ERROR(error);
+		}
+
+		fDirFD = vfs_open_vnode(vnode, O_RDONLY, true);
+
+		if (fDirFD < 0) {
+			ERROR("Failed to open package domain \"%s\"\n", strerror(fDirFD));
+			vfs_put_vnode(vnode);
+			RETURN_ERROR(fDirFD);
+		}
+		// Our vnode reference has been transferred to the FD.
+
+		// Is it a directory at all?
+		struct stat& st = _st;
+		if (fstat(fDirFD, &st) < 0)
+			RETURN_ERROR(errno);
+
+		fDeviceID = st.st_dev;
+		fNodeID = st.st_ino;
+
+		// get a normalized path
+		KPath normalizedPath;
+		if (normalizedPath.InitCheck() != B_OK)
+			RETURN_ERROR(normalizedPath.InitCheck());
+
+		char* normalizedPathBuffer = normalizedPath.LockBuffer();
+		error = vfs_entry_ref_to_path(fDeviceID, fNodeID, NULL,
+			normalizedPathBuffer, normalizedPath.BufferSize());
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		fPath = strdup(normalizedPathBuffer);
+		if (fPath == NULL)
+			RETURN_ERROR(B_NO_MEMORY);
+
+		return B_OK;
 	}
 
 private:
-	PackageDomain*	fDomain;
+	char*	fPath;
+	int		fDirFD;
+	dev_t	fDeviceID;
+	ino_t	fNodeID;
 };
 
 
@@ -264,22 +327,32 @@ Volume::Volume(fs_volume* fsVolume)
 	fFSVolume(fsVolume),
 	fRootDirectory(NULL),
 	fPackageFSRoot(NULL),
-	fPackageLoader(-1),
-	fNextNodeID(kRootDirectoryID + 1),
-	fTerminating(false)
+	fPackagesDirectory(NULL),
+	fNextNodeID(kRootDirectoryID + 1)
 {
 	rw_lock_init(&fLock, "packagefs volume");
-	mutex_init(&fJobQueueLock, "packagefs volume job queue");
-	fJobQueueCondition.Init(this, "packagefs volume job queue");
 }
 
 
 Volume::~Volume()
 {
-	_TerminatePackageLoader();
+	// remove the packages from the node tree
+	{
+		VolumeWriteLocker systemVolumeLocker(_SystemVolumeIfNotSelf());
+		VolumeWriteLocker volumeLocker(this);
+		for (PackageFileNameHashTable::Iterator it = fPackages.GetIterator();
+			Package* package = it.Next();) {
+			_RemovePackageContent(package, NULL, false);
+		}
+	}
 
-	while (PackageDomain* packageDomain = fPackageDomains.Head())
-		_RemovePackageDomain(packageDomain);
+	// delete the packages
+	Package* package = fPackages.Clear(true);
+	while (package != NULL) {
+		Package* next = package->FileNameHashTableNext();
+		package->ReleaseReference();
+		package = next;
+	}
 
 	// delete all indices
 	Index* index = fIndices.Clear(true);
@@ -307,8 +380,14 @@ Volume::~Volume()
 	if (fRootDirectory != NULL)
 		fRootDirectory->ReleaseReference();
 
-	mutex_destroy(&fJobQueueLock);
 	rw_lock_destroy(&fLock);
+}
+
+
+int
+Volume::PackagesDirectoryFD() const
+{
+	return fPackagesDirectory->DirectoryFD();
 }
 
 
@@ -321,6 +400,10 @@ Volume::Mount(const char* parameterString)
 		RETURN_ERROR(error);
 
 	error = fNodeListeners.Init();
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	error = fPackages.Init();
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
@@ -425,14 +508,14 @@ Volume::Mount(const char* parameterString)
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
-	// create initial package domain
-	PackageDomain* packageDomain = new(std::nothrow) PackageDomain(this);
-	if (packageDomain == NULL)
+	// create package domain
+	fPackagesDirectory = new(std::nothrow) PackagesDirectory;
+	if (fPackagesDirectory == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
-	BReference<PackageDomain> packageDomainReference(packageDomain, true);
 
 	struct stat st;
-	error = packageDomain->Init(packages, &st);
+	error = fPackagesDirectory->Init(packages, fMountPoint.deviceID,
+		fMountPoint.nodeID, st);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
@@ -481,16 +564,10 @@ Volume::Mount(const char* parameterString)
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
-	// add initial package domain
-	error = _AddPackageDomain(packageDomain, false);
+	// add initial packages
+	error = _AddInitialPackages();
 	if (error != B_OK)
 		RETURN_ERROR(error);
-
-	// spawn package loader thread
-	fPackageLoader = spawn_kernel_thread(&_PackageLoaderEntry,
-		"package loader", B_NORMAL_PRIORITY, this);
-	if (fPackageLoader < 0)
-		RETURN_ERROR(fPackageLoader);
 
 	// publish the root node
 	fRootDirectory->AcquireReference();
@@ -505,9 +582,6 @@ Volume::Mount(const char* parameterString)
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
-	// run the package loader
-	resume_thread(fPackageLoader);
-
 	return B_OK;
 }
 
@@ -515,7 +589,6 @@ Volume::Mount(const char* parameterString)
 void
 Volume::Unmount()
 {
-	_TerminatePackageLoader();
 }
 
 
@@ -534,10 +607,8 @@ Volume::IOCtl(Node* node, uint32 operation, void* buffer, size_t size)
 			info.mountType = fMountType;
 			info.rootDeviceID = fPackageFSRoot->DeviceID();
 			info.rootDirectoryID = fPackageFSRoot->NodeID();
-
-			PackageDomain* domain = fPackageDomains.Head();
-			info.packagesDeviceID = domain != NULL ? domain->DeviceID() : -1;
-			info.packagesDirectoryID = domain != NULL ? domain->NodeID() : -1;
+			info.packagesDeviceID = fPackagesDirectory->DeviceID();
+			info.packagesDirectoryID = fPackagesDirectory->NodeID();
 
 			RETURN_ERROR(user_memcpy(buffer, &info, sizeof(info)));
 		}
@@ -552,13 +623,9 @@ Volume::IOCtl(Node* node, uint32 operation, void* buffer, size_t size)
 
 			VolumeReadLocker volumeReadLocker(this);
 
-			PackageDomain* domain = fPackageDomains.Head();
-			if (domain == NULL)
-				RETURN_ERROR(B_BAD_VALUE);
-
 			uint32 packageIndex = 0;
 			for (PackageFileNameHashTable::Iterator it
-					= domain->Packages().GetIterator(); it.HasNext();
+					= fPackages.GetIterator(); it.HasNext();
 				packageIndex++) {
 				Package* package = it.Next();
 				PackageFSPackageInfo info;
@@ -572,7 +639,7 @@ Volume::IOCtl(Node* node, uint32 operation, void* buffer, size_t size)
 					return B_BAD_ADDRESS;
 			}
 
-			uint32 packageCount = domain->Packages().CountElements();
+			uint32 packageCount = fPackages.CountElements();
 			RETURN_ERROR(user_memcpy(&request->packageCount, &packageCount,
 				sizeof(packageCount)));
 		}
@@ -685,28 +752,6 @@ Volume::PublishVNode(Node* node)
 }
 
 
-status_t
-Volume::AddPackageDomain(const char* path)
-{
-	PackageDomain* packageDomain = new(std::nothrow) PackageDomain(this);
-	if (packageDomain == NULL)
-		RETURN_ERROR(B_NO_MEMORY);
-	BReference<PackageDomain> packageDomainReference(packageDomain, true);
-
-	status_t error = packageDomain->Init(path, NULL);
-	if (error != B_OK)
-		RETURN_ERROR(error);
-
-	Job* job = new(std::nothrow) AddPackageDomainJob(this, packageDomain);
-	if (job == NULL)
-		RETURN_ERROR(B_NO_MEMORY);
-
-	_PushJob(job);
-
-	return B_OK;
-}
-
-
 void
 Volume::PackageLinkNodeAdded(Node* node)
 {
@@ -736,84 +781,23 @@ Volume::PackageLinkNodeChanged(Node* node, uint32 statFields,
 }
 
 
-/*static*/ status_t
-Volume::_PackageLoaderEntry(void* data)
-{
-	return ((Volume*)data)->_PackageLoader();
-}
-
-
 status_t
-Volume::_PackageLoader()
+Volume::_AddInitialPackages()
 {
-	while (!fTerminating) {
-		MutexLocker jobQueueLocker(fJobQueueLock);
-
-		Job* job = fJobQueue.RemoveHead();
-		if (job == NULL) {
-			// no job yet -- wait for someone notifying us
-			ConditionVariableEntry waitEntry;
-			fJobQueueCondition.Add(&waitEntry);
-			jobQueueLocker.Unlock();
-			waitEntry.Wait();
-			continue;
-		}
-
-		// do the job
-		jobQueueLocker.Unlock();
-		job->Do();
-		delete job;
-	}
-
-	return B_OK;
-}
-
-
-void
-Volume::_TerminatePackageLoader()
-{
-	fTerminating = true;
-
-	if (fPackageLoader >= 0) {
-		MutexLocker jobQueueLocker(fJobQueueLock);
-		fJobQueueCondition.NotifyOne();
-		jobQueueLocker.Unlock();
-
-		wait_for_thread(fPackageLoader, NULL);
-		fPackageLoader = -1;
-	}
-
-	// empty the job queue
-	while (Job* job = fJobQueue.RemoveHead())
-		delete job;
-}
-
-
-void
-Volume::_PushJob(Job* job)
-{
-	MutexLocker jobQueueLocker(fJobQueueLock);
-	fJobQueue.Add(job);
-	fJobQueueCondition.NotifyOne();
-}
-
-
-status_t
-Volume::_AddPackageDomain(PackageDomain* domain, bool notify)
-{
-	dprintf("packagefs: Adding package domain \"%s\"\n", domain->Path());
+	dprintf("packagefs: Adding packages from \"%s\"\n",
+		fPackagesDirectory->Path());
 
 	// iterate through the dir and create packages
-	int fd = dup(domain->DirectoryFD());
+	int fd = dup(fPackagesDirectory->DirectoryFD());
 	if (fd < 0) {
-		ERROR("Failed to dup() package domain FD: %s\n", strerror(errno));
+		ERROR("Failed to dup() packages directory FD: %s\n", strerror(errno));
 		RETURN_ERROR(errno);
 	}
 
 	DIR* dir = fdopendir(fd);
 	if (dir == NULL) {
-		ERROR("Failed to open package domain directory \"%s\": %s\n",
-			domain->Path(), strerror(errno));
+		ERROR("Failed to open packages directory \"%s\": %s\n",
+			fPackagesDirectory->Path(), strerror(errno));
 		RETURN_ERROR(errno);
 	}
 	CObjectDeleter<DIR, int> dirCloser(dir, closedir);
@@ -824,53 +808,56 @@ Volume::_AddPackageDomain(PackageDomain* domain, bool notify)
 			continue;
 
 		Package* package;
-		if (_LoadPackage(domain, entry->d_name, package) != B_OK)
+		if (_LoadPackage(entry->d_name, package) != B_OK)
 			continue;
 		BReference<Package> packageReference(package, true);
 
 		VolumeWriteLocker systemVolumeLocker(_SystemVolumeIfNotSelf());
 		VolumeWriteLocker volumeLocker(this);
-		domain->AddPackage(package);
+		_AddPackage(package);
 
 	}
 
 	// add the packages to the node tree
 	VolumeWriteLocker systemVolumeLocker(_SystemVolumeIfNotSelf());
 	VolumeWriteLocker volumeLocker(this);
-	for (PackageFileNameHashTable::Iterator it
-			= domain->Packages().GetIterator(); Package* package = it.Next();) {
-		status_t error = _AddPackageContent(package, notify);
+	for (PackageFileNameHashTable::Iterator it = fPackages.GetIterator();
+		Package* package = it.Next();) {
+		status_t error = _AddPackageContent(package, false);
 		if (error != B_OK) {
 			for (it.Rewind(); Package* activePackage = it.Next();) {
 				if (activePackage == package)
 					break;
-				_RemovePackageContent(activePackage, NULL, notify);
+				_RemovePackageContent(activePackage, NULL, false);
 			}
 			RETURN_ERROR(error);
 		}
 	}
 
-	fPackageDomains.Add(domain);
-	domain->AcquireReference();
-
 	return B_OK;
 }
 
 
-void
-Volume::_RemovePackageDomain(PackageDomain* domain)
+inline void
+Volume::_AddPackage(Package* package)
 {
-	// remove the domain's packages from the node tree
-	VolumeWriteLocker systemVolumeLocker(_SystemVolumeIfNotSelf());
-	VolumeWriteLocker volumeLocker(this);
-	for (PackageFileNameHashTable::Iterator it
-			= domain->Packages().GetIterator(); Package* package = it.Next();) {
-		_RemovePackageContent(package, NULL, false);
-	}
+	fPackages.Insert(package);
+	package->AcquireReference();
+}
 
-	// remove the domain
-	fPackageDomains.Remove(domain);
-	domain->ReleaseReference();
+
+inline void
+Volume::_RemovePackage(Package* package)
+{
+	fPackages.Remove(package);
+	package->ReleaseReference();
+}
+
+
+inline Package*
+Volume::_FindPackage(const char* fileName) const
+{
+	return fPackages.Lookup(fileName);
 }
 
 
@@ -1336,19 +1323,18 @@ Volume::_RemoveNodeAndVNode(Node* node)
 }
 
 
-/*static*/ status_t
-Volume::_LoadPackage(PackageDomain* domain, const char* name,
-	Package*& _package)
+status_t
+Volume::_LoadPackage(const char* name, Package*& _package)
 {
 	// check whether the entry is a file
 	struct stat st;
-	if (fstatat(domain->DirectoryFD(), name, &st, 0) < 0
+	if (fstatat(fPackagesDirectory->DirectoryFD(), name, &st, 0) < 0
 		|| !S_ISREG(st.st_mode)) {
 		return B_BAD_VALUE;
 	}
 
 	// create a package
-	Package* package = new(std::nothrow) Package(domain, st.st_dev, st.st_ino);
+	Package* package = new(std::nothrow) Package(this, st.st_dev, st.st_ino);
 	if (package == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 	BReference<Package> packageReference(package, true);
@@ -1369,12 +1355,6 @@ Volume::_LoadPackage(PackageDomain* domain, const char* name,
 status_t
 Volume::_ChangeActivation(ActivationChangeRequest& request)
 {
-// TODO: Would need locking, but will be irrelevant when removing the support
-// for multiple package domains.
-	PackageDomain* domain = fPackageDomains.Head();
-	if (domain == NULL)
-		RETURN_ERROR(B_BAD_VALUE);
-
 	// first check the request
 	int32 newPackageCount = 0;
 	int32 oldPackageCount = 0;
@@ -1384,14 +1364,14 @@ Volume::_ChangeActivation(ActivationChangeRequest& request)
 		for (ActivationChangeRequest::Iterator it = request.GetIterator();
 			it.HasNext();) {
 			PackageFSActivationChangeItem* item = it.Next();
-			if (item->parentDeviceID != domain->DeviceID()
-				|| item->parentDirectoryID != domain->NodeID()) {
+			if (item->parentDeviceID != fPackagesDirectory->DeviceID()
+				|| item->parentDirectoryID != fPackagesDirectory->NodeID()) {
 				ERROR("Volume::_ChangeActivation(): mismatching packages "
-					"domain\n");
+					"directory\n");
 				RETURN_ERROR(B_BAD_VALUE);
 			}
 
-			Package* package = domain->FindPackage(item->name);
+			Package* package = _FindPackage(item->name);
 // TODO: We should better look up the package by node_ref!
 			if (item->type == PACKAGE_FS_ACTIVATE_PACKAGE) {
 				if (package != NULL) {
@@ -1449,7 +1429,7 @@ INFORM("Volume::_ChangeActivation(): %" B_PRId32 " new packages, %" B_PRId32 " o
 		}
 
 		Package* package;
-		status_t error = _LoadPackage(domain, item->name, package);
+		status_t error = _LoadPackage(item->name, package);
 		if (error != B_OK) {
 			ERROR("Volume::_ChangeActivation(): failed to load package "
 				"\"%s\"\n", item->name);
@@ -1476,11 +1456,11 @@ INFORM("Volume::_ChangeActivation(): %" B_PRId32 " new packages, %" B_PRId32 " o
 			continue;
 		}
 
-		Package* package = domain->FindPackage(item->name);
+		Package* package = _FindPackage(item->name);
 // TODO: We should better look up the package by node_ref!
 		oldPackageReferences[oldPackageIndex++].SetTo(package);
 		_RemovePackageContent(package, NULL, true);
-		domain->RemovePackage(package);
+		_RemovePackage(package);
 INFORM("package \"%s\" deactivated\n", package->FileName());
 	}
 // TODO: Since package removal cannot fail, consider adding the new packages
@@ -1492,12 +1472,12 @@ INFORM("package \"%s\" deactivated\n", package->FileName());
 	for (newPackageIndex = 0; newPackageIndex < newPackageCount;
 		newPackageIndex++) {
 		Package* package = newPackageReferences[newPackageIndex];
-		domain->AddPackage(package);
+		_AddPackage(package);
 
 		// add the package to the node tree
 		error = _AddPackageContent(package, true);
 		if (error != B_OK) {
-			domain->RemovePackage(package);
+			_RemovePackage(package);
 			break;
 		}
 INFORM("package \"%s\" activated\n", package->FileName());
@@ -1508,19 +1488,19 @@ INFORM("package \"%s\" activated\n", package->FileName());
 		for (int32 i = newPackageIndex - 1; i >= 0; i--) {
 			Package* package = newPackageReferences[i];
 			_RemovePackageContent(package, NULL, true);
-			domain->RemovePackage(package);
+			_RemovePackage(package);
 		}
 
 		for (int32 i = oldPackageCount - 1; i >= 0; i--) {
 			Package* package = oldPackageReferences[i];
-			domain->AddPackage(package);
+			_AddPackage(package);
 
 			if (_AddPackageContent(package, true) != B_OK) {
 				// nothing we can do here
 				ERROR("Volume::_ChangeActivation(): failed to roll back "
 					"deactivation of package \"%s\" after error\n",
 		  			package->FileName());
-				domain->RemovePackage(package);
+				_RemovePackage(package);
 			}
 		}
 	}

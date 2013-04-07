@@ -24,22 +24,22 @@
 using BPackageKit::BPackageArchitecture;
 
 
-class PackageDomain;
 class PackageLinkDirectory;
+class Volume;
 class Version;
 
 
 class Package : public BReferenceable,
 	public DoublyLinkedListLinkImpl<Package> {
 public:
-								Package(PackageDomain* domain, dev_t deviceID,
+								Package(::Volume* volume, dev_t deviceID,
 									ino_t nodeID);
 								~Package();
 
 			status_t			Init(const char* fileName);
 			status_t			Load();
 
-			PackageDomain*		Domain() const		{ return fDomain; }
+			::Volume*			Volume() const		{ return fVolume; }
 			const char*			FileName() const	{ return fFileName; }
 
 			status_t			SetName(const char* name);
@@ -93,7 +93,7 @@ private:
 
 private:
 			mutex				fLock;
-			PackageDomain*		fDomain;
+			::Volume*			fVolume;
 			char*				fFileName;
 			char*				fName;
 			char*				fInstallPath;
