@@ -666,8 +666,9 @@ TExpandoMenuBar::AddTeam(team_id team, const char* signature)
 void
 TExpandoMenuBar::RemoveTeam(team_id team, bool partial)
 {
-	int32 count = CountItems();
-	for (int32 i = 0; i < count; i++) {
+	TWindowMenuItem* windowItem = NULL;
+
+	for (int32 i = 0; i < CountItems(); i++) {
 		if (TTeamMenuItem* item = dynamic_cast<TTeamMenuItem*>(ItemAt(i))) {
 			if (item->Teams()->HasItem((void*)(addr_t)team)) {
 				item->Teams()->RemoveItem(team);
@@ -680,10 +681,18 @@ TExpandoMenuBar::RemoveTeam(team_id team, bool partial)
 					fLastClickItem = -1;
 #endif
 
+				BAutolock locker(sMonLocker);
+					// make the update thread wait
 				RemoveItem(i);
+				delete item;
+				while ((windowItem = dynamic_cast<TWindowMenuItem*>(
+						ItemAt(i))) != NULL) {
+					// Also remove window items (if there are any)
+					RemoveItem(i);
+					delete windowItem;
+				}
 				SizeWindow(-1);
 				Window()->UpdateIfNeeded();
-				delete item;
 				return;
 			}
 		}
