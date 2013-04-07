@@ -763,24 +763,24 @@ BControlLook::DrawArrowShape(BView* view, BRect& rect, const BRect& updateRect,
 			tri3.Set(rect.right + 1, rect.top + 1);
 			break;
 		case B_LEFT_UP_ARROW:
-			tri1.Set(rect.left, rect.bottom);
-			tri2.Set(rect.left, rect.top);
+			tri1.Set(rect.left + 1, rect.bottom);
+			tri2.Set(rect.left + 1, rect.top);
 			tri3.Set(rect.right, rect.top);
 			break;
 		case B_RIGHT_UP_ARROW:
-			tri1.Set(rect.left, rect.top);
+			tri1.Set(rect.left + 1, rect.top);
 			tri2.Set(rect.right, rect.top);
 			tri3.Set(rect.right, rect.bottom);
 			break;
 		case B_RIGHT_DOWN_ARROW:
 			tri1.Set(rect.right, rect.top);
 			tri2.Set(rect.right, rect.bottom);
-			tri3.Set(rect.left, rect.bottom);
+			tri3.Set(rect.left + 1, rect.bottom);
 			break;
 		case B_LEFT_DOWN_ARROW:
 			tri1.Set(rect.right, rect.bottom);
-			tri2.Set(rect.left, rect.bottom);
-			tri3.Set(rect.left, rect.top);
+			tri2.Set(rect.left + 1, rect.bottom);
+			tri3.Set(rect.left + 1, rect.top);
 			break;
 	}
 
