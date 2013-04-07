@@ -10,9 +10,11 @@
 
 
 #include <Handler.h>
+#include <Locker.h>
 #include <String.h>
 
 #include <packagefs.h>
+#include <util/DoublyLinkedList.h>
 
 #include "Package.h"
 
@@ -24,11 +26,14 @@ class Root;
 
 class Volume : public BHandler {
 public:
-								Volume();
+								Volume(BLooper* looper);
 	virtual						~Volume();
 
 			status_t			Init(const node_ref& rootDirectoryRef,
 									node_ref& _packageRootRef);
+			status_t			InitPackages();
+
+			void				Unmounted();
 
 	virtual	void				MessageReceived(BMessage* message);
 
@@ -58,10 +63,18 @@ public:
 
 			int					OpenRootDirectory() const;
 
+			void				ProcessPendingNodeMonitorEvents();
+
+private:
+			struct NodeMonitorEvent;
+			typedef DoublyLinkedList<NodeMonitorEvent> NodeMonitorEventList;
+
 private:
 			void				_HandleEntryCreatedOrRemoved(
 									const BMessage* message, bool created);
 			void				_HandleEntryMoved(const BMessage* message);
+			void				_QueueNodeMonitorEvent(const BString& name,
+									bool wasCreated);
 
 			void				_PackagesEntryCreated(const char* name);
 			void				_PackagesEntryRemoved(const char* name);
@@ -77,6 +90,8 @@ private:
 			Root*				fRoot;
 			PackageFileNameHashTable fPackagesByFileName;
 			PackageNodeRefHashTable fPackagesByNodeRef;
+			BLocker				fPendingNodeMonitorEventsLock;
+			NodeMonitorEventList fPendingNodeMonitorEvents;
 };
 
 

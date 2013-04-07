@@ -96,7 +96,7 @@ PackageDaemon::_RegisterVolume(dev_t deviceID)
 		RETURN_ERROR(B_BAD_VALUE);
 
 	// create a volume
-	Volume* volume = new(std::nothrow) Volume;
+	Volume* volume = new(std::nothrow) Volume(this);
 	if (volume == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 	ObjectDeleter<Volume> volumeDeleter(volume);
@@ -126,19 +126,6 @@ PackageDaemon::_RegisterVolume(dev_t deviceID)
 	}
 	volumeDeleter.Detach();
 
-	AddHandler(volume);
-
-	// node-monitor the volume's packages directory
-	error = watch_node(&volume->PackagesDirectoryRef(), B_WATCH_DIRECTORY,
-		BMessenger(volume, this));
-	if (error != B_OK) {
-		ERROR("PackageDaemon::_RegisterVolume(): failed to start watching the "
-			"packages directory of the volume at \"%s\": %s\n",
-			volume->Path().String(), strerror(error));
-		// Not good, but not fatal. Only the manual package operations in the
-		// packages directory won't work correctly.
-	}
-
 	INFORM("volume at \"%s\" registered\n", volume->Path().String());
 
 	return B_OK;
@@ -148,16 +135,13 @@ PackageDaemon::_RegisterVolume(dev_t deviceID)
 void
 PackageDaemon::_UnregisterVolume(Volume* volume)
 {
-	stop_watching(BMessenger(volume, this));
+	volume->Unmounted();
 
-	RemoveHandler(volume);
+	INFORM("volume at \"%s\" unregistered\n", volume->Path().String());
 
 	Root* root = volume->GetRoot();
 	root->UnregisterVolume(volume);
 
-	INFORM("volume at \"%s\" unregistered\n", volume->Path().String());
-
-	delete volume;
 	_PutRoot(root);
 }
 

@@ -17,19 +17,88 @@
 #include "Volume.h"
 
 
+// #pragma mark - InitVolumePackagesJob
+
+
+struct Root::InitPackagesJob : public Job {
+	InitPackagesJob(Volume* volume)
+		:
+		fVolume(volume)
+	{
+	}
+
+	virtual void Do()
+	{
+		fVolume->InitPackages();
+	}
+
+private:
+	Volume*	fVolume;
+};
+
+
+// #pragma mark - DeleteVolumeJob
+
+
+struct Root::DeleteVolumeJob : public Job {
+	DeleteVolumeJob(Volume* volume)
+		:
+		fVolume(volume)
+	{
+	}
+
+	virtual void Do()
+	{
+		delete fVolume;
+	}
+
+private:
+	Volume*	fVolume;
+};
+
+
+// #pragma mark - HandleNodeMonitorEventsJob
+
+
+struct Root::HandleNodeMonitorEventsJob : public Job {
+	HandleNodeMonitorEventsJob(Volume* volume)
+		:
+		fVolume(volume)
+	{
+	}
+
+	virtual void Do()
+	{
+		fVolume->ProcessPendingNodeMonitorEvents();
+	}
+
+private:
+	Volume*	fVolume;
+};
+
+
+// #pragma mark - Root
+
+
 Root::Root()
 	:
 	fNodeRef(),
 	fPath(),
 	fSystemVolume(NULL),
 	fCommonVolume(NULL),
-	fHomeVolume(NULL)
+	fHomeVolume(NULL),
+	fJobQueue(),
+	fJobRunner(-1)
 {
 }
 
 
 Root::~Root()
 {
+	fJobQueue.Close();
+
+	if (fJobRunner >= 0)
+		wait_for_thread(fJobRunner, NULL);
 }
 
 
@@ -38,12 +107,22 @@ Root::Init(const node_ref& nodeRef)
 {
 	fNodeRef = nodeRef;
 
+	// init job queue and spawn job runner thread
+	status_t error = fJobQueue.Init();
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	fJobRunner = spawn_thread(&_JobRunnerEntry, "job runner", B_NORMAL_PRIORITY,
+		this);
+	if (fJobRunner < 0)
+		RETURN_ERROR(fJobRunner);
+
 	// get the path
 	BDirectory directory;
-	status_t error = directory.SetTo(&fNodeRef);
+	error = directory.SetTo(&fNodeRef);
 	if (error != B_OK) {
 		ERROR("Root::Init(): failed to open directory: %s\n", strerror(error));
-		return error;
+		RETURN_ERROR(error);
 	}
 
 	BEntry entry;
@@ -62,6 +141,8 @@ Root::Init(const node_ref& nodeRef)
 	fPath = path.Path();
 	if (fPath.IsEmpty())
 		RETURN_ERROR(B_NO_MEMORY);
+
+	resume_thread(fJobRunner);
 
 	return B_OK;
 }
@@ -84,6 +165,14 @@ Root::RegisterVolume(Volume* volume)
 	*volumeToSet = volume;
 	volume->SetRoot(this);
 
+	// queue a job for reading the volume's packages
+	status_t error = _QueueJob(new(std::nothrow) InitPackagesJob(volume));
+	if (error != B_OK) {
+		volume->SetRoot(NULL);
+		*volumeToSet = NULL;
+		return error;
+	}
+
 	return B_OK;
 }
 
@@ -99,7 +188,10 @@ Root::UnregisterVolume(Volume* volume)
 	}
 
 	*volumeToSet = NULL;
-	volume->SetRoot(NULL);
+
+	// Use the job queue to delete the volume to make sure there aren't any
+	// pending jobs that reference the volume.
+	_QueueJob(new(std::nothrow) DeleteVolumeJob(volume));
 }
 
 
@@ -114,6 +206,14 @@ Root::FindVolume(dev_t deviceID) const
 	}
 
 	return NULL;
+}
+
+
+void
+Root::HandleNodeMonitorEvents(Volume* volume)
+{
+// TODO: Don't push a new one, if one is already pending!
+	_QueueJob(new(std::nothrow) HandleNodeMonitorEventsJob(volume));
 }
 
 
@@ -137,4 +237,39 @@ Root::_GetVolume(PackageFSMountType mountType)
 		default:
 			return NULL;
 	}
+}
+
+
+status_t
+Root::_QueueJob(Job* job)
+{
+	if (job == NULL)
+		return B_NO_MEMORY;
+
+	BReference<Job> jobReference(job, true);
+	if (!fJobQueue.QueueJob(job)) {
+		// job queue already closed
+		return B_BAD_VALUE;
+	}
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
+Root::_JobRunnerEntry(void* data)
+{
+	return ((Root*)data)->_JobRunner();
+}
+
+
+status_t
+Root::_JobRunner()
+{
+	while (Job* job = fJobQueue.DequeueJob()) {
+		job->Do();
+		job->ReleaseReference();
+	}
+
+	return B_OK;
 }

@@ -6,6 +6,8 @@ UsePrivateHeaders app kernel package shared ;
 Server package_daemon
  	:
  	DebugSupport.cpp
+ 	Job.cpp
+ 	JobQueue.cpp
  	Package.cpp
  	PackageDaemon.cpp
  	Root.cpp

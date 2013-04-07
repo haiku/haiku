@@ -10,11 +10,15 @@
 
 
 #include <Node.h>
+#include <ObjectList.h>
+#include <OS.h>
 #include <String.h>
 
 #include <Referenceable.h>
 
 #include <packagefs.h>
+
+#include "JobQueue.h"
 
 
 class Volume;
@@ -34,14 +38,27 @@ public:
 
 			status_t			RegisterVolume(Volume* volume);
 			void				UnregisterVolume(Volume* volume);
+									// deletes the volume (eventually)
 
 			Volume*				FindVolume(dev_t deviceID) const;
+
+			void				HandleNodeMonitorEvents(Volume* volume);
 
 protected:
 	virtual	void				LastReferenceReleased();
 
 private:
+			struct InitPackagesJob;
+			struct DeleteVolumeJob;
+			struct HandleNodeMonitorEventsJob;
+
+private:
 			Volume**			_GetVolume(PackageFSMountType mountType);
+
+			status_t			_QueueJob(Job* job);
+
+	static	status_t			_JobRunnerEntry(void* data);
+			status_t			_JobRunner();
 
 private:
 			node_ref			fNodeRef;
@@ -49,6 +66,8 @@ private:
 			Volume*				fSystemVolume;
 			Volume*				fCommonVolume;
 			Volume*				fHomeVolume;
+			JobQueue			fJobQueue;
+			thread_id			fJobRunner;
 };
 
 

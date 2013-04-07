@@ -16,15 +16,50 @@
 
 #include <Directory.h>
 #include <Entry.h>
+#include <Looper.h>
 #include <NodeMonitor.h>
 #include <Path.h>
 
 #include <AutoDeleter.h>
+#include <AutoLocker.h>
 
 #include "DebugSupport.h"
+#include "Root.h"
 
 
-Volume::Volume()
+// #pragma mark - NodeMonitorEvent
+
+
+struct Volume::NodeMonitorEvent
+	: public DoublyLinkedListLinkImpl<NodeMonitorEvent> {
+public:
+	NodeMonitorEvent(const BString& entryName, bool created)
+		:
+		fEntryName(entryName),
+		fCreated(created)
+	{
+	}
+
+	const BString& EntryName() const
+	{
+		return fEntryName;
+	}
+
+	bool WasCreated() const
+	{
+		return fCreated;
+	}
+
+private:
+	BString	fEntryName;
+	bool	fCreated;
+};
+
+
+// #pragma mark - Volume
+
+
+Volume::Volume(BLooper* looper)
 	:
 	BHandler(),
 	fPath(),
@@ -33,8 +68,11 @@ Volume::Volume()
 	fPackagesDirectoryRef(),
 	fRoot(NULL),
 	fPackagesByFileName(),
-	fPackagesByNodeRef()
+	fPackagesByNodeRef(),
+	fPendingNodeMonitorEventsLock("pending node monitor events"),
+	fPendingNodeMonitorEvents()
 {
+	looper->AddHandler(this);
 }
 
 
@@ -107,18 +145,54 @@ Volume::Init(const node_ref& rootDirectoryRef, node_ref& _packageRootRef)
 	fPackagesDirectoryRef.device = info.packagesDeviceID;
 	fPackagesDirectoryRef.node = info.packagesDirectoryID;
 
-	// read in all packages in the directory
-	error = _ReadPackagesDirectory();
-	if (error != B_OK)
-		RETURN_ERROR(error);
-
-	_GetActivePackages(fd);
-
 	_packageRootRef.device = info.rootDeviceID;
 	_packageRootRef.node = info.rootDirectoryID;
 
 	return B_OK;
 }
+
+
+status_t
+Volume::InitPackages()
+{
+	// node-monitor the volume's packages directory
+	status_t error = watch_node(&fPackagesDirectoryRef, B_WATCH_DIRECTORY,
+		BMessenger(this));
+	if (error != B_OK) {
+		ERROR("Volume::InitPackages(): failed to start watching the packages "
+			"directory of the volume at \"%s\": %s\n",
+			fPath.String(), strerror(error));
+		// Not good, but not fatal. Only the manual package operations in the
+		// packages directory won't work correctly.
+	}
+
+	// read the packages directory and get the active packages
+	int fd = OpenRootDirectory();
+	if (fd < 0) {
+		ERROR("Volume::InitPackages(): failed to open root directory: %s\n",
+			strerror(fd));
+		RETURN_ERROR(fd);
+	}
+	FileDescriptorCloser fdCloser(fd);
+
+	error = _ReadPackagesDirectory();
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	error = _GetActivePackages(fd);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	return B_OK;
+}
+
+
+void
+Volume::Unmounted()
+{
+	stop_watching(BMessenger(this));
+}
+
 
 void
 Volume::MessageReceived(BMessage* message)
@@ -169,6 +243,28 @@ Volume::OpenRootDirectory() const
 
 
 void
+Volume::ProcessPendingNodeMonitorEvents()
+{
+	// get the events
+	NodeMonitorEventList events;
+	{
+		AutoLocker<BLocker> eventsLock(fPendingNodeMonitorEventsLock);
+		events.MoveFrom(&fPendingNodeMonitorEvents);
+	}
+
+	// process them
+// TODO: Don't do that individually.
+	while (NodeMonitorEvent* event = events.RemoveHead()) {
+		ObjectDeleter<NodeMonitorEvent> eventDeleter(event);
+		if (event->WasCreated())
+			_PackagesEntryCreated(event->EntryName());
+		else
+			_PackagesEntryRemoved(event->EntryName());
+	}
+}
+
+
+void
 Volume::_HandleEntryCreatedOrRemoved(const BMessage* message, bool created)
 {
 	// only moves to or from our packages directory are interesting
@@ -182,10 +278,7 @@ Volume::_HandleEntryCreatedOrRemoved(const BMessage* message, bool created)
 		return;
 	}
 
-	if (created)
-		_PackagesEntryCreated(name);
-	else
-		_PackagesEntryRemoved(name);
+	_QueueNodeMonitorEvent(name, created);
 }
 
 
@@ -209,9 +302,32 @@ Volume::_HandleEntryMoved(const BMessage* message)
 	}
 
 	if (fromDirectoryID == fPackagesDirectoryRef.node)
-		_PackagesEntryRemoved(fromName);
+		_QueueNodeMonitorEvent(fromName, false);
 	if (toDirectoryID == fPackagesDirectoryRef.node)
-		_PackagesEntryCreated(toName);
+		_QueueNodeMonitorEvent(toName, true);
+}
+
+
+void
+Volume::_QueueNodeMonitorEvent(const BString& name, bool wasCreated)
+{
+	if (name.IsEmpty()) {
+		ERROR("Volume::_QueueNodeMonitorEvent(): got empty name.\n");
+		return;
+	}
+
+	NodeMonitorEvent* event
+		= new(std::nothrow) NodeMonitorEvent(name, wasCreated);
+	if (event == NULL) {
+		ERROR("Volume::_QueueNodeMonitorEvent(): out of memory.\n");
+		return;
+	}
+
+	AutoLocker<BLocker> eventsLock(fPendingNodeMonitorEventsLock);
+	fPendingNodeMonitorEvents.Add(event);
+	eventsLock.Unlock();
+
+	fRoot->HandleNodeMonitorEvents(this);
 }
 
 
