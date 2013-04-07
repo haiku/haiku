@@ -113,32 +113,31 @@ TShowHideMenuItem::TeamShowHideCommon(int32 action, const BList* teamList,
 	if (teamList == NULL)
 		return B_BAD_VALUE;
 
-	int32 count = teamList->CountItems();
-	for (int32 index = 0; index < count; index++) {
-		team_id team = (addr_t)teamList->ItemAt(index);
+	for (int32 i = teamList->CountItems() - 1; i >= 0; i--) {
+		team_id team = (addr_t)teamList->ItemAt(i);
 
 		switch (action) {
 			case B_MINIMIZE_WINDOW:
-				do_minimize_team(zoomRect, team, doZoom && index == 0);
+				do_minimize_team(zoomRect, team, doZoom && i == 0);
 				break;
 
 			case B_BRING_TO_FRONT:
-				do_bring_to_front_team(zoomRect, team, doZoom && index == 0);
+				do_bring_to_front_team(zoomRect, team, doZoom && i == 0);
 				break;
 
 			case B_QUIT_REQUESTED:
-				{
-					BMessenger messenger((char*)NULL, team);
-					uint32 command = B_QUIT_REQUESTED;
-					app_info aInfo;
-					be_roster->GetRunningAppInfo(team, &aInfo);
+			{
+				BMessenger messenger((char*)NULL, team);
+				uint32 command = B_QUIT_REQUESTED;
+				app_info aInfo;
+				be_roster->GetRunningAppInfo(team, &aInfo);
 
-					if (strcasecmp(aInfo.signature, kTrackerSignature) == 0)
-						command = 'Tall';
+				if (strcasecmp(aInfo.signature, kTrackerSignature) == 0)
+					command = 'Tall';
 
-					messenger.SendMessage(command);
-					break;
-				}
+				messenger.SendMessage(command);
+				break;
+			}
 		}
 	}
 

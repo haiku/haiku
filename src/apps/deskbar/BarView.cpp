@@ -663,12 +663,13 @@ TBarView::ChangeState(int32 state, bool vertical, bool left, bool top,
 void
 TBarView::SaveExpandedItems()
 {
-	if (fExpandoMenuBar == NULL || fExpandoMenuBar->CountItems() <= 0)
+	if (fExpandoMenuBar == NULL)
 		return;
 
 	// Get a list of the signatures of expanded apps. Can't use
 	// team_id because there can be more than one team per application
-	for (int32 i = 0; i < fExpandoMenuBar->CountItems(); i++) {
+	int32 count = fExpandoMenuBar->CountItems();
+	for (int32 i = 0; i < count; i++) {
 		TTeamMenuItem* teamItem
 			= dynamic_cast<TTeamMenuItem*>(fExpandoMenuBar->ItemAt(i));
 

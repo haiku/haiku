@@ -731,7 +731,7 @@ TExpandoMenuBar::RemoveTeam(team_id team, bool partial)
 {
 	TWindowMenuItem* windowItem = NULL;
 
-	for (int32 i = 0; i < CountItems(); i++) {
+	for (int32 i = CountItems() - 1; i >= 0; i--) {
 		if (TTeamMenuItem* item = dynamic_cast<TTeamMenuItem*>(ItemAt(i))) {
 			if (item->Teams()->HasItem((void*)(addr_t)team)) {
 				item->Teams()->RemoveItem(team);

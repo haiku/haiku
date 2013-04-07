@@ -466,7 +466,7 @@ TSwitchManager::TSwitchManager(BPoint point)
 
 TSwitchManager::~TSwitchManager()
 {
-	for (int32 i = fGroupList.CountItems(); i-- > 0;) {
+	for (int32 i = fGroupList.CountItems() - 1; i >= 0; i--) {
 		TTeamGroup* teamInfo = static_cast<TTeamGroup*>(fGroupList.ItemAt(i));
 		delete teamInfo;
 	}
@@ -551,8 +551,9 @@ TSwitchManager::MessageReceived(BMessage* message)
 		{
 			const char* signature = message->FindString("sig");
 			team_id team = message->FindInt32("team");
+			int32 count = fGroupList.CountItems();
 
-			for (int32 i = 0; i < fGroupList.CountItems(); i++) {
+			for (int32 i = 0; i < count; i++) {
 				TTeamGroup* tinfo = (TTeamGroup*)fGroupList.ItemAt(i);
 				if (strcasecmp(tinfo->Signature(), signature) == 0) {
 					if (!(tinfo->TeamList()->HasItem((void*)(addr_t)team)))
@@ -566,8 +567,9 @@ TSwitchManager::MessageReceived(BMessage* message)
 		case kRemoveTeam:
 		{
 			team_id team = message->FindInt32("team");
+			int32 count = fGroupList.CountItems();
 
-			for (int32 i = 0; i < fGroupList.CountItems(); i++) {
+			for (int32 i = 0; i < count; i++) {
 				TTeamGroup* tinfo = (TTeamGroup*)fGroupList.ItemAt(i);
 				if (tinfo->TeamList()->HasItem((void*)(addr_t)team)) {
 					tinfo->TeamList()->RemoveItem((void*)(addr_t)team);
@@ -813,14 +815,15 @@ int32
 TSwitchManager::CountVisibleGroups()
 {
 	int32 result = 0;
-
 	int32 count = fGroupList.CountItems();
+
 	for (int32 i = 0; i < count; i++) {
 		if (!OKToUse((TTeamGroup*)fGroupList.ItemAt(i)))
 			continue;
 
 		result++;
 	}
+
 	return result;
 }
 
@@ -1047,7 +1050,8 @@ TSwitchManager::QuitApp()
 	TTeamGroup* teamGroup;
 	int32 count = 0;
 
-	for (int32 i = fCurrentIndex + 1; i < fGroupList.CountItems(); i++) {
+	int32 groupCount = fGroupList.CountItems();
+	for (int32 i = fCurrentIndex + 1; i < groupCount; i++) {
 		teamGroup = (TTeamGroup*)fGroupList.ItemAt(i);
 
 		if (!OKToUse(teamGroup))
@@ -1067,7 +1071,7 @@ TSwitchManager::QuitApp()
 
 	// send the quit request to all teams in this group
 
-	for (int32 i = teamGroup->TeamList()->CountItems(); i-- > 0;) {
+	for (int32 i = teamGroup->TeamList()->CountItems() - 1; i >= 0; i--) {
 		team_id team = (addr_t)teamGroup->TeamList()->ItemAt(i);
 		app_info info;
 		if (be_roster->GetRunningAppInfo(team, &info) == B_OK) {
@@ -1090,7 +1094,7 @@ TSwitchManager::HideApp()
 
 	TTeamGroup* teamGroup = (TTeamGroup*)fGroupList.ItemAt(fCurrentIndex);
 
-	for (int32 i = teamGroup->TeamList()->CountItems(); i-- > 0;) {
+	for (int32 i = teamGroup->TeamList()->CountItems() - 1; i >= 0; i--) {
 		team_id team = (addr_t)teamGroup->TeamList()->ItemAt(i);
 		app_info info;
 		if (be_roster->GetRunningAppInfo(team, &info) == B_OK)
