@@ -92,16 +92,16 @@ TTeamMenuItem::~TTeamMenuItem()
 status_t
 TTeamMenuItem::Invoke(BMessage* message)
 {
-	if ((static_cast<TBarApp*>(be_app))->BarView()->InvokeItem(Signature()))
+	if (fBarView->InvokeItem(Signature())) {
 		// handles drop on application
 		return B_OK;
+	}
 
 	// if the app could not handle the drag message
 	// and we were dragging, then kill the drag
 	// should never get here, disabled item will not invoke
-	TBarView* barView = (static_cast<TBarApp*>(be_app))->BarView();
-	if (barView && barView->Dragging())
-		barView->DragStop();
+	if (fBarView != NULL && fBarView->Dragging())
+		fBarView->DragStop();
 
 	// bring to front or minimize shortcuts
 	uint32 mods = modifiers();
@@ -136,10 +136,10 @@ TTeamMenuItem::SetOverrideSelected(bool selected)
 }
 
 
-bool
-TTeamMenuItem::HasLabel() const
+void
+TTeamMenuItem::SetArrowDirection(int32 direction)
 {
-	return fDrawLabel;
+	fArrowDirection = direction;
 }
 
 
@@ -147,34 +147,6 @@ void
 TTeamMenuItem::SetHasLabel(bool drawLabel)
 {
 	fDrawLabel = drawLabel;
-}
-
-
-float
-TTeamMenuItem::LabelWidth() const
-{
-	return fLabelWidth;
-}
-
-
-BList*
-TTeamMenuItem::Teams() const
-{
-	return fTeam;
-}
-
-
-const char*
-TTeamMenuItem::Signature() const
-{
-	return fSig;
-}
-
-
-const char*
-TTeamMenuItem::Name() const
-{
-	return fName;
 }
 
 
@@ -221,9 +193,8 @@ TTeamMenuItem::Draw()
 	menu->PushState();
 
 	rgb_color menuColor = menu->LowColor();
-	TBarView* barView = (static_cast<TBarApp*>(be_app))->BarView();
-	bool canHandle = !barView->Dragging()
-		|| barView->AppCanHandleTypes(Signature());
+	bool canHandle = !fBarView->Dragging()
+		|| fBarView->AppCanHandleTypes(Signature());
 	uint32 flags = 0;
 	if (_IsSelected() && canHandle)
 		flags |= BControlLook::B_ACTIVATED;
@@ -311,9 +282,10 @@ TTeamMenuItem::DrawContent()
 		DrawContentLabel();
 	}
 
-	int32 arrowDirection = fExpanded ? BControlLook::B_DOWN_ARROW
-		: BControlLook::B_RIGHT_ARROW;
-	DrawExpanderArrow(arrowDirection);
+	if (fVertical && static_cast<TBarApp*>(be_app)->Settings()->superExpando
+		&& fBarView->ExpandoState()) {
+		DrawExpanderArrow();
+	}
 }
 
 
@@ -352,9 +324,8 @@ TTeamMenuItem::DrawContentLabel()
 	if (!label)
 		label = Label();
 
-	TBarView* barview = (static_cast<TBarApp*>(be_app))->BarView();
-	bool canHandle = !barview->Dragging()
-		|| barview->AppCanHandleTypes(Signature());
+	bool canHandle = !fBarView->Dragging()
+		|| fBarView->AppCanHandleTypes(Signature());
 	if (_IsSelected() && IsEnabled() && canHandle)
 		menu->SetLowColor(tint_color(menu->LowColor(),
 			B_HIGHLIGHT_BACKGROUND_TINT));
@@ -373,37 +344,28 @@ TTeamMenuItem::DrawContentLabel()
 
 
 void
-TTeamMenuItem::DrawExpanderArrow(int32 arrowDirection)
+TTeamMenuItem::DrawExpanderArrow()
 {
-	TBarView* barView = (static_cast<TBarApp*>(be_app))->BarView();
-	bool canHandle = !barView->Dragging()
-		|| barView->AppCanHandleTypes(Signature());
+	BMenu* menu = Menu();
+	BRect frame(Frame());
+	BRect rect(0, 0, kSwitchWidth, 10);
+	rect.OffsetTo(BPoint(frame.right - rect.Width(),
+		ContentLocation().y + ((frame.Height() - rect.Height()) / 2)));
+
+#if 0
+	bool canHandle = !fBarView->Dragging()
+		|| fBarView->AppCanHandleTypes(Signature());
 	uint32 flags = 0;
 	if (_IsSelected() && canHandle)
 		flags |= BControlLook::B_ACTIVATED;
 
-	if (fVertical && static_cast<TBarApp*>(be_app)->Settings()->superExpando
-		&& barView->ExpandoState()) {
-		BMenu* menu = Menu();
-		BRect frame(Frame());
-		BRect rect(0, 0, kSwitchWidth, 10);
-		rect.OffsetTo(BPoint(frame.right - rect.Width(),
-			ContentLocation().y + ((frame.Height() - rect.Height()) / 2)));
-
-		if (flags == 0) {
-			menu->SetHighColor(menu->LowColor());
-			menu->FillRect(rect);
-		}
-		be_control_look->DrawArrowShape(menu, rect, rect, menu->LowColor(),
-			arrowDirection, 0, B_DARKEN_3_TINT);
+	if (flags == 0) {
+		menu->SetHighColor(menu->LowColor());
+		menu->FillRect(rect);
 	}
-}
-
-
-bool
-TTeamMenuItem::IsExpanded()
-{
-	return fExpanded;
+#endif
+	be_control_look->DrawArrowShape(menu, rect, rect, menu->LowColor(),
+		fArrowDirection, 0, B_DARKEN_3_TINT);
 }
 
 
@@ -411,6 +373,8 @@ void
 TTeamMenuItem::ToggleExpandState(bool resizeWindow)
 {
 	fExpanded = !fExpanded;
+	fArrowDirection = fExpanded ? BControlLook::B_DOWN_ARROW
+		: BControlLook::B_RIGHT_ARROW;
 
 	if (fExpanded) {
 		// Populate Menu() with the stuff from SubMenu().
@@ -516,9 +480,13 @@ TTeamMenuItem::_InitData(BList* team, BBitmap* icon, char* name, char* sig,
 		snprintf(temp, sizeof(temp), "team %ld", (addr_t)team->ItemAt(0));
 		fName = strdup(temp);
 	}
-
 	SetLabel(fName);
+	fOverrideWidth = width;
+	fOverrideHeight = height;
+	fDrawLabel = drawLabel;
+	fVertical = vertical;
 
+	fBarView = static_cast<TBarApp*>(be_app)->BarView();
 	BFont font(be_plain_font);
 	fLabelWidth = ceilf(font.StringWidth(fName));
 	font_height fontHeight;
@@ -526,14 +494,10 @@ TTeamMenuItem::_InitData(BList* team, BBitmap* icon, char* name, char* sig,
 	fLabelAscent = ceilf(fontHeight.ascent);
 	fLabelDescent = ceilf(fontHeight.descent + fontHeight.leading);
 
-	fOverrideWidth = width;
-	fOverrideHeight = height;
 	fOverriddenSelected = false;
 
-	fVertical = vertical;
-	fDrawLabel = drawLabel;
-
 	fExpanded = false;
+	fArrowDirection = BControlLook::B_RIGHT_ARROW;
 }
 
 

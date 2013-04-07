@@ -335,7 +335,8 @@ TExpandoMenuBar::MouseDown(BPoint where)
 		// start the animation here, finish on mouse up
 		fLastClickedItem = item;
 		fClickedExpander = true;
-		item->DrawExpanderArrow(BControlLook::B_RIGHT_DOWN_ARROW);
+		item->SetArrowDirection(BControlLook::B_RIGHT_DOWN_ARROW);
+		Invalidate(item->ExpanderBounds());
 		return;
 			// absorb the message
 	}
@@ -378,8 +379,8 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 					&& lastItem != NULL && buttons == B_PRIMARY_MOUSE_BUTTON) {
 					// Started expander animation, exited view then entered
 					// again, redraw the expanded arrow
-					int32 arrowDirection = BControlLook::B_RIGHT_DOWN_ARROW;
-					lastItem->DrawExpanderArrow(arrowDirection);
+					lastItem->SetArrowDirection(BControlLook::B_RIGHT_DOWN_ARROW);
+					Invalidate(lastItem->ExpanderBounds());
 				}
 				break;
 			}
@@ -444,10 +445,10 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 					// Started expander animation, then exited view,
 					// since we can't track outside mouse movements
 					// redraw the original expander arrow
-					int32 arrowDirection = lastItem->IsExpanded()
+					lastItem->SetArrowDirection(lastItem->IsExpanded()
 						? BControlLook::B_DOWN_ARROW
-						: BControlLook::B_RIGHT_ARROW;
-					lastItem->DrawExpanderArrow(arrowDirection);
+						: BControlLook::B_RIGHT_ARROW);
+					Invalidate(lastItem->ExpanderBounds());
 				}
 				break;
 			}
@@ -527,9 +528,9 @@ TExpandoMenuBar::MouseUp(BPoint where)
 				// absorb the message
 		} else if (lastItem != NULL) {
 			// User changed their mind, redraw the original expander arrow
-			int32 arrowDirection = lastItem->IsExpanded()
-				? BControlLook::B_DOWN_ARROW : BControlLook::B_RIGHT_ARROW;
-			lastItem->DrawExpanderArrow(arrowDirection);
+			lastItem->SetArrowDirection(lastItem->IsExpanded()
+				? BControlLook::B_DOWN_ARROW : BControlLook::B_RIGHT_ARROW);
+			Invalidate(lastItem->ExpanderBounds());
 		}
 	}
 

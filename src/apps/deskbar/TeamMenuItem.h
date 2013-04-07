@@ -67,25 +67,28 @@ public:
 			void				SetOverrideHeight(float height);
 			void				SetOverrideSelected(bool selected);
 
-			bool				HasLabel() const;
+			int32				ArrowDirection() const { return fArrowDirection; };
+			void				SetArrowDirection(int32 direction);
+
+			bool				HasLabel() const { return fDrawLabel; };
 			void				SetHasLabel(bool drawLabel);
 
-			bool				IsExpanded();
+			bool				IsExpanded() const { return fExpanded; };
 			void				ToggleExpandState(bool resizeWindow);
 			BRect				ExpanderBounds() const;
 			TWindowMenuItem*	ExpandedWindowItem(int32 id);
 
-			float				LabelWidth() const;
-			BList*				Teams() const;
-			const char*			Signature() const;
-			const char*			Name() const;
+			float				LabelWidth() const { return fLabelWidth; };
+			BList*				Teams() const { return fTeam; };
+			const char*			Signature() const { return fSig; };
+			const char*			Name() const { return fName; };
 
 protected:
 			void				GetContentSize(float* width, float* height);
 			void				Draw();
 			void				DrawContent();
 			void				DrawContentLabel();
-			void				DrawExpanderArrow(int32 arrowDirection);
+			void				DrawExpanderArrow();
 
 private:
 	friend	class				TExpandoMenuBar;
@@ -102,17 +105,20 @@ private:
 			BBitmap*			fIcon;
 			char*				fName;
 			char*				fSig;
-			float				fLabelWidth;
-			float				fLabelAscent;
-			float				fLabelDescent;
 			float				fOverrideWidth;
 			float				fOverrideHeight;
-
 			bool				fDrawLabel;
 			bool				fVertical;
 
-			bool				fExpanded;
+			TBarView*			fBarView;
+			float				fLabelWidth;
+			float				fLabelAscent;
+			float				fLabelDescent;
+
 			bool				fOverriddenSelected;
+
+			bool				fExpanded;
+			int32				fArrowDirection;
 };
 
 
