@@ -464,7 +464,7 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 	switch (code) {
 		case B_ENTERED_VIEW:
 			// fPreviousDragTargetItem should always be NULL here anyways.
-			if (fPreviousDragTargetItem)
+			if (fPreviousDragTargetItem != NULL)
 				_FinishedDrag();
 
 			fBarView->CacheDragData(message);
@@ -748,6 +748,10 @@ TExpandoMenuBar::RemoveTeam(team_id team, bool partial)
 				BAutolock locker(sMonLocker);
 					// make the update thread wait
 				RemoveItem(i);
+				if (item == fPreviousDragTargetItem)
+					fPreviousDragTargetItem = NULL;
+				if (item == fLastMousedOverItem)
+					fLastMousedOverItem = NULL;
 				if (item == fLastClickedItem)
 					fLastClickedItem = NULL;
 				delete item;
@@ -755,6 +759,8 @@ TExpandoMenuBar::RemoveTeam(team_id team, bool partial)
 						ItemAt(i))) != NULL) {
 					// Also remove window items (if there are any)
 					RemoveItem(i);
+					if (windowItem == fLastMousedOverItem)
+						fLastMousedOverItem = NULL;
 					if (windowItem == fLastClickedItem)
 						fLastClickedItem = NULL;
 					delete windowItem;
