@@ -349,21 +349,9 @@ TTeamMenuItem::DrawExpanderArrow()
 	BMenu* menu = Menu();
 	BRect frame(Frame());
 	BRect rect(0, 0, kSwitchWidth, 10);
+
 	rect.OffsetTo(BPoint(frame.right - rect.Width(),
 		ContentLocation().y + ((frame.Height() - rect.Height()) / 2)));
-
-#if 0
-	bool canHandle = !fBarView->Dragging()
-		|| fBarView->AppCanHandleTypes(Signature());
-	uint32 flags = 0;
-	if (_IsSelected() && canHandle)
-		flags |= BControlLook::B_ACTIVATED;
-
-	if (flags == 0) {
-		menu->SetHighColor(menu->LowColor());
-		menu->FillRect(rect);
-	}
-#endif
 	be_control_look->DrawArrowShape(menu, rect, rect, menu->LowColor(),
 		fArrowDirection, 0, B_DARKEN_3_TINT);
 }
