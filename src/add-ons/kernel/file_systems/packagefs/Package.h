@@ -37,6 +37,7 @@ public:
 								~Package();
 
 			status_t			Init(const char* fileName);
+			status_t			Load();
 
 			PackageDomain*		Domain() const		{ return fDomain; }
 			const char*			FileName() const	{ return fFileName; }
@@ -85,6 +86,10 @@ public:
 									{ return fResolvables; }
 			const DependencyList& Dependencies() const
 									{ return fDependencies; }
+
+private:
+			struct LoaderErrorOutput;
+			struct LoaderContentHandler;
 
 private:
 			mutex				fLock;

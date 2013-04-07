@@ -25,34 +25,21 @@
 #include <Notifications.h>
 #include <vfs.h>
 
-#include <package/hpkg/ErrorOutput.h>
-#include <package/hpkg/PackageEntry.h>
-#include <package/hpkg/PackageEntryAttribute.h>
-#include <package/hpkg/PackageReaderImpl.h>
-
 #include "AttributeIndex.h"
 #include "DebugSupport.h"
 #include "kernel_interface.h"
 #include "LastModifiedIndex.h"
 #include "NameIndex.h"
 #include "OldUnpackingNodeAttributes.h"
-#include "PackageDirectory.h"
-#include "PackageFile.h"
 #include "PackageFSRoot.h"
 #include "PackageLinkDirectory.h"
 #include "PackageLinksDirectory.h"
-#include "PackageSymlink.h"
 #include "Resolvable.h"
 #include "SizeIndex.h"
 #include "UnpackingLeafNode.h"
 #include "UnpackingDirectory.h"
 #include "Utils.h"
 #include "Version.h"
-
-
-using namespace BPackageKit;
-using namespace BPackageKit::BHPKG;
-using BPackageKit::BHPKG::BPrivate::PackageReaderImpl;
 
 
 // node ID of the root directory
@@ -153,264 +140,6 @@ struct Volume::DomainDirectoryEventJob : Job {
 private:
 	PackageDomain*	fDomain;
 	KMessage		fEvent;
-};
-
-
-// #pragma mark - PackageLoaderErrorOutput
-
-
-struct Volume::PackageLoaderErrorOutput : BErrorOutput {
-	PackageLoaderErrorOutput(Package* package)
-		:
-		fPackage(package)
-	{
-	}
-
-	virtual void PrintErrorVarArgs(const char* format, va_list args)
-	{
-// TODO:...
-	}
-
-private:
-	Package*	fPackage;
-};
-
-
-// #pragma mark - PackageLoaderContentHandler
-
-
-struct Volume::PackageLoaderContentHandler : BPackageContentHandler {
-	PackageLoaderContentHandler(Package* package)
-		:
-		fPackage(package),
-		fErrorOccurred(false)
-	{
-	}
-
-	status_t Init()
-	{
-		return B_OK;
-	}
-
-	virtual status_t HandleEntry(BPackageEntry* entry)
-	{
-		if (fErrorOccurred)
-			return B_OK;
-
-		PackageDirectory* parentDir = NULL;
-		if (entry->Parent() != NULL) {
-			parentDir = dynamic_cast<PackageDirectory*>(
-				(PackageNode*)entry->Parent()->UserToken());
-			if (parentDir == NULL)
-				RETURN_ERROR(B_BAD_DATA);
-		}
-
-		status_t error;
-
-		// get the file mode -- filter out write permissions
-		mode_t mode = entry->Mode() & ~(mode_t)(S_IWUSR | S_IWGRP | S_IWOTH);
-
-		// create the package node
-		PackageNode* node;
-		if (S_ISREG(mode)) {
-			// file
-			node = new(std::nothrow) PackageFile(fPackage, mode, entry->Data());
-		} else if (S_ISLNK(mode)) {
-			// symlink
-			PackageSymlink* symlink = new(std::nothrow) PackageSymlink(
-				fPackage, mode);
-			if (symlink == NULL)
-				RETURN_ERROR(B_NO_MEMORY);
-
-			error = symlink->SetSymlinkPath(entry->SymlinkPath());
-			if (error != B_OK) {
-				delete symlink;
-				return error;
-			}
-
-			node = symlink;
-		} else if (S_ISDIR(mode)) {
-			// directory
-			node = new(std::nothrow) PackageDirectory(fPackage, mode);
-		} else
-			RETURN_ERROR(B_BAD_DATA);
-
-		if (node == NULL)
-			RETURN_ERROR(B_NO_MEMORY);
-		BReference<PackageNode> nodeReference(node, true);
-
-		error = node->Init(parentDir, entry->Name());
-		if (error != B_OK)
-			RETURN_ERROR(error);
-
-		node->SetModifiedTime(entry->ModifiedTime());
-
-		// add it to the parent directory
-		if (parentDir != NULL)
-			parentDir->AddChild(node);
-		else
-			fPackage->AddNode(node);
-
-		entry->SetUserToken(node);
-
-		return B_OK;
-	}
-
-	virtual status_t HandleEntryAttribute(BPackageEntry* entry,
-		BPackageEntryAttribute* attribute)
-	{
-		if (fErrorOccurred)
-			return B_OK;
-
-		PackageNode* node = (PackageNode*)entry->UserToken();
-
-		PackageNodeAttribute* nodeAttribute = new(std::nothrow)
-			PackageNodeAttribute(attribute->Type(), attribute->Data());
-		if (nodeAttribute == NULL)
-			RETURN_ERROR(B_NO_MEMORY)
-
-		status_t error = nodeAttribute->Init(attribute->Name());
-		if (error != B_OK) {
-			delete nodeAttribute;
-			RETURN_ERROR(error);
-		}
-
-		node->AddAttribute(nodeAttribute);
-
-		return B_OK;
-	}
-
-	virtual status_t HandleEntryDone(BPackageEntry* entry)
-	{
-		return B_OK;
-	}
-
-	virtual status_t HandlePackageAttribute(
-		const BPackageInfoAttributeValue& value)
-	{
-		switch (value.attributeID) {
-			case B_PACKAGE_INFO_NAME:
-				return fPackage->SetName(value.string);
-
-			case B_PACKAGE_INFO_INSTALL_PATH:
-				return fPackage->SetInstallPath(value.string);
-
-			case B_PACKAGE_INFO_VERSION:
-			{
-				Version* version;
-				status_t error = Version::Create(value.version.major,
-					value.version.minor, value.version.micro,
-					value.version.preRelease, value.version.release, version);
-				if (error != B_OK)
-					RETURN_ERROR(error);
-
-				fPackage->SetVersion(version);
-
-				break;
-			}
-
-			case B_PACKAGE_INFO_ARCHITECTURE:
-				if (value.unsignedInt >= B_PACKAGE_ARCHITECTURE_ENUM_COUNT)
-					RETURN_ERROR(B_BAD_VALUE);
-
-				fPackage->SetArchitecture(
-					(BPackageArchitecture)value.unsignedInt);
-				break;
-
-			case B_PACKAGE_INFO_PROVIDES:
-			{
-				// create a version object, if a version is specified
-				Version* version = NULL;
-				if (value.resolvable.haveVersion) {
-					const BPackageVersionData& versionInfo
-						= value.resolvable.version;
-					status_t error = Version::Create(versionInfo.major,
-						versionInfo.minor, versionInfo.micro,
-						versionInfo.preRelease, versionInfo.release, version);
-					if (error != B_OK)
-						RETURN_ERROR(error);
-				}
-				ObjectDeleter<Version> versionDeleter(version);
-
-				// create a version object, if a compatible version is specified
-				Version* compatibleVersion = NULL;
-				if (value.resolvable.haveCompatibleVersion) {
-					const BPackageVersionData& versionInfo
-						= value.resolvable.compatibleVersion;
-					status_t error = Version::Create(versionInfo.major,
-						versionInfo.minor, versionInfo.micro,
-						versionInfo.preRelease, versionInfo.release,
-						compatibleVersion);
-					if (error != B_OK)
-						RETURN_ERROR(error);
-				}
-				ObjectDeleter<Version> compatibleVersionDeleter(
-					compatibleVersion);
-
-				// create the resolvable
-				Resolvable* resolvable = new(std::nothrow) Resolvable(fPackage);
-				if (resolvable == NULL)
-					RETURN_ERROR(B_NO_MEMORY);
-				ObjectDeleter<Resolvable> resolvableDeleter(resolvable);
-
-				status_t error = resolvable->Init(value.resolvable.name,
-					versionDeleter.Detach(), compatibleVersionDeleter.Detach());
-				if (error != B_OK)
-					RETURN_ERROR(error);
-
-				fPackage->AddResolvable(resolvableDeleter.Detach());
-
-				break;
-			}
-
-			case B_PACKAGE_INFO_REQUIRES:
-			{
-				// create the dependency
-				Dependency* dependency = new(std::nothrow) Dependency(fPackage);
-				if (dependency == NULL)
-					RETURN_ERROR(B_NO_MEMORY);
-				ObjectDeleter<Dependency> dependencyDeleter(dependency);
-
-				status_t error = dependency->Init(
-					value.resolvableExpression.name);
-				if (error != B_OK)
-					RETURN_ERROR(error);
-
-				// create a version object, if a version is specified
-				Version* version = NULL;
-				if (value.resolvableExpression.haveOpAndVersion) {
-					const BPackageVersionData& versionInfo
-						= value.resolvableExpression.version;
-					status_t error = Version::Create(versionInfo.major,
-						versionInfo.minor, versionInfo.micro,
-						versionInfo.preRelease, versionInfo.release, version);
-					if (error != B_OK)
-						RETURN_ERROR(error);
-
-					dependency->SetVersionRequirement(
-						value.resolvableExpression.op, version);
-				}
-
-				fPackage->AddDependency(dependencyDeleter.Detach());
-
-				break;
-			}
-
-			default:
-				break;
-		}
-
-		return B_OK;
-	}
-
-	virtual void HandleErrorOccurred()
-	{
-		fErrorOccurred = true;
-	}
-
-private:
-	Package*	fPackage;
-	bool		fErrorOccurred;
 };
 
 
@@ -1040,36 +769,6 @@ Volume::_RemovePackageDomain(PackageDomain* domain)
 
 
 status_t
-Volume::_LoadPackage(Package* package)
-{
-	// open package file
-	int fd = package->Open();
-	if (fd < 0)
-		RETURN_ERROR(fd);
-	PackageCloser packageCloser(package);
-
-	// initialize package reader
-	PackageLoaderErrorOutput errorOutput(package);
-	PackageReaderImpl packageReader(&errorOutput);
-	status_t error = packageReader.Init(fd, false);
-	if (error != B_OK)
-		RETURN_ERROR(error);
-
-	// parse content
-	PackageLoaderContentHandler handler(package);
-	error = handler.Init();
-	if (error != B_OK)
-		RETURN_ERROR(error);
-
-	error = packageReader.ParseContent(&handler);
-	if (error != B_OK)
-		RETURN_ERROR(error);
-
-	return B_OK;
-}
-
-
-status_t
 Volume::_AddPackageContent(Package* package, bool notify)
 {
 	status_t error = fPackageFSRoot->AddPackage(package);
@@ -1613,26 +1312,10 @@ Volume::_DomainEntryCreated(PackageDomain* domain, dev_t deviceID,
 		return;
 	}
 
-	// check whether the entry is a file
-	struct stat st;
-	if (fstatat(domain->DirectoryFD(), name, &st, 0) < 0
-		|| !S_ISREG(st.st_mode)) {
-		return;
-	}
-
-	// create a package
-	Package* package = new(std::nothrow) Package(domain, st.st_dev, st.st_ino);
-	if (package == NULL)
+	Package* package;
+	if (_LoadPackage(domain, name, package) != B_OK)
 		return;
 	BReference<Package> packageReference(package, true);
-
-	status_t error = package->Init(name);
-	if (error != B_OK)
-		return;
-
-	error = _LoadPackage(package);
-	if (error != B_OK)
-		return;
 
 	VolumeWriteLocker systemVolumeLocker(_SystemVolumeIfNotSelf());
 	VolumeWriteLocker volumeLocker(this);
@@ -1640,7 +1323,7 @@ Volume::_DomainEntryCreated(PackageDomain* domain, dev_t deviceID,
 
 	// add the package to the node tree
 	if (addContent) {
-		error = _AddPackageContent(package, notify);
+		status_t error = _AddPackageContent(package, notify);
 		if (error != B_OK) {
 			domain->RemovePackage(package);
 			return;
@@ -1679,6 +1362,36 @@ Volume::_DomainEntryMoved(PackageDomain* domain, dev_t deviceID,
 		notify);
 	_DomainEntryCreated(domain, deviceID, toDirectoryID, nodeID, name, true,
 		notify);
+}
+
+
+/*static*/ status_t
+Volume::_LoadPackage(PackageDomain* domain, const char* name,
+	Package*& _package)
+{
+	// check whether the entry is a file
+	struct stat st;
+	if (fstatat(domain->DirectoryFD(), name, &st, 0) < 0
+		|| !S_ISREG(st.st_mode)) {
+		return B_BAD_VALUE;
+	}
+
+	// create a package
+	Package* package = new(std::nothrow) Package(domain, st.st_dev, st.st_ino);
+	if (package == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+	BReference<Package> packageReference(package, true);
+
+	status_t error = package->Init(name);
+	if (error != B_OK)
+		return error;
+
+	error = package->Load();
+	if (error != B_OK)
+		return error;
+
+	_package = packageReference.Detach();
+	return B_OK;
 }
 
 

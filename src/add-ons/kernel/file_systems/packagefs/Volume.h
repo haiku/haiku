@@ -132,7 +132,6 @@ private:
 			status_t			_AddPackageDomain(PackageDomain* domain,
 									bool notify);
 			void				_RemovePackageDomain(PackageDomain* domain);
-			status_t			_LoadPackage(Package* package);
 
 			status_t			_AddPackageContent(Package* package,
 									bool notify);
@@ -176,6 +175,9 @@ private:
 									ino_t toDirectoryID, dev_t nodeDeviceID,
 									ino_t nodeID, const char* fromName,
 									const char* name, bool notify);
+
+	static	status_t			_LoadPackage(PackageDomain* domain,
+									const char* name, Package*& _package);
 
 			status_t			_InitMountType(const char* mountType);
 			status_t			_CreateShineThroughDirectory(Directory* parent,

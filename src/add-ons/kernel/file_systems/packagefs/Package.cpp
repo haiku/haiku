@@ -12,11 +12,24 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <AutoDeleter.h>
+#include <package/hpkg/ErrorOutput.h>
+#include <package/hpkg/PackageEntry.h>
+#include <package/hpkg/PackageEntryAttribute.h>
+#include <package/hpkg/PackageReaderImpl.h>
 #include <util/AutoLock.h>
 
 #include "DebugSupport.h"
+#include "PackageDirectory.h"
 #include "PackageDomain.h"
+#include "PackageFile.h"
+#include "PackageSymlink.h"
 #include "Version.h"
+
+
+using namespace BPackageKit;
+using namespace BPackageKit::BHPKG;
+using BPackageKit::BHPKG::BPrivate::PackageReaderImpl;
 
 
 const char* const kArchitectureNames[B_PACKAGE_ARCHITECTURE_ENUM_COUNT] = {
@@ -24,6 +37,267 @@ const char* const kArchitectureNames[B_PACKAGE_ARCHITECTURE_ENUM_COUNT] = {
 	"x86",
 	"x86_gcc2",
 };
+
+
+// #pragma mark - LoaderErrorOutput
+
+
+struct Package::LoaderErrorOutput : BErrorOutput {
+	LoaderErrorOutput(Package* package)
+		:
+		fPackage(package)
+	{
+	}
+
+	virtual void PrintErrorVarArgs(const char* format, va_list args)
+	{
+// TODO:...
+	}
+
+private:
+	Package*	fPackage;
+};
+
+
+// #pragma mark - LoaderContentHandler
+
+
+struct Package::LoaderContentHandler : BPackageContentHandler {
+	LoaderContentHandler(Package* package)
+		:
+		fPackage(package),
+		fErrorOccurred(false)
+	{
+	}
+
+	status_t Init()
+	{
+		return B_OK;
+	}
+
+	virtual status_t HandleEntry(BPackageEntry* entry)
+	{
+		if (fErrorOccurred)
+			return B_OK;
+
+		PackageDirectory* parentDir = NULL;
+		if (entry->Parent() != NULL) {
+			parentDir = dynamic_cast<PackageDirectory*>(
+				(PackageNode*)entry->Parent()->UserToken());
+			if (parentDir == NULL)
+				RETURN_ERROR(B_BAD_DATA);
+		}
+
+		status_t error;
+
+		// get the file mode -- filter out write permissions
+		mode_t mode = entry->Mode() & ~(mode_t)(S_IWUSR | S_IWGRP | S_IWOTH);
+
+		// create the package node
+		PackageNode* node;
+		if (S_ISREG(mode)) {
+			// file
+			node = new(std::nothrow) PackageFile(fPackage, mode, entry->Data());
+		} else if (S_ISLNK(mode)) {
+			// symlink
+			PackageSymlink* symlink = new(std::nothrow) PackageSymlink(
+				fPackage, mode);
+			if (symlink == NULL)
+				RETURN_ERROR(B_NO_MEMORY);
+
+			error = symlink->SetSymlinkPath(entry->SymlinkPath());
+			if (error != B_OK) {
+				delete symlink;
+				return error;
+			}
+
+			node = symlink;
+		} else if (S_ISDIR(mode)) {
+			// directory
+			node = new(std::nothrow) PackageDirectory(fPackage, mode);
+		} else
+			RETURN_ERROR(B_BAD_DATA);
+
+		if (node == NULL)
+			RETURN_ERROR(B_NO_MEMORY);
+		BReference<PackageNode> nodeReference(node, true);
+
+		error = node->Init(parentDir, entry->Name());
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		node->SetModifiedTime(entry->ModifiedTime());
+
+		// add it to the parent directory
+		if (parentDir != NULL)
+			parentDir->AddChild(node);
+		else
+			fPackage->AddNode(node);
+
+		entry->SetUserToken(node);
+
+		return B_OK;
+	}
+
+	virtual status_t HandleEntryAttribute(BPackageEntry* entry,
+		BPackageEntryAttribute* attribute)
+	{
+		if (fErrorOccurred)
+			return B_OK;
+
+		PackageNode* node = (PackageNode*)entry->UserToken();
+
+		PackageNodeAttribute* nodeAttribute = new(std::nothrow)
+			PackageNodeAttribute(attribute->Type(), attribute->Data());
+		if (nodeAttribute == NULL)
+			RETURN_ERROR(B_NO_MEMORY)
+
+		status_t error = nodeAttribute->Init(attribute->Name());
+		if (error != B_OK) {
+			delete nodeAttribute;
+			RETURN_ERROR(error);
+		}
+
+		node->AddAttribute(nodeAttribute);
+
+		return B_OK;
+	}
+
+	virtual status_t HandleEntryDone(BPackageEntry* entry)
+	{
+		return B_OK;
+	}
+
+	virtual status_t HandlePackageAttribute(
+		const BPackageInfoAttributeValue& value)
+	{
+		switch (value.attributeID) {
+			case B_PACKAGE_INFO_NAME:
+				return fPackage->SetName(value.string);
+
+			case B_PACKAGE_INFO_INSTALL_PATH:
+				return fPackage->SetInstallPath(value.string);
+
+			case B_PACKAGE_INFO_VERSION:
+			{
+				::Version* version;
+				status_t error = Version::Create(value.version.major,
+					value.version.minor, value.version.micro,
+					value.version.preRelease, value.version.release, version);
+				if (error != B_OK)
+					RETURN_ERROR(error);
+
+				fPackage->SetVersion(version);
+
+				break;
+			}
+
+			case B_PACKAGE_INFO_ARCHITECTURE:
+				if (value.unsignedInt >= B_PACKAGE_ARCHITECTURE_ENUM_COUNT)
+					RETURN_ERROR(B_BAD_VALUE);
+
+				fPackage->SetArchitecture(
+					(BPackageArchitecture)value.unsignedInt);
+				break;
+
+			case B_PACKAGE_INFO_PROVIDES:
+			{
+				// create a version object, if a version is specified
+				::Version* version = NULL;
+				if (value.resolvable.haveVersion) {
+					const BPackageVersionData& versionInfo
+						= value.resolvable.version;
+					status_t error = Version::Create(versionInfo.major,
+						versionInfo.minor, versionInfo.micro,
+						versionInfo.preRelease, versionInfo.release, version);
+					if (error != B_OK)
+						RETURN_ERROR(error);
+				}
+				ObjectDeleter< ::Version> versionDeleter(version);
+
+				// create a version object, if a compatible version is specified
+				::Version* compatibleVersion = NULL;
+				if (value.resolvable.haveCompatibleVersion) {
+					const BPackageVersionData& versionInfo
+						= value.resolvable.compatibleVersion;
+					status_t error = Version::Create(versionInfo.major,
+						versionInfo.minor, versionInfo.micro,
+						versionInfo.preRelease, versionInfo.release,
+						compatibleVersion);
+					if (error != B_OK)
+						RETURN_ERROR(error);
+				}
+				ObjectDeleter< ::Version> compatibleVersionDeleter(
+					compatibleVersion);
+
+				// create the resolvable
+				Resolvable* resolvable = new(std::nothrow) Resolvable(fPackage);
+				if (resolvable == NULL)
+					RETURN_ERROR(B_NO_MEMORY);
+				ObjectDeleter<Resolvable> resolvableDeleter(resolvable);
+
+				status_t error = resolvable->Init(value.resolvable.name,
+					versionDeleter.Detach(), compatibleVersionDeleter.Detach());
+				if (error != B_OK)
+					RETURN_ERROR(error);
+
+				fPackage->AddResolvable(resolvableDeleter.Detach());
+
+				break;
+			}
+
+			case B_PACKAGE_INFO_REQUIRES:
+			{
+				// create the dependency
+				Dependency* dependency = new(std::nothrow) Dependency(fPackage);
+				if (dependency == NULL)
+					RETURN_ERROR(B_NO_MEMORY);
+				ObjectDeleter<Dependency> dependencyDeleter(dependency);
+
+				status_t error = dependency->Init(
+					value.resolvableExpression.name);
+				if (error != B_OK)
+					RETURN_ERROR(error);
+
+				// create a version object, if a version is specified
+				::Version* version = NULL;
+				if (value.resolvableExpression.haveOpAndVersion) {
+					const BPackageVersionData& versionInfo
+						= value.resolvableExpression.version;
+					status_t error = Version::Create(versionInfo.major,
+						versionInfo.minor, versionInfo.micro,
+						versionInfo.preRelease, versionInfo.release, version);
+					if (error != B_OK)
+						RETURN_ERROR(error);
+
+					dependency->SetVersionRequirement(
+						value.resolvableExpression.op, version);
+				}
+
+				fPackage->AddDependency(dependencyDeleter.Detach());
+
+				break;
+			}
+
+			default:
+				break;
+		}
+
+		return B_OK;
+	}
+
+	virtual void HandleErrorOccurred()
+	{
+		fErrorOccurred = true;
+	}
+
+private:
+	Package*	fPackage;
+	bool		fErrorOccurred;
+};
+
+
+// #pragma mark - Package
 
 
 Package::Package(PackageDomain* domain, dev_t deviceID, ino_t nodeID)
@@ -70,6 +344,36 @@ Package::Init(const char* fileName)
 	fFileName = strdup(fileName);
 	if (fFileName == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
+
+	return B_OK;
+}
+
+
+status_t
+Package::Load()
+{
+	// open package file
+	int fd = Open();
+	if (fd < 0)
+		RETURN_ERROR(fd);
+	PackageCloser packageCloser(this);
+
+	// initialize package reader
+	LoaderErrorOutput errorOutput(this);
+	PackageReaderImpl packageReader(&errorOutput);
+	status_t error = packageReader.Init(fd, false);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// parse content
+	LoaderContentHandler handler(this);
+	error = handler.Init();
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	error = packageReader.ParseContent(&handler);
+	if (error != B_OK)
+		RETURN_ERROR(error);
 
 	return B_OK;
 }
