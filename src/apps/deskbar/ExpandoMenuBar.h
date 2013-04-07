@@ -60,64 +60,67 @@ enum drag_and_drop_selection {
 };
 
 class TExpandoMenuBar : public BMenuBar {
-	public:
-		TExpandoMenuBar(BRect frame, const char* name, bool vertical);
+public:
+							TExpandoMenuBar(BRect frame, const char* name,
+								bool vertical);
 
-		virtual void AttachedToWindow();
-		virtual void DetachedFromWindow();
+	virtual	void			AttachedToWindow();
+	virtual	void			DetachedFromWindow();
 
-		virtual void Draw(BRect update);
-		virtual void DrawBackground(BRect update);
+	virtual	void			Draw(BRect update);
+	virtual	void			DrawBackground(BRect update);
 
-		virtual void MessageReceived(BMessage* message);
+	virtual	void			MessageReceived(BMessage* message);
 
-		virtual void MouseDown(BPoint where);
-		virtual void MouseMoved(BPoint where, uint32 code, const BMessage*);
-		virtual void MouseUp(BPoint where);
+	virtual	void			MouseDown(BPoint where);
+	virtual	void			MouseMoved(BPoint where, uint32 code,
+								const BMessage* message);
+	virtual	void			MouseUp(BPoint where);
 
-		void BuildItems();
+			void			BuildItems();
 
-		TTeamMenuItem* TeamItemAtPoint(BPoint location,
-			BMenuItem** _item = NULL);
-		bool InDeskbarMenu(BPoint) const;
+			TTeamMenuItem*	TeamItemAtPoint(BPoint location,
+								BMenuItem** _item = NULL);
+			bool			InDeskbarMenu(BPoint) const;
 
-		void CheckItemSizes(int32 delta);
+			void			CheckItemSizes(int32 delta);
 
-		menu_layout MenuLayout() const;
+			menu_layout		MenuLayout() const;
 
-		void SizeWindow(int32 delta);
-		bool CheckForSizeOverrun();
+			void			SizeWindow(int32 delta);
+			bool			CheckForSizeOverrun();
 
-	private:
-		static int CompareByName(const void* first, const void* second);
-		static int32 monitor_team_windows(void* arg);
+private:
+	static	int				CompareByName(const void* first,
+								const void* second);
+	static	int32			monitor_team_windows(void* arg);
 
-		void AddTeam(BList* team, BBitmap* icon, char* name, char* signature);
-		void AddTeam(team_id team, const char* signature);
-		void RemoveTeam(team_id team, bool partial);
+			void			AddTeam(BList* team, BBitmap* icon, char* name,
+								char* signature);
+			void			AddTeam(team_id team, const char* signature);
+			void			RemoveTeam(team_id team, bool partial);
 
-		void _FinishedDrag(bool invoke = false);
+			void			_FinishedDrag(bool invoke = false);
 
-		bool fVertical : 1;
-		bool fOverflow : 1;
-		bool fDrawLabel : 1;
-		bool fShowTeamExpander : 1;
-		bool fExpandNewTeams : 1;
+private:
+			bool			fVertical : 1;
+			bool			fOverflow : 1;
+			bool			fDrawLabel : 1;
+			bool			fShowTeamExpander : 1;
+			bool			fExpandNewTeams : 1;
 
-		float fDeskbarMenuWidth;
+			float			fDeskbarMenuWidth;
+			TBarView*		fBarView;
+			TTeamMenuItem*	fPreviousDragTargetItem;
+			BMenuItem*		fLastMousedOverItem;
+			BMenuItem*		fLastClickedItem;
+			bool			fClickedExpander;
+			BList			fTeamList;
 
-		TBarView* fBarView;
-
-		TTeamMenuItem* 		fPreviousDragTargetItem;
-
-		BMenuItem*			fLastMousedOverItem;
-		BMenuItem*			fLastClickItem;
-		BList				fTeamList;
-
-		static bool			sDoMonitor;
-		static thread_id	sMonThread;
-		static BLocker		sMonLocker;
+	static	bool			sDoMonitor;
+	static	thread_id		sMonThread;
+	static	BLocker			sMonLocker;
 };
 
 
-#endif /* EXPANDO_MENU_BAR_H */
+#endif // EXPANDO_MENU_BAR_H

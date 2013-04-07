@@ -50,63 +50,70 @@ All rights reserved.
 class BBitmap;
 
 class TTeamMenuItem : public BMenuItem {
-	public:
-		TTeamMenuItem(BList* team, BBitmap* icon, char* name, char* sig,
-			float width = -1.0f, float height = -1.0f,
-			bool drawLabel = true, bool vertical = true);
-		TTeamMenuItem(float width = -1.0f, float height = -1.0f,
-			bool vertical = true);
-		virtual ~TTeamMenuItem();
+public:
+								TTeamMenuItem(BList* team, BBitmap* icon,
+									char* name, char* sig,
+									float width = -1.0f, float height = -1.0f,
+									bool drawLabel = true,
+									bool vertical = true);
+								TTeamMenuItem(float width = -1.0f,
+									float height = -1.0f,
+									bool vertical = true);
+	virtual						~TTeamMenuItem();
 
-		status_t Invoke(BMessage* msg = NULL);
+			status_t			Invoke(BMessage* msg = NULL);
 
-		void SetOverrideWidth(float width);
-		void SetOverrideHeight(float height);
-		void SetOverrideSelected(bool selected);
+			void				SetOverrideWidth(float width);
+			void				SetOverrideHeight(float height);
+			void				SetOverrideSelected(bool selected);
 
-		bool HasLabel() const;
-		void SetHasLabel(bool drawLabel);
+			bool				HasLabel() const;
+			void				SetHasLabel(bool drawLabel);
 
-		bool IsExpanded();
-		void ToggleExpandState(bool resizeWindow);
-		BRect ExpanderBounds() const;
-		TWindowMenuItem* ExpandedWindowItem(int32 id);
+			bool				IsExpanded();
+			void				ToggleExpandState(bool resizeWindow);
+			BRect				ExpanderBounds() const;
+			TWindowMenuItem*	ExpandedWindowItem(int32 id);
 
-		float LabelWidth() const;
-		BList* Teams() const;
-		const char* Signature() const;
-		const char* Name() const;
+			float				LabelWidth() const;
+			BList*				Teams() const;
+			const char*			Signature() const;
+			const char*			Name() const;
 
-	protected:
-		void GetContentSize(float* width, float* height);
-		void Draw();
-		void DrawContent();
-		void DrawContentLabel();
+protected:
+			void				GetContentSize(float* width, float* height);
+			void				Draw();
+			void				DrawContent();
+			void				DrawContentLabel();
+			void				DrawExpanderArrow(int32 arrowDirection);
 
-	private:
-		friend class TExpandoMenuBar;
-		void InitData(BList* team, BBitmap* icon, char* name, char* sig,
-			float width = -1.0f, float height = -1.0f,
-			bool drawLabel = true, bool vertical = true);
+private:
+	friend	class				TExpandoMenuBar;
+			void				_InitData(BList* team, BBitmap* icon,
+									char* name, char* sig,
+									float width = -1.0f, float height = -1.0f,
+									bool drawLabel = true,
+									bool vertical = true);
 
-		bool _IsSelected() const;
+			bool				_IsSelected() const;
 
-		BList* fTeam;
-		BBitmap* fIcon;
-		char* fName;
-		char* fSig;
-		float fLabelWidth;
-		float fLabelAscent;
-		float fLabelDescent;
-		float fOverrideWidth;
-		float fOverrideHeight;
+private:
+			BList*				fTeam;
+			BBitmap*			fIcon;
+			char*				fName;
+			char*				fSig;
+			float				fLabelWidth;
+			float				fLabelAscent;
+			float				fLabelDescent;
+			float				fOverrideWidth;
+			float				fOverrideHeight;
 
-		bool fDrawLabel;
-		bool fVertical;
+			bool				fDrawLabel;
+			bool				fVertical;
 
-		bool fExpanded;
-		bool fOverriddenSelected;
+			bool				fExpanded;
+			bool				fOverriddenSelected;
 };
 
 
-#endif	/* TEAMMENUITEM_H */
+#endif	// TEAMMENUITEM_H
