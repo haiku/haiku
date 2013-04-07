@@ -1,11 +1,12 @@
 SubDir HAIKU_TOP src servers package ;
 
 UsePrivateSystemHeaders ;
-UsePrivateHeaders app package shared ;
+UsePrivateHeaders app kernel package shared ;
 
 Server package_daemon
  	:
  	DebugSupport.cpp
+ 	Package.cpp
  	PackageDaemon.cpp
  	Root.cpp
  	Volume.cpp

@@ -161,14 +161,15 @@ struct Volume::DomainDirectoryListener : NotificationListener {
 	virtual void EventOccurred(NotificationService& service,
 		const KMessage* event)
 	{
-		DomainDirectoryEventJob* job = new(std::nothrow)
-			DomainDirectoryEventJob(fVolume, fDomain);
-		if (job == NULL || job->Init(event)) {
-			delete job;
-			return;
-		}
-
-		fVolume->_PushJob(job);
+// TODO: Remove!
+// 		DomainDirectoryEventJob* job = new(std::nothrow)
+// 			DomainDirectoryEventJob(fVolume, fDomain);
+// 		if (job == NULL || job->Init(event)) {
+// 			delete job;
+// 			return;
+// 		}
+// 
+// 		fVolume->_PushJob(job);
 	}
 
 private:

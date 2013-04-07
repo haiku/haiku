@@ -10,6 +10,7 @@
 
 
 #include <fs_info.h>
+#include <Node.h>
 #include <ObjectList.h>
 #include <VolumeRoster.h>
 
@@ -36,9 +37,9 @@ private:
 			status_t			_RegisterVolume(dev_t device);
 			void				_UnregisterVolume(Volume* volume);
 
-			status_t			_GetOrCreateRoot(dev_t deviceID, ino_t nodeID,
+			status_t			_GetOrCreateRoot(const node_ref& nodeRef,
 									Root*& _root);
-			Root*				_FindRoot(dev_t deviceID, ino_t nodeID) const;
+			Root*				_FindRoot(const node_ref& nodeRef) const;
 			void				_PutRoot(Root* root);
 
 			Volume*				_FindVolume(dev_t deviceID) const;

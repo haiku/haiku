@@ -9,7 +9,7 @@
 #define ROOT_H
 
 
-#include <fs_info.h>
+#include <Node.h>
 #include <String.h>
 
 #include <Referenceable.h>
@@ -25,12 +25,12 @@ public:
 								Root();
 	virtual						~Root();
 
-			status_t			Init(dev_t deviceID, ino_t nodeID);
+			status_t			Init(const node_ref& nodeRef);
 
-			dev_t				DeviceID() const	{ return fDeviceID; }
-			ino_t				NodeID() const		{ return fNodeID; }
-			const BString&		Path() const
-									{ return fPath; }
+			const node_ref&		NodeRef() const		{ return fNodeRef; }
+			dev_t				DeviceID() const	{ return fNodeRef.device; }
+			ino_t				NodeID() const		{ return fNodeRef.node; }
+			const BString&		Path() const		{ return fPath; }
 
 			status_t			RegisterVolume(Volume* volume);
 			void				UnregisterVolume(Volume* volume);
@@ -44,8 +44,7 @@ private:
 			Volume**			_GetVolume(PackageFSMountType mountType);
 
 private:
-			dev_t				fDeviceID;
-			ino_t				fNodeID;
+			node_ref			fNodeRef;
 			BString				fPath;
 			Volume*				fSystemVolume;
 			Volume*				fCommonVolume;

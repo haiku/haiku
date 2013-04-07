@@ -19,8 +19,7 @@
 
 Root::Root()
 	:
-	fDeviceID(-1),
-	fNodeID(-1),
+	fNodeRef(),
 	fPath(),
 	fSystemVolume(NULL),
 	fCommonVolume(NULL),
@@ -35,17 +34,13 @@ Root::~Root()
 
 
 status_t
-Root::Init(dev_t deviceID, ino_t nodeID)
+Root::Init(const node_ref& nodeRef)
 {
-	fDeviceID = deviceID;
-	fNodeID = nodeID;
+	fNodeRef = nodeRef;
 
 	// get the path
-	node_ref nodeRef;
-	nodeRef.device = fDeviceID;
-	nodeRef.node = fNodeID;
 	BDirectory directory;
-	status_t error = directory.SetTo(&nodeRef);
+	status_t error = directory.SetTo(&fNodeRef);
 	if (error != B_OK) {
 		ERROR("Root::Init(): failed to open directory: %s\n", strerror(error));
 		return error;

@@ -69,6 +69,7 @@ PackageDaemon::MessageReceived(BMessage* message)
 			int32 opcode;
 			if (message->FindInt32("opcode", &opcode) != B_OK)
 				break;
+
 			if (opcode == B_DEVICE_MOUNTED)
 				_HandleVolumeMounted(message);
 			else if (opcode == B_DEVICE_UNMOUNTED)
@@ -94,27 +95,14 @@ PackageDaemon::_RegisterVolume(dev_t deviceID)
 	if (strcmp(info.fsh_name, "packagefs") != 0)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	// open the root directory of the volume
-	node_ref nodeRef;
-	nodeRef.device = info.dev;
-	nodeRef.node = info.root;
-	BDirectory directory;
-	error = directory.SetTo(&nodeRef);
-	if (error != B_OK) {
-		ERROR("PackageDaemon::_RegisterVolume(): failed to open root: %s\n",
-			strerror(error));
-		return error;
-	}
-
 	// create a volume
 	Volume* volume = new(std::nothrow) Volume;
 	if (volume == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 	ObjectDeleter<Volume> volumeDeleter(volume);
 
-	dev_t rootDeviceID;
-	ino_t rootNodeID;
-	error = volume->Init(directory, rootDeviceID, rootNodeID);
+	node_ref rootRef;
+	error = volume->Init(node_ref(info.dev, info.root), rootRef);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
@@ -127,7 +115,7 @@ PackageDaemon::_RegisterVolume(dev_t deviceID)
 
 	// get the root for the volume and register it
 	Root* root;
-	error = _GetOrCreateRoot(rootDeviceID, rootNodeID, root);
+	error = _GetOrCreateRoot(rootRef, root);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
@@ -138,6 +126,19 @@ PackageDaemon::_RegisterVolume(dev_t deviceID)
 	}
 	volumeDeleter.Detach();
 
+	AddHandler(volume);
+
+	// node-monitor the volume's packages directory
+	error = watch_node(&volume->PackagesDirectoryRef(), B_WATCH_DIRECTORY,
+		BMessenger(volume, this));
+	if (error != B_OK) {
+		ERROR("PackageDaemon::_RegisterVolume(): failed to start watching the "
+			"packages directory of the volume at \"%s\": %s\n",
+			volume->Path().String(), strerror(error));
+		// Not good, but not fatal. Only the manual package operations in the
+		// packages directory won't work correctly.
+	}
+
 	INFORM("volume at \"%s\" registered\n", volume->Path().String());
 
 	return B_OK;
@@ -147,6 +148,10 @@ PackageDaemon::_RegisterVolume(dev_t deviceID)
 void
 PackageDaemon::_UnregisterVolume(Volume* volume)
 {
+	stop_watching(BMessenger(volume, this));
+
+	RemoveHandler(volume);
+
 	Root* root = volume->GetRoot();
 	root->UnregisterVolume(volume);
 
@@ -158,9 +163,9 @@ PackageDaemon::_UnregisterVolume(Volume* volume)
 
 
 status_t
-PackageDaemon::_GetOrCreateRoot(dev_t deviceID, ino_t nodeID, Root*& _root)
+PackageDaemon::_GetOrCreateRoot(const node_ref& nodeRef, Root*& _root)
 {
-	Root* root = _FindRoot(deviceID, nodeID);
+	Root* root = _FindRoot(nodeRef);
 	if (root != NULL) {
 		root->AcquireReference();
 	} else {
@@ -169,7 +174,7 @@ PackageDaemon::_GetOrCreateRoot(dev_t deviceID, ino_t nodeID, Root*& _root)
 			RETURN_ERROR(B_NO_MEMORY);
 		ObjectDeleter<Root> rootDeleter(root);
 
-		status_t error = root->Init(deviceID, nodeID);
+		status_t error = root->Init(nodeRef);
 		if (error != B_OK)
 			RETURN_ERROR(error);
 
@@ -179,7 +184,8 @@ PackageDaemon::_GetOrCreateRoot(dev_t deviceID, ino_t nodeID, Root*& _root)
 		rootDeleter.Detach();
 
 		INFORM("root at \"%s\" (device: %" B_PRIdDEV ", node: %" B_PRIdINO ") "
-			"registered\n", root->Path().String(), deviceID, nodeID);
+			"registered\n", root->Path().String(), nodeRef.device,
+			nodeRef.node);
 	}
 
 	_root = root;
@@ -188,10 +194,10 @@ PackageDaemon::_GetOrCreateRoot(dev_t deviceID, ino_t nodeID, Root*& _root)
 
 
 Root*
-PackageDaemon::_FindRoot(dev_t deviceID, ino_t nodeID) const
+PackageDaemon::_FindRoot(const node_ref& nodeRef) const
 {
 	for (int32 i = 0; Root* root = fRoots.ItemAt(i); i++) {
-		if (root->DeviceID() == deviceID && root->NodeID() == nodeID)
+		if (root->NodeRef() == nodeRef)
 			return root;
 	}
 
