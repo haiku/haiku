@@ -747,11 +747,15 @@ TExpandoMenuBar::RemoveTeam(team_id team, bool partial)
 				BAutolock locker(sMonLocker);
 					// make the update thread wait
 				RemoveItem(i);
+				if (item == fLastClickedItem)
+					fLastClickedItem = NULL;
 				delete item;
 				while ((windowItem = dynamic_cast<TWindowMenuItem*>(
 						ItemAt(i))) != NULL) {
 					// Also remove window items (if there are any)
 					RemoveItem(i);
+					if (windowItem == fLastClickedItem)
+						fLastClickedItem = NULL;
 					delete windowItem;
 				}
 				SizeWindow(-1);
