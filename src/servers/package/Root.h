@@ -19,12 +19,10 @@
 #include <packagefs.h>
 
 #include "JobQueue.h"
+#include "Volume.h"
 
 
-class Volume;
-
-
-class Root : public BReferenceable {
+class Root : public BReferenceable, private Volume::Listener {
 public:
 								Root();
 	virtual						~Root();
@@ -42,7 +40,9 @@ public:
 
 			Volume*				FindVolume(dev_t deviceID) const;
 
-			void				HandleNodeMonitorEvents(Volume* volume);
+private:
+	// Volume::Listener
+	virtual	void				VolumeNodeMonitorEventOccurred(Volume* volume);
 
 protected:
 	virtual	void				LastReferenceReleased();
@@ -51,6 +51,8 @@ private:
 			struct InitPackagesJob;
 			struct DeleteVolumeJob;
 			struct HandleNodeMonitorEventsJob;
+
+			friend struct InitPackagesJob;
 
 private:
 			Volume**			_GetVolume(PackageFSMountType mountType);

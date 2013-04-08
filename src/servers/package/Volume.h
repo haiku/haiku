@@ -26,12 +26,15 @@ class Root;
 
 class Volume : public BHandler {
 public:
+			class Listener;
+
+public:
 								Volume(BLooper* looper);
 	virtual						~Volume();
 
 			status_t			Init(const node_ref& rootDirectoryRef,
 									node_ref& _packageRootRef);
-			status_t			InitPackages();
+			status_t			InitPackages(Listener* listener);
 
 			void				Unmounted();
 
@@ -88,10 +91,20 @@ private:
 			node_ref			fRootDirectoryRef;
 			node_ref			fPackagesDirectoryRef;
 			Root*				fRoot;
+			Listener*			fListener;
 			PackageFileNameHashTable fPackagesByFileName;
 			PackageNodeRefHashTable fPackagesByNodeRef;
 			BLocker				fPendingNodeMonitorEventsLock;
 			NodeMonitorEventList fPendingNodeMonitorEvents;
+};
+
+
+class Volume::Listener {
+public:
+	virtual						~Listener();
+
+	virtual	void				VolumeNodeMonitorEventOccurred(Volume* volume)
+									= 0;
 };
 
 

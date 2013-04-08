@@ -14,7 +14,6 @@
 #include <Path.h>
 
 #include "DebugSupport.h"
-#include "Volume.h"
 
 
 // #pragma mark - InitVolumePackagesJob
@@ -29,7 +28,7 @@ struct Root::InitPackagesJob : public Job {
 
 	virtual void Do()
 	{
-		fVolume->InitPackages();
+		fVolume->InitPackages(fVolume->GetRoot());
 	}
 
 private:
@@ -210,9 +209,8 @@ Root::FindVolume(dev_t deviceID) const
 
 
 void
-Root::HandleNodeMonitorEvents(Volume* volume)
+Root::VolumeNodeMonitorEventOccurred(Volume* volume)
 {
-// TODO: Don't push a new one, if one is already pending!
 	_QueueJob(new(std::nothrow) HandleNodeMonitorEventsJob(volume));
 }
 

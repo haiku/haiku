@@ -24,7 +24,14 @@
 #include <AutoLocker.h>
 
 #include "DebugSupport.h"
-#include "Root.h"
+
+
+// #pragma mark - Listener
+
+
+Volume::Listener::~Listener()
+{
+}
 
 
 // #pragma mark - NodeMonitorEvent
@@ -67,6 +74,7 @@ Volume::Volume(BLooper* looper)
 	fRootDirectoryRef(),
 	fPackagesDirectoryRef(),
 	fRoot(NULL),
+	fListener(NULL),
 	fPackagesByFileName(),
 	fPackagesByNodeRef(),
 	fPendingNodeMonitorEventsLock("pending node monitor events"),
@@ -78,6 +86,9 @@ Volume::Volume(BLooper* looper)
 
 Volume::~Volume()
 {
+	Unmounted();
+		// need for error case in InitPackages()
+
 	fPackagesByFileName.Clear();
 
 	Package* package = fPackagesByNodeRef.Clear(true);
@@ -153,7 +164,7 @@ Volume::Init(const node_ref& rootDirectoryRef, node_ref& _packageRootRef)
 
 
 status_t
-Volume::InitPackages()
+Volume::InitPackages(Listener* listener)
 {
 	// node-monitor the volume's packages directory
 	status_t error = watch_node(&fPackagesDirectoryRef, B_WATCH_DIRECTORY,
@@ -165,6 +176,8 @@ Volume::InitPackages()
 		// Not good, but not fatal. Only the manual package operations in the
 		// packages directory won't work correctly.
 	}
+
+	fListener = listener;
 
 	// read the packages directory and get the active packages
 	int fd = OpenRootDirectory();
@@ -190,7 +203,13 @@ Volume::InitPackages()
 void
 Volume::Unmounted()
 {
-	stop_watching(BMessenger(this));
+	if (fListener != NULL) {
+		stop_watching(BMessenger(this));
+		fListener = NULL;
+	}
+
+	if (BLooper* looper = Looper())
+		looper->RemoveHandler(this);
 }
 
 
@@ -324,10 +343,12 @@ Volume::_QueueNodeMonitorEvent(const BString& name, bool wasCreated)
 	}
 
 	AutoLocker<BLocker> eventsLock(fPendingNodeMonitorEventsLock);
+	bool firstEvent = fPendingNodeMonitorEvents.IsEmpty();
 	fPendingNodeMonitorEvents.Add(event);
 	eventsLock.Unlock();
 
-	fRoot->HandleNodeMonitorEvents(this);
+	if (firstEvent && fListener != NULL)
+		fListener->VolumeNodeMonitorEventOccurred(this);
 }
 
 
