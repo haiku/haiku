@@ -26,6 +26,9 @@
 #include "DebugSupport.h"
 
 
+static const char* kPackageFileNameExtension = ".hpkg";
+
+
 // #pragma mark - Listener
 
 
@@ -338,6 +341,10 @@ Volume::_QueueNodeMonitorEvent(const BString& name, bool wasCreated)
 		return;
 	}
 
+	// ignore entries that don't have the ".hpkg" extension
+	if (!name.EndsWith(kPackageFileNameExtension))
+		return;
+
 	NodeMonitorEvent* event
 		= new(std::nothrow) NodeMonitorEvent(name, wasCreated);
 	if (event == NULL) {
@@ -497,6 +504,9 @@ Volume::_ReadPackagesDirectory()
 
 	entry_ref entry;
 	while (directory.GetNextRef(&entry) == B_OK) {
+		if (!BString(entry.name).EndsWith(kPackageFileNameExtension))
+			continue;
+
 		Package* package = new(std::nothrow) Package;
 		if (package == NULL)
 			RETURN_ERROR(B_NO_MEMORY);

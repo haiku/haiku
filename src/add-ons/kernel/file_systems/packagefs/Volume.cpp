@@ -807,6 +807,13 @@ Volume::_AddInitialPackages()
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
 
+		// also skip any entry without a ".hpkg" extension
+		size_t nameLength = strlen(entry->d_name);
+		if (nameLength < 5
+			|| memcmp(entry->d_name + nameLength - 5, ".hpkg", 5) != 0) {
+			continue;
+		}
+
 		Package* package;
 		if (_LoadPackage(entry->d_name, package) != B_OK)
 			continue;
