@@ -320,6 +320,9 @@ Volume::_HandleEntryMoved(const BMessage* message)
 		return;
 	}
 
+	AutoLocker<BLocker> eventsLock(fPendingNodeMonitorEventsLock);
+		// make sure for a move the two events cannot get split
+
 	if (fromDirectoryID == fPackagesDirectoryRef.node)
 		_QueueNodeMonitorEvent(fromName, false);
 	if (toDirectoryID == fPackagesDirectoryRef.node)
