@@ -1362,6 +1362,9 @@ Volume::_LoadPackage(const char* name, Package*& _package)
 status_t
 Volume::_ChangeActivation(ActivationChangeRequest& request)
 {
+	if (request.CountItems() == 0)
+		return B_OK;
+
 	// first check the request
 	int32 newPackageCount = 0;
 	int32 oldPackageCount = 0;
