@@ -114,6 +114,7 @@ OpenState::_ReleaseLockOwner(LockOwner* owner)
 {
 	ASSERT(owner != NULL);
 
+	uint32 attempt = 0;
 	do {
 		RPC::Server* server = fFileSystem->Server();
 		Request request(server, fFileSystem);
@@ -127,7 +128,7 @@ OpenState::_ReleaseLockOwner(LockOwner* owner)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), server))
+		if (HandleErrors(attempt, reply.NFS4Error(), server))
 			continue;
 
 		return reply.ReleaseLockOwner();
@@ -166,6 +167,7 @@ OpenState::_ReclaimOpen(uint64 newClientID)
 	uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
 	OpenDelegation delegType = fDelegation != NULL ? fDelegation->Type()
 		: OPEN_DELEGATE_NONE;
+	uint32 attempt = 0;
 	do {
 		RPC::Server* server = fFileSystem->Server();
 		Request request(server, fFileSystem);
@@ -187,7 +189,8 @@ OpenState::_ReclaimOpen(uint64 newClientID)
 		sequence += IncrementSequence(reply.NFS4Error());
 
 		if (reply.NFS4Error() != NFS4ERR_STALE_CLIENTID
-			&& HandleErrors(reply.NFS4Error(), server, NULL, NULL, &sequence)) {
+			&& HandleErrors(attempt, reply.NFS4Error(), server, NULL, NULL,
+				&sequence)) {
 			continue;
 		}
 
@@ -233,6 +236,7 @@ OpenState::_ReclaimLocks(uint64 newClientID)
 			linfo->fOwner->fClientId = newClientID;
 		}
 
+		uint32 attempt = 0;
 		uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
 		do {
 			RPC::Server* server = fFileSystem->Server();
@@ -254,7 +258,7 @@ OpenState::_ReclaimLocks(uint64 newClientID)
 
 			if (reply.NFS4Error() != NFS4ERR_STALE_CLIENTID
 				&& reply.NFS4Error() !=  NFS4ERR_STALE_STATEID
-				&& HandleErrors(reply.NFS4Error(), server, NULL, NULL,
+				&& HandleErrors(attempt, reply.NFS4Error(), server, NULL, NULL,
 					&sequence)) {
 				continue;
 			}
@@ -283,6 +287,7 @@ OpenState::Close()
 	MutexLocker _(fLock);
 	fOpened = false;
 
+	uint32 attempt = 0;
 	uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
 	do {
 		RPC::Server* serv = fFileSystem->Server();
@@ -310,8 +315,10 @@ OpenState::Close()
 			return B_OK;
 		}
 
-		if (HandleErrors(reply.NFS4Error(), serv, NULL, this, &sequence))
+		if (HandleErrors(attempt, reply.NFS4Error(), serv, NULL, this,
+				&sequence)) {
 			continue;
+		}
  		fFileSystem->OpenOwnerSequenceUnlock(sequence);
 
 		reply.PutFH();

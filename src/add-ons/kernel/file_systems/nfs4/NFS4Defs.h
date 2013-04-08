@@ -367,5 +367,13 @@ sSecToBigTime(uint32 sec)
 }
 
 
+static inline bool
+IsFileHandleInvalid(uint32 error)
+{
+	return error == NFS4ERR_BADHANDLE || error == NFS4ERR_FHEXPIRED
+		|| error == NFS4ERR_STALE;
+}
+
+
 #endif	// NFS4DEFS_H
 

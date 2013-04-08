@@ -58,6 +58,7 @@ RootInode::_UpdateInfo(bool force)
 	if (fInfoCacheExpire > time(NULL))
 		return B_OK;
 
+	uint32 attempt = 0;
 	do {
 		RPC::Server* server = fFileSystem->Server();
 		Request request(server, fFileSystem);
@@ -75,7 +76,7 @@ RootInode::_UpdateInfo(bool force)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), server))
+		if (HandleErrors(attempt, reply.NFS4Error(), server))
 			continue;
 
 		reply.PutFH();
@@ -146,6 +147,7 @@ RootInode::_UpdateInfo(bool force)
 bool
 RootInode::ProbeMigration()
 {
+	uint32 attempt = 0;
 	do {
 		RPC::Server* server = fFileSystem->Server();
 		Request request(server, fFileSystem);
@@ -163,7 +165,7 @@ RootInode::ProbeMigration()
 		if (reply.NFS4Error() == NFS4ERR_MOVED)
 			return true;
 
-		if (HandleErrors(reply.NFS4Error(), server))
+		if (HandleErrors(attempt, reply.NFS4Error(), server))
 			continue;
 
 		return false;
@@ -176,6 +178,7 @@ RootInode::GetLocations(AttrValue** attrv)
 {
 	ASSERT(attrv != NULL);
 
+	uint32 attempt = 0;
 	do {
 		RPC::Server* server = fFileSystem->Server();
 		Request request(server, fFileSystem);
@@ -191,7 +194,7 @@ RootInode::GetLocations(AttrValue** attrv)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), server))
+		if (HandleErrors(attempt, reply.NFS4Error(), server))
 			continue;
 
 		reply.PutFH();
