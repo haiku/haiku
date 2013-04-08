@@ -84,7 +84,7 @@ struct PackageFSActivationChangeItem {
 
 struct PackageFSActivationChangeRequest {
 	uint32							itemCount;
-	PackageFSActivationChangeItem	items[1];
+	PackageFSActivationChangeItem	items[0];
 };
 
 
