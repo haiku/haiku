@@ -174,15 +174,15 @@ Volume::InitPackages(Listener* listener)
 	// node-monitor the volume's packages directory
 	status_t error = watch_node(&fPackagesDirectoryRef, B_WATCH_DIRECTORY,
 		BMessenger(this));
-	if (error != B_OK) {
+	if (error == B_OK) {
+		fListener = listener;
+	} else {
 		ERROR("Volume::InitPackages(): failed to start watching the packages "
 			"directory of the volume at \"%s\": %s\n",
 			fPath.String(), strerror(error));
 		// Not good, but not fatal. Only the manual package operations in the
 		// packages directory won't work correctly.
 	}
-
-	fListener = listener;
 
 	// read the packages directory and get the active packages
 	int fd = OpenRootDirectory();
