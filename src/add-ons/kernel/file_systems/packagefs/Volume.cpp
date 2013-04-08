@@ -200,49 +200,6 @@ private:
 
 struct Volume::ActivationChangeRequest {
 public:
-	struct Iterator {
-		Iterator()
-			:
-			fRequest(NULL),
-			fNextItem(NULL),
-			fNextIndex(0)
-		{
-		}
-
-		Iterator(PackageFSActivationChangeRequest* request)
-			:
-			fRequest(request),
-			fNextItem(NULL),
-			fNextIndex(0)
-		{
-			if (fRequest != NULL && fRequest->itemCount > 0)
-				fNextItem = fRequest->items;
-		}
-
-		bool HasNext() const
-		{
-			return fNextItem != NULL;
-		}
-
-		PackageFSActivationChangeItem* Next()
-		{
-			if (fNextItem == NULL)
-				return NULL;
-
-			PackageFSActivationChangeItem* item = fNextItem;
-			fNextIndex++;
-			fNextItem = fNextIndex < fRequest->itemCount
-				? _NextItem(fNextItem) : NULL;
-			return item;
-		}
-
-	private:
-		PackageFSActivationChangeRequest*	fRequest;
-		PackageFSActivationChangeItem*		fNextItem;
-		uint32								fNextIndex;
-	};
-
-public:
 	ActivationChangeRequest()
 		:
 		fRequest(NULL),
@@ -270,22 +227,21 @@ public:
 		if (error != B_OK)
 			RETURN_ERROR(error);
 
-		// check the validity of the items
-		addr_t requestEnd = (addr_t)fRequest + fRequestSize;
-		uint32 itemCount = 0;
-		PackageFSActivationChangeItem* item = fRequest->items;
-		while (itemCount < fRequest->itemCount) {
-			if ((addr_t)item + sizeof(PackageFSActivationChangeItem)
-					> requestEnd
-				|| item->nameLength > B_FILE_NAME_LENGTH
-				|| (addr_t)item->name + item->nameLength > requestEnd
-				|| item->name[item->nameLength] != '\0'
-				|| strlen(item->name) != item->nameLength) {
-				RETURN_ERROR(B_BAD_VALUE);
-			}
+		uint32 itemCount = fRequest->itemCount;
+		const char* requestEnd = (const char*)fRequest + requestSize;
+		if (&fRequest->items[itemCount] > (void*)requestEnd)
+			RETURN_ERROR(B_BAD_VALUE);
 
-			itemCount++;
-			item = _NextItem(item);
+		// adjust the item name pointers and check their validity
+		addr_t nameDelta = (addr_t)fRequest - (addr_t)userRequest;
+		for (uint32 i = 0; i < itemCount; i++) {
+			PackageFSActivationChangeItem& item = fRequest->items[i];
+			item.name += nameDelta;
+			if (item.name < (char*)fRequest || item.name >= requestEnd)
+				RETURN_ERROR(B_BAD_VALUE);
+			size_t maxNameSize = requestEnd - item.name;
+			if (strnlen(item.name, maxNameSize) == maxNameSize)
+				RETURN_ERROR(B_BAD_VALUE);
 		}
 
 		return B_OK;
@@ -296,21 +252,9 @@ public:
 		return fRequest->itemCount;
 	}
 
-	Iterator GetIterator() const
+	PackageFSActivationChangeItem* ItemAt(uint32 index) const
 	{
-		return Iterator(fRequest);
-	}
-
-private:
-	friend class Iterator;
-		// for GCC 2
-
-private:
-	static inline PackageFSActivationChangeItem* _NextItem(
-		PackageFSActivationChangeItem* item)
-	{
-		return (PackageFSActivationChangeItem*)_ALIGN(
-			(addr_t)item->name + item->nameLength);
+		return index < CountItems() ? &fRequest->items[index] : NULL;
 	}
 
 private:
@@ -1362,7 +1306,8 @@ Volume::_LoadPackage(const char* name, Package*& _package)
 status_t
 Volume::_ChangeActivation(ActivationChangeRequest& request)
 {
-	if (request.CountItems() == 0)
+	uint32 itemCount = request.CountItems();
+	if (itemCount == 0)
 		return B_OK;
 
 	// first check the request
@@ -1371,9 +1316,8 @@ Volume::_ChangeActivation(ActivationChangeRequest& request)
 	{
 		VolumeReadLocker volumeLocker(this);
 
-		for (ActivationChangeRequest::Iterator it = request.GetIterator();
-			it.HasNext();) {
-			PackageFSActivationChangeItem* item = it.Next();
+		for (uint32 i = 0; i < itemCount; i++) {
+			PackageFSActivationChangeItem* item = request.ItemAt(i);
 			if (item->parentDeviceID != fPackagesDirectory->DeviceID()
 				|| item->parentDirectoryID != fPackagesDirectory->NodeID()) {
 				ERROR("Volume::_ChangeActivation(): mismatching packages "
@@ -1429,9 +1373,8 @@ INFORM("Volume::_ChangeActivation(): %" B_PRId32 " new packages, %" B_PRId32 " o
 
 	// load all new packages
 	int32 newPackageIndex = 0;
-	for (ActivationChangeRequest::Iterator it = request.GetIterator();
-		it.HasNext();) {
-		PackageFSActivationChangeItem* item = it.Next();
+	for (uint32 i = 0; i < itemCount; i++) {
+		PackageFSActivationChangeItem* item = request.ItemAt(i);
 
 		if (item->type != PACKAGE_FS_ACTIVATE_PACKAGE
 			&& item->type != PACKAGE_FS_REACTIVATE_PACKAGE) {
@@ -1457,9 +1400,8 @@ INFORM("Volume::_ChangeActivation(): %" B_PRId32 " new packages, %" B_PRId32 " o
 
 	// remove the old packages
 	int32 oldPackageIndex = 0;
-	for (ActivationChangeRequest::Iterator it = request.GetIterator();
-		it.HasNext();) {
-		PackageFSActivationChangeItem* item = it.Next();
+	for (uint32 i = 0; i < itemCount; i++) {
+		PackageFSActivationChangeItem* item = request.ItemAt(i);
 
 		if (item->type != PACKAGE_FS_DEACTIVATE_PACKAGE
 			&& item->type != PACKAGE_FS_REACTIVATE_PACKAGE) {

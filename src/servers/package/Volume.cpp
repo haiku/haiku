@@ -81,7 +81,9 @@ Volume::Volume(BLooper* looper)
 	fPackagesByFileName(),
 	fPackagesByNodeRef(),
 	fPendingNodeMonitorEventsLock("pending node monitor events"),
-	fPendingNodeMonitorEvents()
+	fPendingNodeMonitorEvents(),
+	fPackagesToBeActivated(),
+	fPackagesToBeDeactivated()
 {
 	looper->AddHandler(this);
 }
@@ -275,7 +277,6 @@ Volume::ProcessPendingNodeMonitorEvents()
 	}
 
 	// process them
-// TODO: Don't do that individually.
 	while (NodeMonitorEvent* event = events.RemoveHead()) {
 		ObjectDeleter<NodeMonitorEvent> eventDeleter(event);
 		if (event->WasCreated())
@@ -283,6 +284,100 @@ Volume::ProcessPendingNodeMonitorEvents()
 		else
 			_PackagesEntryRemoved(event->EntryName());
 	}
+}
+
+
+bool
+Volume::HasPendingPackageActivationChanges() const
+{
+	return !fPackagesToBeActivated.empty() || !fPackagesToBeDeactivated.empty();
+}
+
+
+void
+Volume::ProcessPendingPackageActivationChanges()
+{
+	if (!HasPendingPackageActivationChanges())
+		return;
+INFORM("Volume::ProcessPendingPackageActivationChanges(): activating %zu, deactivating %zu packages\n",
+fPackagesToBeActivated.size(), fPackagesToBeDeactivated.size());
+
+	// compute the size of the allocation we need for the activation change
+	// request
+	int32 itemCount
+		= fPackagesToBeActivated.size() + fPackagesToBeDeactivated.size();
+	size_t requestSize = sizeof(PackageFSActivationChangeRequest)
+		+ itemCount * sizeof(PackageFSActivationChangeItem);
+
+	for (PackageSet::iterator it = fPackagesToBeActivated.begin();
+		 it != fPackagesToBeActivated.end(); ++it) {
+		requestSize += (*it)->FileName().Length() + 1;
+	}
+
+	for (PackageSet::iterator it = fPackagesToBeDeactivated.begin();
+		 it != fPackagesToBeDeactivated.end(); ++it) {
+		requestSize += (*it)->FileName().Length() + 1;
+	}
+
+	// allocate and prepare the request
+	PackageFSActivationChangeRequest* request
+		= (PackageFSActivationChangeRequest*)malloc(requestSize);
+	if (request == NULL) {
+		ERROR("out of memory\n");
+		return;
+	}
+	MemoryDeleter requestDeleter(request);
+
+	request->itemCount = itemCount;
+
+	PackageFSActivationChangeItem* item = &request->items[0];
+	char* nameBuffer = (char*)(item + itemCount);
+
+	for (PackageSet::iterator it = fPackagesToBeActivated.begin();
+		it != fPackagesToBeActivated.end(); ++it, item++) {
+		_FillInActivationChangeItem(item, PACKAGE_FS_ACTIVATE_PACKAGE, *it,
+			nameBuffer);
+	}
+
+	for (PackageSet::iterator it = fPackagesToBeDeactivated.begin();
+		it != fPackagesToBeDeactivated.end(); ++it, item++) {
+		_FillInActivationChangeItem(item, PACKAGE_FS_DEACTIVATE_PACKAGE, *it,
+			nameBuffer);
+	}
+
+	// issue the request
+	int fd = OpenRootDirectory();
+	if (fd < 0) {
+		ERROR("Volume::ProcessPendingPackageActivationChanges(): failed to "
+			"open root directory: %s", strerror(fd));
+		return;
+	}
+	FileDescriptorCloser fdCloser(fd);
+
+	if (ioctl(fd, PACKAGE_FS_OPERATION_CHANGE_ACTIVATION, request, requestSize)
+			!= 0) {
+// TODO: We need more error information and error handling!
+		ERROR("Volume::ProcessPendingPackageActivationChanges(): failed to "
+			"activate packages: %s\n", strerror(errno));
+		return;
+	}
+
+	// Update our state, i.e. remove deactivated packages and mark activated
+	// packages accordingly.
+	for (PackageSet::iterator it = fPackagesToBeActivated.begin();
+		it != fPackagesToBeActivated.end(); ++it) {
+		(*it)->SetActive(true);
+	}
+
+	for (PackageSet::iterator it = fPackagesToBeDeactivated.begin();
+		it != fPackagesToBeDeactivated.end(); ++it) {
+		Package* package = *it;
+		_RemovePackage(package);
+		delete package;
+	}
+
+	fPackagesToBeActivated.clear();
+	fPackagesToBeDeactivated.clear();
 }
 
 
@@ -371,13 +466,13 @@ INFORM("Volume::_PackagesEntryCreated(\"%s\")\n", name);
 	entry.directory = fPackagesDirectoryRef.node;
 	status_t error = entry.set_name(name);
 	if (error != B_OK) {
-		ERROR("out of memory");
+		ERROR("out of memory\n");
 		return;
 	}
 
 	Package* package = new(std::nothrow) Package;
 	if (package == NULL) {
-		ERROR("out of memory");
+		ERROR("out of memory\n");
 		return;
 	}
 	ObjectDeleter<Package> packageDeleter(package);
@@ -392,46 +487,12 @@ INFORM("Volume::_PackagesEntryCreated(\"%s\")\n", name);
 	fPackagesByNodeRef.Insert(package);
 	packageDeleter.Detach();
 
-	// activate package
-// TODO: Don't do that here!
-	size_t nameLength = strlen(package->FileName());
-	size_t requestSize = sizeof(PackageFSActivationChangeRequest) + nameLength;
-	PackageFSActivationChangeRequest* request
-		= (PackageFSActivationChangeRequest*)malloc(requestSize);
-	if (request == NULL) {
-		ERROR("out of memory");
+	try {
+		fPackagesToBeActivated.insert(package);
+	} catch (std::bad_alloc& exception) {
+		ERROR("out of memory\n");
 		return;
 	}
-	MemoryDeleter requestDeleter(request);
-
-	request->itemCount = 1;
-	PackageFSActivationChangeItem& item = request->items[0];
-	item.type = PACKAGE_FS_ACTIVATE_PACKAGE;
-
-	item.packageDeviceID = package->NodeRef().device;
-	item.packageNodeID = package->NodeRef().node;
-
-	item.nameLength = nameLength;
-	item.parentDeviceID = fPackagesDirectoryRef.device;
-	item.parentDirectoryID = fPackagesDirectoryRef.node;
-	strcpy(item.name, package->FileName());
-
-	int fd = OpenRootDirectory();
-	if (fd < 0) {
-		ERROR("Volume::_PackagesEntryCreated(): failed to open root directory: "
-			"%s", strerror(fd));
-		return;
-	}
-	FileDescriptorCloser fdCloser(fd);
-
-	if (ioctl(fd, PACKAGE_FS_OPERATION_CHANGE_ACTIVATION, request, requestSize)
-			!= 0) {
-		ERROR("Volume::_PackagesEntryCreated(): activate packages: %s\n",
-			strerror(errno));
-		return;
-	}
-
-	package->SetActive(true);
 }
 
 
@@ -443,51 +504,50 @@ INFORM("Volume::_PackagesEntryRemoved(\"%s\")\n", name);
 	if (package == NULL)
 		return;
 
-	if (package->IsActive()) {
-		// deactivate the package
-// TODO: Don't do that here!
-		size_t nameLength = strlen(package->FileName());
-		size_t requestSize = sizeof(PackageFSActivationChangeRequest)
-			+ nameLength;
-		PackageFSActivationChangeRequest* request
-			= (PackageFSActivationChangeRequest*)malloc(requestSize);
-		if (request == NULL) {
-			ERROR("out of memory");
-			return;
-		}
-		MemoryDeleter requestDeleter(request);
+	// Remove the package from the packages-to-be-activated set, if it is in
+	// there (unlikely, unless we see a create-remove-create sequence).
+	PackageSet::iterator it = fPackagesToBeActivated.find(package);
+	if (it != fPackagesToBeActivated.end())
+		fPackagesToBeActivated.erase(it);
 
-		request->itemCount = 1;
-		PackageFSActivationChangeItem& item = request->items[0];
-		item.type = PACKAGE_FS_DEACTIVATE_PACKAGE;
-
-		item.packageDeviceID = package->NodeRef().device;
-		item.packageNodeID = package->NodeRef().node;
-
-		item.nameLength = nameLength;
-		item.parentDeviceID = fPackagesDirectoryRef.device;
-		item.parentDirectoryID = fPackagesDirectoryRef.node;
-		strcpy(item.name, package->FileName());
-
-		int fd = OpenRootDirectory();
-		if (fd < 0) {
-			ERROR("Volume::_PackagesEntryRemoved(): failed to open root "
-				"directory: %s", strerror(fd));
-			return;
-		}
-		FileDescriptorCloser fdCloser(fd);
-
-		if (ioctl(fd, PACKAGE_FS_OPERATION_CHANGE_ACTIVATION, request,
-				requestSize) != 0) {
-			ERROR("Volume::_PackagesEntryRemoved(): activate packages: %s\n",
-				strerror(errno));
-			return;
-		}
+	// If the package isn't active, just remove it for good.
+	if (!package->IsActive()) {
+		_RemovePackage(package);
+		delete package;
+		return;
 	}
 
+	// The package must be deactivated.
+	try {
+		fPackagesToBeDeactivated.insert(package);
+	} catch (std::bad_alloc& exception) {
+		ERROR("out of memory\n");
+		return;
+	}
+}
+
+
+void
+Volume::_FillInActivationChangeItem(PackageFSActivationChangeItem* item,
+	PackageFSActivationChangeType type, Package* package, char*& nameBuffer)
+{
+	item->type = type;
+	item->packageDeviceID = package->NodeRef().device;
+	item->packageNodeID = package->NodeRef().node;
+	item->nameLength = package->FileName().Length();
+	item->parentDeviceID = fPackagesDirectoryRef.device;
+	item->parentDirectoryID = fPackagesDirectoryRef.node;
+	item->name = nameBuffer;
+	strcpy(nameBuffer, package->FileName());
+	nameBuffer += package->FileName().Length() + 1;
+}
+
+
+void
+Volume::_RemovePackage(Package* package)
+{
 	fPackagesByFileName.Remove(package);
 	fPackagesByNodeRef.Remove(package);
-	delete package;
 }
 
 

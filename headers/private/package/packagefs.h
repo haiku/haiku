@@ -79,7 +79,9 @@ struct PackageFSActivationChangeItem {
 	uint32							nameLength;
 	dev_t							parentDeviceID;
 	ino_t							parentDirectoryID;
-	char							name[1];
+	char*							name;
+										// must point to a location within the
+										// request
 };
 
 struct PackageFSActivationChangeRequest {

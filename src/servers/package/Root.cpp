@@ -220,6 +220,9 @@ void
 Root::_ProcessNodeMonitorEvents(Volume* volume)
 {
 	volume->ProcessPendingNodeMonitorEvents();
+
+	if (volume->HasPendingPackageActivationChanges())
+		volume->ProcessPendingPackageActivationChanges();
 }
 
 

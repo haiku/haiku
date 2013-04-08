@@ -9,6 +9,8 @@
 #define VOLUME_H
 
 
+#include <set>
+
 #include <Handler.h>
 #include <Locker.h>
 #include <String.h>
@@ -68,9 +70,14 @@ public:
 
 			void				ProcessPendingNodeMonitorEvents();
 
+			bool				HasPendingPackageActivationChanges() const;
+			void				ProcessPendingPackageActivationChanges();
+
 private:
 			struct NodeMonitorEvent;
 			typedef DoublyLinkedList<NodeMonitorEvent> NodeMonitorEventList;
+
+			typedef std::set<Package*> PackageSet;
 
 private:
 			void				_HandleEntryCreatedOrRemoved(
@@ -81,6 +88,12 @@ private:
 
 			void				_PackagesEntryCreated(const char* name);
 			void				_PackagesEntryRemoved(const char* name);
+
+			void				_FillInActivationChangeItem(
+									PackageFSActivationChangeItem* item,
+									PackageFSActivationChangeType type,
+									Package* package, char*& nameBuffer);
+			void				_RemovePackage(Package* package);
 
 			status_t			_ReadPackagesDirectory();
 			status_t			_GetActivePackages(int fd);
@@ -96,6 +109,8 @@ private:
 			PackageNodeRefHashTable fPackagesByNodeRef;
 			BLocker				fPendingNodeMonitorEventsLock;
 			NodeMonitorEventList fPendingNodeMonitorEvents;
+			PackageSet			fPackagesToBeActivated;
+			PackageSet			fPackagesToBeDeactivated;
 };
 
 
