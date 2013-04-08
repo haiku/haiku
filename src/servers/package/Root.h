@@ -48,14 +48,14 @@ protected:
 	virtual	void				LastReferenceReleased();
 
 private:
-			struct InitPackagesJob;
-			struct DeleteVolumeJob;
-			struct HandleNodeMonitorEventsJob;
-
-			friend struct InitPackagesJob;
+			struct VolumeJob;
 
 private:
 			Volume**			_GetVolume(PackageFSMountType mountType);
+
+			void				_InitPackages(Volume* volume);
+			void				_DeleteVolume(Volume* volume);
+			void				_ProcessNodeMonitorEvents(Volume* volume);
 
 			status_t			_QueueJob(Job* job);
 

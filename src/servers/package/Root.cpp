@@ -16,63 +16,25 @@
 #include "DebugSupport.h"
 
 
-// #pragma mark - InitVolumePackagesJob
+// #pragma mark - VolumeJob
 
 
-struct Root::InitPackagesJob : public Job {
-	InitPackagesJob(Volume* volume)
+struct Root::VolumeJob : public Job {
+	VolumeJob(Volume* volume, void (Root::*method)(Volume*))
 		:
-		fVolume(volume)
+		fVolume(volume),
+		fMethod(method)
 	{
 	}
 
 	virtual void Do()
 	{
-		fVolume->InitPackages(fVolume->GetRoot());
+		(fVolume->GetRoot()->*fMethod)(fVolume);
 	}
 
 private:
 	Volume*	fVolume;
-};
-
-
-// #pragma mark - DeleteVolumeJob
-
-
-struct Root::DeleteVolumeJob : public Job {
-	DeleteVolumeJob(Volume* volume)
-		:
-		fVolume(volume)
-	{
-	}
-
-	virtual void Do()
-	{
-		delete fVolume;
-	}
-
-private:
-	Volume*	fVolume;
-};
-
-
-// #pragma mark - HandleNodeMonitorEventsJob
-
-
-struct Root::HandleNodeMonitorEventsJob : public Job {
-	HandleNodeMonitorEventsJob(Volume* volume)
-		:
-		fVolume(volume)
-	{
-	}
-
-	virtual void Do()
-	{
-		fVolume->ProcessPendingNodeMonitorEvents();
-	}
-
-private:
-	Volume*	fVolume;
+	void	(Root::*fMethod)(Volume*);
 };
 
 
@@ -165,7 +127,8 @@ Root::RegisterVolume(Volume* volume)
 	volume->SetRoot(this);
 
 	// queue a job for reading the volume's packages
-	status_t error = _QueueJob(new(std::nothrow) InitPackagesJob(volume));
+	status_t error = _QueueJob(
+		new(std::nothrow) VolumeJob(volume, &Root::_InitPackages));
 	if (error != B_OK) {
 		volume->SetRoot(NULL);
 		*volumeToSet = NULL;
@@ -190,7 +153,7 @@ Root::UnregisterVolume(Volume* volume)
 
 	// Use the job queue to delete the volume to make sure there aren't any
 	// pending jobs that reference the volume.
-	_QueueJob(new(std::nothrow) DeleteVolumeJob(volume));
+	_QueueJob(new(std::nothrow) VolumeJob(volume, &Root::_DeleteVolume));
 }
 
 
@@ -211,7 +174,8 @@ Root::FindVolume(dev_t deviceID) const
 void
 Root::VolumeNodeMonitorEventOccurred(Volume* volume)
 {
-	_QueueJob(new(std::nothrow) HandleNodeMonitorEventsJob(volume));
+	_QueueJob(
+		new(std::nothrow) VolumeJob(volume, &Root::_ProcessNodeMonitorEvents));
 }
 
 
@@ -235,6 +199,27 @@ Root::_GetVolume(PackageFSMountType mountType)
 		default:
 			return NULL;
 	}
+}
+
+
+void
+Root::_InitPackages(Volume* volume)
+{
+	volume->InitPackages(this);
+}
+
+
+void
+Root::_DeleteVolume(Volume* volume)
+{
+	delete volume;
+}
+
+
+void
+Root::_ProcessNodeMonitorEvents(Volume* volume)
+{
+	volume->ProcessPendingNodeMonitorEvents();
 }
 
 
