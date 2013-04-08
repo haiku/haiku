@@ -1362,6 +1362,55 @@ BString::IFindLast(const char* string, int32 beforeOffset) const
 }
 
 
+bool
+BString::StartsWith(const BString& string) const
+{
+	return StartsWith(string.String(), string.Length());
+}
+
+
+bool
+BString::StartsWith(const char* string) const
+{
+	return StartsWith(string, strlen(string));
+}
+
+
+bool
+BString::StartsWith(const char* string, int32 length) const
+{
+	if (length > Length())
+		return false;
+
+	return memcmp(String(), string, length) == 0;
+}
+
+
+bool
+BString::EndsWith(const BString& string) const
+{
+	return EndsWith(string.String(), string.Length());
+}
+
+
+bool
+BString::EndsWith(const char* string) const
+{
+	return EndsWith(string, strlen(string));
+}
+
+
+bool
+BString::EndsWith(const char* string, int32 length) const
+{
+	int32 offset = Length() - length;
+	if (offset < 0)
+		return false;
+
+	return memcmp(String() + offset, string, length) == 0;
+}
+
+
 //	#pragma mark - Replacing
 
 

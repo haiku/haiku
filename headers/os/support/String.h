@@ -221,6 +221,14 @@ public:
 			int32			IFindLast(const char* string,
 								int32 beforeOffset) const;
 
+			bool			StartsWith(const BString& string) const;
+			bool			StartsWith(const char* string) const;
+			bool			StartsWith(const char* string, int32 length) const;
+
+			bool			EndsWith(const BString& string) const;
+			bool			EndsWith(const char* string) const;
+			bool			EndsWith(const char* string, int32 length) const;
+
 			// Replacing
 			BString&		ReplaceFirst(char replaceThis, char withThis);
 			BString&		ReplaceLast(char replaceThis, char withThis);
