@@ -56,6 +56,7 @@ DeviceInfo gSupportedDevices[] = {
 	{ { 0x0b95, 0x772a }, DeviceInfo::AX88772A, "AX88772A 10/100" },
 	{ { 0x0b95, 0x772b }, DeviceInfo::AX88772B, "AX88772B 10/100" },
 	{ { 0x0b95, 0x7e2b }, DeviceInfo::AX88772B, "AX88772B 10/100" },
+	{ { 0x0df6, 0x0056 }, DeviceInfo::AX88178, "Sitecom LN-031" },
 	{ { 0x0df6, 0x061c }, DeviceInfo::AX88178, "Sitecom LN-028" },
 	{ { 0x1189, 0x0893 }, DeviceInfo::AX88172, "Acer C&M EP-1427X-2" },
 	{ { 0x13b1, 0x0018 }, DeviceInfo::AX88772A, "Linksys USB200M rev.2" },
@@ -63,9 +64,10 @@ DeviceInfo gSupportedDevices[] = {
 	{ { 0x1557, 0x7720 }, DeviceInfo::AX88772, "OQO 01+ Ethernet" },
 	{ { 0x1631, 0x6200 }, DeviceInfo::AX88172, "GoodWay USB2Ethernet" },
 	{ { 0x1737, 0x0039 }, DeviceInfo::AX88178, "LinkSys 1000" },
+	{ { 0x17ef, 0x7203 }, DeviceInfo::AX88772, "Lenovo U2L100P 10/100" },
 	{ { 0x2001, 0x1A00 }, DeviceInfo::AX88172, "D-Link DUB-E100" },
 	{ { 0x2001, 0x3c05 }, DeviceInfo::AX88772, "D-Link DUB-E100 rev.B1" },
-	{ { 0x6189, 0x182d }, DeviceInfo::AX88172, "Sitecom LN-029" }
+	{ { 0x6189, 0x182d }, DeviceInfo::AX88172, "Sitecom LN-029" },
 };
 
 
