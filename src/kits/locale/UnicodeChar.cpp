@@ -253,7 +253,9 @@ BUnicodeChar::FromUTF8(const char **in)
 {
 	int i = 0;
 	uint32 c = 0;
-	U8_GET_UNSAFE(*in, i, c);
+	U8_NEXT_UNSAFE(*in, i, c);
+	*in += i;
+
 	return c;
 }
 
