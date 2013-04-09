@@ -22,6 +22,7 @@
 #include <package/PackageInfoAttributes.h>
 
 #include <AutoDeleter.h>
+#include <PackagesDirectoryDefs.h>
 
 #include <fs/KPath.h>
 #include <team.h>
@@ -63,6 +64,13 @@ const char* const* kHomeShineThroughDirectories
 
 // sanity limit for activation change request
 const size_t kMaxActivationRequestSize = 10 * 1024 * 1024;
+
+// sanity limit for activation file size
+const size_t kMaxActivationFileSize = 10 * 1024 * 1024;
+
+static const char* const kActivationFilePath
+	= PACKAGES_DIRECTORY_CONFIG_DIRECTORY "/"
+		PACKAGES_DIRECTORY_ACTIVATION_FILE;
 
 
 // #pragma mark - ShineThroughDirectory
@@ -291,12 +299,7 @@ Volume::~Volume()
 	}
 
 	// delete the packages
-	Package* package = fPackages.Clear(true);
-	while (package != NULL) {
-		Package* next = package->FileNameHashTableNext();
-		package->ReleaseReference();
-		package = next;
-	}
+	_RemoveAllPackages();
 
 	// delete all indices
 	Index* index = fIndices.Clear(true);
@@ -731,6 +734,124 @@ Volume::_AddInitialPackages()
 	dprintf("packagefs: Adding packages from \"%s\"\n",
 		fPackagesDirectory->Path());
 
+	// try reading the activation file
+	status_t error = _AddInitialPackagesFromActivationFile();
+	if (error != B_OK) {
+		INFORM("Loading packages from activation file failed. Loading all "
+			"packages in packages directory.\n");
+
+		// remove all packages already added
+		{
+			VolumeWriteLocker systemVolumeLocker(_SystemVolumeIfNotSelf());
+			VolumeWriteLocker volumeLocker(this);
+			_RemoveAllPackages();
+		}
+
+		// read the whole directory
+		error = _AddInitialPackagesFromDirectory();
+		if (error != B_OK)
+			RETURN_ERROR(error);
+	}
+
+	// add the packages to the node tree
+	VolumeWriteLocker systemVolumeLocker(_SystemVolumeIfNotSelf());
+	VolumeWriteLocker volumeLocker(this);
+	for (PackageFileNameHashTable::Iterator it = fPackages.GetIterator();
+		Package* package = it.Next();) {
+		error = _AddPackageContent(package, false);
+		if (error != B_OK) {
+			for (it.Rewind(); Package* activePackage = it.Next();) {
+				if (activePackage == package)
+					break;
+				_RemovePackageContent(activePackage, NULL, false);
+			}
+			RETURN_ERROR(error);
+		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
+Volume::_AddInitialPackagesFromActivationFile()
+{
+	// try reading the activation file
+	int fd = openat(fPackagesDirectory->DirectoryFD(),
+		kActivationFilePath, O_RDONLY);
+	if (fd < 0) {
+		INFORM("Failed to open packages activation file: %s\n",
+			strerror(errno));
+		RETURN_ERROR(errno);
+	}
+	FileDescriptorCloser fdCloser(fd);
+
+	// read the whole file into memory to simplify things
+	struct stat st;
+	if (fstat(fd, &st) != 0) {
+		ERROR("Failed to stat packages activation file: %s\n",
+			strerror(errno));
+		RETURN_ERROR(errno);
+	}
+
+	if (st.st_size > kMaxActivationFileSize) {
+		ERROR("The packages activation file is too big.\n");
+		RETURN_ERROR(B_BAD_DATA);
+	}
+
+	char* fileContent = (char*)malloc(st.st_size + 1);
+	if (fileContent == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+	MemoryDeleter fileContentDeleter(fileContent);
+
+	ssize_t bytesRead = read(fd, fileContent, st.st_size);
+	if (bytesRead < 0) {
+		ERROR("Failed to read packages activation file: %s\n", strerror(errno));
+		RETURN_ERROR(errno);
+	}
+
+	if (bytesRead != st.st_size) {
+		ERROR("Failed to read whole packages activation file\n");
+		RETURN_ERROR(B_ERROR);
+	}
+
+	// null-terminate to simplify parsing
+	fileContent[st.st_size] = '\0';
+
+	// parse the file and add the respective packages
+	const char* packageName = fileContent;
+	char* const fileContentEnd = fileContent + st.st_size;
+	while (packageName < fileContentEnd) {
+		char* packageNameEnd = strchr(packageName, '\n');
+		if (packageNameEnd == NULL)
+			packageNameEnd = fileContentEnd;
+
+		// skip empty lines
+		if (packageName == packageNameEnd) {
+			packageName++;
+			continue;
+		}
+		*packageNameEnd = '\0';
+
+		if (packageNameEnd - packageName >= B_FILE_NAME_LENGTH) {
+			ERROR("Invalid packages activation file content.\n");
+			RETURN_ERROR(B_BAD_DATA);
+		}
+
+		status_t error = _LoadAndAddInitialPackage(packageName);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		packageName = packageNameEnd + 1;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+Volume::_AddInitialPackagesFromDirectory()
+{
 	// iterate through the dir and create packages
 	int fd = dup(fPackagesDirectory->DirectoryFD());
 	if (fd < 0) {
@@ -758,32 +879,27 @@ Volume::_AddInitialPackages()
 			continue;
 		}
 
-		Package* package;
-		if (_LoadPackage(entry->d_name, package) != B_OK)
-			continue;
-		BReference<Package> packageReference(package, true);
-
-		VolumeWriteLocker systemVolumeLocker(_SystemVolumeIfNotSelf());
-		VolumeWriteLocker volumeLocker(this);
-		_AddPackage(package);
-
+		_LoadAndAddInitialPackage(entry->d_name);
 	}
 
-	// add the packages to the node tree
+	return B_OK;
+}
+
+
+status_t
+Volume::_LoadAndAddInitialPackage(const char* name)
+{
+	Package* package;
+	status_t error = _LoadPackage(name, package);
+	if (error != B_OK) {
+		ERROR("Failed to load package \"%s\": %s\n", name, strerror(error));
+		RETURN_ERROR(error);
+	}
+	BReference<Package> packageReference(package, true);
+
 	VolumeWriteLocker systemVolumeLocker(_SystemVolumeIfNotSelf());
 	VolumeWriteLocker volumeLocker(this);
-	for (PackageFileNameHashTable::Iterator it = fPackages.GetIterator();
-		Package* package = it.Next();) {
-		status_t error = _AddPackageContent(package, false);
-		if (error != B_OK) {
-			for (it.Rewind(); Package* activePackage = it.Next();) {
-				if (activePackage == package)
-					break;
-				_RemovePackageContent(activePackage, NULL, false);
-			}
-			RETURN_ERROR(error);
-		}
-	}
+	_AddPackage(package);
 
 	return B_OK;
 }
@@ -802,6 +918,18 @@ Volume::_RemovePackage(Package* package)
 {
 	fPackages.Remove(package);
 	package->ReleaseReference();
+}
+
+
+void
+Volume::_RemoveAllPackages()
+{
+	Package* package = fPackages.Clear(true);
+	while (package != NULL) {
+		Package* next = package->FileNameHashTableNext();
+		package->ReleaseReference();
+		package = next;
+	}
 }
 
 

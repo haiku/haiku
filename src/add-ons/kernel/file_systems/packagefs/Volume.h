@@ -111,9 +111,13 @@ private:
 
 private:
 			status_t			_AddInitialPackages();
+			status_t			_AddInitialPackagesFromActivationFile();
+			status_t			_AddInitialPackagesFromDirectory();
+			status_t			_LoadAndAddInitialPackage(const char* name);
 
 	inline	void				_AddPackage(Package* package);
 	inline	void				_RemovePackage(Package* package);
+			void				_RemoveAllPackages();
 	inline	Package*			_FindPackage(const char* fileName) const;
 
 			status_t			_AddPackageContent(Package* package,
