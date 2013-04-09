@@ -10,6 +10,7 @@
 
 #include <ObjectList.h>
 #include <package/solver/Solver.h>
+#include <package/solver/SolverProblemSolution.h>
 
 #include <solv/pool.h>
 #include <solv/solver.h>
@@ -46,9 +47,11 @@ public:
 private:
 			struct SolvQueue;
 			struct RepositoryInfo;
+			struct Problem;
+			struct Solution;
 
 			typedef BObjectList<RepositoryInfo> RepositoryInfoList;
-			typedef BObjectList<BSolverProblem> ProblemList;
+			typedef BObjectList<Problem> ProblemList;
 			typedef std::map<Solvable*, BSolverPackage*> SolvableMap;
 
 private:
@@ -61,6 +64,14 @@ private:
 			BSolverPackage*		_GetPackage(Id solvableId) const;
 
 			status_t			_AddProblem(Id problemId);
+			status_t			_AddSolution(Problem* problem, Id solutionId);
+			status_t			_AddSolutionElement(Solution* solution,
+									Id sourceId, Id targetId);
+			status_t			_AddSolutionElement(Solution* solution,
+									BSolverProblemSolutionElement::BType type,
+									Solvable* sourceSolvable,
+									Solvable* targetSolvable,
+									const char* selectionString);
 			status_t			_GetResolvableExpression(Id id,
 									BPackageResolvableExpression& _expression)
 									const;

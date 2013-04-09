@@ -13,6 +13,7 @@
 
 #include <new>
 
+#include <solv/policy.h>
 #include <solv/poolarch.h>
 #include <solv/repo.h>
 #include <solv/repo_haiku.h>
@@ -82,6 +83,46 @@ struct LibsolvSolver::RepositoryInfo {
 private:
 	BSolverRepository*	fRepository;
 	Repo*				fSolvRepo;
+};
+
+
+struct LibsolvSolver::Problem : public BSolverProblem {
+	Problem(::Id id, BType type, BSolverPackage* sourcePackage,
+		BSolverPackage* targetPackage,
+		const BPackageResolvableExpression& dependency)
+		:
+		BSolverProblem(type, sourcePackage, targetPackage, dependency),
+		fId(id)
+	{
+	}
+
+	::Id Id() const
+	{
+		return fId;
+	}
+
+private:
+	::Id	fId;
+};
+
+
+struct LibsolvSolver::Solution : public BSolverProblemSolution {
+	Solution(::Id id, Problem* problem)
+		:
+		BSolverProblemSolution(),
+		fId(id),
+		fProblem(problem)
+	{
+	}
+
+	::Id Id() const
+	{
+		return fId;
+	}
+
+private:
+	::Id		fId;
+	Problem*	fProblem;
 };
 
 
@@ -546,10 +587,209 @@ LibsolvSolver::_AddProblem(Id problemId)
 			return error;
 	}
 
-	BSolverProblem* problem = new(std::nothrow) BSolverProblem(problemType,
+	Problem* problem = new(std::nothrow) Problem(problemId, problemType,
 		sourcePackage, targetPackage, dependency);
 	if (problem == NULL || !fProblems.AddItem(problem)) {
 		delete problem;
+		return B_NO_MEMORY;
+	}
+
+	int solutionCount = solver_solution_count(fSolver, problemId);
+	for (Id solutionId = 1; solutionId <= solutionCount; solutionId++) {
+		status_t error = _AddSolution(problem, solutionId);
+		if (error != B_OK)
+			return error;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+LibsolvSolver::_AddSolution(Problem* problem, Id solutionId)
+{
+	Solution* solution = new(std::nothrow) Solution(solutionId, problem);
+	if (solution == NULL || !problem->AppendSolution(solution)) {
+		delete solution;
+		return B_NO_MEMORY;
+	}
+
+	Id elementId = 0;
+	for (;;) {
+		Id sourceId;
+		Id targetId;
+		elementId = solver_next_solutionelement(fSolver, problem->Id(),
+			solutionId, elementId, &sourceId, &targetId);
+		if (elementId == 0)
+			break;
+
+		status_t error = _AddSolutionElement(solution, sourceId, targetId);
+		if (error != B_OK)
+			return error;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+LibsolvSolver::_AddSolutionElement(Solution* solution, Id sourceId, Id targetId)
+{
+	typedef BSolverProblemSolutionElement Element;
+
+	if (sourceId == SOLVER_SOLUTION_JOB
+		|| sourceId == SOLVER_SOLUTION_POOLJOB) {
+		// targetId is an index into the job queue
+		if (sourceId == SOLVER_SOLUTION_JOB)
+			targetId += fSolver->pooljobcnt;
+
+		Id how = fSolver->job.elements[targetId - 1];
+		Id what = fSolver->job.elements[targetId];
+		Id select = how & SOLVER_SELECTMASK;
+
+		switch (how & SOLVER_JOBMASK) {
+			case SOLVER_INSTALL:
+				if (select == SOLVER_SOLVABLE && fInstalledRepository != NULL
+					&& fPool->solvables[what].repo
+						== fInstalledRepository->SolvRepo()) {
+					return _AddSolutionElement(solution, Element::B_DONT_KEEP,
+						fPool->solvables + what, NULL, NULL);
+				}
+
+				return _AddSolutionElement(solution,
+					Element::B_DONT_INSTALL, NULL, NULL,
+					solver_select2str(fPool, select, what));
+
+			case SOLVER_ERASE:
+			{
+				if (select == SOLVER_SOLVABLE
+					&& (fInstalledRepository == NULL
+						|| fPool->solvables[what].repo
+							!= fInstalledRepository->SolvRepo())) {
+					return _AddSolutionElement(solution,
+						Element::B_DONT_FORBID_INSTALLATION,
+						fPool->solvables + what, NULL, NULL);
+				}
+
+				Element::BType type = select == SOLVER_SOLVABLE_PROVIDES
+					? Element::B_DONT_DEINSTALL_ALL : Element::B_DONT_DEINSTALL;
+				return _AddSolutionElement(solution, type, NULL, NULL,
+					solver_select2str(fPool, select, what));
+			}
+
+			case SOLVER_UPDATE:
+				return _AddSolutionElement(solution,
+					Element::B_DONT_INSTALL_MOST_RECENT, NULL, NULL,
+					solver_select2str(fPool, select, what));
+
+			case SOLVER_LOCK:
+				return _AddSolutionElement(solution, Element::B_DONT_LOCK, NULL,
+					NULL, solver_select2str(fPool, select, what));
+
+			default:
+				return _AddSolutionElement(solution, Element::B_UNSPECIFIED,
+					NULL, NULL, NULL);
+		}
+	}
+
+	Solvable* target = targetId != 0 ? fPool->solvables + targetId : NULL;
+	bool targetInstalled = target && fInstalledRepository
+		&& target->repo == fInstalledRepository->SolvRepo();
+
+	if (sourceId == SOLVER_SOLUTION_INFARCH) {
+		return _AddSolutionElement(solution,
+			targetInstalled
+				? Element::B_KEEP_INFERIOR_ARCHITECTURE
+				: Element::B_INSTALL_INFERIOR_ARCHITECTURE,
+			target, NULL, NULL);
+	}
+
+	if (sourceId == SOLVER_SOLUTION_DISTUPGRADE) {
+		return _AddSolutionElement(solution,
+			targetInstalled
+				? Element::B_KEEP_EXCLUDED : Element::B_INSTALL_EXCLUDED,
+			target, NULL, NULL);
+	}
+
+	if (sourceId == SOLVER_SOLUTION_BEST) {
+		return _AddSolutionElement(solution,
+			targetInstalled ? Element::B_KEEP_OLD : Element::B_INSTALL_OLD,
+			target, NULL, NULL);
+	}
+
+	// replace source with target
+	Solvable* source = fPool->solvables + sourceId;
+	if (target == NULL) {
+		return _AddSolutionElement(solution, Element::B_ALLOW_DEINSTALLATION,
+			source, NULL, NULL);
+	}
+
+	int illegalMask = policy_is_illegal(fSolver, source, target, 0);
+	if ((illegalMask & POLICY_ILLEGAL_DOWNGRADE) != 0) {
+		status_t error = _AddSolutionElement(solution,
+			Element::B_ALLOW_DOWNGRADE, source, target, NULL);
+		if (error != B_OK)
+			return error;
+	}
+
+	if ((illegalMask & POLICY_ILLEGAL_NAMECHANGE) != 0) {
+		status_t error = _AddSolutionElement(solution,
+			Element::B_ALLOW_NAME_CHANGE, source, target, NULL);
+		if (error != B_OK)
+			return error;
+	}
+
+	if ((illegalMask & POLICY_ILLEGAL_ARCHCHANGE) != 0) {
+		status_t error = _AddSolutionElement(solution,
+			Element::B_ALLOW_ARCHITECTURE_CHANGE, source, target, NULL);
+		if (error != B_OK)
+			return error;
+	}
+
+	if ((illegalMask & POLICY_ILLEGAL_VENDORCHANGE) != 0) {
+		status_t error = _AddSolutionElement(solution,
+			Element::B_ALLOW_VENDOR_CHANGE, source, target, NULL);
+		if (error != B_OK)
+			return error;
+	}
+
+	if (illegalMask == 0) {
+		return _AddSolutionElement(solution, Element::B_ALLOW_REPLACEMENT,
+			source, target, NULL);
+	}
+
+	return B_OK;
+}
+
+
+status_t
+LibsolvSolver::_AddSolutionElement(Solution* solution,
+	BSolverProblemSolutionElement::BType type, Solvable* sourceSolvable,
+	Solvable* targetSolvable, const char* selectionString)
+{
+	BSolverPackage* sourcePackage = NULL;
+	if (sourceSolvable != NULL) {
+		sourcePackage = _GetPackage(sourceSolvable);
+		if (sourcePackage == NULL)
+			return B_ERROR;
+	}
+
+	BSolverPackage* targetPackage = NULL;
+	if (targetSolvable != NULL) {
+		targetPackage = _GetPackage(targetSolvable);
+		if (targetPackage == NULL)
+			return B_ERROR;
+	}
+
+	BString selection;
+	if (selectionString != NULL && selectionString[0] != '\0') {
+		selection = selectionString;
+		if (selection.IsEmpty())
+			return B_NO_MEMORY;
+	}
+
+	if (!solution->AppendElement(BSolverProblemSolutionElement(
+			type, sourcePackage, targetPackage, selection))) {
 		return B_NO_MEMORY;
 	}
 

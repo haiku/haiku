@@ -6,6 +6,7 @@
 #define _PACKAGE__SOLVER_PROBLEM_H_
 
 
+#include <ObjectList.h>
 #include <package/PackageResolvableExpression.h>
 
 
@@ -13,6 +14,7 @@ namespace BPackageKit {
 
 
 class BSolverPackage;
+class BSolverProblemSolution;
 
 
 class BSolverProblem {
@@ -53,13 +55,23 @@ public:
 			BSolverPackage*		TargetPackage() const;
 			const BPackageResolvableExpression& Dependency() const;
 
+			int32				CountSolutions() const;
+			const BSolverProblemSolution* SolutionAt(int32 index) const;
+
+			bool				AppendSolution(
+									BSolverProblemSolution* solution);
+
 			BString				ToString() const;
+
+private:
+			typedef BObjectList<BSolverProblemSolution> SolutionList;
 
 private:
 			BType				fType;
 			BSolverPackage*		fSourcePackage;
 			BSolverPackage*		fTargetPackage;
 			BPackageResolvableExpression fDependency;
+			SolutionList		fSolutions;
 };
 
 

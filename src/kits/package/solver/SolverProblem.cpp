@@ -9,9 +9,8 @@
 
 #include <package/solver/SolverProblem.h>
 
-#include <stdio.h>
-
 #include <package/solver/SolverPackage.h>
+#include <package/solver/SolverProblemSolution.h>
 
 
 static const char* const kToStringTexts[] = {
@@ -45,7 +44,8 @@ BSolverProblem::BSolverProblem(BType type, BSolverPackage* sourcePackage,
 	fType(type),
 	fSourcePackage(sourcePackage),
 	fTargetPackage(targetPackage),
-	fDependency()
+	fDependency(),
+	fSolutions(10, true)
 {
 }
 
@@ -57,7 +57,8 @@ BSolverProblem::BSolverProblem(BType type, BSolverPackage* sourcePackage,
 	fType(type),
 	fSourcePackage(sourcePackage),
 	fTargetPackage(targetPackage),
-	fDependency(dependency)
+	fDependency(dependency),
+	fSolutions(10, true)
 {
 }
 
@@ -92,6 +93,27 @@ const BPackageResolvableExpression&
 BSolverProblem::Dependency() const
 {
 	return fDependency;
+}
+
+
+int32
+BSolverProblem::CountSolutions() const
+{
+	return fSolutions.CountItems();
+}
+
+
+const BSolverProblemSolution*
+BSolverProblem::SolutionAt(int32 index) const
+{
+	return fSolutions.ItemAt(index);
+}
+
+
+bool
+BSolverProblem::AppendSolution(BSolverProblemSolution* solution)
+{
+	return fSolutions.AddItem(solution);
 }
 
 
