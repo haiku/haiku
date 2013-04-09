@@ -3,11 +3,11 @@
  * Distributed under the terms of the MIT license.
  *
  * Authors:
- *		Ulrich Wimboeck
- *		Marc Flerackers (mflerackers@androme.be)
- *		Stephan Assmus <superstippi@gmx.de>
+ *		Stephan Assmus, superstippi@gmx.de
  *		Axel Dörfler, axeld@pinc-software.de
- *		Rene Gollent (rene@gollent.com)
+ *		Marc Flerackers, mflerackers@androme.be
+ *		Rene Gollent, rene@gollent.com
+ *		Ulrich Wimboeck
  */
 
 
@@ -33,7 +33,9 @@ struct track_data {
 	bigtime_t	last_click_time;
 };
 
+
 const float kDoubleClickTresh = 6;
+
 
 static property_info sProperties[] = {
 	{ "Item", { B_COUNT_PROPERTIES, 0 }, { B_DIRECT_SPECIFIER, 0 },
@@ -494,8 +496,9 @@ BListView::MouseDown(BPoint point)
 	if (timeDelta < doubleClickSpeed
 		&& fabs(delta.x) < kDoubleClickTresh
 		&& fabs(delta.y) < kDoubleClickTresh
-		&& fTrack->item_index == index)
+		&& fTrack->item_index == index) {
 		doubleClick = true;
+	}
 
 	if (doubleClick && index >= fFirstSelected && index <= fLastSelected) {
 		fTrack->drag_start.Set(INT32_MAX, INT32_MAX);
@@ -518,8 +521,10 @@ BListView::MouseDown(BPoint point)
 		if (fListType == B_MULTIPLE_SELECTION_LIST) {
 			if (modifiers & B_SHIFT_KEY) {
 				// select entire block
-				// TODO: maybe review if we want it like in Tracker (anchor item)
-				Select(min_c(index, fFirstSelected), max_c(index, fLastSelected));
+				// TODO: maybe review if we want it like in Tracker
+				// (anchor item)
+				Select(min_c(index, fFirstSelected), max_c(index,
+					fLastSelected));
 			} else {
 				if (modifiers & B_COMMAND_KEY) {
 					// toggle selection state of clicked item (like in Tracker)
@@ -545,7 +550,7 @@ BListView::MouseDown(BPoint point)
 	}
 }
 
-// MouseUp
+
 void
 BListView::MouseUp(BPoint pt)
 {
