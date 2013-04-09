@@ -694,7 +694,7 @@ FindPanel::FindPanel(BRect frame, BFile* node, FindWindow* parent,
 
 	BMessenger self(this);
 	fRecentQueries = new BPopUpMenu("RecentQueries");
-	FindPanel::AddRecentQueries(fRecentQueries,	true, &self,
+	FindPanel::AddRecentQueries(fRecentQueries, true, &self,
 		kSwitchToQueryTemplate);
 
 	AddChild(new MiniMenuField(rect, "RecentQueries", fRecentQueries));
@@ -781,9 +781,10 @@ FindPanel::FindPanel(BRect frame, BFile* node, FindWindow* parent,
 
 	rect = expandedBounds;
 	rect.right = rect.left + 200;
-	rect.bottom = rect.top + 20;;
+	rect.bottom = rect.top + 20;
 	fQueryName = new BTextControl(rect, "queryName",
-		B_TRANSLATE("Query name:"), "", 0);
+		B_TRANSLATE("Query name:"), "", B_FOLLOW_NONE,
+		B_NAVIGABLE | B_NAVIGABLE_JUMP);
 	fQueryName->SetDivider(fQueryName->StringWidth(fQueryName->Label()) + 5);
 	fMoreOptionsPane->AddItem(fQueryName, 1);
 	FillCurrentQueryName(fQueryName, parent);
@@ -1886,7 +1887,6 @@ FindPanel::AddRecentQueries(BMenu* menu, bool addSaveAsItem,
 	for (int32 index = 0; index < count; index++)
 		AddOneRecentItem(&recentQueries.ItemAt(index)->first, &params);
 
-
 	if (addSaveAsItem) {
 		// add a Save as template item
 		if (count || templates.CountItems())
@@ -1894,7 +1894,7 @@ FindPanel::AddRecentQueries(BMenu* menu, bool addSaveAsItem,
 
 		BMessage* message = new BMessage(kRunSaveAsTemplatePanel);
 		BMenuItem* item = new BMenuItem(
-			B_TRANSLATE("Save Query as template"B_UTF8_ELLIPSIS), message);
+			B_TRANSLATE("Save Query as template" B_UTF8_ELLIPSIS), message);
 		menu->AddItem(item);
 	}
 }
@@ -2420,7 +2420,8 @@ FindPanel::ShowOrHideMimeTypeMenu()
 
 
 TAttrView::TAttrView(BRect frame, int32 index)
-	:	BView(frame, "AttrView", B_FOLLOW_NONE, B_WILL_DRAW)
+	:
+	BView(frame, "AttrView", B_FOLLOW_NONE, B_WILL_DRAW)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -3059,9 +3060,10 @@ DeleteTransientQueriesTask::StartUpTransientQueryCleaner()
 
 RecentFindItemsMenu::RecentFindItemsMenu(const char* title,
 	const BMessenger* target, uint32 what)
-	:	BMenu(title, B_ITEMS_IN_COLUMN),
-		fTarget(*target),
-		fWhat(what)
+	:
+	BMenu(title, B_ITEMS_IN_COLUMN),
+	fTarget(*target),
+	fWhat(what)
 {
 }
 
@@ -3095,8 +3097,9 @@ TrackerBuildRecentFindItemsMenu(const char* title)
 DraggableQueryIcon::DraggableQueryIcon(BRect frame, const char* name,
 	const BMessage* message, BMessenger messenger, uint32 resizeFlags,
 		uint32 flags)
-	:	DraggableIcon(frame, name, B_QUERY_MIMETYPE, B_LARGE_ICON,
-			message, messenger, resizeFlags, flags)
+	:
+	DraggableIcon(frame, name, B_QUERY_MIMETYPE, B_LARGE_ICON,
+		message, messenger, resizeFlags, flags)
 {
 }
 
@@ -3329,4 +3332,3 @@ MostUsedNames::UpdateList()
 }
 
 }	// namespace BPrivate
-

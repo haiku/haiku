@@ -34,6 +34,7 @@ All rights reserved.
 
 #include "DialogPane.h"
 
+#include <ControlLook.h>
 #include <LayoutUtils.h>
 
 #include "Thread.h"
@@ -73,7 +74,8 @@ ViewList::AddAll(BView* toParent)
 
 DialogPane::DialogPane(BRect mode1Frame, BRect mode2Frame, int32 initialMode,
 	const char* name, uint32 followFlags, uint32 flags)
-	: BView(FrameForMode(initialMode, mode1Frame, mode2Frame, mode2Frame),
+	:
+	BView(FrameForMode(initialMode, mode1Frame, mode2Frame, mode2Frame),
 		name, followFlags, flags),
 	fMode(initialMode),
 	fMode1Frame(mode1Frame),
@@ -495,103 +497,29 @@ PaneSwitch::Track(BPoint point, uint32)
 void
 PaneSwitch::DrawInState(PaneSwitch::State state)
 {
-	BRect rect(0, 0, 10, 10);
+	BRect rect(0, 0, 12, 12);
+	rect.OffsetBy(-1, -1);
 
-	rgb_color outlineColor = {0, 0, 0, 255};
-	rgb_color middleColor = state == kPressed ? kHighlightColor : kNormalColor;
-
-	SetDrawingMode(B_OP_COPY);
+	rgb_color arrowColor = state == kPressed ? kHighlightColor : kNormalColor;
+	int32 arrowDirection = BControlLook::B_RIGHT_ARROW;
+	float tint = IsEnabled() && Window()->IsActive() ? B_DARKEN_3_TINT
+		: B_DARKEN_1_TINT;
 
 	switch (state) {
 		case kCollapsed:
-			BeginLineArray(6);
-
-			if (fLeftAligned) {
-				AddLine(BPoint(rect.left + 3, rect.top + 1),
-					BPoint(rect.left + 3, rect.bottom - 1), outlineColor);
-				AddLine(BPoint(rect.left + 3, rect.top + 1),
-					BPoint(rect.left + 7, rect.top + 5), outlineColor);
-				AddLine(BPoint(rect.left + 7, rect.top + 5),
-					BPoint(rect.left + 3, rect.bottom - 1), outlineColor);
-
-				AddLine(BPoint(rect.left + 4, rect.top + 3),
-					BPoint(rect.left + 4, rect.bottom - 3), middleColor);
-				AddLine(BPoint(rect.left + 5, rect.top + 4),
-					BPoint(rect.left + 5, rect.bottom - 4), middleColor);
-				AddLine(BPoint(rect.left + 5, rect.top + 5),
-					BPoint(rect.left + 6, rect.top + 5), middleColor);
-			} else {
-				AddLine(BPoint(rect.right - 3, rect.top + 1),
-					BPoint(rect.right - 3, rect.bottom - 1), outlineColor);
-				AddLine(BPoint(rect.right - 3, rect.top + 1),
-					BPoint(rect.right - 7, rect.top + 5), outlineColor);
-				AddLine(BPoint(rect.right - 7, rect.top + 5),
-					BPoint(rect.right - 3, rect.bottom - 1), outlineColor);
-
-				AddLine(BPoint(rect.right - 4, rect.top + 3),
-					BPoint(rect.right - 4, rect.bottom - 3), middleColor);
-				AddLine(BPoint(rect.right - 5, rect.top + 4),
-					BPoint(rect.right - 5, rect.bottom - 4), middleColor);
-				AddLine(BPoint(rect.right - 5, rect.top + 5),
-					BPoint(rect.right - 6, rect.top + 5), middleColor);
-			}
-			EndLineArray();
+			arrowDirection = BControlLook::B_RIGHT_ARROW;
 			break;
 
 		case kPressed:
-			BeginLineArray(7);
-			if (fLeftAligned) {
-				AddLine(BPoint(rect.left + 1, rect.top + 7),
-					BPoint(rect.left + 7, rect.top + 7), outlineColor);
-				AddLine(BPoint(rect.left + 7, rect.top + 1),
-					BPoint(rect.left + 7, rect.top + 7), outlineColor);
-				AddLine(BPoint(rect.left + 1, rect.top + 7),
-					BPoint(rect.left + 7, rect.top + 1), outlineColor);
-
-				AddLine(BPoint(rect.left + 3, rect.top + 6),
-					BPoint(rect.left + 6, rect.top + 6), middleColor);
-				AddLine(BPoint(rect.left + 4, rect.top + 5),
-					BPoint(rect.left + 6, rect.top + 5), middleColor);
-				AddLine(BPoint(rect.left + 5, rect.top + 4),
-					BPoint(rect.left + 6, rect.top + 4), middleColor);
-				AddLine(BPoint(rect.left + 6, rect.top + 3),
-					BPoint(rect.left + 6, rect.top + 4), middleColor);
-			} else {
-				AddLine(BPoint(rect.right - 1, rect.top + 7),
-					BPoint(rect.right - 7, rect.top + 7), outlineColor);
-				AddLine(BPoint(rect.right - 7, rect.top + 1),
-					BPoint(rect.right - 7, rect.top + 7), outlineColor);
-				AddLine(BPoint(rect.right - 1, rect.top + 7),
-					BPoint(rect.right - 7, rect.top + 1), outlineColor);
-
-				AddLine(BPoint(rect.right - 3, rect.top + 6),
-					BPoint(rect.right - 6, rect.top + 6), middleColor);
-				AddLine(BPoint(rect.right - 4, rect.top + 5),
-					BPoint(rect.right - 6, rect.top + 5), middleColor);
-				AddLine(BPoint(rect.right - 5, rect.top + 4),
-					BPoint(rect.right - 6, rect.top + 4), middleColor);
-				AddLine(BPoint(rect.right - 6, rect.top + 3),
-					BPoint(rect.right - 6, rect.top + 4), middleColor);
-			}
-			EndLineArray();
+			arrowDirection = BControlLook::B_RIGHT_DOWN_ARROW;
 			break;
 
 		case kExpanded:
-			BeginLineArray(6);
-			AddLine(BPoint(rect.left + 1, rect.top + 3),
-				BPoint(rect.right - 1, rect.top + 3), outlineColor);
-			AddLine(BPoint(rect.left + 1, rect.top + 3),
-				BPoint(rect.left + 5, rect.top + 7), outlineColor);
-			AddLine(BPoint(rect.left + 5, rect.top + 7),
-				BPoint(rect.right - 1, rect.top + 3), outlineColor);
-
-			AddLine(BPoint(rect.left + 3, rect.top + 4),
-				BPoint(rect.right - 3, rect.top + 4), middleColor);
-			AddLine(BPoint(rect.left + 4, rect.top + 5),
-				BPoint(rect.right - 4, rect.top + 5), middleColor);
-			AddLine(BPoint(rect.left + 5, rect.top + 5),
-				BPoint(rect.left + 5, rect.top + 6), middleColor);
-			EndLineArray();
+			arrowDirection = BControlLook::B_DOWN_ARROW;
 			break;
 	}
+
+	SetDrawingMode(B_OP_COPY);
+	be_control_look->DrawArrowShape(this, rect, rect, arrowColor,
+		arrowDirection, 0, tint);
 }
