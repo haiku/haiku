@@ -115,8 +115,7 @@ mkdir -p $installDir/lib/gcc/$haikuMachine/$gccVersion
 if [ "$HAIKU_USE_GCC_GRAPHITE" = 1 ]; then
 	cloogSourceDir=$buildToolsDir/cloog
 	pplSourceDir=$buildToolsDir/ppl
-	find $cloogSourceDir $pplSourceDir -name \*.info -print0 | xargs -0 touch
-	
+
 	pplObjDir=$objDir/ppl
 	cloogObjDir=$objDir/cloog
 	mkdir -p $pplObjDir $cloogObjDir || exit 1
@@ -144,7 +143,7 @@ if [ "$HAIKU_USE_GCC_GRAPHITE" = 1 ]; then
 	cd $pplObjDir
 	CFLAGS="-O2" CXXFLAGS="-O2" $pplSourceDir/configure --prefix=$installDir \
 		--disable-nls --disable-shared --disable-watchdog \
-		|| exit 1
+		--disable-maintainer-mode || exit 1
 	$MAKE $additionalMakeArgs || exit 1
 	$MAKE $additionalMakeArgs install || exit 1
 
