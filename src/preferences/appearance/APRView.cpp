@@ -78,7 +78,8 @@ APRView::APRView(const char* name)
 	fScrollView = new BScrollView("ScrollView", fAttrList, 0, false, true);
 	fScrollView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	for (int32 i = 0; i < color_description_count(); i++) {
+	int32 count = color_description_count();
+	for (int32 i = 0; i < count; i++) {
 		const ColorDescription& description = *get_color_description(i);
 		const char* text = B_TRANSLATE_NOCOLLECT(description.text);
 		color_which which = description.which;
@@ -178,7 +179,8 @@ APRView::MessageReceived(BMessage *msg)
 void
 APRView::LoadSettings()
 {
-	for (int32 i = 0; i < color_description_count(); i++) {
+	int32 count = color_description_count();
+	for (int32 i = 0; i < count; i++) {
 		color_which which = get_color_description(i)->which;
 		fCurrentSet.SetColor(which, ui_color(which));
 	}
@@ -214,11 +216,13 @@ APRView::Revert()
 bool
 APRView::IsDefaultable()
 {
-	for (int32 i = 0; i < color_description_count(); i++) {
+	int32 count = color_description_count();
+	for (int32 i = 0; i < count; i++) {
 		color_which which = get_color_description(i)->which;
 		if (fCurrentSet.GetColor(which) != fDefaultSet.GetColor(which))
 			return true;
 	}
+
 	return false;
 }
 
@@ -226,11 +230,13 @@ APRView::IsDefaultable()
 bool
 APRView::IsRevertable()
 {
-	for (int32 i = 0; i < color_description_count(); i++) {
+	int32 count = color_description_count();
+	for (int32 i = 0; i < count; i++) {
 		color_which which = get_color_description(i)->which;
 		if (fCurrentSet.GetColor(which) != fPrevSet.GetColor(which))
 			return true;
 	}
+
 	return false;
 }
 
@@ -265,7 +271,8 @@ APRView::_UpdateControls()
 void
 APRView::_UpdateAllColors()
 {
-	for (int32 i = 0; i < color_description_count(); i++) {
+	int32 count = color_description_count();
+	for (int32 i = 0; i < count; i++) {
 		color_which which = get_color_description(i)->which;
 		rgb_color color = fCurrentSet.GetColor(which);
 		set_ui_color(which, color);
