@@ -303,6 +303,17 @@ static const char* kUTF16Aliases[] = {
 static const BCharacterSet kUTF16(27, 1000, B_TRANSLATE("Unicode"), "UTF-16", "UTF-16",
 	kUTF16Aliases);
 
+static const char* kWindows1250Aliases[] = {
+	// IANA aliases
+	"cswindows1250",
+	// java aliases
+	"cp1250",
+	"ms-ee",
+	NULL
+};
+static const BCharacterSet kWindows1250(28, 2250, B_TRANSLATE("Windows-1250 "
+	"(CP-1250)"), "windows-1250", "Windows-1250", kWindows1250Aliases);
+
 /**
  * The following initializes the global character set array.
  * It is organized by id for efficient retrieval using predefined constants in UTF8.h and Font.h.
@@ -323,6 +334,7 @@ const BCharacterSet * character_sets_by_id[] = {
 	// R5 convert_to/from_utf8 encodings end here
 	&big5,&gb18030,
 	&kUTF16,
+	&kWindows1250,
 };
 const uint32 character_sets_by_id_count = sizeof(character_sets_by_id)/sizeof(const BCharacterSet*);
 
