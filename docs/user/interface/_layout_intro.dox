@@ -156,4 +156,20 @@ BLayoutBuilder::Group<>(window, B_VERTICAL)
 	This is only one way that you could build this layout, but it is probably
 	the most succinct. Functionally, this is equivalent to all the previous
 	code in this introduction.
+
+\par Special Handling for BBox
+	BBox is a "container" view that can contain other views.
+	The use of the layout manager within an
+	instance of BBox is a special case.  Code such as is shown below is
+	necessary to automatically layout views within a BBox.
+
+\code
+BBox *box = new BBox("box-example");
+BGroupLayout *boxLayout = BLayoutBuilder::Group<>(B_HORIZONTAL)
+	.Add(button1)
+	.Add(button2);
+
+box->AddChild(boxLayout->View());
+\endcode
+
 */
