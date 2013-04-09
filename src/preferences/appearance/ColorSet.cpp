@@ -8,6 +8,7 @@
  *		Rene Gollent <rene@gollent.com>
  */
 
+
 #include <stdio.h>
 #include <Catalog.h>
 #include <DefaultColors.h>
@@ -21,8 +22,10 @@
 #include <String.h>
 #include "ColorSet.h"
 
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Colors tab"
+
 
 static ColorDescription sColorDescriptionTable[] =
 {
@@ -80,6 +83,7 @@ get_color_description(int32 index)
 	return &sColorDescriptionTable[index];
 }
 
+
 int32
 color_description_count(void)
 {
@@ -93,6 +97,7 @@ ColorSet::ColorSet()
 {
 }
 
+
 /*!
 	\brief Copy constructor which does a massive number of assignments
 	\param cs Color set to copy from
@@ -102,12 +107,14 @@ ColorSet::ColorSet(const ColorSet &cs)
 	*this = cs;
 }
 
+
 /*!
-	\brief Overloaded assignment operator which does a massive number of assignments
+	\brief Overloaded assignment operator which does a massive number of
+	       assignments.
 	\param cs Color set to copy from
 	\return The new values assigned to the color set
 */
-ColorSet &
+ColorSet&
 ColorSet::operator=(const ColorSet &cs)
 {
 	fColors = cs.fColors;
@@ -123,7 +130,7 @@ ColorSet
 ColorSet::DefaultColorSet(void)
 {
 	ColorSet set;
-	
+
 	for (int i = 0; i < sColorDescriptionCount; i++) {
 		color_which which = get_color_description(i)->which;
 		set.fColors[which] =
@@ -150,5 +157,3 @@ ColorSet::GetColor(int32 which)
 {
 	return fColors[(color_which)which];
 }
-
-

@@ -17,11 +17,13 @@
 
 #include <map>
 
-typedef struct 
+
+typedef struct
 {
 	color_which which;
-	const char* text;	
+	const char* text;
 } ColorDescription;
+
 
 const ColorDescription* get_color_description(int32 index);
 int32 color_description_count(void);
@@ -39,9 +41,9 @@ class ColorSet : public BLocker {
 
 		rgb_color	GetColor(int32 which);
 		void		SetColor(color_which which, rgb_color value);
-		
+
 		static ColorSet	DefaultColorSet(void);
-	
+
 		inline bool operator==(const ColorSet &other)
 		{
 			return fColors == other.fColors;
@@ -55,5 +57,6 @@ class ColorSet : public BLocker {
 	private:
 		std::map<color_which, rgb_color> fColors;
 };
+
 
 #endif	// COLOR_SET_H
