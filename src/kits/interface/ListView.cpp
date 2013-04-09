@@ -781,7 +781,7 @@ BListItem*
 BListView::RemoveItem(int32 index)
 {
 	BListItem* item = ItemAt(index);
-	if (!item)
+	if (item == NULL)
 		return NULL;
 
 	if (item->IsSelected())
