@@ -16,6 +16,7 @@
 
 #include <Directory.h>
 #include <Entry.h>
+#include <File.h>
 #include <Looper.h>
 #include <NodeMonitor.h>
 #include <Path.h>
@@ -29,11 +30,18 @@
 
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
+#include <PackagesDirectoryDefs.h>
 
 #include "DebugSupport.h"
 
 
-static const char* kPackageFileNameExtension = ".hpkg";
+static const char* const kPackageFileNameExtension = ".hpkg";
+static const char* const kConfigDirectoryName
+	= PACKAGES_DIRECTORY_CONFIG_DIRECTORY;
+static const char* const kActivationFileName
+	= PACKAGES_DIRECTORY_ACTIVATION_FILE;
+static const char* const kTemporaryActivationFileName
+	= PACKAGES_DIRECTORY_ACTIVATION_FILE ".tmp";
 
 
 // #pragma mark - Listener
@@ -493,6 +501,47 @@ fPackagesToBeActivated.size(), fPackagesToBeDeactivated.size());
 
 	fPackagesToBeActivated.clear();
 	fPackagesToBeDeactivated.clear();
+
+	// write the package activation file
+
+	// create the content
+	BString activationFileContent;
+	for (PackageFileNameHashTable::Iterator it
+			= fPackagesByFileName.GetIterator(); it.HasNext();) {
+		Package* package = it.Next();
+		if (package->IsActive())
+			activationFileContent << package->FileName() << '\n';
+	}
+
+	// open and write the temporary file
+	BFile activationFile;
+	BEntry activationFileEntry;
+	status_t error = _OpenPackagesFile(kConfigDirectoryName,
+		kTemporaryActivationFileName,
+		B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE, activationFile,
+		&activationFileEntry);
+	if (error != B_OK) {
+		ERROR("Volume::ProcessPendingPackageActivationChanges(): failed to "
+			"create activation file: %s\n", strerror(error));
+		return;
+	}
+
+	ssize_t bytesWritten = activationFile.Write(activationFileContent.String(),
+		activationFileContent.Length());
+	if (bytesWritten < 0) {
+		ERROR("Volume::ProcessPendingPackageActivationChanges(): failed to "
+			"write activation file: %s\n", strerror(bytesWritten));
+		return;
+	}
+
+	// rename the temporary file to the final file
+	error = activationFileEntry.Rename(kActivationFileName, true);
+	if (error != B_OK) {
+		ERROR("Volume::ProcessPendingPackageActivationChanges(): failed to "
+			"rename temporary activation file to final file: %s\n",
+			strerror(error));
+		return;
+	}
 }
 
 
@@ -672,8 +721,8 @@ Volume::_ReadPackagesDirectory()
 	BDirectory directory;
 	status_t error = directory.SetTo(&fPackagesDirectoryRef);
 	if (error != B_OK) {
-		ERROR("Volume::_ReadPackagesDirectory(): open packages directory: %s\n",
-			strerror(error));
+		ERROR("Volume::_ReadPackagesDirectory(): failed to open packages "
+			"directory: %s\n", strerror(error));
 		RETURN_ERROR(error);
 	}
 
@@ -792,4 +841,77 @@ Volume::_AddRepository(BSolver* solver, BSolverRepository& repository,
 	}
 
 	return B_OK;
+}
+
+
+status_t
+Volume::_OpenPackagesFile(const char* subDirectoryPath, const char* fileName,
+	uint32 openMode, BFile& _file, BEntry* _entry)
+{
+	BDirectory directory;
+	if (subDirectoryPath != NULL) {
+		status_t error = _OpenPackagesSubDirectory(subDirectoryPath,
+			(openMode & B_CREATE_FILE) != 0, directory);
+		if (error != B_OK) {
+			ERROR("Volume::_OpenPackagesFile(): failed to open packages "
+				"subdirectory \"%s\": %s\n", subDirectoryPath, strerror(error));
+			RETURN_ERROR(error);
+		}
+	} else {
+		status_t error = directory.SetTo(&fPackagesDirectoryRef);
+		if (error != B_OK) {
+			ERROR("Volume::_OpenPackagesFile(): failed to open packages "
+				"directory: %s\n", strerror(error));
+			RETURN_ERROR(error);
+		}
+	}
+
+	BEntry stackEntry;
+	BEntry& entry = _entry != NULL ? *_entry : stackEntry;
+	status_t error = entry.SetTo(&directory, fileName);
+	if (error != B_OK) {
+		ERROR("Volume::_OpenPackagesFile(): failed to get entry for file: %s",
+			strerror(error));
+		RETURN_ERROR(error);
+	}
+
+	return _file.SetTo(&entry, openMode);
+}
+
+
+status_t
+Volume::_OpenPackagesSubDirectory(const char* path, bool create,
+	BDirectory& _directory)
+{
+	// open the packages directory
+	BDirectory directory;
+	status_t error = directory.SetTo(&fPackagesDirectoryRef);
+	if (error != B_OK) {
+		ERROR("Volume::_OpenConfigSubDirectory(): failed to open packages "
+			"directory: %s\n", strerror(error));
+		RETURN_ERROR(error);
+	}
+
+	// If creating is not allowed, just try to open it.
+	if (!create)
+		RETURN_ERROR(_directory.SetTo(&directory, path));
+
+	// get an absolute path and create the subdirectory
+	BPath absolutePath;
+	error = absolutePath.SetTo(&directory, path);
+	if (error != B_OK) {
+		ERROR("Volume::_OpenConfigSubDirectory(): failed to get absolute path "
+			"for subdirectory \"%s\": %s\n", path, strerror(error));
+		RETURN_ERROR(error);
+	}
+
+	error = create_directory(absolutePath.Path(),
+		S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
+	if (error != B_OK) {
+		ERROR("Volume::_OpenConfigSubDirectory(): failed to create packages "
+			"subdirectory \"%s\": %s\n", path, strerror(error));
+		RETURN_ERROR(error);
+	}
+
+	RETURN_ERROR(_directory.SetTo(&directory, path));
 }

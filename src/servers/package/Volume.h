@@ -113,6 +113,12 @@ private:
 									BSolverRepository& repository,
 							 		bool activeOnly, bool installed);
 
+			status_t			_OpenPackagesFile(const char* subDirectoryPath,
+									const char* fileName, uint32 openMode,
+									BFile& _file, BEntry* _entry = NULL);
+			status_t			_OpenPackagesSubDirectory(const char* path,
+									bool create, BDirectory& _directory);
+
 private:
 			BString				fPath;
 			PackageFSMountType	fMountType;
