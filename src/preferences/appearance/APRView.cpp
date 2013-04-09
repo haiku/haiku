@@ -227,8 +227,7 @@ APRView::Revert()
 bool
 APRView::IsDefaultable()
 {
-	int32 count = color_description_count();
-	for (int32 i = 0; i < count; i++) {
+	for (int32 i = color_description_count() - 1; i >= 0; i--) {
 		color_which which = get_color_description(i)->which;
 		if (fCurrentSet.GetColor(which) != fDefaultSet.GetColor(which))
 			return true;
@@ -241,8 +240,7 @@ APRView::IsDefaultable()
 bool
 APRView::IsRevertable()
 {
-	int32 count = color_description_count();
-	for (int32 i = 0; i < count; i++) {
+	for (int32 i = color_description_count() - 1; i >= 0; i--) {
 		color_which which = get_color_description(i)->which;
 		if (fCurrentSet.GetColor(which) != fPrevSet.GetColor(which))
 			return true;
@@ -274,8 +272,7 @@ APRView::_SetCurrentColor(rgb_color color)
 void
 APRView::_UpdateAllColors()
 {
-	int32 count = color_description_count();
-	for (int32 i = 0; i < count; i++) {
+	for (int32 i = color_description_count() - 1; i >= 0; i--) {
 		color_which which = get_color_description(i)->which;
 		rgb_color color = fCurrentSet.GetColor(which);
 		set_ui_color(which, color);
