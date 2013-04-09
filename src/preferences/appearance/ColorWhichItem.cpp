@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2008, Haiku. All rights reserved.
+ * Copyright 2002-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		DarkWyrm (darkwyrm@earthlink.net)
- *		Rene Gollent (rene@gollent.com)
- *		Ryan Leavengood <leavengood@gmail.com>
+ *		DarkWyrm, darkwyrm@earthlink.net
+ *		Rene Gollent, rene@gollent.com
+ *		Ryan Leavengood, leavengood@gmail.com
  */
 
 
@@ -25,7 +25,7 @@ ColorWhichItem::ColorWhichItem(const char* text, color_which which,
 
 
 void
-ColorWhichItem::DrawItem(BView *owner, BRect frame, bool complete)
+ColorWhichItem::DrawItem(BView* owner, BRect frame, bool complete)
 {
 	rgb_color highColor = owner->HighColor();
 	rgb_color lowColor = owner->LowColor();
@@ -85,4 +85,3 @@ ColorWhichItem::SetColor(rgb_color color)
 {
 	fColor = color;
 }
-
