@@ -27,8 +27,7 @@
 #define B_TRANSLATION_CONTEXT "Colors tab"
 
 
-static ColorDescription sColorDescriptionTable[] =
-{
+static ColorDescription sColorDescriptionTable[] = {
 	{ B_PANEL_BACKGROUND_COLOR, B_TRANSLATE_MARK("Panel background") },
 	{ B_PANEL_TEXT_COLOR, B_TRANSLATE_MARK("Panel text") },
 	{ B_DOCUMENT_BACKGROUND_COLOR, B_TRANSLATE_MARK("Document background") },
@@ -75,6 +74,7 @@ static ColorDescription sColorDescriptionTable[] =
 const int32 sColorDescriptionCount = sizeof(sColorDescriptionTable)
 	/ sizeof(ColorDescription);
 
+
 const ColorDescription*
 get_color_description(int32 index)
 {
@@ -89,6 +89,7 @@ color_description_count(void)
 {
 	return sColorDescriptionCount;
 }
+
 
 //	#pragma mark -
 

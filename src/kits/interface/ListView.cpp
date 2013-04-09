@@ -885,8 +885,8 @@ BListView::SelectionCommand() const
 void
 BListView::SetListType(list_view_type type)
 {
-	if (fListType == B_MULTIPLE_SELECTION_LIST &&
-		type == B_SINGLE_SELECTION_LIST) {
+	if (fListType == B_MULTIPLE_SELECTION_LIST
+		&& type == B_SINGLE_SELECTION_LIST) {
 		Select(CurrentSelection(0));
 	}
 

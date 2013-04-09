@@ -14,6 +14,7 @@
 
 struct track_data;
 
+
 enum list_view_type {
 	B_SINGLE_SELECTION_LIST,
 	B_MULTIPLE_SELECTION_LIST

@@ -18,10 +18,9 @@
 #include <map>
 
 
-typedef struct
-{
-	color_which which;
-	const char* text;
+typedef struct {
+	color_which	which;
+	const char*	text;
 } ColorDescription;
 
 
