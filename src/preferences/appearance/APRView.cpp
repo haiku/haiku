@@ -1,10 +1,11 @@
 /*
- * Copyright 2002-2011, Haiku. All rights reserved.
+ * Copyright 2002-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		DarkWyrm (darkwyrm@earthlink.net)
- *		Rene Gollent (rene@gollent.com)
+ *		DarkWyrm, darkwyrm@earthlink.net
+ *		Rene Gollent, rene@gollent.com
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -134,8 +135,8 @@ void
 APRView::MessageReceived(BMessage *msg)
 {
 	if (msg->WasDropped()) {
-		rgb_color *color;
-		ssize_t size;
+		rgb_color* color = NULL;
+		ssize_t size = 0;
 
 		if (msg->FindData("RGBColor", (type_code)'RGBC', (const void**)&color,
 				&size) == B_OK) {
@@ -153,6 +154,7 @@ APRView::MessageReceived(BMessage *msg)
 			Window()->PostMessage(kMsgUpdate);
 			break;
 		}
+
 		case ATTRIBUTE_CHOSEN:
 		{
 			// Received when the user chooses a GUI fAttribute from the list
@@ -169,6 +171,7 @@ APRView::MessageReceived(BMessage *msg)
 			Window()->PostMessage(kMsgUpdate);
 			break;
 		}
+
 		default:
 			BView::MessageReceived(msg);
 			break;
@@ -194,8 +197,12 @@ APRView::SetDefaults()
 {
 	fCurrentSet = ColorSet::DefaultColorSet();
 
-	_UpdateControls();
 	_UpdateAllColors();
+
+	rgb_color color = fCurrentSet.GetColor(fWhich);
+	fPicker->SetValue(color);
+	fColorPreview->SetColor(color);
+	fColorPreview->Invalidate();
 
 	Window()->PostMessage(kMsgUpdate);
 }
@@ -206,8 +213,12 @@ APRView::Revert()
 {
 	fCurrentSet = fPrevSet;
 
-	_UpdateControls();
 	_UpdateAllColors();
+
+	rgb_color color = fCurrentSet.GetColor(fWhich);
+	fPicker->SetValue(color);
+	fColorPreview->SetColor(color);
+	fColorPreview->Invalidate();
 
 	Window()->PostMessage(kMsgUpdate);
 }
@@ -246,14 +257,6 @@ APRView::_SetCurrentColor(rgb_color color)
 {
 	fCurrentSet.SetColor(fWhich, color);
 	set_ui_color(fWhich, color);
-	_UpdateControls();
-}
-
-
-void
-APRView::_UpdateControls()
-{
-	rgb_color color = fCurrentSet.GetColor(fWhich);
 
 	int32 currentIndex = fAttrList->CurrentSelection();
 	ColorWhichItem* item = (ColorWhichItem*)fAttrList->ItemAt(currentIndex);
