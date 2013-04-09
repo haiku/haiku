@@ -853,9 +853,9 @@ status_t
 Volume::_AddInitialPackagesFromDirectory()
 {
 	// iterate through the dir and create packages
-	int fd = dup(fPackagesDirectory->DirectoryFD());
+	int fd = openat(fPackagesDirectory->DirectoryFD(), ".", O_RDONLY);
 	if (fd < 0) {
-		ERROR("Failed to dup() packages directory FD: %s\n", strerror(errno));
+		ERROR("Failed to open packages directory: %s\n", strerror(errno));
 		RETURN_ERROR(errno);
 	}
 
