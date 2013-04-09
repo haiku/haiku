@@ -17,7 +17,7 @@
 static inline bigtime_t
 RetryDelay(uint32 attempt, uint32 leaseTime = 0)
 {
-	bigtime_t delay = (1 << attempt - 1) * 100000;
+	bigtime_t delay = (1 << (attempt - 1)) * 100000;
 	if (leaseTime != 0)
 		delay = min_c(delay, sSecToBigTime(leaseTime));
 	return delay;
