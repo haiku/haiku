@@ -36,7 +36,6 @@ const addr_t VMUserAddressSpace::kMaxInitialRandomize	= 0x20000000000ul;
 const addr_t VMUserAddressSpace::kMaxRandomize			=  0x800000ul;
 const addr_t VMUserAddressSpace::kMaxInitialRandomize	= 0x2000000ul;
 #endif
-const addr_t VMUserAddressSpace::kImageEndAddress		= 0x7ffffffful;
 
 
 /*!	Verifies that an area with the given aligned base and size fits into
@@ -74,8 +73,7 @@ static inline bool
 is_randomized(uint32 addressSpec)
 {
 	return addressSpec == B_RANDOMIZED_ANY_ADDRESS
-		|| addressSpec == B_RANDOMIZED_BASE_ADDRESS
-		|| addressSpec == B_RANDOMIZED_IMAGE_ADDRESS;
+		|| addressSpec == B_RANDOMIZED_BASE_ADDRESS;
 }
 
 
@@ -187,11 +185,6 @@ VMUserAddressSpace::InsertArea(VMArea* _area, size_t size,
 		case B_RANDOMIZED_ANY_ADDRESS:
 			searchBase = fBase;
 			searchEnd = fEndAddress;
-			break;
-
-		case B_RANDOMIZED_IMAGE_ADDRESS:
-			searchBase = (addr_t)addressRestrictions->address;
-			searchEnd = min_c(fEndAddress, kImageEndAddress);
 			break;
 
 		default:
@@ -577,9 +570,7 @@ VMUserAddressSpace::_InsertAreaSlot(addr_t start, addr_t size, addr_t end,
 
 	start = ROUNDUP(start, alignment);
 
-	if (addressSpec == B_RANDOMIZED_BASE_ADDRESS
-		|| addressSpec == B_RANDOMIZED_IMAGE_ADDRESS) {
-
+	if (addressSpec == B_RANDOMIZED_BASE_ADDRESS) {
 		originalStart = start;
 		start = _RandomizeAddress(start, end - size, alignment, true);
 	}
@@ -606,7 +597,6 @@ second_chance:
 		case B_RANDOMIZED_ANY_ADDRESS:
 		case B_BASE_ADDRESS:
 		case B_RANDOMIZED_BASE_ADDRESS:
-		case B_RANDOMIZED_IMAGE_ADDRESS:
 		{
 			// find a hole big enough for a new area
 			if (last == NULL) {
@@ -671,8 +661,7 @@ second_chance:
 				area->SetBase(alignedBase);
 				break;
 			} else if (addressSpec == B_BASE_ADDRESS
-				|| addressSpec == B_RANDOMIZED_BASE_ADDRESS
-				|| addressSpec == B_RANDOMIZED_IMAGE_ADDRESS) {
+				|| addressSpec == B_RANDOMIZED_BASE_ADDRESS) {
 
 				// we didn't find a free spot in the requested range, so we'll
 				// try again without any restrictions

@@ -67,7 +67,6 @@ private:
 private:
 	static	const addr_t		kMaxRandomize;
 	static	const addr_t		kMaxInitialRandomize;
-	static	const addr_t		kImageEndAddress;
 
 			VMUserAreaList		fAreas;
 	mutable	VMUserArea*			fAreaHint;
