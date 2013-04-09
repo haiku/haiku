@@ -276,5 +276,7 @@ APRView::_UpdateAllColors()
 		color_which which = get_color_description(i)->which;
 		rgb_color color = fCurrentSet.GetColor(which);
 		set_ui_color(which, color);
+		static_cast<ColorWhichItem*>(fAttrList->ItemAt(i))->SetColor(color);
+		fAttrList->InvalidateItem(i);
 	}
 }
