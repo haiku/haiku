@@ -497,14 +497,14 @@ NFS4Inode::CreateFile(const char* name, int mode, int perms, OpenState* state,
 
 		ReplyInterpreter& reply = request.Reply();
 
-		sequence += IncrementSequence(reply.NFS4Error());
+		result = reply.PutFH();
+		if (result == B_OK)
+			sequence += IncrementSequence(reply.NFS4Error());
 
 		if (HandleErrors(attempt, reply.NFS4Error(), serv, NULL, state,
 				&sequence)) {
 			continue;
 		}
-
-		reply.PutFH();
 
 		result = reply.Open(state->fStateID, &state->fStateSeq, &confirm,
 			delegation, changeInfo);
@@ -596,13 +596,6 @@ NFS4Inode::OpenFile(OpenState* state, int mode, OpenDelegationData* delegation)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		sequence += IncrementSequence(reply.NFS4Error());
-
-		if (HandleErrors(attempt, reply.NFS4Error(), serv, NULL, state,
-				&sequence)) {
-			continue;
-		}
-
 		// Verify if the file we want to open is the file this Inode
 		// represents.
 		if (fFileSystem->IsAttrSupported(FATTR4_FILEID)
@@ -615,16 +608,21 @@ NFS4Inode::OpenFile(OpenState* state, int mode, OpenDelegationData* delegation)
 			}
 
 			result = reply.Verify();
-			if (result != B_OK)
+			if (result != B_OK && reply.NFS4Error() == NFS4ERR_NOT_SAME) {
 				fFileSystem->OpenOwnerSequenceUnlock(sequence);
-
-			if (result != B_OK && reply.NFS4Error() == NFS4ERR_NOT_SAME)
 				return B_ENTRY_NOT_FOUND;
-			else if (result != B_OK)
-				return result;
+			}
 		}
 
-		reply.PutFH();
+		result = reply.PutFH();
+		if (result == B_OK)
+			sequence += IncrementSequence(reply.NFS4Error());
+
+		if (HandleErrors(attempt, reply.NFS4Error(), serv, NULL, state,
+				&sequence)) {
+			continue;
+		}
+
 		result = reply.Open(state->fStateID, &state->fStateSeq, &confirm,
 			delegation);
 		if (result != B_OK) {
@@ -686,14 +684,15 @@ NFS4Inode::OpenAttr(OpenState* state, const char* name, int mode,
 
 		ReplyInterpreter& reply = request.Reply();
 
-		sequence += IncrementSequence(reply.NFS4Error());
+		result = reply.PutFH();
+		if (result == B_OK)
+			sequence += IncrementSequence(reply.NFS4Error());
 
 		if (HandleErrors(attempt, reply.NFS4Error(), serv, NULL, state,
 				&sequence)) {
 			continue;
 		}
 
-		reply.PutFH();
 		result = reply.Open(state->fStateID, &state->fStateSeq, &confirm,
 			delegation);
 
@@ -1135,9 +1134,10 @@ NFS4Inode::AcquireLock(OpenFileCookie* cookie, LockInfo* lockInfo, bool wait)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		sequence += IncrementSequence(reply.NFS4Error());
+		result = reply.PutFH();
+		if (result == B_OK)
+			sequence += IncrementSequence(reply.NFS4Error());
 
-		reply.PutFH();
 		result = reply.Lock(lockInfo);
 
 		ownerLocker.Unlock();

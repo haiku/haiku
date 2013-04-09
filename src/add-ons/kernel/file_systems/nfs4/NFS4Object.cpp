@@ -209,12 +209,13 @@ NFS4Object::ConfirmOpen(const FileHandle& fh, OpenState* state,
 
 		ReplyInterpreter& reply = request.Reply();
 
-		*sequence += IncrementSequence(reply.NFS4Error());
+		result = reply.PutFH();
+		if (result == B_OK)
+			*sequence += IncrementSequence(reply.NFS4Error());
 
 		if (HandleErrors(attempt, reply.NFS4Error(), serv, NULL, state))
 			continue;
 
-		reply.PutFH();
 		result = reply.OpenConfirm(&state->fStateSeq);
 		if (result != B_OK)
 			return result;
