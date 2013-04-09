@@ -25,6 +25,11 @@ class BDirectory;
 
 class Root;
 
+namespace BPackageKit {
+	class BSolver;
+	class BSolverRepository;
+}
+
 
 class Volume : public BHandler {
 public:
@@ -37,6 +42,12 @@ public:
 			status_t			Init(const node_ref& rootDirectoryRef,
 									node_ref& _packageRootRef);
 			status_t			InitPackages(Listener* listener);
+
+			status_t			AddPackagesToRepository(
+									BSolverRepository& repository,
+									bool activeOnly);
+			void				InitialVerify(Volume* nextVolume,
+									Volume* nextNextVolume);
 
 			void				Unmounted();
 
@@ -97,6 +108,10 @@ private:
 
 			status_t			_ReadPackagesDirectory();
 			status_t			_GetActivePackages(int fd);
+
+			status_t			_AddRepository(BSolver* solver,
+									BSolverRepository& repository,
+							 		bool activeOnly, bool installed);
 
 private:
 			BString				fPath;

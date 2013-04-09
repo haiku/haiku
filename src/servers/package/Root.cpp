@@ -202,10 +202,43 @@ Root::_GetVolume(PackageFSMountType mountType)
 }
 
 
+Volume*
+Root::_NextVolumeFor(Volume* volume)
+{
+	if (volume == NULL)
+		return NULL;
+
+	PackageFSMountType mountType = volume->MountType();
+
+	do {
+		switch (mountType) {
+			case PACKAGE_FS_MOUNT_TYPE_HOME:
+				mountType = PACKAGE_FS_MOUNT_TYPE_COMMON;
+				break;
+			case PACKAGE_FS_MOUNT_TYPE_COMMON:
+				mountType = PACKAGE_FS_MOUNT_TYPE_SYSTEM;
+				break;
+			case PACKAGE_FS_MOUNT_TYPE_SYSTEM:
+			case PACKAGE_FS_MOUNT_TYPE_CUSTOM:
+			default:
+				return NULL;
+		}
+
+		volume = *_GetVolume(mountType);
+	} while (volume == NULL);
+
+	return volume;
+}
+
+
 void
 Root::_InitPackages(Volume* volume)
 {
-	volume->InitPackages(this);
+	if (volume->InitPackages(this) == B_OK) {
+		Volume* nextVolume = _NextVolumeFor(volume);
+		Volume* nextNextVolume = _NextVolumeFor(nextVolume);
+		volume->InitialVerify(nextVolume, nextNextVolume);
+	}
 }
 
 

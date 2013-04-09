@@ -52,6 +52,7 @@ private:
 
 private:
 			Volume**			_GetVolume(PackageFSMountType mountType);
+			Volume*				_NextVolumeFor(Volume* volume);
 
 			void				_InitPackages(Volume* volume);
 			void				_DeleteVolume(Volume* volume);

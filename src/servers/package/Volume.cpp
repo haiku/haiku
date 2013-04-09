@@ -20,6 +20,13 @@
 #include <NodeMonitor.h>
 #include <Path.h>
 
+#include <package/solver/Solver.h>
+#include <package/solver/SolverPackage.h>
+#include <package/solver/SolverProblem.h>
+#include <package/solver/SolverProblemSolution.h>
+#include <package/solver/SolverRepository.h>
+#include <package/solver/SolverResult.h>
+
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
 
@@ -202,6 +209,114 @@ Volume::InitPackages(Listener* listener)
 		RETURN_ERROR(error);
 
 	return B_OK;
+}
+
+
+status_t
+Volume::AddPackagesToRepository(BSolverRepository& repository, bool activeOnly)
+{
+	for (PackageFileNameHashTable::Iterator it
+			= fPackagesByFileName.GetIterator(); it.HasNext();) {
+		Package* package = it.Next();
+		if (activeOnly && !package->IsActive())
+			continue;
+
+		status_t error = repository.AddPackage(package->Info());
+		if (error != B_OK) {
+			ERROR("Volume::AddPackagesToRepository(): failed to add package %s "
+				"to repository: %s\n", package->FileName().String(),
+				strerror(error));
+			return error;
+		}
+	}
+
+	return B_OK;
+}
+
+
+void
+Volume::InitialVerify(Volume* nextVolume, Volume* nextNextVolume)
+{
+INFORM("Volume::InitialVerify(%p, %p)\n", nextVolume, nextNextVolume);
+	// create the solver
+	BSolver* solver;
+	status_t error = BSolver::Create(solver);
+	if (error != B_OK) {
+		ERROR("Volume::InitialVerify(): failed to create solver: %s\n",
+			strerror(error));
+		return;
+	}
+	ObjectDeleter<BSolver> solverDeleter(solver);
+
+	// add a repository with all active packages
+	BSolverRepository repository;
+	error = _AddRepository(solver, repository, true, true);
+	if (error != B_OK) {
+		ERROR("Volume::InitialVerify(): failed to add repository: %s\n",
+			strerror(error));
+		return;
+	}
+
+	// add a repository for the next volume
+	BSolverRepository nextRepository;
+	if (nextVolume != NULL) {
+		nextRepository.SetPriority(1);
+		error = nextVolume->_AddRepository(solver, nextRepository, true, false);
+		if (error != B_OK) {
+			ERROR("Volume::InitialVerify(): failed to add repository: %s\n",
+				strerror(error));
+			return;
+		}
+	}
+
+	// add a repository for the next next volume
+	BSolverRepository nextNextRepository;
+	if (nextNextVolume != NULL) {
+		nextNextRepository.SetPriority(2);
+		error = nextNextVolume->_AddRepository(solver, nextNextRepository, true,
+			false);
+		if (error != B_OK) {
+			ERROR("Volume::InitialVerify(): failed to add repository: %s\n",
+				strerror(error));
+			return;
+		}
+	}
+
+	// verify
+	error = solver->VerifyInstallation();
+	if (error != B_OK) {
+		ERROR("Volume::InitialVerify(): failed to verify: %s\n",
+			strerror(error));
+		return;
+	}
+
+	if (!solver->HasProblems()) {
+		INFORM("Volume::InitialVerify(): volume at \"%s\" is consistent\n",
+			Path().String());
+		return;
+	}
+
+	// print the problems
+// TODO: Notify the user ...
+	INFORM("Volume::InitialVerify(): volume at \"%s\" has problems:\n",
+		Path().String());
+
+	int32 problemCount = solver->CountProblems();
+	for (int32 i = 0; i < problemCount; i++) {
+		BSolverProblem* problem = solver->ProblemAt(i);
+		INFORM("  %" B_PRId32 ": %s\n", i + 1, problem->ToString().String());
+		int32 solutionCount = problem->CountSolutions();
+		for (int32 k = 0; k < solutionCount; k++) {
+			const BSolverProblemSolution* solution = problem->SolutionAt(k);
+			INFORM("    solution %" B_PRId32 ":\n", k + 1);
+			int32 elementCount = solution->CountElements();
+			for (int32 l = 0; l < elementCount; l++) {
+				const BSolverProblemSolutionElement* element
+					= solution->ElementAt(l);
+				INFORM("      - %s\n", element->ToString().String());
+			}
+		}
+	}
 }
 
 
@@ -644,6 +759,37 @@ for (PackageNodeRefHashTable::Iterator it = fPackagesByNodeRef.GetIterator();
 // 	INFORM("  dev: %" B_PRIdDEV ", node: %" B_PRIdINO "\n",
 // 		request->infos[i].packageDeviceID, request->infos[i].packageNodeID);
 // }
+
+	return B_OK;
+}
+
+
+status_t
+Volume::_AddRepository(BSolver* solver, BSolverRepository& repository,
+	bool activeOnly, bool installed)
+{
+	status_t error = repository.SetTo(Path());
+	if (error != B_OK) {
+		ERROR("Volume::_AddRepository(): failed to init repository: %s\n",
+			strerror(error));
+		return error;
+	}
+
+	repository.SetInstalled(installed);
+
+	error = AddPackagesToRepository(repository, true);
+	if (error != B_OK) {
+		ERROR("Volume::_AddRepository(): failed to add packages to "
+			"repository: %s\n", strerror(error));
+		return error;
+	}
+
+	error = solver->AddRepository(&repository);
+	if (error != B_OK) {
+		ERROR("Volume::_AddRepository(): failed to add repository to solver: "
+			"%s\n", strerror(error));
+		return error;
+	}
 
 	return B_OK;
 }
