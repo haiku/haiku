@@ -197,7 +197,7 @@ BackgroundImage::Show(BackgroundImageInfo* info, BView* view)
 	BRect bitmapBounds(info->fBitmap->Bounds());
 	BRect destinationBitmapBounds(bitmapBounds);
 
-	uint32 tile = 0;
+	uint32 options = 0;
 	uint32 followFlags = B_FOLLOW_TOP | B_FOLLOW_LEFT;
 
 	// figure out the display mode and the destination bounds for the bitmap
@@ -225,6 +225,7 @@ BackgroundImage::Show(BackgroundImageInfo* info, BView* view)
 						viewBounds.Width(), viewBounds.Height() + overlap);
 				}
 				followFlags = B_FOLLOW_ALL;
+				options |= B_FILTER_BITMAP_BILINEAR;
 				break;
 			}
 			// else fall thru
@@ -237,13 +238,13 @@ BackgroundImage::Show(BackgroundImageInfo* info, BView* view)
 					(viewBounds.Width() - bitmapBounds.Width()) / 2,
 					(viewBounds.Height() - bitmapBounds.Height()) / 2);
 			}
-			tile = B_TILE_BITMAP;
+			options |= B_TILE_BITMAP;
 			break;
 	}
 
 	// switch to the bitmap and force a redraw
 	view->SetViewBitmap(info->fBitmap, bitmapBounds, destinationBitmapBounds,
-		followFlags, tile);
+		followFlags, options);
 	view->Invalidate();
 	fShowingBitmap = info;
 }
