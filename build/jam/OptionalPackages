@@ -882,8 +882,8 @@ if [ IsOptionalHaikuImagePackageAdded LibIconv ] {
 				: $(baseURL)/libiconv-1.13.1-r1a3-x86-gcc4-2011-05-24.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				libiconv-1.13.1-2-x86_gcc2.hpkg
-				: $(hpkgBaseURL)/libiconv-1.13.1-2-x86_gcc2.hpkg
+				libiconv-1.13.1-3-x86_gcc2.hpkg
+				: $(hpkgBaseURL)/libiconv-1.13.1-3-x86_gcc2.hpkg
 				: common packages ;
 		}
 	}
@@ -1393,8 +1393,8 @@ if [ IsOptionalHaikuImagePackageAdded SQLite ] {
 				: $(baseURL)/sqlite-3.7.5-r1a3-x86-gcc4-2011-05-24.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				sqlite-3.7.5-2-x86_gcc2.hpkg
-				: $(hpkgBaseURL)/sqlite-3.7.5-2-x86_gcc2.hpkg
+				sqlite-3.7.5-3-x86_gcc2.hpkg
+				: $(hpkgBaseURL)/sqlite-3.7.5-3-x86_gcc2.hpkg
 				: common packages ;
 		}
 	}
