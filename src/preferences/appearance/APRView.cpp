@@ -157,7 +157,7 @@ APRView::MessageReceived(BMessage *msg)
 		{
 			// Received when the user chooses a GUI fAttribute from the list
 
-			ColorWhichItem *item = (ColorWhichItem*)
+			ColorWhichItem* item = (ColorWhichItem*)
 				fAttrList->ItemAt(fAttrList->CurrentSelection());
 			if (item == NULL)
 				break;
@@ -256,7 +256,7 @@ APRView::_UpdateControls()
 	rgb_color color = fCurrentSet.GetColor(fWhich);
 
 	int32 currentIndex = fAttrList->CurrentSelection();
-	ColorWhichItem *item = (ColorWhichItem*) fAttrList->ItemAt(currentIndex);
+	ColorWhichItem* item = (ColorWhichItem*)fAttrList->ItemAt(currentIndex);
 	if (item != NULL) {
 		item->SetColor(color);
 		fAttrList->InvalidateItem(currentIndex);
