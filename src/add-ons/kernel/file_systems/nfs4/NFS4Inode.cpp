@@ -20,6 +20,7 @@ NFS4Inode::GetChangeInfo(uint64* change, bool attrDir)
 {
 	ASSERT(change != NULL);
 
+	uint32 attempt = 0;
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -39,7 +40,7 @@ NFS4Inode::GetChangeInfo(uint64* change, bool attrDir)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), serv))
+		if (HandleErrors(attempt, reply.NFS4Error(), serv))
 			continue;
 
 		reply.PutFH();
@@ -62,6 +63,7 @@ NFS4Inode::GetChangeInfo(uint64* change, bool attrDir)
 status_t
 NFS4Inode::CommitWrites()
 {
+	uint32 attempt = 0;
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -76,7 +78,7 @@ NFS4Inode::CommitWrites()
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), serv))
+		if (HandleErrors(attempt, reply.NFS4Error(), serv))
 			continue;
 
 		reply.PutFH();
@@ -90,6 +92,7 @@ NFS4Inode::Access(uint32* allowed)
 {
 	ASSERT(allowed != NULL);
 
+	uint32 attempt = 0;
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -104,7 +107,7 @@ NFS4Inode::Access(uint32* allowed)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), serv))
+		if (HandleErrors(attempt, reply.NFS4Error(), serv))
 			continue;
 
 		reply.PutFH();
@@ -120,6 +123,7 @@ NFS4Inode::LookUp(const char* name, uint64* change, uint64* fileID,
 {
 	ASSERT(name != NULL);
 
+	uint32 attempt = 0;
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -150,7 +154,7 @@ NFS4Inode::LookUp(const char* name, uint64* change, uint64* fileID,
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), serv))
+		if (HandleErrors(attempt, reply.NFS4Error(), serv))
 			continue;
 
 		reply.PutFH();
@@ -209,6 +213,7 @@ NFS4Inode::Link(Inode* dir, const char* name, ChangeInfo* changeInfo)
 	ASSERT(name != NULL);
 	ASSERT(changeInfo != NULL);
 
+	uint32 attempt = 0;
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -225,7 +230,7 @@ NFS4Inode::Link(Inode* dir, const char* name, ChangeInfo* changeInfo)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), serv))
+		if (HandleErrors(attempt, reply.NFS4Error(), serv))
 			continue;
 
 		reply.PutFH();
@@ -244,6 +249,7 @@ NFS4Inode::ReadLink(void* buffer, size_t* length)
 	ASSERT(buffer != NULL);
 	ASSERT(length != NULL);
 
+	uint32 attempt = 0;
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -258,7 +264,7 @@ NFS4Inode::ReadLink(void* buffer, size_t* length)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), serv))
+		if (HandleErrors(attempt, reply.NFS4Error(), serv))
 			continue;
 
 		reply.PutFH();
@@ -278,6 +284,7 @@ NFS4Inode::GetStat(AttrValue** values, uint32* count, OpenAttrCookie* cookie)
 	ASSERT(values != NULL);
 	ASSERT(count != NULL);
 
+	uint32 attempt = 0;
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -300,7 +307,7 @@ NFS4Inode::GetStat(AttrValue** values, uint32* count, OpenAttrCookie* cookie)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), serv))
+		if (HandleErrors(attempt, reply.NFS4Error(), serv))
 			continue;
 
 		reply.PutFH();
@@ -315,6 +322,7 @@ NFS4Inode::WriteStat(OpenState* state, AttrValue* attrs, uint32 attrCount)
 {
 	ASSERT(attrs != NULL);
 
+	uint32 attempt = 0;
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -334,7 +342,7 @@ NFS4Inode::WriteStat(OpenState* state, AttrValue* attrs, uint32 attrCount)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), serv))
+		if (HandleErrors(attempt, reply.NFS4Error(), serv))
 			continue;
 
 		reply.PutFH();
@@ -360,9 +368,10 @@ NFS4Inode::RenameNode(Inode* from, Inode* to, const char* fromName,
 	ASSERT(fromChange != NULL);
 	ASSERT(toChange != NULL);
 
+	uint32 attempt = 0;
 	do {
-		RPC::Server* serv = from->fFileSystem->Server();
-		Request request(serv, from->fFileSystem);
+		RPC::Server* server = from->fFileSystem->Server();
+		Request request(server, from->fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		if (attribute)
@@ -388,24 +397,14 @@ NFS4Inode::RenameNode(Inode* from, Inode* to, const char* fromName,
 
 		ReplyInterpreter& reply = request.Reply();
 
-		// FileHandle has expired
-		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
-			from->fInfo.UpdateFileHandles(from->fFileSystem);
-			to->fInfo.UpdateFileHandles(to->fFileSystem);
+		// If we have to wait, migrate to another server, etc then the first
+		// HandleErrors() will do that. However, if the file handles
+		// were invalid then we need to update both Inodes.
+		bool retry = from->HandleErrors(attempt, reply.NFS4Error(), server);
+		if (IsFileHandleInvalid(reply.NFS4Error()))
+			retry |= to->HandleErrors(attempt, reply.NFS4Error(), server);
+		if (retry)
 			continue;
-		}
-
-		// filesystem has been moved
-		if (reply.NFS4Error() == NFS4ERR_MOVED) {
-			from->fFileSystem->Migrate(serv);
-			continue;
-		}
-
-		// need to wait
-		if (reply.NFS4Error() == NFS4ERR_DELAY) {
-			snooze_etc(sSecToBigTime(5), B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
-			continue;
-		}
 
 		reply.PutFH();
 		reply.SaveFH();
@@ -455,6 +454,7 @@ NFS4Inode::CreateFile(const char* name, int mode, int perms, OpenState* state,
 	bool confirm;
 	status_t result;
 
+	uint32 attempt = 0;
 	uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
 	do {
 		state->fClientID = fFileSystem->NFSServer()->ClientId();
@@ -497,12 +497,14 @@ NFS4Inode::CreateFile(const char* name, int mode, int perms, OpenState* state,
 
 		ReplyInterpreter& reply = request.Reply();
 
-		sequence += IncrementSequence(reply.NFS4Error());
+		result = reply.PutFH();
+		if (result == B_OK)
+			sequence += IncrementSequence(reply.NFS4Error());
 
-		if (HandleErrors(reply.NFS4Error(), serv, NULL, state, &sequence))
+		if (HandleErrors(attempt, reply.NFS4Error(), serv, NULL, state,
+				&sequence)) {
 			continue;
-
-		reply.PutFH();
+		}
 
 		result = reply.Open(state->fStateID, &state->fStateSeq, &confirm,
 			delegation, changeInfo);
@@ -549,6 +551,8 @@ NFS4Inode::OpenFile(OpenState* state, int mode, OpenDelegationData* delegation)
 
 	bool confirm;
 	status_t result;
+
+	uint32 attempt = 0;
 	uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
 	do {
 		state->fClientID = fFileSystem->NFSServer()->ClientId();
@@ -592,11 +596,6 @@ NFS4Inode::OpenFile(OpenState* state, int mode, OpenDelegationData* delegation)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		sequence += IncrementSequence(reply.NFS4Error());
-
-		if (HandleErrors(reply.NFS4Error(), serv, NULL, state, &sequence))
-			continue;
-
 		// Verify if the file we want to open is the file this Inode
 		// represents.
 		if (fFileSystem->IsAttrSupported(FATTR4_FILEID)
@@ -609,16 +608,21 @@ NFS4Inode::OpenFile(OpenState* state, int mode, OpenDelegationData* delegation)
 			}
 
 			result = reply.Verify();
-			if (result != B_OK)
+			if (result != B_OK && reply.NFS4Error() == NFS4ERR_NOT_SAME) {
 				fFileSystem->OpenOwnerSequenceUnlock(sequence);
-
-			if (result != B_OK && reply.NFS4Error() == NFS4ERR_NOT_SAME)
 				return B_ENTRY_NOT_FOUND;
-			else if (result != B_OK)
-				return result;
+			}
 		}
 
-		reply.PutFH();
+		result = reply.PutFH();
+		if (result == B_OK)
+			sequence += IncrementSequence(reply.NFS4Error());
+
+		if (HandleErrors(attempt, reply.NFS4Error(), serv, NULL, state,
+				&sequence)) {
+			continue;
+		}
+
 		result = reply.Open(state->fStateID, &state->fStateSeq, &confirm,
 			delegation);
 		if (result != B_OK) {
@@ -656,6 +660,8 @@ NFS4Inode::OpenAttr(OpenState* state, const char* name, int mode,
 
 	bool confirm;
 	status_t result;
+
+	uint32 attempt = 0;
 	uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
 	do {
 		state->fClientID = fFileSystem->NFSServer()->ClientId();
@@ -678,12 +684,15 @@ NFS4Inode::OpenAttr(OpenState* state, const char* name, int mode,
 
 		ReplyInterpreter& reply = request.Reply();
 
-		sequence += IncrementSequence(reply.NFS4Error());
+		result = reply.PutFH();
+		if (result == B_OK)
+			sequence += IncrementSequence(reply.NFS4Error());
 
-		if (HandleErrors(reply.NFS4Error(), serv, NULL, state, &sequence))
+		if (HandleErrors(attempt, reply.NFS4Error(), serv, NULL, state,
+				&sequence)) {
 			continue;
+		}
 
-		reply.PutFH();
 		result = reply.Open(state->fStateID, &state->fStateSeq, &confirm,
 			delegation);
 
@@ -716,6 +725,7 @@ NFS4Inode::ReadFile(OpenStateCookie* cookie, OpenState* state, uint64 position,
 	ASSERT(buffer != NULL);
 	ASSERT(eof != NULL);
 
+	uint32 attempt = 0;
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -730,7 +740,7 @@ NFS4Inode::ReadFile(OpenStateCookie* cookie, OpenState* state, uint64 position,
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), serv, cookie, state))
+		if (HandleErrors(attempt, reply.NFS4Error(), serv, cookie, state))
 			continue;
 
 		reply.PutFH();
@@ -751,6 +761,7 @@ NFS4Inode::WriteFile(OpenStateCookie* cookie, OpenState* state, uint64 position,
 	ASSERT(length != NULL);
 	ASSERT(buffer != NULL);
 
+	uint32 attempt = 0;
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -767,7 +778,7 @@ NFS4Inode::WriteFile(OpenStateCookie* cookie, OpenState* state, uint64 position,
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), serv, cookie, state))
+		if (HandleErrors(attempt, reply.NFS4Error(), serv, cookie, state))
 			continue;
 
 		reply.PutFH();
@@ -790,6 +801,7 @@ NFS4Inode::CreateObject(const char* name, const char* path, int mode,
 	ASSERT(changeInfo != NULL);
 	ASSERT(handle != NULL);
 
+	uint32 attempt = 0;
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -829,7 +841,7 @@ NFS4Inode::CreateObject(const char* name, const char* path, int mode,
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), serv))
+		if (HandleErrors(attempt, reply.NFS4Error(), serv))
 			continue;
 
 		reply.PutFH();
@@ -869,6 +881,7 @@ NFS4Inode::RemoveObject(const char* name, FileType type, ChangeInfo* changeInfo,
 	ASSERT(name != NULL);
 	ASSERT(changeInfo != NULL);
 
+	uint32 attempt = 0;
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -899,7 +912,7 @@ NFS4Inode::RemoveObject(const char* name, FileType type, ChangeInfo* changeInfo,
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), serv))
+		if (HandleErrors(attempt, reply.NFS4Error(), serv))
 			continue;
 
 		reply.PutFH();
@@ -949,6 +962,7 @@ NFS4Inode::ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
 	ASSERT(count != NULL);
 	ASSERT(eof != NULL);
 
+	uint32 attempt = 0;
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -975,7 +989,7 @@ NFS4Inode::ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), serv))
+		if (HandleErrors(attempt, reply.NFS4Error(), serv))
 			continue;
 
 		reply.PutFH();
@@ -1022,6 +1036,7 @@ NFS4Inode::OpenAttrDir(FileHandle* handle)
 {
 	ASSERT(handle != NULL);
 
+	uint32 attempt = 0;
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -1037,7 +1052,7 @@ NFS4Inode::OpenAttrDir(FileHandle* handle)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), serv))
+		if (HandleErrors(attempt, reply.NFS4Error(), serv))
 			continue;
 
 		reply.PutFH();
@@ -1059,6 +1074,7 @@ NFS4Inode::TestLock(OpenFileCookie* cookie, LockType* type, uint64* position,
 	ASSERT(position != NULL);
 	ASSERT(length != NULL);
 
+	uint32 attempt = 0;
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -1072,8 +1088,10 @@ NFS4Inode::TestLock(OpenFileCookie* cookie, LockType* type, uint64* position,
 			return result;
 
 		ReplyInterpreter& reply = request.Reply();
-		if (HandleErrors(reply.NFS4Error(), serv, cookie))
-			continue;
+		if (reply.NFS4Error() != NFS4ERR_DENIED) {
+			if (HandleErrors(attempt, reply.NFS4Error(), serv, cookie))
+				continue;
+		}
 
 		reply.PutFH();
 		result = reply.LockT(position, length, type);
@@ -1096,6 +1114,7 @@ NFS4Inode::AcquireLock(OpenFileCookie* cookie, LockInfo* lockInfo, bool wait)
 	ASSERT(cookie != NULL);
 	ASSERT(lockInfo != NULL);
 
+	uint32 attempt = 0;
 	uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
 	do {
 		MutexLocker ownerLocker(lockInfo->fOwner->fLock);
@@ -1115,21 +1134,20 @@ NFS4Inode::AcquireLock(OpenFileCookie* cookie, LockInfo* lockInfo, bool wait)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		sequence += IncrementSequence(reply.NFS4Error());
+		result = reply.PutFH();
+		if (result == B_OK)
+			sequence += IncrementSequence(reply.NFS4Error());
 
-		reply.PutFH();
 		result = reply.Lock(lockInfo);
 
 		ownerLocker.Unlock();
-		if (wait && reply.NFS4Error() == NFS4ERR_DENIED) {
-			fFileSystem->OpenOwnerSequenceUnlock(sequence);
-			snooze_etc(sSecToBigTime(5), B_SYSTEM_TIMEBASE,
-				B_RELATIVE_TIMEOUT);
-			sequence = fFileSystem->OpenOwnerSequenceLock();
-			continue;
+
+		if (reply.NFS4Error() != NFS4ERR_DENIED || wait) {
+			if (HandleErrors(attempt, reply.NFS4Error(), serv, cookie, NULL,
+					&sequence)) {
+				continue;
+			}
 		}
-		if (HandleErrors(reply.NFS4Error(), serv, cookie, NULL, &sequence))
-			continue;
 
 		fFileSystem->OpenOwnerSequenceUnlock(sequence);
 		if (result != B_OK)
@@ -1146,6 +1164,7 @@ NFS4Inode::ReleaseLock(OpenFileCookie* cookie, LockInfo* lockInfo)
 	ASSERT(cookie != NULL);
 	ASSERT(lockInfo != NULL);
 
+	uint32 attempt = 0;
 	do {
 		MutexLocker ownerLocker(lockInfo->fOwner->fLock);
 
@@ -1166,7 +1185,7 @@ NFS4Inode::ReleaseLock(OpenFileCookie* cookie, LockInfo* lockInfo)
 		result = reply.LockU(lockInfo);
 
 		ownerLocker.Unlock();
-		if (HandleErrors(reply.NFS4Error(), serv, cookie))
+		if (HandleErrors(attempt, reply.NFS4Error(), serv, cookie))
 			continue;
 
 		if (result != B_OK)

@@ -72,7 +72,7 @@ VnodeToInode::VnodeToInode(ino_t id, FileSystem* fileSystem)
 inline
 VnodeToInode::~VnodeToInode()
 {
-	Replace(NULL);
+	Clear();
 	if (fFileSystem != NULL && !IsRoot())
 		fFileSystem->InoIdMap()->RemoveEntry(fID);
 	rw_lock_destroy(&fLock);
@@ -96,10 +96,7 @@ VnodeToInode::Unlock()
 inline void
 VnodeToInode::Clear()
 {
-	WriteLocker _(fLock);
-	if (!IsRoot())
-		delete fInode;
-	fInode = NULL;
+	Replace(NULL);
 }
 
 

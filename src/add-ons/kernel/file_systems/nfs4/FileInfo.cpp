@@ -148,8 +148,12 @@ FileInfo::UpdateFileHandles(FileSystem* fs)
 
 	uint32 i;
 	InodeNames* names = fNames;
-	for (i = 0; names != NULL; i++)
+	for (i = 0; names != NULL; i++) {
+		if (names->fNames.IsEmpty())
+			return B_ENTRY_NOT_FOUND;
+
 		names = names->fNames.Head()->fParent;
+	}
 
 	if (i > 0) {
 		names = fNames;

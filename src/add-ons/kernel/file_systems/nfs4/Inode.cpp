@@ -60,6 +60,7 @@ Inode::CreateInode(FileSystem* fs, const FileInfo& fi, Inode** _inode)
 	inode->fInfo = fi;
 	inode->fFileSystem = fs;
 
+	uint32 attempt = 0;
 	uint64 size;
 	do {
 		RPC::Server* serv = fs->Server();
@@ -78,7 +79,7 @@ Inode::CreateInode(FileSystem* fs, const FileInfo& fi, Inode** _inode)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (inode->HandleErrors(reply.NFS4Error(), serv))
+		if (inode->HandleErrors(attempt, reply.NFS4Error(), serv))
 			continue;
 
 		reply.PutFH();
