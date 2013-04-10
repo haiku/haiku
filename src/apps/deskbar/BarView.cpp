@@ -156,7 +156,7 @@ TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
 		AddChild(fDragRegion);
 
 	fExpandoMenuBar = new TExpandoMenuBar(BRect(0, 0, 0, 0),
-		"ExpandoMenuBar", fVertical);
+		"ExpandoMenuBar", this, fVertical);
 	fInlineScrollView = new TInlineScrollView(BRect(0, 0, 0, 0),
 		fExpandoMenuBar, fVertical ? B_VERTICAL : B_HORIZONTAL);
 	AddChild(fInlineScrollView);
@@ -764,7 +764,7 @@ TBarView::_ChangeState(BMessage* message)
 			}
 
 			fExpandoMenuBar = new TExpandoMenuBar(BRect(0, 0, 0, 0),
-				"ExpandoMenuBar", fVertical);
+				"ExpandoMenuBar", this, fVertical);
 			fInlineScrollView = new TInlineScrollView(BRect(0, 0, 0, 0),
 				fExpandoMenuBar, fVertical ? B_VERTICAL : B_HORIZONTAL);
 			AddChild(fInlineScrollView);

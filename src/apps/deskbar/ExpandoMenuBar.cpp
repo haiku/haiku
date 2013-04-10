@@ -76,17 +76,18 @@ thread_id TExpandoMenuBar::sMonThread = B_ERROR;
 BLocker TExpandoMenuBar::sMonLocker("expando monitor");
 
 
-TExpandoMenuBar::TExpandoMenuBar(BRect frame, const char* name, bool vertical)
+TExpandoMenuBar::TExpandoMenuBar(BRect frame, const char* name,
+	TBarView* barView, bool vertical)
 	:
 	BMenuBar(frame, name, B_FOLLOW_NONE,
 		vertical ? B_ITEMS_IN_COLUMN : B_ITEMS_IN_ROW),
+	fBarView(barView),
 	fVertical(vertical),
 	fOverflow(false),
 	fDrawLabel(!static_cast<TBarApp*>(be_app)->Settings()->hideLabels),
 	fShowTeamExpander(static_cast<TBarApp*>(be_app)->Settings()->superExpando),
 	fExpandNewTeams(static_cast<TBarApp*>(be_app)->Settings()->expandNewTeams),
 	fDeskbarMenuWidth(kMinMenuItemWidth),
-	fBarView(NULL),
 	fPreviousDragTargetItem(NULL),
 	fLastClickedItem(NULL),
 	fClickedExpander(false)
@@ -125,7 +126,6 @@ TExpandoMenuBar::AttachedToWindow()
 {
 	BMenuBar::AttachedToWindow();
 
-	fBarView = static_cast<TBarWindow*>(Window())->BarView();
 	fTeamList.MakeEmpty();
 
 	if (fVertical) {

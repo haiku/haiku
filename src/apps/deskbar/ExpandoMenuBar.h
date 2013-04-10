@@ -62,7 +62,7 @@ enum drag_and_drop_selection {
 class TExpandoMenuBar : public BMenuBar {
 public:
 							TExpandoMenuBar(BRect frame, const char* name,
-								bool vertical);
+								TBarView* barView, bool vertical);
 
 	virtual	void			AttachedToWindow();
 	virtual	void			DetachedFromWindow();
@@ -103,6 +103,7 @@ private:
 			void			_FinishedDrag(bool invoke = false);
 
 private:
+			TBarView*		fBarView;
 			bool			fVertical : 1;
 			bool			fOverflow : 1;
 			bool			fDrawLabel : 1;
@@ -110,7 +111,6 @@ private:
 			bool			fExpandNewTeams : 1;
 
 			float			fDeskbarMenuWidth;
-			TBarView*		fBarView;
 			TTeamMenuItem*	fPreviousDragTargetItem;
 			BMenuItem*		fLastMousedOverItem;
 			BMenuItem*		fLastClickedItem;
