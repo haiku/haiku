@@ -15,7 +15,7 @@
 #include <Locker.h>
 #include <String.h>
 
-#include <packagefs.h>
+#include <package/packagefs.h>
 #include <util/DoublyLinkedList.h>
 
 #include "Package.h"

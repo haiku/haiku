@@ -16,7 +16,7 @@
 
 #include <Referenceable.h>
 
-#include <packagefs.h>
+#include <package/packagefs.h>
 
 #include "JobQueue.h"
 #include "Volume.h"

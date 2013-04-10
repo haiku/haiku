@@ -30,7 +30,7 @@
 
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
-#include <PackagesDirectoryDefs.h>
+#include <package/PackagesDirectoryDefs.h>
 
 #include "DebugSupport.h"
 
