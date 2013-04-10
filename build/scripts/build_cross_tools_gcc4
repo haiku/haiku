@@ -124,7 +124,8 @@ if [ "$HAIKU_USE_GCC_GRAPHITE" = 1 ]; then
 	
 	gccConfigureArgs="$gccConfigureArgs --with-cloog=$installDir \
 		--enable-cloog-backend=isl --with-ppl=$installDir \
-		--disable-cloog-version-check --with-gmp=$installDir"
+		--disable-cloog-version-check --with-gmp=$installDir \
+		--with-host-libstdcxx=\"-lstdc++ -lsupc++\""
 fi
 
 # force the POSIX locale, as the build (makeinfo) might choke otherwise
