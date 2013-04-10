@@ -55,8 +55,11 @@ private:
 			typedef std::map<Solvable*, BSolverPackage*> SolvableMap;
 
 private:
+			status_t			_Init();
 			void				_Cleanup();
+			void				_CleanupSolver();
 
+			bool				_HaveRepositoriesChanged() const;
 			status_t			_AddRepositories();
 			RepositoryInfo*		_GetRepositoryInfo(
 									BSolverRepository* repository) const;

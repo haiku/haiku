@@ -61,7 +61,8 @@ struct LibsolvSolver::RepositoryInfo {
 	RepositoryInfo(BSolverRepository* repository)
 		:
 		fRepository(repository),
-		fSolvRepo(NULL)
+		fSolvRepo(NULL),
+		fChangeCount(repository->ChangeCount() - 1)
 	{
 	}
 
@@ -80,9 +81,20 @@ struct LibsolvSolver::RepositoryInfo {
 		fSolvRepo = repo;
 	}
 
+	bool HasChanged() const
+	{
+		return fChangeCount != fRepository->ChangeCount();
+	}
+
+	void SetUnchanged()
+	{
+		fChangeCount = fRepository->ChangeCount();
+	}
+
 private:
 	BSolverRepository*	fRepository;
 	Repo*				fSolvRepo;
+	uint64				fChangeCount;
 };
 
 
@@ -135,6 +147,7 @@ LibsolvSolver::LibsolvSolver()
 	fSolver(NULL),
 	fRepositoryInfos(10, true),
 	fInstalledRepository(NULL),
+	fSolvablePackages(),
 	fProblems(10, true)
 {
 }
@@ -149,30 +162,7 @@ LibsolvSolver::~LibsolvSolver()
 status_t
 LibsolvSolver::Init()
 {
-	_Cleanup();
-
-	fPool = pool_create();
-
-	// Set the system architecture. We use what uname() returns unless we're on
-	// x86 gcc2.
-	{
-		const char* arch;
-		#ifdef __HAIKU_ARCH_X86
-			#if (B_HAIKU_ABI & B_HAIKU_ABI_MAJOR) == B_HAIKU_ABI_GCC_2
-				arch = "x86_gcc2";
-			#else
-				arch = "x86";
-			#endif
-		#else
-			struct utsname info;
-			if (uname(&info) != 0)
-				return errno;
-			arch = info.machine;
-		#endif
-
-		pool_setarchpolicy(fPool, arch);
-	}
-
+	// We do all initialization lazily.
 	return B_OK;
 }
 
@@ -211,15 +201,10 @@ LibsolvSolver::Install(const BSolverPackageSpecifierList& packages)
 	if (packages.IsEmpty())
 		return B_BAD_VALUE;
 
-// TODO: Clean up first?
-
 	// add repositories to pool
 	status_t error = _AddRepositories();
 	if (error != B_OK)
 		return error;
-
-	// prepare pool for solving
-	pool_createwhatprovides(fPool);
 
 	// add the packages to install to the job queue
 	SolvQueue jobs;
@@ -279,9 +264,6 @@ LibsolvSolver::VerifyInstallation()
 	if (error != B_OK)
 		return error;
 
-	// prepare pool for solving
-	pool_createwhatprovides(fPool);
-
 	// add the verify job to the job queue
 	SolvQueue jobs;
 	queue_push2(&jobs, SOLVER_SOLVABLE_ALL, 0);
@@ -310,7 +292,7 @@ LibsolvSolver::ProblemAt(int32 index) const
 status_t
 LibsolvSolver::GetResult(BSolverResult& _result)
 {
-	if (HasProblems())
+	if (fSolver == NULL || HasProblems())
 		return B_BAD_VALUE;
 
 	_result.MakeEmpty();
@@ -387,18 +369,45 @@ LibsolvSolver::GetResult(BSolverResult& _result)
 }
 
 
+status_t
+LibsolvSolver::_Init()
+{
+	_Cleanup();
+
+	fPool = pool_create();
+
+	// Set the system architecture. We use what uname() returns unless we're on
+	// x86 gcc2.
+	{
+		const char* arch;
+		#ifdef __HAIKU_ARCH_X86
+			#if (B_HAIKU_ABI & B_HAIKU_ABI_MAJOR) == B_HAIKU_ABI_GCC_2
+				arch = "x86_gcc2";
+			#else
+				arch = "x86";
+			#endif
+		#else
+			struct utsname info;
+			if (uname(&info) != 0)
+				return errno;
+			arch = info.machine;
+		#endif
+
+		pool_setarchpolicy(fPool, arch);
+	}
+
+	return B_OK;
+}
+
+
 void
 LibsolvSolver::_Cleanup()
 {
-	fProblems.MakeEmpty();
+	_CleanupSolver();
+
 	fSolvablePackages.clear();
 	fInstalledRepository = NULL;
 	fRepositoryInfos.MakeEmpty();
-
-	if (fSolver != NULL) {
-		solver_free(fSolver);
-		fSolver = NULL;
-	}
 
 	if (fPool != NULL) {
 		pool_free(fPool);
@@ -407,9 +416,43 @@ LibsolvSolver::_Cleanup()
 }
 
 
+void
+LibsolvSolver::_CleanupSolver()
+{
+	fProblems.MakeEmpty();
+
+	if (fSolver != NULL) {
+		solver_free(fSolver);
+		fSolver = NULL;
+	}
+}
+
+
+bool
+LibsolvSolver::_HaveRepositoriesChanged() const
+{
+	int32 repositoryCount = fRepositoryInfos.CountItems();
+	for (int32 i = 0; i < repositoryCount; i++) {
+		RepositoryInfo* repositoryInfo = fRepositoryInfos.ItemAt(i);
+		if (repositoryInfo->HasChanged())
+			return true;
+	}
+
+	return false;
+}
+
+
 status_t
 LibsolvSolver::_AddRepositories()
 {
+	if (fPool != NULL && !_HaveRepositoriesChanged())
+		return B_OK;
+
+	// something has changed -- re-create the pool
+	status_t error = _Init();
+	if (error != B_OK)
+		return error;
+
 	int32 repositoryCount = fRepositoryInfos.CountItems();
 	for (int32 i = 0; i < repositoryCount; i++) {
 		RepositoryInfo* repositoryInfo = fRepositoryInfos.ItemAt(i);
@@ -438,7 +481,12 @@ LibsolvSolver::_AddRepositories()
 
 		if (repository->IsInstalled())
 			pool_set_installed(fPool, repo);
+
+		repositoryInfo->SetUnchanged();
 	}
+
+	// create "provides" lookup
+	pool_createwhatprovides(fPool);
 
 	return B_OK;
 }
@@ -865,6 +913,8 @@ LibsolvSolver::_GetResolvableExpression(Id id,
 status_t
 LibsolvSolver::_Solve(Queue& jobs)
 {
+	_CleanupSolver();
+
 	// create the solver and solve
 	fSolver = solver_create(fPool);
 	solver_set_flag(fSolver, SOLVER_FLAG_SPLITPROVIDES, 1);
