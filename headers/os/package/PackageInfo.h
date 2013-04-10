@@ -137,6 +137,9 @@ public:
 
 			void				Clear();
 
+			status_t			GetConfigString(BString& _string) const;
+			BString				ToString() const;
+
 public:
 	static	status_t			GetArchitectureByName(const BString& name,
 									BPackageArchitecture& _architecture);
@@ -153,6 +156,7 @@ public:
 private:
 			class Parser;
 			friend class Parser;
+			struct StringBuilder;
 
 private:
 			BString				fName;

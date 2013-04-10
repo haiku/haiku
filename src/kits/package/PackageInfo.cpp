@@ -57,6 +57,9 @@ struct ParseError {
 }	// anonymous namespace
 
 
+// #pragma mark - Parser
+
+
 /*
  * Parses a ".PackageInfo" file and fills a BPackageInfo object with the
  * package info elements found.
@@ -870,6 +873,235 @@ BPackageInfo::kArchitectureNames[B_PACKAGE_ARCHITECTURE_ENUM_COUNT] = {
 };
 
 
+// #pragma mark - StringBuilder
+
+
+struct BPackageInfo::StringBuilder {
+	StringBuilder()
+		:
+		fData(),
+		fError(B_OK)
+	{
+	}
+
+	status_t Error() const
+	{
+		return fError;
+	}
+
+	status_t GetString(BString& _string) const
+	{
+		if (fError != B_OK) {
+			_string = BString();
+			return fError;
+		}
+
+		_string.SetTo((const char*)fData.Buffer(), fData.BufferLength());
+		return (size_t)_string.Length() == fData.BufferLength()
+			? B_OK : B_NO_MEMORY;
+	}
+
+	template<typename Value>
+	StringBuilder& Write(const char* attribute, Value value)
+	{
+		if (_IsValueEmpty(value))
+			return *this;
+
+		_Write(attribute);
+		_Write('\t');
+		_WriteValue(value);
+		_Write('\n');
+		return *this;
+	}
+
+	StringBuilder& WriteFlags(const char* attribute, uint32 flags)
+	{
+		if ((flags & B_PACKAGE_FLAG_APPROVE_LICENSE) == 0
+			&& (flags & B_PACKAGE_FLAG_SYSTEM_PACKAGE) == 0) {
+			return *this;
+		}
+
+		_Write(attribute);
+		_Write('\t');
+
+		if ((flags & B_PACKAGE_FLAG_APPROVE_LICENSE) == 0)
+			_Write(" approve_license");
+		if ((flags & B_PACKAGE_FLAG_SYSTEM_PACKAGE) == 0)
+			_Write(" system_package");
+
+		_Write('\n');
+		return *this;
+	}
+
+private:
+	void _WriteValue(const char* value)
+	{
+		_WriteMaybeQuoted(value);
+	}
+
+	void _WriteValue(const BPackageVersion& value)
+	{
+		if (fError != B_OK)
+			return;
+
+		if (value.InitCheck() != B_OK) {
+			fError = B_BAD_VALUE;
+			return;
+		}
+
+		_Write(value.ToString());
+	}
+
+	void _WriteValue(const BStringList& value)
+	{
+		int32 count = value.CountStrings();
+		if (count == 1) {
+			_WriteMaybeQuoted(value.StringAt(0));
+		} else {
+			_Write("{\n", 2);
+
+			int32 count = value.CountStrings();
+			for (int32 i = 0; i < count; i++) {
+				_Write('\t');
+				_WriteMaybeQuoted(value.StringAt(i));
+				_Write('\n');
+			}
+
+			_Write('}');
+		}
+	}
+
+	template<typename Value>
+	void _WriteValue(const BObjectList<Value>& value)
+	{
+		int32 count = value.CountItems();
+		if (count == 1) {
+			_Write(value.ItemAt(0)->ToString());
+		} else {
+			_Write("{\n", 2);
+
+			int32 count = value.CountItems();
+			for (int32 i = 0; i < count; i++) {
+				_Write('\t');
+				_Write(value.ItemAt(i)->ToString());
+				_Write('\n');
+			}
+
+			_Write('}');
+		}
+	}
+
+	static inline bool _IsValueEmpty(const char* value)
+	{
+		return value[0] == '\0';
+	}
+
+	static inline bool _IsValueEmpty(const BPackageVersion& value)
+	{
+		return false;
+	}
+
+	template<typename List>
+	static inline bool _IsValueEmpty(const List& value)
+	{
+		return value.IsEmpty();
+	}
+
+	void _WriteMaybeQuoted(const char* data)
+	{
+		// check whether quoting is needed
+		bool needsQuoting = false;
+		bool needsEscaping = false;
+		for (const char* it = data; *it != '\0'; it++) {
+			if (isalnum(*it) || *it == '.' || *it == '-' || *it == '_'
+				|| *it == ':' || *it == '+') {
+				continue;
+			}
+
+			needsQuoting = true;
+
+			if (*it == '\t' || *it == '\n' || *it == '"' || *it == '\\') {
+				needsEscaping = true;
+				break;
+			}
+		}
+
+		if (!needsQuoting) {
+			_Write(data);
+			return;
+		}
+
+		// we need quoting
+		_Write('"');
+
+		// escape the string, if necessary
+		if (needsEscaping) {
+			const char* start = data;
+			const char* end = data;
+			while (*end != '\0') {
+				char replacement[2];
+				switch (*end) {
+					case '\t':
+						replacement[1] = 't';
+						break;
+					case '\n':
+						replacement[1] = 'n';
+						break;
+					case '"':
+					case '\\':
+						replacement[1] = *end;
+						break;
+					default:
+						end++;
+						continue;
+				}
+
+				if (start < end)
+					_Write(start, end - start);
+
+				replacement[0] = '\\';
+				_Write(replacement, 2);
+			}
+		} else
+			_Write(data);
+
+		_Write('"');
+	}
+
+	inline void _Write(char data)
+	{
+		_Write(&data, 1);
+	}
+
+	inline void _Write(const char* data)
+	{
+		_Write(data, strlen(data));
+	}
+
+	inline void _Write(const BString& data)
+	{
+		_Write(data, data.Length());
+	}
+
+	void _Write(const void* data, size_t size)
+	{
+		if (fError == B_OK) {
+			ssize_t bytesWritten = fData.Write(data, size);
+			if (bytesWritten < 0)
+				fError = bytesWritten;
+		}
+	}
+
+private:
+	BMallocIO	fData;
+	status_t	fError;
+};
+
+
+// #pragma mark - BPackageInfo
+
+
+
 BPackageInfo::BPackageInfo()
 	:
 	fFlags(0),
@@ -1389,6 +1621,43 @@ BPackageInfo::Clear()
 	fConflictsList.MakeEmpty();
 	fFreshensList.MakeEmpty();
 	fReplacesList.MakeEmpty();
+}
+
+
+status_t
+BPackageInfo::GetConfigString(BString& _string) const
+{
+	return StringBuilder()
+		.Write("name", fName)
+		.Write("version", fVersion)
+		.Write("summary", fSummary)
+		.Write("description", fDescription)
+		.Write("vendor", fVendor)
+		.Write("packager", fPackager)
+		.Write("architecture", kArchitectureNames[fArchitecture])
+		.Write("copyrights", fCopyrightList)
+		.Write("licenses", fLicenseList)
+		.Write("urls", fURLList)
+		.Write("source-urls", fSourceURLList)
+		.Write("provides", fProvidesList)
+		.Write("requires", fRequiresList)
+		.Write("supplements", fSupplementsList)
+		.Write("conflicts", fConflictsList)
+		.Write("freshens", fFreshensList)
+		.Write("replaces", fReplacesList)
+		.WriteFlags("flags", fFlags)
+		.Write("checksum", fChecksum)
+		.GetString(_string);
+	// Note: fInstallPath can not be specified via .PackageInfo.
+}
+
+
+BString
+BPackageInfo::ToString() const
+{
+	BString string;
+	GetConfigString(string);
+	return string;
 }
 
 
