@@ -23,7 +23,7 @@ public:
 								BPackageVersion();
 								BPackageVersion(
 									const BPackageVersionData& data);
-								BPackageVersion(const BString& versionString,
+	explicit					BPackageVersion(const BString& versionString,
 									bool releaseIsOptional = true);
 								BPackageVersion(const BString& major,
 									const BString& minor, const BString& micro,
