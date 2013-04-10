@@ -205,11 +205,23 @@ private:
 #endif
 
 
+class ExistsListener {
+public:
+	virtual	void				MessageExistsReceived(uint32 index) = 0;
+};
+
+
 class ExistsHandler : public Handler {
 public:
 								ExistsHandler();
 
-			bool				HandleUntagged(Response& response);
+			void				SetListener(ExistsListener* listener);
+			ExistsListener*		Listener() const { return fListener; }
+
+	virtual	bool				HandleUntagged(Response& response);
+
+private:
+			ExistsListener*		fListener;
 };
 
 

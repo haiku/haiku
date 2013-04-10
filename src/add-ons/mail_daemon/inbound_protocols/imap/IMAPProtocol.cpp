@@ -16,7 +16,8 @@
 IMAPProtocol::IMAPProtocol(const BMailAccountSettings& settings)
 	:
 	BInboundMailProtocol(settings),
-	fSettings(settings.InboundSettings())
+	fSettings(settings.InboundSettings()),
+	fWorkers(5, false)
 {
 	BPath destination = fSettings.Destination();
 
@@ -25,10 +26,6 @@ IMAPProtocol::IMAPProtocol(const BMailAccountSettings& settings)
 		fprintf(stderr, "imap: Could not create destination directory %s: %s\n",
 			destination.Path(), strerror(status));
 	}
-
-	status = _CreateFolderChangeSemaphore();
-	if (status != B_OK)
-		fprintf(stderr, "imap: Failed to create sem: %s\n", strerror(status));
 
 	PostMessage(B_READY_TO_RUN);
 }
@@ -40,7 +37,7 @@ IMAPProtocol::~IMAPProtocol()
 
 
 status_t
-IMAPProtocol::CheckSubscribedFolders(IMAP::Protocol& protocol)
+IMAPProtocol::CheckSubscribedFolders(IMAP::Protocol& protocol, bool idle)
 {
 	// Get list of subscribed folders
 
@@ -62,7 +59,7 @@ IMAPProtocol::CheckSubscribedFolders(IMAP::Protocol& protocol)
 
 	int32 totalMailboxes = fFolders.size() + newFolders.size();
 	int32 workersWanted = 1;
-	if (fSettings.IdleMode())
+	if (idle)
 		workersWanted = std::min(fSettings.MaxConnections(), totalMailboxes);
 
 	if (newFolders.empty() && fWorkers.CountItems() == workersWanted) {
@@ -84,8 +81,13 @@ IMAPProtocol::CheckSubscribedFolders(IMAP::Protocol& protocol)
 			break;
 		}
 
-		worker->Run();
+		status = worker->Run();
+		if (status != B_OK) {
+			fWorkers.RemoveItem(worker);
+			delete worker;
+		}
 	}
+
 	while (fWorkers.CountItems() > workersWanted) {
 		IMAPConnectionWorker* worker
 			= fWorkers.RemoveItemAt(fWorkers.CountItems() - 1);
@@ -108,9 +110,12 @@ IMAPProtocol::CheckSubscribedFolders(IMAP::Protocol& protocol)
 		index = (index + 1) % fWorkers.CountItems();
 	}
 
-	// Restart waiting workers
-	delete_sem(fFolderChangeSemaphore);
-	return _CreateFolderChangeSemaphore();
+	// Start waiting workers
+	for (int32 i = 0; i < fWorkers.CountItems(); i++) {
+		fWorkers.ItemAt(i)->EnqueueCheckMailboxes();
+	}
+
+	return B_OK;
 }
 
 
@@ -218,14 +223,6 @@ IMAPProtocol::_CreateFolder(const BString& mailbox, const BString& separator)
 	}
 
 	return new IMAPFolder(mailbox, ref);
-}
-
-
-status_t
-IMAPProtocol::_CreateFolderChangeSemaphore()
-{
-	fFolderChangeSemaphore = create_sem(0, "imap folder change");
-	return fFolderChangeSemaphore < 0 ? fFolderChangeSemaphore : B_OK;
 }
 
 

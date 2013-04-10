@@ -507,42 +507,23 @@ ExistsHandler::ExistsHandler()
 }
 
 
+void
+ExistsHandler::SetListener(ExistsListener* listener)
+{
+	fListener = listener;
+}
+
+
 bool
 ExistsHandler::HandleUntagged(Response& response)
 {
 	if (!response.EqualsAt(1, "EXISTS") || response.IsNumberAt(0))
 		return false;
 
-//	int32 expunge = response.NumberAt(0);
-#if 0
-	Listener().ExistsReceived(expunge);
+	int32 index = response.NumberAt(0);
 
-	if (response.FindFirst("EXISTS") < 0)
-		return false;
-
-	int32 exists = 0;
-	if (!IMAPParser::ExtractUntagedFromLeft(response, "EXISTS", exists))
-		return false;
-
-	int32 nMessages = fIMAPMailbox.GetCurrentMessageCount();
-	if (exists <= nMessages)
-		return true;
-
-	MinMessageList& list = const_cast<MinMessageList&>(
-		fIMAPMailbox.GetMessageList());
-	IMAPCommand* command = new FetchMinMessageCommand(fIMAPMailbox,
-		nMessages + 1, exists, &list, NULL);
-	fIMAPMailbox.AddAfterQuakeCommand(command);
-
-	fIMAPMailbox.Listener().NewMessagesToFetch(exists - nMessages);
-
-	command = new FetchMessageCommand(fIMAPMailbox, nMessages + 1, exists,
-		fIMAPMailbox.FetchBodyLimit());
-	fIMAPMailbox.AddAfterQuakeCommand(command);
-
-	TRACE("EXISTS %i\n", (int)exists);
-	fIMAPMailbox.SendRawCommand("DONE");
-#endif
+	if (fListener != NULL)
+		fListener->MessageExistsReceived(index);
 
 	return true;
 }

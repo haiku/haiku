@@ -31,9 +31,7 @@ public:
 	virtual						~IMAPProtocol();
 
 			status_t			CheckSubscribedFolders(
-									IMAP::Protocol& protocol);
-			sem_id				FolderChangeSemaphore() const
-									{ return fFolderChangeSemaphore; }
+									IMAP::Protocol& protocol, bool idle);
 
 	virtual	status_t			SyncMessages();
 	virtual status_t			FetchBody(const entry_ref& ref);
@@ -50,13 +48,11 @@ protected:
 private:
 			IMAPFolder*			_CreateFolder(const BString& mailbox,
 									const BString& separator);
-			status_t			_CreateFolderChangeSemaphore();
 
 protected:
 			Settings			fSettings;
 			BObjectList<IMAPConnectionWorker> fWorkers;
 			FolderMap			fFolders;
-			sem_id				fFolderChangeSemaphore;
 };
 
 

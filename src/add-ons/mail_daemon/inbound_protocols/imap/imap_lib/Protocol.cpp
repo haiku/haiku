@@ -27,6 +27,7 @@ Protocol::Protocol()
 	:
 	fSocket(NULL),
 	fBufferedSocket(NULL),
+	fHandlerList(5, false),
 	fCommandID(0),
 	fIsConnected(false)
 {
@@ -35,9 +36,6 @@ Protocol::Protocol()
 
 Protocol::~Protocol()
 {
-	for (int32 i = 0; i < fAfterQuackCommands.CountItems(); i++)
-		delete fAfterQuackCommands.ItemAt(i);
-
 	delete fSocket;
 	delete fBufferedSocket;
 }
@@ -106,6 +104,20 @@ bool
 Protocol::IsConnected()
 {
 	return fIsConnected;
+}
+
+
+bool
+Protocol::AddHandler(Handler& handler)
+{
+	return fHandlerList.AddItem(&handler);
+}
+
+
+void
+Protocol::RemoveHandler(Handler& handler)
+{
+	fHandlerList.RemoveItem(&handler);
 }
 
 
@@ -239,21 +251,31 @@ Protocol::SendData(const char* buffer, uint32 length)
 
 
 status_t
-Protocol::AddAfterQuakeCommand(Command* command)
-{
-	return fAfterQuackCommands.AddItem(command);
-}
-
-
-status_t
 Protocol::ProcessCommand(Command& command, bigtime_t timeout)
 {
-	status_t status = _ProcessCommandWithoutAfterQuake(command, timeout);
+	BString commandString = command.CommandString();
+	if (commandString.IsEmpty())
+		return B_BAD_VALUE;
 
-	ProcessAfterQuacks(timeout);
+	Handler* handler = dynamic_cast<Handler*>(&command);
+	if (handler != NULL && !AddHandler(*handler))
+		return B_NO_MEMORY;
+
+	int32 commandID = NextCommandID();
+	status_t status = SendCommand(commandID, commandString.String());
+	if (status == B_OK) {
+		fOngoingCommands[commandID] = &command;
+		status = HandleResponse(&command, timeout);
+	}
+
+	if (handler != NULL)
+		RemoveHandler(*handler);
 
 	return status;
 }
+
+
+// #pragma mark - protected
 
 
 status_t
@@ -282,7 +304,7 @@ Protocol::HandleResponse(Command* command, bigtime_t timeout,
 
 			if (response.IsUntagged() || response.IsContinuation()) {
 				bool handled = false;
-				for (int i = 0; i < fHandlerList.CountItems(); i++) {
+				for (int32 i = fHandlerList.CountItems(); i-- > 0;) {
 					if (fHandlerList.ItemAt(i)->HandleUntagged(response)) {
 						handled = true;
 						break;
@@ -314,17 +336,6 @@ Protocol::HandleResponse(Command* command, bigtime_t timeout,
 }
 
 
-void
-Protocol::ProcessAfterQuacks(bigtime_t timeout)
-{
-	while (fAfterQuackCommands.CountItems() != 0) {
-		Command* currentCommand = fAfterQuackCommands.RemoveItemAt(0);
-		_ProcessCommandWithoutAfterQuake(*currentCommand, timeout);
-		delete currentCommand;
-	}
-}
-
-
 int32
 Protocol::NextCommandID()
 {
@@ -333,29 +344,7 @@ Protocol::NextCommandID()
 }
 
 
-status_t
-Protocol::_ProcessCommandWithoutAfterQuake(Command& command, bigtime_t timeout)
-{
-	BString commandString = command.CommandString();
-	if (commandString.IsEmpty())
-		return B_BAD_VALUE;
-
-	Handler* handler = dynamic_cast<Handler*>(&command);
-	if (handler != NULL && !fHandlerList.AddItem(handler, 0))
-		return B_NO_MEMORY;
-
-	int32 commandID = NextCommandID();
-	status_t status = SendCommand(commandID, commandString.String());
-	if (status == B_OK) {
-		fOngoingCommands[commandID] = &command;
-		status = HandleResponse(&command, timeout);
-	}
-
-	if (handler != NULL)
-		fHandlerList.RemoveItem(handler);
-
-	return status;
-}
+// #pragma mark - private
 
 
 status_t

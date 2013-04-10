@@ -31,7 +31,6 @@ class Command;
 class Handler;
 
 
-typedef BObjectList<Command> CommandList;
 typedef BObjectList<Handler> HandlerList;
 typedef std::map<int32, Command*> CommandIDMap;
 
@@ -61,9 +60,8 @@ public:
 			status_t			Disconnect();
 			bool				IsConnected();
 
-			status_t			SendCommand(const char* command);
-			status_t			SendCommand(int32 id, const char* command);
-			ssize_t				SendData(const char* buffer, uint32 length);
+			bool				AddHandler(Handler& handler);
+			void				RemoveHandler(Handler& handler);
 
 			// Some convenience methods
 			status_t			GetFolders(FolderList& folders,
@@ -74,13 +72,15 @@ public:
 			status_t			UnsubscribeFolder(const char* folder);
 			status_t			GetQuota(uint64& used, uint64& total);
 
+			status_t			SendCommand(const char* command);
+			status_t			SendCommand(int32 id, const char* command);
+			ssize_t				SendData(const char* buffer, uint32 length);
+
 			status_t			ProcessCommand(Command& command,
 									bigtime_t timeout = kIMAP4ClientTimeout);
 
 			ArgumentList&		Capabilities() { return fCapabilities; }
 			const ArgumentList&	Capabilities() const { return fCapabilities; }
-
-			status_t			AddAfterQuakeCommand(Command* command);
 
 			const BString&		CommandError() { return fCommandError; }
 
@@ -88,13 +88,9 @@ protected:
 			status_t			HandleResponse(Command* command,
 									bigtime_t timeout = kIMAP4ClientTimeout,
 									bool disconnectOnTimeout = true);
-			void				ProcessAfterQuacks(bigtime_t timeout);
 			int32				NextCommandID();
 
 private:
-			/*! Same as ProccessCommand but AfterShockCommands are not send. */
-			status_t			_ProcessCommandWithoutAfterQuake(
-									Command& command, bigtime_t timeout);
 			status_t			_Disconnect();
 			status_t			_GetAllFolders(StringList& folders);
 			void				_ParseCapabilities(
@@ -105,7 +101,6 @@ protected:
 			BBufferedDataIO*	fBufferedSocket;
 
 			HandlerList			fHandlerList;
-			CommandList			fAfterQuackCommands;
 			ArgumentList		fCapabilities;
 
 private:

@@ -13,20 +13,103 @@
 #include "IMAPProtocol.h"
 
 
+class WorkerPrivate {
+public:
+	WorkerPrivate(IMAPConnectionWorker& worker)
+		:
+		fWorker(worker)
+	{
+	}
+
+	IMAP::Protocol& Protocol()
+	{
+		return fWorker.fProtocol;
+	}
+
+	void Quit()
+	{
+		fWorker.fStopped = true;
+	}
+
+private:
+	IMAPConnectionWorker&	fWorker;
+};
+
+
+class WorkerCommand {
+public:
+								WorkerCommand() {}
+	virtual						~WorkerCommand() {}
+
+	virtual	status_t			Process(IMAPConnectionWorker& worker) = 0;
+};
+
+
+class QuitCommand : public WorkerCommand {
+public:
+	QuitCommand()
+	{
+	}
+
+	virtual status_t Process(IMAPConnectionWorker& worker)
+	{
+		WorkerPrivate(worker).Quit();
+		return B_OK;
+	}
+};
+
+
+class CheckMailboxCommand : public WorkerCommand {
+public:
+	CheckMailboxCommand(IMAPFolder& folder, IMAPMailbox& mailbox)
+		:
+		fFolder(folder),
+		fMailbox(mailbox)
+	{
+	}
+
+	virtual status_t Process(IMAPConnectionWorker& worker)
+	{
+		IMAP::Protocol& protocol = WorkerPrivate(worker).Protocol();
+
+		IMAP::SelectCommand select(fFolder.MailboxName().String());
+		status_t status = protocol.ProcessCommand(select);
+		if (status == B_OK) {
+			fFolder.SetUIDValidity(select.UIDValidity());
+			// TODO: trigger download of mails until UIDNext()
+		}
+
+		return B_OK;
+	}
+
+private:
+	IMAPFolder&				fFolder;
+	IMAPMailbox&			fMailbox;
+};
+
+
+// #pragma mark -
+
+
 IMAPConnectionWorker::IMAPConnectionWorker(IMAPProtocol& owner,
 	const Settings& settings, bool main)
 	:
 	fOwner(owner),
 	fSettings(settings),
+	fPendingCommandsSemaphore(-1),
 	fIdleBox(NULL),
 	fMain(main),
 	fStopped(false)
 {
+	fExistsHandler.SetListener(this);
+	fProtocol.AddHandler(fExistsHandler);
 }
 
 
 IMAPConnectionWorker::~IMAPConnectionWorker()
 {
+	delete_sem(fPendingCommandsSemaphore);
+	_Disconnect();
 }
 
 
@@ -79,6 +162,10 @@ IMAPConnectionWorker::RemoveAllMailboxes()
 status_t
 IMAPConnectionWorker::Run()
 {
+	fPendingCommandsSemaphore = create_sem(0, "imap pending commands");
+	if (fPendingCommandsSemaphore < 0)
+		return fPendingCommandsSemaphore;
+
 	fThread = spawn_thread(&_Worker, "imap connection worker",
 		B_NORMAL_PRIORITY, this);
 	if (fThread < 0)
@@ -92,77 +179,136 @@ IMAPConnectionWorker::Run()
 void
 IMAPConnectionWorker::Quit()
 {
-	// TODO: we'll also need to interrupt listening to the socket
-	fStopped = true;
+	_EnqueueCommand(new QuitCommand());
+}
+
+
+status_t
+IMAPConnectionWorker::EnqueueCheckMailboxes()
+{
+	BAutolock locker(fLocker);
+
+	MailboxMap::iterator iterator = fMailboxes.begin();
+	for (; iterator != fMailboxes.end(); iterator++) {
+		IMAPFolder* folder = iterator->first;
+
+		printf("%p: check: %s\n", this, folder->MailboxName().String());
+		IMAPMailbox* mailbox = iterator->second;
+		if (mailbox == NULL) {
+			mailbox = new IMAPMailbox(fProtocol, folder->MailboxName());
+			folder->SetListener(mailbox);
+		}
+
+		status_t status = _EnqueueCommand(
+			new CheckMailboxCommand(*folder, *mailbox));
+		if (status != B_OK)
+			return status;
+	}
+	return B_OK;
+}
+
+
+status_t
+IMAPConnectionWorker::EnqueueRetrieveMail(entry_ref& ref)
+{
+	return B_OK;
+}
+
+
+void
+IMAPConnectionWorker::MessageExistsReceived(uint32 index)
+{
+	printf("Message exists: %ld\n", index);
 }
 
 
 status_t
 IMAPConnectionWorker::_Worker()
 {
-	status_t status = fProtocol.Connect(fSettings.ServerAddress(),
-		fSettings.Username(), fSettings.Password(), fSettings.UseSSL());
-	if (status != B_OK)
-		return status;
-
-	bool idle = fSettings.IdleMode()
-		&& fProtocol.Capabilities().Contains("IDLE");
-	bool initial = true;
-
 	while (!fStopped) {
 		if (fMain) {
 			// The main worker checks the subscribed folders, and creates
 			// other workers as needed
-			fOwner.CheckSubscribedFolders(fProtocol);
+			status_t status = _Connect();
+			if (status == B_OK)
+				status = fOwner.CheckSubscribedFolders(fProtocol, fIdle);
+			if (status != B_OK)
+				return status;
 		}
 
 		BAutolock locker(fLocker);
 
-		if (!HasMailboxes()) {
+		if (fPendingCommands.IsEmpty()) {
+			_Disconnect();
 			locker.Unlock();
-			_Wait();
+
+			_WaitForCommands();
 			continue;
 		}
 
-		if (!initial && idle && fIdleBox != NULL) {
-			printf("%p: IDLE: %s\n", this, fIdleBox->MailboxName().String());
-			// TODO: enter IDLE mode
-		}
+		WorkerCommand* command = fPendingCommands.RemoveItemAt(0);
+		if (command == NULL)
+			continue;
 
-		MailboxMap::iterator iterator = fMailboxes.begin();
-		for (; iterator != fMailboxes.end(); iterator++) {
-			IMAPFolder* folder = iterator->first;
-			if (!initial && idle && folder == fIdleBox)
-				continue;
+		status_t status = _Connect();
+		if (status != B_OK)
+			return status;
 
-			printf("%p: check: %s\n", this, folder->MailboxName().String());
-			IMAPMailbox* mailbox = iterator->second;
-			if (mailbox == NULL) {
-				mailbox = new IMAPMailbox(fProtocol, folder->MailboxName());
-				folder->SetListener(mailbox);
-			}
-
-			IMAP::SelectCommand select(folder->MailboxName().String());
-			status_t status = fProtocol.ProcessCommand(select);
-			if (status == B_OK) {
-				folder->SetUIDValidity(select.UIDValidity());
-				// TODO: trigger download of mails until UIDNext()
-			}
-		}
-
-		initial = false;
-		// TODO: for now
-		break;
+		status = command->Process(*this);
+		if (status != B_OK)
+			return status;
 	}
 
 	return B_OK;
 }
 
 
-void
-IMAPConnectionWorker::_Wait()
+/*!	Enqueues the given command to the worker queue. This method will take
+	over ownership of the given command even in the error case.
+*/
+status_t
+IMAPConnectionWorker::_EnqueueCommand(WorkerCommand* command)
 {
-	while (acquire_sem(fOwner.FolderChangeSemaphore()) == B_INTERRUPTED);
+	BAutolock locker(fLocker);
+
+	if (!fPendingCommands.AddItem(command)) {
+		delete command;
+		return B_NO_MEMORY;
+	}
+
+	locker.Unlock();
+	release_sem(fPendingCommandsSemaphore);
+	return B_OK;
+}
+
+
+void
+IMAPConnectionWorker::_WaitForCommands()
+{
+	while (acquire_sem(fPendingCommandsSemaphore) == B_INTERRUPTED);
+}
+
+
+status_t
+IMAPConnectionWorker::_Connect()
+{
+	if (fProtocol.IsConnected())
+		return B_OK;
+
+	status_t status = fProtocol.Connect(fSettings.ServerAddress(),
+		fSettings.Username(), fSettings.Password(), fSettings.UseSSL());
+	if (status != B_OK)
+		return status;
+
+	fIdle = fSettings.IdleMode() && fProtocol.Capabilities().Contains("IDLE");
+	return B_OK;
+}
+
+
+void
+IMAPConnectionWorker::_Disconnect()
+{
+	fProtocol.Disconnect();
 }
 
 
