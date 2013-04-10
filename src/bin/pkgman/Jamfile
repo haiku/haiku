@@ -5,12 +5,14 @@ UsePrivateHeaders shared support ;
 BinCommand pkgman :
 	command_add_repo.cpp
 	command_drop_repo.cpp
-	command_resolve_dependencies.cpp
 	command_list_repos.cpp
 	command_refresh.cpp
+	command_resolve_dependencies.cpp
 	DecisionProvider.cpp
 	JobStateListener.cpp
+	PackageInfoErrorListener.cpp
 	pkgman.cpp
+	RepositoryBuilder.cpp
 	:
 	package be
 	$(TARGET_LIBSUPC++)

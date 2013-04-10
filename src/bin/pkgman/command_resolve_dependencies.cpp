@@ -7,40 +7,27 @@
  */
 
 
-#include <dirent.h>
 #include <errno.h>
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 
-#include <map>
-
-#include <Entry.h>
-#include <File.h>
-#include <Path.h>
-
-#include <package/PackageInfo.h>
-#include <package/solver/Solver.h>
-#include <package/solver/SolverPackage.h>
 #include <package/solver/SolverPackageSpecifier.h>
 #include <package/solver/SolverPackageSpecifierList.h>
 #include <package/solver/SolverProblem.h>
-#include <package/solver/SolverRepository.h>
 #include <package/solver/SolverResult.h>
 
 #include <AutoDeleter.h>
 
 #include "pkgman.h"
+#include "RepositoryBuilder.h"
 
 
 // TODO: internationalization!
 
 
 using namespace BPackageKit;
-
-
-typedef std::map<BSolverPackage*, BString> PackagePathMap;
 
 
 static const char* kCommandUsage =
@@ -69,158 +56,6 @@ print_command_usage_and_exit(bool error)
     fprintf(error ? stderr : stdout, kCommandUsage, kProgramName);
     exit(error ? 1 : 0);
 }
-
-
-struct PackageInfoErrorListener : public BPackageInfo::ParseErrorListener {
-public:
-	PackageInfoErrorListener(const BString& errorContext)
-		:
-		fErrorContext(errorContext)
-	{
-	}
-
-	virtual void OnError(const BString& message, int line, int column)
-	{
-		fprintf(stderr, "%s: Parse error in line %d:%d: %s\n",
-			fErrorContext.String(), line, column, message.String());
-	}
-
-private:
-	BString	fErrorContext;
-};
-
-
-struct RepositoryBuilder {
-	RepositoryBuilder(BSolverRepository& repository, const BString& name,
-		const BString& errorName = BString())
-		:
-		fRepository(repository),
-		fErrorName(errorName.IsEmpty() ? name : errorName),
-		fPackagePaths(NULL)
-	{
-		status_t error = fRepository.SetTo(name);
-		if (error != B_OK)
-			DIE(error, "failed to init %s repository", fErrorName.String());
-	}
-
-	RepositoryBuilder& SetPackagePathMap(PackagePathMap* packagePaths)
-	{
-		fPackagePaths = packagePaths;
-		return *this;
-	}
-
-	RepositoryBuilder& AddPackage(const BPackageInfo& info,
-		const char* packageErrorName = NULL, BSolverPackage** _package = NULL)
-	{
-		status_t error = fRepository.AddPackage(info, _package);
-		if (error != B_OK) {
-			DIE(error, "failed to add %s to %s repository",
-				packageErrorName != NULL
-					? packageErrorName
-					: (BString("package ") << info.Name()).String(),
-				fErrorName.String());
-		}
-		return *this;
-	}
-
-	RepositoryBuilder& AddPackage(const char* path,
-		BSolverPackage** _package = NULL)
-	{
-		// read a package info from the (HPKG or package info) file
-		BPackageInfo packageInfo;
-
-		size_t pathLength = strlen(path);
-		status_t error;
-		if (pathLength > 5 && strcmp(path + pathLength - 5, ".hpkg") == 0) {
-			// a package file
-			error = packageInfo.ReadFromPackageFile(path);
-		} else {
-			// a package info file (supposedly)
-			PackageInfoErrorListener errorListener(
-				"Error: failed to read package info");
-			error = packageInfo.ReadFromConfigFile(BEntry(path),
-				&errorListener);
-		}
-
-		if (error != B_OK)
-			DIE(errno, "failed to read package info from \"%s\"", path);
-
-		// add the package
-		BSolverPackage* package;
-		AddPackage(packageInfo, path, &package);
-
-		// enter the package path in the path map, if given
-		if (fPackagePaths != NULL)
-			(*fPackagePaths)[package] = path;
-
-		if (_package != NULL)
-			*_package = package;
-
-		return *this;
-	}
-
-	RepositoryBuilder& AddPackages(BPackageInstallationLocation location,
-		const char* locationErrorName)
-	{
-		status_t error = fRepository.AddPackages(location);
-		if (error != B_OK) {
-			DIE(error, "failed to add %s packages to %s repository",
-				locationErrorName, fErrorName.String());
-		}
-		return *this;
-	}
-
-	RepositoryBuilder& AddPackagesDirectory(const char* path)
-	{
-		// open directory
-		DIR* dir = opendir(path);
-		if (dir == NULL)
-			DIE(errno, "failed to open package directory \"%s\"", path);
-		CObjectDeleter<DIR, int> dirCloser(dir, &closedir);
-
-		// iterate through directory entries
-		while (dirent* entry = readdir(dir)) {
-			// skip "." and ".."
-			const char* name = entry->d_name;
-			if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0)
-				continue;
-
-			// stat() the entry and skip any non-file
-			BPath entryPath;
-			status_t error = entryPath.SetTo(path, name);
-			if (error != B_OK)
-				DIE(errno, "failed to construct path");
-
-			struct stat st;
-			if (lstat(entryPath.Path(), &st) != 0)
-				DIE(errno, "failed to stat() %s", entryPath.Path());
-
-			if (!S_ISREG(st.st_mode))
-				continue;
-
-			AddPackage(entryPath.Path());
-		}
-
-		return *this;
-	}
-
-	RepositoryBuilder& AddToSolver(BSolver* solver, bool isInstalled = false)
-	{
-		fRepository.SetInstalled(isInstalled);
-
-		status_t error = solver->AddRepository(&fRepository);
-		if (error != B_OK) {
-			DIE(error, "failed to add %s repository to solver",
-				fErrorName.String());
-		}
-		return *this;
-	}
-
-private:
-	BSolverRepository&	fRepository;
-	BString				fErrorName;
-	PackagePathMap*		fPackagePaths;
-};
 
 
 static void
