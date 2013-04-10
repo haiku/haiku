@@ -63,6 +63,8 @@ public:
 			status_t			AddPackages(
 									BPackageInstallationLocation location);
 
+			uint64				ChangeCount() const;
+
 private:
 			typedef BObjectList<BSolverPackage> PackageList;
 
@@ -71,6 +73,7 @@ private:
 			uint8				fPriority;
 			bool				fIsInstalled;
 			PackageList			fPackages;
+			uint64				fChangeCount;
 };
 
 

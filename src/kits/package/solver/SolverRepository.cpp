@@ -27,7 +27,8 @@ BSolverRepository::BSolverRepository()
 	fName(),
 	fPriority(0),
 	fIsInstalled(false),
-	fPackages(kInitialPackageListSize, true)
+	fPackages(kInitialPackageListSize, true),
+	fChangeCount(0)
 {
 }
 
@@ -37,7 +38,8 @@ BSolverRepository::BSolverRepository(const BString& name)
 	fName(),
 	fPriority(0),
 	fIsInstalled(false),
-	fPackages(kInitialPackageListSize, true)
+	fPackages(kInitialPackageListSize, true),
+	fChangeCount(0)
 {
 	SetTo(name);
 }
@@ -48,7 +50,8 @@ BSolverRepository::BSolverRepository(BPackageInstallationLocation location)
 	fName(),
 	fPriority(0),
 	fIsInstalled(false),
-	fPackages(kInitialPackageListSize, true)
+	fPackages(kInitialPackageListSize, true),
+	fChangeCount(0)
 {
 	SetTo(location);
 }
@@ -59,7 +62,8 @@ BSolverRepository::BSolverRepository(BAllInstallationLocations)
 	fName(),
 	fPriority(0),
 	fIsInstalled(false),
-	fPackages(kInitialPackageListSize, true)
+	fPackages(kInitialPackageListSize, true),
+	fChangeCount(0)
 {
 	SetTo(B_ALL_INSTALLATION_LOCATIONS);
 }
@@ -70,7 +74,8 @@ BSolverRepository::BSolverRepository(const BRepositoryConfig& config)
 	fName(),
 	fPriority(0),
 	fIsInstalled(false),
-	fPackages(kInitialPackageListSize, true)
+	fPackages(kInitialPackageListSize, true),
+	fChangeCount(0)
 {
 	SetTo(config);
 }
@@ -171,6 +176,7 @@ BSolverRepository::Unset()
 	fPriority = 0;
 	fIsInstalled = false;
 	fPackages.MakeEmpty();
+	fChangeCount++;
 }
 
 
@@ -192,6 +198,7 @@ void
 BSolverRepository::SetInstalled(bool isInstalled)
 {
 	fIsInstalled = isInstalled;
+	fChangeCount++;
 }
 
 
@@ -213,6 +220,7 @@ void
 BSolverRepository::SetPriority(uint8 priority)
 {
 	fPriority = priority;
+	fChangeCount++;
 }
 
 
@@ -247,6 +255,8 @@ BSolverRepository::AddPackage(const BPackageInfo& info,
 		return B_NO_MEMORY;
 	}
 
+	fChangeCount++;
+
 	if (_package != NULL)
 		*_package = package;
 
@@ -271,6 +281,13 @@ BSolverRepository::AddPackages(BPackageInstallationLocation location)
 	}
 
 	return B_OK;
+}
+
+
+uint64
+BSolverRepository::ChangeCount() const
+{
+	return fChangeCount;
 }
 
 
