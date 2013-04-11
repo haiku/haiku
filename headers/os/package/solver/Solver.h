@@ -25,8 +25,10 @@ public:
 			// FindPackages() flags
 			enum {
 				B_FIND_CASE_INSENSITIVE		= 0x01,
-				B_FIND_IN_SUMMARY			= 0x02,
-				B_FIND_IN_DESCRIPTION		= 0x04
+				B_FIND_IN_NAME				= 0x02,
+				B_FIND_IN_SUMMARY			= 0x04,
+				B_FIND_IN_DESCRIPTION		= 0x08,
+				B_FIND_IN_PROVIDES			= 0x10
 			};
 
 public:

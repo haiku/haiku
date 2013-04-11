@@ -226,14 +226,16 @@ LibsolvSolver::FindPackages(const char* searchString, uint32 flags,
 		iteratorFlags |= SEARCH_NOCASE;
 
 	SolvDataIterator iterator(fPool, 0, 0, 0, searchString, iteratorFlags);
+	SolvQueue selection;
 
 	// search package names
-	dataiterator_set_keyname(&iterator, SOLVABLE_NAME);
-	dataiterator_set_search(&iterator, 0, 0);
+	if ((flags & B_FIND_IN_NAME) != 0) {
+		dataiterator_set_keyname(&iterator, SOLVABLE_NAME);
+		dataiterator_set_search(&iterator, 0, 0);
 
-	SolvQueue selection;
-	while (dataiterator_step(&iterator))
-		queue_push2(&selection, SOLVER_SOLVABLE, iterator.solvid);
+		while (dataiterator_step(&iterator))
+			queue_push2(&selection, SOLVER_SOLVABLE, iterator.solvid);
+	}
 
 	// search package summaries
 	if ((flags & B_FIND_IN_SUMMARY) != 0) {
@@ -247,6 +249,15 @@ LibsolvSolver::FindPackages(const char* searchString, uint32 flags,
 	// search package description
 	if ((flags & B_FIND_IN_DESCRIPTION) != 0) {
 		dataiterator_set_keyname(&iterator, SOLVABLE_DESCRIPTION);
+		dataiterator_set_search(&iterator, 0, 0);
+
+		while (dataiterator_step(&iterator))
+			queue_push2(&selection, SOLVER_SOLVABLE, iterator.solvid);
+	}
+
+	// search package provides
+	if ((flags & B_FIND_IN_PROVIDES) != 0) {
+		dataiterator_set_keyname(&iterator, SOLVABLE_PROVIDES);
 		dataiterator_set_search(&iterator, 0, 0);
 
 		while (dataiterator_step(&iterator))

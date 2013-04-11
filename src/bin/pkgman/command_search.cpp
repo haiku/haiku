@@ -172,8 +172,10 @@ command_search(int argc, const char* const* argv)
 	// search
 	BObjectList<BSolverPackage> packages;
 	error = solver->FindPackages(searchString,
-		BSolver::B_FIND_CASE_INSENSITIVE | BSolver::B_FIND_IN_SUMMARY
-			| BSolver::B_FIND_IN_DESCRIPTION, packages);
+		BSolver::B_FIND_CASE_INSENSITIVE | BSolver::B_FIND_IN_NAME
+			| BSolver::B_FIND_IN_SUMMARY | BSolver::B_FIND_IN_DESCRIPTION
+			| BSolver::B_FIND_IN_PROVIDES,
+		packages);
 	if (error != B_OK)
 		DIE(error, "searching packages failed");
 
