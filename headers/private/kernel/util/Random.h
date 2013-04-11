@@ -16,8 +16,8 @@
 #define MAX_FAST_RANDOM_VALUE		0x7fff
 #define MAX_RANDOM_VALUE			0x7fffffffu
 
-const int	kFastRandomShift		= 15;
-const int	kRandomShift			= 31;
+static const int	kFastRandomShift		= 15;
+static const int	kRandomShift			= 31;
 
 #ifdef __cplusplus
 extern "C" {
