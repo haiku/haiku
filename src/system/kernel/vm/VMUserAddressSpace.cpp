@@ -407,7 +407,7 @@ VMUserAddressSpace::_RandomizeAddress(addr_t start, addr_t end,
 	else
 		range = min_c(range, kMaxRandomize);
 
-	addr_t random = get_random<addr_t>();
+	addr_t random = secure_get_random<addr_t>();
 	random %= range;
 	random &= ~addr_t(alignment - 1);
 
