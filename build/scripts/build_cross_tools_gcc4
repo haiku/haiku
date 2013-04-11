@@ -125,7 +125,7 @@ if [ "$HAIKU_USE_GCC_GRAPHITE" = 1 ]; then
 	gccConfigureArgs="$gccConfigureArgs --with-cloog=$installDir \
 		--enable-cloog-backend=isl --with-ppl=$installDir \
 		--disable-cloog-version-check --with-gmp=$installDir \
-		--with-host-libstdcxx=\"-lstdc++ -lsupc++\""
+		--with-host-libstdcxx=\"-lstdc++\""
 fi
 
 # force the POSIX locale, as the build (makeinfo) might choke otherwise
@@ -154,8 +154,8 @@ if [ "$HAIKU_USE_GCC_GRAPHITE" = 1 ]; then
 	CFLAGS="-O2" CXXFLAGS="-O2" $pplSourceDir/configure --prefix=$installDir \
 		--disable-nls --disable-shared --disable-watchdog \
 		--disable-maintainer-mode || exit 1
-	$MAKE $additionalMakeArgs || exit 1
-	$MAKE $additionalMakeArgs install || exit 1
+	$MAKE $additionalMakeArgs AUTOCONF:=true AUTOHEADER:=true ACLOCAL:=true AUTOMAKE:=true || exit 1
+	$MAKE $additionalMakeArgs install AUTOCONF:=true AUTOHEADER:=true ACLOCAL:=true AUTOMAKE:=true || exit 1
 
 	# build cloog
 	cd $cloogObjDir
