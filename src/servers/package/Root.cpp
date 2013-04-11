@@ -11,7 +11,11 @@
 
 #include <Directory.h>
 #include <Entry.h>
+#include <package/PackageDefs.h>
 #include <Path.h>
+
+#include <AutoDeleter.h>
+#include <AutoLocker.h>
 
 #include "DebugSupport.h"
 
@@ -38,11 +42,34 @@ private:
 };
 
 
+// #pragma mark - VolumeJob
+
+
+struct Root::HandleGetPackagesJob : public Job {
+	HandleGetPackagesJob(Root* root, BMessage* message)
+		:
+		fRoot(root),
+		fMessage(message)
+	{
+	}
+
+	virtual void Do()
+	{
+		fRoot->_HandleGetPackagesRequest(fMessage.Get());
+	}
+
+private:
+	Root*					fRoot;
+	ObjectDeleter<BMessage>	fMessage;
+};
+
+
 // #pragma mark - Root
 
 
 Root::Root()
 	:
+	fLock("packagefs root"),
 	fNodeRef(),
 	fPath(),
 	fSystemVolume(NULL),
@@ -68,8 +95,12 @@ Root::Init(const node_ref& nodeRef)
 {
 	fNodeRef = nodeRef;
 
-	// init job queue and spawn job runner thread
+	// init members and spawn job runner thread
 	status_t error = fJobQueue.Init();
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	error = fLock.InitCheck();
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
@@ -112,6 +143,8 @@ Root::Init(const node_ref& nodeRef)
 status_t
 Root::RegisterVolume(Volume* volume)
 {
+	AutoLocker<BLocker> locker(fLock);
+
 	Volume** volumeToSet = _GetVolume(volume->MountType());
 	if (volumeToSet == NULL)
 		return B_BAD_VALUE;
@@ -142,6 +175,8 @@ Root::RegisterVolume(Volume* volume)
 void
 Root::UnregisterVolume(Volume* volume)
 {
+	AutoLocker<BLocker> locker(fLock);
+
 	Volume** volumeToSet = _GetVolume(volume->MountType());
 	if (volumeToSet == NULL || *volumeToSet != volume) {
 		ERROR("Root::UnregisterVolume(): can't unregister unknown volume at "
@@ -160,6 +195,8 @@ Root::UnregisterVolume(Volume* volume)
 Volume*
 Root::FindVolume(dev_t deviceID) const
 {
+	AutoLocker<BLocker> locker(fLock);
+
 	Volume* volumes[] = { fSystemVolume, fCommonVolume, fHomeVolume };
 	for (size_t i = 0; i < sizeof(volumes) / sizeof(volumes[0]); i++) {
 		Volume* volume = volumes[i];
@@ -168,6 +205,20 @@ Root::FindVolume(dev_t deviceID) const
 	}
 
 	return NULL;
+}
+
+
+void
+Root::HandleGetPackagesRequest(BMessage* message)
+{
+	HandleGetPackagesJob* job
+		= new(std::nothrow) HandleGetPackagesJob(this, message);
+	if (job == NULL) {
+		delete message;
+		return;
+	}
+
+	_QueueJob(job);
 }
 
 
@@ -235,8 +286,11 @@ void
 Root::_InitPackages(Volume* volume)
 {
 	if (volume->InitPackages(this) == B_OK) {
+		AutoLocker<BLocker> locker(fLock);
 		Volume* nextVolume = _NextVolumeFor(volume);
 		Volume* nextNextVolume = _NextVolumeFor(nextVolume);
+		locker.Unlock();
+
 		volume->InitialVerify(nextVolume, nextNextVolume);
 	}
 }
@@ -256,6 +310,38 @@ Root::_ProcessNodeMonitorEvents(Volume* volume)
 
 	if (volume->HasPendingPackageActivationChanges())
 		volume->ProcessPendingPackageActivationChanges();
+}
+
+
+void
+Root::_HandleGetPackagesRequest(BMessage* message)
+{
+	int32 location;
+	if (message->FindInt32("location", &location) != B_OK
+		|| location < 0
+		|| location >= B_PACKAGE_INSTALLATION_LOCATION_ENUM_COUNT) {
+		return;
+	}
+
+	// get the volume and let it handle the message
+	AutoLocker<BLocker> locker(fLock);
+	Volume* volume;
+	switch ((BPackageInstallationLocation)location) {
+		case B_PACKAGE_INSTALLATION_LOCATION_SYSTEM:
+			volume = fSystemVolume;
+			break;
+		case B_PACKAGE_INSTALLATION_LOCATION_COMMON:
+			volume = fCommonVolume;
+			break;
+		case B_PACKAGE_INSTALLATION_LOCATION_HOME:
+			volume = fHomeVolume;
+			break;
+		default:
+			return;
+	}
+
+	if (volume != NULL)
+		volume->HandleGetPackagesRequest(message);
 }
 
 

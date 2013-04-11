@@ -16,15 +16,19 @@
 #include <NodeMonitor.h>
 
 #include <AutoDeleter.h>
+#include <package/PackageDaemonDefs.h>
 
 #include "DebugSupport.h"
 #include "Root.h"
 #include "Volume.h"
 
 
+using namespace BPackageKit::BPrivate;
+
+
 PackageDaemon::PackageDaemon(status_t* _error)
 	:
-	BServer("application/x-vnd.haiku-package_daemon", false, _error),
+	BServer(PACKAGE_DAEMON_APP_SIGNATURE, false, _error),
 	fSystemRoot(NULL),
 	fRoots(10, true),
 	fVolumeWatcher()
@@ -34,7 +38,6 @@ PackageDaemon::PackageDaemon(status_t* _error)
 
 PackageDaemon::~PackageDaemon()
 {
-//	delete fSystemRoot;
 }
 
 
@@ -56,6 +59,11 @@ PackageDaemon::Init()
 		_RegisterVolume(device);
 	}
 
+	// find the system root
+	struct stat st;
+	if (stat("/boot", &st) == 0)
+		fSystemRoot = _FindRoot(node_ref(st.st_dev, st.st_ino));
+
 	return B_OK;
 }
 
@@ -76,6 +84,16 @@ PackageDaemon::MessageReceived(BMessage* message)
 				_HandleVolumeUnmounted(message);
 			break;
 		}
+
+		case MESSAGE_GET_PACKAGES:
+		{
+			if (fSystemRoot == NULL)
+				break;
+
+			fSystemRoot->HandleGetPackagesRequest(DetachCurrentMessage());
+			break;
+		}
+
 		default:
 			BServer::MessageReceived(message);
 			break;

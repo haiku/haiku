@@ -14,6 +14,7 @@
 
 #include <Directory.h>
 #include <Entry.h>
+#include <Messenger.h>
 #include <Path.h>
 #include <String.h>
 #include <StringList.h>
@@ -25,6 +26,10 @@
 #include <package/RepositoryConfig.h>
 
 #include <package/hpkg/PackageReader.h>
+
+#if defined(__HAIKU__) && !defined(HAIKU_HOST_PLATFORM_HAIKU)
+#	include <package/PackageDaemonDefs.h>
+#endif
 
 
 namespace BPackageKit {
@@ -206,12 +211,22 @@ BPackageRoster::GetActivePackages(BPackageInstallationLocation location,
 			return B_BAD_VALUE;
 	}
 
-	// find the package links directory
-	BPath packageLinksPath;
-	status_t error = find_directory(B_PACKAGE_LINKS_DIRECTORY,
-		&packageLinksPath);
+	// get the package daemon's address
+	status_t error;
+	BMessenger messenger(PACKAGE_DAEMON_APP_SIGNATURE, -1, &error);
 	if (error != B_OK)
 		return error;
+
+	// request a list of packages
+	BMessage request(BPackageKit::BPrivate::MESSAGE_GET_PACKAGES);
+	error = request.AddInt32("location", location);
+	if (error != B_OK)
+		return error;
+
+	BMessage reply;
+	messenger.SendMessage(&request, &reply);
+	if (reply.what != BPackageKit::BPrivate::MESSAGE_GET_PACKAGES_REPLY)
+		return B_ERROR;
 
 	// find and open the packages directory
 	BPath packagesDirPath;
@@ -219,49 +234,21 @@ BPackageRoster::GetActivePackages(BPackageInstallationLocation location,
 	if (error != B_OK)
 		return error;
 
-	BDirectory directory;
-	error = directory.SetTo(packagesDirPath.Path());
-	if (error != B_OK)
-		return error;
-
-	// TODO: Implement that correctly be reading the activation files/directory!
-
 	// iterate through the packages
-	char buffer[sizeof(dirent) + B_FILE_NAME_LENGTH];
-	dirent* entry = (dirent*)&buffer;
-	while (directory.GetNextDirents(entry, sizeof(buffer), 1) == 1) {
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
-			continue;
-
+	const char* packageFileName;
+	for (int32 i = 0;
+		reply.FindString("active packages", i, &packageFileName) == B_OK; i++) {
 		// get the full package file path
 		BPath packagePath;
-		error = packagePath.SetTo(packagesDirPath.Path(), entry->d_name);
+		error = packagePath.SetTo(packagesDirPath.Path(), packageFileName);
 		if (error != B_OK)
 			continue;
 
 		// read the package info from the file
-		BPackageReader packageReader(NULL);
-		error = packageReader.Init(packagePath.Path());
-		if (error != B_OK)
-			continue;
-
 		BPackageInfo info;
-		BPackageInfoContentHandler handler(info);
-		error = packageReader.ParseContent(&handler);
+		error = info.ReadFromPackageFile(packagePath.Path());
 		if (error != B_OK || info.InitCheck() != B_OK)
 			continue;
-
-		// check whether the package is really active by verifying that a
-		// package link exists for it
-		BString packageLinkName(info.Name());
-		packageLinkName << '-' << info.Version().ToString();
-		BPath packageLinkPath;
-		struct stat st;
-		if (packageLinkPath.SetTo(packageLinksPath.Path(), packageLinkName)
-				!= B_OK
-			|| lstat(packageLinkPath.Path(), &st) != 0) {
-			continue;
-		}
 
 		// add the info
 		error = packageInfos.AddInfo(info);

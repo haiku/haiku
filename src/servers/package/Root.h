@@ -9,6 +9,7 @@
 #define ROOT_H
 
 
+#include <Locker.h>
 #include <Node.h>
 #include <ObjectList.h>
 #include <OS.h>
@@ -40,6 +41,8 @@ public:
 
 			Volume*				FindVolume(dev_t deviceID) const;
 
+			void				HandleGetPackagesRequest(BMessage* message);
+
 private:
 	// Volume::Listener
 	virtual	void				VolumeNodeMonitorEventOccurred(Volume* volume);
@@ -49,6 +52,9 @@ protected:
 
 private:
 			struct VolumeJob;
+			struct HandleGetPackagesJob;
+
+			friend struct HandleGetPackagesJob;
 
 private:
 			Volume**			_GetVolume(PackageFSMountType mountType);
@@ -57,6 +63,7 @@ private:
 			void				_InitPackages(Volume* volume);
 			void				_DeleteVolume(Volume* volume);
 			void				_ProcessNodeMonitorEvents(Volume* volume);
+			void				_HandleGetPackagesRequest(BMessage* message);
 
 			status_t			_QueueJob(Job* job);
 
@@ -64,6 +71,7 @@ private:
 			status_t			_JobRunner();
 
 private:
+	mutable	BLocker				fLock;
 			node_ref			fNodeRef;
 			BString				fPath;
 			Volume*				fSystemVolume;

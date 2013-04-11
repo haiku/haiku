@@ -30,9 +30,13 @@
 
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
+#include <package/PackageDaemonDefs.h>
 #include <package/PackagesDirectoryDefs.h>
 
 #include "DebugSupport.h"
+
+
+using namespace BPackageKit::BPrivate;
 
 
 static const char* const kPackageFileNameExtension = ".hpkg";
@@ -42,6 +46,8 @@ static const char* const kActivationFileName
 	= PACKAGES_DIRECTORY_ACTIVATION_FILE;
 static const char* const kTemporaryActivationFileName
 	= PACKAGES_DIRECTORY_ACTIVATION_FILE ".tmp";
+
+static bigtime_t kCommunicationTimeout = 1000000;
 
 
 // #pragma mark - Listener
@@ -325,6 +331,24 @@ INFORM("Volume::InitialVerify(%p, %p)\n", nextVolume, nextNextVolume);
 			}
 		}
 	}
+}
+
+
+void
+Volume::HandleGetPackagesRequest(BMessage* message)
+{
+	BMessage reply(MESSAGE_GET_PACKAGES_REPLY);
+
+	for (PackageFileNameHashTable::Iterator it
+			= fPackagesByFileName.GetIterator(); it.HasNext();) {
+		Package* package = it.Next();
+		const char* fieldName = package->IsActive()
+			? "active packages" : "inactive packages";
+		if (reply.AddString(fieldName, package->FileName()) != B_OK)
+			return;
+	}
+
+	message->SendReply(&reply, (BHandler*)NULL, kCommunicationTimeout);
 }
 
 

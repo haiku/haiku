@@ -48,6 +48,7 @@ public:
 									bool activeOnly);
 			void				InitialVerify(Volume* nextVolume,
 									Volume* nextNextVolume);
+			void				HandleGetPackagesRequest(BMessage* message);
 
 			void				Unmounted();
 
