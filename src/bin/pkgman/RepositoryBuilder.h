@@ -31,6 +31,8 @@ public:
 								RepositoryBuilder(BSolverRepository& repository,
 									const BString& name,
 									const BString& errorName = BString());
+								RepositoryBuilder(BSolverRepository& repository,
+									const BRepositoryConfig& config);
 
 			RepositoryBuilder&	SetPackagePathMap(PackagePathMap* packagePaths);
 

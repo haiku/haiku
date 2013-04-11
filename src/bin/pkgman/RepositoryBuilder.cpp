@@ -34,6 +34,19 @@ RepositoryBuilder::RepositoryBuilder(BSolverRepository& repository,
 }
 
 
+RepositoryBuilder::RepositoryBuilder(BSolverRepository& repository,
+	const BRepositoryConfig& config)
+	:
+	fRepository(repository),
+	fErrorName(fRepository.Name()),
+	fPackagePaths(NULL)
+{
+	status_t error = fRepository.SetTo(config);
+	if (error != B_OK)
+		DIE(error, "failed to init %s repository", fErrorName.String());
+}
+
+
 RepositoryBuilder&
 RepositoryBuilder::SetPackagePathMap(PackagePathMap* packagePaths)
 {
