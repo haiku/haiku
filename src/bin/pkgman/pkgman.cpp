@@ -11,34 +11,19 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "Command.h"
+
 
 extern const char* __progname;
 const char* kProgramName = __progname;
 
 
-static const char* kUsage =
+static const char* const kUsage =
 	"Usage: %s <command> <command args>\n"
-	"Creates, inspects, or extracts a Haiku package.\n"
+	"Manages packages and package repository.\n"
 	"\n"
 	"Commands:\n"
-	"  add-repo <repo-base-url>\n"
-	"    Adds the repository with the given <repo-base-URL>.\n"
-	"\n"
-	"  drop-repo <repo-name>\n"
-	"    Drops the repository with the given <repo-name>.\n"
-	"\n"
-	"  list-repos\n"
-	"    Lists all repositories.\n"
-	"\n"
-	"  refresh [<repo-name> ...]\n"
-	"    Refreshes all or just the given repositories.\n"
-	"\n"
-	"  resolve-dependencies <package> <repository> [ <priority> ] ...\n"
-	"    Resolves all packages a given package depends on.\n"
-	"\n"
-	"  search <search-string>\n"
-	"    Searches for packages matching <search-string>.\n"
-	"\n"
+	"%s"
 	"Common Options:\n"
 	"  -h, --help   - Print this usage info.\n"
 ;
@@ -47,7 +32,14 @@ static const char* kUsage =
 void
 print_usage_and_exit(bool error)
 {
-    fprintf(error ? stderr : stdout, kUsage, kProgramName);
+	BString commandsUsage;
+	const CommandList& commands = CommandManager::Default()->Commands();
+	for (int32 i = 0; Command* command = commands.ItemAt(i); i++)
+		commandsUsage << command->ShortUsage() << '\n';
+
+    fprintf(error ? stderr : stdout, kUsage, kProgramName,
+    	commandsUsage.String());
+
     exit(error ? 1 : 0);
 }
 
@@ -55,33 +47,19 @@ print_usage_and_exit(bool error)
 int
 main(int argc, const char* const* argv)
 {
+	CommandManager::Default()->InitCommands(kProgramName);
+
 	if (argc < 2)
 		print_usage_and_exit(true);
 
 	const char* command = argv[1];
-	if (strncmp(command, "add-r", 5) == 0)
-		return command_add_repo(argc - 1, argv + 1);
-
-	if (strncmp(command, "drop-r", 6) == 0)
-		return command_drop_repo(argc - 1, argv + 1);
-
-	if (strncmp(command, "list-r", 6) == 0)
-		return command_list_repos(argc - 1, argv + 1);
-
-	if (strncmp(command, "refr", 4) == 0)
-		return command_refresh(argc - 1, argv + 1);
-
-	if (strcmp(command, "resolve-dependencies") == 0)
-		return command_resolve_dependencies(argc - 1, argv + 1);
-
-	if (strcmp(command, "search") == 0)
-		return command_search(argc - 1, argv + 1);
-
 	if (strcmp(command, "help") == 0)
 		print_usage_and_exit(false);
-	else
+
+	CommandList commands;
+	CommandManager::Default()->GetCommands(command, commands);
+	if (commands.CountItems() != 1)
 		print_usage_and_exit(true);
 
-	// never gets here
-	return 0;
+	return commands.ItemAt(0)->Execute(argc - 1, argv + 1);
 }

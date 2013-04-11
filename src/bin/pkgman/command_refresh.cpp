@@ -15,6 +15,7 @@
 #include <package/RefreshRepositoryRequest.h>
 #include <package/PackageRoster.h>
 
+#include "Command.h"
 #include "DecisionProvider.h"
 #include "JobStateListener.h"
 #include "pkgman.h"
@@ -26,23 +27,22 @@ using namespace BPackageKit;
 // TODO: internationalization!
 
 
-static const char* kCommandUsage =
-	"Usage: %s refresh [<repo-name> ...]\n"
+static const char* const kShortUsage =
+	"  %command% [<repo-name> ...]\n"
+	"    Refreshes all or just the given repositories.\n";
+
+static const char* const kLongUsage =
+	"Usage: %program% %command% [<repo-name> ...]\n"
 	"Refreshes all or just the given repositories.\n"
-	"\n"
-;
+	"\n";
 
 
-static void
-print_command_usage_and_exit(bool error)
-{
-    fprintf(error ? stderr : stdout, kCommandUsage, kProgramName);
-    exit(error ? 1 : 0);
-}
+DEFINE_COMMAND(RefreshCommand, "refresh", kShortUsage, kLongUsage)
+
 
 
 int
-command_refresh(int argc, const char* const* argv)
+RefreshCommand::Execute(int argc, const char* const* argv)
 {
 	while (true) {
 		static struct option sLongOptions[] = {
@@ -57,11 +57,11 @@ command_refresh(int argc, const char* const* argv)
 
 		switch (c) {
 			case 'h':
-				print_command_usage_and_exit(false);
+				PrintUsageAndExit(false);
 				break;
 
 			default:
-				print_command_usage_and_exit(true);
+				PrintUsageAndExit(true);
 				break;
 		}
 	}

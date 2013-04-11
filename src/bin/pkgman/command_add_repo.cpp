@@ -16,6 +16,7 @@
 #include <package/RefreshRepositoryRequest.h>
 #include <package/PackageRoster.h>
 
+#include "Command.h"
 #include "DecisionProvider.h"
 #include "JobStateListener.h"
 #include "pkgman.h"
@@ -27,23 +28,21 @@ using namespace BPackageKit;
 // TODO: internationalization!
 
 
-static const char* kCommandUsage =
-	"Usage: %s add-repo <repo-URL> [<repo-URL> ...]\n"
+static const char* const kShortUsage =
+	"  %command% <repo-base-url>\n"
+	"    Adds the repository with the given <repo-base-URL>.\n";
+
+static const char* const kLongUsage =
+	"Usage: %program% %command% <repo-URL> [<repo-URL> ...]\n"
 	"Adds one or more repositories by downloading them from the given URL(s).\n"
-	"\n"
-;
+	"\n";
 
 
-static void
-print_command_usage_and_exit(bool error)
-{
-    fprintf(error ? stderr : stdout, kCommandUsage, kProgramName);
-    exit(error ? 1 : 0);
-}
+DEFINE_COMMAND(AddRepoCommand, "add-repo", kShortUsage, kLongUsage)
 
 
 int
-command_add_repo(int argc, const char* const* argv)
+AddRepoCommand::Execute(int argc, const char* const* argv)
 {
 	bool asUserRepository = false;
 
@@ -61,7 +60,7 @@ command_add_repo(int argc, const char* const* argv)
 
 		switch (c) {
 			case 'h':
-				print_command_usage_and_exit(false);
+				PrintUsageAndExit(false);
 				break;
 
 			case 'u':
@@ -69,14 +68,14 @@ command_add_repo(int argc, const char* const* argv)
 				break;
 
 			default:
-				print_command_usage_and_exit(true);
+				PrintUsageAndExit(true);
 				break;
 		}
 	}
 
 	// The remaining arguments are repo URLs, i. e. at least one more argument.
 	if (argc < optind + 1)
-		print_command_usage_and_exit(true);
+		PrintUsageAndExit(true);
 
 	const char* const* repoURLs = argv + optind;
 	int urlCount = argc - optind;

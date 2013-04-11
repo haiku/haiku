@@ -20,6 +20,7 @@
 
 #include <AutoDeleter.h>
 
+#include "Command.h"
 #include "pkgman.h"
 #include "RepositoryBuilder.h"
 
@@ -30,8 +31,12 @@
 using namespace BPackageKit;
 
 
-static const char* kCommandUsage =
-	"Usage: %s resolve-dependencies <package> <repository> [ <priority> ] ...\n"
+static const char* const kShortUsage =
+	"  %command% <package> <repository> [ <priority> ] ...\n"
+	"    Resolves all packages a given package depends on.\n";
+
+static const char* const kLongUsage =
+	"Usage: %program% %command% <package> <repository> [ <priority> ] ...\n"
 	"Resolves and lists all packages a given package depends on. Fails, if\n"
 	"not all dependencies could be resolved.\n"
 	"\n"
@@ -46,16 +51,11 @@ static const char* kCommandUsage =
 	"  <priority>\n"
 	"    Can follow a <repository> to specify the priority of that\n"
 	"    repository. The default priority is 0.\n"
-	"\n"
-;
+	"\n";
 
 
-static void
-print_command_usage_and_exit(bool error)
-{
-    fprintf(error ? stderr : stdout, kCommandUsage, kProgramName);
-    exit(error ? 1 : 0);
-}
+DEFINE_COMMAND(ResolveDependenciesCommand, "resolve-dependencies", kShortUsage,
+	kLongUsage)
 
 
 static void
@@ -107,7 +107,7 @@ verify_result(const BSolverResult& result, BSolverPackage* specifiedPackage)
 
 
 int
-command_resolve_dependencies(int argc, const char* const* argv)
+ResolveDependenciesCommand::Execute(int argc, const char* const* argv)
 {
 	while (true) {
 		static struct option sLongOptions[] = {
@@ -122,11 +122,11 @@ command_resolve_dependencies(int argc, const char* const* argv)
 
 		switch (c) {
 			case 'h':
-				print_command_usage_and_exit(false);
+				PrintUsageAndExit(false);
 				break;
 
 			default:
-				print_command_usage_and_exit(true);
+				PrintUsageAndExit(true);
 				break;
 		}
 	}
@@ -134,7 +134,7 @@ command_resolve_dependencies(int argc, const char* const* argv)
 	// The remaining arguments are the package (info) file and the repository
 	// directories (at least one), optionally with priorities.
 	if (argc < optind + 2)
-		print_command_usage_and_exit(true);
+		PrintUsageAndExit(true);
 
 	const char* packagePath = argv[optind++];
 	int repositoryDirectoryCount = argc - optind;

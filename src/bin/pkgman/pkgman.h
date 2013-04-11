@@ -34,12 +34,6 @@ do {																\
 
 
 void	print_usage_and_exit(bool error);
-int		command_add_repo(int argc, const char* const* argv);
-int		command_drop_repo(int argc, const char* const* argv);
-int		command_list_repos(int argc, const char* const* argv);
-int		command_refresh(int argc, const char* const* argv);
-int		command_resolve_dependencies(int argc, const char* const* argv);  
-int		command_search(int argc, const char* const* argv);  
 
 
 #endif	// PKGMAN_H

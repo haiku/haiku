@@ -14,6 +14,7 @@
 #include <package/DropRepositoryRequest.h>
 #include <package/Context.h>
 
+#include "Command.h"
 #include "DecisionProvider.h"
 #include "JobStateListener.h"
 #include "pkgman.h"
@@ -25,23 +26,21 @@ using namespace BPackageKit;
 // TODO: internationalization!
 
 
-static const char* kCommandUsage =
-	"Usage: %s drop-repo <repo-name>\n"
+static const char* const kShortUsage =
+	"  %command% <repo-name>\n"
+	"    Drops the repository with the given <repo-name>.\n";
+
+static const char* const kLongUsage =
+	"Usage: %program% %command% <repo-name>\n"
 	"Drops (i.e. removes) the repository with the given name.\n"
-	"\n"
-;
+	"\n";
 
 
-static void
-print_command_usage_and_exit(bool error)
-{
-    fprintf(error ? stderr : stdout, kCommandUsage, kProgramName);
-    exit(error ? 1 : 0);
-}
+DEFINE_COMMAND(DropRepoCommand, "drop-repo", kShortUsage, kLongUsage)
 
 
 int
-command_drop_repo(int argc, const char* const* argv)
+DropRepoCommand::Execute(int argc, const char* const* argv)
 {
 	bool yesMode = false;
 
@@ -59,7 +58,7 @@ command_drop_repo(int argc, const char* const* argv)
 
 		switch (c) {
 			case 'h':
-				print_command_usage_and_exit(false);
+				PrintUsageAndExit(false);
 				break;
 
 			case 'y':
@@ -67,14 +66,14 @@ command_drop_repo(int argc, const char* const* argv)
 				break;
 
 			default:
-				print_command_usage_and_exit(true);
+				PrintUsageAndExit(true);
 				break;
 		}
 	}
 
 	// The remaining argument is a repo name, i. e. one more argument.
 	if (argc != optind + 1)
-		print_command_usage_and_exit(true);
+		PrintUsageAndExit(true);
 
 	const char* repoName = argv[optind];
 

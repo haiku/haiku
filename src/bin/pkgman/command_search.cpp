@@ -19,6 +19,7 @@
 
 #include <AutoDeleter.h>
 
+#include "Command.h"
 #include "pkgman.h"
 #include "RepositoryBuilder.h"
 
@@ -34,8 +35,12 @@ using namespace BPackageKit;
 typedef std::map<BSolverPackage*, BString> PackagePathMap;
 
 
-static const char* kCommandUsage =
-	"Usage: %s search <search-string>\n"
+static const char* const kShortUsage =
+	"  %command% <search-string>\n"
+	"    Searches for packages matching <search-string>.\n";
+
+static const char* const kLongUsage =
+	"Usage: %program% %command% <search-string>\n"
 	"Searches for packages matching <search-string>.\n"
 	"\n"
 	"Options:\n"
@@ -43,16 +48,10 @@ static const char* kCommandUsage =
 	"    Only find installed packages.\n"
 	"  -u, --uninstalled-only\n"
 	"    Only find not installed packages.\n"
-	"\n"
-;
+	"\n";
 
 
-static void
-print_command_usage_and_exit(bool error)
-{
-    fprintf(error ? stderr : stdout, kCommandUsage, kProgramName);
-    exit(error ? 1 : 0);
-}
+DEFINE_COMMAND(SearchCommand, "search", kShortUsage, kLongUsage)
 
 
 static int
@@ -68,7 +67,7 @@ get_terminal_width()
 
 
 int
-command_search(int argc, const char* const* argv)
+SearchCommand::Execute(int argc, const char* const* argv)
 {
 	bool installedOnly = false;
 	bool uninstalledOnly = false;
@@ -88,7 +87,7 @@ command_search(int argc, const char* const* argv)
 
 		switch (c) {
 			case 'h':
-				print_command_usage_and_exit(false);
+				PrintUsageAndExit(false);
 				break;
 
 			case 'i':
@@ -102,14 +101,14 @@ command_search(int argc, const char* const* argv)
 				break;
 
 			default:
-				print_command_usage_and_exit(true);
+				PrintUsageAndExit(true);
 				break;
 		}
 	}
 
 	// The remaining argument is the search string.
 	if (argc != optind + 1)
-		print_command_usage_and_exit(true);
+		PrintUsageAndExit(true);
 
 	const char* searchString = argv[optind++];
 
