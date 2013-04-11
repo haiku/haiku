@@ -121,7 +121,9 @@ HistoryBuffer::GetTerminalLineAt(int32 index, TerminalLine* buffer) const
 		// full width char?
 		if (cell.character.IsFullWidth()) {
 			cell.attributes |= A_WIDTH;
-			charCount++;
+			// attributes of the second, "invisible" cell must be
+			// cleared to let full-width chars detection work properly
+			buffer->cells[charCount++].attributes = 0;
 		}
 	}
 
