@@ -36,6 +36,9 @@ static const char* kUsage =
 	"  resolve-dependencies <package> <repository> [ <priority> ] ...\n"
 	"    Resolves all packages a given package depends on.\n"
 	"\n"
+	"  search <search-string>\n"
+	"    Searches for packages matching <search-string>.\n"
+	"\n"
 	"Common Options:\n"
 	"  -h, --help   - Print this usage info.\n"
 ;
@@ -71,8 +74,8 @@ main(int argc, const char* const* argv)
 	if (strcmp(command, "resolve-dependencies") == 0)
 		return command_resolve_dependencies(argc - 1, argv + 1);
 
-//	if (strcmp(command, "search") == 0)
-//		return command_search(argc - 1, argv + 1);
+	if (strcmp(command, "search") == 0)
+		return command_search(argc - 1, argv + 1);
 
 	if (strcmp(command, "help") == 0)
 		print_usage_and_exit(false);

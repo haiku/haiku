@@ -8,6 +8,7 @@ BinCommand pkgman :
 	command_list_repos.cpp
 	command_refresh.cpp
 	command_resolve_dependencies.cpp
+	command_search.cpp
 	DecisionProvider.cpp
 	JobStateListener.cpp
 	PackageInfoErrorListener.cpp
