@@ -69,7 +69,7 @@ const size_t kMaxActivationRequestSize = 10 * 1024 * 1024;
 const size_t kMaxActivationFileSize = 10 * 1024 * 1024;
 
 static const char* const kActivationFilePath
-	= PACKAGES_DIRECTORY_CONFIG_DIRECTORY "/"
+	= PACKAGES_DIRECTORY_ADMIN_DIRECTORY "/"
 		PACKAGES_DIRECTORY_ACTIVATION_FILE;
 
 

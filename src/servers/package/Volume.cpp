@@ -40,8 +40,8 @@ using namespace BPackageKit::BPrivate;
 
 
 static const char* const kPackageFileNameExtension = ".hpkg";
-static const char* const kConfigDirectoryName
-	= PACKAGES_DIRECTORY_CONFIG_DIRECTORY;
+static const char* const kAdminDirectoryName
+	= PACKAGES_DIRECTORY_ADMIN_DIRECTORY;
 static const char* const kActivationFileName
 	= PACKAGES_DIRECTORY_ACTIVATION_FILE;
 static const char* const kTemporaryActivationFileName
@@ -540,7 +540,7 @@ fPackagesToBeActivated.size(), fPackagesToBeDeactivated.size());
 	// open and write the temporary file
 	BFile activationFile;
 	BEntry activationFileEntry;
-	status_t error = _OpenPackagesFile(kConfigDirectoryName,
+	status_t error = _OpenPackagesFile(kAdminDirectoryName,
 		kTemporaryActivationFileName,
 		B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE, activationFile,
 		&activationFileEntry);
