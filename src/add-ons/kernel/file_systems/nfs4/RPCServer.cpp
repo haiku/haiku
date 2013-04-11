@@ -12,6 +12,7 @@
 #include <stdlib.h>
 
 #include <util/AutoLock.h>
+#include <util/Random.h>
 
 #include "RPCCallbackServer.h"
 #include "RPCReply.h"
@@ -83,7 +84,7 @@ Server::Server(Connection* connection, PeerAddress* address)
 	fPrivateData(NULL),
 	fCallback(NULL),
 	fRepairCount(0),
-	fXID(rand() << 1)
+	fXID(get_random<uint32>())
 {
 	ASSERT(connection != NULL);
 	ASSERT(address != NULL);

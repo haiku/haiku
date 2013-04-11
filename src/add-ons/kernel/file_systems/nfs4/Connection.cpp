@@ -16,8 +16,9 @@
 #include <unistd.h>
 
 #include <AutoDeleter.h>
-#include <util/kernel_cpp.h>
 #include <net/dns_resolver.h>
+#include <util/kernel_cpp.h>
+#include <util/Random.h>
 
 
 #define NFS4_PORT		2049
@@ -655,7 +656,7 @@ Connection::Connect()
 	PeerAddress address(fPeerAddress.Family());
 
 	do {
-		port = rand() % (IPPORT_RESERVED - NFS_MIN_PORT);
+		port = get_random<uint16>() % (IPPORT_RESERVED - NFS_MIN_PORT);
 		port += NFS_MIN_PORT;
 
 		if (attempt == 9)
