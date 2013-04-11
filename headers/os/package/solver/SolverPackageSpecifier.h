@@ -6,38 +6,44 @@
 #define _PACKAGE__SOLVER_PACKAGE_SPECIFIER_H_
 
 
-#include <package/PackageResolvableExpression.h>
+#include <String.h>
 
 
 namespace BPackageKit {
 
 
-class BSolverRepository;
+class BSolverPackage;
 
 
 class BSolverPackageSpecifier {
 public:
+			enum BType {
+				B_UNSPECIFIED,
+				B_PACKAGE,
+				B_SELECT_STRING
+			};
+
+public:
 								BSolverPackageSpecifier();
-								BSolverPackageSpecifier(
-									const BPackageResolvableExpression&
-										expression);
-								BSolverPackageSpecifier(
-									BSolverRepository* repository,
-									const BPackageResolvableExpression&
-										expression);
+	explicit					BSolverPackageSpecifier(
+									BSolverPackage* package);
+	explicit					BSolverPackageSpecifier(
+									const BString& selectString);
 								BSolverPackageSpecifier(
 									const BSolverPackageSpecifier& other);
 								~BSolverPackageSpecifier();
 
-			BSolverRepository*	Repository() const;
-			const BPackageResolvableExpression& Expression() const;
+			BType				Type() const;
+			BSolverPackage*		Package() const;
+			const BString&		SelectString() const;
 
 			BSolverPackageSpecifier& operator=(
 									const BSolverPackageSpecifier& other);
 
 private:
-			BSolverRepository*	fRepository;
-			BPackageResolvableExpression fExpression;
+			BType				fType;
+			BSolverPackage*		fPackage;
+			BString				fSelectString;
 };
 
 

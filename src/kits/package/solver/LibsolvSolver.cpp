@@ -162,6 +162,7 @@ LibsolvSolver::LibsolvSolver()
 	fRepositoryInfos(10, true),
 	fInstalledRepository(NULL),
 	fSolvablePackages(),
+	fPackageSolvables(),
 	fProblems(10, true)
 {
 }
@@ -299,38 +300,61 @@ LibsolvSolver::Install(const BSolverPackageSpecifierList& packages)
 	int32 packageCount = packages.CountSpecifiers();
 	for (int32 i = 0; i < packageCount; i++) {
 		const BSolverPackageSpecifier& specifier = *packages.SpecifierAt(i);
-
-		// find matching packages
-		SolvQueue matchingPackages;
-
-		int flags = SELECTION_NAME | SELECTION_PROVIDES | SELECTION_GLOB
-			| SELECTION_CANON | SELECTION_DOTARCH | SELECTION_REL;
-// TODO: All flags needed/useful?
-		/*int matchFlags =*/ selection_make(fPool, &matchingPackages,
-			specifier.Expression().Name(), flags);
-// TODO: Don't just match the name, but also the version, if given!
-		if (matchingPackages.count == 0)
-			return B_NAME_NOT_FOUND;
-
-		// restrict to the matching repository
-		if (BSolverRepository* repository = specifier.Repository()) {
-			RepositoryInfo* repositoryInfo = _GetRepositoryInfo(repository);
-			if (repositoryInfo == NULL)
+		switch (specifier.Type()) {
+			case BSolverPackageSpecifier::B_UNSPECIFIED:
 				return B_BAD_VALUE;
 
-			SolvQueue repoFilter;
-			queue_push2(&repoFilter,
-				SOLVER_SOLVABLE_REPO/* | SOLVER_SETREPO | SOLVER_SETVENDOR*/,
-				repositoryInfo->SolvRepo()->repoid);
+			case BSolverPackageSpecifier::B_PACKAGE:
+			{
+				BSolverPackage* package = specifier.Package();
+				Solvable* solvable;
+				if (package == NULL
+					|| (solvable = _GetSolvable(package)) == NULL) {
+					return B_BAD_VALUE;
+				}
 
-			selection_filter(fPool, &matchingPackages, &repoFilter);
+				queue_push2(&jobs, SOLVER_SOLVABLE,
+					fPool->solvables - solvable);
+				break;
+			}
+			
+			case BSolverPackageSpecifier::B_SELECT_STRING:
+			{
+				// find matching packages
+				SolvQueue matchingPackages;
+		
+				int flags = SELECTION_NAME | SELECTION_PROVIDES | SELECTION_GLOB
+					| SELECTION_CANON | SELECTION_DOTARCH | SELECTION_REL;
+				/*int matchFlags =*/ selection_make(fPool, &matchingPackages,
+					specifier.SelectString().String(), flags);
+				if (matchingPackages.count == 0)
+					return B_NAME_NOT_FOUND;
+// TODO: We might want to add support for restricting to certain repositories.
+#if 0		
+				// restrict to the matching repository
+				if (BSolverRepository* repository = specifier.Repository()) {
+					RepositoryInfo* repositoryInfo
+						= _GetRepositoryInfo(repository);
+					if (repositoryInfo == NULL)
+						return B_BAD_VALUE;
 
-			if (matchingPackages.count == 0)
-				return B_NAME_NOT_FOUND;
+					SolvQueue repoFilter;
+					queue_push2(&repoFilter,
+						SOLVER_SOLVABLE_REPO
+							/* | SOLVER_SETREPO | SOLVER_SETVENDOR*/,
+						repositoryInfo->SolvRepo()->repoid);
+
+					selection_filter(fPool, &matchingPackages, &repoFilter);
+
+					if (matchingPackages.count == 0)
+						return B_NAME_NOT_FOUND;
+				}
+#endif
+
+				for (int j = 0; j < matchingPackages.count; j++)
+					queue_push(&jobs, matchingPackages.elements[j]);
+			}
 		}
-
-		for (int j = 0; j < matchingPackages.count; j++)
-			queue_push(&jobs, matchingPackages.elements[j]);
 	}
 
 	// set jobs' solver mode and solve
@@ -506,6 +530,7 @@ LibsolvSolver::_CleanupPool()
 
 	// clean up our data structures that depend on/refer to libsolv pool data
 	fSolvablePackages.clear();
+	fPackageSolvables.clear();
 
 	int32 repositoryCount = fRepositoryInfos.CountItems();
 	for (int32 i = 0; i < repositoryCount; i++)
@@ -575,6 +600,7 @@ LibsolvSolver::_AddRepositories()
 
 			try {
 				fSolvablePackages[solvable] = package;
+				fPackageSolvables[package] = solvable;
 			} catch (std::bad_alloc&) {
 				return B_NO_MEMORY;
 			}
@@ -622,6 +648,14 @@ LibsolvSolver::_GetPackage(Id solvableId) const
 {
 	Solvable* solvable = pool_id2solvable(fPool, solvableId);
 	return solvable != NULL ? _GetPackage(solvable) : NULL;
+}
+
+
+Solvable*
+LibsolvSolver::_GetSolvable(BSolverPackage* package) const
+{
+	PackageMap::const_iterator it = fPackageSolvables.find(package);
+	return it != fPackageSolvables.end() ? it->second : NULL;
 }
 
 

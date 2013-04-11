@@ -182,12 +182,8 @@ command_resolve_dependencies(int argc, const char* const* argv)
 
 	// resolve
 	BSolverPackageSpecifierList packagesToInstall;
-	if (!packagesToInstall.AppendSpecifier(
-			BSolverPackageSpecifier(&dummyRepository,
-				BPackageResolvableExpression(
-					specifiedPackage->Info().Name())))) {
+	if (!packagesToInstall.AppendSpecifier(specifiedPackage))
 		DIE(B_NO_MEMORY, "failed to add specified package");
-	}
 
 	error = solver->Install(packagesToInstall);
 	if (error != B_OK)

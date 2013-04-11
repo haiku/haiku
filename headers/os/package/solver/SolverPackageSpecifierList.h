@@ -6,12 +6,13 @@
 #define _PACKAGE__SOLVER_PACKAGE_SPECIFIER_LIST_H_
 
 
-#include <SupportDefs.h>
+#include <String.h>
 
 
 namespace BPackageKit {
 
 
+class BSolverPackage;
 class BSolverPackageSpecifier;
 
 
@@ -28,6 +29,8 @@ public:
 
 			bool				AppendSpecifier(
 									const BSolverPackageSpecifier& specifier);
+			bool				AppendSpecifier(BSolverPackage* package);
+			bool				AppendSpecifier(const BString& selectString);
 			void				MakeEmpty();
 
 			BSolverPackageSpecifierList& operator=(

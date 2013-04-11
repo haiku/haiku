@@ -15,26 +15,27 @@ namespace BPackageKit {
 
 BSolverPackageSpecifier::BSolverPackageSpecifier()
 	:
-	fRepository(NULL),
-	fExpression()
+	fType(B_UNSPECIFIED),
+	fPackage(NULL),
+	fSelectString()
 {
 }
 
 
-BSolverPackageSpecifier::BSolverPackageSpecifier(
-	const BPackageResolvableExpression& expression)
+BSolverPackageSpecifier::BSolverPackageSpecifier(BSolverPackage* package)
 	:
-	fRepository(NULL),
-	fExpression(expression)
+	fType(B_PACKAGE),
+	fPackage(package),
+	fSelectString()
 {
 }
 
 
-BSolverPackageSpecifier::BSolverPackageSpecifier(BSolverRepository* repository,
-	const BPackageResolvableExpression& expression)
+BSolverPackageSpecifier::BSolverPackageSpecifier(const BString& selectString)
 	:
-	fRepository(repository),
-	fExpression(expression)
+	fType(B_SELECT_STRING),
+	fPackage(NULL),
+	fSelectString()
 {
 }
 
@@ -42,8 +43,9 @@ BSolverPackageSpecifier::BSolverPackageSpecifier(BSolverRepository* repository,
 BSolverPackageSpecifier::BSolverPackageSpecifier(
 	const BSolverPackageSpecifier& other)
 	:
-	fRepository(other.fRepository),
-	fExpression(other.fExpression)
+	fType(other.fType),
+	fPackage(other.fPackage),
+	fSelectString(other.fSelectString)
 {
 }
 
@@ -53,25 +55,33 @@ BSolverPackageSpecifier::~BSolverPackageSpecifier()
 }
 
 
-BSolverRepository*
-BSolverPackageSpecifier::Repository() const
+BSolverPackageSpecifier::BType
+BSolverPackageSpecifier::Type() const
 {
-	return fRepository;
+	return fType;
 }
 
 
-const BPackageResolvableExpression&
-BSolverPackageSpecifier::Expression() const
+BSolverPackage*
+BSolverPackageSpecifier::Package() const
 {
-	return fExpression;
+	return fPackage;
+}
+
+
+const BString&
+BSolverPackageSpecifier::SelectString() const
+{
+	return fSelectString;
 }
 
 
 BSolverPackageSpecifier&
 BSolverPackageSpecifier::operator=(const BSolverPackageSpecifier& other)
 {
-	fRepository = other.fRepository;
-	fExpression = other.fExpression;
+	fType = other.fType;
+	fPackage = other.fPackage;
+	fSelectString = other.fSelectString;
 	return *this;
 }
 

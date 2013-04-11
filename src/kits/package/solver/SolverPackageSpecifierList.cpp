@@ -101,6 +101,20 @@ BSolverPackageSpecifierList::AppendSpecifier(
 }
 
 
+bool
+BSolverPackageSpecifierList::AppendSpecifier(BSolverPackage* package)
+{
+	return AppendSpecifier(BSolverPackageSpecifier(package));
+}
+
+
+bool
+BSolverPackageSpecifierList::AppendSpecifier(const BString& selectString)
+{
+	return AppendSpecifier(BSolverPackageSpecifier(selectString));
+}
+
+
 void
 BSolverPackageSpecifierList::MakeEmpty()
 {
