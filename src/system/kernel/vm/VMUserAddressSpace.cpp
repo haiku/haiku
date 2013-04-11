@@ -17,6 +17,7 @@
 #include <heap.h>
 #include <thread.h>
 #include <util/atomic.h>
+#include <util/Random.h>
 #include <vm/vm.h>
 #include <vm/VMArea.h>
 
@@ -420,28 +421,13 @@ VMUserAddressSpace::_RandomizeAddress(addr_t start, addr_t end,
 	if (start == end)
 		return start;
 
-	const int kRandShift = log2(RAND_MAX) + 1;
-	int shift = 0;
-#ifdef B_HAIKU_64_BIT
-	uint64_t random = 0;
-	while (shift < 64) {
-		random |= (uint64_t)rand() << shift;
-		shift += kRandShift;
-	}
-#else
-	uint32_t random = 0;
-	while (shift < 32) {
-		random |= (uint32_t)rand() << shift;
-		shift += kRandShift;
-	}
-#endif
-
 	addr_t range = end - start;
 	if (initial)
 		range = min_c(range, kMaxInitialRandomize);
 	else
 		range = min_c(range, kMaxRandomize);
 
+	addr_t random = get_random<addr_t>();
 	random %= range;
 	random &= ~addr_t(alignment - 1);
 
