@@ -15,9 +15,11 @@
 
 #define MAX_FAST_RANDOM_VALUE		0x7fff
 #define MAX_RANDOM_VALUE			0x7fffffffu
+#define MAX_SECURE_RANDOM_VALUE		0xffffffffu
 
 static const int	kFastRandomShift		= 15;
 static const int	kRandomShift			= 31;
+static const int	kSecureRandomShift		= 32;
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,6 +27,7 @@ extern "C" {
 
 unsigned int	fast_random_value(void);
 unsigned int	random_value(void);
+unsigned int	secure_random_value(void);
 
 #ifdef __cplusplus
 }
@@ -57,6 +60,21 @@ get_random()
 	while (shift < sizeof(T) * 8) {
 		random |= (T)random_value() << shift;
 		shift += kRandomShift;
+	}
+
+	return random;
+}
+
+
+template<typename T>
+T
+secure_get_random()
+{
+	size_t shift = 0;
+	T random = 0;
+	while (shift < sizeof(T) * 8) {
+		random |= (T)secure_random_value() << shift;
+		shift += kSecureRandomShift;
 	}
 
 	return random;
