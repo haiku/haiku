@@ -62,7 +62,7 @@ struct LibsolvSolver::RepositoryInfo {
 		:
 		fRepository(repository),
 		fSolvRepo(NULL),
-		fChangeCount(repository->ChangeCount() - 1)
+		fChangeCount(repository->ChangeCount())
 	{
 	}
 
@@ -83,7 +83,7 @@ struct LibsolvSolver::RepositoryInfo {
 
 	bool HasChanged() const
 	{
-		return fChangeCount != fRepository->ChangeCount();
+		return fChangeCount != fRepository->ChangeCount() || fSolvRepo == NULL;
 	}
 
 	void SetUnchanged()
@@ -162,6 +162,8 @@ LibsolvSolver::~LibsolvSolver()
 status_t
 LibsolvSolver::Init()
 {
+	_Cleanup();
+
 	// We do all initialization lazily.
 	return B_OK;
 }
@@ -370,9 +372,9 @@ LibsolvSolver::GetResult(BSolverResult& _result)
 
 
 status_t
-LibsolvSolver::_Init()
+LibsolvSolver::_InitPool()
 {
-	_Cleanup();
+	_CleanupPool();
 
 	fPool = pool_create();
 
@@ -403,12 +405,28 @@ LibsolvSolver::_Init()
 void
 LibsolvSolver::_Cleanup()
 {
-	_CleanupSolver();
+	_CleanupPool();
 
-	fSolvablePackages.clear();
 	fInstalledRepository = NULL;
 	fRepositoryInfos.MakeEmpty();
 
+}
+
+
+void
+LibsolvSolver::_CleanupPool()
+{
+	// clean up solver data
+	_CleanupSolver();
+
+	// clean up our data structures that depend on/refer to libsolv pool data
+	fSolvablePackages.clear();
+
+	int32 repositoryCount = fRepositoryInfos.CountItems();
+	for (int32 i = 0; i < repositoryCount; i++)
+		fRepositoryInfos.ItemAt(i)->SetSolvRepo(NULL);
+
+	// delete the pool
 	if (fPool != NULL) {
 		pool_free(fPool);
 		fPool = NULL;
@@ -449,7 +467,7 @@ LibsolvSolver::_AddRepositories()
 		return B_OK;
 
 	// something has changed -- re-create the pool
-	status_t error = _Init();
+	status_t error = _InitPool();
 	if (error != B_OK)
 		return error;
 
