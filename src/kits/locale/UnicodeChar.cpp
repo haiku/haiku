@@ -245,6 +245,7 @@ BUnicodeChar::ToUTF8(uint32 c, char **out)
 {
 	int i = 0;
 	U8_APPEND_UNSAFE(*out, i, c);
+	*out += i;
 }
 
 
