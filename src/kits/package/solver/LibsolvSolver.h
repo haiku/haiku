@@ -34,6 +34,10 @@ public:
 
 	virtual	status_t			AddRepository(BSolverRepository* repository);
 
+	virtual	status_t			FindPackages(const char* searchString,
+									uint32 flags,
+									BObjectList<BSolverPackage>& _packages);
+
 	virtual	status_t			Install(
 									const BSolverPackageSpecifierList&
 										packages);
@@ -46,6 +50,7 @@ public:
 
 private:
 			struct SolvQueue;
+			struct SolvDataIterator;
 			struct RepositoryInfo;
 			struct Problem;
 			struct Solution;

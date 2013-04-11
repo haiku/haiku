@@ -57,6 +57,20 @@ struct LibsolvSolver::SolvQueue : Queue {
 };
 
 
+struct LibsolvSolver::SolvDataIterator : Dataiterator {
+	SolvDataIterator(Pool* pool, Repo* repo, Id solvableId, Id keyname,
+		const char* match, int flags)
+	{
+		dataiterator_init(this, pool, repo, solvableId, keyname, match, flags);
+	}
+
+	~SolvDataIterator()
+	{
+		dataiterator_free(this);
+	}
+};
+
+
 struct LibsolvSolver::RepositoryInfo {
 	RepositoryInfo(BSolverRepository* repository)
 		:
@@ -192,6 +206,66 @@ LibsolvSolver::AddRepository(BSolverRepository* repository)
 
 	if (repository->IsInstalled())
 		fInstalledRepository = info;
+
+	return B_OK;
+}
+
+
+status_t
+LibsolvSolver::FindPackages(const char* searchString, uint32 flags,
+	BObjectList<BSolverPackage>& _packages)
+{
+	// add repositories to pool
+	status_t error = _AddRepositories();
+	if (error != B_OK)
+		return error;
+
+	// create data iterator
+	int iteratorFlags = SEARCH_SUBSTRING;
+	if ((flags & B_FIND_CASE_INSENSITIVE) != 0)
+		iteratorFlags |= SEARCH_NOCASE;
+
+	SolvDataIterator iterator(fPool, 0, 0, 0, searchString, iteratorFlags);
+
+	// search package names
+	dataiterator_set_keyname(&iterator, SOLVABLE_NAME);
+	dataiterator_set_search(&iterator, 0, 0);
+
+	SolvQueue selection;
+	while (dataiterator_step(&iterator))
+		queue_push2(&selection, SOLVER_SOLVABLE, iterator.solvid);
+
+	// search package summaries
+	if ((flags & B_FIND_IN_SUMMARY) != 0) {
+		dataiterator_set_keyname(&iterator, SOLVABLE_SUMMARY);
+		dataiterator_set_search(&iterator, 0, 0);
+
+		while (dataiterator_step(&iterator))
+			queue_push2(&selection, SOLVER_SOLVABLE, iterator.solvid);
+	}
+
+	// search package description
+	if ((flags & B_FIND_IN_DESCRIPTION) != 0) {
+		dataiterator_set_keyname(&iterator, SOLVABLE_DESCRIPTION);
+		dataiterator_set_search(&iterator, 0, 0);
+
+		while (dataiterator_step(&iterator))
+			queue_push2(&selection, SOLVER_SOLVABLE, iterator.solvid);
+	}
+
+	// get solvables	
+	SolvQueue solvables;
+	selection_solvables(fPool, &selection, &solvables);
+
+	// get packages
+	for (int i = 0; i < solvables.count; i++) {
+		BSolverPackage* package = _GetPackage(solvables.elements[i]);
+		if (package == NULL)
+			return B_ERROR;
+
+		if (!_packages.AddItem(package))
+			return B_NO_MEMORY;
+	}
 
 	return B_OK;
 }

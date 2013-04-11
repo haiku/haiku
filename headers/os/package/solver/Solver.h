@@ -6,12 +6,14 @@
 #define _PACKAGE__SOLVER_H_
 
 
+#include <ObjectList.h>
 #include <SupportDefs.h>
 
 
 namespace BPackageKit {
 
 
+class BSolverPackage;
 class BSolverPackageSpecifierList;
 class BSolverProblem;
 class BSolverRepository;
@@ -19,6 +21,14 @@ class BSolverResult;
 
 
 class BSolver {
+public:
+			// FindPackages() flags
+			enum {
+				B_FIND_CASE_INSENSITIVE		= 0x01,
+				B_FIND_IN_SUMMARY			= 0x02,
+				B_FIND_IN_DESCRIPTION		= 0x04
+			};
+
 public:
 	virtual						~BSolver();
 
@@ -28,6 +38,10 @@ public:
 
 	virtual	status_t			AddRepository(
 									BSolverRepository* repository) = 0;
+
+	virtual	status_t			FindPackages(const char* searchString,
+									uint32 flags,
+									BObjectList<BSolverPackage>& _packages) = 0;
 
 	virtual	status_t			Install(
 									const BSolverPackageSpecifierList&
