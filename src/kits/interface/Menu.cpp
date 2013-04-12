@@ -1729,7 +1729,8 @@ BMenu::_Track(int* action, long start)
 				GetMouse(&newLocation, &newButtons, true);
 				UnlockLooper();
 			} while (newLocation == location && newButtons == buttons
-				&& !(item && item->Submenu() != NULL)
+				&& !(item != NULL && item->Submenu() != NULL
+						&& item->Submenu()->Window() == NULL)
 				&& fState == MENU_STATE_TRACKING);
 
 			if (newLocation != location || newButtons != buttons) {
