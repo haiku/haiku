@@ -51,8 +51,9 @@ public:
 
 			BString				Name() const;
 
-			uint8				Priority() const;
-			void				SetPriority(uint8 priority);
+			int32				Priority() const;
+			void				SetPriority(int32 priority);
+									// negative priority is fine
 
 			bool				IsEmpty() const;
 			int32				CountPackages() const;
@@ -70,7 +71,7 @@ private:
 
 private:
 			BString				fName;
-			uint8				fPriority;
+			int32				fPriority;
 			bool				fIsInstalled;
 			PackageList			fPackages;
 			uint64				fChangeCount;

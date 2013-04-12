@@ -209,7 +209,7 @@ BSolverRepository::Name() const
 }
 
 
-uint8
+int32
 BSolverRepository::Priority() const
 {
 	return fPriority;
@@ -217,7 +217,7 @@ BSolverRepository::Priority() const
 
 
 void
-BSolverRepository::SetPriority(uint8 priority)
+BSolverRepository::SetPriority(int32 priority)
 {
 	fPriority = priority;
 	fChangeCount++;

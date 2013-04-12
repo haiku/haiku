@@ -588,7 +588,7 @@ LibsolvSolver::_AddRepositories()
 		Repo* repo = repo_create(fPool, repository->Name());
 		repositoryInfo->SetSolvRepo(repo);
 
-		repo->priority = 256 - repository->Priority();
+		repo->priority = -1 - repository->Priority();
 		repo->appdata = (void*)repositoryInfo;
 
 		int32 packageCount = repository->CountPackages();
