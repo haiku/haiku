@@ -14,6 +14,7 @@ namespace BPackageKit {
 
 
 class BSolverPackage;
+class BSolverPackageSpecifier;
 class BSolverPackageSpecifierList;
 class BSolverProblem;
 class BSolverRepository;
@@ -47,7 +48,9 @@ public:
 
 	virtual	status_t			Install(
 									const BSolverPackageSpecifierList&
-										packages) = 0;
+										packages,
+									const BSolverPackageSpecifier** _unmatched
+										= NULL) = 0;
 	virtual	status_t			VerifyInstallation() = 0;
 
 			bool				HasProblems() const

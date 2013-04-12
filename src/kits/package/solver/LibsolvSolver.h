@@ -40,7 +40,9 @@ public:
 
 	virtual	status_t			Install(
 									const BSolverPackageSpecifierList&
-										packages);
+										packages,
+									const BSolverPackageSpecifier** _unmatched
+										= NULL);
 	virtual	status_t			VerifyInstallation();
 
 	virtual	int32				CountProblems() const;

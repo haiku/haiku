@@ -284,8 +284,12 @@ LibsolvSolver::FindPackages(const char* searchString, uint32 flags,
 
 
 status_t
-LibsolvSolver::Install(const BSolverPackageSpecifierList& packages)
+LibsolvSolver::Install(const BSolverPackageSpecifierList& packages,
+	const BSolverPackageSpecifier** _unmatched)
 {
+	if (_unmatched != NULL)
+		*_unmatched = NULL;
+
 	if (packages.IsEmpty())
 		return B_BAD_VALUE;
 
@@ -327,8 +331,11 @@ LibsolvSolver::Install(const BSolverPackageSpecifierList& packages)
 					| SELECTION_CANON | SELECTION_DOTARCH | SELECTION_REL;
 				/*int matchFlags =*/ selection_make(fPool, &matchingPackages,
 					specifier.SelectString().String(), flags);
-				if (matchingPackages.count == 0)
+				if (matchingPackages.count == 0) {
+					if (_unmatched != NULL)
+						*_unmatched = &specifier;
 					return B_NAME_NOT_FOUND;
+				}
 // TODO: We might want to add support for restricting to certain repositories.
 #if 0		
 				// restrict to the matching repository
