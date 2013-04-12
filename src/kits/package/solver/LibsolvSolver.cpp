@@ -314,7 +314,7 @@ LibsolvSolver::Install(const BSolverPackageSpecifierList& packages)
 				}
 
 				queue_push2(&jobs, SOLVER_SOLVABLE,
-					fPool->solvables - solvable);
+					solvable - fPool->solvables);
 				break;
 			}
 			
