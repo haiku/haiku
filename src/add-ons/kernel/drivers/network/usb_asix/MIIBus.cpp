@@ -24,10 +24,10 @@
 
 
 MIIBus::MIIBus()
-		:
-		fStatus(B_NO_INIT),
-		fDevice(0),
-		fSelectedPHY(CurrentPHY)
+	:
+	fStatus(B_NO_INIT),
+	fDevice(0),
+	fSelectedPHY(CurrentPHY)
 {
 	for (size_t i = 0; i < PHYsCount; i++) {
 		fPHYs[i] = PHYNotInstalled;
@@ -47,8 +47,8 @@ MIIBus::Init(usb_device device)
 
 	size_t actual_length = 0;
 	status_t result = gUSBModule->send_request(device,
-			USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN,
-			READ_PHYID, 0, 0, sizeof(fPHYs), fPHYs, &actual_length);
+		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN, READ_PHYID, 0, 0,
+		sizeof(fPHYs), fPHYs, &actual_length);
 
 	if (result != B_OK) {
 		TRACE_ALWAYS("Request of the PHYIDs failed:%#010x\n", result);
@@ -57,7 +57,7 @@ MIIBus::Init(usb_device device)
 
 	if (sizeof(fPHYs) != actual_length) {
 		TRACE_ALWAYS("Mismatch of reading %d PHYIDs bytes instead of %d.\n",
-												actual_length, sizeof(fPHYs));
+			actual_length, sizeof(fPHYs));
 	}
 
 	TRACE("PHYIDs are:%#02x:%#02x\n", fPHYs[0], fPHYs[1]);
@@ -71,7 +71,7 @@ MIIBus::Init(usb_device device)
 	}
 
 	TRACE("PHYs are configured: Selected:%#02x; Primary:%#02x; 2ndary:%#02x\n",
-					PHYID(CurrentPHY), PHYID(PrimaryPHY), PHYID(SecondaryPHY));
+		PHYID(CurrentPHY), PHYID(PrimaryPHY), PHYID(SecondaryPHY));
 	if (fSelectedPHY == CurrentPHY) {
 		TRACE_ALWAYS("No PHYs found!\n");
 		return B_ENTRY_NOT_FOUND;
@@ -100,7 +100,7 @@ MIIBus::SetupPHY()
 	result = Write(MII_BMCR, control);
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of writing control word %#04x:%#010x.\n",
-				control, result);
+			control, result);
 	}
 
 	result = Write(MII_BMCR, BMCR_Reset);
@@ -120,7 +120,7 @@ MIIBus::SetupPHY()
 	}
 
 	TRACE("MII Info: OUI:%04x; Model:%04x; rev:%02x.\n",
-			MII_OUI(id01, id02), MII_MODEL(id02), MII_REV(id02));
+		MII_OUI(id01, id02), MII_MODEL(id02), MII_REV(id02));
 
 	// Dump();
 
@@ -144,7 +144,7 @@ MIIBus::PHYID(PHYIndex phyIndex /*= CurrentPHY*/)
 {
 	if (phyIndex == CurrentPHY) {
 		return (fSelectedPHY == CurrentPHY
-				? 0 : fPHYs[fSelectedPHY]) & PHYIDMask;
+			? 0 : fPHYs[fSelectedPHY]) & PHYIDMask;
 	}
 
 	return fPHYs[phyIndex] & PHYIDMask;
@@ -156,7 +156,7 @@ MIIBus::PHYType(PHYIndex phyIndex /*= CurrentPHY*/)
 {
 	if (phyIndex == CurrentPHY) {
 		return (fSelectedPHY == CurrentPHY
-				? PHYNotInstalled : fPHYs[fSelectedPHY]) & PHYTypeMask;
+			? PHYNotInstalled : fPHYs[fSelectedPHY]) & PHYTypeMask;
 	}
 
 	return fPHYs[phyIndex] & PHYTypeMask;
@@ -181,9 +181,8 @@ MIIBus::Read(uint16 miiRegister, uint16 *value, PHYIndex phyIndex /*= CurrPHY*/)
 
 	size_t actual_length = 0;
 	// switch to SW operation mode
-	result = gUSBModule->send_request(fDevice,
-			USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-			SW_MII_OP, 0, 0, 0, 0, &actual_length);
+	result = gUSBModule->send_request(fDevice, USB_REQTYPE_VENDOR
+		| USB_REQTYPE_DEVICE_OUT, SW_MII_OP, 0, 0, 0, 0, &actual_length);
 
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of switching MII to SW op.mode: %#010x\n", result);
@@ -191,26 +190,24 @@ MIIBus::Read(uint16 miiRegister, uint16 *value, PHYIndex phyIndex /*= CurrPHY*/)
 	}
 
 	// read register value
-	status_t op_result = gUSBModule->send_request(fDevice,
-			USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN,
-			READ_MII, phyId, miiRegister,
-			sizeof(*value), value, &actual_length);
+	status_t op_result = gUSBModule->send_request(fDevice, USB_REQTYPE_VENDOR
+		| USB_REQTYPE_DEVICE_IN, READ_MII, phyId, miiRegister, sizeof(*value),
+		value, &actual_length);
 
 	if (op_result != B_OK) {
 		TRACE_ALWAYS("Error of reading MII reg.%d at PHY%d:%#010x.\n",
-										miiRegister, phyId, op_result);
+			miiRegister, phyId, op_result);
 	}
 
 	if (sizeof(*value) != actual_length) {
 		TRACE_ALWAYS("Mismatch of reading MII reg.%d at PHY %d. "
-						"Read %d bytes instead of %d.\n",
-							miiRegister, phyId, actual_length, sizeof(*value));
+			"Read %d bytes instead of %d.\n", miiRegister, phyId,
+			actual_length, sizeof(*value));
 	}
 
 	// switch to HW operation mode
-	result = gUSBModule->send_request(fDevice,
-			USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-			HW_MII_OP, 0, 0, 0, 0, &actual_length);
+	result = gUSBModule->send_request(fDevice, USB_REQTYPE_VENDOR
+		| USB_REQTYPE_DEVICE_OUT, HW_MII_OP, 0, 0, 0, 0, &actual_length);
 
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of switching MII to HW op.mode: %#010x\n", result);
@@ -239,9 +236,8 @@ MIIBus::Write(uint16 miiRegister, uint16 value, PHYIndex phyIndex /*= CurrPHY*/)
 	uint16 phyId = PHYID(phyIndex);
 
 	// switch to SW operation mode
-	result = gUSBModule->send_request(fDevice,
-			USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-			SW_MII_OP, 0, 0, 0, 0, &actual_length);
+	result = gUSBModule->send_request(fDevice, USB_REQTYPE_VENDOR
+		| USB_REQTYPE_DEVICE_OUT, SW_MII_OP, 0, 0, 0, 0, &actual_length);
 
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of switching MII to SW op.mode: %#010x\n", result);
@@ -249,26 +245,24 @@ MIIBus::Write(uint16 miiRegister, uint16 value, PHYIndex phyIndex /*= CurrPHY*/)
 	}
 
 	// write register value
-	status_t op_result = gUSBModule->send_request(fDevice,
-			USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-			WRITE_MII, phyId, miiRegister,
-			sizeof(value), &value, &actual_length);
+	status_t op_result = gUSBModule->send_request(fDevice, USB_REQTYPE_VENDOR
+		| USB_REQTYPE_DEVICE_OUT, WRITE_MII, phyId, miiRegister, sizeof(value),
+		&value, &actual_length);
 
 	if (op_result != B_OK) {
 		TRACE_ALWAYS("Error of writing MII reg.%d at PHY %d:%#010x.\n",
-										miiRegister, phyId, op_result);
+			miiRegister, phyId, op_result);
 	}
 
 	if (sizeof(value) != actual_length) {
 		TRACE_ALWAYS("Mismatch of writing MII reg.%d at PHY %d."
-						"Write %d bytes instead of %d.\n",
-							miiRegister, phyId, actual_length, sizeof(value));
+			"Write %d bytes instead of %d.\n", miiRegister, phyId,
+			actual_length, sizeof(value));
 	}
 
 	// switch to HW operation mode
-	result = gUSBModule->send_request(fDevice,
-			USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-			HW_MII_OP, 0, 0, 0, 0, &actual_length);
+	result = gUSBModule->send_request(fDevice, USB_REQTYPE_VENDOR
+		| USB_REQTYPE_DEVICE_OUT, HW_MII_OP, 0, 0, 0, 0, &actual_length);
 
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of switching MII to HW op.mode: %#010x\n", result);
@@ -312,36 +306,33 @@ MIIBus::Dump()
 		return result;
 	}
 
-	uint8 regs[] = { MII_BMCR, MII_BMSR,
-						MII_PHYID0, MII_PHYID1,
-						MII_ANAR, MII_ANLPAR/*, MII_ANER*/};
+	uint8 regs[] = { MII_BMCR, MII_BMSR, MII_PHYID0,
+		MII_PHYID1, MII_ANAR, MII_ANLPAR/*, MII_ANER*/};
 	uint16 value = 0;
 	for (size_t i = 0; i < sizeof(regs)/ sizeof(regs[0]); i++) {
 
 		// read register value
 		status_t op_result = gUSBModule->send_request(fDevice,
-				USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN,
-				READ_MII, phyId, regs[i],
-				sizeof(value), &value, &actual_length);
+			USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN, READ_MII, phyId,
+			regs[i], sizeof(value), &value, &actual_length);
 
 		if (op_result != B_OK) {
 			TRACE_ALWAYS("Error of reading MII reg.%d at PHY%d:%#010x.\n",
-												regs[i], phyId, op_result);
+				regs[i], phyId, op_result);
 		}
 
 		if (sizeof(value) != actual_length) {
 			TRACE_ALWAYS("Mismatch of reading MII reg.%d at PHY%d."
-							" Read %d bytes instead of %d.\n",
-							regs[i], phyId, actual_length, sizeof(value));
+				" Read %d bytes instead of %d.\n", regs[i], phyId,
+				actual_length, sizeof(value));
 		}
 
 		TRACE_ALWAYS("MII reg: %d has %#04x\n", regs[i], value);
 	}
 
 	// switch to HW operation mode
-	result = gUSBModule->send_request(fDevice,
-			USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-			HW_MII_OP, 0, 0, 0, 0, &actual_length);
+	result = gUSBModule->send_request(fDevice, USB_REQTYPE_VENDOR
+		| USB_REQTYPE_DEVICE_OUT, HW_MII_OP, 0, 0, 0, 0, &actual_length);
 
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of switching MII to HW op.mode: %#010x\n", result);
@@ -350,4 +341,3 @@ MIIBus::Dump()
 	return result;
 
 }
-

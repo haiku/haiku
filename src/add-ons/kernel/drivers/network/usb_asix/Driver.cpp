@@ -107,7 +107,7 @@ lookup_and_create_device(usb_device device)
 				return new AX88178Device(device, gSupportedDevices[right]);
 			default:
 				TRACE_ALWAYS("Unknown device type:%#x ignored.\n",
-						static_cast<int>(gSupportedDevices[right].fType));
+					static_cast<int>(gSupportedDevices[right].fType));
 				break;
 		}
 	} else {
@@ -390,4 +390,3 @@ find_device(const char *name)
 
 	return &deviceHooks;
 }
-

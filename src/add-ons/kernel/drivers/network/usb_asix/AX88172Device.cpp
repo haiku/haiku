@@ -276,8 +276,8 @@ AX88172Device::GetLinkState(ether_link_state *linkState)
 	linkState->quality = 1000;
 
 	linkState->media   = IFM_ETHER | (fHasConnection ? IFM_ACTIVE : 0);
-	linkState->media  |= mediumStatus & (ANLPAR_TX_FD | ANLPAR_10_FD) ?
-		IFM_FULL_DUPLEX : IFM_HALF_DUPLEX;
+	linkState->media  |= mediumStatus & (ANLPAR_TX_FD | ANLPAR_10_FD)
+		? IFM_FULL_DUPLEX : IFM_HALF_DUPLEX;
 
 	linkState->speed   = mediumStatus & (ANLPAR_TX_FD | ANLPAR_TX_HD)
 		? 100000000 : 10000000;
@@ -288,4 +288,3 @@ AX88172Device::GetLinkState(ether_link_state *linkState)
 		(linkState->media & IFM_FULL_DUPLEX) ? "full" : "half");
 	return B_OK;
 }
-

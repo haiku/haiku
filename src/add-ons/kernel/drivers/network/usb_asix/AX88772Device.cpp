@@ -242,9 +242,8 @@ AX88772Device::ReadMACAddress(ether_address_t *address)
 		size_t actual_length = 0;
 		uint16 addr = 0;
 		status_t result = gUSBModule->send_request(fDevice,
-								USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN,
-								READ_SROM, EEPROM_772B_NODE_ID + i, 0,
-								sizeof(addr), &addr, &actual_length);
+			USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN, READ_SROM,
+			EEPROM_772B_NODE_ID + i, 0, sizeof(addr), &addr, &actual_length);
 		if (result != B_OK) {
 			TRACE_ALWAYS("Error reading MAC[%d] address:%#010x\n", i, result);
 			return result;
@@ -506,11 +505,9 @@ AX88772Device::StartDevice()
 	// AX88772B uses different maximum frame burst configuration.
 	if (fDeviceInfo.fType == DeviceInfo::AX88772B) {
 		result = gUSBModule->send_request(fDevice,
-						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-						WRITE_RXCONTROL_CFG,
-						AX88772B_MFBTable[AX88772B_MFB_2K].ByteCount,
-						AX88772B_MFBTable[AX88772B_MFB_2K].Threshold,
-						0, 0, &actualLength);
+			USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT, WRITE_RXCONTROL_CFG,
+			AX88772B_MFBTable[AX88772B_MFB_2K].ByteCount,
+			AX88772B_MFBTable[AX88772B_MFB_2K].Threshold, 0, 0, &actualLength);
 
 		if (result != B_OK) {
 			TRACE_ALWAYS("Error of writing frame burst:%#010x\n", result);
@@ -527,7 +524,7 @@ AX88772Device::StartDevice()
 	result = WriteRXControlRegister(rxcontrol);
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of writing %#04x RX Control:%#010x\n",
-						rxcontrol, result);
+			rxcontrol, result);
 	}
 
 	TRACE_RET(result);
@@ -610,8 +607,8 @@ AX88772Device::GetLinkState(ether_link_state *linkState)
 	linkState->quality = 1000;
 
 	linkState->media = IFM_ETHER | (fHasConnection ? IFM_ACTIVE : 0);
-	linkState->media |= (mediumStatus & MEDIUM_STATE_FD) ?
-		IFM_FULL_DUPLEX : IFM_HALF_DUPLEX;
+	linkState->media |= (mediumStatus & MEDIUM_STATE_FD)
+		? IFM_FULL_DUPLEX : IFM_HALF_DUPLEX;
 
 	linkState->speed = (mediumStatus & MEDIUM_STATE_PS_100)
 		? 100000000 : 10000000;
@@ -622,4 +619,3 @@ AX88772Device::GetLinkState(ether_link_state *linkState)
 		(linkState->media & IFM_FULL_DUPLEX) ? "full" : "half");
 	return B_OK;
 }
-

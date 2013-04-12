@@ -348,7 +348,7 @@ AX88178Device::OnNotify(uint32 actualLength)
 		return B_BAD_DATA;
 	}
 
-	AX88178_Notify *notification	= (AX88178_Notify *)fNotifyBuffer;
+	AX88178_Notify *notification = (AX88178_Notify *)fNotifyBuffer;
 
 	if (notification->btA1 != 0xa1) {
 		TRACE_ALWAYS("Notify magic byte is invalid: %#02x\n",
@@ -414,13 +414,13 @@ AX88178Device::GetLinkState(ether_link_state *linkState)
 	linkState->quality = 1000;
 
 	linkState->media = IFM_ETHER | (fHasConnection ? IFM_ACTIVE : 0);
-	linkState->media |= (mediumStatus & MEDIUM_STATE_FD) ?
-		IFM_FULL_DUPLEX : IFM_HALF_DUPLEX;
+	linkState->media |= (mediumStatus & MEDIUM_STATE_FD)
+		? IFM_FULL_DUPLEX : IFM_HALF_DUPLEX;
 
 	linkState->speed = (mediumStatus & MEDIUM_STATE_PS_100)
 		? 100000000 : 10000000;
-	linkState->speed = (mediumStatus & MEDIUM_STATE_GM) ?
-		1000000000 : linkState->speed;
+	linkState->speed = (mediumStatus & MEDIUM_STATE_GM)
+		? 1000000000 : linkState->speed;
 
 	TRACE_FLOW("Medium state: %s, %lld MBit/s, %s duplex.\n",
 		(linkState->media & IFM_ACTIVE) ? "active" : "inactive",
@@ -428,4 +428,3 @@ AX88178Device::GetLinkState(ether_link_state *linkState)
 		(linkState->media & IFM_FULL_DUPLEX) ? "full" : "half");
 	return B_OK;
 }
-
