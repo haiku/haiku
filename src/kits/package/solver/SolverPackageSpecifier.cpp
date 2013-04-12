@@ -35,7 +35,7 @@ BSolverPackageSpecifier::BSolverPackageSpecifier(const BString& selectString)
 	:
 	fType(B_SELECT_STRING),
 	fPackage(NULL),
-	fSelectString()
+	fSelectString(selectString)
 {
 }
 
