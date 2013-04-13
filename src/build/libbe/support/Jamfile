@@ -15,6 +15,7 @@ BuildPlatformMergeObjectPIC <libbe_build>support_kit.o :
 	List.cpp
 	Locker.cpp
 	PointerList.cpp
+	Referenceable.cpp
 	String.cpp
 	StringList.cpp
 ;
