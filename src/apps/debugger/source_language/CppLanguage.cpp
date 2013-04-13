@@ -1,11 +1,13 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "CppLanguage.h"
+
+#include <stdlib.h>
 
 #include "TeamTypeInformation.h"
 #include "Type.h"
@@ -39,6 +41,7 @@ CppLanguage::ParseTypeExpression(const BString &expression,
 
 	BString parsedName = expression;
 	BString baseTypeName;
+	BString arraySpecifier;
 	parsedName.RemoveAll(" ");
 
 	int32 modifierIndex = -1;
@@ -52,6 +55,12 @@ CppLanguage::ParseTypeExpression(const BString &expression,
 		parsedName.Remove(0, modifierIndex);
 	} else
 		baseTypeName = parsedName;
+
+	modifierIndex = parsedName.FindFirst('[');
+	if (modifierIndex >= 0) {
+		parsedName.MoveInto(arraySpecifier, modifierIndex,
+			parsedName.Length() - modifierIndex);
+	}
 
 	result = info->LookupTypeByName(baseTypeName, TypeLookupConstraints(),
 		baseType);
@@ -100,6 +109,37 @@ CppLanguage::ParseTypeExpression(const BString &expression,
 		_resultType = derivedType;
 	} else
 		_resultType = baseType;
+
+
+	if (!arraySpecifier.IsEmpty()) {
+		ArrayType* arrayType = NULL;
+
+		int32 startIndex = 1;
+		do {
+			int32 size = strtoul(arraySpecifier.String() + startIndex,
+				NULL, 10);
+			if (size < 0)
+				return B_ERROR;
+
+			if (arrayType == NULL) {
+				result = _resultType->CreateDerivedArrayType(size, true,
+					arrayType);
+			} else {
+				result = arrayType->CreateDerivedArrayType(size, true,
+					arrayType);
+			}
+
+			if (result != B_OK)
+				return result;
+
+			typeRef.SetTo(arrayType, true);
+
+			startIndex = arraySpecifier.FindFirst('[', startIndex + 1);
+
+		} while (startIndex >= 0);
+
+		_resultType = arrayType;
+	}
 
 	typeRef.Detach();
 
