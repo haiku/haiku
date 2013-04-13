@@ -13,6 +13,7 @@
 
 #include <debugger.h>
 
+#include <Alert.h>
 #include <Looper.h>
 #include <PopUpMenu.h>
 #include <ToolTip.h>
@@ -1488,6 +1489,13 @@ VariablesView::MessageReceived(BMessage* message)
 
 			if (language->ParseTypeExpression(typeExpression,
 				fThread->GetTeam()->DebugInfo(), type) != B_OK) {
+				BString errorMessage;
+				errorMessage.SetToFormat("Failed to resolve type %s",
+					typeExpression.String(), strerror(result));
+				BAlert* alert = new(std::nothrow) BAlert("Error",
+					errorMessage.String(), "Close");
+				if (alert != NULL)
+					alert->Go();
 				break;
 			}
 
