@@ -1,8 +1,9 @@
-1	finnish	x-vnd.Haiku-ActivityMonitor	3704566709
+1	finnish	x-vnd.Haiku-ActivityMonitor	1913625522
 P-faults	DataSource		P-viat
 Media nodes	DataSource		Mediasolmut
 Threads	DataSource		Säikeet
 MB	DataSource		Mt
+Always on top	ActivityWindow		Aina päällimmäisenä
 Add graph	ActivityWindow		Lisää kuvaaja
 Teams	DataSource		Ryhmät
 Hide legend	ActivityView		Piilota merkin selitys

@@ -1,8 +1,9 @@
-1	german	x-vnd.Haiku-ActivityMonitor	3704566709
+1	german	x-vnd.Haiku-ActivityMonitor	1913625522
 P-faults	DataSource		Seitenfehler
 Media nodes	DataSource		Media-Nodes
 Threads	DataSource		Threads
 MB	DataSource		MiB
+Always on top	ActivityWindow		Immer im Vordergrund
 Add graph	ActivityWindow		Graphen hinzufügen
 Teams	DataSource		Teams
 Hide legend	ActivityView		Legende ausblenden

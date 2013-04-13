@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Terminal	328707356
+1	finnish	x-vnd.Haiku-Terminal	2967760334
 Not found.	Terminal TermWindow		Ei löytynyt.
 Switch Terminals	Terminal TermWindow		Vaihda pääteikkunoita
 Change directory	Terminal TermView		Vaihda hakemistoa
@@ -79,6 +79,7 @@ Clear all	Terminal TermWindow		Tyhjennä kaikki
 Text encoding	Terminal TermWindow		Tekstikoodaus
 size	Terminal TermView		koko
 Close window	Terminal TermWindow		Sulje ikkuna
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAktiivin prosessin työhakemisto nykyisessä\n\t\t\tvälilehdessä. Valinnaisesti voidaan määritellä polkukompo-\n\t\t\tnenttien enimmäismäärä. Esim.: '%2d' useimmille kahdelle komponentille.\n\t%T\t-\tPääteikkunasovelluksen nimi nykyiselle paikallisasetukselle.\n\t%e\t-\tNykyisen välilehden koodaus. Ei näytetä, jos koodaus on UTF-8.\n\t%i\t-\tIkkunan indeksi.\n\t%p\t-\tAktiivin prosessin nimi nykyisessä välilehdessä.\n\t%t\t-\tNykyisen välilehden otsikko.\n\t%%\t-\tKirjain '%'.
 Save as default	Terminal TermWindow		Tallenna oletuksena
 Set tab title	Terminal TermWindow		Aseta välilehtiotsikko
 Settings…	Terminal TermWindow		Asetukset...

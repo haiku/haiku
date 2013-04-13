@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-LaunchBox	3016105370
+1	finnish	x-vnd.Haiku-LaunchBox	3692177981
 New	LaunchBox		Uusi
 Set description…	LaunchBox		Aseta kuvaus...
 Vertical layout	LaunchBox		Pystysuora sijoittelu
@@ -6,6 +6,7 @@ OK	LaunchBox		Valmis
 Pad 1	LaunchBox		Alusta 1
 last chance	LaunchBox		viimeinen mahdollisuus
 Quit	LaunchBox		Poistu
+Open containing folder	LaunchBox		Avaa sisältyvä kansio
 Clear button	LaunchBox		Nollaa painike
 LaunchBox	System name		Käynnistysikkuna
 Ignore double-click	LaunchBox		Ohita kaksoisnapsautukset

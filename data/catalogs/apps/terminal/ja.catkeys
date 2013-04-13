@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Terminal	328707356
+1	japanese	x-vnd.Haiku-Terminal	2967760334
 Not found.	Terminal TermWindow		これ以上見つかりません。
 Switch Terminals	Terminal TermWindow		ターミナルを切替える
 Change directory	Terminal TermView		ディレクトリを変更
@@ -79,6 +79,7 @@ Clear all	Terminal TermWindow		すべて消去
 Text encoding	Terminal TermWindow		テキストエンコーディング
 size	Terminal TermView		サイズ
 Close window	Terminal TermWindow		ウィンドウを閉じる
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tタブ内で動作中のプロセスの作業中のフォルダー\n\t\t\tオプションでパスの最大要素を指定できます。\n\t\t\t例. '%2d' は2 つの要素を示します。\n\t%T\t-\t現在のロケールでの Terminal アプリケーション名\n\t%e\t-\tタブのエンコーディング。UTF-8 の場合は表示されません。\n\t%i\t-\tウィンドウのインデックス\n\t%p\t-\tタブ内で実行中のプロセス名\n\t%t\t-\tタブのタイトル.\n\t%%\t-\t文字 '%'
 Save as default	Terminal TermWindow		デフォルトとして保存
 Set tab title	Terminal TermWindow		タブのタイトルを設定
 Settings…	Terminal TermWindow		設定…

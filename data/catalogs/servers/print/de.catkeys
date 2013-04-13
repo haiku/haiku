@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-PSRV	1761631281
+1	german	x-vnd.Be-PSRV	123334776
 Undefined	ConfigWindow		Unbestimmt
 Return the number of available transports	PrintServerApp Scripting		Anzahl der verfügbaren Transporte melden
 Return the number of available printers	PrintServerApp Scripting		Meldet die Anzahl der verfügbaren Drucker
@@ -9,6 +9,7 @@ Retrieve a specific printer	PrintServerApp Scripting		Einen bestimmten Drucker h
 Page %1 to %2	ConfigWindow		Seite %1 bis %2
 Get name of the printer add-on used for this printer	Printer Scripting		Name des von diesem Drucker verwendeten Add-ons anzeigen
 Page setup:	ConfigWindow		Seite einrichten:
+B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
 OK	ConfigWindow		OK
 Cancel	ConfigWindow		Abbrechen
 Printer server	ConfigWindow		Druckserver
