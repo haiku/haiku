@@ -214,7 +214,7 @@ private:
 									bool moveItems, float* width,
 									float* height);
 			void				_ComputeColumnLayout(int32 index, bool bestFit,
-									bool moveItems, BRect& outRect);
+									bool moveItems, BRect* override, BRect& outRect);
 			void				_ComputeRowLayout(int32 index, bool bestFit,
 									bool moveItems, BRect& outRect);		
 			void				_ComputeMatrixLayout(BRect& outRect);
