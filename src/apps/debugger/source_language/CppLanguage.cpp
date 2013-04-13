@@ -45,15 +45,15 @@ CppLanguage::ParseTypeExpression(const BString &expression,
 	parsedName.RemoveAll(" ");
 
 	int32 modifierIndex = -1;
-	for (int32 i = parsedName.Length() - 1; i >= 0; i--) {
-		if (parsedName[i] == '*' || parsedName[i] == '&')
-			modifierIndex = i;
-	}
+	modifierIndex = parsedName.FindFirst('*');
+	if (modifierIndex == -1)
+		modifierIndex = parsedName.FindFirst('&');
+	if (modifierIndex == -1)
+		modifierIndex = parsedName.FindFirst('[');
 
-	if (modifierIndex >= 0) {
-		parsedName.CopyInto(baseTypeName, 0, modifierIndex);
-		parsedName.Remove(0, modifierIndex);
-	} else
+	if (modifierIndex >= 0)
+		parsedName.MoveInto(baseTypeName, 0, modifierIndex);
+	else
 		baseTypeName = parsedName;
 
 	modifierIndex = parsedName.FindFirst('[');
@@ -111,6 +111,7 @@ CppLanguage::ParseTypeExpression(const BString &expression,
 		_resultType = baseType;
 
 
+#if 0
 	if (!arraySpecifier.IsEmpty()) {
 		ArrayType* arrayType = NULL;
 
@@ -140,6 +141,7 @@ CppLanguage::ParseTypeExpression(const BString &expression,
 
 		_resultType = arrayType;
 	}
+#endif
 
 	typeRef.Detach();
 
