@@ -1491,7 +1491,7 @@ VariablesView::MessageReceived(BMessage* message)
 				fThread->GetTeam()->DebugInfo(), type) != B_OK) {
 				BString errorMessage;
 				errorMessage.SetToFormat("Failed to resolve type %s",
-					typeExpression.String(), strerror(result));
+					typeExpression.String());
 				BAlert* alert = new(std::nothrow) BAlert("Error",
 					errorMessage.String(), "Close");
 				if (alert != NULL)
