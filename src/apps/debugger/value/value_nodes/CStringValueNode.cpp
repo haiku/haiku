@@ -84,11 +84,17 @@ CStringValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 	ValuePieceLocation piece;
 	piece.SetToMemory(addressData.ToUInt64());
 
+	TRACE_LOCALS("    Address found: %#" B_PRIx64 "\n",
+		addressData.ToUInt64());
+
 	error = valueLoader->LoadStringValue(addressData, maxSize, valueData);
 	if (error != B_OK)
 		return error;
 
 	piece.size = valueData.Length();
+
+	TRACE_LOCALS("    String value found, length: %" B_PRIu64 "bytes\n",
+		piece.size);
 
 	ValueLocation* stringLocation = new(std::nothrow) ValueLocation(
 		valueLoader->GetArchitecture()->IsBigEndian(), piece);
