@@ -243,15 +243,11 @@ BRepositoryCache::SetTo(const BEntry& entry)
 	fPackages.MakeEmpty();
 	fEntry.Unset();
 
-	// init package info set
-	status_t result = fPackages.Init();
-	if (result != B_OK)
-		return result;
-
 	// get cache file path
 	fEntry = entry;
 
 	BPath repositoryCachePath;
+	status_t result;
 	if ((result = entry.GetPath(&repositoryCachePath)) != B_OK)
 		return result;
 

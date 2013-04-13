@@ -21,15 +21,19 @@ public:
 
 public:
 								BPackageInfoSet();
+								BPackageInfoSet(const BPackageInfoSet& other);
 	virtual						~BPackageInfoSet();
-
-			status_t			Init();
 
 			status_t			AddInfo(const BPackageInfo& info);
 			void				MakeEmpty();
 
 			uint32				CountInfos() const;
 			Iterator			GetIterator() const;
+
+			BPackageInfoSet&	operator=(const BPackageInfoSet& other);
+
+private:
+			bool				_CopyOnWrite();
 
 private:
 			struct PackageInfo;
@@ -46,7 +50,7 @@ private:
 class BPackageInfoSet::Iterator {
 public:
 								Iterator();
-								Iterator(const BPackageInfoSet* set);
+								Iterator(const PackageMap* map);
 
 			bool				HasNext() const;
 			const BPackageInfo*	Next();
@@ -55,7 +59,7 @@ private:
 			friend class BRepositoryCache;
 
 private:
-			const BPackageInfoSet* fSet;
+			const PackageMap*	fMap;
 			PackageInfo*		fNextInfo;
 };
 
