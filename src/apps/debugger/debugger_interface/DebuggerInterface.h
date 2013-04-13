@@ -21,6 +21,7 @@ class AreaInfo;
 class ImageInfo;
 class SemaphoreInfo;
 class SymbolInfo;
+class SystemInfo;
 class ThreadInfo;
 
 namespace BPrivate {
@@ -54,6 +55,7 @@ public:
 									uint32 type, int32 length);
 	virtual status_t			UninstallWatchpoint(target_addr_t address);
 
+	virtual	status_t			GetSystemInfo(SystemInfo& info);
 	virtual	status_t			GetThreadInfos(BObjectList<ThreadInfo>& infos);
 	virtual	status_t			GetImageInfos(BObjectList<ImageInfo>& infos);
 	virtual status_t			GetAreaInfos(BObjectList<AreaInfo>& infos);

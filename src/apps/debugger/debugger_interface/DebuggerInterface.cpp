@@ -29,6 +29,7 @@
 #include "ImageInfo.h"
 #include "SemaphoreInfo.h"
 #include "SymbolInfo.h"
+#include "SystemInfo.h"
 #include "ThreadInfo.h"
 
 
@@ -461,6 +462,24 @@ DebuggerInterface::UninstallWatchpoint(target_addr_t address)
 
 	return write_port(fNubPort, B_DEBUG_MESSAGE_CLEAR_WATCHPOINT,
 		&message, sizeof(message));
+}
+
+
+status_t
+DebuggerInterface::GetSystemInfo(SystemInfo& info)
+{
+	system_info sysInfo;
+	status_t result = get_system_info(&sysInfo);
+	if (result != B_OK)
+		return result;
+
+	utsname name;
+	result = uname(&name);
+	if (result != B_OK)
+		return result;
+
+	info.SetTo(fTeamID, sysInfo, name);
+	return B_OK;
 }
 
 

@@ -154,6 +154,7 @@ Application Debugger :
 	StackTrace.cpp
 	Statement.cpp
 	SymbolInfo.cpp
+	SystemInfo.cpp
 	Team.cpp
 	TeamMemory.cpp
 	TeamMemoryBlock.cpp

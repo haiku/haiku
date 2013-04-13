@@ -6,8 +6,6 @@
 
 #include "DebugReportGenerator.h"
 
-#include <sys/utsname.h>
-
 #include <cpu_type.h>
 
 #include <AutoLocker.h>
@@ -27,6 +25,7 @@
 #include "StackFrame.h"
 #include "StackTrace.h"
 #include "StringUtils.h"
+#include "SystemInfo.h"
 #include "Team.h"
 #include "Thread.h"
 #include "Type.h"
@@ -212,11 +211,10 @@ DebugReportGenerator::_GenerateReportHeader(BString& _output)
 		fTeam->Name(), fTeam->ID());
 	_output << data;
 
-	// TODO: this information should probably be requested via the debugger
-	// interface, since e.g. in the case of a remote team, the report should
-	// include data about the target, not the debugging host
-	system_info info;
-	if (get_system_info(&info) == B_OK) {
+	SystemInfo sysInfo;
+
+	if (fDebuggerInterface->GetSystemInfo(sysInfo) == B_OK) {
+		const system_info &info = sysInfo.GetSystemInfo();
 		data.SetToFormat("CPU(s): %" B_PRId32 "x %s %s\n",
 			info.cpu_count, get_cpu_vendor_string(info.cpu_type),
 			get_cpu_model_string(&info));
@@ -230,11 +228,12 @@ DebugReportGenerator::_GenerateReportHeader(BString& _output)
 			BPrivate::string_for_size((int64)info.used_pages * B_PAGE_SIZE,
 				usedSize, sizeof(usedSize)));
 		_output << data;
+
+		const utsname& name = sysInfo.GetSystemName();
+		data.SetToFormat("Haiku revision: %s (%s)\n", name.version,
+			name.machine);
+		_output << data;
 	}
-	utsname name;
-	uname(&name);
-	data.SetToFormat("Haiku revision: %s (%s)\n", name.version, name.machine);
-	_output << data;
 
 	return B_OK;
 }
