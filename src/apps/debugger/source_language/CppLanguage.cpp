@@ -123,10 +123,10 @@ CppLanguage::ParseTypeExpression(const BString &expression,
 				return B_ERROR;
 
 			if (arrayType == NULL) {
-				result = _resultType->CreateDerivedArrayType(size, true,
+				result = _resultType->CreateDerivedArrayType(0, size, true,
 					arrayType);
 			} else {
-				result = arrayType->CreateDerivedArrayType(size, true,
+				result = arrayType->CreateDerivedArrayType(0, size, true,
 					arrayType);
 			}
 

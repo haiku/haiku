@@ -141,7 +141,8 @@ public:
 									AddressType*& _resultType);
 
 	virtual	status_t			CreateDerivedArrayType(
-									uint64 elementCount,
+									int64 lowerBound,
+									int64 elementCount,
 									bool extendExisting,
 										// if the current object is already
 										// an array type, attach an extra

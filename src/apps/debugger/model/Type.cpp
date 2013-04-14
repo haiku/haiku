@@ -105,7 +105,7 @@ Type::CreateDerivedAddressType(address_type_kind kind,
 
 
 status_t
-Type::CreateDerivedArrayType(uint64 elementCount,
+Type::CreateDerivedArrayType(int64 lowerBound, int64 elementCount,
 	bool extendExisting, ArrayType*& _resultType)
 {
 	_resultType = NULL;

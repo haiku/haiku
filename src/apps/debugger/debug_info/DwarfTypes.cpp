@@ -253,8 +253,8 @@ DwarfType::CreateDerivedAddressType(address_type_kind addressType,
 
 
 status_t
-DwarfType::CreateDerivedArrayType(uint64 elementCount, bool extendExisting,
-	ArrayType*& _resultType)
+DwarfType::CreateDerivedArrayType(int64 lowerBound, int64 elementCount,
+	bool extendExisting, ArrayType*& _resultType)
 {
 	DwarfArrayType* resultType = NULL;
 	BReference<DwarfType> baseTypeReference;
@@ -271,8 +271,8 @@ DwarfType::CreateDerivedArrayType(uint64 elementCount, bool extendExisting,
 		return B_NO_MEMORY;
 
 	DwarfSubrangeType* subrangeType = new(std::nothrow) DwarfSubrangeType(
-		fTypeContext, fName, NULL, resultType, BVariant((uint64)0),
-		BVariant(elementCount - 1));
+		fTypeContext, fName, NULL, resultType, BVariant(lowerBound),
+		BVariant(lowerBound + elementCount - 1));
 	if (subrangeType == NULL)
 		return B_NO_MEMORY;
 
