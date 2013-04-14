@@ -451,6 +451,17 @@ TInlineScrollView::AttachScrollers()
 			fScrollLimit = fTarget->Bounds().Width()
 				- (frame.Width() - 2 * kScrollerDimension);
 		}
+
+		if (fScrollValue > fScrollLimit) {
+			// If scroll value is above limit scroll back
+			float delta = fScrollLimit - fScrollValue;
+			if (fOrientation == B_VERTICAL)
+				fTarget->ScrollBy(0, delta);
+			else
+				fTarget->ScrollBy(delta, 0);
+
+			fScrollValue = fScrollLimit;
+		}
 		return;
 	}
 
