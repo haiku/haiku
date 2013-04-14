@@ -37,8 +37,6 @@ All rights reserved.
 #include "BarApp.h"
 
 #include <locale.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include <AppFileInfo.h>
 #include <Autolock.h>
