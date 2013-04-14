@@ -533,9 +533,6 @@ TExpandoMenuBar::MouseUp(BPoint where)
 void
 TExpandoMenuBar::BuildItems()
 {
-	RemoveItems(0, CountItems(), true);
-		// remove all items
-
 	BMessenger self(this);
 	TBarApp::Subscribe(self, &fTeamList);
 
@@ -556,6 +553,9 @@ TExpandoMenuBar::BuildItems()
 			itemWidth += kIconPadding * 2;
 	}
 	float itemHeight = -1.0f;
+
+	RemoveItems(0, CountItems(), true);
+		// remove all items
 
 	if (settings->sortRunningApps)
 		fTeamList.SortItems(CompareByName);
