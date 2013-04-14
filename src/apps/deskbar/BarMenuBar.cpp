@@ -36,8 +36,6 @@ All rights reserved.
 
 #include "BarMenuBar.h"
 
-#include <string.h>
-
 #include <Bitmap.h>
 #include <Debug.h>
 #include <NodeInfo.h>
