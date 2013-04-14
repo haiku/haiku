@@ -6202,9 +6202,10 @@ xterm-24|vs100|xterms|xterm terminal emulator (X Window System):\
 	:u7=\E[6n:u8=\E[?1;2c:u9=\E[c:ue=\E[m:up=\E[A:us=\E[4m:
 
 # This is xterm for ncurses.
+# Haiku: This one customized to declare 256 colors support
 xterm|xterm terminal emulator (X Window System):\
 	:5i:NP:am:bs:km:mi:ms:ut:xn:\
-	:Co#8:co#80:it#8:li#24:pa#64:\
+	:Co#256:co#80:it#8:li#24:pa#32767:\
 	:#2=\E[1;2H:#3=\E[2;2~:#4=\E[1;2D:%c=\E[6;2~:%e=\E[5;2~:\
 	:%i=\E[1;2C:*4=\E[3;2~:*7=\E[1;2F:@7=\EOF:@8=\EOM:\
 	:AB=\E[4%dm:AF=\E[3%dm:AL=\E[%dL:DC=\E[%dP:DL=\E[%dM:\
