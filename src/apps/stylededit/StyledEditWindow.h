@@ -49,8 +49,6 @@ public:
 									bool caseSensitive);
 			bool				IsDocumentEntryRef(const entry_ref* ref);
 
-	static	BMenu*				PopulateEncodingMenu(BMenu* menu,
-									const char* encoding);
 private:
 			void				_InitWindow(uint32 encoding = 0);
 			void				_LoadAttrs();
@@ -79,6 +77,8 @@ private:
 									const BString& label, const BString& label2,
 									const BString& label3,
 									alert_type type) const;
+			BMenu*				_PopulateEncodingMenu(BMenu* menu,
+									const char* encoding);
 
 				// node monitoring helper
 			class _NodeMonitorSuspender {

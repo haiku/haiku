@@ -47,6 +47,7 @@
 #include <TextView.h>
 #include <TranslationUtils.h>
 #include <UnicodeChar.h>
+#include <UTF8.h>
 
 
 using namespace BPrivate;
@@ -1295,7 +1296,7 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 
 	BMessage *message = new BMessage(MENU_RELOAD);
 	message->AddString("encoding", "auto");
-	menu->AddItem(fEncodingItem = new BMenuItem(PopulateEncodingMenu(
+	menu->AddItem(fEncodingItem = new BMenuItem(_PopulateEncodingMenu(
 		new BMenu(B_TRANSLATE("Text encoding")), "UTF-8"),
 		message));
 	fEncodingItem->SetEnabled(false);
@@ -1501,13 +1502,27 @@ StyledEditWindow::_ReloadDocument(BMessage* message)
 			return;
 	}
 
+	const BCharacterSet* charset
+		= BCharacterSetRoster::GetCharacterSetByFontID(
+			fTextView->GetEncoding());
 	const char* forceEncoding = NULL;
 	if (message->FindString("encoding", &forceEncoding) != B_OK) {
-		const BCharacterSet* charset
-			= BCharacterSetRoster::GetCharacterSetByFontID(
-					fTextView->GetEncoding());
 		if (charset != NULL)
 			forceEncoding = charset->GetName();
+	} else {
+		if (charset != NULL) {
+			// UTF8 id assumed equal to -1
+			const uint32 idUTF8 = -1;
+			uint32 id = charset->GetConversionID();
+			if (strcmp(forceEncoding, "next") == 0)
+				id = id == B_MS_WINDOWS_1250_CONVERSION	? idUTF8 : id + 1;
+			else if (strcmp(forceEncoding, "previous") == 0)
+				id = id == idUTF8 ? B_MS_WINDOWS_1250_CONVERSION : id - 1;
+			const BCharacterSet* newCharset
+				= BCharacterSetRoster::GetCharacterSetByConversionID(id);
+			if (newCharset != NULL)
+				forceEncoding = newCharset->GetName();
+		}
 	}
 
 	BScrollBar* vertBar = fScrollView->ScrollBar(B_VERTICAL);
@@ -1888,7 +1903,7 @@ StyledEditWindow::_ShowAlert(const BString& text, const BString& label,
 
 
 BMenu*
-StyledEditWindow::PopulateEncodingMenu(BMenu* menu, const char* currentEncoding)
+StyledEditWindow::_PopulateEncodingMenu(BMenu* menu, const char* currentEncoding)
 {
 	menu->SetRadioMode(true);
 	BString encoding(currentEncoding);
@@ -1918,6 +1933,13 @@ StyledEditWindow::PopulateEncodingMenu(BMenu* menu, const char* currentEncoding)
 	BMessage *message = new BMessage(MENU_RELOAD);
 	message->AddString("encoding", "auto");
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Autodetect"), message));
+
+	message = new BMessage(MENU_RELOAD);
+	message->AddString("encoding", "next");
+	AddShortcut(B_PAGE_DOWN, B_OPTION_KEY, message);
+	message = new BMessage(MENU_RELOAD);
+	message->AddString("encoding", "previous");
+	AddShortcut(B_PAGE_UP, B_OPTION_KEY, message);
 
 	return menu;
 }
