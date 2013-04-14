@@ -47,12 +47,13 @@ All rights reserved.
 
 
 TBarMenuTitle::TBarMenuTitle(float width, float height, const BBitmap* icon,
-	BMenu* menu, bool inexpando)
-	:	BMenuItem(menu, new BMessage(B_REFS_RECEIVED)),
-		fWidth(width),
-		fHeight(height),
-		fInExpando(inexpando),
-		fIcon(icon)
+	BMenu* menu, bool expando)
+	:
+	BMenuItem(menu, new BMessage(B_REFS_RECEIVED)),
+	fWidth(width),
+	fHeight(height),
+	fInExpando(expando),
+	fIcon(icon)
 {
 }
 

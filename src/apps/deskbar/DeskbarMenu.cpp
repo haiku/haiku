@@ -88,7 +88,8 @@ using namespace BPrivate;
 
 
 TDeskbarMenu::TDeskbarMenu(TBarView* barView)
-	: BNavMenu("DeskbarMenu", B_REFS_RECEIVED, DefaultTarget()),
+	:
+	BNavMenu("DeskbarMenu", B_REFS_RECEIVED, DefaultTarget()),
 	fAddState(kStart),
 	fBarView(barView)
 {

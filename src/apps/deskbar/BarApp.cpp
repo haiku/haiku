@@ -92,10 +92,11 @@ main()
 
 
 TBarApp::TBarApp()
-	:	BApplication(kDeskbarSignature),
-		fSettingsFile(NULL),
-		fClockSettingsFile(NULL),
-		fPreferencesWindow(NULL)
+	:
+	BApplication(kDeskbarSignature),
+	fSettingsFile(NULL),
+	fClockSettingsFile(NULL),
+	fPreferencesWindow(NULL)
 {
 	InitSettings();
 	InitIconPreloader();
@@ -585,6 +586,7 @@ TBarApp::MessageReceived(BMessage* message)
 
 			if (fPreferencesWindow != NULL)
 				fPreferencesWindow->PostMessage(kUpdatePreferences);
+
 			break;
 		}
 
@@ -952,22 +954,24 @@ TBarApp::IconRect()
 
 BarTeamInfo::BarTeamInfo(BList* teams, uint32 flags, char* sig, BBitmap* icon,
 	char* name)
-	:	teams(teams),
-		flags(flags),
-		sig(sig),
-		icon(icon),
-		name(name)
+	:
+	teams(teams),
+	flags(flags),
+	sig(sig),
+	icon(icon),
+	name(name)
 {
 	_Init();
 }
 
 
 BarTeamInfo::BarTeamInfo(const BarTeamInfo &info)
-	:	teams(new BList(*info.teams)),
-		flags(info.flags),
-		sig(strdup(info.sig)),
-		icon(new BBitmap(*info.icon)),
-		name(strdup(info.name))
+	:
+	teams(new BList(*info.teams)),
+	flags(info.flags),
+	sig(strdup(info.sig)),
+	icon(new BBitmap(*info.icon)),
+	name(strdup(info.name))
 {
 	_Init();
 }

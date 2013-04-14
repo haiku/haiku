@@ -70,4 +70,4 @@ private:
 };
 
 
-#endif /* BARMENUTITLE_H */
+#endif	// BARMENUTITLE_H

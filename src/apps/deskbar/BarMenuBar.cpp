@@ -221,14 +221,15 @@ TBarMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 			BPoint loc;
 			uint32 buttons;
 			GetMouse(&loc, &buttons);
-			// attempt to start DnD tracking
-			if (message && buttons != 0) {
+			if (message != NULL && buttons != 0) {
+				// attempt to start DnD tracking
 				fBarView->CacheDragData(const_cast<BMessage*>(message));
 				MouseDown(loc);
 			}
 			break;
 		}
 	}
+
 	BMenuBar::MouseMoved(where, code, message);
 }
 

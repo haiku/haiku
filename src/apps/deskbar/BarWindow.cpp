@@ -100,6 +100,7 @@ TBarWindow::TBarWindow()
 	desk_settings* settings = ((TBarApp*)be_app)->Settings();
 	if (settings->alwaysOnTop)
 		SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
+
 	fBarView = new TBarView(Bounds(), settings->vertical, settings->left,
 		settings->top, settings->state, settings->width);
 	AddChild(fBarView);

@@ -234,4 +234,4 @@ TBarView::CachedTypesList() const
 }
 
 
-#endif	/* BARVIEW_H */
+#endif	// BARVIEW_H

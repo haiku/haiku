@@ -190,6 +190,7 @@ TTeamMenuItem::Draw()
 {
 	BRect frame(Frame());
 	BMenu* menu = Menu();
+
 	menu->PushState();
 
 	rgb_color menuColor = menu->LowColor();
@@ -224,6 +225,7 @@ TTeamMenuItem::Draw()
 
 	menu->MovePenTo(ContentLocation());
 	DrawContent();
+
 	menu->PopState();
 }
 
