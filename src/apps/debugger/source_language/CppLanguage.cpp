@@ -111,7 +111,6 @@ CppLanguage::ParseTypeExpression(const BString &expression,
 		_resultType = baseType;
 
 
-#if 0
 	if (!arraySpecifier.IsEmpty()) {
 		ArrayType* arrayType = NULL;
 
@@ -139,9 +138,18 @@ CppLanguage::ParseTypeExpression(const BString &expression,
 
 		} while (startIndex >= 0);
 
-		_resultType = arrayType;
+		// since a C/C++ array is essentially pointer math,
+		// the resulting array has to be wrapped in a pointer to
+		// ensure the element addresses wind up being against the
+		// correct address.
+		AddressType* addressType = NULL;
+		result = arrayType->CreateDerivedAddressType(DERIVED_TYPE_POINTER,
+			addressType);
+		if (result != B_OK)
+			return result;
+
+		_resultType = addressType;
 	}
-#endif
 
 	typeRef.Detach();
 
