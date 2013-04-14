@@ -136,7 +136,7 @@ TTeamMenu::DetachedFromWindow()
 	TBarView* barView = (dynamic_cast<TBarApp*>(be_app))->BarView();
 	if (barView != NULL) {
 		BLooper* looper = barView->Looper();
-		if (looper->Lock()) {
+		if (looper != NULL && looper->Lock()) {
 			barView->DragStop();
 			looper->Unlock();
 		}
