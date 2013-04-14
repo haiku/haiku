@@ -173,18 +173,10 @@ private:
 // #pragma mark - Iterator
 
 
-BPackageInfoSet::Iterator::Iterator()
-	:
-	fMap(NULL),
-	fNextInfo(NULL)
-{
-}
-
-
 BPackageInfoSet::Iterator::Iterator(const PackageMap* map)
 	:
 	fMap(map),
-	fNextInfo(map->GetIterator().Next())
+	fNextInfo(map != NULL ? map->GetIterator().Next() : NULL)
 {
 }
 

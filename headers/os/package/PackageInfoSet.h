@@ -49,8 +49,7 @@ private:
 
 class BPackageInfoSet::Iterator {
 public:
-								Iterator();
-								Iterator(const PackageMap* map);
+								Iterator(const PackageMap* map = NULL);
 
 			bool				HasNext() const;
 			const BPackageInfo*	Next();
