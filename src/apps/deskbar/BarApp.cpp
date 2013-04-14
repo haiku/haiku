@@ -191,7 +191,7 @@ TBarApp::SaveSettings()
 		prefs.AddBool("vertical", fSettings.vertical);
 		prefs.AddBool("left", fSettings.left);
 		prefs.AddBool("top", fSettings.top);
-		prefs.AddUInt32("state", fSettings.state);
+		prefs.AddInt32("state", fSettings.state);
 		prefs.AddFloat("width", fSettings.width);
 		prefs.AddPoint("switcherLoc", fSettings.switcherLoc);
 		prefs.AddBool("showClock", fSettings.showClock);
@@ -291,7 +291,7 @@ TBarApp::InitSettings()
 				fDefaultSettings.left);
 			settings.top = prefs.GetBool("top",
 				fDefaultSettings.top);
-			settings.state = prefs.GetUInt32("state",
+			settings.state = prefs.GetInt32("state",
 				fDefaultSettings.state);
 			settings.width = prefs.GetFloat("width",
 				fDefaultSettings.width);

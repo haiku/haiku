@@ -40,7 +40,7 @@ struct desk_settings {
 	bool vertical;
 	bool left;
 	bool top;
-	uint32 state;
+	int32 state;
 	float width;
 	BPoint switcherLoc;
 	bool showClock;

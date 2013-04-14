@@ -126,9 +126,10 @@ BarViewMessageFilter::Filter(BMessage* message, BHandler** target)
 
 
 TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
-	uint32 state, float)
+	int32 state, float)
 	:
 	BView(frame, "BarView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
+	fBarApp(static_cast<TBarApp*>(be_app)),
 	fInlineScrollView(NULL),
 	fBarMenuBar(NULL),
 	fExpandoMenuBar(NULL),
@@ -136,7 +137,7 @@ TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
 	fVertical(vertical),
 	fTop(top),
 	fLeft(left),
-	fState(static_cast<int32>(state)),
+	fState(state),
 	fRefsRcvdOnly(true),
 	fDragMessage(NULL),
 	fCachedTypesList(NULL),
@@ -625,7 +626,7 @@ TBarView::SaveSettings()
 	settings->vertical = fVertical;
 	settings->left = fLeft;
 	settings->top = fTop;
-	settings->state = (uint32)fState;
+	settings->state = fState;
 	settings->width = 0;
 
 	fReplicantTray->SaveTimeSettings();
