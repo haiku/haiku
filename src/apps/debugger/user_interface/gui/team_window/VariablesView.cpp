@@ -1286,16 +1286,20 @@ VariablesView::VariableTableModel::_AddNode(Variable* variable,
 	// is a compound type, mark it hidden
 	if (isOnlyChild && parent != NULL) {
 		ValueNode* parentValueNode = parent->NodeChild()->Node();
-		if (parentValueNode != NULL
-			&& parentValueNode->GetType()->ResolveRawType(false)->Kind()
-				== TYPE_ADDRESS
-			&& nodeChildRawType->Kind() == TYPE_COMPOUND) {
-			node->SetHidden(true);
+		if (parentValueNode != NULL) {
+			if (parentValueNode->GetType()->ResolveRawType(false)->Kind()
+				== TYPE_ADDRESS) {
+				type_kind childKind = nodeChildRawType->Kind();
+				if (childKind == TYPE_COMPOUND || childKind == TYPE_ARRAY) {
+					node->SetHidden(true);
 
-			// we need to tell the listener about nodes like this so any
-			// necessary actions can be taken for them (i.e. value resolution),
-			// since they're otherwise invisible to outsiders.
-			NotifyNodeHidden(node);
+					// we need to tell the listener about nodes like this so
+					// any necessary actions can be taken for them (i.e. value
+					// resolution), since they're otherwise invisible to
+					// outsiders.
+					NotifyNodeHidden(node);
+				}
+			}
 		}
 	}
 
