@@ -509,6 +509,11 @@ TBarView::PlaceApplicationBar()
 	fExpandoMenuBar->MoveTo(0, 0);
 	fExpandoMenuBar->ResizeTo(expandoFrame.Width(), expandoFrame.Height());
 
+	if (!fVertical) {
+		// Set the max item width based on icon size
+		fExpandoMenuBar->SetMaxItemWidth();
+	}
+
 	fExpandoMenuBar->BuildItems();
 	if (fVertical)
 		ExpandItems();

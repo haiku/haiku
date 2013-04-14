@@ -94,15 +94,7 @@ TExpandoMenuBar::TExpandoMenuBar(BRect frame, const char* name,
 {
 	SetItemMargins(0.0f, 0.0f, 0.0f, 0.0f);
 	SetFont(be_plain_font);
-	if (fVertical)
-		SetMaxContentWidth(sMinimumWindowWidth);
-	else {
-		// Make more room for the icon in horizontal mode
-		int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
-		float maxContentWidth = sMinimumWindowWidth + iconSize
-			- kMinimumIconSize;
-		SetMaxContentWidth(maxContentWidth);
-	}
+	SetMaxItemWidth();
 
 	// top or bottom mode, add deskbar menu and sep for menubar tracking
 	// consistency
@@ -910,6 +902,20 @@ TExpandoMenuBar::CheckForSizeOverrun()
 		- fDeskbarMenuWidth - kSepItemWidth;
 
 	return menuWidth > maxWidth;
+}
+
+
+void
+TExpandoMenuBar::SetMaxItemWidth()
+{
+	if (fVertical)
+		SetMaxContentWidth(sMinimumWindowWidth);
+	else {
+		// Make more room for the icon in horizontal mode
+		int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
+		SetMaxContentWidth(sMinimumWindowWidth + iconSize
+			- kMinimumIconSize);
+	}
 }
 
 

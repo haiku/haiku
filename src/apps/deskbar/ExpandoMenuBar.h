@@ -87,6 +87,8 @@ public:
 
 			menu_layout		MenuLayout() const;
 
+			void			SetMaxItemWidth();
+
 			void			SizeWindow(int32 delta);
 			bool			CheckForSizeOverrun();
 
