@@ -533,6 +533,9 @@ TExpandoMenuBar::MouseUp(BPoint where)
 void
 TExpandoMenuBar::BuildItems()
 {
+	RemoveItems(0, CountItems(), true);
+		// remove all items
+
 	BMessenger self(this);
 	TBarApp::Subscribe(self, &fTeamList);
 
@@ -554,28 +557,25 @@ TExpandoMenuBar::BuildItems()
 	}
 	float itemHeight = -1.0f;
 
-	RemoveItems(0, CountItems(), true);
-		// remove all items
-
 	if (settings->sortRunningApps)
 		fTeamList.SortItems(CompareByName);
 
 	int32 count = fTeamList.CountItems();
 	for (int32 i = 0; i < count; i++) {
-		// add them again
+		// add items back
 		BarTeamInfo* barInfo = (BarTeamInfo*)fTeamList.ItemAt(i);
+
 		if ((barInfo->flags & B_BACKGROUND_APP) == 0
 			&& strcasecmp(barInfo->sig, kDeskbarSignature) != 0) {
+			TTeamMenuItem* item = new TTeamMenuItem(barInfo->teams,
+				barInfo->icon, barInfo->name, barInfo->sig, itemWidth,
+				itemHeight, fDrawLabel, fVertical);
+
 			if (settings->trackerAlwaysFirst
-				&& !strcmp(barInfo->sig, kTrackerSignature)) {
-				AddItem(new TTeamMenuItem(barInfo->teams, barInfo->icon,
-					barInfo->name, barInfo->sig, itemWidth, itemHeight,
-					fDrawLabel, fVertical), 0);
-			} else {
-				AddItem(new TTeamMenuItem(barInfo->teams, barInfo->icon,
-					barInfo->name, barInfo->sig, itemWidth, itemHeight,
-					fDrawLabel, fVertical));
-			}
+				&& strcmp(barInfo->sig, kTrackerSignature) == 0) {
+				AddItem(item, 0);
+			} else
+				AddItem(item);
 		}
 	}
 
