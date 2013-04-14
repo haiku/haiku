@@ -172,7 +172,7 @@ TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
 	AddChild(fInlineScrollView);
 
 	// If mini mode, hide the application menubar
-	if (state != kMiniState)
+	if (state == kMiniState)
 		fInlineScrollView->Hide();
 }
 
