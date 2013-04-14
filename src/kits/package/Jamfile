@@ -51,6 +51,7 @@ SharedLibrary libpackage.so
 	BlockBufferCacheNoLock.cpp
 	ChecksumAccessors.cpp
 	Context.cpp
+	DaemonClient.cpp
 	DropRepositoryRequest.cpp
 	FetchFileJob.cpp
 	InstallationLocationInfo.cpp

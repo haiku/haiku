@@ -13,6 +13,7 @@
 
 #include <Handler.h>
 #include <Locker.h>
+#include <Message.h>
 #include <String.h>
 
 #include <package/packagefs.h>
@@ -48,7 +49,7 @@ public:
 									bool activeOnly);
 			void				InitialVerify(Volume* nextVolume,
 									Volume* nextNextVolume);
-			void				HandleGetPackagesRequest(BMessage* message);
+			void				HandleGetLocationInfoRequest(BMessage* message);
 
 			void				Unmounted();
 
@@ -105,6 +106,8 @@ private:
 									PackageFSActivationChangeItem* item,
 									PackageFSActivationChangeType type,
 									Package* package, char*& nameBuffer);
+
+			void				_AddPackage(Package* package);
 			void				_RemovePackage(Package* package);
 
 			status_t			_ReadPackagesDirectory();
@@ -133,6 +136,8 @@ private:
 			NodeMonitorEventList fPendingNodeMonitorEvents;
 			PackageSet			fPackagesToBeActivated;
 			PackageSet			fPackagesToBeDeactivated;
+			int64				fChangeCount;
+			BMessage			fLocationInfoReply;
 };
 
 

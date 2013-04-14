@@ -19,6 +19,7 @@
 #include <String.h>
 #include <StringList.h>
 
+#include <package/InstallationLocationInfo.h>
 #include <package/PackageInfo.h>
 #include <package/PackageInfoContentHandler.h>
 #include <package/PackageInfoSet.h>
@@ -28,7 +29,7 @@
 #include <package/hpkg/PackageReader.h>
 
 #if defined(__HAIKU__) && !defined(HAIKU_HOST_PLATFORM_HAIKU)
-#	include <package/PackageDaemonDefs.h>
+#	include <package/DaemonClient.h>
 #endif
 
 
@@ -189,73 +190,33 @@ BPackageRoster::GetRepositoryConfig(const BString& name,
 
 
 status_t
+BPackageRoster::GetInstallationLocationInfo(
+	BPackageInstallationLocation location, BInstallationLocationInfo& _info)
+{
+// This method makes sense only on an installed Haiku, but not for the build
+// tools.
+#if defined(__HAIKU__) && !defined(HAIKU_HOST_PLATFORM_HAIKU)
+	return BPackageKit::BPrivate::BDaemonClient().GetInstallationLocationInfo(
+		location, _info);
+#else
+	return B_NOT_SUPPORTED;
+#endif
+}
+
+
+status_t
 BPackageRoster::GetActivePackages(BPackageInstallationLocation location,
 	BPackageInfoSet& packageInfos)
 {
 // This method makes sense only on an installed Haiku, but not for the build
 // tools.
 #if defined(__HAIKU__) && !defined(HAIKU_HOST_PLATFORM_HAIKU)
-	// check the given location
-	directory_which packagesDirectory;
-	switch (location) {
-		case B_PACKAGE_INSTALLATION_LOCATION_SYSTEM:
-			packagesDirectory = B_SYSTEM_PACKAGES_DIRECTORY;
-			break;
-		case B_PACKAGE_INSTALLATION_LOCATION_COMMON:
-			packagesDirectory = B_COMMON_PACKAGES_DIRECTORY;
-			break;
-		case B_PACKAGE_INSTALLATION_LOCATION_HOME:
-			packagesDirectory = B_USER_PACKAGES_DIRECTORY;
-			break;
-		default:
-			return B_BAD_VALUE;
-	}
-
-	// get the package daemon's address
-	status_t error;
-	BMessenger messenger(PACKAGE_DAEMON_APP_SIGNATURE, -1, &error);
+	BInstallationLocationInfo info;
+	status_t error = GetInstallationLocationInfo(location, info);
 	if (error != B_OK)
 		return error;
 
-	// request a list of packages
-	BMessage request(BPackageKit::BPrivate::MESSAGE_GET_PACKAGES);
-	error = request.AddInt32("location", location);
-	if (error != B_OK)
-		return error;
-
-	BMessage reply;
-	messenger.SendMessage(&request, &reply);
-	if (reply.what != BPackageKit::BPrivate::MESSAGE_GET_PACKAGES_REPLY)
-		return B_ERROR;
-
-	// find and open the packages directory
-	BPath packagesDirPath;
-	error = find_directory(packagesDirectory, &packagesDirPath);
-	if (error != B_OK)
-		return error;
-
-	// iterate through the packages
-	const char* packageFileName;
-	for (int32 i = 0;
-		reply.FindString("active packages", i, &packageFileName) == B_OK; i++) {
-		// get the full package file path
-		BPath packagePath;
-		error = packagePath.SetTo(packagesDirPath.Path(), packageFileName);
-		if (error != B_OK)
-			continue;
-
-		// read the package info from the file
-		BPackageInfo info;
-		error = info.ReadFromPackageFile(packagePath.Path());
-		if (error != B_OK || info.InitCheck() != B_OK)
-			continue;
-
-		// add the info
-		error = packageInfos.AddInfo(info);
-		if (error != B_OK)
-			return error;
-	}
-
+	packageInfos = info.ActivePackageInfos();
 	return B_OK;
 #else
 	return B_NOT_SUPPORTED;

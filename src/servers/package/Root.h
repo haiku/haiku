@@ -41,7 +41,7 @@ public:
 
 			Volume*				FindVolume(dev_t deviceID) const;
 
-			void				HandleGetPackagesRequest(BMessage* message);
+			void				HandleGetLocationInfoRequest(BMessage* message);
 
 private:
 	// Volume::Listener
@@ -52,9 +52,9 @@ protected:
 
 private:
 			struct VolumeJob;
-			struct HandleGetPackagesJob;
+			struct HandleGetLocationInfoRequestJob;
 
-			friend struct HandleGetPackagesJob;
+			friend struct HandleGetLocationInfoRequestJob;
 
 private:
 			Volume**			_GetVolume(PackageFSMountType mountType);
@@ -63,7 +63,8 @@ private:
 			void				_InitPackages(Volume* volume);
 			void				_DeleteVolume(Volume* volume);
 			void				_ProcessNodeMonitorEvents(Volume* volume);
-			void				_HandleGetPackagesRequest(BMessage* message);
+			void				_HandleGetLocationInfoRequest(
+									BMessage* message);
 
 			status_t			_QueueJob(Job* job);
 

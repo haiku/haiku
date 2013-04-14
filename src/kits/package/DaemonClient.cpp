@@ -1,0 +1,137 @@
+/*
+ * Copyright 2013, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold <ingo_weinhold@gmx.de>
+ */
+
+
+#include <package/DaemonClient.h>
+
+#include <package/InstallationLocationInfo.h>
+#include <package/PackageInfo.h>
+
+#include <package/DaemonDefs.h>
+
+
+namespace BPackageKit {
+namespace BPrivate {
+
+
+BDaemonClient::BDaemonClient()
+	:
+	fDaemonMessenger()
+{
+}
+
+
+BDaemonClient::~BDaemonClient()
+{
+}
+
+
+status_t
+BDaemonClient::GetInstallationLocationInfo(
+	BPackageInstallationLocation location, BInstallationLocationInfo& _info)
+{
+	status_t error = _InitMessenger();
+	if (error != B_OK)
+		return error;
+
+	// send the request
+	BMessage request(B_MESSAGE_GET_INSTALLATION_LOCATION_INFO);
+	error = request.AddInt32("location", location);
+	if (error != B_OK)
+		return error;
+
+	BMessage reply;
+	fDaemonMessenger.SendMessage(&request, &reply);
+	if (reply.what != B_MESSAGE_GET_INSTALLATION_LOCATION_INFO_REPLY)
+		return B_ERROR;
+
+	// extract the location info
+	int32 baseDirectoryDevice;
+	int64 baseDirectoryNode;
+	int32 packagesDirectoryDevice;
+	int64 packagesDirectoryNode;
+	int64 changeCount;
+	BPackageInfoSet activePackages;
+	BPackageInfoSet inactivePackages;
+	if ((error = reply.FindInt32("base directory device", &baseDirectoryDevice))
+			!= B_OK
+		|| (error = reply.FindInt64("base directory node", &baseDirectoryNode))
+			!= B_OK
+		|| (error = reply.FindInt32("packages directory device",
+			&packagesDirectoryDevice)) != B_OK
+		|| (error = reply.FindInt64("packages directory node",
+			&packagesDirectoryNode)) != B_OK
+		|| (error = _ExtractPackageInfoSet(reply, "active packages",
+			activePackages)) != B_OK
+		|| (error = _ExtractPackageInfoSet(reply, "inactive packages",
+			inactivePackages)) != B_OK
+		|| (error = reply.FindInt64("change count", &changeCount)) != B_OK) {
+		return error;
+	}
+
+	_info.Unset();
+	_info.SetLocation(location);
+	_info.SetBaseDirectoryRef(node_ref(baseDirectoryDevice, baseDirectoryNode));
+	_info.SetPackagesDirectoryRef(
+		node_ref(packagesDirectoryDevice, packagesDirectoryNode));
+	_info.SetActivePackageInfos(activePackages);
+	_info.SetInactivePackageInfos(inactivePackages);
+	_info.SetChangeCount(changeCount);
+
+	return B_OK;
+}
+
+
+status_t
+BDaemonClient::_InitMessenger()
+{
+	if (fDaemonMessenger.IsValid())
+		return B_OK;
+
+		// get the package daemon's address
+	status_t error;
+	fDaemonMessenger = BMessenger(B_PACKAGE_DAEMON_APP_SIGNATURE, -1, &error);
+	return error;
+}
+
+
+status_t
+BDaemonClient::_ExtractPackageInfoSet(const BMessage& message,
+	const char* field, BPackageInfoSet& _infos)
+{
+	// get the number of items
+	type_code type;
+	int32 count;
+	if (message.GetInfo(field, &type, &count)) {
+		// the field is missing
+		return B_OK;
+	}
+	if (type != B_MESSAGE_TYPE)
+		return B_BAD_DATA;
+
+	for (int32 i = 0; i < count; i++) {
+		BMessage archive;
+		status_t error = message.FindMessage(field, i, &archive);
+		if (error != B_OK)
+			return error;
+
+		BPackageInfo info(&archive, &error);
+		if (error != B_OK)
+			return error;
+
+		error = _infos.AddInfo(info);
+		if (error != B_OK)
+			return error;
+	}
+
+	return B_OK;
+}
+
+
+}	// namespace BPrivate
+}	// namespace BPackageKit

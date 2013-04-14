@@ -42,11 +42,11 @@ private:
 };
 
 
-// #pragma mark - VolumeJob
+// #pragma mark - HandleGetLocationInfoRequestJob
 
 
-struct Root::HandleGetPackagesJob : public Job {
-	HandleGetPackagesJob(Root* root, BMessage* message)
+struct Root::HandleGetLocationInfoRequestJob : public Job {
+	HandleGetLocationInfoRequestJob(Root* root, BMessage* message)
 		:
 		fRoot(root),
 		fMessage(message)
@@ -55,7 +55,7 @@ struct Root::HandleGetPackagesJob : public Job {
 
 	virtual void Do()
 	{
-		fRoot->_HandleGetPackagesRequest(fMessage.Get());
+		fRoot->_HandleGetLocationInfoRequest(fMessage.Get());
 	}
 
 private:
@@ -209,10 +209,10 @@ Root::FindVolume(dev_t deviceID) const
 
 
 void
-Root::HandleGetPackagesRequest(BMessage* message)
+Root::HandleGetLocationInfoRequest(BMessage* message)
 {
-	HandleGetPackagesJob* job
-		= new(std::nothrow) HandleGetPackagesJob(this, message);
+	HandleGetLocationInfoRequestJob* job
+		= new(std::nothrow) HandleGetLocationInfoRequestJob(this, message);
 	if (job == NULL) {
 		delete message;
 		return;
@@ -314,7 +314,7 @@ Root::_ProcessNodeMonitorEvents(Volume* volume)
 
 
 void
-Root::_HandleGetPackagesRequest(BMessage* message)
+Root::_HandleGetLocationInfoRequest(BMessage* message)
 {
 	int32 location;
 	if (message->FindInt32("location", &location) != B_OK
@@ -341,7 +341,7 @@ Root::_HandleGetPackagesRequest(BMessage* message)
 	}
 
 	if (volume != NULL)
-		volume->HandleGetPackagesRequest(message);
+		volume->HandleGetLocationInfoRequest(message);
 }
 
 

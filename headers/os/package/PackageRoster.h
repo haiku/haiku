@@ -28,6 +28,7 @@ struct BRepositoryConfigVisitor {
 };
 
 
+class BInstallationLocationInfo;
 class BPackageInfoSet;
 class BRepositoryCache;
 class BRepositoryConfig;
@@ -60,6 +61,9 @@ public:
 			status_t			GetRepositoryConfig(const BString& name,
 									BRepositoryConfig* repositoryConfig);
 
+			status_t			GetInstallationLocationInfo(
+									BPackageInstallationLocation location,
+									BInstallationLocationInfo& _info);
 			status_t			GetActivePackages(
 									BPackageInstallationLocation location,
 									BPackageInfoSet& packageInfos);

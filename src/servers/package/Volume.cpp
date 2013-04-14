@@ -30,7 +30,7 @@
 
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
-#include <package/PackageDaemonDefs.h>
+#include <package/DaemonDefs.h>
 #include <package/PackagesDirectoryDefs.h>
 
 #include "DebugSupport.h"
@@ -104,7 +104,9 @@ Volume::Volume(BLooper* looper)
 	fPendingNodeMonitorEventsLock("pending node monitor events"),
 	fPendingNodeMonitorEvents(),
 	fPackagesToBeActivated(),
-	fPackagesToBeDeactivated()
+	fPackagesToBeDeactivated(),
+	fChangeCount(0),
+	fLocationInfoReply(B_MESSAGE_GET_INSTALLATION_LOCATION_INFO_REPLY)
 {
 	looper->AddHandler(this);
 }
@@ -335,20 +337,49 @@ INFORM("Volume::InitialVerify(%p, %p)\n", nextVolume, nextNextVolume);
 
 
 void
-Volume::HandleGetPackagesRequest(BMessage* message)
+Volume::HandleGetLocationInfoRequest(BMessage* message)
 {
-	BMessage reply(MESSAGE_GET_PACKAGES_REPLY);
+	// If the cached reply message is up-to-date, just send it.
+	int64 changeCount;
+	if (fLocationInfoReply.FindInt64("change count", &changeCount) == B_OK
+		&& changeCount == fChangeCount) {
+		message->SendReply(&fLocationInfoReply, (BHandler*)NULL,
+			kCommunicationTimeout);
+		return;
+	}
+
+	// rebuild the reply message
+	fLocationInfoReply.MakeEmpty();
+
+	if (fLocationInfoReply.AddInt32("base directory device",
+			fRootDirectoryRef.device) != B_OK
+		|| fLocationInfoReply.AddInt64("base directory node",
+			fRootDirectoryRef.node) != B_OK
+		|| fLocationInfoReply.AddInt32("packages directory device",
+			fPackagesDirectoryRef.device) != B_OK
+		|| fLocationInfoReply.AddInt64("packages directory node",
+			fPackagesDirectoryRef.node) != B_OK) {
+		return;
+	}
 
 	for (PackageFileNameHashTable::Iterator it
 			= fPackagesByFileName.GetIterator(); it.HasNext();) {
 		Package* package = it.Next();
 		const char* fieldName = package->IsActive()
 			? "active packages" : "inactive packages";
-		if (reply.AddString(fieldName, package->FileName()) != B_OK)
+		BMessage packageArchive;
+		if (package->Info().Archive(&packageArchive) != B_OK
+			|| fLocationInfoReply.AddMessage(fieldName, &packageArchive)
+				!= B_OK) {
 			return;
+		}
 	}
 
-	message->SendReply(&reply, (BHandler*)NULL, kCommunicationTimeout);
+	if (fLocationInfoReply.AddInt64("change count", fChangeCount) != B_OK)
+		return;
+
+	message->SendReply(&fLocationInfoReply, (BHandler*)NULL,
+		kCommunicationTimeout);
 }
 
 
@@ -514,6 +545,7 @@ fPackagesToBeActivated.size(), fPackagesToBeDeactivated.size());
 	for (PackageSet::iterator it = fPackagesToBeActivated.begin();
 		it != fPackagesToBeActivated.end(); ++it) {
 		(*it)->SetActive(true);
+		fChangeCount++;
 	}
 
 	for (PackageSet::iterator it = fPackagesToBeDeactivated.begin();
@@ -671,8 +703,7 @@ INFORM("Volume::_PackagesEntryCreated(\"%s\")\n", name);
 		return;
 	}
 
-	fPackagesByFileName.Insert(package);
-	fPackagesByNodeRef.Insert(package);
+	_AddPackage(package);
 	packageDeleter.Detach();
 
 	try {
@@ -732,10 +763,18 @@ Volume::_FillInActivationChangeItem(PackageFSActivationChangeItem* item,
 
 
 void
+Volume::_AddPackage(Package* package)
+{
+	fPackagesByFileName.Insert(package);
+	fPackagesByNodeRef.Insert(package);
+}
+
+void
 Volume::_RemovePackage(Package* package)
 {
 	fPackagesByFileName.Remove(package);
 	fPackagesByNodeRef.Remove(package);
+	fChangeCount++;
 }
 
 
@@ -762,8 +801,7 @@ Volume::_ReadPackagesDirectory()
 
 		status_t error = package->Init(entry);
 		if (error == B_OK) {
-			fPackagesByFileName.Insert(package);
-			fPackagesByNodeRef.Insert(package);
+			_AddPackage(package);
 			packageDeleter.Detach();
 		}
 	}

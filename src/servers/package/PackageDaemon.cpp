@@ -16,7 +16,7 @@
 #include <NodeMonitor.h>
 
 #include <AutoDeleter.h>
-#include <package/PackageDaemonDefs.h>
+#include <package/DaemonDefs.h>
 
 #include "DebugSupport.h"
 #include "Root.h"
@@ -28,7 +28,7 @@ using namespace BPackageKit::BPrivate;
 
 PackageDaemon::PackageDaemon(status_t* _error)
 	:
-	BServer(PACKAGE_DAEMON_APP_SIGNATURE, false, _error),
+	BServer(B_PACKAGE_DAEMON_APP_SIGNATURE, false, _error),
 	fSystemRoot(NULL),
 	fRoots(10, true),
 	fVolumeWatcher()
@@ -85,12 +85,12 @@ PackageDaemon::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case MESSAGE_GET_PACKAGES:
+		case B_MESSAGE_GET_INSTALLATION_LOCATION_INFO:
 		{
 			if (fSystemRoot == NULL)
 				break;
 
-			fSystemRoot->HandleGetPackagesRequest(DetachCurrentMessage());
+			fSystemRoot->HandleGetLocationInfoRequest(DetachCurrentMessage());
 			break;
 		}
 
