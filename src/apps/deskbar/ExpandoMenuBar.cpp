@@ -776,15 +776,17 @@ TExpandoMenuBar::CheckItemSizes(int32 delta)
 		- fDeskbarMenuWidth - kSepItemWidth;
 	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
 	float iconOnlyWidth = kIconPadding + iconSize + kIconPadding;
-	float minItemWidth = fDrawLabel ? iconOnlyWidth + kMinMenuItemWidth
-									: iconOnlyWidth - kIconPadding;
-	float maxItemWidth = fDrawLabel ? sMinimumWindowWidth + iconSize
-		- kMinimumIconSize : iconOnlyWidth;
+	float minItemWidth = fDrawLabel
+		? iconOnlyWidth + kMinMenuItemWidth
+		: iconOnlyWidth - kIconPadding;
+	float maxItemWidth = fDrawLabel
+		? sMinimumWindowWidth + iconSize - kMinimumIconSize
+		: iconOnlyWidth;
 	float menuWidth = maxItemWidth * CountItems() + fDeskbarMenuWidth
 		+ kSepItemWidth;
 
 	bool reset = false;
-	float newWidth = 0.0f;
+	float newWidth = -1.0f;
 
 	if (delta >= 0 && menuWidth > maxWidth) {
 		fOverflow = true;
@@ -798,15 +800,16 @@ TExpandoMenuBar::CheckItemSizes(int32 delta)
 			newWidth = maxItemWidth;
 	}
 
-	if (newWidth > maxItemWidth)
-		newWidth = maxItemWidth;
-	else if (newWidth < minItemWidth)
-		newWidth = minItemWidth;
-
 	if (reset) {
+		if (newWidth > maxItemWidth)
+			newWidth = maxItemWidth;
+		else if (newWidth < minItemWidth)
+			newWidth = minItemWidth;
+
 		SetMaxContentWidth(newWidth);
 		if (newWidth == maxItemWidth)
 			fOverflow = false;
+
 		InvalidateLayout();
 
 		for (int32 index = 0; ; index++) {
@@ -819,9 +822,8 @@ TExpandoMenuBar::CheckItemSizes(int32 delta)
 
 		Invalidate();
 		Window()->UpdateIfNeeded();
+		fBarView->CheckForScrolling();
 	}
-
-	fBarView->CheckForScrolling();
 }
 
 
@@ -894,8 +896,9 @@ TExpandoMenuBar::CheckForSizeOverrun()
 
 	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
 	float iconOnlyWidth = kIconPadding + iconSize + kIconPadding;
-	float minItemWidth = fDrawLabel ? iconOnlyWidth + kMinMenuItemWidth
-									: iconOnlyWidth - kIconPadding;
+	float minItemWidth = fDrawLabel
+		? iconOnlyWidth + kMinMenuItemWidth
+		: iconOnlyWidth - kIconPadding;
 	float menuWidth = minItemWidth * CountItems() + fDeskbarMenuWidth
 		+ kSepItemWidth;
 	float maxWidth = fBarView->DragRegion()->Frame().left
