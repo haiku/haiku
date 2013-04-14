@@ -840,7 +840,7 @@ TBarApp::RemoveTeam(team_id team)
 void
 TBarApp::ResizeTeamIcons()
 {
-	for (int32 i = 0; i < sBarTeamInfoList.CountItems(); i++) {
+	for (int32 i = sBarTeamInfoList.CountItems() - 1; i >= 0; i--) {
 		BarTeamInfo* barInfo = (BarTeamInfo*)sBarTeamInfoList.ItemAt(i);
 		if ((barInfo->flags & B_BACKGROUND_APP) == 0
 			&& strcasecmp(barInfo->sig, kDeskbarSignature) != 0) {
