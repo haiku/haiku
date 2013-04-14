@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2011-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -67,8 +67,9 @@ static void
 do_folders(int argc, char** argv)
 {
 	IMAP::FolderList folders;
+	BString separator;
 
-	status_t status = sProtocol.GetFolders(folders);
+	status_t status = sProtocol.GetFolders(folders, separator);
 	if (status != B_OK) {
 		error("folders", status);
 		return;
