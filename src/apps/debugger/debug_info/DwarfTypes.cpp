@@ -287,8 +287,6 @@ DwarfType::CreateDerivedArrayType(int64 lowerBound, int64 elementCount,
 	if (!resultType->AddDimension(dimension))
 		return B_NO_MEMORY;
 
-	dimensionReference.Detach();
-	subrangeReference.Detach();
 	baseTypeReference.Detach();
 
 	_resultType = resultType;
