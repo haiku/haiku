@@ -556,20 +556,26 @@ TBarApp::MessageReceived(BMessage* message)
 
 		case kResizeTeamIcons:
 		{
+			int32 oldIconSize = fSettings.iconSize;
 			int32 iconSize;
-
 			if (message->FindInt32("be:value", &iconSize) != B_OK)
 				break;
 
 			fSettings.iconSize = iconSize * kIconSizeInterval;
 
+			// pin icon size between min and max values
 			if (fSettings.iconSize < kMinimumIconSize)
 				fSettings.iconSize = kMinimumIconSize;
 			else if (fSettings.iconSize > kMaximumIconSize)
 				fSettings.iconSize = kMaximumIconSize;
 
+			// don't resize if icon size hasn't changed
+			if (fSettings.iconSize == oldIconSize)
+				break;
+
 			ResizeTeamIcons();
 
+			// if mini mode we don't need to update the view
 			if (fBarView->MiniState())
 				break;
 
