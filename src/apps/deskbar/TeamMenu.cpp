@@ -50,7 +50,8 @@ All rights reserved.
 
 
 TTeamMenu::TTeamMenu()
-	: BMenu("Team Menu")
+	:
+	BMenu("Team Menu")
 {
 	SetItemMargins(0.0f, 0.0f, 0.0f, 0.0f);
 	SetFont(be_plain_font);
@@ -133,7 +134,7 @@ void
 TTeamMenu::DetachedFromWindow()
 {
 	TBarView* barView = (dynamic_cast<TBarApp*>(be_app))->BarView();
-	if (barView) {
+	if (barView != NULL) {
 		BLooper* looper = barView->Looper();
 		if (looper->Lock()) {
 			barView->DragStop();
