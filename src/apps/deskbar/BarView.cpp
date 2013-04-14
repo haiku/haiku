@@ -395,7 +395,7 @@ TBarView::PlaceDeskbarMenu()
 			width += 1;
 		} else {
 			// shows apps to the right of bemenu
-			fBarMenuBar->AddSeperatorItem();
+			fBarMenuBar->AddSeparatorItem();
 			width = floorf(width) / 2 + kSepItemWidth;
 		}
 		loc = Bounds().LeftTop();

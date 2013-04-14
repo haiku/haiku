@@ -44,6 +44,7 @@ All rights reserved.
 
 #include "BarApp.h"
 #include "BarMenuBar.h"
+#include "BarView.h"
 #include "DeskbarUtils.h"
 #include "TeamMenuItem.h"
 

@@ -50,7 +50,7 @@ class BMenu;
 class TBarMenuTitle : public BMenuItem {
 public:
 	TBarMenuTitle(float width, float height, const BBitmap* icon,
-		BMenu* menu, bool inexpando = false);
+		BMenu* menu, bool expando = false);
 	virtual ~TBarMenuTitle();
 
 	void SetContentSize(float width, float height);
