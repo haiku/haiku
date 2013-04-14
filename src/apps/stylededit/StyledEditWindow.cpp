@@ -1512,7 +1512,7 @@ StyledEditWindow::_ReloadDocument(BMessage* message)
 	} else {
 		if (charset != NULL) {
 			// UTF8 id assumed equal to -1
-			const uint32 idUTF8 = -1;
+			const uint32 idUTF8 = (uint32)-1;
 			uint32 id = charset->GetConversionID();
 			if (strcmp(forceEncoding, "next") == 0)
 				id = id == B_MS_WINDOWS_1250_CONVERSION	? idUTF8 : id + 1;
