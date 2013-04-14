@@ -466,10 +466,12 @@ TBarApp::MessageReceived(BMessage* message)
 
 		case kAlwaysTop:
 			fSettings.alwaysOnTop = !fSettings.alwaysOnTop;
-			fBarWindow->SetFeel(fSettings.alwaysOnTop ?
-				B_FLOATING_ALL_WINDOW_FEEL : B_NORMAL_WINDOW_FEEL);
+
 			if (fPreferencesWindow != NULL)
 				fPreferencesWindow->PostMessage(kUpdatePreferences);
+
+			fBarWindow->SetFeel(fSettings.alwaysOnTop ?
+				B_FLOATING_ALL_WINDOW_FEEL : B_NORMAL_WINDOW_FEEL);
 			break;
 
 		case kAutoRaise:
@@ -483,34 +485,44 @@ TBarApp::MessageReceived(BMessage* message)
 		case kAutoHide:
 			fSettings.autoHide = !fSettings.autoHide;
 
+			if (fPreferencesWindow != NULL)
+				fPreferencesWindow->PostMessage(kUpdatePreferences);
+
 			fBarWindow->Lock();
 			fBarView->HideDeskbar(fSettings.autoHide);
 			fBarWindow->Unlock();
-
-			if (fPreferencesWindow != NULL)
-				fPreferencesWindow->PostMessage(kUpdatePreferences);
 			break;
 
 		case kTrackerFirst:
 			fSettings.trackerAlwaysFirst = !fSettings.trackerAlwaysFirst;
 
-			fBarWindow->Lock();
-			fBarView->PlaceApplicationBar();
-			fBarWindow->Unlock();
-
 			if (fPreferencesWindow != NULL)
 				fPreferencesWindow->PostMessage(kUpdatePreferences);
+
+			// if mini mode we don't need to update the view
+			if (fBarView->MiniState())
+				break;
+
+			fBarWindow->Lock();
+			fBarView->SaveExpandedItems();
+			fBarView->PlaceApplicationBar();
+			fBarWindow->Unlock();
 			break;
 
 		case kSortRunningApps:
 			fSettings.sortRunningApps = !fSettings.sortRunningApps;
 
-			fBarWindow->Lock();
-			fBarView->PlaceApplicationBar();
-			fBarWindow->Unlock();
-
 			if (fPreferencesWindow != NULL)
 				fPreferencesWindow->PostMessage(kUpdatePreferences);
+
+			// if mini mode we don't need to update the view
+			if (fBarView->MiniState())
+				break;
+
+			fBarWindow->Lock();
+			fBarView->SaveExpandedItems();
+			fBarView->PlaceApplicationBar();
+			fBarWindow->Unlock();
 			break;
 
 		case kUnsubscribe:
@@ -524,34 +536,49 @@ TBarApp::MessageReceived(BMessage* message)
 		case kSuperExpando:
 			fSettings.superExpando = !fSettings.superExpando;
 
-			fBarWindow->Lock();
-			fBarView->PlaceApplicationBar();
-			fBarWindow->Unlock();
-
 			if (fPreferencesWindow != NULL)
 				fPreferencesWindow->PostMessage(kUpdatePreferences);
+
+			// if mini mode we don't need to update the view
+			if (fBarView->MiniState())
+				break;
+
+			fBarWindow->Lock();
+			fBarView->SaveExpandedItems();
+			fBarView->PlaceApplicationBar();
+			fBarWindow->Unlock();
 			break;
 
 		case kExpandNewTeams:
 			fSettings.expandNewTeams = !fSettings.expandNewTeams;
 
-			fBarWindow->Lock();
-			fBarView->PlaceApplicationBar();
-			fBarWindow->Unlock();
-
 			if (fPreferencesWindow != NULL)
 				fPreferencesWindow->PostMessage(kUpdatePreferences);
+
+			// if mini mode we don't need to update the view
+			if (fBarView->MiniState())
+				break;
+
+			fBarWindow->Lock();
+			fBarView->SaveExpandedItems();
+			fBarView->PlaceApplicationBar();
+			fBarWindow->Unlock();
 			break;
 
 		case kHideLabels:
 			fSettings.hideLabels = !fSettings.hideLabels;
 
-			fBarWindow->Lock();
-			fBarView->PlaceApplicationBar();
-			fBarWindow->Unlock();
-
 			if (fPreferencesWindow != NULL)
 				fPreferencesWindow->PostMessage(kUpdatePreferences);
+
+			// if mini mode we don't need to update the view
+			if (fBarView->MiniState())
+				break;
+
+			fBarWindow->Lock();
+			fBarView->SaveExpandedItems();
+			fBarView->PlaceApplicationBar();
+			fBarWindow->Unlock();
 			break;
 
 		case kResizeTeamIcons:
@@ -575,11 +602,15 @@ TBarApp::MessageReceived(BMessage* message)
 
 			ResizeTeamIcons();
 
+			if (fPreferencesWindow != NULL)
+				fPreferencesWindow->PostMessage(kUpdatePreferences);
+
 			// if mini mode we don't need to update the view
 			if (fBarView->MiniState())
 				break;
 
 			fBarWindow->Lock();
+			fBarView->SaveExpandedItems();
 			if (!fBarView->Vertical()) {
 				// Must also resize the Deskbar menu and replicant tray in
 				// horizontal mode
@@ -588,10 +619,6 @@ TBarApp::MessageReceived(BMessage* message)
 			}
 			fBarView->PlaceApplicationBar();
 			fBarWindow->Unlock();
-
-			if (fPreferencesWindow != NULL)
-				fPreferencesWindow->PostMessage(kUpdatePreferences);
-
 			break;
 		}
 
