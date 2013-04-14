@@ -107,7 +107,7 @@ BDaemonClient::_ExtractPackageInfoSet(const BMessage& message,
 	// get the number of items
 	type_code type;
 	int32 count;
-	if (message.GetInfo(field, &type, &count)) {
+	if (message.GetInfo(field, &type, &count) != B_OK) {
 		// the field is missing
 		return B_OK;
 	}

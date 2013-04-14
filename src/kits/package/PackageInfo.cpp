@@ -2033,7 +2033,7 @@ BPackageInfo::_ExtractStringList(BMessage* archive, const char* field,
 	// get the number of items
 	type_code type;
 	int32 count;
-	if (archive->GetInfo(field, &type, &count)) {
+	if (archive->GetInfo(field, &type, &count) != B_OK) {
 		// the field is missing
 		return B_OK;
 	}
@@ -2071,7 +2071,7 @@ BPackageInfo::_ExtractResolvables(BMessage* archive, const char* field,
 	// get the number of items
 	type_code type;
 	int32 count;
-	if (archive->GetInfo(nameField, &type, &count)) {
+	if (archive->GetInfo(nameField, &type, &count) != B_OK) {
 		// the field is missing
 		return B_OK;
 	}
@@ -2130,7 +2130,7 @@ BPackageInfo::_ExtractResolvableExpressions(BMessage* archive,
 	// get the number of items
 	type_code type;
 	int32 count;
-	if (archive->GetInfo(nameField, &type, &count)) {
+	if (archive->GetInfo(nameField, &type, &count) != B_OK) {
 		// the field is missing
 		return B_OK;
 	}
