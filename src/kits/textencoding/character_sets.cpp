@@ -207,8 +207,8 @@ static const char * windows1251aliases[] = {
 	"cp1251", "cp5347", "ansi-1251",
 	NULL
 };
-static const BCharacterSet windows1251(18,2251, B_TRANSLATE("Windows Cyrillic (CP 1251)"),
-	"windows-1251",NULL,windows1251aliases);
+static const BCharacterSet windows1251(18,2251, B_TRANSLATE("Windows Cyrillic "
+	"(CP 1251)"), "windows-1251",NULL,windows1251aliases);
 
 static const char * IBM866aliases[] = {
 	// IANA aliases
@@ -238,7 +238,8 @@ static const char * eucKRaliases[] = {
 	// IANA aliases
 	"csEUCKR",
 	// java aliases
-	"ksc5601", "euckr", "ks_c_5601-1987", "ksc5601-1987", "ksc5601_1987", "ksc_5601", "5601",
+	"ksc5601", "euckr", "ks_c_5601-1987", "ksc5601-1987",
+	"ksc5601_1987", "ksc_5601", "5601",
 	NULL
 };
 static const BCharacterSet eucKR(21,38, B_TRANSLATE("EUC Korean"),
@@ -311,8 +312,8 @@ static const char* kWindows1250Aliases[] = {
 	"ms-ee",
 	NULL
 };
-static const BCharacterSet kWindows1250(28, 2250, B_TRANSLATE("Windows-1250 "
-	"(CP-1250)"), "windows-1250", "Windows-1250", kWindows1250Aliases);
+static const BCharacterSet kWindows1250(28, 2250, B_TRANSLATE("Windows Central "
+	"European (CP 1250)"), "windows-1250", NULL, kWindows1250Aliases);
 
 /**
  * The following initializes the global character set array.
