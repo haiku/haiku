@@ -130,10 +130,9 @@ TBarApp::TBarApp()
 
 	// Call UpdatePlacement() after the window is shown because expanded
 	// apps need to resize the window.
-	if (fBarWindow->Lock()) {
-		fBarView->UpdatePlacement();
-		fBarWindow->Unlock();
-	}
+	fBarWindow->Lock();
+	fBarView->UpdatePlacement();
+	fBarWindow->Unlock();
 
 	// this messenger now targets the barview instead of the
 	// statusview so that all additions to the tray
