@@ -74,6 +74,7 @@ BuildPlatformSharedLibrary libpackage_build.so
 	Context.cpp
 	DropRepositoryRequest.cpp
 	FetchFileJob.cpp
+	InstallationLocationInfo.cpp
 	Job.cpp
 	JobQueue.cpp
 	PackageInfo.cpp
