@@ -8,9 +8,15 @@
 
 #include <Autolock.h>
 
+#include <AutoDeleter.h>
+
 #include "IMAPFolder.h"
 #include "IMAPMailbox.h"
 #include "IMAPProtocol.h"
+
+
+static const uint32 kMaxFetchEntries = 500;
+static const uint32 kMaxDirectDownloadSize = 4096;
 
 
 class WorkerPrivate {
@@ -24,6 +30,38 @@ public:
 	IMAP::Protocol& Protocol()
 	{
 		return fWorker.fProtocol;
+	}
+
+	status_t AddFolders(BObjectList<IMAPFolder>& folders)
+	{
+		IMAPConnectionWorker::MailboxMap::iterator iterator
+			= fWorker.fMailboxes.begin();
+		for (; iterator != fWorker.fMailboxes.end(); iterator++) {
+			IMAPFolder* folder = iterator->first;
+			if (!folders.AddItem(folder))
+				return B_NO_MEMORY;
+		}
+		return B_OK;
+	}
+
+	status_t SelectMailbox(IMAPFolder& folder)
+	{
+		return fWorker._SelectMailbox(folder, NULL);
+	}
+
+	status_t SelectMailbox(IMAPFolder& folder, uint32& nextUID)
+	{
+		return fWorker._SelectMailbox(folder, &nextUID);
+	}
+
+	IMAPMailbox* MailboxFor(IMAPFolder& folder)
+	{
+		return fWorker._MailboxFor(folder);
+	}
+
+	status_t EnqueueCommand(WorkerCommand* command)
+	{
+		return fWorker._EnqueueCommand(command);
 	}
 
 	void Quit()
@@ -42,6 +80,7 @@ public:
 	virtual						~WorkerCommand() {}
 
 	virtual	status_t			Process(IMAPConnectionWorker& worker) = 0;
+	virtual bool				IsDone() const { return true; }
 };
 
 
@@ -59,12 +98,29 @@ public:
 };
 
 
-class CheckMailboxCommand : public WorkerCommand {
+class CheckSubscribedFoldersCommand : public WorkerCommand {
 public:
-	CheckMailboxCommand(IMAPFolder& folder, IMAPMailbox& mailbox)
+	virtual status_t Process(IMAPConnectionWorker& worker)
+	{
+		IMAP::Protocol& protocol = WorkerPrivate(worker).Protocol();
+
+		// The main worker checks the subscribed folders, and creates
+		// other workers as needed
+		return worker.Owner().CheckSubscribedFolders(protocol,
+			worker.UsesIdle());
+	}
+};
+
+
+class FetchHeadersCommand : public WorkerCommand {
+public:
+	FetchHeadersCommand(IMAPFolder& folder, IMAPMailbox& mailbox,
+		uint32 from, uint32 to)
 		:
 		fFolder(folder),
-		fMailbox(mailbox)
+		fMailbox(mailbox),
+		fFrom(from),
+		fTo(to)
 	{
 	}
 
@@ -72,12 +128,19 @@ public:
 	{
 		IMAP::Protocol& protocol = WorkerPrivate(worker).Protocol();
 
-		IMAP::SelectCommand select(fFolder.MailboxName().String());
-		status_t status = protocol.ProcessCommand(select);
-		if (status == B_OK) {
-			fFolder.SetUIDValidity(select.UIDValidity());
-			// TODO: trigger download of mails until UIDNext()
-		}
+		// TODO: check nextUID if we get one
+		status_t status = WorkerPrivate(worker).SelectMailbox(fFolder);
+		if (status != B_OK)
+			return status;
+
+		// TODO: create messages!
+		// TODO: trigger download of mails for all messages below the
+		// body fetch limit
+		// TODO: we would really like to have the message flags at this point
+		IMAP::FetchCommand fetch(fFrom, fTo, IMAP::kFetchHeader);
+		status = protocol.ProcessCommand(fetch);
+		if (status != B_OK)
+			return status;
 
 		return B_OK;
 	}
@@ -85,6 +148,131 @@ public:
 private:
 	IMAPFolder&				fFolder;
 	IMAPMailbox&			fMailbox;
+	uint32					fFrom;
+	uint32					fTo;
+};
+
+
+class CheckMailboxesCommand : public WorkerCommand {
+public:
+	CheckMailboxesCommand()
+		:
+		fFolders(5, false),
+		fState(INIT),
+		fFolder(NULL),
+		fMailbox(NULL)
+	{
+	}
+
+	virtual status_t Process(IMAPConnectionWorker& worker)
+	{
+		IMAP::Protocol& protocol = WorkerPrivate(worker).Protocol();
+
+		if (fState == INIT) {
+			// Collect folders
+			status_t status = WorkerPrivate(worker).AddFolders(fFolders);
+			if (status != B_OK || fFolders.IsEmpty())
+				return status;
+
+			fState = SELECT;
+		}
+
+		if (fState == SELECT) {
+			// Get next mailbox from list, and select it
+			fFolder = fFolders.RemoveItemAt(fFolders.CountItems() - 1);
+			if (fFolder == NULL) {
+				for (int32 i = 0; i < fFetchCommands.CountItems(); i++) {
+					WorkerPrivate(worker).EnqueueCommand(
+						fFetchCommands.ItemAt(i));
+				}
+
+				fState = DONE;
+				return B_OK;
+			}
+
+			fMailbox = WorkerPrivate(worker).MailboxFor(*fFolder);
+
+			status_t status = WorkerPrivate(worker).SelectMailbox(*fFolder,
+				fNextUID);
+			if (status != B_OK)
+				return status;
+
+			fState = FETCH_ENTRIES;
+//			fFirstUID = fLastUID = fFolder->LastUID();
+			fFirstUID = fLastUID = 0;
+			fMailboxEntries = 0;
+		}
+
+		if (fState == FETCH_ENTRIES) {
+			status_t status = WorkerPrivate(worker).SelectMailbox(*fFolder);
+			if (status != B_OK)
+				return status;
+
+			// TODO: this does not scale that well. Over time, the holes in the
+			// UIDs might become really large
+			uint32 from = fLastUID;
+			uint32 to = fNextUID;
+			if (to - from > kMaxFetchEntries)
+				to = from + kMaxFetchEntries;
+
+			printf("IMAP: get entries from %lu to %lu\n", from, to);
+			// TODO: we don't really need the flags at this point at all
+			IMAP::MessageEntryList	entries;
+			IMAP::FetchMessageEntriesCommand fetch(entries, from, to);
+			status = protocol.ProcessCommand(fetch);
+			if (status != B_OK)
+				return status;
+
+			// Determine how much we need to download
+			for (size_t i = 0; i < entries.size(); i++) {
+				printf("%10lu %8lu bytes, flags: %#lx\n", entries[i].uid,
+					entries[i].size, entries[i].flags);
+				fTotalBytes += entries[i].size;
+			}
+			fTotalEntries += entries.size();
+			fMailboxEntries += entries.size();
+
+			fLastUID = to;
+
+			if (to == fNextUID) {
+				if (fMailboxEntries > 0) {
+					// Add pending command to fetch the message headers
+					WorkerCommand* command = new FetchHeadersCommand(*fFolder,
+						*fMailbox, fFirstUID, fLastUID);
+					if (!fFetchCommands.AddItem(command))
+						delete command;
+				}
+				fState = SELECT;
+			}
+		}
+
+		return B_OK;
+	}
+
+	virtual bool IsDone() const
+	{
+		return fState == DONE;
+	}
+
+private:
+	enum State {
+		INIT,
+		SELECT,
+		FETCH_ENTRIES,
+		DONE
+	};
+
+	BObjectList<IMAPFolder>	fFolders;
+	State					fState;
+	IMAPFolder*				fFolder;
+	IMAPMailbox*			fMailbox;
+	uint32					fFirstUID;
+	uint32					fLastUID;
+	uint32					fNextUID;
+	uint32					fMailboxEntries;
+	uint64					fTotalEntries;
+	uint64					fTotalBytes;
+	WorkerCommandList		fFetchCommands;
 };
 
 
@@ -108,6 +296,7 @@ IMAPConnectionWorker::IMAPConnectionWorker(IMAPProtocol& owner,
 
 IMAPConnectionWorker::~IMAPConnectionWorker()
 {
+	puts("worker quit");
 	delete_sem(fPendingCommandsSemaphore);
 	_Disconnect();
 }
@@ -179,32 +368,24 @@ IMAPConnectionWorker::Run()
 void
 IMAPConnectionWorker::Quit()
 {
+	printf("IMAP: worker %p: enqueue quit\n", this);
 	_EnqueueCommand(new QuitCommand());
+}
+
+
+status_t
+IMAPConnectionWorker::EnqueueCheckSubscribedFolders()
+{
+	printf("IMAP: worker %p: enqueue check subscribed folders\n", this);
+	return _EnqueueCommand(new CheckSubscribedFoldersCommand());
 }
 
 
 status_t
 IMAPConnectionWorker::EnqueueCheckMailboxes()
 {
-	BAutolock locker(fLocker);
-
-	MailboxMap::iterator iterator = fMailboxes.begin();
-	for (; iterator != fMailboxes.end(); iterator++) {
-		IMAPFolder* folder = iterator->first;
-
-		printf("%p: check: %s\n", this, folder->MailboxName().String());
-		IMAPMailbox* mailbox = iterator->second;
-		if (mailbox == NULL) {
-			mailbox = new IMAPMailbox(fProtocol, folder->MailboxName());
-			folder->SetListener(mailbox);
-		}
-
-		status_t status = _EnqueueCommand(
-			new CheckMailboxCommand(*folder, *mailbox));
-		if (status != B_OK)
-			return status;
-	}
-	return B_OK;
+	printf("IMAP: worker %p: enqueue check mailboxes\n", this);
+	return _EnqueueCommand(new CheckMailboxesCommand());
 }
 
 
@@ -215,6 +396,9 @@ IMAPConnectionWorker::EnqueueRetrieveMail(entry_ref& ref)
 }
 
 
+// #pragma mark - Handler listener
+
+
 void
 IMAPConnectionWorker::MessageExistsReceived(uint32 index)
 {
@@ -222,20 +406,20 @@ IMAPConnectionWorker::MessageExistsReceived(uint32 index)
 }
 
 
+void
+IMAPConnectionWorker::MessageExpungeReceived(uint32 index)
+{
+	printf("Message expunge: %ld\n", index);
+}
+
+
+// #pragma mark - private
+
+
 status_t
 IMAPConnectionWorker::_Worker()
 {
 	while (!fStopped) {
-		if (fMain) {
-			// The main worker checks the subscribed folders, and creates
-			// other workers as needed
-			status_t status = _Connect();
-			if (status == B_OK)
-				status = fOwner.CheckSubscribedFolders(fProtocol, fIdle);
-			if (status != B_OK)
-				return status;
-		}
-
 		BAutolock locker(fLocker);
 
 		if (fPendingCommands.IsEmpty()) {
@@ -250,6 +434,8 @@ IMAPConnectionWorker::_Worker()
 		if (command == NULL)
 			continue;
 
+		ObjectDeleter<WorkerCommand> deleter(command);
+
 		status_t status = _Connect();
 		if (status != B_OK)
 			return status;
@@ -257,8 +443,14 @@ IMAPConnectionWorker::_Worker()
 		status = command->Process(*this);
 		if (status != B_OK)
 			return status;
+
+		if (!command->IsDone()) {
+			deleter.Detach();
+			_EnqueueCommand(command);
+		}
 	}
 
+	fOwner.WorkerQuit(this);
 	return B_OK;
 }
 
@@ -286,6 +478,43 @@ void
 IMAPConnectionWorker::_WaitForCommands()
 {
 	while (acquire_sem(fPendingCommandsSemaphore) == B_INTERRUPTED);
+}
+
+
+status_t
+IMAPConnectionWorker::_SelectMailbox(IMAPFolder& folder, uint32* _nextUID)
+{
+	if (fSelectedBox == &folder && _nextUID == NULL)
+		return B_OK;
+
+	IMAP::SelectCommand select(folder.MailboxName().String());
+
+	status_t status = fProtocol.ProcessCommand(select);
+	if (status == B_OK) {
+		folder.SetUIDValidity(select.UIDValidity());
+		if (_nextUID != NULL)
+			*_nextUID = select.NextUID();
+		fSelectedBox = &folder;
+	}
+
+	return status;
+}
+
+
+IMAPMailbox*
+IMAPConnectionWorker::_MailboxFor(IMAPFolder& folder)
+{
+	MailboxMap::iterator found = fMailboxes.find(&folder);
+	if (found == fMailboxes.end())
+		return NULL;
+
+	IMAPMailbox* mailbox = found->second;
+	if (mailbox == NULL) {
+		mailbox = new IMAPMailbox(fProtocol, folder.MailboxName());
+		folder.SetListener(mailbox);
+		found->second = mailbox;
+	}
+	return mailbox;
 }
 
 

@@ -237,11 +237,23 @@ public:
 };
 
 
+class ExpungeListener {
+public:
+	virtual	void				MessageExpungeReceived(uint32 index) = 0;
+};
+
+
 class ExpungeHandler : public Handler {
 public:
 								ExpungeHandler();
 
-			bool				HandleUntagged(Response& response);
+			void				SetListener(ExpungeListener* listener);
+			ExpungeListener*	Listener() const { return fListener; }
+
+	virtual	bool				HandleUntagged(Response& response);
+
+private:
+			ExpungeListener*	fListener;
 };
 
 

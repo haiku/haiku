@@ -119,6 +119,13 @@ IMAPProtocol::CheckSubscribedFolders(IMAP::Protocol& protocol, bool idle)
 }
 
 
+void
+IMAPProtocol::WorkerQuit(IMAPConnectionWorker* worker)
+{
+	fWorkers.RemoveItem(worker);
+}
+
+
 status_t
 IMAPProtocol::SyncMessages()
 {
@@ -133,6 +140,7 @@ IMAPProtocol::SyncMessages()
 			return B_NO_MEMORY;
 		}
 
+		worker->EnqueueCheckSubscribedFolders();
 		return worker->Run();
 	}
 

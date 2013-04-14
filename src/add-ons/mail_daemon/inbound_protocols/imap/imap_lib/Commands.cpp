@@ -330,8 +330,7 @@ FetchMessageEntriesCommand::HandleUntagged(Response& response)
 // #pragma mark -
 
 
-FetchCommand::FetchCommand(uint32 from, uint32 to,
-	FetchMode mode)
+FetchCommand::FetchCommand(uint32 from, uint32 to, FetchMode mode)
 	:
 	fFrom(from),
 	fTo(to),
@@ -517,7 +516,7 @@ ExistsHandler::SetListener(ExistsListener* listener)
 bool
 ExistsHandler::HandleUntagged(Response& response)
 {
-	if (!response.EqualsAt(1, "EXISTS") || response.IsNumberAt(0))
+	if (!response.EqualsAt(1, "EXISTS") || !response.IsNumberAt(0))
 		return false;
 
 	int32 index = response.NumberAt(0);
@@ -552,31 +551,24 @@ ExpungeHandler::ExpungeHandler()
 }
 
 
+void
+ExpungeHandler::SetListener(ExpungeListener* listener)
+{
+	fListener = listener;
+}
+
+
 bool
 ExpungeHandler::HandleUntagged(Response& response)
 {
-	if (!response.EqualsAt(1, "EXPUNGE") || response.IsNumberAt(0))
+	if (!response.EqualsAt(1, "EXPUNGE") || !response.IsNumberAt(0))
 		return false;
 
-//	int32 expunge = response.NumberAt(0);
-#if 0
-	Listener().ExpungeReceived(expunge);
+	int32 index = response.NumberAt(0);
 
-	// remove from storage
-	IMAPStorage& storage = fIMAPMailbox.GetStorage();
-	storage.DeleteMessage(fIMAPMailbox.MessageNumberToUID(expunge));
+	if (fListener != NULL)
+		fListener->MessageExpungeReceived(index);
 
-	// remove from min message list
-	MinMessageList& messageList = const_cast<MinMessageList&>(
-		fIMAPMailbox.GetMessageList());
-	messageList.erase(messageList.begin() + expunge - 1);
-
-	TRACE("EXPUNGE %i\n", (int)expunge);
-
-	// the watching loop restarts again, we need to watch again to because
-	// some IDLE implementation stop sending notifications
-	fIMAPMailbox.SendRawCommand("DONE");
-#endif
 	return true;
 }
 

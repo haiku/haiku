@@ -32,6 +32,7 @@ public:
 
 			status_t			CheckSubscribedFolders(
 									IMAP::Protocol& protocol, bool idle);
+			void				WorkerQuit(IMAPConnectionWorker* worker);
 
 	virtual	status_t			SyncMessages();
 	virtual status_t			FetchBody(const entry_ref& ref);

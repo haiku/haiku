@@ -24,7 +24,8 @@ class WorkerPrivate;
 typedef BObjectList<WorkerCommand> WorkerCommandList;
 
 
-class IMAPConnectionWorker : public IMAP::ExistsListener {
+class IMAPConnectionWorker : public IMAP::ExistsListener,
+	IMAP::ExpungeListener {
 public:
 								IMAPConnectionWorker(IMAPProtocol& owner,
 									const Settings& settings,
@@ -36,23 +37,34 @@ public:
 			void				AddMailbox(IMAPFolder* folder);
 			void				RemoveAllMailboxes();
 
+			IMAPProtocol&		Owner() const { return fOwner; }
 			bool				IsMain() const { return fMain; }
+			bool				UsesIdle() const { return fIdle; }
 
 			status_t			Run();
 			void				Quit();
 
+			status_t			EnqueueCheckSubscribedFolders();
 			status_t			EnqueueCheckMailboxes();
 			status_t			EnqueueRetrieveMail(entry_ref& ref);
 
 	// Handler listener
 	virtual	void				MessageExistsReceived(uint32 index);
+	virtual	void				MessageExpungeReceived(uint32 index);
 
 private:
 			status_t			_Worker();
 			status_t			_EnqueueCommand(WorkerCommand* command);
 			void				_WaitForCommands();
+
+			status_t			_SelectMailbox(IMAPFolder& folder,
+									uint32* _nextUID);
+			IMAPMailbox*		_MailboxFor(IMAPFolder& folder);
+			IMAPFolder*			_Selected() const { return fSelectedBox; }
+
 			status_t			_Connect();
 			void				_Disconnect();
+
 	static	status_t			_Worker(void* self);
 
 private:
@@ -66,8 +78,10 @@ private:
 			WorkerCommandList	fPendingCommands;
 
 			IMAP::ExistsHandler	fExistsHandler;
+			IMAP::ExpungeHandler fExpungeHandler;
 
 			IMAPFolder*			fIdleBox;
+			IMAPFolder*			fSelectedBox;
 			MailboxMap			fMailboxes;
 
 			BLocker				fLocker;
