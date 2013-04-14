@@ -66,6 +66,7 @@ const float kHiddenDimension = 1.0f;
 const float kMaxPreventHidingDist = 80.0f;
 
 class BShelf;
+class TBarApp;
 class TBarMenuBar;
 class TExpandoMenuBar;
 class TReplicantTray;
@@ -170,6 +171,7 @@ class TBarView : public BView {
 		void ExpandItems();
 		void _ChangeState(BMessage* message);
 
+		TBarApp* fBarApp;
 		TInlineScrollView* fInlineScrollView;
 		TBarMenuBar* fBarMenuBar;
 		TExpandoMenuBar* fExpandoMenuBar;
