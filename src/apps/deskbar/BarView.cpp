@@ -377,15 +377,12 @@ TBarView::PlaceDeskbarMenu()
 	} else
 		fBarMenuBar->SmartResize(-1, -1);
 
-	float width = sMinimumWindowWidth;
 	BPoint loc(B_ORIGIN);
+	float width = sMinimumWindowWidth;
 
 	if (fState == kFullState) {
 		fBarMenuBar->RemoveTeamMenu();
 		fBarMenuBar->RemoveSeperatorItem();
-		// TODO: Magic constants need explanation
-		width = 8 + 16 + 8;
-		fBarMenuBar->SmartResize(width, menuFrame.Height());
 		loc = Bounds().LeftTop();
 	} else if (fState == kExpandoState) {
 		fBarMenuBar->RemoveTeamMenu();
