@@ -238,6 +238,7 @@ union res_sockaddr_union {
 #define RES_NOTLDQUERY	0x00100000	/* don't unqualified name as a tld */
 #define RES_USE_DNSSEC	0x00200000	/* use DNSSEC using OK bit in OPT */
 /* #define RES_DEBUG2	0x00400000 */	/* nslookup internal */
+#define RES_USE_INET4	0x00800000	/* use IPv4 in gethostbyname() */
 /* KAME extensions: use higher bit to avoid conflict with ISC use */
 #define RES_USE_DNAME	0x10000000	/* use DNAME */
 #define RES_USE_EDNS0	0x40000000	/* use EDNS0 if configured */
