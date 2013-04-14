@@ -88,13 +88,13 @@ TBarMenuBar::SmartResize(float width, float height)
 	width -= 1;
 
 	if (fSeparatorItem != NULL)
-		fDeskbarMenuItem->SetWidthHeight(width - kSepItemWidth, height);
+		fDeskbarMenuItem->SetContentSize(width - kSepItemWidth, height);
 	else {
 		int32 count = CountItems();
 		if (fDeskbarMenuItem)
-			fDeskbarMenuItem->SetWidthHeight(width / count, height);
+			fDeskbarMenuItem->SetContentSize(width / count, height);
 		if (fAppListMenuItem)
-			fAppListMenuItem->SetWidthHeight(width / count, height);
+			fAppListMenuItem->SetContentSize(width / count, height);
 	}
 
 	InvalidateLayout();

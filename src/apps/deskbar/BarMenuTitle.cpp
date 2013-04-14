@@ -64,7 +64,7 @@ TBarMenuTitle::~TBarMenuTitle()
 
 
 void
-TBarMenuTitle::SetWidthHeight(float width, float height)
+TBarMenuTitle::SetContentSize(float width, float height)
 {
 	fWidth = width;
 	fHeight = height;
