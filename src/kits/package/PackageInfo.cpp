@@ -1098,12 +1098,58 @@ private:
 };
 
 
-// #pragma mark - BPackageInfo
+// #pragma mark - FieldName
 
+
+struct BPackageInfo::FieldName {
+	FieldName(const char* prefix, const char* suffix)
+	{
+		size_t prefixLength = strlen(prefix);
+		size_t suffixLength = strlen(suffix);
+		if (prefixLength + suffixLength >= sizeof(fFieldName)) {
+			fFieldName[0] = '\0';
+			return;
+		}
+
+		memcpy(fFieldName, prefix, prefixLength);
+		memcpy(fFieldName + prefixLength, suffix, suffixLength);
+		fFieldName[prefixLength + suffixLength] = '\0';
+	}
+
+	bool ReplaceSuffix(size_t prefixLength, const char* suffix)
+	{
+		size_t suffixLength = strlen(suffix);
+		if (prefixLength + suffixLength >= sizeof(fFieldName)) {
+			fFieldName[0] = '\0';
+			return false;
+		}
+
+		memcpy(fFieldName + prefixLength, suffix, suffixLength);
+		fFieldName[prefixLength + suffixLength] = '\0';
+		return true;
+	}
+
+	bool IsValid() const
+	{
+		return fFieldName[0] != '\0';
+	}
+
+	operator const char*()
+	{
+		return fFieldName;
+	}
+
+private:
+	char	fFieldName[64];
+};
+
+
+// #pragma mark - BPackageInfo
 
 
 BPackageInfo::BPackageInfo()
 	:
+	BArchivable(),
 	fFlags(0),
 	fArchitecture(B_PACKAGE_ARCHITECTURE_ENUM_COUNT),
 	fCopyrightList(5),
@@ -1117,6 +1163,65 @@ BPackageInfo::BPackageInfo()
 	fFreshensList(5, true),
 	fReplacesList(5)
 {
+}
+
+
+BPackageInfo::BPackageInfo(BMessage* archive, status_t* _error)
+	:
+	BArchivable(archive),
+	fFlags(0),
+	fArchitecture(B_PACKAGE_ARCHITECTURE_ENUM_COUNT),
+	fCopyrightList(5),
+	fLicenseList(5),
+	fURLList(5),
+	fSourceURLList(5),
+	fProvidesList(20, true),
+	fRequiresList(20, true),
+	fSupplementsList(20, true),
+	fConflictsList(5, true),
+	fFreshensList(5, true),
+	fReplacesList(5)
+{
+	status_t error;
+	int32 architecture;
+	if ((error = archive->FindString("name", &fName)) == B_OK
+		&& (error = archive->FindString("summary", &fSummary)) == B_OK
+		&& (error = archive->FindString("description", &fDescription)) == B_OK
+		&& (error = archive->FindString("vendor", &fVendor)) == B_OK
+		&& (error = archive->FindString("packager", &fPackager)) == B_OK
+		&& (error = archive->FindUInt32("flags", &fFlags)) == B_OK
+		&& (error = archive->FindInt32("architecture", &architecture)) == B_OK
+		&& (error = _ExtractVersion(archive, "version", 0, fVersion)) == B_OK
+		&& (error = _ExtractStringList(archive, "copyrights", fCopyrightList))
+			== B_OK
+		&& (error = _ExtractStringList(archive, "licenses", fLicenseList))
+			== B_OK
+		&& (error = _ExtractStringList(archive, "urls", fURLList)) == B_OK
+		&& (error = _ExtractStringList(archive, "source-urls", fSourceURLList))
+			== B_OK
+		&& (error = _ExtractResolvables(archive, "provides", fProvidesList))
+			== B_OK
+		&& (error = _ExtractResolvableExpressions(archive, "requires",
+			fRequiresList)) == B_OK
+		&& (error = _ExtractResolvableExpressions(archive, "supplements",
+			fSupplementsList)) == B_OK
+		&& (error = _ExtractResolvableExpressions(archive, "conflicts",
+			fConflictsList)) == B_OK
+		&& (error = _ExtractResolvableExpressions(archive, "freshens",
+			fFreshensList)) == B_OK
+		&& (error = _ExtractStringList(archive, "replaces", fReplacesList))
+			== B_OK
+		&& (error = archive->FindString("checksum", &fChecksum)) == B_OK
+		&& (error = archive->FindString("install-path", &fInstallPath)) == B_OK) {
+		if (architecture >= 0
+			|| architecture <= B_PACKAGE_ARCHITECTURE_ENUM_COUNT) {
+			fArchitecture = (BPackageArchitecture)architecture;
+		} else
+			error = B_BAD_DATA;
+	}
+
+	if (_error != NULL)
+		*_error = error;
 }
 
 
@@ -1625,6 +1730,55 @@ BPackageInfo::Clear()
 
 
 status_t
+BPackageInfo::Archive(BMessage* archive, bool deep) const
+{
+	status_t error = BArchivable::Archive(archive, deep);
+	if (error != B_OK)
+		return error;
+
+	if ((error = archive->AddString("name", fName)) != B_OK
+		|| (error = archive->AddString("summary", fSummary)) != B_OK
+		|| (error = archive->AddString("description", fDescription)) != B_OK
+		|| (error = archive->AddString("vendor", fVendor)) != B_OK
+		|| (error = archive->AddString("packager", fPackager)) != B_OK
+		|| (error = archive->AddUInt32("flags", fFlags)) != B_OK
+		|| (error = archive->AddInt32("architecture", fArchitecture)) != B_OK
+		|| (error = _AddVersion(archive, "version", fVersion)) != B_OK
+		|| (error = _AddStringList(archive, "copyrights", fCopyrightList))
+			!= B_OK
+		|| (error = _AddStringList(archive, "licenses", fLicenseList)) != B_OK
+		|| (error = _AddStringList(archive, "urls", fURLList)) != B_OK
+		|| (error = _AddStringList(archive, "source-urls", fSourceURLList))
+			!= B_OK
+		|| (error = _AddResolvables(archive, "provides", fProvidesList)) != B_OK
+		|| (error = _AddResolvableExpressions(archive, "requires",
+			fRequiresList)) != B_OK
+		|| (error = _AddResolvableExpressions(archive, "supplements",
+			fSupplementsList)) != B_OK
+		|| (error = _AddResolvableExpressions(archive, "conflicts",
+			fConflictsList)) != B_OK
+		|| (error = _AddResolvableExpressions(archive, "freshens",
+			fFreshensList)) != B_OK
+		|| (error = _AddStringList(archive, "replaces", fReplacesList)) != B_OK
+		|| (error = archive->AddString("checksum", fChecksum)) != B_OK
+		|| (error = archive->AddString("install-path", fInstallPath)) != B_OK) {
+		return error;
+	}
+
+	return B_OK;
+}
+
+
+/*static*/ BArchivable*
+BPackageInfo::Instantiate(BMessage* archive)
+{
+	if (validate_instantiation(archive, "BPackageInfo"))
+		return new(std::nothrow) BPackageInfo(archive);
+	return NULL;
+}
+
+
+status_t
 BPackageInfo::GetConfigString(BString& _string) const
 {
 	return StringBuilder()
@@ -1680,6 +1834,337 @@ BPackageInfo::ParseVersionString(const BString& string, bool releaseIsOptional,
 	BPackageVersion& _version, ParseErrorListener* listener)
 {
 	return Parser(listener).ParseVersion(string, releaseIsOptional, _version);
+}
+
+
+/*static*/ status_t
+BPackageInfo::_AddVersion(BMessage* archive, const char* field,
+	const BPackageVersion& version)
+{
+	// Storing BPackageVersion::ToString() would be nice, but the corresponding
+	// constructor only works for valid versions and we might want to store
+	// invalid versions as well.
+
+	// major
+	size_t fieldLength = strlen(field);
+	FieldName fieldName(field, ":major");
+	if (!fieldName.IsValid())
+		return B_BAD_VALUE;
+
+	status_t error = archive->AddString(fieldName, version.Major());
+	if (error != B_OK)
+		return error;
+
+	// minor
+	if (!fieldName.ReplaceSuffix(fieldLength, ":minor"))
+		return B_BAD_VALUE;
+
+	error = archive->AddString(fieldName, version.Minor());
+	if (error != B_OK)
+		return error;
+
+	// micro
+	if (!fieldName.ReplaceSuffix(fieldLength, ":micro"))
+		return B_BAD_VALUE;
+
+	error = archive->AddString(fieldName, version.Micro());
+	if (error != B_OK)
+		return error;
+
+	// pre-release
+	if (!fieldName.ReplaceSuffix(fieldLength, ":pre"))
+		return B_BAD_VALUE;
+
+	error = archive->AddString(fieldName, version.PreRelease());
+	if (error != B_OK)
+		return error;
+
+	// revision
+	if (!fieldName.ReplaceSuffix(fieldLength, ":revision"))
+		return B_BAD_VALUE;
+
+	return archive->AddUInt8(fieldName, version.Release());
+}
+
+
+/*static*/ status_t
+BPackageInfo::_AddStringList(BMessage* archive, const char* field,
+	const BStringList& list)
+{
+	int32 count = list.CountStrings();
+	for (int32 i = 0; i < count; i++) {
+		status_t error = archive->AddString(field, list.StringAt(i));
+		if (error != B_OK)
+			return error;
+	}
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
+BPackageInfo::_AddResolvables(BMessage* archive, const char* field,
+	const ResolvableList& resolvables)
+{
+	// construct the field names we need
+	FieldName nameField(field, ":name");
+	FieldName typeField(field, ":type");
+	FieldName versionField(field, ":version");
+	FieldName compatibleVersionField(field, ":compat");
+
+	if (!nameField.IsValid() || !typeField.IsValid() || !versionField.IsValid()
+		|| !compatibleVersionField.IsValid()) {
+		return B_BAD_VALUE;
+	}
+
+	// add fields
+	int32 count = resolvables.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		const BPackageResolvable* resolvable = resolvables.ItemAt(i);
+		status_t error;
+		if ((error = archive->AddString(nameField, resolvable->Name())) != B_OK
+			|| (error = archive->AddInt32(typeField, resolvable->Type()))
+				!= B_OK
+			|| (error = _AddVersion(archive, versionField,
+				resolvable->Version())) != B_OK
+			|| (error = _AddVersion(archive, compatibleVersionField,
+				resolvable->CompatibleVersion())) != B_OK) {
+			return error;
+		}
+	}
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
+BPackageInfo::_AddResolvableExpressions(BMessage* archive, const char* field,
+	const ResolvableExpressionList& expressions)
+{
+	// construct the field names we need
+	FieldName nameField(field, ":name");
+	FieldName operatorField(field, ":operator");
+	FieldName versionField(field, ":version");
+
+	if (!nameField.IsValid() || !operatorField.IsValid()
+		|| !versionField.IsValid()) {
+		return B_BAD_VALUE;
+	}
+
+	// add fields
+	int32 count = expressions.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		const BPackageResolvableExpression* expression = expressions.ItemAt(i);
+		status_t error;
+		if ((error = archive->AddString(nameField, expression->Name())) != B_OK
+			|| (error = archive->AddInt32(operatorField,
+				expression->Operator())) != B_OK
+			|| (error = _AddVersion(archive, versionField,
+				expression->Version())) != B_OK) {
+			return error;
+		}
+	}
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
+BPackageInfo::_ExtractVersion(BMessage* archive, const char* field, int32 index,
+	BPackageVersion& _version)
+{
+	// major
+	size_t fieldLength = strlen(field);
+	FieldName fieldName(field, ":major");
+	if (!fieldName.IsValid())
+		return B_BAD_VALUE;
+
+	BString major;
+	status_t error = archive->FindString(fieldName, index, &major);
+	if (error != B_OK)
+		return error;
+
+	// minor
+	if (!fieldName.ReplaceSuffix(fieldLength, ":minor"))
+		return B_BAD_VALUE;
+
+	BString minor;
+	error = archive->FindString(fieldName, index, &minor);
+	if (error != B_OK)
+		return error;
+
+	// micro
+	if (!fieldName.ReplaceSuffix(fieldLength, ":micro"))
+		return B_BAD_VALUE;
+
+	BString micro;
+	error = archive->FindString(fieldName, index, &micro);
+	if (error != B_OK)
+		return error;
+
+	// pre-release
+	if (!fieldName.ReplaceSuffix(fieldLength, ":pre"))
+		return B_BAD_VALUE;
+
+	BString preRelease;
+	error = archive->FindString(fieldName, index, &preRelease);
+	if (error != B_OK)
+		return error;
+
+	// revision
+	if (!fieldName.ReplaceSuffix(fieldLength, ":revision"))
+		return B_BAD_VALUE;
+
+	uint8 revision;
+	error = archive->FindUInt8(fieldName, index, &revision);
+	if (error != B_OK)
+		return error;
+
+	_version.SetTo(major, minor, micro, preRelease, revision);
+	return B_OK;
+}
+
+
+/*static*/ status_t
+BPackageInfo::_ExtractStringList(BMessage* archive, const char* field,
+	BStringList& _list)
+{
+	// get the number of items
+	type_code type;
+	int32 count;
+	if (archive->GetInfo(field, &type, &count)) {
+		// the field is missing
+		return B_OK;
+	}
+	if (type != B_STRING_TYPE)
+		return B_BAD_DATA;
+
+	for (int32 i = 0; i < count; i++) {
+		BString string;
+		status_t error = archive->FindString(field, i, &string);
+		if (error != B_OK)
+			return error;
+		if (!_list.Add(string))
+			return B_NO_MEMORY;
+	}
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
+BPackageInfo::_ExtractResolvables(BMessage* archive, const char* field,
+	ResolvableList& _resolvables)
+{
+	// construct the field names we need
+	FieldName nameField(field, ":name");
+	FieldName typeField(field, ":type");
+	FieldName versionField(field, ":version");
+	FieldName compatibleVersionField(field, ":compat");
+
+	if (!nameField.IsValid() || !typeField.IsValid() || !versionField.IsValid()
+		|| !compatibleVersionField.IsValid()) {
+		return B_BAD_VALUE;
+	}
+
+	// get the number of items
+	type_code type;
+	int32 count;
+	if (archive->GetInfo(nameField, &type, &count)) {
+		// the field is missing
+		return B_OK;
+	}
+
+	// extract fields
+	for (int32 i = 0; i < count; i++) {
+		BString name;
+		status_t error = archive->FindString(nameField, i, &name);
+		if (error != B_OK)
+			return error;
+
+		int32 type;
+		error = archive->FindInt32(typeField, i, &type);
+		if (error != B_OK)
+			return error;
+		if (type < 0 || type > B_PACKAGE_RESOLVABLE_TYPE_ENUM_COUNT)
+			return B_BAD_DATA;
+
+		BPackageVersion version;
+		error = _ExtractVersion(archive, versionField, i, version);
+		if (error != B_OK)
+			return error;
+
+		BPackageVersion compatibleVersion;
+		error = _ExtractVersion(archive, compatibleVersionField, i,
+			compatibleVersion);
+		if (error != B_OK)
+			return error;
+
+		BPackageResolvable* resolvable = new(std::nothrow) BPackageResolvable(
+			name, (BPackageResolvableType)type, version, compatibleVersion);
+		if (resolvable == NULL || !_resolvables.AddItem(resolvable)) {
+			delete resolvable;
+			return B_NO_MEMORY;
+		}
+	}
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
+BPackageInfo::_ExtractResolvableExpressions(BMessage* archive,
+	const char* field, ResolvableExpressionList& _expressions)
+{
+	// construct the field names we need
+	FieldName nameField(field, ":name");
+	FieldName operatorField(field, ":operator");
+	FieldName versionField(field, ":version");
+
+	if (!nameField.IsValid() || !operatorField.IsValid()
+		|| !versionField.IsValid()) {
+		return B_BAD_VALUE;
+	}
+
+	// get the number of items
+	type_code type;
+	int32 count;
+	if (archive->GetInfo(nameField, &type, &count)) {
+		// the field is missing
+		return B_OK;
+	}
+
+	// extract fields
+	for (int32 i = 0; i < count; i++) {
+		BString name;
+		status_t error = archive->FindString(nameField, i, &name);
+		if (error != B_OK)
+			return error;
+
+		int32 operatorType;
+		error = archive->FindInt32(operatorField, i, &operatorType);
+		if (error != B_OK)
+			return error;
+		if (operatorType < 0 
+			| operatorType > B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT) {
+			return B_BAD_DATA;
+		}
+
+		BPackageVersion version;
+		error = _ExtractVersion(archive, versionField, i, version);
+		if (error != B_OK)
+			return error;
+
+		BPackageResolvableExpression* expression
+			= new(std::nothrow) BPackageResolvableExpression(name,
+				(BPackageResolvableOperator)operatorType, version);
+		if (expression == NULL || !_expressions.AddItem(expression)) {
+			delete expression;
+			return B_NO_MEMORY;
+		}
+	}
+
+	return B_OK;
 }
 
 

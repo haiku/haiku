@@ -6,6 +6,7 @@
 #define _PACKAGE__PACKAGE_INFO_H_
 
 
+#include <Archivable.h>
 #include <ObjectList.h>
 #include <String.h>
 #include <StringList.h>
@@ -31,7 +32,7 @@ namespace BPackageKit {
  * these elements have been parsed from a ".PackageInfo" file.
  * Alternatively, they can be read from an existing package file.
  */
-class BPackageInfo {
+class BPackageInfo : public BArchivable {
 public:
 			struct ParseErrorListener {
 				virtual	~ParseErrorListener();
@@ -40,7 +41,9 @@ public:
 
 public:
 								BPackageInfo();
-								~BPackageInfo();
+								BPackageInfo(BMessage* archive,
+									status_t* _error = NULL);
+	virtual						~BPackageInfo();
 
 			status_t			ReadFromConfigFile(
 									const BEntry& packageInfoEntry,
@@ -137,6 +140,10 @@ public:
 
 			void				Clear();
 
+	virtual	status_t 			Archive(BMessage* archive,
+									bool deep = true) const;
+	static 	BArchivable*		Instantiate(BMessage* archive);
+
 			status_t			GetConfigString(BString& _string) const;
 			BString				ToString() const;
 
@@ -157,6 +164,36 @@ private:
 			class Parser;
 			friend class Parser;
 			struct StringBuilder;
+			struct FieldName;
+
+			typedef BObjectList<BPackageResolvable> ResolvableList;
+			typedef BObjectList<BPackageResolvableExpression>
+				ResolvableExpressionList;
+
+private:
+	static	status_t			_AddVersion(BMessage* archive,
+									const char* field,
+									const BPackageVersion& version);
+	static	status_t			_AddStringList(BMessage* archive,
+									const char* field, const BStringList& list);
+	static	status_t			_AddResolvables(BMessage* archive,
+									const char* field,
+									const ResolvableList& resolvables);
+	static	status_t			_AddResolvableExpressions(BMessage* archive,
+									const char* field,
+									const ResolvableExpressionList&
+										expressions);
+	static	status_t			_ExtractVersion(BMessage* archive,
+									const char* field, int32 index,
+									BPackageVersion& _version);
+	static	status_t			_ExtractStringList(BMessage* archive,
+									const char* field, BStringList& _list);
+	static	status_t			_ExtractResolvables(BMessage* archive,
+									const char* field,
+									ResolvableList& _resolvables);
+	static	status_t			_ExtractResolvableExpressions(BMessage* archive,
+									const char* field,
+									ResolvableExpressionList& _expressions);
 
 private:
 			BString				fName;
@@ -167,7 +204,7 @@ private:
 
 			uint32				fFlags;
 
-			BPackageArchitecture	fArchitecture;
+			BPackageArchitecture fArchitecture;
 
 			BPackageVersion		fVersion;
 
@@ -176,14 +213,12 @@ private:
 			BStringList			fURLList;
 			BStringList			fSourceURLList;
 
-			BObjectList<BPackageResolvable>	fProvidesList;
+			ResolvableList		fProvidesList;
 
-			BObjectList<BPackageResolvableExpression>	fRequiresList;
-			BObjectList<BPackageResolvableExpression>	fSupplementsList;
-
-			BObjectList<BPackageResolvableExpression>	fConflictsList;
-
-			BObjectList<BPackageResolvableExpression>	fFreshensList;
+			ResolvableExpressionList fRequiresList;
+			ResolvableExpressionList fSupplementsList;
+			ResolvableExpressionList fConflictsList;
+			ResolvableExpressionList fFreshensList;
 
 			BStringList			fReplacesList;
 
