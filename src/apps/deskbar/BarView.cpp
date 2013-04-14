@@ -36,10 +36,6 @@ All rights reserved.
 
 #include "BarView.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include <AppFileInfo.h>
 #include <Bitmap.h>
 #include <Debug.h>
