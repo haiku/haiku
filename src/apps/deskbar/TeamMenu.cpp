@@ -147,9 +147,3 @@ TTeamMenu::DetachedFromWindow()
 	BMessenger self(this);
 	TBarApp::Unsubscribe(self);
 }
-
-
-void
-TTeamMenu::DrawBackground(BRect)
-{
-}
