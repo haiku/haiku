@@ -6,6 +6,10 @@
 
 #include <Referenceable.h>
 
+#ifdef DEBUG
+#include <stdio.h>
+#endif
+
 #include <debugger.h>
 
 //#define TRACE_REFERENCEABLE
@@ -28,6 +32,7 @@ BReferenceable::~BReferenceable()
 {
 #ifdef DEBUG
 	bool enterDebugger = false;
+	char message[256];
 	if (fReferenceCount == 1) {
 		// Simple heuristic to test if this object was allocated
 		// on the stack: check if this is within 1KB in either
@@ -44,14 +49,21 @@ BReferenceable::~BReferenceable()
 			status_t result = get_thread_info(find_thread(NULL), &info);
 			if (result != B_OK || this < info.stack_base
 				|| this > info.stack_end) {
+				snprintf(message, sizeof(message), "Deleted referenceable "
+					"object that's not on the stack (this: %p, stack_base: %p,"
+					" stack_end: %p)\n", this, info.stack_base,
+					info.stack_end);
 				enterDebugger = true;
 			}
 		}
-	} else if (fReferenceCount != 0)
+	} else if (fReferenceCount != 0) {
+		snprintf(message, sizeof(message), "Deleted referenceable object with "
+			"non-zero reference count (%" B_PRId32 ")\n", fReferenceCount);
 		enterDebugger = true;
+	}
 
 	if (enterDebugger)
-		debugger("Deleted referenceable object with non-zero ref count.");
+		debugger(message);
 #endif
 }
 
