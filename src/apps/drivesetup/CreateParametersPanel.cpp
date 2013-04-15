@@ -87,7 +87,7 @@ CreateParametersPanel::MessageReceived(BMessage* message)
 
 		case MSG_SIZE_TEXTCONTROL:
 		{
-			off_t size = atoi(fSizeTextControl->Text()) * kMegaByte;
+			off_t size = strtoll(fSizeTextControl->Text(), NULL, 10) * kMegaByte;
 			if (size >= 0 && size <= fSizeSlider->MaxPartitionSize())
 				fSizeSlider->SetSize(size);
 			else
