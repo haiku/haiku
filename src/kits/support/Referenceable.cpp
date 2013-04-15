@@ -41,7 +41,7 @@ BReferenceable::~BReferenceable()
 		// imply the object was allocated/destroyed on the stack
 		// without any references being acquired or released.
 		char test;
-		size_t testOffset = (addr_t)this - (addr_t)&test;
+		ssize_t testOffset = (addr_t)this - (addr_t)&test;
 		if (testOffset > 1024 || -testOffset > 1024) {
 			// might still be a stack object, check the thread's
 			// stack range to be sure.
