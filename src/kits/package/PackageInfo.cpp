@@ -73,7 +73,7 @@ public:
 									BPackageInfo* packageInfo);
 
 			status_t			ParseVersion(const BString& versionString,
-									bool releaseIsOptional,
+									bool revisionIsOptional,
 									BPackageVersion& _version);
 
 private:
@@ -89,10 +89,10 @@ private:
 			void				_ParseArchitectureValue(
 									BPackageArchitecture* value);
 			void				_ParseVersionValue(BPackageVersion* value,
-									bool releaseIsOptional);
+									bool revisionIsOptional);
 	static	void				_ParseVersionValue(Token& word,
 									BPackageVersion* value,
-									bool releaseIsOptional);
+									bool revisionIsOptional);
 			void				_ParseList(ListElementParser& elementParser,
 									bool allowSingleNonListElement);
 			void				_ParseStringList(BStringList* value,
@@ -219,13 +219,13 @@ BPackageInfo::Parser::Parse(const BString& packageInfoString,
 
 status_t
 BPackageInfo::Parser::ParseVersion(const BString& versionString,
-	bool releaseIsOptional, BPackageVersion& _version)
+	bool revisionIsOptional, BPackageVersion& _version)
 {
 	fPos = versionString.String();
 
 	try {
 		Token token(TOKEN_WORD, fPos, versionString.Length());
-		_ParseVersionValue(token, &_version, releaseIsOptional);
+		_ParseVersionValue(token, &_version, revisionIsOptional);
 	} catch (const ParseError& error) {
 		if (fListener != NULL) {
 			int32 offset = error.pos - versionString.String();
@@ -393,41 +393,41 @@ BPackageInfo::Parser::_ParseArchitectureValue(BPackageArchitecture* value)
 
 void
 BPackageInfo::Parser::_ParseVersionValue(BPackageVersion* value,
-	bool releaseIsOptional)
+	bool revisionIsOptional)
 {
 	Token word = _NextToken();
-	_ParseVersionValue(word, value, releaseIsOptional);
+	_ParseVersionValue(word, value, revisionIsOptional);
 }
 
 
 /*static*/ void
 BPackageInfo::Parser::_ParseVersionValue(Token& word, BPackageVersion* value,
-	bool releaseIsOptional)
+	bool revisionIsOptional)
 {
 	if (word.type != TOKEN_WORD)
 		throw ParseError("expected word (a version)", word.pos);
 
-	// get the release number
-	uint8 release = 0;
+	// get the revision number
+	uint32 revision = 0;
 	int32 lastDashPos = word.text.FindLast('-');
 	if (lastDashPos >= 0) {
-		// Might be either the release number or, if that is optional, a
+		// Might be either the revision number or, if that is optional, a
 		// pre-release. The former always is a number, the latter starts with a
 		// non-digit.
 		if (isdigit(word.text[lastDashPos + 1])) {
 			int number = atoi(word.text.String() + lastDashPos + 1);
-			if (number <= 0 || number > 99) {
-				throw ParseError("release number must be from 1-99",
+			if (number <= 0) {
+				throw ParseError("revision number must be > 0",
 					word.pos + word.text.Length());
 			}
-			release = number;
+			revision = number;
 			word.text.Truncate(lastDashPos);
 			lastDashPos = word.text.FindLast('-');
 		}
 	}
 
-	if (release == 0 && !releaseIsOptional) {
-		throw ParseError("expected release number (-<number> suffix)",
+	if (revision == 0 && !revisionIsOptional) {
+		throw ParseError("expected revision number (-<number> suffix)",
 			word.pos + word.text.Length());
 	}
 
@@ -465,7 +465,7 @@ BPackageInfo::Parser::_ParseVersionValue(Token& word, BPackageVersion* value,
 		}
 	}
 
-	value->SetTo(major, minor, micro, preRelease, release);
+	value->SetTo(major, minor, micro, preRelease, revision);
 }
 
 
@@ -1831,10 +1831,10 @@ BPackageInfo::GetArchitectureByName(const BString& name,
 
 
 /*static*/ status_t
-BPackageInfo::ParseVersionString(const BString& string, bool releaseIsOptional,
+BPackageInfo::ParseVersionString(const BString& string, bool revisionIsOptional,
 	BPackageVersion& _version, ParseErrorListener* listener)
 {
-	return Parser(listener).ParseVersion(string, releaseIsOptional, _version);
+	return Parser(listener).ParseVersion(string, revisionIsOptional, _version);
 }
 
 
@@ -1884,7 +1884,7 @@ BPackageInfo::_AddVersion(BMessage* archive, const char* field,
 	if (!fieldName.ReplaceSuffix(fieldLength, ":revision"))
 		return B_BAD_VALUE;
 
-	return archive->AddUInt8(fieldName, version.Release());
+	return archive->AddUInt32(fieldName, version.Revision());
 }
 
 
@@ -2016,8 +2016,8 @@ BPackageInfo::_ExtractVersion(BMessage* archive, const char* field, int32 index,
 	if (!fieldName.ReplaceSuffix(fieldLength, ":revision"))
 		return B_BAD_VALUE;
 
-	uint8 revision;
-	error = archive->FindUInt8(fieldName, index, &revision);
+	uint32 revision;
+	error = archive->FindUInt32(fieldName, index, &revision);
 	if (error != B_OK)
 		return error;
 

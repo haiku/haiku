@@ -152,7 +152,7 @@ public:
 									BPackageArchitecture& _architecture);
 
 	static	status_t			ParseVersionString(const BString& string,
-									bool releaseIsOptional,
+									bool revisionIsOptional,
 									BPackageVersion& _version,
 									ParseErrorListener* listener = NULL);
 

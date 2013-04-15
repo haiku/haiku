@@ -577,12 +577,12 @@ WriterImplBase::RegisterPackageVersion(PackageAttributeList& attributeList,
 		versionMajor->children.Add(preRelease);
 	}
 
-	if (version.Release() != 0) {
-		PackageAttribute* versionRelease = new PackageAttribute(
-			B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_RELEASE,
-			B_HPKG_ATTRIBUTE_TYPE_UINT, B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
-		versionRelease->unsignedInt = version.Release();
-		versionMajor->children.Add(versionRelease);
+	if (version.Revision() != 0) {
+		PackageAttribute* versionRevision = new PackageAttribute(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_REVISION,
+			B_HPKG_ATTRIBUTE_TYPE_UINT, B_HPKG_ATTRIBUTE_ENCODING_INT_32_BIT);
+		versionRevision->unsignedInt = version.Revision();
+		versionMajor->children.Add(versionRevision);
 	}
 }
 

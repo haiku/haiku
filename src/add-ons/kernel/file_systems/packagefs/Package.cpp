@@ -183,7 +183,7 @@ struct Package::LoaderContentHandler : BPackageContentHandler {
 				::Version* version;
 				status_t error = Version::Create(value.version.major,
 					value.version.minor, value.version.micro,
-					value.version.preRelease, value.version.release, version);
+					value.version.preRelease, value.version.revision, version);
 				if (error != B_OK)
 					RETURN_ERROR(error);
 
@@ -209,7 +209,7 @@ struct Package::LoaderContentHandler : BPackageContentHandler {
 						= value.resolvable.version;
 					status_t error = Version::Create(versionInfo.major,
 						versionInfo.minor, versionInfo.micro,
-						versionInfo.preRelease, versionInfo.release, version);
+						versionInfo.preRelease, versionInfo.revision, version);
 					if (error != B_OK)
 						RETURN_ERROR(error);
 				}
@@ -222,7 +222,7 @@ struct Package::LoaderContentHandler : BPackageContentHandler {
 						= value.resolvable.compatibleVersion;
 					status_t error = Version::Create(versionInfo.major,
 						versionInfo.minor, versionInfo.micro,
-						versionInfo.preRelease, versionInfo.release,
+						versionInfo.preRelease, versionInfo.revision,
 						compatibleVersion);
 					if (error != B_OK)
 						RETURN_ERROR(error);
@@ -266,7 +266,7 @@ struct Package::LoaderContentHandler : BPackageContentHandler {
 						= value.resolvableExpression.version;
 					status_t error = Version::Create(versionInfo.major,
 						versionInfo.minor, versionInfo.micro,
-						versionInfo.preRelease, versionInfo.release, version);
+						versionInfo.preRelease, versionInfo.revision, version);
 					if (error != B_OK)
 						RETURN_ERROR(error);
 

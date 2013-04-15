@@ -20,28 +20,28 @@ namespace BPackageKit {
 
 BPackageVersion::BPackageVersion()
 	:
-	fRelease(0)
+	fRevision(0)
 {
 }
 
 
 BPackageVersion::BPackageVersion(const BPackageVersionData& data)
 {
-	SetTo(data.major, data.minor, data.micro, data.preRelease, data.release);
+	SetTo(data.major, data.minor, data.micro, data.preRelease, data.revision);
 }
 
 
 BPackageVersion::BPackageVersion(const BString& versionString,
-	bool releaseIsOptional)
+	bool revisionIsOptional)
 {
-	SetTo(versionString, releaseIsOptional);
+	SetTo(versionString, revisionIsOptional);
 }
 
 
 BPackageVersion::BPackageVersion(const BString& major, const BString& minor,
-	const BString& micro, const BString& preRelease, uint8 release)
+	const BString& micro, const BString& preRelease, uint32 revision)
 {
-	SetTo(major, minor, micro, preRelease, release);
+	SetTo(major, minor, micro, preRelease, revision);
 }
 
 
@@ -80,10 +80,10 @@ BPackageVersion::PreRelease() const
 }
 
 
-uint8
-BPackageVersion::Release() const
+uint32
+BPackageVersion::Revision() const
 {
-	return fRelease;
+	return fRevision;
 }
 
 
@@ -117,7 +117,7 @@ BPackageVersion::Compare(const BPackageVersion& other) const
 			return diff;
 	}
 
-	return (int)fRelease - (int)other.fRelease;
+	return (int)fRevision - (int)other.fRevision;
 }
 
 
@@ -135,8 +135,8 @@ BPackageVersion::ToString() const
 	if (!fPreRelease.IsEmpty())
 		string << '-' << fPreRelease;
 
-	if (fRelease > 0)
-		string << '-' << fRelease;
+	if (fRevision > 0)
+		string << '-' << fRevision;
 
 	return string;
 }
@@ -144,13 +144,13 @@ BPackageVersion::ToString() const
 
 void
 BPackageVersion::SetTo(const BString& major, const BString& minor,
-	const BString& micro, const BString& preRelease, uint8 release)
+	const BString& micro, const BString& preRelease, uint32 revision)
 {
 	fMajor = major;
 	fMinor = minor;
 	fMicro = micro;
 	fPreRelease = preRelease;
-	fRelease = release;
+	fRevision = revision;
 
 	fMajor.ToLower();
 	fMinor.ToLower();
@@ -160,10 +160,10 @@ BPackageVersion::SetTo(const BString& major, const BString& minor,
 
 
 status_t
-BPackageVersion::SetTo(const BString& versionString, bool releaseIsOptional)
+BPackageVersion::SetTo(const BString& versionString, bool revisionIsOptional)
 {
 	Clear();
-	return BPackageInfo::ParseVersionString(versionString, releaseIsOptional,
+	return BPackageInfo::ParseVersionString(versionString, revisionIsOptional,
 		*this);
 }
 
@@ -175,7 +175,7 @@ BPackageVersion::Clear()
 	fMinor.Truncate(0);
 	fMicro.Truncate(0);
 	fPreRelease.Truncate(0);
-	fRelease = 0;
+	fRevision = 0;
 }
 
 

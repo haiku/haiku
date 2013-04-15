@@ -135,8 +135,8 @@ ReaderImplBase::PackageVersionAttributeHandler::HandleAttribute(
 			fPackageVersionData.preRelease = value.string;
 			break;
 
-		case B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_RELEASE:
-			fPackageVersionData.release = value.unsignedInt;
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_REVISION:
+			fPackageVersionData.revision = value.unsignedInt;
 			break;
 
 		default:

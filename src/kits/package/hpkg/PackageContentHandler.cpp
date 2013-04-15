@@ -44,7 +44,7 @@ static const char* kAttributeNames[B_HPKG_ATTRIBUTE_ID_ENUM_COUNT + 1] = {
 	"package:version.major",
 	"package:version.minor",
 	"package:version.micro",
-	"package:version.release",
+	"package:version.revision",
 	"package:copyright",
 	"package:license",
 	"package:provides",

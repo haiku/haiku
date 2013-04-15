@@ -39,7 +39,7 @@ Version::Version()
 	fMinor(NULL),
 	fMicro(NULL),
 	fPreRelease(NULL),
-	fRelease(0)
+	fRevision(0)
 {
 }
 
@@ -55,7 +55,7 @@ Version::~Version()
 
 status_t
 Version::Init(const char* major, const char* minor, const char* micro,
-	const char* preRelease, uint8 release)
+	const char* preRelease, uint32 revision)
 {
 	if (major != NULL) {
 		fMajor = strdup(major);
@@ -81,7 +81,7 @@ Version::Init(const char* major, const char* minor, const char* micro,
 			return B_NO_MEMORY;
 	}
 
-	fRelease = release;
+	fRevision = revision;
 
 	return B_OK;
 }
@@ -89,13 +89,13 @@ Version::Init(const char* major, const char* minor, const char* micro,
 
 /*static*/ status_t
 Version::Create(const char* major, const char* minor, const char* micro,
-	const char* preRelease, uint8 release, Version*& _version)
+	const char* preRelease, uint32 revision, Version*& _version)
 {
 	Version* version = new(std::nothrow) Version;
 	if (version == NULL)
 		return B_NO_MEMORY;
 
-	status_t error = version->Init(major, minor, micro, preRelease, release);
+	status_t error = version->Init(major, minor, micro, preRelease, revision);
 	if (error != B_OK) {
 		delete version;
 		return error;
@@ -136,7 +136,8 @@ Version::Compare(const Version& other) const
 			return cmp;
 	}
 
-	return (int)fRelease - other.fRelease;
+	return fRevision == other.fRevision
+		? 0 : (fRevision < other.fRevision ? -1 : 1);
 }
 
 
@@ -200,9 +201,10 @@ Version::ToString(char* buffer, size_t bufferSize) const
 			fPreRelease);
 	}
 
-	if (fRelease != 0) {
+	if (fRevision != 0) {
 		size_t offset = std::min(bufferSize, size);
-		size += snprintf(buffer + offset, bufferSize - offset, "-%u", fRelease);
+		size += snprintf(buffer + offset, bufferSize - offset, "-%" B_PRIu32,
+			fRevision);
 	}
 
 	return size;

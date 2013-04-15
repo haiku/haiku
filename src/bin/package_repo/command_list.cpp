@@ -238,8 +238,8 @@ private:
 			printf(".%s", version.micro);
 		if (version.preRelease != NULL && version.preRelease[0] != '\0')
 			printf("-%s", version.preRelease);
-		if (version.release > 0)
-			printf("-%d", version.release);
+		if (version.revision > 0)
+			printf("-%" B_PRIu32, version.revision);
 	}
 
 private:
