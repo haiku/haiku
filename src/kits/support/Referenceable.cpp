@@ -13,7 +13,7 @@
 #include <debugger.h>
 
 //#define TRACE_REFERENCEABLE
-#ifdef TRACE_REFERENCEABLE
+#if defined(TRACE_REFERENCEABLE) && defined(_KERNEL_MODE)
 #	include <tracing.h>
 #	define TRACE(x, ...) ktrace_printf(x, __VA_ARGS__);
 #else
