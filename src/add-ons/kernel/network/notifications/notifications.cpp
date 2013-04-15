@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -21,15 +21,17 @@
 
 class NetNotificationService : public DefaultUserNotificationService {
 public:
-							NetNotificationService();
-	virtual					~NetNotificationService();
+								NetNotificationService();
+	virtual						~NetNotificationService();
 
-			void			Notify(const KMessage& event);
+			void				Notify(const KMessage& event);
 
 protected:
-	virtual	void			FirstAdded();
-	virtual	void			LastRemoved();
+	virtual	void				LastReferenceReleased();
+	virtual	void				FirstAdded();
+	virtual	void				LastRemoved();
 };
+
 
 static NetNotificationService sNotificationService;
 
@@ -38,8 +40,11 @@ static NetNotificationService sNotificationService;
 
 
 NetNotificationService::NetNotificationService()
-	: DefaultUserNotificationService("network")
+	:
+	DefaultUserNotificationService("network")
 {
+	// We need to set the reference count to zero for DEBUG builds
+	fReferenceCount = 0;
 }
 
 
@@ -58,6 +63,13 @@ NetNotificationService::Notify(const KMessage& event)
 	TRACE("notify for %lx\n", opcode);
 
 	DefaultUserNotificationService::Notify(event, opcode);
+}
+
+
+void
+NetNotificationService::LastReferenceReleased()
+{
+	// don't delete us here
 }
 
 
