@@ -72,9 +72,10 @@ initialization process.
 		HOOK(SET_DPMS_MODE);
 
 		/* cursor managment */
-		HOOK(SET_CURSOR_SHAPE);
-		HOOK(MOVE_CURSOR);
-		HOOK(SHOW_CURSOR);
+// TODO: fix
+//		HOOK(SET_CURSOR_SHAPE);
+//		HOOK(MOVE_CURSOR);
+//		HOOK(SHOW_CURSOR);
 
 		/* synchronization */
 		HOOK(ACCELERANT_ENGINE_COUNT);
