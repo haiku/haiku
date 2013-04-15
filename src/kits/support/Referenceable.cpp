@@ -57,8 +57,8 @@ BReferenceable::~BReferenceable()
 			}
 		}
 	} else if (fReferenceCount != 0) {
-		snprintf(message, sizeof(message), "Deleted referenceable object with "
-			"non-zero reference count (%" B_PRId32 ")\n", fReferenceCount);
+		snprintf(message, sizeof(message), "Deleted referenceable object %p with "
+			"non-zero reference count (%" B_PRId32 ")\n", this, fReferenceCount);
 		enterDebugger = true;
 	}
 
