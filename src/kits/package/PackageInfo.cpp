@@ -14,6 +14,7 @@
 
 #include <File.h>
 #include <Entry.h>
+#include <Message.h>
 #include <package/hpkg/NoErrorOutput.h>
 #include <package/hpkg/PackageReader.h>
 #include <package/PackageInfoContentHandler.h>
@@ -2145,8 +2146,8 @@ BPackageInfo::_ExtractResolvableExpressions(BMessage* archive,
 		error = archive->FindInt32(operatorField, i, &operatorType);
 		if (error != B_OK)
 			return error;
-		if (operatorType < 0 
-			| operatorType > B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT) {
+		if (operatorType < 0
+			|| operatorType > B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT) {
 			return B_BAD_DATA;
 		}
 
