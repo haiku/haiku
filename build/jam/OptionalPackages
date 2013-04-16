@@ -505,7 +505,7 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 			: $(hpkgBaseURL)/automake-1.11.1-3-x86_gcc2.hpkg
 			: common packages ;
 		InstallOptionalHaikuImagePackage
-			libtool-2.4-2-x86_gcc2.hpkg
+			libtool-2.4-3-x86_gcc2.hpkg
 			: $(hpkgBaseURL)/libtool-2.4-3-x86_gcc2.hpkg
 			: common packages ;
 		InstallOptionalHaikuImagePackage
