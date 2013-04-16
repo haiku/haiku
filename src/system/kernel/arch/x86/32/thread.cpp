@@ -24,6 +24,7 @@
 #include <tls.h>
 #include <tracing.h>
 #include <util/AutoLock.h>
+#include <util/Random.h>
 #include <vm/vm_types.h>
 #include <vm/VMAddressSpace.h>
 
@@ -204,8 +205,9 @@ arch_thread_dump_info(void *info)
 static addr_t
 arch_randomize_stack_pointer(addr_t value)
 {
-	value -= rand() & (B_PAGE_SIZE - 1);
-	return value & ~0xful;
+	STATIC_ASSERT(MAX_RANDOM_VALUE >= B_PAGE_SIZE - 1);
+	value -= random_value() & (B_PAGE_SIZE - 1);
+	return value & ~addr_t(0xf);
 }
 
 
