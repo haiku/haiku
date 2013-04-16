@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -111,7 +111,8 @@ public:
 		fTableCellRenderer(NULL),
 		fComponentPath(NULL),
 		fIsPresentationNode(isPresentationNode),
-		fHidden(false)
+		fHidden(false),
+		fCastedType(NULL)
 	{
 		fNodeChild->AcquireReference();
 	}
@@ -129,6 +130,9 @@ public:
 
 		if (fComponentPath != NULL)
 			fComponentPath->ReleaseReference();
+
+		if (fCastedType != NULL)
+			fCastedType->ReleaseReference();
 	}
 
 	status_t Init()
@@ -193,6 +197,21 @@ public:
 
 		if (fValue != NULL)
 			fValue->AcquireReference();
+	}
+
+	Type* GetCastedType() const
+	{
+		return fCastedType;
+	}
+
+	void SetCastedType(Type* type)
+	{
+		if (fCastedType != NULL)
+			fCastedType->ReleaseReference();
+
+		fCastedType = type;
+		if (type != NULL)
+			fCastedType->AcquireReference();
 	}
 
 	TypeComponentPath* GetPath() const
@@ -309,6 +328,7 @@ private:
 	TypeComponentPath*		fComponentPath;
 	bool					fIsPresentationNode;
 	bool					fHidden;
+	Type*					fCastedType;
 
 public:
 	ModelNode*			fNext;
@@ -1509,9 +1529,8 @@ VariablesView::MessageReceived(BMessage* message)
 				break;
 			}
 
-			// TODO: we need to also persist/restore the casted state
-			// in VariableViewState
 			node->NodeChild()->SetNode(valueNode);
+			node->SetCastedType(type);
 			break;
 		}
 		case MSG_SHOW_WATCH_VARIABLE_PROMPT:
@@ -1967,6 +1986,7 @@ VariablesView::_AddViewStateDescendentNodeInfos(VariablesViewState* viewState,
 		// add the node's info
 		VariablesViewNodeInfo nodeInfo;
 		nodeInfo.SetNodeExpanded(fVariableTable->IsNodeExpanded(path));
+		nodeInfo.SetCastedType(node->GetCastedType());
 
 		status_t error = viewState->SetNodeInfo(node->GetVariable()->ID(),
 			node->GetPath(), nodeInfo);
@@ -1999,6 +2019,20 @@ VariablesView::_ApplyViewStateDescendentNodeInfos(VariablesViewState* viewState,
 		const VariablesViewNodeInfo* nodeInfo = viewState->GetNodeInfo(
 			node->GetVariable()->ID(), node->GetPath());
 		if (nodeInfo != NULL) {
+			// NB: if the node info indicates that the node in question
+			// was being cast to a different type, this *must* be applied
+			// before any other view state restoration, since it potentially
+			// changes the child hierarchy under that node.
+			Type* type = nodeInfo->GetCastedType();
+			if (type != NULL) {
+				ValueNode* valueNode = NULL;
+				if (TypeHandlerRoster::Default()->CreateValueNode(
+					node->NodeChild(), type, valueNode) == B_OK) {
+					node->NodeChild()->SetNode(valueNode);
+					node->SetCastedType(type);
+				}
+			}
+
 			fVariableTable->SetNodeExpanded(path, nodeInfo->IsNodeExpanded());
 
 			// recurse

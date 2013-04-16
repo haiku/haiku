@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -12,6 +13,7 @@
 
 class ObjectID;
 class StackFrameValues;
+class Type;
 class TypeComponentPath;
 
 
@@ -20,6 +22,7 @@ public:
 								VariablesViewNodeInfo();
 								VariablesViewNodeInfo(
 									const VariablesViewNodeInfo& other);
+	virtual						~VariablesViewNodeInfo();
 
 			VariablesViewNodeInfo& operator=(
 									const VariablesViewNodeInfo& other);
@@ -28,8 +31,13 @@ public:
 									{ return fNodeExpanded; }
 			void				SetNodeExpanded(bool expanded);
 
+			Type*				GetCastedType() const
+									{ return fCastedType; }
+			void				SetCastedType(Type* type);
+
 private:
 			bool				fNodeExpanded;
+			Type*				fCastedType;
 };
 
 
