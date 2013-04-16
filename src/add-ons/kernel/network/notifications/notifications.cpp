@@ -145,7 +145,7 @@ notifications_std_ops(int32 op, ...)
 
 			// we need to release the reference that was acquired
 			// on our behalf by the NotificationManager.
-			sNotificationService.ReleaseReference();
+//			sNotificationService.ReleaseReference();
 			sNotificationService.~NetNotificationService();
 			return B_OK;
 
