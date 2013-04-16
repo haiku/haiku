@@ -920,8 +920,10 @@ rule InstallSourceArchive file : url
 	}
 }
 
-rule InstallOptionalHaikuImagePackage package : url : dirTokens : isCDPackage
+rule InstallOptionalHaikuImagePackage url : dirTokens : isCDPackage
 {
+	local package = $(url:BS) ;
+
 	# download archive file
 	local archiveFile = [ DownloadFile $(package) : $(url) ] ;
 
