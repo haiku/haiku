@@ -298,14 +298,14 @@ IsWindowOK(const window_info* windowInfo)
 bool
 OKToUse(const TTeamGroup* teamGroup)
 {
-	if (!teamGroup)
+	if (teamGroup == NULL)
 		return false;
 
 	// skip background applications
 	if ((teamGroup->Flags() & B_BACKGROUND_APP) != 0)
 		return false;
 
-	// skip the Deskbar itself
+	// skip Deskbar itself
 	if (strcasecmp(teamGroup->Signature(), kDeskbarSignature) == 0)
 		return false;
 
