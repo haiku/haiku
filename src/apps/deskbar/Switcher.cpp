@@ -877,6 +877,9 @@ TSwitchManager::CycleApp(bool forward, bool activateNow)
 bool
 TSwitchManager::_FindNextValidApp(bool forward)
 {
+	if (fGroupList.IsEmpty())
+		return false;
+
 	int32 startIndex = fCurrentIndex;
 	int32 max = fGroupList.CountItems();
 
