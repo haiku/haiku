@@ -1167,7 +1167,7 @@ _init_interface_kit_()
 		return status;
 
 	general_info.background_color = ui_color(B_PANEL_BACKGROUND_COLOR);
-	general_info.mark_color.set_to(0, 0, 0);
+	general_info.mark_color = ui_color(B_CONTROL_MARK_COLOR);
 	general_info.highlight_color = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
 	general_info.window_frame_color = ui_color(B_WINDOW_TAB_COLOR);
 	general_info.color_frame = true;
