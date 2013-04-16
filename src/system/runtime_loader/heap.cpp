@@ -178,8 +178,8 @@ static status_t
 add_area(size_t size)
 {
 	void *base;
-	area_id area = _kern_create_area("rld heap", &base, B_ANY_ADDRESS, size,
-		B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+	area_id area = _kern_create_area("rld heap", &base,
+		B_RANDOMIZED_ANY_ADDRESS, size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (area < B_OK)
 		return area;
 
