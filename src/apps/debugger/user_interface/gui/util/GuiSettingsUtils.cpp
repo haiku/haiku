@@ -20,7 +20,7 @@ GuiSettingsUtils::ArchiveSplitView(BMessage& settings, BSplitView* view)
 		if (settings.AddFloat("weight", view->ItemWeight(i)) != B_OK)
 			return B_NO_MEMORY;
 
-		if (settings.AddFloat("collapsed", view->IsItemCollapsed(i)) != B_OK)
+		if (settings.AddBool("collapsed", view->IsItemCollapsed(i)) != B_OK)
 			return B_NO_MEMORY;
 	}
 
