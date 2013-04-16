@@ -43,8 +43,6 @@ NetNotificationService::NetNotificationService()
 	:
 	DefaultUserNotificationService("network")
 {
-	// We need to set the reference count to zero for DEBUG builds
-	fReferenceCount = 0;
 }
 
 
@@ -145,6 +143,9 @@ notifications_std_ops(int32 op, ...)
 
 			unregister_generic_syscall(NET_NOTIFICATIONS_SYSCALLS, 1);
 
+			// we need to release the reference that was acquired
+			// on our behalf by the NotificationManager.
+			sNotificationService.ReleaseReference();
 			sNotificationService.~NetNotificationService();
 			return B_OK;
 
