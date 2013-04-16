@@ -32,18 +32,18 @@ using namespace BPackageKit;
 
 
 static const char* const kShortUsage =
-	"  %command% <package> <repository> [ <priority> ] ...\n"
-	"    Resolves all packages a given package depends on.\n";
+	"  %command% <package> ... <repository> [ <priority> ] ...\n"
+	"    Resolves all packages the given packages depend on.\n";
 
 static const char* const kLongUsage =
-	"Usage: %program% %command% <package> <repository> [ <priority> ] ...\n"
-	"Resolves and lists all packages a given package depends on. Fails, if\n"
+	"Usage: %program% %command% <package> ... <repository> [ <priority> ] ...\n"
+	"Resolves and lists all packages the given packages depend on. Fails, if\n"
 	"not all dependencies could be resolved.\n"
 	"\n"
 	"Arguments:\n"
 	"  <package>\n"
 	"    The HPKG or package info file of the package for which the\n"
-	"    dependencies shall be resolved.\n"
+	"    dependencies shall be resolved. Multiple files can be specified.\n"
 	"  <repository>\n"
 	"    Path to a directory containing packages from which the package's\n"
 	"    dependencies shall be resolved. Multiple directories can be\n"
@@ -76,7 +76,8 @@ check_problems(BSolver* solver, const char* errorContext)
 
 
 static void
-verify_result(const BSolverResult& result, BSolverPackage* specifiedPackage)
+verify_result(const BSolverResult& result,
+	const PackagePathMap& specifiedPackagePaths)
 {
 	// create the solver
 	BSolver* solver;
@@ -85,14 +86,14 @@ verify_result(const BSolverResult& result, BSolverPackage* specifiedPackage)
 		DIE(error, "failed to create solver");
 
 	// Add an installation repository and add all of the result packages save
-	// the specified package.
+	// the specified packages.
 	BSolverRepository installation;
 	RepositoryBuilder installationBuilder(installation, "installation");
 
 	for (int32 i = 0; const BSolverResultElement* element = result.ElementAt(i);
 			i++) {
 		BSolverPackage* package = element->Package();
-		if (package != specifiedPackage)
+		if (specifiedPackagePaths.find(package) == specifiedPackagePaths.end())
 			installationBuilder.AddPackage(package->Info());
 	}
 	installationBuilder.AddToSolver(solver, true);
@@ -131,14 +132,26 @@ ResolveDependenciesCommand::Execute(int argc, const char* const* argv)
 		}
 	}
 
-	// The remaining arguments are the package (info) file and the repository
+	// The remaining arguments are the package (info) files and the repository
 	// directories (at least one), optionally with priorities.
 	if (argc < optind + 2)
 		PrintUsageAndExit(true);
 
-	const char* packagePath = argv[optind++];
-	int repositoryDirectoryCount = argc - optind;
+	// Determine where the package list ends and the repository list starts.
+	const char* const* specifiedPackages = argv + optind;
+	for (; optind < argc; optind++) {
+		const char* path = argv[optind];
+		struct stat st;
+		if (stat(path, &st) != 0)
+			DIE(errno, "failed to stat() \"%s\"", path);
+
+		if (S_ISDIR(st.st_mode))
+			break;
+	}
+
 	const char* const* repositoryDirectories = argv + optind;
+	int repositoryDirectoryCount = argc - optind;
+	int specifiedPackageCount = repositoryDirectories - specifiedPackages;
 
 	// create the solver
 	BSolver* solver;
@@ -173,17 +186,27 @@ ResolveDependenciesCommand::Execute(int argc, const char* const* argv)
 			.AddToSolver(solver);
 	}
 
-	// add a repository with only the specified package
+	// add a repository with only the specified packages
+	PackagePathMap specifiedPackagePaths;
 	BSolverRepository dummyRepository;
-	RepositoryBuilder(dummyRepository, "dummy", "specified package")
-		.AddPackage(packagePath)
-		.AddToSolver(solver);
-	BSolverPackage* specifiedPackage = dummyRepository.PackageAt(0);
+	{
+		RepositoryBuilder builder(dummyRepository, "dummy",
+				"specified packages");
+		builder.SetPackagePathMap(&specifiedPackagePaths);
+
+		for (int i = 0; i < specifiedPackageCount; i++)
+			builder.AddPackage(specifiedPackages[i]);
+
+		builder.AddToSolver(solver);
+	}
 
 	// resolve
 	BSolverPackageSpecifierList packagesToInstall;
-	if (!packagesToInstall.AppendSpecifier(specifiedPackage))
-		DIE(B_NO_MEMORY, "failed to add specified package");
+	for (PackagePathMap::const_iterator it = specifiedPackagePaths.begin();
+		it != specifiedPackagePaths.end(); ++it) {
+		if (!packagesToInstall.AppendSpecifier(it->first))
+			DIE(B_NO_MEMORY, "failed to add specified package");
+	}
 
 	error = solver->Install(packagesToInstall);
 	if (error != B_OK)
@@ -197,14 +220,14 @@ ResolveDependenciesCommand::Execute(int argc, const char* const* argv)
 		DIE(error, "failed to resolve package dependencies");
 
 	// Verify that the resolved packages don't depend on the specified package.
-	verify_result(result, specifiedPackage);
+	verify_result(result, specifiedPackagePaths);
 
 	// print packages
 	for (int32 i = 0; const BSolverResultElement* element = result.ElementAt(i);
 			i++) {
 		// skip the specified package
 		BSolverPackage* package = element->Package();
-		if (package == specifiedPackage)
+		if (specifiedPackagePaths.find(package) != specifiedPackagePaths.end())
 			continue;
 
 		// resolve and print the path
