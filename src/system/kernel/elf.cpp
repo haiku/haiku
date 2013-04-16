@@ -1827,6 +1827,7 @@ elf_load_user_image(const char *path, Team *team, int flags, addr_t *entry)
 	int i;
 	addr_t delta = 0;
 	uint32 addressSpec = B_RANDOMIZED_BASE_ADDRESS;
+	area_id* mappedAreas = NULL;
 
 	TRACE(("elf_load: entry path '%s', team %p\n", path, team));
 
@@ -1906,7 +1907,14 @@ elf_load_user_image(const char *path, Team *team, int flags, addr_t *entry)
 			strcpy(baseName, leaf);
 	}
 
-	// map the program's segments into memory
+	// map the program's segments into memory, initially with rw access
+	// correct area protection will be set after relocation
+
+	mappedAreas = (area_id*)malloc(sizeof(area_id) * elfHeader.e_phnum);
+	if (mappedAreas == NULL) {
+		status = B_NO_MEMORY;
+		goto error2;
+	}
 
 	image_info imageInfo;
 	memset(&imageInfo, 0, sizeof(image_info));
@@ -1916,6 +1924,8 @@ elf_load_user_image(const char *path, Team *team, int flags, addr_t *entry)
 		char *regionAddress;
 		char *originalRegionAddress;
 		area_id id;
+
+		mappedAreas[i] = -1;
 
 		if (programHeaders[i].p_type == PT_DYNAMIC) {
 			image->dynamic_section = programHeaders[i].p_vaddr;
@@ -1950,6 +1960,7 @@ elf_load_user_image(const char *path, Team *team, int flags, addr_t *entry)
 				status = B_NOT_AN_EXECUTABLE;
 				goto error2;
 			}
+			mappedAreas[i] = id;
 
 			imageInfo.data = regionAddress;
 			imageInfo.data_size = memUpperBound;
@@ -1998,13 +2009,15 @@ elf_load_user_image(const char *path, Team *team, int flags, addr_t *entry)
 
 			id = vm_map_file(team->id, regionName, (void **)&regionAddress,
 				addressSpec, segmentSize,
-				B_READ_AREA | B_EXECUTE_AREA | B_WRITE_AREA, REGION_PRIVATE_MAP,
-				false, fd, ROUNDDOWN(programHeaders[i].p_offset, B_PAGE_SIZE));
+				B_READ_AREA | B_WRITE_AREA, REGION_PRIVATE_MAP, false, fd,
+				ROUNDDOWN(programHeaders[i].p_offset, B_PAGE_SIZE));
 			if (id < B_OK) {
 				dprintf("error mapping file text: %s!\n", strerror(id));
 				status = B_NOT_AN_EXECUTABLE;
 				goto error2;
 			}
+
+			mappedAreas[i] = id;
 
 			imageInfo.text = regionAddress;
 			imageInfo.text_size = segmentSize;
@@ -2033,6 +2046,26 @@ elf_load_user_image(const char *path, Team *team, int flags, addr_t *entry)
 	if (status != B_OK)
 		goto error2;
 
+	// set correct area protection
+	for (i = 0; i < elfHeader.e_phnum; i++) {
+		if (mappedAreas[i] == -1)
+			continue;
+
+		uint32 protection = 0;
+
+		if (programHeaders[i].p_flags & PF_EXECUTE)
+			protection |= B_EXECUTE_AREA;
+		if (programHeaders[i].p_flags & PF_WRITE)
+			protection |= B_WRITE_AREA;
+		if (programHeaders[i].p_flags & PF_READ)
+			protection |= B_READ_AREA;
+
+		status = vm_set_area_protection(team->id, mappedAreas[i], protection,
+			true);
+		if (status != B_OK)
+			goto error2;
+	}
+
 	// register the loaded image
 	imageInfo.type = B_LIBRARY_IMAGE;
     imageInfo.device = st.st_dev;
@@ -2056,6 +2089,8 @@ elf_load_user_image(const char *path, Team *team, int flags, addr_t *entry)
 	status = B_OK;
 
 error2:
+	free(mappedAreas);
+
 	image->elf_header = NULL;
 	delete_elf_image(image);
 

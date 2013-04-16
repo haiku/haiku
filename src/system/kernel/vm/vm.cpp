@@ -274,6 +274,7 @@ static status_t map_backing_store(VMAddressSpace* addressSpace,
 	int protection, int mapping, uint32 flags,
 	const virtual_address_restrictions* addressRestrictions, bool kernel,
 	VMArea** _area, void** _virtualAddress);
+static void fix_protection(uint32* protection);
 
 
 //	#pragma mark -
@@ -2527,10 +2528,12 @@ vm_copy_area(team_id team, const char* name, void** _address,
 }
 
 
-static status_t
+status_t
 vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 	bool kernel)
 {
+	fix_protection(&newProtection);
+
 	TRACE(("vm_set_area_protection(team = %#" B_PRIx32 ", area = %#" B_PRIx32
 		", protection = %#" B_PRIx32 ")\n", team, areaID, newProtection));
 
@@ -5808,8 +5811,6 @@ _get_next_area_info(team_id team, ssize_t* cookie, area_info* info, size_t size)
 status_t
 set_area_protection(area_id area, uint32 newProtection)
 {
-	fix_protection(&newProtection);
-
 	return vm_set_area_protection(VMAddressSpace::KernelID(), area,
 		newProtection, true);
 }
@@ -6036,8 +6037,6 @@ _user_set_area_protection(area_id area, uint32 newProtection)
 {
 	if ((newProtection & ~B_USER_PROTECTION) != 0)
 		return B_BAD_VALUE;
-
-	fix_protection(&newProtection);
 
 	return vm_set_area_protection(VMAddressSpace::CurrentID(), area,
 		newProtection, false);
