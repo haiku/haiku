@@ -33,6 +33,13 @@ SimpleTest imap_tester :
 	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ] bnetapi mail
 ;
 
+SimpleTest rfc3501_encoding_test :
+	rfc3501_encoding_test.cpp
+	$(libSources)
+
+	: be $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) bnetapi
+;
+
 SEARCH on [ FGristFiles $(libSources) ]
 	= [ FDirName $(HAIKU_TOP) src add-ons mail_daemon inbound_protocols imap
 		imap_lib ] ;

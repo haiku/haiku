@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2011-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -7,6 +7,8 @@
 #include "Response.h"
 
 #include <stdlib.h>
+
+#include <UnicodeChar.h>
 
 
 #define TRACE_IMAP
@@ -53,8 +55,41 @@ RFC3501Encoding::~RFC3501Encoding()
 BString
 RFC3501Encoding::Encode(const BString& clearText) const
 {
-	// TODO!
-	return clearText;
+	const char* clear = clearText.String();
+	bool shifted = false;
+	int32 bitsToWrite = 0;
+	int32 sextet = 0;
+	BString buffer;
+
+	while (true) {
+		uint32 c = BUnicodeChar::FromUTF8(&clear);
+		if (c == 0)
+			break;
+
+		if (!shifted && c == '&')
+			buffer += "&-";
+		else if (c >= 0x20 && c <= 0x7e) {
+			_Unshift(buffer, bitsToWrite, sextet, shifted);
+			buffer += c;
+		} else {
+			// Enter shifted mode, encode in base64
+			if (!shifted) {
+				buffer += '&';
+				shifted = true;
+			}
+
+			bitsToWrite += 16;
+			while (bitsToWrite >= 6) {
+				bitsToWrite -= 6;
+				buffer += kBase64Alphabet[(sextet + (c >> bitsToWrite)) & 0x3f];
+				sextet = 0;
+			}
+			sextet = (c << (6 - bitsToWrite)) & 0x3f;
+		}
+	}
+
+	_Unshift(buffer, bitsToWrite, sextet, shifted);
+	return buffer;
 }
 
 
@@ -69,6 +104,7 @@ RFC3501Encoding::Decode(const BString& encodedText) const
 			if (i < end - 1 && encodedText.ByteAt(i + 1) == '-') {
 				// just add an ampersand
 				buffer += '&';
+				i++;
 			} else {
 				// base64 encoded chunk
 				uint32 value = 0;
@@ -131,6 +167,23 @@ RFC3501Encoding::_ToUTF8(BString& string, uint32 c) const
 		string += 0x80 | ((c >> 6) & 0x3f);
 		string += 0x80 | (c & 0x3f);
 	}
+}
+
+
+//!	Exit base64, or "shifted" mode.
+void
+RFC3501Encoding::_Unshift(BString& buffer, int32& bitsToWrite, int32& sextet,
+	bool& shifted) const
+{
+	if (!shifted)
+		return;
+
+	if (bitsToWrite != 0)
+		buffer += kBase64Alphabet[sextet];
+	buffer += '-';
+	sextet = 0;
+	bitsToWrite = 0;
+	shifted = false;
 }
 
 

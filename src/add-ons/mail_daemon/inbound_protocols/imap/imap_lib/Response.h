@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2011-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef RESPONSE_H
@@ -30,6 +30,8 @@ public:
 
 private:
 			void				_ToUTF8(BString& string, uint32 c) const;
+			void				_Unshift(BString& string, int32& bitsToWrite,
+									int32& sextet, bool& shifted) const;
 };
 
 
