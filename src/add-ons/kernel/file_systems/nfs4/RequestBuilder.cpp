@@ -12,6 +12,8 @@
 #include <errno.h>
 #include <string.h>
 
+#include <util/Random.h>
+
 #include "Cookie.h"
 #include "OpenState.h"
 #include "RPCCallback.h"
@@ -659,8 +661,7 @@ RequestBuilder::SetClientID(RPC::Server* server)
 		return B_NO_MEMORY;
 
 	fRequest->Stream().AddUInt(OpSetClientID);
-	uint64 verifier = rand();
-	verifier = verifier << 32 | rand();
+	uint64 verifier = get_random<uint64>();
 	fRequest->Stream().AddUHyper(verifier);
 
 	status_t result = _GenerateClientId(fRequest->Stream(), server);

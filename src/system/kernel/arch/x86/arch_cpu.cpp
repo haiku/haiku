@@ -605,10 +605,12 @@ detect_cpu(int currentCPU)
 	get_current_cpuid(&cpuid, 1);
 	cpu->arch.feature[FEATURE_COMMON] = cpuid.eax_1.features; // edx
 	cpu->arch.feature[FEATURE_EXT] = cpuid.eax_1.extended_features; // ecx
-	if (cpu->arch.vendor == VENDOR_AMD) {
+	if (cpu->arch.vendor == VENDOR_AMD || cpu->arch.vendor == VENDOR_INTEL) {
 		get_current_cpuid(&cpuid, 0x80000001);
 		cpu->arch.feature[FEATURE_EXT_AMD] = cpuid.regs.edx; // edx
 	}
+	if (cpu->arch.vendor == VENDOR_INTEL)
+		cpu->arch.feature[FEATURE_EXT_AMD] &= IA32_FEATURES_INTEL_EXT;
 	get_current_cpuid(&cpuid, 6);
 	cpu->arch.feature[FEATURE_6_EAX] = cpuid.regs.eax;
 	cpu->arch.feature[FEATURE_6_ECX] = cpuid.regs.ecx;
@@ -862,21 +864,26 @@ arch_cpu_init_post_modules(kernel_args* args)
 	// put the optimized functions into the commpage
 	size_t memcpyLen = (addr_t)gOptimizedFunctions.memcpy_end
 		- (addr_t)gOptimizedFunctions.memcpy;
-	fill_commpage_entry(COMMPAGE_ENTRY_X86_MEMCPY,
+	addr_t memcpyPosition = fill_commpage_entry(COMMPAGE_ENTRY_X86_MEMCPY,
 		(const void*)gOptimizedFunctions.memcpy, memcpyLen);
 	size_t memsetLen = (addr_t)gOptimizedFunctions.memset_end
 		- (addr_t)gOptimizedFunctions.memset;
-	fill_commpage_entry(COMMPAGE_ENTRY_X86_MEMSET,
+	addr_t memsetPosition = fill_commpage_entry(COMMPAGE_ENTRY_X86_MEMSET,
 		(const void*)gOptimizedFunctions.memset, memsetLen);
+	size_t threadExitLen = (addr_t)x86_end_userspace_thread_exit
+		- (addr_t)x86_userspace_thread_exit;
+	addr_t threadExitPosition = fill_commpage_entry(
+		COMMPAGE_ENTRY_X86_THREAD_EXIT, (const void*)x86_userspace_thread_exit,
+		threadExitLen);
 
 	// add the functions to the commpage image
 	image_id image = get_commpage_image();
-	elf_add_memory_image_symbol(image, "commpage_memcpy",
-		((addr_t*)USER_COMMPAGE_ADDR)[COMMPAGE_ENTRY_X86_MEMCPY], memcpyLen,
-		B_SYMBOL_TYPE_TEXT);
-	elf_add_memory_image_symbol(image, "commpage_memset",
-		((addr_t*)USER_COMMPAGE_ADDR)[COMMPAGE_ENTRY_X86_MEMSET], memsetLen,
-		B_SYMBOL_TYPE_TEXT);
+	elf_add_memory_image_symbol(image, "commpage_memcpy", memcpyPosition,
+		memcpyLen, B_SYMBOL_TYPE_TEXT);
+	elf_add_memory_image_symbol(image, "commpage_memset", memsetPosition,
+		memsetLen, B_SYMBOL_TYPE_TEXT);
+	elf_add_memory_image_symbol(image, "commpage_thread_exit",
+		threadExitPosition, threadExitLen, B_SYMBOL_TYPE_TEXT);
 
 	return B_OK;
 }

@@ -728,6 +728,15 @@ arch_vm_supports_protection(uint32 protection)
 		return false;
 	}
 
+	// Userland and the kernel have the same setting of NX-bit.
+	// That's why we do not allow any area that user can access, but not execute
+	// and the kernel can execute.
+	if ((protection & (B_READ_AREA | B_WRITE_AREA)) != 0
+		&& (protection & B_EXECUTE_AREA) == 0
+		&& (protection & B_KERNEL_EXECUTE_AREA) != 0) {
+		return false;
+	}
+
 	return true;
 }
 

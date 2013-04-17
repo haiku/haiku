@@ -51,6 +51,7 @@ struct rld_export {
 	void (*call_termination_hooks)();
 
 	const struct user_space_program_args *program_args;
+	const void* commpage_address;
 };
 
 extern struct rld_export *__gRuntimeLoader;

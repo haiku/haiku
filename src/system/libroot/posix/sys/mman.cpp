@@ -113,9 +113,13 @@ mmap(void* address, size_t length, int protection, int flags, int fd,
 	int mapping = (flags & MAP_SHARED) != 0
 		? REGION_NO_PRIVATE_MAP : REGION_PRIVATE_MAP;
 
-	uint32 addressSpec = address == NULL ? B_ANY_ADDRESS : B_BASE_ADDRESS;
+	uint32 addressSpec;
 	if ((flags & MAP_FIXED) != 0)
 		addressSpec = B_EXACT_ADDRESS;
+	else if (address != NULL)
+		addressSpec = B_RANDOMIZED_BASE_ADDRESS;
+	else
+		addressSpec = B_RANDOMIZED_ANY_ADDRESS;
 
 	uint32 areaProtection = 0;
 	if ((protection & PROT_READ) != 0)

@@ -28,12 +28,12 @@ x86_initialize_commpage_signal_handler()
 
 	// Copy the signal handler code to the commpage.
 	size_t len = (size_t)((addr_t)handlerCodeEnd - (addr_t)handlerCode);
-	fill_commpage_entry(COMMPAGE_ENTRY_X86_SIGNAL_HANDLER, handlerCode, len);
+	addr_t position = fill_commpage_entry(COMMPAGE_ENTRY_X86_SIGNAL_HANDLER,
+		handlerCode, len);
 
 	// Add symbol to the commpage image.
 	image_id image = get_commpage_image();
-	elf_add_memory_image_symbol(image, "commpage_signal_handler",
-		((addr_t*)USER_COMMPAGE_ADDR)[COMMPAGE_ENTRY_X86_SIGNAL_HANDLER],
+	elf_add_memory_image_symbol(image, "commpage_signal_handler", position,
 		len, B_SYMBOL_TYPE_TEXT);
 }
 

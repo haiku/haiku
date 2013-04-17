@@ -13,6 +13,7 @@
 
 #include <arch/user_debugger.h>
 #include <arch_cpu.h>
+#include <commpage.h>
 #include <cpu.h>
 #include <debug.h>
 #include <kernel.h>
@@ -23,6 +24,7 @@
 #include <tls.h>
 #include <tracing.h>
 #include <util/AutoLock.h>
+#include <util/Random.h>
 #include <vm/vm_types.h>
 #include <vm/VMAddressSpace.h>
 
@@ -200,6 +202,15 @@ arch_thread_dump_info(void *info)
 }
 
 
+static addr_t
+arch_randomize_stack_pointer(addr_t value)
+{
+	STATIC_ASSERT(MAX_RANDOM_VALUE >= B_PAGE_SIZE - 1);
+	value -= random_value() & (B_PAGE_SIZE - 1);
+	return value & ~addr_t(0xf);
+}
+
+
 /*!	Sets up initial thread context and enters user space
 */
 status_t
@@ -207,21 +218,19 @@ arch_thread_enter_userspace(Thread* thread, addr_t entry, void* args1,
 	void* args2)
 {
 	addr_t stackTop = thread->user_stack_base + thread->user_stack_size;
-	uint32 codeSize = (addr_t)x86_end_userspace_thread_exit
-		- (addr_t)x86_userspace_thread_exit;
 	uint32 args[3];
 
 	TRACE(("arch_thread_enter_userspace: entry 0x%lx, args %p %p, "
 		"ustack_top 0x%lx\n", entry, args1, args2, stackTop));
 
-	// copy the little stub that calls exit_thread() when the thread entry
-	// function returns, as well as the arguments of the entry function
-	stackTop -= codeSize;
+	stackTop = arch_randomize_stack_pointer(stackTop);
 
-	if (user_memcpy((void *)stackTop, (const void *)&x86_userspace_thread_exit, codeSize) < B_OK)
-		return B_BAD_ADDRESS;
-
-	args[0] = stackTop;
+	// Copy the address of the stub that calls exit_thread() when the thread
+	// entry function returns to the top of the stack to act as the return
+	// address. The stub is inside commpage.
+	addr_t commPageAddress = (addr_t)thread->team->commpage_address;
+	args[0] = ((addr_t*)commPageAddress)[COMMPAGE_ENTRY_X86_THREAD_EXIT]
+		+ commPageAddress;
 	args[1] = (uint32)args1;
 	args[2] = (uint32)args2;
 	stackTop -= sizeof(args);
@@ -345,7 +354,8 @@ arch_setup_signal_frame(Thread* thread, struct sigaction* action,
 	// the prepared stack, executing the signal handler wrapper function.
 	frame->user_sp = (addr_t)userStack;
 	frame->ip = x86_get_user_signal_handler_wrapper(
-		(action->sa_flags & SA_BEOS_COMPATIBLE_HANDLER) != 0);
+		(action->sa_flags & SA_BEOS_COMPATIBLE_HANDLER) != 0,
+		thread->team->commpage_address);
 
 	return B_OK;
 }

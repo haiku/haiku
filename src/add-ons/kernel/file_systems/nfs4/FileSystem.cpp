@@ -13,6 +13,7 @@
 
 #include <AutoDeleter.h>
 #include <lock.h>
+#include <util/Random.h>
 
 #include "Request.h"
 #include "RootInode.h"
@@ -32,9 +33,7 @@ FileSystem::FileSystem(const MountConfiguration& configuration)
 	fId(1),
 	fConfiguration(configuration)
 {
-	fOpenOwner = rand();
-	fOpenOwner <<= 32;
-	fOpenOwner |= rand();
+	fOpenOwner = get_random<uint64>();
 
 	mutex_init(&fOpenOwnerLock, NULL);
 	mutex_init(&fOpenLock, NULL);

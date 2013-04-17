@@ -165,6 +165,12 @@ private:
 	{
 		x86_write_cr3((addr_t)physicalPDPT);
 		x86_write_cr4(x86_read_cr4() | IA32_CR4_PAE | IA32_CR4_GLOBAL_PAGES);
+
+		// if availalbe enable NX-bit (No eXecute)
+		if (x86_check_feature(IA32_FEATURE_AMD_EXT_NX, FEATURE_EXT_AMD)) {
+			x86_write_msr(IA32_MSR_EFER, x86_read_msr(IA32_MSR_EFER)
+				| IA32_MSR_EFER_NX);
+		}
 	}
 
 	void _TranslatePageTable(addr_t virtualBase)
@@ -778,6 +784,8 @@ X86PagingMethodPAE::PutPageTableEntryInTable(pae_page_table_entry* entry,
 		page |= X86_PAE_PTE_USER;
 		if ((attributes & B_WRITE_AREA) != 0)
 			page |= X86_PAE_PTE_WRITABLE;
+		if ((attributes & B_EXECUTE_AREA) == 0)
+			page |= X86_PAE_PTE_NOT_EXECUTABLE;
 	} else if ((attributes & B_KERNEL_WRITE_AREA) != 0)
 		page |= X86_PAE_PTE_WRITABLE;
 

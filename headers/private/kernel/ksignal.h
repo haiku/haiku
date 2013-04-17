@@ -52,6 +52,7 @@ struct signal_frame_data {
 	int32		thread_flags;
 	uint64		syscall_restart_return_value;
 	uint8		syscall_restart_parameters[SYSCALL_RESTART_PARAMETER_SIZE];
+	void*		commpage_address;
 };
 
 
