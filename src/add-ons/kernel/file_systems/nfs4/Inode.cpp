@@ -110,6 +110,7 @@ Inode::CreateInode(FileSystem* fs, const FileInfo& fi, Inode** _inode)
 
 		// FATTR4_SIZE is mandatory
 		size = values[2].fData.fValue64;
+		inode->fMaxFileSize = size;
 
 		// FATTR4_FSID is mandatory
 		FileSystemId* fsid
@@ -170,13 +171,14 @@ Inode::RevalidateFileCache()
 	if (change == fChange)
 		return B_OK;
 
+	SyncAndCommit(true);
+	file_cache_delete(fFileCache);
+
 	struct stat st;
+	fMetaCache.InvalidateStat();
 	result = Stat(&st);
 	if (result != B_OK)
 		return result;
-
-	SyncAndCommit(true);
-	file_cache_delete(fFileCache);
 
 	fFileCache = file_cache_create(fFileSystem->DevId(), ID(), st.st_size);
 
@@ -600,6 +602,9 @@ Inode::WriteStat(const struct stat* st, uint32 mask, OpenAttrCookie* cookie)
 	uint32 i = 0;
 
 	if ((mask & B_STAT_SIZE) != 0) {
+		fMaxFileSize = st->st_size;
+		file_cache_set_size(fFileCache, st->st_size);
+
 		attr[i].fAttribute = FATTR4_SIZE;
 		attr[i].fFreePointer = false;
 		attr[i].fData.fValue64 = st->st_size;

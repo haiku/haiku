@@ -410,25 +410,28 @@ Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
 	ASSERT(_buffer != NULL);
 	ASSERT(_length != NULL);
 
-	struct stat st;
-	status_t result = Stat(&st);
-	if (result != B_OK)
-		return result;
+	if (pos < 0)
+		pos = 0;
+
+	if ((cookie->fMode & O_RWMASK) == O_RDONLY)
+		return B_NOT_ALLOWED;
 
 	if ((cookie->fMode & O_APPEND) != 0)
-		pos = st.st_size;
+		pos = fMaxFileSize;
 
-	uint64 fileSize = max_c(st.st_size, pos + *_length);
-	fMaxFileSize = max_c(fMaxFileSize, fileSize);
+	uint64 fileSize = max_c((off_t)fMaxFileSize, pos + *_length);
+	if (fileSize > fMaxFileSize) {
+		status_t result = file_cache_set_size(fFileCache, fileSize);
+		if (result != B_OK)
+			return result;
+		fMaxFileSize = fileSize;
+		fMetaCache.GrowFile(fMaxFileSize);
+	}
 
 	if ((cookie->fMode & O_NOCACHE) != 0) {
 		WriteDirect(cookie, pos, _buffer, _length);
 		Commit();
 	}
-
-	result = file_cache_set_size(fFileCache, fileSize);
-	if (result != B_OK)
-		return result;
 
 	return file_cache_write(fFileCache, cookie, pos, _buffer, _length);
 }

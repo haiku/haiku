@@ -12,6 +12,8 @@
 #include <io_requests.h>
 
 
+#define	MAX_BUFFER_SIZE			(1024 * 1024)
+
 WorkQueue*		gWorkQueue		= NULL;
 
 
@@ -152,43 +154,62 @@ WorkQueue::JobIO(IORequestArgs* args)
 	uint64 offset = io_request_offset(args->fRequest);
 	uint64 length = io_request_length(args->fRequest);
 
-	char* buffer = reinterpret_cast<char*>(malloc(length));
+	size_t bufferLength = min_c(MAX_BUFFER_SIZE, length);
+	char* buffer = reinterpret_cast<char*>(malloc(bufferLength));
 	if (buffer == NULL) {
 		notify_io_request(args->fRequest, B_NO_MEMORY);
 		args->fInode->EndAIOOp();
 		return;
 	}
 
-	bool eof = false;
-	uint64 size = 0;
 	status_t result;
 	if (io_request_is_write(args->fRequest)) {
 		if (offset + length > args->fInode->MaxFileSize())
 				length = args->fInode->MaxFileSize() - offset;
 
-		result = read_from_io_request(args->fRequest, buffer, length);
+		uint64 position = 0;
 		do {
-			size_t bytesWritten = length - size;
-			result = args->fInode->WriteDirect(NULL, offset + size,
-				buffer + size, &bytesWritten);
-			size += bytesWritten;
-		} while (size < length && result == B_OK);
+			size_t size = 0;
+			size_t thisBufferLength = min_c(bufferLength, length - position);
+
+			result = read_from_io_request(args->fRequest, buffer,
+				thisBufferLength);
+
+			while (size < thisBufferLength && result == B_OK) {
+				size_t bytesWritten = thisBufferLength - size;
+				result = args->fInode->WriteDirect(NULL,
+					offset + position + size, buffer + size, &bytesWritten);
+				size += bytesWritten;
+			}
+
+			position += thisBufferLength;
+		} while (position < length && result == B_OK);
 	} else {
+		bool eof = false;
+		uint64 position = 0;
 		do {
-			size_t bytesRead = length - size;
-			result = args->fInode->ReadDirect(NULL, offset + size, buffer,
-				&bytesRead, &eof);
-			if (result != B_OK)
-				break;
+			size_t size = 0;
+			size_t thisBufferLength = min_c(bufferLength, length - position);
 
-			result = write_to_io_request(args->fRequest, buffer, bytesRead);
-			if (result != B_OK)
-				break;
+			do {
+				size_t bytesRead = thisBufferLength - size;
+				result = args->fInode->ReadDirect(NULL,
+					offset + position + size, buffer + size, &bytesRead, &eof);
+				if (result != B_OK)
+					break;
 
-			size += bytesRead;
-		} while (size < length && result == B_OK && !eof);
-		
+				result = write_to_io_request(args->fRequest, buffer + size,
+					bytesRead);
+				if (result != B_OK)
+					break;
+
+				size += bytesRead;
+			} while (size < length && result == B_OK && !eof);
+
+			position += thisBufferLength;
+		} while (position < length && result == B_OK && !eof);
 	}
+
 	free(buffer);
 
 	notify_io_request(args->fRequest, result);
