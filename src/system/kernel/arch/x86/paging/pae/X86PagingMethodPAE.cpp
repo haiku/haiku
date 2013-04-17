@@ -148,6 +148,12 @@ struct X86PagingMethodPAE::ToPAESwitcher {
 		// enable PAE on all CPUs
 		call_all_cpus_sync(&_EnablePAE, (void*)(addr_t)physicalPDPT);
 
+		// if availalbe enable NX-bit (No eXecute)
+		if (x86_check_feature(IA32_FEATURE_AMD_EXT_NX, FEATURE_EXT_AMD)) {
+			x86_write_msr(IA32_MSR_EFER, x86_read_msr(IA32_MSR_EFER)
+				| IA32_MSR_EFER_NX);
+		}
+
 		// set return values
 		_virtualPDPT = pdpt;
 		_physicalPDPT = physicalPDPT;
@@ -165,12 +171,6 @@ private:
 	{
 		x86_write_cr3((addr_t)physicalPDPT);
 		x86_write_cr4(x86_read_cr4() | IA32_CR4_PAE | IA32_CR4_GLOBAL_PAGES);
-
-		// if availalbe enable NX-bit (No eXecute)
-		if (x86_check_feature(IA32_FEATURE_AMD_EXT_NX, FEATURE_EXT_AMD)) {
-			x86_write_msr(IA32_MSR_EFER, x86_read_msr(IA32_MSR_EFER)
-				| IA32_MSR_EFER_NX);
-		}
 	}
 
 	void _TranslatePageTable(addr_t virtualBase)
