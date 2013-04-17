@@ -470,8 +470,8 @@ TBarApp::MessageReceived(BMessage* message)
 			if (fPreferencesWindow != NULL)
 				fPreferencesWindow->PostMessage(kUpdatePreferences);
 
-			fBarWindow->SetFeel(fSettings.alwaysOnTop ?
-				B_FLOATING_ALL_WINDOW_FEEL : B_NORMAL_WINDOW_FEEL);
+			fBarWindow->SetFeel(fSettings.alwaysOnTop ? B_FLOATING_ALL_WINDOW_FEEL
+				: B_NORMAL_WINDOW_FEEL);
 			break;
 
 		case kAutoRaise:
@@ -753,7 +753,7 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char* sig, entry_ref* ref)
 {
 	if ((flags & B_BACKGROUND_APP) != 0
 		|| strcasecmp(sig, kDeskbarSignature) == 0) {
-		// it's a background app or Deskbar itself, don't add it
+		// don't add if a background app or Deskbar itself
 		return;
 	}
 
