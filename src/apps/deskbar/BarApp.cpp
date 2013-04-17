@@ -433,13 +433,13 @@ TBarApp::MessageReceived(BMessage* message)
 			uint32 flags = 0;
 			message->FindInt32("be:flags", (int32*)&flags);
 
-			const char* sig = NULL;
-			message->FindString("be:signature", &sig);
+			const char* signature = NULL;
+			message->FindString("be:signature", &signature);
 
 			entry_ref ref;
 			message->FindRef("be:ref", &ref);
 
-			AddTeam(team, flags, sig, &ref);
+			AddTeam(team, flags, signature, &ref);
 			break;
 		}
 
