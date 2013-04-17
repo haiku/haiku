@@ -21,7 +21,8 @@
 VariablesViewNodeInfo::VariablesViewNodeInfo()
 	:
 	fNodeExpanded(false),
-	fCastedType(NULL)
+	fCastedType(NULL),
+	fRendererSettings()
 {
 }
 
@@ -29,7 +30,8 @@ VariablesViewNodeInfo::VariablesViewNodeInfo()
 VariablesViewNodeInfo::VariablesViewNodeInfo(const VariablesViewNodeInfo& other)
 	:
 	fNodeExpanded(other.fNodeExpanded),
-	fCastedType(other.fCastedType)
+	fCastedType(other.fCastedType),
+	fRendererSettings(other.fRendererSettings)
 {
 	if (fCastedType != NULL)
 		fCastedType->AcquireReference();
@@ -48,6 +50,7 @@ VariablesViewNodeInfo::operator=(const VariablesViewNodeInfo& other)
 {
 	fNodeExpanded = other.fNodeExpanded;
 	SetCastedType(other.fCastedType);
+	fRendererSettings = other.fRendererSettings;
 
 	return *this;
 }
@@ -69,6 +72,13 @@ VariablesViewNodeInfo::SetCastedType(Type* type)
 	fCastedType = type;
 	if (fCastedType != NULL)
 		fCastedType->AcquireReference();
+}
+
+
+void
+VariablesViewNodeInfo::SetRendererSettings(const BMessage& settings)
+{
+	fRendererSettings = settings;
 }
 
 

@@ -7,6 +7,7 @@
 #define VARIABLES_VIEW_STATE_H
 
 
+#include <Message.h>
 #include <Referenceable.h>
 #include <util/OpenHashTable.h>
 
@@ -35,9 +36,15 @@ public:
 									{ return fCastedType; }
 			void				SetCastedType(Type* type);
 
+			const BMessage&		GetRendererSettings() const
+									{ return fRendererSettings; }
+
+			void				SetRendererSettings(const BMessage& settings);
+
 private:
 			bool				fNodeExpanded;
 			Type*				fCastedType;
+			BMessage			fRendererSettings;
 };
 
 
