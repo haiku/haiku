@@ -109,10 +109,11 @@ public:
 		fValue(NULL),
 		fValueHandler(NULL),
 		fTableCellRenderer(NULL),
+		fLastRendererSettings(),
+		fCastedType(NULL),
 		fComponentPath(NULL),
 		fIsPresentationNode(isPresentationNode),
-		fHidden(false),
-		fCastedType(NULL)
+		fHidden(false)
 	{
 		fNodeChild->AcquireReference();
 	}
@@ -212,6 +213,16 @@ public:
 		fCastedType = type;
 		if (type != NULL)
 			fCastedType->AcquireReference();
+	}
+
+	const BMessage& GetLastRendererSettings() const
+	{
+		return fLastRendererSettings;
+	}
+
+	void SetLastRendererSettings(const BMessage& settings)
+	{
+		fLastRendererSettings = settings;
 	}
 
 	TypeComponentPath* GetPath() const
@@ -324,11 +335,12 @@ private:
 	Value*					fValue;
 	ValueHandler*			fValueHandler;
 	TableCellValueRenderer*	fTableCellRenderer;
+	BMessage				fLastRendererSettings;
+	Type*					fCastedType;
 	ChildList				fChildren;
 	TypeComponentPath*		fComponentPath;
 	bool					fIsPresentationNode;
 	bool					fHidden;
-	Type*					fCastedType;
 
 public:
 	ModelNode*			fNext;
@@ -1074,6 +1086,14 @@ VariablesView::VariableTableModel::ValueNodeValueChanged(ValueNode* valueNode)
 	modelNode->SetValue(value);
 	modelNode->SetValueHandler(valueHandler);
 	modelNode->SetTableCellRenderer(renderer);
+
+	// we have to restore renderer settings here since until this point
+	// we don't yet know what renderer is in use.
+	if (renderer != NULL) {
+		Settings* settings = renderer->GetSettings();
+		if (settings != NULL)
+			settings->RestoreValues(modelNode->GetLastRendererSettings());
+	}
 
 	// notify table model listeners
 	NotifyNodeChanged(modelNode);
@@ -1987,6 +2007,12 @@ VariablesView::_AddViewStateDescendentNodeInfos(VariablesViewState* viewState,
 		VariablesViewNodeInfo nodeInfo;
 		nodeInfo.SetNodeExpanded(fVariableTable->IsNodeExpanded(path));
 		nodeInfo.SetCastedType(node->GetCastedType());
+		TableCellValueRenderer* renderer = node->TableCellRenderer();
+		if (renderer != NULL) {
+			Settings* settings = renderer->GetSettings();
+			if (settings != NULL)
+				nodeInfo.SetRendererSettings(settings->Message());
+		}
 
 		status_t error = viewState->SetNodeInfo(node->GetVariable()->ID(),
 			node->GetPath(), nodeInfo);
@@ -2032,6 +2058,11 @@ VariablesView::_ApplyViewStateDescendentNodeInfos(VariablesViewState* viewState,
 					node->SetCastedType(type);
 				}
 			}
+
+			// we don't have a renderer yet so we can't apply the settings
+			// at this stage. Store them on the model node so we can lazily
+			// apply them once the value is retrieved.
+			node->SetLastRendererSettings(nodeInfo->GetRendererSettings());
 
 			fVariableTable->SetNodeExpanded(path, nodeInfo->IsNodeExpanded());
 
