@@ -91,30 +91,26 @@ TTeamMenu::AttachedToWindow()
 	for (int32 i = 0; i < count; i++) {
 		// add items back
 		BarTeamInfo* barInfo = (BarTeamInfo*)teamList.ItemAt(i);
+		TTeamMenuItem* item = new TTeamMenuItem(barInfo->teams,
+			barInfo->icon, barInfo->name, barInfo->sig,
+			width, -1, !settings->hideLabels, true);
 
-		if (((barInfo->flags & B_BACKGROUND_APP) == 0)
-			&& (strcasecmp(barInfo->sig, kDeskbarSignature) != 0)) {
-			TTeamMenuItem* item = new TTeamMenuItem(barInfo->teams,
-				barInfo->icon, barInfo->name, barInfo->sig,
-				width, -1, !settings->hideLabels, true);
+		if (settings->trackerAlwaysFirst
+			&& strcmp(barInfo->sig, kTrackerSignature) == 0) {
+			AddItem(item, 0);
+		} else
+			AddItem(item);
 
-			if (settings->trackerAlwaysFirst
-				&& strcmp(barInfo->sig, kTrackerSignature) == 0) {
-				AddItem(item, 0);
-			} else
-				AddItem(item);
+		if (dragging && item != NULL) {
+			bool canhandle = (dynamic_cast<TBarApp*>(be_app))->BarView()->
+				AppCanHandleTypes(item->Signature());
+			if (item->IsEnabled() != canhandle)
+				item->SetEnabled(canhandle);
 
-			if (dragging && item != NULL) {
-				bool canhandle = (dynamic_cast<TBarApp*>(be_app))->BarView()->
-					AppCanHandleTypes(item->Signature());
-				if (item->IsEnabled() != canhandle)
-					item->SetEnabled(canhandle);
-
-				BMenu* menu = item->Submenu();
-				if (menu)
-					menu->SetTrackingHook(barview->MenuTrackingHook,
-						barview->GetTrackingHookData());
-			}
+			BMenu* menu = item->Submenu();
+			if (menu)
+				menu->SetTrackingHook(barview->MenuTrackingHook,
+					barview->GetTrackingHookData());
 		}
 	}
 

@@ -167,21 +167,11 @@ TExpandoMenuBar::MessageReceived(BMessage* message)
 			BBitmap* icon = NULL;
 			message->FindPointer("icon", (void**)&icon);
 
-			const char* signature;
-			if (message->FindString("sig", &signature) == B_OK
-				&&strcasecmp(signature, kDeskbarSignature) == 0) {
-				delete teams;
-				delete icon;
-				break;
-			}
+			const char* signature = NULL;
+			message->FindString("sig", &signature);
 
-			uint32 flags;
-			if (message->FindInt32("flags", ((int32*) &flags)) == B_OK
-				&& (flags & B_BACKGROUND_APP) != 0) {
-				delete teams;
-				delete icon;
-				break;
-			}
+			uint32 flags = 0;
+			message->FindInt32("flags", ((int32*) &flags));
 
 			const char* name = NULL;
 			message->FindString("name", &name);
@@ -564,19 +554,15 @@ TExpandoMenuBar::BuildItems()
 	for (int32 i = 0; i < count; i++) {
 		// add items back
 		BarTeamInfo* barInfo = (BarTeamInfo*)fTeamList.ItemAt(i);
+		TTeamMenuItem* item = new TTeamMenuItem(barInfo->teams,
+			barInfo->icon, barInfo->name, barInfo->sig, itemWidth,
+			itemHeight, fDrawLabel, fVertical);
 
-		if ((barInfo->flags & B_BACKGROUND_APP) == 0
-			&& strcasecmp(barInfo->sig, kDeskbarSignature) != 0) {
-			TTeamMenuItem* item = new TTeamMenuItem(barInfo->teams,
-				barInfo->icon, barInfo->name, barInfo->sig, itemWidth,
-				itemHeight, fDrawLabel, fVertical);
-
-			if (settings->trackerAlwaysFirst
-				&& strcmp(barInfo->sig, kTrackerSignature) == 0) {
-				AddItem(item, 0);
-			} else
-				AddItem(item);
-		}
+		if (settings->trackerAlwaysFirst
+			&& strcmp(barInfo->sig, kTrackerSignature) == 0) {
+			AddItem(item, 0);
+		} else
+			AddItem(item);
 	}
 
 	if (CountItems() == 0) {
