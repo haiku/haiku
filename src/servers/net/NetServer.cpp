@@ -971,8 +971,8 @@ NetServer::_HandleDeviceMonitor(BMessage* message)
 		|| message->FindString("path", &path) != B_OK)
 		return B_BAD_VALUE;
 
-	if (strncmp(path, "/dev/net", 9)) {
-		// not a device entry, ignore
+	if (strncmp(path, "/dev/net/", 9)) {
+		// not a valid device entry, ignore
 		return B_NAME_NOT_FOUND;
 	}
 
