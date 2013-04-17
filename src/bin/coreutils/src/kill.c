@@ -262,13 +262,6 @@ int kill_by_name(int signum, const char *name)
 			*token = 0;
 		}
 
-		args = strdup(args);
-		if (args == NULL) {
-			error (0, errno, "%s", name);
-			status = EXIT_FAILURE;
-			continue;
-		}
-
 		/* skip the path if any */
 		token = basename(args);
 
@@ -279,7 +272,6 @@ int kill_by_name(int signum, const char *name)
 				status = EXIT_FAILURE;
 			}
 		}
-		free(args);
 	}
 	return status;
 }
