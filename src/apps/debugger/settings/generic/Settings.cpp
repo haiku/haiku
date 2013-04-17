@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -78,6 +79,24 @@ Settings::SetValue(Setting* setting, const BVariant& value)
 		fListeners.ItemAt(i)->SettingValueChanged(setting);
 
 	return success;
+}
+
+
+bool
+Settings::RestoreValues(const BMessage& message)
+{
+	AutoLocker<BLocker> locker(fLock);
+
+	for (int32 i = 0; i < fDescription->CountSettings(); i++) {
+		Setting* setting = fDescription->SettingAt(i);
+		BVariant value;
+		if (value.SetFromMessage(message, setting->ID()) == B_OK) {
+			if (!SetValue(setting, value))
+				return false;
+		}
+	}
+
+	return true;
 }
 
 
