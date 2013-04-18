@@ -173,7 +173,9 @@ Version::ToString(char* buffer, size_t bufferSize) const
 	// We need to normalize the version string somewhat. If a subpart is given,
 	// make sure that also the superparts are defined, using a placeholder. This
 	// avoids clashes, e.g. if one version defines major and minor and one only
-	// major and micro.
+	// major and micro. In principle that should not be necessary, though. Valid
+	// packages should have valid versions, which means that the existence of a
+	// subpart implies the existence of all superparts.
 	const char* major = fMajor;
 	const char* minor = fMinor;
 	const char* micro = fMicro;
@@ -197,7 +199,7 @@ Version::ToString(char* buffer, size_t bufferSize) const
 
 	if (fPreRelease != NULL) {
 		size_t offset = std::min(bufferSize, size);
-		size += snprintf(buffer + offset, bufferSize - offset, "-%s",
+		size += snprintf(buffer + offset, bufferSize - offset, "[%s]",
 			fPreRelease);
 	}
 
