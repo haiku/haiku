@@ -7,6 +7,7 @@
 #include <package/PackageInfo.h>
 
 #include <ctype.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -84,7 +85,8 @@ private:
 			Token				_NextToken();
 			void				_RewindTo(const Token& token);
 
-			void				_ParseStringValue(BString* value);
+			void				_ParseStringValue(BString* value,
+									const char** _tokenPos = NULL);
 			uint32				_ParseFlags();
 			void				_ParseArchitectureValue(
 									BPackageArchitecture* value);
@@ -105,6 +107,13 @@ private:
 										value);
 
 			void				_Parse(BPackageInfo* packageInfo);
+
+	static	bool				_IsAlphaNumUnderscore(const BString& string,
+									int32* _errorPos = NULL);
+	static	bool				_IsAlphaNumUnderscore(const char* string,
+									int32* _errorPos = NULL);
+	static	bool				_IsAlphaNumUnderscore(const char* start,
+									const char* end, int32* _errorPos = NULL);
 
 private:
 			ParseErrorListener*	fListener;
@@ -335,7 +344,8 @@ BPackageInfo::Parser::_NextToken()
 		{
 			const char* start = fPos;
 			while (isalnum(*fPos) || *fPos == '.' || *fPos == '-'
-				|| *fPos == '_' || *fPos == ':' || *fPos == '+') {
+				|| *fPos == '_' || *fPos == ':' || *fPos == '+' || *fPos == '['
+				|| *fPos == ']') {
 				fPos++;
 			}
 			if (fPos == start)
@@ -357,13 +367,15 @@ BPackageInfo::Parser::_RewindTo(const Token& token)
 
 
 void
-BPackageInfo::Parser::_ParseStringValue(BString* value)
+BPackageInfo::Parser::_ParseStringValue(BString* value, const char** _tokenPos)
 {
 	Token string = _NextToken();
 	if (string.type != TOKEN_QUOTED_STRING && string.type != TOKEN_WORD)
 		throw ParseError("expected quoted-string or word", string.pos);
 
 	*value = string.text;
+	if (_tokenPos != NULL)
+		*_tokenPos = string.pos;
 }
 
 
@@ -409,21 +421,18 @@ BPackageInfo::Parser::_ParseVersionValue(Token& word, BPackageVersion* value,
 
 	// get the revision number
 	uint32 revision = 0;
-	int32 lastDashPos = word.text.FindLast('-');
-	if (lastDashPos >= 0) {
-		// Might be either the revision number or, if that is optional, a
-		// pre-release. The former always is a number, the latter starts with a
-		// non-digit.
-		if (isdigit(word.text[lastDashPos + 1])) {
-			int number = atoi(word.text.String() + lastDashPos + 1);
-			if (number <= 0) {
-				throw ParseError("revision number must be > 0",
-					word.pos + word.text.Length());
-			}
-			revision = number;
-			word.text.Truncate(lastDashPos);
-			lastDashPos = word.text.FindLast('-');
+	int32 dashPos = word.text.FindLast('-');
+	if (dashPos >= 0) {
+		char* end;
+		long long number = strtoll(word.text.String() + dashPos + 1, &end,
+			0);
+		if (*end != '\0' || number < 0 || number > UINT_MAX) {
+			throw ParseError("revision must be a number > 0 and < UINT_MAX",
+				word.pos + dashPos + 1);
 		}
+
+		revision = (uint32)number;
+		word.text.Truncate(dashPos);
 	}
 
 	if (revision == 0 && !revisionIsOptional) {
@@ -433,14 +442,27 @@ BPackageInfo::Parser::_ParseVersionValue(Token& word, BPackageVersion* value,
 
 	// get the pre-release string
 	BString preRelease;
-	if (lastDashPos >= 0) {
-		if (isdigit(word.text[lastDashPos + 1])) {
-			throw ParseError("pre-release number must not start with a digit",
-				word.pos + word.text.Length());
+	if (word.text.Length() > 0 && word.text[word.text.Length() - 1] == ']') {
+		int32 openingBracket = word.text.FindLast('[');
+		if (openingBracket < 0) {
+			throw ParseError("unmatched ']' in version string",
+				word.pos + word.text.Length() - 1);
 		}
 
-		word.text.CopyInto(preRelease, lastDashPos + 1, word.text.Length());
-		word.text.Truncate(lastDashPos);
+		word.text.CopyInto(preRelease, openingBracket + 1,
+			word.text.Length() - openingBracket - 2);
+		word.text.Truncate(openingBracket);
+
+		if (preRelease.IsEmpty()) {
+			throw ParseError("invalid empty pre-release string",
+				word.pos + openingBracket + 1);
+		}
+
+		int32 errorPos;
+		if (!_IsAlphaNumUnderscore(preRelease, &errorPos)) {
+			throw ParseError("invalid character in pre-release string",
+				word.pos + openingBracket + 1 + errorPos);
+		}
 	}
 
 	// get major, minor, and micro strings
@@ -456,13 +478,31 @@ BPackageInfo::Parser::_ParseVersionValue(Token& word, BPackageVersion* value,
 		if (secondDotPos == firstDotPos + 1)
 			throw ParseError("expected minor version", word.pos + secondDotPos);
 
-		if (secondDotPos < 0)
+		if (secondDotPos < 0) {
 			word.text.CopyInto(minor, firstDotPos + 1, word.text.Length());
-		else {
+		} else {
 			word.text.CopyInto(minor, firstDotPos + 1,
 				secondDotPos - (firstDotPos + 1));
 			word.text.CopyInto(micro, secondDotPos + 1, word.text.Length());
+
+			int32 errorPos;
+			if (!_IsAlphaNumUnderscore(micro, &errorPos)) {
+				throw ParseError("invalid character in micro version string",
+					word.pos + secondDotPos + 1 + errorPos);
+			}
 		}
+
+		int32 errorPos;
+		if (!_IsAlphaNumUnderscore(minor, &errorPos)) {
+			throw ParseError("invalid character in minor version string",
+				word.pos + firstDotPos + 1 + errorPos);
+		}
+	}
+
+	int32 errorPos;
+	if (!_IsAlphaNumUnderscore(major, &errorPos)) {
+		throw ParseError("invalid character in major version string",
+			word.pos + errorPos);
 	}
 
 	value->SetTo(major, minor, micro, preRelease, revision);
@@ -476,7 +516,7 @@ BPackageInfo::Parser::_ParseList(ListElementParser& elementParser,
 	Token openBracket = _NextToken();
 	if (openBracket.type != TOKEN_OPEN_BRACE) {
 		if (!allowSingleNonListElement)
-			throw ParseError("expected start of list ('[')", openBracket.pos);
+			throw ParseError("expected start of list ('{')", openBracket.pos);
 
 		elementParser(openBracket);
 		return;
@@ -620,6 +660,26 @@ BPackageInfo::Parser::_ParseResolvableList(
 				}
 			}
 
+			if (colonPos >= 0) {
+				int32 errorPos;
+				if (!_IsAlphaNumUnderscore(token.text.String(),
+						token.text.String() + colonPos, &errorPos)) {
+					throw ParseError("invalid character in resolvable name",
+						token.pos + errorPos);
+				}
+				if (!_IsAlphaNumUnderscore(token.text.String() + colonPos + 1,
+						&errorPos)) {
+					throw ParseError("invalid character in resolvable name",
+						token.pos + colonPos + 1 + errorPos);
+				}
+			} else {
+				int32 errorPos;
+				if (!_IsAlphaNumUnderscore(token.text, &errorPos)) {
+					throw ParseError("invalid character in resolvable name",
+						token.pos + errorPos);
+				}
+			}
+
 			// parse version
 			BPackageVersion version;
 			Token op = parser._NextToken();
@@ -629,7 +689,7 @@ BPackageInfo::Parser::_ParseResolvableList(
 				|| op.type == TOKEN_CLOSE_BRACE) {
 				parser._RewindTo(op);
 			} else
-				throw ParseError("expected '=', comma or ']'", op.pos);
+				throw ParseError("expected '=', comma or '}'", op.pos);
 
 			// parse compatible version
 			BPackageVersion compatibleVersion;
@@ -677,26 +737,47 @@ BPackageInfo::Parser::_ParseResolvableExprList(
 					token.pos);
 			}
 
-		BPackageVersion version;
-			Token op = parser._NextToken();
-		if (op.type == TOKEN_OPERATOR_LESS
-			|| op.type == TOKEN_OPERATOR_LESS_EQUAL
-			|| op.type == TOKEN_OPERATOR_EQUAL
-			|| op.type == TOKEN_OPERATOR_NOT_EQUAL
-			|| op.type == TOKEN_OPERATOR_GREATER_EQUAL
-			|| op.type == TOKEN_OPERATOR_GREATER) {
-				parser._ParseVersionValue(&version, true);
-		} else if (op.type == TOKEN_ITEM_SEPARATOR
-			|| op.type == TOKEN_CLOSE_BRACE) {
-				parser._RewindTo(op);
-		} else {
-			throw ParseError(
-				"expected '<', '<=', '==', '!=', '>=', '>', comma or ']'",
-				op.pos);
-		}
+			int32 colonPos = token.text.FindFirst(':');
+			if (colonPos >= 0) {
+				int32 errorPos;
+				if (!_IsAlphaNumUnderscore(token.text.String(),
+						token.text.String() + colonPos, &errorPos)) {
+					throw ParseError("invalid character in resolvable name",
+						token.pos + errorPos);
+				}
+				if (!_IsAlphaNumUnderscore(token.text.String() + colonPos + 1,
+						&errorPos)) {
+					throw ParseError("invalid character in resolvable name",
+						token.pos + colonPos + 1 + errorPos);
+				}
+			} else {
+				int32 errorPos;
+				if (!_IsAlphaNumUnderscore(token.text, &errorPos)) {
+					throw ParseError("invalid character in resolvable name",
+						token.pos + errorPos);
+				}
+			}
 
-		BPackageResolvableOperator resolvableOperator
-			= (BPackageResolvableOperator)(op.type - TOKEN_OPERATOR_LESS);
+			BPackageVersion version;
+				Token op = parser._NextToken();
+			if (op.type == TOKEN_OPERATOR_LESS
+				|| op.type == TOKEN_OPERATOR_LESS_EQUAL
+				|| op.type == TOKEN_OPERATOR_EQUAL
+				|| op.type == TOKEN_OPERATOR_NOT_EQUAL
+				|| op.type == TOKEN_OPERATOR_GREATER_EQUAL
+				|| op.type == TOKEN_OPERATOR_GREATER) {
+					parser._ParseVersionValue(&version, true);
+			} else if (op.type == TOKEN_ITEM_SEPARATOR
+				|| op.type == TOKEN_CLOSE_BRACE) {
+					parser._RewindTo(op);
+			} else {
+				throw ParseError(
+					"expected '<', '<=', '=', '==', '!=', '>=', '>', comma or "
+						"'}'", op.pos);
+			}
+
+			BPackageResolvableOperator resolvableOperator
+				= (BPackageResolvableOperator)(op.type - TOKEN_OPERATOR_LESS);
 
 			value->AddItem(new BPackageResolvableExpression(token.text,
 			resolvableOperator, version));
@@ -745,7 +826,15 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 			case B_PACKAGE_INFO_NAME:
 			{
 				BString name;
-				_ParseStringValue(&name);
+				const char* namePos;
+				_ParseStringValue(&name, &namePos);
+
+				int32 errorPos;
+				if (!_IsAlphaNumUnderscore(name, &errorPos)) {
+					throw ParseError("invalid character in package name",
+						namePos + errorPos);
+				}
+
 				packageInfo->SetName(name);
 				break;
 			}
@@ -839,6 +928,39 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 			throw ParseError(error, fPos);
 		}
 	}
+}
+
+
+/*static*/ inline bool
+BPackageInfo::Parser::_IsAlphaNumUnderscore(const BString& string,
+	int32* _errorPos)
+{
+	return _IsAlphaNumUnderscore(string.String(),
+		string.String() + string.Length(), _errorPos);
+}
+
+
+/*static*/ inline bool
+BPackageInfo::Parser::_IsAlphaNumUnderscore(const char* string,
+	int32* _errorPos)
+{
+	return _IsAlphaNumUnderscore(string, string + strlen(string), _errorPos);
+}
+
+
+/*static*/ bool
+BPackageInfo::Parser::_IsAlphaNumUnderscore(const char* start, const char* end,
+	int32* _errorPos)
+{
+	for (const char* c = start; c < end; c++) {
+		if (!isalnum(*c) && *c != '_') {
+			if (_errorPos != NULL)
+				*_errorPos = c - start;
+			return false;
+		}
+	}
+
+	return true;
 }
 
 
