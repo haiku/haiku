@@ -487,7 +487,7 @@ BPackageInfo::Parser::_ParseVersionValue(Token& word, BPackageVersion* value,
 			word.text.CopyInto(micro, secondDotPos + 1, word.text.Length());
 
 			int32 errorPos;
-			if (!_IsAlphaNumUnderscore(micro, "", &errorPos)) {
+			if (!_IsAlphaNumUnderscore(micro, ".", &errorPos)) {
 				throw ParseError("invalid character in micro version string",
 					word.pos + secondDotPos + 1 + errorPos);
 			}
