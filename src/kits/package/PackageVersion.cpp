@@ -124,6 +124,9 @@ BPackageVersion::Compare(const BPackageVersion& other) const
 BString
 BPackageVersion::ToString() const
 {
+	if (InitCheck() != B_OK)
+		return BString();
+
 	BString string = fMajor;
 
 	if (fMinor.Length() > 0) {
