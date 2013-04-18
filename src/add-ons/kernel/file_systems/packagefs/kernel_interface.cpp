@@ -291,7 +291,7 @@ packagefs_ioctl(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p, operation: %" B_PRI32u
+	FUNCTION("volume: %p, node: %p (%lld), cookie: %p, operation: %" B_PRIu32
 		", buffer: %p, size: %zu\n", volume, node, node->ID(), cookie,
 		operation, buffer, size);
 	TOUCH(cookie);
