@@ -355,10 +355,10 @@ CopyDirectoryToPackage documentation
 BuildHaikuPackage $(haikuPackage) : haiku ;
 
 
-#pragma mark - haiku-devel.hpkg
+#pragma mark - haiku_devel.hpkg
 
 
-local haikuDevelPackage = haiku-devel.hpkg ;
+local haikuDevelPackage = haiku_devel.hpkg ;
 HaikuPackage $(haikuDevelPackage) ;
 
 local arch = $(TARGET_ARCH) ;
@@ -435,13 +435,13 @@ if $(HAIKU_GCC_VERSION[1]) = 2 {
 		: [ FDirName $(HAIKU_TOP) headers cpp ] : 2.95.3 : -x .svn ;
 }
 
-BuildHaikuPackage $(haikuDevelPackage) : haiku-devel ;
+BuildHaikuPackage $(haikuDevelPackage) : haiku_devel ;
 
 
-#pragma mark - haiku-userguide.hpkg
+#pragma mark - haiku_userguide.hpkg
 
 
-local haikuUserGuidePackage = haiku-userguide.hpkg ;
+local haikuUserGuidePackage = haiku_userguide.hpkg ;
 HaikuPackage $(haikuUserGuidePackage) ;
 
 CopyDirectoryToPackage documentation : [ FDirName $(HAIKU_TOP) docs userguide ]
@@ -449,13 +449,13 @@ CopyDirectoryToPackage documentation : [ FDirName $(HAIKU_TOP) docs userguide ]
 SEARCH on userguide = [ FDirName $(HAIKU_TOP) data bin ] ;
 AddFilesToPackage bin : userguide ;
 
-BuildHaikuPackage $(haikuUserGuidePackage) : haiku-userguide ;
+BuildHaikuPackage $(haikuUserGuidePackage) : haiku_userguide ;
 
 
-#pragma mark - haiku-welcome.hpkg
+#pragma mark - haiku_welcome.hpkg
 
 
-local haikuWelcomePackage = haiku-welcome.hpkg ;
+local haikuWelcomePackage = haiku_welcome.hpkg ;
 HaikuPackage $(haikuWelcomePackage) ;
 
 CopyDirectoryToPackage documentation : [ FDirName $(HAIKU_TOP) docs welcome ]
@@ -463,13 +463,13 @@ CopyDirectoryToPackage documentation : [ FDirName $(HAIKU_TOP) docs welcome ]
 SEARCH on welcome = [ FDirName $(HAIKU_TOP) data bin ] ;
 AddFilesToPackage bin : welcome ;
 
-BuildHaikuPackage $(haikuWelcomePackage) : haiku-welcome ;
+BuildHaikuPackage $(haikuWelcomePackage) : haiku_welcome ;
 
 
-#pragma mark - makefile-engine.hpkg
+#pragma mark - makefile_engine.hpkg
 
 
-local makefileEnginePackage = makefile-engine.hpkg ;
+local makefileEnginePackage = makefile_engine.hpkg ;
 HaikuPackage $(makefileEnginePackage) ;
 
 # skeleton makefile and makefile-engine
@@ -480,4 +480,4 @@ local makefileEngineFiles =
 SEARCH on $(makefileEngineFiles) = [ FDirName $(HAIKU_TOP) data develop ] ;
 AddFilesToPackage develop etc : $(makefileEngineFiles) ;
 
-BuildHaikuPackage $(makefileEnginePackage) : makefile-engine ;
+BuildHaikuPackage $(makefileEnginePackage) : makefile_engine ;

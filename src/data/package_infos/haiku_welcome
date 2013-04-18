@@ -1,5 +1,5 @@
-name			haiku-welcome
-version			R1-alpha3_pm-1
+name			haiku_welcome
+version			R1[alpha3_pm]-1
 architecture	any
 summary			"The Haiku welcome documentation"
 description		"The Haiku welcome documentation for new users."
@@ -11,7 +11,7 @@ copyrights		"2001-2011 Haiku, Inc. et al"
 licenses		"MIT"
 
 provides {
-	haiku-welcome=R1-alpha3_pm-1
+	haiku_welcome=R1[alpha3_pm]-1
 }
 
 requires {
