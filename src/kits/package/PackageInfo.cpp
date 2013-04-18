@@ -109,11 +109,17 @@ private:
 			void				_Parse(BPackageInfo* packageInfo);
 
 	static	bool				_IsAlphaNumUnderscore(const BString& string,
-									int32* _errorPos = NULL);
+									const char* additionalChars,
+									int32* _errorPos);
 	static	bool				_IsAlphaNumUnderscore(const char* string,
-									int32* _errorPos = NULL);
+									const char* additionalChars,
+									int32* _errorPos);
 	static	bool				_IsAlphaNumUnderscore(const char* start,
-									const char* end, int32* _errorPos = NULL);
+									const char* end,
+									const char* additionalChars,
+									int32* _errorPos);
+	static	bool				_IsValidResolvableName(const char* string,
+									int32* _errorPos);
 
 private:
 			ParseErrorListener*	fListener;
@@ -344,8 +350,8 @@ BPackageInfo::Parser::_NextToken()
 		{
 			const char* start = fPos;
 			while (isalnum(*fPos) || *fPos == '.' || *fPos == '-'
-				|| *fPos == '_' || *fPos == ':' || *fPos == '+' || *fPos == '['
-				|| *fPos == ']') {
+				|| *fPos == '_' || *fPos == ':' || *fPos == '+'
+				|| *fPos == '~') {
 				fPos++;
 			}
 			if (fPos == start)
@@ -442,26 +448,21 @@ BPackageInfo::Parser::_ParseVersionValue(Token& word, BPackageVersion* value,
 
 	// get the pre-release string
 	BString preRelease;
-	if (word.text.Length() > 0 && word.text[word.text.Length() - 1] == ']') {
-		int32 openingBracket = word.text.FindLast('[');
-		if (openingBracket < 0) {
-			throw ParseError("unmatched ']' in version string",
-				word.pos + word.text.Length() - 1);
-		}
-
-		word.text.CopyInto(preRelease, openingBracket + 1,
-			word.text.Length() - openingBracket - 2);
-		word.text.Truncate(openingBracket);
+	int32 tildePos = word.text.FindLast('~');
+	if (tildePos >= 0) {
+		word.text.CopyInto(preRelease, tildePos + 1,
+			word.text.Length() - tildePos - 1);
+		word.text.Truncate(tildePos);
 
 		if (preRelease.IsEmpty()) {
 			throw ParseError("invalid empty pre-release string",
-				word.pos + openingBracket + 1);
+				word.pos + tildePos + 1);
 		}
 
 		int32 errorPos;
-		if (!_IsAlphaNumUnderscore(preRelease, &errorPos)) {
+		if (!_IsAlphaNumUnderscore(preRelease, ".", &errorPos)) {
 			throw ParseError("invalid character in pre-release string",
-				word.pos + openingBracket + 1 + errorPos);
+				word.pos + tildePos + 1 + errorPos);
 		}
 	}
 
@@ -486,21 +487,21 @@ BPackageInfo::Parser::_ParseVersionValue(Token& word, BPackageVersion* value,
 			word.text.CopyInto(micro, secondDotPos + 1, word.text.Length());
 
 			int32 errorPos;
-			if (!_IsAlphaNumUnderscore(micro, &errorPos)) {
+			if (!_IsAlphaNumUnderscore(micro, "", &errorPos)) {
 				throw ParseError("invalid character in micro version string",
 					word.pos + secondDotPos + 1 + errorPos);
 			}
 		}
 
 		int32 errorPos;
-		if (!_IsAlphaNumUnderscore(minor, &errorPos)) {
+		if (!_IsAlphaNumUnderscore(minor, "", &errorPos)) {
 			throw ParseError("invalid character in minor version string",
 				word.pos + firstDotPos + 1 + errorPos);
 		}
 	}
 
 	int32 errorPos;
-	if (!_IsAlphaNumUnderscore(major, &errorPos)) {
+	if (!_IsAlphaNumUnderscore(major, "", &errorPos)) {
 		throw ParseError("invalid character in major version string",
 			word.pos + errorPos);
 	}
@@ -660,24 +661,10 @@ BPackageInfo::Parser::_ParseResolvableList(
 				}
 			}
 
-			if (colonPos >= 0) {
-				int32 errorPos;
-				if (!_IsAlphaNumUnderscore(token.text.String(),
-						token.text.String() + colonPos, &errorPos)) {
-					throw ParseError("invalid character in resolvable name",
-						token.pos + errorPos);
-				}
-				if (!_IsAlphaNumUnderscore(token.text.String() + colonPos + 1,
-						&errorPos)) {
-					throw ParseError("invalid character in resolvable name",
-						token.pos + colonPos + 1 + errorPos);
-				}
-			} else {
-				int32 errorPos;
-				if (!_IsAlphaNumUnderscore(token.text, &errorPos)) {
-					throw ParseError("invalid character in resolvable name",
-						token.pos + errorPos);
-				}
+			int32 errorPos;
+			if (!_IsValidResolvableName(token.text, &errorPos)) {
+				throw ParseError("invalid character in resolvable name",
+					token.pos + errorPos);
 			}
 
 			// parse version
@@ -737,25 +724,10 @@ BPackageInfo::Parser::_ParseResolvableExprList(
 					token.pos);
 			}
 
-			int32 colonPos = token.text.FindFirst(':');
-			if (colonPos >= 0) {
-				int32 errorPos;
-				if (!_IsAlphaNumUnderscore(token.text.String(),
-						token.text.String() + colonPos, &errorPos)) {
-					throw ParseError("invalid character in resolvable name",
-						token.pos + errorPos);
-				}
-				if (!_IsAlphaNumUnderscore(token.text.String() + colonPos + 1,
-						&errorPos)) {
-					throw ParseError("invalid character in resolvable name",
-						token.pos + colonPos + 1 + errorPos);
-				}
-			} else {
-				int32 errorPos;
-				if (!_IsAlphaNumUnderscore(token.text, &errorPos)) {
-					throw ParseError("invalid character in resolvable name",
-						token.pos + errorPos);
-				}
+			int32 errorPos;
+			if (!_IsValidResolvableName(token.text, &errorPos)) {
+				throw ParseError("invalid character in resolvable name",
+					token.pos + errorPos);
 			}
 
 			BPackageVersion version;
@@ -830,7 +802,7 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 				_ParseStringValue(&name, &namePos);
 
 				int32 errorPos;
-				if (!_IsAlphaNumUnderscore(name, &errorPos)) {
+				if (!_IsAlphaNumUnderscore(name, ".", &errorPos)) {
 					throw ParseError("invalid character in package name",
 						namePos + errorPos);
 				}
@@ -933,27 +905,28 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 
 /*static*/ inline bool
 BPackageInfo::Parser::_IsAlphaNumUnderscore(const BString& string,
-	int32* _errorPos)
+	const char* additionalChars, int32* _errorPos)
 {
 	return _IsAlphaNumUnderscore(string.String(),
-		string.String() + string.Length(), _errorPos);
+		string.String() + string.Length(), additionalChars, _errorPos);
 }
 
 
 /*static*/ inline bool
 BPackageInfo::Parser::_IsAlphaNumUnderscore(const char* string,
-	int32* _errorPos)
+	const char* additionalChars, int32* _errorPos)
 {
-	return _IsAlphaNumUnderscore(string, string + strlen(string), _errorPos);
+	return _IsAlphaNumUnderscore(string, string + strlen(string),
+		additionalChars, _errorPos);
 }
 
 
 /*static*/ bool
 BPackageInfo::Parser::_IsAlphaNumUnderscore(const char* start, const char* end,
-	int32* _errorPos)
+	const char* additionalChars, int32* _errorPos)
 {
 	for (const char* c = start; c < end; c++) {
-		if (!isalnum(*c) && *c != '_') {
+		if (!isalnum(*c) && *c != '_' && strchr(additionalChars, *c) == NULL) {
 			if (_errorPos != NULL)
 				*_errorPos = c - start;
 			return false;
@@ -961,6 +934,28 @@ BPackageInfo::Parser::_IsAlphaNumUnderscore(const char* start, const char* end,
 	}
 
 	return true;
+}
+
+
+/*static*/ bool
+BPackageInfo::Parser::_IsValidResolvableName(const char* string,
+	int32* _errorPos)
+{
+	int32 errorPos;
+	if (const char* colon = strchr(string, ':')) {
+		if (_IsAlphaNumUnderscore(string, colon, ".", &errorPos)) {
+			if (_IsAlphaNumUnderscore(colon + 1, ".", &errorPos))
+				return true;
+			errorPos += colon + 1 - string;
+		}
+	} else {
+		if (_IsAlphaNumUnderscore(string, ".", &errorPos))
+			return true;
+	}
+
+	if (_errorPos != NULL)
+		*_errorPos = errorPos;
+	return false;
 }
 
 

@@ -136,7 +136,7 @@ BPackageVersion::ToString() const
 	}
 
 	if (!fPreRelease.IsEmpty())
-		string << '[' << fPreRelease << ']';
+		string << '~' << fPreRelease;
 
 	if (fRevision > 0)
 		string << '-' << fRevision;
