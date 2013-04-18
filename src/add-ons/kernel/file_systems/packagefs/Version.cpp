@@ -199,7 +199,7 @@ Version::ToString(char* buffer, size_t bufferSize) const
 
 	if (fPreRelease != NULL) {
 		size_t offset = std::min(bufferSize, size);
-		size += snprintf(buffer + offset, bufferSize - offset, "[%s]",
+		size += snprintf(buffer + offset, bufferSize - offset, "~%s",
 			fPreRelease);
 	}
 
