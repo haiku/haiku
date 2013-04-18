@@ -265,15 +265,7 @@ private:
 
 	static void _PrintPackageVersion(const BPackageVersionData& version)
 	{
-		printf("%s", version.major);
-		if (version.minor != NULL && version.minor[0] != '\0')
-			printf(".%s", version.minor);
-		if (version.micro != NULL && version.micro[0] != '\0')
-			printf(".%s", version.micro);
-		if (version.preRelease != NULL && version.preRelease[0] != '\0')
-			printf("-%s", version.preRelease);
-		if (version.revision > 0)
-			printf("-%" B_PRIu32, version.revision);
+		printf("%s", BPackageVersion(version).ToString().String());
 	}
 
 private:
