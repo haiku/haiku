@@ -583,8 +583,10 @@ Response::ParseLiteral(ArgumentList& arguments, BDataIO& stream)
 	Consume(stream, '\n');
 
 	bool handled = false;
-	if (fLiteralHandler != NULL)
-		handled = fLiteralHandler->HandleLiteral(*this, stream, size);
+	if (fLiteralHandler != NULL) {
+		handled = fLiteralHandler->HandleLiteral(*this, arguments, stream,
+			size);
+	}
 
 	if (!handled) {
 		// The default implementation just adds the data as a string

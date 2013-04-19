@@ -136,18 +136,20 @@ private:
 };
 
 
-enum FetchMode {
-	kFetchHeader,
-	kFetchBody,
-	kFetchAll
+enum FetchFlags {
+	kFetchHeader	= 0x01,
+	kFetchBody		= 0x02,
+	kFetchAll		= kFetchHeader | kFetchBody,
+	kFetchFlags		= 0x04,
 };
 
 
 class FetchListener {
 public:
-	virtual	bool				FetchData(Response& reponse, uint32 uid,
-									FetchMode mode, BDataIO& stream,
+	virtual	bool				FetchData(uint32 fetchFlags, BDataIO& stream,
 									size_t length) = 0;
+	virtual void				FetchedData(uint32 fetchFlags, uint32 uid,
+									uint32 flags) = 0;
 };
 
 
@@ -155,7 +157,7 @@ class FetchCommand : public Command, public Handler,
 	public LiteralHandler {
 public:
 								FetchCommand(uint32 from, uint32 to,
-									FetchMode mode);
+									uint32 fetchFlags);
 
 			void				SetListener(FetchListener* listener);
 			FetchListener*		Listener() const { return fListener; }
@@ -163,12 +165,13 @@ public:
 	virtual	BString				CommandString();
 	virtual	bool				HandleUntagged(Response& response);
 	virtual bool				HandleLiteral(Response& response,
-									BDataIO& stream, size_t length);
+									ArgumentList& arguments, BDataIO& stream,
+									size_t length);
 
 private:
 			uint32				fFrom;
 			uint32				fTo;
-			FetchMode			fMode;
+			uint32				fFlags;
 			FetchListener*		fListener;
 };
 

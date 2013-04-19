@@ -129,7 +129,8 @@ public:
 	virtual						~LiteralHandler();
 
 	virtual bool				HandleLiteral(Response& response,
-									BDataIO& stream, size_t length) = 0;
+									ArgumentList& arguments, BDataIO& stream,
+									size_t length) = 0;
 };
 
 

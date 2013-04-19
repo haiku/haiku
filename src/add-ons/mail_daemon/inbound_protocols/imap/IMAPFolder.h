@@ -45,7 +45,13 @@ public:
 			void				SetListener(FolderListener* listener);
 			void				SetUIDValidity(uint32 uidValidity);
 
-			void				StoreMessage(uint32 uid, ...);
+			status_t			StoreTemporaryMessage(uint32 fetchFlags,
+									BDataIO& stream, size_t length,
+									entry_ref& ref);
+			void				StoreMessage(uint32 fetchFlags, uint32 uid,
+									uint32 flags, entry_ref& ref);
+			status_t			StoreMessage(uint32 fetchFlags, uint32 uid,
+									BDataIO& stream, size_t length);
 			void				DeleteMessage(uint32 uid);
 			void				SetMessageFlags(uint32 uid, uint32 flags);
 

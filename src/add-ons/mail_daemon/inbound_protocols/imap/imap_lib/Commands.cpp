@@ -330,11 +330,11 @@ FetchMessageEntriesCommand::HandleUntagged(Response& response)
 // #pragma mark -
 
 
-FetchCommand::FetchCommand(uint32 from, uint32 to, FetchMode mode)
+FetchCommand::FetchCommand(uint32 from, uint32 to, uint32 flags)
 	:
 	fFrom(from),
 	fTo(to),
-	fMode(mode)
+	fFlags(flags)
 {
 }
 
@@ -355,7 +355,9 @@ FetchCommand::CommandString()
 		command << ":" << fTo;
 
 	command += " (UID ";
-	switch (fMode) {
+	if ((fFlags & kFetchFlags) != 0)
+		command += "FLAGS ";
+	switch (fFlags & kFetchAll) {
 		case kFetchHeader:
 			command += "RFC822.HEADER";
 			break;
@@ -378,35 +380,35 @@ FetchCommand::HandleUntagged(Response& response)
 	if (!response.EqualsAt(1, "FETCH") || !response.IsListAt(2))
 		return false;
 
-	// We don't need to parse anything here - all the data is processed via
-	// HandleLiteral().
+	ArgumentList& list = response.ListAt(2);
+	uint32 uid = 0;
+	uint32 flags = 0;
+
+	for (int32 i = 0; i < list.CountItems(); i += 2) {
+		if (list.EqualsAt(i, "UID") && list.IsNumberAt(i + 1))
+			uid = list.NumberAt(i + 1);
+		else if (list.EqualsAt(i, "FLAGS") && list.IsListAt(i + 1)) {
+			// Parse flags
+			ArgumentList& flagList = list.ListAt(i + 1);
+			flags = ParseFlags(flagList);
+		}
+	}
+
+	if (fListener != NULL)
+		fListener->FetchedData(fFlags, uid, flags);
 	return true;
 }
 
 
 bool
-FetchCommand::HandleLiteral(Response& response, BDataIO& stream,
-	size_t length)
+FetchCommand::HandleLiteral(Response& response, ArgumentList& arguments,
+	BDataIO& stream, size_t length)
 {
 	if (fListener == NULL || !response.EqualsAt(1, "FETCH")
 		|| !response.IsListAt(2))
 		return false;
 
-	uint32 uid = 0;
-
-	// Get current UID
-	ArgumentList& list = response.ListAt(2);
-	for (int32 i = 0; i < list.CountItems(); i += 2) {
-		if (list.EqualsAt(i, "UID") && list.IsNumberAt(i + 1)) {
-			uid = list.NumberAt(i + 1);
-			break;
-		}
-	}
-
-	if (uid == 0)
-		return false;
-
-	return fListener->FetchData(response, uid, fMode, stream, length);
+	return fListener->FetchData(fFlags, stream, length);
 }
 
 

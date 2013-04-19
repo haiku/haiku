@@ -11,8 +11,10 @@
 #include <ByteOrder.h>
 #include <Debug.h>
 #include <Directory.h>
+#include <File.h>
 #include <fs_attr.h>
 #include <Node.h>
+#include <Path.h>
 
 
 static const char* kMailboxNameAttribute = "IMAP:mailbox";
@@ -95,9 +97,57 @@ IMAPFolder::SetUIDValidity(uint32 uidValidity)
 }
 
 
-void
-IMAPFolder::StoreMessage(uint32 uid, ...)
+status_t
+IMAPFolder::StoreTemporaryMessage(uint32 fetchFlags, BDataIO& stream,
+	size_t length, entry_ref& ref)
 {
+	BPath path;
+	status_t status = path.SetTo(&fRef);
+	if (status != B_OK)
+		return status;
+
+	path.Append("tmp1234");
+
+	BFile file;
+	status = (path.Path(), B_CREATE_FILE);
+	if (status != B_OK)
+		return status;
+
+	get_ref_for_path(path.Path(), &ref);
+
+	char buffer[65535];
+	while (length > 0) {
+		ssize_t bytesRead = stream.Read(buffer,
+			min_c(sizeof(buffer), length));
+		if (bytesRead <= 0)
+			break;
+
+		file.Write(buffer, bytesRead);
+		length -= bytesRead;
+	}
+
+	return B_OK;
+}
+
+
+void
+IMAPFolder::StoreMessage(uint32 fetchFlags, uint32 uid, uint32 flags,
+	entry_ref& ref)
+{
+	BString name = "mail-";
+	name << uid;
+
+	// TODO: remove renaming as its superfluous here
+	BEntry entry(&ref);
+	entry.Rename(name.String());
+}
+
+
+status_t
+IMAPFolder::StoreMessage(uint32 fetchFlags, uint32 uid, BDataIO& stream,
+	size_t length)
+{
+	return B_ERROR;
 }
 
 

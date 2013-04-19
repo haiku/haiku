@@ -87,17 +87,17 @@ do_fetch(int argc, char** argv)
 {
 	uint32 from = 1;
 	uint32 to;
-	IMAP::FetchMode	mode = IMAP::kFetchAll;
+	uint32 flags = IMAP::kFetchAll;
 	if (argc < 2) {
 		printf("usage: %s [<from>] [<to>] [header|body]\n", argv[0]);
 		return;
 	}
 	if (argc > 2) {
 		if (!strcasecmp(argv[argc - 1], "header")) {
-			mode = IMAP::kFetchHeader;
+			flags = IMAP::kFetchHeader;
 			argc--;
 		} else if (!strcasecmp(argv[argc - 1], "body")) {
-			mode = IMAP::kFetchBody;
+			flags = IMAP::kFetchBody;
 			argc--;
 		}
 	}
@@ -107,15 +107,20 @@ do_fetch(int argc, char** argv)
 	} else
 		from = to = atoul(argv[1]);
 
-	IMAP::FetchCommand command(from, to, mode);
+	IMAP::FetchCommand command(from, to, flags | IMAP::kFetchFlags);
 
 	// A fetch listener that dumps everything to stdout
 	class Listener : public IMAP::FetchListener {
 	public:
-		virtual	bool FetchData(IMAP::Response& reponse, uint32 uid,
-			IMAP::FetchMode mode, BDataIO& stream, size_t length)
+		virtual ~Listener()
 		{
-			BMallocIO copy;
+		}
+
+		virtual	bool FetchData(uint32 fetchFlags, BDataIO& stream,
+			size_t length)
+		{
+			fBuffer.SetSize(0);
+
 			char buffer[65535];
 			while (length > 0) {
 				ssize_t bytesRead = stream.Read(buffer,
@@ -123,18 +128,26 @@ do_fetch(int argc, char** argv)
 				if (bytesRead <= 0)
 					break;
 
-				copy.Write(buffer, bytesRead);
+				fBuffer.Write(buffer, bytesRead);
 				length -= bytesRead;
 			}
 
 			// Null terminate the buffer
 			char null = '\0';
-			copy.Write(&null, 1);
+			fBuffer.Write(&null, 1);
 
-			printf("================= UID %ld =================\n", uid);
-			puts((const char*)copy.Buffer());
 			return true;
 		}
+
+		virtual	void FetchedData(uint32 fetchFlags, uint32 uid, uint32 flags)
+		{
+			printf("================= UID %ld, flags %lx =================\n",
+				uid, flags);
+			puts((const char*)fBuffer.Buffer());
+		}
+
+	private:
+		BMallocIO	fBuffer;
 	} listener;
 
 	command.SetListener(&listener);

@@ -112,7 +112,7 @@ public:
 };
 
 
-class FetchHeadersCommand : public WorkerCommand {
+class FetchHeadersCommand : public WorkerCommand, public IMAP::FetchListener {
 public:
 	FetchHeadersCommand(IMAPFolder& folder, IMAPMailbox& mailbox,
 		uint32 from, uint32 to)
@@ -133,11 +133,11 @@ public:
 		if (status != B_OK)
 			return status;
 
-		// TODO: create messages!
 		// TODO: trigger download of mails for all messages below the
 		// body fetch limit
-		// TODO: we would really like to have the message flags at this point
 		IMAP::FetchCommand fetch(fFrom, fTo, IMAP::kFetchHeader);
+		fetch.SetListener(this);
+
 		status = protocol.ProcessCommand(fetch);
 		if (status != B_OK)
 			return status;
@@ -145,11 +145,26 @@ public:
 		return B_OK;
 	}
 
+	virtual bool FetchData(uint32 fetchFlags, BDataIO& stream, size_t length)
+	{
+		fFetchStatus = fFolder.StoreTemporaryMessage(fetchFlags, stream,
+			length, fRef);
+		return true;
+	}
+
+	virtual void FetchedData(uint32 fetchFlags, uint32 uid, uint32 flags)
+	{
+		if (fFetchStatus == B_OK)
+			fFolder.StoreMessage(fetchFlags, uid, flags, fRef);
+	}
+
 private:
 	IMAPFolder&				fFolder;
 	IMAPMailbox&			fMailbox;
 	uint32					fFrom;
 	uint32					fTo;
+	entry_ref				fRef;
+	status_t				fFetchStatus;
 };
 
 

@@ -85,6 +85,34 @@ Protocol::Connect(const BNetworkAddress& address, const char* username,
 		_ParseCapabilities(capabilityHandler.Capabilities());
 	}
 
+	if (Capabilities().Contains("ID")) {
+		// Get the server's ID into our log
+		class IDCommand : public IMAP::Command, public IMAP::Handler {
+		public:
+			BString CommandString()
+			{
+				return "ID NIL";
+			}
+
+			bool HandleUntagged(IMAP::Response& response)
+			{
+				if (response.IsCommand("ID") && response.IsListAt(1)) {
+					puts("Server:");
+					ArgumentList& list = response.ListAt(1);
+					for (int32 i = 0; i < list.CountItems(); i += 2) {
+						printf("  %s: %s\n",
+							list.ItemAt(i)->ToString().String(),
+							list.ItemAt(i + 1)->ToString().String());
+					}
+					return true;
+				}
+
+				return false;
+			}
+		};
+		IDCommand idCommand;
+		ProcessCommand(idCommand);
+	}
 	return B_OK;
 }
 
