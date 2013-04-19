@@ -39,6 +39,20 @@ public:
 			void				SetActive(bool active)
 									{ fActive = active; }
 
+			int32				EntryCreatedIgnoreLevel() const
+									{ return fIgnoreEntryCreated; }
+			void				IncrementEntryCreatedIgnoreLevel()
+									{ fIgnoreEntryCreated++; }
+			void				DecrementEntryCreatedIgnoreLevel()
+									{ fIgnoreEntryCreated--; }
+
+			int32				EntryRemovedIgnoreLevel() const
+									{ return fIgnoreEntryRemoved; }
+			void				IncrementEntryRemovedIgnoreLevel()
+									{ fIgnoreEntryRemoved++; }
+			void				DecrementEntryRemovedIgnoreLevel()
+									{ fIgnoreEntryRemoved--; }
+
 			Package*&			FileNameHashTableNext()
 									{ return fFileNameHashTableNext; }
 			Package*&			NodeRefHashTableNext()
@@ -51,6 +65,8 @@ private:
 			bool				fActive;
 			Package*			fFileNameHashTableNext;
 			Package*			fNodeRefHashTableNext;
+			int32				fIgnoreEntryCreated;
+			int32				fIgnoreEntryRemoved;
 };
 
 

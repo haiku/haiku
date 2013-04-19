@@ -12,6 +12,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <time.h>
 #include <unistd.h>
 
 #include <Directory.h>
@@ -84,6 +85,608 @@ public:
 private:
 	BString	fEntryName;
 	bool	fCreated;
+};
+
+
+// #pragma mark - RelativePath
+
+
+struct Volume::RelativePath {
+	RelativePath(const char* component1 = NULL, const char* component2 = NULL,
+		const char* component3 = NULL)
+		:
+		fComponentCount(kMaxComponentCount)
+	{
+		fComponents[0] = component1;
+		fComponents[1] = component2;
+		fComponents[2] = component3;
+
+		for (size_t i = 0; i < kMaxComponentCount; i++) {
+			if (fComponents[i] == NULL) {
+				fComponentCount = i;
+				break;
+			}
+		}
+	}
+
+	bool IsEmpty() const
+	{
+		return fComponentCount == 0;
+	}
+
+	RelativePath HeadPath(size_t componentsToDropCount = 1)
+	{
+		RelativePath result;
+		if (componentsToDropCount < fComponentCount) {
+			result.fComponentCount = fComponentCount - componentsToDropCount;
+			for (size_t i = 0; i < result.fComponentCount; i++)
+				result.fComponents[i] = fComponents[i];
+		}
+
+		return result;
+	}
+
+	const char* LastComponent() const
+	{
+		return fComponentCount > 0 ? fComponents[fComponentCount - 1] : NULL;
+	}
+
+	BString ToString() const
+	{
+		if (fComponentCount == 0)
+			return BString();
+
+		size_t length = fComponentCount - 1;
+		for (size_t i = 0; i < fComponentCount; i++)
+			length += strlen(fComponents[i]);
+
+		BString result;
+		char* buffer = result.LockBuffer(length + 1);
+		if (buffer == NULL)
+			return BString();
+
+		for (size_t i = 0; i < fComponentCount; i++) {
+			if (i > 0) {
+				*buffer = '/';
+				buffer++;
+			}
+			strcpy(buffer, fComponents[i]);
+			buffer += strlen(buffer);
+		}
+
+		return result.UnlockBuffer();
+	}
+
+private:
+	static const size_t	kMaxComponentCount = 3;
+
+	const char*	fComponents[kMaxComponentCount];
+	size_t		fComponentCount;
+};
+
+
+// #pragma mark - Exception
+
+
+struct Volume::Exception {
+	Exception(int32 error, const char* errorMessage = NULL,
+		const char* packageName = NULL)
+		:
+		fError(error),
+		fErrorMessage(errorMessage),
+		fPackageName(packageName)
+	{
+	}
+
+	int32 Error() const
+	{
+		return fError;
+	}
+
+	const BString& ErrorMessage() const
+	{
+		return fErrorMessage;
+	}
+
+	const BString& PackageName() const
+	{
+		return fPackageName;
+	}
+
+	BString ToString() const
+	{
+		const char* error;
+		if (fError >= 0) {
+			switch (fError) {
+				case B_DAEMON_OK:
+					error = "no error";
+					break;
+				case B_DAEMON_CHANGE_COUNT_MISMATCH:
+					error = "transaction out of date";
+					break;
+				case B_DAEMON_BAD_REQUEST:
+					error = "invalid transaction";
+					break;
+				case B_DAEMON_NO_SUCH_PACKAGE:
+					error = "no such package";
+					break;
+				case B_DAEMON_PACKAGE_ALREADY_EXISTS:
+					error = "package already exists";
+					break;
+				default:
+					error = "unknown error";
+					break;
+			}
+		} else
+			error = strerror(fError);
+
+		BString string;
+		if (!fErrorMessage.IsEmpty()) {
+			string = fErrorMessage;
+			string << ": ";
+		}
+
+		string << error;
+
+		if (!fPackageName.IsEmpty())
+			string << ", package: \"" << fPackageName << '"';
+
+		return string;
+	}
+
+private:
+	int32		fError;
+	BString		fErrorMessage;
+	BString		fPackageName;
+};
+
+
+// #pragma mark - CommitTransactionHandler
+
+
+struct Volume::CommitTransactionHandler {
+	CommitTransactionHandler(Volume* volume, BMessage* request, BMessage& reply)
+		:
+		fVolume(volume),
+		fRequest(request),
+		fReply(reply),
+		fPackagesToActivate(20, true),
+		fPackagesToDeactivate(),
+		fAddedPackages(),
+		fRemovedPackages()
+	{
+	}
+
+	void HandleRequest()
+	{
+		// check the change count
+		int64 changeCount;
+		if (fRequest->FindInt64("change count", &changeCount) != B_OK)
+			throw Exception(B_DAEMON_CHANGE_COUNT_MISMATCH);
+
+		// collect the packages to deactivate
+		_GetPackagesToDeactivate();
+
+		// read the packages to activate
+		_ReadPackagesToActivate();
+
+		// anything to do at all?
+		if (fPackagesToActivate.IsEmpty() &&  fPackagesToDeactivate.empty()) {
+			throw Exception(B_DAEMON_BAD_REQUEST,
+				"no packages to activate or deactivate");
+		}
+
+		// create an old state directory
+		_CreateOldStateDirectory();
+
+		// move packages to deactivate to old state directory
+		_RemovePackagesToDeactivate();
+
+		// move packages to activate to packages directory
+		_AddPackagesToActivate();
+
+		// activate/deactivate packages
+		fVolume->_ChangePackageActivation(fAddedPackages, fRemovedPackages);
+
+		// removed packages have been deleted, new packages shall not be deleted
+		fAddedPackages.clear();
+		fRemovedPackages.clear();
+		fPackagesToActivate.MakeEmpty(false);
+		fPackagesToDeactivate.clear();
+	}
+
+	void Revert()
+	{
+		// move packages to activate back to transaction directory
+		_RevertAddPackagesToActivate();
+
+		// move packages to deactivate back to packages directory
+		_RevertRemovePackagesToDeactivate();
+
+		// remove old state directory
+		_RemoveOldStateDirectory();
+	}
+
+private:
+	typedef BObjectList<Package> PackageList;
+
+	void _GetPackagesToDeactivate()
+	{
+		static const char* const kPackagesToDeactivateFieldName = "deactivate";
+
+		// get the number of packages to activate
+		type_code type;
+		int32 packagesToDeactivateCount;
+		if (fRequest->GetInfo(kPackagesToDeactivateFieldName, &type,
+				&packagesToDeactivateCount) != B_OK) {
+			// the field is missing, i.e. no packages shall be deactivated
+			return;
+		}
+
+		for (int32 i = 0; i < packagesToDeactivateCount; i++) {
+			const char* packageName;
+			status_t error = fRequest->FindString(
+				kPackagesToDeactivateFieldName, i, &packageName);
+			if (error != B_OK)
+				throw Exception(error);
+
+			Package* package = fVolume->fPackagesByFileName.Lookup(packageName);
+			if (package == NULL) {
+				throw Exception(B_DAEMON_NO_SUCH_PACKAGE, "no such package",
+					packageName);
+			}
+
+			fPackagesToDeactivate.insert(package);
+
+			package->IncrementEntryRemovedIgnoreLevel();
+		}
+	}
+
+	void _ReadPackagesToActivate()
+	{
+		static const char* const kPackagesToActivateFieldName = "activate";
+
+		// get the number of packages to activate
+		type_code type;
+		int32 packagesToActivateCount;
+		if (fRequest->GetInfo(kPackagesToActivateFieldName, &type,
+				&packagesToActivateCount) != B_OK) {
+			// the field is missing, i.e. no packages shall be activated
+			return;
+		}
+
+		// get the name of the transaction directory
+		BString transactionDirectoryName;
+		if (packagesToActivateCount > 0) {
+			if (fRequest->FindString("transaction", &transactionDirectoryName)
+					!= B_OK) {
+				throw Exception(B_DAEMON_BAD_REQUEST);
+			}
+		}
+
+		// check the name -- we only allow a simple subdirectory of the admin
+		// directory
+		if (transactionDirectoryName.IsEmpty()
+			|| transactionDirectoryName.FindFirst('/') >= 0
+			|| transactionDirectoryName == "."
+			|| transactionDirectoryName == "..") {
+			throw Exception(B_DAEMON_BAD_REQUEST);
+		}
+
+		// open the directory
+		RelativePath directoryPath(kAdminDirectoryName,
+			transactionDirectoryName);
+		BDirectory directory;
+		status_t error = fVolume->_OpenPackagesSubDirectory(directoryPath,
+			false, directory);
+		if (error != B_OK)
+			throw Exception(error, "failed to open transaction directory");
+
+		error = directory.GetNodeRef(&fTransactionDirectoryRef);
+		if (error != B_OK) {
+			throw Exception(error,
+				"failed to get transaction directory node ref");
+		}
+
+		// read the packages
+		for (int32 i = 0; i < packagesToActivateCount; i++) {
+			const char* packageName;
+			error = fRequest->FindString(kPackagesToActivateFieldName, i,
+				&packageName);
+			if (error != B_OK)
+				throw Exception(error);
+
+			// make sure it doesn't clash with an already existing package
+			Package* package = fVolume->fPackagesByFileName.Lookup(packageName);
+			if (package != NULL
+				&& fPackagesToDeactivate.find(package)
+					== fPackagesToDeactivate.end()) {
+				throw Exception(B_DAEMON_PACKAGE_ALREADY_EXISTS, NULL,
+					packageName);
+			}
+
+			// read the package
+			entry_ref entryRef;
+			entryRef.device = fTransactionDirectoryRef.device;
+			entryRef.directory = fTransactionDirectoryRef.node;
+			if (entryRef.set_name(packageName) != B_OK)
+				throw Exception(B_NO_MEMORY);
+
+			package = new(std::nothrow) Package;
+			if (package == NULL || !fPackagesToActivate.AddItem(package)) {
+				delete package;
+				throw Exception(B_NO_MEMORY);
+			}
+
+			error = package->Init(entryRef);
+			if (error != B_OK)
+				throw Exception(error, "failed to read package", packageName);
+
+			package->IncrementEntryCreatedIgnoreLevel();
+		}
+	}
+
+	void _CreateOldStateDirectory()
+	{
+		// construct a nice name from the current date and time
+		time_t nowSeconds = time(NULL);
+		struct tm now;
+		BString baseName;
+		if (localtime_r(&nowSeconds, &now) != NULL) {
+			baseName.SetToFormat("state_%d-%02d-%02d_%02d:%02d:%02d",
+				1900 + now.tm_year, now.tm_mon + 1, now.tm_mday, now.tm_hour,
+				now.tm_min, now.tm_sec);
+		} else
+			baseName = "state";
+
+		if (baseName.IsEmpty())
+			throw Exception(B_NO_MEMORY);
+
+		// make sure the directory doesn't exist yet
+		BDirectory adminDirectory;
+		status_t error = fVolume->_OpenPackagesSubDirectory(
+			RelativePath(kAdminDirectoryName), true, adminDirectory);
+		if (error != B_OK)
+			throw Exception(error, "failed to open administrative directory");
+
+		int uniqueId = 1;
+		BString directoryName = baseName;
+		while (BEntry(&adminDirectory, directoryName).Exists()) {
+			directoryName.SetToFormat("%s-%d", baseName.String(), uniqueId++);
+			if (directoryName.IsEmpty())
+				throw Exception(B_NO_MEMORY);
+		}
+
+		// create the directory
+		error = adminDirectory.CreateDirectory(directoryName,
+			&fOldStateDirectory);
+		if (error != B_OK)
+			throw Exception(error, "failed to create old state directory");
+
+		fOldStateDirectoryName = directoryName;
+
+		// write the old activation file
+		BEntry activationFile;
+		error = fVolume->_WriteActivationFile(
+			RelativePath(kAdminDirectoryName, directoryName),
+			kActivationFileName, PackageSet(), PackageSet(), activationFile);
+		if (error != B_OK)
+			throw Exception(error, "failed to write old activation file");
+
+		// add the old state directory to the reply
+		error = fReply.AddString("old state", fOldStateDirectoryName);
+		if (error != B_OK)
+			throw Exception(error, "failed to add field to reply");
+	}
+
+	void _RemovePackagesToDeactivate()
+	{
+		if (fPackagesToDeactivate.empty())
+			return;
+
+		for (PackageSet::const_iterator it = fPackagesToDeactivate.begin();
+			it != fPackagesToDeactivate.end(); ++it) {
+			// get an BEntry for the package
+			Package* package = *it;
+			entry_ref entryRef;
+			entryRef.device = fVolume->fPackagesDirectoryRef.device;
+			entryRef.directory = fVolume->fPackagesDirectoryRef.node;
+			if (entryRef.set_name(package->FileName()) != B_OK)
+				throw Exception(B_NO_MEMORY);
+
+			BEntry entry;
+			status_t error = entry.SetTo(&entryRef);
+			if (error != B_OK) {
+				throw Exception(error, "failed to get package entry",
+					package->FileName());
+			}
+
+			// move entry
+			fRemovedPackages.insert(package);
+
+			error = entry.MoveTo(&fOldStateDirectory);
+			if (error != B_OK) {
+				fRemovedPackages.erase(package);
+				throw Exception(error,
+					"failed to move old package from packages directory",
+					package->FileName());
+			}
+		}
+	}
+
+	void _AddPackagesToActivate()
+	{
+		if (fPackagesToActivate.IsEmpty())
+			return;
+
+		// open packages directory
+		BDirectory packagesDirectory;
+		status_t error
+			= packagesDirectory.SetTo(&fVolume->fPackagesDirectoryRef);
+		if (error != B_OK)
+			throw Exception(error, "failed to open packages directory");
+
+		int32 count = fPackagesToActivate.CountItems();
+		for (int32 i = 0; i < count; i++) {
+			// get an BEntry for the package
+			Package* package = fPackagesToActivate.ItemAt(i);
+			entry_ref entryRef;
+			entryRef.device = fTransactionDirectoryRef.device;
+			entryRef.directory = fTransactionDirectoryRef.node;
+			if (entryRef.set_name(package->FileName()) != B_OK)
+				throw Exception(B_NO_MEMORY);
+
+			BEntry entry;
+			error = entry.SetTo(&entryRef);
+			if (error != B_OK) {
+				throw Exception(error, "failed to get package entry",
+					package->FileName());
+			}
+
+			// move entry
+			fAddedPackages.insert(package);
+
+			error = entry.MoveTo(&packagesDirectory);
+			if (error != B_OK) {
+				fAddedPackages.erase(package);
+				throw Exception(error,
+					"failed to move new package to packages directory",
+					package->FileName());
+			}
+
+			// also add the package to the volume
+			fVolume->_AddPackage(package);
+		}
+	}
+
+	void _RevertAddPackagesToActivate()
+	{
+		if (fAddedPackages.empty())
+			return;
+
+		// open transaction directory
+		BDirectory transactionDirectory;
+		status_t error = transactionDirectory.SetTo(&fTransactionDirectoryRef);
+		if (error != B_OK) {
+			ERROR("failed to open transaction directory: %s\n",
+				strerror(error));
+		}
+
+		for (PackageSet::iterator it = fAddedPackages.begin();
+			it != fAddedPackages.end(); ++it) {
+			// remove package from the volume
+			Package* package = *it;
+			fVolume->_RemovePackage(package);
+
+			if (transactionDirectory.InitCheck() != B_OK)
+				continue;
+
+			// get BEntry for the package
+			entry_ref entryRef;
+			entryRef.device = fVolume->fPackagesDirectoryRef.device;
+			entryRef.directory = fVolume->fPackagesDirectoryRef.node;
+			if (entryRef.set_name(package->FileName()) != B_OK) {
+				ERROR("out of memory\n");
+				continue;
+			}
+
+			BEntry entry;
+			error = entry.SetTo(&entryRef);
+			if (error != B_OK) {
+				ERROR("failed to get entry for package \"%s\": %s\n",
+					package->FileName().String(), strerror(error));
+				continue;
+			}
+
+			// move entry
+			error = entry.MoveTo(&transactionDirectory);
+			if (error != B_OK) {
+				ERROR("failed to move new package \"%s\" back to transaction "
+					"directory: %s\n", package->FileName().String(),
+					strerror(error));
+				continue;
+			}
+		}
+	}
+
+	void _RevertRemovePackagesToDeactivate()
+	{
+		if (fRemovedPackages.empty())
+			return;
+
+		// open packages directory
+		BDirectory packagesDirectory;
+		status_t error
+			= packagesDirectory.SetTo(&fVolume->fPackagesDirectoryRef);
+		if (error != B_OK) {
+			throw Exception(error, "failed to open packages directory");
+			ERROR("failed to open packages directory: %s\n",
+				strerror(error));
+			return;
+		}
+
+		for (PackageSet::iterator it = fRemovedPackages.begin();
+			it != fRemovedPackages.end(); ++it) {
+			// get an BEntry for the package
+			Package* package = *it;
+			BEntry entry;
+			status_t error = entry.SetTo(&fOldStateDirectory,
+				package->FileName());
+			if (error != B_OK) {
+				ERROR("failed to get entry for package \"%s\": %s\n",
+					package->FileName().String(), strerror(error));
+				continue;
+			}
+
+			// move entry
+			error = entry.MoveTo(&packagesDirectory);
+			if (error != B_OK) {
+				ERROR("failed to move old package \"%s\" back to packages "
+					"directory: %s\n", package->FileName().String(),
+					strerror(error));
+				continue;
+			}
+		}
+	}
+
+	void _RemoveOldStateDirectory()
+	{
+		if (fOldStateDirectory.InitCheck() != B_OK)
+			return;
+
+		// remove the old activation file (it won't exist, if creating it
+		// failed)
+		BEntry(&fOldStateDirectory, kActivationFileName).Remove();
+
+		// Now the directory should be empty. If it isn't, it still contains
+		// some old package file, which we failed to move back.
+		BEntry entry;
+		status_t error = fOldStateDirectory.GetEntry(&entry);
+		if (error != B_OK) {
+			ERROR("failed to get entry for old state directory: %s\n",
+				strerror(error));
+			return;
+		}
+
+		error = entry.Remove();
+		if (error != B_OK) {
+			ERROR("failed to remove old state directory: %s\n",
+				strerror(error));
+			return;
+		}
+	}
+
+private:
+	Volume*		fVolume;
+	BMessage*	fRequest;
+	BMessage&	fReply;
+	PackageList	fPackagesToActivate;
+	PackageSet	fPackagesToDeactivate;
+	PackageSet	fAddedPackages;
+	PackageSet	fRemovedPackages;
+	BDirectory	fOldStateDirectory;
+	BString		fOldStateDirectoryName;
+	node_ref	fTransactionDirectoryRef;
 };
 
 
@@ -384,6 +987,42 @@ Volume::HandleGetLocationInfoRequest(BMessage* message)
 
 
 void
+Volume::HandleCommitTransactionRequest(BMessage* message)
+{
+	// Prepare the reply in so far that we can at least set the error code
+	// without risk of failure.
+	BMessage reply(B_MESSAGE_COMMIT_TRANSACTION_REPLY);
+	if (reply.AddInt32("error", B_ERROR) != B_OK)
+		return;
+
+	// perform the request
+	CommitTransactionHandler handler(this, message, reply);
+	int32 error;
+	try {
+		handler.HandleRequest();
+		error = B_DAEMON_OK;
+	} catch (Exception& exception) {
+		error = exception.Error();
+
+		if (!exception.ErrorMessage().IsEmpty())
+			reply.AddString("error message", exception.ErrorMessage());
+		if (!exception.PackageName().IsEmpty())
+			reply.AddString("error package", exception.PackageName());
+	} catch (std::bad_alloc& exception) {
+		error = B_NO_MEMORY;
+	}
+
+	// revert on error
+	if (error != B_DAEMON_OK)
+		handler.Revert();
+
+	// send the reply
+	reply.ReplaceInt32("error", error);
+	message->SendReply(&reply, (BHandler*)NULL, kCommunicationTimeout);
+}
+
+
+void
 Volume::Unmounted()
 {
 	if (fListener != NULL) {
@@ -477,127 +1116,19 @@ Volume::ProcessPendingPackageActivationChanges()
 {
 	if (!HasPendingPackageActivationChanges())
 		return;
-INFORM("Volume::ProcessPendingPackageActivationChanges(): activating %zu, deactivating %zu packages\n",
-fPackagesToBeActivated.size(), fPackagesToBeDeactivated.size());
 
-	// compute the size of the allocation we need for the activation change
-	// request
-	int32 itemCount
-		= fPackagesToBeActivated.size() + fPackagesToBeDeactivated.size();
-	size_t requestSize = sizeof(PackageFSActivationChangeRequest)
-		+ itemCount * sizeof(PackageFSActivationChangeItem);
-
-	for (PackageSet::iterator it = fPackagesToBeActivated.begin();
-		 it != fPackagesToBeActivated.end(); ++it) {
-		requestSize += (*it)->FileName().Length() + 1;
+	try {
+		_ChangePackageActivation(fPackagesToBeActivated,
+			fPackagesToBeDeactivated);
+	} catch (Exception& exception) {
+		ERROR("Volume::ProcessPendingPackageActivationChanges(): package "
+			"activation failed: %s\n", exception.ToString().String());
+// TODO: Notify the user!
 	}
 
-	for (PackageSet::iterator it = fPackagesToBeDeactivated.begin();
-		 it != fPackagesToBeDeactivated.end(); ++it) {
-		requestSize += (*it)->FileName().Length() + 1;
-	}
-
-	// allocate and prepare the request
-	PackageFSActivationChangeRequest* request
-		= (PackageFSActivationChangeRequest*)malloc(requestSize);
-	if (request == NULL) {
-		ERROR("out of memory\n");
-		return;
-	}
-	MemoryDeleter requestDeleter(request);
-
-	request->itemCount = itemCount;
-
-	PackageFSActivationChangeItem* item = &request->items[0];
-	char* nameBuffer = (char*)(item + itemCount);
-
-	for (PackageSet::iterator it = fPackagesToBeActivated.begin();
-		it != fPackagesToBeActivated.end(); ++it, item++) {
-		_FillInActivationChangeItem(item, PACKAGE_FS_ACTIVATE_PACKAGE, *it,
-			nameBuffer);
-	}
-
-	for (PackageSet::iterator it = fPackagesToBeDeactivated.begin();
-		it != fPackagesToBeDeactivated.end(); ++it, item++) {
-		_FillInActivationChangeItem(item, PACKAGE_FS_DEACTIVATE_PACKAGE, *it,
-			nameBuffer);
-	}
-
-	// issue the request
-	int fd = OpenRootDirectory();
-	if (fd < 0) {
-		ERROR("Volume::ProcessPendingPackageActivationChanges(): failed to "
-			"open root directory: %s", strerror(fd));
-		return;
-	}
-	FileDescriptorCloser fdCloser(fd);
-
-	if (ioctl(fd, PACKAGE_FS_OPERATION_CHANGE_ACTIVATION, request, requestSize)
-			!= 0) {
-// TODO: We need more error information and error handling!
-		ERROR("Volume::ProcessPendingPackageActivationChanges(): failed to "
-			"activate packages: %s\n", strerror(errno));
-		return;
-	}
-
-	// Update our state, i.e. remove deactivated packages and mark activated
-	// packages accordingly.
-	for (PackageSet::iterator it = fPackagesToBeActivated.begin();
-		it != fPackagesToBeActivated.end(); ++it) {
-		(*it)->SetActive(true);
-		fChangeCount++;
-	}
-
-	for (PackageSet::iterator it = fPackagesToBeDeactivated.begin();
-		it != fPackagesToBeDeactivated.end(); ++it) {
-		Package* package = *it;
-		_RemovePackage(package);
-		delete package;
-	}
-
+	// clear the activation/deactivation sets in any event
 	fPackagesToBeActivated.clear();
 	fPackagesToBeDeactivated.clear();
-
-	// write the package activation file
-
-	// create the content
-	BString activationFileContent;
-	for (PackageFileNameHashTable::Iterator it
-			= fPackagesByFileName.GetIterator(); it.HasNext();) {
-		Package* package = it.Next();
-		if (package->IsActive())
-			activationFileContent << package->FileName() << '\n';
-	}
-
-	// open and write the temporary file
-	BFile activationFile;
-	BEntry activationFileEntry;
-	status_t error = _OpenPackagesFile(kAdminDirectoryName,
-		kTemporaryActivationFileName,
-		B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE, activationFile,
-		&activationFileEntry);
-	if (error != B_OK) {
-		ERROR("Volume::ProcessPendingPackageActivationChanges(): failed to "
-			"create activation file: %s\n", strerror(error));
-		return;
-	}
-
-	ssize_t bytesWritten = activationFile.Write(activationFileContent.String(),
-		activationFileContent.Length());
-	if (bytesWritten < 0) {
-		ERROR("Volume::ProcessPendingPackageActivationChanges(): failed to "
-			"write activation file: %s\n", strerror(bytesWritten));
-		return;
-	}
-
-	// rename the temporary file to the final file
-	error = activationFileEntry.Rename(kActivationFileName, true);
-	if (error != B_OK) {
-		ERROR("Volume::ProcessPendingPackageActivationChanges(): failed to "
-			"rename temporary activation file to final file: %s\n",
-			strerror(error));
-		return;
-	}
 }
 
 
@@ -681,6 +1212,13 @@ void
 Volume::_PackagesEntryCreated(const char* name)
 {
 INFORM("Volume::_PackagesEntryCreated(\"%s\")\n", name);
+	// Ignore the event, if we generated it ourselves.
+	Package* package = fPackagesByFileName.Lookup(name);
+	if (package->EntryCreatedIgnoreLevel() > 0) {
+		package->DecrementEntryCreatedIgnoreLevel();
+		return;
+	}
+
 	entry_ref entry;
 	entry.device = fPackagesDirectoryRef.device;
 	entry.directory = fPackagesDirectoryRef.node;
@@ -690,7 +1228,7 @@ INFORM("Volume::_PackagesEntryCreated(\"%s\")\n", name);
 		return;
 	}
 
-	Package* package = new(std::nothrow) Package;
+	package = new(std::nothrow) Package;
 	if (package == NULL) {
 		ERROR("out of memory\n");
 		return;
@@ -722,6 +1260,12 @@ INFORM("Volume::_PackagesEntryRemoved(\"%s\")\n", name);
 	Package* package = fPackagesByFileName.Lookup(name);
 	if (package == NULL)
 		return;
+
+	// Ignore the event, if we generated it ourselves.
+	if (package->EntryRemovedIgnoreLevel() > 0) {
+		package->DecrementEntryRemovedIgnoreLevel();
+		return;
+	}
 
 	// Remove the package from the packages-to-be-activated set, if it is in
 	// there (unlikely, unless we see a create-remove-create sequence).
@@ -907,16 +1451,17 @@ Volume::_AddRepository(BSolver* solver, BSolverRepository& repository,
 
 
 status_t
-Volume::_OpenPackagesFile(const char* subDirectoryPath, const char* fileName,
-	uint32 openMode, BFile& _file, BEntry* _entry)
+Volume::_OpenPackagesFile(const RelativePath& subDirectoryPath,
+	const char* fileName, uint32 openMode, BFile& _file, BEntry* _entry)
 {
 	BDirectory directory;
-	if (subDirectoryPath != NULL) {
+	if (!subDirectoryPath.IsEmpty()) {
 		status_t error = _OpenPackagesSubDirectory(subDirectoryPath,
 			(openMode & B_CREATE_FILE) != 0, directory);
 		if (error != B_OK) {
 			ERROR("Volume::_OpenPackagesFile(): failed to open packages "
-				"subdirectory \"%s\": %s\n", subDirectoryPath, strerror(error));
+				"subdirectory \"%s\": %s\n",
+				subDirectoryPath.ToString().String(), strerror(error));
 			RETURN_ERROR(error);
 		}
 	} else {
@@ -942,7 +1487,7 @@ Volume::_OpenPackagesFile(const char* subDirectoryPath, const char* fileName,
 
 
 status_t
-Volume::_OpenPackagesSubDirectory(const char* path, bool create,
+Volume::_OpenPackagesSubDirectory(const RelativePath& path, bool create,
 	BDirectory& _directory)
 {
 	// open the packages directory
@@ -954,16 +1499,22 @@ Volume::_OpenPackagesSubDirectory(const char* path, bool create,
 		RETURN_ERROR(error);
 	}
 
+	// get a string for the path
+	BString pathString = path.ToString();
+	if (pathString.IsEmpty())
+		RETURN_ERROR(B_NO_MEMORY);
+
 	// If creating is not allowed, just try to open it.
 	if (!create)
-		RETURN_ERROR(_directory.SetTo(&directory, path));
+		RETURN_ERROR(_directory.SetTo(&directory, pathString));
 
 	// get an absolute path and create the subdirectory
 	BPath absolutePath;
-	error = absolutePath.SetTo(&directory, path);
+	error = absolutePath.SetTo(&directory, pathString);
 	if (error != B_OK) {
 		ERROR("Volume::_OpenConfigSubDirectory(): failed to get absolute path "
-			"for subdirectory \"%s\": %s\n", path, strerror(error));
+			"for subdirectory \"%s\": %s\n", pathString.String(),
+			strerror(error));
 		RETURN_ERROR(error);
 	}
 
@@ -971,9 +1522,197 @@ Volume::_OpenPackagesSubDirectory(const char* path, bool create,
 		S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
 	if (error != B_OK) {
 		ERROR("Volume::_OpenConfigSubDirectory(): failed to create packages "
-			"subdirectory \"%s\": %s\n", path, strerror(error));
+			"subdirectory \"%s\": %s\n", pathString.String(),
+			strerror(error));
 		RETURN_ERROR(error);
 	}
 
-	RETURN_ERROR(_directory.SetTo(&directory, path));
+	RETURN_ERROR(_directory.SetTo(&directory, pathString));
+}
+
+
+status_t
+Volume::_CreateActivationFileContent(const PackageSet& toActivate,
+	const PackageSet& toDeactivate, BString& _content)
+{
+	BString activationFileContent;
+	for (PackageFileNameHashTable::Iterator it
+			= fPackagesByFileName.GetIterator(); it.HasNext();) {
+		Package* package = it.Next();
+		if (package->IsActive()
+			&& toDeactivate.find(package) == toDeactivate.end()) {
+			int32 length = activationFileContent.Length();
+			activationFileContent << package->FileName() << '\n';
+			if (activationFileContent.Length()
+					< length + package->FileName().Length() + 1) {
+				return B_NO_MEMORY;
+			}
+		}
+	}
+
+	for (PackageSet::const_iterator it = toActivate.begin();
+		it != toActivate.end(); ++it) {
+		Package* package = *it;
+		int32 length = activationFileContent.Length();
+		activationFileContent << package->FileName() << '\n';
+		if (activationFileContent.Length()
+				< length + package->FileName().Length() + 1) {
+			return B_NO_MEMORY;
+		}
+	}
+
+	_content = activationFileContent;
+	return B_OK;
+}
+
+
+status_t
+Volume::_WriteActivationFile(const RelativePath& directoryPath,
+	const char* fileName, const PackageSet& toActivate,
+	const PackageSet& toDeactivate,
+	BEntry& _entry)
+{
+	// create the content
+	BString activationFileContent;
+	status_t error = _CreateActivationFileContent(fPackagesToBeActivated,
+		fPackagesToBeDeactivated, activationFileContent);
+	if (error != B_OK)
+		return error;
+
+	// write the file
+	BEntry activationFileEntry;
+	error = _WriteTextFile(directoryPath, fileName, activationFileContent,
+		activationFileEntry);
+	if (error != B_OK) {
+		ERROR("Volume::_WriteActivationFile(): failed to write activation "
+			"file \"%s/%s\": %s\n", directoryPath.ToString().String(), fileName,
+			strerror(error));
+		return error;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+Volume::_WriteTextFile(const RelativePath& directoryPath, const char* fileName,
+	const BString& content, BEntry& _entry)
+{
+	BFile file;
+	status_t error = _OpenPackagesFile(directoryPath,
+		fileName, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE, file, &_entry);
+	if (error != B_OK) {
+		ERROR("Volume::_WriteTextFile(): failed to create file \"%s/%s\": %s\n",
+			directoryPath.ToString().String(), fileName, strerror(error));
+		return error;
+	}
+
+	ssize_t bytesWritten = file.Write(content.String(),
+		content.Length());
+	if (bytesWritten < 0) {
+		ERROR("Volume::_WriteTextFile(): failed to write file \"%s/%s\": %s\n",
+			directoryPath.ToString().String(), fileName,
+			strerror(bytesWritten));
+		return bytesWritten;
+	}
+
+	return B_OK;
+}
+
+
+void
+Volume::_ChangePackageActivation(const PackageSet& packagesToActivate,
+	const PackageSet& packagesToDeactivate)
+{
+INFORM("Volume::ProcessPendingPackageActivationChanges(): activating %zu, deactivating %zu packages\n",
+packagesToActivate.size(), packagesToDeactivate.size());
+
+	// write the temporary package activation file
+	BEntry activationFileEntry;
+	status_t error = _WriteActivationFile(RelativePath(kAdminDirectoryName),
+		kTemporaryActivationFileName, packagesToActivate, packagesToDeactivate,
+		activationFileEntry);
+	if (error != B_OK)
+		throw Exception(error, "failed to write activation file");
+
+	// compute the size of the allocation we need for the activation change
+	// request
+	int32 itemCount = packagesToActivate.size() + packagesToDeactivate.size();
+	size_t requestSize = sizeof(PackageFSActivationChangeRequest)
+		+ itemCount * sizeof(PackageFSActivationChangeItem);
+
+	for (PackageSet::iterator it = packagesToActivate.begin();
+		 it != packagesToActivate.end(); ++it) {
+		requestSize += (*it)->FileName().Length() + 1;
+	}
+
+	for (PackageSet::iterator it = packagesToDeactivate.begin();
+		 it != packagesToDeactivate.end(); ++it) {
+		requestSize += (*it)->FileName().Length() + 1;
+	}
+
+	// allocate and prepare the request
+	PackageFSActivationChangeRequest* request
+		= (PackageFSActivationChangeRequest*)malloc(requestSize);
+	if (request == NULL)
+		throw Exception(B_NO_MEMORY);
+	MemoryDeleter requestDeleter(request);
+
+	request->itemCount = itemCount;
+
+	PackageFSActivationChangeItem* item = &request->items[0];
+	char* nameBuffer = (char*)(item + itemCount);
+
+	for (PackageSet::iterator it = packagesToActivate.begin();
+		it != packagesToActivate.end(); ++it, item++) {
+		_FillInActivationChangeItem(item, PACKAGE_FS_ACTIVATE_PACKAGE, *it,
+			nameBuffer);
+	}
+
+	for (PackageSet::iterator it = packagesToDeactivate.begin();
+		it != packagesToDeactivate.end(); ++it, item++) {
+		_FillInActivationChangeItem(item, PACKAGE_FS_DEACTIVATE_PACKAGE, *it,
+			nameBuffer);
+	}
+
+	// issue the request
+	int fd = OpenRootDirectory();
+	if (fd < 0)
+		throw Exception(fd, "failed to open root directory");
+	FileDescriptorCloser fdCloser(fd);
+
+	if (ioctl(fd, PACKAGE_FS_OPERATION_CHANGE_ACTIVATION, request, requestSize)
+			!= 0) {
+// TODO: We need more error information and error handling!
+		throw Exception(errno, "ioctl() to de-/activate packages failed");
+	}
+
+	// rename the temporary activation file to the final file
+	error = activationFileEntry.Rename(kActivationFileName, true);
+	if (error != B_OK) {
+		throw Exception(error,
+			"failed to rename temporary activation file to final file");
+// TODO: We should probably try to reverse the activation changes, though that
+// will fail, if this method has been called in response to node monitoring
+// events. Alternatively moving the package activation file could be made part
+// of the ioctl(), since packagefs should be able to undo package changes until
+// the very end, unless running out of memory. In the end the situation would be
+// bad anyway, though, since the activation file may refer to removed packages
+// and things would be in an inconsistent state after rebooting.
+	}
+
+	// Update our state, i.e. remove deactivated packages and mark activated
+	// packages accordingly.
+	for (PackageSet::iterator it = packagesToActivate.begin();
+		it != packagesToActivate.end(); ++it) {
+		(*it)->SetActive(true);
+		fChangeCount++;
+	}
+
+	for (PackageSet::iterator it = fPackagesToBeDeactivated.begin();
+		it != fPackagesToBeDeactivated.end(); ++it) {
+		Package* package = *it;
+		_RemovePackage(package);
+		delete package;
+	}
 }

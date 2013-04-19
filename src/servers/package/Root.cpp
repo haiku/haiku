@@ -17,7 +17,12 @@
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
 
+#include <package/DaemonDefs.h>
+
 #include "DebugSupport.h"
+
+
+using namespace BPackageKit::BPrivate;
 
 
 // #pragma mark - VolumeJob
@@ -42,11 +47,11 @@ private:
 };
 
 
-// #pragma mark - HandleGetLocationInfoRequestJob
+// #pragma mark - RequestJob
 
 
-struct Root::HandleGetLocationInfoRequestJob : public Job {
-	HandleGetLocationInfoRequestJob(Root* root, BMessage* message)
+struct Root::RequestJob : public Job {
+	RequestJob(Root* root, BMessage* message)
 		:
 		fRoot(root),
 		fMessage(message)
@@ -55,7 +60,7 @@ struct Root::HandleGetLocationInfoRequestJob : public Job {
 
 	virtual void Do()
 	{
-		fRoot->_HandleGetLocationInfoRequest(fMessage.Get());
+		fRoot->_HandleRequest(fMessage.Get());
 	}
 
 private:
@@ -209,10 +214,9 @@ Root::FindVolume(dev_t deviceID) const
 
 
 void
-Root::HandleGetLocationInfoRequest(BMessage* message)
+Root::HandleRequest(BMessage* message)
 {
-	HandleGetLocationInfoRequestJob* job
-		= new(std::nothrow) HandleGetLocationInfoRequestJob(this, message);
+	RequestJob* job = new(std::nothrow) RequestJob(this, message);
 	if (job == NULL) {
 		delete message;
 		return;
@@ -247,6 +251,22 @@ Root::_GetVolume(PackageFSMountType mountType)
 		case PACKAGE_FS_MOUNT_TYPE_HOME:
 			return &fHomeVolume;
 		case PACKAGE_FS_MOUNT_TYPE_CUSTOM:
+		default:
+			return NULL;
+	}
+}
+
+
+Volume*
+Root::_GetVolume(BPackageInstallationLocation location)
+{
+	switch ((BPackageInstallationLocation)location) {
+		case B_PACKAGE_INSTALLATION_LOCATION_SYSTEM:
+			return fSystemVolume;
+		case B_PACKAGE_INSTALLATION_LOCATION_COMMON:
+			return fCommonVolume;
+		case B_PACKAGE_INSTALLATION_LOCATION_HOME:
+			return fHomeVolume;
 		default:
 			return NULL;
 	}
@@ -314,7 +334,7 @@ Root::_ProcessNodeMonitorEvents(Volume* volume)
 
 
 void
-Root::_HandleGetLocationInfoRequest(BMessage* message)
+Root::_HandleRequest(BMessage* message)
 {
 	int32 location;
 	if (message->FindInt32("location", &location) != B_OK
@@ -325,23 +345,19 @@ Root::_HandleGetLocationInfoRequest(BMessage* message)
 
 	// get the volume and let it handle the message
 	AutoLocker<BLocker> locker(fLock);
-	Volume* volume;
-	switch ((BPackageInstallationLocation)location) {
-		case B_PACKAGE_INSTALLATION_LOCATION_SYSTEM:
-			volume = fSystemVolume;
-			break;
-		case B_PACKAGE_INSTALLATION_LOCATION_COMMON:
-			volume = fCommonVolume;
-			break;
-		case B_PACKAGE_INSTALLATION_LOCATION_HOME:
-			volume = fHomeVolume;
-			break;
-		default:
-			return;
-	}
+	Volume* volume = _GetVolume((BPackageInstallationLocation)location);
+	locker.Unlock();
 
-	if (volume != NULL)
-		volume->HandleGetLocationInfoRequest(message);
+	if (volume != NULL) {
+		switch (message->what) {
+			case B_MESSAGE_GET_INSTALLATION_LOCATION_INFO:
+				volume->HandleGetLocationInfoRequest(message);
+				break;
+			case B_MESSAGE_COMMIT_TRANSACTION:
+				volume->HandleCommitTransactionRequest(message);
+				break;
+		}
+	}
 }
 
 

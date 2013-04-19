@@ -25,7 +25,9 @@ Package::Package()
 	fInfo(),
 	fActive(false),
 	fFileNameHashTableNext(NULL),
-	fNodeRefHashTableNext(NULL)
+	fNodeRefHashTableNext(NULL),
+	fIgnoreEntryCreated(0),
+	fIgnoreEntryRemoved(0)
 {
 }
 

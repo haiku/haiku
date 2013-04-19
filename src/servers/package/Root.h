@@ -13,6 +13,7 @@
 #include <Node.h>
 #include <ObjectList.h>
 #include <OS.h>
+#include <package/PackageDefs.h>
 #include <String.h>
 
 #include <Referenceable.h>
@@ -41,7 +42,7 @@ public:
 
 			Volume*				FindVolume(dev_t deviceID) const;
 
-			void				HandleGetLocationInfoRequest(BMessage* message);
+			void				HandleRequest(BMessage* message);
 
 private:
 	// Volume::Listener
@@ -52,19 +53,20 @@ protected:
 
 private:
 			struct VolumeJob;
-			struct HandleGetLocationInfoRequestJob;
+			struct RequestJob;
 
-			friend struct HandleGetLocationInfoRequestJob;
+			friend struct RequestJob;
 
 private:
 			Volume**			_GetVolume(PackageFSMountType mountType);
+			Volume*				_GetVolume(
+									BPackageInstallationLocation location);
 			Volume*				_NextVolumeFor(Volume* volume);
 
 			void				_InitPackages(Volume* volume);
 			void				_DeleteVolume(Volume* volume);
 			void				_ProcessNodeMonitorEvents(Volume* volume);
-			void				_HandleGetLocationInfoRequest(
-									BMessage* message);
+			void				_HandleRequest(BMessage* message);
 
 			status_t			_QueueJob(Job* job);
 

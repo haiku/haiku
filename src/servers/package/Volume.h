@@ -50,6 +50,8 @@ public:
 			void				InitialVerify(Volume* nextVolume,
 									Volume* nextNextVolume);
 			void				HandleGetLocationInfoRequest(BMessage* message);
+			void				HandleCommitTransactionRequest(
+									BMessage* message);
 
 			void				Unmounted();
 
@@ -88,8 +90,13 @@ public:
 
 private:
 			struct NodeMonitorEvent;
-			typedef DoublyLinkedList<NodeMonitorEvent> NodeMonitorEventList;
+			struct RelativePath;
+			struct Exception;
+			struct CommitTransactionHandler;
 
+			friend struct CommitTransactionHandler;
+
+			typedef DoublyLinkedList<NodeMonitorEvent> NodeMonitorEventList;
 			typedef std::set<Package*> PackageSet;
 
 private:
@@ -117,11 +124,34 @@ private:
 									BSolverRepository& repository,
 							 		bool activeOnly, bool installed);
 
-			status_t			_OpenPackagesFile(const char* subDirectoryPath,
+			status_t			_OpenPackagesFile(
+									const RelativePath& subDirectoryPath,
 									const char* fileName, uint32 openMode,
 									BFile& _file, BEntry* _entry = NULL);
-			status_t			_OpenPackagesSubDirectory(const char* path,
-									bool create, BDirectory& _directory);
+			status_t			_OpenPackagesSubDirectory(
+									const RelativePath& path, bool create,
+									BDirectory& _directory);
+
+			status_t			_CreateActivationFileContent(
+									const PackageSet& toActivate,
+									const PackageSet& toDeactivate,
+									BString& _content);
+			status_t			_WriteActivationFile(
+									const RelativePath& directoryPath,
+									const char* fileName,
+									const PackageSet& toActivate,
+									const PackageSet& toDeactivate,
+									BEntry& _entry);
+
+			status_t			_WriteTextFile(
+									const RelativePath& directoryPath,
+									const char* fileName,
+									const BString& content, BEntry& _entry);
+
+			void				_ChangePackageActivation(
+									const PackageSet& packagesToActivate,
+									const PackageSet& packagesToDeactivate);
+									// throws Exception
 
 private:
 			BString				fPath;

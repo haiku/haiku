@@ -86,11 +86,10 @@ PackageDaemon::MessageReceived(BMessage* message)
 		}
 
 		case B_MESSAGE_GET_INSTALLATION_LOCATION_INFO:
+		case B_MESSAGE_COMMIT_TRANSACTION:
 		{
-			if (fSystemRoot == NULL)
-				break;
-
-			fSystemRoot->HandleGetLocationInfoRequest(DetachCurrentMessage());
+			if (fSystemRoot != NULL)
+				fSystemRoot->HandleRequest(DetachCurrentMessage());
 			break;
 		}
 

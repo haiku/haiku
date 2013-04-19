@@ -12,11 +12,14 @@
 #include <package/InstallationLocationInfo.h>
 #include <package/PackageInfo.h>
 
-#include <package/DaemonDefs.h>
+#include <package/ActivationTransaction.h>
 
 
 namespace BPackageKit {
 namespace BPrivate {
+
+
+// #pragma mark - BCommitTransactionResult
 
 
 BDaemonClient::BDaemonClient()
@@ -88,6 +91,19 @@ BDaemonClient::GetInstallationLocationInfo(
 
 
 status_t
+BDaemonClient::CommitTransaction(const BActivationTransaction& transaction,
+	BCommitTransactionResult& _result)
+{
+	status_t error = _CommitTransaction(transaction, _result);
+		// B_OK just indicates that _result has been initialized.
+	if (error != B_OK)
+		_result.SetTo(error, BString(), BString(), BString());
+
+	return _result.Error();
+}
+
+
+status_t
 BDaemonClient::_InitMessenger()
 {
 	if (fDaemonMessenger.IsValid())
@@ -130,6 +146,137 @@ BDaemonClient::_ExtractPackageInfoSet(const BMessage& message,
 	}
 
 	return B_OK;
+}
+
+
+status_t
+BDaemonClient::_CommitTransaction(const BActivationTransaction& transaction,
+	BCommitTransactionResult& _result)
+{
+	if (transaction.InitCheck() != B_OK)
+		return B_BAD_VALUE;
+
+	status_t error = _InitMessenger();
+	if (error != B_OK)
+		return error;
+
+	// send the request
+	BMessage request(B_MESSAGE_COMMIT_TRANSACTION);
+	if ((error = request.AddInt32("location", transaction.Location())) != B_OK
+		|| (error = request.AddInt64("change count",
+			transaction.ChangeCount())) != B_OK
+		|| (error = request.AddString("transaction",
+			transaction.TransactionDirectoryName())) != B_OK
+		|| (error = request.AddStrings("activate",
+			transaction.PackagesToActivate())) != B_OK
+		|| (error = request.AddStrings("deactivate",
+			transaction.PackagesToDeactivate())) != B_OK) {
+		return error;
+	}
+
+	BMessage reply;
+	fDaemonMessenger.SendMessage(&request, &reply);
+	if (reply.what != B_MESSAGE_COMMIT_TRANSACTION_REPLY)
+		return B_ERROR;
+
+	// extract the result
+	int32 requestError;
+	error = reply.FindInt32("error", &requestError);
+	if (error != B_OK)
+		return error;
+
+	BString errorMessage;
+	BString errorPackage;
+	BString oldStateDirectory;
+	if (requestError == 0) {
+		error = reply.FindString("old state", &oldStateDirectory);
+		if (error != B_OK)
+			return error;
+	} else {
+		reply.FindString("error message", &errorMessage);
+		reply.FindString("error package", &errorPackage);
+	}
+
+	_result.SetTo(requestError, errorMessage, errorPackage, oldStateDirectory);
+	return B_OK;
+		// Even on error. B_OK just indicates that we have initialized _result.
+}
+
+
+// #pragma mark - BCommitTransactionResult
+
+
+BDaemonClient::BCommitTransactionResult::BCommitTransactionResult()
+	:
+	fError(B_NO_INIT),
+	fErrorMessage(),
+	fErrorPackage(),
+	fOldStateDirectory()
+{
+}
+
+
+BDaemonClient::BCommitTransactionResult::BCommitTransactionResult(int32 error,
+	const BString& errorMessage, const BString& errorPackage,
+	const BString& oldStateDirectory)
+	:
+	fError(error),
+	fErrorMessage(errorMessage),
+	fErrorPackage(errorPackage),
+	fOldStateDirectory(oldStateDirectory)
+{
+}
+
+
+BDaemonClient::BCommitTransactionResult::~BCommitTransactionResult()
+{
+}
+
+
+void
+BDaemonClient::BCommitTransactionResult::SetTo(int32 error,
+	const BString& errorMessage, const BString& errorPackage,
+	const BString& oldStateDirectory)
+{
+	fError = error;
+	fErrorMessage = errorMessage;
+	fErrorPackage = errorPackage;
+	fOldStateDirectory = oldStateDirectory;
+}
+
+
+status_t
+BDaemonClient::BCommitTransactionResult::Error() const
+{
+	return fError <= 0 ? fError : B_ERROR;
+}
+
+
+BDaemonError
+BDaemonClient::BCommitTransactionResult::DaemonError() const
+{
+	return fError > 0 ? (BDaemonError)fError : B_DAEMON_OK;
+}
+
+
+const BString&
+BDaemonClient::BCommitTransactionResult::ErrorMessage() const
+{
+	return fErrorMessage;
+}
+
+
+const BString&
+BDaemonClient::BCommitTransactionResult::ErrorPackage() const
+{
+	return fErrorPackage;
+}
+
+
+const BString&
+BDaemonClient::BCommitTransactionResult::OldStateDirectory() const
+{
+	return fOldStateDirectory;
 }
 
 
