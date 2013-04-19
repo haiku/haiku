@@ -46,15 +46,19 @@ RetrieveMemoryBlockJob::Do()
 {
 	ssize_t result = fTeamMemory->ReadMemory(fMemoryBlock->BaseAddress(),
 		fMemoryBlock->Data(), fMemoryBlock->Size());
-	if (result < 0)
+	if (result < 0) {
+		fMemoryBlock->NotifyDataRetrieved(result);
 		return result;
+	}
 
 	uint32 protection = 0;
 	uint32 locking = 0;
 	status_t error = get_memory_properties(fTeam->ID(),
 		(const void *)fMemoryBlock->BaseAddress(), &protection, &locking);
-	if (error != B_OK)
+	if (error != B_OK) {
+		fMemoryBlock->NotifyDataRetrieved(error);
 		return error;
+	}
 
 	fMemoryBlock->SetWritable((protection & B_WRITE_AREA) != 0);
 	fMemoryBlock->MarkValid();
