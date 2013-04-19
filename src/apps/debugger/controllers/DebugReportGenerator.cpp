@@ -50,6 +50,7 @@ DebugReportGenerator::DebugReportGenerator(::Team* team,
 	fListener(listener),
 	fWaitingNode(NULL),
 	fCurrentBlock(NULL),
+	fBlockRetrievalStatus(B_OK),
 	fTraceWaitingThread(NULL)
 {
 	fTeam->AddListener(this);
@@ -185,6 +186,24 @@ DebugReportGenerator::MemoryBlockRetrieved(TeamMemoryBlock* block)
 		fCurrentBlock->ReleaseReference();
 		fCurrentBlock = NULL;
 	}
+
+	fBlockRetrievalStatus = B_OK;
+
+	fCurrentBlock = block;
+	release_sem(fTeamDataSem);
+}
+
+
+void
+DebugReportGenerator::MemoryBlockRetrievalFailed(TeamMemoryBlock* block,
+	status_t result)
+{
+	if (fCurrentBlock != NULL) {
+		fCurrentBlock->ReleaseReference();
+		fCurrentBlock = NULL;
+	}
+
+	fBlockRetrievalStatus = result;
 
 	fCurrentBlock = block;
 	release_sem(fTeamDataSem);
@@ -484,8 +503,16 @@ DebugReportGenerator::_DumpStackFrameMemory(BString& _output,
 	}
 
 	_output << "\t\t\tFrame memory:\n";
-	UiUtils::DumpMemory(_output, 3, fCurrentBlock, startAddress, 1, 16,
-		endAddress - startAddress);
+	if (fBlockRetrievalStatus == B_OK) {
+		UiUtils::DumpMemory(_output, 3, fCurrentBlock, startAddress, 1, 16,
+			endAddress - startAddress);
+	} else {
+		BString data;
+		data.SetToFormat("\t\t\tUnavailable (%s)\n", strerror(
+				fBlockRetrievalStatus));
+		_output += data;
+	}
+
 }
 
 

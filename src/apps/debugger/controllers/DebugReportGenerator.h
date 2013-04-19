@@ -50,6 +50,8 @@ private:
 
 	// TeamMemoryBlock::Listener
 	virtual	void				MemoryBlockRetrieved(TeamMemoryBlock* block);
+	virtual	void				MemoryBlockRetrievalFailed(
+									TeamMemoryBlock* block, status_t result);
 
 	// ValueNodeContainer::Listener
 	virtual	void				ValueNodeValueChanged(ValueNode* node);
@@ -81,6 +83,7 @@ private:
 			UserInterfaceListener* fListener;
 			ValueNode*			fWaitingNode;
 			TeamMemoryBlock*	fCurrentBlock;
+			status_t			fBlockRetrievalStatus;
 			::Thread*			fTraceWaitingThread;
 };
 
