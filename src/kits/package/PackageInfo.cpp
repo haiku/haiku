@@ -942,11 +942,23 @@ BPackageInfo::Parser::_IsValidResolvableName(const char* string,
 	int32* _errorPos)
 {
 	for (const char* c = string; *c != '\0'; c++) {
-		if (*c == '-' || *c == '/' || isspace(*c)) {
-			if (_errorPos != NULL)
-				*_errorPos = c - string;
-			return false;
+		switch (*c) {
+			case '-':
+			case '/':
+			case '<':
+			case '>':
+			case '=':
+			case '!':
+				break;
+			default:
+				if (!isspace(*c))
+					continue;
+				break;
 		}
+
+		if (_errorPos != NULL)
+			*_errorPos = c - string;
+		return false;
 	}
 	return true;
 }
