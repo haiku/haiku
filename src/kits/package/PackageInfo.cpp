@@ -1867,11 +1867,11 @@ BPackageInfo::Archive(BMessage* archive, bool deep) const
 		|| (error = archive->AddUInt32("flags", fFlags)) != B_OK
 		|| (error = archive->AddInt32("architecture", fArchitecture)) != B_OK
 		|| (error = _AddVersion(archive, "version", fVersion)) != B_OK
-		|| (error = _AddStringList(archive, "copyrights", fCopyrightList))
+		|| (error = archive->AddStrings("copyrights", fCopyrightList))
 			!= B_OK
-		|| (error = _AddStringList(archive, "licenses", fLicenseList)) != B_OK
-		|| (error = _AddStringList(archive, "urls", fURLList)) != B_OK
-		|| (error = _AddStringList(archive, "source-urls", fSourceURLList))
+		|| (error = archive->AddStrings("licenses", fLicenseList)) != B_OK
+		|| (error = archive->AddStrings("urls", fURLList)) != B_OK
+		|| (error = archive->AddStrings("source-urls", fSourceURLList))
 			!= B_OK
 		|| (error = _AddResolvables(archive, "provides", fProvidesList)) != B_OK
 		|| (error = _AddResolvableExpressions(archive, "requires",
@@ -1882,7 +1882,7 @@ BPackageInfo::Archive(BMessage* archive, bool deep) const
 			fConflictsList)) != B_OK
 		|| (error = _AddResolvableExpressions(archive, "freshens",
 			fFreshensList)) != B_OK
-		|| (error = _AddStringList(archive, "replaces", fReplacesList)) != B_OK
+		|| (error = archive->AddStrings("replaces", fReplacesList)) != B_OK
 		|| (error = archive->AddString("checksum", fChecksum)) != B_OK
 		|| (error = archive->AddString("install-path", fInstallPath)) != B_OK) {
 		return error;
@@ -2007,21 +2007,6 @@ BPackageInfo::_AddVersion(BMessage* archive, const char* field,
 		return B_BAD_VALUE;
 
 	return archive->AddUInt32(fieldName, version.Revision());
-}
-
-
-/*static*/ status_t
-BPackageInfo::_AddStringList(BMessage* archive, const char* field,
-	const BStringList& list)
-{
-	int32 count = list.CountStrings();
-	for (int32 i = 0; i < count; i++) {
-		status_t error = archive->AddString(field, list.StringAt(i));
-		if (error != B_OK)
-			return error;
-	}
-
-	return B_OK;
 }
 
 
@@ -2152,26 +2137,9 @@ BPackageInfo::_ExtractVersion(BMessage* archive, const char* field, int32 index,
 BPackageInfo::_ExtractStringList(BMessage* archive, const char* field,
 	BStringList& _list)
 {
-	// get the number of items
-	type_code type;
-	int32 count;
-	if (archive->GetInfo(field, &type, &count) != B_OK) {
-		// the field is missing
-		return B_OK;
-	}
-	if (type != B_STRING_TYPE)
-		return B_BAD_DATA;
-
-	for (int32 i = 0; i < count; i++) {
-		BString string;
-		status_t error = archive->FindString(field, i, &string);
-		if (error != B_OK)
-			return error;
-		if (!_list.Add(string))
-			return B_NO_MEMORY;
-	}
-
-	return B_OK;
+	status_t error = archive->FindStrings(field, &_list);
+	return error == B_NAME_NOT_FOUND ? B_OK : error;
+		// If the field doesn't exist, that's OK.
 }
 
 

@@ -174,8 +174,6 @@ private:
 	static	status_t			_AddVersion(BMessage* archive,
 									const char* field,
 									const BPackageVersion& version);
-	static	status_t			_AddStringList(BMessage* archive,
-									const char* field, const BStringList& list);
 	static	status_t			_AddResolvables(BMessage* archive,
 									const char* field,
 									const ResolvableList& resolvables);
