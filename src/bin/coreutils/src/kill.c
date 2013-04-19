@@ -210,7 +210,7 @@ list_signals (bool table, char *const *argv)
  *		The converted number is returned in NUM if it is not NULL
  *
  *	false:  on invalid number
- *	
+ *
  */
 bool is_number(const char *str, intmax_t *_number)
 {
@@ -251,6 +251,7 @@ int kill_by_name(int signum, const char *name)
 	team_info teamInfo;
 	uint32    cookie = 0;
 	int       status = EXIT_SUCCESS;
+	int       found = 0;
 
 	while (get_next_team_info(&cookie, &teamInfo) >= B_OK) {
 		char *token, *args;
@@ -266,6 +267,7 @@ int kill_by_name(int signum, const char *name)
 		token = basename(args);
 
 		if (!strncmp(name, token, strlen(token))) {
+			found = 1;
 			/* name matched */
 			if (kill((pid_t)teamInfo.team, signum) != 0) {
 				error (0, errno, "%s", name);
@@ -273,6 +275,10 @@ int kill_by_name(int signum, const char *name)
 			}
 		}
 	}
+
+	if (!found)
+		error (0, errno, "%s", name);
+
 	return status;
 }
 
@@ -294,14 +300,10 @@ send_signals (int signum, char *const *argv)
 				error (0, errno, "%s", arg);
 				status = EXIT_FAILURE;
 			}
-			continue;
-		}
-
-		/* not a valid pid, kill by process name */
-		if (kill_by_name(signum, arg) != EXIT_SUCCESS)
+		} else if (kill_by_name(signum, arg) != EXIT_SUCCESS)
 			status = EXIT_FAILURE;
 
-	} while ((arg = *argv++));
+	} while ((arg = *++argv));
 
 	return status;
 }
