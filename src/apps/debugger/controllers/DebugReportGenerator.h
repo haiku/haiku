@@ -74,6 +74,9 @@ private:
 			status_t			_ResolveValueIfNeeded(ValueNode* node,
 									StackFrame* frame, int32 maxDepth);
 
+			void				_HandleMemoryBlockRetrieved(
+									TeamMemoryBlock* block, status_t result);
+
 private:
 			::Team*				fTeam;
 			Architecture*		fArchitecture;

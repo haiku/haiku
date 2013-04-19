@@ -182,15 +182,7 @@ DebugReportGenerator::ThreadStackTraceChanged(const ::Team::ThreadEvent& event)
 void
 DebugReportGenerator::MemoryBlockRetrieved(TeamMemoryBlock* block)
 {
-	if (fCurrentBlock != NULL) {
-		fCurrentBlock->ReleaseReference();
-		fCurrentBlock = NULL;
-	}
-
-	fBlockRetrievalStatus = B_OK;
-
-	fCurrentBlock = block;
-	release_sem(fTeamDataSem);
+	_HandleMemoryBlockRetrieved(block, B_OK);
 }
 
 
@@ -198,15 +190,7 @@ void
 DebugReportGenerator::MemoryBlockRetrievalFailed(TeamMemoryBlock* block,
 	status_t result)
 {
-	if (fCurrentBlock != NULL) {
-		fCurrentBlock->ReleaseReference();
-		fCurrentBlock = NULL;
-	}
-
-	fBlockRetrievalStatus = result;
-
-	fCurrentBlock = block;
-	release_sem(fTeamDataSem);
+	_HandleMemoryBlockRetrieved(block, result);
 }
 
 
@@ -553,4 +537,20 @@ DebugReportGenerator::_ResolveValueIfNeeded(ValueNode* node, StackFrame* frame,
 	}
 
 	return result;
+}
+
+
+void
+DebugReportGenerator::_HandleMemoryBlockRetrieved(TeamMemoryBlock* block,
+	status_t result)
+{
+	if (fCurrentBlock != NULL) {
+		fCurrentBlock->ReleaseReference();
+		fCurrentBlock = NULL;
+	}
+
+	fBlockRetrievalStatus = result;
+
+	fCurrentBlock = block;
+	release_sem(fTeamDataSem);
 }
