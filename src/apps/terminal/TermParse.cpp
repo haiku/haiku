@@ -37,7 +37,6 @@
 
 
 extern int gUTF8GroundTable[];		/* UTF8 Ground table */
-extern int gCS96GroundTable[];		/* CS96 Ground table */
 extern int gISO8859GroundTable[];	/* ISO8859 & EUC Ground table */
 extern int gWinCPGroundTable[];		/* Windows cp1252, cp1251, koi-8r */
 extern int gSJISGroundTable[];		/* Shift-JIS Ground table */
@@ -49,7 +48,6 @@ extern int gScrTable[];				/* ESC # */
 extern int gIgnoreTable[];			/* ignore table */
 extern int gIesTable[];				/* ignore ESC table */
 extern int gEscIgnoreTable[];		/* ESC ignore table */
-extern int gMbcsTable[];			/* ESC $ */
 
 extern const char* gLineDrawGraphSet[]; /* may be used for G0, G1, G2, G3 */
 
@@ -290,7 +288,6 @@ TermParse::DumpState(int *groundtable, int *parsestate, uchar c)
 #define T(t) \
 	{ t, #t }
 		T(gUTF8GroundTable),
-		T(gCS96GroundTable),
 		T(gISO8859GroundTable),
 		T(gWinCPGroundTable),
 		T(gSJISGroundTable),
@@ -301,7 +298,6 @@ TermParse::DumpState(int *groundtable, int *parsestate, uchar c)
 		T(gIgnoreTable),
 		T(gIesTable),
 		T(gEscIgnoreTable),
-		T(gMbcsTable),
 		{ NULL, NULL }
 	};
 	int i;
@@ -339,7 +335,6 @@ TermParse::_GuessGroundTable(int encoding)
 		case B_EUC_CONVERSION:
 		case B_EUC_KR_CONVERSION:
 		case B_JIS_CONVERSION:
-		case B_GBK_CONVERSION:
 		case B_BIG5_CONVERSION:
 			return gISO8859GroundTable;
 
@@ -348,6 +343,7 @@ TermParse::_GuessGroundTable(int encoding)
 		case B_MS_WINDOWS_CONVERSION:
 		case B_MAC_ROMAN_CONVERSION:
 		case B_MS_DOS_866_CONVERSION:
+		case B_GBK_CONVERSION:
 		case B_MS_DOS_CONVERSION:
 			return gWinCPGroundTable;
 
@@ -368,12 +364,9 @@ TermParse::EscParse()
 {
 	int top;
 	int bottom;
-//	int cs96 = 0;
-	uchar curess = 0;
 
 	char cbuf[4] = { 0 };
 	char dstbuf[4] = { 0 };
-	char *ptr;
 
 	int currentEncoding = -1;
 
@@ -392,11 +385,6 @@ TermParse::EscParse()
 	int curGL = 0;
 	int curGR = 0;
 
-	int32 srcLen = sizeof(cbuf);
-	int32 dstLen = sizeof(dstbuf);
-	int32 dummyState = 0;
-
-	int width = 1;
 	BAutolock locker(fBuffer);
 
 	while (!fQuitting) {
@@ -413,6 +401,9 @@ TermParse::EscParse()
 			}
 
 	//debug_printf("TermParse: char: '%c' (%d), parse state: %d\n", c, c, parsestate[c]);
+			int32 srcLen = 0;
+			int32 dstLen = sizeof(dstbuf);
+			int32 dummyState = 0;
 
 			switch (parsestate[c]) {
 				case CASE_PRINT:
@@ -431,70 +422,48 @@ TermParse::EscParse()
 					break;
 				}
 				case CASE_PRINT_GR:
+				{
 					/* case iso8859 gr character, or euc */
-					ptr = cbuf;
-					if (currentEncoding == B_EUC_CONVERSION
-							|| currentEncoding == B_EUC_KR_CONVERSION
-							|| currentEncoding == B_JIS_CONVERSION
-							|| currentEncoding == B_GBK_CONVERSION
-							|| currentEncoding == B_BIG5_CONVERSION) {
-						switch (parsestate[curess]) {
-							case CASE_SS2:		/* JIS X 0201 */
-								width = 1;
-								*ptr++ = curess;
-								*ptr++ = c;
-								*ptr = 0;
-								curess = 0;
-								break;
+					switch (currentEncoding) {
+						case B_EUC_CONVERSION:
+						case B_EUC_KR_CONVERSION:
+						case B_JIS_CONVERSION:
+						case B_BIG5_CONVERSION:
+							cbuf[srcLen++] = c;
+							c = _NextParseChar();
+							cbuf[srcLen++] = c;
+							break;
 
-							case CASE_SS3:		/* JIS X 0212 */
-								width = 1;
-								*ptr++ = curess;
-								*ptr++ = c;
+						case B_GBK_CONVERSION:
+							cbuf[srcLen++] = c;
+							do {
+								// GBK-compatible codepoints are 2-bytes long
 								c = _NextParseChar();
-								*ptr++ = c;
-								*ptr = 0;
-								curess = 0;
-								break;
+								cbuf[srcLen++] = c;
 
-							default:		/* JIS X 0208 */
-								width = 2;
-								*ptr++ = c;
-								c = _NextParseChar();
-								*ptr++ = c;
-								*ptr = 0;
-								break;
-						}
-					} else {
-						/* ISO-8859-1...10 and MacRoman */
-						*ptr++ = c;
-						*ptr = 0;
+								// GB18030 extends GBK with 4-byte codepoints
+								// using 2nd byte from range 0x30...0x39
+								if (srcLen == 2 && (c < 0x30 || c > 0x39))
+									break;
+							} while (srcLen < 4);
+							break;
+
+						default: // ISO-8859-1...10 and MacRoman
+							cbuf[srcLen++] = c;
+							break;
 					}
 
-					srcLen = strlen(cbuf);
-					dstLen = sizeof(dstbuf);
-					if (currentEncoding != B_JIS_CONVERSION) {
-						convert_to_utf8(currentEncoding, cbuf, &srcLen,
+					if (srcLen > 0) {
+						int encoding = currentEncoding == B_JIS_CONVERSION
+							? B_EUC_CONVERSION : currentEncoding;
+
+						convert_to_utf8(encoding, cbuf, &srcLen,
 								dstbuf, &dstLen, &dummyState, '?');
-					} else {
-						convert_to_utf8(B_EUC_CONVERSION, cbuf, &srcLen,
-								dstbuf, &dstLen, &dummyState, '?');
+
+						fBuffer->InsertChar(UTF8Char(dstbuf, dstLen));
 					}
-
-					fBuffer->InsertChar(UTF8Char(dstbuf, dstLen));
 					break;
-
-				case CASE_PRINT_CS96:
-					cbuf[0] = c | 0x80;
-					c = _NextParseChar();
-					cbuf[1] = c | 0x80;
-					cbuf[2] = 0;
-					srcLen = 2;
-					dstLen = sizeof(dstbuf);
-					convert_to_utf8(B_EUC_CONVERSION, cbuf, &srcLen,
-							dstbuf, &dstLen, &dummyState, '?');
-					fBuffer->InsertChar(UTF8Char(dstbuf, dstLen));
-					break;
+				}
 
 				case CASE_LF:
 					fBuffer->InsertLF();
@@ -505,62 +474,47 @@ TermParse::EscParse()
 					break;
 
 				case CASE_SJIS_KANA:
-					cbuf[0] = c;
-					cbuf[1] = '\0';
-					srcLen = 1;
-					dstLen = sizeof(dstbuf);
+					cbuf[srcLen++] = c;
 					convert_to_utf8(currentEncoding, cbuf, &srcLen,
 							dstbuf, &dstLen, &dummyState, '?');
 					fBuffer->InsertChar(UTF8Char(dstbuf, dstLen));
 					break;
 
 				case CASE_SJIS_INSTRING:
-					cbuf[0] = c;
+					cbuf[srcLen++] = c;
 					c = _NextParseChar();
-					cbuf[1] = c;
-					cbuf[2] = '\0';
-					srcLen = 2;
-					dstLen = sizeof(dstbuf);
+					cbuf[srcLen++] = c;
+
 					convert_to_utf8(currentEncoding, cbuf, &srcLen,
 							dstbuf, &dstLen, &dummyState, '?');
 					fBuffer->InsertChar(UTF8Char(dstbuf, dstLen));
 					break;
 
 				case CASE_UTF8_2BYTE:
-					cbuf[0] = c;
+					cbuf[srcLen++] = c;
 					c = _NextParseChar();
 					if (groundtable[c] != CASE_UTF8_INSTRING)
 						break;
-					cbuf[1] = c;
-					cbuf[2] = '\0';
+					cbuf[srcLen++] = c;
 
-					fBuffer->InsertChar(UTF8Char(cbuf, 2));
+					fBuffer->InsertChar(UTF8Char(cbuf, srcLen));
 					break;
 
 				case CASE_UTF8_3BYTE:
-					cbuf[0] = c;
-					c = _NextParseChar();
-					if (groundtable[c] != CASE_UTF8_INSTRING)
-						break;
-					cbuf[1] = c;
+					cbuf[srcLen++] = c;
 
-					c = _NextParseChar();
-					if (groundtable[c] != CASE_UTF8_INSTRING)
-						break;
-					cbuf[2] = c;
-					cbuf[3] = '\0';
-					fBuffer->InsertChar(UTF8Char(cbuf, 3));
-					break;
+					do {
+						c = _NextParseChar();
+						if (groundtable[c] != CASE_UTF8_INSTRING) {
+							srcLen = 0;
+							break;
+						}
+						cbuf[srcLen++] = c;
 
-				case CASE_MBCS:
-					/* ESC $ */
-					parsestate = gMbcsTable;
-					break;
+					} while (srcLen != 3);
 
-				case CASE_GSETS:
-					/* ESC $ ? */
-					parsestate = gCS96GroundTable;
-					//		cs96 = 1;
+					if (srcLen > 0)
+						fBuffer->InsertChar(UTF8Char(cbuf, srcLen));
 					break;
 
 				case CASE_SCS_STATE:
@@ -1073,13 +1027,11 @@ TermParse::EscParse()
 
 				case CASE_SS2:
 					/* SS2 */
-					curess = c;
 					parsestate = groundtable;
 					break;
 
 				case CASE_SS3:
 					/* SS3 */
-					curess = c;
 					parsestate = groundtable;
 					break;
 
