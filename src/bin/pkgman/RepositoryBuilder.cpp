@@ -91,7 +91,7 @@ RepositoryBuilder::AddPackage(const char* path, BSolverPackage** _package)
 	}
 
 	if (error != B_OK)
-		DIE(errno, "failed to read package info from \"%s\"", path);
+		DIE(error, "failed to read package info from \"%s\"", path);
 
 	// add the package
 	BSolverPackage* package;
