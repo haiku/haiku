@@ -802,7 +802,7 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 				_ParseStringValue(&name, &namePos);
 
 				int32 errorPos;
-				if (!_IsAlphaNumUnderscore(name, ".", &errorPos)) {
+				if (!_IsValidResolvableName(name, &errorPos)) {
 					throw ParseError("invalid character in package name",
 						namePos + errorPos);
 				}
@@ -941,21 +941,14 @@ BPackageInfo::Parser::_IsAlphaNumUnderscore(const char* start, const char* end,
 BPackageInfo::Parser::_IsValidResolvableName(const char* string,
 	int32* _errorPos)
 {
-	int32 errorPos;
-	if (const char* colon = strchr(string, ':')) {
-		if (_IsAlphaNumUnderscore(string, colon, ".", &errorPos)) {
-			if (_IsAlphaNumUnderscore(colon + 1, ".", &errorPos))
-				return true;
-			errorPos += colon + 1 - string;
+	for (const char* c = string; *c != '\0'; c++) {
+		if (*c == '-' || *c == '/' || isspace(*c)) {
+			if (_errorPos != NULL)
+				*_errorPos = c - string;
+			return false;
 		}
-	} else {
-		if (_IsAlphaNumUnderscore(string, ".", &errorPos))
-			return true;
 	}
-
-	if (_errorPos != NULL)
-		*_errorPos = errorPos;
-	return false;
+	return true;
 }
 
 
