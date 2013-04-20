@@ -343,6 +343,8 @@ image_init(void)
 
 	new(&sNotificationService) ImageNotificationService();
 
+	sNotificationService.Register();
+
 #ifdef ADD_DEBUGGER_COMMANDS
 	add_debugger_command("team_images", &dump_images_list, "Dump all registered images from the current team");
 #endif

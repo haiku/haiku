@@ -2771,6 +2771,8 @@ team_init(kernel_args* args)
 
 	new(&sNotificationService) TeamNotificationService();
 
+	sNotificationService.Register();
+
 	return B_OK;
 }
 

@@ -130,22 +130,32 @@ notifications_std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
+		{
 			TRACE("init\n");
 
 			new(&sNotificationService) NetNotificationService();
+			status_t result = sNotificationService.Register();
+			if (result != B_OK)
+				return result;
 
 			register_generic_syscall(NET_NOTIFICATIONS_SYSCALLS,
 				net_notifications_control, 1, 0);
 			return B_OK;
-
+		}
 		case B_MODULE_UNINIT:
 			TRACE("uninit\n");
 
 			unregister_generic_syscall(NET_NOTIFICATIONS_SYSCALLS, 1);
 
+			// TODO: due to the way the locking in the notification
+			// manager works, there's a potential race condition here
+			// where someone attempts to add a listener right as
+			// we're uninitializing. Needs to be looked at/resolved.
+			sNotificationService.Unregister();
+
 			// we need to release the reference that was acquired
 			// on our behalf by the NotificationManager.
-//			sNotificationService.ReleaseReference();
+			sNotificationService.ReleaseReference();
 			sNotificationService.~NetNotificationService();
 			return B_OK;
 

@@ -2738,6 +2738,8 @@ thread_init(kernel_args *args)
 	// init the notification service
 	new(&sNotificationService) ThreadNotificationService();
 
+	sNotificationService.Register();
+
 	// start the undertaker thread
 	new(&sUndertakerEntries) DoublyLinkedList<UndertakerEntry>();
 	sUndertakerCondition.Init(&sUndertakerEntries, "undertaker entries");

@@ -254,6 +254,8 @@ KDiskDeviceManager::KDiskDeviceManager()
 	if (InitCheck() != B_OK)
 		return;
 
+	fNotifications->Register();
+
 	RescanDiskSystems();
 
 	fMediaChecker = spawn_kernel_thread(_CheckMediaStatusDaemon,
@@ -309,6 +311,8 @@ KDiskDeviceManager::~KDiskDeviceManager()
 		} else
 			delete diskSystem;
 	}
+
+	fNotifications->Unregister();
 
 	// delete the containers
 	delete fPartitions;
