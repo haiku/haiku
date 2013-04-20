@@ -16,6 +16,7 @@ struct UTF8Char {
 
 	UTF8Char()
 	{
+		bytes[0] = 0;
 	}
 
 	UTF8Char(char c)
@@ -64,7 +65,13 @@ struct UTF8Char {
 
 	bool IsFullWidth() const
 	{
-		// TODO: Implement!
+		switch (BUnicodeChar::EastAsianWidth(BUnicodeChar::FromUTF8(bytes))) {
+			case B_UNICODE_EA_FULLWIDTH:
+			case B_UNICODE_EA_WIDE:
+				return true;
+			default:
+				break;
+		}
 		return false;
 	}
 

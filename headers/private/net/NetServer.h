@@ -19,6 +19,7 @@
 #define kMsgRemovePersistentNetwork	'RPnw'
 #define kMsgJoinNetwork				'JNnw'
 #define kMsgLeaveNetwork			'LVnw'
+#define kMsgAutoJoinNetwork			'AJnw'
 
 
 #endif	// _NET_SERVER_H

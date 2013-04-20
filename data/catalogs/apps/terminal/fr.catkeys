@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	766764238
+1	french	x-vnd.Haiku-Terminal	328707356
 Not found.	Terminal TermWindow		Non trouvé.
 Switch Terminals	Terminal TermWindow		Inverser les Terminaux
 Change directory	Terminal TermView		Changer de répertoire
@@ -21,6 +21,7 @@ Font:	Terminal AppearancePrefView		Police :
 Copy here	Terminal TermView		Copier ici
 Really close?	Terminal TermWindow		Êtes-vous sûr de vouloir fermer ?
 Copy	Terminal TermWindow		Copier
+Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 Color scheme:	Terminal AppearancePrefView		Profil de couleurs :
 Window title:	Terminal TermWindow		Titre de la fenêtre :
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Option « %s » non reconnue\n

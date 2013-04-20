@@ -157,9 +157,18 @@ enum AX88772_BBState {
 	LINK_STATE_MDINT	= 0x08
 };
 
+// RX Control Register bits (772B)
+enum ASIX772RXControl {
+	RXCTL_HDR_TYPE_0	= 0x0000,
+	RXCTL_HDR_TYPE_1	= 0x0100,
+	RXCTL_HDR_IPALIGN	= 0x0200,
+	RXCTL_ADD_CHKSUM	= 0x0400,
+};
+
 // EEPROM Map.
 enum AX88772B_EEPROM {
-	EEPROM_772B_NODE_ID	= 0x04
+	EEPROM_772B_NODE_ID	= 0x04,
+	EEPROM_772B_PHY_PWRCFG	= 0x18
 };
 
 enum AX88772B_MFB {
@@ -194,8 +203,8 @@ const uint16 maxFrameSize = 1536;
 
 
 AX88772Device::AX88772Device(usb_device device, DeviceInfo& deviceInfo)
-		:
-		ASIXDevice(device, deviceInfo)
+	:
+	ASIXDevice(device, deviceInfo)
 {
 	fStatus = InitDevice();
 }
@@ -281,12 +290,10 @@ AX88772Device::SetupDevice(bool deviceReplugged)
 
 	size_t actualLength = 0;
 	result = gUSBModule->send_request(fDevice,
-						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-						WRITE_MEDIUM_MODE,
-						MEDIUM_STATE_FD | MEDIUM_STATE_BIT2 |
-						MEDIUM_STATE_RFC| MEDIUM_STATE_TFC	|
-						MEDIUM_STATE_RE | MEDIUM_STATE_PS_100,
-						0, 0, 0, &actualLength);
+		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT, WRITE_MEDIUM_MODE,
+		MEDIUM_STATE_FD | MEDIUM_STATE_BIT2 | MEDIUM_STATE_RFC
+		| MEDIUM_STATE_TFC | MEDIUM_STATE_RE | MEDIUM_STATE_PS_100,
+		0, 0, 0, &actualLength);
 
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of setting medium mode: %#010x\n", result);
@@ -304,8 +311,8 @@ AX88772Device::_SetupAX88772()
 	// enable GPIO2 - magic from FreeBSD's if_axe
 	uint16 GPIOs = GPIO_OO_2EN | GPIO_IO_2 | GPIO_RSE;
 	status_t result = gUSBModule->send_request(fDevice,
-						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-						WRITE_GPIOS, GPIOs, 0, 0, 0, &actualLength);
+		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT, WRITE_GPIOS,
+		GPIOs, 0, 0, 0, &actualLength);
 
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of wrinting GPIOs: %#010x\n", result);
@@ -314,16 +321,16 @@ AX88772Device::_SetupAX88772()
 
 	// select PHY
 	bool useEmbeddedPHY = fMII.PHYID() == PHYIDEmbedded;
-	uint16 selectPHY = useEmbeddedPHY ?
-					SW_PHY_SEL_STATUS_INT : SW_PHY_SEL_STATUS_EXT;
+	uint16 selectPHY = useEmbeddedPHY
+		? SW_PHY_SEL_STATUS_INT : SW_PHY_SEL_STATUS_EXT;
 
 	result = gUSBModule->send_request(fDevice,
-						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-						WRITE_PHY_SEL, selectPHY, 0, 0, 0, &actualLength);
+		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
+		WRITE_PHY_SEL, selectPHY, 0, 0, 0, &actualLength);
 	snooze(10000);
 
 	TRACE("Selecting %s PHY[%#02x].\n",
-						useEmbeddedPHY ? "embedded" : "external", selectPHY);
+		useEmbeddedPHY ? "embedded" : "external", selectPHY);
 
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of selecting PHY:%#010x\n", result);
@@ -353,15 +360,14 @@ AX88772Device::_SetupAX88772()
 
 	for (size_t i = from; i <= to; i++) {
 		result = gUSBModule->send_request(fDevice,
-					USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-					WRITE_SOFT_RESET, resetCommands[i].reset,
-					0, 0, 0, &actualLength);
+			USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT, WRITE_SOFT_RESET,
+			resetCommands[i].reset, 0, 0, 0, &actualLength);
 
 		snooze(resetCommands[i].delay);
 
 		if (result != B_OK) {
 			TRACE_ALWAYS("Error of SW reset command %d:[%#04x]: %#010x\n",
-										i, resetCommands[i].reset, result);
+				i, resetCommands[i].reset, result);
 			return result;
 		}
 	}
@@ -377,19 +383,19 @@ AX88772Device::_WakeupPHY()
 {
 	// select PHY
 	bool useEmbeddedPHY = fMII.PHYID() == PHYIDEmbedded;
-	uint16 selectPHY = useEmbeddedPHY ?
-					SW_PHY_SEL_STATUS_INT : SW_PHY_SEL_STATUS_EXT;
+	uint16 selectPHY = useEmbeddedPHY
+		? SW_PHY_SEL_STATUS_INT : SW_PHY_SEL_STATUS_EXT;
 
 	selectPHY |= SW_PHY_SEL_STATUS_SS_MII | SW_PHY_SEL_STATUS_SS_ENB;
 
 	size_t actualLength = 0;
 	status_t result = gUSBModule->send_request(fDevice,
-						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-						WRITE_PHY_SEL, selectPHY, 0, 0, 0, &actualLength);
+		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT, WRITE_PHY_SEL,
+		selectPHY, 0, 0, 0, &actualLength);
 	snooze(31000);
 
 	TRACE("Selecting %s PHY[%#02x].\n",
-						useEmbeddedPHY ? "embedded" : "external", selectPHY);
+		useEmbeddedPHY ? "embedded" : "external", selectPHY);
 
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of selecting PHY:%#010x\n", result);
@@ -408,15 +414,14 @@ AX88772Device::_WakeupPHY()
 
 	for (size_t i = 0; i < _countof(resetCommands); i++) {
 		result = gUSBModule->send_request(fDevice,
-					USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-					WRITE_SOFT_RESET, resetCommands[i].reset,
-					0, 0, 0, &actualLength);
+			USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT, WRITE_SOFT_RESET,
+			resetCommands[i].reset, 0, 0, 0, &actualLength);
 
 		snooze(resetCommands[i].delay);
 
 		if (result != B_OK) {
 			TRACE_ALWAYS("Error of SW reset command %d:[%#04x]: %#010x\n",
-										i, resetCommands[i].reset, result);
+				i, resetCommands[i].reset, result);
 			return result;
 		}
 	}
@@ -431,8 +436,8 @@ AX88772Device::_SetupAX88772A()
 	// Reload EEPROM
 	size_t actualLength = 0;
 	status_t result = gUSBModule->send_request(fDevice,
-						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-						WRITE_GPIOS, GPIO_RSE, 0, 0, 0, &actualLength);
+		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT, WRITE_GPIOS,
+		GPIO_RSE, 0, 0, 0, &actualLength);
 
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of reloading EEPROM: %#010x\n", result);
@@ -457,8 +462,8 @@ AX88772Device::_SetupAX88772B()
 	// Reload EEPROM
 	size_t actualLength = 0;
 	status_t result = gUSBModule->send_request(fDevice,
-						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-						WRITE_GPIOS, GPIO_RSE, 0, 0, 0, &actualLength);
+		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT, WRITE_GPIOS,
+		GPIO_RSE, 0, 0, 0, &actualLength);
 
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of reloading EEPROM: %#010x\n", result);
@@ -482,8 +487,8 @@ AX88772Device::StartDevice()
 {
 	size_t actualLength = 0;
 	status_t result = gUSBModule->send_request(fDevice,
-						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-						WRITE_IPGS, 0, 0, sizeof(fIPG), fIPG, &actualLength);
+		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT, WRITE_IPGS,
+		0, 0, sizeof(fIPG), fIPG, &actualLength);
 
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of writing IPGs:%#010x\n", result);
@@ -492,12 +497,12 @@ AX88772Device::StartDevice()
 
 	if (actualLength != sizeof(fIPG)) {
 		TRACE_ALWAYS("Mismatch of written IPGs data. "
-				"%d bytes of %d written.\n", actualLength, sizeof(fIPG));
+			"%d bytes of %d written.\n", actualLength, sizeof(fIPG));
 
 	}
-	
+
 	uint16 rxcontrol = 0;
-	
+
 	// AX88772B uses different maximum frame burst configuration.
 	if (fDeviceInfo.fType == DeviceInfo::AX88772B) {
 		result = gUSBModule->send_request(fDevice,
@@ -511,8 +516,11 @@ AX88772Device::StartDevice()
 			TRACE_ALWAYS("Error of writing frame burst:%#010x\n", result);
 			return result;
 		}
-		
-		rxcontrol = RXCTL_USB_MFB;
+		rxcontrol = RXCTL_HDR_TYPE_1;
+	} else {
+		// TODO: FreeBSD documents this to speed up xfers, I don't
+		// have the hardware to test however.
+		// rxcontrol = RXCTL_USB_MFB_MAX;
 	}
 
 	rxcontrol |= RXCTL_START | RXCTL_BROADCAST;
@@ -532,15 +540,15 @@ AX88772Device::OnNotify(uint32 actualLength)
 {
 	if (actualLength < sizeof(AX88772_Notify)) {
 		TRACE_ALWAYS("Data underrun error. %d of %d bytes received\n",
-										actualLength, sizeof(AX88772_Notify));
+			actualLength, sizeof(AX88772_Notify));
 		return B_BAD_DATA;
 	}
 
-	AX88772_Notify *notification	= (AX88772_Notify *)fNotifyBuffer;
+	AX88772_Notify *notification = (AX88772_Notify *)fNotifyBuffer;
 
 	if (notification->btA1 != 0xa1) {
 		TRACE_ALWAYS("Notify magic byte is invalid: %#02x\n",
-														notification->btA1);
+			notification->btA1);
 	}
 
 	uint phyIndex = 0;
@@ -548,11 +556,13 @@ AX88772Device::OnNotify(uint32 actualLength)
 	switch(fMII.ActivePHY()) {
 		case PrimaryPHY:
 			phyIndex = 1;
-			linkIsUp = (notification->btBB & LINK_STATE_PPLS) == LINK_STATE_PPLS;
+			linkIsUp = (notification->btBB & LINK_STATE_PPLS)
+				== LINK_STATE_PPLS;
 			break;
 		case SecondaryPHY:
 			phyIndex = 2;
-			linkIsUp = (notification->btBB & LINK_STATE_SPLS) == LINK_STATE_SPLS;
+			linkIsUp = (notification->btBB & LINK_STATE_SPLS)
+				== LINK_STATE_SPLS;
 			break;
 		default:
 		case CurrentPHY:
@@ -565,7 +575,7 @@ AX88772Device::OnNotify(uint32 actualLength)
 
 	if (linkStateChange) {
 		TRACE("Link state of PHY%d has been changed to '%s'\n",
-									phyIndex, fHasConnection ? "up" : "down");
+			phyIndex, fHasConnection ? "up" : "down");
 	}
 
 	if (linkStateChange && fLinkStateChangeSem >= B_OK)
@@ -581,9 +591,8 @@ AX88772Device::GetLinkState(ether_link_state *linkState)
 	size_t actualLength = 0;
 	uint16 mediumStatus = 0;
 	status_t result = gUSBModule->send_request(fDevice,
-						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN,
-						READ_MEDIUM_STATUS, 0, 0, sizeof(mediumStatus),
-						&mediumStatus, &actualLength);
+		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN, READ_MEDIUM_STATUS,
+		0, 0, sizeof(mediumStatus), &mediumStatus, &actualLength);
 
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of reading medium status:%#010x.\n", result);
@@ -592,25 +601,25 @@ AX88772Device::GetLinkState(ether_link_state *linkState)
 
 	if (actualLength != sizeof(mediumStatus)) {
 		TRACE_ALWAYS("Mismatch of reading medium status."
-							"Read %d bytes instead of %d\n",
-									actualLength, sizeof(mediumStatus));
+			"Read %d bytes instead of %d\n", actualLength,
+			sizeof(mediumStatus));
 	}
 
 	TRACE_FLOW("Medium status is %#04x\n", mediumStatus);
 
 	linkState->quality = 1000;
 
-	linkState->media   = IFM_ETHER | (fHasConnection ? IFM_ACTIVE : 0);
-	linkState->media  |= (mediumStatus & MEDIUM_STATE_FD) ?
-							IFM_FULL_DUPLEX : IFM_HALF_DUPLEX;
+	linkState->media = IFM_ETHER | (fHasConnection ? IFM_ACTIVE : 0);
+	linkState->media |= (mediumStatus & MEDIUM_STATE_FD) ?
+		IFM_FULL_DUPLEX : IFM_HALF_DUPLEX;
 
-	linkState->speed   = (mediumStatus & MEDIUM_STATE_PS_100)
-							? 100000000 : 10000000;
+	linkState->speed = (mediumStatus & MEDIUM_STATE_PS_100)
+		? 100000000 : 10000000;
 
 	TRACE_FLOW("Medium state: %s, %lld MBit/s, %s duplex.\n",
-						(linkState->media & IFM_ACTIVE) ? "active" : "inactive",
-						linkState->speed / 1000000,
-						(linkState->media & IFM_FULL_DUPLEX) ? "full" : "half");
+		(linkState->media & IFM_ACTIVE) ? "active" : "inactive",
+		linkState->speed / 1000000,
+		(linkState->media & IFM_FULL_DUPLEX) ? "full" : "half");
 	return B_OK;
 }
 

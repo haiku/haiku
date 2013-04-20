@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -13,6 +13,7 @@
 
 #include <debugger.h>
 
+#include <Alert.h>
 #include <Looper.h>
 #include <PopUpMenu.h>
 #include <ToolTip.h>
@@ -108,6 +109,8 @@ public:
 		fValue(NULL),
 		fValueHandler(NULL),
 		fTableCellRenderer(NULL),
+		fLastRendererSettings(),
+		fCastedType(NULL),
 		fComponentPath(NULL),
 		fIsPresentationNode(isPresentationNode),
 		fHidden(false)
@@ -128,6 +131,9 @@ public:
 
 		if (fComponentPath != NULL)
 			fComponentPath->ReleaseReference();
+
+		if (fCastedType != NULL)
+			fCastedType->ReleaseReference();
 	}
 
 	status_t Init()
@@ -192,6 +198,31 @@ public:
 
 		if (fValue != NULL)
 			fValue->AcquireReference();
+	}
+
+	Type* GetCastedType() const
+	{
+		return fCastedType;
+	}
+
+	void SetCastedType(Type* type)
+	{
+		if (fCastedType != NULL)
+			fCastedType->ReleaseReference();
+
+		fCastedType = type;
+		if (type != NULL)
+			fCastedType->AcquireReference();
+	}
+
+	const BMessage& GetLastRendererSettings() const
+	{
+		return fLastRendererSettings;
+	}
+
+	void SetLastRendererSettings(const BMessage& settings)
+	{
+		fLastRendererSettings = settings;
 	}
 
 	TypeComponentPath* GetPath() const
@@ -304,6 +335,8 @@ private:
 	Value*					fValue;
 	ValueHandler*			fValueHandler;
 	TableCellValueRenderer*	fTableCellRenderer;
+	BMessage				fLastRendererSettings;
+	Type*					fCastedType;
 	ChildList				fChildren;
 	TypeComponentPath*		fComponentPath;
 	bool					fIsPresentationNode;
@@ -1054,6 +1087,14 @@ VariablesView::VariableTableModel::ValueNodeValueChanged(ValueNode* valueNode)
 	modelNode->SetValueHandler(valueHandler);
 	modelNode->SetTableCellRenderer(renderer);
 
+	// we have to restore renderer settings here since until this point
+	// we don't yet know what renderer is in use.
+	if (renderer != NULL) {
+		Settings* settings = renderer->GetSettings();
+		if (settings != NULL)
+			settings->RestoreValues(modelNode->GetLastRendererSettings());
+	}
+
 	// notify table model listeners
 	NotifyNodeChanged(modelNode);
 }
@@ -1285,16 +1326,20 @@ VariablesView::VariableTableModel::_AddNode(Variable* variable,
 	// is a compound type, mark it hidden
 	if (isOnlyChild && parent != NULL) {
 		ValueNode* parentValueNode = parent->NodeChild()->Node();
-		if (parentValueNode != NULL
-			&& parentValueNode->GetType()->ResolveRawType(false)->Kind()
-				== TYPE_ADDRESS
-			&& nodeChildRawType->Kind() == TYPE_COMPOUND) {
-			node->SetHidden(true);
+		if (parentValueNode != NULL) {
+			if (parentValueNode->GetType()->ResolveRawType(false)->Kind()
+				== TYPE_ADDRESS) {
+				type_kind childKind = nodeChildRawType->Kind();
+				if (childKind == TYPE_COMPOUND || childKind == TYPE_ARRAY) {
+					node->SetHidden(true);
 
-			// we need to tell the listener about nodes like this so any
-			// necessary actions can be taken for them (i.e. value resolution),
-			// since they're otherwise invisible to outsiders.
-			NotifyNodeHidden(node);
+					// we need to tell the listener about nodes like this so
+					// any necessary actions can be taken for them (i.e. value
+					// resolution), since they're otherwise invisible to
+					// outsiders.
+					NotifyNodeHidden(node);
+				}
+			}
 		}
 	}
 
@@ -1488,6 +1533,13 @@ VariablesView::MessageReceived(BMessage* message)
 
 			if (language->ParseTypeExpression(typeExpression,
 				fThread->GetTeam()->DebugInfo(), type) != B_OK) {
+				BString errorMessage;
+				errorMessage.SetToFormat("Failed to resolve type %s",
+					typeExpression.String());
+				BAlert* alert = new(std::nothrow) BAlert("Error",
+					errorMessage.String(), "Close");
+				if (alert != NULL)
+					alert->Go();
 				break;
 			}
 
@@ -1497,9 +1549,8 @@ VariablesView::MessageReceived(BMessage* message)
 				break;
 			}
 
-			// TODO: we need to also persist/restore the casted state
-			// in VariableViewState
 			node->NodeChild()->SetNode(valueNode);
+			node->SetCastedType(type);
 			break;
 		}
 		case MSG_SHOW_WATCH_VARIABLE_PROMPT:
@@ -1955,6 +2006,13 @@ VariablesView::_AddViewStateDescendentNodeInfos(VariablesViewState* viewState,
 		// add the node's info
 		VariablesViewNodeInfo nodeInfo;
 		nodeInfo.SetNodeExpanded(fVariableTable->IsNodeExpanded(path));
+		nodeInfo.SetCastedType(node->GetCastedType());
+		TableCellValueRenderer* renderer = node->TableCellRenderer();
+		if (renderer != NULL) {
+			Settings* settings = renderer->GetSettings();
+			if (settings != NULL)
+				nodeInfo.SetRendererSettings(settings->Message());
+		}
 
 		status_t error = viewState->SetNodeInfo(node->GetVariable()->ID(),
 			node->GetPath(), nodeInfo);
@@ -1987,6 +2045,25 @@ VariablesView::_ApplyViewStateDescendentNodeInfos(VariablesViewState* viewState,
 		const VariablesViewNodeInfo* nodeInfo = viewState->GetNodeInfo(
 			node->GetVariable()->ID(), node->GetPath());
 		if (nodeInfo != NULL) {
+			// NB: if the node info indicates that the node in question
+			// was being cast to a different type, this *must* be applied
+			// before any other view state restoration, since it potentially
+			// changes the child hierarchy under that node.
+			Type* type = nodeInfo->GetCastedType();
+			if (type != NULL) {
+				ValueNode* valueNode = NULL;
+				if (TypeHandlerRoster::Default()->CreateValueNode(
+					node->NodeChild(), type, valueNode) == B_OK) {
+					node->NodeChild()->SetNode(valueNode);
+					node->SetCastedType(type);
+				}
+			}
+
+			// we don't have a renderer yet so we can't apply the settings
+			// at this stage. Store them on the model node so we can lazily
+			// apply them once the value is retrieved.
+			node->SetLastRendererSettings(nodeInfo->GetRendererSettings());
+
 			fVariableTable->SetNodeExpanded(path, nodeInfo->IsNodeExpanded());
 
 			// recurse

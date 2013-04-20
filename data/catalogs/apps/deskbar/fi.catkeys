@@ -1,16 +1,19 @@
-1	finnish	x-vnd.Be-TSKB	1042823442
+1	finnish	x-vnd.Be-TSKB	2335730970
 Power off	DeskbarMenu		Sammuta virta
+Sort applications by name	PreferencesWindow		Lajittele sovellukset nimen perusteella
 Suspend	DeskbarMenu		Keskeytystila
 Hide clock	TimeView		Piilota kello
 Applications	PreferencesWindow		Sovellukset
 Time preferences…	TimeView		Aika-asetukset...
 About Haiku	DeskbarMenu		Haikusta
+Edit in Tracker…	PreferencesWindow		Muokkaa Seuraajassa…
 Recent documents:	PreferencesWindow		Äskettäiset asiakirjat:
 Recent applications	DeskbarMenu		Äskettäiset sovellukset
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Sovellukset
 Find…	DeskbarMenu		Etsi...
 Show clock	Tray		Näytä kello
 Window	PreferencesWindow		Ikkuna
+Defaults	PreferencesWindow		Oletukset
 Menu	PreferencesWindow		Valikko
 Recent documents	DeskbarMenu		Äskettäiset asiakirjat
 Auto-hide	PreferencesWindow		Piilota automaattisesti
@@ -28,6 +31,7 @@ Restart Tracker	DeskbarMenu		Käynnistä Seuraaja uudelleen
 Close all	WindowMenu		Sulje kaikki
 Deskbar preferences	PreferencesWindow		Työpöytäpalkin asetukset
 Mount	DeskbarMenu		Liitä
+Revert	PreferencesWindow		Palauta
 Small	PreferencesWindow		Pieni
 Recent applications:	PreferencesWindow		Äskettäiset sovellukset:
 Shutdown…	DeskbarMenu		Sammuttaminen...

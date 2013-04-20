@@ -33,7 +33,8 @@ AutoconfigLooper::AutoconfigLooper(BMessenger target, const char* device)
 	fTarget(target),
 	fDevice(device),
 	fCurrentClient(NULL),
-	fLastMediaStatus(0)
+	fLastMediaStatus(0),
+	fJoiningNetwork(false)
 {
 	BMessage ready(kMsgReadyToRun);
 	PostMessage(&ready);
@@ -124,9 +125,85 @@ AutoconfigLooper::_ConfigureIPv4()
 void
 AutoconfigLooper::_ReadyToRun()
 {
-	start_watching_network(B_WATCH_NETWORK_LINK_CHANGES, this);
-	_ConfigureIPv4();
-	//_ConfigureIPv6();	// TODO: router advertisement and dhcpv6
+	start_watching_network(
+		B_WATCH_NETWORK_LINK_CHANGES | B_WATCH_NETWORK_WLAN_CHANGES, this);
+
+	BNetworkInterface interface(fDevice.String());
+	if (interface.HasLink()) {
+		_ConfigureIPv4();
+		//_ConfigureIPv6();	// TODO: router advertisement and dhcpv6
+
+		// Also make sure we don't spuriously try to configure again from
+		// a link changed notification that might race us.
+		fLastMediaStatus |= IFM_ACTIVE;
+	}
+}
+
+
+void
+AutoconfigLooper::_NetworkMonitorNotification(BMessage* message)
+{
+	int32 opcode;
+	BString device;
+	if (message->FindString("device", &device) != B_OK) {
+		if (message->FindString("interface", &device) != B_OK)
+			return;
+
+		// TODO: Clean this mess up. Wireless devices currently use their
+		// "device_name" in the interface field. First of all the
+		// joins/leaves/scans should be device, not interface specific, so
+		// the field should be changed. Then the device_name as seen by the
+		// driver is missing the "/dev" part, as it is a relative path within
+		// "/dev". On the other hand the net stack uses names that include
+		// "/dev" as it uses them to open the fds, hence a full absolute path.
+		// Note that the wpa_supplicant does the same workaround as we do here
+		// to build an interface name, so that has to be changed as well when
+		// this is fixed.
+		device.Prepend("/dev/");
+	}
+
+	if (device != fDevice || message->FindInt32("opcode", &opcode) != B_OK)
+		return;
+
+	switch (opcode) {
+		case B_NETWORK_DEVICE_LINK_CHANGED:
+		{
+			int32 media;
+			if (message->FindInt32("media", &media) != B_OK)
+				break;
+
+			if ((fLastMediaStatus & IFM_ACTIVE) == 0
+				&& (media & IFM_ACTIVE) != 0) {
+				// Reconfigure the interface when we have a link again
+				_ConfigureIPv4();
+				//_ConfigureIPv6();	// TODO: router advertisement and dhcpv6
+			}
+
+			fLastMediaStatus = media;
+			break;
+		}
+
+		case B_NETWORK_WLAN_SCANNED:
+		{
+			if (fJoiningNetwork || (fLastMediaStatus & IFM_ACTIVE) != 0) {
+				// We already have a link or are already joining.
+				break;
+			}
+
+			fJoiningNetwork = true;
+				// TODO: For now we never reset this flag. We can only do that
+				// after infrastructure has been added to discern a scan reason.
+				// If we would always auto join we would possibly interfere
+				// with active scans in the process of connecting to an AP
+				// either for the initial connection, or after connection loss
+				// to re-establish the link.
+
+			BMessage message(kMsgAutoJoinNetwork);
+			message.AddString("device", fDevice);
+			fTarget.SendMessage(&message);
+			break;
+		}
+	}
 }
 
 
@@ -139,23 +216,7 @@ AutoconfigLooper::MessageReceived(BMessage* message)
 			break;
 
 		case B_NETWORK_MONITOR:
-			const char* device;
-			int32 opcode;
-			int32 media;
-			if (message->FindInt32("opcode", &opcode) != B_OK
-				|| opcode != B_NETWORK_DEVICE_LINK_CHANGED
-				|| message->FindString("device", &device) != B_OK
-				|| fDevice != device
-				|| message->FindInt32("media", &media) != B_OK)
-				break;
-
-			if ((fLastMediaStatus & IFM_ACTIVE) == 0
-				&& (media & IFM_ACTIVE) != 0) {
-				// Reconfigure the interface when we have a link again
-				_ConfigureIPv4();
-				//_ConfigureIPv6();	// TODO: router advertisement and dhcpv6
-			}
-			fLastMediaStatus = media;
+			_NetworkMonitorNotification(message);
 			break;
 
 		default:

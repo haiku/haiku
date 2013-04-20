@@ -104,7 +104,7 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 
 	BRect bounds = list->ItemFrame(list->IndexOf(this));
 
-	rgb_color highColor = list->HighColor();
+	//rgb_color highColor = list->HighColor();
 	rgb_color lowColor = list->LowColor();
 
 	if (IsSelected() || complete) {
@@ -224,7 +224,7 @@ InterfaceListItem::Update(BView* owner, const BFont* font)
 	fSecondlineOffset = fFirstlineOffset + lineHeight;
 	fThirdlineOffset = fFirstlineOffset + (lineHeight * 2);
 
-	SetHeight(max(3 * lineHeight + 4, fIcon->Bounds().Height() + 8));
+	SetHeight(std::max(3 * lineHeight + 4, fIcon->Bounds().Height() + 8));
 		// either to the text height or icon height, whichever is taller
 }
 

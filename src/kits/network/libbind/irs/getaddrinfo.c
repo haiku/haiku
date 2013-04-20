@@ -328,6 +328,7 @@ getaddrinfo(hostname, servname, hints, res)
 	struct addrinfo ai, ai0, *afai = NULL;
 	struct addrinfo *pai;
 	const struct explore *ex;
+	struct net_data *net_data;
 
 	memset(&sentinel, 0, sizeof(sentinel));
 	cur = &sentinel;
@@ -500,6 +501,11 @@ getaddrinfo(hostname, servname, hints, res)
 		SETERROR(EAI_NONAME);
 	if (hostname == NULL)
 		SETERROR(EAI_NONAME);
+
+	/* init after numeric lookups to avoid recursion in resolv.conf */
+	net_data = init();
+	if ((net_data->res->options & RES_USE_INET4) && ai0.ai_family == PF_UNSPEC)
+		ai0.ai_family = PF_INET;
 
 	/*
 	 * hostname as alphabetical name.

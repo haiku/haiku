@@ -368,8 +368,11 @@ UdpDomainSupport::ConnectEndpoint(UdpEndpoint *endpoint,
 		struct net_route *routeToDestination
 			= gDatalinkModule->get_route(fDomain, address);
 		if (routeToDestination) {
+			// stay bound to current local port, if any.
+			uint16 port = endpoint->LocalAddress().Port();
 			status = endpoint->LocalAddress().SetTo(
 				routeToDestination->interface_address->local);
+			endpoint->LocalAddress().SetPort(port);
 			gDatalinkModule->put_route(fDomain, routeToDestination);
 			if (status < B_OK)
 				return status;

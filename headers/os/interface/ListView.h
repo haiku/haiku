@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2002-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _LIST_VIEW_H
@@ -13,6 +13,7 @@
 
 
 struct track_data;
+
 
 enum list_view_type {
 	B_SINGLE_SELECTION_LIST,
@@ -58,13 +59,13 @@ public:
 	virtual void				MessageReceived(BMessage* message);
 	virtual void				KeyDown(const char* bytes, int32 numBytes);
 	virtual void				MouseDown(BPoint where);
-	virtual void				MouseUp(BPoint point);
-	virtual void				MouseMoved(BPoint point, uint32 code,
+	virtual void				MouseUp(BPoint where);
+	virtual void				MouseMoved(BPoint where, uint32 code,
 									const BMessage* dragMessage);
 
 	virtual void				ResizeToPreferred();
-	virtual void				GetPreferredSize(float* _width,
-									float* _height);
+	virtual void				GetPreferredSize(float *_width,
+									float *_height);
 
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();

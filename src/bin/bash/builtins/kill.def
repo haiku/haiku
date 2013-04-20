@@ -22,6 +22,7 @@ $PRODUCES kill.c
 
 $BUILTIN kill
 $FUNCTION kill_builtin
+$DEPENDS_ON HAVE_KILL_BUILTIN
 $SHORT_DOC kill [-s sigspec | -n signum | -sigspec] pid | jobspec ... or kill -l [sigspec]
 Send a signal to a job.
 

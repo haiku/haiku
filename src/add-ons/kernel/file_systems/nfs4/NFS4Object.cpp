@@ -14,12 +14,22 @@
 #include "Request.h"
 
 
+static inline bigtime_t
+RetryDelay(uint32 attempt, uint32 leaseTime = 0)
+{
+	attempt = min_c(attempt, sizeof(bigtime_t) * 8);
+
+	bigtime_t delay = (1 << (attempt - 1)) * 100000;
+	if (leaseTime != 0)
+		delay = min_c(delay, sSecToBigTime(leaseTime));
+	return delay;
+}
+
+
 bool
-NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
+NFS4Object::HandleErrors(uint32& attempt, uint32 nfs4Error, RPC::Server* server,
 	OpenStateCookie* cookie, OpenState* state, uint32* sequence)
 {
-	uint32 leaseTime;
-
 	// No request send by the client should cause any of the following errors.
 	ASSERT(nfs4Error != NFS4ERR_CLID_INUSE);
 	ASSERT(nfs4Error != NFS4ERR_NOFILEHANDLE);
@@ -28,17 +38,42 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 	ASSERT(nfs4Error != NFS4ERR_LOCKS_HELD);
 	ASSERT(nfs4Error != NFS4ERR_OP_ILLEGAL);
 
+	attempt++;
+
 	if (cookie != NULL)
 		state = cookie->fOpenState;
 
+	uint32 leaseTime;
+	status_t result;
 	switch (nfs4Error) {
 		case NFS4_OK:
 			return false;
 
 		// retransmission of CLOSE caused seqid to fall back
 		case NFS4ERR_BAD_SEQID:
-			ASSERT(sequence != NULL);
-			(*sequence)++;
+			if (attempt == 1) {
+				ASSERT(sequence != NULL);
+				(*sequence)++;
+				return true;
+			}
+			return false;
+
+		// resource is locked, we need to wait
+		case NFS4ERR_DENIED:
+			if (sequence != NULL)
+				fFileSystem->OpenOwnerSequenceUnlock(*sequence);
+
+			result = acquire_sem_etc(cookie->fSnoozeCancel, 1,
+				B_RELATIVE_TIMEOUT, RetryDelay(attempt));
+
+			if (sequence != NULL)
+				*sequence = fFileSystem->OpenOwnerSequenceLock();
+
+			if (result != B_TIMED_OUT) {
+				if (result == B_OK)
+					release_sem(cookie->fSnoozeCancel);
+				return false;
+			}
 			return true;
 
 		// server needs more time, we need to wait
@@ -48,8 +83,9 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 				fFileSystem->OpenOwnerSequenceUnlock(*sequence);
 
 			if (cookie == NULL) {
-				snooze_etc(sSecToBigTime(5), B_SYSTEM_TIMEBASE,
+				snooze_etc(RetryDelay(attempt), B_SYSTEM_TIMEBASE,
 					B_RELATIVE_TIMEOUT);
+				
 
 				if (sequence != NULL)
 					*sequence = fFileSystem->OpenOwnerSequenceLock();
@@ -58,8 +94,8 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 			}
 
 			if ((cookie->fMode & O_NONBLOCK) == 0) {
-				status_t result = acquire_sem_etc(cookie->fSnoozeCancel, 1,
-					B_RELATIVE_TIMEOUT, sSecToBigTime(5));
+				result = acquire_sem_etc(cookie->fSnoozeCancel, 1,
+					B_RELATIVE_TIMEOUT, RetryDelay(attempt));
 
 				if (sequence != NULL)
 					*sequence = fFileSystem->OpenOwnerSequenceLock();
@@ -83,7 +119,7 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 				fFileSystem->OpenOwnerSequenceUnlock(*sequence);
 
 			if (cookie == NULL) {
-				snooze_etc(sSecToBigTime(leaseTime) / 3, B_SYSTEM_TIMEBASE,
+				snooze_etc(RetryDelay(attempt, leaseTime), B_SYSTEM_TIMEBASE,
 					B_RELATIVE_TIMEOUT);
 				if (sequence != NULL)
 					*sequence = fFileSystem->OpenOwnerSequenceLock();
@@ -91,8 +127,8 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 			}
 
 			if ((cookie->fMode & O_NONBLOCK) == 0) {
-				status_t result = acquire_sem_etc(cookie->fSnoozeCancel, 1,
-					B_RELATIVE_TIMEOUT, sSecToBigTime(leaseTime) / 3);
+				result = acquire_sem_etc(cookie->fSnoozeCancel, 1,
+					B_RELATIVE_TIMEOUT, RetryDelay(attempt, leaseTime));
 
 				if (sequence != NULL)
 					*sequence = fFileSystem->OpenOwnerSequenceLock();
@@ -125,7 +161,6 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 			return false;
 
 		// File Handle has expired, is invalid or the node has been deleted
-		case NFS4ERR_NOFILEHANDLE:
 		case NFS4ERR_BADHANDLE:
 		case NFS4ERR_FHEXPIRED:
 		case NFS4ERR_STALE:
@@ -136,7 +171,7 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 		// filesystem has been moved
 		case NFS4ERR_LEASE_MOVED:
 		case NFS4ERR_MOVED:
-			fFileSystem->Migrate(serv);
+			fFileSystem->Migrate(server);
 			return true;
 
 		// lease has expired
@@ -160,6 +195,7 @@ NFS4Object::ConfirmOpen(const FileHandle& fh, OpenState* state,
 	ASSERT(state != NULL);
 	ASSERT(sequence != NULL);
 
+	uint32 attempt = 0;
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -175,12 +211,13 @@ NFS4Object::ConfirmOpen(const FileHandle& fh, OpenState* state,
 
 		ReplyInterpreter& reply = request.Reply();
 
-		*sequence += IncrementSequence(reply.NFS4Error());
+		result = reply.PutFH();
+		if (result == B_OK)
+			*sequence += IncrementSequence(reply.NFS4Error());
 
-		if (HandleErrors(reply.NFS4Error(), serv, NULL, state))
+		if (HandleErrors(attempt, reply.NFS4Error(), serv, NULL, state))
 			continue;
 
-		reply.PutFH();
 		result = reply.OpenConfirm(&state->fStateSeq);
 		if (result != B_OK)
 			return result;

@@ -50,10 +50,10 @@ class BMenu;
 class TBarMenuTitle : public BMenuItem {
 public:
 	TBarMenuTitle(float width, float height, const BBitmap* icon,
-		BMenu* menu, bool inexpando = false);
+		BMenu* menu, bool expando = false);
 	virtual ~TBarMenuTitle();
 
-	void SetWidthHeight(float width, float height);
+	void SetContentSize(float width, float height);
 	void Draw();
 
 	status_t Invoke(BMessage* message);
@@ -70,4 +70,4 @@ private:
 };
 
 
-#endif /* BARMENUTITLE_H */
+#endif	// BARMENUTITLE_H

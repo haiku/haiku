@@ -821,19 +821,10 @@ create_thread_user_stack(Team* team, Thread* thread, void* _stackBase,
 		snprintf(nameBuffer, B_OS_NAME_LENGTH, "%s_%" B_PRId32 "_stack",
 			thread->name, thread->id);
 
-		virtual_address_restrictions virtualRestrictions = {};
-		if (thread->id == team->id) {
-			// The main thread gets a fixed position at the top of the stack
-			// address range.
-			stackBase = (uint8*)(USER_STACK_REGION + USER_STACK_REGION_SIZE
-				- areaSize);
-			virtualRestrictions.address_specification = B_EXACT_ADDRESS;
+		stackBase = (uint8*)USER_STACK_REGION;
 
-		} else {
-			// not a main thread
-			stackBase = (uint8*)(addr_t)USER_STACK_REGION;
-			virtualRestrictions.address_specification = B_BASE_ADDRESS;
-		}
+		virtual_address_restrictions virtualRestrictions = {};
+		virtualRestrictions.address_specification = B_RANDOMIZED_BASE_ADDRESS;
 		virtualRestrictions.address = (void*)stackBase;
 
 		physical_address_restrictions physicalRestrictions = {};

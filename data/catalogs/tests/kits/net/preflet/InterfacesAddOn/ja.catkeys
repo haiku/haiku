@@ -1,0 +1,33 @@
+1	japanese	x-vnd.Haiku-InterfacesAddOn	160108912
+Interface	InterfaceWindow		インターフェース
+Configure…	InterfacesListView		構成…
+Static	IntefaceAddressView		静的
+None	InterfacesListView		なし
+IP:	InterfacesListView	IPv4 address label	IP:
+Status:	IntefaceHardwareView		状態:
+IPv6:	InterfacesListView	IPv6 address label	IPv6:
+Save	InterfaceWindow		保存
+Link speed:	IntefaceHardwareView		リンクスピード:
+Renegotiate	InterfacesAddOn		再ネゴシエート
+The method for obtaining an IP address	IntefaceAddressView		IP アドレスを取得する方法
+Your gateway	IntefaceAddressView		ゲートウェイ
+Enable	InterfacesListView		有効
+Received:	IntefaceHardwareView		受信:
+Revert	InterfaceWindow		取り消し
+connected	IntefaceHardwareView		接続しました
+Gateway:	IntefaceAddressView		ゲートウェイ:
+Disable	InterfacesListView		無効
+Sent:	IntefaceHardwareView		送信:
+Disable	InterfacesAddOn		無効
+Configure…	InterfacesAddOn		構成…
+Renegotiate Address	InterfacesListView		アドレスを再ネゴシエートする
+DHCP	IntefaceAddressView		DHCP
+Mode:	IntefaceAddressView		モード:
+Your netmask	IntefaceAddressView		ネットマスク
+IP Address:	IntefaceAddressView		IP アドレス:
+Off	IntefaceAddressView		オフ
+MAC address:	IntefaceHardwareView		MAC アドレス:
+Netmask:	IntefaceAddressView		ネットマスク:
+Your IP address	IntefaceAddressView		IP アドレス
+%llu KBytes	IntefaceHardwareView		%llu KBytes
+disconnected	IntefaceHardwareView		切断されました

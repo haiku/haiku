@@ -164,6 +164,7 @@ ppc_exception_entry(int vector, struct iframe *iframe)
 
 			vm_page_fault(iframe->dar, iframe->srr0,
 				iframe->dsisr & (1 << 25), // store or load
+				false,
 				iframe->srr1 & (1 << 14), // was the system in user or supervisor
 				&newip);
 			if (newip != 0) {

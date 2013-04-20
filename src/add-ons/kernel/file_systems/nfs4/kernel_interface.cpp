@@ -691,7 +691,10 @@ nfs4_read_stat(fs_volume* volume, fs_vnode* vnode, struct stat* stat)
 	if (inode == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	return inode->Stat(stat);
+	status_t result = inode->Stat(stat);
+	if (inode->GetOpenState() != NULL)
+		stat->st_size = inode->MaxFileSize();
+	return result;
 }
 
 

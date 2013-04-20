@@ -400,3 +400,65 @@ KernelImage::Init(const image_info& info)
 		fSymbolTable, &fSymbolCount, fStringTable, &fStringTableSize,
 		&fLoadDelta);
 }
+
+
+CommPageImage::CommPageImage()
+{
+}
+
+
+CommPageImage::~CommPageImage()
+{
+	delete[] fSymbolTable;
+	delete[] fStringTable;
+}
+
+
+status_t
+CommPageImage::Init(const image_info& info)
+{
+	// find kernel image for commpage
+	image_id commPageID = -1;
+	image_info commPageInfo;
+
+	int32 cookie = 0;
+	while (_kern_get_next_image_info(B_SYSTEM_TEAM, &cookie, &commPageInfo,
+			sizeof(image_info)) == B_OK) {
+		if (!strcmp("commpage", commPageInfo.name)) {
+			commPageID = commPageInfo.id;
+			break;
+		}
+	}
+	if (commPageID < 0)
+		return B_ENTRY_NOT_FOUND;
+
+	fInfo = commPageInfo;
+	fInfo.text = info.text;
+
+	// get the table sizes
+	fSymbolCount = 0;
+	fStringTableSize = 0;
+	status_t error = _kern_read_kernel_image_symbols(commPageID, NULL,
+		&fSymbolCount, NULL, &fStringTableSize, NULL);
+	if (error != B_OK)
+		return error;
+
+	// allocate the tables
+	fSymbolTable = new(std::nothrow) elf_sym[fSymbolCount];
+	fStringTable = new(std::nothrow) char[fStringTableSize];
+	if (fSymbolTable == NULL || fStringTable == NULL)
+		return B_NO_MEMORY;
+
+	// get the info
+	error = _kern_read_kernel_image_symbols(commPageID,
+		fSymbolTable, &fSymbolCount, fStringTable, &fStringTableSize, NULL);
+	if (error != B_OK) {
+		delete[] fSymbolTable;
+		delete[] fStringTable;
+		return error;
+	}
+
+	fLoadDelta = (addr_t)info.text;
+
+	return B_OK;
+}

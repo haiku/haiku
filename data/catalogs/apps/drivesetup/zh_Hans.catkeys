@@ -1,11 +1,14 @@
-1	english	x-vnd.Haiku-DriveSetup	644135944
+1	english	x-vnd.Haiku-DriveSetup	1752326393
 DriveSetup	System name		磁盘管理器
+Cancel	AbstractParametersPanel		取消
 Delete	MainWindow		删除
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		您确定将所做修改写入磁盘吗？\n\n如果执行此操作，选中分区上的所有数据将丢失，无法恢复！
 Rescan	MainWindow		重新扫描
 OK	MainWindow		确定
 Could not aquire partitioning information.	MainWindow		无法获取分区信息。
 There's no space on the partition where a child partition could be created.	MainWindow		所选分区没有足够的空间创建子分区。
+Initialize	InitializeParametersPanel		初始化
+OK	AbstractParametersPanel		确定
 <empty>	PartitionList		<空白>
 Unable to find the selected partition by ID.	MainWindow		无法通过ID找到所选分区。
 Select a partition from the list below.	DiskView		请从以下列表选择一个分区。

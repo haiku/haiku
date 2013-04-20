@@ -936,7 +936,7 @@ MimeType::_Dump(const char* mimetype) throw (Error)
 			_DumpIcon((uint8*) fBigIcon->Bits(), fBigIcon->BitsLength());
 		}
 
-	if (fVectorIcon != NULL && fVectorIcon != NULL) {
+		if (fVectorIcon != NULL && fVectorIconSize != 0) {
 			cout << " \\" << endl << "\t" << kVectorIcon << " ";
 			_DumpIcon((uint8*) fVectorIcon, fVectorIconSize);
 		}

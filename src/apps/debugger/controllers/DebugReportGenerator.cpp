@@ -1,12 +1,10 @@
 /*
- * Copyright 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "DebugReportGenerator.h"
-
-#include <sys/utsname.h>
 
 #include <cpu_type.h>
 
@@ -17,13 +15,17 @@
 #include <StringForSize.h>
 
 #include "Architecture.h"
+#include "AreaInfo.h"
 #include "CpuState.h"
+#include "DebuggerInterface.h"
 #include "Image.h"
 #include "MessageCodes.h"
 #include "Register.h"
+#include "SemaphoreInfo.h"
 #include "StackFrame.h"
 #include "StackTrace.h"
 #include "StringUtils.h"
+#include "SystemInfo.h"
 #include "Team.h"
 #include "Thread.h"
 #include "Type.h"
@@ -37,16 +39,18 @@
 
 
 DebugReportGenerator::DebugReportGenerator(::Team* team,
-	UserInterfaceListener* listener)
+	UserInterfaceListener* listener, DebuggerInterface* interface)
 	:
 	BLooper("DebugReportGenerator"),
 	fTeam(team),
 	fArchitecture(team->GetArchitecture()),
+	fDebuggerInterface(interface),
 	fTeamDataSem(-1),
 	fNodeManager(NULL),
 	fListener(listener),
 	fWaitingNode(NULL),
 	fCurrentBlock(NULL),
+	fBlockRetrievalStatus(B_OK),
 	fTraceWaitingThread(NULL)
 {
 	fTeam->AddListener(this);
@@ -88,9 +92,11 @@ DebugReportGenerator::Init()
 
 
 DebugReportGenerator*
-DebugReportGenerator::Create(::Team* team, UserInterfaceListener* listener)
+DebugReportGenerator::Create(::Team* team, UserInterfaceListener* listener,
+	DebuggerInterface* interface)
 {
-	DebugReportGenerator* self = new DebugReportGenerator(team, listener);
+	DebugReportGenerator* self = new DebugReportGenerator(team, listener,
+		interface);
 
 	try {
 		self->Init();
@@ -117,6 +123,14 @@ DebugReportGenerator::_GenerateReport(const entry_ref& outputPath)
 		return result;
 
 	result = _DumpLoadedImages(output);
+	if (result != B_OK)
+		return result;
+
+	result = _DumpAreas(output);
+	if (result != B_OK)
+		return result;
+
+	result = _DumpSemaphores(output);
 	if (result != B_OK)
 		return result;
 
@@ -168,13 +182,15 @@ DebugReportGenerator::ThreadStackTraceChanged(const ::Team::ThreadEvent& event)
 void
 DebugReportGenerator::MemoryBlockRetrieved(TeamMemoryBlock* block)
 {
-	if (fCurrentBlock != NULL) {
-		fCurrentBlock->ReleaseReference();
-		fCurrentBlock = NULL;
-	}
+	_HandleMemoryBlockRetrieved(block, B_OK);
+}
 
-	fCurrentBlock = block;
-	release_sem(fTeamDataSem);
+
+void
+DebugReportGenerator::MemoryBlockRetrievalFailed(TeamMemoryBlock* block,
+	status_t result)
+{
+	_HandleMemoryBlockRetrieved(block, result);
 }
 
 
@@ -198,11 +214,10 @@ DebugReportGenerator::_GenerateReportHeader(BString& _output)
 		fTeam->Name(), fTeam->ID());
 	_output << data;
 
-	// TODO: this information should probably be requested via the debugger
-	// interface, since e.g. in the case of a remote team, the report should
-	// include data about the target, not the debugging host
-	system_info info;
-	if (get_system_info(&info) == B_OK) {
+	SystemInfo sysInfo;
+
+	if (fDebuggerInterface->GetSystemInfo(sysInfo) == B_OK) {
+		const system_info &info = sysInfo.GetSystemInfo();
 		data.SetToFormat("CPU(s): %" B_PRId32 "x %s %s\n",
 			info.cpu_count, get_cpu_vendor_string(info.cpu_type),
 			get_cpu_model_string(&info));
@@ -216,11 +231,12 @@ DebugReportGenerator::_GenerateReportHeader(BString& _output)
 			BPrivate::string_for_size((int64)info.used_pages * B_PAGE_SIZE,
 				usedSize, sizeof(usedSize)));
 		_output << data;
+
+		const utsname& name = sysInfo.GetSystemName();
+		data.SetToFormat("Haiku revision: %s (%s)\n", name.version,
+			name.machine);
+		_output << data;
 	}
-	utsname name;
-	uname(&name);
-	data.SetToFormat("Haiku revision: %s (%s)\n", name.version, name.machine);
-	_output << data;
 
 	return B_OK;
 }
@@ -248,6 +264,69 @@ DebugReportGenerator::_DumpLoadedImages(BString& _output)
 					buffer, sizeof(buffer)), textBase,
 				textBase + info.TextSize(), dataBase,
 				dataBase + info.DataSize());
+
+			_output << data;
+		} catch (...) {
+			return B_NO_MEMORY;
+		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
+DebugReportGenerator::_DumpAreas(BString& _output)
+{
+	BObjectList<AreaInfo> areas(20, true);
+	status_t result = fDebuggerInterface->GetAreaInfos(areas);
+	if (result != B_OK)
+		return result;
+
+	_output << "\nAreas:\n";
+	BString data;
+	AreaInfo* info;
+	BString protectionBuffer;
+	char lockingBuffer[32];
+	for (int32 i = 0; (info = areas.ItemAt(i)) != NULL; i++) {
+		try {
+			data.SetToFormat("\t%s (%" B_PRId32 ") "
+				"Base: %#08" B_PRIx64 ", Size: %" B_PRId64
+				", RAM Size: %" B_PRId64 ",Locking: %s, Protection: %s\n",
+				info->Name().String(), info->AreaID(), info->BaseAddress(),
+				info->Size(), info->RamSize(),
+				UiUtils::AreaLockingFlagsToString(info->Lock(), lockingBuffer,
+					sizeof(lockingBuffer)),
+				UiUtils::AreaProtectionFlagsToString(info->Protection(),
+					protectionBuffer).String());
+
+			_output << data;
+		} catch (...) {
+			return B_NO_MEMORY;
+		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
+DebugReportGenerator::_DumpSemaphores(BString& _output)
+{
+	BObjectList<SemaphoreInfo> semaphores(20, true);
+	status_t result = fDebuggerInterface->GetSemaphoreInfos(semaphores);
+	if (result != B_OK)
+		return result;
+
+	_output << "\nSemaphores:\n";
+	BString data;
+	SemaphoreInfo* info;
+	for (int32 i = 0; (info = semaphores.ItemAt(i)) != NULL; i++) {
+		try {
+			data.SetToFormat("\t%s (%" B_PRId32 ") "
+				"Count: %" B_PRId32 ", Latest Holding Thread: %" B_PRId32 "\n",
+				info->Name().String(), info->SemID(), info->Count(),
+				info->LatestHolder());
 
 			_output << data;
 		} catch (...) {
@@ -408,8 +487,16 @@ DebugReportGenerator::_DumpStackFrameMemory(BString& _output,
 	}
 
 	_output << "\t\t\tFrame memory:\n";
-	UiUtils::DumpMemory(_output, 3, fCurrentBlock, startAddress, 1, 16,
-		endAddress - startAddress);
+	if (fBlockRetrievalStatus == B_OK) {
+		UiUtils::DumpMemory(_output, 3, fCurrentBlock, startAddress, 1, 16,
+			endAddress - startAddress);
+	} else {
+		BString data;
+		data.SetToFormat("\t\t\tUnavailable (%s)\n", strerror(
+				fBlockRetrievalStatus));
+		_output += data;
+	}
+
 }
 
 
@@ -450,4 +537,20 @@ DebugReportGenerator::_ResolveValueIfNeeded(ValueNode* node, StackFrame* frame,
 	}
 
 	return result;
+}
+
+
+void
+DebugReportGenerator::_HandleMemoryBlockRetrieved(TeamMemoryBlock* block,
+	status_t result)
+{
+	if (fCurrentBlock != NULL) {
+		fCurrentBlock->ReleaseReference();
+		fCurrentBlock = NULL;
+	}
+
+	fBlockRetrievalStatus = result;
+
+	fCurrentBlock = block;
+	release_sem(fTeamDataSem);
 }

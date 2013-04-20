@@ -20,7 +20,8 @@ static void
 init_syscall_registers(void* dummy, int cpuNum)
 {
 	// Enable SYSCALL (EFER.SCE = 1).
-	x86_write_msr(IA32_MSR_EFER, x86_read_msr(IA32_MSR_EFER) | (1 << 0));
+	x86_write_msr(IA32_MSR_EFER, x86_read_msr(IA32_MSR_EFER)
+		| IA32_MSR_EFER_SYSCALL);
 
 	// Flags to clear upon entry. Want interrupts disabled and the direction
 	// flag cleared.

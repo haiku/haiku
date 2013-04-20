@@ -10,9 +10,13 @@
 .align 4
 
 FUNCTION(memcpy):
-	jmp	*(USER_COMMPAGE_ADDR + COMMPAGE_ENTRY_X86_MEMCPY * 4)
+	movl	__gCommPageAddress, %eax
+	addl	4 * COMMPAGE_ENTRY_X86_MEMCPY(%eax), %eax
+	jmp 	*%eax
 FUNCTION_END(memcpy)
 
 FUNCTION(memset):
-	jmp	*(USER_COMMPAGE_ADDR + COMMPAGE_ENTRY_X86_MEMSET * 4)
+	movl	__gCommPageAddress, %eax
+	addl	4 * COMMPAGE_ENTRY_X86_MEMSET(%eax), %eax
+	jmp 	*%eax
 FUNCTION_END(memset)

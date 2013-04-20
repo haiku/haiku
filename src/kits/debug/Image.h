@@ -111,6 +111,15 @@ public:
 			status_t			Init(const image_info& info);
 };
 
+
+class CommPageImage : public SymbolTableBasedImage {
+public:
+								CommPageImage();
+	virtual						~CommPageImage();
+
+			status_t			Init(const image_info& info);
+};
+
 }	// namespace Debug
 }	// namespace BPrivate
 

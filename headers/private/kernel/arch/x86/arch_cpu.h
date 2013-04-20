@@ -39,6 +39,11 @@
 
 #define IA32_MSR_EFER					0xc0000080
 
+// MSR EFER bits
+// reference
+#define IA32_MSR_EFER_SYSCALL			(1 << 0)
+#define IA32_MSR_EFER_NX				(1 << 11)
+
 // x86_64 MSRs.
 #define IA32_MSR_STAR					0xc0000081
 #define IA32_MSR_LSTAR					0xc0000082
@@ -130,6 +135,13 @@
 #define IA32_FEATURE_AMD_EXT_LONG		(1 << 29) // long mode
 #define IA32_FEATURE_AMD_EXT_3DNOWEXT	(1 << 30) // 3DNow! extensions
 #define IA32_FEATURE_AMD_EXT_3DNOW		(1 << 31) // 3DNow!
+
+// some of the features from cpuid eax 0x80000001, edx register (AMD) are also
+// available on Intel processors
+#define IA32_FEATURES_INTEL_EXT			(IA32_FEATURE_AMD_EXT_SYSCALL		\
+											| IA32_FEATURE_AMD_EXT_NX		\
+											| IA32_FEATURE_AMD_EXT_RDTSCP	\
+											| IA32_FEATURE_AMD_EXT_LONG)
 
 // x86 defined features from cpuid eax 6, eax register
 // reference http://www.intel.com/Assets/en_US/PDF/appnote/241618.pdf (Table 5-11)

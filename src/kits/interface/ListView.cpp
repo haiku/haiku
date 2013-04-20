@@ -1,13 +1,13 @@
 /*
- * Copyright 2001-2009, Haiku, Inc. All rights resrerved.
+ * Copyright 2001-2013 Haiku, Inc. All rights resrerved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
- *		Ulrich Wimboeck
- *		Marc Flerackers (mflerackers@androme.be)
- *		Stephan Assmus <superstippi@gmx.de>
+ *		Stephan Assmus, superstippi@gmx.de
  *		Axel Dörfler, axeld@pinc-software.de
- *		Rene Gollent (rene@gollent.com)
+ *		Marc Flerackers, mflerackers@androme.be
+ *		Rene Gollent, rene@gollent.com
+ *		Ulrich Wimboeck
  */
 
 
@@ -33,16 +33,21 @@ struct track_data {
 	bigtime_t	last_click_time;
 };
 
+
 const float kDoubleClickTresh = 6;
+
 
 static property_info sProperties[] = {
 	{ "Item", { B_COUNT_PROPERTIES, 0 }, { B_DIRECT_SPECIFIER, 0 },
-		"Returns the number of BListItems currently in the list.", 0, { B_INT32_TYPE }
+		"Returns the number of BListItems currently in the list.", 0,
+		{ B_INT32_TYPE }
 	},
 
-	{ "Item", { B_EXECUTE_PROPERTY, 0 }, { B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER,
-		B_RANGE_SPECIFIER, B_REVERSE_RANGE_SPECIFIER, 0 },
-		"Select and invoke the specified items, first removing any existing selection."
+	{ "Item", { B_EXECUTE_PROPERTY, 0 }, { B_INDEX_SPECIFIER,
+		B_REVERSE_INDEX_SPECIFIER, B_RANGE_SPECIFIER,
+		B_REVERSE_RANGE_SPECIFIER, 0 },
+		"Select and invoke the specified items, first removing any existing "
+		"selection."
 	},
 
 	{ "Selection", { B_COUNT_PROPERTIES, 0 }, { B_DIRECT_SPECIFIER, 0 },
@@ -54,46 +59,52 @@ static property_info sProperties[] = {
 	},
 
 	{ "Selection", { B_GET_PROPERTY, 0 }, { B_DIRECT_SPECIFIER, 0 },
-		"Returns int32 indices of all items in the selection.", 0, { B_INT32_TYPE }
+		"Returns int32 indices of all items in the selection.", 0,
+		{ B_INT32_TYPE }
 	},
 
-	{ "Selection", { B_SET_PROPERTY, 0 }, { B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER,
-		B_RANGE_SPECIFIER, B_REVERSE_RANGE_SPECIFIER, 0 },
-		"Extends current selection or deselects specified items. Boolean field \"data\" "
-		"chooses selection or deselection.", 0, { B_BOOL_TYPE }
+	{ "Selection", { B_SET_PROPERTY, 0 }, { B_INDEX_SPECIFIER,
+		B_REVERSE_INDEX_SPECIFIER, B_RANGE_SPECIFIER,
+		B_REVERSE_RANGE_SPECIFIER, 0 },
+		"Extends current selection or deselects specified items. Boolean field "
+		"\"data\" chooses selection or deselection.", 0, { B_BOOL_TYPE }
 	},
 
 	{ "Selection", { B_SET_PROPERTY, 0 }, { B_DIRECT_SPECIFIER, 0 },
-		"Select or deselect all items in the selection. Boolean field \"data\" chooses "
-		"selection or deselection.", 0, { B_BOOL_TYPE }
+		"Select or deselect all items in the selection. Boolean field \"data\" "
+		"chooses selection or deselection.", 0, { B_BOOL_TYPE }
 	},
 };
 
 
 BListView::BListView(BRect frame, const char* name, list_view_type type,
-		uint32 resizingMode, uint32 flags)
-	: BView(frame, name, resizingMode, flags)
+	uint32 resizingMode, uint32 flags)
+	:
+	BView(frame, name, resizingMode, flags)
 {
 	_InitObject(type);
 }
 
 
 BListView::BListView(const char* name, list_view_type type, uint32 flags)
-	: BView(name, flags)
+	:
+	BView(name, flags)
 {
 	_InitObject(type);
 }
 
 
 BListView::BListView(list_view_type type)
-	: BView(NULL, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE)
+	:
+	BView(NULL, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE)
 {
 	_InitObject(type);
 }
 
 
 BListView::BListView(BMessage* archive)
-	: BView(archive)
+	:
+	BView(archive)
 {
 	int32 listType;
 	archive->FindInt32("_lv_type", &listType);
@@ -102,24 +113,24 @@ BListView::BListView(BMessage* archive)
 	int32 i = 0;
 	BMessage subData;
 	while (archive->FindMessage("_l_items", i++, &subData) == B_OK) {
-		BArchivable *object = instantiate_object(&subData);
-		if (!object)
+		BArchivable* object = instantiate_object(&subData);
+		if (object == NULL)
 			continue;
 
-		BListItem *item = dynamic_cast<BListItem*>(object);
-		if (item)
+		BListItem* item = dynamic_cast<BListItem*>(object);
+		if (item != NULL)
 			AddItem(item);
 	}
 
 	if (archive->HasMessage("_msg")) {
-		BMessage *invokationMessage = new BMessage;
+		BMessage* invokationMessage = new BMessage;
 
 		archive->FindMessage("_msg", invokationMessage);
 		SetInvocationMessage(invokationMessage);
 	}
 
 	if (archive->HasMessage("_2nd_msg")) {
-		BMessage *selectionMessage = new BMessage;
+		BMessage* selectionMessage = new BMessage;
 
 		archive->FindMessage("_2nd_msg", selectionMessage);
 		SetSelectionMessage(selectionMessage);
@@ -157,7 +168,7 @@ BListView::Archive(BMessage* archive, bool deep) const
 
 	status = archive->AddInt32("_lv_type", fListType);
 	if (status == B_OK && deep) {
-		BListItem *item;
+		BListItem* item;
 		int32 i = 0;
 
 		while ((item = ItemAt(i++))) {
@@ -377,11 +388,10 @@ BListView::MessageReceived(BMessage* msg)
 
 
 void
-BListView::KeyDown(const char *bytes, int32 numBytes)
+BListView::KeyDown(const char* bytes, int32 numBytes)
 {
-	bool extend
-		= fListType == B_MULTIPLE_SELECTION_LIST
-			&& (modifiers() & B_SHIFT_KEY) != 0;
+	bool extend = fListType == B_MULTIPLE_SELECTION_LIST
+		&& (modifiers() & B_SHIFT_KEY) != 0;
 
 	switch (bytes[0]) {
 		case B_UP_ARROW:
@@ -425,6 +435,7 @@ BListView::KeyDown(const char *bytes, int32 numBytes)
 				fAnchorIndex = 0;
 			} else
 				Select(0, false);
+
 			ScrollToSelection();
 			break;
 		case B_END:
@@ -433,6 +444,7 @@ BListView::KeyDown(const char *bytes, int32 numBytes)
 				fAnchorIndex = CountItems() - 1;
 			} else
 				Select(CountItems() - 1, false);
+
 			ScrollToSelection();
 			break;
 
@@ -475,7 +487,7 @@ BListView::MouseDown(BPoint point)
 		Window()->UpdateIfNeeded();
 	}
 
-	BMessage *message = Looper()->CurrentMessage();
+	BMessage* message = Looper()->CurrentMessage();
 	int32 index = IndexOf(point);
 
 	// If the user double (or more) clicked within the current selection,
@@ -494,8 +506,9 @@ BListView::MouseDown(BPoint point)
 	if (timeDelta < doubleClickSpeed
 		&& fabs(delta.x) < kDoubleClickTresh
 		&& fabs(delta.y) < kDoubleClickTresh
-		&& fTrack->item_index == index)
+		&& fTrack->item_index == index) {
 		doubleClick = true;
+	}
 
 	if (doubleClick && index >= fFirstSelected && index <= fLastSelected) {
 		fTrack->drag_start.Set(INT32_MAX, INT32_MAX);
@@ -518,8 +531,10 @@ BListView::MouseDown(BPoint point)
 		if (fListType == B_MULTIPLE_SELECTION_LIST) {
 			if (modifiers & B_SHIFT_KEY) {
 				// select entire block
-				// TODO: maybe review if we want it like in Tracker (anchor item)
-				Select(min_c(index, fFirstSelected), max_c(index, fLastSelected));
+				// TODO: maybe review if we want it like in Tracker
+				// (anchor item)
+				Select(min_c(index, fFirstSelected), max_c(index,
+					fLastSelected));
 			} else {
 				if (modifiers & B_COMMAND_KEY) {
 					// toggle selection state of clicked item (like in Tracker)
@@ -528,9 +543,8 @@ BListView::MouseDown(BPoint point)
 						Deselect(index);
 					else
 						Select(index, true);
-				} else {
+				} else
 					Select(index);
-				}
 			}
 		} else {
 			// toggle selection state of clicked item
@@ -539,15 +553,13 @@ BListView::MouseDown(BPoint point)
 			else
 				Select(index);
 		}
-	} else {
-		if (!(modifiers & B_COMMAND_KEY))
-			DeselectAll();
-	}
+	} else if ((modifiers & B_COMMAND_KEY) == 0)
+		DeselectAll();
 }
 
-// MouseUp
+
 void
-BListView::MouseUp(BPoint pt)
+BListView::MouseUp(BPoint where)
 {
 	fTrack->try_drag = false;
 }
@@ -591,7 +603,7 @@ BListView::ResizeToPreferred()
 
 
 void
-BListView::GetPreferredSize(float* _width, float* _height)
+BListView::GetPreferredSize(float *_width, float *_height)
 {
 	int32 count = CountItems();
 
@@ -607,9 +619,8 @@ BListView::GetPreferredSize(float* _width, float* _height)
 			*_width = maxWidth;
 		if (_height != NULL)
 			*_height = ItemAt(count - 1)->Bottom();
-	} else {
+	} else
 		BView::GetPreferredSize(_width, _height);
-	}
 }
 
 
@@ -769,8 +780,8 @@ BListView::AddList(BList* list)
 BListItem*
 BListView::RemoveItem(int32 index)
 {
-	BListItem *item = ItemAt(index);
-	if (!item)
+	BListItem* item = ItemAt(index);
+	if (item == NULL)
 		return NULL;
 
 	if (item->IsSelected())
@@ -798,7 +809,7 @@ BListView::RemoveItem(int32 index)
 
 
 bool
-BListView::RemoveItem(BListItem *item)
+BListView::RemoveItem(BListItem* item)
 {
 	return BListView::RemoveItem(IndexOf(item)) != NULL;
 }
@@ -819,6 +830,7 @@ BListView::RemoveItems(int32 index, int32 count)
 	fList.RemoveItems(index, count);
 	if (index < fList.CountItems())
 		_RecalcItemTops(index);
+
 	Invalidate();
 	return true;
 }
@@ -873,9 +885,10 @@ BListView::SelectionCommand() const
 void
 BListView::SetListType(list_view_type type)
 {
-	if (fListType == B_MULTIPLE_SELECTION_LIST &&
-		type == B_SINGLE_SELECTION_LIST)
+	if (fListType == B_MULTIPLE_SELECTION_LIST
+		&& type == B_SINGLE_SELECTION_LIST) {
 		Select(CurrentSelection(0));
+	}
 
 	fListType = type;
 }
@@ -903,6 +916,7 @@ BListView::IndexOf(BListItem *item) const
 			int32 index = IndexOf(BPoint(0.0, item->Top()));
 			if (index >= 0 && fList.ItemAt(index) == item)
 				return index;
+
 			return -1;
 		}
 	}
@@ -918,6 +932,7 @@ BListView::IndexOf(BPoint point) const
 	int32 mid = -1;
 	float frameTop = -1.0;
 	float frameBottom = 1.0;
+
 	// binary search the list
 	while (high >= low) {
 		mid = (low + high) / 2;
@@ -1052,8 +1067,8 @@ BListView::Select(int32 start, int32 finish, bool extend)
 bool
 BListView::IsItemSelected(int32 index) const
 {
-	BListItem *item = ItemAt(index);
-	if (item)
+	BListItem* item = ItemAt(index);
+	if (item != NULL)
 		return item->IsSelected();
 
 	return false;
@@ -1206,7 +1221,7 @@ BListView::MoveItem(int32 from, int32 to)
 
 
 bool
-BListView::ReplaceItem(int32 index, BListItem *item)
+BListView::ReplaceItem(int32 index, BListItem* item)
 {
 	MiscData data;
 
@@ -1499,7 +1514,8 @@ BListView::_Select(int32 index, bool extend)
 }
 
 
-/*!	Selects the items between \a from and \a to, and returns \c true in
+/*!
+	Selects the items between \a from and \a to, and returns \c true in
 	case the selection was changed because of this method.
 	If \a extend is \c false, all previously selected items are deselected.
 */
@@ -1687,8 +1703,10 @@ BListView::_SwapItems(int32 a, int32 b)
 	int32 first = min_c(a, b);
 	int32 last = max_c(a, b);
 	if (ItemAt(a)->IsSelected() != ItemAt(b)->IsSelected()) {
-		if (first < fFirstSelected || last > fLastSelected)
-			_RescanSelection(min_c(first, fFirstSelected), max_c(last, fLastSelected));
+		if (first < fFirstSelected || last > fLastSelected) {
+			_RescanSelection(min_c(first, fFirstSelected),
+				max_c(last, fLastSelected));
+		}
 		// though the actually selected items stayed the
 		// same, the selection has still changed
 		SelectionChanged();
@@ -1749,9 +1767,9 @@ BListView::_MoveItem(int32 from, int32 to)
 
 
 bool
-BListView::_ReplaceItem(int32 index, BListItem *item)
+BListView::_ReplaceItem(int32 index, BListItem* item)
 {
-	if (!item)
+	if (item == NULL)
 		return false;
 
 	BListItem* old = ItemAt(index);
@@ -1848,4 +1866,3 @@ BListView::_RecalcItemTops(int32 start, int32 end)
 		top += ceilf(item->Height());
 	}
 }
-

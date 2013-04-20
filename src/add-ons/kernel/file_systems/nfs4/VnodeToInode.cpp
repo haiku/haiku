@@ -27,7 +27,7 @@ void
 VnodeToInode::Replace(Inode* newInode)
 {
 	WriteLocker _(fLock);
-	if (fInode != NULL && !IsRoot())
+	if (!IsRoot())
 		delete fInode;
 
 	fInode = newInode;

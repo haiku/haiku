@@ -500,7 +500,7 @@ TReplicantTray::DeleteAddOnSupport()
 {
 	_SaveSettings();
 
-	for (int32 i = fItemList->CountItems(); i-- > 0 ;) {
+	for (int32 i = fItemList->CountItems() - 1; i >= 0; i--) {
 		DeskbarItemInfo* item = (DeskbarItemInfo*)fItemList->RemoveItem(i);
 		if (item) {
 			if (item->isAddOn)
@@ -519,7 +519,7 @@ TReplicantTray::DeleteAddOnSupport()
 DeskbarItemInfo*
 TReplicantTray::DeskbarItemFor(node_ref& nodeRef)
 {
-	for (int32 i = fItemList->CountItems(); i-- > 0 ;) {
+	for (int32 i = fItemList->CountItems() - 1; i >= 0; i--) {
 		DeskbarItemInfo* item = (DeskbarItemInfo*)fItemList->ItemAt(i);
 		if (item == NULL)
 			continue;
@@ -535,7 +535,7 @@ TReplicantTray::DeskbarItemFor(node_ref& nodeRef)
 DeskbarItemInfo*
 TReplicantTray::DeskbarItemFor(int32 id)
 {
-	for (int32 i = fItemList->CountItems(); i-- > 0 ;) {
+	for (int32 i = fItemList->CountItems() - 1; i >= 0; i--) {
 		DeskbarItemInfo* item = (DeskbarItemInfo*)fItemList->ItemAt(i);
 		if (item == NULL)
 			continue;
@@ -719,7 +719,7 @@ void
 TReplicantTray::UnloadAddOn(node_ref* nodeRef, dev_t* device,
 	bool which, bool removeAll)
 {
-	for (int32 i = fItemList->CountItems(); i-- > 0 ;) {
+	for (int32 i = fItemList->CountItems() - 1; i >= 0; i--) {
 		DeskbarItemInfo* item = (DeskbarItemInfo*)fItemList->ItemAt(i);
 		if (!item)
 			continue;
@@ -783,7 +783,7 @@ TReplicantTray::MoveItem(entry_ref* ref, ino_t toDirectory)
 	//
 	// don't need to change node info as it does not change
 
-	for (int32 i = fItemList->CountItems(); i-- > 0 ;) {
+	for (int32 i = fItemList->CountItems() - 1; i >= 0; i--) {
 		DeskbarItemInfo* item = (DeskbarItemInfo*)fItemList->ItemAt(i);
 		if (!item)
 			continue;

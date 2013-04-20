@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-LaunchBox	3016105370
+1	french	x-vnd.Haiku-LaunchBox	3692177981
 New	LaunchBox		Nouveau
 Set description…	LaunchBox		Ajouter une description…
 Vertical layout	LaunchBox		Disposition verticale
@@ -6,6 +6,7 @@ OK	LaunchBox		OK
 Pad 1	LaunchBox		Pavé 1
 last chance	LaunchBox		dernière chance
 Quit	LaunchBox		Quitter
+Open containing folder	LaunchBox		Ouvrir le dossier hôte
 Clear button	LaunchBox		Vider le bouton
 LaunchBox	System name		Lanceur rapide
 Ignore double-click	LaunchBox		Ignorer le double click

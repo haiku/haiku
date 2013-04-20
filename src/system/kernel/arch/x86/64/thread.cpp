@@ -22,6 +22,7 @@
 #include <thread.h>
 #include <tls.h>
 #include <tracing.h>
+#include <util/Random.h>
 #include <vm/vm_types.h>
 #include <vm/VMAddressSpace.h>
 
@@ -197,6 +198,15 @@ arch_thread_dump_info(void* info)
 }
 
 
+static addr_t
+arch_randomize_stack_pointer(addr_t value)
+{
+	STATIC_ASSERT(MAX_RANDOM_VALUE >= B_PAGE_SIZE - 1);
+	value -= random_value() & (B_PAGE_SIZE - 1);
+	return value & ~addr_t(0xf);
+}
+
+
 /*!	Sets up initial thread context and enters user space
 */
 status_t
@@ -208,20 +218,14 @@ arch_thread_enter_userspace(Thread* thread, addr_t entry, void* args1,
 	TRACE("arch_thread_enter_userspace: entry %#lx, args %p %p, "
 		"stackTop %#lx\n", entry, args1, args2, stackTop);
 
-	// Copy the little stub that calls exit_thread() when the thread entry
-	// function returns.
-	// TODO: This will become a problem later if we want to support execute
-	// disable, the stack shouldn't really be executable.
-	size_t codeSize = (addr_t)x86_end_userspace_thread_exit
-		- (addr_t)x86_userspace_thread_exit;
-	stackTop -= codeSize;
-	if (user_memcpy((void*)stackTop, (const void*)&x86_userspace_thread_exit,
-			codeSize) != B_OK)
-		return B_BAD_ADDRESS;
+	stackTop = arch_randomize_stack_pointer(stackTop);
 
-	// Copy the address of the stub to the top of the stack to act as the
-	// return address.
-	addr_t codeAddr = stackTop;
+	// Copy the address of the stub that calls exit_thread() when the thread
+	// entry function returns to the top of the stack to act as the return
+	// address. The stub is inside commpage.
+	addr_t commPageAddress = (addr_t)thread->team->commpage_address;
+	addr_t codeAddr = ((addr_t*)commPageAddress)[COMMPAGE_ENTRY_X86_THREAD_EXIT]
+		+ commPageAddress;
 	stackTop -= sizeof(codeAddr);
 	if (user_memcpy((void*)stackTop, (const void*)&codeAddr, sizeof(codeAddr))
 			!= B_OK)
@@ -340,8 +344,10 @@ arch_setup_signal_frame(Thread* thread, struct sigaction* action,
 
 	// Set up the iframe to execute the signal handler wrapper on our prepared
 	// stack. First argument points to the frame data.
+	addr_t* commPageAddress = (addr_t*)thread->team->commpage_address;
 	frame->user_sp = (addr_t)userStack;
-	frame->ip = ((addr_t*)USER_COMMPAGE_ADDR)[COMMPAGE_ENTRY_X86_SIGNAL_HANDLER];
+	frame->ip = commPageAddress[COMMPAGE_ENTRY_X86_SIGNAL_HANDLER]
+		+ (addr_t)commPageAddress;
 	frame->di = (addr_t)userSignalFrameData;
 
 	return B_OK;

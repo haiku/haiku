@@ -1729,7 +1729,8 @@ BMenu::_Track(int* action, long start)
 				GetMouse(&newLocation, &newButtons, true);
 				UnlockLooper();
 			} while (newLocation == location && newButtons == buttons
-				&& !(item && item->Submenu() != NULL)
+				&& !(item != NULL && item->Submenu() != NULL
+						&& item->Submenu()->Window() == NULL)
 				&& fState == MENU_STATE_TRACKING);
 
 			if (newLocation != location || newButtons != buttons) {
@@ -2118,9 +2119,18 @@ BMenu::_ComputeLayout(int32 index, bool bestFit, bool moveItems,
 
 	switch (fLayout) {
 		case B_ITEMS_IN_COLUMN:
-			_ComputeColumnLayout(index, bestFit, moveItems, frame);
-			break;
+		{
+			BRect parentFrame;
+			BRect* overrideFrame = NULL;
+			if (dynamic_cast<_BMCMenuBar_*>(Supermenu()) != NULL) {
+				parentFrame = Supermenu()->Bounds();
+				overrideFrame = &parentFrame;
+			}
 
+			_ComputeColumnLayout(index, bestFit, moveItems, overrideFrame,
+					frame);
+			break;
+		}
 		case B_ITEMS_IN_ROW:
 			_ComputeRowLayout(index, bestFit, moveItems, frame);
 			break;
@@ -2163,7 +2173,7 @@ BMenu::_ComputeLayout(int32 index, bool bestFit, bool moveItems,
 
 void
 BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems,
-	BRect& frame)
+	BRect* overrideFrame, BRect& frame)
 {
 	BFont font;
 	GetFont(&font);
@@ -2173,7 +2183,9 @@ BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems,
 	bool option = false;
 	if (index > 0)
 		frame = ItemAt(index - 1)->Frame();
-	else
+	else if (overrideFrame != NULL) {
+		frame.Set(0, 0, overrideFrame->right, -1);
+	} else
 		frame.Set(0, 0, 0, -1);
 
 	for (; index < fItems.CountItems(); index++) {
@@ -2325,13 +2337,12 @@ BMenu::_CalcFrame(BPoint where, bool* scrollOn)
 	BMenu* superMenu = Supermenu();
 	BMenuItem* superItem = Superitem();
 
-	bool scroll = false;
-
 	// TODO: Horrible hack:
 	// When added to a BMenuField, a BPopUpMenu is the child of
 	// a _BMCMenuBar_ to "fake" the menu hierarchy
-	if (superMenu == NULL || superItem == NULL
-		|| dynamic_cast<_BMCMenuBar_*>(superMenu) != NULL) {
+	bool inMenuField = dynamic_cast<_BMCMenuBar_*>(superMenu) != NULL;
+	bool scroll = false;
+	if (superMenu == NULL || superItem == NULL || inMenuField) {
 		// just move the window on screen
 
 		if (frame.bottom > screenFrame.bottom)

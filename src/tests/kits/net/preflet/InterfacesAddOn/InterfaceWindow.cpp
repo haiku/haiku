@@ -104,14 +104,9 @@ InterfaceWindow::_PopulateTabs()
 	fTabHardwareView = new InterfaceHardwareView(frame,
 		fNetworkSettings);
 	fTabView->AddTab(fTabHardwareView, hardwareTab);
+	hardwareTab->SetLabel(B_TRANSLATE("Interface"));
 
-	if (fNetworkSettings->IsEthernet())
-		hardwareTab->SetLabel(B_TRANSLATE("Wired"));
-	else
-		hardwareTab->SetLabel(B_TRANSLATE("Wirless"));
-
-	for (int index = 0; index < MAX_PROTOCOLS; index++)
-	{
+	for (int index = 0; index < MAX_PROTOCOLS; index++) {
 		if (supportedFamilies[index].present) {
 			int inet_id = supportedFamilies[index].inet_id;
 			fTabIPView[inet_id] = new InterfaceAddressView(frame,

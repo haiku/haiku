@@ -40,6 +40,7 @@ Delegation::GiveUp(bool truncate)
 status_t
 Delegation::ReturnDelegation()
 {
+	uint32 attempt = 0;
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -54,8 +55,10 @@ Delegation::ReturnDelegation()
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), serv, NULL, fInode->GetOpenState()))
+		if (HandleErrors(attempt, reply.NFS4Error(), serv, NULL,
+				fInode->GetOpenState())) {
 			continue;
+		}
 
 		reply.PutFH();
 

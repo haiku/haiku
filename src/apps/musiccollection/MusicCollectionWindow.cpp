@@ -10,6 +10,7 @@
 
 #include <Application.h>
 #include <ControlLook.h>
+#include <Debug.h>
 #include <ScrollView.h>
 #include <VolumeRoster.h>
 

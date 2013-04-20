@@ -311,6 +311,8 @@ enum color_which {
 	B_LIST_ITEM_TEXT_COLOR = 30,
 	B_LIST_SELECTED_ITEM_TEXT_COLOR = 31,
 
+	B_SCROLL_BAR_THUMB_COLOR = 32,
+
 	B_TOOL_TIP_BACKGROUND_COLOR = 20,
 	B_TOOL_TIP_TEXT_COLOR = 21,
 
@@ -329,9 +331,9 @@ enum color_which {
 	B_KEYBOARD_NAVIGATION_COLOR = B_NAVIGATION_BASE_COLOR,
 	B_MENU_SELECTION_BACKGROUND_COLOR = B_MENU_SELECTED_BACKGROUND_COLOR,
 
-	// These are deprecated -- do not use in new code.  See BScreen for
-	// the replacement for B_DESKTOP_COLOR.
+	// The following constants are deprecated, do not use in new code.
 	B_DESKTOP_COLOR = 5
+		// see BScreen class for B_DESKTOP_COLOR replacement
 };
 
 

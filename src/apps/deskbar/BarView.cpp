@@ -36,10 +36,6 @@ All rights reserved.
 
 #include "BarView.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include <AppFileInfo.h>
 #include <Bitmap.h>
 #include <Debug.h>
@@ -130,9 +126,10 @@ BarViewMessageFilter::Filter(BMessage* message, BHandler** target)
 
 
 TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
-	uint32 state, float)
+	int32 state, float)
 	:
 	BView(frame, "BarView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
+	fBarApp(static_cast<TBarApp*>(be_app)),
 	fInlineScrollView(NULL),
 	fBarMenuBar(NULL),
 	fExpandoMenuBar(NULL),
@@ -140,7 +137,7 @@ TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
 	fVertical(vertical),
 	fTop(top),
 	fLeft(left),
-	fState(static_cast<int32>(state)),
+	fState(state),
 	fRefsRcvdOnly(true),
 	fDragMessage(NULL),
 	fCachedTypesList(NULL),
@@ -149,18 +146,32 @@ TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
 	fLastDragItem(NULL),
 	fMouseFilter(NULL)
 {
+	// determine the initial Be menu size
+	BRect menuFrame(frame);
+	if (fVertical)
+		menuFrame.bottom = menuFrame.top + kMenuBarHeight;
+	else
+		menuFrame.bottom = menuFrame.top + fBarApp->IconSize() + 4;
+
+	// create and add the Be menu
+	fBarMenuBar = new TBarMenuBar(menuFrame, "BarMenuBar", this);
+	AddChild(fBarMenuBar);
+
+	// create and add the status tray
 	fReplicantTray = new TReplicantTray(this, fVertical);
 	fDragRegion = new TDragRegion(this, fReplicantTray);
 	fDragRegion->AddChild(fReplicantTray);
 	if (fTrayLocation != 0)
 		AddChild(fDragRegion);
 
+	// create and add the application menubar
 	fExpandoMenuBar = new TExpandoMenuBar(BRect(0, 0, 0, 0),
-		"ExpandoMenuBar", fVertical);
+		"ExpandoMenuBar", this, fVertical);
 	fInlineScrollView = new TInlineScrollView(BRect(0, 0, 0, 0),
 		fExpandoMenuBar, fVertical ? B_VERTICAL : B_HORIZONTAL);
 	AddChild(fInlineScrollView);
 
+	// If mini mode, hide the application menubar
 	if (state == kMiniState)
 		fInlineScrollView->Hide();
 }
@@ -279,7 +290,7 @@ TBarView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 	if (transit == B_ENTERED_VIEW && EventMask() == 0)
 		SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 
-	desk_settings* settings = ((TBarApp*)be_app)->Settings();
+	desk_settings* settings = fBarApp->Settings();
 	bool alwaysOnTop = settings->alwaysOnTop;
 	bool autoRaise = settings->autoRaise;
 	bool autoHide = settings->autoHide;
@@ -346,7 +357,7 @@ TBarView::MouseDown(BPoint where)
 		}
 	} else {
 		// hide deskbar if required
-		desk_settings* settings = ((TBarApp*)be_app)->Settings();
+		desk_settings* settings = fBarApp->Settings();
 		bool alwaysOnTop = settings->alwaysOnTop;
 		bool autoRaise = settings->autoRaise;
 		bool autoHide = settings->autoHide;
@@ -364,31 +375,15 @@ TBarView::MouseDown(BPoint where)
 void
 TBarView::PlaceDeskbarMenu()
 {
-	// Calculate the size of the deskbar menu
-	BRect menuFrame(Bounds());
-	if (fVertical)
-		menuFrame.bottom = menuFrame.top + kMenuBarHeight;
-	else {
-		menuFrame.bottom = menuFrame.top
-			+ static_cast<TBarApp*>(be_app)->IconSize() + 4;
-	}
+	float height;
+	height = fVertical ? kMenuBarHeight : fBarApp->IconSize() + 4;
 
-	if (fBarMenuBar == NULL) {
-		// create the Be menu
-		fBarMenuBar = new TBarMenuBar(this, menuFrame, "BarMenuBar");
-		AddChild(fBarMenuBar);
-	} else
-		fBarMenuBar->SmartResize(-1, -1);
-
-	float width = sMinimumWindowWidth;
 	BPoint loc(B_ORIGIN);
+	float width = sMinimumWindowWidth;
 
 	if (fState == kFullState) {
 		fBarMenuBar->RemoveTeamMenu();
 		fBarMenuBar->RemoveSeperatorItem();
-		// TODO: Magic constants need explanation
-		width = 8 + 16 + 8;
-		fBarMenuBar->SmartResize(width, menuFrame.Height());
 		loc = Bounds().LeftTop();
 	} else if (fState == kExpandoState) {
 		fBarMenuBar->RemoveTeamMenu();
@@ -398,7 +393,7 @@ TBarView::PlaceDeskbarMenu()
 			width += 1;
 		} else {
 			// shows apps to the right of bemenu
-			fBarMenuBar->AddSeperatorItem();
+			fBarMenuBar->AddSeparatorItem();
 			width = floorf(width) / 2 + kSepItemWidth;
 		}
 		loc = Bounds().LeftTop();
@@ -408,7 +403,7 @@ TBarView::PlaceDeskbarMenu()
 		fBarMenuBar->AddTeamMenu();
 	}
 
-	fBarMenuBar->SmartResize(width, menuFrame.Height());
+	fBarMenuBar->SmartResize(width, height);
 	fBarMenuBar->MoveTo(loc);
 }
 
@@ -491,11 +486,10 @@ TBarView::PlaceApplicationBar()
 	} else {
 		// top or bottom
 		expandoFrame.top = 0;
-		int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
-		expandoFrame.bottom = iconSize + 4;
+		expandoFrame.bottom = fBarApp->IconSize() + 4;
 
 		if (fBarMenuBar != NULL)
-			expandoFrame.left = fBarMenuBar->Frame().Width();
+			expandoFrame.left = fBarMenuBar->Frame().Width() + 1;
 
 		if (fTrayLocation != 0 && fDragRegion != NULL) {
 			expandoFrame.right = screenFrame.Width()
@@ -512,6 +506,11 @@ TBarView::PlaceApplicationBar()
 	fExpandoMenuBar->MoveTo(0, 0);
 	fExpandoMenuBar->ResizeTo(expandoFrame.Width(), expandoFrame.Height());
 
+	if (!fVertical) {
+		// Set the max item width based on icon size
+		fExpandoMenuBar->SetMaxItemWidth();
+	}
+
 	fExpandoMenuBar->BuildItems();
 	if (fVertical)
 		ExpandItems();
@@ -519,7 +518,7 @@ TBarView::PlaceApplicationBar()
 	SizeWindow(screenFrame);
 	PositionWindow(screenFrame);
 	fExpandoMenuBar->DoLayout();
-		// force menu to autosize
+		// force menu to resize
 	CheckForScrolling();
 	Window()->UpdateIfNeeded();
 	Invalidate();
@@ -531,9 +530,8 @@ TBarView::GetPreferredWindowSize(BRect screenFrame, float* width, float* height)
 {
 	float windowHeight = 0;
 	float windowWidth = sMinimumWindowWidth;
-	bool setToHiddenSize = ((TBarApp*)be_app)->Settings()->autoHide
-		&& IsHidden() && !fDragRegion->IsDragging();
-	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
+	bool setToHiddenSize = fBarApp->Settings()->autoHide && IsHidden()
+		&& !fDragRegion->IsDragging();
 
 	if (setToHiddenSize) {
 		windowHeight = kHiddenDimension;
@@ -560,7 +558,7 @@ TBarView::GetPreferredWindowSize(BRect screenFrame, float* width, float* height)
 			} else {
 				// top or bottom, full
 				fExpandoMenuBar->CheckItemSizes(0);
-				windowHeight = iconSize + 4;
+				windowHeight = fBarApp->IconSize() + 4;
 				windowWidth = screenFrame.Width();
 			}
 		} else {
@@ -624,12 +622,12 @@ TBarView::CheckForScrolling()
 void
 TBarView::SaveSettings()
 {
-	desk_settings* settings = ((TBarApp*)be_app)->Settings();
+	desk_settings* settings = fBarApp->Settings();
 
 	settings->vertical = fVertical;
 	settings->left = fLeft;
 	settings->top = fTop;
-	settings->state = (uint32)fState;
+	settings->state = fState;
 	settings->width = 0;
 
 	fReplicantTray->SaveTimeSettings();
@@ -663,12 +661,13 @@ TBarView::ChangeState(int32 state, bool vertical, bool left, bool top,
 void
 TBarView::SaveExpandedItems()
 {
-	if (fExpandoMenuBar == NULL || fExpandoMenuBar->CountItems() <= 0)
+	if (fExpandoMenuBar == NULL)
 		return;
 
 	// Get a list of the signatures of expanded apps. Can't use
 	// team_id because there can be more than one team per application
-	for (int32 i = 0; i < fExpandoMenuBar->CountItems(); i++) {
+	int32 count = fExpandoMenuBar->CountItems();
+	for (int32 i = 0; i < count; i++) {
 		TTeamMenuItem* teamItem
 			= dynamic_cast<TTeamMenuItem*>(fExpandoMenuBar->ItemAt(i));
 
@@ -691,9 +690,10 @@ void
 TBarView::ExpandItems()
 {
 	if (fExpandoMenuBar == NULL || !fVertical || fState != kExpandoState
-		|| !static_cast<TBarApp*>(be_app)->Settings()->superExpando
-		|| fExpandedItems.CountItems() <= 0)
+		|| !fBarApp->Settings()->superExpando
+		|| fExpandedItems.CountItems() <= 0) {
 		return;
+	}
 
 	// Start at the 'bottom' of the list working up.
 	// Prevents being thrown off by expanding items.
@@ -763,7 +763,7 @@ TBarView::_ChangeState(BMessage* message)
 			}
 
 			fExpandoMenuBar = new TExpandoMenuBar(BRect(0, 0, 0, 0),
-				"ExpandoMenuBar", fVertical);
+				"ExpandoMenuBar", this, fVertical);
 			fInlineScrollView = new TInlineScrollView(BRect(0, 0, 0, 0),
 				fExpandoMenuBar, fVertical ? B_VERTICAL : B_HORIZONTAL);
 			AddChild(fInlineScrollView);

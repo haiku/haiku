@@ -295,24 +295,6 @@ IsWindowOK(const window_info* windowInfo)
 }
 
 
-bool
-OKToUse(const TTeamGroup* teamGroup)
-{
-	if (!teamGroup)
-		return false;
-
-	// skip background applications
-	if ((teamGroup->Flags() & B_BACKGROUND_APP) != 0)
-		return false;
-
-	// skip the Deskbar itself
-	if (strcasecmp(teamGroup->Signature(), kDeskbarSignature) == 0)
-		return false;
-
-	return true;
-}
-
-
 int
 SmartStrcmp(const char* s1, const char* s2)
 {
@@ -466,7 +448,7 @@ TSwitchManager::TSwitchManager(BPoint point)
 
 TSwitchManager::~TSwitchManager()
 {
-	for (int32 i = fGroupList.CountItems(); i-- > 0;) {
+	for (int32 i = fGroupList.CountItems() - 1; i >= 0; i--) {
 		TTeamGroup* teamInfo = static_cast<TTeamGroup*>(fGroupList.ItemAt(i));
 		delete teamInfo;
 	}
@@ -489,12 +471,10 @@ TSwitchManager::MessageReceived(BMessage* message)
 				if (tinfo->TeamList()->HasItem((void*)(addr_t)teamID)) {
 					fGroupList.RemoveItem(i);
 
-					if (OKToUse(tinfo)) {
-						fWindow->Redraw(i);
-						if (i <= fCurrentIndex) {
-							fCurrentIndex--;
-							CycleApp(true);
-						}
+					fWindow->Redraw(i);
+					if (i <= fCurrentIndex) {
+						fCurrentIndex--;
+						CycleApp(true);
 					}
 					delete tinfo;
 					break;
@@ -541,8 +521,7 @@ TSwitchManager::MessageReceived(BMessage* message)
 				signature);
 
 			fGroupList.AddItem(tinfo);
-			if (OKToUse(tinfo))
-				fWindow->Redraw(fGroupList.CountItems() - 1);
+			fWindow->Redraw(fGroupList.CountItems() - 1);
 
 			break;
 		}
@@ -551,8 +530,9 @@ TSwitchManager::MessageReceived(BMessage* message)
 		{
 			const char* signature = message->FindString("sig");
 			team_id team = message->FindInt32("team");
+			int32 count = fGroupList.CountItems();
 
-			for (int32 i = 0; i < fGroupList.CountItems(); i++) {
+			for (int32 i = 0; i < count; i++) {
 				TTeamGroup* tinfo = (TTeamGroup*)fGroupList.ItemAt(i);
 				if (strcasecmp(tinfo->Signature(), signature) == 0) {
 					if (!(tinfo->TeamList()->HasItem((void*)(addr_t)team)))
@@ -566,8 +546,9 @@ TSwitchManager::MessageReceived(BMessage* message)
 		case kRemoveTeam:
 		{
 			team_id team = message->FindInt32("team");
+			int32 count = fGroupList.CountItems();
 
-			for (int32 i = 0; i < fGroupList.CountItems(); i++) {
+			for (int32 i = 0; i < count; i++) {
 				TTeamGroup* tinfo = (TTeamGroup*)fGroupList.ItemAt(i);
 				if (tinfo->TeamList()->HasItem((void*)(addr_t)team)) {
 					tinfo->TeamList()->RemoveItem((void*)(addr_t)team);
@@ -809,22 +790,6 @@ TSwitchManager::QuickSwitch(BMessage* message)
 }
 
 
-int32
-TSwitchManager::CountVisibleGroups()
-{
-	int32 result = 0;
-
-	int32 count = fGroupList.CountItems();
-	for (int32 i = 0; i < count; i++) {
-		if (!OKToUse((TTeamGroup*)fGroupList.ItemAt(i)))
-			continue;
-
-		result++;
-	}
-	return result;
-}
-
-
 void
 TSwitchManager::CycleWindow(bool forward, bool wrap)
 {
@@ -874,31 +839,21 @@ TSwitchManager::CycleApp(bool forward, bool activateNow)
 bool
 TSwitchManager::_FindNextValidApp(bool forward)
 {
-	int32 startIndex = fCurrentIndex;
+	if (fGroupList.IsEmpty())
+		return false;
+
 	int32 max = fGroupList.CountItems();
-
-	for (;;) {
-		if (forward) {
-			fCurrentIndex++;
-			if (fCurrentIndex >= max)
-				fCurrentIndex = 0;
-		} else {
-			fCurrentIndex--;
-			if (fCurrentIndex < 0)
-				fCurrentIndex = max - 1;
-		}
-
-		if (fCurrentIndex == startIndex) {
-			// we've gone completely through the list without finding
-			// a good app. Oh well.
-			break;
-		}
-
-		if (OKToUse((TTeamGroup*)fGroupList.ItemAt(fCurrentIndex)))
-			return true;
+	if (forward) {
+		fCurrentIndex++;
+		if (fCurrentIndex >= max)
+			fCurrentIndex = 0;
+	} else {
+		fCurrentIndex--;
+		if (fCurrentIndex < 0)
+			fCurrentIndex = max - 1;
 	}
 
-	return false;
+	return true;
 }
 
 
@@ -908,9 +863,6 @@ TSwitchManager::SwitchToApp(int32 previousIndex, int32 newIndex, bool forward)
 	int32 previousSlot = fCurrentSlot;
 
 	fCurrentIndex = newIndex;
-	if (!OKToUse((TTeamGroup *)fGroupList.ItemAt(fCurrentIndex)))
-		_FindNextValidApp(forward);
-
 	fCurrentSlot = fWindow->SlotOf(fCurrentIndex);
 	fCurrentWindow = 0;
 
@@ -1039,26 +991,19 @@ TSwitchManager::ActivateApp(bool forceShow, bool allowWorkspaceSwitch)
 }
 
 
+/*!
+	\brief quit all teams in this group
+*/
 void
 TSwitchManager::QuitApp()
 {
-	// check if we're in the last slot already (the last usable team group)
+	// we should not be trying to quit an app if we have an empty list
+	if (fGroupList.IsEmpty())
+		return;
 
-	TTeamGroup* teamGroup;
-	int32 count = 0;
-
-	for (int32 i = fCurrentIndex + 1; i < fGroupList.CountItems(); i++) {
-		teamGroup = (TTeamGroup*)fGroupList.ItemAt(i);
-
-		if (!OKToUse(teamGroup))
-			continue;
-
-		count++;
-	}
-
-	teamGroup = (TTeamGroup*)fGroupList.ItemAt(fCurrentIndex);
-
-	if (count == 0) {
+	TTeamGroup* teamGroup = (TTeamGroup*)fGroupList.ItemAt(fCurrentIndex);
+	if (fCurrentIndex == fGroupList.CountItems() - 1) {
+		// if we're in the last slot already (the last usable team group)
 		// switch to previous app in the list so that we don't jump to
 		// the start of the list (try to keep the same position when
 		// the apps at the current index go away)
@@ -1066,12 +1011,11 @@ TSwitchManager::QuitApp()
 	}
 
 	// send the quit request to all teams in this group
-
-	for (int32 i = teamGroup->TeamList()->CountItems(); i-- > 0;) {
+	for (int32 i = teamGroup->TeamList()->CountItems() - 1; i >= 0; i--) {
 		team_id team = (addr_t)teamGroup->TeamList()->ItemAt(i);
 		app_info info;
 		if (be_roster->GetRunningAppInfo(team, &info) == B_OK) {
-			if (!strcasecmp(info.signature, kTrackerSignature)) {
+			if (strcasecmp(info.signature, kTrackerSignature) == 0) {
 				// Tracker can't be quit this way
 				continue;
 			}
@@ -1083,14 +1027,19 @@ TSwitchManager::QuitApp()
 }
 
 
+/*!
+	\brief hide all teams in this group
+*/
 void
 TSwitchManager::HideApp()
 {
-	// hide all teams in this group
+	// we should not be trying to hide an app if we have an empty list
+	if (fGroupList.IsEmpty())
+		return;
 
 	TTeamGroup* teamGroup = (TTeamGroup*)fGroupList.ItemAt(fCurrentIndex);
 
-	for (int32 i = teamGroup->TeamList()->CountItems(); i-- > 0;) {
+	for (int32 i = teamGroup->TeamList()->CountItems() - 1; i >= 0; i--) {
 		team_id team = (addr_t)teamGroup->TeamList()->ItemAt(i);
 		app_info info;
 		if (be_roster->GetRunningAppInfo(team, &info) == B_OK)
@@ -1309,8 +1258,8 @@ TBox::MouseDown(BPoint where)
 			int32 newSlot = previousSlot - (kNumSlots - 1);
 			if (newSlot < 0)
 				newSlot = 0;
-			int32 newIndex = fIconView->IndexAt(newSlot);
 
+			int32 newIndex = fIconView->IndexAt(newSlot);
 			fManager->SwitchToApp(previousIndex, newIndex, false);
 		}
 	}
@@ -1326,8 +1275,7 @@ TBox::MouseDown(BPoint where)
 
 			if (newIndex < 0) {
 				// don't have a page full to scroll
-				int32 valid = fManager->CountVisibleGroups();
-				newIndex = fIconView->IndexAt(valid - 1);
+				newIndex = fManager->GroupList()->CountItems() - 1;
 			}
 			fManager->SwitchToApp(previousIndex, newIndex, true);
 		}
@@ -2005,27 +1953,7 @@ TIconView::CenterOn(int32 index)
 int32
 TIconView::ItemAtPoint(BPoint point) const
 {
-	float tmpPointVerticalIndex = (point.x / kSlotSize) - kCenterSlot;
-	if (tmpPointVerticalIndex < 0)
-		return -1;
-
-	int32 pointVerticalIndex = (int32)tmpPointVerticalIndex;
-
-	for (int32 i = 0, verticalIndex = 0; ; i++) {
-
-		TTeamGroup* teamGroup = (TTeamGroup*)fManager->GroupList()->ItemAt(i);
-		if (teamGroup == NULL)
-			break;
-
-		if (!OKToUse(teamGroup))
-			continue;
-
-		if (verticalIndex == pointVerticalIndex)
-			return i;
-
-		verticalIndex++;
-	}
-	return -1;
+	return IndexAt((int32)(point.x / kSlotSize) - kCenterSlot);
 }
 
 
@@ -2040,22 +1968,10 @@ TIconView::ScrollTo(BPoint where)
 int32
 TIconView::IndexAt(int32 slot) const
 {
-	BList* list = fManager->GroupList();
-	int32 count = list->CountItems();
-	int32 slotIndex = 0;
+	if (slot < 0 || slot >= fManager->GroupList()->CountItems())
+		return -1;
 
-	for (int32 i = 0; i < count; i++) {
-		TTeamGroup* teamGroup = (TTeamGroup*)list->ItemAt(i);
-
-		if (!OKToUse(teamGroup))
-			continue;
-
-		if (slotIndex == slot) {
-			return i;
-		}
-		slotIndex++;
-	}
-	return -1;
+	return slot;
 }
 
 
@@ -2071,19 +1987,8 @@ TIconView::SlotOf(int32 index) const
 BRect
 TIconView::FrameOf(int32 index) const
 {
-	BList* list = fManager->GroupList();
-	int32 visible = kCenterSlot - 1;
+	int32 visible = index + kCenterSlot;
 		// first few slots in view are empty
-
-	TTeamGroup* teamGroup;
-	for (int32 i = 0; i <= index; i++) {
-		teamGroup = (TTeamGroup*)list->ItemAt(i);
-
-		if (!OKToUse(teamGroup))
-			continue;
-
-		visible++;
-	}
 
 	return BRect(visible * kSlotSize, 0, (visible + 1) * kSlotSize - 1,
 		kSlotSize - 1);
@@ -2102,10 +2007,6 @@ TIconView::DrawTeams(BRect update)
 
 	for (int32 i = 0; i < count; i++) {
 		TTeamGroup* teamGroup = (TTeamGroup*)list->ItemAt(i);
-
-		if (!OKToUse(teamGroup))
-			continue;
-
 		if (rect.Intersects(update) && teamGroup) {
 			SetDrawingMode(B_OP_ALPHA);
 			SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);

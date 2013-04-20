@@ -47,12 +47,13 @@ All rights reserved.
 
 
 TBarMenuTitle::TBarMenuTitle(float width, float height, const BBitmap* icon,
-	BMenu* menu, bool inexpando)
-	:	BMenuItem(menu, new BMessage(B_REFS_RECEIVED)),
-		fWidth(width),
-		fHeight(height),
-		fInExpando(inexpando),
-		fIcon(icon)
+	BMenu* menu, bool expando)
+	:
+	BMenuItem(menu, new BMessage(B_REFS_RECEIVED)),
+	fWidth(width),
+	fHeight(height),
+	fInExpando(expando),
+	fIcon(icon)
 {
 }
 
@@ -63,7 +64,7 @@ TBarMenuTitle::~TBarMenuTitle()
 
 
 void
-TBarMenuTitle::SetWidthHeight(float width, float height)
+TBarMenuTitle::SetContentSize(float width, float height)
 {
 	fWidth = width;
 	fHeight = height;
@@ -81,120 +82,51 @@ TBarMenuTitle::GetContentSize(float* width, float* height)
 void
 TBarMenuTitle::Draw()
 {
-	if (be_control_look == NULL) {
-		BMenuItem::Draw();
+	BMenu* menu = Menu();
+	if (menu == NULL)
 		return;
-	}
 
-	// fill background if selected
-	rgb_color base = Menu()->LowColor();
-	BRect rect = Frame();
+	BRect frame(Frame());
+	rgb_color base = menu->LowColor();
 
-	BRect windowBounds = Menu()->Window()->Bounds();
-	if (rect.right > windowBounds.right)
-		rect.right = windowBounds.right;
+	menu->PushState();
 
+	BRect windowBounds = menu->Window()->Bounds();
+	if (frame.right > windowBounds.right)
+		frame.right = windowBounds.right;
+
+	// fill in background
 	if (IsSelected()) {
-		be_control_look->DrawMenuItemBackground(Menu(), rect, rect, base,
+		be_control_look->DrawMenuItemBackground(menu, frame, frame, base,
 			BControlLook::B_ACTIVATED);
-	} else {
-		be_control_look->DrawButtonBackground(Menu(), rect, rect, base);
-	}
+	} else
+		be_control_look->DrawButtonBackground(menu, frame, frame, base);
 
-	// draw content
+	menu->MovePenTo(ContentLocation());
 	DrawContent();
 
-	// make sure we restore state
-	Menu()->SetLowColor(base);
+	menu->PopState();
 }
 
 
 void
 TBarMenuTitle::DrawContent()
 {
+	if (fIcon == NULL)
+		return;
+
 	BMenu* menu = Menu();
 	BRect frame(Frame());
-
-	if (be_control_look != NULL) {
-		menu->SetDrawingMode(B_OP_ALPHA);
-
-		if (fIcon != NULL) {
-			BRect dstRect(fIcon->Bounds());
-			dstRect.OffsetTo(frame.LeftTop());
-			dstRect.OffsetBy(rintf(((frame.Width() - dstRect.Width()) / 2)
-				- 1.0f), rintf(((frame.Height() - dstRect.Height()) / 2)
-				+ 2.0f));
-
-			menu->DrawBitmapAsync(fIcon, dstRect);
-		}
-		return;
-	}
-
-	rgb_color menuColor = menu->LowColor();
-	rgb_color dark = tint_color(menuColor, B_DARKEN_1_TINT);
-	rgb_color light = tint_color(menuColor, B_LIGHTEN_2_TINT);
-
-	bool inExpandoMode = dynamic_cast<TExpandoMenuBar*>(menu) != NULL;
-
-	BRect bounds(menu->Window()->Bounds());
-	if (bounds.right < frame.right)
-		frame.right = bounds.right;
-
-	menu->SetDrawingMode(B_OP_COPY);
-
-	if (!IsSelected() && !menu->IsRedrawAfterSticky()) {
-		menu->BeginLineArray(8);
-		menu->AddLine(frame.RightTop(), frame.LeftTop(), light);
-		menu->AddLine(frame.LeftBottom(), frame.RightBottom(), dark);
-		menu->AddLine(frame.LeftTop(),
-			frame.LeftBottom()+BPoint(0, inExpandoMode ? 0 : -1), light);
-		menu->AddLine(frame.RightBottom(), frame.RightTop(), dark);
-		if (inExpandoMode) {
-			frame.top += 1;
-			menu->AddLine(frame.LeftTop(), frame.RightTop() + BPoint(-1, 0),
-				light);
-		}
-
-		menu->EndLineArray();
-
-		frame.InsetBy(1, 1);
-		menu->SetHighColor(menuColor);
-		menu->FillRect(frame);
-		if (IsSelected())
-			menu->SetHighColor(ui_color(B_MENU_SELECTED_ITEM_TEXT_COLOR));
-		else
-			menu->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
-		frame.InsetBy(-1, -1);
-		if (inExpandoMode)
-			frame.top -= 1;
-	}
-
-	ASSERT(IsEnabled());
-	if (IsSelected() && !menu->IsRedrawAfterSticky()) {
-		menu->SetHighColor(tint_color(menuColor, B_HIGHLIGHT_BACKGROUND_TINT));
-		menu->FillRect(frame);
-
-		if (menu->IndexOf(this) > 0) {
-			menu->SetHighColor(tint_color(menuColor, B_DARKEN_4_TINT));
-			menu->StrokeLine(frame.LeftTop(), frame.LeftBottom());
-		}
-
-		if (IsSelected())
-			menu->SetHighColor(ui_color(B_MENU_SELECTED_ITEM_TEXT_COLOR));
-		else
-			menu->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
-	}
+	BRect iconRect(fIcon->Bounds());
 
 	menu->SetDrawingMode(B_OP_ALPHA);
+	iconRect.OffsetTo(frame.LeftTop());
 
-	if (fIcon != NULL) {
-		BRect dstRect(fIcon->Bounds());
-		dstRect.OffsetTo(frame.LeftTop());
-		dstRect.OffsetBy(rintf(((frame.Width() - dstRect.Width()) / 2) - 1.0f),
-			rintf(((frame.Height() - dstRect.Height()) / 2) - 0.0f));
+	float widthOffset = rintf((frame.Width() - iconRect.Width()) / 2);
+	float heightOffset = rintf((frame.Height() - iconRect.Height()) / 2);
+	iconRect.OffsetBy(widthOffset - 1.0f, heightOffset + 2.0f);
 
-		menu->DrawBitmapAsync(fIcon, dstRect);
-	}
+	menu->DrawBitmapAsync(fIcon, iconRect);
 }
 
 

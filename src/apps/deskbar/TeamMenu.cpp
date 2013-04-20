@@ -44,12 +44,15 @@ All rights reserved.
 
 #include "BarApp.h"
 #include "BarMenuBar.h"
+#include "BarView.h"
 #include "DeskbarUtils.h"
+#include "StatusView.h"
 #include "TeamMenuItem.h"
 
 
 TTeamMenu::TTeamMenu()
-	: BMenu("Team Menu")
+	:
+	BMenu("Team Menu")
 {
 	SetItemMargins(0.0f, 0.0f, 0.0f, 0.0f);
 	SetFont(be_plain_font);
@@ -68,6 +71,7 @@ void
 TTeamMenu::AttachedToWindow()
 {
 	RemoveItems(0, CountItems(), true);
+		// remove all items
 
 	BMessenger self(this);
 	BList teamList;
@@ -75,39 +79,38 @@ TTeamMenu::AttachedToWindow()
 
 	TBarView* barview = (dynamic_cast<TBarApp*>(be_app))->BarView();
 	bool dragging = barview && barview->Dragging();
-
+	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
 	desk_settings* settings = ((TBarApp*)be_app)->Settings();
+
+	float width = sMinimumWindowWidth - iconSize - 4;
 
 	if (settings->sortRunningApps)
 		teamList.SortItems(CompareByName);
 
 	int32 count = teamList.CountItems();
 	for (int32 i = 0; i < count; i++) {
+		// add items back
 		BarTeamInfo* barInfo = (BarTeamInfo*)teamList.ItemAt(i);
+		TTeamMenuItem* item = new TTeamMenuItem(barInfo->teams,
+			barInfo->icon, barInfo->name, barInfo->sig,
+			width, -1, !settings->hideLabels, true);
 
-		if (((barInfo->flags & B_BACKGROUND_APP) == 0)
-			&& (strcasecmp(barInfo->sig, kDeskbarSignature) != 0)) {
-			TTeamMenuItem* item = new TTeamMenuItem(barInfo->teams,
-				barInfo->icon, barInfo->name, barInfo->sig, -1, -1,
-				!settings->hideLabels, true);
+		if (settings->trackerAlwaysFirst
+			&& strcmp(barInfo->sig, kTrackerSignature) == 0) {
+			AddItem(item, 0);
+		} else
+			AddItem(item);
 
-			if ((settings->trackerAlwaysFirst)
-				&& (strcmp(barInfo->sig, kTrackerSignature) == 0))
-				AddItem(item, 0);
-			else
-				AddItem(item);
+		if (dragging && item != NULL) {
+			bool canhandle = (dynamic_cast<TBarApp*>(be_app))->BarView()->
+				AppCanHandleTypes(item->Signature());
+			if (item->IsEnabled() != canhandle)
+				item->SetEnabled(canhandle);
 
-			if (dragging && item) {
-				bool canhandle = (dynamic_cast<TBarApp*>(be_app))->BarView()->
-					AppCanHandleTypes(item->Signature());
-				if (item->IsEnabled() != canhandle)
-					item->SetEnabled(canhandle);
-
-				BMenu* menu = item->Submenu();
-				if (menu)
-					menu->SetTrackingHook(barview->MenuTrackingHook,
-						barview->GetTrackingHookData());
-			}
+			BMenu* menu = item->Submenu();
+			if (menu)
+				menu->SetTrackingHook(barview->MenuTrackingHook,
+					barview->GetTrackingHookData());
 		}
 	}
 
@@ -132,9 +135,9 @@ void
 TTeamMenu::DetachedFromWindow()
 {
 	TBarView* barView = (dynamic_cast<TBarApp*>(be_app))->BarView();
-	if (barView) {
+	if (barView != NULL) {
 		BLooper* looper = barView->Looper();
-		if (looper->Lock()) {
+		if (looper != NULL && looper->Lock()) {
 			barView->DragStop();
 			looper->Unlock();
 		}
@@ -144,10 +147,4 @@ TTeamMenu::DetachedFromWindow()
 
 	BMessenger self(this);
 	TBarApp::Unsubscribe(self);
-}
-
-
-void
-TTeamMenu::DrawBackground(BRect)
-{
 }

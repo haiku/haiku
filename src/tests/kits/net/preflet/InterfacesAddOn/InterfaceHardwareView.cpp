@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *      Alexander von Gluck, kallisti5@unixzen.com
+ *		Alexander von Gluck, kallisti5@unixzen.com
  *		John Scipione, jscipione@gmail.com
  */
 
@@ -21,6 +21,8 @@
 #include <Size.h>
 #include <StringView.h>
 #include <TextControl.h>
+
+#include <stdio.h>
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -57,7 +59,19 @@ InterfaceHardwareView::InterfaceHardwareView(BRect frame,
 	fLinkSpeedField = new BStringView("link speed field", "");
 	fLinkSpeedField->SetExplicitMinSize(BSize(minimumWidth, B_SIZE_UNSET));
 
-	Revert();
+	// TODO: These metrics may be better in a BScrollView?
+	BStringView* linkTx = new BStringView("tx label",
+		B_TRANSLATE("Sent:"));
+	linkTx->SetAlignment(B_ALIGN_RIGHT);
+	fLinkTxField = new BStringView("tx field", "");
+	fLinkTxField ->SetExplicitMinSize(BSize(minimumWidth, B_SIZE_UNSET));
+	BStringView* linkRx = new BStringView("rx label",
+		B_TRANSLATE("Received:"));
+	linkRx->SetAlignment(B_ALIGN_RIGHT);
+	fLinkRxField = new BStringView("rx field", "");
+	fLinkRxField ->SetExplicitMinSize(BSize(minimumWidth, B_SIZE_UNSET));
+
+	Update();
 		// Populate the fields
 
 	BLayoutBuilder::Group<>(this)
@@ -68,6 +82,10 @@ InterfaceHardwareView::InterfaceHardwareView(BRect frame,
 			.Add(fMacAddressField, 1, 1)
 			.Add(linkSpeed, 0, 2)
 			.Add(fLinkSpeedField, 1, 2)
+			.Add(linkTx, 0, 3)
+			.Add(fLinkTxField, 1, 3)
+			.Add(linkRx, 0, 4)
+			.Add(fLinkRxField, 1, 4)
 		.End()
 		.AddGlue()
 		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
@@ -107,16 +125,44 @@ InterfaceHardwareView::MessageReceived(BMessage* message)
 status_t
 InterfaceHardwareView::Revert()
 {
+	Update();
+	return B_OK;
+}
+
+
+status_t
+InterfaceHardwareView::Update()
+{
 	// Populate fields with current settings
-	if (fSettings->HasLink())
-		fStatusField->SetText(B_TRANSLATE("connected"));
-	else
+	if (fSettings->HasLink()) {
+		if (fSettings->IsWireless()) {
+			BString network = fSettings->WirelessNetwork();
+			network.Prepend(" (");
+			network.Prepend(B_TRANSLATE("connected"));
+			network.Append(")");
+			fStatusField->SetText(network.String());
+		} else {
+			fStatusField->SetText(B_TRANSLATE("connected"));
+		}
+	} else
 		fStatusField->SetText(B_TRANSLATE("disconnected"));
 
 	fMacAddressField->SetText(fSettings->HardwareAddress());
 
 	// TODO : Find how to get link speed
 	fLinkSpeedField->SetText("100 Mb/s");
+
+	// Update Link stats
+	ifreq_stats stats;
+	char buffer[100];
+	fSettings->Stats(&stats);
+	snprintf(buffer, sizeof(buffer), B_TRANSLATE("%" B_PRIu64 " KBytes"),
+		stats.send.bytes / 1024);
+	fLinkTxField->SetText(buffer);
+
+	snprintf(buffer, sizeof(buffer), B_TRANSLATE("%" B_PRIu64 " KBytes"),
+		stats.receive.bytes / 1024);
+	fLinkRxField->SetText(buffer);
 
 	return B_OK;
 }

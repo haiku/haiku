@@ -1,0 +1,33 @@
+1	hungarian	x-vnd.Haiku-InterfacesAddOn	160108912
+Interface	InterfaceWindow		Eszköz
+Configure…	InterfacesListView		Beállítás…
+Static	IntefaceAddressView		Állandó
+None	InterfacesListView		Nincs
+IP:	InterfacesListView	IPv4 address label	IP:
+Status:	IntefaceHardwareView		Állapot:
+IPv6:	InterfacesListView	IPv6 address label	IPv6:
+Save	InterfaceWindow		Mentés
+Link speed:	IntefaceHardwareView		Kapcsolat sebessége:
+Renegotiate	InterfacesAddOn		Megújítás
+The method for obtaining an IP address	IntefaceAddressView		Az IP-cím lekérésének módja
+Your gateway	IntefaceAddressView		Átjáró
+Enable	InterfacesListView		Engedélyezés
+Received:	IntefaceHardwareView		Fogadott:
+Revert	InterfaceWindow		Visszaállítás
+connected	IntefaceHardwareView		csatlakozva
+Gateway:	IntefaceAddressView		Átjáró:
+Disable	InterfacesListView		Letiltás
+Sent:	IntefaceHardwareView		Küldött:
+Disable	InterfacesAddOn		Letiltás
+Configure…	InterfacesAddOn		Beállítás…
+Renegotiate Address	InterfacesListView		Cím újra lekérése
+DHCP	IntefaceAddressView		DHCP
+Mode:	IntefaceAddressView		Mód:
+Your netmask	IntefaceAddressView		Hálózati maszk
+IP Address:	IntefaceAddressView		IP-cím:
+Off	IntefaceAddressView		Kikapcsolva
+MAC address:	IntefaceHardwareView		MAC-cím:
+Netmask:	IntefaceAddressView		Hálózati maszk:
+Your IP address	IntefaceAddressView		IP cím
+%llu KBytes	IntefaceHardwareView		%llu KByte
+disconnected	IntefaceHardwareView		leválasztva

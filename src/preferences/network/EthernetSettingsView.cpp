@@ -98,7 +98,6 @@ EthernetSettingsView::EthernetSettingsView()
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	fSocket = socket(AF_INET, SOCK_DGRAM, 0);
 	_GatherInterfaces();
 
 	// build the GUI
@@ -216,7 +215,6 @@ EthernetSettingsView::EthernetSettingsView()
 
 EthernetSettingsView::~EthernetSettingsView()
 {
-	close(fSocket);
 }
 
 

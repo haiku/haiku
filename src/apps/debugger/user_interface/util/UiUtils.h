@@ -31,6 +31,10 @@ public:
 									char* buffer, size_t bufferSize);
 	static	const char*			ImageTypeToString(image_type type,
 									char* buffer, size_t bufferSize);
+	static	const char*			AreaLockingFlagsToString(uint32 flags,
+									char* buffer, size_t bufferSize);
+	static	const BString&			AreaProtectionFlagsToString(uint32 protection,
+									BString& _output);
 
 	static	const char*			ReportNameForTeam(::Team* team,
 									char* buffer, size_t bufferSize);

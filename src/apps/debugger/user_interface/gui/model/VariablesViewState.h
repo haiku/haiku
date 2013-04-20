@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -6,12 +7,14 @@
 #define VARIABLES_VIEW_STATE_H
 
 
+#include <Message.h>
 #include <Referenceable.h>
 #include <util/OpenHashTable.h>
 
 
 class ObjectID;
 class StackFrameValues;
+class Type;
 class TypeComponentPath;
 
 
@@ -20,6 +23,7 @@ public:
 								VariablesViewNodeInfo();
 								VariablesViewNodeInfo(
 									const VariablesViewNodeInfo& other);
+	virtual						~VariablesViewNodeInfo();
 
 			VariablesViewNodeInfo& operator=(
 									const VariablesViewNodeInfo& other);
@@ -28,8 +32,19 @@ public:
 									{ return fNodeExpanded; }
 			void				SetNodeExpanded(bool expanded);
 
+			Type*				GetCastedType() const
+									{ return fCastedType; }
+			void				SetCastedType(Type* type);
+
+			const BMessage&		GetRendererSettings() const
+									{ return fRendererSettings; }
+
+			void				SetRendererSettings(const BMessage& settings);
+
 private:
 			bool				fNodeExpanded;
+			Type*				fCastedType;
+			BMessage			fRendererSettings;
 };
 
 

@@ -295,6 +295,14 @@ SymbolLookup::Init()
 
 			error = kernelImage->Init(imageInfo);
 			image = kernelImage;
+		} else if (!strcmp("commpage", imageInfo.name)) {
+			// commpage image
+			CommPageImage* commPageImage = new(std::nothrow) CommPageImage;
+			if (commPageImage == NULL)
+				return B_NO_MEMORY;
+
+			error = commPageImage->Init(imageInfo);
+			image = commPageImage;
 		} else {
 			// userland image -- try to load an image file
 			ImageFile* imageFile = new(std::nothrow) ImageFile;

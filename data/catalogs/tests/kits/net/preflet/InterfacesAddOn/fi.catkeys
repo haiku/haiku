@@ -1,0 +1,29 @@
+1	finnish	x-vnd.Haiku-InterfacesAddOn	1172292901
+Configure…	InterfacesListView		Aseta…
+Static	IntefaceAddressView		Staattinen
+None	InterfacesListView		Ei mitään
+IP:	InterfacesListView	IPv4 address label	IP:
+Status:	IntefaceHardwareView		Tila:
+IPv6:	InterfacesListView	IPv6 address label	IPv6:
+Save	InterfaceWindow		Tallenna
+Link speed:	IntefaceHardwareView		Yhteysnopeus:
+Renegotiate	InterfacesAddOn		Neuvottele uudelleen
+The method for obtaining an IP address	IntefaceAddressView		IP-osoitteen hakumenetelmä
+Your gateway	IntefaceAddressView		Yhdyskäytäväsi
+Enable	InterfacesListView		Käytössä
+Revert	InterfaceWindow		Palauta
+connected	IntefaceHardwareView		yhdistetty
+Gateway:	IntefaceAddressView		Yhdyskäytävä:
+Disable	InterfacesListView		Ei ole käytössä
+Disable	InterfacesAddOn		Ei ole käytössä
+Configure…	InterfacesAddOn		Aseta…
+Renegotiate Address	InterfacesListView		Neuvottele osoite uudelleen
+DHCP	IntefaceAddressView		DHCP
+Mode:	IntefaceAddressView		Tila:
+Your netmask	IntefaceAddressView		Verkopeitteesi
+IP Address:	IntefaceAddressView		IP-osoite:
+Off	IntefaceAddressView		Pois käytöstä
+MAC address:	IntefaceHardwareView		MAC-osoite:
+Netmask:	IntefaceAddressView		Verkkopeite:
+Your IP address	IntefaceAddressView		IP-osoitteesi
+disconnected	IntefaceHardwareView		yhteys katkaistu

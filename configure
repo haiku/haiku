@@ -77,6 +77,8 @@ options:
                               as first option!]
   --use-gcc-pipe              Build with GCC option -pipe. Speeds up the build
                               process, but uses more memory.
+  --use-gcc-graphite          Build with GCC Graphite engine for loop
+                              optimizations. Only for gcc 4.
   --use-32bit                 Use -m32 flag on 64bit host gcc compiler.
   --use-xattr                 Use Linux xattr support for BeOS attribute
                               emulation. Warning: Make sure your file system
@@ -170,6 +172,13 @@ standard_gcc_settings()
 
 	HAIKU_GCC_RAW_VERSION=`$HAIKU_CC -dumpversion`
 	HAIKU_GCC_MACHINE=`$HAIKU_CC -dumpmachine`
+	if [ "$HAIKU_USE_GCC_GRAPHITE" != 0 ]; then
+		UNUSED=`echo "int main() {}" | $HAIKU_CC -xc -c -floop-block - 2>&1`
+		if [ $? != 0 ]; then
+			echo "GCC Graphite loop optimizations cannot be used"
+			HAIKU_USE_GCC_GRAPHITE=0
+		fi
+	fi
 
 	HAIKU_GCC_LIB_DIR=${gccdir}
 	HAIKU_GCC_LIBGCC=${gccdir}/libgcc.a
@@ -345,6 +354,7 @@ HAIKU_ENABLE_MULTIUSER=0
 HAIKU_DISTRO_COMPATIBILITY=default
 TARGET_PLATFORM=haiku
 HAIKU_USE_GCC_PIPE=0
+HAIKU_USE_GCC_GRAPHITE=0
 HAIKU_HOST_USE_32BIT=0
 HAIKU_HOST_USE_XATTR=0
 HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR=
@@ -459,6 +469,7 @@ while [ $# -gt 0 ] ; do
         -j*)				buildCrossToolsJobs="$1"; shift 1;;
 		--target=*)     TARGET_PLATFORM=`echo $1 | cut -d'=' -f2-`; shift 1;;
 		--use-gcc-pipe)	HAIKU_USE_GCC_PIPE=1; shift 1;;
+		--use-gcc-graphite)	HAIKU_USE_GCC_GRAPHITE=1; shift 1;;
 		--use-32bit)	HAIKU_HOST_USE_32BIT=1; shift 1;;
 		--use-xattr)	HAIKU_HOST_USE_XATTR=1; shift 1;;
 		*)				echo Invalid argument: \`$1\'; exit 1;;
@@ -519,6 +530,7 @@ mkdir -p "$buildOutputDir" || exit 1
 
 # build cross tools from sources
 if [ -n "$buildCrossTools" ]; then
+	export HAIKU_USE_GCC_GRAPHITE
 	"$buildCrossToolsScript" $buildCrossToolsMachine "$sourceDir" \
 		"$buildCrossTools" "$outputDir" $buildCrossToolsJobs || exit 1
 	crossToolsPrefix="$outputDir/cross-tools/bin/${HAIKU_GCC_MACHINE}-"
@@ -574,6 +586,7 @@ HAIKU_INCLUDE_3RDPARTY				?= "${HAIKU_INCLUDE_3RDPARTY}" ;
 HAIKU_ENABLE_MULTIUSER				?= "${HAIKU_ENABLE_MULTIUSER}" ;
 HAIKU_DISTRO_COMPATIBILITY			?= "${HAIKU_DISTRO_COMPATIBILITY}" ;
 HAIKU_USE_GCC_PIPE					?= "${HAIKU_USE_GCC_PIPE}" ;
+HAIKU_USE_GCC_GRAPHITE				?= "${HAIKU_USE_GCC_GRAPHITE}" ;
 HAIKU_HOST_USE_32BIT				?= "${HAIKU_HOST_USE_32BIT}" ;
 HAIKU_HOST_USE_XATTR				?= "${HAIKU_HOST_USE_XATTR}" ;
 HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR	?= ${HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR} ;

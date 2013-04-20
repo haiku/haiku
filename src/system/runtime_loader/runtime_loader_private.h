@@ -43,6 +43,7 @@ struct SymbolLookupCache;
 
 
 extern struct user_space_program_args* gProgramArgs;
+extern void* __gCommPageAddress;
 extern struct rld_export gRuntimeLoader;
 extern char* (*gGetEnv)(const char* name);
 extern bool gProgramLoaded;
@@ -53,7 +54,7 @@ extern image_t* gProgramImage;
 extern "C" {
 #endif
 
-int runtime_loader(void* arg);
+int runtime_loader(void* arg, void* commpage);
 int open_executable(char* name, image_type type, const char* rpath,
 	const char* programPath, const char* compatibilitySubDir);
 status_t test_executable(const char* path, char* interpreter);

@@ -680,6 +680,7 @@ p_option(u_long option) {
 	case RES_INSECURE2:	return "insecure2";
 	case RES_NOALIASES:	return "noaliases";
 	case RES_USE_INET6:	return "inet6";
+	case RES_USE_INET4:	return "inet4";
 #ifdef RES_USE_EDNS0	/*%< KAME extension */
 	case RES_USE_EDNS0:	return "edns0";
 	case RES_NSID:		return "nsid";

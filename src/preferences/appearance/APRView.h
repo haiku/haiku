@@ -52,7 +52,6 @@ public:
 
 private:
 			void				_SetCurrentColor(rgb_color color);
-			void				_UpdateControls();
 			void				_UpdateAllColors();
 
 private:

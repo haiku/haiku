@@ -10136,7 +10136,8 @@ BPoseView::ClearFilter()
 	fLastFilterStringCount = 1;
 	fLastFilterStringLength = 0;
 
-	fFiltering = false;
+	if (fRefFilter == NULL)
+		fFiltering = false;
 	fFilteredPoseList->MakeEmpty();
 
 	Invalidate();

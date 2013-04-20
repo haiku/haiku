@@ -207,8 +207,8 @@ static const char * windows1251aliases[] = {
 	"cp1251", "cp5347", "ansi-1251",
 	NULL
 };
-static const BCharacterSet windows1251(18,2251, B_TRANSLATE("Windows Cyrillic (CP 1251)"),
-	"windows-1251",NULL,windows1251aliases);
+static const BCharacterSet windows1251(18,2251, B_TRANSLATE("Windows Cyrillic "
+	"(CP 1251)"), "windows-1251",NULL,windows1251aliases);
 
 static const char * IBM866aliases[] = {
 	// IANA aliases
@@ -238,7 +238,8 @@ static const char * eucKRaliases[] = {
 	// IANA aliases
 	"csEUCKR",
 	// java aliases
-	"ksc5601", "euckr", "ks_c_5601-1987", "ksc5601-1987", "ksc5601_1987", "ksc_5601", "5601",
+	"ksc5601", "euckr", "ks_c_5601-1987", "ksc5601-1987",
+	"ksc5601_1987", "ksc_5601", "5601",
 	NULL
 };
 static const BCharacterSet eucKR(21,38, B_TRANSLATE("EUC Korean"),
@@ -303,6 +304,17 @@ static const char* kUTF16Aliases[] = {
 static const BCharacterSet kUTF16(27, 1000, B_TRANSLATE("Unicode"), "UTF-16", "UTF-16",
 	kUTF16Aliases);
 
+static const char* kWindows1250Aliases[] = {
+	// IANA aliases
+	"cswindows1250",
+	// java aliases
+	"cp1250",
+	"ms-ee",
+	NULL
+};
+static const BCharacterSet kWindows1250(28, 2250, B_TRANSLATE("Windows Central "
+	"European (CP 1250)"), "windows-1250", NULL, kWindows1250Aliases);
+
 /**
  * The following initializes the global character set array.
  * It is organized by id for efficient retrieval using predefined constants in UTF8.h and Font.h.
@@ -323,6 +335,7 @@ const BCharacterSet * character_sets_by_id[] = {
 	// R5 convert_to/from_utf8 encodings end here
 	&big5,&gb18030,
 	&kUTF16,
+	&kWindows1250,
 };
 const uint32 character_sets_by_id_count = sizeof(character_sets_by_id)/sizeof(const BCharacterSet*);
 

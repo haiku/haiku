@@ -28,7 +28,7 @@ extern "C" {
 
 // Should only be used by vm internals
 status_t vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite,
-	bool isUser, addr_t *newip);
+	bool isExecute, bool isUser, addr_t *newip);
 void vm_unreserve_memory(size_t bytes);
 status_t vm_try_reserve_memory(size_t bytes, int priority, bigtime_t timeout);
 status_t vm_daemon_init(void);

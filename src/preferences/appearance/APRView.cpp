@@ -1,10 +1,11 @@
 /*
- * Copyright 2002-2011, Haiku. All rights reserved.
+ * Copyright 2002-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		DarkWyrm (darkwyrm@earthlink.net)
- *		Rene Gollent (rene@gollent.com)
+ *		DarkWyrm, darkwyrm@earthlink.net
+ *		Rene Gollent, rene@gollent.com
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -78,7 +79,8 @@ APRView::APRView(const char* name)
 	fScrollView = new BScrollView("ScrollView", fAttrList, 0, false, true);
 	fScrollView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	for (int32 i = 0; i < color_description_count(); i++) {
+	int32 count = color_description_count();
+	for (int32 i = 0; i < count; i++) {
 		const ColorDescription& description = *get_color_description(i);
 		const char* text = B_TRANSLATE_NOCOLLECT(description.text);
 		color_which which = description.which;
@@ -133,8 +135,8 @@ void
 APRView::MessageReceived(BMessage *msg)
 {
 	if (msg->WasDropped()) {
-		rgb_color *color;
-		ssize_t size;
+		rgb_color* color = NULL;
+		ssize_t size = 0;
 
 		if (msg->FindData("RGBColor", (type_code)'RGBC', (const void**)&color,
 				&size) == B_OK) {
@@ -152,11 +154,12 @@ APRView::MessageReceived(BMessage *msg)
 			Window()->PostMessage(kMsgUpdate);
 			break;
 		}
+
 		case ATTRIBUTE_CHOSEN:
 		{
 			// Received when the user chooses a GUI fAttribute from the list
 
-			ColorWhichItem *item = (ColorWhichItem*)
+			ColorWhichItem* item = (ColorWhichItem*)
 				fAttrList->ItemAt(fAttrList->CurrentSelection());
 			if (item == NULL)
 				break;
@@ -168,6 +171,7 @@ APRView::MessageReceived(BMessage *msg)
 			Window()->PostMessage(kMsgUpdate);
 			break;
 		}
+
 		default:
 			BView::MessageReceived(msg);
 			break;
@@ -178,7 +182,8 @@ APRView::MessageReceived(BMessage *msg)
 void
 APRView::LoadSettings()
 {
-	for (int32 i = 0; i < color_description_count(); i++) {
+	int32 count = color_description_count();
+	for (int32 i = 0; i < count; i++) {
 		color_which which = get_color_description(i)->which;
 		fCurrentSet.SetColor(which, ui_color(which));
 	}
@@ -192,8 +197,12 @@ APRView::SetDefaults()
 {
 	fCurrentSet = ColorSet::DefaultColorSet();
 
-	_UpdateControls();
 	_UpdateAllColors();
+
+	rgb_color color = fCurrentSet.GetColor(fWhich);
+	fPicker->SetValue(color);
+	fColorPreview->SetColor(color);
+	fColorPreview->Invalidate();
 
 	Window()->PostMessage(kMsgUpdate);
 }
@@ -204,8 +213,12 @@ APRView::Revert()
 {
 	fCurrentSet = fPrevSet;
 
-	_UpdateControls();
 	_UpdateAllColors();
+
+	rgb_color color = fCurrentSet.GetColor(fWhich);
+	fPicker->SetValue(color);
+	fColorPreview->SetColor(color);
+	fColorPreview->Invalidate();
 
 	Window()->PostMessage(kMsgUpdate);
 }
@@ -214,11 +227,12 @@ APRView::Revert()
 bool
 APRView::IsDefaultable()
 {
-	for (int32 i = 0; i < color_description_count(); i++) {
+	for (int32 i = color_description_count() - 1; i >= 0; i--) {
 		color_which which = get_color_description(i)->which;
 		if (fCurrentSet.GetColor(which) != fDefaultSet.GetColor(which))
 			return true;
 	}
+
 	return false;
 }
 
@@ -226,11 +240,12 @@ APRView::IsDefaultable()
 bool
 APRView::IsRevertable()
 {
-	for (int32 i = 0; i < color_description_count(); i++) {
+	for (int32 i = color_description_count() - 1; i >= 0; i--) {
 		color_which which = get_color_description(i)->which;
 		if (fCurrentSet.GetColor(which) != fPrevSet.GetColor(which))
 			return true;
 	}
+
 	return false;
 }
 
@@ -240,17 +255,9 @@ APRView::_SetCurrentColor(rgb_color color)
 {
 	fCurrentSet.SetColor(fWhich, color);
 	set_ui_color(fWhich, color);
-	_UpdateControls();
-}
-
-
-void
-APRView::_UpdateControls()
-{
-	rgb_color color = fCurrentSet.GetColor(fWhich);
 
 	int32 currentIndex = fAttrList->CurrentSelection();
-	ColorWhichItem *item = (ColorWhichItem*) fAttrList->ItemAt(currentIndex);
+	ColorWhichItem* item = (ColorWhichItem*)fAttrList->ItemAt(currentIndex);
 	if (item != NULL) {
 		item->SetColor(color);
 		fAttrList->InvalidateItem(currentIndex);
@@ -265,9 +272,11 @@ APRView::_UpdateControls()
 void
 APRView::_UpdateAllColors()
 {
-	for (int32 i = 0; i < color_description_count(); i++) {
+	for (int32 i = color_description_count() - 1; i >= 0; i--) {
 		color_which which = get_color_description(i)->which;
 		rgb_color color = fCurrentSet.GetColor(which);
 		set_ui_color(which, color);
+		static_cast<ColorWhichItem*>(fAttrList->ItemAt(i))->SetColor(color);
+		fAttrList->InvalidateItem(i);
 	}
 }

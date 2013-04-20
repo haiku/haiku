@@ -99,10 +99,10 @@ APRWindow::MessageReceived(BMessage *message)
 			break;
 
 		case kMsgRevert:
-			fColorsView->Revert();
-			fAntialiasingSettings->Revert();
-			fLookAndFeelSettings->Revert();
 			fFontSettings->Revert();
+			fColorsView->Revert();
+			fLookAndFeelSettings->Revert();
+			fAntialiasingSettings->Revert();
 
 			_UpdateButtons();
 			break;

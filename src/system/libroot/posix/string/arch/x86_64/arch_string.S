@@ -8,10 +8,15 @@
 
 
 FUNCTION(memcpy):
-	jmp	*(USER_COMMPAGE_ADDR + COMMPAGE_ENTRY_X86_MEMCPY * 8)
+	movq	__gCommPageAddress@GOTPCREL(%rip), %rax
+	movq	(%rax), %rax
+	addq	8 * COMMPAGE_ENTRY_X86_MEMCPY(%rax), %rax
+	jmp 	*%rax
 FUNCTION_END(memcpy)
 
-
 FUNCTION(memset):
-	jmp	*(USER_COMMPAGE_ADDR + COMMPAGE_ENTRY_X86_MEMSET * 8)
+	movq	__gCommPageAddress@GOTPCREL(%rip), %rax
+	movq	(%rax), %rax
+	addq	8 * COMMPAGE_ENTRY_X86_MEMSET(%rax), %rax
+	jmp 	*%rax
 FUNCTION_END(memset)

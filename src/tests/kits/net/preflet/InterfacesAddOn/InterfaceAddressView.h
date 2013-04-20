@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *      Alexander von Gluck, kallisti5@unixzen.com
+ *		Alexander von Gluck, kallisti5@unixzen.com
  *		John Scipione, jscipione@gmail.com
  */
 #ifndef INTERFACE_ADDRESS_VIEW_H

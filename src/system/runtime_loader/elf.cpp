@@ -1031,7 +1031,7 @@ rldelf_init(void)
 
 		runtime_loader_debug_area *area;
 		area_id areaID = _kern_create_area(RUNTIME_LOADER_DEBUG_AREA_NAME,
-			(void **)&area, B_ANY_ADDRESS, size, B_NO_LOCK,
+			(void **)&area, B_RANDOMIZED_ANY_ADDRESS, size, B_NO_LOCK,
 			B_READ_AREA | B_WRITE_AREA);
 		if (areaID < B_OK) {
 			FATAL("Failed to create debug area.\n");

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Appearance	76206318
+1	german	x-vnd.Haiku-Appearance	2993758435
 Plain font:	Font view		Normal:
 Control highlight	Colors tab		Steuerelement - Ausgewählt
 Control border	Colors tab		Steuerelement - Rahmen
@@ -9,12 +9,14 @@ Defaults	APRWindow		Standardwerte
 Grayscale	AntialiasingSettingsView		Graustufen
 Shine	Colors tab		Glanz
 About	DecorSettingsView		Über
+About decorator	DecorSettingsView		Dekorator Info
 Off	AntialiasingSettingsView		Aus
 Choose Decorator	DecorSettingsView		Dekorator wählen
 Success	Colors tab		Erfolg
 Inactive window tab text	Colors tab		Reiter - Text (inaktiv)
 Failure	Colors tab		Fehler
 Hinting menu	AntialiasingSettingsView		Hinting-Menü
+Scroll bar:	DecorSettingsView		Scroll-Leiste:
 Document background	Colors tab		Dokument - Hintergrund
 Revert	APRWindow		Anfangswerte
 Window tab	Colors tab		Reiter
@@ -34,6 +36,7 @@ List background	Colors tab		Liste - Hintergrund
 OK	DecorSettingsView		OK
 Control mark	Colors tab		Steuerelement - Markierung
 Size:	Font Selection view		Größe:
+Decorator:	DecorSettingsView		Dekorator:
 Selected list item background	Colors tab		Liste - Hintergrund (ausgewählt)
 Panel background	Colors tab		Oberfläche - Hintergrund
 Menu font:	Font view		Menü:
@@ -44,6 +47,7 @@ List item text	Colors tab		Liste - Text
 Appearance	System name		Erscheinungsbild
 Fixed font:	Font view		Feste Breite:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Franz jagt im total verwahrlosten Taxi quer durch Bayern.
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutoren:\n\t%decorAuthors\n\nURL: %decorURL\nLizens: %decorLic\n\n%decorDesc\n
 Reduce colored edges filter strength:	AntialiasingSettingsView		Farbsaumfilter:
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Zur Vermeidung von möglichen Patentproblemen ist die Kombination von Subpixel-Kantenglättung und Glyph-Hinting deaktiviert. Um diese Funktion zu aktivieren, müssen spezielle Optionen im Konfigurationsheader der Freetype-Bibliothek freigeschaltet und anschließend Haiku neu kompiliert werden.
 Control text	Colors tab		Steuerelement - Text

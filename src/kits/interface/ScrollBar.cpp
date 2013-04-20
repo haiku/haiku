@@ -965,11 +965,13 @@ BScrollBar::Draw(BRect updateRect)
 			bottomOfThumb, updateRect, normal, flags, fOrientation);
 	}
 
+	rgb_color thumbColor = ui_color(B_SCROLL_BAR_THUMB_COLOR);
+
 	// Draw scroll thumb
 	if (enabled) {
 		// fill the clickable surface of the thumb
 		be_control_look->DrawButtonBackground(this, rect, updateRect,
-			normal, 0, BControlLook::B_ALL_BORDERS, fOrientation);
+			thumbColor, 0, BControlLook::B_ALL_BORDERS, fOrientation);
 		// TODO: Add the other thumb styles - dots and lines
 	} else {
 		if (fMin >= fMax || fProportion >= 1.0 || fProportion < 0.0) {

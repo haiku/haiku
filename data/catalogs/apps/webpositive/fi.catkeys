@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-WebPositive	233049275
+1	finnish	x-vnd.Haiku-WebPositive	3577331897
 Show home button	Settings Window		Näytä aloitussivupainike
 Username:	Authentication Panel		Käyttäjätunnus:
 Copy URL to clipboard	Download Window		Kopioi verkko-osoite leikepöydälle
@@ -16,6 +16,7 @@ Start page:	Settings Window		Aloitussivu:
 History	WebPositive Window		Historia
 Error opening downloads folder	Download Window		Virhe avattaessa latauskansiota
 Paste	WebPositive Window		Liitä
+Proxy username:	Settings Window		Välityspalvelimen käyttäjätunnus:
 Settings	Settings Window		Asetukset
 %seconds seconds left	Download Window		%seconds sekuntia jäljellä
 Confirmation	WebPositive Window		Vahvistus
@@ -41,6 +42,7 @@ Quit	WebPositive Window		Lopeta
 Full screen	WebPositive Window		Koko näyttö
 Open download error	Download Window		Avaa latausvirhe
 Standard font:	Settings Window		Vakiokirjasin:
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Etsi haettavien merkkijonojen edellinen esiintymä
 Restart	Download Window		Käynnistä uudelleen
 Proxy server	Settings Window		Välityspalvelin
 Open containing folder	Download Window		Avaa kansio, josta tiedosto löytyy
@@ -58,6 +60,7 @@ Cut	WebPositive Window		Leikkaa
 Bookmark this page	WebPositive Window		Merkitse tämä sivu kirjanmerkillä
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Virhe yritettäessä näyttää kirjanmerkkikansiota.\n\nVirhe: %error
 Open downloads folder	Download Window		Avaa latauskansio
+Proxy password:	Settings Window		Välityspalvelimen salasana:
 Number of days to keep links in History menu:	Settings Window		Kuinka monta päivää linkit pidetään historiavalikossa:
 Hide	Download Window		Piilota
 Reset size	WebPositive Window		Nollaa koko
@@ -67,6 +70,7 @@ There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive 
 Over 1 day left	Download Window		Yli 1 päivää jäljellä
 Downloads	WebPositive Window		Lataukset
 Requesting %url	WebPositive Window		Pyydetään %url
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Etsi haettavien merkkijonojen seuraava esiintymä
 Apply	Settings Window		Käytä
 Bookmark info	WebPositive Window		Kirjanmerkkitiedot
 Size:	Font Selection view		Koko:
@@ -80,6 +84,7 @@ Open blank page	Settings Window		Avaa tyhjä sivu
 New tabs:	Settings Window		Uudet välilehdet:
 Cancel	WebPositive Window		Peru
 Open all	WebPositive Window		Avaa kaikki
+Proxy server requires authentication	Settings Window		Välityspalvelin vaatii tunnistautumista
 Clear	URL Bar		Tyhjennä
 Cut	URL Bar		Leikkaa
 Clear	WebPositive Window		Tyhjennä

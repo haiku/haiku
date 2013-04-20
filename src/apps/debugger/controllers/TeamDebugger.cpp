@@ -416,7 +416,8 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 		return error;
 
 	// create the debug report generator
-	fReportGenerator = new(std::nothrow) DebugReportGenerator(fTeam, this);
+	fReportGenerator = new(std::nothrow) DebugReportGenerator(fTeam, this,
+		fDebuggerInterface);
 	if (fReportGenerator == NULL)
 		return B_NO_MEMORY;
 

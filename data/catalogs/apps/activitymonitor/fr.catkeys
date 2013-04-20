@@ -1,8 +1,9 @@
-1	french	x-vnd.Haiku-ActivityMonitor	3704566709
+1	french	x-vnd.Haiku-ActivityMonitor	1913625522
 P-faults	DataSource		P-fautes
 Media nodes	DataSource		Nœuds média
 Threads	DataSource		Tâches
 MB	DataSource		Mo
+Always on top	ActivityWindow		Toujours au-dessus
 Add graph	ActivityWindow		Ajouter un graphe
 Teams	DataSource		Processus
 Hide legend	ActivityView		Cacher la légende

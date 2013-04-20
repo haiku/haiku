@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -13,7 +13,6 @@
 #include <Locker.h>
 
 #include <AutoLocker.h>
-#include <commpage_defs.h>
 #include <OS.h>
 #include <system_info.h>
 #include <util/DoublyLinkedList.h>
@@ -23,10 +22,13 @@
 
 #include "ArchitectureX86.h"
 #include "ArchitectureX8664.h"
+#include "AreaInfo.h"
 #include "CpuState.h"
 #include "DebugEvent.h"
 #include "ImageInfo.h"
+#include "SemaphoreInfo.h"
 #include "SymbolInfo.h"
+#include "SystemInfo.h"
 #include "ThreadInfo.h"
 
 
@@ -463,6 +465,24 @@ DebuggerInterface::UninstallWatchpoint(target_addr_t address)
 
 
 status_t
+DebuggerInterface::GetSystemInfo(SystemInfo& info)
+{
+	system_info sysInfo;
+	status_t result = get_system_info(&sysInfo);
+	if (result != B_OK)
+		return result;
+
+	utsname name;
+	result = uname(&name);
+	if (result != B_OK)
+		return result;
+
+	info.SetTo(fTeamID, sysInfo, name);
+	return B_OK;
+}
+
+
+status_t
 DebuggerInterface::GetThreadInfos(BObjectList<ThreadInfo>& infos)
 {
 	thread_info threadInfo;
@@ -496,21 +516,42 @@ DebuggerInterface::GetImageInfos(BObjectList<ImageInfo>& infos)
 		}
 	}
 
-	// Also add the "commpage" image, which belongs to the kernel, but is used
-	// by userland teams.
-	cookie = 0;
-	while (get_next_image_info(B_SYSTEM_TEAM, &cookie, &imageInfo) == B_OK) {
-		if ((addr_t)imageInfo.text >= USER_COMMPAGE_ADDR
-			&& (addr_t)imageInfo.text < USER_COMMPAGE_ADDR + COMMPAGE_SIZE) {
-			ImageInfo* info = new(std::nothrow) ImageInfo(B_SYSTEM_TEAM,
-				imageInfo.id, imageInfo.name, imageInfo.type,
-				(addr_t)imageInfo.text, imageInfo.text_size,
-				(addr_t)imageInfo.data, imageInfo.data_size);
-			if (info == NULL || !infos.AddItem(info)) {
-				delete info;
-				return B_NO_MEMORY;
-			}
-			break;
+	return B_OK;
+}
+
+
+status_t
+DebuggerInterface::GetAreaInfos(BObjectList<AreaInfo>& infos)
+{
+	// get the team's areas
+	area_info areaInfo;
+	ssize_t cookie = 0;
+	while (get_next_area_info(fTeamID, &cookie, &areaInfo) == B_OK) {
+		AreaInfo* info = new(std::nothrow) AreaInfo(fTeamID, areaInfo.area,
+			areaInfo.name, (addr_t)areaInfo.address, areaInfo.size,
+			areaInfo.ram_size, areaInfo.lock, areaInfo.protection);
+		if (info == NULL || !infos.AddItem(info)) {
+			delete info;
+			return B_NO_MEMORY;
+		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
+DebuggerInterface::GetSemaphoreInfos(BObjectList<SemaphoreInfo>& infos)
+{
+	// get the team's semaphores
+	sem_info semInfo;
+	int32 cookie = 0;
+	while (get_next_sem_info(fTeamID, &cookie, &semInfo) == B_OK) {
+		SemaphoreInfo* info = new(std::nothrow) SemaphoreInfo(fTeamID,
+			semInfo.sem, semInfo.name, semInfo.count, semInfo.latest_holder);
+		if (info == NULL || !infos.AddItem(info)) {
+			delete info;
+			return B_NO_MEMORY;
 		}
 	}
 

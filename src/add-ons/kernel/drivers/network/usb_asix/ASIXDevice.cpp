@@ -37,29 +37,29 @@ struct TRXHeader {
 
 
 ASIXDevice::ASIXDevice(usb_device device, DeviceInfo& deviceInfo)
-		:
-		fDevice(device),
-		fStatus(B_ERROR),
-		fOpen(false),
-		fRemoved(false),
-		fHasConnection(false),
-		fNonBlocking(false),
-		fInsideNotify(0),
-		fFrameSize(0),
-		fNotifyEndpoint(0),
-		fReadEndpoint(0),
-		fWriteEndpoint(0),
-		fActualLengthRead(0),
-		fActualLengthWrite(0),
-		fStatusRead(B_OK),
-		fStatusWrite(B_OK),
-		fNotifyReadSem(-1),
-		fNotifyWriteSem(-1),
-		fNotifyBuffer(NULL),
-		fNotifyBufferLength(0),
-		fLinkStateChangeSem(-1),
-		fUseTRXHeader(false),
-		fReadNodeIDRequest(kInvalidRequest)
+	:
+	fDevice(device),
+	fStatus(B_ERROR),
+	fOpen(false),
+	fRemoved(false),
+	fHasConnection(false),
+	fNonBlocking(false),
+	fInsideNotify(0),
+	fFrameSize(0),
+	fNotifyEndpoint(0),
+	fReadEndpoint(0),
+	fWriteEndpoint(0),
+	fActualLengthRead(0),
+	fActualLengthWrite(0),
+	fStatusRead(B_OK),
+	fStatusWrite(B_OK),
+	fNotifyReadSem(-1),
+	fNotifyWriteSem(-1),
+	fNotifyBuffer(NULL),
+	fNotifyBufferLength(0),
+	fLinkStateChangeSem(-1),
+	fUseTRXHeader(false),
+	fReadNodeIDRequest(kInvalidRequest)
 {
 	fDeviceInfo = deviceInfo;
 
@@ -72,14 +72,14 @@ ASIXDevice::ASIXDevice(usb_device device, DeviceInfo& deviceInfo)
 	fNotifyReadSem = create_sem(0, DRIVER_NAME"_notify_read");
 	if (fNotifyReadSem < B_OK) {
 		TRACE_ALWAYS("Error of creating read notify semaphore:%#010x\n",
-															fNotifyReadSem);
+			fNotifyReadSem);
 		return;
 	}
 
 	fNotifyWriteSem = create_sem(0, DRIVER_NAME"_notify_write");
 	if (fNotifyWriteSem < B_OK) {
 		TRACE_ALWAYS("Error of creating write notify semaphore:%#010x\n",
-															fNotifyWriteSem);
+			fNotifyWriteSem);
 		return;
 	}
 
@@ -122,7 +122,7 @@ ASIXDevice::Open(uint32 flags)
 
 	// setup state notifications
 	result = gUSBModule->queue_interrupt(fNotifyEndpoint, fNotifyBuffer,
-								fNotifyBufferLength, _NotifyCallback, this);
+		fNotifyBufferLength, _NotifyCallback, this);
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of requesting notify interrupt:%#010x\n", result);
 		return result;
@@ -170,7 +170,7 @@ ASIXDevice::Read(uint8 *buffer, size_t *numBytes)
 
 	if (fRemoved) {
 		TRACE_ALWAYS("Error of receiving %d bytes from removed device.\n",
-															numBytesToRead);
+			numBytesToRead);
 		return B_DEVICE_NOT_FOUND;
 	}
 
@@ -186,7 +186,8 @@ ASIXDevice::Read(uint8 *buffer, size_t *numBytes)
 	size_t chunkCount = fUseTRXHeader ? 2 : 1 ;
 
 	status_t result = gUSBModule->queue_bulk_v(fReadEndpoint,
-						&rxData[startIndex], chunkCount, _ReadCallback, this);
+		&rxData[startIndex], chunkCount, _ReadCallback, this);
+
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of queue_bulk_v request:%#010x\n", result);
 		return result;
@@ -205,7 +206,7 @@ ASIXDevice::Read(uint8 *buffer, size_t *numBytes)
 			USB_FEATURE_ENDPOINT_HALT);
 		if (result != B_OK) {
 			TRACE_ALWAYS("Error during clearing of HALT state:%#010x.\n",
-					result);
+				result);
 			return result;
 		}
 	}
@@ -213,13 +214,13 @@ ASIXDevice::Read(uint8 *buffer, size_t *numBytes)
 	if (fUseTRXHeader) {
 		if (fActualLengthRead < sizeof(TRXHeader)) {
 			TRACE_ALWAYS("Error: no place for TRXHeader:only %d of %d bytes.\n",
-										fActualLengthRead, sizeof(TRXHeader));
+				fActualLengthRead, sizeof(TRXHeader));
 			return B_ERROR; // TODO: ???
 		}
 
 		if (!header.IsValid()) {
 			TRACE_ALWAYS("Error:TRX Header is invalid: len:%#04x; ilen:%#04x\n",
-							header.fLength, header.fInvertedLength);
+				header.fLength, header.fInvertedLength);
 			return B_ERROR; // TODO: ???
 		}
 
@@ -227,7 +228,7 @@ ASIXDevice::Read(uint8 *buffer, size_t *numBytes)
 
 		if (fActualLengthRead - sizeof(TRXHeader) > header.Length()) {
 			TRACE_ALWAYS("MISMATCH of the frame length: hdr %d; received:%d\n",
-						header.Length(), fActualLengthRead - sizeof(TRXHeader));
+				header.Length(), fActualLengthRead - sizeof(TRXHeader));
 		}
 
 	} else {
@@ -248,7 +249,7 @@ ASIXDevice::Write(const uint8 *buffer, size_t *numBytes)
 
 	if (fRemoved) {
 		TRACE_ALWAYS("Error of writing %d bytes to removed device.\n",
-														numBytesToWrite);
+			numBytesToWrite);
 		return B_DEVICE_NOT_FOUND;
 	}
 
@@ -264,7 +265,8 @@ ASIXDevice::Write(const uint8 *buffer, size_t *numBytes)
 	size_t chunkCount = fUseTRXHeader ? 2 : 1 ;
 
 	status_t result = gUSBModule->queue_bulk_v(fWriteEndpoint,
-						&txData[startIndex], chunkCount, _WriteCallback, this);
+		&txData[startIndex], chunkCount, _WriteCallback, this);
+
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of queue_bulk_v request:%#010x\n", result);
 		return result;
@@ -380,17 +382,18 @@ ASIXDevice::SetupDevice(bool deviceReplugged)
 	}
 
 	TRACE("MAC address is:%02x:%02x:%02x:%02x:%02x:%02x\n",
-				address.ebyte[0], address.ebyte[1], address.ebyte[2],
-				address.ebyte[3], address.ebyte[4], address.ebyte[5]);
+		address.ebyte[0], address.ebyte[1], address.ebyte[2],
+		address.ebyte[3], address.ebyte[4], address.ebyte[5]);
 
 	if (deviceReplugged) {
 		// this might be the same device that was replugged - read the MAC
 		// address (which should be at the same index) to make sure
 		if (memcmp(&address, &fMACAddress, sizeof(address)) != 0) {
 			TRACE_ALWAYS("Cannot replace device with MAC address:"
-											"%02x:%02x:%02x:%02x:%02x:%02x\n",
-				fMACAddress.ebyte[0], fMACAddress.ebyte[1], fMACAddress.ebyte[2],
-				fMACAddress.ebyte[3], fMACAddress.ebyte[4], fMACAddress.ebyte[5]);
+				"%02x:%02x:%02x:%02x:%02x:%02x\n", fMACAddress.ebyte[0],
+				fMACAddress.ebyte[1], fMACAddress.ebyte[2],
+				fMACAddress.ebyte[3], fMACAddress.ebyte[4],
+				fMACAddress.ebyte[5]);
 			return B_BAD_VALUE; // is not the same
 		}
 	} else
@@ -473,30 +476,26 @@ ASIXDevice::_SetupEndpoints()
 	for (size_t ep = 0; ep < interface->endpoint_count; ep++) {
 		usb_endpoint_descriptor *epd = interface->endpoint[ep].descr;
 		if ((epd->attributes & USB_ENDPOINT_ATTR_MASK)
-				== USB_ENDPOINT_ATTR_INTERRUPT)
-		{
+			== USB_ENDPOINT_ATTR_INTERRUPT) {
 			notifyEndpoint = ep;
 			continue;
 		}
 
 		if ((epd->attributes & USB_ENDPOINT_ATTR_MASK)
-				!= USB_ENDPOINT_ATTR_BULK)
-		{
+			!= USB_ENDPOINT_ATTR_BULK) {
 			TRACE_ALWAYS("Error: USB endpoint type %#04x is unknown.\n",
-					epd->attributes);
+				epd->attributes);
 			continue;
 		}
 
 		if ((epd->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN)
-				== USB_ENDPOINT_ADDR_DIR_IN)
-		{
+			== USB_ENDPOINT_ADDR_DIR_IN) {
 			readEndpoint = ep;
 			continue;
 		}
 
 		if ((epd->endpoint_address & USB_ENDPOINT_ADDR_DIR_OUT)
-				== USB_ENDPOINT_ADDR_DIR_OUT)
-		{
+			== USB_ENDPOINT_ADDR_DIR_OUT) {
 			writeEndpoint = ep;
 			continue;
 		}
@@ -504,16 +503,16 @@ ASIXDevice::_SetupEndpoints()
 
 	if (notifyEndpoint == -1 || readEndpoint == -1 || writeEndpoint == -1) {
 		TRACE_ALWAYS("Error: not all USB endpoints were found: "
-							"notify:%d; read:%d; write:%d\n",
-							notifyEndpoint, readEndpoint, writeEndpoint);
+			"notify:%d; read:%d; write:%d\n", notifyEndpoint, readEndpoint,
+			writeEndpoint);
 		return B_ERROR;
 	}
 
 	gUSBModule->set_configuration(fDevice, config);
 
 	fNotifyEndpoint = interface->endpoint[notifyEndpoint].handle;
-	fReadEndpoint   = interface->endpoint[readEndpoint  ].handle;
-	fWriteEndpoint  = interface->endpoint[writeEndpoint ].handle;
+	fReadEndpoint   = interface->endpoint[readEndpoint].handle;
+	fWriteEndpoint  = interface->endpoint[writeEndpoint].handle;
 
 	return B_OK;
 }
@@ -524,9 +523,9 @@ ASIXDevice::ReadMACAddress(ether_address_t *address)
 {
 	size_t actual_length = 0;
 	status_t result = gUSBModule->send_request(fDevice,
-								USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN,
-								fReadNodeIDRequest, 0, 0, sizeof(ether_address),
-								address, &actual_length);
+		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN, fReadNodeIDRequest,
+		0, 0, sizeof(ether_address), address, &actual_length);
+
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of reading MAC address:%#010x\n", result);
 		return result;
@@ -549,14 +548,13 @@ ASIXDevice::ReadRXControlRegister(uint16 *rxcontrol)
 	*rxcontrol = 0;
 
 	status_t result = gUSBModule->send_request(fDevice,
-					USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN,
-					READ_RX_CONTROL, 0, 0,
-					sizeof(*rxcontrol), rxcontrol, &actual_length);
+		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN, READ_RX_CONTROL,
+		0, 0, sizeof(*rxcontrol), rxcontrol, &actual_length);
 
 	if (sizeof(*rxcontrol) != actual_length) {
 		TRACE_ALWAYS("Mismatch during reading RX control register."
-											"Read %d bytes instead of %d.\n",
-											actual_length, sizeof(*rxcontrol));
+			"Read %d bytes instead of %d.\n", actual_length,
+			sizeof(*rxcontrol));
 	}
 
 	return result;
@@ -567,8 +565,8 @@ status_t
 ASIXDevice::WriteRXControlRegister(uint16 rxcontrol)
 {
 	status_t result = gUSBModule->send_request(fDevice,
-							USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-							WRITE_RX_CONTROL, rxcontrol, 0, 0, 0, 0);
+		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT, WRITE_RX_CONTROL,
+		rxcontrol, 0, 0, 0, 0);
 	return result;
 }
 
@@ -578,9 +576,8 @@ ASIXDevice::StopDevice()
 {
 	status_t result = WriteRXControlRegister(0);
 
-	if (result != B_OK) {
+	if (result != B_OK)
 		TRACE_ALWAYS("Error of writing %#04x RX Control:%#010x\n", 0, result);
-	}
 
 	TRACE_RET(result);
 	return result;
@@ -607,7 +604,7 @@ ASIXDevice::SetPromiscuousMode(bool on)
 
 	if (result != B_OK ) {
 		TRACE_ALWAYS("Error of writing %#04x RX Control:%#010x\n",
-				rxcontrol, result);
+			rxcontrol, result);
 	}
 
 	TRACE_RET(result);
@@ -681,9 +678,9 @@ ASIXDevice::ModifyMulticastTable(bool join, ether_address_t* group)
 	// write multicast hash table
 	size_t actualLength = 0;
 	result = gUSBModule->send_request(fDevice,
-							USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-							WRITE_MF_ARRAY, 0, 0,
-							hashLength, hashTable, &actualLength);
+		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT, WRITE_MF_ARRAY,
+		0, 0, hashLength, hashTable, &actualLength);
+
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error writing hash table in MAR: %#010x.\n", result);
 		return result;
@@ -691,7 +688,7 @@ ASIXDevice::ModifyMulticastTable(bool join, ether_address_t* group)
 
 	if (actualLength != hashLength)
 		TRACE_ALWAYS("Incomplete writing of hash table: %d bytes of %d\n",
-						actualLength, hashLength);
+			actualLength, hashLength);
 
 	result = WriteRXControlRegister(rxcontrol);
 	if (result != B_OK)

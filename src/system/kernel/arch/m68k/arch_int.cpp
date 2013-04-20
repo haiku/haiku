@@ -238,6 +238,7 @@ m68k_exception_entry(struct iframe *iframe)
 
 			vm_page_fault(fault_address(iframe), iframe->cpu.pc,
 				fault_was_write(iframe), // store or load
+				false,
 				iframe->cpu.sr & SR_S, // was the system in user or supervisor
 				&newip);
 			if (newip != 0) {

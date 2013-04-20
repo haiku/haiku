@@ -139,12 +139,14 @@ Application Debugger :
 	RetrieveMemoryBlockJob.cpp
 
 	# model
+	AreaInfo.cpp
 	Breakpoint.cpp
 	DisassembledCode.cpp
 	FileSourceCode.cpp
 	Image.cpp
 	ImageInfo.cpp
 	ReturnValueInfo.cpp
+	SemaphoreInfo.cpp
 	SourceCode.cpp
 	StackFrame.cpp
 	StackFrameValues.cpp
@@ -152,6 +154,7 @@ Application Debugger :
 	StackTrace.cpp
 	Statement.cpp
 	SymbolInfo.cpp
+	SystemInfo.cpp
 	Team.cpp
 	TeamMemory.cpp
 	TeamMemoryBlock.cpp

@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copryight 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DWARF_TYPES_H
@@ -113,6 +113,12 @@ public:
 	virtual status_t			CreateDerivedAddressType(
 									address_type_kind kind,
 									AddressType*& _resultType);
+
+	virtual	status_t			CreateDerivedArrayType(
+									int64 lowerBound,
+									int64 elementCount,
+									bool extendExisting,
+									ArrayType*& _resultType);
 
 	virtual	status_t			ResolveObjectDataLocation(
 									const ValueLocation& objectLocation,

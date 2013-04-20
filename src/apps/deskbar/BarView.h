@@ -65,7 +65,9 @@ const float kStatusHeight = 22.0f;
 const float kHiddenDimension = 1.0f;
 const float kMaxPreventHidingDist = 80.0f;
 
+
 class BShelf;
+class TBarApp;
 class TBarMenuBar;
 class TExpandoMenuBar;
 class TReplicantTray;
@@ -73,129 +75,142 @@ class TDragRegion;
 class TInlineScrollView;
 class TTeamMenuItem;
 
-
 class TBarView : public BView {
-	public:
-		TBarView(BRect frame, bool vertical, bool left, bool top,
-			uint32 state, float width);
-		~TBarView();
+public:
+							TBarView(BRect frame, bool vertical, bool left,
+								bool top, int32 state, float width);
+							~TBarView();
 
-		virtual void AttachedToWindow();
-		virtual void DetachedFromWindow();
-		virtual void Draw(BRect updateRect);
-		virtual void MessageReceived(BMessage* message);
-		virtual void MouseMoved(BPoint where, uint32 transit,
-			const BMessage* dragMessage);
-		virtual void MouseDown(BPoint where);
+	virtual	void			AttachedToWindow();
+	virtual	void			DetachedFromWindow();
 
-		void SaveSettings();
-		void UpdatePlacement();
-		void ChangeState(int32 state, bool vertical, bool left, bool top,
-			bool aSync = false);
-		void RaiseDeskbar(bool raise);
-		void HideDeskbar(bool hide);
+	virtual	void			Draw(BRect updateRect);
 
-		// window placement methods
-		bool Vertical() const { return fVertical; };
-		bool Left() const { return fLeft; };
-		bool Top() const { return fTop; };
-		bool AcrossTop() const { return fTop && !fVertical; };
-		bool AcrossBottom() const { return !fTop && !fVertical; };
+	virtual	void			MessageReceived(BMessage* message);
 
-		// window state methods
-		bool ExpandoState() const { return fState == kExpandoState; };
-		bool FullState() const { return fState == kFullState; };
-		bool MiniState() const { return fState == kMiniState; };
-		int32 State() const { return fState; };
+	virtual	void			MouseMoved(BPoint where, uint32 transit,
+								const BMessage* dragMessage);
+	virtual	void			MouseDown(BPoint where);
 
-		// drag and drop methods
-		void CacheDragData(const BMessage* incoming);
-		status_t DragStart();
-		static bool MenuTrackingHook(BMenu* menu, void* castToThis);
-		void DragStop(bool full = false);
-		TrackingHookData* GetTrackingHookData();
-		bool Dragging() const;
-		const BMessage* DragMessage() const;
-		BObjectList<BString>*CachedTypesList() const;
-		bool AppCanHandleTypes(const char* signature);
-		void SetDragOverride(bool);
-		bool DragOverride();
-		bool InvokeItem(const char* signature);
+			void			SaveSettings();
 
-		void HandleDeskbarMenu(BMessage* targetmessage);
+			void			UpdatePlacement();
+			void			ChangeState(int32 state, bool vertical, bool left,
+								bool top, bool aSync = false);
 
-		status_t ItemInfo(int32 id, const char** name, DeskbarShelf* shelf);
-		status_t ItemInfo(const char* name, int32* id, DeskbarShelf* shelf);
+			void			RaiseDeskbar(bool raise);
+			void			HideDeskbar(bool hide);
 
-		bool ItemExists(int32 id, DeskbarShelf shelf);
-		bool ItemExists(const char* name, DeskbarShelf shelf);
+	// window placement methods
+			bool			Vertical() const { return fVertical; };
+			bool			Left() const { return fLeft; };
+			bool			Top() const { return fTop; };
+			bool			AcrossTop() const { return fTop && !fVertical; };
+			bool			AcrossBottom() const
+								{ return !fTop && !fVertical; };
 
-		int32 CountItems(DeskbarShelf shelf);
+	// window state methods
+			bool			ExpandoState() const
+								{ return fState == kExpandoState; };
+			bool			FullState() const { return fState == kFullState; };
+			bool			MiniState() const { return fState == kMiniState; };
+			int32			State() const { return fState; };
 
-		status_t AddItem(BMessage* archive, DeskbarShelf shelf, int32* id);
-		status_t AddItem(BEntry* entry, DeskbarShelf shelf, int32* id);
+	// drag and drop methods
+			void			CacheDragData(const BMessage* incoming);
+			status_t		DragStart();
+	static	bool			MenuTrackingHook(BMenu* menu, void* castToThis);
+			void			DragStop(bool full = false);
+			TrackingHookData*	GetTrackingHookData();
+			bool			Dragging() const;
+			const			BMessage* DragMessage() const;
+			BObjectList<BString>*	CachedTypesList() const;
+			bool			AppCanHandleTypes(const char* signature);
+			void			SetDragOverride(bool);
+			bool			DragOverride();
+			bool			InvokeItem(const char* signature);
 
-		void RemoveItem(int32 id);
-		void RemoveItem(const char* name, DeskbarShelf shelf);
+			void			HandleDeskbarMenu(BMessage* targetmessage);
 
-		BRect OffsetIconFrame(BRect rect) const;
-		BRect IconFrame(int32 id) const;
-		BRect IconFrame(const char* name) const;
+			status_t		ItemInfo(int32 id, const char** name,
+								DeskbarShelf* shelf);
+			status_t		ItemInfo(const char* name, int32* id,
+								DeskbarShelf* shelf);
 
-		void GetPreferredWindowSize(BRect screenFrame, float* width,
-			float* height);
-		void SizeWindow(BRect screenFrame);
-		void PositionWindow(BRect screenFrame);
-		void AddExpandedItem(const char* signature);
+			bool			ItemExists(int32 id, DeskbarShelf shelf);
+			bool			ItemExists(const char* name, DeskbarShelf shelf);
 
-		void CheckForScrolling();
+			int32			CountItems(DeskbarShelf shelf);
 
-		TExpandoMenuBar* ExpandoMenuBar() const;
-		TBarMenuBar* BarMenuBar() const;
-		TDragRegion* DragRegion() const { return fDragRegion; }
-		TReplicantTray* ReplicantTray() const { return fReplicantTray; }
+			status_t		AddItem(BMessage* archive, DeskbarShelf shelf,
+								int32* id);
+			status_t		AddItem(BEntry* entry, DeskbarShelf shelf,
+								int32* id);
 
-	private:
-		friend class TBarApp;
-		friend class TDeskbarMenu;
-		friend class PreferencesWindow;
+			void			RemoveItem(int32 id);
+			void			RemoveItem(const char* name, DeskbarShelf shelf);
 
-		status_t SendDragMessage(const char* signature, entry_ref* ref = NULL);
+			BRect			OffsetIconFrame(BRect rect) const;
+			BRect			IconFrame(int32 id) const;
+			BRect			IconFrame(const char* name) const;
 
-		void PlaceDeskbarMenu();
-		void PlaceTray(bool vertSwap, bool leftSwap);
-		void PlaceApplicationBar();
-		void SaveExpandedItems();
-		void RemoveExpandedItems();
-		void ExpandItems();
-		void _ChangeState(BMessage* message);
+			void			GetPreferredWindowSize(BRect screenFrame,
+								float* width, float* height);
+			void			SizeWindow(BRect screenFrame);
+			void			PositionWindow(BRect screenFrame);
+			void			AddExpandedItem(const char* signature);
 
-		TInlineScrollView* fInlineScrollView;
-		TBarMenuBar* fBarMenuBar;
-		TExpandoMenuBar* fExpandoMenuBar;
+			void			CheckForScrolling();
 
-		int32 fTrayLocation;
-		TDragRegion* fDragRegion;
-		TReplicantTray* fReplicantTray;
+			TExpandoMenuBar*	ExpandoMenuBar() const;
+			TBarMenuBar*		BarMenuBar() const;
+			TDragRegion*		DragRegion() const { return fDragRegion; }
+			TReplicantTray*		ReplicantTray() const { return fReplicantTray; }
 
-		bool fVertical : 1;
-		bool fTop : 1;
-		bool fLeft : 1;
+private:
+	friend class TBarApp;
+	friend class TDeskbarMenu;
+	friend class PreferencesWindow;
 
-		int32 fState;
+			status_t		SendDragMessage(const char* signature,
+								entry_ref* ref = NULL);
 
-		bigtime_t fPulseRate;
-		bool fRefsRcvdOnly;
-		BMessage* fDragMessage;
-		BObjectList<BString>*fCachedTypesList;
-		TrackingHookData fTrackingHookData;
+			void			PlaceDeskbarMenu();
+			void			PlaceTray(bool vertSwap, bool leftSwap);
+			void			PlaceApplicationBar();
 
-		uint32 fMaxRecentDocs;
-		uint32 fMaxRecentApps;
+			void			SaveExpandedItems();
+			void			RemoveExpandedItems();
+			void			ExpandItems();
 
-		TTeamMenuItem* fLastDragItem;
-		BList fExpandedItems;
-		BMessageFilter* fMouseFilter;
+			void			_ChangeState(BMessage* message);
+
+			TBarApp*			fBarApp;
+			TInlineScrollView*	fInlineScrollView;
+			TBarMenuBar*		fBarMenuBar;
+			TExpandoMenuBar*	fExpandoMenuBar;
+
+			int32			fTrayLocation;
+			TDragRegion*	fDragRegion;
+			TReplicantTray*	fReplicantTray;
+
+			bool			fVertical : 1;
+			bool			fTop : 1;
+			bool			fLeft : 1;
+			int32			fState;
+
+			bigtime_t		fPulseRate;
+			bool			fRefsRcvdOnly;
+			BMessage*		fDragMessage;
+			BObjectList<BString>*	fCachedTypesList;
+			TrackingHookData		fTrackingHookData;
+
+			uint32			fMaxRecentDocs;
+			uint32			fMaxRecentApps;
+
+			TTeamMenuItem*	fLastDragItem;
+			BList			fExpandedItems;
+			BMessageFilter*	fMouseFilter;
 };
 
 
@@ -234,4 +249,4 @@ TBarView::CachedTypesList() const
 }
 
 
-#endif	/* BARVIEW_H */
+#endif	// BARVIEW_H

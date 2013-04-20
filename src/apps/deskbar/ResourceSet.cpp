@@ -253,7 +253,7 @@ namespace TResourcePrivate {
 
 		TypeItem* FindItemByID(int32 id)
 		{
-			for (int32 i = 0; i < fItems.CountItems(); i++ ) {
+			for (int32 i = fItems.CountItems() - 1; i >= 0; i--) {
 				TypeItem* it = (TypeItem*)fItems.ItemAt(i);
 				if (it->ID() == id)
 					return it;
@@ -263,7 +263,7 @@ namespace TResourcePrivate {
 
 		TypeItem* FindItemByName(const char* name)
 		{
-			for (int32 i = 0; i < fItems.CountItems(); i++ ) {
+			for (int32 i = fItems.CountItems() - 1; i >= 0; i--) {
 				TypeItem* it = (TypeItem*)fItems.ItemAt(i);
 				if (strcmp(it->Name(), name) == 0)
 					return it;
@@ -677,8 +677,7 @@ TResourceSet::FindTypeList(type_code type)
 {
 	BAutolock lock(&fLock);
 
-	int32 count = fTypes.CountItems();
-	for (int32 i = 0; i < count; i++ ) {
+	for (int32 i = fTypes.CountItems() - 1; i >= 0; i--) {
 		TypeList* list = (TypeList*)fTypes.ItemAt(i);
 		if (list && list->Type() == type)
 			return list;
@@ -731,8 +730,7 @@ TResourceSet::LoadResource(type_code type, int32 id, const char* name,
 
 		// If a named resource, first look in directories.
 		fLock.Lock();
-		int32 count = fDirectories.CountItems();
-		for (int32 i = 0; item == 0 && i < count; i++) {
+		for (int32 i = fDirectories.CountItems() - 1; i >= 0; i--) {
 			BPath* dir = (BPath*)fDirectories.ItemAt(i);
 			if (dir) {
 				fLock.Unlock();
@@ -754,8 +752,7 @@ TResourceSet::LoadResource(type_code type, int32 id, const char* name,
 	if (!item) {
 		// Look through resource objects for data.
 		fLock.Lock();
-		int32 count = fResources.CountItems();
-		for (int32 i = 0; item == 0 && i < count; i++ ) {
+		for (int32 i = fResources.CountItems() - 1; i >= 0; i--) {
 			BResources* resource = (BResources*)fResources.ItemAt(i);
 			if (resource) {
 				const void* data = NULL;

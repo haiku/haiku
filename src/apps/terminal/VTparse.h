@@ -25,10 +25,6 @@
 #define CASE_LS1 12
 #define CASE_SP 13
 #define CASE_SCR_STATE 14
-#define CASE_SCS0_STATE 15
-#define CASE_SCS1_STATE 16
-#define CASE_SCS2_STATE 17
-#define CASE_SCS3_STATE 18
 #define CASE_ESC_IGNORE 19
 #define CASE_ESC_DIGIT 20
 #define CASE_ESC_SEMI 21
@@ -56,7 +52,6 @@
 #define CASE_DECSET 43
 #define CASE_DECRST 44
 #define CASE_DECALN 45
-#define CASE_GSETS 46
 #define CASE_DECSC 47
 #define CASE_DECRC 48
 #define CASE_DECKPAM 49
@@ -83,12 +78,6 @@
 #define CASE_HP_MEM_LOCK 70
 #define CASE_HP_MEM_UNLOCK 71
 #define CASE_HP_BUGGY_LL 72
-#define CASE_TO_STATUS 73
-#define CASE_FROM_STATUS 74
-#define CASE_SHOW_STATUS 75
-#define CASE_HIDE_STATUS 76
-#define CASE_ERASE_STATUS 77
-#define CASE_MBCS 78
 #define CASE_SCS_STATE 79
 #define CASE_UTF8_2BYTE 80
 #define CASE_UTF8_3BYTE 81
@@ -96,7 +85,6 @@
 #define CASE_SJIS_INSTRING 83
 #define CASE_SJIS_KANA 84
 #define CASE_PRINT_GR 85
-#define CASE_PRINT_CS96 86
 // additions, maybe reorder/reuse older ones ?
 #define CASE_VPA 87
 #define CASE_HPA 88

@@ -19,7 +19,7 @@ extern "C" {
 #endif
 
 const char *get_cpu_vendor_string(enum cpu_types type);
-const char *get_cpu_model_string(system_info *info);
+const char *get_cpu_model_string(const system_info *info);
 void get_cpu_type(char *vendorBuffer, size_t vendorSize,
 		char *modelBuffer, size_t modelSize);
 int32 get_rounded_cpu_speed(void);
@@ -257,7 +257,7 @@ get_cpuid_model_string(char *name)
 
 
 const char *
-get_cpu_model_string(system_info *info)
+get_cpu_model_string(const system_info *info)
 {
 #if defined(__INTEL__) || defined(__x86_64__)
 	char cpuidName[49];

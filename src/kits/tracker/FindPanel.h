@@ -223,7 +223,7 @@ class FindPanel : public BView {
 
 		void AddMimeTypesToMenu();
 			// populates the type menu
-		static bool AddOneMimeTypeToMenu(const ShortMimeInfo*, void*);
+		static bool AddOneMimeTypeToMenu(const ShortMimeInfo*, void* castToMenu);
 
 		void AddVolumes(BMenu*);
 			// populates the volume menu

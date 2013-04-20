@@ -69,7 +69,7 @@ menu_info *_menu_info_ptr_;
 
 extern "C" const char B_NOTIFICATION_SENDER[] = "be:sender";
 
-static const rgb_color _kDefaultColors[kNumColors] = {
+static const rgb_color _kDefaultColors[kColorWhichCount] = {
 	{216, 216, 216, 255},	// B_PANEL_BACKGROUND_COLOR
 	{216, 216, 216, 255},	// B_MENU_BACKGROUND_COLOR
 	{255, 203, 0, 255},		// B_WINDOW_TAB_COLOR
@@ -101,6 +101,7 @@ static const rgb_color _kDefaultColors[kNumColors] = {
 	{153, 153, 153, 255},	// B_LIST_SELECTED_BACKGROUND_COLOR
 	{0, 0, 0, 255},			// B_LIST_ITEM_TEXT_COLOR
 	{0, 0, 0, 255},			// B_LIST_SELECTED_ITEM_TEXT_COLOR
+	{216, 216, 216, 255},	// B_SCROLL_BAR_THUMB_COLOR
 	// 100...
 	{0, 255, 0, 255},		// B_SUCCESS_COLOR
 	{255, 0, 0, 255},		// B_FAILURE_COLOR
@@ -1070,7 +1071,7 @@ rgb_color
 ui_color(color_which which)
 {
 	int32 index = color_which_to_index(which);
-	if (index < 0 || index >= kNumColors) {
+	if (index < 0 || index >= kColorWhichCount) {
 		fprintf(stderr, "ui_color(): unknown color_which %d\n", which);
 		return make_color(0, 0, 0);
 	}
@@ -1089,7 +1090,7 @@ void
 set_ui_color(const color_which &which, const rgb_color &color)
 {
 	int32 index = color_which_to_index(which);
-	if (index < 0 || index >= kNumColors) {
+	if (index < 0 || index >= kColorWhichCount) {
 		fprintf(stderr, "set_ui_color(): unknown color_which %d\n", which);
 		return;
 	}
@@ -1166,7 +1167,7 @@ _init_interface_kit_()
 		return status;
 
 	general_info.background_color = ui_color(B_PANEL_BACKGROUND_COLOR);
-	general_info.mark_color.set_to(0, 0, 0);
+	general_info.mark_color = ui_color(B_CONTROL_MARK_COLOR);
 	general_info.highlight_color = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
 	general_info.window_frame_color = ui_color(B_WINDOW_TAB_COLOR);
 	general_info.color_frame = true;

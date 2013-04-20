@@ -57,6 +57,7 @@ static struct option const kLongOptions[] = {
 	I(list_selected_background_color, B_LIST_SELECTED_BACKGROUND_COLOR),
 	I(list_item_text_color, B_LIST_ITEM_TEXT_COLOR),
 	I(list_selected_item_text_color, B_LIST_SELECTED_ITEM_TEXT_COLOR),
+	I(scroll_bar_thumb_color, B_SCROLL_BAR_THUMB_COLOR),
 	I(tooltip_background_color, B_TOOL_TIP_BACKGROUND_COLOR),
 	I(tooltip_text_color, B_TOOL_TIP_TEXT_COLOR),
 	I(success_color, B_SUCCESS_COLOR),

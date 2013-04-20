@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2013, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -66,6 +66,10 @@ ClientMemoryAllocator::~ClientMemoryAllocator()
 void*
 ClientMemoryAllocator::Allocate(size_t size, block** _address, bool& newArea)
 {
+	// A detached allocator no longer allows any further allocations
+	if (fApplication == NULL)
+		return NULL;
+
 	BAutolock locker(fLock);
 
 	// Search best matching free block from the list
@@ -179,7 +183,9 @@ ClientMemoryAllocator::Free(block* freeBlock)
 
 		fChunks.Remove(chunk);
 		delete_area(chunk->area);
-		fApplication->NotifyDeleteClientArea(chunk->area);
+
+		if (fApplication != NULL)
+			fApplication->NotifyDeleteClientArea(chunk->area);
 
 		free(chunk);
 	}
@@ -187,10 +193,20 @@ ClientMemoryAllocator::Free(block* freeBlock)
 
 
 void
+ClientMemoryAllocator::Detach()
+{
+	BAutolock locker(fLock);
+	fApplication = NULL;
+}
+
+
+void
 ClientMemoryAllocator::Dump()
 {
-	debug_printf("Application %" B_PRId32 ", %s: chunks:\n",
-		fApplication->ClientTeam(), fApplication->Signature());
+	if (fApplication != NULL) {
+		debug_printf("Application %" B_PRId32 ", %s: chunks:\n",
+			fApplication->ClientTeam(), fApplication->Signature());
+	}
 
 	chunk_list::Iterator iterator = fChunks.GetIterator();
 	int32 i = 0;

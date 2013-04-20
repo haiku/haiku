@@ -72,7 +72,7 @@ const int32 kMinimumIconSize = 16;
 const int32 kMaximumIconSize = 96;
 const int32 kIconSizeInterval = 8;
 const int32 kIconCacheCount = (kMaximumIconSize - kMinimumIconSize)
-								/ kIconSizeInterval + 1;
+	/ kIconSizeInterval + 1;
 
 // update preferences message constant
 const uint32 kUpdatePreferences = 'Pref';
@@ -93,6 +93,10 @@ public:
 									BarTeamInfo(const BarTeamInfo &info);
 									~BarTeamInfo();
 
+private:
+			void					_Init();
+
+public:
 			BList*					teams;
 			uint32					flags;
 			char*					sig;

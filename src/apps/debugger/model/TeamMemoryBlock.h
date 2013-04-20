@@ -44,7 +44,7 @@ public:
 			bool			IsWritable() const		{ return fWritable; }
 			void			SetWritable(bool writable);
 
-			void			NotifyDataRetrieved();
+			void			NotifyDataRetrieved(status_t result = B_OK);
 
 protected:
 	virtual void			LastReferenceReleased();
@@ -69,6 +69,9 @@ public:
 	virtual					~Listener();
 
 	virtual void			MemoryBlockRetrieved(TeamMemoryBlock* block);
+
+	virtual	void			MemoryBlockRetrievalFailed(TeamMemoryBlock* block,
+								status_t result);
 };
 
 

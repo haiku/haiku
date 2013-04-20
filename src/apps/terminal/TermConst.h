@@ -159,8 +159,10 @@ enum {
 static const int32 DEFAULT = -1;
 
 // Font Width
-static const int  HALF_WIDTH = 1;
-static const int  FULL_WIDTH = 2;
+enum {
+	HALF_WIDTH = 1,
+	FULL_WIDTH = 2
+};
 
 #define M_UTF8 -1
 

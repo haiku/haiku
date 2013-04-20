@@ -115,7 +115,7 @@ FUNCTION(x86_swap_pgdir):
 	ret
 FUNCTION_END(x86_swap_pgdir)
 
-/* thread exit stub - is copied to the userspace stack in arch_thread_enter_uspace() */
+/* thread exit stub */
 	.align 4
 FUNCTION(x86_userspace_thread_exit):
 	pushl	%eax

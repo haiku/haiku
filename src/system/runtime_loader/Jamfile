@@ -91,7 +91,7 @@ Ld runtime_loader :
 	$(TARGET_STATIC_LIBSUPC++)
 	$(TARGET_GCC_LIBGCC)
 	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/runtime_loader.ld
-	: --no-undefined
+	: --no-undefined -shared -soname=runtime_loader
 ;
 
 HaikuSubInclude arch $(TARGET_ARCH) ;

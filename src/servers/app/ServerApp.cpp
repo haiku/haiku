@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2012, Haiku.
+ * Copyright 2001-2013, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -192,6 +192,7 @@ ServerApp::~ServerApp()
 		fWindowListLock.Lock();
 	}
 
+	fMemoryAllocator.Detach();
 	fMapLocker.Lock();
 
 	while (!fBitmapMap.empty())

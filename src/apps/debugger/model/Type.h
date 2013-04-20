@@ -60,6 +60,7 @@ enum {
 
 class AddressType;
 class ArrayIndexPath;
+class ArrayType;
 class BString;
 class Type;
 class ValueLocation;
@@ -135,10 +136,21 @@ public:
 									// if requested)
 
 
-	// TODO: also need the ability to derive array types
 	virtual status_t			CreateDerivedAddressType(
 									address_type_kind kind,
 									AddressType*& _resultType);
+
+	virtual	status_t			CreateDerivedArrayType(
+									int64 lowerBound,
+									int64 elementCount,
+									bool extendExisting,
+										// if the current object is already
+										// an array type, attach an extra
+										// dimension to it rather than
+										// creating a new encapsulating
+										// type object
+									ArrayType*& _resultType);
+
 
 	virtual	status_t			ResolveObjectDataLocation(
 									const ValueLocation& objectLocation,

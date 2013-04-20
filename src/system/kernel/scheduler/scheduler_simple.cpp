@@ -23,6 +23,7 @@
 #include <scheduler_defs.h>
 #include <thread.h>
 #include <timer.h>
+#include <util/Random.h>
 
 #include "scheduler_common.h"
 #include "scheduler_tracing.h"
@@ -41,19 +42,6 @@ const bigtime_t kThreadQuantum = 3000;
 
 // The run queue. Holds the threads ready to run ordered by priority.
 static Thread *sRunQueue = NULL;
-
-
-static int
-_rand(void)
-{
-	static int next = 0;
-
-	if (next == 0)
-		next = system_time();
-
-	next = next * 1103515245 + 12345;
-	return (next >> 16) & 0x7FFF;
-}
 
 
 static int
@@ -272,7 +260,7 @@ simple_reschedule(void)
 
 			// skip normal threads sometimes
 			// (twice as probable per priority level)
-			if ((_rand() >> (15 - priorityDiff)) != 0)
+			if ((fast_random_value() >> (15 - priorityDiff)) != 0)
 				break;
 
 			nextThread = lowerNextThread;

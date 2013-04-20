@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Terminal	2645209895
+1	german	x-vnd.Haiku-Terminal	2967760334
 Not found.	Terminal TermWindow		Nicht gefunden.
 Switch Terminals	Terminal TermWindow		Terminals wechseln
 Change directory	Terminal TermView		Zum Ordner wechseln
@@ -62,7 +62,6 @@ Text not found.	Terminal TermWindow		Der Suchbegriff wurde nicht gefunden.
 Find…	Terminal TermWindow		Suchen...
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Der Prozess \"%1\" läuft noch.\nWird das Terminal geschlossen, wird auch dieser Prozess abgebrochen.
 Move here	Terminal TermView		Hierher verschieben
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tArbeitsverzeichnis des gerade im aktuellen Reiter\n\t\t\tlaufenden Prozesses. Optional kann auch die maximale\n\t\t\tAnzahl der Pfadkomponenten angegeben werden.\n\t\t\tZum Beispiel: '%2d' für maximal zwei Komponenten.\n\t%T\t-\tName der Terminalanwendung in der aktuellen Systemsprache\n\t%i\t-\tLaufende Nummer des Fensters\n\t%p\t-\tName des laufenden Prozesses im aktuellen Reiter\n\t%t\t-\tTitel des aktuellen Reiters\n\t%%\t-\tDas Zeichen '%'
 Retro	Terminal colors scheme		Retro
 Error!	Terminal getString		Fehler!
 New tab	Terminal TermWindow		Neuer Reiter
@@ -80,6 +79,7 @@ Clear all	Terminal TermWindow		Bildschirm leeren
 Text encoding	Terminal TermWindow		Kodierung
 size	Terminal TermView		Größe
 Close window	Terminal TermWindow		Fenster schließen
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tArbeitsverzeichnis des gerade im aktuellen Reiter\n\t\t\tlaufenden Prozesses. Optional kann auch die maximale\n\t\t\tAnzahl der Pfadkomponenten angegeben werden.\n\t\t\tZum Beispiel: '%2d' für maximal zwei Komponenten.\n\t%T\t-\tName der Terminalanwendung in der aktuellen Systemsprache\n\t%T\t-\tKodierung des aktuellen Reiters. Unterdrückt bei UTF-8\n\t%i\t-\tLaufende Nummer des Fensters\n\t%p\t-\tName des laufenden Prozesses im aktuellen Reiter\n\t%t\t-\tTitel des aktuellen Reiters\n\t%%\t-\tDas Zeichen '%'
 Save as default	Terminal TermWindow		Als Standard speichern
 Set tab title	Terminal TermWindow		Reiter umbenennen
 Settings…	Terminal TermWindow		Einstellungen...

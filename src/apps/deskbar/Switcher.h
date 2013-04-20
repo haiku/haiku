@@ -63,7 +63,6 @@ public:
 			int32			CurrentWindow();
 			int32			CurrentSlot();
 			BList*			GroupList();
-			int32			CountVisibleGroups();
 
 			void			QuitApp();
 			void			HideApp();

@@ -766,7 +766,9 @@ FUNCTION(x86_sysenter):
 	pushl	$USER_CODE_SEG			// user cs
 
 	// user_eip
-	movl	USER_COMMPAGE_ADDR + 4 * COMMPAGE_ENTRY_X86_SYSCALL, %edx
+	movl	THREAD_team(%edx), %edx
+	movl	TEAM_commpage_address(%edx), %edx
+	addl	4 * COMMPAGE_ENTRY_X86_SYSCALL(%edx), %edx
 	addl	$4, %edx				// sysenter is at offset 2, 2 bytes long
 	pushl	%edx
 

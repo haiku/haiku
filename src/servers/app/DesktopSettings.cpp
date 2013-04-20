@@ -18,6 +18,7 @@
 #include <Path.h>
 
 #include <DefaultColors.h>
+#include <InterfaceDefs.h>
 #include <ServerReadOnlyMemory.h>
 
 #include "Desktop.h"
@@ -77,7 +78,7 @@ DesktopSettingsPrivate::_SetDefaults()
 	fWorkspacesRows = 2;
 
 	memcpy(fShared.colors, BPrivate::kDefaultColors,
-		sizeof(rgb_color) * kNumColors);
+		sizeof(rgb_color) * kColorWhichCount);
 
 	gSubpixelAntialiasing = false;
 	gDefaultHintingMode = HINTING_MODE_ON;
@@ -291,7 +292,7 @@ DesktopSettingsPrivate::_Load()
 			}
 
 			// colors
-			for (int32 i = 0; i < kNumColors; i++) {
+			for (int32 i = 0; i < kColorWhichCount; i++) {
 				char colorName[12];
 				snprintf(colorName, sizeof(colorName), "color%" B_PRId32,
 					(int32)index_to_color_which(i));
@@ -436,7 +437,7 @@ DesktopSettingsPrivate::Save(uint32 mask)
 			settings.AddInt8("subpixel average weight", gSubpixelAverageWeight);
 			settings.AddBool("subpixel ordering", gSubpixelOrderingRGB);
 
-			for (int32 i = 0; i < kNumColors; i++) {
+			for (int32 i = 0; i < kColorWhichCount; i++) {
 				char colorName[12];
 				snprintf(colorName, sizeof(colorName), "color%" B_PRId32,
 					(int32)index_to_color_which(i));
@@ -648,15 +649,16 @@ DesktopSettingsPrivate::WorkspacesMessage(int32 index) const
 void
 DesktopSettingsPrivate::SetUIColor(color_which which, const rgb_color color)
 {
-	//
 	int32 index = color_which_to_index(which);
-	if (index < 0 || index >= kNumColors)
+	if (index < 0 || index >= kColorWhichCount)
 		return;
+
 	fShared.colors[index] = color;
 	// TODO: deprecate the background_color member of the menu_info struct,
 	// otherwise we have to keep this duplication...
 	if (which == B_MENU_BACKGROUND_COLOR)
 		fMenuInfo.background_color = color;
+
 	Save(kAppearanceSettings);
 }
 
@@ -666,8 +668,9 @@ DesktopSettingsPrivate::UIColor(color_which which) const
 {
 	static const rgb_color invalidColor = {0, 0, 0, 0};
 	int32 index = color_which_to_index(which);
-	if (index < 0 || index >= kNumColors)
+	if (index < 0 || index >= kColorWhichCount)
 		return invalidColor;
+
 	return fShared.colors[index];
 }
 

@@ -47,6 +47,7 @@
 #include <TextView.h>
 #include <TranslationUtils.h>
 #include <UnicodeChar.h>
+#include <UTF8.h>
 
 
 using namespace BPrivate;
@@ -598,9 +599,8 @@ StyledEditWindow::MenusBeginning()
 		BMenu* menu = fCurrentFontItem->Submenu();
 		if (menu != NULL) {
 			BMenuItem* item = menu->FindMarked();
-			if (item != NULL) {
+			if (item != NULL)
 				item->SetMarked(false);
-			}
 		}
 	}
 
@@ -622,9 +622,10 @@ StyledEditWindow::MenusBeginning()
 	rgb_color color = BLACK;
 	bool sameColor;
 	fTextView->GetFontAndColor(&font, &sameProperties, &color, &sameColor);
+	color.alpha = 255;
 
-	if (sameColor && color.alpha == 255) {
-		// select the current color
+	if (sameColor) {
+		// mark the menu according to the current color
 		if (color.red == 0) {
 			if (color.green == 0) {
 				if (color.blue == 0) {
@@ -848,6 +849,11 @@ StyledEditWindow::SaveAs(BMessage* message)
 	fSavePanel->SetSaveText(Title());
 	if (message != NULL)
 		fSavePanel->SetMessage(message);
+
+	// Move the save panel to the middle of the window
+	fSavePanel->Window()->MoveTo(Frame().LeftTop().x + Frame().Width() / 2
+			- fSavePanel->Window()->Frame().Width() / 2,
+		Frame().LeftTop().y + Frame().Height() / 4);
 
 	fSavePanel->Show();
 	return B_OK;
@@ -1086,7 +1092,7 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	textBounds.OffsetTo(B_ORIGIN);
 	textBounds.InsetBy(TEXT_INSET, TEXT_INSET);
 
-	fTextView= new StyledEditView(viewFrame, textBounds, this);
+	fTextView = new StyledEditView(viewFrame, textBounds, this);
 	fTextView->SetDoesUndo(true);
 	fTextView->SetStylable(true);
 	fTextView->SetEncoding(encoding);
@@ -1211,8 +1217,8 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	fFontColorMenu->SetRadioMode(true);
 	fFontMenu->AddItem(fFontColorMenu);
 
-	fFontColorMenu->AddItem(fBlackItem = new BMenuItem(B_TRANSLATE("Black"),
-		new BMessage(FONT_COLOR)));
+	fFontColorMenu->AddItem(fBlackItem = new ColorMenuItem(B_TRANSLATE("Black"),
+		BLACK, new BMessage(FONT_COLOR)));
 	fBlackItem->SetMarked(true);
 	fFontColorMenu->AddItem(fRedItem = new ColorMenuItem(B_TRANSLATE("Red"),
 		RED, new BMessage(FONT_COLOR)));
@@ -1222,10 +1228,12 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 		BLUE, new BMessage(FONT_COLOR)));
 	fFontColorMenu->AddItem(fCyanItem = new ColorMenuItem(B_TRANSLATE("Cyan"),
 		CYAN, new BMessage(FONT_COLOR)));
-	fFontColorMenu->AddItem(fMagentaItem = new ColorMenuItem(B_TRANSLATE("Magenta"),
-		MAGENTA, new BMessage(FONT_COLOR)));
-	fFontColorMenu->AddItem(fYellowItem = new ColorMenuItem(B_TRANSLATE("Yellow"),
-		YELLOW, new BMessage(FONT_COLOR)));
+	fFontColorMenu->AddItem(fMagentaItem
+		= new ColorMenuItem(B_TRANSLATE("Magenta"), MAGENTA,
+			new BMessage(FONT_COLOR)));
+	fFontColorMenu->AddItem(fYellowItem
+		= new ColorMenuItem(B_TRANSLATE("Yellow"), YELLOW,
+			new BMessage(FONT_COLOR)));
 	fFontMenu->AddSeparatorItem();
 
 	// "Bold" & "Italic" menu items
@@ -1293,7 +1301,7 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 
 	BMessage *message = new BMessage(MENU_RELOAD);
 	message->AddString("encoding", "auto");
-	menu->AddItem(fEncodingItem = new BMenuItem(PopulateEncodingMenu(
+	menu->AddItem(fEncodingItem = new BMenuItem(_PopulateEncodingMenu(
 		new BMenu(B_TRANSLATE("Text encoding")), "UTF-8"),
 		message));
 	fEncodingItem->SetEnabled(false);
@@ -1467,11 +1475,10 @@ StyledEditWindow::_ReloadDocument(BMessage* message)
 	entry_ref ref;
 	const char* name;
 
-	if (fSaveMessage == NULL || message == NULL)
+	if (fSaveMessage == NULL || message == NULL
+		|| fSaveMessage->FindRef("directory", &ref) != B_OK
+		|| fSaveMessage->FindString("name", &name) != B_OK)
 		return;
-
-	fSaveMessage->FindRef("directory", &ref);
-	fSaveMessage->FindString("name", &name);
 
 	BDirectory dir(&ref);
 	status_t status = dir.InitCheck();
@@ -1500,13 +1507,27 @@ StyledEditWindow::_ReloadDocument(BMessage* message)
 			return;
 	}
 
+	const BCharacterSet* charset
+		= BCharacterSetRoster::GetCharacterSetByFontID(
+			fTextView->GetEncoding());
 	const char* forceEncoding = NULL;
 	if (message->FindString("encoding", &forceEncoding) != B_OK) {
-		const BCharacterSet* charset
-			= BCharacterSetRoster::GetCharacterSetByFontID(
-					fTextView->GetEncoding());
 		if (charset != NULL)
 			forceEncoding = charset->GetName();
+	} else {
+		if (charset != NULL) {
+			// UTF8 id assumed equal to -1
+			const uint32 idUTF8 = (uint32)-1;
+			uint32 id = charset->GetConversionID();
+			if (strcmp(forceEncoding, "next") == 0)
+				id = id == B_MS_WINDOWS_1250_CONVERSION	? idUTF8 : id + 1;
+			else if (strcmp(forceEncoding, "previous") == 0)
+				id = id == idUTF8 ? B_MS_WINDOWS_1250_CONVERSION : id - 1;
+			const BCharacterSet* newCharset
+				= BCharacterSetRoster::GetCharacterSetByConversionID(id);
+			if (newCharset != NULL)
+				forceEncoding = newCharset->GetName();
+		}
 	}
 
 	BScrollBar* vertBar = fScrollView->ScrollBar(B_VERTICAL);
@@ -1826,6 +1847,10 @@ StyledEditWindow::_ShowStatistics()
 	BAlert* alert = new BAlert("Statistics", result, B_TRANSLATE("OK"), NULL,
 		NULL, B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_INFO_ALERT);
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+	// Move the alert to the middle of the window
+	alert->MoveTo(Frame().LeftTop().x + Frame().Width() / 2
+			- alert->Frame().Width() / 2,
+		Frame().LeftTop().y + Frame().Height() / 4);
 
 	return alert->Go();
 }
@@ -1881,13 +1906,17 @@ StyledEditWindow::_ShowAlert(const BString& text, const BString& label,
 	BAlert* alert = new BAlert("Alert", text.String(), label.String(), button2,
 		button3, B_WIDTH_AS_USUAL, spacing, type);
 	alert->SetShortcut(0, B_ESCAPE);
+	// Move the alert to the middle of the window
+	alert->MoveTo(Frame().LeftTop().x + Frame().Width() / 2
+			- alert->Frame().Width() / 2,
+		Frame().LeftTop().y + Frame().Height() / 4);
 
 	return alert->Go();
 }
 
 
 BMenu*
-StyledEditWindow::PopulateEncodingMenu(BMenu* menu, const char* currentEncoding)
+StyledEditWindow::_PopulateEncodingMenu(BMenu* menu, const char* currentEncoding)
 {
 	menu->SetRadioMode(true);
 	BString encoding(currentEncoding);
@@ -1917,6 +1946,13 @@ StyledEditWindow::PopulateEncodingMenu(BMenu* menu, const char* currentEncoding)
 	BMessage *message = new BMessage(MENU_RELOAD);
 	message->AddString("encoding", "auto");
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Autodetect"), message));
+
+	message = new BMessage(MENU_RELOAD);
+	message->AddString("encoding", "next");
+	AddShortcut(B_PAGE_DOWN, B_OPTION_KEY, message);
+	message = new BMessage(MENU_RELOAD);
+	message->AddString("encoding", "previous");
+	AddShortcut(B_PAGE_UP, B_OPTION_KEY, message);
 
 	return menu;
 }

@@ -73,11 +73,14 @@ typedef struct area_info {
 #define	B_32_BIT_CONTIGUOUS		6	/* B_CONTIGUOUS, < 4 GB physical address */
 
 /* address spec for create_area(), and clone_area() */
-#define B_ANY_ADDRESS			0
-#define B_EXACT_ADDRESS			1
-#define B_BASE_ADDRESS			2
-#define B_CLONE_ADDRESS			3
-#define	B_ANY_KERNEL_ADDRESS	4
+#define B_ANY_ADDRESS				0
+#define B_EXACT_ADDRESS				1
+#define B_BASE_ADDRESS				2
+#define B_CLONE_ADDRESS				3
+#define	B_ANY_KERNEL_ADDRESS		4
+/* B_ANY_KERNEL_BLOCK_ADDRESS		5 */
+#define B_RANDOMIZED_ANY_ADDRESS	6
+#define B_RANDOMIZED_BASE_ADDRESS	7
 
 /* area protection */
 #define B_READ_AREA				1
