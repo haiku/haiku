@@ -850,6 +850,11 @@ StyledEditWindow::SaveAs(BMessage* message)
 	if (message != NULL)
 		fSavePanel->SetMessage(message);
 
+	// Move the save panel to the middle of the window
+	fSavePanel->Window()->MoveTo(Frame().LeftTop().x + Frame().Width() / 2
+			- fSavePanel->Window()->Frame().Width() / 2,
+		Frame().LeftTop().y + Frame().Height() / 4);
+
 	fSavePanel->Show();
 	return B_OK;
 }
