@@ -16,9 +16,8 @@ public:
 
 	virtual	const char*			Name() const;
 
-	virtual status_t ParseTypeExpression(const BString &expression,
-									TeamTypeInformation* lookup,
-									Type*& _resultType) const;
+protected:
+	virtual	bool				IsModifierValid(char modifier) const;
 };
 
 

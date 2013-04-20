@@ -15,6 +15,13 @@ public:
 	virtual						~CLanguageFamily();
 
 	virtual	SyntaxHighlighter*	GetSyntaxHighlighter() const;
+
+	virtual status_t 			ParseTypeExpression(const BString& expression,
+									TeamTypeInformation* lookup,
+									Type*& _resultType) const;
+
+protected:
+	virtual	bool				IsModifierValid(char modifier) const = 0;
 };
 
 
