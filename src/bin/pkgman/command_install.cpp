@@ -11,8 +11,9 @@
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
-//#include <sys/stat.h>
 
+#include <Directory.h>
+#include <package/DownloadFileRequest.h>
 #include <package/PackageRoster.h>
 #include <package/RepositoryConfig.h>
 #include <package/solver/SolverPackageSpecifier.h>
@@ -22,8 +23,12 @@
 #include <package/solver/SolverResult.h>
 
 #include <AutoDeleter.h>
+#include <package/ActivationTransaction.h>
+#include <package/DaemonClient.h>
 
 #include "Command.h"
+#include "DecisionProvider.h"
+#include "JobStateListener.h"
 #include "pkgman.h"
 #include "RepositoryBuilder.h"
 
@@ -32,6 +37,7 @@
 
 
 using namespace BPackageKit;
+using namespace BPackageKit::BPrivate;
 
 
 static const char* const kShortUsage =
@@ -50,6 +56,28 @@ static const char* const kLongUsage =
 
 
 DEFINE_COMMAND(InstallCommand, "install", kShortUsage, kLongUsage)
+
+
+struct Repository : public BSolverRepository {
+	Repository()
+		:
+		BSolverRepository()
+	{
+	}
+
+	status_t Init(BPackageRoster& roster, const char* name)
+	{
+		return roster.GetRepositoryConfig(name, &fConfig);
+	}
+
+	const BRepositoryConfig& Config() const
+	{
+		return fConfig;
+	}
+
+private:
+	BRepositoryConfig	fConfig;
+};
 
 
 int
@@ -121,16 +149,25 @@ InstallCommand::Execute(int argc, const char* const* argv)
 		.AddPackages(B_PACKAGE_INSTALLATION_LOCATION_COMMON, "common")
 		.AddToSolver(solver, !installInHome);
 
+	BObjectList<BSolverRepository> installedRepositories(10);
+	if (!installedRepositories.AddItem(&systemRepository)
+		|| !installedRepositories.AddItem(&commonRepository)) {
+		DIE(B_NO_MEMORY, "failed to add installed repositories to list");
+	}
+
 	BSolverRepository homeRepository;
 	if (installInHome) {
 		commonRepository.SetPriority(-2);
 		RepositoryBuilder(homeRepository, "home")
 			.AddPackages(B_PACKAGE_INSTALLATION_LOCATION_HOME, "home")
 			.AddToSolver(solver, true);
+
+		if (!installedRepositories.AddItem(&homeRepository))
+			DIE(B_NO_MEMORY, "failed to add home repository to list");
 	}
 
 	// other repositories
-	BObjectList<BSolverRepository> otherRepositories(10, true);
+	BObjectList<Repository> otherRepositories(10, true);
 	BPackageRoster roster;
 	BStringList repositoryNames;
 	error = roster.GetRepositoryNames(repositoryNames);
@@ -139,20 +176,20 @@ InstallCommand::Execute(int argc, const char* const* argv)
 
 	int32 repositoryNameCount = repositoryNames.CountStrings();
 	for (int32 i = 0; i < repositoryNameCount; i++) {
-		const BString& name = repositoryNames.StringAt(i);
-		BRepositoryConfig config;
-		error = roster.GetRepositoryConfig(name, &config);
-		if (error != B_OK) {
-			WARN(error, "failed to get config for repository \"%s\". Skipping.",
-				name.String());
-			continue;
-		}
-
-		BSolverRepository* repository = new(std::nothrow) BSolverRepository;
+		Repository* repository = new(std::nothrow) Repository;
 		if (repository == NULL || !otherRepositories.AddItem(repository))
 			DIE(B_NO_MEMORY, "out of memory");
 
-		RepositoryBuilder(*repository, config)
+		const BString& name = repositoryNames.StringAt(i);
+		error = repository->Init(roster, name);
+		if (error != B_OK) {
+			WARN(error, "failed to get config for repository \"%s\". Skipping.",
+				name.String());
+			otherRepositories.RemoveItem(repository, true);
+			continue;
+		}
+
+		RepositoryBuilder(*repository, repository->Config())
 			.AddToSolver(solver, false);
 	}
 
@@ -205,21 +242,123 @@ exit(1);
 	if (error != B_OK)
 		DIE(error, "failed to compute packages to install");
 
-	printf("transaction:\n");
+	printf("The following changes will be made:\n");
 	for (int32 i = 0; const BSolverResultElement* element = result.ElementAt(i);
 			i++) {
 		BSolverPackage* package = element->Package();
+
 		switch (element->Type()) {
 			case BSolverResultElement::B_TYPE_INSTALL:
+				if (installedRepositories.HasItem(package->Repository()))
+					continue;
+
 				printf("  install package %s from repository %s\n",
-					package->VersionedName().String(),
+					package->Info().CanonicalFileName().String(),
 					package->Repository()->Name().String());
 				break;
+
 			case BSolverResultElement::B_TYPE_UNINSTALL:
 				printf("  uninstall package %s\n",
 					package->VersionedName().String());
 				break;
 		}
+	}
+// TODO: Print file/download sizes. Unfortunately our package infos don't
+// contain the file size. Which is probably correct. The file size (and possibly
+// other information) should, however, be provided by the repository cache in
+// some way. Extend BPackageInfo? Create a BPackageFileInfo?
+
+	DecisionProvider decisionProvider;
+	if (!decisionProvider.YesNoDecisionNeeded(BString(), "Continue?", "y", "n",
+			"y")) {
+		return 1;
+	}
+
+	// create an activation transaction
+	BDaemonClient daemonClient;
+	BPackageInstallationLocation location = installInHome
+		? B_PACKAGE_INSTALLATION_LOCATION_HOME
+		: B_PACKAGE_INSTALLATION_LOCATION_COMMON;
+	BActivationTransaction transaction;
+	BDirectory transactionDirectory;
+	error = daemonClient.CreateTransaction(location, transaction,
+		transactionDirectory);
+	if (error != B_OK)
+		DIE(error, "failed to create transaction");
+
+	// download the new packages and prepare the transaction
+	JobStateListener listener;
+	BContext context(decisionProvider, listener);
+
+	for (int32 i = 0; const BSolverResultElement* element = result.ElementAt(i);
+			i++) {
+		BSolverPackage* package = element->Package();
+
+		switch (element->Type()) {
+			case BSolverResultElement::B_TYPE_INSTALL:
+			{
+				if (installedRepositories.HasItem(package->Repository()))
+					continue;
+
+				// get package URL and target entry
+				Repository* repository
+					= static_cast<Repository*>(package->Repository());
+				BString url = repository->Config().BaseURL();
+				BString fileName(package->Info().CanonicalFileName());
+				if (fileName.IsEmpty())
+					DIE(B_NO_MEMORY, "out of memory");
+				url << '/' << fileName;
+
+				BEntry entry;
+				error = entry.SetTo(&transactionDirectory, fileName);
+				if (error != B_OK)
+					DIE(error, "failed to create package entry");
+
+				// download the package
+				DownloadFileRequest downloadRequest(context, url, entry,
+					package->Info().Checksum());
+				error = downloadRequest.Process();
+				if (error != B_OK)
+					DIE(error, "failed to download package");
+
+				// add package to transaction
+				if (!transaction.AddPackageToActivate(
+						package->Info().CanonicalFileName())) {
+					DIE(B_NO_MEMORY,
+						"failed to add package to activate to transaction");
+				}
+				break;
+			}
+
+			case BSolverResultElement::B_TYPE_UNINSTALL:
+				// add package to transaction
+				if (!transaction.AddPackageToDeactivate(
+						package->Info().CanonicalFileName())) {
+					DIE(B_NO_MEMORY,
+						"failed to add package to deactivate to transaction");
+				}
+				break;
+		}
+	}
+
+	// commit the transaction
+	BDaemonClient::BCommitTransactionResult transactionResult;
+	error = daemonClient.CommitTransaction(transaction, transactionResult);
+	if (error != B_OK) {
+		fprintf(stderr, "*** failed to commit transaction: %s\n",
+			transactionResult.FullErrorMessage().String());
+		exit(1);
+	}
+
+	printf("Installation done. Old activation state backed up in \"%s\"\n",
+		transactionResult.OldStateDirectory().String());
+
+	printf("Cleaning up ...\n");
+	BEntry transactionDirectoryEntry;
+	if ((error = transactionDirectory.GetEntry(&transactionDirectoryEntry))
+			!= B_OK
+		|| (error = transactionDirectoryEntry.Remove()) != B_OK) {
+		WARN(error, "failed to remove transaction directory");
 	}
 
 	return 0;
