@@ -1212,10 +1212,16 @@ void
 Volume::_PackagesEntryCreated(const char* name)
 {
 INFORM("Volume::_PackagesEntryCreated(\"%s\")\n", name);
-	// Ignore the event, if we generated it ourselves.
+	// Ignore the event, if the package is already known.
 	Package* package = fPackagesByFileName.Lookup(name);
-	if (package->EntryCreatedIgnoreLevel() > 0) {
-		package->DecrementEntryCreatedIgnoreLevel();
+	if (package != NULL) {
+		if (package->EntryCreatedIgnoreLevel() > 0) {
+			package->DecrementEntryCreatedIgnoreLevel();
+		} else {
+			WARN("node monitoring created event for already known entry "
+				"\"%s\"\n", name);
+		}
+
 		return;
 	}
 
