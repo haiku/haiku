@@ -1,4 +1,5 @@
-1	german	x-vnd.Haiku-InterfacesAddOn	1172292901
+1	german	x-vnd.Haiku-InterfacesAddOn	160108912
+Interface	InterfaceWindow		Interface
 Configure…	InterfacesListView		Konfiguriere…
 Static	IntefaceAddressView		Statisch
 None	InterfacesListView		Keine
@@ -11,10 +12,12 @@ Renegotiate	InterfacesAddOn		Neu verhandeln
 The method for obtaining an IP address	IntefaceAddressView		Die Art eine IP Adresse zu erhalten
 Your gateway	IntefaceAddressView		Das Gateway
 Enable	InterfacesListView		Aktivieren
+Received:	IntefaceHardwareView		Empfangen:
 Revert	InterfaceWindow		Anfangswerte
 connected	IntefaceHardwareView		verbunden
 Gateway:	IntefaceAddressView		Gateway:
 Disable	InterfacesListView		Deaktivieren
+Sent:	IntefaceHardwareView		Gesendet:
 Disable	InterfacesAddOn		Deaktivieren
 Configure…	InterfacesAddOn		Konfiguriere...
 Renegotiate Address	InterfacesListView		Adresse neu verhandeln
@@ -26,4 +29,5 @@ Off	IntefaceAddressView		Aus
 MAC address:	IntefaceHardwareView		MAC Adresse:
 Netmask:	IntefaceAddressView		Netzmaske:
 Your IP address	IntefaceAddressView		IP Adresse
+%llu KBytes	IntefaceHardwareView		%llu KByte
 disconnected	IntefaceHardwareView		getrennt
