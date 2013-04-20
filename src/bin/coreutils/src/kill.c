@@ -277,7 +277,7 @@ int kill_by_name(int signum, const char *name)
 	}
 
 	if (!found)
-		error (0, errno, "%s", name);
+		error (0, ESRCH, "%s", name);
 
 	return status;
 }
