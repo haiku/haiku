@@ -1590,6 +1590,17 @@ BPackageInfo::ReplacesList() const
 }
 
 
+BString
+BPackageInfo::CanonicalFileName() const
+{
+	if (InitCheck() != B_OK)
+		return BString();
+
+	return BString().SetToFormat("%s-%s-%s.hpkg", fName.String(),
+		fVersion.ToString().String(), kArchitectureNames[fArchitecture]);
+}
+
+
 void
 BPackageInfo::SetName(const BString& name)
 {

@@ -89,6 +89,8 @@ public:
 								FreshensList() const;
 			const BStringList&	ReplacesList() const;
 
+			BString				CanonicalFileName() const;
+
 			void				SetName(const BString& name);
 			void				SetSummary(const BString& summary);
 			void				SetDescription(const BString& description);
