@@ -101,8 +101,10 @@ RefreshCommand::Execute(int argc, const char* const* argv)
 
 		BRefreshRepositoryRequest refreshRequest(context, repoConfig);
 		result = refreshRequest.Process();
-		if (result != B_OK)
-			DIE(result, "request for refreshing repository failed");
+		if (result != B_OK) {
+			DIE(result, "request for refreshing repository \"%s\" failed",
+				repoName.String());
+		}
 	}
 
 	return 0;
