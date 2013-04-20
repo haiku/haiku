@@ -1,9 +1,10 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2013, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Oliver Tappe <zooey@hirschkaefer.de>
+ *		Ingo Weinhold <ingo_weinhold@gmx.de>
  */
 
 
@@ -24,9 +25,15 @@ namespace BPrivate {
 	(nibble >= 10 ? 'a' + nibble - 10 : '0' + nibble)
 
 
+// #pragma mark - ChecksumAccessor
+
+
 ChecksumAccessor::~ChecksumAccessor()
 {
 }
+
+
+// #pragma mark - ChecksumFileChecksumAccessor
 
 
 ChecksumFileChecksumAccessor::ChecksumFileChecksumAccessor(
@@ -60,6 +67,9 @@ ChecksumFileChecksumAccessor::GetChecksum(BString& checksum) const
 
 	return B_OK;
 }
+
+
+// #pragma mark - GeneralFileChecksumAccessor
 
 
 GeneralFileChecksumAccessor::GeneralFileChecksumAccessor(
@@ -125,6 +135,25 @@ GeneralFileChecksumAccessor::GetChecksum(BString& checksum) const
 
 	return B_OK;
 }
+
+
+// #pragma mark - StringChecksumAccessor
+
+
+StringChecksumAccessor::StringChecksumAccessor(const BString& checksum)
+	:
+	fChecksum(checksum)
+{
+}
+
+
+status_t
+StringChecksumAccessor::GetChecksum(BString& _checksum) const
+{
+	_checksum = fChecksum;
+	return B_OK;
+}
+
 
 
 }	// namespace BPrivate

@@ -49,6 +49,17 @@ private:
 };
 
 
+class StringChecksumAccessor : public ChecksumAccessor {
+public:
+								StringChecksumAccessor(const BString& checksum);
+
+	virtual	status_t			GetChecksum(BString& _checksum) const;
+
+private:
+			BString				fChecksum;
+};
+
+
 }	// namespace BPrivate
 
 }	// namespace BPackageKit
