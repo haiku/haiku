@@ -279,6 +279,8 @@ rule HaikuPackage package
 		HAIKU_CONTAINER_UPDATE_ONLY on $(package) = 1 ;
 		HAIKU_CONTAINER_INHERIT_UPDATE_VARIABLE on $(package)
 			= HAIKU_INCLUDE_IN_IMAGE ;
+	} else if $(HAIKU_UPDATE_ALL_PACKAGES) {
+		HAIKU_INCLUDE_IN_IMAGE on $(package) = 1 ;
 	}
 
 	HAIKU_CONTAINER_ALWAYS_CREATE_DIRECTORIES on $(package) = 1 ;

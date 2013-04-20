@@ -928,6 +928,9 @@ rule InstallOptionalHaikuImagePackage url : dirTokens : isCDPackage
 	local archiveFile = [ DownloadFile $(package) : $(url) ] ;
 
 	if $(package:S) = .hpkg {
+		if $(HAIKU_UPDATE_ALL_PACKAGES) {
+			HAIKU_INCLUDE_IN_IMAGE on $(archiveFile) = 1 ;
+		}
 		AddFilesToHaikuImage $(dirTokens) : $(archiveFile) ;
 	} else if ( $(isCDPackage) = true || $(isCDPackage) = 1 )
 		&& $(HAIKU_CD_NAME) {

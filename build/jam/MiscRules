@@ -407,6 +407,12 @@ rule DefineBuildProfile name : type : path {
 			HAIKU_INCLUDE_IN_PACKAGES = 1 ;
 		}
 
+		case "update-packages" : {
+			JAM_TARGETS = $(buildTarget) ;
+			SetUpdateHaikuImageOnly 1 ;
+			HAIKU_UPDATE_ALL_PACKAGES = 1 ;
+		}
+
 		case "mount" : {
 			if $(type) in "install" "cd-image" {
 				Exit "Build action \"mount\" not supported for profile type"
