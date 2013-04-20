@@ -39,7 +39,7 @@ protected:
 
 			const BContext&		fContext;
 
-private:
+protected:
 			status_t			fInitStatus;
 			JobQueue*			fJobQueue;
 };
