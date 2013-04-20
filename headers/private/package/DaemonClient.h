@@ -16,6 +16,9 @@
 #include <package/DaemonDefs.h>
 
 
+class BDirectory;
+
+
 namespace BPackageKit {
 
 
@@ -43,6 +46,11 @@ public:
 			status_t			CommitTransaction(
 									const BActivationTransaction& transaction,
 									BCommitTransactionResult& _result);
+
+			status_t			CreateTransaction(
+									BPackageInstallationLocation location,
+									BActivationTransaction& _transaction,
+									BDirectory& _transactionDirectory);
 
 private:
 			status_t			_InitMessenger();
@@ -80,6 +88,8 @@ public:
 									// may be empty, even on error
 			const BString&		ErrorPackage() const;
 									// may be empty, even on error
+
+			BString				FullErrorMessage() const;
 
 			const BString&		OldStateDirectory() const;
 

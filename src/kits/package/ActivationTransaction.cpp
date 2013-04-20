@@ -25,20 +25,6 @@ BActivationTransaction::BActivationTransaction()
 }
 
 
-BActivationTransaction::BActivationTransaction(
-	BPackageInstallationLocation location, int64 changeCount,
-	const BString& directoryName, const BStringList& packagesToActivate,
-	const BStringList& packagesToDeactivate)
-	:
-	fLocation(location),
-	fChangeCount(changeCount),
-	fTransactionDirectoryName(directoryName),
-	fPackagesToActivate(packagesToActivate),
-	fPackagesToDeactivate(packagesToDeactivate)
-{
-}
-
-
 BActivationTransaction::~BActivationTransaction()
 {
 }
@@ -57,27 +43,18 @@ BActivationTransaction::InitCheck() const
 
 status_t
 BActivationTransaction::SetTo(BPackageInstallationLocation location,
-	int64 changeCount, const BString& directoryName,
-	const BStringList& packagesToActivate,
-	const BStringList& packagesToDeactivate)
+	int64 changeCount, const BString& directoryName)
 {
 	if (location < 0 || location >= B_PACKAGE_INSTALLATION_LOCATION_ENUM_COUNT
-		|| directoryName.IsEmpty()
-		|| (packagesToActivate.IsEmpty() && packagesToDeactivate.IsEmpty())) {
+		|| directoryName.IsEmpty()) {
 		return B_BAD_VALUE;
 	}
 
 	fLocation = location;
 	fChangeCount = changeCount;
 	fTransactionDirectoryName = directoryName;
-	fPackagesToActivate = packagesToActivate;
-	fPackagesToDeactivate = packagesToDeactivate;
-
-	if (fPackagesToActivate.CountStrings() != packagesToActivate.CountStrings()
-		|| fPackagesToDeactivate.CountStrings()
-			!= packagesToDeactivate.CountStrings()) {
-		return B_NO_MEMORY;
-	}
+	fPackagesToActivate.MakeEmpty();
+	fPackagesToDeactivate.MakeEmpty();
 
 	return B_OK;
 }
@@ -133,10 +110,18 @@ BActivationTransaction::PackagesToActivate() const
 }
 
 
-void
+bool
 BActivationTransaction::SetPackagesToActivate(const BStringList& packages)
 {
 	fPackagesToActivate = packages;
+	return fPackagesToActivate.CountStrings() == packages.CountStrings();
+}
+
+
+bool
+BActivationTransaction::AddPackageToActivate(const BString& package)
+{
+	return fPackagesToActivate.Add(package);
 }
 
 
@@ -147,10 +132,18 @@ BActivationTransaction::PackagesToDeactivate() const
 }
 
 
-void
+bool
 BActivationTransaction::SetPackagesToDeactivate(const BStringList& packages)
 {
 	fPackagesToDeactivate = packages;
+	return fPackagesToDeactivate.CountStrings() == packages.CountStrings();
+}
+
+
+bool
+BActivationTransaction::AddPackageToDeactivate(const BString& package)
+{
+	return fPackagesToDeactivate.Add(package);
 }
 
 

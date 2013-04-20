@@ -9,10 +9,15 @@
 
 #include <package/DaemonClient.h>
 
+#include <time.h>
+
+#include <Directory.h>
+#include <Entry.h>
 #include <package/InstallationLocationInfo.h>
 #include <package/PackageInfo.h>
 
 #include <package/ActivationTransaction.h>
+#include <package/PackagesDirectoryDefs.h>
 
 
 namespace BPackageKit {
@@ -100,6 +105,60 @@ BDaemonClient::CommitTransaction(const BActivationTransaction& transaction,
 		_result.SetTo(error, BString(), BString(), BString());
 
 	return _result.Error();
+}
+
+
+status_t
+BDaemonClient::CreateTransaction(BPackageInstallationLocation location,
+	BActivationTransaction& _transaction, BDirectory& _transactionDirectory)
+{
+	// get an info for the location
+	BInstallationLocationInfo info;
+	status_t error = GetInstallationLocationInfo(location, info);
+	if (error != B_OK)
+		return error;
+
+	// open admin directory
+	entry_ref entryRef;
+	entryRef.device = info.PackagesDirectoryRef().device;
+	entryRef.directory = info.PackagesDirectoryRef().node;
+	error = entryRef.set_name(PACKAGES_DIRECTORY_ADMIN_DIRECTORY);
+	if (error != B_OK)
+		return error;
+	
+	BDirectory adminDirectory;
+	error = adminDirectory.SetTo(&entryRef);
+	if (error != B_OK)
+		return error;
+
+	// create a transaction directory
+	int uniqueId = 1;
+	BString directoryName;
+	for (;; uniqueId++) {
+		directoryName.SetToFormat("transaction-%d", uniqueId);
+		if (directoryName.IsEmpty())
+			return B_NO_MEMORY;
+
+		error = adminDirectory.CreateDirectory(directoryName,
+			&_transactionDirectory);
+		if (error == B_OK)
+			break;
+		if (error != B_FILE_EXISTS)
+			return error;
+	}
+
+	// init the transaction
+	error = _transaction.SetTo(location, info.ChangeCount(), directoryName);
+	if (error != B_OK) {
+		BEntry entry;
+		_transactionDirectory.GetEntry(&entry);
+		_transactionDirectory.Unset();
+		if (entry.InitCheck() == B_OK)
+			entry.Remove();
+		return error;
+	}
+
+	return B_OK;
 }
 
 
@@ -270,6 +329,50 @@ const BString&
 BDaemonClient::BCommitTransactionResult::ErrorPackage() const
 {
 	return fErrorPackage;
+}
+
+
+BString
+BDaemonClient::BCommitTransactionResult::FullErrorMessage() const
+{
+	if (fError == 0)
+		return "no error";
+
+	const char* errorString;
+	if (fError > 0) {
+		switch ((BDaemonError)fError) {
+			case B_DAEMON_CHANGE_COUNT_MISMATCH:
+				errorString = "transaction out of date";
+				break;
+			case B_DAEMON_BAD_REQUEST:
+				errorString = "invalid transaction";
+				break;
+			case B_DAEMON_NO_SUCH_PACKAGE:
+				errorString = "no such package";
+				break;
+			case B_DAEMON_PACKAGE_ALREADY_EXISTS:
+				errorString = "package already exists";
+				break;
+			case B_DAEMON_OK:
+			default:
+				errorString = "unknown error";
+				break;
+		}
+	} else
+		errorString = strerror(fError);
+		
+	BString result;
+	if (!fErrorMessage.IsEmpty()) {
+		result = fErrorMessage;
+		result << ": ";
+	}
+
+	result << errorString;
+
+	if (!fErrorPackage.IsEmpty())
+		result << ", package: \"" << fErrorPackage << '"';
+
+	return result;
 }
 
 

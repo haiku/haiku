@@ -20,20 +20,13 @@ namespace BPrivate {
 class BActivationTransaction {
 public:
 								BActivationTransaction();
-								BActivationTransaction(
-									BPackageInstallationLocation location,
-									int64 changeCount,
-									const BString& directoryName,
-									const BStringList& packagesToActivate,
-									const BStringList& packagesToDeactivate);
 								~BActivationTransaction();
 
-			status_t			InitCheck() const;
 			status_t			SetTo(BPackageInstallationLocation location,
 									int64 changeCount,
-									const BString& directoryName,
-									const BStringList& packagesToActivate,
-									const BStringList& packagesToDeactivate);
+									const BString& directoryName);
+
+			status_t			InitCheck() const;
 
 			BPackageInstallationLocation Location() const;
 			void				SetLocation(
@@ -47,12 +40,14 @@ public:
 									const BString& directoryName);
 
 			const BStringList&	PackagesToActivate() const;
-			void				SetPackagesToActivate(
+			bool				SetPackagesToActivate(
 									const BStringList& packages);
+			bool				AddPackageToActivate(const BString& package);
 
 			const BStringList&	PackagesToDeactivate() const;
-			void				SetPackagesToDeactivate(
+			bool				SetPackagesToDeactivate(
 									const BStringList& packages);
+			bool				AddPackageToDeactivate(const BString& package);
 
 private:
 			BPackageInstallationLocation fLocation;
