@@ -53,6 +53,7 @@ SharedLibrary libpackage.so
 	ChecksumAccessors.cpp
 	Context.cpp
 	DaemonClient.cpp
+	DownloadFileRequest.cpp
 	DropRepositoryRequest.cpp
 	FetchFileJob.cpp
 	InstallationLocationInfo.cpp

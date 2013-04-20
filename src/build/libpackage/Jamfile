@@ -73,6 +73,7 @@ BuildPlatformSharedLibrary libpackage_build.so
 	BlockBufferCacheNoLock.cpp
 	ChecksumAccessors.cpp
 	Context.cpp
+	DownloadFileRequest.cpp
 	DropRepositoryRequest.cpp
 	FetchFileJob.cpp
 	InstallationLocationInfo.cpp
