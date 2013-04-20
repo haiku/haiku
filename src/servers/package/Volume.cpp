@@ -1586,9 +1586,8 @@ Volume::_WriteActivationFile(const RelativePath& directoryPath,
 		return error;
 
 	// write the file
-	BEntry activationFileEntry;
 	error = _WriteTextFile(directoryPath, fileName, activationFileContent,
-		activationFileEntry);
+		_entry);
 	if (error != B_OK) {
 		ERROR("Volume::_WriteActivationFile(): failed to write activation "
 			"file \"%s/%s\": %s\n", directoryPath.ToString().String(), fileName,
