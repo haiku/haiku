@@ -1842,6 +1842,10 @@ StyledEditWindow::_ShowStatistics()
 	BAlert* alert = new BAlert("Statistics", result, B_TRANSLATE("OK"), NULL,
 		NULL, B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_INFO_ALERT);
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+	// Move the alert to the middle of the window
+	alert->MoveTo(Frame().LeftTop().x + Frame().Width() / 2
+			- alert->Frame().Width() / 2,
+		Frame().LeftTop().y + Frame().Height() / 4);
 
 	return alert->Go();
 }
@@ -1897,6 +1901,10 @@ StyledEditWindow::_ShowAlert(const BString& text, const BString& label,
 	BAlert* alert = new BAlert("Alert", text.String(), label.String(), button2,
 		button3, B_WIDTH_AS_USUAL, spacing, type);
 	alert->SetShortcut(0, B_ESCAPE);
+	// Move the alert to the middle of the window
+	alert->MoveTo(Frame().LeftTop().x + Frame().Width() / 2
+			- alert->Frame().Width() / 2,
+		Frame().LeftTop().y + Frame().Height() / 4);
 
 	return alert->Go();
 }
