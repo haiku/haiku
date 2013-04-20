@@ -32,6 +32,8 @@ public:
 
 			BJob*				PopRunnableJob();
 
+			status_t			Process(bool failIfCanceledOnly = false);
+
 protected:
 			status_t			QueueJob(BJob* job);
 
