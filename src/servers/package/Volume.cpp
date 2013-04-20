@@ -1580,8 +1580,8 @@ Volume::_WriteActivationFile(const RelativePath& directoryPath,
 {
 	// create the content
 	BString activationFileContent;
-	status_t error = _CreateActivationFileContent(fPackagesToBeActivated,
-		fPackagesToBeDeactivated, activationFileContent);
+	status_t error = _CreateActivationFileContent(toActivate, toDeactivate,
+		activationFileContent);
 	if (error != B_OK)
 		return error;
 
@@ -1629,7 +1629,7 @@ void
 Volume::_ChangePackageActivation(const PackageSet& packagesToActivate,
 	const PackageSet& packagesToDeactivate)
 {
-INFORM("Volume::ProcessPendingPackageActivationChanges(): activating %zu, deactivating %zu packages\n",
+INFORM("Volume::_ChangePackageActivation(): activating %zu, deactivating %zu packages\n",
 packagesToActivate.size(), packagesToDeactivate.size());
 
 	// write the temporary package activation file
