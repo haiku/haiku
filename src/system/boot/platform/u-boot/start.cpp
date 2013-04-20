@@ -105,6 +105,12 @@ platform_start_kernel(void)
 	addr_t stackTop
 		= gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size;
 
+	if (gFDT) {
+		// clone the Flattened Device Tree blob
+		gKernelArgs.platform_args.fdt = kernel_args_malloc(fdt_totalsize(gFDT));
+		memcpy(gKernelArgs.platform_args.fdt, gFDT, fdt_totalsize(gFDT));
+	}
+
 //	smp_init_other_cpus();
 	serial_cleanup();
 	mmu_init_for_kernel();

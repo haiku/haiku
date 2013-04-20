@@ -22,8 +22,8 @@ typedef struct {
 	void	*openfirmware_entry;
 	char	rtc_path[128];
 
-	// TODO: add FDT
-	char dummy;
+	// Flattened Device Tree blob
+	void	*fdt;
 } platform_kernel_args;
 
 #endif	/* KERNEL_BOOT_PLATFORM_UBOOT_KERNEL_ARGS_H */
