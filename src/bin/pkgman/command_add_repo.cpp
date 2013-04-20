@@ -87,18 +87,13 @@ AddRepoCommand::Execute(int argc, const char* const* argv)
 	status_t result;
 	for (int i = 0; i < urlCount; ++i) {
 		AddRepositoryRequest addRequest(context, repoURLs[i], asUserRepository);
-		result = addRequest.InitCheck();
-		if (result != B_OK)
-			DIE(result, "unable to create request for adding repository");
-		result = addRequest.CreateInitialJobs();
-		if (result != B_OK)
-			DIE(result, "unable to create necessary jobs");
-
-		while (BJob* job = addRequest.PopRunnableJob()) {
-			result = job->Run();
-			delete job;
-			if (result == B_CANCELED)
-				return 1;
+		result = addRequest.Process(true);
+		if (result != B_OK) {
+			if (result != B_CANCELED) {
+				DIE(result, "request for adding repository \"%s\" failed",
+					repoURLs[i]);
+			}
+			return 1;
 		}
 
 		// now refresh the repo-cache of the new repository
@@ -106,19 +101,15 @@ AddRepoCommand::Execute(int argc, const char* const* argv)
 		BPackageRoster roster;
 		BRepositoryConfig repoConfig;
 		roster.GetRepositoryConfig(repoName, &repoConfig);
+		
 		BRefreshRepositoryRequest refreshRequest(context, repoConfig);
-		result = refreshRequest.InitCheck();
-		if (result != B_OK)
-			DIE(result, "unable to create request for refreshing repository");
-		result = refreshRequest.CreateInitialJobs();
-		if (result != B_OK)
-			DIE(result, "unable to create necessary jobs");
-
-		while (BJob* job = refreshRequest.PopRunnableJob()) {
-			result = job->Run();
-			delete job;
-			if (result == B_CANCELED)
-				return 1;
+		result = refreshRequest.Process(true);
+		if (result != B_OK) {
+			if (result != B_CANCELED) {
+				DIE(result, "request for refreshing repository \"%s\" failed",
+					repoName.String());
+			}
+			return 1;
 		}
 	}
 

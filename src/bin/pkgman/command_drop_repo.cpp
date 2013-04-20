@@ -85,18 +85,13 @@ DropRepoCommand::Execute(int argc, const char* const* argv)
 
 	status_t result;
 	DropRepositoryRequest dropRequest(context, repoName);
-	result = dropRequest.InitCheck();
-	if (result != B_OK)
-		DIE(result, "unable to create request for dropping repository");
-	result = dropRequest.CreateInitialJobs();
-	if (result != B_OK)
-		DIE(result, "unable to create necessary jobs");
-
-	while (BJob* job = dropRequest.PopRunnableJob()) {
-		result = job->Run();
-		delete job;
-		if (result == B_CANCELED)
-			return 1;
+	result = dropRequest.Process(true);
+	if (result != B_OK) {
+		if (result != B_CANCELED) {
+			DIE(result, "request for dropping repository \"%s\" failed",
+				repoName);
+		}
+		return 1;
 	}
 
 	return 0;

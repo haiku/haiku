@@ -40,7 +40,6 @@ static const char* const kLongUsage =
 DEFINE_COMMAND(RefreshCommand, "refresh", kShortUsage, kLongUsage)
 
 
-
 int
 RefreshCommand::Execute(int argc, const char* const* argv)
 {
@@ -70,10 +69,6 @@ RefreshCommand::Execute(int argc, const char* const* argv)
 	const char* const* repoArgs = argv + optind;
 	int nameCount = argc - optind;
 
-	DecisionProvider decisionProvider;
-	JobStateListener listener;
-	BContext context(decisionProvider, listener);
-
 	BStringList repositoryNames(20);
 
 	BPackageRoster roster;
@@ -88,6 +83,10 @@ RefreshCommand::Execute(int argc, const char* const* argv)
 		}
 	}
 
+	DecisionProvider decisionProvider;
+	JobStateListener listener;
+	BContext context(decisionProvider, listener);
+
 	status_t result;
 	for (int i = 0; i < repositoryNames.CountStrings(); ++i) {
 		const BString& repoName = repositoryNames.StringAt(i);
@@ -99,20 +98,11 @@ RefreshCommand::Execute(int argc, const char* const* argv)
 			WARN(result, "skipping repository-config '%s'", path.Path());
 			continue;
 		}
-		BRefreshRepositoryRequest refreshRequest(context, repoConfig);
-		result = refreshRequest.InitCheck();
-		if (result != B_OK)
-			DIE(result, "unable to create request for refreshing repository");
-		result = refreshRequest.CreateInitialJobs();
-		if (result != B_OK)
-			DIE(result, "unable to create necessary jobs");
 
-		while (BJob* job = refreshRequest.PopRunnableJob()) {
-			result = job->Run();
-			delete job;
-			if (result != B_OK)
-				return 1;
-		}
+		BRefreshRepositoryRequest refreshRequest(context, repoConfig);
+		result = refreshRequest.Process();
+		if (result != B_OK)
+			DIE(result, "request for refreshing repository failed");
 	}
 
 	return 0;
