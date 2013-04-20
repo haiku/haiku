@@ -15,6 +15,7 @@
 #include <Directory.h>
 #include <package/DownloadFileRequest.h>
 #include <package/PackageRoster.h>
+#include <package/RefreshRepositoryRequest.h>
 #include <package/RepositoryConfig.h>
 #include <package/solver/SolverPackageSpecifier.h>
 #include <package/solver/SolverPackageSpecifierList.h>
@@ -65,8 +66,22 @@ struct Repository : public BSolverRepository {
 	{
 	}
 
-	status_t Init(BPackageRoster& roster, const char* name)
+	status_t Init(BPackageRoster& roster, BContext& context, const char* name)
 	{
+		// get the repository config
+		status_t error = roster.GetRepositoryConfig(name, &fConfig);
+		if (error != B_OK)
+			return error;
+
+		// refresh
+		BRefreshRepositoryRequest refreshRequest(context, fConfig);
+		error = refreshRequest.Process();
+		if (error != B_OK) {
+			WARN(error, "refreshing repository \"%s\" failed", name);
+			return B_OK;
+		}
+
+		// re-get the config
 		return roster.GetRepositoryConfig(name, &fConfig);
 	}
 
@@ -119,8 +134,6 @@ InstallCommand::Execute(int argc, const char* const* argv)
 	int packageCount = argc - optind;
 	const char* const* packages = argv + optind;
 
-// TODO: Refresh repositories.
-
 	// create the solver
 	BSolver* solver;
 	status_t error = BSolver::Create(solver);
@@ -167,6 +180,10 @@ InstallCommand::Execute(int argc, const char* const* argv)
 	}
 
 	// other repositories
+	DecisionProvider decisionProvider;
+	JobStateListener listener;
+	BContext context(decisionProvider, listener);
+
 	BObjectList<Repository> otherRepositories(10, true);
 	BPackageRoster roster;
 	BStringList repositoryNames;
@@ -181,7 +198,7 @@ InstallCommand::Execute(int argc, const char* const* argv)
 			DIE(B_NO_MEMORY, "failed to create/add repository object");
 
 		const BString& name = repositoryNames.StringAt(i);
-		error = repository->Init(roster, name);
+		error = repository->Init(roster, context, name);
 		if (error != B_OK) {
 			WARN(error, "failed to get config for repository \"%s\". Skipping.",
 				name.String());
@@ -268,7 +285,6 @@ exit(1);
 // other information) should, however, be provided by the repository cache in
 // some way. Extend BPackageInfo? Create a BPackageFileInfo?
 
-	DecisionProvider decisionProvider;
 	if (!decisionProvider.YesNoDecisionNeeded(BString(), "Continue?", "y", "n",
 			"y")) {
 		return 1;
@@ -287,9 +303,6 @@ exit(1);
 		DIE(error, "failed to create transaction");
 
 	// download the new packages and prepare the transaction
-	JobStateListener listener;
-	BContext context(decisionProvider, listener);
-
 	for (int32 i = 0; const BSolverResultElement* element = result.ElementAt(i);
 			i++) {
 		BSolverPackage* package = element->Package();
