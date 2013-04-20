@@ -178,7 +178,7 @@ InstallCommand::Execute(int argc, const char* const* argv)
 	for (int32 i = 0; i < repositoryNameCount; i++) {
 		Repository* repository = new(std::nothrow) Repository;
 		if (repository == NULL || !otherRepositories.AddItem(repository))
-			DIE(B_NO_MEMORY, "out of memory");
+			DIE(B_NO_MEMORY, "failed to create/add repository object");
 
 		const BString& name = repositoryNames.StringAt(i);
 		error = repository->Init(roster, name);
@@ -306,7 +306,7 @@ exit(1);
 				BString url = repository->Config().BaseURL();
 				BString fileName(package->Info().CanonicalFileName());
 				if (fileName.IsEmpty())
-					DIE(B_NO_MEMORY, "out of memory");
+					DIE(B_NO_MEMORY, "failed to allocate file name");
 				url << '/' << fileName;
 
 				BEntry entry;
