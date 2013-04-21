@@ -21,8 +21,8 @@ namespace Archiving {
 }
 }
 
-using BPrivate::Archiving::BArchiveManager;
-using BPrivate::Archiving::BUnarchiveManager;
+using ::BPrivate::Archiving::BArchiveManager;
+using ::BPrivate::Archiving::BUnarchiveManager;
 
 
 class BArchivable {
