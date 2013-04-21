@@ -321,71 +321,12 @@ LibsolvSolver::Install(const BSolverPackageSpecifierList& packages,
 	if (error != B_OK)
 		return error;
 
-	int32 packageCount = packages.CountSpecifiers();
-	for (int32 i = 0; i < packageCount; i++) {
-		const BSolverPackageSpecifier& specifier = *packages.SpecifierAt(i);
-		switch (specifier.Type()) {
-			case BSolverPackageSpecifier::B_UNSPECIFIED:
-				return B_BAD_VALUE;
-
-			case BSolverPackageSpecifier::B_PACKAGE:
-			{
-				BSolverPackage* package = specifier.Package();
-				Solvable* solvable;
-				if (package == NULL
-					|| (solvable = _GetSolvable(package)) == NULL) {
-					return B_BAD_VALUE;
-				}
-
-				queue_push2(fJobs, SOLVER_SOLVABLE,
-					solvable - fPool->solvables);
-				break;
-			}
-			
-			case BSolverPackageSpecifier::B_SELECT_STRING:
-			{
-				// find matching packages
-				SolvQueue matchingPackages;
-		
-				int flags = SELECTION_NAME | SELECTION_PROVIDES | SELECTION_GLOB
-					| SELECTION_CANON | SELECTION_DOTARCH | SELECTION_REL;
-				/*int matchFlags =*/ selection_make(fPool, &matchingPackages,
-					specifier.SelectString().String(), flags);
-				if (matchingPackages.count == 0) {
-					if (_unmatched != NULL)
-						*_unmatched = &specifier;
-					return B_NAME_NOT_FOUND;
-				}
-// TODO: We might want to add support for restricting to certain repositories.
-#if 0		
-				// restrict to the matching repository
-				if (BSolverRepository* repository = specifier.Repository()) {
-					RepositoryInfo* repositoryInfo
-						= _GetRepositoryInfo(repository);
-					if (repositoryInfo == NULL)
-						return B_BAD_VALUE;
-
-					SolvQueue repoFilter;
-					queue_push2(&repoFilter,
-						SOLVER_SOLVABLE_REPO
-							/* | SOLVER_SETREPO | SOLVER_SETVENDOR*/,
-						repositoryInfo->SolvRepo()->repoid);
-
-					selection_filter(fPool, &matchingPackages, &repoFilter);
-
-					if (matchingPackages.count == 0)
-						return B_NAME_NOT_FOUND;
-				}
-#endif
-
-				for (int j = 0; j < matchingPackages.count; j++)
-					queue_push(fJobs, matchingPackages.elements[j]);
-			}
-		}
-	}
+	error = _AddSpecifiedPackages(packages, _unmatched, 0);
+	if (error != B_OK)
+		return error;
 
 	// set jobs' solver mode and solve
-	_SetJobsSolverMode(*fJobs, SOLVER_INSTALL);
+	_SetJobsSolverMode(SOLVER_INSTALL);
 
 	_InitSolver();
 	return _Solve();
@@ -412,56 +353,61 @@ LibsolvSolver::Uninstall(const BSolverPackageSpecifierList& packages,
 	if (error != B_OK)
 		return error;
 
-	int32 packageCount = packages.CountSpecifiers();
-	for (int32 i = 0; i < packageCount; i++) {
-		const BSolverPackageSpecifier& specifier = *packages.SpecifierAt(i);
-		switch (specifier.Type()) {
-			case BSolverPackageSpecifier::B_UNSPECIFIED:
-				return B_BAD_VALUE;
+	error = _AddSpecifiedPackages(packages, _unmatched,
+		SELECTION_INSTALLED_ONLY);
+	if (error != B_OK)
+		return error;
 
-			case BSolverPackageSpecifier::B_PACKAGE:
-			{
-				BSolverPackage* package = specifier.Package();
-				Solvable* solvable;
-				if (package == NULL
-					|| (solvable = _GetSolvable(package)) == NULL
-					|| package->Repository()
-						!= fInstalledRepository->Repository()) {
-					return B_BAD_VALUE;
-				}
+	// set jobs' solver mode and solve
+	_SetJobsSolverMode(SOLVER_ERASE);
 
-				queue_push2(fJobs, SOLVER_SOLVABLE,
-					solvable - fPool->solvables);
-				break;
-			}
-			
-			case BSolverPackageSpecifier::B_SELECT_STRING:
-			{
-				// find matching packages
-				SolvQueue matchingPackages;
-		
-				int flags = SELECTION_NAME | SELECTION_PROVIDES | SELECTION_GLOB
-					| SELECTION_CANON | SELECTION_DOTARCH | SELECTION_REL
-					| SELECTION_INSTALLED_ONLY;
-				/*int matchFlags =*/ selection_make(fPool, &matchingPackages,
-					specifier.SelectString().String(), flags);
-				if (matchingPackages.count == 0) {
-					if (_unmatched != NULL)
-						*_unmatched = &specifier;
-					return B_NAME_NOT_FOUND;
-				}
+	_InitSolver();
+	solver_set_flag(fSolver, SOLVER_FLAG_ALLOW_UNINSTALL, 1);
+	return _Solve();
+}
 
-				for (int j = 0; j < matchingPackages.count; j++)
-					queue_push(fJobs, matchingPackages.elements[j]);
+
+status_t
+LibsolvSolver::Update(const BSolverPackageSpecifierList& packages,
+	bool installNotYetInstalled, const BSolverPackageSpecifier** _unmatched)
+{
+	if (_unmatched != NULL)
+		*_unmatched = NULL;
+
+	// add repositories to pool
+	status_t error = _AddRepositories();
+	if (error != B_OK)
+		return error;
+
+	// add the packages to update to the job queue -- if none are specified,
+	// update all
+	error = _InitJobQueue();
+	if (error != B_OK)
+		return error;
+
+	if (packages.IsEmpty()) {
+		queue_push2(fJobs, SOLVER_SOLVABLE_ALL, 0);
+	} else {
+		error = _AddSpecifiedPackages(packages, _unmatched, 0);
+		if (error != B_OK)
+			return error;
+	}
+
+	// set jobs' solver mode and solve
+	_SetJobsSolverMode(SOLVER_UPDATE);
+
+	if (installNotYetInstalled) {
+		for (int i = 0; i < fJobs->count; i += 2) {
+			// change solver mode to SOLVER_INSTALL for empty update jobs
+			if (pool_isemptyupdatejob(fPool, fJobs->elements[i],
+					fJobs->elements[i + 1])) {
+				fJobs->elements[i] &= ~SOLVER_JOBMASK;
+				fJobs->elements[i] |= SOLVER_INSTALL;
 			}
 		}
 	}
 
-	// set jobs' solver mode and solve
-	_SetJobsSolverMode(*fJobs, SOLVER_ERASE);
-
 	_InitSolver();
-	solver_set_flag(fSolver, SOLVER_FLAG_ALLOW_UNINSTALL, 1);
 	return _Solve();
 }
 
@@ -485,7 +431,7 @@ LibsolvSolver::VerifyInstallation()
 	queue_push2(fJobs, SOLVER_SOLVABLE_ALL, 0);
 
 	// set jobs' solver mode and solve
-	_SetJobsSolverMode(*fJobs, SOLVER_VERIFY);
+	_SetJobsSolverMode(SOLVER_VERIFY);
 
 	_InitSolver();
 	return _Solve();
@@ -833,6 +779,79 @@ LibsolvSolver::_GetSolvable(BSolverPackage* package) const
 {
 	PackageMap::const_iterator it = fPackageSolvables.find(package);
 	return it != fPackageSolvables.end() ? it->second : NULL;
+}
+
+
+status_t
+LibsolvSolver::_AddSpecifiedPackages(
+	const BSolverPackageSpecifierList& packages,
+	const BSolverPackageSpecifier** _unmatched, int additionalFlags)
+{
+	int32 packageCount = packages.CountSpecifiers();
+	for (int32 i = 0; i < packageCount; i++) {
+		const BSolverPackageSpecifier& specifier = *packages.SpecifierAt(i);
+		switch (specifier.Type()) {
+			case BSolverPackageSpecifier::B_UNSPECIFIED:
+				return B_BAD_VALUE;
+
+			case BSolverPackageSpecifier::B_PACKAGE:
+			{
+				BSolverPackage* package = specifier.Package();
+				Solvable* solvable;
+				if (package == NULL
+					|| (solvable = _GetSolvable(package)) == NULL) {
+					return B_BAD_VALUE;
+				}
+
+				queue_push2(fJobs, SOLVER_SOLVABLE,
+					solvable - fPool->solvables);
+				break;
+			}
+			
+			case BSolverPackageSpecifier::B_SELECT_STRING:
+			{
+				// find matching packages
+				SolvQueue matchingPackages;
+		
+				int flags = SELECTION_NAME | SELECTION_PROVIDES | SELECTION_GLOB
+					| SELECTION_CANON | SELECTION_DOTARCH | SELECTION_REL
+					| additionalFlags;
+				/*int matchFlags =*/ selection_make(fPool, &matchingPackages,
+					specifier.SelectString().String(), flags);
+				if (matchingPackages.count == 0) {
+					if (_unmatched != NULL)
+						*_unmatched = &specifier;
+					return B_NAME_NOT_FOUND;
+				}
+// TODO: We might want to add support for restricting to certain repositories.
+#if 0		
+				// restrict to the matching repository
+				if (BSolverRepository* repository = specifier.Repository()) {
+					RepositoryInfo* repositoryInfo
+						= _GetRepositoryInfo(repository);
+					if (repositoryInfo == NULL)
+						return B_BAD_VALUE;
+
+					SolvQueue repoFilter;
+					queue_push2(&repoFilter,
+						SOLVER_SOLVABLE_REPO
+							/* | SOLVER_SETREPO | SOLVER_SETVENDOR*/,
+						repositoryInfo->SolvRepo()->repoid);
+
+					selection_filter(fPool, &matchingPackages, &repoFilter);
+
+					if (matchingPackages.count == 0)
+						return B_NAME_NOT_FOUND;
+				}
+#endif
+
+				for (int j = 0; j < matchingPackages.count; j++)
+					queue_push(fJobs, matchingPackages.elements[j]);
+			}
+		}
+	}
+
+	return B_OK;
 }
 
 
@@ -1246,13 +1265,8 @@ LibsolvSolver::_Solve()
 
 
 void
-LibsolvSolver::_SetJobsSolverMode(Queue& jobs, int solverMode)
+LibsolvSolver::_SetJobsSolverMode(int solverMode)
 {
-	for (int i = 0; i < jobs.count; i += 2) {
-		jobs.elements[i] |= solverMode;
-//		if (cleandeps)
-//			jobs.elements[i] |= SOLVER_CLEANDEPS;
-//		if (forcebest)
-//			jobs.elements[i] |= SOLVER_FORCEBEST;
-	}
+	for (int i = 0; i < fJobs->count; i += 2)
+		fJobs->elements[i] |= solverMode;
 }

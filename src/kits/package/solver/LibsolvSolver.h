@@ -46,6 +46,11 @@ public:
 									const BSolverPackageSpecifierList& packages,
 									const BSolverPackageSpecifier** _unmatched
 										= NULL);
+	virtual	status_t			Update(
+									const BSolverPackageSpecifierList& packages,
+									bool installNotYetInstalled,
+									const BSolverPackageSpecifier** _unmatched
+										= NULL);
 	virtual	status_t			VerifyInstallation();
 
 	virtual	int32				CountProblems() const;
@@ -87,6 +92,11 @@ private:
 			BSolverPackage*		_GetPackage(Id solvableId) const;
 			Solvable*			_GetSolvable(BSolverPackage* package) const;
 
+			status_t			_AddSpecifiedPackages(
+									const BSolverPackageSpecifierList& packages,
+									const BSolverPackageSpecifier** _unmatched,
+									int additionalFlags);
+
 			status_t			_AddProblem(Id problemId);
 			status_t			_AddSolution(Problem* problem, Id solutionId);
 			status_t			_AddSolutionElement(Solution* solution,
@@ -101,7 +111,7 @@ private:
 									const;
 
 			status_t			_Solve();
-			void				_SetJobsSolverMode(Queue& jobs, int solverMode);
+			void				_SetJobsSolverMode(int solverMode);
 
 private:
 			Pool*				fPool;

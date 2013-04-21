@@ -55,6 +55,11 @@ public:
 									const BSolverPackageSpecifierList& packages,
 									const BSolverPackageSpecifier** _unmatched
 										= NULL) = 0;
+	virtual	status_t			Update(
+									const BSolverPackageSpecifierList& packages,
+									bool installNotYetInstalled,
+									const BSolverPackageSpecifier** _unmatched
+										= NULL) = 0;
 	virtual	status_t			VerifyInstallation() = 0;
 
 			bool				HasProblems() const
