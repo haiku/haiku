@@ -194,6 +194,36 @@ PackageManager::Install(const char* const* packages, int packageCount)
 
 
 void
+PackageManager::Uninstall(const char* const* packages, int packageCount)
+{
+	// solve
+	BSolverPackageSpecifierList packagesToUninstall;
+	for (int i = 0; i < packageCount; i++) {
+		if (!packagesToUninstall.AppendSpecifier(packages[i]))
+			DIE(B_NO_MEMORY, "failed to add specified package");
+	}
+
+	const BSolverPackageSpecifier* unmatchedSpecifier;
+	status_t error = fSolver->Uninstall(packagesToUninstall,
+		&unmatchedSpecifier);
+	if (error != B_OK) {
+		if (unmatchedSpecifier != NULL) {
+			DIE(error, "failed to find a match for \"%s\"",
+				unmatchedSpecifier->SelectString().String());
+		} else
+			DIE(error, "failed to compute packages to uninstall");
+	}
+
+	_HandleProblems();
+
+	// install/uninstall packages
+	_AnalyzeResult();
+	_PrintResult();
+	_ApplyPackageChanges();
+}
+
+
+void
 PackageManager::_HandleProblems()
 {
 	while (fSolver->HasProblems()) {
@@ -254,7 +284,7 @@ PackageManager::_HandleProblems()
 
 		status_t error = fSolver->SolveAgain();
 		if (error != B_OK)
-			DIE(error, "failed to compute packages to install");
+			DIE(error, "failed to recompute packages to un/-install");
 	}
 }
 
@@ -265,7 +295,7 @@ PackageManager::_AnalyzeResult()
 	BSolverResult result;
 	status_t error = fSolver->GetResult(result);
 	if (error != B_OK)
-		DIE(error, "failed to compute packages to install");
+		DIE(error, "failed to compute packages to un/-install");
 
 	for (int32 i = 0; const BSolverResultElement* element = result.ElementAt(i);
 			i++) {

@@ -52,6 +52,8 @@ public:
 
 			void				Install(const char* const* packages,
 									int packageCount);
+			void				Uninstall(const char* const* packages,
+									int packageCount);
 
 private:
 			typedef BObjectList<BSolverPackage> PackageList;

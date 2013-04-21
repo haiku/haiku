@@ -11,6 +11,7 @@ BinCommand pkgman :
 	command_refresh.cpp
 	command_resolve_dependencies.cpp
 	command_search.cpp
+	command_uninstall.cpp
 	DecisionProvider.cpp
 	JobStateListener.cpp
 	PackageInfoErrorListener.cpp
