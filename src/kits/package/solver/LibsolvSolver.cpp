@@ -387,7 +387,82 @@ LibsolvSolver::Install(const BSolverPackageSpecifierList& packages,
 	// set jobs' solver mode and solve
 	_SetJobsSolverMode(*fJobs, SOLVER_INSTALL);
 
-	return _Solve(false);
+	_InitSolver();
+	return _Solve();
+}
+
+
+status_t
+LibsolvSolver::Uninstall(const BSolverPackageSpecifierList& packages,
+	const BSolverPackageSpecifier** _unmatched)
+{
+	if (_unmatched != NULL)
+		*_unmatched = NULL;
+
+	if (fInstalledRepository == NULL || packages.IsEmpty())
+		return B_BAD_VALUE;
+
+	// add repositories to pool
+	status_t error = _AddRepositories();
+	if (error != B_OK)
+		return error;
+
+	// add the packages to uninstall to the job queue
+	error = _InitJobQueue();
+	if (error != B_OK)
+		return error;
+
+	int32 packageCount = packages.CountSpecifiers();
+	for (int32 i = 0; i < packageCount; i++) {
+		const BSolverPackageSpecifier& specifier = *packages.SpecifierAt(i);
+		switch (specifier.Type()) {
+			case BSolverPackageSpecifier::B_UNSPECIFIED:
+				return B_BAD_VALUE;
+
+			case BSolverPackageSpecifier::B_PACKAGE:
+			{
+				BSolverPackage* package = specifier.Package();
+				Solvable* solvable;
+				if (package == NULL
+					|| (solvable = _GetSolvable(package)) == NULL
+					|| package->Repository()
+						!= fInstalledRepository->Repository()) {
+					return B_BAD_VALUE;
+				}
+
+				queue_push2(fJobs, SOLVER_SOLVABLE,
+					solvable - fPool->solvables);
+				break;
+			}
+			
+			case BSolverPackageSpecifier::B_SELECT_STRING:
+			{
+				// find matching packages
+				SolvQueue matchingPackages;
+		
+				int flags = SELECTION_NAME | SELECTION_PROVIDES | SELECTION_GLOB
+					| SELECTION_CANON | SELECTION_DOTARCH | SELECTION_REL
+					| SELECTION_INSTALLED_ONLY;
+				/*int matchFlags =*/ selection_make(fPool, &matchingPackages,
+					specifier.SelectString().String(), flags);
+				if (matchingPackages.count == 0) {
+					if (_unmatched != NULL)
+						*_unmatched = &specifier;
+					return B_NAME_NOT_FOUND;
+				}
+
+				for (int j = 0; j < matchingPackages.count; j++)
+					queue_push(fJobs, matchingPackages.elements[j]);
+			}
+		}
+	}
+
+	// set jobs' solver mode and solve
+	_SetJobsSolverMode(*fJobs, SOLVER_ERASE);
+
+	_InitSolver();
+	solver_set_flag(fSolver, SOLVER_FLAG_ALLOW_UNINSTALL, 1);
+	return _Solve();
 }
 
 
@@ -412,7 +487,8 @@ LibsolvSolver::VerifyInstallation()
 	// set jobs' solver mode and solve
 	_SetJobsSolverMode(*fJobs, SOLVER_VERIFY);
 
-	return _Solve(false);
+	_InitSolver();
+	return _Solve();
 }
 
 
@@ -452,7 +528,7 @@ LibsolvSolver::SolveAgain()
 			solver_take_solution(fSolver, problem->Id(), solution->Id(), fJobs);
 	}
 
-	return _Solve(true);
+	return _Solve();
 }
 
 
@@ -505,11 +581,11 @@ LibsolvSolver::GetResult(BSolverResult& _result)
 				if (package == NULL)
 					return B_ERROR;
 
-				status_t error = _result.AppendElement(
-					BSolverResultElement(BSolverResultElement::B_TYPE_UNINSTALL,
-						package));
-				if (error != B_OK)
-					return error;
+				if (!_result.AppendElement(
+						BSolverResultElement(
+							BSolverResultElement::B_TYPE_UNINSTALL, package))) {
+					return B_NO_MEMORY;
+				}
 				break;
 			}
 
@@ -588,6 +664,17 @@ LibsolvSolver::_InitJobQueue()
 
 	fJobs = new(std::nothrow) SolvQueue;
 	return fJobs != NULL ? B_OK : B_NO_MEMORY;;
+}
+
+
+void
+LibsolvSolver::_InitSolver()
+{
+	_CleanupSolver();
+
+	fSolver = solver_create(fPool);
+	solver_set_flag(fSolver, SOLVER_FLAG_SPLITPROVIDES, 1);
+	solver_set_flag(fSolver, SOLVER_FLAG_BEST_OBEY_POLICY, 1);
 }
 
 
@@ -1138,22 +1225,10 @@ LibsolvSolver::_GetResolvableExpression(Id id,
 
 
 status_t
-LibsolvSolver::_Solve(bool solveAgain)
+LibsolvSolver::_Solve()
 {
-	if (fJobs == NULL)
+	if (fJobs == NULL || fSolver == NULL)
 		return B_BAD_VALUE;
-
-	if (solveAgain) {
-		if (fSolver == NULL)
-			return B_BAD_VALUE;
-	} else {
-		_CleanupSolver();
-
-		// create the solver and solve
-		fSolver = solver_create(fPool);
-		solver_set_flag(fSolver, SOLVER_FLAG_SPLITPROVIDES, 1);
-		solver_set_flag(fSolver, SOLVER_FLAG_BEST_OBEY_POLICY, 1);
-	}
 
 	int problemCount = solver_solve(fSolver, fJobs);
 

@@ -39,8 +39,11 @@ public:
 									BObjectList<BSolverPackage>& _packages);
 
 	virtual	status_t			Install(
-									const BSolverPackageSpecifierList&
-										packages,
+									const BSolverPackageSpecifierList& packages,
+									const BSolverPackageSpecifier** _unmatched
+										= NULL);
+	virtual	status_t			Uninstall(
+									const BSolverPackageSpecifierList& packages,
 									const BSolverPackageSpecifier** _unmatched
 										= NULL);
 	virtual	status_t			VerifyInstallation();
@@ -70,6 +73,7 @@ private:
 private:
 			status_t			_InitPool();
 			status_t			_InitJobQueue();
+			void				_InitSolver();
 			void				_Cleanup();
 			void				_CleanupPool();
 			void				_CleanupJobQueue();
@@ -96,7 +100,7 @@ private:
 									BPackageResolvableExpression& _expression)
 									const;
 
-			status_t			_Solve(bool solveAgain);
+			status_t			_Solve();
 			void				_SetJobsSolverMode(Queue& jobs, int solverMode);
 
 private:

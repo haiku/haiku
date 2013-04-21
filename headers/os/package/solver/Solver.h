@@ -48,8 +48,11 @@ public:
 									BObjectList<BSolverPackage>& _packages) = 0;
 
 	virtual	status_t			Install(
-									const BSolverPackageSpecifierList&
-										packages,
+									const BSolverPackageSpecifierList& packages,
+									const BSolverPackageSpecifier** _unmatched
+										= NULL) = 0;
+	virtual	status_t			Uninstall(
+									const BSolverPackageSpecifierList& packages,
 									const BSolverPackageSpecifier** _unmatched
 										= NULL) = 0;
 	virtual	status_t			VerifyInstallation() = 0;
