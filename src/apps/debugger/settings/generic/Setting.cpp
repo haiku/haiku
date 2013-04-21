@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -75,6 +76,16 @@ OptionsSetting::DefaultValue() const
 	SettingsOption* option = DefaultOption();
 	return option != NULL
 		? BVariant(option->ID(), B_VARIANT_DONT_COPY_DATA) : BVariant();
+}
+
+
+// #pragma mark - BoundedSetting
+
+
+setting_type
+BoundedSetting::Type() const
+{
+	return SETTING_TYPE_BOUNDED;
 }
 
 
@@ -284,7 +295,7 @@ OptionsSettingImpl::SetDefaultOption(SettingsOption* option)
 // #pragma mark - RangeSettingImpl
 
 
-RangeSettingImpl::RangeSettingImpl(const BString& id, const BString& name,
+BoundedSettingImpl::BoundedSettingImpl(const BString& id, const BString& name,
 	const BVariant& lowerBound, const BVariant& upperBound,
 	const BVariant& defaultValue)
 	:
@@ -297,9 +308,49 @@ RangeSettingImpl::RangeSettingImpl(const BString& id, const BString& name,
 
 
 BVariant
-RangeSettingImpl::DefaultValue() const
+BoundedSettingImpl::DefaultValue() const
 {
 	return fDefaultValue;
+}
+
+
+BVariant
+BoundedSettingImpl::LowerBound() const
+{
+	return fLowerBound;
+}
+
+
+BVariant
+BoundedSettingImpl::UpperBound() const
+{
+	return fUpperBound;
+}
+
+
+// #pragma mark - RangeSettingImpl
+
+
+RangeSettingImpl::RangeSettingImpl(const BString& id, const BString& name,
+	const BVariant& lowerBound, const BVariant& upperBound,
+	const BVariant& lowerValue, const BVariant& upperValue)
+	:
+	AbstractSetting(id, name),
+	fLowerBound(lowerBound),
+	fUpperBound(upperBound),
+	fLowerValue(lowerValue),
+	fUpperValue(upperValue)
+{
+}
+
+
+BVariant
+RangeSettingImpl::DefaultValue() const
+{
+	// this one doesn't really make sense for RangeSetting since it
+	// describes a pair of values, which BVariant can't readily
+	// represent.
+	return BVariant();
 }
 
 
@@ -314,6 +365,20 @@ BVariant
 RangeSettingImpl::UpperBound() const
 {
 	return fUpperBound;
+}
+
+
+BVariant
+RangeSettingImpl::LowerValue() const
+{
+	return fLowerValue;
+}
+
+
+BVariant
+RangeSettingImpl::UpperValue() const
+{
+	return fUpperValue;
 }
 
 
