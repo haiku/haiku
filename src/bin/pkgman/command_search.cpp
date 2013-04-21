@@ -14,14 +14,13 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-#include <package/PackageRoster.h>
-#include <package/RepositoryConfig.h>
+#include <algorithm>
 
-#include <AutoDeleter.h>
+#include <package/solver/SolverPackage.h>
 
 #include "Command.h"
+#include "PackageManager.h"
 #include "pkgman.h"
-#include "RepositoryBuilder.h"
 
 
 // TODO: internationalization!
@@ -30,9 +29,6 @@
 
 
 using namespace BPackageKit;
-
-
-typedef std::map<BSolverPackage*, BString> PackagePathMap;
 
 
 static const char* const kShortUsage =
@@ -113,64 +109,13 @@ SearchCommand::Execute(int argc, const char* const* argv)
 	const char* searchString = argv[optind++];
 
 	// create the solver
-	BSolver* solver;
-	status_t error = BSolver::Create(solver);
-	if (error != B_OK)
-		DIE(error, "failed to create solver");
-
-	// add repositories
-
-	// installed
-	BSolverRepository systemRepository;
-	BSolverRepository commonRepository;
-	BSolverRepository homeRepository;
-	if (!uninstalledOnly) {
-		RepositoryBuilder(systemRepository, "system")
-			.AddPackages(B_PACKAGE_INSTALLATION_LOCATION_SYSTEM, "system")
-			.AddToSolver(solver, false);
-		RepositoryBuilder(commonRepository, "common")
-			.AddPackages(B_PACKAGE_INSTALLATION_LOCATION_COMMON, "common")
-			.AddToSolver(solver, false);
-//		RepositoryBuilder(homeRepository, "home")
-//			.AddPackages(B_PACKAGE_INSTALLATION_LOCATION_HOME, "home")
-//			.AddToSolver(solver, false);
-	}
-
-	// not installed
-	BObjectList<BSolverRepository> uninstalledRepositories(10, true);
-
-	if (!installedOnly) {
-		BPackageRoster roster;
-		BStringList repositoryNames;
-		error = roster.GetRepositoryNames(repositoryNames);
-		if (error != B_OK)
-			WARN(error, "failed to get repository names");
-
-		int32 repositoryNameCount = repositoryNames.CountStrings();
-		for (int32 i = 0; i < repositoryNameCount; i++) {
-			const BString& name = repositoryNames.StringAt(i);
-			BRepositoryConfig config;
-			error = roster.GetRepositoryConfig(name, &config);
-			if (error != B_OK) {
-				WARN(error, "failed to get config for repository \"%s\". "
-					"Skipping.", name.String());
-				continue;
-			}
-
-			BSolverRepository* repository = new(std::nothrow) BSolverRepository;
-			if (repository == NULL
-				|| !uninstalledRepositories.AddItem(repository)) {
-				DIE(B_NO_MEMORY, "out of memory");
-			}
-
-			RepositoryBuilder(*repository, config)
-				.AddToSolver(solver, false);
-		}
-	}
+	PackageManager packageManager(B_PACKAGE_INSTALLATION_LOCATION_COMMON,
+		!uninstalledOnly, !installedOnly);
+// TODO: Use B_PACKAGE_INSTALLATION_LOCATION_HOME once we actually mount it.
 
 	// search
 	BObjectList<BSolverPackage> packages;
-	error = solver->FindPackages(searchString,
+	status_t error = packageManager.Solver()->FindPackages(searchString,
 		BSolver::B_FIND_CASE_INSENSITIVE | BSolver::B_FIND_IN_NAME
 			| BSolver::B_FIND_IN_SUMMARY | BSolver::B_FIND_IN_DESCRIPTION
 			| BSolver::B_FIND_IN_PROVIDES,
@@ -230,11 +175,11 @@ SearchCommand::Execute(int argc, const char* const* argv)
 		BSolverPackage* package = packages.ItemAt(i);
 
 		const char* installed = "";
-		if (package->Repository() == &systemRepository)
+		if (package->Repository() == packageManager.SystemRepository())
 			installed = "system";
-		else if (package->Repository() == &commonRepository)
+		else if (package->Repository() == packageManager.CommonRepository())
 			installed = "common";
-		else if (package->Repository() == &homeRepository)
+		else if (package->Repository() == packageManager.HomeRepository())
 			installed = "home";
 
 		printf("%-*s  %-*s  %-*.*s\n",

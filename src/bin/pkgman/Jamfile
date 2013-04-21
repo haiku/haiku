@@ -14,6 +14,7 @@ BinCommand pkgman :
 	DecisionProvider.cpp
 	JobStateListener.cpp
 	PackageInfoErrorListener.cpp
+	PackageManager.cpp
 	pkgman.cpp
 	RepositoryBuilder.cpp
 	:
