@@ -33,7 +33,7 @@ static const char* const kLongUsage =
 	"\n"
 	"Options:\n"
 	"  -H, --home\n"
-	"    Install the packages in the user's home directory. Default is to.\n"
+	"    Install the packages in the user's home directory. Default is to\n"
 	"    install in the common directory.\n"
 	"\n";
 
