@@ -32,6 +32,7 @@
 #include "FunctionInstance.h"
 #include "GuiSettingsUtils.h"
 #include "MessageCodes.h"
+#include "RangeList.h"
 #include "Register.h"
 #include "SettingsMenu.h"
 #include "SourceLanguage.h"
@@ -46,6 +47,7 @@
 #include "TypeComponentPath.h"
 #include "TypeHandlerRoster.h"
 #include "TypeLookupConstraints.h"
+#include "UiUtils.h"
 #include "Value.h"
 #include "ValueHandler.h"
 #include "ValueHandlerRoster.h"
@@ -1571,6 +1573,65 @@ VariablesView::MessageReceived(BMessage* message)
 			node->SetCastedType(type);
 			break;
 		}
+		case MSG_SHOW_CONTAINER_RANGE_PROMPT:
+		{
+			ModelNode* node = (ModelNode*)fVariableTable
+				->SelectionModel()->NodeAt(0);
+			int32 lowerBound, upperBound;
+			ValueNode* valueNode = node->NodeChild()->Node();
+			if (valueNode->SupportedChildRange(lowerBound, upperBound) != B_OK)
+				break;
+
+			BMessage* promptMessage = new(std::nothrow) BMessage(
+				MSG_SET_CONTAINER_RANGE);
+			if (promptMessage == NULL)
+				break;
+
+			ObjectDeleter<BMessage> messageDeleter(promptMessage);
+			promptMessage->AddPointer("node", node);
+			BString infoText;
+			infoText.SetToFormat("Allowed range: %" B_PRId32
+				"-%" B_PRId32 ".", lowerBound, upperBound);
+			PromptWindow* promptWindow = new(std::nothrow) PromptWindow(
+				"Set Range", "Range: ", infoText.String(), BMessenger(this),
+				promptMessage);
+			if (promptWindow == NULL)
+				return;
+
+			messageDeleter.Detach();
+			promptWindow->CenterOnScreen();
+			promptWindow->Show();
+			break;
+		}
+		case MSG_SET_CONTAINER_RANGE:
+		{
+			ModelNode* node = (ModelNode*)fVariableTable
+				->SelectionModel()->NodeAt(0);
+			int32 lowerBound, upperBound;
+			ValueNode* valueNode = node->NodeChild()->Node();
+			if (valueNode->SupportedChildRange(lowerBound, upperBound) != B_OK)
+				break;
+
+			BString rangeExpression = message->FindString("text");
+			if (rangeExpression.Length() == 0)
+				break;
+
+			RangeList ranges;
+			status_t result = UiUtils::ParseRangeExpression(
+				rangeExpression, lowerBound, upperBound, ranges);
+			if (result != B_OK)
+				break;
+
+			valueNode->ClearChildren();
+			for (int32 i = 0; i < ranges.CountRanges(); i++) {
+				const Range* range = ranges.RangeAt(i);
+				result = valueNode->CreateChildrenInRange(
+					range->lowerBound, range->upperBound);
+				if (result != B_OK)
+					break;
+			}
+			break;
+		}
 		case MSG_SHOW_WATCH_VARIABLE_PROMPT:
 		{
 			ModelNode* node = reinterpret_cast<ModelNode*>(
@@ -1899,6 +1960,14 @@ VariablesView::_GetContextActionsForNode(ModelNode* node,
 		MSG_SHOW_WATCH_VARIABLE_PROMPT, actions, message);
 	if (result != B_OK)
 		return result;
+
+	ValueNode* valueNode = node->NodeChild()->Node();
+	if (valueNode != NULL && valueNode->IsRangedContainer()) {
+		result = _AddContextAction("Set visible range" B_UTF8_ELLIPSIS,
+			MSG_SHOW_CONTAINER_RANGE_PROMPT, actions, message);
+		if (result != B_OK)
+			return result;
+	}
 
 	return B_OK;
 }

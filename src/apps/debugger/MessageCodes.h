@@ -56,6 +56,8 @@ enum {
 	MSG_SHOW_TYPECAST_NODE_PROMPT				= 'stnp',
 	MSG_TYPECAST_NODE							= 'tyno',
 	MSG_SHOW_WATCH_VARIABLE_PROMPT				= 'swvp',
+	MSG_SHOW_CONTAINER_RANGE_PROMPT				= 'scrp',
+	MSG_SET_CONTAINER_RANGE						= 'chcr',
 	MSG_GENERATE_DEBUG_REPORT					= 'gdrp'
 };
 
