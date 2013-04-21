@@ -23,11 +23,12 @@ compare_commands_by_name(const Command* a, const Command* b)
 
 
 Command::Command(const BString& name, const BString& shortUsage,
-	const BString& longUsage)
+	const BString& longUsage, const BString& category)
 	:
 	fName(name),
 	fShortUsage(shortUsage),
-	fLongUsage(longUsage)
+	fLongUsage(longUsage),
+	fCategory(category)
 {
 	fShortUsage.ReplaceAll("%command%", fName);
 	fLongUsage.ReplaceAll("%command%", fName);
@@ -95,6 +96,17 @@ CommandManager::GetCommands(const char* prefix, CommandList& _commands)
 {
 	for (int32 i = 0; Command* command = fCommands.ItemAt(i); i++) {
 		if (command->Name().StartsWith(prefix))
+			_commands.AddItem(command);
+	}
+}
+
+
+void
+CommandManager::GetCommandsForCategory(const char* category,
+	CommandList& _commands)
+{
+	for (int32 i = 0; Command* command = fCommands.ItemAt(i); i++) {
+		if (command->Category() == category)
 			_commands.AddItem(command);
 	}
 }

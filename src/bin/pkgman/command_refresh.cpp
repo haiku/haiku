@@ -37,7 +37,8 @@ static const char* const kLongUsage =
 	"\n";
 
 
-DEFINE_COMMAND(RefreshCommand, "refresh", kShortUsage, kLongUsage)
+DEFINE_COMMAND(RefreshCommand, "refresh", kShortUsage, kLongUsage,
+	kCommandCategoryRepositories)
 
 
 int

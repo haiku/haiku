@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <String.h>
+
 
 extern const char* kProgramName;
 
@@ -34,6 +36,11 @@ do {																\
 
 
 void	print_usage_and_exit(bool error);
+
+
+extern const BString kCommandCategoryPackages;
+extern const BString kCommandCategoryRepositories;
+extern const BString kCommandCategoryOther;
 
 
 #endif	// PKGMAN_H

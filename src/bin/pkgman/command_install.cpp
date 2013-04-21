@@ -38,7 +38,8 @@ static const char* const kLongUsage =
 	"\n";
 
 
-DEFINE_COMMAND(InstallCommand, "install", kShortUsage, kLongUsage)
+DEFINE_COMMAND(InstallCommand, "install", kShortUsage, kLongUsage,
+	kCommandCategoryPackages)
 
 
 int

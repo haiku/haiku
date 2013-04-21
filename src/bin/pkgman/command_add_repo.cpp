@@ -38,7 +38,8 @@ static const char* const kLongUsage =
 	"\n";
 
 
-DEFINE_COMMAND(AddRepoCommand, "add-repo", kShortUsage, kLongUsage)
+DEFINE_COMMAND(AddRepoCommand, "add-repo", kShortUsage, kLongUsage,
+	kCommandCategoryRepositories)
 
 
 int

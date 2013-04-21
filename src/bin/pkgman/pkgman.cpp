@@ -18,27 +18,51 @@ extern const char* __progname;
 const char* kProgramName = __progname;
 
 
+const BString kCommandCategoryPackages("packages");
+const BString kCommandCategoryRepositories("repositories");
+const BString kCommandCategoryOther("other");
+
+
 static const char* const kUsage =
 	"Usage: %s <command> <command args>\n"
-	"Manages packages and package repository.\n"
+	"Manages packages and package repositories.\n"
 	"\n"
-	"Commands:\n"
+	"Package management commands:\n"
+	"%s"
+	"Repository management commands:\n"
+	"%s"
+	"Other commands:\n"
 	"%s"
 	"Common Options:\n"
-	"  -h, --help   - Print this usage info.\n"
+	"  -h, --help   - Print usage info.\n"
 ;
+
+
+static BString
+get_commands_usage_for_category(const char* category)
+{
+	BString commandsUsage;
+	CommandList commands;
+	CommandManager::Default()->GetCommandsForCategory(category, commands);
+	for (int32 i = 0; Command* command = commands.ItemAt(i); i++)
+		commandsUsage << command->ShortUsage() << '\n';
+	return commandsUsage;
+}
 
 
 void
 print_usage_and_exit(bool error)
 {
-	BString commandsUsage;
-	const CommandList& commands = CommandManager::Default()->Commands();
-	for (int32 i = 0; Command* command = commands.ItemAt(i); i++)
-		commandsUsage << command->ShortUsage() << '\n';
+	BString packageCommandsUsage
+		= get_commands_usage_for_category(kCommandCategoryPackages);
+	BString repositoryCommandsUsage
+		= get_commands_usage_for_category(kCommandCategoryRepositories);
+	BString otherCommandsUsage
+		= get_commands_usage_for_category(kCommandCategoryOther);
 
     fprintf(error ? stderr : stdout, kUsage, kProgramName,
-    	commandsUsage.String());
+    	packageCommandsUsage.String(), repositoryCommandsUsage.String(),
+    	otherCommandsUsage.String());
 
     exit(error ? 1 : 0);
 }

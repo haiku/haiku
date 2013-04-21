@@ -47,7 +47,8 @@ static const char* const kLongUsage =
 	"\n";
 
 
-DEFINE_COMMAND(SearchCommand, "search", kShortUsage, kLongUsage)
+DEFINE_COMMAND(SearchCommand, "search", kShortUsage, kLongUsage,
+	kCommandCategoryPackages)
 
 
 static int

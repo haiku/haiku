@@ -38,7 +38,8 @@ static const char* const kLongUsage =
 	"\n";
 
 
-DEFINE_COMMAND(UninstallCommand, "uninstall", kShortUsage, kLongUsage)
+DEFINE_COMMAND(UninstallCommand, "uninstall", kShortUsage, kLongUsage,
+	kCommandCategoryPackages)
 
 
 int

@@ -17,14 +17,16 @@ class Command {
 public:
 								Command(const BString& name,
 									const BString& shortUsage,
-									const BString& longUsage);
+									const BString& longUsage,
+									const BString& category);
 	virtual						~Command();
 
 			void				Init(const char* programName);
 
 			const BString&		Name() const		{ return fName; }
 			const BString&		ShortUsage() const	{ return fShortUsage; }
-			const BString&		LongUsage() const	{ return fName; }
+			const BString&		LongUsage() const	{ return fLongUsage; }
+			const BString&		Category() const	{ return fCategory; }
 
 			void				PrintUsage(bool error) const;
 			void				PrintUsageAndExit(bool error) const;
@@ -35,6 +37,7 @@ private:
 			BString				fName;
 			BString				fShortUsage;
 			BString				fLongUsage;
+			BString				fCategory;
 };
 
 
@@ -51,6 +54,8 @@ public:
 			const CommandList&	Commands() const
 									{ return fCommands; }
 			void				GetCommands(const char* prefix,
+									CommandList& _commands);
+			void				GetCommandsForCategory(const char* category,
 									CommandList& _commands);
 
 private:
@@ -70,11 +75,11 @@ struct CommandRegistrar {
 };
 
 
-#define DEFINE_COMMAND(className, name, shortUsage, longUsage)	\
+#define DEFINE_COMMAND(className, name, shortUsage, longUsage, category)	\
 	struct className : Command {								\
 		className()												\
 			:													\
-			Command(name, shortUsage, longUsage)				\
+			Command(name, shortUsage, longUsage, category)		\
 		{														\
 		}														\
 																\
