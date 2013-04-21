@@ -493,11 +493,6 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 		InstallOptionalHaikuImagePackage
 			$(hpkgBaseURL)/gcc-2.95.3_130421-1-x86_gcc2.hpkg
 			: common packages ;
-
-		# TODO: remove this when we have a mechanism to switch gcc via PATH
-		AddSymlinkToHaikuImage common settings develop tools
-			: /boot/common/develop/tools/gcc-2.95.3-110711
-			: current ;
 	}
 
 	if $(HAIKU_GCC_VERSION[1]) = 4 {

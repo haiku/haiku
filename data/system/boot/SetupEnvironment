@@ -8,9 +8,6 @@ export LC_CTYPE="en_US.UTF-8"
 
 BUILDHOME=/boot/system/develop
 
-#TODO: fix this or drop it!
-BETOOLS="/boot/common/settings/develop/tools/current/bin"
-
 case `uname -m` in
 BePC|Intel|unknown)
 	BE_HOST_CPU=x86
@@ -29,7 +26,6 @@ BH=$BUILDHOME/headers
 BEINCLUDES="$BH;$BH/be;$BH/posix;$BH/glibc;$BH/cpp;$BH/be/app;$BH/be/device;$BH/be/interface;$BH/be/locale;$BH/be/media;$BH/be/midi;$BH/be/midi2;$BH/be/net;$BH/be/kernel;$BH/be/storage;$BH/be/support;$BH/be/game;$BH/be/opengl;$BH/be/drivers;$BH/gnu;$BH/be/mail;$BH/be/translation;$BH/be/devel;$BH/be/add-ons/graphics;$BH/be/be_apps/Deskbar;$BH/be/be_apps/NetPositive;$BH/be/be_apps/Tracker"
 
 export BUILDHOME
-export BETOOLS
 export BELIBRARIES
 export BEINCLUDES
 export BE_HOST_CPU
@@ -44,11 +40,11 @@ export BE_DEFAULT_CPLUS_FLAGS=""
 
 if [ "$SAFEMODE" != "yes" ]
 then
-	export PATH=.:$HOME/config/non-packaged/bin:$HOME/config/bin:/boot/common/non-packaged/bin:/boot/common/bin:/bin:/boot/apps:/boot/preferences:/boot/system/apps:/boot/system/preferences:$BETOOLS
+	export PATH=.:$HOME/config/non-packaged/bin:$HOME/config/bin:/boot/common/non-packaged/bin:/boot/common/bin:/bin:/boot/apps:/boot/preferences:/boot/system/apps:/boot/system/preferences
 	export LIBRARY_PATH="%A/lib:$HOME/config/non-packaged/lib:$HOME/config/lib:/boot/common/non-packaged/lib:/boot/common/lib:/boot/system/lib"
 	export ADDON_PATH="%A/add-ons:$HOME/config/non-packaged/add-ons:$HOME/config/add-ons:/boot/common/non-packaged/add-ons:/boot/common/add-ons:/boot/system/add-ons"
 else
-	export PATH=.:/bin:/boot/apps:/boot/system/apps:/boot/system/preferences:$BETOOLS
+	export PATH=.:/bin:/boot/apps:/boot/system/apps:/boot/system/preferences
 	export LIBRARY_PATH="%A/lib:/boot/system/lib"
 	export ADDON_PATH="%A/add-ons:/boot/system/add-ons"
 fi

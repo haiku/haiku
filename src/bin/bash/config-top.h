@@ -56,8 +56,7 @@
 #define DEFAULT_PATH_VALUE \
   ".:/boot/home/config/bin:/bin:/boot/apps:/boot/preferences" \
   ":/boot/system/apps" \
-  ":/boot/system/preferences" \
-  ":/boot/common/settings/develop/tools/current/bin"
+  ":/boot/system/preferences" 
 #endif
 
 /* The value for PATH when invoking `command -p'.  This is only used when
