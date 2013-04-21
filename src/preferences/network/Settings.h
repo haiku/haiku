@@ -55,7 +55,6 @@ private:
 			BString				fNetmask;
 			BString				fName;
 			BString				fDomain;
-			int					fSocket;
 			bool				fAuto;
 			bool				fDisabled;
 			BObjectList<BString> fNameServers;

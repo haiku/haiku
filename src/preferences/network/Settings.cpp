@@ -26,6 +26,7 @@
 #include <driver_settings.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <NetworkInterface.h>
 #include <Path.h>
 #include <String.h>
 
@@ -38,7 +39,6 @@ Settings::Settings(const char* name)
 	fDisabled(false),
 	fNameServers(5, true)
 {
-	fSocket = socket(AF_INET, SOCK_DGRAM, 0);
 	fName = name;
 
 	ReadConfiguration();
@@ -47,7 +47,6 @@ Settings::Settings(const char* name)
 
 Settings::~Settings()
 {
-	close(fSocket);
 }
 
 
@@ -67,61 +66,38 @@ Settings::_PrepareRequest(struct ifreq& request)
 }
 
 
-void
-Settings::ReadConfiguration()
+static status_t
+GetDefaultGateway(BString& gateway)
 {
-	ifreq request;
-	if (!_PrepareRequest(request))
-		return;
+	// TODO: This method is here because BNetworkInterface
+	// doesn't yet have any route getting methods
 
-	BString text = "dummy";
-	char address[32];
-	sockaddr_in* inetAddress = NULL;
+	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
+	if (socket < 0)
+		return errno;
 
-	// Obtain IP.
-	if (ioctl(fSocket, SIOCGIFADDR, &request, sizeof(request)) < 0)
-		return;
-
-	inetAddress = (sockaddr_in*)&request.ifr_addr;
-	if (inet_ntop(AF_INET, &inetAddress->sin_addr, address,
-			sizeof(address)) == NULL) {
-		return;
-	}
-
-	fIP = address;
-
-	// Obtain netmask.
-	if (ioctl(fSocket, SIOCGIFNETMASK, &request, sizeof(request)) < 0)
-		return;
-
-	inetAddress = (sockaddr_in*)&request.ifr_mask;
-	if (inet_ntop(AF_INET, &inetAddress->sin_addr, address,
-			sizeof(address)) == NULL) {
-		return;
-	}
-
-	fNetmask = address;
+	FileDescriptorCloser fdCloser(socket);
 
 	// Obtain gateway
 	ifconf config;
 	config.ifc_len = sizeof(config.ifc_value);
-	if (ioctl(fSocket, SIOCGRTSIZE, &config, sizeof(struct ifconf)) < 0)
-		return;
+	if (ioctl(socket, SIOCGRTSIZE, &config, sizeof(struct ifconf)) < 0)
+		return errno;
 
 	uint32 size = (uint32)config.ifc_value;
 	if (size == 0)
-		return;
+		return B_ERROR;
 
 	void* buffer = malloc(size);
 	if (buffer == NULL)
-		return;
+		return B_NO_MEMORY;
 
 	MemoryDeleter bufferDeleter(buffer);
 	config.ifc_len = size;
 	config.ifc_buf = buffer;
 
-	if (ioctl(fSocket, SIOCGRTTABLE, &config, sizeof(struct ifconf)) < 0)
-		return;
+	if (ioctl(socket, SIOCGRTTABLE, &config, sizeof(struct ifconf)) < 0)
+		return errno;
 
 	ifreq* interface = (ifreq*)buffer;
 	ifreq* end = (ifreq*)((uint8*)buffer + size);
@@ -130,8 +106,8 @@ Settings::ReadConfiguration()
 		route_entry& route = interface->ifr_route;
 
 		if ((route.flags & RTF_GATEWAY) != 0) {
-			inetAddress = (sockaddr_in*)route.gateway;
-			fGateway = inet_ntoa(inetAddress->sin_addr);
+			sockaddr_in* inetAddress = (sockaddr_in*)route.gateway;
+			gateway = inet_ntoa(inetAddress->sin_addr);
 		}
 
 		int32 addressSize = 0;
@@ -146,9 +122,26 @@ Settings::ReadConfiguration()
 			+ sizeof(route_entry) + addressSize);
 	}
 
-	uint32 flags = 0;
-	if (ioctl(fSocket, SIOCGIFFLAGS, &request, sizeof(struct ifreq)) == 0)
-		flags = request.ifr_flags;
+	return B_OK;
+}
+
+
+void
+Settings::ReadConfiguration()
+{
+	BNetworkInterface interface(fName);
+	BNetworkInterfaceAddress address;
+
+	if (interface.GetAddressAt(0, address) != B_OK)
+		return;
+
+	fIP = address.Address().ToString();
+	fNetmask = address.Mask().ToString();
+
+	if (GetDefaultGateway(fGateway) != B_OK)
+		return;
+
+	uint32 flags = interface.Flags();
 
 	fAuto = (flags & (IFF_AUTO_CONFIGURED | IFF_CONFIGURING)) != 0;
 	fDisabled = (flags & IFF_UP) == 0;
