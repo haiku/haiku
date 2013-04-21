@@ -224,6 +224,36 @@ PackageManager::Uninstall(const char* const* packages, int packageCount)
 
 
 void
+PackageManager::Update(const char* const* packages, int packageCount)
+{
+	// solve
+	BSolverPackageSpecifierList packagesToUpdate;
+	for (int i = 0; i < packageCount; i++) {
+		if (!packagesToUpdate.AppendSpecifier(packages[i]))
+			DIE(B_NO_MEMORY, "failed to add specified package");
+	}
+
+	const BSolverPackageSpecifier* unmatchedSpecifier;
+	status_t error = fSolver->Update(packagesToUpdate, true,
+		&unmatchedSpecifier);
+	if (error != B_OK) {
+		if (unmatchedSpecifier != NULL) {
+			DIE(error, "failed to find a match for \"%s\"",
+				unmatchedSpecifier->SelectString().String());
+		} else
+			DIE(error, "failed to compute packages to update");
+	}
+
+	_HandleProblems();
+
+	// install/uninstall packages
+	_AnalyzeResult();
+	_PrintResult();
+	_ApplyPackageChanges();
+}
+
+
+void
 PackageManager::_HandleProblems()
 {
 	while (fSolver->HasProblems()) {
