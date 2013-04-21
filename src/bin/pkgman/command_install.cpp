@@ -357,54 +357,44 @@ InstallCommand::Execute(int argc, const char* const* argv)
 		DIE(error, "failed to create transaction");
 
 	// download the new packages and prepare the transaction
-	for (int32 i = 0; const BSolverResultElement* element = result.ElementAt(i);
-			i++) {
-		BSolverPackage* package = element->Package();
+	for (int32 i = 0; BSolverPackage* package = packagesToActivate.ItemAt(i);
+		i++) {
+		// get package URL and target entry
+		Repository* repository
+			= static_cast<Repository*>(package->Repository());
+		BString url = repository->Config().BaseURL();
+		BString fileName(package->Info().CanonicalFileName());
+		if (fileName.IsEmpty())
+			DIE(B_NO_MEMORY, "failed to allocate file name");
+		url << '/' << fileName;
 
-		switch (element->Type()) {
-			case BSolverResultElement::B_TYPE_INSTALL:
-			{
-				if (installedRepositories.HasItem(package->Repository()))
-					continue;
+		BEntry entry;
+		error = entry.SetTo(&transactionDirectory, fileName);
+		if (error != B_OK)
+			DIE(error, "failed to create package entry");
 
-				// get package URL and target entry
-				Repository* repository
-					= static_cast<Repository*>(package->Repository());
-				BString url = repository->Config().BaseURL();
-				BString fileName(package->Info().CanonicalFileName());
-				if (fileName.IsEmpty())
-					DIE(B_NO_MEMORY, "failed to allocate file name");
-				url << '/' << fileName;
+		// download the package
+		DownloadFileRequest downloadRequest(context, url, entry,
+			package->Info().Checksum());
+		error = downloadRequest.Process();
+		if (error != B_OK)
+			DIE(error, "failed to download package");
 
-				BEntry entry;
-				error = entry.SetTo(&transactionDirectory, fileName);
-				if (error != B_OK)
-					DIE(error, "failed to create package entry");
+		// add package to transaction
+		if (!transaction.AddPackageToActivate(
+				package->Info().CanonicalFileName())) {
+			DIE(B_NO_MEMORY,
+				"failed to add package to activate to transaction");
+		}
+	}
 
-				// download the package
-				DownloadFileRequest downloadRequest(context, url, entry,
-					package->Info().Checksum());
-				error = downloadRequest.Process();
-				if (error != B_OK)
-					DIE(error, "failed to download package");
-
-				// add package to transaction
-				if (!transaction.AddPackageToActivate(
-						package->Info().CanonicalFileName())) {
-					DIE(B_NO_MEMORY,
-						"failed to add package to activate to transaction");
-				}
-				break;
-			}
-
-			case BSolverResultElement::B_TYPE_UNINSTALL:
-				// add package to transaction
-				if (!transaction.AddPackageToDeactivate(
-						package->Info().CanonicalFileName())) {
-					DIE(B_NO_MEMORY,
-						"failed to add package to deactivate to transaction");
-				}
-				break;
+	for (int32 i = 0; BSolverPackage* package = packagesToDeactivate.ItemAt(i);
+		i++) {
+		// add package to transaction
+		if (!transaction.AddPackageToDeactivate(
+				package->Info().CanonicalFileName())) {
+			DIE(B_NO_MEMORY,
+				"failed to add package to deactivate to transaction");
 		}
 	}
 
