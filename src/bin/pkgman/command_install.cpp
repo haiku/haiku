@@ -233,24 +233,60 @@ InstallCommand::Execute(int argc, const char* const* argv)
 
 		int32 problemCount = solver->CountProblems();
 		for (int32 i = 0; i < problemCount; i++) {
+			// print problem and possible solutions
 			BSolverProblem* problem = solver->ProblemAt(i);
-			printf("  %" B_PRId32 ": %s\n", i + 1,
+			printf("problem %" B_PRId32 ": %s\n", i + 1,
 				problem->ToString().String());
 
 			int32 solutionCount = problem->CountSolutions();
 			for (int32 k = 0; k < solutionCount; k++) {
 				const BSolverProblemSolution* solution = problem->SolutionAt(k);
-				printf("    solution %" B_PRId32 ":\n", k + 1);
+				printf("  solution %" B_PRId32 ":\n", k + 1);
 				int32 elementCount = solution->CountElements();
 				for (int32 l = 0; l < elementCount; l++) {
 					const BSolverProblemSolutionElement* element
 						= solution->ElementAt(l);
-					printf("      - %s\n", element->ToString().String());
+					printf("    - %s\n", element->ToString().String());
 				}
 			}
+
+			// let the user choose a solution
+			printf("Please select a solution, skip the problem for now or "
+				"quit.\n");
+			for (;;) {
+				if (solutionCount > 1)
+					printf("select [1...%" B_PRId32 "/s/q]: ", solutionCount);
+				else
+					printf("select [1/s/q]: ");
+	
+				char buffer[32];
+				if (fgets(buffer, sizeof(buffer), stdin) == NULL
+					|| strcmp(buffer, "q\n") == 0) {
+					exit(1);
+				}
+
+				if (strcmp(buffer, "s\n") == 0)
+					break;
+
+				char* end;
+				long selected = strtol(buffer, &end, 0);
+				if (end == buffer || *end != '\n' || selected < 1
+					|| selected > solutionCount) {
+					printf("*** invalid input\n");
+					continue;
+				}
+
+				error = solver->SelectProblemSolution(problem,
+					problem->SolutionAt(selected - 1));
+				if (error != B_OK)
+					DIE(error, "failed to set solution");
+				break;
+			}
 		}
-// TODO: Allow the user to select solutions!
-exit(1);
+
+		error = solver->SolveAgain();
+		if (error != B_OK)
+			DIE(error, "failed to compute packages to install");
 	}
 
 	// print result
@@ -259,26 +295,44 @@ exit(1);
 	if (error != B_OK)
 		DIE(error, "failed to compute packages to install");
 
-	printf("The following changes will be made:\n");
+	BObjectList<BSolverPackage> packagesToActivate;
+	BObjectList<BSolverPackage> packagesToDeactivate;
+
 	for (int32 i = 0; const BSolverResultElement* element = result.ElementAt(i);
 			i++) {
 		BSolverPackage* package = element->Package();
 
 		switch (element->Type()) {
 			case BSolverResultElement::B_TYPE_INSTALL:
-				if (installedRepositories.HasItem(package->Repository()))
-					continue;
-
-				printf("  install package %s from repository %s\n",
-					package->Info().CanonicalFileName().String(),
-					package->Repository()->Name().String());
+				if (!installedRepositories.HasItem(package->Repository())) {
+					if (!packagesToActivate.AddItem(package))
+						DIE(B_NO_MEMORY, "failed to add package to activate");
+				}
 				break;
 
 			case BSolverResultElement::B_TYPE_UNINSTALL:
-				printf("  uninstall package %s\n",
-					package->VersionedName().String());
+				if (!packagesToDeactivate.AddItem(package))
+					DIE(B_NO_MEMORY, "failed to add package to deactivate");
 				break;
 		}
+	}
+
+	if (packagesToActivate.IsEmpty() && packagesToDeactivate.IsEmpty()) {
+		printf("Nothing to do.\n");
+		exit(0);
+	}
+
+	printf("The following changes will be made:\n");
+	for (int32 i = 0; BSolverPackage* package = packagesToActivate.ItemAt(i);
+		i++) {
+		printf("  install package %s from repository %s\n",
+			package->Info().CanonicalFileName().String(),
+			package->Repository()->Name().String());
+	}
+
+	for (int32 i = 0; BSolverPackage* package = packagesToDeactivate.ItemAt(i);
+		i++) {
+		printf("  uninstall package %s\n", package->VersionedName().String());
 	}
 // TODO: Print file/download sizes. Unfortunately our package infos don't
 // contain the file size. Which is probably correct. The file size (and possibly
