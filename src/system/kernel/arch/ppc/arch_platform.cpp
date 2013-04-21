@@ -15,6 +15,9 @@
 #include <util/kernel_cpp.h>
 
 
+// TODO: declare this in some header
+extern void *gFDT;
+
 static PPCPlatform *sPPCPlatform;
 
 
@@ -278,7 +281,9 @@ PPCUBoot::~PPCUBoot()
 status_t
 PPCUBoot::Init(struct kernel_args *kernelArgs)
 {
-	return B_ERROR;
+	gFDT = kernelArgs->platform_args.fdt;
+	// XXX: do we error out if no FDT?
+	return B_OK;
 }
 
 // InitSerialDebug
