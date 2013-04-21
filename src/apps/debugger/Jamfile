@@ -330,7 +330,7 @@ Application Debugger :
 	libexpression_parser.a
 	libmapm.a
 	libedit.a
-	libtermcap.a
+	libncurses.a
 
 	$(TARGET_LIBSTDC++)
 	be tracker libbsd.so libdebug.so

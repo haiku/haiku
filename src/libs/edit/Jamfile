@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src libs edit ;
 
 SetSubDirSupportedPlatforms $(HAIKU_BONE_COMPATIBLE_PLATFORMS) ;
 
-UseLibraryHeaders termcap ;
+UseLibraryHeaders ncurses ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers libs ncurses ] : true ;
 

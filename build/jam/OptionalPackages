@@ -97,6 +97,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	System-sounds			- a collection of system sounds
 #	TagLib					- id3 tag library
 #	Tar						- archiving utility
+#	TermInfo				- terminal capabilites database
 #	TimGMSoundFont			- a good quality General MIDI Sound Font
 #	TrackerNewTemplates		- template files for Tracker's New menu
 #	Transmission			- a fast, easy, and free BitTorrent Client
@@ -961,7 +962,6 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ]
 
 	# third party libs headers
 	AddHeaderDirectoryToHaikuImage libs ncurses : 3rdparty ;
-	AddHeaderDirectoryToHaikuImage libs termcap : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs tiff : 3rdparty ;
 
 	CopyDirectoryToHaikuImage develop headers :
@@ -2062,6 +2062,13 @@ if [ IsOptionalHaikuImagePackageAdded Tar ] {
 	} else {
 		Echo "No optional package Tar available for $(TARGET_ARCH)" ;
 	}
+}
+
+
+# TermInfo
+if [ IsOptionalHaikuImagePackageAdded TermInfo ] {
+	InstallOptionalHaikuImagePackage terminfo-1.383-2013-05-21.zip
+		: $(baseURL)/terminfo-1.383-2013-05-21.zip ;
 }
 
 

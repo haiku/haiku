@@ -8,7 +8,7 @@ TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 
 SubDirCcFlags -DHAVE_CONFIG_H -DSHELL ;
 
-UseLibraryHeaders termcap ;
+UseLibraryHeaders ncurses ;
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) include ] ;

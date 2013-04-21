@@ -35,7 +35,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	setversion setvolume seq sha1sum shar shred shuf shutdown sleep sort
 	spamdbm split stat strace stty su sum sync sysinfo
 	tac tail tcpdump tcptester tee telnet telnetd test timeout top touch
-	tput tr traceroute translate trash true truncate tsort tty
+	<ncurses>tput tr traceroute translate trash true truncate tsort tty
 	uname unchop unexpand unmount uniq unlink unshar unzip unzipsfx
 	<bin>updatedb uptime urlwrapper useradd uudecode uuencode
 	vdir version vmstat

@@ -1,16 +1,5 @@
 SubDir HAIKU_TOP src libs termcap ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
-# set some additional defines
-{
-	SubDirCcFlags -DHAVE_STRING_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1  -DTERMCAP_FILE=\'\"/etc/termcap\"\' -w ;
-}
-
-StaticLibrary libtermcap.a : 
-	termcap.c tparam.c version.c
-;
-
 # Build the /etc/termcap file. It's already ready to use, but we filter out the
 # comments.
 

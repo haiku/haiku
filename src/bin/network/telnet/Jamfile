@@ -20,5 +20,5 @@ BinCommand telnet :
 	telnet.c
 	terminal.c
 	utilities.c
-	: libtermcap.a libncurses.a libtelnet.a libutil.a libbsd.so $(TARGET_NETWORK_LIBS)
+	: libncurses.a libtelnet.a libutil.a libbsd.so $(TARGET_NETWORK_LIBS)
 ;
