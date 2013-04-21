@@ -131,7 +131,7 @@ serial_init_fdt(const void *fdt)
 		return;
 
 	// determine the MMIO address
-	// TODO: ppc640 use 64bit addressing, but U-Boot seems to map it below 4G,
+	// TODO: ppc460 use 64bit addressing, but U-Boot seems to map it below 4G,
 	// and the FDT is not very clear. libfdt is also getting 64bit addr support.
 	// so FIXME someday.
 	prop = fdt_getprop(fdt, node, "virtual-reg", &len);
