@@ -122,6 +122,10 @@ DebugReportGenerator::_GenerateReport(const entry_ref& outputPath)
 	if (result != B_OK)
 		return result;
 
+	result = _DumpRunningThreads(output);
+	if (result != B_OK)
+		return result;
+
 	result = _DumpLoadedImages(output);
 	if (result != B_OK)
 		return result;
@@ -131,10 +135,6 @@ DebugReportGenerator::_GenerateReport(const entry_ref& outputPath)
 		return result;
 
 	result = _DumpSemaphores(output);
-	if (result != B_OK)
-		return result;
-
-	result = _DumpRunningThreads(output);
 	if (result != B_OK)
 		return result;
 
