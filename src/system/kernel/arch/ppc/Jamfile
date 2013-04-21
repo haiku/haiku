@@ -26,6 +26,8 @@ KernelMergeObject kernel_arch_ppc.o :
 	arch_vm.cpp
 	arch_vm_translation_map.cpp
 	arch_asm.S
+	debug_uart_8250.cpp
+	arch_uart_8250.cpp
 
 	generic_vm_physical_page_mapper.cpp
 	generic_vm_physical_page_ops.cpp
