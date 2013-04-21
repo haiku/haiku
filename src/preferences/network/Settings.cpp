@@ -26,6 +26,7 @@
 #include <driver_settings.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <NetworkDevice.h>
 #include <NetworkInterface.h>
 #include <Path.h>
 #include <String.h>
@@ -47,22 +48,6 @@ Settings::Settings(const char* name)
 
 Settings::~Settings()
 {
-}
-
-
-bool
-Settings::_PrepareRequest(struct ifreq& request)
-{
-	// This function is used for talking direct to the stack.
-	// It´s used by _ShowConfiguration.
-
-	const char* name = fName.String();
-
-	if (strlen(name) > IF_NAMESIZE)
-		return false;
-
-	strcpy(request.ifr_name, name);
-	return true;
 }
 
 
@@ -132,6 +117,7 @@ Settings::ReadConfiguration()
 	BNetworkInterface interface(fName);
 	BNetworkInterfaceAddress address;
 
+	// TODO: We only get the first address
 	if (interface.GetAddressAt(0, address) != B_OK)
 		return;
 
@@ -150,51 +136,15 @@ Settings::ReadConfiguration()
 
 	fWirelessNetwork.SetTo(NULL);
 
-	BPath path;
-	find_directory(B_COMMON_SETTINGS_DIRECTORY, &path);
-	path.Append("network");
-	path.Append("interfaces");
-
-	void* handle = load_driver_settings(path.Path());
-	if (handle != NULL) {
-		const driver_settings* settings = get_driver_settings(handle);
-		if (settings != NULL) {
-			for (int32 i = 0; i < settings->parameter_count; i++) {
-				driver_parameter& top = settings->parameters[i];
-				if (!strcmp(top.name, "interface")) {
-					// The name of the interface can either be the value of
-					// the "interface" parameter, or a separate "name" parameter
-					const char* name = NULL;
-					if (top.value_count > 0) {
-						name = top.values[0];
-						if (fName != name)
-							continue;
-					}
-
-					// search "network" parameter
-					for (int32 j = 0; j < top.parameter_count; j++) {
-						driver_parameter& sub = top.parameters[j];
-						if (name == NULL && !strcmp(sub.name, "name")
-							&& sub.value_count > 0) {
-							name = sub.values[0];
-							if (fName != sub.values[0])
-								break;
-						}
-
-						if (!strcmp(sub.name, "network")
-							&& sub.value_count > 0) {
-							fWirelessNetwork.SetTo(sub.values[0]);
-							break;
-						}
-					}
-
-					// We found our interface
-					if (fName == name)
-						break;
-				}
-			}
+	BNetworkDevice networkDevice(fName);
+	if (networkDevice.IsWireless()) {
+		uint32 networkIndex = 0;
+		wireless_network wirelessNetwork;
+		// TODO: We only get the first associated network for now
+		if (networkDevice.GetNextAssociatedNetwork(networkIndex,
+				wirelessNetwork) == B_OK) {
+			fWirelessNetwork.SetTo(wirelessNetwork.name);
 		}
-		unload_driver_settings(handle);
 	}
 
 	// read resolv.conf for the dns.

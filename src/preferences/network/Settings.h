@@ -48,8 +48,6 @@ public:
 			void				ReadConfiguration();
 
 private:
-			bool				_PrepareRequest(struct ifreq& request);
-
 			BString				fIP;
 			BString				fGateway;
 			BString				fNetmask;
