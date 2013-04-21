@@ -9,6 +9,7 @@
 
 #include <KernelExport.h>
 
+#include <arch/generic/debug_uart.h>
 #include <boot/kernel_args.h>
 #include <platform/openfirmware/openfirmware.h>
 #include <real_time_clock.h>
@@ -17,6 +18,7 @@
 
 // TODO: declare this in some header
 extern void *gFDT;
+extern "C" DebugUART *debug_uart_from_fdt(const void *fdt);
 
 static PPCPlatform *sPPCPlatform;
 
@@ -256,6 +258,7 @@ private:
 	int	fInput;
 	int	fOutput;
 	int	fRTC;
+	DebugUART *fDebugUART;
 };
 
 }	// namespace BPrivate
@@ -268,7 +271,8 @@ PPCUBoot::PPCUBoot()
 	: PPCPlatform(PPC_PLATFORM_U_BOOT),
 	  fInput(-1),
 	  fOutput(-1),
-	  fRTC(-1)
+	  fRTC(-1),
+	  fDebugUART(NULL)
 {
 }
 
@@ -290,7 +294,10 @@ PPCUBoot::Init(struct kernel_args *kernelArgs)
 status_t
 PPCUBoot::InitSerialDebug(struct kernel_args *kernelArgs)
 {
-	return B_ERROR;
+	fDebugUART = debug_uart_from_fdt(gFDT);
+	if (fDebugUART == NULL)
+		return B_ERROR;
+	return B_OK;
 }
 
 // InitPostVM
@@ -312,6 +319,8 @@ PPCUBoot::InitRTC(struct kernel_args *kernelArgs,
 char
 PPCUBoot::SerialDebugGetChar()
 {
+	if (fDebugUART)
+		return fDebugUART->GetChar(false);
 	return 0;
 }
 
@@ -319,6 +328,8 @@ PPCUBoot::SerialDebugGetChar()
 void
 PPCUBoot::SerialDebugPutChar(char c)
 {
+	if (fDebugUART)
+		fDebugUART->PutChar(c);
 }
 
 // SetHardwareRTC
