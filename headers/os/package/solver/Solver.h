@@ -17,6 +17,7 @@ class BSolverPackage;
 class BSolverPackageSpecifier;
 class BSolverPackageSpecifierList;
 class BSolverProblem;
+class BSolverProblemSolution;
 class BSolverRepository;
 class BSolverResult;
 
@@ -57,6 +58,11 @@ public:
 									{ return CountProblems() > 0; }
 	virtual	int32				CountProblems() const = 0;
 	virtual	BSolverProblem*		ProblemAt(int32 index) const = 0;
+
+	virtual	status_t			SelectProblemSolution(
+									BSolverProblem* problem,
+									const BSolverProblemSolution* solution) = 0;
+	virtual	status_t			SolveAgain() = 0;
 
 	virtual	status_t			GetResult(BSolverResult& _result) = 0;
 

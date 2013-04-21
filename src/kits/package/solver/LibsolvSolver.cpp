@@ -118,7 +118,8 @@ struct LibsolvSolver::Problem : public BSolverProblem {
 		const BPackageResolvableExpression& dependency)
 		:
 		BSolverProblem(type, sourcePackage, targetPackage, dependency),
-		fId(id)
+		fId(id),
+		fSelectedSolution(NULL)
 	{
 	}
 
@@ -127,13 +128,24 @@ struct LibsolvSolver::Problem : public BSolverProblem {
 		return fId;
 	}
 
+	const Solution* SelectedSolution() const
+	{
+		return fSelectedSolution;
+	}
+
+	void SetSelectedSolution(const Solution* solution)
+	{
+		fSelectedSolution = solution;
+	}
+
 private:
-	::Id	fId;
+	::Id			fId;
+	const Solution*	fSelectedSolution;
 };
 
 
 struct LibsolvSolver::Solution : public BSolverProblemSolution {
-	Solution(::Id id, Problem* problem)
+	Solution(::Id id, LibsolvSolver::Problem* problem)
 		:
 		BSolverProblemSolution(),
 		fId(id),
@@ -146,9 +158,14 @@ struct LibsolvSolver::Solution : public BSolverProblemSolution {
 		return fId;
 	}
 
+	LibsolvSolver::Problem* Problem() const
+	{
+		return fProblem;
+	}
+
 private:
-	::Id		fId;
-	Problem*	fProblem;
+	::Id					fId;
+	LibsolvSolver::Problem*	fProblem;
 };
 
 
@@ -159,6 +176,7 @@ LibsolvSolver::LibsolvSolver()
 	:
 	fPool(NULL),
 	fSolver(NULL),
+	fJobs(NULL),
 	fRepositoryInfos(10, true),
 	fInstalledRepository(NULL),
 	fSolvablePackages(),
@@ -299,7 +317,9 @@ LibsolvSolver::Install(const BSolverPackageSpecifierList& packages,
 		return error;
 
 	// add the packages to install to the job queue
-	SolvQueue jobs;
+	error = _InitJobQueue();
+	if (error != B_OK)
+		return error;
 
 	int32 packageCount = packages.CountSpecifiers();
 	for (int32 i = 0; i < packageCount; i++) {
@@ -317,7 +337,7 @@ LibsolvSolver::Install(const BSolverPackageSpecifierList& packages,
 					return B_BAD_VALUE;
 				}
 
-				queue_push2(&jobs, SOLVER_SOLVABLE,
+				queue_push2(fJobs, SOLVER_SOLVABLE,
 					solvable - fPool->solvables);
 				break;
 			}
@@ -359,15 +379,15 @@ LibsolvSolver::Install(const BSolverPackageSpecifierList& packages,
 #endif
 
 				for (int j = 0; j < matchingPackages.count; j++)
-					queue_push(&jobs, matchingPackages.elements[j]);
+					queue_push(fJobs, matchingPackages.elements[j]);
 			}
 		}
 	}
 
 	// set jobs' solver mode and solve
-	_SetJobsSolverMode(jobs, SOLVER_INSTALL);
+	_SetJobsSolverMode(*fJobs, SOLVER_INSTALL);
 
-	return _Solve(jobs);
+	return _Solve(false);
 }
 
 
@@ -383,13 +403,56 @@ LibsolvSolver::VerifyInstallation()
 		return error;
 
 	// add the verify job to the job queue
-	SolvQueue jobs;
-	queue_push2(&jobs, SOLVER_SOLVABLE_ALL, 0);
+	error = _InitJobQueue();
+	if (error != B_OK)
+		return error;
+
+	queue_push2(fJobs, SOLVER_SOLVABLE_ALL, 0);
 
 	// set jobs' solver mode and solve
-	_SetJobsSolverMode(jobs, SOLVER_VERIFY);
+	_SetJobsSolverMode(*fJobs, SOLVER_VERIFY);
 
-	return _Solve(jobs);
+	return _Solve(false);
+}
+
+
+status_t
+LibsolvSolver::SelectProblemSolution(BSolverProblem* _problem,
+	const BSolverProblemSolution* _solution)
+{
+	if (_problem == NULL)
+		return B_BAD_VALUE;
+
+	Problem* problem = static_cast<Problem*>(_problem);
+	if (_solution == NULL) {
+		problem->SetSelectedSolution(NULL);
+		return B_OK;
+	}
+
+	const Solution* solution = static_cast<const Solution*>(_solution);
+	if (solution->Problem() != problem)
+		return B_BAD_VALUE;
+
+	problem->SetSelectedSolution(solution);
+	return B_OK;
+}
+
+
+status_t
+LibsolvSolver::SolveAgain()
+{
+	if (fSolver == NULL || fJobs == NULL)
+		return B_BAD_VALUE;
+
+	// iterate through all problems and propagate the selected solutions
+	int32 problemCount = fProblems.CountItems();
+	for (int32 i = 0; i < problemCount; i++) {
+		Problem* problem = fProblems.ItemAt(i);
+		if (const Solution* solution = problem->SelectedSolution())
+			solver_take_solution(fSolver, problem->Id(), solution->Id(), fJobs);
+	}
+
+	return _Solve(true);
 }
 
 
@@ -518,6 +581,16 @@ LibsolvSolver::_InitPool()
 }
 
 
+status_t
+LibsolvSolver::_InitJobQueue()
+{
+	_CleanupJobQueue();
+
+	fJobs = new(std::nothrow) SolvQueue;
+	return fJobs != NULL ? B_OK : B_NO_MEMORY;;
+}
+
+
 void
 LibsolvSolver::_Cleanup()
 {
@@ -532,8 +605,8 @@ LibsolvSolver::_Cleanup()
 void
 LibsolvSolver::_CleanupPool()
 {
-	// clean up solver data
-	_CleanupSolver();
+	// clean up jobs and solver data
+	_CleanupJobQueue();
 
 	// clean up our data structures that depend on/refer to libsolv pool data
 	fSolvablePackages.clear();
@@ -548,6 +621,16 @@ LibsolvSolver::_CleanupPool()
 		pool_free(fPool);
 		fPool = NULL;
 	}
+}
+
+
+void
+LibsolvSolver::_CleanupJobQueue()
+{
+	_CleanupSolver();
+
+	delete fJobs;
+	fJobs = NULL;
 }
 
 
@@ -1055,16 +1138,24 @@ LibsolvSolver::_GetResolvableExpression(Id id,
 
 
 status_t
-LibsolvSolver::_Solve(Queue& jobs)
+LibsolvSolver::_Solve(bool solveAgain)
 {
-	_CleanupSolver();
+	if (fJobs == NULL)
+		return B_BAD_VALUE;
 
-	// create the solver and solve
-	fSolver = solver_create(fPool);
-	solver_set_flag(fSolver, SOLVER_FLAG_SPLITPROVIDES, 1);
-	solver_set_flag(fSolver, SOLVER_FLAG_BEST_OBEY_POLICY, 1);
+	if (solveAgain) {
+		if (fSolver == NULL)
+			return B_BAD_VALUE;
+	} else {
+		_CleanupSolver();
 
-	int problemCount = solver_solve(fSolver, &jobs);
+		// create the solver and solve
+		fSolver = solver_create(fPool);
+		solver_set_flag(fSolver, SOLVER_FLAG_SPLITPROVIDES, 1);
+		solver_set_flag(fSolver, SOLVER_FLAG_BEST_OBEY_POLICY, 1);
+	}
+
+	int problemCount = solver_solve(fSolver, fJobs);
 
 	// get the problems (if any)
 	fProblems.MakeEmpty();

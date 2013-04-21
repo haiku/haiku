@@ -48,6 +48,11 @@ public:
 	virtual	int32				CountProblems() const;
 	virtual	BSolverProblem*		ProblemAt(int32 index) const;
 
+	virtual	status_t			SelectProblemSolution(
+									BSolverProblem* problem,
+									const BSolverProblemSolution* solution);
+	virtual	status_t			SolveAgain();
+
 	virtual	status_t			GetResult(BSolverResult& _result);
 
 private:
@@ -64,8 +69,10 @@ private:
 
 private:
 			status_t			_InitPool();
+			status_t			_InitJobQueue();
 			void				_Cleanup();
 			void				_CleanupPool();
+			void				_CleanupJobQueue();
 			void				_CleanupSolver();
 
 			bool				_HaveRepositoriesChanged() const;
@@ -89,12 +96,13 @@ private:
 									BPackageResolvableExpression& _expression)
 									const;
 
-			status_t			_Solve(Queue& jobs);
+			status_t			_Solve(bool solveAgain);
 			void				_SetJobsSolverMode(Queue& jobs, int solverMode);
 
 private:
 			Pool*				fPool;
 			Solver*				fSolver;
+			SolvQueue*			fJobs;
 			RepositoryInfoList	fRepositoryInfos;
 			RepositoryInfo*		fInstalledRepository;
 			SolvableMap			fSolvablePackages;
