@@ -17,6 +17,7 @@
 #include <boot/stage2.h>
 #include <arch/cpu.h>
 #include <arch/ppc/arch_cpu.h>
+#include <arch/ppc/arch_platform.h>
 #include <arch_kernel.h>
 #include <arch_system_info.h>
 #include <platform/openfirmware/devices.h>
@@ -264,6 +265,9 @@ arch_spin(bigtime_t microseconds)
 extern "C" status_t
 boot_arch_cpu_init(void)
 {
+	// This is U-Boot
+	gKernelArgs.arch_args.platform = PPC_PLATFORM_U_BOOT;
+
 	// first check some features
 	// including some necessary for dprintf()...
 	status_t err = check_cpu_features();
