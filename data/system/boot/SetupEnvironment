@@ -30,14 +30,6 @@ export BELIBRARIES
 export BEINCLUDES
 export BE_HOST_CPU
 
-# for the "cc" and "ld" shell scripts
-
-export BE_C_COMPILER=gcc
-export BE_CPLUS_COMPILER="g++"
-export BE_LINKER=ld
-export BE_DEFAULT_C_FLAGS=""
-export BE_DEFAULT_CPLUS_FLAGS=""
-
 if [ "$SAFEMODE" != "yes" ]
 then
 	export PATH=.:$HOME/config/non-packaged/bin:$HOME/config/bin:/boot/common/non-packaged/bin:/boot/common/bin:/bin:/boot/apps:/boot/preferences:/boot/system/apps:/boot/system/preferences

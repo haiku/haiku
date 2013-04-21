@@ -401,8 +401,8 @@ AddFilesToPackage $(developDirTokens) lib : libposix_error_mapper.a ;
 
 # ABI independent stuff
 
-# scripts: cc and c++ wrapper, freetype-config, setgcc
-local scripts = cc c++ freetype-config setgcc ;
+# scripts: freetype-config, setgcc
+local scripts = freetype-config setgcc ;
 SEARCH on $(scripts) = [ FDirName $(HAIKU_TOP) data bin ] ;
 AddFilesToPackage bin : $(scripts) ;
 
