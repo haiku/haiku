@@ -467,16 +467,16 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 			: : true ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			$(hpkgBaseURL)/autoconf-2.68-4-x86_gcc2.hpkg
+			$(hpkgBaseURL)/autoconf-2.69-3-x86_gcc2.hpkg
 			: common packages ;
 		InstallOptionalHaikuImagePackage
-			$(hpkgBaseURL)/automake-1.11.1-4-x86_gcc2.hpkg
+			$(hpkgBaseURL)/automake-1.13.1-3-x86_gcc2.hpkg
 			: common packages ;
 		InstallOptionalHaikuImagePackage
 			$(hpkgBaseURL)/libtool-2.4-4-x86_gcc2.hpkg
 			: common packages ;
 		InstallOptionalHaikuImagePackage
-			$(hpkgBaseURL)/texinfo-4.13a-2-x86_gcc2.hpkg
+			$(hpkgBaseURL)/texinfo-4.13a-4-x86_gcc2.hpkg
 			: common packages ;
 	}
 }
@@ -488,10 +488,10 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 	# gcc and binutils
 	if $(HAIKU_GCC_VERSION[1]) = 2 {
 		InstallOptionalHaikuImagePackage
-			$(hpkgBaseURL)/binutils-2.17_110711-2-x86_gcc2.hpkg
+			$(hpkgBaseURL)/binutils-2.17_130421-1-x86_gcc2.hpkg
 			: common packages ;
 		InstallOptionalHaikuImagePackage
-			$(hpkgBaseURL)/gcc-2.95.3_110711-5-x86_gcc2.hpkg
+			$(hpkgBaseURL)/gcc-2.95.3_130421-1-x86_gcc2.hpkg
 			: common packages ;
 
 		# TODO: remove this when we have a mechanism to switch gcc via PATH
@@ -521,13 +521,13 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 			$(baseURL)/make-3.82-r1a3-x86-gcc4-2011-05-23.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			$(hpkgBaseURL)/bison-2.4.3-2-x86_gcc2.hpkg
+			$(hpkgBaseURL)/bison-2.4.3-4-x86_gcc2.hpkg
 			: common packages ;
 		InstallOptionalHaikuImagePackage
 			$(hpkgBaseURL)/m4-1.4.16-4-x86_gcc2.hpkg
 			: common packages ;
 		InstallOptionalHaikuImagePackage
-			$(hpkgBaseURL)/flex-2.5.35-2-x86_gcc2.hpkg
+			$(hpkgBaseURL)/flex-2.5.35-4-x86_gcc2.hpkg
 			: common packages ;
 		InstallOptionalHaikuImagePackage
 			$(hpkgBaseURL)/jam-2.5-1-x86_gcc2.hpkg
