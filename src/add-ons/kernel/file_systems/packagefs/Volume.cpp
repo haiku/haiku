@@ -162,7 +162,7 @@ struct Volume::PackagesDirectory {
 			RETURN_ERROR(normalizedPath.InitCheck());
 
 		char* normalizedPathBuffer = normalizedPath.LockBuffer();
-		error = vfs_entry_ref_to_path(fDeviceID, fNodeID, NULL,
+		error = vfs_entry_ref_to_path(fDeviceID, fNodeID, NULL, true,
 			normalizedPathBuffer, normalizedPath.BufferSize());
 		if (error != B_OK)
 			RETURN_ERROR(error);

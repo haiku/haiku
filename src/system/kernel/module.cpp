@@ -1412,7 +1412,7 @@ ModuleNotificationService::_AddModuleNode(dev_t device, ino_t node, int fd,
 	KPath path;
 	status = path.InitCheck();
 	if (status == B_OK) {
-		status = vfs_entry_ref_to_path(device, directory, name,
+		status = vfs_entry_ref_to_path(device, directory, name, true,
 			path.LockBuffer(), path.BufferSize());
 	}
 	if (status != B_OK)
@@ -1583,7 +1583,7 @@ ModuleNotificationService::_Notify(int32 opcode, dev_t device, ino_t directory,
 	if (name != NULL) {
 		// we have an entry ref
 		if (pathBuffer.InitCheck() != B_OK
-			|| vfs_entry_ref_to_path(device, directory, name,
+			|| vfs_entry_ref_to_path(device, directory, name, true,
 				pathBuffer.LockBuffer(), pathBuffer.BufferSize()) != B_OK)
 			return;
 
