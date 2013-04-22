@@ -1608,7 +1608,7 @@ if [ IsOptionalHaikuImagePackageAdded Yasm ] {
 			$(baseURL)/yasm-1.1.0-r1a3-x86-gcc4-2011-05-24.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			$(hpkgBaseURL)/yasm-1.1.0-1-x86_gcc2.hpkg
+			$(hpkgBaseURL)/yasm-1.2.0-2-x86_gcc2.hpkg
 			: common packages ;
 	}
 }
