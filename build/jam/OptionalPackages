@@ -1562,7 +1562,8 @@ if [ IsOptionalHaikuImagePackageAdded wpa_supplicant ] {
 			$(baseURL)/wpa_supplicant-0.7.3-x86-gcc4-2011-10-05.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			$(baseURL)/wpa_supplicant-0.7.3-x86-gcc2-2011-10-05.zip ;
+			$(hpkgBaseURL)/wpa_supplicant-0.7.3-2-x86_gcc2.hpkg
+			: system packages ;
 	}
 }
 
