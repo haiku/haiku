@@ -1543,12 +1543,11 @@ if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		Echo "No optional package WonderBrush available for gcc4" ;
 	} else {
-# TODO: Package as HPKG!
-#		InstallOptionalHaikuImagePackage
-#			$(baseURL)/WonderBrush-2.1.2-x86-gcc2-2008-11-08.zip
-#			: common apps ;
-#		AddSymlinkToHaikuImage home config settings deskbar Applications
-#			: /boot/apps/WonderBrush/WonderBrush ;
+		InstallOptionalHaikuImagePackage
+			$(hpkgBaseURL)/wonderbrush-2.1.2-1-x86_gcc2.hpkg
+			: common packages ;
+		AddSymlinkToHaikuImage home config settings deskbar Applications
+			: /boot/common/apps/WonderBrush/WonderBrush ;
 	}
 }
 
