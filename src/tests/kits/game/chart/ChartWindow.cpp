@@ -1125,7 +1125,8 @@ ChartWindow::GetAppWindow(const char *name)
 		if (window == NULL)
 			break;
 		if (window->LockWithTimeout(200000) == B_OK) {
-			if (strcmp(window->Name(), name) == 0) {
+			// skip the w> prefix in window's name.
+			if (strcmp(window->Name() + 2, name) == 0) {
 				window->Unlock();
 				break;
 			}
