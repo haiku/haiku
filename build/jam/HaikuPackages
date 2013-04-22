@@ -412,6 +412,15 @@ AddHeaderDirectoryToPackage glibc ;
 AddHeaderDirectoryToPackage os ;
 AddHeaderDirectoryToPackage posix ;
 
+# private headers
+AddHeaderDirectoryToPackage private ;
+CopyDirectoryToPackage develop headers private libs compat
+	: [ FDirName $(HAIKU_TOP) src libs compat freebsd_network ]
+	: : -x *.c -x *.cpp -x *.awk -x Jamfile -x miidevs ;
+CopyDirectoryToPackage develop headers private libs compat
+	: [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ]
+	: : -x *.c -x Jamfile ;
+
 # create be -> os symlink for now
 AddSymlinkToPackage $(developDirTokens) headers : os : be ;
 
