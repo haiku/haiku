@@ -373,8 +373,10 @@ X86PagingMethod64Bit::PutPageTableEntryInTable(uint64* entry,
 		page |= X86_64_PTE_USER;
 		if ((attributes & B_WRITE_AREA) != 0)
 			page |= X86_64_PTE_WRITABLE;
-		if ((attributes & B_EXECUTE_AREA) == 0)
+		if ((attributes & B_EXECUTE_AREA) == 0
+			&& x86_check_feature(IA32_FEATURE_AMD_EXT_NX, FEATURE_EXT_AMD)) {
 			page |= X86_64_PTE_NOT_EXECUTABLE;
+		}
 	} else if ((attributes & B_KERNEL_WRITE_AREA) != 0)
 		page |= X86_64_PTE_WRITABLE;
 
