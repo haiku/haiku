@@ -1449,7 +1449,7 @@ if [ IsOptionalHaikuImagePackageAdded Vision ] {
 				$(baseURL)/vision-908-r1a3-x86-gcc4-2011-06-07.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/vision-908-1-x86_gcc2.hpkg
+				$(hpkgBaseURL)/vision-908-2-x86_gcc2.hpkg
 				: common packages ;
 		}
 		AddSymlinkToHaikuImage home config settings deskbar Applications
