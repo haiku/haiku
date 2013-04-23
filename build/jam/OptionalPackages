@@ -1111,7 +1111,7 @@ if [ IsOptionalHaikuImagePackageAdded P7zip ] {
 				$(baseURL)/p7zip-9.13-r1a3-x86-gcc4-2011-05-24.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/p7zip-9.13-1-x86_gcc2.hpkg
+				$(hpkgBaseURL)/p7zip-9.20.1-2-x86_gcc2.hpkg
 				: common packages ;
 		}
 		AddExpanderRuleToHaikuImage "application/x-7z-compressed" : .7z
