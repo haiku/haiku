@@ -38,7 +38,14 @@ CliThreadsCommand::Execute(int argc, const char* const* argv,
 		 	Thread* thread = it.Next();) {
 		const char* stateString = UiUtils::ThreadStateToString(
 			thread->State(), thread->StoppedReason());
-		printf("%10" B_PRId32 "  %-9s  \"%s\"\n", thread->ID(), stateString,
+		printf("%10" B_PRId32 "  %-9s  \"%s\"", thread->ID(), stateString,
 			thread->Name());
+
+		const BString& stoppedReason = thread->StoppedReasonInfo();
+		if (thread->State() == THREAD_STATE_STOPPED
+			&& !stoppedReason.IsEmpty()) {
+			printf(" (Reason: \"%s\")", stoppedReason.String());
+		}
+		printf("\n");
 	}
 }
