@@ -692,3 +692,9 @@ rule SubInclude
 	# restore SUBDIR_TOKENS
 	SUBDIR_TOKENS = $(oldSubDirTokens) ;
 }
+
+
+actions File
+{
+	$(CP) "$(>)" "$(<)"
+}
