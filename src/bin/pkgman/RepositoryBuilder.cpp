@@ -86,7 +86,7 @@ RepositoryBuilder::AddPackage(const char* path, BSolverPackage** _package)
 		// a package info file (supposedly)
 		PackageInfoErrorListener errorListener(
 			"Error: failed to read package info");
-		error = packageInfo.ReadFromConfigFile(BEntry(path),
+		error = packageInfo.ReadFromConfigFile(BEntry(path, true),
 			&errorListener);
 	}
 
@@ -144,7 +144,7 @@ RepositoryBuilder::AddPackagesDirectory(const char* path)
 			DIE(errno, "failed to construct path");
 
 		struct stat st;
-		if (lstat(entryPath.Path(), &st) != 0)
+		if (stat(entryPath.Path(), &st) != 0)
 			DIE(errno, "failed to stat() %s", entryPath.Path());
 
 		if (!S_ISREG(st.st_mode))
