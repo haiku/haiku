@@ -73,7 +73,6 @@
 #	TagLib					- id3 tag library
 #	Tar						- archiving utility
 #	TimGMSoundFont			- a good quality General MIDI Sound Font
-#	TrackerNewTemplates		- template files for Tracker's New menu
 #	Transmission			- a fast, easy, and free BitTorrent Client
 #	UserlandFS				- aids native file system development (like FUSE)
 #	Vim						- Vi IMproved. Highly configurable text editor
@@ -1335,15 +1334,6 @@ if [ IsOptionalHaikuImagePackageAdded TimGMSoundFont ] {
 	InstallOptionalHaikuImagePackage
 		$(hpkgBaseURL)/TimGMSoundFont-2010-06-16.hpkg
 		: system packages ;
-}
-
-
-# TrackerNewTemplates
-if [ IsOptionalHaikuImagePackageAdded TrackerNewTemplates ] {
-	InstallOptionalHaikuImagePackage
-		$(baseURL)/TrackerNewTemplates-2010-04-26.zip
-		: home config settings Tracker "Tracker New Templates"
-	;
 }
 
 

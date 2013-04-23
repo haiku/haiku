@@ -265,6 +265,15 @@ AddDirectoryToHaikuImage home config boot launch ;
 AddFilesToHaikuImage home config settings Mail ProviderInfo :
 	$(HAIKU_PROVIDER_INFOS) ;
 
+# Add Tracker New Templates
+AddFilesToHaikuImage home config settings Tracker "Tracker New Templates"
+	:
+	"<tracker-new-templates>C++ header"
+	"<tracker-new-templates>C++ source"
+	"<tracker-new-templates>makefile"
+	"<tracker-new-templates>text file"
+;
+
 local etcDir = [ FDirName $(HAIKU_TOP) data etc ] ;
 local etcFiles = inputrc profile ;
 etcFiles = $(etcFiles:G=etc) ;

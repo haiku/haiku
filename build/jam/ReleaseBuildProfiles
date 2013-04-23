@@ -19,8 +19,7 @@ switch $(HAIKU_BUILD_PROFILE) {
 		HAIKU_IMAGE_SIZE = 750 ;
 		HAIKU_STRIP_DEBUG_FROM_OPTIONAL_PACKAGES = 1 ;
 
-		AddOptionalHaikuImagePackages TimGMSoundFont TrackerNewTemplates
-			WQY-MicroHei ;
+		AddOptionalHaikuImagePackages TimGMSoundFont WQY-MicroHei ;
 		AddOptionalHaikuImagePackages BePDF Pe Vision
 			WebPositive WonderBrush ;
 		AddOptionalHaikuImagePackages CVS Development Git Mercurial
