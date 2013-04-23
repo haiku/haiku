@@ -714,8 +714,8 @@ if [ IsOptionalHaikuImagePackageAdded Groff ] {
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(baseURL)/groff-1.20.1-r1a3-x86-gcc2-2011-05-18.zip
-				: : true ;
+				$(hpkgBaseURL)/groff-1.20.1-1-x86_gcc2.hpkg
+				: common packages ;
 		}
 	}
 }
