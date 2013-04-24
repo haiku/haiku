@@ -249,9 +249,8 @@ main(int argc, char *argv[])
 		if (result == B_OK) {
 			printf("%s\n", buffer);
 		} else {
-			/* else what? */
-			/* this can not happen! */
-			fprintf(stderr, "Serious internal error; contact support\n");
+			fprintf(stderr, "Failed to get directory: %s\n", strerror(result));
+			return 1;
 		}
 	}
 
