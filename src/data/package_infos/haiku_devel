@@ -15,7 +15,6 @@ licenses		"MIT"
 
 provides {
 	haiku_devel = R1~alpha3_pm-1
-	lib:libncurses = 5.5 compat >= 5
 }
 
 requires {

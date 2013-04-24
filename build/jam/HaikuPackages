@@ -393,7 +393,6 @@ for lib in $(SYSTEM_LIBS) $(SYSTEM_LIBS_LIBGL_ALIASES) $(developmentLibs) {
 }
 
 # static libraries
-AddFilesToPackage $(developDirTokens) lib : libncurses.a ;
 AddFilesToPackage $(developDirTokens) lib : liblocalestub.a ;
 
 # the POSIX error code mapper library
@@ -431,7 +430,6 @@ AddHeaderDirectoryToPackage compatibility gnu : gnu ;
 # third party libs headers
 AddHeaderDirectoryToPackage libs freetype2 : 3rdparty ;
 AddHeaderDirectoryToPackage libs jpeg : 3rdparty ;
-AddHeaderDirectoryToPackage libs ncurses : 3rdparty ;
 AddHeaderDirectoryToPackage libs png : 3rdparty ;
 AddHeaderDirectoryToPackage libs termcap : 3rdparty ;
 AddHeaderDirectoryToPackage libs tiff : 3rdparty ;
