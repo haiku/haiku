@@ -259,7 +259,7 @@ DebugReportGenerator::_DumpLoadedImages(BString& _output)
 
 	Image* image = NULL;
 	data.SetToFormat("\tID\t\tText Base\tText End\tData Base\tData"
-		" End\tType\t\tName\n\t");
+		" End\tType\tName\n\t");
 	_output << data;
 	_output.Append('-', 80);
 	_output.Append("\n");
@@ -272,7 +272,7 @@ DebugReportGenerator::_DumpLoadedImages(BString& _output)
 
 			data.SetToFormat("\t%" B_PRId32 "\t0x%08" B_PRIx64 "\t"
 				"0x%08" B_PRIx64 "\t0x%08" B_PRIx64 "\t0x%08" B_PRIx64 "\t"
-				"%-7s\t\t%s\n", info.ImageID(), textBase, textBase + info.TextSize(),
+				"%-7s\t%s\n", info.ImageID(), textBase, textBase + info.TextSize(),
 				dataBase, dataBase + info.DataSize(),
 				UiUtils::ImageTypeToString(info.Type(), buffer,
 					sizeof(buffer)), info.Name().String());
@@ -299,7 +299,7 @@ DebugReportGenerator::_DumpAreas(BString& _output)
 
 	_output << "\nAreas:\n";
 	BString data;
-	data.SetToFormat("\tID\t\tBase\t\tEnd\t\t\tSize (KiB)\tProtection\tLocking\t\t\t\tName\n\t");
+	data.SetToFormat("\tID\t\tBase\t\tEnd\t\t\tSize (KiB)\tProtection\tLocking\t\t\tName\n\t");
 	_output << data;
 	_output.Append('-', 80);
 	_output.Append("\n");
@@ -309,7 +309,7 @@ DebugReportGenerator::_DumpAreas(BString& _output)
 	for (int32 i = 0; (info = areas.ItemAt(i)) != NULL; i++) {
 		try {
 			data.SetToFormat("\t%" B_PRId32 "\t0x%08" B_PRIx64 "\t"
-				"0x%08" B_PRIx64 "\t%10" B_PRId64 "\t%-11s\t%-17s\t%s\n",
+				"0x%08" B_PRIx64 "\t%10" B_PRId64 "\t%-11s\t%-14s\t%s\n",
 				info->AreaID(), info->BaseAddress(), info->BaseAddress()
 					+ info->Size(), info->Size() / 1024,
 				UiUtils::AreaProtectionFlagsToString(info->Protection(),
@@ -342,15 +342,15 @@ DebugReportGenerator::_DumpSemaphores(BString& _output)
 
 	_output << "\nSemaphores:\n";
 	BString data;
-	data.SetToFormat("\tID\t\tCount\tLast Holder\t\tName\n\t");
+	data.SetToFormat("\tID\t\tCount\tLast Holder\tName\n\t");
 	_output << data;
-	_output.Append('-', 80);
+	_output.Append('-', 60);
 	_output.Append("\n");
 	SemaphoreInfo* info;
 	for (int32 i = 0; (info = semaphores.ItemAt(i)) != NULL; i++) {
 		try {
 			data.SetToFormat("\t%" B_PRId32 "\t%5" B_PRId32 "\t%11" B_PRId32
-				"\t\t%s\n", info->SemID(), info->Count(),
+				"\t%s\n", info->SemID(), info->Count(),
 				info->LatestHolder(), info->Name().String());
 
 			_output << data;

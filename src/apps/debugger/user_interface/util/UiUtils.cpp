@@ -173,7 +173,7 @@ UiUtils::AreaLockingFlagsToString(uint32 flags, char* buffer,
 			snprintf(buffer, bufferSize, "32-bit full");
 			break;
 		case B_32_BIT_CONTIGUOUS:
-			snprintf(buffer, bufferSize, "32-bit contiguous");
+			snprintf(buffer, bufferSize, "32-bit contig.");
 			break;
 		default:
 			snprintf(buffer, bufferSize, "unknown");
