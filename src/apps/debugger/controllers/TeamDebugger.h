@@ -116,6 +116,8 @@ private:
 
 			void				_HandleDebuggerMessage(DebugEvent* event);
 
+			bool				_HandleTeamDeleted(
+									TeamDeletedEvent* event);
 			bool				_HandleThreadCreated(
 									ThreadCreatedEvent* event);
 			bool				_HandleThreadRenamed(

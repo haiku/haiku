@@ -1145,10 +1145,14 @@ TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 //printf("B_DEBUGGER_MESSAGE_TEAM_CREATED: team: %ld\n", message.team_created.new_team);
 //			break;
 		case B_DEBUGGER_MESSAGE_TEAM_DELETED:
-			// TODO: Handle!
+		{
 			TRACE_EVENTS("B_DEBUGGER_MESSAGE_TEAM_DELETED: team: %" B_PRId32
 				"\n", event->Team());
+			TeamDeletedEvent* teamEvent
+				= dynamic_cast<TeamDeletedEvent*>(event);
+			handled = _HandleTeamDeleted(teamEvent);
 			break;
+		}
 		case B_DEBUGGER_MESSAGE_TEAM_EXEC:
 			TRACE_EVENTS("B_DEBUGGER_MESSAGE_TEAM_EXEC: team: %" B_PRId32 "\n",
 				event->Team());
@@ -1223,6 +1227,20 @@ TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 
 	if (!handled && event->ThreadStopped())
 		fDebuggerInterface->ContinueThread(event->Thread());
+}
+
+
+bool
+TeamDebugger::_HandleTeamDeleted(TeamDeletedEvent* event)
+{
+	char message[64];
+	snprintf(message, sizeof(message), "Team %" B_PRId32 " has terminated.",
+		event->Team());
+	fUserInterface->SynchronouslyAskUser("Quit Debugger", message, "Quit",
+		NULL, NULL);
+	PostMessage(B_QUIT_REQUESTED);
+
+	return true;
 }
 
 
