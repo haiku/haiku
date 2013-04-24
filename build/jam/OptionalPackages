@@ -926,7 +926,8 @@ if [ IsOptionalHaikuImagePackageAdded Man ] {
 			$(baseURL)/man-1.6f-r1a3-x86-gcc4-2011-05-24.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			$(baseURL)/man-1.6f-r1a3-x86-gcc2-2011-05-18.zip ;
+			$(hpkgBaseURL)/man-1.6g-1-x86_gcc2.hpkg
+			: common packages ;
 	}
 }
 
