@@ -129,19 +129,19 @@ UiUtils::ImageTypeToString(image_type type, char* buffer, size_t bufferSize)
 {
 	switch (type) {
 		case B_APP_IMAGE:
-			snprintf(buffer, bufferSize, "Application");
+			snprintf(buffer, bufferSize, "app");
 			break;
 		case B_LIBRARY_IMAGE:
-			snprintf(buffer, bufferSize, "Library");
+			snprintf(buffer, bufferSize, "lib");
 			break;
 		case B_ADD_ON_IMAGE:
-			snprintf(buffer, bufferSize, "Add-on");
+			snprintf(buffer, bufferSize, "add-on");
 			break;
 		case B_SYSTEM_IMAGE:
-			snprintf(buffer, bufferSize, "System");
+			snprintf(buffer, bufferSize, "system");
 			break;
 		default:
-			snprintf(buffer, bufferSize, "Unknown");
+			snprintf(buffer, bufferSize, "unknown");
 			break;
 	}
 
@@ -155,28 +155,28 @@ UiUtils::AreaLockingFlagsToString(uint32 flags, char* buffer,
 {
 	switch (flags) {
 		case B_NO_LOCK:
-			snprintf(buffer, bufferSize, "None");
+			snprintf(buffer, bufferSize, "none");
 			break;
 		case B_LAZY_LOCK:
-			snprintf(buffer, bufferSize, "Lazy");
+			snprintf(buffer, bufferSize, "lazy");
 			break;
 		case B_FULL_LOCK:
-			snprintf(buffer, bufferSize, "Full");
+			snprintf(buffer, bufferSize, "full");
 			break;
 		case B_CONTIGUOUS:
-			snprintf(buffer, bufferSize, "Contiguous");
+			snprintf(buffer, bufferSize, "contiguous");
 			break;
 		case B_LOMEM:
-			snprintf(buffer, bufferSize, "Lo-mem");
+			snprintf(buffer, bufferSize, "lo-mem");
 			break;
 		case B_32_BIT_FULL_LOCK:
-			snprintf(buffer, bufferSize, "32-bit Full");
+			snprintf(buffer, bufferSize, "32-bit full");
 			break;
 		case B_32_BIT_CONTIGUOUS:
-			snprintf(buffer, bufferSize, "32-bit Contiguous");
+			snprintf(buffer, bufferSize, "32-bit contiguous");
 			break;
 		default:
-			snprintf(buffer, bufferSize, "Unknown");
+			snprintf(buffer, bufferSize, "unknown");
 			break;
 	}
 
@@ -188,56 +188,54 @@ UiUtils::AreaLockingFlagsToString(uint32 flags, char* buffer,
 UiUtils::AreaProtectionFlagsToString(uint32 protection, BString& _output)
 {
 	#undef ADD_AREA_FLAG_IF_PRESENT
-	#define ADD_AREA_FLAG_IF_PRESENT(flag, protection, name, output) \
+	#define ADD_AREA_FLAG_IF_PRESENT(flag, protection, name, output, missing)\
 		if ((protection & flag) != 0) { \
 			_output += name; \
 			protection &= ~flag; \
-		}
+		} else \
+			_output += missing; \
 
 	_output.Truncate(0);
 	uint32 userFlags = protection & B_USER_PROTECTION;
-	if ((protection & B_USER_PROTECTION) != 0) {
-		ADD_AREA_FLAG_IF_PRESENT(B_READ_AREA, protection, "r", _output);
-		ADD_AREA_FLAG_IF_PRESENT(B_WRITE_AREA, protection, "w", _output);
-		ADD_AREA_FLAG_IF_PRESENT(B_EXECUTE_AREA, protection, "x", _output);
-		ADD_AREA_FLAG_IF_PRESENT(B_STACK_AREA, protection, "s", _output);
-		ADD_AREA_FLAG_IF_PRESENT(B_OVERCOMMITTING_AREA, protection, " overcommitting",
-			_output);
-		_output += ", ";
+	bool userProtectionPresent = userFlags != 0;
+	ADD_AREA_FLAG_IF_PRESENT(B_READ_AREA, protection, "r", _output,
+		userProtectionPresent ? "-" : " ");
+	ADD_AREA_FLAG_IF_PRESENT(B_WRITE_AREA, protection, "w", _output,
+		userProtectionPresent ? "-" : " ");
+	ADD_AREA_FLAG_IF_PRESENT(B_EXECUTE_AREA, protection, "x", _output,
+		userProtectionPresent ? "-" : " ");
 
-		// if the user versions of these flags are present,
-		// filter out their kernel equivalents since they're implied.
-		if ((userFlags & B_READ_AREA) != 0)
-			protection &= ~B_KERNEL_READ_AREA;
-		if ((userFlags & B_WRITE_AREA) != 0)
-			protection &= ~B_KERNEL_WRITE_AREA;
-		if ((userFlags & B_EXECUTE_AREA) != 0)
-			protection &= ~B_KERNEL_EXECUTE_AREA;
-		if ((userFlags & B_STACK_AREA) != 0)
-			protection &= ~B_KERNEL_STACK_AREA;
-	}
-	if ((protection & B_KERNEL_AREA_FLAGS) != 0) {
-		_output += "kernel:";
-		ADD_AREA_FLAG_IF_PRESENT(B_KERNEL_READ_AREA, protection, "r", _output);
+	// if the user versions of these flags are present,
+	// filter out their kernel equivalents since they're implied.
+	if ((userFlags & B_READ_AREA) != 0)
+		protection &= ~B_KERNEL_READ_AREA;
+	if ((userFlags & B_WRITE_AREA) != 0)
+		protection &= ~B_KERNEL_WRITE_AREA;
+	if ((userFlags & B_EXECUTE_AREA) != 0)
+		protection &= ~B_KERNEL_EXECUTE_AREA;
+
+	if ((protection & B_KERNEL_PROTECTION) != 0) {
+		ADD_AREA_FLAG_IF_PRESENT(B_KERNEL_READ_AREA, protection, "r",
+			_output, "-");
 		ADD_AREA_FLAG_IF_PRESENT(B_KERNEL_WRITE_AREA, protection, "w",
-			_output);
+			_output, "-");
 		ADD_AREA_FLAG_IF_PRESENT(B_KERNEL_EXECUTE_AREA, protection, "x",
-			_output);
-		ADD_AREA_FLAG_IF_PRESENT(B_KERNEL_STACK_AREA, protection, "s",
-			_output);
-		ADD_AREA_FLAG_IF_PRESENT(B_USER_CLONEABLE_AREA, protection, " cloneable",
-			_output);
-		ADD_AREA_FLAG_IF_PRESENT(B_SHARED_AREA, protection, " shared", _output);
-		_output += ", ";
+			_output, "-");
 	}
+
+	ADD_AREA_FLAG_IF_PRESENT(B_STACK_AREA, protection, "s", _output, "");
+	ADD_AREA_FLAG_IF_PRESENT(B_KERNEL_STACK_AREA, protection, "s", _output, "");
+	ADD_AREA_FLAG_IF_PRESENT(B_OVERCOMMITTING_AREA, protection, _output, "o",
+		"");
+	ADD_AREA_FLAG_IF_PRESENT(B_SHARED_AREA, protection, "S", _output, "");
+	ADD_AREA_FLAG_IF_PRESENT(B_KERNEL_AREA, protection, "k", _output, "");
 
 	if (protection != 0) {
 		char buffer[32];
-		snprintf(buffer, sizeof(buffer), " Unknown (%#04" B_PRIx32 ")",
+		snprintf(buffer, sizeof(buffer), ", u:(%#04" B_PRIx32 ")",
 			protection);
 		_output += buffer;
-	} else if (!_output.IsEmpty())
-		_output.Truncate(_output.Length() - 2);
+	}
 
 	return _output;
 }
