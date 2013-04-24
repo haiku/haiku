@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2011-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -140,8 +140,13 @@ BBufferedDataIO::Read(void* buffer, size_t size)
 		if (status != B_OK)
 			return status;
 
-		TRACE("%p: read %" B_PRIuSIZE " bytes from stream\n", this, fBufferSize);
-		fSize = fStream.Read(fBuffer, fBufferSize);
+		TRACE("%p: read %" B_PRIuSIZE " bytes from stream\n", this,
+			fBufferSize);
+		ssize_t nextRead = fStream.Read(fBuffer, fBufferSize);
+		if (nextRead < 0)
+			return nextRead;
+
+		fSize = nextRead;
 		TRACE("%p: retrieved %" B_PRIuSIZE " bytes from stream\n", this, fSize);
 		fPosition = 0;
 
