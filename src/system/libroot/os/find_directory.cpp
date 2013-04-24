@@ -308,6 +308,7 @@ find_directory(directory_which which, dev_t device, bool createIt,
 		case B_COMMON_NONPACKAGED_DOCUMENTATION_DIRECTORY:
 		case B_COMMON_NONPACKAGED_LIB_DIRECTORY:
 		case B_COMMON_NONPACKAGED_HEADERS_DIRECTORY:
+		case B_COMMON_NONPACKAGED_DEVELOP_DIRECTORY:
 			templatePath = kCommonDirectories[which - B_COMMON_DIRECTORY];
 			break;
 
@@ -328,6 +329,8 @@ find_directory(directory_which which, dev_t device, bool createIt,
 		case B_USER_CACHE_DIRECTORY:
 		case B_USER_PACKAGES_DIRECTORY:
 		case B_USER_HEADERS_DIRECTORY:
+		case B_USER_DEVELOP_DIRECTORY:
+		case B_USER_DOCUMENTATION_DIRECTORY:
 		case B_USER_NONPACKAGED_DIRECTORY:
 		case B_USER_NONPACKAGED_ADDONS_DIRECTORY:
 		case B_USER_NONPACKAGED_TRANSLATORS_DIRECTORY:
@@ -339,6 +342,7 @@ find_directory(directory_which which, dev_t device, bool createIt,
 		case B_USER_NONPACKAGED_DOCUMENTATION_DIRECTORY:
 		case B_USER_NONPACKAGED_LIB_DIRECTORY:
 		case B_USER_NONPACKAGED_HEADERS_DIRECTORY:
+		case B_USER_NONPACKAGED_DEVELOP_DIRECTORY:
 			templatePath = kUserDirectories[which - B_USER_DIRECTORY];
 			break;
 
