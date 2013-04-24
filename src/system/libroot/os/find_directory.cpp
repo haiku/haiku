@@ -103,6 +103,7 @@ static const char *kCommonDirectories[] = {
 	COMMON NON_PACKAGED "/documentation",
 	COMMON NON_PACKAGED "/lib",
 	COMMON NON_PACKAGED "/develop/headers",
+	COMMON NON_PACKAGED "/develop",
 };
 
 /* User directories */
@@ -138,6 +139,9 @@ static const char *kUserDirectories[] = {
 	HOME CONFIG NON_PACKAGED "/documentation",
 	HOME CONFIG NON_PACKAGED "/lib",
 	HOME CONFIG NON_PACKAGED "/develop/headers",
+	HOME CONFIG NON_PACKAGED "/develop",
+	HOME CONFIG "/develop",
+	HOME CONFIG "/documentation",
 };
 
 
