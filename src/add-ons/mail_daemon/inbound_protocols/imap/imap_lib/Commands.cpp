@@ -402,7 +402,7 @@ FetchCommand::HandleUntagged(Response& response)
 
 bool
 FetchCommand::HandleLiteral(Response& response, ArgumentList& arguments,
-	BDataIO& stream, size_t length)
+	BDataIO& stream, size_t& length)
 {
 	if (fListener == NULL || !response.EqualsAt(1, "FETCH")
 		|| !response.IsListAt(2))

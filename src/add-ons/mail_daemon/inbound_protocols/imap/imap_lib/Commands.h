@@ -147,7 +147,7 @@ enum FetchFlags {
 class FetchListener {
 public:
 	virtual	bool				FetchData(uint32 fetchFlags, BDataIO& stream,
-									size_t length) = 0;
+									size_t& length) = 0;
 	virtual void				FetchedData(uint32 fetchFlags, uint32 uid,
 									uint32 flags) = 0;
 };
@@ -166,7 +166,7 @@ public:
 	virtual	bool				HandleUntagged(Response& response);
 	virtual bool				HandleLiteral(Response& response,
 									ArgumentList& arguments, BDataIO& stream,
-									size_t length);
+									size_t& length);
 
 private:
 			uint32				fFrom;

@@ -126,6 +126,16 @@ IMAPProtocol::WorkerQuit(IMAPConnectionWorker* worker)
 }
 
 
+void
+IMAPProtocol::MessageStored(entry_ref& ref, BFile& stream, uint32 fetchFlags)
+{
+	if ((fetchFlags & IMAP::kFetchHeader) != 0)
+		NotifyHeaderFetched(ref, &stream);
+	if ((fetchFlags & IMAP::kFetchBody) != 0)
+		NotifyBodyFetched(ref, &stream);
+}
+
+
 status_t
 IMAPProtocol::SyncMessages()
 {
@@ -230,7 +240,7 @@ IMAPProtocol::_CreateFolder(const BString& mailbox, const BString& separator)
 		return NULL;
 	}
 
-	return new IMAPFolder(mailbox, ref);
+	return new IMAPFolder(*this, mailbox, ref);
 }
 
 

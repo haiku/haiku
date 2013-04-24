@@ -130,7 +130,7 @@ public:
 
 	virtual bool				HandleLiteral(Response& response,
 									ArgumentList& arguments, BDataIO& stream,
-									size_t length) = 0;
+									size_t& length) = 0;
 };
 
 
@@ -167,6 +167,9 @@ protected:
 			char				Next(BDataIO& stream);
 			char				Peek(BDataIO& stream);
 			char				Read(BDataIO& stream);
+
+private:
+			void				_SkipLiteral(BDataIO& stream, size_t size);
 
 protected:
 			LiteralHandler*		fLiteralHandler;

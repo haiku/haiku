@@ -16,15 +16,76 @@
 #include <Node.h>
 #include <Path.h>
 
+#include "Commands.h"
+
+#include "IMAPProtocol.h"
+
 
 static const char* kMailboxNameAttribute = "IMAP:mailbox";
 static const char* kUIDValidityAttribute = "IMAP:uidvalidity";
 static const char* kStateAttribute = "IMAP:state";
+static const char* kFlagsAttribute = "IMAP:flags";
 static const char* kUIDAttribute = "MAIL:unique_id";
 
 
-IMAPFolder::IMAPFolder(const BString& mailboxName, const entry_ref& ref)
+class TemporaryFile : public BFile {
+public:
+	TemporaryFile(BFile& file)
+		:
+		fFile(file),
+		fDeleteFile(false)
+	{
+	}
+
+	~TemporaryFile()
+	{
+		if (fDeleteFile) {
+			fFile.Unset();
+			BEntry(fPath.Path()).Remove();
+		}
+	}
+
+	status_t Init(const BPath& path, entry_ref& ref)
+	{
+		int32 tries = 53;
+		while (true) {
+			BString name("temp-mail-");
+			name << system_time();
+
+			fPath = path;
+			fPath.Append(name.String());
+
+			status_t status = fFile.SetTo(fPath.Path(),
+				B_CREATE_FILE | B_FAIL_IF_EXISTS | B_READ_WRITE);
+			if (status == B_FILE_EXISTS && tries-- > 0)
+				continue;
+			if (status != B_OK)
+				return status;
+
+			fDeleteFile = true;
+			return get_ref_for_path(fPath.Path(), &ref);
+		}
+	}
+
+	void KeepFile()
+	{
+		fDeleteFile = false;
+	}
+
+private:
+			BFile&				fFile;
+			BPath				fPath;
+			bool				fDeleteFile;
+};
+
+
+// #pragma mark -
+
+
+IMAPFolder::IMAPFolder(IMAPProtocol& protocol, const BString& mailboxName,
+	const entry_ref& ref)
 	:
+	fProtocol(protocol),
 	fRef(ref),
 	fMailboxName(mailboxName),
 	fUIDValidity(UINT32_MAX)
@@ -97,57 +158,66 @@ IMAPFolder::SetUIDValidity(uint32 uidValidity)
 }
 
 
+/*!	Stores the given \a stream into a temporary file using the provided
+	BFile object. A new file will be created, and the \a ref object will
+	point to it. The file will remain open when this method exits without
+	an error.
+
+	\a length will reflect how many bytes are left to read in case there
+	were an error.
+*/
 status_t
-IMAPFolder::StoreTemporaryMessage(uint32 fetchFlags, BDataIO& stream,
-	size_t length, entry_ref& ref)
+IMAPFolder::StoreMessage(BFile& file, uint32 fetchFlags, BDataIO& stream,
+	size_t& length, entry_ref& ref)
 {
 	BPath path;
 	status_t status = path.SetTo(&fRef);
 	if (status != B_OK)
 		return status;
 
-	path.Append("tmp1234");
-
-	BFile file;
-	status = (path.Path(), B_CREATE_FILE);
+	TemporaryFile temporaryFile(file);
+	status = temporaryFile.Init(path, ref);
 	if (status != B_OK)
 		return status;
-
-	get_ref_for_path(path.Path(), &ref);
 
 	char buffer[65535];
 	while (length > 0) {
 		ssize_t bytesRead = stream.Read(buffer,
-			min_c(sizeof(buffer), length));
+			std::min(sizeof(buffer), length));
+		if (bytesRead < 0)
+			return bytesRead;
 		if (bytesRead <= 0)
 			break;
 
-		file.Write(buffer, bytesRead);
 		length -= bytesRead;
+
+		ssize_t bytesWritten = file.Write(buffer, bytesRead);
+		if (bytesWritten < 0)
+			return bytesWritten;
+		if (bytesWritten != bytesRead)
+			return B_IO_ERROR;
 	}
 
+	temporaryFile.KeepFile();
 	return B_OK;
 }
 
 
+/*!	Writes UID, and flags to the message, and notifies the protocol that a
+	message has been fetched. This method also closes the \a file passed in.
+*/
 void
-IMAPFolder::StoreMessage(uint32 fetchFlags, uint32 uid, uint32 flags,
-	entry_ref& ref)
+IMAPFolder::MessageStored(entry_ref& ref, BFile& file, uint32 fetchFlags,
+	uint32 uid, uint32 flags)
 {
-	BString name = "mail-";
-	name << uid;
+	_WriteUniqueID(file, uid);
+	if ((fetchFlags & IMAP::kFetchFlags) != 0)
+		_WriteFlags(file, flags);
 
-	// TODO: remove renaming as its superfluous here
-	BEntry entry(&ref);
-	entry.Rename(name.String());
-}
+	// TODO: the call below may move/rename the file
+	fProtocol.MessageStored(ref, file, fetchFlags);
 
-
-status_t
-IMAPFolder::StoreMessage(uint32 fetchFlags, uint32 uid, BDataIO& stream,
-	size_t length)
-{
-	return B_ERROR;
+	file.Unset();
 }
 
 
@@ -207,8 +277,8 @@ IMAPFolder::_InitializeFolderState()
 		} else {
 			// This is a new message
 			// TODO: the token must be the originating token!
-			// TODO: uid might be udpated from the call
 			uid = fListener->MessageAdded(_Token(uid), ref);
+			_WriteUniqueID(node, uid);
 		}
 
 		fRefMap.insert(std::make_pair(uid, ref));
@@ -240,9 +310,31 @@ IMAPFolder::_ReadUniqueID(BNode& node)
 }
 
 
+status_t
+IMAPFolder::_WriteUniqueID(BNode& node, uint32 uid)
+{
+	BString string;
+	string << uid;
+
+	return node.WriteAttrString(kUIDAttribute, &string);
+}
+
+
 uint32
 IMAPFolder::_ReadFlags(BNode& node)
 {
 	// TODO!
 	return 0;
+}
+
+
+status_t
+IMAPFolder::_WriteFlags(BNode& node, uint32 flags)
+{
+	ssize_t bytesWritten = node.WriteAttr(kFlagsAttribute, B_UINT32_TYPE, 0,
+		&flags, sizeof(uint32));
+	if (bytesWritten == (ssize_t)sizeof(uint32))
+		return B_OK;
+
+	return bytesWritten < 0 ? bytesWritten : B_IO_ERROR;
 }

@@ -135,7 +135,8 @@ public:
 
 		// TODO: trigger download of mails for all messages below the
 		// body fetch limit
-		IMAP::FetchCommand fetch(fFrom, fTo, IMAP::kFetchHeader);
+		IMAP::FetchCommand fetch(fFrom, fTo,
+			IMAP::kFetchHeader | IMAP::kFetchFlags);
 		fetch.SetListener(this);
 
 		status = protocol.ProcessCommand(fetch);
@@ -145,9 +146,9 @@ public:
 		return B_OK;
 	}
 
-	virtual bool FetchData(uint32 fetchFlags, BDataIO& stream, size_t length)
+	virtual bool FetchData(uint32 fetchFlags, BDataIO& stream, size_t& length)
 	{
-		fFetchStatus = fFolder.StoreTemporaryMessage(fetchFlags, stream,
+		fFetchStatus = fFolder.StoreMessage(fFile, fetchFlags, stream,
 			length, fRef);
 		return true;
 	}
@@ -155,7 +156,7 @@ public:
 	virtual void FetchedData(uint32 fetchFlags, uint32 uid, uint32 flags)
 	{
 		if (fFetchStatus == B_OK)
-			fFolder.StoreMessage(fetchFlags, uid, flags, fRef);
+			fFolder.MessageStored(fRef, fFile, fetchFlags, uid, flags);
 	}
 
 private:
@@ -164,6 +165,7 @@ private:
 	uint32					fFrom;
 	uint32					fTo;
 	entry_ref				fRef;
+	BFile					fFile;
 	status_t				fFetchStatus;
 };
 

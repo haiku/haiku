@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2012-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef IMAP_FOLDER_H
@@ -13,6 +13,9 @@
 #include <Node.h>
 #include <Handler.h>
 #include <String.h>
+
+
+class IMAPProtocol;
 
 
 struct MessageToken {
@@ -36,7 +39,8 @@ public:
 
 class IMAPFolder : public BHandler {
 public:
-								IMAPFolder(const BString& mailboxName,
+								IMAPFolder(IMAPProtocol& protocol,
+									const BString& mailboxName,
 									const entry_ref& ref);
 	virtual						~IMAPFolder();
 
@@ -45,13 +49,13 @@ public:
 			void				SetListener(FolderListener* listener);
 			void				SetUIDValidity(uint32 uidValidity);
 
-			status_t			StoreTemporaryMessage(uint32 fetchFlags,
-									BDataIO& stream, size_t length,
+			status_t			StoreMessage(BFile& file, uint32 fetchFlags,
+									BDataIO& stream, size_t& length,
 									entry_ref& ref);
-			void				StoreMessage(uint32 fetchFlags, uint32 uid,
-									uint32 flags, entry_ref& ref);
-			status_t			StoreMessage(uint32 fetchFlags, uint32 uid,
-									BDataIO& stream, size_t length);
+			void				MessageStored(entry_ref& ref, BFile& file,
+									uint32 fetchFlags, uint32 uid,
+									uint32 flags);
+
 			void				DeleteMessage(uint32 uid);
 			void				SetMessageFlags(uint32 uid, uint32 flags);
 
@@ -61,12 +65,15 @@ private:
 			void				_InitializeFolderState();
 			const MessageToken	_Token(uint32 uid) const;
 			uint32				_ReadUniqueID(BNode& node);
+			status_t			_WriteUniqueID(BNode& node, uint32 uid);
 			uint32				_ReadFlags(BNode& node);
+			status_t			_WriteFlags(BNode& node, uint32 flags);
 
 private:
 	typedef std::hash_map<uint32, uint32> UIDToFlagsMap;
 	typedef std::hash_map<uint32, entry_ref> UIDToRefMap;
 
+			IMAPProtocol&		fProtocol;
 			const entry_ref		fRef;
 			BString				fMailboxName;
 			uint32				fUIDValidity;

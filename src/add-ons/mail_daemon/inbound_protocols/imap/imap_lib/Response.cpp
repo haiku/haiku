@@ -6,6 +6,7 @@
 
 #include "Response.h"
 
+#include <algorithm>
 #include <stdlib.h>
 
 #include <UnicodeChar.h>
@@ -588,7 +589,7 @@ Response::ParseLiteral(ArgumentList& arguments, BDataIO& stream)
 			size);
 	}
 
-	if (!handled) {
+	if (!handled && size <= 65536) {
 		// The default implementation just adds the data as a string
 		TRACE("Trying to read literal with %" B_PRIuSIZE " bytes.\n", size);
 		BString string;
@@ -612,6 +613,9 @@ Response::ParseLiteral(ArgumentList& arguments, BDataIO& stream)
 
 		string.UnlockBuffer(size);
 		arguments.AddItem(new StringArgument(string));
+	} else {
+		// Skip any bytes left in the literal stream
+		_SkipLiteral(stream, size);
 	}
 }
 
@@ -705,6 +709,24 @@ Response::Read(BDataIO& stream)
 		throw ParseException("Unexpected end of string");
 
 	throw StreamException(bytesRead);
+}
+
+
+void
+Response::_SkipLiteral(BDataIO& stream, size_t size)
+{
+	char buffer[4096];
+	size_t totalRead = 0;
+	while (totalRead < size) {
+		size_t toRead = std::min(sizeof(buffer), size - totalRead);
+		ssize_t bytesRead = stream.Read(buffer, toRead);
+		if (bytesRead == 0)
+			throw ParseException("Unexpected end of literal");
+		if (bytesRead < 0)
+			throw StreamException(bytesRead);
+
+		totalRead += bytesRead;
+	}
 }
 
 
