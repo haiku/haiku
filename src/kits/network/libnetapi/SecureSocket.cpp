@@ -1,6 +1,6 @@
 /*
- * Copyright 2014 Haiku, Inc.
- * Copyright 2011, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2013-2015 Haiku, Inc.
+ * Copyright 2011-2015, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2010, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
@@ -38,15 +38,19 @@ public:
 								~Private();
 
 			status_t			InitCheck();
+			status_t			ErrorCode(int returnValue);
 
 	static	SSL_CTX*			Context();
 	static	int					VerifyCallback(int ok, X509_STORE_CTX* ctx);
+
 private:
-	static	void				CreateContext();
+	static	void				_CreateContext();
+
 public:
 			SSL*				fSSL;
 			BIO*				fBIO;
 	static	int					sDataIndex;
+
 private:
 	static	SSL_CTX*			sContext;
 		// FIXME When do we SSL_CTX_free it?
@@ -90,27 +94,32 @@ BSecureSocket::Private::InitCheck()
 }
 
 
-/* static */ void
-BSecureSocket::Private::CreateContext()
+status_t
+BSecureSocket::Private::ErrorCode(int returnValue)
 {
-	sContext = SSL_CTX_new(SSLv23_method());
+	int error = SSL_get_error(fSSL, returnValue);
+	switch (error) {
+		case SSL_ERROR_NONE:
+			// Shouldn't happen...
+			return B_NO_ERROR;
+		case SSL_ERROR_ZERO_RETURN:
+			// Socket is closed
+			return B_CANCELED;
+		case SSL_ERROR_SSL:
+			// Probably no certificate
+			return B_NOT_ALLOWED;
 
-	// Disable legacy protocols. They have known vulnerabilities.
-	SSL_CTX_set_options(sContext, SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3);
-
-	// Setup certificate verification
-	BPath certificateStore;
-	find_directory(B_SYSTEM_DATA_DIRECTORY, &certificateStore);
-	certificateStore.Append("ssl/CARootCertificates.pem");
-	// TODO we may want to add a non-packaged certificate directory?
-	// (would make it possible to store user-added certificate exceptions
-	// there)
-	SSL_CTX_load_verify_locations(sContext, certificateStore.Path(), NULL);
-	SSL_CTX_set_verify(sContext, SSL_VERIFY_PEER, VerifyCallback);
-
-	// Get an unique index number for storing application data in SSL
-	// structs. We will store a pointer to the BSecureSocket class there.
-	sDataIndex = SSL_get_ex_new_index(0, NULL, NULL, NULL, NULL);
+		case SSL_ERROR_WANT_READ:
+		case SSL_ERROR_WANT_WRITE:
+		case SSL_ERROR_WANT_CONNECT:
+		case SSL_ERROR_WANT_ACCEPT:
+		case SSL_ERROR_WANT_X509_LOOKUP:
+		case SSL_ERROR_SYSCALL:
+		default:
+			// TODO: translate SSL error codes!
+			fprintf(stderr, "SSL error: %d\n", error);
+			return B_ERROR;
+	}
 }
 
 
@@ -120,14 +129,15 @@ BSecureSocket::Private::Context()
 	// We use lazy initialisation here, because reading certificates from disk
 	// and parsing them is a relatively long operation and uses some memory.
 	// We don't want programs that don't use SSL to waste resources with that.
-	pthread_once(&sInitOnce, CreateContext);
+	pthread_once(&sInitOnce, _CreateContext);
 
 	return sContext;
 }
 
 
-// This is called each time a certificate verification occurs. It allows us to
-// catch failures and report them.
+/*!	This is called each time a certificate verification occurs. It allows us to
+	catch failures and report them.
+*/
 /* static */ int
 BSecureSocket::Private::VerifyCallback(int ok, X509_STORE_CTX* ctx)
 {
@@ -162,6 +172,30 @@ BSecureSocket::Private::VerifyCallback(int ok, X509_STORE_CTX* ctx)
 	// Let the BSecureSocket (or subclass) decide if we should continue anyway.
 	BCertificate failedCertificate(certificate);
 	return socket->CertificateVerificationFailed(failedCertificate, message);
+}
+
+
+/* static */ void
+BSecureSocket::Private::_CreateContext()
+{
+	sContext = SSL_CTX_new(SSLv23_method());
+
+	// Disable legacy protocols. They have known vulnerabilities.
+	SSL_CTX_set_options(sContext, SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3);
+
+	// Setup certificate verification
+	BPath certificateStore;
+	find_directory(B_SYSTEM_DATA_DIRECTORY, &certificateStore);
+	certificateStore.Append("ssl/CARootCertificates.pem");
+	// TODO we may want to add a non-packaged certificate directory?
+	// (would make it possible to store user-added certificate exceptions
+	// there)
+	SSL_CTX_load_verify_locations(sContext, certificateStore.Path(), NULL);
+	SSL_CTX_set_verify(sContext, SSL_VERIFY_PEER, VerifyCallback);
+
+	// Get an unique index number for storing application data in SSL
+	// structs. We will store a pointer to the BSecureSocket class there.
+	sDataIndex = SSL_get_ex_new_index(0, NULL, NULL, NULL, NULL);
 }
 
 
@@ -238,25 +272,11 @@ BSecureSocket::Connect(const BNetworkAddress& peer, bigtime_t timeout)
 	SSL_set_bio(fPrivate->fSSL, fPrivate->fBIO, fPrivate->fBIO);
 	SSL_set_ex_data(fPrivate->fSSL, Private::sDataIndex, this);
 
-	int sslStatus = SSL_connect(fPrivate->fSSL);
-
-	if (sslStatus <= 0)	{
+	int returnValue = SSL_connect(fPrivate->fSSL);
+	if (returnValue <= 0) {
 		TRACE("SSLConnection can't connect\n");
 		BSocket::Disconnect();
-
-		switch (SSL_get_error(fPrivate->fSSL, sslStatus)) {
-			case SSL_ERROR_NONE:
-				// Shouldn't happen...
-				return B_NO_ERROR;
-			case SSL_ERROR_ZERO_RETURN:
-				// Socket is closed
-				return B_CANCELED;
-			case SSL_ERROR_SSL:
-				// Probably no certificate
-				return B_NOT_ALLOWED;
-			default:
-				return B_ERROR;
-		}
+		return fPrivate->ErrorCode(returnValue);
 	}
 
 	return B_OK;
@@ -267,9 +287,8 @@ void
 BSecureSocket::Disconnect()
 {
 	if (IsConnected()) {
-		if (fPrivate->fSSL != NULL) {
+		if (fPrivate->fSSL != NULL)
 			SSL_shutdown(fPrivate->fSSL);
-		}
 
 		BSocket::Disconnect();
 	}
@@ -314,8 +333,7 @@ BSecureSocket::Read(void* buffer, size_t size)
 	if (bytesRead >= 0)
 		return bytesRead;
 
-	// TODO: translate SSL error codes!
-	return B_ERROR;
+	return fPrivate->ErrorCode(bytesRead);
 }
 
 
@@ -329,8 +347,7 @@ BSecureSocket::Write(const void* buffer, size_t size)
 	if (bytesWritten >= 0)
 		return bytesWritten;
 
-	// TODO: translate SSL error codes!
-	return B_ERROR;
+	return fPrivate->ErrorCode(bytesWritten);
 }
 
 
