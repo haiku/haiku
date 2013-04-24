@@ -17,21 +17,182 @@ licenses {
 
 provides {
 	haiku=R1~alpha3_pm-1 compat>=R1~alpha1
-	coreutils=8.4 compat>=0.0
-	diffutils=2.8.1 compat>=0.0
-	findutils=4.2.33 compat>=0.0
-	zlib=1.2.5 compat>=1
-	cmd:awk=0.0.0
-	cmd:cp=8.4 compat>=0.0
-	cmd:diff=2.8.1 compat>=0.0
-	cmd:find=4.2.33 compat>=0.0
-	cmd:ln=8.4 compat>=0.0
-	cmd:mv=8.4 compat>=0.0
-	cmd:sh=0.0.0
-	cmd:unzip=5.50 compat>=0.0
-	cmd:wget=0.0.0
-	cmd:zip=2.32 compat>=0.0
-	lib:libz=1.2.5 compat>=1
+	coreutils = 8.4 compat >= 0
+	diffutils = 2.8.1 compat >= 0
+	findutils = 4.2.33 compat >= 0
+	zlib = 1.2.5 compat >= 1
+	cmd:arp
+	cmd:awk
+	cmd:base64
+	cmd:basename
+	cmd:bash
+	cmd:bc
+	cmd:bunzip2
+	cmd:bzip2
+	cmd:cat
+	cmd:chgrp
+	cmd:chmod
+	cmd:chop
+	cmd:chown
+	cmd:chroot
+	cmd:cksum
+	cmd:clear
+	cmd:cmp
+	cmd:comm
+	cmd:compress
+	cmd:cp = 8.4
+	cmd:csplit
+	cmd:ctags
+	cmd:cut
+	cmd:date
+	cmd:dc
+	cmd:dd
+	cmd:df
+	cmd:diff = 2.8.1
+	cmd:diff3
+	cmd:dirname
+	cmd:du
+	cmd:echo
+	cmd:egrep
+	cmd:env
+	cmd:expand
+	cmd:expr
+	cmd:factor
+	cmd:false
+	cmd:fgrep
+	cmd:find = 4.2.33
+	cmd:fmt
+	cmd:fold
+	cmd:frcode
+	cmd:ftp
+	cmd:ftpd
+	cmd:funzip
+	cmd:gawk
+	cmd:gdb
+	cmd:getlimits
+	cmd:grep
+	cmd:groups
+	cmd:gunzip
+	cmd:gzexe
+	cmd:gzip
+	cmd:hd
+	cmd:head
+	cmd:hostname
+	cmd:id
+	cmd:install
+	cmd:join
+	cmd:kill
+	cmd:less
+	cmd:lessecho
+	cmd:lesskey
+	cmd:link
+	cmd:ln = 8.4
+	cmd:locate
+	cmd:logname
+	cmd:ls
+	cmd:md5sum
+	cmd:merge
+	cmd:mkdir
+	cmd:mkfifo
+	cmd:mktemp
+	cmd:more
+	cmd:mv = 8.4
+	cmd:netcat
+	cmd:nl
+	cmd:nohup
+	cmd:nproc
+	cmd:od
+	cmd:paste
+	cmd:patch
+	cmd:pathchk
+	cmd:ping
+	cmd:ping6
+	cmd:pr
+	cmd:printenv
+	cmd:printf
+	cmd:prio
+	cmd:ps
+	cmd:ptx
+	cmd:pwd
+	cmd:readlink
+	cmd:renice
+	cmd:rlog
+	cmd:rm
+	cmd:rmdir
+	cmd:sdiff
+	cmd:seq
+	cmd:sh
+	cmd:sha1sum
+	cmd:sha256sum
+	cmd:shar
+	cmd:shred
+	cmd:shuf
+	cmd:sleep
+	cmd:sort
+	cmd:split
+	cmd:stat
+	cmd:stty
+	cmd:su
+	cmd:sum
+	cmd:sync
+	cmd:tac
+	cmd:tail
+	cmd:tcpdump
+	cmd:tee
+	cmd:telnet
+	cmd:telnetd
+	cmd:test
+	cmd:timeout
+	cmd:top
+	cmd:touch
+	cmd:tput
+	cmd:tr
+	cmd:traceroute
+	cmd:trash
+	cmd:true
+	cmd:truncate
+	cmd:tsort
+	cmd:tty
+	cmd:uname
+	cmd:unchop
+	cmd:unexpand
+	cmd:uniq
+	cmd:unlink
+	cmd:unrar
+	cmd:unshar
+	cmd:unzip = 5.50
+	cmd:unzipsfx
+	cmd:updatedb
+	cmd:useradd
+	cmd:uudecode
+	cmd:uuencode
+	cmd:vdir
+	cmd:watch
+	cmd:wc
+	cmd:wget = 1.12
+	cmd:which
+	cmd:whoami
+	cmd:xargs
+	cmd:xres
+	cmd:yes
+	cmd:zcat
+	cmd:zcmp
+	cmd:zdiff
+	cmd:zforce
+	cmd:zgrep
+	cmd:zip = 2.32
+	cmd:zipcloak
+	cmd:zipgrep
+	cmd:zipinfo
+	cmd:zipnote
+	cmd:zipsplit
+	cmd:zmore
+	cmd:znew
+	lib:libfreetype = 2.4.4 compat >= 2
+	lib:libjpeg = 8.0
+	lib:libpng = 1.4.4 compat >= 1
+	lib:libtiff = 3.9.4 compat >= 3
+	lib:libz = 1.2.5 compat >= 1
 }
 
 requires {
