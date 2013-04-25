@@ -36,9 +36,9 @@ apm_init(void)
 		return B_ERROR;
 	}
 
-	apm_info &info = gKernelArgs.platform_args.apm;
-	info.version = regs.eax & 0xffff;
-	info.flags = regs.ecx & 0xffff;
+	const apm_info &info = gKernelArgs.platform_args.apm;
+	gKernelArgs.platform_args.apm.version = regs.eax & 0xffff;
+	gKernelArgs.platform_args.apm.flags = regs.ecx & 0xffff;
 
 	dprintf("APM version %d.%d available, flags %x.\n",
 		(info.version >> 8) & 0xf, info.version & 0xf, info.flags);
@@ -64,19 +64,19 @@ apm_init(void)
 	call_bios(0x15, &regs);
 	if ((regs.flags & CARRY_FLAG) != 0) {
 		// reset the version, so that the kernel won't try to use APM
-		info.version = 0;
+		gKernelArgs.platform_args.apm.version = 0;
 		return B_ERROR;
 	}
 
-	info.code32_segment_base = regs.eax & 0xffff;
-	info.code32_segment_offset = regs.ebx;
-	info.code32_segment_length = regs.esi & 0xffff;
+	gKernelArgs.platform_args.apm.code32_segment_base = regs.eax & 0xffff;
+	gKernelArgs.platform_args.apm.code32_segment_offset = regs.ebx;
+	gKernelArgs.platform_args.apm.code32_segment_length = regs.esi & 0xffff;
 
-	info.code16_segment_base = regs.ecx & 0xffff;
-	info.code16_segment_length = regs.esi >> 16;
+	gKernelArgs.platform_args.apm.code16_segment_base = regs.ecx & 0xffff;
+	gKernelArgs.platform_args.apm.code16_segment_length = regs.esi >> 16;
 
-	info.data_segment_base = regs.edx & 0xffff;
-	info.data_segment_length = regs.edi & 0xffff;
+	gKernelArgs.platform_args.apm.data_segment_base = regs.edx & 0xffff;
+	gKernelArgs.platform_args.apm.data_segment_length = regs.edi & 0xffff;
 
 	TRACE(("  code32: 0x%x, 0x%lx, length 0x%x\n",
 		info.code32_segment_base, info.code32_segment_offset, info.code32_segment_length));
