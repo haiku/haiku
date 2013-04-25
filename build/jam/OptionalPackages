@@ -491,7 +491,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 			$(hpkgBaseURL)/binutils-2.17_130421-1-x86_gcc2.hpkg
 			: common packages ;
 		InstallOptionalHaikuImagePackage
-			$(hpkgBaseURL)/gcc-2.95.3_130421-1-x86_gcc2.hpkg
+			$(hpkgBaseURL)/gcc-2.95.3_130425-1-x86_gcc2.hpkg
 			: common packages ;
 	}
 
@@ -967,7 +967,7 @@ if [ IsOptionalHaikuImagePackageAdded Nano ] {
 				$(baseURL)/nano-2.2.6-r1a3-x86-gcc4-2011-05-24.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/nano-2.2.6-1-x86_gcc2.hpkg
+				$(hpkgBaseURL)/nano-2.2.6-2-x86_gcc2.hpkg
 				: common packages ;
 		}
 	}
@@ -983,7 +983,7 @@ if [ IsOptionalHaikuImagePackageAdded Nano ] {
 			Echo "No optional package NCurses available for gcc 4" ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/ncurses-5.9-3-x86_gcc2.hpkg
+				$(hpkgBaseURL)/ncurses-5.9-4-x86_gcc2.hpkg
 				: common packages ;
 		}
 	}

@@ -22,6 +22,7 @@ OptionalPackageDependencies Man : Groff ;
 OptionalPackageDependencies Tar : LibIconv ;
 OptionalPackageDependencies Python : Bzip ;
 OptionalPackageDependencies Mercurial : Python ;
+OptionalPackageDependencies Nano : NCurses ;
 OptionalPackageDependencies Neon : LibXML2 ;
 OptionalPackageDependencies NetFS : UserlandFS ;
 OptionalPackageDependencies NetSurf : OpenSSL Curl LibXML2 LibIconv Libmng ;
