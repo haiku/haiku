@@ -52,6 +52,7 @@
 #	Man						- standard commands to read man pages
 #	Mercurial				- the distributed version control system
 #	Nano					- the command line text editor
+#	NCurses					- the new curses library
 #	Neon					- support libraries used for example by SVN
 #	NetFS					- the native networked file system components
 #	NetSurf					- the web browser
@@ -967,6 +968,22 @@ if [ IsOptionalHaikuImagePackageAdded Nano ] {
 		} else {
 			InstallOptionalHaikuImagePackage
 				$(hpkgBaseURL)/nano-2.2.6-1-x86_gcc2.hpkg
+				: common packages ;
+		}
+	}
+}
+
+
+# NCurses
+if [ IsOptionalHaikuImagePackageAdded Nano ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package NCurses available for $(TARGET_ARCH)" ;
+	} else {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			Echo "No optional package NCurses available for gcc 4" ;
+		} else {
+			InstallOptionalHaikuImagePackage
+				$(hpkgBaseURL)/ncurses-5.9-3-x86_gcc2.hpkg
 				: common packages ;
 		}
 	}
