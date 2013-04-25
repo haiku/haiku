@@ -29,6 +29,7 @@
 #include "SemaphoreInfo.h"
 #include "SymbolInfo.h"
 #include "SystemInfo.h"
+#include "TeamInfo.h"
 #include "ThreadInfo.h"
 
 
@@ -478,6 +479,19 @@ DebuggerInterface::GetSystemInfo(SystemInfo& info)
 		return result;
 
 	info.SetTo(fTeamID, sysInfo, name);
+	return B_OK;
+}
+
+
+status_t
+DebuggerInterface::GetTeamInfo(TeamInfo& info)
+{
+	team_info teamInfo;
+	status_t result = get_team_info(fTeamID, &teamInfo);
+	if (result != B_OK)
+		return result;
+
+	info.SetTo(fTeamID, teamInfo);
 	return B_OK;
 }
 
