@@ -1248,31 +1248,48 @@ VariablesView::VariableTableModel::GetToolTipForTablePath(
 	if (node->NodeChild()->LocationResolutionState() != B_OK)
 		return false;
 
-	ValueLocation* location = node->NodeChild()->Location();
 	BString tipData;
-	for (int32 i = 0; i < location->CountPieces(); i++) {
-		ValuePieceLocation piece = location->PieceAt(i);
-		BString pieceData;
-		switch (piece.type) {
-			case VALUE_PIECE_LOCATION_MEMORY:
-				pieceData.SetToFormat("(%" B_PRId32 "): Address: %#" B_PRIx64
-					", Size: %" B_PRId64 " bytes", i, piece.address, piece.size);
-				break;
-			case VALUE_PIECE_LOCATION_REGISTER:
-			{
-				Architecture* architecture = fThread->GetTeam()->GetArchitecture();
-				pieceData.SetToFormat("(%" B_PRId32 "): Register (%s)",
-					i, architecture->Registers()[piece.reg].Name());
+	switch (columnIndex) {
+		case 0:
+		{
+			ValueLocation* location = node->NodeChild()->Location();
+			for (int32 i = 0; i < location->CountPieces(); i++) {
+				ValuePieceLocation piece = location->PieceAt(i);
+				BString pieceData;
+				switch (piece.type) {
+					case VALUE_PIECE_LOCATION_MEMORY:
+						pieceData.SetToFormat("(%" B_PRId32 "): Address: %#"
+							B_PRIx64 ", Size: %" B_PRId64 " bytes", i,
+							piece.address, piece.size);
+						break;
+					case VALUE_PIECE_LOCATION_REGISTER:
+					{
+						Architecture* architecture = fThread->GetTeam()
+							->GetArchitecture();
+						pieceData.SetToFormat("(%" B_PRId32 "): Register (%s)",
+							i, architecture->Registers()[piece.reg].Name());
+						break;
+					}
+					default:
+						break;
+				}
 
-				break;
+				tipData	+= pieceData;
+				if (i < location->CountPieces() - 1)
+					tipData += "\n";
 			}
-			default:
-				break;
+			break;
 		}
+		case 1:
+		{
+			Value* value = node->GetValue();
+			if (value != NULL)
+				value->ToString(tipData);
 
-		tipData	+= pieceData;
-		if (i < location->CountPieces() - 1)
-			tipData += "\n";
+			break;
+		}
+		default:
+			break;
 	}
 
 	if (tipData.IsEmpty())
