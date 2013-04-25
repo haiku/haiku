@@ -19,14 +19,11 @@ BeMac|BeBox)
 	BE_HOST_CPU=unknown
 esac
 
-BELIBRARIES="/boot/common/non-packaged/lib:/boot/common/lib:$BUILDHOME/lib"
-
-# not used by Haiku, but probably by legacy applications (BeIDE?)
+# not used by Haiku, but by (legacy) applications (e.g. Pe)
 BH=$BUILDHOME/headers
 BEINCLUDES="$BH;$BH/be;$BH/posix;$BH/glibc;$BH/cpp;$BH/be/app;$BH/be/device;$BH/be/interface;$BH/be/locale;$BH/be/media;$BH/be/midi;$BH/be/midi2;$BH/be/net;$BH/be/kernel;$BH/be/storage;$BH/be/support;$BH/be/game;$BH/be/opengl;$BH/be/drivers;$BH/gnu;$BH/be/mail;$BH/be/translation;$BH/be/devel;$BH/be/add-ons/graphics;$BH/be/be_apps/Deskbar;$BH/be/be_apps/NetPositive;$BH/be/be_apps/Tracker"
 
 export BUILDHOME
-export BELIBRARIES
 export BEINCLUDES
 export BE_HOST_CPU
 
