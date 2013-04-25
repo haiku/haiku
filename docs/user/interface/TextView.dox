@@ -113,9 +113,9 @@
 		uint32 resizeMask, uint32 flags)
 	\brief Creates a new BTextView object.
 
-	\param frame The BTextView frame rectangle.
-	\param name The name of the object.
-	\param textRect The area of the text within the BTextView object.
+	\param frame The frame rectangle of the view.
+	\param name The name of the view.
+	\param textRect The area of the text within the view.
 	\param resizeMask Resizing mask, passed to BView.
 	\param flags \a flags passed to BView, \c B_FRAME_EVENTS,
 		\c B_PULSE_NEEDED and \c B_INPUT_METHOD_AWARE are always set.
@@ -222,25 +222,30 @@
 
 /*!
 	\fn void BTextView::AttachedToWindow()
-	\brief Hook method that is called when the BTextView is added to the
-	       view hierarchy.
+	\brief Hook method called when the text view is added to the view hierarchy.
 
 	Sets the pulse rate to 2 per second and adjust scrollbars if needed.
+
+	\see BView::AttachedToWindow()
 */
 
 
 /*!
 	\fn void BTextView::DetachedFromWindow()
-	\brief Hook method that is called when the BTextView is removed from the
+	\brief Hook method that is called when the text view is removed from the
 	       view hierarchy.
+
+	\see BView::DetachedFromWindow()
 */
 
 
 /*!
 	\fn void BTextView::Draw(BRect updateRect)
-	\brief Hook method that is called to draw the contents of the BTextView.
+	\brief Hook method called to draw the contents of the text view.
 
-	\param updateRect The rectangular area to be redrawn.
+	\param updateRect The rectangular area to draw.
+
+	\see BView::Draw()
 */
 
 
@@ -250,6 +255,8 @@
 	       the cursor is contained in the view.
 
 	\param where The location where the mouse button was pushed down.
+
+	\see BView::MouseDown()
 */
 
 
@@ -258,9 +265,11 @@
 	\brief Hook method that is called when a mouse button is released while
 	       the cursor is contained in the view.
 
-	\note This method stops asynchronous mouse tracking.
+	This method stops asynchronous mouse tracking.
 
-	\param where The location where the mouse button was released.
+	\param where The location that the mouse button was released.
+
+	\see BView::MouseUp()
 */
 
 
@@ -273,6 +282,8 @@
 	\param where The point where the mouse cursor has moved to.
 	\param code A code which indicates if the mouse entered or exited the view.
 	\param message A message containing drag and drop information.
+
+	\see BView::MouseMoved()
 */
 
 
@@ -281,8 +292,10 @@
 	\brief Hook method that is called when the window becomes the active window
 	       or gives up that status.
 
-	\param state If \c true, window has just become active. If \c false the 
-	       window has just become inactive.
+	\param state If \c true, window has just been activated. If \c false the
+	       window has just been deactivated.
+
+	\see BView::WindowActivated()
 */
 
 
@@ -290,6 +303,8 @@
 	\fn void BTextView::KeyDown(const char* bytes, int32 numBytes)
 	\brief Hook method that is called when a key is pressed while the view is
 	       the focus view of the active window.
+
+	\see BView::KeyDown()
 */
 
 
@@ -298,6 +313,8 @@
 	\brief Hook method that is called at a set interval.
 
 	This method is used to make the I-beam blink.
+
+	\see BView::Pulse()
 */
 
 
@@ -309,15 +326,18 @@
 
 	\param width The new view width.
 	\param height The new view height.
+
+	\see BView::FrameResized()
 */
 
 
 /*!
 	\fn void BTextView::MessageReceived(BMessage* message)
-	\brief Hook method that is called each time the BTextView receives
-	       a message.
+	\brief Hook method called with a message is received by the text view.
 
-	\param message The received message.
+	\param message The message received by the text view.
+
+	\see BView::MessageReceived()
 */
 
 
@@ -326,10 +346,12 @@
 
 /*!
 	\fn void BTextView::MakeFocus(bool focusState)
-	\brief Highlight or unhighlight the selection when the view gets
+	\brief Highlight or unhighlight the selection when the text view acquires
 		or loses its focus state.
 
-	\param focusState \c true to get focus or \c false to lose it.
+	\param focusState \c true to receive focus or \c false to lose it.
+
+	\see BView::MakeFocus()
 */
 
 
@@ -345,6 +367,8 @@
 	\param property The name of the target property.
 
 	\return The proper BHandler for the passed in scripting \a message.
+
+	\see BView::ResolveSpecifier()
 */
 
 
@@ -406,6 +430,7 @@
 	\param length The number of bytes of text to read from the file.
 	\param runs The text styling to use, can be \c NULL.
 */
+
 
 //! @}
 
