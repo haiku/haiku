@@ -49,6 +49,8 @@ public:
 			void				SetListener(FolderListener* listener);
 			void				SetUIDValidity(uint32 uidValidity);
 
+			uint32				LastUID() const { return fLastUID; }
+
 			status_t			StoreMessage(BFile& file, uint32 fetchFlags,
 									BDataIO& stream, size_t& length,
 									entry_ref& ref);
@@ -69,6 +71,10 @@ private:
 			uint32				_ReadFlags(BNode& node);
 			status_t			_WriteFlags(BNode& node, uint32 flags);
 
+			uint32				_ReadUInt32(BNode& node, const char* attribute);
+			status_t			_WriteUInt32(BNode& node,
+									const char* attribute, uint32 value);
+
 private:
 	typedef std::hash_map<uint32, uint32> UIDToFlagsMap;
 	typedef std::hash_map<uint32, entry_ref> UIDToRefMap;
@@ -77,6 +83,7 @@ private:
 			const entry_ref		fRef;
 			BString				fMailboxName;
 			uint32				fUIDValidity;
+			uint32				fLastUID;
 			FolderListener*		fListener;
 			UIDToRefMap			fRefMap;
 			UIDToFlagsMap		fUIDMap;

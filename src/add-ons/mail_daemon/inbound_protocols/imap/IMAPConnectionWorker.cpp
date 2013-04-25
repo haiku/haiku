@@ -215,8 +215,7 @@ public:
 				return status;
 
 			fState = FETCH_ENTRIES;
-//			fFirstUID = fLastUID = fFolder->LastUID();
-			fFirstUID = fLastUID = 0;
+			fFirstUID = fLastUID = fFolder->LastUID() + 1;
 			fMailboxEntries = 0;
 		}
 

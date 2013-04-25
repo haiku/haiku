@@ -23,6 +23,7 @@
 
 static const char* kMailboxNameAttribute = "IMAP:mailbox";
 static const char* kUIDValidityAttribute = "IMAP:uidvalidity";
+static const char* kLastUIDAttribute = "IMAP:lastuid";
 static const char* kStateAttribute = "IMAP:state";
 static const char* kFlagsAttribute = "IMAP:flags";
 static const char* kUIDAttribute = "MAIL:unique_id";
@@ -88,22 +89,23 @@ IMAPFolder::IMAPFolder(IMAPProtocol& protocol, const BString& mailboxName,
 	fProtocol(protocol),
 	fRef(ref),
 	fMailboxName(mailboxName),
-	fUIDValidity(UINT32_MAX)
+	fUIDValidity(UINT32_MAX),
+	fLastUID(0)
 {
 	// Initialize from folder attributes
 	BNode node(&ref);
 	if (node.InitCheck() != B_OK)
 		return;
 
-	if (node.ReadAttrString(kMailboxNameAttribute, &fMailboxName) != B_OK)
-		return;
+	BString originalMailboxName;
+	if (node.ReadAttrString(kMailboxNameAttribute, &originalMailboxName) == B_OK
+		&& originalMailboxName != mailboxName) {
+		// TODO: mailbox name has changed
+	}
 
-	uint32 uidValidity;
-	if (node.ReadAttr(kUIDValidityAttribute, B_UINT32_TYPE, 0, &uidValidity,
-			sizeof(uint32)) != sizeof(uint32))
-		return;
-
-	fUIDValidity = B_BENDIAN_TO_HOST_INT32(uidValidity);
+	fUIDValidity = _ReadUInt32(node, kUIDValidityAttribute);
+	fLastUID = _ReadUInt32(node, kLastUIDAttribute);
+	printf("IMAP: %s, last UID %lu\n", fMailboxName.String(), fLastUID);
 
 	attr_info info;
 	status_t status = node.GetAttrInfo(kStateAttribute, &info);
@@ -135,7 +137,7 @@ IMAPFolder::IMAPFolder(IMAPProtocol& protocol, const BString& mailboxName,
 
 	// Initialize current state from actual folder
 	// TODO: this should be done in another thread
-	_InitializeFolderState();
+	//_InitializeFolderState();
 }
 
 
@@ -154,7 +156,13 @@ IMAPFolder::SetListener(FolderListener* listener)
 void
 IMAPFolder::SetUIDValidity(uint32 uidValidity)
 {
+	if (fUIDValidity == uidValidity)
+		return;
+
 	fUIDValidity = uidValidity;
+
+	BNode node(&fRef);
+	_WriteUInt32(node, kUIDValidityAttribute, uidValidity);
 }
 
 
@@ -216,8 +224,18 @@ IMAPFolder::MessageStored(entry_ref& ref, BFile& file, uint32 fetchFlags,
 
 	// TODO: the call below may move/rename the file
 	fProtocol.MessageStored(ref, file, fetchFlags);
-
 	file.Unset();
+
+	if (uid > fLastUID) {
+		// Update last known UID
+		fLastUID = uid;
+
+		BNode directory(&fRef);
+		status_t status = _WriteUInt32(directory, kLastUIDAttribute, uid);
+		if (status != B_OK)
+			fprintf(stderr, "IMAP: Could not write last UID for mailbox "
+				"%s: %s\n", fMailboxName.String(), strerror(status));
+	}
 }
 
 
@@ -323,16 +341,35 @@ IMAPFolder::_WriteUniqueID(BNode& node, uint32 uid)
 uint32
 IMAPFolder::_ReadFlags(BNode& node)
 {
-	// TODO!
-	return 0;
+	return _ReadUInt32(node, kFlagsAttribute);
 }
 
 
 status_t
 IMAPFolder::_WriteFlags(BNode& node, uint32 flags)
 {
-	ssize_t bytesWritten = node.WriteAttr(kFlagsAttribute, B_UINT32_TYPE, 0,
-		&flags, sizeof(uint32));
+	return _WriteUInt32(node, kFlagsAttribute, flags);
+}
+
+
+uint32
+IMAPFolder::_ReadUInt32(BNode& node, const char* attribute)
+{
+	uint32 value;
+	ssize_t bytesRead = node.ReadAttr(attribute, B_UINT32_TYPE, 0,
+		&value, sizeof(uint32));
+	if (bytesRead == (ssize_t)sizeof(uint32))
+		return value;
+
+	return 0;
+}
+
+
+status_t
+IMAPFolder::_WriteUInt32(BNode& node, const char* attribute, uint32 value)
+{
+	ssize_t bytesWritten = node.WriteAttr(attribute, B_UINT32_TYPE, 0,
+		&value, sizeof(uint32));
 	if (bytesWritten == (ssize_t)sizeof(uint32))
 		return B_OK;
 
