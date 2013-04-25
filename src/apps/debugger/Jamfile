@@ -156,6 +156,7 @@ Application Debugger :
 	SymbolInfo.cpp
 	SystemInfo.cpp
 	Team.cpp
+	TeamInfo.cpp
 	TeamMemory.cpp
 	TeamMemoryBlock.cpp
 	TeamTypeInformation.cpp
