@@ -14,7 +14,7 @@ extern "C" {
 #endif
 
 enum {
-	B_SUPPORTS_OVERLAYS = 1 << 31	// part of display_mode.flags
+	B_SUPPORTS_OVERLAYS = 1U << 31	// part of display_mode.flags
 };
 
 enum {
