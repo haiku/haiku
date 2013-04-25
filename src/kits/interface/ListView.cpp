@@ -284,9 +284,9 @@ BListView::WindowActivated(bool state)
 
 
 void
-BListView::MessageReceived(BMessage* msg)
+BListView::MessageReceived(BMessage* message)
 {
-	switch (msg->what) {
+	switch (message->what) {
 		case B_COUNT_PROPERTIES:
 		case B_EXECUTE_PROPERTY:
 		case B_GET_PROPERTY:
@@ -296,14 +296,14 @@ BListView::MessageReceived(BMessage* msg)
 			BMessage specifier;
 			const char *property;
 
-			if (msg->GetCurrentSpecifier(NULL, &specifier) != B_OK
+			if (message->GetCurrentSpecifier(NULL, &specifier) != B_OK
 				|| specifier.FindString("property", &property) != B_OK)
 				return;
 
-			switch (propInfo.FindMatch(msg, 0, &specifier, msg->what,
+			switch (propInfo.FindMatch(message, 0, &specifier, message->what,
 					property)) {
 				case B_ERROR:
-					BView::MessageReceived(msg);
+					BView::MessageReceived(message);
 					break;
 
 				case 0:
@@ -312,7 +312,7 @@ BListView::MessageReceived(BMessage* msg)
 					reply.AddInt32("result", CountItems());
 					reply.AddInt32("error", B_OK);
 
-					msg->SendReply(&reply);
+					message->SendReply(&reply);
 					break;
 				}
 
@@ -332,7 +332,7 @@ BListView::MessageReceived(BMessage* msg)
 					reply.AddInt32("result", count);
 					reply.AddInt32("error", B_OK);
 
-					msg->SendReply(&reply);
+					message->SendReply(&reply);
 					break;
 				}
 
@@ -350,7 +350,7 @@ BListView::MessageReceived(BMessage* msg)
 
 					reply.AddInt32("error", B_OK);
 
-					msg->SendReply(&reply);
+					message->SendReply(&reply);
 					break;
 				}
 
@@ -362,14 +362,14 @@ BListView::MessageReceived(BMessage* msg)
 					BMessage reply(B_REPLY);
 
 					bool select;
-					if (msg->FindBool("data", &select) == B_OK && select)
+					if (message->FindBool("data", &select) == B_OK && select)
 						Select(0, CountItems() - 1, false);
 					else
 						DeselectAll();
 
 					reply.AddInt32("error", B_OK);
 
-					msg->SendReply(&reply);
+					message->SendReply(&reply);
 					break;
 				}
 			}
@@ -382,7 +382,7 @@ BListView::MessageReceived(BMessage* msg)
 			break;
 
 		default:
-			BView::MessageReceived(msg);
+			BView::MessageReceived(message);
 	}
 }
 
@@ -686,7 +686,7 @@ BListView::ScrollTo(BPoint point)
 
 
 bool
-BListView::AddItem(BListItem *item, int32 index)
+BListView::AddItem(BListItem* item, int32 index)
 {
 	if (!fList.AddItem(item, index))
 		return false;
@@ -909,7 +909,7 @@ BListView::ItemAt(int32 index) const
 
 
 int32
-BListView::IndexOf(BListItem *item) const
+BListView::IndexOf(BListItem* item) const
 {
 	if (Window()) {
 		if (item != NULL) {
