@@ -13,7 +13,8 @@
 
 class Settings {
 public:
-								Settings(const BMessage& archive);
+								Settings(const char* accountName,
+									const BMessage& archive);
 								~Settings();
 
 			BNetworkAddress		ServerAddress() const;
@@ -32,6 +33,7 @@ public:
 
 private:
 			const BMessage		fMessage;
+			BString				fAccountName;
 };
 
 

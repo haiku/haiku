@@ -256,7 +256,7 @@ FolderConfigWindow::FolderConfigWindow(BRect parent, const BMessage& settings)
 	BWindow(BRect(0, 0, 350, 350), B_TRANSLATE("IMAP Folders"),
 		B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
-	fSettings(settings)
+	fSettings("in", settings)
 {
 	fQuotaView = new BStringView("quota view",
 		B_TRANSLATE("Failed to fetch available storage."));

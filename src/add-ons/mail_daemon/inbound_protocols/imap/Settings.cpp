@@ -9,9 +9,10 @@
 #include <crypt.h>
 
 
-Settings::Settings(const BMessage& archive)
+Settings::Settings(const char* accountName, const BMessage& archive)
 	:
-	fMessage(archive)
+	fMessage(archive),
+	fAccountName(accountName)
 {
 }
 
@@ -78,7 +79,13 @@ Settings::Password() const
 BPath
 Settings::Destination() const
 {
-	return BPath(fMessage.GetString("destination", "/boot/home/mail/in"));
+	BPath path(fMessage.FindString("destination"));
+	if (path.Path() == NULL) {
+		// Use default directory
+		path = "/boot/home/mail";
+		path.Append(fAccountName.String());
+	}
+	return path;
 }
 
 

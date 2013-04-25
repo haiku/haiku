@@ -16,14 +16,14 @@
 IMAPProtocol::IMAPProtocol(const BMailAccountSettings& settings)
 	:
 	BInboundMailProtocol(settings),
-	fSettings(settings.InboundSettings()),
+	fSettings(settings.Name(), settings.InboundSettings()),
 	fWorkers(5, false)
 {
 	BPath destination = fSettings.Destination();
 
 	status_t status = create_directory(destination.Path(), 0755);
 	if (status != B_OK) {
-		fprintf(stderr, "imap: Could not create destination directory %s: %s\n",
+		fprintf(stderr, "IMAP: Could not create destination directory %s: %s\n",
 			destination.Path(), strerror(status));
 	}
 
