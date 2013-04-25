@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -39,6 +39,7 @@
 #include "Statement.h"
 #include "SymbolInfo.h"
 #include "TeamDebugInfo.h"
+#include "TeamInfo.h"
 #include "TeamMemoryBlock.h"
 #include "TeamMemoryBlockManager.h"
 #include "TeamSettings.h"
@@ -338,9 +339,8 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 		return error;
 
 	// check whether the team exists at all
-	// TODO: That should be done in the debugger interface!
-	team_info teamInfo;
-	error = get_team_info(fTeamID, &teamInfo);
+	TeamInfo teamInfo;
+	error = fDebuggerInterface->GetTeamInfo(teamInfo);
 	if (error != B_OK)
 		return error;
 
@@ -354,7 +354,7 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 	error = fTeam->Init();
 	if (error != B_OK)
 		return error;
-	fTeam->SetName(teamInfo.args);
+	fTeam->SetName(teamInfo.Arguments());
 		// TODO: Set a better name!
 
 	fTeam->AddListener(this);
