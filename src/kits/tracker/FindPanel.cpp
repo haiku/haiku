@@ -1956,25 +1956,27 @@ void
 FindPanel::SetUpAddRemoveButtons(BBox* box)
 {
 	BButton* removeButton = dynamic_cast<BButton*>(box->FindView("remove"));
-	if (removeButton == NULL) {
-		BButton* addButton = new BButton("add", B_TRANSLATE("Add"),
-			new BMessage(kAddItem));
-		addButton->SetTarget(this);
-
-		removeButton = new BButton("remove", B_TRANSLATE("Remove"),
-			new BMessage(kRemoveItem));
-		removeButton->SetEnabled(false);
-		removeButton->SetTarget(this);
-
-		BGroupLayout* layout = dynamic_cast<BGroupLayout*>(box->GetLayout());
-		BLayoutBuilder::Group<>(layout)
-			.AddGroup(B_HORIZONTAL)
-				.Add(addButton)
-				.Add(removeButton)
-				.AddGlue();
+	if (removeButton != NULL) {
+		removeButton->SetEnabled(fAttrGrid->CountRows() > 1);
+		return;
 	}
-	// enable remove button as needed
-	removeButton->SetEnabled(fAttrGrid->CountRows() > 1);
+
+	removeButton = new BButton("remove", B_TRANSLATE("Remove"),
+		new BMessage(kRemoveItem));
+	removeButton->SetEnabled(false);
+	removeButton->SetTarget(this);
+
+	BButton* addButton = new BButton("add", B_TRANSLATE("Add"),
+		new BMessage(kAddItem));
+	addButton->SetTarget(this);
+
+	BGroupLayout* layout = dynamic_cast<BGroupLayout*>(box->GetLayout());
+	BLayoutBuilder::Group<>(layout)
+		.AddGroup(B_HORIZONTAL)
+			.AddGlue()
+			.Add(removeButton)
+			.Add(addButton)
+			.End();
 }
 
 
