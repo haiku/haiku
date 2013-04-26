@@ -226,9 +226,8 @@ FindWindow::FindWindow(const entry_ref* newRef, bool editIfTemplateOnly)
 
 	fBackground = new FindPanel(fFile, this, fFromTemplate,
 		fEditTemplateOnly);
-	BLayoutBuilder::Group<>(this, B_VERTICAL, 10.0)
-		.SetInsets(0, 0, 0, 0)
-		.Add(fBackground);
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	GetLayout()->AddView(fBackground);
 	CenterOnScreen();
 }
 
