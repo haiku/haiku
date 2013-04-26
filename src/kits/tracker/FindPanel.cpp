@@ -876,11 +876,11 @@ FindPanel::AttachedToWindow()
 			textControl->MakeFocus();
 	}
 
-	BButton* button = dynamic_cast<BButton*>(FindView("remove"));
+	BButton* button = dynamic_cast<BButton*>(FindView("remove button"));
 	if (button)
 		button->SetTarget(this);
 
-	button = dynamic_cast<BButton*>(FindView("add"));
+	button = dynamic_cast<BButton*>(FindView("add button"));
 	if (button)
 		button->SetTarget(this);
 
@@ -1955,18 +1955,18 @@ FindPanel::AddRecentQueries(BMenu* menu, bool addSaveAsItem,
 void
 FindPanel::SetUpAddRemoveButtons(BBox* box)
 {
-	BButton* removeButton = dynamic_cast<BButton*>(box->FindView("remove"));
+	BButton* removeButton = dynamic_cast<BButton*>(box->FindView("remove button"));
 	if (removeButton != NULL) {
 		removeButton->SetEnabled(fAttrGrid->CountRows() > 1);
 		return;
 	}
 
-	removeButton = new BButton("remove", B_TRANSLATE("Remove"),
+	removeButton = new BButton("remove button", B_TRANSLATE("Remove"),
 		new BMessage(kRemoveItem));
 	removeButton->SetEnabled(false);
 	removeButton->SetTarget(this);
 
-	BButton* addButton = new BButton("add", B_TRANSLATE("Add"),
+	BButton* addButton = new BButton("add button", B_TRANSLATE("Add"),
 		new BMessage(kAddItem));
 	addButton->SetTarget(this);
 
@@ -2046,7 +2046,7 @@ FindPanel::RemoveAttrRow()
 	if (fAttrGrid->CountRows() != 1)
 		return;
 
-	BButton* button = dynamic_cast<BButton*>(FindView("remove"));
+	BButton* button = dynamic_cast<BButton*>(FindView("remove button"));
 	if (button)
 		button->SetEnabled(false);
 }
@@ -2386,13 +2386,13 @@ void
 FindPanel::RemoveByAttributeItems()
 {
 	RemoveAttrViewItems();
-	BView* view = FindView("add");
+	BView* view = FindView("add button");
 	if (view) {
 		view->RemoveSelf();
 		delete view;
 	}
 
-	view = FindView("remove");
+	view = FindView("remove button");
 	if (view) {
 		view->RemoveSelf();
 		delete view;
