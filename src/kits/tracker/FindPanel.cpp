@@ -89,7 +89,7 @@ All rights reserved.
 
 const char* kAllMimeTypes = "mime/ALLTYPES";
 
-const BRect kInitialRect(100, 100, 0, 0);
+const BRect kInitialRect(0, 0, 0, 0);
 const int32 kInitialAttrModeWindowHeight = 140;
 const int32 kIncrementPerAttribute = 30;
 const float kMoreOptionsDelta = 20;
@@ -229,6 +229,7 @@ FindWindow::FindWindow(const entry_ref* newRef, bool editIfTemplateOnly)
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 10.0)
 		.SetInsets(0, 0, 0, 0)
 		.Add(fBackground);
+	CenterOnScreen();
 }
 
 
