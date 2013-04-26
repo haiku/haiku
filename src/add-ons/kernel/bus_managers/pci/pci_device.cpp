@@ -107,9 +107,9 @@ pci_device_get_pci_info(pci_device* device, struct pci_info* info)
 static status_t
 pci_device_init_driver(device_node* node, void** _cookie)
 {
-	uint32 domain;
+	uint8 domain;
 	uint8 bus, deviceNumber, function;
-	if (gDeviceManager->get_attr_uint32(node, B_PCI_DEVICE_DOMAIN, &domain,
+	if (gDeviceManager->get_attr_uint8(node, B_PCI_DEVICE_DOMAIN, &domain,
 			false) != B_OK
 		|| gDeviceManager->get_attr_uint8(node, B_PCI_DEVICE_BUS, &bus,
 			false) != B_OK
