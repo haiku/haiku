@@ -27,7 +27,7 @@ static status_t
 scsi_controller_added(device_node *parent)
 {
 	const char *controller_name;
-	int pathID;
+	int32 pathID;
 
 	SHOW_FLOW0(4, "");
 
@@ -48,7 +48,8 @@ scsi_controller_added(device_node *parent)
 		device_attr attrs[] = {
 			// remember who we are
 			// (could use the controller name, but probably some software would choke)
-			{ SCSI_BUS_PATH_ID_ITEM, B_UINT8_TYPE, { ui8: pathID }},
+			// TODO create_id() generates a 32 bit ranged integer but we need only 8 bits
+			{ SCSI_BUS_PATH_ID_ITEM, B_UINT8_TYPE, { ui8: (uint8)pathID }},
 
 			// tell PnP manager to clean up ID
 //			{ PNP_MANAGER_ID_GENERATOR, B_STRING_TYPE, { string: SCSI_PATHID_GENERATOR }},
