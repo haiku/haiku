@@ -528,7 +528,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 			$(hpkgBaseURL)/jam-2.5-1-x86_gcc2.hpkg
 			: common packages ;
 		InstallOptionalHaikuImagePackage
-			$(hpkgBaseURL)/mkdepend-1.7-1-x86_gcc2.hpkg
+			$(hpkgBaseURL)/mkdepend-1.7-2-x86_gcc2.hpkg
 			: common packages ;
 		InstallOptionalHaikuImagePackage
 			$(hpkgBaseURL)/make-3.82-4-x86_gcc2.hpkg
