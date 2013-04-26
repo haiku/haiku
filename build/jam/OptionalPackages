@@ -863,7 +863,7 @@ if [ IsOptionalHaikuImagePackageAdded LibXML2 ] {
 				$(baseURL)/libxml2-2.7.8-r1a3-x86-gcc4-2011-05-24.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/libxml2-2.7.8-4-x86_gcc2.hpkg
+				$(hpkgBaseURL)/libxml2-2.8.0-1-x86_gcc2.hpkg
 				: common packages ;
 		}
 	}
