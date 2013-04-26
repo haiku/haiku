@@ -1999,7 +1999,6 @@ FindPanel::AddAttrRow()
 		BLayoutBuilder::Group<>(box, B_VERTICAL);
 
 		grid = new BGridView("AttrFields");
-		//box->SetBorder(B_FANCY_BORDER);
 		box->AddChild(grid);
 	}
 
@@ -2007,7 +2006,7 @@ FindPanel::AddAttrRow()
 
 	AddAttributeControls(fAttrGrid->CountRows());
 
-		// add logic to previous attrview
+	// add logic to previous attrview
 	if (fAttrGrid->CountRows() > 1)
 		AddLogicMenu(fAttrGrid->CountRows() - 2);
 
