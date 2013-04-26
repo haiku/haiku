@@ -54,6 +54,7 @@ class BCheckBox;
 class BMenuField;
 class BFile;
 class BPopUpMenu;
+class BGridLayout;
 
 namespace BPrivate {
 
@@ -173,11 +174,12 @@ class FindWindow : public BWindow {
 
 class FindPanel : public BView {
 	public:
-		FindPanel(BRect, BFile*, FindWindow* parent, bool fromTemplate,
+		FindPanel(BFile*, FindWindow* parent, bool fromTemplate,
 			bool editTemplateOnly);
 		virtual ~FindPanel();
 
 		virtual	void AttachedToWindow();
+		virtual	void Draw(BRect updateRect);
 		virtual	void MessageReceived(BMessage*);
 
 		void BuildAttrQuery(BQuery*, bool &dynamicDate) const;
@@ -192,10 +194,6 @@ class FindPanel : public BView {
 		uint32 Mode() const
 			{ return fMode; }
 
-		static BRect InitialViewSize(const BNode*);
-			// used when showing window, does not account for more options,
-			// those if used will force a resize later
-
 		static uint32 InitialMode(const BNode* entry);
 		void SaveWindowState(BNode*, bool editTemplate);
 
@@ -207,6 +205,7 @@ class FindPanel : public BView {
 			// build up a simple query from the name we are searching for
 
 		void GetDefaultName(BString &) const;
+		void GetDefaultAttrName(BString &, int32) const;
 		const char* UserSpecifiedName() const;
 			// name filled out in the query name text field
 
@@ -216,11 +215,6 @@ class FindPanel : public BView {
 			// queries
 
 	private:
-		static float ViewHeightForMode(uint32 mode, bool moreOptions);
-			// accouts for moreOptions
-			// if in attributeView, only returns valid result if one attr only
-		static float BoxHeightForMode(uint32 mode, bool moreOptions);
-
 		void AddMimeTypesToMenu();
 			// populates the type menu
 		static bool AddOneMimeTypeToMenu(const ShortMimeInfo*, void* castToMenu);
@@ -229,9 +223,9 @@ class FindPanel : public BView {
 			// populates the volume menu
 		void ShowVolumeMenuLabel();
 
-		void AddAttrView();
+		void AddAttrRow();
 			// add one more attribute item to the attr view
-		void RemoveAttrView();
+		void RemoveAttrRow();
 			// remove the last attribute item
 		void AddFirstAttr();
 
@@ -239,12 +233,13 @@ class FindPanel : public BView {
 		void RestoreWindowState(const BNode*);
 		void RestoreMimeTypeMenuSelection(const BNode*);
 		void AddByAttributeItems(const BNode*);
-		void ResizeAttributeBox(const BNode*);
 		void RemoveByAttributeItems();
-		void RemoveAttrViewItems();
+		void RemoveAttrViewItems(bool removeGrid = true);
 		void ShowOrHideMimeTypeMenu();
 			// MimeTypeWindow is only shown in kByNameItem and
 			// kByAttributeItem modes
+
+		void AddAttributeControls(int32);
 
 		void ShowOrHideMoreOptions(bool show);
 			// fMode gets set by this and the call relies on it being
@@ -252,7 +247,6 @@ class FindPanel : public BView {
 		static int32 InitialAttrCount(const BNode*);
 		void FillCurrentQueryName(BTextControl*, FindWindow*);
 		void AddByNameOrFormulaItems();
-		void AddOneAttributeItem(BBox* box, BRect);
 		void SetUpAddRemoveButtons(BBox* box);
 
 		void SwitchMode(uint32);
@@ -262,14 +256,25 @@ class FindPanel : public BView {
 
 		void SaveAsQueryOrTemplate(const entry_ref*, const char*, bool queryTemplate);
 
+		BView* FindAttrView(const char*, int row) const;
+
+		void AddAttributes(BMenu* menu, const BMimeType &type);
+		void AddMimeTypeAttrs(BMenu* menu);
+		void RestoreAttrState(const BMessage &, int32);
+		void SaveAttrState(BMessage*, int32);
+		void AddLogicMenu(int32, bool selectAnd = true);
+		void RemoveLogicMenu(int32);
+
+		void ResizeMenuField(BMenuField*);
+
 		uint32 fMode;
-		BObjectList<TAttrView> fAttrViewList;
+		BGridLayout* fAttrGrid;
 		BPopUpMenu* fMimeTypeMenu;
 		BMenuField* fMimeTypeField;
 		BPopUpMenu* fVolMenu;
 		BPopUpMenu* fSearchModeMenu;
 		BPopUpMenu* fRecentQueries;
-		DialogPane* fMoreOptionsPane;
+		BBox* fMoreOptions;
 		BTextControl* fQueryName;
 		BString fInitialQueryName;
 
@@ -282,38 +287,6 @@ class FindPanel : public BView {
 		typedef BView _inherited;
 
 		friend class RecentQueriesPopUp;
-};
-
-class TAttrView : public BView {
-	// a single attribute item - the search by attribute view
-	// can add several of these
-	public:
-		TAttrView(BRect frame, int32 index);
-		~TAttrView();
-
-		virtual void AttachedToWindow();
-
-		void RestoreState(const BMessage &settings, int32 index);
-		void SaveState(BMessage* settings, int32 index);
-
-		virtual	void Draw(BRect updateRect);
-		virtual	void MessageReceived(BMessage* message);
-
-		void AddLogicMenu(bool selectAnd = true);
-		void RemoveLogicMenu();
-		void AddMimeTypeAttrs();
-		void MakeTextViewFocus();
-
-		void GetDefaultName(BString &result) const;
-
-	private:
-		void AddAttributes(BMenu* menu, const BMimeType &type);
-		void AddMimeTypeAttrs(BMenu* menu);
-
-		BMenuField* fMenuField;
-		BTextControl* fTextControl;
-
-		typedef BView _inherited;
 };
 
 
