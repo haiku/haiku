@@ -799,16 +799,16 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate,
 		fRecentQueries);
 	queryBox->SetLabel(recentQueriesMenuField);
 
-	BGroupView* queryBoxView = new BGroupView(B_VERTICAL, 10.0);
-	queryBoxView->GroupLayout()->SetInsets(10, 10, 10, 10);
+	BGroupView* queryBoxView = new BGroupView(B_VERTICAL, B_USE_DEFAULT_SPACING);
+	queryBoxView->GroupLayout()->SetInsets(B_USE_DEFAULT_SPACING);
 	queryBox->AddChild(queryBoxView);
 
 	icon->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_BOTTOM));
 	button->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT, B_ALIGN_BOTTOM));
 
-	BLayoutBuilder::Group<>(queryBoxView, B_VERTICAL, 10.0)
-		.SetInsets(10, 10, 10, 10)
-		.AddGroup(B_HORIZONTAL, 1.0)
+	BLayoutBuilder::Group<>(queryBoxView, B_VERTICAL, B_USE_DEFAULT_SPACING)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
 			.Add(fMimeTypeField)
 			.Add(mimeTypeFieldSpacer)
 			.Add(searchModeField)
@@ -817,10 +817,10 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate,
 			.End()
 		.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
 		.Add(queryControls);
-	BLayoutBuilder::Group<>(this, B_VERTICAL, 10.0)
-		.SetInsets(10, 10, 10, 10)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_DEFAULT_SPACING)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(queryBox)
-		.AddGroup(B_HORIZONTAL, 10.0)
+		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 			.Add(icon)
 			.AddGroup(B_VERTICAL)
 				.AddGroup(B_HORIZONTAL)
