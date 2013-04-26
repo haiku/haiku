@@ -1517,7 +1517,8 @@ VariablesView::MessageReceived(BMessage* message)
 			promptMessage->AddPointer("node", fVariableTable
 				->SelectionModel()->NodeAt(0));
 			PromptWindow* promptWindow = new(std::nothrow) PromptWindow(
-				"Specify Type", "Type: ", BMessenger(this), promptMessage);
+				"Specify Type", "Type: ", NULL, BMessenger(this),
+				promptMessage);
 			if (promptWindow == NULL)
 				return;
 
