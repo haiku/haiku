@@ -751,14 +751,18 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate,
 		B_TRANSLATE("Temporary"), NULL);
 	fTemporaryCheck->SetValue(B_CONTROL_ON);
 
+	BView* checkboxGroup = BLayoutBuilder::Group<>(B_HORIZONTAL)
+		.Add(fSearchTrashCheck)
+		.Add(fTemporaryCheck)
+		.View();
+
 	// add the more options collapsible pane
 	fMoreOptions = new BBox(B_NO_BORDER, BLayoutBuilder::Group<>()
-		.AddGroup(B_VERTICAL)
-			.Add(fQueryName)
-			.AddGroup(B_HORIZONTAL)
-				.Add(fSearchTrashCheck)
-				.Add(fTemporaryCheck)
-				.End()
+		.AddGrid(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
+			.Add(fQueryName->CreateLabelLayoutItem(), 0, 0)
+			.Add(fQueryName->CreateTextViewLayoutItem(), 1, 0)
+			.Add(BSpaceLayoutItem::CreateHorizontalStrut(0), 0, 1)
+			.Add(checkboxGroup, 1, 1)
 			.End()
 		.View());
 
