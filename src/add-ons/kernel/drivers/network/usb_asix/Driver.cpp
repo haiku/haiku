@@ -65,7 +65,8 @@ DeviceInfo gSupportedDevices[] = {
 	{ { 0x1631, 0x6200 }, DeviceInfo::AX88172, "GoodWay USB2Ethernet" },
 	{ { 0x1737, 0x0039 }, DeviceInfo::AX88178, "LinkSys 1000" },
 	{ { 0x17ef, 0x7203 }, DeviceInfo::AX88772, "Lenovo U2L100P 10/100" },
-	{ { 0x2001, 0x1A00 }, DeviceInfo::AX88172, "D-Link DUB-E100" },
+	{ { 0x2001, 0x1a00 }, DeviceInfo::AX88172, "D-Link DUB-E100" },
+	{ { 0x2001, 0x1a02 }, DeviceInfo::AX88772B, "D-Link DUB-E100 rev.C1" },
 	{ { 0x2001, 0x3c05 }, DeviceInfo::AX88772, "D-Link DUB-E100 rev.B1" },
 	{ { 0x6189, 0x182d }, DeviceInfo::AX88172, "Sitecom LN-029" },
 };
