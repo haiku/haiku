@@ -998,11 +998,9 @@ VariablesView::VariableTableModel::ValueNodeChildrenCreated(
 				child->IsInternal(), childCount == 1);
 		}
 
-		if (valueNode->ChildCreationNeedsValue()) {
-			ModelNode* childNode = fNodeTable.Lookup(child);
-			if (childNode != NULL)
-				fContainerListener->ModelNodeValueRequested(childNode);
-		}
+		ModelNode* childNode = fNodeTable.Lookup(child);
+		if (childNode != NULL)
+			fContainerListener->ModelNodeValueRequested(childNode);
 	}
 
 	if (valueNode->ChildCreationNeedsValue())
@@ -1921,9 +1919,23 @@ VariablesView::_RequestNodeValue(ModelNode* node)
 
 	// get the value node and check whether its value has not yet been resolved
 	ValueNode* valueNode = nodeChild->Node();
-	if (valueNode == NULL
-		|| valueNode->LocationAndValueResolutionState()
-			!= VALUE_NODE_UNRESOLVED) {
+	if (valueNode == NULL) {
+		ModelNode* parent = node->Parent();
+		if (parent != NULL) {
+			TreeTablePath path;
+			if (!fVariableTableModel->GetTreePath(parent, path))
+				return;
+
+			// if the parent node was already expanded when the child was
+			// added, we may not yet have added a value node.
+			// Notify the table model that this needs to be done.
+			if (fVariableTable->IsNodeExpanded(path))
+				fVariableTableModel->NodeExpanded(parent);
+		}
+	}
+
+	if (valueNode == NULL || valueNode->LocationAndValueResolutionState()
+		!= VALUE_NODE_UNRESOLVED) {
 		return;
 	}
 
