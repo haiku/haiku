@@ -7,21 +7,23 @@
  *		Yongcong Du <ycdu.vmcore@gmail.com>
  */
 
-#include <KernelExport.h>
-#include <Drivers.h>
-#include <Errors.h>
-#include <smp.h>
-#include <cpu.h>
-#include <arch_system_info.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include <ACPI.h>
+#include <Drivers.h>
+#include <Errors.h>
+#include <KernelExport.h>
+
+#include <arch_system_info.h>
+#include <cpu.h>
 #include <cpuidle.h>
+#include <smp.h>
 
 #include "x86_cpuidle.h"
+
 
 #define ACPI_PDC_REVID		0x1
 #define ACPI_OSC_QUERY		(1 << 0)
@@ -65,6 +67,7 @@
 
 #define ACPI_CPUIDLE_MODULE_NAME "drivers/power/x86_cpuidle/acpi/driver_v1"
 
+
 struct acpicpu_reg {
 	uint8	reg_desc;
 	uint16	reg_reslen;
@@ -89,10 +92,12 @@ struct acpi_cstate_info {
 	uint8 type;
 };
 
-static acpi_cpuidle_driver_info *acpi_processor[B_MAX_CPU_COUNT];
+
+static acpi_cpuidle_driver_info *sAcpiProcessor[B_MAX_CPU_COUNT];
 static CpuidleDevice sAcpiDevice;
 static device_manager_info *sDeviceManager;
 static acpi_module_info *sAcpi;
+
 CpuidleModuleInfo *gIdle;
 
 
@@ -110,11 +115,13 @@ acpi_eval_pdc(acpi_cpuidle_driver_info *device)
 	cap[2] = ACPI_PDC_C_C1_HALT | ACPI_PDC_SMP_C1PT | ACPI_PDC_SMP_C2C3;
 	cap[2] |= ACPI_PDC_SMP_P_SW | ACPI_PDC_SMP_C_SW | ACPI_PDC_SMP_T_SW;
 	cap[2] |= ACPI_PDC_C_C1_FFH | ACPI_PDC_C_C2C3_FFH;
-	cap[2] |= ACPI_PDC_SMP_T_SW | ACPI_PDC_P_FFH | ACPI_PDC_P_HWCOORD | ACPI_PDC_T_FFH;
+	cap[2] |= ACPI_PDC_SMP_T_SW | ACPI_PDC_P_FFH | ACPI_PDC_P_HWCOORD
+		| ACPI_PDC_T_FFH;
 	obj.object_type = ACPI_TYPE_BUFFER;
 	obj.data.buffer.length = sizeof(cap);
 	obj.data.buffer.buffer = cap;
-	status_t status = device->acpi->evaluate_method(device->acpi_cookie, "_PDC", &arg, NULL);
+	status_t status = device->acpi->evaluate_method(device->acpi_cookie, "_PDC",
+		&arg, NULL);
 	return status;
 }
 
@@ -133,7 +140,8 @@ acpi_eval_osc(acpi_cpuidle_driver_info *device)
 	cap[1] = ACPI_PDC_C_C1_HALT | ACPI_PDC_SMP_C1PT | ACPI_PDC_SMP_C2C3;
 	cap[1] |= ACPI_PDC_SMP_P_SW | ACPI_PDC_SMP_C_SW | ACPI_PDC_SMP_T_SW;
 	cap[1] |= ACPI_PDC_C_C1_FFH | ACPI_PDC_C_C2C3_FFH;
-	cap[1] |= ACPI_PDC_SMP_T_SW | ACPI_PDC_P_FFH | ACPI_PDC_P_HWCOORD | ACPI_PDC_T_FFH;
+	cap[1] |= ACPI_PDC_SMP_T_SW | ACPI_PDC_P_FFH | ACPI_PDC_P_HWCOORD
+		| ACPI_PDC_T_FFH;
 
 	acpi_objects arg;
 	acpi_object_type obj[4];
@@ -155,7 +163,8 @@ acpi_eval_osc(acpi_cpuidle_driver_info *device)
 	acpi_data buf;
 	buf.pointer = NULL;
 	buf.length = ACPI_ALLOCATE_LOCAL_BUFFER;
-	status_t status = device->acpi->evaluate_method(device->acpi_cookie, "_OSC", &arg, &buf);
+	status_t status = device->acpi->evaluate_method(device->acpi_cookie, "_OSC",
+		&arg, &buf);
 	if (status != B_OK)
 		return status;
 	acpi_object_type *osc = (acpi_object_type *)buf.pointer;
@@ -232,7 +241,7 @@ acpi_cstate_idle(int32 state, CpuidleDevice *device)
 	// set BM_RLD for Bus Master to activity to wake the system from C3
 	// With Newer chipsets BM_RLD is a NOP Since DMA is automatically handled
 	// during C3 State
-	acpi_cpuidle_driver_info *pi = acpi_processor[smp_get_current_cpu()];
+	acpi_cpuidle_driver_info *pi = sAcpiProcessor[smp_get_current_cpu()];
 	if (pi->flags & ACPI_FLAG_C_BM)
 		sAcpi->write_bit_register(ACPI_BITREG_BUS_MASTER_RLD, 1);
 
@@ -283,7 +292,7 @@ acpi_cstate_add(acpi_object_type *object, CpuidleCstate *cState)
 	}
 	ci->type = n;
 	dprintf("C%" B_PRId32 "\n", n);
-	snprintf(cState->name, sizeof(cState->name), "C%"B_PRId32, n);
+	snprintf(cState->name, sizeof(cState->name), "C%" B_PRId32, n);
 
 	// Latency
 	pointer = &object->data.package.objects[2];
@@ -378,7 +387,7 @@ acpi_cpuidle_setup(acpi_cpuidle_driver_info *device)
 	if (status != B_OK)
 		status = acpi_eval_pdc(device);
 	if (status != B_OK) {
-		dprintf("faile to eval _OSC and _PDC\n");
+		dprintf("failed to eval _OSC and _PDC\n");
 		return status;
 	}
 
@@ -433,7 +442,7 @@ acpi_cpuidle_init(void)
 	dprintf("acpi_cpuidle_init\n");
 
 	for (int32 i = 0; i < smp_get_num_cpus(); i++)
-		if (acpi_cpuidle_setup(acpi_processor[i]) != B_OK)
+		if (acpi_cpuidle_setup(sAcpiProcessor[i]) != B_OK)
 			return B_ERROR;
 
 	status_t status = gIdle->AddDevice(&sAcpiDevice);
@@ -459,10 +468,10 @@ acpi_processor_init(acpi_cpuidle_driver_info *device)
 		return B_IO_ERROR;
 	}
 	acpi_object_type *object = (acpi_object_type *)buffer.pointer;
-	dprintf("acpi cpu%"B_PRId32": P_BLK at %#x/%lu\n",
-			object->data.processor.cpu_id,
-			object->data.processor.pblk_address,
-			object->data.processor.pblk_length);
+	dprintf("acpi cpu%" B_PRId32 ": P_BLK at %#x/%lu\n",
+		object->data.processor.cpu_id,
+		object->data.processor.pblk_address,
+		object->data.processor.pblk_length);
 	int32 cpuid = object->data.processor.cpu_id;
 	free(buffer.pointer);
 	if (cpuid > smp_get_num_cpus())
@@ -471,7 +480,7 @@ acpi_processor_init(acpi_cpuidle_driver_info *device)
 	if (smp_get_num_cpus() == 1)
 		cpuid = 1;
 
-	acpi_processor[cpuid-1] = device;
+	sAcpiProcessor[cpuid - 1] = device;
 
 	if (cpuid == 1) {
 		if (intel_cpuidle_init() != B_OK)
@@ -493,11 +502,12 @@ acpi_cpuidle_support(device_node *parent)
 	if (sDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false))
 		return -1;
 
-	if (strcmp(bus, "acpi"))
+	if (strcmp(bus, "acpi") != 0)
 		return 0.0;
 
 	// check whether it's really a cpu Device
-	if (sDeviceManager->get_attr_uint32(parent, ACPI_DEVICE_TYPE_ITEM, &device_type, false) != B_OK
+	if (sDeviceManager->get_attr_uint32(parent, ACPI_DEVICE_TYPE_ITEM,
+			&device_type, false) != B_OK
 		|| device_type != ACPI_TYPE_PROCESSOR) {
 		return 0.0;
 	}
