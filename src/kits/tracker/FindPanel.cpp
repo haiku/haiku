@@ -686,7 +686,7 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate,
 	uint32 initialMode = InitialMode(node);
 
 	BMessenger self(this);
-	fRecentQueries = new BPopUpMenu(B_TRANSLATE("Recent Queries"));
+	fRecentQueries = new BPopUpMenu(B_TRANSLATE("Recent queries"));
 	AddRecentQueries(fRecentQueries, true, &self,
 		kSwitchToQueryTemplate);
 
@@ -1929,11 +1929,13 @@ FindPanel::AddRecentQueries(BMenu* menu, bool addSaveAsItem,
 	templates.EachElement(AddOneRecentItem, &params);
 
 	int32 count = recentQueries.CountItems();
-	// show only up to 10 recent queries
-	if (count > 10)
+	if (count > 10) {
+		// show only up to 10 recent queries
 		count = 10;
+	} else if (count < 0)
+		count = 0;
 
-	if (templates.CountItems() && count)
+	if (templates.CountItems() > 0 && count > 0)
 		menu->AddSeparatorItem();
 
 	for (int32 index = 0; index < count; index++)
@@ -1941,7 +1943,7 @@ FindPanel::AddRecentQueries(BMenu* menu, bool addSaveAsItem,
 
 	if (addSaveAsItem) {
 		// add a Save as template item
-		if (count || templates.CountItems())
+		if (count > 0 || templates.CountItems() > 0)
 			menu->AddSeparatorItem();
 
 		BMessage* message = new BMessage(kRunSaveAsTemplatePanel);
