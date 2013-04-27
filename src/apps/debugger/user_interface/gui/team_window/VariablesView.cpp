@@ -1035,7 +1035,7 @@ VariablesView::VariableTableModel::ValueNodeChildrenDeleted(ValueNode* node)
 		fNodeTable.Remove(hiddenChild);
 	}
 
-	for (int32 i = 0; i < modelNode->CountChildren(); i++) {
+	for (int32 i = modelNode->CountChildren() - 1; i >= 0 ; i--) {
 		BReference<ModelNode> childNode = modelNode->ChildAt(i);
 		TreeTablePath treePath;
 		if (GetTreePath(childNode, treePath)) {
