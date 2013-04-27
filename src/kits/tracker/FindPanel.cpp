@@ -686,9 +686,9 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate,
 	uint32 initialMode = InitialMode(node);
 
 	BMessenger self(this);
-	fRecentQueries = new BPopUpMenu(B_TRANSLATE("Recent queries"));
-	AddRecentQueries(fRecentQueries, true, &self,
-		kSwitchToQueryTemplate);
+	fRecentQueries = new BPopUpMenu(B_TRANSLATE("Recent queries"), false,
+		false);
+	AddRecentQueries(fRecentQueries, true, &self, kSwitchToQueryTemplate);
 
 	// add popup for mime types
 	fMimeTypeMenu = new BPopUpMenu("MimeTypeMenu");
