@@ -1039,6 +1039,10 @@ VariablesView::VariableTableModel::ValueNodeChildrenDeleted(ValueNode* node)
 
 	for (int32 i = modelNode->CountChildren() - 1; i >= 0 ; i--) {
 		BReference<ModelNode> childNode = modelNode->ChildAt(i);
+		// recursively remove the current node's child hierarchy.
+		if (childNode->CountChildren() != 0)
+			ValueNodeChildrenDeleted(childNode->NodeChild()->Node());
+
 		TreeTablePath treePath;
 		if (GetTreePath(childNode, treePath)) {
 			int32 index = treePath.RemoveLastComponent();
