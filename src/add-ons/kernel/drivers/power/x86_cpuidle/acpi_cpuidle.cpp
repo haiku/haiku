@@ -83,6 +83,7 @@ struct acpi_cpuidle_driver_info {
 	acpi_device_module_info *acpi;
 	acpi_device acpi_cookie;
 	uint32 flags;
+	int32 cpuIndex;
 };
 
 struct acpi_cstate_info {
@@ -455,39 +456,48 @@ acpi_cpuidle_init(void)
 static status_t
 acpi_processor_init(acpi_cpuidle_driver_info *device)
 {
-	status_t status = B_ERROR;
+	// get the CPU index
+	dprintf("get acpi processor @%p\n", device->acpi_cookie);
 
 	acpi_data buffer;
 	buffer.pointer = NULL;
 	buffer.length = ACPI_ALLOCATE_BUFFER;
-	dprintf("get acpi processor @%p\n", device->acpi_cookie);
-	status = device->acpi->evaluate_method(device->acpi_cookie, NULL, NULL,
-		&buffer);
+	status_t status = device->acpi->evaluate_method(device->acpi_cookie, NULL,
+		NULL, &buffer);
 	if (status != B_OK) {
 		dprintf("failed to get processor obj\n");
-		return B_IO_ERROR;
+		return status;
 	}
+
 	acpi_object_type *object = (acpi_object_type *)buffer.pointer;
 	dprintf("acpi cpu%" B_PRId32 ": P_BLK at %#x/%lu\n",
 		object->data.processor.cpu_id,
 		object->data.processor.pblk_address,
 		object->data.processor.pblk_length);
-	int32 cpuid = object->data.processor.cpu_id;
+
+	int32 cpuIndex = object->data.processor.cpu_id;
 	free(buffer.pointer);
-	if (cpuid > smp_get_num_cpus())
+
+	if (cpuIndex < 0 || cpuIndex >= smp_get_num_cpus())
 		return B_ERROR;
 
-	if (smp_get_num_cpus() == 1)
-		cpuid = 1;
+	device->cpuIndex = cpuIndex;
+	sAcpiProcessor[cpuIndex] = device;
 
-	sAcpiProcessor[cpuid - 1] = device;
-
-	if (cpuid == 1) {
-		if (intel_cpuidle_init() != B_OK)
-			return acpi_cpuidle_init();
+	// If nodes for all processors have been registered, init the idle callback.
+	for (int32 i = smp_get_num_cpus() - 1; i >= 0; i--) {
+		if (sAcpiProcessor[i] == NULL)
+			return B_OK;
 	}
 
-	return B_OK;
+	if (intel_cpuidle_init() == B_OK)
+		return B_OK;
+
+	status = acpi_cpuidle_init();
+	if (status != B_OK)
+		sAcpiProcessor[cpuIndex] = NULL;
+
+	return status;
 }
 
 
@@ -539,8 +549,6 @@ acpi_cpuidle_init_driver(device_node *node, void **driverCookie)
 	if (device == NULL)
 		return B_NO_MEMORY;
 
-	*driverCookie = device;
-
 	device->node = node;
 
 	device_node *parent;
@@ -549,7 +557,14 @@ acpi_cpuidle_init_driver(device_node *node, void **driverCookie)
 		(void **)&device->acpi_cookie);
 	sDeviceManager->put_node(parent);
 
-	return acpi_processor_init(device);
+	status_t status = acpi_processor_init(device);
+	if (status != B_OK) {
+		free(device);
+		return status;
+	}
+
+	*driverCookie = device;
+	return B_OK;
 }
 
 
@@ -558,6 +573,9 @@ acpi_cpuidle_uninit_driver(void *driverCookie)
 {
 	dprintf("acpi_cpuidle_uninit_driver");
 	acpi_cpuidle_driver_info *device = (acpi_cpuidle_driver_info *)driverCookie;
+	// TODO: When the first device to be unregistered, we'd need to balance the
+	// gIdle->AddDevice() call, but ATM isn't any API for that.
+	sAcpiProcessor[device->cpuIndex] = NULL;
 	free(device);
 }
 
