@@ -1106,6 +1106,8 @@ DwarfImageDebugInfo::_CreateReturnValues(ReturnValueInfoList* returnValueInfos,
 		status_t result = B_OK;
 		ImageDebugInfo* imageInfo = image->GetImageDebugInfo();
 		FunctionInstance* targetFunction;
+		target_size_t addressSize = fDebuggerInterface->GetArchitecture()
+			->AddressSize();
 		if (subroutineAddress >= fPLTSectionStart
 			&& subroutineAddress < fPLTSectionEnd) {
 			// if the function in question is position-independent, the call
@@ -1118,8 +1120,6 @@ DwarfImageDebugInfo::_CreateReturnValues(ReturnValueInfoList* returnValueInfos,
 				return B_BAD_VALUE;
 			}
 
-			target_size_t addressSize = fDebuggerInterface->GetArchitecture()
-				->AddressSize();
 			ssize_t bytesRead = fDebuggerInterface->ReadMemory(
 				info.TargetAddress(), &subroutineAddress, addressSize);
 
@@ -1154,6 +1154,11 @@ DwarfImageDebugInfo::_CreateReturnValues(ReturnValueInfoList* returnValueInfos,
 						byteSize = fArchitecture->AddressSize();
 				} else
 					byteSize = returnType->ByteSize()->constant;
+
+				// if we were unable to determine a size for the type,
+				// simply default to the architecture's register width.
+				if (byteSize == 0)
+					byteSize = addressSize;
 
 				ValueLocation* location;
 				result = fArchitecture->GetReturnAddressLocation(frame,
