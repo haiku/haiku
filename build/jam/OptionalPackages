@@ -40,6 +40,7 @@
 #	Groff					- text formatter used for man pages
 #	ICU-devel				- the headers and lib-links for ICU (for development)
 #	KeymapSwitcher			- Easy to use keymap switcher
+#	LibEdit					- A BSD licensed replacement for GNU readline
 #	LibEvent				- An event notification library
 #	LibIconv				- text encoding conversion library
 #	LibLayout				- GCC2 package needed by some BeOS apps to compile
@@ -775,6 +776,22 @@ if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
 		}
 		AddSymlinkToHaikuImage home config settings deskbar Preferences
 			: /boot/common/bin/KeymapSwitcher ;
+	}
+}
+
+
+# LibEdit
+if [ IsOptionalHaikuImagePackageAdded LibEdit ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package LibEdit available for $(TARGET_ARCH)" ;
+	} else {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			Echo "No optional package LibEdit available for gcc 4" ;
+		} else {
+			InstallOptionalHaikuImagePackage
+				$(hpkgBaseURL)/libedit-20120601_3.0-2-x86_gcc2.hpkg
+				: common packages ;
+		}
 	}
 }
 

@@ -17,6 +17,7 @@ OptionalPackageDependencies Development : DevelopmentBase Perl ;
 OptionalPackageDependencies GetText : LibIconv ;
 OptionalPackageDependencies Git : Expat Curl OpenSSL LibIconv ;
 OptionalPackageDependencies ICU-devel : DevelopmentBase ;
+OptionalPackageDependencies LibEdit : NCurses ;
 OptionalPackageDependencies LibLayout : DevelopmentBase ;
 OptionalPackageDependencies Man : Groff ;
 OptionalPackageDependencies Tar : LibIconv ;
