@@ -799,9 +799,7 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate,
 	queryControls->SetBorder(B_NO_BORDER);
 
 	BBox* queryBox = new BBox("Outer Controls");
-	BMenuField* recentQueriesMenuField = new BMenuField("RecentQueries", NULL,
-		fRecentQueries);
-	queryBox->SetLabel(recentQueriesMenuField);
+	queryBox->SetLabel(new BMenuField("RecentQueries", NULL, fRecentQueries));
 
 	BGroupView* queryBoxView = new BGroupView(B_VERTICAL, B_USE_DEFAULT_SPACING);
 	queryBoxView->GroupLayout()->SetInsets(B_USE_DEFAULT_SPACING);
