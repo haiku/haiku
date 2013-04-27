@@ -490,10 +490,10 @@ VMAnonymousCache::Resize(off_t newSize, int priority)
 {
 	// If the cache size shrinks, drop all swap pages beyond the new size.
 	if (fAllocatedSwapSize > 0) {
-		page_num_t oldPageCount = (virtual_end + B_PAGE_SIZE - 1) >> PAGE_SHIFT;
+		off_t oldPageCount = (virtual_end + B_PAGE_SIZE - 1) >> PAGE_SHIFT;
 		swap_block* swapBlock = NULL;
 
-		for (page_num_t pageIndex = (newSize + B_PAGE_SIZE - 1) >> PAGE_SHIFT;
+		for (off_t pageIndex = (newSize + B_PAGE_SIZE - 1) >> PAGE_SHIFT;
 			pageIndex < oldPageCount && fAllocatedSwapSize > 0; pageIndex++) {
 
 			WriteLocker locker(sSwapHashLock);
@@ -579,7 +579,7 @@ VMAnonymousCache::HasPage(off_t offset)
 bool
 VMAnonymousCache::DebugHasPage(off_t offset)
 {
-	page_num_t pageIndex = offset >> PAGE_SHIFT;
+	off_t pageIndex = offset >> PAGE_SHIFT;
 	swap_hash_key key = { this, pageIndex };
 	swap_block* swap = sSwapHashTable.Lookup(key);
 	if (swap == NULL)
@@ -1093,7 +1093,7 @@ VMAnonymousCache::_MergeSwapPages(VMAnonymousCache* source)
 
 		WriteLocker locker(sSwapHashLock);
 
-		page_num_t swapBlockPageIndex = offset >> PAGE_SHIFT;
+		off_t swapBlockPageIndex = offset >> PAGE_SHIFT;
 		swap_hash_key key = { source, swapBlockPageIndex };
 		swap_block* sourceSwapBlock = sSwapHashTable.Lookup(key);
 
