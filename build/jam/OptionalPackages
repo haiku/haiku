@@ -992,7 +992,7 @@ if [ IsOptionalHaikuImagePackageAdded Nano ] {
 
 
 # NCurses
-if [ IsOptionalHaikuImagePackageAdded Nano ] {
+if [ IsOptionalHaikuImagePackageAdded NCurses ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package NCurses available for $(TARGET_ARCH)" ;
 	} else {
