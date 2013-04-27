@@ -96,7 +96,7 @@ struct swap_file : DoublyLinkedListLinkImpl<swap_file> {
 
 struct swap_hash_key {
 	VMAnonymousCache	*cache;
-	page_num_t			page_index;  // page index in the cache
+	off_t				page_index;  // page index in the cache
 };
 
 // Each swap block contains swap address information for
@@ -128,8 +128,8 @@ struct SwapHashTableDefinition {
 
 	bool Compare(const swap_hash_key& key, const swap_block* value) const
 	{
-		return (key.page_index & ~(page_num_t)SWAP_BLOCK_MASK)
-				== (value->key.page_index & ~(page_num_t)SWAP_BLOCK_MASK)
+		return (key.page_index & ~(off_t)SWAP_BLOCK_MASK)
+				== (value->key.page_index & ~(off_t)SWAP_BLOCK_MASK)
 			&& key.cache == value->key.cache;
 	}
 
@@ -557,7 +557,7 @@ VMAnonymousCache::Commit(off_t size, int priority)
 
 		// pre-commit some pages to make a later failure less probable
 		fHasPrecommitted = true;
-		off_t precommitted = (off_t)fPrecommittedPages * B_PAGE_SIZE;
+		uint32 precommitted = fPrecommittedPages * B_PAGE_SIZE;
 		if (size > precommitted)
 			size = precommitted;
 	}
@@ -593,7 +593,7 @@ status_t
 VMAnonymousCache::Read(off_t offset, const generic_io_vec* vecs, size_t count,
 	uint32 flags, generic_size_t* _numBytes)
 {
-	page_num_t pageIndex = offset >> PAGE_SHIFT;
+	off_t pageIndex = offset >> PAGE_SHIFT;
 
 	for (uint32 i = 0, j = 0; i < count; i = j) {
 		swap_addr_t startSlotIndex = _SwapBlockGetAddress(pageIndex + i);
@@ -625,7 +625,7 @@ status_t
 VMAnonymousCache::Write(off_t offset, const generic_io_vec* vecs, size_t count,
 	uint32 flags, generic_size_t* _numBytes)
 {
-	page_num_t pageIndex = offset >> PAGE_SHIFT;
+	off_t pageIndex = offset >> PAGE_SHIFT;
 
 	AutoLocker<VMCache> locker(this);
 
@@ -636,13 +636,13 @@ VMAnonymousCache::Write(off_t offset, const generic_io_vec* vecs, size_t count,
 		if (slotIndex != SWAP_SLOT_NONE) {
 			swap_slot_dealloc(slotIndex, pageCount);
 			_SwapBlockFree(pageIndex + totalPages, pageCount);
-			fAllocatedSwapSize -= (off_t)pageCount * B_PAGE_SIZE;
+			fAllocatedSwapSize -= pageCount * B_PAGE_SIZE;
 		}
 
 		totalPages += pageCount;
 	}
 
-	off_t totalSize = (off_t)totalPages * B_PAGE_SIZE;
+	off_t totalSize = totalPages * B_PAGE_SIZE;
 	if (fAllocatedSwapSize + totalSize > fCommittedSwapSize)
 		return B_ERROR;
 
@@ -695,8 +695,8 @@ VMAnonymousCache::Write(off_t offset, const generic_io_vec* vecs, size_t count,
 			pagesLeft -= n;
 
 			if (n != pageCount) {
-				vectorBase = vectorBase + (off_t)n * B_PAGE_SIZE;
-				vectorLength -= (off_t)n * B_PAGE_SIZE;
+				vectorBase = vectorBase + n * B_PAGE_SIZE;
+				vectorLength -= n * B_PAGE_SIZE;
 			}
 		}
 
@@ -818,7 +818,7 @@ VMAnonymousCache::Fault(struct VMAddressSpace* aspace, off_t offset)
 					? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER;
 				if (vm_try_reserve_memory(B_PAGE_SIZE, priority, 0) != B_OK) {
 					dprintf("%p->VMAnonymousCache::Fault(): Failed to reserve "
-						"%d bytes of RAM.\n", this, B_PAGE_SIZE);
+						"%d bytes of RAM.\n", this, (int)B_PAGE_SIZE);
 					return B_NO_MEMORY;
 				}
 			}
@@ -873,14 +873,14 @@ VMAnonymousCache::DeleteObject()
 
 
 void
-VMAnonymousCache::_SwapBlockBuild(page_num_t startPageIndex,
+VMAnonymousCache::_SwapBlockBuild(off_t startPageIndex,
 	swap_addr_t startSlotIndex, uint32 count)
 {
 	WriteLocker locker(sSwapHashLock);
 
 	uint32 left = count;
 	for (uint32 i = 0, j = 0; i < count; i += j) {
-		page_num_t pageIndex = startPageIndex + i;
+		off_t pageIndex = startPageIndex + i;
 		swap_addr_t slotIndex = startSlotIndex + i;
 
 		swap_hash_key key = { this, pageIndex };
@@ -899,7 +899,7 @@ VMAnonymousCache::_SwapBlockBuild(page_num_t startPageIndex,
 			}
 
 			swap->key.cache = this;
-			swap->key.page_index = pageIndex & ~(page_num_t)SWAP_BLOCK_MASK;
+			swap->key.page_index = pageIndex & ~(off_t)SWAP_BLOCK_MASK;
 			swap->used = 0;
 			for (uint32 i = 0; i < SWAP_BLOCK_PAGES; i++)
 				swap->swap_slots[i] = SWAP_SLOT_NONE;
@@ -919,13 +919,13 @@ VMAnonymousCache::_SwapBlockBuild(page_num_t startPageIndex,
 
 
 void
-VMAnonymousCache::_SwapBlockFree(page_num_t startPageIndex, uint32 count)
+VMAnonymousCache::_SwapBlockFree(off_t startPageIndex, uint32 count)
 {
 	WriteLocker locker(sSwapHashLock);
 
 	uint32 left = count;
 	for (uint32 i = 0, j = 0; i < count; i += j) {
-		page_num_t pageIndex = startPageIndex + i;
+		off_t pageIndex = startPageIndex + i;
 		swap_hash_key key = { this, pageIndex };
 		swap_block* swap = sSwapHashTable.Lookup(key);
 
@@ -948,7 +948,7 @@ VMAnonymousCache::_SwapBlockFree(page_num_t startPageIndex, uint32 count)
 
 
 swap_addr_t
-VMAnonymousCache::_SwapBlockGetAddress(page_num_t pageIndex)
+VMAnonymousCache::_SwapBlockGetAddress(off_t pageIndex)
 {
 	ReadLocker locker(sSwapHashLock);
 
@@ -1127,7 +1127,7 @@ VMAnonymousCache::_MergeSwapPages(VMAnonymousCache* source)
 			continue;
 
 		for (uint32 i = 0; i < SWAP_BLOCK_PAGES; i++) {
-			page_num_t pageIndex = swapBlockPageIndex + i;
+			off_t pageIndex = swapBlockPageIndex + i;
 			swap_addr_t sourceSlotIndex = sourceSwapBlock->swap_slots[i];
 
 			if (sourceSlotIndex == SWAP_SLOT_NONE)
@@ -1318,7 +1318,7 @@ swap_file_add(const char* path)
 	swap->vnode = node;
 	swap->cookie = descriptor->cookie;
 
-	page_num_t pageCount = st.st_size >> PAGE_SHIFT;
+	uint32 pageCount = st.st_size >> PAGE_SHIFT;
 	swap->bmp = radix_bitmap_create(pageCount);
 	if (swap->bmp == NULL) {
 		free(swap);
@@ -1635,18 +1635,18 @@ swap_free_page_swap_space(vm_page* page)
 }
 
 
-page_num_t
+uint32
 swap_available_pages()
 {
 	mutex_lock(&sAvailSwapSpaceLock);
-	page_num_t avail = sAvailSwapSpace >> PAGE_SHIFT;
+	uint32 avail = sAvailSwapSpace >> PAGE_SHIFT;
 	mutex_unlock(&sAvailSwapSpaceLock);
 
 	return avail;
 }
 
 
-page_num_t
+uint32
 swap_total_swap_pages()
 {
 	mutex_lock(&sSwapFileListLock);

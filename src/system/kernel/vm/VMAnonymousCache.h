@@ -25,8 +25,8 @@ extern "C" {
 	void swap_init(void);
 	void swap_init_post_modules(void);
 	bool swap_free_page_swap_space(vm_page* page);
-	page_num_t swap_available_pages(void);
-	page_num_t swap_total_swap_pages(void);
+	uint32 swap_available_pages(void);
+	uint32 swap_total_swap_pages(void);
 }
 
 
@@ -73,10 +73,10 @@ private:
 			class WriteCallback;
 			friend class WriteCallback;
 
-			void				_SwapBlockBuild(page_num_t pageIndex,
+			void				_SwapBlockBuild(off_t pageIndex,
 									swap_addr_t slotIndex, uint32 count);
-			void        		_SwapBlockFree(page_num_t pageIndex, uint32 count);
-			swap_addr_t			_SwapBlockGetAddress(page_num_t pageIndex);
+			void        		_SwapBlockFree(off_t pageIndex, uint32 count);
+			swap_addr_t			_SwapBlockGetAddress(off_t pageIndex);
 			status_t			_Commit(off_t size, int priority);
 
 			void				_MergePagesSmallerSource(
