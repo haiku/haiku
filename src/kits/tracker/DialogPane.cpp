@@ -498,7 +498,7 @@ void
 PaneSwitch::DrawInState(PaneSwitch::State state)
 {
 	BRect rect(0, 0, 12, 12);
-	rect.OffsetBy(-1, -1);
+	rect.OffsetBy(1, 1);
 
 	rgb_color arrowColor = state == kPressed ? kHighlightColor : kNormalColor;
 	int32 arrowDirection = BControlLook::B_RIGHT_ARROW;
