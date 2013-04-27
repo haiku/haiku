@@ -132,7 +132,7 @@ AbstractArrayValueNode::CreateChildrenInRange(int32 lowIndex,
 	}
 
 	// create children for the array elements
-	for (int32 i = lowIndex; i <= (int32)highIndex; i++) {
+	for (int32 i = lowIndex; i <= highIndex; i++) {
 		BString name(Name());
 		name << '[' << i << ']';
 		if (name.Length() <= Name().Length())
