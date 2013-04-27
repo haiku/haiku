@@ -1950,7 +1950,7 @@ FindPanel::AddRecentQueries(BMenu* menu, bool addSaveAsItem,
 
 		BMessage* message = new BMessage(kRunSaveAsTemplatePanel);
 		BMenuItem* item = new BMenuItem(
-			B_TRANSLATE("Save Query as template" B_UTF8_ELLIPSIS), message);
+			B_TRANSLATE("Save query as template" B_UTF8_ELLIPSIS), message);
 		menu->AddItem(item);
 	}
 }
