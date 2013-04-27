@@ -20,6 +20,7 @@
 
 #include "FunctionInstance.h"
 #include "Image.h"
+#include "RangeList.h"
 #include "StackFrame.h"
 #include "Team.h"
 #include "TeamMemoryBlock.h"
@@ -387,4 +388,67 @@ UiUtils::DumpMemory(BString& _output, int32 indentLevel,
 	}
 
 	_output.Append("\n");
+}
+
+
+static status_t ParseRangeString(BString& rangeString, int32& lowerBound,
+	int32& upperBound)
+{
+	lowerBound = atoi(rangeString.String());
+	int32 index = rangeString.FindFirst('-');
+	if (index >= 0) {
+		rangeString.Remove(0, index + 1);
+		upperBound = atoi(rangeString.String());
+	} else
+		upperBound = lowerBound;
+
+	if (lowerBound > upperBound)
+		return B_BAD_VALUE;
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
+UiUtils::ParseRangeExpression(const BString& rangeExpression, int32 lowerBound,
+	int32 upperBound, RangeList& _output)
+{
+	if (rangeExpression.IsEmpty())
+		return B_BAD_DATA;
+
+	BString dataString = rangeExpression;
+	dataString.RemoveAll(" ");
+
+	// first, tokenize the range list to its constituent child ranges.
+	int32 index;
+	int32 lowValue;
+	int32 highValue;
+	BString tempRange;
+	while (!dataString.IsEmpty()) {
+		index = dataString.FindFirst(',');
+		if (index == 0)
+			return B_BAD_VALUE;
+		else if (index > 0) {
+			dataString.MoveInto(tempRange, 0, index);
+			dataString.Remove(0, 1);
+		} else {
+			tempRange = dataString;
+			dataString.Truncate(0);
+		}
+
+		status_t result = ParseRangeString(tempRange, lowValue, highValue);
+		if (result != B_OK)
+			return result;
+
+		if (lowValue < lowerBound || highValue > upperBound)
+			return B_BAD_VALUE;
+
+		result = _output.AddRange(lowValue, highValue);
+		if (result != B_OK)
+			return result;
+
+		tempRange.Truncate(0);
+	}
+
+	return B_OK;
 }
