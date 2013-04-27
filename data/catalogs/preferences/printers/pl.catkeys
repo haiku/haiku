@@ -2,7 +2,7 @@
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Drukarka: %printer_name%\nSterownik:  %driver%\n
 Waiting	JobListView		Oczekuję
 Print test page	PrintersWindow		Wydrukuj stronę testową
-Test Page	TestPageView		Strona testowa
+Test Page	TestPageView		Strona Testowa
 Test Page	PrintersWindow		Strona testowa
 page	JobListView		strona
 Cancel	AddPrinterDialog		Anuluj

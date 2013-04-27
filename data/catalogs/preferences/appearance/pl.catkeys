@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Appearance	2464466870
+1	polish	x-vnd.Haiku-Appearance	556979190
 Plain font:	Font view		Zwykła czcionka:
 Control highlight	Colors tab		Podkreślenie kontrolki
 Control border	Colors tab		Obramowanie kontrolki
@@ -43,10 +43,11 @@ Inactive window tab	Colors tab		Nieaktywna zakładka okna
 Appearance	System name		Wygląd
 Fixed font:	Font view		Czcionka o stałej szerokości:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Koń i żółw grali w kości z piękną ćmą u źródła.
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutorzy:\n\t%decorAuthors\n\nURL: %decorURL\nLicencja: %decorLic\n\n%decorDesc\n
 Reduce colored edges filter strength:	AntialiasingSettingsView		Zmniejszenie siły kolorowych filtrów krawędzi:
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Antyaliasing podpikselowy w połączeniu z hintowaniem czcionek jest niedostępny w tym buildzie Haiku w celu uniknięcia problemów patentowych. Aby włączyć tę funkcjonalność, musisz zbudować Haiku samemu i włączyć niektóre opcje w pliku nagłówkowym biblioteki libfreetype.
 Control text	Colors tab		Tekst kontrolki
-Single:	DecorSettingsView		Pojedynczy:
+Single:	DecorSettingsView		Pojedyncze:
 Tooltip text	Colors tab		Tekst podpowiedzi
 Bold font:	Font view		Czcionka pogrubiona:
 Inactive window border	Colors tab		Nieaktywne obramowanie okna

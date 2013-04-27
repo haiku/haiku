@@ -1,0 +1,25 @@
+1	french	x-vnd.Haiku-InterfacesAddOn	2859631070
+Interface	InterfaceWindow		Interface
+Configure…	InterfacesListView		Configurer…
+Static	IntefaceAddressView		Statique
+None	InterfacesListView		Aucune
+IP:	InterfacesListView	IPv4 address label	IPv4 :
+Status:	IntefaceHardwareView		État :
+IPv6:	InterfacesListView	IPv6 address label	IPv6 :
+Save	InterfaceWindow		Sauvegarder
+Link speed:	IntefaceHardwareView		Vitesse du lien :
+Renegotiate	InterfacesAddOn		Renégocier
+connected	IntefaceHardwareView		connecté
+Gateway:	IntefaceAddressView		Passerelle :
+Disable	InterfacesListView		Désactiver
+Sent:	IntefaceHardwareView		Envoyés :
+Disable	InterfacesAddOn		Désactiver
+Configure…	InterfacesAddOn		Configurer…
+DHCP	IntefaceAddressView		DHCP
+Mode:	IntefaceAddressView		Mode :
+Your netmask	IntefaceAddressView		Votre masque réseau
+IP Address:	IntefaceAddressView		Adresse IP :
+MAC address:	IntefaceHardwareView		Adresse MAC :
+Netmask:	IntefaceAddressView		Masque réseau :
+Your IP address	IntefaceAddressView		Votre adresse IP
+disconnected	IntefaceHardwareView		déconnecté

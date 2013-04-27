@@ -1,15 +1,19 @@
-1	polish	x-vnd.Be-TSKB	1398106986
+1	polish	x-vnd.Be-TSKB	2335730970
 Power off	DeskbarMenu		Wyłącz komputer
+Sort applications by name	PreferencesWindow		Sortuj programy po nazwie
 Suspend	DeskbarMenu		Wstrzymaj
 Hide clock	TimeView		Ukryj zegar
+Applications	PreferencesWindow		Aplikacje
 Time preferences…	TimeView		Ustawienia czasu...
 About Haiku	DeskbarMenu		O Haiku
+Edit in Tracker…	PreferencesWindow		Edytuj w Trakerze…
 Recent documents:	PreferencesWindow		Ostatnio przeglądane dokumenty:
 Recent applications	DeskbarMenu		Ostatnio uruchomione aplikacje
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplikacje
 Find…	DeskbarMenu		Wyszukaj…
 Show clock	Tray		Pokaż zegar
 Window	PreferencesWindow		Położenie
+Defaults	PreferencesWindow		Ustawienia domyślne
 Menu	PreferencesWindow		Menu
 Recent documents	DeskbarMenu		Ostatnio otwarte dokumenty
 Auto-hide	PreferencesWindow		Autoukrywanie
@@ -27,6 +31,7 @@ Restart Tracker	DeskbarMenu		Uruchom ponownie Trackera
 Close all	WindowMenu		Zamknij wszystkie okna
 Deskbar preferences	PreferencesWindow		Ustawienia Panelu Pulpitu
 Mount	DeskbarMenu		Zamontuj
+Revert	PreferencesWindow		Przywróć
 Small	PreferencesWindow		Małe
 Recent applications:	PreferencesWindow		Ostatnio używane aplikacje:
 Shutdown…	DeskbarMenu		Wyłącz…

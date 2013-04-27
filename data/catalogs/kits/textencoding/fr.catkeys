@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtextencoding	3062073902
+1	french	x-vnd.Haiku-libtextencoding	1525027211
 ISO Greek	textencodings		ISO Grecque
 ISO South European	textencodings		ISO Europe du Sud
 Chinese Big5	textencodings		Chinois Big5
@@ -7,6 +7,7 @@ ISO Arabic	textencodings		ISO Arabe
 ISO Latin 9	textencodings		ISO Latin 9
 Japanese Shift JIS	textencodings		Japonais Shift-JIS
 DOS Cyrillic	textencodings		DOS Cyrillique
+Windows Central European (CP 1250)	textencodings		Windows Europe Centrale (CP 1250)
 Windows Cyrillic (CP 1251)	textencodings		Windows Cyrillique (CP 1251)
 Japanese EUC	textencodings		Japonais EUC
 Unicode	textencodings		Unicode
