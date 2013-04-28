@@ -2046,12 +2046,39 @@ FindPanel::RemoveAttrRow()
 	if (view != NULL)
 		view->MakeFocus();
 
-	if (fAttrGrid->CountRows() != 1)
+	if (fAttrGrid->CountRows() > 1) {
+		// remove the And/Or menu field of the previous row
+		BLayoutItem* item = fAttrGrid->ItemAt(3, row - 1);
+		if (item == NULL)
+			return;
+
+		view = item->View();
+		if (view == NULL)
+			return;
+
+		view->RemoveSelf();
+		delete view;
+		return;
+	}
+
+	// only one row remains
+
+	// disable the remove button
+	BButton* button = dynamic_cast<BButton*>(FindView("remove button"));
+	if (button != NULL)
+		button->SetEnabled(false);
+
+	// remove the And/Or menu field
+	BLayoutItem* item = fAttrGrid->RemoveItem(3);
+	if (item == NULL)
 		return;
 
-	BButton* button = dynamic_cast<BButton*>(FindView("remove button"));
-	if (button)
-		button->SetEnabled(false);
+	view = item->View();
+	if (view == NULL)
+		return;
+
+	view->RemoveSelf();
+	delete view;
 }
 
 
