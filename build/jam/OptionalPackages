@@ -19,6 +19,7 @@
 #	Bluetooth				- experimental Haiku components for Bluetooth
 #	BurnItNow				- CD burning app
 #	Bzip					- file archiving utility
+#	CARootCertificates		- bundle with trusted CA root certificates
 #	CCache					- fast compiler cache
 #	CDRecord				- the command line CD writing tools
 #	Clockwerk				- native audio/video compositing
@@ -250,7 +251,7 @@ if [ IsOptionalHaikuImagePackageAdded BePDF ] {
 		Echo "No optional package BePDF available for gcc4" ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			$(hpkgBaseURL)/bepdf-1.1.1b4-1-x86_gcc2.hpkg
+			$(hpkgBaseURL)/bepdf-1.1.1~beta5-1-x86_gcc2.hpkg
 			: common packages ;
 		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/BePDF/BePDF ;
@@ -333,6 +334,20 @@ if [ IsOptionalHaikuImagePackageAdded Bzip ] {
 	} else {
 		InstallOptionalHaikuImagePackage
 			$(hpkgBaseURL)/bzip2-1.0.6-1-x86_gcc2.hpkg
+			: common packages ;
+	}
+}
+
+
+# CARootCertificates
+if [ IsOptionalHaikuImagePackageAdded CARootCertificates ] {
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage
+			: $(baseURL)/cert-2012-07-04.zip
+			: common data ssl ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			: $(hpkgBaseURL)/ca_root_certificates-121229-1-any.hpkg 
 			: common packages ;
 	}
 }
@@ -426,7 +441,7 @@ if [ IsOptionalHaikuImagePackageAdded Curl ] {
 			$(baseURL)/curl-7.21.7-x86-gcc4-2011-06-23.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			$(hpkgBaseURL)/curl-7.26.0-1-x86_gcc2.hpkg
+			$(hpkgBaseURL)/curl-7.26.0-2-x86_gcc2.hpkg
 			: common packages ;
 	}
 }
