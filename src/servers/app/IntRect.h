@@ -150,16 +150,6 @@ IntRect::IntRect(const IntRect &r)
 
 
 inline
-IntRect::IntRect(const BRect &r)
-{
-	left = (int32)r.left;
-	top = (int32)r.top;
-	right = (int32)r.right;
-	bottom = (int32)r.bottom;
-}
-
-
-inline
 IntRect::IntRect(const IntPoint& leftTop, const IntPoint& rightBottom)
 {
 	left = leftTop.x;

@@ -12,6 +12,15 @@
 #include <stdio.h>
 
 
+IntRect::IntRect(const BRect &r)
+{
+	left = (int32)r.left;
+	top = (int32)r.top;
+	right = (int32)r.right;
+	bottom = (int32)r.bottom;
+}
+
+
 void
 IntRect::SetLeftTop(const IntPoint& p)
 {
