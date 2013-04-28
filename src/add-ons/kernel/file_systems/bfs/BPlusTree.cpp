@@ -2663,15 +2663,20 @@ TreeIterator::Traverse(int8 direction, void* key, uint16* keyLength,
 		RETURN_ERROR(B_BAD_DATA);
 	}
 
-	length = min_c(length, maxLength);
+	// include the termination for string types
+	bool needsTermination = fTree->fHeader.DataType() == BPLUSTREE_STRING_TYPE;
+	if (length + (needsTermination ? 1 : 0) > maxLength) {
+		// the buffer is too small, restore the last key and return an error
+		fCurrentNodeOffset = savedNodeOffset;
+		fCurrentKey = savedKey;
+		return B_BUFFER_OVERFLOW;
+	}
+
 	memcpy(key, keyStart, length);
 
-	if (fTree->fHeader.DataType() == BPLUSTREE_STRING_TYPE)	{
-		// terminate string type
-		if (length == maxLength)
-			length--;
+	if (needsTermination)
 		((char*)key)[length] = '\0';
-	}
+
 	*keyLength = length;
 
 	off_t offset = BFS_ENDIAN_TO_HOST_INT64(node->Values()[fCurrentKey]);
