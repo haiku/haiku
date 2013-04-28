@@ -201,10 +201,10 @@ if [ IsOptionalHaikuImagePackageAdded Beam ] {
 # BeBook
 if [ IsOptionalHaikuImagePackageAdded BeBook ] {
 	InstallOptionalHaikuImagePackage
-		$(hpkgBaseURL)/bebook-2008-10-26-1.hpkg
+		$(hpkgBaseURL)/be_book-20081026-1-any.hpkg
 		: system packages ;
 	AddSymlinkToHaikuImage home Desktop
-		: /boot/system/documentation/bebook/index.html
+		: /boot/system/documentation/BeBook/index.html
 		: BeBook ;
 }
 
@@ -251,7 +251,7 @@ if [ IsOptionalHaikuImagePackageAdded BePDF ] {
 		Echo "No optional package BePDF available for gcc4" ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			$(hpkgBaseURL)/bepdf-1.1.1~beta5-1-x86_gcc2.hpkg
+			$(hpkgBaseURL)/bepdf-1.1.1~beta5_130428-1-x86_gcc2.hpkg
 			: common packages ;
 		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/BePDF/BePDF ;
