@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-StyledEdit	3117187160
+1	dutch; flemish	x-vnd.Haiku-StyledEdit	3019034824
 StyledEdit	System name		StyledEdit
 Paste	Menus		Plakken
 OK	LoadAlert		Oké
@@ -43,6 +43,7 @@ Don't save	QuitAlert		Niet opslaan
 Align	Menus		Uitlijnen
 Color	Menus		Kleur
 Red	Menus		Rood
+OK	QuitAlert		Oké
 Open…	Menus		Openen…
 Center	Menus		Centreren
 Blue	Menus		Blauw

@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-StyledEdit	3117187160
+1	hindi	x-vnd.Haiku-StyledEdit	3019034824
 StyledEdit	System name		StyledEdit
 Paste	Menus		पेस्ट
 OK	LoadAlert		ठीक है
@@ -43,6 +43,7 @@ Don't save	QuitAlert		न सहेजें
 Align	Menus		संरेखित करे
 Color	Menus		रंग
 Red	Menus		लाल
+OK	QuitAlert		ठीक है
 Open…	Menus		खोलें...
 Center	Menus		बीच में
 Blue	Menus		नीला

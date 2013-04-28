@@ -1,11 +1,14 @@
-1	slovak	x-vnd.Haiku-DriveSetup	644135944
+1	slovak	x-vnd.Haiku-DriveSetup	1752326393
 DriveSetup	System name		Nastavenie diskových oblastí
+Cancel	AbstractParametersPanel		Zrušiť
 Delete	MainWindow		Zmazať
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Ste si istí, že chcete tieto zmeny teraz zapísať na disk?\n\nAk tak urobíte, všetky údaje na vybranej diskovej oblasti budú nenávratne stratené!
 Rescan	MainWindow		Znovu preskúmať
 OK	MainWindow		OK
 Could not aquire partitioning information.	MainWindow		Nepodarilo sa získať informácie o diskových oblastiach.
 There's no space on the partition where a child partition could be created.	MainWindow		Na oblasti nie je miesto, kde by bolo možné vytvoriť podriadenú oblasť.
+Initialize	InitializeParametersPanel		Inicializovať
+OK	AbstractParametersPanel		OK
 <empty>	PartitionList		<prázdne>
 Unable to find the selected partition by ID.	MainWindow		Nebolo možné nájsť vybranú oblasť podľa ID.
 Select a partition from the list below.	DiskView		Vyberte oblasť zo zoznamu dolu.

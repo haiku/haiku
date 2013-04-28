@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-MidiPlayer	4180509704
+1	greek, modern (1453-)	x-vnd.Haiku-MidiPlayer	1227982606
 None	Main Window		Κανένα
 Live input:	Main Window		Live είσοδος:
 Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku MIDI Player 1.0.0 beta\n\nΑυτό το μικρό πρόγραμμα\nμπορεί να παίξει χιλιάδες \nμουσικές μελωδίες
@@ -13,6 +13,7 @@ Play	Main Window		Αναπαραγωγή
 Garage	Main Window		Γκαράζ
 Closet	Main Window		Θάλαμος
 MidiPlayer	System name		MidiPlayer
+OK	Main Application		Εντάξει
 Drop MIDI file here	Scope View		Αφήστε τα αρχεία MIDI εδώ
 Igor's lab	Main Window		Εργαστήριο του Igor
 Scope	Main Window		Επισκόπηση

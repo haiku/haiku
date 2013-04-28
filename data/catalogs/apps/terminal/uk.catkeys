@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Terminal	4173005440
+1	ukrainian	x-vnd.Haiku-Terminal	3734948558
 Not found.	Terminal TermWindow		Не знайдено.
 Switch Terminals	Terminal TermWindow		Перемкнути термінали
 Change directory	Terminal TermView		Змінити каталог
@@ -19,6 +19,7 @@ Font:	Terminal AppearancePrefView		Шрифт:
 Copy here	Terminal TermView		Копіювати сюди
 Really close?	Terminal TermWindow		Дійсно закрити?
 Copy	Terminal TermWindow		Копіювати
+Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Термінал
 Window title:	Terminal TermWindow		Ім'я вікна:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Невідома опція \"%s\"\n
 %app% settings	Terminal PrefWindow	window title	Параметри %app%

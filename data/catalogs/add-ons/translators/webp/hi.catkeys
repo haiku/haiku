@@ -1,5 +1,6 @@
-1	hindi	x-vnd.Haiku-WebPTranslator	2427600890
+1	hindi	x-vnd.Haiku-WebPTranslator	3197103165
 Compression method:	ConfigView		काम्प्रेस्शन का तरीका:
+WebP image translator	ConfigView		WebP चित्र का अनुवादक
 Based on libwebp v0.1,	ConfigView		libwebp v0.1 पर आधारित,
 Preset	ConfigView		प्रीसेट
 WebP images	WebPTranslator		WebP चित्र

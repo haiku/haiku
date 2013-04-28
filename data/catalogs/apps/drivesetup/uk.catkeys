@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-DriveSetup	4088461154
+1	ukrainian	x-vnd.Haiku-DriveSetup	2061656786
 DriveSetup	System name		DriveSetup
 Delete	MainWindow		Видалити
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск зараз?\n\nВсі дані на вибраному розділі будуть безповоротно втрачені!
@@ -6,6 +6,8 @@ Rescan	MainWindow		Пересканувати
 OK	MainWindow		Гаразд
 Could not aquire partitioning information.	MainWindow		Неможливо відобразити інформацію про розмітку.
 There's no space on the partition where a child partition could be created.	MainWindow		Відсутнє місце в розділі , де ви бажаєте створити дочірній розділ.
+Initialize	InitializeParametersPanel		Ініціалізація
+OK	AbstractParametersPanel		Гаразд
 <empty>	PartitionList		<пусто>
 Unable to find the selected partition by ID.	MainWindow		Неможливо знайти розділ за ID.
 Select a partition from the list below.	DiskView		Виберіть розділ зі списку нижче.

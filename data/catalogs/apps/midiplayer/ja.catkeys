@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-MidiPlayer	4180509704
+1	japanese	x-vnd.Haiku-MidiPlayer	1227982606
 None	Main Window		無し
 Live input:	Main Window		ライブ入力：
 Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku MIDI Player 1.0.0 ベータ版\n\n幾千の\n曲を奏でる\nきりぎりす
@@ -13,6 +13,7 @@ Play	Main Window		再生
 Garage	Main Window		Garage (ガレージ)
 Closet	Main Window		Closet (クローゼット)
 MidiPlayer	System name		MIDI プレーヤー
+OK	Main Application		OK
 Drop MIDI file here	Scope View		ここに MIDI ファイルをドロップ
 Igor's lab	Main Window		Igor's lab (実験室)
 Scope	Main Window		Scope (スコープ)

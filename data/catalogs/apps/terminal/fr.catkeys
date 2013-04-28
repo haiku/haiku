@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	328707356
+1	french	x-vnd.Haiku-Terminal	2967760334
 Not found.	Terminal TermWindow		Non trouvé.
 Switch Terminals	Terminal TermWindow		Inverser les Terminaux
 Change directory	Terminal TermView		Changer de répertoire
@@ -79,6 +79,7 @@ Clear all	Terminal TermWindow		Effacer tout
 Text encoding	Terminal TermWindow		Encodage texte
 size	Terminal TermView		taille
 Close window	Terminal TermWindow		Fermer la fenêtre
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tLe répertoire de travail du processus actif dans l'onglet courant.\n\t\t\tVous pouvez éventuellement spécifier le nombre d'éléments maximum\n\t\t\tdans le chemin. Par exemple, '%2d' pour au plus deux éléments.\n\t%T\t-\tLe nom de l'application Terminal suivant les préférences linguistique en cours.\n\t%e\t-\tJeu de caractère utilisé par l'onglet courant. Masqué pour UTF-8.\n\t%i\t-\tL'indice de la fenêtre.\n\t%p\t-\tLe nom du processus actif dans l'onglet courant.\n\t%t\t-\tLe titre de l'onglet courant.\n\t%%\t-\tLe caractère '%'.
 Save as default	Terminal TermWindow		Enregistrer les préférences
 Set tab title	Terminal TermWindow		Changer le titre de l'onglet
 Settings…	Terminal TermWindow		Réglages…

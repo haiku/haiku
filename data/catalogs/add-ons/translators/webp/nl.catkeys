@@ -1,5 +1,6 @@
-1	dutch; flemish	x-vnd.Haiku-WebPTranslator	2427600890
+1	dutch; flemish	x-vnd.Haiku-WebPTranslator	3197103165
 Compression method:	ConfigView		Compressie methode:
+WebP image translator	ConfigView		WebP afbeelding vertaler
 Based on libwebp v0.1,	ConfigView		Gebaseerd op libwebp v0.1,
 Preset	ConfigView		Voorinstelling
 WebP images	WebPTranslator		WebP afbeeldingen

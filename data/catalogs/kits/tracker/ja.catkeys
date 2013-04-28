@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	1567365366
+1	japanese	x-vnd.Haiku-libtracker	3333908373
 common	B_COMMON_DIRECTORY		一般
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		アイコン表示
@@ -209,7 +209,6 @@ Resize to fit	VolumeWindow		最適な表示サイズに変更
 Could not find application \"%appname\"	OpenWithWindow		アプリケーション \"%appname\" が見つかりませんでした
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		選択した項目をごみ箱に移動できません。完全に削除しても良いでしょうか？元は戻せませんので、ご注意ください。
 Invert	SelectionWindow		反転
-Save Query as template…	FindPanel		クエリテンプレートとして保存…
 rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	名前の変更
 Find	FindPanel		検索
 Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	移動

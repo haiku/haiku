@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Terminal	4173005440
+1	romanian	x-vnd.Haiku-Terminal	3734948558
 Not found.	Terminal TermWindow		Nu a fost găsit.
 Switch Terminals	Terminal TermWindow		Comută terminale
 Change directory	Terminal TermView		Modifică dosar
@@ -19,6 +19,7 @@ Font:	Terminal AppearancePrefView		Font:
 Copy here	Terminal TermView		Copiază aici
 Really close?	Terminal TermWindow		Sigur închideți?
 Copy	Terminal TermWindow		Copiază
+Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 Window title:	Terminal TermWindow		Titlu fereastră:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Opțiune „%s” nerecunoscută\n
 %app% settings	Terminal PrefWindow	window title	Setări %app%

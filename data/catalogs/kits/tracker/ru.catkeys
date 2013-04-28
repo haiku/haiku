@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	4167158175
+1	russian	x-vnd.Haiku-libtracker	1638733886
 common	B_COMMON_DIRECTORY		Общие
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Большие значки
@@ -212,7 +212,6 @@ Resize to fit	VolumeWindow		Подогнать размер окна
 Could not find application \"%appname\"	OpenWithWindow		Невозможно найти приложение \"%appname\"
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Выбранный объект не может быть перемещён в корзину. Хотите ли вы вместо этого удалить его? (Эту операцию будет невозможно отменить)
 Invert	SelectionWindow		Инвертировать
-Save Query as template…	FindPanel		Сохранить запрос как шаблон…
 rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	переименуете
 Find	FindPanel		Найти
 Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Переместить

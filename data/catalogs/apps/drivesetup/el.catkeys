@@ -1,10 +1,13 @@
-1	greek, modern (1453-)	x-vnd.Haiku-DriveSetup	2224844276
+1	greek, modern (1453-)	x-vnd.Haiku-DriveSetup	3333034725
 DriveSetup	System name		Εγκατάσταση Οδηγού
+Cancel	AbstractParametersPanel		Άκυρο
 Delete	MainWindow		Διαγραφή
 Rescan	MainWindow		Επανάληψη σάρωσης
 OK	MainWindow		Εντάξει
 Could not aquire partitioning information.	MainWindow		Αδυναμία απόκτησης πληροφορίας διαμέρισης.
 There's no space on the partition where a child partition could be created.	MainWindow		Δεν υπάρχει χώρος στη κατάτμηση, όπου θα μπορούσε να δημιουργηθεί νέα κατάτμηση.
+Initialize	InitializeParametersPanel		Αρχικοποίηση
+OK	AbstractParametersPanel		Εντάξει
 <empty>	PartitionList		<άδειο>
 Unable to find the selected partition by ID.	MainWindow		Αδύνατο να βρεθεί η επιλεγμένη κατάτμηση ID.
 Select a partition from the list below.	DiskView		Επιλέξτε μία κατάτμηση από την παρακάτω λίστα.

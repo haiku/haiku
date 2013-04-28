@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-InterfacesAddOn	1153539807
+1	polish	x-vnd.Haiku-InterfacesAddOn	34473294
 Interface	InterfaceWindow		Interfejs
 Configure…	InterfacesListView		Konfiguruj…
 Static	IntefaceAddressView		Statyczny
@@ -8,6 +8,7 @@ The method for obtaining an IP address	IntefaceAddressView		Metoda uzyskania adr
 Your gateway	IntefaceAddressView		Brama
 Received:	IntefaceHardwareView		Otrzymano:
 Sent:	IntefaceHardwareView		Wysłano:
+Configure…	InterfacesAddOn		Konfiguruj…
 Mode:	IntefaceAddressView		Tryb:
 Your netmask	IntefaceAddressView		Maska sieci
 IP Address:	IntefaceAddressView		Adres IP:

@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-MidiPlayer	4180509704
+1	lithuanian	x-vnd.Haiku-MidiPlayer	1227982606
 None	Main Window		Nieko
 Live input:	Main Window		Tiesioginė įvestis:
 Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	„Haiku“ MIDI grotuvas 1.0.0 beta\n\nŠi maža programėlė\nGeba atkurti tūkstančius\nSenokų gaidų
@@ -13,6 +13,7 @@ Play	Main Window		Groti
 Garage	Main Window		Garažas
 Closet	Main Window		Vonia
 MidiPlayer	System name		MIDI grotuvas
+OK	Main Application		Gerai
 Drop MIDI file here	Scope View		Numeskite MIDI failą čia
 Igor's lab	Main Window		Igorio laboratorija
 Scope	Main Window		Osciloskopas

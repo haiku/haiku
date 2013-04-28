@@ -1,5 +1,6 @@
-1	japanese	x-vnd.Haiku-WebPTranslator	2427600890
+1	japanese	x-vnd.Haiku-WebPTranslator	3197103165
 Compression method:	ConfigView		圧縮方法：
+WebP image translator	ConfigView		WebP イメージトランスレーター
 Based on libwebp v0.1,	ConfigView		libwebp v0.1 に基づく、
 Preset	ConfigView		プリセット：
 WebP images	WebPTranslator		WebP イメージ

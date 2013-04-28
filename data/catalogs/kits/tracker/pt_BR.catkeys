@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-libtracker	4167158175
+1	portuguese (brazil)	x-vnd.Haiku-libtracker	1638733886
 common	B_COMMON_DIRECTORY		comum
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Em ícones
@@ -212,7 +212,6 @@ Resize to fit	VolumeWindow		Reduzir para caber
 Could not find application \"%appname\"	OpenWithWindow		Não foi possível encontrar o aplicativo \"%appname\"
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		O item selecionado não pode ser movido para a Lixeira. Ao invés disso, você deseja apagá-lo? (Esta operação não pode ser desfeita.)
 Invert	SelectionWindow		Inverter
-Save Query as template…	FindPanel		Salvar como modelo de Consulta...
 rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	renomear
 Find	FindPanel		Pesquisar
 Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Mover
