@@ -28,6 +28,11 @@ public:
 	virtual						~PackageNode();
 
 			Package*			GetPackage() const	{ return fPackage; }
+									// Since PackageNode does only hold a
+									// reference to the package between
+									// VFSInit() and VFSUninit(), the caller
+									// must otherwise make sure the package
+									// still exists.
 			PackageDirectory*	Parent() const		{ return fParent; }
 			const char*			Name() const		{ return fName; }
 
@@ -36,6 +41,7 @@ public:
 
 	virtual	status_t			VFSInit(dev_t deviceID, ino_t nodeID);
 	virtual	void				VFSUninit();
+									// base class versions must be called
 
 			mode_t				Mode() const			{ return fMode; }
 
@@ -64,6 +70,12 @@ public:
 	virtual	void				UnsetIndexCookie(void* attributeCookie);
 
 	inline	void*				IndexCookieForAttribute(const char* name) const;
+
+protected:
+			void				NonVirtualVFSUninit()
+									{ PackageNode::VFSUninit(); }
+									// service for derived classes, e.g. for use
+									// with MethodDeleter
 
 protected:
 			Package*			fPackage;

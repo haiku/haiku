@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include "DebugSupport.h"
+#include "Package.h"
 
 
 PackageNode::PackageNode(Package* package, mode_t mode)
@@ -48,6 +49,7 @@ PackageNode::Init(PackageDirectory* parent, const char* name)
 status_t
 PackageNode::VFSInit(dev_t deviceID, ino_t nodeID)
 {
+	fPackage->AcquireReference();
 	return B_OK;
 }
 
@@ -55,6 +57,7 @@ PackageNode::VFSInit(dev_t deviceID, ino_t nodeID)
 void
 PackageNode::VFSUninit()
 {
+	fPackage->ReleaseReference();
 }
 
 

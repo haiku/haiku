@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <new>
 
+#include <AutoDeleter.h>
+
 #include <fs_cache.h>
 #include <util/AutoLock.h>
 
@@ -153,6 +155,12 @@ PackageFile::~PackageFile()
 status_t
 PackageFile::VFSInit(dev_t deviceID, ino_t nodeID)
 {
+	status_t error = PackageNode::VFSInit(deviceID, nodeID);
+	if (error != B_OK)
+		return error;
+	MethodDeleter<PackageNode> baseClassUninit(this,
+		&PackageNode::NonVirtualVFSUninit);
+
 	// open the package
 	int fd = fPackage->Open();
 	if (fd < 0)
@@ -164,7 +172,7 @@ PackageFile::VFSInit(dev_t deviceID, ino_t nodeID)
 	if (fDataAccessor == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 
-	status_t error = fDataAccessor->Init(deviceID, nodeID, fd);
+	error = fDataAccessor->Init(deviceID, nodeID, fd);
 	if (error != B_OK) {
 		delete fDataAccessor;
 		fDataAccessor = NULL;
@@ -172,6 +180,7 @@ PackageFile::VFSInit(dev_t deviceID, ino_t nodeID)
 	}
 
 	packageCloser.Detach();
+	baseClassUninit.Detach();
 	return B_OK;
 }
 
@@ -184,6 +193,8 @@ PackageFile::VFSUninit()
 		delete fDataAccessor;
 		fDataAccessor = NULL;
 	}
+
+	PackageNode::VFSUninit();
 }
 
 
