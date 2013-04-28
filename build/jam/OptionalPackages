@@ -1206,7 +1206,7 @@ if [ IsOptionalHaikuImagePackageAdded Pe ] {
 				$(baseURL)/pe-2.4.3-600-r1a3-x86-gcc4-2011-05-24.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/pe-2.4.3_hg602-2-x86_gcc2.hpkg
+				$(hpkgBaseURL)/pe-2.4.3_hg602-3-x86_gcc2.hpkg
 				: common packages ;
 		}
 		AddSymlinkToHaikuImage home config settings deskbar Applications
