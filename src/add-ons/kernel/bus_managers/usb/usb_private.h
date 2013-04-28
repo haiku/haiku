@@ -610,6 +610,8 @@ virtual	status_t						BuildDeviceName(char *string,
 											Device *device);
 
 private:
+		status_t						_DebouncePort(uint8 index);
+
 		InterruptPipe *					fInterruptPipe;
 		usb_hub_descriptor				fHubDescriptor;
 
