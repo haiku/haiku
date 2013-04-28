@@ -410,7 +410,7 @@ if [ IsOptionalHaikuImagePackageAdded CMake ] {
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/cmake-2.8.5-2-gcc2_x86.hpkg
+				$(hpkgBaseURL)/cmake-2.8.5-3-x86_gcc2.hpkg
 				: common packages ;
 		}
 	}
