@@ -274,10 +274,52 @@ private:
 };
 
 
+struct PackageContentListPathsHandler : BPackageContentHandler {
+	PackageContentListPathsHandler()
+		:
+		fPathComponents()
+	{
+	}
+
+	virtual status_t HandleEntry(BPackageEntry* entry)
+	{
+		fPathComponents.Add(entry->Name());
+		printf("%s\n", fPathComponents.Join("/").String());
+		return B_OK;
+	}
+
+	virtual status_t HandleEntryAttribute(BPackageEntry* entry,
+		BPackageEntryAttribute* attribute)
+	{
+		return B_OK;
+	}
+
+	virtual status_t HandleEntryDone(BPackageEntry* entry)
+	{
+		fPathComponents.Remove(fPathComponents.CountStrings() - 1);
+		return B_OK;
+	}
+
+	virtual status_t HandlePackageAttribute(
+		const BPackageInfoAttributeValue& value)
+	{
+		return B_OK;
+	}
+
+	virtual void HandleErrorOccurred()
+	{
+	}
+
+private:
+	BStringList	fPathComponents;
+};
+
+
 int
 command_list(int argc, const char* const* argv)
 {
 	bool listAttributes = false;
+	bool filePathsOnly = false;
 
 	while (true) {
 		static struct option sLongOptions[] = {
@@ -286,7 +328,7 @@ command_list(int argc, const char* const* argv)
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "+ha", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "+hap", sLongOptions, NULL);
 		if (c == -1)
 			break;
 
@@ -297,6 +339,10 @@ command_list(int argc, const char* const* argv)
 
 			case 'h':
 				print_usage_and_exit(false);
+				break;
+
+			case 'p':
+				filePathsOnly = true;
 				break;
 
 			default:
@@ -319,8 +365,13 @@ command_list(int argc, const char* const* argv)
 		return 1;
 
 	// list
-	PackageContentListHandler handler(listAttributes);
-	error = packageReader.ParseContent(&handler);
+	if (filePathsOnly) {
+		PackageContentListPathsHandler handler;
+		error = packageReader.ParseContent(&handler);
+	} else {
+		PackageContentListHandler handler(listAttributes);
+		error = packageReader.ParseContent(&handler);
+	}
 	if (error != B_OK)
 		return 1;
 
