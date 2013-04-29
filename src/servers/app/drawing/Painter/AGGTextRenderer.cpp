@@ -334,8 +334,9 @@ AGGTextRenderer::RenderString(const char* string, uint32 length,
 	// for when we bypass the transformation pipeline
 	BPoint transformOffset(0.0, 0.0);
 	transform.Transform(&transformOffset);
+	IntRect clippingIntFrame(clippingFrame);
 
-	StringRenderer renderer(clippingFrame, dryRun,
+	StringRenderer renderer(clippingIntFrame, dryRun,
 		gSubpixelAntialiasing && fAntialias,
 		transformedOutline, transformedContourOutline,
 		transform, transformOffset, nextCharPos, *this);
@@ -369,8 +370,9 @@ AGGTextRenderer::RenderString(const char* string, uint32 length,
 	// for when we bypass the transformation pipeline
 	BPoint transformOffset(0.0, 0.0);
 	transform.Transform(&transformOffset);
+	IntRect clippingIntFrame(clippingFrame);
 
-	StringRenderer renderer(clippingFrame, dryRun,
+	StringRenderer renderer(clippingIntFrame, dryRun,
 		gSubpixelAntialiasing && fAntialias,
 		transformedOutline, transformedContourOutline,
 		transform, transformOffset, nextCharPos, *this);
