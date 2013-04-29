@@ -1,19 +1,18 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "VariablesView.h"
 
-#include <stdio.h>
-
 #include <new>
 
 #include <debugger.h>
 
 #include <Alert.h>
+#include <Clipboard.h>
 #include <Looper.h>
 #include <PopUpMenu.h>
 #include <ToolTip.h>
@@ -1822,6 +1821,11 @@ VariablesView::MessageReceived(BMessage* message)
 			fVariableTableModel->NotifyNodeChanged(node);
 			break;
 		}
+		case B_COPY:
+		{
+			_CopyVariableValueToClipboard();
+			break;
+		}
 		default:
 			BGroupView::MessageReceived(message);
 			break;
@@ -2084,6 +2088,15 @@ VariablesView::_GetContextActionsForNode(ModelNode* node,
 	if (valueNode == NULL)
 		return B_OK;
 
+	if (valueNode->LocationAndValueResolutionState() == B_OK) {
+		result = _AddContextAction("Copy Value", B_COPY, actions, message);
+		if (result != B_OK)
+			return result;
+	}
+
+	// if the current node isn't itself a ranged container, check if it
+	// contains a hidden node which is, since in the latter case we
+	// want to present the range selection as well.
 	if (!valueNode->IsRangedContainer()) {
 		if (node->CountChildren() == 1 && node->ChildAt(0)->IsHidden()) {
 			valueNode = node->ChildAt(0)->NodeChild()->Node();
@@ -2293,6 +2306,26 @@ VariablesView::_ApplyViewStateDescendentNodeInfos(VariablesViewState* viewState,
 	}
 
 	return B_OK;
+}
+
+
+void
+VariablesView::_CopyVariableValueToClipboard()
+{
+	ModelNode* node = reinterpret_cast<ModelNode*>(
+		fVariableTable->SelectionModel()->NodeAt(0));
+
+	Value* value = node->GetValue();
+	BString valueData;
+	if (value != NULL && value->ToString(valueData)) {
+		be_clipboard->Lock();
+		be_clipboard->Data()->RemoveData("text/plain");
+		be_clipboard->Data()->AddData ("text/plain",
+			B_MIME_TYPE, valueData.String(),
+			valueData.Length());
+		be_clipboard->Commit();
+		be_clipboard->Unlock();
+	}
 }
 
 

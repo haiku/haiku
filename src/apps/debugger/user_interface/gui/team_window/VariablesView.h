@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef VARIABLES_VIEW_H
@@ -86,6 +86,7 @@ private:
 			status_t			_ApplyViewStateDescendentNodeInfos(
 									VariablesViewState* viewState, void* parent,
 									TreeTablePath& path);
+			void				_CopyVariableValueToClipboard();
 
 private:
 			Thread*				fThread;
