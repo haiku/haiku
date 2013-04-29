@@ -419,7 +419,7 @@ Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
 	if ((cookie->fMode & O_APPEND) != 0)
 		pos = fMaxFileSize;
 
-	uint64 fileSize = max_c((off_t)fMaxFileSize, pos + *_length);
+	uint64 fileSize = pos + *_length;
 	if (fileSize > fMaxFileSize) {
 		status_t result = file_cache_set_size(fFileCache, fileSize);
 		if (result != B_OK)
