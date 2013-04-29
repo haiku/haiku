@@ -1654,6 +1654,8 @@ Volume::_CreateShineThroughDirectories(const char* shineThroughSetting)
 				break;
 			case PACKAGE_FS_MOUNT_TYPE_CUSTOM:
 				return B_OK;
+			case PACKAGE_FS_MOUNT_TYPE_ENUM_COUNT:
+				return B_BAD_VALUE;
 		}
 	} else if (strcmp(shineThroughSetting, "system") == 0)
 		directories = kSystemShineThroughDirectories;
