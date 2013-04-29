@@ -98,7 +98,10 @@ PackageLinkSymlink::Update(Package* package, PackageLinksListener* listener)
 
 	if (package != NULL) {
 		fLinkPath = package->InstallPath();
-		if (fLinkPath == NULL) {
+		if (fLinkPath != NULL) {
+			if (fType == TYPE_SETTINGS)
+				fLinkPath = ".self/settings";
+		} else {
 			fLinkPath = link_path_for_mount_type(
 				package->Volume()->MountType(), fType);
 		}
