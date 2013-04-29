@@ -1775,7 +1775,7 @@ FindPanel::AddMimeTypesToMenu()
 		const char* superType;
 		int32 index = 0;
 
-		while (types.FindString("super_types",index++,&superType) == B_OK) {
+		while (types.FindString("super_types", index++, &superType) == B_OK) {
 			BMenu* superMenu = new BMenu(superType);
 
 			BMessage* message = new BMessage(kMIMETypeItem);
