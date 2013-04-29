@@ -461,6 +461,7 @@ AddTargetVariableToScript $(script) : <build>fs_shell_command : fsShellCommand ;
 AddTargetVariableToScript $(script) : <build>copyattr ;
 AddTargetVariableToScript $(script) : <build>create_image : createImage ;
 AddTargetVariableToScript $(script) : <build>makebootable ;
+AddTargetVariableToScript $(script) : <build>package ;
 AddTargetVariableToScript $(script) : <build>rc ;
 AddTargetVariableToScript $(script) : <build>resattr ;
 AddTargetVariableToScript $(script) : <build>unzip ;
@@ -475,6 +476,16 @@ if $(optionalPackageDescriptions) {
 		: optionalPackageDescriptions ;
 }
 
+# add a variable "packages" with the packages copied/updated
+local container = $(HAIKU_IMAGE_CONTAINER_NAME) ;
+local packages = [ on $(container) return $(HAIKU_PACKAGES_IN_IMAGE) ] ;
+if [ on $(container) return $(HAIKU_CONTAINER_UPDATE_ONLY) ]
+	&& ! [ IncludeAllTargetsInContainer $(container) ] {
+	packages = [ FilterContainerUpdateTargets $(packages)
+		: HAIKU_INCLUDE_IN_IMAGE ] ;
+}
+
+AddTargetVariableToScript $(script) : $(packages) : packages ;
 
 # create the other scripts
 HAIKU_IMAGE_MAKE_DIRS_SCRIPT = <HaikuImage>haiku.image-make-dirs ;

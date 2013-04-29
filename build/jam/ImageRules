@@ -883,6 +883,9 @@ rule AddBootModuleSymlinksToHaikuImage targets
 
 rule AddPackageFilesToHaikuImage location : packages
 {
+	HAIKU_PACKAGES_IN_IMAGE on $(HAIKU_IMAGE_CONTAINER_NAME)
+		= [ on $(HAIKU_IMAGE_CONTAINER_NAME) return $(HAIKU_PACKAGES_IN_IMAGE) ]
+			$(packages) ;
 	AddFilesToHaikuImage $(location) packages : $(packages) ;
 }
 

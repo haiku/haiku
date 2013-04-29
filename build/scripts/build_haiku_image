@@ -6,6 +6,7 @@ set -o errexit
 # outputDir
 # tmpDir
 # addBuildCompatibilityLibDir
+# packages - a list of the hpkg packages copied/updated
 # The following are only for image types:
 # installDir
 # isImage
@@ -20,6 +21,7 @@ set -o errexit
 #
 # addattr
 # copyattr
+# package
 # rc
 # rmAttrs
 # unzip
@@ -158,7 +160,7 @@ stripDebugInfo()
 
 extractFile()
 {
-	# extractFile <archive> <directory>
+	# extractFile <archive> <directory> <extractedSubDir>
 	archiveFile=$1
 	targetExtractedDir=$2
 	extractedSubDir=$3
@@ -177,11 +179,17 @@ extractFile()
 			tar -C "$extractDir" -xf "$archiveFile"
 			;;
 		*.hpkg)
-			echo "Adding package $archiveFile ..."
-			cp "$archiveFile" "$extractDir"
+			echo "Extracting $archiveFile ..."
+			if [ -n "$extractedSubDir" ]; then
+				$package extract -C "$extractDir" "$archiveFile" \
+					"$extractedSubDir"
+			else
+				$package extract -C "$extractDir" "$archiveFile"
+			fi
 			;;
 		*)
-			echo "Unhandled archive extension in build_haiku_image extractFile()"
+			echo "Unhandled archive extension in build_haiku_image" \
+				"extractFile()"
 			exit 1
 			;;
 	esac
@@ -210,7 +218,8 @@ extractFile()
 		fi
 	fi
 
-	$cp -r "${sPrefix}$extractDir/$extractedSubDir/." "${tPrefix}$targetExtractedDir"
+	$cp -r "${sPrefix}$extractDir/$extractedSubDir/." \
+		"${tPrefix}$targetExtractedDir"
 
 	$rmAttrs -rf "$extractDir"
 }
@@ -274,6 +283,14 @@ echo "Populating image ..."
 while [ $# -gt 0 ]; do
 	. $1
 	shift
+done
+
+
+# install default settings for packages
+for packageFile in $packages; do
+	if $package list -p $packageFile | egrep '^settings/' > /dev/null; then
+		extractFile $packageFile common/settings settings
+	fi
 done
 
 
