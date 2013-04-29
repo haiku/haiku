@@ -58,7 +58,6 @@ All rights reserved.
 #include <SeparatorView.h>
 #include <Size.h>
 #include <SpaceLayoutItem.h>
-#include <SupportDefs.h>
 #include <TextControl.h>
 #include <TextView.h>
 #include <View.h>
@@ -956,7 +955,7 @@ FindPanel::ResizeMenuField(BMenuField* menuField)
 	for (int32 index = menu->CountItems(); index-- > 0; ) {
 		BMenuItem* item = menu->ItemAt(index);
 		if (item->Label() != NULL)
-			width = max_c(width, StringWidth(item->Label()));
+			width = std::max(width, StringWidth(item->Label()));
 
 		BMenu* submenu = item->Submenu();
 		if (submenu != NULL) {
@@ -965,7 +964,8 @@ FindPanel::ResizeMenuField(BMenuField* menuField)
 				if (subItem->Label() == NULL)
 					continue;
 
-				width = max_c(width, menuField->StringWidth(subItem->Label()));
+				width = std::max(width,
+					menuField->StringWidth(subItem->Label()));
 			}
 		}
 	}
