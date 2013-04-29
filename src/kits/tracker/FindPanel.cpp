@@ -1033,27 +1033,26 @@ FindPanel::Draw(BRect)
 		return;
 
 	for (int32 index = 0; index < fAttrGrid->CountRows(); index++) {
-
 		BMenuField* menuField
 			= dynamic_cast<BMenuField*>(FindAttrView("MenuField", index));
 		if (menuField == NULL)
-			return;
+			continue;
 
+		BLayoutItem* stringView = fAttrGrid->ItemAt(1, index);
 		BMenuItem* item = menuField->Menu()->FindMarked();
-		if (item == NULL)
-			return;
+		if (item == NULL || item->Submenu() == NULL
+			|| item->Submenu()->FindMarked() == NULL) {
+			continue;
+		}
 
-		if (item->Submenu()->FindMarked()) {
-			BLayoutItem* stringView = fAttrGrid->ItemAt(1, index);
-			if (stringView == NULL)
-				stringView = fAttrGrid->AddView(new BStringView("",
-					item->Submenu()->FindMarked()->Label()), 1, index);
-			else
-				dynamic_cast<BStringView*>(stringView->View())->SetText(
-					item->Submenu()->FindMarked()->Label());
-
+		if (stringView == NULL) {
+			stringView = fAttrGrid->AddView(new BStringView("",
+				item->Submenu()->FindMarked()->Label()), 1, index);
 			stringView->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
 				B_ALIGN_VERTICAL_UNSET));
+		} else {
+			dynamic_cast<BStringView*>(stringView->View())->SetText(
+				item->Submenu()->FindMarked()->Label());
 		}
 	}
 }
@@ -1128,6 +1127,11 @@ FindPanel::MessageReceived(BMessage* message)
 
 		case kMIMETypeItem:
 		{
+			if (fMode == kByAttributeItem) {
+				// the attributes for this type may be different
+				RemoveAttrViewItems(false);
+			}
+
 			BMenuItem* item;
 			if (message->FindPointer("source", (void**)&item) == B_OK) {
 				// don't add the "All files and folders" to the list
@@ -1137,15 +1141,9 @@ FindPanel::MessageReceived(BMessage* message)
 				SetCurrentMimeType(item);
 			}
 
-			// mime type switched
-			if (fMode != kByAttributeItem)
-				break;
+			if (fMode == kByAttributeItem)
+				AddAttrRow();
 
-			// the attributes for this type may be different,
-			// rip out the existing ones
-			RemoveAttrViewItems(false);
-
-			AddAttrRow();
 			break;
 		}
 
