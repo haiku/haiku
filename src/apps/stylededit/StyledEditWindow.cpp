@@ -850,11 +850,10 @@ StyledEditWindow::SaveAs(BMessage* message)
 	if (message != NULL)
 		fSavePanel->SetMessage(message);
 
-	// Move the save panel to the middle of the window
-	fSavePanel->Window()->MoveTo(Frame().LeftTop().x + Frame().Width() / 2
-			- fSavePanel->Window()->Frame().Width() / 2,
-		Frame().LeftTop().y + Frame().Height() / 4);
-
+	// Position the save panel so that it is centered vertically but offset
+	// a bit horizontally in the parent window's frame.
+	fSavePanel->Window()->CenterIn(Frame().InsetByCopy(0, Frame().Height() / 2)
+		.OffsetBySelf(0, -Frame().Height() / 3));
 	fSavePanel->Show();
 	return B_OK;
 }
@@ -1847,10 +1846,6 @@ StyledEditWindow::_ShowStatistics()
 	BAlert* alert = new BAlert("Statistics", result, B_TRANSLATE("OK"), NULL,
 		NULL, B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_INFO_ALERT);
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-	// Move the alert to the middle of the window
-	alert->MoveTo(Frame().LeftTop().x + Frame().Width() / 2
-			- alert->Frame().Width() / 2,
-		Frame().LeftTop().y + Frame().Height() / 4);
 
 	return alert->Go();
 }
@@ -1906,10 +1901,6 @@ StyledEditWindow::_ShowAlert(const BString& text, const BString& label,
 	BAlert* alert = new BAlert("Alert", text.String(), label.String(), button2,
 		button3, B_WIDTH_AS_USUAL, spacing, type);
 	alert->SetShortcut(0, B_ESCAPE);
-	// Move the alert to the middle of the window
-	alert->MoveTo(Frame().LeftTop().x + Frame().Width() / 2
-			- alert->Frame().Width() / 2,
-		Frame().LeftTop().y + Frame().Height() / 4);
 
 	return alert->Go();
 }
