@@ -109,6 +109,28 @@ static const char* kDragNDropActionSpecifiers [] = {
 
 const uint32 kAttachFile = 'attf';
 
+static const int32 operators[] = {
+	B_CONTAINS,
+	B_EQ,
+	B_NE,
+	B_BEGINS_WITH,
+	B_ENDS_WITH,
+	B_GE,
+	B_LE
+};
+
+static const char* operatorLabels[] = {
+	B_TRANSLATE_MARK("contains"),
+	B_TRANSLATE_MARK("is"),
+	B_TRANSLATE_MARK("is not"),
+	B_TRANSLATE_MARK("starts with"),
+	B_TRANSLATE_MARK("ends with"),
+	B_TRANSLATE_MARK("greater than"),
+	B_TRANSLATE_MARK("less than"),
+	B_TRANSLATE_MARK("before"),
+	B_TRANSLATE_MARK("after")
+};
+
 
 namespace BPrivate {
 
@@ -2483,29 +2505,18 @@ FindPanel::AddAttributeControls(int32 gridRow)
 	BMenuItem* item = new BMenuItem(submenu, message);
 	menu->AddItem(item);
 
-	const int32 operators[] = {
-		B_CONTAINS,
-		B_EQ,
-		B_NE,
-		B_BEGINS_WITH,
-		B_ENDS_WITH};
-	static const char* operatorLabels[] = {
-		B_TRANSLATE_MARK("contains"),
-		B_TRANSLATE_MARK("is"),
-		B_TRANSLATE_MARK("is not"),
-		B_TRANSLATE_MARK("starts with"),
-		B_TRANSLATE_MARK("ends with")};
-
 	for (int32 i = 0; i < 5; i++) {
 		message = new BMessage(kAttributeItem);
 		message->AddInt32("operator", operators[i]);
-		submenu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(
-			operatorLabels[i]), message));
+		submenu->AddItem(new BMenuItem(
+			B_TRANSLATE_NOCOLLECT(operatorLabels[i]), message));
 	}
 
-	// mark first item
-	menu->ItemAt(0)->SetMarked(true);
-	submenu->ItemAt(0)->SetMarked(true);
+	// mark first items if not marked
+	if (menu->FindMarked() == NULL)
+		menu->ItemAt(0)->SetMarked(true);
+	if (submenu->FindMarked() == NULL)
+		submenu->ItemAt(0)->SetMarked(true);
 
 	// add SIZE attribute
 	submenu = new BMenu(B_TRANSLATE("Size"));
@@ -2519,15 +2530,18 @@ FindPanel::AddAttributeControls(int32 gridRow)
 
 	message = new BMessage(kAttributeItem);
 	message->AddInt32("operator", B_GE);
-	submenu->AddItem(new BMenuItem(B_TRANSLATE("greater than"), message));
+	submenu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(operatorLabels[5]),
+		message));
 
 	message = new BMessage(kAttributeItem);
 	message->AddInt32("operator", B_LE);
-	submenu->AddItem(new BMenuItem(B_TRANSLATE("less than"), message));
+	submenu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(operatorLabels[6]),
+		message));
 
 	message = new BMessage(kAttributeItem);
 	message->AddInt32("operator", B_EQ);
-	submenu->AddItem(new BMenuItem(B_TRANSLATE("is"), message));
+	submenu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(operatorLabels[1]),
+		message));
 
 	// add "modified" field
 	submenu = new BMenu(B_TRANSLATE("Modified"));
@@ -2541,15 +2555,23 @@ FindPanel::AddAttributeControls(int32 gridRow)
 
 	message = new BMessage(kAttributeItem);
 	message->AddInt32("operator", B_LE);
-	submenu->AddItem(new BMenuItem(B_TRANSLATE("before"), message));
+	submenu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(operatorLabels[7]),
+		message));
 
 	message = new BMessage(kAttributeItem);
 	message->AddInt32("operator", B_GE);
-	submenu->AddItem(new BMenuItem(B_TRANSLATE("after"), message));
+	submenu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(operatorLabels[8]),
+		message));
 
 	BMenuField* menuField = new BMenuField("MenuField", "", menu);
 	menuField->SetDivider(0.0f);
 	fAttrGrid->AddView(menuField, 0, gridRow);
+
+	BStringView* stringView = new BStringView("",
+		menu->FindMarked()->Submenu()->FindMarked()->Label());
+	BLayoutItem* layoutItem = fAttrGrid->AddView(stringView, 1, gridRow);
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
+		B_ALIGN_VERTICAL_UNSET));
 
 	BString title("TextEntry");
 	title << gridRow;
@@ -2737,29 +2759,25 @@ FindPanel::AddAttributes(BMenu* menu, const BMimeType &mimeType)
 			case B_STRING_TYPE:
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_CONTAINS);
-				submenu->AddItem(new BMenuItem(B_TRANSLATE("contains"),
-					message));
+				submenu->AddItem(new BMenuItem(operatorLabels[0], message));
 
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_EQ);
-				submenu->AddItem(new BMenuItem(B_TRANSLATE("is"), message));
+				submenu->AddItem(new BMenuItem(operatorLabels[1], message));
 
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_NE);
-				submenu->AddItem(new BMenuItem(B_TRANSLATE("is not"),
-					message));
+				submenu->AddItem(new BMenuItem(operatorLabels[2], message));
 				submenu->SetTargetForItems(this);
 
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_BEGINS_WITH);
-				submenu->AddItem(new BMenuItem(B_TRANSLATE("starts with"),
-					message));
+				submenu->AddItem(new BMenuItem(operatorLabels[3], message));
 				submenu->SetTargetForItems(this);
 
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_ENDS_WITH);
-				submenu->AddItem(new BMenuItem(B_TRANSLATE("ends with"),
-					message));
+				submenu->AddItem(new BMenuItem(operatorLabels[4], message));
 				break;
 
 			case B_BOOL_TYPE:
@@ -2776,27 +2794,25 @@ FindPanel::AddAttributes(BMenu* menu, const BMimeType &mimeType)
 			case B_DOUBLE_TYPE:
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_EQ);
-				submenu->AddItem(new BMenuItem(B_TRANSLATE("is"), message));
+				submenu->AddItem(new BMenuItem(operatorLabels[1], message));
 
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_GE);
-				submenu->AddItem(new BMenuItem(B_TRANSLATE("greater than"),
-					message));
+				submenu->AddItem(new BMenuItem(operatorLabels[5], message));
 
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_LE);
-				submenu->AddItem(new BMenuItem(B_TRANSLATE("less than"),
-					message));
+				submenu->AddItem(new BMenuItem(operatorLabels[6], message));
 				break;
 
 			case B_TIME_TYPE:
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_LE);
-				submenu->AddItem(new BMenuItem(B_TRANSLATE("before"), message));
+				submenu->AddItem(new BMenuItem(operatorLabels[7], message));
 
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_GE);
-				submenu->AddItem(new BMenuItem(B_TRANSLATE("after"), message));
+				submenu->AddItem(new BMenuItem(operatorLabels[8], message));
 				break;
 		}
 		submenu->SetTargetForItems(this);
