@@ -1049,7 +1049,7 @@ AttributeEntry::FillDirent(struct dirent *dirent, size_t bufferSize,
 status_t
 AttributeEntry::Read(off_t position, void *buffer, size_t *length)
 {
-	*length = min_c(*length, fEntry->size - position);
+	*length = (size_t)min_c((off_t)*length, fEntry->size - position);
 	memcpy(buffer, fData + position, *length);
 	return B_OK;
 }
