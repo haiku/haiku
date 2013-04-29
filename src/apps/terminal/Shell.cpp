@@ -119,8 +119,8 @@ typedef struct
 {
 	int status;		/* status of child */
 	char msg[128];	/* error message */
-	int row;		/* terminal rows */
-	int col;		/* Terminal columns */
+	unsigned short row;		/* terminal rows */
+	unsigned short col;		/* Terminal columns */
 } handshake_t;
 
 /* status of handshake */
