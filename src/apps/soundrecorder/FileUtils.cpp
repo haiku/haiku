@@ -9,6 +9,7 @@
 ******************************************************************************/
 #include "FileUtils.h"
 
+#include <algorithm>
 #include <new>
 #include <stdio.h>
 #include <string.h>
@@ -95,7 +96,7 @@ CopyAttributes(BNode& dst, BNode& src)
 		uint8 buffer[size];
 		off_t offset = 0;
 		ssize_t read = src.ReadAttr(attrName, info.type, offset, buffer,
-			min_c(size, info.size));
+			std::min((off_t)size, info.size));
 		if (read < 0) {
 			fprintf(stderr, "Error reading attribute '%s'\n", attrName);
 			return (status_t)read;
@@ -113,7 +114,7 @@ CopyAttributes(BNode& dst, BNode& src)
 			}
 			offset += read;
 			read = src.ReadAttr(attrName, info.type, offset, buffer,
-				min_c(size, info.size - offset));
+				std::min((off_t)size, info.size - offset));
 			if (read < 0) {
 				fprintf(stderr, "Error reading attribute '%s'\n", attrName);
 				return (status_t)read;
