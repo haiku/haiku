@@ -933,46 +933,43 @@ FindPanel::ResizeMenuField(BMenuField* menuField)
 
 	BMenu* menu = menuField->Menu();
 
-	float padding = 0.0;
-	float width = size.width;
+	float padding = 0.0f;
+	float width = 0.0f;
 
 	BMenuItem* markedItem = menu->FindMarked();
 	if (markedItem != NULL) {
 		if (markedItem->Submenu() != NULL) {
 			BMenuItem* markedSubItem = markedItem->Submenu()->FindMarked();
 			if (markedSubItem != NULL && markedSubItem->Label() != NULL) {
-				float labelWidth = StringWidth(markedSubItem->Label());
+				float labelWidth
+					= menuField->StringWidth(markedSubItem->Label());
 				padding = size.width - labelWidth;
 			}
 		} else if (markedItem->Label() != NULL) {
-			float labelWidth = StringWidth(markedItem->Label());
+			float labelWidth = menuField->StringWidth(markedItem->Label());
 			padding = size.width - labelWidth;
 		}
 	}
 
 	for (int32 index = menu->CountItems(); index-- > 0; ) {
 		BMenuItem* item = menu->ItemAt(index);
-		if (item->Label() != NULL) {
-			float labelWidth = StringWidth(item->Label());
-			if (labelWidth > width) {
-				width = labelWidth;
-			}
-		}
+		if (item->Label() != NULL)
+			width = max(width, StringWidth(item->Label()));
+
 		BMenu* submenu = item->Submenu();
 		if (submenu != NULL) {
 			for (int32 subIndex = submenu->CountItems(); subIndex-- > 0; ) {
 				BMenuItem* subItem = submenu->ItemAt(subIndex);
-				if (subItem->Label() != NULL) {
-					float labelWidth = StringWidth(subItem->Label());
-					if (labelWidth > width)
-						width = labelWidth;
-				}
+				if (subItem->Label() == NULL)
+					continue;
+
+				width = max(width, menuField->StringWidth(subItem->Label()));
 			}
 		}
 	}
 
 	size.width = width + padding;
-	menuField->SetExplicitMinSize(size);
+	menuField->SetExplicitSize(size);
 }
 
 static void
@@ -2696,7 +2693,7 @@ FindPanel::AddLogicMenu(int32 index, bool selectAnd)
 	BMenuField* menufield = new BMenuField("Logic", "", menu, B_WILL_DRAW);
 	menufield->SetDivider(0.0f);
 
-	menufield->SetExplicitMaxSize(menufield->MinSize());
+	ResizeMenuField(menufield);
 
 	fAttrGrid->AddView(menufield, 3, index);
 }
