@@ -431,14 +431,14 @@ CopyEngine::_CopyFolder(const char* _source, const char* _destination,
 			uint8 buffer[size];
 			off_t offset = 0;
 			ssize_t read = sourceNode.ReadAttr(attrName, info.type,
-				offset, buffer, min_c(size, info.size));
+				offset, buffer, std::min((off_t)size, info.size));
 			// NOTE: It's important to still write the attribute even if
 			// we have read 0 bytes!
 			while (read >= 0) {
 				targetNode.WriteAttr(attrName, info.type, offset, buffer, read);
 				offset += read;
 				read = sourceNode.ReadAttr(attrName, info.type,
-				offset, buffer, min_c(size, info.size - offset));
+					offset, buffer, std::min((off_t)size, info.size - offset));
 				if (read == 0)
 					break;
 			}
