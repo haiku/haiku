@@ -698,8 +698,7 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate,
 
 	fMimeTypeField = new BMenuField("MimeTypeMenu", "", fMimeTypeMenu);
 	fMimeTypeField->SetDivider(0.0f);
-	fMimeTypeField->MenuItem()->SetLabel(
-		B_TRANSLATE("All files and folders"));
+	fMimeTypeField->MenuItem()->SetLabel(B_TRANSLATE("All files and folders"));
 	// add popup for search criteria
 	fSearchModeMenu = new BPopUpMenu("searchMode");
 	fSearchModeMenu->AddItem(new BMenuItem(B_TRANSLATE("by name"),
@@ -1150,20 +1149,25 @@ FindPanel::MessageReceived(BMessage* message)
 			if (message->FindPointer("source", (void**)&item) != B_OK)
 				return;
 
-			if (item->Submenu()->ItemAt(0))
+			if (item->Submenu()->ItemAt(0) != NULL)
 				item->Submenu()->ItemAt(0)->SetMarked(true);
+
 			Invalidate();
 			break;
 
 		case kLatchChanged:
+		{
 			int32 value;
-			if (message->FindInt32("be:value", &value) == B_OK) {
-				if (value == 0 && !fMoreOptions->IsHidden(this))
-					fMoreOptions->Hide();
-				else if (value == 1 && fMoreOptions->IsHidden(this))
-					fMoreOptions->Show();
-			}
+			if (message->FindInt32("be:value", &value) != B_OK)
+				break;
+
+			if (value == 0 && !fMoreOptions->IsHidden(this))
+				fMoreOptions->Hide();
+			else if (value == 1 && fMoreOptions->IsHidden(this))
+				fMoreOptions->Show();
+
 			break;
+		}
 
 		case B_SAVE_REQUESTED:
 		{
@@ -1635,24 +1639,28 @@ FindPanel::SetCurrentMimeType(BMenuItem* item)
 
 		BMenuItem* search;
 		for (int32 i = 2; (search = MimeTypeMenu()->ItemAt(i)) != NULL; i++) {
-			if (item == search || !search->Label())
+			if (item == search || search->Label() == NULL)
 				continue;
-			if (strcmp(item->Label(),search->Label()) == 0) {
+
+			if (strcmp(item->Label(), search->Label()) == 0) {
 				search->SetMarked(true);
 				break;
 			}
+
 			BMenu* submenu = search->Submenu();
-			if (submenu) {
-				for (int32 j = submenu->CountItems();j-- > 0;) {
-					BMenuItem* sub = submenu->ItemAt(j);
-					if (strcmp(item->Label(),sub->Label()) == 0) {
-						sub->SetMarked(true);
-						break;
-					}
+			if (submenu == NULL)
+				continue;
+
+			for (int32 j = submenu->CountItems(); j-- > 0;) {
+				BMenuItem* sub = submenu->ItemAt(j);
+				if (strcmp(item->Label(),sub->Label()) == 0) {
+					sub->SetMarked(true);
+					break;
 				}
 			}
 		}
 	}
+
 	return B_OK;
 }
 
@@ -1781,22 +1789,24 @@ FindPanel::AddMimeTypesToMenu()
 		}
 	}
 
-	if (tracker)
+	if (tracker != NULL) {
 		tracker->MimeTypes()->EachCommonType(&FindPanel::AddOneMimeTypeToMenu,
 			MimeTypeMenu());
+	}
 
 	// remove empty super type menus (and set target)
 
-	for (int32 index = MimeTypeMenu()->CountItems();index-- > 2;) {
+	for (int32 index = MimeTypeMenu()->CountItems(); index-- > 2;) {
 		BMenuItem* item = MimeTypeMenu()->ItemAt(index);
 		BMenu* submenu = item->Submenu();
-		if (submenu != NULL) {
-			if (submenu->CountItems() == 0) {
-				MimeTypeMenu()->RemoveItem(item);
-				delete item;
-			} else
-				submenu->SetTargetForItems(this);
-		}
+		if (submenu == NULL)
+			continue;
+
+		if (submenu->CountItems() == 0) {
+			MimeTypeMenu()->RemoveItem(item);
+			delete item;
+		} else
+			submenu->SetTargetForItems(this);
 	}
 
 	MimeTypeMenu()->SetTargetForItems(this);
@@ -2405,6 +2415,7 @@ FindPanel::RemoveAttrViewItems(bool removeGrid)
 		child->RemoveSelf();
 		delete child;
 	}
+
 	if (removeGrid) {
 		view->RemoveSelf();
 		delete view;
@@ -2549,7 +2560,6 @@ FindPanel::AddAttributeControls(int32 gridRow)
 
 	// target everything
 	menu->SetTargetForItems(this);
-
 	for (int32 index = menu->CountItems() - 1; index >= 0; index--)
 		menu->SubmenuAt(index)->SetTargetForItems(this);
 
@@ -2591,7 +2601,7 @@ FindPanel::RestoreAttrState(const BMessage &message, int32 index)
 	int32 logicMenuSelectedIndex;
 	BMenuField* field = dynamic_cast<BMenuField*>(FindAttrView("Logic", index));
 	if (message.FindInt32("logicalRelation", index,
-		&logicMenuSelectedIndex) == B_OK) {
+			&logicMenuSelectedIndex) == B_OK) {
 		if (field)
 			field->Menu()->ItemAt(logicMenuSelectedIndex)->SetMarked(true);
 		else
@@ -2631,7 +2641,7 @@ FindPanel::SaveAttrState(BMessage* message, int32 index)
 	message->AddString("attrViewText", textControl->TextView()->Text());
 
 	BMenuField* field = dynamic_cast<BMenuField*>(FindAttrView("Logic", index));
-	if (field) {
+	if (field != NULL) {
 		BMenuItem* item = field->Menu()->FindMarked();
 		ASSERT(item);
 		message->AddInt32("logicalRelation",
