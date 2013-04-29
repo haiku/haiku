@@ -200,7 +200,7 @@ SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs bindfs btrfs cdda exfat ext2 fat iso9660 nfs
 # build the haiku system package and add it
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) HaikuPackages ] ;
 
-AddFilesToHaikuImage system packages : haiku.hpkg ;
+AddPackageFilesToHaikuImage system : haiku.hpkg ;
 
 
 AddSymlinkToHaikuImage . : /boot/common/apps ;

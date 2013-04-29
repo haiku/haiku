@@ -579,8 +579,8 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 			$(HAIKU_GCC_VERSION[1]) ;
 	}
 
-	AddFilesToHaikuImage system packages : haiku_devel.hpkg ;
-	AddFilesToHaikuImage common packages : makefile_engine.hpkg ;
+	AddPackageFilesToHaikuImage system : haiku_devel.hpkg ;
+	AddPackageFilesToHaikuImage common : makefile_engine.hpkg ;
 }
 
 
@@ -1515,8 +1515,8 @@ if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
 
 # Welcome
 if [ IsOptionalHaikuImagePackageAdded Welcome ] {
-	AddFilesToHaikuImage system packages : haiku_userguide.hpkg ;
-	AddFilesToHaikuImage system packages : haiku_welcome.hpkg ;
+	AddPackageFilesToHaikuImage system : haiku_userguide.hpkg ;
+	AddPackageFilesToHaikuImage system : haiku_welcome.hpkg ;
 
 	AddSymlinkToHaikuImage home Desktop	: /boot/system/bin/welcome
 		: Welcome ;

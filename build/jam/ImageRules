@@ -862,6 +862,11 @@ rule AddBootModuleSymlinksToHaikuImage targets
 		: $(targets) ;
 }
 
+rule AddPackageFilesToHaikuImage location : packages
+{
+	AddFilesToHaikuImage $(location) packages : $(packages) ;
+}
+
 rule AddOptionalHaikuImagePackages packages
 {
 	local package ;
