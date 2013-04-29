@@ -927,16 +927,29 @@ rule InstallSourceArchive file : url
 
 rule InstallOptionalHaikuImagePackage url : dirTokens : isCDPackage
 {
+	# TODO: Remove the non-hpkg cases!
+	# Currently the semantics differs depending on isCDPackage and the type of
+	# the package file:
+	# * For a hpkg <dirTokens> is "common" (default) or "system" and specifies
+	#   the installation location of the package (will be copied to the
+	#   packages/ subdirectory).
+	# * For a regular archive and isCDPackage true, <dirTokens> is ignored and
+	#   the package will be copied to the _package_ directory of the CD image.
+	# * For a regular archive and isCDPackage false, <dirTokens> specifies the
+	#   directory relative to the image's root directory where the content of
+	#   the archive will be extracted to.
+
 	local package = $(url:BS) ;
 
 	# download archive file
 	local archiveFile = [ DownloadFile $(package) : $(url) ] ;
 
 	if $(package:S) = .hpkg {
+		local location = $(dirTokens:E=common) ;
 		if $(HAIKU_UPDATE_ALL_PACKAGES) {
 			HAIKU_INCLUDE_IN_IMAGE on $(archiveFile) = 1 ;
 		}
-		AddFilesToHaikuImage $(dirTokens) : $(archiveFile) ;
+		AddPackageFilesToHaikuImage $(location) : $(archiveFile) ;
 	} else if ( $(isCDPackage) = true || $(isCDPackage) = 1 )
 		&& $(HAIKU_CD_NAME) {
 		# TODO: If HAIKU_CD_NAME is set, that doesn't mean we're building a CD
