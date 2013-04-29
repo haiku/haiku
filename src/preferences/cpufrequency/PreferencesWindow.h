@@ -356,13 +356,10 @@ PreferencesWindow<Preferences>::PreferencesWindow(const char* title,
 	BGroupView* buttonView = new BGroupView(B_HORIZONTAL);
 	fDefaultButton = new BButton(B_TRANSLATE("Defaults"),
 		new BMessage(kDefaultMsg));
-
 	buttonView->AddChild(fDefaultButton);
-	buttonView->GetLayout()->AddItem(
-		BSpaceLayoutItem::CreateHorizontalStrut(7));
+
 	fRevertButton = new BButton(B_TRANSLATE("Revert"),
 		new BMessage(kRevertMsg));
-
 	buttonView->AddChild(fRevertButton);
 	buttonView->GetLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
 
@@ -370,8 +367,8 @@ PreferencesWindow<Preferences>::PreferencesWindow(const char* title,
 
 	SetLayout(new BGroupLayout(B_VERTICAL));
 	fRootLayout = new BGroupLayout(B_VERTICAL);
-	fRootLayout->SetInsets(10, 10, 10, 10);
-	fRootLayout->SetSpacing(10);
+	fRootLayout->SetInsets(B_USE_DEFAULT_SPACING);
+	fRootLayout->SetSpacing(B_USE_DEFAULT_SPACING);
 	BView* rootView = new BView("root view", 0, fRootLayout);
 	AddChild(rootView);
 	rootView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
