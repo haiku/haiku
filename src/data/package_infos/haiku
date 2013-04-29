@@ -88,6 +88,7 @@ provides {
 	cmd:link
 	cmd:ln = 8.4
 	cmd:locate
+	cmd:login
 	cmd:logname
 	cmd:ls
 	cmd:md5sum
@@ -102,6 +103,7 @@ provides {
 	cmd:nohup
 	cmd:nproc
 	cmd:od
+	cmd:passwd
 	cmd:paste
 	cmd:patch
 	cmd:pathchk
