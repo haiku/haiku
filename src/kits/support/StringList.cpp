@@ -260,6 +260,14 @@ BStringList::IsEmpty() const
 }
 
 
+BString
+BStringList::Join(const char* separator, int32 length)
+{
+	return _Join(separator,
+		length >= 0 ? strnlen(separator, length) : strlen(separator));
+}
+
+
 void
 BStringList::DoForEach(bool (*func)(const BString& string))
 {
@@ -327,4 +335,40 @@ BStringList::_DecrementRefCounts() const
 	int32 count = fStrings.CountItems();
 	for (int32 i = 0; i < count; i++)
 		BString::Private::DecrementDataRefCount((char*)fStrings.ItemAt(i));
+}
+
+
+BString
+BStringList::_Join(const char* separator, int32 length)
+{
+	// handle simple cases (0 or 1 element)
+	int32 count = CountStrings();
+	if (count == 0)
+		return BString();
+	if (count == 1)
+		return StringAt(0);
+
+	// determine the total length
+	int32 totalLength = length * (count - 1);
+	for (int32 i = 0; i < count; i++)
+		totalLength += StringAt(i).Length();
+
+	// compose the result string
+	BString result;
+	char* buffer = result.LockBuffer(totalLength);
+	if (buffer == NULL)
+		return result;
+
+	for (int32 i = 0; i < count; i++) {
+		if (i > 0 && length > 0) {
+			memcpy(buffer, separator, length);
+			buffer += length;
+		}
+
+		BString string = StringAt(i);
+		memcpy(buffer, string.String(), string.Length());
+		buffer += string.Length();
+	}
+
+	return result.UnlockBuffer(totalLength);
 }
