@@ -677,8 +677,8 @@ if [ IsOptionalHaikuImagePackageAdded GetText ] {
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(baseURL)/gettext-0.18.1.1-x86-gcc2-2011-02-07.zip
-				: : true ;
+				$(hpkgBaseURL)/gettext-0.18.1.1-3-x86_gcc2.hpkg
+				: common packages ;
 		}
 	}
 }
