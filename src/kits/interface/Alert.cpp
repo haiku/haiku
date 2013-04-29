@@ -499,9 +499,11 @@ BAlert::_InitObject(const char* text, const char* button0, const char* button1,
 		}
 	}
 
-	float defaultButtonFrameWidth = -fButtons[buttonCount - 1]->Bounds().Width() / 2.0f;
+	float defaultButtonFrameWidth
+		= -fButtons[buttonCount - 1]->Bounds().Width() / 2.0f;
 	SetDefaultButton(fButtons[buttonCount - 1]);
-	defaultButtonFrameWidth += fButtons[buttonCount - 1]->Bounds().Width() / 2.0f;
+	defaultButtonFrameWidth
+		+= fButtons[buttonCount - 1]->Bounds().Width() / 2.0f;
 
 	// Layout buttons
 
@@ -525,9 +527,9 @@ BAlert::_InitObject(const char* text, const char* button0, const char* button1,
 	int32 iconLayoutScale = icon_layout_scale();
 	float totalWidth = kRightOffset + fButtons[buttonCount - 1]->Frame().right
 		- defaultButtonFrameWidth - fButtons[0]->Frame().left;
-	if (view->Bitmap()) {
+	if (view->Bitmap())
 		totalWidth += (kIconStripeWidth + kWindowIconOffset) * iconLayoutScale;
-	} else
+	else
 		totalWidth += kWindowMinOffset;
 
 	float width = (spacing == B_OFFSET_SPACING
@@ -815,4 +817,3 @@ _BAlertFilter_::Filter(BMessage* msg, BHandler** target)
 
 	return B_DISPATCH_MESSAGE;
 }
-
