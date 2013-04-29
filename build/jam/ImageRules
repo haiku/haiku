@@ -70,28 +70,47 @@ actions together AddVariableToScript1
 	$(VARIABLE_DEFS)$(1);
 }
 
-rule AddTargetVariableToScript
+
+rule AddTargetVariableToScript script : targets : variable
 {
-	# AddTargetVariableToScript <script> : <target> [ : <variable> ] ;
+	# AddTargetVariableToScript <script> : <targets> [ : <variable> ] ;
 	#
-	local script = $(1) ;
-	local target = $(2) ;
-	local variable = $(3:E=$(target:BS)) ;
+	# If <targets> contains multiple targets, their paths must not contain
+	# whitespaces or other characters that need to be escaped in the shell.
+	#
+	variable ?= $(3:E=$(targets[1]:BS)) ;
 
-	InitScript $(script) ;
+	local initScript = [ InitScript $(script) ] ;
 
-	# That's not completely save, if one has more than on target with the
-	# same base name. A unique pseudo target would have to be introduced
-	# to do it more correctly.
-	VARIABLE_NAME($(target:BS)) on $(script) = $(variable) ;
+	serialization = [ on $(script) return $(HAIKU_SERIALIZATION) ] ;
 
-	Depends $(script) : $(target) ;
-	AddTargetVariableToScript1 $(script) : $(target) ;
+	local variableTarget = [ NewUniqueTarget ] ;
+	NotFile $(variableTarget) ;
+	Depends $(variableTarget) : $(initScript) $(targets) $(serialization) ;
+	Depends $(script) : $(variableTarget) ;
+
+	HAIKU_SERIALIZATION on $(script) = $(variableTarget) ;
+
+	HAIKU_VARIABLE_NAME on $(variableTarget) = $(variable) ;
+	AddTargetVariableToScript1 $(variableTarget) : $(initScript) $(targets) ;
 }
+
 
 actions AddTargetVariableToScript1
 {
-	echo "$(VARIABLE_NAME($(2:BS)))=\"$(2)\"" >> $(1)
+	script="$(2[1])"
+	echo "$(HAIKU_VARIABLE_NAME)=" >> "$script"
+
+	firstSeen=
+	for value in "$(2[2-])" ; do
+		if [ -z "$firstSeen" ]; then
+			echo "$(HAIKU_VARIABLE_NAME)=\"$value\"" >> "$script"
+			firstSeen=1
+		else
+			echo "$(HAIKU_VARIABLE_NAME)=\"\$$(HAIKU_VARIABLE_NAME) $value\"" \
+				>> "$script"
+		fi
+	done
 }
 
 
