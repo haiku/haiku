@@ -396,6 +396,7 @@ BAlert::QuitRequested()
 }
 
 
+// This method is deprecated, do not use
 BPoint
 BAlert::AlertPosition(float width, float height)
 {
@@ -572,7 +573,16 @@ BAlert::_InitObject(const char* text, const char* button0, const char* button1,
 
 	AddCommonFilter(new(std::nothrow) _BAlertFilter_(this));
 
-	MoveTo(AlertPosition(Frame().Width(), Frame().Height()));
+	// Position the alert so that it is centered vertically but offset a bit
+	// horizontally in the parent window's frame or, if unavailable, the
+	// screen frame.
+	BWindow* window =
+		dynamic_cast<BWindow*>(BLooper::LooperForThread(find_thread(NULL)));
+	const BRect frame = window != NULL ? window->Frame()
+		: (BScreen(this)).Frame();
+
+	CenterIn(frame.InsetByCopy(0, frame.Height() / 2)
+		.OffsetBySelf(0, -frame.Height() / 4));
 }
 
 
