@@ -58,6 +58,7 @@ All rights reserved.
 #include <SeparatorView.h>
 #include <Size.h>
 #include <SpaceLayoutItem.h>
+#include <SupportDefs.h>
 #include <TextControl.h>
 #include <TextView.h>
 #include <View.h>
@@ -100,16 +101,18 @@ const uint32 kSwitchToQueryTemplate = 'swqt';
 const uint32 kRunSaveAsTemplatePanel = 'svtm';
 const uint32 kLatchChanged = 'ltch';
 
-const char* kDragNDropTypes [] = {
+const char* kDragNDropTypes[] = {
 	B_QUERY_MIMETYPE,
-	B_QUERY_TEMPLATE_MIMETYPE };
-static const char* kDragNDropActionSpecifiers [] = {
+	B_QUERY_TEMPLATE_MIMETYPE
+};
+static const char* kDragNDropActionSpecifiers[] = {
 	B_TRANSLATE_MARK("Create a Query"),
-	B_TRANSLATE_MARK("Create a Query template") };
+	B_TRANSLATE_MARK("Create a Query template")
+};
 
 const uint32 kAttachFile = 'attf';
 
-static const int32 operators[] = {
+const int32 operators[] = {
 	B_CONTAINS,
 	B_EQ,
 	B_NE,
@@ -118,7 +121,6 @@ static const int32 operators[] = {
 	B_GE,
 	B_LE
 };
-
 static const char* operatorLabels[] = {
 	B_TRANSLATE_MARK("contains"),
 	B_TRANSLATE_MARK("is"),
@@ -954,7 +956,7 @@ FindPanel::ResizeMenuField(BMenuField* menuField)
 	for (int32 index = menu->CountItems(); index-- > 0; ) {
 		BMenuItem* item = menu->ItemAt(index);
 		if (item->Label() != NULL)
-			width = max(width, StringWidth(item->Label()));
+			width = max_c(width, StringWidth(item->Label()));
 
 		BMenu* submenu = item->Submenu();
 		if (submenu != NULL) {
@@ -963,7 +965,7 @@ FindPanel::ResizeMenuField(BMenuField* menuField)
 				if (subItem->Label() == NULL)
 					continue;
 
-				width = max(width, menuField->StringWidth(subItem->Label()));
+				width = max_c(width, menuField->StringWidth(subItem->Label()));
 			}
 		}
 	}
