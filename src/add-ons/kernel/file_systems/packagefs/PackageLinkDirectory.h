@@ -41,7 +41,7 @@ private:
 			struct DependencyLink : public PackageLinkSymlink {
 				DependencyLink(Package* package)
 					:
-					PackageLinkSymlink(package)
+					PackageLinkSymlink(package, TYPE_INSTALLATION_LOCATION)
 				{
 				}
 
@@ -58,10 +58,18 @@ private:
 			status_t			_UpdateDependencies(
 									PackageLinksListener* listener);
 
+			status_t			_CreateOrUpdateLink(Link*& link,
+									Package* package, Link::Type type,
+									const char* name,
+									PackageLinksListener* listener);
+			void				_RemoveLink(Link* link,
+									PackageLinksListener* listener);
+
 private:
 			timespec			fModifiedTime;
 			PackageList			fPackages;
 			Link*				fSelfLink;
+			Link*				fSettingsLink;
 			FamilyDependencyList fDependencyLinks;
 };
 

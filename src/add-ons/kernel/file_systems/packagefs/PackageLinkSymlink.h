@@ -15,7 +15,16 @@ class PackageLinksListener;
 
 class PackageLinkSymlink : public Node {
 public:
-								PackageLinkSymlink(Package* package);
+			enum Type {
+				TYPE_INSTALLATION_LOCATION,
+				TYPE_SETTINGS,
+
+				TYPE_ENUM_COUNT
+			};
+
+public:
+								PackageLinkSymlink(Package* package,
+									Type type);
 	virtual						~PackageLinkSymlink();
 
 			void				Update(Package* package,
@@ -37,6 +46,7 @@ private:
 private:
 			timespec			fModifiedTime;
 			const char*			fLinkPath;
+			Type				fType;
 };
 
 

@@ -212,8 +212,11 @@ AddDirectoryToHaikuImage home mail draft ;
 AddDirectoryToHaikuImage home mail in ;
 AddDirectoryToHaikuImage home mail out ;
 
-AddSymlinkToHaikuImage home config settings : deskbar : be ;
+# global settings when a package is installed in ~/config
+AddDirectoryToHaikuImage home config settings global ;
+
 # Deskbar Application links
+AddSymlinkToHaikuImage home config settings : deskbar : be ;
 AddDirectoryToHaikuImage home config settings deskbar Applications ;
 DESKBAR_APPLICATIONS = ActivityMonitor CharacterMap CodyCam CDPlayer DeskCalc
 	Devices DiskProbe DriveSetup DiskUsage Expander Icon-O-Matic Installer

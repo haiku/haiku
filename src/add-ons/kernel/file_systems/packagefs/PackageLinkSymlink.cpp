@@ -17,27 +17,32 @@
 #include "Volume.h"
 
 
-static const char* const kSystemLinkPath = "../..";
-static const char* const kCommonLinkPath = "../../../common";
-static const char* const kHomeLinkPath = "../../../home/config";
+static const char* const kLinkPaths[PackageLinkSymlink::TYPE_ENUM_COUNT]
+		[PACKAGE_FS_MOUNT_TYPE_ENUM_COUNT] = {
+	{
+		"../..",
+		"../../../common",
+		"../../../home/config"
+	},
+	{
+		"../../../common/settings",
+		"../../../common/settings",
+		"../../../home/config/settings/global"
+	}
+};
 
 static const char* const kUnknownLinkTarget = "?";
 
 
 static const char*
-link_path_for_mount_type(MountType type)
+link_path_for_mount_type(MountType mountType, PackageLinkSymlink::Type linkType)
 {
-	switch (type) {
-		case PACKAGE_FS_MOUNT_TYPE_SYSTEM:
-			return kSystemLinkPath;
-		case PACKAGE_FS_MOUNT_TYPE_COMMON:
-			return kCommonLinkPath;
-		case PACKAGE_FS_MOUNT_TYPE_HOME:
-			return kHomeLinkPath;
-		case PACKAGE_FS_MOUNT_TYPE_CUSTOM:
-		default:
-			return "?";
+	if (mountType < 0 || mountType >= PACKAGE_FS_MOUNT_TYPE_ENUM_COUNT
+		|| linkType < 0 || linkType >= PackageLinkSymlink::TYPE_ENUM_COUNT) {
+		return kUnknownLinkTarget;
 	}
+
+	return kLinkPaths[linkType][mountType];
 }
 
 
@@ -71,10 +76,11 @@ private:
 // #pragma mark - PackageLinkSymlink
 
 
-PackageLinkSymlink::PackageLinkSymlink(Package* package)
+PackageLinkSymlink::PackageLinkSymlink(Package* package, Type type)
 	:
 	Node(0),
-	fLinkPath(kUnknownLinkTarget)
+	fLinkPath(kUnknownLinkTarget),
+	fType(type)
 {
 	Update(package, NULL);
 }
@@ -94,7 +100,7 @@ PackageLinkSymlink::Update(Package* package, PackageLinksListener* listener)
 		fLinkPath = package->InstallPath();
 		if (fLinkPath == NULL) {
 			fLinkPath = link_path_for_mount_type(
-				package->Volume()->MountType());
+				package->Volume()->MountType(), fType);
 		}
 	} else
 		fLinkPath = kUnknownLinkTarget;

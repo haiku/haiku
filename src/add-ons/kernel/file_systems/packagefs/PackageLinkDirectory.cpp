@@ -20,13 +20,15 @@
 
 
 static const char* const kSelfLinkName = ".self";
+static const char* const kSettingsLinkName = ".settings";
 
 
 PackageLinkDirectory::PackageLinkDirectory()
 	:
 	Directory(0),
 		// the ID needs to be assigned later, when added to a volume
-	fSelfLink(NULL)
+	fSelfLink(NULL),
+	fSettingsLink(NULL)
 {
 	get_real_time(fModifiedTime);
 }
@@ -36,6 +38,8 @@ PackageLinkDirectory::~PackageLinkDirectory()
 {
 	if (fSelfLink != NULL)
 		fSelfLink->ReleaseReference();
+	if (fSettingsLink != NULL)
+		fSettingsLink->ReleaseReference();
 
 	while (DependencyLink* link = fDependencyLinks.RemoveHead())
 		link->ReleaseReference();
@@ -154,55 +158,32 @@ PackageLinkDirectory::_Update(PackageLinksListener* listener)
 {
 	// Always remove all dependency links -- if there's still a package, they
 	// will be re-created below.
-	while (DependencyLink* link = fDependencyLinks.RemoveHead()) {
-		NodeWriteLocker linkLocker(link);
-		if (listener != NULL)
-			listener->PackageLinkNodeRemoved(link);
-
-		RemoveChild(link);
-		linkLocker.Unlock();
-		link->ReleaseReference();
-	}
+	while (DependencyLink* link = fDependencyLinks.RemoveHead())
+		_RemoveLink(link, listener);
 
 	// check, if empty
 	Package* package = fPackages.Head();
 	if (package == NULL) {
-		// remove self link, if any
-		if (fSelfLink != NULL) {
-			NodeWriteLocker selfLinkLocker(fSelfLink);
-			if (listener != NULL)
-				listener->PackageLinkNodeRemoved(fSelfLink);
+		// remove self and settings link
+		_RemoveLink(fSelfLink, listener);
+		fSelfLink = NULL;
 
-			RemoveChild(fSelfLink);
-			selfLinkLocker.Unlock();
-			fSelfLink->ReleaseReference();
-			fSelfLink = NULL;
-		}
+		_RemoveLink(fSettingsLink, listener);
+		fSettingsLink = NULL;
 
 		return B_OK;
 	}
 
-	// create/update self link
-	if (fSelfLink == NULL) {
-		fSelfLink = new(std::nothrow) Link(package);
-		if (fSelfLink == NULL)
-			return B_NO_MEMORY;
+	// create/update self and settings link
+	status_t error = _CreateOrUpdateLink(fSelfLink, package,
+		Link::TYPE_INSTALLATION_LOCATION, kSelfLinkName, listener);
+	if (error != B_OK)
+		RETURN_ERROR(error);
 
-		status_t error = fSelfLink->Init(this, kSelfLinkName,
-			NODE_FLAG_CONST_NAME);
-		if (error != B_OK)
-			RETURN_ERROR(error);
-
-		AddChild(fSelfLink);
-
-		if (listener != NULL) {
-			NodeWriteLocker selfLinkLocker(fSelfLink);
-			listener->PackageLinkNodeAdded(fSelfLink);
-		}
-	} else {
-		NodeWriteLocker selfLinkLocker(fSelfLink);
-		fSelfLink->Update(package, listener);
-	}
+	error = _CreateOrUpdateLink(fSettingsLink, package, Link::TYPE_SETTINGS,
+		kSettingsLinkName, listener);
+	if (error != B_OK)
+		RETURN_ERROR(error);
 
 	// update the dependency links
 	return _UpdateDependencies(listener);
@@ -253,6 +234,50 @@ PackageLinkDirectory::_UpdateDependencies(PackageLinksListener* listener)
 			}
 		}
 	}
+
+	return B_OK;
+}
+
+
+void
+PackageLinkDirectory::_RemoveLink(Link* link, PackageLinksListener* listener)
+{
+	if (link != NULL) {
+		NodeWriteLocker linkLocker(link);
+		if (listener != NULL)
+			listener->PackageLinkNodeRemoved(link);
+
+		RemoveChild(link);
+		linkLocker.Unlock();
+		link->ReleaseReference();
+	}
+}
+
+
+status_t
+PackageLinkDirectory::_CreateOrUpdateLink(Link*& link, Package* package,
+	Link::Type type, const char* name, PackageLinksListener* listener)
+{
+	if (link == NULL) {
+		link = new(std::nothrow) Link(package, type);
+		if (link == NULL)
+			return B_NO_MEMORY;
+
+		status_t error = link->Init(this, name, NODE_FLAG_CONST_NAME);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		AddChild(link);
+
+		if (listener != NULL) {
+			NodeWriteLocker lLinkLocker(link);
+			listener->PackageLinkNodeAdded(link);
+		}
+	} else {
+		NodeWriteLocker lLinkLocker(link);
+		link->Update(package, listener);
+	}
+
 
 	return B_OK;
 }
