@@ -1,5 +1,6 @@
 /*
  * Copyright 2005-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -220,11 +221,12 @@ private:
 
 
 // constructor
-SymbolLookup::SymbolLookup(team_id team)
+SymbolLookup::SymbolLookup(team_id team, image_id image)
 	:
 	RemoteMemoryAccessor(team),
 	fDebugArea(NULL),
-	fImages()
+	fImages(),
+	fImageID(image)
 {
 }
 
@@ -281,53 +283,23 @@ SymbolLookup::Init()
 		}
 	}
 
-	// create a list of the team's images
 	image_info imageInfo;
-	int32 cookie = 0;
-	while (get_next_image_info(fTeam, &cookie, &imageInfo) == B_OK) {
-		Image* image;
-
-		if (fTeam == B_SYSTEM_TEAM) {
-			// kernel image
-			KernelImage* kernelImage = new(std::nothrow) KernelImage;
-			if (kernelImage == NULL)
-				return B_NO_MEMORY;
-
-			error = kernelImage->Init(imageInfo);
-			image = kernelImage;
-		} else if (!strcmp("commpage", imageInfo.name)) {
-			// commpage image
-			CommPageImage* commPageImage = new(std::nothrow) CommPageImage;
-			if (commPageImage == NULL)
-				return B_NO_MEMORY;
-
-			error = commPageImage->Init(imageInfo);
-			image = commPageImage;
-		} else {
-			// userland image -- try to load an image file
-			ImageFile* imageFile = new(std::nothrow) ImageFile;
-			if (imageFile == NULL)
-				return B_NO_MEMORY;
-
-			error = imageFile->Init(imageInfo);
-			image = imageFile;
+	if (fImageID < 0) {
+		// create a list of the team's images
+		int32 cookie = 0;
+		while (get_next_image_info(fTeam, &cookie, &imageInfo) == B_OK) {
+			error = _LoadImageInfo(imageInfo);
+			if (error != B_OK)
+				return error;
 		}
+	} else {
+		error = get_image_info(fImageID, &imageInfo);
+		if (error != B_OK)
+			return error;
 
-		if (error != B_OK) {
-			// initialization error -- fall back to the loaded image
-			delete image;
-
-			const image_t* loadedImage = _FindLoadedImageByID(imageInfo.id);
-			if (loadedImage == NULL)
-				continue;
-
-			image = new(std::nothrow) LoadedImage(this, loadedImage,
-				Read(loadedImage->symhash[1]));
-			if (image == NULL)
-				return B_NO_MEMORY;
-		}
-
-		fImages.Add(image);
+		error = _LoadImageInfo(imageInfo);
+		if (error != B_OK)
+			return error;
 	}
 
 	return B_OK;
@@ -533,6 +505,58 @@ SymbolLookup::_SymbolNameLen(const char* address) const
 		- (addr_t)address);
 }
 
+
+status_t
+SymbolLookup::_LoadImageInfo(const image_info& imageInfo)
+{
+	status_t error = B_OK;
+
+	Image* image;
+	if (fTeam == B_SYSTEM_TEAM) {
+		// kernel image
+		KernelImage* kernelImage = new(std::nothrow) KernelImage;
+		if (kernelImage == NULL)
+			return B_NO_MEMORY;
+
+		error = kernelImage->Init(imageInfo);
+		image = kernelImage;
+	} else if (!strcmp("commpage", imageInfo.name)) {
+		// commpage image
+		CommPageImage* commPageImage = new(std::nothrow) CommPageImage;
+		if (commPageImage == NULL)
+			return B_NO_MEMORY;
+
+		error = commPageImage->Init(imageInfo);
+		image = commPageImage;
+	} else {
+		// userland image -- try to load an image file
+		ImageFile* imageFile = new(std::nothrow) ImageFile;
+		if (imageFile == NULL)
+			return B_NO_MEMORY;
+
+		error = imageFile->Init(imageInfo);
+		image = imageFile;
+	}
+
+	if (error != B_OK) {
+		// initialization error -- fall back to the loaded image
+		delete image;
+
+		const image_t* loadedImage = _FindLoadedImageByID(imageInfo.id);
+		if (loadedImage == NULL)
+			return B_OK;
+
+		image = new(std::nothrow) LoadedImage(this, loadedImage,
+			Read(loadedImage->symhash[1]));
+		if (image == NULL)
+			return B_NO_MEMORY;
+
+	}
+
+	fImages.Add(image);
+
+	return B_OK;
+}
 
 // #pragma mark - LoadedImage
 

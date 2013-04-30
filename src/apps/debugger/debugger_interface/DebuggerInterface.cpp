@@ -578,9 +578,9 @@ DebuggerInterface::GetSymbolInfos(team_id team, image_id image,
 	BObjectList<SymbolInfo>& infos)
 {
 	// create a lookup context
-// TODO: It's too expensive to create a lookup context for each image!
 	debug_symbol_lookup_context* lookupContext;
-	status_t error = debug_create_symbol_lookup_context(team, &lookupContext);
+	status_t error = debug_create_symbol_lookup_context(team, image,
+		&lookupContext);
 	if (error != B_OK)
 		return error;
 
@@ -623,10 +623,9 @@ DebuggerInterface::GetSymbolInfo(team_id team, image_id image, const char* name,
 	int32 symbolType, SymbolInfo& info)
 {
 	// create a lookup context
-	// TODO: It's a bit expensive to create a lookup context just for one
-	// symbol!
 	debug_symbol_lookup_context* lookupContext;
-	status_t error = debug_create_symbol_lookup_context(team, &lookupContext);
+	status_t error = debug_create_symbol_lookup_context(team, image,
+		&lookupContext);
 	if (error != B_OK)
 		return error;
 
