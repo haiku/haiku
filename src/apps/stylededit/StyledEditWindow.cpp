@@ -850,10 +850,6 @@ StyledEditWindow::SaveAs(BMessage* message)
 	if (message != NULL)
 		fSavePanel->SetMessage(message);
 
-	// Position the save panel so that it is centered vertically but offset
-	// a bit horizontally in the parent window's frame.
-	fSavePanel->Window()->CenterIn(Frame().InsetByCopy(0, Frame().Height() / 2)
-		.OffsetBySelf(0, -Frame().Height() / 3));
 	fSavePanel->Show();
 	return B_OK;
 }
