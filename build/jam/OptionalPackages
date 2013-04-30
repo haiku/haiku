@@ -114,7 +114,7 @@ if [ IsOptionalHaikuImagePackageAdded APR ] {
 			: : true ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			$(hpkgBaseURL)/apr-1.4.6-5-x86_gcc2.hpkg ;
+			$(hpkgBaseURL)/apr-1.4.6-6-x86_gcc2.hpkg ;
 	}
 }
 
@@ -129,7 +129,7 @@ if [ IsOptionalHaikuImagePackageAdded APR-util ] {
 			: : true ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			$(hpkgBaseURL)/apr_util-1.4.1-1-x86_gcc2.hpkg ;
+			$(hpkgBaseURL)/apr_util-1.4.1-2-x86_gcc2.hpkg ;
 	}
 }
 
@@ -433,7 +433,7 @@ if [ IsOptionalHaikuImagePackageAdded Curl ] {
 			$(baseURL)/curl-7.21.7-x86-gcc4-2011-06-23.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			$(hpkgBaseURL)/curl-7.26.0-2-x86_gcc2.hpkg ;
+			$(hpkgBaseURL)/curl-7.26.0-3-x86_gcc2.hpkg ;
 	}
 }
 
@@ -604,7 +604,7 @@ if [ IsOptionalHaikuImagePackageAdded Expat ] {
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/expat-2.0.1-4-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/expat-2.0.1-5-x86_gcc2.hpkg ;
 		}
 	}
 }
@@ -866,7 +866,7 @@ if [ IsOptionalHaikuImagePackageAdded LibXML2 ] {
 				$(baseURL)/libxml2-2.7.8-r1a3-x86-gcc4-2011-05-24.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/libxml2-2.8.0-1-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/libxml2-2.8.0-2-x86_gcc2.hpkg ;
 		}
 	}
 }
@@ -982,7 +982,7 @@ if [ IsOptionalHaikuImagePackageAdded NCurses ] {
 			Echo "No optional package NCurses available for gcc 4" ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/ncurses-5.9-5-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/ncurses-5.9-6-x86_gcc2.hpkg ;
 		}
 	}
 }
@@ -998,7 +998,7 @@ if [ IsOptionalHaikuImagePackageAdded Neon ] {
 				$(baseURL)/neon-0.29.6-r1a3-x86-gcc4-2011-05-24.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/neon-0.29.6-4-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/neon-0.29.6-5-x86_gcc2.hpkg ;
 		}
 	}
 }
@@ -1167,7 +1167,7 @@ if [ IsOptionalHaikuImagePackageAdded PCRE ] {
 				$(baseURL)/libpcre-8.12-r1a3-x86-gcc4-2011-05-24.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/libpcre-8.21-3-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/libpcre-8.21-4-x86_gcc2.hpkg ;
 		}
 	}
 }
@@ -1298,7 +1298,7 @@ if [ IsOptionalHaikuImagePackageAdded Subversion ] {
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/subversion-1.6.15-4-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/subversion-1.6.18-4-x86_gcc2.hpkg ;
 		}
 	}
 }
