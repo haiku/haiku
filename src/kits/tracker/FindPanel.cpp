@@ -862,7 +862,9 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate,
 	else
 		AddByAttributeItems(node);
 
-	ResizeMenuField(fMimeTypeField);
+	fMimeTypeField->SetExplicitSize(
+		BSize(be_control_look->DefaultItemSpacing() * 20, B_SIZE_UNSET));
+		// ResizeMenuField() makes fMimeTypeField too wide.
 	ResizeMenuField(searchModeField);
 	ResizeMenuField(volumeField);
 }
