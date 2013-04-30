@@ -1132,6 +1132,7 @@ FindPanel::MessageReceived(BMessage* message)
 			if (fMode == kByAttributeItem) {
 				// the attributes for this type may be different
 				RemoveAttrViewItems(false);
+				AddAttrRow();
 			}
 
 			BMenuItem* item;
@@ -1142,9 +1143,6 @@ FindPanel::MessageReceived(BMessage* message)
 
 				SetCurrentMimeType(item);
 			}
-
-			if (fMode == kByAttributeItem)
-				AddAttrRow();
 
 			break;
 		}
@@ -1672,7 +1670,7 @@ FindPanel::SetCurrentMimeType(BMenuItem* item)
 
 			for (int32 j = submenu->CountItems(); j-- > 0;) {
 				BMenuItem* sub = submenu->ItemAt(j);
-				if (strcmp(item->Label(),sub->Label()) == 0) {
+				if (strcmp(item->Label(), sub->Label()) == 0) {
 					sub->SetMarked(true);
 					break;
 				}
@@ -2509,11 +2507,9 @@ FindPanel::AddAttributeControls(int32 gridRow)
 			B_TRANSLATE_NOCOLLECT(operatorLabels[i]), message));
 	}
 
-	// mark first items if not marked
-	if (menu->FindMarked() == NULL)
-		menu->ItemAt(0)->SetMarked(true);
-	if (submenu->FindMarked() == NULL)
-		submenu->ItemAt(0)->SetMarked(true);
+	// mark first items initially
+	menu->ItemAt(0)->SetMarked(true);
+	submenu->ItemAt(0)->SetMarked(true);
 
 	// add SIZE attribute
 	submenu = new BMenu(B_TRANSLATE("Size"));
