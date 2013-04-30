@@ -139,16 +139,12 @@ NetworkStatusView::NetworkStatusView(BMessage* archive)
 
 NetworkStatusView::~NetworkStatusView()
 {
-	if (fAboutWindow != NULL && fAboutWindow->Lock())
-		fAboutWindow->Quit();
 }
 
 
 void
 NetworkStatusView::_Init()
 {
-	fAboutWindow = NULL;
-
 	for (int i = 0; i < kStatusCount; i++) {
 		fTrayIcons[i] = NULL;
 		fNotifyIcons[i] = NULL;
@@ -508,22 +504,24 @@ NetworkStatusView::MouseDown(BPoint point)
 void
 NetworkStatusView::_AboutRequested()
 {
-	if (fAboutWindow == NULL) {
+	bool needsInit;
+	BAboutWindow* window = BAboutWindow::GetWindow(
+		B_TRANSLATE_SYSTEM_NAME("NetworkStatus"), kSignature, &needsInit);
+	
+	if (needsInit) {
 		const char* authors[] = {
 			"Axel Dörfler",
 			"Hugo Santos",
 			NULL
 		};
 
-		fAboutWindow = new BAboutWindow(
-			B_TRANSLATE_SYSTEM_NAME("NetworkStatus"), kSignature);
-		fAboutWindow->AddCopyright(2007, "Haiku, Inc.");
-		fAboutWindow->AddAuthors(authors);
-		fAboutWindow->Show();
-	} else if (fAboutWindow->IsHidden())
-		fAboutWindow->Show();
-	else
-		fAboutWindow->Activate();
+		window->AddCopyright(2007, "Haiku, Inc.");
+		window->AddAuthors(authors);
+	}
+
+	if (window->IsHidden())
+		window->Show();
+	window->Activate();
 }
 
 

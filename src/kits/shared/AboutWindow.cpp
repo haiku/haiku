@@ -356,13 +356,15 @@ BAboutWindow::BAboutWindow(const char* appName, const char* signature)
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
 			| B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE)
 {
+	sAboutWindow = this;
+
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	const char* about = B_TRANSLATE_MARK("About");
+	const char* about = B_TRANSLATE_MARK("About %app%");
 	about = gSystemCatalog.GetString(about, "AboutWindow");
 
 	BString title(about);
-	title << " " << appName;
+	title.ReplaceFirst("%app%", appName);
 	SetTitle(title.String());
 
 	fAboutView = new AboutView(appName, signature);
@@ -374,6 +376,8 @@ BAboutWindow::BAboutWindow(const char* appName, const char* signature)
 
 BAboutWindow::~BAboutWindow()
 {
+	sAboutWindow = NULL;
+
 	fAboutView->RemoveSelf();
 	delete fAboutView;
 	fAboutView = NULL;
@@ -381,15 +385,6 @@ BAboutWindow::~BAboutWindow()
 
 
 //	#pragma mark - BAboutWindow virtual methods
-
-
-bool
-BAboutWindow::QuitRequested()
-{
-	Hide();
-
-	return false;
-}
 
 
 void
@@ -617,3 +612,21 @@ BAboutWindow::SetIcon(BBitmap* icon)
 {
 	fAboutView->SetIcon(icon);
 }
+
+/* static */ BAboutWindow*
+BAboutWindow::GetWindow(const char* appName, const char* signature,
+	bool* needsInit)
+{
+	if(needsInit != NULL)
+		*needsInit = (sAboutWindow == NULL);
+		
+	if(sAboutWindow == NULL) {
+		new BAboutWindow(appName, signature);
+	}
+
+	return sAboutWindow;
+}
+
+
+/* static */ BAboutWindow*
+BAboutWindow::sAboutWindow = NULL;

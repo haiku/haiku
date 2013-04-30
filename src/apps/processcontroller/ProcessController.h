@@ -26,7 +26,6 @@
 #include <View.h>
 
 
-class BAboutWindow;
 class BMessageRunner;
 class ThreadBarMenu;
 
@@ -60,7 +59,6 @@ class ProcessController : public BView {
 	private:
 		void			Init();
 
-		BAboutWindow*	fAboutWindow;
 		bool			fTemp;
 		float			fMemoryUsage;
 		float			fLastBarHeight[B_MAX_CPU_COUNT];

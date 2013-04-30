@@ -36,7 +36,6 @@ private:
 		status_t			_RestartApp(const char* signature) const;
 		
 		LocaleWindow*		fLocaleWindow;
-		BAboutWindow*		fAboutWindow;
 };
 
 
@@ -46,8 +45,7 @@ private:
 LocalePreflet::LocalePreflet()
 	:
 	BApplication(kSignature),
-	fLocaleWindow(new LocaleWindow()),
-	fAboutWindow(NULL)
+	fLocaleWindow(new LocaleWindow())
 {
 	fLocaleWindow->Show();
 }
@@ -55,9 +53,6 @@ LocalePreflet::LocalePreflet()
 
 LocalePreflet::~LocalePreflet()
 {
-	// replicant deleted, destroy the about window
-	if (fAboutWindow != NULL)
-		fAboutWindow->Quit();
 }
 
 
@@ -78,7 +73,12 @@ LocalePreflet::MessageReceived(BMessage* message)
 			break;
 
 		case B_ABOUT_REQUESTED:
-			if (fAboutWindow == NULL) {
+		{
+			bool needsInit;
+			BAboutWindow* window = BAboutWindow::GetWindow(kAppName,
+				kSignature, &needsInit);
+
+			if (needsInit) {
 				const char* authors[] = {
 					"Axel Dörfler",
 					"Adrien Destugues",
@@ -86,16 +86,17 @@ LocalePreflet::MessageReceived(BMessage* message)
 					NULL
 				};
 
-				fAboutWindow = new BAboutWindow(kAppName, kSignature);
-				fAboutWindow->AddCopyright(2005, "Haiku, Inc.");
-				fAboutWindow->AddAuthors(authors);
-				fAboutWindow->Show();
-			} else if (fAboutWindow->IsHidden())
-				fAboutWindow->Show();
-			else
-				fAboutWindow->Activate();
+				window = new BAboutWindow(kAppName, kSignature);
+				window->AddCopyright(2005, "Haiku, Inc.");
+				window->AddAuthors(authors);
+			}
+
+			if (window->IsHidden())
+				window->Show();
+			window->Activate();
 
 			break;
+		}
 
 		default:
 			BApplication::MessageReceived(message);

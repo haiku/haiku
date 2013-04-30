@@ -18,7 +18,6 @@
 class AboutView;
 class BBitmap;
 class BPoint;
-class BHandler;
 
 class BAboutWindow : public BWindow {
  public:
@@ -26,7 +25,6 @@ class BAboutWindow : public BWindow {
 								const char* signature);
 	virtual					~BAboutWindow();
 
-	virtual	bool			QuitRequested();
 	virtual	void			Show();
 
 			BPoint			AboutPosition(float width, float height);
@@ -48,9 +46,12 @@ class BAboutWindow : public BWindow {
 			const char*		Version();
 			void			SetVersion(const char* version);
 
+	static	BAboutWindow*	GetWindow(const char* appName,
+								const char* signature, bool* needsInit = NULL);
  private:
 			AboutView*		fAboutView;
-			BHandler*		fCaller;
+
+	static	BAboutWindow*	sAboutWindow;
 };
 
 #endif	// B_ABOUT_WINDOW_H

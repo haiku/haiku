@@ -204,10 +204,6 @@ ProcessController::~ProcessController()
 
 	delete fMessageRunner;
 	gPCView = NULL;
-
-	// replicant deleted, destroy the about window
-	if (fAboutWindow != NULL && fAboutWindow->Lock())
-		fAboutWindow->Quit();
 }
 
 
@@ -221,7 +217,6 @@ ProcessController::Init()
 	memset(fCPUTimes, 0, sizeof(fCPUTimes));
 	memset(fPrevActive, 0, sizeof(fPrevActive));
 	fPrevTime = 0;
-	fAboutWindow = NULL;
 }
 
 
@@ -438,7 +433,11 @@ ProcessController::MessageReceived(BMessage *message)
 void
 ProcessController::AboutRequested()
 {
-	if (fAboutWindow == NULL) {
+	bool needsInit;
+	BAboutWindow* window = BAboutWindow::GetWindow(
+		B_TRANSLATE_SYSTEM_NAME("ProcessController"), kSignature, &needsInit);
+
+	if (needsInit) {
 		const char* extraCopyrights[] = {
 			"2004 beunited.org",
 			"1997-2001 Georges-Edouard Berenger",
@@ -450,15 +449,13 @@ ProcessController::AboutRequested()
 			NULL
 		};
 
-		fAboutWindow = new BAboutWindow(
-			B_TRANSLATE_SYSTEM_NAME("ProcessController"), kSignature);
-		fAboutWindow->AddCopyright(2007, "Haiku, Inc.", extraCopyrights);
-		fAboutWindow->AddAuthors(authors);
-		fAboutWindow->Show();
-	} else if (fAboutWindow->IsHidden())
-		fAboutWindow->Show();
-	else
-		fAboutWindow->Activate();
+		window->AddCopyright(2007, "Haiku, Inc.", extraCopyrights);
+		window->AddAuthors(authors);
+	}
+
+	if (window->IsHidden())
+		window->Show();
+	window->Activate();
 }
 
 

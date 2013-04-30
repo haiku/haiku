@@ -77,8 +77,6 @@ PowerStatusView::PowerStatusView(BMessage* archive)
 
 PowerStatusView::~PowerStatusView()
 {
-	if (fAboutWindow != NULL && fAboutWindow->Lock())
-		fAboutWindow->Quit();
 }
 
 
@@ -97,8 +95,6 @@ void
 PowerStatusView::_Init()
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
-
-	fAboutWindow = NULL;
 
 	fShowLabel = true;
 	fShowTime = false;
@@ -514,9 +510,6 @@ PowerStatusReplicant::~PowerStatusReplicant()
 	fDriverInterface->Disconnect();
 	fDriverInterface->ReleaseReference();
 
-	if (fAboutWindow != NULL)
-		fAboutWindow->Quit();
-
 	_SaveSettings();
 }
 
@@ -627,7 +620,11 @@ PowerStatusReplicant::MouseDown(BPoint point)
 void
 PowerStatusReplicant::_AboutRequested()
 {
-	if (fAboutWindow == NULL) {
+	bool needsInit;
+	BAboutWindow* window = BAboutWindow::GetWindow(
+		B_TRANSLATE_SYSTEM_NAME("PowerStatus"), kSignature, &needsInit);
+
+	if (needsInit) {
 		const char* authors[] = {
 			"Axel Dörfler",
 			"Alexander von Gluck",
@@ -635,15 +632,13 @@ PowerStatusReplicant::_AboutRequested()
 			NULL
 		};
 
-		fAboutWindow = new BAboutWindow(
-			B_TRANSLATE_SYSTEM_NAME("PowerStatus"), kSignature);
-		fAboutWindow->AddCopyright(2006, "Haiku, Inc.");
-		fAboutWindow->AddAuthors(authors);
-		fAboutWindow->Show();
-	} else if (fAboutWindow->IsHidden())
-		fAboutWindow->Show();
-	else
-		fAboutWindow->Activate();
+		window->AddCopyright(2006, "Haiku, Inc.");
+		window->AddAuthors(authors);
+	}
+
+	if (window->IsHidden())
+		window->Show();
+	window->Activate();
 }
 
 

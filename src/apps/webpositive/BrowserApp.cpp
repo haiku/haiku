@@ -77,7 +77,6 @@ BrowserApp::BrowserApp()
 	fCookieJar(NULL),
 	fDownloadWindow(NULL),
 	fSettingsWindow(NULL),
-	fAboutWindow(NULL)
 {
 }
 
@@ -88,16 +87,17 @@ BrowserApp::~BrowserApp()
 	delete fSettings;
 	delete fCookies;
 	delete fCookieJar;
-
-	if (fAboutWindow != NULL && fAboutWindow->Lock())
-		fAboutWindow->Quit();
 }
 
 
 void
 BrowserApp::AboutRequested()
 {
-	if (fAboutWindow == NULL) {
+	bool needsInit;
+	BAboutWindow window = BAboutWindow::GetWindow(kApplicationName,
+		kApplicationSignature, &needsInit);
+	
+	if (needsInit) {
 		// create the about window
 
 		const char* authors[] = {
@@ -117,16 +117,14 @@ BrowserApp::AboutRequested()
 		aboutText << "\nWebKit " << WebKitInfo::WebKitVersion();
 		aboutText << " (" << WebKitInfo::WebKitRevision() << ")";
 
-		fAboutWindow = new BAboutWindow(kApplicationName,
-			kApplicationSignature);
-		fAboutWindow->AddCopyright(2007, "Haiku, Inc.");
-		fAboutWindow->AddAuthors(authors);
-		fAboutWindow->AddExtraInfo(aboutText.String());
-		fAboutWindow->Show();
-	} else if (fAboutWindow->IsHidden())
-		fAboutWindow->Show();
-	else
-		fAboutWindow->Activate();
+		window->AddCopyright(2007, "Haiku, Inc.");
+		window->AddAuthors(authors);
+		window->AddExtraInfo(aboutText.String());
+	}
+
+	if (window->IsHidden())
+		window->Show();
+	window->Activate();
 }
 
 

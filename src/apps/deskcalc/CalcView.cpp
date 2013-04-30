@@ -183,10 +183,6 @@ CalcView::~CalcView()
 	delete fKeypad;
 	delete fOptions;
 	free(fKeypadDescription);
-
-	// replicant deleted, destroy the about window
-	if (fAboutWindow != NULL && fAboutWindow->Lock())
-		fAboutWindow->Quit();
 }
 
 
@@ -270,7 +266,12 @@ CalcView::MessageReceived(BMessage* message)
 
 			// (replicant) about box requested
 			case B_ABOUT_REQUESTED:
-				if (fAboutWindow == NULL) {
+			{
+				bool needsInit;
+				BAboutWindow* window = BAboutWindow::GetWindow(kAppName,
+					kSignature, &needsInit);
+
+				if (needsInit) {
 					// create the about window
 					const char* extraCopyrights[] = {
 						"1997, 1998 R3 Software Ltd.",
@@ -285,17 +286,16 @@ CalcView::MessageReceived(BMessage* message)
 						NULL
 					};
 
-					fAboutWindow = new BAboutWindow(kAppName, kSignature);
-					fAboutWindow->AddCopyright(2006, "Haiku, Inc.",
-						extraCopyrights);
-					fAboutWindow->AddAuthors(authors);
-					fAboutWindow->Show();
-				} else if (fAboutWindow->IsHidden())
-					fAboutWindow->Show();
-				else
-					fAboutWindow->Activate();
+					window->AddCopyright(2006, "Haiku, Inc.", extraCopyrights);
+					window->AddAuthors(authors);
+				}
+
+				if (window->IsHidden())
+					window->Show();
+				window->Activate();
 
 				break;
+			}
 
 			case MSG_UNFLASH_KEY:
 			{
@@ -1006,8 +1006,6 @@ CalcView::_Init(BMessage* settings)
 
 	// fetch the calc icon for compact view
 	_FetchAppIcon(fCalcIcon);
-
-	fAboutWindow = NULL;
 }
 
 
