@@ -439,7 +439,8 @@ ColorSlider::SetModeAndValues(selected_color_mode mode,
 		R*=255.0; G*=255.0; B*=255.0;
 	}
 	
-	rgb_color color = { round(R), round(G), round(B), 255 };
+	rgb_color color = {(uint8)round(R), (uint8)round(G),
+		(uint8)round(B), 255 };
 	
 	fMode = mode;
 	SetOtherValues(value1, value2);
@@ -638,7 +639,7 @@ void
 ColorSlider::_DrawColorLineY(BView *view, float y,
 							 int r, int g, int b)
 {
-	rgb_color color = { r, g, b, 255 };
+	rgb_color color = {(uint8)r, (uint8)g, (uint8)b, 255 };
 	y = 255.0 - y;
 	view->AddLine( BPoint(8.0, y + 5.0), BPoint(27.0, y + 5.0), color );
 }
@@ -648,7 +649,7 @@ void
 ColorSlider::_DrawColorLineX(BView *view, float x,
 							 int r, int g, int b)
 {
-	rgb_color color = { r, g, b, 255 };
+	rgb_color color = {(uint8)r, (uint8)g, (uint8)b, 255 };
 	BRect bounds(view->Bounds());
 	x = (255.0 - x) * (bounds.Width() - 2.0) / 255.0 + 2.0;
 	view->AddLine( BPoint(x, bounds.top + 2.0), BPoint(x, bounds.bottom - 2.0), color );
