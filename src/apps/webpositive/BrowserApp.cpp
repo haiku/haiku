@@ -76,7 +76,7 @@ BrowserApp::BrowserApp()
 	fCookies(NULL),
 	fCookieJar(NULL),
 	fDownloadWindow(NULL),
-	fSettingsWindow(NULL),
+	fSettingsWindow(NULL)
 {
 }
 
@@ -93,7 +93,7 @@ BrowserApp::~BrowserApp()
 void
 BrowserApp::AboutRequested()
 {
-	BAboutWindow window = new BAboutWindow(kApplicationName,
+	BAboutWindow* window = new BAboutWindow(kApplicationName,
 		kApplicationSignature);
 	
 	// create the about window
