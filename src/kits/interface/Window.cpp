@@ -2585,61 +2585,38 @@ BWindow::ResizeTo(float width, float height)
 
 
 /*!
-	\brief Center the window in the passed in rectangular area.
+	\brief Center the window in the passed in \a rect.
 	\param rect The rectangle to center the window in.
-	\return The new window position.
 */
-BPoint
+void
 BWindow::CenterIn(const BRect& rect)
 {
 	// Set size limits now if needed
 	UpdateSizeLimits();
 
-	BPoint point = BLayoutUtils::AlignInFrame(rect, Size(),
+	MoveTo(BLayoutUtils::AlignInFrame(rect, Size(),
 		BAlignment(B_ALIGN_HORIZONTAL_CENTER,
-			B_ALIGN_VERTICAL_CENTER)).LeftTop();
-
-	BRect screenFrame = (BScreen(this)).Frame();
-	if (screenFrame == rect) {
-		// if rect is the screen frame we can skip the ajustments below
-		MoveTo(point);
-		return point;
-	}
-
-	float borderWidth;
-	float tabHeight;
-	_GetDecoratorSize(&borderWidth, &tabHeight);
-
-	// clip the x position within the horizontal edges of the screen
-	if (point.x < screenFrame.left + borderWidth)
-		point.x = screenFrame.left + borderWidth;
-	else if (point.x + Frame().Width() > screenFrame.right - borderWidth)
-		point.x = screenFrame.right - borderWidth - Frame().Width();
-
-	// If the window is covering the window tab lower it down
-	if (point.y < rect.LeftTop().y + borderWidth)
-		point.y = rect.LeftTop().y + borderWidth;
-
-	// clip the y position within the vertical edges of the screen
-	if (point.y < screenFrame.top + borderWidth)
-		point.y = screenFrame.top + borderWidth;
-	else if (point.y + Frame().Height() > screenFrame.bottom - borderWidth)
-		point.y = screenFrame.bottom - borderWidth - Frame().Height();
-
-	MoveTo(point);
-	return point;
+			B_ALIGN_VERTICAL_CENTER)).LeftTop());
 }
 
 
 /*!
 	\brief Centers the window on the screen the window is currently on.
-	\return The new window position.
 */
-BPoint
+void
 BWindow::CenterOnScreen()
 {
-	BScreen screen(this);
-	return CenterIn(screen.Frame());
+	CenterIn(BScreen(this).Frame());
+}
+
+
+/*!
+	\brief Centers the window on the screen with the passed in \a id.
+*/
+void
+BWindow::CenterOnScreen(screen_id id)
+{
+	CenterIn(BScreen(id).Frame());
 }
 
 
