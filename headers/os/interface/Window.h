@@ -283,6 +283,7 @@ private:
 	struct unpack_cookie;
 	class Shortcut;
 
+	friend class BAlert;
 	friend class BApplication;
 	friend class BBitmap;
 	friend class BView;
@@ -303,6 +304,7 @@ private:
 
 	virtual	void				task_looper();
 
+			BPoint				AlertPosition(const BRect& frame);
 	virtual BMessage*			ConvertToMessage(void* raw, int32 code);
 
 			void				AddShortcut(uint32 key, uint32 modifiers,

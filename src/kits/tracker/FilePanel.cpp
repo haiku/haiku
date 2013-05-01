@@ -40,6 +40,9 @@ All rights reserved.
 #include <BeBuild.h>
 #include <Debug.h>
 #include <FilePanel.h>
+#include <Looper.h>
+#include <Screen.h>
+#include <Window.h>
 
 #include "AutoLock.h"
 #include "Commands.h"
@@ -121,6 +124,13 @@ BFilePanel::Show()
 	if (!(windowWorkspaces & workspace))
 		// window in a different workspace, reopen in current
 		fWindow->SetWorkspaces(workspace);
+
+	// Position the file panel like an alert
+	BWindow* parent =
+		dynamic_cast<BWindow*>(BLooper::LooperForThread(find_thread(NULL)));
+	const BRect frame = parent != NULL ? parent->Frame()
+		: BScreen(fWindow).Frame();
+	fWindow->MoveTo(dynamic_cast<BWindow*>(fWindow)->AlertPosition(frame));
 
 	if (!IsShowing())
 		fWindow->Show();

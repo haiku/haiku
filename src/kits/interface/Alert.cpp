@@ -576,13 +576,10 @@ BAlert::_InitObject(const char* text, const char* button0, const char* button1,
 	// Position the alert so that it is centered vertically but offset a bit
 	// horizontally in the parent window's frame or, if unavailable, the
 	// screen frame.
-	BWindow* window =
+	BWindow* parent =
 		dynamic_cast<BWindow*>(BLooper::LooperForThread(find_thread(NULL)));
-	const BRect frame = window != NULL ? window->Frame()
-		: (BScreen(this)).Frame();
-
-	CenterIn(frame.InsetByCopy(0, frame.Height() / 2)
-		.OffsetBySelf(0, -frame.Height() / 4));
+	const BRect frame = parent != NULL ? parent->Frame() : BScreen(this).Frame();
+	MoveTo(dynamic_cast<BWindow*>(this)->AlertPosition(frame));
 }
 
 

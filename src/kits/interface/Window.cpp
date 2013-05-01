@@ -3891,6 +3891,58 @@ BWindow::_KeyboardNavigation()
 }
 
 
+/*!
+	\brief Return the position of the window centered horizontally to the passed
+           in \a frame and vertically 3/4 from the top of \a frame.
+
+	If the window is on the borders
+
+	\param width The width of the window.
+	\param height The height of the window.
+	\param frame The \a frame to center the window in.
+
+	\return The new window position.
+*/
+BPoint
+BWindow::AlertPosition(const BRect& frame)
+{
+	float width = Bounds().Width();
+	float height = Bounds().Height();
+
+	BPoint point(frame.left + (frame.Width() / 2.0f) - (width / 2.0f),
+		frame.top + (frame.Height() / 4.0f) - ceil(height / 3.0f));
+
+	BRect screenFrame = BScreen(this).Frame();
+	if (frame == screenFrame) {
+		// reference frame is screen frame, skip the below adjustments
+		return point;
+	}
+
+	float borderWidth;
+	float tabHeight;
+	_GetDecoratorSize(&borderWidth, &tabHeight);
+
+	// clip the x position within the horizontal edges of the screen
+	if (point.x < screenFrame.left + borderWidth)
+		point.x = screenFrame.left + borderWidth;
+	else if (point.x + width > screenFrame.right - borderWidth)
+		point.x = screenFrame.right - borderWidth - width;
+
+	// lower the window down if it is covering the window tab
+	float tabPosition = frame.LeftTop().y + tabHeight + borderWidth;
+	if (point.y < tabPosition)
+		point.y = tabPosition;
+
+	// clip the y position within the vertical edges of the screen
+	if (point.y < screenFrame.top + borderWidth)
+		point.y = screenFrame.top + borderWidth;
+	else if (point.y + height > screenFrame.bottom - borderWidth)
+		point.y = screenFrame.bottom - borderWidth - height;
+
+	return point;
+}
+
+
 BMessage*
 BWindow::ConvertToMessage(void* raw, int32 code)
 {
