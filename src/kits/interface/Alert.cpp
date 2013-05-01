@@ -406,9 +406,9 @@ BAlert::AlertPosition(float width, float height)
 		dynamic_cast<BWindow*>(BLooper::LooperForThread(find_thread(NULL)));
 
 	BScreen screen(window);
- 	BRect screenFrame(0, 0, 640, 480);
- 	if (screen.IsValid())
- 		screenFrame = screen.Frame();
+	BRect screenFrame(0, 0, 640, 480);
+	if (screen.IsValid())
+		screenFrame = screen.Frame();
 
 	// Horizontally, we're smack in the middle
 	result.x = screenFrame.left + (screenFrame.Width() / 2.0) - (width / 2.0);
