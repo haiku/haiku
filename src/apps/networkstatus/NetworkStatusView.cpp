@@ -504,24 +504,19 @@ NetworkStatusView::MouseDown(BPoint point)
 void
 NetworkStatusView::_AboutRequested()
 {
-	bool needsInit;
-	BAboutWindow* window = BAboutWindow::GetWindow(
-		B_TRANSLATE_SYSTEM_NAME("NetworkStatus"), kSignature, &needsInit);
+	BAboutWindow* window = new BAboutWindow(
+		B_TRANSLATE_SYSTEM_NAME("NetworkStatus"), kSignature);
 	
-	if (needsInit) {
-		const char* authors[] = {
-			"Axel Dörfler",
-			"Hugo Santos",
-			NULL
-		};
+	const char* authors[] = {
+		"Axel Dörfler",
+		"Hugo Santos",
+		NULL
+	};
 
-		window->AddCopyright(2007, "Haiku, Inc.");
-		window->AddAuthors(authors);
-	}
+	window->AddCopyright(2007, "Haiku, Inc.");
+	window->AddAuthors(authors);
 
-	if (window->IsHidden())
-		window->Show();
-	window->Activate();
+	window->Show();
 }
 
 

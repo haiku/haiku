@@ -16,6 +16,7 @@
 #include <Alert.h>
 #include <AppFileInfo.h>
 #include <Bitmap.h>
+#include <Button.h>
 #include <File.h>
 #include <Font.h>
 #include <GroupLayoutBuilder.h>
@@ -182,6 +183,11 @@ AboutView::AboutView(const char* appName, const char* signature)
 
 	fStripeView = new StripeView(_GetIconFromSignature(signature));
 
+	const char* ok = B_TRANSLATE_MARK("Ok");
+	BButton* closeButton = new BButton("ok",
+		gSystemCatalog.GetString(ok, "AboutWindow"),
+		new BMessage(B_QUIT_REQUESTED));
+
 	GroupLayout()->SetSpacing(0);
 	BLayoutBuilder::Group<>(this)
 		.AddGroup(B_HORIZONTAL, 0)
@@ -192,6 +198,7 @@ AboutView::AboutView(const char* appName, const char* signature)
 				.Add(fNameView)
 				.Add(fVersionView)
 				.Add(infoViewScroller)
+				.Add(closeButton)
 				.End()
 			.AddGlue()
 			.End();
@@ -352,12 +359,10 @@ AboutView::SetIcon(BBitmap* icon)
 
 
 BAboutWindow::BAboutWindow(const char* appName, const char* signature)
-	:	BWindow(BRect(0.0, 0.0, 200.0, 200.0), appName, B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
-			| B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE)
+	:	BWindow(BRect(0.0, 0.0, 200.0, 200.0), appName, B_MODAL_WINDOW,
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_MOVABLE | B_NOT_ZOOMABLE
+			| B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE)
 {
-	sAboutWindow = this;
-
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
 	const char* about = B_TRANSLATE_MARK("About %app%");
@@ -376,8 +381,6 @@ BAboutWindow::BAboutWindow(const char* appName, const char* signature)
 
 BAboutWindow::~BAboutWindow()
 {
-	sAboutWindow = NULL;
-
 	fAboutView->RemoveSelf();
 	delete fAboutView;
 	fAboutView = NULL;
@@ -613,20 +616,3 @@ BAboutWindow::SetIcon(BBitmap* icon)
 	fAboutView->SetIcon(icon);
 }
 
-/* static */ BAboutWindow*
-BAboutWindow::GetWindow(const char* appName, const char* signature,
-	bool* needsInit)
-{
-	if(needsInit != NULL)
-		*needsInit = (sAboutWindow == NULL);
-		
-	if(sAboutWindow == NULL) {
-		new BAboutWindow(appName, signature);
-	}
-
-	return sAboutWindow;
-}
-
-
-/* static */ BAboutWindow*
-BAboutWindow::sAboutWindow = NULL;

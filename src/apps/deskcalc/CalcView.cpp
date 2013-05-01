@@ -267,32 +267,26 @@ CalcView::MessageReceived(BMessage* message)
 			// (replicant) about box requested
 			case B_ABOUT_REQUESTED:
 			{
-				bool needsInit;
-				BAboutWindow* window = BAboutWindow::GetWindow(kAppName,
-					kSignature, &needsInit);
+				BAboutWindow* window = new BAboutWindow(kAppName, kSignature);
 
-				if (needsInit) {
-					// create the about window
-					const char* extraCopyrights[] = {
-						"1997, 1998 R3 Software Ltd.",
-						NULL
-					};
+				// create the about window
+				const char* extraCopyrights[] = {
+					"1997, 1998 R3 Software Ltd.",
+					NULL
+				};
 
-					const char* authors[] = {
-						"Stephan Aßmus",
-						"John Scipione",
-						"Timothy Wayper",
-						"Ingo Weinhold",
-						NULL
-					};
+				const char* authors[] = {
+					"Stephan Aßmus",
+					"John Scipione",
+					"Timothy Wayper",
+					"Ingo Weinhold",
+					NULL
+				};
 
-					window->AddCopyright(2006, "Haiku, Inc.", extraCopyrights);
-					window->AddAuthors(authors);
-				}
+				window->AddCopyright(2006, "Haiku, Inc.", extraCopyrights);
+				window->AddAuthors(authors);
 
-				if (window->IsHidden())
-					window->Show();
-				window->Activate();
+				window->Show();
 
 				break;
 			}

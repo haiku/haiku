@@ -433,29 +433,24 @@ ProcessController::MessageReceived(BMessage *message)
 void
 ProcessController::AboutRequested()
 {
-	bool needsInit;
-	BAboutWindow* window = BAboutWindow::GetWindow(
-		B_TRANSLATE_SYSTEM_NAME("ProcessController"), kSignature, &needsInit);
+	BAboutWindow* window = new BAboutWindow(
+		B_TRANSLATE_SYSTEM_NAME("ProcessController"), kSignature);
 
-	if (needsInit) {
-		const char* extraCopyrights[] = {
-			"2004 beunited.org",
-			"1997-2001 Georges-Edouard Berenger",
-			NULL
-		};
+	const char* extraCopyrights[] = {
+		"2004 beunited.org",
+		"1997-2001 Georges-Edouard Berenger",
+		NULL
+	};
 
-		const char* authors[] = {
-			"Georges-Edouard Berenger",
-			NULL
-		};
+	const char* authors[] = {
+		"Georges-Edouard Berenger",
+		NULL
+	};
 
-		window->AddCopyright(2007, "Haiku, Inc.", extraCopyrights);
-		window->AddAuthors(authors);
-	}
+	window->AddCopyright(2007, "Haiku, Inc.", extraCopyrights);
+	window->AddAuthors(authors);
 
-	if (window->IsHidden())
-		window->Show();
-	window->Activate();
+	window->Show();
 }
 
 

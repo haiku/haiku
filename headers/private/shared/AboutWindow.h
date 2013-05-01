@@ -45,13 +45,8 @@ class BAboutWindow : public BWindow {
 
 			const char*		Version();
 			void			SetVersion(const char* version);
-
-	static	BAboutWindow*	GetWindow(const char* appName,
-								const char* signature, bool* needsInit = NULL);
  private:
 			AboutView*		fAboutView;
-
-	static	BAboutWindow*	sAboutWindow;
 };
 
 #endif	// B_ABOUT_WINDOW_H

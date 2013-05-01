@@ -74,26 +74,20 @@ LocalePreflet::MessageReceived(BMessage* message)
 
 		case B_ABOUT_REQUESTED:
 		{
-			bool needsInit;
-			BAboutWindow* window = BAboutWindow::GetWindow(kAppName,
-				kSignature, &needsInit);
+			BAboutWindow* window = new BAboutWindow(kAppName, kSignature);
 
-			if (needsInit) {
-				const char* authors[] = {
-					"Axel Dörfler",
-					"Adrien Destugues",
-					"Oliver Tappe",
-					NULL
-				};
+			const char* authors[] = {
+				"Axel Dörfler",
+				"Adrien Destugues",
+				"Oliver Tappe",
+				NULL
+			};
 
-				window = new BAboutWindow(kAppName, kSignature);
-				window->AddCopyright(2005, "Haiku, Inc.");
-				window->AddAuthors(authors);
-			}
+			window = new BAboutWindow(kAppName, kSignature);
+			window->AddCopyright(2005, "Haiku, Inc.");
+			window->AddAuthors(authors);
 
-			if (window->IsHidden())
-				window->Show();
-			window->Activate();
+			window->Show();
 
 			break;
 		}

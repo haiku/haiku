@@ -400,36 +400,31 @@ WorkspacesView::Archive(BMessage* archive, bool deep) const
 void
 WorkspacesView::_AboutRequested()
 {
-	bool needsInit;
-	BAboutWindow* window = BAboutWindow::GetWindow(
-		B_TRANSLATE_SYSTEM_NAME("Workspaces"), kSignature, &needsInit);
+	BAboutWindow* window = new BAboutWindow(
+		B_TRANSLATE_SYSTEM_NAME("Workspaces"), kSignature);
 
-	if (needsInit) {
-		const char* authors[] = {
-			"Axel Dörfler",
-			"Oliver \"Madison\" Kohl",
-			"Matt Madia",
-			"François Revol",
-			NULL
-		};
+	const char* authors[] = {
+		"Axel Dörfler",
+		"Oliver \"Madison\" Kohl",
+		"Matt Madia",
+		"François Revol",
+		NULL
+	};
 
-		const char* extraCopyrights[] = {
-			"2002 François Revol",
-			NULL
-		};
+	const char* extraCopyrights[] = {
+		"2002 François Revol",
+		NULL
+	};
 
-		const char* extraInfo = "Send windows behind using the Option key. "
-			"Move windows to front using the Control key.\n";
+	const char* extraInfo = "Send windows behind using the Option key. "
+		"Move windows to front using the Control key.\n";
 
-		window->AddCopyright(2002, "Haiku, Inc.",
+	window->AddCopyright(2002, "Haiku, Inc.",
 			extraCopyrights);
-		window->AddAuthors(authors);
-		window->AddExtraInfo(extraInfo);
-	}
+	window->AddAuthors(authors);
+	window->AddExtraInfo(extraInfo);
 
-	if (window->IsHidden())
-		window->Show();
-	window->Activate();
+	window->Show();
 }
 
 
