@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -299,7 +299,8 @@ DwarfImageDebugInfo::Init()
 
 
 status_t
-DwarfImageDebugInfo::GetFunctions(BObjectList<FunctionDebugInfo>& functions)
+DwarfImageDebugInfo::GetFunctions(const BObjectList<SymbolInfo>& symbols,
+	BObjectList<FunctionDebugInfo>& functions)
 {
 	TRACE_IMAGES("DwarfImageDebugInfo::GetFunctions()\n");
 	TRACE_IMAGES("  %" B_PRId32 " compilation units\n",
@@ -414,7 +415,7 @@ DwarfImageDebugInfo::GetFunctions(BObjectList<FunctionDebugInfo>& functions)
 
 	// if we had no compilation units, fall back to providing basic
 	// debug infos with DWARF-supported call frame unwinding
-	return SpecificImageDebugInfo::GetFunctionsFromSymbols(functions,
+	return SpecificImageDebugInfo::GetFunctionsFromSymbols(symbols, functions,
 		fDebuggerInterface, fImageInfo, this);
 }
 

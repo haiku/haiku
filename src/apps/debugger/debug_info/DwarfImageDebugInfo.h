@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DWARF_IMAGE_DEBUG_INFO_H
@@ -52,6 +52,7 @@ public:
 									{ return fRelocationDelta; }
 
 	virtual	status_t			GetFunctions(
+									const BObjectList<SymbolInfo>& symbols,
 									BObjectList<FunctionDebugInfo>& functions);
 	virtual	status_t			GetType(GlobalTypeCache* cache,
 									const BString& name,

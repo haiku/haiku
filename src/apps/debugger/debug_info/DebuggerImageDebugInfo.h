@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DEBUGGER_IMAGE_DEBUG_INFO_H
@@ -26,6 +27,7 @@ public:
 			status_t			Init();
 
 	virtual	status_t			GetFunctions(
+									const BObjectList<SymbolInfo>& symbols,
 									BObjectList<FunctionDebugInfo>& functions);
 	virtual	status_t			GetType(GlobalTypeCache* cache,
 									const BString& name,
