@@ -1107,22 +1107,17 @@ ActivityView::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case B_ABOUT_REQUESTED:
 		{
-			bool needsInit;
-			BAboutWindow* window = BAboutWindow::GetWindow(kAppName, kSignature,
-				&needsInit);
-			if (needsInit) {
-				const char* authors[] = {
-					"Axel Dörfler",
-					NULL
-				};
+			BAboutWindow* window = new BAboutWindow(kAppName, kSignature);
 
-				window->AddCopyright(2008, "Haiku, Inc.");
-				window->AddAuthors(authors);
-			}
+			const char* authors[] = {
+				"Axel Dörfler",
+				NULL
+			};
 
-			if (window->IsHidden())
-				window->Show();
-			window->Activate();
+			window->AddCopyright(2008, "Haiku, Inc.");
+			window->AddAuthors(authors);
+
+			window->Show();
 
 			break;
 		}

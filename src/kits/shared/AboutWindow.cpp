@@ -360,8 +360,8 @@ AboutView::SetIcon(BBitmap* icon)
 
 BAboutWindow::BAboutWindow(const char* appName, const char* signature)
 	:	BWindow(BRect(0.0, 0.0, 200.0, 200.0), appName, B_MODAL_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_NOT_MOVABLE | B_NOT_ZOOMABLE
-			| B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE)
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE 
+		| B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE)
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
 

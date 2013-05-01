@@ -620,25 +620,20 @@ PowerStatusReplicant::MouseDown(BPoint point)
 void
 PowerStatusReplicant::_AboutRequested()
 {
-	bool needsInit;
-	BAboutWindow* window = BAboutWindow::GetWindow(
-		B_TRANSLATE_SYSTEM_NAME("PowerStatus"), kSignature, &needsInit);
+	BAboutWindow* window = new BAboutWindow(
+		B_TRANSLATE_SYSTEM_NAME("PowerStatus"), kSignature);
 
-	if (needsInit) {
-		const char* authors[] = {
-			"Axel Dörfler",
-			"Alexander von Gluck",
-			"Clemens Zeidler",
-			NULL
-		};
+	const char* authors[] = {
+		"Axel Dörfler",
+		"Alexander von Gluck",
+		"Clemens Zeidler",
+		NULL
+	};
 
-		window->AddCopyright(2006, "Haiku, Inc.");
-		window->AddAuthors(authors);
-	}
+	window->AddCopyright(2006, "Haiku, Inc.");
+	window->AddAuthors(authors);
 
-	if (window->IsHidden())
-		window->Show();
-	window->Activate();
+	window->Show();
 }
 
 
