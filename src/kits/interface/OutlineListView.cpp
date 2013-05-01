@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku Inc.
+ * Copyright 2001-2013 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,6 +7,7 @@
  *		Axel Dörfler, axeld@pinc-software.de
  *		Rene Gollent (rene@gollent.com)
  *		Philippe Saint-Pierre, stpere@gmail.com
+ *		John Scipione, jscipione@gmail.com
  */
 
 //! BOutlineListView represents a "nestable" list view.
@@ -18,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <ControlLook.h>
 #include <Window.h>
 
 #include <binary_compatibility/Interface.h>
@@ -40,10 +42,6 @@ struct ListItemComparator {
 private:
 	compare_func	fCompareFunc;
 };
-
-
-const float kLatchHeight = 8.0f;
-const float kLatchWidth = 4.0f;
 
 
 static void
@@ -882,8 +880,10 @@ BOutlineListView::ExpandOrCollapse(BListItem* item, bool expand)
 BRect
 BOutlineListView::LatchRect(BRect itemRect, int32 level) const
 {
+	float latchDimension = be_plain_font->Size();
+	float indentWidth = be_control_look->DefaultItemSpacing();
 	return BRect(itemRect.left, itemRect.top, itemRect.left
-		+ (level * 10.0f + 15.0f), itemRect.bottom);
+		+ latchDimension + level * indentWidth, itemRect.bottom);
 }
 
 
@@ -891,47 +891,20 @@ void
 BOutlineListView::DrawLatch(BRect itemRect, int32 level, bool collapsed,
 	bool highlighted, bool misTracked)
 {
-	float left = level * 10.0f;
+	float latchDimension = be_plain_font->Size();
+	float indentWidth = be_control_look->DefaultItemSpacing();
+	BPoint itemLoc(itemRect.LeftTop());
+	float latchOffset = itemRect.Height() / 2 - latchDimension / 2;
 
-	float halfHeight = itemRect.Height() / 2.0f;
+	BRect rect = BRect(0, 0, latchDimension, latchDimension)
+		.OffsetBySelf(itemLoc.x, itemLoc.y + latchOffset)
+		.OffsetBySelf(level * indentWidth, 0);
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	int32 arrowDirection = collapsed ? BControlLook::B_RIGHT_ARROW
+		: BControlLook::B_DOWN_ARROW;
 
-	if (collapsed) {
-		SetHighColor(192, 192, 192);
-
-		FillTriangle(itemRect.LeftTop() + BPoint(left + 4.0f,
-				halfHeight - kLatchHeight / 2.0f),
-			itemRect.LeftTop() + BPoint(left + 4.0f,
-				halfHeight + kLatchHeight / 2.0f),
-			itemRect.LeftTop() + BPoint(left + kLatchWidth + 4.0f,
-				halfHeight));
-
-		SetHighColor(0, 0, 0);
-
-		StrokeTriangle(itemRect.LeftTop() + BPoint(left + 4.0f,
-				halfHeight - kLatchHeight / 2.0f),
-			itemRect.LeftTop() + BPoint(left + 4.0f,
-				halfHeight + kLatchHeight / 2.0f),
-			itemRect.LeftTop() + BPoint(left + kLatchWidth + 4.0f,
-				halfHeight));
-	} else {
-		SetHighColor(192, 192, 192);
-
-		FillTriangle(itemRect.LeftTop() + BPoint(left + 2.0f,
-				halfHeight - kLatchWidth + 2.0f),
-			itemRect.LeftTop() + BPoint(left + kLatchHeight + 2.0f,
-				halfHeight - kLatchWidth + 2.0f),
-			itemRect.LeftTop() + BPoint(left + 2.0f + kLatchHeight / 2.0f,
-				halfHeight + 2.0f));
-
-		SetHighColor(0, 0, 0);
-
-		StrokeTriangle(itemRect.LeftTop() + BPoint(left + 2.0f,
-				halfHeight - kLatchWidth + 2.0f),
-			itemRect.LeftTop() + BPoint(left + kLatchHeight + 2.0f,
-				halfHeight - kLatchWidth + 2.0f),
-			itemRect.LeftTop() + BPoint(left + 2.0f + kLatchHeight / 2.0f,
-				halfHeight + 2.0f));
-	}
+	be_control_look->DrawArrowShape(this, rect, rect, base,
+		arrowDirection, 0, B_DARKEN_4_TINT);
 }
 
 
@@ -941,7 +914,9 @@ BOutlineListView::DrawItem(BListItem* item, BRect itemRect, bool complete)
 	if (item->fHasSubitems)
 		DrawLatch(itemRect, item->fLevel, !item->IsExpanded(), false, false);
 
-	itemRect.left += item->fLevel * 10.0f + 15.0f;
+	float latchDimension = be_plain_font->Size();
+	float indentWidth = be_control_look->DefaultItemSpacing();
+	itemRect.left += latchDimension + item->fLevel * indentWidth;
 	item->DrawItem(this, itemRect, complete);
 }
 
