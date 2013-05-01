@@ -93,38 +93,33 @@ BrowserApp::~BrowserApp()
 void
 BrowserApp::AboutRequested()
 {
-	bool needsInit;
-	BAboutWindow window = BAboutWindow::GetWindow(kApplicationName,
-		kApplicationSignature, &needsInit);
+	BAboutWindow window = new BAboutWindow(kApplicationName,
+		kApplicationSignature);
 	
-	if (needsInit) {
-		// create the about window
+	// create the about window
 
-		const char* authors[] = {
-			"Andrea Anzani",
-			"Stephan Aßmus",
-			"Alexandre Deckner",
-			"Rene Gollent",
-			"Ryan Leavengood",
-			"Michael Lotz",
-			"Maxime Simon",
-			NULL
-		};
+	const char* authors[] = {
+		"Andrea Anzani",
+		"Stephan Aßmus",
+		"Alexandre Deckner",
+		"Rene Gollent",
+		"Ryan Leavengood",
+		"Michael Lotz",
+		"Maxime Simon",
+		NULL
+	};
 
-		BString aboutText("");
-		aboutText << "HaikuWebKit " << WebKitInfo::HaikuWebKitVersion();
-		aboutText << " (" << WebKitInfo::HaikuWebKitRevision() << ")";
-		aboutText << "\nWebKit " << WebKitInfo::WebKitVersion();
-		aboutText << " (" << WebKitInfo::WebKitRevision() << ")";
+	BString aboutText("");
+	aboutText << "HaikuWebKit " << WebKitInfo::HaikuWebKitVersion();
+	aboutText << " (" << WebKitInfo::HaikuWebKitRevision() << ")";
+	aboutText << "\nWebKit " << WebKitInfo::WebKitVersion();
+	aboutText << " (" << WebKitInfo::WebKitRevision() << ")";
 
-		window->AddCopyright(2007, "Haiku, Inc.");
-		window->AddAuthors(authors);
-		window->AddExtraInfo(aboutText.String());
-	}
+	window->AddCopyright(2007, "Haiku, Inc.");
+	window->AddAuthors(authors);
+	window->AddExtraInfo(aboutText.String());
 
-	if (window->IsHidden())
-		window->Show();
-	window->Activate();
+	window->Show();
 }
 
 
