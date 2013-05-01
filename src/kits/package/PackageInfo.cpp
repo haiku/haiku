@@ -744,8 +744,8 @@ BPackageInfo::Parser::_ParseResolvableExprList(
 					parser._RewindTo(op);
 			} else {
 				throw ParseError(
-					"expected '<', '<=', '=', '==', '!=', '>=', '>', comma or "
-						"'}'", op.pos);
+					"expected '<', '<=', '==', '!=', '>=', '>', comma or '}'",
+					op.pos);
 			}
 
 			BPackageResolvableOperator resolvableOperator
