@@ -370,7 +370,7 @@ if [ IsOptionalHaikuImagePackageAdded CDRecord ] {
 			$(baseURL)/cdrtools-3.01a01-r1a3-x86-gcc4-2011-05-23.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			$(hpkgBaseURL)/cdrtools-3.00-1-x86_gcc2.hpkg ;
+			$(hpkgBaseURL)/cdrtools-3.01~a07-2-x86_gcc2.hpkg ;
 	}
 }
 
@@ -760,7 +760,7 @@ if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
 				$(baseURL)/KeymapSwitcher-1.2.6-r1a3-x86-gcc4-2011-06-12.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(baseURL)/KeymapSwitcher-1.2.6-r1a3-x86-gcc2-2011-06-12.zip ;
+				$(hpkgBaseURL)/keymapswitcher-1.2.7.9-2-x86_gcc2.hpkg ;
 		}
 		AddSymlinkToHaikuImage home config settings deskbar Preferences
 			: /boot/common/bin/KeymapSwitcher ;
