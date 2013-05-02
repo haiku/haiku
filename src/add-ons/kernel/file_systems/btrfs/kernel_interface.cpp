@@ -520,22 +520,41 @@ btrfs_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	struct dirent *dirent, size_t bufferSize, uint32 *_num)
 {
 	DirectoryIterator* iterator = (DirectoryIterator*)_cookie;
-
-	size_t length = bufferSize;
-	ino_t id;
-	status_t status = iterator->GetNext(dirent->d_name, &length, &id);
-	if (status == B_ENTRY_NOT_FOUND) {
-		*_num = 0;
-		return B_OK;
-	} else if (status != B_OK)
-		return status;
-
 	Volume* volume = (Volume*)_volume->private_volume;
-	dirent->d_dev = volume->ID();
-	dirent->d_ino = id;
-	dirent->d_reclen = sizeof(struct dirent) + length;
-	*_num = 1;
 
+	uint32 maxCount = *_num;
+	uint32 count = 0;
+
+	while (count < maxCount && bufferSize > sizeof(struct dirent)) {
+		ino_t id;
+		size_t length = bufferSize - sizeof(struct dirent) + 1;
+
+		status_t status = iterator->GetNext(dirent->d_name, &length,
+			&id);
+
+		if (status == B_ENTRY_NOT_FOUND)
+			break;
+
+		if (status == B_BUFFER_OVERFLOW) {
+			// the remaining name buffer length was too small
+			if (count == 0)
+				return B_BUFFER_OVERFLOW;
+			break;
+		}
+
+		if (status != B_OK)
+			return status;
+
+		dirent->d_dev = volume->ID();
+		dirent->d_ino = id;
+		dirent->d_reclen = sizeof(struct dirent) + length;
+
+		bufferSize -= dirent->d_reclen;
+		dirent = (struct dirent*)((uint8*)dirent + dirent->d_reclen);
+		count++;
+	}
+
+	*_num = count;
 	return B_OK;
 }
 
