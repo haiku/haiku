@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DWARF_FILE_H
@@ -38,6 +38,10 @@ public:
 
 			const char*			Name() const		{ return fName; }
 			ElfFile*			GetElfFile() const	{ return fElfFile; }
+
+			bool				HasFrameInformation() const
+									{ return fDebugFrameSection != NULL
+										|| fEHFrameSection != NULL; }
 
 			int32				CountCompilationUnits() const;
 			CompilationUnit*	CompilationUnitAt(int32 index) const;
