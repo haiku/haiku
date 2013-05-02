@@ -283,9 +283,11 @@ BPopUpMenu::AsyncAutoDestruct() const
 BPoint
 BPopUpMenu::ScreenLocation()
 {
+	// This case is when the BPopUpMenu is standalone
 	if (fUseWhere)
 		return fWhere;
 
+	// This case is when the BPopUpMenu is inside a BMenuField
 	BMenuItem* superItem = Superitem();
 	BMenu* superMenu = Supermenu();
 	BMenuItem* selectedItem = FindItem(superItem->Label());
@@ -421,11 +423,10 @@ BMenuItem*
 BPopUpMenu::_StartTrack(BPoint where, bool autoInvoke, bool startOpened,
 	BRect* _specialRect)
 {
-	fWhere = where;
-
 	// I know, this doesn't look senseful, but don't be fooled,
 	// fUseWhere is used in ScreenLocation(), which is a virtual
 	// called by BMenu::Track()
+	fWhere = where;
 	fUseWhere = true;
 
 	// Determine when mouse-down-up will be taken as a 'press',

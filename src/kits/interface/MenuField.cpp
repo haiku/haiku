@@ -362,45 +362,16 @@ BMenuField::Draw(BRect update)
 
 	BRect frame(fMenuBar->Frame());
 
-	if (be_control_look != NULL) {
-		frame.InsetBy(-kVMargin, -kVMargin);
-		rgb_color base = fMenuBar->LowColor();
-		rgb_color background = LowColor();
-		uint32 flags = 0;
-		if (!fMenuBar->IsEnabled())
-			flags |= BControlLook::B_DISABLED;
-		if (active)
-			flags |= BControlLook::B_FOCUSED;
-		be_control_look->DrawMenuFieldFrame(this, frame, update, base,
-			background, flags);
-		return;
-	}
-
-	if (frame.InsetByCopy(-kVMargin, -kVMargin).Intersects(update)) {
-		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));
-		StrokeLine(BPoint(frame.left - 1.0f, frame.top - 1.0f),
-			BPoint(frame.left - 1.0f, frame.bottom - 1.0f));
-		StrokeLine(BPoint(frame.left - 1.0f, frame.top - 1.0f),
-			BPoint(frame.right - 1.0f, frame.top - 1.0f));
-
-		StrokeLine(BPoint(frame.left + 1.0f, frame.bottom + 1.0f),
-			BPoint(frame.right + 1.0f, frame.bottom + 1.0f));
-		StrokeLine(BPoint(frame.right + 1.0f, frame.top + 1.0f));
-
-		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_4_TINT));
-		StrokeLine(BPoint(frame.left - 1.0f, frame.bottom),
-			BPoint(frame.left - 1.0f, frame.bottom));
-		StrokeLine(BPoint(frame.right, frame.top - 1.0f),
-			BPoint(frame.right, frame.top - 1.0f));
-	}
-
-	if (active || fTransition) {
-		SetHighColor(active ? ui_color(B_KEYBOARD_NAVIGATION_COLOR) :
-			ViewColor());
-		StrokeRect(frame.InsetByCopy(-kVMargin, -kVMargin));
-
-		fTransition = false;
-	}
+	frame.InsetBy(-kVMargin, -kVMargin);
+	rgb_color base = fMenuBar->LowColor();
+	rgb_color background = LowColor();
+	uint32 flags = 0;
+	if (!fMenuBar->IsEnabled())
+		flags |= BControlLook::B_DISABLED;
+	if (active)
+		flags |= BControlLook::B_FOCUSED;
+	be_control_look->DrawMenuFieldFrame(this, frame, update, base,
+		background, flags);
 }
 
 
