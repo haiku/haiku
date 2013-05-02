@@ -293,8 +293,13 @@ BPopUpMenu::ScreenLocation()
 
 	superMenu->ConvertToScreen(&point);
 
-	if (selectedItem != NULL)
+	if (selectedItem != NULL) {
+		while (selectedItem->Menu() != this
+			&& selectedItem->Menu()->Superitem() != NULL) {
+			selectedItem = selectedItem->Menu()->Superitem();
+		}
 		point.y -= selectedItem->Frame().top;
+	}
 
 	return point;
 }
