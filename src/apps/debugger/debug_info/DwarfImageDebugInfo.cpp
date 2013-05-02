@@ -414,9 +414,14 @@ DwarfImageDebugInfo::GetFunctions(const BObjectList<SymbolInfo>& symbols,
 		return B_OK;
 
 	// if we had no compilation units, fall back to providing basic
-	// debug infos with DWARF-supported call frame unwinding
-	return SpecificImageDebugInfo::GetFunctionsFromSymbols(symbols, functions,
-		fDebuggerInterface, fImageInfo, this);
+	// debug infos with DWARF-supported call frame unwinding,
+	// if available.
+	if (fFile->HasFrameInformation()) {
+		return SpecificImageDebugInfo::GetFunctionsFromSymbols(symbols,
+			functions, fDebuggerInterface, fImageInfo, this);
+	}
+
+	return B_OK;
 }
 
 
