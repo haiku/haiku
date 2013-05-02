@@ -452,7 +452,7 @@ BPopUpMenu::_StartTrack(BPoint where, bool autoInvoke, bool startOpened,
 BMenuItem*
 BPopUpMenu::_WaitMenu(void* _data)
 {
-	popup_menu_data* data = (popup_menu_data*)_data;
+	popup_menu_data* data = static_cast<popup_menu_data*>(_data);
 	BWindow* window = data->window;
 	sem_id sem = data->lock;
 	if (window != NULL) {
