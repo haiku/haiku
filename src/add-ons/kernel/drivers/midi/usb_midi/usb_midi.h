@@ -2,7 +2,7 @@
  * midi usb driver
  * usb_midi.h
  *
- * Copyright 2006-2011 Haiku Inc.  All rights reserved.
+ * Copyright 2006-2013 Haiku Inc.  All rights reserved.
  * Distributed under the terms of the MIT Licence.
  *
  * Authors:
@@ -51,6 +51,9 @@
 	#define DPRINTF_DEBUG(x)
 #endif
 
+/* a convenient way of suppressing some printouts: */
+#define ZDPRINTF_DEBUG(x)
+
 
 /* driver specific definitions */
 
@@ -82,7 +85,7 @@ typedef struct usbmidi_device_info
 	area_id buffer_area;
 	usb_midi_event_packet* buffer;	/* input buffer & base of area */
 	usb_midi_event_packet* out_buffer;	/* above input buffer */
-	size_t buffer_size;		/* for each of in and out buffers */
+	size_t inMaxPkt, outMaxPkt;		/* for each of in and out buffers */
 
 	const usb_device* dev;
 	uint16 ifno;

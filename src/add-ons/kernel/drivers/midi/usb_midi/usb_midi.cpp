@@ -2,7 +2,7 @@
  * midi usb driver
  * usb_midi.c
  *
- * Copyright 2006-2011 Haiku Inc.  All rights reserved.
+ * Copyright 2006-2013 Haiku Inc.  All rights reserved.
  * Distributed under the terms of the MIT Licence.
  *
  * Authors:
@@ -17,7 +17,7 @@
  */
 
 
-/* #define DEBUG 1 */	/* Define this to enable DPRINTF_DEBUG statements */
+/* #define DEBUG 1 */	/* Define this to enable DPRINTF_DEBUG statements */ 
 /* (Other categories of printout set in usb_midi.h) */
 
 #include "usb_midi.h"
@@ -134,7 +134,8 @@ create_device(const usb_device* dev, uint16 ifno)
 	midiDevice->active = true;
 	midiDevice->flags = 0;
 	memset(midiDevice->ports, 0, sizeof(midiDevice->ports));
-	midiDevice->buffer_size = B_PAGE_SIZE / 2;
+	midiDevice->inMaxPkt = midiDevice->outMaxPkt = B_PAGE_SIZE / 2;
+		/* Initially -- will get reduced */
 	DPRINTF_INFO((MY_ID "Created device %p\n", midiDevice));
 
 	return midiDevice;
@@ -234,8 +235,10 @@ midi_usb_read_callback(void* cookie, status_t status,
 	usbmidi_device_info* midiDevice = (usbmidi_device_info*)cookie;
 
 	assert(cookie != NULL);
-	DPRINTF_DEBUG((MY_ID "midi_usb_read_callback() -- packet length %ld\n",
-		actual_len));
+	if (actual_len > 0) {
+		DPRINTF_DEBUG((MY_ID "midi_usb_read_callback() -- packet length %ld\n",
+			actual_len));
+	}
 
 	acquire_sem(midiDevice->sem_lock);
 	midiDevice->actual_length = actual_len;
@@ -271,7 +274,7 @@ midi_usb_read_callback(void* cookie, status_t status,
 
 	/* issue next request */
 	st = usb->queue_bulk(midiDevice->ept_in->handle,
-		midiDevice->buffer, midiDevice->buffer_size,
+		midiDevice->buffer, midiDevice->inMaxPkt,
 		(usb_callback_func)midi_usb_read_callback, midiDevice);
 	if (st != B_OK) {
 		/* probably endpoint stall */
@@ -383,18 +386,26 @@ got_one:
 
 	for (uint16 i = 0; i < intf->endpoint_count && i < 2; i++) {
 		/* we are actually assuming max one IN, one OUT endpoint... */
-		DPRINTF_INFO((MY_ID "endpoint %d = %p  %s\n",
+		DPRINTF_INFO((MY_ID "endpoint %d = %p  %s maxPkt=%d\n",
 			i, &intf->endpoint[i],
 			(intf->endpoint[i].descr->endpoint_address & 0x80) != 0
-			 ? "IN" : "OUT"));
+			 ? "IN" : "OUT", intf->endpoint[i].descr->max_packet_size));
 		if ((intf->endpoint[i].descr->endpoint_address & 0x80) != 0) {
 			if (midiDevice->ept_in == NULL) {
 				midiDevice->ept_in = &intf->endpoint[i];
 				in_cables = cable_count[i];
+				if (intf->endpoint[i].descr->max_packet_size
+					< midiDevice->inMaxPkt)
+					midiDevice->inMaxPkt = intf->endpoint[i].descr->max_packet_size;
 			}
-		} else if (midiDevice->ept_out == NULL) {
-			midiDevice->ept_out = &intf->endpoint[i];
-			out_cables = cable_count[i];
+		} else {
+			if (midiDevice->ept_out == NULL) {
+				midiDevice->ept_out = &intf->endpoint[i];
+				out_cables = cable_count[i];
+				if (intf->endpoint[i].descr->max_packet_size
+					< midiDevice->outMaxPkt)
+					midiDevice->outMaxPkt = intf->endpoint[i].descr->max_packet_size;
+			}
 		}
 	}
 
@@ -416,7 +427,7 @@ got_one:
 	/* issue bulk transfer */
 	DPRINTF_DEBUG((MY_ID "queueing bulk xfer IN endpoint\n"));
 	status = usb->queue_bulk(midiDevice->ept_in->handle, midiDevice->buffer,
-		midiDevice->buffer_size,
+		midiDevice->inMaxPkt,
 		(usb_callback_func)midi_usb_read_callback, midiDevice);
 	if (status != B_OK) {
 		DPRINTF_ERR((MY_ID "queue_bulk() error 0x%lx\n", status));
@@ -498,9 +509,9 @@ usb_midi_open(const char* name, uint32 flags,
 	if ((port = search_port_info(name)) == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	if (!port->has_in && mode != O_RDONLY)
+	if (!port->has_in && mode != O_WRONLY)
 		return B_PERMISSION_DENIED;	 /* == EACCES */
-	else if (!port->has_out && mode != O_WRONLY)
+	else if (!port->has_out && mode != O_RDONLY)
 		return B_PERMISSION_DENIED;
 
 	if ((cookie = (driver_cookie*)malloc(sizeof(driver_cookie))) == NULL)
@@ -550,11 +561,11 @@ usb_midi_read(driver_cookie* cookie, off_t position,
 	DPRINTF_DEBUG((MY_ID "usb_midi_read: (%ld byte buffer at %lld cookie %p)"
 		"\n", *num_bytes, position, cookie));
 	while (midiDevice && midiDevice->active) {
-		DPRINTF_DEBUG((MY_ID "waiting on acquire_sem_etc\n"));
+		ZDPRINTF_DEBUG((MY_ID "waiting on acquire_sem_etc\n"));
 		err = acquire_sem_etc(cookie->sem_cb, 1,
 			 B_RELATIVE_TIMEOUT, 1000000);
 		if (err == B_TIMED_OUT) {
-			DPRINTF_DEBUG((MY_ID "acquire_sem_etc timed out\n"));
+			ZDPRINTF_DEBUG((MY_ID "acquire_sem_etc timed out\n"));
 			continue;	/* see if we're still active */
 		}
 		if (err != B_OK) {
@@ -616,7 +627,7 @@ usb_midi_write(driver_cookie* cookie, off_t position,
 	if (!midiDevice || !midiDevice->active)
 		return B_ERROR;		/* already unplugged */
 
-	buff_lim = midiDevice->buffer_size * 3 / 4;
+	buff_lim = midiDevice->outMaxPkt * 3 / 4;
 		/* max MIDI bytes buffer space */
 
 	DPRINTF_DEBUG((MY_ID "MIDI write (%ld bytes at %lld)\n",
