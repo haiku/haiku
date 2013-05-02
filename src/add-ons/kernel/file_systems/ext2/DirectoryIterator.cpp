@@ -108,8 +108,8 @@ DirectoryIterator::Get(char* name, size_t* _nameLength, ino_t* _id)
 			entry->InodeID(), entry->Length(), length, entry->FileType());
 
 		if (*_nameLength > 0) {
-			if (*_nameLength < length)
-				length = *_nameLength - 1;
+			if (length + 1 > *_nameLength)
+				return B_BUFFER_OVERFLOW;
 
 			memcpy(name, entry->name, length);
 			name[length] = '\0';
