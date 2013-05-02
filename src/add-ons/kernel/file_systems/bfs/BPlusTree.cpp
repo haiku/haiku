@@ -2715,7 +2715,7 @@ TreeIterator::Traverse(int8 direction, void* key, uint16* keyLength,
 				RETURN_ERROR(B_ERROR);
 
 			// reset current key
-			fCurrentKey = forward ? 0 : node->NumKeys();
+			fCurrentKey = forward ? 0 : node->NumKeys() - 1;
 		} else {
 			// there are no nodes left, so turn back to the last key
 			fCurrentNodeOffset = savedNodeOffset;
