@@ -3089,7 +3089,7 @@ duplicate_array::Insert(off_t value)
 	// binary search, if not, just iterate linearly to find
 	// the insertion point
 	int32 size = Count();
-	int32 i;
+	int32 i = 0;
 	if (size > 8 ) {
 		if (!_FindInternal(value, i) && ValueAt(i) <= value)
 			i++;
