@@ -88,7 +88,7 @@ private:
 	int32					fSize;
 	const char*				fText;
 };
-#endif
+#endif // DEBUG
 
 
 class BitmapArray {
@@ -289,8 +289,9 @@ CachedNode::SetTo(off_t offset, const bplustree_node** _node, bool check)
 	// instead)
 	if (offset > fTree->fHeader.MaximumSize() - fTree->fNodeSize
 		|| offset <= 0
-		|| (offset % fTree->fNodeSize) != 0)
+		|| (offset % fTree->fNodeSize) != 0) {
 		RETURN_ERROR(B_BAD_VALUE);
+	}
 
 	if (InternalSetTo(NULL, offset) != NULL && check) {
 		// sanity checks (links, all_key_count)
@@ -345,8 +346,9 @@ CachedNode::MakeWritable(Transaction& transaction)
 		return NULL;
 
 	if (block_cache_make_writable(transaction.GetVolume()->BlockCache(),
-			fBlockNumber, transaction.ID()) == B_OK)
+			fBlockNumber, transaction.ID()) == B_OK) {
 		return fNode;
+	}
 
 	return NULL;
 }
