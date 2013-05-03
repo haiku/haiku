@@ -59,10 +59,10 @@ public:
 
 	static bdaddr_t FromString(const char * addr)
 	{
-		int b0, b1, b2, b3, b4, b5;
+		uint8 b0, b1, b2, b3, b4, b5;
 
 		if (addr != NULL) {
-			size_t count = sscanf(addr, "%2X:%2X:%2X:%2X:%2X:%2X",
+			size_t count = sscanf(addr, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx",
 						&b5, &b4, &b3, &b2, &b1, &b0);
 
 			if (count == 6)
