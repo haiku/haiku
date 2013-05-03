@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2010, Philippe Houdoin, phoudoin@haiku-os.org. All rights reserved.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TEAMS_WINDOW_H
@@ -8,6 +9,7 @@
 
 #include <Window.h>
 
+class BButton;
 class BListView;
 class BFile;
 class BMessage;
@@ -32,11 +34,13 @@ private:
 			status_t			_SaveSettings();
 
 private:
+			team_id				fCurrentTeam;
 			TeamsListView*		fTeamsListView;
+			BButton*			fAttachTeamButton;
+			BButton*			fCreateTeamButton;
 			SettingsManager*	fSettingsManager;
 
 };
 
-static const uint32 kMsgDebugThisTeam = 'dbtm';
 
 #endif	// TEAMS_WINDOW_H

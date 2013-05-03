@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2010, Philippe Houdoin, phoudoin@haiku-os.org. All rights reserved.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -11,11 +12,13 @@
 #include <stdarg.h>
 
 #include <Application.h>
-#include <ListView.h>
-#include <ScrollView.h>
+#include <Button.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <LayoutBuilder.h>
+#include <ListView.h>
 #include <Path.h>
+#include <ScrollView.h>
 
 #include "MessageCodes.h"
 #include "SettingsManager.h"
@@ -23,13 +26,24 @@
 #include "TeamsListView.h"
 
 
+enum {
+	MSG_CREATE_NEW_TEAM = 'crnt',
+	MSG_TEAM_SELECTION_CHANGED = 'tesc'
+};
+
+
 TeamsWindow::TeamsWindow(SettingsManager* settingsManager)
 	:
 	BWindow(BRect(100, 100, 500, 250), "Teams", B_DOCUMENT_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS),
 	fTeamsListView(NULL),
+	fAttachTeamButton(NULL),
+	fCreateTeamButton(NULL),
 	fSettingsManager(settingsManager)
 {
+	team_info info;
+	get_team_info(B_CURRENT_TEAM, &info);
+	fCurrentTeam = info.team;
 }
 
 
@@ -58,14 +72,33 @@ void
 TeamsWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case kMsgDebugThisTeam:
+		case MSG_CREATE_NEW_TEAM:
 		{
-			TeamRow* row = dynamic_cast<TeamRow*>(fTeamsListView->CurrentSelection());
+			// TODO: implement
+			break;
+		}
+
+		case MSG_DEBUG_THIS_TEAM:
+		{
+			TeamRow* row = dynamic_cast<TeamRow*>(
+				fTeamsListView->CurrentSelection());
 			if (row != NULL) {
 				BMessage message(MSG_DEBUG_THIS_TEAM);
 				message.AddInt32("team", row->TeamID());
 				be_app_messenger.SendMessage(&message);
 			}
+			break;
+		}
+
+		case MSG_TEAM_SELECTION_CHANGED:
+		{
+			TeamRow* row = dynamic_cast<TeamRow*>(
+				fTeamsListView->CurrentSelection());
+			bool enabled = false;
+			if (row != NULL && row->TeamID() != fCurrentTeam)
+				enabled = true;
+
+			fAttachTeamButton->SetEnabled(enabled);
 			break;
 		}
 
@@ -101,17 +134,25 @@ TeamsWindow::_Init()
 		ResizeTo(frame.Width(), frame.Height());
 	}
 
-	// TODO: add button to start a team debugger
-	// TODO: add UI to setup arguments and environ, launch a program
-	//       and start his team debugger
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.Add(fTeamsListView = new TeamsListView("TeamsList", fCurrentTeam))
+		.SetInsets(1.0f, 1.0f, 1.0f, 1.0f)
+		.AddGroup(B_HORIZONTAL, 4.0f)
+			.Add(fAttachTeamButton = new BButton("Attach"))
+			.Add(fCreateTeamButton = new BButton("Create new team"
+					B_UTF8_ELLIPSIS))
+			.End()
+		.End();
 
-	// Add a teams list view
-	frame = Bounds();
-	frame.InsetBy(-1, -1);
-	fTeamsListView = new TeamsListView(frame, "TeamsList");
-	fTeamsListView->SetInvocationMessage(new BMessage(kMsgDebugThisTeam));
+	fTeamsListView->SetInvocationMessage(new BMessage(MSG_DEBUG_THIS_TEAM));
+	fTeamsListView->SetSelectionMessage(new BMessage(
+			MSG_TEAM_SELECTION_CHANGED));
 
-	AddChild(fTeamsListView);
+	fAttachTeamButton->SetMessage(new BMessage(MSG_DEBUG_THIS_TEAM));
+	fAttachTeamButton->SetEnabled(false);
+	fCreateTeamButton->SetMessage(new BMessage(MSG_CREATE_NEW_TEAM));
+	// TODO: re-enable once action is implemented
+	fAttachTeamButton->SetEnabled(false);
 }
 
 
