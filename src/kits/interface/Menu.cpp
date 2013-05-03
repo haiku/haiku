@@ -2871,6 +2871,20 @@ BMenu::_UpdateWindowViewSize(const bool &move)
 			}
 
 			window->AttachScrollers();
+
+			BMenuItem* selectedItem = FindMarked();
+			if (selectedItem != NULL && fLayout == B_ITEMS_IN_COLUMN) {
+				// scroll to the selected item
+				if (Supermenu() == NULL) {
+					window->TryScrollTo(selectedItem->Frame().top);
+				} else {
+					BPoint point = selectedItem->Frame().LeftTop();
+					BPoint superpoint = Superitem()->Frame().LeftTop();
+					Supermenu()->ConvertToScreen(&superpoint);
+					ConvertToScreen(&point);
+					window->TryScrollTo(point.y - superpoint.y);
+				}
+			}
 		}
 	} else {
 		_CacheFontInfo();

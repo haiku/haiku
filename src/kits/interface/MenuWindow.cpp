@@ -413,6 +413,17 @@ BMenuWindow::TryScrollBy(const float& step)
 
 
 bool
+BMenuWindow::TryScrollTo(const float& where)
+{
+	if (!fMenuFrame || !fUpperScroller || !fLowerScroller)
+		return false;
+
+	_ScrollBy(where - fValue);
+	return true;
+}
+
+
+bool
 BMenuWindow::_Scroll(const BPoint& where)
 {
 	ASSERT((fLowerScroller != NULL));
