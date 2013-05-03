@@ -8,8 +8,12 @@
 
 #include <ListView.h>
 
-class BListItem;
 
+class BList;
+class BListItem;
+class BMessage;
+class BPoint;
+class BRect;
 
 class BOutlineListView : public BListView {
 public:
