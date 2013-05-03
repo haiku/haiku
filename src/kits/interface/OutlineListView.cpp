@@ -880,10 +880,14 @@ BOutlineListView::ExpandOrCollapse(BListItem* item, bool expand)
 BRect
 BOutlineListView::LatchRect(BRect itemRect, int32 level) const
 {
-	float latchDimension = be_plain_font->Size();
-	float indentWidth = be_control_look->DefaultItemSpacing();
-	return BRect(itemRect.left, itemRect.top, itemRect.left
-		+ latchDimension + level * indentWidth, itemRect.bottom);
+	float latchWidth = be_plain_font->Size();
+	float latchHeight = be_plain_font->Size();
+	float indentOffset = level * be_control_look->DefaultItemSpacing();
+	float heightOffset = itemRect.Height() / 2 - latchHeight / 2;
+
+	return BRect(0, 0, latchWidth, latchHeight)
+		.OffsetBySelf(itemRect.left, itemRect.top)
+		.OffsetBySelf(indentOffset, heightOffset);
 }
 
 
@@ -891,19 +895,12 @@ void
 BOutlineListView::DrawLatch(BRect itemRect, int32 level, bool collapsed,
 	bool highlighted, bool misTracked)
 {
-	float latchDimension = be_plain_font->Size();
-	float indentWidth = be_control_look->DefaultItemSpacing();
-	BPoint itemLoc(itemRect.LeftTop());
-	float latchOffset = itemRect.Height() / 2 - latchDimension / 2;
-
-	BRect rect = BRect(0, 0, latchDimension, latchDimension)
-		.OffsetBySelf(itemLoc.x, itemLoc.y + latchOffset)
-		.OffsetBySelf(level * indentWidth, 0);
+	BRect latchRect(LatchRect(itemRect, level));
 	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 	int32 arrowDirection = collapsed ? BControlLook::B_RIGHT_ARROW
 		: BControlLook::B_DOWN_ARROW;
 
-	be_control_look->DrawArrowShape(this, rect, rect, base,
+	be_control_look->DrawArrowShape(this, latchRect, itemRect, base,
 		arrowDirection, 0, B_DARKEN_4_TINT);
 }
 
@@ -911,12 +908,12 @@ BOutlineListView::DrawLatch(BRect itemRect, int32 level, bool collapsed,
 void
 BOutlineListView::DrawItem(BListItem* item, BRect itemRect, bool complete)
 {
-	if (item->fHasSubitems)
-		DrawLatch(itemRect, item->fLevel, !item->IsExpanded(), false, false);
+	if (item->fHasSubitems) {
+		DrawLatch(itemRect, item->fLevel, !item->IsExpanded(),
+			item->IsSelected() || complete, false);
+	}
 
-	float latchDimension = be_plain_font->Size();
-	float indentWidth = be_control_look->DefaultItemSpacing();
-	itemRect.left += latchDimension + item->fLevel * indentWidth;
+	itemRect.left += LatchRect(itemRect, item->fLevel).right;
 	item->DrawItem(this, itemRect, complete);
 }
 
