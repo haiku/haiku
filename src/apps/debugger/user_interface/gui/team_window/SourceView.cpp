@@ -981,17 +981,15 @@ SourceView::MarkerView::GetToolTipAt(BPoint point, BToolTip** _tip)
 	if (marker == NULL) {
 		text.SetToFormat(kEnableBreakpointMessage, line);
 	} else if ((modifiers() & B_SHIFT_KEY) != 0) {
-		if (!marker->IsEnabled()) {
+		if (!marker->IsEnabled())
 			text.SetToFormat(kClearBreakpointMessage, line);
-		} else {
+		else
 			text.SetToFormat(kDisableBreakpointMessage, line);
-		}
 	} else {
-		if (marker->IsEnabled()) {
+		if (marker->IsEnabled())
 			text.SetToFormat(kClearBreakpointMessage, line);
-		} else {
+		else
 			text.SetToFormat(kEnableBreakpointMessage, line);
-		}
 	}
 
 	if (text.Length() > 0) {
