@@ -952,7 +952,7 @@ if [ IsOptionalHaikuImagePackageAdded Mercurial ] {
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/mercurial-1.8.3-1-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/mercurial-2.2.2-2-x86_gcc2.hpkg ;
 		}
 	}
 }
@@ -1220,7 +1220,7 @@ if [ IsOptionalHaikuImagePackageAdded Python ] {
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/python-2.6.8-2-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/python-2.6.8-3-x86_gcc2.hpkg ;
 		}
 	}
 }
