@@ -2870,19 +2870,22 @@ BMenu::_UpdateWindowViewSize(const bool &move)
 					screen.Frame().bottom - frame.top);
 			}
 
-			window->AttachScrollers();
+			if (fLayout == B_ITEMS_IN_COLUMN) {
+				// we currently only support scrolling for B_ITEMS_IN_COLUMN
+				window->AttachScrollers();
 
-			BMenuItem* selectedItem = FindMarked();
-			if (selectedItem != NULL && fLayout == B_ITEMS_IN_COLUMN) {
-				// scroll to the selected item
-				if (Supermenu() == NULL) {
-					window->TryScrollTo(selectedItem->Frame().top);
-				} else {
-					BPoint point = selectedItem->Frame().LeftTop();
-					BPoint superpoint = Superitem()->Frame().LeftTop();
-					Supermenu()->ConvertToScreen(&superpoint);
-					ConvertToScreen(&point);
-					window->TryScrollTo(point.y - superpoint.y);
+				BMenuItem* selectedItem = FindMarked();
+				if (selectedItem != NULL) {
+					// scroll to the selected item
+					if (Supermenu() == NULL) {
+						window->TryScrollTo(selectedItem->Frame().top);
+					} else {
+						BPoint point = selectedItem->Frame().LeftTop();
+						BPoint superPoint = Superitem()->Frame().LeftTop();
+						Supermenu()->ConvertToScreen(&superPoint);
+						ConvertToScreen(&point);
+						window->TryScrollTo(point.y - superPoint.y);
+					}
 				}
 			}
 		}
