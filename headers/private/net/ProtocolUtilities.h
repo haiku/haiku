@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2013, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -36,6 +36,7 @@ public:
 
 extern net_buffer_module_info* gBufferModule;
 extern net_stack_module_info* gStackModule;
+
 
 class NetModuleBundleGetter {
 public:
@@ -294,7 +295,7 @@ DECL_DATAGRAM_SOCKET(inline status_t)::SocketStatus(bool peek) const
 {
 	if (peek)
 		return fSocket->error;
-	
+
 	status_t status = fSocket->error;
 	fSocket->error = B_OK;
 
@@ -345,7 +346,7 @@ DECL_DATAGRAM_SOCKET(inline status_t)::_Wait(bigtime_t timeout)
 {
 	LockingBase::Unlock(&fLock);
 	status_t status = acquire_sem_etc(fNotify, 1, B_CAN_INTERRUPT
-		| B_ABSOLUTE_TIMEOUT, timeout);
+		| (timeout != 0 ? B_ABSOLUTE_TIMEOUT : B_RELATIVE_TIMEOUT), timeout);
 	LockingBase::Lock(&fLock);
 
 	return status;
