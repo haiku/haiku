@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2009, Rene Gollent, rene@gollent.com.
+ * Copyright 2009-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -22,6 +22,7 @@
 #include <Region.h>
 #include <ScrollBar.h>
 #include <ScrollView.h>
+#include <ToolTip.h>
 
 #include <AutoLocker.h>
 #include <ObjectList.h>
@@ -44,6 +45,13 @@ static const float kMinViewHeight = 80.0f;
 static const int32 kSpacesPerTab = 4;
 	// TODO: Should be settable!
 static const bigtime_t kScrollTimer = 10000LL;
+
+static const char* kClearBreakpointMessage = "Click to clear breakpoint at "
+	"line %" B_PRId32 ".";
+static const char* kDisableBreakpointMessage = "Click to disable breakpoint at "
+	"line %" B_PRId32 ".";
+static const char* kEnableBreakpointMessage = "Click to enable breakpoint at "
+	"line %" B_PRId32 ".";
 
 
 class SourceView::BaseView : public BView {
@@ -157,6 +165,8 @@ public:
 
 	virtual	void				MouseDown(BPoint where);
 
+protected:
+	virtual bool				GetToolTipAt(BPoint point, BToolTip** _tip);
 
 private:
 			Team*				fTeam;
@@ -941,6 +951,59 @@ SourceView::MarkerView::MouseDown(BPoint where)
 		else
 			fListener->SetBreakpointRequested(address, true);
 	}
+}
+
+
+bool
+SourceView::MarkerView::GetToolTipAt(BPoint point, BToolTip** _tip)
+{
+	if (fSourceCode == NULL)
+		return false;
+
+	int32 line = LineAtOffset(point.y);
+	if (line < 0)
+		return false;
+
+	AutoLocker<Team> locker(fTeam);
+	Statement* statement;
+	if (fTeam->GetStatementAtSourceLocation(fSourceCode,
+			SourceLocation(line), statement) != B_OK) {
+		return false;
+	}
+	BReference<Statement> statementReference(statement, true);
+	if (statement->StartSourceLocation().Line() != line)
+		return false;
+
+	SourceView::MarkerManager::BreakpointMarker* marker =
+		fMarkerManager->BreakpointMarkerAtLine(line);
+
+	BString text;
+	if (marker == NULL) {
+		text.SetToFormat(kEnableBreakpointMessage, line);
+	} else if ((modifiers() & B_SHIFT_KEY) != 0) {
+		if (!marker->IsEnabled()) {
+			text.SetToFormat(kClearBreakpointMessage, line);
+		} else {
+			text.SetToFormat(kDisableBreakpointMessage, line);
+		}
+	} else {
+		if (marker->IsEnabled()) {
+			text.SetToFormat(kClearBreakpointMessage, line);
+		} else {
+			text.SetToFormat(kEnableBreakpointMessage, line);
+		}
+	}
+
+	if (text.Length() > 0) {
+		BTextToolTip* tip = new(std::nothrow) BTextToolTip(text);
+		if (tip == NULL)
+			return false;
+
+		*_tip = tip;
+		return true;
+	}
+
+	return false;
 }
 
 
