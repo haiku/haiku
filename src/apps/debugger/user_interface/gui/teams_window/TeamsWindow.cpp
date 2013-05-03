@@ -95,8 +95,11 @@ TeamsWindow::MessageReceived(BMessage* message)
 			TeamRow* row = dynamic_cast<TeamRow*>(
 				fTeamsListView->CurrentSelection());
 			bool enabled = false;
-			if (row != NULL && row->TeamID() != fCurrentTeam)
-				enabled = true;
+			if (row != NULL) {
+				team_id id = row->TeamID();
+				if (id != fCurrentTeam && id != B_SYSTEM_TEAM)
+					enabled = true;
+			}
 
 			fAttachTeamButton->SetEnabled(enabled);
 			break;
