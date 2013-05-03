@@ -68,6 +68,7 @@
 #	Pe						- the powerful native Programmer's Editor
 #	Perl					- the scripting language
 #	Python					- the scripting language
+#	Readline				- the GNU Readline library
 #	Rsync					- remote directory synchronization
 #	Ruby					- the programming language
 #	Sed						- the ultimate stream editor
@@ -449,7 +450,7 @@ if [ IsOptionalHaikuImagePackageAdded CVS ] {
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/cvs-1.12.13.1-2-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/cvs-1.12.13.1-4-x86_gcc2.hpkg ;
 		}
 	}
 }
@@ -587,7 +588,7 @@ if [ IsOptionalHaikuImagePackageAdded Doxygen ] {
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/doxygen-1.6.3-1-gcc2_x86.hpkg ;
+				$(hpkgBaseURL)/doxygen-1.6.3-2-x86_gcc2.hpkg ;
 		}
 	}
 }
@@ -1219,11 +1220,25 @@ if [ IsOptionalHaikuImagePackageAdded Python ] {
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/python-2.6.6-1-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/python-2.6.8-2-x86_gcc2.hpkg ;
 		}
 	}
 }
 
+
+# Readline
+if [ IsOptionalHaikuImagePackageAdded Readline ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Readline available for $(TARGET_ARCH)" ;
+	} else {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			Echo "No optional package Readline available for gcc 4" ;
+		} else {
+			InstallOptionalHaikuImagePackage
+				$(hpkgBaseURL)/readline-6.2-2-x86_gcc2.hpkg ;
+		}
+	}
+}
 
 # Rsync
 if [ IsOptionalHaikuImagePackageAdded Rsync ] {
@@ -1337,7 +1352,7 @@ if [ IsOptionalHaikuImagePackageAdded Tar ] {
 # TimGMSoundFont
 if [ IsOptionalHaikuImagePackageAdded TimGMSoundFont ] {
 	InstallOptionalHaikuImagePackage
-		$(hpkgBaseURL)/TimGMSoundFont-2010-06-16.hpkg
+		$(hpkgBaseURL)/timgmsoundfont-2004_01_24-2-any.hpkg
 		: system ;
 }
 
