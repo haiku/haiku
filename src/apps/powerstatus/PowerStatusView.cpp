@@ -321,10 +321,11 @@ PowerStatusView::_SetLabel(char* buffer, size_t bufferLength)
 		close = ")";
 	}
 
-	if (!fShowTime && fPercent >= 0)
-		snprintf(buffer, bufferLength, "%s%ld%%%s", open, fPercent, close);
-	else if (fShowTime && fTimeLeft >= 0) {
-		snprintf(buffer, bufferLength, "%s%ld:%02ld%s",
+	if (!fShowTime && fPercent >= 0) {
+		snprintf(buffer, bufferLength, "%s%" B_PRId32 "%%%s", open, fPercent,
+			close);
+	} else if (fShowTime && fTimeLeft >= 0) {
+		snprintf(buffer, bufferLength, "%s%" B_PRId32 ":%02" B_PRId32 "%s",
 			open, fTimeLeft / 3600, (fTimeLeft / 60) % 60, close);
 	}
 }
@@ -372,11 +373,12 @@ PowerStatusView::Update(bool force)
 				close = ")";
 			}
 			if (fHasBattery) {
-				size_t length = snprintf(text, sizeof(text), "%s%ld%%%s",
-					open, fPercent, close);
+				size_t length = snprintf(text, sizeof(text), "%s%" B_PRId32
+					"%%%s", open, fPercent, close);
 				if (fTimeLeft) {
 					length += snprintf(text + length, sizeof(text) - length,
-						"\n%ld:%02ld", fTimeLeft / 3600, (fTimeLeft / 60) % 60);
+						"\n%" B_PRId32 ":%02" B_PRId32, fTimeLeft / 3600,
+						(fTimeLeft / 60) % 60);
 				}
 
 				const char* state = NULL;
