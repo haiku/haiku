@@ -118,8 +118,8 @@ NodeManager::SetPlayMode(int32 mode, bool continuePlaying)
 		status_t ret = fMediaRoster->SetRunModeNode(fVideoConnection.consumer,
 			runMode);
 		if (ret != B_OK) {
-			printf("NodeManager::SetPlayMode(%ld), setting run mode failed: "
-				"%s\n", mode, strerror(ret));
+			printf("NodeManager::SetPlayMode(%" B_PRId32 "), setting run mode "
+				"failed: %s\n", mode, strerror(ret));
 		}
 		fMediaRoster->Unlock();
 	}

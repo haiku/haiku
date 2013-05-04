@@ -697,8 +697,10 @@ VideoProducer::_FrameGeneratorThread()
 					&& nextWaitUntil < system_time() - fBufferLatency
 					&& droppedFrames < kMaxDroppedFrames) {
 					// Drop frame if it's at least a frame late.
-					if (playingDirection > 0)
-						printf("VideoProducer: dropped frame (%Ld)\n", fFrame);
+					if (playingDirection > 0) {
+						printf("VideoProducer: dropped frame (%" B_PRId64
+							")\n", fFrame);
+					}
 					// next frame
 					droppedFrames++;
 					fFrame++;

@@ -22,10 +22,10 @@ duration_to_string(int32 seconds, char* string, size_t stringSize)
 	seconds = seconds % 60;
 
 	if (hours > 0) {
-		snprintf(string, stringSize, "%s%ld:%02ld:%02ld",
-			negative ? "-" : "", hours, minutes, seconds);
+		snprintf(string, stringSize, "%s%" B_PRId32 ":%02" B_PRId32 ":%02"
+			B_PRId32, negative ? "-" : "", hours, minutes, seconds);
 	} else {
-		snprintf(string, stringSize, "%s%ld:%02ld",
+		snprintf(string, stringSize, "%s%" B_PRId32 ":%02" B_PRId32,
 			negative ? "-" : "", minutes, seconds);
 	}
 }

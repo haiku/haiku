@@ -51,6 +51,6 @@ Event::SetAutoDelete(bool autoDelete)
 void
 Event::Execute()
 {
-	printf("Event::Execute() - %Ld\n", fTime);
+	printf("Event::Execute() - %" B_PRIdBIGTIME "\n", fTime);
 }
 

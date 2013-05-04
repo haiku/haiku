@@ -169,8 +169,10 @@ bigtime_t _performanceTime = *performanceTime;
 
 	ret = fVideoTrack->SeekToTime(performanceTime);
 	if (ret == B_OK) {
-if (_performanceTime != *performanceTime)
-printf("seeked by time: %lld -> %lld\n", _performanceTime, *performanceTime);
+		if (_performanceTime != *performanceTime) {
+			printf("seeked by time: %" B_PRIdBIGTIME " -> %" B_PRIdBIGTIME
+				"\n", _performanceTime, *performanceTime);
+		}
 		fPerformanceTime = *performanceTime;
 		fCurrentFrame = fVideoTrack->CurrentFrame();
 	}
@@ -333,7 +335,7 @@ MediaTrackVideoSupplier::_SwitchFormat(color_space format, uint32 bytesPerRow)
 	}
 
 	if (fFormat.u.raw_video.last_active != height - 1) {
-		printf("should skip %ld lines at bottom!\n", 
+		printf("should skip %" B_PRId32 " lines at bottom!\n", 
 			(height - 1) - fFormat.u.raw_video.last_active);
 	}
 

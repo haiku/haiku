@@ -817,7 +817,7 @@ AudioProducer::_FillNextBuffer(bigtime_t eventTime)
 		static bool errorPrinted = false;
 		if (!errorPrinted) {
 			ERROR("AudioProducer::_FillNextBuffer() - no buffer "
-				"(size: %ld, duration: %lld)\n",
+				"(size: %" B_PRIuSIZE ", duration: %" B_PRIiBIGTIME ")\n",
 				fOutput.format.u.raw_audio.buffer_size, BufferDuration());
 			errorPrinted = true;
 		}
