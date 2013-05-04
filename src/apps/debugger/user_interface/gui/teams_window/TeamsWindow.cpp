@@ -37,6 +37,7 @@ TeamsWindow::TeamsWindow(SettingsManager* settingsManager)
 	BWindow(BRect(100, 100, 500, 250), "Teams", B_DOCUMENT_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS),
 	fTeamsListView(NULL),
+	fStartTeamWindow(NULL),
 	fAttachTeamButton(NULL),
 	fCreateTeamButton(NULL),
 	fSettingsManager(settingsManager)
@@ -49,6 +50,7 @@ TeamsWindow::TeamsWindow(SettingsManager* settingsManager)
 
 TeamsWindow::~TeamsWindow()
 {
+	BMessenger(fStartTeamWindow).SendMessage(B_QUIT_REQUESTED);
 }
 
 
@@ -74,9 +76,12 @@ TeamsWindow::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case MSG_START_NEW_TEAM:
 		{
-			fStartTeamWindow = StartTeamWindow::Create();
-			if (fStartTeamWindow == NULL)
-				break;
+			BMessenger messenger(fStartTeamWindow);
+			if (!messenger.IsValid()) {
+				fStartTeamWindow = StartTeamWindow::Create();
+				if (fStartTeamWindow == NULL)
+					break;
+			}
 
 			fStartTeamWindow->Show();
 			break;
