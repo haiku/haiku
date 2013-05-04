@@ -681,7 +681,7 @@ utf8_to_rfc2047 (char **bufp, ssize_t length, uint32 charset, char encoding)
 		}
 	}
 
-	while ((currentWord = (struct word *)words.RemoveItem(0L)) != NULL) {
+	while ((currentWord = (struct word *)words.RemoveItem((int32)0)) != NULL) {
 		if ((encoding != quoted_printable && encoding != base64) ||
 		!currentWord->needsEncoding) {
 			rfc2047.Append (currentWord->convertedWord);

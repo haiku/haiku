@@ -320,7 +320,7 @@ BSimpleMailAttachment::SetToRFC822(BPositionIO *data, size_t length,
 	BMailComponent::SetToRFC822(data, length, parseNow);
 
 	// this actually happens...
-	if (data->Position() - position > length)
+	if (data->Position() - position > (off_t)length)
 		return B_ERROR;
 
 	length -= (data->Position() - position);
@@ -519,8 +519,8 @@ BAttributedMailAttachment::SetTo(BFile *file, bool deleteFileWhenDone)
 	// Also, we have the make up the boundary out of whole cloth
 	// This is likely to give a completely random string
 	BString boundary;
-	boundary << "BFile--" << (int32(file) ^ time(NULL)) << "-"
-		<< ~((int32)file ^ (int32)&fStatus ^ (int32)&_attributes) << "--";
+	boundary << "BFile--" << ((long)file ^ time(NULL)) << "-"
+		<< ~((long)file ^ (long)&fStatus ^ (long)&_attributes) << "--";
 	fContainer->SetBoundary(boundary.String());
 
 	return fStatus = B_OK;
@@ -558,8 +558,8 @@ BAttributedMailAttachment::SetTo(entry_ref *ref)
 			buffer[i] = '_';
 	}
 	buffer[32] = '\0';
-	boundary << "BFile-" << buffer << "--" << ((int32)_data ^ time(NULL))
-		<< "-" << ~((int32)_data ^ (int32)&buffer ^ (int32)&_attributes)
+	boundary << "BFile-" << buffer << "--" << ((long)_data ^ time(NULL))
+		<< "-" << ~((long)_data ^ (long)&buffer ^ (long)&_attributes)
 		<< "--";
 	fContainer->SetBoundary(boundary.String());
 

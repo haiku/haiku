@@ -2396,7 +2396,7 @@ TMailWindow::Send(bool now)
 
 			char versionString[255];
 			sprintf(versionString,
-				"Mail/Haiku %ld.%ld.%ld",
+				"Mail/Haiku %" B_PRIu32 ".%" B_PRIu32 ".%" B_PRIu32,
 				info.major, info.middle, info.minor);
 			fMail->SetHeaderField("X-Mailer", versionString);
 		}
@@ -2578,7 +2578,7 @@ TMailWindow::SaveAsDraft()
 					if (status == B_OK)
 						break;
 					char appendix[B_FILE_NAME_LENGTH];
-					sprintf(appendix, " %ld", i++);
+					sprintf(appendix, " %" B_PRId32, i++);
 					int32 pos = min_c(sizeof(fileName) - strlen(appendix),
 						originalLength);
 					sprintf(fileName + pos, "%s", appendix);
@@ -2746,8 +2746,8 @@ TMailWindow::TrainMessageAs(const char *CommandWord)
 ErrorExit:
 	beep();
 	sprintf(errorString, "Unable to train the message file \"%s\" as %s.  "
-		"Possibly useful error code: %s (%ld).",
-		filePath.Path(), CommandWord, strerror (errorCode), errorCode);
+		"Possibly useful error code: %s (%" B_PRId32 ").",
+		filePath.Path(), CommandWord, strerror(errorCode), errorCode);
 	BAlert* alert = new BAlert("", errorString,	B_TRANSLATE("OK"));
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
@@ -2921,7 +2921,7 @@ TMailWindow::OpenMessage(const entry_ref *ref, uint32 characterSetForDecoding)
 		//	Put the addresses in the 'Save Address' Menu
 		//
 		BMenuItem *item;
-		while ((item = fSaveAddrMenu->RemoveItem(0L)) != NULL)
+		while ((item = fSaveAddrMenu->RemoveItem((int32)0)) != NULL)
 			delete item;
 
 		// create the list of addresses
@@ -2935,7 +2935,7 @@ TMailWindow::OpenMessage(const entry_ref *ref, uint32 characterSetForDecoding)
 		BMessage *msg;
 
 		for (int32 i = addressList.CountItems(); i-- > 0;) {
-			char *address = (char *)addressList.RemoveItem(0L);
+			char *address = (char *)addressList.RemoveItem((int32)0);
 
 			// insert the new address in alphabetical order
 			int32 index = 0;
