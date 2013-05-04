@@ -89,6 +89,7 @@ StartTeamWindow::_Init()
 		.End();
 
 	fTeamTextControl->SetExplicitMinSize(BSize(200.0, B_SIZE_UNSET));
+	fGuideText->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	fStartButton->SetTarget(this);
 	fCancelButton->SetTarget(this);
