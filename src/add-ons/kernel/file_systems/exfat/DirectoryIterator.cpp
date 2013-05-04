@@ -47,9 +47,13 @@ status_t
 DirectoryIterator::GetNext(char* name, size_t* _nameLength, ino_t* _id,
 	EntryVisitor* visitor)
 {
+	if (fCluster == EXFAT_CLUSTER_END)
+		return B_ENTRY_NOT_FOUND;
 	if (fOffset == -2) {
-		*_nameLength = 3;
-		strlcpy(name, "..", *_nameLength);
+		if (*_nameLength < 3)
+			return B_BUFFER_OVERFLOW;
+		*_nameLength = 2;
+		strlcpy(name, "..", *_nameLength + 1);
 		if (fInode->ID() == 1)
 			*_id = fInode->ID();
 		else
@@ -58,19 +62,22 @@ DirectoryIterator::GetNext(char* name, size_t* _nameLength, ino_t* _id,
 		TRACE("DirectoryIterator::GetNext() found ..\n");
 		return B_OK;
 	} else if (fOffset == -1) {
-		*_nameLength = 2;
-		strlcpy(name, ".", *_nameLength);
+		if (*_nameLength < 2)
+			return B_BUFFER_OVERFLOW;
+		*_nameLength = 1;
+		strlcpy(name, ".", *_nameLength + 1);
 		*_id = fInode->ID();
 		fOffset = 0;
 		TRACE("DirectoryIterator::GetNext() found .\n");
 		return B_OK;
 	}
 
-	uchar unicodeName[EXFAT_FILENAME_MAX_LENGTH];
+	uchar unicodeName[EXFAT_FILENAME_MAX_LENGTH + 1];
 	size_t nameLength = EXFAT_FILENAME_MAX_LENGTH;
 	status_t status = _GetNext(unicodeName, &nameLength, _id, visitor);
 	if (status == B_OK && name != NULL) {
-		unicode_to_utf8(unicodeName, nameLength, (uint8 *)name , _nameLength);
+		status = unicode_to_utf8(unicodeName, nameLength, (uint8 *)name,
+			_nameLength);
 		TRACE("DirectoryIterator::GetNext() %ld %s, %" B_PRIdINO "\n", 
 			fInode->Cluster(), name, *_id);
 	}
@@ -96,7 +103,7 @@ DirectoryIterator::Lookup(const char* name, size_t nameLength, ino_t* _id)
 	Rewind();
 	fOffset = 0;
 
-	uchar currentName[EXFAT_FILENAME_MAX_LENGTH];
+	uchar currentName[EXFAT_FILENAME_MAX_LENGTH + 1];
 	size_t currentLength = EXFAT_FILENAME_MAX_LENGTH;
 	while (_GetNext((uchar*)currentName, &currentLength, _id) == B_OK) {
 		char utfName[EXFAT_FILENAME_MAX_LENGTH];
@@ -122,7 +129,7 @@ DirectoryIterator::LookupEntry(EntryVisitor* visitor)
 	fCluster = fInode->Cluster();
 	fOffset = fInode->Offset();
 
-	uchar unicodeName[EXFAT_FILENAME_MAX_LENGTH];
+	uchar unicodeName[EXFAT_FILENAME_MAX_LENGTH + 1];
 	size_t nameLength = EXFAT_FILENAME_MAX_LENGTH;
 	return _GetNext(unicodeName, &nameLength, NULL, visitor);
 }

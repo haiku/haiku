@@ -218,7 +218,7 @@ LabelVisitor::LabelVisitor(Volume* volume)
 bool
 LabelVisitor::VisitLabel(struct exfat_entry* entry)
 {
-	dprintf("LabelVisitor::VisitLabel()\n");
+	TRACE("LabelVisitor::VisitLabel()\n");
 	char utfName[30];
 	size_t utfLength = 30;
 	unicode_to_utf8((const uchar*)entry->name_label.name,
@@ -418,6 +418,8 @@ Volume::LoadSuperBlock()
 status_t
 Volume::ClusterToBlock(cluster_t cluster, fsblock_t &block)
 {
+	if (cluster < 2)
+		return B_BAD_VALUE;
 	block = ((cluster - 2) << SuperBlock().BlocksPerClusterShift())
 		+ SuperBlock().FirstDataBlock();
 	TRACE("Volume::ClusterToBlock() cluster %lu %u %lu: %llu, %lu\n", cluster, 

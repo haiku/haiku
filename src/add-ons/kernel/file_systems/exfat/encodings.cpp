@@ -106,6 +106,7 @@ _lendian_unicode_to_utf8(
 	int32 dstLimit = *dstLen;
 	int32 srcCount = 0;
 	int32 dstCount = 0;
+	status_t status = B_ERROR;
 
 	for (srcCount = 0; srcCount < srcLimit; srcCount += 2) {
 		uint16  *UNICODE = (uint16 *)&src[srcCount];
@@ -119,19 +120,22 @@ _lendian_unicode_to_utf8(
 		u_lendian_to_utf8(UTF8, UNICODE);
 
 		utf8Len = UTF8 - utf8;
-		if ((dstCount + utf8Len) > dstLimit)
+		if ((dstCount + utf8Len) > dstLimit) {
+			status = B_BUFFER_OVERFLOW;
 			break;
+		}
 
 		for (j = 0; j < utf8Len; j++)
 			dst[dstCount + j] = utf8[j];
 		dstCount += utf8Len;
+		status = B_OK;
 	}
 
 	*srcLen = srcCount;
 	*dstLen = dstCount;
 	dst[dstCount] = '\0';
 	
-	return ((dstCount > 0) ? B_NO_ERROR : B_ERROR);
+	return status;
 }
 
 // utf8 to LENDIAN unicode
@@ -146,6 +150,7 @@ _utf8_to_lendian_unicode(
 	int32 dstLimit = *dstLen - 1;
 	int32 srcCount = 0;
 	int32 dstCount = 0;
+	status_t status = B_ERROR;
 
 	while ((srcCount < srcLimit) && (dstCount < dstLimit)) {
 		uint16	unicode;
@@ -157,20 +162,25 @@ _utf8_to_lendian_unicode(
 			break;
 
 		utf8_to_u_hostendian(UTF8, UNICODE, err_flag);
-		if(err_flag == 1)
+		if (err_flag == 1)
 			return EINVAL;
 
 		unicode = B_HOST_TO_LENDIAN_INT16(unicode);
+		if ((dstCount + 1) > dstLimit) {
+			status = B_BUFFER_OVERFLOW;
+			break;
+		}
 		dst[dstCount++] = unicode & 0xFF;
 		dst[dstCount++] = unicode >> 8;
 
 		srcCount += UTF8 - ((uchar *)(src + srcCount));
+		status = B_OK;	
 	}
 
 	*srcLen = srcCount;
 	*dstLen = dstCount;
 
-	return ((dstCount > 0) ? B_NO_ERROR : B_ERROR);
+	return status;
 }
 
 
