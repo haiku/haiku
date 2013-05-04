@@ -43,7 +43,7 @@ class VideoConsumer : public BMediaEventLooper, public BBufferConsumer {
 
 	/*	BMediaNode */
 	public:
-		virtual	BMediaAddOn* AddOn(long* cookie) const;
+		virtual	BMediaAddOn* AddOn(int32* cookie) const;
 
 	protected:
 		virtual void Start(bigtime_t performanceTime);
@@ -114,7 +114,7 @@ class VideoConsumer : public BMediaEventLooper, public BBufferConsumer {
 
 	private:
 		BStringView*		fStatusLine;
-		uint32				fInternalID;
+		int32				fInternalID;
 		BMediaAddOn*		fAddOn;
 
 		thread_id			fFtpThread;
@@ -129,7 +129,7 @@ class VideoConsumer : public BMediaEventLooper, public BBufferConsumer {
 		BBitmap*			fBitmap[3];
 		bool				fOurBuffers;
 		BBufferGroup*		fBuffers;
-		uint32				fBufferMap[3];
+		BBuffer*			fBufferMap[3];
 
 		BBitmap*			fFtpBitmap;
 		volatile bool		fTimeToFtp;

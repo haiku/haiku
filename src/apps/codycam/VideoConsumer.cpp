@@ -124,7 +124,7 @@ VideoConsumer::~VideoConsumer()
 
 
 BMediaAddOn*
-VideoConsumer::AddOn(long* cookie) const
+VideoConsumer::AddOn(int32* cookie) const
 {
 	FUNCTION("VideoConsumer::AddOn\n");
 	// do the right thing if we're ever used with an add-on
@@ -243,7 +243,8 @@ VideoConsumer::HandleMessage(int32 message, const void* data, size_t size)
 void
 VideoConsumer::BufferReceived(BBuffer* buffer)
 {
-	LOOP("VideoConsumer::Buffer #%ld received, start_time %Ld\n", buffer->ID(), buffer->Header()->start_time);
+	LOOP("VideoConsumer::Buffer #%" B_PRId32 " received, start_time %" B_PRIdBIGTIME
+		"\n", buffer->ID(), buffer->Header()->start_time);
 
 	if (RunState() == B_STOPPED) {
 		buffer->Recycle();
@@ -309,8 +310,8 @@ VideoConsumer::CreateBuffers(const media_format& withFormat)
 			else
 				PROGRESS("VideoConsumer::CreateBuffers - SUCCESSFUL ADD BUFFER TO GROUP\n");
 		} else {
-			ERROR("VideoConsumer::CreateBuffers - ERROR CREATING VIDEO RING BUFFER: %08lx\n",
-				status);
+			ERROR("VideoConsumer::CreateBuffers - ERROR CREATING VIDEO RING "
+				"BUFFER: %08" B_PRIx32 "\n", status);
 			return B_ERROR;
 		}
 	}
@@ -322,8 +323,8 @@ VideoConsumer::CreateBuffers(const media_format& withFormat)
 	if ((status = fBuffers->GetBufferList(3, buffList)) == B_OK)
 		for (int j = 0; j < 3; j++)
 			if (buffList[j] != NULL) {
-				fBufferMap[j] = (uint32)buffList[j];
-				PROGRESS(" j = %d buffer = %08lx\n", j, fBufferMap[j]);
+				fBufferMap[j] = buffList[j];
+				PROGRESS(" j = %d buffer = %p\n", j, fBufferMap[j]);
 			} else {
 				ERROR("VideoConsumer::CreateBuffers ERROR MAPPING RING BUFFER\n");
 				return B_ERROR;
@@ -542,7 +543,7 @@ VideoConsumer::HandleEvent(const media_timed_event* event, bigtime_t lateness,
 				uint32 index = 0;
 				fOurBuffers = true;
 				while (index < 3)
-					if ((uint32)buffer == fBufferMap[index])
+					if (buffer == fBufferMap[index])
 						break;
 					else
 						index++;
@@ -735,7 +736,7 @@ VideoConsumer::FtpSave(char* filename)
 					uint32 time = real_time_clock();
 					char s[80];
 					strcpy(s, B_TRANSLATE("Last Capture: "));
-					strcat(s, ctime((const long*)&time));
+					strcat(s, ctime((const time_t*)&time));
 					s[strlen(s) - 1] = 0;
 					UpdateFtpStatus(s);
 					delete ftp;
