@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	3375521561
+1	belarusian	x-vnd.Haiku-libtracker	4167158175
 common	B_COMMON_DIRECTORY		агульны
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Від іконак
@@ -74,6 +74,7 @@ Arrange by	ContainerWindow		Сартаваць па
 Mount server error	AutoMounterSettings		Памылка сервера мантавання
 Search	FindPanel		Пошук
 Preparing to empty Trash…	StatusWindow		Падрыхтоўка да ачысткі Сметніцы…
+You cannot put the selected item(s) into the trash.	FSUtils		Немагчыма змясціць абраныя элементы ў сметніцу.
 Disks	Model		Дыскі
 Create link	ContainerWindow		Стварыць спасылку
 develop	B_COMMON_DEVELOP_DIRECTORY		распрацоўка

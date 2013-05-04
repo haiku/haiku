@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	3333908373
+1	japanese	x-vnd.Haiku-libtracker	419889716
 common	B_COMMON_DIRECTORY		一般
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		アイコン表示
@@ -124,6 +124,7 @@ Create %s clipping	PoseView		%s クリップを作成
 Set new link target	InfoWindow		リンク先を変更
 If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		システムフォルダーおよびその中身を%ifYouDoActionした場合、%osName が起動しなくなります!\n\n本当に続けますか?\n\nそれでもシステムフォルダーまたはその中身の%toDoActionを実行するなら、Shift キーを押しながら \"%toConfirmAction\" をクリックしてください。
 Save as Query template:	FindPanel		クエリ雛型として保存する：
+preferences	B_PREFERENCES_DIRECTORY		設定
 Cancel	FSUtils		中止
 move	FSUtils	As in 'to move this folder...' (en) Um diesen Ordner zu verschieben...' (de)	移動
 Edit name	ContainerWindow		名前の編集
@@ -441,6 +442,7 @@ contains	FindPanel		含む
 Relation	OpenWithWindow		関連
 Open	FilePanelPriv		開く
 Mount	DeskWindow		マウント
+Recent queries	FindPanel		最近のクエリー
 Mount	ContainerWindow		マウント
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used 使用中 -- %free 使用可能)
 Cancel	FSClipBoard		中止

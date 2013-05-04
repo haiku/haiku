@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtextencoding	3062073902
+1	belarusian	x-vnd.Haiku-libtextencoding	1525027211
 ISO Greek	textencodings		ISO Грэцкая
 ISO South European	textencodings		ISO Паўднёва-Еўрапейская
 Chinese Big5	textencodings		Кітайская Big5
@@ -7,6 +7,7 @@ ISO Arabic	textencodings		ISO Арабская
 ISO Latin 9	textencodings		ISO Latin 9
 Japanese Shift JIS	textencodings		Японская Shift JIS
 DOS Cyrillic	textencodings		Кірыліца DOS
+Windows Central European (CP 1250)	textencodings		Windows Цэнтральная Эўропа (CP 1250)
 Windows Cyrillic (CP 1251)	textencodings		Кірыліца Windows (CP 1251)
 Japanese EUC	textencodings		Японская EUC
 Unicode	textencodings		Юнікод

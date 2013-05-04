@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-BluetoothPrefs	1628593228
+1	belarusian	x-vnd.Haiku-BluetoothPrefs	3212620536
 About Bluetooth…	Window		Пра праграму Bluetooth…
 Handheld	Settings view		Наладоннік
 Default inquiry time:	Settings view		Час стандартнага запыту:
@@ -55,6 +55,7 @@ Always ask	Settings view		Заўсёды пытаць
 Retrieving name of %1	Inquiry panel		Атрымліваем імя %1
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Праверце, ці актыўныя Bluetooth магчымасці вашай прылады. Націсніце 'Запыт' каб пачаць сканіраванне. Час, патрэбны на атрыманне імёнаў прылад, невядомы, але не павінны перавышаць 3 секунды для кожнай прылады. Пасля вы зможаце дадаць іх да вашага асноўнага спісу, дзе можна задаць іх сапражэнні.
 Authenticate	Extended local device view		Аўтэнтыфікаваць
+Pick device...	Settings view		Абраць прыладу...
 Retrieving names...	Inquiry panel		Атрыманне іменаў...
 Help	Window		Даведка
 Add…	Remote devices		Дадаць…

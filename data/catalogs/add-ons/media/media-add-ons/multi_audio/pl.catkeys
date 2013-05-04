@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-hmulti_audio.media_addon	817927367
+1	polish	x-vnd.Haiku-hmulti_audio.media_addon	2905288525
 Master	MultiAudio		Master
 SPDIF	MultiAudio		SPDIF
 Gain	MultiAudio		Wzmocnienie
@@ -7,6 +7,7 @@ Extended Setup	MultiAudio		Zaawansowane Ustawienia
 CD	MultiAudio		CD
 Tone control	MultiAudio		Kontrola tonów
 Phone	MultiAudio		Telefon
+Aux	MultiAudio		Aux
 Headphones	MultiAudio		Słuchawki
 Beep	MultiAudio		Brzęczyk
 Input	MultiAudio		Wejście
