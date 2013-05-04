@@ -14,6 +14,7 @@ class BListView;
 class BFile;
 class BMessage;
 class SettingsManager;
+class StartTeamWindow;
 class TeamsListView;
 
 class TeamsWindow : public BWindow {
@@ -36,6 +37,7 @@ private:
 private:
 			team_id				fCurrentTeam;
 			TeamsListView*		fTeamsListView;
+			StartTeamWindow*	fStartTeamWindow;
 			BButton*			fAttachTeamButton;
 			BButton*			fCreateTeamButton;
 			SettingsManager*	fSettingsManager;

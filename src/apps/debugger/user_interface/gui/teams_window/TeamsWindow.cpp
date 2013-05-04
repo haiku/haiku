@@ -22,12 +22,12 @@
 
 #include "MessageCodes.h"
 #include "SettingsManager.h"
+#include "StartTeamWindow.h"
 #include "TeamsWindow.h"
 #include "TeamsListView.h"
 
 
 enum {
-	MSG_CREATE_NEW_TEAM = 'crnt',
 	MSG_TEAM_SELECTION_CHANGED = 'tesc'
 };
 
@@ -72,9 +72,13 @@ void
 TeamsWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case MSG_CREATE_NEW_TEAM:
+		case MSG_START_NEW_TEAM:
 		{
-			// TODO: implement
+			fStartTeamWindow = StartTeamWindow::Create();
+			if (fStartTeamWindow == NULL)
+				break;
+
+			fStartTeamWindow->Show();
 			break;
 		}
 
@@ -141,9 +145,10 @@ TeamsWindow::_Init()
 		.Add(fTeamsListView = new TeamsListView("TeamsList", fCurrentTeam))
 		.SetInsets(1.0f, 1.0f, 1.0f, 1.0f)
 		.AddGroup(B_HORIZONTAL, 4.0f)
-			.Add(fAttachTeamButton = new BButton("Attach"))
-			.Add(fCreateTeamButton = new BButton("Create new team"
-					B_UTF8_ELLIPSIS))
+			.Add(fAttachTeamButton = new BButton("Attach", new BMessage(
+						MSG_DEBUG_THIS_TEAM)))
+			.Add(fCreateTeamButton = new BButton("Start new team"
+					B_UTF8_ELLIPSIS, new BMessage(MSG_START_NEW_TEAM)))
 			.End()
 		.End();
 
@@ -151,10 +156,6 @@ TeamsWindow::_Init()
 	fTeamsListView->SetSelectionMessage(new BMessage(
 			MSG_TEAM_SELECTION_CHANGED));
 
-	fAttachTeamButton->SetMessage(new BMessage(MSG_DEBUG_THIS_TEAM));
-	fAttachTeamButton->SetEnabled(false);
-	fCreateTeamButton->SetMessage(new BMessage(MSG_CREATE_NEW_TEAM));
-	// TODO: re-enable once action is implemented
 	fAttachTeamButton->SetEnabled(false);
 }
 
