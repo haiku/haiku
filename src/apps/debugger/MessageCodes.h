@@ -49,6 +49,7 @@ enum {
 	MSG_TEAM_DEBUGGER_QUIT						= 'dbqt',
 	MSG_SHOW_TEAMS_WINDOW						= 'stsw',
 	MSG_TEAMS_WINDOW_CLOSED						= 'tswc',
+	MSG_START_NEW_TEAM							= 'sttt',
 	MSG_DEBUG_THIS_TEAM							= 'dbtt',
 	MSG_SHOW_INSPECTOR_WINDOW					= 'sirw',
 	MSG_INSPECTOR_WINDOW_CLOSED					= 'irwc',

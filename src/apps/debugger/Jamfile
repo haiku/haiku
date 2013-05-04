@@ -227,6 +227,7 @@ Application Debugger :
 	MemoryView.cpp
 
 	# user_interface/gui/teams_window
+	StartTeamWindow.cpp
 	TeamsWindow.cpp
 	TeamsListView.cpp
 
