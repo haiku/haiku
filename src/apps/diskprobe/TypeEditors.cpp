@@ -226,7 +226,7 @@ StringEditor::_UpdateText()
 
 	size_t viewSize = fEditor.ViewSize();
 	// that may need some more memory...
-	if (viewSize < fEditor.FileSize())
+	if ((off_t)viewSize < fEditor.FileSize())
 		fEditor.SetViewSize(fEditor.FileSize());
 
 	const char *buffer;
@@ -486,7 +486,7 @@ NumberEditor::_UpdateText()
 bool
 NumberEditor::TypeMatches()
 {
-	return fEditor.FileSize() >= _Size();
+	return fEditor.FileSize() >= (off_t)_Size();
 		// we only look at as many bytes we need to
 }
 
@@ -949,7 +949,7 @@ ImageView::_UpdateImage()
 
 	size_t viewSize = fEditor.ViewSize();
 	// that may need some more memory...
-	if (viewSize < fEditor.FileSize())
+	if ((off_t)viewSize < fEditor.FileSize())
 		fEditor.SetViewSize(fEditor.FileSize());
 
 	const char *data;
@@ -1169,7 +1169,7 @@ MessageView::_TypeToString(type_code type)
 	for (int32 i = 0; i < 4; i++) {
 		text[i] = type >> (24 - 8 * i);
 		if (text[i] < ' ' || text[i] == 0x7f) {
-			snprintf(text, sizeof(text), "0x%04lx", type);
+			snprintf(text, sizeof(text), "0x%04" B_PRIx32, type);
 			break;
 		} else if (i == 3)
 			text[4] = '\0';
@@ -1226,16 +1226,16 @@ MessageView::SetTo(BMessage& message)
 
 			switch (type) {
 				case B_INT64_TYPE:
-					snprintf(text, sizeof(text), "%Ld", *(int64*)data);
+					snprintf(text, sizeof(text), "%" B_PRId64, *(int64*)data);
 					break;
 				case B_UINT64_TYPE:
-					snprintf(text, sizeof(text), "%Lu", *(uint64*)data);
+					snprintf(text, sizeof(text), "%" B_PRIu64, *(uint64*)data);
 					break;
 				case B_INT32_TYPE:
-					snprintf(text, sizeof(text), "%ld", *(int32*)data);
+					snprintf(text, sizeof(text), "%" B_PRId32, *(int32*)data);
 					break;
 				case B_UINT32_TYPE:
-					snprintf(text, sizeof(text), "%lu", *(uint32*)data);
+					snprintf(text, sizeof(text), "%" B_PRIu32, *(uint32*)data);
 					break;
 				case B_BOOL_TYPE:
 					if (*(uint8*)data)
@@ -1255,7 +1255,7 @@ MessageView::SetTo(BMessage& message)
 				fTextView->Insert("\t\t");
 				if (count > 1) {
 					char index[16];
-					snprintf(index, sizeof(index), "%ld.\t", j);
+					snprintf(index, sizeof(index), "%" B_PRId32 ".\t", j);
 					fTextView->Insert(index);
 				}
 				fTextView->Insert(text);
@@ -1273,7 +1273,7 @@ MessageView::_UpdateMessage()
 
 	size_t viewSize = fEditor.ViewSize();
 	// that may need some more memory...
-	if (viewSize < fEditor.FileSize())
+	if ((off_t)viewSize < fEditor.FileSize())
 		fEditor.SetViewSize(fEditor.FileSize());
 
 	const char *buffer;
