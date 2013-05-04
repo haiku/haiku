@@ -73,7 +73,7 @@ PackageInfo::~PackageInfo()
 {
 	pkg_profile *iter = 0;
 	while (1) {
-		iter = static_cast<pkg_profile *>(fProfiles.RemoveItem((long int)0));
+		iter = static_cast<pkg_profile *>(fProfiles.RemoveItem((int32)0));
 		if (iter == NULL)
 			break;
 
@@ -82,7 +82,7 @@ PackageInfo::~PackageInfo()
 
 	PackageItem *file = 0;
 	while (true) {
-		file = static_cast<PackageItem *>(fFiles.RemoveItem((long int)0));
+		file = static_cast<PackageItem *>(fFiles.RemoveItem((int32)0));
 		if (file == NULL)
 			break;
 
@@ -90,7 +90,7 @@ PackageInfo::~PackageInfo()
 	}
 
 	while (true) {
-		file = static_cast<PackageScript *>(fScripts.RemoveItem((long int)0));
+		file = static_cast<PackageScript *>(fScripts.RemoveItem((int32)0));
 		if (file == NULL)
 			break;
 
