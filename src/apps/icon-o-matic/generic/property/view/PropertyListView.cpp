@@ -399,7 +399,7 @@ PropertyListView::SetTo(PropertyObject* object)
 				// unkown to the PropertyEditorFactory and therefor
 				// there is no editor view at this item
 				fprintf(stderr, "PropertyListView::_SetTo() - "
-								"property mismatch at %ld\n", i);
+								"property mismatch at %" B_PRId32 "\n", i);
 				error = true;
 				break;
 			}
@@ -425,7 +425,7 @@ PropertyListView::SetTo(PropertyObject* object)
 		int32 focused = -1;
 		for (int32 i = 0; PropertyItemView* item = _ItemAt(i); i++) {
 			if (item->IsSelected())
-				selection.AddItem((void*)i);
+				selection.AddItem((void*)(long)i);
 			if (item->IsFocused())
 				focused = i;
 		}
@@ -449,7 +449,7 @@ PropertyListView::SetTo(PropertyObject* object)
 			// restore scroll pos, selection and focus
 			SetScrollOffset(scrollOffset);
 			for (int32 i = 0; PropertyItemView* item = _ItemAt(i); i++) {
-				if (selection.HasItem((void*)i))
+				if (selection.HasItem((void*)(long)i))
 					item->SetSelected(true);
 				if (i == focused)
 					item->MakeFocus(true);

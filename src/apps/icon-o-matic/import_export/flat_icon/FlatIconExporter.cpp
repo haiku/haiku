@@ -51,12 +51,12 @@ FlatIconExporter::~FlatIconExporter()
 {
 #if PRINT_STATISTICS
 	printf("Statistics\n"
-		   "--style section size: %ld\n"
-		   "           gradients: %ld\n"
-		   " gradient transforms: %ld\n"
-		   "---path section size: %ld\n"
-		   "--shape section size: %ld\n"
-		   "---total/different points: %ld/%lu\n",
+		   "--style section size: %" B_PRId32 "\n"
+		   "           gradients: %" B_PRId32 "\n"
+		   " gradient transforms: %" B_PRId32 "\n"
+		   "---path section size: %" B_PRId32 "\n"
+		   "--shape section size: %" B_PRId32 "\n"
+		   "---total/different points: %" B_PRId32 "/%" B_PRIdSSIZE "\n",
 		   fStyleSectionSize,
 		   fGradientSize,
 		   fGradientTransformSize,

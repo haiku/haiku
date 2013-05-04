@@ -147,7 +147,7 @@ FreezeTransformationCommand::_ApplyTransformation(Shape* shape,
 			path->ApplyTransform(transform);
 		} else {
 			printf("Not transfering transformation of \"%s\" onto "
-				   "path \"%s\", because %ld other shapes "
+				   "path \"%s\", because %" B_PRId32 " other shapes "
 				   "have it assigned.\n", shape->Name(), path->Name(),
 				   shapes - 1);
 		}

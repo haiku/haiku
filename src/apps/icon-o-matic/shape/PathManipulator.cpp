@@ -143,21 +143,21 @@ public:
 						break;
 					}
 				}
-				BList::AddItem((void*)value, index);
+				BList::AddItem((void*)(long)value, index);
 			}
 		}
 
 	inline bool Remove(int32 value)
-		{ return BList::RemoveItem((void*)value); }
+		{ return BList::RemoveItem((void*)(long)value); }
 
 	inline bool Contains(int32 value) const
-		{ return BList::HasItem((void*)value); }
+		{ return BList::HasItem((void*)(long)value); }
 
 	inline bool IsEmpty() const
 		{ return BList::IsEmpty(); }
 
 	inline int32 IndexAt(int32 index) const
-		{ return (int32)BList::ItemAt(index); }
+		{ return (int32)(long)BList::ItemAt(index); }
 
 	inline void MakeEmpty()
 		{ BList::MakeEmpty(); }
