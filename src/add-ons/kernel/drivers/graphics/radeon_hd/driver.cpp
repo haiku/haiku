@@ -436,7 +436,7 @@ init_driver(void)
 		gDeviceInfo[found]->init_status = B_NO_INIT;
 		gDeviceInfo[found]->id = found;
 		gDeviceInfo[found]->pci = info;
-		gDeviceInfo[found]->registers = (uint8*)info->u.h0.base_registers[0];
+		gDeviceInfo[found]->registers = info->u.h0.base_registers[0];
 		gDeviceInfo[found]->pciID = kSupportedDevices[type].pciID;
 		gDeviceInfo[found]->deviceName = kSupportedDevices[type].deviceName;
 		gDeviceInfo[found]->chipsetID = kSupportedDevices[type].chipsetID;

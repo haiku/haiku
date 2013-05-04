@@ -25,7 +25,7 @@ struct intel_info {
 	addr_t			aperture_base;
 	aperture_id		aperture;
 
-	uint8*			registers;
+	addr_t			registers;
 
 	area_id			registers_area;
 	struct intel_shared_info* shared_info;

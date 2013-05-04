@@ -231,7 +231,7 @@ device_ioctl(void* data, uint32 op, void* buffer, size_t bufferLength)
 
 			status_t status = intel_allocate_memory(*info, allocMemory.size,
 				allocMemory.alignment, allocMemory.flags,
-				(addr_t* )&allocMemory.buffer_base);
+				&allocMemory.buffer_base);
 			if (status == B_OK) {
 				// copy result
 #ifdef __HAIKU__
