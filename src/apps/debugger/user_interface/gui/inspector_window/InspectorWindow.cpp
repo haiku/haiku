@@ -125,7 +125,7 @@ InspectorWindow::_Init()
 	textMenu->AddItem(item);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.SetInsets(4.0f, 4.0f, 4.0f, 4.0f)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.AddGroup(B_HORIZONTAL, 4.0f)
 			.Add(fAddressInput = new BTextControl("addrInput",
 			"Target Address:", "",
