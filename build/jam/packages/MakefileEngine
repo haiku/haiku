@@ -1,0 +1,12 @@
+local makefileEnginePackage = makefile_engine.hpkg ;
+HaikuPackage $(makefileEnginePackage) ;
+
+# skeleton makefile and makefile-engine
+local makefileEngineFiles =
+	<makefile-engine>makefile
+	<makefile-engine>makefile-engine
+;
+SEARCH on $(makefileEngineFiles) = [ FDirName $(HAIKU_TOP) data develop ] ;
+AddFilesToPackage develop etc : $(makefileEngineFiles) ;
+
+BuildHaikuPackage $(makefileEnginePackage) : makefile_engine ;
