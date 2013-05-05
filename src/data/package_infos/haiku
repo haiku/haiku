@@ -27,8 +27,6 @@ provides {
 	cmd:basename
 	cmd:bash
 	cmd:bc
-	cmd:bunzip2
-	cmd:bzip2
 	cmd:cat
 	cmd:chgrp
 	cmd:chmod
@@ -42,7 +40,6 @@ provides {
 	cmd:compress
 	cmd:cp = 8.4
 	cmd:csplit
-	cmd:ctags
 	cmd:cut
 	cmd:date
 	cmd:dc
@@ -53,13 +50,11 @@ provides {
 	cmd:dirname
 	cmd:du
 	cmd:echo
-	cmd:egrep
 	cmd:env
 	cmd:expand
 	cmd:expr
 	cmd:factor
 	cmd:false
-	cmd:fgrep
 	cmd:find = 4.2.33
 	cmd:fmt
 	cmd:fold
@@ -70,7 +65,6 @@ provides {
 	cmd:gawk
 	cmd:gdb
 	cmd:getlimits
-	cmd:grep
 	cmd:groups
 	cmd:gunzip
 	cmd:gzexe
@@ -160,7 +154,6 @@ provides {
 	cmd:unexpand
 	cmd:uniq
 	cmd:unlink
-	cmd:unrar
 	cmd:unshar
 	cmd:unzip = 5.50
 	cmd:unzipsfx
