@@ -364,13 +364,23 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 
 	char data[B_MEDIA_MESSAGE_SIZE]; // about 16 KByte stack used
 	int32 message;
-	ssize_t size = read_port_etc(ControlPort(), &message, data, sizeof(data),
-		B_ABSOLUTE_TIMEOUT, waitUntil);
-	if (size < 0) {
+	ssize_t size;
+	while (true) {
+		size = read_port_etc(ControlPort(), &message, data,
+			sizeof(data), B_ABSOLUTE_TIMEOUT, waitUntil);
+
+		if (size >= 0)
+			break;
+
 		status_t error = (status_t)size;
-		if (error != B_TIMED_OUT && error != B_BAD_PORT_ID)
+		if (error == B_INTERRUPTED)
+			continue;
+
+		if (error != B_TIMED_OUT && error != B_BAD_PORT_ID) {
 			ERROR("BMediaNode::WaitForMessage: read_port_etc error: %s\n",
 				strerror(error));
+		}
+
 		return error;
 	}
 
