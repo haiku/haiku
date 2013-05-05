@@ -253,10 +253,10 @@ FUNCTION(arch_cpu_user_strlcpy):
 	not		%rcx
 		# %rcx was 0 and is now max
 	xor		%al, %al
-	movl	%rsi, %rdi
+	movq	%rsi, %rdi
 	repnz
 	scasb
-	movl	%rdi, %rsi
+	movq	%rdi, %rsi
 
 .L_user_strlcpy_source_done:
 	// Restore the old fault handler
