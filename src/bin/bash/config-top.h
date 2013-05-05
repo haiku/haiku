@@ -54,7 +54,9 @@
 /* The default value of the PATH variable. */
 #ifndef DEFAULT_PATH_VALUE
 #define DEFAULT_PATH_VALUE \
-  ".:/boot/home/config/bin:/bin:/boot/apps:/boot/preferences" \
+  ".:/boot/home/config/non-packaged/bin:/boot/home/config/bin" \
+  ":/boot/common/non-packaged/bin:/boot/common/bin" \
+  ":/bin:/boot/apps:/boot/preferences" \
   ":/boot/system/apps" \
   ":/boot/system/preferences" 
 #endif
@@ -63,7 +65,10 @@
    the Posix.2 confstr () function, or CS_PATH define are not present. */
 #ifndef STANDARD_UTILS_PATH
 #define STANDARD_UTILS_PATH \
-  "/bin:/usr/bin:/sbin:/usr/sbin:/etc:/usr/etc"
+  ":/boot/common/non-packaged/bin:/boot/common/bin" \
+  ":/bin:/boot/apps:/boot/preferences" \
+  ":/boot/system/apps" \
+  ":/boot/system/preferences" 
 #endif
 
 /* Default primary and secondary prompt strings. */
