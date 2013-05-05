@@ -146,6 +146,9 @@ AddSymlinkToPackage lib : $(HAIKU_ZLIB_CURRENT_LIB:BS)
 AddSymlinkToPackage lib : $(HAIKU_ZLIB_CURRENT_LINK)
 	: libz.so : : true ;
 
+# TODO: Remove when the packages have been rebuilt!
+AddSymlinkToPackage lib : libbe.so : liblocale.so ;
+
 # servers
 AddFilesToPackage servers : $(SYSTEM_SERVERS) ;
 
