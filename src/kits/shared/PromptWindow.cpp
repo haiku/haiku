@@ -30,7 +30,7 @@ PromptWindow::PromptWindow(const char* title, const char* label,
 	BButton* acceptButton = new BButton("Accept", new
 		BMessage(kAcceptInput));
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.SetInsets(4.0f, 4.0f, 4.0f, 4.0f)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(fInfoView)
 		.Add(fTextControl)
 		.AddGroup(B_HORIZONTAL)

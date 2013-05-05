@@ -149,7 +149,8 @@ TeamsWindow::_Init()
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.Add(fTeamsListView = new TeamsListView("TeamsList", fCurrentTeam))
 		.SetInsets(1.0f, 1.0f, 1.0f, 1.0f)
-		.AddGroup(B_HORIZONTAL, 4.0f)
+		.AddGroup(B_HORIZONTAL)
+			.SetInsets(B_USE_DEFAULT_SPACING)
 			.Add(fAttachTeamButton = new BButton("Attach", new BMessage(
 						MSG_DEBUG_THIS_TEAM)))
 			.Add(fCreateTeamButton = new BButton("Start new team"
