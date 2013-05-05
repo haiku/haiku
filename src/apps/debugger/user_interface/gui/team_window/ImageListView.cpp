@@ -292,7 +292,7 @@ ImageListView::_Init()
 	fImagesTable->AddColumn(new Int32TableColumn(0, "ID", 40, 20, 1000,
 		B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT));
 	fImagesTable->AddColumn(new StringTableColumn(1, "Name", 80, 40, 1000,
-		B_TRUNCATE_END, B_ALIGN_LEFT));
+		B_TRUNCATE_BEGINNING, B_ALIGN_LEFT));
 
 	fImagesTable->AddTableListener(this);
 

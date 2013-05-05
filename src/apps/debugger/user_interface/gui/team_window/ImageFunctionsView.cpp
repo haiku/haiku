@@ -444,7 +444,7 @@ ImageFunctionsView::_Init()
 
 	// columns
 	fFunctionsTable->AddColumn(new StringTableColumn(0, "File/Function", 300,
-		100, 1000, B_TRUNCATE_END, B_ALIGN_LEFT));
+		100, 1000, B_TRUNCATE_BEGINNING, B_ALIGN_LEFT));
 
 	fFunctionsTableModel = new FunctionsTableModel();
 	fFunctionsTable->SetTreeTableModel(fFunctionsTableModel);
