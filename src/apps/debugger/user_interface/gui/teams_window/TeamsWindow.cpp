@@ -18,6 +18,7 @@
 #include <LayoutBuilder.h>
 #include <ListView.h>
 #include <Path.h>
+#include <Screen.h>
 #include <ScrollView.h>
 
 #include "MessageCodes.h"
@@ -67,6 +68,23 @@ TeamsWindow::Create(SettingsManager* settingsManager)
 	}
 
 	return self;
+}
+
+
+void
+TeamsWindow::Zoom(BPoint, float, float)
+{
+	BSize preferredSize = fTeamsListView->PreferredSize();
+	ResizeBy(preferredSize.Width() - Bounds().Width(),
+		0.0);
+
+	// if the new size would extend us past the screen border,
+	// move sufficiently to the left to bring us back within the bounds
+	// + a bit of extra margin so we're not flush against the edge.
+	BScreen screen;
+	float offset = screen.Frame().right - Frame().right;
+	if (offset < 0)
+		MoveBy(offset - 5.0, 0.0);
 }
 
 
