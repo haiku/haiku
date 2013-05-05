@@ -358,7 +358,7 @@ BMenuItem::Frame() const
 
 
 void
-BMenuItem::GetContentSize(float *width, float *height)
+BMenuItem::GetContentSize(float* width, float* height)
 {
 	// TODO: Get rid of this. BMenu should handle this
 	// automatically. Maybe it's not even needed, since our
@@ -376,7 +376,7 @@ BMenuItem::GetContentSize(float *width, float *height)
 
 
 void
-BMenuItem::TruncateLabel(float maxWidth, char *newLabel)
+BMenuItem::TruncateLabel(float maxWidth, char* newLabel)
 {
 	BFont font;
 	fSuper->GetFont(&font);
@@ -406,16 +406,17 @@ BMenuItem::DrawContent()
 
 	float frameWidth = fBounds.Width();
 	if (menuPrivate.State() == MENU_STATE_CLOSED) {
-		float rightMargin, leftMargin;
+		float leftMargin;
+		float rightMargin;
 		menuPrivate.GetItemMargins(&leftMargin, NULL, &rightMargin, NULL);
-		frameWidth = fSuper->Frame().Width() - (rightMargin + leftMargin);
+		frameWidth = fSuper->Frame().Width() - rightMargin + leftMargin;
 	}
 
-	// truncate if needed
 	if (frameWidth >= labelWidth)
 		fSuper->DrawString(fLabel);
 	else {
-		char *truncatedLabel = new char[strlen(fLabel) + 4];
+		// truncate the label to fit
+		char* truncatedLabel = new char[strlen(fLabel) + 4];
 		TruncateLabel(frameWidth, truncatedLabel);
 		fSuper->DrawString(truncatedLabel);
 		delete[] truncatedLabel;
