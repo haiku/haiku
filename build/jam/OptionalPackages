@@ -1020,7 +1020,6 @@ if [ IsOptionalHaikuImagePackageAdded ICU ] {
 			InstallOptionalHaikuImagePackage
 				$(baseURL)/$(HAIKU_ICU_GCC_4_PACKAGE)
 				: system lib ;
-			}
 		}
 	} else if $(TARGET_ARCH) = arm {
 		InstallOptionalHaikuImagePackage
@@ -1033,6 +1032,7 @@ if [ IsOptionalHaikuImagePackageAdded ICU ] {
 	} else {
 		Echo "No optional package ICU available for $(TARGET_ARCH)" ;
 	}
+}
 
 
 # ICU-devel
