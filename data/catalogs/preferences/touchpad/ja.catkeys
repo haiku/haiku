@@ -1,20 +1,20 @@
 1	japanese	x-vnd.Haiku-Touchpad	607725922
-Acceleration	TouchpadPrefView		加速度
-Cancel	TouchpadPrefView		中止
-Defaults	TouchpadPrefView		デフォルト
-Fast	TouchpadPrefView		速い
-High	TouchpadPrefView		高い
-Horizontal	TouchpadPrefView		水平方向
-Horizontal scrolling	TouchpadPrefView		水平スクロール
-OK	TouchpadPrefView		OK
-Off	TouchpadPrefView		無効
-Please confirm	TouchpadPrefView		確認してください
-Revert	TouchpadPrefView		元に戻す
 Scrolling	TouchpadPrefView		スクロール
-Sensitivity	TouchpadPrefView		感度
-Slow	TouchpadPrefView		遅い
-Tapping	TouchpadPrefView		タップ
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		新しいスクロール範囲はとても広いので、通常のマウス操作を妨害するかもしれません。本当に変更してよいですか?
 Touchpad	System name		タッチパッド
+Revert	TouchpadPrefView		元に戻す
+Tapping	TouchpadPrefView		タップ
+Please confirm	TouchpadPrefView		確認してください
 Two finger scrolling	TouchpadPrefView		２本指スクロール
+Defaults	TouchpadPrefView		デフォルト
+Slow	TouchpadPrefView		遅い
 Vertical	TouchpadPrefView		垂直方向
+High	TouchpadPrefView		高い
+Horizontal scrolling	TouchpadPrefView		水平スクロール
+Fast	TouchpadPrefView		速い
+OK	TouchpadPrefView		OK
+Acceleration	TouchpadPrefView		加速度
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		新しいスクロール範囲はとても広いので、通常のマウス操作を妨害するかもしれません。本当に変更してよいですか?
+Horizontal	TouchpadPrefView		水平方向
+Off	TouchpadPrefView		無効
+Sensitivity	TouchpadPrefView		感度
+Cancel	TouchpadPrefView		中止

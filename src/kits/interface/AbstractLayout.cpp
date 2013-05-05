@@ -30,6 +30,10 @@ struct BAbstractLayout::Proxy {
 	{
 	}
 
+	virtual ~Proxy()
+	{
+	}
+
 	virtual	BSize		MinSize() const = 0;
 	virtual void		SetMinSize(const BSize&) = 0;
 
@@ -420,6 +424,13 @@ BAbstractLayout::Archive(BMessage* into, bool deep) const
 
 
 status_t
+BAbstractLayout::AllArchived(BMessage* archive) const
+{
+	return BLayout::AllArchived(archive);
+}
+
+
+status_t
 BAbstractLayout::AllUnarchived(const BMessage* from)
 {
 	status_t err = fExplicitData->RestoreDataFromArchive(from);
@@ -427,6 +438,43 @@ BAbstractLayout::AllUnarchived(const BMessage* from)
 		return err;
 		
 	return BLayout::AllUnarchived(from);
+}
+
+
+status_t
+BAbstractLayout::ItemArchived(BMessage* into, BLayoutItem* item,
+	int32 index) const
+{
+	return BLayout::ItemArchived(into, item, index);
+}
+
+
+status_t
+BAbstractLayout::ItemUnarchived(const BMessage* from, BLayoutItem* item,
+	int32 index)
+{
+	return BLayout::ItemUnarchived(from, item, index);
+}
+
+
+bool
+BAbstractLayout::ItemAdded(BLayoutItem* item, int32 atIndex)
+{
+	return BLayout::ItemAdded(item, atIndex);
+}
+
+
+void
+BAbstractLayout::ItemRemoved(BLayoutItem* item, int32 fromIndex)
+{
+	BLayout::ItemRemoved(item, fromIndex);
+}
+
+
+void
+BAbstractLayout::LayoutInvalidated(bool children)
+{
+	BLayout::LayoutInvalidated(children);
 }
 
 
@@ -444,6 +492,20 @@ BAbstractLayout::OwnerChanged(BView* was)
 
 
 void
+BAbstractLayout::AttachedToLayout()
+{
+	BLayout::AttachedToLayout();
+}
+
+
+void
+BAbstractLayout::DetachedFromLayout(BLayout* layout)
+{
+	BLayout::DetachedFromLayout(layout);
+}
+
+
+void
 BAbstractLayout::AncestorVisibilityChanged(bool shown)
 {
 	if (AncestorsVisible() == shown)
@@ -457,4 +519,26 @@ BAbstractLayout::AncestorVisibilityChanged(bool shown)
 	}
 	BLayout::AncestorVisibilityChanged(shown);
 }
+
+
+// Binary compatibility stuff
+
+
+status_t
+BAbstractLayout::Perform(perform_code code, void* _data)
+{
+	return BLayout::Perform(code, _data);
+}
+
+
+void BAbstractLayout::_ReservedAbstractLayout1() {}
+void BAbstractLayout::_ReservedAbstractLayout2() {}
+void BAbstractLayout::_ReservedAbstractLayout3() {}
+void BAbstractLayout::_ReservedAbstractLayout4() {}
+void BAbstractLayout::_ReservedAbstractLayout5() {}
+void BAbstractLayout::_ReservedAbstractLayout6() {}
+void BAbstractLayout::_ReservedAbstractLayout7() {}
+void BAbstractLayout::_ReservedAbstractLayout8() {}
+void BAbstractLayout::_ReservedAbstractLayout9() {}
+void BAbstractLayout::_ReservedAbstractLayout10() {}
 

@@ -11,10 +11,12 @@
 #include <string.h>
 #include <errno.h>
 
+#include <errno_private.h>
+
 
 #define RETURN_AND_SET_ERRNO(err) \
 	if (err < 0) { \
-		errno = err; \
+		__set_errno(err); \
 		return -1; \
 	} \
 	return err;
@@ -23,14 +25,14 @@
 extern thread_id __main_thread_id;
 
 
-pid_t 
+pid_t
 getpgrp(void)
 {
 	return getpgid(__main_thread_id);
 }
 
 
-pid_t 
+pid_t
 getpid(void)
 {
 	// this one returns the ID of the main thread
@@ -38,7 +40,7 @@ getpid(void)
 }
 
 
-pid_t 
+pid_t
 getppid(void)
 {
 	return _kern_process_info(0, PARENT_ID);
@@ -64,7 +66,7 @@ getpgid(pid_t process)
 }
 
 
-int 
+int
 setpgid(pid_t process, pid_t group)
 {
 	pid_t result = _kern_setpgid(process, group);
@@ -85,7 +87,7 @@ setpgrp(void)
 }
 
 
-pid_t 
+pid_t
 setsid(void)
 {
 	status_t status = _kern_setsid();

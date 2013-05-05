@@ -884,7 +884,7 @@ private const el_action_t el_map_vi_command[] = {
 /* map_init():
  *	Initialize and allocate the maps
  */
-protected int
+int
 map_init(EditLine *el)
 {
 
@@ -934,7 +934,7 @@ map_init(EditLine *el)
 /* map_end():
  *	Free the space taken by the editor maps
  */
-protected void
+void
 map_end(EditLine *el)
 {
 
@@ -1012,7 +1012,7 @@ map_init_meta(EditLine *el)
 /* map_init_vi():
  *	Initialize the vi bindings
  */
-protected void
+void
 map_init_vi(EditLine *el)
 {
 	int i;
@@ -1042,7 +1042,7 @@ map_init_vi(EditLine *el)
 /* map_init_emacs():
  *	Initialize the emacs bindings
  */
-protected void
+void
 map_init_emacs(EditLine *el)
 {
 	int i;
@@ -1076,7 +1076,7 @@ map_init_emacs(EditLine *el)
 /* map_set_editor():
  *	Set the editor
  */
-protected int
+int
 map_set_editor(EditLine *el, char *editor)
 {
 
@@ -1095,7 +1095,7 @@ map_set_editor(EditLine *el, char *editor)
 /* map_get_editor():
  *	Retrieve the editor
  */
-protected int
+int
 map_get_editor(EditLine *el, const char **editor)
 {
 
@@ -1231,7 +1231,7 @@ map_print_all_keys(EditLine *el)
 /* map_bind():
  *	Add/remove/change bindings
  */
-protected int
+int
 map_bind(EditLine *el, int argc, const char **argv)
 {
 	el_action_t *map;
@@ -1381,7 +1381,7 @@ map_bind(EditLine *el, int argc, const char **argv)
 /* map_addfunc():
  *	add a user defined function
  */
-protected int
+int
 map_addfunc(EditLine *el, const char *name, const char *help, el_func_t func)
 {
 	void *p;

@@ -54,12 +54,12 @@ All rights reserved.
 #include "Utilities.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "DirMenu"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "DirMenu"
 
 
-BDirMenu::BDirMenu(BMenuBar *bar, BMessenger target, uint32 command,
-	const char *entryName)
+BDirMenu::BDirMenu(BMenuBar* bar, BMessenger target, uint32 command,
+	const char* entryName)
 	:
 	BPopUpMenu("directories"),
 	fTarget(target),
@@ -80,7 +80,7 @@ BDirMenu::~BDirMenu()
 
 
 void
-BDirMenu::Populate(const BEntry *startEntry, BWindow *originatingWindow,
+BDirMenu::Populate(const BEntry* startEntry, BWindow* originatingWindow,
 	bool includeStartEntry, bool select, bool reverse, bool addShortcuts,
 	bool navMenuEntries)
 {
@@ -91,7 +91,7 @@ BDirMenu::Populate(const BEntry *startEntry, BWindow *originatingWindow,
 		Model model(startEntry);
 		ThrowOnInitCheckError(&model);
 
-		ModelMenuItem *menu = new ModelMenuItem(&model, this, true, true);
+		ModelMenuItem* menu = new ModelMenuItem(&model, this, true, true);
 
 		if (fMenuBar)
 			fMenuBar->AddItem(menu);
@@ -109,10 +109,13 @@ BDirMenu::Populate(const BEntry *startEntry, BWindow *originatingWindow,
 		if (!includeStartEntry) {
 			BDirectory parent;
 			BDirectory dir(&entry);
-			// if we're at the root directory skip "mnt" and go straight to "/"
-			if (!showDesktop && dir.InitCheck() == B_OK && dir.IsRootDirectory())
+
+			if (!showDesktop && dir.InitCheck() == B_OK
+				&& dir.IsRootDirectory()) {
+				// if we're at the root directory skip "mnt" and
+				// go straight to "/"
 				parent.SetTo("/");
-			else
+			} else
 				entry.GetParent(&parent);
 
 			parent.GetEntry(&entry);
@@ -137,9 +140,11 @@ BDirMenu::Populate(const BEntry *startEntry, BWindow *originatingWindow,
 
 			bool hitRoot = false;
 
-			// if we're at the root directory skip "mnt" and go straight to "/"
 			BDirectory dir(&entry);
-			if (!showDesktop && dir.InitCheck() == B_OK && dir.IsRootDirectory()) {
+			if (!showDesktop && dir.InitCheck() == B_OK
+				&& dir.IsRootDirectory()) {
+				// if we're at the root directory skip "mnt" and
+				// go straight to "/"
 				hitRoot = true;
 				parent.SetTo("/");
 			}
@@ -160,7 +165,7 @@ BDirMenu::Populate(const BEntry *startEntry, BWindow *originatingWindow,
 			if (result == kReadAttrFailed || !info.fInvisible
 				|| (showDesktop && desktopEntry == entry)) {
 				AddItemToDirMenu(&entry, originatingWindow, reverse,
-								 addShortcuts, navMenuEntries);
+					addShortcuts, navMenuEntries);
 			}
 
 			if (hitRoot) {
@@ -176,7 +181,8 @@ BDirMenu::Populate(const BEntry *startEntry, BWindow *originatingWindow,
 		if (!select)
 			return;
 
-		ModelMenuItem *item = dynamic_cast<ModelMenuItem *>(ItemAt(CountItems() - 1));
+		ModelMenuItem* item
+			= dynamic_cast<ModelMenuItem*>(ItemAt(CountItems() - 1));
 		if (item) {
 			item->SetMarked(true);
 			if (menu) {
@@ -196,27 +202,27 @@ BDirMenu::Populate(const BEntry *startEntry, BWindow *originatingWindow,
 
 
 void
-BDirMenu::AddItemToDirMenu(const BEntry *entry, BWindow *originatingWindow,
+BDirMenu::AddItemToDirMenu(const BEntry* entry, BWindow* originatingWindow,
 	bool atEnd, bool addShortcuts, bool navMenuEntries)
 {
 	Model model(entry);
 	if (model.InitCheck() != B_OK)
 		return;
 
-	BMessage *message = new BMessage(fCommand);
+	BMessage* message = new BMessage(fCommand);
 	message->AddRef(fEntryName.String(), model.EntryRef());
 
 	// add reference to the container windows model so that we can
 	// close the window if
-	BContainerWindow *window = originatingWindow ?
-		dynamic_cast<BContainerWindow *>(originatingWindow) : 0;
+	BContainerWindow* window = originatingWindow ?
+		dynamic_cast<BContainerWindow*>(originatingWindow) : 0;
 	if (window)
-		message->AddData("nodeRefsToClose", B_RAW_TYPE, window->TargetModel()->NodeRef(),
-			sizeof (node_ref));
-	ModelMenuItem *item;
+		message->AddData("nodeRefsToClose", B_RAW_TYPE,
+			window->TargetModel()->NodeRef(), sizeof (node_ref));
+	ModelMenuItem* item;
 	if (navMenuEntries) {
-		BNavMenu* subMenu = new BNavMenu(model.Name(), B_REFS_RECEIVED, fTarget,
-			window);
+		BNavMenu* subMenu = new BNavMenu(model.Name(), B_REFS_RECEIVED,
+			fTarget, window);
 		entry_ref ref;
 		entry->GetRef(&ref);
 		subMenu->SetNavDir(&ref);
@@ -242,7 +248,8 @@ BDirMenu::AddItemToDirMenu(const BEntry *entry, BWindow *originatingWindow,
 	item->SetTarget(fTarget);
 
 	if (fMenuBar) {
-		ModelMenuItem *menu = dynamic_cast<ModelMenuItem *>(fMenuBar->ItemAt(0));
+		ModelMenuItem* menu
+			= dynamic_cast<ModelMenuItem*>(fMenuBar->ItemAt(0));
 		if (menu) {
 			ThrowOnError(menu->SetEntry(entry));
 			item->SetMarked(true);
@@ -259,7 +266,7 @@ BDirMenu::AddDisksIconToMenu(bool atEnd)
 	if (model.InitCheck() != B_OK)
 		return;
 
-	BMessage *message = new BMessage(fCommand);
+	BMessage* message = new BMessage(fCommand);
 	message->AddRef(fEntryName.String(), model.EntryRef());
 
 	ModelMenuItem* item = new ModelMenuItem(&model,	B_TRANSLATE("Disks"),
@@ -269,4 +276,3 @@ BDirMenu::AddDisksIconToMenu(bool atEnd)
 	else
 		AddItem(item, 0);
 }
-

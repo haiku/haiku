@@ -13,7 +13,6 @@ static void dump_dev_size(int dev)
 		return;
 	}
 	printf("size: %ld bytes\n", sz);
-	puts("");
 }
 
 static void dump_bios_id(int dev)
@@ -24,7 +23,6 @@ static void dump_bios_id(int dev)
 		return;
 	}
 	printf("bios id: %d, 0x%x\n", id, id);
-	puts("");
 }
 
 static void dump_media_status(int dev)
@@ -35,7 +33,6 @@ static void dump_media_status(int dev)
 		return;
 	}
 	printf("media status: %s\n", strerror(st));
-	puts("");
 }
 
 static const char *device_type(uint32 type)
@@ -70,7 +67,23 @@ static void dump_geom(int dev, bool bios)
 	printf("%sremovable.\n", geom.removable?"":"not ");
 	printf("%sread_only.\n", geom.read_only?"":"not ");
 	printf("%swrite_once.\n", geom.write_once?"":"not ");
-	puts("");
+}
+
+static void dump_partition(int dev)
+{
+	partition_info partition;
+	
+	if (ioctl(dev, B_GET_PARTITION_INFO, &partition, sizeof(partition)) < 0) {
+		perror("ioctl(B_GET_PARTITION_INFO)");
+		return;
+	}
+	printf("partition:\n");
+	printf("offset:\t%lld\n", partition.offset);
+	printf("size:\t%lld\n", partition.size);
+	printf("logical_block_size:\t%ld\n", partition.logical_block_size);
+	printf("session:\t%ld\n", partition.session);
+	printf("partition:\t%ld\n", partition.partition);
+	printf("device:\t%s\n", partition.device);
 }
 
 static void dump_misc(int dev)
@@ -88,7 +101,6 @@ static void dump_misc(int dev)
 		printf("device path:\t%s\n", path);
 	}
 #endif
-	puts("");
 }
 
 int main(int argc, char **argv)
@@ -104,10 +116,18 @@ int main(int argc, char **argv)
 		return 1;
 	}
 	dump_dev_size(dev);
+	puts("");
 	dump_bios_id(dev);
+	puts("");
 	dump_media_status(dev);
+	puts("");
 	dump_geom(dev, false);
+	puts("");
 	dump_geom(dev, true);
+	puts("");
+	dump_partition(dev);
+	puts("");
 	dump_misc(dev);
+	puts("");
 	return 0;
 }

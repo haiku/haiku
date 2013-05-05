@@ -1,27 +1,27 @@
-1	romanian	x-vnd.Be-PRNT	995190222
-1 pending job.	PrinterListView		1 sarcină în așteptare.
-Add	AddPrinterDialog		Adaugă
-Add printer	AddPrinterDialog		Adaugă imprimantă
-Add …	PrintersWindow		Adaugă ...
-Cancel	AddPrinterDialog		Anulează
-Cancel job	PrintersWindow		Anulează sarcină
-Completed	JobListView		Completat
-Connected to:	AddPrinterDialog		Conectat la:
-Default Printer	PrinterListView		Imprimantă implicită
-Failed	JobListView		Eșuat
-Make default	PrintersWindow		Stabilește ca implicit
-No pending jobs.	PrinterListView		Nu există sarcini în așteptare.
-No printer found!	TransportMenu		Nicio imprimantă găsită!
-Print jobs for 	PrintersWindow		Sarcini de tipărire pentru
-Print jobs: No printer selected	PrintersWindow		Sarcini de tipărire: Nicio imprimantă selectată
-Printer name:	AddPrinterDialog		Nume imprimantă:
-Printer type:	AddPrinterDialog		Tip de imprimantă:
-Printers	PrintersWindow		Imprimante
-Processing	JobListView		Se procesează
-Remove	PrintersWindow		Elimină
-Restart job	PrintersWindow		Repornește sarcină
-Unknown status	JobListView		Stare necunoscută
+1	romanian	x-vnd.Be-PRNT	2337778735
 Waiting	JobListView		Se așteaptă
 page	JobListView		pagină
+Cancel	AddPrinterDialog		Anulează
+Add printer	AddPrinterDialog		Adaugă imprimantă
+Printers	PrintersWindow		Imprimante
+Default Printer	PrinterListView		Imprimantă implicită
+No pending jobs.	PrinterListView		Nu există sarcini în așteptare.
 pages	JobListView		pagini
-pending jobs.	PrinterListView		sarcini în așteptare.
+Printers	System name		Imprimante
+Processing	JobListView		Se procesează
+Printer name:	AddPrinterDialog		Nume imprimantă:
+Restart job	PrintersWindow		Repornește sarcină
+Add	AddPrinterDialog		Adaugă
+Make default	PrintersWindow		Stabilește ca implicit
+Cancel job	PrintersWindow		Anulează sarcină
+1 pending job.	PrinterListView		1 sarcină în așteptare.
+Remove	PrintersWindow		Elimină
+Add …	PrintersWindow		Adaugă ...
+Print jobs for 	PrintersWindow		Sarcini de tipărire pentru
+Failed	JobListView		Eșuat
+Completed	JobListView		Completat
+No printer found!	TransportMenu		Nicio imprimantă găsită!
+Print jobs: No printer selected	PrintersWindow		Sarcini de tipărire: Nicio imprimantă selectată
+Unknown status	JobListView		Stare necunoscută
+Connected to:	AddPrinterDialog		Conectat la:
+Printer type:	AddPrinterDialog		Tip de imprimantă:

@@ -106,9 +106,7 @@ BTitledColumn::FontHeight() const
 float
 BTitledColumn::GetPreferredWidth(BField *_field, BView* parent) const
 {
-	BFont font;
-	parent->GetFont(&font);
-	return font.StringWidth(fTitle.String()) + 2 * kTEXT_MARGIN;
+	return parent->StringWidth(fTitle.String()) + 2 * kTEXT_MARGIN;
 }
 
 
@@ -130,7 +128,7 @@ BStringField::SetString(const char* val)
 	fString = val;
 	fClippedString = "";
 	fWidth = 0;
-} 
+}
 
 
 const char*
@@ -158,7 +156,7 @@ void
 BStringField::SetClippedString(const char* val)
 {
 	fClippedString = val;
-} 
+}
 
 
 const char*
@@ -184,15 +182,17 @@ BStringColumn::DrawField(BField* _field, BRect rect, BView* parent)
 {
 	float width = rect.Width() - (2 * kTEXT_MARGIN);
 	BStringField* field = static_cast<BStringField*>(_field);
+	bool clipNeeded = width < field->Width();
 
-	if (width != field->Width()) {
+	if (clipNeeded) {
 		BString out_string(field->String());
 
 		parent->TruncateString(&out_string, fTruncate, width + 2);
 		field->SetClippedString(out_string.String());
 		field->SetWidth(width);
 	}
-	DrawString(field->ClippedString(), parent, rect);
+
+	DrawString(clipNeeded ? field->ClippedString() : field->String(), parent, rect);
 }
 
 
@@ -200,11 +200,7 @@ float
 BStringColumn::GetPreferredWidth(BField *_field, BView* parent) const
 {
 	BStringField* field = static_cast<BStringField*>(_field);
-	BFont font;
-	parent->GetFont(&font);
-	float width = font.StringWidth(field->String()) + 2 * kTEXT_MARGIN;
-	float parentWidth = BTitledColumn::GetPreferredWidth(_field, parent);
-	return max_c(width, parentWidth);
+	return parent->StringWidth(field->String()) + 2 * kTEXT_MARGIN;
 }
 
 
@@ -256,7 +252,7 @@ void
 BDateField::SetClippedString(const char* val)
 {
 	fClippedString = val;
-} 
+}
 
 
 const char*
@@ -404,9 +400,9 @@ BSizeColumn::DrawField(BField* _field, BRect rect, BView* parent)
 
 	parent->GetFont(&font);
 	if (size < kKB_SIZE) {
-		sprintf(str, "%Ld bytes", size);
+		sprintf(str, "%" B_PRId64 " bytes", size);
 		if (font.StringWidth(str) > width)
-			sprintf(str, "%Ld B", size);
+			sprintf(str, "%" B_PRId64 " B", size);
 	} else {
 		const char*	suffix;
 		float float_value;
@@ -643,7 +639,7 @@ BBitmapColumn::CompareFields(BField* /*field1*/, BField* /*field2*/)
 }
 
 
-bool 
+bool
 BBitmapColumn::AcceptsField(const BField *field) const
 {
 	return static_cast<bool>(dynamic_cast<const BBitmapField*>(field));

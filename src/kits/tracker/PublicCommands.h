@@ -31,11 +31,12 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef __PUBLIC_COMMANDS__
 #define __PUBLIC_COMMANDS__
 
+
 #include <SupportDefs.h>
+
 
 // commands that may be issued to the tracker by other apps using messengers
 namespace BPrivate {
@@ -45,15 +46,18 @@ const uint32 kSaveButton = 'Tsav';
 const uint32 kShowSplash = 'Spls';
 
 const uint32 kStartWatchClipboardRefs = 'TCbw';
-	// StartWatching() clipboard changes. Changes will be sent to given BMessenger "target"
+	// StartWatching() clipboard changes. Changes will be sent to given
+	// BMessenger "target"
 const uint32 kStopWatchClipboardRefs = 'TCfw';
 	// StopWatching() given BMessenger "target"
 const uint32 kFSClipboardChanges = 'TCch';
-	// Used by FSClipboard functions which change refs in clipboard and are used outside Tracker (like BFilePanel called in another app)
-	// Contains movemodes named as in FSClipboard operations and in Clipboard (look into FSClipboard files)
+	// Used by FSClipboard functions which change refs in clipboard and are
+	// used outside Tracker (like BFilePanel called in another app)
+	// Contains movemodes named as in FSClipboard operations and in Clipboard
+	// (look into FSClipboard files)
 
 } // namespace BPrivate
 
 using namespace BPrivate;
 
-#endif	/* __PUBLIC_COMMANDS__ */
+#endif	// __PUBLIC_COMMANDS__

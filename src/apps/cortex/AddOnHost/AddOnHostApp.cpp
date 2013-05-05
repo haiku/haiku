@@ -170,11 +170,13 @@ main(int argc, char** argv)
 {
 	App app;
 	if (argc < 2 || strcmp(argv[1], "--addon-host") != 0) {
-		int32 response = (new BAlert(
-			"Cortex AddOnHost",
+		BAlert* alert = new BAlert("Cortex AddOnHost",
 			"This program runs in the background, and is started automatically "
 			"by Cortex when necessary.  You probably don't want to start it manually.",
-			"Continue", "Quit"))->Go();
+			"Continue", "Quit");
+		alert->SetShortcut(1, B_ESCAPE);
+		int32 response = alert->Go();
+
 		if(response == 1)
 			return 0;
 	}

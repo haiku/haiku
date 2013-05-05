@@ -33,17 +33,18 @@ holders.
 All rights reserved.
 */
 
-#include <Debug.h>
 
 #include "BarMenuBar.h"
 
-#include <string.h>
-
 #include <Bitmap.h>
+#include <ControlLook.h>
+#include <Debug.h>
 #include <NodeInfo.h>
 
 #include "icons.h"
-#include "icons_logo.h"
+
+#include "BarMenuTitle.h"
+#include "BarView.h"
 #include "BarWindow.h"
 #include "DeskbarMenu.h"
 #include "DeskbarUtils.h"
@@ -51,17 +52,63 @@ All rights reserved.
 #include "TeamMenu.h"
 
 
-TBarMenuBar::TBarMenuBar(TBarView* bar, BRect frame, const char* name)
-	: BMenuBar(frame, name, B_FOLLOW_NONE, B_ITEMS_IN_ROW, false),
-	fBarView(bar),
-	fAppListMenuItem(NULL)
+const float kSepItemWidth = 5.0f;
+
+
+//	#pragma mark - TSeparatorItem
+
+
+TSeparatorItem::TSeparatorItem()
+	:
+	BSeparatorItem()
+{
+}
+
+
+void
+TSeparatorItem::Draw()
+{
+	BMenu* menu = Menu();
+	if (menu == NULL)
+		return;
+
+	BRect frame(Frame());
+	frame.right = frame.left + kSepItemWidth;
+	rgb_color base = menu->LowColor();
+
+	menu->PushState();
+
+	menu->SetHighColor(tint_color(base, 1.22));
+	frame.top--;
+		// need to expand the frame for some reason
+
+	// stroke a darker line on the left edge
+	menu->StrokeLine(frame.LeftTop(), frame.LeftBottom());
+	frame.left++;
+
+	// fill in background
+	be_control_look->DrawButtonBackground(menu, frame, frame, base);
+
+	menu->PopState();
+}
+
+
+//	#pragma mark - TBarMenuBar
+
+
+TBarMenuBar::TBarMenuBar(BRect frame, const char* name, TBarView* barView)
+	:
+	BMenuBar(frame, name, B_FOLLOW_NONE, B_ITEMS_IN_ROW, false),
+	fBarView(barView),
+	fAppListMenuItem(NULL),
+	fSeparatorItem(NULL)
 {
 	SetItemMargins(0.0f, 0.0f, 0.0f, 0.0f);
 
-	TDeskbarMenu* beMenu = new TDeskbarMenu(bar);
+	TDeskbarMenu* beMenu = new TDeskbarMenu(barView);
 	TBarWindow::SetDeskbarMenu(beMenu);
 
-	fDeskbarMenuItem = new TBarMenuTitle(frame.Width(), frame.Height(),
+	fDeskbarMenuItem = new TBarMenuTitle(0.0f, 0.0f,
 		AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_LeafLogoBitmap), beMenu);
 	AddItem(fDeskbarMenuItem);
 }
@@ -84,61 +131,115 @@ TBarMenuBar::SmartResize(float width, float height)
 
 	width -= 1;
 
-	int32 count = CountItems();
-	if (fDeskbarMenuItem)
-		fDeskbarMenuItem->SetWidthHeight(width / count, height);
-	if (fAppListMenuItem)
-		fAppListMenuItem->SetWidthHeight(width / count, height);
+	if (fSeparatorItem != NULL)
+		fDeskbarMenuItem->SetContentSize(width - kSepItemWidth, height);
+	else {
+		int32 count = CountItems();
+		if (fDeskbarMenuItem)
+			fDeskbarMenuItem->SetContentSize(width / count, height);
+		if (fAppListMenuItem)
+			fAppListMenuItem->SetContentSize(width / count, height);
+	}
 
 	InvalidateLayout();
 }
 
 
-void
+bool
 TBarMenuBar::AddTeamMenu()
 {
 	if (CountItems() > 1)
-		return;
+		return false;
 
 	BRect frame(Frame());
-	delete fAppListMenuItem;
 
+	delete fAppListMenuItem;
 	fAppListMenuItem = new TBarMenuTitle(0.0f, 0.0f,
 		AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_TeamIcon), new TTeamMenu());
-	AddItem(fAppListMenuItem);
-	SmartResize(frame.Width() - 1.0f, frame.Height());
+
+	bool added = AddItem(fAppListMenuItem);
+
+	if (added)
+		SmartResize(frame.Width() - 1.0f, frame.Height());
+	else
+		SmartResize(frame.Width(), frame.Height());
+
+	return added;
 }
 
 
-void
+bool
 TBarMenuBar::RemoveTeamMenu()
 {
 	if (CountItems() < 2)
-		return;
+		return false;
 
-	if (fAppListMenuItem) {
-		RemoveItem((BMenuItem*)fAppListMenuItem);
+	bool removed = false;
+
+	if (fAppListMenuItem != NULL && RemoveItem(fAppListMenuItem)) {
 		delete fAppListMenuItem;
 		fAppListMenuItem = NULL;
+		SmartResize(-1, -1);
+		removed = true;
 	}
 
-	BRect frame = Frame();
-	SmartResize(frame.Width(), frame.Height());
+	return removed;
+}
+
+
+bool
+TBarMenuBar::AddSeparatorItem()
+{
+	if (CountItems() > 1)
+		return false;
+
+	BRect frame(Frame());
+
+	delete fSeparatorItem;
+	fSeparatorItem = new TSeparatorItem();
+
+	bool added = AddItem(fSeparatorItem);
+
+	if (added)
+		SmartResize(frame.Width() - 1.0f, frame.Height());
+	else
+		SmartResize(frame.Width(), frame.Height());
+
+	return added;
+}
+
+
+bool
+TBarMenuBar::RemoveSeperatorItem()
+{
+	if (CountItems() < 2)
+		return false;
+
+	bool removed = false;
+
+	if (fSeparatorItem != NULL && RemoveItem(fSeparatorItem)) {
+		delete fSeparatorItem;
+		fSeparatorItem = NULL;
+		SmartResize(-1, -1);
+		removed = true;
+	}
+
+	return removed;
 }
 
 
 void
-TBarMenuBar::Draw(BRect rect)
+TBarMenuBar::Draw(BRect updateRect)
 {
-	// want to skip the fancy BMenuBar drawing code.
-	BMenu::Draw(rect);
+	// skip the fancy BMenuBar drawing code
+	BMenu::Draw(updateRect);
 }
 
 
 void
-TBarMenuBar::DrawBackground(BRect rect)
+TBarMenuBar::DrawBackground(BRect updateRect)
 {
-	BMenu::DrawBackground(rect);
+	BMenu::DrawBackground(updateRect);
 }
 
 
@@ -160,14 +261,15 @@ TBarMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 			BPoint loc;
 			uint32 buttons;
 			GetMouse(&loc, &buttons);
-			// attempt to start DnD tracking
-			if (message && buttons != 0) {
+			if (message != NULL && buttons != 0) {
+				// attempt to start DnD tracking
 				fBarView->CacheDragData(const_cast<BMessage*>(message));
 				MouseDown(loc);
 			}
 			break;
 		}
 	}
+
 	BMenuBar::MouseMoved(where, code, message);
 }
 
@@ -203,4 +305,3 @@ TBarMenuBar::InitTrackingHook(bool (*hookFunction)(BMenu*, void*),
 	if (fAppListMenuItem && (fAppListMenuItem->Frame().Contains(loc) || both))
 		init_tracking_hook(fAppListMenuItem, hookFunction, state);
 }
-

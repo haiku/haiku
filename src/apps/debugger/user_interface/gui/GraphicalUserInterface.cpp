@@ -9,7 +9,7 @@
 
 #include <Alert.h>
 
-#include "GUITeamUISettings.h"
+#include "GuiTeamUiSettings.h"
 #include "TeamWindow.h"
 #include "Tracing.h"
 
@@ -72,22 +72,22 @@ GraphicalUserInterface::Terminate()
 
 
 status_t
-GraphicalUserInterface::LoadSettings(const TeamUISettings* settings)
+GraphicalUserInterface::LoadSettings(const TeamUiSettings* settings)
 {
-	status_t result = fTeamWindow->LoadSettings((GUITeamUISettings*)settings);
+	status_t result = fTeamWindow->LoadSettings((GuiTeamUiSettings*)settings);
 
 	return result;
 }
 
 
 status_t
-GraphicalUserInterface::SaveSettings(TeamUISettings*& settings) const
+GraphicalUserInterface::SaveSettings(TeamUiSettings*& settings) const
 {
-	settings = new(std::nothrow) GUITeamUISettings(ID());
+	settings = new(std::nothrow) GuiTeamUiSettings(ID());
 	if (settings == NULL)
 		return B_NO_MEMORY;
 
-	fTeamWindow->SaveSettings((GUITeamUISettings*)settings);
+	fTeamWindow->SaveSettings((GuiTeamUiSettings*)settings);
 
 	return B_OK;
 }

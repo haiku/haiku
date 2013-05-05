@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2012, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef VOLUME_H
@@ -40,7 +40,8 @@ public:
 
 			bool			IsInitializing() const { return fVolume == NULL; }
 
-			bool			IsValidSuperBlock();
+			bool			IsValidSuperBlock() const;
+			bool			IsValidInodeBlock(off_t block) const;
 			bool			IsReadOnly() const;
 			void			Panic();
 			mutex&			Lock();

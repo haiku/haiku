@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 
+ *
+ * Copyright 2009-2010, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		tiagoms
+ *		Francisco Dourado
+ *		Adriano Duarte
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Miniaplicativo Espaços de Trabalho</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../../fr/desktop-applets/workspaces.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/desktop-applets/workspaces.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/desktop-applets/workspaces.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/desktop-applets/workspaces.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/desktop-applets/workspaces.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/desktop-applets/workspaces.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/desktop-applets/workspaces.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/desktop-applets/workspaces.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/desktop-applets/workspaces.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/desktop-applets/workspaces.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/desktop-applets/workspaces.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/desktop-applets/workspaces.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/desktop-applets/workspaces.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../ca/desktop-applets/workspaces.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../../en/desktop-applets/workspaces.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="processcontroller.html">Controlador de Processos</a> 
+::  <a href="../desktop-applets.html" class="uplink">Miniaplicativos da Área de Trabalho</a> 
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<h1><img src="../../images/desktop-applets-images/workspaces-icon_64.png" alt="workspaces-icon_64.png" width="64" height="64" /><a name="applet" id="applet">Espaços de Trabalho</a></h1>
+<table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Miniaplicativos da área de trabalho</span></td></tr>
+<tr><td>Localização:</td><td></td><td><span class="path">/boot/system/apps/Workspaces</span></td></tr>
+<tr><td>Configurações:</td><td></td><td><span class="path">~/config/settings/system/app_server/workspaces</span><br />
+<span class="path">~/config/settings/Workspaces_settings</span> - Armazena a posição da janela do painel.</td></tr>
+</table>
+<p><br /></p>
+<img src="../images/workspaces-images/workspaces.png" alt="workspaces.png" />
+<p>Você vai encontrar o miniaplicativo Workspaces juntamente com outros nos <span class="menu">miniaplicativos da Área de Trabalho</span> no Deskbar. Ele mostra uma versão em miniatura de todos os espaços de trabalho. Existem várias opções disponíveis no menu de contexto da janela do aplicativo, são todas muito auto-explicativas.<br />
+<span class="menu">Mudando a quantidade de espaços de trabalho...</span> abrirá as preferências de <a href="../preferences/screen.html">Tela</a> onde você pode mudar o número dos espaços de trabalho e a forma como são arranjadas (quantas linhas e colunas).</p>
+<p>Uma vez que o miniaplicativo é um <a href="../gui.html#replicants">Replicante</a>, pode-se redimensionar a janela como desejada e então arrastar e soltá-la na área de trabalho (certifique-se que <span class="menu">Exibir replicantes</span> esteja ativado no menu da Deskbar). Segure a tecla <span class="key">SHIFT</span> enquanto redimensiona para manter a taxa de amostragem da sua tela.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="moving" name="moving">Movendo-se pelos espaços de trabalho</a></h2>
+<p>Para mover uma janela, você simplesmente deve arrastá-la para outra área de trabalho virtual dentro do Workspaces.  A vantagem disso é que você não precisa sair da atual área de trabalho.  Claro que isso só funciona bem quando não há muitas janelas na área de trabalho e quando seu alvo não está sob outra janela.   Outra possibilidade é pegar a aba da janela e segurá-la enquanto se muda de área de trabalho clicando <span class="key">ALT</span> <span class="key">Fx</span>.</p>
+<p>Para mais informações  e mais atalhos de teclado sobre espaços de trabalho em geral,  leia o tópico <a href="../workspaces.html">Workspaces</a>.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="special" name="special">Funcionalidade especial</a></h2>
+<p>O Workspaces oferece algumas funcionalidades adicionais quando a gente clica numa janela segurando essas teclas:</p>
+<table summary="functionality-thru-modifiers" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="key">CTRL</span></td><td style="width:15px;"></td><td>Traz a janela para o primeiro plano.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">SHIFT</span></td><td></td><td>Minimiza a janela.</td></tr>
+<tr><td><span class="key">OPT</span></td><td></td><td>Manda a janela pro plano de fundo.</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="processcontroller.html">Controlador de Processos</a> 
+::  <a href="../desktop-applets.html" class="uplink">Miniaplicativos da Área de Trabalho</a> 
+</span></div>
+</div>
+
+</body>
+</html>

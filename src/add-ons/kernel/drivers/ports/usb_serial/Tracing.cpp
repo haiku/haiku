@@ -37,6 +37,8 @@ load_settings()
 {
 	void *settingsHandle;
 	settingsHandle = load_driver_settings(DRIVER_NAME);
+	if (settingsHandle == NULL)
+		return;
 
 #if !DEBUG
 	gLogEnabled = get_driver_boolean_parameter(settingsHandle,

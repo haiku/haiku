@@ -33,8 +33,8 @@
 #include <MailSettings.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MailDaemon"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MailDaemon"
 
 
 using std::map;
@@ -306,6 +306,7 @@ MailDaemonApp::MessageReceived(BMessage* msg)
 				BAlert* alert = new BAlert(B_TRANSLATE("New Messages"),
 					fAlertString.String(), "OK", NULL, NULL, B_WIDTH_AS_USUAL);
 				alert->SetFeel(B_NORMAL_WINDOW_FEEL);
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 				alert->Go(NULL);
 				fAlertString = B_EMPTY_STRING;
 			}
@@ -458,9 +459,8 @@ MailDaemonApp::GetNewMessages(BMessage* msg)
 	int32 account = -1;
 	if (msg->FindInt32("account", &account) == B_OK && account >= 0) {
 		InboundProtocolThread* protocol = _FindInboundProtocol(account);
-		if (!protocol)
-			return;
-		protocol->SyncMessages();
+		if (protocol != NULL)
+			protocol->SyncMessages();
 		return;
 	}
 
@@ -468,9 +468,8 @@ MailDaemonApp::GetNewMessages(BMessage* msg)
 	AccountMap::const_iterator it = fAccounts.begin();
 	for (; it != fAccounts.end(); it++) {
 		InboundProtocolThread* protocol = it->second.inboundThread;
-		if (!protocol)
-			continue;
-		protocol->SyncMessages();
+		if (protocol != NULL)
+			protocol->SyncMessages();
 	}
 }
 
@@ -482,7 +481,6 @@ MailDaemonApp::SendPendingMessages(BMessage* msg)
 	BVolume volume;
 
 	map<int32, send_mails_info> messages;
-
 
 	int32 account = -1;
 	if (msg->FindInt32("account", &account) != B_OK)
@@ -738,7 +736,6 @@ MailDaemonApp::_CreateInboundProtocol(BMailAccountSettings& settings,
 	image_id& image)
 {
 	const entry_ref& entry = settings.InboundPath();
-
 	InboundProtocol* (*instantiate_protocol)(BMailAccountSettings*);
 
 	BPath path(&entry);
@@ -746,13 +743,12 @@ MailDaemonApp::_CreateInboundProtocol(BMailAccountSettings& settings,
 	if (image < 0)
 		return NULL;
 	if (get_image_symbol(image, "instantiate_inbound_protocol",
-		B_SYMBOL_TYPE_TEXT, (void **)&instantiate_protocol) != B_OK) {
+			B_SYMBOL_TYPE_TEXT, (void**)&instantiate_protocol) != B_OK) {
 		unload_add_on(image);
 		image = -1;
 		return NULL;
 	}
-	InboundProtocol* protocol = (*instantiate_protocol)(&settings);
-	return protocol;
+	return (*instantiate_protocol)(&settings);
 }
 
 
@@ -761,7 +757,6 @@ MailDaemonApp::_CreateOutboundProtocol(BMailAccountSettings& settings,
 	image_id& image)
 {
 	const entry_ref& entry = settings.OutboundPath();
-
 	OutboundProtocol* (*instantiate_protocol)(BMailAccountSettings*);
 
 	BPath path(&entry);
@@ -769,13 +764,12 @@ MailDaemonApp::_CreateOutboundProtocol(BMailAccountSettings& settings,
 	if (image < 0)
 		return NULL;
 	if (get_image_symbol(image, "instantiate_outbound_protocol",
-		B_SYMBOL_TYPE_TEXT, (void **)&instantiate_protocol) != B_OK) {
+			B_SYMBOL_TYPE_TEXT, (void**)&instantiate_protocol) != B_OK) {
 		unload_add_on(image);
 		image = -1;
 		return NULL;
 	}
-	OutboundProtocol* protocol = (*instantiate_protocol)(&settings);
-	return protocol;
+	return (*instantiate_protocol)(&settings);
 }
 
 

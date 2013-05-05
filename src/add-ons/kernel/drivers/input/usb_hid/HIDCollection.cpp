@@ -214,18 +214,18 @@ HIDCollection::PrintToStream(uint32 indentLevel)
 
 	TRACE_ALWAYS("%sHIDCollection %p\n", indent, this);
 	TRACE_ALWAYS("%s\ttype: %u %s\n", indent, fType, typeName);
-	TRACE_ALWAYS("%s\tusage: 0x%08lx\n", indent, fUsage);
+	TRACE_ALWAYS("%s\tusage: 0x%08" B_PRIx32 "\n", indent, fUsage);
 	TRACE_ALWAYS("%s\tstring id: %u\n", indent, fStringID);
 	TRACE_ALWAYS("%s\tphysical id: %u\n", indent, fPhysicalID);
 
-	TRACE_ALWAYS("%s\titem count: %lu\n", indent, fItemCount);
+	TRACE_ALWAYS("%s\titem count: %" B_PRIu32 "\n", indent, fItemCount);
 	for (uint32 i = 0; i < fItemCount; i++) {
 		HIDReportItem *item = fItems[i];
 		if (item != NULL)
 			item->PrintToStream(indentLevel + 1);
 	}
 
-	TRACE_ALWAYS("%s\tchild count: %lu\n", indent, fChildCount);
+	TRACE_ALWAYS("%s\tchild count: %" B_PRIu32 "\n", indent, fChildCount);
 	for (uint32 i = 0; i < fChildCount; i++) {
 		HIDCollection *child = fChildren[i];
 		if (child != NULL)

@@ -30,8 +30,8 @@
 #include "WatchApp.h"
 #include "WatchView.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "WatchView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "WatchView"
 
 
 const rgb_color COLOR_FOREGROUND = { 0, 0, 0 };
@@ -68,7 +68,7 @@ WatchView::WatchView(BMessage* message)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-__declspec(dllexport) WatchView* WatchView::Instantiate(BMessage* archive)
+WatchView* WatchView::Instantiate(BMessage* archive)
 {
 	if (validate_instantiation(archive, REPLICANT_CLASS)) 
 	{
@@ -159,7 +159,9 @@ void WatchView::OnAboutRequested()
 		"mahlzeit@users.sourceforge.net\n\n"
 		"Thanks to Jason Parks for his help.\n");
 	text.ReplaceFirst("%1", VERSION);
-	(new BAlert(NULL, text.String(), B_TRANSLATE("OK")))->Go(NULL);
+	BAlert* alert = new BAlert(NULL, text.String(), B_TRANSLATE("OK"));
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+	alert->Go(NULL);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

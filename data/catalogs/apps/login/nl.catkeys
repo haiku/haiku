@@ -1,0 +1,21 @@
+1	dutch; flemish	x-vnd.Haiku-Login	1678631300
+Error: %1	Login App		Fout: %1
+Hide password	Login View		Wachtwoord verbergen
+Desktop	Desktop Window		Bureaublad
+Invalid login!	Login View		Ongeldige inloggegevens!
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\t Start in onderhoudsmodus om het bureaublad aan te passen.\n
+OK	Login View		OK
+error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	fout %s\n
+Login:	Login View		Gebruikersnaam:
+Error	Login App		Fout
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Alt-Q).	Login App		Je kunt het bureaublad dat achter de inlogapplicatie getoond wordt, aanpassen door er replicanten naar te slepen.\n\nWanneer je klaar bent, verlaat dan gewoon deze applicatie (Alt-Q).
+Unimplemented	Login App		Niet geïmplementeerd
+Welcome to Haiku	Login Window		Welkom bij Haiku
+Reboot	Login View		Herstarten
+Login application for Haiku\nUsage:\n	Login App		Loginapplicatie voor Haiku\nGebruik:\n
+Info	Login App		Informatie
+Halt	Login View		Stoppen
+ValidateLogin: %s\n	Login App	A message returned from the ValidateLogin function. It can be \"B_OK\".	ValideerLogin: %s\n
+Password:	Login View		Wachtwoord:
+OK	Login App		OK
+--nonmodal\tDo not make the window modal\n	Login App		--nonmodal\t Maak een venster niet modaal\n

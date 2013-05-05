@@ -1,9 +1,9 @@
 1	romanian	x-vnd.Haiku-WonderBrushTranslator	491575314
-Version %d.%d.%d %s	WonderBrushView		Versiune %d.%d.%d %s
-WBI Settings	WonderBrushMain		Configurări WBI
-WBI Settings	WonderBrushTranslator		Configurări WBI
-WonderBrush image	WonderBrushTranslator		Imagine WonderBrush
 WonderBrush image translator	WonderBrushTranslator		Traducător imagine WonderBrush
-WonderBrush image translator	WonderBrushView		Traducător imagine WonderBrush
+WBI Settings	WonderBrushTranslator		Configurări WBI
+WBI Settings	WonderBrushMain		Configurări WBI
+Version %d.%d.%d %s	WonderBrushView		Versiune %d.%d.%d %s
 WonderBrush images	WonderBrushTranslator		Imagini WonderBrush
+WonderBrush image	WonderBrushTranslator		Imagine WonderBrush
+WonderBrush image translator	WonderBrushView		Traducător imagine WonderBrush
 written by:	WonderBrushView		scris de:

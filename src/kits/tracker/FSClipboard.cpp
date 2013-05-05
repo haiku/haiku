@@ -44,11 +44,12 @@ All rights reserved.
 
 
 // prototypes
-static void MakeNodeFromName(node_ref *node, char *name);
-static inline void MakeRefName(char *refName, const node_ref *node);
-static inline void MakeModeName(char *modeName, const node_ref *node);
-static inline void MakeModeNameFromRefName(char *modeName, char *refName);
-static inline bool CompareModeAndRefName(const char *modeName, const char *refName);
+static void MakeNodeFromName(node_ref* node, char* name);
+static inline void MakeRefName(char* refName, const node_ref* node);
+static inline void MakeModeName(char* modeName, const node_ref* node);
+static inline void MakeModeNameFromRefName(char* modeName, char* refName);
+static inline bool CompareModeAndRefName(const char* modeName,
+	const char* refName);
 
 /*
 static bool
@@ -59,39 +60,39 @@ FSClipboardCheckIntegrity()
 */
 
 static void
-MakeNodeFromName(node_ref *node, char *name)
+MakeNodeFromName(node_ref* node, char* name)
 {
-	char *nodeString = strchr(name, '_');
+	char* nodeString = strchr(name, '_');
 	if (nodeString != NULL) {
-		node->node = strtoll(nodeString + 1, (char **)NULL, 10);
+		node->node = strtoll(nodeString + 1, (char**)NULL, 10);
 		node->device = atoi(name + 1);
 	}
 }
 
 
 static inline void
-MakeRefName(char *refName, const node_ref *node)
+MakeRefName(char* refName, const node_ref* node)
 {
-	sprintf(refName, "r%ld_%Ld", node->device, node->node);
+	sprintf(refName, "r%" B_PRIdDEV "_%" B_PRIdINO, node->device, node->node);
 }
 
 
 static inline void
-MakeModeName(char *modeName, const node_ref *node)
+MakeModeName(char* modeName, const node_ref* node)
 {
-	sprintf(modeName, "m%ld_%Ld", node->device, node->node);
+	sprintf(modeName, "m%" B_PRIdDEV "_%" B_PRIdINO, node->device, node->node);
 }
 
 
 static inline void
-MakeModeName(char *name)
+MakeModeName(char* name)
 {
 	name[0] = 'm';
 }
 
 
 static inline void
-MakeModeNameFromRefName(char *modeName, char *refName)
+MakeModeNameFromRefName(char* modeName, char* refName)
 {
 	strcpy(modeName, refName);
 	modeName[0] = 'm';
@@ -99,7 +100,7 @@ MakeModeNameFromRefName(char *modeName, char *refName)
 
 
 static inline bool
-CompareModeAndRefName(const char *modeName, const char *refName)
+CompareModeAndRefName(const char* modeName, const char* refName)
 {
 	return !strcmp(refName + 1, modeName + 1);
 }
@@ -108,8 +109,8 @@ CompareModeAndRefName(const char *modeName, const char *refName)
 //	#pragma mark -
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "FSClipBoard"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "FSClipBoard"
 
 bool
 FSClipboardHasRefs()
@@ -117,21 +118,23 @@ FSClipboardHasRefs()
 	bool result = false;
 
 	if (be_clipboard->Lock()) {
-		BMessage *clip = be_clipboard->Data();
+		BMessage* clip = be_clipboard->Data();
 		if (clip != NULL) {
 #ifdef B_BEOS_VERSION_DANO
 			const
 #endif
-			char *refName;
+			char* refName;
 #ifdef B_BEOS_VERSION_DANO
 			const
 #endif
-			char *modeName;
+			char* modeName;
 			uint32 type;
 			int32 count;
 			if (clip->GetInfo(B_REF_TYPE, 0, &refName, &type, &count) == B_OK
-				&& clip->GetInfo(B_INT32_TYPE, 0, &modeName, &type, &count) == B_OK)
+				&& clip->GetInfo(B_INT32_TYPE, 0, &modeName, &type, &count)
+					== B_OK) {
 				result = CompareModeAndRefName(modeName, refName);
+			}
 		}
 		be_clipboard->Unlock();
 	}
@@ -142,11 +145,11 @@ FSClipboardHasRefs()
 void
 FSClipboardStartWatch(BMessenger target)
 {
-	if (dynamic_cast<TTracker *>(be_app) != NULL)
-		((TTracker *)be_app)->ClipboardRefsWatcher()->AddToNotifyList(target);
+	if (dynamic_cast<TTracker*>(be_app) != NULL)
+		((TTracker*)be_app)->ClipboardRefsWatcher()->AddToNotifyList(target);
 	else {
-		// this code is used by external apps using objects using FSClipboard functions
-		// i.e: applications using FilePanel
+		// this code is used by external apps using objects using FSClipboard
+		// functions, i.e. applications using FilePanel
 		BMessenger messenger(kTrackerSignature);
 		if (messenger.IsValid()) {
 			BMessage message(kStartWatchClipboardRefs);
@@ -160,11 +163,11 @@ FSClipboardStartWatch(BMessenger target)
 void
 FSClipboardStopWatch(BMessenger target)
 {
-	if (dynamic_cast<TTracker *>(be_app) != NULL)
-		((TTracker *)be_app)->ClipboardRefsWatcher()->AddToNotifyList(target);
+	if (dynamic_cast<TTracker*>(be_app) != NULL)
+		((TTracker*)be_app)->ClipboardRefsWatcher()->AddToNotifyList(target);
 	else {
-		// this code is used by external apps using objects using FSClipboard functions
-		// i.e: applications using FilePanel
+		// this code is used by external apps using objects using FSClipboard
+		// functions, i.e. applications using FilePanel
 		BMessenger messenger(kTrackerSignature);
 		if (messenger.IsValid()) {
 			BMessage message(kStopWatchClipboardRefs);
@@ -195,8 +198,8 @@ FSClipboardClear()
  */
 
 uint32
-FSClipboardAddPoses(const node_ref *directory, PoseList *list, uint32 moveMode,
-	bool clearClipboard)
+FSClipboardAddPoses(const node_ref* directory, PoseList* list,
+	uint32 moveMode, bool clearClipboard)
 {
 	uint32 refsAdded = 0;
 	int32 listCount = list->CountItems();
@@ -216,13 +219,13 @@ FSClipboardAddPoses(const node_ref *directory, PoseList *list, uint32 moveMode,
 	if (clearClipboard)
 		be_clipboard->Clear();
 
-	BMessage *clip = be_clipboard->Data();
+	BMessage* clip = be_clipboard->Data();
 	if (clip != NULL) {
 		for (int32 index = 0; index < listCount; index++) {
 			char refName[64], modeName[64];
-			BPose *pose = (BPose *)list->ItemAt(index);
-			Model *model = pose->TargetModel();
-			const node_ref *node = model->NodeRef();
+			BPose* pose = (BPose*)list->ItemAt(index);
+			Model* model = pose->TargetModel();
+			const node_ref* node = model->NodeRef();
 
 			BEntry entry;
 			model->GetEntry(&entry);
@@ -263,7 +266,7 @@ FSClipboardAddPoses(const node_ref *directory, PoseList *list, uint32 moveMode,
 						refsAdded++;
 					} else {
 						clip->RemoveName(modeName);
-						
+
 						clipNode.node = *node;
 						clipNode.moveMode = kDelete;	// note removing node
 						updateMessage.AddData("tcnode", T_CLIPBOARD_NODE,
@@ -277,7 +280,7 @@ FSClipboardAddPoses(const node_ref *directory, PoseList *list, uint32 moveMode,
 					if (clip->AddRef(refName, model->EntryRef()) == B_OK
 						&& clip->AddInt32(modeName, (int32)moveMode) == B_OK) {
 						pose->SetClipboardMode(moveMode);
-						
+
 						clipNode.node = *node;
 						updateMessage.AddData("tcnode", T_CLIPBOARD_NODE,
 							&clipNode, sizeof(TClipboardNodeRef), true,
@@ -294,7 +297,7 @@ FSClipboardAddPoses(const node_ref *directory, PoseList *list, uint32 moveMode,
 			}
 		}
 		be_clipboard->Commit();
-	}	
+	}
 	be_clipboard->Unlock();
 
 	BMessenger(kTrackerSignature).SendMessage(&updateMessage);
@@ -305,7 +308,7 @@ FSClipboardAddPoses(const node_ref *directory, PoseList *list, uint32 moveMode,
 
 
 uint32
-FSClipboardRemovePoses(const node_ref *directory, PoseList *list)
+FSClipboardRemovePoses(const node_ref* directory, PoseList* list)
 {
 	if (!be_clipboard->Lock())
 		return 0;
@@ -321,19 +324,20 @@ FSClipboardRemovePoses(const node_ref *directory, PoseList *list)
 
 	uint32 refsRemoved = 0;
 
-	BMessage *clip = be_clipboard->Data();
+	BMessage* clip = be_clipboard->Data();
 	if (clip != NULL) {
 		int32 listCount = list->CountItems();
 
 		for (int32 index = 0; index < listCount; index++) {
 			char refName[64], modeName[64];
-			BPose *pose = (BPose *)list->ItemAt(index);
+			BPose* pose = (BPose*)list->ItemAt(index);
 
 			clipNode.node = *pose->TargetModel()->NodeRef();
 			MakeRefName(refName, &clipNode.node);
 			MakeModeName(modeName);
 
-			if (clip->RemoveName(refName) == B_OK && clip->RemoveName(modeName)) {
+			if (clip->RemoveName(refName) == B_OK
+				&& clip->RemoveName(modeName)) {
 				updateMessage.AddData("tcnode", T_CLIPBOARD_NODE, &clipNode,
 					sizeof(TClipboardNodeRef), true, listCount);
 				refsRemoved++;
@@ -353,37 +357,36 @@ FSClipboardRemovePoses(const node_ref *directory, PoseList *list)
 /** Pastes entries from the clipboard to the target model's directory.
  *	Updates moveModes and notifies listeners if necessary.
  */
-
 bool
-FSClipboardPaste(Model *model, uint32 linksMode)
+FSClipboardPaste(Model* model, uint32 linksMode)
 {
 	if (!FSClipboardHasRefs())
 		return false;
 
 	BMessenger tracker(kTrackerSignature);
 
-	node_ref *destNodeRef = (node_ref *)model->NodeRef();
+	node_ref* destNodeRef = (node_ref*)model->NodeRef();
 
 	// these will be passed to the asynchronous copy/move process
-	BObjectList<entry_ref> *moveList = new BObjectList<entry_ref>(0, true);
-	BObjectList<entry_ref> *copyList = new BObjectList<entry_ref>(0, true);
+	BObjectList<entry_ref>* moveList = new BObjectList<entry_ref>(0, true);
+	BObjectList<entry_ref>* copyList = new BObjectList<entry_ref>(0, true);
 
 	if ((be_clipboard->Lock())) {
-		BMessage *clip = be_clipboard->Data();
+		BMessage* clip = be_clipboard->Data();
 		if (clip != NULL) {
 			char modeName[64];
 			uint32 moveMode = 0;
 
-			BMessage *updateMessage = NULL;
+			BMessage* updateMessage = NULL;
 			node_ref updateNodeRef;
 			updateNodeRef.device = -1;
 
-			char *refName;
+			char* refName;
 			type_code type;
 			int32 count;
 			for (int32 index = 0; clip->GetInfo(B_REF_TYPE, index,
 #ifdef B_BEOS_VERSION_DANO
-				(const char **)
+				(const char**)
 #endif
 				&refName, &type, &count) == B_OK; index++) {
 				entry_ref ref;
@@ -404,19 +407,22 @@ FSClipboardPaste(Model *model, uint32 linksMode)
 
 					updateMessage = new BMessage(kFSClipboardChanges);
 					updateMessage->AddInt32("device", updateNodeRef.device);
-					updateMessage->AddInt64("directory", updateNodeRef.node);					
+					updateMessage->AddInt64("directory", updateNodeRef.node);
 				}
 
 				// we need this data later on
 				MakeModeNameFromRefName(modeName, refName);
-				if (!linksMode && clip->FindInt32(modeName, (int32 *)&moveMode) != B_OK)
+				if (!linksMode && clip->FindInt32(modeName, (int32*)&moveMode)
+					!= B_OK) {
 					continue;
+				}
 
 				BEntry entry(&ref);
 
 				uint32 newMoveMode = 0;
-				bool sameDirectory = destNodeRef->device == ref.device && destNodeRef->node == ref.directory;
-				
+				bool sameDirectory = destNodeRef->device == ref.device
+					&& destNodeRef->node == ref.directory;
+
 				if (!entry.Exists()) {
 					// The entry doesn't exist anymore, so we'll remove
 					// that entry from the clipboard as well
@@ -435,9 +441,10 @@ FSClipboardPaste(Model *model, uint32 linksMode)
 							copyList->AddItem(new entry_ref(ref));
 					}
 
-					// if the entry should have been removed from its directory,
-					// we want to copy that entry next time, no matter if the
-					// items don't have to be moved at all (source == target)
+					// if the entry should have been removed from its
+					// directory, we want to copy that entry next time, no
+					// matter if the items don't have to be moved at all
+					// (source == target)
 					if (moveMode == kMoveSelectionTo)
 						newMoveMode = kCopySelectionTo;
 				}
@@ -449,8 +456,8 @@ FSClipboardPaste(Model *model, uint32 linksMode)
 					TClipboardNodeRef clipNode;
 					MakeNodeFromName(&clipNode.node, modeName);
 					clipNode.moveMode = kDelete;
-					updateMessage->AddData("tcnode", T_CLIPBOARD_NODE, &clipNode,
-						sizeof(TClipboardNodeRef), true);
+					updateMessage->AddData("tcnode", T_CLIPBOARD_NODE,
+						&clipNode, sizeof(TClipboardNodeRef), true);
 				}
 			}
 			be_clipboard->Commit();
@@ -470,11 +477,11 @@ FSClipboardPaste(Model *model, uint32 linksMode)
 	if (model->IsRoot()) {
 		BAlert* alert = new BAlert("",
 			B_TRANSLATE("You must drop items on one of the disk icons "
-			"in the \"Disks\" window."), B_TRANSLATE("Cancel"),	NULL, NULL,
+			"in the \"Disks\" window."), B_TRANSLATE("Cancel"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
-		okToMove = false;			
+		okToMove = false;
 	}
 
 	BEntry entry;
@@ -486,7 +493,7 @@ FSClipboardPaste(Model *model, uint32 linksMode)
 			B_TRANSLATE("Sorry, you can't copy items to the Trash."),
 			B_TRANSLATE("Cancel"), NULL, NULL, B_WIDTH_AS_USUAL,
 			B_WARNING_ALERT);
-		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		okToMove = false;
 	}
@@ -499,9 +506,10 @@ FSClipboardPaste(Model *model, uint32 linksMode)
 	}
 
 	// asynchronous calls take over ownership of the objects passed to it
-	if (moveList->CountItems() > 0)
-		FSMoveToFolder(moveList, new BEntry(entry), linksMode ? linksMode : kMoveSelectionTo);
-	else
+	if (moveList->CountItems() > 0) {
+		FSMoveToFolder(moveList, new BEntry(entry),
+			linksMode ? linksMode : kMoveSelectionTo);
+	} else
 		delete moveList;
 
 	if (copyList->CountItems() > 0)
@@ -513,12 +521,10 @@ FSClipboardPaste(Model *model, uint32 linksMode)
 }
 
 
-/**	Seek node in clipboard, if found return it's moveMode
- *	else return 0
- */
-
+// Seek node in clipboard, if found return it's moveMode
+// else return 0
 uint32
-FSClipboardFindNodeMode(Model *model, bool autoLock, bool updateRefIfNeeded)
+FSClipboardFindNodeMode(Model* model, bool autoLock, bool updateRefIfNeeded)
 {
 	int32 moveMode = 0;
 	if (autoLock) {
@@ -528,13 +534,13 @@ FSClipboardFindNodeMode(Model *model, bool autoLock, bool updateRefIfNeeded)
 	bool remove = false;
 	bool change = false;
 
-	BMessage *clip = be_clipboard->Data();
+	BMessage* clip = be_clipboard->Data();
 	if (clip != NULL) {
-		const node_ref *node = model->NodeRef();
+		const node_ref* node = model->NodeRef();
 		char modeName[64];
 		MakeModeName(modeName, node);
 		if ((clip->FindInt32(modeName, &moveMode) == B_OK)) {
-			const entry_ref *ref = model->EntryRef();
+			const entry_ref* ref = model->EntryRef();
 			entry_ref clipref;
 			char refName[64];
 			MakeRefName(refName, node);
@@ -561,7 +567,7 @@ FSClipboardFindNodeMode(Model *model, bool autoLock, bool updateRefIfNeeded)
 	}
 	if (change)
 		be_clipboard->Commit();
-	
+
 	if (autoLock)
 		be_clipboard->Unlock();
 
@@ -573,19 +579,20 @@ FSClipboardFindNodeMode(Model *model, bool autoLock, bool updateRefIfNeeded)
 
 
 void
-FSClipboardRemove(Model *model)
+FSClipboardRemove(Model* model)
 {
 	BMessenger messenger(kTrackerSignature);
 	if (messenger.IsValid()) {
-		BMessage *report = new BMessage(kFSClipboardChanges);
+		BMessage* report = new BMessage(kFSClipboardChanges);
 		TClipboardNodeRef tcnode;
 		tcnode.node = *model->NodeRef();
 		tcnode.moveMode = kDelete;
-		const entry_ref *ref = model->EntryRef();
+		const entry_ref* ref = model->EntryRef();
 		report->AddInt32("device", ref->device);
 		report->AddInt64("directory", ref->directory);
 		report->AddBool("clearClipboard", false);
-		report->AddData("tcnode", T_CLIPBOARD_NODE, &tcnode, sizeof(tcnode), true);
+		report->AddData("tcnode", T_CLIPBOARD_NODE, &tcnode, sizeof(tcnode),
+			true);
 		messenger.SendMessage(report);
 		delete report;
 	}
@@ -618,10 +625,11 @@ BClipboardRefsWatcher::AddToNotifyList(BMessenger target)
 	if (Lock()) {
 		// add the messenger if it's not already in the list
 		// ToDo: why do we have to care about that?
-		BMessenger *messenger;
+		BMessenger* messenger;
 		bool found = false;
 
-		for (int32 index = 0;(messenger = fNotifyList.ItemAt(index)) != NULL; index++) {
+		for (int32 index = 0; (messenger = fNotifyList.ItemAt(index)) != NULL;
+				index++) {
 			if (*messenger == target) {
 				found = true;
 				break;
@@ -639,9 +647,10 @@ void
 BClipboardRefsWatcher::RemoveFromNotifyList(BMessenger target)
 {
 	if (Lock()) {
-		BMessenger *messenger;
+		BMessenger* messenger;
 
-		for (int32 index = 0;(messenger = fNotifyList.ItemAt(index)) != NULL; index++) {
+		for (int32 index = 0; (messenger = fNotifyList.ItemAt(index)) != NULL;
+				index++) {
 			if (*messenger == target) {
 				delete fNotifyList.RemoveItemAt(index);
 				break;
@@ -653,7 +662,7 @@ BClipboardRefsWatcher::RemoveFromNotifyList(BMessenger target)
 
 
 void
-BClipboardRefsWatcher::AddNode(const node_ref *node)
+BClipboardRefsWatcher::AddNode(const node_ref* node)
 {
 	TTracker::WatchNode(node, B_WATCH_NAME, this);
 	fRefsInClipboard = true;
@@ -661,7 +670,7 @@ BClipboardRefsWatcher::AddNode(const node_ref *node)
 
 
 void
-BClipboardRefsWatcher::RemoveNode(node_ref *node, bool removeFromClipboard)
+BClipboardRefsWatcher::RemoveNode(node_ref* node, bool removeFromClipboard)
 {
 	watch_node(node, B_STOP_WATCHING, this);
 
@@ -669,7 +678,7 @@ BClipboardRefsWatcher::RemoveNode(node_ref *node, bool removeFromClipboard)
 		return;
 
 	if (be_clipboard->Lock()) {
-		BMessage *clip = be_clipboard->Data();
+		BMessage* clip = be_clipboard->Data();
 		if (clip != NULL) {
 			char name[64];
 			MakeRefName(name, node);
@@ -690,18 +699,18 @@ BClipboardRefsWatcher::RemoveNodesByDevice(dev_t device)
 	if (!be_clipboard->Lock())
 		return;
 
-	BMessage *clip = be_clipboard->Data();
+	BMessage* clip = be_clipboard->Data();
 	if (clip != NULL) {
 		char deviceName[6];
-		sprintf(deviceName, "r%ld_", device);
+		sprintf(deviceName, "r%" B_PRIdDEV "_", device);
 
 		int32 index = 0;
-		char *refName;
+		char* refName;
 		type_code type;
 		int32 count;
 		while (clip->GetInfo(B_REF_TYPE, index,
 #ifdef B_BEOS_VERSION_DANO
-			(const char **)
+			(const char**)
 #endif
 			&refName, &type, &count) == B_OK) {
 			if (!strncmp(deviceName, refName, strlen(deviceName))) {
@@ -722,12 +731,12 @@ BClipboardRefsWatcher::RemoveNodesByDevice(dev_t device)
 
 
 void
-BClipboardRefsWatcher::UpdateNode(node_ref *node, entry_ref *ref)
+BClipboardRefsWatcher::UpdateNode(node_ref* node, entry_ref* ref)
 {
 	if (!be_clipboard->Lock())
 		return;
 
-	BMessage *clip = be_clipboard->Data();
+	BMessage* clip = be_clipboard->Data();
 	if (clip != NULL) {
 		char name[64];
 		MakeRefName(name, node);
@@ -735,7 +744,7 @@ BClipboardRefsWatcher::UpdateNode(node_ref *node, entry_ref *ref)
 			clip->RemoveName(name);
 			MakeModeName(name);
 			clip->RemoveName(name);
-			
+
 			RemoveNode(node);
 		}
 		be_clipboard->Commit();
@@ -761,27 +770,28 @@ BClipboardRefsWatcher::Clear()
 	}
 }
 
-/*
-void
-BClipboardRefsWatcher::UpdatePoseViews(bool clearClipboard, const node_ref *node)
-{
-	BMessage message(kFSClipboardChanges);
-	message.AddInt32("device", node->device);
-	message.AddInt64("directory", node->node);
-	message.AddBool("clearClipboard", clearClipboard);
 
-	if (Lock()) {
-		int32 items = fNotifyList.CountItems();
-		for (int32 i = 0;i < items;i++) {
-			fNotifyList.ItemAt(i)->SendMessage(&message);
-		}
-		Unlock();
-	}
-}
-*/
+//void
+//BClipboardRefsWatcher::UpdatePoseViews(bool clearClipboard,
+//	const node_ref* node)
+//{
+//	BMessage message(kFSClipboardChanges);
+//	message.AddInt32("device", node->device);
+//	message.AddInt64("directory", node->node);
+//	message.AddBool("clearClipboard", clearClipboard);
+//
+//	if (Lock()) {
+//		int32 items = fNotifyList.CountItems();
+//		for (int32 i = 0;i < items;i++) {
+//			fNotifyList.ItemAt(i)->SendMessage(&message);
+//		}
+//		Unlock();
+//	}
+//}
+
 
 void
-BClipboardRefsWatcher::UpdatePoseViews(BMessage *reportMessage)
+BClipboardRefsWatcher::UpdatePoseViews(BMessage* reportMessage)
 {
 	if (Lock()) {
 		// check if it was cleared, if so clear watching
@@ -796,9 +806,10 @@ BClipboardRefsWatcher::UpdatePoseViews(BMessage *reportMessage)
 		// move or copy: start watching node_ref
 		// remove: stop watching node_ref
 		int32 index = 0;
-		TClipboardNodeRef *tcnode = NULL;
+		TClipboardNodeRef* tcnode = NULL;
 		ssize_t size;
-		while (reportMessage->FindData("tcnode", T_CLIPBOARD_NODE, index, (const void**)&tcnode, &size) == B_OK) {
+		while (reportMessage->FindData("tcnode", T_CLIPBOARD_NODE, index,
+				(const void**)&tcnode, &size) == B_OK) {
 			if (tcnode->moveMode == kDelete) {
 				watch_node(&tcnode->node, B_STOP_WATCHING, this);
 			} else {
@@ -820,7 +831,7 @@ BClipboardRefsWatcher::UpdatePoseViews(BMessage *reportMessage)
 
 
 void
-BClipboardRefsWatcher::MessageReceived(BMessage *message)
+BClipboardRefsWatcher::MessageReceived(BMessage* message)
 {
 	if (message->what == B_CLIPBOARD_CHANGED && fRefsInClipboard) {
 		if (!(fRefsInClipboard = FSClipboardHasRefs()))
@@ -831,13 +842,13 @@ BClipboardRefsWatcher::MessageReceived(BMessage *message)
 		return;
 	}
 
-	switch (message->FindInt32("opcode")) {	
+	switch (message->FindInt32("opcode")) {
 		case B_ENTRY_MOVED:
 		{
 			ino_t toDir;
 			ino_t fromDir;
 			node_ref node;
-			const char *name = NULL;
+			const char* name = NULL;
 			message->FindInt64("from directory", &fromDir);
 			message->FindInt64("to directory", &toDir);
 			message->FindInt64("node", &node.node);
@@ -846,7 +857,7 @@ BClipboardRefsWatcher::MessageReceived(BMessage *message)
 			entry_ref ref(node.device, toDir, name);
 			UpdateNode(&node, &ref);
 			break;
-		}			
+		}
 
 		case B_DEVICE_UNMOUNTED:
 		{

@@ -92,8 +92,8 @@ PairsView::_HasBitmap(BList& bitmaps, BBitmap* bitmap)
 	return false;
 }
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PairsView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PairsView"
 
 void
 PairsView::_ReadRandomIcons()
@@ -175,7 +175,7 @@ PairsView::_ReadRandomIcons()
 			BAlert* alert = new BAlert("Fatal", msgStr.String(),
 				B_TRANSLATE("OK"), 	NULL, NULL, B_WIDTH_FROM_WIDEST,
 				B_STOP_ALERT);
-			alert->SetShortcut(0, B_ESCAPE);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 			exit(1);
 		}
@@ -183,7 +183,7 @@ PairsView::_ReadRandomIcons()
 	}
 
 	// delete the remaining bitmaps from the list
-	while (BBitmap* bitmap = (BBitmap*)bitmaps.RemoveItem(0L))
+	while (BBitmap* bitmap = (BBitmap*)bitmaps.RemoveItem((int32)0))
 		delete bitmap;
 }
 

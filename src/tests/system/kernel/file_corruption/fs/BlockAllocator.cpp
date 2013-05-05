@@ -722,7 +722,7 @@ BlockAllocator::_FreeInBitmapBlock(uint64 base, uint32 count,
 status_t
 BlockAllocator::_UpdateSuperBlock(Transaction& transaction)
 {
-	// write the super block
+	// write the superblock
 	Block block;
 	if (!block.GetWritable(fVolume, kCheckSumFSSuperBlockOffset / B_PAGE_SIZE,
 			transaction)) {

@@ -140,13 +140,13 @@ struct BPackageInfoSet::PackageMap : public BReferenceable,
 		if (info == NULL)
 			return B_NO_MEMORY;
 		ObjectDeleter<PackageInfo> infoDeleter(info);
-	
+
 		status_t error = info->InitCheck();
 		if (error != B_OK)
 			return error;
-	
+
 		AddPackageInfo(infoDeleter.Detach());
-	
+
 		return B_OK;
 	}
 

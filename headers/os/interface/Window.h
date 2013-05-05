@@ -132,6 +132,7 @@ public:
 									BMessage* message);
 			void				AddShortcut(uint32 key, uint32 modifiers,
 									BMessage* message, BHandler* target);
+			bool				HasShortcut(uint32 key, uint32 modifiers);
 			void				RemoveShortcut(uint32 key, uint32 modifiers);
 
 			void				SetDefaultButton(BButton* button);
@@ -165,8 +166,9 @@ public:
 			void				ResizeBy(float dx, float dy);
 			void				ResizeTo(float width, float height);
 
-			void 				CenterIn(const BRect& rect);
-			void 				CenterOnScreen();
+			void				CenterIn(const BRect& rect);
+			void				CenterOnScreen();
+			void				CenterOnScreen(screen_id id);
 
 	virtual	void				Show();
 	virtual	void				Hide();
@@ -282,6 +284,7 @@ private:
 	struct unpack_cookie;
 	class Shortcut;
 
+	friend class BAlert;
 	friend class BApplication;
 	friend class BBitmap;
 	friend class BView;
@@ -302,6 +305,7 @@ private:
 
 	virtual	void				task_looper();
 
+			BPoint				AlertPosition(const BRect& frame);
 	virtual BMessage*			ConvertToMessage(void* raw, int32 code);
 
 			void				AddShortcut(uint32 key, uint32 modifiers,
@@ -352,6 +356,7 @@ private:
 
 			void				_GetDecoratorSize(float* _borderWidth,
 									float* _tabHeight) const;
+			void				_SendShowOrHideMessage();
 
 private:
 			char*				fTitle;

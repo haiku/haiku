@@ -6,11 +6,11 @@
 /*!
 	\class DragTrackingFilter
 	\brief A simple mouse drag detection filter
-	* 
+	*
 	* A simple mouse filter that detects the start of a mouse drag over a
 	* threshold distance and sends a message with the 'what' field of your
-	* choice. Especially usefull for drag and drop.
-	* Allows you to free your code of encumbering mouse tracking details. 
+	* choice. Especially useful for drag and drop.
+	* Allows you to free your code of encumbering mouse tracking details.
 	*
 	* It can detect fast drags spanning outside of a small view by temporarily
 	* setting the B_POINTER_EVENTS flag on the view.

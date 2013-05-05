@@ -26,8 +26,11 @@ Image::Image(Team* team,const ImageInfo& imageInfo, LocatableFile* imageFile)
 
 Image::~Image()
 {
-	if (fDebugInfo != NULL)
+	if (fDebugInfo != NULL) {
+		if (fTeam != NULL)
+			fTeam->DebugInfo()->RemoveImageDebugInfo(fDebugInfo);
 		fDebugInfo->ReleaseReference();
+	}
 	if (fImageFile != NULL)
 		fImageFile->ReleaseReference();
 }

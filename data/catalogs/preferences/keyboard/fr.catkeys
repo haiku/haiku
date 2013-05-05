@@ -1,14 +1,14 @@
 1	french	x-vnd.Haiku-Keyboard	1711838804
+Written by Andrew Edward McCall	KeyboardApplication		Écrit par Andrew Edward McCall
+Typing test area	KeyboardView		Zone de test de frappe
 Defaults	KeyboardWindow		Par défaut
-Delay until key repeat	KeyboardView		Délai avant répétition des touches
-Fast	KeyboardView		Rapide
 Key repeat rate	KeyboardView		Vitesse de répétition des touches
-Keyboard	System name		Clavier
-Long	KeyboardView		Longue
-OK	KeyboardApplication		OK
 Revert	KeyboardWindow		Rétablir
-Short	KeyboardView		Courte
+Delay until key repeat	KeyboardView		Délai avant répétition des touches
+Keyboard	System name		Clavier
+OK	KeyboardApplication		OK
+Fast	KeyboardView		Rapide
 Slow	KeyboardView		Lente
 Something has gone wrong!	KeyboardApplication		Quelque chose s'est mal passé !
-Typing test area	KeyboardView		Zone de test de frappe
-Written by Andrew Edward McCall	KeyboardApplication		Écrit par Andrew Edward McCall
+Long	KeyboardView		Longue
+Short	KeyboardView		Courte

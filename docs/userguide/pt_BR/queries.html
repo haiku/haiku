@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Adriano Duarte
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Consultas</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../fr/queries.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/queries.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/queries.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/queries.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/queries.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/queries.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/queries.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/queries.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/queries.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/queries.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/queries.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/queries.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../hu/queries.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../ca/queries.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../en/queries.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="index.html">Índice</a> 
+::  <a href="contents.html" class="uplink">Conteúdo</a> 
+::  <a href="workshop-filetypes+attributes.html">Oficina</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Índice</td></tr>
+<tr class="index"><td>
+	<a href="#find-window">A janela Encontrar</a><br />
+	<a href="#basic-query">Consultas básicas - "por Nome"</a><br />
+	<a href="#adv-query">Consultas avançadas - "por Atributo"</a><br />
+	<a href="#more-adv-query">Consultas ainda mais avançadas - "por Fórmula"</a><br />
+	<a href="#result-window">A janela de resultado</a><br />
+	<a href="#query-template">Modelos de Consulta</a>
+</td></tr>
+</table>
+
+<h1>Consultas</h1>
+
+<p>Uma consulta é uma pesquisa de arquivos baseada em atributos e pode ser realizada dentro do Rastreador ou no Terminal. As consultas são salvas em <span class="path">/boot/home/queries/</span> e por padrão após sete dias são eliminadas. Note que estas não listas estáticas resultantes de sua pesquisa, mas são as fórmulas de consulta que ativam uma nova pesquisa toda vez que abertas.<br />
+Ainda melhor, não é preciso duplo clique para refazer uma consulta. Pode-se <a href="tracker.html#navigating">aprofundar</a> uma consulta salva assim como qualquer pasta com o clique do botão direito do mouse sobre ela e navegar através dos submenus.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="find-window" name="find-window">A janela Encontrar</a></h2>
+<p>Inicia-se uma consulta acionando o menu <span class="menu">Encontrar...</span> também a partir do menu da Deskbar ou de qualquer janela do Rastreador ou da Área de Trabalho (que na realidade é uma janela em tela cheia do Rastreador). As teclas de atalho são <span class="key">ALT</span> <span class="key">F</span>. Será mostrada a janela Encontrar:</p>
+<img src="images/queries-images/basic-query.png" alt="basic-query.png" />
+<ol>
+<li><p>Seleciona consultas recentes ou salvas ou salva os parâmetros da pesquisa atual como <a href="#query-template">Modelo de Consulta</a>.</p></li>
+<li><p>Afina sua pesquisa a partir de <span class="menu">Todos os arquivos e pastas</span> para tipos de arquivo específicos.</p></li>
+<li>Define o método de pesquisa:<ul>
+    <li><span class="menu">por Nome</span> - uma pesquisa básica por nome de arquivo ou pasta</li>
+    <li><span class="menu">por Atributo</span> - uma pesquisa avançada, especificando termos de pesquisa para um ou mais atributos</li>
+    <li><span class="menu">por Fórmula</span> - uma pesquisa ainda mais avançada, pode-se fazer uma sintonia fina de um termo de pesquisa complexo</li></ul></li>
+<li><p>Seleciona que dispositivos pesquisar.</p></li>
+<li><p>Insere o termo de pesquisa.</p></li>
+<li><p>O expansor oculta/exibe as opções adicionais.</p></li>
+<li><p>Desmarque a caixa de verificação <span class="menu">Temporário</span> se não quiser que esta consulta se auto-destrua após 7 dias.</p></li>
+<li><p>Marque se sua pesquisa pretende <span class="menu">Incluir a lixeira</span>.</p></li>
+<li><p>Opcionalmente, insira um nome para esta pesquisa se deseja salvá-la.</p></li>
+<li><p>Pode-se arrastar e soltar o ícone em qualquer lugar para salvar uma consulta. Fazer isso com o botão direito do mouse, oferece a opção de salvar como modelo.</p></li>
+</ol>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="basic-query" name="basic-query">Consultas básicas - "por Nome"</a></h2>
+<p>Se simplesmente deseja encontrar todos os arquivos e pastas em seus discos montados que atendem a certo padrão, simplesmente deixe o método de pesquisa em <span class="menu">por Nome</span>, insira o termo de pesquisa dentro da caixa de texto e pressione <span class="key">ENTER</span>.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="adv-query" name="adv-query">Consultas avançadas - "por Atributo"</a></h2>
+<p>Pode-se criar consultas mais avançadas pela pesquisa dentro dos atributos de tipos específicos de arquivo. Para que funcione, estes atributos tem que estar <a href="index.html">indexados</a>.</p>
+<img src="images/queries-images/query-window.png" alt="query-window.png" />
+<p>Comece por definir o tipo de arquivo a partir de <span class="menu">Todos os arquivos e pastas</span> para, por exemplo, <span class="menu">Texto | Correio eletrônico</span> e altere o método de pesquisa para <span class="menu">por Atributo</span>.</p>
+<p>Isto adiciona um menu pop-up à esquerda da caixa de texto e os botões <span class="button">Adicionar</span> e <span class="button">Remover</span> abaixo dele. A partir do menu escolha qual atributo pesquisar. Com <span class="button">Adicionar</span> e <span class="button">Remover</span> pode-se consultar atributos adicionais ou removê-los novamente. Estes atributos podem ser logicamente vinculados com E/OU.</p>
+<p>Façamos uma consulta de correio eletrônico como um exemplo:</p>
+<img src="images/queries-images/query-window-filled.png" alt="query-window-filled.png" />
+<p>Esta é sua janela Encontrar quando está procurando por todas as mensagens que Clara Botters enviou a você nos últimos dois meses com o assunto "vibraphone" ou "skepticality".<br />
+Como pode ver, procurar através de atributos baseados em tempo suporta algumas frases úteis: além de "últimos 2 meses", poderia também utilizar "hoje", "ontem", "Segunda-feira" ou "última Segunda-feira" (o que seria a Segunda-feira da semana passada), ou "últimos 2 minutos/horas/dias/semanas".<br />
+Uma boa maneira de reduzir o número de resultados de pesquisa.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="more-adv-query" name="more-adv-query">Consutlas ainda mais avançadas - "por Fórmula"</a></h2>
+<p>Digitar em uma consulta por fórmula à mão é assustador e realmente muito pouco prático. Mas tem seus usos.</p>
+<p>Tome a consulta por atributo das mensagens de Clara sobre vibrafones acima. Se possui todos os atributos e seus termos de busca definidos, tente alterar para o modo <span class="menu">por Fórmula</span> mode e seja oprimido por esta sequência de consulta em uma linha:</p>
+<img src="images/queries-images/formula-query.png" alt="formula-query.png" />
+<p>Mais uma vez como texto, editado para maior legibilidade:</p>
+<pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [bB][oO][tT][tT][eE][rR][sS]*")
+       &amp;&amp;(MAIL:when&gt;=%2 months%))
+       &amp;&amp;(MAIL:subject=="*[vV][iI][bB][rR][aA][pP][hH][oO][nN][eE]*"))
+       ||(MAIL:subject=="*[sS][kK][eE][pP][tT][iI][cC][aA][lL][iI][tT][yY]*"))
+       &amp;&amp;(BEOS:TYPE=="text/x-email"))</pre>
+<p>Qual é a utilidade?</p>
+<ul>
+<li><p>Poderia copiar e colar a sequência dentro de uma mensagem de correio, forum ou IRC para outros utilizarem ou depurarem.</p></li>
+<li><p>Pode-se utilizar este método para construir uma consulta no modo <span class="menu">Atributo</span> e então alternar para o modo <span class="menu">Fórmula</span>, para confortavelmente gerar uma sequência de pesquisa para uso numa consulta no Terminal ou num script.</p></li>
+<li><p>Pode-se realizar uma sintonia fina de sua consulta ao inserir parêntesis onde necessário, fazer partes diferenciarem maiúsculas de minúsculas ou negar combinações lógicas por mudança. Por exemplo, "<tt>==</tt>" para "<tt>!=</tt>" para um NÃO E. Tudo o que precisa é um entendimento básico de <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression">expressões regulares</a> e talvez alguma base de scripting.</p></li>
+</ul>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="result-window" name="result-window">A janela de resultado</a></h2>
+<p>Após iniciar uma pesquisa, a janela Encontrar será substituída por uma janela de resultado. Aqui está um exemplo que consultou por "servidor":</p>
+<img src="images/queries-images/result-window.png" alt="result-window.png" />
+<p>Além do fundo cinzaa janela de resultado funciona exatamente como qualquer outra janela do Rastreador. Algumas coisas são dignas de nota:</p>
+<ul>
+<li><p>Pode-se abrir a localização de um arquivo ou pasta pelo clique duplo no seu atributo de caminho.</p></li>
+<li><p>Com <span class="menu">Arquivo | Editar consulta</span> ou <span class="key">ALT</span> <span class="key">G</span> pode-se voltar para a janela Encontrar para refinar a consulta.</p></li>
+<li><p>Uma consulta é viva, ou seja, se um arquivo que atende a seus critérios de pesquisa aparece ou desaparece de seu sistema, esta mudança é refletida nos seus resultados em tempo real.</p></li>
+</ul>
+<p>Pode-se atribuir uma disposição de atributo sensível para resultados de consultas de um tipo de arquivo específico. Abra uma pasta contendo arquivos do tipo de arquivo para o qualque gostaria de criar um modelo e organize os atributos como gostaria de ter os resultados da consulta apresentados. Copie esta disposição com <span class="menu">Atributos | Copiar disposição</span>.</p>
+<p>Abra <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, crie uma nova pasta chamada <i>grupo/tipo de arquivo</i>, substituindo a barra com um sublinhado, por exemplo "audio_x-mp3". Abra a nova pasta e cole nela a disposição previamente copiada com <span class="menu">Atributos | Colar disposição</span>.</p>
+
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="query-template" name="query-template">Modelos de Consulta</a></h2>
+<p>Ao executar duplo clique numa consulta salva, a pesquisa de arquivo é iniciada e a janela de resultado abre imediatamente. Contudo, você pode não querer pesquisar com estes parâmetros de pesquisa <i>exatos</i>, mas utilizá-lo como ponto de partida para apenas ajustar levemente a fórmula.<br />
+Ao utilizar o item de menu <span class="menu">Salvar consulta como modelo</span> (veja <a href="#find-window">(1) na captura de tela</a> no topo) ou arrastar e soltar o ícone (10) em qualquer lugar com o botão direito do mouse, pode-se criar o referido modelo. Um duplo clique nele não irá abrir uma janela de resultado, mas a janela de diálogo Encontrar, dando a oportunidade para rapidamente alterar as sequências de pesquisa ou adicionar/remover atributos.</p>
+<p>Onde quer que escolha salvar modelos de consulta, eles serão listados no menu da janela de diálogo Encontrar de consultas recentes.</p>
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="index.html">Índice</a> 
+::  <a href="contents.html" class="uplink">Conteúdo</a> 
+::  <a href="workshop-filetypes+attributes.html">Oficina</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

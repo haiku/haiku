@@ -25,6 +25,12 @@ virtual	status_t			SetupDevice(bool deviceReplugged);
 virtual	status_t			StartDevice();
 virtual	status_t			OnNotify(uint32 actualLength);
 virtual	status_t			GetLinkState(ether_link_state *state);
+virtual	status_t			ReadMACAddress(ether_address_t *address);
+
+		status_t			_WakeupPHY();
+		status_t			_SetupAX88772();
+		status_t			_SetupAX88772A();
+		status_t			_SetupAX88772B();
 };
 
 #endif // _USB_AX88772_DEVICE_H_

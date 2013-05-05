@@ -8,7 +8,7 @@ determineGitRevision()
 	revision=`cat ${haikuBuildOutputDir}/haiku-revision 2>/dev/null`
 	lastBuiltRevision=`cat ${haikuBuildOutputDir}/last-built-revision \
 		2>/dev/null`
-	localRev=`git rev-list -n1 HEAD`
+	localRev=`git rev-parse HEAD`
 
 	# only determine the haiku-revision if anything has changed from
 	# last build
@@ -16,7 +16,10 @@ determineGitRevision()
 		# the revision we use is the description of HEAD with respect to the
 		# last reachable hrev-(haiku-revision-)tag
 		revision=`git describe --dirty --tags --match=hrev*`
-		if echo "$revision" | grep -- '-' >/dev/null; then
+		if [ -z "$revision" ]; then
+			# failed to find any hrev tags, use short hash instead
+			revision=`git rev-parse --short HEAD`
+		elif echo "$revision" | grep -- '-' >/dev/null; then
 			# HEAD is not directly a changeset from Haiku's central repo, so we
 			# add the current branch name as additional info
 			branchName=`git branch | grep '*' | cut -b 3-`
@@ -59,7 +62,7 @@ determineHaikuRevision()
 			grep --max-count=1 "(svn r" |
 			$SED -n -e 's,(svn r\(.*\)).*,\1,p'`
 	fi
-	if [ "$revision" = "" ]; then
+	if [ -z "$revision" ]; then
 		revision=0
 	fi
 	echo $revision >${haikuBuildOutputDir}/haiku-revision

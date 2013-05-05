@@ -1,16 +1,22 @@
 SubDir HAIKU_TOP src preferences appearance ;
 
 UsePrivateHeaders app interface [ FDirName servers app ] ;
-UseFreeTypeHeaders ;
+UseHeaders $(HAIKU_FREETYPE_HEADERS) : true ;
+
+Includes [ FGristFiles AntialiasingSettingsView.cpp ]
+	: $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
 
 Preference Appearance :
 	APRMain.cpp
 	AntialiasingSettingsView.cpp
-	DecorSettingsView.cpp
+	LookAndFeelSettingsView.cpp
+	FakeScrollBar.cpp
+	FontSelectionView.cpp
+	FontView.cpp
 	APRView.cpp
 	APRWindow.cpp
+	ColorPreview.cpp
 	ColorSet.cpp
-	ColorWell.cpp
 	ColorWhichItem.cpp
 
 	# These are currently disabled while everything else is being worked on
@@ -30,11 +36,12 @@ DoCatalogs Appearance :
 	x-vnd.Haiku-Appearance
 	:
 	AntialiasingSettingsView.cpp
-	DecorSettingsView.cpp
 	APRView.cpp
 	APRWindow.cpp
+	ColorPreview.cpp
 	ColorSet.cpp
-	ColorWell.cpp
 	ColorWhichItem.cpp
+	LookAndFeelSettingsView.cpp
+	FontView.cpp
+	FontSelectionView.cpp
 ;
-

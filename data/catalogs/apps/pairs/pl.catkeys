@@ -1,12 +1,14 @@
-1	polish	x-vnd.Haiku-Pairs	1126884905
-Beginner (4x4)	PairsWindow		Początkujący (4x4)
+1	polish	x-vnd.Haiku-Pairs	1981673050
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\tnapisał Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nUkończyłeś grę w %num% kliknięć.\n
 Expert (8x8)	PairsWindow		Ekspert (8x8)
-Game	PairsWindow		Gra
-Intermediate (6x6)	PairsWindow		Średni (6x6)
-New	PairsWindow		Nowy
-New game	PairsWindow		Nowa gra
-OK	PairsView		OK
-Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Pairs nie znalazły wystarczająco dużo ikon wektorowych w systemie; potrzeba co najmniej %d.
-Quit	PairsWindow		Zamknij
+Beginner (4x4)	PairsWindow		Początkujący (4x4)
 Quit game	PairsWindow		Wyjdź z gry
+Game	PairsWindow		Gra
 Size	PairsWindow		Rozmiar
+New	PairsWindow		Nowy
+OK	PairsView		OK
+Intermediate (6x6)	PairsWindow		Średni (6x6)
+Quit	PairsWindow		Zamknij
+Pairs	System name		Pary
+New game	PairsWindow		Nowa gra
+Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Pairs nie znalazły wystarczająco dużo ikon wektorowych w systemie; potrzeba co najmniej %d.

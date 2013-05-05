@@ -195,7 +195,7 @@ X86PagingMethod32Bit::PhysicalPageSlotPool::AllocatePool(
 	physical_address_restrictions physicalRestrictions = {};
 	area_id dataArea = create_area_etc(B_SYSTEM_TEAM, "physical page pool",
 		PAGE_ALIGN(areaSize), B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, CREATE_AREA_DONT_WAIT,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, CREATE_AREA_DONT_WAIT, 0,
 		&virtualRestrictions, &physicalRestrictions, &data);
 	if (dataArea < 0)
 		return dataArea;
@@ -266,7 +266,7 @@ X86PagingMethod32Bit::Init(kernel_args* args,
 	TRACE("X86PagingMethod32Bit::Init(): entry\n");
 
 	// page hole set up in stage2
-	fPageHole = (page_table_entry*)args->arch_args.page_hole;
+	fPageHole = (page_table_entry*)(addr_t)args->arch_args.page_hole;
 	// calculate where the pgdir would be
 	fPageHolePageDir = (page_directory_entry*)
 		(((addr_t)args->arch_args.page_hole)
@@ -276,7 +276,7 @@ X86PagingMethod32Bit::Init(kernel_args* args,
 		sizeof(page_directory_entry) * NUM_USER_PGDIR_ENTS);
 
 	fKernelPhysicalPageDirectory = args->arch_args.phys_pgdir;
-	fKernelVirtualPageDirectory = (page_directory_entry*)
+	fKernelVirtualPageDirectory = (page_directory_entry*)(addr_t)
 		args->arch_args.vir_pgdir;
 
 #ifdef TRACE_X86_PAGING_METHOD_32_BIT
@@ -367,7 +367,7 @@ X86PagingMethod32Bit::CreateTranslationMap(bool kernel, VMTranslationMap** _map)
 status_t
 X86PagingMethod32Bit::MapEarly(kernel_args* args, addr_t virtualAddress,
 	phys_addr_t physicalAddress, uint8 attributes,
-	phys_addr_t (*get_free_page)(kernel_args*))
+	page_num_t (*get_free_page)(kernel_args*))
 {
 	// XXX horrible back door to map a page quickly regardless of translation
 	// map object, etc. used only during VM setup.
@@ -419,9 +419,8 @@ X86PagingMethod32Bit::IsKernelPageAccessible(addr_t virtualAddress,
 {
 	// We only trust the kernel team's page directory. So switch to it first.
 	// Always set it to make sure the TLBs don't contain obsolete data.
-	uint32 physicalPageDirectory;
-	read_cr3(physicalPageDirectory);
-	write_cr3(fKernelPhysicalPageDirectory);
+	uint32 physicalPageDirectory = x86_read_cr3();
+	x86_write_cr3(fKernelPhysicalPageDirectory);
 
 	// get the page directory entry for the address
 	page_directory_entry pageDirectoryEntry;
@@ -465,7 +464,7 @@ X86PagingMethod32Bit::IsKernelPageAccessible(addr_t virtualAddress,
 
 	// switch back to the original page directory
 	if (physicalPageDirectory != fKernelPhysicalPageDirectory)
-		write_cr3(physicalPageDirectory);
+		x86_write_cr3(physicalPageDirectory);
 
 	if ((pageTableEntry & X86_PTE_PRESENT) == 0)
 		return false;

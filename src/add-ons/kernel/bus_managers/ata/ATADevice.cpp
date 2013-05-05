@@ -532,32 +532,13 @@ ATADevice::Configure()
 		return B_ERROR;
 	}
 
-	fTotalSectors = fInfoBlock.lba_sector_count;
-
-	if (fInfoBlock.word_106_bit_14_one && !fInfoBlock.word_106_bit_15_zero) {
-		// contains a valid block size configuration
-		if (fInfoBlock.logical_sector_not_512_bytes)
-			fBlockSize = fInfoBlock.logical_sector_size * 2;
-
-		if (fInfoBlock.multiple_logical_per_physical_sectors) {
-			fPhysicalBlockSize
-				= fBlockSize << fInfoBlock.logical_sectors_per_physical_sector;
-		} else
-			fPhysicalBlockSize = fBlockSize;
-	}
-	if (fInfoBlock.word_209_bit_14_one && !fInfoBlock.word_209_bit_15_zero) {
-		// contains a valid logical block offset configuration
-		fBlockOffset = fInfoBlock.logical_sector_offset;
-	}
+	fTotalSectors = fInfoBlock.SectorCount(fUse48Bits, false);
+	fBlockSize = fInfoBlock.SectorSize();
+	fPhysicalBlockSize = fInfoBlock.PhysicalSectorSize();
+	fBlockOffset = fInfoBlock.BlockOffset();
 
 	fTaskFile.lba.mode = ATA_MODE_LBA;
 	fTaskFile.lba.device = fIndex;
-
-	if (fInfoBlock.lba48_supported
-		&& fInfoBlock.lba48_sector_count >= fInfoBlock.lba_sector_count) {
-		fUse48Bits = true;
-		fTotalSectors = fInfoBlock.lba48_sector_count;
-	}
 
 	status_t result = ConfigureDMA();
 	if (result != B_OK)
@@ -574,7 +555,7 @@ ATADevice::Configure()
 status_t
 ATADevice::Identify()
 {
-	snprintf(fDebugContext, sizeof(fDebugContext), "%s %lu-%u",
+	snprintf(fDebugContext, sizeof(fDebugContext), "%s %" B_PRIu32 "-%u",
 		IsATAPI() ? "pi" : "", fChannel->ChannelID(), fIndex);
 
 	ATARequest request(false);

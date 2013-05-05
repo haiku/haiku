@@ -18,8 +18,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "SyslogDaemon"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "SyslogDaemon"
 
 const char *kSignature = "application/x-vnd.Haiku-SystemLogger";
 
@@ -73,6 +73,7 @@ SyslogDaemon::AboutRequested()
 	font.SetFace(B_BOLD_FACE); 			
 	view->SetFontAndColor(0, name.Length(), &font);
 
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go(NULL);
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku.
+ * Copyright 2001-2013, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -109,7 +109,8 @@ ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
 		fSignature = "application/no-signature";
 
 	char name[B_OS_NAME_LENGTH];
-	snprintf(name, sizeof(name), "a<%ld:%s", clientTeam, SignatureLeaf());
+	snprintf(name, sizeof(name), "a<%" B_PRId32 ":%s", clientTeam,
+		SignatureLeaf());
 
 	fMessagePort = create_port(DEFAULT_MONITOR_PORT_SIZE, name);
 	if (fMessagePort < B_OK)
@@ -141,8 +142,8 @@ ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
 	desktop->UnlockSingleWindow();
 
 	STRACE(("ServerApp %s:\n", Signature()));
-	STRACE(("\tBApp port: %ld\n", fClientReplyPort));
-	STRACE(("\tReceiver port: %ld\n", fMessagePort));
+	STRACE(("\tBApp port: %" B_PRId32 "\n", fClientReplyPort));
+	STRACE(("\tReceiver port: %" B_PRId32 "\n", fMessagePort));
 }
 
 
@@ -191,6 +192,7 @@ ServerApp::~ServerApp()
 		fWindowListLock.Lock();
 	}
 
+	fMemoryAllocator.Detach();
 	fMapLocker.Lock();
 
 	while (!fBitmapMap.empty())
@@ -484,13 +486,28 @@ ServerApp::RemovePicture(ServerPicture* picture)
 }
 
 
+/*!	Called from the ClientMemoryAllocator whenever a server area could be
+	deleted.
+	A message is then sent to the client telling it that it can delete its
+	client area, too.
+*/
+void
+ServerApp::NotifyDeleteClientArea(area_id serverArea)
+{
+	BMessage notify(kMsgDeleteServerMemoryArea);
+	notify.AddInt32("server area", serverArea);
+
+	SendMessageToClient(&notify);
+}
+
+
 // #pragma mark - private methods
 
 
 void
 ServerApp::_GetLooperName(char* name, size_t length)
 {
-	snprintf(name, length, "a:%ld:%s", ClientTeam(), SignatureLeaf());
+	snprintf(name, length, "a:%" B_PRId32 ":%s", ClientTeam(), SignatureLeaf());
 }
 
 
@@ -552,13 +569,14 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		{
 			fMapLocker.Lock();
 
-			debug_printf("Application %ld, %s: %d bitmaps:\n", ClientTeam(),
-				Signature(), (int)fBitmapMap.size());
+			debug_printf("Application %" B_PRId32 ", %s: %d bitmaps:\n",
+				ClientTeam(), Signature(), (int)fBitmapMap.size());
 
 			BitmapMap::const_iterator iterator = fBitmapMap.begin();
 			for (; iterator != fBitmapMap.end(); iterator++) {
 				ServerBitmap* bitmap = iterator->second;
-				debug_printf("  [%ld] %ldx%ld, area %ld, size %ld\n",
+				debug_printf("  [%" B_PRId32 "] %" B_PRId32 "x%" B_PRId32 ", "
+					"area %" B_PRId32 ", size %" B_PRId32 "\n",
 					bitmap->Token(), bitmap->Width(), bitmap->Height(),
 					bitmap->Area(), bitmap->BitsLength());
 			}
@@ -720,10 +738,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				fLink.Attach<int32>(bitmap->Token());
 				fLink.Attach<uint8>(allocationFlags);
 
-				fLink.Attach<area_id>(
-					fMemoryAllocator.Area(bitmap->AllocationCookie()));
-				fLink.Attach<int32>(
-					fMemoryAllocator.AreaOffset(bitmap->AllocationCookie()));
+				fLink.Attach<area_id>(bitmap->Area());
+				fLink.Attach<int32>(bitmap->AreaOffset());
 
 				if ((allocationFlags & kFramebuffer) != 0)
 					fLink.Attach<int32>(bitmap->BytesPerRow());
@@ -752,8 +768,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			ServerBitmap* bitmap = _FindBitmap(token);
 			if (bitmap != NULL) {
-				STRACE(("ServerApp %s: Deleting Bitmap %ld\n", Signature(),
-					token));
+				STRACE(("ServerApp %s: Deleting Bitmap %" B_PRId32 "\n",
+					Signature(), token));
 
 				_DeleteBitmap(bitmap);
 			}
@@ -774,7 +790,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			ServerBitmap* bitmap = GetBitmap(token);
 			if (bitmap != NULL) {
 				STRACE(("ServerApp %s: Get overlay restrictions for bitmap "
-					"%ld\n", Signature(), token));
+					"%" B_PRId32 "\n", Signature(), token));
 
 				status = fDesktop->HWInterface()->GetOverlayRestrictions(
 					bitmap->Overlay(), &restrictions);
@@ -802,6 +818,49 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			fLink.StartMessage(B_OK);
 			fLink.Attach<int32>(flags);
+			fLink.Flush();
+			break;
+		}
+
+		case AS_RECONNECT_BITMAP:
+		{
+			// First, let's attempt to allocate the bitmap
+			ServerBitmap* bitmap = NULL;
+
+			BRect frame;
+			color_space colorSpace;
+			uint32 flags;
+			int32 bytesPerRow;
+			int32 screenID;
+			area_id clientArea;
+			int32 areaOffset;
+
+			link.Read<BRect>(&frame);
+			link.Read<color_space>(&colorSpace);
+			link.Read<uint32>(&flags);
+			link.Read<int32>(&bytesPerRow);
+			link.Read<int32>(&screenID);
+			link.Read<int32>(&clientArea);
+			if (link.Read<int32>(&areaOffset) == B_OK) {
+				// TODO: choose the right HWInterface with regards to the
+				// screenID
+				bitmap = gBitmapManager->CloneFromClient(clientArea, areaOffset,
+					frame, colorSpace, flags, bytesPerRow);
+			}
+
+			if (bitmap != NULL && _AddBitmap(bitmap)) {
+				fLink.StartMessage(B_OK);
+				fLink.Attach<int32>(bitmap->Token());
+
+				fLink.Attach<area_id>(bitmap->Area());
+
+			} else {
+				if (bitmap != NULL)
+					bitmap->ReleaseReference();
+
+				fLink.StartMessage(B_NO_MEMORY);
+			}
+
 			fLink.Flush();
 			break;
 		}
@@ -2713,17 +2772,17 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<uint32>(&index);
 
 			fLink.StartMessage(B_OK);
-			fDesktop->Lock();
+			fDesktop->LockSingleWindow();
 
 			// we're nice to our children (and also take the default case
 			// into account which asks for the current workspace)
 			if (index >= (uint32)kMaxWorkspaces)
 				index = fDesktop->CurrentWorkspace();
 
-			Workspace workspace(*fDesktop, index);
+			Workspace workspace(*fDesktop, index, true);
 			fLink.Attach<rgb_color>(workspace.Color());
 
-			fDesktop->Unlock();
+			fDesktop->UnlockSingleWindow();
 			fLink.Flush();
 			break;
 		}
@@ -2741,7 +2800,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (link.Read<bool>(&makeDefault) != B_OK)
 				break;
 
-			fDesktop->Lock();
+			fDesktop->LockAllWindows();
 
 			// we're nice to our children (and also take the default case
 			// into account which asks for the current workspace)
@@ -2751,7 +2810,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			Workspace workspace(*fDesktop, index);
 			workspace.SetColor(color, makeDefault);
 
-			fDesktop->Unlock();
+			fDesktop->UnlockAllWindows();
 			break;
 		}
 
@@ -3105,8 +3164,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		}
 
 		default:
-			printf("ServerApp %s received unhandled message code %ld\n",
-				Signature(), code);
+			printf("ServerApp %s received unhandled message code %" B_PRId32
+				"\n", Signature(), code);
 
 			if (link.NeedsReply()) {
 				// the client is now blocking and waiting for a reply!
@@ -3143,8 +3202,8 @@ ServerApp::_MessageLooper()
 	status_t err = B_OK;
 
 	while (!fQuitting) {
-		STRACE(("info: ServerApp::_MessageLooper() listening on port %ld.\n",
-			fMessagePort));
+		STRACE(("info: ServerApp::_MessageLooper() listening on port %" B_PRId32
+			".\n", fMessagePort));
 
 		err = receiver.GetNextMessage(code, B_INFINITE_TIMEOUT);
 		if (err != B_OK || code == B_QUIT_REQUESTED) {

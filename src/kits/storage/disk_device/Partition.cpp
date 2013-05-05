@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <errno.h>
 #include <new>
 #include <unistd.h>
@@ -44,6 +45,7 @@ using std::nothrow;
 
 static const char *skAutoCreatePrefix = "_HaikuAutoCreated";
 
+
 /*!	\class BPartition
 	\brief A BPartition object represent a partition and provides a lot of
 		   methods to retrieve information about it and some to manipulate it.
@@ -55,7 +57,6 @@ static const char *skAutoCreatePrefix = "_HaikuAutoCreated";
 */
 
 
-// compare_string
 /*!	\brief \c NULL aware strcmp().
 
 	\c NULL is considered the least of all strings. \c NULL equals \c NULL.
@@ -73,23 +74,26 @@ compare_string(const char* str1, const char* str2)
 		if (str2 == NULL)
 			return 0;
 		return 1;
-	} else if (str2 == NULL)
+	}
+	if (str2 == NULL)
 		return -1;
 	return strcmp(str1, str2);
 }
 
 
-// constructor
+// #pragma mark -
+
+
 BPartition::BPartition()
-	: fDevice(NULL),
-	  fParent(NULL),
-	  fPartitionData(NULL),
-	  fDelegate(NULL)
+	:
+	fDevice(NULL),
+	fParent(NULL),
+	fPartitionData(NULL),
+	fDelegate(NULL)
 {
 }
 
 
-// destructor
 /*!	\brief Frees all resources associated with this object.
 */
 BPartition::~BPartition()
@@ -98,7 +102,6 @@ BPartition::~BPartition()
 }
 
 
-// Offset
 /*!	\brief Returns the partition's offset relative to the beginning of the
 		   device it resides on.
 	\return The partition's offset in bytes relative to the beginning of the
@@ -111,7 +114,6 @@ BPartition::Offset() const
 }
 
 
-// Size
 /*!	\brief Returns the size of the partition.
 	\return The size of the partition in bytes.
 */
@@ -122,14 +124,13 @@ BPartition::Size() const
 }
 
 
-// ContentSize
 off_t
 BPartition::ContentSize() const
 {
 	return _PartitionData()->content_size;
 }
 
-// BlockSize
+
 /*!	\brief Returns the block size of the device.
 	\return The block size of the device in bytes.
 */
@@ -140,7 +141,6 @@ BPartition::BlockSize() const
 }
 
 
-// Index
 /*!	\brief Returns the index of the partition in its session's list of
 		   partitions.
 	\return The index of the partition in its session's list of partitions.
@@ -152,7 +152,6 @@ BPartition::Index() const
 }
 
 
-// Status
 uint32
 BPartition::Status() const
 {
@@ -160,7 +159,6 @@ BPartition::Status() const
 }
 
 
-// ContainsFileSystem
 bool
 BPartition::ContainsFileSystem() const
 {
@@ -168,7 +166,6 @@ BPartition::ContainsFileSystem() const
 }
 
 
-// ContainsPartitioningSystem
 bool
 BPartition::ContainsPartitioningSystem() const
 {
@@ -176,7 +173,6 @@ BPartition::ContainsPartitioningSystem() const
 }
 
 
-// IsDevice
 bool
 BPartition::IsDevice() const
 {
@@ -184,7 +180,6 @@ BPartition::IsDevice() const
 }
 
 
-// IsReadOnly
 bool
 BPartition::IsReadOnly() const
 {
@@ -192,7 +187,6 @@ BPartition::IsReadOnly() const
 }
 
 
-// IsMounted
 /*!	\brief Returns whether the volume is mounted.
 	\return \c true, if the volume is mounted, \c false otherwise.
 */
@@ -205,7 +199,6 @@ BPartition::IsMounted() const
 }
 
 
-// IsBusy
 bool
 BPartition::IsBusy() const
 {
@@ -213,7 +206,6 @@ BPartition::IsBusy() const
 }
 
 
-// SupportsChildName
 bool
 BPartition::SupportsChildName() const
 {
@@ -221,7 +213,6 @@ BPartition::SupportsChildName() const
 }
 
 
-// Flags
 /*!	\brief Returns the flags for this partitions.
 
 	The partition flags are a bitwise combination of:
@@ -242,7 +233,6 @@ BPartition::Flags() const
 }
 
 
-// Name
 /*!	\brief Returns the name of the partition.
 
 	Note, that not all partitioning system support names. The method returns
@@ -258,7 +248,6 @@ BPartition::Name() const
 }
 
 
-// ContentName
 const char*
 BPartition::ContentName() const
 {
@@ -266,7 +255,6 @@ BPartition::ContentName() const
 }
 
 
-// Type
 /*!	\brief Returns a human readable string for the type of the partition.
 	\return A human readable string for the type of the partition.
 */
@@ -277,7 +265,6 @@ BPartition::Type() const
 }
 
 
-// ContentType
 const char*
 BPartition::ContentType() const
 {
@@ -285,7 +272,6 @@ BPartition::ContentType() const
 }
 
 
-// ID
 /*!	\brief Returns a unique identifier for this partition.
 
 	The ID is not persistent, i.e. in general won't be the same after
@@ -302,7 +288,6 @@ BPartition::ID() const
 }
 
 
-// Parameters
 const char*
 BPartition::Parameters() const
 {
@@ -310,7 +295,6 @@ BPartition::Parameters() const
 }
 
 
-// ContentParameters
 const char*
 BPartition::ContentParameters() const
 {
@@ -318,12 +302,11 @@ BPartition::ContentParameters() const
 }
 
 
-// GetDiskSystem
 status_t
 BPartition::GetDiskSystem(BDiskSystem* diskSystem) const
 {
 	const user_partition_data* data = _PartitionData();
-	if (!data || !diskSystem)
+	if (data == NULL || diskSystem == NULL)
 		return B_BAD_VALUE;
 
 	if (data->disk_system < 0)
@@ -333,7 +316,6 @@ BPartition::GetDiskSystem(BDiskSystem* diskSystem) const
 }
 
 
-// GetPath
 status_t
 BPartition::GetPath(BPath* path) const
 {
@@ -354,10 +336,11 @@ BPartition::GetPath(BPath* path) const
 		if (!leaf || strcmp(leaf, "raw") != B_OK)
 			return B_ERROR;
 
-		snprintf(indexBuffer, sizeof(indexBuffer), "%ld", Index());
+		snprintf(indexBuffer, sizeof(indexBuffer), "%" B_PRId32, Index());
 	} else {
 		// Our parent is a normal partition, no device: Append our index.
-		snprintf(indexBuffer, sizeof(indexBuffer), "%s_%ld", path->Leaf(), Index());
+		snprintf(indexBuffer, sizeof(indexBuffer), "%s_%" B_PRId32,
+			path->Leaf(), Index());
 	}
 
 	error = path->GetParent(path);
@@ -368,7 +351,6 @@ BPartition::GetPath(BPath* path) const
 }
 
 
-// GetVolume
 /*!	\brief Returns a BVolume for the partition.
 
 	This can only succeed, if the partition is mounted.
@@ -381,14 +363,13 @@ BPartition::GetPath(BPath* path) const
 status_t
 BPartition::GetVolume(BVolume* volume) const
 {
-	if (!volume)
+	if (volume == NULL)
 		return B_BAD_VALUE;
 
 	return volume->SetTo(_PartitionData()->volume);
 }
 
 
-// GetIcon
 /*!	\brief Returns an icon for this partition.
 
 	Note, that currently there are only per-device icons, i.e. the method
@@ -459,7 +440,6 @@ BPartition::GetIcon(uint8** _data, size_t* _size, type_code* _type) const
 }
 
 
-// GetMountPoint
 /*!	\brief Returns the mount point for the partition.
 
 	If the partition is mounted this is the actual mount point. If it is not
@@ -476,7 +456,7 @@ BPartition::GetIcon(uint8** _data, size_t* _size, type_code* _type) const
 status_t
 BPartition::GetMountPoint(BPath* mountPoint) const
 {
-	if (!mountPoint || !ContainsFileSystem())
+	if (mountPoint == NULL || !ContainsFileSystem())
 		return B_BAD_VALUE;
 
 	// if the partition is mounted, return the actual mount point
@@ -492,9 +472,9 @@ BPartition::GetMountPoint(BPath* mountPoint) const
 	// partition not mounted
 	// get the volume name
 	const char* volumeName = ContentName();
-	if (!volumeName || strlen(volumeName) == 0)
+	if (volumeName == NULL || strlen(volumeName) == 0)
 		volumeName = Name();
-	if (!volumeName || strlen(volumeName) == 0)
+	if (volumeName == NULL || strlen(volumeName) == 0)
 		volumeName = "unnamed volume";
 
 	// construct a path name from the volume name
@@ -523,7 +503,6 @@ BPartition::GetMountPoint(BPath* mountPoint) const
 }
 
 
-// Mount
 /*!	\brief Mounts the volume.
 
 	The volume can only be mounted, if the partition contains a recognized
@@ -597,7 +576,6 @@ BPartition::Mount(const char* mountPoint, uint32 mountFlags,
 }
 
 
-// Unmount
 /*!	\brief Unmounts the volume.
 
 	The volume can of course only be unmounted, if it currently is mounted.
@@ -642,7 +620,6 @@ BPartition::Unmount(uint32 unmountFlags)
 }
 
 
-// Device
 /*!	\brief Returns the device this partition resides on.
 	\return The device this partition resides on.
 */
@@ -653,7 +630,6 @@ BPartition::Device() const
 }
 
 
-// Parent
 BPartition*
 BPartition::Parent() const
 {
@@ -661,11 +637,10 @@ BPartition::Parent() const
 }
 
 
-// ChildAt
 BPartition*
 BPartition::ChildAt(int32 index) const
 {
-	if (fDelegate) {
+	if (fDelegate != NULL) {
 		Delegate* child = fDelegate->ChildAt(index);
 		return child ? child->Partition() : NULL;
 	}
@@ -674,18 +649,16 @@ BPartition::ChildAt(int32 index) const
 }
 
 
-// CountChildren
 int32
 BPartition::CountChildren() const
 {
-	if (fDelegate)
+	if (fDelegate != NULL)
 		return fDelegate->CountChildren();
 
 	return _CountChildren();
 }
 
 
-// CountDescendants
 int32
 BPartition::CountDescendants() const
 {
@@ -696,7 +669,6 @@ BPartition::CountDescendants() const
 }
 
 
-// FindDescendant
 BPartition*
 BPartition::FindDescendant(partition_id id) const
 {
@@ -705,24 +677,22 @@ BPartition::FindDescendant(partition_id id) const
 }
 
 
-// GetPartitioningInfo
 status_t
 BPartition::GetPartitioningInfo(BPartitioningInfo* info) const
 {
 	if (!info)
 		return B_BAD_VALUE;
-	if (!fDelegate)
+	if (fDelegate == NULL)
 		return B_NO_INIT;
 
 	return fDelegate->GetPartitioningInfo(info);
 }
 
 
-// VisitEachChild
 BPartition*
 BPartition::VisitEachChild(BDiskDeviceVisitor* visitor) const
 {
-	if (visitor) {
+	if (visitor != NULL) {
 		int32 level = _Level();
 		for (int32 i = 0; BPartition* child = ChildAt(i); i++) {
 			if (child->_AcceptVisitor(visitor, level))
@@ -733,17 +703,15 @@ BPartition::VisitEachChild(BDiskDeviceVisitor* visitor) const
 }
 
 
-// VisitEachDescendant
 BPartition*
 BPartition::VisitEachDescendant(BDiskDeviceVisitor* visitor) const
 {
-	if (visitor)
+	if (visitor != NULL)
 		return const_cast<BPartition*>(this)->_VisitEachDescendant(visitor);
 	return NULL;
 }
 
 
-// CanDefragment
 bool
 BPartition::CanDefragment(bool* whileMounted) const
 {
@@ -752,18 +720,16 @@ BPartition::CanDefragment(bool* whileMounted) const
 }
 
 
-// Defragment
 status_t
 BPartition::Defragment() const
 {
-	if (!fDelegate)
+	if (fDelegate == NULL)
 		return B_NO_INIT;
 
 	return fDelegate->Defragment();
 }
 
 
-// CanRepair
 bool
 BPartition::CanRepair(bool checkOnly, bool* whileMounted) const
 {
@@ -781,23 +747,21 @@ BPartition::CanRepair(bool checkOnly, bool* whileMounted) const
 }
 
 
-// Repair
 status_t
 BPartition::Repair(bool checkOnly) const
 {
-	if (!fDelegate)
+	if (fDelegate == NULL)
 		return B_NO_INIT;
 
 	return fDelegate->Repair(checkOnly);
 }
 
 
-// CanResize
 bool
 BPartition::CanResize(bool* canResizeContents, bool* whileMounted) const
 {
 	BPartition* parent = Parent();
-	if (!parent)
+	if (parent == NULL)
 		return false;
 
 	if (!parent->_SupportsChildOperation(this,
@@ -813,12 +777,11 @@ BPartition::CanResize(bool* canResizeContents, bool* whileMounted) const
 }
 
 
-// ValidateResize
 status_t
 BPartition::ValidateResize(off_t* size) const
 {
 	BPartition* parent = Parent();
-	if (!parent || !fDelegate)
+	if (parent == NULL || fDelegate == NULL)
 		return B_NO_INIT;
 
 	status_t error = parent->fDelegate->ValidateResizeChild(fDelegate, size);
@@ -826,7 +789,7 @@ BPartition::ValidateResize(off_t* size) const
 		return error;
 
 	if (_HasContent()) {
-// TODO: We would actually need the parameter for the content size.
+		// TODO: We would actually need the parameter for the content size.
 		off_t contentSize = *size;
 		error = fDelegate->ValidateResize(&contentSize);
 		if (error != B_OK)
@@ -840,7 +803,6 @@ BPartition::ValidateResize(off_t* size) const
 }
 
 
-// Resize
 status_t
 BPartition::Resize(off_t size)
 {
@@ -860,7 +822,7 @@ BPartition::Resize(off_t size)
 	}
 
 	// If shrinking the partition, resize content first, otherwise last.
-	bool shrink = (Size() > size);
+	bool shrink = Size() > size;
 
 	if (shrink && ContentType() != NULL) {
 		error = fDelegate->Resize(contentSize);
@@ -882,13 +844,12 @@ BPartition::Resize(off_t size)
 }
 
 
-// CanMove
 bool
 BPartition::CanMove(BObjectList<BPartition>* unmovableDescendants,
 	BObjectList<BPartition>* movableOnlyIfUnmounted) const
 {
 	BPartition* parent = Parent();
-	if (!parent || !fDelegate)
+	if (parent == NULL || fDelegate == NULL)
 		return false;
 
 	if (!parent->_SupportsChildOperation(this,
@@ -915,12 +876,11 @@ BPartition::CanMove(BObjectList<BPartition>* unmovableDescendants,
 }
 
 
-// ValidateMove
 status_t
 BPartition::ValidateMove(off_t* offset) const
 {
 	BPartition* parent = Parent();
-	if (!parent || !fDelegate)
+	if (parent == NULL || fDelegate == NULL)
 		return B_NO_INIT;
 
 	status_t error = parent->fDelegate->ValidateMoveChild(fDelegate, offset);
@@ -941,12 +901,11 @@ BPartition::ValidateMove(off_t* offset) const
 }
 
 
-// Move
 status_t
 BPartition::Move(off_t offset)
 {
 	BPartition* parent = Parent();
-	if (!parent || !fDelegate)
+	if (parent == NULL || fDelegate == NULL)
 		return B_NO_INIT;
 
 	status_t error = parent->fDelegate->MoveChild(fDelegate, offset);
@@ -963,12 +922,11 @@ BPartition::Move(off_t offset)
 }
 
 
-// CanSetName
 bool
 BPartition::CanSetName() const
 {
 	BPartition* parent = Parent();
-	if (!parent || !fDelegate)
+	if (parent == NULL || fDelegate == NULL)
 		return false;
 
 	return parent->_SupportsChildOperation(this,
@@ -976,31 +934,28 @@ BPartition::CanSetName() const
 }
 
 
-// ValidateSetName
 status_t
 BPartition::ValidateSetName(BString* name) const
 {
 	BPartition* parent = Parent();
-	if (!parent || !fDelegate)
+	if (parent == NULL || fDelegate == NULL)
 		return B_NO_INIT;
 
 	return parent->fDelegate->ValidateSetName(fDelegate, name);
 }
 
 
-// SetName
 status_t
 BPartition::SetName(const char* name)
 {
 	BPartition* parent = Parent();
-	if (!parent || !fDelegate)
+	if (parent == NULL || fDelegate == NULL)
 		return B_NO_INIT;
 
 	return parent->fDelegate->SetName(fDelegate, name);
 }
 
 
-// CanSetContentName
 bool
 BPartition::CanSetContentName(bool* whileMounted) const
 {
@@ -1010,34 +965,31 @@ BPartition::CanSetContentName(bool* whileMounted) const
 }
 
 
-// ValidateSetContentName
 status_t
 BPartition::ValidateSetContentName(BString* name) const
 {
-	if (!fDelegate)
+	if (fDelegate == NULL)
 		return B_NO_INIT;
 
 	return fDelegate->ValidateSetContentName(name);
 }
 
 
-// SetContentName
 status_t
 BPartition::SetContentName(const char* name)
 {
-	if (!fDelegate)
+	if (fDelegate == NULL)
 		return B_NO_INIT;
 
 	return fDelegate->SetContentName(name);
 }
 
 
-// CanSetType
 bool
 BPartition::CanSetType() const
 {
 	BPartition* parent = Parent();
-	if (!parent)
+	if (parent == NULL)
 		return false;
 
 	return parent->_SupportsChildOperation(this,
@@ -1045,36 +997,33 @@ BPartition::CanSetType() const
 }
 
 
-// ValidateSetType
 status_t
 BPartition::ValidateSetType(const char* type) const
 {
 	BPartition* parent = Parent();
-	if (!parent || !fDelegate)
+	if (parent == NULL || fDelegate == NULL)
 		return B_NO_INIT;
 
 	return parent->fDelegate->ValidateSetType(fDelegate, type);
 }
 
 
-// SetType
 status_t
 BPartition::SetType(const char* type)
 {
 	BPartition* parent = Parent();
-	if (!parent || !fDelegate)
+	if (parent == NULL || fDelegate == NULL)
 		return B_NO_INIT;
 
 	return parent->fDelegate->SetType(fDelegate, type);
 }
 
 
-// CanEditParameters
 bool
 BPartition::CanEditParameters() const
 {
 	BPartition* parent = Parent();
-	if (!parent)
+	if (parent == NULL)
 		return false;
 
 	return parent->_SupportsChildOperation(this,
@@ -1082,31 +1031,28 @@ BPartition::CanEditParameters() const
 }
 
 
-// GetParameterEditor
 status_t
 BPartition::GetParameterEditor(B_PARAMETER_EDITOR_TYPE type,
 	BPartitionParameterEditor** editor)
 {
-	if (!fDelegate)
+	if (fDelegate == NULL)
 		return B_NO_INIT;
 
 	return fDelegate->GetParameterEditor(type, editor);
 }
 
 
-// SetParameters
 status_t
 BPartition::SetParameters(const char* parameters)
 {
 	BPartition* parent = Parent();
-	if (!parent || !fDelegate)
+	if (parent == NULL || fDelegate == NULL)
 		return B_NO_INIT;
 
 	return parent->fDelegate->SetParameters(fDelegate, parameters);
 }
 
 
-// CanEditContentParameters
 bool
 BPartition::CanEditContentParameters(bool* whileMounted) const
 {
@@ -1116,25 +1062,23 @@ BPartition::CanEditContentParameters(bool* whileMounted) const
 }
 
 
-// SetContentParameters
 status_t
 BPartition::SetContentParameters(const char* parameters)
 {
-	if (!fDelegate)
+	if (fDelegate == NULL)
 		return B_NO_INIT;
 
 	return fDelegate->SetContentParameters(parameters);
 }
 
 
-// GetNextSupportedType
 status_t
 BPartition::GetNextSupportedType(int32* cookie, BString* type) const
 {
 	TRACE("%p->BPartition::GetNextSupportedType(%ld)\n", this, *cookie);
 
 	BPartition* parent = Parent();
-	if (!parent || !fDelegate) {
+	if (parent == NULL || fDelegate == NULL) {
 		TRACE("  not prepared (parent: %p, fDelegate: %p)!\n", parent,
 			fDelegate);
 		return B_NO_INIT;
@@ -1145,13 +1089,12 @@ BPartition::GetNextSupportedType(int32* cookie, BString* type) const
 }
 
 
-// GetNextSupportedChildType
 status_t
 BPartition::GetNextSupportedChildType(int32* cookie, BString* type) const
 {
 	TRACE("%p->BPartition::GetNextSupportedChildType(%ld)\n", this, *cookie);
 
-	if (!fDelegate) {
+	if (fDelegate == NULL) {
 		TRACE("  not prepared!\n");
 		return B_NO_INIT;
 	}
@@ -1160,51 +1103,49 @@ BPartition::GetNextSupportedChildType(int32* cookie, BString* type) const
 }
 
 
-// IsSubSystem
 bool
 BPartition::BPartition::IsSubSystem(const char* diskSystem) const
 {
 	BPartition* parent = Parent();
-	if (!parent || !fDelegate)
+	if (parent == NULL || fDelegate == NULL)
 		return false;
 
 	return parent->fDelegate->IsSubSystem(fDelegate, diskSystem);
 }
 
 
-// CanInitialize
 bool
 BPartition::CanInitialize(const char* diskSystem) const
 {
-	return fDelegate && fDelegate->CanInitialize(diskSystem);
+	if (Size() == 0 || BlockSize() == 0 || fDelegate == NULL)
+		return false;
+
+	return fDelegate->CanInitialize(diskSystem);
 }
 
 
-// ValidateInitialize
 status_t
 BPartition::ValidateInitialize(const char* diskSystem, BString* name,
 	const char* parameters)
 {
-	if (!fDelegate)
+	if (fDelegate == NULL)
 		return B_NO_INIT;
 
 	return fDelegate->ValidateInitialize(diskSystem, name, parameters);
 }
 
 
-// Initialize
 status_t
 BPartition::Initialize(const char* diskSystem, const char* name,
 	const char* parameters)
 {
-	if (!fDelegate)
+	if (fDelegate == NULL)
 		return B_NO_INIT;
 
 	return fDelegate->Initialize(diskSystem, name, parameters);
 }
 
 
-// Uninitialize
 status_t
 BPartition::Uninitialize()
 {
@@ -1213,7 +1154,6 @@ BPartition::Uninitialize()
 }
 
 
-// CanCreateChild
 bool
 BPartition::CanCreateChild() const
 {
@@ -1221,36 +1161,33 @@ BPartition::CanCreateChild() const
 }
 
 
-// ValidateCreateChild
 status_t
 BPartition::ValidateCreateChild(off_t* offset, off_t* size, const char* type,
 	BString* name, const char* parameters) const
 {
-	if (!fDelegate)
+	if (fDelegate == NULL)
 		return B_NO_INIT;
 
 	return fDelegate->ValidateCreateChild(offset, size, type, name, parameters);
 }
 
 
-// CreateChild
 status_t
 BPartition::CreateChild(off_t offset, off_t size, const char* type,
 	const char* name, const char* parameters, BPartition** child)
 {
-	if (!fDelegate)
+	if (fDelegate == NULL)
 		return B_NO_INIT;
 
 	return fDelegate->CreateChild(offset, size, type, name, parameters, child);
 }
 
 
-// CanDeleteChild
 bool
 BPartition::CanDeleteChild(int32 index) const
 {
 	BPartition* child = ChildAt(index);
-	if (!fDelegate || !child)
+	if (fDelegate == NULL || child == NULL)
 		return false;
 
 	return _SupportsChildOperation(child,
@@ -1258,21 +1195,20 @@ BPartition::CanDeleteChild(int32 index) const
 }
 
 
-// DeleteChild
 status_t
 BPartition::DeleteChild(int32 index)
 {
-	if (!fDelegate)
+	if (fDelegate == NULL)
 		return B_NO_INIT;
+
 	BPartition* child = ChildAt(index);
-	if (!child || child->Parent() != this)
+	if (child == NULL || child->Parent() != this)
 		return B_BAD_VALUE;
 
 	return fDelegate->DeleteChild(child->fDelegate);
 }
 
 
-// constructor
 /*!	\brief Privatized copy constructor to avoid usage.
 */
 BPartition::BPartition(const BPartition &)
@@ -1280,7 +1216,6 @@ BPartition::BPartition(const BPartition &)
 }
 
 
-// =
 /*!	\brief Privatized assignment operator to avoid usage.
 */
 BPartition &
@@ -1290,14 +1225,14 @@ BPartition::operator=(const BPartition &)
 }
 
 
-// _SetTo
 status_t
 BPartition::_SetTo(BDiskDevice* device, BPartition* parent,
 	user_partition_data* data)
 {
 	_Unset();
-	if (!device || !data)
+	if (device == NULL || data == NULL)
 		return B_BAD_VALUE;
+
 	fPartitionData = data;
 	fDevice = device;
 	fParent = parent;
@@ -1322,12 +1257,11 @@ BPartition::_SetTo(BDiskDevice* device, BPartition* parent,
 }
 
 
-// _Unset
 void
 BPartition::_Unset()
 {
 	// delete children
-	if (fPartitionData) {
+	if (fPartitionData != NULL) {
 		for (int32 i = 0; i < fPartitionData->child_count; i++) {
 			if (BPartition* child = ChildAt(i))
 				delete child;
@@ -1342,7 +1276,6 @@ BPartition::_Unset()
 }
 
 
-// _RemoveObsoleteDescendants
 status_t
 BPartition::_RemoveObsoleteDescendants(user_partition_data* data, bool* updated)
 {
@@ -1381,7 +1314,6 @@ BPartition::_RemoveObsoleteDescendants(user_partition_data* data, bool* updated)
 }
 
 
-// _Update
 status_t
 BPartition::_Update(user_partition_data* data, bool* updated)
 {
@@ -1401,7 +1333,7 @@ BPartition::_Update(user_partition_data* data, bool* updated)
 		|| compare_string(data->content_type, oldData->content_type)
 		|| compare_string(data->parameters, oldData->parameters)
 		|| compare_string(data->content_parameters,
-						  oldData->content_parameters)) {
+				oldData->content_parameters)) {
 		*updated = true;
 	}
 
@@ -1435,7 +1367,6 @@ BPartition::_Update(user_partition_data* data, bool* updated)
 }
 
 
-// _RemoveChild
 void
 BPartition::_RemoveChild(int32 index)
 {
@@ -1453,7 +1384,6 @@ BPartition::_RemoveChild(int32 index)
 }
 
 
-// _ChildAt
 BPartition*
 BPartition::_ChildAt(int32 index) const
 {
@@ -1463,7 +1393,6 @@ BPartition::_ChildAt(int32 index) const
 }
 
 
-// _CountChildren
 int32
 BPartition::_CountChildren() const
 {
@@ -1471,7 +1400,6 @@ BPartition::_CountChildren() const
 }
 
 
-// _CountDescendants
 int32
 BPartition::_CountDescendants() const
 {
@@ -1482,7 +1410,6 @@ BPartition::_CountDescendants() const
 }
 
 
-// _Level
 int32
 BPartition::_Level() const
 {
@@ -1494,7 +1421,6 @@ BPartition::_Level() const
 }
 
 
-// _AcceptVisitor
 bool
 BPartition::_AcceptVisitor(BDiskDeviceVisitor* visitor, int32 level)
 {
@@ -1502,7 +1428,6 @@ BPartition::_AcceptVisitor(BDiskDeviceVisitor* visitor, int32 level)
 }
 
 
-// _VisitEachDescendant
 BPartition*
 BPartition::_VisitEachDescendant(BDiskDeviceVisitor* visitor, int32 level)
 {
@@ -1520,7 +1445,6 @@ BPartition::_VisitEachDescendant(BDiskDeviceVisitor* visitor, int32 level)
 }
 
 
-// _PartitionData
 const user_partition_data*
 BPartition::_PartitionData() const
 {
@@ -1528,20 +1452,18 @@ BPartition::_PartitionData() const
 }
 
 
-// _HasContent
 bool
 BPartition::_HasContent() const
 {
-	return (ContentType() != NULL);
+	return ContentType() != NULL;
 }
 
 
-// _SupportsOperation
 bool
 BPartition::_SupportsOperation(uint32 flag, uint32 whileMountedFlag,
 	bool* whileMounted) const
 {
-	if (!fDelegate)
+	if (fDelegate == NULL)
 		return false;
 
 	uint32 supported = fDelegate->SupportedOperations(flag | whileMountedFlag);
@@ -1549,38 +1471,36 @@ BPartition::_SupportsOperation(uint32 flag, uint32 whileMountedFlag,
 	if (whileMounted)
 		*whileMounted = supported & whileMountedFlag;
 
-	return supported & flag;
+	return (supported & flag) != 0;
 }
 
 
-// _SupportsChildOperation
 bool
 BPartition::_SupportsChildOperation(const BPartition* child, uint32 flag) const
 {
-	if (!fDelegate || (child && !child->fDelegate))
+	if (fDelegate == NULL || (child != NULL && child->fDelegate == NULL))
 		return false;
 
 	uint32 supported = fDelegate->SupportedChildOperations(
-		child ? child->fDelegate : NULL, flag);
+		child != NULL ? child->fDelegate : NULL, flag);
 
-	return supported & flag;
+	return (supported & flag) != 0;
 }
 
 
-// _CreateDelegates
 status_t
 BPartition::_CreateDelegates()
 {
-	if (fDelegate || !fPartitionData)
+	if (fDelegate != NULL || fPartitionData == NULL)
 		return B_NO_INIT;
 
 	// create and init delegate
 	fDelegate = new(nothrow) Delegate(this);
-	if (!fDelegate)
+	if (fDelegate == NULL)
 		return B_NO_MEMORY;
 
 	status_t error = fDelegate->InitHierarchy(fPartitionData,
-		fParent ? fParent->fDelegate : NULL);
+		fParent != NULL ? fParent->fDelegate : NULL);
 	if (error != B_OK)
 		return error;
 
@@ -1597,7 +1517,6 @@ BPartition::_CreateDelegates()
 }
 
 
-// _InitDelegates
 status_t
 BPartition::_InitDelegates()
 {
@@ -1618,7 +1537,6 @@ BPartition::_InitDelegates()
 }
 
 
-// _DeleteDelegates
 void
 BPartition::_DeleteDelegates()
 {
@@ -1638,11 +1556,10 @@ BPartition::_DeleteDelegates()
 }
 
 
-// _IsModified
 bool
 BPartition::_IsModified() const
 {
-	if (!fDelegate)
+	if (fDelegate == NULL)
 		return false;
 
 	return fDelegate->IsModified();

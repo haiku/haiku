@@ -33,15 +33,18 @@ holders.
 All rights reserved.
 */
 
+
 #include "WindowMenuItem.h"
 
 #include <stdio.h>
 
 #include <Bitmap.h>
 #include <Debug.h>
+#include <NaturalCompare.h>
 
 #include "BarApp.h"
 #include "BarMenuBar.h"
+#include "BarView.h"
 #include "ExpandoMenuBar.h"
 #include "icons.h"
 #include "ResourceSet.h"
@@ -151,8 +154,8 @@ TWindowMenuItem::InsertIndexFor(BMenu* menu, int32 startIndex,
 	for (int32 index = startIndex;; index++) {
 		TWindowMenuItem* item
 			= dynamic_cast<TWindowMenuItem*>(menu->ItemAt(index));
-		if (item == NULL
-			|| strcasecmp(item->FullTitle(), newItem->FullTitle()) > 0)
+		if (item == NULL || NaturalCompare(item->FullTitle(),
+				newItem->FullTitle()) > 0)
 			return index;
 	}
 }
@@ -199,7 +202,9 @@ TWindowMenuItem::Draw()
 		return;
 	}
 
-	rgb_color menuColor = tint_color(Menu()->ViewColor(), 1.07);
+	// TODO: Tint this smartly based on the low color, this does
+	// nothing to black.
+	rgb_color menuColor = tint_color(Menu()->LowColor(), 1.07);
 	BRect frame(Frame());
 	BMenu* menu = Menu();
 
@@ -268,8 +273,11 @@ TWindowMenuItem::DrawContent()
 		+ ((frame.Height() - fTitleAscent - fTitleDescent) / 2) + 1.0f;
 
 	menu->MovePenTo(contLoc);
-	// Set the pen color so that the label is always visible.
-	menu->SetHighColor(0, 0, 0);
+
+	if (IsSelected())
+		menu->SetHighColor(ui_color(B_MENU_SELECTED_ITEM_TEXT_COLOR));
+	else
+		menu->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
 
 	BMenuItem::DrawContent();
 
@@ -328,4 +336,3 @@ TWindowMenuItem::RequiresUpdate()
 {
 	return fRequireUpdate;
 }
-

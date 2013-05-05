@@ -892,6 +892,10 @@ setup_signal_frame(Thread* thread, struct sigaction* action, Signal* signal,
 	memcpy(frameData.syscall_restart_parameters,
 		thread->syscall_restart.parameters,
 		sizeof(frameData.syscall_restart_parameters));
+
+	// commpage address
+	frameData.commpage_address = thread->team->commpage_address;
+
 	// syscall_restart_return_value is filled in by the architecture specific
 	// code.
 
@@ -2324,7 +2328,7 @@ _user_set_signal_stack(const stack_t* newUserStack, stack_t* oldUserStack)
 		return B_BAD_ADDRESS;
 
 	if (thread->signal_stack_enabled) {
-		// determine wether or not the user thread is currently
+		// determine whether or not the user thread is currently
 		// on the active signal stack
 		onStack = arch_on_signal_stack(thread);
 	}

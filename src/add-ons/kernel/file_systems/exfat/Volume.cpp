@@ -5,7 +5,7 @@
  */
 
 
-//! Super block, mounting, etc.
+//! Superblock, mounting, etc.
 
 
 #include "Volume.h"
@@ -310,7 +310,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	if (opener.IsReadOnly())
 		fFlags |= VOLUME_READ_ONLY;
 
-	// read the super block
+	// read the superblock
 	status_t status = Identify(fDevice, &fSuperBlock);
 	if (status != B_OK) {
 		ERROR("Volume::Mount(): Identify() failed\n");
@@ -502,7 +502,7 @@ Volume::Identify(int fd, exfat_super_block* superBlock)
 		return B_IO_ERROR;
 
 	if (!superBlock->IsValid()) {
-		ERROR("invalid super block!\n");
+		ERROR("invalid superblock!\n");
 		return B_BAD_VALUE;
 	}
 

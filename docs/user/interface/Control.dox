@@ -1,29 +1,35 @@
 /*
- * Copyright 2011, Haiku inc.
+ * Copyright 2011 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation by:
+ * Authors:
  *		John Scipione, jscipione@gmail.com
+ *
  * Corresponds to:
- *		/trunk/headers/os/interface/Control.h	 rev 42794
- *		/trunk/src/kits/interface/Control.cpp	 rev 42794
+ *		headers/os/interface/Control.h	 rev 42794
+ *		src/kits/interface/Control.cpp	 rev 42794
  */
+
 
 /*!
 	\file Control.h
+	\ingroup interface
+	\ingroup libbe
 	\brief BControl class definition and support enums.
 */
 
 
 /*!
 	\var B_CONTROL_ON
-	Control on
+
+	Control on. Value equal to 1.
 */
 
 
 /*!
 	\var B_CONTROL_OFF
-	Control off
+
+	Control off. Value equal to 0.
 */
 
 

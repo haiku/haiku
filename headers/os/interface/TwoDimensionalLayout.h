@@ -38,11 +38,9 @@ public:
 
 	virtual	void				SetFrame(BRect frame);
 
-	virtual	void				InvalidateLayout(bool children = false);
-
 	virtual status_t			Archive(BMessage* into, bool deep = true) const;
-	virtual status_t			AllArchived(BMessage* into) const;
-	virtual	status_t			AllUnarchived(const BMessage* from);
+
+	virtual status_t			Perform(perform_code d, void* arg);
 
 protected:
 			struct ColumnRowConstraints {
@@ -58,7 +56,16 @@ protected:
 				int32	height;
 			};
 
-	virtual	void				DerivedLayoutItems();
+	virtual status_t			AllArchived(BMessage* into) const;
+	virtual	status_t			AllUnarchived(const BMessage* from);
+
+	virtual status_t			ItemArchived(BMessage* into, BLayoutItem* item,
+									int32 index) const;
+	virtual	status_t			ItemUnarchived(const BMessage* from,
+									BLayoutItem* item, int32 index);
+	virtual	void				LayoutInvalidated(bool children = false);
+
+	virtual	void				DoLayout();
 
 			BSize				AddInsets(BSize size);
 			void				AddInsets(float* minHeight, float* maxHeight,
@@ -96,7 +103,27 @@ protected:
 			float				fVSpacing;
 
 private:
+
+	// FBC padding
+	virtual	void				_ReservedTwoDimensionalLayout1();
+	virtual	void				_ReservedTwoDimensionalLayout2();
+	virtual	void				_ReservedTwoDimensionalLayout3();
+	virtual	void				_ReservedTwoDimensionalLayout4();
+	virtual	void				_ReservedTwoDimensionalLayout5();
+	virtual	void				_ReservedTwoDimensionalLayout6();
+	virtual	void				_ReservedTwoDimensionalLayout7();
+	virtual	void				_ReservedTwoDimensionalLayout8();
+	virtual	void				_ReservedTwoDimensionalLayout9();
+	virtual	void				_ReservedTwoDimensionalLayout10();
+
+	// forbidden methods
+								BTwoDimensionalLayout(
+									const BTwoDimensionalLayout&);
+			void				operator =(const BTwoDimensionalLayout&);
+
 			LocalLayouter*		fLocalLayouter;
+
+			uint32				_reserved[5];
 };
 
 #endif // _TWO_DIMENSIONAL_LAYOUT_H

@@ -15,7 +15,7 @@
 
 #include <assert.h>
 
-#include <Catalog.h>
+#include <CatalogData.h>
 #include <HashMap.h>
 #include <String.h>
 
@@ -60,23 +60,19 @@ class CatKey {
 		uint32 GetHashCode() const { return fHashVal; }
 };
 
-} // namespace BPrivate
 
-
-namespace BPrivate {
-
-class BHashMapCatalog: public BCatalogAddOn {
+class HashMapCatalog: public BCatalogData {
 	protected:
 		uint32 ComputeFingerprint() const;
 		typedef HashMap<CatKey, BString> CatMap;
 		CatMap 				fCatMap;
 
 	public:
-		BHashMapCatalog(const char* signature, const char* language,
+		HashMapCatalog(const char* signature, const char* language,
 			uint32 fingerprint);
 			// Constructor for normal use
 			//
-		// overrides of BCatalogAddOn:
+		// overrides of BCatalogData:
 		const char *GetString(const char *string, const char *context = NULL,
 						const char *comment = NULL);
 		const char *GetString(uint32 id);
@@ -116,7 +112,7 @@ class BHashMapCatalog: public BCatalogAddOn {
 			public:
 				//CatWalker() {}; // if you use this there is no way to set fPos
 				// properly.
-				CatWalker(BHashMapCatalog* catalog);
+				CatWalker(HashMapCatalog* catalog);
 				bool AtEnd() const;
 				const CatKey& GetKey() const;
 				const char *GetValue() const;
@@ -133,16 +129,16 @@ class BHashMapCatalog: public BCatalogAddOn {
 };
 
 
-inline BHashMapCatalog::BHashMapCatalog(const char* signature,
+inline HashMapCatalog::HashMapCatalog(const char* signature,
 	const char* language, uint32 fingerprint)
 	:
-	BCatalogAddOn(signature, language, fingerprint)
+	BCatalogData(signature, language, fingerprint)
 {
 }
 
 
 inline
-BHashMapCatalog::CatWalker::CatWalker(BHashMapCatalog* catalog)
+HashMapCatalog::CatWalker::CatWalker(HashMapCatalog* catalog)
 	:
 	fPos(catalog->fCatMap.GetIterator())
 {
@@ -155,14 +151,14 @@ BHashMapCatalog::CatWalker::CatWalker(BHashMapCatalog* catalog)
 
 
 inline bool
-BHashMapCatalog::CatWalker::AtEnd() const
+HashMapCatalog::CatWalker::AtEnd() const
 {
 	return atEnd;
 }
 
 
 inline const CatKey &
-BHashMapCatalog::CatWalker::GetKey() const
+HashMapCatalog::CatWalker::GetKey() const
 {
 	assert(!atEnd);
 	return current.key;
@@ -170,7 +166,7 @@ BHashMapCatalog::CatWalker::GetKey() const
 
 
 inline const char *
-BHashMapCatalog::CatWalker::GetValue() const
+HashMapCatalog::CatWalker::GetValue() const
 {
 	assert(!atEnd);
 	return current.value.String();
@@ -178,7 +174,7 @@ BHashMapCatalog::CatWalker::GetValue() const
 
 
 inline void
-BHashMapCatalog::CatWalker::Next()
+HashMapCatalog::CatWalker::Next()
 {
 	if (fPos.HasNext()) {
 		current = fPos.Next();
@@ -189,7 +185,7 @@ BHashMapCatalog::CatWalker::Next()
 
 
 inline status_t
-BHashMapCatalog::GetWalker(CatWalker *walker)
+HashMapCatalog::GetWalker(CatWalker *walker)
 {
 	if (!walker)
 		return B_BAD_VALUE;
@@ -199,7 +195,5 @@ BHashMapCatalog::GetWalker(CatWalker *walker)
 
 
 } // namespace BPrivate
-
-using namespace BPrivate;
 
 #endif // _HASH_MAP_CATALOG_H_

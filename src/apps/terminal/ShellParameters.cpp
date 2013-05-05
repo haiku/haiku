@@ -6,6 +6,8 @@
 
 #include "ShellParameters.h"
 
+#include "TermConst.h"
+
 
 ShellParameters::ShellParameters(int argc, const char* const* argv,
 	const BString& currentDirectory)
@@ -13,7 +15,7 @@ ShellParameters::ShellParameters(int argc, const char* const* argv,
 	fArguments(argv),
 	fArgumentCount(argc),
 	fCurrentDirectory(currentDirectory),
-	fEncoding("UTF8")
+	fEncoding(M_UTF8)
 {
 }
 
@@ -34,7 +36,7 @@ ShellParameters::SetCurrentDirectory(const BString& currentDirectory)
 
 
 void
-ShellParameters::SetEncoding(const BString& encoding)
+ShellParameters::SetEncoding(int encoding)
 {
 	fEncoding = encoding;
 }

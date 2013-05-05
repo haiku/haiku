@@ -1,4 +1,4 @@
-/* Copyright (C) 1995, 1997, 1998, 2001 Free Software Foundation, Inc.
+/* Copyright (C) 1995, 1997, 1998, 2001, 2006 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@gnu.ai.mit.edu>, August 1995.
 
@@ -30,7 +30,7 @@ __jrand48_r (xsubi, buffer, result)
     return -1;
 
   /* Store the result.  */
-  *result = ((xsubi[2] << 16) | xsubi[1]) & 0xffffffffl;
+  *result = (int32_t) ((xsubi[2] << 16) | xsubi[1]);
 
   return 0;
 }

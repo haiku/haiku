@@ -11,5 +11,5 @@ UnitTestLib libNumberFormatTests.so
 	  GenericNumberFormatTests.cpp
 	  GenericNumberFormatConstructorTest.cpp
 
-	: be $(TARGET_LIBSTDC++) liblocale.so
+	: be $(TARGET_LIBSTDC++)
 ;

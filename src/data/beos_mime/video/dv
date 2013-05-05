@@ -5,5 +5,5 @@ resource(1, "META:TYPE") "video/dv";
 
 resource(2, "META:SNIFF_RULE") "0.50 (0x1f0700)";
 
-resource(3, "META:S:DESC") #'MSDC' "DV Movie";
+resource(3, "META:S:DESC") #'MSDC' "DV video file";
 

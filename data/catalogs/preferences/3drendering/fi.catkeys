@@ -1,0 +1,27 @@
+1	finnish	x-vnd.Haiku-3DRendering	1725618140
+List stack size:	Capabilities		Luettelopinon koko:
+Information	InfoView		Tiedot
+Max. clipping planes:	Capabilities		Maksimileikkaustasot:
+GL version:	InfoView		GL-versio:
+Max. texture units:	Capabilities		Maksimitekstuuriyksiköt:
+Renderer name:	InfoView		Renderointinimi:
+Vendor name:	InfoView		Myyjänimi:
+Attributes stack size:	Capabilities		Attribuuttipinokoko:
+Name stack size:	Capabilities		Nimipinokoko:
+Auxiliary buffer(s):	Capabilities		Apupuskuri(t):
+Max. recommended vertex elements:	Capabilities		Suositeltujen vertex-elementtien enimmäismäärä:
+GLU version:	InfoView		GLU-versio:
+Model stack size:	Capabilities		Mallipinokoko:
+Projection stack size:	Capabilities		Projektiopinokoko:
+Max. lights:	Capabilities		Valoja enintään:
+Max. 2D texture size:	Capabilities		2D-tekstuurin enimmäiskoko:
+Max. convolution:	Capabilities		Maksimikierre:
+GLUT API version:	InfoView		GLUT API -versio:
+Texture stack size:	Capabilities		Tekstuuripinokoko:
+Max. evaluators equation order:	Capabilities		Maksimievaloijan yhtälöjärjestys:
+Max. 3D texture size:	Capabilities		3D-tekstuurin enimmäiskoko:
+3D Rendering	System name		3D-renderointi
+Capabilities	Capabilities		Kapasiteetit
+Max. recommended index elements:	Capabilities		Suositeltujen indeksielementtien enimmäismäärä:
+Available	Extensions		Käytettävissä oleva
+Extensions	Extensions		Laajennukset

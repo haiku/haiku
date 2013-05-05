@@ -1,0 +1,10 @@
+1	croatian	x-vnd.Haiku-JPEG2000Translator	2060367215
+About	JPEG2000Translator		O programu
+High	JPEG2000Translator		Visoko
+JPEG2000 images	JPEG2000Translator		JPEG2000 slike
+Low	JPEG2000Translator		Nisko
+Output quality	JPEG2000Translator		Kvaliteta izlaza
+Read	JPEG2000Translator		Čitaj
+Read greyscale images as RGB32	JPEG2000Translator		Čitaj sive slike kao RGB32
+Write	JPEG2000Translator		Piši
+Write black-and-white images as RGB24	JPEG2000Translator		Piši crno-bijele slike kao RGB24

@@ -126,7 +126,8 @@
 #if defined(__i386__) || defined(__ia64__) || defined(__alpha__) || \
     defined(__sparc64__) || defined(__powerpc__) || defined(__POWERPC__) || \
     defined(__m68k__) || defined(__M68K__) || defined(__arm__) || \
-    defined(__ARM__) || defined(__mipsel__) || defined(__MIPSEL__)
+    defined(__ARM__) || defined(__mipsel__) || defined(__MIPSEL__) || \
+    defined(__x86_64__)
 #	include <sys/types.h>
 #	if BYTE_ORDER == BIG_ENDIAN
 #		define IEEE_BIG_ENDIAN
@@ -156,6 +157,8 @@ typedef	u_int32_t ULong;
 
 #include <errno.h>
 #include <ctype.h>
+
+#include <errno_private.h>
 
 #ifdef Bad_float_h
 #undef __STDC__
@@ -1306,7 +1309,7 @@ strtod(const char * __restrict s00, char ** __restrict se)
 		if ( (e1 &= ~15) ) {
 			if (e1 > DBL_MAX_10_EXP) {
  ovfl:
-				errno = ERANGE;
+				__set_errno(ERANGE);
 				rv = HUGE_VAL;
 				goto ret;
 			}
@@ -1348,7 +1351,7 @@ strtod(const char * __restrict s00, char ** __restrict se)
 				if (!rv) {
  undfl:
 					rv = 0.;
-					errno = ERANGE;
+					__set_errno(ERANGE);
 					goto ret;
 					}
 				word0(rv) = Tiny0;

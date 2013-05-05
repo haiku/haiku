@@ -37,9 +37,14 @@ SimpleTest xsi_msg_queue_test1 : xsi_msg_queue_test1.cpp ;
 SimpleTest xsi_sem_test1 : xsi_sem_test1.cpp ;
 
 # wide character tests
+SimpleTest fwide_test : fwide_test.c ;
 SimpleTest gnulib-test-btowc : gnulib-test-btowc.c ;
 SimpleTest gnulib-test-mbrtowc : gnulib-test-mbrtowc.c ;
+#SimpleTest gnulib-test-mbsnrtowcs : gnulib-test-mbsnrtowcs.c ;
+SimpleTest gnulib-test-mbsrtowcs : gnulib-test-mbsrtowcs.c ;
 SimpleTest gnulib-test-wcrtomb : gnulib-test-wcrtomb.c ;
+#SimpleTest gnulib-test-wcsnrtombs : gnulib-test-wcsnrtombs.c ;
+SimpleTest gnulib-test-wcsrtombs : gnulib-test-wcsrtombs.c ;
 SimpleTest mbtest : mbtest.c ;
 SimpleTest testmb : testmb.c ;
 SimpleTest tst-btowc : tst-btowc.c ;
@@ -59,6 +64,7 @@ SimpleTest tst-wprintf2 : tst-wprintf2.c ;
 SimpleTest tst-wscanf : tst-wscanf.c ;
 SimpleTest test_wcfuncs : test_wcfuncs.c ;
 SimpleTest test_wctype : test_wctype.c ;
+SimpleTest wcs_test : wcs_test.cpp ;
 
 
 # Tell Jam where to find these sources

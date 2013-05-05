@@ -10,15 +10,14 @@
 
 #include <Catalog.h>
 #include <CheckBox.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <StringView.h>
 
 #include <stdio.h>
 #include <string.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ConfigView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ConfigView"
 
 const char* kShortName2 = B_TRANSLATE_MARK("RAWTranslator Settings");
 
@@ -28,7 +27,7 @@ ConfigView::ConfigView(uint32 flags)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	BStringView *fTitle = new BStringView("title", B_TRANSLATE("RAW Images"));
+	BStringView *fTitle = new BStringView("title", B_TRANSLATE("RAW image translator"));
 	fTitle->SetFont(be_bold_font);
 
 	char version[256];
@@ -49,9 +48,8 @@ ConfigView::ConfigView(uint32 flags)
 		B_UTF8_COPYRIGHT "1997-2007 Dave Coffin");
 
 	// Build the layout
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 7)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 7)
+		.SetInsets(5)
 		.Add(fTitle)
 		.AddGlue()
 		.Add(fVersion)
@@ -59,9 +57,7 @@ ConfigView::ConfigView(uint32 flags)
 		.AddGlue()
 		.Add(fCopyright2)
 		.Add(fCopyright3)
-		.AddGlue()
-		.SetInsets(5, 5, 5, 5)
-	);
+		.AddGlue();
 
 	BFont font;
 	GetFont(&font);

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Adriano Duarte
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Analisador de Disco</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../../fr/applications/diskprobe.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/diskprobe.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/diskprobe.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/diskprobe.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/diskprobe.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/diskprobe.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/diskprobe.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/diskprobe.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/diskprobe.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/diskprobe.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/diskprobe.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/diskprobe.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/applications/diskprobe.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../ca/applications/diskprobe.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../../en/applications/diskprobe.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="deskcalc.html">DeskCalc</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos
+</a> 
+::  <a href="diskusage.html">Uso da Unidade</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/diskprobe-icon_64.png" alt="diskprobe-icon_64.png" width="64" height="64" />Analisador de Disco</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplicativos</span></td></tr>
+<tr><td>Localização:</td><td></td><td><span class="path">/boot/system/apps/DiskProbe</span></td></tr>
+<tr><td>Configurações:</td><td></td><td><span class="path">~/config/settings/DiskProbe_data</span></td></tr>
+</table>
+<p><br /></p>
+<p>O Analisador de Disco é um editor hexadecimal para ver e alterar dados de um arquivo ou num dispositivo em nível de byte. É uma ferramenta de muito baixo nível e tem portanto o potencial para realmente bagunçar as coisas se não for cuidadoso!</p>
+<div class="box-warning">Sempre trabalhe com a cópia de segurança de um arquivo e seja extra cuidadoso quando trabalhando diretamente num dispositivo.</div>
+<p>Ao iniciar o Analisador de Disco primeiro será perguntado pelo arquivo ou dispositivo a ser trabalhado. Após isso será mostrada esta interface:</p>
+<p><img id="diskprobe" src="../images/apps-images/diskprobe.png" alt="diskprobe.png" /></p>
+<p>A visualização principal mostra sempre um bloco de dados, o tamanho dos que pode ser ajustado com <span class="menu">Visualizar | Tamanho de Bloco</span>. À esquerda está o deslocamento para o início do bloco, no meio os dados como valores hexadecimais e à direita os mesmos como símbolos ASCII.<br />
+Pode-se mover de bloco em bloco com o botão deslizante ou com <span class="key">ALT</span> <span class="key">←</span> e <span class="key">ALT</span> <span class="key">→</span> e alternar entre as colunas HEX e ASCII com <span class="key">TAB</span>.</p>
+<p><span class="menu">Bloco | Seleção</span> não apenas exibirá a seleção com diferentes extremidades (e em hexa ou decimal, definido por <span class="menu">Visualizar | Base</span>), irá também interpretar a seleção como um bloco deslocado para o qual pode ser pulado. Ele ficará acinzentado se a posição estiver fora do arquivo/dispositivo.<br />
+Esta é uma funcionalidade útil principalmente quando se olha para os sistemas de arquivos, como eles frequentemente contém ponteiros para outros blocos.</p>
+<p>Se o arquivo que está analisando incluir atributos, o menu <span class="menu">Atributos</span> pode ser utilizado para abrir qualquer um deles em uma nova janela do Analisador de Disco. Aqui está o atributo de direitos autorais do aplicativo <span class="app">Sobre o Sistema</span>:
+</p><p><img id="diskprobe-attribute" src="../images/apps-images/diskprobe-about-attr.png" alt="diskprobe-about-attr.png" /></p>
+<p>Dependendo do tipo de atributo, será fornecida uma guia de edição diferente junto com o sempre presente <i>Editor Raw</i>. Por exemplo, existem editores para sequencias e tipos MIME ou um visualizador de ícone para o atributo vectoricon.</p>
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="deskcalc.html">DeskCalc</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos
+</a> 
+::  <a href="diskusage.html">Uso da Unidade</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

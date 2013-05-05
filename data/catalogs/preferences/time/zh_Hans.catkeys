@@ -1,0 +1,45 @@
+1	english	x-vnd.Haiku-Time	3544635877
+GMT (UNIX compatible)	Time		GMT（UNIX 兼容）
+OK	Time		确定
+Asia	Time		亚洲
+\nNow: 	Time		\n现在时间：
+Africa	Time		非洲
+Stop	Time		停止
+Could not contact server	Time		无法连接服务器
+Australia	Time		澳大利亚
+Preview time:	Time		时间预览：
+Synchronize	Time		同步
+Revert	Time		恢复
+Pacific	Time		太平洋
+Add	Time		添加
+Date and time	Time		日期时间
+about	Time		关于
+Local time (Windows compatible)	Time		本地时间（Windows 兼容）
+Message receiving failed	Time		消息接收失败
+Set time zone	Time		设置时区
+Waiting for answer failed	Time		等待回复失败
+Hardware clock set to:	Time		硬件时钟设置为：
+The following error occured while synchronizing:r\n%s	Time		时间同步时发生如下错误：r\n%s
+Europe	Time		欧洲
+Remove	Time		移除
+Time	Time		时间
+Indian	Time		印度洋
+Sending request failed	Time		发送请求失败
+Arctic	Time		北极
+Time	System name		时间
+America	Time		美洲
+Reset	Time		重置
+Synchronize at boot	Time		启动时同步
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		时间日期，编写者：\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\n版权所有 2004-2012, Haiku.
+Received invalid time	Time		接收时间无效
+Antarctica	Time		南极
+The following error occured while synchronizing:r\n%s: %s	Time		同步时间时发生如下错误：r\n%s：%s
+<Other>	Time		<其他>
+Current time:	Time		当前时间：
+Try all servers	Time		尝试所有服务器
+Time zone	Time		时区
+Could not create socket	Time		无法创建套接字
+Synchronize again	Time		再次同步
+Clock	Time		时钟
+Network time	Time		网络时间
+Atlantic	Time		大西洋

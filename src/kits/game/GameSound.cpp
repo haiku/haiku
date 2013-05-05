@@ -1,15 +1,17 @@
 /*
- * Copyright 2001-2002, Haiku Inc.
+ * Copyright 2002-2012 Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
  * Authors:
  *		Christopher ML Zumwalt May (zummy@users.sf.net)
  *
- * Distributed under the terms of the MIT License.
  */
+
+
+#include <GameSound.h>
 
 #include <stdio.h>
 #include <string.h>
-
-#include <GameSound.h>
 
 #include "GameSoundBuffer.h"
 #include "GameSoundDevice.h"
@@ -17,11 +19,13 @@
 
 using std::nothrow;
 
+
 // Local Defines ---------------------------------------------------------------
 
 // BGameSound class ------------------------------------------------------------
 BGameSound::BGameSound(BGameSoundDevice *device)
-		:	fSound(-1)
+	:
+	fSound(-1)
 {
 	// TODO: device is ignored!
 	// NOTE: BeBook documents that BGameSoundDevice must currently always
@@ -32,7 +36,8 @@ BGameSound::BGameSound(BGameSoundDevice *device)
 
 
 BGameSound::BGameSound(const BGameSound &other)
-		:	fSound(-1)
+	:
+	fSound(-1)
 {
 	memcpy(&fFormat, &other.fFormat, sizeof(gs_audio_format));
 	// TODO: device from other is ignored!
@@ -106,8 +111,7 @@ BGameSound::StopPlaying()
 
 
 status_t
-BGameSound::SetGain(float gain,
-					bigtime_t duration)
+BGameSound::SetGain(float gain, bigtime_t duration)
 {
 	gs_attribute attribute;
 
@@ -121,8 +125,7 @@ BGameSound::SetGain(float gain,
 
 
 status_t
-BGameSound::SetPan(float pan,
-				   bigtime_t duration)
+BGameSound::SetPan(float pan, bigtime_t duration)
 {
 	gs_attribute attribute;
 
@@ -166,16 +169,14 @@ BGameSound::Pan()
 
 
 status_t
-BGameSound::SetAttributes(gs_attribute *inAttributes,
-						  size_t inAttributeCount)
+BGameSound::SetAttributes(gs_attribute *inAttributes, size_t inAttributeCount)
 {
 	return fDevice->SetAttributes(fSound, inAttributes, inAttributeCount);
 }
 
 
 status_t
-BGameSound::GetAttributes(gs_attribute *outAttributes,
-						  size_t inAttributeCount)
+BGameSound::GetAttributes(gs_attribute *outAttributes, size_t inAttributeCount)
 {
 	return fDevice->GetAttributes(fSound, outAttributes, inAttributeCount);
 }
@@ -258,7 +259,8 @@ BGameSound::Init(gs_id handle)
 	return B_OK;
 }
 
-/*
+
+#if 0
 BGameSound &
 BGameSound::operator=(const BGameSound &other)
 {
@@ -272,7 +274,8 @@ BGameSound::operator=(const BGameSound &other)
 
 	return this;
 }
-*/
+#endif
+
 
 /* unimplemented for protection of the user:
  *
@@ -614,5 +617,3 @@ BGameSound::_Reserved_BGameSound_47(int32 arg, ...)
 {
 	return B_ERROR;
 }
-
-

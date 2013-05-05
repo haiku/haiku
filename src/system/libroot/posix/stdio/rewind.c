@@ -37,6 +37,8 @@
 #include <errno.h>
 #include <stdio.h>
 
+#include <errno_private.h>
+
 
 void
 rewind(fp)
@@ -44,5 +46,5 @@ rewind(fp)
 {
 	(void) fseek(fp, 0L, SEEK_SET);
 	//clearerr(fp);
-	errno = 0;      /* not required, but seems reasonable */
+	__set_errno(0);      /* not required, but seems reasonable */
 }

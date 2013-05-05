@@ -216,6 +216,7 @@ int ntfs_change_label(ntfs_volume *vol, char *label)
 	}
 	result = 0;
 err_out:
+	ntfs_attr_put_search_ctx(ctx);
 	free(new_label);
 	return result;
 }

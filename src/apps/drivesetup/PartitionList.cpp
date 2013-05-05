@@ -1,12 +1,14 @@
 /*
- * Copyright 2006-2010 Haiku Inc. All rights reserved.
+ * Copyright 2006-2013, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Ithamar R. Adema <ithamar@unet.nl>
  *		James Urquhart
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Axel Dörfler, axeld@pinc-software.de
  */
+
 
 #include "PartitionList.h"
 
@@ -20,8 +22,21 @@
 #include "Support.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PartitionList"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PartitionList"
+
+
+static const char* kUnavailableString = "";
+
+enum {
+	kDeviceColumn,
+	kFilesystemColumn,
+	kVolumeNameColumn,
+	kMountedAtColumn,
+	kSizeColumn,
+	kParametersColumn,
+	kPartitionTypeColumn,
+};
 
 
 // #pragma mark - BBitmapStringField
@@ -179,18 +194,6 @@ PartitionColumn::InitTextMargin(BView* parent)
 // #pragma mark - PartitionListRow
 
 
-static const char* kUnavailableString = "";
-
-enum {
-	kDeviceColumn,
-	kFilesystemColumn,
-	kVolumeNameColumn,
-	kMountedAtColumn,
-	kSizeColumn,
-	kParametersColumn
-};
-
-
 PartitionListRow::PartitionListRow(BPartition* partition)
 	:
 	Inherited(),
@@ -201,6 +204,8 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 {
 	BPath path;
 	partition->GetPath(&path);
+
+	// Device icon
 
 	BBitmap* icon = NULL;
 	if (partition->IsDevice()) {
@@ -214,29 +219,51 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 
 	SetField(new BBitmapStringField(icon, path.Path()), kDeviceColumn);
 
+	// File system & volume name
+
+	BString partitionType(partition->Type());
+
 	if (partition->ContainsFileSystem()) {
 		SetField(new BStringField(partition->ContentType()), kFilesystemColumn);
 		SetField(new BStringField(partition->ContentName()), kVolumeNameColumn);
+	} else if (partition->IsDevice()) {
+		SetField(new BStringField(kUnavailableString), kFilesystemColumn);
+		if (partition->Name() != NULL && partition->Name()[0])
+			SetField(new BStringField(partition->Name()), kVolumeNameColumn);
+		else
+			SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
 	} else if (partition->CountChildren() > 0) {
 		SetField(new BStringField(kUnavailableString), kFilesystemColumn);
 		SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
 	} else {
-		if (partition->ContainsFileSystem())
-			SetField(new BStringField(partition->Type()), kFilesystemColumn);
-		else
-			SetField(new BStringField(kUnavailableString), kFilesystemColumn);		
+		if (!partitionType.IsEmpty()) {
+			partitionType.Prepend("(");
+			partitionType.Append(")");
+			SetField(new BStringField(partitionType), kFilesystemColumn);
+		} else
+			SetField(new BStringField(kUnavailableString), kFilesystemColumn);
+
 		SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
 	}
 
-	if (partition->IsMounted() && partition->GetMountPoint(&path) == B_OK) {
+	// Mounted at
+
+	if (partition->IsMounted() && partition->GetMountPoint(&path) == B_OK)
 		SetField(new BStringField(path.Path()), kMountedAtColumn);
-	} else {
+	else
 		SetField(new BStringField(kUnavailableString), kMountedAtColumn);
+
+	// Size
+
+	if (fSize > 0) {
+		char size[1024];
+		SetField(new BStringField(string_for_size(partition->Size(), size,
+			sizeof(size))), kSizeColumn);
+	} else {
+		SetField(new BStringField(kUnavailableString), kSizeColumn);
 	}
 
-	char size[1024];
-	SetField(new BStringField(string_for_size(partition->Size(), size,
-		sizeof(size))), kSizeColumn);
+	// Additional parameters
 
 	if (partition->Parameters() != NULL) {
 		BString parameters;
@@ -250,11 +277,17 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 
 			delete_driver_settings(handle);
 		}
-		
+
 		SetField(new BStringField(parameters), kParametersColumn);
 	} else {
 		SetField(new BStringField(kUnavailableString), kParametersColumn);
 	}
+
+	// Partition type
+
+	if (partitionType.IsEmpty())
+		partitionType = partition->ContentType();
+	SetField(new BStringField(partitionType), kPartitionTypeColumn);
 }
 
 
@@ -281,6 +314,19 @@ PartitionListRow::PartitionListRow(partition_id parentID, partition_id id,
 }
 
 
+const char*
+PartitionListRow::DevicePath()
+{
+	BBitmapStringField* stringField
+		= dynamic_cast<BBitmapStringField*>(GetField(kDeviceColumn));
+
+	if (stringField == NULL)
+		return NULL;
+
+	return stringField->String();
+}
+
+
 // #pragma mark - PartitionListView
 
 
@@ -297,8 +343,10 @@ PartitionListView::PartitionListView(const BRect& frame, uint32 resizeMode)
 		B_TRUNCATE_MIDDLE), kMountedAtColumn);
 	AddColumn(new PartitionColumn(B_TRANSLATE("Size"), 100, 50, 500,
 		B_TRUNCATE_END, B_ALIGN_RIGHT), kSizeColumn);
-	AddColumn(new PartitionColumn(B_TRANSLATE("Parameters"), 150, 50, 500,
-		B_TRUNCATE_MIDDLE), kParametersColumn);
+	AddColumn(new PartitionColumn(B_TRANSLATE("Parameters"), 100, 50, 500,
+		B_TRUNCATE_END), kParametersColumn);
+	AddColumn(new PartitionColumn(B_TRANSLATE("Partition type"), 200, 50, 500,
+		B_TRUNCATE_END), kPartitionTypeColumn);
 
 	SetSortingEnabled(false);
 }
@@ -309,6 +357,30 @@ PartitionListView::AttachedToWindow()
 {
 	Inherited::AttachedToWindow();
 	PartitionColumn::InitTextMargin(ScrollView());
+}
+
+
+bool
+PartitionListView::InitiateDrag(BPoint rowPoint, bool wasSelected)
+{
+	PartitionListRow* draggedRow
+		= dynamic_cast<PartitionListRow*>(RowAt(rowPoint));
+	if (draggedRow == NULL)
+		return false;
+
+	const char* draggedPath = draggedRow->DevicePath();
+	if (draggedPath == NULL)
+		return false;
+
+	BRect draggedRowRect;
+	GetRowRect(draggedRow, &draggedRowRect);
+
+	BMessage dragMessage(B_MIME_DATA);
+	dragMessage.AddData("text/plain", B_MIME_TYPE, draggedPath,
+		strlen(draggedPath));
+
+	DragMessage(&dragMessage, draggedRowRect, NULL);
+	return true;
 }
 
 
@@ -393,6 +465,17 @@ PartitionListView::AddSpace(partition_id parentID, partition_id id,
 	ExpandOrCollapse(partitionrow, true);
 
 	return partitionrow;
+}
+
+
+BSize
+PartitionListView::PreferredSize()
+{
+	// Remove default size for parameters + partition type column
+	BSize size = BColumnListView::PreferredSize();
+	size.width -= ColumnAt(kParametersColumn)->Width()
+		+ ColumnAt(kPartitionTypeColumn)->Width();
+	return size;
 }
 
 

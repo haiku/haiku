@@ -1,10 +1,10 @@
 1	belarusian	x-vnd.Haiku-Mandelbrot	3766380907
 File	Mandelbrot		Файл
-Iterations	Mandelbrot		Паўторы
-Mandelbrot	System name		Фракталы
-Palette	Mandelbrot		Палета
-Palette 1	Mandelbrot		Плаета 1
-Palette 2	Mandelbrot		Палета 2
 Palette 3	Mandelbrot		Палета 3
-Palette 4	Mandelbrot		Палета 4
 Quit	Mandelbrot		Выйсці
+Palette 2	Mandelbrot		Палета 2
+Palette 4	Mandelbrot		Палета 4
+Palette	Mandelbrot		Палета
+Mandelbrot	System name		Фракталы
+Palette 1	Mandelbrot		Плаета 1
+Iterations	Mandelbrot		Паўторы

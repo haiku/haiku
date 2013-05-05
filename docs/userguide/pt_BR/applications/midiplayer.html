@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Gerard Stanczak (Google Code-In student)
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Adriano Duarte
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Tocador de Midi</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../../fr/applications/midiplayer.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/midiplayer.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/midiplayer.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/midiplayer.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/midiplayer.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/midiplayer.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/midiplayer.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/midiplayer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/midiplayer.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/midiplayer.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/midiplayer.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/midiplayer.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/applications/midiplayer.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../ca/applications/midiplayer.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../../en/applications/midiplayer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="mediaplayer.html">Tocador de Mídia</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos
+</a> 
+::  <a href="packageinstaller.html">Instalador de Pacotes</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/midiplayer-icon_64.png" alt="midiplayer-icon_64.png" width="64" height="64" />Tocador de Midi</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplicativos</span></td></tr>
+<tr><td>Localização:</td><td></td><td><span class="path">/boot/system/apps/MidiPlayer</span></td></tr>
+<tr><td>Configurações:</td><td></td><td><span class="path">~/config/settings/MidiPlayerSettings</span></td></tr>
+</table>
+<p><br /></p>
+<p>Como o nome sugere, o Tocador de Midi é utilizado para reproduzir arquivos de música midi. Arquivos midi são especiais, como eles não contém a música realmente digitalizado e em alguns casos codificada, mas apenas uma descrição dela: Mantenha esta nota para aquele trecho com este volume e use o instrumento X.<br />
+Enquanto isto mantém o tamanho do arquivo bem pequeno, também significa que dependendo da biblioteca de instrumentos (a tão falada "Fonte de Sons") o resultado pode diferenciar enormemente. Igualmente, estas Fontes de Sons tendem a ser bastante grandes, cada vez mais com o número e a qualidade das amostras de instrumentos.</p>
+<div class="box-info"><p>O Haiku não vem com uma Fonte de Sons instalada, porque são muito grandes e apenas poucas pessoas precisam de uma. A maioria das que as utilizam, já tem Sontes de Sons de alta qualidade ou personalizadas. Para ser capaz de ao menos ouvir <i>algo</i> pode-se instalar uma livre a partir de um pacote opcional. No Terminal, digite: <tt>installoptionalpackage TimGMSoundFont</tt></p>
+<p>Para usar qualquer outra Fonte de Sons, crie um vínculo para ela em <tt>/boot/system/data/synth</tt> e nomeei-a <tt>big_synth.sy</tt>.</p></div>
+<img src="../images/apps-images/midiplayer.png" alt="midiplayer.png" />
+<p>A interface do Tocador de Midi é muito simples. Apenas dê um duplo clique ou arraste e solte um arquivo midi e a reprodução começa. Vontrole o volume com o botão deslizante e adicione efeitos de reverberação a partir do menu pop-up <span class="menu">Reverberação</span>. Ativar o scope irá exibir uma visualização em forma de um  osciloscópio executando no topo.</p>
+
+</div>
+</div>
+<!--
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="mediaplayer.html">Tocador de Mídia</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos
+</a> 
+::  <a href="packageinstaller.html">Instalador de Pacotes</a>  »
+</span></div>
+</div>
+-->
+</body>
+</html>

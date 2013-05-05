@@ -20,7 +20,9 @@
 #include <Debug.h>
 #include <TypeConstants.h>
 
-/* 
+#include <errno_private.h>
+
+/*
  * Some notes.
  * Users are stored in an fs node (not necessarily a regular file,
  * that could be a dir, even the user's home dir,
@@ -78,16 +80,16 @@ static int32 pw_tls_id;
 typedef struct pw_tls {
 	DIR *grent_query;
 	DIR *pwent_query;
-	
+
 	int gridx;
 	int pwidx;
-	
+
 	char grfile[B_PATH_NAME_LENGTH+1]; /* current group's cached file path */
 	char pwfile[B_PATH_NAME_LENGTH+1]; /* current user's cached file path */
-	
+
 	struct group grent;
 	char grbuff[GRBUFFSZ]; /* XXX: merge with pwbuff ? */
-	
+
 	struct passwd pwent;
 	char pwbuff[PWBUFFSZ];
 } pw_tls_t;
@@ -96,7 +98,7 @@ struct pw_tls *get_pw_tls(void)
 {
 	pw_tls_t *p = (pw_tls_t *)tls_get(pw_tls_id);
 	PRINT(("%s()\n", __FUNCTION__));
-	
+
 	if (!p) {
 		p = (pw_tls_t *)malloc(sizeof(pw_tls_t));
 		if (!p)
@@ -117,7 +119,7 @@ int dentopen(struct dirent *dent, char *path)
 	dent->d_dev = boot_device;
 	err = get_path_for_dirent(dent, path, B_PATH_NAME_LENGTH);
 	if ((err < 0) || (path[0] != '/')) {
-		errno = err;
+		__set_errno(err);
 		return -1;
 	}
 	PRINT(("%s: open(%s)\n", __FUNCTION__, path));
@@ -178,7 +180,7 @@ void endgrent(void)
 	pw_tls_t *p;
 	PRINT(("%s()\n", __FUNCTION__));
 	p = get_pw_tls();
-	
+
 	if (p->grent_query)
 		fs_close_query(p->grent_query);
 	p->grent_query = NULL;
@@ -203,7 +205,7 @@ PRINT(("getgrent_r: grq = %p, idx = %d\n", p->grent_query, p->gridx));
 		setgrent(); /* y0u clumsy app! */
 	if (!p->grent_query)
 		return EIO; /* something happened... */
-	errno = 0;
+	__set_errno(0);
 	dent = fs_read_query(p->grent_query);
 	*gbufp = NULL;
 	if (!dent) {
@@ -238,12 +240,12 @@ struct group *getgrent(void)
 	p = get_pw_tls();
 	if (!p) {
 		/* we are really bork */
-		errno = ENOMEM;
+		__set_errno(ENOMEM);
 		return NULL;
 	}
 	err = getgrent_r(&p->grent, p->grbuff, GRBUFFSZ, &ent);
 	if (err < 0) {
-		errno = err;
+		__set_errno(err);
 		return NULL;
 	}
 	if (!ent)
@@ -265,17 +267,17 @@ struct group *getgrgid(gid_t gid)
 	p = get_pw_tls();
 	if (!p) {
 		/* we are really bork */
-		errno = ENOMEM;
+		__set_errno(ENOMEM);
 		return NULL;
 	}
-	
+
 	/* reusing path */
 	sprintf(p->grfile, QT_GR_GID, gid);
 	query = fs_open_query(boot_device, p->grfile, 0);
 	PRINT(("q: %p\n", query));
 	if (!query)
 		return NULL;
-	
+
 	dent = fs_read_query(query);
 	if (!dent) {
 		fs_close_query(query);
@@ -291,7 +293,7 @@ struct group *getgrgid(gid_t gid)
 	if (err)
 		return NULL;
 	return &p->grent;
-	
+
 }
 
 /* by name */
@@ -307,12 +309,12 @@ struct group *getgrnam(const char *name)
 	p = get_pw_tls();
 	if (!p) {
 		/* we are really bork */
-		errno = ENOMEM;
+		__set_errno(ENOMEM);
 		return NULL;
 	}
-	
+
 	if (!name || strlen(name) > GR_MAX_NAME) {
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		return NULL;
 	}
 	/* reusing path */
@@ -321,7 +323,7 @@ struct group *getgrnam(const char *name)
 	PRINT(("q: %p\n", query));
 	if (!query)
 		return NULL;
-	
+
 	dent = fs_read_query(query);
 	if (!dent) {
 		fs_close_query(query);
@@ -337,7 +339,7 @@ struct group *getgrnam(const char *name)
 	if (err)
 		return NULL;
 	return &p->grent;
-	
+
 }
 
 
@@ -455,7 +457,7 @@ void endpwent(void)
 	pw_tls_t *p;
 	PRINT(("%s()\n", __FUNCTION__));
 	p = get_pw_tls();
-	
+
 	if (p->pwent_query)
 		fs_close_query(p->pwent_query);
 	p->pwent_query = NULL;
@@ -480,7 +482,7 @@ PRINT(("getpwent_r: pwq = %p, idx = %d\n", p->pwent_query, p->pwidx));
 		setpwent(); /* y0u clumsy app! */
 	if (!p->pwent_query)
 		return EIO; /* something happened... */
-	errno = 0;
+	__set_errno(0);
 	dent = fs_read_query(p->pwent_query);
 	*pwbufp = NULL;
 	if (!dent) {
@@ -515,12 +517,12 @@ struct passwd *getpwent(void)
 	p = get_pw_tls();
 	if (!p) {
 		/* we are really bork */
-		errno = ENOMEM;
+		__set_errno(ENOMEM);
 		return NULL;
 	}
 	err = getpwent_r(&p->pwent, p->pwbuff, PWBUFFSZ, &ent);
 	if (err < 0) {
-		errno = err;
+		__set_errno(err);
 		return NULL;
 	}
 	if (!ent)
@@ -542,10 +544,10 @@ struct passwd *getpwuid(uid_t uid)
 	p = get_pw_tls();
 	if (!p) {
 		/* we are really bork */
-		errno = ENOMEM;
+		__set_errno(ENOMEM);
 		return NULL;
 	}
-	
+
 	/* reusing path */
 	sprintf(p->pwfile, QT_PW_UID, uid);
 	PRINT(("%s: query(%s)\n", __FUNCTION__, p->pwfile));
@@ -553,7 +555,7 @@ struct passwd *getpwuid(uid_t uid)
 	PRINT(("q: %p\n", query));
 	if (!query)
 		return NULL;
-	
+
 	dent = fs_read_query(query);
 	if (!dent) {
 		fs_close_query(query);
@@ -569,7 +571,7 @@ struct passwd *getpwuid(uid_t uid)
 	if (err)
 		return NULL;
 	return &p->pwent;
-	
+
 }
 
 /* by name */
@@ -585,12 +587,12 @@ struct passwd *getpwnam(const char *name)
 	p = get_pw_tls();
 	if (!p) {
 		/* we are really bork */
-		errno = ENOMEM;
+		__set_errno(ENOMEM);
 		return NULL;
 	}
-	
+
 	if (!name || strlen(name) > PW_MAX_NAME) {
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		return NULL;
 	}
 	/* reusing path */
@@ -600,7 +602,7 @@ struct passwd *getpwnam(const char *name)
 	PRINT(("q: %p\n", query));
 	if (!query)
 		return NULL;
-	
+
 	dent = fs_read_query(query);
 	if (!dent) {
 		fs_close_query(query);
@@ -617,7 +619,7 @@ struct passwd *getpwnam(const char *name)
 	if (err)
 		return NULL;
 	return &p->pwent;
-	
+
 }
 
 void __init_pwd_backend(void)
@@ -631,7 +633,7 @@ void __init_pwd_backend(void)
 /*
 void __fini_pwd_backend(void)
 {
-	
+
 }
 */
 

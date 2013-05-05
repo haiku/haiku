@@ -9,6 +9,7 @@
 
 #include <new>
 
+#include <ControlLook.h>
 #include <Message.h>
 
 
@@ -18,6 +19,13 @@ namespace {
 	const char* const kAlignmentField = "BSpaceLayoutItem:alignment";
 	const char* const kFrameField = "BSpaceLayoutItem:frame";
 	const char* const kVisibleField = "BSpaceLayoutItem:visible";
+
+	BSize& ComposeSpacingInPlace(BSize& size)
+	{
+		size.width = BControlLook::ComposeSpacing(size.width);
+		size.height = BControlLook::ComposeSpacing(size.height);
+		return size;
+	}
 }
 
 
@@ -25,9 +33,9 @@ BSpaceLayoutItem::BSpaceLayoutItem(BSize minSize, BSize maxSize,
 	BSize preferredSize, BAlignment alignment)
 	:
 	fFrame(),
-	fMinSize(minSize),
-	fMaxSize(maxSize),
-	fPreferredSize(preferredSize),
+	fMinSize(ComposeSpacingInPlace(minSize)),
+	fMaxSize(ComposeSpacingInPlace(maxSize)),
+	fPreferredSize(ComposeSpacingInPlace(preferredSize)),
 	fAlignment(alignment),
 	fVisible(true)
 {
@@ -225,4 +233,16 @@ BSpaceLayoutItem::Instantiate(BMessage* from)
 		return new(std::nothrow) BSpaceLayoutItem(from);
 	return NULL;
 }
+
+
+void BSpaceLayoutItem::_ReservedSpaceLayoutItem1() {}
+void BSpaceLayoutItem::_ReservedSpaceLayoutItem2() {}
+void BSpaceLayoutItem::_ReservedSpaceLayoutItem3() {}
+void BSpaceLayoutItem::_ReservedSpaceLayoutItem4() {}
+void BSpaceLayoutItem::_ReservedSpaceLayoutItem5() {}
+void BSpaceLayoutItem::_ReservedSpaceLayoutItem6() {}
+void BSpaceLayoutItem::_ReservedSpaceLayoutItem7() {}
+void BSpaceLayoutItem::_ReservedSpaceLayoutItem8() {}
+void BSpaceLayoutItem::_ReservedSpaceLayoutItem9() {}
+void BSpaceLayoutItem::_ReservedSpaceLayoutItem10() {}
 

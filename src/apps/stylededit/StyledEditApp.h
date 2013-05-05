@@ -36,7 +36,8 @@ public:
 
 			int32				NumberOfWindows();
 			void				OpenDocument();
-			status_t			OpenDocument(entry_ref* ref);
+			status_t			OpenDocument(entry_ref* ref,
+									BMessage* message = NULL);
 			void				CloseDocument();
 
 private:

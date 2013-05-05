@@ -16,7 +16,12 @@
 #include <HashMapCatalog.h>
 #include <PlainTextCatalog.h>
 
+using BPrivate::CatKey;
+using BPrivate::DefaultCatalog;
+using BPrivate::HashMapCatalog;
+using BPrivate::PlainTextCatalog;
 using std::vector;
+
 
 void
 usage()
@@ -108,7 +113,7 @@ main(int argc, char **argv)
 
 		// now walk over all entries in input-catalog and add them to
 		// target catalog, unless they already exist there.
-		BHashMapCatalog::CatWalker walker(&inputCatalog);
+		HashMapCatalog::CatWalker walker(&inputCatalog);
 		while (!walker.AtEnd()) {
 			const CatKey &key(walker.GetKey());
 

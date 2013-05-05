@@ -31,17 +31,18 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
-#ifndef	_QUERY_CONTAINER_WINDOW_H
+#ifndef _QUERY_CONTAINER_WINDOW_H
 #define _QUERY_CONTAINER_WINDOW_H
 
-#include "ContainerWindow.h"
-
-namespace BPrivate {
 
 // Container window specificaly used for displaying BQueryPoseViews
 // Adds query window specific menus
 
+
+#include "ContainerWindow.h"
+
+
+namespace BPrivate {
 
 #define kQueryTemplates "DefaultQueryTemplates"
 
@@ -49,21 +50,21 @@ class BQueryPoseView;
 
 class BQueryContainerWindow : public BContainerWindow {
 public:
-	BQueryContainerWindow(LockingList<BWindow> *windowList,
+	BQueryContainerWindow(LockingList<BWindow>* windowList,
 		uint32 containerWindowFlags,
 		window_look look = B_DOCUMENT_WINDOW_LOOK,
-		window_feel feel = B_NORMAL_WINDOW_FEEL, 
+		window_feel feel = B_NORMAL_WINDOW_FEEL,
 		uint32 flags = B_WILL_ACCEPT_FIRST_CLICK | B_NO_WORKSPACE_ACTIVATION,
 		uint32 workspace = B_CURRENT_WORKSPACE);
 
-	BQueryPoseView *PoseView() const;
+	BQueryPoseView* PoseView() const;
 	bool ActiveOnDevice(dev_t) const;
 
 protected:
-	virtual	void CreatePoseView(Model *);
-	virtual BPoseView *NewPoseView(Model *model, BRect rect, uint32 viewMode);
-	virtual	void AddWindowMenu(BMenu *menu);
-	virtual	void AddWindowContextMenus(BMenu *menu);
+	virtual	void CreatePoseView(Model*);
+	virtual BPoseView* NewPoseView(Model* model, BRect rect, uint32 viewMode);
+	virtual	void AddWindowMenu(BMenu* menu);
+	virtual	void AddWindowContextMenus(BMenu* menu);
 
 	virtual void SetUpDefaultState();
 
@@ -75,4 +76,4 @@ private:
 
 using namespace BPrivate;
 
-#endif
+#endif	// _QUERY_CONTAINER_WINDOW_H

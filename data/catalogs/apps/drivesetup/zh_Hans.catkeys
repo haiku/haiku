@@ -1,0 +1,75 @@
+1	english	x-vnd.Haiku-DriveSetup	1752326393
+DriveSetup	System name		磁盘管理器
+Cancel	AbstractParametersPanel		取消
+Delete	MainWindow		删除
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		您确定将所做修改写入磁盘吗？\n\n如果执行此操作，选中分区上的所有数据将丢失，无法恢复！
+Rescan	MainWindow		重新扫描
+OK	MainWindow		确定
+Could not aquire partitioning information.	MainWindow		无法获取分区信息。
+There's no space on the partition where a child partition could be created.	MainWindow		所选分区没有足够的空间创建子分区。
+Initialize	InitializeParametersPanel		初始化
+OK	AbstractParametersPanel		确定
+<empty>	PartitionList		<空白>
+Unable to find the selected partition by ID.	MainWindow		无法通过ID找到所选分区。
+Select a partition from the list below.	DiskView		请从以下列表选择一个分区。
+No disk devices have been recognized.	DiskView		无可识别的磁盘。  
+Failed to initialize the disk %s!\n	MainWindow		初始化磁盘 %s 失败！\n
+The selected disk is read-only.	MainWindow		所选磁盘是只读的。
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		您是否确定格式化分区 \"%s\" ？在磁盘写入修改前，您将需要再次确认。
+Could not mount partition %s.	MainWindow		无法挂载分区 ％s。
+The partition %s has been successfully formatted.\n	MainWindow		分区 %s 已完成初始化。\n
+The partition %s is already unmounted.	MainWindow		分区 ％s 已经卸载。  
+Failed to delete the partition. No changes have been written to disk.	MainWindow		删除分区失败。所作修改未写入磁盘。
+Could not delete the selected partition.	MainWindow		无法删除所选分区。  
+Initialize	MainWindow		初始化
+Error: 	MainWindow	in any error alert	错误：
+Partition %ld	DiskView		分区 %ld
+<empty>	DiskView		<空白>
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		初始化分区 %s 失败。(修改未写入磁盘。)
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		您确定将所做修改写入磁盘吗？\n\n如果执行该操作，分区中的所有数据将丢失，无法恢复！
+Mounted at	PartitionList		挂载于
+There was an error acquiring the partition row.	MainWindow		获取分区序列出错。
+You need to select a partition entry from the list.	MainWindow		您需要从列表中选择一个分区。
+The currently selected partition does not have a parent partition.	MainWindow		当前选中分区无父分区。
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		您确定将所做修改写入磁盘吗？\n\n如果执行该操作，选中磁盘中的所有数据将丢失，无法恢复！
+Write changes	MainWindow		写入修改
+There was an error preparing the disk for modifications.	MainWindow		准备对磁盘写入修改时出现错误。
+The partition %s is already mounted.	MainWindow		分区 %s 已经挂载。
+Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		您是否确定格式化该分区？在磁盘写入修改前，您将需要再次确认。
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		您确定将所做修改写入磁盘吗？\n\n如果执行该操作，磁盘 %s 中的所有数据将丢失，无法恢复！
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		您确定删除所选分区吗？\n\n如果执行该操作，分区中的所有数据将丢失，无法恢复！
+Create…	MainWindow		创建…
+Disk system \"%s\"\" not found!	MainWindow		磁盘系统 \"%s\"\"不存在！
+The disk has been successfully initialized.\n	MainWindow		磁盘 %s 已完成初始化。\n
+Could not unmount partition %s.	MainWindow		无法卸载分区 %s。
+Failed to format the partition %s!\n	MainWindow		分区 %s 格式化失败！\n
+Mount	MainWindow		挂载
+Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		您是否确定格式化原始磁盘？（首先需要将磁盘进行初始化分区）在磁盘写入修改前，您将需要再次确认。
+Device	PartitionList		设备
+Disk	MainWindow		磁盘
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		您是否确定初始化选中磁盘？所有数据将会丢失。在磁盘写入修改之前，您将需要再次确认。
+Device	DiskView		设备
+Active	PartitionList		活动
+Volume name	PartitionList		卷标
+Continue	MainWindow		继续
+Cannot delete the selected partition.	MainWindow		无法删除选中分区。
+Mount all	MainWindow		挂载所有磁盘
+Cancel	MainWindow		取消
+Delete partition	MainWindow		删除分区
+Eject	MainWindow		弹出
+Partition	MainWindow		分区
+File system	PartitionList		文件系统
+Validation of the given creation parameters failed.	MainWindow		给定创建参数验证失败。
+Size	PartitionList		大小
+Wipe (not implemented)	MainWindow		擦除数据（未实现）
+Validation of the given initialization parameters failed.	MainWindow		给定初始化参数验证失败。
+The selected partition does not contain a partitioning system.	MainWindow		选中分区不包含分区系统。
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		您确定将所做修改写入磁盘吗？\n\n执行此操作之后，分区 %s 中的所有数据将丢失，无法恢复！
+The partition %s is currently mounted.	MainWindow		分区 %s 当前已挂载。
+Surface test (not implemented)	MainWindow		表面测试（未执行）
+Format	MainWindow		格式化
+Parameters	PartitionList		参数
+Creation of the partition has failed.	MainWindow		分区创建失败。
+The currently selected partition is not empty.	MainWindow		当前选中分区不为空。
+Failed to format the partition. No changes have been written to disk.	MainWindow		分区格式化失败。所有修改未写入磁盘。
+Unmount	MainWindow		卸载

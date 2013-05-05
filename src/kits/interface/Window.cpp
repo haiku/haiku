@@ -43,6 +43,7 @@
 #include <MenuPrivate.h>
 #include <MessagePrivate.h>
 #include <PortLink.h>
+#include <RosterPrivate.h>
 #include <ServerProtocol.h>
 #include <TokenSpace.h>
 #include <ToolTipManager.h>
@@ -275,8 +276,8 @@ BWindow::Shortcut::Matches(uint32 key, uint32 modifiers) const
 uint32
 BWindow::Shortcut::AllowedModifiers()
 {
-	return B_COMMAND_KEY | B_OPTION_KEY | B_SHIFT_KEY
-		| B_CONTROL_KEY | B_MENU_KEY;
+	return B_COMMAND_KEY | B_OPTION_KEY | B_SHIFT_KEY | B_CONTROL_KEY
+		| B_MENU_KEY;
 }
 
 
@@ -514,7 +515,7 @@ BWindow::Quit()
 			name = "no-name";
 
 		printf("ERROR - you must Lock a looper before calling Quit(), "
-			   "team=%ld, looper=%s\n", Team(), name);
+			   "team=%" B_PRId32 ", looper=%s\n", Team(), name);
 	}
 
 	// Try to lock
@@ -588,14 +589,14 @@ BWindow::ChildAt(int32 index) const
 void
 BWindow::Minimize(bool minimize)
 {
-	if (IsModal() || IsFloating() || fMinimized == minimize || !Lock())
+	if (IsModal() || IsFloating() || IsHidden() || fMinimized == minimize
+		|| !Lock())
 		return;
 
 	fMinimized = minimize;
 
 	fLink->StartMessage(AS_MINIMIZE_WINDOW);
 	fLink->Attach<bool>(minimize);
-	fLink->Attach<int32>(fShowLevel);
 	fLink->Flush();
 
 	Unlock();
@@ -722,6 +723,55 @@ BWindow::MessageReceived(BMessage* msg)
 	if (!msg->HasSpecifiers()) {
 		if (msg->what == B_KEY_DOWN)
 			_KeyboardNavigation();
+
+		if (msg->what == (int32)kMsgAppServerRestarted) {
+			fLink->SetSenderPort(BApplication::Private::ServerLink()->SenderPort());
+
+			BPrivate::AppServerLink lockLink;
+				// we're talking to the server application using our own
+				// communication channel (fLink) - we better make sure no one
+				// interferes by locking that channel (which AppServerLink does
+				// implicetly)
+
+			fLink->StartMessage(AS_CREATE_WINDOW);
+
+			fLink->Attach<BRect>(fFrame);
+			fLink->Attach<uint32>((uint32)fLook);
+			fLink->Attach<uint32>((uint32)fFeel);
+			fLink->Attach<uint32>(fFlags);
+			fLink->Attach<uint32>(0);
+			fLink->Attach<int32>(_get_object_token_(this));
+			fLink->Attach<port_id>(fLink->ReceiverPort());
+			fLink->Attach<port_id>(fMsgPort);
+			fLink->AttachString(fTitle);
+
+			port_id sendPort;
+			int32 code;
+			if (fLink->FlushWithReply(code) == B_OK
+				&& code == B_OK
+				&& fLink->Read<port_id>(&sendPort) == B_OK) {
+				// read the frame size and its limits that were really
+				// enforced on the server side
+
+				fLink->Read<BRect>(&fFrame);
+				fLink->Read<float>(&fMinWidth);
+				fLink->Read<float>(&fMaxWidth);
+				fLink->Read<float>(&fMinHeight);
+				fLink->Read<float>(&fMaxHeight);
+
+				fMaxZoomWidth = fMaxWidth;
+				fMaxZoomHeight = fMaxHeight;
+			} else
+				sendPort = -1;
+
+			// Redirect our link to the new window connection
+			fLink->SetSenderPort(sendPort);
+
+			// connect all views to the server again
+			fTopView->_CreateSelf();
+
+			_SendShowOrHideMessage();
+		}
 
 		return BLooper::MessageReceived(msg);
 	}
@@ -979,7 +1029,8 @@ BWindow::DispatchMessage(BMessage* msg, BHandler* target)
 			be_roster->GetAppList(info.signature, &list);
 
 			for (int32 i = 0; i < list.CountItems(); i++) {
-				do_minimize_team(BRect(), (team_id)list.ItemAt(i), false);
+				do_minimize_team(BRect(), (team_id)(addr_t)list.ItemAt(i),
+					false);
 			}
 			break;
 		}
@@ -1380,8 +1431,8 @@ FrameMoved(origin);
 					if (BView* view = _FindView(info->token))
 						view->_Draw(info->updateRect);
 					else {
-						printf("_UPDATE_ - didn't find view by token: %ld\n",
-							info->token);
+						printf("_UPDATE_ - didn't find view by token: %"
+							B_PRId32 "\n", info->token);
 					}
 //drawTime += system_time() - drawStart;
 				}
@@ -1809,6 +1860,13 @@ BWindow::AddShortcut(uint32 key, uint32 modifiers, BMessage* message,
 }
 
 
+bool
+BWindow::HasShortcut(uint32 key, uint32 modifiers)
+{
+	return _FindShortcut(key, modifiers) != NULL;
+}
+
+
 void
 BWindow::RemoveShortcut(uint32 key, uint32 modifiers)
 {
@@ -2042,10 +2100,6 @@ BWindow::IsMinimized() const
 	if (!locker.IsLocked())
 		return false;
 
-	// Hiding takes precendence over minimization!!!
-	if (IsHidden())
-		return false;
-
 	return fMinimized;
 }
 
@@ -2085,13 +2139,13 @@ BWindow::DecoratorFrame() const
 		// else use fall-back values from above
 	}
 
-	if (fLook & kLeftTitledWindowLook) {
+	if (fLook == kLeftTitledWindowLook) {
 		decoratorFrame.top -= borderWidth;
-		decoratorFrame.left -= tabRect.Width();
+		decoratorFrame.left -= borderWidth + tabRect.Width();
 		decoratorFrame.right += borderWidth;
 		decoratorFrame.bottom += borderWidth;
 	} else {
-		decoratorFrame.top -= tabRect.Height();
+		decoratorFrame.top -= borderWidth + tabRect.Height();
 		decoratorFrame.left -= borderWidth;
 		decoratorFrame.right += borderWidth;
 		decoratorFrame.bottom += borderWidth;
@@ -2530,6 +2584,10 @@ BWindow::ResizeTo(float width, float height)
 }
 
 
+/*!
+	\brief Center the window in the passed in \a rect.
+	\param rect The rectangle to center the window in.
+*/
 void
 BWindow::CenterIn(const BRect& rect)
 {
@@ -2542,11 +2600,23 @@ BWindow::CenterIn(const BRect& rect)
 }
 
 
+/*!
+	\brief Centers the window on the screen the window is currently on.
+*/
 void
 BWindow::CenterOnScreen()
 {
-	BScreen screen(this);
-	CenterIn(screen.Frame());
+	CenterIn(BScreen(this).Frame());
+}
+
+
+/*!
+	\brief Centers the window on the screen with the passed in \a id.
+*/
+void
+BWindow::CenterOnScreen(screen_id id)
+{
+	CenterIn(BScreen(id).Frame());
 }
 
 
@@ -2555,12 +2625,9 @@ BWindow::Show()
 {
 	bool runCalled = true;
 	if (Lock()) {
-		fShowLevel++;
+		fShowLevel--;
 
-		if (fShowLevel == 1) {
-			fLink->StartMessage(AS_SHOW_WINDOW);
-			fLink->Flush();
-		}
+		_SendShowOrHideMessage();
 
 		runCalled = fRunCalled;
 
@@ -2585,24 +2652,24 @@ BWindow::Show()
 void
 BWindow::Hide()
 {
-	if (!Lock())
-		return;
+	if (Lock()) {
+		// If we are minimized and are about to be hidden, unminimize
+		if (IsMinimized() && fShowLevel == 0)
+			Minimize(false);
 
-	fShowLevel--;
+		fShowLevel++;
 
-	if (fShowLevel == 0) {
-		fLink->StartMessage(AS_HIDE_WINDOW);
-		fLink->Flush();
+		_SendShowOrHideMessage();
+
+		Unlock();
 	}
-
-	Unlock();
 }
 
 
 bool
 BWindow::IsHidden() const
 {
-	return fShowLevel <= 0;
+	return fShowLevel > 0;
 }
 
 
@@ -2739,7 +2806,7 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 	fInTransaction = bitmapToken >= 0;
 	fUpdateRequested = false;
 	fActive = false;
-	fShowLevel = 0;
+	fShowLevel = 1;
 
 	fTopView = NULL;
 	fFocus = NULL;
@@ -3055,9 +3122,6 @@ BWindow::task_looper()
 							DispatchMessage(fLastMessage, handler);
 					}
 
-					if (!cookie.tokens_scanned)
-						continue;
-
 					// Delete the current message
 					delete fLastMessage;
 					fLastMessage = NULL;
@@ -3284,7 +3348,7 @@ BWindow::_DetermineTarget(BMessage* message, BHandler* target)
 
 		case B_PULSE:
 		case B_QUIT_REQUESTED:
-			// TODO: test wether R5 will let BView dispatch these messages
+			// TODO: test whether R5 will let BView dispatch these messages
 			return this;
 
 		case _MESSAGE_DROPPED_:
@@ -3699,6 +3763,7 @@ BWindow::_HandleKeyDown(BMessage* event)
 			message.AddBool("shortcut", true);
 
 			be_app->PostMessage(&message);
+			// eat the event
 			return true;
 		}
 
@@ -3800,6 +3865,58 @@ BWindow::_KeyboardNavigation()
 	if (nextFocus && nextFocus != fFocus) {
 		nextFocus->MakeFocus(true);
 	}
+}
+
+
+/*!
+	\brief Return the position of the window centered horizontally to the passed
+           in \a frame and vertically 3/4 from the top of \a frame.
+
+	If the window is on the borders
+
+	\param width The width of the window.
+	\param height The height of the window.
+	\param frame The \a frame to center the window in.
+
+	\return The new window position.
+*/
+BPoint
+BWindow::AlertPosition(const BRect& frame)
+{
+	float width = Bounds().Width();
+	float height = Bounds().Height();
+
+	BPoint point(frame.left + (frame.Width() / 2.0f) - (width / 2.0f),
+		frame.top + (frame.Height() / 4.0f) - ceil(height / 3.0f));
+
+	BRect screenFrame = BScreen(this).Frame();
+	if (frame == screenFrame) {
+		// reference frame is screen frame, skip the below adjustments
+		return point;
+	}
+
+	float borderWidth;
+	float tabHeight;
+	_GetDecoratorSize(&borderWidth, &tabHeight);
+
+	// clip the x position within the horizontal edges of the screen
+	if (point.x < screenFrame.left + borderWidth)
+		point.x = screenFrame.left + borderWidth;
+	else if (point.x + width > screenFrame.right - borderWidth)
+		point.x = screenFrame.right - borderWidth - width;
+
+	// lower the window down if it is covering the window tab
+	float tabPosition = frame.LeftTop().y + tabHeight + borderWidth;
+	if (point.y < tabPosition)
+		point.y = tabPosition;
+
+	// clip the y position within the vertical edges of the screen
+	if (point.y < screenFrame.top + borderWidth)
+		point.y = screenFrame.top + borderWidth;
+	else if (point.y + height > screenFrame.bottom - borderWidth)
+		point.y = screenFrame.bottom - borderWidth - height;
+
+	return point;
 }
 
 
@@ -4006,6 +4123,15 @@ BWindow::_GetDecoratorSize(float* _borderWidth, float* _tabHeight) const
 		*_borderWidth = borderWidth;
 	if (_tabHeight != NULL)
 		*_tabHeight = tabHeight;
+}
+
+
+void
+BWindow::_SendShowOrHideMessage()
+{
+	fLink->StartMessage(AS_SHOW_OR_HIDE_WINDOW);
+	fLink->Attach<int32>(fShowLevel);
+	fLink->Flush();
 }
 
 

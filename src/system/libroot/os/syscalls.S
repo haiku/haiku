@@ -1,6 +1,9 @@
 #ifdef ARCH_x86
 #	include "arch/x86/syscalls.inc"
 #endif
+#ifdef ARCH_x86_64
+#	include "arch/x86_64/syscalls.inc"
+#endif
 #ifdef ARCH_alpha
 #	include "arch/alpha/syscalls.inc"
 #endif
@@ -21,6 +24,9 @@
 #endif
 #ifdef ARCH_ppc
 #	include "arch/ppc/syscalls.inc"
+#endif
+#ifdef ARCH_arm
+#	include "arch/arm/syscalls.inc"
 #endif
 #ifdef ARCH_m68k
 #	include "arch/m68k/syscalls.inc"

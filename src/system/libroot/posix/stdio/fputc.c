@@ -40,6 +40,9 @@ static char rcsid[] = "$OpenBSD: fputc.c,v 1.4 2001/07/09 06:57:44 deraadt Exp $
 
 #include <stdio.h>
 #include <errno.h>
+
+#include <errno_private.h>
+
 #include "local.h"
 
 int
@@ -48,7 +51,7 @@ fputc(c, fp)
 	register FILE *fp;
 {
 	if (cantwrite(fp)) {
-		errno = EBADF;
+		__set_errno(EBADF);
 		return (EOF);
 	}
 	return (putc(c, fp));

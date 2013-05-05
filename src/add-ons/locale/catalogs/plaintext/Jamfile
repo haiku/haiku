@@ -5,5 +5,5 @@ UsePrivateHeaders locale shared ;
 
 Addon <catalog-addon>plaintext
 	: Catalog.cpp 
-	: be $(TARGET_LIBSTDC++) liblocale.so 
+	: be $(TARGET_LIBSTDC++)
 	;

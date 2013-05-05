@@ -17,7 +17,7 @@
 
 #define TRACE_OUTPUT(x, y, z...) \
 	{ \
-		dprintf("usb %s%s %ld: ", y, (x)->TypeName(), (x)->USBID()); \
+		dprintf("usb %s%s %" B_PRId32 ": ", y, (x)->TypeName(), (x)->USBID()); \
 		dprintf(z); \
 	}
 
@@ -91,7 +91,8 @@ typedef enum {
 	USB_SPEED_FULLSPEED,
 	USB_SPEED_HIGHSPEED,
 	USB_SPEED_SUPER,
-	USB_SPEED_MAX = USB_SPEED_SUPER
+	USB_SPEED_WIRELESS,
+	USB_SPEED_MAX = USB_SPEED_WIRELESS
 } usb_speed;
 
 
@@ -135,13 +136,14 @@ public:
 		BusManager *					BusManagerAt(int32 index) const;
 
 		status_t						AllocateChunk(void **logicalAddress,
-											void **physicalAddress,
+											phys_addr_t *physicalAddress,
 											size_t size);
 		status_t						FreeChunk(void *logicalAddress,
-											void *physicalAddress, size_t size);
+											phys_addr_t physicalAddress,
+											size_t size);
 
 		area_id							AllocateArea(void **logicalAddress,
-											void **physicalAddress,
+											phys_addr_t *physicalAddress,
 											size_t size, const char *name);
 
 		void							NotifyDeviceChange(Device *device,
@@ -201,10 +203,10 @@ virtual	status_t						InitCheck();
 		int8							AllocateAddress();
 		void							FreeAddress(int8 address);
 
-		Device *						AllocateDevice(Hub *parent,
+virtual	Device *						AllocateDevice(Hub *parent,
 											int8 hubAddress, uint8 hubPort,
 											usb_speed speed);
-		void							FreeDevice(Device *device);
+virtual void							FreeDevice(Device *device);
 
 virtual	status_t						Start();
 virtual	status_t						Stop();
@@ -479,7 +481,8 @@ public:
 											uint8 hubPort,
 											usb_device_descriptor &desc,
 											int8 deviceAddress,
-											usb_speed speed, bool isRootHub);
+											usb_speed speed, bool isRootHub,
+											void *controllerCookie = NULL);
 virtual									~Device();
 
 		status_t						InitCheck();
@@ -534,6 +537,11 @@ virtual	status_t						BuildDeviceName(char *string,
 											{ return fHubAddress; }
 		uint8							HubPort() const { return fHubPort; }
 
+		void							SetControllerCookie(void *cookie)
+											{ fControllerCookie = cookie; }
+		void *							ControllerCookie() const
+											{ return fControllerCookie; }
+
 		// Convenience functions for standard requests
 virtual	status_t						SetFeature(uint16 selector);
 virtual	status_t						ClearFeature(uint16 selector);
@@ -553,6 +561,7 @@ private:
 		int8							fHubAddress;
 		uint8							fHubPort;
 		ControlPipe *					fDefaultPipe;
+		void *							fControllerCookie;
 };
 
 
@@ -601,6 +610,8 @@ virtual	status_t						BuildDeviceName(char *string,
 											Device *device);
 
 private:
+		status_t						_DebouncePort(uint8 index);
+
 		InterruptPipe *					fInterruptPipe;
 		usb_hub_descriptor				fHubDescriptor;
 

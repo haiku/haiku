@@ -17,8 +17,6 @@
 #include <Catalog.h>
 #include <ControlLook.h>
 #include <File.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayoutBuilder.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuField.h>
@@ -32,8 +30,8 @@
 #include <stdio.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "FileType Window"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "FileType Window"
 
 
 const uint32 kMsgTypeEntered = 'type';
@@ -51,7 +49,7 @@ const uint32 kMsgSamePreferredAppAsOpened = 'spaO';
 
 FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 	:
-	BWindow(BRect(0.0f, 0.0f, 200.0f, 200.0f).OffsetBySelf(position),
+	BWindow(BRect(0.0f, 0.0f, 300.0f, 200.0f).OffsetBySelf(position),
 		B_TRANSLATE("File type"), B_TITLED_WINDOW,
 		B_NOT_V_RESIZABLE | B_NOT_ZOOMABLE
 			| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
@@ -79,22 +77,20 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 		B_TRANSLATE_COMMENT("Same as" B_UTF8_ELLIPSIS,
 			"The same TYPE as ..."), new BMessage(kMsgSameTypeAs));
 
-	fileTypeBox->AddChild(BGridLayoutBuilder(padding, padding)
-		.Add(fTypeControl, 0, 0, 2, 1)
+	BLayoutBuilder::Grid<>(fileTypeBox, padding, padding / 2)
+		.SetInsets(padding, padding * 2, padding, padding)
+		.Add(fTypeControl, 0, 0, 3, 1)
 		.Add(fSelectTypeButton, 0, 1)
-		.Add(fSameTypeAsButton, 1, 1)
-		.SetInsets(padding, padding, padding, padding)
-		.View());
+		.Add(fSameTypeAsButton, 1, 1);
 
 	// "Icon" group
 
 	BBox* iconBox = new BBox("icon BBox");
 	iconBox->SetLabel(B_TRANSLATE("Icon"));
 	fIconView = new IconView("icon");
-	iconBox->AddChild(BGroupLayoutBuilder(B_HORIZONTAL)
-		.Add(fIconView)
-		.SetInsets(padding, padding, padding, padding)
-		.TopView());
+	BLayoutBuilder::Group<>(iconBox, B_HORIZONTAL)
+		.SetInsets(padding, padding * 2, padding, padding)
+		.Add(fIconView);
 
 	// "Preferred Application" group
 
@@ -118,20 +114,17 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 			"The same APPLICATION as ..."),
 			new BMessage(kMsgSamePreferredAppAs));
 
-	preferredBox->AddChild(BGridLayoutBuilder(padding, padding)
-		.Add(fPreferredField, 0, 0, 2, 1)
+	BLayoutBuilder::Grid<>(preferredBox, padding, padding / 2)
+		.SetInsets(padding, padding * 2, padding, padding)
+		.Add(fPreferredField, 0, 0, 3, 1)
 		.Add(fSelectAppButton, 0, 1)
-		.Add(fSameAppAsButton, 1, 1)
-		.SetInsets(padding, padding, padding, padding)
-		.View());
+		.Add(fSameAppAsButton, 1, 1);
 
-	BLayoutBuilder::Group<>(this, B_HORIZONTAL, padding)
-		.SetInsets(padding, padding, padding, padding)
-		.AddGroup(B_VERTICAL, padding)
-			.Add(fileTypeBox)
-			.Add(preferredBox)
-			.End()
-		.Add(iconBox);
+	BLayoutBuilder::Grid<>(this)
+		.SetInsets(padding)
+		.Add(fileTypeBox, 0, 0, 2, 1)
+		.Add(preferredBox, 0, 1, 1, 1)
+		.Add(iconBox, 1, 1, 1, 1);
 
 	fTypeControl->MakeFocus(true);
 	BMimeType::StartWatching(this);

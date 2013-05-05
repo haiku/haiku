@@ -73,11 +73,14 @@ typedef struct area_info {
 #define	B_32_BIT_CONTIGUOUS		6	/* B_CONTIGUOUS, < 4 GB physical address */
 
 /* address spec for create_area(), and clone_area() */
-#define B_ANY_ADDRESS			0
-#define B_EXACT_ADDRESS			1
-#define B_BASE_ADDRESS			2
-#define B_CLONE_ADDRESS			3
-#define	B_ANY_KERNEL_ADDRESS	4
+#define B_ANY_ADDRESS				0
+#define B_EXACT_ADDRESS				1
+#define B_BASE_ADDRESS				2
+#define B_CLONE_ADDRESS				3
+#define	B_ANY_KERNEL_ADDRESS		4
+/* B_ANY_KERNEL_BLOCK_ADDRESS		5 */
+#define B_RANDOMIZED_ANY_ADDRESS	6
+#define B_RANDOMIZED_BASE_ADDRESS	7
 
 /* area protection */
 #define B_READ_AREA				1
@@ -96,7 +99,7 @@ extern status_t		set_area_protection(area_id id, uint32 newProtection);
 
 /* system private, use macros instead */
 extern status_t		_get_area_info(area_id id, area_info *areaInfo, size_t size);
-extern status_t		_get_next_area_info(team_id team, int32 *cookie,
+extern status_t		_get_next_area_info(team_id team, ssize_t *cookie,
 						area_info *areaInfo, size_t size);
 
 #define get_area_info(id, areaInfo) \
@@ -494,7 +497,7 @@ typedef enum cpu_types {
 	B_CPU_INTEL_PENTIUM_M				= 0x1069,
 	B_CPU_INTEL_PENTIUM_III_XEON		= 0x106a,
 	B_CPU_INTEL_PENTIUM_III_MODEL_11 	= 0x106b,
-	B_CPU_INTEL_ATOM			= 0x1106c,
+	B_CPU_INTEL_ATOM					= 0x1106c,
 	B_CPU_INTEL_PENTIUM_M_MODEL_13		= 0x106d, /* Dothan */
 	B_CPU_INTEL_PENTIUM_CORE,
 	B_CPU_INTEL_PENTIUM_CORE_2,
@@ -513,15 +516,14 @@ typedef enum cpu_types {
 
 	/* AMD */
 
-	/* Checked with "AMD Processor Recognition Application Note"
-	 * (Table 3)
-	 * 20734.pdf
-	 */
+	// AMD Processor Recognition Application Note
 	B_CPU_AMD_x86						= 0x1100,
+
+	// Family 5h
 	B_CPU_AMD_K5_MODEL_0				= 0x1150,
-	B_CPU_AMD_K5_MODEL_1,
-	B_CPU_AMD_K5_MODEL_2,
-	B_CPU_AMD_K5_MODEL_3,
+	B_CPU_AMD_K5_MODEL_1				= 0x1151,
+	B_CPU_AMD_K5_MODEL_2				= 0x1152,
+	B_CPU_AMD_K5_MODEL_3				= 0x1153,
 	B_CPU_AMD_K6_MODEL_6				= 0x1156,
 	B_CPU_AMD_K6_MODEL_7				= 0x1157,
 	B_CPU_AMD_K6_MODEL_8				= 0x1158,
@@ -530,42 +532,71 @@ typedef enum cpu_types {
 	B_CPU_AMD_K6_III					= 0x1159,
 	B_CPU_AMD_K6_III_MODEL_13			= 0x115d,
 
+	B_CPU_AMD_GEODE_LX					= 0x115a,
+
+	// Family 6h
 	B_CPU_AMD_ATHLON_MODEL_1			= 0x1161,
 	B_CPU_AMD_ATHLON_MODEL_2			= 0x1162,
 
 	B_CPU_AMD_DURON 					= 0x1163,
 
 	B_CPU_AMD_ATHLON_THUNDERBIRD		= 0x1164,
-	B_CPU_AMD_ATHLON_XP 				= 0x1166,
-	B_CPU_AMD_ATHLON_XP_MODEL_7,
-	B_CPU_AMD_ATHLON_XP_MODEL_8,
+	B_CPU_AMD_ATHLON_XP_MODEL_6			= 0x1166,
+	B_CPU_AMD_ATHLON_XP_MODEL_7			= 0x1167,
+	B_CPU_AMD_ATHLON_XP_MODEL_8			= 0x1168,
 	B_CPU_AMD_ATHLON_XP_MODEL_10		= 0x116a, /* Barton */
 
-	B_CPU_AMD_SEMPRON_MODEL_8			= B_CPU_AMD_ATHLON_XP_MODEL_8,
-	B_CPU_AMD_SEMPRON_MODEL_10			= B_CPU_AMD_ATHLON_XP_MODEL_10,
-
-	/* According to "Revision Guide for AMD Family 10h
-	 * Processors" (41322.pdf)
-	 */
-	B_CPU_AMD_PHENOM					= 0x11f2,
-
-	/* According to "Revision guide for AMD Athlon 64
-	 * and AMD Opteron Processors" (25759.pdf)
-	 */
+	// Family fh
 	B_CPU_AMD_ATHLON_64_MODEL_3			= 0x11f3,
-	B_CPU_AMD_ATHLON_64_MODEL_4,
-	B_CPU_AMD_ATHLON_64_MODEL_5,
-	B_CPU_AMD_PHENOM_II					= B_CPU_AMD_ATHLON_64_MODEL_4,
-	B_CPU_AMD_OPTERON					= B_CPU_AMD_ATHLON_64_MODEL_5,
-	B_CPU_AMD_ATHLON_64_FX				= B_CPU_AMD_ATHLON_64_MODEL_5,
+	B_CPU_AMD_ATHLON_64_MODEL_4			= 0x11f4,
 	B_CPU_AMD_ATHLON_64_MODEL_7			= 0x11f7,
-	B_CPU_AMD_ATHLON_64_MODEL_8,
+	B_CPU_AMD_ATHLON_64_MODEL_8			= 0x11f8,
 	B_CPU_AMD_ATHLON_64_MODEL_11		= 0x11fb,
-	B_CPU_AMD_ATHLON_64_MODEL_12,
+	B_CPU_AMD_ATHLON_64_MODEL_12		= 0x11fc,
 	B_CPU_AMD_ATHLON_64_MODEL_14		= 0x11fe,
-	B_CPU_AMD_ATHLON_64_MODEL_15,
+	B_CPU_AMD_ATHLON_64_MODEL_15		= 0x11ff,
+	B_CPU_AMD_ATHLON_64_MODEL_20		= 0x111f4,
+	B_CPU_AMD_ATHLON_64_MODEL_23		= 0x111f7,
+	B_CPU_AMD_ATHLON_64_MODEL_24		= 0x111f8,
+	B_CPU_AMD_ATHLON_64_MODEL_27		= 0x111fb,
+	B_CPU_AMD_ATHLON_64_MODEL_28		= 0x111fc,
+	B_CPU_AMD_ATHLON_64_MODEL_31		= 0x111ff,
+	B_CPU_AMD_ATHLON_64_MODEL_35		= 0x211f3,
+	B_CPU_AMD_ATHLON_64_MODEL_43		= 0x211fb,
+	B_CPU_AMD_ATHLON_64_MODEL_44		= 0x211fc,
+	B_CPU_AMD_ATHLON_64_MODEL_47		= 0x211ff,
+	B_CPU_AMD_ATHLON_64_MODEL_63		= 0x311ff,
+	B_CPU_AMD_ATHLON_64_MODEL_79		= 0x411ff,
+	B_CPU_AMD_ATHLON_64_MODEL_95		= 0x511ff,
+	B_CPU_AMD_ATHLON_64_MODEL_127		= 0x711ff,
 
-	B_CPU_AMD_GEODE_LX					= 0x115a,
+	B_CPU_AMD_OPTERON_MODEL_5			= 0x11f5,
+	B_CPU_AMD_OPTERON_MODEL_21			= 0x111f5,
+	B_CPU_AMD_OPTERON_MODEL_33			= 0x211f1,
+	B_CPU_AMD_OPTERON_MODEL_37			= 0x211f5,
+	B_CPU_AMD_OPTERON_MODEL_39			= 0x211f7,
+
+	B_CPU_AMD_TURION_64_MODEL_36		= 0x211f4,
+	B_CPU_AMD_TURION_64_MODEL_76		= 0x411fc,
+	B_CPU_AMD_TURION_64_MODEL_104		= 0x611f8,
+
+	// Family 10h
+	B_CPU_AMD_PHENOM_MODEL_2			= 0x1011f2,
+	B_CPU_AMD_PHENOM_II_MODEL_4			= 0x1011f4,
+	B_CPU_AMD_PHENOM_II_MODEL_5			= 0x1011f5,
+	B_CPU_AMD_PHENOM_II_MODEL_6			= 0x1011f6,
+	B_CPU_AMD_PHENOM_II_MODEL_10		= 0x1011fa,
+
+	// Family 12h
+	B_CPU_AMD_A_SERIES					= 0x3011f1,
+
+	// Family 14h
+	B_CPU_AMD_C_SERIES					= 0x5011f1,
+	B_CPU_AMD_E_SERIES					= 0x5011f2,
+
+	// Family 15h
+	B_CPU_AMD_FX_SERIES_MODEL_1			= 0x6011f1, /* Bulldozer */
+	B_CPU_AMD_FX_SERIES_MODEL_2			= 0x6011f2,
 
 	/* VIA/Cyrix */
 	B_CPU_CYRIX_x86						= 0x1200,
@@ -618,7 +649,7 @@ typedef enum cpu_types {
 
 #define B_CPU_x86_VENDOR_MASK	0xff00
 
-#ifdef __INTEL__
+#if defined(__INTEL__) || defined(__x86_64__)
 typedef union {
 	struct {
 		uint32	max_eax;
@@ -686,7 +717,8 @@ typedef enum platform_types {
 	B_MK_61_PLATFORM,
 	B_NINTENDO_64_PLATFORM,
 	B_AMIGA_PLATFORM,
-	B_ATARI_PLATFORM
+	B_ATARI_PLATFORM,
+	B_64_BIT_PC_PLATFORM
 } platform_type;
 
 typedef struct {

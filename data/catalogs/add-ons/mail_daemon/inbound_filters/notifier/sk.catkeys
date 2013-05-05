@@ -1,16 +1,16 @@
 1	slovak	x-vnd.Haiku-NewMailNotification	3624191291
 %num new message	filter		%num nová správa
 %num new messages	filter		%num nových správ
-Alert	ConfigView		Upozornenie
-Beep	ConfigView		Pípnutie
-Central alert	ConfigView		Centrálne upozornenie
-Central beep	ConfigView		Centrálne pípnutie
 Keyboard LEDs	ConfigView		LED klávesnice
-Log window	ConfigView		Okno záznamu
-Method:	ConfigView		Metóda:
-New mails notification	ConfigView		Upozornenie na nové správy
-New messages	filter		Nové správy
-OK	filter		OK
-You have %num new message for %name.	filter		Máte %num novú správu pre %name.
 You have %num new messages for %name.	filter		Máte %num nových správ pre %name.
+You have %num new message for %name.	filter		Máte %num novú správu pre %name.
+Log window	ConfigView		Okno záznamu
+Central beep	ConfigView		Centrálne pípnutie
+Beep	ConfigView		Pípnutie
+Method:	ConfigView		Metóda:
+Central alert	ConfigView		Centrálne upozornenie
+Alert	ConfigView		Upozornenie
 none	ConfigView		žiadne
+New messages	filter		Nové správy
+New mails notification	ConfigView		Upozornenie na nové správy
+OK	filter		OK

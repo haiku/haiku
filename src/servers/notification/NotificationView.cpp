@@ -13,18 +13,25 @@
  *		Adrien Destugues <pulkomandy@pulkomandy.ath.cx>
  */
 
+
+#include "NotificationView.h"
+
+
+#include <Bitmap.h>
 #include <ControlLook.h>
 #include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
-#include <Layout.h>
 #include <LayoutUtils.h>
+#include <MessageRunner.h>
 #include <Messenger.h>
+#include <Notification.h>
 #include <Path.h>
+#include <PropertyInfo.h>
 #include <Roster.h>
 #include <StatusBar.h>
 
-#include "NotificationView.h"
+#include "AppGroupView.h"
 #include "NotificationWindow.h"
+
 
 static const int kIconStripeWidth = 32;
 
@@ -48,13 +55,13 @@ property_info message_prop_list[] = {
 NotificationView::NotificationView(NotificationWindow* win,
 	BNotification* notification, bigtime_t timeout)
 	:
-	BView("NotificationView", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE
-		| B_FRAME_EVENTS),
+	BView("NotificationView", B_WILL_DRAW),
 	fParent(win),
 	fNotification(notification),
 	fTimeout(timeout),
 	fRunner(NULL),
-	fBitmap(NULL)
+	fBitmap(NULL),
+	fCloseClicked(false)
 {
 	if (fNotification->Icon() != NULL)
 		fBitmap = new BBitmap(fNotification->Icon());
@@ -64,8 +71,6 @@ NotificationView::NotificationView(NotificationWindow* win,
 
 	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
 	SetLayout(layout);
-
-	SetText();
 
 	switch (fNotification->Type()) {
 		case B_IMPORTANT_NOTIFICATION:
@@ -87,15 +92,15 @@ NotificationView::NotificationView(NotificationWindow* win,
 			label << (int)(fNotification->Progress() * 100) << " %";
 			progress->SetTrailingText(label);
 
-			BGroupLayoutBuilder b(layout);
-				b.AddGlue()
-				.Add(progress);
+			layout->AddView(progress);
 		}
 		// fall through
 		default:
 			SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 			SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	}
+
+	SetText();
 }
 
 
@@ -269,26 +274,49 @@ NotificationView::Draw(BRect updateRect)
 	rgb_color detailCol = ui_color(B_CONTROL_BORDER_COLOR);
 	detailCol = tint_color(detailCol, B_LIGHTEN_2_TINT);
 
-	// Draw the close widget
-	BRect closeRect = Bounds();
-	closeRect.InsetBy(2 * kEdgePadding, 2 * kEdgePadding);
-	closeRect.left = closeRect.right - kCloseSize;
-	closeRect.bottom = closeRect.top + kCloseSize;
-
-	PushState();
-		SetHighColor(detailCol);
-		StrokeRoundRect(closeRect, kSmallPadding, kSmallPadding);
-		BRect closeCross = closeRect.InsetByCopy(kSmallPadding, kSmallPadding);
-		StrokeLine(closeCross.LeftTop(), closeCross.RightBottom());
-		StrokeLine(closeCross.LeftBottom(), closeCross.RightTop());
-	PopState();
+	AppGroupView* groupView = dynamic_cast<AppGroupView*>(Parent());
+	if (groupView != NULL && groupView->ChildrenCount() > 1)
+		_DrawCloseButton(updateRect);
 
 	SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
-	BPoint left(Bounds().left, Bounds().bottom - 1);
-	BPoint right(Bounds().right, Bounds().bottom - 1);
+	BPoint left(Bounds().left, Bounds().top);
+	BPoint right(Bounds().right, Bounds().top);
 	StrokeLine(left, right);
 
 	Sync();
+}
+
+
+void
+NotificationView::_DrawCloseButton(const BRect& updateRect)
+{
+	PushState();
+	BRect closeRect = Bounds();
+
+	closeRect.InsetBy(3 * kEdgePadding, 3 * kEdgePadding);
+	closeRect.left = closeRect.right - kCloseSize;
+	closeRect.bottom = closeRect.top + kCloseSize;
+
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	float tint = B_DARKEN_2_TINT;
+
+	if (fCloseClicked) {
+		BRect buttonRect(closeRect.InsetByCopy(-4, -4));
+		be_control_look->DrawButtonFrame(this, buttonRect, updateRect,
+			base, base,
+			BControlLook::B_ACTIVATED | BControlLook::B_BLEND_FRAME);
+		be_control_look->DrawButtonBackground(this, buttonRect, updateRect,
+			base, BControlLook::B_ACTIVATED);
+		tint *= 1.2;
+		closeRect.OffsetBy(1, 1);
+	}
+
+	base = tint_color(base, tint);
+	SetHighColor(base);
+	SetPenSize(2);
+	StrokeLine(closeRect.LeftTop(), closeRect.RightBottom());
+	StrokeLine(closeRect.LeftBottom(), closeRect.RightTop());
+	PopState();
 }
 
 
@@ -353,6 +381,8 @@ NotificationView::MouseDown(BPoint point)
 					be_roster->Launch(fNotification->OnClickApp(), &messages);
 				else
 					be_roster->Launch(fNotification->OnClickFile(), &messages);
+			} else {
+				fCloseClicked = true;
 			}
 
 			// Remove the info view after a click
@@ -364,28 +394,6 @@ NotificationView::MouseDown(BPoint point)
 			break;
 		}
 	}
-}
-
-
-BSize
-NotificationView::MinSize()
-{
-	return BLayoutUtils::ComposeSize(ExplicitMinSize(), _CalculateSize());
-}
-
-
-BSize
-NotificationView::MaxSize()
-{
-	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), _CalculateSize());
-}
-
-
-BSize
-NotificationView::PreferredSize()
-{
-	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(),
-		_CalculateSize());
 }
 
 
@@ -524,6 +532,8 @@ NotificationView::SetText(float newMaxWidth)
 	// enough.
 	static_cast<BGroupLayout*>(GetLayout())->SetInsets(kIconStripeWidth + 8,
 		fHeight, 8, 8);
+
+	_CalculateSize();
 }
 
 
@@ -534,21 +544,19 @@ NotificationView::MessageID() const
 }
 
 
-BSize
+void
 NotificationView::_CalculateSize()
 {
-	BSize size;
-
-	// Parent width, minus the edge padding, minus the pensize
-	size.width = B_SIZE_UNLIMITED;
-	size.height = fHeight;
+	float height = fHeight;
 
 	if (fNotification->Type() == B_PROGRESS_NOTIFICATION) {
 		font_height fh;
 		be_plain_font->GetHeight(&fh);
 		float fontHeight = fh.ascent + fh.descent + fh.leading;
-		size.height += (kSmallPadding * 2) + (kEdgePadding * 1) + fontHeight;
+		height += 9 + (kSmallPadding * 2) + (kEdgePadding * 1)
+			+ fontHeight * 2;
 	}
 
-	return size;
+	SetExplicitMinSize(BSize(0, height));
+	SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, height));
 }

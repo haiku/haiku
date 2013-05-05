@@ -19,7 +19,7 @@ local sources =
 	des.c
 	FileConfigView.cpp
 	HaikuMailFormatFilter.cpp
-	mail_encoding.c
+	mail_encoding.cpp
 	mail_util.cpp
 	MailAttachment.cpp
 	MailComponent.cpp
@@ -32,12 +32,11 @@ local sources =
 	numailkit.cpp
 	ProtocolConfigView.cpp
 	ServerConnection.cpp
-	StringList.cpp
 ;
 
 
 # use OpenSSL, if enabled
-if $(HAIKU_OPENSSL_ENABLED) {
+if $(HAIKU_BUILD_FEATURE_OPENSSL_ENABLED) {
 	SubDirC++Flags -DUSE_SSL ;
 	SubDirSysHdrs $(HAIKU_OPENSSL_HEADERS) ;
 	Includes [ FGristFiles $(sources) ] : $(HAIKU_OPENSSL_HEADERS_DEPENDENCY) ;

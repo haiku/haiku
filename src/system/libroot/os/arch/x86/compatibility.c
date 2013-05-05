@@ -10,6 +10,7 @@
 #include <sys/stat.h>
 
 #include <SupportDefs.h>
+#include <errno_private.h>
 #include <fs_info.h>
 #include <fs_volume.h>
 
@@ -116,13 +117,13 @@ mount(const char *filesystem, const char *where, const char *device, ulong flags
 
 	// we don't support passing (binary) parameters
 	if (parms != NULL || len != 0 || flags & ~1) {
-		errno = B_BAD_VALUE;
+		__set_errno(B_BAD_VALUE);
 		return -1;
 	}
 
 	err = fs_mount_volume(where, device, filesystem, mountFlags, NULL);
 	if (err < B_OK) {
-		errno = err;
+		__set_errno(err);
 		return -1;
 	}
 	return 0;
@@ -136,7 +137,7 @@ unmount(const char *path)
 
 	err = fs_unmount_volume(path, 0);
 	if (err < B_OK) {
-		errno = err;
+		__set_errno(err);
 		return -1;
 	}
 	return 0;

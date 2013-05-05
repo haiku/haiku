@@ -1,0 +1,27 @@
+1	slovak	x-vnd.Haiku-mixer.media_addon	3450667169
+Input gain controls represent	AudioMixer		Ovládacie prvky vstupného zosilnenia predstavujú
+Linear interpolation	AudioMixer		Lineárna interpolácia
+Virtual output channels	AudioMixer		Virtuálne výstupné kanály
+Refuse output format changes	AudioMixer		Odmietnuť zmeny výstupného formátu
+Output mapping	AudioMixer		Mapovanie výstupu
+Allow input channel remapping	AudioMixer		Povoliť premapovanie vstupného kanála
+Resampling algorithm	AudioMixer		Algoritmus prevzorkovania
+Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Utlmiť výstup zmiešavačao 3dB (ako BeOS R5)
+Display balance control for stereo connections	AudioMixer		Zobraziť ovládanie vyváženia pri stereo spojeniach
+To output	AudioMixer		Na výstup
+not connected	AudioMixer		nepripojené
+Refuse input format changes	AudioMixer		Odmietnuť zmeny formátu vstupu
+Drop/repeat samples	AudioMixer		Zahodiť/opakovať vzorky
+Output channel sources	AudioMixer		Zdroje výstupného kanála
+dB	AudioMixer		dB
+Gain controls	AudioMixer		Ovládanie zosilnenia
+Input mapping	AudioMixer		Mapovanie vstupu
+Mute	AudioMixer		Stlmiť
+Input channel destinations	AudioMixer		Ciele vstupného kanála
+To master	AudioMixer		Na hlavný
+Master output	AudioMixer		Hlavný výstup
+Setup	AudioMixer		Nastavenie
+Use non linear gain sliders (like BeOS R5)	AudioMixer		Použiť nelineárne posuvníky zosilnenia (ako BeOS R5)
+Gain	AudioMixer		Zosilnenie
+Allow output channel remapping	AudioMixer		Povoliť premapovanie výstupných kanálov
+Physical input channels	AudioMixer		Fyzické vstupné kanály

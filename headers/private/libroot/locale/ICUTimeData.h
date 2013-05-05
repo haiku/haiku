@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Oliver Tappe, zooey@hirschkaefer.de.
+ * Copyright 2010-2011, Oliver Tappe, zooey@hirschkaefer.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _ICU_TIME_DATA_H
@@ -18,10 +18,15 @@ namespace BPrivate {
 namespace Libroot {
 
 
+class ICUMessagesData;
+
+
 class ICUTimeData : public ICUCategoryData {
 	typedef	ICUCategoryData		inherited;
 public:
-								ICUTimeData(struct lc_time_t& lcTimeInfo);
+								ICUTimeData(pthread_key_t tlsKey,
+									struct lc_time_t& lcTimeInfo,
+									const ICUMessagesData& messagesData);
 								~ICUTimeData();
 
 			void				Initialize(LocaleTimeDataBridge* dataBridge);
@@ -32,7 +37,7 @@ public:
 
 			const char*			GetLanginfo(int index);
 
-			const Locale&		ICULocale() const;
+			const Locale&		ICULocaleForStrings() const;
 
 private:
 			status_t			_SetLCTimeEntries(const UnicodeString* strings,
@@ -58,6 +63,8 @@ private:
 			struct lc_time_t&	fLCTimeInfo;
 
 			LocaleTimeDataBridge*	fDataBridge;
+
+			const ICUMessagesData&	fMessagesData;
 };
 
 

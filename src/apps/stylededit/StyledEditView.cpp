@@ -30,10 +30,15 @@
 using namespace BPrivate;
 
 
-StyledEditView::StyledEditView(BRect viewFrame, BRect textBounds, BHandler *handler)
-	: BTextView(viewFrame, "textview", textBounds, 
-		B_FOLLOW_ALL, B_FRAME_EVENTS | B_WILL_DRAW)
-{ 
+StyledEditView::StyledEditView(BRect viewFrame, BRect textBounds,
+	BHandler* handler)
+	:
+	BTextView(viewFrame, "textview", textBounds,  B_FOLLOW_ALL,
+		B_FRAME_EVENTS | B_WILL_DRAW)
+{
+	SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
+	SetLowColor(ViewColor());
+
 	fMessenger = new BMessenger(handler);
 	fSuppressChanges = false;
 }
@@ -45,12 +50,51 @@ StyledEditView::~StyledEditView()
 }
 
 
+
+void
+StyledEditView::FrameResized(float width, float height)
+{
+	BTextView::FrameResized(width, height);
+
+	if (DoesWordWrap()) {
+		BRect textRect;
+		textRect = Bounds();
+		textRect.OffsetTo(B_ORIGIN);
+		textRect.InsetBy(TEXT_INSET, TEXT_INSET);
+		SetTextRect(textRect);
+	}
+}
+
+
+void
+StyledEditView::DeleteText(int32 start, int32 finish)
+{
+	if (!fSuppressChanges)
+		fMessenger-> SendMessage(TEXT_CHANGED);
+
+	BTextView::DeleteText(start, finish);
+	_UpdateStatus();
+}
+
+
+void
+StyledEditView::InsertText(const char* text, int32 length, int32 offset,
+	const text_run_array* runs)
+{
+	if (!fSuppressChanges)
+		fMessenger->SendMessage(TEXT_CHANGED);
+
+	BTextView::InsertText(text, length, offset, runs);
+	_UpdateStatus();
+}
+
+
 void
 StyledEditView::Select(int32 start, int32 finish)
 {
 	fMessenger->SendMessage(start == finish ? DISABLE_ITEMS : ENABLE_ITEMS);
-	fMessenger->SendMessage(UPDATE_LINE);
-	BTextView::Select(start, finish);	
+	BTextView::Select(start, finish);
+	_UpdateStatus();
 }
 
 
@@ -72,8 +116,11 @@ StyledEditView::SetSuppressChanges(bool suppressChanges)
 
 
 status_t
-StyledEditView::GetStyledText(BPositionIO* stream)
+StyledEditView::GetStyledText(BPositionIO* stream, const char* forceEncoding)
 {
+	if (forceEncoding != NULL)
+		fEncoding = strcmp(forceEncoding, "auto") != 0 ? forceEncoding : "";
+
 	fSuppressChanges = true;
 	status_t result = BTranslationUtils::GetStyledText(stream, this,
 		fEncoding.String());
@@ -84,24 +131,25 @@ StyledEditView::GetStyledText(BPositionIO* stream)
 
 	BNode* node = dynamic_cast<BNode*>(stream);
 	if (node != NULL) {
-		// get encoding
-		if (node->ReadAttrString("be:encoding", &fEncoding) != B_OK) {
-			// try to read as "int32"
-			int32 encoding;
-			ssize_t bytesRead = node->ReadAttr("be:encoding", B_INT32_TYPE, 0,
-				&encoding, sizeof(encoding));
-			if (bytesRead == (ssize_t)sizeof(encoding)) {
-				if (encoding == 65535) {
-					fEncoding = "UTF-8";
-				} else {
-					const BCharacterSet* characterSet
-						= BCharacterSetRoster::GetCharacterSetByConversionID(encoding);
-					if (characterSet != NULL)
-						fEncoding = characterSet->GetName();
+		if (forceEncoding == NULL) {
+			// get encoding
+			if (node->ReadAttrString("be:encoding", &fEncoding) != B_OK) {
+				// try to read as "int32"
+				int32 encoding;
+				ssize_t bytesRead = node->ReadAttr("be:encoding", B_INT32_TYPE, 0,
+					&encoding, sizeof(encoding));
+				if (bytesRead == (ssize_t)sizeof(encoding)) {
+					if (encoding == 65535) {
+						fEncoding = "UTF-8";
+					} else {
+						const BCharacterSet* characterSet
+							= BCharacterSetRoster::GetCharacterSetByConversionID(encoding);
+						if (characterSet != NULL)
+							fEncoding = characterSet->GetName();
+					}
 				}
 			}
 		}
-
 		// TODO: move those into BTranslationUtils::GetStyledText() as well?
 
 		// restore alignment
@@ -162,7 +210,7 @@ StyledEditView::GetEncoding() const
 
 	const BCharacterSet* set = 
 		BCharacterSetRoster::FindCharacterSetByName(fEncoding.String());
-	if(set != NULL)
+	if (set != NULL)
 		return set->GetFontID();
 
 	return 0;
@@ -170,39 +218,29 @@ StyledEditView::GetEncoding() const
 
 
 void
-StyledEditView::DeleteText(int32 start, int32 finish)
+StyledEditView::_UpdateStatus()
 {
-	if (!fSuppressChanges)
-		fMessenger-> SendMessage(TEXT_CHANGED);
+	int32 selStart, selFinish;
+	GetSelection(&selStart, &selFinish);
 
-	BTextView::DeleteText(start, finish);
-	fMessenger->SendMessage(UPDATE_LINE);
-}
+	int32 line = CurrentLine();
+	int32 lineStart = OffsetAt(line);
 
-
-void
-StyledEditView::InsertText(const char *text, int32 length, int32 offset,
-	const text_run_array *runs)
-{
-	if (!fSuppressChanges)
-		fMessenger->SendMessage(TEXT_CHANGED);
-
-	BTextView::InsertText(text, length, offset, runs);
-	fMessenger->SendMessage(UPDATE_LINE);
-}
-
-
-void
-StyledEditView::FrameResized(float width, float height)
-{
-	BTextView::FrameResized(width, height);
-
-	if (DoesWordWrap()) {
-		BRect textRect;
-		textRect = Bounds();
-		textRect.OffsetTo(B_ORIGIN);
-		textRect.InsetBy(TEXT_INSET, TEXT_INSET);
-		SetTextRect(textRect);
+	int32 column = 1;
+	int32 tabSize = (int32)ceilf(TabWidth() / StringWidth("s"));
+	for (int i = lineStart; i < selStart; i++) {
+		unsigned char ch = ByteAt(i);
+		if ((ch & 0xC0) != 0x80) {
+			if (ch == '\t')
+				while (column % tabSize)
+					column++;
+			column++;
+		}
 	}
-}				
 
+	BMessage* message = new BMessage(UPDATE_STATUS);
+	message->AddInt32("line", line + 1);
+	message->AddInt32("column", column);
+	message->AddString("encoding", fEncoding.String());
+	fMessenger->SendMessage(message);
+}

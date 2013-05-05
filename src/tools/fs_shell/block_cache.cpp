@@ -173,7 +173,7 @@ static fssh_mutex sNotificationsLock;
 //	#pragma mark - notifications/listener
 
 
-/*!	Checks wether or not this is an event that closes a transaction. */
+/*!	Checks whether or not this is an event that closes a transaction. */
 static inline bool
 is_closing_event(int32_t event)
 {
@@ -709,7 +709,7 @@ put_cached_block(block_cache* cache, fssh_off_t blockNumber)
 /*!	Retrieves the block \a blockNumber from the hash table, if it's already
 	there, or reads it from the disk.
 
-	\param _allocated tells you wether or not a new block has been allocated
+	\param _allocated tells you whether or not a new block has been allocated
 		to satisfy your request.
 	\param readBlock if \c false, the block will not be read in case it was
 		not already in the cache. The block you retrieve may contain random
@@ -927,7 +927,7 @@ write_cached_block(block_cache* cache, cached_block* block,
 			}
 		}
 	}
-	if (block->transaction == NULL && block->ref_count == 0) {
+	if (block->transaction == NULL && block->ref_count == 0 && !block->unused) {
 		// the block is no longer used
 		block->unused = true;
 		cache->unused_blocks.Add(block);

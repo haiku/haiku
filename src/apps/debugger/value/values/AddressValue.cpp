@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -28,7 +28,7 @@ AddressValue::ToString(BString& _string) const
 		return false;
 
 	char buffer[32];
-	snprintf(buffer, sizeof(buffer), "%#llx", fValue.ToUInt64());
+	snprintf(buffer, sizeof(buffer), "%#" B_PRIx64, fValue.ToUInt64());
 
 	BString string(buffer);
 	if (string.Length() == 0)

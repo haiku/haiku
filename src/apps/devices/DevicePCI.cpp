@@ -14,8 +14,8 @@
 
 #include <Catalog.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "DevicePCI"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "DevicePCI"
 
 extern "C" {
 #include "dm_wrapper.h"

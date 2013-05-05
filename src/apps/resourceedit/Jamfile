@@ -1,0 +1,54 @@
+SubDir HAIKU_TOP src apps resourceedit ;
+
+UsePrivateHeaders interface shared ;
+
+local sourceDirs =
+	edits
+	interface
+	settings
+	support
+;
+
+local sourceDir ;
+
+for sourceDir in $(sourceDirs) {
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps resourceedit $(sourceDir) ] ;
+}
+
+Application ResourceEdit
+	:
+		# edits
+		AppFlagsEdit.cpp
+		BooleanEdit.cpp
+		EditView.cpp
+		NormalEdit.cpp
+
+		# interface
+		ImageButton.cpp
+
+		# settings
+		GenericSettingsView.cpp
+
+		# support
+		UndoContext.cpp
+
+		# .
+		DefaultTypes.cpp
+		EditWindow.cpp
+		MainWindow.cpp
+		ResourceEdit.cpp
+		ResourceListView.cpp
+		ResourceRow.cpp
+		SettingsFile.cpp
+		SettingsWindow.cpp
+
+		main.cpp
+	:
+		be
+		tracker
+		translation
+		libcolumnlistview.a
+		$(TARGET_LIBSTDC++)
+	:
+		ResourceEdit.rdef
+;

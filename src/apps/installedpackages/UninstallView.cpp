@@ -34,8 +34,8 @@
 #include <TextView.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "UninstallView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "UninstallView"
 
 
 enum {
@@ -257,7 +257,7 @@ UninstallView::MessageReceived(BMessage* msg)
 					"been corrupted."), B_TRANSLATE("OK"), NULL,
 					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			}
-
+			notify->SetFlags(notify->Flags() | B_CLOSE_ON_ESCAPE);
 			notify->Go();
 		}
 		default:

@@ -1,0 +1,128 @@
+/*
+ * Copyright 2007 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Documentation written by:
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/support/StopWatch.h rev 19972
+ *		src/kits/support/StopWatch.cpp rev 14204
+ */
+
+
+/*!
+	\file StopWatch.h
+	\ingroup support
+	\ingroup libbe
+	\brief Provides the BStopWatch class.
+*/
+
+
+/*!
+	\class BStopWatch
+	\ingroup support
+	\ingroup libbe
+	\brief A simple class used to time events like a stop watch.
+
+	The interface of this class is designed to behave like a physical
+	stop watch. It is useful for debugging parts of your code acting as a
+	quick and dirty profiler.
+
+	To use this class first create a BStopWatch object, this starts the timer
+	going. You may call Suspend() and Resume() to start and stop the stop
+	watch. Call ElapsedTime() to get the current timer count at any time. You
+	may call Lap() to start a new lap (up to 10 laps are supported) or call
+	Reset() to reset the timer back to 0 clearing all lap info. When the
+	object is destroyed the timing information is streamed to standard out
+	unless you set the \a silent parameter to \c true in the constructor.
+*/
+
+
+/*!
+	\fn BStopWatch::BStopWatch(const char *name, bool silent)
+	\brief Constructs a BStopWatch object and starts the timer.
+
+	This method creates a new BStopWatch object. As soon as the object is
+	created the timer starts ticking away.
+
+	If you are profiling your code with this class pass \c false to the
+	\a silent parameter to cause the elapsed time information to be
+	streamed to standard output when the object is destroyed.
+
+	\param name The name of the stop watch. You may pass \c NULL to create an
+	       anonymous stop watch.
+	\param silent Pass \c true to suppress time information from streaming to
+	       standard output when the object is destroyed.
+*/
+
+
+/*!
+	\fn BStopWatch::~BStopWatch()
+	\brief Destroys the object stopping the timer.
+
+	If \a silent was set to \c false in the constructor then this method
+	will print elapsed time information to standard output.
+*/
+
+
+/*!
+	\fn void BStopWatch::Resume()
+	\brief Resume the timer from a suspended state.
+
+	\see Suspend()
+*/
+
+
+/*!
+	\fn void BStopWatch::Suspend()
+	\brief Suspend the timer.
+
+	\see Resume()
+*/
+
+
+/*!
+	\fn bigtime_t BStopWatch::Lap()
+	\brief Starts a new timer lap.
+
+	In the current implementation you are unable to actually retrieve the
+	timings of each lap, they are only printed to the standard output when the
+	object is destroyed. This makes the Lap() method only usable when doing
+	some types of profiling.
+
+	\note The current implementation is limited to 10 laps. The value returned
+	      is the time that has passed since the timer was last started (not
+	      the time that has passed since the last lap). Any call to Lap()
+	      beyond the 10th lap will overwrite the last value. Calling Lap()
+	      while the timer is suspended does nothing and returns 0.
+*/
+
+
+/*!
+	\fn bigtime_t BStopWatch::ElapsedTime() const
+	\brief Gets the elapsed time the object has counted.
+
+	\return The elapsed time in microseconds.
+*/
+
+
+/*!
+	\fn void BStopWatch::Reset()
+	\brief Restarts the timer.
+
+	Resets the stop watch clearing the start time and stored laps and
+	restarts the timer.
+*/
+
+
+/*!
+	\fn const char* BStopWatch::Name() const
+	\brief Returns the name of the stop watch.
+
+	If name was set to \c NULL in the constructor this method returns a blank
+	string.
+
+	\return the name of the stop watch set in the constructor.
+*/

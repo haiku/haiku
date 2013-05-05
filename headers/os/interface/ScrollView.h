@@ -48,8 +48,6 @@ public:
 	virtual	BSize				PreferredSize();
 	virtual void				ResizeToPreferred();
 
-	virtual	void				InvalidateLayout(bool descendants = false);
-	virtual	void				DoLayout();
 	virtual	void				FrameMoved(BPoint position);
 	virtual	void				FrameResized(float width, float height);
 
@@ -79,6 +77,10 @@ public:
 	virtual status_t			GetSupportedSuites(BMessage* data);
 
 	virtual status_t			Perform(perform_code d, void* arg);
+
+protected:
+	virtual	void				LayoutInvalidated(bool descendants = false);
+	virtual	void				DoLayout();
 
 private:
 	// FBC padding and forbidden methods

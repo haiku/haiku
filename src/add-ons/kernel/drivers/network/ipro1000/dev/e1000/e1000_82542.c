@@ -30,7 +30,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 
 ******************************************************************************/
-/*$FreeBSD: src/sys/dev/e1000/e1000_82542.c,v 1.3.2.2.4.1 2010/12/21 17:09:25 kensmith Exp $*/
+/*$FreeBSD$*/
 
 /*
  * 82542 Gigabit Ethernet Controller
@@ -50,7 +50,6 @@ static s32  e1000_led_off_82542(struct e1000_hw *hw);
 static void e1000_rar_set_82542(struct e1000_hw *hw, u8 *addr, u32 index);
 static void e1000_clear_hw_cntrs_82542(struct e1000_hw *hw);
 static s32  e1000_read_mac_addr_82542(struct e1000_hw *hw);
-
 
 /**
  *  e1000_init_phy_params_82542 - Init PHY func ptrs.
@@ -192,7 +191,7 @@ static s32 e1000_reset_hw_82542(struct e1000_hw *hw)
 {
 	struct e1000_bus_info *bus = &hw->bus;
 	s32 ret_val = E1000_SUCCESS;
-	u32 ctrl, icr;
+	u32 ctrl;
 
 	DEBUGFUNC("e1000_reset_hw_82542");
 
@@ -223,7 +222,7 @@ static s32 e1000_reset_hw_82542(struct e1000_hw *hw)
 	msec_delay(2);
 
 	E1000_WRITE_REG(hw, E1000_IMC, 0xffffffff);
-	icr = E1000_READ_REG(hw, E1000_ICR);
+	E1000_READ_REG(hw, E1000_ICR);
 
 	if (hw->revision_id == E1000_REVISION_2) {
 		if (bus->pci_cmd_word & CMD_MEM_WRT_INVALIDATE)

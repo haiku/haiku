@@ -131,6 +131,7 @@ HWindow::AboutRequested()
 		font.SetSize(12); // font.SetFace(B_OUTLINED_FACE);
 		v->SetFontAndColor(0, s-text+1, &font, B_FONT_SIZE);
 	};
+	about->SetFlags(about->Flags() | B_CLOSE_ON_ESCAPE);
 	about->Go();
 }
 

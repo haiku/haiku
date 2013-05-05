@@ -1,0 +1,33 @@
+1	hindi	x-vnd.Haiku.TextSearch	1180598828
+%s: Not enough room to escape the filename.	Grepper		%s: फ़ाइल नाम  escape करने के लिए पर्याप्त जगह नहीं है.
+Trim to selection	GrepWindow		चयन तक ट्रिम कर दीजिए
+Follow symbolic links	GrepWindow		प्रतीकात्मक लिंक का अनुकरण करें
+Close	GrepWindow		बंद करें
+Cancel	GrepWindow		रद्द करें
+The unselected files will be removed from the list.	GrepWindow		अचयनित फ़ाइलें सूची से हटा दी जाएंगी.
+Set target…	GrepWindow		लक्ष्य को निर्धारित करें…
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		कृपया जिन फ़ाइलों को आप ट्रैकर में चयनित करना चाहते हैं उन फाइलों को चुने.
+Open files in Pe	GrepWindow		फ़ाइलें पीई मे खोले
+Copy text to clipboard	GrepWindow		क्लिपबोर्ड पर टेक्स्ट प्रतिलिपि करें
+Settings	GrepWindow		सेटिंग्स
+Select all	GrepWindow		सभी का चयन करें
+OK	GrepWindow		ठीक है
+Skip folders starting with a dot	GrepWindow		डॉट के साथ शुरू होने वाले फ़ोल्डर्स को छोड़ें 
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_Name एक या अधिक फ़ोल्डर्स नहीं खोल सकता है.
+Escape search text	GrepWindow		सर्च टेक्स्ट एस्केप करें
+Search	GrepWindow		खोजें
+Open selection	GrepWindow		चयन को खोलें
+Look in sub-folders	GrepWindow		सबफ़ोल्डर्स में देखें
+Actions	GrepWindow		क्रियाएँ
+File	GrepWindow		फ़ाइल
+Encoding	GrepWindow		एन्कोडिंग
+History	GrepWindow		इतिहास
+%s: There was a problem running grep.	Grepper		%s: ग्रेप (grep) चलाने में समस्या थी.
+New window	GrepWindow		नई विंडो
+Please select the files you wish to keep searching.	GrepWindow		कृपया जिन फ़ाइलों की खोजना चाहते हैं उन्हें चुनें.
+TextSearch	GrepWindow		टेक्स्ट मे खोज
+Quit	GrepWindow		बाहर आएं
+Show files in Tracker	GrepWindow		कृपया फ़ाइलें ट्रैकर में दिखाएँ
+Case-sensitive	GrepWindow		केस संवेदी
+Text files only	GrepWindow		केवल टेक्स्ट फ़ाइलें
+Show lines	GrepWindow		पंक्तियों दिखाएँ

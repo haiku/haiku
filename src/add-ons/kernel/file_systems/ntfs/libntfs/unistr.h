@@ -61,6 +61,7 @@ extern char *ntfs_uppercase_mbs(const char *low,
 		const ntfschar *upcase, u32 upcase_len);
 
 extern void ntfs_upcase_table_build(ntfschar *uc, u32 uc_len);
+extern u32 ntfs_upcase_build_default(ntfschar **upcase);
 extern ntfschar *ntfs_locase_table_build(const ntfschar *uc, u32 uc_cnt);
 
 extern ntfschar *ntfs_str2ucs(const char *s, int *len);

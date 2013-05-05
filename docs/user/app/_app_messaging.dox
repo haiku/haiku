@@ -1,15 +1,14 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  */
 
-
 /*!
 	\page app_messaging Messaging Foundations
-	
+
 	One of the foundations of the Haiku API is the messaging system. This
 	framework is the basis for the efficient multithreaded Haiku applications,
 	because it solves one of the fundamental issues of multithreading: it
@@ -17,21 +16,21 @@
 	framework allows inter-application messaging as well as 
 	intra-application messaging, and it will always use the most effective
 	mechanism for the communication automatically.
-	
+
 	This page will introduce you to the subject of messaging. It is meant as a
 	broad overview to the classes, rather than a tutorial. If you are looking
 	for effective messaging techniques or a tutorial on messaging, have a look
 	at the developer section of the Haiku website.
-	
+
 	<b>Table of contents</b>
 	- Overview of the Messaging Classes
 	- Receiving and Handling Messages
 	- Sending messages
-	
+
 	\section app_messaging_overview Overview of the Messaging Classes
-	
+
 	\subsection app_messaging_overview_bmessage BMessage
-	
+
 	The BMessage class is the class that is in the center of all the messenger
 	operations, because it represents a message. A message is nothing more than
 	an object that contains:
@@ -49,15 +48,15 @@
 	context. The Haiku API defines several messages and their required data
 	members. Several applications provide a scripting interface with defined
 	message syntax. You can do the same for your application.
-	
+
 	\subsection app_messaging_overview_blooper BLooper
-	
+
 	Objects of the BLooper type are objects that run message loops. Every
 	object runs in its own thread. The BLooper objects continually check for
 	incoming messages. To process the messages, the looper looks for message
 	handlers that handle the messages within the thread's context. Message
 	handling within a looper is synchronous.
-	
+
 	BLooper inherits BHandler, the base class for message handling. However, it
 	is possible to chain additional handlers to the object. For example, if you
 	have an application that understands different networking protocols, and
@@ -65,23 +64,23 @@
 	can provide handlers that you can chain in your general message parser
 	thread. See AddHandler() and SetPreferredHandler() for information on
 	handlers.
-	
+
 	Messages can be posted to the looper by using the object's PostMessage()
 	method. This method puts the message in the BMessageQueue of the looper.
 	Since PostMessage() is asynchronous, the message might not be handled
 	immediately. See \ref app_messaging_overview_bmessenger "BMessenger"
 	for a synchronous implementation.
-	
+
 	Loopers can have a generic filter that discards messages based on
 	user-definable characteristics. The BMessageFilter class provides the
 	foundation for the qualifying of messages. See AddCommonFilterList() and
 	SetCommonFilterList() for more information.
-	
+
 	To get the most out of the functionality of BLooper, it is usually
 	subclassed to create a self-contained event 'machine'. Most of the time,
 	these subclasses also perform the message handling, which is possible
 	due to the fact that it is also a subclass of BHandler.
-	
+
 	In the Haiku API, there are two major classes that inherit BLooper:
 	the base application class, BApplication, and the window class, BWindow.
 	Because they inherit BLooper, each application and each window has its
@@ -90,47 +89,47 @@
 	event handling that requires more processing power, is done within its own
 	BLooper context. Networking usually qualifies as a candidate for its own
 	thread.
-	
+
 	\subsection app_messaging_overview_bhandler BHandler
-	
+
 	Objects of the BHandler type are associated to BLoopers. When they are
 	created, they should be passed to the BLooper::AddHandler() method of the
 	looper they want to handle messages for. They can then either be set as
 	preferred handlers (by chaining them with BLooper::SetPreferredHandler()),
 	or they can be added to other BHandlers with the SetNextHandler() method.
-	
+
 	The magic of the class happens in the MessageReceived() method. In your
 	subclasses you override this method, to check the incoming BMessage.
 	Usually, you check the \c what member of the message in a switch statement.
 	If your handler cannot handle the object, it will pass the message on to
 	the parent class. 
-	
+
 	\warning Don't forget to actuall call the MessageReceived() method of the
 		base class. Failing to do this will mean that the message chain will
 		not completely be followed, which can lead to unhandled messages. There
 		might be some internal system messages that the Haiku API classes
 		handle, and not actually handling these messages could lead to
 		inconsistent internal behavior.
-	
+
 	\subsection app_messaging_overview_bmessenger BMessenger
-	
+
 	BMessenger objects can send messages to both local and remote targets. For
 	local targets, a BMessenger provides an advantage over directly calling
 	the BLooper::PostMessage() method: some variants of the 
 	BMessenger::SendMessage() methods allow for synchronous replies. So, the
 	call will actually verify the handling thread processes the message, and
 	reply to the sender.
-	
+
 	The other feature of BMessenger is that it is able to be constructed with
 	the signature of another application as argument. This allows the messenger
 	to pass messages to other applications. It facilitates inter-application
 	communication.
-	
+
 	\subsection app_messaging-overview-other Other messaging classes
-	
+
 	There are several convenience classes supplied with the application kit,
 	which can make your life easier in some specific cases. 
-	
+
 	- BInvoker binds together a message and a target. By calling 
 	  BInvoker::Invoke(), the message will be sent. This class is inherited by
 	  the controls in the interface kit, such as BButton.
@@ -146,12 +145,10 @@
 	  Filter() \endlink method.
 
 	\section app-messaging-receiving Receiving Messages
-	
+
 	To do...
-	
+
 	\section app-messaging-sending Sending Messages
-	
+
 	To do...
-	
 */
-	

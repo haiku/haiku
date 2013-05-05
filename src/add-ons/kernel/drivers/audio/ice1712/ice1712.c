@@ -9,14 +9,6 @@
  * Distributed under the terms of the MIT license.
  */
 
-#include <KernelExport.h>
-#include <Drivers.h>
-#include <Errors.h>
-#include <OS.h>
-#include <fcntl.h>
-#include <image.h>
-#include <midi_driver.h>
-#include <string.h>
 
 #include "ice1712.h"
 #include "ice1712_reg.h"
@@ -24,21 +16,24 @@
 #include "multi.h"
 #include "util.h"
 
-#include "debug.h"
-//------------------------------------------------------
-//------------------------------------------------------
+#include <KernelExport.h>
+#include <Drivers.h>
+#include <OS.h>
+#include <midi_driver.h>
+#include <drivers/driver_settings.h>
+
+#include <fcntl.h>
+#include <stdlib.h>
+#include <string.h>
+
 
 status_t init_hardware(void);
 status_t init_driver(void);
 void uninit_driver(void);
 const char **publish_devices(void);
 device_hooks *find_device(const char *);
-
-//------------------------------------------------------
-
+status_t load_settings(ice1712 *card);
 int32 ice_1712_int(void *arg);
-
-//------------------------------------------------------
 
 pci_module_info *pci;
 generic_mpu401_module *mpu401;
@@ -47,33 +42,19 @@ int32 num_cards = 0;
 ice1712 cards[NUM_CARDS];
 int32 num_names = 0;
 char *names[NUM_CARDS*20+1];
-
-//------------------------------------------------------
-//------------------------------------------------------
-
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
 #define HMULTI_AUDIO_DEV_PATH "audio/hmulti/ice1712"
-//#define HMULTI_AUDIO_DEV_PATH "audio/multi/ice1712"
 
-//------------------------------------------------------
-//------------------------------------------------------
 
-//void republish_devices(void);
-
-//extern image_id	load_kernel_addon(const char *path);
-//extern status_t	unload_kernel_addon(image_id imid);
-
-//------------------------------------------------------
-//------------------------------------------------------
-
-status_t init_hardware(void)
+status_t
+init_hardware(void)
 {
 	int ix = 0;
 	pci_info info;
 
 	memset(cards, 0, sizeof(ice1712) * NUM_CARDS);
-	TRACE("ice1712: init_hardware()\n");
+	TRACE("@@init_hardware()\n");
 
 	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci))
 		return ENOSYS;
@@ -100,7 +81,7 @@ ice_1712_int(void *arg)
 	uint16 reg16 = 0;
 	uint32 status = B_UNHANDLED_INTERRUPT;
 
-// interrupt from DMA PATH
+	// interrupt from DMA PATH
 	reg8 = read_mt_uint8(ice, MT_DMA_INT_MASK_STATUS);
 	if (reg8 != 0) {
 		ice->buffer++;
@@ -112,14 +93,33 @@ ice_1712_int(void *arg)
 		status = B_HANDLED_INTERRUPT;
 	}
 
-// interrupt from Controller Registers
+	// interrupt from Controller Registers
 	reg8 = read_ccs_uint8(ice, CCS_INTERRUPT_STATUS);
 	if (reg8 != 0) {
-		write_ccs_uint8(ice, CCS_INTERRUPT_STATUS, reg8);
-		status = B_HANDLED_INTERRUPT;
+		bool ret;
+		if (reg8 & CCS_INTERRUPT_MIDI_1) {
+			ret = (*mpu401->interrupt_hook)(ice->midi_interf[0].mpu401device);
+			if (ret) {
+				//Do not ack, cause more datas are available
+				reg8 &= ~CCS_INTERRUPT_MIDI_1;
+			}
+		}
+
+		if (reg8 & CCS_INTERRUPT_MIDI_2) {
+			ret = (*mpu401->interrupt_hook)(ice->midi_interf[1].mpu401device);
+			if (ret) {
+				//Do not ack, cause more datas are available
+				reg8 &= ~CCS_INTERRUPT_MIDI_2;
+			}
+		}
+
+		if (reg8 != 0) {
+			write_ccs_uint8(ice, CCS_INTERRUPT_STATUS, reg8);
+			status = B_HANDLED_INTERRUPT;
+		}
 	}
 
-// interrupt from DS PATH
+	// interrupt from DS PATH
 	reg16 = read_ds_uint16(ice, DS_DMA_INT_STATUS);
 	if (reg16 != 0) {
 		//Ack interrupt
@@ -134,9 +134,9 @@ ice_1712_int(void *arg)
 static status_t
 ice1712_setup(ice1712 *ice)
 {
-	int result, i;
-	status_t status = B_OK;
+	int i;
 	uint8 reg8 = 0;
+	uint16 mute;
 
 	ice->irq			= ice->info.u.h0.interrupt_line;
 	ice->Controller		= ice->info.u.h0.base_registers[0];
@@ -150,7 +150,7 @@ ice1712_setup(ice1712 *ice)
 	write_ccs_uint8(ice, CCS_CONTROL_STATUS, 0x01);
 	snooze(200000);
 
-	result = read_eeprom(ice, ice->eeprom_data);
+	read_eeprom(ice, ice->eeprom_data);
 
 /*	TRACE("EEprom -> ");
 	for (i = 0; i < 32; i++)
@@ -161,36 +161,36 @@ ice1712_setup(ice1712 *ice)
 
 	//Write all configurations register from EEProm
 	ice->info.device_id = ice->eeprom_data[E2PROM_MAP_SUBVENDOR_HIGH] << 8
-            | ice->eeprom_data[E2PROM_MAP_SUBVENDOR_LOW];
+		| ice->eeprom_data[E2PROM_MAP_SUBVENDOR_LOW];
 	ice->info.vendor_id = ice->eeprom_data[E2PROM_MAP_SUBDEVICE_HIGH] << 8
-            | ice->eeprom_data[E2PROM_MAP_SUBDEVICE_LOW];
+		| ice->eeprom_data[E2PROM_MAP_SUBDEVICE_LOW];
 	ice->product = ice->info.vendor_id << 16 | ice->info.device_id;
 	TRACE("Product ID : 0x%x\n", ice->product);
 
 	write_cci_uint8(ice, CCI_GPIO_WRITE_MASK,
-                    ice->eeprom_data[E2PROM_MAP_GPIOMASK]);
+		ice->eeprom_data[E2PROM_MAP_GPIOMASK]);
 	write_cci_uint8(ice, CCI_GPIO_DATA,
-                    ice->eeprom_data[E2PROM_MAP_GPIOSTATE]);
+		ice->eeprom_data[E2PROM_MAP_GPIOSTATE]);
 	write_cci_uint8(ice, CCI_GPIO_DIRECTION_CONTROL,
-                    ice->eeprom_data[E2PROM_MAP_GPIODIR]);
+		ice->eeprom_data[E2PROM_MAP_GPIODIR]);
 
 	TRACE("CCI_GPIO_WRITE_MASK : 0x%x\n",
-                    ice->eeprom_data[E2PROM_MAP_GPIOMASK]);
+		ice->eeprom_data[E2PROM_MAP_GPIOMASK]);
 	TRACE("CCI_GPIO_DATA : 0x%x\n",
-                    ice->eeprom_data[E2PROM_MAP_GPIOSTATE]);
+		ice->eeprom_data[E2PROM_MAP_GPIOSTATE]);
 	TRACE("CCI_GPIO_DIRECTION_CONTROL : 0x%x\n",
-                    ice->eeprom_data[E2PROM_MAP_GPIODIR]);
+		ice->eeprom_data[E2PROM_MAP_GPIODIR]);
 
 
 	//Write Configuration in the PCI configuration Register
 	(pci->write_pci_config)(ice->info.bus, ice->info.device,
-        ice->info.function, 0x60, 1, ice->eeprom_data[E2PROM_MAP_CONFIG]);
+		ice->info.function, 0x60, 1, ice->eeprom_data[E2PROM_MAP_CONFIG]);
 	(pci->write_pci_config)(ice->info.bus, ice->info.device,
-        ice->info.function, 0x61, 1, ice->eeprom_data[E2PROM_MAP_ACL]);
+		ice->info.function, 0x61, 1, ice->eeprom_data[E2PROM_MAP_ACL]);
 	(pci->write_pci_config)(ice->info.bus, ice->info.device,
-        ice->info.function, 0x62, 1, ice->eeprom_data[E2PROM_MAP_I2S]);
+		ice->info.function, 0x62, 1, ice->eeprom_data[E2PROM_MAP_I2S]);
 	(pci->write_pci_config)(ice->info.bus, ice->info.device,
-        ice->info.function, 0x63, 1, ice->eeprom_data[E2PROM_MAP_SPDIF]);
+		ice->info.function, 0x63, 1, ice->eeprom_data[E2PROM_MAP_SPDIF]);
 
 	TRACE("E2PROM_MAP_CONFIG : 0x%x\n", ice->eeprom_data[E2PROM_MAP_CONFIG]);
 	reg8 = ice->eeprom_data[E2PROM_MAP_CONFIG];
@@ -204,9 +204,9 @@ ice1712_setup(ice1712 *ice)
 	// B : Stereo ADC number minus 1 (=> 1 to 4)
 	// A : Stereo DAC number minus 1 (=> 1 to 4)
 
-	ice->nb_DAC = ((reg8 & 0x03) + 1) * 2;
+	ice->config.nb_DAC = ((reg8 & 0x03) + 1) * 2;
 	reg8 >>= 2;
-	ice->nb_ADC = ((reg8 & 0x03) + 1) * 2;
+	ice->config.nb_ADC = ((reg8 & 0x03) + 1) * 2;
 	reg8 >>= 2;
 
 	if ((reg8 & 0x01) != 0) {//Consumer AC'97 Exist
@@ -220,16 +220,40 @@ ice1712_setup(ice1712 *ice)
 		TRACE("Consumer AC'97 does NOT exist\n");
 	}
 	reg8 >>= 1;
-	ice->nb_MPU401 = (reg8 & 0x1) + 1;
+	ice->config.nb_MPU401 = (reg8 & 0x1) + 1;
 
-	for (i = 0; i < ice->nb_MPU401; i++) {
-		sprintf(ice->midi_interf[i].name, "midi/ice1712/%ld/%d",
-            ice - cards + 1, i + 1);
-		names[num_names++] = ice->midi_interf[i].name;
+	if (ice->config.nb_MPU401 > 0) {
+		sprintf(ice->midi_interf[0].name, "midi/ice1712/%ld/1",
+			ice - cards + 1);
+
+		(*mpu401->create_device)(ice->Controller + CCS_MIDI_1_DATA,
+			&ice->midi_interf[0].mpu401device,
+			0x14121712,
+			ice_1712_midi_interrupt_op,
+			&ice->midi_interf[0]);
+
+		names[num_names++] = ice->midi_interf[0].name;
+		ice->midi_interf[0].card = ice;
+		ice->midi_interf[0].int_mask = CCS_INTERRUPT_MIDI_1;
+	}
+
+	if (ice->config.nb_MPU401 > 1) {
+		sprintf(ice->midi_interf[1].name, "midi/ice1712/%ld/2",
+			ice - cards + 1);
+
+		(*mpu401->create_device)(ice->Controller + CCS_MIDI_2_DATA,
+			&ice->midi_interf[1].mpu401device,
+			0x14121712,
+			ice_1712_midi_interrupt_op,
+			&ice->midi_interf[1]);
+
+		names[num_names++] = ice->midi_interf[1].name;
+		ice->midi_interf[1].card = ice;
+		ice->midi_interf[1].int_mask = CCS_INTERRUPT_MIDI_2;
 	}
 
 	TRACE("E2PROM_MAP_SPDIF : 0x%x\n", ice->eeprom_data[E2PROM_MAP_SPDIF]);
-	ice->spdif_config	= ice->eeprom_data[E2PROM_MAP_SPDIF];
+	ice->config.spdif = ice->eeprom_data[E2PROM_MAP_SPDIF];
 
 	switch (ice->product) {
 		case ICE1712_SUBDEVICE_DELTA66 :
@@ -238,7 +262,7 @@ ice1712_setup(ice1712 *ice)
 			ice->CommLines.data_in = 0;
 			ice->CommLines.data_out = DELTA66_DOUT;
 			ice->CommLines.cs_mask = DELTA66_CLK | DELTA66_DOUT
-                    | DELTA66_CODEC_CS_0 | DELTA66_CODEC_CS_1;
+				| DELTA66_CS_MASK;
 			break;
 		case ICE1712_SUBDEVICE_DELTA410 :
 		case ICE1712_SUBDEVICE_AUDIOPHILE_2496 :
@@ -247,7 +271,7 @@ ice1712_setup(ice1712 *ice)
 			ice->CommLines.data_in = AP2496_DIN;
 			ice->CommLines.data_out = AP2496_DOUT;
 			ice->CommLines.cs_mask = AP2496_CLK | AP2496_DIN
-                    | AP2496_DOUT | AP2496_SPDIF_CS | AP2496_CODEC_CS;
+				| AP2496_DOUT | AP2496_CS_MASK;
 			break;
 		case ICE1712_SUBDEVICE_DELTA1010 :
 		case ICE1712_SUBDEVICE_DELTA1010LT :
@@ -255,14 +279,14 @@ ice1712_setup(ice1712 *ice)
 			ice->CommLines.data_in = DELTA1010LT_DIN;
 			ice->CommLines.data_out = DELTA1010LT_DOUT;
 			ice->CommLines.cs_mask = DELTA1010LT_CLK | DELTA1010LT_DIN
-                    | DELTA1010LT_DOUT | DELTA1010LT_CS_NONE;
+				| DELTA1010LT_DOUT | DELTA1010LT_CS_NONE;
 			break;
 		case ICE1712_SUBDEVICE_VX442 :
 			ice->CommLines.clock = VX442_CLK;
 			ice->CommLines.data_in = VX442_DIN;
 			ice->CommLines.data_out = VX442_DOUT;
-			ice->CommLines.cs_mask = VX442_SPDIF_CS | VX442_CODEC_CS_0
-                    | VX442_CODEC_CS_1;
+			ice->CommLines.cs_mask = VX442_CLK | VX442_DIN | VX442_DOUT
+				| VX442_CS_MASK;
 			break;
 	}
 
@@ -276,11 +300,7 @@ ice1712_setup(ice1712 *ice)
 	}
 
 //	TRACE("installing interrupt : %0x\n", ice->irq);
-	status = install_io_interrupt_handler(ice->irq, ice_1712_int, ice, 0);
-	if (status == B_OK)
-		TRACE("Install Interrupt Handler == B_OK\n");
-	else
-		TRACE("Install Interrupt Handler != B_OK\n");
+	install_io_interrupt_handler(ice->irq, ice_1712_int, ice, 0);
 
 	ice->mem_id_pb = alloc_mem(&ice->phys_addr_pb, &ice->log_addr_pb,
 								PLAYBACK_BUFFER_TOTAL_SIZE,
@@ -307,14 +327,14 @@ ice1712_setup(ice1712 *ice)
 	ice->sampling_rate = 0x08;
 	ice->buffer = 0;
 	ice->frames_count = 0;
-	ice->buffer_size = MAX_BUFFER_FRAMES;
+	ice->buffer_size = ice->settings.bufferSize;
 
-	ice->total_output_channels = ice->nb_DAC;
-	if (ice->spdif_config & NO_IN_YES_OUT)
+	ice->total_output_channels = ice->config.nb_DAC;
+	if (ice->config.spdif & SPDIF_OUT_PRESENT)
 		ice->total_output_channels += 2;
 
-	ice->total_input_channels = ice->nb_ADC + 2;
-	if (ice->spdif_config & YES_IN_NO_OUT)
+	ice->total_input_channels = ice->config.nb_ADC + 2;
+	if (ice->config.spdif & SPDIF_IN_PRESENT)
 		ice->total_input_channels += 2;
 
 	//Write bits in the GPIO
@@ -325,9 +345,10 @@ ice1712_setup(ice1712 *ice)
 	//Set the rampe volume to a faster one
 	write_mt_uint16(ice, MT_VOLUME_CONTROL_RATE, 0x01);
 
-	//Digital Mixer To DAC 0 and SPDIF Out
-	write_mt_uint16(ice, MT_ROUTING_CONTROL_PSDOUT,	0x0101);
-//	write_mt_uint16(ice, MT_ROUTING_CONTROL_SPDOUT,	0x0005);
+	//All Analog outputs from DMA
+	write_mt_uint16(ice, MT_ROUTING_CONTROL_PSDOUT,	0x0000);
+	//All Digital output from DMA
+	write_mt_uint16(ice, MT_ROUTING_CONTROL_SPDOUT,	0x0000);
 
 	//Just to route all input to all output
 //	write_mt_uint16(ice, MT_ROUTING_CONTROL_PSDOUT,	0xAAAA);
@@ -338,18 +359,18 @@ ice1712_setup(ice1712 *ice)
 //	write_mt_uint32(ice, MT_CAPTURED_DATA,	0x76543280);
 
 	//Mute all input
-/*	for (i = 0; i < 20; i++)
-	{
+	mute = (ICE1712_MUTE_VALUE << 0) | (ICE1712_MUTE_VALUE << 8);
+	for (i = 0; i < 2 * ICE1712_HARDWARE_VOLUME; i++) {
 		write_mt_uint8(ice, MT_VOLUME_CONTROL_CHANNEL_INDEX, i);
-		write_mt_uint16(ice, MT_VOLUME_CONTROL_CHANNEL_INDEX, 0x7F7F);
+		write_mt_uint16(ice, MT_VOLUME_CONTROL_CHANNEL_INDEX, mute);
 	}
-*/
+
 	//Unmask Interrupt
 	write_ccs_uint8(ice, CCS_CONTROL_STATUS, 0x41);
 
 	reg8 = read_ccs_uint8(ice, CCS_INTERRUPT_MASK);
 	TRACE("-----CCS----- = %x\n", reg8);
-	write_ccs_uint8(ice, CCS_INTERRUPT_MASK, 0x6F);
+	write_ccs_uint8(ice, CCS_INTERRUPT_MASK, 0xEF);
 
 /*	reg16 = read_ds_uint16(ice, DS_DMA_INT_MASK);
 	TRACE("-----DS_DMA----- = %x\n", reg16);
@@ -370,7 +391,7 @@ init_driver(void)
 	status_t err;
 	num_cards = 0;
 
-	TRACE("ice1712: init_driver()\n");
+	TRACE("@@init_driver()\n");
 
 	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci))
 		return ENOSYS;
@@ -398,6 +419,9 @@ init_driver(void)
 					cards[num_cards].info.function, strerror(err));
 				continue;
 			}
+
+			load_settings(&cards[num_cards]);
+
 			if (ice1712_setup(&cards[num_cards]) != B_OK) {
 			//Vendor_ID and Device_ID has been modified
 				TRACE("Setup of ice1712 %d failed\n", (int)(num_cards + 1));
@@ -426,15 +450,9 @@ init_driver(void)
 static void
 ice_1712_shutdown(ice1712 *ice)
 {
-	status_t result;
-
 	delete_sem(ice->buffer_ready_sem);
 
-	result = remove_io_interrupt_handler(ice->irq, ice_1712_int, ice);
-	if (result == B_OK)
-		TRACE("remove Interrupt result == B_OK\n");
-	else
-		TRACE("remove Interrupt result != B_OK\n");
+	remove_io_interrupt_handler(ice->irq, ice_1712_int, ice);
 
 	if (ice->mem_id_pb != B_ERROR)
 		delete_area(ice->mem_id_pb);
@@ -451,7 +469,7 @@ uninit_driver(void)
 {
 	int ix, cnt = num_cards;
 
-	TRACE("===uninit_driver()===\n");
+	TRACE("@@uninit_driver()\n");
 
 	num_cards = 0;
 
@@ -466,13 +484,12 @@ uninit_driver(void)
 	put_module(B_PCI_MODULE_NAME);
 }
 
-//------------------------------------------------------
 
 const char **
 publish_devices(void)
 {
 	int ix = 0;
-	TRACE("===publish_devices()===\n");
+	TRACE("@@publish_devices()\n");
 
 	for (ix=0; names[ix]; ix++) {
 		TRACE("publish %s\n", names[ix]);
@@ -486,7 +503,7 @@ ice_1712_open(const char *name, uint32 flags, void **cookie)
 {
 	int ix;
 	ice1712 *card = NULL;
-	TRACE("===open()===\n");
+	TRACE("**open()\n");
 
 	for (ix=0; ix<num_cards; ix++) {
 		if (!strcmp(cards[ix].name, name)) {
@@ -509,7 +526,7 @@ ice_1712_open(const char *name, uint32 flags, void **cookie)
 static status_t
 ice_1712_close(void *cookie)
 {
-	TRACE("===close()===\n");
+	TRACE("**close()\n");
 	return B_OK;
 }
 
@@ -517,7 +534,7 @@ ice_1712_close(void *cookie)
 static status_t
 ice_1712_free(void *cookie)
 {
-	TRACE("===free()===\n");
+	TRACE("**free()\n");
 	return B_OK;
 }
 
@@ -529,7 +546,7 @@ ice_1712_control(void *cookie, uint32 op, void *arg, size_t len)
 		case B_MULTI_GET_DESCRIPTION :
 			TRACE("B_MULTI_GET_DESCRIPTION\n");
 			return ice1712_get_description((ice1712 *)cookie,
-                            (multi_description*)arg);
+				(multi_description*)arg);
 		case B_MULTI_GET_EVENT_INFO :
 			TRACE("B_MULTI_GET_EVENT_INFO\n");
 			return B_ERROR;
@@ -542,19 +559,19 @@ ice_1712_control(void *cookie, uint32 op, void *arg, size_t len)
 		case B_MULTI_GET_ENABLED_CHANNELS :
 			TRACE("B_MULTI_GET_ENABLED_CHANNELS\n");
 			return ice1712_get_enabled_channels((ice1712*)cookie,
-                            (multi_channel_enable*)arg);
+				(multi_channel_enable*)arg);
 		case B_MULTI_SET_ENABLED_CHANNELS :
 			TRACE("B_MULTI_SET_ENABLED_CHANNELS\n");
 			return ice1712_set_enabled_channels((ice1712*)cookie,
-                            (multi_channel_enable*)arg);
+				(multi_channel_enable*)arg);
 		case B_MULTI_GET_GLOBAL_FORMAT :
 			TRACE("B_MULTI_GET_GLOBAL_FORMAT\n");
 			return ice1712_get_global_format((ice1712*)cookie,
-                            (multi_format_info *)arg);
+				(multi_format_info *)arg);
 		case B_MULTI_SET_GLOBAL_FORMAT :
 			TRACE("B_MULTI_SET_GLOBAL_FORMAT\n");
 			return ice1712_set_global_format((ice1712*)cookie,
-                            (multi_format_info *)arg);
+				(multi_format_info *)arg);
 		case B_MULTI_GET_CHANNEL_FORMATS :
 			TRACE("B_MULTI_GET_CHANNEL_FORMATS\n");
 			return B_ERROR;
@@ -564,27 +581,27 @@ ice_1712_control(void *cookie, uint32 op, void *arg, size_t len)
 		case B_MULTI_GET_MIX :
 			TRACE("B_MULTI_GET_MIX\n");
 			return ice1712_get_mix((ice1712*)cookie,
-                            (multi_mix_value_info *)arg);
+				(multi_mix_value_info *)arg);
 		case B_MULTI_SET_MIX :
 			TRACE("B_MULTI_SET_MIX\n");
 			return ice1712_set_mix((ice1712*)cookie,
-                            (multi_mix_value_info *)arg);
+				(multi_mix_value_info *)arg);
 		case B_MULTI_LIST_MIX_CHANNELS :
 			TRACE("B_MULTI_LIST_MIX_CHANNELS\n");
 			return ice1712_list_mix_channels((ice1712*)cookie,
-                            (multi_mix_channel_info *)arg);
+				(multi_mix_channel_info *)arg);
 		case B_MULTI_LIST_MIX_CONTROLS :
 			TRACE("B_MULTI_LIST_MIX_CONTROLS\n");
 			return ice1712_list_mix_controls((ice1712*)cookie,
-                            (multi_mix_control_info *)arg);
+				(multi_mix_control_info *)arg);
 		case B_MULTI_LIST_MIX_CONNECTIONS :
 			TRACE("B_MULTI_LIST_MIX_CONNECTIONS\n");
 			return ice1712_list_mix_connections((ice1712*)cookie,
-                            (multi_mix_connection_info *)arg);
+				(multi_mix_connection_info *)arg);
 		case B_MULTI_GET_BUFFERS :
 			TRACE("B_MULTI_GET_BUFFERS\n");
 			return ice1712_get_buffers((ice1712*)cookie,
-                            (multi_buffer_list*)arg);
+				(multi_buffer_list*)arg);
 		case B_MULTI_SET_BUFFERS :
 			TRACE("B_MULTI_SET_BUFFERS\n");
 			return B_ERROR;
@@ -594,7 +611,7 @@ ice_1712_control(void *cookie, uint32 op, void *arg, size_t len)
 		case B_MULTI_BUFFER_EXCHANGE :
 //			TRACE("B_MULTI_BUFFER_EXCHANGE\n");
 			return ice1712_buffer_exchange((ice1712*)cookie,
-                            (multi_buffer_info *)arg);
+				(multi_buffer_info *)arg);
 		case B_MULTI_BUFFER_FORCE_STOP :
 			TRACE("B_MULTI_BUFFER_FORCE_STOP\n");
 			return ice1712_buffer_force_stop((ice1712*)cookie);
@@ -627,7 +644,7 @@ ice_1712_control(void *cookie, uint32 op, void *arg, size_t len)
 static status_t
 ice_1712_read(void *cookie, off_t position, void *buf, size_t *num_bytes)
 {
-	TRACE("===read()===\n");
+	TRACE("**read()\n");
 	*num_bytes = 0;
 	return B_IO_ERROR;
 }
@@ -635,9 +652,9 @@ ice_1712_read(void *cookie, off_t position, void *buf, size_t *num_bytes)
 
 static status_t
 ice_1712_write(void *cookie, off_t position, const void *buffer,
-            size_t *num_bytes)
+	size_t *num_bytes)
 {
-	TRACE("===write()===\n");
+	TRACE("**write()\n");
 	*num_bytes = 0;
 	return B_IO_ERROR;
 }
@@ -657,61 +674,91 @@ device_hooks ice1712_hooks =
 	NULL
 };
 
-/*
-device_hooks ice1712Midi_hooks =
+
+device_hooks ice1712_midi_hooks =
 {
-	ice1712Midi_open,
-	ice1712Midi_close,
-	ice1712Midi_free,
-	ice1712Midi_control,
-	ice1712Midi_read,
-	ice1712Midi_write,
+	ice_1712_midi_open,
+	ice_1712_midi_close,
+	ice_1712_midi_free,
+	ice_1712_midi_control,
+	ice_1712_midi_read,
+	ice_1712_midi_write,
 	NULL,
 	NULL,
 	NULL,
 	NULL
 };
-*/
+
 
 device_hooks *
 find_device(const char * name)
 {
-	int ix;
+	int ix, midi;
 
-	TRACE("ice1712: find_device(%s)\n", name);
+	TRACE("**find_device(%s)\n", name);
 
-	for (ix=0; ix<num_cards; ix++) {
+	for (ix=0; ix < num_cards; ix++) {
 
-/*		if (!strcmp(cards[ix].midi.name, name)) {
-			return &midi_hooks;
-		}*/
+		for (midi = 0; midi < MAX_MIDI_INTERFACE; midi++) {
+			if (!strcmp(cards[ix].midi_interf[midi].name, name)) {
+				return &ice1712_midi_hooks;
+			}
+		}
 
 		if (!strcmp(cards[ix].name, name)) {
 			return &ice1712_hooks;
 		}
 	}
-	TRACE("ice1712: find_device(%s) failed\n", name);
+	TRACE("!!! failed !!!\n");
 	return NULL;
 }
 
-//-----------------------------------------------------------------------------
+status_t
+load_settings(ice1712 *card)
+{
+	// get driver settings
+	void *settings_handle = load_driver_settings("ice1712.settings");
 
-#define ICE1712_MUTE_VALUE (0x7F)
+	//Use a large enough value for modern computer
+	card->settings.bufferSize = 512;
+
+	if (settings_handle != NULL) {
+		const char *item;
+		char *end;
+
+		item = get_driver_parameter(settings_handle, "buffer_size",
+			"512", "512");
+		if (item) {
+			uint32 value = strtoul(item, &end, 0);
+			if ((*end == '\0')
+				&& (value >= MIN_BUFFER_FRAMES)
+				&& (value <= MAX_BUFFER_FRAMES)) {
+					card->settings.bufferSize = value;
+			}
+		}
+
+		unload_driver_settings(settings_handle);
+	}
+
+	return B_OK;
+}
+
 
 status_t
-applySettings(ice1712 *card)
+apply_settings(ice1712 *card)
 {
 	int i;
-	uint16 val;
+	uint16 val, mt30 = 0;
+	uint32 mt34 = 0;
 
-	for (i = 0; i < MAX_HARDWARE_VOLUME; i++) {
+	for (i = 0; i < ICE1712_HARDWARE_VOLUME; i++) {
 		//Select the channel
 		write_mt_uint8(card, MT_VOLUME_CONTROL_CHANNEL_INDEX, i);
 
-		if (card->settings.Playback[i].Mute == true) {
+		if (card->settings.playback[i].mute == true) {
 			val = (ICE1712_MUTE_VALUE << 0) | (ICE1712_MUTE_VALUE << 8);
 		} else {
-			unsigned char volume = card->settings.Playback[i].Volume / -1.5;
+			unsigned char volume = card->settings.playback[i].volume / -1.5;
 			if (i & 1) {//a right channel
 				val = ICE1712_MUTE_VALUE << 0; //Mute left volume
 				val |= volume << 8;
@@ -725,15 +772,15 @@ applySettings(ice1712 *card)
 		TRACE_VV("Apply Settings %d : 0x%x\n", i, val);
 	}
 
-	for (i = 0; i < MAX_HARDWARE_VOLUME; i++) {
+	for (i = 0; i < ICE1712_HARDWARE_VOLUME; i++) {
 		//Select the channel
 		write_mt_uint8(card, MT_VOLUME_CONTROL_CHANNEL_INDEX,
-                    i + MAX_HARDWARE_VOLUME);
+			i + ICE1712_HARDWARE_VOLUME);
 
-		if (card->settings.Record[i].Mute == true) {
+		if (card->settings.record[i].mute == true) {
 			val = (ICE1712_MUTE_VALUE << 0) | (ICE1712_MUTE_VALUE << 8);
 		} else {
-			unsigned char volume = card->settings.Record[i].Volume / -1.5;
+			uint8 volume = card->settings.record[i].volume / -1.5;
 			if (i & 1) {//a right channel
 				val = ICE1712_MUTE_VALUE << 0; //Mute left volume
 				val |= volume << 8;
@@ -747,7 +794,58 @@ applySettings(ice1712 *card)
 		TRACE_VV("Apply Settings %d : 0x%x\n", i, val);
 	}
 
-	//Output selection
+	//Analog output selection
+	for (i = 0; i < 4; i++) {
+		uint8 out = card->settings.output[i];
+		if (out == 0) {
+			TRACE_VV("Output %d is haiku output\n", i);
+			//Nothing to do
+		} else if (out <= (card->config.nb_ADC / 2)) {
+			uint8 mt34_c;
+			out--;
+			TRACE_VV("Output %d is input %d\n", i, out);
+			mt34_c = (out * 2);
+			mt34_c |= (out * 2 + 1) << 4;
+			mt30 |= 0x0202 << (2*i);
+			mt30 |= mt34_c << (8*i);
+		} else if (out == ((card->config.nb_ADC / 2) + 1)
+				&& (card->config.spdif & SPDIF_IN_PRESENT) != 0) {
+			TRACE_VV("Output %d is digital input\n", i);
+			mt30 |= 0x0303 << (2*i);
+			mt34 |= 0x80 << (8*i);
+		} else {
+			TRACE_VV("Output %d is digital Mixer\n", i);
+			mt30 |= 0x0101;
+		}
+	}
+	write_mt_uint16(card, MT_ROUTING_CONTROL_PSDOUT, mt30);
+	write_mt_uint32(card, MT_CAPTURED_DATA, mt34);
+
+	//Digital output
+	if ((card->config.spdif & SPDIF_OUT_PRESENT) != 0) {
+		uint16 mt32 = 0;
+		uint8 out = card->settings.output[4];
+		if (out == 0) {
+			TRACE_VV("Digital output is haiku output\n");
+			//Nothing to do
+		} else if (out <= (card->config.nb_ADC / 2)) {
+			out--;
+			TRACE_VV("Digital output is input %d\n", out);
+			mt32 |= 0x0202;
+			mt32 |= (out * 2) << 8;
+			mt32 |= (out * 2 + 1) << 12;
+		} else if (out == ((card->config.nb_ADC / 2) + 1)
+				&& (card->config.spdif & SPDIF_IN_PRESENT) != 0) {
+			TRACE_VV("Digital output is digital input\n");
+			mt32 |= 0x800F;
+		} else {
+			TRACE_VV("Digital output is digital Mixer\n");
+			mt32 |= 0x0005;
+		}
+
+		write_mt_uint16(card, MT_ROUTING_CONTROL_SPDOUT, mt32);
+	}
+
 
 	return B_OK;
 }

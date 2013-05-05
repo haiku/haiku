@@ -1,0 +1,12 @@
+1	croatian	x-vnd.Haiku-CPUFrequencyPref	2355894194
+CPU frequency status view	CPU Frequency View		Pogled stanja frekvencije procesora
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Frekvencija procesora\n\tnapisao Clemens Zeidler\n\tAutoraska prava 2009, Haiku, Inc.\n
+Defaults	Pref Window		Zadano
+Dynamic performance	Status view		Dinamične performanse
+High performance	Status view		Visoke performanse
+Integration time [ms]: 	CPU Frequency View		Vrijeme integracije [ms]:
+Ok	Status view		U redu
+Open Speedstep preferences…	Status view		Otvori Speedstep osobitosti...
+Quit	Status view		Isključi
+Revert	Pref Window		Preokreni
+Set state	Status view		Postavi stanje

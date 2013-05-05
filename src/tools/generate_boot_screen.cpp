@@ -201,11 +201,11 @@ read_png(const char* filename, int& width, int& height, png_bytep*& rowPtrs,
 	png_set_bgr(pngPtr);
 
 	png_read_info(pngPtr, infoPtr);
-	width = infoPtr->width;
-	height = infoPtr->height;
-	if (infoPtr->bit_depth != 8)
+	width = (int)png_get_image_width(pngPtr, infoPtr);
+	height = (int)png_get_image_height(pngPtr, infoPtr);
+	if (png_get_bit_depth(pngPtr, infoPtr) != 8)
 		error("[read_png] File %s has wrong bit depth\n", filename);
-	if ((int)infoPtr->rowbytes < width * 3) {
+	if ((int)png_get_rowbytes(pngPtr, infoPtr) < width * 3) {
 		error("[read_png] File %s has wrong color type (RGB required)\n",
 			filename);
 	}
@@ -221,7 +221,7 @@ read_png(const char* filename, int& width, int& height, png_bytep*& rowPtrs,
 
 	rowPtrs = (png_bytep*)malloc(sizeof(png_bytep) * height);
 	for (int y = 0; y < height; y++)
-		rowPtrs[y] = (png_byte*)malloc(infoPtr->rowbytes);
+		rowPtrs[y] = (png_byte*)malloc(png_get_rowbytes(pngPtr, infoPtr));
 
 	png_read_image(pngPtr, rowPtrs);
 }
@@ -252,7 +252,7 @@ write_24bit_image(const char* baseName, int width, int height, png_bytep* rowPtr
 static void
 write_8bit_image(const char* baseName, int width, int height, unsigned char** rowPtrs)
 {
-	int buffer[128];
+	//int buffer[128];
 	// buffer[0] stores count, buffer[1..127] holds the actual values
 
 	fprintf(sOutput, "static uint8 %s8BitCompressedImage[] = {\n\t",

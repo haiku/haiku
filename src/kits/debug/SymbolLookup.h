@@ -1,5 +1,6 @@
 /*
  * Copyright 2005-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -16,7 +17,6 @@
 
 struct image_t;
 struct runtime_loader_debug_area;
-struct Elf32_Sym;
 
 
 namespace BPrivate {
@@ -137,7 +137,7 @@ struct SymbolIterator {
 // SymbolLookup
 class SymbolLookup : private RemoteMemoryAccessor {
 public:
-	SymbolLookup(team_id team);
+	SymbolLookup(team_id team, image_id image);
 	~SymbolLookup();
 
 	status_t Init();
@@ -167,10 +167,12 @@ private:
 	Image* _FindImageAtAddress(addr_t address) const;
 	Image* _FindImageByID(image_id id) const;
 	size_t _SymbolNameLen(const char* address) const;
+	status_t _LoadImageInfo(const image_info& imageInfo);
 
 private:
 	const runtime_loader_debug_area	*fDebugArea;
 	DoublyLinkedList<Image>	fImages;
+	image_id fImageID;
 };
 
 }	// namespace Debug

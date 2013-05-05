@@ -1,49 +1,68 @@
-1	finnish	x-vnd.Haiku-Appearance	3577998894
-About	DecorSettingsView		Ohjelmasta
-About Decerator	DecorSettingsView		Koristeluohjelmasta
-Antialiasing	APRWindow		Reunanpehmennys
-Antialiasing menu	AntialiasingSettingsView		Reunanpehmennysvalikko
+1	finnish	x-vnd.Haiku-Appearance	2993758435
+Plain font:	Font view		Pelkkä kirjasin:
+Control highlight	Colors tab		Kontrollin korostus
+Control border	Colors tab		Kontrollin reuna
 Antialiasing type:	AntialiasingSettingsView		Reunanpehmennystapa:
-Appearance	System name		Ulkoasuasetukset
+Shadow	Colors tab		Varjo
+On	AntialiasingSettingsView		Päällä
+Defaults	APRWindow		Oletusasetukset
+Grayscale	AntialiasingSettingsView		Harmaasävy
+Shine	Colors tab		Hohto
+About	DecorSettingsView		Ohjelmasta
+About decorator	DecorSettingsView		Koristeluohjelmasta
+Off	AntialiasingSettingsView		Pois päältä
 Choose Decorator	DecorSettingsView		Valitse koristelu
+Success	Colors tab		Onnistuminen
+Inactive window tab text	Colors tab		Epäaktiivisen ikkunavälilehden tekstin väri
+Failure	Colors tab		Epäonnistuminen
+Hinting menu	AntialiasingSettingsView		Vinkkausvalikko
+Scroll bar:	DecorSettingsView		Vierityspalkki:
+Document background	Colors tab		Dokumentin tausta
+Revert	APRWindow		Palauta
+Window tab	Colors tab		Ikkunan välilehti
+Tooltip background	Colors tab		Työkaluvinkin tausta
+Selected menu item background	Colors tab		Valitun valikkovalinnan tausta
+Antialiasing	APRWindow		Reunanpehmennys
+Navigation base	Colors tab		Navigoinnin pohja
+Selected list item text	Colors tab		Valitun luettelorivin teksti
+Window border	Colors tab		Ikkunaraja
+Double:	DecorSettingsView		Kaksikko:
+Window tab text	Colors tab		Ikkunavälilehden teksti
+Document text	Colors tab		Dokumentin teksti
+Navigation pulse	Colors tab		Navigoinnin välke
+Selected menu item text	Colors tab		Valitun valikkovalinnan teksti
+Menu background	Colors tab		Valikon tausta
+List background	Colors tab		Luettelotausta
+OK	DecorSettingsView		Valmis
+Control mark	Colors tab		Ohjausmerkki
+Size:	Font Selection view		Koko:
+Decorator:	DecorSettingsView		Koristelija:
+Selected list item background	Colors tab		Valitun luettelorivin tausta
+Panel background	Colors tab		Paneelin tausta
+Menu font:	Font view		Valikkokirjasin:
 Colors	APRWindow		Värit
 Control background	Colors tab		Kontrollin tausta
-Control border	Colors tab		Kontrollin reuna
-Control highlight	Colors tab		Kontrollin korostus
-Control text	Colors tab		Kontrollin teksti
-Defaults	APRWindow		Oletusasetukset
-Document background	Colors tab		Dokumentin tausta
-Document text	Colors tab		Dokumentin teksti
-Failure	Colors tab		Epäonnistuminen
-Glyph hinting:	AntialiasingSettingsView		Kirjoitusmerkin viimeistely:
-Grayscale	AntialiasingSettingsView		Harmaasävy
-Hinting menu	AntialiasingSettingsView		Vinkkausvalikko
-Inactive window tab	Colors tab		Epäaktiivisen ikkunakahvan väri
-Inactive window tab text	Colors tab		Epäaktiivisen ikkunakahvan tekstin väri
-LCD subpixel	AntialiasingSettingsView		LCD alipikseli
-Menu background	Colors tab		Valikon tausta
-Menu item text	Colors tab		Valikkovalinnan teksti
-Monospaced fonts only	AntialiasingSettingsView		Vain monospace-kirjasimet
-Navigation base	Colors tab		Navigoinnin pohja
-Navigation pulse	Colors tab		Navigoinnin välke
-OK	DecorSettingsView		Valmis
-Off	AntialiasingSettingsView		Pois päältä
-On	AntialiasingSettingsView		Päällä
-Panel background	Colors tab		Paneelin tausta
-Panel text	Colors tab		Paneelin teksti
+Inactive window tab	Colors tab		Epäaktiivisen ikkunavälilehden väri
+List item text	Colors tab		Luettelorivin teksti
+Appearance	System name		Ulkoasuasetukset
+Fixed font:	Font view		Tasalevyinen kirjasin:
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Albert osti fagotin ja töräytti puhkuvan melodian.
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nTekijät:\n\t%decorAuthors\n\nVerkko-osoite: %decorURL\nLisenssi: %decorLic\n\n%decorDesc\n
 Reduce colored edges filter strength:	AntialiasingSettingsView		Vähennä värillisten reunojen suodatuksen vahvuutta:
-Revert	APRWindow		Palauta
-Selected menu item background	Colors tab		Valitun valikkovalinnan tausta
-Selected menu item border	Colors tab		Valitun valikkovalinnan reuna
-Selected menu item text	Colors tab		Valitun valikkovalinnan teksti
-Shadow	Colors tab		Varjo
-Shine	Colors tab		Hohto
-Strong	AntialiasingSettingsView		Vahva
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Alipikselipohjainen reunanpehmennys yhdistettynä kirjoitusmerkkiviimeistelyyn ei ole saatavilla tässä Haiku-versiossa patenttisyiden takia. Ominaisuuden saaminen käyttöön vaatii Haikun uudelleenkääntämistä ja eräiden optioiden aktivoimista libfreetype:n määrittelytiedostoissa.
-Success	Colors tab		Onnistuminen
-Tooltip background	Colors tab		Työkaluvinkin tausta
+Control text	Colors tab		Kontrollin teksti
+Single:	DecorSettingsView		Yksikkö:
 Tooltip text	Colors tab		Työkaluvinkin teksti
-Window Decorator	APRWindow		Ikkunakoristelu
-Window Decorator:	DecorSettingsView		Ikkunakoristelu:
-Window tab	Colors tab		Ikkunakahva
-Window tab text	Colors tab		Ikkunakahvan teksti
+Bold font:	Font view		Lihavoitu kirjasin:
+Inactive window border	Colors tab		Ei-aktiivinen ikkunaraja
+Menu item text	Colors tab		Valikkovalinnan teksti
+LCD subpixel	AntialiasingSettingsView		LCD alipikseli
+Selected menu item border	Colors tab		Valitun valikkovalinnan reuna
+Strong	AntialiasingSettingsView		Vahva
+Panel text	Colors tab		Paneelin teksti
+Arrow style	DecorSettingsView		Nuolityyli
+Monospaced fonts only	AntialiasingSettingsView		Vain monospace-kirjasimet
+Look and feel	APRWindow		Ulkoasu ja käyttötuntuma
+Antialiasing menu	AntialiasingSettingsView		Reunanpehmennysvalikko
+Fonts	APRWindow		Kirjasimet
+Glyph hinting:	AntialiasingSettingsView		Kirjoitusmerkin viimeistely:

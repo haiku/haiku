@@ -1,8 +1,8 @@
 1	swedish	x-vnd.Haiku-notification_server	906000487
-Couldn't start display settings monitor.\nLive filter changes disabled.	NotificationWindow		Kunde inte starta övervakning av visningsinställningarna.\nAvkänning av ändringar i filterinställningarna avstängd.
 Couldn't start filter monitor. Live filter changes disabled.	NotificationWindow		Kunde inte starta övervakning av filterinställningarna.\nAvkänning av ändringar i filterinställningarna avstängd.
-Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Kunde inte starta övervakning av de generella inställningarna.\nAvkänning av ändringar i filterinställningarna avstängd.
+Couldn't start display settings monitor.\nLive filter changes disabled.	NotificationWindow		Kunde inte starta övervakning av visningsinställningarna.\nAvkänning av ändringar i filterinställningarna avstängd.
 Darn.	NotificationWindow		Attans.
-Notification	NotificationWindow		Notifiering
-OK	NotificationWindow		OK
 Warning	NotificationWindow		Varning
+OK	NotificationWindow		OK
+Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Kunde inte starta övervakning av de generella inställningarna.\nAvkänning av ändringar i filterinställningarna avstängd.
+Notification	NotificationWindow		Notifiering

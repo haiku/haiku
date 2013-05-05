@@ -26,8 +26,8 @@
 #include "RemoteDevicesView.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Remote devices"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Remote devices"
 
 static const uint32 kMsgAddDevices = 'ddDv';
 static const uint32 kMsgRemoveDevice = 'rmDv';

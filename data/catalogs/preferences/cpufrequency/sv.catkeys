@@ -1,20 +1,21 @@
-1	swedish	x-vnd.Haiku-CPUFrequencyPref	3079996868
-CPU frequency status view	CPU Frequency View		Statusvy för ProcessorFrekvens
-CPUFrequency	System name		ProcessorFrekvens
-CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		ProcessorFrekvens\n\tskriven av Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
-Defaults	Pref Window		Förval
-Dynamic performance	Status view		Dynamisk prestanda
-Dynamic stepping	CPU Frequency View		Dynamisk acceleration
-High performance	Status view		Hög prestanda
-Install replicant into Deskbar	CPU Frequency View		Installera replikant i Deskbar
-Integration time [ms]: 	CPU Frequency View		Integreringstid
-Launching the CPU frequency preflet failed.\n\nError: 	Status view		Misslyckades med att starta inställningsprogrammet ProcessorFrekvens.\n\nFel:
-Low energy	Status view		Lågenergiläge
+1	swedish	x-vnd.Haiku-CPUFrequencyPref	1007318924
 Ok	Status view		OK
-Open Speedstep preferences…	Status view		Öppna inställningar för ProcessorFrekvens…
-Quit	Status view		Avsluta
-Revert	Pref Window		Återgå
+CPU frequency status view	CPU Frequency View		Statusvy för ProcessorFrekvens
+OK	Status view		OK
 Set state	Status view		Ändra läge
-Step up by CPU usage	Color Step View		Öka vid CPU-belastning
+Defaults	Pref Window		Förval
+Install replicant into Deskbar	CPU Frequency View		Installera replikant i Deskbar
+Quit	Status view		Avsluta
+High performance	Status view		Hög prestanda
 Stepping policy	CPU Frequency View		Accelerationspolicy
+Dynamic performance	Status view		Dynamisk prestanda
+Step up by CPU usage	Color Step View		Öka vid CPU-belastning
+Dynamic stepping	CPU Frequency View		Dynamisk acceleration
 Stepping policy: 	CPU Frequency View		Accelerationspolicy:
+Integration time [ms]: 	CPU Frequency View		Integreringstid
+Open Speedstep preferences…	Status view		Öppna inställningar för ProcessorFrekvens…
+Revert	Pref Window		Återgå
+Low energy	Status view		Lågenergiläge
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Misslyckades med att starta inställningsprogrammet ProcessorFrekvens.\n\nFel:
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		ProcessorFrekvens\n\tskriven av Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
+CPUFrequency	System name		ProcessorFrekvens

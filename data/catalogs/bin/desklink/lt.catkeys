@@ -1,0 +1,15 @@
+1	lithuanian	x-vnd.Haiku-desklink	2797960853
+Control physical output	MediaReplicant		Valdyti fizinę išvestį
+Couldn't launch 	MediaReplicant		Nepavyko paleisti 
+OK	MediaReplicant		Gerai
+Sound preferences…	MediaReplicant		Garsų nuostatos…
+%g dB	MediaReplicant		%g dB
+Open %name	DeskButton	Don't translate variable %name	Atverti %name
+No media server running	VolumeControl		Nepaleista įvairialypės terpės tarnyba
+Media preferences…	MediaReplicant		Įvairialypės terpės nuostatos…
+Open MediaPlayer	MediaReplicant		Atverti Medijos leistuvę
+desklink	MediaReplicant		desklink
+Options	MediaReplicant		Parinktys
+%ld dB	VolumeControl		%ld dB
+Beep	MediaReplicant		Pyptelėti
+Volume	VolumeControl		Garsis

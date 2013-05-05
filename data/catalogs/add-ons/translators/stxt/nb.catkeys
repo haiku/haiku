@@ -1,7 +1,6 @@
-1	norwegian_bokmål	x-vnd.Haiku-STXTTranslator	4053395273
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-STXTTranslator	3302294301
 Be styled text file	STXTTranslator		Be styled-tekstfil
 Plain text file	STXTTranslator		Ren tekstfil
-STXT Settings	STXTMain		STXT-innstillinger
 STXTTranslator Settings	STXTTranslator		STXT-ovesetterinnstillinger
 StyledEdit files	STXTTranslator		StyledEdit-filer
-StyledEdit files translator	STXTTranslator		StyledEdit-filoversetter
+STXT Settings	STXTMain		STXT-innstillinger

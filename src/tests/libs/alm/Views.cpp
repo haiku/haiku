@@ -18,6 +18,7 @@
 #include <Window.h>
 
 #include "ALMLayout.h"
+#include "ALMLayoutBuilder.h"
 
 
 using namespace LinearProgramming;
@@ -53,32 +54,32 @@ public:
 		menu->AddItem(new BPopUpMenu("Menu 2"));
 		BStringView* stringView2 = new BStringView("string 2", "string 2");
 
-		// create a new BALMLayout and use  it for this window
-		BALMLayout* layout = new BALMLayout(10);
-		SetLayout(layout);
-		layout->SetInset(10.);
+		BALM::BALMLayout* layout = new BALMLayout(10, 10);
+		BALM::BALMLayoutBuilder(this, layout)
+			.SetInsets(10)
+			.Add(button1, layout->Left(), layout->Top())
+			.StartingAt(button1)
+				.AddToRight(radioButton)
+				.AddToRight(BSpaceLayoutItem::CreateGlue())
+				.AddToRight(button3)
+			.StartingAt(radioButton)
+				.AddBelow(textView1, NULL, NULL, layout->RightOf(button3))
+				.AddBelow(button4)
+				.AddToRight(button5, layout->Right())
+				.AddBelow(button6)
+				.AddBelow(menu1, layout->AddYTab(), layout->Left(),
+					layout->AddXTab())
+				.AddToRight(stringView1)
+				.AddToRight(BSpaceLayoutItem::CreateGlue(), layout->Right())
+				.AddBelow(statusBar, NULL, layout->Left(), layout->Right());
 
-		layout->AddView(button1);
-		layout->AddViewToRight(radioButton);
-		layout->AddItemToRight(BSpaceLayoutItem::CreateGlue());
-		Area* a3 = layout->AddViewToRight(button3);
-		layout->SetCurrentArea(radioButton);
-		layout->AddViewToBottom(textView1, NULL, NULL, a3->Right());
-		layout->AddViewToBottom(button4);
-		layout->AddViewToRight(button5, layout->Right());
-		layout->AddViewToBottom(button6);
-
-		layout->AddView(menu1, layout->Left(), layout->BottomOf(button6));
-		layout->AddViewToRight(stringView1);
-		layout->AddItemToRight(BSpaceLayoutItem::CreateGlue(), layout->Right());
-
-		layout->AddViewToBottom(statusBar, NULL, layout->Left(),
-			layout->Right());
-
-		layout->AddView(menu2, layout->Left(), layout->BottomOf(statusBar),
-			layout->RightOf(menu1), layout->Bottom());
-		layout->AddViewToRight(stringView2);
-		layout->AddItemToRight(BSpaceLayoutItem::CreateGlue(), layout->Right());
+		// start over so that layout->RightOf() can return accurate results
+		BALM::BALMLayoutBuilder(layout)
+			.StartingAt(statusBar)
+				.AddBelow(menu2, layout->Bottom(), layout->Left(),
+					layout->RightOf(menu1))
+				.AddToRight(stringView2)
+				.AddToRight(BSpaceLayoutItem::CreateGlue(), layout->Right());
 
 		layout->Solver()->AddConstraint(2, layout->TopOf(menu1), -1,
 			layout->Bottom(), OperatorType(kEQ), 0);

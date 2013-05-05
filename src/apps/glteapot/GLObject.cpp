@@ -16,11 +16,16 @@
 	This file may be used under the terms of the Be Sample Code License.
 */
 
+
 #include "GLObject.h"
+
+#include <Application.h>
 #include <GL/gl.h>
-#include <stdlib.h>
 #include <InterfaceKit.h>
+#include <Resources.h>
+
 #include "glob.h"
+
 
 struct material {
 	float ambient[3], diffuse[3], specular[3];
@@ -141,11 +146,13 @@ GLObject::MenuInvoked(BPoint point)
 	setEvent(fObjView->drawEvent);
 }
 
+
 int
 GLObject::Solidity() const
 {
 	return solidity;
 }
+
 
 
 bool
@@ -200,54 +207,66 @@ GLObject::Draw(bool forID, float IDcolor[])
 }
 
 
-TriangleObject::TriangleObject(ObjectView* ov, char* filename)
-	: 	GLObject(ov), 
-		fPoints(100,100),
-		fTriangles(100,100),
-		fQs(50,50)
+TriangleObject::TriangleObject(ObjectView* ov)
+		: 	
+		GLObject(ov),
+		fStatus(B_NO_INIT),
+		fPoints(100, 100),
+		fTriangles(100, 100),
+		fQs(50, 50)
 {
+	BResources *res = BApplication::AppResources();
+	if (res == NULL)
+		return;
+
+	size_t size = 0;
+	int32 *arrayOfPoints
+					= (int32*)res->LoadResource(B_RAW_TYPE, "points", &size);
+	if (arrayOfPoints == NULL)
+		return;
+
 	float maxp = 0;
-	int numPt,numTri;
-	
-	FILE* f = fopen(filename,"r");
-	fscanf(f,"%d",&numPt);
-//	printf("Points: %d\n",numPt);
-	for (int i = 0; i < numPt; i++) {
+	size_t numPt = size / sizeof(int32);
+	for (size_t i = 0; i < numPt; i += 6) {
 		point p;
-		fscanf(f,"%f %f %f %f %f %f",
-			&p.x,
-			&p.y,
-			&p.z,
-			&p.nx,
-			&p.ny,
-			&p.nz);
+		p.x = 1e-6 * arrayOfPoints[i];
+		p.y = 1e-6 * arrayOfPoints[i + 1];
+		p.z = 1e-6 * arrayOfPoints[i + 2];
+		p.nx = 1e-6 * arrayOfPoints[i + 3];
+		p.ny = 1e-6 * arrayOfPoints[i + 4];
+		p.nz = 1e-6 * arrayOfPoints[i + 5];
+
 		if (fabs(p.x) > maxp)
 			maxp = fabs(p.x);
 		if (fabs(p.y) > maxp)
 			maxp = fabs(p.y);
 		if (fabs(p.z) > maxp)
 			maxp = fabs(p.z);
+
 		fPoints.add(p);
 	}
-	
+
 	for (int i = 0; i < fPoints.num_items; i++) {
 		fPoints[i].x /= maxp;
 		fPoints[i].y /= maxp;
 		fPoints[i].z /= maxp;
 	}
-		
-	fscanf(f,"%d",&numTri);
-//	printf("Triangles: %d\n",numTri);
-	int tpts = 0;
-	for (int i = 0; i < numTri; i++) {
+
+	int32 *arrayOfTriangles
+					= (int32*)res->LoadResource(B_RAW_TYPE, "triangles", &size);
+	if (arrayOfTriangles == NULL)
+		return;
+
+	size_t numTriPoints = size / sizeof(int32);
+	for (size_t i = 0; i < numTriPoints; i += 3) {
 		tri t;
-		fscanf(f,"%d %d %d",
-			&t.p1,
-			&t.p2,
-			&t.p3);
+		t.p1 = arrayOfTriangles[i];
+		t.p2 = arrayOfTriangles[i + 1];
+		t.p3 = arrayOfTriangles[i + 2];
 		fTriangles.add(t);
-		tpts += 3;
 	}
+
+	size_t numTri = numTriPoints / 3;
 
 	int qpts = 4;
 	int qp[1024];
@@ -259,37 +278,37 @@ TriangleObject::TriangleObject(ObjectView* ov, char* filename)
 	q.pts[1] = fTriangles[0].p3;
 	q.pts[3] = fTriangles[1].p3;
 
-	for (int i = 2; i < numTri; i += 2) {
-		if ((fTriangles[i-1].p1 == fTriangles[i].p2) &&
-			(fTriangles[i-1].p3 == fTriangles[i].p3)) {
-			q.pts[q.numpts++] = fTriangles[i+1].p1;
-			q.pts[q.numpts++] = fTriangles[i+1].p3;
+	for (size_t i = 2; i < numTri; i += 2) {
+		if ((fTriangles[i - 1].p1 == fTriangles[i].p2) &&
+			(fTriangles[i - 1].p3 == fTriangles[i].p3)) {
+			q.pts[q.numpts++] = fTriangles[i + 1].p1;
+			q.pts[q.numpts++] = fTriangles[i + 1].p3;
 			qpts+=2;
 		} else {
 			int *np = (int*)malloc(sizeof(int)*q.numpts);
-			memcpy(np,qp,q.numpts*sizeof(int));
+			memcpy(np, qp, q.numpts * sizeof(int));
 			quadStrip nqs;
 			nqs.numpts = q.numpts;
 			nqs.pts = np;
 			fQs.add(nqs);
-		
+
 			qpts += 4;
 			q.numpts = 4;
 			q.pts[2] = fTriangles[i].p1;
 			q.pts[0] = fTriangles[i].p2;
 			q.pts[1] = fTriangles[i].p3;
-			q.pts[3] = fTriangles[i+1].p3;
+			q.pts[3] = fTriangles[i + 1].p3;
 		}
 	}
 
 	int* np = (int*)malloc(sizeof(int)*q.numpts);
-	memcpy(np,qp,q.numpts*sizeof(int));
+	memcpy(np, qp, q.numpts * sizeof(int));
 	quadStrip nqs;
 	nqs.numpts = q.numpts;
 	nqs.pts = np;
 	fQs.add(nqs);
 
-	fclose(f);
+	fStatus = B_OK;
 }
 
 
@@ -298,6 +317,13 @@ TriangleObject::~TriangleObject()
 	for (int i = 0; i < fQs.num_items; i++) {
 		free(fQs[i].pts);
 	}
+}
+
+
+status_t
+TriangleObject::InitCheck() const
+{
+	return fStatus;
 }
 
 

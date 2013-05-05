@@ -26,6 +26,7 @@
 
 #include <extended_system_info_defs.h>
 
+#include <commpage.h>
 #include <boot_device.h>
 #include <elf.h>
 #include <file_cache.h>
@@ -157,6 +158,9 @@ static int32 sMaxTeams = 2048;
 static int32 sUsedTeams = 1;
 
 static TeamNotificationService sNotificationService;
+
+static const size_t kTeamUserDataReservedSize	= 128 * B_PAGE_SIZE;
+static const size_t kTeamUserDataInitialSize	= 4 * B_PAGE_SIZE;
 
 
 // #pragma mark - TeamListIterator
@@ -446,6 +450,8 @@ Team::Team(team_id id, bool kernel)
 	used_user_data = 0;
 	user_data_size = 0;
 	free_user_threads = NULL;
+
+	commpage_address = NULL;
 
 	supplementary_groups = NULL;
 	supplementary_group_count = 0;
@@ -976,7 +982,7 @@ ProcessGroup::ProcessGroup(pid_t id)
 
 ProcessGroup::~ProcessGroup()
 {
-	TRACE(("ProcessGroup::~ProcessGroup(): id = %ld\n", group->id));
+	TRACE(("ProcessGroup::~ProcessGroup(): id = %" B_PRId32 "\n", id));
 
 	// If the group is in the orphaned check list, remove it.
 	MutexLocker orphanedCheckLocker(sOrphanedCheckLock);
@@ -1114,38 +1120,39 @@ static void
 _dump_team_info(Team* team)
 {
 	kprintf("TEAM: %p\n", team);
-	kprintf("id:               %ld (%#lx)\n", team->id, team->id);
+	kprintf("id:               %" B_PRId32 " (%#" B_PRIx32 ")\n", team->id,
+		team->id);
 	kprintf("serial_number:    %" B_PRId64 "\n", team->serial_number);
 	kprintf("name:             '%s'\n", team->Name());
 	kprintf("args:             '%s'\n", team->Args());
 	kprintf("hash_next:        %p\n", team->hash_next);
 	kprintf("parent:           %p", team->parent);
 	if (team->parent != NULL) {
-		kprintf(" (id = %ld)\n", team->parent->id);
+		kprintf(" (id = %" B_PRId32 ")\n", team->parent->id);
 	} else
 		kprintf("\n");
 
 	kprintf("children:         %p\n", team->children);
 	kprintf("num_threads:      %d\n", team->num_threads);
 	kprintf("state:            %d\n", team->state);
-	kprintf("flags:            0x%lx\n", team->flags);
+	kprintf("flags:            0x%" B_PRIx32 "\n", team->flags);
 	kprintf("io_context:       %p\n", team->io_context);
 	if (team->address_space)
 		kprintf("address_space:    %p\n", team->address_space);
-	kprintf("user data:        %p (area %ld)\n", (void*)team->user_data,
-		team->user_data_area);
+	kprintf("user data:        %p (area %" B_PRId32 ")\n",
+		(void*)team->user_data, team->user_data_area);
 	kprintf("free user thread: %p\n", team->free_user_threads);
 	kprintf("main_thread:      %p\n", team->main_thread);
 	kprintf("thread_list:      %p\n", team->thread_list);
-	kprintf("group_id:         %ld\n", team->group_id);
-	kprintf("session_id:       %ld\n", team->session_id);
+	kprintf("group_id:         %" B_PRId32 "\n", team->group_id);
+	kprintf("session_id:       %" B_PRId32 "\n", team->session_id);
 }
 
 
 static int
 dump_team_info(int argc, char** argv)
 {
-	team_id id = -1;
+	ulong arg;
 	bool found = false;
 
 	if (argc < 2) {
@@ -1157,10 +1164,10 @@ dump_team_info(int argc, char** argv)
 		return 0;
 	}
 
-	id = strtoul(argv[1], NULL, 0);
-	if (IS_KERNEL_ADDRESS(id)) {
+	arg = strtoul(argv[1], NULL, 0);
+	if (IS_KERNEL_ADDRESS(arg)) {
 		// semi-hack
-		_dump_team_info((Team*)id);
+		_dump_team_info((Team*)arg);
 		return 0;
 	}
 
@@ -1168,7 +1175,7 @@ dump_team_info(int argc, char** argv)
 	for (TeamTable::Iterator it = sTeamHash.GetIterator();
 		Team* team = it.Next();) {
 		if ((team->Name() && strcmp(argv[1], team->Name()) == 0)
-			|| team->id == id) {
+			|| team->id == (team_id)arg) {
 			_dump_team_info(team);
 			found = true;
 			break;
@@ -1176,7 +1183,7 @@ dump_team_info(int argc, char** argv)
 	}
 
 	if (!found)
-		kprintf("team \"%s\" (%ld) doesn't exist!\n", argv[1], id);
+		kprintf("team \"%s\" (%" B_PRId32 ") doesn't exist!\n", argv[1], (team_id)arg);
 	return 0;
 }
 
@@ -1184,11 +1191,12 @@ dump_team_info(int argc, char** argv)
 static int
 dump_teams(int argc, char** argv)
 {
-	kprintf("team           id  parent      name\n");
+	kprintf("%-*s       id  %-*s    name\n", B_PRINTF_POINTER_WIDTH, "team",
+		B_PRINTF_POINTER_WIDTH, "parent");
 
 	for (TeamTable::Iterator it = sTeamHash.GetIterator();
 		Team* team = it.Next();) {
-		kprintf("%p%7ld  %p  %s\n", team, team->id, team->parent, team->Name());
+		kprintf("%p%7" B_PRId32 "  %p  %s\n", team, team->id, team->parent, team->Name());
 	}
 
 	return 0;
@@ -1322,23 +1330,44 @@ remove_team_from_group(Team* team)
 
 
 static status_t
-create_team_user_data(Team* team)
+create_team_user_data(Team* team, void* exactAddress = NULL)
 {
 	void* address;
-	size_t size = 4 * B_PAGE_SIZE;
+	uint32 addressSpec;
+
+	if (exactAddress != NULL) {
+		address = exactAddress;
+		addressSpec = B_EXACT_ADDRESS;
+	} else {
+		address = (void*)KERNEL_USER_DATA_BASE;
+		addressSpec = B_RANDOMIZED_BASE_ADDRESS;
+	}
+
+	status_t result = vm_reserve_address_range(team->id, &address, addressSpec,
+		kTeamUserDataReservedSize, RESERVED_AVOID_BASE);
+
 	virtual_address_restrictions virtualRestrictions = {};
-	virtualRestrictions.address = (void*)KERNEL_USER_DATA_BASE;
-	virtualRestrictions.address_specification = B_BASE_ADDRESS;
+	if (result == B_OK || exactAddress != NULL) {
+		if (exactAddress != NULL)
+			virtualRestrictions.address = exactAddress;
+		else
+			virtualRestrictions.address = address;
+		virtualRestrictions.address_specification = B_EXACT_ADDRESS;
+	} else {
+		virtualRestrictions.address = (void*)KERNEL_USER_DATA_BASE;
+		virtualRestrictions.address_specification = B_RANDOMIZED_BASE_ADDRESS;
+	}
+
 	physical_address_restrictions physicalRestrictions = {};
-	team->user_data_area = create_area_etc(team->id, "user area", size,
-		B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA, 0, &virtualRestrictions,
-		&physicalRestrictions, &address);
+	team->user_data_area = create_area_etc(team->id, "user area",
+		kTeamUserDataInitialSize, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA, 0, 0,
+		&virtualRestrictions, &physicalRestrictions, &address);
 	if (team->user_data_area < 0)
 		return team->user_data_area;
 
 	team->user_data = (addr_t)address;
 	team->used_user_data = 0;
-	team->user_data_size = size;
+	team->user_data_size = kTeamUserDataInitialSize;
 	team->free_user_threads = NULL;
 
 	return B_OK;
@@ -1350,6 +1379,9 @@ delete_team_user_data(Team* team)
 {
 	if (team->user_data_area >= 0) {
 		vm_delete_area(team->id, team->user_data_area, true);
+		vm_unreserve_address_range(team->id, (void*)team->user_data,
+			kTeamUserDataReservedSize);
+
 		team->user_data = 0;
 		team->used_user_data = 0;
 		team->user_data_size = 0;
@@ -1378,7 +1410,7 @@ copy_user_process_args(const char* const* userFlatArgs, size_t flatArgsSize,
 		return B_BAD_ADDRESS;
 
 	// allocate kernel memory
-	char** flatArgs = (char**)malloc(flatArgsSize);
+	char** flatArgs = (char**)malloc(_ALIGN(flatArgsSize));
 	if (flatArgs == NULL)
 		return B_NO_MEMORY;
 
@@ -1480,7 +1512,8 @@ team_create_thread_start_internal(void* args)
 	team = thread->team;
 	cache_node_launched(teamArgs->arg_count, teamArgs->flat_args);
 
-	TRACE(("team_create_thread_start: entry thread %ld\n", thread->id));
+	TRACE(("team_create_thread_start: entry thread %" B_PRId32 "\n",
+		thread->id));
 
 	// Main stack area layout is currently as follows (starting from 0):
 	//
@@ -1536,6 +1569,32 @@ team_create_thread_start_internal(void* args)
 		// the arguments are already on the user stack, we no longer need
 		// them in this form
 
+	// Clone commpage area
+	area_id commPageArea = clone_commpage_area(team->id,
+		&team->commpage_address);
+	if (commPageArea  < B_OK) {
+		TRACE(("team_create_thread_start: clone_commpage_area() failed: %s\n",
+			strerror(commPageArea)));
+		return commPageArea;
+	}
+
+	// Register commpage image
+	image_id commPageImage = get_commpage_image();
+	image_info imageInfo;
+	err = get_image_info(commPageImage, &imageInfo);
+	if (err != B_OK) {
+		TRACE(("team_create_thread_start: get_image_info() failed: %s\n",
+			strerror(err)));
+		return err;
+	}
+	imageInfo.text = team->commpage_address;
+	image_id image = register_image(team, &imageInfo, sizeof(image_info));
+	if (image < 0) {
+		TRACE(("team_create_thread_start: register_image() failed: %s\n",
+			strerror(image)));
+		return image;
+	}
+
 	// NOTE: Normally arch_thread_enter_userspace() never returns, that is
 	// automatic variables with function scope will never be destroyed.
 	{
@@ -1569,7 +1628,7 @@ team_create_thread_start_internal(void* args)
 
 	// enter userspace -- returns only in case of error
 	return thread_enter_userspace_new_team(thread, (addr_t)entry,
-		programArgs, NULL);
+		programArgs, team->commpage_address);
 }
 
 
@@ -1602,8 +1661,8 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 
 	const char* path = flatArgs[0];
 
-	TRACE(("load_image_internal: name '%s', args = %p, argCount = %ld\n",
-		path, flatArgs, argCount));
+	TRACE(("load_image_internal: name '%s', args = %p, argCount = %" B_PRId32
+		"\n", path, flatArgs, argCount));
 
 	// cut the path from the main thread name
 	const char* threadName = strrchr(path, '/');
@@ -1802,8 +1861,9 @@ exec_team(const char* path, char**& _flatArgs, size_t flatArgsSize,
 	const char* threadName;
 	thread_id nubThreadID = -1;
 
-	TRACE(("exec_team(path = \"%s\", argc = %ld, envCount = %ld): team %ld\n",
-		path, argCount, envCount, team->id));
+	TRACE(("exec_team(path = \"%s\", argc = %" B_PRId32 ", envCount = %"
+		B_PRId32 "): team %" B_PRId32 "\n", path, argCount, envCount,
+		team->id));
 
 	T(ExecTeam(path, argCount, flatArgs, envCount, flatArgs + argCount + 1));
 
@@ -1938,9 +1998,10 @@ fork_team(void)
 	struct area_info info;
 	thread_id threadID;
 	status_t status;
-	int32 cookie;
+	ssize_t areaCookie;
+	int32 imageCookie;
 
-	TRACE(("fork_team(): team %ld\n", parentTeam->id));
+	TRACE(("fork_team(): team %" B_PRId32 "\n", parentTeam->id));
 
 	if (parentTeam == team_get_kernel_team())
 		return B_NOT_ALLOWED;
@@ -1966,6 +2027,8 @@ fork_team(void)
 
 	team->SetName(parentTeam->Name());
 	team->SetArgs(parentTeam->Args());
+
+	team->commpage_address = parentTeam->commpage_address;
 
 	// Inherit the parent's user/group.
 	inherit_parent_user_and_group(team, parentTeam);
@@ -2026,11 +2089,11 @@ fork_team(void)
 	// TODO: should be able to handle stack areas differently (ie. don't have
 	// them copy-on-write)
 
-	cookie = 0;
-	while (get_next_area_info(B_CURRENT_TEAM, &cookie, &info) == B_OK) {
+	areaCookie = 0;
+	while (get_next_area_info(B_CURRENT_TEAM, &areaCookie, &info) == B_OK) {
 		if (info.area == parentTeam->user_data_area) {
 			// don't clone the user area; just create a new one
-			status = create_team_user_data(team);
+			status = create_team_user_data(team, info.address);
 			if (status != B_OK)
 				break;
 
@@ -2054,7 +2117,7 @@ fork_team(void)
 
 	if (thread->user_thread == NULL) {
 #if KDEBUG
-		panic("user data area not found, parent area is %ld",
+		panic("user data area not found, parent area is %" B_PRId32,
 			parentTeam->user_data_area);
 #endif
 		status = B_ERROR;
@@ -2073,8 +2136,9 @@ fork_team(void)
 
 	// copy image list
 	image_info imageInfo;
-	cookie = 0;
-	while (get_next_image_info(parentTeam->id, &cookie, &imageInfo) == B_OK) {
+	imageCookie = 0;
+	while (get_next_image_info(parentTeam->id, &imageCookie, &imageInfo)
+			== B_OK) {
 		image_id image = register_image(team, &imageInfo, sizeof(imageInfo));
 		if (image < 0)
 			goto err5;
@@ -2237,7 +2301,7 @@ job_control_entry::~job_control_entry()
 		ProcessGroup* group = sGroupHash.Lookup(group_id);
 		if (group == NULL) {
 			panic("job_control_entry::~job_control_entry(): unknown group "
-				"ID: %ld", group_id);
+				"ID: %" B_PRId32, group_id);
 			return;
 		}
 
@@ -2302,7 +2366,8 @@ wait_for_child(pid_t child, uint32 flags, siginfo_t& _info)
 	struct job_control_entry* freeDeathEntry = NULL;
 	status_t status = B_OK;
 
-	TRACE(("wait_for_child(child = %ld, flags = %ld)\n", child, flags));
+	TRACE(("wait_for_child(child = %" B_PRId32 ", flags = %" B_PRId32 ")\n",
+		child, flags));
 
 	T(WaitForChild(child, flags));
 
@@ -2494,8 +2559,8 @@ fill_team_info(Team* team, team_info* info, size_t size)
 	//info->area_count =
 	info->debugger_nub_thread = team->debug_info.nub_thread;
 	info->debugger_nub_port = team->debug_info.nub_port;
-	//info->uid =
-	//info->gid =
+	info->uid = team->effective_uid;
+	info->gid = team->effective_gid;
 
 	strlcpy(info->args, team->Args(), sizeof(info->args));
 	info->argc = 1;
@@ -2705,6 +2770,8 @@ team_init(kernel_args* args)
 		"Prints a list of all existing teams.\n", 0);
 
 	new(&sNotificationService) TeamNotificationService();
+
+	sNotificationService.Register();
 
 	return B_OK;
 }
@@ -3353,7 +3420,7 @@ team_allocate_user_thread(Team* team)
 
 	while (true) {
 		// enough space left?
-		size_t needed = ROUNDUP(sizeof(user_thread), 8);
+		size_t needed = ROUNDUP(sizeof(user_thread), 128);
 		if (team->user_data_size - team->used_user_data < needed) {
 			// try to resize the area
 			if (resize_area(team->user_data_area,
@@ -4028,6 +4095,7 @@ _user_setsid(void)
 
 	// lock the team's current process group, parent, and the team itself
 	team->LockTeamParentAndProcessGroup();
+	BReference<ProcessGroup> oldGroupReference(team->group);
 	AutoLocker<ProcessGroup> oldGroupLocker(team->group, true);
 	TeamLocker parentLocker(team->parent, true);
 	TeamLocker teamLocker(team, true);
@@ -4075,7 +4143,7 @@ _user_load_image(const char* const* userFlatArgs, size_t flatArgsSize,
 	int32 argCount, int32 envCount, int32 priority, uint32 flags,
 	port_id errorPort, uint32 errorToken)
 {
-	TRACE(("_user_load_image: argc = %ld\n", argCount));
+	TRACE(("_user_load_image: argc = %" B_PRId32 "\n", argCount));
 
 	if (argCount < 1)
 		return B_BAD_VALUE;

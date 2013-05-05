@@ -1,0 +1,4 @@
+1	hindi	x-vnd.Haiku-SystemLogger	57960782
+%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nयह डीमन जिमेदार है सारे सिस्टम के सन्देश को कलेक्ट करने के लिए और उन्हें लिखने के लिए सिस्टम वाइड लोग पर \"%s\".\n\n
+OK	SyslogDaemon		ठीक है
+Syslog Daemon	SyslogDaemon		Syslog Daemon

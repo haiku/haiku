@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -10,6 +11,9 @@
 
 #include <Referenceable.h>
 #include <util/DoublyLinkedList.h>
+
+#include "ReturnValueInfo.h"
+#include "types/Types.h"
 
 
 class CpuState;
@@ -67,11 +71,19 @@ public:
 			StackTrace*			GetStackTrace() const	{ return fStackTrace; }
 			void				SetStackTrace(StackTrace* trace);
 
+			ReturnValueInfoList*
+								ReturnValueInfos() const
+								{ return fReturnValueInfos; }
+			status_t			AddReturnValueInfo(ReturnValueInfo* info);
+			void				ClearReturnValueInfos();
+
 private:
 			Team*				fTeam;
 			thread_id			fID;
 			BString				fName;
 			uint32				fState;
+			ReturnValueInfoList*
+								fReturnValueInfos;
 			uint32				fStoppedReason;
 			BString				fStoppedReasonInfo;
 			CpuState*			fCpuState;

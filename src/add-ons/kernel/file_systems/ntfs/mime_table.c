@@ -3,14 +3,14 @@
 	This file may be used under the terms of the Be Sample Code License.
 */
 
+#include <sys/types.h>
+
 struct ext_mime {
 	char *extension;
 	char *mime;
 };
 
 struct ext_mime mimes[] = {
-	{ "***", "application/x-vnd.Be-directory"},
-	
 	{ "gz", "application/x-gzip" },
 	{ "hqx", "application/x-binhex40" },
 	{ "lha", "application/x-lharc" },
@@ -24,8 +24,13 @@ struct ext_mime mimes[] = {
 	{ "z", "application/x-compress" },
 	{ "zip", "application/zip" },
 	{ "zoo", "application/x-zoo" },
-	{ "rar", "application/x-rar-compressed" },
+	{ "rar", "application/x-rar" },
 	{ "pkg", "application/x-scode-UPkg" },
+	{ "7z", "application/x-7z-compressed" },
+	{ "bz2", "application/x-bzip2" },
+	{ "xz", "application/x-xz" },
+	
+	{ "jar", "application/x-jar" },
 
 	{ "aif", "audio/x-aiff" },
 	{ "aiff", "audio/x-aiff" },
@@ -37,13 +42,20 @@ struct ext_mime mimes[] = {
 	{ "wav", "audio/x-wav" },
 	{ "mp3", "audio/x-mpeg" },
 	{ "ogg", "audio/x-vorbis" },
+	{ "flac", "audio/x-flac" },
+	{ "wma", "audio/x-ms-wma" },
 
 	{ "avi", "video/x-msvideo" },
 	{ "mov", "video/quicktime" },
+	{ "qt", "video/quicktime" },
 	{ "mpg", "video/mpeg" },
 	{ "mpeg", "video/mpeg" },
+	{ "flv", "video/x-flv" },
+	{ "mp4", "video/mp4" },
+	{ "mkv", "video/x-matroska" },	
 	{ "asf", "application/x-asf" },
 	{ "rm", "video/vnd.rn-realvideo" },
+	{ "wmv", "video/x-ms-wmv" },
 
 	{ "bmp", "image/x-bmp" },
 	{ "fax", "image/g3fax" },
@@ -61,11 +73,21 @@ struct ext_mime mimes[] = {
 	{ "tif", "image/tiff" },
 	{ "tiff", "image/tiff" },
 	{ "xbm", "image/x-xbitmap" },
-	{ "djvu", "image/x-djvu" },	
+	{ "djvu", "image/x-djvu" },
+	{ "svg", "image/svg+xml" },
+	{ "ico", "image/vnd.microsoft.icon" },
 
+	{ "doc", "application/msword" },
+	{ "xls", "application/vnd.ms-excel" },
+	{ "xls", "application/vnd.ms-excel" },
+	{ "xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
+	{ "docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
+	{ "ppt", "application/vnd.ms-powerpoint" },
+	{ "pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation" },
+	{ "chm", "application/x-chm" },
+	
 	{ "txt", "text/plain" },
 	{ "xml", "text/plain" },
-	{ "doc", "text/plain" },
 	{ "htm", "text/html" },
 	{ "html", "text/html" },
 	{ "rtf", "text/rtf" },
@@ -74,15 +96,15 @@ struct ext_mime mimes[] = {
 	{ "c++", "text/x-source-code" },
 	{ "h", "text/x-source-code" },
 	{ "hh", "text/x-source-code" },
+	{ "hpp", "text/x-source-code" },
 	{ "cxx", "text/x-source-code" },
 	{ "cpp", "text/x-source-code" },
 	{ "S", "text/x-source-code" },
 	{ "java", "text/x-source-code" },
-	
-	{ "exe", "application/x-vnd.Be-elfexecutable" },
-	{ "dll", "application/x-vnd.Be.ELF-object" },	
-	
+	{ "ini", "text/plain" },
+	{ "inf", "text/plain" },
+		
 	{ "ttf", "application/x-truetype" },
 
-	{ 0, 0 }
+	{ NULL, NULL }
 };

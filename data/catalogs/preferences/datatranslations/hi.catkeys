@@ -1,0 +1,18 @@
+1	hindi	x-vnd.Haiku-DataTranslations	3820343452
+DataTranslations	System name		डेटा का अनुवाद
+Cancel	DataTranslations		रद्द करें
+Name:	DataTranslations		नाम:
+Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		नाम:%s \nसंस्करण: %ld.%ld.%ld\n\nजानकारी:\n%s\n\nपथ:\n%s\n
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		यह चीज '%name' अनुवादक प्रकट नहीं होता और स्थापित नहीं किया जाएगा.
+Could not install %s:\n%s	DataTranslations		%s स्थापित नहीं कर सका \n%s
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		इस नियंत्रण कक्ष का उपयोग करें अनुवादकों के लिए डिफ़ॉल्ट मूल्य सेट करने के लिए,इसका उपयोग जब करे जब कोई अन्य सेटिंग्स एक आवेदन के द्वारा निर्दिष्ट कर रहे हैं.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		एक आइटम '%name' अनुवादक फ़ोल्डर में पहले से ही मौजूद है! मौजूदा अनुवादक अधिलेखित हो?
+DataTranslations - Note	DataTranslations		डेटा अनुवाद - नोट
+Overwrite	DataTranslations		अधिलेखित
+Info:	DataTranslations		जानकारी:
+Info	DataTranslations		जानकारी
+Path:	DataTranslations		रास्ता:
+The new translator has been installed successfully.	DataTranslations		नया अनुवादक सफलतापूर्वक स्थापित हो गया है.
+DataTranslations - Error	DataTranslations		डेटा अनुवाद - त्रुटि
+OK	DataTranslations		ठीक है
+Version:	DataTranslations		संस्करण:

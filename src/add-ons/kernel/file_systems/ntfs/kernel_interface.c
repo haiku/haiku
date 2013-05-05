@@ -156,7 +156,7 @@ fs_vnode_ops gNTFSVnodeOps = {
 	&fs_read_attrib_stat,
 	NULL,	//&fs_write_attr_stat,
 	NULL,	//&fs_rename_attr,
-	NULL,	//&fs_remove_attr,
+	&fs_remove_attrib,
 };
 
 
@@ -168,9 +168,11 @@ static file_system_module_info sNTFSFileSystem = {
 		ntfs_std_ops,
 	},
 
-	"ntfs",						// short_name
-	"Windows NT File System",	// pretty_name
-	B_DISK_SYSTEM_SUPPORTS_WRITING,							// DDM flags
+	"ntfs",				// short_name
+	"NT File System",	// pretty_name
+	B_DISK_SYSTEM_SUPPORTS_INITIALIZING
+	| B_DISK_SYSTEM_SUPPORTS_CONTENT_NAME
+	| B_DISK_SYSTEM_SUPPORTS_WRITING,	// DDM flags
 
 	// scanning
 	fs_identify_partition,
@@ -179,6 +181,27 @@ static file_system_module_info sNTFSFileSystem = {
 	NULL,	// free_partition_content_cookie()
 
 	&fs_mount,
+	/* capability querying operations */
+	&fs_get_supported_operations,
+
+	NULL,	// validate_resize
+	NULL,	// validate_move
+	NULL,	// validate_set_content_name
+	NULL,	// validate_set_content_parameters
+	NULL,	// validate_initialize,
+
+	/* shadow partition modification */
+	NULL,	// shadow_changed
+
+	/* writing */
+	NULL,	// defragment
+	NULL,	// repair
+	NULL,	// resize
+	NULL,	// move
+	NULL,	// set_content_name
+	NULL,	// set_content_parameters
+	fs_initialize,
+	NULL	
 };
 
 

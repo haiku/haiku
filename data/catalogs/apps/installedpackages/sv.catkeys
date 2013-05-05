@@ -1,8 +1,8 @@
 1	swedish	x-vnd.Haiku-InstalledPackages	4131220089
-InstalledPackages	System name		InstalleradePaket
 No package selected.	UninstallView		Inget paket markerat.
-OK	UninstallView		OK
-Package description	UninstallView		Paketbeskrivning
 Remove	UninstallView		Ta bort
+Package description	UninstallView		Paketbeskrivning
+InstalledPackages	System name		InstalleradePaket
 The package you selected has been successfully removed from your system.	UninstallView		Paketet du valde har framgångsrikt tagits bort från ditt system.
+OK	UninstallView		OK
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Det valda paketet togs inte bort från ditt system. Den installerade paketinformationsfilen kan ha varit korrupt.

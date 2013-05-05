@@ -1,0 +1,8 @@
+1	croatian	x-vnd.Haiku-HPGSTranslator	1752058641
+Based on HPGS (http://hpgs.berlios.de)	ConfigView		Bazirano na HPGS (http://hpgs.berlios.de)
+HPGS image	HPGSTranslator		HPGS slika
+HPGS image translator	HPGSTranslator		HPGS prevoditelj slika
+HPGS images	ConfigView		HPGS slike
+HPGS images	HPGSTranslator		HPGS slike
+HPGSTranslator Settings	ConfigView		Postavke 	HPGST prevoditelja
+Version %d.%d.%d, %s	ConfigView		Verzija %d.%d.%d, %s

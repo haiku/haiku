@@ -1,0 +1,1502 @@
+/*
+ * Copyright 2013 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/Font.h	 hrev45178
+ *		src/kits/interface/Font.cpp	 hrev45178
+ */
+
+
+/*!
+	\file Font.h
+	\ingroup interface
+	\ingroup libbe
+	\brief BFont class definition, unicode_block class definition, and
+		font-related struct and enum definitions.
+*/
+
+
+/*!
+	\var B_CHAR_SPACING
+
+	Position each character without adjustment. Best mode for printing.
+*/
+
+
+/*!
+	\var B_STRING_SPACING
+
+	Optimizes the position of each character within it's space. Collisions
+	are unlikely but characters may touch each other. Best mode to use when
+	the screen needs to match what appears on the printed page.
+*/
+
+
+/*!
+	\var B_BITMAP_SPACING
+
+	The widths of the characters are chosen so that they never collide and
+	rarely touch. Best mode for drawing small amounts of text.
+*/
+
+
+/*!
+	\var B_FIXED_SPACING
+
+	Positions characters at a constant width. Best mode for fixed-width fonts.
+*/
+
+
+/*!
+	\enum font_direction
+	\ingroup interface
+
+	Determines the direction of the text rendered by the font,
+	left-to-right or right-to-left.
+*/
+
+
+/*!
+	\var font_direction B_FONT_LEFT_TO_RIGHT
+
+	Left to right.
+*/
+
+/*!
+	\var font_direction B_FONT_RIGHT_TO_LEFT
+
+	Right to left.
+*/
+
+
+/*!
+	\var B_DISABLE_ANTIALIASING
+
+	Disable antialiasing. Used by BFont::Flags() and BFont::SetFlags().
+*/
+
+
+/*!
+	\var B_FORCE_ANTIALIASING
+
+	Force antialiasing. Used by BFont::Flags() and BFont::SetFlags().
+*/
+
+
+/*!
+	\var B_TRUNCATE_END
+
+	Truncate from the end of the string.
+*/
+
+
+/*!
+	\var B_TRUNCATE_BEGINNING
+
+	Truncate from the beginning of the string.
+*/
+
+
+/*!
+	\var B_TRUNCATE_MIDDLE
+
+	Truncate from the middle of the string.
+*/
+
+
+/*!
+	\var B_TRUNCATE_SMART
+
+	Truncate while keeping each string unique.
+*/
+
+
+/*!
+	\var B_UNICODE_UTF8
+
+	UTF-8 font encoding.
+*/
+
+
+/*!
+	\var B_ISO_8859_1
+
+	ISO 8859-1 aka Latin 1 "Western European" font encoding.
+*/
+
+
+/*!
+	\var B_ISO_8859_2
+
+	ISO 8859-2 aka Latin 2 "Eastern European" font encoding.
+*/
+
+
+/*!
+	\var B_ISO_8859_3
+
+	ISO 8859-3 aka Latin 3 "South European" font encoding.
+*/
+
+
+/*!
+	\var B_ISO_8859_4
+
+	ISO 8859-4 aka Latin 4 "Northern European" font encoding.
+*/
+
+
+/*!
+	\var B_ISO_8859_5
+
+	ISO 8859-5 "Latin/Cyrillic" font encoding.
+*/
+
+
+/*!
+	\var B_ISO_8859_6
+
+	ISO 8859-6 "Latin/Arabic" font encoding.
+*/
+
+
+/*!
+	\var B_ISO_8859_7
+
+	ISO 8859-7 "Latin/Greek" font encoding.
+*/
+
+
+/*!
+	\var B_ISO_8859_8
+
+	ISO 8859-8 "Latin/Hebrew" font encoding.
+*/
+
+
+/*!
+	\var B_ISO_8859_9
+
+	ISO 8859-9 aka Latin 5 "Latin/Turkish" font encoding.
+*/
+
+
+/*!
+	\var B_ISO_8859_10
+
+	ISO 8859-10 aka Latin 6 "Nordic" font encoding.
+*/
+
+
+/*!
+	\var B_MACINTOSH_ROMAN
+
+	Macintosh Roman font encoding.
+*/
+
+
+/*!
+	\var B_HAS_TUNED_FONT
+
+	Flags for get_font_family() and get_font_style()
+*/
+
+
+/*!
+	\var B_IS_FIXED
+
+	flags for get_font_family() and get_font_style()
+*/
+
+
+/*!
+	\var B_ITALIC_FACE
+
+	Italic font face flag.
+*/
+
+
+/*!
+	\var B_UNDERSCORE_FACE
+
+	Underscore font face flag.
+*/
+
+
+/*!
+	\var B_NEGATIVE_FACE
+
+	Negative font face flag.
+*/
+
+
+/*!
+	\var B_OUTLINED_FACE
+
+	Outline font face flag.
+*/
+
+
+/*!
+	\var B_STRIKEOUT_FACE
+
+	Strikeout font face flag.
+*/
+
+
+/*!
+	\var B_BOLD_FACE
+
+	Bold font face flag.
+*/
+
+
+/*!
+	\var B_REGULAR_FACE
+
+	Regular font face flag.
+*/
+
+
+/*!
+	\var B_CONDENSED_FACE
+
+	Condensed font face flag. Not in BeOS 5.
+*/
+
+
+/*!
+	\var B_LIGHT_FACE
+
+	Light font face flag. Not in BeOS 5.
+*/
+
+
+/*!
+	\var B_HEAVY_FACE
+
+	Heavy font face flag. Not in BeOS 5.
+*/
+
+
+/*!
+	\enum font_metric_mode
+
+	Font metric mode, screen or printing.
+*/
+
+/*!
+	\var font_metric_mode B_SCREEN_METRIC
+
+	Screen font metric mode.
+*/
+
+/*!
+	\var font_metric_mode B_PRINTING_METRIC
+
+	Printing font metric mode.
+*/
+
+
+/*!
+	\enum font_file_format
+	\ingroup interface
+
+	Font file format, TrueType™ or PostScript™ Type1.
+
+	\see BFont::FileFormat()
+*/
+
+/*!
+	\var font_file_format B_TRUETYPE_WINDOWS
+
+	TrueType™ font file format.
+*/
+
+/*!
+	\var font_file_format B_POSTSCRIPT_TYPE1_WINDOWS
+
+	PostScript™ Type1 font file format.
+*/
+
+
+/*!
+	\class unicode_block
+	\ingroup interface
+	\ingroup libbe
+	\brief Describes the blocks of Unicode characters supported by a font.
+
+	\see BFont::Blocks()
+*/
+
+
+/*!
+	\fn unicode_block::unicode_block()
+	\brief Construct a \c unicode_block and set block data to 0.
+
+	You must initialize the block data before before using this object.
+*/
+
+
+/*!
+	\fn unicode_block::unicode_block(uint64 block2, uint64 block1)
+	\brief Construct a \c unicode_block object and initialize it with the
+		supplied Unicode block range.
+
+	\param block2 End block.
+	\param block1 Begin block.
+*/
+
+
+/*!
+	\fn bool unicode_block::Includes(const unicode_block& block) const
+	\brief Determines if \a block is a subset of the \c unicode_block object.
+
+	\param block The Unicode block to check.
+
+	\returns Whether or not \a block is a subset of the \c unicode_block
+		object.
+	\retval true \a block is a subset of the current \c unicode_block.
+	\retval false \a block is NOT a subset of the current \c unicode_block.
+*/
+
+
+/*!
+	\name Assignment operators
+*/
+
+
+//! @{
+
+
+/*!
+	\fn unicode_block unicode_block::operator&(const unicode_block& block) const
+	\brief Creates a new \c unicode_block object that is the intersection of
+		\a block and the \c unicode_block object.
+
+	\param block The Unicode block to intersect with.
+
+	\returns The intersection of \a block and the \c unicode_block object.
+*/
+
+
+/*!
+	\fn unicode_block unicode_block::operator|(const unicode_block& block) const
+	\brief Creates a new \c unicode_block object that is the union of \a block
+		and the \c unicode_block object.
+
+	\param block The Unicode block to form a union with.
+
+	\returns The union of \a block and the \c unicode_block object.
+*/
+
+
+/*!
+	\fn unicode_block& unicode_block::operator=(const unicode_block& block)
+	\brief Copies \a block data into the left-hand side object.
+
+	\param block The unicode block to copy from.
+
+	\returns A copy of \a block.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Comparison operators
+*/
+
+
+//! @{
+
+
+/*!
+	\fn bool unicode_block::operator==(const unicode_block& block) const
+	\brief Determines if the block object are exactly equal.
+
+	\param block The unicode block to compare against.
+
+	\returns \c true if the block object are exactly equal, \c false
+		otherwise.
+*/
+
+
+/*!
+	\fn bool unicode_block::operator!=(const unicode_block& block) const
+	\brief Determines if the block object are not equal.
+
+	\param block The unicode block to compare against.
+
+	\returns \c true if the block object are NOT equal, \c false
+		if the block objects are exactly equal.
+*/
+
+
+//! @}
+
+
+/*!
+	\struct edge_info
+	\ingroup interface
+	\ingroup libbe
+	\brief The distance that a character outline is inset from its escapement
+		boundaries.
+
+	Edge values, like escapements, need to be multiplied by the font size to
+	get the correct value for the font.
+
+	\see BFont::GetEdges()
+*/
+
+
+/*!
+	\var edge_info::left
+
+	The distance that the character outline is inset from the left
+	escapement boundary.
+*/
+
+
+/*!
+	\var edge_info::right
+
+	The distance that the character outline is inset from the right
+	escapement boundary.
+*/
+
+
+/*!
+	\struct font_height
+	\ingroup interface
+	\ingroup libbe
+	\brief The amount of vertical space surrounding a character.
+
+	\see BFont::GetHeight()
+*/
+
+
+/*!
+	\var font_height::ascent
+
+	The distance characters can ascend above the baseline.
+*/
+
+
+/*!
+	\var font_height::descent
+
+	The distance characters can descend below the baseline.
+*/
+
+
+/*!
+	\var font_height::leading
+
+	The distance between lines, descent above to ascent below.
+*/
+
+
+/*!
+	\struct escapement_delta
+	\ingroup interface
+	\ingroup libbe
+	\brief The amount of horizontal space surrounding a character.
+
+	Escapements need to be multiplied by the font size to get the correct
+	value for the font.
+
+	\see BFont::GetEscapements()
+*/
+
+
+/*!
+	\var escapement_delta::nonspace
+
+	The amount of space surrounding a character with a visible glyph.
+*/
+
+
+/*!
+	\var escapement_delta::space
+
+	The amount of space surrounding a whitespace character, for example
+	\c B_TAB and \c B_SPACE.
+*/
+
+
+/*!
+	\struct font_cache_info
+	\ingroup interface
+	\ingroup libbe
+	\brief Font cache parameters.
+*/
+
+
+/*!
+	\var font_cache_info::sheared_font_penalty
+
+	Sheared font penalty.
+*/
+
+
+/*!
+	\var font_cache_info::rotated_font_penalty
+
+	Rotated font penalty.
+*/
+
+
+/*!
+	\var font_cache_info::oversize_threshold
+
+	Oversize threshold.
+*/
+
+
+/*!
+	\var font_cache_info::oversize_penalty
+
+	Oversize penalty.
+*/
+
+/*!
+	\var font_cache_info::cache_size
+
+	Cache size.
+*/
+
+
+/*!
+	\var font_cache_info::spacing_size_threshold
+
+	Spacing size threshold.
+*/
+
+
+/*!
+	\struct tuned_font_info
+	\ingroup interface
+	\ingroup libbe
+	\brief Tuning information of fonts used to make it look better when
+		displayed on-screen.
+
+	\see BFont::GetTunedInfo()
+	\see BFont::CountTuned()
+*/
+
+
+/*!
+	\var tuned_font_info::size
+
+	Font size.
+*/
+
+
+/*!
+	\var tuned_font_info::shear
+
+	Font shear.
+*/
+
+
+/*!
+	\var tuned_font_info::rotation
+
+	Font rotation.
+*/
+
+
+/*!
+	\var tuned_font_info::flags
+
+	Font flags.
+*/
+
+/*!
+	\var tuned_font_info::face
+
+	Font face.
+*/
+
+
+/*!
+	\fn int32 count_font_families()
+	\brief Gets the number of installed font families
+
+	\return The number of installed font families
+*/
+
+
+/*!
+	\fn int32 count_font_styles(font_family family)
+	\brief Gets the number of styles available for a font family.
+
+	\return The number of styles available for a font family.
+*/
+
+
+/*!
+	\fn status_t get_font_family(int32 index, font_family *_name,
+		uint32 *_flags)
+	\brief Retrieves the family name at the specified index.
+
+	\param index Unique font identifier code.
+	\param _name font_family String to receive the name of the family.
+	\param _flags if non-<tt>NULL</tt>, the values of the flags \c IS_FIXED
+		and \c B_HAS_TUNED_FONT are returned.
+
+	\return A status code, \c B_OK on success or an error code.
+	\retval B_BAD_VALUE \a _name is \c NULL.
+	\retval B_ERROR \a index does not correspond to a font family.
+*/
+
+
+/*!
+	\fn status_t get_font_style(font_family family, int32 index,
+		font_style *_name, uint32 *_flags)
+	\brief Retrieves the family name at the specified index.
+
+	\param family The font family.
+	\param index Unique font identifier code.
+	\param _name string to receive the name of the family.
+	\param _flags if non-<tt>NULL</tt>, the values of the flags \c IS_FIXED
+		and \c B_HAS_TUNED_FONT are returned
+
+	\return A status code, \c B_OK on success or an error code.
+	\retval B_ERROR \a index does not correspond to a font style.
+*/
+
+
+/*!
+	\fn status_t get_font_style(font_family family, int32 index,
+		font_style *_name, uint16 *_face, uint32 *_flags)
+	\brief Retrieves the family name at the specified index.
+
+	The face value returned by this function is not very reliable. At the same
+	time, the value returned should be fairly reliable, returning the proper
+	flag for 90%-99% of font names.
+
+	\param family The font family.
+	\param index Unique font identifier code.
+	\param _name String to receive the name of the family.
+	\param _face recipient of font face value, such as \c B_REGULAR_FACE.
+	\param _flags if non-<tt>NULL</tt>, the values of the flags \c IS_FIXED
+		and \c B_HAS_TUNED_FONT are returned.
+
+	\return A status code, \c B_OK on success or an error code.
+	\retval B_ERROR \a index does not correspond to a font style.
+*/
+
+
+/*!
+	\fn bool update_font_families(bool checkOnly)
+	\brief Updates the font families list.
+
+	\param checkOnly Parameter is ignored.
+
+	\return \c true if the font list has changed, \c false if not.
+*/
+
+
+/*!
+	\class BFont
+	\ingroup interface
+	\ingroup libbe
+	\brief Represents a typeface including it's family, style and size.
+
+	The Interface Kit provides three prebuilt BFont objects which can be used
+	but not modified.
+	- \c const BFont* \c be_plain_font A plain font used by many controls.
+	- \c const BFont* \c be_bold_font A bold font used by titles.
+	- \c const BFont* \c be_fixed_font A fixed-width font.
+
+	A BFont object does nothing on it's own but is used in combination with
+	a view or control. Here is an example of creating a BFont object from a
+	system font and assigning it to a view:
+
+\code
+	BFont font(be_plain_font);
+	font.SetSize(12.0);
+	font.SetEncoding(B_ISO_8859_1);
+	view->SetFont(&font);
+\endcode
+
+	You may also create a BFont object from a view, modify it and reassign it
+	back to the view like this:
+
+\code
+	BFont font;
+	view->GetFont(&font);
+	font.SetFace(B_ITALIC_FACE);
+	font.SetSpacing(B_CHAR_SPACING);
+	myView->SetFont(&font);
+\endcode
+
+	You can change the way a font renders with the SetFamilyAndStyle(),
+	SetFamilyAndFace(), SetSize(), SetShear(), SetRotation(), 
+	SetFalseBoldWidth(), SetSpacing(), SetEncoding(), SetFace(), and
+	SetFlags() methods.
+
+	More information about the space taken up by a font can be determined
+	by querying a BFont object using the following methods:
+	StringWidth(), GetStringWidths() GetEscapements(), GetEdges(),
+	GetHeight(), BoundingBox() GetBoundingBoxesAsGlyphs(),
+	GetBoundingBoxesAsString(), and GetBoundingBoxesForStrings().
+
+	You can also perform intelligent string truncation with the
+	TruncateString() and GetTruncatedStrings() methods.
+*/
+
+
+/*!
+	\fn BFont::BFont()
+	\brief Creates a BFont object initialized to \c be_plain_font.
+
+	\see BView::GetFont()
+*/
+
+
+/*!
+	\fn BFont::BFont(const BFont &font)
+	\brief Creates and initializes a BFont object from another BFont object.
+
+	\param font The BFont object to initialize from.
+*/
+
+
+/*!
+	\fn BFont::BFont(const BFont *font)
+	\brief Creates and initializes a BFont object from a pointer to a BFont
+		object.
+
+	\param font The pointer to a BFont object to initialize from.
+*/
+
+
+/*!
+	\fn BFont::BFont(const BFont *font)
+	\brief Creates and initializes a BFont object from a pointer to a BFont
+		object.
+
+	\param font The pointer to a BFont object to initialize from.
+*/
+
+
+/*!
+	\fn status_t BFont::SetFamilyAndStyle(const font_family family,
+		const font_style style)
+	\brief Sets the font's family and style all at once.
+
+	\param family Font family to set.
+	\param style Font style to set.
+
+	\returns A status code, \c B_OK on success or an error code.
+	\retval B_BAD_VALUE \a family is \c NULL and \a style is \c NULL.
+	\retval B_NAME_NOT_FOUND Family or style do not exist.
+*/
+
+
+/*!
+	\fn void BFont::SetFamilyAndStyle(uint32 code)
+	\brief Sets the font's family and style from a font identifier.
+
+	\param code Unique font identifier obtained from the server.
+*/
+
+
+/*!
+	\fn status_t BFont::SetFamilyAndFace(const font_family family, uint16 face)
+	\brief Sets the font's family and face all at once.
+
+	\param family Font family to set.
+	\param face Font face to set.
+
+	\note To comply with the BeBook, this function will only set valid values,
+		i.e. passing a nonexistent family will cause only the face to be set.
+		Additionally, if a particular face does not exist in a family, the
+		closest match will be chosen.
+
+	\returns A status code, \c B_OK on success or an error code.
+	\retval B_ERROR Family does not exists or face has an invalid value.
+*/
+
+
+/*!
+	\fn void BFont::SetSize(float size)
+	\brief Sets the font size.
+
+	\param size The point size to set the font to.
+*/
+
+
+/*!
+	\fn void BFont::SetShear(float shear)
+	\brief Sets the angle in degrees relative to the baseline.
+
+	The default shear is 90.0° measured counterclockwise. The shear
+	range is from 45.0° to 135.0°.
+
+	\param shear The shear in degrees to set the font to.
+*/
+
+
+/*!
+	\fn void BFont::SetRotation(float rotation)
+	\brief Sets the font rotation from the baseline in degrees.
+
+	The default baseline is 0° and rotates counterclockwise. Rotation is not
+	supported by BTextView.
+
+	\param rotation The rotation in degrees to set the font to.
+*/
+
+
+/*!
+	\fn void BFont::SetFalseBoldWidth(float width)
+	\brief Sets the false bold width.
+
+	\param width The false bold width to set.
+*/
+
+
+/*!
+	\fn void BFont::SetSpacing(uint8 spacing)
+	\brief Sets how characters are horizontally spaced relative to each other.
+
+	- \c B_CHAR_SPACING Position each character without adjustment. Best mode
+		for printing. Characters may collide or overlap at small font sizes.
+	- \c B_STRING_SPACING Optimizes the position of each character within it's
+		space. Collisions are unlikely but characters may touch each other.
+		Best mode to use when the screen needs to match what appears on the
+		printed page. Adding new characters requires the entire string to
+		be redrawn.
+	- \c B_BITMAP_SPACING The widths of the characters are chosen so that they
+		never collide and rarely touch. Best mode for drawing small amounts
+		of text. Character widths are integral values. Spacing on screen will
+		not match spacing used by \c B_CHAR_SPACING mode for printing.
+	- \c B_FIXED_SPACING Positions characters at a constant width. Must be
+		used with fixed-width fonts otherwise \c B_CHAR_SPACING mode is used.
+		All characters have an identical integral escapement.
+
+	\c B_STRING_SPACING and \c B_BITMAP_SPACING modes are relevant only for
+	font sizes from 7.0pt to 18.0pt, above and below that range
+	\c B_CHAR_SPACING produces nicer results. \c B_CHAR_SPACING is also always
+	used for rotated or sheared text and when antialiasing is disabled.
+
+	\param spacing The spacing mode to set.
+
+	\see BView::DrawString()
+	\see GetEscapements()
+*/
+
+
+/*!
+	\fn void BFont::SetEncoding(uint8 encoding)
+	\brief Sets the character encoding of the font for example
+		\c B_UNICODE_UTF8 or \c B_ISO_8859_1.
+
+	The following character encodings are supported:
+	- \c B_UNICODE_UTF8
+	- \c B_ISO_8859_1 aka Latin 1 aka "Western European".
+	- \c B_ISO_8859_2 aka Latin 2 aka "Eastern European".
+	- \c B_ISO_8859_3 aka Latin 3 aka "South European".
+	- \c B_ISO_8859_4 aka Latin 4 aka "Northern European".
+	- \c B_ISO_8859_5 aka "Latin/Cyrillic".
+	- \c B_ISO_8859_6 aka "Latin/Arabic".
+	- \c B_ISO_8859_7 aka "Latin/Greek".
+	- \c B_ISO_8859_8 aka "Latin/Hebrew".
+	- \c B_ISO_8859_9 aka Latin 5 aka "Latin/Turkish".
+	- \c B_ISO_8859_10 aka Latin 6 aka "Nordic".
+	- \c B_MACINTOSH_ROMAN
+
+	\param encoding The character encoding to set the font to.
+*/
+
+
+/*!
+	\fn void BFont::SetFace(uint16 face)
+	\brief Sets the font face according to the flags set by \a face.
+
+	The following font face flags are supported:
+	- \c B_ITALIC_FACE Characters are slanted to the right.
+	- \c B_UNDERSCORE_FACE Characters are underlined.
+	- \c B_NEGATIVE_FACE High and low colors are reversed when drawing
+		characters.
+	- \c B_OUTLINED_FACE Characters are drawn hollowed out.
+	- \c B_STRIKEOUT_FACE A horizontal line is drawn through their middle.
+	- \c B_BOLD_FACE Characters are bold.
+	- \c B_REGULAR_FACE Characters are drawn normally.
+	- \c B_CONDENSED_FACE Characters are drawn condensed. Not in BeOS 5.
+ 	- \c B_LIGHT_FACE Characters are drawn thiner than normal. Not in BeOS 5.
+	- \c B_HEAVY_FACE Characters are drawn heavier than normal. Not in BeOS 5.
+
+	\param face The bitmap of font face flags to set.
+*/
+
+
+/*!
+	\fn void BFont::SetFlags(uint32 flags)
+	\brief Sets font flags controlling antialiasing.
+
+	The following flags are supported:
+	- \c B_DISABLE_ANTIALIASING Disable antialiasing.
+	- \c B_FORCE_ANTIALIASING Force antialiasing.
+
+	\param flags The bitmap of flags to set.
+*/
+
+
+/*!
+	\fn void BFont::GetFamilyAndStyle(font_family *family,
+		font_style *style) const
+	\brief Writes out the name of the font family and/or font style.
+
+	This method may be called with either \a family or \a style set to
+	\c NULL in order to get one or the other.
+
+	\param family A font_family pointer to be filled out.
+	\param style  A font_style pointer to be filled out.
+*/
+
+
+/*!
+	\fn uint32 BFont::FamilyAndStyle() const
+	\brief Gets the code of the font family and style combination.
+
+	\returns The family and style combination encoded as a unique integer.
+
+	\see SetFamilyAndStyle(uint32 code)
+*/
+
+
+/*!
+	\fn float BFont::Size() const
+	\brief Gets the font size.
+
+	\returns The font size in points.
+
+	\see SetSize()
+*/
+
+
+/*!
+	\fn float BFont::Shear() const
+	\brief Gets the font shear.
+
+	\returns The font shear as an angle from 45.0° to 135.0°.
+
+	\see SetShear()
+*/
+
+
+/*!
+	\fn float BFont::Rotation() const
+	\brief Gets the font rotation.
+
+	\returns The font rotation as an angle in degrees.
+
+	\see SetRotation()
+*/
+
+
+/*!
+	\fn float BFont::FalseBoldWidth() const
+	\brief Gets the width of the font as if it were bold.
+
+	\returns The font width of the bold font variety.
+
+	\see SetFalseBoldWidth()
+*/
+
+
+/*!
+	\fn uint8 BFont::Spacing() const
+	\brief Gets the spacing constant.
+
+	\returns The spacing constant.
+
+	\see SetSpacing()
+*/
+
+
+/*!
+	\fn uint8 BFont::Encoding() const
+	\brief Gets the character encoding constant.
+
+	\returns The character encoding constant.
+
+	\see SetEncoding()
+*/
+
+
+/*!
+	\fn uint16 BFont::Face() const
+	\brief Gets the font face flags bitmap.
+
+	\returns The font face flags bitmap.
+
+	\see SetFace()
+*/
+
+
+/*!
+	\fn uint32 BFont::Flags() const
+	\brief Gets the antialiasing flags.
+
+	\returns The antialiasing flags.
+
+	\see SetFlags()
+*/
+
+
+/*!
+	\fn font_direction BFont::Direction() const
+	\brief Gets the font direction, left-to-right or right-to left.
+
+	\returns The font direction.
+*/
+
+
+/*!
+	\fn bool BFont::IsFixed() const
+	\brief Gets whether or not the font is fixed width.
+
+	\returns \c true if the font is fixed width, \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BFont::IsFullAndHalfFixed() const
+	\brief Returns whether or not the font is fixed-width and contains both
+		full and half-width characters.
+
+	\note This was left unimplemented as of R5. It is a way to work with both
+		Kanji and Roman characters in the same fixed-width font.
+*/
+
+
+/*!
+	\fn BRect BFont::BoundingBox() const
+	\brief Gets a BRect that encloses the font text.
+
+	\returns A BRect that encloses the font text.
+*/
+
+
+/*!
+	\fn unicode_block BFont::Blocks() const
+	\brief Gets a \c unicode_block object that identifies the Unicode blocks
+		supported by this font face and family.
+
+	\attention Currently unimplemented, returns an empty \a unicode_block
+		object.
+
+	\returns A \c unicode_block object containing supported Unicode blocks.
+*/
+
+
+/*!
+	\fn font_file_format BFont::FileFormat() const
+	\brief Gets whether the font is a TrueType™ or PostScript™ Type1 font.
+
+	\returns A \c font_file_format struct containing the font file format.
+*/
+
+
+/*!
+	\fn int32 BFont::CountTuned() const
+	\brief Gets the number of tuned fonts for the font family and style.
+
+	\returns The number of tuned fonts.
+*/
+
+
+/*!
+	\fn void BFont::GetTunedInfo(int32 index, tuned_font_info *info) const
+	\brief Writes information about the tuned font at \a index into \a info.
+
+	The index begins at 0 and counts tuned fonts for current font family and
+	style only.
+
+	\param index The index of desired tuned font.
+	\param info The \a turned_font_info struct to be filled out.
+*/
+
+
+/*!
+	\fn void BFont::TruncateString(BString *inOut, uint32 mode,
+		float width) const
+	\brief Truncates \a inOut to be no longer than \a width using the
+		supplied truncation \a mode.
+
+	The following truncation modes are supported:
+	- \c B_TRUNCATE_BEGINNING Truncate from the beginning of the string.
+	- \c B_TRUNCATE_MIDDLE Truncate from the middle of the string.
+	- \c B_TRUNCATE_END Truncate from the end of the string.
+	- \c B_TRUNCATE_SMART Truncate from anywhere, but do so so that each
+		string is made unique after being truncated.
+
+	\param inOut The BString to truncate.
+	\param mode Truncation mode to use.
+	\param width The maximum width to truncate to.
+*/
+
+
+/*!
+	\fn void BFont::GetTruncatedStrings(const char *stringArray[],
+		int32 numStrings, uint32 mode, float width,
+		BString resultArray[]) const
+	\brief Write truncated BString objects to \a resultArray given source
+		BString objects in \a stringArray.
+
+	The following truncation modes are supported:
+	- \c B_TRUNCATE_BEGINNING Truncate from the beginning of the string.
+	- \c B_TRUNCATE_MIDDLE Truncate from the middle of the string.
+	- \c B_TRUNCATE_END Truncate from the end of the string.
+	- \c B_TRUNCATE_SMART Truncate from anywhere, but do so so that each
+		string is made unique after being truncated.
+
+	\param stringArray The source string array.
+	\param numStrings The number of strings in \a stringArray.
+	\param mode Truncation mode to use.
+	\param width The maximum width to truncate to.
+	\param resultArray The destination string array.
+*/
+
+
+/*!
+	\fn void BFont::GetTruncatedStrings(const char *stringArray[],
+		int32 numStrings, uint32 mode, float width, char *resultArray[]) const
+	\brief Write truncated strings to \a resultArray given source
+		BString objects in \a stringArray.
+
+	\a resultArray is an array of pointers to string buffers which should be
+	allocated ahead of time and should be at least 3 bytes longer than the
+	matching input string. The 3 extra bytes provide enough room for the
+	truncated output given that GetTruncatedStrings() truncates only a
+	single-byte character from the input string and replaces it with an
+	ellipsis character (which takes three bytes for the UTF-8 encoding),
+	and adds a \c NUL-terminator.
+
+	The following truncation modes are supported:
+	- \c B_TRUNCATE_BEGINNING Truncate from the beginning of the string.
+	- \c B_TRUNCATE_MIDDLE Truncate from the middle of the string.
+	- \c B_TRUNCATE_END Truncate from the end of the string.
+	- \c B_TRUNCATE_SMART Truncate from anywhere, but do so so that each
+		string is made unique after being truncated.
+
+	\param stringArray The source string array.
+	\param numStrings The number of strings in \a stringArray.
+	\param mode Truncation mode to use.
+	\param width The maximum width to truncate to.
+	\param resultArray The destination string array.
+*/
+
+
+/*!
+	\fn float BFont::StringWidth(const char *string) const
+	\brief Determines the amount of space required to draw \a string in the
+		current font.
+
+	\param string The source string.
+
+	\returns The width required to draw the string.
+*/
+
+
+/*!
+	\fn float BFont::StringWidth(const char *string, int32 length) const
+	\brief Determines the amount of space required to draw \a string in the
+		current font up to \a length characters.
+
+	\param string The source string.
+	\param length The number of characters in \a string to consider.
+
+	\returns The width required to draw the string.
+*/
+
+
+/*!
+	\fn void BFont::GetStringWidths(const char *stringArray[],
+		const int32 lengthArray[], int32 numStrings, float widthArray[]) const
+	\brief Determines the amount of space required to draw each string in
+		\a stringArray and writes the result in \a widthArray.
+
+	\param stringArray The source string array.
+	\param lengthArray The number of characters to consider for each string in
+		\a stringArray
+	\param numStrings The number of strings in \a stringArray.
+	\param widthArray The destination array to put the widths required to draw
+		each string.
+*/
+
+
+/*!
+	\fn void BFont::GetEscapements(const char charArray[], int32 numChars,
+		float escapementArray[]) const
+	\brief Determines the escapements for each char in \a charArray and writes
+		the result in \a escapementArray.
+
+	\param charArray The source character array.
+	\param numChars The number of characters to consider in \a charArray.
+	\param escapementArray The destination array to put the escapements.
+*/
+
+
+/*!
+	\fn void BFont::GetEscapements(const char charArray[], int32 numChars,
+		escapement_delta *delta, float escapementArray[]) const
+	\brief Determines the escapements for each char in \a charArray and writes
+		the result in \a escapementArray with consideration to the provided
+		escapement \a delta.
+
+	The escapement_delta structure contains the following values:
+	- \c nonspace The amount of space surrounding a character with a visible
+		glyph.
+	- \c space The amount of space surrounding a whitespace character, for
+		example \c B_TAB and \c B_SPACE.
+
+	\param charArray The source character array.
+	\param numChars The number of characters to consider in \a charArray.
+	\param delta The escapement_delta structure to use.
+	\param escapementArray The destination array to put the escapements.
+*/
+
+
+/*!
+	\fn void BFont::GetEscapements(const char charArray[], int32 numChars,
+		escapement_delta *delta, BPoint escapementArray[]) const
+	\brief Determines the escapements for each char in \a charArray and writes
+		the result in \a escapementArray as an array of BPoint objects
+		with consideration to the provided escapement \a delta.
+
+	The escapement_delta structure contains the following values:
+	- \c nonspace The amount of space surrounding a character with a visible
+		glyph.
+	- \c space The amount of space surrounding a whitespace character, for
+		example \c B_TAB and \c B_SPACE.
+
+	\param charArray The source character array.
+	\param numChars The number of characters to consider in \a charArray.
+	\param delta The escapement_delta structure to use.
+	\param escapementArray The destination array of escapements as BPoint
+		objects.
+*/
+
+
+/*!
+	\fn void BFont::GetEscapements(const char charArray[], int32 numChars,
+		escapement_delta *delta, BPoint escapementArray[],
+		BPoint offsetArray[]) const
+	\brief Determines the escapements for each char in \a charArray and writes
+		the result in \a escapementArray as an array of BPoint objects
+		with consideration to the provided escapement \a delta
+		and writes offsets to \a offsetArray.
+
+	The escapement_delta structure contains the following values:
+	- \c nonspace The amount of space surrounding a character with a visible
+		glyph.
+	- \c space The amount of space surrounding a whitespace character, for
+		example \c B_TAB and \c B_SPACE.
+
+	\param charArray The source character array.
+	\param numChars The number of characters to consider in \a charArray.
+	\param delta The escapement_delta structure to use.
+	\param escapementArray The destination array of escapements as BPoint
+		objects.
+	\param offsetArray The destination array of offsets as BPoint objects.
+*/
+
+
+/*!
+	\fn void BFont::GetEdges(const char charArray[], int32 numChars,
+		edge_info edgeArray[]) const
+	\brief Determines the edge information for each character in \a charArray
+		and writes the result in \a edgeArray.
+
+	The \c edge_info struct contains the following values:
+	- \c left The distance that the character outline is inset from the left
+		escapement boundary.
+	- \c right  The distance that the character outline is inset from the
+		right escapement boundary.
+
+	\param charArray The source character array.
+	\param numChars The number of characters to consider in \a charArray.
+	\param edgeArray The destination array of \c edge_info structs.
+*/
+
+
+/*!
+	\fn void BFont::GetHeight(font_height *_height) const
+	\brief Fills out the \c font_height struct with the amount of vertical
+		space surrounding a character.
+
+	The \c font_height struct contains the following values:
+	- \c ascent The distance characters can ascend above the baseline.
+	- \c descent The distance characters can descend below the baseline.
+	- \c leading The distance between lines, descent above to ascent below.
+
+	\param _height The \c font_height struct to fill out.
+*/
+
+
+/*!
+	\fn void BFont::GetBoundingBoxesAsGlyphs(const char charArray[],
+		int32 numChars, font_metric_mode mode, BRect boundingBoxArray[]) const
+	\brief Writes an array of BRect objects to \a boundingBoxArray
+		representing the bounding rectangles of each character in
+		\a charArray.
+
+	Each BRect object corresponds to the glyph of one character.
+
+	The \c font_metric_mode should contain one of the following values:
+	- \c B_SCREEN_METRIC The bounding boxes should use the screen metric.
+	- \c B_PRINTING_METRIC The bounding boxes should use the print metric.
+
+	\param charArray The source character array.
+	\param numChars The number of characters to consider in \a charArray.
+	\param mode The \c font_metric_mode to use, screen or printing.
+	\param boundingBoxArray The destination array of BRect bounding boxes.
+*/
+
+
+/*!
+	\fn void BFont::GetBoundingBoxesAsString(const char charArray[],
+		int32 numChars, font_metric_mode mode, escapement_delta *delta,
+		BRect boundingBoxArray[]) const
+	\brief Writes an array of BRect objects to \a boundingBoxArray
+		representing the bounding rectangles of each character in
+		\a charArray with consideration to the provided escapement
+		\a delta.
+
+	Each BRect object corresponds to the glyph of one character.
+
+	The \c font_metric_mode should contain one of the following values:
+	- \c B_SCREEN_METRIC The bounding boxes should use the screen metric.
+	- \c B_PRINTING_METRIC The bounding boxes should use the print metric.
+
+	Escapement deltas are applied as part of the bounding box calculations.
+	This lets you specify a character spacing is looser or tighter than
+	normal.
+
+	The escapement_delta structure contains the following values:
+	- \c nonspace The amount of space surrounding a character with a visible
+		glyph.
+	- \c space The amount of space surrounding a whitespace character, for
+		example \c B_TAB and \c B_SPACE.
+
+	\param charArray The source character array.
+	\param numChars The number of characters to consider in \a charArray.
+	\param mode The \c font_metric_mode to use, screen or printing.
+	\param delta The escapement_delta structure to use.
+	\param boundingBoxArray The destination array of BRect bounding boxes.
+*/
+
+
+/*!
+	\fn void BFont::GetBoundingBoxesForStrings(const char *stringArray[],
+		int32 numStrings, font_metric_mode mode, escapement_delta deltas[],
+		BRect boundingBoxArray[]) const
+	\brief Writes an array of BRect objects to \a boundingBoxArray
+		representing the bounding rectangles of each string in
+		\a stringArray with consideration to the provided escapement
+		\a delta.
+
+	Each BRect object corresponds to the bounding box of the entire string.
+
+	The \c font_metric_mode should contain one of the following values:
+	- \c B_SCREEN_METRIC The bounding boxes should use the screen metric.
+	- \c B_PRINTING_METRIC The bounding boxes should use the print metric.
+
+	Escapement deltas are applied as part of the bounding box calculations.
+	This lets you specify a character spacing is looser or tighter than
+	normal.
+
+	The escapement_delta structures should contain the following values:
+	- \c nonspace The amount of space surrounding a character with a visible
+		glyph.
+	- \c space The amount of space surrounding a whitespace character, for
+		example \c B_TAB and \c B_SPACE.
+
+	\param stringArray The source string array.
+	\param numStrings The number of strings to consider in \a stringArray.
+	\param mode The \c font_metric_mode to use, screen or printing.
+	\param deltas The array of escapement_delta structures to use.
+	\param boundingBoxArray The destination array of BRect bounding boxes.
+*/
+
+
+/*!
+	void BFont::GetGlyphShapes(const char charArray[], int32 numChars,
+		BShape *glyphShapeArray[]) const
+	\brief Writes an array of BShape objects to \a glyphShapeArray
+		representing the glyph shapes of each character in
+		\a charArray.
+
+	Each BShape object corresponds to the glyph of one character.
+
+	\param charArray The source character array.
+	\param numChars The number of characters to consider in \a charArray.
+	\param glyphShapeArray The destination array of BShape glyphs.
+*/
+
+
+/*!
+	void BFont::GetHasGlyphs(const char charArray[], int32 numChars,
+		bool hasArray[]) const
+	\brief Fills out \a hasArray with whether or not each characters in
+		\a charArray has a glyph for the font.
+
+	\c true is written in \a hasArray if the character has a glyph in the
+	current font and \c false is written in \a hasArray if the character
+	does NOT have a glyph in the current font.
+
+	\param charArray The source character array.
+	\param numChars The number of characters to consider in \a charArray.
+	\param hasArray The destination array of booleans.
+*/
+
+
+/*!
+	BFont& BFont::operator=(const BFont &font)
+	\brief Assignment overload method.
+
+	\param font The BFont object to assign from.
+*/
+
+
+/*!
+	bool BFont::operator==(const BFont &font) const
+	\brief Equality comparison overload method.
+
+	\param font The BFont object to compare the current font to.
+
+	\returns \c true if the fonts objects are identical, \c false otherwise.
+*/
+
+
+/*!
+	bool BFont::operator!=(const BFont &font) const
+	\brief Inequality comparison overload method.
+
+	\param font The BFont object to compare the current font to.
+
+	\returns \c true if the fonts objects are NOT identical, \c true
+		otherwise.
+*/
+
+
+/*!
+	void BFont::PrintToStream() const
+	\brief Writes information about the font to \c stdout.
+
+	printf("BFont { %s (%d), %s (%d) 0x%x %f/%f %fpt (%f %f %f), %d }\n",
+		family, fFamilyID, style, fStyleID, fFace, fShear, fRotation, fSize,
+		fHeight.ascent, fHeight.descent, fHeight.leading, fEncoding);
+*/

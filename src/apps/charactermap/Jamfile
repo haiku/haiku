@@ -11,7 +11,7 @@ Application CharacterMap :
 	UnicodeBlocks.cpp
 	UnicodeBlockView.cpp
 
-	: be locale $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: be $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: CharacterMap.rdef
 	;
 

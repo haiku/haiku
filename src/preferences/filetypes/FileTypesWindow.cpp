@@ -24,8 +24,6 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <ControlLook.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayoutBuilder.h>
 #include <LayoutBuilder.h>
 #include <ListView.h>
 #include <Locale.h>
@@ -48,8 +46,8 @@
 #include <stdlib.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "FileTypes Window"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "FileTypes Window"
 
 
 const uint32 kMsgTypeSelected = 'typs';
@@ -404,12 +402,11 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 	fIconView = new TypeIconView("icon");
 	fIconBox = new BBox("Icon BBox");
 	fIconBox->SetLabel(B_TRANSLATE("Icon"));
-	fIconBox->AddChild(BGroupLayoutBuilder(B_VERTICAL, padding)
-		.Add(BSpaceLayoutItem::CreateGlue(), 1)
+	BLayoutBuilder::Group<>(fIconBox, B_VERTICAL, padding)
+		.SetInsets(padding)
+		.AddGlue(1)
 		.Add(fIconView, 3)
-		.Add(BSpaceLayoutItem::CreateGlue(), 1)
-		.SetInsets(padding, padding, padding, padding)
-		.TopView());
+		.AddGlue(1);
 
 	// "File Recognition" group
 
@@ -443,16 +440,13 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 	fRuleControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	fRuleControl->Hide();
 
-	BGridView* recognitionBoxGrid = new BGridView(padding, padding / 2);
-	BGridLayoutBuilder(recognitionBoxGrid)
+	BLayoutBuilder::Grid<>(fRecognitionBox, padding, padding / 2)
+		.SetInsets(padding, padding * 2, padding, padding)
 		.Add(fExtensionLabel->LabelView(), 0, 0)
-		.Add(scrollView, 0, 1, 2, 3)
+		.Add(scrollView, 0, 1, 2, 2)
 		.Add(fAddExtensionButton, 2, 1)
 		.Add(fRemoveExtensionButton, 2, 2)
-		.Add(fRuleControl, 0, 4, 3, 1)
-		.SetInsets(padding, padding, padding, padding);
-
-	fRecognitionBox->AddChild(recognitionBoxGrid);
+		.Add(fRuleControl, 0, 3, 3, 1);
 
 	// "Description" group
 
@@ -467,15 +461,14 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 	fDescriptionControl = new BTextControl("description",
 		B_TRANSLATE("Description:"), "", new BMessage(kMsgDescriptionEntered));
 
-	fDescriptionBox->AddChild(BGridLayoutBuilder(padding / 2, padding / 2)
+	BLayoutBuilder::Grid<>(fDescriptionBox, padding / 2, padding / 2)
+		.SetInsets(padding, padding * 2, padding, padding)
 		.Add(fInternalNameView->LabelView(), 0, 0)
 		.Add(fInternalNameView->TextView(), 1, 0)
 		.Add(fTypeNameControl->CreateLabelLayoutItem(), 0, 1)
 		.Add(fTypeNameControl->CreateTextViewLayoutItem(), 1, 1, 2)
 		.Add(fDescriptionControl->CreateLabelLayoutItem(), 0, 2)
-		.Add(fDescriptionControl->CreateTextViewLayoutItem(), 1, 2, 2)
-		.SetInsets(padding, padding, padding, padding)
-		.View());
+		.Add(fDescriptionControl->CreateTextViewLayoutItem(), 1, 2, 2);
 
 	// "Preferred Application" group
 
@@ -496,12 +489,11 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 		B_TRANSLATE("Same as" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgSamePreferredAppAs));
 
-	fPreferredBox->AddChild(BGroupLayoutBuilder(B_HORIZONTAL, padding)
+	BLayoutBuilder::Group<>(fPreferredBox, B_HORIZONTAL, padding)
+		.SetInsets(padding, padding * 2, padding, padding)
 		.Add(fPreferredField)
 		.Add(fSelectButton)
-		.Add(fSameAsButton)
-		.SetInsets(padding, padding, padding, padding)
-		.TopView());
+		.Add(fSameAsButton);
 
 	// "Extra Attributes" group
 
@@ -536,23 +528,22 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 	BScrollView* attributesScroller = new BScrollView("scrollview attr",
 		fAttributeListView, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
 
-	fAttributeBox->AddChild(BGroupLayoutBuilder(B_HORIZONTAL, padding)
+	BLayoutBuilder::Group<>(fAttributeBox, B_HORIZONTAL, padding)
+		.SetInsets(padding, padding * 2, padding, padding)
 		.Add(attributesScroller, 1.0f)
 		.AddGroup(B_VERTICAL, padding / 2, 0.0f)
+			.SetInsets(0)
 			.Add(fAddAttributeButton)
 			.Add(fRemoveAttributeButton)
 			.AddStrut(padding)
 			.Add(fMoveUpAttributeButton)
 			.Add(fMoveDownAttributeButton)
-			.AddGlue()
-		.End()
-		.SetInsets(padding, padding, padding, padding)
-		.TopView());
+			.AddGlue();
 
 	fMainSplitView = new BSplitView(B_HORIZONTAL, floorf(padding / 2));
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
-		.SetInsets(0, 0, 0, 0)
+		.SetInsets(0)
 		.Add(menuBar)
 		.AddGroup(B_HORIZONTAL, 0)
 			.SetInsets(padding, padding, padding, padding)
@@ -688,12 +679,14 @@ FileTypesWindow::MessageReceived(BMessage* message)
 					"group, hold down the Shift key and press \"Remove\"."),
 					B_TRANSLATE("Remove"), B_SHIFT_KEY, B_TRANSLATE("Cancel"),
 					0, NULL, 0, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+				alert->SetShortcut(1, B_ESCAPE);
 			} else {
 				alert = new BAlert(B_TRANSLATE("FileTypes request"),
 					B_TRANSLATE("Removing a file type cannot be reverted.\n"
 					"Are you sure you want to remove it?"),
 					B_TRANSLATE("Remove"), B_TRANSLATE("Cancel"),
 					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				alert->SetShortcut(1, B_ESCAPE);
 			}
 			if (alert->Go())
 				break;
@@ -972,7 +965,7 @@ FileTypesWindow::QuitRequested()
 {
 	BMessage update(kMsgSettingsChanged);
 	update.AddRect("file_types_frame", Frame());
-	update.AddFloat("left_split_weight", fMainSplitView->ItemWeight(0L));
+	update.AddFloat("left_split_weight", fMainSplitView->ItemWeight((int32)0));
 	update.AddFloat("right_split_weight", fMainSplitView->ItemWeight(1));
 	be_app_messenger.SendMessage(&update);
 

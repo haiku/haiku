@@ -19,6 +19,7 @@
 #include <TabView.h>
 
 #include "BaseView.h"
+#include "ClockView.h"
 #include "DateTimeView.h"
 #include "NetworkTimeView.h"
 #include "TimeMessages.h"
@@ -26,8 +27,8 @@
 #include "ZoneView.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Time"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Time"
 
 TTimeWindow::TTimeWindow()
 	:
@@ -79,6 +80,7 @@ TTimeWindow::MessageReceived(BMessage* message)
 			fDateTimeView->MessageReceived(message);
 			fTimeZoneView->MessageReceived(message);
 			fNetworkTimeView->MessageReceived(message);
+			fClockView->MessageReceived(message);
 			fRevertButton->SetEnabled(false);
 			break;
 
@@ -92,7 +94,13 @@ TTimeWindow::MessageReceived(BMessage* message)
 			_SetRevertStatus();
 			break;
 
-		case kMsgClockSettingChanged:
+		case kSelectClockTab:
+			// focus the clock tab (last one)
+			fTabView->Select(fTabView->CountTabs() - 1);
+			break;
+
+		case kShowHideTime:
+			fClockView->MessageReceived(message);
 			break;
 
 		default:
@@ -110,17 +118,19 @@ TTimeWindow::_InitWindow()
 	fDateTimeView = new DateTimeView(B_TRANSLATE("Date and time"));
 	fTimeZoneView = new TimeZoneView(B_TRANSLATE("Time zone"));
 	fNetworkTimeView = new NetworkTimeView(B_TRANSLATE("Network time"));
+	fClockView = new ClockView(B_TRANSLATE("Clock"));
 
 	fBaseView = new TTimeBaseView("baseView");
 	fBaseView->StartWatchingAll(fDateTimeView);
 	fBaseView->StartWatchingAll(fTimeZoneView);
 
-	BTabView* tabView = new BTabView("tabView");
-	tabView->AddTab(fDateTimeView);
-	tabView->AddTab(fTimeZoneView);
-	tabView->AddTab(fNetworkTimeView);
+	fTabView = new BTabView("tabView");
+	fTabView->AddTab(fDateTimeView);
+	fTabView->AddTab(fTimeZoneView);
+	fTabView->AddTab(fNetworkTimeView);
+	fTabView->AddTab(fClockView);
 
-	fBaseView->AddChild(tabView);
+	fBaseView->AddChild(fTabView);
 
 	fRevertButton = new BButton("revert", B_TRANSLATE("Revert"),
 		new BMessage(kMsgRevert));
@@ -129,10 +139,11 @@ TTimeWindow::_InitWindow()
 	fRevertButton->SetExplicitAlignment(
 		BAlignment(B_ALIGN_LEFT, B_ALIGN_MIDDLE));
 
-	BLayoutBuilder::Group<>(this, B_VERTICAL, 5)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_DEFAULT_SPACING)
 		.Add(fBaseView)
 		.Add(fRevertButton)
-		.SetInsets(5, 5, 5, 5);
+		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
+			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
 }
 
 
@@ -168,5 +179,6 @@ TTimeWindow::_SetRevertStatus()
 {
 	fRevertButton->SetEnabled(fDateTimeView->CheckCanRevert()
 		|| fTimeZoneView->CheckCanRevert()
-		|| fNetworkTimeView->CheckCanRevert());
+		|| fNetworkTimeView->CheckCanRevert()
+		|| fClockView->CheckCanRevert());
 }

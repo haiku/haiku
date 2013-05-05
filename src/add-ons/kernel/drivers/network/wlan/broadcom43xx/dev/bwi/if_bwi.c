@@ -1,13 +1,13 @@
 /*
  * Copyright (c) 2007 The DragonFly Project.  All rights reserved.
- *
+ * 
  * This code is derived from software contributed to The DragonFly Project
  * by Sepherosa Ziehau <sepherosa@gmail.com>
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- *
+ * 
  * 1. Redistributions of source code must retain the above copyright
  *    notice, this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright
@@ -17,7 +17,7 @@
  * 3. Neither the name of The DragonFly Project nor the names of its
  *    contributors may be used to endorse or promote products derived
  *    from this software without specific, prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -30,7 +30,7 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- *
+ * 
  * $DragonFly: src/sys/dev/netif/bwi/if_bwi.c,v 1.19 2008/02/15 11:15:38 sephe Exp $
  */
 
@@ -52,7 +52,7 @@ __FBSDID("$FreeBSD$");
 #include <sys/sysctl.h>
 #include <sys/systm.h>
 #include <sys/taskqueue.h>
-
+ 
 #include <net/if.h>
 #include <net/if_dl.h>
 #include <net/if_media.h>
@@ -70,7 +70,7 @@ __FBSDID("$FreeBSD$");
 #include <net/bpf.h>
 
 #ifdef INET
-#include <netinet/in.h>
+#include <netinet/in.h> 
 #include <netinet/if_ether.h>
 #endif
 
@@ -96,9 +96,9 @@ struct bwi_myaddr_bssid {
 } __packed;
 
 static struct ieee80211vap *bwi_vap_create(struct ieee80211com *,
-		   const char [IFNAMSIZ], int, int, int,
-		   const uint8_t [IEEE80211_ADDR_LEN],
-		   const uint8_t [IEEE80211_ADDR_LEN]);
+		    const char [IFNAMSIZ], int, enum ieee80211_opmode, int,
+		    const uint8_t [IEEE80211_ADDR_LEN],
+		    const uint8_t [IEEE80211_ADDR_LEN]);
 static void	bwi_vap_delete(struct ieee80211vap *);
 static void	bwi_init(void *);
 static int	bwi_ioctl(struct ifnet *, u_long, caddr_t);
@@ -106,7 +106,7 @@ static void	bwi_start(struct ifnet *);
 static void	bwi_start_locked(struct ifnet *);
 static int	bwi_raw_xmit(struct ieee80211_node *, struct mbuf *,
 			const struct ieee80211_bpf_params *);
-static void	bwi_watchdog(struct ifnet *);
+static void	bwi_watchdog(void *);
 static void	bwi_scan_start(struct ieee80211com *);
 static void	bwi_set_channel(struct ieee80211com *);
 static void	bwi_scan_end(struct ieee80211com *);
@@ -118,8 +118,7 @@ static void	bwi_calibrate(void *);
 
 static int	bwi_calc_rssi(struct bwi_softc *, const struct bwi_rxbuf_hdr *);
 static int	bwi_calc_noise(struct bwi_softc *);
-static __inline uint8_t bwi_ofdm_plcp2rate(const uint32_t *);
-static __inline uint8_t bwi_ds_plcp2rate(const struct ieee80211_ds_plcp_hdr *);
+static __inline uint8_t bwi_plcp2rate(uint32_t, enum ieee80211_phytype);
 static void	bwi_rx_radiotap(struct bwi_softc *, struct mbuf *,
 			struct bwi_rxbuf_hdr *, const void *, int, int, int);
 
@@ -221,7 +220,7 @@ static const struct {
 } bwi_bbpid_map[] = {
 	{ 0x4301, 0x4301, 0x4301 },
 	{ 0x4305, 0x4307, 0x4307 },
-	{ 0x4403, 0x4403, 0x4402 },
+	{ 0x4402, 0x4403, 0x4402 },
 	{ 0x4610, 0x4615, 0x4610 },
 	{ 0x4710, 0x4715, 0x4710 },
 	{ 0x4720, 0x4725, 0x4309 }
@@ -461,10 +460,10 @@ bwi_attach(struct bwi_softc *sc)
 	ifp->if_init = bwi_init;
 	ifp->if_ioctl = bwi_ioctl;
 	ifp->if_start = bwi_start;
-	ifp->if_watchdog = bwi_watchdog;
 	IFQ_SET_MAXLEN(&ifp->if_snd, ifqmaxlen);
 	ifp->if_snd.ifq_drv_maxlen = ifqmaxlen;
 	IFQ_SET_READY(&ifp->if_snd);
+	callout_init_mtx(&sc->sc_watchdog_timer, &sc->sc_mtx, 0);
 
 	/*
 	 * Setup ratesets, phytype, channels and get MAC address
@@ -537,11 +536,11 @@ bwi_attach(struct bwi_softc *sc)
 	/*
 	 * Add sysctl nodes
 	 */
-	SYSCTL_ADD_UINT(device_get_sysctl_ctx(dev),
+	SYSCTL_ADD_INT(device_get_sysctl_ctx(dev),
 		        SYSCTL_CHILDREN(device_get_sysctl_tree(dev)), OID_AUTO,
 		        "fw_version", CTLFLAG_RD, &sc->sc_fw_version, 0,
 		        "Firmware version");
-	SYSCTL_ADD_UINT(device_get_sysctl_ctx(dev),
+	SYSCTL_ADD_INT(device_get_sysctl_ctx(dev),
 		        SYSCTL_CHILDREN(device_get_sysctl_tree(dev)), OID_AUTO,
 		        "led_idle", CTLFLAG_RW, &sc->sc_led_idle, 0,
 		        "# ticks before LED enters idle state");
@@ -577,6 +576,7 @@ bwi_detach(struct bwi_softc *sc)
 	bwi_stop(sc, 1);
 	callout_drain(&sc->sc_led_blink_ch);
 	callout_drain(&sc->sc_calib_ch);
+	callout_drain(&sc->sc_watchdog_timer);
 	ieee80211_ifdetach(ic);
 
 	for (i = 0; i < sc->sc_nmac; ++i)
@@ -591,10 +591,10 @@ bwi_detach(struct bwi_softc *sc)
 }
 
 static struct ieee80211vap *
-bwi_vap_create(struct ieee80211com *ic,
-	const char name[IFNAMSIZ], int unit, int opmode, int flags,
-	const uint8_t bssid[IEEE80211_ADDR_LEN],
-	const uint8_t mac[IEEE80211_ADDR_LEN])
+bwi_vap_create(struct ieee80211com *ic, const char name[IFNAMSIZ], int unit,
+    enum ieee80211_opmode opmode, int flags,
+    const uint8_t bssid[IEEE80211_ADDR_LEN],
+    const uint8_t mac[IEEE80211_ADDR_LEN])
 {
 	struct bwi_vap *bvp;
 	struct ieee80211vap *vap;
@@ -1288,6 +1288,7 @@ bwi_init_statechg(struct bwi_softc *sc, int statechg)
 	sc->sc_flags &= ~BWI_F_STOP;
 
 	ifp->if_drv_flags |= IFF_DRV_RUNNING;
+	callout_reset(&sc->sc_watchdog_timer, hz, bwi_watchdog, sc);
 
 	/* Enable intrs */
 	bwi_enable_intrs(sc, BWI_INIT_INTRS);
@@ -1426,7 +1427,7 @@ bwi_start_locked(struct ifnet *ifp)
 	tbd->tbd_idx = idx;
 
 	if (trans)
-		ifp->if_timer = 5;
+		sc->sc_tx_timer = 5;
 }
 
 static int
@@ -1467,7 +1468,7 @@ bwi_raw_xmit(struct ieee80211_node *ni, struct mbuf *m,
 		if (++tbd->tbd_used + BWI_TX_NSPRDESC >= BWI_TX_NDESC)
 			ifp->if_drv_flags |= IFF_DRV_OACTIVE;
 		tbd->tbd_idx = (idx + 1) % BWI_TX_NDESC;
-		ifp->if_timer = 5;
+		sc->sc_tx_timer = 5;
 	} else {
 		/* NB: m is reclaimed on encap failure */
 		ieee80211_free_node(ni);
@@ -1478,17 +1479,20 @@ bwi_raw_xmit(struct ieee80211_node *ni, struct mbuf *m,
 }
 
 static void
-bwi_watchdog(struct ifnet *ifp)
+bwi_watchdog(void *arg)
 {
-	struct bwi_softc *sc = ifp->if_softc;
+	struct bwi_softc *sc;
+	struct ifnet *ifp;
 
-	BWI_LOCK(sc);
-	if ((ifp->if_drv_flags & IFF_DRV_RUNNING)) {
+	sc = arg;
+	ifp = sc->sc_ifp;
+	BWI_ASSERT_LOCKED(sc);
+	if (sc->sc_tx_timer != 0 && --sc->sc_tx_timer == 0) {
 		if_printf(ifp, "watchdog timeout\n");
 		ifp->if_oerrors++;
 		taskqueue_enqueue(sc->sc_tq, &sc->sc_restart_task);
 	}
-	BWI_UNLOCK(sc);
+	callout_reset(&sc->sc_watchdog_timer, hz, bwi_watchdog, sc);
 }
 
 static void
@@ -1544,7 +1548,7 @@ bwi_stop_locked(struct bwi_softc *sc, int statechg)
 		bwi_bbp_power_off(sc);
 
 	sc->sc_tx_timer = 0;
-	ifp->if_timer = 0;
+	callout_stop(&sc->sc_watchdog_timer);
 	ifp->if_drv_flags &= ~(IFF_DRV_RUNNING | IFF_DRV_OACTIVE);
 }
 
@@ -1800,7 +1804,7 @@ bwi_newstate(struct ieee80211vap *vap, enum ieee80211_state nstate, int arg)
 			 * the same AP, this will reinialize things
 			 * correctly...
 			 */
-			if (ic->ic_opmode == IEEE80211_M_STA &&
+			if (ic->ic_opmode == IEEE80211_M_STA && 
 			    !(sc->sc_flags & BWI_F_STOP))
 				bwi_set_bssid(sc, bwi_zero_addr);
 		}
@@ -2630,7 +2634,7 @@ bwi_rxeof(struct bwi_softc *sc, int end_idx)
 		struct ieee80211_frame_min *wh;
 		struct ieee80211_node *ni;
 		struct mbuf *m;
-		const void *plcp;
+		uint32_t plcp;
 		uint16_t flags2;
 		int buflen, wh_ofs, hdr_extra, rssi, noise, type, rate;
 
@@ -2660,7 +2664,7 @@ bwi_rxeof(struct bwi_softc *sc, int end_idx)
 			goto next;
 		}
 
-		plcp = ((const uint8_t *)(hdr + 1) + hdr_extra);
+	        bcopy((uint8_t *)(hdr + 1) + hdr_extra, &plcp, sizeof(plcp));	
 		rssi = bwi_calc_rssi(sc, hdr);
 		noise = bwi_calc_noise(sc);
 
@@ -2669,13 +2673,13 @@ bwi_rxeof(struct bwi_softc *sc, int end_idx)
 		m_adj(m, sizeof(*hdr) + wh_ofs);
 
 		if (htole16(hdr->rxh_flags1) & BWI_RXH_F1_OFDM)
-			rate = bwi_ofdm_plcp2rate(plcp);
+			rate = bwi_plcp2rate(plcp, IEEE80211_T_OFDM);
 		else
-			rate = bwi_ds_plcp2rate(plcp);
+			rate = bwi_plcp2rate(plcp, IEEE80211_T_CCK);
 
 		/* RX radio tap */
 		if (ieee80211_radiotap_active(ic))
-			bwi_rx_radiotap(sc, m, hdr, plcp, rate, rssi, noise);
+			bwi_rx_radiotap(sc, m, hdr, &plcp, rate, rssi, noise);
 
 		m_adj(m, -IEEE80211_CRC_LEN);
 
@@ -3397,7 +3401,7 @@ _bwi_txeof(struct bwi_softc *sc, uint16_t tx_id, int acked, int data_txcnt)
 	tb->tb_mbuf = NULL;
 
 	if (tbd->tbd_used == 0)
-		ifp->if_timer = 0;
+		sc->sc_tx_timer = 0;
 
 	ifp->if_drv_flags &= ~IFF_DRV_OACTIVE;
 }
@@ -3803,20 +3807,10 @@ bwi_calc_noise(struct bwi_softc *sc)
 }
 
 static __inline uint8_t
-bwi_ofdm_plcp2rate(const uint32_t *plcp0)
+bwi_plcp2rate(const uint32_t plcp0, enum ieee80211_phytype type)
 {
-	uint32_t plcp;
-	uint8_t plcp_rate;
-
-	plcp = le32toh(*plcp0);
-	plcp_rate = __SHIFTOUT(plcp, IEEE80211_OFDM_PLCP_RATE_MASK);
-	return ieee80211_plcp2rate(plcp_rate, IEEE80211_T_OFDM);
-}
-
-static __inline uint8_t
-bwi_ds_plcp2rate(const struct ieee80211_ds_plcp_hdr *hdr)
-{
-	return ieee80211_plcp2rate(hdr->i_signal, IEEE80211_T_DS);
+	uint32_t plcp = le32toh(plcp0) & IEEE80211_OFDM_PLCP_RATE_MASK;
+	return (ieee80211_plcp2rate(plcp, type));
 }
 
 static void
@@ -3899,7 +3893,7 @@ bwi_led_attach(struct bwi_softc *sc)
 			"%dth led, act %d, lowact %d\n", i,
 			led->l_act, led->l_flags & BWI_LED_F_ACTLOW);
 	}
-	callout_init(&sc->sc_led_blink_ch, CALLOUT_MPSAFE);
+	callout_init_mtx(&sc->sc_led_blink_ch, &sc->sc_mtx, 0);
 }
 
 static __inline uint16_t

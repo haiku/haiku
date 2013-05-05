@@ -1,9 +1,9 @@
 1	swedish	x-vnd.Haiku-SpamFilter	1975155212
-Add spam rating to start of subject	SpamFilterConfig		Lägg till skräpranking före rubriken
-Close	SpamFilterConfig		Stäng
+or empty e-mail	SpamFilterConfig		eller tomt e-post
+Spam Filter (AGMS Bayesian)	SpamFilter		Skräppostfilter (AGMS Bayesian)
 Genuine below and uncertain above:	SpamFilterConfig		Säkert under eller osäkert över:
+Spam above:	SpamFilterConfig		Skräppost över:
+Add spam rating to start of subject	SpamFilterConfig		Lägg till skräpranking före rubriken
 Learn from all incoming e-mail	SpamFilterConfig		Lär från all inkommande e-post
 Sorry, unable to launch the spamdbm program to let you edit the server settings.	SpamFilterConfig		Kunde inte starta spamdb-programmet för redigering av serverinställningarna.
-Spam Filter (AGMS Bayesian)	SpamFilter		Skräppostfilter (AGMS Bayesian)
-Spam above:	SpamFilterConfig		Skräppost över:
-or empty e-mail	SpamFilterConfig		eller tomt e-post
+Close	SpamFilterConfig		Stäng

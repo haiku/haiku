@@ -21,7 +21,7 @@ pci_get_msi_count(uint8 virtualBus, uint8 _device, uint8 function)
 		return 0;
 
 	uint8 bus;
-	int domain;
+	uint8 domain;
 	if (gPCI->ResolveVirtualBus(virtualBus, &domain, &bus) != B_OK)
 		return 0;
 
@@ -48,7 +48,7 @@ pci_configure_msi(uint8 virtualBus, uint8 _device, uint8 function,
 		return B_BAD_VALUE;
 
 	uint8 bus;
-	int domain;
+	uint8 domain;
 	status_t result = gPCI->ResolveVirtualBus(virtualBus, &domain, &bus);
 	if (result != B_OK)
 		return result;
@@ -102,7 +102,7 @@ pci_unconfigure_msi(uint8 virtualBus, uint8 _device, uint8 function)
 		return B_UNSUPPORTED;
 
 	uint8 bus;
-	int domain;
+	uint8 domain;
 	status_t result = gPCI->ResolveVirtualBus(virtualBus, &domain, &bus);
 	if (result != B_OK)
 		return result;
@@ -138,7 +138,7 @@ pci_enable_msi(uint8 virtualBus, uint8 _device, uint8 function)
 		return B_UNSUPPORTED;
 
 	uint8 bus;
-	int domain;
+	uint8 domain;
 	status_t result = gPCI->ResolveVirtualBus(virtualBus, &domain, &bus);
 	if (result != B_OK)
 		return result;
@@ -163,7 +163,7 @@ pci_enable_msi(uint8 virtualBus, uint8 _device, uint8 function)
 	gPCI->WriteConfig(device, info->capability_offset + PCI_msi_control, 2,
 		info->control_value);
 
-	dprintf("msi enabled: 0x%04lx\n",
+	dprintf("msi enabled: 0x%04" B_PRIx32 "\n",
 		gPCI->ReadConfig(device, info->capability_offset + PCI_msi_control, 2));
 	return B_OK;
 }
@@ -176,7 +176,7 @@ pci_disable_msi(uint8 virtualBus, uint8 _device, uint8 function)
 		return B_UNSUPPORTED;
 
 	uint8 bus;
-	int domain;
+	uint8 domain;
 	status_t result = gPCI->ResolveVirtualBus(virtualBus, &domain, &bus);
 	if (result != B_OK)
 		return result;

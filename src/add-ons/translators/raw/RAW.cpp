@@ -951,7 +951,7 @@ DCRaw::_ScaleColors()
 	if (fProgressMonitor != NULL)
 		fProgressMonitor("Scale Colors", 5, fProgressData);
 
-	int dblack, c, val, sum[8];
+	int c, val, sum[8];
 	uint32 row, col, x, y;
 	double dsum[8], dmin, dmax;
 	float scale_mul[4];
@@ -1020,7 +1020,9 @@ DCRaw::_ScaleColors()
 	if (fMeta.pre_multipliers[3] == 0)
 		fMeta.pre_multipliers[3] = fColors < 4 ? fMeta.pre_multipliers[1] : 1;
 
-	dblack = fMeta.black;
+#if 0
+	int dblack = fMeta.black;
+#endif
 	if (fThreshold)
 		_WaveletDenoise();
 
@@ -2656,7 +2658,7 @@ DCRaw::_LoadRAW(const image_data_info& image)
 				break;
 
 			default:
-				fprintf(stderr, "DCRaw: unknown compression: %ld\n",
+				fprintf(stderr, "DCRaw: unknown compression: %" B_PRId32 "\n",
 					image.compression);
 				throw (status_t)B_NO_TRANSLATOR;
 				break;
@@ -3502,7 +3504,7 @@ DCRaw::Identify()
 	if (fMeta.maximum == 0)
 		fMeta.maximum = (1 << _Raw().bits_per_sample) - 1;
 
-	if (fFilters == ~0UL)
+	if (fFilters == ~(uint32)0)
 		fFilters = 0x94949494;
 	if (fFilters && fColors == 3) {
 		for (int32 i = 0; i < 32; i += 4) {

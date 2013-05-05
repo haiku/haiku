@@ -36,6 +36,9 @@
 #include "SmallObjectCache.h"
 
 
+#if !USE_GUARDED_HEAP_FOR_OBJECT_CACHE
+
+
 typedef DoublyLinkedList<ObjectCache> ObjectCacheList;
 
 typedef DoublyLinkedList<ObjectCache,
@@ -255,16 +258,17 @@ dump_slab(::slab* slab)
 static int
 dump_slabs(int argc, char* argv[])
 {
-	kprintf("%10s %22s %8s %8s %8s %6s %8s %8s %8s\n", "address", "name",
-		"objsize", "align", "usage", "empty", "usedobj", "total", "flags");
+	kprintf("%*s %22s %8s %8s %8s %6s %8s %8s %8s\n",
+		B_PRINTF_POINTER_WIDTH + 2, "address", "name", "objsize", "align",
+		"usage", "empty", "usedobj", "total", "flags");
 
 	ObjectCacheList::Iterator it = sObjectCaches.GetIterator();
 
 	while (it.HasNext()) {
 		ObjectCache* cache = it.Next();
 
-		kprintf("%p %22s %8lu %8" B_PRIuSIZE " %8lu %6lu %8lu %8lu %8lx\n",
-			cache, cache->name, cache->object_size, cache->alignment,
+		kprintf("%p %22s %8lu %8" B_PRIuSIZE " %8lu %6lu %8lu %8lu %8" B_PRIx32
+			"\n", cache, cache->name, cache->object_size, cache->alignment,
 			cache->usage, cache->empty_count, cache->used_count,
 			cache->total_objects, cache->flags);
 	}
@@ -295,12 +299,13 @@ dump_cache_info(int argc, char* argv[])
 	kprintf("slab_size:         %lu\n", cache->slab_size);
 	kprintf("usage:             %lu\n", cache->usage);
 	kprintf("maximum:           %lu\n", cache->maximum);
-	kprintf("flags:             0x%lx\n", cache->flags);
+	kprintf("flags:             0x%" B_PRIx32 "\n", cache->flags);
 	kprintf("cookie:            %p\n", cache->cookie);
 	kprintf("resize entry don't wait: %p\n", cache->resize_entry_dont_wait);
 	kprintf("resize entry can wait:   %p\n", cache->resize_entry_can_wait);
 
-	kprintf("  slab        chunk         size   used offset  free\n");
+	kprintf("  %-*s    %-*s      size   used offset  free\n",
+		B_PRINTF_POINTER_WIDTH, "slab", B_PRINTF_POINTER_WIDTH, "chunk");
 
 	SlabList::Iterator iterator = cache->empty.GetIterator();
 	if (iterator.HasNext())
@@ -792,8 +797,8 @@ dump_allocations_per_caller(int argc, char **argv)
 		kprintf("%10" B_PRIuSIZE "  %10" B_PRIuSIZE "  %p", info.count,
 			info.size, (void*)info.caller);
 
-		const char *symbol;
-		const char *imageName;
+		const char* symbol;
+		const char* imageName;
 		bool exactMatch;
 		addr_t baseAddress;
 
@@ -823,12 +828,14 @@ add_alloc_tracing_entry(ObjectCache* cache, uint32 flags, void* object)
 {
 #if SLAB_OBJECT_CACHE_TRACING
 #if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
+	MutexLocker _(cache->lock);
 	cache->TrackingInfoFor(object)->Init(T(Alloc(cache, flags, object)));
 #else
 	T(Alloc(cache, flags, object));
 #endif
 #endif
 }
+
 
 // #pragma mark -
 
@@ -1220,7 +1227,7 @@ object_cache_alloc(object_cache* cache, uint32 flags)
 		}
 	}
 
-	MutexLocker _(cache->lock);
+	MutexLocker locker(cache->lock);
 	slab* source = NULL;
 
 	while (true) {
@@ -1264,6 +1271,8 @@ object_cache_alloc(object_cache* cache, uint32 flags)
 	}
 
 	void* object = link_to_object(link, cache->object_size);
+	locker.Unlock();
+
 	add_alloc_tracing_entry(cache, flags, object);
 	return fill_allocated_block(object, cache->object_size);
 }
@@ -1295,7 +1304,9 @@ object_cache_free(object_cache* cache, void* object, uint32 flags)
 #endif
 
 #if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
+	mutex_lock(&cache->lock);
 	cache->TrackingInfoFor(object)->Clear();
+	mutex_unlock(&cache->lock);
 #endif
 
 	if ((cache->flags & CACHE_NO_DEPOT) == 0) {
@@ -1416,3 +1427,6 @@ slab_init_post_thread()
 
 
 RANGE_MARKER_FUNCTION_END(Slab)
+
+
+#endif	// !USE_GUARDED_HEAP_FOR_OBJECT_CACHE

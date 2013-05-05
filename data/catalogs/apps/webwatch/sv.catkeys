@@ -1,6 +1,6 @@
 1	swedish	x-vnd.mahlzeit.webwatch	1164039487
-About	WatchView		Om
+WebWatch	System name		InternetTid
 OK	WatchView		OK
 Quit	WatchView		Avsluta
-WebWatch	System name		InternetTid
+About	WatchView		Om
 WebWatch %1\nAn internet time clock for your Deskbar\n\nCreated by Matthijs Hollemans\nmahlzeit@users.sourceforge.net\n\nThanks to Jason Parks for his help.\n	WatchView		InternetTid %1\nEn internetklocka för din Deskbar\n\nSkapad av Matthijs Hollemans\nmahlzeit@users.sourceforge.net\n\nTack till Jason Parks.\n

@@ -1,0 +1,52 @@
+1	hindi	x-vnd.Haiku-Screen	2033930135
+yes	Screen		हाँ
+Use laptop panel:	Screen		लैपटॉप पैनल प्रयोग करें :
+15 bits/pixel, 32768 colors	Screen		15 बिट / पिक्सेल, 32768 रंग
+/other…	Screen		/अन्य...
+16 bits/pixel, 65536 colors	Screen		16 बिट / पिक्सेल, 65536 रंग
+Revert	Screen		वापस लौटना
+Swap displays:	Screen		स्वैप प्रदर्शित करता है:
+Combine displays:	Screen		गठबंधन दिखाता है:
+Done	Screen		हो गया
+Set background…	Screen		पृष्ठभूमि को सेट करें...
+Undo	Screen		पूर्ववत्
+if needed	Screen		अगर जरूरत है
+Screen preferences by the Haiku team	Screen		हाइकू टीम द्वारा स्क्रीन वरीयताओं
+Screen	System name		स्क्रीन
+OK	Screen		ठीक है
+Workspaces	Screen		कार्यस्थान
+The screen mode could not be set:\n\t%s\n	Screen		स्क्रीन मोड सेट नहीं किया जा सका:\n\t%s\n
+no	Screen		नहीं
+Could not write VESA mode settings file:\n\t	Screen		VESA मोड सेटिंग फ़ाइल नहीं लिखी जा सकी :\n\t
+Type or use the left and right arrow keys.	Screen		टाइप करें या बाएँ और दाएँ तीर कुंजी का उपयोग करें.
+Warning	Screen		चेतावनी
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		क्षैतिज आवृत्ति:\t%lu - %lu किलो हर्ट्ज\nऊर्ध्वाधर आवृत्ति:\t%lu - %lu Hz\n\nअधिकतम पिक्सेल घड़ी:\t%g मेगाहर्ट्ज
+Keep	Screen		रखना
+Unknown mode	Screen		अज्ञात मोड
+disable	Screen		निष्क्रिय
+Columns:	Screen		कॉलम
+All workspaces	Screen		सभी कार्यस्थान
+always	Screen		हमेशा
+32 bits/pixel, 16 Million colors	Screen		32 बिट/ पिक्सेल, 16 लाख रंग
+Current workspace	Screen		वर्तमान कार्यस्थान
+About	Screen		के बारे में
+24 bits/pixel, 16 Million colors	Screen		24 बिट/पिक्सेल, 16 लाख रंग
+horizontally	Screen		क्षैतिज रूप
+Other…	Screen		अन्य...
+Cancel	Screen		रद्द
+bits/pixel	Screen		बिट/पिक्सेल
+Settings will revert in %seconds seconds.	Screen		सेटिंग्स %seconds सेकंड में लौट जाएगा.
+Refresh rate:	Screen		ताज़ा दर:
+Hz	Screen		हर्ट्ज
+Do you wish to keep these settings?	Screen		क्या आप इन सेटिंग्स को रखना चाहते हैं?
+Rows:	Screen		पंक्तियाँ:
+vertically	Screen		ऊर्ध्व
+Resolution:	Screen		रेज़लूशन:
+Screen	Screen		स्क्रीन
+%.1f Hz	Screen		%.1f हर्ट्ज
+8 bits/pixel, 256 colors	Screen		8 बिट/पिक्सेल, 256 रंग
+Apply	Screen		लागू करना
+Refresh rate	Screen		ताज़ा दर
+%sSerial no.: %s	Screen		%sक्रम संख्या: %s
+Colors:	Screen		रंग:
+Video format:	Screen		वीडियो प्रारूप:

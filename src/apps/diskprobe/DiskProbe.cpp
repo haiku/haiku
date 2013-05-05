@@ -29,8 +29,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "DiskProbe"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "DiskProbe"
 
 const char *kSignature = "application/x-vnd.Haiku-DiskProbe";
 
@@ -367,9 +367,11 @@ DiskProbe::RefsReceived(BMessage *message)
 				"error message is shown."),
 				ref.name, strerror(status));
 
-			(new BAlert(B_TRANSLATE("DiskProbe request"),
+			BAlert* alert = new BAlert(B_TRANSLATE("DiskProbe request"),
 				buffer, B_TRANSLATE("OK"), NULL, NULL,
-				B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
+				B_WIDTH_AS_USUAL, B_STOP_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
 		}
 	}
 }

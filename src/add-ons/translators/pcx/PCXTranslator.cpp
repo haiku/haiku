@@ -14,8 +14,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PCXTranslator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PCXTranslator"
 
 #define kPCXMimeType "image/x-pcx"
 
@@ -72,7 +72,8 @@ const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / sizeof(TranSetting
 
 
 PCXTranslator::PCXTranslator()
-	: BaseTranslator(B_TRANSLATE("PCX images"), B_TRANSLATE("PCX translator"),
+	: BaseTranslator(B_TRANSLATE("PCX images"),
+		B_TRANSLATE("PCX image translator"),
 		PCX_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
 		sOutputFormats, kNumOutputFormats,

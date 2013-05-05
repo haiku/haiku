@@ -1,6 +1,9 @@
 /*
  * Copyright 2011, Adrien Destugues <pulkomandy@pulkomandy.ath.cx>
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
 
 

@@ -372,9 +372,12 @@ RouteWindow::MessageReceived(BMessage* pMsg)
 //
 	switch (pMsg->what) {
 		case B_ABOUT_REQUESTED:
-			(new BAlert("About", g_aboutText, "OK"))->Go();
+		{
+			BAlert* alert = new BAlert("About", g_aboutText, "OK");
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
 			break;
-
+		}
 		case MediaRoutingView::M_GROUP_SELECTED:
 			_handleGroupSelected(pMsg);
 			break;

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2003, Daniel Reinhold, danielre@users.sf.net. All rights reserved.
  * Copyright 2007, François Revol, mmu_man@users.sf.net. All rights reserved.
  * Distributed under the terms of the MIT License.
@@ -14,6 +14,9 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/param.h>
+
+#include <errno_private.h>
+
 
 /**
  * give the name of a tty fd. threadsafe.
@@ -53,7 +56,7 @@ ttyname(int fd)
 
 	int err = ttyname_r(fd, pathname, sizeof(pathname));
 	if (err != 0) {
-		errno = err;
+		__set_errno(err);
 		return NULL;
 	}
 	return pathname;

@@ -5,6 +5,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UseHeaders [ FDirName $(HAIKU_TOP) src kits tracker ] ;
 
 UsePrivateHeaders libroot kernel shared system ;
+UsePrivateHeaders textencoding ;
 
 Application Terminal :
 	ActiveProcessInfo.cpp
@@ -12,7 +13,6 @@ Application Terminal :
 	Arguments.cpp
 	BasicTerminalBuffer.cpp
 	Colors.cpp
-	Encoding.cpp
 	FindWindow.cpp
 	Globals.cpp
 	HistoryBuffer.cpp
@@ -37,8 +37,9 @@ Application Terminal :
 	TitlePlaceholderMapper.cpp
 	VTKeyTbl.c
 	VTPrsTbl.c
-	: be $(HAIKU_LOCALE_LIBS) tracker textencoding $(TARGET_LIBSUPC++)
-	: Terminal.rdef
+	: be $(HAIKU_LOCALE_LIBS) tracker textencoding
+	$(TARGET_LIBSUPC++) $(TARGET_LIBSTDC++)
+	: Terminal.rdef XColors.rdef
 ;
 
 DoCatalogs Terminal :

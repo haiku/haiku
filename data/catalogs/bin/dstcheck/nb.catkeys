@@ -1,6 +1,6 @@
-1	norwegian_bokmål	x-vnd.Haiku-cmd-dstconfig	2337923203
-.\n\nIs this the correct time?	dstcheck		.\n\nGår klokken riktig?
-Ask me later	dstcheck		Spør meg senere
-Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		NB!\n\nPå grunn av endring fra sommertid kan klokken være en time feil.\nDatamaskinen tror klokken er
-Manually adjust time…	dstcheck		Still klokken manuelt...
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-cmd-dstconfig	2337923203
 Use this time	dstcheck		Bruk dette klokkeslettet
+Ask me later	dstcheck		Spør meg senere
+Manually adjust time…	dstcheck		Still klokken manuelt...
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		NB!\n\nPå grunn av endring fra sommertid kan klokken være en time feil.\nDatamaskinen tror klokken er
+.\n\nIs this the correct time?	dstcheck		.\n\nGår klokken riktig?

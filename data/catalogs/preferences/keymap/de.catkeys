@@ -1,22 +1,38 @@
-1	german	x-vnd.Haiku-Keymap	1259868356
-(Current)	Keymap window		(Aktiv)
-Acute trigger	Keymap window		´ Akut
+1	german	x-vnd.Haiku-Keymap	4022885915
+Shift:	Modifier keys window	Shift key role name	Shift:
+Revert	Modifier keys window		Anfangswerte
+Tilde trigger	Keymap window		~ Tilde
+Grave trigger	Keymap window		` Gravis
+Role	Modifier keys window	As in the role of a modifier key	Funktion
+Select dead keys	Keymap window		Auslösetasten definieren
+Cancel	Modifier keys window		Abbrechen
+Quit	Keymap window		Beenden
+Switch shortcut keys to Haiku mode	Keymap window		Befehlstasten tauschen: Haiku-Modus
 Circumflex trigger	Keymap window		^ Zirkumflex
 Diaeresis trigger	Keymap window		¨ Trema/Diärese
-File	Keymap window		Datei
-Font	Keymap window		Schriftart
-Grave trigger	Keymap window		` Gravis
-Keymap	System name		Tastaturlayout
-Layout	Keymap window		Tastatur
+Disabled	Modifier keys window	Do nothing	Deaktiviert
 Open…	Keymap window		Öffnen…
-Quit	Keymap window		Beenden
-Revert	Keymap window		Anfangswerte
-Sample and clipboard:	Keymap window		Tastenausgabe:
-Save as…	Keymap window		Speichern unter…
-Select dead keys	Keymap window		Auslösetasten definieren
-Switch shortcut keys	Keymap window		Befehlstasten tauschen
-Switch shortcut keys to Haiku mode	Keymap window		Befehlstasten tauschen: Haiku-Modus
-Switch shortcut keys to Windows/Linux mode	Keymap window		Befehlstasten tauschen: Windows/Linux-Modus
 System:	Keymap window		System:
-Tilde trigger	Keymap window		~ Tilde
+Set modifier keys…	Keymap window		Hilfstasten zuordnen…
+Option:	Modifier keys window	Option key role name	Option:
+Switch shortcut keys	Keymap window		Befehlstasten tauschen
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift-Taste
 User:	Keymap window		Benutzer:
+Key	Modifier keys window	As in a computer keyboard key	Taste
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Strg-Taste
+Control:	Modifier keys window	Control key role name	Steuerung:
+Sample and clipboard:	Keymap window		Tastenausgabe:
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt-Taste
+Layout	Keymap window		Tastatur
+Switch shortcut keys to Windows/Linux mode	Keymap window		Befehlstasten tauschen: Windows/Linux-Modus
+Revert	Keymap window		Anfangswerte
+Command:	Modifier keys window	Command key role name	Befehl:
+Save as…	Keymap window		Speichern unter…
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd-Taste
+File	Keymap window		Datei
+(Current)	Keymap window		(Aktiv)
+Font	Keymap window		Schriftart
+Keymap	System name		Tastaturlayout
+Set modifier keys	Modifier keys window		Hilfstasten zuordnen
+Modifier keys	Modifier keys window		Hilfstasten
+Acute trigger	Keymap window		´ Akut

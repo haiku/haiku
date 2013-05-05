@@ -11,6 +11,7 @@
 
 #include <View.h>
 #include <Region.h>
+#include <String.h>
 
 class BShape;
 class BBitmap;
@@ -37,8 +38,8 @@ class FontDemoView : public BView {
 		void SetFontRotation(float rotation);
 		const float Rotation() const { return fFont.Rotation(); }
 
-		void SetString(const char* string);
-		const char* String() const;
+		void SetString(BString string);
+		BString String() const;
 
 		void SetAntialiasing(bool state);
 
@@ -49,7 +50,7 @@ class FontDemoView : public BView {
 		const int8 OutLineLevel() const { return fOutLineLevel; }
 
 	private:
-		void _AddShapes(const char* string);
+		void _AddShapes(BString string);
 		void _DrawView(BView* view);
 
 		BView* _GetView(BRect rect);
@@ -58,7 +59,7 @@ class FontDemoView : public BView {
 		BBitmap*	fBitmap;
 		BView*		fBufferView;
 
-		char*		fString;
+		BString		fString;
 		float		fFontSize;
 		float 		fSpacing;
 		int8		fOutLineLevel;

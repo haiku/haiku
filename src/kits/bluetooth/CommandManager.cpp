@@ -8,10 +8,12 @@
 
 
 #include <bluetooth/bluetooth_error.h>
+#include <bluetooth/debug.h>
 
 inline void* buildCommand(uint8 ogf, uint8 ocf, void** param, size_t psize,
 	size_t* outsize)
 {
+	CALLED();
 	struct hci_command_header* header;
 
 #ifdef BT_IOCTLS_PASS_SIZE
@@ -57,6 +59,7 @@ status_t
 NonParameterCommandRequest(uint8 ofg, uint8 ocf, int32* result, hci_id hId,
 	BMessenger* messenger)
 {
+	CALLED();
 	int8 bt_status = BT_ERROR;
 
 	BluetoothCommand<> simpleCommand(ofg, ocf);
@@ -87,6 +90,7 @@ NonParameterCommandRequest(uint8 ofg, uint8 ocf, int32* result, hci_id hId,
 
 void* buildReset(size_t* outsize)
 {
+	CALLED();
 	return buildCommand(OGF_CONTROL_BASEBAND, OCF_RESET,
 		NULL, 0, outsize);
 }
@@ -94,6 +98,7 @@ void* buildReset(size_t* outsize)
 
 void* buildReadLocalName(size_t* outsize)
 {
+	CALLED();
 	return buildCommand(OGF_CONTROL_BASEBAND, OCF_READ_LOCAL_NAME,
 		NULL, 0, outsize);
 }
@@ -101,13 +106,23 @@ void* buildReadLocalName(size_t* outsize)
 
 void* buildReadClassOfDevice(size_t* outsize)
 {
+	CALLED();
 	return buildCommand(OGF_CONTROL_BASEBAND, OCF_READ_CLASS_OF_DEV,
+	NULL, 0, outsize);
+}
+
+
+void* buildReadScan(size_t* outsize)
+{
+	CALLED();
+	return buildCommand(OGF_CONTROL_BASEBAND, OCF_READ_SCAN_ENABLE,
 	NULL, 0, outsize);
 }
 
 
 void* buildWriteScan(uint8 scanmode, size_t* outsize)
 {
+	CALLED();
 	struct hci_write_scan_enable* param;
 	void* command = buildCommand(OGF_CONTROL_BASEBAND, OCF_WRITE_SCAN_ENABLE,
 		(void**) &param, sizeof(struct hci_write_scan_enable), outsize);
@@ -118,7 +133,6 @@ void* buildWriteScan(uint8 scanmode, size_t* outsize)
 	}
 
 	return command;
-
 }
 
 
@@ -130,7 +144,7 @@ void* buildWriteScan(uint8 scanmode, size_t* outsize)
 void* buildRemoteNameRequest(bdaddr_t bdaddr, uint8 pscan_rep_mode,
 	uint16 clock_offset, size_t* outsize)
 {
-
+	CALLED();
 	struct hci_remote_name_request* param;
 	void* command = buildCommand(OGF_LINK_CONTROL, OCF_REMOTE_NAME_REQUEST,
 		(void**)&param, sizeof(struct hci_remote_name_request), outsize);
@@ -147,7 +161,7 @@ void* buildRemoteNameRequest(bdaddr_t bdaddr, uint8 pscan_rep_mode,
 
 void* buildInquiry(uint32 lap, uint8 length, uint8 num_rsp, size_t* outsize)
 {
-
+	CALLED();
 	struct hci_cp_inquiry* param;
 	void* command = buildCommand(OGF_LINK_CONTROL, OCF_INQUIRY,
 		(void**) &param, sizeof(struct hci_cp_inquiry), outsize);
@@ -167,15 +181,15 @@ void* buildInquiry(uint32 lap, uint8 length, uint8 num_rsp, size_t* outsize)
 
 void* buildInquiryCancel(size_t* outsize)
 {
-
+	CALLED();
 	return buildCommand(OGF_LINK_CONTROL, OCF_INQUIRY_CANCEL, NULL, 0, outsize);
-
 }
 
 
 void* buildPinCodeRequestReply(bdaddr_t bdaddr, uint8 length, char pincode[16],
 	size_t* outsize)
 {
+	CALLED();
 	struct hci_cp_pin_code_reply* param;
 
 	if (length > HCI_PIN_SIZE)  // PinCode cannot be longer than 16
@@ -196,7 +210,7 @@ void* buildPinCodeRequestReply(bdaddr_t bdaddr, uint8 length, char pincode[16],
 
 void* buildPinCodeRequestNegativeReply(bdaddr_t bdaddr, size_t* outsize)
 {
-
+	CALLED();
 	struct hci_cp_pin_code_neg_reply* param;
 
 	void* command = buildCommand(OGF_LINK_CONTROL, OCF_PIN_CODE_NEG_REPLY,
@@ -214,6 +228,7 @@ void* buildPinCodeRequestNegativeReply(bdaddr_t bdaddr, size_t* outsize)
 
 void* buildAcceptConnectionRequest(bdaddr_t bdaddr, uint8 role, size_t* outsize)
 {
+	CALLED();
 	struct hci_cp_accept_conn_req* param;
 
 	void* command = buildCommand(OGF_LINK_CONTROL, OCF_ACCEPT_CONN_REQ,
@@ -230,6 +245,7 @@ void* buildAcceptConnectionRequest(bdaddr_t bdaddr, uint8 role, size_t* outsize)
 
 void* buildRejectConnectionRequest(bdaddr_t bdaddr, size_t* outsize)
 {
+	CALLED();
 	struct hci_cp_reject_conn_req* param;
 
 	void* command = buildCommand(OGF_LINK_CONTROL, OCF_REJECT_CONN_REQ,
@@ -250,6 +266,7 @@ void* buildRejectConnectionRequest(bdaddr_t bdaddr, size_t* outsize)
 
 void* buildReadLocalVersionInformation(size_t* outsize)
 {
+	CALLED();
 	return buildCommand(OGF_INFORMATIONAL_PARAM, OCF_READ_LOCAL_VERSION,
 		NULL, 0, outsize);
 }
@@ -257,6 +274,7 @@ void* buildReadLocalVersionInformation(size_t* outsize)
 
 void* buildReadBufferSize(size_t* outsize)
 {
+	CALLED();
 	return buildCommand(OGF_INFORMATIONAL_PARAM, OCF_READ_BUFFER_SIZE,
 		NULL, 0, outsize);
 }
@@ -264,6 +282,7 @@ void* buildReadBufferSize(size_t* outsize)
 
 void* buildReadBdAddr(size_t* outsize)
 {
+	CALLED();
 	return buildCommand(OGF_INFORMATIONAL_PARAM, OCF_READ_BD_ADDR,
 		NULL, 0, outsize);
 }
@@ -697,6 +716,7 @@ const char* lmpVersion[] = { "1.0 " , "1.1 " , "1.2 " , "2.0 " , "2.1 "};
 const char*
 BluetoothHciVersion(uint16 ver)
 {
+	CALLED();
 	return hciVersion[ver];
 }
 
@@ -704,6 +724,7 @@ BluetoothHciVersion(uint16 ver)
 const char*
 BluetoothLmpVersion(uint16 ver)
 {
+	CALLED();
 	return lmpVersion[ver];
 }
 
@@ -711,7 +732,7 @@ BluetoothLmpVersion(uint16 ver)
 const char*
 BluetoothCommandOpcode(uint16 opcode)
 {
-
+	CALLED();
 	// NOTE: BT implementations beyond 2.1
 	// could specify new commands with OCF numbers
 	// beyond the boundaries of the arrays and crash.
@@ -755,6 +776,7 @@ BluetoothCommandOpcode(uint16 opcode)
 const char*
 BluetoothEvent(uint8 event)
 {
+	CALLED();
 	if (event < sizeof(bluetoothEvents) / sizeof(const char*))
 		return bluetoothEvents[event - 1];
 	else
@@ -765,6 +787,7 @@ BluetoothEvent(uint8 event)
 const char*
 BluetoothManufacturer(uint16 manufacturer)
 {
+	CALLED();
 	if (manufacturer < sizeof(bluetoothManufacturers) / sizeof(const char*))
 		return bluetoothManufacturers[manufacturer];
 	else if (manufacturer == 0xFFFF)
@@ -777,6 +800,7 @@ BluetoothManufacturer(uint16 manufacturer)
 const char*
 BluetoothError(uint8 error)
 {
+	CALLED();
 	if (error < sizeof(bluetoothErrors) / sizeof(const char*))
 		return bluetoothErrors[error];
 	else

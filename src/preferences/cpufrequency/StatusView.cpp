@@ -14,6 +14,7 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Deskbar.h>
 #include <GroupLayout.h>
 #include <Locale.h>
@@ -29,8 +30,8 @@
 extern "C" _EXPORT BView *instantiate_deskbar_item(void);
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Status view"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Status view"
 #define MAX_FREQ_STRING "9999MHz"
 
 
@@ -41,18 +42,16 @@ extern "C" _EXPORT BView *instantiate_deskbar_item(void);
  * and then collectcatkeys will not see the strings in the file.
  * So we mark them explicitly here.
  */
-void notUsed() {
-	B_TRANSLATE_MARK("Dynamic performance");
-	B_TRANSLATE_MARK("High performance");
-	B_TRANSLATE_MARK("Low energy");
-	B_TRANSLATE_MARK("Set state");
-	B_TRANSLATE_MARK("CPUFrequency\n"
-			"\twritten by Clemens Zeidler\n"
-			"\tCopyright 2009, Haiku, Inc.\n");
-	B_TRANSLATE_MARK("Ok");
-	B_TRANSLATE_MARK("Open Speedstep preferences" B_UTF8_ELLIPSIS);
-	B_TRANSLATE_MARK("Quit");
-}
+B_TRANSLATE_MARK_VOID("Dynamic performance");
+B_TRANSLATE_MARK_VOID("High performance");
+B_TRANSLATE_MARK_VOID("Low energy");
+B_TRANSLATE_MARK_VOID("Set state");
+B_TRANSLATE_MARK_VOID("CPUFrequency\n"
+	"\twritten by Clemens Zeidler\n"
+	"\tCopyright 2009, Haiku, Inc.\n");
+B_TRANSLATE_MARK_VOID("Ok");
+B_TRANSLATE_MARK_VOID("Open Speedstep preferences" B_UTF8_ELLIPSIS);
+B_TRANSLATE_MARK_VOID("Quit");
 
 // messages FrequencySwitcher
 const uint32 kMsgDynamicPolicyPulse = '&dpp';
@@ -430,7 +429,7 @@ StatusView::_AboutRequested()
 	BAlert *alert = new BAlert("about", B_TRANSLATE("CPUFrequency\n"
 			"\twritten by Clemens Zeidler\n"
 			"\tCopyright 2009, Haiku, Inc.\n"),
-		B_TRANSLATE("Ok"));
+		B_TRANSLATE("OK"));
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -441,6 +440,7 @@ StatusView::_AboutRequested()
 	font.SetFace(B_BOLD_FACE);
 	view->SetFontAndColor(0, 13, &font);
 
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 }
 
@@ -590,9 +590,13 @@ StatusView::Draw(BRect updateRect)
 	GetFontHeight(&fontHeight);
 	float height = fontHeight.ascent + fontHeight.descent;
 
-	MovePenTo(0, height);
-
-	DrawString(fFreqString.String());
+	if (be_control_look != NULL)
+		be_control_look->DrawLabel(this, fFreqString.String(),
+			this->ViewColor(), 0, BPoint(0, height));
+	else {
+		MovePenTo(0, height);
+		DrawString(fFreqString.String());
+	}
 }
 
 
@@ -686,9 +690,10 @@ StatusView::_OpenPreferences()
 			"Launching the CPU frequency preflet failed.\n\nError: "));
 		errorMessage << strerror(ret);
 		BAlert* alert = new BAlert("launch error", errorMessage.String(),
-			"Ok");
+			"OK");
 		// asynchronous alert in order to not block replicant host
 		// application
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go(NULL);
 	}
 }

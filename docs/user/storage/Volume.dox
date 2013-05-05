@@ -1,0 +1,394 @@
+/*
+ * Copyright 2002-2013 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ *		Vincent Dominguez
+ *		John Scipione, jscipione@gmail.com
+ *		Ingo Weinhold, bonefish@users.sf.net
+ *
+ * Corresponds to:
+ *		headers/os/storage/Volume.h	hrev45306
+ *		src/kits/storage/Volume.cpp	hrev45306
+ */
+
+
+/*!
+	\file Volume.h
+	\ingroup storage
+	\ingroup libbe
+	\brief Provides the BVolume class.
+*/
+
+
+/*!
+	\class BVolume
+	\ingroup storage
+	\ingroup libbe
+	\brief Provides an interface for querying information about a volume.
+
+	The class is a simple wrapper for a \c dev_t and the function
+	fs_stat_dev(). The sole exception is the SetName() method which
+	sets the name of the volume.
+*/
+
+
+/*!
+	\fn BVolume::BVolume()
+	\brief Creates an uninitialized BVolume object.
+
+	InitCheck() will return \c B_NO_INIT.
+
+	\see SetTo()
+*/
+
+
+/*!
+	\fn BVolume::BVolume(dev_t device)
+	\brief Creates a BVolume and initializes it to the volume specified
+	       by the supplied device ID.
+
+	InitCheck() should be called afterwards to check if initialization was
+	successful.
+
+	\param device The device ID of the volume.
+*/
+
+
+/*!
+	\fn BVolume::BVolume(const BVolume &volume)
+	\brief Creates a copy of the supplied BVolume object.
+
+	Afterwards the object refers to the same device the supplied object
+	does. If the latter is not properly initialized, this result isn't
+	either.
+
+	\param volume The volume object to be copied.
+*/
+
+
+/*!
+	\fn BVolume::~BVolume()
+	\brief Destroys the object and frees all associated resources.
+*/
+
+
+/*!
+	\name Constructor helper methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BVolume::InitCheck(void) const
+	\brief Returns the initialization status.
+
+	\return \c B_OK if the object was properly initialized, or an error code
+	        otherwise.
+*/
+
+
+/*!
+	\fn status_t BVolume::SetTo(dev_t device)
+	\brief Initializes the object to refer to the volume specified by
+	       the supplied device ID.
+
+	\param device The device ID of the volume to set.
+	\return \c B_OK if the object was properly initialized, or an error code
+	        otherwise.
+*/
+
+
+/*!
+	\fn void BVolume::Unset()
+	\brief Brings the BVolume object to an uninitialized state.
+
+	InitCheck() will return \c B_NO_INIT.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Volume information methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn dev_t BVolume::Device() const
+	\brief Returns the device ID of the volume the object refers to.
+
+	\return Returns the device ID of the volume the object refers to
+			or -1 if the object was not properly initialized.
+*/
+
+
+/*!
+	\fn status_t BVolume::GetRootDirectory(BDirectory *directory) const
+	\brief Writes the root directory of the volume referred to by this
+	       object into \a directory.
+
+	\param directory A pointer to a pre-allocated BDirectory to be initialized
+		   to the volume's root directory.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \a directory was \c NULL or the object was not properly
+	        initialized.
+*/
+
+
+/*!
+	\fn off_t BVolume::Capacity() const
+	\brief Returns the total storage capacity of the volume.
+
+	\return The volume's total storage capacity (in bytes), or \c B_BAD_VALUE
+	        if the object is not properly initialized.
+*/
+
+
+/*!
+	\fn off_t BVolume::FreeBytes() const
+	\brief Returns the amount of unused space on the volume (in bytes).
+
+	\return The amount of unused space on the volume (in bytes), or
+	        \c B_BAD_VALUE if the object is not properly initialized.
+*/
+
+
+/*!
+	\fn off_t BVolume::BlockSize() const
+	\brief Returns the size of one block (in bytes). The meaning of this
+	       depends on the underlying file system.
+
+	\return The block size in bytes, \c B_NO_INIT if the volume is not
+	        initialized or other errors forwarded from the file system.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Volume name methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BVolume::GetName(char* name) const
+	\brief Writes the volume's name into the provided buffer.
+
+	\param name A pointer to a pre-allocated character buffer of size
+	       \c B_FILE_NAME_LENGTH or larger into which the name of the
+	       volume is written.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \a name was \c NULL or the object was not properly
+	        initialized.
+*/
+
+
+/*!
+	\fn status_t BVolume::SetName(const char *name)
+	\brief Sets the volume's name to \a name.
+
+	\note The R5 implementation checks if an entry with the volume's old name
+	      exists in the root directory and renames that entry, if it is indeed
+	      the mount point of the volume (or a link referring to it). In all
+	      other cases, nothing is done (even if the mount point is named like
+	      the volume, but lives in a different directory). We follow suit for
+	      the time being.
+
+	\warning If the volume name is set to "boot" this method tries to rename
+	         it to /boot, but is prevented by the kernel.
+
+	\param name The new name of the volume, must not be longer than
+		   \c B_FILE_NAME_LENGTH (including the terminating \c NULL).
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \a name was \c NULL or the object was not properly
+	        initialized.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Volume icon methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BVolume::GetIcon(BBitmap *icon, icon_size which) const
+	\brief Writes the volume's icon into the supplied BBitmap.
+
+	\param icon A pointer to a pre-allocated BBitmap of the correct dimension
+		   to store the requested icon (16x16 for the mini and 32x32 for the
+		   large icon).
+
+	\param which The icon size to be retrieved: \c B_MINI_ICON for the mini or
+	       \c B_LARGE_ICON for the large icon.
+*/
+
+
+/*!
+	\fn status_t BVolume::GetIcon(uint8** _data, size_t* _size,
+		type_code* _type) const
+	\brief Writes the volume's icon data into the supplied \c uint8 array.
+
+	\param _data A pointer to a pointer to a pre-allocated \c uint8 array of
+	       the correct size to store the requested icon.
+	\param _size The size of the retrieved icon (in bytes).
+	\param _type The type code of the retrieve icon.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_INIT Object was not properly initialized.
+
+	\see fs_stat_dev() for more return codes.
+	\see get_device_icon() for more return codes.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Volume capability methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn bool BVolume::IsRemovable() const
+	\brief Returns whether or not the volume is removable.
+
+	\return \c true, if the volume was properly initialized and is removable,
+	        \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BVolume::IsReadOnly(void) const
+	\brief Returns whether or not the volume is read-only.
+
+	\return \c true, if the volume was properly initialized and is read-only,
+	        \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BVolume::IsPersistent(void) const
+	\brief Returns whether or not the volume is persistent.
+
+	\return \c true, if the volume was properly initialized and is persistent,
+	       \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BVolume::IsShared(void) const
+	\brief Returns whether or not the volume is shared.
+
+	return \c true, if the volume was properly initialized and is shared,
+	       \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BVolume::KnowsMime(void) const
+	\brief Returns whether or not the volume supports MIME-types.
+
+	\return \c true, if the volume was properly initialized and supports
+	        MIME-types, \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BVolume::KnowsAttr(void) const
+	\brief Returns whether or not the volume supports attributes.
+
+	\return \c true, if the volume was properly initialized and supports
+	        attributes, \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BVolume::KnowsQuery(void) const
+	\brief Returns whether or not the volume supports queries.
+
+	\return \c true, if the volume was properly initialized and supports
+	        queries, \c false otherwise.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Operator overload methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn bool BVolume::operator==(const BVolume &volume) const
+	\brief Returns whether or not the supplied BVolume object is equal to this
+	       object.
+
+	Two volume objects are said to be equal if they are both uninitialized,
+	or they are both initialized and refer to the same volume.
+
+	\param volume The volume to be tested for equality.
+
+	\return \c true, if the objects are equal, \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BVolume::operator!=(const BVolume &volume) const
+	\brief Returns whether or not the supplied BVolume object is NOT equal to
+	       this object.
+
+	Two volume objects are said to be unequal if one is initialized and the
+	other is not or if they are both initialized and refer to the different
+	volumes.
+
+	\param volume The volume to be tested for inequality.
+
+	\return \c true, if the objects and unequal, \c false otherwise.
+*/
+
+
+/*!
+	\fn BVolume& BVolume::operator=(const BVolume &volume)
+	\brief Assigns the supplied BVolume object to this volume, this object is
+	       made to be an exact clone of the supplied one.
+
+	\param volume The volume to be assigned.
+
+	\return A reference to this object.
+*/
+
+
+//! @}

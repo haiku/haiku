@@ -68,14 +68,8 @@ BitmapManager::BitmapManager()
 BitmapManager::~BitmapManager()
 {
 	int32 count = fBitmapList.CountItems();
-	for (int32 i = 0; i < count; i++) {
-		if (ServerBitmap* bitmap = (ServerBitmap*)fBitmapList.ItemAt(i)) {
-			if (bitmap->AllocationCookie() != NULL)
-				debugger("We're not supposed to keep our cookies...");
-
-			delete bitmap;
-		}
-	}
+	for (int32 i = 0; i < count; i++)
+		delete (ServerBitmap*)fBitmapList.ItemAt(i);
 }
 
 
@@ -94,7 +88,6 @@ BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator,
 	int32 bytesPerRow, int32 screen, uint8* _allocationFlags)
 {
 	BAutolock locker(fLock);
-
 	if (!locker.IsLocked())
 		return NULL;
 
@@ -112,7 +105,7 @@ BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator,
 		}
 	}
 
-	ServerBitmap* bitmap = new(nothrow) ServerBitmap(bounds, space, flags,
+	ServerBitmap* bitmap = new(std::nothrow) ServerBitmap(bounds, space, flags,
 		bytesPerRow);
 	if (bitmap == NULL) {
 		if (overlayToken != NULL)
@@ -121,11 +114,10 @@ BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator,
 		return NULL;
 	}
 
-	void* cookie = NULL;
 	uint8* buffer = NULL;
 
 	if (flags & B_BITMAP_WILL_OVERLAY) {
-		Overlay* overlay = new (std::nothrow) Overlay(hwInterface, bitmap,
+		Overlay* overlay = new(std::nothrow) Overlay(hwInterface, bitmap,
 			overlayToken);
 
 		overlay_client_data* clientData = NULL;
@@ -134,32 +126,29 @@ BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator,
 		if (overlay != NULL && overlay->InitCheck() == B_OK) {
 			// allocate client memory to communicate the overlay semaphore
 			// and buffer location to the BBitmap
-			cookie = allocator->Allocate(sizeof(overlay_client_data),
-				(void**)&clientData, newArea);
+			clientData = (overlay_client_data*)bitmap->fClientMemory.Allocate(
+				allocator, sizeof(overlay_client_data), newArea);
 		}
 
-		if (cookie != NULL) {
+		if (clientData != NULL) {
 			overlay->SetClientData(clientData);
 
-			bitmap->fAllocator = allocator;
-			bitmap->fAllocationCookie = cookie;
+			bitmap->fMemory = &bitmap->fClientMemory;
 			bitmap->SetOverlay(overlay);
 			bitmap->fBytesPerRow = overlay->OverlayBuffer()->bytes_per_row;
 
 			buffer = (uint8*)overlay->OverlayBuffer()->buffer;
 			if (_allocationFlags)
 				*_allocationFlags = kFramebuffer | (newArea ? kNewAllocatorArea : 0);
-		} else {
+		} else
 			delete overlay;
-			allocator->Free(cookie);
-		}
 	} else if (allocator != NULL) {
 		// standard bitmaps
 		bool newArea;
-		cookie = allocator->Allocate(bitmap->BitsLength(), (void**)&buffer, newArea);
-		if (cookie != NULL) {
-			bitmap->fAllocator = allocator;
-			bitmap->fAllocationCookie = cookie;
+		buffer = (uint8*)bitmap->fClientMemory.Allocate(allocator,
+			bitmap->BitsLength(), newArea);
+		if (buffer != NULL) {
+			bitmap->fMemory = &bitmap->fClientMemory;
 
 			if (_allocationFlags)
 				*_allocationFlags = kAllocator | (newArea ? kNewAllocatorArea : 0);
@@ -168,8 +157,7 @@ BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator,
 		// server side only bitmaps
 		buffer = (uint8*)malloc(bitmap->BitsLength());
 		if (buffer != NULL) {
-			bitmap->fAllocator = NULL;
-			bitmap->fAllocationCookie = NULL;
+			bitmap->fMemory = NULL;
 
 			if (_allocationFlags)
 				*_allocationFlags = kHeap;
@@ -198,6 +186,37 @@ BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator,
 		bitmap = NULL;
 	}
 
+	return bitmap;
+}
+
+
+ServerBitmap*
+BitmapManager::CloneFromClient(area_id clientArea, int32 areaOffset,
+	BRect bounds, color_space space, uint32 flags, int32 bytesPerRow)
+{
+	BAutolock locker(fLock);
+	if (!locker.IsLocked())
+		return NULL;
+	ServerBitmap* bitmap = new(std::nothrow) ServerBitmap(bounds, space, flags,
+		bytesPerRow);
+	if (bitmap == NULL)
+		return NULL;
+
+	ClonedAreaMemory* memory = new(std::nothrow) ClonedAreaMemory;
+	if (memory == NULL) {
+		delete bitmap;
+		return NULL;
+	}
+	int8* buffer = (int8*)memory->Clone(clientArea, areaOffset);
+	if (buffer == NULL) {
+		delete bitmap;
+		delete memory;
+		return NULL;
+	}
+
+	bitmap->fMemory = memory;
+	bitmap->fBuffer = memory->Address();
+	bitmap->fToken = gTokenSpace.NewToken(kBitmapToken, bitmap);
 	return bitmap;
 }
 

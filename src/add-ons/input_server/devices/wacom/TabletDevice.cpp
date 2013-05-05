@@ -339,7 +339,7 @@ TabletDevice::ReadData(const uchar* data, int dataBytes, bool& hasContact,
 				xPos = data[3] << 8 | data[2];
 				yPos = data[5] << 8 | data[4];
 
-				hasContact = (data[1] & 0x10) && (data[1] & 0x20);
+				hasContact = (data[1] & 0x20);
 
 				uint16 pressureData = data[7] << 8 | data[6];
 				pressure = (float)pressureData / 1023.0;

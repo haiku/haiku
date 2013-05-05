@@ -1,19 +1,28 @@
 SubDir HAIKU_TOP src add-ons screen_savers flurry ;
+SubDirSysHdrs $(HAIKU_GLU_HEADERS) ;
+SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
 
 AddResources Message : Flurry.rdef ;
 
-ScreenSaver Flurry :
+local sources =
 	Flurry.cpp
 	Smoke.cpp
 	Spark.cpp
 	Star.cpp
 	Texture.cpp
-	:
+;
+
+Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+	# Dependency needed to trigger downloading/unzipping the package before
+	# compiling the files.
+
+ScreenSaver Flurry :
+	$(sources) :
 	be screensaver GL libshared.a $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
 ;
 
 DoCatalogs Flurry :
-	x-vnd.Haiku-Flurry
+	x-vnd.Haiku-FlurryScreensaver
 	:
-	Flurry.cpp	
+	$(sources)
 ;

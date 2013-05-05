@@ -153,11 +153,10 @@ BTimeZone::ShortName() const
 	if ((fInitializedFields & skShortNameField) == 0) {
 		UnicodeString unicodeString;
 		if (fICULocale != NULL) {
-			fICUTimeZone->getDisplayName(false, TimeZone::SHORT_COMMONLY_USED,
-				*fICULocale, unicodeString);
-		} else {
-			fICUTimeZone->getDisplayName(false, TimeZone::SHORT_COMMONLY_USED,
+			fICUTimeZone->getDisplayName(false, TimeZone::SHORT, *fICULocale,
 				unicodeString);
+		} else {
+			fICUTimeZone->getDisplayName(false, TimeZone::SHORT, unicodeString);
 		}
 		BStringByteSink sink(&fShortName);
 		unicodeString.toUTF8(sink);
@@ -174,11 +173,10 @@ BTimeZone::ShortDaylightSavingName() const
 	if ((fInitializedFields & skShortDaylightSavingNameField) == 0) {
 		UnicodeString unicodeString;
 		if (fICULocale != NULL) {
-			fICUTimeZone->getDisplayName(true, TimeZone::SHORT_COMMONLY_USED,
-				*fICULocale, unicodeString);
-		} else {
-			fICUTimeZone->getDisplayName(true, TimeZone::SHORT_COMMONLY_USED,
+			fICUTimeZone->getDisplayName(true, TimeZone::SHORT, *fICULocale,
 				unicodeString);
+		} else {
+			fICUTimeZone->getDisplayName(true, TimeZone::SHORT, unicodeString);
 		}
 		BStringByteSink sink(&fShortDaylightSavingName);
 		unicodeString.toUTF8(sink);

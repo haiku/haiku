@@ -13,6 +13,7 @@
 #include <stdarg.h>
 #include <unistd.h>
 
+#include <errno_private.h>
 #include <syscalls.h>
 #include <syscall_utils.h>
 #include <umask.h>
@@ -64,7 +65,7 @@ fcntl(int fd, int op, ...)
 {
 	va_list args;
 	va_start(args, op);
-	uint32 argument = va_arg(args, uint32);
+	size_t argument = va_arg(args, size_t);
 	va_end(args);
 
 	status_t error = _kern_fcntl(fd, op, argument);

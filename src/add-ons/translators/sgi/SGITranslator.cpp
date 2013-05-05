@@ -54,8 +54,8 @@
 
 using std::nothrow;
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "SGITranslator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "SGITranslator"
 
 
 // The input formats that this translator supports.
@@ -203,7 +203,8 @@ identify_sgi_header(BPositionIO *inSource, translator_info *outInfo, uint32 outT
 			outInfo->quality = SGI_IN_QUALITY;
 			outInfo->capability = SGI_IN_CAPABILITY;
 			strcpy(outInfo->MIME, "image/sgi");
-			strcpy(outInfo->name, B_TRANSLATE("SGI image"));
+			strlcpy(outInfo->name, B_TRANSLATE("SGI image"),
+				sizeof(outInfo->name));
 		}
 	} else {
 		delete sgiImage;

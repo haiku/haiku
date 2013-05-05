@@ -1,6 +1,8 @@
 
 resource app_signature "application/x-vnd.Haiku-Playground";
 
+resource app_name_catalog_entry "x-vnd.Haiku-Playground:System name:Playground";
+
 resource app_flags B_SINGLE_LAUNCH;
 
 resource app_version {

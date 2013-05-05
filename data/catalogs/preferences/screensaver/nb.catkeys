@@ -1,22 +1,22 @@
-1	norwegian_bokmål	x-vnd.Haiku-ScreenSaver	1144284462
-30 seconds	ScreenSaver		30 sekunder
-Add…	ScreenSaver		Legg til...
-Blackness	ScreenSaver		Svart skjerm
-Cancel	ScreenSaver		Avbryt
-Confirm password:	ScreenSaver		Bekreft passord:
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-ScreenSaver	1144284462
 Could not load screen saver	ScreenSaver		Kunne ikke laste skjermsparer
-Display Power Management Signaling not available	ScreenSaver		Signal for strømstyring av skjerm er ikke tilgjengelig
-Done	ScreenSaver		Ferdig
-No options available	ScreenSaver		Ingen valg tilgjengelig
-OK	ScreenSaver		OK
-Password Window	ScreenSaver		Passordvindu
-Password lock	ScreenSaver		Passordlås
-Password:	ScreenSaver		Passord:
-Passwords don't match. Please try again.	ScreenSaver		Passordene passer ikke. Prøv igjen.
+30 seconds	ScreenSaver		30 sekunder
 Password…	ScreenSaver		Passord...
+Password:	ScreenSaver		Passord:
+Password lock	ScreenSaver		Passordlås
+Add…	ScreenSaver		Legg til...
+mouse is here	ScreenSaver		mus er her
+Display Power Management Signaling not available	ScreenSaver		Signal for strømstyring av skjerm er ikke tilgjengelig
 ScreenSaver	System name		Skjermsparer
 Test	ScreenSaver		Test
+Cancel	ScreenSaver		Avbryt
 Turn off screen	ScreenSaver		Skru av skjerm
+No options available	ScreenSaver		Ingen valg tilgjengelig
+Password Window	ScreenSaver		Passordvindu
+Passwords don't match. Please try again.	ScreenSaver		Passordene passer ikke. Prøv igjen.
+OK	ScreenSaver		OK
+Blackness	ScreenSaver		Svart skjerm
 Use custom password	ScreenSaver		Bruk eget passord
+Done	ScreenSaver		Ferdig
+Confirm password:	ScreenSaver		Bekreft passord:
 Use network password	ScreenSaver		Bruk nettverkspassord
-mouse is here	ScreenSaver		mus er her

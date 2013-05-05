@@ -1,32 +1,32 @@
 1	french	x.vnd.OBOS-Inspector	2075781936
-Active Translators	ImageWindow		Traducteurs actifs
-Active Translators	InspectorApp		Traducteurs actifs
-Bummer	ImageWindow		Zut
-File	ImageWindow		Fichier
-First Page	ImageWindow		Première page
-Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Image : %1\nEspace couleur : %2 (%3)\nDimensions : %4 x %5\nOctets par lignes : %6\nNombre total d'octets : %7\n\nInformation d'identité :\nChaîne d'ID : %8\nType MIME : %9\nType : « %10 » (%11)\nID du traducteur : %12\nGroupe : « %13 » (%14)\nQualité : %15\nAptitudes : %16\n\nInformations sur les extensions :\n
-Info	ImageWindow		Informations
-Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Fenêtre d'information
-Last Page	ImageWindow		Dernière page
-Next Page	ImageWindow		Page suivante
+User Translators	ActiveTranslatorsWindow		Traducteurs utilisateurs
 No image available to save.	ImageWindow		Aucune image à sauvegarder n'est disponible.
-Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Nombre de documents : %1\n\nTraducteur utilisé :\nNom : %2\nInformations : %3\nVersion : %4\n
-OK	ImageView		OK
-OK	ImageWindow		OK
-Open...	ImageWindow		Ouvrir…
-Previous Page	ImageWindow		Page Précédente
-Quit	ImageWindow		Quitter
-Save feature not implemented yet.	ImageWindow		La sauvegarde n'est pas encore implémentée.
-Save...	ImageWindow		Sauvegarder…
-Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Documents sélectionnés : %1\n\nTraducteur utilisé :\nNom : %2\nInformations : %3\nVersion : %4\n
-Sorry, unable to load the image.	ImageView		Désolé, impossible de charger l'image.
 Sorry, unable to write the image file.	ImageView		Désolé, impossible d'écrire l'image dans le fichier.
+Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Nombre de documents : %1\n\nTraducteur utilisé :\nNom : %2\nInformations : %3\nVersion : %4\n
+\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nType : « %1 » (%2)\nGroupe : « %3 » (%4)\nQualité : %5\nAptitudes : %6\nType MIME : %7\nNom : %8\n
+Bummer	ImageWindow		Zut
+Last Page	ImageWindow		Dernière page
+\nInput Formats:	ImageView		\nFormats d'entrée :
+Sorry, unable to load the image.	ImageView		Désolé, impossible de charger l'image.
+Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Fenêtre d'information
+Active Translators	InspectorApp		Traducteurs actifs
+Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Image : %1\nEspace couleur : %2 (%3)\nDimensions : %4 x %5\nOctets par lignes : %6\nNombre total d'octets : %7\n\nInformation d'identité :\nChaîne d'ID : %8\nType MIME : %9\nType : « %10 » (%11)\nID du traducteur : %12\nGroupe : « %13 » (%14)\nQualité : %15\nAptitudes : %16\n\nInformations sur les extensions :\n
+\nOutput Formats:	ImageView		\nFormats de sorties :
+Save feature not implemented yet.	ImageWindow		La sauvegarde n'est pas encore implémentée.
+First Page	ImageWindow		Première page
+Next Page	ImageWindow		Page suivante
+Open...	ImageWindow		Ouvrir…
+\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nTraducteur utilisé :\nNom : %1\nInformations : %2\nVersion : %3\n
+Save...	ImageWindow		Sauvegarder…
+Info	ImageWindow		Informations
+OK	ImageWindow		OK
+Window	ImageWindow		Fenêtre
+Quit	ImageWindow		Quitter
+Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Documents sélectionnés : %1\n\nTraducteur utilisé :\nNom : %2\nInformations : %3\nVersion : %4\n
+Active Translators	ImageWindow		Traducteurs actifs
+View	ImageWindow		Vue
+Previous Page	ImageWindow		Page Précédente
+OK	ImageView		OK
 System Translators	ActiveTranslatorsWindow		Traducteurs systèmes
 Unknown	ImageView		Inconnu
-User Translators	ActiveTranslatorsWindow		Traducteurs utilisateurs
-View	ImageWindow		Vue
-Window	ImageWindow		Fenêtre
-\nInput Formats:	ImageView		\nFormats d'entrée :
-\nOutput Formats:	ImageView		\nFormats de sorties :
-\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nTraducteur utilisé:\nNom: %1\nInformations: %2\nVersion: %3\n
-\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nType : « %1 » (%2)\nGroupe : « %3 » (%4)\nQualité : %5\nAptitudes : %6\nType MIME : %7\nNom : %8\n
+File	ImageWindow		Fichier

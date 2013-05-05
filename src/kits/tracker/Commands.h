@@ -31,9 +31,9 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef _COMMANDS_H
 #define _COMMANDS_H
+
 
 #include "PublicCommands.h"
 
@@ -78,6 +78,7 @@ const uint32 kLoadAddOn = 'Tlda';
 const uint32 kEmptyTrash = 'Tetr';
 const uint32 kAddPrinter = 'Tadp';
 const uint32 kMakeActivePrinter = 'Tmap';
+const uint32 kRestartDeskbar = 'DBar';
 
 const uint32 kRunAutomounterSettings = 'Tram';
 

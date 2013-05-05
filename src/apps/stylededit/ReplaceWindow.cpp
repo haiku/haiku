@@ -25,11 +25,11 @@
 #include <TextControl.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "FindandReplaceWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "FindandReplaceWindow"
 
 ReplaceWindow::ReplaceWindow(BRect frame, BHandler* _handler,
-	BString* searchString, 	BString *replaceString,
+	BString* searchString, 	BString* replaceString,
 	bool caseState, bool wrapState, bool backState)
 	: BWindow(frame, "ReplaceWindow", B_MODAL_WINDOW,
 		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS,

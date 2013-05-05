@@ -30,6 +30,9 @@ public:
 			void				SetStackTrace(StackTrace* stackTrace);
 			void				SetStackFrame(StackFrame* stackFrame);
 
+			void				LoadSettings(const BMessage& settings);
+			status_t			SaveSettings(BMessage& settings);
+
 private:
 			class FramesTableModel;
 

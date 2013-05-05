@@ -23,6 +23,7 @@
 #include <scheduler_defs.h>
 #include <thread.h>
 #include <timer.h>
+#include <util/Random.h>
 
 #include "scheduler_common.h"
 #include "scheduler_tracing.h"
@@ -44,19 +45,6 @@ static Thread *sRunQueue = NULL;
 
 
 static int
-_rand(void)
-{
-	static int next = 0;
-
-	if (next == 0)
-		next = system_time();
-
-	next = next * 1103515245 + 12345;
-	return (next >> 16) & 0x7FFF;
-}
-
-
-static int
 dump_run_queue(int argc, char **argv)
 {
 	Thread *thread;
@@ -67,8 +55,8 @@ dump_run_queue(int argc, char **argv)
 	else {
 		kprintf("thread    id      priority name\n");
 		while (thread) {
-			kprintf("%p  %-7ld %-8ld %s\n", thread, thread->id,
-				thread->priority, thread->name);
+			kprintf("%p  %-7" B_PRId32 " %-8" B_PRId32 " %s\n", thread,
+				thread->id, thread->priority, thread->name);
 			thread = thread->queue_next;
 		}
 	}
@@ -272,7 +260,7 @@ simple_reschedule(void)
 
 			// skip normal threads sometimes
 			// (twice as probable per priority level)
-			if ((_rand() >> (15 - priorityDiff)) != 0)
+			if ((fast_random_value() >> (15 - priorityDiff)) != 0)
 				break;
 
 			nextThread = lowerNextThread;
@@ -324,8 +312,10 @@ simple_reschedule(void)
 			cancel_timer(quantumTimer);
 
 		oldThread->cpu->preempted = 0;
-		add_timer(quantumTimer, &reschedule_event, quantum,
-			B_ONE_SHOT_RELATIVE_TIMER | B_TIMER_ACQUIRE_SCHEDULER_LOCK);
+		if (!thread_is_idle_thread(nextThread)) {
+			add_timer(quantumTimer, &reschedule_event, quantum,
+				B_ONE_SHOT_RELATIVE_TIMER | B_TIMER_ACQUIRE_SCHEDULER_LOCK);
+		}
 
 		if (nextThread != oldThread)
 			scheduler_switch_thread(oldThread, nextThread);

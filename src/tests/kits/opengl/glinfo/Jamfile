@@ -1,0 +1,39 @@
+SubDir HAIKU_TOP src tests kits opengl glinfo ;
+SubDirSysHdrs $(HAIKU_GLU_HEADERS) ;
+SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
+
+UsePrivateHeaders interface ;
+
+local sources =
+	OpenGLApp.cpp
+	OpenGLWindow.cpp
+	OpenGLView.cpp
+	CapabilitiesView.cpp
+	ExtensionsView.cpp
+	InfoView.cpp
+	GearsView.cpp
+;
+
+Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+	# Dependency needed to trigger downloading/unzipping the package before
+	# compiling the files.
+
+Preference GLInfo :
+	$(sources)
+	:
+	be GL libglut.so 
+	translation libcolumnlistview.a $(HAIKU_LOCALE_LIBS)
+	$(TARGET_LIBSUPC++)
+	:
+	GLInfo.rdef
+;
+
+DoCatalogs GLInfo :
+    x-vnd.Haiku-GLInfo
+	:
+	CapabilitiesView.cpp
+	ExtensionsView.cpp
+	InfoView.cpp
+	OpenGLView.cpp
+	OpenGLWindow.cpp
+;

@@ -1,17 +1,17 @@
 1	german	x-vnd.Haiku-mount_server	1422362183
-Cancel	AutoMounter		Abbrechen
-Could not unmount disk \"%s\":\n\t%s	AutoMounter		Datenträger \"%s\" konnte nicht ausgehängt werden:\n\t%s
-Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Datenträger \"%s\" konnte nicht ausgehängt werden:\n\t%s\n\nSoll das Aushängen erzwungen werden?\n\nAchtung: Wird der Datenträger gerade noch beschrieben, kann das Aushängen zum jetzigen Zeitpunkt zu Datenverlust führen.\n
-Error mounting volume:\n\n%s	AutoMounter		Fehler beim Einhängen:\n\n%s
-Force unmount	AutoMounter		Aushängen erzwingen
-It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Alle weiteren Haiku-Datenträger sollten schreibgeschützt eingehängt werden. Dadurch wird möglicher Datenverlust durch Fehler in Haiku ausgeschlossen.
-Mount error	AutoMounter		Fehler beim Einhängen
 Mount read-only	AutoMounter		Schreibgeschützt einhängen
-Mount read/write	AutoMounter		Beschreibbar einhängen
+Error mounting volume:\n\n%s	AutoMounter		Fehler beim Einhängen:\n\n%s
+Unmount error	AutoMounter		Fehler beim Aushängen
 Mount warning	AutoMounter		Warnung beim Einhängen
+Mount read/write	AutoMounter		Beschreibbar einhängen
 Mounting volume '%s'\n\n	AutoMounter		'%s' wird eingehangen\n\n
+Cancel	AutoMounter		Abbrechen
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Datenträger \"%s\" konnte nicht ausgehängt werden:\n\t%s\n\nSoll das Aushängen erzwungen werden?\n\nAchtung: Wird der Datenträger gerade noch beschrieben, kann das Aushängen zum jetzigen Zeitpunkt zu Datenverlust führen.\n
+Could not unmount disk \"%s\":\n\t%s	AutoMounter		Datenträger \"%s\" konnte nicht ausgehängt werden:\n\t%s
 Mounting volume <unnamed volume>\n\n	AutoMounter		<Unbenannter Datenträger> wird eingehangen\n\n
 OK	AutoMounter		OK
-Previous volumes mounted.	AutoMounter		Vorherige Datenträger wurden eingehängt.
 The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Dieser Datenträger ist nicht mit dem Haiku-Dateisystem formatiert. Es wird empfohlen, den Datenträger schreibgeschützt einzuhängen, um möglichen Datenverlust durch Fehler in Haiku auszuschließen.
-Unmount error	AutoMounter		Fehler beim Aushängen
+Previous volumes mounted.	AutoMounter		Vorherige Datenträger wurden eingehängt.
+Mount error	AutoMounter		Fehler beim Einhängen
+It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Alle weiteren Haiku-Datenträger sollten schreibgeschützt eingehängt werden. Dadurch wird möglicher Datenverlust durch Fehler in Haiku ausgeschlossen.
+Force unmount	AutoMounter		Aushängen erzwingen

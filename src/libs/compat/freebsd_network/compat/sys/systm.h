@@ -96,4 +96,7 @@ void delete_unrhdr(struct unrhdr *);
 int alloc_unr(struct unrhdr *);
 void free_unr(struct unrhdr *, u_int);
 
+extern char *getenv(const char *name);
+extern void    freeenv(char *env);
+
 #endif	/* _FBSD_COMPAT_SYS_SYSTM_H_ */

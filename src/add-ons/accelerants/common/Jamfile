@@ -12,6 +12,7 @@ StaticLibrary libaccelerantscommon.a :
 	create_display_modes.cpp
 	ddc.c
 	decode_edid.c
+	dp.cpp
 	dump_edid.c
 	i2c.c
 	validate_display_mode.cpp

@@ -20,8 +20,8 @@
 #include <Catalog.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Time"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Time"
 
 
 /* This structure and its data fields are described in RFC 1305
@@ -153,6 +153,7 @@ ntp_update_time(const char* hostname, const char** errorString,
 			0, (struct sockaddr *)&address, sizeof(address)) < 0) {
 		*errorString = B_TRANSLATE("Sending request failed");
 		*errorCode = errno;
+		close(connection);
 		return B_ERROR;
 	}
 
@@ -168,6 +169,7 @@ ntp_update_time(const char* hostname, const char** errorString,
 	if (select(connection + 1, &waitForReceived, NULL, NULL, &timeout) <= 0) {
 		*errorString = B_TRANSLATE("Waiting for answer failed");
 		*errorCode = errno;
+		close(connection);
 		return B_ERROR;
 	}
 

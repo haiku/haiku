@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2012, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,19 +12,18 @@
 
 
 #include <Alert.h>
+#include <Node.h>
 #include <Window.h>
-#include <String.h>
-#include <Message.h>
-
 
 struct entry_ref;
 
+class BFilePanel;
 class BMenu;
-class BMessage;
 class BMenuBar;
 class BMenuItem;
-class BFilePanel;
+class BMessage;
 class BScrollView;
+class StatusView;
 class StyledEditView;
 
 
@@ -54,10 +53,13 @@ private:
 			void				_InitWindow(uint32 encoding = 0);
 			void				_LoadAttrs();
 			void				_SaveAttrs();
-			status_t			_LoadFile(entry_ref* ref);
-			void				_RevertToSaved();
+			status_t			_LoadFile(entry_ref* ref,
+									const char* forceEncoding = NULL);
+			void				_ReloadDocument(BMessage *message);
+			status_t			_UnlockFile();
 			bool				_Search(BString searchFor, bool caseSensitive,
-									bool wrap, bool backSearch);
+									bool wrap, bool backSearch,
+									bool scrollToOccurence = true);
 			void				_FindSelection();
 			bool				_Replace(BString findThis, BString replaceWith,
 									bool caseSensitive, bool wrap,
@@ -69,11 +71,35 @@ private:
 			void				_SetFontStyle(const char* fontFamily,
 									const char* fontStyle);
 			int32				_ShowStatistics();
+			void				_SetReadOnly(bool editable);
 			void				_UpdateCleanUndoRedoSaveRevert();
 			int32				_ShowAlert(const BString& text,
 									const BString& label, const BString& label2,
 									const BString& label3,
 									alert_type type) const;
+			BMenu*				_PopulateEncodingMenu(BMenu* menu,
+									const char* encoding);
+
+				// node monitoring helper
+			class _NodeMonitorSuspender {
+				StyledEditWindow *fWindow;
+			public:
+				_NodeMonitorSuspender(StyledEditWindow *w) : fWindow(w) {
+					fWindow->_SwitchNodeMonitor(false);
+				}
+
+				~_NodeMonitorSuspender() {
+					fWindow->_SwitchNodeMonitor(true);
+				}
+			};
+
+			friend class		_NodeMonitorSuspender;
+
+			void				_HandleNodeMonitorEvent(BMessage *message);
+			void				_ShowNodeChangeAlert(const char* name,
+									bool removed);
+			void				_SwitchNodeMonitor(bool on,
+									entry_ref* ref = NULL);
 
 private:
 			BMenuBar*			fMenuBar;
@@ -88,13 +114,14 @@ private:
 			BMenuItem*			fCurrentStyleItem;
 
 			BMenuItem*			fSaveItem;
-			BMenuItem*			fRevertItem;
+			BMenuItem*			fReloadItem;
 
 			BMenuItem*			fUndoItem;
 			BMenuItem*			fCutItem;
 			BMenuItem*			fCopyItem;
 
 			BMenuItem*			fFindAgainItem;
+			BMenuItem*			fReplaceItem;
 			BMenuItem*			fReplaceSameItem;
 
 			BMenuItem*			fBlackItem;
@@ -112,22 +139,23 @@ private:
 			BMenuItem*			fAlignLeft;
 			BMenuItem*			fAlignCenter;
 			BMenuItem*			fAlignRight;
+			BMenuItem*			fEncodingItem;
 
 			BString				fStringToFind;
 			BString				fReplaceString;
 
 			// undo modes
-			bool	 			fUndoFlag;   // we just did an undo action
-			bool				fCanUndo;    // we can do an undo action next
-			bool 				fRedoFlag;   // we just did a redo action
-			bool				fCanRedo;    // we can do a redo action next
+			bool				fUndoFlag;	// we just did an undo action
+			bool				fCanUndo;	// we can do an undo action next
+			bool 				fRedoFlag;	// we just did a redo action
+			bool				fCanRedo;	// we can do a redo action next
 
 			// clean modes
 			bool				fUndoCleans;
 				// an undo action will put us in a clean state
 			bool				fRedoCleans;
 				// a redo action will put us in a clean state
-			bool				fClean;      // we are in a clean state
+			bool				fClean;		// we are in a clean state
 
 			bool				fCaseSensitive;
 			bool				fWrapAround;
@@ -135,9 +163,14 @@ private:
 
 			StyledEditView*		fTextView;
 			BScrollView*		fScrollView;
+			StatusView*			fStatusView;
 
 			BFilePanel*			fSavePanel;
 			BMenu*				fSavePanelEncodingMenu;
+				// node monitoring
+			node_ref			fNodeRef;
+			node_ref			fFolderNodeRef;
+			bool				fNagOnNodeChange;
 };
 
 

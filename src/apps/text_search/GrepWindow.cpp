@@ -46,8 +46,8 @@
 #include "InitialIterator.h"
 #include "Translation.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "GrepWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "GrepWindow"
 
 
 using std::nothrow;
@@ -1049,6 +1049,10 @@ GrepWindow::_OnReportResult(BMessage* message)
 		// also reported (count == 0).
 		item = fSearchResults->RemoveResults(ref, count == 0);
 	}
+
+	if (count == 0)
+		return;
+
 	if (item == NULL) {
 		item = new ResultItem(ref);
 		fSearchResults->AddItem(item);
@@ -1290,6 +1294,7 @@ GrepWindow::_OnTrimSelection()
 		text << "\n";
 		BAlert* alert = new BAlert(NULL, text.String(), B_TRANSLATE("OK"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go(NULL);
 		return;
 	}
@@ -1382,6 +1387,7 @@ GrepWindow::_OnSelectInTracker()
 			B_TRANSLATE("Please select the files you wish to have selected for you in "
 				"Tracker."),
 			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go(NULL);
 		return;
 	}
@@ -1446,6 +1452,7 @@ GrepWindow::_OnSelectInTracker()
 		str1.ReplaceFirst("%APP_NAME",APP_NAME);
 		BAlert* alert = new BAlert(NULL, str1.String(), B_TRANSLATE("OK"), 
 			NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go(NULL);
 		goto out;
 	}

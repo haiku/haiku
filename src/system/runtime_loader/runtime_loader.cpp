@@ -9,7 +9,6 @@
 
 #include "runtime_loader_private.h"
 
-#include <elf32.h>
 #include <syscalls.h>
 #include <user_runtime.h>
 
@@ -23,6 +22,7 @@
 
 
 struct user_space_program_args *gProgramArgs;
+void *__gCommPageAddress;
 
 
 static const char *
@@ -352,7 +352,7 @@ test_executable(const char *name, char *invoker)
 			status = B_OK;
 		}
 	} else if (status == B_OK) {
-		struct Elf32_Ehdr *elfHeader = (struct Elf32_Ehdr *)buffer;
+		elf_ehdr *elfHeader = (elf_ehdr *)buffer;
 		if (elfHeader->e_entry == 0) {
 			// we don't like to open shared libraries
 			status = B_NOT_AN_EXECUTABLE;
@@ -371,12 +371,13 @@ out:
 	specified by its ld-script.
 */
 int
-runtime_loader(void *_args)
+runtime_loader(void* _args, void* commpage)
 {
 	void *entry = NULL;
 	int returnCode;
 
 	gProgramArgs = (struct user_space_program_args *)_args;
+	__gCommPageAddress = commpage;
 
 	// Relocate the args and env arrays -- they are organized in a contiguous
 	// buffer which the kernel just copied into user space without adjusting the

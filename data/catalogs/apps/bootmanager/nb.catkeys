@@ -1,65 +1,65 @@
-1	norwegian_bokmål	x-vnd.Haiku-BootManager	3014946856
-About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Vil nå gjennopprette hovedpartisjonssektoren (MBR) for %disk fra %file. Ønsker du å fortsette?
-About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Klar til å skrive oppstartsmenyen til disk. Er du sikker på at du vil fortsette?
-About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Vil nå skrive følgende oppstartsmeny til oppstartsdisken (%s). Vennligst sjekk informasjonen nedenfor før du fortsetter.
-After five seconds	DefaultPartitionPage		Etter fem sekunder
-After four seconds	DefaultPartitionPage		Etter fire sekunder
-After one minute	DefaultPartitionPage		Etter ett minutt
-After one second	DefaultPartitionPage		Etter ett sekund
-After three seconds	DefaultPartitionPage		Etter tre sekunder
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-BootManager	3014946856
+The boot manager has been successfully installed on your system.	BootManagerController		Innstallering av oppstartsbehandleren på systemet var vellykket.
 After two seconds	DefaultPartitionPage		Etter to sekunder
-An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		En feil skjedde under skriving av oppstartsmenyen. Hovedpartisjonssektoren (MBR) kan bli ødelagt, du bør gjennopprette oppstartsektoren nå!
+Uninstall Boot Manager	UninstallPage	Title	Avinstaller oppstartsbehandleren
 At least one partition must be selected!	BootManagerController		Minst én partisjon må være valgt!
-Back	BootManagerController	Button	Tilbake
-Backup Master Boot Record	BootManagerController	Title	Sikkerhetskopier hovedpartisjonssektor
-Boot Manager is unable to read the partition table!	BootManagerController		Oppstartsbehandleren klarer ikke å lese partisjonstabellen.
-BootManager	System name		Oppstartsbehandler
-Cannot access!	DrivesPage	Cannot install	Får ikke tilgang!
-Default Partition	DefaultPartitionPage	Title	Standardpartisjon
-Default Partition:	DefaultPartitionPage	Menu field label	Standard partisjon:
-Done	BootManagerController	Button	Ferdig
-Drives	DrivesPage	Title	Disker
-Error reading partition table	BootManagerController	Title	Feil ved lesing av partisjonstabell
-File:	FileSelectionPage	Text control label	Fil:
+The old Master Boot Record could not be saved to %s	BootManagerController		Den gamle hovedpartisjonssektoren (MBR) kunne ikke bli lagret til %s
+Restore MBR	BootManagerController	Button	Gjennopprett MBR
 Hard Drive	DrivesPage	Default disk name	Harddisk
-Immediately	DefaultPartitionPage		Umiddelbart
-Install	DrivesPage	Button	Installer
-Installation of boot menu completed	BootManagerController	Title	Installasjon av oppstartsmeny vellykket
-Installation of boot menu failed	BootManagerController	Title	Installasjon av oppstartsmeny mislyktes
-Never	DefaultPartitionPage		Aldri
-Next	WizardView	Button	Neste
-No space available!	DrivesPage	Cannot install	Ingen ledig plass!
-OK	BootManagerController	Button	OK
-Old Master Boot Record Saved failure	BootManagerController	Title	Lagring av gammel MBR mislyktes
-Old Master Boot Record saved	BootManagerController	Title	Gammel hovedpartisjonssektor lagret
-Partition table not compatible	BootManagerController	Title	Ikke kompatibel partisjonstabell
-Partitions	DefaultPartitionPage	Pop up menu title	Partisjoner
+USB Drive	DrivesPage	Default disk name	USB-disk
+The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Hovedpartisjonssektoren (MBR) på oppstartsenheten:\n\t%s\nvil nå bli lagret på disken. Vennligst velg en fil til å lagre oppstartsektoren i.\n\nHvis noe går galt med installasjonen eller hvis du senere ønsker å fjerne oppstartsmenyen, kan du enkelt kjøre oppstartsbehandleren og velge "Avinstaller".
+About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Vil nå gjennopprette hovedpartisjonssektoren (MBR) for %disk fra %file. Ønsker du å fortsette?
+An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		En feil skjedde under skriving av oppstartsmenyen. Hovedpartisjonssektoren (MBR) kan bli ødelagt, du bør gjennopprette oppstartsektoren nå!
 Partitions	PartitionsPage	Title	Partisjoner
+Timeout: %s	DefaultPartitionPage		Tidsavbrudd: %s
+Select	FileSelectionPage	Button	Velg
+Cannot access!	DrivesPage	Cannot install	Får ikke tilgang!
+Uninstall boot manager	BootManagerController	Title	Avinstaller oppstartsbehandleren
+After four seconds	DefaultPartitionPage		Etter fire sekunder
+Uninstallation of boot menu failed	BootManagerController	Title	Avinstallering av oppstartsmeny var mislykket
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Vennligst finn filen som inneholder hovedpartisjonssektoren (MBR) som skal gjennopprettes. Dette er filen som ble laget da oppstartsbehandleren ble installert.
-Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Vennligst finn den lagrede filen til hovedpartisjonssektoren (MBR) for å gjenopprette. Dette er filen som ble laget da oppstartsbehandleren ble installert.
+Next	WizardView	Button	Neste
+Uninstallation of boot menu completed	BootManagerController	Title	Avinstallering av oppstartsmeny fullført
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Vennligst velg disken du vil at oppstartsbehandleren skal bli installert på eller avinstallert fra.
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Vennligst spesifiser en standardpartisjon og et tidsavbrudd.\nOppstartsmenyen vil laste standardpartisjonen etter tidsavbruddet hvis du ikke velger en annen partisjon. Du kan også la oppstartsmenyen vente ubegrenset på at du skal velge en partisjon.\nHold nede 'ALT'-knappen for å deaktivere tidsavbrudd under oppstart. 
-Previous	WizardView	Button	Forrige
-Quit	DrivesPage	Button	Avslutt
-Restore MBR	BootManagerController	Button	Gjennopprett MBR
-Select	FileSelectionPage	Button	Velg
-Summary	BootManagerController	Title	Oppsummering
-The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Hovedpartisjonssektoren (MBR) på oppstartsenheten:\n\t%s\nvil nå bli lagret på disken. Vennligst velg en fil til å lagre oppstartsektoren i.\n\nHvis noe går galt med installasjonen eller hvis du senere ønsker å fjerne oppstartsmenyen, kan du enkelt kjøre oppstartsbehandleren og velge "Avinstaller".
-The Master Boot Record could not be restored!	BootManagerController		Hovedpartisjonssektoren kunne ikke gjennopprettes!
-The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Hovedpartisjonssektoren (MBR) på oppstartsmediet (%DISK) har blitt vellykket gjennopprettet fra %FILE.
-The boot manager has been successfully installed on your system.	BootManagerController		Innstallering av oppstartsbehandleren på systemet var vellykket.
-The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Følgende partisjoner ble oppdaget. Vennligst merk av i boksen ved siden av partisjonene du vil ha inkludert i oppstartsmenyen. Du kan også navngi partisjonene slik du vil de skal vises i oppstartsmenyen.
-The old Master Boot Record could not be saved to %s	BootManagerController		Den gamle hovedpartisjonssektoren (MBR) kunne ikke bli lagret til %s
-The old Master Boot Record was successfully saved to %s.	BootManagerController		Lagring av gammel hovedpartisjonssektor til %s var vellykket.
+After one second	DefaultPartitionPage		Etter ett sekund
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Partisjonstabellen på den første harddisken er ikke kompatibel med oppstartsehandleren.\nOppstartsbehandleren trenger 2 KB med tilgjengelig plass foran den første partisjonen.
-Timeout: %s	DefaultPartitionPage		Tidsavbrudd: %s
-USB Drive	DrivesPage	Default disk name	USB-disk
-Uninstall	DrivesPage	Button	Avinstaller
-Uninstall Boot Manager	UninstallPage	Title	Avinstaller oppstartsbehandleren
-Uninstall boot manager	BootManagerController	Title	Avinstaller oppstartsbehandleren
-Uninstallation of boot menu completed	BootManagerController	Title	Avinstallering av oppstartsmeny fullført
-Uninstallation of boot menu failed	BootManagerController	Title	Avinstallering av oppstartsmeny var mislykket
-Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Ukjent
-Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Uten navn %d
-Update	DrivesPage	Button	Oppdater
+The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Følgende partisjoner ble oppdaget. Vennligst merk av i boksen ved siden av partisjonene du vil ha inkludert i oppstartsmenyen. Du kan også navngi partisjonene slik du vil de skal vises i oppstartsmenyen.
+After one minute	DefaultPartitionPage		Etter ett minutt
+The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Hovedpartisjonssektoren (MBR) på oppstartsmediet (%DISK) har blitt vellykket gjennopprettet fra %FILE.
 Write boot menu	BootManagerController	Button	Skriv oppstartsmeny
+The Master Boot Record could not be restored!	BootManagerController		Hovedpartisjonssektoren kunne ikke gjennopprettes!
+Uninstall	DrivesPage	Button	Avinstaller
+Default Partition	DefaultPartitionPage	Title	Standardpartisjon
+After five seconds	DefaultPartitionPage		Etter fem sekunder
+Back	BootManagerController	Button	Tilbake
+Installation of boot menu completed	BootManagerController	Title	Installasjon av oppstartsmeny vellykket
+Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Uten navn %d
+File:	FileSelectionPage	Text control label	Fil:
+Previous	WizardView	Button	Forrige
+Install	DrivesPage	Button	Installer
+About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Vil nå skrive følgende oppstartsmeny til oppstartsdisken (%s). Vennligst sjekk informasjonen nedenfor før du fortsetter.
+Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Ukjent
+Update	DrivesPage	Button	Oppdater
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Vennligst finn den lagrede filen til hovedpartisjonssektoren (MBR) for å gjenopprette. Dette er filen som ble laget da oppstartsbehandleren ble installert.
+Old Master Boot Record Saved failure	BootManagerController	Title	Lagring av gammel MBR mislyktes
+Drives	DrivesPage	Title	Disker
+No space available!	DrivesPage	Cannot install	Ingen ledig plass!
+Never	DefaultPartitionPage		Aldri
+Partition table not compatible	BootManagerController	Title	Ikke kompatibel partisjonstabell
+Old Master Boot Record saved	BootManagerController	Title	Gammel hovedpartisjonssektor lagret
+Boot Manager is unable to read the partition table!	BootManagerController		Oppstartsbehandleren klarer ikke å lese partisjonstabellen.
+Error reading partition table	BootManagerController	Title	Feil ved lesing av partisjonstabell
+Installation of boot menu failed	BootManagerController	Title	Installasjon av oppstartsmeny mislyktes
+Backup Master Boot Record	BootManagerController	Title	Sikkerhetskopier hovedpartisjonssektor
+Quit	DrivesPage	Button	Avslutt
+About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Klar til å skrive oppstartsmenyen til disk. Er du sikker på at du vil fortsette?
+The old Master Boot Record was successfully saved to %s.	BootManagerController		Lagring av gammel hovedpartisjonssektor til %s var vellykket.
+Default Partition:	DefaultPartitionPage	Menu field label	Standard partisjon:
+Partitions	DefaultPartitionPage	Pop up menu title	Partisjoner
+BootManager	System name		Oppstartsbehandler
+Summary	BootManagerController	Title	Oppsummering
+OK	BootManagerController	Button	OK
+Immediately	DefaultPartitionPage		Umiddelbart
+Done	BootManagerController	Button	Ferdig
+After three seconds	DefaultPartitionPage		Etter tre sekunder

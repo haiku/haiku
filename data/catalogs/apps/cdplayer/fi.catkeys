@@ -1,14 +1,14 @@
 1	finnish	x-vnd.Haiku-CDPlayer	592310631
-Audio CD	CDPlayer		Audio-CD
-CD	CDPlayer		CD
-CD drive is empty	CDPlayer		CD-levyasema on tyhjä
 CDPlayer	System name		CD-soitin
+CD	CDPlayer		CD
 Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		Levy: %ld:%.2ld / %ld:%.2ld
-Disc: --:-- / --:--	CDPlayer		Levy: --:-- / --:--
-Disc: 88:88 / 88:88	CDPlayer		Levy: 88:88 / 88:88
-It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Näyttää, että tietokoneellasi ei ole CD-levyasemaa tai järjestelmäohjelmisto ei tue sellaista.
 OK	CDPlayer		Valmis
 Track %whichTrack%: %trackAt%	CDPlayer		Kappale %whichTrack%: %trackAt%
+Audio CD	CDPlayer		Audio-CD
+It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Näyttää, että tietokoneellasi ei ole CD-levyasemaa tai järjestelmäohjelmisto ei tue sellaista.
 Track: %ld:%.2ld / %ld:%.2ld	CDPlayer		Kappale: %ld:%.2ld / %ld:%.2ld
-Track: --:-- / --:--	CDPlayer		Kappale: --:-- / --:--
 Track: 88:88 / 88:88	CDPlayer		Kappale: 88:88 / 88:88
+Track: --:-- / --:--	CDPlayer		Kappale: --:-- / --:--
+Disc: 88:88 / 88:88	CDPlayer		Levy: 88:88 / 88:88
+Disc: --:-- / --:--	CDPlayer		Levy: --:-- / --:--
+CD drive is empty	CDPlayer		CD-levyasema on tyhjä

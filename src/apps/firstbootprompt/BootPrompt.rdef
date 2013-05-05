@@ -1,0 +1,18 @@
+
+resource app_signature "application/x-vnd.Haiku-FirstBootPrompt";
+
+resource app_name_catalog_entry "x-vnd.Haiku-FirstBootPrompt:System name:FirstBootPrompt";
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	variety = B_APPV_BETA,
+	internal = 0,
+
+	short_info = "FirstBootPrompt",
+	long_info  = "FirstBootPrompt ©2011-2013 The Haiku Project"
+};
+
+resource app_flags B_EXCLUSIVE_LAUNCH;

@@ -1,0 +1,21 @@
+1	hindi	x-vnd.Haiku-JPEGTranslator	965709535
+Output quality	JPEGTranslator		ओउत्पुट कुँलिटी  
+JPEG images	JPEGTranslator		जेपीजी चित्र
+Prevent colors 'washing out'	JPEGTranslator		कलर्स को बहने न दें
+JPEG Library Error: %s\n	be_jerror		जेपेईएजी लाइब्ररी त्रुटि: %s\n  
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		सीऍमवाएके कोड 0 के साथ 100% के लिए पूरी इंक कोवेरागे इस्तमाल करें
+About	JPEGTranslator		के बारें में 
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, मार्सिन कोनिच्की\n©2005-2007, हैंकु\n\nआईजेजी लाइब्ररी पर आधारित ©1994-2009, थोमस जी. लेन, गुइडो वोल्ल्बेद्डिंग.\n\t http://www.ijg.org/files/\n\nwith \"lossless\"एन्कोडिंग मदद पतच केन मुर्चिसों के द्वारा\n\t http://www.oceana.com/ftp/ljpeg/\n\nमाग्नुस  हील्लमन के द्वारा कुछ कोलोर्स्पस कोन्वेर्सिओं रौतिनेस\n\t http://www.bebits.com/app/802\n     
+Low	JPEGTranslator		निम्न
+Make file smaller (sligthtly worse quality)	JPEGTranslator		फ़ाइल को छोटा बनायें (थोड़ी सी गन्दी कुँलिटी) 
+None	JPEGTranslator		कोई नहीं
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		बित्माप फॉर्मेट ही रहनेदे (जेपेईएजी अनुवादक)
+Show warning messages	JPEGTranslator		सावधानी के बात दिखाएँ
+Output smoothing strength	JPEGTranslator		आउटपुट स्मूथिंग ताकत
+High	JPEGTranslator		उच्च
+Write	JPEGTranslator		लिखें
+Write black-and-white images as RGB24	JPEGTranslator		काला और सफ़ेद चित्र को आरजीबी24 लिखें
+Read greyscale images as RGB32	JPEGTranslator		ग्रेस्केल चित्र को आरजीबी32 की तरह पढ़ें
+Read	JPEGTranslator		पढ़ें
+JPEG Library Warning: %s\n	be_jerror		जेपेईएजी लाइब्ररी चेतावनी: %s\n
+Use progressive compression	JPEGTranslator		प्रोग्रेस्सिव कम्प्रेशन को इस्तमाल करें

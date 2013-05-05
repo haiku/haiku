@@ -106,6 +106,9 @@ status_t 	fs_fsync(fs_volume *_vol, fs_vnode *_node);
 status_t	fs_rename(fs_volume *volume, fs_vnode *fromDir, const char *fromName,
 				fs_vnode *toDir, const char *toName);
 status_t	fs_unlink(fs_volume *volume, fs_vnode *dir, const char *name);
+status_t	fs_initialize(int fd, partition_id partitionID, const char* name,
+				const char* parameterString, off_t partitionSize, disk_job_id job);
+uint32		fs_get_supported_operations(partition_data* partition, uint32 mask);
 
 #endif	// NTFS_FS_FUNC_H
 

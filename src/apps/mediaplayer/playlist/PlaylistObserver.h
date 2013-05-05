@@ -26,7 +26,7 @@ public:
 
 	virtual	void				ItemsSorted();
 
-	virtual	void				CurrentItemChanged(int32 newIndex);
+	virtual	void				CurrentItemChanged(int32 newIndex, bool play);
 
 	virtual	void				ImportFailed();
 };

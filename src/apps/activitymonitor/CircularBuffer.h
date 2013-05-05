@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef CIRCULAR_BUFFER_H
@@ -16,7 +16,8 @@ class CircularBuffer {
 public:
 	CircularBuffer(size_t size)
 		:
-		fSize(0)
+		fSize(0),
+		fBuffer(NULL)
 	{
 		SetSize(size);
 	}
@@ -95,5 +96,6 @@ private:
 	uint32		fSize;
 	Type*		fBuffer;
 };
+
 
 #endif	// CIRCULAR_BUFFER_H

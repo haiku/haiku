@@ -1,0 +1,34 @@
+1	lithuanian	x-vnd.Haiku-LaunchBox	3016105370
+New	LaunchBox		Naujas
+Set description…	LaunchBox		Keisti aprašą…
+Vertical layout	LaunchBox		Išdėstyti stačiai
+OK	LaunchBox		Gerai
+Pad 1	LaunchBox		Skydelis Nr. 1
+last chance	LaunchBox		paskutinė proga
+Quit	LaunchBox		Baigti darbą
+Clear button	LaunchBox		Atlaisvinti mygtuką
+LaunchBox	System name		Leidyklė
+Ignore double-click	LaunchBox		Nepaisyti dvigubų spustelėjimų
+Auto-raise	LaunchBox		Automatiškai iškilti
+Show on all workspaces	LaunchBox		Rodyti visuose darbalaukiuose
+Show window border	LaunchBox		Rodyti lango rėmelį
+Pad	LaunchBox		Skydelis
+Icon size	LaunchBox		Mygtukų dydis
+Bummer	LaunchBox		Vaje
+Cancel	LaunchBox		Atsisakyti
+Remove button	LaunchBox		Pašalinti mygtuką
+Horizontal layout	LaunchBox		Išdėstyti gulsčiai
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nNepavyko paleisti programos, kurios identifikatorius „%2“.\n\nKlaida:
+Failed to launch '%1'.\n\nError:	LaunchBox		Nepavyko paleisti „%1“\n\nKlaida:
+Name Panel	LaunchBox		Pavadinkite skydelį
+Add button here	LaunchBox		Pridėti mygtuką čia
+Description for '%3'	LaunchBox		Įveskite „%3“ aprašą:
+Settings	LaunchBox		Parinktys
+Failed to launch 'something', error in Pad data.	LaunchBox		Nepavyko paleisti „something“ dėl klaidos pultelio duomenyse.
+Pad %1	LaunchBox		Pultelis Nr. %1
+Close	LaunchBox		Užverti
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Pėdsekiui nepavyko perduoti komandos „atverti aplanką“.\n\nKlaida:
+You can drag an icon here.	LaunchBox		Čia galite atitempti ir numesti piktogramą.
+Clone	LaunchBox		Dubliuoti
+launch popup	LaunchBox		launch popup
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Ar tikrai norite užverti šį pultelį?\nAtkrepkite dėmesį, jog jis nebus įsimintas.

@@ -1,0 +1,9 @@
+1	hindi	x-vnd.Haiku-IMAP	3892875357
+Destination:	imap_config		गंतव्य:
+status	IMAPFolderConfig		स्थति
+Apply	IMAPFolderConfig		लागू करें
+IMAP Folders	imap_config		आईमेपआएपि फोल्डर
+Fetching IMAP folders, have patience...	IMAPFolderConfig		आईमेपआएपि फोल्डर खोज रहें है, धैर्य रखें...
+IMAP Folders	IMAPFolderConfig		आईमेप फोल्डर
+Subcribe / Unsuscribe IMAP folders, have patience...	IMAPFolderConfig		सुब्स्क्रैब / अन्सुब्स्क्रैब आईमेपआएपि फोल्डर, धैर्य रखें...
+Failed to fetch available storage.	IMAPFolderConfig		उपलब्ध जगा खोजने में असफल.

@@ -24,8 +24,8 @@
 #include "DataTranslationsWindow.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "DataTranslations"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "DataTranslations"
 
 
 const char* kApplicationSignature = "application/x-vnd.Haiku-DataTranslations";
@@ -53,6 +53,7 @@ DataTranslationsApplication::_InstallError(const char* name, status_t status)
 	text.UnlockBuffer();
 	BAlert* alert = new BAlert(B_TRANSLATE("DataTranslations - Error"),
 		text.String(), B_TRANSLATE("OK"));
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 }
 
@@ -64,7 +65,7 @@ DataTranslationsApplication::_InstallError(const char* name, status_t status)
 status_t
 DataTranslationsApplication::_Install(BDirectory& target, BEntry& entry)
 {
-	// Find out wether we need to copy it
+	// Find out whether we need to copy it
 	status_t status = entry.MoveTo(&target, NULL, true);
 	if (status == B_OK)
 		return B_OK;
@@ -83,7 +84,8 @@ DataTranslationsApplication::_NoTranslatorError(const char* name)
 		B_TRANSLATE("The item '%name' does not appear to be a Translator and "
 		"will not be installed."));
 	text.ReplaceAll("%name", name);
-	BAlert* alert = new BAlert("", text.String(), B_TRANSLATE("Ok"));
+	BAlert* alert = new BAlert("", text.String(), B_TRANSLATE("OK"));
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 }
 
@@ -145,13 +147,14 @@ DataTranslationsApplication::RefsReceived(BMessage* message)
 			// the original file will be replaced
 		}
 
-		// find out wether we need to copy it or not
+		// find out whether we need to copy it or not
 
 		status = _Install(target, entry);
 		if (status == B_OK) {
 			BAlert* alert = new BAlert(B_TRANSLATE("DataTranslations - Note"),
 				B_TRANSLATE("The new translator has been installed "
 					"successfully."), B_TRANSLATE("OK"));
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go(NULL);
 		} else
 			_InstallError(ref.name, status);

@@ -522,7 +522,7 @@ BTabView::AllUnarchived(const BMessage* archive)
 
 	BUnarchiver unarchiver(archive);
 
-	int32 tabCount;	
+	int32 tabCount;
 	archive->GetInfo("_l_items", NULL, &tabCount);
 	for (int32 i = 0; i < tabCount && err == B_OK; i++) {
 		BTab* tab;
@@ -1284,10 +1284,8 @@ BTabView::SetTabHeight(float height)
 	if (fTabHeight == height)
 		return;
 
-	fContainerView->MoveBy(0.0f, height - fTabHeight);
-	fContainerView->ResizeBy(0.0f, height - fTabHeight);
-
 	fTabHeight = height;
+	_LayoutContainerView(GetLayout() != NULL);
 
 	Invalidate();
 }
@@ -1506,21 +1504,11 @@ BTabView::operator=(const BTabView&)
 
 //	#pragma mark - binary compatibility
 
-#if __GNUC__ < 3
 
 extern "C" void
-_ReservedTabView1__8BTabView(BTabView* tabView, border_style border)
+B_IF_GCC_2(_ReservedTabView1__8BTabView, _ZN8BTabView17_ReservedTabView1Ev)(
+	BTabView* tabView, border_style border)
 {
 	tabView->BTabView::SetBorder(border);
 }
-
-#else // __GNUC__ >= 3
-
-extern "C" void
-_ZN8BTabView17_ReservedTabView1Ev(BTabView* tabView, border_style border)
-{
-	tabView->BTabView::SetBorder(border);
-}
-
-#endif // __GNUC__ >= 3
 

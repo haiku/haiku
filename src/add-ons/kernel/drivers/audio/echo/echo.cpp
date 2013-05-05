@@ -110,6 +110,7 @@ echo_mem_new(echo_dev *card, size_t size)
 	return mem;
 }
 
+
 void
 echo_mem_delete(echo_mem *mem)
 {
@@ -117,6 +118,7 @@ echo_mem_delete(echo_mem *mem)
 		delete_area(mem->area);
 	free(mem);
 }
+
 
 echo_mem *
 echo_mem_alloc(echo_dev *card, size_t size)
@@ -131,6 +133,7 @@ echo_mem_alloc(echo_dev *card, size_t size)
 
 	return mem;
 }
+
 
 void
 echo_mem_free(echo_dev *card, void *ptr)
@@ -248,7 +251,8 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 	sample_size = stream->bitsPerSample / 8;
 	frame_size = sample_size * stream->channels;
 
-	stream->buffer = echo_mem_alloc(stream->card, stream->bufframes * frame_size * stream->bufcount);
+	stream->buffer = echo_mem_alloc(stream->card,
+		stream->bufframes * frame_size * stream->bufcount);
 
 	stream->trigblk = 1;
 	stream->blkmod = stream->bufcount;
@@ -322,6 +326,7 @@ echo_stream_start(echo_stream *stream, void (*inth) (void *), void *inthparam)
 	}
 }
 
+
 void
 echo_stream_halt(echo_stream *stream)
 {
@@ -335,6 +340,7 @@ echo_stream_halt(echo_stream *stream)
 		PRINT(("echo_stream_halt : Could not stop the pipe %s\n", pStatusStrs[status]));
 	}
 }
+
 
 echo_stream *
 echo_stream_new(echo_dev *card, uint8 use, uint32 bufframes, uint8 bufcount)
@@ -374,6 +380,7 @@ echo_stream_new(echo_dev *card, uint8 use, uint32 bufframes, uint8 bufcount)
 
 	return stream;
 }
+
 
 void
 echo_stream_delete(echo_stream *stream)
@@ -464,7 +471,7 @@ init_hardware(void)
 #ifdef CARDBUS
 	return B_OK;
 #else
-	int ix=0;
+	int ix = 0;
 	pci_info info;
 	status_t err = ENODEV;
 
@@ -545,7 +552,7 @@ init_driver(void)
 	LIST_INIT(&(devices));
 	return B_OK;
 #else
-	int ix=0;
+	int ix = 0;
 
 	pci_info info;
 	status_t err;
@@ -601,7 +608,7 @@ init_driver(void)
 			}
 #endif
 			if (echo_setup(&cards[num_cards])) {
-				PRINT(("Setup of "DRIVER_NAME" %ld failed\n", num_cards+1));
+				PRINT(("Setup of "DRIVER_NAME" %ld failed\n", num_cards + 1));
 #ifdef __HAIKU__
 				(*pci->unreserve_device)(info.bus, info.device, info.function,
 					DRIVER_NAME, &cards[num_cards]);
@@ -626,14 +633,13 @@ init_driver(void)
 
 #ifndef CARDBUS
 static void
-make_device_names(
-	echo_dev * card)
+make_device_names(echo_dev * card)
 {
 #ifdef MIDI_SUPPORT
-	sprintf(card->midi.name, "midi/"DRIVER_NAME"/%ld", card-cards+1);
+	sprintf(card->midi.name, "midi/"DRIVER_NAME"/%ld", card-cards + 1);
 	names[num_names++] = card->midi.name;
 #endif
-	sprintf(card->name, "audio/hmulti/"DRIVER_NAME"/%ld", card-cards+1);
+	sprintf(card->name, "audio/hmulti/"DRIVER_NAME"/%ld", card-cards + 1);
 	names[num_names++] = card->name;
 
 	names[num_names] = NULL;
@@ -851,7 +857,7 @@ echo_setup(echo_dev * card)
 
 #ifdef ECHO3G_FAMILY
 	if (card->type == ECHO3G) {
-		strncpy(card->caps.szName, ((C3g*)card->pEG)->Get3gBoxName(),
+		strlcpy(card->caps.szName, ((C3g*)card->pEG)->Get3gBoxName(),
 			ECHO_MAXNAMELEN);
 	}
 #endif

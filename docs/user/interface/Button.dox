@@ -1,16 +1,19 @@
 /*
- * Copyright 2011, Haiku inc.
+ * Copyright 2011 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation by:
+ * Authors:
  *		John Scipione, jscipione@gmail.com
+ *
  * Corresponds to:
- *		/trunk/headers/os/interface/Button.h	 rev 42794
- *		/trunk/src/kits/interface/Button.cpp	 rev 42794
+ *		headers/os/interface/Button.h	 rev 42794
+ *		src/kits/interface/Button.cpp	 rev 42794
 
 
 /*!
 	\file Button.h
+	\ingroup interface
+	\ingroup libbe
 	\brief Describes the BButton class.
 */
 
@@ -18,6 +21,7 @@
 /*!
 	\class BButton Button.h
 	\ingroup interface
+	\ingroup libbe
 	\brief A BButton is a labeled on-screen button.
 
 	A BButton control is used to initiate an action. An action is activated
@@ -29,8 +33,8 @@
 
 	A BButton, unlike other user interface elements such as check boxes and
 	radio buttons has only a single state. During a click event the
-	BButton's value is set to \c 1, (\c B_CONTROL_ON) otherwise this value
-	is \c 0 (\c B_CONTROL_OFF).
+	BButton's value is set to 1, (\c B_CONTROL_ON) otherwise this value
+	is 0 (\c B_CONTROL_OFF).
 
 	BButton inherits from the BControl class.
 */
@@ -170,36 +174,6 @@
 
 
 /*!
-	\fn void BButton::MouseDown(BPoint point)
-	\brief Hook method that is called when a mouse button is pressed.
-
-	\param point The point on the screen where to mouse pointer is when
-		the mouse button is pressed.
-
-	\sa BView::MouseDown()
-*/
-
-
-/*!
-	\fn void BButton::AttachedToWindow()
-	\brief Hook method that is called when the object is attached to a
-		window.
-
-	\sa BControl::AttachedToWindow()
-*/
-
-
-/*!
-	\fn void BButton::KeyDown(const char *bytes, int32 numBytes)
-	\brief Hook method that is called when a keyboard key is pushed down.
-		to the window.
-	
-	\param bytes The key pressed.
-	\param numBytes The number of keys pressed.
-*/
-
-
-/*!
 	\fn void BButton::MakeDefault(bool flag)
 	\brief Make the BButton the default button i.e. it will be activated
 		when the user pushes the \key{Enter} key.
@@ -259,14 +233,6 @@
 
 
 /*!
-	\fn void BButton::ResizeToPreferred()
-	\brief Resizes the BButton to its preferred size.
-
-	\see BView::ResizeToPreferred()
-*/
-
-
-/*!
 	\fn status_t BButton::Invoke(BMessage *message)
 	\brief The BButton is invoked from a message.
 
@@ -281,89 +247,4 @@
 		\a status_t flag is returned.
 
 	\see BControl::Invoke()
-*/
-
-
-/*!
-	\fn void BButton::FrameMoved(BPoint newLocation)
-	\brief Hook method that is called when the BButton has moved.
-
-	\param newLocation The location on the screen that the BButton
-		is moved to.
-
-	\see BView::FrameMoved();
-*/
-
-
-/*!
-	\fn void BButton::FrameResized(float width, float height)
-	\brief Hook method that is called when the BButton changes size.
-
-	\param width the new \a width of the BButton
-	\param height the new \a height of the BButton
-
-	\see BView::FrameResized();
-*/
-
-
-/*!
-	\fn void BButton::MakeFocus(bool focused)
-	\brief Focus or unfocus the BButton.
-
-	\param focused If \c true focus the button, otherwise remove focus from
-		the button.
-
-	\see BControl::MakeFocus()
-*/
-
-
-/*!
-	\fn status_t BButton::Perform(perform_code code, void* _data)
-	\brief Perform an action on the BButton.
-
-	\param code The \a perform_code. One of the following:
-		\li \c PERFORM_CODE_MIN_SIZE
-		\li \c PERFORM_CODE_MAX_SIZE
-		\li \c PERFORM_CODE_PREFERRED_SIZE
-		\li \c PERFORM_CODE_LAYOUT_ALIGNMENT
-		\li \c PERFORM_CODE_HAS_HEIGHT_FOR_WIDTH
-		\li \c PERFORM_CODE_GET_HEIGHT_FOR_WIDTH
-		\li \c PERFORM_CODE_SET_LAYOUT
-		\li \c PERFORM_CODE_INVALIDATE_LAYOUT
-		\li \c PERFORM_CODE_DO_LAYOUT
-	\param _data Data to use to act on.
-
-	\returns \c B_OK if the action was successful or an error code if not.
-*/
-
-
-/*!
-	\fn void BButton::InvalidateLayout(bool descendants)
-	\brief Redraws the BButton.
-
-	\param descendants Redraw subviews as well.
-*/
-
-
-/*!
-	\fn BSize BButton::MinSize()
-	\brief Returns the minimum size of the BButton.
-
-	\returns The minimum BButton size as a BSize
-*/
-
-
-/*!
-	\fn BSize BButton::MaxSize()
-	\brief Returns the maximum size of the BButton.
-
-	\returns The maximum BButton size as a BSize
-*/
-
-
-/*!
-	\fn BSize BButton::PreferredSize()
-	\brief Returns the preferred size of the BButton.
-
-	\returns The preferred BButton size as a BSize
 */

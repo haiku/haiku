@@ -1,7 +1,7 @@
 /*
 	ProcessController © 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org
-	Copyright (c) 2006-2009, Haiku, Inc. All rights reserved.
+	Copyright (c) 2006-2012, Haiku, Inc. All rights reserved.
 
 	This library is free software; you can redistribute it and/or
 	modify it under the terms of the GNU Lesser General Public
@@ -58,8 +58,8 @@
 #include "Utilities.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ProcessController"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ProcessController"
 
 
 const char* kDeskbarItemName = "ProcessController";
@@ -90,7 +90,7 @@ bool gInDeskbar = false;
 
 #define addtopbottom(x) if (top) popup->AddItem(x); else popup->AddItem(x, 0)
 
-long thread_popup(void *arg);
+status_t thread_popup(void *arg);
 
 int32			gPopupFlag = 0;
 thread_id		gPopupThreadID = 0;
@@ -103,8 +103,8 @@ typedef struct {
 
 #define DEBUG_THREADS 1
 
-long thread_quit_application(void *arg);
-long thread_debug_thread(void *arg);
+status_t thread_quit_application(void *arg);
+status_t thread_debug_thread(void *arg);
 
 typedef struct {
 	thread_id	thread;
@@ -124,7 +124,7 @@ layoutT layout[] = {
 	{ 1, 1, 1 },
 	{ 5, 1, 5 },	// 1
 	{ 3, 1, 4 },	// 2
-	{ 1, 1, 1 },
+	{ 2, 1, 3 },
 	{ 2, 0, 3 },	// 4
 	{ 1, 1, 1 },
 	{ 1, 1, 1 },
@@ -220,7 +220,7 @@ ProcessController::Init()
 }
 
 
-ProcessController *
+ProcessController*
 ProcessController::Instantiate(BMessage *data)
 {
 	if (!validate_instantiation(data, kClassName))
@@ -257,7 +257,7 @@ ProcessController::MessageReceived(BMessage *message)
 			if (message->FindInt32("team", &team) == B_OK) {
 				resume_thread(spawn_thread(thread_quit_application,
 					B_TRANSLATE("Quit application"), B_NORMAL_PRIORITY,
-					(void*) team));
+					(void*)(addr_t)team));
 			}
 			break;
 
@@ -280,7 +280,7 @@ ProcessController::MessageReceived(BMessage *message)
 						B_TRANSLATE("This team is already gone"B_UTF8_ELLIPSIS),
 						B_TRANSLATE("Ok!"), NULL, NULL, B_WIDTH_AS_USUAL,
 						B_STOP_ALERT);
-					alert->SetShortcut(0, B_ESCAPE);
+					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 					alert->Go();
 				}
 			}
@@ -298,6 +298,8 @@ ProcessController::MessageReceived(BMessage *message)
 						B_TRANSLATE("Cancel"), B_TRANSLATE("Debug this thread!"),
 						B_TRANSLATE("Kill this thread!"), B_WIDTH_AS_USUAL,
 						B_STOP_ALERT);
+					alert->SetShortcut(0, B_ESCAPE);
+
 					#define KILL 2
 					#else
 					snprintf(question, sizeof(question),
@@ -306,6 +308,8 @@ ProcessController::MessageReceived(BMessage *message)
 					alert = new BAlert(B_TRANSLATE("Please confirm"), question,
 						B_TRANSLATE("Cancel"), B_TRANSLATE("Kill this thread!"),
 						NULL, B_WIDTH_AS_USUAL,	B_STOP_ALERT);
+					alert->SetShortcut(0, B_ESCAPE);
+
 					#define KILL 1
 					#endif
 					alert->SetShortcut(0, B_ESCAPE);
@@ -330,7 +334,7 @@ ProcessController::MessageReceived(BMessage *message)
 						B_TRANSLATE("This thread is already gone"B_UTF8_ELLIPSIS),
 						B_TRANSLATE("Ok!"),	NULL, NULL,
 						B_WIDTH_AS_USUAL, B_STOP_ALERT);
-					alert->SetShortcut(0, B_ESCAPE);
+					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 					alert->Go();
 				}
 			}
@@ -338,7 +342,7 @@ ProcessController::MessageReceived(BMessage *message)
 
 		case 'PrTh':
 			if (message->FindInt32("thread", &thread) == B_OK) {
-				long new_priority;
+				int32 new_priority;
 				if (message->FindInt32("priority", &new_priority) == B_OK)
 					set_thread_priority(thread, new_priority);
 			}
@@ -368,10 +372,9 @@ ProcessController::MessageReceived(BMessage *message)
 		{
 			BPath terminalPath;
 			if (find_directory(B_SYSTEM_APPS_DIRECTORY, &terminalPath) == B_OK
-				&& terminalPath.Append("Deskbar") == B_OK) {
+				&& terminalPath.Append("Terminal") == B_OK) {
 				launch(kTerminalSig, terminalPath.Path());
 			}
-			launch(kTerminalSig, terminalPath.Path());
 			break;
 		}
 
@@ -409,7 +412,7 @@ ProcessController::MessageReceived(BMessage *message)
 						"You can't turn it off!"),
 						B_TRANSLATE("That's no Fun!"), NULL, NULL,
 						B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-					alert->SetShortcut(0, B_ESCAPE);
+					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 					alert->Go();
 				} else
 					_kern_set_cpu_enabled(cpu, !_kern_cpu_enabled(cpu));
@@ -430,15 +433,24 @@ ProcessController::MessageReceived(BMessage *message)
 void
 ProcessController::AboutRequested()
 {
+	BAboutWindow* window = new BAboutWindow(
+		B_TRANSLATE_SYSTEM_NAME("ProcessController"), kSignature);
+
+	const char* extraCopyrights[] = {
+		"2004 beunited.org",
+		"1997-2001 Georges-Edouard Berenger",
+		NULL
+	};
+
 	const char* authors[] = {
 		"Georges-Edouard Berenger",
 		NULL
 	};
 
-	BAboutWindow about(B_TRANSLATE_SYSTEM_NAME("ProcessController"), 2007, authors,
-		"Copyright 1997-2001\n"
-		"Georges-Edouard Berenger.");
-	about.Show();
+	window->AddCopyright(2007, "Haiku, Inc.", extraCopyrights);
+	window->AddAuthors(authors);
+
+	window->Show();
 }
 
 
@@ -543,16 +555,17 @@ ProcessController::DoDraw(bool force)
 	float right = left + gCPUcount * (barWidth + layout[gCPUcount].cpu_inter)
 		- layout[gCPUcount].cpu_inter; // right of CPU frame...
 	if (force && Parent()) {
-		SetHighColor(Parent()->ViewColor ());
+		SetHighColor(Parent()->ViewColor());
 		FillRect(BRect(right + 1, top - 1, right + 2, bottom + 1));
 	}
 
 	if (force) {
 		SetHighColor(frame_color);
 		StrokeRect(BRect(left - 1, top - 1, right, bottom + 1));
-		if (gCPUcount == 2) {
-			StrokeLine(BPoint(left + barWidth, top), BPoint(left + barWidth,
-				bottom));
+		if (gCPUcount > 1 && layout[gCPUcount].cpu_inter == 1) {
+			for (int x = 1; x < gCPUcount; x++)
+				StrokeLine(BPoint(left + x * barWidth + x - 1, top),
+					BPoint(left + x * barWidth + x - 1, bottom));
 		}
 	}
 	float leftMem = bounds.Width() - layout[gCPUcount].mem_width;
@@ -593,9 +606,9 @@ ProcessController::DoDraw(bool force)
 		fLastBarHeight[x] = barHeight;
 	}
 
-	float rightMem = bounds.Width () - 1;
+	float rightMem = bounds.Width() - 1;
 	float rem = fMemoryUsage * (h + 1);
-	float barHeight = floorf (rem);
+	float barHeight = floorf(rem);
 	rem -= barHeight;
 
 	rgb_color used_memory_color;
@@ -661,7 +674,7 @@ ProcessController::Update()
 //	#pragma mark -
 
 
-long
+status_t
 thread_popup(void *arg)
 {
 	Tpopup_param* param = (Tpopup_param*) arg;
@@ -772,15 +785,32 @@ thread_popup(void *arg)
 
 	addtopbottom(new BSeparatorItem());
 
-	if (be_roster->IsRunning(kDeskbarSig)) {
+	bool showLiveInDeskbarItem = gInDeskbar;
+	if (!showLiveInDeskbarItem) {
+		int32 cookie = 0;
+		image_info info;
+		while (get_next_image_info(B_CURRENT_TEAM, &cookie, &info) == B_OK) {
+			if (info.type == B_APP_IMAGE) {
+				// only show the Live in Deskbar item if a) we're running in
+				// deskbar itself, or b) we're running in PC's team.
+				if (strstr(info.name, "ProcessController") != NULL) {
+					showLiveInDeskbarItem = true;
+					break;
+				}
+			}
+		}
+	}
+
+	if (showLiveInDeskbarItem && be_roster->IsRunning(kDeskbarSig)) {
 		item = new BMenuItem(B_TRANSLATE("Live in the Deskbar"),
-		new BMessage('AlDb'));
+			new BMessage('AlDb'));
 		BDeskbar deskbar;
 		item->SetMarked(gInDeskbar || deskbar.HasItem(kDeskbarItemName));
 		item->SetTarget(gPCView);
 		addtopbottom(item);
 		addtopbottom(new BSeparatorItem ());
 	}
+
 
 	item = new IconMenuItem(gPCView->fProcessControllerIcon,
 	B_TRANSLATE("About ProcessController"B_UTF8_ELLIPSIS),
@@ -808,16 +838,16 @@ thread_popup(void *arg)
 }
 
 
-long
+status_t
 thread_quit_application(void *arg)
 {
-	BMessenger messenger(NULL, (team_id)arg);
+	BMessenger messenger(NULL, (addr_t)arg);
 	messenger.SendMessage(B_QUIT_REQUESTED);
 	return B_OK;
 }
 
 
-long
+status_t
 thread_debug_thread(void *arg)
 {
 	Tdebug_thead_param*	param = (Tdebug_thead_param*) arg;
@@ -876,6 +906,7 @@ thread_debug_thread(void *arg)
 						alert = new BAlert("", "The semaphore wasn't released, "
 							"because it wasn't necessary anymore!",
 							"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+						alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 						alert->Go();
 					}
 				}

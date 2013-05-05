@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef VARIABLES_VIEW_H
@@ -11,10 +12,12 @@
 #include "table/TreeTable.h"
 
 
+class ActionMenuItem;
 class CpuState;
 class SettingsMenu;
 class StackFrame;
 class Thread;
+class Type;
 class TypeComponentPath;
 class ValueNode;
 class ValueNodeContainer;
@@ -41,6 +44,9 @@ public:
 
 	virtual	void				DetachedFromWindow();
 
+			void				LoadSettings(const BMessage& settings);
+			status_t			SaveSettings(BMessage& settings);
+
 private:
 	// TreeTableListener
 	virtual	void				TreeTableNodeExpandedChanged(TreeTable* table,
@@ -58,13 +64,18 @@ private:
 			class VariableTableModel;
 			class ContextMenu;
 			class TableCellContextMenuTracker;
+			typedef BObjectList<ActionMenuItem> ContextActionList;
 
 private:
 			void				_Init();
 
 			void				_RequestNodeValue(ModelNode* node);
+			status_t			_GetContextActionsForNode(ModelNode* node,
+									ContextActionList* actions);
+			status_t			_AddContextAction(const char* action,
+									uint32 what, ContextActionList* actions,
+									BMessage*& _message);
 			void				_FinishContextMenu(bool force);
-
 			void				_SaveViewState() const;
 			void				_RestoreViewState();
 			status_t			_AddViewStateDescendentNodeInfos(

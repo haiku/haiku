@@ -13,9 +13,7 @@
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <FindDirectory.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locker.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -23,7 +21,6 @@
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <Screen.h>
-#include <SpaceLayoutItem.h>
 #include <StringView.h>
 #include <TranslatorAddOn.h>
 #include <TranslationKit.h>
@@ -36,8 +33,8 @@
 
 #include "colorspace.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PPMTranslator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PPMTranslator"
 
 #if DEBUG
  #define dprintf(x) printf x
@@ -280,14 +277,15 @@ Identify(	/*	required	*/
 		outInfo->type = PPM_TYPE;
 		outInfo->quality = 0.3;		/* no alpha, etc */
 		outInfo->capability = 0.8;	/* we're pretty good at PPM reading, though */
-		strcpy(outInfo->name, B_TRANSLATE("PPM image"));
+		strlcpy(outInfo->name, B_TRANSLATE("PPM image"), sizeof(outInfo->name));
 		strcpy(outInfo->MIME, "image/x-portable-pixmap");
 	}
 	else {
 		outInfo->type = B_TRANSLATOR_BITMAP;
 		outInfo->quality = 0.4;		/* B_TRANSLATOR_BITMAP can do alpha, at least */
 		outInfo->capability = 0.8;	/* and we might not know many variations thereof */
-		strcpy(outInfo->name, B_TRANSLATE("Be Bitmap Format (PPMTranslator)"));
+		strlcpy(outInfo->name, B_TRANSLATE("Be Bitmap Format (PPMTranslator)"),
+			sizeof(outInfo->name));
 		strcpy(outInfo->MIME, "image/x-be-bitmap");	/* this is the MIME type of B_TRANSLATOR_BITMAP */
 	}
 	return B_OK;
@@ -456,7 +454,7 @@ public:
 				SetLowColor(ViewColor());
 
 				mTitle = new BStringView("title",
-					B_TRANSLATE("PPM Image Translator"));
+					B_TRANSLATE("PPM image translator"));
 				mTitle->SetFont(be_bold_font);
 
 				char detail[100];
@@ -520,23 +518,20 @@ public:
  				mAscii->SetViewColor(ViewColor());
 
  				// Build the layout
- 				SetLayout(new BGroupLayout(B_HORIZONTAL));
-
- 				AddChild(BGroupLayoutBuilder(B_VERTICAL, 7)
- 					.Add(mTitle)
+				BLayoutBuilder::Group<>(this, B_VERTICAL, 7)
+					.SetInsets(5)
+					.Add(mTitle)
  					.Add(mDetail)
  					.AddGlue()
  					.Add(mBasedOn)
  					.Add(mCopyright)
  					.AddGlue()
- 					.Add(BGridLayoutBuilder(10, 10)
- 						.Add(mField->CreateLabelLayoutItem(), 0, 0)
+					.AddGrid(10, 10)
+						.Add(mField->CreateLabelLayoutItem(), 0, 0)
  						.Add(mField->CreateMenuBarLayoutItem(), 1, 0)
  						.Add(mAscii, 0, 1)
- 					)
- 					.AddGlue()
- 					.SetInsets(5, 5, 5, 5)
- 				);
+					.End()
+					.AddGlue();
 
  				BFont font;
  				GetFont(&font);

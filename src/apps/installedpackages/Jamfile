@@ -11,7 +11,7 @@ Application InstalledPackages :
 	main.cpp
 	UninstallWindow.cpp
 	UninstallView.cpp
-	: be tracker translation z $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: be tracker translation $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 ;
 
 DoCatalogs InstalledPackages :

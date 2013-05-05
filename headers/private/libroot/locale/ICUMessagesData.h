@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Oliver Tappe, zooey@hirschkaefer.de.
+ * Copyright 2010-2011, Oliver Tappe, zooey@hirschkaefer.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _ICU_MESSAGES_DATA_H
@@ -16,7 +16,10 @@ namespace Libroot {
 
 class ICUMessagesData : public ICUCategoryData {
 	typedef	ICUCategoryData		inherited;
+
 public:
+								ICUMessagesData(pthread_key_t tlsKey);
+
 	virtual	status_t			SetTo(const Locale& locale,
 									const char* posixLocaleName);
 	virtual	status_t			SetToPosix();

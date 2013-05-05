@@ -23,8 +23,8 @@
 #include "Colors.h"
 #include "ProcessController.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ProcessController"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ProcessController"
 
 NoiseBarMenuItem::NoiseBarMenuItem()
 	: BMenuItem(B_TRANSLATE("Gone teams"B_UTF8_ELLIPSIS), NULL)

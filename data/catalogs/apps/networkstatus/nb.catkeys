@@ -1,21 +1,21 @@
-1	norwegian_bokmål	x-vnd.Haiku-NetworkStatus	1179196195
-%ifaceName information:\n	NetworkStatusView		%ifaceName informasjon:\n
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-NetworkStatus	1179196195
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		NetworkStatus valg:\n\t--deskbar\tautomatisk legg en replikant til Deskbar\n\t--help\t\tskriv ut denne informasjonen og avslutt\n
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Du kan kjøre Nettverkstatus i et vindu eller installere det i Deskbar.
 <no wireless networks found>	NetworkStatusView		<ingen trådløse nettverk funnet>
-Address	NetworkStatusView		Adresse
-Broadcast	NetworkStatusView		Kringkast
-Configuring	NetworkStatusView		Konfigurerer
-Could not join wireless network:\n	NetworkStatusView		Kunne ikke koble på trådløst nettverk:\n
+Run in window	NetworkStatus		Kjør i vindu
+No link	NetworkStatusView		Ingen lenke
 Install in Deskbar	NetworkStatus		Installer i Deskbar
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Åpning av Nettverksinnstillinger mislyktes.\n\nFeilmelding:
-Netmask	NetworkStatusView		Subnett
-NetworkStatus	System name		Nettverkstatus
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		NetworkStatus valg:\n\t--deskbar\tautomatisk legg en replikant til Deskbar\n\t--help\t\tskriv ut denne informasjonen og avslutt\n
 NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		NetworkStatus\n\tskrevet av %1 og Hugo Santos\n\t%2, Haiku, Inc.\n
-No link	NetworkStatusView		Ingen lenke
-OK	NetworkStatusView		OK
-Open network preferences…	NetworkStatusView		Åpne Nettverksinnstillinger
-Quit	NetworkStatusView		Avslutt
-Ready	NetworkStatusView		Klar
-Run in window	NetworkStatus		Kjør i vindu
+Netmask	NetworkStatusView		Subnett
+Broadcast	NetworkStatusView		Kringkast
 Unknown	NetworkStatusView		Ukjent
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Du kan kjøre Nettverkstatus i et vindu eller installere det i Deskbar.
+Ready	NetworkStatusView		Klar
+%ifaceName information:\n	NetworkStatusView		%ifaceName informasjon:\n
+Configuring	NetworkStatusView		Konfigurerer
+Address	NetworkStatusView		Adresse
+OK	NetworkStatusView		OK
+NetworkStatus	System name		Nettverkstatus
+Open network preferences…	NetworkStatusView		Åpne Nettverksinnstillinger
+Could not join wireless network:\n	NetworkStatusView		Kunne ikke koble på trådløst nettverk:\n
+Quit	NetworkStatusView		Avslutt

@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2004-2006 Anton Altaparmakov
  * Copyright (c) 2004-2006 Szabolcs Szakacsits
+ * Copyright (c) 2010      Jean-Pierre Andre
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -57,11 +58,17 @@
 #ifdef HAVE_SYS_MOUNT_H
 #include <sys/mount.h>
 #endif
+#ifdef HAVE_SYS_DISK_H
+#include <sys/disk.h>
+#endif
 #ifdef HAVE_LINUX_FD_H
 #include <linux/fd.h>
 #endif
 #ifdef HAVE_LINUX_HDREG_H
 #include <linux/hdreg.h>
+#endif
+#ifdef __HAIKU__
+#include <Drivers.h>
 #endif
 
 #include "types.h"
@@ -152,6 +159,25 @@ int ntfs_device_free(struct ntfs_device *dev)
 	free(dev->d_name);
 	free(dev);
 	return 0;
+}
+
+/*
+ *		Sync the device
+ *
+ *	returns zero if successful.
+ */
+
+int ntfs_device_sync(struct ntfs_device *dev)
+{
+	int ret;
+	struct ntfs_device_operations *dops;
+
+	if (NDevDirty(dev)) {
+		dops = dev->d_ops;
+		ret = dops->sync(dev);
+	} else
+		ret = 0;
+	return ret;
 }
 
 /**
@@ -259,6 +285,9 @@ s64 ntfs_pwrite(struct ntfs_device *dev, const s64 pos, s64 count,
 		/* Nothing written and error, return error status. */
 		total = written;
 		break;
+	}
+	if (NDevSync(dev) && total && dops->sync(dev)) {
+		total--; /* on sync error, return partially written */
 	}
 	ret = total;
 out:	
@@ -534,6 +563,54 @@ s64 ntfs_device_size_get(struct ntfs_device *dev, int block_size)
 		}
 	}
 #endif
+#ifdef DIOCGMEDIASIZE
+	{
+		/* FreeBSD */
+		off_t size;
+
+		if (dev->d_ops->ioctl(dev, DIOCGMEDIASIZE, &size) >= 0) {
+			ntfs_log_debug("DIOCGMEDIASIZE nr bytes = %llu (0x%llx)\n",
+					(unsigned long long)size,
+					(unsigned long long)size);
+			return (s64)size / block_size;
+		}
+	}
+#endif
+#ifdef DKIOCGETBLOCKCOUNT
+	{
+		/* Mac OS X */
+		uint64_t blocks;
+		int sector_size;
+
+		sector_size = ntfs_device_sector_size_get(dev);
+		if (sector_size >= 0 && dev->d_ops->ioctl(dev,
+			DKIOCGETBLOCKCOUNT, &blocks) >= 0)
+		{
+			ntfs_log_debug("DKIOCGETBLOCKCOUNT nr blocks = %llu (0x%llx)\n",
+				(unsigned long long) blocks,
+				(unsigned long long) blocks);
+			return blocks * sector_size / block_size;
+		}
+	}
+#endif
+#ifdef __HAIKU__
+	{
+		off_t size = 0;
+
+		partition_info partitionInfo;
+		device_geometry geometry;
+		
+		if (dev->d_ops->ioctl(dev, B_GET_PARTITION_INFO, &partitionInfo) == 0)
+			size = partitionInfo.size;
+		else if (dev->d_ops->ioctl(dev, B_GET_GEOMETRY, &geometry) == 0) {
+			size = (off_t)geometry.cylinder_count * geometry.sectors_per_track
+				* geometry.head_count * geometry.bytes_per_sector;
+		}
+		
+		if (size > 0)
+			return (s64)size / block_size;
+	}
+#endif
 	/*
 	 * We couldn't figure it out by using a specialized ioctl,
 	 * so do binary search to find the size of the device.
@@ -679,6 +756,28 @@ int ntfs_device_sector_size_get(struct ntfs_device *dev)
 		if (!dev->d_ops->ioctl(dev, BLKSSZGET, &sect_size)) {
 			ntfs_log_debug("BLKSSZGET sector size = %d bytes\n",
 					sect_size);
+			return sect_size;
+		}
+	}
+#elif defined(DIOCGSECTORSIZE)
+	{
+		/* FreeBSD */
+		size_t sect_size = 0;
+
+		if (!dev->d_ops->ioctl(dev, DIOCGSECTORSIZE, &sect_size)) {
+			ntfs_log_debug("DIOCGSECTORSIZE sector size = %d bytes\n",
+					(int) sect_size);
+			return sect_size;
+		}
+	}
+#elif defined(DKIOCGETBLOCKSIZE)
+	{
+		/* Mac OS X */
+		uint32_t sect_size = 0;
+
+		if (!dev->d_ops->ioctl(dev, DKIOCGETBLOCKSIZE, &sect_size)) {
+			ntfs_log_debug("DKIOCGETBLOCKSIZE sector size = %d bytes\n",
+					(int) sect_size);
 			return sect_size;
 		}
 	}

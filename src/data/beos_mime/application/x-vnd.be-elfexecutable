@@ -3,9 +3,9 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "application/x-vnd.Be-elfexecutable";
 
-resource(2, "META:S:DESC") #'MSDC' "Be Application";
+resource(2, "META:S:DESC") #'MSDC' "Be application";
 
-resource(3, "META:L:DESC") #'MLDC' "Generic Be Application executable";
+resource(3, "META:L:DESC") #'MLDC' "Generic Be application executable";
 
 resource(4, "META:SNIFF_RULE") "0.90 (0x7f454c46)";
 

@@ -41,8 +41,8 @@
 #include "DeskbarViewIcons.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "DeskbarView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "DeskbarView"
 
 
 const char* kTrackerSignature = "application/x-vnd.Be-TRAK";
@@ -603,7 +603,7 @@ DeskbarView::_BuildMenu()
 	}
 
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Preferences" B_UTF8_ELLIPSIS),
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS),
 		new BMessage(MD_OPEN_PREFS)));
 
 	if (modifiers() & B_SHIFT_KEY) {

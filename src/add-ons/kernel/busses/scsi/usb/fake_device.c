@@ -1,20 +1,20 @@
 /**
  *
  * TODO: description
- * 
- * This file is a part of USB SCSI CAM for Haiku OS.
+ *
+ * This file is a part of USB SCSI CAM for Haiku.
  * May be used under terms of the MIT License
  *
  * Author(s):
  * 	Siarzhuk Zharski <imker@gmx.li>
- * 	
- * 	
+ *
+ *
  */
-#include "usb_scsi.h" 
+#include "usb_scsi.h"
 
 #include <strings.h>
-#include "device_info.h" 
-#include "tracing.h" 
+#include "device_info.h"
+#include "tracing.h"
 
 #include "fake_device.h"
 
@@ -38,7 +38,7 @@ void fake_inquiry_request(usb_device_info *udi, CCB_SCSIIO *ccbio)
 		if(ccbio->cam_dxfer_len >= 0x24){
 			strncpy(&data[8],  "USB SCSI", INQ_VENDOR_LEN);
 			strncpy(&data[16], "Reserved", INQ_PRODUCT_LEN);
-			strncpy(&data[32], "N/A",      INQ_REVISION_LEN); 
+			strncpy(&data[32], "N/A",      INQ_REVISION_LEN);
 		}
 	}
 }
@@ -62,8 +62,8 @@ void fake_test_unit_ready_request(CCB_SCSIIO *ccbio)
 	\fn:fake_scsi_io
 	\param ccbio: ????
 	\return: ???
-		
-	xpt_scsi_io - handle XPT_SCSI_IO sim action 
+
+	xpt_scsi_io - handle XPT_SCSI_IO sim action
 */
 status_t fake_scsi_io(CCB_SCSIIO *ccbio)
 {

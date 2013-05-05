@@ -134,7 +134,7 @@ struct editline {
 	el_read_t	  el_read;	/* Character reading stuff	*/
 };
 
-protected int	el_editmode(EditLine *, int, const char **);
+int	el_editmode(EditLine *, int, const char **);
 
 #ifdef DEBUG
 #define	EL_ABORT(a)	do { \

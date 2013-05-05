@@ -13,6 +13,7 @@
 
 #include <OS.h>
 
+#include <errno_private.h>
 #include <syscall_utils.h>
 
 #include <user_timer_defs.h>

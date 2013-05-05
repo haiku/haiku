@@ -11,8 +11,8 @@
 
 #include "IFSSaver.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Screensaver IFS"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Screensaver IFS"
 
 
 enum {
@@ -103,14 +103,18 @@ IFSSaver::StartConfig(BView *view)
 	BTextView* textView = new BTextView(bounds, B_EMPTY_STRING, textRect,
 										B_FOLLOW_ALL, B_WILL_DRAW);
 	textView->SetViewColor(view->ViewColor());
-	textView->Insert(B_TRANSLATE("Iterated Function System\n\n"
+	
+	BString aboutScreenSaver(B_TRANSLATE("%screenSaverName%\n\n"
 					 ""B_UTF8_COPYRIGHT" 1997 Massimino Pascal\n\n"
 					 "xscreensaver port by Stephan Aßmus\n"
 					 "<stippi@yellowbites.com>"));
+	BString screenSaverName(B_TRANSLATE("Iterated Function System"));
 
+	aboutScreenSaver.ReplaceFirst("%screenSaverName%", screenSaverName);
+	textView->Insert(aboutScreenSaver);
 
 	textView->SetStylable(true);
-	textView->SetFontAndColor(0, 24, be_bold_font);
+	textView->SetFontAndColor(0, screenSaverName.Length(), be_bold_font);
 //	textView->SetFontAndColor(25, 255, be_plain_font);
 
 	textView->MakeEditable(false);

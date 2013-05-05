@@ -108,6 +108,7 @@ class TMailWindow : public BWindow {
 				void			SaveTrackerPosition(entry_ref*);
 				void			SetOriginatingWindow(BWindow* window);
 
+				void			PreserveReadingPos(bool save);
 				void			MarkMessageRead(entry_ref* message,
 									read_flags flag);
 				void			SetTrackerSelectionToCurrent();
@@ -163,6 +164,7 @@ class TMailWindow : public BWindow {
 				BMenu*			fSaveAddrMenu;
 
 				BMenu*			fQueryMenu;
+				BMenu*			fLeaveStatusMenu;
 		
 				ButtonBar*		fButtonBar;
 				BmapButton*		fSendButton;
@@ -198,7 +200,6 @@ class TMailWindow : public BWindow {
 				static BList	sWindowList;
 				static BLocker	sWindowListLock;
 		
-				char*			fStartingText;	
 				entry_ref		fRepliedMail;
 				BMessenger*		fOriginatingWindow;
 				

@@ -16,8 +16,8 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <CheckBox.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayoutBuilder.h>
+#include <ControlLook.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <OptionPopUp.h>
 #include <SpaceLayoutItem.h>
@@ -27,8 +27,8 @@
 #include <View.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MediaPlayer-SettingsWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MediaPlayer-SettingsWindow"
 
 
 enum {
@@ -40,11 +40,6 @@ enum {
 };
 
 
-#define SPACE 10
-#define SPACEING 7
-#define BUTTONHEIGHT 20
-
-
 SettingsWindow::SettingsWindow(BRect frame)
  	:
  	BWindow(frame, B_TRANSLATE("MediaPlayer settings"), B_FLOATING_WINDOW_LOOK,
@@ -52,11 +47,13 @@ SettingsWindow::SettingsWindow(BRect frame)
  		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
  			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
+	const float kSpacing = be_control_look->DefaultItemSpacing();
+	
 	BBox* settingsBox = new BBox(B_PLAIN_BORDER, NULL);
-	BGroupLayout* settingsLayout = new BGroupLayout(B_VERTICAL, 5);
+	BGroupLayout* settingsLayout = new BGroupLayout(B_VERTICAL, kSpacing / 2);
 	settingsBox->SetLayout(settingsLayout);
 	BBox* buttonBox = new BBox(B_PLAIN_BORDER, NULL);
-	BGroupLayout* buttonLayout = new BGroupLayout(B_HORIZONTAL, 5);
+	BGroupLayout* buttonLayout = new BGroupLayout(B_HORIZONTAL, kSpacing / 2);
 	buttonBox->SetLayout(buttonLayout);
 
 	BStringView* playModeLabel = new BStringView("stringViewPlayMode",
@@ -137,63 +134,57 @@ SettingsWindow::SettingsWindow(BRect frame)
 		new BMessage(M_SETTINGS_SAVE));
 	okButton->MakeDefault(true);
 
-
 	// Build the layout
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
-		.Add(BGroupLayoutBuilder(settingsLayout)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.AddGroup(settingsLayout)
+			.SetInsets(kSpacing, kSpacing, kSpacing * 2, 0)
 			.Add(playModeLabel)
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL, 0)
-				.Add(BSpaceLayoutItem::CreateHorizontalStrut(10))
-				.Add(BGroupLayoutBuilder(B_VERTICAL, 0)
+			.AddGroup(B_HORIZONTAL, 0)
+				.AddStrut(kSpacing)
+				.AddGroup(B_VERTICAL, 0)
 					.Add(fAutostartCB)
-					.Add(BGridLayoutBuilder(5, 0)
-						.Add(BSpaceLayoutItem::CreateHorizontalStrut(10), 0, 0)
+					.AddGrid(kSpacing, 0)
+						.Add(BSpaceLayoutItem::CreateHorizontalStrut(kSpacing), 0, 0)
 						.Add(fCloseWindowMoviesCB, 1, 0)
-						.Add(BSpaceLayoutItem::CreateHorizontalStrut(10), 0, 1)
+						.Add(BSpaceLayoutItem::CreateHorizontalStrut(kSpacing), 0, 1)
 						.Add(fCloseWindowSoundsCB, 1, 1)
-					)
+					.End()
 					.Add(fLoopMoviesCB)
 					.Add(fLoopSoundsCB)
-				)
-			)
-			.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
+				.End()
+			.End()
+			.AddStrut(kSpacing)
 
 			.Add(viewOptionsLabel)
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL, 0)
-				.Add(BSpaceLayoutItem::CreateHorizontalStrut(10))
-				.Add(BGroupLayoutBuilder(B_VERTICAL, 0)
+			.AddGroup(B_HORIZONTAL, 0)
+				.AddStrut(10)
+				.AddGroup(B_VERTICAL, 0)
 					.Add(fUseOverlaysCB)
 					.Add(fScaleBilinearCB)
 					.Add(fScaleFullscreenControlsCB)
 					.Add(fSubtitleSizeOP)
 					.Add(fSubtitlePlacementOP)
-				)
-			)
-			.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
+				.End()
+			.End()
+			.AddStrut(kSpacing)
 
 			.Add(bgMoviesModeLabel)
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL, 0)
-				.Add(BSpaceLayoutItem::CreateHorizontalStrut(10))
-				.Add(BGroupLayoutBuilder(B_VERTICAL, 0)
+			.AddGroup(B_HORIZONTAL, 0)
+				.AddStrut(10)
+				.AddGroup(B_VERTICAL, 0)
 					.Add(fFullVolumeBGMoviesRB)
 					.Add(fHalfVolumeBGMoviesRB)
 					.Add(fMutedVolumeBGMoviesRB)
-				)
-			)
-			.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
-
-			.SetInsets(5, 5, 15, 5)
-		)
-		.Add(BGroupLayoutBuilder(buttonLayout)
+				.End()
+			.End()
+			.AddStrut(kSpacing)
+		.End()
+		.AddGroup(buttonLayout)
+			.SetInsets(kSpacing)
 			.Add(fRevertB)
 			.AddGlue()
 			.Add(cancelButton)
-			.Add(okButton)
-			.SetInsets(5, 5, 5, 5)
-		)
-	);
+			.Add(okButton);
 }
 
 

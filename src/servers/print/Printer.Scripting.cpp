@@ -19,8 +19,8 @@
 #include <PropertyInfo.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Printer Scripting"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Printer Scripting"
 
 
 static property_info prop_list[] = {

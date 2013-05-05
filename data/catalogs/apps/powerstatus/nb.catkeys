@@ -1,40 +1,35 @@
-1	norwegian_bokmål	x-vnd.Haiku-PowerStatus	3288892313
-About	PowerStatus		Om
-About…	PowerStatus		Om...
-Battery charging	PowerStatus		Batteri lader
-Battery discharging	PowerStatus		Batteri utlader
-Battery info	PowerStatus		Batteriinformasjon
-Battery info…	PowerStatus		Batteriinformasjon...
-Battery unused	PowerStatus		Batteri ikke i bruk
-Capacity: 	PowerStatus		Kapasitet:
-Empty battery slot	PowerStatus		Batteri ikke til stede
-Extended battery info	PowerStatus		Utvidet batteriinformasjon
-Install in Deskbar	PowerStatus		Installer i Deskbar
-Last full charge: 	PowerStatus		Siste fullstendige lading:
-Model number: 	PowerStatus		Modellnummer:
-OEM info: 	PowerStatus		OEM-informasjon:
-OK	PowerStatus		OK
-Power status box	PowerStatus		Boks for strømstatus
-PowerStatus	PowerStatus		Strøm
-PowerStatus	System name		Strøm
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nskrevet av Axel Dörfler, Clemens Zeidler\nOpphavsrett 2006, Haiku, Inc.\n
-Quit	PowerStatus		Avslutt
-Run in window	PowerStatus		Kjør i vindu
-Serial number: 	PowerStatus		Serienummer:
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-PowerStatus	1862124102
 Show percent	PowerStatus		Vis prosent
-Show status icon	PowerStatus		Vis statusikon
-Show text label	PowerStatus		Vis tekst
-Show time	PowerStatus		Vis tid
-Technology: 	PowerStatus		Teknologi:
 Type: 	PowerStatus		Type:
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Du kan kjøre Strøm i et vindu eller installere det i Deskbar
-charging	PowerStatus		lader
-discharging	PowerStatus		lader ut
-mA	PowerStatus		mA
-mAh	PowerStatus		mAh
-mV	PowerStatus		mV
-mW	PowerStatus		mW
-mWh	PowerStatus		mWh
-no battery	PowerStatus		ingen batteri
 non-rechargeable	PowerStatus		ikke ladbar
+Empty battery slot	PowerStatus		Batteri ikke til stede
+Run in window	PowerStatus		Kjør i vindu
+About	PowerStatus		Om
+PowerStatus	System name		Strøm
+PowerStatus	PowerStatus		Strøm
+Battery info…	PowerStatus		Batteriinformasjon...
+Show time	PowerStatus		Vis tid
+Last full charge: 	PowerStatus		Siste fullstendige lading:
+Battery unused	PowerStatus		Batteri ikke i bruk
+Extended battery info	PowerStatus		Utvidet batteriinformasjon
+discharging	PowerStatus		lader ut
+Show text label	PowerStatus		Vis tekst
+About…	PowerStatus		Om...
+Model number: 	PowerStatus		Modellnummer:
+Install in Deskbar	PowerStatus		Installer i Deskbar
+Capacity: 	PowerStatus		Kapasitet:
+Battery discharging	PowerStatus		Batteri utlader
+Serial number: 	PowerStatus		Serienummer:
+OK	PowerStatus		OK
+OEM info: 	PowerStatus		OEM-informasjon:
+PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nskrevet av Axel Dörfler, Clemens Zeidler\nOpphavsrett 2006, Haiku, Inc.\n
+Battery charging	PowerStatus		Batteri lader
+Battery info	PowerStatus		Batteriinformasjon
+Quit	PowerStatus		Avslutt
 rechargeable	PowerStatus		oppladbar
+charging	PowerStatus		lader
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Du kan kjøre Strøm i et vindu eller installere det i Deskbar
+Power status box	PowerStatus		Boks for strømstatus
+Show status icon	PowerStatus		Vis statusikon
+Technology: 	PowerStatus		Teknologi:
+no battery	PowerStatus		ingen batteri

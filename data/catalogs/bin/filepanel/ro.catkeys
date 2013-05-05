@@ -1,20 +1,20 @@
 1	romanian	x-vnd.mmu_man.filepanel	1802971238
-%s not a valid option\n	FilePanelApp		%s nu este o opțiune validă\n
-%s: UNIMPLEMENTED\n	FilePanelApp		%s: NEIMPLEMENTAT\n
-%s: this option requires a parameter\n	FilePanelApp		%s: această opțiune necesită un parametru\n
--1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tpermite doar 1 fișier să fie selectat\n
--a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tnu e implementat\n
--d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tdeschide la <dosar>\n
--f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tnu e implementat\n
--h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tafișează utilizare\n
--k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\ttip de intrări care pot fi deschise (asezonare): orice combinație de f, d, s (fișier (implicit), dosar, legătură simbolică)\n
--l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tutilizează pentru a încărca FilePanel (implicit)\n
--m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\talcătuiește FilePanel modal\n
--n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tstabilește numele implicit pentru salvare\n
--s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tutilizează o salvare FilePanel\n
--t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tstabilește numele fereastrei FilePanel\n
 display a load/save file panel\n	FilePanelApp		afișează un panou pentru salvarea/încărcarea fișierelor
 options:\n	FilePanelApp		opțiuni:\n
-short\tlong\tdescription\n	FilePanelApp		scurtă\tlungă\tdescriere\n
 usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		utilizare: %s [--help] [--directory dosar] [--load|--save] [--title ttl] [--single] [--modal] [--allow model] [--forbid model]\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\ttip de intrări care pot fi deschise (asezonare): orice combinație de f, d, s (fișier (implicit), dosar, legătură simbolică)\n
 usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		utilizare: %s [-h] [-d dosar] [-l|-s] [-t ttl] [-1] [-m] [-a model] [-f model]\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tdeschide la <dosar>\n
+%s not a valid option\n	FilePanelApp		%s nu este o opțiune validă\n
+short\tlong\tdescription\n	FilePanelApp		scurtă\tlungă\tdescriere\n
+%s: this option requires a parameter\n	FilePanelApp		%s: această opțiune necesită un parametru\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tutilizează pentru a încărca FilePanel (implicit)\n
+-f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tnu e implementat\n
+-s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tutilizează o salvare FilePanel\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tstabilește numele implicit pentru salvare\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\talcătuiește FilePanel modal\n
+-h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tafișează utilizare\n
+-a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tnu e implementat\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tpermite doar 1 fișier să fie selectat\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tstabilește numele fereastrei FilePanel\n
+%s: UNIMPLEMENTED\n	FilePanelApp		%s: NEIMPLEMENTAT\n

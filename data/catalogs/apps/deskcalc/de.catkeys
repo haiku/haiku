@@ -1,5 +1,9 @@
-1	german	x-vnd.Haiku-DeskCalc	2547506672
-Audio Feedback	CalcView		Audiorückmeldung
+1	german	x-vnd.Haiku-DeskCalc	3276968552
+Compact	CalcView		Kompakt
+Scientific	CalcView		Wissenschaftlich
 DeskCalc	System name		Rechner
+Basic	CalcView		Einfach
+Radians	CalcView		Radiant
 Enable Num Lock on startup	CalcView		Num-Lock beim Start aktivieren
-Show keypad	CalcView		Tastenfeld anzeigen
+Degrees	CalcView		Grad
+Audio Feedback	CalcView		Audiorückmeldung

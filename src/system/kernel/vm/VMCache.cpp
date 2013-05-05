@@ -670,8 +670,8 @@ VMCache::Delete()
 	// free all of the pages in the cache
 	while (vm_page* page = pages.Root()) {
 		if (!page->mappings.IsEmpty() || page->WiredCount() != 0) {
-			panic("remove page %p from cache %p: page still has mappings!\n",
-				page, this);
+			panic("remove page %p from cache %p: page still has mappings!\n"
+				"@!page %p; cache %p", page, this, page, this);
 		}
 
 		// remove it
@@ -679,7 +679,7 @@ VMCache::Delete()
 		page->SetCacheRef(NULL);
 
 		TRACE(("vm_cache_release_ref: freeing page 0x%lx\n",
-			oldPage->physical_page_number));
+			page->physical_page_number));
 		DEBUG_PAGE_ACCESS_START(page);
 		vm_page_free(this, page);
 	}
@@ -769,7 +769,7 @@ VMCache::LookupPage(off_t offset)
 void
 VMCache::InsertPage(vm_page* page, off_t offset)
 {
-	TRACE(("VMCache::InsertPage(): cache %p, page %p, offset %Ld\n",
+	TRACE(("VMCache::InsertPage(): cache %p, page %p, offset %" B_PRIdOFF "\n",
 		this, page, offset));
 	AssertLocked();
 
@@ -928,7 +928,7 @@ VMCache::WaitForPageEvents(vm_page* page, uint32 events, bool relock)
 void
 VMCache::AddConsumer(VMCache* consumer)
 {
-	TRACE(("add consumer vm cache %p to cache %p\n", consumer, cache));
+	TRACE(("add consumer vm cache %p to cache %p\n", consumer, this));
 	AssertLocked();
 	consumer->AssertLocked();
 
@@ -1054,8 +1054,8 @@ VMCache::WriteModified()
 status_t
 VMCache::SetMinimalCommitment(off_t commitment, int priority)
 {
-	TRACE(("VMCache::SetMinimalCommitment(cache %p, commitment %Ld)\n",
-		this, commitment));
+	TRACE(("VMCache::SetMinimalCommitment(cache %p, commitment %" B_PRIdOFF
+		")\n", this, commitment));
 	AssertLocked();
 
 	T(SetMinimalCommitment(this, commitment));
@@ -1088,8 +1088,8 @@ VMCache::SetMinimalCommitment(off_t commitment, int priority)
 status_t
 VMCache::Resize(off_t newSize, int priority)
 {
-	TRACE(("VMCache::Resize(cache %p, newSize %Ld) old size %Ld\n",
-		this, newSize, this->virtual_end));
+	TRACE(("VMCache::Resize(cache %p, newSize %" B_PRIdOFF ") old size %"
+		B_PRIdOFF "\n", this, newSize, this->virtual_end));
 	this->AssertLocked();
 
 	T(Resize(this, newSize));
@@ -1325,24 +1325,24 @@ void
 VMCache::Dump(bool showPages) const
 {
 	kprintf("CACHE %p:\n", this);
-	kprintf("  ref_count:    %ld\n", RefCount());
+	kprintf("  ref_count:    %" B_PRId32 "\n", RefCount());
 	kprintf("  source:       %p\n", source);
 	kprintf("  type:         %s\n", vm_cache_type_to_string(type));
-	kprintf("  virtual_base: 0x%Lx\n", virtual_base);
-	kprintf("  virtual_end:  0x%Lx\n", virtual_end);
-	kprintf("  temporary:    %ld\n", temporary);
+	kprintf("  virtual_base: 0x%" B_PRIx64 "\n", virtual_base);
+	kprintf("  virtual_end:  0x%" B_PRIx64 "\n", virtual_end);
+	kprintf("  temporary:    %" B_PRIu32 "\n", temporary);
 	kprintf("  lock:         %p\n", &fLock);
 #if KDEBUG
-	kprintf("  lock.holder:  %ld\n", fLock.holder);
+	kprintf("  lock.holder:  %" B_PRId32 "\n", fLock.holder);
 #endif
 	kprintf("  areas:\n");
 
 	for (VMArea* area = areas; area != NULL; area = area->cache_next) {
-		kprintf("    area 0x%lx, %s\n", area->id, area->name);
+		kprintf("    area 0x%" B_PRIx32 ", %s\n", area->id, area->name);
 		kprintf("\tbase_addr:  0x%lx, size: 0x%lx\n", area->Base(),
 			area->Size());
-		kprintf("\tprotection: 0x%lx\n", area->protection);
-		kprintf("\towner:      0x%lx\n", area->address_space->ID());
+		kprintf("\tprotection: 0x%" B_PRIx32 "\n", area->protection);
+		kprintf("\towner:      0x%" B_PRIx32 "\n", area->address_space->ID());
 	}
 
 	kprintf("  consumers:\n");
@@ -1367,7 +1367,7 @@ VMCache::Dump(bool showPages) const
 			}
 		}
 	} else
-		kprintf("\t%ld in cache\n", page_count);
+		kprintf("\t%" B_PRIu32 " in cache\n", page_count);
 }
 
 
@@ -1400,7 +1400,7 @@ VMCache::_MergeWithOnlyConsumer()
 {
 	VMCache* consumer = consumers.RemoveHead();
 
-	TRACE(("merge vm cache %p (ref == %ld) with vm cache %p\n",
+	TRACE(("merge vm cache %p (ref == %" B_PRId32 ") with vm cache %p\n",
 		this, this->fRefCount, consumer));
 
 	T(Merge(this, consumer));

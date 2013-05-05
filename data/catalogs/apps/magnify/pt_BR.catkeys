@@ -1,0 +1,21 @@
+1	portuguese (brazil)	x-vnd.Haiku-Magnify	907580139
+no clip msg\n	In console, when clipboard is empty after clicking Copy image		nenhuma mensagem do clipboard\n
+Make square	Magnify-Main		Criar quadrado
+Copy image	Magnify-Main		Copiar imagem
+usage: magnify [size] (magnify size * size pixels)\n	Console		utilização: magnify [tamanho] (tamanho da ampliação * tamanho em pixels)\n 
+Stick coordinates	Magnify-Main		Coordenadas do ponto de fixação
+Hide/Show grid	Magnify-Main		Ocultar/Exibir grade
+magnify: size must be a multiple of 4\n	Console		ampliar: tamanho deve ser um múltiplo de 4\n
+Decrease pixel size	Magnify-Main		Diminuir tamanho do pixel
+Magnify	System name		Ampliar
+%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height  @ %pixelSize pixels/pixel
+Info	Magnify-Main		Informações
+Remove a crosshair	Magnify-Main		Remover uma mira
+Freeze/Unfreeze image	Magnify-Main		Congelar/Descongelar imagem
+Hide/Show info	Magnify-Main		Ocultar/Exibir informações
+Save image	Magnify-Main		Salvar imagem
+Increase window size	Magnify-Main		Aumentar o tamanho da janela
+Decrease window size	Magnify-Main		Diminuir o tamanho da janela
+Increase pixel size	Magnify-Main		Aumentar tamanho do pixel
+  size must be > 4 and a multiple of 4\n	Console		tamanho deve ser > 4 e um múltiplo de 4\n
+Add a crosshair	Magnify-Main		Adicionar uma mira

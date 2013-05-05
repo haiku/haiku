@@ -54,7 +54,8 @@ BBufferGroup::BBufferGroup(size_t size, int32 count, uint32 placement,
 	// don't allow all placement parameter values
 	if (placement != B_ANY_ADDRESS && placement != B_ANY_KERNEL_ADDRESS) {
 		ERROR("BBufferGroup: placement != B_ANY_ADDRESS "
-			"&& placement != B_ANY_KERNEL_ADDRESS (0x%08lx)\n", placement);
+			"&& placement != B_ANY_KERNEL_ADDRESS (0x%#" B_PRIx32 ")\n",
+			placement);
 		placement = B_ANY_ADDRESS;
 	}
 

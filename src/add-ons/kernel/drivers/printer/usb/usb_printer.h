@@ -6,9 +6,9 @@
  *		Michael Lotz <mmlr@mlotz.ch>
  *		Michael Pfeiffer <laplace@users.sourceforge.net>
  */
-
 #ifndef _USB_PRINTER_H_
 #define _USB_PRINTER_H_
+
 
 #include <lock.h>
 #include <USB3.h>
@@ -45,6 +45,7 @@ typedef struct printer_device_s {
 	usb_pipe	bulk_in;
 	usb_pipe	bulk_out;
 	uint8		interface;
+	uint8       alternate;
 	uint8       alternate_setting;
 
 	// used to store callback information

@@ -14,8 +14,8 @@
 #include "StaticMesh.h"
 #include "VideoFileTexture.h"
 
-#include <opengl/GL/gl.h>
-#include <opengl/GL/glu.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 
 #include <TranslationKit.h>
 #include <TranslationUtils.h>

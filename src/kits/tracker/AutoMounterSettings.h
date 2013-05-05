@@ -31,7 +31,6 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef AUTOMOUNTER_SETTINGS_H
 #define AUTOMOUNTER_SETTINGS_H
 
@@ -43,13 +42,13 @@ namespace BPrivate {
 
 class AutomountSettingsDialog : public BWindow {
 	public:
-		AutomountSettingsDialog(BMessage *settings, const BMessenger &target);
+		AutomountSettingsDialog(BMessage* settings, const BMessenger &target);
 		virtual ~AutomountSettingsDialog();
 
 		static void RunAutomountSettings(const BMessenger &target);
 
 	private:
-		static AutomountSettingsDialog *sOneCopyOnly;
+		static AutomountSettingsDialog* sOneCopyOnly;
 };
 
 } // namespace BPrivate

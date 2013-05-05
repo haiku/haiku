@@ -6,7 +6,7 @@
 #define ACTICE_SET_SOLVER_H
 
 
-#include "QPSolverInterface.h"
+#include "LinearSpec.h"
 
 
 class EquationSystem {
@@ -18,6 +18,8 @@ public:
 			int32				Rows();
 			int32				Columns();
 
+			//! Debug function: check bounds
+			bool				InRange(int32 row, int32 column);
 	inline	double&				A(int32 row, int32 column);
 	inline	double&				B(int32 row);
 			/*! Copy the solved variables into results, keeping the original
@@ -27,6 +29,7 @@ public:
 	inline	void				SwapColumn(int32 i, int32 j);
 	inline	void				SwapRow(int32 i, int32 j);
 
+			bool				GaussianElimination();
 			bool				GaussJordan();
 			/*! Gauss Jordan elimination just for one column, the diagonal
 			element must be none zero. */
@@ -39,6 +42,9 @@ public:
 
 			void				Print();
 private:
+	inline	void				_EliminateColumn(int32 column, int32 startRow,
+									int32 endRow);
+
 			int32*				fRowIndices;
 			int32*				fColumnIndices;
 			double**			fMatrix;
@@ -48,7 +54,7 @@ private:
 };
 
 
-class ActiveSetSolver : public QPSolverInterface {
+class ActiveSetSolver : public LinearProgramming::SolverInterface {
 public:
 								ActiveSetSolver(LinearSpec* linearSpec);
 								~ActiveSetSolver();
@@ -64,15 +70,26 @@ public:
 			bool				LeftSideChanged(Constraint* constraint);
 			bool				RightSideChanged(Constraint* constraint);
 			bool				OperatorChanged(Constraint* constraint);
+			bool				PenaltiesChanged(Constraint* constraint);
 
 			bool				SaveModel(const char* fileName);
 
-			BSize				MinSize(Variable* width, Variable* height);
-			BSize				MaxSize(Variable* width, Variable* height);
+			ResultType			FindMaxs(const VariableList* variables);
+			ResultType			FindMins(const VariableList* variables);
 
-public:
+			void				GetRangeConstraints(const Variable* var,
+									const Constraint** _min,
+									const Constraint** _max) const;
+
+private:
 			void				_RemoveSoftConstraint(ConstraintList& list);
 			void				_AddSoftConstraint(const ConstraintList& list);
+
+	typedef Constraint* (*AddConstraintFunc)(LinearSpec* spec, Variable* var);
+
+			ResultType			_FindWithConstraintsNoSoft(
+									const VariableList* variables,
+									AddConstraintFunc constraintFunc);
 
 	const	VariableList&		fVariables;
 	const	ConstraintList&		fConstraints;

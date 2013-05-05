@@ -14,7 +14,7 @@
 
 
 BUrlSynchronousRequest::BUrlSynchronousRequest(BUrl& url)
-	: 
+	:
 	BUrlRequest(url, this),
 	fRequestComplete(false)
 {
@@ -26,8 +26,8 @@ BUrlSynchronousRequest::Perform()
 {
 	SetProtocolListener(this);
 	fRequestComplete = false;
-	
-	return BUrlRequest::Perform();
+
+	return Start();
 }
 
 
@@ -36,7 +36,7 @@ BUrlSynchronousRequest::WaitUntilCompletion()
 {
 	while (!fRequestComplete)
 		snooze(10000);
-		
+
 	return B_OK;
 }
 
@@ -70,7 +70,7 @@ BUrlSynchronousRequest::HeadersReceived(BUrlProtocol*)
 
 
 void
-BUrlSynchronousRequest::DataReceived(BUrlProtocol*, const char*, 
+BUrlSynchronousRequest::DataReceived(BUrlProtocol*, const char*,
 	ssize_t size)
 {
 	PRINT(("SynchronousRequest::DataReceived(%zd)\n", size));
@@ -78,7 +78,7 @@ BUrlSynchronousRequest::DataReceived(BUrlProtocol*, const char*,
 
 
 void
-BUrlSynchronousRequest::DownloadProgress(BUrlProtocol*, 
+BUrlSynchronousRequest::DownloadProgress(BUrlProtocol*,
 	ssize_t bytesReceived, ssize_t bytesTotal)
 {
 	PRINT(("SynchronousRequest::DownloadProgress(%zd, %zd)\n", bytesReceived,
@@ -98,7 +98,7 @@ BUrlSynchronousRequest::UploadProgress(BUrlProtocol*, ssize_t bytesSent,
 void
 BUrlSynchronousRequest::RequestCompleted(BUrlProtocol* caller, bool success)
 {
-	PRINT(("SynchronousRequest::RequestCompleted(%s) : %s\n", (success?"true":"false"), 
+	PRINT(("SynchronousRequest::RequestCompleted(%s) : %s\n", (success?"true":"false"),
 		caller->StatusString(caller->Status())));
 	fRequestComplete = true;
 }

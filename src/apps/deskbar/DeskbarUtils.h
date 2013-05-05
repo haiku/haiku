@@ -32,15 +32,18 @@ brand product names are registered trademarks or trademarks of their respective
 holders.
 All rights reserved.
 */
-
 #ifndef DB_UTILS_H
 #define DB_UTILS_H
 
+
+#include <Path.h>
+
 #include "tracker_private.h"
 
+
+class BMessage;
 
 void AddRefsToDeskbarMenu(const BMessage* m, entry_ref* subdirectory);
 
 
 #endif	/* DB_UTILS_H */
-

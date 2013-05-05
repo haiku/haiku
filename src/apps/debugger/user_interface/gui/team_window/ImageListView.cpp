@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -15,6 +16,7 @@
 #include <AutoLocker.h>
 #include <ObjectList.h>
 
+#include "GuiSettingsUtils.h"
 #include "table/TableColumns.h"
 #include "Tracing.h"
 
@@ -221,6 +223,32 @@ ImageListView::MessageReceived(BMessage* message)
 			BGroupView::MessageReceived(message);
 			break;
 	}
+}
+
+
+void
+ImageListView::LoadSettings(const BMessage& settings)
+{
+	BMessage tableSettings;
+	if (settings.FindMessage("imagesTable", &tableSettings) == B_OK) {
+		GuiSettingsUtils::UnarchiveTableSettings(tableSettings,
+			fImagesTable);
+	}
+}
+
+
+status_t
+ImageListView::SaveSettings(BMessage& settings)
+{
+	settings.MakeEmpty();
+
+	BMessage tableSettings;
+	status_t result = GuiSettingsUtils::ArchiveTableSettings(tableSettings,
+		fImagesTable);
+	if (result == B_OK)
+		result = settings.AddMessage("imagesTable", &tableSettings);
+
+	return result;
 }
 
 

@@ -147,7 +147,7 @@ dumpLogEntry(int device, disk_super_block &superBlock, int32 &start, uint8 *bloc
 				break;
 
 			off_t value = array[arrayIndex];
-			printf("%7ld: %Ld%s\n", index, value, value == 0 ? " (super block)" :
+			printf("%7ld: %Ld%s\n", index, value, value == 0 ? " (superblock)" :
 				value < bitmapSize + 1 ? " (bitmap block)" : "");
 
 			if (data != NULL) {
@@ -208,12 +208,12 @@ main(int argc, char **argv)
 
 	disk_super_block superBlock;
 	if (read_pos(device, 512, &superBlock, sizeof(disk_super_block)) < (ssize_t)sizeof(disk_super_block)) {
-		fprintf(stderr, "%s: could not read super block.\n", sProgramName);
+		fprintf(stderr, "%s: could not read superblock.\n", sProgramName);
 		return -1;
 	}
 
 	if (!superBlock.IsValid()) {
-		fprintf(stderr, "%s: invalid super block!\n", sProgramName);
+		fprintf(stderr, "%s: invalid superblock!\n", sProgramName);
 		return -1;
 	}
 

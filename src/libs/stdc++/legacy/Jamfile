@@ -25,6 +25,8 @@ SYSHDRS =
 	[ FDirName $(HAIKU_TOP) headers os support ] 
 	$(TARGET_GCC_HEADERS_DIR) ; 		# such that include_next will work
 
+UsePrivateHeaders libroot ;
+
 # some source-files generate several different objects, depending on
 # the defines that are used during the compilation call.
 # So we explicitly state each of these (with their respective defines):

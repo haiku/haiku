@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -10,6 +11,7 @@
 
 #include "FunctionID.h"
 #include "StackFrameValues.h"
+#include "Type.h"
 #include "TypeComponentPath.h"
 
 
@@ -18,15 +20,28 @@
 
 VariablesViewNodeInfo::VariablesViewNodeInfo()
 	:
-	fNodeExpanded(false)
+	fNodeExpanded(false),
+	fCastedType(NULL),
+	fRendererSettings()
 {
 }
 
 
 VariablesViewNodeInfo::VariablesViewNodeInfo(const VariablesViewNodeInfo& other)
 	:
-	fNodeExpanded(other.fNodeExpanded)
+	fNodeExpanded(other.fNodeExpanded),
+	fCastedType(other.fCastedType),
+	fRendererSettings(other.fRendererSettings)
 {
+	if (fCastedType != NULL)
+		fCastedType->AcquireReference();
+}
+
+
+VariablesViewNodeInfo::~VariablesViewNodeInfo()
+{
+	if (fCastedType != NULL)
+		fCastedType->ReleaseReference();
 }
 
 
@@ -34,6 +49,9 @@ VariablesViewNodeInfo&
 VariablesViewNodeInfo::operator=(const VariablesViewNodeInfo& other)
 {
 	fNodeExpanded = other.fNodeExpanded;
+	SetCastedType(other.fCastedType);
+	fRendererSettings = other.fRendererSettings;
+
 	return *this;
 }
 
@@ -42,6 +60,25 @@ void
 VariablesViewNodeInfo::SetNodeExpanded(bool expanded)
 {
 	fNodeExpanded = expanded;
+}
+
+
+void
+VariablesViewNodeInfo::SetCastedType(Type* type)
+{
+	if (fCastedType != NULL)
+		fCastedType->ReleaseReference();
+
+	fCastedType = type;
+	if (fCastedType != NULL)
+		fCastedType->AcquireReference();
+}
+
+
+void
+VariablesViewNodeInfo::SetRendererSettings(const BMessage& settings)
+{
+	fRendererSettings = settings;
 }
 
 

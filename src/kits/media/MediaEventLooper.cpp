@@ -87,7 +87,7 @@ BMediaEventLooper::Start(bigtime_t performance_time)
 	// This hook function is called when a node is started
 	// by a call to the BMediaRoster. The specified
 	// performanceTime, the time at which the node
-	// should start running, may be in the future. 
+	// should start running, may be in the future.
 	fEventQueue.AddEvent(media_timed_event(performance_time, BTimedEventQueue::B_START));
 }
 
@@ -97,15 +97,15 @@ BMediaEventLooper::Stop(bigtime_t performance_time,
 						bool immediate)
 {
 	CALLED();
-	// This hook function is called when a node is stopped 
-	// by a call to the BMediaRoster. The specified performanceTime, 
-	// the time at which the node should stop, may be in the future. 
-	// If immediate is true, your node should ignore the performanceTime 
+	// This hook function is called when a node is stopped
+	// by a call to the BMediaRoster. The specified performanceTime,
+	// the time at which the node should stop, may be in the future.
+	// If immediate is true, your node should ignore the performanceTime
 	// value and synchronously stop performance. When Stop() returns,
 	// you're promising not to write into any BBuffers you may have
-	// received from your downstream consumers, and you promise not 
+	// received from your downstream consumers, and you promise not
 	// to send any more buffers until Start() is called again.
-	
+
 	if (immediate) {
 		// always be sure to add to the front of the queue so we can make sure it is
 		// handled before any buffers are sent!
@@ -120,11 +120,11 @@ BMediaEventLooper::Seek(bigtime_t media_time,
 						bigtime_t performance_time)
 {
 	CALLED();
-	// This hook function is called when a node is asked to seek to 
-	// the specified mediaTime by a call to the BMediaRoster. 
-	// The specified performanceTime, the time at which the node 
-	// should begin the seek operation, may be in the future. 
-	fEventQueue.AddEvent(media_timed_event(performance_time, BTimedEventQueue::B_SEEK, NULL, 
+	// This hook function is called when a node is asked to seek to
+	// the specified mediaTime by a call to the BMediaRoster.
+	// The specified performanceTime, the time at which the node
+	// should begin the seek operation, may be in the future.
+	fEventQueue.AddEvent(media_timed_event(performance_time, BTimedEventQueue::B_SEEK, NULL,
 		BTimedEventQueue::B_NO_CLEANUP, 0, media_time, NULL));
 }
 
@@ -134,18 +134,18 @@ BMediaEventLooper::TimeWarp(bigtime_t at_real_time,
 							bigtime_t to_performance_time)
 {
 	CALLED();
-	// This hook function is called when the time source to which the 
+	// This hook function is called when the time source to which the
 	// node is slaved is repositioned (via a seek operation) such that
-	// there will be a sudden jump in the performance time progression 
-	// as seen by the node. The to_performance_time argument indicates 
+	// there will be a sudden jump in the performance time progression
+	// as seen by the node. The to_performance_time argument indicates
 	// the new performance time; the change should occur at the real
-	// time specified by the at_real_time argument. 
+	// time specified by the at_real_time argument.
 
 	// place in the realtime queue
-	fRealTimeQueue.AddEvent(media_timed_event(at_real_time,	BTimedEventQueue::B_WARP, 
+	fRealTimeQueue.AddEvent(media_timed_event(at_real_time,	BTimedEventQueue::B_WARP,
 		NULL, BTimedEventQueue::B_NO_CLEANUP, 0, to_performance_time, NULL));
-		
-	// BeBook: Your implementation of TimeWarp() should call through to BMediaNode::TimeWarp() 
+
+	// BeBook: Your implementation of TimeWarp() should call through to BMediaNode::TimeWarp()
 	// BeBook: as well as all other inherited forms of TimeWarp()
 	// XXX should we do this here?
 	BMediaNode::TimeWarp(at_real_time, to_performance_time);
@@ -168,15 +168,16 @@ BMediaEventLooper::SetRunMode(run_mode mode)
 	CALLED();
 	// The SetRunMode() hook function is called when someone requests that your node's run mode be changed.
 
-	// bump or reduce priority when switching from/to offline run mode	
-	int32 priority;	
+	// bump or reduce priority when switching from/to offline run mode
+	int32 priority;
 	priority = (mode == B_OFFLINE) ? min_c(B_NORMAL_PRIORITY, fSetPriority) : fSetPriority;
 	if (priority != fCurrentPriority) {
 		fCurrentPriority = priority;
 		if (fControlThread > 0) {
 			set_thread_priority(fControlThread, fCurrentPriority);
 			fSchedulingLatency = estimate_max_scheduling_latency(fControlThread);
-			printf("BMediaEventLooper: SchedulingLatency is %Ld\n", fSchedulingLatency);
+			printf("BMediaEventLooper: SchedulingLatency is %" B_PRId64 "\n",
+				fSchedulingLatency);
 		}
 	}
 
@@ -188,9 +189,9 @@ BMediaEventLooper::SetRunMode(run_mode mode)
 BMediaEventLooper::CleanUpEvent(const media_timed_event *event)
 {
 	CALLED();
-	// Implement this function to clean up after custom events you've created 
-	// and added to your queue. It's called when a custom event is removed from 
-	// the queue, to let you handle any special tidying-up that the event might require. 
+	// Implement this function to clean up after custom events you've created
+	// and added to your queue. It's called when a custom event is removed from
+	// the queue, to let you handle any special tidying-up that the event might require.
 }
 
 
@@ -220,8 +221,8 @@ BMediaEventLooper::ControlLoop()
 			if (RunState() == B_QUITTING)
 				return;
 			// BMediaEventLooper compensates your performance time by adding the event latency
-			// (see SetEventLatency()) and the scheduling latency (or, for real-time events, 
-			// only the scheduling latency). 
+			// (see SetEventLatency()) and the scheduling latency (or, for real-time events,
+			// only the scheduling latency).
 
 			latency = fEventLatency + fSchedulingLatency;
 			waituntil = B_INFINITE_TIMEOUT;
@@ -349,17 +350,18 @@ BMediaEventLooper::SetPriority(int32 priority)
 	// clamp to a valid value
 	if (priority < 5)
 		priority = 5;
-		
+
 	if (priority > 120)
 		priority = 120;
-		
+
 	fSetPriority = priority;
 	fCurrentPriority = (RunMode() == B_OFFLINE) ? min_c(B_NORMAL_PRIORITY, fSetPriority) : fSetPriority;
 
 	if (fControlThread > 0) {
 		set_thread_priority(fControlThread, fCurrentPriority);
 		fSchedulingLatency = estimate_max_scheduling_latency(fControlThread);
-		printf("BMediaEventLooper: SchedulingLatency is %Ld\n", fSchedulingLatency);
+		printf("BMediaEventLooper: SchedulingLatency is %" B_PRId64 "\n",
+			fSchedulingLatency);
 	}
 
 	return B_OK;
@@ -375,7 +377,7 @@ BMediaEventLooper::SetRunState(run_state state)
 	// also needed for correct terminating of the ControlLoop()
 	if (fRunState == B_QUITTING && state != B_TERMINATED)
 		return;
-	
+
 	fRunState = state;
 }
 
@@ -413,10 +415,10 @@ void
 BMediaEventLooper::Run()
 {
 	CALLED();
-	
+
 	if (fControlThread != -1)
 		return; // thread already running
-	
+
 	// until now, the run state is B_UNREGISTERED, but we need to start in B_STOPPED state.
 	SetRunState(B_STOPPED);
 
@@ -427,7 +429,8 @@ BMediaEventLooper::Run()
 
 	// get latency information
 	fSchedulingLatency = estimate_max_scheduling_latency(fControlThread);
-	printf("BMediaEventLooper: SchedulingLatency is %Ld\n", fSchedulingLatency);
+	printf("BMediaEventLooper: SchedulingLatency is %" B_PRId64 "\n",
+		fSchedulingLatency);
 }
 
 
@@ -438,7 +441,7 @@ BMediaEventLooper::Quit()
 
 	if (fRunState == B_TERMINATED)
 		return;
-	
+
 	SetRunState(B_QUITTING);
 	close_port(ControlPort());
 	if (fControlThread != -1) {
@@ -463,23 +466,23 @@ BMediaEventLooper::DispatchEvent(const media_timed_event *event,
 		case BTimedEventQueue::B_START:
 			SetRunState(B_STARTED);
 			break;
-		
-		case BTimedEventQueue::B_STOP: 
+
+		case BTimedEventQueue::B_STOP:
 			SetRunState(B_STOPPED);
 			break;
 
 		case BTimedEventQueue::B_SEEK:
 			/* nothing */
 			break;
-		
+
 		case BTimedEventQueue::B_WARP:
 			/* nothing */
 			break;
-		
+
 		default:
 			break;
 	}
-	
+
 	_DispatchCleanUp(event);
 }
 
@@ -513,8 +516,8 @@ BMediaEventLooper::_DispatchCleanUp(const media_timed_event *event)
 {
 	PRINT(6, "CALLED BMediaEventLooper::_DispatchCleanUp()\n");
 
-	// this function to clean up after custom events you've created 
-	if (event->cleanup >= BTimedEventQueue::B_USER_CLEANUP) 
+	// this function to clean up after custom events you've created
+	if (event->cleanup >= BTimedEventQueue::B_USER_CLEANUP)
 		CleanUpEvent(event);
 }
 

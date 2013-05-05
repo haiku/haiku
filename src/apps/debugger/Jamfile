@@ -3,16 +3,21 @@ SubDir HAIKU_TOP src apps debugger ;
 CCFLAGS +=  -Werror ;
 C++FLAGS += -Werror ;
 
+UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 UsePrivateHeaders app debug interface kernel shared libroot ;
 UsePrivateSystemHeaders ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) arch ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) arch x86 ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) arch x86_64 ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) controllers ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debug_info ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) debug_managers ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debugger_interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) elf ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) files ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) ids ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) jobs ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) model ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) settings ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) settings generic ] ;
@@ -27,6 +32,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui team_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui teams_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui util ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui value ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface util ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) util ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) value ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) value type_handlers ] ;
@@ -53,13 +59,7 @@ SourceHdrs
 ;
 
 Application Debugger :
-	BreakpointManager.cpp
 	Debugger.cpp
-	Jobs.cpp
-	TeamMemoryBlockManager.cpp
-	TeamDebugger.cpp
-	ThreadHandler.cpp
-	Worker.cpp
 
 	# arch
 	Architecture.cpp
@@ -71,6 +71,20 @@ Application Debugger :
 	# arch/x86
 	ArchitectureX86.cpp
 	CpuStateX86.cpp
+
+	# arch/x86_64
+	ArchitectureX8664.cpp
+	CpuStateX8664.cpp
+
+	# controllers
+	DebugReportGenerator.cpp
+	TeamDebugger.cpp
+	ThreadHandler.cpp
+
+	# debug_managers
+	BreakpointManager.cpp
+	TeamMemoryBlockManager.cpp
+	WatchpointManager.cpp
 
 	# debug_info
 	BasicFunctionDebugInfo.cpp
@@ -110,16 +124,29 @@ Application Debugger :
 
 	# ids
 	FunctionID.cpp
+	FunctionParameterID.cpp
 	LocalVariableID.cpp
 	ObjectID.cpp
-	FunctionParameterID.cpp
+	ReturnValueID.cpp
+
+	# jobs
+	GetCPUStateJob.cpp
+	GetStackTraceJob.cpp
+	GetThreadStateJob.cpp
+	LoadImageDebugInfoJob.cpp
+	LoadSourceCodeJob.cpp
+	ResolveValueNodeJob.cpp
+	RetrieveMemoryBlockJob.cpp
 
 	# model
+	AreaInfo.cpp
 	Breakpoint.cpp
 	DisassembledCode.cpp
 	FileSourceCode.cpp
 	Image.cpp
 	ImageInfo.cpp
+	ReturnValueInfo.cpp
+	SemaphoreInfo.cpp
 	SourceCode.cpp
 	StackFrame.cpp
 	StackFrameValues.cpp
@@ -127,8 +154,9 @@ Application Debugger :
 	StackTrace.cpp
 	Statement.cpp
 	SymbolInfo.cpp
-	UserBreakpoint.cpp
+	SystemInfo.cpp
 	Team.cpp
+	TeamInfo.cpp
 	TeamMemory.cpp
 	TeamMemoryBlock.cpp
 	TeamTypeInformation.cpp
@@ -137,15 +165,17 @@ Application Debugger :
 	Type.cpp
 	TypeComponentPath.cpp
 	TypeLookupConstraints.cpp
+	UserBreakpoint.cpp
 	Variable.cpp
+	Watchpoint.cpp
 
 	# settings
 	BreakpointSetting.cpp
-	GUITeamUISettings.cpp
+	GuiTeamUiSettings.cpp
 	SettingsManager.cpp
 	TeamSettings.cpp
-	TeamUISettings.cpp
-	TeamUISettingsFactory.cpp
+	TeamUiSettings.cpp
+	TeamUiSettingsFactory.cpp
 
 	# settings/generic
 	Setting.cpp
@@ -169,11 +199,24 @@ Application Debugger :
 	# user_interface
 	UserInterface.cpp
 
+	# user_interface/cli
+	CliCommand.cpp
+	CliContext.cpp
+	CliContinueCommand.cpp
+	CliDebugReportCommand.cpp
+	CliDumpMemoryCommand.cpp
+	CliPrintVariableCommand.cpp
+	CliQuitCommand.cpp
+	CliStackFrameCommand.cpp
+	CliStackTraceCommand.cpp
+	CliStopCommand.cpp
+	CliThreadCommand.cpp
+	CliThreadsCommand.cpp
+	CliVariablesCommand.cpp
+	CommandLineUserInterface.cpp
+
 	# user_interface/gui
 	GraphicalUserInterface.cpp
-
-	# user_interface/cli
-	CommandLineUserInterface.cpp
 
 	# user_interface/gui/model
 	VariablesViewState.cpp
@@ -184,6 +227,7 @@ Application Debugger :
 	MemoryView.cpp
 
 	# user_interface/gui/teams_window
+	StartTeamWindow.cpp
 	TeamsWindow.cpp
 	TeamsListView.cpp
 
@@ -198,10 +242,14 @@ Application Debugger :
 	TeamWindow.cpp
 	ThreadListView.cpp
 	VariablesView.cpp
+	WatchPromptWindow.cpp
 
 	# user_interface/gui/util
+	ActionMenuItem.cpp
+	GuiSettingsUtils.cpp
 	SettingsMenu.cpp
 	TargetAddressTableColumn.cpp
+
 
 	# user_interface/gui/value
 	TableCellBoolRenderer.cpp
@@ -212,11 +260,16 @@ Application Debugger :
 	TableCellValueRenderer.cpp
 	TableCellValueRendererUtils.cpp
 
+	# user_interface/util
+	UiUtils.cpp
+
 	# util
 	ArchivingUtils.cpp
 	BitBuffer.cpp
 	IntegerFormatter.cpp
+	RangeList.cpp
 	StringUtils.cpp
+	Worker.cpp
 
 	# value
 	TypeHandler.cpp
@@ -227,8 +280,10 @@ Application Debugger :
 	ValueLoader.cpp
 	ValueNode.cpp
 	ValueNodeContainer.cpp
+	ValueNodeManager.cpp
 
 	# value/type_handlers
+	BListTypeHandler.cpp
 	BMessageTypeHandler.cpp
 	CStringTypeHandler.cpp
 
@@ -243,6 +298,7 @@ Application Debugger :
 	# value/value_nodes
 	AddressValueNode.cpp
 	ArrayValueNode.cpp
+	BListValueNode.cpp
 	BMessageValueNode.cpp
 	CompoundValueNode.cpp
 	CStringValueNode.cpp
@@ -262,6 +318,7 @@ Application Debugger :
 	:
 	<nogrist>Debugger_demangler.o
 	<nogrist>Debugger_disasm_x86.o
+	<nogrist>Debugger_disasm_x86_64.o
 	<nogrist>Debugger_dwarf.o
 	<nogrist>DebugAnalyzer_gui_table.o
 
@@ -269,13 +326,19 @@ Application Debugger :
 	<bin>debug_utils.a
 	libcolumnlistview.a
 	libshared.a
+	libshared.a
+	libexpression_parser.a
+	libmapm.a
+	libedit.a
+	libtermcap.a
 
 	$(TARGET_LIBSTDC++)
-	be tracker libdebug.so libshared.a libexpression_parser.a libmapm.a
+	be tracker libbsd.so libdebug.so
 
 	: Debugger.rdef
 ;
 
 HaikuSubInclude arch x86 disasm ;
+HaikuSubInclude arch x86_64 disasm ;
 HaikuSubInclude demangler ;
 HaikuSubInclude dwarf ;

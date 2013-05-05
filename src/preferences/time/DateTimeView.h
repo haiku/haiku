@@ -36,12 +36,10 @@ public:
 	virtual	void 				MessageReceived(BMessage* message);
 
 			bool				CheckCanRevert();
-			bool				GetUseGmtTime();
 
 private:
 			void 				_InitView();
 			void 				_UpdateDateTime(BMessage* message);
-			void 				_NotifyClockSettingChanged();
 			void				_Revert();
 			time_t				_PrefletUptime() const;
 

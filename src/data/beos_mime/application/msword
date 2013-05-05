@@ -3,9 +3,9 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "application/msword";
 
-resource(2, "META:S:DESC") #'MSDC' "Word Document";
+resource(2, "META:S:DESC") #'MSDC' "Word document";
 
-resource(3, "META:L:DESC") #'MLDC' "Microsoft® Word® Document";
+resource(3, "META:L:DESC") #'MLDC' "Microsoft® Word® document";
 
 resource(4, "META:EXTENS") message(234) {
 	"extensions" = "doc",

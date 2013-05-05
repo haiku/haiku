@@ -1,14 +1,14 @@
-1	norwegian_bokmål	x-vnd.Haiku-Pairs	1981673050
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Pairs	1981673050
 %app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\tskrevet av Ralf Schülke\n\tOpphavsrett 2008-2010, Haiku Inc.\n\nDu fullførte spillet på %num% klikk.\n
-Beginner (4x4)	PairsWindow		Nybegynner (4x4)
 Expert (8x8)	PairsWindow		Ekspert (8x8)
-Game	PairsWindow		Spill
-Intermediate (6x6)	PairsWindow		Viderekommen (6x6)
-New	PairsWindow		Ny
-New game	PairsWindow		Nytt spill
-OK	PairsView		OK
-Pairs	System name		Pairs
-Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Pairs fant ikke mange nok vektorikoner på systemet; det trengs minst %d.
-Quit	PairsWindow		Avslutt
+Beginner (4x4)	PairsWindow		Nybegynner (4x4)
 Quit game	PairsWindow		Avslutt spill
+Game	PairsWindow		Spill
 Size	PairsWindow		Størrelse
+New	PairsWindow		Ny
+OK	PairsView		OK
+Intermediate (6x6)	PairsWindow		Viderekommen (6x6)
+Quit	PairsWindow		Avslutt
+Pairs	System name		Pairs
+New game	PairsWindow		Nytt spill
+Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Pairs fant ikke mange nok vektorikoner på systemet; det trengs minst %d.

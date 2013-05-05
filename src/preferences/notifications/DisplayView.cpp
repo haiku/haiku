@@ -31,8 +31,8 @@
 #include "SettingsHost.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "DisplayView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "DisplayView"
 
 
 DisplayView::DisplayView(SettingsHost* host)
@@ -65,6 +65,7 @@ DisplayView::DisplayView(SettingsHost* host)
 		.Add(fIconSizeField->CreateLabelLayoutItem(), 0, 1)
 		.Add(fIconSizeField->CreateMenuBarLayoutItem(), 1, 1)
 		.Add(BSpaceLayoutItem::CreateGlue(), 0, 2, 2, 1)
+		.SetInsets(inset, inset, inset, inset)
 	);
 }
 
@@ -106,6 +107,7 @@ DisplayView::Load()
 				"It's possible you don't have write access to the "
 				"settings directory."), B_TRANSLATE("OK"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		(void)alert->Go();
 	}
 
@@ -175,6 +177,7 @@ DisplayView::Save()
 			B_TRANSLATE("Can't save preferenes, you probably don't have "
 				"write access to the settings directory or the disk is full."),
 				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		(void)alert->Go();
 		return ret;
 	}

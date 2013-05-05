@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2012, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -80,7 +80,7 @@ BRect::InsetBySelf(float dx, float dy)
 
 
 BRect
-BRect::InsetByCopy(BPoint point)
+BRect::InsetByCopy(BPoint point) const
 {
 	BRect copy(*this);
 	copy.InsetBy(point);
@@ -89,7 +89,7 @@ BRect::InsetByCopy(BPoint point)
 
 
 BRect
-BRect::InsetByCopy(float dx, float dy)
+BRect::InsetByCopy(float dx, float dy) const
 {
 	BRect copy(*this);
 	copy.InsetBy(dx, dy);
@@ -134,7 +134,7 @@ BRect::OffsetBySelf(float dx, float dy)
 
 
 BRect
-BRect::OffsetByCopy(BPoint point)
+BRect::OffsetByCopy(BPoint point) const
 {
 	BRect copy(*this);
 	copy.OffsetBy(point);
@@ -143,7 +143,7 @@ BRect::OffsetByCopy(BPoint point)
 
 
 BRect
-BRect::OffsetByCopy(float dx, float dy)
+BRect::OffsetByCopy(float dx, float dy) const
 {
 	BRect copy(*this);
 	copy.OffsetBy(dx, dy);
@@ -188,7 +188,7 @@ BRect::OffsetToSelf(float dx, float dy)
 
 
 BRect
-BRect::OffsetToCopy(BPoint point)
+BRect::OffsetToCopy(BPoint point) const
 {
 	BRect copy(*this);
 	copy.OffsetTo(point);
@@ -197,7 +197,7 @@ BRect::OffsetToCopy(BPoint point)
 
 
 BRect
-BRect::OffsetToCopy(float dx, float dy)
+BRect::OffsetToCopy(float dx, float dy) const
 {
 	BRect copy(*this);
 	copy.OffsetTo(dx, dy);
@@ -215,31 +215,31 @@ BRect::PrintToStream() const
 bool
 BRect::operator==(BRect rect) const
 {
-	 return left == rect.left && right == rect.right &&
-	 		top == rect.top && bottom == rect.bottom;
+	return left == rect.left && right == rect.right &&
+		top == rect.top && bottom == rect.bottom;
 }
 
 
 bool
 BRect::operator!=(BRect rect) const
 {
-	 return !(*this == rect);
+	return !(*this == rect);
 }
 
 
 BRect
 BRect::operator&(BRect rect) const
 {
-	 return BRect(max_c(left, rect.left), max_c(top, rect.top),
-	 			  min_c(right, rect.right), min_c(bottom, rect.bottom));
+	return BRect(max_c(left, rect.left), max_c(top, rect.top),
+		min_c(right, rect.right), min_c(bottom, rect.bottom));
 }
 
 
 BRect
 BRect::operator|(BRect rect) const
 {
-	 return BRect(min_c(left, rect.left), min_c(top, rect.top),
-	 			  max_c(right, rect.right), max_c(bottom, rect.bottom));
+	return BRect(min_c(left, rect.left), min_c(top, rect.top),
+		max_c(right, rect.right), max_c(bottom, rect.bottom));
 }
 
 
@@ -250,7 +250,7 @@ BRect::Intersects(BRect rect) const
 		return false;
 
 	return !(rect.left > right || rect.right < left
-			|| rect.top > bottom || rect.bottom < top);	
+		|| rect.top > bottom || rect.bottom < top);
 }
 
 
@@ -258,7 +258,7 @@ bool
 BRect::Contains(BPoint point) const
 {
 	return point.x >= left && point.x <= right
-			&& point.y >= top && point.y <= bottom;
+		&& point.y >= top && point.y <= bottom;
 }
 
 
@@ -266,5 +266,124 @@ bool
 BRect::Contains(BRect rect) const
 {
 	return rect.left >= left && rect.right <= right
-			&& rect.top >= top && rect.bottom <= bottom;
+		&& rect.top >= top && rect.bottom <= bottom;
 }
+
+
+// #pragma mark - BeOS compatibility only
+#if __GNUC__ == 2
+
+
+extern "C" BRect
+InsetByCopy__5BRectG6BPoint(BRect* self, BPoint point)
+{
+	BRect copy(*self);
+	copy.InsetBy(point);
+	return copy;
+}
+
+
+extern "C" BRect
+InsetByCopy__5BRectff(BRect* self, float dx, float dy)
+{
+	BRect copy(*self);
+	copy.InsetBy(dx, dy);
+	return copy;
+}
+
+
+extern "C" BRect
+OffsetByCopy__5BRectG6BPoint(BRect* self, BPoint point)
+{
+	BRect copy(*self);
+	copy.OffsetBy(point);
+	return copy;
+}
+
+
+extern "C" BRect
+OffsetByCopy__5BRectff(BRect* self, float dx, float dy)
+{
+	BRect copy(*self);
+	copy.OffsetBy(dx, dy);
+	return copy;
+}
+
+
+extern "C" BRect
+OffsetToCopy__5BRectG6BPoint(BRect* self, BPoint point)
+{
+	BRect copy(*self);
+	copy.OffsetTo(point);
+	return copy;
+}
+
+
+extern "C" BRect
+OffsetToCopy__5BRectff(BRect* self, float dx, float dy)
+{
+	BRect copy(*self);
+	copy.OffsetTo(dx, dy);
+	return copy;
+}
+
+
+#elif __GNUC__ == 4
+// TODO: remove this when new GCC 4 packages have to be built anyway
+
+
+extern "C" BRect
+_ZN5BRect11InsetByCopyE6BPoint(BRect* self, BPoint point)
+{
+	BRect copy(*self);
+	copy.InsetBy(point);
+	return copy;
+}
+
+
+extern "C" BRect
+_ZN5BRect11InsetByCopyEff(BRect* self, float dx, float dy)
+{
+	BRect copy(*self);
+	copy.InsetBy(dx, dy);
+	return copy;
+}
+
+
+extern "C" BRect
+_ZN5BRect12OffsetByCopyE6BPoint(BRect* self, BPoint point)
+{
+	BRect copy(*self);
+	copy.OffsetBy(point);
+	return copy;
+}
+
+
+extern "C" BRect
+_ZN5BRect12OffsetByCopyEff(BRect* self, float dx, float dy)
+{
+	BRect copy(*self);
+	copy.OffsetBy(dx, dy);
+	return copy;
+}
+
+
+extern "C" BRect
+_ZN5BRect12OffsetToCopyE6BPoint(BRect* self, BPoint point)
+{
+	BRect copy(*self);
+	copy.OffsetTo(point);
+	return copy;
+}
+
+
+extern "C" BRect
+_ZN5BRect12OffsetToCopyEff(BRect* self, float dx, float dy)
+{
+	BRect copy(*self);
+	copy.OffsetTo(dx, dy);
+	return copy;
+}
+
+
+#endif	// __GNUC__ == 4

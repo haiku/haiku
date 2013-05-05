@@ -10,7 +10,10 @@
 
 
 void	x86_initialize_commpage_signal_handler();
-addr_t	x86_get_user_signal_handler_wrapper(bool beosHandler);
+#ifndef __x86_64__
+addr_t	x86_get_user_signal_handler_wrapper(bool beosHandler,
+	void* commPageAddress);
+#endif
 
 
 #endif	// _KERNEL_ARCH_X86_SIGNALS_H

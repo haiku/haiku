@@ -1,14 +1,14 @@
 1	romanian	x-vnd.Haiku-CDPlayer	592310631
-Audio CD	CDPlayer		CD audio
-CD	CDPlayer		CD
-CD drive is empty	CDPlayer		Unitatea CD este vidă
 CDPlayer	System name		PlayerCD
+CD	CDPlayer		CD
 Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		Disc: %ld:%.2ld / %ld:%.2ld
-Disc: --:-- / --:--	CDPlayer		Disc: --:-- / --:--
-Disc: 88:88 / 88:88	CDPlayer		Disc: 88:88 / 88:88
-It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Se pare că nu există unități CD în calculatorul dumneavoastră sau nu există un sistem software pentru a suporta una.
 OK	CDPlayer		OK
 Track %whichTrack%: %trackAt%	CDPlayer		Pistă %whichTrack%: %trackAt%
+Audio CD	CDPlayer		CD audio
+It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Se pare că nu există unități CD în calculatorul dumneavoastră sau nu există un sistem software pentru a suporta una.
 Track: %ld:%.2ld / %ld:%.2ld	CDPlayer		Pistă:%ld:%.2ld / %ld:%.2ld
-Track: --:-- / --:--	CDPlayer		Pistă: --:-- / --:--
 Track: 88:88 / 88:88	CDPlayer		Pistă: 88:88 / 88:88
+Track: --:-- / --:--	CDPlayer		Pistă: --:-- / --:--
+Disc: 88:88 / 88:88	CDPlayer		Disc: 88:88 / 88:88
+Disc: --:-- / --:--	CDPlayer		Disc: --:-- / --:--
+CD drive is empty	CDPlayer		Unitatea CD este vidă

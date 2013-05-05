@@ -4,6 +4,7 @@
 
 #include <Application.h>
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Cursor.h>
 #include <Message.h>
 #include <MessageQueue.h>
@@ -12,9 +13,12 @@
 #include <String.h>
 #include <Window.h>
 
+#include "ObjectView.h"
 #include "States.h"
 
-#include "ObjectView.h"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Playground"
+
 
 const unsigned char kMoveCursor[] = { 16, 1, 8, 8,
 	0x01, 0x80, 0x02, 0x40, 0x04, 0x20, 0x08, 0x10,
@@ -157,7 +161,7 @@ ObjectView::Draw(BRect updateRect)
 	SetDrawingMode(B_OP_OVER);
 	SetHighColor(255, 0, 0, 128);
 
-	const char* message = "Click and drag to draw an object";
+	const char* message = B_TRANSLATE("Click and drag to draw an object");
 	float width = StringWidth(message);
 
 	BPoint p((r.Width() - width) / 2.0, r.Height() / 2.0);
@@ -341,7 +345,7 @@ if (dragMessage) {
 				helper->FillRect(r);
 
 				helper->SetHighColor(0, 0, 0, 255);
-				const char* text = "Test";
+				const char* text = B_TRANSLATE("Test");
 				float pos = (r.Width() - helper->StringWidth(text)) / 2;
 				helper->DrawString(text, BPoint(pos, 25));
 				helper->Sync();

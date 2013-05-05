@@ -1,0 +1,54 @@
+1	hindi	x-vnd.Be-PSRV	1761631281
+Undefined	ConfigWindow		अपरिभाषित
+Return the number of available transports	PrintServerApp Scripting		उपलब्ध परिवहन की संख्या बताये
+Return the number of available printers	PrintServerApp Scripting		उपलब्ध मुद्राको की संख्या बताये
+Get currently available ports/devices	Transport Scripting		वर्तमान में उपलब्ध पोर्ट / उपकरण लाओ
+Retrieve or select the active printer	PrintServerApp Scripting		पुनः प्राप्त करे या सक्रिय प्रिंटर का चयन करें
+Cancel	PrintServerApp		रद्द करें
+Retrieve a specific printer	PrintServerApp Scripting		एक विशेष प्रिंटर पुनर्प्राप्त करें
+Page %1 to %2	ConfigWindow		पृष्ठ %1 से %2
+Get name of the printer add-on used for this printer	Printer Scripting		इस प्रिंटर के लिए उपयोग किया गया प्रिंटर ऐड ओन का नाम प्राप्त करें
+Page setup:	ConfigWindow		पृष्ठ की रूपरचना:
+OK	ConfigWindow		ठीक है
+Cancel	ConfigWindow		रद्द करें
+Printer server	ConfigWindow		मुद्रक सर्वर
+Page %1 to %2, %3 copies	ConfigWindow		पृष्ठ %1 से %2, %3 की प्रतियां
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		इस नाम के साथ एक प्रिंटर पहले से मौजूद है, लेकिन इसके चालक पाया नहीं जा सका!बदलें?
+Yes	PrintServerApp		हां
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	बही खाता 
+Would you like to set one up now?	PrintServerApp		क्या आप अब एक स्थापित करना चाहते हैं ?
+A6	ConfigWindow	ISO 216 paper size	ए छह
+Portrait	ConfigWindow		पृष्ठ का उन्मुखीकरण ऐसा है कि लंबाई चौड़ाई से अधिक है
+All pages	ConfigWindow		सभी पृष्ठ
+There is no default printer set up.	PrintServerApp		कोई मूलभूत प्रिंटर स्थापित नही है.
+B5	ConfigWindow	ISO 216 paper size	बी पाँच
+A0	ConfigWindow	ISO 216 paper size	ए शून्य
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	पत्र
+Printer:	ConfigWindow		मुद्रक: 
+A2	ConfigWindow	ISO 216 paper size	ए दो
+Select a printer	ConfigWindow		मुद्रक चुने
+Show configuration window	PrintServerApp Scripting		कॉन्फ़िगरेशन विंडों दिखाएँ 
+A4	ConfigWindow	ISO 216 paper size	ए चार
+Get comments about this printer	Printer Scripting		इस मुद्रक के बारे में टिप्पणी प्राप्त करें
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		इस नाम के साथ एक प्रिंटर पहले से मौजूद है, लेकिन यह बिलकुल भी उपयोगी नहीं है!बदलें?
+No	PrintServerApp		नहीं
+Get the transport configuration for this printer	Printer Scripting		इस प्रिंटर के लिए ट्रांसपोर्ट कॉन्फ़िगरेशन लाओ
+Landscape	ConfigWindow		पृष्ठ का उन्मुखीकरण ऐसा है कि चौड़ाई लंबाई से अधिक है
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	कानूनी
+There are no printers set up.	PrintServerApp		कोई मुद्रक स्थापित नही हैं.
+Get name of the transport add-on used for this printer	Printer Scripting		इस प्रिंटर के लिए उपयोग किया गया यातायात ऐड ओन का नाम प्राप्त करें
+All pages, %1 copies	ConfigWindow		सभी पृष्ठों की , %1 प्रतियां
+Delete a specific printer	PrintServerApp Scripting		विशेष मुद्रक को हटाएँ 
+Create a new printer	PrintServerApp Scripting		एक नया मुद्रक बनाएँ
+OK	PrintServerApp		ठीक है
+Print setup	ConfigWindow		मुद्रक की व्यवस्था
+A1	ConfigWindow	ISO 216 paper size	ए एक
+Retrieve a specific transport	PrintServerApp Scripting		एक विशिष्ट ट्रांसपोर्ट पुनर्प्राप्त करें
+Get name of printer	Printer Scripting		मुद्रक का नाम प्राप्त करें
+A3	ConfigWindow	ISO 216 paper size	ए तीन
+Get name of transport	Transport Scripting		ट्रांसपोर्ट का नाम प्राप्त करें
+A5	ConfigWindow	ISO 216 paper size	Aपांच
+Would you like to make @ the default printer?	PrintServerApp		क्या आप @ डिफ़ॉल्ट मुद्रक बनाना चाहते हैं?
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	टैब्लॉइड
+Page setup	ConfigWindow		पृष्ठ की व्यवस्था
+Paper setup:	ConfigWindow		काग़ज़ की व्यवस्था

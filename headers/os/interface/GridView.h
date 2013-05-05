@@ -24,6 +24,28 @@ public:
 			BGridLayout*		GridLayout() const;
 
 	static	BArchivable*		Instantiate(BMessage* from);
+
+	virtual	status_t			Perform(perform_code d, void* arg);
+
+private:
+
+	// FBC padding
+	virtual	void				_ReservedGridView1();
+	virtual	void				_ReservedGridView2();
+	virtual	void				_ReservedGridView3();
+	virtual	void				_ReservedGridView4();
+	virtual	void				_ReservedGridView5();
+	virtual	void				_ReservedGridView6();
+	virtual	void				_ReservedGridView7();
+	virtual	void				_ReservedGridView8();
+	virtual	void				_ReservedGridView9();
+	virtual	void				_ReservedGridView10();
+
+	// forbidden methods
+								BGridView(const BGridView&);
+			void				operator =(const BGridView&);
+
+			uint32				_reserved[2];
 };
 
 

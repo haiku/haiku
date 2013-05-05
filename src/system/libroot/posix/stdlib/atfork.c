@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 */
@@ -8,6 +8,8 @@
 
 #include <stdlib.h>
 #include <errno.h>
+
+#include <errno_private.h>
 
 
 /**	This is the BeOS compatible atfork() function; since it's not part of POSIX,
@@ -20,7 +22,7 @@ atfork(void (*function)(void))
 {
 	status_t status = __register_atfork(NULL, NULL, function);
 	if (status < B_OK) {
-		errno = status;
+		__set_errno(status);
 		return -1;
 	}
 

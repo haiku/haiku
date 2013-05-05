@@ -79,7 +79,7 @@ of their respective holders. All rights reserved.
 #endif
 
 
-#define B_TRANSLATE_CONTEXT "Mail"
+#define B_TRANSLATION_CONTEXT "Mail"
 
 
 const rgb_color kNormalTextColor = {0, 0, 0, 255};
@@ -119,19 +119,14 @@ Unicode2UTF8(int32 c, char **out)
 
 	if (c < 0x80)
 		*(s++) = c;
-	else if (c < 0x800)
-	{
+	else if (c < 0x800) {
 		*(s++) = 0xc0 | (c >> 6);
 		*(s++) = 0x80 | (c & 0x3f);
-	}
-	else if (c < 0x10000)
-	{
+	} else if (c < 0x10000) {
 		*(s++) = 0xe0 | (c >> 12);
 		*(s++) = 0x80 | ((c >> 6) & 0x3f);
 		*(s++) = 0x80 | (c & 0x3f);
-	}
-	else if (c < 0x200000)
-	{
+	} else if (c < 0x200000) {
 		*(s++) = 0xf0 | (c >> 18);
 		*(s++) = 0x80 | ((c >> 12) & 0x3f);
 		*(s++) = 0x80 | ((c >> 6) & 0x3f);
@@ -680,7 +675,7 @@ TContentView::MessageReceived(BMessage *msg)
 		{
 			BFont *font;
 			msg->FindPointer("font", (void **)&font);
-			fTextView->SetFontAndColor(0, LONG_MAX, font);
+			fTextView->UpdateFont(font);
 			fTextView->Invalidate(Bounds());
 			break;
 		}
@@ -702,6 +697,13 @@ TContentView::MessageReceived(BMessage *msg)
 
 		case M_SIGNATURE:
 		{
+			if (fTextView->IsReaderThreadRunning()) {
+				// Do not add the signature until the reader thread
+				// is finished. Resubmit the message for later processing
+				Window()->PostMessage(msg);
+				break;
+			}
+
 			entry_ref ref;
 			msg->FindRef("ref", &ref);
 
@@ -716,6 +718,8 @@ TContentView::MessageReceived(BMessage *msg)
 					break;
 
 				char *signature = (char *)malloc(size);
+				if (signature == NULL)
+					break;
 				ssize_t bytesRead = file.Read(signature, size);
 				if (bytesRead < B_OK) {
 					free (signature);
@@ -725,29 +729,32 @@ TContentView::MessageReceived(BMessage *msg)
 				const char *text = fTextView->Text();
 				int32 length = fTextView->TextLength();
 
-				if (length && text[length - 1] != '\n') {
-					fTextView->Select(length, length);
+				// reserve some empty lines before the signature
+				const char* newLines = "\n\n\n\n";
+				if (length && text[length - 1] == '\n')
+					newLines++;
 
-					char newLine = '\n';
-					fTextView->Insert(&newLine, 1);
+				fTextView->Select(length, length);
+				fTextView->Insert(newLines, strlen(newLines));
+				length += strlen(newLines);
 
-					length++;
-				}
-
+				// append the signature
 				fTextView->Select(length, length);
 				fTextView->Insert(signature, bytesRead);
 				fTextView->Select(length, length + bytesRead);
 				fTextView->ScrollToSelection();
 
-				fTextView->Select(start, finish);
+				// set the editing cursor position
+				fTextView->Select(length - 2 , length - 2);
 				fTextView->ScrollToSelection();
 				free (signature);
 			} else {
 				beep();
-				(new BAlert("",
+				BAlert* alert = new BAlert("",
 					B_TRANSLATE("An error occurred trying to open this "
-						"signature."),
-					B_TRANSLATE("Sorry")))->Go();
+						"signature."), B_TRANSLATE("Sorry"));
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+				alert->Go();
 			}
 			break;
 		}
@@ -920,6 +927,21 @@ TTextView::~TTextView()
 
 
 void
+TTextView::UpdateFont(const BFont* newFont)
+{
+	fFont = *newFont;
+
+	// update the text run array safely with new font
+	text_run_array *runArray = RunArray(0, LONG_MAX);
+	for (int i = 0; i < runArray->count; i++)
+		runArray->runs[i].font = *newFont;
+
+	SetRunArray(0, LONG_MAX, runArray);
+	FreeRunArray(runArray);
+}
+
+
+void
 TTextView::AttachedToWindow()
 {
 	BTextView::AttachedToWindow();
@@ -947,15 +969,12 @@ TTextView::KeyDown(const char *key, int32 count)
 	msg = Window()->CurrentMessage();
 	mods = msg->FindInt32("modifiers");
 
-	switch (key[0])
-	{
+	switch (key[0]) {
 		case B_HOME:
-			if (IsSelectable())
-			{
+			if (IsSelectable()) {
 				if (IsEditable())
 					BTextView::KeyDown(key, count);
-				else
-				{
+				else {
 					// scroll to the beginning
 					Select(0, 0);
 					ScrollToSelection();
@@ -964,12 +983,10 @@ TTextView::KeyDown(const char *key, int32 count)
 			break;
 
 		case B_END:
-			if (IsSelectable())
-			{
+			if (IsSelectable()) {
 				if (IsEditable())
 					BTextView::KeyDown(key, count);
-				else
-				{
+				else {
 					// scroll to the end
 					int32 length = TextLength();
 					Select(length, length);
@@ -979,19 +996,15 @@ TTextView::KeyDown(const char *key, int32 count)
 			break;
 
 		case 0x02:						// ^b - back 1 char
-			if (IsSelectable())
-			{
+			if (IsSelectable()) {
 				GetSelection(&start, &end);
-				while (!IsInitialUTF8Byte(ByteAt(--start)))
-				{
-					if (start < 0)
-					{
+				while (!IsInitialUTF8Byte(ByteAt(--start))) {
+					if (start < 0) {
 						start = 0;
 						break;
 					}
 				}
-				if (start >= 0)
-				{
+				if (start >= 0) {
 					Select(start, start);
 					ScrollToSelection();
 				}
@@ -999,21 +1012,16 @@ TTextView::KeyDown(const char *key, int32 count)
 			break;
 
 		case B_DELETE:
-			if (IsSelectable())
-			{
-				if ((key[0] == B_DELETE) || (mods & B_CONTROL_KEY))	// ^d
-				{
-					if (IsEditable())
-					{
+			if (IsSelectable()) {
+				if ((key[0] == B_DELETE) || (mods & B_CONTROL_KEY)) {
+					// ^d
+					if (IsEditable()) {
 						GetSelection(&start, &end);
 						if (start != end)
 							Delete();
-						else
-						{
-							for (end = start + 1; !IsInitialUTF8Byte(ByteAt(end)); end++)
-							{
-								if (end > textLen)
-								{
+						else {
+							for (end = start + 1; !IsInitialUTF8Byte(ByteAt(end)); end++) {
+								if (end > textLen) {
 									end = textLen;
 									break;
 								}
@@ -1030,12 +1038,10 @@ TTextView::KeyDown(const char *key, int32 count)
 			break;
 
 		case 0x05:						// ^e - end of line
-			if ((IsSelectable()) && (mods & B_CONTROL_KEY))
-			{
+			if (IsSelectable() && (mods & B_CONTROL_KEY)) {
 				if (CurrentLine() == CountLines() - 1)
 					Select(TextLength(), TextLength());
-				else
-				{
+				else {
 					GoToLine(CurrentLine() + 1);
 					GetSelection(&start, &end);
 					Select(start - 1, start - 1);
@@ -1044,17 +1050,14 @@ TTextView::KeyDown(const char *key, int32 count)
 			break;
 
 		case 0x06:						// ^f - forward 1 char
-			if (IsSelectable())
-			{
+			if (IsSelectable()) {
 				GetSelection(&start, &end);
 				if (end > start)
 					start = end;
-				else
-				{
-					for (end = start + 1; !IsInitialUTF8Byte(ByteAt(end)); end++)
-					{
-						if (end > textLen)
-						{
+				else {
+					for (end = start + 1; !IsInitialUTF8Byte(ByteAt(end));
+						end++) {
+						if (end > textLen) {
 							end = textLen;
 							break;
 						}
@@ -1067,16 +1070,14 @@ TTextView::KeyDown(const char *key, int32 count)
 			break;
 
 		case 0x0e:						// ^n - next line
-			if (IsSelectable())
-			{
+			if (IsSelectable()) {
 				raw = B_DOWN_ARROW;
 				BTextView::KeyDown(&raw, 1);
 			}
 			break;
 
 		case 0x0f:						// ^o - open line
-			if (IsEditable())
-			{
+			if (IsEditable()) {
 				GetSelection(&start, &end);
 				Delete();
 
@@ -1096,7 +1097,7 @@ TTextView::KeyDown(const char *key, int32 count)
 						fYankBuffer = NULL;
 					}
 					fLastPosition = start;
-					if (CurrentLine() < (CountLines() - 1)) {
+					if (CurrentLine() < CountLines() - 1) {
 						GoToLine(CurrentLine() + 1);
 						GetSelection(&end, &end);
 						end--;
@@ -1134,7 +1135,7 @@ TTextView::KeyDown(const char *key, int32 count)
 			break;
 
 		case 0x19:						// ^y yank text
-			if ((IsEditable()) && (fYankBuffer)) {
+			if (IsEditable() && fYankBuffer) {
 				Delete();
 				Insert(fYankBuffer);
 				ScrollToSelection();
@@ -1524,9 +1525,8 @@ TTextView::MouseDown(BPoint where)
 				BMenuItem *menuItem;
 				BPopUpMenu menu("Words", false, false);
 
-				int32 matchCount;
 				for (int32 i = 0; i < gDictCount; i++)
-					matchCount = gWords[i]->FindBestMatches(&matches,
+					gWords[i]->FindBestMatches(&matches,
 						srcWord.String());
 
 				if (matches.CountItems()) {
@@ -1889,10 +1889,11 @@ TTextView::Open(hyper_text *enclosure)
 			status_t result = be_roster->Launch(handlerToLaunch, 1, &enclosure->name);
 			if (result != B_NO_ERROR && result != B_ALREADY_RUNNING) {
 				beep();
-				(new BAlert("",
+				BAlert* alert = new BAlert("",
 					B_TRANSLATE("There is no installed handler for "
-						"URL links."),
-					"Sorry"))->Go();
+						"URL links."), B_TRANSLATE("Sorry"));
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+				alert->Go();
 			}
 			break;
 		}
@@ -2040,9 +2041,10 @@ TTextView::Save(BMessage *msg, bool makeNewFile)
 
 	if (result != B_NO_ERROR) {
 		beep();
-		(new BAlert("", B_TRANSLATE("An error occurred trying to save "
-				"the attachment."),
-			B_TRANSLATE("Sorry")))->Go();
+		BAlert* alert = new BAlert("", B_TRANSLATE("An error occurred trying to save "
+				"the attachment."),	B_TRANSLATE("Sorry"));
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 	}
 
 	return result;
@@ -2066,6 +2068,20 @@ TTextView::StopLoad()
 	}
 
 	Window()->Lock();
+}
+
+
+bool
+TTextView::IsReaderThreadRunning()
+{
+	if (fThread == 0)
+		return false;
+
+	thread_info info;
+	for (int i = 5; i > 0; i--, usleep(100000))
+		if (get_thread_info(fThread, &info) != B_OK)
+			return false;
+	return true;
 }
 
 
@@ -2214,7 +2230,7 @@ TTextView::AddAsContent(BEmailMessage *mail, bool wrap, uint32 charset, mail_enc
 
 			// add a newline to every line except for the ones
 			// that already end in newlines, and the last line
-			if ((text[endOffset - 1] != '\n') && (i < (numLines - 1))) {
+			if ((text[endOffset - 1] != '\n') && (i < numLines - 1)) {
 				content[contentLength++] = '\n';
 
 				// copy quote level of the first line
@@ -2282,6 +2298,9 @@ TTextView::Reader::ParseMail(BMailContainer *container,
 				return false;
 
 			hyper_text *enclosure = (hyper_text *)malloc(sizeof(hyper_text));
+			if (enclosure == NULL)
+				return false;
+
 			memset(enclosure, 0, sizeof(hyper_text));
 
 			enclosure->type = TYPE_ENCLOSURE;
@@ -2309,6 +2328,9 @@ TTextView::Reader::ParseMail(BMailContainer *container,
 				count--;
 		} else if (fIncoming) {
 			hyper_text *enclosure = (hyper_text *)malloc(sizeof(hyper_text));
+			if (enclosure == NULL)
+				return false;
+
 			memset(enclosure, 0, sizeof(hyper_text));
 
 			enclosure->type = TYPE_ENCLOSURE;
@@ -2331,8 +2353,12 @@ TTextView::Reader::ParseMail(BMailContainer *container,
 			if (type.GetShortDescription(typeDescription) != B_OK)
 				strcpy(typeDescription, type.Type() ? type.Type() : B_EMPTY_STRING);
 
-			name = "\n<Enclosure: ";
-			name << enclosure->name << " (Type: " << typeDescription << ")>\n";
+			name = "\n<";
+			name.Append(B_TRANSLATE_COMMENT("Enclosure: %name% (Type: %type%)",
+				"Don't translate the variables %name% and %type%."));
+			name.Append(">\n");
+			name.ReplaceFirst("%name%", enclosure->name);
+			name.ReplaceFirst("%type%", typeDescription);
 
 			fView->GetSelection(&enclosure->text_start, &enclosure->text_end);
 			enclosure->text_start++;
@@ -2378,13 +2404,18 @@ TTextView::Reader::Process(const char *data, int32 data_len, bool isHeader)
 				count = 0;
 
 				hyper_text *enclosure = (hyper_text *)malloc(sizeof(hyper_text));
+				if (enclosure == NULL)
+					return false;
+
 				memset(enclosure, 0, sizeof(hyper_text));
 				fView->GetSelection(&enclosure->text_start,
 									&enclosure->text_end);
 				enclosure->type = type;
 				enclosure->name = strdup(url.String());
-				if (enclosure->name == NULL)
+				if (enclosure->name == NULL) {
+					free(enclosure);
 					return false;
+				}
 
 				Insert(&data[loop], urlLength, true, isHeader);
 				enclosure->text_end += urlLength;
@@ -2590,6 +2621,9 @@ TTextView::Reader::Run(void *_this)
 	}
 
 done:
+	// restore the reading position if available
+	view->Window()->PostMessage(M_READ_POS);
+
 	reader->Unlock();
 
 	delete reader;
@@ -3280,10 +3314,11 @@ TTextView::Undo(BClipboard */*clipboard*/)
 					Select(offset, offset + length);
 				} else {
 					::beep();
-					(new BAlert("",
+					BAlert* alert = new BAlert("",
 						B_TRANSLATE("Inconsistency occurred in the undo/redo "
-							"buffer."),
-						B_TRANSLATE("OK")))->Go();
+							"buffer."),	B_TRANSLATE("OK"));
+					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+					alert->Go();
 				}
 				break;
 		}
@@ -3327,10 +3362,11 @@ TTextView::Redo()
 
 			case K_REPLACED:
 				::beep();
-				(new BAlert("",
+				BAlert* alert = new BAlert("",
 					B_TRANSLATE("Inconsistency occurred in the undo/redo "
-						"buffer."),
-					B_TRANSLATE("OK")))->Go();
+						"buffer."),	B_TRANSLATE("OK"));
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+				alert->Go();
 				break;
 		}
 		ScrollToSelection();

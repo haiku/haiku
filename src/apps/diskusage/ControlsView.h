@@ -28,7 +28,8 @@ public:
 			BVolume*			FindDeviceFor(dev_t device,
 									bool invoke = false);
 
-			void				SetRescanEnabled(bool enabled);
+			void				EnableRescan();
+			void				EnableCancel();
 			void				ShowInfo(const FileInfo* info);
 
 private:

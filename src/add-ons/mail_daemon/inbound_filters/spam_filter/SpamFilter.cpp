@@ -129,8 +129,8 @@
 #include "SpamFilter.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "SpamFilter"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "SpamFilter"
 
 
 // The names match the ones set up by spamdbm for sound effects.

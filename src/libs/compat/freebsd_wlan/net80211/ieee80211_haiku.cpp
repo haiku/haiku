@@ -192,6 +192,34 @@ stop_wlan(device_t device)
 
 
 status_t
+wlan_open(void* cookie)
+{
+	dprintf("wlan_open(%p)\n", cookie);
+	struct ifnet* ifp = (struct ifnet*)cookie;
+
+	ifp->if_init(ifp->if_softc);
+
+	ifp->if_flags |= IFF_UP;
+	ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);
+
+	return B_OK;
+}
+
+
+status_t
+wlan_close(void* cookie)
+{
+	dprintf("wlan_close(%p)\n", cookie);
+	struct ifnet* ifp = (struct ifnet*)cookie;
+
+	ifp->if_flags &= ~IFF_UP;
+	ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);
+
+	return release_sem_etc(ifp->scan_done_sem, 1, B_RELEASE_ALL);
+}
+
+
+status_t
 wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 {
 	struct ifnet* ifp = (struct ifnet*)cookie;
@@ -344,6 +372,11 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 			if (user_memcpy(&request, arg, sizeof(struct ieee80211req)) != B_OK)
 				return B_BAD_ADDRESS;
 
+			if (request.i_type == IEEE80211_IOC_HAIKU_COMPAT_WLAN_UP)
+				return wlan_open(cookie);
+			else if (request.i_type == IEEE80211_IOC_HAIKU_COMPAT_WLAN_DOWN)
+				return wlan_close(cookie);
+
 			TRACE("wlan_control: %ld, %d\n", op, request.i_type);
 			status_t status = ifp->if_ioctl(ifp, op, (caddr_t)&request);
 			if (status != B_OK)
@@ -368,26 +401,14 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 
 
 status_t
-wlan_close(void* cookie)
-{
-	struct ifnet* ifp = (struct ifnet*)cookie;
-
-	ifp->if_flags &= ~IFF_UP;
-	ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);
-
-	return release_sem_etc(ifp->scan_done_sem, 1, B_RELEASE_ALL);
-}
-
-
-status_t
 wlan_if_l2com_alloc(void* data)
 {
 	struct ifnet* ifp = (struct ifnet*)data;
 
 	ifp->if_l2com = _kernel_malloc(sizeof(struct ieee80211com), M_ZERO);
-	((struct ieee80211com*)(ifp->if_l2com))->ic_ifp = ifp;
 	if (ifp->if_l2com == NULL)
 		return B_NO_MEMORY;
+	((struct ieee80211com*)(ifp->if_l2com))->ic_ifp = ifp;
 	return B_OK;
 }
 
@@ -539,7 +560,6 @@ ieee80211_sysctl_vattach(struct ieee80211vap* vap)
 		| IEEE80211_MSG_NODE
 		| IEEE80211_MSG_ASSOC
 		| IEEE80211_MSG_AUTH
-		| IEEE80211_MSG_SCAN
 		| IEEE80211_MSG_STATE
 		| IEEE80211_MSG_POWER
 		| IEEE80211_MSG_WME

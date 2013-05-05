@@ -25,6 +25,9 @@
 
 #define MTX_DEF				0x0000
 #define MTX_RECURSE			0x0004
+#define MTX_QUIET			0x40000
+#define MTX_DUPOK			0x400000
+
 
 #define MTX_NETWORK_LOCK	"network driver"
 

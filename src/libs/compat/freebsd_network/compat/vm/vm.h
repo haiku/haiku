@@ -10,10 +10,17 @@
 #include <KernelExport.h>
 
 
-// TODO at the moment for 32 bit machines only
+#ifdef B_HAIKU_64_BIT
+
+typedef uint64_t vm_offset_t;
+typedef uint64_t vm_paddr_t;
+
+#else
 
 typedef uint32_t vm_offset_t;
 typedef uint32_t vm_paddr_t;
+
+#endif
 
 typedef void *pmap_t;
 

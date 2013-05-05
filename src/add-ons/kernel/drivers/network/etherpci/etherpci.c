@@ -370,10 +370,10 @@ output_count(etherpci_private_t *data)
 /*
  * How many waiting for input?
  */
-static long
+static int32
 input_count(etherpci_private_t *data)
 {
-	long count;
+	int32 count;
 
 	get_sem_count(data->ilock, &count);
 	return (count);
@@ -1207,7 +1207,7 @@ enable_addressing(etherpci_private_t *data)
 	data->reg_base = data->reg_base + offset;
 
 #endif
-	dprintf(kDevName ": reg_base=%lx\n", data->reg_base);
+	dprintf(kDevName ": reg_base=%" B_PRIx32 "\n", data->reg_base);
 
 	/* enable pci address access */
 	cmd = (gPCIModInfo->read_pci_config)(data->pciInfo->bus, data->pciInfo->device, data->pciInfo->function, PCI_command, 2);
@@ -1377,7 +1377,7 @@ init_driver(void)
 	/* Create device name list*/
 	for (i=0; i<entries; i++ )
 	{
-		sprintf(devName, "%s%ld", kDevDir, i );
+		sprintf(devName, "%s%" B_PRId32, kDevDir, i );
 		gDevNameList[i] = (char *)malloc(strlen(devName)+1);
 		strcpy(gDevNameList[i], devName);
 	}

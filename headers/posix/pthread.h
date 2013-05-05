@@ -185,6 +185,10 @@ extern int pthread_attr_getschedparam(const pthread_attr_t *attr,
 extern int pthread_attr_setschedparam(pthread_attr_t *attr,
 	const struct sched_param *param);
 
+extern int pthread_attr_getguardsize(const pthread_attr_t *attr,
+	size_t *guardsize);
+extern int pthread_attr_setguardsize(pthread_attr_t *attr, size_t guardsize);
+
 #if 0   /* Unimplemented attribute functions: */
 
 /* [TPS] */
@@ -195,11 +199,6 @@ extern int pthread_attr_setinheritsched(pthread_attr_t *attr, int inheritsched);
 extern int pthread_attr_getschedpolicy(const pthread_attr_t *attr,
 	int *policy);
 extern int pthread_attr_setschedpolicy(pthread_attr_t *attr, int policy);
-
-/* [XSI] */
-extern int pthread_attr_getguardsize(const pthread_attr_t *attr,
-	size_t *guardsize);
-extern int pthread_attr_setguardsize(pthread_attr_t *attr, size_t guardsize);
 
 /* [TSA] */
 extern int pthread_attr_getstackaddr(const pthread_attr_t *attr,

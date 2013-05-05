@@ -13,6 +13,7 @@
 
 // include this for ALM
 #include "ALMLayout.h"
+#include "ALMLayoutBuilder.h"
 
 
 class PinwheelWindow : public BWindow {
@@ -34,16 +35,33 @@ public:
 		button4->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 
 		// create a new BALMLayout and use  it for this window
-		BALMLayout* layout = new BALMLayout(10.);
+		BALMLayout* layout = new BALMLayout(10, 10);
+
+		BReference<XTab> xTabs[2];
+		BReference<YTab> yTabs[2];
+		layout->AddXTabs(xTabs, 2);
+		layout->AddYTabs(yTabs, 2);
+
+		BALM::BALMLayoutBuilder(this, layout)
+			.SetInsets(5)
+			.Add(textView1, xTabs[0], yTabs[0], xTabs[1], yTabs[1])
+			.StartingAt(textView1)
+				.AddAbove(button1, layout->Top(), layout->Left())
+				.AddToRight(button2, layout->Right(), NULL, yTabs[1])
+				.AddBelow(button3, layout->Bottom(), xTabs[0])
+				.AddToLeft(button4, layout->Left(),  yTabs[0]);
+
+		// alternative setup
+		/*
 		SetLayout(layout);
 
-		layout->SetInset(5.);
+		layout->SetInsets(5.);
 
 		// create extra tabs
-		XTab* x1 = layout->AddXTab();
-		XTab* x2 = layout->AddXTab();
-		YTab* y1 = layout->AddYTab();
-		YTab* y2 = layout->AddYTab();
+		BReference<XTab> x1 = layout->AddXTab();
+		BReference<XTab> x2 = layout->AddXTab();
+		BReference<YTab> y1 = layout->AddYTab();
+		BReference<YTab> y2 = layout->AddYTab();
 
 		layout->AddView(button1, layout->Left(), layout->Top(), x2,
 			y1);
@@ -52,22 +70,6 @@ public:
 			layout->Bottom());
 		layout->AddView(button4, layout->Left(), y1, x1, layout->Bottom());
 		layout->AddView(textView1, x1, y1, x2, y2);
-
-		// alternative setup
-		/* 
-		layout->AddView(button1);
-		Area* a1 = layout->AreaOf(button1);
-		Area* a2 = layout->AddViewToRight(button2, a1, layout->Right(), NULL,
-			layout->AddYTab());
-		Area* a3 = layout->AddViewToBottom(button3, a2, layout->Bottom(),
-			layout->AddXTab(), NULL);
-		Area* a4 = layout->AddViewToLeft(button4, a3, layout->Left(),
-			a1->Bottom());
-
-		layout->AddView(textView1, a4->Right(), a1->Bottom(), a2->Left(),
-			a3->Top());
-		a1->SetWidthAs(a3);
-		a1->SetHeightAs(a3);
 		*/
 
 		// test size limits

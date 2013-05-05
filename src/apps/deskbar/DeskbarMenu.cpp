@@ -33,6 +33,9 @@ holders.
 All rights reserved.
 */
 
+
+#include "DeskbarMenu.h"
+
 #include <Debug.h>
 #include <Bitmap.h>
 #include <Catalog.h>
@@ -42,7 +45,6 @@ All rights reserved.
 #include <MenuItem.h>
 #include <Roster.h>
 
-#include "DeskbarMenu.h"
 #include "BarApp.h"
 #include "BarView.h"
 #include "DeskbarUtils.h"
@@ -57,8 +59,8 @@ All rights reserved.
 #include "StatusView.h"
 #include "tracker_private.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "DeskbarMenu"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "DeskbarMenu"
 
 #define ROSTER_SIG "application/x-vnd.Be-ROST"
 
@@ -86,7 +88,8 @@ using namespace BPrivate;
 
 
 TDeskbarMenu::TDeskbarMenu(TBarView* barView)
-	: BNavMenu("DeskbarMenu", B_REFS_RECEIVED, DefaultTarget()),
+	:
+	BNavMenu("DeskbarMenu", B_REFS_RECEIVED, DefaultTarget()),
 	fAddState(kStart),
 	fBarView(barView)
 {
@@ -251,21 +254,14 @@ TDeskbarMenu::AddStandardDeskbarMenuItems()
 // One of them is used if HAIKU_DISTRO_COMPATIBILITY_OFFICIAL, and the other if
 // not. However, we want both of them to end up in the catalog, so we have to
 // make them visible to collectcatkeys in either case.
-#if defined(B_COLLECTING_CATKEYS)||defined(HAIKU_DISTRO_COMPATIBILITY_OFFICIAL)
-	static const char* kAboutHaikuMenuItemStr = B_TRANSLATE_MARK(
-		"About Haiku");
-#endif
-
-#if defined(B_COLLECTING_CATKEYS)||!defined(HAIKU_DISTRO_COMPATIBILITY_OFFICIAL)
-	static const char* kAboutThisSystemMenuItemStr = B_TRANSLATE_MARK(
-		"About this system");
-#endif
+B_TRANSLATE_MARK_VOID("About Haiku")
+B_TRANSLATE_MARK_VOID("About this system")
 
 	item = new BMenuItem(
 #ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
-	B_TRANSLATE_NOCOLLECT(kAboutHaikuMenuItemStr)
+	B_TRANSLATE_NOCOLLECT("About Haiku")
 #else
-	B_TRANSLATE_NOCOLLECT(kAboutThisSystemMenuItemStr)
+	B_TRANSLATE_NOCOLLECT("About this system")
 #endif
 		, new BMessage(kShowSplash));
 	item->SetEnabled(!dragging);
@@ -314,13 +310,11 @@ TDeskbarMenu::AddStandardDeskbarMenuItems()
 	item->SetEnabled(!dragging);
 	shutdownMenu->AddItem(item);
 
-#if defined(APM_SUPPORT) || defined(B_COLLECTING_CATKEYS)
-	static const char* kSuspendMenuItemStr = B_TRANSLATE_MARK("Suspend");
-#endif
+	B_TRANSLATE_MARK_VOID("Suspend");
 
 #ifdef APM_SUPPORT
 	if (_kapm_control_(APM_CHECK_ENABLED) == B_OK) {
-		item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kSuspendMenuItemStr),
+		item = new BMenuItem(B_TRANSLATE_NOCOLLECT("Suspend"),
 			new BMessage(kSuspendSystem));
 		item->SetEnabled(!dragging);
 		shutdownMenu->AddItem(item);
@@ -386,11 +380,21 @@ TDeskbarMenu::ResetTargets()
 				case kShowSplash:
 				case kToggleDraggers:
 				case kConfigShow:
+				case kConfigQuit:
 				case kAlwaysTop:
-				case kShowSeconds:
+				case kExpandNewTeams:
+				case kHideLabels:
+				case kResizeTeamIcons:
+				case kSortRunningApps:
+				case kTrackerFirst:
 				case kRebootSystem:
 				case kSuspendSystem:
 				case kShutdownSystem:
+				case kShowHideTime:
+				case kShowSeconds:
+				case kShowDayOfWeek:
+				case kShowTimeZone:
+				case kGetClockSettings:
 					item->SetTarget(be_app);
 					break;
 			}
@@ -675,6 +679,4 @@ DeskbarMountMenu::AddDynamicItem(add_state s)
 	return false;
 }
 
-
 #endif
-

@@ -7,7 +7,6 @@ UsePrivateHeaders interface ;
 Application Screenshot :
 	ScreenshotApp.cpp
 	ScreenshotWindow.cpp
-	PreviewView.cpp
 	Utility.cpp
 	: be $(HAIKU_LOCALE_LIBS) tracker translation $(TARGET_LIBSUPC++)
 	: ScreenshotApp.rdef

@@ -13,6 +13,7 @@
 
 #include <algorithm>
 
+#include <ControlLook.h>
 #include <GroupLayout.h>
 #include <GroupView.h>
 
@@ -22,136 +23,147 @@
 #include "NotificationView.h"
 
 
+static const int kHeaderSize = 23;
+
+
 AppGroupView::AppGroupView(NotificationWindow* win, const char* label)
 	:
-	BBox(B_FANCY_BORDER, (fView = new BGroupView(B_VERTICAL, 0))),
+	BGroupView("appGroup", B_VERTICAL, 0),
 	fLabel(label),
 	fParent(win),
-	fCollapsed(false)
+	fCollapsed(false),
+	fCloseClicked(false)
 {
-	// If no group was specified we don't have any border or label
-	if (label == NULL)
-		SetBorder(B_NO_BORDER);
-	else
-		SetLabel(label);
+	SetFlags(Flags() | B_WILL_DRAW);
+
+	static_cast<BGroupLayout*>(GetLayout())->SetInsets(0, kHeaderSize, 0, 0);
 }
 
 
-AppGroupView::~AppGroupView()
-{
-}
-
-
-/*
-void
-AppGroupView::AttachedToWindow()
-{
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
-}
-*/
-
-/*
 void
 AppGroupView::Draw(BRect updateRect)
 {
-	FillRect(Bounds(), B_SOLID_LOW);
+	rgb_color menuColor = ViewColor();
+	BRect bounds = Bounds();
+	rgb_color hilite = tint_color(menuColor, B_DARKEN_1_TINT);
+	rgb_color vlight = tint_color(menuColor, B_LIGHTEN_2_TINT);
+	bounds.bottom = bounds.top + kHeaderSize;
 
+	// Draw the header background
+	SetHighColor(tint_color(menuColor, 1.22));
+	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	StrokeLine(bounds.LeftTop(), bounds.LeftBottom());
+	uint32 borders = BControlLook::B_TOP_BORDER
+		| BControlLook::B_BOTTOM_BORDER | BControlLook::B_RIGHT_BORDER;
+
+	be_control_look->DrawButtonBackground(this, bounds, bounds, menuColor,
+		0, borders);
+
+	// Draw the buttons
+	fCollapseRect.top = (kHeaderSize - kExpandSize) / 2;
+	fCollapseRect.left = kEdgePadding * 3;
+	fCollapseRect.right = fCollapseRect.left + 1.5 * kExpandSize;
+	fCollapseRect.bottom = fCollapseRect.top + kExpandSize;
+
+	fCloseRect = bounds;
+	fCloseRect.top = (kHeaderSize - kCloseSize) / 2;
+	// Take off the 1 to line this up with the close button on the
+	// notification view
+	fCloseRect.right -= kEdgePadding * 3 - 1;
+	fCloseRect.left = fCloseRect.right - kCloseSize;
+	fCloseRect.bottom = fCloseRect.top + kCloseSize;
+
+	uint32 arrowDirection = fCollapsed
+		? BControlLook::B_DOWN_ARROW : BControlLook::B_UP_ARROW;
+	be_control_look->DrawArrowShape(this, fCollapseRect, fCollapseRect,
+		LowColor(), arrowDirection, 0, B_DARKEN_3_TINT);
+
+	SetPenSize(kPenSize);
+
+	// Draw the dismiss widget
+	_DrawCloseButton(updateRect);
+
+	// Draw the label
+	SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 	BString label = fLabel;
 	if (fCollapsed)
 		label << " (" << fInfo.size() << ")";
 
-	font_height fh;
-	be_bold_font->GetHeight(&fh);
-	float labelOffset = fh.ascent + fh.leading;
-
-
-	BRect textRect = Bounds();
-	//textRect.right = textRect.left + be_bold_font->StringWidth(label.String())
-	//	+ (kEdgePadding * 3);
-	textRect.bottom = 2 * labelOffset;
-	
-	BRect borderRect = Bounds().InsetByCopy(kEdgePadding, kEdgePadding);
-	borderRect.top = 2 * labelOffset;
-
-	BRect closeCross = fCloseRect;
-	closeCross.InsetBy(kSmallPadding, kSmallPadding);
-
-	rgb_color detailCol = ui_color(B_CONTROL_BORDER_COLOR);
-	detailCol = tint_color(detailCol, B_LIGHTEN_2_TINT);
-	// detailCol = tint_color(detailCol, B_LIGHTEN_1_TINT);
-
-	PushState();
 	SetFont(be_bold_font);
-	SetPenSize(kPenSize);
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+	float y = (bounds.top + bounds.bottom - ceilf(fontHeight.ascent)
+		- ceilf(fontHeight.descent)) / 2.0 + ceilf(fontHeight.ascent);
 
-	if (fCollapsed) {
-		// Draw the expand widget
-		PushState();
-			SetHighColor(detailCol);
-			StrokeRoundRect(fCollapseRect, kSmallPadding, kSmallPadding);
-			
-			BPoint expandHorStart(fCollapseRect.left + kSmallPadding, fCollapseRect.Height() / 2 + fCollapseRect.top);
-			BPoint expandHorEnd(fCollapseRect.right - kSmallPadding, fCollapseRect.Height() / 2 + fCollapseRect.top);			
-			StrokeLine(expandHorStart, expandHorEnd);
-			
-			BPoint expandVerStart(fCollapseRect.Width() / 2 + fCollapseRect.left, fCollapseRect.top + kSmallPadding);
-			BPoint expandVerEnd(fCollapseRect.Width() / 2 + fCollapseRect.left, fCollapseRect.bottom - kSmallPadding);				
-			StrokeLine(expandVerStart, expandVerEnd);
-		PopState();
-		
-		SetHighColor(tint_color(ui_color(B_PANEL_TEXT_COLOR), B_LIGHTEN_1_TINT));
-	} else {
-		SetLowColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
-		FillRect(textRect, B_SOLID_LOW);
-			
-		SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
-
-		// Draw the collapse widget
-		StrokeRoundRect(fCollapseRect, kSmallPadding, kSmallPadding);
-
-		BPoint expandHorStart(fCollapseRect.left + kSmallPadding, fCollapseRect.Height() / 2 + fCollapseRect.top);
-		BPoint expandHorEnd(fCollapseRect.right - kSmallPadding, fCollapseRect.Height() / 2 + fCollapseRect.top);
-
-		StrokeLine(expandHorStart, expandHorEnd);
-	}
-	// Draw the dismiss widget
-	StrokeRoundRect(fCloseRect, kSmallPadding, kSmallPadding);
-
-	StrokeLine(closeCross.LeftTop(), closeCross.RightBottom());
-	StrokeLine(closeCross.RightTop(), closeCross.LeftBottom());
-
-	// Draw the label
-	DrawString(label.String(), BPoint(fCollapseRect.right + 2 * kEdgePadding, labelOffset + kEdgePadding));
-	PopState();
-
-	Sync();	
+	DrawString(label.String(),
+		BPoint(fCollapseRect.right + 4 * kEdgePadding, y));
 }
-*/
+
+
+void
+AppGroupView::_DrawCloseButton(const BRect& updateRect)
+{
+	PushState();
+	BRect closeRect = fCloseRect;
+
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	float tint = B_DARKEN_2_TINT;
+
+	if (fCloseClicked) {
+		BRect buttonRect(closeRect.InsetByCopy(-4, -4));
+		be_control_look->DrawButtonFrame(this, buttonRect, updateRect,
+			base, base,
+			BControlLook::B_ACTIVATED | BControlLook::B_BLEND_FRAME);
+		be_control_look->DrawButtonBackground(this, buttonRect, updateRect,
+			base, BControlLook::B_ACTIVATED);
+		tint *= 1.2;
+		closeRect.OffsetBy(1, 1);
+	}
+
+	base = tint_color(base, tint);
+	SetHighColor(base);
+	SetPenSize(2);
+	StrokeLine(closeRect.LeftTop(), closeRect.RightBottom());
+	StrokeLine(closeRect.LeftBottom(), closeRect.RightTop());
+	PopState();
+}
+
 
 void
 AppGroupView::MouseDown(BPoint point)
 {
-	bool changed = false;
-	if (fCloseRect.Contains(point)) {
-		changed = true;
-
+	if (BRect(fCloseRect).InsetBySelf(-5, -5).Contains(point)) {
 		int32 children = fInfo.size();
 		for (int32 i = 0; i < children; i++) {
-			fView->GetLayout()->RemoveView(fInfo[i]);
+			GetLayout()->RemoveView(fInfo[i]);
 			delete fInfo[i];
 		}
+
 		fInfo.clear();
-	}
 
-	if (fCollapseRect.Contains(point)) {
+		// Remove ourselves from the parent view
+		BMessage message(kRemoveGroupView);
+		message.AddPointer("view", this);
+		fParent->PostMessage(&message);
+	} else if (BRect(fCollapseRect).InsetBySelf(-5, -5).Contains(point)) {
 		fCollapsed = !fCollapsed;
-		changed = true;
-	}
+		int32 children = fInfo.size();
+		if (fCollapsed) {
+			for (int32 i = 0; i < children; i++) {
+				if (!fInfo[i]->IsHidden())
+					fInfo[i]->Hide();
+			}
+			GetLayout()->SetExplicitMaxSize(GetLayout()->MinSize());
+		} else {
+			for (int32 i = 0; i < children; i++) {
+				if (fInfo[i]->IsHidden())
+					fInfo[i]->Show();
+			}
+			GetLayout()->SetExplicitMaxSize(BSize(B_SIZE_UNSET, B_SIZE_UNSET));
+		}
 
-	if (changed) {
-		_ResizeViews();
+		InvalidateLayout();
+		Invalidate(); // Need to redraw the collapse indicator and title
 	}
 }
 
@@ -167,17 +179,22 @@ AppGroupView::MessageReceived(BMessage* msg)
 				return;
 
 			infoview_t::iterator vIt = find(fInfo.begin(), fInfo.end(), view);
+			if (vIt == fInfo.end())
+				break;
 
-			if (vIt != fInfo.end()) {
-				fInfo.erase(vIt);
-				fView->GetLayout()->RemoveView(view);
-				delete view;
+			fInfo.erase(vIt);
+			GetLayout()->RemoveView(view);
+			delete view;
+
+			fParent->PostMessage(msg);
+
+			if (!this->HasChildren()) {
+				Hide();
+				BMessage removeSelfMessage(kRemoveGroupView);
+				removeSelfMessage.AddPointer("view", this);
+				fParent->PostMessage(&removeSelfMessage);
 			}
-
-			if (Window() != NULL)
-				Window()->PostMessage(msg);
-
-			_ResizeViews();
+			
 			break;
 		}
 		default:
@@ -197,8 +214,10 @@ AppGroupView::AddInfo(NotificationView* view)
 
 		for (int32 i = 0; i < children; i++) {
 			if (id == fInfo[i]->MessageID()) {
-				fView->GetLayout()->RemoveView(fInfo[i]);
-				delete fInfo[i];
+				NotificationView* oldView = fInfo[i];
+				fParent->NotificationViewSwapped(oldView, view);
+				GetLayout()->RemoveView(oldView);
+				delete oldView;
 				
 				fInfo[i] = view;
 				found = true;
@@ -208,61 +227,29 @@ AppGroupView::AddInfo(NotificationView* view)
 		}
 	}
 
-	if (!found)
+	// Invalidate all children to show or hide the close buttons in the
+	// notification view
+	int32 children = fInfo.size();
+	for (int32 i = 0; i < children; i++) {
+		fInfo[i]->Invalidate();
+	}
+
+	if (!found) {
 		fInfo.push_back(view);
-	fView->GetLayout()->AddView(view);
+	}
+	GetLayout()->AddView(view);
 
 	if (IsHidden())
 		Show();
-	if (view->IsHidden())
+	if (view->IsHidden(view) && !fCollapsed)
 		view->Show();
-
-	_ResizeViews();
 }
 
 
-void
-AppGroupView::_ResizeViews()
+const BString&
+AppGroupView::Group() const
 {
-	font_height fh;
-	be_bold_font->GetHeight(&fh);
-
-	float offset = 2 * kEdgePadding + fh.ascent + fh.leading + fh.descent;
-	int32 children = fInfo.size();
-
-	if (!fCollapsed) {
-		offset += kEdgePadding + kPenSize;
-
-		for (int32 i = 0; i < children; i++) {
-			fInfo[i]->ResizeToPreferred();
-			fInfo[i]->MoveTo(0, offset);
-			
-			offset += fInfo[i]->Bounds().Height();
-			if (fInfo[i]->IsHidden())
-				fInfo[i]->Show();
-		}
-	} else {
-		for (int32 i = 0; i < children; i++)
-			if (!fInfo[i]->IsHidden())
-				fInfo[i]->Hide();
-	}
-
-	ResizeTo(fParent->Width(), offset);
-	float labelOffset = fh.ascent + fh.leading;
-
-	BRect borderRect = Bounds().InsetByCopy(kEdgePadding, kEdgePadding);
-	borderRect.top = 2*labelOffset;
-
-	fCollapseRect = borderRect;
-	fCollapseRect.right = fCollapseRect.left + kExpandSize;
-	fCollapseRect.bottom = fCollapseRect.top + kExpandSize;
-	fCollapseRect.OffsetTo(kEdgePadding * 2, kEdgePadding * 1.5);
-
-	fCloseRect = borderRect;
-	fCloseRect.right -= kEdgePadding * 2;
-	fCloseRect.top += kEdgePadding * 1.5;
-	fCloseRect.left = fCloseRect.right - kCloseSize;
-	fCloseRect.bottom = fCloseRect.top + kCloseSize;
+	return fLabel;
 }
 
 
@@ -270,4 +257,11 @@ bool
 AppGroupView::HasChildren()
 {
 	return !fInfo.empty();
+}
+
+
+int32
+AppGroupView::ChildrenCount()
+{
+	return fInfo.size();
 }

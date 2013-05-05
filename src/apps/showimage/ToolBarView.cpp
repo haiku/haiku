@@ -51,8 +51,8 @@ ToolBarView::AddAction(uint32 command, BHandler* target, const BBitmap* icon,
 
 
 void
-ToolBarView::AddAction(BMessage* message, BHandler* target, const BBitmap* icon,
-	const char* toolTipText)
+ToolBarView::AddAction(BMessage* message, BHandler* target,
+	const BBitmap* icon, const char* toolTipText)
 {
 	BIconButton* button = new BIconButton(NULL, NULL, message, target);
 	button->SetIcon(icon);

@@ -12,7 +12,7 @@ Application MusicCollection :
 
 	NodeMonitorHandler.cpp
 	:
-	be liblpsolve55.so libalm.so $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	be libalm.so $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
 	$(TARGET_LIBSTDC++) libshared.a
 	:
 	MusicCollection.rdef

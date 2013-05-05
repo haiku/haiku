@@ -27,8 +27,8 @@
 
 #define APP_SIG "application/x-vnd.mmu_man.filepanel"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "FilePanelApp"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "FilePanelApp"
 
 
 volatile int return_code = 0;

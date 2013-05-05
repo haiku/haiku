@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel console vga_text ;
 
-UsePrivateHeaders kernel [ FDirName kernel arch $(TARGET_ARCH) ] 
+UsePrivateHeaders kernel [ FDirName kernel arch $(TARGET_KERNEL_ARCH) ] 
 	[ FDirName kernel boot platform $(HAIKU_BOOT_PLATFORM) ] ;
 
 KernelAddon vga_text :

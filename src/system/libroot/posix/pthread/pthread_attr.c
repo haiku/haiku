@@ -30,6 +30,7 @@ pthread_attr_init(pthread_attr_t *_attr)
 	attr->detach_state = PTHREAD_CREATE_JOINABLE;
 	attr->sched_priority = B_NORMAL_PRIORITY;
 	attr->stack_size = USER_STACK_SIZE;
+	attr->guard_size = USER_STACK_GUARD_SIZE;
 
 	*_attr = attr;
 	return B_OK;
@@ -162,3 +163,30 @@ pthread_attr_getschedparam(const pthread_attr_t *attr,
 	return 0;
 }
 
+
+int
+pthread_attr_getguardsize(const pthread_attr_t *_attr, size_t *guardsize)
+{
+	pthread_attr *attr;
+
+	if (_attr == NULL || (attr = *_attr) == NULL || guardsize == NULL)
+		return B_BAD_VALUE;
+
+	*guardsize = attr->guard_size;
+
+	return 0;
+}
+
+
+int
+pthread_attr_setguardsize(pthread_attr_t *_attr, size_t guardsize)
+{
+	pthread_attr *attr;
+
+	if (_attr == NULL || (attr = *_attr) == NULL)
+		return B_BAD_VALUE;
+
+	attr->guard_size = guardsize;
+
+	return 0;
+}

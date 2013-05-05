@@ -10,10 +10,15 @@
 #define NETWORK_STATUS_VIEW_H
 
 
+#include <Notification.h>
 #include <ObjectList.h>
 #include <View.h>
 
+#include <map>
+
+
 class BMessageRunner;
+class BNetworkInterface;
 
 
 enum {
@@ -25,6 +30,7 @@ enum {
 
 	kStatusCount
 };
+
 
 class NetworkStatusView : public BView {
 	public:
@@ -52,14 +58,16 @@ class NetworkStatusView : public BView {
 		void			_ShowConfiguration(BMessage* message);
 		bool			_PrepareRequest(struct ifreq& request,
 							const char* name);
-		int32			_DetermineInterfaceStatus(const char* name);
+		int32			_DetermineInterfaceStatus(
+							const BNetworkInterface& interface);
 		void			_Update(bool force = false);
 		void			_OpenNetworksPreferences();
 
-		BObjectList<BString> fInterfaces;
+		std::map<BString, int32>
+						fInterfaceStatuses;
 		bool			fInDeskbar;
-		BBitmap*		fBitmaps[kStatusCount];
-		int32			fStatus;
+		BBitmap*		fTrayIcons[kStatusCount];
+		BBitmap*		fNotifyIcons[kStatusCount];
 };
 
 #endif	// NETWORK_STATUS_VIEW_H

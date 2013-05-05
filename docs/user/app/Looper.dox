@@ -1,17 +1,19 @@
 /*
- * Copyright 2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2008 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  * 		Niels Sascha Reedijk, niels.reedijk@gmail.com
  * 
  * Corresponds to:
- *		/trunk/headers/os/app/Looper.h  rev 21863
- *		/trunk/src/kits/app/Looper.cpp  rev 21864
+ *		headers/os/app/Looper.h	rev 21863
+ *		src/kits/app/Looper.cpp	rev 21864
  */
 
 /*!
 	\file Looper.h
+	\ingroup app
+	\ingroup libbe
 	\brief Provides the BLooper class.
 */
 
@@ -25,6 +27,7 @@
 /*!
 	\class BLooper
 	\ingroup app
+	\ingroup libbe
 	\brief Receive and process messages in a separate thread.
 	
 	When an object of this class is created, the message loop can be started

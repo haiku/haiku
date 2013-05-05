@@ -44,15 +44,15 @@ typedef struct pci_info {
 	uchar	reserved;				/* filler, for alignment */
 	union {
 		struct {
-			ulong	cardbus_cis;			/* CardBus CIS pointer */
+			uint32	cardbus_cis;			/* CardBus CIS pointer */
 			ushort	subsystem_id;			/* subsystem (add-in card) id */
 			ushort	subsystem_vendor_id;	/* subsystem (add-in card) vendor id */
-			ulong	rom_base;				/* rom base address, viewed from host */
-			ulong	rom_base_pci;			/* rom base addr, viewed from pci */
-			ulong	rom_size;				/* rom size */
-			ulong	base_registers[6];		/* base registers, viewed from host */
-			ulong	base_registers_pci[6];	/* base registers, viewed from pci */
-			ulong	base_register_sizes[6];	/* size of what base regs point to */
+			uint32	rom_base;				/* rom base address, viewed from host */
+			uint32	rom_base_pci;			/* rom base addr, viewed from pci */
+			uint32	rom_size;				/* rom size */
+			uint32	base_registers[6];		/* base registers, viewed from host */
+			uint32	base_registers_pci[6];	/* base registers, viewed from pci */
+			uint32	base_register_sizes[6];	/* size of what base regs point to */
 			uchar	base_register_flags[6];	/* flags from base address fields */
 			uchar	interrupt_line;			/* interrupt line */
 			uchar	interrupt_pin;			/* interrupt pin */
@@ -60,9 +60,9 @@ typedef struct pci_info {
 			uchar	max_latency;			/* how often PCI access needed */
 		} h0;
 		struct {
-			ulong	base_registers[2];		/* base registers, viewed from host */
-			ulong	base_registers_pci[2];	/* base registers, viewed from pci */
-			ulong	base_register_sizes[2];	/* size of what base regs point to */
+			uint32	base_registers[2];		/* base registers, viewed from host */
+			uint32	base_registers_pci[2];	/* base registers, viewed from pci */
+			uint32	base_register_sizes[2];	/* size of what base regs point to */
 			uchar	base_register_flags[2];	/* flags from base address fields */
 			uchar	primary_bus;
 			uchar	secondary_bus;
@@ -75,12 +75,12 @@ typedef struct pci_info {
 			ushort	memory_limit;
 			ushort  prefetchable_memory_base;
 			ushort  prefetchable_memory_limit;
-			ulong	prefetchable_memory_base_upper32;
-			ulong	prefetchable_memory_limit_upper32;
+			uint32	prefetchable_memory_base_upper32;
+			uint32	prefetchable_memory_limit_upper32;
 			ushort	io_base_upper16;
 			ushort	io_limit_upper16;
-			ulong	rom_base;				/* rom base address, viewed from host */
-			ulong	rom_base_pci;			/* rom base addr, viewed from pci */
+			uint32	rom_base;				/* rom base address, viewed from host */
+			uint32	rom_base_pci;			/* rom base addr, viewed from pci */
 			uchar	interrupt_line;			/* interrupt line */
 			uchar	interrupt_pin;			/* interrupt pin */
 			ushort	bridge_control;
@@ -98,14 +98,14 @@ typedef struct pci_info {
 			uchar   subordinate_bus;
 			uchar   secondary_latency;
 			ushort  reserved;
-			ulong   memory_base;
-			ulong   memory_limit;
-			ulong   memory_base_upper32;
-			ulong   memory_limit_upper32;
-			ulong   io_base;
-			ulong   io_limit;
-			ulong   io_base_upper32;
-			ulong   io_limit_upper32;
+			uint32  memory_base;
+			uint32  memory_limit;
+			uint32  memory_base_upper32;
+			uint32  memory_limit_upper32;
+			uint32  io_base;
+			uint32  io_limit;
+			uint32  io_base_upper32;
+			uint32  io_limit_upper32;
 			ushort  secondary_status;
 			ushort  bridge_control;
 #endif /* __HAIKU_PCI_BUS_MANAGER_TESTING */
@@ -654,6 +654,19 @@ struct pci_module_info {
 #define PCI_pin_c               0x03
 #define PCI_pin_d               0x04
 #define PCI_pin_max             0x04
+
+/** PCI bridge control register bits */
+#define PCI_bridge_parity_error_response	0x0001	/* 1/0 Parity Error Response */
+#define PCI_bridge_serr						0x0002	/* 1/0 SERR# en/disabled */
+#define PCI_bridge_isa						0x0004	/* 1/0 ISA en/disabled */
+#define PCI_bridge_vga						0x0008	/* 1/0 VGA en/disabled */
+#define PCI_bridge_master_abort				0x0020	/* 1/0 Master Abort mode */
+#define PCI_bridge_secondary_bus_reset		0x0040	/* 1/0 Secondary bus reset */
+#define PCI_bridge_secondary_bus_fastback	0x0080	/* 1/0 fast back-to-back en/disabled */
+#define PCI_bridge_primary_discard_timeout	0x0100	/* 1/0 primary discard timeout */
+#define PCI_bridge_secondary_discard_timeout	0x0200	/* 1/0 secondary discard timeout */
+#define PCI_bridge_discard_timer_status		0x0400	/* 1/0 discard timer status */
+#define PCI_bridge_discard_timer_serr		0x0800	/* 1/0 discard timer serr */
 
 /** PCI Capability Codes */
 #define PCI_cap_id_reserved	0x00

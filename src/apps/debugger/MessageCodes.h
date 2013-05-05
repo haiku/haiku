@@ -16,6 +16,10 @@ enum {
 	MSG_CLEAR_BREAKPOINT						= 'cbrk',
 	MSG_ENABLE_BREAKPOINT						= 'ebrk',
 	MSG_DISABLE_BREAKPOINT						= 'dbrk',
+	MSG_SET_WATCHPOINT							= 'swpt',
+	MSG_CLEAR_WATCHPOINT						= 'cwpt',
+	MSG_ENABLE_WATCHPOINT						= 'ewpt',
+	MSG_DISABLE_WATCHPOINT						= 'dwpt',
 
 	MSG_THREAD_STATE_CHANGED					= 'tsch',
 	MSG_THREAD_CPU_STATE_CHANGED				= 'tcsc',
@@ -25,6 +29,7 @@ enum {
 	MSG_IMAGE_FILE_CHANGED						= 'ifch',
 	MSG_FUNCTION_SOURCE_CODE_CHANGED			= 'fnsc',
 	MSG_USER_BREAKPOINT_CHANGED					= 'ubrc',
+	MSG_WATCHPOINT_CHANGED						= 'wapc',
 	MSG_DEBUGGER_EVENT							= 'dbge',
 	MSG_LOAD_SETTINGS							= 'ldst',
 
@@ -44,10 +49,17 @@ enum {
 	MSG_TEAM_DEBUGGER_QUIT						= 'dbqt',
 	MSG_SHOW_TEAMS_WINDOW						= 'stsw',
 	MSG_TEAMS_WINDOW_CLOSED						= 'tswc',
+	MSG_START_NEW_TEAM							= 'sttt',
 	MSG_DEBUG_THIS_TEAM							= 'dbtt',
 	MSG_SHOW_INSPECTOR_WINDOW					= 'sirw',
 	MSG_INSPECTOR_WINDOW_CLOSED					= 'irwc',
-	MSG_INSPECT_ADDRESS							= 'isad'
+	MSG_INSPECT_ADDRESS							= 'isad',
+	MSG_SHOW_TYPECAST_NODE_PROMPT				= 'stnp',
+	MSG_TYPECAST_NODE							= 'tyno',
+	MSG_SHOW_WATCH_VARIABLE_PROMPT				= 'swvp',
+	MSG_SHOW_CONTAINER_RANGE_PROMPT				= 'scrp',
+	MSG_SET_CONTAINER_RANGE						= 'chcr',
+	MSG_GENERATE_DEBUG_REPORT					= 'gdrp'
 };
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 Haiku Inc. All rights reserved.
+ * Copyright 2002-2013 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -31,7 +31,7 @@ enum {
 
 class MainWindow : public BWindow {
 public:
-								MainWindow(BRect frame);
+								MainWindow();
 	virtual						~MainWindow();
 
 	// BWindow interface
@@ -71,9 +71,11 @@ private:
 									partition_id selectedPartition);
 			void				_Delete(BDiskDevice* disk,
 									partition_id selectedPartition);
+			void				_ChangeParameters(BDiskDevice* disk,
+									partition_id selectedPartition);
 
-
-			BDiskDeviceRoster	fDDRoster;
+private:
+			BDiskDeviceRoster	fDiskDeviceRoster;
 			BDiskDevice*		fCurrentDisk;
 			partition_id		fCurrentPartitionID;
 
@@ -83,19 +85,22 @@ private:
 			SpaceIDMap			fSpaceIDMap;
 
 			BMenu*				fDiskMenu;
+			BMenu*				fDiskInitMenu;
+
 			BMenu*				fPartitionMenu;
-			BMenu*				fInitMenu;
+			BMenu*				fFormatMenu;
 
-			BMenuItem*			fFormatMI;
-			BMenuItem*			fEjectMI;
-			BMenuItem*			fSurfaceTestMI;
-			BMenuItem*			fRescanMI;
+			BMenuItem*			fWipeMenuItem;
+			BMenuItem*			fEjectMenuItem;
+			BMenuItem*			fSurfaceTestMenuItem;
+			BMenuItem*			fRescanMenuItem;
 
-			BMenuItem*			fCreateMI;
-			BMenuItem*			fDeleteMI;
-			BMenuItem*			fMountMI;
-			BMenuItem*			fUnmountMI;
-			BMenuItem*			fMountAllMI;
+			BMenuItem*			fCreateMenuItem;
+			BMenuItem*			fChangeMenuItem;
+			BMenuItem*			fDeleteMenuItem;
+			BMenuItem*			fMountMenuItem;
+			BMenuItem*			fUnmountMenuItem;
+			BMenuItem*			fMountAllMenuItem;
 };
 
 

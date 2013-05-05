@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010 Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2012 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SYS_SELECT_H
@@ -42,6 +42,9 @@ typedef struct fd_set {
 
 #define _FD_BITSINDEX(fd) ((fd) / NFDBITS)
 #define _FD_BIT(fd) (1L << ((fd) % NFDBITS))
+
+// FD_ZERO uses memset
+#include <string.h>
 
 #define FD_ZERO(set) memset((set), 0, sizeof(fd_set))
 #define FD_SET(fd, set) ((set)->bits[_FD_BITSINDEX(fd)] |= _FD_BIT(fd))

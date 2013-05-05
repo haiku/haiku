@@ -1,22 +1,22 @@
 /*
- * Copyright 2004-2010 Haiku, Inc. All rights reserved.
+ * Copyright 2004-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Andre Alves Garzia, andre@andregarzia.com
- *		Vegard Wærp, vegarwa@online.no
  *		Alexander von Gluck, kallisti5@unixzen.com
+ *		John Scipione, jscipione@gmail.com
+ *		Vegard Wærp, vegarwa@online.no
  */
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
 
+#include <map>
+
+#include <ObjectList.h>
 #include <NetworkDevice.h>
 #include <NetworkInterface.h>
-#include <ObjectList.h>
-#include <String.h>
-
-#include <map>
 
 
 #define MAX_PROTOCOLS	7
@@ -39,6 +39,8 @@ typedef struct _protocols {
 } protocols;
 
 
+class BString;
+
 class NetworkSettings {
 public:
 								NetworkSettings(const char* name);
@@ -48,11 +50,11 @@ public:
 									{ return fProtocols; }
 
 			void				SetIP(int family, const char* ip)
-									{ fAddress[family].SetTo(ip); }
+									{ fAddress[family].SetTo(family, ip); }
 			void				SetNetmask(int family, const char* mask)
-									{ fNetmask[family].SetTo(mask); }
+									{ fNetmask[family].SetTo(family, mask); }
 			void				SetGateway(int family, const char* ip)
-									{ fGateway[family].SetTo(ip); }
+									{ fGateway[family].SetTo(family, ip); }
 			void				SetAutoConfigure(int family, bool autoConf)
 									{ fAutoConfigure[family] = autoConf; }
 
@@ -63,7 +65,6 @@ public:
 //									{ fWirelessNetwork.SetTo(name); }
 //			void				SetDomain(const BString& domain)
 //									{ fDomain = domain; }
-
 
 			bool				AutoConfigure(int family)
 									{ return fAutoConfigure[family]; }
@@ -82,6 +83,9 @@ public:
 
 			const char*			Name()  { return fName.String(); }
 			const char*			Domain() { return fDomain.String(); }
+			status_t			Stats(ifreq_stats* ptr)
+									{ return fNetworkInterface->GetStats(*ptr); }
+
 			bool				IsDisabled() { return fDisabled; }
 
 			bool				IsWireless() {
@@ -90,6 +94,8 @@ public:
 									return fNetworkDevice->IsEthernet(); }
 			bool				HasLink() {
 									return fNetworkDevice->HasLink(); }
+
+			const char*			HardwareAddress();
 
 			const BString&		WirelessNetwork() { return fWirelessNetwork; }
 
@@ -128,4 +134,4 @@ private:
 };
 
 
-#endif /* SETTINGS_H */
+#endif // SETTINGS_H

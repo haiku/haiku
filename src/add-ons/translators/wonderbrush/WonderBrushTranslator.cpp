@@ -22,8 +22,8 @@
 #include "WonderBrushView.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "WonderBrushTranslator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "WonderBrushTranslator"
 
 
 using std::nothrow;
@@ -134,7 +134,8 @@ identify_wbi_header(BPositionIO* inSource, translator_info* outInfo,
 			outInfo->quality = WBI_IN_QUALITY;
 			outInfo->capability = WBI_IN_CAPABILITY;
 			strcpy(outInfo->MIME, "image/x-wonderbrush");
-			strcpy(outInfo->name, B_TRANSLATE("WonderBrush image"));
+			strlcpy(outInfo->name, B_TRANSLATE("WonderBrush image"),
+				sizeof(outInfo->name));
 		}
 	} else {
 		delete wbImage;

@@ -25,7 +25,7 @@ const uint32 MENU_NEW					= 'MFnw';
 const uint32 MENU_OPEN					= 'MFop';
 const uint32 MENU_SAVE					= 'MSav';
 const uint32 MENU_SAVEAS				= 'MEsa';
-const uint32 MENU_REVERT				= 'MFre';
+const uint32 MENU_RELOAD				= 'MFrl';
 const uint32 MENU_CLOSE					= 'MFcl';
 const uint32 MENU_PAGESETUP				= 'MFps';
 const uint32 MENU_PRINT					= 'MFpr';
@@ -54,10 +54,10 @@ const uint32 kMsgSetBold				= 'Fbld';
 // fontcolors
 const rgb_color	BLACK 					= {0, 0, 0, 255};
 const rgb_color	RED 					= {255, 0, 0, 255};
-const rgb_color	GREEN			 		= {0, 255, 0, 255};
-const rgb_color	BLUE			 		= {0, 0, 255, 255};
-const rgb_color	CYAN			 		= {0, 255, 255, 255};
-const rgb_color	MAGENTA				 	= {255, 0, 255, 255};
+const rgb_color	GREEN					= {0, 255, 0, 255};
+const rgb_color	BLUE					= {0, 0, 255, 255};
+const rgb_color	CYAN					= {0, 255, 255, 255};
+const rgb_color	MAGENTA					= {255, 0, 255, 255};
 const rgb_color	YELLOW 					= {255, 255, 0, 255};
 
 // "Document"-menu
@@ -78,8 +78,10 @@ const uint32 OPEN_AS_ENCODING			= 'FPoe';
 const uint32 SAVE_AS_ENCODING			= 'FPse';
 const uint32 SAVE_THEN_QUIT				= 'FPsq';
 
-// Update Line Info
-const uint32 UPDATE_LINE				= 'UPln';
+// Update StatusView
+const uint32 UPDATE_STATUS				= 'UPSt';
+const uint32 UNLOCK_FILE				= 'UNLk';
+const uint32 UPDATE_LINE_SELECTION		= 'UPls';
 
 #endif	// CONSTANTS_H
 

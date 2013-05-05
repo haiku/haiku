@@ -29,8 +29,8 @@
 #include "WizardView.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "BootManagerController"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "BootManagerController"
 
 
 BootManagerController::BootManagerController()
@@ -177,6 +177,7 @@ BootManagerController::_HasSelectedPartitions()
 	BAlert* alert = new BAlert("info",
 		B_TRANSLATE("At least one partition must be selected!"),
 		B_TRANSLATE_COMMENT("OK", "Button"));
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 
 	return false;

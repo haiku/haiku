@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2012, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _ENTRY_H
@@ -50,6 +50,8 @@ public:
 			status_t			InitCheck() const;
 			bool				Exists() const;
 
+			const char*			Name() const;
+
 	virtual status_t			GetStat(struct stat* stat) const;
 
 			status_t			SetTo(const BDirectory* dir, const char* path,
@@ -88,7 +90,7 @@ private:
 	virtual	void				_PennyEntry5();
 	virtual	void				_PennyEntry6();
 
-	/*! BEntry implementation of BStatable::set_stat() */
+	// BEntry implementation of BStatable::set_stat()
 	virtual	status_t			set_stat(struct stat& stat, uint32 what);
 			status_t			_SetTo(int dir, const char* path,
 									bool traverse);

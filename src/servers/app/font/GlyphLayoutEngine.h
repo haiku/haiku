@@ -211,7 +211,7 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 	double advanceX = 0.0;
 	double advanceY = 0.0;
 
-	uint32 lastCharCode = 0;
+//	uint32 lastCharCode = 0;
 	uint32 charCode;
 	int32 index = 0;
 	bool writeLocked = false;
@@ -268,7 +268,7 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 			advanceY = glyph->advance_y;
 		}
 
-		lastCharCode = charCode;
+//		lastCharCode = charCode;
 		if (utf8String - start + 1 > length)
 			break;
 	}

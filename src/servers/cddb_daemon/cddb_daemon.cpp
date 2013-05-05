@@ -84,11 +84,11 @@ CDDBDaemon::_Lookup(const dev_t device)
 	uint32 cddbId;
 	if (!_CanLookup(device, &cddbId, toc)) {
 		free(toc);
-		printf("Skipping device with id %ld.\n", device);
+		printf("Skipping device with id %" B_PRId32 ".\n", device);
 		return B_BAD_TYPE;
 	}
 		
-	printf("Looking up CD with CDDB Id %08lx.\n", cddbId);
+	printf("Looking up CD with CDDB Id %08" B_PRIx32 ".\n", cddbId);
 
 	CDDBServer cddb_server("freedb.freedb.org:80");
 
@@ -123,7 +123,7 @@ CDDBDaemon::_Lookup(const dev_t device)
 	// Delete itens in the query response BList;
 	int32 count = queryResponse.CountItems();
 	for (int32 i = 0; i < count; ++i) {
-		delete (QueryResponseData*)queryResponse.RemoveItem(0L);
+		delete (QueryResponseData*)queryResponse.RemoveItem((int32)0);
 	}
 						
 	queryResponse.MakeEmpty();
@@ -131,7 +131,7 @@ CDDBDaemon::_Lookup(const dev_t device)
 	// Delete itens in the track data BList in the read response data;
 	count = readResponse.tracks.CountItems();
 	for (int32 i = 0; i < count; ++i) {
-		delete (TrackData*)readResponse.tracks.RemoveItem(0L);
+		delete (TrackData*)readResponse.tracks.RemoveItem((int32)0);
 	}
 						
 	readResponse.tracks.MakeEmpty();
@@ -247,15 +247,15 @@ CDDBDaemon::_WriteCDData(dev_t device, QueryResponseData* diskData,
 		
 		// Add relevant attributes. We consider an error here as non-fatal.
 		BNode node(&entry);
-		node.WriteAttr("Audio:Title", B_STRING_TYPE, 0, (data->title).String(),
+		node.WriteAttr("Media:Title", B_STRING_TYPE, 0, (data->title).String(),
 			(data->title).Length());
 		node.WriteAttr("Audio:Album", B_STRING_TYPE, 0,
 			(readResponse->title).String(),
 			(readResponse->title).Length());
-		node.WriteAttr("Audio:Genre", B_STRING_TYPE, 0,
+		node.WriteAttr("Media:Genre", B_STRING_TYPE, 0,
 			(readResponse->genre).String(),
 			(readResponse->genre).Length());
-		node.WriteAttr("Audio:Year", B_INT32_TYPE, 0, &(readResponse->year),
+		node.WriteAttr("Media:Year", B_INT32_TYPE, 0, &(readResponse->year),
 			sizeof(int32));
 
 		if (data->artist == "") {

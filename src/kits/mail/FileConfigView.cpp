@@ -20,8 +20,8 @@ class _EXPORT BFileControl;
 class _EXPORT BMailFileConfigView;
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MailKit"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MailKit"
 
 
 const uint32 kMsgSelectButton = 'fsel';

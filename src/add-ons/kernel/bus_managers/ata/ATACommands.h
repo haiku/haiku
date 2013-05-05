@@ -1,4 +1,5 @@
 /*
+ * Copyright 2012, Adrien Destugues, pulkomandy@pulkomandy.tk.
  * Copyright 2009, Michael Lotz, mmlr@mlotz.ch.
  * Copyright 2002-2003, Thomas Kurschel.
  *
@@ -41,6 +42,8 @@
 
 #define ATA_COMMAND_FLUSH_CACHE							0xe7
 #define ATA_COMMAND_FLUSH_CACHE_EXT						0xea
+
+#define ATA_COMMAND_DATA_SET_MANAGEMENT					0x06
 
 #define ATA_COMMAND_MEDIA_EJECT							0xed
 

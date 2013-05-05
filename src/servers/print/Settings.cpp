@@ -15,23 +15,27 @@
 AppSettings::AppSettings(const char* mimetype, const char* printer) 
 	: fMimeType(mimetype)
 {
-	if (printer) fPrinter = printer;
+	if (printer != NULL)
+		fPrinter = printer;
 }
 
 
 // Implementation of PrinterSettings
 
-PrinterSettings::PrinterSettings(const char* printer, BMessage* pageSettings, BMessage* jobSettings)
+PrinterSettings::PrinterSettings(const char* printer,
+		BMessage* pageSettings, BMessage* jobSettings)
 	: fPrinter(printer)
 {
-	if (pageSettings) fPageSettings = *pageSettings;
-	if (jobSettings) fJobSettings = *jobSettings;
+	if (pageSettings != NULL)
+		fPageSettings = *pageSettings;
+	if (jobSettings != NULL)
+		fJobSettings = *jobSettings;
 }
 
 
 // Implementation of Settings
 
-Settings* Settings::fSingleton = NULL;
+Settings* Settings::sSingleton = NULL;
 
 static const BRect kConfigWindowFrame(30, 30, 220, 120);
 
@@ -44,33 +48,39 @@ Settings::Settings()
 }
 
 
-Settings::~Settings() {
-	fSingleton = NULL;
+Settings::~Settings()
+{
+	sSingleton = NULL;
 }
 
 
 Settings* 
-Settings::GetSettings() {
-	if (fSingleton == NULL) fSingleton = new Settings();
-	return fSingleton;
+Settings::GetSettings()
+{
+	if (sSingleton == NULL)
+		sSingleton = new Settings();
+	return sSingleton;
 }
 
 
 void 
-Settings::RemoveAppSettings(int i) {
+Settings::RemoveAppSettings(int i)
+{
 	delete fApps.RemoveItemAt(i);
 }
 
 
 void 
-Settings::RemovePrinterSettings(int i) {
+Settings::RemovePrinterSettings(int i)
+{
 	delete fPrinters.RemoveItemAt(i);
 }
 
 
 AppSettings* 
-Settings::FindAppSettings(const char* mimeType) {
-	for (int i = AppSettingsCount()-1; i >= 0; i --) {
+Settings::FindAppSettings(const char* mimeType)
+{
+	for (int i = AppSettingsCount() - 1; i >= 0; i --) {
 		if (strcmp(AppSettingsAt(i)->GetMimeType(), mimeType) == 0) 
 			return AppSettingsAt(i);
 	}
@@ -79,8 +89,9 @@ Settings::FindAppSettings(const char* mimeType) {
 
 
 PrinterSettings* 
-Settings::FindPrinterSettings(const char* printer) {
-	for (int i = PrinterSettingsCount()-1; i >= 0; i --) {
+Settings::FindPrinterSettings(const char* printer)
+{
+	for (int i = PrinterSettingsCount() - 1; i >= 0; i --) {
 		if (strcmp(PrinterSettingsAt(i)->GetPrinter(), printer) == 0) 
 			return PrinterSettingsAt(i);
 	}
@@ -89,54 +100,59 @@ Settings::FindPrinterSettings(const char* printer) {
 
 
 void 
-Settings::Save(BFile* file) {
-	BMessage m;
-		// store application settings
+Settings::Save(BFile* file)
+{
+	BMessage message;
+	// store application settings
 	for (int i = 0; i < AppSettingsCount(); i++) {
 		AppSettings* app = AppSettingsAt(i);
-		m.AddString("m", app->GetMimeType());
-		m.AddString("p", app->GetPrinter());
+		message.AddString("message", app->GetMimeType());
+		message.AddString("p", app->GetPrinter());
 	}
-		// store printer settings
+	// store printer settings
 	for (int i = 0; i < PrinterSettingsCount(); i++) {
 		PrinterSettings* p = PrinterSettingsAt(i);
-		m.AddString("P", p->GetPrinter());
-		m.AddMessage("S", p->GetPageSettings());
-		m.AddMessage("J", p->GetJobSettings());
+		message.AddString("P", p->GetPrinter());
+		message.AddMessage("S", p->GetPageSettings());
+		message.AddMessage("J", p->GetJobSettings());
 	}
 	
-	m.AddBool("UseConfigWindow", fUseConfigWindow);
-	m.AddRect("ConfigWindowFrame", fConfigWindowFrame);
-	m.AddString("DefaultPrinter", fDefaultPrinter);
-	m.Flatten(file);
+	message.AddBool("UseConfigWindow", fUseConfigWindow);
+	message.AddRect("ConfigWindowFrame", fConfigWindowFrame);
+	message.AddString("DefaultPrinter", fDefaultPrinter);
+	message.Flatten(file);
 }
 
 
 void 
-Settings::Load(BFile* file) {
-	BMessage m;
-	if (m.Unflatten(file) == B_OK) {
-			// restore application settings
-		BString mimetype, printer;
-		for (int i = 0; m.FindString("m", i, &mimetype) == B_OK &&
-			m.FindString("p", i, &printer ) == B_OK; i ++) {
+Settings::Load(BFile* file)
+{
+	BMessage message;
+	if (message.Unflatten(file) == B_OK) {
+		// restore application settings
+		BString mimetype;
+		BString printer;
+		for (int i = 0; message.FindString("message", i, &mimetype) == B_OK &&
+			message.FindString("p", i, &printer ) == B_OK; i ++) {
 			AddAppSettings(new AppSettings(mimetype.String(), printer.String()));
 		}
-			// restore printer settings
-		BMessage page, job;
-		for (int i = 0; m.FindString("P", i, &printer) == B_OK &&
-			m.FindMessage("S", i, &page) == B_OK &&
-			m.FindMessage("J", i, &job) == B_OK; i ++) {
+
+		// restore printer settings
+		BMessage page;
+		BMessage job;
+		for (int i = 0; message.FindString("P", i, &printer) == B_OK &&
+			message.FindMessage("S", i, &page) == B_OK &&
+			message.FindMessage("J", i, &job) == B_OK; i ++) {
 			AddPrinterSettings(new PrinterSettings(printer.String(), &page, &job));
 		}
 		
-		if (m.FindBool("UseConfigWindow", &fUseConfigWindow) != B_OK)
+		if (message.FindBool("UseConfigWindow", &fUseConfigWindow) != B_OK)
 			fUseConfigWindow = true;
 		
-		if (m.FindRect("ConfigWindowFrame", &fConfigWindowFrame) != B_OK)
+		if (message.FindRect("ConfigWindowFrame", &fConfigWindowFrame) != B_OK)
 			fConfigWindowFrame = BRect(kConfigWindowFrame);
 			
-		if (m.FindString("DefaultPrinter", &fDefaultPrinter) != B_OK)
+		if (message.FindString("DefaultPrinter", &fDefaultPrinter) != B_OK)
 			fDefaultPrinter = "";
 	}
 }

@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -39,6 +40,8 @@ public:
 			BVariant			Value(const char* settingID) const;
 			bool				SetValue(Setting* setting,
 									const BVariant& value);
+
+			bool				RestoreValues(const BMessage& message);
 
 			bool				BoolValue(BoolSetting* setting) const
 									{ return Value(setting).ToBool(); }

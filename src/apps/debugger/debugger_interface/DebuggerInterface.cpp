@@ -1,6 +1,6 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010, Rene Gollent, rene@gollent.com.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -13,7 +13,6 @@
 #include <Locker.h>
 
 #include <AutoLocker.h>
-#include <commpage_defs.h>
 #include <OS.h>
 #include <system_info.h>
 #include <util/DoublyLinkedList.h>
@@ -22,10 +21,15 @@
 #include "debug_utils.h"
 
 #include "ArchitectureX86.h"
+#include "ArchitectureX8664.h"
+#include "AreaInfo.h"
 #include "CpuState.h"
 #include "DebugEvent.h"
 #include "ImageInfo.h"
+#include "SemaphoreInfo.h"
 #include "SymbolInfo.h"
+#include "SystemInfo.h"
+#include "TeamInfo.h"
 #include "ThreadInfo.h"
 
 
@@ -239,7 +243,8 @@ DebuggerInterface::DebuggerInterface(team_id teamID)
 
 DebuggerInterface::~DebuggerInterface()
 {
-	fArchitecture->ReleaseReference();
+	if (fArchitecture != NULL)
+		fArchitecture->ReleaseReference();
 
 	Close(false);
 
@@ -251,8 +256,13 @@ status_t
 DebuggerInterface::Init()
 {
 	// create the architecture
-#ifdef ARCH_x86
+	// TODO: this probably needs to be rethought a bit,
+	// since especially when we eventually support remote debugging,
+	// the architecture will depend on the target machine, not the host
+#if defined(ARCH_x86)
 	fArchitecture = new(std::nothrow) ArchitectureX86(this);
+#elif defined(ARCH_x86_64)
+	fArchitecture = new(std::nothrow) ArchitectureX8664(this);
 #else
 	return B_UNSUPPORTED;
 #endif
@@ -266,7 +276,7 @@ DebuggerInterface::Init()
 
 	// create debugger port
 	char buffer[128];
-	snprintf(buffer, sizeof(buffer), "team %ld debugger", fTeamID);
+	snprintf(buffer, sizeof(buffer), "team %" B_PRId32 " debugger", fTeamID);
 	fDebuggerPort = create_port(100, buffer);
 	if (fDebuggerPort < 0)
 		return fDebuggerPort;
@@ -312,7 +322,7 @@ status_t
 DebuggerInterface::GetNextDebugEvent(DebugEvent*& _event)
 {
 	while (true) {
-		char buffer[1024];
+		char buffer[2048];
 		int32 messageCode;
 		ssize_t size = read_port(fDebuggerPort, &messageCode, buffer,
 			sizeof(buffer));
@@ -324,7 +334,7 @@ DebuggerInterface::GetNextDebugEvent(DebugEvent*& _event)
 		}
 
 		if (messageCode <= B_DEBUGGER_MESSAGE_HANDED_OVER) {
-			debug_debugger_message_data message;
+ 			debug_debugger_message_data message;
 			memcpy(&message, buffer, size);
 			if (message.origin.team != fTeamID)
 				continue;
@@ -422,6 +432,71 @@ DebuggerInterface::UninstallBreakpoint(target_addr_t address)
 
 
 status_t
+DebuggerInterface::InstallWatchpoint(target_addr_t address, uint32 type,
+	int32 length)
+{
+	DebugContextGetter contextGetter(fDebugContextPool);
+
+	debug_nub_set_watchpoint message;
+	message.reply_port = contextGetter.Context()->reply_port;
+	message.address = (void*)(addr_t)address;
+	message.type = type;
+	message.length = length;
+
+	debug_nub_set_watchpoint_reply reply;
+
+	status_t error = send_debug_message(contextGetter.Context(),
+		B_DEBUG_MESSAGE_SET_WATCHPOINT, &message, sizeof(message), &reply,
+		sizeof(reply));
+	return error == B_OK ? reply.error : error;
+}
+
+
+status_t
+DebuggerInterface::UninstallWatchpoint(target_addr_t address)
+{
+	DebugContextGetter contextGetter(fDebugContextPool);
+
+	debug_nub_clear_watchpoint message;
+	message.address = (void*)(addr_t)address;
+
+	return write_port(fNubPort, B_DEBUG_MESSAGE_CLEAR_WATCHPOINT,
+		&message, sizeof(message));
+}
+
+
+status_t
+DebuggerInterface::GetSystemInfo(SystemInfo& info)
+{
+	system_info sysInfo;
+	status_t result = get_system_info(&sysInfo);
+	if (result != B_OK)
+		return result;
+
+	utsname name;
+	result = uname(&name);
+	if (result != B_OK)
+		return result;
+
+	info.SetTo(fTeamID, sysInfo, name);
+	return B_OK;
+}
+
+
+status_t
+DebuggerInterface::GetTeamInfo(TeamInfo& info)
+{
+	team_info teamInfo;
+	status_t result = get_team_info(fTeamID, &teamInfo);
+	if (result != B_OK)
+		return result;
+
+	info.SetTo(fTeamID, teamInfo);
+	return B_OK;
+}
+
+
+status_t
 DebuggerInterface::GetThreadInfos(BObjectList<ThreadInfo>& infos)
 {
 	thread_info threadInfo;
@@ -455,21 +530,42 @@ DebuggerInterface::GetImageInfos(BObjectList<ImageInfo>& infos)
 		}
 	}
 
-	// Also add the "commpage" image, which belongs to the kernel, but is used
-	// by userland teams.
-	cookie = 0;
-	while (get_next_image_info(B_SYSTEM_TEAM, &cookie, &imageInfo) == B_OK) {
-		if ((addr_t)imageInfo.text >= USER_COMMPAGE_ADDR
-			&& (addr_t)imageInfo.text < USER_COMMPAGE_ADDR + COMMPAGE_SIZE) {
-			ImageInfo* info = new(std::nothrow) ImageInfo(B_SYSTEM_TEAM,
-				imageInfo.id, imageInfo.name, imageInfo.type,
-				(addr_t)imageInfo.text, imageInfo.text_size,
-				(addr_t)imageInfo.data, imageInfo.data_size);
-			if (info == NULL || !infos.AddItem(info)) {
-				delete info;
-				return B_NO_MEMORY;
-			}
-			break;
+	return B_OK;
+}
+
+
+status_t
+DebuggerInterface::GetAreaInfos(BObjectList<AreaInfo>& infos)
+{
+	// get the team's areas
+	area_info areaInfo;
+	ssize_t cookie = 0;
+	while (get_next_area_info(fTeamID, &cookie, &areaInfo) == B_OK) {
+		AreaInfo* info = new(std::nothrow) AreaInfo(fTeamID, areaInfo.area,
+			areaInfo.name, (addr_t)areaInfo.address, areaInfo.size,
+			areaInfo.ram_size, areaInfo.lock, areaInfo.protection);
+		if (info == NULL || !infos.AddItem(info)) {
+			delete info;
+			return B_NO_MEMORY;
+		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
+DebuggerInterface::GetSemaphoreInfos(BObjectList<SemaphoreInfo>& infos)
+{
+	// get the team's semaphores
+	sem_info semInfo;
+	int32 cookie = 0;
+	while (get_next_sem_info(fTeamID, &cookie, &semInfo) == B_OK) {
+		SemaphoreInfo* info = new(std::nothrow) SemaphoreInfo(fTeamID,
+			semInfo.sem, semInfo.name, semInfo.count, semInfo.latest_holder);
+		if (info == NULL || !infos.AddItem(info)) {
+			delete info;
+			return B_NO_MEMORY;
 		}
 	}
 
@@ -482,9 +578,9 @@ DebuggerInterface::GetSymbolInfos(team_id team, image_id image,
 	BObjectList<SymbolInfo>& infos)
 {
 	// create a lookup context
-// TODO: It's too expensive to create a lookup context for each image!
 	debug_symbol_lookup_context* lookupContext;
-	status_t error = debug_create_symbol_lookup_context(team, &lookupContext);
+	status_t error = debug_create_symbol_lookup_context(team, image,
+		&lookupContext);
 	if (error != B_OK)
 		return error;
 
@@ -527,10 +623,9 @@ DebuggerInterface::GetSymbolInfo(team_id team, image_id image, const char* name,
 	int32 symbolType, SymbolInfo& info)
 {
 	// create a lookup context
-	// TODO: It's a bit expensive to create a lookup context just for one
-	// symbol!
 	debug_symbol_lookup_context* lookupContext;
-	status_t error = debug_create_symbol_lookup_context(team, &lookupContext);
+	status_t error = debug_create_symbol_lookup_context(team, image,
+		&lookupContext);
 	if (error != B_OK)
 		return error;
 
@@ -719,8 +814,8 @@ DebuggerInterface::_CreateDebugEvent(int32 messageCode,
 			break;
 		}
 		default:
-			printf("DebuggerInterface for team %ld: unknown message from "
-				"kernel: %ld\n", fTeamID, messageCode);
+			printf("DebuggerInterface for team %" B_PRId32 ": unknown message "
+				"from kernel: %" B_PRId32 "\n", fTeamID, messageCode);
 			// fall through...
 		case B_DEBUGGER_MESSAGE_TEAM_CREATED:
 		case B_DEBUGGER_MESSAGE_PRE_SYSCALL:

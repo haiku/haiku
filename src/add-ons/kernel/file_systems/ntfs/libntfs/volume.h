@@ -5,6 +5,7 @@
  * Copyright (c) 2004-2005 Richard Russon
  * Copyright (c) 2005-2006 Yura Pakhuchiy
  * Copyright (c) 2005-2009 Szabolcs Szakacsits
+ * Copyright (c) 2010      Jean-Pierre Andre
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -57,6 +58,7 @@
 #endif
 
 #define MS_IGNORE_HIBERFILE   0x20000000
+#define MS_FORENSIC	      0x04000000 /* No modification during mount */
 
 /* Forward declaration */
 typedef struct _ntfs_volume ntfs_volume;
@@ -111,6 +113,7 @@ typedef enum {
 	NV_ShowHidFiles,	/* 1: Show files marked hidden. */
 	NV_HideDotFiles,	/* 1: Set hidden flag on dot files */
 	NV_Compression,		/* 1: allow compression */
+	NV_NoFixupWarn,		/* 1: Do not log fixup errors */
 } ntfs_volume_state_bits;
 
 #define  test_nvol_flag(nv, flag)	 test_bit(NV_##flag, (nv)->state)
@@ -144,6 +147,10 @@ typedef enum {
 #define NVolCompression(nv)		 test_nvol_flag(nv, Compression)
 #define NVolSetCompression(nv)		  set_nvol_flag(nv, Compression)
 #define NVolClearCompression(nv)	clear_nvol_flag(nv, Compression)
+
+#define NVolNoFixupWarn(nv)		 test_nvol_flag(nv, NoFixupWarn)
+#define NVolSetNoFixupWarn(nv)		  set_nvol_flag(nv, NoFixupWarn)
+#define NVolClearNoFixupWarn(nv)	clear_nvol_flag(nv, NoFixupWarn)
 
 /*
  * NTFS version 1.1 and 1.2 are used by Windows NT4.
@@ -251,7 +258,9 @@ struct _ntfs_volume {
 	s64 free_mft_records; 	/* Same for free mft records (see above) */
 	BOOL efs_raw;		/* volume is mounted for raw access to
 				   efs-encrypted files */
-
+#ifdef XATTR_MAPPINGS
+	struct XATTRMAPPING *xattr_mapping;
+#endif /* XATTR_MAPPINGS */
 #if CACHE_INODE_SIZE
 	struct CACHE_HEADER *xinode_cache;
 #endif
@@ -293,6 +302,7 @@ extern int ntfs_volume_error(int err);
 extern void ntfs_mount_error(const char *vol, const char *mntpoint, int err);
 
 extern int ntfs_volume_get_free_space(ntfs_volume *vol);
+extern int ntfs_volume_rename(ntfs_volume *vol, ntfschar *label, int label_len);
 
 extern int ntfs_set_shown_files(ntfs_volume *vol,
 		BOOL show_sys_files, BOOL show_hid_files, BOOL hide_dot_files);

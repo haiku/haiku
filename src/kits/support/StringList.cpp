@@ -1,5 +1,7 @@
 /*
- * Copyright 2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Ingo Weinhold, ingo_weinhold@gmx.de
+ * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
+ *
  * Distributed under the terms of the MIT License.
  */
 
@@ -9,21 +11,22 @@
 #include <algorithm>
 
 #include <StringPrivate.h>
+#include <TypeConstants.h>
 
 
 static int
 compare_private_data(const void* a, const void* b)
 {
-	return BString::Private::StringFromData((char*)a).Compare(
-		BString::Private::StringFromData((char*)b));
+	return BString::Private::StringFromData(*(char**)a).Compare(
+		BString::Private::StringFromData(*(char**)b));
 }
 
 
 static int
 compare_private_data_ignore_case(const void* a, const void* b)
 {
-	return BString::Private::StringFromData((char*)a).ICompare(
-		BString::Private::StringFromData((char*)b));
+	return BString::Private::StringFromData(*(char**)a).ICompare(
+		BString::Private::StringFromData(*(char**)b));
 }
 
 
@@ -123,6 +126,18 @@ BStringList::Remove(const BString& string, bool ignoreCase)
 	}
 
 	return result;
+}
+
+
+bool
+BStringList::Remove(const BStringList& list, bool ignoreCase)
+{
+	bool removedAnything = false;
+	int32 stringCount = list.CountStrings();
+	for (int32 i = 0; i < stringCount; i++)
+		removedAnything |= Remove(list.StringAt(i), ignoreCase);
+
+	return removedAnything;
 }
 
 
@@ -233,16 +248,16 @@ BStringList::IndexOf(const BString& string, bool ignoreCase) const
 		for (int32 i = 0; i < count; i++) {
 			BString element(StringAt(i));
 			if (length == element.Length() && string.ICompare(element) == 0)
-				return true;
+				return i;
 		}
 	} else {
 		for (int32 i = 0; i < count; i++) {
 			if (string == StringAt(i))
-				return true;
+				return i;
 		}
 	}
 
-	return false;
+	return -1;
 }
 
 
@@ -316,6 +331,86 @@ BStringList::operator==(const BStringList& other) const
 	}
 
 	return true;
+}
+
+
+bool
+BStringList::IsFixedSize() const
+{
+	return false;
+}
+
+
+type_code
+BStringList::TypeCode() const
+{
+	return B_STRING_LIST_TYPE;
+}
+
+
+
+bool
+BStringList::AllowsTypeCode(type_code code) const
+{
+	return code == B_STRING_LIST_TYPE;
+}
+
+
+ssize_t
+BStringList::FlattenedSize() const
+{
+	ssize_t size = 0;
+	int32 count = CountStrings();
+	for (int32 i = 0; i < count; i++)
+		size += StringAt(i).Length() + 1;
+
+	return size;
+}
+
+
+status_t
+BStringList::Flatten(void* buf, ssize_t size) const
+{
+	const char* buffer = (const char*)buf;
+
+	if (size < FlattenedSize())
+		return B_NO_MEMORY;
+
+	int32 count = CountStrings();
+	for (int32 i = 0; i < count; i++) {
+		BString item = StringAt(i);
+		ssize_t storeSize = item.Length() + 1;
+		memcpy((void*)buffer, (const void*)item.String(), storeSize);
+		buffer += storeSize;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+BStringList::Unflatten(type_code code, const void* buffer, ssize_t size)
+{
+	if (code != B_STRING_LIST_TYPE)
+		return B_ERROR;
+	const char* bufferStart = (const char*)buffer;
+
+	MakeEmpty();
+
+	off_t offset = 0;
+	while (offset < size) {
+		const char* string = bufferStart + offset;
+		size_t restSize = size - offset;
+		size_t read = strnlen(string, restSize);
+		if (read == restSize)
+			return B_BAD_VALUE;
+
+		if (!Add(string))
+			return B_NO_MEMORY;
+		offset += read + 1;
+	}
+
+	return B_OK;
 }
 
 

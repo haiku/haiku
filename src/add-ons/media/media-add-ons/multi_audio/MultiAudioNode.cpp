@@ -14,6 +14,7 @@
 #include <Autolock.h>
 #include <Buffer.h>
 #include <BufferGroup.h>
+#include <Catalog.h>
 #include <ParameterWeb.h>
 #include <String.h>
 
@@ -24,12 +25,16 @@
 #	define PRINTING
 #endif
 #include "debug.h"
+#include "Resampler.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MultiAudio"
 
 #define PARAMETER_ID_INPUT_FREQUENCY	1
 #define PARAMETER_ID_OUTPUT_FREQUENCY	2
 
 
+//This represent an hardware output
 class node_input {
 public:
 	node_input(media_input& input, media_format format);
@@ -39,11 +44,14 @@ public:
 	media_input			fInput;
 	media_format 		fPreferredFormat;
 	media_format		fFormat;
-	uint32 				fBufferCycle;
+	volatile uint32		fBufferCycle;
 	multi_buffer_info	fOldBufferInfo;
 	BBuffer*			fBuffer;
+	Resampler			*fResampler;
 };
 
+
+//This represent an hardware input
 class node_output {
 public:
 	node_output(media_output& output, media_format format);
@@ -59,11 +67,13 @@ public:
 	uint64 				fSamplesSent;
 	volatile uint32 	fBufferCycle;
 	multi_buffer_info	fOldBufferInfo;
+	Resampler			*fResampler;
 };
 
 
-struct OutputFrameRateChangeCookie : public BReferenceable {
+struct FrameRateChangeCookie : public BReferenceable {
 	float	oldFrameRate;
+	uint32	id;
 };
 
 
@@ -71,6 +81,7 @@ struct sample_rate_info {
 	uint32		multiAudioRate;
 	const char*	name;
 };
+
 
 static const sample_rate_info kSampleRateInfos[] = {
 	{B_SR_8000,		"8000"},
@@ -95,10 +106,18 @@ static const sample_rate_info kSampleRateInfos[] = {
 
 const char* kMultiControlString[] = {
 	"NAME IS ATTACHED",
-	"Output", "Input", "Setup", "Tone Control", "Extended Setup", "Enhanced Setup", "Master",
-	"Beep", "Phone", "Mic", "Line", "CD", "Video", "Aux", "Wave", "Gain", "Level", "Volume",
-	"Mute", "Enable", "Stereo Mix", "Mono Mix", "Output Stereo Mix", "Output Mono Mix", "Output Bass",
-	"Output Treble", "Output 3D Center", "Output 3D Depth", "Headphones", "SPDIF"
+	B_TRANSLATE("Output"), B_TRANSLATE("Input"), B_TRANSLATE("Setup"),
+	B_TRANSLATE("Tone control"), B_TRANSLATE("Extended Setup"),
+	B_TRANSLATE("Enhanced Setup"), B_TRANSLATE("Master"), B_TRANSLATE("Beep"),
+	B_TRANSLATE("Phone"), B_TRANSLATE("Mic"), B_TRANSLATE("Line"),
+	B_TRANSLATE("CD"), B_TRANSLATE("Video"), B_TRANSLATE("Aux"),
+	B_TRANSLATE("Wave"), B_TRANSLATE("Gain"), B_TRANSLATE("Level"),
+	B_TRANSLATE("Volume"), B_TRANSLATE("Mute"), B_TRANSLATE("Enable"),
+	B_TRANSLATE("Stereo mix"), B_TRANSLATE("Mono mix"),
+	B_TRANSLATE("Output stereo mix"), B_TRANSLATE("Output mono mix"),
+	B_TRANSLATE("Output bass"), B_TRANSLATE("Output treble"),
+	B_TRANSLATE("Output 3D center"), B_TRANSLATE("Output 3D depth"),
+	B_TRANSLATE("Headphones"), B_TRANSLATE("SPDIF")
 };
 
 
@@ -112,6 +131,7 @@ node_input::node_input(media_input& input, media_format format)
 	fPreferredFormat = format;
 	fBufferCycle = 1;
 	fBuffer = NULL;
+	fResampler = NULL;
 }
 
 
@@ -133,6 +153,7 @@ node_output::node_output(media_output& output, media_format format)
 	fOutput = output;
 	fPreferredFormat = format;
 	fBufferCycle = 1;
+	fResampler = NULL;
 }
 
 
@@ -348,6 +369,10 @@ MultiAudioNode::NodeRegistered()
 			currentInput = new node_input(*input, fOutputPreferredFormat);
 			currentInput->fPreferredFormat.u.raw_audio.channel_count = 1;
 			currentInput->fInput.format = currentInput->fPreferredFormat;
+			delete currentInput->fResampler;
+			currentInput->fResampler = new
+				Resampler(currentInput->fPreferredFormat.AudioFormat(),
+					fOutputPreferredFormat.AudioFormat());
 
 			currentInput->fChannelId = fDevice->Description().channels[i].channel_id;
 			fInputs.AddItem(currentInput);
@@ -394,6 +419,11 @@ MultiAudioNode::NodeRegistered()
 			currentOutput = new node_output(*output, fInputPreferredFormat);
 			currentOutput->fPreferredFormat.u.raw_audio.channel_count = 1;
 			currentOutput->fOutput.format = currentOutput->fPreferredFormat;
+			delete currentOutput->fResampler;
+			currentOutput->fResampler = new
+				Resampler(fInputPreferredFormat.AudioFormat(),
+					currentOutput->fPreferredFormat.AudioFormat());
+
 			currentOutput->fChannelId = fDevice->Description().channels[i].channel_id;
 			fOutputs.AddItem(currentOutput);
 
@@ -438,16 +468,21 @@ MultiAudioNode::RequestCompleted(const media_request_info& info)
 	if (info.what != media_request_info::B_REQUEST_FORMAT_CHANGE)
 		return B_OK;
 
-	OutputFrameRateChangeCookie* cookie
-		= (OutputFrameRateChangeCookie*)info.user_data;
+	FrameRateChangeCookie* cookie
+		= (FrameRateChangeCookie*)info.user_data;
 	if (cookie == NULL)
 		return B_OK;
 
-	BReference<OutputFrameRateChangeCookie> cookieReference(cookie, true);
+	BReference<FrameRateChangeCookie> cookieReference(cookie, true);
 
 	// if the request failed, we reset the frame rate
 	if (info.status != B_OK) {
-		_SetNodeInputFrameRate(cookie->oldFrameRate);
+		if (cookie->id == PARAMETER_ID_INPUT_FREQUENCY) {
+			_SetNodeInputFrameRate(cookie->oldFrameRate);
+			if (fDevice->Description().output_rates & B_SR_SAME_AS_INPUT)
+				_SetNodeOutputFrameRate(cookie->oldFrameRate);
+		} else if (cookie->id == PARAMETER_ID_OUTPUT_FREQUENCY)
+			_SetNodeOutputFrameRate(cookie->oldFrameRate);
 
 		// TODO: If we have multiple connections, we should request to change
 		// the format back!
@@ -503,10 +538,10 @@ MultiAudioNode::AcceptFormat(const media_destination& dest,
 	format->u.raw_audio.format = channel->fPreferredFormat.u.raw_audio.format;
 	format->u.raw_audio.valid_bits = channel->fPreferredFormat.u.raw_audio.valid_bits;
 
-	format->u.raw_audio.frame_rate    = channel->fPreferredFormat.u.raw_audio.frame_rate;
+	format->u.raw_audio.frame_rate = channel->fPreferredFormat.u.raw_audio.frame_rate;
 	format->u.raw_audio.channel_count = channel->fPreferredFormat.u.raw_audio.channel_count;
-	format->u.raw_audio.byte_order    = B_MEDIA_HOST_ENDIAN;
-	format->u.raw_audio.buffer_size   = fDevice->BufferList().return_playback_buffer_size
+	format->u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
+	format->u.raw_audio.buffer_size = fDevice->BufferList().return_playback_buffer_size
 		* (format->u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
 		* format->u.raw_audio.channel_count;
 
@@ -1305,6 +1340,7 @@ MultiAudioNode::GetParameterValue(int32 id, bigtime_t* lastChange, void* value,
 	if (id == PARAMETER_ID_INPUT_FREQUENCY
 		|| id == PARAMETER_ID_OUTPUT_FREQUENCY) {
 		const multi_format_info& info = fDevice->FormatInfo();
+
 		uint32 rate = id == PARAMETER_ID_INPUT_FREQUENCY
 			? info.input.rate : info.output.rate;
 
@@ -1394,12 +1430,9 @@ MultiAudioNode::SetParameterValue(int32 id, bigtime_t performanceTime,
 	if (parameter == NULL)
 		return;
 
-	if (id == PARAMETER_ID_INPUT_FREQUENCY) {
-		// TODO: Support!
-		return;
-	}
-
-	if (id == PARAMETER_ID_OUTPUT_FREQUENCY) {
+	if (id == PARAMETER_ID_OUTPUT_FREQUENCY
+		|| (id == PARAMETER_ID_INPUT_FREQUENCY
+			&& (fDevice->Description().output_rates & B_SR_SAME_AS_INPUT))) {
 		uint32 rate;
 		if (size < sizeof(rate))
 			return;
@@ -1410,13 +1443,14 @@ MultiAudioNode::SetParameterValue(int32 id, bigtime_t performanceTime,
 
 		// create a cookie RequestCompleted() can get the old frame rate from,
 		// if anything goes wrong
-		OutputFrameRateChangeCookie* cookie
-			= new(std::nothrow) OutputFrameRateChangeCookie;
+		FrameRateChangeCookie* cookie
+			= new(std::nothrow) FrameRateChangeCookie;
 		if (cookie == NULL)
 			return;
 
 		cookie->oldFrameRate = fOutputPreferredFormat.u.raw_audio.frame_rate;
-		BReference<OutputFrameRateChangeCookie> cookieReference(cookie, true);
+		cookie->id = id;
+		BReference<FrameRateChangeCookie> cookieReference(cookie, true);
 
 		// NOTE: What we should do is call RequestFormatChange() for all
 		// connections and change the device's format in RequestCompleted().
@@ -1442,6 +1476,59 @@ MultiAudioNode::SetParameterValue(int32 id, bigtime_t performanceTime,
 			int32 changeTag = 0;
 			status_t error = RequestFormatChange(channel->fInput.source,
 				channel->fInput.destination, newFormat, NULL, &changeTag);
+			if (error == B_OK)
+				cookie->AcquireReference();
+		}
+
+		if (id != PARAMETER_ID_INPUT_FREQUENCY)
+			return;
+		//Do not return cause we should go in the next if
+	}
+
+	if (id == PARAMETER_ID_INPUT_FREQUENCY) {
+		uint32 rate;
+		if (size < sizeof(rate))
+			return;
+		memcpy(&rate, value, sizeof(rate));
+
+		if (rate == fInputPreferredFormat.u.raw_audio.frame_rate)
+			return;
+
+		// create a cookie RequestCompleted() can get the old frame rate from,
+		// if anything goes wrong
+		FrameRateChangeCookie* cookie
+			= new(std::nothrow) FrameRateChangeCookie;
+		if (cookie == NULL)
+			return;
+
+		cookie->oldFrameRate = fInputPreferredFormat.u.raw_audio.frame_rate;
+		cookie->id = id;
+		BReference<FrameRateChangeCookie> cookieReference(cookie, true);
+
+		// NOTE: What we should do is call RequestFormatChange() for all
+		// connections and change the device's format in RequestCompleted().
+		// Unfortunately we need the new buffer size first, which we only get
+		// from the device after changing the format. So we do that now and
+		// reset it in RequestCompleted(), if something went wrong. This causes
+		// the buffers we receive until then to be played incorrectly leading
+		// to unpleasant noise.
+		float frameRate = MultiAudio::convert_to_sample_rate(rate);
+		if (_SetNodeOutputFrameRate(frameRate) != B_OK)
+			return;
+
+		for (int32 i = 0; i < fOutputs.CountItems(); i++) {
+			node_output* channel = (node_output*)fOutputs.ItemAt(i);
+			if (channel->fOutput.source == media_source::null)
+				continue;
+
+			media_format newFormat = channel->fOutput.format;
+			newFormat.u.raw_audio.frame_rate = frameRate;
+			newFormat.u.raw_audio.buffer_size
+				= fInputPreferredFormat.u.raw_audio.buffer_size;
+
+			int32 changeTag = 0;
+			status_t error = RequestFormatChange(channel->fOutput.source,
+				channel->fOutput.destination, newFormat, NULL, &changeTag);
 			if (error == B_OK)
 				cookie->AcquireReference();
 		}
@@ -1503,14 +1590,19 @@ MultiAudioNode::MakeParameterWeb()
 	PRINT(("MixControlInfo().control_count : %li\n",
 		fDevice->MixControlInfo().control_count));
 
-	BParameterGroup* generalGroup = web->MakeGroup("General");
+	BParameterGroup* generalGroup = web->MakeGroup(B_TRANSLATE("General"));
 
 	const multi_description& description = fDevice->Description();
-//	_CreateFrequencyParameterGroup(generalGroup, "Input",
-//		PARAMETER_ID_INPUT_FREQUENCY, description.input_rates);
-		// TODO: Enable when implemented correctly in SetParameterValue()!
-	_CreateFrequencyParameterGroup(generalGroup, "Output",
-		PARAMETER_ID_OUTPUT_FREQUENCY, description.output_rates);
+
+	if (description.output_rates & B_SR_SAME_AS_INPUT) {
+		_CreateFrequencyParameterGroup(generalGroup, B_TRANSLATE("Input & Output"),
+			PARAMETER_ID_INPUT_FREQUENCY, description.input_rates);
+	} else {
+		_CreateFrequencyParameterGroup(generalGroup, B_TRANSLATE("Input"),
+			PARAMETER_ID_INPUT_FREQUENCY, description.input_rates);
+		_CreateFrequencyParameterGroup(generalGroup, B_TRANSLATE("Output"),
+			PARAMETER_ID_OUTPUT_FREQUENCY, description.output_rates);
+	}
 
 	multi_mix_control* controls = fDevice->MixControlInfo().controls;
 
@@ -1638,7 +1730,7 @@ MultiAudioNode::_CreateFrequencyParameterGroup(BParameterGroup* parentGroup,
 {
 	BParameterGroup* group = parentGroup->MakeGroup(name);
 	BDiscreteParameter* frequencyParam = group->MakeDiscreteParameter(
-		parameterID, B_MEDIA_NO_TYPE, BString(name) << " Frequency:",
+		parameterID, B_MEDIA_NO_TYPE, BString(name) << B_TRANSLATE(" frequency:"),
 		B_GENERIC);
 
 	for (int32 i = 0; kSampleRateInfos[i].name != NULL; i++) {
@@ -1660,8 +1752,6 @@ MultiAudioNode::_OutputThread()
 	CALLED();
 	multi_buffer_info bufferInfo;
 	bufferInfo.info_size = sizeof(multi_buffer_info);
-	bufferInfo._reserved_0 = 0;
-	bufferInfo._reserved_1 = 2;
 	bufferInfo.playback_buffer_cycle = 0;
 	bufferInfo.record_buffer_cycle = 0;
 
@@ -1693,8 +1783,7 @@ MultiAudioNode::_OutputThread()
 		for (int32 i = 0; i < fInputs.CountItems(); i++) {
 			node_input* input = (node_input*)fInputs.ItemAt(i);
 
-			if (bufferInfo._reserved_0 == input->fChannelId
-				&& bufferInfo.playback_buffer_cycle >= 0
+			if (bufferInfo.playback_buffer_cycle >= 0
 				&& bufferInfo.playback_buffer_cycle
 						< fDevice->BufferList().return_playback_buffers
 				&& (input->fOldBufferInfo.playback_buffer_cycle
@@ -1749,14 +1838,15 @@ MultiAudioNode::_OutputThread()
 			// buffer
 			if (RunState() == BMediaEventLooper::B_STARTED
 				&& output->fOutput.destination != media_destination::null) {
-				if (bufferInfo._reserved_1 == output->fChannelId
-					&& bufferInfo.record_buffer_cycle >= 0
+				if (bufferInfo.record_buffer_cycle >= 0
 					&& bufferInfo.record_buffer_cycle
 							< fDevice->BufferList().return_record_buffers
 					&& (output->fOldBufferInfo.record_buffer_cycle
 							!= bufferInfo.record_buffer_cycle
 						|| fDevice->BufferList().return_record_buffers == 1)) {
 					//PRINT(("record_buffer_cycle ok\n"));
+
+					output->fBufferCycle = bufferInfo.record_buffer_cycle;
 
 					// Get the next buffer of data
 					BBuffer* buffer = _FillNextBuffer(bufferInfo, *output);
@@ -1824,6 +1914,17 @@ MultiAudioNode::_WriteZeros(node_input& input, uint32 bufferCycle)
 			}
 			break;
 
+		case media_raw_audio_format::B_AUDIO_DOUBLE:
+			for (uint32 channel = 0; channel < channelCount; channel++) {
+				char* dest = _PlaybackBuffer(bufferCycle,
+					input.fChannelId + channel);
+				for (uint32 i = bufferSize; i > 0; i--) {
+					*(double*)dest = 0;
+					dest += stride;
+				}
+			}
+			break;
+
 		case media_raw_audio_format::B_AUDIO_INT:
 			for (uint32 channel = 0; channel < channelCount; channel++) {
 				char* dest = _PlaybackBuffer(bufferCycle,
@@ -1841,6 +1942,28 @@ MultiAudioNode::_WriteZeros(node_input& input, uint32 bufferCycle)
 					input.fChannelId + channel);
 				for (uint32 i = bufferSize; i > 0; i--) {
 					*(int16*)dest = 0;
+					dest += stride;
+				}
+			}
+			break;
+
+		case media_raw_audio_format::B_AUDIO_UCHAR:
+			for (uint32 channel = 0; channel < channelCount; channel++) {
+				char* dest = _PlaybackBuffer(bufferCycle,
+					input.fChannelId + channel);
+				for (uint32 i = bufferSize; i > 0; i--) {
+					*(uint8*)dest = 128;
+					dest += stride;
+				}
+			}
+			break;
+
+		case media_raw_audio_format::B_AUDIO_CHAR:
+			for (uint32 channel = 0; channel < channelCount; channel++) {
+				char* dest = _PlaybackBuffer(bufferCycle,
+					input.fChannelId + channel);
+				for (uint32 i = bufferSize; i > 0; i--) {
+					*(int8*)dest = 0;
 					dest += stride;
 				}
 			}
@@ -1864,218 +1987,35 @@ MultiAudioNode::_FillWithZeros(node_input& input)
 void
 MultiAudioNode::_FillNextBuffer(node_input& input, BBuffer* buffer)
 {
-	// TODO: simplify this, or put it into a static function to remove
-	// the need for checking all over again
+	uint32 channelCount = input.fInput.format.u.raw_audio.channel_count;
+	size_t inputSampleSize = input.fInput.format.u.raw_audio.format
+			& media_raw_audio_format::B_AUDIO_SIZE_MASK;
 
 	uint32 bufferSize = fDevice->BufferList().return_playback_buffer_size;
 
-	if (buffer->SizeUsed()
-		/ (input.fInput.format.u.raw_audio.format
-			& media_raw_audio_format::B_AUDIO_SIZE_MASK)
-		/ input.fInput.format.u.raw_audio.channel_count != bufferSize) {
+	if (buffer->SizeUsed() / inputSampleSize / channelCount != bufferSize) {
 		_WriteZeros(input, input.fBufferCycle);
 		return;
 	}
 
-	switch (input.fInput.format.u.raw_audio.format) {
-		case media_raw_audio_format::B_AUDIO_FLOAT:
-			switch (input.fFormat.u.raw_audio.format) {
-				case media_raw_audio_format::B_AUDIO_FLOAT:
-				{
-					size_t frameSize = input.fInput.format.u.raw_audio
-						.channel_count * sizeof(float);
-					size_t stride = _PlaybackStride(input.fBufferCycle,
-						input.fChannelId);
-					//PRINT(("stride : %i, frame_size : %i, return_playback_buffer_size : %i\n", stride, frame_size, fDevice->BufferList().return_playback_buffer_size));
-					for (uint32 channel = 0; channel
-							< input.fInput.format.u.raw_audio.channel_count;
-							channel++) {
-						char* dest = _PlaybackBuffer(input.fBufferCycle,
+	if (channelCount != input.fFormat.u.raw_audio.channel_count) {
+		PRINT(("Channel count is different"));
+		return;
+	}
+
+	if (input.fResampler != NULL) {
+		size_t srcStride = channelCount * inputSampleSize;
+
+		for (uint32 channel = 0; channel < channelCount; channel++) {
+			char* src = (char*)buffer->Data() + channel * inputSampleSize;
+			char* dst = _PlaybackBuffer(input.fBufferCycle,
 							input.fChannelId + channel);
-						char* src = (char*)buffer->Data()
-							+ channel * sizeof(float);
-
-						for (uint32 i = bufferSize; i > 0; i--) {
-							*(float *)dest = *(float *)src;
-							dest += stride;
-							src += frameSize;
-						}
-					}
-					break;
-				}
-
-				case media_raw_audio_format::B_AUDIO_SHORT:
-					if (input.fInput.format.u.raw_audio.channel_count == 2) {
-						int16* dest1 = (int16*)_PlaybackBuffer(
-							input.fBufferCycle, input.fChannelId);
-						int16* dest2 = (int16*)_PlaybackBuffer(
-							input.fBufferCycle, input.fChannelId + 1);
-						float* src = (float*)buffer->Data();
-						if (_PlaybackStride(input.fBufferCycle,
-									input.fChannelId) == sizeof(int16)
-							&& _PlaybackStride(input.fBufferCycle,
-									input.fChannelId + 1) == sizeof(int16)) {
-							//PRINT(("FillNextBuffer : 2 channels strides 2\n"));
-							for (uint32 i = bufferSize; i > 0; i--) {
-								*dest1++ = int16(32767 * *src++);
-								*dest2++ = int16(32767 * *src++);
-							}
-						} else if (_PlaybackStride(input.fBufferCycle,
-									input.fChannelId) == 2 * sizeof(int16)
-							&& _PlaybackStride(input.fBufferCycle,
-									input.fChannelId + 1) == 2 * sizeof(int16)
-							&& dest1 + 1 == dest2) {
-							//PRINT(("FillNextBuffer : 2 channels strides 4\n"));
-							for (uint32 i = 2 * bufferSize; i > 0; i--)
-								*dest1++ = int16(32767 * *src++);
-						} else {
-							//PRINT(("FillNextBuffer : 2 channels strides != 2\n"));
-							size_t stride1 = _PlaybackStride(input.fBufferCycle,
-								input.fChannelId) / sizeof(int16);
-							size_t stride2 = _PlaybackStride(input.fBufferCycle,
-								input.fChannelId + 1) / sizeof(int16);
-							for (uint32 i = bufferSize; i > 0; i--) {
-								*dest1 = int16(32767 * *src++);
-								*dest2 = int16(32767 * *src++);
-								dest1 += stride1;
-								dest2 += stride2;
-							}
-						}
-					} else {
-						size_t frameSize = input.fInput.format.u
-							.raw_audio.channel_count * sizeof(int16);
-						size_t stride = _PlaybackStride(input.fBufferCycle,
-							input.fChannelId);
-						//PRINT(("stride : %i, frame_size : %i, return_playback_buffer_size : %i\n", stride, frame_size, fDevice->BufferList().return_playback_buffer_size));
-						for (uint32 channel = 0; channel <
-								input.fInput.format.u.raw_audio.channel_count;
-								channel++) {
-							char* dest = _PlaybackBuffer(input.fBufferCycle,
-								input.fChannelId + channel);
-							char* src = (char*)buffer->Data()
-								+ channel * sizeof(int16);
-
-							for (uint32 i = bufferSize; i > 0; i--) {
-								*(int16*)dest = int16(32767 * *(float*)src);
-								dest += stride;
-								src += frameSize;
-							}
-						}
-					}
-					break;
-
-				case media_raw_audio_format::B_AUDIO_INT:
-				default:
-					break;
-			}
-			break;
-
-		case media_raw_audio_format::B_AUDIO_INT:
-			switch (input.fFormat.u.raw_audio.format) {
-				case media_raw_audio_format::B_AUDIO_INT:
-				{
-					size_t frameSize = input.fInput.format.u.raw_audio
-						.channel_count * sizeof(int32);
-					size_t stride = _PlaybackStride(input.fBufferCycle,
-						input.fChannelId);
-					//PRINT(("stride : %i, frame_size : %i, return_playback_buffer_size : %i\n", stride, frame_size, fDevice->BufferList().return_playback_buffer_size));
-					for (uint32 channel = 0; channel
-							< input.fInput.format.u.raw_audio.channel_count;
-							channel++) {
-						char* dest = _PlaybackBuffer(input.fBufferCycle,
+			size_t dstStride = _PlaybackStride(input.fBufferCycle,
 							input.fChannelId + channel);
-						char* src = (char*)buffer->Data()
-							+ channel * sizeof(int32);
 
-						for (uint32 i = bufferSize; i > 0; i--) {
-							*(int32 *)dest = *(int32 *)src;
-							dest += stride;
-							src += frameSize;
-						}
-					}
-					break;
-				}
-				case media_raw_audio_format::B_AUDIO_SHORT:
-				case media_raw_audio_format::B_AUDIO_FLOAT:
-				default:
-					break;
-			}
-			break;
-
-		case media_raw_audio_format::B_AUDIO_SHORT:
-			switch (input.fFormat.u.raw_audio.format) {
-				case media_raw_audio_format::B_AUDIO_SHORT:
-					if (input.fInput.format.u.raw_audio.channel_count == 2) {
-						int16* dest1 = (int16*)_PlaybackBuffer(
-							input.fBufferCycle, input.fChannelId);
-						int16* dest2 = (int16*)_PlaybackBuffer(
-							input.fBufferCycle, input.fChannelId + 1);
-						int16* src = (int16*)buffer->Data();
-						if (_PlaybackStride(input.fBufferCycle,
-								input.fChannelId) == sizeof(int16)
-							&& _PlaybackStride(input.fBufferCycle,
-								input.fChannelId + 1) == sizeof(int16)) {
-							//PRINT(("FillNextBuffer : 2 channels strides 2\n"));
-							for (uint32 i = bufferSize; i > 0; i--) {
-								*dest1++ = *src++;
-								*dest2++ = *src++;
-							}
-						} else if (_PlaybackStride(input.fBufferCycle,
-								input.fChannelId) == 2 * sizeof(int16)
-							&& _PlaybackStride(input.fBufferCycle,
-								input.fChannelId + 1) == 2 * sizeof(int16)
-							&& dest1 + 1 == dest2) {
-								//PRINT(("FillNextBuffer : 2 channels strides 4\n"));
-								memcpy(dest1, src,
-									bufferSize * 2 * sizeof(int16));
-							} else {
-								//PRINT(("FillNextBuffer : 2 channels strides != 2\n"));
-								size_t stride1 = _PlaybackStride(
-									input.fBufferCycle, input.fChannelId) / 2;
-								size_t stride2 = _PlaybackStride(
-									input.fBufferCycle, input.fChannelId + 1)
-									/ 2;
-
-								for (uint32 i = bufferSize; i > 0; i--) {
-									*dest1 = *src++;
-									*dest2 = *src++;
-									dest1 += stride1;
-									dest2 += stride2;
-								}
-							}
-					} else {
-						size_t frameSize = input.fInput.format.u
-							.raw_audio.channel_count * sizeof(int16);
-						size_t stride = _PlaybackStride(input.fBufferCycle,
-							input.fChannelId);
-						//PRINT(("stride : %i, frame_size : %i, return_playback_buffer_size : %i\n", stride, frame_size, fDevice->BufferList().return_playback_buffer_size));
-						for (uint32 channel = 0; channel
-								< input.fInput.format.u.raw_audio.channel_count;
-								channel++) {
-							char* dest = _PlaybackBuffer(input.fBufferCycle,
-								input.fChannelId + channel);
-							char* src = (char*)buffer->Data()
-								+ channel * sizeof(int16);
-
-							for (uint32 i = bufferSize; i > 0; i--) {
-								*(int16*)dest = *(int16*)src;
-								dest += stride;
-								src += frameSize;
-							}
-						}
-					}
-					break;
-
-				case media_raw_audio_format::B_AUDIO_FLOAT:
-				case media_raw_audio_format::B_AUDIO_INT:
-				default:
-					break;
-			}
-			break;
-
-		case media_raw_audio_format::B_AUDIO_UCHAR:
-		default:
-			break;
+			input.fResampler->Resample(src, srcStride,
+				dst, dstStride, bufferSize);
+		}
 	}
 }
 
@@ -2154,7 +2094,7 @@ MultiAudioNode::_UpdateTimeSource(multi_buffer_info& info,
 
 
 BBuffer*
-MultiAudioNode::_FillNextBuffer(multi_buffer_info &info, node_output &channel)
+MultiAudioNode::_FillNextBuffer(multi_buffer_info &info, node_output &output)
 {
 	//CALLED();
 	// get a buffer from our buffer group
@@ -2162,15 +2102,16 @@ MultiAudioNode::_FillNextBuffer(multi_buffer_info &info, node_output &channel)
 	//PRINT(("MBI.record_buffer_cycle : %i\n", MBI.record_buffer_cycle));
 	//PRINT(("MBI.recorded_real_time : %i\n", MBI.recorded_real_time));
 	//PRINT(("MBI.recorded_frames_count : %i\n", MBI.recorded_frames_count));
-	if (!channel.fBufferGroup)
+	if (!output.fBufferGroup)
 		return NULL;
 
-	BBuffer* buffer = channel.fBufferGroup->RequestBuffer(
-		channel.fOutput.format.u.raw_audio.buffer_size, BufferDuration());
+	BBuffer* buffer = output.fBufferGroup->RequestBuffer(
+		output.fOutput.format.u.raw_audio.buffer_size, BufferDuration());
 	if (buffer == NULL) {
 		// If we fail to get a buffer (for example, if the request times out),
 		// we skip this buffer and go on to the next, to avoid locking up the
 		// control thread.
+		fprintf(stderr, "Buffer is null");
 		return NULL;
 	}
 
@@ -2181,17 +2122,34 @@ MultiAudioNode::_FillNextBuffer(multi_buffer_info &info, node_output &channel)
 	if (TimeSource() == NULL)
 		fprintf(stderr, "TimeSource() NULL\n");
 
-	// now fill it with data, continuing where the last buffer left off
-	memcpy(buffer->Data(),
-		fDevice->BufferList().record_buffers[info.record_buffer_cycle]
-			[channel.fChannelId
-				- fDevice->Description().output_channel_count].base,
-		channel.fOutput.format.u.raw_audio.buffer_size);
+	uint32 channelCount = output.fOutput.format.u.raw_audio.channel_count;
+	size_t outputSampleSize = output.fOutput.format.u.raw_audio.format
+		& media_raw_audio_format::B_AUDIO_SIZE_MASK;
+
+	uint32 bufferSize = fDevice->BufferList().return_record_buffer_size;
+
+	if (output.fResampler != NULL) {
+		size_t dstStride = channelCount * outputSampleSize;
+
+		uint32 channelId = output.fChannelId
+			- fDevice->Description().output_channel_count;
+
+		for (uint32 channel = 0; channel < channelCount; channel++) {
+			char* src = _RecordBuffer(output.fBufferCycle,
+									channelId + channel);
+			size_t srcStride = _RecordStride(output.fBufferCycle,
+									channelId + channel);
+			char* dst = (char*)buffer->Data() + channel * outputSampleSize;
+
+			output.fResampler->Resample(src, srcStride, dst, dstStride,
+				bufferSize);
+		}
+	}
 
 	// fill in the buffer header
 	media_header* header = buffer->Header();
 	header->type = B_MEDIA_RAW_AUDIO;
-	header->size_used = channel.fOutput.format.u.raw_audio.buffer_size;
+	header->size_used = output.fOutput.format.u.raw_audio.buffer_size;
 	header->time_source = TimeSource()->ID();
 	header->start_time = PerformanceTimeFor(info.recorded_real_time);
 
@@ -2357,6 +2315,58 @@ MultiAudioNode::_SetNodeInputFrameRate(float frameRate)
 
 	// update internal latency
 	_UpdateInternalLatency(fOutputPreferredFormat);
+
+	return B_OK;
+}
+
+
+status_t
+MultiAudioNode::_SetNodeOutputFrameRate(float frameRate)
+{
+	// check whether the frame rate is supported
+	uint32 multiAudioRate = MultiAudio::convert_from_sample_rate(frameRate);
+	if ((fDevice->Description().input_rates & multiAudioRate) == 0)
+		return B_BAD_VALUE;
+
+	BAutolock locker(fBufferLock);
+
+	// already set?
+	if (fDevice->FormatInfo().input.rate == multiAudioRate)
+		return B_OK;
+
+	// set the frame rate on the device
+	status_t error = fDevice->SetInputFrameRate(multiAudioRate);
+	if (error != B_OK)
+		return error;
+
+	// it went fine -- update all formats
+	fInputPreferredFormat.u.raw_audio.frame_rate = frameRate;
+	fInputPreferredFormat.u.raw_audio.buffer_size
+		= fDevice->BufferList().return_record_buffer_size
+			* (fInputPreferredFormat.u.raw_audio.format
+				& media_raw_audio_format::B_AUDIO_SIZE_MASK)
+			* fInputPreferredFormat.u.raw_audio.channel_count;
+
+	for (int32 i = 0; node_output* channel = (node_output*)fOutputs.ItemAt(i);
+			i++) {
+		channel->fPreferredFormat.u.raw_audio.frame_rate = frameRate;
+		channel->fPreferredFormat.u.raw_audio.buffer_size
+			= fInputPreferredFormat.u.raw_audio.buffer_size;
+
+		channel->fFormat.u.raw_audio.frame_rate = frameRate;
+		channel->fFormat.u.raw_audio.buffer_size
+			= fInputPreferredFormat.u.raw_audio.buffer_size;
+
+		channel->fOutput.format.u.raw_audio.frame_rate = frameRate;
+		channel->fOutput.format.u.raw_audio.buffer_size
+			= fInputPreferredFormat.u.raw_audio.buffer_size;
+	}
+
+	// make sure the time base is reset
+	fTimeComputer.SetFrameRate(frameRate);
+
+	// update internal latency
+	_UpdateInternalLatency(fInputPreferredFormat);
 
 	return B_OK;
 }

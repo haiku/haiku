@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <GL/gl.h>
 #include <GL/glu.h>

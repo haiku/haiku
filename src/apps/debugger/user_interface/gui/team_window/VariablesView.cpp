@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -11,32 +11,49 @@
 
 #include <new>
 
+#include <debugger.h>
+
+#include <Alert.h>
 #include <Looper.h>
 #include <PopUpMenu.h>
+#include <ToolTip.h>
 
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
+#include <PromptWindow.h>
 
 #include "table/TableColumns.h"
 
+#include "ActionMenuItem.h"
 #include "Architecture.h"
+#include "FileSourceCode.h"
+#include "Function.h"
 #include "FunctionID.h"
 #include "FunctionInstance.h"
+#include "GuiSettingsUtils.h"
 #include "MessageCodes.h"
+#include "RangeList.h"
+#include "Register.h"
 #include "SettingsMenu.h"
+#include "SourceLanguage.h"
+#include "StackTrace.h"
 #include "StackFrame.h"
 #include "StackFrameValues.h"
 #include "TableCellValueRenderer.h"
 #include "Team.h"
+#include "TeamDebugInfo.h"
 #include "Thread.h"
 #include "Tracing.h"
 #include "TypeComponentPath.h"
 #include "TypeHandlerRoster.h"
+#include "TypeLookupConstraints.h"
+#include "UiUtils.h"
 #include "Value.h"
 #include "ValueHandler.h"
 #include "ValueHandlerRoster.h"
+#include "ValueLocation.h"
 #include "ValueNode.h"
-#include "ValueNodeContainer.h"
+#include "ValueNodeManager.h"
 #include "Variable.h"
 #include "VariableValueNodeChild.h"
 #include "VariablesViewState.h"
@@ -94,6 +111,8 @@ public:
 		fValue(NULL),
 		fValueHandler(NULL),
 		fTableCellRenderer(NULL),
+		fLastRendererSettings(),
+		fCastedType(NULL),
 		fComponentPath(NULL),
 		fIsPresentationNode(isPresentationNode),
 		fHidden(false)
@@ -114,6 +133,9 @@ public:
 
 		if (fComponentPath != NULL)
 			fComponentPath->ReleaseReference();
+
+		if (fCastedType != NULL)
+			fCastedType->ReleaseReference();
 	}
 
 	status_t Init()
@@ -178,6 +200,31 @@ public:
 
 		if (fValue != NULL)
 			fValue->AcquireReference();
+	}
+
+	Type* GetCastedType() const
+	{
+		return fCastedType;
+	}
+
+	void SetCastedType(Type* type)
+	{
+		if (fCastedType != NULL)
+			fCastedType->ReleaseReference();
+
+		fCastedType = type;
+		if (type != NULL)
+			fCastedType->AcquireReference();
+	}
+
+	const BMessage& GetLastRendererSettings() const
+	{
+		return fLastRendererSettings;
+	}
+
+	void SetLastRendererSettings(const BMessage& settings)
+	{
+		fLastRendererSettings = settings;
 	}
 
 	TypeComponentPath* GetPath() const
@@ -263,6 +310,23 @@ public:
 		return true;
 	}
 
+	bool RemoveChild(ModelNode* child)
+	{
+		if (!fChildren.RemoveItem(child))
+			return false;
+
+		child->ReleaseReference();
+		return true;
+	}
+
+	bool RemoveAllChildren()
+	{
+		for (int32 i = 0; i < fChildren.CountItems(); i++)
+			RemoveChild(fChildren.ItemAt(i));
+
+		return true;
+	}
+
 private:
 	typedef BObjectList<ModelNode> ChildList;
 
@@ -273,6 +337,8 @@ private:
 	Value*					fValue;
 	ValueHandler*			fValueHandler;
 	TableCellValueRenderer*	fTableCellRenderer;
+	BMessage				fLastRendererSettings;
+	Type*					fCastedType;
 	ChildList				fChildren;
 	TypeComponentPath*		fComponentPath;
 	bool					fIsPresentationNode;
@@ -309,10 +375,12 @@ protected:
 					targetView);
 				return;
 			}
+		} else if (value.Type() == B_STRING_TYPE) {
+			fField.SetString(value.ToString());
+		} else {
+			// fall back to drawing an empty string
+			fField.SetString("");
 		}
-
-		// fall back to drawing an empty string
-		fField.SetString("");
 		fField.SetWidth(Width());
 		fColumn.DrawField(&fField, rect, targetView);
 	}
@@ -342,7 +410,8 @@ protected:
 // #pragma mark - VariableTableModel
 
 
-class VariablesView::VariableTableModel : public TreeTableModel {
+class VariablesView::VariableTableModel : public TreeTableModel,
+	public TreeTableToolTipProvider {
 public:
 								VariableTableModel();
 								~VariableTableModel();
@@ -375,6 +444,10 @@ public:
 
 			void				NotifyNodeChanged(ModelNode* node);
 			void				NotifyNodeHidden(ModelNode* node);
+
+	virtual	bool				GetToolTipForTablePath(
+									const TreeTablePath& path,
+									int32 columnIndex, BToolTip** _tip);
 
 private:
 			struct NodeHashDefinition {
@@ -413,17 +486,10 @@ private:
 									ValueNodeChild* nodeChild,
 									bool isPresentationNode = false,
 									bool isOnlyChild = false);
-			void				_AddNode(Variable* variable);
-			status_t			_CreateValueNode(ValueNodeChild* nodeChild);
-			status_t			_AddChildNodes(ValueNodeChild* nodeChild);
-
-//			ModelNode*			_GetNode(Variable* variable,
-//									TypeComponentPath* path) const;
 
 private:
 			Thread*				fThread;
-			StackFrame*			fStackFrame;
-			ValueNodeContainer*	fContainer;
+			ValueNodeManager*	fNodeManager;
 			ContainerListener*	fContainerListener;
 			NodeList			fNodes;
 			NodeTable			fNodeTable;
@@ -486,34 +552,77 @@ public:
 	}
 
 	status_t Init(Settings* rendererSettings,
-		SettingsMenu* rendererSettingsMenu)
+		SettingsMenu* rendererSettingsMenu,
+		ContextActionList* preSettingsActions = NULL,
+		ContextActionList* postSettingsActions = NULL)
 	{
-		fRendererSettings = rendererSettings;
-		fRendererSettings->AcquireReference();
+		if (rendererSettings == NULL && preSettingsActions == NULL
+			&& postSettingsActions == NULL) {
+			return B_BAD_VALUE;
+		}
 
-		fRendererSettingsMenu = rendererSettingsMenu;
-		fRendererSettingsMenu->AcquireReference();
+		if (rendererSettings != NULL) {
+			fRendererSettings = rendererSettings;
+			fRendererSettings->AcquireReference();
+
+
+			fRendererSettingsMenu = rendererSettingsMenu;
+			fRendererSettingsMenu->AcquireReference();
+		}
 
 		fContextMenu = new(std::nothrow) ContextMenu(fParent,
 			"table cell settings popup");
 		if (fContextMenu == NULL)
 			return B_NO_MEMORY;
 
-		status_t error = fRendererSettingsMenu->AddToMenu(fContextMenu, 0);
-		if (error != B_OK)
-			return error;
+		status_t error = B_OK;
+		if (preSettingsActions != NULL
+			&& preSettingsActions->CountItems() > 0) {
+			error = _AddActionItems(preSettingsActions);
+			if (error != B_OK)
+				return error;
 
-		AutoLocker<Settings> settingsLocker(fRendererSettings);
-		fRendererSettings->AddListener(this);
+			if (fRendererSettingsMenu != NULL || postSettingsActions != NULL)
+				fContextMenu->AddSeparatorItem();
+		}
 
-		fRendererMenuAdded = true;
+		if (fRendererSettingsMenu != NULL) {
+			error = fRendererSettingsMenu->AddToMenu(fContextMenu,
+				fContextMenu->CountItems());
+			if (error != B_OK)
+				return error;
+
+			if (postSettingsActions != NULL)
+				fContextMenu->AddSeparatorItem();
+		}
+
+		if (postSettingsActions != NULL) {
+			error = _AddActionItems(postSettingsActions);
+			if (error != B_OK)
+				return error;
+
+		}
+
+		if (fRendererSettings != NULL) {
+			AutoLocker<Settings> settingsLocker(fRendererSettings);
+			fRendererSettings->AddListener(this);
+			fRendererMenuAdded = true;
+		}
 
 		return B_OK;
 	}
 
 	void ShowMenu(BPoint screenWhere)
 	{
-		fRendererSettingsMenu->PrepareToShow(fParentLooper);
+		if (fRendererMenuAdded)
+			fRendererSettingsMenu->PrepareToShow(fParentLooper);
+
+		for (int32 i = 0; i < fContextMenu->CountItems(); i++) {
+			ActionMenuItem* item = dynamic_cast<ActionMenuItem*>(
+				fContextMenu->ItemAt(i));
+			if (item != NULL)
+				item->PrepareToShow(fParentLooper, fParent.Target(NULL));
+		}
 
 		fMenuPreparedToShow = true;
 
@@ -527,7 +636,18 @@ public:
 		bool stillActive = false;
 
 		if (fMenuPreparedToShow) {
-			stillActive = fRendererSettingsMenu->Finish(fParentLooper, force);
+			if (fRendererMenuAdded)
+				stillActive = fRendererSettingsMenu->Finish(fParentLooper,
+					force);
+			for (int32 i = 0; i < fContextMenu->CountItems(); i++) {
+				ActionMenuItem* item = dynamic_cast<ActionMenuItem*>(
+					fContextMenu->ItemAt(i));
+				if (item != NULL) {
+					stillActive |= item->Finish(fParentLooper,
+						fParent.Target(NULL), force);
+				}
+			}
+
 			fMenuPreparedToShow = stillActive;
 		}
 
@@ -556,6 +676,24 @@ private:
 			|| fParent.SendMessage(&message) != B_OK) {
 			fNode->ReleaseReference();
 		}
+	}
+
+	status_t _AddActionItems(ContextActionList* actions)
+	{
+		if (fContextMenu == NULL)
+			return B_BAD_VALUE;
+
+		int32 index = fContextMenu->CountItems();
+		for (int32 i = 0; ActionMenuItem* item = actions->ItemAt(i); i++) {
+			if (!fContextMenu->AddItem(item, index + i)) {
+				for (i--; i >= 0; i--)
+					fContextMenu->RemoveItem(fContextMenu->ItemAt(index + i));
+
+				return B_NO_MEMORY;
+			}
+		}
+
+		return B_OK;
 	}
 
 private:
@@ -731,8 +869,8 @@ VariablesView::ContainerListener::ModelNodeRestoreViewStateRequested(
 
 VariablesView::VariableTableModel::VariableTableModel()
 	:
-	fStackFrame(NULL),
-	fContainer(NULL),
+	fThread(NULL),
+	fNodeManager(NULL),
 	fContainerListener(NULL),
 	fNodeTable()
 {
@@ -741,13 +879,18 @@ VariablesView::VariableTableModel::VariableTableModel()
 
 VariablesView::VariableTableModel::~VariableTableModel()
 {
-	SetStackFrame(NULL, NULL);
+	if (fNodeManager != NULL)
+		fNodeManager->ReleaseReference();
 }
 
 
 status_t
 VariablesView::VariableTableModel::Init()
 {
+	fNodeManager = new(std::nothrow) ValueNodeManager();
+	if (fNodeManager == NULL)
+		return B_NO_MEMORY;
+
 	return fNodeTable.Init();
 }
 
@@ -760,10 +903,8 @@ VariablesView::VariableTableModel::SetContainerListener(
 		return;
 
 	if (fContainerListener != NULL) {
-		if (fContainer != NULL) {
-			AutoLocker<ValueNodeContainer> containerLocker(fContainer);
-			fContainer->RemoveListener(fContainerListener);
-		}
+		if (fNodeManager != NULL)
+			fNodeManager->RemoveListener(fContainerListener);
 
 		fContainerListener->SetModel(NULL);
 	}
@@ -773,10 +914,8 @@ VariablesView::VariableTableModel::SetContainerListener(
 	if (fContainerListener != NULL) {
 		fContainerListener->SetModel(this);
 
-		if (fContainer != NULL) {
-			AutoLocker<ValueNodeContainer> containerLocker(fContainer);
-			fContainer->AddListener(fContainerListener);
-		}
+		if (fNodeManager != NULL)
+			fNodeManager->AddListener(fContainerListener);
 	}
 }
 
@@ -785,17 +924,9 @@ void
 VariablesView::VariableTableModel::SetStackFrame(Thread* thread,
 	StackFrame* stackFrame)
 {
-	if (fContainer != NULL) {
-		AutoLocker<ValueNodeContainer> containerLocker(fContainer);
+	fThread = thread;
 
-		if (fContainerListener != NULL)
-			fContainer->RemoveListener(fContainerListener);
-
-		fContainer->RemoveAllChildren();
-		containerLocker.Unlock();
-		fContainer->ReleaseReference();
-		fContainer = NULL;
-	}
+	fNodeManager->SetStackFrame(thread, stackFrame);
 
 	fNodeTable.Clear(true);
 
@@ -807,38 +938,19 @@ VariablesView::VariableTableModel::SetStackFrame(Thread* thread,
 		NotifyNodesRemoved(TreeTablePath(), 0, count);
 	}
 
-	fStackFrame = stackFrame;
-	fThread = thread;
+	if (stackFrame == NULL)
+		return;
 
-	if (fStackFrame != NULL) {
-		fContainer = new(std::nothrow) ValueNodeContainer;
-		if (fContainer == NULL)
-			return;
+	ValueNodeContainer* container = fNodeManager->GetContainer();
+	AutoLocker<ValueNodeContainer> containerLocker(container);
 
-		status_t error = fContainer->Init();
-		if (error != B_OK) {
-			delete fContainer;
-			fContainer = NULL;
-			return;
-		}
-
-		AutoLocker<ValueNodeContainer> containerLocker(fContainer);
-
-		if (fContainerListener != NULL)
-			fContainer->AddListener(fContainerListener);
-
-		for (int32 i = 0; Variable* variable = fStackFrame->ParameterAt(i);
-				i++) {
-			_AddNode(variable);
-		}
-
-		for (int32 i = 0; Variable* variable
-				= fStackFrame->LocalVariableAt(i); i++) {
-			_AddNode(variable);
-		}
-
-//		if (!fNodes.IsEmpty())
-//			NotifyNodesAdded(TreeTablePath(), 0, fNodes.CountItems());
+	for (int32 i = 0; i < container->CountChildren(); i++) {
+		VariableValueNodeChild* child = dynamic_cast<VariableValueNodeChild *>(
+			container->ChildAt(i));
+		_AddNode(child->GetVariable(), NULL, child);
+		// top level nodes get their children added immediately
+		// so those won't invoke our callback hook. Add them directly here.
+		ValueNodeChildrenCreated(child->Node());
 	}
 }
 
@@ -847,11 +959,16 @@ void
 VariablesView::VariableTableModel::ValueNodeChanged(ValueNodeChild* nodeChild,
 	ValueNode* oldNode, ValueNode* newNode)
 {
-	if (fContainer == NULL)
+	AutoLocker<ValueNodeContainer> containerLocker(
+		fNodeManager->GetContainer());
+	ModelNode* modelNode = fNodeTable.Lookup(nodeChild);
+	if (modelNode == NULL)
 		return;
 
-	AutoLocker<ValueNodeContainer> containerLocker(fContainer);
-// TODO:...
+	if (oldNode != NULL) {
+		ValueNodeChildrenDeleted(oldNode);
+		NotifyNodeChanged(modelNode);
+	}
 }
 
 
@@ -859,10 +976,8 @@ void
 VariablesView::VariableTableModel::ValueNodeChildrenCreated(
 	ValueNode* valueNode)
 {
-	if (fContainer == NULL)
-		return;
-
-	AutoLocker<ValueNodeContainer> containerLocker(fContainer);
+	AutoLocker<ValueNodeContainer> containerLocker(
+		fNodeManager->GetContainer());
 
 	// check whether we know the node
 	ValueNodeChild* nodeChild = valueNode->NodeChild();
@@ -883,11 +998,9 @@ VariablesView::VariableTableModel::ValueNodeChildrenCreated(
 				child->IsInternal(), childCount == 1);
 		}
 
-		if (valueNode->ChildCreationNeedsValue()) {
-			ModelNode* childNode = fNodeTable.Lookup(child);
-			if (childNode != NULL)
-				fContainerListener->ModelNodeValueRequested(childNode);
-		}
+		ModelNode* childNode = fNodeTable.Lookup(child);
+		if (childNode != NULL)
+			fContainerListener->ModelNodeValueRequested(childNode);
 	}
 
 	if (valueNode->ChildCreationNeedsValue())
@@ -898,21 +1011,52 @@ VariablesView::VariableTableModel::ValueNodeChildrenCreated(
 void
 VariablesView::VariableTableModel::ValueNodeChildrenDeleted(ValueNode* node)
 {
-	if (fContainer == NULL)
+	AutoLocker<ValueNodeContainer> containerLocker(
+		fNodeManager->GetContainer());
+
+	// check whether we know the node
+	ValueNodeChild* nodeChild = node->NodeChild();
+	if (nodeChild == NULL)
 		return;
 
-	AutoLocker<ValueNodeContainer> containerLocker(fContainer);
-// TODO:...
+	ModelNode* modelNode = fNodeTable.Lookup(nodeChild);
+	if (modelNode == NULL)
+		return;
+
+	// in the case of an address node with a hidden child,
+	// we want to send removal notifications for the children
+	// instead.
+	BReference<ModelNode> hiddenChild;
+	if (modelNode->CountChildren() == 1
+		&& modelNode->ChildAt(0)->IsHidden()) {
+		hiddenChild.SetTo(modelNode->ChildAt(0));
+		modelNode->RemoveChild(hiddenChild);
+		modelNode = hiddenChild;
+		fNodeTable.Remove(hiddenChild);
+	}
+
+	for (int32 i = modelNode->CountChildren() - 1; i >= 0 ; i--) {
+		BReference<ModelNode> childNode = modelNode->ChildAt(i);
+		// recursively remove the current node's child hierarchy.
+		if (childNode->CountChildren() != 0)
+			ValueNodeChildrenDeleted(childNode->NodeChild()->Node());
+
+		TreeTablePath treePath;
+		if (GetTreePath(childNode, treePath)) {
+			int32 index = treePath.RemoveLastComponent();
+			NotifyNodesRemoved(treePath, index, 1);
+		}
+		modelNode->RemoveChild(childNode);
+		fNodeTable.Remove(childNode);
+	}
 }
 
 
 void
 VariablesView::VariableTableModel::ValueNodeValueChanged(ValueNode* valueNode)
 {
-	if (fContainer == NULL)
-		return;
-
-	AutoLocker<ValueNodeContainer> containerLocker(fContainer);
+	AutoLocker<ValueNodeContainer> containerLocker(
+		fNodeManager->GetContainer());
 
 	// check whether we know the node
 	ValueNodeChild* nodeChild = valueNode->NodeChild();
@@ -922,19 +1066,6 @@ VariablesView::VariableTableModel::ValueNodeValueChanged(ValueNode* valueNode)
 	ModelNode* modelNode = fNodeTable.Lookup(nodeChild);
 	if (modelNode == NULL)
 		return;
-
-	if (valueNode->ChildCreationNeedsValue()
-		&& !valueNode->ChildrenCreated()) {
-		status_t error = valueNode->CreateChildren();
-		if (error != B_OK)
-			return;
-
-		for (int32 i = 0; i < valueNode->CountChildren(); i++) {
-			ValueNodeChild* child = valueNode->ChildAt(i);
-			_CreateValueNode(child);
-			_AddChildNodes(child);
-		}
-	}
 
 	// check whether the value actually changed
 	Value* value = valueNode->GetValue();
@@ -959,6 +1090,14 @@ VariablesView::VariableTableModel::ValueNodeValueChanged(ValueNode* valueNode)
 	modelNode->SetValue(value);
 	modelNode->SetValueHandler(valueHandler);
 	modelNode->SetTableCellRenderer(renderer);
+
+	// we have to restore renderer settings here since until this point
+	// we don't yet know what renderer is in use.
+	if (renderer != NULL) {
+		Settings* settings = renderer->GetSettings();
+		if (settings != NULL)
+			settings->RestoreValues(modelNode->GetLastRendererSettings());
+	}
 
 	// notify table model listeners
 	NotifyNodeChanged(modelNode);
@@ -1030,8 +1169,29 @@ VariablesView::VariableTableModel::GetValueAt(void* object, int32 columnIndex,
 			_value.SetTo(node->Name(), B_VARIANT_DONT_COPY_DATA);
 			return true;
 		case 1:
-			if (node->GetValue() == NULL)
+			if (node->GetValue() == NULL) {
+				ValueLocation* location = node->NodeChild()->Location();
+				if (location == NULL)
+					return false;
+
+				Type* nodeChildRawType = node->NodeChild()->Node()->GetType()
+					->ResolveRawType(false);
+				if (nodeChildRawType->Kind() == TYPE_COMPOUND)
+				{
+					if (location->CountPieces() > 1)
+						return false;
+
+					BString data;
+					ValuePieceLocation piece = location->PieceAt(0);
+					if (piece.type != VALUE_PIECE_LOCATION_MEMORY)
+						return false;
+
+					data.SetToFormat("[@ %#" B_PRIx64 "]", piece.address);
+					_value.SetTo(data);
+					return true;
+				}
 				return false;
+			}
 
 			_value.SetTo(node, VALUE_NODE_TYPE);
 			return true;
@@ -1044,11 +1204,8 @@ VariablesView::VariableTableModel::GetValueAt(void* object, int32 columnIndex,
 void
 VariablesView::VariableTableModel::NodeExpanded(ModelNode* node)
 {
-	if (fContainer == NULL)
-		return;
-
-	AutoLocker<ValueNodeContainer> containerLocker(fContainer);
-
+	AutoLocker<ValueNodeContainer> containerLocker(
+		fNodeManager->GetContainer());
 	// add children of all children
 
 	// If the node only has a hidden child, add the child's children instead.
@@ -1060,7 +1217,7 @@ VariablesView::VariableTableModel::NodeExpanded(ModelNode* node)
 
 	// add the children
 	for (int32 i = 0; ModelNode* child = node->ChildAt(i); i++)
-		_AddChildNodes(child->NodeChild());
+		fNodeManager->AddChildNodes(child->NodeChild());
 }
 
 
@@ -1081,6 +1238,72 @@ void
 VariablesView::VariableTableModel::NotifyNodeHidden(ModelNode* node)
 {
 	fContainerListener->ModelNodeHidden(node);
+}
+
+
+bool
+VariablesView::VariableTableModel::GetToolTipForTablePath(
+	const TreeTablePath& path, int32 columnIndex, BToolTip** _tip)
+{
+	ModelNode* node = (ModelNode*)NodeForPath(path);
+	if (node == NULL)
+		return false;
+
+	if (node->NodeChild()->LocationResolutionState() != B_OK)
+		return false;
+
+	BString tipData;
+	switch (columnIndex) {
+		case 0:
+		{
+			ValueLocation* location = node->NodeChild()->Location();
+			for (int32 i = 0; i < location->CountPieces(); i++) {
+				ValuePieceLocation piece = location->PieceAt(i);
+				BString pieceData;
+				switch (piece.type) {
+					case VALUE_PIECE_LOCATION_MEMORY:
+						pieceData.SetToFormat("(%" B_PRId32 "): Address: %#"
+							B_PRIx64 ", Size: %" B_PRId64 " bytes", i,
+							piece.address, piece.size);
+						break;
+					case VALUE_PIECE_LOCATION_REGISTER:
+					{
+						Architecture* architecture = fThread->GetTeam()
+							->GetArchitecture();
+						pieceData.SetToFormat("(%" B_PRId32 "): Register (%s)",
+							i, architecture->Registers()[piece.reg].Name());
+						break;
+					}
+					default:
+						break;
+				}
+
+				tipData	+= pieceData;
+				if (i < location->CountPieces() - 1)
+					tipData += "\n";
+			}
+			break;
+		}
+		case 1:
+		{
+			Value* value = node->GetValue();
+			if (value != NULL)
+				value->ToString(tipData);
+
+			break;
+		}
+		default:
+			break;
+	}
+
+	if (tipData.IsEmpty())
+		return false;
+
+	*_tip = new(std::nothrow) BTextToolTip(tipData);
+	if (*_tip == NULL)
+		return false;
+
+	return true;
 }
 
 
@@ -1124,16 +1347,20 @@ VariablesView::VariableTableModel::_AddNode(Variable* variable,
 	// is a compound type, mark it hidden
 	if (isOnlyChild && parent != NULL) {
 		ValueNode* parentValueNode = parent->NodeChild()->Node();
-		if (parentValueNode != NULL
-			&& parentValueNode->GetType()->ResolveRawType(false)->Kind()
-				== TYPE_ADDRESS
-			&& nodeChildRawType->Kind() == TYPE_COMPOUND) {
-			node->SetHidden(true);
+		if (parentValueNode != NULL) {
+			if (parentValueNode->GetType()->ResolveRawType(false)->Kind()
+				== TYPE_ADDRESS) {
+				type_kind childKind = nodeChildRawType->Kind();
+				if (childKind == TYPE_COMPOUND || childKind == TYPE_ARRAY) {
+					node->SetHidden(true);
 
-			// we need to tell the listener about nodes like this so any
-			// necessary actions can be taken for them (i.e. value resolution),
-			// since they're otherwise invisible to outsiders.
-			NotifyNodeHidden(node);
+					// we need to tell the listener about nodes like this so
+					// any necessary actions can be taken for them (i.e. value
+					// resolution), since they're otherwise invisible to
+					// outsiders.
+					NotifyNodeHidden(node);
+				}
+			}
 		}
 	}
 
@@ -1146,148 +1373,10 @@ VariablesView::VariableTableModel::_AddNode(Variable* variable,
 
 	// if the node is hidden, add its children
 	if (node->IsHidden())
-		_AddChildNodes(nodeChild);
+		fNodeManager->AddChildNodes(nodeChild);
 
 	return B_OK;
 }
-
-
-void
-VariablesView::VariableTableModel::_AddNode(Variable* variable)
-{
-	// create the node child for the variable
-	ValueNodeChild* nodeChild = new (std::nothrow) VariableValueNodeChild(
-		variable);
-	BReference<ValueNodeChild> nodeChildReference(nodeChild, true);
-	if (nodeChild == NULL || !fContainer->AddChild(nodeChild)) {
-		delete nodeChild;
-		return;
-	}
-
-	// create the model node
-	status_t error = _AddNode(variable, NULL, nodeChild, false);
-	if (error != B_OK)
-		return;
-
-	// automatically add child nodes for the top level nodes
-	_AddChildNodes(nodeChild);
-}
-
-
-status_t
-VariablesView::VariableTableModel::_CreateValueNode(ValueNodeChild* nodeChild)
-{
-	if (nodeChild->Node() != NULL)
-		return B_OK;
-
-	// create the node
-	ValueNode* valueNode;
-	status_t error;
-	if (nodeChild->IsInternal()) {
-		error = nodeChild->CreateInternalNode(valueNode);
-	} else {
-		error = TypeHandlerRoster::Default()->CreateValueNode(nodeChild,
-			nodeChild->GetType(), valueNode);
-	}
-
-	if (error != B_OK)
-		return error;
-
-	nodeChild->SetNode(valueNode);
-	valueNode->ReleaseReference();
-
-	return B_OK;
-}
-
-
-status_t
-VariablesView::VariableTableModel::_AddChildNodes(ValueNodeChild* nodeChild)
-{
-	// create a value node for the value node child, if doesn't have one yet
-	ValueNode* valueNode = nodeChild->Node();
-	if (valueNode == NULL) {
-		status_t error = _CreateValueNode(nodeChild);
-		if (error != B_OK)
-			return error;
-		valueNode = nodeChild->Node();
-	}
-
-	// check if this node requires child creation
-	// to be deferred until after its location/value have been resolved
-	if (valueNode->ChildCreationNeedsValue())
-		return B_OK;
-
-	// create the children, if not done yet
-	if (valueNode->ChildrenCreated())
-		return B_OK;
-
-	return valueNode->CreateChildren();
-}
-
-
-//VariablesView::ModelNode*
-//VariablesView::VariableTableModel::_GetNode(Variable* variable,
-//	TypeComponentPath* path) const
-//{
-//	// find the variable node
-//	ModelNode* node;
-//	for (int32 i = 0; (node = fNodes.ItemAt(i)) != NULL; i++) {
-//		if (node->GetVariable() == variable)
-//			break;
-//	}
-//	if (node == NULL)
-//		return NULL;
-//
-//	// Now walk along the path, finding the respective child node for each
-//	// component (might be several components at once).
-//	int32 componentCount = path->CountComponents();
-//	for (int32 i = 0; i < componentCount;) {
-//		ModelNode* childNode = NULL;
-//
-//		for (int32 k = 0; (childNode = node->ChildAt(k)) != NULL; k++) {
-//			TypeComponentPath* childPath = childNode->Path();
-//			int32 childComponentCount = childPath->CountComponents();
-//			if (childComponentCount > componentCount)
-//				continue;
-//
-//			for (int32 componentIndex = i;
-//				componentIndex < childComponentCount; componentIndex++) {
-//				TypeComponent childComponent
-//					= childPath->ComponentAt(componentIndex);
-//				TypeComponent pathComponent
-//					= path->ComponentAt(componentIndex);
-//				if (childComponent != pathComponent) {
-//					if (componentIndex + 1 == childComponentCount
-//						&& pathComponent.HasPrefix(childComponent)) {
-//						// The last child component is a prefix of the
-//						// corresponding path component. We consider this a
-//						// match, but need to recheck the component with the
-//						// next node level.
-//						childComponentCount--;
-//						break;
-//					}
-//
-//					// mismatch -- skip the child
-//					childNode = NULL;
-//					break;
-//				}
-//			}
-//
-//			if (childNode != NULL) {
-//				// got a match -- skip the matched children components
-//				i = childComponentCount;
-//				break;
-//			}
-//		}
-//
-//		if (childNode == NULL)
-//			return NULL;
-//
-//		node = childNode;
-//	}
-//
-//	return node;
-//}
 
 
 bool
@@ -1411,6 +1500,156 @@ void
 VariablesView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case MSG_SHOW_INSPECTOR_WINDOW:
+		{
+			// TODO: it'd probably be more ideal to extend the context
+			// action mechanism to allow one to specify an explicit
+			// target for each action rather than them all defaulting
+			// to targetting here.
+			Looper()->PostMessage(message);
+			break;
+		}
+		case MSG_SHOW_TYPECAST_NODE_PROMPT:
+		{
+			BMessage* promptMessage = new(std::nothrow) BMessage(
+				MSG_TYPECAST_NODE);
+
+			if (promptMessage == NULL)
+				return;
+
+			ObjectDeleter<BMessage> messageDeleter(promptMessage);
+			promptMessage->AddPointer("node", fVariableTable
+				->SelectionModel()->NodeAt(0));
+			PromptWindow* promptWindow = new(std::nothrow) PromptWindow(
+				"Specify Type", "Type: ", NULL, BMessenger(this),
+				promptMessage);
+			if (promptWindow == NULL)
+				return;
+
+			messageDeleter.Detach();
+			promptWindow->CenterOnScreen();
+			promptWindow->Show();
+			break;
+		}
+		case MSG_TYPECAST_NODE:
+		{
+			ModelNode* node = NULL;
+			if (message->FindPointer("node", reinterpret_cast<void **>(&node))
+				!= B_OK) {
+				break;
+			}
+
+			Type* type = NULL;
+			BString typeExpression = message->FindString("text");
+			if (typeExpression.Length() == 0)
+				break;
+
+			FileSourceCode* code = fStackFrame->Function()->GetFunction()
+				->GetSourceCode();
+			if (code == NULL)
+				break;
+
+			SourceLanguage* language = code->GetSourceLanguage();
+			if (language == NULL)
+				break;
+
+			if (language->ParseTypeExpression(typeExpression,
+				fThread->GetTeam()->DebugInfo(), type) != B_OK) {
+				BString errorMessage;
+				errorMessage.SetToFormat("Failed to resolve type %s",
+					typeExpression.String());
+				BAlert* alert = new(std::nothrow) BAlert("Error",
+					errorMessage.String(), "Close");
+				if (alert != NULL)
+					alert->Go();
+				break;
+			}
+
+			ValueNode* valueNode = NULL;
+			if (TypeHandlerRoster::Default()->CreateValueNode(
+				node->NodeChild(), type, valueNode) != B_OK) {
+				break;
+			}
+
+			node->NodeChild()->SetNode(valueNode);
+			node->SetCastedType(type);
+			break;
+		}
+		case MSG_SHOW_CONTAINER_RANGE_PROMPT:
+		{
+			ModelNode* node = (ModelNode*)fVariableTable
+				->SelectionModel()->NodeAt(0);
+			int32 lowerBound, upperBound;
+			ValueNode* valueNode = node->NodeChild()->Node();
+			if (valueNode->SupportedChildRange(lowerBound, upperBound) != B_OK)
+				break;
+
+			BMessage* promptMessage = new(std::nothrow) BMessage(
+				MSG_SET_CONTAINER_RANGE);
+			if (promptMessage == NULL)
+				break;
+
+			ObjectDeleter<BMessage> messageDeleter(promptMessage);
+			promptMessage->AddPointer("node", node);
+			BString infoText;
+			infoText.SetToFormat("Allowed range: %" B_PRId32
+				"-%" B_PRId32 ".", lowerBound, upperBound);
+			PromptWindow* promptWindow = new(std::nothrow) PromptWindow(
+				"Set Range", "Range: ", infoText.String(), BMessenger(this),
+				promptMessage);
+			if (promptWindow == NULL)
+				return;
+
+			messageDeleter.Detach();
+			promptWindow->CenterOnScreen();
+			promptWindow->Show();
+			break;
+		}
+		case MSG_SET_CONTAINER_RANGE:
+		{
+			ModelNode* node = (ModelNode*)fVariableTable
+				->SelectionModel()->NodeAt(0);
+			int32 lowerBound, upperBound;
+			ValueNode* valueNode = node->NodeChild()->Node();
+			if (valueNode->SupportedChildRange(lowerBound, upperBound) != B_OK)
+				break;
+
+			BString rangeExpression = message->FindString("text");
+			if (rangeExpression.Length() == 0)
+				break;
+
+			RangeList ranges;
+			status_t result = UiUtils::ParseRangeExpression(
+				rangeExpression, lowerBound, upperBound, ranges);
+			if (result != B_OK)
+				break;
+
+			valueNode->ClearChildren();
+			for (int32 i = 0; i < ranges.CountRanges(); i++) {
+				const Range* range = ranges.RangeAt(i);
+				result = valueNode->CreateChildrenInRange(
+					range->lowerBound, range->upperBound);
+				if (result != B_OK)
+					break;
+			}
+			break;
+		}
+		case MSG_SHOW_WATCH_VARIABLE_PROMPT:
+		{
+			ModelNode* node = reinterpret_cast<ModelNode*>(
+				fVariableTable->SelectionModel()->NodeAt(0));
+			ValueLocation* location = node->NodeChild()->Location();
+			ValuePieceLocation piece = location->PieceAt(0);
+			if (piece.type != VALUE_PIECE_LOCATION_MEMORY)
+				break;
+
+			BMessage looperMessage(*message);
+			looperMessage.AddUInt64("address", piece.address);
+			looperMessage.AddInt32("length", piece.size);
+			looperMessage.AddUInt32("type", B_DATA_READ_WRITE_WATCHPOINT);
+			Looper()->PostMessage(&looperMessage);
+			break;
+		}
 		case MSG_VALUE_NODE_CHANGED:
 		{
 			ValueNodeChild* nodeChild;
@@ -1485,8 +1724,10 @@ VariablesView::MessageReceived(BMessage* message)
 		case MSG_MODEL_NODE_HIDDEN:
 		{
 			ModelNode* node;
-			if (message->FindPointer("node", (void**)&node) == B_OK)
+			if (message->FindPointer("node", (void**)&node) == B_OK) {
+				BReference<ModelNode> modelNodeReference(node, true);
 				_RequestNodeValue(node);
+			}
 
 			break;
 		}
@@ -1517,6 +1758,34 @@ VariablesView::DetachedFromWindow()
 {
 	_FinishContextMenu(true);
 }
+
+
+void
+VariablesView::LoadSettings(const BMessage& settings)
+{
+	BMessage tableSettings;
+	if (settings.FindMessage("variableTable", &tableSettings) == B_OK) {
+		GuiSettingsUtils::UnarchiveTableSettings(tableSettings,
+			fVariableTable);
+	}
+}
+
+
+status_t
+VariablesView::SaveSettings(BMessage& settings)
+{
+	settings.MakeEmpty();
+
+	BMessage tableSettings;
+	status_t result = GuiSettingsUtils::ArchiveTableSettings(tableSettings,
+		fVariableTable);
+	if (result == B_OK)
+		result = settings.AddMessage("variableTable", &tableSettings);
+
+	return result;
+}
+
+
 
 
 void
@@ -1565,25 +1834,39 @@ VariablesView::TreeTableCellMouseDown(TreeTable* table,
 	if (node == NULL)
 		return;
 
+	Settings* settings = NULL;
+	SettingsMenu* settingsMenu = NULL;
+	BReference<SettingsMenu> settingsMenuReference;
+	status_t error = B_OK;
 	TableCellValueRenderer* cellRenderer = node->TableCellRenderer();
-	if (cellRenderer == NULL)
-		return;
-
-	Settings* settings = cellRenderer->GetSettings();
-	if (settings == NULL)
-		return;
-
-	SettingsMenu* settingsMenu;
-	status_t error = node->GetValueHandler()->CreateTableCellValueSettingsMenu(
-		node->GetValue(), settings, settingsMenu);
-	BReference<SettingsMenu> settingsMenuReference(settingsMenu, true);
-	if (error != B_OK)
-		return;
+	if (cellRenderer != NULL) {
+		settings = cellRenderer->GetSettings();
+		if (settings != NULL) {
+			error = node->GetValueHandler()
+				->CreateTableCellValueSettingsMenu(node->GetValue(), settings,
+					settingsMenu);
+			settingsMenuReference.SetTo(settingsMenu, true);
+			if (error != B_OK)
+				return;
+		}
+	}
 
 	TableCellContextMenuTracker* tracker = new(std::nothrow)
 		TableCellContextMenuTracker(node, Looper(), this);
 	BReference<TableCellContextMenuTracker> trackerReference(tracker);
-	if (tracker == NULL || tracker->Init(settings, settingsMenu) != B_OK)
+
+	ContextActionList* preActionList = new(std::nothrow) ContextActionList;
+	if (preActionList == NULL)
+		return;
+
+	BPrivate::ObjectDeleter<ContextActionList> preActionListDeleter(
+		preActionList);
+
+	error = _GetContextActionsForNode(node, preActionList);
+	if (error != B_OK)
+		return;
+
+	if (tracker == NULL || tracker->Init(settings, settingsMenu, preActionList) != B_OK)
 		return;
 
 	fTableCellContextMenuTracker = trackerReference.Detach();
@@ -1608,6 +1891,7 @@ VariablesView::_Init()
 	if (fVariableTableModel->Init() != B_OK)
 		throw std::bad_alloc();
 	fVariableTable->SetTreeTableModel(fVariableTableModel);
+	fVariableTable->SetToolTipProvider(fVariableTableModel);
 
 	fContainerListener = new ContainerListener(this);
 	fVariableTableModel->SetContainerListener(fContainerListener);
@@ -1635,9 +1919,23 @@ VariablesView::_RequestNodeValue(ModelNode* node)
 
 	// get the value node and check whether its value has not yet been resolved
 	ValueNode* valueNode = nodeChild->Node();
-	if (valueNode == NULL
-		|| valueNode->LocationAndValueResolutionState()
-			!= VALUE_NODE_UNRESOLVED) {
+	if (valueNode == NULL) {
+		ModelNode* parent = node->Parent();
+		if (parent != NULL) {
+			TreeTablePath path;
+			if (!fVariableTableModel->GetTreePath(parent, path))
+				return;
+
+			// if the parent node was already expanded when the child was
+			// added, we may not yet have added a value node.
+			// Notify the table model that this needs to be done.
+			if (fVariableTable->IsNodeExpanded(path))
+				fVariableTableModel->NodeExpanded(parent);
+		}
+	}
+
+	if (valueNode == NULL || valueNode->LocationAndValueResolutionState()
+		!= VALUE_NODE_UNRESOLVED) {
 		return;
 	}
 
@@ -1647,6 +1945,73 @@ VariablesView::_RequestNodeValue(ModelNode* node)
 	// request resolution of the value
 	fListener->ValueNodeValueRequested(fStackFrame->GetCpuState(), container,
 		valueNode);
+}
+
+
+status_t
+VariablesView::_GetContextActionsForNode(ModelNode* node,
+	ContextActionList* actions)
+{
+	ValueLocation* location = node->NodeChild()->Location();
+
+	// if the location's stored somewhere other than in memory,
+	// then we won't be able to inspect it this way.
+	if (location->PieceAt(0).type != VALUE_PIECE_LOCATION_MEMORY)
+		return B_OK;
+
+	BMessage* message = NULL;
+	status_t result = _AddContextAction("Inspect", MSG_SHOW_INSPECTOR_WINDOW,
+		actions, message);
+	if (result != B_OK)
+		return result;
+
+	message->AddUInt64("address", location->PieceAt(0).address);
+
+	result = _AddContextAction("Cast as" B_UTF8_ELLIPSIS,
+		MSG_SHOW_TYPECAST_NODE_PROMPT, actions, message);
+	if (result != B_OK)
+		return result;
+
+	result = _AddContextAction("Watch" B_UTF8_ELLIPSIS,
+		MSG_SHOW_WATCH_VARIABLE_PROMPT, actions, message);
+	if (result != B_OK)
+		return result;
+
+	ValueNode* valueNode = node->NodeChild()->Node();
+	if (valueNode != NULL && valueNode->IsRangedContainer()) {
+		result = _AddContextAction("Set visible range" B_UTF8_ELLIPSIS,
+			MSG_SHOW_CONTAINER_RANGE_PROMPT, actions, message);
+		if (result != B_OK)
+			return result;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+VariablesView::_AddContextAction(const char* action, uint32 what,
+	ContextActionList* actions, BMessage*& _message)
+{
+	_message = new BMessage(what);
+	if (_message == NULL)
+		return B_NO_MEMORY;
+
+	ObjectDeleter<BMessage> messageDeleter(_message);
+
+	ActionMenuItem* item = new(std::nothrow) ActionMenuItem(action,
+		_message);
+	if (item == NULL)
+		return B_NO_MEMORY;
+
+	messageDeleter.Detach();
+	ObjectDeleter<ActionMenuItem> actionDeleter(item);
+	if (!actions->AddItem(item))
+		return B_NO_MEMORY;
+
+	actionDeleter.Detach();
+
+	return B_OK;
 }
 
 
@@ -1744,6 +2109,13 @@ VariablesView::_AddViewStateDescendentNodeInfos(VariablesViewState* viewState,
 		// add the node's info
 		VariablesViewNodeInfo nodeInfo;
 		nodeInfo.SetNodeExpanded(fVariableTable->IsNodeExpanded(path));
+		nodeInfo.SetCastedType(node->GetCastedType());
+		TableCellValueRenderer* renderer = node->TableCellRenderer();
+		if (renderer != NULL) {
+			Settings* settings = renderer->GetSettings();
+			if (settings != NULL)
+				nodeInfo.SetRendererSettings(settings->Message());
+		}
 
 		status_t error = viewState->SetNodeInfo(node->GetVariable()->ID(),
 			node->GetPath(), nodeInfo);
@@ -1776,6 +2148,25 @@ VariablesView::_ApplyViewStateDescendentNodeInfos(VariablesViewState* viewState,
 		const VariablesViewNodeInfo* nodeInfo = viewState->GetNodeInfo(
 			node->GetVariable()->ID(), node->GetPath());
 		if (nodeInfo != NULL) {
+			// NB: if the node info indicates that the node in question
+			// was being cast to a different type, this *must* be applied
+			// before any other view state restoration, since it potentially
+			// changes the child hierarchy under that node.
+			Type* type = nodeInfo->GetCastedType();
+			if (type != NULL) {
+				ValueNode* valueNode = NULL;
+				if (TypeHandlerRoster::Default()->CreateValueNode(
+					node->NodeChild(), type, valueNode) == B_OK) {
+					node->NodeChild()->SetNode(valueNode);
+					node->SetCastedType(type);
+				}
+			}
+
+			// we don't have a renderer yet so we can't apply the settings
+			// at this stage. Store them on the model node so we can lazily
+			// apply them once the value is retrieved.
+			node->SetLastRendererSettings(nodeInfo->GetRendererSettings());
+
 			fVariableTable->SetNodeExpanded(path, nodeInfo->IsNodeExpanded());
 
 			// recurse

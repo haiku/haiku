@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Haiku Inc. All rights reserved.
+ * Copyright 2010-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,11 +10,21 @@
 #include <HttpAuthentication.h>
 
 #include <cstdlib>
-#include <openssl/md5.h>
 
 #include <cstdio>
 #define PRINT(x) printf x
 
+extern "C" {
+#ifdef OPENSSL_ENABLED
+#include <openssl/md5.h>
+#else
+#include "md5.h"
+#endif
+};
+
+#ifndef MD5_DIGEST_LENGTH
+#define MD5_DIGEST_LENGTH 16
+#endif
 
 static const char* kBase64Symbols 
 	= "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
@@ -361,11 +371,13 @@ BHttpAuthentication::_DigestResponse(const BString& uri, const BString& method) 
 
 BString
 BHttpAuthentication::_H(const BString& value) const
-{		
-	unsigned char* hashResult 
-		= MD5(reinterpret_cast<const unsigned char*>(value.String()), 
-			value.Length(), NULL);
-
+{
+	MD5_CTX context;
+	static unsigned char hashResult[MD5_DIGEST_LENGTH];
+	MD5_Init(&context);
+	MD5_Update(&context, (void *)(value.String()), value.Length());
+	MD5_Final(hashResult, &context);
+	
 	BString result;
 	// TODO: This is slower than it needs to be. If we already know the
 	// final hash string length, we can use

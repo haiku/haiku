@@ -8,10 +8,12 @@
 
 #include <boot/kernel_args.h>
 
+#include <util/KMessage.h>
 
 struct stage2_args;
 
 extern struct kernel_args gKernelArgs;
+extern KMessage gBootVolume;
 
 #ifdef __cplusplus
 extern "C" {

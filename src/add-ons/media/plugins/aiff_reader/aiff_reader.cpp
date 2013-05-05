@@ -405,15 +405,15 @@ aiffReader::GetNextChunk(void *cookie,
 }
 
 uint32
-aiffReader::DecodeFrameRate(void *_80bit_float)
+aiffReader::DecodeFrameRate(const void *_80bit_float)
 {
 	// algorithm from http://www.borg.com/~jglatt/tech/aiff.htm
 	uint32 mantissa;
 	uint32 last;
 	uint32 exp;
-	
-	mantissa = (uint32)B_BENDIAN_TO_HOST_INT32(*(uint32 *)((char *)_80bit_float + 2));
-	exp = 30 - *(uint8 *)((char *)_80bit_float + 1);
+
+	mantissa = (uint32)B_BENDIAN_TO_HOST_INT32(*(const uint32 *)((const char *)_80bit_float + 2));
+	exp = 30 - *(const uint8 *)((const char *)_80bit_float + 1);
 	if (exp > 32)
 		return 0;
 	last = 0;

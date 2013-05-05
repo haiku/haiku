@@ -277,7 +277,7 @@ static int
 dump_inode(int argc, char** argv)
 {
 	bool block = false;
-	if (argc == 3 && !strcmp(argv[1], "-b"))
+	if (argc >= 3 && !strcmp(argv[1], "-b"))
 		block = true;
 
 	if (argc != 2 + (block ? 1 : 0) || !strcmp(argv[1], "--help")) {
@@ -299,8 +299,9 @@ dump_inode(int argc, char** argv)
 		kprintf("  tree:              %p\n", inode->Tree());
 		kprintf("  file cache:        %p\n", inode->FileCache());
 		kprintf("  file map:          %p\n", inode->Map());
-		kprintf("  old size:          %Ld\n", inode->OldSize());
-		kprintf("  old last modified: %Ld\n", inode->OldLastModified());
+		kprintf("  old size:          %" B_PRIdOFF "\n", inode->OldSize());
+		kprintf("  old last modified: %" B_PRIdOFF "\n",
+			inode->OldLastModified());
 
 		node = &inode->Node();
 	}
@@ -334,8 +335,9 @@ dump_volume(int argc, char** argv)
 				run.start = HOST_ENDIAN_TO_BFS_INT16(strtoul(arg + 1, NULL, 0));
 				run.length = 0;
 
-				kprintf("%ld.%u -> block %Ld, bitmap block %ld\n",
-					run.AllocationGroup(), run.Start(), volume->ToBlock(run),
+				kprintf("%" B_PRId32 ".%u -> block %" B_PRIdOFF ", bitmap block"
+					" %" B_PRId32 "\n", run.AllocationGroup(), run.Start(),
+					volume->ToBlock(run),
 					volume->SuperBlock().BlocksPerAllocationGroup()
 						* run.AllocationGroup() + 1);
 			} else {
@@ -343,16 +345,16 @@ dump_volume(int argc, char** argv)
 				off_t offset = parse_expression(arg);
 				block_run run = volume->ToBlockRun(offset);
 
-				kprintf("block %Ld -> %ld.%u, bitmap block %ld\n", offset,
-					run.AllocationGroup(), run.Start(),
-					volume->SuperBlock().BlocksPerAllocationGroup()
+				kprintf("block %" B_PRIdOFF " -> %" B_PRId32 ".%u, bitmap block"
+					" %" B_PRId32 "\n", offset, run.AllocationGroup(),
+					run.Start(), volume->SuperBlock().BlocksPerAllocationGroup()
 						* run.AllocationGroup() + 1);
 			}
 		}
 		return 0;
 	}
 
-	kprintf("id:           %ld\n", volume->ID());
+	kprintf("id:           %" B_PRId32 "\n", volume->ID());
 	kprintf("block cache:  %p\n", volume->BlockCache());
 	kprintf("journal:      %p\n", volume->GetJournal(0));
 	kprintf("allocator:    %p\n", &volume->Allocator());
@@ -373,7 +375,8 @@ static int
 dump_block_run_array(int argc, char** argv)
 {
 	if (argc < 2 || !strcmp(argv[1], "--help")) {
-		kprintf("usage: %s <ptr-to-array> [number-of-runs]\n", argv[0]);
+		kprintf("usage: %s <ptr-to-array> [number-of-runs] [block-size] "
+			"[start-offset] [search-offset]\n", argv[0]);
 		return 0;
 	}
 
@@ -382,9 +385,32 @@ dump_block_run_array(int argc, char** argv)
 	if (argc > 2)
 		count = parse_expression(argv[2]);
 
+	uint32 blockSize = 0;
+	if (argc > 3)
+		blockSize = parse_expression(argv[3]);
+
+	off_t offset = 0;
+	if (argc > 4)
+		offset = parse_expression(argv[4]);
+
+	off_t searchOffset = 0;
+	if (argc > 5)
+		searchOffset = parse_expression(argv[5]);
+
 	for (uint32 i = 0; i < count; i++) {
-		dprintf("[%3lu]  ", i);
+		if (blockSize != 0)
+			dprintf("[%3" B_PRIu32 "]  %10" B_PRIdOFF "  ", i, offset);
+		else
+			dprintf("[%3" B_PRIu32 "]  ", i);
+
+		uint32 size = runs[i].Length() * blockSize;
+		if (searchOffset != 0 && searchOffset >= offset
+			&& searchOffset < offset + size)
+			dprintf("*  ");
+
 		dump_block_run("", runs[i]);
+
+		offset += size;
 	}
 
 	return 0;

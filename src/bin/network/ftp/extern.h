@@ -100,8 +100,6 @@ struct sockaddr;
 struct tm;
 struct addrinfo;
 
-typedef int sa_family_t;
-
 void	abort_remote(FILE *);
 void	abort_squared(int);
 void	abortpt(int);

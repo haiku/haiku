@@ -11,7 +11,8 @@ SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc stdio-common ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 
-# ToDo: for now, all wide character functions are disabled
+UsePrivateHeaders libroot ;
+
 
 MergeObject posix_gnu_stdio.o : #_common.o :
 	_itoa.c

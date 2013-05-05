@@ -24,7 +24,6 @@
 
 #include "Filter.h"
 #include "SelectionBox.h"
-#include "ShowImageUndo.h"
 
 
 class BitmapOwner;
@@ -52,7 +51,8 @@ public:
 			void				SetTrackerMessenger(
 									const BMessenger& trackerMessenger);
 			status_t			SetImage(const BMessage* message);
-			status_t			SetImage(const entry_ref* ref, BBitmap* bitmap);
+			status_t			SetImage(const entry_ref* ref, BBitmap* bitmap,
+									BitmapOwner* bitmapOwner);
 			const entry_ref*	Image() const { return &fCurrentRef; }
 			BBitmap*			Bitmap();
 
@@ -81,7 +81,6 @@ public:
 			void				SetSelectionMode(bool selectionMode);
 			bool				IsSelectionModeEnabled() const
 									{ return fSelectionMode; }
-			void				Undo();
 			void				SelectAll();
 			void				ClearSelection();
 
@@ -104,20 +103,20 @@ public:
 
 private:
 			enum image_orientation {
-				k0,    // 0
-				k90,   // 1
-				k180,  // 2
-				k270,  // 3
-				k0V,   // 4
-				k90V,  // 5
-				k0H,   // 6
-				k270V, // 7
+				k0,		// 0
+				k90,	// 1
+				k180,	// 2
+				k270,	// 3
+				k0V,	// 4
+				k90V,	// 5
+				k0H,	// 6
+				k270V,	// 7
 				kNumberOfOrientations,
 			};
 
 			void				_SetHasSelection(bool bHasSelection);
 			void				_AnimateSelection(bool a);
-			void				_SendMessageToWindow(BMessage *message);
+			void				_SendMessageToWindow(BMessage* message);
 			void				_SendMessageToWindow(uint32 code);
 			void				_Notify();
 			void				_UpdateStatusText();
@@ -181,7 +180,6 @@ private:
 			void				_ShowToolBarIfEnabled(bool show);
 
 private:
-			ShowImageUndo		fUndo;
 			entry_ref			fCurrentRef;
 
 			BitmapOwner*		fBitmapOwner;

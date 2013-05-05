@@ -1,8 +1,8 @@
-1	norwegian_bokmål	application/x-vnd.Haiku-BFSAddOn	1074880496
-1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (Hovedsaklig små filer)
-2048 (Recommended)	BFS_Initialize_Parameter		2048 (Anbefalt)
-8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (Hovedsaklig store filer)
-Blocksize:	BFS_Initialize_Parameter		Blokkstørrelse:
-Disabling query support may speed up certain file system operations, but should only be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		Å slå av søkefunksjonen kan øke hastigheten på noen filsystemprosesser, men bør bare brukes hvis man er sikker på at man ikke trenger å søke.\nAlle oppstartsvolumer for Haiku må ha søkefunksjonen aktivert.
-Enable query support	BFS_Initialize_Parameter		Aktiver søkefunksjon
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-BFSAddOn	1074880496
+Enable query support	BFS_Initialize_Parameter		Slå på støtte for søk
+2048 (Recommended)	BFS_Initialize_Parameter		2048 (anbefalt)
+8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (hovedsaklig store filer)
+Disabling query support may speed up certain file system operations, but should only be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		Å slå av støtte for søk kan gjøre at noen filsystemoperasjoner går raskere, men bør bare brukes hvis man er helt sikker på at man ikke kommer til å få bruk for søk.\nVolumer som skal brukes som oppstartsvolum for Haiku må ha støtte for søk slått på.
+1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (hovedsaklig små filer)
+Blocksize:	BFS_Initialize_Parameter		Blokkstørelse:
 Name:	BFS_Initialize_Parameter		Navn:

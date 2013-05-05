@@ -43,9 +43,11 @@ const uint32 MSG_SOURCETEXT		= 'mSTX';
 const uint32 MSG_DESTTEXT		= 'mDTX';
 const uint32 MSG_SHOWCONTENTS	= 'mSCT';
 
+const int32 MAX_STATUS_LENGTH	= 35;
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ExpanderWindow"
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ExpanderWindow"
 
 ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 		BMessage* settings)
@@ -92,6 +94,12 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 	BScrollView* scrollView = new BScrollView("", fListingText,
 		B_INVALIDATE_AFTER_LAYOUT, true, true);
 
+	// workaround to let the layout manager estimate
+	// the width of status view and fix the #5289
+	// we assume that spaces are twice narrower than normal chars
+	BString statusPlaceholderString;
+	statusPlaceholderString.SetTo(' ', MAX_STATUS_LENGTH * 2);
+
 	BView* topView = layout->View();
 	const float spacing = be_control_look->DefaultItemSpacing();
 	topView->AddChild(BGroupLayoutBuilder(B_VERTICAL, spacing)
@@ -110,7 +118,8 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 					.Add(fShowContents = new BCheckBox(
 						B_TRANSLATE("Show contents"),
 						new BMessage(MSG_SHOWCONTENTS)))
-					.Add(fStatusView = new BStringView(NULL, NULL))
+					.Add(fStatusView = new BStringView(NULL,
+							statusPlaceholderString))
 				.End()
 			.End()
 		.End()
@@ -150,27 +159,53 @@ ExpanderWindow::ValidateDest()
 	BVolume volume;
 	if (!entry.Exists()) {
 		BAlert* alert = new BAlert("destAlert",
-			B_TRANSLATE("The destination folder does not exist."),
-			B_TRANSLATE("Cancel"), NULL, NULL,
+			B_TRANSLATE("Destination folder doesn't exist. "
+				"Would you like to create it?"),
+			B_TRANSLATE("Create"), B_TRANSLATE("Cancel"), NULL,
 			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
-		alert->Go();
-		return false;
-	} else if (!entry.IsDirectory()) {
-		(new BAlert("destAlert",
+		alert->SetShortcut(0, B_ESCAPE);
+
+		if (alert->Go() != 0)
+			return false;
+
+		if (create_directory(fDestText->Text(), 0755) != B_OK) {
+			BAlert* alert = new BAlert("stopAlert",
+				B_TRANSLATE("Failed to create the destination folder."),
+				B_TRANSLATE("Cancel"), NULL, NULL,
+				B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
+			return false;
+		}
+
+		BEntry newEntry(fDestText->Text(), true);
+		newEntry.GetRef(&fDestRef);
+		return true;
+
+	}
+
+	if (!entry.IsDirectory()) {
+		BAlert* alert = new BAlert("destAlert",
 			B_TRANSLATE("The destination is not a folder."),
 			B_TRANSLATE("Cancel"), NULL, NULL,
-			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT))->Go();
+			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 		return false;
-	} else if (entry.GetVolume(&volume) != B_OK || volume.IsReadOnly()) {
-		(new BAlert("destAlert",
+	}
+
+	if (entry.GetVolume(&volume) != B_OK || volume.IsReadOnly()) {
+		BAlert* alert = new BAlert("destAlert",
 			B_TRANSLATE("The destination is read only."),
 			B_TRANSLATE("Cancel"), NULL, NULL, B_WIDTH_AS_USUAL,
-			B_EVEN_SPACING,	B_WARNING_ALERT))->Go();
+			B_EVEN_SPACING,	B_WARNING_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 		return false;
-	} else {
-		entry.GetRef(&fDestRef);
-		return true;
 	}
+
+	entry.GetRef(&fDestRef);
+	return true;
 }
 
 
@@ -246,6 +281,7 @@ ExpanderWindow::MessageReceived(BMessage* msg)
 						"archive? The expanded items may not be complete."),
 					B_TRANSLATE("Stop"), B_TRANSLATE("Continue"), NULL,
 					B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
+				alert->SetShortcut(0, B_ESCAPE);
 				if (alert->Go() == 0) {
 					fExpandingThread->ResumeExternalExpander();
 					StopExpanding();
@@ -280,6 +316,7 @@ ExpanderWindow::MessageReceived(BMessage* msg)
 					B_TRANSLATE("The file doesn't exist"),
 					B_TRANSLATE("Cancel"), NULL, NULL,
 					B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 				alert->Go();
 				break;
 			}
@@ -303,6 +340,7 @@ ExpanderWindow::MessageReceived(BMessage* msg)
 			BAlert* alert = new BAlert("srcAlert", string.String(),
 				B_TRANSLATE("Cancel"),
 				NULL, NULL, B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_INFO_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 
 			fShowContents->SetEnabled(false);
@@ -369,6 +407,7 @@ ExpanderWindow::MessageReceived(BMessage* msg)
 					BAlert* alert = new BAlert("stopAlert", string,
 						B_TRANSLATE("Stop"), B_TRANSLATE("Continue"), NULL,
 						B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
+					alert->SetShortcut(0, B_ESCAPE);
 					if (alert->Go() == 0) {
 						fExpandingThread->ResumeExternalExpander();
 						StopExpanding();
@@ -382,7 +421,7 @@ ExpanderWindow::MessageReceived(BMessage* msg)
 			// thread has finished		(finished, quit, killed, we don't know)
 			// reset window state
 			if (fExpandingStarted) {
-				fStatusView->SetText(B_TRANSLATE("File expanded"));
+				SetStatus(B_TRANSLATE("File expanded"));
 				StopExpanding();
 				OpenDestFolder();
 				CloseWindowOrKeepOpen();
@@ -391,13 +430,13 @@ ExpanderWindow::MessageReceived(BMessage* msg)
 				StopListing();
 				_ExpandListingText();
 			} else
-				fStatusView->SetText("");
+				SetStatus("");
 			break;
 
 		case 'exrr':	// thread has finished
 			// reset window state
 
-			fStatusView->SetText(B_TRANSLATE("Error when expanding archive"));
+			SetStatus(B_TRANSLATE("Error when expanding archive"));
 			CloseWindowOrKeepOpen();
 			break;
 
@@ -422,6 +461,7 @@ ExpanderWindow::CanQuit()
 				"archive? The expanded items may not be complete."),
 			B_TRANSLATE("Stop"), B_TRANSLATE("Continue"), NULL,
 			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
+			alert->SetShortcut(0, B_ESCAPE);
 		if (alert->Go() == 0) {
 			fExpandingThread->ResumeExternalExpander();
 			StopExpanding();
@@ -506,8 +546,8 @@ ExpanderWindow::RefsReceived(BMessage* msg)
 }
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ExpanderMenu"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ExpanderMenu"
 
 void
 ExpanderWindow::_AddMenuBar(BLayout* layout)
@@ -542,8 +582,8 @@ ExpanderWindow::_AddMenuBar(BLayout* layout)
 }
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ExpanderWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ExpanderWindow"
 
 void
 ExpanderWindow::StartExpanding()
@@ -558,6 +598,7 @@ ExpanderWindow::StartExpanding()
 		B_TRANSLATE("The folder was either moved, renamed or not\nsupported."),
 		B_TRANSLATE("Cancel"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		return;
 	}
@@ -582,7 +623,7 @@ ExpanderWindow::StartExpanding()
 	BPath path(&entry);
 	BString text(B_TRANSLATE("Expanding '%s'"));
 	text.ReplaceFirst("%s", path.Leaf());
-	fStatusView->SetText(text.String());
+	SetStatus(text.String());
 
 	fExpandingThread = new ExpanderThread(&message, new BMessenger(this));
 	fExpandingThread->Start();
@@ -682,6 +723,18 @@ ExpanderWindow::_UpdateWindowSize(bool showContents)
 
 
 void
+ExpanderWindow::SetStatus(BString text)
+{
+	if (text.Length() >= MAX_STATUS_LENGTH) {
+		text.Truncate(MAX_STATUS_LENGTH - 1);
+		text << B_UTF8_ELLIPSIS;
+	}
+
+	fStatusView->SetText(text);
+}
+
+
+void
 ExpanderWindow::StartListing()
 {
 	_UpdateWindowSize(true);
@@ -718,7 +771,7 @@ ExpanderWindow::StartListing()
 	BPath path(&entry);
 	BString text(B_TRANSLATE("Creating listing for '%s'"));
 	text.ReplaceFirst("%s", path.Leaf());
-	fStatusView->SetText(text.String());
+	SetStatus(text.String());
 	fListingText->SetText("");
 
 	fListingThread = new ExpanderThread(&message, new BMessenger(this));
@@ -749,7 +802,7 @@ ExpanderWindow::StopListing(void)
 	fSourceButton->SetEnabled(true);
 	fDestButton->SetEnabled(true);
 	fExpandButton->SetEnabled(true);
-	fStatusView->SetText("");
+	SetStatus("");
 }
 
 

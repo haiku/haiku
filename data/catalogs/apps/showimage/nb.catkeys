@@ -1,60 +1,62 @@
-1	norwegian_bokmål	x-vnd.Haiku-ShowImage	3331911881
-%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekunder
-Browse	Menus		Bla gjennom
-Cancel	ClosePrompt		Avbryt
-Clear selection	Menus		Fjern utvalg
-Close	ClosePrompt		Lukk
-Close	Menus		Lukk
-Close document	ClosePrompt		Lukk dokument
-Copy	Menus		Kopier
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Kunne ikke laste bildet! Enten filen eller en bildeoversetter for den finnes ikke.
-DPI:	PrintOptionsWindow		DPI:
-Edit	Menus		Rediger
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-ShowImage	886873119
+Use as background…	Menus		Bruk som bakgrunn…
 File	Menus		Fil
-First page	Menus		Første side
-Fit image to page	PrintOptionsWindow		Tilpass bilde til siden
-Fit to window	Menus		Tilpass til vindu
-Flip left to right	Menus		Vend fra venstre til høyre
-Flip top to bottom	Menus		Vend opp/ned
+Slide delay	Menus		Lysbildeintervall
+Selection mode	Menus		Utvalgsmodus
+Zoom in	Menus		Zoom inn
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' har blitt endret. Ønsker du å lukke dokumentet?
+Page setup…	Menus		Sideoppssett...
+Print…	Menus		Skriv ut...
+OK	SaveToFile		OK
+Previous page	Menus		Forrige side
+View	Menus		Vis
 Full screen	Menus		Fullskjerm
 Go to page	Menus		Gå til side
-Height: 	PrintOptionsWindow		Høyde: 
-High-quality zooming	Menus		Høykvalitets zoom
-Image	Menus		Bilde
-Job setup	PrintOptionsWindow		Jobboppsett
-Last page	Menus		Siste side
-Next file	Menus		Neste fil
-Next page	Menus		Neste side
-OK	Alerts		OK
-OK	SaveToFile		OK
-Open…	Menus		Åpne...
-Original size	Menus		Originalstørrelse
-Page setup…	Menus		Sideoppssett...
-Previous file	Menus		Forrige fil
-Previous page	Menus		Forrige side
-Print options	PrintOptionsWindow		Utskriftsalternativer
-Print…	Menus		Skriv ut...
-Progress monitor	ProgressWindow		Fremdriftsoversikt
-Quit	Menus		Avslutt
-Rating	Menus		Vurdering
-Resize to (in 1/72 inches):	PrintOptionsWindow		Endre størrelse til (i 1/72 tommer):
-Rotate clockwise	Menus		Roter med klokken
-Rotate counterclockwise	Menus		Roter mot klokken
-Save as…	Menus		Lagre som...
-Select all	Menus		Merk alle
-Selection mode	Menus		Utvalgsmodus
-Show caption in full screen mode	Menus		Vis bildetekst i fullskjermsmodus
-ShowImage	System name		ShowImage
-Slide delay	Menus		Lysbildeintervall
-Slide show	Menus		Lysbildevisning
-Stretch to window	Menus		Strekk til vindu
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' (side %d) er endret. Ønsker du å lukke dokumentet?
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' har blitt endret. Ønsker du å lukke dokumentet?
-The file '%s' could not be written.	SaveToFile		Kunne ikke skrive filen '%s'.
-Undo	Menus		Angre
-Use as background…	Menus		Bruk som bakgrunn…
-View	Menus		Vis
-Width:	PrintOptionsWindow		Bredde:
-Zoom factor in %:	PrintOptionsWindow		zoomfaktor i %:
-Zoom in	Menus		Zoom inn
 Zoom out	Menus		Zoom ut
+Quit	Menus		Avslutt
+Rotate counterclockwise	Menus		Roter mot klokken
+High-quality zooming	Menus		Høykvalitets zoom
+Browse	Menus		Bla gjennom
+Edit	Menus		Rediger
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Kunne ikke laste bildet! Enten filen eller en bildeoversetter for den finnes ikke.
+First page	Menus		Første side
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' (side %d) er endret. Ønsker du å lukke dokumentet?
+%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekunder
+Leave full screen	Menus		Forlat fullskjerm
+Close	Menus		Lukk
+Close	ClosePrompt		Lukk
+Undo	Menus		Angre
+Resize to (in 1/72 inches):	PrintOptionsWindow		Endre størrelse til (i 1/72 tommer):
+Rating	Menus		Vurdering
+Flip left to right	Menus		Vend fra venstre til høyre
+Show caption in full screen mode	Menus		Vis bildetekst i fullskjermsmodus
+DPI:	PrintOptionsWindow		DPI:
+Open…	Menus		Åpne...
+Next file	Menus		Neste fil
+Clear selection	Menus		Fjern utvalg
+Close document	ClosePrompt		Lukk dokument
+Height: 	PrintOptionsWindow		Høyde: 
+The file '%s' could not be written.	SaveToFile		Kunne ikke skrive filen '%s'.
+Cancel	ClosePrompt		Avbryt
+Show tool bar	Menus		Vis verktøylinje
+Fit to window	Menus		Tilpass til vindu
+Print options	PrintOptionsWindow		Utskriftsalternativer
+Copy	Menus		Kopier
+Progress monitor	ProgressWindow		Fremdriftsoversikt
+Last page	Menus		Siste side
+Stretch to window	Menus		Strekk til vindu
+Previous file	Menus		Forrige fil
+ShowImage	System name		ShowImage
+Slide show	Menus		Lysbildevisning
+Fit image to page	PrintOptionsWindow		Tilpass bilde til siden
+Flip top to bottom	Menus		Vend opp/ned
+Select all	Menus		Merk alle
+Zoom factor in %:	PrintOptionsWindow		zoomfaktor i %:
+Width:	PrintOptionsWindow		Bredde:
+Image	Menus		Bilde
+OK	Alerts		OK
+Rotate clockwise	Menus		Roter med klokken
+Job setup	PrintOptionsWindow		Jobboppsett
+Original size	Menus		Originalstørrelse
+Next page	Menus		Neste side
+Save as…	Menus		Lagre som...

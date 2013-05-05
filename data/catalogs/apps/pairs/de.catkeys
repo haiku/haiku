@@ -1,14 +1,14 @@
 1	german	x-vnd.Haiku-Pairs	1981673050
 %app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\tvon Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nDas Spiel wurde mit %num% Klicks gelöst.\n
-Beginner (4x4)	PairsWindow		Anfänger (4x4)
 Expert (8x8)	PairsWindow		Könner (8x8)
-Game	PairsWindow		Spiel
-Intermediate (6x6)	PairsWindow		Fortgeschrittener (6x6)
-New	PairsWindow		Neu
-New game	PairsWindow		Neues Spiel
-OK	PairsView		OK
-Pairs	System name		Pairs
-Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Es wurden nicht genügend Vektoricons auf dem System gefunden. Es werden mindestens %d benötigt.
-Quit	PairsWindow		Beenden
+Beginner (4x4)	PairsWindow		Anfänger (4x4)
 Quit game	PairsWindow		Spiel beenden
+Game	PairsWindow		Spiel
 Size	PairsWindow		Größe
+New	PairsWindow		Neu
+OK	PairsView		OK
+Intermediate (6x6)	PairsWindow		Fortgeschrittener (6x6)
+Quit	PairsWindow		Beenden
+Pairs	System name		Pairs
+New game	PairsWindow		Neues Spiel
+Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Es wurden nicht genügend Vektoricons auf dem System gefunden. Es werden mindestens %d benötigt.

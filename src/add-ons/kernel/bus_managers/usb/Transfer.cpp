@@ -274,6 +274,13 @@ Transfer::_CalculateBandwidth()
 			break;
 		}
 
+		case USB_SPEED_SUPER:
+		{
+			// TODO it should only be useful for isochronous type
+			bandwidthNS = 0;
+			break;
+		}
+
 		default:
 			// We should never get here
 			TRACE("speed unknown");

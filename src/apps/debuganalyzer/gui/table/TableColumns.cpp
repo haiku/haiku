@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -144,7 +144,7 @@ BField*
 Int32TableColumn::PrepareField(const BVariant& value) const
 {
 	char buffer[16];
-	snprintf(buffer, sizeof(buffer), "%ld", value.ToInt32());
+	snprintf(buffer, sizeof(buffer), "%" B_PRId32, value.ToInt32());
 	return StringTableColumn::PrepareField(
 		BVariant(buffer, B_VARIANT_DONT_COPY_DATA));
 }
@@ -174,7 +174,7 @@ BField*
 Int64TableColumn::PrepareField(const BVariant& value) const
 {
 	char buffer[32];
-	snprintf(buffer, sizeof(buffer), "%lld", value.ToInt64());
+	snprintf(buffer, sizeof(buffer), "%" B_PRId64, value.ToInt64());
 	return StringTableColumn::PrepareField(
 		BVariant(buffer, B_VARIANT_DONT_COPY_DATA));
 }

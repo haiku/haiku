@@ -1,14 +1,14 @@
 1	swedish	x-vnd.Haiku-Keyboard	1711838804
+Written by Andrew Edward McCall	KeyboardApplication		Skrivet av Andrew Edward McCall
+Typing test area	KeyboardView		Testområde
 Defaults	KeyboardWindow		Standardinställningar
-Delay until key repeat	KeyboardView		Fördröjning till tangentupprepning
-Fast	KeyboardView		Snabb
 Key repeat rate	KeyboardView		Hastighet för tangentupprepning
-Keyboard	System name		Tangentbord
-Long	KeyboardView		Lång
-OK	KeyboardApplication		Ok
 Revert	KeyboardWindow		Återställ
-Short	KeyboardView		Kort
+Delay until key repeat	KeyboardView		Fördröjning till tangentupprepning
+Keyboard	System name		Tangentbord
+OK	KeyboardApplication		Ok
+Fast	KeyboardView		Snabb
 Slow	KeyboardView		Långsam
 Something has gone wrong!	KeyboardApplication		Något har gått fel!
-Typing test area	KeyboardView		Testområde
-Written by Andrew Edward McCall	KeyboardApplication		Skrivet av Andrew Edward McCall
+Long	KeyboardView		Lång
+Short	KeyboardView		Kort

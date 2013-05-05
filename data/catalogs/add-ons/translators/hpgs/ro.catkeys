@@ -1,12 +1,12 @@
 1	romanian	x-vnd.Haiku-HPGSTranslator	3633584048
 Based on HPGS (http://hpgs.berlios.de)	ConfigView		Bazat pe HPGS (http://hpgs.berlios.de)
-Error: Cannot imbue plot device to reader: %s\n	HPGSTranslator		Eroare: Nu se poate integra dispozitivul de plot la cititor: %s\n
+Version %d.%d.%d, %s	ConfigView		Versiune %d.%d.%d, %s
 Error: Cannot process plot data %s\n	HPGSTranslator		Eroare: Nu se pot procesa datele de plot %s\n
 HPGS image	HPGSTranslator		Imagine HPGS
-HPGS image translator	HPGSTranslator		Traducător de imagine HPGS
+HPGSTranslator Settings	ConfigView		Configurări TraducătorHPGS
+Error: Cannot imbue plot device to reader: %s\n	HPGSTranslator		Eroare: Nu se poate integra dispozitivul de plot la cititor: %s\n
 HPGS images	ConfigView		Imagini HPGS
 HPGS images	HPGSTranslator		Imagini HPGS
-HPGSTranslator Settings	ConfigView		Configurări TraducătorHPGS
-Version %d.%d.%d, %s	ConfigView		Versiune %d.%d.%d, %s
-Write error %s\n	HPGSTranslator		Eroare de scriere %s\n
 no hpgs\n	HPGSTranslator		nu hpgs\n
+HPGS image translator	HPGSTranslator		Traducător de imagine HPGS
+Write error %s\n	HPGSTranslator		Eroare de scriere %s\n

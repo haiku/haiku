@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2012, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PATH_H
@@ -25,7 +25,7 @@ public:
 							BPath(const BEntry* entry);
 							BPath(const char* dir, const char* leaf = NULL,
 								bool normalize = false);
-							BPath(const BDirectory* dir, 
+							BPath(const BDirectory* dir,
 								const char* leaf = NULL,
 								bool normalize = false);
 
@@ -37,7 +37,7 @@ public:
 			status_t		SetTo(const BEntry* entry);
 			status_t		SetTo(const char* path, const char* leaf = NULL,
 								bool normalize = false);
-			status_t		SetTo(const BDirectory* dir, 
+			status_t		SetTo(const BDirectory* dir,
 								const char* leaf = NULL,
 								bool normalize = false);
 			void			Unset();
@@ -47,6 +47,7 @@ public:
 			const char*		Path() const;
 			const char*		Leaf() const;
 			status_t		GetParent(BPath* path) const;
+			bool			IsAbsolute() const;
 
 			bool			operator==(const BPath& item) const;
 			bool			operator==(const char* path) const;
@@ -75,7 +76,9 @@ private:
 			uint32			_reserved[4];
 
 			char*			fName;
+								// Pointer to the path string of the object.
 			status_t		fCStatus;
+								// The initialization status of the object.
 };
 
 #endif	// _PATH_H

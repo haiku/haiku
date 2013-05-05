@@ -157,11 +157,14 @@ HashedObjectCache::ReturnSlab(slab* _slab, uint32 flags)
 slab*
 HashedObjectCache::ObjectSlab(void* object) const
 {
+	ASSERT_LOCKED_MUTEX(&lock);
+
 	HashedSlab* slab = hash_table.Lookup(::lower_boundary(object, slab_size));
 	if (slab == NULL) {
 		panic("hash object cache %p: unknown object %p", this, object);
 		return NULL;
 	}
+
 	return slab;
 }
 

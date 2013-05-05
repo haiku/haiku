@@ -449,7 +449,7 @@ RemoteView::_DrawThread()
 		if (!locker.IsLocked())
 			break;
 
-		// handle stuff that doesn't go to a specicifc engine
+		// handle stuff that doesn't go to a specific engine
 		switch (code) {
 			case RP_INIT_CONNECTION:
 			{

@@ -444,7 +444,7 @@ BIconButton::SetIcon(const unsigned char* bitsFromQuickRes,
 		if (status >= B_OK) {
 			// It doesn't look right to copy BitsLength() bytes, but bitmaps
 			// exported from QuickRes still contain their padding, so it is
-			// alright.
+			// all right.
 			memcpy(quickResBitmap->Bits(), bitsFromQuickRes,
 				quickResBitmap->BitsLength());
 			if (format != B_RGB32 && format != B_RGBA32
@@ -454,7 +454,7 @@ BIconButton::SetIcon(const unsigned char* bitsFromQuickRes,
 					quickResBitmap->Bounds(), B_RGB32, true);
 				if (bitmap && bitmap->IsValid()) {
 					BView* helper = new BView(bitmap->Bounds(), "helper",
-											  B_FOLLOW_NONE, B_WILL_DRAW);
+						B_FOLLOW_NONE, B_WILL_DRAW);
 					if (bitmap->Lock()) {
 						bitmap->AddChild(helper);
 						helper->SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -520,7 +520,7 @@ BIconButton::TrimIcon(bool keepAspect)
 	uint32 bpr = fNormalBitmap->BytesPerRow();
 	uint32 width = fNormalBitmap->Bounds().IntegerWidth() + 1;
 	uint32 height = fNormalBitmap->Bounds().IntegerHeight() + 1;
-	BRect trimmed(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN);
+	BRect trimmed(INT32_MAX, INT32_MAX, INT32_MIN, INT32_MIN);
 	for (uint32 y = 0; y < height; y++) {
 		uint8* b = bits + 3;
 		bool rowHasAlpha = false;

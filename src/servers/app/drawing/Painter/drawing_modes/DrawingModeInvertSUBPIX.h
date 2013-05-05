@@ -20,6 +20,7 @@
 	_p.data32 = *(uint32*)d; \
 	BLEND_SUBPIX(d, 255 - _p.data8[2], 255 - _p.data8[1], 255 - _p.data8[0], \
 					a1, a2, a3); \
+	(void)_p; \
 }
 
 

@@ -39,7 +39,7 @@ ShowImageApp::ShowImageApp()
 	fPulseStarted(false),
 	fLastWindowFrame(BRect(30, 30, 430, 330))
 {
-	B_TRANSLATE_MARK_SYSTEM_NAME("ShowImage");
+	B_TRANSLATE_MARK_SYSTEM_NAME_VOID("ShowImage");
 	_UpdateLastWindowFrame();
 	// BBitmap can be created after there is a BApplication instance.
 	init_tool_bar_icons();
@@ -198,7 +198,7 @@ ShowImageApp::_Open(const entry_ref& ref, const BMessenger& trackerMessenger)
 	fLastWindowFrame.OffsetBy(20, 20);
 	if (!BScreen(B_MAIN_SCREEN_ID).Frame().Contains(fLastWindowFrame))
 		fLastWindowFrame.OffsetTo(50, 50);
-	
+
 	new ShowImageWindow(fLastWindowFrame, ref, trackerMessenger);
 }
 
@@ -207,7 +207,7 @@ void
 ShowImageApp::_BroadcastToWindows(BMessage* message)
 {
 	const int32 count = CountWindows();
-	for (int32 i = 0; i < count; i ++) {
+	for (int32 i = 0; i < count; i++) {
 		// BMessenger checks for us if BWindow is still a valid object
 		BMessenger messenger(WindowAt(i));
 		messenger.SendMessage(message);

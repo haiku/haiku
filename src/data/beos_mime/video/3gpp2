@@ -3,7 +3,7 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "video/3gpp2";
 
-resource(2, "META:S:DESC") #'MSDC' "3GPP2 Multimedia File";
+resource(2, "META:S:DESC") #'MSDC' "3GPP2 multimedia file";
 
 resource(3, "META:EXTENS") message(234) {
 	"extensions" = "3g2",

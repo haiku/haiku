@@ -1,0 +1,7 @@
+http://www.linux-mips.org/wiki/Common_Firmware_Environment
+http://www.broadcom.com/support/communications_processors/downloads.php
+http://www.broadcom.com/docs/SiByte/README-1.4.2.txt
+http://wiki.openwrt.org/doc/techref/bootloader/cfe
+http://amigaos.net/content/2/what%E2%80%99s-new
+http://lguohan.blogspot.com/2010/03/embedded-powerpc.html
+

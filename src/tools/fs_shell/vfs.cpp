@@ -12,6 +12,7 @@
 
 #include <new>
 #include <stdlib.h>
+#include <string.h>
 
 #include "fd.h"
 #include "fssh_atomic.h"
@@ -440,31 +441,21 @@ find_mount(fssh_mount_id id)
 static fssh_status_t
 get_mount(fssh_mount_id id, struct fs_mount **_mount)
 {
-	struct fs_mount *mount;
-	fssh_status_t status;
+	MutexLocker locker(&sMountMutex);
 
-	fssh_mutex_lock(&sMountMutex);
-
-	mount = find_mount(id);
-	if (mount) {
-		// ToDo: the volume is locked (against removal) by locking
-		//	its root node - investigate if that's a good idea
-		if (mount->root_vnode)
-			inc_vnode_ref_count(mount->root_vnode);
-		else {
-			// might have been called during a mount operation in which
-			// case the root node may still be NULL
-			mount = NULL;
-		}
-	} else
-		status = FSSH_B_BAD_VALUE;
-
-	fssh_mutex_unlock(&sMountMutex);
-
+	struct fs_mount *mount = find_mount(id);
 	if (mount == NULL)
-		return FSSH_B_BUSY;
+		return FSSH_B_BAD_VALUE;
 
+	if (mount->root_vnode == NULL) {
+		// might have been called during a mount operation in which
+		// case the root node may still be NULL
+		return FSSH_B_BUSY;
+	}
+
+	inc_vnode_ref_count(mount->root_vnode);
 	*_mount = mount;
+
 	return FSSH_B_OK;
 }
 
@@ -2393,7 +2384,8 @@ vfs_fs_vnode_to_node_ref(void *_vnode, fssh_mount_id *_mountID,
  */
 
 fssh_status_t
-vfs_lookup_vnode(fssh_mount_id mountID, fssh_vnode_id vnodeID, void **_vnode)
+vfs_lookup_vnode(fssh_mount_id mountID, fssh_vnode_id vnodeID,
+	struct vnode **_vnode)
 {
 	fssh_mutex_lock(&sVnodeMutex);
 	struct vnode *vnode = lookup_vnode(mountID, vnodeID);
@@ -2408,10 +2400,11 @@ vfs_lookup_vnode(fssh_mount_id mountID, fssh_vnode_id vnodeID, void **_vnode)
 
 
 fssh_status_t
-vfs_get_fs_node_from_path(fssh_fs_volume *volume, const char *path, bool kernel, void **_node)
+vfs_get_fs_node_from_path(fssh_fs_volume *volume, const char *path,
+	bool kernel, void **_node)
 {
-	TRACE(("vfs_get_fs_node_from_path(mountID = %ld, path = \"%s\", kernel %d)\n",
-		mountID, path, kernel));
+	TRACE(("vfs_get_fs_node_from_path(volume = %p (%ld), path = \"%s\", "
+		"kernel %d)\n", volume, volume->id, path, kernel));
 
 	KPath pathBuffer(FSSH_B_PATH_NAME_LENGTH + 1);
 	if (pathBuffer.InitCheck() != FSSH_B_OK)

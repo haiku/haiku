@@ -223,7 +223,7 @@ FontManager::MessageReceived(BMessage* message)
 							if (fromDirectory == NULL) {
 								// there is a new directory to watch for us
 								_AddPath(entry);
-								FTRACE("new directory moved in");
+								FTRACE(("new directory moved in"));
 							} else {
 								// A directory from our watched directories has
 								// been renamed or moved within the watched
@@ -237,7 +237,7 @@ FontManager::MessageReceived(BMessage* message)
 										style->UpdatePath(directory->directory);
 									}
 								}
-								FTRACE("directory renamed");
+								FTRACE(("directory renamed"));
 							}
 						} else {
 							if (fromDirectory != NULL) {
@@ -642,7 +642,8 @@ FontManager::_FindDirectory(node_ref& nodeRef)
 void
 FontManager::_RemoveDirectory(font_directory* directory)
 {
-	FTRACE(("FontManager: Remove directory (%Ld)!\n", directory->directory.node));
+	FTRACE(("FontManager: Remove directory (%" B_PRIdINO ")!\n",
+		directory->directory.node));
 
 	fDirectories.RemoveItem(directory, false);
 
@@ -704,8 +705,8 @@ FontManager::_AddPath(BEntry& entry, font_directory** _newDirectory)
 	if (status != B_OK) {
 		// we cannot watch this directory - while this is unfortunate,
 		// it's not a critical error
-		printf("could not watch directory %ld:%Ld\n", nodeRef.device,
-			nodeRef.node);
+		printf("could not watch directory %" B_PRIdDEV ":%" B_PRIdINO "\n",
+			nodeRef.device, nodeRef.node);
 			// TODO: should go into syslog()
 	} else {
 		BPath path(&entry);

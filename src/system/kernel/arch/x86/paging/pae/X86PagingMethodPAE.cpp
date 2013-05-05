@@ -56,7 +56,8 @@ struct X86PagingMethodPAE::ToPAESwitcher {
 		fKernelArgs(args)
 	{
 		// page hole set up in the boot loader
-		fPageHole = (page_table_entry*)fKernelArgs->arch_args.page_hole;
+		fPageHole = (page_table_entry*)
+			(addr_t)fKernelArgs->arch_args.page_hole;
 
 		// calculate where the page dir would be
 		fPageHolePageDir = (page_directory_entry*)
@@ -147,6 +148,12 @@ struct X86PagingMethodPAE::ToPAESwitcher {
 		// enable PAE on all CPUs
 		call_all_cpus_sync(&_EnablePAE, (void*)(addr_t)physicalPDPT);
 
+		// if availalbe enable NX-bit (No eXecute)
+		if (x86_check_feature(IA32_FEATURE_AMD_EXT_NX, FEATURE_EXT_AMD)) {
+			x86_write_msr(IA32_MSR_EFER, x86_read_msr(IA32_MSR_EFER)
+				| IA32_MSR_EFER_NX);
+		}
+
 		// set return values
 		_virtualPDPT = pdpt;
 		_physicalPDPT = physicalPDPT;
@@ -162,7 +169,7 @@ struct X86PagingMethodPAE::ToPAESwitcher {
 private:
 	static void _EnablePAE(void* physicalPDPT, int cpu)
 	{
-		write_cr3((addr_t)physicalPDPT);
+		x86_write_cr3((addr_t)physicalPDPT);
 		x86_write_cr4(x86_read_cr4() | IA32_CR4_PAE | IA32_CR4_GLOBAL_PAGES);
 	}
 
@@ -486,7 +493,7 @@ X86PagingMethodPAE::PhysicalPageSlotPool::AllocatePool(
 	physical_address_restrictions physicalRestrictions = {};
 	area_id dataArea = create_area_etc(B_SYSTEM_TEAM, "physical page pool",
 		PAGE_ALIGN(areaSize), B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, CREATE_AREA_DONT_WAIT,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, CREATE_AREA_DONT_WAIT, 0,
 		&virtualRestrictions, &physicalRestrictions, &data);
 	if (dataArea < 0)
 		return dataArea;
@@ -628,7 +635,7 @@ X86PagingMethodPAE::CreateTranslationMap(bool kernel, VMTranslationMap** _map)
 status_t
 X86PagingMethodPAE::MapEarly(kernel_args* args, addr_t virtualAddress,
 	phys_addr_t physicalAddress, uint8 attributes,
-	phys_addr_t (*get_free_page)(kernel_args*))
+	page_num_t (*get_free_page)(kernel_args*))
 {
 	// check to see if a page table exists for this range
 	pae_page_directory_entry* pageDirEntry = PageDirEntryForAddress(
@@ -680,9 +687,8 @@ X86PagingMethodPAE::IsKernelPageAccessible(addr_t virtualAddress,
 	// We only trust the kernel team's page directories. So switch to the
 	// kernel PDPT first. Always set it to make sure the TLBs don't contain
 	// obsolete data.
-	uint32 physicalPDPT;
-	read_cr3(physicalPDPT);
-	write_cr3(fKernelPhysicalPageDirPointerTable);
+	uint32 physicalPDPT = x86_read_cr3();
+	x86_write_cr3(fKernelPhysicalPageDirPointerTable);
 
 	// get the PDPT entry for the address
 	pae_page_directory_pointer_table_entry pdptEntry = 0;
@@ -733,7 +739,7 @@ X86PagingMethodPAE::IsKernelPageAccessible(addr_t virtualAddress,
 
 	// switch back to the original page directory
 	if (physicalPDPT != fKernelPhysicalPageDirPointerTable)
-		write_cr3(physicalPDPT);
+		x86_write_cr3(physicalPDPT);
 
 	if ((pageTableEntry & X86_PAE_PTE_PRESENT) == 0)
 		return false;
@@ -778,6 +784,10 @@ X86PagingMethodPAE::PutPageTableEntryInTable(pae_page_table_entry* entry,
 		page |= X86_PAE_PTE_USER;
 		if ((attributes & B_WRITE_AREA) != 0)
 			page |= X86_PAE_PTE_WRITABLE;
+		if ((attributes & B_EXECUTE_AREA) == 0
+			&& x86_check_feature(IA32_FEATURE_AMD_EXT_NX, FEATURE_EXT_AMD)) {
+			page |= X86_PAE_PTE_NOT_EXECUTABLE;
+		}
 	} else if ((attributes & B_KERNEL_WRITE_AREA) != 0)
 		page |= X86_PAE_PTE_WRITABLE;
 

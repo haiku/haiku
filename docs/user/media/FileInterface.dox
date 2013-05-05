@@ -1,0 +1,177 @@
+/*
+ * Copyright 2012 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ * 
+ * Corresponds to:
+ *		headers/os/media/FileInterface.h	hrev45081
+ *		src/kits/media/FileInterface.cpp	hrev45081
+ */
+
+
+/*!
+	\file FileInterface.h
+	\ingroup media
+	\ingroup libbe
+	\brief Provides BFileInterface abstract class.
+*/
+
+
+/*!
+	\class BFileInterface
+	\ingroup media
+	\ingroup libbe
+	\brief A node that can read and write data to a file on disk.
+
+	You should derive your subclass from BFileInterface so that your
+	application may specify the file that the node will reference.
+	The Media Server will then call upon the node to try to identify
+	and work with files that are hereunto unknown to it.
+
+	Your node must also derive from BBufferConsumer or BBufferProducer,
+	in addition to BFileInterface.
+*/
+
+
+/*!
+	\fn BFileInterface::BFileInterface()
+	\brief Constructor.
+*/
+
+
+/*!
+	\fn BFileInterface::~BFileInterface()
+	\brief Destructor.
+*/
+
+
+/*!
+	\fn status_t BFileInterface::HandleMessage(int32 message,
+		const void *data, size_t size)
+	\brief Dispatches a message to the appropriate BMediaNode hook method
+		given a message received on the control port. Implement this method
+		to handle messages that arrive on your control port.
+
+	\param message The message identifier.
+	\param data The message data.
+	\param size The size of the message data in bytes.
+
+	\returns A status code.
+	\retval B_OK Message was dispatched.
+	\retval B_ERROR There was an error dispatching the message, possibly
+			because it doesn't correspond to a hook function.
+
+	\see BMediaNode::HandleMessage() for details.
+*/
+
+
+/*!
+	\fn status_t BFileInterface::GetNextFileFormat(int32* cookie,
+		media_file_format* _format) = 0;
+	\brief Implement this method to fill out information about a file format
+		   indexed by \a cookie.
+
+	The first time this method is called \a cookie will be set to 0.
+	In your implementation you should set information about the first
+	file format you support in \a _format and set \a cookie to some
+	meaningful non-zero value to track your positing in the list of
+	supported formats, then return \c B_OK.
+
+	On successive calls return successive file format information and update
+	\a cookie to track your position in the list. Each time you return new
+	information about a file format return \c B_OK.
+
+	Once you run out of formats return \c B_ERROR.
+
+	\param cookie Index of file format to fill out.
+	\param _format Pointer to a preallocated \c media_file_format object to
+		   fill out.
+
+	\return \c B_OK if a file format was filled out for \a cookie, \c B_ERROR
+			or an appropriate error code otherwise.
+*/
+
+
+/*!
+	\fn void BFileInterface::DisposeFileFormatCookie(int32 cookie) = 0;
+	\brief Implement this method to dispose of a file format supported by your
+		   node indexed by \a cookie.
+
+	You are responsible for freeing any data blocks associated with this
+	\a cookie before returning.
+
+	\param cookie Index of the cookie you wish to dispose of.
+*/
+
+
+/*!
+	\fn status_t BFileInterface::GetDuration(bigtime_t* _time) = 0;
+	\brief Implement this method to fill out the duration in microseconds of
+		   the media data contained in the currently referenced file in
+		   \a _time.
+
+	\param _time The duration parameter to fill out.
+
+	\return A status code, typically \c B_OK on success and \c B_ERROR
+			or another error code on error.
+*/
+
+
+/*!
+	\fn status_t BFileInterface::SniffRef(const entry_ref& file,
+		char* _mimeType, float* _quality) = 0;
+	\brief Implement this method to allow the Media Roster to identify
+		   a file format associated with this node.
+
+	If you can handle the format, set \a _mimeType to the MIME type
+	of the file format and set \a _quality to indicate how well you
+	can process the file.
+
+	A \a _quality of 0.0 means that you can't handle the file format
+	at all and an \a _quality of 1.0 means you have total control over
+	the file format.
+
+	\param file The file being sniffed.
+	\param _mimeType Fill this out with the appropriate MIME type.
+	\param _quality How well you are able to handle the file format
+		   from 0.0 to 1.0.
+
+	\return \c B_OK if you can identify the file's contents, otherwise return
+			an appropriate error code. If you can't handle the file format at
+			all, you should return \c B_MEDIA_NO_HANDLER.
+*/
+
+
+/*!
+	\fn status_t BFileInterface::SetRef(const entry_ref& file, bool create,
+		bigtime_t* _time) = 0;
+	\brief Used when an application wants your node to use a specific file.
+
+	The file specified by \a file may or may not exist.
+
+	If create is \c false you should try to open the existing file, and if
+	successful you should write the running time of the file into \a _time.
+	If you the file does not exist you should return \c B_ENTRY_NOT_FOUND.
+
+	If \a create is \c true you should create a new file, initialize the file
+	for writing, and store 0 in \a _time. You should overwrite the file if
+	it already exists.
+
+	\return \c B_OK on success or an appropriate error code such as \c B_ERROR
+			or \c B_ENTRY_NOT_FOUND on error.
+*/
+
+
+/*!
+	\fn status_t BFileInterface::GetRef(entry_ref* _ref, char* _mimeType) = 0;
+	\brief Implement to set the \c entry_ref and the MIME type of the file
+		   referenced by the current node.
+
+	\param _ref Set to the \c entry_ref of the file.
+	\param _mimeType Set to the MIME type of the current file.
+
+	\return \c B_OK on success or an appropriate error code such as \c B_ERROR
+			on error.
+*/

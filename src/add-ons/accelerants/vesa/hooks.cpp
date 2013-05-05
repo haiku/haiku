@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2005-2012, Axel Dörfler, axeld@pinc-software.de.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -12,8 +12,12 @@
 
 #define FAKE_OVERLAY_SUPPORT 0
 	// Enables a fake overlay support, making the app_server believe it can
-	// use overlays with this driver; the actual buffers are in the frame buffer
-	// so the on-screen graphics will be messed up.
+	// use overlays with this driver; the actual buffers are in the frame
+	// buffer so the on-screen graphics will be messed up.
+
+#define FAKE_HARDWARE_CURSOR_SUPPORT 0
+	// Enables the faking of a hardware cursor. The cursor will not be
+	// visible, but it will still function.
 
 
 #if FAKE_OVERLAY_SUPPORT
@@ -22,14 +26,14 @@ static int32 sOverlayChannelUsed;
 
 
 static uint32
-vesa_overlay_count(const display_mode *mode)
+vesa_overlay_count(const display_mode* mode)
 {
 	return 1;
 }
 
 
 static const uint32*
-vesa_overlay_supported_spaces(const display_mode *mode)
+vesa_overlay_supported_spaces(const display_mode* mode)
 {
 	static const uint32 kSupportedSpaces[] = {B_RGB15, B_RGB16, B_RGB32,
 		B_YCbCr422, 0};
@@ -65,14 +69,14 @@ vesa_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 	buffer->bytes_per_row = gInfo->shared_info->bytes_per_row;
 
 	buffer->buffer = gInfo->shared_info->frame_buffer;
-	buffer->buffer_dma = (uint8 *)gInfo->shared_info->physical_frame_buffer;
+	buffer->buffer_dma = (uint8*)gInfo->shared_info->physical_frame_buffer;
 
 	return buffer;
 }
 
 
 static status_t
-vesa_release_overlay_buffer(const overlay_buffer *buffer)
+vesa_release_overlay_buffer(const overlay_buffer* buffer)
 {
 	debug_printf("release_overlay_buffer(buffer %p)\n", buffer);
 
@@ -82,8 +86,8 @@ vesa_release_overlay_buffer(const overlay_buffer *buffer)
 
 
 static status_t
-vesa_get_overlay_constraints(const display_mode *mode,
-	const overlay_buffer *buffer, overlay_constraints *constraints)
+vesa_get_overlay_constraints(const display_mode* mode,
+	const overlay_buffer* buffer, overlay_constraints* constraints)
 {
 	debug_printf("get_overlay_constraints(buffer %p)\n", buffer);
 
@@ -121,7 +125,7 @@ vesa_get_overlay_constraints(const display_mode *mode,
 
 
 static overlay_token
-vesa_allocate_overlay(void)
+vesa_allocate_overlay()
 {
 	debug_printf("allocate_overlay()\n");
 
@@ -148,8 +152,8 @@ vesa_release_overlay(overlay_token overlayToken)
 
 
 static status_t
-vesa_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer,
-	const overlay_window *window, const overlay_view *view)
+vesa_configure_overlay(overlay_token overlayToken, const overlay_buffer* buffer,
+	const overlay_window* window, const overlay_view* view)
 {
 	debug_printf("configure_overlay: buffer %p, window %p, view %p\n",
 		buffer, window, view);
@@ -158,12 +162,18 @@ vesa_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer,
 #endif	// FAKE_OVERLAY_SUPPORT
 
 
-// TODO: these are some temporary dummy functions to see if this helps with our
-// current app_server
+#if FAKE_HARDWARE_CURSOR_SUPPORT
+status_t
+vesa_set_cursor_shape(uint16 width, uint16 height, uint16 hotX, uint16 hotY,
+	const uint8* andMask, const uint8* xorMask)
+{
+	return B_OK;
+}
+
 
 status_t
-vesa_set_cursor_shape(uint16 width, uint16 height, uint16 hot_x, uint16 hot_y,
-	uint8 *andMask, uint8 *xorMask)
+vesa_set_cursor_bitmap(uint16 width, uint16 height, uint16 hotX, uint16 hotY,
+	color_space colorSpace, uint16 bytesPerRow, const uint8* bitmapData)
 {
 	return B_OK;
 }
@@ -176,13 +186,14 @@ vesa_move_cursor(uint16 x, uint16 y)
 
 
 void
-vesa_show_cursor(bool is_visible)
+vesa_show_cursor(bool isVisible)
 {
 }
+#endif	// # FAKE_HARDWARE_CURSOR_SUPPORT
 
 
-extern "C" void *
-get_accelerant_hook(uint32 feature, void *data)
+extern "C" void*
+get_accelerant_hook(uint32 feature, void* data)
 {
 	switch (feature) {
 		/* general */
@@ -234,12 +245,16 @@ get_accelerant_hook(uint32 feature, void *data)
 			return (void*)vesa_set_dpms_mode;
 
 		/* cursor managment */
+#if FAKE_HARDWARE_CURSOR_SUPPORT
 		case B_SET_CURSOR_SHAPE:
 			return (void*)vesa_set_cursor_shape;
 		case B_MOVE_CURSOR:
 			return (void*)vesa_move_cursor;
 		case B_SHOW_CURSOR:
 			return (void*)vesa_show_cursor;
+		case B_SET_CURSOR_BITMAP:
+			return (void*)vesa_set_cursor_bitmap;
+#endif
 
 		/* engine/synchronization */
 		case B_ACCELERANT_ENGINE_COUNT:

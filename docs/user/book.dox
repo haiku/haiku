@@ -32,6 +32,8 @@
 		- The \ref app is the starting point for developing applications
 			and includes classes for messaging and for interacting with
 			the rest of the system.
+		- The \ref game provides classes for producing game sounds and
+			working with full screen apps.
 		- The \ref interface is used to create responsive and attractive
 			graphical user interfaces building on the messaging facilities
 			provided by the Application Kit.
@@ -50,10 +52,13 @@
 			retrieving information from disk.
 		- The \ref support contains support classes to use in your application
 			including resources for thread safety, IO, and serialization.
+		- The \ref translation provides a framework for converting data streams
+			between media formats.
 
 	\section special_topics Special Topics
 
 	- \ref drivers
+	- \ref keyboard
 */
 
 ///// Define main kits /////
@@ -96,7 +101,9 @@
 		- BRoster
 
 
-	\defgroup drivers Device Drivers
+	\defgroup game Game Kit
+	\brief The Game Kit provides classes for producing game sounds and
+		working with full screen apps.
 
 
 	\defgroup interface Interface Kit
@@ -538,6 +545,11 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 			- Error codes for all kits
 
 
+	\defgroup translation Translation Kit
+	\brief Provides a framework for converting data streams between media
+		formats.
+
+
 	\defgroup libbe (libbe.so)
 
 
@@ -553,3 +565,9 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 	\defgroup layout Layout classes in the Interface Kit
 	\ingroup interface
 */
+
+
+///// Special Topics /////
+
+\defgroup drivers Device Drivers
+\defgroup keyboard Keyboard

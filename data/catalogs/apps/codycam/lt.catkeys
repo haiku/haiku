@@ -1,0 +1,92 @@
+1	lithuanian	x-vnd.Haiku-CodyCam	2923092031
+Capturing Image…	VideoConsumer.cpp		Fotografuojama…
+Every 30 seconds	CodyCam		30 sekundžių
+File name:	CodyCam		Failo vardas:
+Last Capture: 	VideoConsumer.cpp		Paskiausiai fotografuota: 
+Server login failed	VideoConsumer.cpp		Prisijungti prie serverio nepavyko
+Remote host has closed the connection.\n	FtpClient		Nutolęs serveris užbaigė ryšį.\n
+Login:	CodyCam		Abonento vardas:
+Format:	CodyCam		Formatas:
+Every 2 hours	CodyCam		2 valandos
+Closing the window\n	VideoConsumer.cpp		Užveriamas langas\n
+login ID expected	CodyCam		reikalingas abonento vardas
+Rate:	CodyCam		Intervalas:
+JPEG image	CodyCam		JPEG paveikslas
+Capture Rate Menu	CodyCam		Fotografavimo intervalo meniu
+File %s # unterminated quote at end of file\n	SettingsHandler		Failas %s # failo gale neterminuota kabutė\n
+Password:	CodyCam		Slaptažodis:
+Passive FTP	CodyCam		Pasyvioji FTP veiksena
+destination directory expected	CodyCam		reikalingas paskirties aplankas
+password	CodyCam		slaptažodis
+Directory:	CodyCam		Aplankas:
+Every minute	CodyCam		1 minutė
+read: %ld\n	SftpClient		skaitoma: %ld\n
+Waiting…	CodyCam		Laukiama…
+Logging in…	VideoConsumer.cpp		Registruojamasi į seansą…
+Server:	CodyCam		Serveris:
+server address expected	CodyCam		reikalingas serverio adresas
+Error creating output file	VideoConsumer.cpp		Klaida kuriant išvesties failą
+unrecognized upload client specified	CodyCam		nurodytas nežinomas įkėlimo būdas
+File %s ; Line %ld # unterminated quote\n	SettingsHandler		Failas %s; eilutė %ld # neterminuota kabutė\n
+Output	CodyCam		Paskirtis
+Every 15 minutes	CodyCam		15 minučių
+Cannot find an available video stream	CodyCam		Nepavyko rasti laisvo vaizdo srauto
+Can't find an available connection to the video window	CodyCam		Nepavyko rasti laisvos jungties prie vaizdo lango
+Transmitting…	VideoConsumer.cpp		Siunčiama…
+Cannot get a time source	CodyCam		Nepavyko gauti laikmačio
+Every 8 hours	CodyCam		8 valandos
+Rename failed	VideoConsumer.cpp		Nepavyko pervardinti
+Cannot start time source!	CodyCam		Nepavyko paleisti laikmačio!
+Cannot register the video window	CodyCam		Nepavyko užregistruoti vaizdo lango
+CodyCam	System name		CodyCam
+Every 24 hours	CodyCam		24 valandos
+unknown command	SettingsHandler		nežinoma komanda
+Video settings	CodyCam		Vaizdo parametrai
+Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Nepavyksta rasti vaizdo šaltinio. Norint naudotis „CodyCam“, Jums reikės internetinės kameros.
+still image filename expected	CodyCam		reikalingas paveikslo failo vardas
+invalid upload client %ld\n	VideoConsumer.cpp		negalimas įkėlimo būdas %ld\n
+Every 15 seconds	CodyCam		15 sekundžių
+Error writing output file	VideoConsumer.cpp		Klaida rašant išvesties failą
+image file format expected	CodyCam		reikalingas paveikslo failo formatas
+Cannot set the time source for the video source	CodyCam		Nepavyko susieti laikmačio su vaizdo šaltiniu
+Type:	CodyCam		Tipas:
+Cannot set the time source for the video window	CodyCam		Nepavyko susieti laikmačio su vaizdo ekranu
+Stop video	CodyCam		Stabdyti vaizdą
+Locking the window\n	VideoConsumer.cpp		Langas užrakinamas\n
+File %s; Line %ld # %s	SettingsHandler		Failas %s; eilutė %ld # %s
+Couldn't find requested directory on server	VideoConsumer.cpp		Nurodytas aplankas serveryje nerastas
+Renaming…	VideoConsumer.cpp		Pervardinama…
+Local	CodyCam		vietinis
+Error setting type of output file	VideoConsumer.cpp		Klaida nustatant išvesties failo tipą
+upload client name expected	CodyCam		reikalingas įkėlimo būdas
+SFTP	CodyCam		SFTP
+Connected…	VideoConsumer.cpp		Prisijungta…
+PASS <suppressed>  (real password sent)\n	FtpClient		PASS <nerodomas>  (nusiųstas tikras slaptažodis)\n
+Every 5 minutes	CodyCam		5 minutės
+read: %d\n	SftpClient		skaitoma: %d\n
+OK	CodyCam		Gerai
+Capture controls	CodyCam		Fotografavimo parinktys
+Every hour	CodyCam		1 valanda
+Cannot connect the video source to the video window	CodyCam		Nepavyko prijungti vaizdo šaltinio prie vaizdo lango
+capture rate expected	CodyCam		reikalingas fotografavimo intervalas
+Error getting initial latency for the capture node	CodyCam		Klaida gaunant pradinę vaizdo šaltinio delsą
+Send to…	CodyCam		Siųsti į…
+on or off expected	Settings	Do not translate 'on' and 'off'	reikšmė turi būti „on“ arba „off“
+Quit	CodyCam		Baigti darbą
+cmd: '%s'\n	FtpClient		komanda: „%s“\n
+Never	CodyCam		niekada
+Cannot create a video window	CodyCam		Nepavyko sukurti vaizdo lango
+Every 10 minutes	CodyCam		10 minučių
+Cannot start the video source	CodyCam		Nepavyko paleisti vaizdo šaltinio
+Cannot start the video window	CodyCam		Nepavyko paleisti vaizdo lango
+password expected	CodyCam		reikalingas slaptažodis
+reply: %d, %d\n	FtpClient		atsakas: %d, %d\n
+Every 4 hours	CodyCam		4 valandos
+FTP	CodyCam		FTP
+File transmission failed	VideoConsumer.cpp		Failų perdavimas nepavyko
+Cannot seek time source!	CodyCam		Laikmačio pervynioti negalima!
+File	CodyCam		Failas
+Image Format Menu	CodyCam		Paveikslo formato meniu
+Every 30 minutes	CodyCam		30 minučių
+reply: '%s'\n	SftpClient		atsakas: „%s“\n
+Start video	CodyCam		Pradėti vaizdą

@@ -1,43 +1,43 @@
-1	norwegian_bokmål	x-vnd.Haiku-Appearance	3187486915
-Antialiasing	APRWindow		Kantutjevning
-Antialiasing menu	AntialiasingSettingsView		Kantutjevning-meny
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Appearance	3187486915
+Control highlight	Colors tab		Uthevet kontroll
+Control border	Colors tab		Kontrollkant
 Antialiasing type:	AntialiasingSettingsView		Kantutjevningstype
-Appearance	System name		Utseende
+Shadow	Colors tab		Skygge
+On	AntialiasingSettingsView		På
+Defaults	APRWindow		Standardinnstillinger
+Grayscale	AntialiasingSettingsView		Gråtone
+Shine	Colors tab		Høylys
+Off	AntialiasingSettingsView		Av
+Success	Colors tab		Suksess
+Inactive window tab text	Colors tab		Fanetekst på inaktivt vindu
+Failure	Colors tab		Mislykket
+Hinting menu	AntialiasingSettingsView		Hinting-meny
+Document background	Colors tab		Dokumentbakgrunn
+Revert	APRWindow		Tilbakestill
+Window tab	Colors tab		Vindusfane
+Tooltip background	Colors tab		Skjermtipsbakgrunn
+Selected menu item background	Colors tab		Bakgrunn for valgt menyelement
+Antialiasing	APRWindow		Kantutjevning
+Navigation base	Colors tab		Navigasjonsbase
+Window tab text	Colors tab		Vindusfanetekst
+Document text	Colors tab		Dokumenttekst
+Navigation pulse	Colors tab		Navigasjonspuls
+Selected menu item text	Colors tab		Tekstfarge på valgt menyelement
+Menu background	Colors tab		Menybakgrunn
+Panel background	Colors tab		Panelbakgrunn
 Colors	APRWindow		Farger
 Control background	Colors tab		Bakgrunn for kontrollelement
-Control border	Colors tab		Kontrollkant
-Control highlight	Colors tab		Uthevet kontroll
-Control text	Colors tab		Kontroll-tekst
-Defaults	APRWindow		Standardinnstillinger
-Document background	Colors tab		Dokumentbakgrunn
-Document text	Colors tab		Dokumenttekst
-Failure	Colors tab		Mislykket
-Glyph hinting:	AntialiasingSettingsView		Glyff-hinting
-Grayscale	AntialiasingSettingsView		Gråtone
-Hinting menu	AntialiasingSettingsView		Hinting-meny
 Inactive window tab	Colors tab		Inaktiv vindusfane
-Inactive window tab text	Colors tab		Fanetekst på inaktivt vindu
-LCD subpixel	AntialiasingSettingsView		LCD subpixel
-Menu background	Colors tab		Menybakgrunn
-Menu item text	Colors tab		Tekstfarge på menyelement
-Monospaced fonts only	AntialiasingSettingsView		Bare tegn med fast bredde
-Navigation base	Colors tab		Navigasjonsbase
-Navigation pulse	Colors tab		Navigasjonspuls
-Off	AntialiasingSettingsView		Av
-On	AntialiasingSettingsView		På
-Panel background	Colors tab		Panelbakgrunn
-Panel text	Colors tab		Paneltekst
+Appearance	System name		Utseende
 Reduce colored edges filter strength:	AntialiasingSettingsView		Filterstyrke for reduserte kantfarger
-Revert	APRWindow		Tilbakestill
-Selected menu item background	Colors tab		Bakgrunn for valgt menyelement
-Selected menu item border	Colors tab		Kant på valgt menyelement
-Selected menu item text	Colors tab		Tekstfarge på valgt menyelement
-Shadow	Colors tab		Skygge
-Shine	Colors tab		Høylys
-Strong	AntialiasingSettingsView		Uthevet
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Subpixelbasert kantutjevning kombinert med glyff-hinting er ikke tilgjengelig i denne utgaven av Haiku for å unngå mulige patentproblemer. For å benytte disse funksjonene må du kompilere Haiku selv og aktivere visse alternativer i konfigurasjonsheaderen for libfreetype.
-Success	Colors tab		Suksess
-Tooltip background	Colors tab		Skjermtipsbakgrunn
+Control text	Colors tab		Kontroll-tekst
 Tooltip text	Colors tab		Skjermtips-tekst
-Window tab	Colors tab		Vindusfane
-Window tab text	Colors tab		Vindusfanetekst
+Menu item text	Colors tab		Tekstfarge på menyelement
+LCD subpixel	AntialiasingSettingsView		LCD subpixel
+Selected menu item border	Colors tab		Kant på valgt menyelement
+Strong	AntialiasingSettingsView		Uthevet
+Panel text	Colors tab		Paneltekst
+Monospaced fonts only	AntialiasingSettingsView		Bare tegn med fast bredde
+Antialiasing menu	AntialiasingSettingsView		Kantutjevning-meny
+Glyph hinting:	AntialiasingSettingsView		Glyff-hinting

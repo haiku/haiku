@@ -143,8 +143,8 @@ PrinterDriverAddOn::TakeJob(const char* spoolFile, BDirectory* spoolFolder)
 	// This seems to be required for legacy?
 	// HP PCL3 add-on crashes without it!
 	BMessage parameters(B_REFS_RECEIVED);
-	parameters.AddInt32("file", (int32)&file);
-	parameters.AddInt32("printer", (int32)spoolFolder);
+	parameters.AddInt32("file", (addr_t)&file);
+	parameters.AddInt32("printer", (addr_t)spoolFolder);
 
 	BMessage* message = (*func)(&file, spoolFolder, &parameters);
 	if (message == NULL || message->what != 'okok')

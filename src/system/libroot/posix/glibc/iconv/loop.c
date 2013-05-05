@@ -205,8 +205,6 @@
    points.  */
 #define STANDARD_TO_LOOP_ERR_HANDLER(Incr) \
   {									      \
-    struct __gconv_trans_data *trans;					      \
-									      \
     result = __GCONV_ILLEGAL_INPUT;					      \
 									      \
     if (irreversible == NULL)						      \
@@ -214,20 +212,7 @@
 	 case we are not doing any error recovery outself.  */		      \
       break;								      \
 									      \
-    /* First try the transliteration methods.  */			      \
-    for (trans = step_data->__trans; trans != NULL; trans = trans->__next)    \
-      {									      \
-	result = DL_CALL_FCT (trans->__trans_fct,			      \
-			      (step, step_data, trans->__data, *inptrp,	      \
-			       &inptr, inend, &outptr, irreversible));	      \
-	if (result != __GCONV_ILLEGAL_INPUT)				      \
-	  break;							      \
-      }									      \
-    /* If any of them recognized the input continue with the loop.  */	      \
-    if (result != __GCONV_ILLEGAL_INPUT)				      \
-      continue;								      \
-									      \
-    /* Next see whether we have to ignore the error.  If not, stop.  */	      \
+    /* See whether we have to ignore the error.  If not, stop.  */	      \
     if (! ignore_errors_p ())						      \
       break;								      \
 									      \

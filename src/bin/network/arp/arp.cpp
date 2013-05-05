@@ -270,7 +270,7 @@ set_entries_from_file(const char *filename)
 		char *rest = line;
 		const char *argument = next_argument(&rest);
 		if (argument == NULL) {
-			fprintf(stderr, "%s: Line %ld is invalid (missing hostname).\n",
+			fprintf(stderr, "%s: Line %" B_PRId32 " is invalid (missing hostname).\n",
 				kProgramName, counter);
 			continue;
 		}
@@ -280,12 +280,12 @@ set_entries_from_file(const char *filename)
 			// get host by name
 			struct hostent *host = gethostbyname(argument);
 			if (host == NULL) {
-				fprintf(stderr, "%s: Line %ld, host \"%s\" is not known in the IPv4 domain: %s\n",
+				fprintf(stderr, "%s: Line %" B_PRId32 ", host \"%s\" is not known in the IPv4 domain: %s\n",
 					kProgramName, counter, argument, strerror(errno));
 				continue;
 			}
 			if (host->h_addrtype != AF_INET) {
-				fprintf(stderr, "%s: Line %ld, host \"%s\" is not known in the IPv4 domain.\n",
+				fprintf(stderr, "%s: Line " B_PRId32 ", host \"%s\" is not known in the IPv4 domain.\n",
 					kProgramName, counter, argument);
 				continue;
 			}
@@ -299,14 +299,14 @@ set_entries_from_file(const char *filename)
 
 		argument = next_argument(&rest);
 		if (argument == NULL) {
-			fprintf(stderr, "%s: Line %ld is invalid (missing ethernet address).\n",
+			fprintf(stderr, "%s: Line %" B_PRId32 " is invalid (missing ethernet address).\n",
 				kProgramName, counter);
 			continue;
 		}
 
 		uint8 ethernetAddress[6];
 		if (!parse_ethernet_address(argument, ethernetAddress)) {
-			fprintf(stderr, "%s: Line %ld, \"%s\" is not a valid ethernet address.\n",
+			fprintf(stderr, "%s: Line %" B_PRId32 ", \"%s\" is not a valid ethernet address.\n",
 				kProgramName, counter, argument);
 			continue;
 		}
@@ -316,14 +316,14 @@ set_entries_from_file(const char *filename)
 		uint32 flags = ARP_FLAG_PERMANENT;
 		while ((argument = next_argument(&rest)) != NULL) {
 			if (!set_flags(flags, argument)) {
-				fprintf(stderr, "%s: Line %ld, ignoring invalid flag \"%s\".\n",
+				fprintf(stderr, "%s: Line %" B_PRId32 ", ignoring invalid flag \"%s\".\n",
 					kProgramName, counter, argument);
 			}
 		}
 
 		status_t status = set_entry(&address, ethernetAddress, flags);
 		if (status != B_OK) {
-			fprintf(stderr, "%s: Line %ld, ARP entry could not been set: %s\n",
+			fprintf(stderr, "%s: Line %" B_PRId32 ", ARP entry could not been set: %s\n",
 				kProgramName, counter, strerror(status));
 		}
 	}

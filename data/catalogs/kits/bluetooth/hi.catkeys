@@ -1,0 +1,88 @@
+1	hindi	x-vnd.Haiku-Bluetooth	3550394259
+Display	DeviceClass		प्रदर्शक
+Capturing	DeviceClass		कब्जा
+Printer	DeviceClass		प्रिंटर
+Uncategorized	DeviceClass		उनकेटरग्रिज़ड
+1-17% utilized	DeviceClass		1-17% उपयोग किया
+Positioning	DeviceClass		पोजिशनिंग
+Rendering	DeviceClass		प्रतिपादन
+Phone	DeviceClass		फोन
+17-33% utilized	DeviceClass		17-33% उपयोग किया
+#ServerNotReady#Not Valid name	RemoteDevice		#सर्वर त्यार नहीं है#नहीं मान्य नाम
+Combo keyboard/pointing device	DeviceClass		कॉम्बो कीबोर्ड/इशाराकरने के लिए डिवाइस
+Controller	DeviceClass		नियंत्रक
+No service available	DeviceClass		कोई सेवा उपलब्ध नहीं है
+Wearable	DeviceClass	A wearable computer	वेअरअबल ध्यान दें: एक वेअरअबल कंप्यूटर
+Handheld	DeviceClass		हैण्डहेल्ड
+Invalid device class!\n	DeviceClass		अवैध उपकरण क्लास!\n
+Sensing device	DeviceClass		संवेदन डिवाइस
+Computer	DeviceClass		कंप्यूटर
+Cellular	DeviceClass		सेलुलर
+Microphone	DeviceClass		माइक्रोफ़ोन
+Unknown (reserved) minor device class	DeviceClass		अज्ञात (आरक्षित) छोटी युक्ति वर्ग
+Cordless	DeviceClass		ताररहित
+Common ISDN access	DeviceClass		आम आईएसडीएन उपयोग
+83-99% utilized	DeviceClass		83-99% उपयोग किया
+Scanner	DeviceClass		स्कैनर
+Game	DeviceClass		खेल
+Gamepad	DeviceClass		गमेपेड़  
+(reserved)	DeviceClass		(सुरक्षित)
+Desktop workstation	DeviceClass		डेस्कटॉप कार्य केंद्र
+Audio/Video	DeviceClass		ऑडियो / वीडियो
+Glasses	DeviceClass		चश्मा
+Keyboard	DeviceClass		कीबोर्ड
+Camera	DeviceClass		कैमरा
+Major class: 	DeviceClass		प्रमुख वर्ग: 
+50-67% utilized	DeviceClass		50-67% उपयोग किया
+Card reader	DeviceClass		कार्ड रीडर   
+Set-top box	DeviceClass		सेट-टॉप बॉक्स
+Helmet	DeviceClass		हेलमेट
+Laptop	DeviceClass		लैपटॉप
+Car audio	DeviceClass		कार ऑडियो
+SIM card reader	DeviceClass		सिम कार्ड रीडर
+Headphones	DeviceClass		हेअद्फोनेस 
+Information	DeviceClass		जानकारी
+Remote control	DeviceClass		रिमोट कंट्रोल
+Service classes: 	DeviceClass		सेवा वर्गों: 
+Pager	DeviceClass	A small radio device to receive short text messages	पेजर नोट: एक छोटा सा रेडियो डिवाइस छोटे पाठ संदेश प्राप्त करने के लिए
+Object transfer	DeviceClass		वस्तु स्थानांतरण
+Gaming/Toy	DeviceClass		गेमिंग/खिलौना
+Audio	DeviceClass		ऑडियो
+Robot	DeviceClass		रोबोट
+Camcorder	DeviceClass		कैमकॉर्डर 
+Digitizer tablet	DeviceClass		दिगितिज़ेर टेबलेट 
+Loudspeaker	DeviceClass		लाउडस्पीकर
+Joystick	DeviceClass		जोस्टिक
+LAN access	DeviceClass		लैन का उपयोग
+Wrist watch	DeviceClass		कलाई घड़ी
+Minor class: 	DeviceClass		नाबालिग वर्ग: 
+Networking	DeviceClass		नेटवर्किंग
+Portable audio	DeviceClass		पोर्टेबल ऑडियो 
+Device conforms to the headset profile	DeviceClass		युक्ति हेडसेट प्रोफ़ाइल के अनुरूप है
+Hands-free	DeviceClass		हंड्स-फ्री 
+#CommandFailed#Not Valid name	RemoteDevice		#कमांड फैलड#नहीं मान्य नाम
+Vehicle	DeviceClass		वाहन
+Palm	DeviceClass	A palm-held device	पाम ध्यान दें: एक पाम हेल्ड उपकरण
+Video display and loudspeaker	DeviceClass		वीडियो प्रदर्शन और लाउडस्पीकर
+Peripheral	DeviceClass		परिधीय
+#NoOwnerError#Not Valid name	RemoteDevice		#नूव्नेरेर्रोर#नहीं मान्य नाम  
+Wired modem or voice gateway	DeviceClass		वायर्ड मॉडेम या आवाज प्रवेश द्वार
+Jacket	DeviceClass		जैकेट
+Unspecified	DeviceClass		अनिर्दिष्ट
+Fully available	DeviceClass		पूरी तरह से उपलब्ध
+67-83% utilized	DeviceClass		67-83% उपयोग किया
+Not implemented	RemoteDevice		लागू नहीं जो पाया 
+#NotCompletedRequest#Not Valid name	RemoteDevice		#नोटकोम्प्लेतेडरेकुएस्ट#नहीं मान्य नाम 
+Server	DeviceClass		सर्वर
+Video conferencing	DeviceClass		वीडियो कॉन्फ्रेंसिंग
+Video camera	DeviceClass		वीडियो कैमरा
+HiFi audio device	DeviceClass		हिफी ऑडियो डिवाइस 
+Smart phone	DeviceClass		स्मार्ट फोन
+Telephony	DeviceClass		टेलिफ़ोनी
+Doll/Action figure	DeviceClass		गुड़िया/लड़ाई आंकड़ा
+VCR	DeviceClass		वीसीआर
+Video monitor	DeviceClass		वीडियो मोनिटर 
+Pointing device	DeviceClass		इंगित डिवाइस
+Miscellaneous	DeviceClass		विविध
+33-50% utilized	DeviceClass		33-50% उपयोग किया
+Imaging	DeviceClass		इमेजिंग

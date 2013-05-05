@@ -1,26 +1,27 @@
-1	swedish	x-vnd.haiku-screenshot	1697748405
-Artwork folder	ScreenshotWindow		Illustrationsmapp
-Cancel	ScreenshotWindow		Avbryt
-Capture active window	ScreenshotWindow		Fånga aktivt fönster
-Choose folder	ScreenshotWindow		Välj mapp
-Choose folder...	ScreenshotWindow		Välj mapp...
-Copy to clipboard	ScreenshotWindow		Kopiera till urklipp
-Delay:	ScreenshotWindow		Fördröjning:
+1	swedish	x-vnd.haiku-screenshot	1721618877
+seconds	ScreenshotWindow		sekunder
 Desktop	ScreenshotWindow		Skrivbord
-Home folder	ScreenshotWindow		Hemmapp
-Include mouse pointer	ScreenshotWindow		Inkludera muspekare
 Include window border	ScreenshotWindow		Inkludera fönsterkant
-Name:	ScreenshotWindow		Namn:
-New screenshot	ScreenshotWindow		Ny skärmdump
-Please select	ScreenshotWindow		Vänligen välj
-Save	ScreenshotWindow		Spara
-Save as:	ScreenshotWindow		Spara som:
-Save in:	ScreenshotWindow		Spara i:
 Screenshot	System name		Skärmdump
 Select	ScreenshotWindow		Markera
-Settings…	ScreenshotWindow		Inställningar...
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Filen finns redan.\n Är du säker på att du vill skriva över den?
-Translator Settings	ScreenshotWindow		Översättningsinställningar
-overwrite	ScreenshotWindow		skriv över
+Capture active window	ScreenshotWindow		Fånga aktivt fönster
+Cancel	ScreenshotWindow		Avbryt
+Name:	ScreenshotWindow		Namn:
+Choose folder	ScreenshotWindow		Välj mapp
+Save	ScreenshotWindow		Spara
+Overwrite	ScreenshotWindow		Skriv över
+Choose folder...	ScreenshotWindow		Välj mapp...
+Please select	ScreenshotWindow		Vänligen välj
+Save as:	ScreenshotWindow		Spara som:
+Copy to clipboard	ScreenshotWindow		Kopiera till urklipp
+Save in:	ScreenshotWindow		Spara i:
 screenshot	Screenshot	Base filename of screenshot files	skärmdump
-seconds	ScreenshotWindow		sekunder
+New screenshot	ScreenshotWindow		Ny skärmdump
+Artwork folder	ScreenshotWindow		Illustrationsmapp
+Home folder	ScreenshotWindow		Hemmapp
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Filen finns redan.\n Är du säker på att du vill skriva över den?
+Settings…	ScreenshotWindow		Inställningar...
+overwrite	ScreenshotWindow		skriv över
+Delay:	ScreenshotWindow		Fördröjning:
+Include mouse pointer	ScreenshotWindow		Inkludera muspekare
+Translator Settings	ScreenshotWindow		Översättningsinställningar

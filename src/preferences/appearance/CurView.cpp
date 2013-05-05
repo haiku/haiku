@@ -238,6 +238,7 @@ printf("Loading cursor sets from disk\n");
 					"Please contact OpenBeOS about Appearance Preferences::CurView::"
 					"LoadCursorSets::B_NAME_TOO_LONG for a bugfix", "OK",
 					 NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				a->SetFlags(a->Flags() | B_CLOSE_ON_ESCAPE);
 				a->Go();
 				break;
 			}
@@ -267,6 +268,7 @@ printf("Loading cursor sets from disk\n");
 					"because of a file error. Perhaps there is a file (instead of a folder) at " COLOR_SET_DIR
 					"? You will be able to change system cursors, but be unable to save them to a cursor set. ",
 					"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				a->SetFlags(a->Flags() | B_CLOSE_ON_ESCAPE);
 				a->Go();
 				break;
 			}
@@ -276,6 +278,7 @@ printf("Loading cursor sets from disk\n");
 					"because there are too many open files. Please close some files and restart "
 					" this application.", "OK",
 					 NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				a->SetFlags(a->Flags() | B_CLOSE_ON_ESCAPE);
 				a->Go();
 				if(Window())
 					Window()->PostMessage(B_QUIT_REQUESTED);

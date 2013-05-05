@@ -243,7 +243,7 @@ socket_write(struct file_descriptor *descriptor, off_t pos, const void *buffer,
 
 
 static status_t
-socket_ioctl(struct file_descriptor *descriptor, uint32 op, void *buffer,
+socket_ioctl(struct file_descriptor *descriptor, ulong op, void *buffer,
 	size_t length)
 {
 	return sStackInterface->ioctl(descriptor->u.socket, op, buffer, length);

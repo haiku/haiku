@@ -79,7 +79,7 @@ DMABuffer::Dump() const
 	kprintf("  bounce buffer:      %p (physical %#" B_PRIxPHYSADDR ")\n",
 		fBounceBuffer->address, fBounceBuffer->physical_address);
 	kprintf("  bounce buffer size: %" B_PRIxPHYSADDR "\n", fBounceBuffer->size);
-	kprintf("  vecs:               %lu\n", fVecCount);
+	kprintf("  vecs:               %" B_PRIu32 "\n", fVecCount);
 
 	for (uint32 i = 0; i < fVecCount; i++) {
 		kprintf("    [%" B_PRIu32 "] %#" B_PRIxGENADDR ", %" B_PRIuGENADDR "\n",
@@ -246,7 +246,7 @@ DMAResource::CreateBounceBuffer(DMABounceBuffer** _buffer)
 	physicalRestrictions.alignment = fRestrictions.alignment;
 	physicalRestrictions.boundary = fRestrictions.boundary;
 	area = create_area_etc(B_SYSTEM_TEAM, "dma buffer", size, B_CONTIGUOUS,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, &virtualRestrictions,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, 0, &virtualRestrictions,
 		&physicalRestrictions, &bounceBuffer);
 	if (area < B_OK)
 		return area;

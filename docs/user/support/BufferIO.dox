@@ -1,184 +1,207 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007,Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation by: 
- *   Niels Sascha Reedijk <niels.reedijk@gmail.com>
- *   Stefano Ceccherini (burton666@libero.it) 
+ * Authors:
+ *		Stefano Ceccherini, burton666@libero.it
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *
  * Corresponds to:
- *   /trunk/headers/os/support/BufferIO.h  rev 19972
- *   /trunk/src/kits/support/BufferIO.cpp  rev 20510
+ *		headers/os/support/BufferIO.h	rev 19972
+ *		src/kits/support/BufferIO.cpp	rev 20510
  */
 
+
 /*!
-  \file BufferIO.h
-  \brief Provides the BBufferIO class.
+	\file BufferIO.h
+	\ingroup support
+	\ingroup libbe
+	\brief Provides the BBufferIO class.
+*/
+
+
+/*!
+	\class BBufferIO
+	\ingroup support
+	\ingroup libbe
+	\brief A buffered adapter for BPositionIO objects.
+
+	This class differs from other classes derived from BPositionIO in a sense
+	that it does not actually provide an actual entity to be read or written 
+	to, but rather acts like a "frontend" to a stream. This class especially
+	comes in handy when working with files that are constantly written and
+	rewritten and where you want do this writing buffered so that the hard
+	disk or the network will not have to be accessed so frequently.
+
+	This class works as follows. After constructing a BBufferIO object that
+	you want to be buffered, you can create this object. The constructor
+	takes a \a stream parameter that points to the object to be buffered.
+
+	You then use this object as a proxy to the resource you want to read
+	of or write to. As soon as you use ReadAt(), the buffer will be
+	initialized to the contents of the original stream, and subsequent calls
+	to the positions within the buffer will not be routed to the original
+	stream. In the same way WriteAt() will change the data in the buffer,
+	but not in the actual stream. In order to flush the changes to the
+	original stream, use the Flush() method. Deleting the object when you are
+	done with it will also flush the stream and update the original stream.
+
+	\note This class is not meant to be used in cases where the
+		original stream requires to be in a consistent state. Neither should
+		this class be used as a way to perform 'atomic' writes, because the
+		object might need to do partial writes if it needs to 'move' the
+		buffer. This happens for instance if the original stream is bigger
+		than the buffer.
 */
 
 /*!
-  \class BBufferIO
-  \ingroup support
-  \ingroup libbe
-  \brief A buffered adapter for BPositionIO objects.
-  \author Stefano Ceccherini \<burton666@freemail.it\>
+	\fn BBufferIO::BBufferIO(BPositionIO *stream, size_t bufferSize,
+		bool ownsStream)
+	\brief Initialize a BBufferIO object.
 
-  This class differs from other classes derived from BPositionIO in a sense that
-  it does not actually provide an actual entity to be read or written to, but
-  rather acts like a "frontend" to a stream. This class especially comes in
-  handy when working with files that are constantly written and rewritten and
-  where you want do this writing buffered so that the hard disk or the network
-  will not have to be accessed so frequently.
+	The constructor will create a buffer of the given size
+	and associate the object with the given BPositionIO stream.
 
-  This class works as follows. After constructing a BBufferIO object that you
-  want to be buffered, you can create this object. The constructor takes a 
-  \a stream parameter that points to the object to be buffered. You then use
-  this object as a proxy to the resource you want to read of or write to. As
-  soon as you use ReadAt(), the buffer will be initialised to the contents
-  of the original stream,
-  and subsequent calls to the positions within the buffer will not be
-  routed to the original stream. In the same way WriteAt() will change
-  the data in the buffer, but not in the actual stream. In order to flush
-  the changes to the original stream, use the Flush() method. Deleting
-  the object when you are done with it will also flush the stream and
-  update the original stream.
-
-  \note This class is not meant to be used in cases where the 
-  original stream requires to be in a consistent state. Neither should this
-  class be used as a way to perform 'atomic' writes, because the object 
-  might need to do partial writes if it needs to 'move' the buffer. This 
-  happens for instance if the original stream is bigger than the buffer. 
+	\param stream A pointer to a BPositionIO object.
+	\param bufferSize The size of the buffer that the object will allocate and 
+    	use.
+	\param ownsStream Specifies if the object will delete the stream on 
+		destruction.
 */
 
 /*!
-  \fn BBufferIO::BBufferIO(BPositionIO *stream, size_t bufferSize, bool ownsStream)
-  \brief Initialize a BBufferIO object.
-    
-  The constructor will create a buffer of the given size
-  and associate the object with the given BPositionIO stream.
+	\fn BBufferIO::~BBufferIO()
+	\brief Free the resources allocated by the object
 
-  \param stream A pointer to a BPositionIO object.
-  \param bufferSize The size of the buffer that the object will allocate and 
-    use.
-  \param ownsStream Specifies if the object will delete the stream on 
-    destruction.
-*/
-
-/*!
-  \fn BBufferIO::~BBufferIO()
-  \brief Free the resources allocated by the object
-
-  Flush pending changes to the stream and free the allocated memory.
-  If the \c owns_stream property is \c true, the destructor also
-  deletes the stream associated with the BBufferIO object.
+	Flush pending changes to the stream and free the allocated memory.
+	If the \c owns_stream property is \c true, the destructor also
+	deletes the stream associated with the BBufferIO object.
 */
 
 
 /*! 
-  \fn ssize_t BBufferIO::ReadAt(off_t pos, void *buffer, size_t size)
-  \brief Read the specified amount of bytes at the given position.
-  \param pos The offset into the stream where to read.
-  \param buffer A pointer to a buffer where to copy the read data.
-  \param size The amount of bytes to read.
-  \return The amount of bytes actually read, or an error code.
-  \retval B_NO_INIT The object is not associated with a valid BPositionIO
+	\fn ssize_t BBufferIO::ReadAt(off_t pos, void *buffer, size_t size)
+	\brief Read the specified amount of bytes at the given position.
+
+	\param pos The offset into the stream where to read.
+	\param buffer A pointer to a buffer where to copy the read data.
+	\param size The amount of bytes to read.
+
+	\return The amount of bytes actually read, or an error code.
+	\retval B_NO_INIT The object is not associated with a valid BPositionIO
     stream.
-  \retval B_BAD_VALUE The \c buffer parameter is not valid.
+	\retval B_BAD_VALUE The \c buffer parameter is not valid.
 */
 
 /*! 
-  \fn ssize_t BBufferIO::WriteAt(off_t pos, const void *buffer, size_t size)
-  \brief Write the specified amount of bytes at the given position.
-  \param pos The offset into the stream where to write.
-  \param buffer A pointer to a buffer which contains the data to write.
-  \param size The amount of bytes to write.
-  \return The amount of bytes actually written, or an error code.
-  \retval B_NO_INIT The object is not associated with a valid BPositionIO
-    stream.
-  \retval B_BAD_VALUE The \c buffer parameter is not valid.
+	\fn ssize_t BBufferIO::WriteAt(off_t pos, const void *buffer, size_t size)
+	\brief Write the specified amount of bytes at the given position.
+
+	\param pos The offset into the stream where to write.
+	\param buffer A pointer to a buffer which contains the data to write.
+	\param size The amount of bytes to write.
+
+	\return The amount of bytes actually written, or an error code.
+	\retval B_NO_INIT The object is not associated with a valid BPositionIO
+		stream.
+	\retval B_BAD_VALUE The \c buffer parameter is not valid.
 */
 
 /*! 
-  \fn off_t BBufferIO::Seek(off_t position, uint32 seekMode)
-  \brief Set the position in the stream.
-    
-   Set the position in the stream where the Read() and Write() functions
-   (inherited from BPositionIO) begin reading and writing.
-   How the position argument is understood depends on the seek_mode flag.
-   
-   \param position The position where you want to seek.
-   \param seekMode Can have three values:
-   - \c SEEK_SET. The position passed is an offset from the beginning of the
-     stream; in other words, the current position is set to position.
-    For this mode, position should be a positive value. 
-   - \c SEEK_CUR. The position argument is an offset from the current position;
-    the value of the argument is added to the current position.
-   - \c SEEK_END. The position argument is an offset from the end of the
-     stream. In this mode the position argument should be negative (or zero).
+	\fn off_t BBufferIO::Seek(off_t position, uint32 seekMode)
+	\brief Set the position in the stream.
 
-   \return The current position as an offset in bytes from the beginning of
-     the stream.
-    
-    \retval B_NO_INIT The object is not associated with a valid BPositionIO
-      stream.
-*/
+	Set the position in the stream where the Read() and Write() functions
+	(inherited from BPositionIO) begin reading and writing.
+	How the position argument is understood depends on the seek_mode flag.
 
-/*! 
-  \fn off_t BBufferIO::Position() const
-  \brief Return the current position in the stream.
-  \return The current position as an offset in bytes
-    from the beginning of the stream.
-  \retval B_NO_INIT The object is not associated with a valid BPositionIO
-    stream.
-*/
+	\param position The position where you want to seek.
+	\param seekMode Can have three values:
+		- \c SEEK_SET The position passed is an offset from the beginning of
+			the stream; in other words, the current position is set to
+			position. For this mode, position should be a positive value. 
+		- \c SEEK_CUR The position argument is an offset from the current
+			position; the value of the argument is added to the current
+			position.
+		- \c SEEK_END. The position argument is an offset from the end of the
+			stream. In this mode the position argument should be negative
+			(or zero).
 
-/*! 
-  \fn status_t BBufferIO::SetSize(off_t size)
-  \brief Call the SetSize() function of the assigned BPositionIO stream.
-  \param size The new size of the BPositionIO object.
-  \retval B_OK The stream is resized.
-  \retval B_NO_INIT The object is not associated with a valid BPositionIO
-    stream.
+	\return The current position as an offset in bytes from the beginning of
+		the stream.
+	\retval B_NO_INIT The object is not associated with a valid BPositionIO
+		stream.
 */
 
 /*!
-  \fn status_t BBufferIO::Flush()
-  \brief Write pending modifications to the stream.
-  \return The amount of bytes written, or if it failed it will return an error
+	\fn off_t BBufferIO::Position() const
+	\brief Return the current position in the stream.
+
+	\return The current position as an offset in bytes
+	from the beginning of the stream.
+	\retval B_NO_INIT The object is not associated with a valid BPositionIO
+		stream.
+*/
+
+/*!
+	\fn status_t BBufferIO::SetSize(off_t size)
+	\brief Call the SetSize() function of the assigned BPositionIO stream.
+
+	\param size The new size of the BPositionIO object.
+
+	\returns A status code.
+	\retval B_OK The stream is resized.
+	\retval B_NO_INIT The object is not associated with a valid BPositionIO
+		stream.
+*/
+
+/*!
+	\fn status_t BBufferIO::Flush()
+	\brief Write pending modifications to the stream.
+
+	\return The amount of bytes written, or if it failed it will return an error
     code.
 */
 
 
 /*! 
-  \fn BPositionIO *BBufferIO::Stream() const
-  \brief Return a pointer to the stream specified on construction.
-  \return A pointer to the BPositionIO stream specified on construction.
+	\fn BPositionIO *BBufferIO::Stream() const
+	\brief Return a pointer to the stream specified on construction.
+
+	\return A pointer to the BPositionIO stream specified on construction.
 */
 
 
-/*! 
-  \fn size_t BBufferIO::BufferSize() const
-  \brief Return the size of the internal buffer.
-  \return The size of the buffer allocated by the object.
-*/
+/*!
+	\fn size_t BBufferIO::BufferSize() const
+	\brief Return the size of the internal buffer.
 
-/*! 
-  \fn bool BBufferIO::OwnsStream() const
-  \brief Tell if the BBufferIO object "owns" the specified stream.
-  \retval true The object "owns" the stream and will destroy it upon
-    destruction.
-  \retval false The object does not own the stream.
-  \see SetOwnsStream()
-*/
-
-/*! 
-  \fn void BBufferIO::SetOwnsStream(bool owns_stream)
-  \brief Set the \c owns_stream property of the object.
-  \param owns_stream If you pass \c true, the object will delete the stream
-    upon destruction, if you pass \c false it will not.
+	\return The size of the buffer allocated by the object.
 */
 
 
-/*! 
-  \fn void BBufferIO::PrintToStream() const
-  \brief Print the object to stdout.
+/*!
+	\fn bool BBufferIO::OwnsStream() const
+	\brief Tell if the BBufferIO object "owns" the specified stream.
+
+	\retval true The object "owns" the stream and will destroy it upon
+		destruction.
+	\retval false The object does not own the stream.
+
+	\see SetOwnsStream()
+*/
+
+
+/*!
+	\fn void BBufferIO::SetOwnsStream(bool owns_stream)
+	\brief Set the \c owns_stream property of the object.
+
+	\param owns_stream If you pass \c true, the object will delete the stream
+		upon destruction, if you pass \c false it will not.
+*/
+
+
+/*!
+	\fn void BBufferIO::PrintToStream() const
+	\brief Print the object to stdout.
 */

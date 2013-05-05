@@ -31,7 +31,7 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef	STATUS_WINDOW_H
+#ifndef STATUS_WINDOW_H
 #define STATUS_WINDOW_H
 
 
@@ -202,5 +202,6 @@ extern BStatusWindow* gStatusWindow;
 } // namespace BPrivate
 
 using namespace BPrivate;
+
 
 #endif // STATUS_WINDOW_H

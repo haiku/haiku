@@ -89,7 +89,7 @@ BRadioButton::Draw(BRect updateRect)
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 
-	if (be_control_look) {
+	if (be_control_look != NULL) {
 		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 
 		uint32 flags = be_control_look->Flags(this);
@@ -541,11 +541,11 @@ BRadioButton::Perform(perform_code code, void* _data)
 			BRadioButton::SetLayout(data->layout);
 			return B_OK;
 		}
-		case PERFORM_CODE_INVALIDATE_LAYOUT:
+		case PERFORM_CODE_LAYOUT_INVALIDATED:
 		{
-			perform_data_invalidate_layout* data
-				= (perform_data_invalidate_layout*)_data;
-			BRadioButton::InvalidateLayout(data->descendants);
+			perform_data_layout_invalidated* data
+				= (perform_data_layout_invalidated*)_data;
+			BRadioButton::LayoutInvalidated(data->descendants);
 			return B_OK;
 		}
 		case PERFORM_CODE_DO_LAYOUT:

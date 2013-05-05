@@ -14,26 +14,52 @@
 #include <CheckBox.h>
 
 
-class PoorManSiteView: public BView
-{
+class PoorManSiteView: public BView {
 public:
-				PoorManSiteView(BRect, const char *name);
-		void	SetSendDirValue(bool state) {if (state) sendDir->SetValue(B_CONTROL_ON); 
-												else sendDir->SetValue(B_CONTROL_OFF); }
-		bool	SendDirValue()	{ return (sendDir->Value() == B_CONTROL_ON) ? true : false; }
-const	char *	IndexFileName()	{ return indexFileName->Text(); }
-		void	SetIndexFileName(const char * name) { indexFileName->SetText(name); }
-const	char *	WebDir() 		{ return webDir->Text(); }
-		void	SetWebDir(const char * dir) { webDir->SetText(dir); }
+							PoorManSiteView(const char *name);
+
+	void SetSendDirValue(bool state)
+	{
+		if (state)
+			fSendDir->SetValue(B_CONTROL_ON);
+		else
+			fSendDir->SetValue(B_CONTROL_OFF);
+	}
+
+	bool SendDirValue()
+	{
+		return (fSendDir->Value() == B_CONTROL_ON);
+	}
+
+	const char* IndexFileName()
+	{
+		return fIndexFileName->Text();
+	}
+
+	void SetIndexFileName(const char* name)
+	{
+		fIndexFileName->SetText(name);
+	}
+
+	const char* WebDir()
+	{
+		return fWebDir->Text();
+	}
+
+	void SetWebDir(const char* dir)
+	{
+		fWebDir->SetText(dir);
+	}
+
 private:
 		// Site Tab
 			// Web Site Location
-			BTextControl	*	webDir;
-			BTextControl	*	indexFileName;
-			BButton			*	selectWebDir;
+			BTextControl*	fWebDir;
+			BTextControl*	fIndexFileName;
+			BButton*		fSelectWebDir;
 			
 			// Web Site Options
-			BCheckBox		*	sendDir;
+			BCheckBox*		fSendDir;
 			
 };
 

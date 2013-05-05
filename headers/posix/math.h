@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010 Haiku Inc. All Rights Reserved.
+ * Copyright 2001-2012 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _MATH_H_
@@ -269,7 +269,6 @@ extern long double	tgammal(long double x);
 extern long double	truncl(long double x);
 
 /* some BSD non-ANSI or POSIX math functions */
-extern double		gamma_r(double x, int *y);
 extern double		j0(double x);
 extern double		j1(double x);
 extern double		jn(int x, double y);
@@ -293,7 +292,6 @@ extern float		jnf(int x, float y);
 extern float		y0f(float x);
 extern float		y1f(float x);
 extern float		ynf(int x, float y);
-extern float		gammaf_r(float x, int *y);
 extern float		lgammaf_r(float x, int *y);
 
 

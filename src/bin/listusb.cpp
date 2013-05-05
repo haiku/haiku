@@ -14,6 +14,7 @@
 #include <stdio.h>
 
 #include "usbspec_private.h"
+#include "usb-utils.h"
 
 
 const char*
@@ -144,10 +145,15 @@ DumpConfiguration(const BUSBConfiguration *configuration)
 static void
 DumpInfo(BUSBDevice &device, bool verbose)
 {
+	const char *vendorName = NULL, *deviceName = NULL;
+	usb_get_vendor_info(device.VendorID(), &vendorName);
+	usb_get_device_info(device.VendorID(), device.ProductID(), &deviceName);
+
 	if (!verbose) {
 		printf("%04x:%04x /dev/bus/usb%s \"%s\" \"%s\" ver. %04x\n",
 			device.VendorID(), device.ProductID(), device.Location(),
-			device.ManufacturerString(), device.ProductString(),
+			vendorName ? vendorName : device.ManufacturerString(),
+			deviceName ? deviceName : device.ProductString(),
 			device.Version());
 		return;
 	}
@@ -159,9 +165,13 @@ DumpInfo(BUSBDevice &device, bool verbose)
 	printf("    Protocol ............... 0x%02x\n", device.Protocol());
 	printf("    Max Endpoint 0 Packet .. %d\n", device.MaxEndpoint0PacketSize());
 	printf("    USB Version ............ 0x%04x\n", device.USBVersion());
-	printf("    Vendor ID .............. 0x%04x\n", device.VendorID());
-	printf("    Product ID ............. 0x%04x\n", device.ProductID());
-	printf("    Product Version ........ 0x%04x\n", device.Version());
+	printf("    Vendor ID .............. 0x%04x", device.VendorID());
+	if (vendorName != NULL)
+		printf(" (%s)", vendorName);
+	printf("\n    Product ID ............. 0x%04x", device.ProductID());
+	if (deviceName != NULL)
+		printf(" (%s)", deviceName);
+	printf("\n    Product Version ........ 0x%04x\n", device.Version());
 	printf("    Manufacturer String .... \"%s\"\n", device.ManufacturerString());
 	printf("    Product String ......... \"%s\"\n", device.ProductString());
 	printf("    Serial Number .......... \"%s\"\n", device.SerialNumberString());

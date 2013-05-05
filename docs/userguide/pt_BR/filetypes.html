@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Adriano Duarte
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Tipos de Arquivos</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../fr/filetypes.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/filetypes.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/filetypes.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/filetypes.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/filetypes.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/filetypes.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/filetypes.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/filetypes.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/filetypes.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/filetypes.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/filetypes.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/filetypes.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../hu/filetypes.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../ca/filetypes.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../en/filetypes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="deskbar.html">Deskbar</a> 
+::  <a href="contents.html" class="uplink">Conteúdo</a> 
+::  <a href="attributes.html">Atributos</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h1>Tipos de Arquivos</h1>
+
+<p>Diferentemente do Windows, o Haiku não conta com a extensão de arquivos de 3 letras para o tipo de arquivo (por exemplo, .txt, .jpg, .mp3). Este método é apenas um último recurso. O Haiku usa tipos <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> exatamente como é costume na internet.</p>
+<div class="box-info">Ainda que não exista razão para usar extensões de arquivo no Haiku, lembre-se de adicioná-los a arquivos que deseje compartilhar com usuários de outros sistemas operacionais, por exemplo por correio, enviando um arquivo para um servidor ou por troca via dispositivo USB. Caso contrário o sistema deles pode não reconhecer o tipo de arquivo.</div>
+
+<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="specific-file" name="specific-file">Definindo o tipo de arquivo de um arquivo específico</a></h2>
+<p>Pode-se mudar o tipo de um arquivo específico, seu ícone e o aplicativo associado. Selecione o arquivo e chame através do clique com o botão direito do mouse, <span class="menu">Adicionais | Adicional de tipo de arquivo</span>, a partir do menu de contexto.</p>
+<img src="images/filetypes-images/filetype-addon.png" alt="filetype-addon.png" />
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="filetype" id="filetype">O Tipo de Arquivo</a></h3>
+<p>Acima temos um arquivo PNG, é uma sequência MIME image/png. Digamos que você definitivamente sabe que não é um PNG mas um GIF. Pode-se mudar isso também entrando com a sequência MIME correta à mão ou com um dos dois botões abaixo da caixa de texto:</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="button">Selecionar...</span></td><td> </td><td>exibe uma lista hierárquica de tipos de arquivo onde pode navegar para <tt>image | GIF Image</tt>.</td></tr>
+<tr><td><span class="button">O mesmo que...</span></td><td> </td><td>abre uma caixa de diálogo onde pode-se escolher qualquer arquivo que já tenha o tipo de arquivo que esteja procurando.</td></tr>
+</table>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="preferred-app" name="preferred-app">O Aplicativo Preferido</a></h3>
+<p>Este menu pop-up exibe uma lista de todos os aplicativos que podem manipular este tipo de arquivo em particular. A partir daqui pode-se escolher qual programa deveria abrir este arquivo específico quando é executado o duplo clique sobre ele. Pode-se, por exemplo, mudar o aplicativo preferido de arquivo HTML do navegador para um editor de texto enquanto se está trabalhando nele. Todos os outros arquivos HTML ainda abrem no navegador, apenas este em particular inicia em seu editor de texto.</p>
+
+<p>O <span class="menu">Aplicativo padrão</span> é aquele que é definido globalmente para aquele tipo de arquivo. Se não encontrar o programa que deseja associar com este arquivo no menu pop-up, poderá novamente encontrar os botões <span class="button">Selecionar...</span> e <span class="button">O mesmo que...</span> que fazem a mesma coisa descrita em "O Tipo de Arquivo" acima.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="icon" name="icon">O Ícone</a></h3>
+<p>Se está imaginando o porquê da fonte de ícone na primeira imagem estar vazia: Ícones são normalmente herdados do sistema padrão para aquele tipo de arquivo. Pode-se abrir o <span class="app">Adicional de tipo de arquivo</span> de um arquivo que contenha um ícone e arrastar e soltá-lo dentro da sua fonte de ícone de arquivo. Ou dê um clique duplo na fonte de ícone e crie ou edite seu próprio ícone. Para mais informações sobre ícones e como criar o seu próprio, veja o tópico <a href="applications/icon-o-matic.html">Icon-O-Mático</a>.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="settings-apps" name="settings-apps">Definições especiais para aplicativos</a></h2>
+<p>Se chamar o <span class="app">Adicional de tipo de arquivo</span> em um executável (aqui: <span class="app">StyledEdit</span>), obterá um diálogo diferente:</p>
+<img src="images/filetypes-images/filetype-addon-stylededit.png" alt="filetype-addon-stylededit.png" />
+<p>No topo verá, ao invés de uma sequência MIME padronizada, a assinatura única da aplicação. Com ela, o sistema encontra o programa onde quer que esteja instalado.</p>
+<p>Abaixo dele estão vários flags, controlando o comportamento do aplicativo:</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Lançamento único</span></td><td> </td><td>Apenas uma instância do aplicativo pode ser executado por arquivo executável. Se possuir duas cópias daquele aplicativo, entretanto, eles poderão executar lado a lado.</td></tr>
+<tr><td><span class="menu">Lançamento múltiplo</span></td><td> </td><td>Muitas instâncias do aplicativo podem executar simultaneamente.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Lançamento exclusivo</span></td><td> </td><td>Verdadeiramente a apenas uma instância com aquela assintaura de aplicativo é permitido executar por vez.</td></tr>
+<tr><td><span class="menu">Apenas argumentos</span></td><td> </td><td>Indica ao aplicativo não responder a mensagens.</td></tr>
+<tr><td><span class="menu">Aplicação em segundo plano</span></td><td> </td><td>O aplicativo não irá aparecer no <a href="twitcher.html">Twitcher</a> ou na lista de aplicativos em execução da Deskbar.</td></tr>
+</table>
+<p>Então surge a lista de tipos de arquivos suportados. Pode-se adicionar (e remover) tipos de arquivos se considerar que o aplicativo pode manuseá-los. Como consequencia, o aplicativo aparecerá no menu de aplicativos preferidos ou no menu de contexto <span class="menu">Abrir com...</span> do Rastreador quando clicar com o botão direito do mouse em um arquivo daquele tipo.</p>
+<p>Na base está a informação de versão e direitos autorais. Como a assinatura de aplicativo, eles são preenchidos pelo autor do aplicativo e não deverão ser alterados.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="filetypes-preferences" name="filetypes-preferences">Definições globais com as Preferências de Tipos de Arquivos</a></h2>
+<p>As preferências dos <span class="app">Tipos de Arquivos</span> não lidam com arquivos individuais mas com definições globais de tipos de arquivos. Pode-se mudar ícones padrão e aplicativos preferidos ou adicionar, remover ou alterar atributos de tipos de arquivos inteiros. Pode-se ainda criar seu próprio tipo de arquivo do zero.</p>
+<p>Todos os tipos de arquivos e suas configurações estão armazenadas em <span class="path">/boot/home/config/settings/beos_mime/</span>. Antes de começar a experimentar, seria prudente fazer um backup daquela pasta...</p>
+<p>Para aprender mais sobre as preferências dos <span class="app">Tipos de Arquivos</span> veja a oficina: <a href="workshop-filetypes+attributes.html">Tipos de arquivos, Atributos, Indexação e Consultas</a>.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="deskbar.html">Deskbar</a> 
+::  <a href="contents.html" class="uplink">Conteúdo</a> 
+::  <a href="attributes.html">Atributos</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

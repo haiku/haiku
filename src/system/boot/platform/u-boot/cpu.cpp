@@ -28,49 +28,25 @@
 #	define TRACE(x) ;
 #endif
 
-//uint32 gTimeConversionFactor;
-
-
-static void
-calculate_cpu_conversion_factor()
-{
-         #warning ARM:TODO!
-}
-
-
-static status_t
-check_cpu_features()
-{
-
-        #warning ARM:TODO!
-	return B_OK;
-}
-
-
-//	#pragma mark -
-
 
 extern "C" void
 spin(bigtime_t microseconds)
 {
-	for(bigtime_t i=0;i<microseconds;i=i+1)
-	{
-		asm volatile ("mov r0,r0");
-		asm volatile ("mov r0,r0");
-	}
-	#warning ARM/UBOOT:TODO!!
+	#warning U-Boot:TODO!!
+	// TODO: use API if available
+
+	// fallback to arch-specific code
+	arch_spin(microseconds);
 }
 
 
 extern "C" void
 cpu_init()
 {
-	if (check_cpu_features() != B_OK)
-		panic("You need a Pentium or higher in order to boot!\n");
-
-	calculate_cpu_conversion_factor();
-
 	gKernelArgs.num_cpus = 1;
 		// this will eventually be corrected later on
+
+	if (boot_arch_cpu_init() != B_OK)
+		panic("You need a 6502 or higher in order to boot!\n");
 }
 

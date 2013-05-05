@@ -1,15 +1,15 @@
 1	ukrainian	x-vnd.Haiku-MatchHeader	1205906732
-<Choose account>	ConfigView		<Вибір акаунта>
 <Choose action>	ConfigView		<Вибір дії>
-Delete message	ConfigView		Видалити повідомлення
-If	ConfigView		Якщо
-Move to	ConfigView		Перемістити до
-Reply with	ConfigView		Відповісти з
-Rule filter	RuleFilter		Фільтр правил
-Set as read	ConfigView		Встановити як прочитані
-Set flags to	ConfigView		Встановити флаги для
-Then	ConfigView		Тоді
 has	ConfigView		має
-header (e.g. Subject)	ConfigView		заголовок (e.g. Subject)
-this field is based on the action	ConfigView		це поле засноване на дії
+Move to	ConfigView		Перемістити до
+Then	ConfigView		Тоді
 value (use REGEX: in from of regular expressions like *spam*)	ConfigView		величина (використовуйте REGEX: в широкому розумінні *spam*)
+this field is based on the action	ConfigView		це поле засноване на дії
+Delete message	ConfigView		Видалити повідомлення
+Rule filter	RuleFilter		Фільтр правил
+<Choose account>	ConfigView		<Вибір акаунта>
+Set flags to	ConfigView		Встановити флаги для
+Set as read	ConfigView		Встановити як прочитані
+Reply with	ConfigView		Відповісти з
+If	ConfigView		Якщо
+header (e.g. Subject)	ConfigView		заголовок (e.g. Subject)

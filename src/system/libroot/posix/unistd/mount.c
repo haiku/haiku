@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 */
@@ -9,21 +9,24 @@
 #include <errno.h>
 #include <sys/types.h>
 
+#include <errno_private.h>
+
+
 int mount(const char *filesystem, const char *where, const char *device, ulong flags, void *parms, int len);
 int unmount(const char *path);
 
-int 
+int
 mount(const char *filesystem, const char *where, const char *device, ulong flags, void *parms, int len)
 {
-	errno = EOPNOTSUPP;
+	__set_errno(EOPNOTSUPP);
 	return -1;
 }
 
 
-int 
+int
 unmount(const char *path)
 {
-	errno = EOPNOTSUPP;
+	__set_errno(EOPNOTSUPP);
 	return -1;
 }
 

@@ -32,14 +32,16 @@ brand product names are registered trademarks or trademarks of their respective
 holders.
 All rights reserved.
 */
+#ifndef __STATUS_VIEW_SHELF__
+#define __STATUS_VIEW_SHELF__
+
 
 // overrides BShelf; rejects draggers that won't fit into the shelf
 // alligns received draggers into a grid
 
-#ifndef __STATUS_VIEW_SHELF__
-#define __STATUS_VIEW_SHELF__
 
 #include <Shelf.h>
+
 
 class TReplicantTray;
 class TReplicantShelf : public BShelf {
@@ -58,5 +60,5 @@ private:
 		TReplicantTray* 	fParent;
 };
 
-#endif
 
+#endif	/* __STATUS_VIEW_SHELF__ */

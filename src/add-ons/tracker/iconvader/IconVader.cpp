@@ -18,6 +18,7 @@ static void Error(BView *view, status_t status, bool unlock=false)
 		view->UnlockLooper();
 	BString s(strerror(status));
 	alert = new BAlert("Error", s.String(), "OK");
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 }
 
@@ -80,7 +81,9 @@ process_refs(entry_ref dir, BMessage* refs, void* /*reserved*/)
 
 
 
-	alert = new BAlert("Error", "IconVader:\nClick on the icons to get points.\nAvoid symlinks!", "OK");
+	alert = new BAlert("Error", "IconVader:\nClick on the icons to get points."
+		"\nAvoid symlinks!", "OK");
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 
 
@@ -133,6 +136,7 @@ process_refs(entry_ref dir, BMessage* refs, void* /*reserved*/)
 	BString scoreStr("You scored ");
 	scoreStr << score << " points!";
 	alert = new BAlert("Error", scoreStr.String(), "Cool!");
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 
 

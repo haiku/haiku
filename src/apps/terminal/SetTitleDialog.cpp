@@ -17,8 +17,8 @@ static const uint32 kMessageDefault			= 'dflt';
 static const uint32 kMessageTitleChanged	= 'chng';
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Terminal SetTitleWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Terminal SetTitleWindow"
 
 
 // #pragma mark - SetTitleDialog
@@ -32,6 +32,7 @@ SetTitleDialog::SetTitleDialog(const char* dialogTitle, const char* label,
 		B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
 	fListener(NULL),
 	fTitle(),
+	fOldTitleUserDefined(false),
 	fTitleUserDefined(false)
 {
 	BLayoutBuilder::Group<>(this, B_VERTICAL)

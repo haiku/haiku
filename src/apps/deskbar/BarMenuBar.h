@@ -32,44 +32,58 @@ brand product names are registered trademarks or trademarks of their respective
 holders.
 All rights reserved.
 */
+#ifndef BARMENUBAR_H
+#define BARMENUBAR_H
+
 
 // Be Menu, used in vertical mode, expanded and mini
 //   - in mini mode will have team menu next to Be menu
 //   - Be menu in horizontal mode is embedded in ExpandoMenuBar
 
-#ifndef BARMENUBAR_H
-#define BARMENUBAR_H
 
 #include <MenuBar.h>
-
-#include "BarView.h"
-#include "BarMenuTitle.h"
-#include "TimeView.h"
+#include <SeparatorItem.h>
 
 
-class TBarMenuBar : public BMenuBar {
-	public:
-		TBarMenuBar(TBarView* bar, BRect frame, const char* name);
-		virtual ~TBarMenuBar();
+class TBarMenuTitle;
+class TBarView;
 
-		virtual void MouseMoved(BPoint where, uint32 code,
-			const BMessage* message);
-		virtual void Draw(BRect);
+class TSeparatorItem : public BSeparatorItem {
+public:
+							TSeparatorItem();
 
-		void DrawBackground(BRect);
-		void SmartResize(float width = -1.0f, float height = -1.0f);
-
-		void AddTeamMenu();
-		void RemoveTeamMenu();
-
-		void InitTrackingHook(bool (* hookfunction)(BMenu*, void*), void* state,
-			bool both = false);
-
-	private:
-		TBarView* fBarView;
-		TBarMenuTitle* fDeskbarMenuItem;
-		TBarMenuTitle* fAppListMenuItem;
+	virtual	void			Draw();
 };
 
-#endif /* BARMENUBAR_H */
+class TBarMenuBar : public BMenuBar {
+public:
+							TBarMenuBar(BRect frame, const char* name,
+								TBarView* barView);
+	virtual					~TBarMenuBar();
 
+	virtual	void			MouseMoved(BPoint where, uint32 code,
+								const BMessage* message);
+	virtual	void			Draw(BRect);
+
+			void			DrawBackground(BRect);
+			void			SmartResize(float width = -1.0f,
+								float height = -1.0f);
+
+			bool			AddTeamMenu();
+			bool			RemoveTeamMenu();
+
+			bool			AddSeparatorItem();
+			bool			RemoveSeperatorItem();
+
+			void			InitTrackingHook(
+								bool (* hookfunction)(BMenu*, void*),
+								void* state, bool both = false);
+
+private:
+			TBarView*		fBarView;
+			TBarMenuTitle*	fDeskbarMenuItem;
+			TBarMenuTitle*	fAppListMenuItem;
+			TSeparatorItem*	fSeparatorItem;
+};
+
+#endif	// BARMENUBAR_H

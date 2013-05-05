@@ -1,6 +1,6 @@
 1	french	x-vnd.mahlzeit.webwatch	1164039487
-About	WatchView		À propos
+WebWatch	System name		WebHorloge
 OK	WatchView		OK
 Quit	WatchView		Quitter
-WebWatch	System name		WebHorloge
+About	WatchView		À propos
 WebWatch %1\nAn internet time clock for your Deskbar\n\nCreated by Matthijs Hollemans\nmahlzeit@users.sourceforge.net\n\nThanks to Jason Parks for his help.\n	WatchView		WebHorloge %1\nUne horloge synchronisée à internet pour votre DeskBar\n\nCréée par Matthijs Hollemans\nmahlzeit@users.sourceforge.net\n\nMerci à Jason Parks pour son aide.\n

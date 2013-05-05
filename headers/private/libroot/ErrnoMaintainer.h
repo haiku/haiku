@@ -25,9 +25,9 @@ public:
 
 	~ErrnoMaintainer()
 	{
-		if (errno != 0 && fErrnoUponEntry == 0)
-			errno = 0;
+		errno = fErrnoUponEntry;
 	}
+
 private:
 	int fErrnoUponEntry;
 };

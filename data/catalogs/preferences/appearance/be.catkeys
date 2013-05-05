@@ -1,49 +1,69 @@
-1	belarusian	x-vnd.Haiku-Appearance	3577998894
+1	belarusian	x-vnd.Haiku-Appearance	727801787
+Plain font:	Font view		Просты шрыфт:
+Control highlight	Colors tab		Выдзяленне кнопак
+Control border	Colors tab		Аблямоўка кнопак
+Antialiasing type:	AntialiasingSettingsView		Тып згладжвання:
+Shadow	Colors tab		Цень
+On	AntialiasingSettingsView		Укл.
+Defaults	APRWindow		Прадвызначаныя
+Grayscale	AntialiasingSettingsView		Адценні шэрага
+Shine	Colors tab		Ззянне
 About	DecorSettingsView		Пра Праграму
-About Decerator	DecorSettingsView		Пра Дэкаратар
-Antialiasing	APRWindow		Згладжванне
-Antialiasing menu	AntialiasingSettingsView		Меню згладжвання
-Antialiasing type:	AntialiasingSettingsView		Тып згладжвання
-Appearance	System name		Афармленне
+About decorator	DecorSettingsView		Пра дэкаратар
+Off	AntialiasingSettingsView		Выкл.
 Choose Decorator	DecorSettingsView		Абраць Дэкаратар
+Success	Colors tab		Паспяхова
+Inactive window tab text	Colors tab		Тэкст неактыўнай укладкі вакна
+Failure	Colors tab		Непаспяхова
+Hinting menu	AntialiasingSettingsView		Меню хінтынгу
+Scroll bar:	DecorSettingsView		Пракрутка:
+Document background	Colors tab		Фон дакумента
+Revert	APRWindow		Вярнуць
+Window tab	Colors tab		Ўкладка вакна
+Tooltip background	Colors tab		Фон падказкі
+Selected menu item background	Colors tab		Фон пазначанага пункту меню
+Antialiasing	APRWindow		Згладжванне
+Navigation base	Colors tab		Базавы колер навігацыі
+Selected list item text	Colors tab		Тэкст пазначанага пункту меню
+Window border	Colors tab		Мяжа вакна
+Double:	DecorSettingsView		Падвойны:
+Window tab text	Colors tab		Тэкст загалоўку акна
+Document text	Colors tab		Тэкст дакументу
+Navigation pulse	Colors tab		Колер падсветкі навігацыі
+Selected menu item text	Colors tab		Тэкст пазначанага пункту меню
+Menu background	Colors tab		Фон меню
+List background	Colors tab		Фон радкоў
+OK	DecorSettingsView		Так
+Control mark	Colors tab		Адзнакі кнопак
+Size:	Font Selection view		Памер:
+Decorator:	DecorSettingsView		Дэкаратар:
+Selected list item background	Colors tab		Фон пазначанага радку спіса
+Panel background	Colors tab		Фон панэлі
+Menu font:	Font view		Шрыфт меню:
 Colors	APRWindow		Колеры
 Control background	Colors tab		Фон кнопак
-Control border	Colors tab		Аблямоўка кнопак
-Control highlight	Colors tab		Выдзяленне кнопак
-Control text	Colors tab		Тэкст кнопак
-Defaults	APRWindow		Прадвызначаныя
-Document background	Colors tab		Фон дакумента
-Document text	Colors tab		Тэкст дакументу
-Failure	Colors tab		Непаспяхова
-Glyph hinting:	AntialiasingSettingsView		Хінтынг сімвалаў
-Grayscale	AntialiasingSettingsView		Адценні шэрага
-Hinting menu	AntialiasingSettingsView		Меню хінтынгу
 Inactive window tab	Colors tab		Неактыўная ўкладка
-Inactive window tab text	Colors tab		Тэкст неактыўнай укладкі вакна
-LCD subpixel	AntialiasingSettingsView		Субпіксельнае (LCD)
-Menu background	Colors tab		Фон меню
-Menu item text	Colors tab		Тэкст пунктаў меню
-Monospaced fonts only	AntialiasingSettingsView		Толькі монашырынныя шрыфты
-Navigation base	Colors tab		Базавы колер навігацыі
-Navigation pulse	Colors tab		Колер падсветкі навігацыі
-OK	DecorSettingsView		Так
-Off	AntialiasingSettingsView		Выкл.
-On	AntialiasingSettingsView		Укл.
-Panel background	Colors tab		Фон панэлі
-Panel text	Colors tab		Тэкст панэлі
+List item text	Colors tab		Тэкст радку спіса
+Appearance	System name		Афармленне
+Fixed font:	Font view		Роўнашырокі шрыфт:
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	У рудога вераб’я ў сховішчы пад фатэлем ляжаць нейкія гаючыя зёлкі.
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nАўтары:\n\t%decorAuthors\n\nURL: %decorURL\nЛіцэнзія: %decorLic\n\n%decorDesc\n
 Reduce colored edges filter strength:	AntialiasingSettingsView		Паменьшыць інтэнсіўнасць фільтру каляровых краёў:
-Revert	APRWindow		Вярнуць
-Selected menu item background	Colors tab		Фон пазначанага пункту меню
-Selected menu item border	Colors tab		Аблямоўка пазначанага пункту меню
-Selected menu item text	Colors tab		Тэкст пазначанага пункту меню
-Shadow	Colors tab		Цень
-Shine	Colors tab		Ззянне
-Strong	AntialiasingSettingsView		Жырны
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Субпіксельнае згладжванне ў камбінацыі з хінтынгам сімвалаў недаступнае ў гэтай зборцы Haiku з-за магчымых канфліктаў з патэнтамі. Каб уключыць гэтую функцыю, вы павінны сабрать Haiku самастойна і уключыць канкрэтныя опцыі ў канфігурацыйным загалоўку libfreetype.
-Success	Colors tab		Паспяхова
-Tooltip background	Colors tab		Фон падказкі
+Scroll bar thumb	Colors tab		Гузік пракруткі
+Control text	Colors tab		Тэкст кнопак
+Single:	DecorSettingsView		Адзіночны:
 Tooltip text	Colors tab		Тэкст падказак
-Window Decorator	APRWindow		Дэкаратар Вакон
-Window Decorator:	DecorSettingsView		Дэкаратар Вакон:
-Window tab	Colors tab		Ўкладка вакна
-Window tab text	Colors tab		Тэкст загалоўку акна
+Bold font:	Font view		Тлусты шрыфт:
+Inactive window border	Colors tab		Неактыўная мяжа вакна
+Menu item text	Colors tab		Тэкст пунктаў меню
+LCD subpixel	AntialiasingSettingsView		Субпіксельнае (LCD)
+Selected menu item border	Colors tab		Аблямоўка пазначанага пункту меню
+Strong	AntialiasingSettingsView		Жырны
+Panel text	Colors tab		Тэкст панэлі
+Arrow style	DecorSettingsView		Стыль стрэлкі
+Monospaced fonts only	AntialiasingSettingsView		Толькі монашырынныя шрыфты
+Look and feel	APRWindow		Выгляд і паводзіны
+Antialiasing menu	AntialiasingSettingsView		Меню згладжвання
+Fonts	APRWindow		Шрыфты
+Glyph hinting:	AntialiasingSettingsView		Хінтынг сімвалаў:

@@ -63,7 +63,7 @@ typedef enum {
 
 uint32	read_ds_channel_data(ice1712 *ice, uint8 channel, ds8_register index);
 void	write_ds_channel_data(ice1712 *ice, uint8 channel,
-                ds8_register index, uint32 data);
+			ds8_register index, uint32 data);
 //------------------------------------------------------
 //------------------------------------------------------
 //Address are [PCI_1C] + xx

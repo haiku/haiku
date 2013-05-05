@@ -1,0 +1,173 @@
+/*
+ * Copyright 2002-2013 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *		Travis Smith
+ *		Michael Wilber
+ *
+ * Corresponds to:
+ *		headers/os/translation/BitmapStream.h	 hrev45181
+ *		src/kits/translation/BitmapStream.cpp	 hrev45181
+ */
+
+
+/*!
+	\file BitmapStream.h
+	\ingroup translation
+	\ingroup libbe
+	\brief BBitmapStream class definition.
+*/
+
+
+/*!
+	\class BBitmapStream
+	\ingroup translation
+	\ingroup libbe
+	\brief Provides for the conversion of a Translation Kit bitmap object to
+		a BBitmap.
+
+	BBitmapStream is limited subclass of BPositionIO that is good at reading
+	and writing Translation Kit bitmaps. The DetachBitmap() method
+	is the main method of this class as it returns the contents of the
+	Translation Kit bitmap object into a BBitmap.
+
+	In most cases you shouldn't have to use this class directly as
+	BTranslationUtils contains methods to load images from files and
+	resources.
+*/
+
+
+/*!
+	\fn BBitmapStream::BBitmapStream(BBitmap* bitmap)
+	\brief Initializes this object to either use the BBitmap passed to
+		it as the object to read/write to or to create a BBitmap when data
+		is written to this object.
+
+	If \a bitmap is \c NULL, a new BBitmap object is created when this object
+	is written to.
+
+	\param bitmap The bitmap object to read from/write to.
+*/
+
+
+/*!
+	\fn void BBitmapStream::~BBitmapStream()
+	\brief Destroys the object and the BBitmap object if attached.
+*/
+
+
+/*!
+	\fn ssize_t BBitmapStream::ReadAt(off_t pos, void* buffer, size_t size)
+	\brief Reads data from the stream into \a buffer at a specific position
+		and size.
+
+	The first sizeof(TranslatorBitmap) bytes are the bitmap header. The header
+	is always written out and read in as big endian byte order.
+
+	\param pos The position in the stream to read from.
+	\param buffer Where the data will be read into
+	\param size The amount of data to be read.
+
+	\return The amount of data written if the result is >= 0 or an error code.
+	\retval B_BAD_VALUE \a buffer is \c NULL or \a pos is invalid or the amount
+		read if the result >= 0
+	\retval B_NO_INIT There is no bitmap stored by the stream.
+*/
+
+
+/*!
+	\fn ssize_t BBitmapStream::WriteAt(off_t pos, const void* data,
+		size_t size)
+	\brief Writes data to the bitmap starting at a specific position and size.
+
+	The first sizeof(TranslatorBitmap) bytes of data must be the
+	TranslatorBitmap header in big endian byte order or the data
+	will not be written.
+
+	\param pos The position in the stream to write to \a data.
+	\param data The data to write to the stream.
+	\param size The size of the data to write to the stream.
+
+	\return The amount of data written if the result is >= 0 or an error code.
+	\retval B_BAD_VALUE Size is bad or data is \c NULL or \a pos is invalid.
+	\retval B_MISMATCHED_VALUES The bitmap header is bad.
+	\retval B_ERROR Error allocating memory or setting up big endian header,
+*/
+
+
+/*!
+	\fn off_t BBitmapStream::Seek(off_t position, uint32 seekMode)
+	\brief Changes the current stream position.
+
+	\param position The position offset.
+	\param seekMode Decides how the position offset is used:
+	- \c SEEK_CUR Position is added to current stream position.
+	- \c SEEK_END Position is added to the end stream position.
+	- \c SEEK_SET The stream position is set to position.
+
+	\return The new position offset if the result >= 0.
+	\retval B_BAD_VALUE \a position was bad.
+*/
+
+
+/*!
+	\fn off_t BBitmapStream::Position() const
+	\brief Gets the current stream position.
+
+	\returns The current stream position.
+*/
+
+
+/*!
+	\fn off_t BBitmapStream::Size() const
+	\brief Gets the current stream size.
+
+	\returns The current stream size.
+*/
+
+
+/*!
+	\fn status_t BBitmapStream::SetSize(off_t size)
+	\brief Sets the size of the data.
+
+	\param size The size to set the stream size to.
+
+	\return A status code, \c B_NO_ERROR on success or an error code.
+	\retval B_NO_ERROR (or \c B_OK) Size is a valid value.
+	\retval B_BAD_VALUE \a size is NOT a valid value.
+*/
+
+
+/*!
+	\fn status_t BBitmapStream::DetachBitmap(BBitmap** _bitmap)
+	\brief Sets \a _bitmap to point to the internal bitmap object.
+
+	The bitmap is not deleted when the BBitmapStream is deleted. After the
+	bitmap has been detached it is still used by the stream, but it is never
+	deleted by the stream.
+
+	Once you have called DetachBitmap() no further operations should be
+	performed on the BBitmapStream except to destroy the object.
+
+	\param _bitmap A BBitmap pointer that will be set to point to the internal
+		bitmap object.
+
+	\return A status code, \c B_OK on success or an error code.
+	\retval B_OK The bitmap was detached.
+	\retval B_BAD_VALUE _bitmap is \c NULL.
+	\retval B_ERROR The internal bitmap object is \c NULL or has already been
+		detached.
+*/
+
+
+/*!
+	\fn void BBitmapStream::SwapHeader(const TranslatorBitmap* source,
+		TranslatorBitmap* destination)
+	\brief Swaps the byte order of \a source, no matter the byte order, and
+		copies the result to \a destination.
+
+	\param source Data to be swapped.
+	\param destination Where the swapped data will be copied to.
+*/

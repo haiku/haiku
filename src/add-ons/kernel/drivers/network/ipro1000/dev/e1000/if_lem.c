@@ -1,6 +1,6 @@
 /******************************************************************************
 
-  Copyright (c) 2001-2010, Intel Corporation 
+  Copyright (c) 2001-2011, Intel Corporation 
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without 
@@ -30,11 +30,12 @@
   POSSIBILITY OF SUCH DAMAGE.
 
 ******************************************************************************/
-/*$FreeBSD: src/sys/dev/e1000/if_lem.c,v 1.3.2.10.2.1 2010/12/21 17:09:25 kensmith Exp $*/
+/*$FreeBSD$*/
 
 #ifdef HAVE_KERNEL_OPTION_HEADERS
 #include "opt_device_polling.h"
 #include "opt_inet.h"
+#include "opt_inet6.h"
 #endif
 
 #include <sys/param.h>
@@ -74,11 +75,9 @@
 #include <netinet/udp.h>
 
 #include <machine/in_cksum.h>
-
 #ifndef __HAIKU__
 #include <dev/led/led.h>
 #endif
-
 #include <dev/pci/pcivar.h>
 #include <dev/pci/pcireg.h>
 
@@ -88,7 +87,7 @@
 /*********************************************************************
  *  Legacy Em Driver version:
  *********************************************************************/
-char lem_driver_version[] = "1.0.3";
+char lem_driver_version[] = "1.0.4";
 
 /*********************************************************************
  *  PCI Device ID Table
@@ -286,7 +285,6 @@ static driver_t lem_driver = {
 devclass_t lem_devclass;
 DRIVER_MODULE(lem, pci, lem_driver, lem_devclass, 0, 0);
 #endif
-
 MODULE_DEPEND(lem, pci, 1, 1, 1);
 MODULE_DEPEND(lem, ether, 1, 1, 1);
 
@@ -329,6 +327,10 @@ TUNABLE_INT("hw.em.fc_setting", &lem_fc_setting);
 
 /* Global used in WOL setup with multiport cards */
 static int global_quad_port_a = 0;
+
+#ifdef DEV_NETMAP	/* see ixgbe.c for details */
+#include <dev/netmap/if_lem_netmap.h>
+#endif /* DEV_NETMAP */
 
 /*********************************************************************
  *  Device identification routine
@@ -400,6 +402,13 @@ lem_attach(device_t dev)
 
 	INIT_DEBUGOUT("lem_attach: begin");
 
+#ifndef __HAIKU__
+	if (resource_disabled("lem", device_get_unit(dev))) {
+		device_printf(dev, "Disabled by device hint\n");
+		return (ENXIO);
+	}
+#endif
+
 	adapter = device_get_softc(dev);
 	adapter->dev = adapter->osdep.dev = dev;
 	EM_CORE_LOCK_INIT(adapter, device_get_nameunit(dev));
@@ -463,7 +472,7 @@ lem_attach(device_t dev)
 
         /* Sysctl for setting the interface flow control */
 	lem_set_flow_cntrl(adapter, "flow_control",
-	    "max number of rx packets to process",
+	    "flow control setting",
 	    &adapter->fc_setting, lem_fc_setting);
 
 	/*
@@ -662,6 +671,9 @@ lem_attach(device_t dev)
 	    device_get_nameunit(dev));
 #endif
 
+#ifdef DEV_NETMAP
+	lem_netmap_attach(adapter);
+#endif /* DEV_NETMAP */
 	INIT_DEBUGOUT("lem_attach: end");
 
 	return (0);
@@ -742,6 +754,9 @@ lem_detach(device_t dev)
 	callout_drain(&adapter->timer);
 	callout_drain(&adapter->tx_fifo_timer);
 
+#ifdef DEV_NETMAP
+	netmap_detach(ifp);
+#endif /* DEV_NETMAP */
 	lem_free_pci_resources(adapter);
 	bus_generic_detach(dev);
 	if_free(ifp);
@@ -898,11 +913,12 @@ static int
 lem_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 {
 	struct adapter	*adapter = ifp->if_softc;
-	struct ifreq *ifr = (struct ifreq *)data;
-#ifdef INET
-	struct ifaddr *ifa = (struct ifaddr *)data;
+	struct ifreq	*ifr = (struct ifreq *)data;
+#if defined(INET) || defined(INET6)
+	struct ifaddr	*ifa = (struct ifaddr *)data;
 #endif
-	int error = 0;
+	bool		avoid_reset = FALSE;
+	int		error = 0;
 
 	if (adapter->in_detach)
 		return (error);
@@ -910,23 +926,26 @@ lem_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 	switch (command) {
 	case SIOCSIFADDR:
 #ifdef INET
-		if (ifa->ifa_addr->sa_family == AF_INET) {
-			/*
-			 * XXX
-			 * Since resetting hardware takes a very long time
-			 * and results in link renegotiation we only
-			 * initialize the hardware only when it is absolutely
-			 * required.
-			 */
-			ifp->if_flags |= IFF_UP;
-			if (!(ifp->if_drv_flags & IFF_DRV_RUNNING)) {
-				EM_CORE_LOCK(adapter);
-				lem_init_locked(adapter);
-				EM_CORE_UNLOCK(adapter);
-			}
-			arp_ifinit(ifp, ifa);
-		} else
+		if (ifa->ifa_addr->sa_family == AF_INET)
+			avoid_reset = TRUE;
 #endif
+#ifdef INET6
+		if (ifa->ifa_addr->sa_family == AF_INET6)
+			avoid_reset = TRUE;
+#endif
+		/*
+		** Calling init results in link renegotiation,
+		** so we avoid doing it when possible.
+		*/
+		if (avoid_reset) {
+			ifp->if_flags |= IFF_UP;
+			if (!(ifp->if_drv_flags & IFF_DRV_RUNNING))
+				lem_init(adapter);
+#ifdef INET
+			if (!(ifp->if_flags & IFF_NOARP))
+				arp_ifinit(ifp, ifa);
+#endif
+		} else
 			error = ether_ioctl(ifp, command, data);
 		break;
 	case SIOCSIFMTU:
@@ -1225,9 +1244,6 @@ lem_init_locked(struct adapter *adapter)
 	/* AMT based hardware can now take control from firmware */
 	if (adapter->has_manage && adapter->has_amt)
 		lem_get_hw_control(adapter);
-
-	/* Don't reset the phy next time init gets called */
-	adapter->hw.phy.reset_disable = TRUE;
 }
 
 static void
@@ -1525,11 +1541,6 @@ lem_media_change(struct ifnet *ifp)
 	default:
 		device_printf(adapter->dev, "Unsupported media type\n");
 	}
-
-	/* As the speed/duplex settings my have changed we need to
-	 * reset the PHY.
-	 */
-	adapter->hw.phy.reset_disable = FALSE;
 
 	lem_init_locked(adapter);
 	EM_CORE_UNLOCK(adapter);
@@ -2360,7 +2371,6 @@ lem_setup_interface(device_t dev, struct adapter *adapter)
 		return (-1);
 	}
 	if_initname(ifp, device_get_name(dev), device_get_unit(dev));
-	ifp->if_mtu = ETHERMTU;
 	ifp->if_init =  lem_init;
 	ifp->if_softc = adapter;
 	ifp->if_flags = IFF_BROADCAST | IFF_SIMPLEX | IFF_MULTICAST;
@@ -2598,10 +2608,10 @@ lem_dma_free(struct adapter *adapter, struct em_dma_alloc *dma)
 static int
 lem_allocate_transmit_structures(struct adapter *adapter)
 {
+	int i;
 	device_t dev = adapter->dev;
 	struct em_buffer *tx_buffer;
 	int error;
-	int i = 0;
 
 	/*
 	 * Create DMA tags for tx descriptors
@@ -2655,8 +2665,13 @@ fail:
 static void
 lem_setup_transmit_structures(struct adapter *adapter)
 {
+	int i;
 	struct em_buffer *tx_buffer;
-	int i = 0;
+#ifdef DEV_NETMAP
+	/* we are already locked */
+	struct netmap_adapter *na = NA(adapter->ifp);
+	struct netmap_slot *slot = netmap_reset(na, NR_TX, 0, 0);
+#endif /* DEV_NETMAP */
 
 	/* Clear the old ring contents */
 	bzero(adapter->tx_desc_base,
@@ -2670,10 +2685,24 @@ lem_setup_transmit_structures(struct adapter *adapter)
 		bus_dmamap_unload(adapter->txtag, tx_buffer->map);
 		m_freem(tx_buffer->m_head);
 		tx_buffer->m_head = NULL;
+#ifdef DEV_NETMAP
+		if (slot) {
+			/* the i-th NIC entry goes to slot si */
+			int si = netmap_idx_n2k(&na->tx_rings[0], i);
+			uint64_t paddr;
+			void *addr;
+
+			addr = PNMB(slot + si, &paddr);
+			adapter->tx_desc_base[si].buffer_addr = htole64(paddr);
+			/* reload the map for netmap mode */
+			netmap_load_map(adapter->txtag, tx_buffer->map, addr);
+		}
+#endif /* DEV_NETMAP */
 		tx_buffer->next_eop = -1;
 	}
 
 	/* Reset state */
+	adapter->last_hw_offload = 0;
 	adapter->next_avail_tx_desc = 0;
 	adapter->next_tx_to_clean = 0;
 	adapter->num_tx_desc_avail = adapter->num_tx_desc;
@@ -2761,11 +2790,11 @@ static void
 lem_free_transmit_structures(struct adapter *adapter)
 {
 	struct em_buffer *tx_buffer;
-	int i = 0;
 
 	INIT_DEBUGOUT("free_transmit_structures: begin");
 
 	if (adapter->tx_buffer_area != NULL) {
+		int i;
 		for (i = 0; i < adapter->num_tx_desc; i++) {
 			tx_buffer = &adapter->tx_buffer_area[i];
 			if (tx_buffer->m_head != NULL) {
@@ -2793,8 +2822,7 @@ lem_free_transmit_structures(struct adapter *adapter)
 		bus_dma_tag_destroy(adapter->txtag);
 		adapter->txtag = NULL;
 	}
-
-#ifndef __HAIKU__	
+#ifndef __HAIKU__
 #if __FreeBSD_version >= 800000
 	if (adapter->br != NULL)
         	buf_ring_free(adapter->br, M_DEVBUF);
@@ -2974,6 +3002,12 @@ lem_txeof(struct adapter *adapter)
 
 	EM_TX_LOCK_ASSERT(adapter);
 
+#ifdef DEV_NETMAP
+	if (ifp->if_capenable & IFCAP_NETMAP) {
+		selwakeuppri(&NA(ifp)->tx_rings[0].si, PI_NET);
+		return;
+	}
+#endif /* DEV_NETMAP */
         if (adapter->num_tx_desc_avail == adapter->num_tx_desc)
                 return;
 
@@ -3204,6 +3238,11 @@ lem_setup_receive_structures(struct adapter *adapter)
 {
 	struct em_buffer *rx_buffer;
 	int i, error;
+#ifdef DEV_NETMAP
+	/* we are already under lock */
+	struct netmap_adapter *na = NA(adapter->ifp);
+	struct netmap_slot *slot = netmap_reset(na, NR_RX, 0, 0);
+#endif
 
 	/* Reset descriptor ring */
 	bzero(adapter->rx_desc_base,
@@ -3223,6 +3262,20 @@ lem_setup_receive_structures(struct adapter *adapter)
 
 	/* Allocate new ones. */
 	for (i = 0; i < adapter->num_rx_desc; i++) {
+#ifdef DEV_NETMAP
+		if (slot) {
+			/* the i-th NIC entry goes to slot si */
+			int si = netmap_idx_n2k(&na->rx_rings[0], i);
+			uint64_t paddr;
+			void *addr;
+
+			addr = PNMB(slot + si, &paddr);
+			netmap_load_map(adapter->rxtag, rx_buffer->map, addr);
+			/* Update descriptor */
+			adapter->rx_desc_base[i].buffer_addr = htole64(paddr);
+			continue;
+		}
+#endif /* DEV_NETMAP */
 		error = lem_get_buf(adapter, i);
 		if (error)
                         return (error);
@@ -3247,10 +3300,10 @@ lem_setup_receive_structures(struct adapter *adapter)
 static void
 lem_initialize_receive_unit(struct adapter *adapter)
 {
+	int i; 
 	struct ifnet	*ifp = adapter->ifp;
 	u64	bus_addr;
 	u32	rctl, rxcsum;
-	int i = 0;
 
 	INIT_DEBUGOUT("lem_initialize_receive_unit: begin");
 
@@ -3348,6 +3401,18 @@ lem_initialize_receive_unit(struct adapter *adapter)
 	 * Tail Descriptor Pointers
 	 */
 	E1000_WRITE_REG(&adapter->hw, E1000_RDH(0), 0);
+#ifdef DEV_NETMAP
+	/* preserve buffers already made available to clients */
+	if (ifp->if_capenable & IFCAP_NETMAP) {
+		struct netmap_adapter *na = NA(adapter->ifp);
+		struct netmap_kring *kring = &na->rx_rings[0];
+		int t = na->num_rx_desc - 1 - kring->nr_hwavail;
+
+		if (t >= na->num_rx_desc)
+			t -= na->num_rx_desc;
+		E1000_WRITE_REG(&adapter->hw, E1000_RDT(0), t);
+	} else
+#endif /* DEV_NETMAP */
 	E1000_WRITE_REG(&adapter->hw, E1000_RDT(0), adapter->num_rx_desc - 1);
 
 	return;
@@ -3430,6 +3495,16 @@ lem_rxeof(struct adapter *adapter, int count, int *done)
 	current_desc = &adapter->rx_desc_base[i];
 	bus_dmamap_sync(adapter->rxdma.dma_tag, adapter->rxdma.dma_map,
 	    BUS_DMASYNC_POSTREAD);
+
+#ifdef DEV_NETMAP
+	if (ifp->if_capenable & IFCAP_NETMAP) {
+		struct netmap_adapter *na = NA(ifp);
+		na->rx_rings[0].nr_kflags |= NKR_PENDINTR;
+		selwakeuppri(&na->rx_rings[0].si, PI_NET);
+		EM_RX_UNLOCK(adapter);
+		return (0);
+	}
+#endif /* DEV_NETMAP */
 
 	if (!((current_desc->status) & E1000_RXD_STAT_DD)) {
 		if (done != NULL)
@@ -3534,8 +3609,7 @@ lem_rxeof(struct adapter *adapter, int count, int *done)
 #endif
 				if (status & E1000_RXD_STAT_VP) {
 					adapter->fmp->m_pkthdr.ether_vtag =
-					    (le16toh(current_desc->special) &
-					    E1000_RXD_SPC_VLAN_MASK);
+					    le16toh(current_desc->special);
 					adapter->fmp->m_flags |= M_VLANTAG;
 				}
 #ifndef __NO_STRICT_ALIGNMENT
@@ -3741,9 +3815,9 @@ lem_unregister_vlan(void *arg, struct ifnet *ifp, u16 vtag)
 static void
 lem_setup_vlan_hw_support(struct adapter *adapter)
 {
+	int i;
 	struct e1000_hw *hw = &adapter->hw;
 	u32             reg;
-	int				i = 0;
 
 	/*
 	** We get here thru init_locked, meaning
@@ -3965,7 +4039,7 @@ lem_enable_wakeup(device_t dev)
 	u32		pmc, ctrl, ctrl_ext, rctl;
 	u16     	status;
 
-	if ((pci_find_extcap(dev, PCIY_PMG, &pmc) != 0))
+	if ((pci_find_cap(dev, PCIY_PMG, &pmc) != 0))
 		return;
 
 	/* Advertise the wakeup capability */
@@ -4023,10 +4097,10 @@ lem_enable_wakeup(device_t dev)
 static int
 lem_enable_phy_wakeup(struct adapter *adapter)
 {
+	int i;
 	struct e1000_hw *hw = &adapter->hw;
 	u32 mreg, ret = 0;
 	u16 preg;
-	int i = 0;
 
 	/* copy MAC RARs to PHY RARs */
 	for (i = 0; i < adapter->hw.mac.rar_entry_count; i++) {
@@ -4276,11 +4350,10 @@ lem_sysctl_reg_handler(SYSCTL_HANDLER_ARGS)
 	struct adapter *adapter;
 	u_int val;
 
-#ifndef __HAIKU__	
+#ifndef __HAIKU__
 	adapter = oidp->oid_arg1;
 	val = E1000_READ_REG(&adapter->hw, oidp->oid_arg2);
-#endif	
-
+#endif
 	return (sysctl_handle_int(oidp, &val, 0, req));
 }
 
@@ -4327,11 +4400,11 @@ lem_add_hw_stats(struct adapter *adapter)
 			"Watchdog timeouts");
 
 	SYSCTL_ADD_PROC(ctx, child, OID_AUTO, "device_control",
-			CTLFLAG_RD, adapter, E1000_CTRL,
+			CTLTYPE_UINT | CTLFLAG_RD, adapter, E1000_CTRL,
 			lem_sysctl_reg_handler, "IU",
 			"Device Control Register");
 	SYSCTL_ADD_PROC(ctx, child, OID_AUTO, "rx_control",
-			CTLFLAG_RD, adapter, E1000_RCTL,
+			CTLTYPE_UINT | CTLFLAG_RD, adapter, E1000_RCTL,
 			lem_sysctl_reg_handler, "IU",
 			"Receiver Control Register");
 	SYSCTL_ADD_UINT(ctx, child, OID_AUTO, "fc_high_water",
@@ -4340,27 +4413,27 @@ lem_add_hw_stats(struct adapter *adapter)
 	SYSCTL_ADD_UINT(ctx, child, OID_AUTO, "fc_low_water", 
 			CTLFLAG_RD, &adapter->hw.fc.low_water, 0,
 			"Flow Control Low Watermark");
-	SYSCTL_ADD_QUAD(ctx, child, OID_AUTO, "fifo_workaround",
+	SYSCTL_ADD_UQUAD(ctx, child, OID_AUTO, "fifo_workaround",
 			CTLFLAG_RD, &adapter->tx_fifo_wrk_cnt,
 			"TX FIFO workaround events");
-	SYSCTL_ADD_QUAD(ctx, child, OID_AUTO, "fifo_reset",
+	SYSCTL_ADD_UQUAD(ctx, child, OID_AUTO, "fifo_reset",
 			CTLFLAG_RD, &adapter->tx_fifo_reset_cnt,
 			"TX FIFO resets");
 
 	SYSCTL_ADD_PROC(ctx, child, OID_AUTO, "txd_head", 
-			CTLFLAG_RD, adapter, E1000_TDH(0),
+			CTLTYPE_UINT | CTLFLAG_RD, adapter, E1000_TDH(0),
 			lem_sysctl_reg_handler, "IU",
  			"Transmit Descriptor Head");
 	SYSCTL_ADD_PROC(ctx, child, OID_AUTO, "txd_tail", 
-			CTLFLAG_RD, adapter, E1000_TDT(0),
+			CTLTYPE_UINT | CTLFLAG_RD, adapter, E1000_TDT(0),
 			lem_sysctl_reg_handler, "IU",
  			"Transmit Descriptor Tail");
 	SYSCTL_ADD_PROC(ctx, child, OID_AUTO, "rxd_head", 
-			CTLFLAG_RD, adapter, E1000_RDH(0),
+			CTLTYPE_UINT | CTLFLAG_RD, adapter, E1000_RDH(0),
 			lem_sysctl_reg_handler, "IU",
 			"Receive Descriptor Head");
 	SYSCTL_ADD_PROC(ctx, child, OID_AUTO, "rxd_tail", 
-			CTLFLAG_RD, adapter, E1000_RDT(0),
+			CTLTYPE_UINT | CTLFLAG_RD, adapter, E1000_RDT(0),
 			lem_sysctl_reg_handler, "IU",
 			"Receive Descriptor Tail");
 	
@@ -4371,146 +4444,146 @@ lem_add_hw_stats(struct adapter *adapter)
 				    CTLFLAG_RD, NULL, "Statistics");
 	stat_list = SYSCTL_CHILDREN(stat_node);
 
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "excess_coll", 
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "excess_coll",
 			CTLFLAG_RD, &stats->ecol,
 			"Excessive collisions");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "single_coll", 
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "single_coll",
 			CTLFLAG_RD, &stats->scc,
 			"Single collisions");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "multiple_coll", 
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "multiple_coll",
 			CTLFLAG_RD, &stats->mcc,
 			"Multiple collisions");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "late_coll", 
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "late_coll",
 			CTLFLAG_RD, &stats->latecol,
 			"Late collisions");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "collision_count", 
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "collision_count",
 			CTLFLAG_RD, &stats->colc,
 			"Collision Count");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "symbol_errors",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "symbol_errors",
 			CTLFLAG_RD, &adapter->stats.symerrs,
 			"Symbol Errors");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "sequence_errors",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "sequence_errors",
 			CTLFLAG_RD, &adapter->stats.sec,
 			"Sequence Errors");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "defer_count",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "defer_count",
 			CTLFLAG_RD, &adapter->stats.dc,
 			"Defer Count");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "missed_packets",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "missed_packets",
 			CTLFLAG_RD, &adapter->stats.mpc,
 			"Missed Packets");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "recv_no_buff",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "recv_no_buff",
 			CTLFLAG_RD, &adapter->stats.rnbc,
 			"Receive No Buffers");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "recv_undersize",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "recv_undersize",
 			CTLFLAG_RD, &adapter->stats.ruc,
 			"Receive Undersize");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "recv_fragmented",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "recv_fragmented",
 			CTLFLAG_RD, &adapter->stats.rfc,
 			"Fragmented Packets Received ");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "recv_oversize",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "recv_oversize",
 			CTLFLAG_RD, &adapter->stats.roc,
 			"Oversized Packets Received");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "recv_jabber",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "recv_jabber",
 			CTLFLAG_RD, &adapter->stats.rjc,
 			"Recevied Jabber");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "recv_errs",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "recv_errs",
 			CTLFLAG_RD, &adapter->stats.rxerrc,
 			"Receive Errors");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "crc_errs",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "crc_errs",
 			CTLFLAG_RD, &adapter->stats.crcerrs,
 			"CRC errors");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "alignment_errs",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "alignment_errs",
 			CTLFLAG_RD, &adapter->stats.algnerrc,
 			"Alignment Errors");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "coll_ext_errs",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "coll_ext_errs",
 			CTLFLAG_RD, &adapter->stats.cexterr,
 			"Collision/Carrier extension errors");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "xon_recvd",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "xon_recvd",
 			CTLFLAG_RD, &adapter->stats.xonrxc,
 			"XON Received");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "xon_txd",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "xon_txd",
 			CTLFLAG_RD, &adapter->stats.xontxc,
 			"XON Transmitted");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "xoff_recvd",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "xoff_recvd",
 			CTLFLAG_RD, &adapter->stats.xoffrxc,
 			"XOFF Received");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "xoff_txd",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "xoff_txd",
 			CTLFLAG_RD, &adapter->stats.xofftxc,
 			"XOFF Transmitted");
 
 	/* Packet Reception Stats */
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "total_pkts_recvd",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "total_pkts_recvd",
 			CTLFLAG_RD, &adapter->stats.tpr,
 			"Total Packets Received ");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "good_pkts_recvd",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "good_pkts_recvd",
 			CTLFLAG_RD, &adapter->stats.gprc,
 			"Good Packets Received");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "bcast_pkts_recvd",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "bcast_pkts_recvd",
 			CTLFLAG_RD, &adapter->stats.bprc,
 			"Broadcast Packets Received");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "mcast_pkts_recvd",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "mcast_pkts_recvd",
 			CTLFLAG_RD, &adapter->stats.mprc,
 			"Multicast Packets Received");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "rx_frames_64",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "rx_frames_64",
 			CTLFLAG_RD, &adapter->stats.prc64,
 			"64 byte frames received ");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "rx_frames_65_127",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "rx_frames_65_127",
 			CTLFLAG_RD, &adapter->stats.prc127,
 			"65-127 byte frames received");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "rx_frames_128_255",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "rx_frames_128_255",
 			CTLFLAG_RD, &adapter->stats.prc255,
 			"128-255 byte frames received");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "rx_frames_256_511",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "rx_frames_256_511",
 			CTLFLAG_RD, &adapter->stats.prc511,
 			"256-511 byte frames received");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "rx_frames_512_1023",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "rx_frames_512_1023",
 			CTLFLAG_RD, &adapter->stats.prc1023,
 			"512-1023 byte frames received");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "rx_frames_1024_1522",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "rx_frames_1024_1522",
 			CTLFLAG_RD, &adapter->stats.prc1522,
 			"1023-1522 byte frames received");
- 	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "good_octets_recvd", 
+ 	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "good_octets_recvd",
  			CTLFLAG_RD, &adapter->stats.gorc, 
  			"Good Octets Received");
 
 	/* Packet Transmission Stats */
- 	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "good_octets_txd", 
+ 	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "good_octets_txd",
  			CTLFLAG_RD, &adapter->stats.gotc, 
  			"Good Octets Transmitted"); 
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "total_pkts_txd",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "total_pkts_txd",
 			CTLFLAG_RD, &adapter->stats.tpt,
 			"Total Packets Transmitted");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "good_pkts_txd",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "good_pkts_txd",
 			CTLFLAG_RD, &adapter->stats.gptc,
 			"Good Packets Transmitted");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "bcast_pkts_txd",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "bcast_pkts_txd",
 			CTLFLAG_RD, &adapter->stats.bptc,
 			"Broadcast Packets Transmitted");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "mcast_pkts_txd",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "mcast_pkts_txd",
 			CTLFLAG_RD, &adapter->stats.mptc,
 			"Multicast Packets Transmitted");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "tx_frames_64",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "tx_frames_64",
 			CTLFLAG_RD, &adapter->stats.ptc64,
 			"64 byte frames transmitted ");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "tx_frames_65_127",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "tx_frames_65_127",
 			CTLFLAG_RD, &adapter->stats.ptc127,
 			"65-127 byte frames transmitted");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "tx_frames_128_255",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "tx_frames_128_255",
 			CTLFLAG_RD, &adapter->stats.ptc255,
 			"128-255 byte frames transmitted");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "tx_frames_256_511",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "tx_frames_256_511",
 			CTLFLAG_RD, &adapter->stats.ptc511,
 			"256-511 byte frames transmitted");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "tx_frames_512_1023",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "tx_frames_512_1023",
 			CTLFLAG_RD, &adapter->stats.ptc1023,
 			"512-1023 byte frames transmitted");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "tx_frames_1024_1522",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "tx_frames_1024_1522",
 			CTLFLAG_RD, &adapter->stats.ptc1522,
 			"1024-1522 byte frames transmitted");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "tso_txd",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "tso_txd",
 			CTLFLAG_RD, &adapter->stats.tsctc,
 			"TSO Contexts Transmitted");
-	SYSCTL_ADD_QUAD(ctx, stat_list, OID_AUTO, "tso_ctx_fail",
+	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "tso_ctx_fail",
 			CTLFLAG_RD, &adapter->stats.tsctfc,
 			"TSO Contexts Failed");
 }

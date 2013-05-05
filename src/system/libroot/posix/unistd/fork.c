@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <errno.h>
 
+#include <errno_private.h>
 #include <locks.h>
 #include <libroot_private.h>
 #include <runtime_loader.h>
@@ -138,7 +139,7 @@ fork(void)
 	if (thread < 0) {
 		// something went wrong
 		mutex_unlock(&sForkLock);
-		errno = thread;
+		__set_errno(thread);
 		return -1;
 	}
 

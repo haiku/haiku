@@ -1,0 +1,547 @@
+/*
+ * Copyright 2002-2013 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		John Scipione, jscipione@gmail.com
+ *		Ingo Weinhold, bonefish@users.sf.net
+ *
+ * Corresponds to:
+ *		headers/os/storage/Query.h	hrev45283
+ *		src/kits/storage/Query.cpp	hrev45283
+ */
+
+
+/*!
+	\file Query.h
+	\ingroup storage
+	\ingroup libbe
+	\brief Provides the BQuery class.
+*/
+
+
+/*!
+	\class BQuery
+	\ingroup storage
+	\ingroup libbe
+	\brief Provides an interface for creating file system queries and
+	       implements BEntryList methods for iterating through the results.
+*/
+
+
+/*!
+	\fn BQuery::BQuery()
+	\brief Creates an uninitialized BQuery object.
+
+	\see SetPredicate()
+*/
+
+
+/*!
+	\fn BQuery::~BQuery()
+	\brief Destroys the BQuery object and frees any associated resources.
+*/
+
+
+/*!
+	\fn status_t BQuery::Clear()
+	\brief Resets the object to a uninitialized state.
+
+	\return \c B_OK
+*/
+
+
+/*!
+	\fn status_t BQuery::Fetch()
+	\brief Start fetching entries satisfying the predicate.
+
+	After Fetch() has been called GetNextEntry(), GetNextRef() and
+	GetNextDirents() can be used to retrieve the entities. Live query updates
+	may be sent immediately after this method has been called.
+
+	Fetch() fails if it has already been called. To reuse the BQuery object it
+	must first be reset with the Clear() method.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_INIT The object predicate or the volume wasn't set.
+	\retval B_BAD_VALUE The object predicate was invalid.
+	\retval B_NOT_ALLOWED Fetch() already called.
+*/
+
+
+/*!
+	\name Predicate push methods
+
+	Methods to push data onto the predicate stack.
+
+	\warning In BeOS R5 these methods returned \c void. That is checking the
+	         return value will render your code source and binary
+	         incompatible! Calling PushXYZ() after a Fetch() does change the
+	         predicate on R5, but it doesn't affect the active query and the
+	         newly created predicate can not even be used for the next query,
+	         since in order to be able to reuse the BQuery object for another
+	         query, Clear() has to be called and Clear() also deletes the
+	         predicate.
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BQuery::PushAttr(const char* attrName)
+	\brief Pushes an attribute name onto the predicate stack.
+
+	\param attrName The name of the attribute to push on the stack.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_MEMORY Not enough memory.
+	\retval B_NOT_ALLOWED PushAttribute() was called after Fetch().
+*/
+
+
+/*!
+	\fn status_t BQuery::PushOp(query_op op)
+	\brief Pushes an operator onto the predicate stack.
+
+	\param op The operator code to push onto the stack.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_MEMORY Not enough memory.
+	\retval B_NOT_ALLOWED PushOp() was called after Fetch().
+*/
+
+
+/*!
+	\fn status_t BQuery::PushUInt32(uint32 value)
+	\brief Pushes a \c uint32 onto the predicate stack.
+
+	\param value The \c uint32 to push onto the stack.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_MEMORY Not enough memory.
+	\retval B_NOT_ALLOWED PushUInt32() was called after Fetch().
+*/
+
+
+/*!
+	\fn status_t BQuery::PushInt32(int32 value)
+	\brief Pushes an \c int32 onto the predicate stack.
+
+	\param value The \c int32 to push onto the stack.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_MEMORY Not enough memory.
+	\retval B_NOT_ALLOWED PushInt32() was called after Fetch().
+*/
+
+
+/*!
+	\fn status_t BQuery::PushUInt64(uint64 value)
+	\brief Pushes a \c uint64 onto the predicate stack.
+
+	\param value The \c uint64 to push onto the stack.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_MEMORY Not enough memory.
+	\retval B_NOT_ALLOWED PushUInt64() was called after Fetch().
+*/
+
+
+/*!
+	\fn status_t BQuery::PushInt64(int64 value)
+	\brief Pushes an int64 onto the predicate stack.
+
+	\param value The \c int64 to push onto the stack.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_MEMORY Not enough memory.
+	\retval B_NOT_ALLOWED PushInt64() was called after Fetch().
+*/
+
+
+/*!
+	\fn status_t BQuery::PushFloat(float value)
+	\brief Pushes a \c float onto the predicate stack.
+
+	\param value The \c float to push onto the stack.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_MEMORY Not enough memory.
+	\retval B_NOT_ALLOWED PushFloat() was called after Fetch().
+*/
+
+
+/*!
+	\fn status_t BQuery::PushDouble(double value)
+	\brief Pushes a \c double onto the predicate stack.
+
+	\param value The \c double to push onto the stack.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_MEMORY Not enough memory.
+	\retval B_NOT_ALLOWED PushDouble() was called after Fetch().
+*/
+
+
+/*!
+	\fn status_t BQuery::PushString(const char* value, bool caseInsensitive)
+	\brief Pushes a string onto the predicate stack.
+
+	\param value The string to push onto the stack.
+	\param caseInsensitive Whether or not the case of \a value should be
+	       ignored in the resulting query.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_MEMORY Not enough memory.
+	\retval B_NOT_ALLOWED PushString() was called after Fetch().
+*/
+
+
+/*!
+	\fn status_t BQuery::PushDate(const char* date)
+	\brief Pushes a date string onto the predicate stack.
+
+	The supplied date can be any string understood by parsedate().
+
+	\param date The date string to push onto the stack.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_MEMORY Not enough memory.
+	\retval B_NOT_ALLOWED PushDate() was called after Fetch().
+
+	\see parsedate()
+*/
+
+
+//! @}
+
+
+/*!
+	\name Assignment methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BQuery::SetVolume(const BVolume* volume)
+	\brief Assigns \a volume to the BQuery object.
+
+	A query may only be assigned to one volume.
+
+	The method fails if called after Fetch(). To reuse the BQuery object it
+	must first be reset using the Clear() method.
+
+	\param volume The \a volume to set.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NOT_ALLOWED SetVolume() was called after Fetch().
+*/
+
+
+/*!
+	\fn status_t BQuery::SetPredicate(const char* expression)
+	\brief Assigns the passed-in predicate \a expression.
+
+	A predicate can be set either using this method or by constructing one on
+	the predicate stack, however, the two methods can not be mixed. The
+	predicate stack takes precedence over this method.
+
+	The method fails if called after Fetch(). To reuse the BQuery object it
+	must first be reset using the Clear() method.
+
+	\param expression The predicate \a expression to set.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_MEMORY Not enough memory.
+	\retval B_NOT_ALLOWED SetPredicate() was called after Fetch().
+*/
+
+
+/*!
+	\fn status_t BQuery::SetTarget(BMessenger messenger)
+	\brief Assigns the target \a messenger and makes the query live.
+
+	The query update messages are sent to the specified target. They might
+	roll in immediately after calling Fetch().
+
+	This methods fails if called after Fetch(). To reuse the BQuery object it
+	must first be reset via Clear().
+
+	\param messenger The target \a messenger to set.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_MEMORY Not enough memory.
+	\retval B_NOT_ALLOWED SetTarget() was called after Fetch().
+*/
+
+
+//! @}
+
+
+/*!
+	\name Query information methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn bool BQuery::IsLive() const
+	\brief Gets whether the query associated with this object is live.
+	\return \c true, if the query is live, \c false otherwise.
+*/
+
+
+/*!
+	\fn dev_t BQuery::TargetDevice() const
+	\brief Gets the device ID identifying the volume of the BQuery object.
+
+	\return The device ID of the volume or \c B_NO_INIT if the volume wasn't
+	        set.
+*/
+
+
+/*!
+	\fn size_t BQuery::PredicateLength()
+	\brief Gets the length of the predicate string.
+
+	This method returns the length of the string representation of the
+	predicate (including the terminating \c NUL) regardless of whether the
+	predicate has been constructed using the predicate stack or set via
+	SetPredicate().
+
+	\return The length of the predicate string or 0 if an error occurred.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Get predicate methods
+
+	These methods fetch a string representation regardless of whether the
+	predicate has been constructed using the predicate stack or via
+	SetPredicate().
+
+	\note These methods cause the predicate stack to be evaluated and cleared.
+		  You can't interleave calls to push data and GetPredicate() methods.
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BQuery::GetPredicate(char* buffer, size_t length)
+	\brief Fills out \a buffer with the predicate string assigned to the
+	       BQuery object.
+
+	\param buffer A pointer to a buffer which the predicate is written to.
+	\param length the size of \a buffer.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_INIT The predicate of the BQuery object wasn't set.
+	\retval B_BAD_VALUE \a buffer was \c NULL or too short.
+*/
+
+
+/*!
+	\fn status_t BQuery::GetPredicate(BString* predicate)
+	\brief Fills out the passed-in BString object with the predicate string
+	       assigned to the BQuery object.
+
+	\param predicate A pointer to a BString object that gets filled out with
+	       the predicate string.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_INIT The predicate of the BQuery object wasn't set.
+	\retval B_BAD_VALUE \a predicate was \c NULL.
+*/
+
+
+//! @}
+
+
+/*!
+	\name BEntryList interface methods
+
+	These methods are used to traverse the results of a query as a BEntryList.
+
+	\note The iterator used by these methods is the same one used by
+		  GetNextRef() and GetNextDirents().
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BQuery::GetNextEntry(BEntry* entry, bool traverse)
+	\brief Fills out \a entry with the next entry traversing symlinks if
+	       \a traverse is \c true.
+
+	\param entry A pointer to a BEntry object initialized with the entry.
+	\param traverse Whether or not to follow symbolic links.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ENTRY_NOT_FOUND At end of list.
+	\retval B_BAD_VALUE The predicate included unindexed attributes.
+	\retval B_NOT_ALLOWED Fetch() was not previously called on the object.
+*/
+
+
+/*!
+	\fn status_t BQuery::GetNextRef(entry_ref* ref)
+	\brief Fills out \a ref with the next entry as an entry_ref.
+
+	\param ref A pointer to an entry_ref object filled out with the
+	       entry's data.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ENTRY_NOT_FOUND At end of list.
+	\retval B_BAD_VALUE The predicate included unindexed attributes.
+	\retval B_NOT_ALLOWED Fetch() was not previously called on the object.
+*/
+
+
+/*!
+	\fn int32 BQuery::GetNextDirents(struct dirent* buffer, size_t length,
+		int32 count)
+	\brief Fill out up to \a count entries into the array of dirent structs
+	       pointed to by \a buffer.
+
+	Reads as many but no more than \a count entries, as many entries as
+	remain, or as many entries as will fit into the array at \a buffer with
+	the given \a length (in bytes), whichever is smallest.
+
+	\param buffer A pointer to a buffer filled out with dirent structures of
+		   the entries.
+	\param length The length of \a buffer.
+	\param count The maximum number of entries to be read.
+
+	\return The number of dirent structures stored in the buffer, 0 when there
+	        are no more entries to be read, or an error code.
+	\retval B_BAD_VALUE The predicate included unindexed attributes.
+	\retval B_FILE_ERROR Fetch() was not previously called on the object.
+*/
+
+
+/*!
+	\fn status_t BQuery::Rewind()
+	\brief Rewinds the entry list back to the first entry.
+
+	\note BeOS R5 does not implement this method for BQuery.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_FILE_ERROR Fetch() was not previously called on the object.
+*/
+
+
+/*!
+	\fn int32 BQuery::CountEntries()
+	\brief Unimplemented.
+
+	\return \c B_ERROR.
+*/
+
+
+//! @}
+
+
+/// private methods, won't show up in docs
+
+
+/*!
+	\fn bool BQuery::_HasFetched() const
+	\brief Gets whether Fetch() has already been called on this object.
+
+	\return \c true, if Fetch() was already called, \c false otherwise.
+*/
+
+
+/*!
+	\fn status_t BQuery::_PushNode(QueryNode* node, bool deleteOnError)
+	\brief Pushes a node onto the predicate stack.
+
+	If the stack has not been allocate until this time, this method does
+	allocate it.
+
+	If the supplied node is \c NULL, it is assumed that there was not enough
+	memory to allocate the node and thus \c B_NO_MEMORY is returned.
+
+	In case the method fails, the caller retains the ownership of the supplied
+	node and thus is responsible for deleting it, if \a deleteOnError is
+	\c false. If it is \c true, the node is deleted, if an error occurs.
+
+	\param node The node to push.
+	\param deleteOnError Whether or not to delete the node if an error occurs.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_MEMORY \a node was \c NULL or there was insufficient memory to
+	        allocate the predicate stack or push the node.
+	\retval B_NOT_ALLOWED _PushNode() was called after Fetch().
+*/
+
+
+/*!
+	\fn status_t BQuery::_SetPredicate(const char* expression)
+	\brief Helper method to set the predicate.
+
+	Does not check whether Fetch() has already been invoked.
+
+	\param expression The predicate string to set.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_MEMORY There was insufficient memory to store the predicate.
+*/
+
+
+/*!
+	\fn status_t BQuery::_EvaluateStack()
+	Evaluates the predicate stack.
+
+	The method does nothing (and returns \c B_OK), if the stack is \c NULL.
+	If the stack is not  \c null and Fetch() has already been called, this
+	method fails.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_MEMORY There was insufficient memory.
+	\retval B_NOT_ALLOWED _EvaluateStack() was called after Fetch().
+*/
+
+
+/*!
+	\fn void BQuery::_ParseDates(BString& parsedPredicate)
+	\brief Fills out \a parsedPredicate with a parsed predicate string.
+
+	\param parsedPredicate The predicate string to fill out.
+*/

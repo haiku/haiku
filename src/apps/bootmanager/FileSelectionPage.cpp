@@ -20,8 +20,8 @@
 #include <TextView.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "FileSelectionPage"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "FileSelectionPage"
 
 
 const uint32 kMsgOpenFilePanel = 'open';

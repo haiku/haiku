@@ -28,25 +28,52 @@ public:
 	virtual	void				GetHeightForWidth(float width, float* min,
 									float* max, float* preferred);
 
-	virtual	void				InvalidateLayout(bool children = false);
-
 	virtual status_t			Archive(BMessage* into, bool deep = true) const;
-	virtual status_t			AllUnarchived(const BMessage* from);
 	static	BArchivable*		Instantiate(BMessage* from);
 
+	virtual	status_t			Perform(perform_code d, void* arg);
+
 protected:
-	virtual	void				DerivedLayoutItems();
+	virtual	status_t			AllArchived(BMessage* archive) const;
+	virtual status_t			AllUnarchived(const BMessage* from);
+
+	virtual status_t			ItemArchived(BMessage* into, BLayoutItem* item,
+									int32 index) const;
+	virtual	status_t			ItemUnarchived(const BMessage* from,
+									BLayoutItem* item, int32 index);
+
+	virtual	void				LayoutInvalidated(bool children = false);
+	virtual	void				DoLayout();
 	virtual	bool				ItemAdded(BLayoutItem* item, int32 atIndex);
 	virtual	void				ItemRemoved(BLayoutItem* item, int32 fromIndex);
 
 private:
+
+			void				_ValidateMinMax();
+
+	// FBC padding
+	virtual	void				_ReservedCardLayout1();
+	virtual	void				_ReservedCardLayout2();
+	virtual	void				_ReservedCardLayout3();
+	virtual	void				_ReservedCardLayout4();
+	virtual	void				_ReservedCardLayout5();
+	virtual	void				_ReservedCardLayout6();
+	virtual	void				_ReservedCardLayout7();
+	virtual	void				_ReservedCardLayout8();
+	virtual	void				_ReservedCardLayout9();
+	virtual	void				_ReservedCardLayout10();
+
+	// forbidden methods
+								BCardLayout(const BCardLayout&);
+			void				operator =(const BCardLayout&);
+
 			BSize				fMin;
 			BSize				fMax;
 			BSize				fPreferred;
 			BLayoutItem*		fVisibleItem;
 			bool				fMinMaxValid;
 
-			void				_ValidateMinMax();
+			uint32				_reserved[5];
 };
 
 #endif	// _CARD_LAYOUT_H

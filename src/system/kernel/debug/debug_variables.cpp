@@ -226,8 +226,8 @@ cmd_variables(int argc, char **argv)
 	for (int i = 0; i < kVariableCount; i++) {
 		Variable& variable = sVariables[i];
 		if (variable.IsUsed()) {
-			kprintf("%16s: %llu (0x%llx)\n", variable.name, variable.value,
-				variable.value);
+			kprintf("%16s: %" B_PRIu64 " (0x%" B_PRIx64 ")\n", variable.name,
+				variable.value, variable.value);
 		}
 	}
 
@@ -235,8 +235,8 @@ cmd_variables(int argc, char **argv)
 	for (int i = 0; i < kTemporaryVariableCount; i++) {
 		Variable& variable = sTemporaryVariables[i];
 		if (variable.IsUsed()) {
-			kprintf("%16s: %llu (0x%llx)\n", variable.name, variable.value,
-				variable.value);
+			kprintf("%16s: %" B_PRIu64 " (0x%" B_PRIx64 ")\n", variable.name,
+				variable.value, variable.value);
 		}
 	}
 

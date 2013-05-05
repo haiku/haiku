@@ -1,0 +1,27 @@
+1	dutch; flemish	x-vnd.Haiku-mixer.media_addon	3450667169
+Input gain controls represent	AudioMixer		Invoer versterkingsknoppen representeren
+Linear interpolation	AudioMixer		Lineaire interpolatie
+Virtual output channels	AudioMixer		Virtuele uitvoerkanalen
+Refuse output format changes	AudioMixer		Weiger wijzigingen van het uitvoerformaat
+Output mapping	AudioMixer		Uitgang mapping
+Allow input channel remapping	AudioMixer		Sta toe het invoerkanaal opnieuw te mappen
+Resampling algorithm	AudioMixer		Resampling algorithme
+Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Verzwakken mixeruitgang met 3dB (zoals BeOS R5)
+Display balance control for stereo connections	AudioMixer		Balansknop voor stereoverbindingen weergeven
+To output	AudioMixer		Uitvoer
+not connected	AudioMixer		niet verbonden
+Refuse input format changes	AudioMixer		Weiger veranderingen in invoerformaat
+Drop/repeat samples	AudioMixer		Drop/herhaal samples
+Output channel sources	AudioMixer		Uitgangskanaal bronnen
+dB	AudioMixer		dB
+Gain controls	AudioMixer		Gain instellingen
+Input mapping	AudioMixer		Invoermapping
+Mute	AudioMixer		Dempen
+Input channel destinations	AudioMixer		Ingang kanaal bestemming
+To master	AudioMixer		Naar master
+Master output	AudioMixer		Masteruitvoer
+Setup	AudioMixer		Instellingen
+Use non linear gain sliders (like BeOS R5)	AudioMixer		Gebruik nonlineare versterkingsschuifknoppen (zoals BeOS R5)
+Gain	AudioMixer		Versterking
+Allow output channel remapping	AudioMixer		Uitvoerkanaal hermappen toelaten
+Physical input channels	AudioMixer		Fysieke invoerkanalen

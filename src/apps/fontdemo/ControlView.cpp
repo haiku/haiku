@@ -25,8 +25,8 @@
 
 #include <stdio.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ControlView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ControlView"
 
 ControlView::ControlView(BRect rect)
 	: BView(rect, "ControlView", B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE_JUMP),
@@ -380,7 +380,7 @@ ControlView::MessageReceived(BMessage* msg)
 		 				printf("Failed to add style or family to the message\n");
 		 				return;
 		 			}
-		 			printf("InstalledStyles(%ld), Font(%s), Style(%s)\n",
+					printf("InstalledStyles(%" B_PRId32 "), Font(%s), Style(%s)\n",
 		 				installedStyles, newFontFamilyItem->Label(),
 		 				newstyleitem->Label());
 					_UpdateAndSendStyle(msg);

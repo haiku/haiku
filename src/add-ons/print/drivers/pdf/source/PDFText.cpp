@@ -320,10 +320,9 @@ void
 PDFWriter::ToPDFUnicode(const char *string, BString &unicode)
 {
 	// PDFlib requires BOM at begin and two 0 at end of string
-	char marker[3] = { 0xfe, 0xff, 0}; // byte order marker
 	BString s;
 	ToUnicode(string, s);
-	unicode << marker;
+	unicode << "\xfe\xff";
 	int32 len = s.Length()+2;
 	char* buf = unicode.LockBuffer(len + 2);
 		// reserve space for two additional '\0'

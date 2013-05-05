@@ -31,12 +31,12 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef __TEMPLATES_MENU__
 #define __TEMPLATES_MENU__
 
 
 #include <Menu.h>
+
 
 namespace BPrivate {
 
@@ -45,27 +45,25 @@ extern const char* kTemplatesMenuName;
 
 class TemplatesMenu : public BMenu {
 public:
-	TemplatesMenu(const BMessenger &target,
-		const char *label);
-	virtual ~TemplatesMenu();
-
+				TemplatesMenu(const BMessenger& target, const char* label);
+	virtual		~TemplatesMenu();
 
 	virtual	void AttachedToWindow();
 
-	virtual	status_t SetTargetForItems(BHandler *);
+	virtual	status_t SetTargetForItems(BHandler*);
 	virtual	status_t SetTargetForItems(BMessenger);
 
 	void UpdateMenuState();
 
 private:
 	bool BuildMenu(bool addItems = true);
-		
+
 	BMessenger fTarget;
-	BMenuItem *fOpenItem;
+	BMenuItem* fOpenItem;
 };
 
 } // namespace BPrivate
 
 using namespace BPrivate;
 
-#endif
+#endif	// __TEMPLATES_MENU__

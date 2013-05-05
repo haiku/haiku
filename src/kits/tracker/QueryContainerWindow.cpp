@@ -32,6 +32,7 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+
 #include <Catalog.h>
 #include <Locale.h>
 #include <Menu.h>
@@ -47,10 +48,10 @@ All rights reserved.
 #include "QueryPoseView.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "QueryContainerWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "QueryContainerWindow"
 
-BQueryContainerWindow::BQueryContainerWindow(LockingList<BWindow> *windowList,
+BQueryContainerWindow::BQueryContainerWindow(LockingList<BWindow>* windowList,
 	uint32 containerWindowFlags, window_look look,
 	window_feel feel, uint32 flags, uint32 workspace)
 	:	BContainerWindow(windowList, containerWindowFlags, look, feel,
@@ -59,22 +60,22 @@ BQueryContainerWindow::BQueryContainerWindow(LockingList<BWindow> *windowList,
 }
 
 
-BPoseView *
-BQueryContainerWindow::NewPoseView(Model *model, BRect rect, uint32)
+BPoseView*
+BQueryContainerWindow::NewPoseView(Model* model, BRect rect, uint32)
 {
 	return new BQueryPoseView(model, rect);
 }
 
 
-BQueryPoseView *
+BQueryPoseView*
 BQueryContainerWindow::PoseView() const
 {
-	return static_cast<BQueryPoseView *>(fPoseView);
+	return static_cast<BQueryPoseView*>(fPoseView);
 }
 
 
 void
-BQueryContainerWindow::CreatePoseView(Model *model)
+BQueryContainerWindow::CreatePoseView(Model* model)
 {
 	BRect rect(Bounds());
 	rect.right -= B_V_SCROLL_BAR_WIDTH;
@@ -86,9 +87,9 @@ BQueryContainerWindow::CreatePoseView(Model *model)
 
 
 void
-BQueryContainerWindow::AddWindowMenu(BMenu *menu)
+BQueryContainerWindow::AddWindowMenu(BMenu* menu)
 {
-	BMenuItem *item;
+	BMenuItem* item;
 
 	item = new BMenuItem(B_TRANSLATE("Resize to fit"),
 		new BMessage(kResizeToFit), 'Y');
@@ -100,8 +101,8 @@ BQueryContainerWindow::AddWindowMenu(BMenu *menu)
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
-	item = new BMenuItem(B_TRANSLATE("Select all"),	new BMessage(B_SELECT_ALL),
-		'A');
+	item = new BMenuItem(B_TRANSLATE("Select all"),
+		new BMessage(B_SELECT_ALL), 'A');
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
@@ -110,15 +111,15 @@ BQueryContainerWindow::AddWindowMenu(BMenu *menu)
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
-	item = new BMenuItem(B_TRANSLATE("Close"), new BMessage(B_QUIT_REQUESTED),
-		'W');
+	item = new BMenuItem(B_TRANSLATE("Close"),
+		new BMessage(B_QUIT_REQUESTED), 'W');
 	item->SetTarget(this);
 	menu->AddItem(item);
 }
 
 
-void 
-BQueryContainerWindow::AddWindowContextMenus(BMenu *menu)
+void
+BQueryContainerWindow::AddWindowContextMenus(BMenu* menu)
 {
 	BMenuItem* resizeItem = new BMenuItem(B_TRANSLATE("Resize to fit"),
 		new BMessage(kResizeToFit), 'Y');
@@ -137,7 +138,7 @@ BQueryContainerWindow::AddWindowContextMenus(BMenu *menu)
 }
 
 
-void 
+void
 BQueryContainerWindow::SetUpDefaultState()
 {
 	BNode defaultingNode;
@@ -152,7 +153,7 @@ BQueryContainerWindow::SetUpDefaultState()
 
 	defaultStatePath += '/';
 	int32 length = sanitizedType.Length();
-	char *buf = sanitizedType.LockBuffer(length);
+	char* buf = sanitizedType.LockBuffer(length);
 	for (int32 index = length - 1; index >= 0; index--)
 		if (buf[index] == '/')
 			buf[index] = '_';
@@ -160,9 +161,11 @@ BQueryContainerWindow::SetUpDefaultState()
 
 	defaultStatePath += sanitizedType;
 
-	PRINT(("looking for default query state at %s\n", defaultStatePath.String()));
+	PRINT(("looking for default query state at %s\n",
+		defaultStatePath.String()));
 
-	if (!DefaultStateSourceNode(defaultStatePath.String(), &defaultingNode, false)) {
+	if (!DefaultStateSourceNode(defaultStatePath.String(), &defaultingNode,
+			false)) {
 		TRACE();
 		return;
 	}
@@ -170,7 +173,7 @@ BQueryContainerWindow::SetUpDefaultState()
 	// copy over the attributes
 
 	// set up a filter of the attributes we want copied
-	const char *allowAttrs[] = {
+	const char* allowAttrs[] = {
 		kAttrWindowFrame,
 		kAttrViewState,
 		kAttrViewStateForeign,
@@ -187,9 +190,8 @@ BQueryContainerWindow::SetUpDefaultState()
 }
 
 
-bool 
+bool
 BQueryContainerWindow::ActiveOnDevice(dev_t device) const
 {
 	return PoseView()->ActiveOnDevice(device);
 }
-

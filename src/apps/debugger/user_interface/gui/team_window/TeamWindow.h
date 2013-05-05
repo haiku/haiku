@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TEAM_WINDOW_H
@@ -12,7 +12,7 @@
 
 #include "BreakpointsView.h"
 #include "Function.h"
-#include "GUITeamUISettings.h"
+#include "GuiTeamUiSettings.h"
 #include "ImageFunctionsView.h"
 #include "ImageListView.h"
 #include "SourceView.h"
@@ -24,6 +24,7 @@
 
 
 class BButton;
+class BFilePanel;
 class BMenuBar;
 class BSplitView;
 class BStringView;
@@ -58,9 +59,9 @@ public:
 	virtual	bool				QuitRequested();
 
 			status_t			LoadSettings(
-									const GUITeamUISettings* settings);
+									const GuiTeamUiSettings* settings);
 			status_t			SaveSettings(
-									GUITeamUISettings* settings);
+									GuiTeamUiSettings* settings);
 
 
 private:
@@ -94,6 +95,15 @@ private:
 	virtual	void				ClearBreakpointRequested(
 									UserBreakpoint* breakpoint);
 
+	virtual	void				WatchpointSelectionChanged(
+									Watchpoint* Watchpoint);
+	virtual	void				SetWatchpointEnabledRequested(
+									Watchpoint* breakpoint,
+									bool enabled);
+	virtual	void				ClearWatchpointRequested(
+									Watchpoint* watchpoint);
+
+
 	// SourceView::Listener
 	virtual	void				SetBreakpointRequested(target_addr_t address,
 									bool enabled);
@@ -115,6 +125,10 @@ private:
 									const Team::ImageEvent& event);
 	virtual	void				UserBreakpointChanged(
 									const Team::UserBreakpointEvent& event);
+	virtual	void				WatchpointChanged(
+									const Team::WatchpointEvent& event);
+	virtual void				DebugReportChanged(
+									const Team::DebugReportEvent& event);
 
 	// Function::Listener
 	virtual	void				FunctionSourceCodeChanged(Function* function);
@@ -131,6 +145,7 @@ private:
 			void				_SetActiveSourceCode(SourceCode* sourceCode);
 			void				_UpdateCpuState();
 			void				_UpdateRunButtons();
+			void				_UpdateSourcePathState();
 			void				_ScrollToActiveFunction();
 
 			void				_HandleThreadStateChanged(thread_id threadID);
@@ -140,15 +155,10 @@ private:
 			void				_HandleSourceCodeChanged();
 			void				_HandleUserBreakpointChanged(
 									UserBreakpoint* breakpoint);
+			void				_HandleWatchpointChanged(
+									Watchpoint* watchpoint);
 			void				_HandleResolveMissingSourceFile(entry_ref&
 									locatedPath);
-
-			void				_LoadSplitSettings(BSplitView* view,
-									const char* name,
-									const GUITeamUISettings* settings);
-			status_t			_SaveSplitSettings(BSplitView* view,
-									const char* name,
-									GUITeamUISettings* settings);
 
 			status_t			_SaveInspectorSettings(
 									const BMessage* settings);
@@ -184,7 +194,8 @@ private:
 			BSplitView*			fImageSplitView;
 			BSplitView*			fThreadSplitView;
 			InspectorWindow*	fInspectorWindow;
-			GUITeamUISettings	fUISettings;
+			GuiTeamUiSettings	fUiSettings;
+			BFilePanel*			fFilePanel;
 };
 
 

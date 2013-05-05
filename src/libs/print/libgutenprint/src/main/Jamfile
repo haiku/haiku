@@ -6,6 +6,9 @@ SubDirSysHdrs [ FDirName $(HAIKU_TOP) src libs print libgutenprint include ] ;
 
 DEFINES += HAVE_CONFIG_H=1 ;
 
+# Some targets in this subdir fail to build with DEBUG=1
+DEBUG = 0 ;
+
 StaticLibrary libgutenprint.a :
 	array.c
 	bit-ops.c

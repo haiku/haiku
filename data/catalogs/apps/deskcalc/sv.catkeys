@@ -1,5 +1,9 @@
-1	swedish	x-vnd.Haiku-DeskCalc	2547506672
-Audio Feedback	CalcView		Knappljud
+1	swedish	x-vnd.Haiku-DeskCalc	3276968552
+Compact	CalcView		Kompakt
+Scientific	CalcView		Vetenskaplig
 DeskCalc	System name		Kalkylator
+Basic	CalcView		Enkel
+Radians	CalcView		Radianer
 Enable Num Lock on startup	CalcView		Aktivera Num Lock vid start
-Show keypad	CalcView		Visa tangenter
+Degrees	CalcView		Grader
+Audio Feedback	CalcView		Knappljud

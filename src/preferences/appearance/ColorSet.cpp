@@ -8,22 +8,26 @@
  *		Rene Gollent <rene@gollent.com>
  */
 
+
 #include <stdio.h>
 #include <Catalog.h>
+#include <DefaultColors.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
 #include <InterfaceDefs.h>
 #include <Locale.h>
 #include <Message.h>
+#include <ServerReadOnlyMemory.h>
 #include <String.h>
 #include "ColorSet.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Colors tab"
 
-static ColorDescription sColorDescriptionTable[] =
-{
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Colors tab"
+
+
+static ColorDescription sColorDescriptionTable[] = {
 	{ B_PANEL_BACKGROUND_COLOR, B_TRANSLATE_MARK("Panel background") },
 	{ B_PANEL_TEXT_COLOR, B_TRANSLATE_MARK("Panel text") },
 	{ B_DOCUMENT_BACKGROUND_COLOR, B_TRANSLATE_MARK("Document background") },
@@ -32,6 +36,7 @@ static ColorDescription sColorDescriptionTable[] =
 	{ B_CONTROL_TEXT_COLOR, B_TRANSLATE_MARK("Control text") },
 	{ B_CONTROL_BORDER_COLOR, B_TRANSLATE_MARK("Control border") },
 	{ B_CONTROL_HIGHLIGHT_COLOR, B_TRANSLATE_MARK("Control highlight") },
+	{ B_CONTROL_MARK_COLOR, B_TRANSLATE_MARK("Control mark") },
 	{ B_NAVIGATION_BASE_COLOR, B_TRANSLATE_MARK("Navigation base") },
 	{ B_NAVIGATION_PULSE_COLOR, B_TRANSLATE_MARK("Navigation pulse") },
 	{ B_SHINE_COLOR, B_TRANSLATE_MARK("Shine") },
@@ -44,6 +49,14 @@ static ColorDescription sColorDescriptionTable[] =
 		B_TRANSLATE_MARK("Selected menu item text") },
 	{ B_MENU_SELECTED_BORDER_COLOR,
 		B_TRANSLATE_MARK("Selected menu item border") },
+	{ B_LIST_BACKGROUND_COLOR, B_TRANSLATE_MARK("List background") },
+	{ B_LIST_SELECTED_BACKGROUND_COLOR,
+		B_TRANSLATE_MARK("Selected list item background") },
+	{ B_LIST_ITEM_TEXT_COLOR, B_TRANSLATE_MARK("List item text") },
+	{ B_LIST_SELECTED_ITEM_TEXT_COLOR,
+		B_TRANSLATE_MARK("Selected list item text") },
+	{ B_SCROLL_BAR_THUMB_COLOR,
+		B_TRANSLATE_MARK("Scroll bar thumb") },
 	{ B_TOOL_TIP_BACKGROUND_COLOR, B_TRANSLATE_MARK("Tooltip background") },
 	{ B_TOOL_TIP_TEXT_COLOR, B_TRANSLATE_MARK("Tooltip text") },
 	{ B_SUCCESS_COLOR, B_TRANSLATE_MARK("Success") },
@@ -52,11 +65,15 @@ static ColorDescription sColorDescriptionTable[] =
 	{ B_WINDOW_TEXT_COLOR, B_TRANSLATE_MARK("Window tab text") },
 	{ B_WINDOW_INACTIVE_TAB_COLOR, B_TRANSLATE_MARK("Inactive window tab") },
 	{ B_WINDOW_INACTIVE_TEXT_COLOR,
-		B_TRANSLATE_MARK("Inactive window tab text") }
+		B_TRANSLATE_MARK("Inactive window tab text") },
+	{ B_WINDOW_BORDER_COLOR, B_TRANSLATE_MARK("Window border") },
+	{ B_WINDOW_INACTIVE_BORDER_COLOR,
+		B_TRANSLATE_MARK("Inactive window border") }
 };
 
 const int32 sColorDescriptionCount = sizeof(sColorDescriptionTable)
 	/ sizeof(ColorDescription);
+
 
 const ColorDescription*
 get_color_description(int32 index)
@@ -66,11 +83,13 @@ get_color_description(int32 index)
 	return &sColorDescriptionTable[index];
 }
 
+
 int32
 color_description_count(void)
 {
 	return sColorDescriptionCount;
 }
+
 
 //	#pragma mark -
 
@@ -78,6 +97,7 @@ color_description_count(void)
 ColorSet::ColorSet()
 {
 }
+
 
 /*!
 	\brief Copy constructor which does a massive number of assignments
@@ -88,12 +108,14 @@ ColorSet::ColorSet(const ColorSet &cs)
 	*this = cs;
 }
 
+
 /*!
-	\brief Overloaded assignment operator which does a massive number of assignments
+	\brief Overloaded assignment operator which does a massive number of
+	       assignments.
 	\param cs Color set to copy from
 	\return The new values assigned to the color set
 */
-ColorSet &
+ColorSet&
 ColorSet::operator=(const ColorSet &cs)
 {
 	fColors = cs.fColors;
@@ -109,32 +131,12 @@ ColorSet
 ColorSet::DefaultColorSet(void)
 {
 	ColorSet set;
-	set.fColors[B_PANEL_BACKGROUND_COLOR] = make_color(216, 216, 216);
-	set.fColors[B_PANEL_TEXT_COLOR] = make_color(0, 0, 0);
-	set.fColors[B_DOCUMENT_BACKGROUND_COLOR] = make_color(255,255, 255);
-	set.fColors[B_DOCUMENT_TEXT_COLOR] = make_color(0, 0, 0);
-	set.fColors[B_CONTROL_BACKGROUND_COLOR] = make_color(245, 245, 245);
-	set.fColors[B_CONTROL_TEXT_COLOR] = make_color(0, 0, 0);
-	set.fColors[B_CONTROL_BORDER_COLOR] = make_color(0, 0, 0);
-	set.fColors[B_CONTROL_HIGHLIGHT_COLOR] = make_color(102, 152, 203);
-	set.fColors[B_NAVIGATION_BASE_COLOR] = make_color(0, 0, 229);
-	set.fColors[B_NAVIGATION_PULSE_COLOR] = make_color(0, 0, 0);
-	set.fColors[B_SHINE_COLOR] = make_color(255, 255, 255);
-	set.fColors[B_SHADOW_COLOR] = make_color(0, 0, 0);
-	set.fColors[B_MENU_BACKGROUND_COLOR] = make_color(216, 216, 216);
-	set.fColors[B_MENU_SELECTED_BACKGROUND_COLOR] = make_color(115, 120, 184);
-	set.fColors[B_MENU_ITEM_TEXT_COLOR] = make_color(0, 0, 0);
-	set.fColors[B_MENU_SELECTED_ITEM_TEXT_COLOR] = make_color(255, 255, 255);
-	set.fColors[B_MENU_SELECTED_BORDER_COLOR] = make_color(0, 0, 0);
-	set.fColors[B_TOOL_TIP_BACKGROUND_COLOR] = make_color(255, 255, 0);
-	set.fColors[B_TOOL_TIP_TEXT_COLOR] = make_color(0, 0, 0);
-	set.fColors[B_SUCCESS_COLOR] = make_color(0, 255, 0);
-	set.fColors[B_FAILURE_COLOR] = make_color(255, 0, 0);
-	set.fColors[B_WINDOW_TAB_COLOR] = make_color(255, 203, 0);
-	set.fColors[B_WINDOW_TEXT_COLOR] = make_color(0, 0, 0);
-	set.fColors[B_WINDOW_INACTIVE_TAB_COLOR] = make_color(232, 232, 232);
-	set.fColors[B_WINDOW_INACTIVE_TEXT_COLOR] = make_color(80, 80, 80);
 
+	for (int i = 0; i < sColorDescriptionCount; i++) {
+		color_which which = get_color_description(i)->which;
+		set.fColors[which] =
+			BPrivate::kDefaultColors[color_which_to_index(which)];
+	}
 	return set;
 }
 
@@ -156,5 +158,3 @@ ColorSet::GetColor(int32 which)
 {
 	return fColors[(color_which)which];
 }
-
-

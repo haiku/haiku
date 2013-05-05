@@ -122,6 +122,7 @@ private:
 			BGroupLayout*		fControlLayout;
 
 			float				fSymbolScale;
+			uint32				fLastEnabledButtons;
 };
 
 #endif	// TRANSPORT_CONTROL_GROUP_H

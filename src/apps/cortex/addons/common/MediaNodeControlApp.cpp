@@ -84,7 +84,9 @@ MediaNodeControlApp::MediaNodeControlApp(
 		sprintf(buffer,
 			"MediaNodeControlApp: couldn't find node (%ld):\n%s\n",
 			nodeID, strerror(err));
-		(new BAlert("error", buffer, "OK"))->Go();
+		BAlert* alert = new BAlert("error", buffer, "OK");
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 		return;
 	}
 	
@@ -96,7 +98,9 @@ MediaNodeControlApp::MediaNodeControlApp(
 		sprintf(buffer,
 			"MediaNodeControlApp: couldn't get node info (%ld):\n%s\n",
 			nodeID, strerror(err));
-		(new BAlert("error", buffer, "OK"))->Go();
+		BAlert* alert = new BAlert("error", buffer, "OK");
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 		return;
 	}
 	
@@ -111,7 +115,9 @@ MediaNodeControlApp::MediaNodeControlApp(
 		sprintf(buffer,
 			"MediaNodeControlApp: no parameters for node (%ld):\n%s\n",
 			nodeID, strerror(err));
-		(new BAlert("error", buffer, "OK"))->Go();
+		BAlert* alert = new BAlert("error", buffer, "OK");
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 		return;
 	}
 	

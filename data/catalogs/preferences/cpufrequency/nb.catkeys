@@ -1,19 +1,19 @@
-1	norwegian_bokmål	x-vnd.Haiku-CPUFrequencyPref	1579805342
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-CPUFrequencyPref	1579805342
+Ok	Status view		OK
 CPU frequency status view	CPU Frequency View		Visning av CPU-status
-CPUFrequency	System name		Prosessorhastighet
-CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPUFrequency\n\tskrevet av Clemens Zeidler\n\tOpphavsrett 2009, Haiku, Inc.\n
+Set state	Status view		Sett tilstand
 Defaults	Pref Window		Standardinnstillinger
+Install replicant into Deskbar	CPU Frequency View		Installer replikanten i Deskbar
+Quit	Status view		Avslutt
+High performance	Status view		Høy ytelse
+Stepping policy	CPU Frequency View		Stepping-policy
 Dynamic performance	Status view		Dynamisk ytelse
 Dynamic stepping	CPU Frequency View		Dynamisk stepping
-High performance	Status view		Høy ytelse
-Install replicant into Deskbar	CPU Frequency View		Installer replikanten i Deskbar
-Integration time [ms]: 	CPU Frequency View		Integrasjonstid [ms]:
-Launching the CPU frequency preflet failed.\n\nError: 	Status view		Feil ved lasting av Prosessorhastighet. \n\nFeil: 
-Low energy	Status view		Lavenergi
-Ok	Status view		OK
-Open Speedstep preferences…	Status view		Åpne Speedstep-innstillinger
-Quit	Status view		Avslutt
-Revert	Pref Window		Tilbakestill
-Set state	Status view		Sett tilstand
-Stepping policy	CPU Frequency View		Stepping-policy
 Stepping policy: 	CPU Frequency View		Stepping-policy
+Integration time [ms]: 	CPU Frequency View		Integrasjonstid [ms]:
+Open Speedstep preferences…	Status view		Åpne Speedstep-innstillinger
+Revert	Pref Window		Tilbakestill
+Low energy	Status view		Lavenergi
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Feil ved lasting av Prosessorhastighet. \n\nFeil: 
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPUFrequency\n\tskrevet av Clemens Zeidler\n\tOpphavsrett 2009, Haiku, Inc.\n
+CPUFrequency	System name		Prosessorhastighet

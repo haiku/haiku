@@ -308,5 +308,6 @@ GPDriver::ShowError(const char* message)
 	text << "\n";
 	text << message;
 	BAlert* alert = new BAlert("", text.String(), "OK");
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 }

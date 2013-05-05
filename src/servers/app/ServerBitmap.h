@@ -16,9 +16,10 @@
 
 #include <Referenceable.h>
 
+#include "ClientMemoryAllocator.h"
+
 
 class BitmapManager;
-class ClientMemoryAllocator;
 class HWInterface;
 class Overlay;
 class ServerApp;
@@ -60,9 +61,6 @@ public:
 	inline	int32			Token() const
 								{ return fToken; }
 
-	inline	void*			AllocationCookie() const
-								{ return fAllocationCookie; }
-
 			area_id			Area() const;
 			uint32			AreaOffset() const;
 
@@ -96,8 +94,8 @@ protected:
 			void			AllocateBuffer();
 
 protected:
-			ClientMemoryAllocator* fAllocator;
-			void*			fAllocationCookie;
+			ClientMemory	fClientMemory;
+			AreaMemory*		fMemory;
 			::Overlay*		fOverlay;
 			uint8*			fBuffer;
 

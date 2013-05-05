@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Oliver Tappe, zooey@hirschkaefer.de.
+ * Copyright 2010-2011, Oliver Tappe, zooey@hirschkaefer.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -15,15 +15,19 @@
 
 #include <AutoDeleter.h>
 
+#include "ICUMessagesData.h"
 
 namespace BPrivate {
 namespace Libroot {
 
 
-ICUTimeData::ICUTimeData(struct lc_time_t& lcTimeInfo)
+ICUTimeData::ICUTimeData(pthread_key_t tlsKey, struct lc_time_t& lcTimeInfo,
+	const ICUMessagesData& messagesData)
 	:
+	inherited(tlsKey),
 	fLCTimeInfo(lcTimeInfo),
-	fDataBridge(NULL)
+	fDataBridge(NULL),
+	fMessagesData(messagesData)
 {
 	for (int i = 0; i < 12; ++i) {
 		fLCTimeInfo.mon[i] = fMon[i];
@@ -65,7 +69,7 @@ ICUTimeData::SetTo(const Locale& locale, const char* posixLocaleName)
 		return result;
 
 	UErrorCode icuStatus = U_ZERO_ERROR;
-	DateFormatSymbols formatSymbols(fLocale, icuStatus);
+	DateFormatSymbols formatSymbols(ICULocaleForStrings(), icuStatus);
 	if (!U_SUCCESS(icuStatus))
 		return B_UNSUPPORTED;
 
@@ -254,6 +258,22 @@ ICUTimeData::GetLanginfo(int index)
 }
 
 
+const Locale&
+ICUTimeData::ICULocaleForStrings() const
+{
+	// check if the date strings should be taken from the messages-locale
+	// or from the time-locale (default)
+	UErrorCode icuStatus = U_ZERO_ERROR;
+	char stringsValue[16];
+	fLocale.getKeywordValue("strings", stringsValue, sizeof(stringsValue),
+		icuStatus);
+	if (U_SUCCESS(icuStatus) && strcasecmp(stringsValue, "messages") == 0)
+		return fMessagesData.ICULocale();
+	else
+		return fLocale;
+}
+
+
 status_t
 ICUTimeData::_SetLCTimeEntries(const UnicodeString* strings, char* destination,
 	int entrySize, int count, int maxCount)
@@ -403,14 +423,6 @@ ICUTimeData::_SetLCTimePattern(DateFormat* format, char* destination,
 
 	return _ConvertUnicodeStringToLocaleconvEntry(posixPattern, destination,
 		destinationSize);
-}
-
-
-const Locale&
-ICUTimeData::ICULocale() const
-{
-	return fLocale;
-
 }
 
 

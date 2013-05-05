@@ -66,7 +66,7 @@ class EBML_DLL_API EbmlMaster : public EbmlElement {
 		uint64 UpdateSize(bool bKeepIntact = false, bool bForceRender = false);
 		
 		/*!
-			\brief Set wether the size is finite (size is known in advance when writing, or infinite size is not known on writing)
+			\brief Set whether the size is finite (size is known in advance when writing, or infinite size is not known on writing)
 		*/
 		bool SetSizeInfinite(bool aIsInfinite = true) {bSizeIsFinite = !aIsInfinite; return true;}
 	

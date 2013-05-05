@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011-2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef ARCHITECTURE_H
@@ -12,6 +13,7 @@
 #include <Referenceable.h>
 #include <Variant.h>
 
+#include "ReturnValueInfo.h"
 #include "Types.h"
 
 
@@ -29,6 +31,20 @@ class StackTrace;
 class Statement;
 class Team;
 class TeamMemory;
+class ValueLocation;
+
+
+enum {
+	STACK_GROWTH_DIRECTION_POSITIVE = 0,
+	STACK_GROWTH_DIRECTION_NEGATIVE
+};
+
+
+enum {
+	WATCHPOINT_CAPABILITY_FLAG_READ = 1,
+	WATCHPOINT_CAPABILITY_FLAG_WRITE = 2,
+	WATCHPOINT_CAPABILITY_FLAG_READ_WRITE = 4
+};
 
 
 class Architecture : public BReferenceable {
@@ -44,6 +60,8 @@ public:
 	inline	bool				IsBigEndian() const		{ return fBigEndian; }
 	inline	bool				IsHostEndian() const;
 
+	virtual int32				StackGrowthDirection() const = 0;
+
 	virtual	int32				CountRegisters() const = 0;
 	virtual	const Register*		Registers() const = 0;
 	virtual status_t			InitRegisterRules(CfaContext& context) const;
@@ -58,7 +76,7 @@ public:
 	virtual	status_t			CreateStackFrame(Image* image,
 									FunctionDebugInfo* function,
 									CpuState* cpuState, bool isTopFrame,
-									StackFrame*& _previousFrame,
+									StackFrame*& _frame,
 									CpuState*& _previousCpuState) = 0;
 										// returns reference to previous frame
 										// and CPU state; returned CPU state
@@ -86,13 +104,28 @@ public:
 									target_addr_t address,
 									Statement*& _statement) = 0;
 	virtual	status_t			GetInstructionInfo(target_addr_t address,
-									InstructionInfo& _info) = 0;
+									InstructionInfo& _info,
+									CpuState* state) = 0;
 
 			status_t			CreateStackTrace(Team* team,
 									ImageDebugInfoProvider* imageInfoProvider,
 									CpuState* cpuState,
-									StackTrace*& _stackTrace);
+									StackTrace*& _stackTrace,
+									ReturnValueInfoList* returnValueInfos,
+									int32 maxStackDepth = -1,
+									bool useExistingTrace = false,
+									bool getFullFrameInfo = true);
 										// team is not locked
+
+	virtual	status_t			GetWatchpointDebugCapabilities(
+									int32& _maxRegisterCount,
+									int32& _maxBytesPerRegister,
+									uint8& _watchpointCapabilityFlags) = 0;
+
+	virtual	status_t			GetReturnAddressLocation(
+									StackFrame* frame, target_size_t valueSize,
+									ValueLocation*& _location) = 0;
+
 
 protected:
 			TeamMemory*			fTeamMemory;

@@ -32,6 +32,7 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+
 #include "Attributes.h"
 #include "MimeTypes.h"
 #include "Model.h"
@@ -71,7 +72,7 @@ extern _IMPEXP_BE const uint32	LARGE_ICON_TYPE;
 extern _IMPEXP_BE const uint32	MINI_ICON_TYPE;
 
 
-FILE *logFile = NULL;
+FILE* logFile = NULL;
 
 static const float kMinSeparatorStubX = 10;
 static const float kStubToStringSlotX = 5;
@@ -81,15 +82,12 @@ namespace BPrivate {
 
 const float kExactMatchScore = INFINITY;
 
-const rgb_color	kBlack = {0, 0, 0, 255};
-const rgb_color	kWhite = {255, 255, 255, 255};
-
 
 bool gLocalizedNamePreferred;
 
 
 uint32
-HashString(const char *string, uint32 seed)
+HashString(const char* string, uint32 seed)
 {
 	char ch;
 	uint32 result = seed;
@@ -105,7 +103,7 @@ HashString(const char *string, uint32 seed)
 
 
 uint32
-AttrHashString(const char *string, uint32 type)
+AttrHashString(const char* string, uint32 type)
 {
 	char c;
 	uint32 hash = 0;
@@ -125,7 +123,7 @@ AttrHashString(const char *string, uint32 type)
 
 
 bool
-ValidateStream(BMallocIO *stream, uint32 key, int32 version)
+ValidateStream(BMallocIO* stream, uint32 key, int32 version)
 {
 	uint32 testKey;
 	int32 testVersion;
@@ -139,14 +137,14 @@ ValidateStream(BMallocIO *stream, uint32 key, int32 version)
 
 
 void
-DisallowFilenameKeys(BTextView *textView)
+DisallowFilenameKeys(BTextView* textView)
 {
 	textView->DisallowChar('/');
 }
 
 
 void
-DisallowMetaKeys(BTextView *textView)
+DisallowMetaKeys(BTextView* textView)
 {
 	textView->DisallowChar(B_TAB);
 	textView->DisallowChar(B_ESCAPE);
@@ -177,10 +175,10 @@ PeriodicUpdatePoses::~PeriodicUpdatePoses()
 
 
 void
-PeriodicUpdatePoses::AddPose(BPose *pose, BPoseView *poseView,
-	PeriodicUpdateCallback callback, void *cookie)
+PeriodicUpdatePoses::AddPose(BPose* pose, BPoseView* poseView,
+	PeriodicUpdateCallback callback, void* cookie)
 {
-	periodic_pose *periodic = new periodic_pose;
+	periodic_pose* periodic = new periodic_pose;
 	periodic->pose = pose;
 	periodic->pose_view = poseView;
 	periodic->callback = callback;
@@ -190,7 +188,7 @@ PeriodicUpdatePoses::AddPose(BPose *pose, BPoseView *poseView,
 
 
 bool
-PeriodicUpdatePoses::RemovePose(BPose *pose, void **cookie)
+PeriodicUpdatePoses::RemovePose(BPose* pose, void** cookie)
 {
 	int32 count = fPoseList.CountItems();
 	for (int32 index = 0; index < count; index++) {
@@ -198,7 +196,7 @@ PeriodicUpdatePoses::RemovePose(BPose *pose, void **cookie)
 			if (!fLock->Lock())
 				return false;
 
-			periodic_pose *periodic = fPoseList.RemoveItemAt(index);
+			periodic_pose* periodic = fPoseList.RemoveItemAt(index);
 			if (cookie)
 				*cookie = periodic->cookie;
 			delete periodic;
@@ -219,7 +217,7 @@ PeriodicUpdatePoses::DoPeriodicUpdate(bool forceRedraw)
 
 	int32 count = fPoseList.CountItems();
 	for (int32 index = 0; index < count; index++) {
-		periodic_pose *periodic = fPoseList.ItemAt(index);
+		periodic_pose* periodic = fPoseList.ItemAt(index);
 		if (periodic->callback(periodic->pose, periodic->cookie)
 			|| forceRedraw) {
 			periodic->pose_view->LockLooper();
@@ -239,9 +237,9 @@ PeriodicUpdatePoses gPeriodicUpdatePoses;
 
 
 void
-PoseInfo::EndianSwap(void *castToThis)
+PoseInfo::EndianSwap(void* castToThis)
 {
-	PoseInfo *self = (PoseInfo *)castToThis;
+	PoseInfo* self = (PoseInfo*)castToThis;
 
 	PRINT(("swapping PoseInfo\n"));
 
@@ -263,7 +261,8 @@ PoseInfo::EndianSwap(void *castToThis)
 void
 PoseInfo::PrintToStream()
 {
-	PRINT(("%s, inode:%Lx, location %f %f\n", fInvisible ? "hidden" : "visible",
+	PRINT(("%s, inode:%" B_PRIx64 ", location %f %f\n",
+		fInvisible ? "hidden" : "visible",
 		fInitedDirectory, fLocation.x, fLocation.y));
 }
 
@@ -288,7 +287,8 @@ ExtendedPoseInfo::Size(int32 count)
 size_t
 ExtendedPoseInfo::SizeWithHeadroom() const
 {
-	return sizeof(ExtendedPoseInfo) + (fNumFrames + 1) * sizeof(FrameLocation);
+	return sizeof(ExtendedPoseInfo) + (fNumFrames + 1)
+		* sizeof(FrameLocation);
 }
 
 
@@ -352,9 +352,9 @@ ExtendedPoseInfo::SetLocationForFrame(BPoint newLocation, BRect frame)
 
 
 void
-ExtendedPoseInfo::EndianSwap(void *castToThis)
+ExtendedPoseInfo::EndianSwap(void* castToThis)
 {
-	ExtendedPoseInfo *self = (ExtendedPoseInfo *)castToThis;
+	ExtendedPoseInfo* self = (ExtendedPoseInfo *)castToThis;
 
 	PRINT(("swapping ExtendedPoseInfo\n"));
 
@@ -415,7 +415,7 @@ OffscreenBitmap::NewBitmap(BRect bounds)
 	delete fBitmap;
 	fBitmap = new(std::nothrow) BBitmap(bounds, B_RGB32, true);
 	if (fBitmap && fBitmap->Lock()) {
-		BView *view = new BView(fBitmap->Bounds(), "", B_FOLLOW_NONE, 0);
+		BView* view = new BView(fBitmap->Bounds(), "", B_FOLLOW_NONE, 0);
 		fBitmap->AddChild(view);
 
 		BRect clipRect = view->Bounds();
@@ -431,7 +431,7 @@ OffscreenBitmap::NewBitmap(BRect bounds)
 }
 
 
-BView *
+BView*
 OffscreenBitmap::BeginUsing(BRect frame)
 {
 	if (!fBitmap || fBitmap->Bounds() != frame)
@@ -449,7 +449,7 @@ OffscreenBitmap::DoneUsing()
 }
 
 
-BBitmap *
+BBitmap*
 OffscreenBitmap::Bitmap() const
 {
 	ASSERT(fBitmap);
@@ -458,7 +458,7 @@ OffscreenBitmap::Bitmap() const
 }
 
 
-BView *
+BView*
 OffscreenBitmap::View() const
 {
 	ASSERT(fBitmap);
@@ -471,12 +471,11 @@ OffscreenBitmap::View() const
 
 namespace BPrivate {
 
-/*!	Changes the alpha value of the given bitmap to create a nice
-	horizontal fade out in the specified region.
-	"from" is always transparent, "to" opaque.
-*/
+// Changes the alpha value of the given bitmap to create a nice
+// horizontal fade out in the specified region.
+// "from" is always transparent, "to" opaque.
 void
-FadeRGBA32Horizontal(uint32 *bits, int32 width, int32 height, int32 from,
+FadeRGBA32Horizontal(uint32* bits, int32 width, int32 height, int32 from,
 	int32 to)
 {
 	// check parameters
@@ -510,7 +509,7 @@ FadeRGBA32Horizontal(uint32 *bits, int32 width, int32 height, int32 from,
 	"from" is always transparent, "to" opaque.
 */
 void
-FadeRGBA32Vertical(uint32 *bits, int32 width, int32 height, int32 from,
+FadeRGBA32Vertical(uint32* bits, int32 width, int32 height, int32 from,
 	int32 to)
 {
 	// check parameters
@@ -548,9 +547,9 @@ FadeRGBA32Vertical(uint32 *bits, int32 width, int32 height, int32 from,
 // #pragma mark -
 
 
-DraggableIcon::DraggableIcon(BRect rect, const char *name, const char *mimeType,
-		icon_size size, const BMessage *message, BMessenger target,
-		uint32 resizeMask, uint32 flags)
+DraggableIcon::DraggableIcon(BRect rect, const char* name,
+		const char* mimeType, icon_size size, const BMessage* message,
+		BMessenger target, uint32 resizeMask, uint32 flags)
 	:
 	BView(rect, name, resizeMask, flags),
 	fMessage(*message),
@@ -594,7 +593,7 @@ DraggableIcon::PreferredRect(BPoint offset, icon_size size)
 void
 DraggableIcon::AttachedToWindow()
 {
-	BView *parent = Parent();
+	BView* parent = Parent();
 	if (parent != NULL) {
 		SetViewColor(parent->ViewColor());
 		SetLowColor(parent->LowColor());
@@ -609,9 +608,9 @@ DraggableIcon::MouseDown(BPoint point)
 		return;
 
 	BRect rect(Bounds());
-	BBitmap *dragBitmap = new BBitmap(rect, B_RGBA32, true);
+	BBitmap* dragBitmap = new BBitmap(rect, B_RGBA32, true);
 	dragBitmap->Lock();
-	BView *view = new BView(dragBitmap->Bounds(), "", B_FOLLOW_NONE, 0);
+	BView* view = new BView(dragBitmap->Bounds(), "", B_FOLLOW_NONE, 0);
 	dragBitmap->AddChild(view);
 	view->SetOrigin(0, 0);
 	BRect clipRect(view->Bounds());
@@ -634,7 +633,7 @@ DraggableIcon::MouseDown(BPoint point)
 
 
 bool
-DraggableIcon::DragStarted(BMessage *)
+DraggableIcon::DragStarted(BMessage*)
 {
 	return true;
 }
@@ -652,8 +651,8 @@ DraggableIcon::Draw(BRect)
 // #pragma mark -
 
 
-FlickerFreeStringView::FlickerFreeStringView(BRect bounds, const char *name,
-		const char *text, uint32 resizeFlags, uint32 flags)
+FlickerFreeStringView::FlickerFreeStringView(BRect bounds, const char* name,
+		const char* text, uint32 resizeFlags, uint32 flags)
 	:
 	BStringView(bounds, name, text, resizeFlags, flags),
 	fBitmap(NULL),
@@ -662,8 +661,8 @@ FlickerFreeStringView::FlickerFreeStringView(BRect bounds, const char *name,
 }
 
 
-FlickerFreeStringView::FlickerFreeStringView(BRect bounds, const char *name,
-		const char *text, BBitmap *inBitmap, uint32 resizeFlags, uint32 flags)
+FlickerFreeStringView::FlickerFreeStringView(BRect bounds, const char* name,
+		const char* text, BBitmap* inBitmap, uint32 resizeFlags, uint32 flags)
 	:
 	BStringView(bounds, name, text, resizeFlags, flags),
 	fBitmap(NULL),
@@ -685,7 +684,7 @@ FlickerFreeStringView::Draw(BRect)
 	if (!fBitmap)
 		fBitmap = new OffscreenBitmap(Bounds());
 
-	BView *offscreen = fBitmap->BeginUsing(bounds);
+	BView* offscreen = fBitmap->BeginUsing(bounds);
 
 	if (Parent()) {
 		fViewColor = Parent()->ViewColor();
@@ -788,7 +787,7 @@ FlickerFreeStringView::SetLowColor(rgb_color color)
 // #pragma mark -
 
 
-TitledSeparatorItem::TitledSeparatorItem(const char *label)
+TitledSeparatorItem::TitledSeparatorItem(const char* label)
 	:
 	BMenuItem(label, 0)
 {
@@ -809,7 +808,7 @@ TitledSeparatorItem::SetEnabled(bool)
 
 
 void
-TitledSeparatorItem::GetContentSize(float *width, float *height)
+TitledSeparatorItem::GetContentSize(float* width, float* height)
 {
 	_inherited::GetContentSize(width, height);
 }
@@ -827,7 +826,7 @@ TitledSeparatorItem::Draw()
 {
 	BRect frame(Frame());
 
-	BMenu *parent = Menu();
+	BMenu* parent = Menu();
 	ASSERT(parent);
 
 	menu_info minfo;
@@ -921,7 +920,7 @@ TitledSeparatorItem::Draw()
 
 
 ShortcutFilter::ShortcutFilter(uint32 shortcutKey, uint32 shortcutModifier,
-		uint32 shortcutWhat, BHandler *target)
+		uint32 shortcutWhat, BHandler* target)
 	:
 	BMessageFilter(B_KEY_DOWN),
 	fShortcutKey(shortcutKey),
@@ -933,7 +932,7 @@ ShortcutFilter::ShortcutFilter(uint32 shortcutKey, uint32 shortcutModifier,
 
 
 filter_result
-ShortcutFilter::Filter(BMessage *message, BHandler **)
+ShortcutFilter::Filter(BMessage* message, BHandler**)
 {
 	if (message->what == B_KEY_DOWN) {
 		uint32 modifiers;
@@ -941,9 +940,9 @@ ShortcutFilter::Filter(BMessage *message, BHandler **)
 		uint8 byte = 0;
 		int32 key = 0;
 
-		if (message->FindInt32("modifiers", (int32 *)&modifiers) != B_OK
-			|| message->FindInt32("raw_char", (int32 *)&rawKeyChar) != B_OK
-			|| message->FindInt8("byte", (int8 *)&byte) != B_OK
+		if (message->FindInt32("modifiers", (int32*)&modifiers) != B_OK
+			|| message->FindInt32("raw_char", (int32*)&rawKeyChar) != B_OK
+			|| message->FindInt8("byte", (int8*)&byte) != B_OK
 			|| message->FindInt32("key", &key) != B_OK)
 			return B_DISPATCH_MESSAGE;
 
@@ -969,7 +968,7 @@ namespace BPrivate {
 
 
 void
-EmbedUniqueVolumeInfo(BMessage *message, const BVolume *volume)
+EmbedUniqueVolumeInfo(BMessage* message, const BVolume* volume)
 {
 	BDirectory rootDirectory;
 	time_t created;
@@ -988,7 +987,7 @@ EmbedUniqueVolumeInfo(BMessage *message, const BVolume *volume)
 
 
 status_t
-MatchArchivedVolume(BVolume *result, const BMessage *message, int32 index)
+MatchArchivedVolume(BVolume* result, const BMessage* message, int32 index)
 {
 	time_t created;
 	off_t capacity;
@@ -1072,7 +1071,7 @@ MatchArchivedVolume(BVolume *result, const BMessage *message, int32 index)
 
 
 void
-StringFromStream(BString *string, BMallocIO *stream, bool endianSwap)
+StringFromStream(BString* string, BMallocIO* stream, bool endianSwap)
 {
 	int32 length;
 	stream->Read(&length, sizeof(length));
@@ -1086,14 +1085,14 @@ StringFromStream(BString *string, BMallocIO *stream, bool endianSwap)
 		return;
 	}
 
-	char *buffer = string->LockBuffer(length + 1);
+	char* buffer = string->LockBuffer(length + 1);
 	stream->Read(buffer, (size_t)length + 1);
 	string->UnlockBuffer(length);
 }
 
 
 void
-StringToStream(const BString *string, BMallocIO *stream)
+StringToStream(const BString* string, BMallocIO* stream)
 {
 	int32 length = string->Length();
 	stream->Write(&length, sizeof(int32));
@@ -1102,14 +1101,14 @@ StringToStream(const BString *string, BMallocIO *stream)
 
 
 int32
-ArchiveSize(const BString *string)
+ArchiveSize(const BString* string)
 {
 	return string->Length() + 1 + (ssize_t)sizeof(int32);
 }
 
 
 int32
-CountRefs(const BMessage *message)
+CountRefs(const BMessage* message)
 {
 	uint32 type;
 	int32 count;
@@ -1119,9 +1118,9 @@ CountRefs(const BMessage *message)
 }
 
 
-static entry_ref *
-EachEntryRefCommon(BMessage *message, entry_ref *(*func)(entry_ref *, void *),
-	void *passThru, int32 maxCount)
+static entry_ref*
+EachEntryRefCommon(BMessage* message, entry_ref *(*func)(entry_ref*, void*),
+	void* passThru, int32 maxCount)
 {
 	uint32 type;
 	int32 count;
@@ -1133,7 +1132,7 @@ EachEntryRefCommon(BMessage *message, entry_ref *(*func)(entry_ref *, void *),
 	for (int32 index = 0; index < count; index++) {
 		entry_ref ref;
 		message->FindRef("refs", index, &ref);
-		entry_ref *result = (func)(&ref, passThru);
+		entry_ref* result = (func)(&ref, passThru);
 		if (result)
 			return result;
 	}
@@ -1143,7 +1142,7 @@ EachEntryRefCommon(BMessage *message, entry_ref *(*func)(entry_ref *, void *),
 
 
 bool
-ContainsEntryRef(const BMessage *message, const entry_ref *ref)
+ContainsEntryRef(const BMessage* message, const entry_ref* ref)
 {
 	entry_ref match;
 	for (int32 index = 0; (message->FindRef("refs", index, &match) == B_OK);
@@ -1156,35 +1155,36 @@ ContainsEntryRef(const BMessage *message, const entry_ref *ref)
 }
 
 
-entry_ref *
-EachEntryRef(BMessage *message, entry_ref *(*func)(entry_ref *, void *),
-	void *passThru)
+entry_ref*
+EachEntryRef(BMessage* message, entry_ref* (*func)(entry_ref*, void*),
+	void* passThru)
 {
 	return EachEntryRefCommon(message, func, passThru, -1);
 }
 
 typedef entry_ref *(*EachEntryIteratee)(entry_ref *, void *);
 
-const entry_ref *
-EachEntryRef(const BMessage *message,
-	const entry_ref *(*func)(const entry_ref *, void *), void *passThru)
+
+const entry_ref*
+EachEntryRef(const BMessage* message,
+	const entry_ref* (*func)(const entry_ref*, void*), void* passThru)
 {
-	return EachEntryRefCommon(const_cast<BMessage *>(message),
+	return EachEntryRefCommon(const_cast<BMessage*>(message),
 		(EachEntryIteratee)func, passThru, -1);
 }
 
 
-entry_ref *
-EachEntryRef(BMessage *message, entry_ref *(*func)(entry_ref *, void *),
-	void *passThru, int32 maxCount)
+entry_ref*
+EachEntryRef(BMessage* message, entry_ref* (*func)(entry_ref*, void*),
+	void* passThru, int32 maxCount)
 {
 	return EachEntryRefCommon(message, func, passThru, maxCount);
 }
 
 
 const entry_ref *
-EachEntryRef(const BMessage *message,
-	const entry_ref *(*func)(const entry_ref *, void *), void *passThru,
+EachEntryRef(const BMessage* message,
+	const entry_ref *(*func)(const entry_ref *, void *), void* passThru,
 	int32 maxCount)
 {
 	return EachEntryRefCommon(const_cast<BMessage *>(message),
@@ -1193,7 +1193,7 @@ EachEntryRef(const BMessage *message,
 
 
 void
-TruncateLeaf(BString *string)
+TruncateLeaf(BString* string)
 {
 	for (int32 index = string->Length(); index >= 0; index--) {
 		if ((*string)[index] == '/') {
@@ -1205,12 +1205,12 @@ TruncateLeaf(BString *string)
 
 
 int64
-StringToScalar(const char *text)
+StringToScalar(const char* text)
 {
-	char *end;
+	char* end;
 	int64 val;
 
-	char *buffer = new char [strlen(text) + 1];
+	char* buffer = new char [strlen(text) + 1];
 	strcpy(buffer, text);
 
 	if (strstr(buffer, "k") || strstr(buffer, "K")) {
@@ -1251,7 +1251,7 @@ LineBounds(BPoint where, float length, bool vertical)
 
 
 SeparatorLine::SeparatorLine(BPoint where, float length, bool vertical,
-	const char *name)
+	const char* name)
 	:
 	BView(LineBounds(where, length, vertical), name,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW)
@@ -1283,11 +1283,11 @@ SeparatorLine::Draw(BRect)
 
 
 void
-HexDump(const void *buf, int32 length)
+HexDump(const void* buf, int32 length)
 {
 	const int32 kBytesPerLine = 16;
 	int32 offset;
-	unsigned char *buffer = (unsigned char *)buf;
+	unsigned char* buffer = (unsigned char*)buf;
 
 	for (offset = 0; ; offset += kBytesPerLine, buffer += kBytesPerLine) {
 		int32 remain = length;
@@ -1321,53 +1321,53 @@ HexDump(const void *buf, int32 length)
 
 
 void
-EnableNamedMenuItem(BMenu *menu, const char *itemName, bool on)
+EnableNamedMenuItem(BMenu* menu, const char* itemName, bool on)
 {
-	BMenuItem *item = menu->FindItem(itemName);
+	BMenuItem* item = menu->FindItem(itemName);
 	if (item)
 		item->SetEnabled(on);
 }
 
 
 void
-MarkNamedMenuItem(BMenu *menu, const char *itemName, bool on)
+MarkNamedMenuItem(BMenu* menu, const char* itemName, bool on)
 {
-	BMenuItem *item = menu->FindItem(itemName);
+	BMenuItem* item = menu->FindItem(itemName);
 	if (item)
 		item->SetMarked(on);
 }
 
 
 void
-EnableNamedMenuItem(BMenu *menu, uint32 commandName, bool on)
+EnableNamedMenuItem(BMenu* menu, uint32 commandName, bool on)
 {
-	BMenuItem *item = menu->FindItem(commandName);
+	BMenuItem* item = menu->FindItem(commandName);
 	if (item)
 		item->SetEnabled(on);
 }
 
 
 void
-MarkNamedMenuItem(BMenu *menu, uint32 commandName, bool on)
+MarkNamedMenuItem(BMenu* menu, uint32 commandName, bool on)
 {
-	BMenuItem *item = menu->FindItem(commandName);
+	BMenuItem* item = menu->FindItem(commandName);
 	if (item)
 		item->SetMarked(on);
 }
 
 
 void
-DeleteSubmenu(BMenuItem *submenuItem)
+DeleteSubmenu(BMenuItem* submenuItem)
 {
 	if (!submenuItem)
 		return;
 
-	BMenu *menu = submenuItem->Submenu();
+	BMenu* menu = submenuItem->Submenu();
 	if (!menu)
 		return;
 
 	for (;;) {
-		BMenuItem *item = menu->RemoveItem((int32)0);
+		BMenuItem* item = menu->RemoveItem((int32)0);
 		if (!item)
 			return;
 
@@ -1377,7 +1377,7 @@ DeleteSubmenu(BMenuItem *submenuItem)
 
 
 status_t
-GetAppSignatureFromAttr(BFile *file, char *result)
+GetAppSignatureFromAttr(BFile* file, char* result)
 {
 	// This call is a performance improvement that
 	// avoids using the BAppFileInfo API when retrieving the
@@ -1400,7 +1400,7 @@ GetAppSignatureFromAttr(BFile *file, char *result)
 
 
 status_t
-GetAppIconFromAttr(BFile *file, BBitmap *result, icon_size size)
+GetAppIconFromAttr(BFile* file, BBitmap* result, icon_size size)
 {
 	// This call is a performance improvement that
 	// avoids using the BAppFileInfo API when retrieving the
@@ -1412,7 +1412,7 @@ GetAppIconFromAttr(BFile *file, BBitmap *result, icon_size size)
 	return appFileInfo.GetIcon(result, size);
 //#else
 //
-//	const char *attrName = kAttrIcon;
+//	const char* attrName = kAttrIcon;
 //	uint32 type = B_VECTOR_ICON_TYPE;
 //
 //	// try vector icon
@@ -1455,7 +1455,7 @@ GetAppIconFromAttr(BFile *file, BBitmap *result, icon_size size)
 
 
 status_t
-GetFileIconFromAttr(BNode *file, BBitmap *result, icon_size size)
+GetFileIconFromAttr(BNode* file, BBitmap* result, icon_size size)
 {
 	BNodeInfo fileInfo(file);
 	return fileInfo.GetIcon(result, size);
@@ -1470,18 +1470,18 @@ PrintToStream(rgb_color color)
 }
 
 
-extern BMenuItem *
-EachMenuItem(BMenu *menu, bool recursive, BMenuItem *(*func)(BMenuItem *))
+extern BMenuItem*
+EachMenuItem(BMenu* menu, bool recursive, BMenuItem* (*func)(BMenuItem *))
 {
 	int32 count = menu->CountItems();
 	for (int32 index = 0; index < count; index++) {
-		BMenuItem *item = menu->ItemAt(index);
-		BMenuItem *result = (func)(item);
+		BMenuItem* item = menu->ItemAt(index);
+		BMenuItem* result = (func)(item);
 		if (result)
 			return result;
 
 		if (recursive) {
-			BMenu *submenu = menu->SubmenuAt(index);
+			BMenu* submenu = menu->SubmenuAt(index);
 			if (submenu)
 				return EachMenuItem(submenu, true, func);
 		}
@@ -1491,19 +1491,19 @@ EachMenuItem(BMenu *menu, bool recursive, BMenuItem *(*func)(BMenuItem *))
 }
 
 
-extern const BMenuItem *
-EachMenuItem(const BMenu *menu, bool recursive,
-	BMenuItem *(*func)(const BMenuItem *))
+extern const BMenuItem*
+EachMenuItem(const BMenu* menu, bool recursive,
+	BMenuItem* (*func)(const BMenuItem *))
 {
 	int32 count = menu->CountItems();
 	for (int32 index = 0; index < count; index++) {
-		BMenuItem *item = menu->ItemAt(index);
-		BMenuItem *result = (func)(item);
+		BMenuItem* item = menu->ItemAt(index);
+		BMenuItem* result = (func)(item);
 		if (result)
 			return result;
 
 		if (recursive) {
-			BMenu *submenu = menu->SubmenuAt(index);
+			BMenu* submenu = menu->SubmenuAt(index);
 			if (submenu)
 				return EachMenuItem(submenu, true, func);
 		}
@@ -1513,15 +1513,15 @@ EachMenuItem(const BMenu *menu, bool recursive,
 }
 
 
-PositionPassingMenuItem::PositionPassingMenuItem(const char *title,
-		BMessage *message, char shortcut, uint32 modifiers)
+PositionPassingMenuItem::PositionPassingMenuItem(const char* title,
+		BMessage* message, char shortcut, uint32 modifiers)
 	:
 	BMenuItem(title, message, shortcut, modifiers)
 {
 }
 
 
-PositionPassingMenuItem::PositionPassingMenuItem(BMenu *menu, BMessage *message)
+PositionPassingMenuItem::PositionPassingMenuItem(BMenu* menu, BMessage* message)
 	:
 	BMenuItem(menu, message)
 {
@@ -1529,7 +1529,7 @@ PositionPassingMenuItem::PositionPassingMenuItem(BMenu *menu, BMessage *message)
 
 
 status_t
-PositionPassingMenuItem::Invoke(BMessage *message)
+PositionPassingMenuItem::Invoke(BMessage* message)
 {
 	if (!Menu())
 		return B_ERROR;
@@ -1550,7 +1550,7 @@ PositionPassingMenuItem::Invoke(BMessage *message)
 
 	// embed the invoke location of the menu so that we can create
 	// a new folder, etc. on the spot
-	BMenu *menu = Menu();
+	BMenu* menu = Menu();
 
 	for (;;) {
 		if (!menu->Supermenu())
@@ -1560,7 +1560,7 @@ PositionPassingMenuItem::Invoke(BMessage *message)
 
 	// use the window position only, if the item was invoked from the menu
 	// menu->Window() points to the window the item was invoked from
-	if (dynamic_cast<BContainerWindow *>(menu->Window()) == NULL) {
+	if (dynamic_cast<BContainerWindow*>(menu->Window()) == NULL) {
 		LooperAutoLocker lock(menu);
 		if (lock.IsLocked()) {
 			BPoint invokeOrigin(menu->Window()->Frame().LeftTop());
@@ -1575,13 +1575,13 @@ PositionPassingMenuItem::Invoke(BMessage *message)
 bool
 BootedInSafeMode()
 {
-	const char *safeMode = getenv("SAFEMODE");
+	const char* safeMode = getenv("SAFEMODE");
 	return (safeMode && strcmp(safeMode, "yes") == 0);
 }
 
 
 float
-ComputeTypeAheadScore(const char *text, const char *match, bool wordMode)
+ComputeTypeAheadScore(const char* text, const char* match, bool wordMode)
 {
 	// highest score: exact match
 	const char* found = strcasestr(text, match);
@@ -1630,7 +1630,7 @@ ComputeTypeAheadScore(const char *text, const char *match, bool wordMode)
 
 
 void
-_ThrowOnError(status_t error, const char *DEBUG_ONLY(file),
+_ThrowOnError(status_t error, const char* DEBUG_ONLY(file),
 	int32 DEBUG_ONLY(line))
 {
 	if (error != B_OK) {
@@ -1641,7 +1641,7 @@ _ThrowOnError(status_t error, const char *DEBUG_ONLY(file),
 
 
 void
-_ThrowIfNotSize(ssize_t size, const char *DEBUG_ONLY(file),
+_ThrowIfNotSize(ssize_t size, const char* DEBUG_ONLY(file),
 	int32 DEBUG_ONLY(line))
 {
 	if (size < B_OK) {
@@ -1652,8 +1652,8 @@ _ThrowIfNotSize(ssize_t size, const char *DEBUG_ONLY(file),
 
 
 void
-_ThrowOnError(status_t error, const char *DEBUG_ONLY(debugString),
-	const char *DEBUG_ONLY(file), int32 DEBUG_ONLY(line))
+_ThrowOnError(status_t error, const char* DEBUG_ONLY(debugString),
+	const char* DEBUG_ONLY(file), int32 DEBUG_ONLY(line))
 {
 	if (error != B_OK) {
 		PRINT(("failing %s, %s at %s:%d\n", debugString, strerror(error), file,
@@ -1661,6 +1661,5 @@ _ThrowOnError(status_t error, const char *DEBUG_ONLY(debugString),
 		throw error;
 	}
 }
-
 
 } // namespace BPrivate

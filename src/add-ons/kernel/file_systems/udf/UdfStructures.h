@@ -1,9 +1,8 @@
-//----------------------------------------------------------------------
-// This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//  Copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
-//---------------------------------------------------------------------
+/*
+ * Copyright 2012, Jérôme Duval, korli@users.berlios.de.
+ * Copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
+ * This file may be used under the terms of the MIT License.
+ */
 #ifndef _UDF_DISK_STRUCTURES_H
 #define _UDF_DISK_STRUCTURES_H
 
@@ -121,7 +120,8 @@ public:
 	uint8 microsecond() const { return _microsecond; }
 	
 	// Set functions
-	void set_type_and_timezone(uint16 type_and_timezone) { _type_and_timezone = B_HOST_TO_LENDIAN_INT16(type_and_timezone); }
+	void set_type_and_timezone(uint16 type_and_timezone) { 
+		_type_and_timezone = B_HOST_TO_LENDIAN_INT16(type_and_timezone); }
 	void set_type(uint8 type) {
 		type_and_timezone_accessor t;
 		t.type_and_timezone = type_and_timezone();
@@ -141,7 +141,8 @@ public:
 	void set_minute(uint8 minute) { _minute = minute; }
 	void set_second(uint8 second) { _second = second; }
 	void set_centisecond(uint8 centisecond) { _centisecond = centisecond; }
-	void set_hundred_microsecond(uint8 hundred_microsecond) { _hundred_microsecond = hundred_microsecond; }
+	void set_hundred_microsecond(uint8 hundred_microsecond) { 
+		_hundred_microsecond = hundred_microsecond; }
 	void set_microsecond(uint8 microsecond) { _microsecond = microsecond; }
 private:
 	void _clear();
@@ -293,17 +294,18 @@ private:
 	array<uint8, kIdentifierSuffixLength> _identifier_suffix;
 } __attribute__((packed));
 
-extern const entity_id kMetadataPartitionMapId;
-extern const entity_id kSparablePartitionMapId;
-extern const entity_id kVirtualPartitionMapId;
-extern const entity_id kImplementationId;
-extern const entity_id kPartitionContentsId1xx;
-extern const entity_id kPartitionContentsId2xx;
-extern const entity_id kUdfId;
-extern const entity_id kLogicalVolumeInfoId150;
-extern const entity_id kLogicalVolumeInfoId201;
-extern const entity_id kDomainId150;
-extern const entity_id kDomainId201;
+extern entity_id kMetadataPartitionMapId;
+extern entity_id kSparablePartitionMapId;
+extern entity_id kVirtualPartitionMapId;
+extern entity_id kImplementationId;
+extern entity_id kPartitionContentsId1xx;
+extern entity_id kPartitionContentsId2xx;
+extern entity_id kUdfId;
+extern entity_id kLogicalVolumeInfoId150;
+extern entity_id kLogicalVolumeInfoId201;
+extern entity_id kDomainId150;
+extern entity_id kDomainId201;
+extern void init_entities(void);
 
 //----------------------------------------------------------------------
 // ECMA-167 Part 2
@@ -1307,6 +1309,49 @@ private:
 	See also: UDF-2.50 2.2.10
 */
 struct metadata_partition_map {
+public:
+	entity_id& partition_type_id() { return _partition_type_id; }
+	const entity_id& partition_type_id() const { return _partition_type_id; }
+
+	uint16 volume_sequence_number() const {
+		return B_LENDIAN_TO_HOST_INT16(_volume_sequence_number); }
+	void set_volume_sequence_number(uint16 number) {
+		_volume_sequence_number = B_HOST_TO_LENDIAN_INT16(number); }
+
+	uint16 partition_number() const {
+		return B_LENDIAN_TO_HOST_INT16(_partition_number); }
+	void set_partition_number(uint16 number) {
+		_partition_number = B_HOST_TO_LENDIAN_INT16(number); }
+
+	uint32 metadata_file_location() const {
+		return B_LENDIAN_TO_HOST_INT32(_metadata_file_location); }
+	void set_metadata_file_location(uint32 location) {
+		_metadata_file_location = B_HOST_TO_LENDIAN_INT32(location); }
+
+	uint32 metadata_mirror_file_location() const {
+		return B_LENDIAN_TO_HOST_INT32(_metadata_mirror_file_location); }
+	void set_metadata_mirror_file_location(uint32 location) {
+		_metadata_mirror_file_location = B_HOST_TO_LENDIAN_INT32(location); }
+
+	uint32 metadata_bitmap_file_location() const {
+		return B_LENDIAN_TO_HOST_INT32(_metadata_bitmap_file_location); }
+	void set_metadata_bitmap_file_location(uint32 location) {
+		_metadata_bitmap_file_location = B_HOST_TO_LENDIAN_INT32(location); }
+
+	uint32 allocation_unit_size() const {
+		return B_LENDIAN_TO_HOST_INT32(_allocation_unit_size); }
+	void set_allocation_unit_size(uint32 size) {
+		_allocation_unit_size = B_HOST_TO_LENDIAN_INT32(size); }
+
+	uint32 alignment_unit_size() const {
+		return B_LENDIAN_TO_HOST_INT32(_alignment_unit_size); }
+	void set_alignment_unit_size(uint32 size) {
+		_alignment_unit_size = B_HOST_TO_LENDIAN_INT32(size); }
+
+	uint8 flags() const { return _flags; }
+	void set_flags(uint8 flags) { _flags = flags; }
+	
+private:
 	uint8 type;
 	uint8 length;
 	uint8 reserved1[2];
@@ -1315,14 +1360,20 @@ struct metadata_partition_map {
 	    - identifier: "*UDF Metadata Partition"
 	    - identifier_suffix: per UDF-2.50 2.1.5
 	*/
-	entity_id partition_type_id;
-	uint16 volume_sequence_number;
+	entity_id _partition_type_id;
+	uint16 _volume_sequence_number;
 	
 	/*! corresponding type 1 or type 2 sparable partition
 	    map in same logical volume
 	*/
-	uint16 partition_number;	
-	uint8 reserved2[24];
+	uint16 _partition_number;	
+	uint32 _metadata_file_location;
+	uint32 _metadata_mirror_file_location;
+	uint32 _metadata_bitmap_file_location;
+	uint32 _allocation_unit_size;
+	uint16 _alignment_unit_size;
+	uint8 _flags;
+	uint8 reserved2[5];
 } __attribute__((packed));
 
 
@@ -1470,7 +1521,7 @@ enum {
 
 /*! \brief Highest currently supported UDF read revision.
 */
-#define UDF_MAX_READ_REVISION 0x0201
+#define UDF_MAX_READ_REVISION 0x0250
 
 //----------------------------------------------------------------------
 // ECMA-167 Part 4

@@ -31,6 +31,11 @@ BUrlProtocolDispatchingListener::BUrlProtocolDispatchingListener
 }
 
 
+BUrlProtocolDispatchingListener::~BUrlProtocolDispatchingListener()
+{
+}
+
+
 void
 BUrlProtocolDispatchingListener::ConnectionOpened(BUrlProtocol* caller)
 {

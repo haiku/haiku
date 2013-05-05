@@ -71,6 +71,8 @@ KeyCommandMap::KeyCommandMap(const char* file)
 	strcpy(fFileName, file);
 
 	BEntry fileEntry(fFileName);
+	// TODO: Using a BPathMonitor would be preferable. See discussion linked off
+	// ticket #6278.
 	if (!fileEntry.Exists())
 		BFile file(fFileName, B_READ_ONLY | B_CREATE_FILE);
 	

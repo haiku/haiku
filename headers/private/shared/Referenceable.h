@@ -41,20 +41,32 @@ template<typename Type = BReferenceable>
 class BReference {
 public:
 	BReference()
-		: fObject(NULL)
+		:
+		fObject(NULL)
 	{
 	}
 
 	BReference(Type* object, bool alreadyHasReference = false)
-		: fObject(NULL)
+		:
+		fObject(NULL)
 	{
 		SetTo(object, alreadyHasReference);
 	}
 
 	BReference(const BReference<Type>& other)
-		: fObject(NULL)
+		:
+		fObject(NULL)
 	{
 		SetTo(other.fObject);
+	}
+
+	
+	template<typename OtherType>
+	BReference(const BReference<OtherType>& other)
+		:
+		fObject(NULL)
+	{
+		SetTo(other.Get());
 	}
 
 	~BReference()
@@ -113,14 +125,37 @@ public:
 		return *this;
 	}
 
+	BReference& operator=(Type* other)
+	{
+		SetTo(other);
+		return *this;
+	}
+
+	template<typename OtherType>
+	BReference& operator=(const BReference<OtherType>& other)
+	{
+		SetTo(other.Get());
+		return *this;
+	}
+
 	bool operator==(const BReference<Type>& other) const
 	{
-		return (fObject == other.fObject);
+		return fObject == other.fObject;
+	}
+
+	bool operator==(const Type* other) const
+	{
+		return fObject == other;
 	}
 
 	bool operator!=(const BReference<Type>& other) const
 	{
-		return (fObject != other.fObject);
+		return fObject != other.fObject;
+	}
+
+	bool operator!=(const Type* other) const
+	{
+		return fObject != other;
 	}
 
 private:

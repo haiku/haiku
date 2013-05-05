@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2011, Haiku, Inc.
+ * Copyright 2005-2012, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -46,6 +46,7 @@
 #include <AppMisc.h>
 #include <AutoDeleter.h>
 #include <cpu_type.h>
+#include <parsedate.h>
 #include <system_revision.h>
 
 #include <Catalog.h>
@@ -89,7 +90,8 @@ typedef struct
 static const Translation gTranslations[] =
 {
 	{ "ar",
-		"Khaled Berraoui (khallebal)\n"
+		"Khaled Berraoui - khallebal\n"
+		"Kendhia\n"
 	},
 	{ "be",
 		"Michael Bulash\n"
@@ -102,22 +104,6 @@ static const Translation gTranslations[] =
 		"Pavel Drotár\n"
 		"Matěj Kocián\n"
 	},
-	{ "nl",
-		"Floris Kint\n"
-		"Meanwhile\n"
-	},
-	{ "eo",
-		"Travis D. Reed (Dancxjo)\n"
-	},
-	{ "fi",
-		"Jorma Karvonen (Karvjorm)\n"
-		"Jaakko Leikas (Garjala)\n"
-	},
-	{ "fr",
-		"Jean-Loïc Charroud\n"
-		"Adrien Destugues (PulkoMandy)\n"
-		"Florent Revest\n"
-	},
 	{ "da",
 		"Brian Matzon\n"
 	},
@@ -126,21 +112,59 @@ static const Translation gTranslations[] =
 		"Mirko Israel\n"
 		"leszek\n"
 		"Christian Morgenroth\n"
-		"Joachim Seemer (Humdinger)\n"
+		"Aleksas Pantechovskis\n"
+		"Joachim Seemer - Humdinger\n"
 		"Matthias Spreiter\n"
+		"Ivaylo Tsenkov\n"
 		"svend\n"
+	},
+	{ "el",
+		"Γιάννης Κωνσταντινίδης (Giannis Konstantinidis) - giannisk\n"
+		"Βαγγέλης Μαμαλάκης (Vaggelis Mamalakis)\n"
+		"Άλεξ-Π. Νάτσιος (Alex-P. Natsios) - Drakevr\n"
+	},
+	{ "eo",
+		"Travis D. Reed - Dancxjo\n"
+	},
+	{ "es",
+		"Pedro Arregui\n"
+		"Zola Bridges\n"
+		"Nicolás C - CapitanPico\n"
+		"Oscar Carballal - oscarcp\n"
+		"Miguel Zúñiga González - miguel~1.mx\n"
+		"Luis Gustavo Lira\n"
+		"Victor Madariaga\n"
+		"César Ortiz Pantoja - ccortiz\n"
+	},
+	{ "fi",
+		"Jorma Karvonen - Karvjorm\n"
+		"Jaakko Leikas - Garjala\n"
+		"Slavi Stefanov Sotirov\n"
+	},
+	{ "fr",
+		"Jean-Loïc Charroud\n"
+		"Adrien Destugues - PulkoMandy\n"
+		"Florent Revest\n"
+		"Harsh Vardhan\n"
 	},
 	{ "hi",
 		"Abhishek Arora\n"
+		"Dhruwat Bhagat\n"
 		"Jayneil Dalal\n"
 		"Atharva Lath\n"
 	},
 	{ "hr",
+		"Ivica Koli\n"
+		"Zlatko Sehanović\n"
 		"zvacet\n"
 	},
 	{ "hu",
-		"Zoltán Mizsei (miqlas)\n"
-		"Zoltán Szabó (Bird)\n"
+		"Zsolt Bicskei\n"
+		"Róbert Dancsó - dsjonny\n"
+		"Kálmán Kéménczy\n"
+		"Zoltán Mizsei - miqlas\n"
+		"Bence Nagy\n"
+		"Zoltán Szabó - Bird\n"
 	},
 	{ "it",
 		"Andrea Bernardi\n"
@@ -153,16 +177,25 @@ static const Translation gTranslations[] =
 	{ "ja",
 		"Satoshi Eguchi\n"
 		"Shota Fukumori\n"
+		"hiromu1996\n"
 		"Hironori Ichimiya\n"
-		"Jorge G. Mare (Koki)\n"
+		"Jorge G. Mare - Koki\n"
 		"Takashi Murai\n"
+		"nolze\n"
 		"SHINTA\n"
+		"thebowseat\n"
 		"Hiroyuki Tsutsumi\n"
 		"Hiromu Yakura\n"
 		"The JPBE.net user group\n"
 	},
 	{ "lt",
 		"Algirdas Buckus\n"
+		"Simonas Kazlauskas\n"
+		"Rimas Kudelis\n"
+	},
+	{ "nl",
+		"Floris Kint\n"
+		"Meanwhile\n"
 	},
 	{ "pl",
 		"Szymon Barczak\n"
@@ -172,49 +205,63 @@ static const Translation gTranslations[] =
 		"Artur Wyszyński\n"
 	},
 	{ "pt",
-		"Marcos Alves (Xeon3D)\n"
-		"Vasco Costa (gluon)\n"
-		"Michael Vinícius de Oliveira (michaelvo)\n"
+		"Marcos Alves - Xeon3D\n"
+		"Vasco Costa - gluon\n"
+		"Michael Vinícius de Oliveira - michaelvo\n"
+	},
+	{ "pt_BR",
+		"Cabral Bandeira - beyraq\n"
+		"Adriano A. Duarte - Sri_Dhryko\n"
+		"Tiago Matos - tiagoms\n"
+		"Nadilson Santana - nadilsonsantana\n"
 	},
 	{ "ro",
 		"Victor Carbune\n"
+		"Silviu Dureanu\n"
+		"Alexsander Krustev\n"
+		"Danca Monica\n"
 		"Florentina Mușat\n"
+		"Dragos Serban\n"
+		"Hedeș Cristian Teodor\n"
+		"Ivaylo Tsenkov\n"
+		"Călinescu Valentin\n"
 	},
 	{ "ru",
-		"Tatyana Fursic (iceid)\n"
+		"Tatyana Fursic - iceid\n"
 		"StoroZ Gneva\n"
-		"Rodastahm Islamov (RISC)\n"
-		"Eugene Katashov (mrNoisy)\n"
-		"Reznikov Sergei (Diver)\n"
+		"Rodastahm Islamov - RISC\n"
+		"Eugene Katashov - mrNoisy\n"
+		"Reznikov Sergei - Diver\n"
 		"Michael Smirnov\n"
 		"Vladimir Vasilenko\n"
 	},
-	{ "es",
-		"Pedro Arregui\n"
-		"Zola Bridges\n"
-		"Nicolás C (CapitanPico)\n"
-		"Oscar Carballal (oscarcp)\n"
-		"Miguel Zúñiga González (miguel~1.mx)\n"
-		"Luis Gustavo Lira\n"
-		"Victor Madariaga\n"
-		"César Ortiz Pantoja (ccortiz)\n"
+	{ "sk",
+		"Ivan Masár\n"
+	},
+	{ "sr",
+		"Nikola Miljković\n"
 	},
 	{ "sv",
 		"Patrik Gissberg\n"
 		"Johan Holmberg\n"
-		"Jimmy Olsson (phalax)\n"
+		"Jimmy Olsson - phalax\n"
 		"Jonas Sundström\n"
 		"Victor Widell\n"
 	},
 	{ "tr",
+		"Hüseyin Aksu\n"
+		"Halil İbrahim Azak\n"
 		"Aras Ergus\n"
+		"Enes Burhan Kuran\n"
+		"Ali Rıza Nazlı\n"
 	},
 	{ "uk",
-		"Alex Rudyk (totish)\n"
+		"Mariya Pilipchuk\n"
+		"Alex Rudyk - totish\n"
 		"Oleg Varunok\n"
 	},
 	{ "zh",
-		"Pengfei Han (kurain)\n"
+		"Pengfei Han - kurain\n"
 	}
 };
 
@@ -351,7 +398,7 @@ private:
 AboutApp::AboutApp()
 	: BApplication("application/x-vnd.Haiku-About")
 {
-	B_TRANSLATE_MARK_SYSTEM_NAME("AboutSystem");
+	B_TRANSLATE_MARK_SYSTEM_NAME_VOID("AboutSystem");
 
 	AboutWindow *window = new(std::nothrow) AboutWindow();
 	if (window)
@@ -362,8 +409,8 @@ AboutApp::AboutApp()
 //	#pragma mark -
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "AboutWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "AboutWindow"
 
 AboutWindow::AboutWindow()
 	: BWindow(BRect(0, 0, 500, 300), B_TRANSLATE("About this system"),
@@ -505,8 +552,8 @@ CropView::DoLayout()
 
 //	#pragma mark - AboutView
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "AboutView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "AboutView"
 
 AboutView::AboutView()
 	: BView("aboutview", B_WILL_DRAW | B_PULSE_NEEDED),
@@ -598,10 +645,21 @@ AboutView::AboutView()
 		B_ALIGN_VERTICAL_UNSET));
 
 	// Kernel build time/date
-	snprintf(string, sizeof(string), "%s %s",
-		systemInfo.kernel_build_date, systemInfo.kernel_build_time);
+	BString kernelTimeDate;
+	kernelTimeDate << systemInfo.kernel_build_date
+		<< " " << systemInfo.kernel_build_time;
+	BString buildTimeDate;
+	const BLocale* locale = BLocale::Default();
 
-	BStringView* kernelView = new BStringView("kerneltext", string);
+	time_t buildTimeDateStamp = parsedate(kernelTimeDate, -1);
+	if (buildTimeDateStamp > 0) {
+		if (locale->FormatDateTime(&buildTimeDate, buildTimeDateStamp,
+			B_LONG_DATE_FORMAT, B_MEDIUM_TIME_FORMAT) != B_OK)
+			buildTimeDate.SetTo(kernelTimeDate);
+	} else
+		buildTimeDate.SetTo(kernelTimeDate);
+
+	BStringView* kernelView = new BStringView("kerneltext", buildTimeDate);
 	kernelView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_UNSET));
 
@@ -914,7 +972,7 @@ AboutView::_CreateCreditsView()
 	if (year < 2008)
 		year = 2008;
 	snprintf(string, sizeof(string),
-		COPYRIGHT_STRING "2001-%ld The Haiku project. ", year);
+		COPYRIGHT_STRING "2001-%" B_PRId32 " The Haiku project. ", year);
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(string);
@@ -943,7 +1001,6 @@ AboutView::_CreateCreditsView()
 		"Ithamar R. Adema\n"
 		"Bruno G. Albuquerque\n"
 		"Stephan Aßmus\n"
-		"Salvatore Benedetto\n"
 		"Stefano Ceccherini\n"
 		"Rudolf Cornelissen\n"
 		"Alexandre Deckner\n"
@@ -954,25 +1011,20 @@ AboutView::_CreateCreditsView()
 		"René Gollent\n"
 		"Bryce Groff\n"
 		"Colin Günther\n"
-		"Karsten Heimrich\n"
 		"Fredrik Holmqvist\n"
 		"Philippe Houdoin\n"
-		"Maurice Kalinowski\n"
-		"Euan Kirkhope\n"
 		"Ryan Leavengood\n"
 		"Michael Lotz\n"
-		"Brecht Machiels\n"
 		"Matt Madia\n"
 		"Scott McCreary\n"
 		"David McPaul\n"
-		"Wim van der Meer\n"
 		"Fredrik Modéen\n"
 		"Marcus Overhagen\n"
 		"Michael Pfeiffer\n"
+		"Joseph R. Prostko\n"
 		"François Revol\n"
 		"Philippe Saint-Pierre\n"
 		"John Scipione\n"
-		"Andrej Spielmann\n"
 		"Jonas Sundström\n"
 		"Oliver Tappe\n"
 		"Gerasim Troeglazov\n"
@@ -990,13 +1042,19 @@ AboutView::_CreateCreditsView()
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Andrew Bachmann\n"
+		"Salvatore Benedetto\n"
 		"Tyler Dauwalder\n"
 		"Daniel Furrer\n"
 		"Andre Alves Garzia\n"
+		"Karsten Heimrich\n"
 		"Erik Jaesler\n"
+		"Maurice Kalinowski\n"
+		"Euan Kirkhope\n"
 		"Marcin Konicki\n"
 		"Waldemar Kornewald\n"
 		"Thomas Kurschel\n"
+		"Brecht Machiels\n"
+		"Wim van der Meer\n"
 		"Frans Van Nispen\n"
 		"Adi Oanca\n"
 		"Michael Phipps\n"
@@ -1004,6 +1062,7 @@ AboutView::_CreateCreditsView()
 		"David Reid\n"
 		"Hugo Santos\n"
 		"Alexander G. M. Smith\n"
+		"Andrej Spielmann\n"
 		"Bryan Varner\n"
 		"Nathan Whitehorn\n"
 		"Michael Wilber\n"
@@ -1020,7 +1079,7 @@ AboutView::_CreateCreditsView()
 		"Gavin James\n"
 		"Urias McCullough\n"
 		"Niels Sascha Reedijk\n"
-		"Joachim Seemer (Humdinger)\n"
+		"Joachim Seemer - Humdinger\n"
 		"Jonathan Yoder\n"
 		"\n");
 
@@ -1031,6 +1090,7 @@ AboutView::_CreateCreditsView()
 	fCreditsView->Insert(
 		"Andrea Anzani\n"
 		"Sean Bartell\n"
+		"Hannah Boneß\n"
 		"Andre Braga\n"
 		"Michael Bulash\n"
 		"Bruce Cameron\n"
@@ -1039,8 +1099,10 @@ AboutView::_CreateCreditsView()
 		"Michael Davidson\n"
 		"David Dengg\n"
 		"John Drinkwater\n"
+		"Yongcong Du\n"
 		"Cian Duffy\n"
 		"Vincent Duvert\n"
+		"Pawel Dziepak\n"
 		"Mikael Eiman\n"
 		"Fredrik Ekdahl\n"
 		"Joshua R. Elsasser\n"
@@ -1051,11 +1113,14 @@ AboutView::_CreateCreditsView()
 		"Janito Ferreira Filho\n"
 		"Pier Luigi Fiorini\n"
 		"Marc Flerackers\n"
-		"Michele Frau (zuMi)\n"
+		"Michele Frau - zuMi\n"
+		"Landon Fuller\n"
 		"Deyan Genovski\n"
 		"Pete Goodeve\n"
 		"Lucian Adrian Grijincu\n"
+		"Jessica Hamilton\n"
 		"Sean Healy\n"
+		"Andreas Henriksson\n"
 		"Matthijs Hollemans\n"
 		"Mathew Hounsell\n"
 		"Morgan Howe\n"
@@ -1063,6 +1128,7 @@ AboutView::_CreateCreditsView()
 		"Jian Jiang\n"
 		"Ma Jie\n"
 		"Carwyn Jones\n"
+		"Prasad Joshi\n"
 		"Vasilis Kaoutsis\n"
 		"James Kim\n"
 		"Shintaro Kinugawa\n"
@@ -1079,7 +1145,7 @@ AboutView::_CreateCreditsView()
 		"Brian Luft\n"
 		"Christof Lutteroth\n"
 		"Graham MacDonald\n"
-		"Jorge G. Mare (Koki)\n"
+		"Jorge G. Mare - Koki\n"
 		"Jan Matějek\n"
 		"Brian Matzon\n"
 		"Christopher ML Zumwalt May\n"
@@ -1094,30 +1160,34 @@ AboutView::_CreateCreditsView()
 		"Alan Murta\n"
 		"Raghuram Nagireddy\n"
 		"Kazuho Okui\n"
-		"Jeroen Oortwijn (idefix)\n"
+		"Jeroen Oortwijn - idefix\n"
 		"Pahtz\n"
 		"Michael Paine\n"
 		"Adrian Panasiuk\n"
+		"Aleksas Pantechovskis\n"
 		"Romain Picard\n"
 		"Francesco Piccinno\n"
+		"Peter Poláčik\n"
 		"David Powell\n"
 		"Jeremy Rand\n"
 		"Hartmut Reh\n"
 		"Daniel Reinhold\n"
+		"Sergei Reznikov\n"
 		"Chris Roberts\n"
 		"Samuel Rodríguez Pérez\n"
 		"Thomas Roell\n"
 		"Rafael Romo\n"
 		"Ralf Schülke\n"
-		"Reznikov Sergei\n"
 		"Zousar Shaker\n"
 		"Caitlin Shaw\n"
+		"Alex Smith\n"
 		"Geoffry Song\n"
 		"Daniel Switkin\n"
 		"Atsushi Takamatsu\n"
 		"James Urquhart\n"
 		"Jason Vandermark\n"
 		"Sandor Vroemisse\n"
+		"Jürgen Wall\n"
 		"Denis Washington\n"
 		"Ulrich Wimboeck\n"
 		"Johannes Wischert\n"
@@ -1129,7 +1199,7 @@ AboutView::_CreateCreditsView()
 		"Zhao Shuai\n");
 	fCreditsView->Insert(
 		B_TRANSLATE("\n" B_UTF8_ELLIPSIS
-			" and probably some more we forgot to mention (sorry!)"
+			"and probably some more we forgot to mention (sorry!)"
 			"\n\n"));
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
@@ -1197,11 +1267,12 @@ AboutView::_CreateCreditsView()
 	fCreditsView->Insert(
 		B_TRANSLATE("The BeGeistert team\n"));
 	fCreditsView->Insert(
-		B_TRANSLATE("Google & their Google Summer of Code program\n"));
+		B_TRANSLATE("Google and their Google Summer of Code and Google Code In "
+			"programs\n"));
 	fCreditsView->Insert(
 		B_TRANSLATE("The University of Auckland and Christof Lutteroth\n\n"));
 	fCreditsView->Insert(
-		B_TRANSLATE("... and the many people making donations!\n\n"));
+		B_TRANSLATE(B_UTF8_ELLIPSIS "and the many people making donations!\n\n"));
 
 	// copyrights for various projects we use
 
@@ -1318,7 +1389,8 @@ AboutView::_CreateCreditsView()
 
 	// FreeType copyrights
 	_AddPackageCredit(PackageCredit("FreeType2")
-		.SetCopyright(B_TRANSLATE("Portions of this software are copyright. "
+		.SetCopyright(B_TRANSLATE("Portions of this software are under "
+			"copyright.\n"
 			COPYRIGHT_STRING "1996-2006 "
 			"The FreeType Project. All rights reserved."))
 		.SetLicense("FTL")
@@ -1334,8 +1406,7 @@ AboutView::_CreateCreditsView()
 	// SGI's GLU implementation copyrights
 	_AddPackageCredit(PackageCredit("GLU")
 		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "1991-2000 "
-			"Silicon Graphics, Inc. SGI's Software FreeB license. "
-			"All rights reserved."))
+			"Silicon Graphics, Inc. All rights reserved."))
 		.SetLicense("SGI Free B")
 		.SetURL("http://www.sgi.com/products/software/opengl"));
 
@@ -1364,9 +1435,9 @@ AboutView::_CreateCreditsView()
 		.SetCopyrights(B_TRANSLATE(COPYRIGHT_STRING "1990-2003 Wada Laboratory,"
 			" the University of Tokyo."), COPYRIGHT_STRING
 			"2003-2004 Electronic Font Open Laboratory (/efont/).",
-			COPYRIGHT_STRING "2003-2008 M+ FONTS PROJECT.",
-			COPYRIGHT_STRING "2006-2009 Daisuke SUZUKI.",
-			COPYRIGHT_STRING "2006-2009 Project Vine.",
+			COPYRIGHT_STRING "2003-2012 M+ FONTS PROJECT.",
+			COPYRIGHT_STRING "2006-2012 Daisuke SUZUKI.",
+			COPYRIGHT_STRING "2006-2012 Project Vine.",
 			B_TRANSLATE("MIT license. All rights reserved."),
 			NULL)
 		.SetLicense("BSD (3-clause)")
@@ -1634,6 +1705,12 @@ AboutView::_CreateCreditsView()
 			"Generalized Timing Formula"))
 		.SetLicense(B_TRANSLATE("BSD (3-clause)"))
 		.SetURL("http://gtf.sourceforge.net/"));
+
+	// libqrencode
+	_AddPackageCredit(PackageCredit("libqrencode")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2006-2012 Kentaro Fukuchi"))
+		.SetLicense(B_TRANSLATE("GNU LGPL v2.1"))
+		.SetURL("http://fukuchi.org/works/qrencode/"));
 
 	_AddCopyrightsFromAttribute();
 	_AddPackageCreditEntries();

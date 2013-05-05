@@ -236,6 +236,22 @@ main (int argc, char *argv[])
           assert (ret == 1);
           assert (wc == 'r');
           assert (mbsinit (&state));
+
+          /* reproduce a valid use case from readline (as used in our bash): */
+          {
+	        char tooShort[] = "\303";
+	        char ok[] = "\303\274";
+        	/* make a backup of the state */
+        	mbstate_t stateBackup = state;
+        	/* try with a source that's too short */
+            ret = mbrtowc (&wc, tooShort, 1, &state);
+            assert (ret == (size_t)-2);
+            /* restore the state from the backup */
+            state = stateBackup;
+			/* retry with enough source */
+            ret = mbrtowc (&wc, ok, 2, &state);
+            assert (ret == 2);
+          }
         }
         break;
 

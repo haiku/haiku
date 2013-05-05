@@ -1,5 +1,6 @@
 /*
- * Copyright 2005-2009, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com
  * Distributed under the terms of the MIT License.
  */
 #ifndef _DEBUG_SUPPORT_H
@@ -61,8 +62,11 @@ status_t debug_get_stack_frame(debug_context *context,
 typedef struct debug_symbol_lookup_context debug_symbol_lookup_context;
 typedef struct debug_symbol_iterator debug_symbol_iterator;
 
-status_t debug_create_symbol_lookup_context(team_id team,
+status_t debug_create_symbol_lookup_context(team_id team, image_id image,
 			debug_symbol_lookup_context **lookupContext);
+				// imageID can be -1 if all images in the target team are
+				// desired, otherwise a valid image id is expected.
+
 void debug_delete_symbol_lookup_context(
 			debug_symbol_lookup_context *lookupContext);
 
@@ -77,6 +81,7 @@ status_t debug_lookup_symbol_address(debug_symbol_lookup_context *lookupContext,
 status_t debug_create_image_symbol_iterator(
 			debug_symbol_lookup_context* lookupContext, image_id imageID,
 			debug_symbol_iterator** _iterator);
+
 status_t debug_create_file_symbol_iterator(const char* path,
 			debug_symbol_iterator** _iterator);
 void debug_delete_symbol_iterator(debug_symbol_iterator* iterator);

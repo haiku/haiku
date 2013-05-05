@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,13 +7,16 @@
  *		Ingo Weinhold, bonefish@cs.tu-berlin.de
  * 
  * Corresponds to:
- *		/trunk/headers/os/interface/GroupLayoutBuilder.h	 rev 42274
- *		/trunk/src/kits/interface/GroupLayoutBuilder.cpp	 rev 42274
+ *		headers/os/interface/GroupLayoutBuilder.h	 rev 42274
+ *		src/kits/interface/GroupLayoutBuilder.cpp	 rev 42274
  */
 
 
 /*!
 	\file GroupLayoutBuilder.h
+	\ingroup interface
+	\ingroup layout
+	\ingroup libbe
 	\brief Provides the BLayoutBuilder::Group<> class.
 */
 
@@ -22,6 +25,7 @@
 	\class BLayoutBuilder::Group<>
 	\ingroup interface
 	\ingroup layout
+	\ingroup libbe
 	\brief BLayoutBuilder::Base subclass for building BGroupLayouts.
 */
 
@@ -347,7 +351,7 @@
 
 
 /*!
-	\fn	BView* BLayoutBuilder::Group<ParentBuilder>::View() const
+	\fn BView* BLayoutBuilder::Group<ParentBuilder>::View() const
 	\brief Get the BView this builder's BGroupLayout is attached to.
 */
 
@@ -361,7 +365,7 @@
 
 
 /*!
-	\fn	ThisBuilder& BLayoutBuilder::Group<ParentBuilder>::GetView(
+	\fn ThisBuilder& BLayoutBuilder::Group<ParentBuilder>::GetView(
 	BView** _view)
 	\brief Get the BView this builder's BGroupLayout is attached to.
 	\param[out] _view The BView this builder's BGroupLayout is attached to.

@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src system boot loader ;
 
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems amiga ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems apple ;
-SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems efi ;
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems gpt ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems intel ;
 UsePrivateKernelHeaders ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
@@ -12,7 +12,7 @@ UsePrivateHeaders shared storage ;
 {
 	DEFINES +=
 		_BOOT_MODE
-		BOOT_ARCH=\\\"$(TARGET_ARCH)\\\"
+		BOOT_ARCH=\\\"$(TARGET_KERNEL_ARCH)\\\"
 		KMESSAGE_CONTAINER_ONLY
 
 		BOOT_SUPPORT_PARTITION_INTEL
@@ -25,7 +25,7 @@ UsePrivateHeaders shared storage ;
 
 	# Add architecture specific partition/file system modules
 
-	switch $(TARGET_ARCH) {
+	switch $(TARGET_KERNEL_ARCH) {
 		case "ppc" :
 		{
 			DEFINES +=
@@ -38,6 +38,9 @@ UsePrivateHeaders shared storage ;
 		case "x86" :
 		{
 			DEFINES +=
+				ALTERNATE_BOOT_ARCH=\\\"x86_64\\\"
+				BOOT_SUPPORT_ELF64
+
 				BOOT_SUPPORT_PARTITION_EFI
 
 				#BOOT_SUPPORT_FILE_SYSTEM_FAT
@@ -52,7 +55,7 @@ UsePrivateHeaders shared storage ;
 }
 
 
-KernelStaticLibrary boot_loader :
+BootStaticLibrary boot_loader :
 	elf.cpp
 	heap.cpp
 	kernel_args.cpp
@@ -85,11 +88,16 @@ KernelStaticLibrary boot_loader :
 # The partition support is built in an extra static library
 # so that only the ones that are used will be included.
 
-KernelStaticLibrary boot_partitions :
+BootStaticLibrary boot_partitions :
 	FileMapDisk.cpp
 	amiga_rdb.cpp
 	apple.cpp
+
 	efi_gpt.cpp
+	Header.cpp
+	crc32.cpp
+	utility.cpp
+
 	intel.cpp
 	PartitionMap.cpp
 	PartitionMapParser.cpp
@@ -115,14 +123,14 @@ SEARCH on [ FGristFiles amiga_rdb.cpp ]
 SEARCH on [ FGristFiles apple.cpp ]
     = [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems apple ] ;
 
-SEARCH on [ FGristFiles efi_gpt.cpp ]
-    = [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems efi ] ;
+SEARCH on [ FGristFiles efi_gpt.cpp Header.cpp crc32.cpp utility.cpp ]
+    = [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems gpt ] ;
 
 SEARCH on [ FGristFiles intel.cpp PartitionMap.cpp PartitionMapParser.cpp ]
     = [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems intel ] ;
 
 SEARCH on [ FGristFiles stage2_crt0.S ]
-    = [ FDirName $(HAIKU_TOP) src system boot arch $(TARGET_ARCH) ] ;
+    = [ FDirName $(HAIKU_TOP) src system boot arch $(TARGET_KERNEL_ARCH) ] ;
 
 SEARCH on [ FGristFiles Referenceable.cpp ]
     = [ FDirName $(HAIKU_TOP) src kits support ] ;

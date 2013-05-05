@@ -1,0 +1,193 @@
+/*
+ * Copyright 2011 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/Dragger.h	 hrev45050
+ *		src/kits/interface/Dragger.cpp	 hrev45050
+
+
+/*!
+	\file Dragger.h
+	\ingroup interface
+	\ingroup libbe
+	\brief Provides the BDragger class.
+*/
+
+
+/*!
+	\class BDragger
+	\ingroup interface
+	\ingroup libbe
+	\brief A view that allows the user drag and drop a target view.
+
+	The target view must be its immediate relative--a sibling, a parent, or
+	single child. The target BView must be able to be archived.
+
+	The dragger draws a handle on top of the target view, usually in the
+	bottom left the corner that the user can grab. When the user drags the
+	handle the target view appears to move with the handle.
+
+	However the target view doesn't actually move, instead, the view is archived
+	into a BMessage object and the BMessage object is dragged. When the BMessage
+	is dropped, the target BView is reconstructed from the archive (along with
+	the BDragger). The new object is a a replicant of the target view.
+
+	An example of a dragger handle on the Clock app can be seen below.
+
+	\image html BDragger_example.png
+
+	This class is tied closely to BShelf. A BShelf object accepts dragged BViews,
+	reconstructs them from their archives and adds them to the view hierarchy
+	of another view.
+
+	The Show Replicants/Hide Replicants menu item in Deskbar shows and hides the
+	BDragger handles.
+*/
+
+
+/*!
+	\fn BDragger::BDragger(BRect frame, BView* target, uint32 resizingMode,
+		uint32 flags)
+	\brief Creates a new BDragger and sets its target view.
+
+	The target view must be its immediate relative--a sibling, a parent, or
+	single child, however, the constructor does not establish this
+	relationship for you.
+	
+	Once you construct the BDragger you must do one of of these:
+	- Add the target as a child of the dragger.
+	- Add the dragger as a child of the target.
+	- Add the dragger as a sibling of the target.
+
+	If you add the target as a child of the dragger it should be its only
+	child.
+
+	A BDragger draws in the right bottom corner of its frame rectangle. If the
+	\a target view is a parent or a sibling of the dragger then the frame
+	rectangle needs to be no larger than the handle. However, if the \a target
+	is a child of the dragger then the dragger's frame rectangle must enclose
+	the target's frame so that the dragger doesn't clip the \a target.
+
+	\param frame The frame rectangle that the dragger is draw into.
+	\param target The view to set the dragger to.
+	\param resizingMode Sets the parameters by which the dragger can be
+		resized. See BView for more information on resizing options.
+	\param flags The flags mask sets what notifications the BDragger can
+		receive. See BView for more information on \a flags.
+*/
+
+
+/*!
+	\fn BDragger::BDragger(BMessage* data)
+	\brief Constructs a BDragger object from message \a data.
+
+	\param data The message \a data to restore from.
+*/
+
+
+/*!
+	\fn BDragger::~BDragger()
+	\brief Destroys the BDragger object and frees the memory it uses,
+		primarily from the bitmap handle.
+*/
+
+
+/*!
+	\fn static BArchivable* BDragger::Instantiate(BMessage* data)
+	\brief Creates a new BDragger object from the BMessage constructor.
+
+	\returns A newly created BDragger or \c NULL if the message doesn't
+		contain an archived BDragger object.
+*/
+
+
+/*!
+	\fn status_t BDragger::Archive(BMessage* data, bool deep) const
+	\brief Archives the draggers's relationship to the target view.
+
+	The \a deep parameter has no effect on the BDragger object but
+	is passed on to BView::Archive().
+
+	\returns A status code, typically \c B_OK or \c B_ERROR on error.
+
+	\see BView::Archive()
+*/
+
+
+/*!
+	\fn void BDragger::AttachedToWindow()
+	\brief Puts the BDragger under the control of HideAllDraggers() and
+		ShowAllDraggers().
+*/
+
+
+/*!
+	\fn void BDragger::DetachedFromWindow()
+	\brief Removes the BDragger from the control of HideAllDraggers()
+		and ShowAllDraggers().
+*/
+
+
+/*!
+	\fn void BDragger::Draw(BRect updateRect)
+	\brief Draws the dragger handle.
+
+	\param updateRect The rectangular area to draw the handle in.
+*/
+
+
+/*!
+	\fn void BDragger::MouseDown(BPoint point)
+	\brief Hook method that is called when a mouse button is pressed over the
+		dragger.
+
+	This results in the archiving of the target view and the dragger and
+	initiates a drag-and-drop operation.
+
+	\param point The point on the screen where to mouse pointer is when
+		the mouse is clicked.
+*/
+
+
+/*!
+	\fn void BDragger::MessageReceived(BMessage* msg)
+	\brief Receives messages that control the visibility of the dragger handle.
+
+	\param msg The message received
+
+	\see BView::MessageReceived()
+*/
+
+
+/*!
+	\fn static status_t BDragger::ShowAllDraggers()
+	\brief Causes all BDragger objects to draw their handles.
+
+	The Show Replicants menu item in Deskbar does its work through this
+	method.
+
+	\returns A status code, \c B_OK on success or an error code on failure.
+*/
+
+
+/*!
+	\fn static status_t BDragger::HideAllDraggers()
+	\brief Hides all BDragger objects so that they're not visible on screen.
+
+	The Hide Replicants menu item in Deskbar does its work through this
+	method.
+
+	\returns A status code, \c B_OK on success or an error code on failure.
+*/
+
+
+/*!
+	\fn static bool BDragger::AreDraggersDrawn()
+	\brief Returns whether or not draggers are currently drawn.
+
+	\returns \c true if draggers are drawn, \c false otherwise.
+*/

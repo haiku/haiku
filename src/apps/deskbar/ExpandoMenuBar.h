@@ -35,6 +35,7 @@ All rights reserved.
 #ifndef EXPANDO_MENU_BAR_H
 #define EXPANDO_MENU_BAR_H
 
+
 // application list
 // top level at window
 // in expanded mode horizontal and vertical
@@ -42,6 +43,7 @@ All rights reserved.
 
 #include <MenuBar.h>
 #include <Locker.h>
+
 
 class BBitmap;
 class TBarView;
@@ -58,63 +60,69 @@ enum drag_and_drop_selection {
 };
 
 class TExpandoMenuBar : public BMenuBar {
-	public:
-		TExpandoMenuBar(TBarView* bar, BRect frame, const char* name,
-			bool vertical, bool drawLabel = true);
+public:
+							TExpandoMenuBar(BRect frame, const char* name,
+								TBarView* barView, bool vertical);
 
-		virtual void AttachedToWindow();
-		virtual void DetachedFromWindow();
-		virtual void MessageReceived(BMessage* message);
-		virtual void MouseDown(BPoint where);
-		virtual void MouseMoved(BPoint where, uint32 code, const BMessage*);
-		virtual void MouseUp(BPoint where);
+	virtual	void			AttachedToWindow();
+	virtual	void			DetachedFromWindow();
 
-		virtual void Draw(BRect update);
-		virtual void DrawBackground(BRect update);
+	virtual	void			Draw(BRect update);
+	virtual	void			DrawBackground(BRect update);
 
-		TTeamMenuItem* TeamItemAtPoint(BPoint location,
-			BMenuItem** _item = NULL);
-		bool InDeskbarMenu(BPoint) const;
+	virtual	void			MessageReceived(BMessage* message);
 
-		void CheckItemSizes(int32 delta);
+	virtual	void			MouseDown(BPoint where);
+	virtual	void			MouseMoved(BPoint where, uint32 code,
+								const BMessage* message);
+	virtual	void			MouseUp(BPoint where);
 
-		menu_layout MenuLayout() const;
+			void			BuildItems();
 
-		void SizeWindow();
-		void CheckForSizeOverrun();
+			TTeamMenuItem*	TeamItemAtPoint(BPoint location,
+								BMenuItem** _item = NULL);
+			bool			InDeskbarMenu(BPoint) const;
 
-	private:
-		static int CompareByName( const void* first, const void* second);
-		static int32 monitor_team_windows(void* arg);
+			void			CheckItemSizes(int32 delta);
 
-		void AddTeam(BList* team, BBitmap* icon, char* name, char* signature);
-		void AddTeam(team_id team, const char* signature);
-		void RemoveTeam(team_id team, bool partial);
+			menu_layout		MenuLayout() const;
 
-		void _FinishedDrag(bool invoke = false);
+			void			SetMaxItemWidth();
 
-		bool fVertical : 1;
-		bool fOverflow : 1;
-		bool fDrawLabel : 1;
-		bool fIsScrolling : 1;
-		bool fShowTeamExpander : 1;
-		bool fExpandNewTeams : 1;
+			void			SizeWindow(int32 delta);
+			bool			CheckForSizeOverrun();
 
-		float fDeskbarMenuWidth;
+private:
+	static	int				CompareByName(const void* first,
+								const void* second);
+	static	int32			monitor_team_windows(void* arg);
 
-		TBarView* fBarView;
-		int32 fFirstApp;
+			void			AddTeam(BList* team, BBitmap* icon, char* name,
+								char* signature);
+			void			AddTeam(team_id team, const char* signature);
+			void			RemoveTeam(team_id team, bool partial);
 
-		TBarMenuTitle* fDeskbarMenuItem;
-		TTeamMenuItem* fSeparatorItem;
-		TTeamMenuItem* fPreviousDragTargetItem;
+			void			_FinishedDrag(bool invoke = false);
 
-		BMenuItem*			fLastClickItem;
+private:
+			TBarView*		fBarView;
+			bool			fVertical : 1;
+			bool			fOverflow : 1;
+			bool			fDrawLabel : 1;
+			bool			fShowTeamExpander : 1;
+			bool			fExpandNewTeams : 1;
 
-		static bool			sDoMonitor;
-		static thread_id	sMonThread;
-		static BLocker		sMonLocker;
+			float			fDeskbarMenuWidth;
+			TTeamMenuItem*	fPreviousDragTargetItem;
+			BMenuItem*		fLastMousedOverItem;
+			BMenuItem*		fLastClickedItem;
+			bool			fClickedExpander;
+			BList			fTeamList;
+
+	static	bool			sDoMonitor;
+	static	thread_id		sMonThread;
+	static	BLocker			sMonLocker;
 };
 
-#endif /* EXPANDO_MENU_BAR_H */
 
+#endif // EXPANDO_MENU_BAR_H

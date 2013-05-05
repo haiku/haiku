@@ -207,6 +207,7 @@ BTextToolTip::SetText(const char* text)
 		return;
 
 	fTextView->SetText(text);
+	fTextView->InvalidateLayout();
 
 	Unlock();
 }

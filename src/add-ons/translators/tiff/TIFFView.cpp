@@ -34,9 +34,7 @@
 #include <string.h>
 
 #include <Catalog.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <MenuBar.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -50,8 +48,8 @@
 
 #include "TIFFView.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "TIFFView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "TIFFView"
 
 // add_menu_item
 void
@@ -90,7 +88,7 @@ TIFFView::TIFFView(const char *name, uint32 flags,
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ViewColor());
 
-	fTitle = new BStringView("title", B_TRANSLATE("TIFF Image Translator"));
+	fTitle = new BStringView("title", B_TRANSLATE("TIFF image translator"));
 	fTitle->SetFont(be_bold_font);
 
 	char detail[100];
@@ -134,10 +132,8 @@ TIFFView::TIFFView(const char *name, uint32 flags,
  	fCompressionMF = new BMenuField(B_TRANSLATE("Use Compression:"), menu);
 
  	// Build the layout
- 	SetLayout(new BGroupLayout(B_VERTICAL));
-
- 	i = 0;
- 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 7)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 7)
+		.SetInsets(5)
  		.Add(fTitle)
  		.Add(fDetail)
  		.AddGlue()
@@ -149,9 +145,7 @@ TIFFView::TIFFView(const char *name, uint32 flags,
  		.Add(fLibTIFF[3])
  			// Theses 4 adding above work because we know there are 4 strings
  			// but it's fragile: one string less in the library version and the application breaks
- 		.AddGlue()
- 		.SetInsets(5, 5, 5, 5)
- 	);
+		.AddGlue();
 
  	BFont font;
  	GetFont(&font);

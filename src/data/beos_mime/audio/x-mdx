@@ -3,9 +3,9 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "audio/x-mdx";
 
-resource(2, "META:S:DESC") #'MSDC' "MDX Sound File";
+resource(2, "META:S:DESC") #'MSDC' "MDX audio file";
 
-resource(3, "META:L:DESC") #'MLDC' "SHARP X68000 MDX (Music Data for mXdrv) Sound File";
+resource(3, "META:L:DESC") #'MLDC' "SHARP X68000 MDX (Music Data for mXdrv) audio file";
 
 resource(4, "META:EXTENS") message(234) {
 	"extensions" = "mdx",

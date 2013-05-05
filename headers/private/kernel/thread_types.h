@@ -187,9 +187,6 @@ private:
 
 typedef int32 (*thread_entry_func)(thread_func, void *);
 
-typedef bool (*page_fault_callback)(addr_t address, addr_t faultAddress,
-	bool isWrite);
-
 
 namespace BKernel {
 
@@ -261,6 +258,8 @@ struct Team : TeamThreadIteratorEntry<team_id>, KernelReferenceable,
 	size_t			user_data_size;
 	size_t			used_user_data;
 	struct free_user_thread* free_user_threads;
+
+	void*			commpage_address;
 
 	struct team_debug_info debug_info;
 
@@ -477,13 +476,7 @@ struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable {
 	} msg;	// write_sem/read_sem are protected by fLock when accessed by
 			// others, the other fields are protected by write_sem/read_sem
 
-	union {
-		addr_t		fault_handler;
-		page_fault_callback fault_callback;
-			// TODO: this is a temporary field used for the vm86 implementation
-			// and should be removed again when that one is moved into the
-			// kernel entirely.
-	};
+	addr_t			fault_handler;
 	int32			page_faults_allowed;
 		/* this field may only stay in debug builds in the future */
 

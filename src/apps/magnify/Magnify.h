@@ -165,9 +165,12 @@ class TInfoView : public BBox {
 		virtual void	AttachedToWindow();
 		virtual void	Draw(BRect updateRect);
 		virtual void	FrameResized(float width, float height);
+		virtual void	GetPreferredSize(float* _width, float* _height);
 
 		void			AddMenu();
 		void			SetMagView(TMagnify* magView);
+		void			SetInfoTextVisible(bool visible);
+		bool			IsInfoTextVisible();
 
 	private:
 		float	 		fFontHeight;
@@ -188,6 +191,8 @@ class TInfoView : public BBox {
 		char			fRGBStr[64];
 		char			fCH1Str[64];
 		char			fCH2Str[64];
+
+		bool			fInfoTextVisible;
 };
 
 class TWindow : public BWindow {
@@ -219,6 +224,7 @@ class TWindow : public BWindow {
 		void			ShowInfo(bool);
 		bool			InfoIsShowing();
 		void			UpdateInfo();
+		void			UpdateInfoBarOnResize();
 
 		void			AddCrossHair();
 		void			RemoveCrossHair();
@@ -230,8 +236,6 @@ class TWindow : public BWindow {
 		void			SetPixelSize(bool);
 		int32			PixelSize();
 
-		void			ShowHelp();
-
 		bool			IsActive();
 
 	private:
@@ -240,6 +244,7 @@ class TWindow : public BWindow {
 		float 			fFontHeight;
 
 		bool			fShowGrid;
+		bool			fInfoBarState;
 
 		int32			fHPixelCount;
 		int32			fVPixelCount;

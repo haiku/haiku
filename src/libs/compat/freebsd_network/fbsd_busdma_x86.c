@@ -43,7 +43,11 @@ __FBSDID("$FreeBSD: src/sys/i386/i386/busdma_machdep.c,v 1.74.2.4 2006/10/21 16:
 #include <machine/atomic.h>
 #include <machine/bus.h>
 
-#define MAX_BPAGES 512
+#ifdef __x86_64__
+#	define MAX_BPAGES 8192
+#else
+#	define MAX_BPAGES 512
+#endif
 
 /* -hugo */
 #define malloc(a, b, c)						kernel_malloc(a, b, c)
@@ -60,7 +64,7 @@ struct bounce_zone;
 struct bus_dma_tag {
 	bus_dma_tag_t	  parent;
 	bus_size_t	  alignment;
-	bus_size_t	  boundary;
+	bus_addr_t	  boundary;
 	bus_addr_t	  lowaddr;
 	bus_addr_t	  highaddr;
 	bus_dma_filter_t *filter;
@@ -97,7 +101,7 @@ struct bounce_zone {
 	int		total_bounced;
 	int		total_deferred;
 	bus_size_t	alignment;
-	bus_size_t	boundary;
+	bus_addr_t	boundary;
 	bus_addr_t	lowaddr;
 	char		zoneid[8];
 	char		lowaddrid[20];

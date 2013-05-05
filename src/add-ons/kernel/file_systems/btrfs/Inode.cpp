@@ -1,6 +1,7 @@
 /*
  * Copyright 2011, Jérôme Duval, korli@users.berlios.de.
  * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2005-2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -9,6 +10,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <zlib.h>
 
 #include "BPlusTree.h"
 #include "CachedBlock.h"
@@ -197,20 +199,27 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 	search_key.SetObjectID(fID);
 	search_key.SetOffset(pos + 1);
 
+	size_t item_size;
 	btrfs_extent_data *extent_data;
 	status_t status = fVolume->FSTree()->FindPrevious(search_key,
-		(void**)&extent_data);
+		(void**)&extent_data, &item_size);
 	if (status != B_OK) {
 		ERROR("Inode::FindBlock(): Couldn't find extent_data 0x%lx\n", status);
 		return status;
 	}
 
+	uint8 compression = extent_data->Compression();
 	if (FileCache() != NULL
 		&& extent_data->Type() == BTRFS_EXTENT_DATA_REGULAR) {
 		TRACE("inode %" B_PRIdINO ": ReadAt cache (pos %lld, length %lu)\n", 
 			ID(), pos, length);
 		free(extent_data);
-		return file_cache_read(FileCache(), NULL, pos, buffer, _length);
+		if (compression == BTRFS_EXTENT_COMPRESS_NONE)
+			return file_cache_read(FileCache(), NULL, pos, buffer, _length);
+		else if (compression == BTRFS_EXTENT_COMPRESS_ZLIB)
+			panic("zlib isn't unsupported for regular extent\n");
+		else
+			panic("unknown extent compression; %d\n", compression);
 	}
 
 	TRACE("Inode::ReadAt(%" B_PRIdINO ") key.Offset() %lld\n", ID(),
@@ -220,8 +229,87 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 	if (extent_data->Type() != BTRFS_EXTENT_DATA_INLINE)
 		panic("unknown extent type; %d\n", extent_data->Type());
 
-	*_length = min_c(extent_data->MemoryBytes() - diff, *_length);
-	memcpy(buffer, extent_data->inline_data, *_length);
+	*_length = min_c(extent_data->Size() - diff, *_length);
+	if (compression == BTRFS_EXTENT_COMPRESS_NONE)
+		memcpy(buffer, extent_data->inline_data, *_length);
+	else if (compression == BTRFS_EXTENT_COMPRESS_ZLIB) {
+		char in[2048];
+		z_stream zStream = {
+			(Bytef*)in,		// next in
+			sizeof(in),		// avail in
+			0,				// total in
+			NULL,			// next out
+			0,				// avail out
+			0,				// total out
+			0,				// msg
+			0,				// state
+			Z_NULL,			// zalloc
+			Z_NULL,			// zfree
+			Z_NULL,			// opaque
+			0,				// data type
+			0,				// adler
+			0,				// reserved
+		};
+
+		int status;
+		ssize_t offset = 0;
+		size_t inline_size = item_size - 13;
+		bool headerRead = false;
+
+		TRACE("Inode::ReadAt(%" B_PRIdINO ") diff %lld size %ld\n", ID(),
+			diff, item_size);
+
+		do {
+			ssize_t bytesRead = min_c(sizeof(in), inline_size - offset);
+			memcpy(in, extent_data->inline_data + offset, bytesRead);
+			if (bytesRead != (ssize_t)sizeof(in)) {
+				if (bytesRead <= 0) {
+					status = Z_STREAM_ERROR;
+					break;
+				}
+			}
+
+			zStream.avail_in = bytesRead;
+			zStream.next_in = (Bytef*)in;
+
+			if (!headerRead) {
+				headerRead = true;
+
+				zStream.avail_out = length;
+				zStream.next_out = (Bytef*)buffer;
+
+				status = inflateInit2(&zStream, 15);
+				if (status != Z_OK) {
+					free(extent_data);
+					return B_ERROR;
+				}
+			}
+
+			status = inflate(&zStream, Z_SYNC_FLUSH);
+			offset += bytesRead;
+			if (diff > 0) {
+				zStream.next_out -= max_c(bytesRead, diff);
+				diff -= max_c(bytesRead, diff);
+			}
+
+			if (zStream.avail_in != 0 && status != Z_STREAM_END) {
+				TRACE("Inode::ReadAt() didn't read whole block: %s\n",
+					zStream.msg);
+			}
+		} while (status == Z_OK);
+
+		inflateEnd(&zStream);
+
+		if (status != Z_STREAM_END) {
+			TRACE("Inode::ReadAt() inflating failed: %d!\n", status);
+			free(extent_data);
+			return B_BAD_DATA;
+		}
+
+		*_length = zStream.total_out;
+
+	} else
+		panic("unknown extent compression; %d\n", compression);
 	free(extent_data);
 	return B_OK;
 	

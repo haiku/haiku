@@ -1,14 +1,43 @@
-1	norwegian_bokmål	x-vnd.Haiku-Time	4271151042
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Time	1859841283
+GMT (UNIX compatible)	Time		GMT (UNIX kompatible)
+OK	Time		OK
+Asia	Time		Asia
+\nNow: 	Time		\nNå:
+Africa	Time		Afrika
+Stop	Time		Stopp
+Could not contact server	Time		Kunne ikke kontakte server
+Australia	Time		Australia
+Preview time:	Time		Forhåndsvis tid:
+Synchronize	Time		Synkroniser
+Revert	Time		Tilbakestill
+Pacific	Time		Stillehavet
+Add	Time		Legg til
+Date and time	Time		Dato og tid
+about	Time		om
+Local time (Windows compatible)	Time		Lokal tid (Windows kompatible)
+Message receiving failed	Time		Melding mottak mislykket
+Set time zone	Time		Sett tidssone
+Waiting for answer failed	Time		Venter på svar mislykket
+Hardware clock set to:	Time		Hardware klokke set til:
+The following error occured while synchronizing:r\n%s	Time		Følgende feil oppsto under synkronisering:r\n%s
+Europe	Time		Europa
+Remove	Time		Ta vekk
+Time	Time		Tid
+Indian	Time		India
+Sending request failed	Time		Sending forespørsel feilet
+Arctic	Time		Arktis
+Time	System name		Tid
+America	Time		Amerika
+Reset	Time		Reset
+Synchronize at boot	Time		Synkroniser ved oppstart
+Received invalid time	Time		Mottok ugyldig tid
+Antarctica	Time		Antarktika
+The following error occured while synchronizing:r\n%s: %s	Time		Følgende feil oppsto under synkronisering:r\n%s
 <Other>	Time		<Andre>
 Current time:	Time		Tid nå:
-Local time	Time		Lokal tid
-OK	Time		OK
-Preview time:	Time		Forhåndsvis tid:
-Revert	Time		Tilbakestill
-Set time zone	Time		Sett tidssone
-Time	System name		Tid
-Time	Time		Tid
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date skrevet av:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nOpphavsrett 2004-2008 Haiku.
+Try all servers	Time		Prøv alle servere
 Time zone	Time		Tidssone
-\nNow: 	Time		\nNå:
-about	Time		om
+Could not create socket	Time		Kunne ikke lage socket
+Synchronize again	Time		Synkroniser igjen
+Network time	Time		Netwerk tid
+Atlantic	Time		Atlanterhavet

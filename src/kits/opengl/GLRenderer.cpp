@@ -4,13 +4,15 @@
  */
 
 
-#include "GLDispatcher.h"
 #include "GLRenderer.h"
 
+#include "GLDispatcher.h"
 
-BGLRenderer::BGLRenderer(BGLView *view, ulong glOptions,
-		BGLDispatcher *dispatcher)
-	: fRefCount(1),
+
+BGLRenderer::BGLRenderer(BGLView* view, ulong glOptions,
+	BGLDispatcher* dispatcher)
+	:
+	fRefCount(1),
 	fView(view),
 	fOptions(glOptions),
 	fDispatcher(dispatcher)
@@ -24,7 +26,7 @@ BGLRenderer::~BGLRenderer()
 }
 
 
-void 
+void
 BGLRenderer::Acquire()
 {
 	atomic_add(&fRefCount, 1);
@@ -39,13 +41,13 @@ BGLRenderer::Release()
 }
 
 
-void 
+void
 BGLRenderer::LockGL()
 {
 }
 
 
-void 
+void
 BGLRenderer::UnlockGL()
 {
 }
@@ -64,18 +66,17 @@ BGLRenderer::Draw(BRect updateRect)
 
 
 status_t
-BGLRenderer::CopyPixelsOut(BPoint source, BBitmap *dest)
+BGLRenderer::CopyPixelsOut(BPoint source, BBitmap* dest)
 {
 	return B_ERROR;
 }
 
 
 status_t
-BGLRenderer::CopyPixelsIn(BBitmap *source, BPoint dest)
+BGLRenderer::CopyPixelsIn(BBitmap* source, BPoint dest)
 {
 	return B_ERROR;
 }
-
 
 
 void
@@ -84,21 +85,20 @@ BGLRenderer::FrameResized(float width, float height)
 }
 
 
-void 
-BGLRenderer::DirectConnected(direct_buffer_info *info)
+void
+BGLRenderer::DirectConnected(direct_buffer_info* info)
 {
 }
 
 
-void 
+void
 BGLRenderer::EnableDirectMode(bool enabled)
 {
 }
 
 
-status_t BGLRenderer::_Reserved_Renderer_0(int32 n, void *p) { return B_ERROR; }
-status_t BGLRenderer::_Reserved_Renderer_1(int32 n, void *p) { return B_ERROR; }
-status_t BGLRenderer::_Reserved_Renderer_2(int32 n, void *p) { return B_ERROR; }
-status_t BGLRenderer::_Reserved_Renderer_3(int32 n, void *p) { return B_ERROR; }
-status_t BGLRenderer::_Reserved_Renderer_4(int32 n, void *p) { return B_ERROR; }
-
+status_t BGLRenderer::_Reserved_Renderer_0(int32 n, void* p) { return B_ERROR; }
+status_t BGLRenderer::_Reserved_Renderer_1(int32 n, void* p) { return B_ERROR; }
+status_t BGLRenderer::_Reserved_Renderer_2(int32 n, void* p) { return B_ERROR; }
+status_t BGLRenderer::_Reserved_Renderer_3(int32 n, void* p) { return B_ERROR; }
+status_t BGLRenderer::_Reserved_Renderer_4(int32 n, void* p) { return B_ERROR; }

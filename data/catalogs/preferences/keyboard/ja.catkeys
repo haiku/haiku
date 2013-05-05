@@ -1,14 +1,14 @@
 1	japanese	x-vnd.Haiku-Keyboard	1711838804
+Written by Andrew Edward McCall	KeyboardApplication		Andrew Edward McCall 作
+Typing test area	KeyboardView		タイピングのテスト
 Defaults	KeyboardWindow		デフォルト
-Delay until key repeat	KeyboardView		キーリピートの開始までの時間
-Fast	KeyboardView		速い
 Key repeat rate	KeyboardView		キーリピートの速度
-Keyboard	System name		キーボード
-Long	KeyboardView		長い
-OK	KeyboardApplication		OK
 Revert	KeyboardWindow		元に戻す
-Short	KeyboardView		短い
+Delay until key repeat	KeyboardView		キーリピートの開始までの時間
+Keyboard	System name		キーボード
+OK	KeyboardApplication		OK
+Fast	KeyboardView		速い
 Slow	KeyboardView		遅い
 Something has gone wrong!	KeyboardApplication		何か問題があります！
-Typing test area	KeyboardView		タイピングのテスト
-Written by Andrew Edward McCall	KeyboardApplication		Andrew Edward McCall 作
+Long	KeyboardView		長い
+Short	KeyboardView		短い

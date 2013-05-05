@@ -34,8 +34,8 @@
 #include <Mime.h>
 #include <Path.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ProcessController"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ProcessController"
 
 Preferences::Preferences(const char* name, const char* signature, bool doSave)
 	: BMessage('Pref'), BLocker("Preferences", true),
@@ -89,14 +89,13 @@ Preferences::~Preferences()
 {
 	if (fSavePreferences) {
 		BFile file;
-		status_t set = B_ERROR;
 		if (fSettingsFile)
-			file.SetTo (fSettingsFile, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
+			file.SetTo(fSettingsFile, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
 		else {
 			BPath prefpath;
 			if (find_directory(B_USER_SETTINGS_DIRECTORY, &prefpath, true) == B_OK) {
 				BDirectory prefdir(prefpath.Path());
-				set = prefdir.CreateFile(fName, &file, false);
+				prefdir.CreateFile(fName, &file, false);
 			}
 		}
 
@@ -116,11 +115,11 @@ Preferences::~Preferences()
 			BAlert *alert = new BAlert(B_TRANSLATE("Error saving file"),
 				error.String(), B_TRANSLATE("Damned!"), NULL, NULL,
 				B_WIDTH_AS_USUAL, B_STOP_ALERT);
-			alert->SetShortcut(0, B_ESCAPE);
-
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 		}
 	}
+	delete fSettingsFile;
 	free(fName);
 	free(fSignature);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010 Haiku Inc. All Rights Reserved.
+ * Copyright 2003-2012 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SYS_RESOURCE_H

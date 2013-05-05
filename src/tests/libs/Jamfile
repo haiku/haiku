@@ -3,5 +3,4 @@ SubDir HAIKU_TOP src tests libs ;
 SubInclude HAIKU_TOP src tests libs alm ;
 SubInclude HAIKU_TOP src tests libs bsd ;
 SubInclude HAIKU_TOP src tests libs linprog ;
-SubInclude HAIKU_TOP src tests libs lp_solve ;
 

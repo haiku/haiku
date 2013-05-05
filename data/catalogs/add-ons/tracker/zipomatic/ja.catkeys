@@ -1,18 +1,18 @@
 1	japanese	x-vnd.haiku.zip-o-matic	2207848100
-%ld files added.	file:ZipOMaticWindow.cpp		%ld 個のファイルを追加しました。
 1 file added.	file:ZipOMaticWindow.cpp		ファイルを追加しました。
-Archive	file:ZipperThread.cpp		アーカイブ
-Archive created OK	file:ZipOMaticWindow.cpp		アーカイブを正常に作成しました。
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		アーカイブの作成を中止してよろしいですか？
-Continue	file:ZipOMaticWindow.cpp		続ける
+Stop	file:ZipOMaticWindow.cpp		中止
 Creating archive: %s	file:ZipOMaticWindow.cpp		アーカイブ %s を作成中
-Do you want to stop them?	file:ZipOMatic.cpp		中止してよろしいですか？
+Continue	file:ZipOMaticWindow.cpp		続ける
+Preparing to archive	file:ZipperThread.cpp		アーカイブを準備中
 Drop files here.	file:ZipOMaticWindow.cpp		ここにファイルをドロップしてください。
-Error creating archive	file:ZipOMaticWindow.cpp		アーカイブの作成中にエラーが発生しました。
 Filename: %s	file:ZipOMaticWindow.cpp		ファイル名： %s
 Let them continue	file:ZipOMatic.cpp		これらを続ける
-Preparing to archive	file:ZipperThread.cpp		アーカイブを準備中
-Stop	file:ZipOMaticWindow.cpp		中止
-Stop them	file:ZipOMatic.cpp		これらを中止
+Do you want to stop them?	file:ZipOMatic.cpp		中止してよろしいですか？
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		アーカイブの作成を中止してよろしいですか？
+%ld files added.	file:ZipOMaticWindow.cpp		%ld 個のファイルを追加しました。
 Stopped	file:ZipOMaticWindow.cpp		一時停止中
+Archive	file:ZipperThread.cpp		アーカイブ
+Error creating archive	file:ZipOMaticWindow.cpp		アーカイブの作成中にエラーが発生しました。
 You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		%ld 個の Zip-O-Matic が動作中です。\n\n
+Archive created OK	file:ZipOMaticWindow.cpp		アーカイブを正常に作成しました。
+Stop them	file:ZipOMatic.cpp		これらを中止

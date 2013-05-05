@@ -1,0 +1,502 @@
+/*
+ * Copyright 2002-2013 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		John Scipione, jscipione@gmail.com
+ *		Ingo Weinhold, bonefish@users.sf.net
+ *
+ * Corresponds to:
+ *		headers/os/storage/Path.h	hrev45260
+ *		src/kits/storage/Path.cpp	hrev45260
+ */
+
+
+/*!
+	\file Path.h
+	\ingroup storage
+	\ingroup libbe
+	\brief Provides the BPath class.
+*/
+
+
+/*!
+	\class BPath
+	\ingroup storage
+	\ingroup libbe
+	\brief A class representing a file system path.
+*/
+
+
+/*!
+	\fn BPath::BPath()
+	\brief Creates an uninitialized BPath object.
+
+	\see SetTo()
+*/
+
+
+/*!
+	\fn BPath::BPath(const BPath& path)
+	\brief Creates a copy of the given BPath object.
+
+	\param path the object to be copied.
+*/
+
+
+/*!
+	\fn BPath::BPath(const entry_ref* ref)
+	\brief Creates a BPath object and initializes it to the filesystem entry
+	       specified by the passed in entry_ref struct.
+
+	\param ref the entry_ref to initialize from.
+*/
+
+
+/*!
+	\fn BPath::BPath(const BEntry* entry)
+	\brief Creates a BPath object and initializes it to the filesystem entry
+	       specified by the passed in BEntry object.
+
+	\param entry the BEntry object to initialize from.
+*/
+
+
+/*!
+	\fn BPath::BPath(const char* dir, const char* leaf, bool normalize)
+	\brief Creates a BPath object and initializes it to the specified path or
+	       path and filename combination.
+
+	\param dir The base component of the pathname. May be absolute or relative.
+	       If relative, it is based off the current working directory.
+	\param leaf The (optional) leaf component of the pathname. Must be
+	       relative. The value of \a leaf is concatenated to the end of \a dir
+	       (a "/" will be added as a separator, if necessary).
+	\param normalize boolean flag used to force normalization; normalization
+	       may sometimes occur even if \c false. The following items require
+	       normalization:
+	       - Relative pathnames (after concatenation; e.g. "boot/ltj")
+	       - The presence of "." or ".." ("/boot/ltj/../ltj/./gwar")
+	       - Redundant slashes ("/boot//ltj")
+	       - A trailing slash ("/boot/ltj/")
+*/
+
+
+/*!
+	\fn BPath::BPath(const BDirectory* dir, const char* leaf, bool normalize)
+	\brief Creates a BPath object and initializes it to the specified directory
+	       and filename combination.
+
+	\param dir The directory that provides the base component of the pathname.
+	\param leaf The (optional) leaf component of the pathname. Must be
+	       relative. The value of \a leaf is concatenated to the end of \a dir
+	       (a "/" will be added as a separator, if necessary).
+	\param normalize boolean flag used to force normalization; normalization
+	       may sometimes occur even if \c false. The following items require
+	       normalization:
+	       - Relative pathnames (after concatenation; e.g. "boot/ltj")
+	       - The presence of "." or ".." ("/boot/ltj/../ltj/./gwar")
+	       - Redundant slashes ("/boot//ltj")
+	       - A trailing slash ("/boot/ltj/")
+*/
+
+
+/*!
+	\fn BPath::~BPath()
+	\brief Destroys the BPath object and frees any associated resources.
+*/
+
+
+/*!
+	\name Constructor helper methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BPath::InitCheck() const
+	\brief Checks whether or not the object was properly initialized.
+
+	\return \c B_OK, if the BPath object was properly initialized, an error
+	        code otherwise.
+*/
+
+
+/*!
+	\fn status_t BPath::SetTo(const entry_ref* ref)
+	\brief Reinitializes the object to the filesystem entry specified by the
+	       passed in entry_ref struct.
+	\param ref The entry_ref to reinitialize the entry from.
+
+	\returns A status code.
+	\retval B_OK Initialization was successful.
+	\retval B_BAD_VALUE \a ref was \c NULL.
+	\retval B_NAME_TOO_LONG The pathname was longer than \c B_PATH_NAME_LENGTH.
+*/
+
+
+/*!
+	\fn status_t BPath::SetTo(const BEntry* entry)
+	\brief Reinitializes the object to the specified filesystem entry.
+
+	\param entry The BEntry to reinitialize the entry from.
+
+	\returns A status code.
+	\retval B_OK Initialization was successful.
+	\retval B_BAD_VALUE \a ref was \c NULL.
+	\retval B_NAME_TOO_LONG The pathname was longer than \c B_PATH_NAME_LENGTH.
+*/
+
+
+/*!
+	\fn status_t BPath::SetTo(const char* path, const char* leaf, bool normalize)
+	\brief Reinitializes the object to the passed in \a path or \a path and
+	       \a leaf combination.
+
+	\remarks The following pseudocode is safe:
+	         \code path.SetTo(path.Path(), "new leaf") \endcode
+
+	\param path The \a path name to use.
+	\param leaf The \a leaf name to use (may be \c NULL).
+	\param normalize Boolean flag used to force normalization; normalization
+	       may sometimes occur even if \c false. The following items require
+	       normalization:
+	       - Relative pathnames (after concatenation; e.g. "boot/ltj")
+	       - The presence of "." or ".." ("/boot/ltj/../ltj/./gwar")
+	       - Redundant slashes ("/boot//ltj")
+	       - A trailing slash ("/boot/ltj/")
+
+	\returns A status code.
+	\retval B_OK Initialization was successful.
+	\retval B_BAD_VALUE \a ref was \c NULL.
+	\retval B_NAME_TOO_LONG The pathname was longer than \c B_PATH_NAME_LENGTH.
+*/
+
+
+/*!
+	\fn status_t BPath::SetTo(const BDirectory* dir, const char* path,
+		bool normalize)
+	\brief Reinitializes the object to the passed in \a dir and relative
+	       \a path combination.
+
+	\param dir The directory that provides the base component of the pathname.
+	\param path the relative \a path name (may be \c NULL).
+	\param normalize boolean flag used to force normalization; normalization
+	       may sometimes occur even if \c false. The following items require
+	       normalization:
+	       - Relative pathnames (after concatenation; e.g. "boot/ltj")
+	       - The presence of "." or ".." ("/boot/ltj/../ltj/./gwar")
+	       - Redundant slashes ("/boot//ltj")
+	       - A trailing slash ("/boot/ltj/")
+
+	\returns A status code.
+	\retval B_OK Initialization was successful.
+	\retval B_BAD_VALUE \a ref was \c NULL.
+	\retval B_NAME_TOO_LONG The pathname was longer than \c B_PATH_NAME_LENGTH.
+*/
+
+
+/*!
+	\fn void BPath::Unset()
+	\brief Returns the object to an uninitialized state.
+
+	Frees any resources it allocated and marks the object as uninitialized.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Path manipulation methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BPath::Append(const char* path, bool normalize)
+	\brief Appends the passed in relative path to the end of the current path.
+
+	This method fails if the path is absolute or the BPath object is
+	uninitialized.
+
+	\param path Relative pathname to append to current path (may be \c NULL).
+	\param normalize Boolean flag used to force normalization; normalization
+	       may sometimes occur even if \c false. The following items require
+	       normalization:
+	       - Relative pathnames (after concatenation; e.g. "boot/ltj")
+	       - The presence of "." or ".." ("/boot/ltj/../ltj/./gwar")
+	       - Redundant slashes ("/boot//ltj")
+	       - A trailing slash ("/boot/ltj/")
+
+	\returns A status code.
+	\retval B_OK Initialization was successful.
+	\retval B_BAD_VALUE \a ref was \c NULL.
+	\retval B_NAME_TOO_LONG The pathname was longer than \c B_PATH_NAME_LENGTH.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Path information methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn const char* BPath::Path() const
+	\brief Gets the entire path of the object.
+
+	\returns The path name of the object, or \c NULL if it is not properly
+	         initialized.
+*/
+
+
+/*!
+	\fn const char* BPath::Leaf() const
+	\brief Gets the leaf portion of the path.
+
+	The leaf portion of the path is defined to be the string after the last
+	\c '/'. For the root path (\c "/") it is an empty string (\c "").
+
+	\returns The leaf portion of the path or \c NULL if it is not properly
+	         initialized.
+*/
+
+
+/*!
+	\fn status_t BPath::GetParent(BPath* path) const
+	\brief Initializes \a path with the parent directory of the BPath object.
+
+	No normalization is performed on the path.
+
+	\param path The BPath object to be initialized to the parent directory.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \a path was \c NULL.
+	\retval B_ENTRY_NOT_FOUND The BPath object represents the root path and
+	        thus has no parent.
+*/
+
+
+/*!
+	\fn bool BPath::IsAbsolute() const
+	\brief Gets whether or not the path is absolute or relative.
+
+	\warning This method returns \c false if the object is initialized.
+
+	\returns \c true if the path is absolute, \c false if relative or if the
+	         object is uninitialized.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Operator overload methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn bool BPath::operator==(const BPath& item) const
+	\brief Performs a simple (string-wise) comparison of paths for equality.
+
+	\warning No normalization takes place, two uninitialized BPath objects are
+	         considered equal.
+
+	\param item the BPath object to compare.
+
+	\return \c true, if the paths are equal, \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BPath::operator==(const char* path) const
+	\brief Performs a simple (string-wise) comparison of paths for equality.
+
+	\warning No normalization takes place.
+
+	\param path The path to compare.
+
+	\return \c true, if the path names are equal, \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BPath::operator!=(const BPath& item) const
+	\brief Performs a simple (string-wise) comparison of paths for inequality.
+
+	\warning No normalization takes place, two uninitialized BPath objects are
+	         considered equal.
+
+	\param item the BPath object to compare.
+
+	\return \c true, if the path names are \b not equal, \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BPath::operator!=(const char* path) const
+	\brief Performs a simple (string-wise) comparison of paths for inequality.
+
+	\warning No normalization takes place.
+
+	\param path The path to compare.
+
+	\return \c true, if the path names are \b not equal, \c false otherwise.
+*/
+
+
+/*!
+	\fn BPath& BPath::operator=(const BPath& item)
+	\brief Initializes the object as a copy of \a item.
+
+	\param item The BPath object to copy
+
+	\return A pointer to the newly initialized BPath object.
+*/
+
+
+/*!
+	\fn BPath& BPath::operator=(const char* path)
+	\brief Initializes the object with the passed in \a path.
+
+	Has the same effect as \code SetTo(path) \endcode
+
+	\param path the path to be assign to this object.
+
+	\return A pointer to the newly initialized BPath object.
+*/
+
+
+//! @}
+
+
+/*!
+	\name BFlattenable method implementations
+*/
+
+
+//! @{
+
+
+/*!
+	\fn bool BPath::IsFixedSize() const
+	\brief Implements BFlattenable::IsFixedSize(). Always returns \c false.
+
+	\return \c false
+*/
+
+
+/*!
+	\fn type_code BPath::TypeCode() const
+	\brief Implements BFlattenable::TypeCode(). Always returns \c B_REF_TYPE.
+
+	\return \c B_REF_TYPE
+*/
+
+
+/*!
+	\fn ssize_t BPath::FlattenedSize() const
+	\brief Implements BFlattenable::FlattenedSize(). Gets the size of the
+	       flattened entry_ref struct that represents the path in bytes.
+
+	\return The size of the flattened entry_ref struct that represents the
+	        path in bytes.
+*/
+
+
+/*!
+	\fn status_t BPath::Flatten(void* buffer, ssize_t size) const
+	\brief Implements BFlattenable::Flatten(). Converts the path of the object
+	       to an entry_ref and writes it into <em>buffer</em>.
+
+	\param buffer The buffer that the data is to be stored in.
+	\param size Size of <em>buffer</em>.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \a buffer was \c NULL or of insufficient size.
+*/
+
+
+/*!
+	\fn bool BPath::AllowsTypeCode(type_code code) const
+	\brief Implements BFlattenable::AllowsTypeCode(). Checks if type code is
+	       equal to \c B_REF_TYPE.
+
+	\param code The type code to test.
+
+	\return \c true if code is \c B_REF_TYPE, \c false otherwise.
+*/
+
+
+/*!
+	\fn status_t BPath::Unflatten(type_code code, const void* buffer,
+		ssize_t size)
+	\brief Implements BFlattenable::Unflatten(). Initializes the object with
+	       the flattened entry_ref data from the passed in buffer.
+
+	The type code must be set to \c B_REF_TYPE.
+
+	\param code The type code of the flattened data, must be \c B_REF_TYPE.
+	\param buffer A pointer to a buffer containing the flattened data.
+	\param size The size of \a buffer in bytes.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \a buffer was \c NULL or didn't contain an entry_ref.
+*/
+
+
+//! @}
+
+
+/// private methods, won't show up in docs
+
+
+/*!
+	status_t BPath::_SetPath(const char* path)
+	\brief Sets the supplied path.
+
+	The path is copied, if \a path is \c NULL the path of the object is set to
+	\c NULL as well. The old path is deleted.
+
+	\param path the path to be set
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_MEMORY Insufficient memory.
+*/
+
+
+/*!
+	bool BPath::_MustNormalize(const char* path, status_t* _error)
+	\brief Checks a path to see if normalization is required.
+
+	The following items require normalization:
+	- Relative pathnames (after concatenation; e.g. "boot/ltj")
+	- The presence of "." or ".." ("/boot/ltj/../ltj/./gwar")
+	- Redundant slashes ("/boot//ltj")
+	- A trailing slash ("/boot/ltj/")
+
+	\param _error A pointer to an error variable that will be set if the input
+		is not a valid path.
+
+	\return \c true if \a path requires normalization, \c false otherwise.
+*/

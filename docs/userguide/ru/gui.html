@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2011, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,6 +12,8 @@
  * Translators:
  *		Rodastahm Islamov
  *		Diver
+ *		Emalf Tallefer
+ *		PoZorro
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -39,6 +41,11 @@
 <li><a href="../uk/gui.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/gui.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/gui.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/gui.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/gui.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../hu/gui.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../pt_BR/gui.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../ca/gui.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../en/gui.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -50,6 +57,16 @@
 
 <div id="content">
 <div>
+<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Содержание</td></tr>
+<tr class="index"><td>
+		<a href="#move-resize">Быстрый способ перемещения и изменения размера окон</a><br />
+                <a href="#stack-tile">Стекирование и прикремление</a><br />
+                <a href="#open-save-panel">Диалоги открытия и сохранения</a><br />
+                <a href="#replicants">Replicants</a></td></tr>
+</table>
 
 <h1>Графический интерфейс Haiku</h1>
 
@@ -65,18 +82,37 @@
 <li>Вы можете отправить окно на задний план при помоши правого щелчка мыши по заголовку или по краю окна.</li></ul></li>
 <li><p>Кнопка закрытия окна.</p></li>
 <li><p>Позволяет развернуть окно на весь экран (или при помощи комбинации клавиш <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>).</p></li>
-<li><p>Кнопка изменения размера окна. Потяните в любую сторону и окно поменяет свой размер.</p></li>
+<li><p>Край окна. Движение мыши с нажатой левой кнопкой передвигает окно, с нажатой правой изменяет его размеры.</p></li>
+<li><p>Угол окна. Потяните в любую сторону и окно поменяет свой размер.</p></li>
 </ol>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="move-resize" name="move-resize">Быстрый способ перемещения и изменения размера окон</a></h2>
-<p>
-Перемещение и изменение размера окон очень важный аспект при работе паралельно с несколькими программами. Вместо того чтобы дёргать за желтый ярлычок (читайте заголовок окна) или за тоненькие грани окна, либо за нижний правый угол, но есть более простой способ переместить окно. </p>
-<p>Haiku предоставляет удобное чёткое решение данной проблемы - сочетание клавиш <span class="key">CTRL</span> <span class="key">ALT</span> и мыши. Для более подробного изучения управления окнами при помощи горячих клавиш обратитесь к теме <a href="keyboard-shortcuts.html#general">Горячие клавиши</a></p>
+<p>Перемещение и изменение размера окон очень важный аспект при параллельной работе с несколькими программами. Вместо того чтобы целиться на желтый заголовок окна или еще более тонкий край окна существует более удобный способ для перемещения окна. В дополнение к небольшому размеру угла окна он имеет и другое ограничение: с помощью него можно изменять размер окон только в направлении правого нижнего угла. <br />Ищменение размера окна с помощью правого клика работает, но опять же, вам придется хорошенько прицелиться.</p>
+<p>Haiku предоставляет удобное чёткое решение данной проблемы - сочетание клавиш <span class="key">CTRL</span> <span class="key">ALT</span> и мыши. Для более подробного изучения управления окнами при помощи горячих клавиш обратитесь к теме <a href="keyboard-shortcuts.html#general">Горячие клавиши</a>.</p>
 <img src="images/gui-images/resizing.png" alt="resizing.png" />
 <p>Во время удержания клавиш <span class="key">CTRL</span> <span class="key">ALT</span> вы увидите, как подсвечиваются границы окна, в зависимости от того к какому из краёв указатель мыши находится ближе. Нажмите и удерживайте <i>правую кнопку мыши</i>  и потяните, окно изменит размеры по направлению подсвеченных границ окна.</p>
 <p>Во время удержания клавиш <span class="key">CTRL</span> <span class="key">ALT</span> нажмите и удерживайте <i>левую кнопку мыши</i> и потяните окно за любую область, таким образом вы сможете быстро переместить окно. Быстрый щелчок <i>правой кнопкой мыши</i> отправляет окно на задний план.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="stack-tile" name="stack-tile">Stack &amp; Tile</a></h2>
+<p>Haiku's user interface provides a unique feature that puts the fact that windows have a yellow tab instead of a full-width title bar to perfect use. It's called "Stack &amp; Tile".<br />
+In the example below, a Tracker window with bookmarks is tiled to the left of a WebPositive window, which itself is stacked with another Tracker window showing the source folder <tt>haiku</tt>. In this animation, the user clicks on the tabs of the stacked windows to alternately bring one or  the other to the front.</p> 
+<img src="images/gui-images/gui-s+t.gif" alt="gui-s+t.gif" />
+<p>Connected like this, the group of windows can be moved and resized together - a nice arrangement to work in a more project centric environment. Instead of looking for the right browser window with documentation, editor and Tracker windows and maybe a related email concerning one project you are currently working on, just stack&amp;tile them together.</p>
+<p>Doing the actual arranging of windows is easy: Hold down <span class="key">OPT</span> while dragging a window by its tab close to another window's tab or border until it's highlighted and release the mouse button.</p>
+<p>Stack &amp; Tile consists of two related parts.</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><img src="images/gui-images/gui-stacking.png" alt="gui-stacking.png" /></td><td width="10"></td>
+<td><p>"<i>Stacking</i>" is putting windows on top of each other, automatically moving the yellow tabs into position.<br />
+While holding <span class="key">OPT</span>, tabs change color when they overlap; drop the window to establish the stacking.</p></td></tr></table>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2" vspace="10">
+<tr><td><img src="images/gui-images/gui-tiling.png" alt="gui-tilinging.png" /></td><td></td>
+<td><p>"<i>Tiling</i>" means gluing windows horizontally or vertically together.<br />
+Again, while holding <span class="key">OPT</span>, the borders that'll fuse together when you drop the window change color when brought near each other.</p></td></tr></table>
+<p>Separation is done in the same way, by holding <span class="key">OPT</span> while dragging a window by its tab out of the group.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>

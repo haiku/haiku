@@ -39,6 +39,8 @@
 <li><a href="../uk/wifi.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/wifi.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/wifi.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/wifi.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/wifi.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../en/wifi.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 
@@ -68,14 +70,14 @@ Aironet PCI4800<br />
 <li><p><i>broadcom43xx</i>, supporta i chipset<br />
 BCM4301, BCM4306, BCM4307, BCM4309, BCM4311, BCM4312 e BCM4318
 </p></li>
-<li><p><i>ipw2100</i> supporting Intel Pro Wireless 2100 chips</p></li>
-<li><p><i>iprowifi2200</i> supporting Intel Pro Wireless<br />
+<li><p><i>iprowifi2100</i>, supporta i chip Intel Pro Wireless 2100</p></li>
+<li><p><i>iprowifi2200</i>, supporta i chip Intel Pro Wireless<br />
 2200BG<br />
 2225BG<br />
 2915ABG
 </p></li>
-<li><p><i>iprowifi3945</i> supporting Intel Pro Wireless 3945 chips</p></li>
-<li><p><i>iprowifi4965</i> supporting Intel Pro Wireless 4965 chips</p></li>
+<li><p><i>iprowifi3945</i>, supporta i chip Intel Pro Wireless 3945</p></li>
+<li><p><i>iprowifi4965</i>, supporta i chip Intel Pro Wireless 4965</p></li>
 <li><p><i>marvell88w8335</i>, supporta<br />
 Marvell Libertas 88W8310<br />
 Marvell Libertas 88W8335
@@ -87,7 +89,7 @@ RT2561S<br />
 RT2561<br />
 RT2661
 </p></li>
-<li><p>ralink2860 supporting Ralink RT2860</p></li>
+<li><p>ralink2860, supporta i chip Ralink RT2860</p></li>
 <li><p><i>wavelanwifi</i>, supporta almeno<br />
 3Com Airconnect<br />
 GLPRISM2 WaveLAN<br />
@@ -103,13 +105,13 @@ Addtron AWA-100 PCI
 </p></li>
 </ul>
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="connect" rel="nofollow" id="connect">Connecting to a wireless network</a></h3>
+<a name="connect" rel="nofollow" id="connect">Connettersi a un network wireless</a></h3>
 <p>Besides of course unencrypted networks, Haiku has preliminary support for accessing wireless networks via <a href="#wep-notes" rel="nofollow">WEP encryption keys</a>. WEP is an early encryption method, although not the most secure.</p>
 <p>You can list available networks, join and leave them with the command <span class="cli">ifconfig</span> from Terminal:</p>
 <pre class="terminal">ifconfig [wifi_device_path] [list|join|leave] (key)</pre>
 <p>You can find your <tt>wifi_device_path</tt> in the <span class="app">Network</span> preferences applet, or by executing <span class="cli">ifconfig -a</span>.</p>
 <p>Below are a few examples of connecting to a wireless network named <i>wifitopia</i>. For these examples we are assuming your wifi network card is <tt>/dev/net/iprowifi3945/0</tt>.</p>
-<h4>Listing wireless networks:</h4>
+<h4>Mostrare una lista dei network wireless:</h4>
 <pre class="terminal">ifconfig /dev/net/iprowifi3945/0 list</pre>
 <h4>Joining unsecured wireless network:</h4>
 <pre class="terminal">ifconfig /dev/net/iprowifi3945/0 join wifitopia</pre>
@@ -121,13 +123,13 @@ Addtron AWA-100 PCI
 <pre class="terminal">ifconfig /dev/net/iprowifi3945/0 leave wifitopia</pre>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="auto-connect" rel="nofollow" id="auto-connect">Automatically connecting to a wireless network</a></h3>
+<a name="auto-connect" rel="nofollow" id="auto-connect">Connettersi automaticamente a un network wireless</a></h3>
 <p>To make your system connect to a given SSID at each boot automatically, you can specify your wireless networks and passwords in <tt>/boot/common/settings/network/wireless_networks</tt> with the following format:</p>
 <pre>network wifitopia {
    password mypassword
 }</pre>
 <p>If you don't create this configuration file, the system will connect to the first unencrypted network it finds.</p>
-<p><a name="wep-notes" rel="nofollow" id="wep-notes"><strong>WEP notes</strong></a></p>
+<p><a name="wep-notes" rel="nofollow" id="wep-notes"><strong>Note sul WEP</strong></a></p>
 <ul>
 <li>64-bit WEP uses a 40-bit key, which means 5 text characters or 10 hex digits</li>
 <li>128-bit WEP uses a 104-bit key, which means 13 text characters or 26 hex digits</li>
@@ -140,7 +142,7 @@ Addtron AWA-100 PCI
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="indice" /></a>
 <a name="install_script" rel="nofollow" id="install_script">install-wifi-firmwares.sh</a></h3>
-<p>To install the firmware for Intel ipw2100, Intel iprowifi2200/2225/2915, Broadcom 43xx &amp; Marvell 88W8335, you need to run</p>
+<p>Per installare il firmware per le schede ipw2100, Intel iprowifi2200/2225/2915, Broadcom 43xx &amp; Marvell 88W8335, dovete far partire lo script</p>
 <pre class="terminal">install-wifi-firmwares.sh
 </pre>
 <p>The Intel ipw2100 and iprowifi22xx will install without an internet connection, as the licensing terms allow Haiku to distribute the original firmware archives. However, they do require acknowledgment by the end-user prior to their installation. The Broadcom 43xx and Marvell 88W8335 will require an active internet connection, as the files containing their respective firmwares cannot be distributed with Haiku.</p>

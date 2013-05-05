@@ -14,10 +14,10 @@ rule ExtractCatalogEntries target : sources : signature : regexp
 	local systemIncludesOption ;
 
 	on $(target) { # use on $(target) variable values
+		defines = $(DEFINES) ;
 		headers = $(HAIKU_CONFIG_HEADERS) $(SEARCH_SOURCE) $(SUBDIRHDRS)
 			$(HDRS) ;
 		sysHeaders = $(SUBDIRSYSHDRS) $(SYSHDRS) ;
-		defines = $(DEFINES) ;
 
 		if $(PLATFORM) = host {
 			sysHeaders += $(HOST_HDRS) ;
@@ -57,10 +57,8 @@ rule ExtractCatalogEntries target : sources : signature : regexp
 
 	SEARCH on $(sources) += $(SEARCH_SOURCE) ;
 
-	local subdir
-		= [ on $(signature) return $(HAIKU_CATALOGS_SUBDIR) ] ;
-	MakeLocate $(target)
-		: [ FDirName $(HAIKU_CATALOGS_OBJECT_DIR) $(subdir) ] ;
+	local subdir = [ on $(signature) return $(HAIKU_CATALOGS_SUBDIR) ] ;
+	MakeLocate $(target) : [ FDirName $(HAIKU_CATALOGS_OBJECT_DIR) $(subdir) ] ;
 	Depends $(target) : $(sources) <build>collectcatkeys ;
 	LocalClean clean : $(target).pre ;
 	ExtractCatalogEntries1 $(target) : <build>collectcatkeys $(sources) ;
@@ -82,10 +80,8 @@ rule LinkApplicationCatalog target : sources : signature : language
 	# if the fingerprint matches the one from the untranslated catalog for the
 	# same file.
 
-	local subdir
-		= [ on $(signature) return $(HAIKU_CATALOGS_SUBDIR) ] ;
-	MakeLocate $(target)
-		: [ FDirName $(HAIKU_CATALOGS_OBJECT_DIR) $(subdir) ] ;
+	local subdir = [ on $(signature) return $(HAIKU_CATALOGS_SUBDIR) ] ;
+	MakeLocate $(target) : [ FDirName $(HAIKU_CATALOGS_OBJECT_DIR) $(subdir) ] ;
 	Depends $(target) : $(sources) <build>linkcatkeys ;
 	LocalClean clean : $(target) ;
 

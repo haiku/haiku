@@ -7,6 +7,7 @@
 
 #include "RowColumnManager.h"
 
+
 #include <LayoutItem.h>
 
 
@@ -68,8 +69,8 @@ RowColumnManager::RemoveArea(Area* area)
 		if (row->fAreas.CountItems() == 0) {
 			fRows.RemoveItem(row);
 			delete row;
-		}
-		_UpdateConstraints(row);
+		} else
+			_UpdateConstraints(row);
 	}
 
 	Column* column = area->fColumn;
@@ -79,8 +80,8 @@ RowColumnManager::RemoveArea(Area* area)
 		if (column->fAreas.CountItems() == 0) {
 			fColumns.RemoveItem(column);
 			delete column;
-		}
-		_UpdateConstraints(column);
+		} else
+			_UpdateConstraints(column);
 	}
 }
 
@@ -108,7 +109,8 @@ RowColumnManager::_FindRowFor(Area* area)
 {
 	for (int32 i = 0; i < fRows.CountItems(); i++) {
 		Row* row = fRows.ItemAt(i);
-		if (row->fTop == area->Top() && row->fBottom == area->Bottom())
+		if (row->fTop.Get() == area->Top()
+			&& row->fBottom.Get() == area->Bottom())
 			return row;
 	}
 	return NULL;
@@ -120,7 +122,8 @@ RowColumnManager::_FindColumnFor(Area* area)
 {
 	for (int32 i = 0; i < fColumns.CountItems(); i++) {
 		Column* column = fColumns.ItemAt(i);
-		if (column->fLeft == area->Left() && column->fRight == area->Right())
+		if (column->fLeft.Get() == area->Left()
+			&& column->fRight.Get() == area->Right())
 			return column;
 	}
 	return NULL;
@@ -135,16 +138,16 @@ RowColumnManager::_PreferredHeight(Row* row, double& weight)
 	double pref = 0;
 	for (int32 i = 0; i < row->fAreas.CountItems(); i++) {
 		BSize prefSize = row->fAreas.ItemAt(i)->Item()->PreferredSize();
-		if (prefSize.height > 0) {
-			nAreas++;
-			pref += prefSize.height;
-		}
+		if (prefSize.height <= 0)
+			continue;
+		nAreas++;
+		pref += prefSize.height;
 		double negPen = row->fAreas.ItemAt(i)->ShrinkPenalties().height;
 		if (negPen > 0)
 			weight += negPen;
 	}
 	if (nAreas == 0) {
-		pref = 0;
+		pref = -1;
 		weight = 1;
 	} else {
 		pref /= nAreas;
@@ -162,16 +165,17 @@ RowColumnManager::_PreferredWidth(Column* column, double& weight)
 	double pref = 0;
 	for (int32 i = 0; i < column->fAreas.CountItems(); i++) {
 		BSize prefSize = column->fAreas.ItemAt(i)->Item()->PreferredSize();
-		if (prefSize.width > 0) {
-			nAreas++;
-			pref += prefSize.width;
-		}
+		if (prefSize.width <= 0)
+			continue;
+		nAreas++;
+		pref += prefSize.width;
+
 		double negPen = column->fAreas.ItemAt(i)->ShrinkPenalties().height;
 		if (negPen > 0)
 			weight += negPen;
 	}
 	if (nAreas == 0) {
-		pref = 0;
+		pref = -1;
 		weight = 1;
 	} else {
 		pref /= nAreas;
@@ -189,7 +193,8 @@ RowColumnManager::_UpdateConstraints(Row* row)
 	if (prefSize >= 0) {
 		if (row->fPrefSizeConstraint == NULL) {
 			row->fPrefSizeConstraint = fLinearSpec->AddConstraint(1,
-			row->fBottom, -1, row->fTop, kEQ, prefSize, weight, weight);
+				row->fBottom, -1, row->fTop, kEQ, prefSize, weight, weight);
+			row->fPrefSizeConstraint->SetLabel("Pref Height");
 		} else {
 			row->fPrefSizeConstraint->SetRightSide(prefSize);
 			row->fPrefSizeConstraint->SetPenaltyNeg(weight);
@@ -212,6 +217,7 @@ RowColumnManager::_UpdateConstraints(Column* column)
 			column->fPrefSizeConstraint = fLinearSpec->AddConstraint(1,
 				column->fRight, -1, column->fLeft, kEQ, prefSize, weight,
 				weight);
+			column->fPrefSizeConstraint->SetLabel("Pref Width");
 		} else {
 			column->fPrefSizeConstraint->SetRightSide(prefSize);
 			column->fPrefSizeConstraint->SetPenaltyNeg(weight);

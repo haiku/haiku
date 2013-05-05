@@ -31,7 +31,7 @@ typedef void *				acpi_handle;
 #define ACPI_ALL_NOTIFY					(ACPI_SYSTEM_NOTIFY | ACPI_DEVICE_NOTIFY)
 #define ACPI_MAX_NOTIFY_HANDLER_TYPE	0x3
 
-#define ACPI_MAX_SYS_NOTIFY				0x7f
+#define ACPI_MAX_SYS_NOTIFY				0x7F
 
 /* Address Space (Operation Region) Types */
 
@@ -133,6 +133,7 @@ typedef struct acpi_data {
 
 enum {
 	ACPI_ALLOCATE_BUFFER = -1,
+	ACPI_ALLOCATE_LOCAL_BUFFER = -2,
 };
 
 
@@ -235,8 +236,8 @@ struct acpi_module_info {
 
 	/* Control method execution and data acquisition */
 
-	status_t	(*evaluate_object)(const char* object,
-					acpi_object_type *returnValue, size_t bufferLength);
+	status_t	(*evaluate_object)(acpi_handle handle, const char* object,
+					acpi_objects *args, acpi_object_type *returnValue, size_t bufferLength);
 	status_t	(*evaluate_method)(acpi_handle handle, const char *method,
 					acpi_objects *args, acpi_data *returnValue);
 
@@ -261,6 +262,10 @@ struct acpi_module_info {
 	/* Table Access */
 	status_t	(*get_table)(const char *signature, uint32 instance,
 					void **tableHeader);
+
+	/* Register Access */
+	status_t	(*read_bit_register)(uint32 regid, uint32 *val);
+	status_t	(*write_bit_register)(uint32 regid, uint32 val);
 };
 
 

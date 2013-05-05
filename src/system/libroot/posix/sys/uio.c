@@ -9,10 +9,12 @@
 #include <sys/uio.h>
 #include <errno.h>
 
+#include <errno_private.h>
+
 
 #define RETURN_AND_SET_ERRNO(err) \
 	if (err < 0) { \
-		errno = err; \
+		__set_errno(err); \
 		return -1; \
 	} \
 	return err;
@@ -32,7 +34,7 @@ readv_pos(int fd, off_t pos, const struct iovec *vecs, size_t count)
 {
 	ssize_t bytes;
 	if (pos < 0) {
-		errno = B_BAD_VALUE;
+		__set_errno(B_BAD_VALUE);
 		return -1;
 	}
 	bytes = _kern_readv(fd, pos, vecs, count);
@@ -55,7 +57,7 @@ writev_pos(int fd, off_t pos, const struct iovec *vecs, size_t count)
 {
 	ssize_t bytes;
 	if (pos < 0) {
-		errno = B_BAD_VALUE;
+		__set_errno(B_BAD_VALUE);
 		return -1;
 	}
 	bytes = _kern_writev(fd, pos, vecs, count);

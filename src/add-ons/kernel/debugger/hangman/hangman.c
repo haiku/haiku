@@ -76,6 +76,7 @@ char bigbuffer[BIGBUFFSZ];
 #define BIT_FROM_LETTER(l) (0x1 << (l - 'a'))
 
 status_t init_words(char *from);
+status_t init_words_from_threadnames(void);
 void print_hangman(int fails);
 void display_word(int current, uint32 tried_letters);
 int play_hangman(void);
@@ -165,6 +166,51 @@ init_words(char *from)
 	for (current = 0; current < MAX_CACHED_WORDS; current++)
 		dprintf("%s\n", words[current]);
 */
+	return B_OK;
+}
+
+
+status_t
+init_words_from_threadnames(void)
+{
+	size_t sz, got;
+	int current, beg, end, i;
+	thread_info ti;
+
+	memset((void *)words, 0, sizeof(words));
+	srand((unsigned int)(system_time() & 0x0ffffffff));
+	for (current = 0; current < MAX_CACHED_WORDS; ) {
+		int offset;
+		char *p;
+		if (get_thread_info(rand() % 200, &ti) != B_OK)
+			continue;
+		sz = strnlen(ti.name, B_OS_NAME_LENGTH);
+		if (sz <= MIN_LETTERS)
+			continue;
+		offset = (rand() % (sz - MIN_LETTERS));
+		//dprintf("thread '%-.32s' + %d\n", ti.name, offset);
+		p = ti.name + offset;
+		got = sz - offset;
+		for (beg = 0; beg < got && isalpha(p[beg]); beg++);
+		for (; beg < got && !isalpha(p[beg]); beg++);
+		if (beg + 1 < got && isalpha(p[beg])) {
+			for (end = beg; end < got && isalpha(p[end]); end++);
+			if (end < got && !isalpha(p[end]) && beg + MIN_LETTERS < end) {
+				/* got one */
+				/* tolower */
+				for (i = beg; i < end; i++)
+					p[i] = tolower(p[i]);
+				strncpy(&(words[current][0]), &(p[beg]), end - beg);
+			} else
+				continue;
+		} else
+			continue;
+		current++;
+	}
+	/*
+	for (current = 0; current < MAX_CACHED_WORDS; current++)
+		dprintf("%s\n", words[current]);
+	*/
 	return B_OK;
 }
 
@@ -456,7 +502,12 @@ std_ops(int32 op, ...)
 			if (err < B_OK) {
 				dprintf("hangman: error reading fortune file: %s\n",
 					strerror(err));
-				return B_ERROR;
+				err = init_words_from_threadnames();
+				if (err < B_OK) {
+					dprintf("hangman: error getting thread names: %s\n",
+						strerror(err));
+					return B_ERROR;
+				}
 			}
 			add_debugger_command("kdlhangman", kdlhangman, KCMD_HELP);
 			return B_OK;
@@ -497,7 +548,7 @@ kdl_trip(void)
 	fd = open("/dev/misc/hangman", O_WRONLY);
 	if (fd < B_OK) {
 		puts("hey, you're pissing me off, no /dev/"DEV_ENTRY" !!!");
-		system("/bin/alert --stop 'It would work better with the hangman driver enabled...\nyou really deserves a forced reboot :P'");
+		system("/bin/alert --stop 'It would work better with the hangman driver enabled...\nyou really deserve a forced reboot :P'");
 		return;
 	}
 	write(fd, "hangme!", 7);

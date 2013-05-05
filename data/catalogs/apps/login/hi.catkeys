@@ -1,0 +1,21 @@
+1	hindi	x-vnd.Haiku-Login	1678631300
+Error: %1	Login App		त्रुटि: %1
+Hide password	Login View		पासवर्ड को छिपाएँ
+Desktop	Desktop Window		डेस्कटॉप
+Invalid login!	Login View		इन्वालिड लोगिन
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--संपादित\tशेल्फ एडिटिंग मोड पर लॉन्च करें जिससे वह कस्तामिज़ कर सकें डेस्कटॉप.\n 
+OK	Login View		ठीक है
+error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	त्रुटि %s\n
+Login:	Login View		लोगिन:
+Error	Login App		त्रुटि
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Alt-Q).	Login App		आप डेस्कटॉप को बदल सकते हैं जो दिखाया गया है लोगिन अप्प्लिकेशन के पीछे रेप्लिकान्ट्स को उसके ऊपर द्दलते हुए उसके ऊपर.\n\nजब आप खतम कर चुकें हो उससे कुइट कर दें(Alt-Q).
+Unimplemented	Login App		लागू नहीं किया गया
+Welcome to Haiku	Login Window		हैकू में आपका स्वजात है 
+Reboot	Login View		रिबूट 
+Login application for Haiku\nUsage:\n	Login App		लोगिन अप्प्लिकेशन फॉर हैकू\nउसेज:\n 
+Info	Login App		के बारे में 
+Halt	Login View		होल्ट 
+ValidateLogin: %s\n	Login App	A message returned from the ValidateLogin function. It can be \"B_OK\".	मान्य लोगिन: %s\n
+Password:	Login View		पासवर्ड:
+OK	Login App		ठीक है 
+--nonmodal\tDo not make the window modal\n	Login App		--नोंमोदल\tविंडो मोडल न बनाये\n

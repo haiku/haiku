@@ -146,6 +146,17 @@ typedef	generic_addr_t			generic_size_t;
 /* time_t */
 #define B_PRIdTIME		B_PRId32
 #define B_PRIiTIME		B_PRIi32
+/* bigtime_t */
+#define B_PRIdBIGTIME	B_PRId64
+#define B_PRIiBIGTIME	B_PRIi64
+
+
+/* Printed width of a pointer with the %p format (minus 0x prefix). */
+#ifdef B_HAIKU_64_BIT
+#	define B_PRINTF_POINTER_WIDTH	16
+#else
+#	define B_PRINTF_POINTER_WIDTH	8
+#endif
 
 
 /* Empty string ("") */

@@ -37,8 +37,8 @@
 	// for unlink
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PrintServerApp"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PrintServerApp"
 
 
 typedef struct _printer_data {

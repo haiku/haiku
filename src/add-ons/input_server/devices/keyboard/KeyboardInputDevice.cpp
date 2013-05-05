@@ -31,6 +31,8 @@
 //#define TRACE_KEYBOARD_DEVICE
 #ifdef TRACE_KEYBOARD_DEVICE
 
+static	int32		sFunctionDepth = -1;
+
 class FunctionTracer {
 public:
 	FunctionTracer(const void* pointer, const char* className,
@@ -54,14 +56,12 @@ public:
 		sFunctionDepth--;
 	}
 
-	static int32 Depth() const { return sFunctionDepth; }
+	static int32 Depth() { return sFunctionDepth; }
 
 private:
 			BString		fFunctionName;
 			BString		fPrepend;
 			const void* fPointer;
-
-	static	int32		sFunctionDepth = -1;
 };
 
 #	define KD_CALLED(x...) \
@@ -73,7 +73,7 @@ private:
 			_to.Append(' ', (FunctionTracer::Depth() + 1) * 2); \
 			debug_printf("%p -> %s", this, _to.String()); \
 			debug_printf(x); } while (0)
-#	define LOG_EVENT(text...) do {} while (0)
+#	define LOG_EVENT(text...) debug_printf(text)
 #	define LOG_ERR(text...) TRACE(text)
 #else
 #	define TRACE(x...) do {} while (0)
@@ -291,7 +291,13 @@ KeyboardDevice::_ControlThread()
 	}
 
 	while (fActive) {
-		if (ioctl(fFD, KB_READ, &keyInfo, sizeof(keyInfo)) != B_OK) {
+		status_t status = ioctl(fFD, KB_READ, &keyInfo, sizeof(keyInfo));
+		if (status == B_BUSY) {
+			// probably the debugger is listening to key events, wait and try
+			// again
+			snooze(100000);
+			continue;
+		} else if (status != B_OK) {
 			_ControlThreadCleanup();
 			// TOAST!
 			return 0;

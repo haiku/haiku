@@ -135,7 +135,7 @@ __END_NAMESPACE_C99
 
 /* Maximum length of a multibyte character in the current locale.  */
 #define	MB_CUR_MAX	(__ctype_get_mb_cur_max ())
-extern size_t __ctype_get_mb_cur_max (void) __THROW;
+extern unsigned short __ctype_get_mb_cur_max(void);
 
 
 __BEGIN_NAMESPACE_STD

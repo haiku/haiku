@@ -70,11 +70,11 @@ BTrashWatcher::~BTrashWatcher()
 
 
 bool
-BTrashWatcher::IsTrashNode(const node_ref *testNode) const
+BTrashWatcher::IsTrashNode(const node_ref* testNode) const
 {
 	int32 count = fTrashNodeList.CountItems();
 	for (int32 index = 0; index < count; index++) {
-		node_ref *nref = fTrashNodeList.ItemAt(index);
+		node_ref* nref = fTrashNodeList.ItemAt(index);
 		if (nref->node == testNode->node && nref->device == testNode->device)
 			return true;
 	}
@@ -84,7 +84,7 @@ BTrashWatcher::IsTrashNode(const node_ref *testNode) const
 
 
 void
-BTrashWatcher::MessageReceived(BMessage *message)
+BTrashWatcher::MessageReceived(BMessage* message)
 {
 	if (message->what != B_NODE_MONITOR) {
 		_inherited::MessageReceived(message);
@@ -109,12 +109,8 @@ BTrashWatcher::MessageReceived(BMessage *message)
 			message->FindInt64("to directory", &toDir);
 			if (fromDir == toDir)
 				break;
-		}			
-			// fall thru
-			
-		case B_DEVICE_UNMOUNTED:
-			// fall thru
-
+		} // fall thru
+		case B_DEVICE_UNMOUNTED: // fall thru
 		case B_ENTRY_REMOVED:
 		{
 			bool full = CheckTrashDirs();
@@ -153,45 +149,47 @@ void
 BTrashWatcher::UpdateTrashIcons()
 {
 	BVolumeRoster roster;
-	BVolume	volume;
+	BVolume volume;
 	roster.Rewind();
 
 	BDirectory trashDir;
 	while (roster.GetNextVolume(&volume) == B_OK) {
 		if (FSGetTrashDir(&trashDir, volume.Device()) == B_OK) {
-			// pull out the icons for the current trash state from resources and
-			// apply them onto the trash directory node
+			// pull out the icons for the current trash state from resources
+			// and apply them onto the trash directory node
 			size_t largeSize = 0;
 			size_t smallSize = 0;
-			const void *largeData = GetTrackerResources()->LoadResource('ICON',
-				fTrashFull ? R_TrashFullIcon : R_TrashIcon, &largeSize);
-	
-			const void *smallData = GetTrackerResources()->LoadResource('MICN',
-				fTrashFull ? R_TrashFullIcon : R_TrashIcon,  &smallSize);
-	
+			const void* largeData
+				= GetTrackerResources()->LoadResource('ICON',
+					fTrashFull ? R_TrashFullIcon : R_TrashIcon, &largeSize);
+
+			const void* smallData
+				= GetTrackerResources()->LoadResource('MICN',
+					fTrashFull ? R_TrashFullIcon : R_TrashIcon,  &smallSize);
+
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 			size_t vectorSize = 0;
-			const void *vectorData = GetTrackerResources()->LoadResource(
-				B_VECTOR_ICON_TYPE, fTrashFull ? R_TrashFullIcon : R_TrashIcon,
-				&vectorSize);
-	
-			if (vectorData)
+			const void* vectorData = GetTrackerResources()->LoadResource(
+				B_VECTOR_ICON_TYPE,
+				fTrashFull ? R_TrashFullIcon : R_TrashIcon, &vectorSize);
+
+			if (vectorData) {
 				trashDir.WriteAttr(kAttrIcon, B_VECTOR_ICON_TYPE, 0,
 					vectorData, vectorSize);
-			else
+			} else
 				TRESPASS();
 #endif
-	
-			if (largeData) 
+
+			if (largeData) {
 				trashDir.WriteAttr(kAttrLargeIcon, 'ICON', 0,
 					largeData, largeSize);
-			else
+			} else
 				TRESPASS();
-	
-			if (smallData)
+
+			if (smallData) {
 				trashDir.WriteAttr(kAttrMiniIcon, 'MICN', 0,
 					smallData, smallSize);
-			else
+			} else
 				TRESPASS();
 		}
 	}

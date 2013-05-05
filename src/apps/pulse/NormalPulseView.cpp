@@ -24,8 +24,8 @@
 
 #include <cpu_type.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "NormalPulseView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "NormalPulseView"
 
 
 float

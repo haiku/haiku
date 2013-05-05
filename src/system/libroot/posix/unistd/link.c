@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <unistd.h>
 
+#include <errno_private.h>
 #include <syscalls.h>
 #include <syscall_utils.h>
 
@@ -24,7 +25,7 @@ readlinkat(int fd, const char *path, char *buffer, size_t bufferSize)
 	size_t linkLen = bufferSize;
 	status_t status = _kern_read_link(fd, path, buffer, &linkLen);
 	if (status < B_OK) {
-		errno = status;
+		__set_errno(status);
 		return -1;
 	}
 
@@ -75,7 +76,12 @@ unlinkat(int fd, const char *path, int flag)
 int
 link(const char *toPath, const char *linkPath)
 {
-	RETURN_AND_SET_ERRNO(_kern_create_link(-1, linkPath, -1, toPath, true));
+	int status = _kern_create_link(-1, linkPath, -1, toPath, true);
+	// Haiku -> POSIX error mapping
+	if (status == B_UNSUPPORTED)
+		status = EPERM;
+
+	RETURN_AND_SET_ERRNO(status);
 }
 
 

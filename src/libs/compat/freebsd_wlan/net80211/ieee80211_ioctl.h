@@ -582,7 +582,7 @@ struct ieee80211req {
 	char		i_name[IFNAMSIZ];	/* if_name, e.g. "wi0" */
 	uint16_t	i_type;			/* req type */
 	int16_t		i_val;			/* Index or simple value */
-	int16_t		i_len;			/* Index or simple value */
+	uint16_t	i_len;			/* Index or simple value */
 	void		*i_data;		/* Extra data */
 };
 #define	SIOCS80211		 _IOW('i', 234, struct ieee80211req)
@@ -719,6 +719,22 @@ struct ieee80211req {
 #define	IEEE80211_IOC_TDMA_SLOTLEN	203	/* TDMA: slot length (usecs) */
 #define	IEEE80211_IOC_TDMA_BINTERVAL	204	/* TDMA: beacon intvl (slots) */
 
+#ifdef __HAIKU__
+/*
+	These are here to allow overcoming a difference between Haiku and
+	FreeBSD drivers. In FreeBSD a device can be set into the down state
+	but is still fully configurable using the ioctl interface. The Haiku
+	network stack on the other hand opens and closes the driver on the
+	transition form up to down and vice versa. This difference can become
+	problematic with ported software that depends on the original behaviour.
+	Therefore IEEE80211_IOC_HAIKU_COMPAT_WLAN_{UP|DOWN} provide a way to
+	achieve the behaviour of setting and clearing IFF_UP without opening
+	or closing the driver itself.
+*/
+#define IEEE80211_IOC_HAIKU_COMPAT_WLAN_UP		0x6000
+#define IEEE80211_IOC_HAIKU_COMPAT_WLAN_DOWN	0x6001
+#endif /* __HAIKU__ */
+
 /*
  * Parameters for controlling a scan requested with
  * IEEE80211_IOC_SCAN_REQ.
@@ -798,7 +814,7 @@ struct ieee80211req_scan_result {
 #endif
 	int8_t						isr_noise;
 	int8_t						isr_rssi;
-	uint8_t						isr_intval;		/* beacon interval */
+	uint16_t					isr_intval;		/* beacon interval */
 	uint8_t						isr_capinfo;		/* capabilities */
 	uint8_t						isr_erp;		/* ERP element */
 	uint8_t						isr_bssid[IEEE80211_ADDR_LEN];

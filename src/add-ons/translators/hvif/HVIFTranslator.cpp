@@ -22,8 +22,8 @@
 #define HVIF_TRANSLATION_QUALITY		1.0
 #define HVIF_TRANSLATION_CAPABILITY		1.0
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "HVIFTranslator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "HVIFTranslator"
 
 
 static const translation_format sInputFormats[] = {
@@ -45,7 +45,7 @@ static const translation_format sOutputFormats[] = {
 		0.4,
 		0.4,
 		"image/x-be-bitmap",
-		"Be Bitmap Format (HVIFTranslator)"
+		"Be Bitmap format (HVIFTranslator)"
 	}
 };
 
@@ -71,7 +71,7 @@ make_nth_translator(int32 n, image_id image, uint32 flags, ...)
 
 HVIFTranslator::HVIFTranslator()
 	: BaseTranslator(B_TRANSLATE("HVIF icons"), 
-		B_TRANSLATE("Native Haiku vector icon translator"),
+		B_TRANSLATE("Haiku vector icon translator"),
 		HVIF_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
 		sOutputFormats, kNumOutputFormats,

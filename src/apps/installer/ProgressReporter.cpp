@@ -11,8 +11,8 @@
 #include <Locale.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "InstallProgress"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "InstallProgress"
 
 
 ProgressReporter::ProgressReporter(const BMessenger& messenger,
@@ -69,8 +69,8 @@ ProgressReporter::StartTimer()
 {
 	fStartTime = system_time();
 
-	printf("%lld bytes to write in %lld files\n", fBytesToWrite,
-		fItemsToWrite);
+	printf("%" B_PRIdOFF " bytes to write in %" B_PRId64 " files\n",
+		fBytesToWrite, fItemsToWrite);
 
 	if (fMessage) {
 		BMessage message(*fMessage);

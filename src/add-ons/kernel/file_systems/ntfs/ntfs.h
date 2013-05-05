@@ -87,19 +87,20 @@ typedef struct vnode {
 } vnode;
 
 typedef struct filecookie {
-	int	omode;
-	off_t last_size;
+	int			omode;
+	off_t 		last_size;
 } filecookie;
 
 typedef struct attrcookie {
-	int	omode;
-	ntfs_inode *inode;
-	ntfs_attr *stream;
-	// MFT ref for EA ?
+	int			omode;
+	ino_t		vnid;
+	ntfschar*	uname;
+	int			uname_len;
+	uint32		type;
 } attrcookie;
 
 typedef struct attrdircookie {
-	ntfs_inode *inode;
+	ntfs_inode*	inode;
 	ntfs_attr_search_ctx *ctx;
 } attrdircookie;
 
@@ -119,6 +120,7 @@ typedef struct nspace {
 	long 		free_mft;
 	BOOL 		ro;
 	BOOL 		show_sys_files;
+	BOOL		fake_attrib;
 	BOOL 		silent;
 	BOOL 		force;
 	BOOL 		debug;

@@ -17,7 +17,6 @@ set -o errexit
 # dontClearImage
 # isVMwareImage
 # optionalPackageDescriptions
-# stripOptionalPackageDebugSymbols
 #
 # addattr
 # copyattr
@@ -34,6 +33,7 @@ set -o errexit
 # The following is only for cd types:
 # generate_attribute_stores
 # isCD
+# stripCommand
 #
 if [ $# -gt 0 ]; then
 	. $1
@@ -154,16 +154,17 @@ stripDebugInfo()
 	if [ "$elfMarker" = 'ELF' ]; then
 		# make user-writable first -- some files aren't
 		chmod u+w "$file"
-		strip --strip-debug "$file"
+		"$stripCommand" --strip-debug "$file"
 	fi
 }
 
 extractFile()
 {
-	# extractFile <archive> <directory> <extractedSubDir>
+	# extractFile <archive> <directory> <extractedSubDir> <stripDebugSymbols>
 	archiveFile=$1
 	targetExtractedDir=$2
 	extractedSubDir=$3
+	stripDebugSymbols=$4
 
 	extractDir=$tmpDir/extract
 	$rmAttrs -rf "$extractDir"
@@ -200,7 +201,7 @@ extractFile()
 		rm $extractDir/.OptionalPackageDescription
 	fi
 
-	if [ "$stripOptionalPackageDebugSymbols" = "1" ]; then
+	if [ "$stripDebugSymbols" = "1" ]; then
 		# strip executables in common/bin
 		if [ -d $extractDir/common/bin ]; then
 			for file in `find $extractDir/common/bin -type f -a -perm +100 \

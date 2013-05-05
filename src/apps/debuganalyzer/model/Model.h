@@ -71,6 +71,9 @@ public:
 									// time >= eventTime; may return
 									// CountEvents()
 
+			bool				AddAssociatedData(void* data);
+			void				RemoveAssociatedData(void* data);
+
 			void				LoadingFinished();
 
 	inline	nanotime_t			BaseTime() const;
@@ -160,6 +163,7 @@ private:
 			WaitObjectGroupList	fWaitObjectGroups;
 			IOSchedulerList		fIOSchedulers;
 			SchedulingStateList	fSchedulingStates;
+			BList				fAssociatedData;
 };
 
 

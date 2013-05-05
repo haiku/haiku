@@ -19,13 +19,16 @@ KernelAddon ralinkwifi :
 	if_ral_pci.c
 	rt2560.c
 	rt2661.c
+	rt2860.c
 	glue.c
 	:
 	libfreebsd_wlan.a
 	libfreebsd_network.a
 	;
 
-HAIKU_WIFI_FIRMWARE_PACKAGE on ralinkwifi = RT61_Firmware_V1.2 ;
-HAIKU_WIFI_FIRMWARE_ARCHIVE on ralinkwifi = RT61_Firmware_V1.2.zip ;
+HAIKU_WIFI_FIRMWARE_PACKAGES on ralinkwifi = RT61_Firmware_V1.2
+	RT2860_Firmware_V26 ;
+HAIKU_WIFI_FIRMWARE_ARCHIVES on ralinkwifi = RT61_Firmware_V1.2.zip
+	RT2860_Firmware_V26.zip ;
 HAIKU_WIFI_FIRMWARE_DO_EXTRACT on ralinkwifi = true ;
 

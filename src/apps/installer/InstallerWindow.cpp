@@ -19,8 +19,7 @@
 #include <ControlLook.h>
 #include <Directory.h>
 #include <FindDirectory.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <LayoutUtils.h>
 #include <Locale.h>
 #include <MenuBar.h>
@@ -46,8 +45,8 @@
 #include "WorkerThread.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "InstallerWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "InstallerWindow"
 
 
 static const char* kDriveSetupSignature = "application/x-vnd.Haiku-DriveSetup";
@@ -166,6 +165,9 @@ InstallerWindow::InstallerWindow()
 	fWorkerThread(new WorkerThread(this)),
 	fCopyEngineCancelSemaphore(-1)
 {
+	if (!be_roster->IsRunning(kTrackerSignature))
+		SetWorkspaces(B_ALL_WORKSPACES);
+
 	LogoView* logoView = new LogoView();
 
 	fStatusView = new BTextView("statusView", be_plain_font, NULL,
@@ -248,13 +250,13 @@ InstallerWindow::InstallerWindow()
 
 	float spacing = be_control_look->DefaultItemSpacing();
 
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.Add(mainMenu)
 		.Add(logoGroup)
 		.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
-		.Add(BGroupLayoutBuilder(B_VERTICAL, spacing)
-			.Add(BGridLayoutBuilder(0, spacing)
+		.AddGroup(B_VERTICAL, spacing)
+			.SetInsets(spacing)
+			.AddGrid(new BGridView(0.0f, spacing))
 				.Add(fSrcMenuField->CreateLabelLayoutItem(), 0, 0)
 				.Add(fSrcMenuField->CreateMenuBarLayoutItem(), 1, 0)
 				.Add(fDestMenuField->CreateLabelLayoutItem(), 0, 1)
@@ -266,16 +268,12 @@ InstallerWindow::InstallerWindow()
 				.Add(packagesScrollView, 0, 4, 2)
 				.Add(fProgressBar, 0, 5, 2)
 				.Add(fSizeView, 0, 6, 2)
-			)
+			.End()
 
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL, spacing)
+			.AddGroup(B_HORIZONTAL, spacing)
 				.Add(fLaunchDriveSetupButton)
 				.AddGlue()
-				.Add(fBeginButton)
-			)
-			.SetInsets(spacing, spacing, spacing, spacing)
-		)
-	);
+				.Add(fBeginButton);
 
 	// Make the optional packages and progress bar invisible on start
 	fPackagesLayoutItem = layout_item_for(packagesScrollView);
@@ -351,7 +349,9 @@ InstallerWindow::MessageReceived(BMessage *msg)
 					B_TRANSLATE("An error was encountered and the "
 					"installation was not completed:\n\n"
 					"Error:  %s"), strerror(error));
-				(new BAlert("error", errorMessage, B_TRANSLATE("OK")))->Go();
+				BAlert* alert = new BAlert("error", errorMessage, B_TRANSLATE("OK"));
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+				alert->Go();
 			}
 
 			_DisableInterface(false);
@@ -431,10 +431,13 @@ InstallerWindow::MessageReceived(BMessage *msg)
 		}
 		case ENCOURAGE_DRIVESETUP:
 		{
-			(new BAlert("use drive setup", B_TRANSLATE("No partitions have "
+			BAlert* alert = new BAlert("use drive setup", B_TRANSLATE("No partitions have "
 				"been found that are suitable for installation. Please set "
 				"up partitions and initialize at least one partition with the "
-				"Be File System."), B_TRANSLATE("OK")))->Go();
+				"Be File System."), B_TRANSLATE("OK"));
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
+			break;
 		}
 		case MSG_STATUS_MESSAGE:
 		{
@@ -579,39 +582,48 @@ InstallerWindow::QuitRequested()
 		// thing on the screen and we will reboot the machine once it quits.
 
 		if (fDriveSetupLaunched && fBootManagerLaunched) {
-			(new BAlert(B_TRANSLATE("Quit Boot Manager and DriveSetup"),
-				B_TRANSLATE("Please close the Boot Manager and DriveSetup "
-					"windows before closing the Installer window."),
-				B_TRANSLATE("OK")))->Go();
+			BAlert* alert = new BAlert(B_TRANSLATE("Quit Boot Manager and "
+				"DriveSetup"),	B_TRANSLATE("Please close the Boot Manager "
+				"and DriveSetup windows before closing the Installer window."),
+				B_TRANSLATE("OK"));
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
 			return false;
 		}
 		if (fDriveSetupLaunched) {
-			(new BAlert(B_TRANSLATE("Quit DriveSetup"),
-				B_TRANSLATE("Please close the DriveSetup window before closing "
-					"the Installer window."), B_TRANSLATE("OK")))->Go();
+			BAlert* alert = new BAlert(B_TRANSLATE("Quit DriveSetup"),
+				B_TRANSLATE("Please close the DriveSetup window before "
+				"closing the Installer window."), B_TRANSLATE("OK"));
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
 			return false;
 		}
 		if (fBootManagerLaunched) {
-			(new BAlert(B_TRANSLATE("Quit Boot Manager"),
+			BAlert* alert = new BAlert(B_TRANSLATE("Quit Boot Manager"),
 				B_TRANSLATE("Please close the Boot Manager window before "
-					"closing the Installer window."), B_TRANSLATE("OK")))->Go();
+				"closing the Installer window."), B_TRANSLATE("OK"));
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
 			return false;
 		}
-
-		if (fInstallStatus != kFinished
-			&& (new BAlert(B_TRANSLATE_SYSTEM_NAME("Installer"),
-					B_TRANSLATE("Are you sure you want to abort the "
-						"installation and restart the system?"),
-					B_TRANSLATE("Cancel"), B_TRANSLATE("Restart system"), NULL,
-					B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() == 0) {
-			return false;
+		if (fInstallStatus != kFinished) {
+			BAlert* alert = new BAlert(B_TRANSLATE_SYSTEM_NAME("Installer"),
+				B_TRANSLATE("Are you sure you want to abort the "
+					"installation and restart the system?"),
+				B_TRANSLATE("Cancel"), B_TRANSLATE("Restart system"), NULL,
+				B_WIDTH_AS_USUAL, B_STOP_ALERT);
+			alert->SetShortcut(0, B_ESCAPE);
+			if (alert->Go() == 0)
+				return false;
 		}
-	} else if (fInstallStatus == kInstalling
-		&& (new BAlert(B_TRANSLATE_SYSTEM_NAME("Installer"),
-			B_TRANSLATE("Are you sure you want to abort the installation?"),
-			B_TRANSLATE("Cancel"), B_TRANSLATE("Abort"), NULL,
-			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() == 0) {
-		return false;
+	} else if (fInstallStatus == kInstalling) {
+			BAlert* alert = new BAlert(B_TRANSLATE_SYSTEM_NAME("Installer"),
+				B_TRANSLATE("Are you sure you want to abort the installation?"),
+				B_TRANSLATE("Cancel"), B_TRANSLATE("Abort"), NULL,
+				B_WIDTH_AS_USUAL, B_STOP_ALERT);
+			alert->SetShortcut(0, B_ESCAPE);
+			if (alert->Go() == 0)
+				return false;
 	}
 
 	_QuitCopyEngine(false);
@@ -652,6 +664,7 @@ InstallerWindow::_LaunchDriveSetup()
 			BAlert* alert = new BAlert("error", B_TRANSLATE("DriveSetup, the "
 				"application to configure disk partitions, could not be "
 				"launched."), B_TRANSLATE("OK"));
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 		}
 	}
@@ -680,6 +693,7 @@ InstallerWindow::_LaunchBootManager()
 			BAlert* alert = new BAlert("error", B_TRANSLATE("BootManager, the "
 				"application to configure the Haiku boot menu, could not be "
 				"launched."), B_TRANSLATE("OK"));
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 		}
 	}
@@ -880,11 +894,13 @@ InstallerWindow::_QuitCopyEngine(bool askUser)
 
 	bool quit = true;
 	if (askUser) {
-		quit = (new BAlert("cancel",
+		BAlert* alert = new BAlert("cancel",
 			B_TRANSLATE("Are you sure you want to to stop the installation?"),
 			B_TRANSLATE_COMMENT("Continue", "In alert after pressing Stop"),
 			B_TRANSLATE_COMMENT("Stop", "In alert after pressing Stop"), 0,
-			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0;
+			B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->SetShortcut(1, B_ESCAPE);
+		quit = alert->Go() != 0;
 	}
 
 	if (quit) {

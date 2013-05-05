@@ -5,6 +5,7 @@
 #ifndef _FSSH_FSSH_H
 #define _FSSH_FSSH_H
 
+
 #include "compatibility.h"
 
 #include <map>
@@ -69,6 +70,9 @@ private:
 
 	static	CommandManager*		sManager;
 };
+
+
+extern void register_additional_commands(void);
 
 
 }	// namespace FSShell

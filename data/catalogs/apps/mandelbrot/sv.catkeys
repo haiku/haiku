@@ -1,10 +1,10 @@
 1	swedish	x-vnd.Haiku-Mandelbrot	3766380907
 File	Mandelbrot		Arkiv
-Iterations	Mandelbrot		Upprepningar
-Mandelbrot	System name		Mandelbrot
-Palette	Mandelbrot		Palett
-Palette 1	Mandelbrot		Palett 1
-Palette 2	Mandelbrot		Palett 2
 Palette 3	Mandelbrot		Palett 3
-Palette 4	Mandelbrot		Palett 4
 Quit	Mandelbrot		Avsluta
+Palette 2	Mandelbrot		Palett 2
+Palette 4	Mandelbrot		Palett 4
+Palette	Mandelbrot		Palett
+Mandelbrot	System name		Mandelbrot
+Palette 1	Mandelbrot		Palett 1
+Iterations	Mandelbrot		Upprepningar

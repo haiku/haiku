@@ -1,0 +1,26 @@
+1	croatian	x-vnd.Haiku.TV	4209665098
+Always on top	MainWin		Uvijek na vrhu
+Channel	MainWin		Kanal
+DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
+Error, connecting to interface failed:\n\n	MainWin		Greška,spajanje na sučelje nije uspjelo: \n\n
+Error, interface is busy:\n\n	MainWin		Problem, sučelje je zauzeto:\n\n
+Full screen	MainWin		Cijeli ekran 
+Interface	MainWin		Sučelje
+Keep aspect ratio	MainWin		Zadrži omjer prozora
+Next channel	MainWin		Slijedeći kanal
+No border	MainWin		Bez rubova
+No menu	MainWin		Bez izbornika
+None	MainWin		Nema
+OK	MainWin		U redu
+Previous channel	MainWin		Prethodni kanal
+Quit	MainWin		Izađi 
+Scale to native size	MainWin		Skaliraj na prirodnu veličinu
+Settings	MainWin		Postavke
+Settings…	MainWin		Postavke...
+TV	MainWin		TV
+TV	System name		TV
+force 544 x 576, display aspect 4:3	MainWin		forsiraj 544 x 576, odnos ekrana 4:3
+force 704 x 576, display aspect 4:3	MainWin		forsiraj 704 x 576, odnos ekrana 4:3
+force 720 x 576, display aspect 4:3	MainWin		forsiraj 720 x 576, odnos ekrana 4:3
+pixel aspect ratio	MainWin		odnos piksela 
+unknown	MainWin		nepoznato

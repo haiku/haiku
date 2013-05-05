@@ -1,0 +1,9 @@
+1	croatian	x-vnd.Haiku-BMPTranslator	2497639570
+BMP Settings	BMPMain		BMP postavke
+BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	BMP slika (MS format, %d bits
+BMP image (OS/2 format, %d bits)	BMPTranslator		BMP slika (OS/2 format, %d bits) 
+BMP image translator	BMPTranslator		BMP prevoditelj slika
+BMP image translator	BMPView		BMP prevoditelj slika
+BMP images	BMPTranslator		BMP slike
+BMPTranslator Settings	BMPTranslator		Postavke BMPprevoditelja
+Version %d.%d.%d, %s	BMPView		Verzija %d.%d.%d, %s

@@ -1,4 +1,5 @@
 /*
+ * Copyright 2012, Jérôme Duval, korli@users.berlios.de.
  * Copyright 2008, Salvatore Benedetto, salvatore.benedetto@gmail.com
  * Copyright 2003, Tyler Dauwalder, tyler@dauwalder.net.
  * Distributed under the terms of the MIT License.
@@ -50,6 +51,8 @@ public:
 	uint32				BlockShift() const { return fBlockShift; }
 	bool				Mounted() const { return fMounted; }
 	Icb*				RootIcb() { return fRootIcb; }
+	primary_volume_descriptor *PrimaryVolumeDescriptor() 
+							{ return &fPrimaryVolumeDescriptor; }
 
 private:
 	void				_Unset();
@@ -69,6 +72,7 @@ private:
 	off_t				fOffset;
 	Partition			*fPartitions[UDF_MAX_PARTITION_MAPS];
 	Icb					*fRootIcb;	// Destroyed by vfs via callback to put_node()
+	primary_volume_descriptor fPrimaryVolumeDescriptor;
 };
 
 #endif	// _UDF_VOLUME_H

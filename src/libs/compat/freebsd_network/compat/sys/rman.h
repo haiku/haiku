@@ -59,6 +59,7 @@ struct resource {
 
 bus_space_handle_t rman_get_bushandle(struct resource *);
 bus_space_tag_t rman_get_bustag(struct resource *);
+int rman_get_rid(struct resource *);
 
 
 static inline u_long

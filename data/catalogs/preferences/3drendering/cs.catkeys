@@ -1,0 +1,26 @@
+1	czech	x-vnd.Haiku-3DRendering	899836772
+Attributes stack size:	Capabilities		Velikost zásobníku atributů:
+Auxiliary buffer(s):	Capabilities		Pomocný/é buffer(y):
+Available	Extensions		Dostupné
+Capabilities	Capabilities		Schopnosti
+Extensions	Extensions		Rozšíření
+GLU version:	InfoView		Verze GLU:
+GLUT API version:	InfoView		Verze GLUT API:
+Information	InfoView		Informace
+List stack size:	Capabilities		Vypsat velikost zásobníku:
+Max. 2D texture size:	Capabilities		Max. velikost 2D textur:
+Max. 3D texture size:	Capabilities		Max. velikost 3D textur:
+Max. clipping planes:	Capabilities		Max. rovin ořezu:
+Max. convolution:	Capabilities		Max: křivek:
+Max. evaluators equation order:	Capabilities		Max. řád hodnotící rovnice:
+Max. lights:	Capabilities		Max. světel:
+Max. recommended index elements:	Capabilities		Max. prvků doporučeného indexu:
+Max. recommended vertex elements:	Capabilities		Max. doporučených vrcholových prvků:
+Max. texture units:	Capabilities		Max. jednotek textur:
+Model stack size:	Capabilities		Velikost zásobníku modelů:
+Name stack size:	Capabilities		Velikost zásobníku jmen:
+GL version:	InfoView		Verze GL:
+Projection stack size:	Capabilities		Velikost zásobníku projekce:
+Renderer name:	InfoView		Jméno vykreslovače:
+Texture stack size:	Capabilities		Velikost zásobníku textur:
+Vendor name:	InfoView		Jméno prodejce:

@@ -503,10 +503,10 @@ register_boot_file_system(BootVolume& bootVolume)
 		return status;
 	}
 
-	gKernelArgs.boot_volume.SetInt64(BOOT_VOLUME_PARTITION_OFFSET,
+	gBootVolume.SetInt64(BOOT_VOLUME_PARTITION_OFFSET,
 		partition->offset);
 	if (bootVolume.IsPackaged())
-		gKernelArgs.boot_volume.SetBool(BOOT_VOLUME_PACKAGED, true);
+		gBootVolume.SetBool(BOOT_VOLUME_PACKAGED, true);
 
 	Node *device = get_node_from(partition->FD());
 	if (device == NULL) {

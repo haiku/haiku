@@ -9,6 +9,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 
+#include <errno_private.h>
 #include <syscalls.h>
 
 
@@ -17,7 +18,7 @@ realpath(const char* path, char* resolved)
 {
 	status_t status = _kern_normalize_path(path, true, resolved);
 	if (status != B_OK) {
-		errno = status;
+		__set_errno(status);
 		return NULL;
 	}
 

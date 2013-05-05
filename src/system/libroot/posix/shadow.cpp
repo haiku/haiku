@@ -14,6 +14,7 @@
 #include <OS.h>
 
 #include <AutoDeleter.h>
+#include <errno_private.h>
 #include <libroot_private.h>
 #include <RegistrarDefs.h>
 #include <user_group.h>
@@ -82,7 +83,7 @@ getspent(void)
 	int status = getspent_r(&sShadowPwdBuffer, sShadowPwdStringBuffer,
 		sizeof(sShadowPwdStringBuffer), &result);
 	if (status != 0)
-		errno = status;
+		__set_errno(status);
 	return result;
 }
 
@@ -142,7 +143,7 @@ getspnam(const char *name)
 	int status = getspnam_r(name, &sShadowPwdBuffer, sShadowPwdStringBuffer,
 		sizeof(sShadowPwdStringBuffer), &result);
 	if (status != 0)
-		errno = status;
+		__set_errno(status);
 	return result;
 }
 
@@ -200,7 +201,7 @@ sgetspent(const char* line)
 	int status = sgetspent_r(line, &sShadowPwdBuffer, sShadowPwdStringBuffer,
 		sizeof(sShadowPwdStringBuffer), &result);
 	if (status != 0)
-		errno = status;
+		__set_errno(status);
 	return result;
 }
 
@@ -252,7 +253,7 @@ fgetspent(FILE* file)
 	int status = fgetspent_r(file, &sShadowPwdBuffer, sShadowPwdStringBuffer,
 		sizeof(sShadowPwdStringBuffer), &result);
 	if (status != 0)
-		errno = status;
+		__set_errno(status);
 	return result;
 }
 
@@ -265,7 +266,7 @@ fgetspent_r(FILE* file, struct spwd* spwd, char* buffer, size_t bufferSize,
 
 	// read a line
 	char lineBuffer[LINE_MAX + 1];
-	errno = 0;
+	__set_errno(0);
 	char* line = fgets(lineBuffer, sizeof(lineBuffer), file);
 	if (line == NULL) {
 		if (errno != 0)

@@ -30,16 +30,19 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
+#include "BaseTranslator.h"
+
 #include <string.h>
 #include <stdio.h>
+
+#include <algorithm>
 
 #include <Catalog.h>
 #include <Locale.h>
 
-#include "BaseTranslator.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "BaseTranslator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "BaseTranslator"
 
 
 // ---------------------------------------------------------------
@@ -305,7 +308,8 @@ BaseTranslator::identify_bits_header(BPositionIO *inSource,
 		outInfo->group = B_TRANSLATOR_BITMAP;
 		outInfo->quality = 0.2;
 		outInfo->capability = 0.2;
-		strcpy(outInfo->name, B_TRANSLATE("Be Bitmap Format"));
+		strlcpy(outInfo->name, B_TRANSLATE("Be Bitmap Format"),
+			sizeof(outInfo->name));
 		strcpy(outInfo->MIME, "image/x-be-bitmap");
 
 		// Look for quality / capability info in fInputFormats
@@ -545,7 +549,8 @@ BaseTranslator::translate_from_bits_to_bits(BPositionIO *inSource,
 				if (writ < 0)
 					break;
 				remaining -= static_cast<uint32>(writ);
-				rd = inSource->Read(buf, min(1024, remaining));
+				rd = inSource->Read(buf, std::min((uint32)1024,
+					remaining));
 			}
 
 			if (remaining > 0)

@@ -24,6 +24,9 @@ public:
 
 			void				SetCpuState(CpuState* cpuState);
 
+			void				LoadSettings(const BMessage& settings);
+			status_t			SaveSettings(BMessage& settings);
+
 private:
 			class RegisterValueColumn;
 			class RegisterTableModel;

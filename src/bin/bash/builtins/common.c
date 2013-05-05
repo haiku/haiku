@@ -760,7 +760,7 @@ display_signal_list (list, forcecols)
 	      list = list->next;
 	      continue;
 	    }
-#if defined (JOB_CONTROL)
+#if defined (JOB_CONTROL) && defined(HAVE_KILL_BUILTIN)
 	  /* POSIX.2 says that `kill -l signum' prints the signal name without
 	     the `SIG' prefix. */
 	  printf ("%s\n", (this_shell_builtin == kill_builtin) ? name + 3 : name);
@@ -771,8 +771,10 @@ display_signal_list (list, forcecols)
       else
 	{
 	  dflags = DSIG_NOCASE;
+#if defined(HAVE_KILL_BUILTIN)
 	  if (posixly_correct == 0 || this_shell_builtin != kill_builtin)
 	    dflags |= DSIG_SIGPREFIX;
+#endif
 	  signum = decode_signal (list->word->word, dflags);
 	  if (signum == NO_SIG)
 	    {

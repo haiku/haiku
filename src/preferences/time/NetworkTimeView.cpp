@@ -29,8 +29,8 @@
 #include "TimeMessages.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Time"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Time"
 
 
 Settings::Settings()
@@ -167,23 +167,26 @@ Settings::SettingsChanged()
 	ssize_t oldSize = fOldMessage.FlattenedSize();
 	ssize_t newSize = fMessage.FlattenedSize();
 	
-	if (oldSize != newSize)
+	if (oldSize != newSize || oldSize < 0 || newSize < 0)
 		return true;
 
-	char* oldBytes = new char[oldSize];
+	char* oldBytes = new (std::nothrow) char[oldSize];
+	if (oldBytes == NULL)
+		return true;
 	fOldMessage.Flatten(oldBytes, oldSize);
-	char* newBytes = new char[newSize];
+	char* newBytes = new (std::nothrow) char[newSize];
+	if (newBytes == NULL) {
+		delete[] oldBytes;
+		return true;
+	}
 	fMessage.Flatten(newBytes, newSize);
 	
-	int result = memcmp(oldBytes, newBytes, oldSize);	
+	int result = memcmp(oldBytes, newBytes, oldSize);
 
 	delete[] oldBytes;
 	delete[] newBytes;
 
-	if (result != 0)
-		return true;
-	else
-		return false;
+	return result != 0;
 }
 
 
@@ -374,8 +377,10 @@ NetworkTimeView::MessageReceived(BMessage* message)
 						"while synchronizing:\r\n%s"),
 						errorString);
 
-				(new BAlert(B_TRANSLATE("Time"), buffer, 
-					B_TRANSLATE("OK")))->Go();
+				BAlert* alert = new BAlert(B_TRANSLATE("Time"), buffer, 
+					B_TRANSLATE("OK"));
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+				alert->Go();
 			}
 			break;
 		}
@@ -474,7 +479,7 @@ NetworkTimeView::_InitView()
 void
 NetworkTimeView::_UpdateServerList()
 {
-	while (fServerListView->RemoveItem(0L) != NULL);
+	while (fServerListView->RemoveItem((int32)0) != NULL);
 
 	const char* server;
 	int32 index = 0;

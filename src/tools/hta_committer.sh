@@ -115,31 +115,37 @@ DownloadAllLanguageTarballs()
 
 DownloadLanguageTarball()
 {
+	LANGUAGE=$1
+	# The package for zh_hans catalogs is actually called zh-hans
+	if [ "$LANGUAGE" = "zh_hans" ] ; then
+		LANGUAGE="zh-hans"
+	fi
+	
 	cd "$tempDirectory"
-	echo "Downloading language:  $1"
+	echo "Downloading language:  $LANGUAGE"
 
-	if [ -e "$1.tgz" ] ; then
-		rm "$1.tgz"
+	if [ -e "$LANGUAGE.tgz" ] ; then
+		rm "$LANGUAGE.tgz"
 	fi	
 	
 	attempt=0
 	local tarballURL="http://hta.polytect.org/catalogs/tarball"
 	
-	while [ $(wget -nv -U hta_committer -O "$1.tgz" "$tarballURL/$1" ; echo $?) -ne 0 ]; do
+	while [ $(wget -nv -U hta_committer -O "$LANGUAGE.tgz" "$tarballURL/$LANGUAGE" ; echo $?) -ne 0 ]; do
 		if [ $attempt -eq 5 ]; then
 			break
 		fi
 		(( attempt++ ))
 		echo "Download attempt #$attempt failed. Retrying ..."
-		if [ -e "$1" ]; then
-			rm "$1"
+		if [ -e "$LANGUAGE" ]; then
+			rm "$LANGUAGE"
 		fi
 	done
 	if [ $attempt -ge 5 ]; then
-		if [ -e "$1" ]; then
-			rm "$1"
+		if [ -e "$LANGUAGE" ]; then
+			rm "$LANGUAGE"
 		fi
-		echo "WARNING: Max download retries exceeded for language $1."
+		echo "WARNING: Max download retries exceeded for language $LANGUAGE."
 	fi
 		
 	cd "$subversionRootDirectory"

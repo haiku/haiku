@@ -6,9 +6,19 @@
 #define	COLUMN_H
 
 
-#include "Constraint.h"
-#include "LinearSpec.h"
-#include "Tab.h"
+#include <ObjectList.h>
+#include <Referenceable.h>
+
+
+namespace LinearProgramming {
+	class Constraint;
+	class LinearSpec;
+};
+
+
+namespace BPrivate {
+	class SharedSolver;
+};
 
 
 namespace BALM {
@@ -17,6 +27,8 @@ namespace BALM {
 class Area;
 class BALMLayout;
 class RowColumnManager;
+class XTab;
+class YTab;
 
 
 /**
@@ -30,20 +42,21 @@ public:
 			XTab*				Right() const;
 
 private:
-								Column(LinearSpec* ls, XTab* left, XTab* right);
-
-			LinearSpec*			fLS;
-			XTab*				fLeft;
-			XTab*				fRight;
-
-			//! managed by RowColumnManager
-			Constraint*			fPrefSizeConstraint;
-			BObjectList<Area>	fAreas;
-
-public:
 	friend class BALMLayout;
 	friend class BALM::RowColumnManager;
-	
+	friend class BPrivate::SharedSolver;
+
+								Column(LinearProgramming::LinearSpec* ls,
+									XTab* left, XTab* right);
+
+			BReference<XTab>	fLeft;
+			BReference<XTab>	fRight;
+
+			LinearProgramming::LinearSpec* fLS;
+			LinearProgramming::Constraint* fPrefSizeConstraint;
+				// managed by RowColumnManager
+
+			BObjectList<Area>	fAreas;
 };
 
 }	// namespace BALM

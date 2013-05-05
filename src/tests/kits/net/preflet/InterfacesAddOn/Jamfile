@@ -34,3 +34,13 @@ Addon Interfaces :
 	$(HAIKU_LOCALE_LIBS)
 	libicon.a libagg.a
 ;
+
+DoCatalogs Interfaces :
+	x-vnd.Haiku-InterfacesAddOn
+	:
+	InterfacesAddOn.cpp
+	InterfacesListView.cpp
+	InterfaceWindow.cpp
+	InterfaceAddressView.cpp
+	InterfaceHardwareView.cpp
+;

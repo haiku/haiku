@@ -1,0 +1,45 @@
+1	lithuanian	x-vnd.Haiku-SoundRecorder	2149017672
+Loop	RecorderWindow		Kartoti
+Cannot find default audio hardware	RecorderWindow		Nepavyko rasti numatytosios garso techninės įrangos
+Cannot find the temporary file created to hold the new recording	RecorderWindow		Nepavyko rasti laikinojo failo, sukurto naujam įrašui talpinti
+Sample size:	RecorderWindow		Garso elemento dydis:
+Nothing to play	RecorderWindow		Nėra ką groti
+Duration: 	RecorderWindow		Trukmė: 
+Some of the files don't appear to be audio files	RecorderWindow		Panašu, jog kai kurie failai nėra garso įrašai
+File info	RecorderWindow		Failo savybės
+Drop files here	SoundListView		Meskite failus čia
+Input	RecorderWindow		Įvestis
+Stop	RecorderWindow		Stabdyti
+Format:	RecorderWindow		Formatas:
+Sound List	RecorderWindow		Garsų sąrašas
+Compression: 	RecorderWindow		Glaudinimas:
+Rewind	RecorderWindow		Pervynioti atgal
+Sample rate:	RecorderWindow		Garso elementų dažnis:
+Invalid audio files	RecorderWindow		Netinkami garso įrašai
+ seconds	RecorderWindow		sek.
+OK	RecorderWindow		Gerai
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Nepavyko atverti laikinojo failo, sukurto naujam įrašui talpinti
+None of the files appear to be audio files	RecorderWindow		Panašu, jog nė vienas failas nėra garso įrašas
+Input:	RecorderWindow		Įvestis:
+Forward	RecorderWindow		Pervynioti pirmyn
+Play	RecorderWindow		Groti
+SoundRecorder	System name		Garsarašis
+Channels:	RecorderWindow		Kanalai:
+ bits	RecorderWindow		b
+None	RecorderWindow		joks
+Record	RecorderWindow		Įrašyti garsą
+Sample size: 	RecorderWindow		Garso elemento dydis:
+Cannot recognize this file as a media file	RecorderWindow		Šis failas nebuvo atpažintas kaip medijos failas
+Format: 	RecorderWindow		Formatas:
+File name: 	RecorderWindow		Failo vardas:
+Cannot connect to the selected sound input	RecorderWindow		Nepavyko prisijungti prie pasirinktos garso įvesties
+Cannot get the file to play	RecorderWindow		Nepavyko gauti grotino failo
+Cannot record a sound that long	RecorderWindow		Negalima sukurti tokio ilgo įrašo
+Duration:	RecorderWindow		Trukmė:
+Compression:	RecorderWindow		Glaudinimas:
+Cannot find an unused name to use for the new recording	RecorderWindow		Nepavyko rasti laisvo vardo, kurį būtų galima panaudoti naujam įrašui
+Channels: 	RecorderWindow		Kanalai:
+Save	RecorderWindow		Įrašyti failą
+Sample rate: 	RecorderWindow		Garso elementų dažnis:
+Cannot connect to media server	RecorderWindow		Nepavyko prisijungti prie įvairialypės terpės tarnybos
+File name:	RecorderWindow		Failo vardas:

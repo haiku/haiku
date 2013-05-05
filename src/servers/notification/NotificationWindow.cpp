@@ -10,8 +10,6 @@
  *		Mikael Eiman, mikael@eiman.tv
  *		Pier Luigi Fiorini, pierluigi.fiorini@gmail.com
  */
-
-
 #include "NotificationWindow.h"
 
 #include <algorithm>
@@ -19,20 +17,22 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
+#include <Deskbar.h>
+#include <Directory.h>
 #include <File.h>
+#include <FindDirectory.h>
 #include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
-#include <Layout.h>
 #include <NodeMonitor.h>
+#include <Notifications.h>
 #include <Path.h>
 #include <PropertyInfo.h>
-#include <private/interface/WindowPrivate.h>
 
 #include "AppGroupView.h"
 #include "AppUsage.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "NotificationWindow"
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "NotificationWindow"
 
 
 property_info main_prop_list[] = {
@@ -48,7 +48,7 @@ property_info main_prop_list[] = {
 };
 
 
-const float kCloseSize				= 8;
+const float kCloseSize				= 6;
 const float kExpandSize				= 8;
 const float kPenSize				= 1;
 const float kEdgePadding			= 2;
@@ -64,11 +64,12 @@ NotificationWindow::NotificationWindow()
 {
 	SetLayout(new BGroupLayout(B_VERTICAL, 0));
 
-	Hide();
-	Show();
-
 	_LoadSettings(true);
 	_LoadAppFilters(true);
+
+	// Start the message loop
+	Hide();
+	Show();
 }
 
 
@@ -99,7 +100,14 @@ NotificationWindow::WorkspaceActivated(int32 /*workspace*/, bool active)
 {
 	// Ensure window is in the correct position
 	if (active)
-		_ResizeAll();
+		SetPosition();
+}
+
+
+void
+NotificationWindow::FrameResized(float width, float height)
+{
+	SetPosition();
 }
 
 
@@ -188,7 +196,7 @@ NotificationWindow::MessageReceived(BMessage* message)
 
 					group->AddInfo(view);
 
-					_ResizeAll();
+					_ShowHide();
 
 					reply.AddInt32("error", B_OK);
 				} else
@@ -211,8 +219,28 @@ NotificationWindow::MessageReceived(BMessage* message)
 
 			if (it != fViews.end())
 				fViews.erase(it);
+			break;
+		}
+		case kRemoveGroupView:
+		{
+			AppGroupView* view = NULL;
+			if (message->FindPointer("view", (void**)&view) != B_OK)
+				return;
 
-			_ResizeAll();
+			// It's possible that between sending this message, and us receiving
+			// it, the view has become used again, in which case we shouldn't
+			// delete it.
+			if (view->HasChildren())
+				return;
+
+			// this shouldn't happen
+			if (fAppViews.erase(view->Group()) < 1)
+				break;
+
+			if (GetLayout()->RemoveView(view))
+				delete view;
+
+			_ShowHide();
 			break;
 		}
 		default:
@@ -289,73 +317,42 @@ NotificationWindow::Width()
 
 
 void
-NotificationWindow::_ResizeAll()
+NotificationWindow::_ShowHide()
 {
-	if (fAppViews.empty()) {
-		if (!IsHidden())
-			Hide();
+	if (fAppViews.empty() && !IsHidden()) {
+		Hide();
 		return;
 	}
 
-	appview_t::iterator aIt;
-	bool shouldHide = true;
-
-	for (aIt = fAppViews.begin(); aIt != fAppViews.end(); aIt++) {
-		AppGroupView* app = aIt->second;
-		if (app->HasChildren()) {
-			shouldHide = false;
-			break;
-		}
-	}
-
-	if (shouldHide) {
-		if (!IsHidden())
-			Hide();
-		return;
-	}
-
-	if (IsHidden())
+	if (IsHidden()) {
+		SetPosition();
 		Show();
-
-	float width = 0;
-	float height = 0;
-
-	for (aIt = fAppViews.begin(); aIt != fAppViews.end(); aIt++) {
-		AppGroupView* view = aIt->second;
-		float w = -1;
-		float h = -1;
-
-		if (!view->HasChildren()) {
-			if (!view->IsHidden())
-				view->Hide();
-		} else {
-			view->GetPreferredSize(&w, &h);
-			width = max_c(width, h);
-
-			view->ResizeToPreferred();
-			view->MoveTo(0, height);
-
-			height += h;
-
-			if (view->IsHidden())
-				view->Show();
-		}
 	}
+}
 
-	ResizeTo(Width(), height);
-	PopupAnimation();
+
+void
+NotificationWindow::NotificationViewSwapped(NotificationView* stale,
+	NotificationView* fresh)
+{
+	views_t::iterator it = find(fViews.begin(), fViews.end(), stale);
+
+	if (it != fViews.end())
+		*it = fresh;
 }
 
 
 void
 NotificationWindow::SetPosition()
 {
+	Layout(true);
+
 	BRect bounds = DecoratorFrame();
 	float width = Bounds().Width() + 1;
 	float height = Bounds().Height() + 1;
-	
+
 	float leftOffset = Frame().left - bounds.left;
-	float topOffset = Frame().top - bounds.top;
+	float topOffset = Frame().top - bounds.top + 1;
 	float rightOffset = bounds.right - Frame().right;
 	float bottomOffset = bounds.bottom - Frame().bottom;
 		// Size of the borders around the window
@@ -370,27 +367,27 @@ NotificationWindow::SetPosition()
 		case B_DESKBAR_TOP:
 			// Put it just under, top right corner
 			y = frame.bottom + topOffset;
-			x = frame.right - width - rightOffset;
+			x = frame.right - width + rightOffset;
 			break;
 		case B_DESKBAR_BOTTOM:
 			// Put it just above, lower left corner
 			y = frame.top - height - bottomOffset;
-			x = frame.right - width - rightOffset;
+			x = frame.right - width + rightOffset;
 			break;
 		case B_DESKBAR_RIGHT_TOP:
 			x = frame.left - width - rightOffset;
-			y = frame.top + topOffset;
+			y = frame.top - topOffset + 1;
 			break;
 		case B_DESKBAR_LEFT_TOP:
 			x = frame.right + leftOffset;
-			y = frame.top + topOffset;
+			y = frame.top - topOffset + 1;
 			break;
 		case B_DESKBAR_RIGHT_BOTTOM:
-			y = frame.bottom - height - bottomOffset;
+			y = frame.bottom - height + bottomOffset;
 			x = frame.left - width - rightOffset;
 			break;
 		case B_DESKBAR_LEFT_BOTTOM:
-			y = frame.bottom - height - bottomOffset;
+			y = frame.bottom - height + bottomOffset;
 			x = frame.right + leftOffset;
 			break;
 		default:
@@ -398,16 +395,6 @@ NotificationWindow::SetPosition()
 	}
 
 	MoveTo(x, y);
-}
-
-void
-NotificationWindow::PopupAnimation()
-{
-	SetPosition();
-
-	if (IsHidden())
-		Show();
-	// Activate();// it hides floaters from apps :-(
 }
 
 
@@ -460,6 +447,7 @@ NotificationWindow::_LoadAppFilters(bool startMonitor)
 			BAlert* alert = new BAlert(B_TRANSLATE("Warning"),
 					B_TRANSLATE("Couldn't start filter monitor."
 						" Live filter changes disabled."), B_TRANSLATE("Darn."));
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 		}
 	}
@@ -485,13 +473,6 @@ NotificationWindow::_SaveAppFilters()
 		settings.AddFlat("app_usage", fIt->second);
 
 	settings.Flatten(&file);
-}
-
-
-void NotificationWindow::Show()
-{
-	BWindow::Show();
-	SetPosition();
 }
 
 
@@ -531,6 +512,7 @@ NotificationWindow::_LoadGeneralSettings(bool startMonitor)
 			BAlert* alert = new BAlert(B_TRANSLATE("Warning"),
 						B_TRANSLATE("Couldn't start general settings monitor.\n"
 						"Live filter changes disabled."), B_TRANSLATE("OK"));
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 		}
 	}
@@ -558,6 +540,8 @@ NotificationWindow::_LoadDisplaySettings(bool startMonitor)
 
 	if (settings.FindFloat(kWidthName, &fWidth) != B_OK)
 		fWidth = kDefaultWidth;
+	GetLayout()->SetExplicitMaxSize(BSize(fWidth, B_SIZE_UNSET));
+	GetLayout()->SetExplicitMinSize(BSize(fWidth, B_SIZE_UNSET));
 
 	if (settings.FindInt32(kIconSizeName, &setting) != B_OK)
 		fIconSize = kDefaultIconSize;
@@ -580,6 +564,7 @@ NotificationWindow::_LoadDisplaySettings(bool startMonitor)
 			BAlert* alert = new BAlert(B_TRANSLATE("Warning"),
 				B_TRANSLATE("Couldn't start display settings monitor.\n"
 					"Live filter changes disabled."), B_TRANSLATE("OK"));
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 		}
 	}

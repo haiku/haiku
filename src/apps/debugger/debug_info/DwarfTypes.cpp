@@ -1,5 +1,6 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copryight 2012-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -10,6 +11,7 @@
 
 #include "Architecture.h"
 #include "ArrayIndexPath.h"
+#include "CompilationUnit.h"
 #include "Dwarf.h"
 #include "DwarfFile.h"
 #include "DwarfTargetInterface.h"
@@ -161,6 +163,14 @@ DwarfTypeContext::~DwarfTypeContext()
 }
 
 
+uint8
+DwarfTypeContext::AddressSize() const
+{
+	return fCompilationUnit != NULL ? fCompilationUnit->AddressSize()
+		: fArchitecture->AddressSize();
+}
+
+
 // #pragma mark - DwarfType
 
 
@@ -222,6 +232,65 @@ target_size_t
 DwarfType::ByteSize() const
 {
 	return fByteSize;
+}
+
+
+status_t
+DwarfType::CreateDerivedAddressType(address_type_kind addressType,
+	AddressType*& _resultType)
+{
+	DwarfAddressType* resultType = new(std::nothrow)
+		DwarfAddressType(fTypeContext, fName, NULL, addressType, this);
+
+	if (resultType == NULL)
+		return B_NO_MEMORY;
+
+	resultType->SetByteSize(fTypeContext->GetArchitecture()->AddressSize());
+
+	_resultType = resultType;
+	return B_OK;
+}
+
+
+status_t
+DwarfType::CreateDerivedArrayType(int64 lowerBound, int64 elementCount,
+	bool extendExisting, ArrayType*& _resultType)
+{
+	DwarfArrayType* resultType = NULL;
+	BReference<DwarfType> baseTypeReference;
+	if (extendExisting)
+		resultType = dynamic_cast<DwarfArrayType*>(this);
+
+	if (resultType == NULL) {
+		resultType = new(std::nothrow)
+			DwarfArrayType(fTypeContext, fName, NULL, this);
+		baseTypeReference.SetTo(resultType, true);
+	}
+
+	if (resultType == NULL)
+		return B_NO_MEMORY;
+
+	DwarfSubrangeType* subrangeType = new(std::nothrow) DwarfSubrangeType(
+		fTypeContext, fName, NULL, resultType, BVariant(lowerBound),
+		BVariant(lowerBound + elementCount - 1));
+	if (subrangeType == NULL)
+		return B_NO_MEMORY;
+
+	BReference<DwarfSubrangeType> subrangeReference(subrangeType, true);
+
+	DwarfArrayDimension* dimension = new(std::nothrow) DwarfArrayDimension(
+		subrangeType);
+	if (dimension == NULL)
+		return B_NO_MEMORY;
+	BReference<DwarfArrayDimension> dimensionReference(dimension, true);
+
+	if (!resultType->AddDimension(dimension))
+		return B_NO_MEMORY;
+
+	baseTypeReference.Detach();
+
+	_resultType = resultType;
+	return B_OK;
 }
 
 
@@ -294,11 +363,11 @@ DwarfType::ResolveLocation(DwarfTypeContext* typeContext,
 	bool hasObjectAddress, ValueLocation& _location)
 {
 	status_t error = typeContext->File()->ResolveLocation(
-		typeContext->GetCompilationUnit(), typeContext->SubprogramEntry(),
-		description, typeContext->TargetInterface(),
-		typeContext->InstructionPointer(), objectAddress, hasObjectAddress,
-		typeContext->FramePointer(), typeContext->RelocationDelta(),
-		_location);
+		typeContext->GetCompilationUnit(), typeContext->AddressSize(),
+		typeContext->SubprogramEntry(), description,
+		typeContext->TargetInterface(), typeContext->InstructionPointer(),
+		objectAddress, hasObjectAddress, typeContext->FramePointer(),
+		typeContext->RelocationDelta(), _location);
 	if (error != B_OK)
 		return error;
 
@@ -346,7 +415,8 @@ DwarfType::ResolveLocation(DwarfTypeContext* typeContext,
 				// TODO: Use bit size and bit offset, if specified!
 			_location.SetPieceAt(0, piece);
 
-			TRACE_LOCALS("  set single piece size to %llu\n", ByteSize());
+			TRACE_LOCALS("  set single piece size to %" B_PRIu64 "\n",
+				ByteSize());
 		}
 	}
 
@@ -501,6 +571,45 @@ DwarfFunctionParameter::GetType() const
 }
 
 
+// #pragma mark - DwarfTemplateParameter
+
+
+DwarfTemplateParameter::DwarfTemplateParameter(DebugInfoEntry* entry,
+	DwarfType* type)
+	:
+	fEntry(entry),
+	fType(type)
+{
+	fType->AcquireReference();
+	DIETemplateTypeParameter* typeParameter
+		= dynamic_cast<DIETemplateTypeParameter *>(entry);
+	if (typeParameter != NULL)
+		fTemplateKind = TEMPLATE_TYPE_TYPE;
+	else {
+		DIETemplateValueParameter* valueParameter
+			= dynamic_cast<DIETemplateValueParameter *>(entry);
+		fTemplateKind = TEMPLATE_TYPE_VALUE;
+		const ConstantAttributeValue* constValue = valueParameter
+			->ConstValue();
+		switch (constValue->attributeClass) {
+			case ATTRIBUTE_CLASS_CONSTANT:
+				fValue.SetTo(constValue->constant);
+				break;
+			case ATTRIBUTE_CLASS_STRING:
+				fValue.SetTo(constValue->string);
+				break;
+			// TODO: ATTRIBUTE_CLASS_BLOCK_DATA
+		}
+	}
+}
+
+
+DwarfTemplateParameter::~DwarfTemplateParameter()
+{
+	fType->ReleaseReference();
+}
+
+
 // #pragma mark - DwarfPrimitiveType
 
 
@@ -532,9 +641,11 @@ DwarfPrimitiveType::TypeConstant() const
 
 
 DwarfCompoundType::DwarfCompoundType(DwarfTypeContext* typeContext,
-	const BString& name, DIECompoundType* entry)
+	const BString& name, DIECompoundType* entry,
+	compound_type_kind compoundKind)
 	:
 	DwarfType(typeContext, name, entry),
+	fCompoundKind(compoundKind),
 	fEntry(entry)
 {
 }
@@ -548,6 +659,18 @@ DwarfCompoundType::~DwarfCompoundType()
 	}
 	for (int32 i = 0; DwarfDataMember* member = fDataMembers.ItemAt(i); i++)
 		member->ReleaseReference();
+
+	for (int32 i = 0; DwarfTemplateParameter* parameter
+		= fTemplateParameters.ItemAt(i); i++) {
+		parameter->ReleaseReference();
+	}
+}
+
+
+compound_type_kind
+DwarfCompoundType::CompoundKind() const
+{
+	return fCompoundKind;
 }
 
 
@@ -576,6 +699,20 @@ DataMember*
 DwarfCompoundType::DataMemberAt(int32 index) const
 {
 	return fDataMembers.ItemAt(index);
+}
+
+
+int32
+DwarfCompoundType::CountTemplateParameters() const
+{
+	return fTemplateParameters.CountItems();
+}
+
+
+TemplateParameter*
+DwarfCompoundType::TemplateParameterAt(int32 index) const
+{
+	return fTemplateParameters.ItemAt(index);
 }
 
 
@@ -623,10 +760,10 @@ DwarfCompoundType::ResolveDataMemberLocation(DataMember* _member,
 	if (memberEntry->ByteSize()->IsValid()) {
 		BVariant value;
 		error = typeContext->File()->EvaluateDynamicValue(
-			typeContext->GetCompilationUnit(), typeContext->SubprogramEntry(),
-			memberEntry->ByteSize(), typeContext->TargetInterface(),
-			typeContext->InstructionPointer(), typeContext->FramePointer(),
-			value);
+			typeContext->GetCompilationUnit(), typeContext->AddressSize(),
+			typeContext->SubprogramEntry(), memberEntry->ByteSize(),
+			typeContext->TargetInterface(), typeContext->InstructionPointer(),
+			typeContext->FramePointer(), value);
 		if (error != B_OK)
 			return error;
 		byteSize = value.ToUInt64();
@@ -638,10 +775,10 @@ DwarfCompoundType::ResolveDataMemberLocation(DataMember* _member,
 	if (memberEntry->BitOffset()->IsValid()) {
 		BVariant value;
 		error = typeContext->File()->EvaluateDynamicValue(
-			typeContext->GetCompilationUnit(), typeContext->SubprogramEntry(),
-			memberEntry->BitOffset(), typeContext->TargetInterface(),
-			typeContext->InstructionPointer(), typeContext->FramePointer(),
-			value);
+			typeContext->GetCompilationUnit(), typeContext->AddressSize(),
+			typeContext->SubprogramEntry(), memberEntry->BitOffset(),
+			typeContext->TargetInterface(), typeContext->InstructionPointer(),
+			typeContext->FramePointer(), value);
 		if (error != B_OK)
 			return error;
 		bitOffset = value.ToUInt64();
@@ -652,17 +789,17 @@ DwarfCompoundType::ResolveDataMemberLocation(DataMember* _member,
 	if (memberEntry->BitSize()->IsValid()) {
 		BVariant value;
 		error = typeContext->File()->EvaluateDynamicValue(
-			typeContext->GetCompilationUnit(), typeContext->SubprogramEntry(),
-			memberEntry->BitSize(), typeContext->TargetInterface(),
-			typeContext->InstructionPointer(), typeContext->FramePointer(),
-			value);
+			typeContext->GetCompilationUnit(), typeContext->AddressSize(),
+			typeContext->SubprogramEntry(), memberEntry->BitSize(),
+			typeContext->TargetInterface(), typeContext->InstructionPointer(),
+			typeContext->FramePointer(), value);
 		if (error != B_OK)
 			return error;
 		bitSize = value.ToUInt64();
 	}
 
-	TRACE_LOCALS("bit field: byte size: %llu, bit offset/size: %llu/%llu\n",
-		byteSize, bitOffset, bitSize);
+	TRACE_LOCALS("bit field: byte size: %" B_PRIu64 ", bit offset/size: %"
+		B_PRIu64 "/%" B_PRIu64 "\n", byteSize, bitOffset, bitSize);
 
 	if (bitOffset + bitSize > byteSize * 8)
 		return B_BAD_VALUE;
@@ -706,6 +843,17 @@ DwarfCompoundType::AddDataMember(DwarfDataMember* member)
 		return false;
 
 	member->AcquireReference();
+	return true;
+}
+
+
+bool
+DwarfCompoundType::AddTemplateParameter(DwarfTemplateParameter* parameter)
+{
+	if (!fTemplateParameters.AddItem(parameter))
+		return false;
+
+	parameter->AcquireReference();
 	return true;
 }
 
@@ -845,14 +993,15 @@ DwarfArrayType::ResolveElementLocation(const ArrayIndexPath& indexPath,
 	// If the array entry has a bit stride, get it. Otherwise fall back to the
 	// element type size.
 	int64 bitStride;
-	if (DIEArrayType* bitStrideOwnerEntry = DwarfUtils::GetDIEByPredicate(
-			fEntry, HasBitStridePredicate<DIEArrayType>())) {
+	DIEArrayType* bitStrideOwnerEntry = NULL;
+	if (fEntry != NULL && (bitStrideOwnerEntry = DwarfUtils::GetDIEByPredicate(
+			fEntry, HasBitStridePredicate<DIEArrayType>()))) {
 		BVariant value;
 		status_t error = typeContext->File()->EvaluateDynamicValue(
-			typeContext->GetCompilationUnit(), typeContext->SubprogramEntry(),
-			bitStrideOwnerEntry->BitStride(), typeContext->TargetInterface(),
-			typeContext->InstructionPointer(), typeContext->FramePointer(),
-			value);
+			typeContext->GetCompilationUnit(), typeContext->AddressSize(),
+			typeContext->SubprogramEntry(), bitStrideOwnerEntry->BitStride(),
+			typeContext->TargetInterface(), typeContext->InstructionPointer(),
+			typeContext->FramePointer(), value);
 		if (error != B_OK)
 			return error;
 		if (!value.IsInteger())
@@ -885,6 +1034,7 @@ DwarfArrayType::ResolveElementLocation(const ArrayIndexPath& indexPath,
 				BVariant value;
 				status_t error = typeContext->File()->EvaluateDynamicValue(
 					typeContext->GetCompilationUnit(),
+					typeContext->AddressSize(),
 					typeContext->SubprogramEntry(),
 					bitStrideOwnerEntry->BitStride(),
 					typeContext->TargetInterface(),
@@ -903,6 +1053,7 @@ DwarfArrayType::ResolveElementLocation(const ArrayIndexPath& indexPath,
 					BVariant value;
 					status_t error = typeContext->File()->EvaluateDynamicValue(
 						typeContext->GetCompilationUnit(),
+						typeContext->AddressSize(),
 						typeContext->SubprogramEntry(),
 						byteStrideOwnerEntry->ByteStride(),
 						typeContext->TargetInterface(),
@@ -933,8 +1084,8 @@ DwarfArrayType::ResolveElementLocation(const ArrayIndexPath& indexPath,
 		// doesn't have a stride and the previous dimension's element count is
 		// not known), we can only resolve the first element.
 		if (dimensionStride == 0 && index != 0) {
-			WARNING("No dimension bit stride for dimension %ld and element "
-				"index is not 0.\n", dimensionIndex);
+			WARNING("No dimension bit stride for dimension %" B_PRId32 " and "
+				"element index is not 0.\n", dimensionIndex);
 			return B_BAD_VALUE;
 		}
 
@@ -944,7 +1095,7 @@ DwarfArrayType::ResolveElementLocation(const ArrayIndexPath& indexPath,
 		previousDimensionStride = dimensionStride;
 	}
 
-	TRACE_LOCALS("total element bit offset: %lld\n", elementOffset);
+	TRACE_LOCALS("total element bit offset: %" B_PRId64 "\n", elementOffset);
 
 	// create the value location object for the element
 	ValueLocation* location = new(std::nothrow) ValueLocation(

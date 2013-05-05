@@ -8,13 +8,15 @@
 #include <errno.h>
 #include <unistd.h>
 
+#include <errno_private.h>
+
 
 int
 chroot(const char *path)
 {
 	status_t error = _kern_change_root(path);
 	if (error != B_OK) {
-		errno = error;
+		__set_errno(error);
 		return -1;
 	}
 

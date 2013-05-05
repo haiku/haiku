@@ -219,8 +219,10 @@ ServerApp::_LaunchAddOnServer()
 	if (err == B_OK)
 		return;
 
-	(new BAlert("media_server", "Launching media_addon_server failed.\n\n"
-		"media_server will terminate", "OK"))->Go();
+	BAlert* alert = new BAlert("media_server", "Launching media_addon_server "
+		"failed.\n\nmedia_server will terminate", "OK");
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 	fprintf(stderr, "Launching media_addon_server (%s) failed: %s\n",
 		B_MEDIA_ADDON_SERVER_SIGNATURE, strerror(err));
 	exit(1);

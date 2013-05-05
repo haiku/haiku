@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -27,6 +28,7 @@ BreakpointsView::BreakpointsView(Team* team, Listener* listener)
 	BGroupView(B_HORIZONTAL, 4.0f),
 	fTeam(team),
 	fBreakpoint(NULL),
+	fWatchpoint(NULL),
 	fListView(NULL),
 	fToggleBreakpointButton(NULL),
 	fRemoveBreakpointButton(NULL),
@@ -67,20 +69,26 @@ BreakpointsView::UnsetListener()
 
 
 void
-BreakpointsView::SetBreakpoint(UserBreakpoint* breakpoint)
+BreakpointsView::SetBreakpoint(UserBreakpoint* breakpoint, Watchpoint* watchpoint)
 {
-	if (breakpoint == fBreakpoint)
+	if (breakpoint == fBreakpoint && watchpoint == fWatchpoint)
 		return;
+
+	if (fWatchpoint != NULL)
+		fWatchpoint->ReleaseReference();
 
 	if (fBreakpoint != NULL)
 		fBreakpoint->ReleaseReference();
 
+	fWatchpoint = watchpoint;
 	fBreakpoint = breakpoint;
 
 	if (fBreakpoint != NULL)
 		fBreakpoint->AcquireReference();
+	else if (fWatchpoint != NULL)
+		fWatchpoint->AcquireReference();
 
-	fListView->SetBreakpoint(breakpoint);
+	fListView->SetBreakpoint(breakpoint, watchpoint);
 
 	_UpdateButtons();
 }
@@ -96,20 +104,48 @@ BreakpointsView::UserBreakpointChanged(UserBreakpoint* breakpoint)
 
 
 void
+BreakpointsView::WatchpointChanged(Watchpoint* watchpoint)
+{
+	fListView->WatchpointChanged(watchpoint);
+
+	_UpdateButtons();
+}
+
+
+void
 BreakpointsView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MSG_ENABLE_BREAKPOINT:
-			if (fListener != NULL && fBreakpoint != NULL)
-				fListener->SetBreakpointEnabledRequested(fBreakpoint, true);
+			if (fListener != NULL) {
+				if (fBreakpoint != NULL) {
+					fListener->SetBreakpointEnabledRequested(fBreakpoint,
+						true);
+				} else if (fWatchpoint != NULL) {
+					fListener->SetWatchpointEnabledRequested(fWatchpoint,
+						true);
+				}
+			}
 			break;
 		case MSG_DISABLE_BREAKPOINT:
-			if (fListener != NULL && fBreakpoint != NULL)
-				fListener->SetBreakpointEnabledRequested(fBreakpoint, false);
+			if (fListener != NULL) {
+				if (fBreakpoint != NULL) {
+					fListener->SetBreakpointEnabledRequested(fBreakpoint,
+						false);
+				} else if (fWatchpoint != NULL) {
+					fListener->SetWatchpointEnabledRequested(fWatchpoint,
+						false);
+				}
+			}
 			break;
 		case MSG_CLEAR_BREAKPOINT:
-			if (fListener != NULL && fBreakpoint != NULL)
-				fListener->ClearBreakpointRequested(fBreakpoint);
+			if (fListener != NULL) {
+				if (fBreakpoint != NULL) {
+					fListener->ClearBreakpointRequested(fBreakpoint);
+				} else if (fWatchpoint != NULL) {
+					fListener->ClearWatchpointRequested(fWatchpoint);
+				}
+			}
 			break;
 		default:
 			BGroupView::MessageReceived(message);
@@ -127,10 +163,42 @@ BreakpointsView::AttachedToWindow()
 
 
 void
+BreakpointsView::LoadSettings(const BMessage& settings)
+{
+	BMessage breakpointListSettings;
+	if (settings.FindMessage("breakpointList", &breakpointListSettings)
+		== B_OK)
+		fListView->LoadSettings(breakpointListSettings);
+}
+
+
+status_t
+BreakpointsView::SaveSettings(BMessage& settings)
+{
+	BMessage breakpointListSettings;
+	if (fListView->SaveSettings(breakpointListSettings) != B_OK)
+		return B_NO_MEMORY;
+
+	if (settings.AddMessage("breakpointList", &breakpointListSettings) != B_OK)
+		return B_NO_MEMORY;
+
+	return B_OK;
+}
+
+
+void
 BreakpointsView::BreakpointSelectionChanged(UserBreakpoint* breakpoint)
 {
 	if (fListener != NULL)
 		fListener->BreakpointSelectionChanged(breakpoint);
+}
+
+
+void
+BreakpointsView::WatchpointSelectionChanged(Watchpoint* watchpoint)
+{
+	if (fListener != NULL)
+		fListener->WatchpointSelectionChanged(watchpoint);
 }
 
 
@@ -157,8 +225,19 @@ BreakpointsView::_UpdateButtons()
 {
 	AutoLocker<Team> teamLocker(fTeam);
 
+	bool enabled = false;
+	bool valid = false;
+
 	if (fBreakpoint != NULL && fBreakpoint->IsValid()) {
-		if (fBreakpoint->IsEnabled()) {
+		valid = true;
+		enabled = fBreakpoint->IsEnabled();
+	} else if (fWatchpoint != NULL) {
+		valid = true;
+		enabled = fWatchpoint->IsEnabled();
+	}
+
+	if (valid) {
+		if (enabled) {
 			fToggleBreakpointButton->SetLabel("Disable");
 			fToggleBreakpointButton->SetMessage(
 				new BMessage(MSG_DISABLE_BREAKPOINT));

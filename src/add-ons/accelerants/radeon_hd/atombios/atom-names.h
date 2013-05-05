@@ -21,11 +21,12 @@
  *
  * Author: Stanislaw Skowronek
  */
-
 #ifndef ATOM_NAMES_H
 #define ATOM_NAMES_H
 
+
 #include "atom.h"
+
 
 #define ATOM_OP_NAMES_CNT 123
 const char *atom_op_names[ATOM_OP_NAMES_CNT] = {
@@ -53,7 +54,7 @@ const char *atom_op_names[ATOM_OP_NAMES_CNT] = {
 "DEBUG", "CTB_DS",
 };
 
-#define ATOM_TABLE_NAMES_CNT 74
+#define ATOM_TABLE_NAMES_CNT 80
 const char *atom_table_names[ATOM_TABLE_NAMES_CNT] = {
 "ASIC_Init", "GetDisplaySurfaceSize", "ASIC_RegistersInit",
 "VRAM_BlockVenderDetection", "SetClocksRatio", "MemoryControllerInit",
@@ -79,7 +80,9 @@ const char *atom_table_names[ATOM_TABLE_NAMES_CNT] = {
 "VRAM_GetCurrentInfoBlock", "DynamicMemorySettings", "MemoryTraining",
 "EnableLVDS_SS", "DFP1OutputControl", "SetVoltage", "CRT1OutputControl",
 "CRT2OutputControl", "SetupHWAssistedI2CStatus", "ClockSource",
-"MemoryDeviceInit", "EnableYUV",
+"MemoryDeviceInit", "EnableYUV", "DIG1EncoderControl", "DIG2EncoderControl",
+"DIG1TransmitterControl (UNIPHY)", "DIG2TransmitterControl (LVTMA)",
+"ProcessAuxChannelTransaction", "DPEncoderService",
 };
 
 #define ATOM_IO_NAMES_CNT 5

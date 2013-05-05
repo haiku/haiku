@@ -55,8 +55,6 @@ main(int argc, char** argv)
 			case 'c':	// --check-only
 				checkOnly = true;
 				break;
-			case -1:	// done with options
-				break;
 			default:	// everything else
 				usage(stderr);
 				return 1;

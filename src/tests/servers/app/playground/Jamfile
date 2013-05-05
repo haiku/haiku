@@ -11,7 +11,7 @@ Application Playground :
 	ObjectView.cpp
 	ObjectWindow.cpp
 	States.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: Playground.rdef
 ;
 
@@ -20,3 +20,10 @@ if ( $(TARGET_PLATFORM) = libbe_test ) {
 		: tests!apps ;
 }
 
+DoCatalogs Playground :
+    x-vnd.Haiku-Playground
+    :
+    main.cpp
+    ObjectView.cpp
+    ObjectWindow.cpp
+;

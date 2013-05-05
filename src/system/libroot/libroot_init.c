@@ -24,6 +24,8 @@ struct rld_export *__gRuntimeLoader = NULL;
 	// This little bugger is set to something meaningful by the runtime loader
 	// Ugly, eh?
 
+const void* __gCommPageAddress;
+
 char *__progname = NULL;
 int __libc_argc;
 char **__libc_argv;
@@ -44,6 +46,8 @@ void
 initialize_before(image_id imageID)
 {
 	char *programPath = __gRuntimeLoader->program_args->args[0];
+	__gCommPageAddress = __gRuntimeLoader->commpage_address;
+
 	if (programPath) {
 		if ((__progname = strrchr(programPath, '/')) == NULL)
 			__progname = programPath;
@@ -62,7 +66,7 @@ initialize_before(image_id imageID)
 
 	pthread_self()->id = find_thread(NULL);
 
-	__init_time();
+	__init_time((addr_t)__gCommPageAddress);
 	__init_heap();
 	__init_env(__gRuntimeLoader->program_args);
 	__init_heap_post_env();

@@ -27,8 +27,8 @@
 #include "PrinterListView.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "TestPageView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "TestPageView"
 
 
 // #pragma mark LeafView

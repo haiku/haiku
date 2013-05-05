@@ -1,14 +1,14 @@
 1	russian	x-vnd.Haiku-CDPlayer	592310631
-Audio CD	CDPlayer		Аудио CD
-CD	CDPlayer		CD
-CD drive is empty	CDPlayer		CD-привод пуст
 CDPlayer	System name		CD плеер
+CD	CDPlayer		CD
 Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		Диск: %ld:%.2ld / %ld:%.2ld
-Disc: --:-- / --:--	CDPlayer		Диск: --:-- / --:--
-Disc: 88:88 / 88:88	CDPlayer		Диск: 88:88 / 88:88
-It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Похоже, что на вашем компьютере отсутствуют CD-приводы или он не поддерживается системой. Извините.
 OK	CDPlayer		ОК
 Track %whichTrack%: %trackAt%	CDPlayer		Трек %whichTrack%: %trackAt%
+Audio CD	CDPlayer		Аудио CD
+It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Похоже, что на вашем компьютере отсутствуют CD-приводы или он не поддерживается системой. Извините.
 Track: %ld:%.2ld / %ld:%.2ld	CDPlayer		Трек: %ld:%.2ld / %ld:%.2ld
-Track: --:-- / --:--	CDPlayer		Дорожка: --:-- / --:--
 Track: 88:88 / 88:88	CDPlayer		Трек: 88:88 / 88:88
+Track: --:-- / --:--	CDPlayer		Дорожка: --:-- / --:--
+Disc: 88:88 / 88:88	CDPlayer		Диск: 88:88 / 88:88
+Disc: --:-- / --:--	CDPlayer		Диск: --:-- / --:--
+CD drive is empty	CDPlayer		CD-привод пуст

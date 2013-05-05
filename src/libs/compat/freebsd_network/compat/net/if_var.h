@@ -610,14 +610,14 @@ __unused static void	ifa_free(struct ifaddr *ifa) {}
 __unused static void	ifa_init(struct ifaddr *ifa) {}
 __unused static void	ifa_ref(struct ifaddr *ifa) {}
 
-extern	struct mtx ifnet_lock;
-#define	IFNET_LOCK_INIT()
-#define	IFNET_WLOCK()			mtx_lock(&ifnet_lock)
-#define	IFNET_WUNLOCK()			mtx_unlock(&ifnet_lock)
-#define	IFNET_RLOCK()			IFNET_WLOCK()
-#define	IFNET_RLOCK_NOSLEEP()	IFNET_WLOCK()
-#define	IFNET_RUNLOCK()			IFNET_WUNLOCK()
-#define	IFNET_RUNLOCK_NOSLEEP()	IFNET_WUNLOCK()
+extern	struct rw_lock ifnet_rwlock;
+#define	IFNET_LOCK_INIT()		rw_lock_init(&ifnet_rwlock, "ifnet rwlock")
+#define	IFNET_WLOCK()			rw_lock_write_lock(&ifnet_rwlock)
+#define	IFNET_WUNLOCK()			rw_lock_write_unlock(&ifnet_rwlock)
+#define	IFNET_RLOCK()			rw_lock_read_lock(&ifnet_rwlock)
+#define	IFNET_RLOCK_NOSLEEP()	rw_lock_read_lock(&ifnet_rwlock)
+#define	IFNET_RUNLOCK()			rw_lock_read_unlock(&ifnet_rwlock)
+#define	IFNET_RUNLOCK_NOSLEEP()	rw_lock_read_unlock(&ifnet_rwlock)
 
 struct ifnet	*ifnet_byindex(u_short idx);
 struct ifnet	*ifnet_byindex_locked(u_short idx);

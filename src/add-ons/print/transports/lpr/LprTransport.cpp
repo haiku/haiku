@@ -129,6 +129,7 @@ LprTransport::_SendFile()
 	catch (LPSException &err) {
 		DBGMSG(("error: %s\n", err.what()));
 		BAlert *alert = new BAlert("", err.what(), "OK");
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 	}
 }

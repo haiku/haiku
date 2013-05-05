@@ -33,13 +33,15 @@ holders.
 All rights reserved.
 */
 
-#include <Debug.h>
+
+#include "StatusViewShelf.h"
+
 #include <stdio.h>
 #include <string.h>
 
+#include <Debug.h>
 #include <InterfaceDefs.h>
 
-#include "StatusViewShelf.h"
 #include "StatusView.h"
 
 
@@ -137,4 +139,3 @@ void
 TReplicantShelf::ReplicantDeleted(int32, const BMessage*, const BView*)
 {
 }
-

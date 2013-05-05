@@ -19,8 +19,8 @@
 #include "RTF.h"
 #include "RTFTranslator.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "main"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "main"
 
 
 int
@@ -57,7 +57,7 @@ main(int argc, char** argv)
 			convert_to_plain_text(header, output);
 		}
 
-		return 1;
+		return result;
 	}
 
 	BApplication app("application/x-vnd.Haiku-RTFTranslator");

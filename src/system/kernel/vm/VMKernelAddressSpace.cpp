@@ -151,7 +151,7 @@ VMKernelAddressSpace::CreateArea(const char* name, uint32 wiring,
 void
 VMKernelAddressSpace::DeleteArea(VMArea* _area, uint32 allocationFlags)
 {
-	TRACE("VMKernelAddressSpace::DeleteArea(%p)\n", area);
+	TRACE("VMKernelAddressSpace::DeleteArea(%p)\n", _area);
 
 	VMKernelArea* area = static_cast<VMKernelArea*>(_area);
 	object_cache_delete(fAreaObjectCache, area);

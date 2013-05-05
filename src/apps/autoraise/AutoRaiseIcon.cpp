@@ -542,6 +542,7 @@ void TrayView::MessageReceived(BMessage* message)
 			alert = new BAlert("about box", "AutoRaise, (c) 2002, mmu_man\nEnjoy :-)", "OK", NULL, NULL,
                 B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_INFO_ALERT);
 	        alert->SetShortcut(0, B_ENTER);
+	        alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
     	    alert->Go(NULL); // use asynchronous version
 			break;
 		case OPEN_SETTINGS:

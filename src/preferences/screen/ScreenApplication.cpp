@@ -19,8 +19,8 @@
 #include <Catalog.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Screen"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Screen"
 
 
 static const char* kAppSignature = "application/x-vnd.Haiku-Screen";
@@ -40,7 +40,7 @@ ScreenApplication::AboutRequested()
 	BAlert *aboutAlert = new BAlert(B_TRANSLATE("About"),
 		B_TRANSLATE("Screen preferences by the Haiku team"), B_TRANSLATE("OK"),
 		NULL, NULL, B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_INFO_ALERT);
-	aboutAlert->SetShortcut(0, B_OK);
+	aboutAlert->SetFlags(aboutAlert->Flags() | B_CLOSE_ON_ESCAPE);
 	aboutAlert->Go();
 }
 
@@ -51,11 +51,11 @@ ScreenApplication::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case SET_CUSTOM_REFRESH_MSG:
 		case MAKE_INITIAL_MSG:
-			fScreenWindow->PostMessage(message);	
+			fScreenWindow->PostMessage(message);
 			break;
 
 		default:
-			BApplication::MessageReceived(message);			
+			BApplication::MessageReceived(message);
 			break;
 	}
 }

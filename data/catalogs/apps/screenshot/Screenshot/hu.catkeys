@@ -1,0 +1,27 @@
+1	hungarian	x-vnd.haiku-screenshot	1721618877
+seconds	ScreenshotWindow		másodperc
+Desktop	ScreenshotWindow		Asztal
+Include window border	ScreenshotWindow		Az ablak keretének belefoglalása a képbe
+Screenshot	System name		Képernyőkép
+Select	ScreenshotWindow		Kiválasztás
+Capture active window	ScreenshotWindow		Kép az aktív ablakról
+Cancel	ScreenshotWindow		Mégse
+Name:	ScreenshotWindow		Név:
+Choose folder	ScreenshotWindow		Mappa kiválasztása
+Save	ScreenshotWindow		Mentés
+Overwrite	ScreenshotWindow		Felülírás
+Choose folder...	ScreenshotWindow		Mappa kiválasztása…
+Please select	ScreenshotWindow		Kérjük válasszon
+Save as:	ScreenshotWindow		Formátum:
+Copy to clipboard	ScreenshotWindow		Másolás a vágólapra
+Save in:	ScreenshotWindow		Mentés ide:
+screenshot	Screenshot	Base filename of screenshot files	képernyőkép
+New screenshot	ScreenshotWindow		Új képernyőkép
+Artwork folder	ScreenshotWindow		Artwork mappa
+Home folder	ScreenshotWindow		Saját mappa
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Ez a fájl már létezik.\n Biztos felül kívánja írni?
+Settings…	ScreenshotWindow		Beállítások…
+overwrite	ScreenshotWindow		felülírás
+Delay:	ScreenshotWindow		Késleltetés:
+Include mouse pointer	ScreenshotWindow		Az egérkurzor belefoglalása a képbe
+Translator Settings	ScreenshotWindow		Fordító beállítások

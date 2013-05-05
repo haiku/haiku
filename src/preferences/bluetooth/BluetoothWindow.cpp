@@ -20,8 +20,8 @@
 #include "defs.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Window"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Window"
 
 static const uint32 kMsgSetDefaults = 'dflt';
 static const uint32 kMsgRevert = 'rvrt';
@@ -88,7 +88,6 @@ BluetoothWindow::BluetoothWindow(BRect frame)
 	tabView->AddTab(fRemoteDevices);
 //	tabView->AddTab(fConnChan);
 	tabView->AddTab(fSettingsView);
-
 
 	fRevertButton->SetEnabled(false);
 

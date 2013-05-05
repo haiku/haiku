@@ -1,0 +1,34 @@
+1	russian	x-vnd.Haiku-hmulti_audio.media_addon	451057402
+Master	MultiAudio		Главный
+SPDIF	MultiAudio		SPDIF
+Gain	MultiAudio		Громкость
+Output 3D center	MultiAudio		Центр 3D выхода
+Extended Setup	MultiAudio		Расширенная настройка
+CD	MultiAudio		CD
+Tone control	MultiAudio		Управление тоном
+Phone	MultiAudio		Телефон
+Aux	MultiAudio		Вспомогательный
+Output bass	MultiAudio		Выход баса
+Headphones	MultiAudio		Наушники
+Beep	MultiAudio		Сигнал
+Output mono mix	MultiAudio		Выход моно микс
+Output stereo mix	MultiAudio		Выход стерео микс
+Input	MultiAudio		Вход
+Output treble	MultiAudio		Выход высоких
+Mono mix	MultiAudio		Моно микширование
+General	MultiAudio		Общие
+Input & Output	MultiAudio		Вход и Выход
+Enhanced Setup	MultiAudio		Расщиренные настройки
+Stereo mix	MultiAudio		Стерео микширование
+Output 3D depth	MultiAudio		Выход 3D глубины
+Volume	MultiAudio		Громкость
+Output	MultiAudio		Выход
+Video	MultiAudio		Видео
+Line	MultiAudio		Линия
+Mic	MultiAudio		Микрофон
+ frequency:	MultiAudio		 частота:
+Enable	MultiAudio		Включить
+Mute	MultiAudio		Приглушить
+Wave	MultiAudio		Волна
+Setup	MultiAudio		Настройки
+Level	MultiAudio		Уровень

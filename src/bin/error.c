@@ -310,7 +310,6 @@ print_error(char *number)
 
 	if (end[0]) {
 		// not a number, check names
-		int i;
 		struct error_pair *p = kErrorNames;
 		while (p->name && strcmp(p->name, number))
 			p++;
@@ -321,7 +320,7 @@ print_error(char *number)
 		error = p->value;
 	}
 
-	printf("0x%lx: %s\n", error, strerror(error));
+	printf("0x%" B_PRIx32 ": %s\n", error, strerror(error));
 }
 
 

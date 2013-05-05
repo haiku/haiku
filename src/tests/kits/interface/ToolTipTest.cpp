@@ -1,13 +1,15 @@
 /*
- * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2009-2012, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include <Application.h>
 #include <Box.h>
+#include <GroupView.h>
 #include <LayoutBuilder.h>
 #include <MessageRunner.h>
+#include <String.h>
 #include <StringView.h>
 #include <Window.h>
 
@@ -18,9 +20,9 @@
 
 class CustomToolTip : public BToolTip {
 public:
-	CustomToolTip()
+	CustomToolTip(const char* text)
 	{
-		fView = new BStringView("", "Custom tool tip!");
+		fView = new BStringView("", text);
 		fView->SetFont(be_bold_font);
 		fView->SetHighColor(255, 0, 0);
 	}
@@ -176,6 +178,52 @@ public:
 };
 
 
+class PulseStringView : public BStringView {
+public:
+	PulseStringView(const char* name, const char* label)
+		:
+		BStringView(name, label, B_WILL_DRAW | B_PULSE_NEEDED)
+	{
+	}
+
+	virtual void Pulse()
+	{
+		char buffer[256];
+		time_t now = time(NULL);
+		strftime(buffer, sizeof(buffer), "%X", localtime(&now));
+		SetToolTip(buffer);
+	}
+};
+
+
+class PulseToolTipView : public BStringView {
+public:
+	PulseToolTipView(const char* name, const char* label)
+		:
+		BStringView(name, label, B_WILL_DRAW | B_PULSE_NEEDED),
+		fToolTip(NULL),
+		fCounter(0)
+	{
+	}
+
+	virtual void Pulse()
+	{
+		if (fToolTip != NULL)
+			fToolTip->ReleaseReference();
+
+		BString text;
+		text.SetToFormat("New tool tip every second! (%d)", fCounter++);
+
+		fToolTip = new CustomToolTip(text.String());
+		SetToolTip(fToolTip);
+	}
+
+private:
+			BToolTip*		fToolTip;
+			int				fCounter;
+};
+
+
 class Window : public BWindow {
 public:
 							Window();
@@ -204,22 +252,44 @@ Window::Window()
 	simple->SetToolTip("This is a really\nsimple tool tip!");
 
 	BView* custom = new BStringView("2", "Custom Tool Tip");
-	custom->SetToolTip(new CustomToolTip());
+	custom->SetToolTip(new CustomToolTip("Custom tool tip!"));
 
 	BView* changing = new BStringView("3", "Changing Tool Tip");
 	changing->SetToolTip(new ChangingToolTip());
 
-	BView* mouse = new BStringView("3", "Mouse Tool Tip (sticky)");
+	BView* mouse = new BStringView("4", "Mouse Tool Tip (sticky)");
 	mouse->SetToolTip(new MouseToolTip());
 
-	BView* immediate = new ImmediateView("3", "Immediate Tool Tip (sticky)");
+	BView* immediate = new ImmediateView("5", "Immediate Tool Tip (sticky)");
 
-	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.Add(simple)
-		.Add(custom)
-		.Add(changing)
-		.Add(mouse)
-		.Add(immediate);
+	BView* pulseString = new PulseStringView("pulseString",
+		"Periodically changing tool tip text");
+
+	BView* pulseToolTip = new PulseToolTipView("pulseToolTip",
+		"Periodically changing tool tip");
+
+	BGroupView* nested = new BGroupView();
+	nested->SetViewColor(50, 50, 90);
+	nested->GroupLayout()->SetInsets(30);
+	nested->SetToolTip("The outer view has a tool tip,\n"
+		"the inner one doesn't.");
+	nested->AddChild(new BGroupView("inner"));
+
+	BLayoutBuilder::Group<>(this, B_HORIZONTAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.AddGroup(B_VERTICAL)
+			.Add(simple)
+			.Add(custom)
+			.Add(changing)
+			.Add(mouse)
+			.Add(immediate)
+			.End()
+		.AddGroup(B_VERTICAL)
+			.Add(pulseString)
+			.Add(pulseToolTip)
+			.Add(nested);
+
+	SetPulseRate(1000000LL);
 }
 
 
@@ -235,7 +305,8 @@ Window::QuitRequested()
 
 
 Application::Application()
-	: BApplication("application/x-vnd.haiku-tooltiptest")
+	:
+	BApplication("application/x-vnd.haiku-tooltiptest")
 {
 }
 

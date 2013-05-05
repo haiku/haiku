@@ -56,13 +56,13 @@
 #define CONNECT FPRINTF
 #define WINDOW FPRINTF
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "RecorderWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "RecorderWindow"
 
 
 // default window positioning
 static const float MIN_WIDTH = 400.0f;
-static const float MIN_HEIGHT = 336.0f;
+static const float MIN_HEIGHT = 175.0f;
 static const float XPOS = 100.0f;
 static const float YPOS = 200.0f;
 
@@ -364,7 +364,7 @@ RecorderWindow::InitWindow()
 		fSoundList = new SoundListView(r, B_TRANSLATE("Sound List"),
 			B_FOLLOW_ALL);
 		fSoundList->SetSelectionMessage(new BMessage(SOUND_SELECTED));
-		fSoundList->SetViewColor(216, 216, 216);
+		fSoundList->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		BScrollView *scroller = new BScrollView("scroller", fSoundList,
 			B_FOLLOW_ALL, 0, false, true, B_FANCY_BORDER);
 		fBottomBox->AddChild(scroller);
@@ -374,43 +374,75 @@ RecorderWindow::InitWindow()
 		r.bottom -= 25;
 		r.InsetBy(10, 8);
 		r.top -= 1;
-		fFileInfoBox = new BBox(r, "fileinfo", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+		fFileInfoBox = new BBox(r, "fileinfo", B_FOLLOW_LEFT);
 		fFileInfoBox->SetLabel(B_TRANSLATE("File info"));
+
+		fFileInfoBox->SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
+
+		BFont font = be_plain_font;
+		font.SetSize(font.Size() * 0.92f);
+		font_height height;
+		font.GetHeight(&height);
+		float fontHeight = height.ascent + height.leading + height.descent;
 
 		r = fFileInfoBox->Bounds();
 		r.left = 8;
-		r.top = 13;
-		r.bottom = r.top + 15;
+		r.top = fontHeight + 6;
+		r.bottom = r.top + fontHeight + 3;
 		r.right -= 10;
 		fFilename = new BStringView(r, "filename", B_TRANSLATE("File name:"));
 		fFileInfoBox->AddChild(fFilename);
-		r.top += 13;
-		r.bottom = r.top + 15;
+		fFilename->SetFont(&font, B_FONT_SIZE);
+		fFilename->SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
+
+		r.top += fontHeight;
+		r.bottom = r.top + fontHeight + 3;
 		fFormat = new BStringView(r, "format", B_TRANSLATE("Format:"));
 		fFileInfoBox->AddChild(fFormat);
-		r.top += 13;
-		r.bottom = r.top + 15;
+		fFormat->SetFont(&font, B_FONT_SIZE);
+		fFormat->SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
+
+		r.top += fontHeight;
+		r.bottom = r.top + fontHeight + 3;
 		fCompression = new BStringView(r, "compression",
 			B_TRANSLATE("Compression:"));
 		fFileInfoBox->AddChild(fCompression);
-		r.top += 13;
-		r.bottom = r.top + 15;
+		fCompression->SetFont(&font, B_FONT_SIZE);
+		fCompression->SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
+
+		r.top += fontHeight;
+		r.bottom = r.top + fontHeight + 3;
 		fChannels = new BStringView(r, "channels", B_TRANSLATE("Channels:"));
 		fFileInfoBox->AddChild(fChannels);
-		r.top += 13;
-		r.bottom = r.top + 15;
+		fChannels->SetFont(&font, B_FONT_SIZE);
+		fChannels->SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
+
+		r.top += fontHeight;
+		r.bottom = r.top + fontHeight + 3;
 		fSampleSize = new BStringView(r, "samplesize",
 			B_TRANSLATE("Sample size:"));
 		fFileInfoBox->AddChild(fSampleSize);
-		r.top += 13;
-		r.bottom = r.top + 15;
+		fSampleSize->SetFont(&font, B_FONT_SIZE);
+		fSampleSize->SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
+
+		r.top += fontHeight;
+		r.bottom = r.top + fontHeight + 3;
 		fSampleRate = new BStringView(r, "samplerate",
 			B_TRANSLATE("Sample rate:"));
 		fFileInfoBox->AddChild(fSampleRate);
-		r.top += 13;
-		r.bottom = r.top + 15;
+		fSampleRate->SetFont(&font, B_FONT_SIZE);
+		fSampleRate->SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
+
+		r.top += fontHeight;
+		r.bottom = r.top + fontHeight + 3;
 		fDuration = new BStringView(r, "duration", B_TRANSLATE("Duration:"));
 		fFileInfoBox->AddChild(fDuration);
+		fDuration->SetFont(&font, B_FONT_SIZE);
+		fDuration->SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
+
+		fFileInfoBox->ResizeTo(fFileInfoBox->Frame().Width(),
+			r.bottom + fontHeight / 2.0f);
+		fDeployedHeight = MIN_HEIGHT + fFileInfoBox->Bounds().Height() + 40.0f;
 
 		//	Input selection lists all available physical inputs that produce
 		//	buffers with B_MEDIA_RAW_AUDIO format data.
@@ -425,7 +457,7 @@ RecorderWindow::InitWindow()
 		error = fRoster->GetDormantNodes(dni, &real_count, 0, &output_format,
 			0, B_BUFFER_PRODUCER | B_PHYSICAL_INPUT);
 		if (real_count > maxInputCount) {
-			WINDOW((stderr, "dropped %ld inputs\n", real_count - maxInputCount));
+			WINDOW((stderr, "dropped %" B_PRId32 " inputs\n", real_count - maxInputCount));
 			real_count = maxInputCount;
 		}
 		char selected_name[B_MEDIA_NAME_LENGTH] = "Default input";
@@ -451,12 +483,10 @@ RecorderWindow::InitWindow()
 		}
 
 		//	Create the actual widget
-		BRect frame(fBottomBox->Bounds());
-		r = frame;
-		r.left = 42;
-		r.right = (r.left + r.right) / 2;
-		r.InsetBy(10,10);
-		r.top = r.bottom - 18;
+		r = fFileInfoBox->Bounds();
+		r.top = r.bottom + 2;
+		r.bottom = r.top + 18;
+		r.InsetBy(10, 10);
 		fInputField = new BMenuField(r, "Input", B_TRANSLATE("Input:"), popup);
 		fInputField->SetDivider(fInputField->StringWidth(B_TRANSLATE("Input:"))
 			+ 4.0f);
@@ -465,9 +495,8 @@ RecorderWindow::InitWindow()
 		fBottomBox->AddChild(fFileInfoBox);
 
 		fBottomBox->Hide();
-		CalcSizes(Frame().Width(), MIN_HEIGHT-161);
-		ResizeTo(Frame().Width(), MIN_HEIGHT-161);
-
+		CalcSizes(MIN_WIDTH, MIN_HEIGHT);
+		ResizeTo(Frame().Width(), MIN_HEIGHT);
 
 		popup->Superitem()->SetLabel(selected_name);
 
@@ -551,12 +580,12 @@ RecorderWindow::MessageReceived(BMessage * message)
 	case VIEW_LIST:
 		if (fUpDownButton->Value() == B_CONTROL_ON) {
 			fBottomBox->Show();
-			CalcSizes(Frame().Width(), MIN_HEIGHT);
-			ResizeTo(Frame().Width(), MIN_HEIGHT);
+			CalcSizes(MIN_WIDTH, fDeployedHeight);
+			ResizeTo(Frame().Width(), fDeployedHeight);
 		} else {
 			fBottomBox->Hide();
-			CalcSizes(Frame().Width(), MIN_HEIGHT-161);
-			ResizeTo(Frame().Width(), MIN_HEIGHT-161);
+			CalcSizes(MIN_WIDTH, MIN_HEIGHT);
+			ResizeTo(Frame().Width(), MIN_HEIGHT);
 
 		}
 		break;
@@ -1143,10 +1172,12 @@ RecorderWindow::ErrorAlert(const char * action, status_t err)
 {
 	char msg[300];
 	if (err != B_OK)
-		sprintf(msg, "%s: %s. [%lx]", action, strerror(err), (int32) err);
+		sprintf(msg, "%s: %s. [%" B_PRIx32 "]", action, strerror(err), (int32) err);
 	else
 		sprintf(msg, "%s.", action);
-	(new BAlert("", msg, B_TRANSLATE("Stop")))->Go();
+	BAlert* alert = new BAlert("", msg, B_TRANSLATE("Stop"));
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+	alert->Go();
 }
 
 
@@ -1305,15 +1336,20 @@ RecorderWindow::RefsReceived(BMessage *msg)
 	}
 
 	if (countBad > 0 && countGood == 0) {
-		(new BAlert(B_TRANSLATE("Nothing to play"), B_TRANSLATE("None of the "
-			"files appear to be audio files"), B_TRANSLATE("OK"), NULL, NULL,
-			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
+		BAlert* alert = new BAlert(B_TRANSLATE("Nothing to play"),
+			B_TRANSLATE("None of the files appear to be audio files"),
+			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 	} else if (countGood > 0) {
-		if (countBad > 0)
-			(new BAlert(B_TRANSLATE("Invalid audio files"), B_TRANSLATE("Some "
-				"of the files don't appear to be audio files"),
+		if (countBad > 0) {
+			BAlert* alert = new BAlert(B_TRANSLATE("Invalid audio files"),
+			B_TRANSLATE("Some of the files don't appear to be audio files"),
 				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
-				B_WARNING_ALERT))->Go();
+				B_WARNING_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
+		}
 		fSoundList->Select(fSoundList->CountItems() - 1);
 	}
 }

@@ -43,11 +43,22 @@ using namespace BPrivate;
 #	define haiku_host_platform_write	haiku_freebsd_write
 #	define haiku_host_platform_readv	haiku_freebsd_readv
 #	define haiku_host_platform_writev	haiku_freebsd_writev
+#	define HAIKU_HOST_STAT_ATIM(x)		((x).st_atimespec)
+#	define HAIKU_HOST_STAT_MTIM(x)		((x).st_mtimespec)
+#elif defined(HAIKU_HOST_PLATFORM_DARWIN)
+#	define haiku_host_platform_read		read
+#	define haiku_host_platform_write	write
+#	define haiku_host_platform_readv	readv
+#	define haiku_host_platform_writev	writev
+#	define HAIKU_HOST_STAT_ATIM(x)		((x).st_atimespec)
+#	define HAIKU_HOST_STAT_MTIM(x)		((x).st_mtimespec)
 #else
 #	define haiku_host_platform_read		read
 #	define haiku_host_platform_write	write
 #	define haiku_host_platform_readv	readv
 #	define haiku_host_platform_writev	writev
+#	define HAIKU_HOST_STAT_ATIM(x)		((x).st_atim)
+#	define HAIKU_HOST_STAT_MTIM(x)		((x).st_mtim)
 #endif
 
 #define RETURN_AND_SET_ERRNO(err)			\
@@ -59,6 +70,129 @@ using namespace BPrivate;
 		}									\
 		return __result;					\
 	} while (0)
+
+
+#if defined(_HAIKU_BUILD_NO_FUTIMENS) || defined(_HAIKU_BUILD_NO_FUTIMENS)
+
+template<typename File>
+static int
+utimes_helper(File& file, const struct timespec times[2])
+{
+	if (times == NULL)
+		return file.SetTimes(NULL);
+
+	timeval timeBuffer[2];
+	timeBuffer[0].tv_sec = times[0].tv_sec;
+	timeBuffer[0].tv_usec = times[0].tv_nsec / 1000;
+	timeBuffer[1].tv_sec = times[1].tv_sec;
+	timeBuffer[1].tv_usec = times[1].tv_nsec / 1000;
+
+	if (times[0].tv_nsec == UTIME_OMIT || times[1].tv_nsec == UTIME_OMIT) {
+		struct stat st;
+		if (file.GetStat(st) != 0)
+			return -1;
+
+		if (times[0].tv_nsec == UTIME_OMIT && times[1].tv_nsec == UTIME_OMIT)
+			return 0;
+
+		if (times[0].tv_nsec == UTIME_OMIT) {
+			timeBuffer[0].tv_sec = st.st_atimespec.tv_sec;
+			timeBuffer[0].tv_usec = st.st_atimespec.tv_nsec / 1000;
+		}
+
+		if (times[1].tv_nsec == UTIME_OMIT) {
+			timeBuffer[1].tv_sec = st.st_mtimespec.tv_sec;
+			timeBuffer[1].tv_usec = st.st_mtimespec.tv_nsec / 1000;
+		}
+	}
+
+	if (times[0].tv_nsec == UTIME_NOW || times[1].tv_nsec == UTIME_NOW) {
+		timeval now;
+		gettimeofday(&now, NULL);
+
+		if (times[0].tv_nsec == UTIME_NOW)
+			timeBuffer[0] = now;
+
+		if (times[1].tv_nsec == UTIME_NOW)
+			timeBuffer[1] = now;
+	}
+
+	return file.SetTimes(timeBuffer);	
+}
+
+#endif	// _HAIKU_BUILD_NO_FUTIMENS || _HAIKU_BUILD_NO_FUTIMENS
+
+
+#ifdef _HAIKU_BUILD_NO_FUTIMENS
+
+struct FDFile {
+	FDFile(int fd)
+		:
+		fFD(fd)
+	{
+	}
+
+	int GetStat(struct stat& _st)
+	{
+		return fstat(fFD, &_st);
+	}
+
+	int SetTimes(const timeval times[2])
+	{
+		return futimes(fFD, times);
+	}
+
+private:
+	int fFD;
+};
+
+
+int
+futimens(int fd, const struct timespec times[2])
+{
+	FDFile file(fd);
+	return utimes_helper(file, times);
+}
+
+#endif	// _HAIKU_BUILD_NO_FUTIMENS
+
+#ifdef _HAIKU_BUILD_NO_UTIMENSAT
+
+struct FDPathFile {
+	FDPathFile(int fd, const char* path, int flag)
+		:
+		fFD(fd),
+		fPath(path),
+		fFlag(flag)
+	{
+	}
+
+	int GetStat(struct stat& _st)
+	{
+		return fstatat(fFD, fPath, &_st, fFlag);
+	}
+
+	int SetTimes(const timeval times[2])
+	{
+		// TODO: fFlag (AT_SYMLINK_NOFOLLOW) is not supported here!
+		return futimesat(fFD, fPath, times);
+	}
+
+private:
+	int			fFD;
+	const char*	fPath;
+	int			fFlag;
+};
+
+
+int
+utimensat(int fd, const char* path, const struct timespec times[2], int flag)
+{
+	FDPathFile file(fd, path, flag);
+	return utimes_helper(file, times);
+}
+
+#endif	// _HAIKU_BUILD_NO_UTIMENSAT
 
 
 static status_t get_path(dev_t device, ino_t node, const char *name,
@@ -1125,8 +1259,10 @@ _haiku_build_utimensat(int fd, const char* path, const struct timespec times[2],
 		|| times[1].tv_nsec == UTIME_NOW) {
 		timeval now;
 		gettimeofday(&now, NULL);
-		stat.st_atim.tv_sec = stat.st_mtim.tv_sec = now.tv_sec;
-		stat.st_atim.tv_nsec = stat.st_mtim.tv_nsec = now.tv_usec * 1000;
+		HAIKU_HOST_STAT_ATIM(stat).tv_sec
+			= HAIKU_HOST_STAT_MTIM(stat).tv_sec = now.tv_sec;
+		HAIKU_HOST_STAT_ATIM(stat).tv_nsec
+			= HAIKU_HOST_STAT_MTIM(stat).tv_nsec = now.tv_usec * 1000;
 	}
 
 	if (times != NULL) {
@@ -1139,7 +1275,7 @@ _haiku_build_utimensat(int fd, const char* path, const struct timespec times[2],
 					RETURN_AND_SET_ERRNO(EINVAL);
 			}
 
-			stat.st_atim = times[0];
+			HAIKU_HOST_STAT_ATIM(stat) = times[0];
 		}
 
 		// modified time
@@ -1151,7 +1287,7 @@ _haiku_build_utimensat(int fd, const char* path, const struct timespec times[2],
 					RETURN_AND_SET_ERRNO(EINVAL);
 			}
 
-			stat.st_mtim = times[1];
+			HAIKU_HOST_STAT_MTIM(stat) = times[1];
 		}
 	} else
 		mask |= B_STAT_ACCESS_TIME | B_STAT_MODIFICATION_TIME;

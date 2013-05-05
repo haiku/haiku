@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -223,6 +224,14 @@ TreeTableModel::NotifyNodesChanged(const TreeTablePath& path, int32 childIndex,
 		TreeTableModelListener* listener = fListeners.ItemAt(i);
 		listener->TableNodesChanged(this, path, childIndex, count);
 	}
+}
+
+
+// #pragma mark - TreeTableToolTipProvider
+
+
+TreeTableToolTipProvider::~TreeTableToolTipProvider()
+{
 }
 
 
@@ -650,6 +659,7 @@ TreeTable::TreeTable(const char* name, uint32 flags, border_style borderStyle,
 	:
 	AbstractTable(name, flags, borderStyle, showHorizontalScrollbar),
 	fModel(NULL),
+	fToolTipProvider(NULL),
 	fRootNode(NULL),
 	fSelectionModel(this),
 	fIgnoreSelectionChange(0)
@@ -731,6 +741,13 @@ TreeTable::SetTreeTableModel(TreeTableModel* model)
 }
 
 
+void
+TreeTable::SetToolTipProvider(TreeTableToolTipProvider* toolTipProvider)
+{
+	fToolTipProvider = toolTipProvider;
+}
+
+
 TreeTableSelectionModel*
 TreeTable::SelectionModel()
 {
@@ -807,6 +824,31 @@ void
 TreeTable::RemoveTreeTableListener(TreeTableListener* listener)
 {
 	fListeners.RemoveItem(listener);
+}
+
+
+bool
+TreeTable::GetToolTipAt(BPoint point, BToolTip** _tip)
+{
+	if (fToolTipProvider == NULL)
+		return AbstractTable::GetToolTipAt(point, _tip);
+
+	// get the table row
+	BRow* row = RowAt(point);
+	if (row == NULL)
+		return AbstractTable::GetToolTipAt(point, _tip);
+
+	TreeTableRow* treeRow = dynamic_cast<TreeTableRow*>(row);
+	// get the table column
+	BColumn* column = ColumnAt(point);
+
+	int32 columnIndex = column != NULL ? column->LogicalFieldNum() : -1;
+
+	TreeTablePath path;
+	_GetPathForNode(treeRow->Node(), path);
+
+	return fToolTipProvider->GetToolTipForTablePath(path, columnIndex,
+		_tip);
 }
 
 

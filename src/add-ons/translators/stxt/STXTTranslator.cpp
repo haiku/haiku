@@ -28,8 +28,8 @@
 using namespace BPrivate;
 using namespace std;
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "STXTTranslator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "STXTTranslator"
 
 #define READ_BUFFER_SIZE 32768
 #define DATA_BUFFER_SIZE 256
@@ -860,7 +860,8 @@ identify_stxt_header(const TranslatorStyledTextStreamHeader &header,
 	outInfo->group = B_TRANSLATOR_TEXT;
 	outInfo->quality = STXT_IN_QUALITY;
 	outInfo->capability = STXT_IN_CAPABILITY;
-	strcpy(outInfo->name, B_TRANSLATE("Be styled text file"));
+	strlcpy(outInfo->name, B_TRANSLATE("Be styled text file"),
+		sizeof(outInfo->name));
 	strcpy(outInfo->MIME, "text/x-vnd.Be-stxt");
 
 	return B_OK;
@@ -981,7 +982,7 @@ translate_from_stxt(BPositionIO *inSource, BPositionIO *outDestination,
 	// of the data from inSource has been read and written.
 	if (btoplain)
 		nreed = min((size_t)READ_BUFFER_SIZE,
-			txtheader.header.data_size - ntotalread);
+			(size_t)txtheader.header.data_size - ntotalread);
 	else
 		nreed = READ_BUFFER_SIZE;
 	nread = inSource->Read(buffer, nreed);
@@ -993,7 +994,7 @@ translate_from_stxt(BPositionIO *inSource, BPositionIO *outDestination,
 		if (btoplain) {
 			ntotalread += nread;
 			nreed = min((size_t)READ_BUFFER_SIZE,
-				txtheader.header.data_size - ntotalread);
+				(size_t)txtheader.header.data_size - ntotalread);
 		} else
 			nreed = READ_BUFFER_SIZE;
 		nread = inSource->Read(buffer, nreed);
@@ -1338,7 +1339,7 @@ translate_from_text(BPositionIO* source, const char* encoding, bool forceEncodin
 
 STXTTranslator::STXTTranslator()
 	: BaseTranslator(B_TRANSLATE("StyledEdit files"), 
-		B_TRANSLATE("StyledEdit files translator"),
+		B_TRANSLATE("StyledEdit file translator"),
 		STXT_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
 		sOutputFormats, kNumOutputFormats,

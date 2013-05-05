@@ -1,13 +1,13 @@
 1	belarusian	x-vnd.Haiku-JPEG2000Translator	547915409
-About	JPEG2000Translator		Пра праграму
-Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Фармат бітмапаў BeOS (Канвертар JPEG2000)
-High	JPEG2000Translator		Найлепшы
+Write	JPEG2000Translator		Запісаць
 JPEG2000 images	JPEG2000Translator		Выявы JPEG2000
-Low	JPEG2000Translator		Эканомны
 Output only codestream (.jpc)	JPEG2000Translator		Выводзіць толькі кодавы паток (.jpc)
+Write black-and-white images as RGB24	JPEG2000Translator		Запісваць чорна-белыя выявы як RGB24
 Output quality	JPEG2000Translator		Якасць вынікаў
 Read	JPEG2000Translator		Чытаць
-Read greyscale images as RGB32	JPEG2000Translator		Прыймаць шэрыя выявы як RGB32
-Write	JPEG2000Translator		Запісаць
-Write black-and-white images as RGB24	JPEG2000Translator		Запісваць чорна-белыя выявы як RGB24
 ©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nГрунтуецца на бібліятэцы JasPer:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\n jp2 кадэк з пакету ImageMagick быў выкарыстаны як \"прыклад\".\n\thttp://www.imagemagick.org/\n
+Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Фармат бітмапаў BeOS (Канвертар JPEG2000)
+Low	JPEG2000Translator		Эканомны
+About	JPEG2000Translator		Пра праграму
+High	JPEG2000Translator		Найлепшы
+Read greyscale images as RGB32	JPEG2000Translator		Прыймаць шэрыя выявы як RGB32

@@ -1,38 +1,45 @@
-1	swedish	x-vnd.Haiku-SoundRecorder	2122042546
-Cannot connect to media server	RecorderWindow		Kan inte ansluta till mediaservern
-Cannot connect to the selected sound input	RecorderWindow		Kan inte ansluta till den valda ljudingången
-Cannot find an unused name to use for the new recording	RecorderWindow		Kan inte hitta ett oanvänt namn att använd för den nya inspelningen
+1	swedish	x-vnd.Haiku-SoundRecorder	2149017672
+Loop	RecorderWindow		Loop
 Cannot find default audio hardware	RecorderWindow		Kan inte hitta den förvalda ljudhårdvaran
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Kan inte hitta den temporära filen skapad för att lagra den nya inspelningen
-Cannot get the file to play	RecorderWindow		Kan inte spela upp filen
-Cannot open the temporary file created to hold the new recording	RecorderWindow		Kan inte hitta den temporära filen skapad för att lagra den nya inspelningen
-Cannot recognize this file as a media file	RecorderWindow		Känner inte igen denna fil som en mediafil
-Cannot record a sound that long	RecorderWindow		Kan inte spela in så långa ljud
-Channels: 	RecorderWindow		Kanaler:
-Compression:	RecorderWindow		Komprimering:
-Drop files here	SoundListView		Släpp filer här
-Duration:	RecorderWindow		Längd:
-File info	RecorderWindow		Filinformation
-File name:	RecorderWindow		Filnamn:
-Format: 	RecorderWindow		Format:
-Forward	RecorderWindow		Framåt
-Input	RecorderWindow		Inmatning
-Input:	RecorderWindow		Inmatning:
-Invalid audio files	RecorderWindow		Ogiltiga ljudfiler
-Loop	RecorderWindow		Loop
-None	RecorderWindow		Ingen
-None of the files appear to be audio files	RecorderWindow		Ingen av filerna verkar vara ljudfiler
+Sample size:	RecorderWindow		Samplingsstorlek:
 Nothing to play	RecorderWindow		Inget att spela
-OK	RecorderWindow		OK
-Play	RecorderWindow		Spela
-Record	RecorderWindow		Spela in
-Rewind	RecorderWindow		Spola tillbaka
-Sample rate: 	RecorderWindow		Samplingsflöde:
-Sample size: 	RecorderWindow		Samplingsstorlek:
-Save	RecorderWindow		Spara
+Duration: 	RecorderWindow		Längd: 
 Some of the files don't appear to be audio files	RecorderWindow		Några av filerna verkar inte vara ljudfiler
-Sound List	RecorderWindow		Ljudlista
-SoundRecorder	System name		LjudInspelare
+File info	RecorderWindow		Filinformation
+Drop files here	SoundListView		Släpp filer här
+Input	RecorderWindow		Inmatning
 Stop	RecorderWindow		Stopp
-bits	RecorderWindow		bitar
-seconds	RecorderWindow		sekunder
+Format:	RecorderWindow		Format:
+Sound List	RecorderWindow		Ljudlista
+Compression: 	RecorderWindow		Komprimering: 
+Rewind	RecorderWindow		Spola tillbaka
+Sample rate:	RecorderWindow		Samplingsflöde:
+Invalid audio files	RecorderWindow		Ogiltiga ljudfiler
+ seconds	RecorderWindow		 sekunder
+OK	RecorderWindow		OK
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Kan inte hitta den temporära filen skapad för att lagra den nya inspelningen
+None of the files appear to be audio files	RecorderWindow		Ingen av filerna verkar vara ljudfiler
+Input:	RecorderWindow		Inmatning:
+Forward	RecorderWindow		Framåt
+Play	RecorderWindow		Spela
+SoundRecorder	System name		LjudInspelare
+Channels:	RecorderWindow		Kanaler:
+ bits	RecorderWindow		 bits
+None	RecorderWindow		Ingen
+Record	RecorderWindow		Spela in
+Sample size: 	RecorderWindow		Samplingsstorlek:
+Cannot recognize this file as a media file	RecorderWindow		Känner inte igen denna fil som en mediafil
+Format: 	RecorderWindow		Format:
+File name: 	RecorderWindow		Filnamn:
+Cannot connect to the selected sound input	RecorderWindow		Kan inte ansluta till den valda ljudingången
+Cannot get the file to play	RecorderWindow		Kan inte spela upp filen
+Cannot record a sound that long	RecorderWindow		Kan inte spela in så långa ljud
+Duration:	RecorderWindow		Längd:
+Compression:	RecorderWindow		Komprimering:
+Cannot find an unused name to use for the new recording	RecorderWindow		Kan inte hitta ett oanvänt namn att använd för den nya inspelningen
+Channels: 	RecorderWindow		Kanaler:
+Save	RecorderWindow		Spara
+Sample rate: 	RecorderWindow		Samplingsfrekvens: 
+Cannot connect to media server	RecorderWindow		Kan inte ansluta till mediaservern
+File name:	RecorderWindow		Filnamn:

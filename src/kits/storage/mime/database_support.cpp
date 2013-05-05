@@ -191,7 +191,7 @@ open_or_create_type(const char *type, BNode *result, bool *didCreate)
 		// Figure out what type of node we need to create
 		// + Supertype == directory
 		// + Non-supertype == file
-		uint32 pos = typeLower.find_first_of('/');
+		size_t pos = typeLower.find_first_of('/');
 		if (pos == std::string::npos) {
 			// Supertype == directory
 			BDirectory parent(get_database_directory().c_str());

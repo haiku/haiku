@@ -30,8 +30,8 @@
 #include "PrintUtils.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ConfigWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ConfigWindow"
 
 
 static const float a0_width = 2380.0;
@@ -58,6 +58,8 @@ static const float ledger_width = 1224.0;
 static const float ledger_height = 792.0;
 static const float tabloid_width = 792.0;
 static const float tabloid_height = 1224.0;
+static const float jis_b5_width = 516.0;
+static const float jis_b5_height = 729.0;
 
 
 static struct PageFormat
@@ -91,6 +93,8 @@ static struct PageFormat
 		a6_width, a6_height },
 	{B_TRANSLATE_MARK_COMMENT("B5", "ISO 216 paper size"),
 		b5_width, b5_height },
+	{B_TRANSLATE_MARK_COMMENT("B5 (JIS)", "JIS P0138 B5, a Japanese "
+		"paper size"), jis_b5_width, jis_b5_height },
 };
 
 
@@ -309,6 +313,7 @@ ConfigWindow::AboutRequested()
 
 	BAlert *about = new BAlert("About printer server", text.String(),
 		B_TRANSLATE("OK"));
+	about->SetFlags(about->Flags() | B_CLOSE_ON_ESCAPE);
 	about->Go();
 }
 
@@ -413,7 +418,7 @@ ConfigWindow::SetupPrintersMenu(BMenu* menu)
 {
 	// clear menu
 	while (menu->CountItems() != 0)
-		delete menu->RemoveItem(0L);
+		delete menu->RemoveItem((int32)0);
 
 	// fill menu with printer names
 	BAutolock lock(gLock);

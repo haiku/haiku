@@ -207,7 +207,7 @@ status_t _AudioAdapterNode::getPreferredOutputFormat(
 		ioFormat.u.raw_audio.buffer_size =
 			bytes_per_frame(ioFormat.u.raw_audio) *
 				frames_per_buffer(input().format.u.raw_audio);
-		PRINT(("##### preferred output buffer_size: %ld (%x)\n", ioFormat.u.raw_audio.buffer_size, ioFormat.u.raw_audio.buffer_size));
+		PRINT(("##### preferred output buffer_size: %ld (%" B_PRIxSIZE ")\n", ioFormat.u.raw_audio.buffer_size, ioFormat.u.raw_audio.buffer_size));
 		ioFormat.u.raw_audio.frame_rate = input().format.u.raw_audio.frame_rate;
 
 	}

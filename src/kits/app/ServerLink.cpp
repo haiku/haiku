@@ -62,7 +62,7 @@ ServerLink::SetTo(port_id sender, port_id receiver)
 status_t
 ServerLink::ReadRegion(BRegion* region)
 {
-	fReceiver->Read(&region->fCount, sizeof(long));
+	fReceiver->Read(&region->fCount, sizeof(int32));
 	if (region->fCount > 0) {
 		fReceiver->Read(&region->fBounds, sizeof(clipping_rect));
 		if (!region->_SetSize(region->fCount))
@@ -78,7 +78,7 @@ ServerLink::ReadRegion(BRegion* region)
 status_t
 ServerLink::AttachRegion(const BRegion& region)
 {
-	fSender->Attach(&region.fCount, sizeof(long));
+	fSender->Attach(&region.fCount, sizeof(int32));
 	if (region.fCount > 0) {
 		fSender->Attach(&region.fBounds, sizeof(clipping_rect));
 		return fSender->Attach(region.fData,

@@ -726,11 +726,10 @@ JPEGPreDecode(TIFF* tif, tsample_t s)
 	if (sp->cinfo.d.image_width < segment_width ||
 	    sp->cinfo.d.image_height < segment_height) {
 		TIFFWarningExt(tif->tif_clientdata, module,
-			       "Improper JPEG strip/tile size, "
-			       "expected %dx%d, got %dx%d",
-			       segment_width, segment_height,
-			       sp->cinfo.d.image_width,
-			       sp->cinfo.d.image_height);
+			"Improper JPEG strip/tile size, "
+			"expected %" B_PRIu32 "x%" B_PRIu32 ", got %" B_PRIu32 "x%"
+			B_PRIu32, segment_width, segment_height, sp->cinfo.d.image_width,
+			sp->cinfo.d.image_height);
 	} 
 	if (sp->cinfo.d.image_width > segment_width ||
 	    sp->cinfo.d.image_height > segment_height) {
@@ -741,10 +740,10 @@ JPEGPreDecode(TIFF* tif, tsample_t s)
 		 * case and error out.
 		 */
 		TIFFErrorExt(tif->tif_clientdata, module,
-			     "JPEG strip/tile size exceeds expected dimensions,"
-			     " expected %dx%d, got %dx%d",
-			     segment_width, segment_height,
-			     sp->cinfo.d.image_width, sp->cinfo.d.image_height);
+			"JPEG strip/tile size exceeds expected dimensions,"
+			"expected %" B_PRIu32 "x%" B_PRIu32 ", got %" B_PRIu32 "x%"
+			B_PRIu32, segment_width, segment_height, sp->cinfo.d.image_width,
+			sp->cinfo.d.image_height);
 		return (0);
 	}
 	if (sp->cinfo.d.num_components !=

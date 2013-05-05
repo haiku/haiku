@@ -1,5 +1,6 @@
 /*
  * Copyright 2005-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -33,15 +34,15 @@ using namespace BPrivate::Debug;
 const void *
 Area::PrepareAddress(const void *address)
 {
-	TRACE(("Area::PrepareAddress(%p): area: %ld\n", address, fRemoteID));
+	TRACE(("Area::PrepareAddress(%p): area: %" B_PRId32 "\n", address, fRemoteID));
 
 	// clone the area, if not done already
 	if (fLocalID < 0) {
 		fLocalID = clone_area("cloned area", &fLocalAddress, B_ANY_ADDRESS,
 			B_READ_AREA, fRemoteID);
 		if (fLocalID < 0) {
-			TRACE(("Area::PrepareAddress(): Failed to clone area %ld: %s\n",
-				fRemoteID, strerror(fLocalID)));
+			TRACE(("Area::PrepareAddress(): Failed to clone area %" B_PRId32
+				": %s\n", fRemoteID, strerror(fLocalID)));
 			throw Exception(fLocalID);
 		}
 	}
@@ -86,11 +87,11 @@ RemoteMemoryAccessor::Init()
 
 	// get a list of the team's areas
 	area_info areaInfo;
-	int32 cookie = 0;
+	ssize_t cookie = 0;
 	status_t error;
 	while ((error = get_next_area_info(fTeam, &cookie, &areaInfo)) == B_OK) {
-		TRACE(("area %ld: address: %p, size: %ld, name: %s\n", areaInfo.area,
-			areaInfo.address, areaInfo.size, areaInfo.name));
+		TRACE(("area %" B_PRId32 ": address: %p, size: %ld, name: %s\n",
+			areaInfo.area, areaInfo.address, areaInfo.size, areaInfo.name));
 
 		Area *area = new(std::nothrow) Area(areaInfo.area, areaInfo.address,
 			areaInfo.size);
@@ -111,8 +112,8 @@ const void *
 RemoteMemoryAccessor::PrepareAddress(const void *remoteAddress,
 	int32 size) const
 {
-	TRACE(("RemoteMemoryAccessor::PrepareAddress(%p, %ld)\n", remoteAddress,
-		size));
+	TRACE(("RemoteMemoryAccessor::PrepareAddress(%p, %" B_PRId32 ")\n",
+		remoteAddress, size));
 
 	if (!remoteAddress) {
 		TRACE(("RemoteMemoryAccessor::PrepareAddress(): Got null address!\n"));
@@ -159,7 +160,8 @@ RemoteMemoryAccessor::AreaForLocalAddress(const void* address) const
 Area &
 RemoteMemoryAccessor::_FindArea(const void *address, int32 size) const
 {
-	TRACE(("RemoteMemoryAccessor::_FindArea(%p, %ld)\n", address, size));
+	TRACE(("RemoteMemoryAccessor::_FindArea(%p, %" B_PRId32 ")\n", address,
+		size));
 
 	for (AreaList::ConstIterator it = fAreas.GetIterator(); it.HasNext();) {
 		Area *area = it.Next();
@@ -196,7 +198,7 @@ public:
 									const image_t* image, int32 symbolCount);
 	virtual						~LoadedImage();
 
-	virtual	const Elf32_Sym*	LookupSymbol(addr_t address,
+	virtual	const elf_sym*		LookupSymbol(addr_t address,
 									addr_t* _baseAddress,
 									const char** _symbolName,
 									size_t *_symbolNameLen,
@@ -219,11 +221,12 @@ private:
 
 
 // constructor
-SymbolLookup::SymbolLookup(team_id team)
+SymbolLookup::SymbolLookup(team_id team, image_id image)
 	:
 	RemoteMemoryAccessor(team),
 	fDebugArea(NULL),
-	fImages()
+	fImages(),
+	fImageID(image)
 {
 }
 
@@ -251,7 +254,7 @@ SymbolLookup::Init()
 
 		// find the runtime loader debug area
 		runtime_loader_debug_area *remoteDebugArea = NULL;
-		int32 cookie = 0;
+		ssize_t cookie = 0;
 		area_info areaInfo;
 		while (get_next_area_info(fTeam, &cookie, &areaInfo) == B_OK) {
 			if (strcmp(areaInfo.name, RUNTIME_LOADER_DEBUG_AREA_NAME) == 0) {
@@ -280,45 +283,23 @@ SymbolLookup::Init()
 		}
 	}
 
-	// create a list of the team's images
 	image_info imageInfo;
-	int32 cookie = 0;
-	while (get_next_image_info(fTeam, &cookie, &imageInfo) == B_OK) {
-		Image* image;
-
-		if (fTeam == B_SYSTEM_TEAM) {
-			// kernel image
-			KernelImage* kernelImage = new(std::nothrow) KernelImage;
-			if (kernelImage == NULL)
-				return B_NO_MEMORY;
-
-			error = kernelImage->Init(imageInfo);
-			image = kernelImage;
-		} else {
-			// userland image -- try to load an image file
-			ImageFile* imageFile = new(std::nothrow) ImageFile;
-			if (imageFile == NULL)
-				return B_NO_MEMORY;
-
-			error = imageFile->Init(imageInfo);
-			image = imageFile;
+	if (fImageID < 0) {
+		// create a list of the team's images
+		int32 cookie = 0;
+		while (get_next_image_info(fTeam, &cookie, &imageInfo) == B_OK) {
+			error = _LoadImageInfo(imageInfo);
+			if (error != B_OK)
+				return error;
 		}
+	} else {
+		error = get_image_info(fImageID, &imageInfo);
+		if (error != B_OK)
+			return error;
 
-		if (error != B_OK) {
-			// initialization error -- fall back to the loaded image
-			delete image;
-
-			const image_t* loadedImage = _FindLoadedImageByID(imageInfo.id);
-			if (loadedImage == NULL)
-				continue;
-
-			image = new(std::nothrow) LoadedImage(this, loadedImage,
-				Read(loadedImage->symhash[1]));
-			if (image == NULL)
-				return B_NO_MEMORY;
-		}
-
-		fImages.Add(image);
+		error = _LoadImageInfo(imageInfo);
+		if (error != B_OK)
+			return error;
 	}
 
 	return B_OK;
@@ -340,7 +321,7 @@ SymbolLookup::LookupSymbolAddress(addr_t address, addr_t *_baseAddress,
 	if (_imageName != NULL)
 		*_imageName = image->Name();
 
-	const Elf32_Sym* symbolFound = image->LookupSymbol(address, _baseAddress,
+	const elf_sym* symbolFound = image->LookupSymbol(address, _baseAddress,
 		_symbolName, _symbolNameLen, _exactMatch);
 
 	TRACE(("SymbolLookup::LookupSymbolAddress(): done: symbol: %p, image name: "
@@ -375,7 +356,8 @@ status_t
 SymbolLookup::InitSymbolIterator(image_id imageID,
 	SymbolIterator& iterator) const
 {
-	TRACE(("SymbolLookup::InitSymbolIterator(): image ID: %ld\n", imageID));
+	TRACE(("SymbolLookup::InitSymbolIterator(): image ID: %" B_PRId32 "\n",
+		imageID));
 
 	// find the image
 	iterator.image = _FindImageByID(imageID);
@@ -524,6 +506,58 @@ SymbolLookup::_SymbolNameLen(const char* address) const
 }
 
 
+status_t
+SymbolLookup::_LoadImageInfo(const image_info& imageInfo)
+{
+	status_t error = B_OK;
+
+	Image* image;
+	if (fTeam == B_SYSTEM_TEAM) {
+		// kernel image
+		KernelImage* kernelImage = new(std::nothrow) KernelImage;
+		if (kernelImage == NULL)
+			return B_NO_MEMORY;
+
+		error = kernelImage->Init(imageInfo);
+		image = kernelImage;
+	} else if (!strcmp("commpage", imageInfo.name)) {
+		// commpage image
+		CommPageImage* commPageImage = new(std::nothrow) CommPageImage;
+		if (commPageImage == NULL)
+			return B_NO_MEMORY;
+
+		error = commPageImage->Init(imageInfo);
+		image = commPageImage;
+	} else {
+		// userland image -- try to load an image file
+		ImageFile* imageFile = new(std::nothrow) ImageFile;
+		if (imageFile == NULL)
+			return B_NO_MEMORY;
+
+		error = imageFile->Init(imageInfo);
+		image = imageFile;
+	}
+
+	if (error != B_OK) {
+		// initialization error -- fall back to the loaded image
+		delete image;
+
+		const image_t* loadedImage = _FindLoadedImageByID(imageInfo.id);
+		if (loadedImage == NULL)
+			return B_OK;
+
+		image = new(std::nothrow) LoadedImage(this, loadedImage,
+			Read(loadedImage->symhash[1]));
+		if (image == NULL)
+			return B_NO_MEMORY;
+
+	}
+
+	fImages.Add(image);
+
+	return B_OK;
+}
+
 // #pragma mark - LoadedImage
 
 
@@ -557,16 +591,16 @@ SymbolLookup::LoadedImage::~LoadedImage()
 }
 
 
-const Elf32_Sym*
+const elf_sym*
 SymbolLookup::LoadedImage::LookupSymbol(addr_t address, addr_t* _baseAddress,
 	const char** _symbolName, size_t *_symbolNameLen, bool *_exactMatch) const
 {
-	TRACE(("LoadedImage::LookupSymbol(): found image: ID: %ld, text: "
+	TRACE(("LoadedImage::LookupSymbol(): found image: ID: %" B_PRId32 ", text: "
 		"address: %p, size: %ld\n", fImage->id,
 		(void*)fImage->regions[0].vmstart, fImage->regions[0].size));
 
 	// search the image for the symbol
-	const struct Elf32_Sym *symbolFound = NULL;
+	const elf_sym *symbolFound = NULL;
 	addr_t deltaFound = INT_MAX;
 	bool exactMatch = false;
 	const char *symbolName = NULL;
@@ -575,7 +609,7 @@ SymbolLookup::LoadedImage::LookupSymbol(addr_t address, addr_t* _baseAddress,
 	const elf_region_t *textRegion = fImage->regions;				// local
 
 	for (int32 i = 0; i < symbolCount; i++) {
-		const struct Elf32_Sym *symbol = &fSymbolLookup->Read(fImage->syms[i]);
+		const elf_sym *symbol = &fSymbolLookup->Read(fImage->syms[i]);
 
 		// The symbol table contains not only symbols referring to functions
 		// and data symbols within the shared object, but also referenced
@@ -584,8 +618,7 @@ SymbolLookup::LoadedImage::LookupSymbol(addr_t address, addr_t* _baseAddress,
 		// that have an st_value != 0 (0 seems to be an indication for a
 		// symbol defined elsewhere -- couldn't verify that in the specs
 		// though).
-		if ((ELF32_ST_TYPE(symbol->st_info) != STT_FUNC
-				&& ELF32_ST_TYPE(symbol->st_info) != STT_OBJECT)
+		if ((symbol->Type() != STT_FUNC && symbol->Type() != STT_OBJECT)
 			|| symbol->st_value == 0
 			|| symbol->st_value + symbol->st_size + textRegion->delta
 				> textRegion->vmstart + textRegion->size) {
@@ -643,10 +676,9 @@ SymbolLookup::LoadedImage::NextSymbol(int32& iterator, const char** _symbolName,
 		if (++iterator >= fSymbolCount)
 			return B_ENTRY_NOT_FOUND;
 
-		const struct Elf32_Sym* symbol
+		const elf_sym* symbol
 			= &fSymbolLookup->Read(fImage->syms[iterator]);
-		if ((ELF32_ST_TYPE(symbol->st_info) != STT_FUNC
-				&& ELF32_ST_TYPE(symbol->st_info) != STT_OBJECT)
+		if ((symbol->Type() != STT_FUNC && symbol->Type() != STT_OBJECT)
 			|| symbol->st_value == 0) {
 			continue;
 		}
@@ -656,8 +688,8 @@ SymbolLookup::LoadedImage::NextSymbol(int32& iterator, const char** _symbolName,
 		*_symbolNameLen = fSymbolLookup->_SymbolNameLen(*_symbolName);
 		*_symbolAddress = symbol->st_value + fTextDelta;
 		*_symbolSize = symbol->st_size;
-		*_symbolType = ELF32_ST_TYPE(symbol->st_info) == STT_FUNC
-			? B_SYMBOL_TYPE_TEXT : B_SYMBOL_TYPE_DATA;
+		*_symbolType = symbol->Type() == STT_FUNC ? B_SYMBOL_TYPE_TEXT
+			: B_SYMBOL_TYPE_DATA;
 
 		return B_OK;
 	}

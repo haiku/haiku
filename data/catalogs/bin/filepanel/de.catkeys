@@ -1,21 +1,20 @@
 1	german	x-vnd.mmu_man.filepanel	1802971238
-%s not a valid option\n	FilePanelApp		%s ist keine gültige Option\n
-%s: UNIMPLEMENTED\n	FilePanelApp		%s: NICHT IMPLEMENTIERT\n
-%s: this option requires a parameter\n	FilePanelApp		%s: diese Option benötigt ein Parameter\n
--1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\terlaube nur eine Datei zur Auswahl\n
--a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tnicht implementiert\n
--d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\töffne in <Ordner>\n
--f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tnicht implementiert\n
--h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tHilfe anzeigen\n
--k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tDie Art der Einträge, die geöffnet werden können (Varianten): beliebige Kombination von f, d, s (f=Datei (Voreinstellung), d=Verzeichnis, s=symbolischer Link)\n
--l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tbenutze einen Datei-Öffnen-Dialog (Voreinstellung)\n
--m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tmacht den Dateidialog modal\n
--n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tSetzt den Vorgabenamen für das Speichern\n
--s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tbenutze einen Datei-Speichern-Dialog\n
--t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tsetzt den Fenstertitel des Dateidialogs\n
 display a load/save file panel\n	FilePanelApp		Datei-Öffnen/Speichern-Dialog zeigen\n
 options:\n	FilePanelApp		Optionen:\n
-short\tlong\tdescription\n	FilePanelApp		kurze\tlange\tBeschreibung\n
-usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		Benutzung: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n 	
-
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		Benutzung: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n 
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tDie Art der Einträge, die geöffnet werden können (Varianten): beliebige Kombination von f, d, s (f=Datei (Voreinstellung), d=Verzeichnis, s=symbolischer Link)\n
 usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		Benutzung: %s [-h] [-d folder] [-l|-s] [-t ttl] [-1] [-m] [-a pattern] [-f pattern]\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\töffne in <Ordner>\n
+%s not a valid option\n	FilePanelApp		%s ist keine gültige Option\n
+short\tlong\tdescription\n	FilePanelApp		kurze\tlange\tBeschreibung\n
+%s: this option requires a parameter\n	FilePanelApp		%s: diese Option benötigt ein Parameter\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tbenutze einen Datei-Öffnen-Dialog (Voreinstellung)\n
+-f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tnicht implementiert\n
+-s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tbenutze einen Datei-Speichern-Dialog\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tSetzt den Vorgabenamen für das Speichern\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tmacht den Dateidialog modal\n
+-h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tHilfe anzeigen\n
+-a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tnicht implementiert\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\terlaube nur eine Datei zur Auswahl\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tsetzt den Fenstertitel des Dateidialogs\n
+%s: UNIMPLEMENTED\n	FilePanelApp		%s: NICHT IMPLEMENTIERT\n

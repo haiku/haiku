@@ -19,32 +19,30 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Button.h>
-#include <Catalog.h>
 #include <Debug.h>
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
-#include <LocaleBackend.h>
 #include <Messenger.h>
 #include <NodeInfo.h>
 #include <OS.h>
 #include <Path.h>
 #include <Region.h>
 #include <Roster.h>
+#include <SystemCatalog.h>
 #include <View.h>
 
 #include <pr_server.h>
 #include <ViewPrivate.h>
 
-using BPrivate::gLocaleBackend;
-using BPrivate::LocaleBackend;
+using BPrivate::gSystemCatalog;
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PrintJob"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PrintJob"
 
 #undef B_TRANSLATE
 #define B_TRANSLATE(str) \
-	gLocaleBackend->GetString(B_TRANSLATE_MARK(str), "PrintJob")
+	gSystemCatalog.GetString(B_TRANSLATE_MARK(str), "PrintJob")
 
 
 /*!	Summary of spool file:
@@ -105,6 +103,7 @@ static void
 ShowError(const char* message)
 {
 	BAlert* alert = new BAlert(B_TRANSLATE("Error"), message, B_TRANSLATE("OK"));
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 }
 
@@ -170,11 +169,6 @@ BPrintJob::BPrintJob(const char* jobName)
 	fCurrentPageHeader = new _page_header_;
 	if (fCurrentPageHeader != NULL)
 		memset(fCurrentPageHeader, 0, sizeof(_page_header_));
-
-	// we need to translate some strings, and in order to do so, we need
-	// to use the LocaleBackend to reach liblocale.so
-	if (gLocaleBackend == NULL)
-		LocaleBackend::LoadBackend();
 }
 
 
@@ -582,7 +576,7 @@ BPrintJob::_RecurseView(BView* view, BPoint origin, BPicture* picture,
 void
 BPrintJob::_GetMangledName(char* buffer, size_t bufferSize) const
 {
-	snprintf(buffer, bufferSize, "%s@%lld", fPrintJobName,
+	snprintf(buffer, bufferSize, "%s@%" B_PRId64, fPrintJobName,
 		system_time() / 1000);
 }
 
@@ -755,6 +749,7 @@ PrintServerMessenger::RejectUserInput()
 	fHiddenApplicationModalWindow = new BAlert("bogus", "app_modal", "OK");
 	fHiddenApplicationModalWindow->DefaultButton()->SetEnabled(false);
 	fHiddenApplicationModalWindow->SetDefaultButton(NULL);
+	fHiddenApplicationModalWindow->SetFlags(fHiddenApplicationModalWindow->Flags() | B_CLOSE_ON_ESCAPE);
 	fHiddenApplicationModalWindow->MoveTo(-65000, -65000);
 	fHiddenApplicationModalWindow->Go(NULL);
 }

@@ -1,0 +1,18 @@
+SubDir HAIKU_TOP src servers app drawing interface local ;
+
+UseLibraryHeaders agg ;
+UsePrivateHeaders app graphics interface kernel shared ;
+UsePrivateHeaders [ FDirName graphics common ] ;
+UsePrivateSystemHeaders ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app font ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter font_support ] ;
+
+StaticLibrary libaslocal.a :
+	AccelerantBuffer.cpp
+	AccelerantHWInterface.cpp
+;

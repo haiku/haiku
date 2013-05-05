@@ -1,0 +1,45 @@
+1	croatian	x-vnd.Haiku.PoorMan	3482023427
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Zadana web mapa je stvorena na \"/boot/home/public_html.\"\nProvjeri da postoji HTML datoteka koja se zove \"index.html\" u toj mapi.
+About PoorMan…	PoorMan		O PoorMan-u...
+Advanced	PoorMan		Napredno
+Cancel	PoorMan		Otkaži
+Cannot start the server	PoorMan		Nije moguće pokrenuti poslužitelj
+Clear hit counter	PoorMan		Brojač čistog pogotka
+Controls	PoorMan		Kontrole
+Copy	PoorMan		Kopiraj
+Create	PoorMan		Napravi
+Default	PoorMan		Zadano
+Dir Created	PoorMan		Direktorij napravljen
+Directory: 	PoorMan		Direktorij:
+Directory: (none)	PoorMan		Direktorij: (nijedan)
+Done	PoorMan		Završeno
+Edit	PoorMan		Uredi
+Error Dir	PoorMan		Greška direktorija
+Error Server	PoorMan		Greška poslužitelja
+File	PoorMan		Datoteka
+File Name	PoorMan		Ime datoteke
+Hits: %lu	PoorMan		Pogotci: %lu
+Max. simultaneous connections:	PoorMan		Maksimalni broj istovremenih veza:
+OK	PoorMan		U redu
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Odaberi mapu za objavljivanje na internetu.\n\nMožeš koristiti PoorMan da napravi \"public_html\" u tvojoj osobnoj mapi.\nIli umjesto toga označite jednu od vaših vlastitih mapa.
+PoorMan	System name		PoorMan
+PoorMan settings	PoorMan		PooMan postavke
+Quit	PoorMan		Izađi
+Run server	PoorMan		Pokreni poslužitelj
+Select	PoorMan		Odaberi
+Select all	PoorMan		Označi sve
+Select web folder	PoorMan		Označi web mapu
+Send file listing if there's no start page	PoorMan		Pošalji listu datoteka ako ne postoji početna stranica
+Settings…	PoorMan		Postavke
+Shutting down.	PoorMan		Gašenje.
+Shutting down.\n	PoorMan		Gašenje.\n
+Site	PoorMan		Stranica
+Start page:	PoorMan		Start stranica:
+Starting up... 	PoorMan		Pokrećem....
+Status: Running	PoorMan		Status: radi
+Status: Stopped	PoorMan		Status: Zaustavljeno
+Web folder:	PoorMan		Web mapa:
+Website location	PoorMan		Lokacija Web stranice
+Website options	PoorMan		Opcije web stranice
+connections	PoorMan		veze
+done.\n	PoorMan		učinjeno. \n

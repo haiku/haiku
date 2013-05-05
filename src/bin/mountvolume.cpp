@@ -1,6 +1,6 @@
 /*
  * Copyright 2005-2007 Ingo Weinhold, bonefish@users.sf.net
- * Copyright 2005-2009 Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2005-2013 Axel Dörfler, axeld@pinc-software.de
  * Copyright 2009 Jonas Sundström, jonas@kirilla.se
  *
  * All rights reserved. Distributed under the terms of the MIT License.
@@ -26,6 +26,9 @@
 #include <DiskDeviceTypes.h>
 #include <DiskDeviceList.h>
 #include <Partition.h>
+
+#include <tracker_private.h>
+
 
 using std::set;
 using std::string;
@@ -56,6 +59,7 @@ static const char* kUsage =
 	"  -alldos               - mount all mountable DOS volumes\n"
 	"  -ro, -readonly        - mount volumes read-only\n"
 	"  -u, -unmount <volume> - unmount the volume with the name <volume>\n"
+	"  -open                 - opens the mounted volumes in Tracker\n"
 	"\n"
 	"[info]\n"
 	"  -p, -l                - list all mounted and mountable volumes\n"
@@ -99,7 +103,7 @@ size_string(int64 size)
 	static char string[64];
 
 	if (size < 1024)
-		sprintf(string, "%Ld", size);
+		sprintf(string, "%" B_PRId64, size);
 	else {
 		const char* units[] = {"K", "M", "G", NULL};
 		int32 i = -1;
@@ -116,6 +120,25 @@ size_string(int64 size)
 }
 
 
+static status_t
+open_in_tracker(BPartition* partition)
+{
+	BPath mountPoint;
+	status_t status = partition->GetMountPoint(&mountPoint);
+	if (status != B_OK)
+		return status;
+
+	entry_ref ref;
+	status = get_ref_for_path(mountPoint.Path(), &ref);
+	if (status != B_OK)
+		return status;
+
+	BMessage refs(B_REFS_RECEIVED);
+	refs.AddRef("refs", &ref);
+	return BMessenger(kTrackerSignature).SendMessage(&refs);
+}
+
+
 //	#pragma mark -
 
 
@@ -127,7 +150,8 @@ struct MountVisitor : public BDiskDeviceVisitor {
 		mountBFS(false),
 		mountHFS(false),
 		mountDOS(false),
-		readOnly(false)
+		readOnly(false),
+		openInTracker(false)
 	{
 	}
 
@@ -184,7 +208,7 @@ struct MountVisitor : public BDiskDeviceVisitor {
 		// mount/unmount
 		if (mount) {
 			status_t error = partition->Mount(NULL,
-				(readOnly ? B_MOUNT_READ_ONLY : 0));
+				readOnly ? B_MOUNT_READ_ONLY : 0);
 			if (!silent) {
 				if (error >= B_OK) {
 					BPath mountPoint;
@@ -196,6 +220,8 @@ struct MountVisitor : public BDiskDeviceVisitor {
 						name, strerror(error));
 				}
 			}
+			if (openInTracker && error == B_OK)
+				open_in_tracker(partition);
 		} else if (unmount) {
 			status_t error = partition->Unmount();
 			if (!silent) {
@@ -219,9 +245,10 @@ struct MountVisitor : public BDiskDeviceVisitor {
 	bool		mountHFS;
 	bool		mountDOS;
 	bool		readOnly;
+	bool		openInTracker;
 };
 
-// PrintPartitionsVisitor
+
 struct PrintPartitionsVisitor : public BDiskDeviceVisitor {
 	PrintPartitionsVisitor()
 		: listMountablePartitions(false),
@@ -330,9 +357,10 @@ MountVolume::RefsReceived(BMessage* message)
 	entry_ref ref;
 	BPath path;
 
-	int32 argc = refCount + 1;
+	int32 argc = refCount + 2;
 	char** argv = new char*[argc + 1];
 	argv[0] = strdup(kAppName);
+	argv[1] = strdup("-open");
 
 	for (int32 i = 0; i < refCount; i++) {
 		message->FindRef("refs", i, &ref);
@@ -341,7 +369,7 @@ MountVolume::RefsReceived(BMessage* message)
 			fprintf(stderr, "Failed to get a path (%s) from entry (%s): %s\n",
 				path.Path(), ref.name, strerror(status));
 		}
-		argv[1 + i] = strdup(path.Path());
+		argv[2 + i] = strdup(path.Path());
 	}
 	argv[argc] = NULL;
 
@@ -385,6 +413,8 @@ MountVolume::ArgvReceived(int32 argc, char** argv)
 			if (argi >= argc)
 				print_usage_and_exit(true);
 			mountVisitor.toUnmount.insert(argv[argi]);
+		} else if (strcmp(arg, "-open") == 0) {
+			mountVisitor.openInTracker = true;
 		} else if (strcmp(arg, "-p") == 0 || strcmp(arg, "-l") == 0) {
 			printPartitionsVisitor.listMountablePartitions = true;
 		} else if (strcmp(arg, "-lh") == 0) {
@@ -461,6 +491,9 @@ MountVolume::ArgvReceived(int32 argc, char** argv)
 			}
 		}
 		if (status >= B_OK) {
+			if (mountVisitor.openInTracker)
+				open_in_tracker(partition);
+
 			// remove from list
 			mountVisitor.toMount.erase(name);
 		} else if (id >= 0)

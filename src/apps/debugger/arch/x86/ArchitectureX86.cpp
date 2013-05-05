@@ -1,5 +1,6 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011-2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -22,6 +23,7 @@
 #include "StackFrame.h"
 #include "Statement.h"
 #include "TeamMemory.h"
+#include "ValueLocation.h"
 #include "X86AssemblyLanguage.h"
 
 #include "disasm/DisassemblerX86.h"
@@ -52,6 +54,7 @@ static const int32 kFromDwarfRegisters[] = {
 	-1, -1, -1, -1, -1, -1, -1, -1,	// SSE
 	-1, -1, -1, -1, -1, -1, -1, -1	// MMX
 };
+
 static const int32 kFromDwarfRegisterCount = sizeof(kFromDwarfRegisters) / 4;
 
 
@@ -181,6 +184,13 @@ ArchitectureX86::Init()
 
 
 int32
+ArchitectureX86::StackGrowthDirection() const
+{
+	return STACK_GROWTH_DIRECTION_NEGATIVE;
+}
+
+
+int32
 ArchitectureX86::CountRegisters() const
 {
 	return fRegisters.Count();
@@ -207,6 +217,7 @@ ArchitectureX86::InitRegisterRules(CfaContext& context) const
 
 	return B_OK;
 }
+
 
 status_t
 ArchitectureX86::GetDwarfRegisterMaps(RegisterMap** _toDwarf,
@@ -242,11 +253,11 @@ status_t
 ArchitectureX86::CreateCpuState(const void* cpuStateData, size_t size,
 	CpuState*& _state)
 {
-	if (size != sizeof(debug_cpu_state_x86))
+	if (size != sizeof(x86_debug_cpu_state))
 		return B_BAD_VALUE;
 
 	CpuStateX86* state = new(std::nothrow) CpuStateX86(
-		*(const debug_cpu_state_x86*)cpuStateData);
+		*(const x86_debug_cpu_state*)cpuStateData);
 	if (state == NULL)
 		return B_NO_MEMORY;
 
@@ -257,7 +268,7 @@ ArchitectureX86::CreateCpuState(const void* cpuStateData, size_t size,
 
 status_t
 ArchitectureX86::CreateStackFrame(Image* image, FunctionDebugInfo* function,
-	CpuState* _cpuState, bool isTopFrame, StackFrame*& _previousFrame,
+	CpuState* _cpuState, bool isTopFrame, StackFrame*& _frame,
 	CpuState*& _previousCpuState)
 {
 	CpuStateX86* cpuState = dynamic_cast<CpuStateX86*>(_cpuState);
@@ -301,25 +312,37 @@ ArchitectureX86::CreateStackFrame(Image* image, FunctionDebugInfo* function,
 		// If the function is not frameless and we're at the top frame we need
 		// to check whether the prologue has not been executed (completely) or
 		// we're already after the epilogue.
-		if (hasPrologue && isTopFrame) {
+		if (isTopFrame) {
 			uint32 stack = 0;
-			if (eip < function->Address() + 3) {
-				// The prologue has not been executed yet, i.e. there's no
-				// stack frame yet. Get the return address from the stack.
-				stack = cpuState->IntRegisterValue(X86_REGISTER_ESP);
-				if (eip > function->Address()) {
-					// The "push %ebp" has already been executed.
-					stack += 4;
+			if (hasPrologue) {
+				if (eip < function->Address() + 3) {
+					// The prologue has not been executed yet, i.e. there's no
+					// stack frame yet. Get the return address from the stack.
+					stack = cpuState->IntRegisterValue(X86_REGISTER_ESP);
+					if (eip > function->Address()) {
+						// The "push %ebp" has already been executed.
+						stack += 4;
+					}
+				} else {
+					// Not in the function prologue, but maybe after the
+					// epilogue. The epilogue is a single "pop %ebp", so we
+					// check whether the current instruction is already a
+					// "ret".
+					uint8 code[1];
+					if (fTeamMemory->ReadMemory(eip, &code, 1) == 1
+						&& code[0] == 0xc3) {
+						stack = cpuState->IntRegisterValue(X86_REGISTER_ESP);
+					}
 				}
 			} else {
-				// Not in the function prologue, but maybe after the epilogue.
-				// The epilogue is a single "pop %ebp", so we check whether the
-				// current instruction is already a "ret".
-				uint8 code[1];
-				if (fTeamMemory->ReadMemory(eip, &code, 1) == 1
-					&& code[0] == 0xc3) {
+				// Check if the instruction pointer is at a readable location.
+				// If it isn't, then chances are we got here via a bogus
+				// function pointer, and the prologue hasn't actually been
+				// executed. In such a case, what we need is right at the top
+				// of the stack.
+				uint8 data[1];
+				if (fTeamMemory->ReadMemory(eip, &data, 1) != 1)
 					stack = cpuState->IntRegisterValue(X86_REGISTER_ESP);
-				}
 			}
 
 			if (stack != 0) {
@@ -374,11 +397,12 @@ ArchitectureX86::CreateStackFrame(Image* image, FunctionDebugInfo* function,
 		previousCpuState->SetIntRegister(X86_REGISTER_EBP,
 			previousFramePointer);
 		previousCpuState->SetIntRegister(X86_REGISTER_EIP, returnAddress);
+		frame->SetPreviousCpuState(previousCpuState);
 	}
 
 	frame->SetReturnAddress(returnAddress);
 
-	_previousFrame = frameReference.Detach();
+	_frame = frameReference.Detach();
 	_previousCpuState = previousCpuState;
 	return B_OK;
 }
@@ -537,7 +561,7 @@ ArchitectureX86::GetStatement(FunctionDebugInfo* function,
 // TODO: This is not architecture dependent anymore!
 	// get the instruction info
 	InstructionInfo info;
-	status_t error = GetInstructionInfo(address, info);
+	status_t error = GetInstructionInfo(address, info, NULL);
 	if (error != B_OK)
 		return error;
 
@@ -554,11 +578,10 @@ ArchitectureX86::GetStatement(FunctionDebugInfo* function,
 
 status_t
 ArchitectureX86::GetInstructionInfo(target_addr_t address,
-	InstructionInfo& _info)
+	InstructionInfo& _info, CpuState* state)
 {
-	// read the code
+	// read the code - maximum x86{-64} instruction size = 15 bytes
 	uint8 buffer[16];
-		// TODO: What's the maximum instruction size?
 	ssize_t bytesRead = fTeamMemory->ReadMemory(address, buffer,
 		sizeof(buffer));
 	if (bytesRead < 0)
@@ -570,34 +593,70 @@ ArchitectureX86::GetInstructionInfo(target_addr_t address,
 	if (error != B_OK)
 		return error;
 
-	// disassemble the instruction
-	BString line;
-	target_addr_t instructionAddress;
-	target_size_t instructionSize;
-	bool breakpointAllowed;
-	error = disassembler.GetNextInstruction(line, instructionAddress,
-		instructionSize, breakpointAllowed);
-	if (error != B_OK)
-		return error;
+	return disassembler.GetNextInstructionInfo(_info, state);
+}
 
-	instruction_type instructionType = INSTRUCTION_TYPE_OTHER;
-	if (buffer[0] == 0xff && (buffer[1] & 0x34) == 0x10) {
-		// absolute call with r/m32
-		instructionType = INSTRUCTION_TYPE_SUBROUTINE_CALL;
-	} else if (buffer[0] == 0xe8 && instructionSize == 5) {
-		// relative call with rel32 -- don't categorize the call with 0 as
-		// subroutine call, since it is only used to get the address of the GOT
-		if (buffer[1] != 0 || buffer[2] != 0 || buffer[3] != 0
-			|| buffer[4] != 0) {
-			instructionType = INSTRUCTION_TYPE_SUBROUTINE_CALL;
-		}
-	}
 
-	if (!_info.SetTo(instructionAddress, instructionSize, instructionType,
-			breakpointAllowed, line)) {
+status_t
+ArchitectureX86::GetWatchpointDebugCapabilities(int32& _maxRegisterCount,
+	int32& _maxBytesPerRegister, uint8& _watchpointCapabilityFlags)
+{
+	// while x86 technically has 4 hardware debug registers, one is reserved by
+	// the kernel, and one is required for breakpoint support, which leaves
+	// two available for watchpoints.
+	_maxRegisterCount = 2;
+	_maxBytesPerRegister = 4;
+
+	// x86 only supports write and read/write watchpoints.
+	_watchpointCapabilityFlags = WATCHPOINT_CAPABILITY_FLAG_WRITE
+		| WATCHPOINT_CAPABILITY_FLAG_READ_WRITE;
+
+	return B_OK;
+}
+
+
+status_t
+ArchitectureX86::GetReturnAddressLocation(StackFrame* frame,
+	target_size_t valueSize, ValueLocation*& _location)
+{
+	// for the calling conventions currently in use on Haiku,
+	// the x86 rules for how values are returned are as follows:
+	//
+	// - 32 bits or smaller values are returned directly in EAX.
+	// - 32-64 bit values are returned across EAX:EDX.
+	// - > 64 bit values are returned on the stack.
+	ValueLocation* location = new(std::nothrow) ValueLocation(
+		IsBigEndian());
+	if (location == NULL)
 		return B_NO_MEMORY;
+	BReference<ValueLocation> locationReference(location,
+		true);
+
+	if (valueSize <= 4) {
+		ValuePieceLocation piece;
+		piece.SetSize(valueSize);
+		piece.SetToRegister(X86_REGISTER_EAX);
+		if (!location->AddPiece(piece))
+			return B_NO_MEMORY;
+	} else if (valueSize <= 8) {
+		ValuePieceLocation piece;
+		piece.SetSize(4);
+		piece.SetToRegister(X86_REGISTER_EAX);
+		if (!location->AddPiece(piece))
+			return B_NO_MEMORY;
+		piece.SetToRegister(X86_REGISTER_EDX);
+		piece.SetSize(valueSize - 4);
+		if (!location->AddPiece(piece))
+			return B_NO_MEMORY;
+	} else {
+		ValuePieceLocation piece;
+		piece.SetToMemory(frame->GetCpuState()->StackPointer());
+		piece.SetSize(valueSize);
+		if (!location->AddPiece(piece))
+			return B_NO_MEMORY;
 	}
 
+	_location = locationReference.Detach();
 	return B_OK;
 }
 

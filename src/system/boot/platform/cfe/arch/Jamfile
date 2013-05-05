@@ -1,0 +1,3 @@
+SubDir HAIKU_TOP src system boot platform cfe arch ;
+
+SubInclude HAIKU_TOP src system boot platform cfe arch $(TARGET_ARCH) ;

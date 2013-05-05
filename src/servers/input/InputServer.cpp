@@ -15,6 +15,7 @@
 #include <AppServerLink.h>
 #include <MessagePrivate.h>
 #include <ObjectListPrivate.h>
+#include <RosterPrivate.h>
 
 #include <Autolock.h>
 #include <Deskbar.h>
@@ -271,7 +272,7 @@ InputServer::_LoadKeymap()
 	if (file.Read(&fKeys, sizeof(fKeys)) < (ssize_t)sizeof(fKeys))
 		return B_BAD_VALUE;
 
-	for (uint32 i = 0; i < sizeof(fKeys)/4; i++)
+	for (uint32 i = 0; i < sizeof(fKeys) / 4; i++)
 		((uint32*)&fKeys)[i] = B_BENDIAN_TO_HOST_INT32(((uint32*)&fKeys)[i]);
 
 	if (file.Read(&fCharsSize, sizeof(uint32)) < (ssize_t)sizeof(uint32))
@@ -602,6 +603,15 @@ InputServer::MessageReceived(BMessage* message)
 			return;
 		}
 
+		case kMsgAppServerRestarted:
+		{
+			BApplication::MessageReceived(message);
+			BPrivate::AppServerLink link;
+			link.StartMessage(AS_REGISTER_INPUT_SERVER);
+			link.Flush();
+			return;
+		}
+
 		default:
 			return;
 	}
@@ -615,11 +625,23 @@ void
 InputServer::HandleSetMethod(BMessage* message)
 {
 	CALLED();
-	uint32 cookie;
-	if (message->FindInt32("cookie", (int32*)&cookie) == B_OK) {
-		BInputServerMethod *method = (BInputServerMethod*)cookie;
-		PRINT(("%s cookie %p\n", __PRETTY_FUNCTION__, method));
-		SetActiveMethod(method);
+	int32 cookie;
+	if (message->FindInt32("cookie", &cookie) != B_OK)
+		return;
+	if (cookie == gKeymapMethod.fOwner->Cookie()) {
+		SetActiveMethod(&gKeymapMethod);
+	} else {
+		BAutolock lock(InputServer::gInputMethodListLocker);
+		for (int32 i = 0; i < gInputMethodList.CountItems(); i++) {
+			BInputServerMethod* method
+				= (BInputServerMethod*)InputServer::gInputMethodList.ItemAt(i);
+			if (method->fOwner->Cookie() == cookie) {
+				PRINT(("%s cookie %" B_PRId32 "\n", __PRETTY_FUNCTION__,
+					cookie));
+				SetActiveMethod(method);
+				break;
+			}
+		}
 	}
 }
 

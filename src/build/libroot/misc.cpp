@@ -24,7 +24,7 @@ debugger(const char *message)
 
 // _debuggerAssert
 int
-_debuggerAssert(const char *file, int line, char *expression)
+_debuggerAssert(const char *file, int line, const char *expression)
 {
 	char buffer[2048];
 	snprintf(buffer, sizeof(buffer), "%s:%d: %s\n", file, line, expression);

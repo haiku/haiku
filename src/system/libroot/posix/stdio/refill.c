@@ -38,6 +38,9 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <errno_private.h>
+
 #include "local.h"
 
 static int
@@ -72,7 +75,7 @@ __srefill(fp)
 	/* if not already reading, have to be reading and writing */
 	if ((fp->_flags & __SRD) == 0) {
 		if ((fp->_flags & __SRW) == 0) {
-			errno = EBADF;
+			__set_errno(EBADF);
 			fp->_flags |= __SERR;
 			return (EOF);
 		}

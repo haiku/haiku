@@ -1,0 +1,205 @@
+/*
+ * Copyright 2013 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/ListItem.h	 hrev45555
+ *		src/kits/interface/ListItem.cpp	 hrev45555
+ */
+
+
+/*!
+	\file ListItem.h
+	\ingroup interface
+	\ingroup libbe
+	\brief ListItem class definition.
+*/
+
+
+/*!
+	\class BListItem
+	\ingroup interface
+	\ingroup libbe
+	\brief A list item, a member of a BListView or BOutlineListView.
+*/
+
+
+/*!
+	\fn BListItem::BListItem(uint32 level, bool expanded)
+	\brief Create a new list item with the specified \a level.
+
+	The \a level and \a expanded arguments are only used if the item is added to
+	a BOutlineListView.
+
+	\param level The level to create the list item on, default level is 0.
+	\param expanded Whether or not the item is expanded.
+
+	\see BOutlineListView::AddItem()
+*/
+
+
+/*!
+	\fn BListItem::BListItem(BMessage* data)
+	\brief Create a new list item from archived message.
+
+	\param data The message to create the list item from.
+*/
+
+
+/*!
+	\fn BListItem::~BListItem()
+	\brief Destroy the list item freeing any memory used.
+
+	The default destructor is empty.
+*/
+
+
+/*!
+	\fn status_t BListItem::Archive(BMessage* archive, bool deep) const
+	\brief Archive the list item to a message.
+
+	\param archive The message to archive the list item to.
+	\param deep If \c true also archive child views.
+*/
+
+
+/*!
+	\fn void DrawItem(BView* owner, BRect frame, bool complete)
+	\brief Hook method called when the item is drawn.
+
+	\param owner The view that the list item is a child of.
+	\param frame The frame of the item.
+	\param complete Whether or not to draw the background in addition to the
+	       item's contents.
+*/
+
+
+/*!
+	\fn float BListItem::Height() const
+	\brief Return the height of the list item.
+
+	\return The height of the list item as a float.
+*/
+
+
+/*!
+	\fn float BListItem::Width() const
+	\brief Return the width of the list item.
+
+	\return The width of the list item as a float.
+*/
+
+
+/*!
+	\fn bool BListItem::IsSelected() const
+	\brief Return whether or not the list item is currently selected.
+
+	\return \c true if the list item is selected, \c false otherwise.
+*/
+
+
+/*!
+	\fn void BListItem::Select()
+	\brief Select the list item.
+*/
+
+
+/*!
+	\fn void BListItem::Deselect()
+	\brief Unselect the list item.
+*/
+
+
+/*!
+	\fn void BListItem::SetEnabled(bool on)
+	\brief Enable or disable the list item.
+
+	\param on Set \c true to enable, \c false to disable the list item.
+*/
+
+
+/*!
+	\fn bool BListItem::IsEnabled() const
+	\brief Returns whether or not the list item is currently enabled.
+
+	\return \c true if the list item is enabled, \c false if it is disabled.
+*/
+
+
+/*!
+	\fn void BListItem::SetHeight(float height)
+	\brief Set the height of the list item to \a height.
+
+	\param height The height to set the list item to.
+*/
+
+
+/*!
+	\fn void BListItem::SetWidth(float width)
+	\brief Set the width of the list item to \a width.
+
+	\param width The width to set the list item to.
+*/
+
+
+/*!
+	\fn void BListItem::Update(BView* owner, const BFont* font)
+	\brief Hook method that's called with the list item's \a owner changes.
+
+	This method gets called when the list item is added to the list view.
+
+	The default implementation sets the width of the list item to the width of
+	\a owner and sets the height to fit \a font.
+
+	\param owner The list item's new \a owner.
+	\param font The font set to the list item's current \a owner.
+*/
+
+
+/*!
+	\fn status_t BListItem::Perform(perform_code d, void* arg)
+	\brief Performs an action give a perform_code and arg. (Internal Method)
+
+	\param d The perform code.
+	\param arg A pointer to some data to perform on.
+
+	\return A status code.
+*/
+
+
+/*!
+	\fn void BListItem::SetExpanded(bool expanded)
+	\brief Set the expanded state of the list item. This only makes sense if the
+	       list item is part of a BOutlineListView.
+
+	\param expanded \c true to expand the list item, \c false to un-expand the
+	       list item.
+*/
+
+
+/*!
+	\fn bool BListItem::IsExpanded() const
+	\brief Returns whether or not the list item is currently expanded.
+
+	\return \c true if the list item is expanded, \c false if it is not expanded.
+*/
+
+
+/*!
+	\fn uint32 BListItem::OutlineLevel() const
+	\brief Returns the current outline level of the list item. This only makes
+	       sense if the list item is part of a BOutlineListView.
+
+	\return The current outline level of the list item.
+*/
+
+
+/*!
+	\fn void BListItem::SetOutlineLevel(uint32 level)
+	\brief Set the outline level of the list item.
+
+	\param level The outline level to set the list item to.
+*/

@@ -65,6 +65,10 @@ enum {
 	DW_TAG_condition				= 0x3f,
 	DW_TAG_shared_type				= 0x40,
 	DW_TAG_lo_user					= 0x4080,
+	DW_TAG_GNU_template_parameter_pack
+									= 0x4107,
+	DW_TAG_GNU_formal_parameter_pack
+									= 0x4108,
 	DW_TAG_hi_user					= 0xffff
 };
 
@@ -404,11 +408,12 @@ enum {
 
 // line number extended opcode
 enum {
-	DW_LNE_end_sequence	= 0x01,
-	DW_LNE_set_address	= 0x02,
-	DW_LNE_define_file	= 0x03,
-	DW_LNE_lo_user		= 0x80,
-	DW_LNE_hi_user		= 0xff
+	DW_LNE_end_sequence			= 0x01,
+	DW_LNE_set_address			= 0x02,
+	DW_LNE_define_file			= 0x03,
+	DW_LNE_set_discriminator 	= 0x04,
+	DW_LNE_lo_user				= 0x80,
+	DW_LNE_hi_user				= 0xff
 };
 
 // macro information type

@@ -45,8 +45,8 @@
 #include "SettingsWindow.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MediaPlayer-Main"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MediaPlayer-Main"
 
 
 static const char* kCurrentPlaylistFilename = "MediaPlayer Current Playlist";
@@ -93,6 +93,8 @@ MainApp::MainApp()
 			"Would you like to start it ?"), B_TRANSLATE("Quit"),
 			B_TRANSLATE("Start media server"), NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetShortcut(0, B_ESCAPE);
+		
 		if (alert->Go() == 0) {
 			PostMessage(B_QUIT_REQUESTED);
 			return;

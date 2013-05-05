@@ -35,6 +35,7 @@ BuildPlatformMain <build>collectcatkeys :
 	PlainTextCatalog.cpp
 	HashMapCatalog.cpp
 	Catalog.cpp
+	CatalogData.cpp
 	RegExp.cpp
 	: $(HOST_LIBBE)  $(HOST_LIBSUPC++) $(HOST_LIBSTDC++) ;
 
@@ -44,4 +45,5 @@ BuildPlatformMain <build>linkcatkeys :
 	HashMapCatalog.cpp
 	DefaultCatalog.cpp
 	Catalog.cpp
+	CatalogData.cpp
 	: $(HOST_LIBBE) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++) ;

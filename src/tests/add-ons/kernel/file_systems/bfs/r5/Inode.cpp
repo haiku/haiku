@@ -1928,7 +1928,7 @@ Inode::Remove(Transaction *transaction, const char *name, off_t *_id, bool isDir
  *	adds the created inode to that parent directory. If an attribute directory
  *	is created, it will also automatically added to the parent inode as such.
  *	However, the indices root node, and the regular root node won't be added
- *	to the super block.
+ *	to the superblock.
  *	It will also create the initial B+tree for the inode if it's a directory
  *	of any kind.
  *	If the "_id" or "_inode" variable is given and non-NULL to store the inode's

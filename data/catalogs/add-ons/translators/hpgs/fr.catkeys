@@ -1,12 +1,12 @@
 1	french	x-vnd.Haiku-HPGSTranslator	3633584048
 Based on HPGS (http://hpgs.berlios.de)	ConfigView		Basé sur HPGS (http://hpgs.berlios.de)
-Error: Cannot imbue plot device to reader: %s\n	HPGSTranslator		Erreur : Impossible d'asservir le tracer au lecteur : %s\n
+Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
 Error: Cannot process plot data %s\n	HPGSTranslator		Erreur : Impossible de traiter des données de points à tracer %s\n
 HPGS image	HPGSTranslator		Image HPGS
-HPGS image translator	HPGSTranslator		Traducteur d'images HPGS
+HPGSTranslator Settings	ConfigView		Réglages du traducteur HPGS
+Error: Cannot imbue plot device to reader: %s\n	HPGSTranslator		Erreur : Impossible d'asservir le tracer au lecteur : %s\n
 HPGS images	ConfigView		Images HPGS
 HPGS images	HPGSTranslator		Images HPGS
-HPGSTranslator Settings	ConfigView		Réglages du traducteur HPGS
-Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
-Write error %s\n	HPGSTranslator		Erreur d'écriture %s\n
 no hpgs\n	HPGSTranslator		non HPGS\n
+HPGS image translator	HPGSTranslator		Traducteur d'images HPGS
+Write error %s\n	HPGSTranslator		Erreur d'écriture %s\n

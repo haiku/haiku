@@ -33,8 +33,8 @@
 #include "TGATranslator.h"
 #include "TranslatorWindow.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "TGAMain"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "TGAMain"
 
 // ---------------------------------------------------------------
 // main

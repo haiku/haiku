@@ -368,8 +368,11 @@ UdpDomainSupport::ConnectEndpoint(UdpEndpoint *endpoint,
 		struct net_route *routeToDestination
 			= gDatalinkModule->get_route(fDomain, address);
 		if (routeToDestination) {
+			// stay bound to current local port, if any.
+			uint16 port = endpoint->LocalAddress().Port();
 			status = endpoint->LocalAddress().SetTo(
 				routeToDestination->interface_address->local);
+			endpoint->LocalAddress().SetPort(port);
 			gDatalinkModule->put_route(fDomain, routeToDestination);
 			if (status < B_OK)
 				return status;
@@ -739,7 +742,7 @@ UdpEndpointManager::ReceiveError(status_t error, net_buffer* buffer)
 	// original packet
 	udp_header header;
 	if (gBufferModule->read(buffer, 0, &header,
-			std::min(buffer->size, sizeof(udp_header))) != B_OK)
+			std::min((size_t)buffer->size, sizeof(udp_header))) != B_OK)
 		return B_BAD_VALUE;
 
 	net_domain* domain = buffer->interface_address->domain;

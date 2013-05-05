@@ -16,8 +16,8 @@
 #include "ImfRgbaFile.h"
 #include "IStreamWrapper.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "EXRTranslator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "EXRTranslator"
 
 
 // The input formats that this translator supports.
@@ -61,7 +61,7 @@ const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / sizeof(TranSetting
 
 
 EXRTranslator::EXRTranslator()
-	: BaseTranslator(B_TRANSLATE("EXR Images"), 
+	: BaseTranslator(B_TRANSLATE("EXR images"), 
 		B_TRANSLATE("EXR image translator"),
 		EXR_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
@@ -98,7 +98,8 @@ EXRTranslator::DerivedIdentify(BPositionIO *stream,
 			outInfo->quality = EXR_IN_QUALITY;
 			outInfo->capability = EXR_IN_CAPABILITY;
 			strcpy(outInfo->MIME, "image/exr");
-			strcpy(outInfo->name, B_TRANSLATE("EXR image"));
+			strlcpy(outInfo->name, B_TRANSLATE("EXR image"),
+				sizeof(outInfo->name));
 		}
 	} catch (const std::exception &e) {
 		return B_NO_TRANSLATOR;

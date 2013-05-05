@@ -3,7 +3,7 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "audio/x-aiff";
 
-resource(2, "META:S:DESC") #'MSDC' "AIFF Sound File";
+resource(2, "META:S:DESC") #'MSDC' "AIFF audio file";
 
 resource(3, "META:EXTENS") message(234) {
 	"extensions" = "aif",

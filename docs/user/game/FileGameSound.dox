@@ -1,0 +1,140 @@
+/*
+ * Copyright 2012 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		src/kits/game/FileGameSound.cpp	hrev45076
+ *		src/kits/game/FileGameSound.h	hrev45076
+ */
+
+
+/*!
+	\file FileGameSound.h
+	\ingroup game
+	\ingroup libbe
+	\brief Provides the BFileGameSound class.
+*/
+
+
+/*!
+	\class BFileGameSound
+	\ingroup game
+	\ingroup libbe
+	\brief Playback audio from a sound file on disk.
+*/
+
+
+/*!
+	\fn BFileGameSound::BFileGameSound(const entry_ref *file, bool looping,
+		BGameSoundDevice *device)
+	\brief Creates and initializes a BFileGameSound object from an
+		   \c entry_ref allowing you to play the specified sound file.
+
+	If \a looping is \c true, the sound automatically replays from the
+	beginning once the end is reached. This is useful for playing
+	background music in a loop.
+
+	You can specify the sound devise to use by setting the \a device
+	parameter. Setting \a device to \c NULL uses the default sound device.
+
+	\param file The entry ref pointing to the sound file on disk.
+	\param looping Whether or not to repeat the sound in a loop.
+	\param device The sound device to use to play the sound, use \c NULL for
+		   default.
+*/
+
+
+/*!
+	\fn BFileGameSound::BFileGameSound(const char *file, bool looping,
+		BGameSoundDevice *device)
+	\brief Creates and initializes a BFileGameSound object from a file path
+		   allowing you to play the specified sound file.
+
+	If \a looping is \c true, the sound automatically replays from the
+	beginning once the end is reached. This is useful for playing
+	background music in a loop.
+
+	You can specify the sound devise to use by setting the \a device
+	parameter. Setting \a device to \c NULL uses the default sound device.
+
+	\param file The path of the sound file on disk.
+	\param looping Whether or not to repeat the sound in a loop.
+	\param device The sound device to use to play the sound, use \c NULL for
+		   default.
+*/
+
+
+/*!
+	\fn BFileGameSound::~BFileGameSound()
+	\brief Destroys the BFileGameSound object.
+*/
+
+
+/*!
+	\fn BGameSound* BFileGameSound::Clone() const
+	\brief Not implemented, always returns \c NULL.
+*/
+
+
+/*!
+	\fn status_t BFileGameSound::StartPlaying()
+	\brief Plays the sound file.
+
+	\returns A status code, \c B_OK on success or an error code on error.
+*/
+
+
+/*!
+	\fn status_t BFileGameSound::StopPlaying()
+	\brief Stops playback of the sound file.
+
+	\returns A status code, \c B_OK on success or an error code on error.
+*/
+
+
+/*!
+	\fn status_t BFileGameSound::Preload()
+	\brief Preload the sound file into memory so that playback won't be delayed.
+
+	\returns A status code, \c B_OK on success or an error code if we were
+			 unable to communicate with the sound port.
+*/
+
+
+/*!
+	\fn void BFileGameSound::FillBuffer(void *inBuffer, size_t inByteCount)
+	\brief Fill a buffer with sound data.
+
+	\param inBuffer The buffer to fill.
+	\param inByteCount The number of bytes to fill buffer with.
+*/
+
+
+/*!
+	\fn status_t BFileGameSound::SetPaused(bool isPaused, bigtime_t rampTime)
+	\brief Pauses playback if \a isPaused is \c true or resumes play if
+		   \a isPaused is \c false.
+
+	\param isPaused \c true to pause playback, \c false to resume playback.
+	\param rampTime Determines how long the change in playback state should
+		   take to complete in microseconds. Set to 0 for an instantaneous
+		   change.
+
+	\returns A status code.
+	\retval B_OK The playback state was updated.
+	\retval EALREADY Already in the requested playback state.
+*/
+
+
+/*!
+	\fn int32 BFileGameSound::IsPaused()
+	\brief Returns the current playback status.
+
+	\returns An integer indicating the current playback status.
+	\retval B_NOT_PAUSED Sound is playing.
+	\retval B_PAUSE_IN_PROGRESS The sound is transitioning to or from a paused state.
+	\retval B_PAUSED Sound is paused.
+*/

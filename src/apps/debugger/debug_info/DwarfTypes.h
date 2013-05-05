@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2012-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DWARF_TYPES_H
@@ -16,6 +17,7 @@
 
 class Architecture;
 class CompilationUnit;
+class DebugInfoEntry;
 class DIEAddressingType;
 class DIEArrayType;
 class DIEBaseType;
@@ -79,6 +81,7 @@ public:
 									{ return fTargetInterface; }
 			RegisterMap*		FromDwarfRegisterMap() const
 									{ return fFromDwarfRegisterMap; }
+			uint8			AddressSize() const;
 
 private:
 			Architecture*		fArchitecture;
@@ -106,6 +109,16 @@ public:
 	virtual	const BString&		ID() const;
 	virtual	const BString&		Name() const;
 	virtual	target_size_t		ByteSize() const;
+
+	virtual status_t			CreateDerivedAddressType(
+									address_type_kind kind,
+									AddressType*& _resultType);
+
+	virtual	status_t			CreateDerivedArrayType(
+									int64 lowerBound,
+									int64 elementCount,
+									bool extendExisting,
+									ArrayType*& _resultType);
 
 	virtual	status_t			ResolveObjectDataLocation(
 									const ValueLocation& objectLocation,
@@ -232,6 +245,25 @@ private:
 };
 
 
+class DwarfTemplateParameter : public TemplateParameter {
+public:
+								DwarfTemplateParameter(
+									DebugInfoEntry* entry,
+									DwarfType* type);
+								~DwarfTemplateParameter();
+
+	virtual	template_type_kind	Kind() const { return fTemplateKind; }
+	virtual	Type*				GetType() const { return fType; }
+	virtual BVariant			Value() const { return fValue; }
+
+private:
+			DebugInfoEntry*		fEntry;
+			template_type_kind	fTemplateKind;
+			Type*				fType;
+			BVariant			fValue;
+};
+
+
 class DwarfPrimitiveType : public PrimitiveType, public DwarfType {
 public:
 								DwarfPrimitiveType(
@@ -254,14 +286,20 @@ private:
 class DwarfCompoundType : public CompoundType, public DwarfType {
 public:
 								DwarfCompoundType(DwarfTypeContext* typeContext,
-									const BString& name, DIECompoundType* entry);
+									const BString& name, DIECompoundType* entry,
+									compound_type_kind compoundKind);
 								~DwarfCompoundType();
+
+	virtual	compound_type_kind	CompoundKind() const;
 
 	virtual	int32				CountBaseTypes() const;
 	virtual	BaseType*			BaseTypeAt(int32 index) const;
 
 	virtual	int32				CountDataMembers() const;
 	virtual	DataMember*			DataMemberAt(int32 index) const;
+
+	virtual int32				CountTemplateParameters() const;
+	virtual TemplateParameter*	TemplateParameterAt(int32 index) const;
 
 	virtual	status_t			ResolveBaseTypeLocation(BaseType* _baseType,
 									const ValueLocation& parentLocation,
@@ -277,10 +315,13 @@ public:
 
 			bool				AddInheritance(DwarfInheritance* inheritance);
 			bool				AddDataMember(DwarfDataMember* member);
+			bool				AddTemplateParameter(
+									DwarfTemplateParameter* parameter);
 
 private:
 			typedef BObjectList<DwarfDataMember> DataMemberList;
 			typedef BObjectList<DwarfInheritance> InheritanceList;
+			typedef BObjectList<DwarfTemplateParameter> TemplateParameterList;
 
 private:
 			status_t			_ResolveDataMemberLocation(
@@ -290,9 +331,11 @@ private:
 									ValueLocation*& _location);
 
 private:
+			compound_type_kind	fCompoundKind;
 			DIECompoundType*	fEntry;
 			InheritanceList		fInheritances;
 			DataMemberList		fDataMembers;
+			TemplateParameterList fTemplateParameters;
 };
 
 

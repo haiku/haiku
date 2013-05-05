@@ -12,6 +12,7 @@ KernelAddon radeon_hd :
 	driver.cpp
 	device.cpp
 	radeon_hd.cpp
+	sensors.cpp
 	: libgraphicscommon.a
 ;
 

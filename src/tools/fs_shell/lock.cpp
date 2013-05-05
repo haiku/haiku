@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2012, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -99,6 +99,17 @@ fssh_recursive_lock_unlock(fssh_recursive_lock *lock)
 		lock->holder = -1;
 		fssh_release_sem(lock->sem);
 	}
+}
+
+
+extern "C" void
+fssh_recursive_lock_transfer_lock(fssh_recursive_lock *lock,
+	fssh_thread_id thread)
+{
+	if (lock->recursion != 1)
+		fssh_panic("invalid recursion level for lock transfer!");
+
+	lock->holder = thread;
 }
 
 

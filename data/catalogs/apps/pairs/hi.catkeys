@@ -1,0 +1,14 @@
+1	hindi	x-vnd.Haiku-Pairs	1981673050
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\tरेल्फ़ स्चुल्के के द्वारा लिखा गया\n\tCopyright 2008-2010, हैकू इंक.\n\n आप ने खेल को खतम किया %num% क्लिच्क्स में.\n
+Expert (8x8)	PairsWindow		विशेषज्ञ (8x8)
+Beginner (4x4)	PairsWindow		शुरू करनेवाला (4x4)
+Quit game	PairsWindow		खेल छोड़े
+Game	PairsWindow		खेल
+Size	PairsWindow		माप
+New	PairsWindow		नया
+OK	PairsView		ठीक है
+Intermediate (6x6)	PairsWindow		मध्यवर्ती (6x6)
+Quit	PairsWindow		बाहर आये
+Pairs	System name		जोड़े
+New game	PairsWindow		नया खेल
+Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		जोड़ो को प्रणाली मे पर्याप्त सदिश चिह्न नहीं मिले ; इसे %d की कम से कम जरूरत है .

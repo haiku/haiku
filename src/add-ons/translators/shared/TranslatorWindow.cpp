@@ -35,8 +35,8 @@
 #include "TranslatorWindow.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "TranslatorWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "TranslatorWindow"
 
 
 // ---------------------------------------------------------------
@@ -88,6 +88,7 @@ LaunchTranslatorWindow(BTranslator *translator, const char *title, BRect rect)
 	if (translator->MakeConfigurationView(NULL, &view, &rect)) {
 		BAlert *err = new BAlert(B_TRANSLATE("Error"),
 			B_TRANSLATE("Unable to create the view."), B_TRANSLATE("OK"));
+		err->SetFlags(err->Flags() | B_CLOSE_ON_ESCAPE);
 		err->Go();
 		return B_ERROR;
 	}

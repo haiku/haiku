@@ -77,8 +77,8 @@ public:
 	virtual	void				DoLayout();
 	virtual	void				FrameMoved(BPoint newPosition);
 	virtual	void				FrameResized(float newWidth, float newHeight);
+
 			void				InvalidateLayout();
-	virtual	void				InvalidateLayout(bool descendants);
 
 	virtual void				MakeFocus(bool focus = true);
 
@@ -122,6 +122,7 @@ public:
 			float				MaxContentWidth() const;
 
 			BMenuItem*			FindMarked();
+			int32				FindMarkedIndex();
 
 			BMenu*				Supermenu() const;
 			BMenuItem*			Superitem() const;
@@ -138,6 +139,8 @@ protected:
 								BMenu(BRect frame, const char* name,
 									uint32 resizeMask, uint32 flags,
 									menu_layout layout, bool resizeToFit);
+
+	virtual	void				LayoutInvalidated(bool descendants);
 
 	virtual	BPoint				ScreenLocation();
 
@@ -211,7 +214,7 @@ private:
 									bool moveItems, float* width,
 									float* height);
 			void				_ComputeColumnLayout(int32 index, bool bestFit,
-									bool moveItems, BRect& outRect);
+									bool moveItems, BRect* override, BRect& outRect);
 			void				_ComputeRowLayout(int32 index, bool bestFit,
 									bool moveItems, BRect& outRect);		
 			void				_ComputeMatrixLayout(BRect& outRect);
@@ -243,7 +246,14 @@ private:
 			void				_SetIgnoreHidden(bool on);
 			void				_SetStickyMode(bool on);
 			bool				_IsStickyMode() const;
-			void				_GetIsAltCommandKey(bool &value) const;
+
+			// Methods to get the current modifier keycode
+			void				_GetShiftKey(uint32 &value) const;
+			void				_GetControlKey(uint32 &value) const;
+			void				_GetCommandKey(uint32 &value) const;
+			void				_GetOptionKey(uint32 &value) const;
+			void				_GetMenuKey(uint32 &value) const;
+
 			void				_CalcTriggers();
 			bool				_ChooseTrigger(const char* title, int32& index,
 									uint32& trigger,
@@ -260,7 +270,14 @@ private:
 			void				_QuitTracking(bool onlyThis = true);
 
 	static	menu_info			sMenuInfo;
-	static	bool				sAltAsCommandKey;
+
+			// Variables to keep track of what code is currently assigned to
+			// each modifier key
+	static	uint32				sShiftKey;
+	static	uint32				sControlKey;
+	static	uint32				sOptionKey;
+	static	uint32				sCommandKey;
+	static	uint32				sMenuKey;
 
 			BMenuItem*			fChosenItem;
 			BList				fItems;

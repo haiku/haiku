@@ -77,6 +77,9 @@ public:
 									{ return fOffset; }
 			off_t				Size() const
 									{ return fSize; }
+
+			const char*			DevicePath();
+
 private:
 			partition_id		fPartitionID;
 			partition_id		fParentID;
@@ -93,11 +96,15 @@ public:
 
 	virtual	void				AttachedToWindow();
 
+	virtual	bool				InitiateDrag(BPoint rowPoint, bool wasSelected);
+
 			PartitionListRow*	FindRow(partition_id id,
 									PartitionListRow* parent = NULL);
 			PartitionListRow*	AddPartition(BPartition* partition);
 			PartitionListRow*	AddSpace(partition_id parent,
 									partition_id id, off_t offset, off_t size);
+
+	virtual BSize				PreferredSize();
 
 private:
 			int32				_InsertIndexForOffset(PartitionListRow* parent,

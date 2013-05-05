@@ -14,7 +14,6 @@
 #include <graphic_driver.h>
 #ifdef __HAIKU__
 #include <boot_item.h>
-#include <arch/x86/vm86.h>
 #endif	// __HAIKU__
 
 #include "DriverInterface.h"

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -240,7 +240,7 @@ void
 ValueLocation::Dump() const
 {
 	int32 count = fPieces.Size();
-	printf("ValueLocation: %s endian, %ld pieces:\n",
+	printf("ValueLocation: %s endian, %" B_PRId32 " pieces:\n",
 		fBigEndian ? "big" : "little", count);
 
 	for (int32 i = 0; i < count; i++) {
@@ -253,14 +253,14 @@ ValueLocation::Dump() const
 				printf("  unknown");
 				break;
 			case VALUE_PIECE_LOCATION_MEMORY:
-				printf("  address %#llx", piece.address);
+				printf("  address %#" B_PRIx64, piece.address);
 				break;
 			case VALUE_PIECE_LOCATION_REGISTER:
-				printf("  register %lu", piece.reg);
+				printf("  register %" B_PRIu32, piece.reg);
 				break;
 		}
 
-		printf(" size: %llu (%llu bits), offset: %llu bits\n", piece.size,
-			piece.bitSize, piece.bitOffset);
+		printf(" size: %" B_PRIu64 " (%" B_PRIu64 " bits), offset: %" B_PRIu64
+			" bits\n", piece.size, piece.bitSize, piece.bitOffset);
 	}
 }

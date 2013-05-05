@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2001-2012, Axel Dörfler, axeld@pinc-software.de
  * This file may be used under the terms of the MIT License.
  */
 #ifndef BFS_CONTROL_H
@@ -36,11 +36,16 @@ struct update_boot_block {
 #define BFS_IOCTL_STOP_CHECKING		14202
 #define BFS_IOCTL_CHECK_NEXT_NODE	14203
 
+/* The "pass" field constants */
+#define BFS_CHECK_PASS_BITMAP		0
+#define BFS_CHECK_PASS_INDEX		1
+
 /* All fields except "flags", and "name" must be set to zero before
  * BFS_IOCTL_START_CHECKING is called, and magic must be set.
  */
 struct check_control {
 	uint32		magic;
+	uint32		pass;
 	uint32		flags;
 	char		name[B_FILE_NAME_LENGTH];
 	ino_t		inode;
@@ -78,6 +83,7 @@ struct check_control {
 	 * Also requires the B_FIX_BITMAP_ERRORS to be set.
 	 */
 #define BFS_FIX_NAME_MISMATCHES	8
+#define BFS_FIX_BPLUSTREES		16
 
 /* values for the errors field */
 #define BFS_MISSING_BLOCKS		1
@@ -86,6 +92,7 @@ struct check_control {
 #define	BFS_COULD_NOT_OPEN		8
 #define BFS_WRONG_TYPE			16
 #define BFS_NAMES_DONT_MATCH	32
+#define BFS_INVALID_BPLUSTREE	64
 
 /* check control magic value */
 #define BFS_IOCTL_CHECK_MAGIC	'BChk'

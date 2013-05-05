@@ -1,0 +1,323 @@
+/*!
+	\file MidiConsumer.h
+	\ingroup midi2
+	\ingroup libbe
+	\brief Defines consumer classes for the MIDI Kit.
+*/
+
+
+/*!
+	\class BMidiConsumer MidiConsumer.h
+	\ingroup midi2
+	\ingroup libmidi2
+	\ingroup libbe
+	\brief Receives MIDI events from a producer
+
+	A consumer is an object that knows how to deal with incoming MIDI events. A 
+	consumer can be connected to multiple producers at the same time. There is no 
+	way to find out which producers are connected to this consumer just by looking 
+	at the BMidiConsumer object; you will have to consult BMidiRoster for that.
+
+	A BMidiConsumer either represents a local consumer, i.e. a class extending from 
+	BMidiLocalConsumer, or is a proxy for a remote object published by another app. 
+*/
+
+
+/*!
+	\fn bigtime_t BMidiConsumer::Latency() const
+	\brief Returns the latency of this consumer
+
+	The latency is measured in microseconds. Producers should attempt to get MIDI 
+	events to this consumer by <I>(when - latency)</I>. You do this by subtracting 
+	the latency from the performance time when you spray the events (provided that 
+	you spray these events ahead of time, of course).
+
+	You cannot <I>set</I> the latency on a BMidiConsumer, only on a 
+	BMidiLocalConsumer.
+
+	The latency issue gets slightly more complicated when multiple endpoints are 
+	chained together, as in the following picture:
+
+\verbatim
++-------+     +-------------+     +-------+
+|       |     |             |     |       |
+| prodA |---->| consB prodB |---->| consC |
+|       |     |             |     |       |
++-------+     +-------------+     +-------+
+  appA          appB (filter)       appC
+\endverbatim
+
+	Suppose consC has 200ms latency, and consB has 100ms latency. If consB simply 
+	reports 100ms, then prodA will schedule its events for (t - 100), which is 
+	really 200ms too late. (Of course, producers send out their events as soon as 
+	possible, so depending on the load of the system, everything may work out just 
+	fine.)
+
+	ConsB should report the latency of the consumer that is hooked up to its 
+	output, consC, in addition to its own latency. In other words, the full 
+	downstream latency. So, the reported latency in this case would be 300ms. This 
+	also means that appB should change the latency of consB when prodB makes or 
+	breaks a connection, and when consC reports a latency change. (If multiple 
+	consumers are connected to prodB, you should take the slowest one.) 
+	Unfortunately, the Midi Kit provides no easy mechanism for doing any of this, 
+	so you are on your own here.
+*/
+
+/*!
+	\class BMidiLocalConsumer MidiConsumer.h
+	\ingroup midi2
+	\ingroup libmidi2
+	\ingroup libbe
+	\brief A consumer endpoint that is created by your own application.
+
+	If you want to create a consumer that reacts to MIDI events, you should 
+	subclass BMidiLocalConsumer.
+
+	Each local consumer has its own thread that receives and dispatches the MIDI 
+	events. Whenever MIDI data arrives, the Data() hook passes the MIDI event on to 
+	a more specific hook function: NoteOn(), NoteOff(), SystemExclusive(), and so 
+	on. Calls to these hook functions are serialized -- they will never have to be 
+	re-entrant. They also should not be called from outside the thread that is 
+	invoking them.
+
+	Your subclass can override any of the MIDI event hooks. BMidiLocalConsumer 
+	doesn't provide default implementations for them, so you don't have to call a 
+	hook's default implementation if you override it. For complete control, you can 
+	also override Data().
+
+	Most hook functions take a channel argument. Even though MIDI channels are 
+	really numbered 1 through 16, the hook functions work with channels 0 through 
+	15. The performance time for the event is specified in microseconds relative to 
+	the system time base. A performance time that is 0 (or really any time in the 
+	past) means "play as soon as possible". See the \ref midi2time "introduction" 
+	for more information about timing and consumers.
+
+	The thread driving the consumer's events is a very high priority real time 
+	thread. Events should be handled as quickly as possible (not counting 
+	snoozing). If non-time-critical computation is needed it may be wise to queue 
+	events up for a lower priority thread to handle them external to the main event 
+	thread.
+*/
+
+
+/*!
+	\fn BMidiLocalConsumer::BMidiLocalConsumer(const char *name = NULL)
+	\brief Creates a new local consumer endpoint
+
+	The new endpoint is not visible to other applications until you Register() it.
+
+	You can tell the constructor what the name of the new consumer will be. If you 
+	pass NULL (or use the default argument), then the consumer's name will be an 
+	empty string. It won't be NULL, since endpoint names cannot be NULL.
+
+	There is no guarantee that the endpoint will be successfully created. For 
+	example, the Midi Server may not be running. Therefore, you should always call 
+	IsValid() after creating a new endpoint to make sure that everything went okay. 
+	If not, Release() the object to reclaim memory and abort gracefully.
+
+\code
+MyConsumer* cons = new MyConsumer(...);
+if (!cons->IsValid())
+{
+    cons->Release();
+    ...exit gracefully...
+}
+\endcode
+
+*/
+
+
+/*!
+	\fn void BMidiLocalConsumer::SetLatency(bigtime_t latency)
+	\brief Changes the published latency of the consumer.
+
+	\sa Latency()
+*/
+
+
+/*!
+	\fn int32 BMidiLocalConsumer::GetProducerID()
+	\brief Returns the ID of the producer that most recently sent a MIDI event to 
+		   this consumer.
+
+	You can call this from one of the hooks to determine which producer the event 
+	came from.
+*/
+
+
+/*!
+	\fn void BMidiLocalConsumer::SetTimeout(bigtime_t when, void* data)
+	\brief Requests that the Timeout() hook will be called at some point.
+
+	This method asks the consumer thread to call the Timeout() hook as soon as 
+	possible after the timeout expires. For every call to SetTimeout(), the 
+	Timeout() hook is only called once. Note: the term "timeout" may be a little 
+	misleading; the hook will <I>always</I> be called, even if events are received 
+	in the mean time. Apparently, this facility is handy for dealing with early 
+	events.
+
+	Note that the event thread blocks on the consumer's port as long as no events 
+	arrive. By default no timeout is set, and as a result the thread blocks 
+	forever. Your call to SetTimeout() doesn't change this. The new timeout value 
+	will go into effect the next time the thread tries to read from the port, i.e. 
+	after the first event has been received. If no event ever comes in, the 
+	Timeout() hook will never be called. This also means that you cannot cancel a 
+	timeout once you have set it. To repeat, calling SetTimeout() only takes effect 
+	after at least one new event has been received.
+
+	\param when An absolute time that's measured against the system clock.
+
+	\param data A pointer to a "cookie" that you can pass along to Timeout(). The 
+	data is not copied, so you must ensure that the pointer remains valid until 
+	Timeout() is called. You typically delete the data inside Timeout().
+*/
+
+
+/*!
+	\fn void BMidiLocalConsumer::Timeout(void* data)
+	\brief Hook function that is called per your own request.
+
+	\sa SetTimeout()
+*/
+
+/*!
+	\fn void BMidiLocalConsumer::Data(uchar* data, size_t length, bool atomic,
+		bigtime_t time)
+	\brief Invoked when raw MIDI is received.
+
+	What the default implementation of Data() does depends on the value of atomic. 
+	If atomic is true, the data received comprises a single MIDI event; i.e. one 
+	status byte followed by the appropriate number of data bytes and nothing else. 
+	In this case, Data() calls the event-specific hook function that corresponds to 
+	that status byte. This optimization is used by the Midi Kit to allow faster 
+	dispatch of events generated by the specific Spray functions from 
+	BMidiLocalProducer.
+
+	If atomic is false, Data() ignores the MIDI event. If you want a consumer to 
+	handle non-atomic events, you have to override Data() and program this 
+	yourself. In that case, you probably also want to call the default 
+	implementation to handle the "normal" MIDI events.
+
+	Data() is rarely overridden, but you can override it if you want to. If you do, 
+	remember that the data buffer is owned by the Midi Kit. Do not attempt to 
+	modify or free it, lest you wish to be laughed at by other developers.
+
+	\param data the MIDI event data
+	\param length byte size of the data buffer
+	\param atomic whether the data buffer contains a single complete MIDI event
+	\param time the requested performance time of the event
+
+	\sa BMidiLocalProducer::SprayData()
+*/
+
+
+/*!
+	\fn void BMidiLocalConsumer::NoteOff(uchar channel, uchar note,
+		uchar velocity, bigtime_t time)
+	\brief Invoked when a Note Off event is received.
+
+	\sa BMidiLocalProducer::SprayNoteOff()
+*/
+
+
+/*!
+	\fn void BMidiLocalConsumer::NoteOn(uchar channel, uchar note,
+		uchar velocity, bigtime_t time)
+	\brief Invoked when a Note On event is received.
+
+	\sa BMidiLocalProducer::SprayNoteOn()
+*/
+
+
+/*!
+	\fn void BMidiLocalConsumer::KeyPressure(uchar channel, uchar note,
+		uchar pressure, bigtime_t time)
+	\brief Invoked when a Polyphonic Pressure (Aftertouch) event is received.
+
+	\sa BMidiLocalProducer::SprayKeyPressure()
+*/
+
+
+/*!
+	\fn void BMidiLocalConsumer::ControlChange(uchar channel,
+		uchar controlNumber, uchar controlValue, bigtime_t time)
+	\brief Invoked when a Controller Change event is received.
+
+	\sa BMidiLocalProducer::SprayControlChange()
+*/
+
+
+/*!
+	\fn void BMidiLocalConsumer::ProgramChange(uchar channel,
+		uchar programNumber, bigtime_t time)
+	\brief Invoked when a Program Change event is received.
+
+	\sa BMidiLocalProducer::SprayProgramChange()
+*/
+
+
+/*!
+	\fn void BMidiLocalConsumer::ChannelPressure(uchar channel,
+		uchar pressure, bigtime_t time)
+	\brief Invoked when a Channel Pressure event is received.
+
+	\sa BMidiLocalProducer::SprayChannelPressure()
+*/
+
+
+/*!
+	\fn void BMidiLocalConsumer::PitchBend(uchar channel, uchar lsb,
+		uchar msb, bigtime_t time)
+	\brief Invoked when a Pitch Bend event is received.
+
+	\sa BMidiLocalProducer::SprayPitchBend()
+*/
+
+
+/*!
+	\fn void BMidiLocalConsumer::SystemExclusive(void* data, size_t length,
+		bigtime_t time)
+	\brief Invoked when a System Exclusive event is received.
+
+	The data does not include the sysex start and end control bytes
+	(0xF0 and 0xF7), only the payload of the sysex message.
+
+	The data belongs to the Midi Kit and is only valid for the duration of
+	this event. You may not modify or free it.
+
+	\sa BMidiLocalProducer::SpraySystemExclusive()
+*/
+
+
+/*!
+	\fn void BMidiLocalConsumer::SystemCommon(uchar status, uchar data1,
+		uchar data2, bigtime_t time)
+	\brief Invoked when a System Common event is received.
+
+	Not all data bytes are used for all common events. Unused bytes are
+	set to 0.
+
+	\sa BMidiLocalProducer::SpraySystemCommon()
+*/
+
+
+/*!
+	\fn void BMidiLocalConsumer::SystemRealTime(uchar status, bigtime_t time)
+	\brief Invoked when a Real Time event is received.
+
+	\sa BMidiLocalProducer::SpraySystemRealTime()
+*/
+
+
+/*!
+	\fn void BMidiLocalConsumer::TempoChange(int32 beatsPerMinute, bigtime_t time)
+
+	\brief Invoked when a Tempo Change event is received
+	\sa BMidiLocalProducer::SprayTempoChange()
+*/
+
+
+/*!
+	\fn void BMidiLocalConsumer::AllNotesOff(bool justChannel, bigtime_t time)
+	\brief Not used.
+*/

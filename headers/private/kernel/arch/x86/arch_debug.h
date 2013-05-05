@@ -10,7 +10,7 @@
 
 
 struct arch_debug_registers {
-	uint32	ebp;
+	addr_t	bp;
 };
 
 

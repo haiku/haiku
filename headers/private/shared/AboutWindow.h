@@ -1,28 +1,52 @@
 /*
- * Copyright 2007-2009 Haiku, Inc.
+ * Copyright 2007-2012 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Ryan Leavengood, leavengood@gmail.com
+ *		Ryan Leavengood <leavengood@gmail.com>
+ *		John Scipione <jscipione@gmail.com>
  */
 #ifndef B_ABOUT_WINDOW_H
 #define B_ABOUT_WINDOW_H
 
 
-#include <String.h>
+#include <GroupView.h>
+#include <Window.h>
+#include <View.h>
 
 
-class BAboutWindow {
-	public:
-		BAboutWindow(const char *appName, int32 firstCopyrightYear,
-			const char **authors, const char *extraInfo = NULL);
-		virtual ~BAboutWindow();
+class AboutView;
+class BBitmap;
+class BPoint;
 
-		void Show();
+class BAboutWindow : public BWindow {
+ public:
+							BAboutWindow(const char* appName,
+								const char* signature);
+	virtual					~BAboutWindow();
 
-	private:
-		BString* 		fAppName;
-		BString*		fText;
+	virtual	void			Show();
+
+			BPoint			AboutPosition(float width, float height);
+			void			AddDescription(const char* description);
+			void			AddCopyright(int32 firstCopyrightYear,
+								const char* copyrightHolder,
+								const char** extraCopyrights = NULL);
+			void			AddAuthors(const char** authors);
+			void			AddSpecialThanks(const char** thanks);
+			void			AddVersionHistory(const char** history);
+			void			AddExtraInfo(const char* extraInfo);
+
+			BBitmap*		Icon();
+			void			SetIcon(BBitmap* icon);
+
+			const char*		Name();
+			void			SetName(const char* name);
+
+			const char*		Version();
+			void			SetVersion(const char* version);
+ private:
+			AboutView*		fAboutView;
 };
 
 #endif	// B_ABOUT_WINDOW_H

@@ -14,8 +14,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "RTFTranslator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "RTFTranslator"
 
 #define READ_BUFFER_SIZE 2048
 #define DATA_BUFFER_SIZE 64
@@ -84,7 +84,7 @@ RTFTranslator::TranslatorName() const
 const char *
 RTFTranslator::TranslatorInfo() const
 {
-	return B_TRANSLATE("Rich Text Format Translator");
+	return B_TRANSLATE("Rich Text Format translator");
 }
 
 
@@ -135,7 +135,8 @@ RTFTranslator::Identify(BPositionIO *stream,
 	info->group = B_TRANSLATOR_TEXT;
 	info->quality = RTF_IN_QUALITY;
 	info->capability = RTF_IN_CAPABILITY;
-	strcpy(info->name, B_TRANSLATE("RichTextFormat file"));
+	strlcpy(info->name, B_TRANSLATE("RichTextFormat file"),
+		sizeof(info->name));
 	strcpy(info->MIME, "text/rtf");
 
 	return B_OK;

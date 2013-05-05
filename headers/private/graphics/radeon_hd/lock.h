@@ -81,4 +81,5 @@ class Autolock {
 		struct lock	*fLock;
 };
 
+
 #endif	/* LOCK_H */

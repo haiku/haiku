@@ -39,8 +39,8 @@
 #include <string.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ProcessController"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ProcessController"
 
 
 class PCApplication : public BApplication {
@@ -93,7 +93,6 @@ PCApplication::ReadyToRun()
 			" or install it in the Deskbar."), B_TRANSLATE("Run in window"),
 			B_TRANSLATE("Install in Deskbar"),
 			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		alert->SetShortcut(0, B_ESCAPE);
 
 		if (alert->Go() != 0) {
 			BDeskbar deskbar;
@@ -107,7 +106,7 @@ PCApplication::ReadyToRun()
 			B_TRANSLATE("ProcessController is already installed in Deskbar."),
 			B_TRANSLATE("OK"), NULL,
 			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 	}
 
@@ -116,10 +115,10 @@ PCApplication::ReadyToRun()
 	// quit other eventually running instances
 	BList list;
 	be_roster->GetAppList(kSignature, &list);
-	long count = list.CountItems();
+	int32 count = list.CountItems();
 	if (count > 1) {
-		for (long i = 0; i < count - 1; i++) {
-			BMessenger* otherme = new BMessenger(NULL, (team_id)list.ItemAt(i));
+		for (int32 i = 0; i < count - 1; i++) {
+			BMessenger* otherme = new BMessenger(NULL, (addr_t)list.ItemAt(i));
 			BMessage* message = new BMessage(B_QUIT_REQUESTED);
 			otherme->SendMessage(message);
 			delete otherme;

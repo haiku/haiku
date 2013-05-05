@@ -5,3 +5,4 @@ SubInclude HAIKU_TOP src add-ons kernel drivers power acpi_button ;
 SubInclude HAIKU_TOP src add-ons kernel drivers power acpi_lid ;
 SubInclude HAIKU_TOP src add-ons kernel drivers power acpi_thermal ;
 SubInclude HAIKU_TOP src add-ons kernel drivers power enhanced_speedstep ;
+SubInclude HAIKU_TOP src add-ons kernel drivers power x86_cpuidle ;

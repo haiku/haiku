@@ -84,6 +84,8 @@ const char* kUploadClients[] = {
 
 const int32 kUploadClientsCount = sizeof(kUploadClients) / sizeof(char*);
 
+class VideoWindow;
+class ControlWindow;
 
 class CodyCam : public BApplication {
 public:
@@ -104,9 +106,9 @@ private:
 			VideoConsumer*	fVideoConsumer;
 			media_output	fProducerOut;
 			media_input		fConsumerIn;
-			BWindow*		fWindow;
+			VideoWindow*	fWindow;
 			port_id			fPort;
-			BWindow*		fVideoControlWindow;
+			ControlWindow*	fVideoControlWindow;
 };
 
 
@@ -124,6 +126,7 @@ public:
 
 			BView*			VideoView();
 			BStringView*	StatusLine();
+			void			ToggleMenuOnOff();
 
 private:
 			void			_BuildCaptureControls();
@@ -159,6 +162,8 @@ private:
 			ftp_msg_info	fFtpInfo;
 
 			Settings*		fSettings;
+			
+			BMenu* 			fMenu;
 
 			StringValueSetting*		fServerSetting;
 			StringValueSetting*		fLoginSetting;

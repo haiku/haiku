@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2013, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Adriano Duarte
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Deskbar</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../fr/deskbar.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/deskbar.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/deskbar.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/deskbar.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/deskbar.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/deskbar.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/deskbar.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/deskbar.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/deskbar.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/deskbar.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/deskbar.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/deskbar.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../hu/deskbar.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../ca/deskbar.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../en/deskbar.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="tracker-add-ons.html">Adicionais do Rastreador</a> 
+::  <a href="contents.html" class="uplink">Conteúdo</a> 
+::  <a href="filetypes.html">Tipos de Arquivos</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Índice</td></tr>
+<tr class="index"><td>
+	<a href="#deskbar-menu">O Menu da Deskbar</a><br />
+	<a href="#tray">A Bandeja</a><br />
+	<a href="#list-of-apps">A lista de programas em execução</a>
+</td></tr>
+</table>
+
+<h1>Deskbar</h1>
+
+<p>A Deskbar é o pequeno painel que por padrão está localizado no canto superior direito da tela. É a versão do Haiku para a barra de tarefas do Windows com seu botão Iniciar. Ele contém o menu da Deskbar de onde pode-se iniciar aplicativos e preferências, uma bandeja com um relógio e outras ferramentas abaixo dele e uma lista dos programas atualmente em execução, mais abaixo.</p>
+<img src="images/deskbar-images/positions.png" alt="positions" />
+<p>Pode-se mover a Deskbar para qualquer canto ou como uma barra ao longo da borda superior ou inferior da tela segurando a área pontilhada em um dos lados da bandeja e arrastar e soltá-la na nova posição. Pode-se também comprimí-la em uma disposição mais compacta arranstando e soltando a área pontilhada dentro do menu da Deskbar.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="deskbar-menu" name="deskbar-menu">O Menu da Deskbar</a></h2>
+<p>Um menu abre ao clicar no topo da Deskbar:</p>
+<img src="images/deskbar-images/deskbar.png" alt="deskbar.png" />
+<ul>
+<li><p><b>Sobre este sistema...</b> - Mostra alguma informação básica do sistema, licenças e os créditos do projeto Haiku.</p></li>
+
+<li><p><b>Procurar...</b> - Abre o diálogo da <a href="queries.html">Consulta</a>.</p></li>
+<li><p><b>Mostrar replicantes</b> - Exibe/oculta o pequeno dispositivo <a href="gui.html#replicants">Replicante</a> widget podendo ser usado para arrastar, remover ou acessar seu menu de contexto.</p></li>
+<li><p><b>Montar</b> - Oferece as mesmas opções como quando invocadas pelo clique no Desktop com o botão direito do mouse (veja <a href="tracker.html#mounting-volumes">Montando Volumes</a>).</p></li>
+<li><p><b>Preferências da Deskbar...</b> - Abre um painel para configurar a Deskbar (veja abaixo).</p></li>
+<li><p><b>Desligar</b> - Oferece opções tanto para <span class="menu">Reiniciar o sistema</span> ou <span class="menu">Desligar</span>.</p></li>
+<li><p><b>Documentos recentes, pastas, aplicativos</b> - Lista dos documentos, pastas e aplicativos abertos recentemente (veja <span class="menu">Preferências da Deskbar</span> abaixo).</p></li>
+<li><p><b>Aplicativos, Demonstrações, Miniaplicativos da Deskbar, Preferências</b> - Lista dos aplicativos instalados, demonstrações, miniaplicativos e preferências.<br /> Pode-se adicionar vínculos para outros programas colocando-os dentro de <span class="path">~/config/settings/deskbar</span>.</p></li>
+</ul>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>Preferências do Deskbar</h3>
+<h4>Menu</h4>
+<p>Enquanto o primeiro par de itens de menu da Deskbar são fixos, pode-se customizar aqueles abaixo de <span class="menu">Desligar...</span>.</p>
+<img src="images/deskbar-images/prefs-menu.png" alt="prefs-menu.png" />
+<p>Aqui pode-se definir o número de documentos, pastas e aplicativos recentes que são mostrados em menu próprio na Deskbar, ou se deseja vê-los todos.<br />
+O botão <span class="button">Editar menu...</span> abre a pasta <span class="path">~/config/settings/deskbar</span>. Nela encontram-se os arquivos e pastas que aparecem na Deskbar, por padrão estes são <span class="menu">Aplicativos</span>, <span class="menu">Demonstrações</span>, <span class="menu">Miniaplicativos da Deskbar</span>, e <span class="menu">Preferências</span>.<br />
+Pode-se eliminar ou adicionar entradas como vínculos para aplicativos, documentos ou até consultas simplesmente copiando/apagando-os desta pasta.</p>
+<p>É ainda mais fácil simplesmente arrastar um arquivo, pasta ou consulta salva e soltar onde você quiser na Deskbar.</p>
+
+<h4>Aplicativos
+</h4>
+<p>As seguintes definições não interferem nos aplicativos instalados, mas no comportamento e visual da lista de aplicativos em execução.</p>
+<img src="images/deskbar-images/prefs-apps.png" alt="prefs-apps.png" />
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Ordenar aplicativos em execução</span></td><td> </td><td>Ordena a lista de programas em execução alfabeticamente.</td></tr>
+<tr><td><span class="menu">Rastreador sempre primeiro</span></td><td> </td><td>Mesmo que tenha ordenado alfabeticamente, a entrada do Rastreador sempre permanece em primeiro na lista.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Exibir expansor do aplicativo</span></td><td> </td><td>Proporciona um pequeno dispositivo para exibir/ocultar todas as janelas de um programa diretamente sob sua entrada na Deskbar.</td></tr>
+<tr><td><span class="menu">Expandir novos aplicativos</span></td><td> </td><td>Programas carregados recentemente tem suas janelas automaticamente expandidas sob suas entradas na Deskbar.</td></tr>
+<tr><td><span class="menu">Ocultar nomes de aplicativos</span></td><td> </td><td>Remove os rótulos de texto de aplicativos em execução.</td></tr>
+<tr><td><span class="menu">Tamanho do ícone</span></td><td> </td><td>Ajusta o tamanho do ícone de aplicativos em execução.</td></tr>
+</table>
+
+<h4>Janela
+</h4>
+<p>A última guia contem as preferências para a janela da Deskbar.</p>
+<img src="images/deskbar-images/prefs-window.png" alt="prefs-window.png" />
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Sempre no topo</span></td><td> </td><td>A Deskbar permanece sempre sobre todas as outras janelas.</td></tr>
+<tr><td><span class="menu">Auto-exibir</span></td><td> </td><td>A Deskbar pula para a frente se o ponteiro do mouse o toca.</td></tr>
+<tr><td><span class="menu">Auto-ocultar</span></td><td> </td><td>A Deskbar é reduzida para apenas uns poucos  pixels e apenas aparece se o ponteiro do mouse os toca.</td></tr>
+</table>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="tray" name="tray">A Bandeja</a></h2>
+<img src="images/deskbar-images/calendar.png" alt="calendar.png" />
+<p>Entre outras coisas, a bandeja é a casa do relógio. Pouse o mouse sobre ele para exibir a data em uma legenda. Clique com o botão esquerdo do mouse para exibir um calendário. Clique com o botão direito do mouse para ocultar/exibir o relógio ou carregar as preferências de <a href="preferences/time.html">Hora</a> para definí-las.</p>
+<p>Qualquer programa pode instalar um ícone na bandeja para prover uma interface ao usuário. O sistema de correio eletrônico, por exemplo, exibe um símbolo diferente quando existe correio não lido e oferece um menu de contexto para, por exemplo, criar ou checar novas mensagens. O<span class="app">Controlador de Processos</span> é outro exemplo que usa seu ícone na bandeja para prover informação (uso da memória/CPU) e oferecer um menu de contexto.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="list-of-apps" name="list-of-apps">A lista de programas em execução</a></h2>
+<img src="images/deskbar-images/list-of-apps.png" alt="list-of-apps.png" />
+<p>Pode-se alternar para um aplicativo em execução específico clicando em sua entrada na Deskbar e escolhendo (uma de) suas janelas a partir do submenu. Clicando com o botão direito do mouse pode-se minimizar ou fechar uma janela ou o aplicativo inteiro.</p>
+<p>Se ativou Expansores nas definições da Deskbar, pode-se expandir/minimizar a lista de janelas diretamente sob uma entrada de aplicativo.</p>
+<p>Na frente de cada janela de aplicativo está um símbolo provendo informação sobre o seu estado. Um símbolo brilhante significa que a janela está visível, um escuro significa que está minimizado. Três linhas na frente de um símbolo mostra que ela não está no espaço de trabalho atual.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="tracker-add-ons.html">Adicionais do Rastreador</a> 
+::  <a href="contents.html" class="uplink">Conteúdo</a> 
+::  <a href="filetypes.html">Tipos de Arquivos</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

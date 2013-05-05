@@ -1,14 +1,14 @@
 1	finnish	x-vnd.Haiku-Keyboard	1711838804
+Written by Andrew Edward McCall	KeyboardApplication		Tekijä: Andrew Edward McCall
+Typing test area	KeyboardView		Kirjoitustestausalue
 Defaults	KeyboardWindow		Oletukset
-Delay until key repeat	KeyboardView		Näppäimen toistoviive
-Fast	KeyboardView		Nopea
 Key repeat rate	KeyboardView		Näppäintoistotaajuus
-Keyboard	System name		Näppäimistöasetukset
-Long	KeyboardView		Pitkä
-OK	KeyboardApplication		Valmis
 Revert	KeyboardWindow		Palauta
-Short	KeyboardView		Lyhyt
+Delay until key repeat	KeyboardView		Näppäimen toistoviive
+Keyboard	System name		Näppäimistöasetukset
+OK	KeyboardApplication		Valmis
+Fast	KeyboardView		Nopea
 Slow	KeyboardView		Hidas
 Something has gone wrong!	KeyboardApplication		Jotain meni väärin!
-Typing test area	KeyboardView		Kirjoitustestausalue
-Written by Andrew Edward McCall	KeyboardApplication		Tekijä: Andrew Edward McCall
+Long	KeyboardView		Pitkä
+Short	KeyboardView		Lyhyt

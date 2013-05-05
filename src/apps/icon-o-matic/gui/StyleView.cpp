@@ -6,7 +6,6 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-
 #include "StyleView.h"
 
 #include <new>
@@ -33,8 +32,8 @@
 #include "Style.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Icon-O-Matic-StyleTypes"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Icon-O-Matic-StyleTypes"
 
 
 using std::nothrow;

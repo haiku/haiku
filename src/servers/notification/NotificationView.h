@@ -10,14 +10,18 @@
 
 #include <list>
 
-#include <Bitmap.h>
-#include <MessageRunner.h>
-#include <Notification.h>
+#include <String.h>
 #include <View.h>
+
+
+class BBitmap;
+class BMessageRunner;
+class BNotification;
 
 class NotificationWindow;
 
 const uint32 kRemoveView = 'ReVi';
+
 
 class NotificationView : public BView {
 public:
@@ -31,9 +35,11 @@ public:
 	virtual	void				Draw(BRect updateRect);
 	virtual	void				MouseDown(BPoint point);
 
+/*
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
 	virtual	BSize 				PreferredSize();
+*/
 
 	virtual	BHandler*			ResolveSpecifier(BMessage* msg, int32 index,
 									BMessage* specifier, int32 form,
@@ -45,7 +51,8 @@ public:
 			const char*			MessageID() const;
 
 private:
-			BSize				_CalculateSize();
+			void				_CalculateSize();
+			void				_DrawCloseButton(const BRect& updateRect);
 
 			struct LineInfo {
 				BFont	font;
@@ -62,10 +69,9 @@ private:
 			BMessageRunner*		fRunner;
 
 			BBitmap*			fBitmap;
-
 			LineInfoList		fLines;
-
 			float				fHeight;
+			bool				fCloseClicked;
 };
 
 #endif	// _NOTIFICATION_VIEW_H

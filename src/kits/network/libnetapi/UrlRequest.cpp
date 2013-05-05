@@ -13,27 +13,15 @@
 #include <Debug.h>
 
 
-BUrlRequest::BUrlRequest(const BUrl& url, BUrlProtocolListener* listener)
-	: 
+BUrlRequest::BUrlRequest(const BUrl& url, BUrlProtocolListener* listener,
+	BUrlContext* context)
+	:
 	fListener(listener),
 	fUrlProtocol(NULL),
 	fResult(url),
-	fContext(),
+	fContext(context),
 	fUrl(),
-	fReady(false)
-{
-	SetUrl(url);
-}
-
-
-BUrlRequest::BUrlRequest(const BUrl& url)
-	: 
-	fListener(NULL),
-	fUrlProtocol(NULL),
-	fResult(url),
-	fContext(),
-	fUrl(),
-	fReady(false)
+	fInitStatus(B_ERROR)
 {
 	SetUrl(url);
 }
@@ -46,11 +34,17 @@ BUrlRequest::BUrlRequest(const BUrlRequest& other)
 	fResult(other.fUrl),
 	fContext(),
 	fUrl(),
-	fReady(false)
+	fInitStatus(B_ERROR)
 {
 	*this = other;
 }
 
+
+BUrlRequest::~BUrlRequest()
+{
+	if (fUrlProtocol != NULL)
+		delete fUrlProtocol;
+}
 
 // #pragma mark Request parameters modification
 
@@ -60,16 +54,14 @@ BUrlRequest::SetUrl(const BUrl& url)
 {
 	fUrl = url;
 	fResult.SetUrl(url);
-	
-	if (fUrlProtocol != NULL && url.Protocol() == fUrl.Protocol())
+
+	if (fUrlProtocol != NULL && url.Protocol() == fUrl.Protocol()) {
 		fUrlProtocol->SetUrl(url);
-	else {
-		status_t err = Identify();
-		if (err != B_OK)
-			return err;
+		return B_OK;
 	}
-		
-	return B_OK;
+
+	fInitStatus = _SetupProtocol();
+	return fInitStatus;
 }
 
 
@@ -84,7 +76,7 @@ void
 BUrlRequest::SetProtocolListener(BUrlProtocolListener* listener)
 {
 	fListener = listener;
-	
+
 	if (fUrlProtocol != NULL)
 		fUrlProtocol->SetListener(listener);
 }
@@ -95,7 +87,7 @@ BUrlRequest::SetProtocolOption(int32 option, void* value)
 {
 	if (fUrlProtocol == NULL)
 		return false;
-		
+
 	fUrlProtocol->SetOption(option, value);
 	return true;
 }
@@ -129,36 +121,18 @@ BUrlRequest::Url()
 
 
 status_t
-BUrlRequest::Identify()
-{
-	// TODO: instanciate the correct BUrlProtocol w/ the services roster
-	delete fUrlProtocol;
-	fUrlProtocol = NULL;
-	
-	if (fUrl.Protocol() == "http") {
-		fUrlProtocol = new(std::nothrow) BUrlProtocolHttp(fUrl, fListener, fContext, &fResult);
-		fReady = true;
-		return B_OK;
-	}
-	
-	fReady = false;
-	return B_NO_HANDLER_FOR_PROTOCOL;
-}
-
-
-status_t
-BUrlRequest::Perform()
+BUrlRequest::Start()
 {
 	if (fUrlProtocol == NULL) {
 		PRINT(("BUrlRequest::Perform() : Oops, no BUrlProtocol defined!\n"));
 		return B_ERROR;
 	}
-		
+
 	thread_id protocolThread = fUrlProtocol->Run();
-	
+
 	if (protocolThread < B_OK)
 		return protocolThread;
-		
+
 	return B_OK;
 }
 
@@ -168,7 +142,7 @@ BUrlRequest::Pause()
 {
 	if (fUrlProtocol == NULL)
 		return B_ERROR;
-	
+
 	return fUrlProtocol->Pause();
 }
 
@@ -178,7 +152,7 @@ BUrlRequest::Resume()
 {
 	if (fUrlProtocol == NULL)
 		return B_ERROR;
-		
+
 	return fUrlProtocol->Resume();
 }
 
@@ -188,11 +162,11 @@ BUrlRequest::Abort()
 {
 	if (fUrlProtocol == NULL)
 		return B_ERROR;
-		
+
 	status_t returnCode = fUrlProtocol->Stop();
 	delete fUrlProtocol;
 	fUrlProtocol = NULL;
-	
+
 	return returnCode;
 }
 
@@ -200,10 +174,10 @@ BUrlRequest::Abort()
 // #pragma mark Request informations
 
 
-bool
+status_t
 BUrlRequest::InitCheck() const
 {
-	return fReady;
+	return fInitStatus;
 }
 
 
@@ -212,7 +186,7 @@ BUrlRequest::IsRunning() const
 {
 	if (fUrlProtocol == NULL)
 		return false;
-		
+
 	return fUrlProtocol->IsRunning();
 }
 
@@ -222,7 +196,7 @@ BUrlRequest::Status() const
 {
 	if (fUrlProtocol == NULL)
 		return B_ERROR;
-		
+
 	return fUrlProtocol->Status();
 }
 
@@ -240,6 +214,29 @@ BUrlRequest::operator=(const BUrlRequest& other)
 	fContext = other.fContext;
 	fResult = BUrlResult(other.fUrl);
 	SetUrl(other.fUrl);
-	
+
 	return *this;
+}
+
+
+status_t
+BUrlRequest::_SetupProtocol()
+{
+	// TODO: instanciate the correct BUrlProtocol w/ the services roster
+	delete fUrlProtocol;
+	fUrlProtocol = NULL;
+
+	if (fUrl.Protocol() == "http")
+		fUrlProtocol = new(std::nothrow) BUrlProtocolHttp(fUrl, false, "HTTP",
+			fListener, fContext, &fResult);
+	else if (fUrl.Protocol() == "https")
+		fUrlProtocol = new(std::nothrow) BUrlProtocolHttp(fUrl, true, "HTTPS",
+			fListener, fContext, &fResult);
+	else
+		return B_NO_HANDLER_FOR_PROTOCOL;
+
+	if (fUrlProtocol == NULL)
+		return B_NO_MEMORY;
+
+	return B_OK;
 }

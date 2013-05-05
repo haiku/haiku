@@ -1,48 +1,59 @@
 /*
- * Copyright 2011, Haiku inc.
+ * Copyright 2011 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation by:
+ * Authors:
  *		John Scipione, jscipione@gmail.com
+ *
  * Corresponds to:
- *		/trunk/headers/os/interface/ColorControl.h	 rev 42794
- *		/trunk/src/kits/interface/ColorControl.cpp	 rev 42794
+ *		headers/os/interface/ColorControl.h	 rev 42794
+ *		src/kits/interface/ColorControl.cpp	 rev 42794
  */
 
 
 /*!
 	\file ColorControl.h
+	\ingroup interface
+	\ingroup libbe
 	\brief BColorControl class definition and support enums.
 */
 
 
-/*! \enum color_control_layout
+/*!
+	\enum color_control_layout
+	\ingroup interface
+
 	Enumeration of the color control layout options.
 */
 
 /*!
 	\var color_control_layout B_CELLS_4x64
-	cells are arranged in 4 columns, 64 rows.
+
+	Cells are arranged in 4 columns, 64 rows.
 */
 
 /*!
 	\var color_control_layout B_CELLS_8x32
-	cells are arranged in 8 columns, 32 rows.
+
+	Cells are arranged in 8 columns, 32 rows.
 */
 
 /*!
 	\var color_control_layout B_CELLS_16x16
-	cells are arranged in 16 columns, 16 rows.
+
+	Cells are arranged in 16 columns, 16 rows.
 */
 
 /*!
 	\var color_control_layout B_CELLS_32x8
-	cells are arranged in 32 columns, 8 rows.
+
+	Cells are arranged in 32 columns, 8 rows.
 */
 
 /*!
 	\var color_control_layout B_CELLS_64x4
-	cells are arranged in 64 columns, 4 rows.
+
+	Cells are arranged in 64 columns, 4 rows.
 */
 
 
@@ -64,7 +75,7 @@
 	An example of creating a color control looks like this:
 \code
 colorControl = new BColorControl(BPoint(0, 0), B_CELLS_32x8, 7.0,
-	"ColorControl", new BMessage(kValueChanged));
+    "ColorControl", new BMessage(kValueChanged));
 colorControl->SetValue(0x336698);
 \endcode
 

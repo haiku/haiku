@@ -174,16 +174,14 @@ BCardLayout::GetHeightForWidth(float width, float* min, float* max,
 
 
 void
-BCardLayout::InvalidateLayout(bool children)
+BCardLayout::LayoutInvalidated(bool children)
 {
-	BLayout::InvalidateLayout(children);
-
 	fMinMaxValid = false;
 }
 
 
 void
-BCardLayout::DerivedLayoutItems()
+BCardLayout::DoLayout()
 {
 	_ValidateMinMax();
 
@@ -215,6 +213,13 @@ BCardLayout::Archive(BMessage* into, bool deep) const
 
 
 status_t
+BCardLayout::AllArchived(BMessage* archive) const
+{
+	return BAbstractLayout::AllArchived(archive);
+}
+
+
+status_t
 BCardLayout::AllUnarchived(const BMessage* from)
 {
 	status_t err = BLayout::AllUnarchived(from);
@@ -228,6 +233,22 @@ BCardLayout::AllUnarchived(const BMessage* from)
 
 	return err;
 }
+
+
+status_t
+BCardLayout::ItemArchived(BMessage* into, BLayoutItem* item, int32 index) const
+{
+	return BAbstractLayout::ItemArchived(into, item, index);
+}
+
+
+status_t
+BCardLayout::ItemUnarchived(const BMessage* from, BLayoutItem* item,
+	int32 index)
+{
+	return BAbstractLayout::ItemUnarchived(from, item, index);
+}
+
 
 
 BArchivable*
@@ -299,3 +320,23 @@ BCardLayout::_ValidateMinMax()
 	fMinMaxValid = true;
 	ResetLayoutInvalidation();
 }
+
+
+status_t
+BCardLayout::Perform(perform_code d, void* arg)
+{
+	return BAbstractLayout::Perform(d, arg);
+}
+
+
+void BCardLayout::_ReservedCardLayout1() {}
+void BCardLayout::_ReservedCardLayout2() {}
+void BCardLayout::_ReservedCardLayout3() {}
+void BCardLayout::_ReservedCardLayout4() {}
+void BCardLayout::_ReservedCardLayout5() {}
+void BCardLayout::_ReservedCardLayout6() {}
+void BCardLayout::_ReservedCardLayout7() {}
+void BCardLayout::_ReservedCardLayout8() {}
+void BCardLayout::_ReservedCardLayout9() {}
+void BCardLayout::_ReservedCardLayout10() {}
+

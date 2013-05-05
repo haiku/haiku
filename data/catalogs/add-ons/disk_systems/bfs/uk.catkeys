@@ -1,8 +1,8 @@
-1	ukrainian	application/x-vnd.Haiku-BFSAddOn	1074880496
-1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (Найменші файли)
+1	ukrainian	x-vnd.Haiku-BFSAddOn	1074880496
+Enable query support	BFS_Initialize_Parameter		Дозвіл підтримку запитів
 2048 (Recommended)	BFS_Initialize_Parameter		2048 (Рекомендовано)
 8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (Найбільші файли)
-Blocksize:	BFS_Initialize_Parameter		Розмір блоків:
 Disabling query support may speed up certain file system operations, but should only be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		Заборона підтримки , but should only be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.
-Enable query support	BFS_Initialize_Parameter		Дозвіл підтримку запитів
+1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (Найменші файли)
+Blocksize:	BFS_Initialize_Parameter		Розмір блоків:
 Name:	BFS_Initialize_Parameter		 Ім'я:

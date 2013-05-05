@@ -30,6 +30,9 @@ struct X86VMTranslationMapPAE : X86VMTranslationMap {
 									vm_page_reservation* reservation);
 	virtual	status_t			Unmap(addr_t start, addr_t end);
 
+	virtual	status_t			DebugMarkRangePresent(addr_t start, addr_t end,
+									bool markPresent);
+
 	virtual	status_t			UnmapPage(VMArea* area, addr_t address,
 									bool updatePageQueue);
 	virtual	void				UnmapPages(VMArea* area, addr_t base,

@@ -339,7 +339,7 @@ GIFLoad::ReadGIFImageData()
 				goto bad_end;
 			
 			//memcpy(newEntry, fOldCode, fOldCodeLength);
-			for (int x = 0; x < fOldCodeLength; x++) {
+			for (unsigned int x = 0; x < fOldCodeLength; x++) {
 				newEntry[x] = fOldCode[x];
 			}
 			
@@ -347,7 +347,7 @@ GIFLoad::ReadGIFImageData()
 			newEntry[fOldCodeLength] = *fTable[fNewCode];
 		} else { // Does not exist in table
 			//memcpy(newEntry, fOldCode, fOldCodeLength);
-			for (int x = 0; x < fOldCodeLength; x++) {
+			for (unsigned int x = 0; x < fOldCodeLength; x++) {
 				newEntry[x] = fOldCode[x];
 			}
 			
@@ -360,7 +360,7 @@ GIFLoad::ReadGIFImageData()
 		fTable[fNextCode] = MemblockAllocate(fOldCodeLength + 1);
 
 		//memcpy(fTable[fNextCode], newEntry, fOldCodeLength + 1);
-		for (int x = 0; x < fOldCodeLength + 1; x++) {
+		for (unsigned int x = 0; x < fOldCodeLength + 1; x++) {
 			fTable[fNextCode][x] = newEntry[x];
 		}
 		

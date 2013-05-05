@@ -62,6 +62,8 @@ static const display_mode kBaseModeList[] = {
 
 	{{106500, 1440, 1520, 1672, 1904, 900, 901, 904, 932, POSITIVE_SYNC}, B_CMAP8, 1440, 900, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1440X900) */
 
+	{{149400, 1366, 1494, 1624, 1798, 768, 770, 776, 795, POSITIVE_SYNC}, B_CMAP8, 1366, 768, 0, 0, MODE_FLAGS}, /* 1366x768 60Hz */
+
 	{{162000, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, POSITIVE_SYNC}, B_CMAP8, 1600, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1600X1200X8.Z1) */
 	{{175500, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, POSITIVE_SYNC}, B_CMAP8, 1600, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@65Hz_(1600X1200X8.Z1) */
 	{{189000, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, POSITIVE_SYNC}, B_CMAP8, 1600, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@70Hz_(1600X1200X8.Z1) */
@@ -331,17 +333,26 @@ ModeList::AddModes(const display_mode* modes, uint32 count)
 bool
 ModeList::CreateColorSpaces(const color_space* spaces, uint32 count)
 {
-	uint32 modeCount = fCount;
+	uint32 baseModeCount = fCount;
+	size_t baseModesSize = baseModeCount * sizeof(display_mode);
+	display_mode* baseModes = (display_mode*)malloc(baseModesSize);
+	if (baseModes == NULL)
+		return false;
+
+	memcpy(baseModes, fModes, baseModesSize);
 
 	for (uint32 i = 0; i < count; i++) {
-		if (i > 0 && !AddModes(fModes, modeCount))
+		if (i > 0 && !AddModes(baseModes, baseModeCount)) {
+			free(baseModes);
 			return false;
+		}
 
-		for (uint32 j = 0; j < modeCount; j++) {
-			fModes[j + fCount - modeCount].space = spaces[i];
+		for (uint32 j = 0; j < baseModeCount; j++) {
+			fModes[j + fCount - baseModeCount].space = spaces[i];
 		}
 	}
 
+	free(baseModes);
 	return true;
 }
 

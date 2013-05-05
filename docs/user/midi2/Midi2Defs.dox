@@ -1,279 +1,344 @@
 /*!
-\file Midi2Defs.h
-\ingroup midi2
+	\file Midi2Defs.h
+	\ingroup midi2
+	\ingroup libbe
+	\brief Some definitions to define raw MIDI events.
 */
+
 
 /*!
-\name Channel Message Masks
-\brief Some definitions to define the raw MIDI events.
+	\name Channel Message Masks
+	\brief Some definitions to define the raw MIDI events.
 
-The default implementation of BMidiLocalConsumer::Data() uses these constants
-to determine which event has been passed on. If you override that method, you
-may use the constants yourself.
+	The default implementation of BMidiLocalConsumer::Data() uses these
+	constants to determine which event has been passed on. If you override
+	that method, you may use the constants yourself.
 */
 
-//! @{
-
-/*!
-\var B_NOTE_OFF
-*/
-
-/*!
-\var B_NOTE_ON
-*/
-
-/*!
-\var B_KEY_PRESSURE
-*/
-
-/*!
-\var B_CONTROL_CHANGE
-*/
-
-/*!
-\var B_PROGRAM_CHANGE
-*/
-
-/*!
-\var B_CHANNEL_PRESSURE
-*/
-
-/*!
-\var B_PITCH_BEND
-*/
-
-//! @}
-
-
-/*! 
-\name System Messages
-\brief Some definitions to define the raw MIDI system messages.
-
-The default implementation of BMidiLocalConsumer::Data() uses these constants
-to determine which event system message has been passed on. See 
-BMidiLocalProducer::SpraySystemCommon() and BMidiLocalProducer::SpraySystemRealTime()
-for more details on how and when to use these messages.
-*/
-
-//! @{
-
-/*!
-\var B_SYS_EX_START
-*/
-
-/*!
-\var B_MIDI_TIME_CODE
-*/
-
-/*!
-\var B_SONG_POSITION
-*/
-
-/*!
-\var B_SONG_SELECT
-*/
-
-/*!
-\var B_CABLE_MESSAGE
-*/
-
-/*!
-\var B_TUNE_REQUEST
-*/
-
-/*!
-\var B_SYS_EX_END
-*/
-
-/*!
-\var B_TIMING_CLOCK
-*/
-
-/*!
-\var B_START
-*/
-
-/*!
-\var B_CONTINUE
-*/
-
-/*!
-\var B_STOP
-*/
-
-/*!
-\var B_ACTIVE_SENSING
-*/
-
-/*!
-\var B_SYSTEM_RESET
-*/
-
-//! @}
-
-/*! 
-\name Controller Numbers
-\brief Constants that represent specific controller messages.
-
-These constants can be used in BMidiLocalProducer::SprayControlChange()
-and BMidiLocalConsumer::ControlChange(). These constants represent the
-MIDI specification.
-*/
 
 //! @{
 
 
+/*!
+	\var B_NOTE_OFF
 */
+
 
 /*!
-\var B_MODULATION
+	\var B_NOTE_ON
 */
+
 
 /*!
-\var B_BREATH_CONTROLLER
+	\var B_KEY_PRESSURE
 */
+
 
 /*!
-\var B_FOOT_CONTROLLER
+	\var B_CONTROL_CHANGE
 */
+
 
 /*!
-\var B_PORTAMENTO_TIME
+	\var B_PROGRAM_CHANGE
 */
+
 
 /*!
-\var B_DATA_ENTRY
+	\var B_CHANNEL_PRESSURE
 */
+
 
 /*!
-\var B_MAIN_VOLUME
-*/
-
-/*!
-\var B_MIDI_BALANCE
-*/
-
-/*!
-\var B_PAN
-*/
-
-/*!
-\var B_EXPRESSION_CTRL
-*/
-
-/*!
-\var B_GENERAL_CTRL_1
-*/
-
-/*!
-\var B_GENERAL_CTRL_2
-*/
-
-/*!
-\var B_GENERAL_CTRL_3
-*/
-
-/*!
-\var B_GENERAL_CTRL_4
-*/
-
-/*!
-\var B_SUSTAIN_PEDAL
-*/
-
-/*!
-\var B_PORTAMENTO
-*/
-
-/*! 
-\var B_SOSTENUTO
-*/
-
-/*!
-\var B_SOFT_PEDAL 
-*/
-
-/*!
-\var B_HOLD_2
-*/
-
-/*!
-\var B_GENERAL_CTRL_5
-*/
-
-/*!
-\var B_GENERAL_CTRL_6
-*/
-
-/*!
-\var B_TEMPO_CHANGE
-*/
-
-/*!
-\var B_GENERAL_CTRL_7
-*/
-
-/*!
-\var B_GENERAL_CTRL_8
-*/
-
-/*!
-\var B_EFFECTS_DEPTH
-*/
-
-/*!
-\var B_TREMOLO_DEPTH 
-*/
-
-/*!
-\var B_CHORUS_DEPTH
-*/
-
-/*!
-\var B_CELESTE_DEPTH
-*/
-
-/*!
-\var B_PHASER_DEPTH
-*/
-
-/*!
-\var B_DATA_INCREMENT
-*/
-
-/*!
-\var B_DATA_DECREMENT
-*/
-
-/*!
-\var B_RESET_ALL_CONTROLLERS
-*/
-
-/*!
-\var B_LOCAL_CONTROL 
-*/
-
-/*!
-\var B_ALL_NOTES_OFF
-*/
-
-/*!
-\var B_OMNI_MODE_OFF
-*/
-
-/*!
-\var B_OMNI_MODE_ON 
-*/
-
-/*!
-\var B_MONO_MODE_ON
-*/
-
-/*!
-\var B_POLY_MODE_ON
+	\var B_PITCH_BEND
 */
 
 
 //! @}
 
 
+/*! 
+	\name System Messages
+	\brief Some definitions to define the raw MIDI system messages.
+
+	The default implementation of BMidiLocalConsumer::Data() uses these
+	constants to determine which event system message has been passed on.
+	See  BMidiLocalProducer::SpraySystemCommon() and
+	BMidiLocalProducer::SpraySystemRealTime() for more details on how and
+	when to use these messages.
+*/
+
+
+//! @{
+
+
+/*!
+	\var B_SYS_EX_START
+*/
+
+
+/*!
+	\var B_MIDI_TIME_CODE
+*/
+
+
+/*!
+	\var B_SONG_POSITION
+*/
+
+
+/*!
+	\var B_SONG_SELECT
+*/
+
+
+/*!
+	\var B_CABLE_MESSAGE
+*/
+
+
+/*!
+	\var B_TUNE_REQUEST
+*/
+
+
+/*!
+	\var B_SYS_EX_END
+*/
+
+
+/*!
+	\var B_TIMING_CLOCK
+*/
+
+
+/*!
+	\var B_START
+*/
+
+
+/*!
+	\var B_CONTINUE
+*/
+
+
+/*!
+	\var B_STOP
+*/
+
+
+/*!
+	\var B_ACTIVE_SENSING
+*/
+
+
+/*!
+	\var B_SYSTEM_RESET
+*/
+
+
+//! @}
+
+
+/*! 
+	\name Controller Numbers
+	\brief Constants that represent specific controller messages.
+
+	These constants can be used in BMidiLocalProducer::SprayControlChange()
+	and BMidiLocalConsumer::ControlChange(). These constants represent the
+	MIDI specification.
+*/
+
+
+//! @{
+
+
+*/
+
+
+/*!
+	\var B_MODULATION
+*/
+
+
+/*!
+	\var B_BREATH_CONTROLLER
+*/
+
+
+/*!
+	\var B_FOOT_CONTROLLER
+*/
+
+
+/*!
+	\var B_PORTAMENTO_TIME
+*/
+
+
+/*!
+	\var B_DATA_ENTRY
+*/
+
+
+/*!
+	\var B_MAIN_VOLUME
+*/
+
+
+/*!
+	\var B_MIDI_BALANCE
+*/
+
+
+/*!
+	\var B_PAN
+*/
+
+
+/*!
+	\var B_EXPRESSION_CTRL
+*/
+
+
+/*!
+	\var B_GENERAL_CTRL_1
+*/
+
+
+/*!
+	\var B_GENERAL_CTRL_2
+*/
+
+
+/*!
+	\var B_GENERAL_CTRL_3
+*/
+
+
+/*!
+	\var B_GENERAL_CTRL_4
+*/
+
+
+/*!
+	\var B_SUSTAIN_PEDAL
+*/
+
+
+/*!
+	\var B_PORTAMENTO
+*/
+
+
+/*! 
+	\var B_SOSTENUTO
+*/
+
+
+/*!
+	\var B_SOFT_PEDAL 
+*/
+
+
+/*!
+	\var B_HOLD_2
+*/
+
+
+/*!
+	\var B_GENERAL_CTRL_5
+*/
+
+
+/*!
+	\var B_GENERAL_CTRL_6
+*/
+
+
+/*!
+	\var B_TEMPO_CHANGE
+*/
+
+
+/*!
+	\var B_GENERAL_CTRL_7
+*/
+
+
+/*!
+	\var B_GENERAL_CTRL_8
+*/
+
+
+/*!
+	\var B_EFFECTS_DEPTH
+*/
+
+
+/*!
+	\var B_TREMOLO_DEPTH 
+*/
+
+
+/*!
+	\var B_CHORUS_DEPTH
+*/
+
+
+/*!
+	\var B_CELESTE_DEPTH
+*/
+
+
+/*!
+	\var B_PHASER_DEPTH
+*/
+
+
+/*!
+	\var B_DATA_INCREMENT
+*/
+
+
+/*!
+	\var B_DATA_DECREMENT
+*/
+
+
+/*!
+	\var B_RESET_ALL_CONTROLLERS
+*/
+
+
+/*!
+	\var B_LOCAL_CONTROL 
+*/
+
+
+/*!
+	\var B_ALL_NOTES_OFF
+*/
+
+
+/*!
+	\var B_OMNI_MODE_OFF
+*/
+
+
+/*!
+	\var B_OMNI_MODE_ON 
+*/
+
+
+/*!
+	\var B_MONO_MODE_ON
+*/
+
+
+/*!
+	\var B_POLY_MODE_ON
+*/
+
+
+//! @}

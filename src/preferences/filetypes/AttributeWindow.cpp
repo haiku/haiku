@@ -13,8 +13,6 @@
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <ControlLook.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayoutBuilder.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuField.h>
@@ -31,8 +29,8 @@
 #include <string.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Attribute Window"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Attribute Window"
 
 
 const uint32 kMsgAttributeUpdated = 'atup';
@@ -175,7 +173,7 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 	fSpecialControl->SetEnabled(false);
 
 	char text[64];
-	snprintf(text, sizeof(text), "%ld", fAttribute.Width());
+	snprintf(text, sizeof(text), "%" B_PRId32, fAttribute.Width());
 	fWidthControl = new BTextControl(B_TRANSLATE_COMMENT("Width:",
 		"Default column width in Tracker for this attribute."),
 		text, NULL);
@@ -254,7 +252,7 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 				.View())
 			)
 		.AddGroup(B_HORIZONTAL, padding)
-			.Add(BSpaceLayoutItem::CreateGlue())
+			.AddGlue()
 			.Add(cancelButton)
 			.Add(fAcceptButton);
 

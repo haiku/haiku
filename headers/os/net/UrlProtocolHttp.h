@@ -12,20 +12,25 @@
 #include <HttpAuthentication.h>
 #include <HttpForm.h>
 #include <HttpHeaders.h>
-#include <NetEndpoint.h>
 #include <NetBuffer.h>
+#include <NetworkAddress.h>
 #include <UrlProtocol.h>
+
+
+class BAbstractSocket;
 
 
 class BUrlProtocolHttp : public BUrlProtocol {
 public:
-								BUrlProtocolHttp(BUrl& url, 
+								BUrlProtocolHttp(BUrl& url, bool ssl = false,
+									const char *protocolName = "HTTP",
 									BUrlProtocolListener* listener = NULL,
 									BUrlContext* context = NULL,
 									BUrlResult* result = NULL);
+	virtual						~BUrlProtocolHttp();
 
 	virtual	status_t			SetOption(uint32 option, void* value);
-	
+
 	static	bool				IsInformationalStatusCode(int16 code);
 	static	bool				IsSuccessStatusCode(int16 code);
 	static	bool				IsRedirectionStatusCode(int16 code);
@@ -34,48 +39,49 @@ public:
 	static	int16				StatusCodeClass(int16 code);
 
 	virtual	const char*			StatusString(status_t threadStatus) const;
-	
+
 private:
 			void				_ResetOptions();
 			status_t			_ProtocolLoop();
 			bool 				_ResolveHostName();
 			status_t			_MakeRequest();
-			
+
 			void				_CreateRequest();
 			void				_AddHeaders();
-			
+
 			status_t			_GetLine(BString& destString);
-			
+
 			void				_ParseStatus();
 			void				_ParseHeaders();
-			
-			void				_CopyChunkInBuffer(char** buffer, 
+
+			void				_CopyChunkInBuffer(char** buffer,
 									ssize_t* bytesReceived);
-			
+
 			void				_AddOutputBufferLine(const char* line);
-			
-			
+
+
 private:
-			BNetEndpoint		fSocket;
-			BNetAddress			fRemoteAddr;
-			
+			BAbstractSocket*	fSocket;
+			BNetworkAddress		fRemoteAddr;
+			bool				fSSL;
+
 			int8				fRequestMethod;
 			int8				fHttpVersion;
-			
+
 			BString				fOutputBuffer;
 			BNetBuffer			fInputBuffer;
-			
+
 			BHttpHeaders		fHeaders;
 			BHttpAuthentication	fAuthentication;
-			
+
 	// Request status
 			BHttpHeaders		fOutputHeaders;
 			bool				fStatusReceived;
 			bool				fHeadersReceived;
 			bool				fContentReceived;
 			bool				fTrailingHeadersReceived;
-			
-			
+
+
 	// Protocol options
 			uint8				fOptMaxRedirs;
 			BString				fOptReferer;
@@ -122,21 +128,21 @@ enum {
 enum {
 	B_HTTPOPT_METHOD = 0,
 		// (int) Request method (see B_HTTP_GET, ...)
-	B_HTTPOPT_FOLLOWLOCATION,	
+	B_HTTPOPT_FOLLOWLOCATION,
 		// (bool) Follow Location: headers
-	B_HTTPOPT_MAXREDIRS,			
+	B_HTTPOPT_MAXREDIRS,
 		// (int) Max relocation
-	B_HTTPOPT_HEADERS,				
+	B_HTTPOPT_HEADERS,
 		// (BHttpHeaders*) Headers to be sent
-	B_HTTPOPT_REFERER,				
+	B_HTTPOPT_REFERER,
 		// (string) Referer
-	B_HTTPOPT_USERAGENT,			
+	B_HTTPOPT_USERAGENT,
 		// (string) User-Agent
-	B_HTTPOPT_SETCOOKIES,			
+	B_HTTPOPT_SETCOOKIES,
 		// (bool) Send cookies from context
-	B_HTTPOPT_DISCARD_DATA,			
+	B_HTTPOPT_DISCARD_DATA,
 		// (bool) Discard incoming data (still notified)
-	B_HTTPOPT_DISABLE_LISTENER,		
+	B_HTTPOPT_DISABLE_LISTENER,
 		// (bool) Don't send notification to the listener
 	B_HTTPOPT_AUTOREFERER,
 		// (bool) Automatically set the Referer header
@@ -150,7 +156,7 @@ enum {
 		// (string) Authentication password
 	B_HTTPOPT_AUTHMETHOD,
 		// (int) Allowed authentication methods (see BHttpAuthenticationMethod)
-	
+
 	B_HTTPOPT__OPT_NUM
 };
 
@@ -173,7 +179,7 @@ enum http_status_code {
 	B_HTTP_STATUS_CONTINUE = B_HTTP_STATUS__INFORMATIONAL_BASE,
 	B_HTTP_STATUS_SWITCHING_PROTOCOLS,
 	B_HTTP_STATUS__INFORMATIONAL_END,
-	
+
 	// Success status codes
 	B_HTTP_STATUS__SUCCESS_BASE			= 200,
 	B_HTTP_STATUS_OK = B_HTTP_STATUS__SUCCESS_BASE,
@@ -184,7 +190,7 @@ enum http_status_code {
 	B_HTTP_STATUS_RESET_CONTENT,
 	B_HTTP_STATUS_PARTIAL_CONTENT,
 	B_HTTP_STATUS__SUCCESS_END,
-	
+
 	// Redirection status codes
 	B_HTTP_STATUS__REDIRECTION_BASE		= 300,
 	B_HTTP_STATUS_MULTIPLE_CHOICE = B_HTTP_STATUS__REDIRECTION_BASE,
@@ -195,7 +201,7 @@ enum http_status_code {
 	B_HTTP_STATUS_USE_PROXY,
 	B_HTTP_STATUS_TEMPORARY_REDIRECT,
 	B_HTTP_STATUS__REDIRECTION_END,
-	
+
 	// Client error status codes
 	B_HTTP_STATUS__CLIENT_ERROR_BASE	= 400,
 	B_HTTP_STATUS_BAD_REQUEST = B_HTTP_STATUS__CLIENT_ERROR_BASE,
@@ -217,7 +223,7 @@ enum http_status_code {
 	B_HTTP_STATUS_REQUESTED_RANGE_NOT_SATISFIABLE,
 	B_HTTP_STATUS_EXPECTATION_FAILED,
 	B_HTTP_STATUS__CLIENT_ERROR_END,
-	
+
 	// Server error status codes
 	B_HTTP_STATUS__SERVER_ERROR_BASE 	= 500,
 	B_HTTP_STATUS_INTERNAL_SERVER_ERROR = B_HTTP_STATUS__SERVER_ERROR_BASE,

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 
+ *
+ * Copyright 2010-2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *		Gerard Stanczak (Google Code-In student)
+ * Translators:
+ *		Adriano Duarte
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Localidade</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../../fr/preferences/locale.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/preferences/locale.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/preferences/locale.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/preferences/locale.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/preferences/locale.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/preferences/locale.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/preferences/locale.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/preferences/locale.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/preferences/locale.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/preferences/locale.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/preferences/locale.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/preferences/locale.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/preferences/locale.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../ca/preferences/locale.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../../en/preferences/locale.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+
+<span>
+ «  <a href="keymap.html">Keymap</a> 
+::  <a href="../preferences.html" class="uplink">Preferences</a> 
+::  <a href="media.html">Media</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/prefs-images/locale-icon_64.png" alt="locale-icon_64.png" width="64" height="64" />Localidade</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferências</span></td></tr>
+<tr><td>Localização:</td><td></td><td><span class="path">/boot/system/preferences/Locale</span></td></tr>
+<tr><td>Configurações:</td><td></td><td><span class="path">~/config/settings/Locale settings</span></td></tr>
+</table>
+<p><br /></p>
+<p>O sistema de localização do Haiku não apenas inclui textos substituídos por suas traduções, mas também tarefas mais complexas tais como formatação de números, datas e horas de um modo que combina com suas preferências de Localidade.</p>
+<div class="box-info">Se você gostaria de ajudar com traduções ou começar com um idioma atualmente faltante, por favor entre em contato pela <a href="http://www.freelists.org/list/haiku-i18n">Lista de discussão Haiku-i18n</a>.</div>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Idioma</h2>
+<p>O Haiku tem sido traduzido para dezenas de idiomas, infelizmente algumas traduções ainda não estão completas. Por essa razão, pode-se escolher mais de um idioma como "Idiomas preferidos". Se algum texto é perdido na tradução, ele é substituído com as palavras do próximo idioma preferido. O Inglês é a reserva padrão (mesmo quando não está listado).</p>
+<img src="../images/prefs-images/locale-language.png" alt="locale-language.png" />
+<p>Neste exemplo, o idioma preferido é ajustado para Espanhol. A primeira reserva é o Italiano e se o texto estiver faltando lá também, ele volta para o padrão em Inglês.<br />
+Como se pode ver, expandir uma entrada de idioma no lado esquerdo revela subentradas para variações específicas ou dialetos do idioma (se disponíveis).</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Formatação</h2>
+<p>Na guia <span class="menu">Formatação</span> pode-se definir a formatação de data, hora, número e formatos atuais independentemente das definições de seu idioma preferido.</p>
+<img src="../images/prefs-images/locale-formatting.png" alt="locale-formatting.png" />
+<p>Suponhamos que seja um colega espanhol que viva na parte italofalante da Suíça. Então, prefira seu sistema em espanhol, mas os números e moeda formatados como no trabalho: Suíço/Italiano.<br />
+Se estiver mais confortável com os nomes para dias e meses em espanhol(pensar nas datas modificadas de arquivos, por exemplo), pode-se passar por cima desta formatação específica de tempo com a caixa de verificação no topo para <span class="menu">Utilizar nomes de mês/dia do idioma preferido</span>.</p>
+<p>O exemplo acima talvez não seja o cenário mais comum, mas ele demonstra a flexibilidade do sistema.</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Opções</h2>
+<p>A última guia oferece uma opção que irá <span class="menu">Traduzir nomes de aplicativos e pastas no Deskbar e Rastreador</span>. Desabilite a caixa de verificação se preferir a interface gráfica localizada, enquanto mantém os nomes originais em inglês para caixas de diálogo de preferências, aplicativos e nomes padrão de pastas.</p>
+<p><br /> </p>
+<p>As mudanças serão aplicadas imediatamente, embora aplicativos atualmente em execução podem precisar ser fechados e reiniciados antes de exibir as novas definições.</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="button">Padrão</span></td><td> </td><td>redefine tudo para os valores padrão.</td></tr>
+<tr><td><span class="button">Reverter</span></td><td> </td><td>traz de volta as definições que estavam ativas quando iniciou as preferências de Localidade.</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="keymap.html">Mapa de Teclado</a> 
+::  <a href="../preferences.html" class="uplink">Preferências</a> 
+::  <a href="media.html">Mídia</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,31 @@
+1	portuguese (brazil)	x-vnd.Haiku-Locale	1488345554
+Available languages	Locale Preflet Window		Idiomas disponíveis
+Negative:	TimeFormatSettings		Negativo:
+already chosen	LanguageListView		já escolhida
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Não foi possível encontrar a lista de idiomas! Você não pode usar esta preferência!
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Deskbar e Rastreador (Tracker) precisam ser reiniciados para que esta mudança tenha efeito. Gostaria de reiniciá-los agora?
+Long format:	TimeFormatSettings		Formato longo:
+Currency	TimeFormatSettings		Moeda
+Locale	System name		Localização
+Short format:	TimeFormatSettings		Formato curto:
+Language	Locale Preflet Window		Idioma
+Preferred languages	Locale Preflet Window		Idiomas preferidos
+Use month/day-names from preferred language	TimeFormatSettings		Utilizar nomes de mês/dia do idioma preferido
+Formatting	Locale Preflet Window		Formatando
+Locale	Locale Preflet Window		Localização
+Numbers	TimeFormatSettings		Números
+24 hour	TimeFormatSettings		24 horas
+OK	Locale Preflet Window		OK
+Restart	Locale Preflet Window		Reiniciar
+Full format:	TimeFormatSettings		Formato completo:
+Defaults	Locale Preflet Window		Padrões
+Cancel	Locale Preflet Window		Cancelar
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Aplicativo de tradução e nomes de pasta no Deskbar e Rastreador (Tracker).
+Revert	Locale Preflet Window		Reverter
+Medium format:	TimeFormatSettings		Formato médio:
+12 hour	TimeFormatSettings		12 horas
+Time	TimeFormatSettings		Horário
+Date	TimeFormatSettings		Data
+Positive:	TimeFormatSettings		Positivo:
+Locale	Locale Preflet		Localização
+Options	Locale Preflet Window		Opções

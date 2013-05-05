@@ -1,0 +1,13 @@
+1	croatian	x-vnd.Haiku-Pairs	1503141585
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\tnapisao Ralf Schülke\n\tAutorska prava 2008-2010, Haiku Inc.\n\nDovršili ste igricu u %num% poteza.\n
+Beginner (4x4)	PairsWindow		Početnik (4x4)
+Expert (8x8)	PairsWindow		Ekspert (8x8)
+Game	PairsWindow		Igra
+Intermediate (6x6)	PairsWindow		Srednja razina (6x6)
+New	PairsWindow		Novo
+New game	PairsWindow		Nova igra
+OK	PairsView		U redu
+Pairs	System name		Parovi
+Quit	PairsWindow		Izađi
+Quit game	PairsWindow		Izađi iz igrice
+Size	PairsWindow		Veličina

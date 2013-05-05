@@ -13,10 +13,12 @@
 #include <Alert.h>
 #include <Catalog.h>
 #include <FilePanel.h>
+#include <FindDirectory.h>
 #include <IconEditorProtocol.h>
 #include <Locale.h>
 #include <Message.h>
 #include <Mime.h>
+#include <Path.h>
 
 #include "support_settings.h"
 
@@ -26,8 +28,8 @@
 #include "SavePanel.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Icon-O-Matic-Main"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Icon-O-Matic-Main"
 
 
 using std::nothrow;
@@ -329,8 +331,14 @@ IconEditorApp::_LastFilePath(path_kind which)
 				path = fLastOpenPath.String();
 			break;
 	}
-	if (!path)
-		path = "/boot/home";
+	if (path == NULL) {
+
+		BPath homePath;
+		if (find_directory(B_USER_DIRECTORY, &homePath) == B_OK)
+			path = homePath.Path();
+		else 
+			path = "/boot/home";
+	}
 
 	return path;
 }
@@ -364,7 +372,11 @@ IconEditorApp::_RestoreSettings()
 		// Compensate offset for next window...
 		fLastWindowFrame.OffsetBy(-kWindowOffset, -kWindowOffset);
 	}
-	settings.FindMessage("window settings", &fLastWindowSettings);
+	BMessage lastSettings;
+	if (settings.FindMessage("window settings", &lastSettings)
+		== B_OK) {
+		fLastWindowSettings = lastSettings;
+	}
 
 	int32 mode;
 	if (settings.FindInt32("export mode", &mode) >= B_OK)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2011, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2012, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -26,6 +26,7 @@
 #include <debug.h>
 #include <elf.h>
 #include <FindDirectory.h>
+#include <fs/devfs.h>
 #include <fs/KPath.h>
 #include <fs/node_monitor.h>
 #include <kdevice_manager.h>
@@ -486,7 +487,7 @@ translate_partition_access(devfs_partition* partition, off_t& offset,
 	ASSERT(offset >= 0);
 	ASSERT(offset < partition->info.size);
 
-	size = min_c(size, partition->info.size - offset);
+	size = (size_t)min_c((off_t)size, partition->info.size - offset);
 	offset += partition->info.offset;
 }
 
@@ -802,19 +803,19 @@ dump_node(int argc, char** argv)
 	}
 
 	kprintf("DEVFS NODE: %p\n", vnode);
-	kprintf(" id:          %Ld\n", vnode->id);
+	kprintf(" id:          %" B_PRIdINO "\n", vnode->id);
 	kprintf(" name:        \"%s\"\n", vnode->name);
 	kprintf(" type:        %x\n", vnode->stream.type);
 	kprintf(" parent:      %p\n", vnode->parent);
 	kprintf(" dir next:    %p\n", vnode->dir_next);
 
 	if (S_ISDIR(vnode->stream.type)) {
-		kprintf(" dir scanned: %ld\n", vnode->stream.u.dir.scanned);
+		kprintf(" dir scanned: %" B_PRId32 "\n", vnode->stream.u.dir.scanned);
 		kprintf(" contents:\n");
 
 		devfs_vnode* children = vnode->stream.u.dir.dir_head;
 		while (children != NULL) {
-			kprintf("   %p, id %Ld\n", children, children->id);
+			kprintf("   %p, id %" B_PRIdINO "\n", children, children->id);
 			children = children->dir_next;
 		}
 	} else if (S_ISLNK(vnode->stream.type)) {
@@ -826,11 +827,11 @@ dump_node(int argc, char** argv)
 			partition_info& info = vnode->stream.u.dev.partition->info;
 			kprintf("  raw device node: %p\n",
 				vnode->stream.u.dev.partition->raw_device);
-			kprintf("  offset:          %Ld\n", info.offset);
-			kprintf("  size:            %Ld\n", info.size);
-			kprintf("  block size:      %ld\n", info.logical_block_size);
-			kprintf("  session:         %ld\n", info.session);
-			kprintf("  partition:       %ld\n", info.partition);
+			kprintf("  offset:          %" B_PRIdOFF "\n", info.offset);
+			kprintf("  size:            %" B_PRIdOFF "\n", info.size);
+			kprintf("  block size:      %" B_PRId32 "\n", info.logical_block_size);
+			kprintf("  session:         %" B_PRId32 "\n", info.session);
+			kprintf("  partition:       %" B_PRId32 "\n", info.partition);
 			kprintf("  device:          %s\n", info.device);
 			set_debug_variable("_raw",
 				(addr_t)vnode->stream.u.dev.partition->raw_device);
@@ -1164,8 +1165,10 @@ devfs_open(fs_volume* _volume, fs_vnode* _vnode, int openMode,
 	if (S_ISCHR(vnode->stream.type)) {
 		BaseDevice* device = vnode->stream.u.dev.device;
 		status = device->InitDevice();
-		if (status != B_OK)
+		if (status != B_OK) {
+			free(cookie);
 			return status;
+		}
 
 		char path[B_FILE_NAME_LENGTH];
 		get_device_name(vnode, path, sizeof(path));
@@ -1496,17 +1499,16 @@ devfs_ioctl(fs_volume* _volume, fs_vnode* _vnode, void* _cookie, uint32 op,
 				device_geometry geometry;
 				status_t status = vnode->stream.u.dev.device->Control(
 					cookie->device_cookie, op, &geometry, length);
-				if (status < B_OK)
+				if (status != B_OK)
 					return status;
 
 				// patch values to match partition size
-				geometry.sectors_per_track = 0;
 				if (geometry.bytes_per_sector == 0)
 					geometry.bytes_per_sector = 512;
-				geometry.sectors_per_track = partition->info.size
-					/ geometry.bytes_per_sector;
-				geometry.head_count = 1;
-				geometry.cylinder_count = 1;
+
+				devfs_compute_geometry_size(&geometry,
+					partition->info.size / geometry.bytes_per_sector,
+					geometry.bytes_per_sector);
 
 				return user_memcpy(buffer, &geometry, sizeof(device_geometry));
 			}
@@ -2202,6 +2204,21 @@ devfs_unpublish_device(BaseDevice* device, bool disconnect)
 
 	put_vnode(sDeviceFileSystem->volume, node->id);
 	return status;
+}
+
+
+void
+devfs_compute_geometry_size(device_geometry* geometry, uint64 blockCount,
+	uint32 blockSize)
+{
+	if (blockCount > UINT32_MAX)
+		geometry->head_count = (blockCount + UINT32_MAX - 1) / UINT32_MAX;
+	else
+		geometry->head_count = 1;
+
+	geometry->cylinder_count = 1;
+	geometry->sectors_per_track = blockCount / geometry->head_count;
+	geometry->bytes_per_sector = blockSize;
 }
 
 

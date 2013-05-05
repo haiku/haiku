@@ -3,61 +3,54 @@ SubDir HAIKU_TOP src kits opengl ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders interface ;
-UseLibraryHeaders mesa ;
 UsePrivateSystemHeaders ;
+
+local sources =
+	GLView.cpp
+	GLDispatcher.cpp
+	GLRenderer.cpp
+	GLRendererRoster.cpp
+	;
+
 
 if $(TARGET_PLATFORM) != haiku {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers os opengl ] : true ;
 		# We need our public GL headers also when not compiling for Haiku.
 }
 
+SubDirSysHdrs $(HAIKU_GLU_HEADERS) ;
+SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
+Includes [ FGristFiles $(sources) ] : $(HAIKU_GLU_HEADERS_DEPENDENCY) ;
+Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa main ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa glapi ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa math ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa tnl ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa shader ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa swrast ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa swrast_setup ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) include ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa main ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi glapi ] ;
 
-{
-	local defines ;
-	defines = BEOS_THREADS GNU_ASSEMBLER ;
+# For older versions of Mesa
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa glapi ] ;
 
-	if $(TARGET_ARCH) = x86 {
-		defines += USE_X86_ASM USE_MMX_ASM USE_3DNOW_ASM USE_SSE_ASM ;
-	} else if $(TARGET_ARCH) = ppc {
-		# Not yet supported, as current Mesa3D PPC assembly is Linux-dependent!
-		# defines += USE_PPC_ASM ;
-	} else if $(TARGET_ARCH) = sparc {
-		defines += USE_SPARC_ASM ;
-	}
+LINKFLAGS on libGL.so = [ on libGL.so return $(LINKFLAGS) ]
+	-Xlinker --whole-archive -Xlinker --no-undefined ;
 
-	defines = [ FDefines $(defines) ] ;
-	SubDirCcFlags $(defines) ;
-	SubDirC++Flags $(defines) ;
-	SubDirAsFlags $(defines) ;
+# For GCC2
+if $(HAIKU_GCC_VERSION[1]) < 3 {
+	SubDirC++Flags --no-warnings ;
 }
 
-SharedLibrary libGL.so :
-	GLView.cpp
-	GLDispatcher.cpp
-	GLRenderer.cpp
-	GLRendererRoster.cpp
-	:
 
-	# Mesa GL API dispatching code
-	<mesa>glapi-dispatching.o
+SharedLibrary libGL.so : $(sources) :
+	# GLU
+	$(HAIKU_GLU_LIBS)
 
-	# GLU API is included in libGL.so under BeOS R5, not a separate libglu.so library
-	<opengl>sgi-glu.o
+	# GLAPI Dispatch code (from Mesa buildpackage)
+	$(HAIKU_GLAPI_LIB)
 
-	# GLUT API is included in libGL.so under Haiku, not a separate libglut.so library
-	<opengl>glut.o 
-
-	# External libs:
-	be 
-	game			# BWindowScreen needed by BGLScreen stub class 
+	# External libraries:
+	game			# BWindowScreen needed by BGLScreen stub class
+	network
+	be
 	$(TARGET_LIBSTDC++)
 ;

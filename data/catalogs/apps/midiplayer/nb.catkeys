@@ -1,18 +1,18 @@
-1	norwegian_bokmål	x-vnd.Haiku-MidiPlayer	471142057
-Cavern	Main Window		Hule
-Closet	Main Window		Skap
-Could not load song	Main Window		Kunne ikke laste sang
-Drop MIDI file here	Scope View		Slipp MIDI-fil her
-Dungeon	Main Window		Fangehull
-Garage	Main Window		Garasje
-Igor's lab	Main Window		Igors labb
-Live input:	Main Window		Live-inndata:
-MidiPlayer	System name		MIDI-spiller
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MidiPlayer	471142057
 None	Main Window		Ingen
+Live input:	Main Window		Live-inndata:
+Stop	Main Window		Stopp
+Cavern	Main Window		Hule
+Volume:	Main Window		Volum:
+Reverb:	Main Window		Klang:
 OK	Main Window		OK
 Off	Main Window		Av
+Dungeon	Main Window		Fangehull
 Play	Main Window		Spill
-Reverb:	Main Window		Klang:
+Garage	Main Window		Garasje
+Closet	Main Window		Skap
+MidiPlayer	System name		MIDI-spiller
+Drop MIDI file here	Scope View		Slipp MIDI-fil her
+Igor's lab	Main Window		Igors labb
 Scope	Main Window		Rekkevidde
-Stop	Main Window		Stopp
-Volume:	Main Window		Volum:
+Could not load song	Main Window		Kunne ikke laste sang

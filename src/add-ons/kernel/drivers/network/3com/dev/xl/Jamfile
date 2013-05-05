@@ -11,6 +11,12 @@ SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
 KernelAddon 3com :
 	if_xl.c
 	glue.c
+	xlphy.c
 	: libfreebsd_network.a 3com_mii.a
 	;
 
+ObjectHdrs [ FGristFiles xlphy$(SUFOBJ) ]
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) libs compat
+			freebsd_network ] ;
+Includes [ FGristFiles xlphy.c ]
+	: <src!libs!compat!freebsd_network>miidevs.h ;

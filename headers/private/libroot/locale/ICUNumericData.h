@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Oliver Tappe, zooey@hirschkaefer.de.
+ * Copyright 2010-2011, Oliver Tappe, zooey@hirschkaefer.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _ICU_NUMERIC_DATA_H
@@ -18,7 +18,8 @@ class ICUNumericData : public ICULocaleconvData {
 	typedef	ICULocaleconvData	inherited;
 
 public:
-								ICUNumericData(struct lconv& localeConv);
+								ICUNumericData(pthread_key_t tlsKey,
+									struct lconv& localeConv);
 
 			void				Initialize(LocaleNumericDataBridge* dataBridge);
 

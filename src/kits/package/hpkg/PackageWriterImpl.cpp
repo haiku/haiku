@@ -941,7 +941,7 @@ PackageWriterImpl::_UpdateCheckEntryCollisions(Attribute* parentAttribute,
 
 	SubPathAdder pathAdder(fListener, pathBuffer, fileName);
 
-	// Check wether there's an entry attribute for this entry. If not, we can
+	// Check whether there's an entry attribute for this entry. If not, we can
 	// ignore this entry.
 	Attribute* entryAttribute = parentAttribute->FindEntryChild(fileName);
 	if (entryAttribute == NULL)

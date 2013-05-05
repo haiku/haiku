@@ -1,22 +1,38 @@
-1	swedish	x-vnd.Haiku-Keymap	1259868356
-(Current)	Keymap window		(Nuvarande)
-Acute trigger	Keymap window		Acute trigger
+1	swedish	x-vnd.Haiku-Keymap	4022885915
+Shift:	Modifier keys window	Shift key role name	Skift:
+Revert	Modifier keys window		Återställ
+Tilde trigger	Keymap window		Tilde trigger
+Grave trigger	Keymap window		Grave trigger
+Role	Modifier keys window	As in the role of a modifier key	Roll
+Select dead keys	Keymap window		Markera döda tangenter
+Cancel	Modifier keys window		Avbryt
+Quit	Keymap window		Avsluta
+Switch shortcut keys to Haiku mode	Keymap window		Byt snabbtangentsknapp till Haikustandard
 Circumflex trigger	Keymap window		Circumflex trigger
 Diaeresis trigger	Keymap window		Diaeresis trigger
-File	Keymap window		Arkiv
-Font	Keymap window		Typsnitt
-Grave trigger	Keymap window		Grave trigger
-Keymap	System name		TangentUppsättning
-Layout	Keymap window		Utseende
+Disabled	Modifier keys window	Do nothing	Inaktiverad
 Open…	Keymap window		Öppna…
-Quit	Keymap window		Avsluta
-Revert	Keymap window		Återställ
-Sample and clipboard:	Keymap window		Exempel:
-Save as…	Keymap window		Spara som…
-Select dead keys	Keymap window		Markera döda tangenter
-Switch shortcut keys	Keymap window		Switch shortcut keys
-Switch shortcut keys to Haiku mode	Keymap window		Byt snabbtangentsknapp till Haikustandard
-Switch shortcut keys to Windows/Linux mode	Keymap window		Byt snabbtangentsknapp till Windows/Linux-standard
 System:	Keymap window		System:
-Tilde trigger	Keymap window		Tilde trigger
+Set modifier keys…	Keymap window		Sätt modifierings tangent...
+Option:	Modifier keys window	Option key role name	Alternativ:
+Switch shortcut keys	Keymap window		Switch shortcut keys
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Skifttangent
 User:	Keymap window		Användare:
+Key	Modifier keys window	As in a computer keyboard key	Tangent
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl-tangent
+Control:	Modifier keys window	Control key role name	Kontroll:
+Sample and clipboard:	Keymap window		Exempel:
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt tangent
+Layout	Keymap window		Utseende
+Switch shortcut keys to Windows/Linux mode	Keymap window		Byt snabbtangentsknapp till Windows/Linux-standard
+Revert	Keymap window		Återställ
+Command:	Modifier keys window	Command key role name	Kommando:
+Save as…	Keymap window		Spara som…
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd tangent
+File	Keymap window		Arkiv
+(Current)	Keymap window		(Nuvarande)
+Font	Keymap window		Typsnitt
+Keymap	System name		TangentUppsättning
+Set modifier keys	Modifier keys window		Set modifierings tangent
+Modifier keys	Modifier keys window		Modifierings tangenter
+Acute trigger	Keymap window		Acute trigger

@@ -8,6 +8,7 @@
 #include <bluetooth/DiscoveryListener.h>
 #include <bluetooth/LocalDevice.h>
 #include <bluetooth/RemoteDevice.h>
+#include <bluetooth/debug.h>
 
 #include <bluetooth/HCI/btHCI_command.h>
 #include <bluetooth/HCI/btHCI_event.h>
@@ -23,6 +24,7 @@ namespace Bluetooth {
 RemoteDevicesList
 DiscoveryAgent::RetrieveDevices(int option)
 {
+	CALLED();
     // No inquiry process initiated
     if (fLastUsedListener == NULL)
         return RemoteDevicesList();
@@ -34,6 +36,7 @@ DiscoveryAgent::RetrieveDevices(int option)
 status_t
 DiscoveryAgent::StartInquiry(int accessCode, DiscoveryListener* listener)
 {
+	CALLED();
     return StartInquiry(accessCode, listener, GetInquiryTime());
 }
 
@@ -41,6 +44,7 @@ DiscoveryAgent::StartInquiry(int accessCode, DiscoveryListener* listener)
 status_t
 DiscoveryAgent::StartInquiry(uint32 accessCode, DiscoveryListener* listener, bigtime_t secs)
 {
+	CALLED();
     size_t size;
 
     if (fMessenger == NULL)
@@ -91,6 +95,7 @@ DiscoveryAgent::StartInquiry(uint32 accessCode, DiscoveryListener* listener, big
 status_t
 DiscoveryAgent::CancelInquiry(DiscoveryListener* listener)
 {
+	CALLED();
     size_t size;
 
     if (fMessenger == NULL)
@@ -123,12 +128,14 @@ DiscoveryAgent::CancelInquiry(DiscoveryListener* listener)
 void
 DiscoveryAgent::SetLocalDeviceOwner(LocalDevice* ld)
 {
+	CALLED();
     fLocalDevice = ld;
 }
 
 
 DiscoveryAgent::DiscoveryAgent(LocalDevice* ld)
 {
+	CALLED();
 	fLocalDevice = ld;
 	fMessenger = _RetrieveBluetoothMessenger();
 }
@@ -136,6 +143,7 @@ DiscoveryAgent::DiscoveryAgent(LocalDevice* ld)
 
 DiscoveryAgent::~DiscoveryAgent()
 {
+	CALLED();
 	delete fMessenger;
 }
 

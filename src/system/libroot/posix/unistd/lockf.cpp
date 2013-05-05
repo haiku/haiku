@@ -7,6 +7,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <errno_private.h>
+
 
 int
 lockf(int fileDescriptor, int function, off_t size)
@@ -36,10 +38,10 @@ lockf(int fileDescriptor, int function, off_t size)
 		if (fileLock.l_type == F_UNLCK)
 			return 0;
 
-		errno = EAGAIN;
+		__set_errno(EAGAIN);
 		return -1;
 	} else {
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		return -1;
 	}
 

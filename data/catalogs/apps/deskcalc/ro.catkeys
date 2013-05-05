@@ -1,4 +1,7 @@
-1	romanian	x-vnd.Haiku-DeskCalc	1432606073
-Audio Feedback	CalcView		Reacție audio
+1	romanian	x-vnd.Haiku-DeskCalc	1916192649
+Compact	CalcView		Compact
+Scientific	CalcView		Științific
+DeskCalc	System name		DeskCalc
+Basic	CalcView		Simplu
 Enable Num Lock on startup	CalcView		Activează tasta Num Lock la pornire
-Show keypad	CalcView		Afișează tastatura numerică
+Audio Feedback	CalcView		Reacție audio

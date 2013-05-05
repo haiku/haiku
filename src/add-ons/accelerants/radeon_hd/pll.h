@@ -9,7 +9,8 @@
 #define RADEON_HD_PLL_H
 
 
-#include "accelerant.h"
+#include <Accelerant.h>
+#include <SupportDefs.h>
 
 
 #define MAX_TOLERANCE 10
@@ -81,14 +82,33 @@ struct pll_info {
 	uint32 maxFeedbackDiv;
 	uint32 minFeedbackDivFrac;
 	uint32 maxFeedbackDivFrac;
+
+	/* spread spectrum info */
+	uint8 ssType;
+	uint8 ssDelay;
+	uint8 ssRange;
+	uint8 ssReferenceDiv;
+	uint16 ssPercentage;
+	uint16 ssStep;
+	/* asic spread spectrum */
+	uint16 ssRate;
+	uint16 ssAmount;
+
+	/* pixel clock to be used in pll calculations (kHz) */
+	uint32 adjustedClock;
 };
 
 
-status_t pll_adjust(pll_info *pll, uint8 crtcID);
-status_t pll_compute(pll_info *pll);
-void pll_setup_flags(pll_info *pll, uint8 crtcID);
-status_t pll_limit_probe(pll_info *pll);
-status_t pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID);
+void pll_external_init();
+status_t pll_external_set(uint32 clock);
+status_t pll_adjust(pll_info* pll, display_mode* mode, uint8 crtcID);
+status_t pll_compute(pll_info* pll);
+void pll_setup_flags(pll_info* pll, uint8 crtcID);
+status_t pll_limit_probe(pll_info* pll);
+status_t pll_ppll_ss_probe(pll_info* pll, uint32 ssID);
+status_t pll_asic_ss_probe(pll_info* pll, uint32 ssID);
+status_t pll_set(display_mode* mode, uint8 crtcID);
+status_t pll_pick(uint32 connectorIndex);
 
 
 #endif /* RADEON_HD_PLL_H */

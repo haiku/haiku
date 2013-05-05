@@ -10,7 +10,14 @@ UsePrivateKernelHeaders ;
 SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
 
 KernelAddon dec21xxx :
+	dcphy.c
 	if_dc.c
 	glue.c
+	pnphy.c
 	: libfreebsd_network.a dec21xxx_mii.a dec21xxx_de.a
 	;
+
+ObjectHdrs [ FGristFiles dcphy$(SUFOBJ)	pnphy$(SUFOBJ) ]
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) libs compat freebsd_network ] ;
+Includes [ FGristFiles dcphy.c pnphy.c ]
+	: <src!libs!compat!freebsd_network>miidevs.h ;

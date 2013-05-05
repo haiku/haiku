@@ -1,0 +1,33 @@
+1	swedish	x-vnd.Haiku-InterfacesAddOn	160108912
+Interface	InterfaceWindow		Gränssnitt
+Configure…	InterfacesListView		Konfigurera...
+Static	IntefaceAddressView		Statisk
+None	InterfacesListView		Ingen
+IP:	InterfacesListView	IPv4 address label	IP:
+Status:	IntefaceHardwareView		Status:
+IPv6:	InterfacesListView	IPv6 address label	IPv6:
+Save	InterfaceWindow		Spara
+Link speed:	IntefaceHardwareView		Länkhastighet:
+Renegotiate	InterfacesAddOn		Omförhandla
+The method for obtaining an IP address	IntefaceAddressView		Metoden för att få en IP adress
+Your gateway	IntefaceAddressView		Min gateway
+Enable	InterfacesListView		Aktivera
+Received:	IntefaceHardwareView		Mottaget:
+Revert	InterfaceWindow		Återgå
+connected	IntefaceHardwareView		ansluten
+Gateway:	IntefaceAddressView		Gateway:
+Disable	InterfacesListView		Inaktivera
+Sent:	IntefaceHardwareView		Skickat:
+Disable	InterfacesAddOn		Inaktivera
+Configure…	InterfacesAddOn		Konfigurera…
+Renegotiate Address	InterfacesListView		Omförhandla Adressen
+DHCP	IntefaceAddressView		DHCP
+Mode:	IntefaceAddressView		Läge:
+Your netmask	IntefaceAddressView		Min nätmask
+IP Address:	IntefaceAddressView		IP-adress:
+Off	IntefaceAddressView		Av
+MAC address:	IntefaceHardwareView		MAC-adress
+Netmask:	IntefaceAddressView		Nätmask:
+Your IP address	IntefaceAddressView		Din IP-adress
+%llu KBytes	IntefaceHardwareView		%llu KBytes
+disconnected	IntefaceHardwareView		koppla från 

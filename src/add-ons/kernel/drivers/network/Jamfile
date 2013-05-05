@@ -34,6 +34,7 @@ SubInclude HAIKU_TOP src add-ons kernel drivers network dec21xxx ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network ipro100 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network ipro1000 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network jmicron2x0 ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network rdc ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network rtl8139 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network vt612x ;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2011, Haiku Inc. All rights reserved.
+ * Copyright 2005-2012, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -246,8 +246,15 @@ void *
 BMessage::operator new(size_t size)
 {
 	DEBUG_FUNCTION_ENTER2;
-	void *pointer = sMsgCache->Get(size);
-	return pointer;
+	return sMsgCache->Get(size);
+}
+
+
+void *
+BMessage::operator new(size_t size, const std::nothrow_t &noThrow)
+{
+	DEBUG_FUNCTION_ENTER2;
+	return sMsgCache->Get(size);
 }
 
 
@@ -2389,9 +2396,12 @@ BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
 }
 
 
-void BMessage::_ReservedMessage1(void) {};
-void BMessage::_ReservedMessage2(void) {};
-void BMessage::_ReservedMessage3(void) {};
+void BMessage::_ReservedMessage1() {}
+void BMessage::_ReservedMessage2() {}
+void BMessage::_ReservedMessage3() {}
+
+
+// #pragma mark - Macro definitions for data access methods
 
 
 /* Relay functions from here on (Add... -> AddData, Find... -> FindData) */
@@ -2402,6 +2412,7 @@ BMessage::Add##typeName(const char *name, type val)							\
 {																			\
 	return AddData(name, typeCode, &val, sizeof(type), true);				\
 }																			\
+																			\
 																			\
 status_t																	\
 BMessage::Find##typeName(const char *name, type *p) const					\
@@ -2419,6 +2430,7 @@ BMessage::Find##typeName(const char *name, type *p) const					\
 	return error;															\
 }																			\
 																			\
+																			\
 status_t																	\
 BMessage::Find##typeName(const char *name, int32 index, type *p) const		\
 {																			\
@@ -2435,17 +2447,20 @@ BMessage::Find##typeName(const char *name, int32 index, type *p) const		\
 	return error;															\
 }																			\
 																			\
-status_t																	\
-BMessage::Replace##typeName(const char *name, type val)						\
-{																			\
-	return ReplaceData(name, typeCode, 0, &val, sizeof(type));				\
-}																			\
 																			\
 status_t																	\
-BMessage::Replace##typeName(const char *name, int32 index, type val)		\
+BMessage::Replace##typeName(const char *name, type value)					\
 {																			\
-	return ReplaceData(name, typeCode, index, &val, sizeof(type));			\
+	return ReplaceData(name, typeCode, 0, &value, sizeof(type));			\
 }																			\
+																			\
+																			\
+status_t																	\
+BMessage::Replace##typeName(const char *name, int32 index, type value)		\
+{																			\
+	return ReplaceData(name, typeCode, index, &value, sizeof(type));		\
+}																			\
+																			\
 																			\
 bool																		\
 BMessage::Has##typeName(const char *name, int32 index) const				\
@@ -2477,6 +2492,7 @@ BMessage::Has##typeName(const char *name, int32 index) const				\
 	return HasData(name, typeCode, index);									\
 }
 
+
 DEFINE_HAS_FUNCTION(Alignment, B_ALIGNMENT_TYPE);
 DEFINE_HAS_FUNCTION(String, B_STRING_TYPE);
 DEFINE_HAS_FUNCTION(Pointer, B_POINTER_TYPE);
@@ -2486,6 +2502,7 @@ DEFINE_HAS_FUNCTION(Message, B_MESSAGE_TYPE);
 
 #undef DEFINE_HAS_FUNCTION
 
+
 #define DEFINE_LAZY_FIND_FUNCTION(type, typeName, initialize)				\
 type																		\
 BMessage::Find##typeName(const char *name, int32 index) const				\
@@ -2494,6 +2511,7 @@ BMessage::Find##typeName(const char *name, int32 index) const				\
 	Find##typeName(name, index, &val);										\
 	return val;																\
 }
+
 
 DEFINE_LAZY_FIND_FUNCTION(BRect, Rect, BRect());
 DEFINE_LAZY_FIND_FUNCTION(BPoint, Point, BPoint());
@@ -2507,6 +2525,83 @@ DEFINE_LAZY_FIND_FUNCTION(float, Float, 0);
 DEFINE_LAZY_FIND_FUNCTION(double, Double, 0);
 
 #undef DEFINE_LAZY_FIND_FUNCTION
+
+
+#define DEFINE_SET_GET_FUNCTIONS(type, typeName, typeCode)					\
+type																		\
+BMessage::Get##typeName(const char *name, type defaultValue) const			\
+{																			\
+	return Get##typeName(name, 0, defaultValue);							\
+}																			\
+																			\
+																			\
+type																		\
+BMessage::Get##typeName(const char *name, int32 index,						\
+	type defaultValue) const												\
+{																			\
+	type value;																\
+	if (Find##typeName(name, index, &value) == B_OK)						\
+		return value;														\
+																			\
+	return defaultValue;													\
+}																			\
+																			\
+																			\
+status_t																	\
+BMessage::Set##typeName(const char *name, type value)						\
+{																			\
+	return SetData(name, typeCode, &value, sizeof(type));					\
+}																			\
+
+
+DEFINE_SET_GET_FUNCTIONS(int8, Int8, B_INT8_TYPE);
+DEFINE_SET_GET_FUNCTIONS(uint8, UInt8, B_UINT8_TYPE);
+DEFINE_SET_GET_FUNCTIONS(int16, Int16, B_INT16_TYPE);
+DEFINE_SET_GET_FUNCTIONS(uint16, UInt16, B_UINT16_TYPE);
+DEFINE_SET_GET_FUNCTIONS(int32, Int32, B_INT32_TYPE);
+DEFINE_SET_GET_FUNCTIONS(uint32, UInt32, B_UINT32_TYPE);
+DEFINE_SET_GET_FUNCTIONS(int64, Int64, B_INT64_TYPE);
+DEFINE_SET_GET_FUNCTIONS(uint64, UInt64, B_UINT64_TYPE);
+DEFINE_SET_GET_FUNCTIONS(bool, Bool, B_BOOL_TYPE);
+DEFINE_SET_GET_FUNCTIONS(float, Float, B_FLOAT_TYPE);
+DEFINE_SET_GET_FUNCTIONS(double, Double, B_DOUBLE_TYPE);
+
+#undef DEFINE_SET_GET_FUNCTION
+
+
+#define DEFINE_SET_GET_BY_REFERENCE_FUNCTIONS(type, typeName, typeCode)		\
+type																		\
+BMessage::Get##typeName(const char *name, const type& defaultValue) const	\
+{																			\
+	return Get##typeName(name, 0, defaultValue);							\
+}																			\
+																			\
+																			\
+type																		\
+BMessage::Get##typeName(const char *name, int32 index,						\
+	const type& defaultValue) const											\
+{																			\
+	type value;																\
+	if (Find##typeName(name, index, &value) == B_OK)						\
+		return value;														\
+																			\
+	return defaultValue;													\
+}																			\
+																			\
+																			\
+status_t																	\
+BMessage::Set##typeName(const char *name, const type& value)				\
+{																			\
+	return SetData(name, typeCode, &value, sizeof(type));					\
+}																			\
+
+
+DEFINE_SET_GET_BY_REFERENCE_FUNCTIONS(BPoint, Point, B_POINT_TYPE);
+DEFINE_SET_GET_BY_REFERENCE_FUNCTIONS(BRect, Rect, B_RECT_TYPE);
+DEFINE_SET_GET_BY_REFERENCE_FUNCTIONS(BSize, Size, B_SIZE_TYPE);
+
+#undef DEFINE_SET_GET_BY_REFERENCE_FUNCTIONS
+
 
 status_t
 BMessage::AddAlignment(const char *name, const BAlignment &alignment)
@@ -2634,6 +2729,35 @@ BMessage::AddFlat(const char *name, BFlattenable *object, int32 count)
 		free(buffer);
 
 	return error;
+}
+
+
+status_t
+BMessage::Append(const BMessage &other)
+{
+	field_header *field = other.fFields;
+	for (uint32 i = 0; i < other.fHeader->field_count; i++, field++) {
+		const char *name = (const char *)(other.fData + field->offset);
+		const void *data = (const void *)(other.fData + field->offset
+			+ field->name_length);
+		bool isFixed = (field->flags & FIELD_FLAG_FIXED_SIZE) != 0;
+		size_t size = field->data_size / field->count;
+
+		for (uint32 j = 0; j < field->count; j++) {
+			if (!isFixed) {
+				size = *(uint32 *)data;
+				data = (const void *)((const char *)data + sizeof(uint32));
+			}
+
+			status_t status = AddData(name, field->type, data, size,
+				isFixed, 1);
+			if (status != B_OK)
+				return status;
+
+			data = (const void *)((const char *)data + size);
+		}
+	}
+	return B_OK;
 }
 
 
@@ -3053,4 +3177,51 @@ BMessage::HasFlat(const char *name, int32 index, const BFlattenable *object)
 	const
 {
 	return HasData(name, object->TypeCode(), index);
+}
+
+
+const char*
+BMessage::GetString(const char *name, const char *defaultValue) const
+{
+	return GetString(name, 0, defaultValue);
+}
+
+
+const char*
+BMessage::GetString(const char *name, int32 index,
+	const char *defaultValue) const
+{
+	const char* value;
+	if (FindString(name, index, &value) == B_OK)
+		return value;
+
+	return defaultValue;
+}
+
+
+status_t
+BMessage::SetString(const char *name, const BString& value)
+{
+	return SetData(name, B_STRING_TYPE, value.String(), value.Length() + 1);
+}
+
+
+status_t
+BMessage::SetString(const char *name, const char* value)
+{
+	return SetData(name, B_STRING_TYPE, value, strlen(value) + 1);
+}
+
+
+status_t
+BMessage::SetData(const char* name, type_code type, const void* data,
+	ssize_t numBytes)
+{
+	if (numBytes <= 0 || data == NULL)
+		return B_BAD_VALUE;
+
+	if (ReplaceData(name, type, data, numBytes) == B_OK)
+		return B_OK;
+
+	return AddData(name, type, data, numBytes);
 }

@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <ControlLook.h>
 #include <Message.h>
 #include <View.h>
 
@@ -77,7 +78,7 @@ BStringItem::DrawItem(BView *owner, BRect frame, bool complete)
 
 	if (IsSelected() || complete) {
 		if (IsSelected()) {
-			owner->SetHighColor(tint_color(lowColor, B_DARKEN_2_TINT));
+			owner->SetHighColor(ui_color(B_LIST_SELECTED_BACKGROUND_COLOR));
 			owner->SetLowColor(owner->HighColor());
 		} else
 			owner->SetHighColor(lowColor);
@@ -85,14 +86,21 @@ BStringItem::DrawItem(BView *owner, BRect frame, bool complete)
 		owner->FillRect(frame);
 	}
 
-	owner->MovePenTo(frame.left, frame.top + fBaselineOffset);
+	owner->MovePenTo(frame.left + be_control_look->DefaultLabelSpacing(),
+		frame.top + fBaselineOffset);
 
-	rgb_color black = {0, 0, 0, 255};
-
-	if (!IsEnabled())
-		owner->SetHighColor(tint_color(black, B_LIGHTEN_2_TINT));
-	else
-		owner->SetHighColor(black);
+	if (!IsEnabled()) {
+		rgb_color textColor = ui_color(B_LIST_ITEM_TEXT_COLOR);
+		if (textColor.red + textColor.green + textColor.blue > 128 * 3)
+			owner->SetHighColor(tint_color(textColor, B_DARKEN_2_TINT));
+		else
+			owner->SetHighColor(tint_color(textColor, B_LIGHTEN_2_TINT));
+	} else {
+		if (IsSelected())
+			owner->SetHighColor(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR));
+		else
+			owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
+	}
 
 	owner->DrawString(fText);
 
@@ -112,7 +120,7 @@ BStringItem::SetText(const char *text)
 }
 
 
-const char *
+const char*
 BStringItem::Text() const
 {
 	return fText;
@@ -122,8 +130,10 @@ BStringItem::Text() const
 void
 BStringItem::Update(BView *owner, const BFont *font)
 {
-	if (fText)
-		SetWidth(font->StringWidth(fText));
+	if (fText) {
+		SetWidth(font->StringWidth(fText)
+			+ be_control_look->DefaultLabelSpacing());
+	}
 
 	font_height fheight;
 	font->GetHeight(&fheight);

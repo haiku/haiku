@@ -83,7 +83,7 @@ UnzipEngine::SetTo(const char* pathToPackage, const char* destinationFolder)
 	ret = commandPipe.ReadLines(stdOutAndErrPipe, this);
 	fRetrievingListing = false;
 
-	printf("%llu items in %llu bytes\n", fItemsToUncompress,
+	printf("%" B_PRIu64 " items in %" B_PRIdOFF " bytes\n", fItemsToUncompress,
 		fBytesToUncompress);
 
 	return ret;

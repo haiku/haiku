@@ -61,7 +61,7 @@ using namespace BPrivate;
 #include "Signature.h"
 
 
-#define B_TRANSLATE_CONTEXT "Mail"
+#define B_TRANSLATION_CONTEXT "Mail"
 
 #define BUTTON_WIDTH		70
 #define BUTTON_HEIGHT		20
@@ -629,7 +629,7 @@ TPrefsWindow::_BuildAccountMenu(int32 account)
 	//menu->SetRadioMode(true);
 	BMailAccounts accounts;
 	if (accounts.CountAccounts() == 0) {
-		menu->AddItem(item = new BMenuItem("<no account found>", NULL));
+		menu->AddItem(item = new BMenuItem(B_TRANSLATE("<no account found>"), NULL));
 		item->SetEnabled(false);
 		return menu;
 	}

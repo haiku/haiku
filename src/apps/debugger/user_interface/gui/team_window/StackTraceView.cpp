@@ -1,5 +1,6 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -15,9 +16,11 @@
 #include "table/TableColumns.h"
 
 #include "FunctionInstance.h"
+#include "GuiSettingsUtils.h"
 #include "Image.h"
 #include "StackTrace.h"
 #include "TargetAddressTableColumn.h"
+#include "UiUtils.h"
 
 
 // #pragma mark - FramesTableModel
@@ -75,30 +78,9 @@ public:
 				return true;
 			case 2:
 			{
-				Image* image = frame->GetImage();
-				FunctionInstance* function = frame->Function();
-				if (image == NULL && function == NULL) {
-					value.SetTo("?", B_VARIANT_DONT_COPY_DATA);
-					return true;
-				}
-
-				BString name;
-				target_addr_t baseAddress;
-				if (function != NULL) {
-					name = function->PrettyName();
-					baseAddress = function->Address();
-				} else {
-					name = image->Name();
-					baseAddress = image->Info().TextBase();
-				}
-
-				char offset[32];
-				snprintf(offset, sizeof(offset), " + %#llx",
-					frame->InstructionPointer() - baseAddress);
-
-				name << offset;
-				value.SetTo(name.String());
-
+				char buffer[512];
+				value.SetTo(UiUtils::FunctionNameForFrame(frame, buffer,
+						sizeof(buffer)));
 				return true;
 			}
 			default:
@@ -193,6 +175,32 @@ StackTraceView::SetStackFrame(StackFrame* stackFrame)
 	}
 
 	fFramesTable->DeselectAllRows();
+}
+
+
+void
+StackTraceView::LoadSettings(const BMessage& settings)
+{
+	BMessage tableSettings;
+	if (settings.FindMessage("framesTable", &tableSettings) == B_OK) {
+		GuiSettingsUtils::UnarchiveTableSettings(tableSettings,
+			fFramesTable);
+	}
+}
+
+
+status_t
+StackTraceView::SaveSettings(BMessage& settings)
+{
+	settings.MakeEmpty();
+
+	BMessage tableSettings;
+	status_t result = GuiSettingsUtils::ArchiveTableSettings(tableSettings,
+		fFramesTable);
+	if (result == B_OK)
+		result = settings.AddMessage("framesTable", &tableSettings);
+
+	return result;
 }
 
 

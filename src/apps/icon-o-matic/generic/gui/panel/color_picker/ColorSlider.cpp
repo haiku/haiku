@@ -439,7 +439,8 @@ ColorSlider::SetModeAndValues(selected_color_mode mode,
 		R*=255.0; G*=255.0; B*=255.0;
 	}
 	
-	rgb_color color = { round(R), round(G), round(B), 255 };
+	rgb_color color = {(uint8)round(R), (uint8)round(G),
+		(uint8)round(B), 255 };
 	
 	fMode = mode;
 	SetOtherValues(value1, value2);
@@ -475,40 +476,38 @@ ColorSlider::GetOtherValues(float* value1, float* value2) const
 void
 ColorSlider::SetMarkerToColor(rgb_color color)
 {
-	float h, s, v;
-	if (fMode & (H_SELECTED | S_SELECTED | V_SELECTED)) {
-		RGB_to_HSV((float)color.red / 255.0, 
-				   (float)color.green / 255.0,
-				   (float)color.blue / 255.0,
-				   h, s, v);
+	float h = 0.0f;
+	float s = 0.0f;
+	float v = 0.0f;
+	if ((fMode & (H_SELECTED | S_SELECTED | V_SELECTED)) != 0) {
+		RGB_to_HSV((float)color.red / 255.0f, (float)color.green / 255.0f,
+			(float)color.blue / 255.0f, h, s, v);
 	}
 	
 	switch (fMode) {
-				
-		case R_SELECTED: {
-			SetValue( 255 - color.red );
-		} break;
+		case R_SELECTED:
+			SetValue(255 - color.red);
+			break;
 		
-		case G_SELECTED: {
-			SetValue( 255 - color.green );
-		} break;
+		case G_SELECTED:
+			SetValue(255 - color.green);
+			break;
 
-		case B_SELECTED: {
-			SetValue( 255 - color.blue );
-		} break;
+		case B_SELECTED:
+			SetValue(255 - color.blue);
+			break;
 		
-		case H_SELECTED: {
-			SetValue( 255.0 - round(h / 6.0 * 255.0) );
-		} break;
+		case H_SELECTED:
+			SetValue(255.0 - round(h / 6.0 * 255.0));
+			break;
 		
-		case S_SELECTED: {
-			SetValue( 255.0 - round(s * 255.0) );
-		} break;
+		case S_SELECTED:
+			SetValue(255.0 - round(s * 255.0));
+			break;
 		
-		case V_SELECTED: {
-			SetValue( 255.0 - round(v * 255.0) );
-		} break;
-		
+		case V_SELECTED:
+			SetValue(255.0 - round(v * 255.0));
+			break;
 	}
 }
 
@@ -640,7 +639,7 @@ void
 ColorSlider::_DrawColorLineY(BView *view, float y,
 							 int r, int g, int b)
 {
-	rgb_color color = { r, g, b, 255 };
+	rgb_color color = {(uint8)r, (uint8)g, (uint8)b, 255 };
 	y = 255.0 - y;
 	view->AddLine( BPoint(8.0, y + 5.0), BPoint(27.0, y + 5.0), color );
 }
@@ -650,7 +649,7 @@ void
 ColorSlider::_DrawColorLineX(BView *view, float x,
 							 int r, int g, int b)
 {
-	rgb_color color = { r, g, b, 255 };
+	rgb_color color = {(uint8)r, (uint8)g, (uint8)b, 255 };
 	BRect bounds(view->Bounds());
 	x = (255.0 - x) * (bounds.Width() - 2.0) / 255.0 + 2.0;
 	view->AddLine( BPoint(x, bounds.top + 2.0), BPoint(x, bounds.bottom - 2.0), color );

@@ -1,0 +1,10 @@
+1	polish	x-vnd.Haiku-libmail	161731481
+Partially download messages larger than	ProtocolConfigView		Częściowo pobierz wiadomości większe niż
+Password:	ProtocolConfigView		Hasło:
+Remove mail from server when deleted	ProtocolConfigView		Usuń wiadomość z serwera przy kasowaniu
+Mail server:	ProtocolConfigView		Serwer pocztowy:
+Select…	MailKit		Wybierz…
+Connection type:	ProtocolConfigView		Typ połączenia:
+Leave mail on server	ProtocolConfigView		Pozostawianie wiadomości na serwerze
+Username:	ProtocolConfigView		Użytkownik:
+Login type:	ProtocolConfigView		Typ logowania:

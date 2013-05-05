@@ -1,7 +1,7 @@
 
 # package dependencies
 #
-# For transitive dependencies dependants should be listed before their
+# For transitive dependencies dependents should be listed before their
 # dependencies.
 
 OptionalPackageDependencies APR-util : APR Expat ;
@@ -10,15 +10,19 @@ OptionalPackageDependencies ArmyKnife : TagLib ;
 OptionalPackageDependencies Beam : LibIconv LibLayout OpenSSL PCRE ;
 OptionalPackageDependencies BeHappy : BeBook NetSurf ;
 OptionalPackageDependencies BurnItNow : CDRecord ;
-OptionalPackageDependencies CDRecord : LibIconv ;
+OptionalPackageDependencies Caya : Expat ;
+OptionalPackageDependencies CDRecord : GetText LibIconv ;
 OptionalPackageDependencies Curl : OpenSSL ;
 OptionalPackageDependencies DevelopmentBase : CDRecord DevelopmentMin Yasm ;
 OptionalPackageDependencies Development : DevelopmentBase Perl ;
+OptionalPackageDependencies DevelopmentPowerPC : DevelopmentMin ;
 OptionalPackageDependencies GetText : LibIconv ;
 OptionalPackageDependencies Git : Expat Curl OpenSSL LibIconv ;
+OptionalPackageDependencies GitDoc : Man Git ;
 OptionalPackageDependencies ICU-devel : DevelopmentBase ;
 OptionalPackageDependencies LibEdit : NCurses ;
 OptionalPackageDependencies LibLayout : DevelopmentBase ;
+OptionalPackageDependencies LibXML2 : XZ-Utils ;
 OptionalPackageDependencies Man : Groff ;
 OptionalPackageDependencies Tar : LibIconv ;
 OptionalPackageDependencies Python : Bzip ;
@@ -28,15 +32,17 @@ OptionalPackageDependencies Neon : LibXML2 ;
 OptionalPackageDependencies NetFS : UserlandFS ;
 OptionalPackageDependencies NetSurf : OpenSSL Curl LibXML2 LibIconv Libmng ;
 OptionalPackageDependencies OpenSSH : OpenSSL ;
-OptionalPackageDependencies Paladin : CCache Fastdep ;
+OptionalPackageDependencies OpenSSL : CARootCertificates ;
+OptionalPackageDependencies Paladin : CCache Fastdep PCRE ;
 OptionalPackageDependencies Pe : PCRE ;
 OptionalPackageDependencies Readline : NCurses ;
 OptionalPackageDependencies SDLLibs : XiphLibs libmad libmikmod Libmng libmodplug physfs ;
 OptionalPackageDependencies Subversion : APR-util Neon LibIconv LibXML2 OpenSSL SQLite ;
 OptionalPackageDependencies Transmission : LibEvent Curl OpenSSL LibIconv ;
 OptionalPackageDependencies Vim : GetText LibIconv ;
-OptionalPackageDependencies WebPositive : Curl LibXML2 SQLite ;
+OptionalPackageDependencies WebPositive : Curl LibXML2 SQLite WebKit WebPositiveBookmarks ;
 OptionalPackageDependencies wpa_supplicant : OpenSSL ;
 OptionalPackageDependencies XZ-Utils : Tar ;
 
-OptionalPackageDependencies MandatoryPackages : ICU LibSolv Sed Tar ;
+OptionalPackageDependencies MandatoryPackages
+	: Bzip Ctags Grep ICU LibSolv Sed Tar ;

@@ -33,9 +33,9 @@ writeAttrValue(int fd, const char *name, type_code type, Type value)
 
 
 /**	Writes an attribute to a node, taking the type into account and
- *	convertig the value accordingly
+ *	converting the value accordingly
  *
- *	On success it will return the amount of bytes writen
+ *	On success it will return the amount of bytes written
  *	On failure it returns an error code (negative number)
  */
 

@@ -1,18 +1,20 @@
 /*
- * Copyright 2011, Haiku inc.
- * Distributed under the terms of the MIT Licence.
+ * Copyright 2011 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  *
  * Documentation by:
- *		Adrien Destugues <pulkomandy@pulkomandy.ath.cx>
+ *		Adrien Destugues, pulkomandy@pulkomandy.ath.cx
+ *
  * Corresponds to:
- *		/trunk/headers/os/storage/FindDirectory.h	 rev 42600
- *		/trunk/src/kits/storage/FindDirectory.cpp	 rev 42600
+ *		headers/os/storage/FindDirectory.h	 rev 42600
+ *		src/kits/storage/FindDirectory.cpp	 rev 42600
  */
 
 
 /*!
 	\file FindDirectory.h
 	\ingroup storage
+	\ingroup libbe
 	\brief Provides the find_directory function.
 
 	Haiku provides a set of directories for applications to use. These can be

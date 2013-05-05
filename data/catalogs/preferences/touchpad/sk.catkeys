@@ -1,20 +1,20 @@
 1	slovak	x-vnd.Haiku-Touchpad	607725922
-Acceleration	TouchpadPrefView		Zrýchlenie
-Cancel	TouchpadPrefView		Zrušiť
-Defaults	TouchpadPrefView		Predvoľby
-Fast	TouchpadPrefView		Rýchle
-High	TouchpadPrefView		Vysoká
-Horizontal	TouchpadPrefView		Vodorovné
-Horizontal scrolling	TouchpadPrefView		Vodorovné posúvanie
-OK	TouchpadPrefView		OK
-Off	TouchpadPrefView		Vypnuté
-Please confirm	TouchpadPrefView		Prosím, potvrďte
-Revert	TouchpadPrefView		Vrátiť
 Scrolling	TouchpadPrefView		Posúvanie
-Sensitivity	TouchpadPrefView		Citlivosť
-Slow	TouchpadPrefView		Pomalé
-Tapping	TouchpadPrefView		Klikanie
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Nová oblasť na posúvanie je veľmi veľká a môže brániť bežnému používaniu myši. Skutočne to chcete zmeniť?
 Touchpad	System name		Touchpad
+Revert	TouchpadPrefView		Vrátiť
+Tapping	TouchpadPrefView		Klikanie
+Please confirm	TouchpadPrefView		Prosím, potvrďte
 Two finger scrolling	TouchpadPrefView		Posúvanie dvomi prstami
+Defaults	TouchpadPrefView		Predvoľby
+Slow	TouchpadPrefView		Pomalé
 Vertical	TouchpadPrefView		Zvislé
+High	TouchpadPrefView		Vysoká
+Horizontal scrolling	TouchpadPrefView		Vodorovné posúvanie
+Fast	TouchpadPrefView		Rýchle
+OK	TouchpadPrefView		OK
+Acceleration	TouchpadPrefView		Zrýchlenie
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Nová oblasť na posúvanie je veľmi veľká a môže brániť bežnému používaniu myši. Skutočne to chcete zmeniť?
+Horizontal	TouchpadPrefView		Vodorovné
+Off	TouchpadPrefView		Vypnuté
+Sensitivity	TouchpadPrefView		Citlivosť
+Cancel	TouchpadPrefView		Zrušiť

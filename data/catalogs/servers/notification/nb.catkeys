@@ -1,5 +1,5 @@
-1	norwegian_bokmål	x-vnd.Haiku-notification_server	430094238
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-notification_server	430094238
 Darn.	NotificationWindow		Søren.
-Notification	NotificationWindow		Melding
-OK	NotificationWindow		OK
 Warning	NotificationWindow		Advarsel
+OK	NotificationWindow		OK
+Notification	NotificationWindow		Melding

@@ -4,19 +4,20 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		hiromu1996
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>ScreenSaver</title>
+	<title>スクリーンセーバー</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -38,47 +39,50 @@
 <li><a href="../../uk/preferences/screensaver.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/preferences/screensaver.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/preferences/screensaver.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/preferences/screensaver.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/preferences/screensaver.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/preferences/screensaver.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../pt_BR/preferences/screensaver.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../ca/preferences/screensaver.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/preferences/screensaver.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="screen.html">Screen</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="sounds.html">Sounds</a>  »
+ «  <a href="screen.html">画面</a> 
+::  <a href="../preferences.html" class="uplink">Preferences (プレファレンス)</a> 
+::  <a href="sounds.html">サウンド</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<h2><img src="../../images/prefs-images/screensaver-icon_64.png" alt="screensaver-icon_64.png" width="64" height="64" />ScreenSaver</h2>
+<h2><img src="../../images/prefs-images/screensaver-icon_64.png" alt="screensaver-icon_64.png" width="64" height="64" />スクリーンセーバー (ScreenSaver)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbarメニュー:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
+<tr><td>Deskbar メニュー:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
 <tr><td>場所:</td><td></td><td><span class="path">/boot/system/preferences/Screensaver</span></td></tr>
 <tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/ScreenSaver_settings</span></td></tr>
 </table>
 
-<p>この設定はFadeとModulesの2つのタブに分けられています。
-</p>
+<p>スクリーンセーバー設定のパネルは 2 つのタブに分かれています。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="fade" id="fade">Fade</a></h2>
+<a name="fade" id="fade">一般 (General)</a></h2>
 <img src="../images/prefs-images/screensaver-fade.png" alt="screensaver-fade.png" />
 <br />
-<p>1つ目のチェックボックスでスクリーンセーバーを有効にするかを選択します。<br />
+<p>一番上のチェックボックスでスクリーンセーバーを有効にするかを選択します。<br />
 その下のスライドバーでスクリーンセーバーが起動するまでの時間を変更できます。</p>
-<p>2つ目では一定時間経過後にディスプレイの電源を切るかを選択します。<br />
-チェックボックスが選択されているなら、横のスライドバーでディスプレイの電源が切られるまでの時間を設定できます。<br />
-3つ目ではパスワードロックをするかを選択できます。<br />
-パスワードロックが有効にされているなら、その横のスライドバーでパスワードロックをかけるまでの時間を設定できます。
+<p>次の2 つのスライダーは、チェック母ックを有効にしたときにのみ未使用できます。<br />
+1 つは、ディスプレイの電源が切れるまでの時間を設定します。<br />
+もう 1 つは、アンロックのためにパスワードが必要となるまでの時間を設定します。
 </p>
 <p>下部の画面のイラストをクリックすることで、どの角にマウスをおいたときにスクリーンセーバーを起動するかを設定できます。この機能を無効化したいときは、イラストの真ん中をクリックしてください。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="modules" id="modules">Modules</a></h2>
+<a name="screensavers" id="modules">スクリーンセーバー (Screensavers)</a></h2>
 <img src="../images/prefs-images/screensaver-modules.png" alt="screensaver-modules.png" />
 <br />
-<p>2つ目のタブには、インストールされたすべてのスクリーンセーバーのモジュールのリストとそれぞれの設定が表示されます。<span class="button">Test</span> ボタンで選択しているスクリーンセーバーを試すことができます。また、<span class="button">Add...</span>ボタンでモジュールの追加ができます。モジュールをリストにドラッグアンドドロップしても追加できます。もちろん、それぞれのユーザーのフォルダ(すなわち<span class="path">/boot/common/add-ons/screensavers/</span>、もしくは<span class="path">/boot/home/config/add-ons/screensavers/</span>)でモジュールのファイルのコピーや削除ができます。(<a href="../filesystem-layout.html">Filesystem layout</a>のトピックをご覧ください)
+<p>2 つめのタブには、インストールされたすべてのスクリーンセーバーのリストとそれぞれの設定が表示されます。リストの下にある<span class="button">テスト (Test)</span> ボタンで選択しているスクリーンセーバーを試すことができます。また、<span class="button">追加… (Add...)</span> ボタンでスクリーンセーバーの追加ができます。別のやり方としては、スクリーンセーバーをリストにドラッグアンドドロップしても追加できます。もちろん、それぞれのユーザーのフォルダー (すなわち<span class="path">/boot/common/add-ons/Screen Savers/</span>、もしくは<span class="path">/boot/home/config/add-ons/Screen Savers/</span>) で、ファイルのコピーや削除ができます (<a href="../filesystem-layout.html">ファイルシステムレイアウト</a>のトピックをご覧ください)。
 </p>
 
 </div>
@@ -86,9 +90,9 @@
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="screen.html">Screen</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="sounds.html">Sounds</a>  »
+ «  <a href="screen.html">画面</a> 
+::  <a href="../preferences.html" class="uplink">Preferences (プレファレンス)</a> 
+::  <a href="sounds.html">サウンド</a>  »
 </span></div>
 </div>
 

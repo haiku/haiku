@@ -51,8 +51,8 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "JPEGTranslator.h"
 #include "TranslatorSettings.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "be_jerror"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "be_jerror"
 
 // Since Translator doesn't use it's own error table, we can use error_mgr's
 // variables to store some usefull data.

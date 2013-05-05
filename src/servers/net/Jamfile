@@ -10,8 +10,6 @@ UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
 #UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
 #UseHeaders [ FDirName $(HAIKU_TOP) src tests kits net DialUpPreflet ] ;
 
-#local defines = [ FDefines INET6=1 ] ;
-
 SubDirCcFlags $(defines) ;
 SubDirC++Flags $(defines) ;
 

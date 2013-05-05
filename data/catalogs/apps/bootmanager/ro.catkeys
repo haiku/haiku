@@ -1,65 +1,65 @@
 1	romanian	x-vnd.Haiku-BootManager	3014946856
-About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Pe punctul de a restaura înregistrarea de boot principală (MBR) de %disk de la %file. Doriți să continuați?
-About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Pe cale de a scrie meniul de boot pe disc. Sigur doriți să continuați?
-About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Pe cale de a scrie următorul meniu de boot pe discul de boot (%s). Verificați informațiile de mai jos înainte de a continua.
-After five seconds	DefaultPartitionPage		După cinci secunde
-After four seconds	DefaultPartitionPage		După patru secunde
-After one minute	DefaultPartitionPage		După un minut
-After one second	DefaultPartitionPage		După o secundă
-After three seconds	DefaultPartitionPage		După trei secunde
+The boot manager has been successfully installed on your system.	BootManagerController		Administratorul de boot a fost instalat cu succes pe sistemul dumneavoastră.
 After two seconds	DefaultPartitionPage		După două secunde
-An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		A apărut o eroare la scrierea meniului de boot. Înregistrarea de boot principală s-ar putea să fie distrusă, ar trebui să restaurați MBR acum!
+Uninstall Boot Manager	UninstallPage	Title	Dezinstalează Administrator de boot
 At least one partition must be selected!	BootManagerController		Cel puțin o partiție trebuie selectată!
-Back	BootManagerController	Button	Înapoi
-Backup Master Boot Record	BootManagerController	Title	Copie de rezervă a Înregistrării de boot principală (MBR)
-Boot Manager is unable to read the partition table!	BootManagerController		Administratorul de Boot nu a putut citi tabelul de patiție!
-BootManager	System name		AdministratorPornire
-Cannot access!	DrivesPage	Cannot install	Nu se poate accesa!
-Default Partition	DefaultPartitionPage	Title	Partiție implicită
-Default Partition:	DefaultPartitionPage	Menu field label	Partiție implicită:
-Done	BootManagerController	Button	Gata
-Drives	DrivesPage	Title	Unități
-Error reading partition table	BootManagerController	Title	Eroare la citirea tabelului de partiție
-File:	FileSelectionPage	Text control label	Fișier:
+The old Master Boot Record could not be saved to %s	BootManagerController		Înregistrarea de boot principală nu a putut fi salvată la %s
+Restore MBR	BootManagerController	Button	Restaurează MBR
 Hard Drive	DrivesPage	Default disk name	Unități hard
-Immediately	DefaultPartitionPage		Imediat
-Install	DrivesPage	Button	Instalează
-Installation of boot menu completed	BootManagerController	Title	Instalarea meniului de boot a fost completată
-Installation of boot menu failed	BootManagerController	Title	Instalarea meniului de boot a eșuat
-Never	DefaultPartitionPage		Niciodată
-Next	WizardView	Button	Următor
-No space available!	DrivesPage	Cannot install	Nu este spațiu disponibil!
-OK	BootManagerController	Button	Bine
-Old Master Boot Record Saved failure	BootManagerController	Title	Eșec la salvarea înregistrării de boot principală veche
-Old Master Boot Record saved	BootManagerController	Title	Înregistrarea de boot principală veche a fost salvată
-Partition table not compatible	BootManagerController	Title	Tabela de partiții nu este compatibilă
-Partitions	DefaultPartitionPage	Pop up menu title	Partiții
+USB Drive	DrivesPage	Default disk name	Unitate USB
+The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Înregistrarea de boot principală (MBR) a dispozitivului de boot:\n\t%s\nva fi salvată acum pe disc. Selectați un fișier în care va fi salvată MBR.\n\nDacă ceva nu merge bine cu instalarea sau dacă doriți mai târziu să eliminați meniul de boot, excutați programul bootman și selectați opțiunea „Dezinstalează”.
+About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Pe punctul de a restaura înregistrarea de boot principală (MBR) de %disk de la %file. Doriți să continuați?
+An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		A apărut o eroare la scrierea meniului de boot. Înregistrarea de boot principală s-ar putea să fie distrusă, ar trebui să restaurați MBR acum!
 Partitions	PartitionsPage	Title	Partiții
+Timeout: %s	DefaultPartitionPage		Timp alocat expirat: %s
+Select	FileSelectionPage	Button	Selectează
+Cannot access!	DrivesPage	Cannot install	Nu se poate accesa!
+Uninstall boot manager	BootManagerController	Title	Dezinstalează administratorul de boot
+After four seconds	DefaultPartitionPage		După patru secunde
+Uninstallation of boot menu failed	BootManagerController	Title	Dezinstalarea meniului de boot a eșuat
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Localizați fișierul de salvare al Înregistrării de boot principală (MBR) din care se va restaura. Acesta este fișierul care a fost creat atunci când administratorul de boot a fost instalat prima dată.
-Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Localizați fișierul de salvare al Înregistrării de boot principală (MBR) din care se va restaura. Acesta este fișierul care a fost creat atunci când administratorul de boot a fost instalat prima dată.
+Next	WizardView	Button	Următor
+Uninstallation of boot menu completed	BootManagerController	Title	Dezinstalarea meniului de boot a fost completată
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Selectați unitatea în care vreți să instalați sau să dezinstalați administratorul de boot.
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Specificați o partiție implicită și o limită de timp.\nMeniul de boot va încărca partiția implicită după limita de timp doar dacă nu selectați altă partiție. Puteți să configurați meniul de boot astfel încât să aștepte un timp nedefinit pentru alegerea unei partiții.\nMențineți apăsată tasta „ALT” pentru a dezactiva limita de timp la pornire.
-Previous	WizardView	Button	Precedent
-Quit	DrivesPage	Button	Părăsește
-Restore MBR	BootManagerController	Button	Restaurează MBR
-Select	FileSelectionPage	Button	Selectează
-Summary	BootManagerController	Title	Rezumat
-The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Înregistrarea de boot principală (MBR) a dispozitivului de boot:\n\t%s\nva fi salvată acum pe disc. Selectați un fișier în care va fi salvată MBR.\n\nDacă ceva nu merge bine cu instalarea sau dacă doriți mai târziu să eliminați meniul de boot, excutați programul bootman și selectați opțiunea „Dezinstalează”.
-The Master Boot Record could not be restored!	BootManagerController		Înregistrarea de boot principală nu a putut fi restaurată!
-The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Înregistrarea de boot principală a unității de boot (%DISK) a fost restaurată cu succes de la %FILE.
-The boot manager has been successfully installed on your system.	BootManagerController		Administratorul de boot a fost instalat cu succes pe sistemul dumneavoastră.
-The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Următoarele partiții au fost detectate. Bifați caseta de lângă partiții pentru a le include în meniul de boot. Puteți să configurați numele partițiilor așa cum doriți să apară în meniul de boot.
-The old Master Boot Record could not be saved to %s	BootManagerController		Înregistrarea de boot principală nu a putut fi salvată la %s
-The old Master Boot Record was successfully saved to %s.	BootManagerController		Înregistrarea de boot principală (MBR) veche a fost salvată cu succes la %s.
+After one second	DefaultPartitionPage		După o secundă
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Tabela de partiții al primului hard disc nu este compatibilă cu Administratorul de boot.\nAdministratorul de boot necesită un spațiu disponibil de 2 KiB înainte de prima partiție.
-Timeout: %s	DefaultPartitionPage		Timp alocat expirat: %s
-USB Drive	DrivesPage	Default disk name	Unitate USB
-Uninstall	DrivesPage	Button	Dezinstalează
-Uninstall Boot Manager	UninstallPage	Title	Dezinstalează Administrator de boot
-Uninstall boot manager	BootManagerController	Title	Dezinstalează administratorul de boot
-Uninstallation of boot menu completed	BootManagerController	Title	Dezinstalarea meniului de boot a fost completată
-Uninstallation of boot menu failed	BootManagerController	Title	Dezinstalarea meniului de boot a eșuat
-Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Necunoscut
-Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Fără nume %d
-Update	DrivesPage	Button	Actualizează
+The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Următoarele partiții au fost detectate. Bifați caseta de lângă partiții pentru a le include în meniul de boot. Puteți să configurați numele partițiilor așa cum doriți să apară în meniul de boot.
+After one minute	DefaultPartitionPage		După un minut
+The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Înregistrarea de boot principală a unității de boot (%DISK) a fost restaurată cu succes de la %FILE.
 Write boot menu	BootManagerController	Button	Scrie meniul de boot
+The Master Boot Record could not be restored!	BootManagerController		Înregistrarea de boot principală nu a putut fi restaurată!
+Uninstall	DrivesPage	Button	Dezinstalează
+Default Partition	DefaultPartitionPage	Title	Partiție implicită
+After five seconds	DefaultPartitionPage		După cinci secunde
+Back	BootManagerController	Button	Înapoi
+Installation of boot menu completed	BootManagerController	Title	Instalarea meniului de boot a fost completată
+Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Fără nume %d
+File:	FileSelectionPage	Text control label	Fișier:
+Previous	WizardView	Button	Precedent
+Install	DrivesPage	Button	Instalează
+About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Pe cale de a scrie următorul meniu de boot pe discul de boot (%s). Verificați informațiile de mai jos înainte de a continua.
+Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Necunoscut
+Update	DrivesPage	Button	Actualizează
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Localizați fișierul de salvare al Înregistrării de boot principală (MBR) din care se va restaura. Acesta este fișierul care a fost creat atunci când administratorul de boot a fost instalat prima dată.
+Old Master Boot Record Saved failure	BootManagerController	Title	Eșec la salvarea înregistrării de boot principală veche
+Drives	DrivesPage	Title	Unități
+No space available!	DrivesPage	Cannot install	Nu este spațiu disponibil!
+Never	DefaultPartitionPage		Niciodată
+Partition table not compatible	BootManagerController	Title	Tabela de partiții nu este compatibilă
+Old Master Boot Record saved	BootManagerController	Title	Înregistrarea de boot principală veche a fost salvată
+Boot Manager is unable to read the partition table!	BootManagerController		Administratorul de Boot nu a putut citi tabelul de patiție!
+Error reading partition table	BootManagerController	Title	Eroare la citirea tabelului de partiție
+Installation of boot menu failed	BootManagerController	Title	Instalarea meniului de boot a eșuat
+Backup Master Boot Record	BootManagerController	Title	Copie de rezervă a Înregistrării de boot principală (MBR)
+Quit	DrivesPage	Button	Părăsește
+About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Pe cale de a scrie meniul de boot pe disc. Sigur doriți să continuați?
+The old Master Boot Record was successfully saved to %s.	BootManagerController		Înregistrarea de boot principală (MBR) veche a fost salvată cu succes la %s.
+Default Partition:	DefaultPartitionPage	Menu field label	Partiție implicită:
+Partitions	DefaultPartitionPage	Pop up menu title	Partiții
+BootManager	System name		AdministratorPornire
+Summary	BootManagerController	Title	Rezumat
+OK	BootManagerController	Button	Bine
+Immediately	DefaultPartitionPage		Imediat
+Done	BootManagerController	Button	Gata
+After three seconds	DefaultPartitionPage		După trei secunde

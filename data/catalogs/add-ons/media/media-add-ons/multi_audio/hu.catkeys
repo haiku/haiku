@@ -1,0 +1,34 @@
+1	hungarian	x-vnd.Haiku-hmulti_audio.media_addon	451057402
+Master	MultiAudio		Elsődleges
+SPDIF	MultiAudio		SPDIF
+Gain	MultiAudio		Erősítés
+Output 3D center	MultiAudio		Kimeneti 3D közép
+Extended Setup	MultiAudio		További beállítások
+CD	MultiAudio		CD
+Tone control	MultiAudio		Hangszín vezérlés
+Phone	MultiAudio		Telefon
+Aux	MultiAudio		Aux
+Output bass	MultiAudio		Kimeneti basszus
+Headphones	MultiAudio		Fejhallgató
+Beep	MultiAudio		Csipogó
+Output mono mix	MultiAudio		Kimeneti monó keverő
+Output stereo mix	MultiAudio		Kimeneti sztereó keverő
+Input	MultiAudio		Bemenet
+Output treble	MultiAudio		Kimeneti szólam
+Mono mix	MultiAudio		Monó keverő
+General	MultiAudio		Általános
+Input & Output	MultiAudio		Ki- és bemenet
+Enhanced Setup	MultiAudio		További beállítások
+Stereo mix	MultiAudio		Sztereó keverő
+Output 3D depth	MultiAudio		Kimeneti 3D mélység
+Volume	MultiAudio		Hangerő
+Output	MultiAudio		Kimenet
+Video	MultiAudio		Videó
+Line	MultiAudio		Vonalbemenet
+Mic	MultiAudio		Mikrofon
+ frequency:	MultiAudio		i frekvencia:
+Enable	MultiAudio		Engedélyezés
+Mute	MultiAudio		Némítás
+Wave	MultiAudio		Hanghullám
+Setup	MultiAudio		Beállítás
+Level	MultiAudio		Szint

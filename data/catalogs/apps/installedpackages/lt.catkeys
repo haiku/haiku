@@ -1,0 +1,8 @@
+1	lithuanian	x-vnd.Haiku-InstalledPackages	4131220089
+No package selected.	UninstallView		Nėra pasirinktų paketų.
+Remove	UninstallView		Pašalinti
+Package description	UninstallView		Paketo aprašas
+InstalledPackages	System name		Įdiegti paketai
+The package you selected has been successfully removed from your system.	UninstallView		Pažymėtas paketas sėkmingai pašalintas iš sistemos.
+OK	UninstallView		Gerai
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Pažymėtas paketas nebuvo pašalintas iš sistemos. Gali būti, jog pažeistas duomenų apie jo įdiegimą failas.

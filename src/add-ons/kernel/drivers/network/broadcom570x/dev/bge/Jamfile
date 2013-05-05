@@ -12,7 +12,7 @@ SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
 KernelAddon broadcom570x :
 	if_bge.c
 	glue.c
-	: libfreebsd_network.a broadcom570x_mii.a
+	: broadcom570x_mii.a libfreebsd_network.a
 	;
 
 ObjectHdrs [ FGristFiles if_bge$(SUFOBJ) ]

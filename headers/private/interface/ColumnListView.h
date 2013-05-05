@@ -133,6 +133,7 @@ public:
 
 			float 				Height() const;
 			bool 				IsExpanded() const;
+			bool				IsSelected() const;
 
 private:
 	// Blows up into the debugger if the validation fails.
@@ -326,8 +327,9 @@ public:
 	// Does not delete row or children at this time.
 	// todo: Make delete row and children
 			void				RemoveRow(BRow* row);
-
 			void				UpdateRow(BRow* row);
+			bool				SwapRows(int32 index1, int32 index2, BRow*
+									parentRow1 = NULL, BRow* parentRow2 = NULL);
 			void				Clear();
 
 	// Appearance (DEPRECATED)
@@ -373,7 +375,6 @@ public:
 	virtual BSize				PreferredSize();
 	virtual BSize				MaxSize();
 
-	virtual	void				InvalidateLayout(bool descendants = false);
 
 protected:
 	virtual	void 				MessageReceived(BMessage* message);
@@ -382,12 +383,12 @@ protected:
 	virtual	void 				WindowActivated(bool active);
 	virtual	void 				Draw(BRect updateRect);
 
+	virtual	void				LayoutInvalidated(bool descendants = false);
 	virtual	void				DoLayout();
 
 private:
-			void				_Init(bool showHorizontalScrollbar);
+			void				_Init();
 			void				_GetChildViewRects(const BRect& bounds,
-									bool showHorizontalScrollBar,
 									BRect& titleRect, BRect& outlineRect,
 									BRect& vScrollBarRect,
 									BRect& hScrollBarRect);
@@ -404,6 +405,7 @@ private:
 			bool				fSortingEnabled;
 			float				fLatchWidth;
 			border_style		fBorderStyle;
+			bool				fShowingHorizontalScrollBar;
 };
 
 #endif // _COLUMN_LIST_VIEW_H

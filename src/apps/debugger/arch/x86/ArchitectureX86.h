@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011-2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef ARCHITECTURE_X86_H
@@ -21,6 +22,8 @@ public:
 	virtual						~ArchitectureX86();
 
 	virtual	status_t			Init();
+
+	virtual int32				StackGrowthDirection() const;
 
 	virtual	int32				CountRegisters() const;
 	virtual	const Register*		Registers() const;
@@ -56,7 +59,17 @@ public:
 									target_addr_t address,
 									Statement*& _statement);
 	virtual	status_t			GetInstructionInfo(target_addr_t address,
-									InstructionInfo& _info);
+									InstructionInfo& _info, CpuState* state);
+
+	virtual	status_t			GetWatchpointDebugCapabilities(
+									int32& _maxRegisterCount,
+									int32& _maxBytesPerRegister,
+									uint8& _watchpointCapabilityFlags);
+
+	virtual	status_t			GetReturnAddressLocation(
+									StackFrame* frame, target_size_t valueSize,
+									ValueLocation*& _location);
+
 
 private:
 			struct ToDwarfRegisterMap;

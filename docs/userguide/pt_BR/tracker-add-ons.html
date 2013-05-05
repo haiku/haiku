@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Adriano Duarte
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Adicionais do Rastreador</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../fr/tracker-add-ons.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/tracker-add-ons.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/tracker-add-ons.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/tracker-add-ons.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/tracker-add-ons.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/tracker-add-ons.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/tracker-add-ons.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/tracker-add-ons.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/tracker-add-ons.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/tracker-add-ons.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/tracker-add-ons.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/tracker-add-ons.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../hu/tracker-add-ons.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../ca/tracker-add-ons.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../en/tracker-add-ons.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="tracker.html">Rastreador</a> 
+::  <a href="contents.html" class="uplink">Conteúdo</a> 
+::  <a href="keyboard-shortcuts.html">Atalhos de teclado</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h1>Adicionais do Rastreador</h1>
+
+<p>Aplicativos podem instalar adicionais assim podem ser chamados facilmente numa seleção de arquivos a partir do Rastreador. Apenas os adicionais que podem manusear um tipo de arquivo específico são apresentados sob <span class="menu">Adicionais</span> a partir do menu de contexto ou do menu <span class="menu">Arquivo</span> de uma janela do Rastreador. Alguns adicionais não necessariamente precisam de um arquivo para funcionar e são, assim, sempre presentes.</p>
+<p>Adicionais do Rastreador, ou vínculos para aplicativos que podem agir como adicionais, podem ser instalados em três diferentes locais (veja o tópico <a href="filesystem-layout.html">Disposição do Sistema de Arquivos</a>):</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="path">/boot/system/add-ons/Tracker/</span></td><td>   </td><td> para adicionais providos pelo sistema.</td></tr>
+<tr><td><span class="path">/boot/common/add-ons/Tracker/</span></td><td>   </td><td> para adicionais disponíveis para todos os usuários.</td></tr>
+<tr><td><span class="path">/boot/home/config/add-ons/Tracker/</span></td><td>   </td><td> para adicionais disponíveis apenas para você mesmo.</td></tr>
+</table>
+<p>O nome de arquivo de um adicional pode ser sufixado com um travessão e uma letra maiúscula e é então disponbilizado através de tecla de atalho. Por exemplo, <span class="app">Abrir Pasta Alvo-O</span> abre com <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">O</span>.<br />
+Naturalmente, deve-se ter cuidado com possíveis conflitos de atalhos quando decidir por um atalho. Não se pode ter o mesmo para diferentes adicionais.</p>
+
+<h2><a id="system-add-ons" name="system-add-ons">Adicionais do Rastreador do Haiku</a></h2>
+<p>Estes Adicionais do Rastreador vêm com toda instalação Haiku:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="4"> 
+	<tr><td class="onelinetop"><b>Fundo</b><i>-B</i></td>
+		<td valign="top">Abre as preferências de <a href="preferences/backgrounds.html">Fundo</a> para alterar a cor ou imagem da Área de Trabalho ou de qualquer pasta. Chamado num arquivo de imagem, a janela de diálogo do Fundo é carregada com aquela imagem já carregada como um fundo potencial.</td></tr>
+	<tr><td class="onelinetop"><b>Uso do Disco</b><i>-I</i></td>
+		<td valign="top">Inicia o aplicativo <a href="applications/diskusage.html">Uso do Disco</a> com a pasta atual como base.</td></tr>
+	<tr><td class="onelinetop"><b>Tipo de Arquivo</b><i>-F</i></td>
+		<td valign="top">Chamado sobre um arquivo, abre sua janela de diálogo <a href="filetypes.html">Tipo de Arquivo</a> específica, do contrário as preferências gerais do Tipos de Arquivos são carregadas.</td></tr>
+	<tr><td class="onelinetop"><b>Abrir Pasta Alvo</b><i>-O</i></td>
+		<td valign="top">Pode apenas ser utilizado em um arquivo vinculado e abrir a pasta onde fica aquele arquivo.</td></tr>
+	<tr><td class="onelinetop"><b>Pesquisa de Texto</b><i>-G</i></td>
+		<td valign="top">Inicia o aplicativo <a href="applications/textsearch.html">Pesqusia de Texto</a> para procurar uma sequência na pasta selecionada (e suas subpastas).</td></tr>
+	<tr><td class="onelinetop"><b>ZipOMático</b><i>-Z</i></td>
+		<td valign="top">Uma seleção de arquivos será adicionada a um arquivo compactado zip, chamado sem uma seleção abre uma janela de diálogo para criar um arquivo compactado via arrastar e soltar.</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="tracker.html">Rastreador</a> 
+::  <a href="contents.html" class="uplink">Conteúdo</a> 
+::  <a href="keyboard-shortcuts.html">Atalhos de teclado</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

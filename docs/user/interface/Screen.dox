@@ -1,19 +1,22 @@
 /*
- * Copyright 2011, Haiku inc.
- * Distributed under the terms of the MIT Licence.
+ * Copyright 2011 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  *
- * Documentation by:
+ * Authors:
  *		Stefano Ceccherini, burton666@libero.it
  *		Axel Dörfler, axeld@pinc-software.de
  *		John Scipione, jscipione@gmail.com
+ *
  * Corresponds to:
- *		/trunk/headers/os/interface/Screen.h	 rev 42759
- *		/trunk/src/kits/interface/Screen.cpp	 rev 42759
+ *		headers/os/interface/Screen.h	rev 42759
+ *		src/kits/interface/Screen.cpp	rev 42759
  */
 
 
 /*!
 	\file Screen.h
+	\ingroup interface
+	\ingroup libbe
 	\brief Defines the BScreen class and support structures.
 */
 
@@ -21,6 +24,7 @@
 /*!
 	\class BScreen
 	\ingroup interface
+	\ingroup libbe
 	\brief The BScreen class provides methods to retrieve and change display
 		settings.
 
@@ -126,7 +130,8 @@
 */
 
 
-/*!	\fn color_space BScreen::ColorSpace()
+/*!
+	\fn color_space BScreen::ColorSpace()
 	\brief Gets the color_space of the display.
 
 	\return \c B_CMAP8, \c B_RGB15, \c B_RGB32, or \c B_NO_COLOR_SPACE

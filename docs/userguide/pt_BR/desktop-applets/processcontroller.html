@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2010-2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Maciej Bałuta  (Google Code-In student)
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		tiagoms
+ *		Adriano Duarte
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Controlador de Processos</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../../fr/desktop-applets/processcontroller.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/desktop-applets/processcontroller.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/desktop-applets/processcontroller.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/desktop-applets/processcontroller.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/desktop-applets/processcontroller.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/desktop-applets/processcontroller.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/desktop-applets/processcontroller.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/desktop-applets/processcontroller.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/desktop-applets/processcontroller.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/desktop-applets/processcontroller.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/desktop-applets/processcontroller.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/desktop-applets/processcontroller.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/desktop-applets/processcontroller.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../ca/desktop-applets/processcontroller.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../../en/desktop-applets/processcontroller.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="powerstatus.html">Estado de Energia</a> 
+::  <a href="../desktop-applets.html" class="uplink">Miniaplicativos da Área de Trabalho</a> 
+::  <a href="workspaces.html">Espaços de Trabalho</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/desktop-applets-images/processcontroller-icon_64.png" alt="processcontroller-icon_64.png" width="64" height="64" />Controlador de Processos</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Miniaplicativos da área de trabalho</span></td></tr>
+<tr><td>Localização:</td><td></td><td><span class="path">/boot/system/apps/ProcessController</span></td></tr>
+<tr><td>Configurações:</td><td></td><td><i>nenhuma</i></td></tr>
+</table>
+
+<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />A tarefa principal do miniaplicativo Controlador de Processos é exibir a atividade do(s) seu(s) CPU(s) e a quantidade de memória utilizada. Ele permite a monitoração de teams individuais, altera suas prioridades, e os mata se o programa congela. Em ambientes multiprocessados ele permite desabilitar processadores/cores individuais. Quando o Rastreador ou Deskbar trava pode-se reiniciá-los a partir do menu do Controlador de Processos.</p>
+<p>Indicadores à esquerda exibem o uso de cada CPU, enquanto a barra à direita exibe o consumo de memória. Lembre-se que o número de indicadores depende do número de processadores/cores no computador.</p>
+<p>Se ainda não estiver executando, carregar o Controlador de Processos pergunta se deve abrir em modo de janela ou como ícone na Deskbar. No modo de janela pode-se redimensionar a barra de exibição redimensionando a janela e então utilizar a alça do <a href="../gui.html#replicants">Replicante</a> para arrastá-lo para a Área de Trabalho.<br />
+Onde quer que esteja instalado, é operado através do menu de contexto acionado pelo clique com o botão direito do mouse.<br />
+Para remover o miniaplicativo novamente da  Deskbar, desmarque <span class="menu">Ao vivo na Deskbar</span> no seu menu de contexto.</p>
+<h2>Fechar um aplicativo</h2>
+<img src="../images/processcontroller-images/quit.png" alt="ProcessController - Quit an application" />
+<p>Para fechar um aplicativo apenas escolha seu nome do menu <span class="menu">Fechar um aplicativo</span>. Este é um modo limpo de fechar aplicativos, como se clicando seu botão de fechar. Seja cuidadoso para não fechar processos de sistema como servidores ou daemons, entretanto. Seu sistema pode certamente parar de funcionar. </p>
+<h2>Uso da memória</h2>
+<img src="../images/processcontroller-images/memory.png" alt="ProcessController - Memory usage" />
+<p>A monitoração da utilização da memória pode ser muito inexata.</p>
+<p>Este menu permite monitorar o uso da memória de diferentes teams no seu sistema. Próximo ao n ome do team existem duas colunas: a primeira com a quantidade reservada para memória gravável, enquanto a segunda mostra toda memória incluindo o espaço de apenas leitura (bibliotecas compartilhadas por exemplo).</p>
+<p>A primeira linha <i>Recursos de sistema &amp; caches...</i> exibe a quantidade total de memória utilizada pelo sistema e todos os aplicativos. A extensão da barra azul é baseada no total de memória física no seu computador. As próximas linhas mostram a memória utilizada em cada processo. Note que a extensão da barra é baseada apenas na parte realmente utilizada da memória.</p>
+<table>
+		<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Memória utilizada apenas por dado aplicativo (com acesso de escrita)</td></tr>
+		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Memória incluindo espaco de apenas leitura (pode ser compartilhada com outros aplicativos)</td></tr>
+</table>
+
+<h2>Processos e utilização da CPU</h2>
+<p>Este menu permite alterar prioridades de processos, matar teams ou depurá-los.</p>
+<div class="box-stop">Alterações através dos comandos neste menu atingem profundamente o sistema e podem causar perdas de dados e instabilidade do sistema. Mantenha a mão do mouse firme!</div>
+<img src="../images/processcontroller-images/priority.png" alt="ProcessController - Priority" />
+<table>
+	<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Código do kernel</td></tr>
+	<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Código do usuário</td></tr>
+	<tr><td style="height:20px;background:#6EBE6E"></td><td></td><td>Processo ocioso</td></tr>
+</table>
+<p>No primeiro nível vê-se nomes de teams. Clicando em um, pode-se matar o team inteiro. A parte azul escura da barra é o tempo gasto no código do kernel, a parte azul clara no código do usuário, a parte verde no(s) processo(s) ocioso(s). Uma barra completamente preenchida com azul significa que o team está utilizando todo o poder de processamento.</p>
+<p>O segundo nível mostra processos particulares de um team. Clicando em um, pode-se depurá-lo ou matá-lo. Uma barra completamente preenchida com azul significa que o processo está prendendo um processador/core.</p>
+<p>O último nível do menu permite alterar a prioridade do processo. Seja cuidadoso com isso! Como uma regra de ouro, a prioridade de um processo deve ser inversa a sua utilização da CPU. Isto é, quanto mais ele tenta reivindicar tempo de CPU, mais baixa deve ser sua prioridade. Em geral, não bagunce as prioridades de um aplicativo; entre em contato com seu autor, este é seu trabalho.
+</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+«  <a href="powerstatus.html">Estado de Energia</a> 
+::  <a href="../desktop-applets.html" class="uplink">Miniaplicativos da Área de Trabalho</a> 
+::  <a href="workspaces.html">Espaços de Trabalho</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

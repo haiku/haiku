@@ -1,25 +1,25 @@
 1	ukrainian	x-vnd.Haiku-Backgrounds	3513602073
-All workspaces	Main View		На всі робочі простори
-Apply	Main View		Використати
 Backgrounds	System name		Тло
-Center	Main View		Відцентрувати
-Current workspace	Main View		Поточний робочий простір
+X:	Main View		X:
+Resolution: 	Image Filepanel		Роздільча здатність:
+pick one	Main View		Виберіть
 Default	Main View		По замовчуванню
-Default folder	Main View		Папка по замовчуванню
-Folder: 	Main View		Папка:
-Icon label outline	Main View		Обкреслювати текст значків
-Image:	Main View		Зображення:
+Center	Main View		Відцентрувати
 Manual	Main View		Вручну
+Default folder	Main View		Папка по замовчуванню
+Revert	Main View		Повернути
 None	Main View		Не вибрано
-Other folder…	Main View		Інша папка…
+All workspaces	Main View		На всі робочі простори
+Icon label outline	Main View		Обкреслювати текст значків
 Other…	Main View		Інше…
+Current workspace	Main View		Поточний робочий простір
+Folder: 	Main View		Папка:
+Apply	Main View		Використати
+Other folder…	Main View		Інша папка…
+Y:	Main View		Y:
+Tile	Main View		Заповнити
+Select	Main View		Вибрати
+Scale to fit	Main View		Припасувати
 Placement:	Main View		Розміщення:
 Preview	Main View		Попередній перегляд
-Resolution: 	Image Filepanel		Роздільча здатність:
-Revert	Main View		Повернути
-Scale to fit	Main View		Припасувати
-Select	Main View		Вибрати
-Tile	Main View		Заповнити
-X:	Main View		X:
-Y:	Main View		Y:
-pick one	Main View		Виберіть
+Image:	Main View		Зображення:

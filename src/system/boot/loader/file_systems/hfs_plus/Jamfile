@@ -6,7 +6,7 @@ UsePrivateHeaders kernel storage ;
 
 SubDirC++Flags -fno-rtti ;
 
-KernelStaticLibrary boot_hfs_plus :
+BootStaticLibrary boot_hfs_plus :
 	hfs_plus.cpp
 	: -fno-pic
 	;

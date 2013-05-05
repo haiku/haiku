@@ -1,14 +1,14 @@
 1	swedish	x-vnd.Haiku-Pairs	1981673050
 %app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\tskrivet av Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nDu klarade spelet på %num% klick.\n
-Beginner (4x4)	PairsWindow		Nybörjare (4x4)
 Expert (8x8)	PairsWindow		Expert (8x8)
-Game	PairsWindow		Spel
-Intermediate (6x6)	PairsWindow		Medelmåtta (6x6)
-New	PairsWindow		Ny
-New game	PairsWindow		Nytt spel
-OK	PairsView		OK
-Pairs	System name		Par
-Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Par hittade inte tillräckligt många vektorbaserade ikoner; åtminstone %d behövs.
-Quit	PairsWindow		Avsluta
+Beginner (4x4)	PairsWindow		Nybörjare (4x4)
 Quit game	PairsWindow		Avsluta spel
+Game	PairsWindow		Spel
 Size	PairsWindow		Storlek
+New	PairsWindow		Ny
+OK	PairsView		OK
+Intermediate (6x6)	PairsWindow		Medelmåtta (6x6)
+Quit	PairsWindow		Avsluta
+Pairs	System name		Par
+New game	PairsWindow		Nytt spel
+Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Par hittade inte tillräckligt många vektorbaserade ikoner; åtminstone %d behövs.

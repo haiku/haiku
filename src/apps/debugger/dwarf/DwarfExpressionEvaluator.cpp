@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -267,7 +267,7 @@ status_t
 DwarfExpressionEvaluator::_Evaluate(ValuePieceLocation* _piece)
 {
 	TRACE_EXPR_ONLY({
-		TRACE_EXPR("DwarfExpressionEvaluator::_Evaluate(%p, %lld)\n",
+		TRACE_EXPR("DwarfExpressionEvaluator::_Evaluate(%p, %" B_PRIdOFF ")\n",
 			fDataReader.Data(), fDataReader.BytesRemaining());
 		const uint8* data = (const uint8*)fDataReader.Data();
 		int32 count = fDataReader.BytesRemaining();
@@ -557,7 +557,7 @@ DwarfExpressionEvaluator::_Evaluate(ValuePieceLocation* _piece)
 			case DW_OP_fbreg:
 			{
 				int64 offset = fDataReader.ReadSignedLEB128(0);
-				TRACE_EXPR("  DW_OP_fbreg(%lld)\n", offset);
+				TRACE_EXPR("  DW_OP_fbreg(%" B_PRId64 ")\n", offset);
 				target_addr_t address;
 				if (!fContext->GetFrameBaseAddress(address)) {
 					throw EvaluationException(
@@ -644,8 +644,8 @@ DwarfExpressionEvaluator::_Evaluate(ValuePieceLocation* _piece)
 					}
 				} else if (opcode >= DW_OP_breg0 && opcode <= DW_OP_breg31) {
 					int64 offset = fDataReader.ReadSignedLEB128(0);
-					TRACE_EXPR("  DW_OP_breg%u(%lld)\n", opcode - DW_OP_breg0,
-						offset);
+					TRACE_EXPR("  DW_OP_breg%u(%" B_PRId64 ")\n",
+						opcode - DW_OP_breg0, offset);
 					_PushRegister(opcode - DW_OP_breg0, offset);
 				} else {
 					WARNING("DwarfExpressionEvaluator::_Evaluate(): "

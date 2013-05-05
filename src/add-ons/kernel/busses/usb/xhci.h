@@ -1,10 +1,11 @@
 /*
- * Copyright 2006-2011, Haiku Inc. All rights reserved.
+ * Copyright 2006-2012, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Michael Lotz <mmlr@mlotz.ch>
  *		Jian Chiang <j.jian.chiang@gmail.com>
+ *		Jérôme Duval <jerome.duval@gmail.com>
  */
 #ifndef XHCI_H
 #define XHCI_H
@@ -14,43 +15,67 @@
 #include "xhci_hardware.h"
 
 
-#define MAX_EVENTS		(16 * 13)
-#define MAX_COMMANDS		(16 * 1)
-#define XHCI_MAX_SLOTS		256
-#define XHCI_MAX_PORTS		127
-
-
 struct pci_info;
 struct pci_module_info;
+struct xhci_td;
+struct xhci_device;
+struct xhci_endpoint;
 class XHCIRootHub;
 
 
-struct xhci_trb {
-	uint64	qwtrb0;
-	uint32	dwtrb2;
-	uint32	dwtrb3;
+enum xhci_state {
+	XHCI_STATE_DISABLED = 0,
+	XHCI_STATE_ENABLED,
+	XHCI_STATE_DEFAULT,
+	XHCI_STATE_ADDRESSED,
+	XHCI_STATE_CONFIGURED,
 };
 
 
-struct xhci_segment {
-	xhci_trb *		trbs;
-	xhci_segment *	next;
-};
+typedef struct xhci_td {
+	struct xhci_trb	trbs[XHCI_MAX_TRBS_PER_TD];
+
+	addr_t	this_phy;					// A physical pointer to this address
+	addr_t	buffer_phy[XHCI_MAX_TRBS_PER_TD];
+	void	*buffer_log[XHCI_MAX_TRBS_PER_TD];	// Pointer to the logical buffer
+	size_t	buffer_size[XHCI_MAX_TRBS_PER_TD];	// Size of the buffer
+	uint8	buffer_count;
+
+	struct xhci_td	*next;
+	Transfer *transfer;
+	uint8	trb_count;
+} xhci_td __attribute__((__aligned__(16)));
 
 
-struct xhci_ring {
-	xhci_segment *	first_seg;
-	xhci_trb *		enqueue;
-	xhci_trb *		dequeue;
-};
+typedef struct xhci_endpoint {
+	xhci_device		*device;
+	xhci_td 		*td_head;
+	struct xhci_trb *trbs; // [XHCI_MAX_TRANSFERS]
+	addr_t trb_addr;
+	uint8	used;
+	uint8	current;
+	mutex	lock;
+} xhci_endpoint;
 
 
-// Section 6.5
-struct xhci_erst_element {
-	uint64	rs_addr;
-	uint32	rs_size;
-	uint32	rsvdz;
-} __attribute__((__aligned__(64)));
+typedef struct xhci_device {
+	uint8 slot;
+	uint8 address;
+	enum xhci_state state;
+	area_id trb_area;
+	addr_t trb_addr;
+	struct xhci_trb (*trbs); // [XHCI_MAX_ENDPOINTS - 1][XHCI_MAX_TRANSFERS]
+
+	area_id input_ctx_area;
+	addr_t input_ctx_addr;
+	struct xhci_input_device_ctx *input_ctx;
+
+	area_id device_ctx_area;
+	addr_t device_ctx_addr;
+	struct xhci_device_ctx *device_ctx;
+
+	xhci_endpoint endpoints[XHCI_MAX_ENDPOINTS - 1];
+} xhci_device;
 
 
 class XHCI : public BusManager {
@@ -60,6 +85,8 @@ public:
 
 			status_t			Start();
 	virtual	status_t			SubmitTransfer(Transfer *transfer);
+			status_t			SubmitControlRequest(Transfer *transfer);
+			status_t			SubmitNormalRequest(Transfer *transfer);
 	virtual	status_t			CancelQueuedTransfers(Pipe *pipe, bool force);
 
 	virtual	status_t			NotifyPipeChange(Pipe *pipe,
@@ -67,13 +94,30 @@ public:
 
 	static	status_t			AddTo(Stack *stack);
 
+	virtual	Device *			AllocateDevice(Hub *parent,
+									int8 hubAddress, uint8 hubPort,
+									usb_speed speed);
+			status_t			ConfigureEndpoint(uint8 slot, uint8 number,
+									uint8 type, uint64 ringAddr,
+									uint16 interval, uint8 maxPacketCount,
+									uint8 mult, uint8 fpsShift,
+									uint16 maxPacketSize, uint16 maxFrameSize,
+									usb_speed speed);
+	virtual	void				FreeDevice(Device *device);
+
+			status_t			_InsertEndpointForPipe(Pipe *pipe);
+			status_t			_RemoveEndpointForPipe(Pipe *pipe);
+
 			// Port operations for root hub
-			uint8				PortCount() { return fPortCount; };
-			status_t			GetPortStatus(uint8 index, usb_port_status *status);
+			uint8				PortCount() const { return fPortCount; }
+			status_t			GetPortStatus(uint8 index,
+									usb_port_status *status);
 			status_t			SetPortFeature(uint8 index, uint16 feature);
 			status_t			ClearPortFeature(uint8 index, uint16 feature);
 
-	virtual	const char *		TypeName() const { return "xhci"; };
+			status_t			GetPortSpeed(uint8 index, usb_speed *speed);
+
+	virtual	const char *		TypeName() const { return "xhci"; }
 
 private:
 			// Controller resets
@@ -84,29 +128,60 @@ private:
 	static	int32				InterruptHandler(void *data);
 			int32				Interrupt();
 
+			// Event management
+	static	int32				EventThread(void *data);
+			void				CompleteEvents();
+
 			// Transfer management
 	static	int32				FinishThread(void *data);
 			void				FinishTransfers();
 
+			// Descriptor
+			xhci_td *			CreateDescriptor(size_t bufferSize);
+			xhci_td *			CreateDescriptorChain(size_t bufferSize);
+			void				FreeDescriptor(xhci_td *descriptor);
+
+			size_t				WriteDescriptorChain(xhci_td *descriptor,
+									iovec *vector, size_t vectorCount);
+			size_t				ReadDescriptorChain(xhci_td *descriptor,
+									iovec *vector, size_t vectorCount);
+
+			status_t			_LinkDescriptorForPipe(xhci_td *descriptor,
+									xhci_endpoint *endpoint);
+			status_t			_UnlinkDescriptorForPipe(xhci_td *descriptor,
+									xhci_endpoint *endpoint);
+
 			// Command
 			void				QueueCommand(xhci_trb *trb);
 			void				HandleCmdComplete(xhci_trb *trb);
-			
+			void				HandleTransferComplete(xhci_trb *trb);
+			status_t			DoCommand(xhci_trb *trb);
 			//Doorbell
-			void				Ring();
+			void				Ring(uint8 slot, uint8 endpoint);
 
-			//no-op
-			void				QueueNoop();
-	static	int32				CmdCompThread(void *data);
-			void				CmdComplete();
+			// Commands
+			status_t			Noop();
+			status_t			EnableSlot(uint8 *slot);
+			status_t			DisableSlot(uint8 slot);
+			status_t			SetAddress(uint64 inputContext, bool bsr,
+									uint8 slot);
+			status_t			ConfigureEndpoint(uint64 inputContext,
+									bool deconfigure, uint8 slot);
+			status_t			EvaluateContext(uint64 inputContext,
+									uint8 slot);
+			status_t			ResetEndpoint(bool preserve, uint8 endpoint,
+									uint8 slot);
+			status_t			StopEndpoint(bool suspend, uint8 endpoint,
+									uint8 slot);
+			status_t			SetTRDequeue(uint64 dequeue, uint16 stream,
+									uint8 endpoint, uint8 slot);
+			status_t			ResetDevice(uint8 slot);
 
 			// Operational register functions
 	inline	void				WriteOpReg(uint32 reg, uint32 value);
 	inline	uint32				ReadOpReg(uint32 reg);
 
 			// Capability register functions
-	inline	uint8				ReadCapReg8(uint32 reg);
-	inline	uint16				ReadCapReg16(uint32 reg);
 	inline	uint32				ReadCapReg32(uint32 reg);
 	inline	void				WriteCapReg32(uint32 reg, uint32 value);
 
@@ -121,8 +196,11 @@ private:
 	static	pci_module_info *	sPCIModule;
 
 			uint8 *				fCapabilityRegisters;
+			uint32				fCapabilityLength;
 			uint8 *				fOperationalRegisters;
+			uint32				fOperationalLength;
 			uint8 *				fRuntimeRegisters;
+			uint32				fRuntimeLength;
 			uint8 *				fDoorbellRegisters;
 			area_id				fRegisterArea;
 			pci_info *			fPCIInfo;
@@ -136,15 +214,16 @@ private:
 			uint32				fCmdResult[2];
 
 			area_id				fDcbaArea;
-			uint8 *				fDcba;
+			struct xhci_device_context_array * fDcba;
 
 			spinlock			fSpinlock;
 
 			sem_id				fCmdCompSem;
-			thread_id			fCmdCompThread;
 			sem_id				fFinishTransfersSem;
 			thread_id			fFinishThread;
 			bool				fStopThreads;
+
+			xhci_td	*			fFinishedHead;
 
 			// Root Hub
 			XHCIRootHub *		fRootHub;
@@ -153,11 +232,25 @@ private:
 			// Port management
 			uint8				fPortCount;
 			uint8				fSlotCount;
+			usb_speed			fPortSpeeds[XHCI_MAX_PORTS];
+			uint8				fPortSlots[XHCI_MAX_PORTS];
 
+			// Scratchpad
+			uint8				fScratchpadCount;
+			area_id				fScratchpadArea[XHCI_MAX_SCRATCHPADS];
+			void *				fScratchpad[XHCI_MAX_SCRATCHPADS];
+
+			// Devices
+			struct xhci_device	fDevices[XHCI_MAX_DEVICES];
+
+			sem_id				fEventSem;
+			thread_id			fEventThread;
 			uint16				fEventIdx;
 			uint16				fCmdIdx;
 			uint8				fEventCcs;
 			uint8				fCmdCcs;
+
+			uint32				fExitLatMax;
 };
 
 

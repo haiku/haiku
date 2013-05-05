@@ -43,8 +43,8 @@
 
 #include "PNGView.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PNGTranslator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PNGTranslator"
 
 // The input formats that this translator supports.
 static const translation_format sInputFormats[] = {
@@ -238,7 +238,8 @@ identify_png_header(BPositionIO *inSource, translator_info *outInfo)
 		outInfo->quality = PNG_IN_QUALITY;
 		outInfo->capability = PNG_IN_CAPABILITY;
 		strcpy(outInfo->MIME, "image/png");
-		strcpy(outInfo->name, B_TRANSLATE("PNG image"));
+		strlcpy(outInfo->name, B_TRANSLATE("PNG image"),
+			sizeof(outInfo->name));
 	}
 
 	return B_OK;

@@ -16,13 +16,13 @@
 #include "CircularBuffer.h"
 #include "DataSource.h"
 
+
 class BBitmap;
 class BMessageRunner;
 class Scale;
 class SystemInfoHandler;
 class ViewHistory;
 struct data_item;
-
 
 class DataHistory {
 public:
@@ -114,7 +114,6 @@ private:
 			void		_DrawHistory(bool drawBackground);
 			void		_UpdateResolution(int32 resolution,
 							bool broadcast = true);
-			void		_LoadBackgroundInfo(bool watch);
 
 private:
 	class HistoryLayoutItem;
@@ -130,10 +129,6 @@ private:
 	BLayoutItem*		fHistoryLayoutItem;
 	BLayoutItem*		fLegendLayoutItem;
 #endif
-
-	BMessage			fBackgroundInfo;
-	bool				fCachedOutline;
-	int32				fCachedWorkspace;
 
 	mutable BLocker		fSourcesLock;
 	BObjectList<DataSource> fSources;

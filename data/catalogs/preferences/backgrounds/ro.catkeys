@@ -1,25 +1,25 @@
 1	romanian	x-vnd.Haiku-Backgrounds	3513602073
-All workspaces	Main View		Toate spațiile de lucru
-Apply	Main View		Aplică
 Backgrounds	System name		Fundaluri
-Center	Main View		Centru
-Current workspace	Main View		Spațiul de lucru curent
+X:	Main View		X:
+Resolution: 	Image Filepanel		Rezoluție: 
+pick one	Main View		alege una
 Default	Main View		Implicit
-Default folder	Main View		Dosar implicit
-Folder: 	Main View		Dosar: 
-Icon label outline	Main View		Conturul etichetei de pictogramă
-Image:	Main View		Imagine:
+Center	Main View		Centru
 Manual	Main View		Manual
+Default folder	Main View		Dosar implicit
+Revert	Main View		Revenire
 None	Main View		Nimic
-Other folder…	Main View		Alt dosar…
+All workspaces	Main View		Toate spațiile de lucru
+Icon label outline	Main View		Conturul etichetei de pictogramă
 Other…	Main View		Altele…
+Current workspace	Main View		Spațiul de lucru curent
+Folder: 	Main View		Dosar: 
+Apply	Main View		Aplică
+Other folder…	Main View		Alt dosar…
+Y:	Main View		Y:
+Tile	Main View		Mozaic
+Select	Main View		Selectează
+Scale to fit	Main View		Potrivește
 Placement:	Main View		Amplasare:
 Preview	Main View		Previzualizare
-Resolution: 	Image Filepanel		Rezoluție: 
-Revert	Main View		Revenire
-Scale to fit	Main View		Potrivește
-Select	Main View		Selectează
-Tile	Main View		Mozaic
-X:	Main View		X:
-Y:	Main View		Y:
-pick one	Main View		alege una
+Image:	Main View		Imagine:

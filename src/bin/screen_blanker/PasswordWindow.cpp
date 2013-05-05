@@ -20,8 +20,8 @@
 #include <WindowPrivate.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Screensaver password dialog"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Screensaver password dialog"
 
 
 PasswordWindow::PasswordWindow()

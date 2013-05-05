@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010 Haiku Inc. All Rights Reserved.
+ * Copyright 2003-2012 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _CTYPE_H
@@ -71,6 +71,8 @@ extern const int *__ctype_toupper;
 #define isspace(c)	__isctype((c), _ISspace)
 #define isupper(c)	__isctype((c), _ISupper)
 #define isxdigit(c)	__isctype((c), _ISxdigit)
+
+extern unsigned short int __ctype_mb_cur_max;
 
 #ifdef __cplusplus
 }

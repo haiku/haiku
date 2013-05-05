@@ -27,8 +27,8 @@
 #define DO_ACTION	'doac'
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "DeskButton"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "DeskButton"
 
 
 extern const char *kAppSignature;
@@ -170,8 +170,9 @@ DeskButton::MouseDown(BPoint point)
 	BPoint where = ConvertToScreen(point);
 
 	if (mouseButtons & B_SECONDARY_MOUSE_BUTTON) {
-		BString label = "Open ";
-		label += fRef.name;
+		BString label = B_TRANSLATE_COMMENT("Open %name", "Don't translate "
+			"variable %name");
+		label.ReplaceFirst("%name", fRef.name);
 		BPopUpMenu *menu = new BPopUpMenu("", false, false);
 		menu->SetFont(be_plain_font);
 		menu->AddItem(new BMenuItem(label.String(), new BMessage(OPEN_REF)));

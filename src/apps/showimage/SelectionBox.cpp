@@ -109,13 +109,13 @@ SelectionBox::Animate()
 {
 	// rotate up
 	uchar p = fPatternUp.data[0];
-	for (int i = 0; i <= 6; i ++)
+	for (int i = 0; i <= 6; i++)
 		fPatternUp.data[i] = fPatternUp.data[i + 1];
 	fPatternUp.data[7] = p;
 
 	// rotate down
 	p = fPatternDown.data[7];
-	for (int i = 7; i >= 1; i --)
+	for (int i = 7; i >= 1; i--)
 		fPatternDown.data[i] = fPatternDown.data[i - 1];
 	fPatternDown.data[0] = p;
 
@@ -170,7 +170,7 @@ SelectionBox::_InitPatterns()
 	uchar p;
 	uchar p1 = 0x33;
 	uchar p2 = 0xCC;
-	for (int i = 0; i <= 7; i ++) {
+	for (int i = 0; i <= 7; i++) {
 		fPatternLeft.data[i] = p1;
 		fPatternRight.data[i] = p2;
 		if ((i / 2) % 2 == 0)

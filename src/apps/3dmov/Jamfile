@@ -1,8 +1,14 @@
 SubDir HAIKU_TOP src apps 3dmov ;
+SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-Application 3DMov :
+# For GCC2
+if $(HAIKU_GCC_VERSION[1]) < 3 {
+	SubDirC++Flags --no-warnings ;
+}
+
+local sources =
 	Application.cpp
 	MainWindow.cpp
 	ViewObject.cpp
@@ -11,6 +17,12 @@ Application 3DMov :
 	ViewCube.cpp
 	ViewSphere.cpp
 	GLUtility.cpp
+    ;
+
+Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+
+Application 3DMov :
+	$(sources)
 	: be GL game $(HAIKU_LOCALE_LIBS) media translation $(TARGET_LIBSUPC++)
 	: 3dmov.rdef
 ;

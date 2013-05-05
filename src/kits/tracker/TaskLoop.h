@@ -31,20 +31,19 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
-//
-//	Delayed Tasks, Periodic Delayed Tasks, Periodic Delayed Tasks with timeout,
-//	Run when idle tasks, accumulating delayed tasks
-//
-
-
 #ifndef __TASK_LOOP__
 #define __TASK_LOOP__
+
+
+// Delayed Tasks, Periodic Delayed Tasks, Periodic Delayed Tasks with timeout,
+// Run when idle tasks, accumulating delayed tasks
+
 
 #include <Locker.h>
 
 #include "FunctionObject.h"
 #include "ObjectList.h"
+
 
 namespace BPrivate {
 
@@ -57,29 +56,31 @@ public:
 
 	virtual bool RunIfNeeded(bigtime_t currentTime) = 0;
 		// returns true if done and should not be called again
-	
+
 	bigtime_t RunAfterTime() const;
 
 protected:
 	bigtime_t fRunAfter;
 };
 
-class OneShotDelayedTask : public DelayedTask {
+
 // called once after a specified delay
+class OneShotDelayedTask : public DelayedTask {
 public:
-	OneShotDelayedTask(FunctionObject *functor, bigtime_t delay);
+	OneShotDelayedTask(FunctionObject* functor, bigtime_t delay);
 	virtual ~OneShotDelayedTask();
-	
+
 	virtual bool RunIfNeeded(bigtime_t currentTime);
 
 protected:
-	FunctionObject *fFunctor;
+	FunctionObject* fFunctor;
 };
 
-class PeriodicDelayedTask : public DelayedTask {
+
 // called periodically till functor return true
+class PeriodicDelayedTask : public DelayedTask {
 public:
-	PeriodicDelayedTask(FunctionObjectWithResult<bool> *functor,
+	PeriodicDelayedTask(FunctionObjectWithResult<bool>* functor,
 		bigtime_t initialDelay, bigtime_t period);
 	virtual ~PeriodicDelayedTask();
 
@@ -87,13 +88,14 @@ public:
 
 protected:
 	bigtime_t fPeriod;
-	FunctionObjectWithResult<bool> *fFunctor;
+	FunctionObjectWithResult<bool>* fFunctor;
 };
 
-class PeriodicDelayedTaskWithTimeout : public PeriodicDelayedTask {
+
 // called periodically till functor returns true or till time out
+class PeriodicDelayedTaskWithTimeout : public PeriodicDelayedTask {
 public:
-	PeriodicDelayedTaskWithTimeout(FunctionObjectWithResult<bool> *functor,
+	PeriodicDelayedTaskWithTimeout(FunctionObjectWithResult<bool>* functor,
 		bigtime_t initialDelay, bigtime_t period, bigtime_t timeout);
 
 	virtual bool RunIfNeeded(bigtime_t currentTime);
@@ -102,12 +104,13 @@ protected:
 	bigtime_t fTimeoutAfter;
 };
 
-class RunWhenIdleTask : public PeriodicDelayedTask {
+
 // after initial delay starts periodically calling functor if system is idle
 // until functor returns true
+class RunWhenIdleTask : public PeriodicDelayedTask {
 public:
-	RunWhenIdleTask(FunctionObjectWithResult<bool> *functor, bigtime_t initialDelay,
-		bigtime_t idleFor, bigtime_t heartBeat);
+	RunWhenIdleTask(FunctionObjectWithResult<bool>* functor,
+		bigtime_t initialDelay, bigtime_t idleFor, bigtime_t heartBeat);
 	virtual ~RunWhenIdleTask();
 
 	virtual bool RunIfNeeded(bigtime_t currentTime);
@@ -125,8 +128,8 @@ protected:
 		kInitialIdleWait,
 		kInIdleState
 	};
-	
-	State fState;	
+
+	State fState;
 	bigtime_t fActivityLevelStart;
 	bigtime_t fActivityLevel;
 	bigtime_t fLastCPUTooBusyTime;
@@ -135,15 +138,16 @@ private:
 	typedef PeriodicDelayedTask _inherited;
 };
 
+
+// This class is used for clumping up function objects that
+// can be done as a single object. For instance the mime
+// notification mechanism sends out multiple notifications on
+// a single change and we need to accumulate the resulting
+// icon update into a single one
 class AccumulatingFunctionObject : public FunctionObject {
-	// This class is used for clumping up function objects that
-	// can be done as a single object. For instance the mime
-	// notification mechanism sends out multiple notifications on
-	// a single change and we need to accumulate the resulting
-	// icon update into a single one
 public:
-	virtual bool CanAccumulate(const AccumulatingFunctionObject *) const = 0;
-	virtual void Accumulate(AccumulatingFunctionObject *) = 0;
+	virtual bool CanAccumulate(const AccumulatingFunctionObject*) const = 0;
+	virtual void Accumulate(AccumulatingFunctionObject*) = 0;
 };
 
 
@@ -155,42 +159,44 @@ public:
 	TaskLoop(bigtime_t heartBeat = 10000);
 	virtual ~TaskLoop();
 
-	void RunLater(DelayedTask *);
-	void RunLater(FunctionObject *functor, bigtime_t delay);
+	void RunLater(DelayedTask*);
+	void RunLater(FunctionObject* functor, bigtime_t delay);
 		// execute a function object after a delay
-		
-	void RunLater(FunctionObjectWithResult<bool> *functor, bigtime_t delay,
-		bigtime_t period);
-		// periodically execute function object after initial delay until function
-		// object returns true
-		
-	void RunLater(FunctionObjectWithResult<bool> *functor, bigtime_t delay,
-		bigtime_t period, bigtime_t timeout);
-		// periodically execute function object after initial delay until function
-		// object returns true or timeout is reached
 
-	void AccumulatedRunLater(AccumulatingFunctionObject *functor, bigtime_t delay,
-		bigtime_t maxAccumulatingTime = 0, int32 maxAccumulateCount = 0);
+	void RunLater(FunctionObjectWithResult<bool>* functor, bigtime_t delay,
+		bigtime_t period);
+		// periodically execute function object after initial delay until
+		// function object returns true
+
+	void RunLater(FunctionObjectWithResult<bool>* functor, bigtime_t delay,
+		bigtime_t period, bigtime_t timeout);
+		// periodically execute function object after initial delay until
+		// function object returns true or timeout is reached
+
+	void AccumulatedRunLater(AccumulatingFunctionObject* functor,
+		bigtime_t delay, bigtime_t maxAccumulatingTime = 0,
+		int32 maxAccumulateCount = 0);
 		// will search the delayed task loop for other accumulating functors
 		// and will accumulate with them, else will create a new delayed task
-		// the task will no longer accumulate if past the <maxAccumulatingTime> delay
-		// unless <maxAccumulatingTime> is zero
+		// the task will no longer accumulate if past the
+		// <maxAccumulatingTime> delay unless <maxAccumulatingTime> is zero
 		// no more than <maxAccumulateCount> will get accumulated, unless
 		// <maxAccumulateCount> is zero
-		
-	void RunWhenIdle(FunctionObjectWithResult<bool> *functor, bigtime_t initialDelay,
-		bigtime_t idleTime, bigtime_t heartBeat = 1000000);
+
+	void RunWhenIdle(FunctionObjectWithResult<bool>* functor,
+		bigtime_t initialDelay, bigtime_t idleTime,
+		bigtime_t heartBeat = 1000000);
 		// after initialDelay starts looking for a slot when the system is
 		// idle for at least idleTime
 
 protected:
-	void AddTask(DelayedTask *);
-	void RemoveTask(DelayedTask *);
+	void AddTask(DelayedTask*);
+	void RemoveTask(DelayedTask*);
 
 	bool Pulse();
 		// return true if quitting
 	bigtime_t LatestRunTime() const;
-	
+
 	virtual bool KeepPulsingWhenEmpty() const = 0;
 	virtual void StartPulsingIfNeeded() = 0;
 
@@ -198,6 +204,7 @@ protected:
 	BObjectList<DelayedTask> fTaskList;
 	bigtime_t fHeartBeat;
 };
+
 
 class StandAloneTaskLoop : public TaskLoop {
 	// this task loop can work on it's own, just instantiate it
@@ -207,10 +214,10 @@ public:
 	~StandAloneTaskLoop();
 
 protected:
-	void AddTask(DelayedTask *);
+	void AddTask(DelayedTask*);
 
 private:
-	static status_t RunBinder(void *);
+	static status_t RunBinder(void*);
 	void Run();
 
 	virtual bool KeepPulsingWhenEmpty() const;
@@ -219,9 +226,10 @@ private:
 	volatile bool fNeedToQuit;
 	volatile thread_id fScanThread;
 	bool fKeepThread;
-	
+
 	typedef TaskLoop _inherited;
 };
+
 
 class PiggybackTaskLoop : public TaskLoop {
 	// this TaskLoop needs periodic calls from a viewable's Pulse
@@ -235,13 +243,13 @@ public:
 private:
 	virtual bool KeepPulsingWhenEmpty() const;
 	virtual void StartPulsingIfNeeded();
-	
+
 	bigtime_t fNextHeartBeatTime;
 	bool fPulseMe;
 };
 
 
-inline bigtime_t 
+inline bigtime_t
 DelayedTask::RunAfterTime() const
 {
 	return fRunAfter;
@@ -251,4 +259,4 @@ DelayedTask::RunAfterTime() const
 
 using namespace BPrivate;
 
-#endif
+#endif	// __TASK_LOOP__

@@ -5,7 +5,7 @@ resource(1, "META:TYPE") "application/x-vnd.Be.URL.news";
 
 resource(2, "META:S:DESC") #'MSDC' "News URL";
 
-resource(3, "META:L:DESC") #'MLDC' "Usenet Newsgroup URL";
+resource(3, "META:L:DESC") #'MLDC' "Usenet newsgroup URL";
 
 resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-urlwrapper";
 

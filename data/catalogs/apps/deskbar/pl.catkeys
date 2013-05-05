@@ -1,38 +1,51 @@
-1	polish	x-vnd.Be-TSKB	3232664655
-<Be folder is empty>	BeMenu		<folder Be jest pusty>
+1	polish	x-vnd.Be-TSKB	2335730970
+Power off	DeskbarMenu		Wyłącz komputer
+Sort applications by name	PreferencesWindow		Sortuj programy po nazwie
+Suspend	DeskbarMenu		Wstrzymaj
+Hide clock	TimeView		Ukryj zegar
+Applications	PreferencesWindow		Aplikacje
+Time preferences…	TimeView		Ustawienia czasu...
+About Haiku	DeskbarMenu		O Haiku
+Edit in Tracker…	PreferencesWindow		Edytuj w Trakerze…
+Recent documents:	PreferencesWindow		Ostatnio przeglądane dokumenty:
+Recent applications	DeskbarMenu		Ostatnio uruchomione aplikacje
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplikacje
+Find…	DeskbarMenu		Wyszukaj…
+Show clock	Tray		Pokaż zegar
+Window	PreferencesWindow		Położenie
+Defaults	PreferencesWindow		Ustawienia domyślne
+Menu	PreferencesWindow		Menu
+Recent documents	DeskbarMenu		Ostatnio otwarte dokumenty
+Auto-hide	PreferencesWindow		Autoukrywanie
 Always on top	PreferencesWindow		Zawsze na wierzchu
-Applications	PreferencesWindow		Lista aplikacji
+<Deskbar folder is empty>	DeskbarMenu		Folder Paska Pulpitu jest pusty
+Show all	WindowMenu		Pokaż wszystkie okna
+No windows	WindowMenu		Brak okien aplikacji
+Deskbar	System name		Pasek Pulpitu
+Restart system	DeskbarMenu		Uruchom ponownie
+Large	PreferencesWindow		Duże
 Auto-raise	PreferencesWindow		Automatyczne rozszerzanie
-Change time…	TimeView		Zmień czas...
-Clock	PreferencesWindow		Zegar
+Recent folders:	PreferencesWindow		Ostatnio przeglądane foldery:
+Show application expander	PreferencesWindow		Aplikacje jako lista rozwijalna
+Restart Tracker	DeskbarMenu		Uruchom ponownie Trackera
 Close all	WindowMenu		Zamknij wszystkie okna
 Deskbar preferences	PreferencesWindow		Ustawienia Panelu Pulpitu
-Deskbar preferences…	BeMenu		Ustawienia Panelu Pulpitu...
-Edit menu…	PreferencesWindow		Edytuj zawartość menu...
-Expand new applications	PreferencesWindow		Uruchamiaj aplikacje rozwinięte
-Find…	BeMenu		Wyszukaj...
-Hide all	WindowMenu		Ukryj wszystkie okna
-Hide time	TimeView		Ukryj czas
-Menu	PreferencesWindow		Menu
-Mount	BeMenu		Zamontuj
-No windows	WindowMenu		Brak okien aplikacji
-Power off	BeMenu		Wyłącz komputer
-Quit application	WindowMenu		Zakończ pracę aplikacji
-Recent applications	BeMenu		Ostatnio używane aplikacje
+Mount	DeskbarMenu		Zamontuj
+Revert	PreferencesWindow		Przywróć
+Small	PreferencesWindow		Małe
 Recent applications:	PreferencesWindow		Ostatnio używane aplikacje:
-Recent documents	BeMenu		Ostatnio przeglądane dokumenty
-Recent documents:	PreferencesWindow		Ostatnio przeglądane dokumenty:
-Recent folders	BeMenu		Ostatnio przeglądane foldery
-Recent folders:	PreferencesWindow		Ostatnio przeglądane foldery:
-Restart Tracker	BeMenu		Uruchom ponownie Tracker
-Restart system	BeMenu		Uruchom komputer ponownie
-Show Time	Tray		Pokaż czas
-Show all	WindowMenu		Pokaż wszystkie okna
-Show application expander	PreferencesWindow		Aplikacje jako lista rozwijalna
-Show calendar…	TimeView		Wyświetl kalendarz...
-Show replicants	BeMenu		Pokazuj replikanty
-Show seconds	PreferencesWindow		Pokazuj sekundy
-Shutdown…	BeMenu		Zakończ pracę...
-Sort running applications	PreferencesWindow		Sortuj uruchomione aplikacje alfabetycznie
+Shutdown…	DeskbarMenu		Wyłącz…
 Tracker always first	PreferencesWindow		Tracker zawsze na początku
-Window	PreferencesWindow		Położenie
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Ustawienia
+Recent folders	DeskbarMenu		Ostatnio przeglądane foldery
+About this system	DeskbarMenu		Informacje o systemie
+Show calendar…	TimeView		Wyświetl kalendarz…
+Deskbar preferences…	DeskbarMenu		Preferencje Deskbara…
+Expand new applications	PreferencesWindow		Uruchamiaj aplikacje rozwinięte
+Show replicants	DeskbarMenu		Pokaż replikanty
+Hide application names	PreferencesWindow		Ukryj nazwy aplikacji
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Dema
+Icon size	PreferencesWindow		Rozmiar ikon
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Aplety pulpitu
+Hide all	WindowMenu		Ukryj wszystkie okna
+Quit application	WindowMenu		Zakończ pracę aplikacji

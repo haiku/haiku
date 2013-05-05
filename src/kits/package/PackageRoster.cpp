@@ -28,6 +28,7 @@
 
 #include <package/hpkg/PackageReader.h>
 
+
 #if defined(__HAIKU__) && !defined(HAIKU_HOST_PLATFORM_HAIKU)
 #	include <package/DaemonClient.h>
 #endif

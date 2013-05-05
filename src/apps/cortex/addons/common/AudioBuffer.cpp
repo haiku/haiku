@@ -223,8 +223,8 @@ uint32 AudioBuffer::copyTo(
 	// convert and copy a sample at a time
 	for(; remaining; remaining -= sampleSize) {
 		convert_sample(
-			(void*) *((int8*)m_pData + fromOffset),
-			(void*) *((int8*)target.m_pData + targetOffset),
+			(void*) ((int8*)m_pData + fromOffset),
+			(void*) ((int8*)target.m_pData + targetOffset),
 			m_format.format,
 			target.m_format.format);
 		

@@ -53,14 +53,18 @@ status_t MessagePrinter::Print(BMessage* msg)
 	// open a file to print message on the desktop
 	status = find_directory(B_DESKTOP_DIRECTORY, &settingsPath);
 	if (status != B_OK) {
-		(new BAlert("","find directory error", "Doh!"))->Go();
+		BAlert* alert = new BAlert("","Find directory error", "Doh!");
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 		return status;
 	}
 
 	settingsPath.Append(msgFileName);
 	status = file.SetTo(settingsPath.Path(), B_WRITE_ONLY | B_CREATE_FILE);
 	if (status != B_OK) {
-		(new BAlert("","file write error", "Doh!"))->Go();
+		BAlert* alert = new BAlert("","File write error", "Doh!");
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 		return status;
 	}	
 	
@@ -73,14 +77,18 @@ status_t MessagePrinter::Print(BMessage* msg)
 		// count
 		out << i;
 		if (file.Write(out.String(), out.Length()) < 0) {
-			(new BAlert("","count write error", "Doh!"))->Go();
+			BAlert* alert = new BAlert("","Count write error", "Doh!");
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
 			return B_ERROR;
 		}	
 		// name
 		out = " ";
 		out << name;
 		if (file.Write(out.String(), out.Length()) < 0) {
-			(new BAlert("","name write error", "Doh!"))->Go();
+			BAlert* alert = new BAlert("","Name write error", "Doh!");
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
 			return B_ERROR;
 		}	
 		
@@ -164,7 +172,9 @@ status_t MessagePrinter::Print(BMessage* msg)
 				break;
 		}
 	    if (file.Write(out.String(), out.Length()) < 0) {
-			(new BAlert("","value write error", "Doh!"))->Go();
+			BAlert* alert = new BAlert("","Value write error", "Doh!");
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
 			return B_ERROR;
 		}	
 	}

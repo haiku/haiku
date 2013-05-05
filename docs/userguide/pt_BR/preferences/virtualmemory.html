@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Adriano Duarte
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Memória Virtual</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../../fr/preferences/virtualmemory.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/preferences/virtualmemory.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/preferences/virtualmemory.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/preferences/virtualmemory.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/preferences/virtualmemory.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/preferences/virtualmemory.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/preferences/virtualmemory.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/preferences/virtualmemory.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/preferences/virtualmemory.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/preferences/virtualmemory.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/preferences/virtualmemory.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/preferences/virtualmemory.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/preferences/virtualmemory.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../ca/preferences/virtualmemory.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../../en/preferences/virtualmemory.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="touchpad.html">Touchpad</a> 
+::  <a href="../preferences.html" class="uplink">Preferências</a>
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/prefs-images/virtualmemory-icon_64.png" alt="virtualmemory-icon_64.png" width="64" height="64" />Memória Virtual</h2>
+<table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferências</span></td></tr>
+<tr><td>Localização:</td><td></td><td><span class="path">/boot/system/preferences/VirtualMemory</span></td></tr>
+<tr><td>Configurações:</td><td></td><td><span class="path">~/config/settings/kernel/drivers/virtual_memory</span><br />
+<span class="path">~/config/settings/VM_data</span> - Armazena a posição da janela da caixa de diálogo.</td></tr>
+</table>
+<p>A memória virtual permite ao sistema parmutar memória para o disco rígido, se a RAM puder ser utilizada mais inteligentemente para outras coisas. Assim, ainda que tenha muita RAM, determinar memória virtual nunca é uma má ideia.</p>
+<img src="../images/prefs-images/virtualmemory.png" alt="virtualmemory.png" />
+<p>Pode-se definir o tamanho para algo maior do que sua memória física se necessário. Com os grandes discos dos dias de hoje, atribuir o tamanho da memória física não deveria ser um problema. Todavia, pode-se rapidamente ajustar o tamanho se seu espaço livre ainda for pouco. Neste caso deve-se também dar uma olhada no <a href="../applications/diskusage.html">Uso do Disco</a> para encontrar o que está devorando seu espaço em disco.</p>
+<p>Normalmente, o arquivo de troca é gravado na sua partição de inicialização. Se frequentemente executar no disco destrói diretamente o sistema de memória virtual transferindo memória para dentro e para fora, pode-se tentar utilizar um disco rígido separado para seu arquivo de troca. Simplesmente outra partição no mesmo disco rígido do seu sistema/dados não irá ajudar.<br />
+Aumentar a sua RAM é naturalmente o mais efetivo caminho a seguir...</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="button">Padrão</span></td><td> </td><td>redefine tudo para os valores padrão.</td></tr>
+<tr><td><span class="button">Reverter</span></td><td> </td><td>traz de volta as definições que estavam ativas quando iniciou as preferências da Memória Virtual.</td></tr>
+</table>
+
+</div>
+</div>
+
+<!--
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="touchpad.html">Touchpad</a> 
+::  <a href="../preferences.html" class="uplink">Preferências</a>
+</span></div>
+</div>
+-->
+</body>
+</html>

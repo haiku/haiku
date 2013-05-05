@@ -7,6 +7,7 @@
 
 #include "LayoutOptimizer.h"
 
+#include <algorithm>
 #include <new>
 #include <stdio.h>
 #include <string.h>
@@ -25,6 +26,18 @@
 #define TRACE_ERROR(format...)	fprintf(stderr, format)
 
 using std::nothrow;
+using std::swap;
+using std::max;
+
+
+bool is_soft(Constraint* constraint)
+{
+	if (constraint->Op() != LinearProgramming::kEQ)
+		return false;
+    if (constraint->PenaltyNeg() > 0. || constraint->PenaltyPos() > 0.)
+		return true;
+	return false;
+}
 
 
 /*!	\class BPrivate::Layout::LayoutOptimizer
@@ -205,62 +218,23 @@ copy_matrix(const double* const* A, double** B, int m, int n)
 }
 
 
-static inline void
-multiply_optimization_matrix_vector(const double* x, int n, double* y)
-{
-	// The matrix has the form:
-	//  2 -1  0     ...   0  0
-	// -1  2 -1  0  ...   .  .
-	//  0 -1  2           .  .
-	//  .  0     .        .  .
-	//  .           .     0  0
-	//  .              . -1  0
-	//  0    ...    0 -1  2 -1
-	//  0    ...         -1  1
-	if (n == 1) {
-		y[0] = x[0];
-		return;
-	}
-
-	y[0] = 2 * x[0] - x[1];
-	for (int i = 1; i < n - 1; i++)
-		y[i] = 2 * x[i] - x[i - 1] - x[i + 1];
-	y[n - 1] = x[n - 1] - x[n - 2];
-}
-
-
-static inline void
-multiply_optimization_matrix_matrix(const double* const* A, int m, int n,
-	double** B)
-{
-	if (m == 1) {
-		memcpy(B[0], A[0], n * sizeof(double));
-		return;
-	}
-
-	for (int k = 0; k < n; k++) {
-		B[0][k] = 2 * A[0][k] - A[1][k];
-		for (int i = 1; i < m - 1; i++)
-			B[i][k] = 2 * A[i][k] - A[i - 1][k] - A[i + 1][k];
-		B[m - 1][k] = A[m - 1][k] - A[m - 2][k];
-	}
-}
-
-
-template<typename Type>
-static inline void
-swap(Type& a, Type& b)
-{
-	Type c = a;
-	a = b;
-	b = c;
-}
-
-
 // #pragma mark - algorithms
 
+#if 0
+static void
+print_system(double** a, int n, double* b)
+{
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			printf("%.1f ", a[i][j]);
+		}
+		printf("= %f\n", b[i]);
+	}
+}
+#endif
 
-bool
+
+static bool
 solve(double** a, int n, double* b)
 {
 	// index array for row permutation
@@ -312,6 +286,8 @@ solve(double** a, int n, double* b)
 		for (int j = i + 1; j < n; j++)
 			sum -= a[index][j] * b[j];
 
+		if (fuzzy_equals(a[index][i], 0))
+			return false;
 		b[i] = sum / a[index][i];
 	}
 
@@ -382,7 +358,7 @@ compute_dependencies(double** a, int m, int n,
 
 
 // remove_linearly_dependent_rows
-int
+static int
 remove_linearly_dependent_rows(double** A, double** temp,
 	bool* independentRows, int m, int n)
 {
@@ -411,7 +387,7 @@ remove_linearly_dependent_rows(double** A, double** temp,
 
 /*!	QR decomposition using Householder transformations.
 */
-bool
+static bool
 qr_decomposition(double** a, int m, int n, double* d, double** q)
 {
 	if (m < n)
@@ -534,7 +510,7 @@ LayoutOptimizer::SetConstraints(const ConstraintList& list, int32 variableCount)
 	// set up soft constraint matrix
 	for (int32 c = 0; c < fConstraints->CountItems(); c++) {
 		Constraint* constraint = fConstraints->ItemAt(c);
-		if (!constraint->IsSoft()) {
+		if (!is_soft(constraint)) {
 			rightSide[c] = 0;
 			continue;
 		}
@@ -564,7 +540,7 @@ LayoutOptimizer::SetConstraints(const ConstraintList& list, int32 variableCount)
 	// create G
 	transpose_matrix(fSoftConstraints, fTemp1, constraintCount, fVariableCount);
 	multiply_matrices(fTemp1, fSoftConstraints, fG, fVariableCount,
-		constraintCount, constraintCount);
+		constraintCount, fVariableCount);
 
 	// create d
 	multiply_matrix_vector(fTemp1, rightSide, fVariableCount, constraintCount,
@@ -630,8 +606,9 @@ LayoutOptimizer::_Init(int32 variableCount, int32 nConstraints)
 {
 	fVariableCount = variableCount;
 
-	fTemp1 = allocate_matrix(nConstraints, nConstraints);
-	fTemp2 = allocate_matrix(nConstraints, nConstraints);
+	int32 maxExtend = max(variableCount, nConstraints);
+	fTemp1 = allocate_matrix(maxExtend, maxExtend);
+	fTemp2 = allocate_matrix(maxExtend, maxExtend);
 	fZtrans = allocate_matrix(nConstraints, fVariableCount);
 	fSoftConstraints = allocate_matrix(nConstraints, fVariableCount);
 	fQ = allocate_matrix(nConstraints, fVariableCount);
@@ -706,7 +683,7 @@ TRACE_ONLY(
 
 	for (int32 i = 0; i < constraintCount; i++) {
 		Constraint* constraint = fConstraints->ItemAt(i);
-		if (constraint->IsSoft())
+		if (is_soft(constraint))
 			continue;
 		double actualValue = _ActualValue(constraint, x);
 		TRACE("constraint %ld: actual: %f  constraint: %f\n", i, actualValue,
@@ -751,7 +728,7 @@ TRACE_ONLY(
 
 		for (int32 i = 0; i < activeCount; i++) {
 			Constraint* constraint = activeConstraints.ItemAt(i);
-			if (constraint->IsSoft())
+			if (is_soft(constraint))
 				continue;
 			SummandList* summands = constraint->LeftSide();
 			for (int32 s = 0; s < summands->CountItems(); s++) {

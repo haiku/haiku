@@ -17,8 +17,8 @@
 
 #include <ReadHelper.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "exit_parser"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "exit_parser"
 
 
 using std::set;

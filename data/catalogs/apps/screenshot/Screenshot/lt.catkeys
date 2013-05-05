@@ -1,28 +1,27 @@
-1	lithuanian	x-vnd.Haiku-screenshot-cli	1342822790
-seconds	ScreenshotWindow		 sek.
-Options	ScreenshotWindow		Parinktys
-Desktop	ScreenshotWindow		Darbastalis
-Include window border	ScreenshotWindow		Su lango rėmeliu
-Back to saving	ScreenshotWindow		Atgal prie išsaugojimo
-Select	ScreenshotWindow		Parinkti
-Capture active window	ScreenshotWindow		Traukti aktyvų langą
+1	lithuanian	x-vnd.haiku-screenshot	1721618877
+seconds	ScreenshotWindow		sek.
+Desktop	ScreenshotWindow		Darbalaukis
+Include window border	ScreenshotWindow		Įtraukti lango rėmelį
+Screenshot	System name		Nuotrauka
+Select	ScreenshotWindow		Rinktis
+Capture active window	ScreenshotWindow		Fotografuoti tik aktyvų langą
 Cancel	ScreenshotWindow		Atsisakyti
-screenshot	ScreenshotWindow	!! Basename of screenshot files. !!	nuotrauka
-Name:	ScreenshotWindow		Pavadinimas:
-screenshot1	ScreenshotWindow	!! Filename of first screenshot !!	nuotrauka1
-Save screenshot	ScreenshotWindow		Išsaugoti nuotrauką
-Capture entire screen	ScreenshotWindow		Traukti visą ekraną
-Choose folder	ScreenshotWindow		Rinktis aplanką
-Take screenshot	ScreenshotWindow		Nuotrauką
-Save	ScreenshotWindow		Išsaugoti
+Name:	ScreenshotWindow		Failo vardas:
+Choose folder	ScreenshotWindow		Parinkite aplanką
+Save	ScreenshotWindow		Įrašyti
 Overwrite	ScreenshotWindow		Perrašyti
-Retake screenshot	ScreenshotWindow		Dar nuotrauką
 Choose folder...	ScreenshotWindow		Rinktis aplanką…
 Please select	ScreenshotWindow		Pasirinkite
-Save as:	ScreenshotWindow		Išsaugoti kaip:
-Save in:	ScreenshotWindow		Išsaugoti į:
-Take screenshot after a delay of	ScreenshotWindow		Daryti nuotrauką užlaikant
-Artwork folder	ScreenshotWindow		Paveikslėlių aplankas
-Home folder	ScreenshotWindow		Naminis aplankas
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Tokia byla jau yra.\n Tikrai ją norite perrašyti?
-Include mouse pointer	ScreenshotWindow		Įtraukiant ir pelės žymeklį
+Save as:	ScreenshotWindow		Failo formatas:
+Copy to clipboard	ScreenshotWindow		Kopijuoti į iškarpinę
+Save in:	ScreenshotWindow		Įrašyti į:
+screenshot	Screenshot	Base filename of screenshot files	nuotrauka
+New screenshot	ScreenshotWindow		Nauja nuotrauka
+Artwork folder	ScreenshotWindow		Paveikslų aplankas
+Home folder	ScreenshotWindow		Namų aplankas
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Toks failas jau yra.\nAr tikrai norite jį perrašyti?
+Settings…	ScreenshotWindow		Nuostatos…
+overwrite	ScreenshotWindow		Perrašyti
+Delay:	ScreenshotWindow		Uždelsti:
+Include mouse pointer	ScreenshotWindow		Įtraukti pelės žymeklį
+Translator Settings	ScreenshotWindow		Keitiklio nuostatos

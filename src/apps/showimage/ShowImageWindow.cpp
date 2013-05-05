@@ -122,8 +122,8 @@ bs_printf(BString* string, const char* format, ...)
 //	#pragma mark -- ShowImageWindow
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Menus"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Menus"
 
 
 ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
@@ -210,6 +210,8 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 	else
 		fToolBarView->Hide();
 
+	fToolBarVisible = fShowToolBar;
+
 	viewFrame.bottom = contentView->Bounds().bottom;
 	viewFrame.bottom -= B_H_SCROLL_BAR_HEIGHT;
 
@@ -262,7 +264,7 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 	}
 
 	// add View menu here so it can access ShowImageView methods
-	BMenu* menu = new BMenu(B_TRANSLATE_WITH_CONTEXT("View", "Menus"));
+	BMenu* menu = new BMenu(B_TRANSLATE_CONTEXT("View", "Menus"));
 	_BuildViewMenu(menu, false);
 	fBar->AddItem(menu);
 
@@ -416,8 +418,6 @@ ShowImageWindow::_AddMenus(BMenuBar* bar)
 	bar->AddItem(menu);
 
 	menu = new BMenu(B_TRANSLATE("Edit"));
-	_AddItemMenu(menu, B_TRANSLATE("Undo"), B_UNDO, 'Z', 0, this, false);
-	menu->AddSeparatorItem();
 	_AddItemMenu(menu, B_TRANSLATE("Copy"), B_COPY, 'C', 0, this, false);
 	menu->AddSeparatorItem();
 	_AddItemMenu(menu, B_TRANSLATE("Selection mode"), MSG_SELECTION_MODE, 0, 0,
@@ -711,7 +711,7 @@ ShowImageWindow::MessageReceived(BMessage* message)
 
 				while (fGoToPageMenu->CountItems() > 0) {
 					// Remove all page numbers
-					delete fGoToPageMenu->RemoveItem(0L);
+					delete fGoToPageMenu->RemoveItem((int32)0);
 				}
 
 				for (int32 i = 1; i <= pages; i++) {
@@ -727,7 +727,7 @@ ShowImageWindow::MessageReceived(BMessage* message)
 					strCaption << i;
 
 					BMenuItem* item = new BMenuItem(strCaption.String(), goTo,
-						B_SHIFT_KEY, shortcut);
+						shortcut, B_SHIFT_KEY);
 					if (currentPage == i)
 						item->SetMarked(true);
 					fGoToPageMenu->AddItem(item);
@@ -764,18 +764,6 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			}
 			break;
 		}
-
-		case MSG_UNDO_STATE:
-		{
-			bool enable;
-			if (message->FindBool("can_undo", &enable) == B_OK)
-				_EnableMenuItem(fBar, B_UNDO, enable);
-			break;
-		}
-
-		case B_UNDO:
-			fImageView->Undo();
-			break;
 
 		case B_COPY:
 			fImageView->CopySelectionToClipboard();
@@ -990,7 +978,8 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			backgroundsMessage.AddRef("refs", fImageView->Image());
 			// This is used in the Backgrounds code for scaled placement
 			backgroundsMessage.AddInt32("placement", 'scpl');
-			be_roster->Launch("application/x-vnd.haiku-backgrounds", &backgroundsMessage);
+			be_roster->Launch("application/x-vnd.haiku-backgrounds",
+				&backgroundsMessage);
 			break;
 		}
 
@@ -1050,15 +1039,12 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			if (message->FindFloat("offset", &offset) == B_OK
 				&& message->FindBool("show", &show) == B_OK) {
 				// Compensate rounding errors with the final placement
-				if (show) {
-					fToolBarView->MoveTo(fToolBarView->Frame().left, 0);
-				} else {
-					fToolBarView->MoveTo(fToolBarView->Frame().left, offset);
+				fToolBarView->MoveTo(fToolBarView->Frame().left, offset);
+				if (!show)
 					fToolBarView->Hide();
-				}
 				BRect frame = fToolBarView->Parent()->Bounds();
 				frame.top = fToolBarView->Frame().bottom + 1;
-				fScrollView->MoveTo(0, frame.top);
+				fScrollView->MoveTo(fScrollView->Frame().left, frame.top);
 				fScrollView->ResizeTo(fScrollView->Bounds().Width(),
 					frame.Height() - B_H_SCROLL_BAR_HEIGHT + 1);
 				fVerticalScrollBar->MoveTo(
@@ -1102,11 +1088,12 @@ ShowImageWindow::_LoadError(const entry_ref& ref)
 {
 	// TODO: give a better error message!
 	BAlert* alert = new BAlert(B_TRANSLATE_SYSTEM_NAME("ShowImage"),
-		B_TRANSLATE_WITH_CONTEXT("Could not load image! Either the "
+		B_TRANSLATE_CONTEXT("Could not load image! Either the "
 			"file or an image translator for it does not exist.",
 			"LoadAlerts"),
-		B_TRANSLATE_WITH_CONTEXT("OK", "Alerts"), NULL, NULL,
-		B_WIDTH_AS_USUAL, B_INFO_ALERT);
+		B_TRANSLATE_CONTEXT("OK", "Alerts"), NULL, NULL,
+		B_WIDTH_AS_USUAL, B_STOP_ALERT);
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 }
 
@@ -1174,7 +1161,8 @@ ShowImageWindow::_SaveToFile(BMessage* message)
 
 	int32 i;
 	for (i = 0; i < outCount; i++) {
-		if (outFormat[i].group == B_TRANSLATOR_BITMAP && outFormat[i].type == outType)
+		if (outFormat[i].group == B_TRANSLATOR_BITMAP && outFormat[i].type
+				== outType)
 			break;
 	}
 	if (i == outCount)
@@ -1186,8 +1174,8 @@ ShowImageWindow::_SaveToFile(BMessage* message)
 }
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ClosePrompt"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ClosePrompt"
 
 
 bool
@@ -1214,6 +1202,8 @@ ShowImageWindow::_ClosePrompt()
 
 	BAlert* alert = new BAlert(B_TRANSLATE("Close document"), prompt.String(),
 		B_TRANSLATE("Cancel"), B_TRANSLATE("Close"));
+	alert->SetShortcut(0, B_ESCAPE);
+	
 	if (alert->Go() == 0) {
 		// Cancel
 		return false;
@@ -1271,7 +1261,7 @@ ShowImageWindow::_ToggleFullScreen()
 		BScreen screen;
 		fWindowFrame = Frame();
 		frame = screen.Frame();
-		frame.top -= fBar->Bounds().Height()+1;
+		frame.top -= fBar->Bounds().Height() + 1;
 		frame.right += B_V_SCROLL_BAR_WIDTH;
 		frame.bottom += B_H_SCROLL_BAR_HEIGHT;
 		frame.InsetBy(-1, -1); // PEN_SIZE in ShowImageView
@@ -1414,7 +1404,7 @@ ShowImageWindow::_Print(BMessage* msg)
 		float width;
 		switch (fPrintOptions.Option()) {
 			case PrintOptions::kFitToPage: {
-				float w1 = printableRect.Width()+1;
+				float w1 = printableRect.Width() + 1;
 				float w2 = imageWidth * (printableRect.Height() + 1)
 					/ imageHeight;
 				if (w2 < w1)
@@ -1514,9 +1504,10 @@ ShowImageWindow::_UpdateRatingMenu()
 void
 ShowImageWindow::_SetToolBarVisible(bool visible, bool animate)
 {
-	if (visible == !fToolBarView->IsHidden())
+	if (visible == fToolBarVisible)
 		return;
 
+	fToolBarVisible = visible;
 	float diff = fToolBarView->Bounds().Height() + 2;
 	if (!visible)
 		diff = -diff;
@@ -1528,14 +1519,13 @@ ShowImageWindow::_SetToolBarVisible(bool visible, bool animate)
 		// not to block the window thread.
 		const float kAnimationOffsets[] = { 0.05, 0.2, 0.5, 0.2, 0.05 };
 		const int32 steps = sizeof(kAnimationOffsets) / sizeof(float);
-		float originalY = fToolBarView->Frame().top;
 		for (int32 i = 0; i < steps; i++) {
 			BMessage message(kMsgSlideToolBar);
 			message.AddFloat("offset", floorf(diff * kAnimationOffsets[i]));
 			PostMessage(&message, this);
 		}
 		BMessage finalMessage(kMsgFinishSlidingToolBar);
-		finalMessage.AddFloat("offset", originalY + diff);
+		finalMessage.AddFloat("offset", visible ? 0 : diff);
 		finalMessage.AddBool("show", visible);
 		PostMessage(&finalMessage, this);
 	} else {

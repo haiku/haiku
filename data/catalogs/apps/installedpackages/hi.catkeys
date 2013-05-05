@@ -1,0 +1,8 @@
+1	hindi	x-vnd.Haiku-InstalledPackages	4131220089
+No package selected.	UninstallView		कोई भी पैकेज चुना नहीं गया है.
+Remove	UninstallView		हटायें
+Package description	UninstallView		पैकेज विवरण
+InstalledPackages	System name		इन्स्ताल्लड पैकेजेस
+The package you selected has been successfully removed from your system.	UninstallView		संकुल जिसे आपने चुना गया है सफलतापूर्वक अपने सिस्टम से हटा दिया.
+OK	UninstallView		ठीक है
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		संकुल चुना आपके सिस्टम से हटाया नहीं गया था. दी संकुल का अधिष्ठापन जानकारी फ़ाइल भ्रष्ट हो गया है.

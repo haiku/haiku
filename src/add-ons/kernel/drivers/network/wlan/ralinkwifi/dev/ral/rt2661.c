@@ -82,9 +82,9 @@ __FBSDID("$FreeBSD$");
 #endif
 
 static struct ieee80211vap *rt2661_vap_create(struct ieee80211com *,
-			    const char name[IFNAMSIZ], int unit, int opmode,
-			    int flags, const uint8_t bssid[IEEE80211_ADDR_LEN],
-			    const uint8_t mac[IEEE80211_ADDR_LEN]);
+			    const char [IFNAMSIZ], int, enum ieee80211_opmode,
+			    int, const uint8_t [IEEE80211_ADDR_LEN],
+			    const uint8_t [IEEE80211_ADDR_LEN]);
 static void		rt2661_vap_delete(struct ieee80211vap *);
 static void		rt2661_dma_map_addr(void *, bus_dma_segment_t *, int,
 			    int);
@@ -368,10 +368,10 @@ rt2661_detach(void *xsc)
 }
 
 static struct ieee80211vap *
-rt2661_vap_create(struct ieee80211com *ic,
-	const char name[IFNAMSIZ], int unit, int opmode, int flags,
-	const uint8_t bssid[IEEE80211_ADDR_LEN],
-	const uint8_t mac[IEEE80211_ADDR_LEN])
+rt2661_vap_create(struct ieee80211com *ic, const char name[IFNAMSIZ], int unit,
+    enum ieee80211_opmode opmode, int flags,
+    const uint8_t bssid[IEEE80211_ADDR_LEN],
+    const uint8_t mac[IEEE80211_ADDR_LEN])
 {
 	struct ifnet *ifp = ic->ic_ifp;
 	struct rt2661_vap *rvp;
@@ -1917,7 +1917,7 @@ rt2661_set_basicrates(struct rt2661_softc *sc,
 	struct ieee80211com *ic = ifp->if_l2com;
 	uint32_t mask = 0;
 	uint8_t rate;
-	int i, j;
+	int i;
 
 	for (i = 0; i < rs->rs_nrates; i++) {
 		rate = rs->rs_rates[i];
@@ -1925,13 +1925,7 @@ rt2661_set_basicrates(struct rt2661_softc *sc,
 		if (!(rate & IEEE80211_RATE_BASIC))
 			continue;
 
-		/*
-		 * Find h/w rate index.  We know it exists because the rate
-		 * set has already been negotiated.
-		 */
-		for (j = 0; ic->ic_sup_rates[IEEE80211_MODE_11G].rs_rates[j] != RV(rate); j++);
-
-		mask |= 1 << j;
+		mask |= 1 << ic->ic_rt->rateCodeToIndex[RV(rate)];
 	}
 
 	RAL_WRITE(sc, RT2661_TXRX_CSR5, mask);

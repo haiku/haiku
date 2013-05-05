@@ -1,0 +1,48 @@
+1	hindi	x-vnd.Haiku-ProcessController	2887520383
+Memory usage	ProcessController		स्मृति के उपयोग
+Do you really want to kill the team \"%s\"?	ProcessController		क्या आप वास्तव में टीम को मारना चाहते हैं \"%s\"?
+Idle priority	ProcessController		आइडल प्राथमिकता
+Restart Deskbar	ProcessController		डेस्कबार पुनः आरंभ करें
+Custom priority	ProcessController		प्राथमिकता कस्टम है
+Debug thread	ProcessController		डिबग थ्रेड
+This team is already gone…	ProcessController		यह टीम पहले से ही जा चुकी है...
+Error saving file	ProcessController		त्रुटि फ़ाइल सहेजने मैं
+Real-time priority	ProcessController		रियल-टाइम प्राथमिकता
+Your setting file could not be saved!\n(%s)	ProcessController		आपकी सेट्टिंग फ़ाइल सेव नहीं हो सकी!\n(%s)
+This thread is already gone…	ProcessController		यह थ्रेड पहले से ही चला गया है...
+Cancel	ProcessController		रद्द
+Display priority	ProcessController		प्राथमिकता दिखाएँ
+Run in window	ProcessController		विंडो में चलाएं
+Processor %d	ProcessController		प्रोसेसर %d
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 जिओरजेस-एडोउअर्द बेरेंगेर, berenger@francenet.fr\n
+ProcessController is already installed in Deskbar.	ProcessController		प्रक्रिया नियंत्रक पहले से डेस्कबार में स्थापित है.
+This is the last active processor...\nYou can't turn it off!	ProcessController		यह आखिरी सक्रिय प्रोसेसर है ...\n आप यह बंद नहीं कर सकते हैं!
+Info	ProcessController		जानकारी
+Quit application	ProcessController		अनुप्रयोग से बाहर जाएँ
+Low priority	ProcessController		निम्न प्राथमिकता 
+What do you want to do with the thread \"%s\"?	ProcessController		आप इस थ्रेड के साथ क्या करना चाहते है \"%s\"?
+Gone teams…	ProcessController		टीमें जो जा चुके हैं...
+Lowest active priority	ProcessController		निम्न सक्रिय प्राथमिकता
+Restart Tracker	ProcessController		ट्रैकर पुनरारंभ करें
+Live in the Deskbar	ProcessController		डेस्कबार में लाइव
+Kill this thread!	ProcessController		इस थ्रेड को मारें!
+Debug this thread!	ProcessController		इस थ्रेड को डिबग करें! 
+Normal priority	ProcessController		प्राथमिकता नोर्मल हैं
+New Terminal	ProcessController		नया टर्मिनल
+Urgent priority	ProcessController		प्राथमिकता उरजेन्ट है
+About ProcessController…	ProcessController		प्रोसस्सर कंट्रोलर के बारे में...
+Ok!	ProcessController		ठीक है!
+Quit an application	ProcessController		एक अनुप्रयोग छोड़ें
+Install in Deskbar	ProcessController		डेस्कबार में स्थापित करें
+Threads and CPU usage	ProcessController		थ्रेड और CPU उपयोग
+Urgent display priority	ProcessController		प्राथमिकता अरजेन्ट डिस्प्ले है
+OK	ProcessController		ठीक है
+Damned!	ProcessController		शापित!
+Usage: %s [-deskbar]\n	ProcessController		प्रयोग: %s [-डेस्कबार]\n
+ProcessController	System name		ProcessController
+Real-time display priority	ProcessController		प्राथमिकता रियल-टाइम डिस्प्ले है
+Please confirm	ProcessController		कृपया पक्का करें
+Yes, kill this team!	ProcessController		हाँ, यह टीम को मार डालो!
+System resources & caches…	ProcessController		सिस्टम रिसोर्से & कैशेस...
+That's no Fun!	ProcessController		वह कुछ भी मज़ा नहीं है!
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		आप एक खिड़की में प्रक्रिया नियंत्रक रन कर सकते या उसको डेस्कबार में स्थापित कर सकते हैं.

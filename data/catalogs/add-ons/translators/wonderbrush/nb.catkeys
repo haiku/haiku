@@ -1,9 +1,9 @@
-1	norwegian_bokmål	x-vnd.Haiku-WonderBrushTranslator	491575314
-Version %d.%d.%d %s	WonderBrushView		Versjon %d.%d.%d %s
-WBI Settings	WonderBrushMain		WBI-innstillinger
-WBI Settings	WonderBrushTranslator		WBI-innstillinger
-WonderBrush image	WonderBrushTranslator		WonderBrush-bilde
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-WonderBrushTranslator	491575314
 WonderBrush image translator	WonderBrushTranslator		WonderBrush-bildeoversetter
-WonderBrush image translator	WonderBrushView		WonderBrush-bildeoversetter
+WBI Settings	WonderBrushTranslator		WBI-innstillinger
+WBI Settings	WonderBrushMain		WBI-innstillinger
+Version %d.%d.%d %s	WonderBrushView		Versjon %d.%d.%d %s
 WonderBrush images	WonderBrushTranslator		WonderBrush-bilder
+WonderBrush image	WonderBrushTranslator		WonderBrush-bilde
+WonderBrush image translator	WonderBrushView		WonderBrush-bildeoversetter
 written by:	WonderBrushView		skrevet av:

@@ -1,0 +1,92 @@
+1	croatian	x-vnd.Haiku-Terminal	3210992622
+%app% settings	Terminal PrefWindow	window title	%app% postavke
+Abort	Terminal Shell		Prekini
+Appearance	Terminal PrefWindow		Izgled
+Background	Terminal AppearancePrefView		Pozadina
+Black on White	Terminal colors schema		Crno na bijelo
+Cancel	Terminal PrefWindow		Odustani
+Cancel	Terminal SetTitleWindow		Odustani
+Cancel	Terminal TermView		Odustani
+Cancel	Terminal TermWindow		Odustani
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Ne mogu izvršiti \"%naredbu\":\n\t%greška
+Change directory	Terminal TermView		Promijeni direktorij
+Clear all	Terminal TermWindow		Očisti sve
+Close	Terminal TermWindow		Zatvori
+Close active tab	Terminal TermWindow		Zatvori aktivnu karticu
+Close other tabs	Terminal TermWindow		Zatvori druge kartice
+Close tab	Terminal TermWindow		Zatvori karticu
+Close window	Terminal TermWindow		Zatvori prozor
+Color schema:	Terminal AppearancePrefView		Shema boje:
+Color:	Terminal AppearancePrefView		Boja:
+Confirm exit if active programs exist	Terminal AppearancePrefView		Potvrdi izlaz ako postoji aktivni program
+Copy	Terminal TermWindow		kopiraj
+Copy here	Terminal TermView		Kopiraj ovdje
+Create link here	Terminal TermView		Napravi poveznicu ovdje
+Custom	Terminal colors schema		Prilagođeno
+Decrease	Terminal TermWindow		Smanji
+Don't save	Terminal PrefWindow		Ne spremaj
+Edit	Terminal TermWindow		Uredi
+Edit tab title…	Terminal TermWindow		Uredi naslov kartice...
+Error!	Terminal getString		Greška!
+Find	Terminal FindWindow		Nađi
+Find failed	Terminal TermWindow		Neuspjelo nalaženje
+Find next	Terminal TermWindow		Nađi tekst
+Find previous	Terminal TermWindow		Nađi prethodno
+Find…	Terminal TermWindow		Nađi...
+Font:	Terminal AppearancePrefView		Font:
+Full screen	Terminal TermWindow		Puni zaslon
+Green on Black	Terminal colors schema		Zeleno na Crno
+Increase	Terminal TermWindow		Povećaj
+Insert path	Terminal TermView		Unesi putanju
+Move here	Terminal TermView		Premjesti ovdje
+New Terminal	Terminal TermWindow		Novi terminal
+New tab	Terminal TermWindow		Nova kartica
+Not found.	Terminal TermWindow		Nije pronađeno
+Nothing is selected.	Terminal TermWindow		Ništa nije izabrano
+OK	Terminal PrefWindow		U redu
+OK	Terminal SetTitleWindow		U redu
+OK	Terminal TermApp		U redu
+OK	Terminal TermWindow		U redu
+Page setup…	Terminal TermWindow		Postavljanje stranice...
+Paste	Terminal TermWindow		Zalijepi
+Print	Terminal TermWindow		Ispis
+Print cancelled.	Terminal TermWindow		Ispisivanje otkazano
+Quit	Terminal TermWindow		Isključi
+Really close?	Terminal TermWindow		Doista zatvoriti?
+Save	Terminal PrefWindow		Spremi
+Save as default	Terminal TermWindow		Spremi kao zadano
+Save changes to this settings panel?	Terminal PrefWindow		Spremiti izmjene u ovu ploču postavki?
+Save to file…	Terminal PrefWindow		Spremi u datoteku...
+Search forward	Terminal FindWindow		Traži naprijed
+Select all	Terminal TermWindow		Odaberi sve
+Selected background	Terminal AppearancePrefView		Odabrana pozadina
+Selected text	Terminal AppearancePrefView		Odabrani tekst
+Set tab title	Terminal TermWindow		Postavi naslov kartice
+Set window title	Terminal TermWindow		Postavi naslov prozora
+Settings	Terminal TermWindow		Postavke
+Settings…	Terminal TermWindow		Postavke...
+Shell 	Terminal TermWindow		Shell
+Size:	Terminal AppearancePrefView		Veličina:
+Switch Terminals	Terminal TermWindow		Zamjeni terminale
+Tab title:	Terminal AppearancePrefView		Naslov kartice:
+Tab title:	Terminal TermWindow		Naslov kartice:
+Terminal	System name		Terminal
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal nije mogao pokrenuti shell. Žao nam je.
+Text	Terminal AppearancePrefView		Tekst
+Text encoding	Terminal TermWindow		Enkodiranje teksta
+Text not found.	Terminal TermWindow		Tekst nije pronađen
+Text size	Terminal TermWindow		Veličina teksta
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Sljedeći procesi još rade:\n\nt%1qn\nAko zatvorite terminal, procesi će biti isključeni.
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Proces \"%1\" i dalje radi.\nAko zatvorite terminal, proces će biti isključen.
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Proces \"%1\" i dalje radi.\nAko zatvorite karticu, proces će biti isključen.
+Unrecognized option \"%s\"\n	Terminal arguments parsing		Neprepoznata opcija \"%s\"\n
+Use default	Terminal SetTitleWindow		Koristi zadano
+Use default shell	Terminal Shell		Koristi zadani shell
+Use selection	Terminal FindWindow		koristi izbor
+Use text:	Terminal FindWindow		Koristi tekst:
+White on Black	Terminal colors schema		Bijelo na crnom
+Window size	Terminal TermWindow		Veličina prozora
+Window title:	Terminal AppearancePrefView		Naslov prozora:
+Window title:	Terminal TermWindow		Naslov prozora:
+Window title…	Terminal TermWindow		Naslov prozora...
+size	Terminal TermView		velična

@@ -1,13 +1,14 @@
-1	japanese	x-vnd.Haiku-Pairs	129365914
+1	japanese	x-vnd.Haiku-Pairs	1981673050
 %app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\Ralf Schülke 作\n\tCopyright 2008-2010, Haiku Inc.\n\nあなたは、このゲームを %num% クリックで完了しました。\n
-Beginner (4x4)	PairsWindow		初級 (4x4)
 Expert (8x8)	PairsWindow		上級 (8x8)
-Game	PairsWindow		ゲーム
-Intermediate (6x6)	PairsWindow		中級 (6x6)
-New	PairsWindow		新規
-New game	PairsWindow		新規ゲーム
-OK	PairsView		Ok
-Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Pairs が最低限必要とする %d 個のベクターアイコンは、このシステムには見つかりませんでした。
-Quit	PairsWindow		終了
+Beginner (4x4)	PairsWindow		初級 (4x4)
 Quit game	PairsWindow		ゲームを終了
+Game	PairsWindow		ゲーム
 Size	PairsWindow		サイズ
+New	PairsWindow		新規
+OK	PairsView		Ok
+Intermediate (6x6)	PairsWindow		中級 (6x6)
+Quit	PairsWindow		終了
+Pairs	System name		Pairs
+New game	PairsWindow		新規ゲーム
+Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Pairs が最低限必要とする %d 個のベクターアイコンは、このシステムには見つかりませんでした。

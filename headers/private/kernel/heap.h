@@ -13,6 +13,15 @@
 #include "kernel_debug_config.h"
 
 
+#if USE_GUARDED_HEAP_FOR_MALLOC && USE_GUARDED_HEAP_FOR_OBJECT_CACHE
+
+// This requires a lot of up-front memory to boot at all...
+#define INITIAL_HEAP_SIZE			128 * 1024 * 1024
+// ... and a lot of reserves to keep running.
+#define HEAP_GROW_SIZE				128 * 1024 * 1024
+
+#else // USE_GUARDED_HEAP_FOR_MALLOC && USE_GUARDED_HEAP_FOR_OBJECT_CACHE
+
 // allocate 16MB initial heap for the kernel
 #define INITIAL_HEAP_SIZE			16 * 1024 * 1024
 // grow by another 4MB each time the heap runs out of memory
@@ -21,6 +30,8 @@
 #define HEAP_DEDICATED_GROW_SIZE	1 * 1024 * 1024
 // use areas for allocations bigger than 1MB
 #define HEAP_AREA_USE_THRESHOLD		1 * 1024 * 1024
+
+#endif // !(USE_GUARDED_HEAP_FOR_MALLOC && USE_GUARDED_HEAP_FOR_OBJECT_CACHE)
 
 
 // allocation/deallocation flags for {malloc,free}_etc()

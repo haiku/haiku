@@ -1,0 +1,91 @@
+SubDir HAIKU_TOP src system libroot posix glibc arch arm ;
+
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch $(TARGET_ARCH) ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch generic ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc libio ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc stdlib ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc math ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
+
+SubDirHdrs $(HAIKU_TOP) src system libroot posix glibc arch generic ;
+
+UsePrivateHeaders libroot ;
+
+if $(OPTIM) = -O0 {
+	OPTIM = -O ;
+}
+
+# don't compile with debugging
+DEBUG = 0 ;
+
+SubDirCcFlags -D_GNU_SOURCE -D_IEEE_LIBM ;
+
+local genericSources =
+	lshift.c rshift.c submul_1.c
+	s_finite.c s_finitef.c
+	add_n.c sub_n.c
+	addmul_1.c mul_1.c
+	
+	cmp.c dbl2mpn.c divrem.c 
+	mpn2dbl.c mpn2flt.c mpn2ldbl.c
+	mul.c mul_n.c
+	s_isinf.c s_isinff.c
+	s_isnan.c s_isnanf.c
+	s_signbit.c s_signbitf.c s_signbitl.c
+
+	s_floor.c s_floorf.c
+	s_ceil.c s_ceilf.c
+	s_modf.c
+	w_powf.c e_powf.c
+	w_pow.c e_pow.c slowpow.c
+	w_exp.c e_exp.c slowexp.c
+	s_frexp.c s_expm1.c
+	dosincos.c
+	doasin.c
+	sincos32.c
+	branred.c
+	halfulp.c
+	mpa.c mplog.c mpexp.c
+	s_sin.c
+	s_atan.c s_atanf.c
+	s_tan.c
+	e_asin.c w_asin.c
+	e_log10.c w_log10.c
+	e_acos.c w_acos.c
+	e_atan2.c w_atan2.c mpatan2.c mpatan.c mptan.c mpsqrt.c w_sqrt.c w_sqrtf.c
+	e_fmod.c w_fmod.c
+	e_log.c w_log.c
+	e_cosh.c w_cosh.c
+	e_sinh.c w_sinh.c
+	s_cosf.c k_cosf.c
+	s_sinf.c k_sinf.c
+	s_ldexp.c s_ldexpf.c
+	s_scalbnf.c s_scalbn.c
+	s_copysign.c
+	s_tanh.c s_tanf.c k_tanf.c
+	s_lround.c s_lroundf.c s_round.c s_roundf.c
+	s_rint.c s_rintf.c s_lrintf.c
+	e_fmodf.c w_fmodf.c
+	e_atan2f.c w_atan2f.c
+	e_rem_pio2f.c k_rem_pio2f.c
+
+	memrchr.c
+;
+
+MergeObject posix_gnu_arch_$(TARGET_ARCH)_generic.o :
+	$(genericSources)
+;
+
+MergeObject posix_gnu_arch_$(TARGET_ARCH)_others.o :
+	e_sqrt.c
+	e_sqrtf.c
+;
+
+MergeObjectFromObjects posix_gnu_arch_$(TARGET_ARCH).o : :
+	posix_gnu_arch_$(TARGET_ARCH)_generic.o
+	posix_gnu_arch_$(TARGET_ARCH)_others.o
+;
+
+SEARCH on [ FGristFiles $(genericSources) ]
+	= [ FDirName $(HAIKU_TOP) src system libroot posix glibc arch generic ] ;

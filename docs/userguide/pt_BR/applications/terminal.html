@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2010, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		tiagoms
+ *		Adriano Duarte
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Terminal</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../../fr/applications/terminal.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/terminal.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/terminal.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/terminal.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/terminal.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/terminal.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/terminal.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/terminal.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/terminal.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/terminal.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/terminal.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/terminal.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/applications/terminal.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../ca/applications/terminal.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../../en/applications/terminal.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="stylededit.html">StyledEdit</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos
+</a> 
+::  <a href="textsearch.html">Pesquisa de Texto</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Terminal</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplicativos</span></td></tr>
+<tr><td>Localização:</td><td></td><td><span class="path">/boot/system/apps/Terminal</span></td></tr>
+<tr><td>Configurações:</td><td></td><td><span class="path">~/config/settings/Terminal</span><br />
+<span class="path">~/.profile</span> - acrescenta/substitui os defaults em <span class="path">/boot/common/etc/profile</span><br />
+<span class="path">~/.inputrc</span> - acrescenta/substitui os defaults em <span class="path">/boot/common/etc/inputrc</span></td></tr>
+</table>
+<p><br /></p>
+<p>O Terminal é a interface do Haiku para o bash, o Bourne Again Shell.</p>
+<p>Por favor tome como referência o tópico sobre <a href="../bash-scripting.html">Scripting</a> para encontrar alguns links para tutoriais online sobre como trabalhar no shell e também faça uma leitura no tópico <a href="cli-apps.html">Aplicativos em linha de comando</a>. Aqui, iremos nos concentar no aplicativo Terminal por si só.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="windows-tabs" name="windows-tabs">Janelas e abas</a></h2>
+<p>Pode-se abrir quantos Terminais forem necessários, também cada um em sua própria janela simplesmente carregando mais Terminais ou com <span class="key">ALT</span> <span class="key">N</span> a partir de um Terminal já aberto. Ou utilizar a visão em guias do Terminal e abrir mais guias com <span class="key">ALT</span> <span class="key">T</span>.</p>
+<img src="../images/apps-images/terminal.png" alt="terminal.png" />
+<br />
+<p>Duplo clique dentro de uma parte vazia da barra de guias abre uma nova guia; dentro de uma guia abre um diálogo para renomear seu título. Existem muitas variáveis %-designadas que são explicadas com uma dica quando paira o mouse sobre o campo de texto.<br />
+Por padrão, <tt>%1d: %p</tt>, uma guia exibe o diretório atual e, separado por <tt>:</tt>, o nome do processo atualmente em execução (ou <tt>--</tt> se apenas o bash está executando, provavelmente ocioso). A captura de tela acima exibe a primeira guia com uma sessão FTP na pasta <span class="path">Área de Trabalho</span> e a segunda guia ociosa na <span class="path">home</span>.<br />
+Através de <span class="menu">Editar | Título da janela...</span> o título da janela do Terminal pode ser editado de maneira similar.</p>
+<p>Clicar com o botão direito do mouse em uma guia exibe um menu de contexto para <span class="menu">Fechar guia</span>, <span class="menu">Fechar outras guias</span> ou, como o duplo clique, <span class="menu">Editar título da guia...</span>.</p>
+<p>Uma janela do Terminal pode ser redimensionada como qualquer outra janela ou usando as predefinições a partir do menu <span class="menu">Definções | Tamanho da janela</span>. <span class="key">ALT</span> <span class="key">ENTER</span> alterna para o modo de tela cheia.</p>
+<p>O tamanho de janela e codificação de texto alterados são mantidos apenas escolhendo <span class="menu">Definições | Salvar como padrão</span>.</p>
+
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="settings" name="settings">Configurações</a></h2>
+<p><span class="menu">Definições | Definições...</span> abre uma janela de diálogo para configurar as definições padrão de um Terminal.</p>
+<img src="../images/apps-images/terminal-settings.png" alt="terminal-settings.png" />
+<br />
+<p>Ele começa com as "fórmulas" para nomear os títulos da guia e da janela. Novamente, dicas exibem as variáveis disponíveis. Abaixo dele define-se o tipo e o tamanho da fonte e as diferentes cores para texto e fundo. Pode-se escolher um esquema de cor predefinido como <span class="menu">Preto sobre branco</span> ou <span class="menu">Branco sobre preto</span> ou criar um <span class="menu">Personalizado</span> utilizando seletor de cores abaixo.<br />
+Ative a caixa de verificação para <span class="menu">Confirmar saída se existem programas ativos</span> e será alertado quando tentra fechar uma janela do Terminal enquanto um aplicativo estiver ainda sendo executado.<br />
+Pode-se salvar diferentes definições como perfis separados, os quais com um duplo clique abrem um Terminal configurado de acordo.<br />
+Pressionar <span class="button">OK</span> salvará as definições atuais como padrão.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="shortcuts" name="shortcuts">Atalhos de teclado</a></h2>
+<p>Você encontrará uma lista de atalhos úteis em <a href="../keyboard-shortcuts.html#terminal">Atalhos e combinações de teclas</a>.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="customization" name="customization">Personalização do Bash</a></h2>
+<p>Vindo do Unix, existem incontáveis possibilidades para personalizar o próprio bash. Existem dois arquivos que são especialmente importantes para o usuário: <span class="cli">.profile</span> e <span class="cli">.inputrc</span>.<br />
+Ambos podem ser criados na pasta <span class="path">home/</span> e adicionar ou sobrepor os padrões do sistema que são definidos em <span class="path">/boot/common/etc/</span>.</p>
+
+<h3>.profile</h3>
+<p>O <span class="cli">.profile</span> é carregado toda vez que se abre um novo Terminal. Ele define todos os tipos de apelidos e variáveis que afetarão o comportamento e a aparência do bash. Você encontrará muitos recursos online que detalharão todas as possibilidades.</p>
+<p>O Haiku/BeOS Tip Server tem algumas dicas para que possa começar, por exemplo:</p>
+<ul>
+<li><a href="http://betips.net/1997/09/09/customize-your-terminal-prompt/">Personalize o prompt do seu Terminal</a></li>
+<li><a href="http://betips.net/1997/09/09/more-prompt-customizations/">Mais personalizações do prompt</a></li>
+<li><a href="http://betips.net/1997/09/09/enhancing-bash/">Melhorando o bash</a></li>
+<li><a href="http://betips.net/1997/09/09/custom-keyboard-shortcuts/">Atalhos de teclado personalizados</a></li>
+</ul>
+<p>Há mais, <a href="http://betips.net/index.php?s=.profile">dê uma olhada</a>.</p>
+
+<h3>.inputrc</h3>
+<p>O <span class="cli">.inputrc</span> mexe com combinação de teclas. Uma vez que o Haiku proporciona padrões úteis, provavelmente não precisa se atrapalhar com estas definições mais complicadas. Se possui necessidades especiais aqui, consulte um dos muitos recursos online, por exemplo <a href="http://tiswww.case.edu/php/chet/readline/rluserman.html">The GNU Readline Library</a>.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="hints" name="hints">Dicas para trabalhar com o Terminal</a></h2>
+<ul><li><p>Arrastar um arquivo ou pasta de uma janela do Rastreador para o Terminal inserirá seu caminho no local do cursor. Arrastar com o botão direito do mouse oferece ações adicionais em um menu de contexto:</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Inserir caminho</span></td><td> </td><td>Insere o local do arquivo, o mesmo que o arrastar e soltar com o botão esquerdo do mouse.</td></tr>
+<tr><td><span class="menu">Alterar diretório</span></td><td> </td><td>Alterna para a pasta do arquivo arrastado.</td></tr>
+<tr><td><span class="menu">Criar vínculo aqui</span></td><td> </td><td>Cria um vínculo para o arquivo arrastado no diretório atualmente acessado pelo Terminal.</td></tr>
+<tr><td><span class="menu">Mover aqui</span></td><td> </td><td>Move o arquivo arrastado para dentro do diretório atualmente acessado pelo Terminal.</td></tr>
+<tr><td><span class="menu">Copiar aqui</span></td><td> </td><td>Copia o arquivo arrastado dentro do diretório atualmente acessado pelo Terminal.</td></tr>
+</table></li>
+<li><p>Pode-se abrir qualquer arquivo com seu aplicativo preferido com o comando <span class="cli">open <i>[nomedoarquivo]</i></span>. Isto também funciona com a representação da pasta atual ("<span class="cli">.</span>") e pai ("<span class="cli">..</span>") o qual então abre numa janela do Rastreador. Então, para abrir o diretório atual, digite:</p>
+<pre class="terminal">open .</pre>
+</li></ul>
+
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="stylededit.html">StyledEdit</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos
+</a> 
+::  <a href="textsearch.html">Pesquisa de Texto</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

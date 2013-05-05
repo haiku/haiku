@@ -1,0 +1,12 @@
+1	hindi	x-vnd.Haiku-JPEG2000Translator	1827737230
+Write	JPEG2000Translator		लिखें 
+JPEG2000 images	JPEG2000Translator		जेपिइजे2000 चित्र 
+Output only codestream (.jpc)	JPEG2000Translator		ओउत्पुत केवल कोडस्ट्रीम  (.jpc)
+Write black-and-white images as RGB24	JPEG2000Translator		काली और सफ़ेद चित्र को आरजीबी24 के तरह लिखें 
+Output quality	JPEG2000Translator		बाहर निकलने वाली कुँलिटी
+Read	JPEG2000Translator		पढ़ें
+©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, हैकू\n\n जस्पेर लाइब्ररी पर आधारित:\n© 1999-2000, चित्र शक्ति, इंक. और\n द उनिवर्सिटी ऑफ ब्रिटिश कोलुम्बिया, केनेडा.\n© 2001-2003 मिचेल डेविड अदेम्स.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\n इमेज मजीकस जेपि2 कोडेक का उपयोग किया गया था \"tutorial\".\n\thttp://www.imagemagick.org/\n
+Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		बित्माप फॉर्मेट (जेपिइजे2000 अनुवादक)
+About	JPEG2000Translator		के बारें में 
+High	JPEG2000Translator		उचा
+Read greyscale images as RGB32	JPEG2000Translator		ग्रेस्केल चित्र को आरजीबी32 की तरह पढ़ें

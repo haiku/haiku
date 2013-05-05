@@ -1,0 +1,15 @@
+1	english	x-vnd.Haiku-desklink	2797960853
+Control physical output	MediaReplicant		控件物理输出
+Couldn't launch 	MediaReplicant		无法启动
+OK	MediaReplicant		确定
+Sound preferences…	MediaReplicant		声音首选项...
+%g dB	MediaReplicant		%g dB
+Open %name	DeskButton	Don't translate variable %name	打开 %name
+No media server running	VolumeControl		无媒体服务器运行
+Media preferences…	MediaReplicant		多媒体首选项...
+Open MediaPlayer	MediaReplicant		打开媒体播放器
+desklink	MediaReplicant		磁盘链接
+Options	MediaReplicant		选项
+%ld dB	VolumeControl		%ld dB
+Beep	MediaReplicant		蜂鸣
+Volume	VolumeControl		卷

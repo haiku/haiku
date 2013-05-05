@@ -6,6 +6,7 @@
 #include <math.h>
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <Debug.h>
 #include <Message.h>
 #include <MessageRunner.h>
@@ -18,6 +19,8 @@
 
 
 #define FORWARD_TO_PARENT
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "BSnow"
 
 
 SnowView::SnowView()
@@ -59,7 +62,7 @@ filter_result msgfilter(BMessage *message, BHandler **target, BMessageFilter *fi
 	case 'NMDN':
 		break;
 	default:
-		printf("For: 0x%08lx: %s\n", *target, (*target)->Name());
+		printf("For: %p: %s\n", *target, (*target)->Name());
 		message->PrintToStream();
 	}
 	return B_DISPATCH_MESSAGE;
@@ -166,7 +169,7 @@ void SnowView::AttachedToWindow()
 		fFallenReg = new BRegion;
 		fInvalidator = spawn_thread(SnowMakerThread, INVALIDATOR_THREAD_NAME, B_LOW_PRIORITY, (void *)this);
 		resume_thread(fInvalidator);
-		printf("BSnow: OK: ws = %ld x %ld\n", fCachedWsWidth, fCachedWsHeight);
+		printf("BSnow: OK: ws = %" B_PRId32 " x %" B_PRId32 "\n", fCachedWsWidth, fCachedWsHeight);
 #ifdef DEBUG
 		Window()->AddCommonFilter(new BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, msgfilter));
 #endif
@@ -211,7 +214,7 @@ void SnowView::MessageReceived(BMessage *msg)
 			"Where is Santa ??");
 		info->SetFeel(B_NORMAL_WINDOW_FEEL);
 		info->SetLook(B_FLOATING_WINDOW_LOOK);
-		info->SetFlags(info->Flags()|B_NOT_ZOOMABLE);
+		info->SetFlags(info->Flags()|B_NOT_ZOOMABLE|B_CLOSE_ON_ESCAPE);
 		info->Go(NULL);
 		break;
 	default:
@@ -234,8 +237,9 @@ void SnowView::Draw(BRect ur)
 			SetLowColor(ViewColor());
 			SetHighColor(0,0,0);
 			SetFontSize(12);
-			DrawString(MSG_DRAG_ME, BPoint(15,25));
-			BPoint arrowHead(Bounds().RightBottom()+BPoint(-10,-10));
+			DrawString(B_TRANSLATE("Drag me on your desktop"B_UTF8_ELLIPSIS),
+				BPoint(15,25));
+			BPoint arrowHead(Bounds().RightBottom() + BPoint(-10,-10));
 			StrokeLine(arrowHead, arrowHead - BPoint(7,0));
 			StrokeLine(arrowHead, arrowHead - BPoint(0,7));
 			StrokeLine(arrowHead, arrowHead - BPoint(12,12));
@@ -244,7 +248,8 @@ void SnowView::Draw(BRect ur)
 			SetLowColor(ViewColor());
 			SetHighColor(0,0,0);
 			SetFontSize(12);
-			DrawString(MSG_CLICK_ME, BPoint(15,25));
+			DrawString(B_TRANSLATE("Click me to remove BSnow"B_UTF8_ELLIPSIS),
+				BPoint(15,25));
 			return;
 		}
 	}
@@ -321,7 +326,7 @@ void SnowView::Calc()
 	if (fCachedWsWidth != pFrame.Width() || fCachedWsHeight != pFrame.Height()) {
 		fCachedWsWidth = pFrame.IntegerWidth();
 		fCachedWsHeight = pFrame.IntegerHeight();
-		printf("BSnow: Parent resized to %ld %ld\n", fCachedWsWidth, fCachedWsHeight);
+		printf("BSnow: Parent resized to %" B_PRId32 " %" B_PRId32 "\n", fCachedWsWidth, fCachedWsHeight);
 		fFallenReg->MakeEmpty(); /* remove all the fallen snow */
 		ResizeTo(pFrame.IntegerWidth(), pFrame.IntegerHeight());
 		fDragger->MoveTo(pFrame.IntegerWidth()-7, pFrame.IntegerHeight()-7);

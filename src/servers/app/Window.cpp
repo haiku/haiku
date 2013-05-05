@@ -102,8 +102,10 @@ Window::Window(const BRect& frame, const char *name,
 	fInUpdate(false),
 	fUpdatesEnabled(true),
 
-	// windows start hidden
+	// Windows start hidden
 	fHidden(true),
+	// Hidden is 1 or more
+	fShowLevel(1),
 	fMinimized(false),
 	fIsFocus(false),
 
@@ -602,10 +604,14 @@ Window::ReloadDecor()
 			Window* window = stack->WindowAt(i);
 			BRegion dirty;
 			DesktopSettings settings(fDesktop);
-			decorator->AddTab(settings, window->Title(), window->Look(),
-				window->Flags(), -1, &dirty);
+			if (decorator->AddTab(settings, window->Title(), window->Look(),
+				window->Flags(), -1, &dirty) == NULL) {
+				delete decorator;
+				return false;
+			}
 		}
-	}
+	} else
+		return true;
 
 	windowBehaviour = gDecorManager.AllocateWindowBehaviour(this);
 	if (windowBehaviour == NULL) {
@@ -624,7 +630,7 @@ Window::ReloadDecor()
 		if (window->IsFocus())
 			decorator->SetFocus(i, true);
 		if (window == stack->TopLayerWindow())
-			decorator->SetTopTap(i);
+			decorator->SetTopTab(i);
 	}
 
 	return true;
@@ -1072,6 +1078,16 @@ Window::SetHidden(bool hidden)
 
 		// TODO: anything else?
 	}
+}
+
+
+void
+Window::SetShowLevel(int32 showLevel)
+{
+	if (showLevel == fShowLevel)
+		return;
+
+	fShowLevel = showLevel;
 }
 
 
@@ -1579,7 +1595,7 @@ Window::SubsetWorkspaces() const
 }
 
 
-/*!	Returns wether or not a window is in the subset workspace list with the
+/*!	Returns whether or not a window is in the subset workspace list with the
 	specified \a index.
 	See SubsetWorkspaces().
 */
@@ -2111,7 +2127,7 @@ Window::DetachFromWindowStack(bool ownStackNeeded)
 	::Decorator* decorator = fCurrentStack->Decorator();
 	if (decorator != NULL) {
 		decorator->RemoveTab(index);
-		decorator->SetTopTap(fCurrentStack->LayerOrder().CountItems() - 1);
+		decorator->SetTopTab(fCurrentStack->LayerOrder().CountItems() - 1);
 	}
 
 	Window* remainingTop = fCurrentStack->TopLayerWindow();
@@ -2230,7 +2246,7 @@ Window::MoveToTopStackLayer()
 		return false;
 	decorator->SetDrawingEngine(fDrawingEngine);
 	SetLook(Look(), NULL);
-	decorator->SetTopTap(PositionInStack());
+	decorator->SetTopTab(PositionInStack());
 	return fCurrentStack->MoveToTopLayer(this);
 }
 
@@ -2248,7 +2264,7 @@ Window::MoveToStackPosition(int32 to, bool isMoving)
 	::Decorator* decorator = Decorator();
 	if (decorator && decorator->MoveTab(index, to, isMoving, &dirty) == false)
 		return false;
-	
+
 	fDesktop->RebuildAndRedrawAfterWindowChange(this, dirty);
 	return true;
 }

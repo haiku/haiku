@@ -66,6 +66,7 @@ private:
 			BMessage			fResolverConfiguration;
 			BMessageRunner*		fRunner;
 			uint8				fMAC[6];
+			BString				fHostName;
 			uint32				fTransactionID;
 			in_addr_t			fAssignedAddress;
 			BNetworkAddress		fServer;

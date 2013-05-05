@@ -931,9 +931,7 @@ status_t NodeManager::splitGroup(
 	// make sure the nodes share a common group
 	NodeGroup* oldGroup = insideNode->group();
 	if(!oldGroup) {
-		PRINT((
-			"!!! NodeManager::splitGroup(): invalid group\n",
-			insideNode->id(), outsideNode->id()));
+		PRINT(("!!! NodeManager::splitGroup(): invalid group\n"));
 		return B_NOT_ALLOWED;
 	}
 	if(oldGroup != outsideNode->group()) {
@@ -2056,7 +2054,7 @@ inline status_t NodeManager::_handleNodesCreated(
 					PRINT((
 						"* NodeManager::_handleNodesCreated():\n"
 						"  Building initial Connection set: couldn't find source node\n"
-						"  connected to input '%s' of '%s' (source port %d).\n",
+						"  connected to input '%s' of '%s' (source port %" B_PRId32 ").\n",
 						input.name, destRef->name(), input.source.port));
 					continue;
 				}

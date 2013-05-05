@@ -12,6 +12,7 @@
 
 #include <new>
 
+#include <AllocationTracking.h>
 #include <arch/vm_types.h>
 #include <condition_variable.h>
 #include <kernel.h>
@@ -23,6 +24,11 @@
 #include <sys/uio.h>
 
 #include "kernel_debug_config.h"
+
+
+#define VM_PAGE_ALLOCATION_TRACKING_AVAILABLE \
+	(VM_PAGE_ALLOCATION_TRACKING && PAGE_ALLOCATION_TRACING != 0 \
+		&& PAGE_ALLOCATION_TRACING_STACK_TRACE > 0)
 
 
 class AsyncIOCallback;
@@ -131,6 +137,10 @@ public:
 
 #if DEBUG_PAGE_ACCESS
 	vint32					accessing_thread;
+#endif
+
+#if VM_PAGE_ALLOCATION_TRACKING_AVAILABLE
+	AllocationTrackingInfo	allocation_tracking_info;
 #endif
 
 private:

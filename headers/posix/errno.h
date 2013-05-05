@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010 Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2012 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _POSIX_ERRNO_H
@@ -9,7 +9,7 @@
 #ifdef __cplusplus
 extern "C"
 {
-#endif  
+#endif
 
 #include <Errors.h>
 
@@ -21,6 +21,6 @@ extern int *_errnop(void);
 
 #ifdef __cplusplus
 } /* "C" */
-#endif 
+#endif
 
 #endif /* _POSIX_ERRNO_H */

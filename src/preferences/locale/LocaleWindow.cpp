@@ -34,8 +34,8 @@
 using BPrivate::MutableLocaleRoster;
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Locale Preflet Window"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Locale Preflet Window"
 
 
 static const uint32 kMsgLanguageInvoked = 'LaIv';
@@ -147,6 +147,7 @@ LocaleWindow::LocaleWindow()
 				"use this preflet!"),
 			B_TRANSLATE("OK"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_STOP_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 	}
 
@@ -294,6 +295,10 @@ void
 LocaleWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case B_LOCALE_CHANGED:
+			fFormatView->MessageReceived(message);
+			break;
+
 		case kMsgDefaults:
 			_Defaults();
 			break;
@@ -477,8 +482,7 @@ LocaleWindow::Show()
 void
 LocaleWindow::_SettingsChanged()
 {
-	bool haveAnythingToRevert = fFormatView->IsReversible() || _IsReversible();
-	fRevertButton->SetEnabled(haveAnythingToRevert);
+	fRevertButton->SetEnabled(fFormatView->IsReversible() || _IsReversible());
 }
 
 

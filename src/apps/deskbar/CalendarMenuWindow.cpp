@@ -21,7 +21,6 @@
 
 using BPrivate::BCalendarView;
 
-
 enum {
 	kInvokationMessage,
 	kMonthDownMessage,
@@ -249,4 +248,3 @@ CalendarMenuWindow::_SetupButton(const char* label, uint32 what, float height)
 
 	return button;
 }
-

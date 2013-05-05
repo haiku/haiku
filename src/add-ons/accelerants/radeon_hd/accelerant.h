@@ -10,47 +10,53 @@
 #define RADEON_HD_ACCELERANT_H
 
 
-#include "atom.h"
-#include "encoder.h"
-#include "mode.h"
-#include "radeon_hd.h"
-#include "pll.h"
-
-
 #include <ByteOrder.h>
 #include <edid.h>
+
+#include "atom.h"
+#include "dp.h"
+#include "encoder.h"
+#include "mode.h"
+#include "pll.h"
+#include "radeon_hd.h"
+#include "ringqueue.h"
 
 
 #define MAX_DISPLAY 2
 	// Maximum displays (more then two requires AtomBIOS)
 
 
-struct gpu_state_info {
-	uint32 d1vga_control;
-	uint32 d2vga_control;
-	uint32 vga_render_control;
-	uint32 vga_hdp_control;
-	uint32 d1crtc_control;
-	uint32 d2crtc_control;
+struct gpu_state {
+	uint32 d1vgaControl;
+	uint32 d2vgaControl;
+	uint32 vgaRenderControl;
+	uint32 vgaHdpControl;
+	uint32 d1crtcControl;
+	uint32 d2crtcControl;
 };
 
 
-struct mc_info {
+struct fb_info {
 	bool		valid;
 	uint64		vramStart;
 	uint64		vramEnd;
 	uint64		vramSize;
+
+	uint64		gartStart;
+	uint64		gartEnd;
+	uint64		gartSize;
+	uint64		agpBase;
 };
 
 
 struct accelerant_info {
-	vuint8			*regs;
+	vuint8*			regs;
 	area_id			regs_area;
 
-	radeon_shared_info *shared_info;
+	radeon_shared_info* shared_info;
 	area_id			shared_info_area;
 
-	display_mode	*mode_list;		// cloned list of standard display modes
+	display_mode*	mode_list;		// cloned list of standard display modes
 	area_id			mode_list_area;
 
 	uint8*			rom;
@@ -62,13 +68,17 @@ struct accelerant_info {
 	int				device;
 	bool			is_clone;
 
-	struct gpu_state_info gpu_info;	// used for last known gpu state
-	struct mc_info	mc;				// used for memory controller info
+	struct fb_info	fb;	// used for frame buffer info within MC
 
 	volatile uint32	dpms_mode;		// current driver dpms mode
 
-	// LVDS panel mode passed from the bios/startup.
-	display_mode	lvds_panel_mode;
+	uint16			maximumPixelClock;
+	uint32			displayClockFrequency;
+	uint32			dpExternalClock;
+
+	uint32			lvdsSpreadSpectrumID;
+
+	RingQueue*		ringQueue[RADEON_QUEUE_MAX]; // Ring buffer command processor
 };
 
 
@@ -99,28 +109,28 @@ struct register_info {
 typedef struct {
 	bool	valid;
 
-	bool	hw_capable;
-	uint32	hw_line;
+	uint32	hwPin;		// GPIO hardware pin on GPU
+	bool	hwCapable;	// can do hw assisted i2c
 
-	uint32	mask_scl_reg;
-	uint32	mask_sda_reg;
-	uint32	mask_scl_mask;
-	uint32	mask_sda_mask;
+	uint32	sclMaskReg;
+	uint32	sdaMaskReg;
+	uint32	sclMask;
+	uint32	sdaMask;
 
-	uint32	en_scl_reg;
-	uint32	en_sda_reg;
-	uint32	en_scl_mask;
-	uint32	en_sda_mask;
+	uint32	sclEnReg;
+	uint32	sdaEnReg;
+	uint32	sclEnMask;
+	uint32	sdaEnMask;
 
-	uint32	y_scl_reg;
-	uint32	y_sda_reg;
-	uint32	y_scl_mask;
-	uint32	y_sda_mask;
+	uint32	sclYReg;
+	uint32	sdaYReg;
+	uint32	sclYMask;
+	uint32	sdaYMask;
 
-	uint32	a_scl_reg;
-	uint32	a_sda_reg;
-	uint32	a_scl_mask;
-	uint32	a_sda_mask;
+	uint32	sclAReg;
+	uint32	sdaAReg;
+	uint32	sclAMask;
+	uint32	sdaAMask;
 } gpio_info;
 
 
@@ -129,9 +139,9 @@ struct encoder_info {
 	uint16		objectID;
 	uint32		type;
 	uint32		flags;
+	uint32		linkEnumeration; // ex. linkb == GRAPH_OBJECT_ENUM_ID2
 	bool		isExternal;
-	bool		isHDMI;
-	bool		isTV;
+	bool		isDPBridge;
 	struct pll_info	pll;
 };
 
@@ -141,22 +151,28 @@ typedef struct {
 	uint16		objectID;
 	uint32		type;
 	uint32		flags;
+	uint32		lvdsFlags;
 	uint16		gpioID;
 	struct encoder_info encoder;
+	struct encoder_info encoderExternal;
 	// TODO struct radeon_hpd hpd;
+	dp_info		dpInfo;
 } connector_info;
 
 
 typedef struct {
-	bool			active;
+	bool			attached;
+	bool			powered;
 	uint32			connectorIndex; // matches connector id in connector_info
-	register_info	*regs;
-	bool			found_ranges;
-	uint32			vfreq_max;
-	uint32			vfreq_min;
-	uint32			hfreq_max;
-	uint32			hfreq_min;
-	edid1_info		edid_info;
+	register_info*	regs;
+	bool			foundRanges;
+	uint32			vfreqMax;
+	uint32			vfreqMin;
+	uint32			hfreqMax;
+	uint32			hfreqMin;
+	edid1_info		edidData;
+	display_mode	preferredMode;
+	display_mode	currentMode;
 } display_info;
 
 
@@ -168,11 +184,11 @@ typedef struct {
 #define MC	0x5 // Memory controller calls
 
 
-extern accelerant_info *gInfo;
-extern atom_context *gAtomContext;
-extern display_info *gDisplay[MAX_DISPLAY];
-extern connector_info *gConnector[ATOM_MAX_SUPPORTED_DEVICE];
-extern gpio_info *gGPIOInfo[ATOM_MAX_SUPPORTED_DEVICE];
+extern accelerant_info* gInfo;
+extern atom_context* gAtomContext;
+extern display_info* gDisplay[MAX_DISPLAY];
+extern connector_info* gConnector[ATOM_MAX_SUPPORTED_DEVICE];
+extern gpio_info* gGPIOInfo[ATOM_MAX_SUPPORTED_DEVICE];
 
 
 // register access
@@ -180,7 +196,7 @@ extern gpio_info *gGPIOInfo[ATOM_MAX_SUPPORTED_DEVICE];
 inline uint32
 _read32(uint32 offset)
 {
-	return *(volatile uint32 *)(gInfo->regs + offset);
+	return *(volatile uint32*)(gInfo->regs + offset);
 }
 
 

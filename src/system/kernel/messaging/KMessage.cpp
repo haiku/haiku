@@ -36,7 +36,21 @@
 #endif
 
 
+#if !defined(HAIKU_TARGET_PLATFORM_HAIKU) || defined(_BOOT_MODE) \
+	|| defined(_LOADER_MODE)
+#	define MEMALIGN(alignment, size)	malloc(size)
+	// Built as part of a build tool or the boot or runtime loader.
+#else
+#	include <malloc.h>
+#	define MEMALIGN(alignment, size)	memalign(alignment, size)
+	// Built as part of the kernel or userland. Using memalign allows use of
+	// special heap implementations that might otherwise return unaligned
+	// buffers for debugging purposes.
+#endif
+
+
 static const int32 kMessageReallocChunkSize = 64;
+static const size_t kMessageBufferAlignment = 4;
 
 const uint32 KMessage::kMessageHeaderMagic = 'kMsG';
 
@@ -46,14 +60,16 @@ const uint32 KMessage::kMessageHeaderMagic = 'kMsG';
 static inline int32
 _Align(int32 offset)
 {
-	return (offset + 3) & ~0x3;
+	return (offset + kMessageBufferAlignment - 1)
+		& ~(kMessageBufferAlignment - 1);
 }
 
 
 static inline void*
 _Align(void* address, int32 offset = 0)
 {
-	return (void*)(((addr_t)address + offset + 3) & ~0x3);
+	return (void*)(((addr_t)address + offset + kMessageBufferAlignment - 1)
+		& ~(kMessageBufferAlignment - 1));
 }
 
 
@@ -605,7 +621,8 @@ KMessage::ReceiveFrom(port_id fromPort, bigtime_t timeout,
 		return error;
 
 	// allocate a buffer
-	uint8* buffer = (uint8*)malloc(messageInfo->size);
+	uint8* buffer = (uint8*)MEMALIGN(kMessageBufferAlignment,
+		messageInfo->size);
 	if (!buffer)
 		return B_NO_MEMORY;
 
@@ -817,24 +834,30 @@ KMessage::_InitFromBuffer(bool sizeFromBuffer)
 		return B_BAD_DATA;
 
 	// clone the buffer, if requested
-	if ((fFlags & KMESSAGE_CLONE_BUFFER) != 0) {
+	if ((fFlags & KMESSAGE_CLONE_BUFFER) != 0 || _Align(fBuffer) != fBuffer) {
 		if (sizeFromBuffer) {
 			int32 size = fBufferCapacity;
 			memcpy(&size, &_Header()->size, 4);
 			fBufferCapacity = size;
 		}
 
-		void* buffer = malloc(fBufferCapacity);
+		void* buffer = MEMALIGN(kMessageBufferAlignment, fBufferCapacity);
 		if (buffer == NULL)
 			return B_NO_MEMORY;
 
 		memcpy(buffer, fBuffer, fBufferCapacity);
+
+		if ((fFlags & KMESSAGE_OWNS_BUFFER) != 0)
+			free(fBuffer);
+
 		fBuffer = buffer;
 		fFlags &= ~(uint32)(KMESSAGE_READ_ONLY | KMESSAGE_CLONE_BUFFER);
+		fFlags |= KMESSAGE_OWNS_BUFFER;
 	}
 
 	if (_Align(fBuffer) != fBuffer)
 		return B_BAD_DATA;
+
 	Header* header = _Header();
 
 	if (sizeFromBuffer)
@@ -952,7 +975,7 @@ KMessage::_AllocateSpace(int32 size, bool alignAddress, bool alignSize,
 	// reallocate if necessary
 	if (fBuffer == &fHeader) {
 		int32 newCapacity = _CapacityFor(newSize);
-		void* newBuffer = malloc(newCapacity);
+		void* newBuffer = MEMALIGN(kMessageBufferAlignment, newCapacity);
 		if (!newBuffer)
 			return B_NO_MEMORY;
 		fBuffer = newBuffer;
@@ -962,8 +985,16 @@ KMessage::_AllocateSpace(int32 size, bool alignAddress, bool alignSize,
 	} else {
 		if (newSize > fBufferCapacity) {
 			// if we don't own the buffer, we can't resize it
-			if (!(fFlags & KMESSAGE_OWNS_BUFFER))
+			if (!(fFlags & KMESSAGE_OWNS_BUFFER)) {
+#if defined(_KERNEL_MODE) && 0
+				// optional debugging to find insufficiently sized KMessage
+				// buffers (e.g. for in-kernel notifications)
+				panic("KMessage: out of space: available: %" B_PRId32
+					", needed: %" B_PRId32 "\n", fBufferCapacity, newSize);
+#endif
 				return B_BUFFER_OVERFLOW;
+			}
+
 			int32 newCapacity = _CapacityFor(newSize);
 			void* newBuffer = realloc(fBuffer, newCapacity);
 			if (!newBuffer)

@@ -177,7 +177,7 @@ DeskbarReplicant::MouseDown(BPoint where)
 
 	BPopUpMenu* menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
 
-	menu->AddItem(new BMenuItem("Preferences"B_UTF8_ELLIPSIS,
+	menu->AddItem(new BMenuItem("Settings" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgOpenBluetoothPreferences)));
 
 	// TODO show list of known/paired devices
@@ -242,6 +242,7 @@ DeskbarReplicant::_ShowErrorAlert(BString msg, status_t status)
 {
 	msg << "\n\nError: " << strerror(status);
 	BAlert* alert = new BAlert("Bluetooth error", msg.String(), "OK");
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go(NULL);
 }
 

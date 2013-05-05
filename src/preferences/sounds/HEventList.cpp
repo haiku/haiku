@@ -19,8 +19,8 @@
 #include <stdio.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "HEventList"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "HEventList"
 
 
 HEventRow::HEventRow(const char* name, const char* path)
@@ -57,7 +57,7 @@ HEventRow::Remove(const char* type)
 
 HEventList::HEventList(const char* name)
 	:
-	BColumnListView(name, 0, B_PLAIN_BORDER, true),
+	BColumnListView(name, B_NAVIGABLE, B_PLAIN_BORDER, true),
 	fType(NULL)
 {
 	AddColumn(new BStringColumn(B_TRANSLATE("Event"), 180, 50, 500,
@@ -127,6 +127,7 @@ HEventList::SelectionChanged()
 			BMediaFiles().RemoveRefFor(fType, row->Name(), ref);
 			BAlert* alert = new BAlert("alert",
 				B_TRANSLATE("No such file or directory"), B_TRANSLATE("OK"));
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 			return;
 		}

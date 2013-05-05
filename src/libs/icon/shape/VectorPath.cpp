@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku.
+ * Copyright 2006-2012, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -314,6 +314,34 @@ VectorPath::operator=(const VectorPath& from)
 	Notify();
 
 	return *this;
+}
+
+
+bool
+VectorPath::operator==(const VectorPath& other) const
+{
+	if (fClosed != other.fClosed)
+		return false;
+	
+	if (fPointCount != other.fPointCount)
+		return false;
+
+	if (fPath == NULL && other.fPath == NULL)
+		return true;
+
+	if (fPath == NULL || other.fPath == NULL)
+		return false;
+
+	for (int32 i = 0; i < fPointCount; i++) {
+		if (fPath[i].point != other.fPath[i].point
+			|| fPath[i].point_in != other.fPath[i].point_in
+			|| fPath[i].point_out != other.fPath[i].point_out
+			|| fPath[i].connected != other.fPath[i].connected) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 
@@ -948,7 +976,7 @@ void
 VectorPath::PrintToStream() const
 {
 	for (int32 i = 0; i < fPointCount; i++) {
-		printf("point %ld: (%f, %f) -> (%f, %f) -> (%f, %f) (%d)\n", i,
+		printf("point %" B_PRId32 ": (%f, %f) -> (%f, %f) -> (%f, %f) (%d)\n", i,
 			fPath[i].point_in.x, fPath[i].point_in.y,
 			fPath[i].point.x, fPath[i].point.y,
 			fPath[i].point_out.x, fPath[i].point_out.y, fPath[i].connected);
@@ -1057,7 +1085,7 @@ VectorPath::_SetPointCount(int32 count)
 		// reallocation might have failed
 		fPointCount = 0;
 		fAllocCount = 0;
-		fprintf(stderr, "VectorPath::_SetPointCount(%ld) - allocation failed!\n",
+		fprintf(stderr, "VectorPath::_SetPointCount(%" B_PRId32 ") - allocation failed!\n",
 			count);
 	}
 

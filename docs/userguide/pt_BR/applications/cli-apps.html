@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 
+ *
+ * Copyright 2010-2012, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		tiagoms
+ *		Adriano Duarte
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Aplicativos em Linha de Comando</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../../fr/applications/cli-apps.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/cli-apps.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/cli-apps.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/cli-apps.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/cli-apps.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/cli-apps.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/cli-apps.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/cli-apps.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/cli-apps.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/cli-apps.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/cli-apps.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/cli-apps.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/applications/cli-apps.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../ca/applications/cli-apps.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../../en/applications/cli-apps.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+
+<span>
+ «  <a href="list-cli-apps.html">List of commands</a> 
+::  <a href="../applications.html#cli-apps" class="uplink">Applications</a> 
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Aplicações em linha de comando específicas do Haiku</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Localização:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
+</table>
+<p><br /></p>
+<p>Todos os aplicativos em linha de comando que acompanham o Haiku estão em <span class="path">/boot/system/bin</span> ou <span class="path">/boot/common/bin</span>. Seus aplicativos em linha de comando particulares ou adicionalmente instalados devem ficar em <span class="path">~/config/bin</span>. Todas estas localidades são parte da variável PATH e são, portanto, automaticamente encontrados.<br />
+Segue uma não exaustiva lista de todos os aplicativos de linha de comando específicos do Haiku, ele serve apenas para destacar alguns dos mais úteis para dar-lhe um gostinho. Sinta-se encorajado a explorar o que se encontra nas pastas  <span class="path">bin/</span> folders por sua própria conta. Executar um aplicativo como parâmetro <tt>--help</tt> mostra o uso do comando e todos as suas variadas opções.</p>
+
+<h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="cli-attributes" name="cli-attributes">Relacionados aos atributos: <span class="cli">listattr</span>, <span class="cli">catattr</span>, <span class="cli">addattr</span>, <span class="cli">rmattr</span>, <span class="cli">copyattr</span></a></h3>
+<p>Estes comandos são utilizados para exibir, ler, adicionar e remover atributos de arquivos. Lembre-se que estes metadados são atualmente apenas disponíveis em volumes formatados em BFS. Mover arquivos para outros sistemas de arquivos irá eliminar todos os atributos!<br />
+Todos estes comandos são descritos no tópico <a href="../attributes.html#attributes-terminal">Atributos no Terminal</a>.</p>
+
+<h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="cli-index" name="cli-index">Relacionados ao índice: <span class="cli">lsindex</span>, <span class="cli">mkindex</span>, <span class="cli">reindex</span>, <span class="cli">rmindex</span></a></h3>
+<p>Com estes comandos pode-se listar, gerar, reindexar e remover atributos para o indexador do BFS. Todo volume tem seu próprio índice, lembre-se disso quando copiar arquivos de um volume para outro.<br />
+Estes comando são descritos no tópico <a href="../index.html">Indexação</a>.</p>
+
+<h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="cli-scripting" name="cli-scripting">Comandos de scripting úteis</a></h3>
+<p>Aqui estão umas poucas ferramentas de linha de comando que são especificamente úteis para scripting (veja também o tópico <a href="../bash-scripting.html">Bash e Scripting</a>).</p>
+<table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><p><span class="cli">alert</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">alert</span> evoca a janela típica de alerta com um ícone predefinido, texto explicativo e até três botões. Ela irá retornar o título do botão pressionado e um status de saída (comaçando com 0). Por exemplo, isto pe feito da linha:</p>
+<pre class="terminal">alert --idea "FantasticApp(tm) installado com sucesso!
+Gostaria de um atalho para ele?" "Na Área de Trabalho" "No Deskbar" "Não, obrigado"</pre>
+<p><img src="../images/apps-images/cli-alert.png" alt="cli-alert.png" /></p>
+</td></tr>
+<tr><td><p><span class="cli">filepanel</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">filepanel</span> exibe uma caixa de diálogo de abrir ou salvar arquivo e permite ao usuário escolher um arquivo ou localidade. Como um valor de retorno obtém-se o arquivo escolhido ou o caminho da pasta. Existem muitos parâmetros disponíveis, por exemplo para definir um diretório inicial, um título de janela, um nome padrão ao salvar ou restrições para os tipos de arquivos permitidos. Este é um exemplo de </p>
+<pre class="terminal">filepanel -s -t "Salve seu arquivo de log" -d ~/config/settings -n Fantastic.log</pre>
+<p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
+</td></tr>
+<tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">waitfor</span> é uma maneira elegante de aguardar por um aplicativo particular ou tarefa ser iniciado ou até ter terminado.</p>
+</td></tr>
+<tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">query</span> é a versão em linha de comando da janela Procurar. Na verdade, uma maneira rápida para gerar o termo de pesquisa é construir uma consulta na janela Procurar, converter para <span class="menu">por fórmula</span>, adicionar aspas duplas (<tt>"</tt>) no início e no fim e colar a sequência inteira após o comando <span class="cli">query</span> no Terminal ou no seu script.</p>
+</td></tr></table>
+
+<h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="cli-other" name="cli-other">Outros comandos</a></h3>
+
+<table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
+		<td><p><span class="cli">checkfs</span> é uma importante ferramenta para checar erros no seu sistema de arquivos. Simplesmente adicione o nome do volume ou dispositivo e ele irá executar através de todos os arquivos e corrigir inconsistências quando possível.</p>
+</td></tr>
+<tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">desklink</span> pode instalar um ícone para qualquer arquivo, pasta, consulta ou aplicativo na bandeja do Deskbar. Ele também oferece a opção de prover um menu de contexto quando clicar com o botão direito do mouse em um ícone para executar ações especiais. Como um exemplo, tente isto para adicionar o aplicativo de linha de comando <span class="app">screenshot</span> com várias opções (a "<tt>\</tt>" na primeira linha é apenas para a quebra de linha no Terminal):</p>
+<pre class="terminal"> desklink "cmd=Active window (2s):/bin/screenshot --window --border --delay 2" \
+"cmd=Remove replicant:desklink --remove=screenshot" /bin/screenshot
+</pre>
+<p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>
+</td></tr>
+<tr><td><p><span class="cli">diskimage</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">diskimage</span> permite registrar um arquivo regular como um dispositivo de disco. Por exemplo, pode-se registrar uma imagem anyboot do Haiku, montá-la no Rastreador e copiar, editar ou remover arquivos lá antes de usá-la como fonte no Instalador.</p>
+</td></tr>
+<tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">open</span> é uma pequena ferramenta muito prática. Com ela abre-se qualquer arquivo com seu aplicativo preferido, ou inicia um aplicativo específico pela sua assinatura sem a necessidade de conhecer seu caminho exato. Ela também trabalha com URLs e até com os diretórios "virtuais" <tt>.</tt> para o diretório atual e <tt>..</tt> para o superior, abrindo a pasta no Rastreador.</p>
+</td></tr>
+</table>
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="list-cli-apps.html">Lista de comandos</a> 
+::  <a href="../applications.html#cli-apps" class="uplink">Aplicativos
+</a> 
+</span></div>
+</div>
+
+</body>
+</html>

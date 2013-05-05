@@ -115,12 +115,19 @@
 #include <machine/cpufunc.h>
 
 
+struct resource;
+
+
 // TODO: x86 specific!
 #define I386_BUS_SPACE_IO			0
 #define I386_BUS_SPACE_MEM			1
 
 #define BUS_SPACE_MAXADDR_32BIT		0xffffffff
-#define BUS_SPACE_MAXADDR			0xffffffff
+#ifdef __x86_64__
+#	define BUS_SPACE_MAXADDR		0xffffffffffffffffull
+#else
+#	define BUS_SPACE_MAXADDR		0xffffffff
+#endif
 
 #define BUS_SPACE_MAXSIZE_32BIT		0xffffffff
 #define BUS_SPACE_MAXSIZE			0xffffffff
@@ -208,6 +215,14 @@ bus_space_write_region_1(bus_space_tag_t tag, bus_space_handle_t bsh,
 		void* _port_ = (void*) (bsh + offset);
 		memcpy(_port_, addr, count);
 	}
+}
+
+
+static inline void
+bus_space_set_region_4(bus_space_tag_t tag, bus_space_handle_t bsh,
+		       bus_size_t offset, u_int32_t value, size_t count)
+{
+	/* TODO implement */
 }
 
 

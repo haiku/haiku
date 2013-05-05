@@ -1,12 +1,12 @@
 1	swedish	x-vnd.Haiku-HPGSTranslator	3633584048
 Based on HPGS (http://hpgs.berlios.de)	ConfigView		Baserad på HPGS (http://hpgs.berlios.de)
-Error: Cannot imbue plot device to reader: %s\n	HPGSTranslator		Fel: Kan inte koppla plotter till läsaren: %s\n
+Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
 Error: Cannot process plot data %s\n	HPGSTranslator		Fel: Kan inte bearbeta plotterdata %s\n
 HPGS image	HPGSTranslator		HPGS bild
-HPGS image translator	HPGSTranslator		HPGS bildöversättning
+HPGSTranslator Settings	ConfigView		HPGS översättningsinställningar
+Error: Cannot imbue plot device to reader: %s\n	HPGSTranslator		Fel: Kan inte koppla plotter till läsaren: %s\n
 HPGS images	ConfigView		HPGS bilder
 HPGS images	HPGSTranslator		HPGS bilder
-HPGSTranslator Settings	ConfigView		HPGS översättningsinställningar
-Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
-Write error %s\n	HPGSTranslator		Skrivfel %s\n
 no hpgs\n	HPGSTranslator		ingen HPGS\n
+HPGS image translator	HPGSTranslator		HPGS bildöversättning
+Write error %s\n	HPGSTranslator		Skrivfel %s\n

@@ -31,33 +31,33 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef _MIME_TYPES_H
 #define _MIME_TYPES_H
 
+
 namespace BPrivate {
 
-#define	B_FILE_MIMETYPE		"application/octet-stream"
-#define	B_DIR_MIMETYPE		"application/x-vnd.Be-directory"
-#define	B_VOLUME_MIMETYPE	"application/x-vnd.Be-volume"
-#define	B_QUERY_MIMETYPE	"application/x-vnd.Be-query"
-#define	B_QUERY_TEMPLATE_MIMETYPE	"application/x-vnd.Be-queryTemplate"
-#define	B_LINK_MIMETYPE		"application/x-vnd.Be-symlink"
-#define	B_ROOT_MIMETYPE		"application/x-vnd.Be-root"
-#define	B_BOOKMARK_MIMETYPE	"application/x-vnd.Be-bookmark"
-#define	B_PERSON_MIMETYPE	"application/x-person"
+#define B_FILE_MIMETYPE				"application/octet-stream"
+#define B_DIR_MIMETYPE				"application/x-vnd.Be-directory"
+#define B_VOLUME_MIMETYPE			"application/x-vnd.Be-volume"
+#define B_QUERY_MIMETYPE			"application/x-vnd.Be-query"
+#define B_QUERY_TEMPLATE_MIMETYPE	"application/x-vnd.Be-queryTemplate"
+#define B_LINK_MIMETYPE				"application/x-vnd.Be-symlink"
+#define B_ROOT_MIMETYPE				"application/x-vnd.Be-root"
+#define B_BOOKMARK_MIMETYPE			"application/x-vnd.Be-bookmark"
+#define B_PERSON_MIMETYPE			"application/x-person"
 
-#define	B_PRINTER_MIMETYPE	"application/x-vnd.Be.printer"
-#define	B_PRINTER_SPOOL_MIMETYPE	"application/x-vnd.Be.printer-spool"
+#define B_PRINTER_MIMETYPE			"application/x-vnd.Be.printer"
+#define B_PRINTER_SPOOL_MIMETYPE	"application/x-vnd.Be.printer-spool"
 
-#define	kPlainTextMimeType	"text/plain"
+#define kPlainTextMimeType			"text/plain"
 
-#define	kBitmapMimeType		"image/x-vnd.Be-bitmap"
-#define	kLargeIconType		"icon/large"
-#define	kMiniIconType		"icon/mini"
+#define kBitmapMimeType				"image/x-vnd.Be-bitmap"
+#define kLargeIconType				"icon/large"
+#define kMiniIconType				"icon/mini"
 
 } // namespace BPrivate
 
 using namespace BPrivate;
 
-#endif
+#endif	// _MIME_TYPES_H

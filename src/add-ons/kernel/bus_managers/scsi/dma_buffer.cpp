@@ -51,7 +51,7 @@ is_sg_list_dma_safe(scsi_ccb *request)
 	}
 
 	// if there are no further restrictions - be happy
-	if (dma_boundary == ~0UL && alignment == 0 && max_sg_block_size == 0)
+	if (dma_boundary == ~(uint32)0 && alignment == 0 && max_sg_block_size == 0)
 		return true;
 
 	// argh - controller is a bit picky, so make sure he likes us
@@ -195,7 +195,7 @@ scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 			// TODO: Use 64 bit addresses, if possible!
 #endif
 		buffer->area = create_area_etc(B_SYSTEM_TEAM, "DMA buffer", size,
-			B_CONTIGUOUS, 0, 0, &virtualRestrictions, &physicalRestrictions,
+			B_CONTIGUOUS, 0, 0, 0, &virtualRestrictions, &physicalRestrictions,
 			(void**)&buffer->address);
 
 		if (buffer->area < 0) {

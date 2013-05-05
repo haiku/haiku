@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef SETTING_H
@@ -18,6 +18,7 @@ enum setting_type {
 	SETTING_TYPE_BOOL,
 	SETTING_TYPE_FLOAT,
 	SETTING_TYPE_OPTIONS,
+	SETTING_TYPE_BOUNDED,
 	SETTING_TYPE_RANGE,
 	SETTING_TYPE_RECT
 };
@@ -78,12 +79,20 @@ public:
 };
 
 
-class RangeSetting : public virtual Setting {
+class BoundedSetting : public virtual Setting {
 public:
 	virtual	setting_type		Type() const;
 
 	virtual	BVariant			LowerBound() const = 0;
 	virtual	BVariant			UpperBound() const = 0;
+};
+
+
+class RangeSetting : public virtual BoundedSetting {
+	virtual	setting_type		Type() const;
+
+	virtual	BVariant			LowerValue() const = 0;
+	virtual	BVariant			UpperValue() const = 0;
 };
 
 
@@ -164,9 +173,9 @@ private:
 };
 
 
-class RangeSettingImpl : public AbstractSetting, public RangeSetting {
+class BoundedSettingImpl : public AbstractSetting, public BoundedSetting {
 public:
-								RangeSettingImpl(const BString& id,
+								BoundedSettingImpl(const BString& id,
 									const BString& name,
 									const BVariant& lowerBound,
 									const BVariant& upperBound,
@@ -181,6 +190,30 @@ private:
 			BVariant			fLowerBound;
 			BVariant			fUpperBound;
 			BVariant			fDefaultValue;
+};
+
+
+class RangeSettingImpl : public AbstractSetting, public RangeSetting {
+public:
+								RangeSettingImpl(const BString& id,
+									const BString& name,
+									const BVariant& lowerBound,
+									const BVariant& upperBound,
+									const BVariant& lowerValue,
+									const BVariant& upperValue);
+
+	virtual	BVariant			DefaultValue() const;
+
+	virtual BVariant			LowerBound() const;
+	virtual	BVariant			UpperBound() const;
+	virtual BVariant			LowerValue() const;
+	virtual BVariant			UpperValue() const;
+
+private:
+			BVariant			fLowerBound;
+			BVariant			fUpperBound;
+			BVariant			fLowerValue;
+			BVariant			fUpperValue;
 };
 
 

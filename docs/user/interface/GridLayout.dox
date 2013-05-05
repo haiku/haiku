@@ -1,18 +1,22 @@
 /*
- * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation by:
- *   Alex Wilson <yourpalal2@gmail.com>
+ * Authors:
+ *		Alex Wilson, yourpalal2@gmail.com
+ *
  * Corresponds to:
- *   /trunk/headers/os/interface/GridLayout.h  rev 38207
- *   /trunk/src/kits/interface/GridLayout.cpp  rev 38207
+ *		headers/os/interface/GridLayout.h	rev 38207
+ *		src/kits/interface/GridLayout.cpp	rev 38207
  */
 
 
 /*!
 	\file GridLayout.h
-	Provides the BGridLayout class.
+	\ingroup interface
+	\ingroup layout
+	\ingroup libbe
+	\brief Provides the BGridLayout class.
 */
 
 
@@ -21,9 +25,8 @@
 	\ingroup interface
 	\ingroup layout
 	\ingroup libbe
-
 	\brief The BGridLayout class a BLayout subclass that arranges the items it
-	holds in a grid.
+		holds in a grid.
 
 	Each item in a BGridLayout receives a rectangular area which can span more
 	than a single row or column. The indexing of columns and rows is zero based,

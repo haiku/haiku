@@ -1,143 +1,29 @@
-1	norwegian_bokmål	x-vnd.Be-MAIL	3779892957
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-MAIL	700850788
+View	Mail		Vis
 %d - Date	Mail		%d - Dato
-%e - E-mail address	Mail		%e - E-postadresse
-%n - Full name	Mail		%n - Fullt navn
-Account from mail	Mail		Konto fra e-post
-Account:	Mail		Konto:
-Accounts…	Mail		Kontoer…
-Add	Mail		Legg til
-Add enclosure…	Mail		Legg til vedlegg…
-Add signature	Mail		Legg til signatur
-An error occurred trying to open this signature.	Mail		Det oppstod en feil ved åpning av denne signaturen.
-An error occurred trying to save the attachment.	Mail		En feil oppsto da vedlegget skulle lagres.
-An error occurred trying to save this signature.	Mail		En feil oppstod ved lagring av denne signaturen.
 Attach attributes:	Mail		Legg ved attributter:
-Attachments:	Mail		Vedlegg: 
-Auto signature:	Mail		Automatisk signatur
+Inconsistency occurred in the undo/redo buffer.	Mail		Inkonsistens oppsto i angre/gjenopprett-bufferen.
+An error occurred trying to save the attachment.	Mail		En feil oppsto da vedlegget skulle lagres.
+Copy to new	Mail		Kopier til ny
+Edit	Mail		Rediger
+Print	Mail		Skriv ut
+New mail message	Mail		Ny melding
 Automatic	Mail		Automatisk
 Automatically mark mail as read:	Mail		Marker e-post som lest automatisk:
-Bcc:	Mail		Blindkopi:
-Beginner	Mail		Nybegynner
-Button bar:	Mail		Verktøylinje:
-Cancel	Mail		Avbryt
-Cc:	Mail		Kopi til:
-Check spelling	Mail		Stavekontroll
-Close	Mail		Lukk
-Close and 	Mail		Lukk og
-Colored quotes:	Mail		Fargede sitater:
-Copy	Mail		Kopier
-Copy link location	Mail		Kopier lenkeadresse
-Copy to new	Mail		Kopier til ny
-Couldn't open this signature. Sorry.	Mail		Kan ikke åpne denne signaturen. Beklager.
-Cut	Mail		Klipp ut
-Date:	Mail		Dato:
-Decoding:	Mail		Dekoding:
-Default account:	Mail		Standardkonto:
-Delete	Mail		Slett
-Discard	Mail		Forkast
-Do you wish to save this message as a draft before closing?	Mail		Ønsker du å lagre denne meldingen som et utkast før lukking?
-Do you wish to send this message before closing?	Mail		Ønsker du å sende denne meldingen før lukking?
-Don't save	Mail		Ikke lagre
-E-mail draft could not be saved!	Mail		Utkastet til e-post kunne ikke lagres!
-Edit	Mail		Rediger
-Edit queries…	Mail		Rediger søk…
-Edit signatures…	Mail		Rediger signaturer…
-Encoding:	Mail		Koding:
-Expert	Mail		Ekspert
-File	Mail		Fil
-Find	Mail		Finn
-Find again	Mail		Finn igjen
-Find…	Mail		Finn…
-Font:	Mail		Font:
-Forward	Mail		Videresend
-Forward without attachments	Mail		Videresend uten vedlegg
-From:	Mail		Fra:
-Hide	Mail		Skjul
-Include file attributes in attachments	Mail		Inkluder filattributter i vedlegg
-Inconsistency occurred in the undo/redo buffer.	Mail		Inkonsistens oppsto i angre/gjenopprett-bufferen.
-Leave as '%s'	Mail		La være som '%s'
-Mail	System name		E-post
-Mail couldn't find its dictionary.	Mail		E-post kunne ikke finne ordboken
-Mail preferences	Mail		E-postinnstillinger
-Mailing	Mail		Sender e-post
-Message	Mail		Melding
-Move to trash	Mail		Flytt til søppelkurv
-Need Tracker to move items to trash	Mail		Trenger Tracker til å flytte objekter til søppelkurven
-New	Mail		Ny
-New mail message	Mail		Ny melding
-Next	Mail		Neste
-Next message	Mail		Neste melding
-No file attributes, just plain data	Mail		Ingen filattributter, bare data
-No matches	Mail		Ingen treff
-None	Mail		Ingen
-OK	Mail		OK
-Off	Mail		Av
-On	Mail		På
-Only files can be added as attachments.	Mail		Bare filer kan legges ved som vedlegg.
-Open	Mail		Åpne
-Open attachment	Mail		Åpne vedlegg
-Open draft	Mail		Åpne utkast
-Open this link	Mail		Åpne lenke
-Page setup…	Mail		Sideoppsett…
-Paste	Mail		Lim inn
-Preferences…	Mail		Innstillinger…
-Previous	Mail		Forrige
-Previous message	Mail		Forrige melding
-Print	Mail		Skriv ut
-Print…	Mail		Skriv ut…
-Put your favorite e-mail queries and query templates in this folder.	Mail		Legg dine favorittsøk og søkemaler for e-post i denne mappen.
-Queries	Mail		Spørringer
-Quit	Mail		Avslutt
-Quote	Mail		Sitat
-Random	Mail		Tilfeldig
-Read 	Mail		Les
-Really delete this signature? This cannot be undone.	Mail		Er du sikker på at du vil slette signaturen? Dette kan ikke omgjøres.
-Redo	Mail		Gjenopprett
-Remove attachment	Mail		Fjern vedlegg
-Remove enclosure	Mail		Fjern vedlegg
-Remove quote	Mail		Fjern sitering
-Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Fjerning av vedlegg fra videresendt epost er foreløpig ikke implementert!\nDet vil ikke fungere korrekt.
-Reply	Mail		Svar
-Reply account:	Mail		Konto for svar
-Reply preamble:	Mail		Innled svar med:
-Reply to all	Mail		Svar til alle
-Reply to sender	Mail		Svar til avsender
-Resend	Mail		Send på nytt
-Revert	Mail		Tilbakestill
-Save	Mail		Lagre
-Save address	Mail		Lagre adresse
-Save as draft	Mail		Lagre som utkast
-Save attachment…	Mail		Lagre vedlegg…
-Save changes to this signature?	Mail		Lagre endringer i denne signaturen?
-Select all	Mail		Merk alle
-Send	Mail		Send
-Send message	Mail		Send melding
-Set to %s	Mail		Sett til %s
-Set to Saved	Mail		Merk som lagret
-Set to…	Mail		Sett til…
-Show header	Mail		Vis header
-Show icons & labels	Mail		Vis ikoner og tekst
-Show icons only	Mail		Vis bare ikoner
-Show raw message	Mail		Vis råmelding
-Signature	Mail		Signatur
-Signature:	Mail		Signatur:
-Signatures	Mail		Signaturer
-Size:	Mail		Størrelse:
-Sorry	Mail		Beklager
-Sorry, could not find an application that supports the 'Person' data type.	Mail		Beklager, kunne ikke finne et program som støtter datatypen 'Person'.
-Start now	Mail		Start nå
-Subject:	Mail		Emne:
-Text wrapping:	Mail		Tekstbryting
-The mail_daemon could not be started:\n\t	Mail		mail_daemon kunne ikke startes:\n\t
-The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		mail_daemon kjører ikke. Meldingen er lagt i køen og vil bli sendt når mail_daemon blir startet.
-There is no installed handler for URL links.	Mail		Det er ikke installert noen behandler for URL-lenker.
-Title:	Mail		Tittel:
-To:	Mail		Til:
-Trash	Mail		Søppel
-Undo	Mail		Angre
-Unread	Mail		Ulest
-Use default account	Mail		Bruk standardkonto
-User interface	Mail		Brukergrensesnitt
-View	Mail		Vis
-\\n - Newline	Mail		\\n - Ny linje
 helpful message	Mail		nyttig melding
+Colored quotes:	Mail		Fargede sitater:
+Subject:	Mail		Emne:
+Reply to all	Mail		Svar til alle
+Show icons & labels	Mail		Vis ikoner og tekst
+Remove attachment	Mail		Fjern vedlegg
+Button bar:	Mail		Verktøylinje:
+Beginner	Mail		Nybegynner
+Don't save	Mail		Ikke lagre
+Expert	Mail		Ekspert
+Reply account:	Mail		Konto for svar
+Discard	Mail		Forkast
+Message	Mail		Melding
+Reply to sender	Mail		Svar til avsender
+There is no installed handler for URL links.	Mail		Det er ikke installert noen behandler for URL-lenker.
+Signature	Mail		Signatur
+Find again	Mail		Finn igjen

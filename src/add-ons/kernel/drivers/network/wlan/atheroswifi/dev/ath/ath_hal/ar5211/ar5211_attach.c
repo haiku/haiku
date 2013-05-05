@@ -73,6 +73,7 @@ static const struct ath_hal_private ar5211hal = {{
 	.ah_procTxDesc			= ar5211ProcTxDesc,
 	.ah_getTxIntrQueue		= ar5211GetTxIntrQueue,
 	.ah_reqTxIntrDesc 		= ar5211IntrReqTxDesc,
+	.ah_getTxCompletionRates	= ar5211GetTxCompletionRates,
 
 	/* RX Functions */
 	.ah_getRxDP			= ar5211GetRxDP,
@@ -88,7 +89,8 @@ static const struct ath_hal_private ar5211hal = {{
 	.ah_setRxFilter			= ar5211SetRxFilter,
 	.ah_setupRxDesc			= ar5211SetupRxDesc,
 	.ah_procRxDesc			= ar5211ProcRxDesc,
-	.ah_rxMonitor			= ar5211AniPoll,
+	.ah_rxMonitor			= ar5211RxMonitor,
+	.ah_aniPoll			= ar5211AniPoll,
 	.ah_procMibEvent		= ar5211MibEvent,
 
 	/* Misc Functions */
@@ -146,6 +148,7 @@ static const struct ath_hal_private ar5211hal = {{
 	.ah_beaconInit			= ar5211BeaconInit,
 	.ah_setStationBeaconTimers	= ar5211SetStaBeaconTimers,
 	.ah_resetStationBeaconTimers	= ar5211ResetStaBeaconTimers,
+	.ah_getNextTBTT			= ar5211GetNextTBTT,
 
 	/* Interrupt Functions */
 	.ah_isInterruptPending		= ar5211IsInterruptPending,
@@ -188,7 +191,8 @@ ar5211GetRadioRev(struct ath_hal *ah)
  */
 static struct ath_hal *
 ar5211Attach(uint16_t devid, HAL_SOFTC sc,
-	HAL_BUS_TAG st, HAL_BUS_HANDLE sh, HAL_STATUS *status)
+	HAL_BUS_TAG st, HAL_BUS_HANDLE sh, uint16_t *eepromdata,
+	HAL_STATUS *status)
 {
 #define	N(a)	(sizeof(a)/sizeof(a[0]))
 	struct ath_hal_5211 *ahp;
@@ -197,13 +201,13 @@ ar5211Attach(uint16_t devid, HAL_SOFTC sc,
 	uint16_t eeval;
 	HAL_STATUS ecode;
 
-	HALDEBUG(AH_NULL, HAL_DEBUG_ATTACH, "%s: sc %p st %p sh %p\n",
+	HALDEBUG_G(AH_NULL, HAL_DEBUG_ATTACH, "%s: sc %p st %p sh %p\n",
 	    __func__, sc, (void*) st, (void*) sh);
 
 	/* NB: memory is returned zero'd */
 	ahp = ath_hal_malloc(sizeof (struct ath_hal_5211));
 	if (ahp == AH_NULL) {
-		HALDEBUG(AH_NULL, HAL_DEBUG_ANY,
+		HALDEBUG_G(AH_NULL, HAL_DEBUG_ANY,
 		    "%s: cannot allocate memory for state block\n", __func__);
 		ecode = HAL_ENOMEM;
 		goto bad;
@@ -505,6 +509,9 @@ ar5211FillCapabilityInfo(struct ath_hal *ah)
 			| HAL_INT_BNR
 			| HAL_INT_TIM
 			;
+
+	pCap->hal4kbSplitTransSupport = AH_TRUE;
+	pCap->halHasRxSelfLinkedTail = AH_TRUE;
 
 	/* XXX might be ok w/ some chip revs */
 	ahpriv->ah_rxornIsFatal = AH_TRUE;

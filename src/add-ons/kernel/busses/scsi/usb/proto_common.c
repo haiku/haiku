@@ -1,24 +1,24 @@
 /**
  *
  * TODO: description
- * 
- * This file is a part of USB SCSI CAM for Haiku OS.
+ *
+ * This file is a part of USB SCSI CAM for Haiku.
  * May be used under terms of the MIT License
  *
  * Author(s):
  * 	Siarzhuk Zharski <imker@gmx.li>
- * 	
- * 	
+ *
+ *
  */
 #include <string.h>
 
 #include "usb_scsi.h"
- 
-#include "device_info.h" 
-#include "proto_common.h" 
-#include "tracing.h" 
-#include "usb_defs.h" 
-#include "scsi_commands.h" 
+
+#include "device_info.h"
+#include "proto_common.h"
+#include "tracing.h"
+#include "usb_defs.h"
+#include "scsi_commands.h"
 
 /**
 	\fn:bulk_callback
@@ -27,7 +27,7 @@
 	\param data:???
 	\param actual_len:???
 	\return:???
-	
+
 	???
 */
 void bulk_callback(void	*cookie, status_t status, void* data, uint32 actual_len)
@@ -40,14 +40,14 @@ void bulk_callback(void	*cookie, status_t status, void* data, uint32 actual_len)
 		udi->actual_len = actual_len;
 		if(udi->status != B_CANCELED)
 			release_sem(udi->trans_sem);
-	}		
+	}
 }
 
 /**
 	\fn:exec_io
 	\param udi: ???
 	\return:???
-	
+
 	???
 */
 status_t process_data_io(usb_device_info *udi, //sg_buffer *sgb,
@@ -64,15 +64,15 @@ status_t process_data_io(usb_device_info *udi, //sg_buffer *sgb,
 			if(udi->status == B_DEV_STALLED){
 				status_t st=(*udi->usb_m->clear_feature)(pipe, USB_FEATURE_ENDPOINT_HALT);
 				TRACE_ALWAYS("clear_on_STALL:%08x\n",st);
-			}		 
+			}
 		}else{
-			TRACE_ALWAYS("process_data_io:acquire_sem failed:%08x\n", status); 
+			TRACE_ALWAYS("process_data_io:acquire_sem failed:%08x\n", status);
 			(*udi->usb_m->cancel_queued_transfers)(pipe);
-		} 
+		}
 	} else {
 		TRACE_ALWAYS("process_data_io:queue_bulk_v failed:%08x\n", status);
 	}
-	TRACE_DATA_IO("process_data_io:processed:%d;status:%08x\n", udi->actual_len, status);	
+	TRACE_DATA_IO("process_data_io:processed:%d;status:%08x\n", udi->actual_len, status);
 	return status;
 }
 
@@ -124,7 +124,7 @@ void sense_callback(struct _usb_device_info *udi, CCB_SCSIIO *ccbio,
 {
 	ccbio->cam_sense_resid = residue;
 	switch(status){
-	case B_CMD_UNKNOWN:	
+	case B_CMD_UNKNOWN:
 	case B_CMD_FAILED:
 	case B_OK:{
 			bool b_own_data = (ccbio->cam_sense_ptr == NULL);
@@ -147,7 +147,7 @@ void sense_callback(struct _usb_device_info *udi, CCB_SCSIIO *ccbio,
 	 //			 ccbio->cam_ch.cam_status = CAM_REQ_CMP_ERR /*| CAM_AUTOSNS_VALID*/;
 	 //			 ccbio->cam_scsi_status = SCSI_STATUS_CHECK_CONDITION;
 					TRACE("sense_callback: sense still not handled...\n");
-				}	
+				}
 			}
 		}
 		break;

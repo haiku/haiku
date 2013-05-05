@@ -1,10 +1,11 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2012, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  * 		Vegard Wærp, vegarwa@online.no
+ *		Alexander von Gluck, kallisti5@unixzen.com
  */
 
 
@@ -16,6 +17,7 @@
 #include <stdlib.h>
 #include <string>
 #include <string.h>
+#include <syslog.h>
 #include <unistd.h>
 
 #include <arpa/inet.h>
@@ -64,6 +66,7 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 
 private:
+			bool				_IsValidFamily(uint32 family);
 			bool				_IsValidInterface(BNetworkInterface& interface);
 			void				_RemoveInvalidInterfaces();
 			status_t			_RemoveInterface(const char* name);
@@ -77,13 +80,15 @@ private:
 			status_t			_ConfigureDevice(const char* path);
 			void				_ConfigureDevices(const char* path,
 									BMessage* suggestedInterface = NULL);
-			void				_ConfigureInterfaces(
+			void				_ConfigureInterfacesFromSettings(
 									BMessage* _missingDevice = NULL);
+			void				_ConfigureIPv6LinkLocal(const char* name);
+
 			void				_BringUpInterfaces();
 			void				_StartServices();
 			status_t			_HandleDeviceMonitor(BMessage* message);
 
-			status_t			_AutoJoinNetwork(const char* name);
+			status_t			_AutoJoinNetwork(const BMessage& message);
 			status_t			_JoinNetwork(const BMessage& message,
 									const char* name = NULL);
 			status_t			_LeaveNetwork(const BMessage& message);
@@ -104,13 +109,6 @@ struct address_family {
 	const char*	identifiers[4];
 };
 
-
-// AF_INET6 family
-#if INET6
-static bool inet6_parse_address(const char* string, sockaddr* address);
-static void inet6_set_any_address(sockaddr* address);
-static void inet6_set_port(sockaddr* address, int32 port);
-#endif
 
 static const address_family kFamilies[] = {
 	{
@@ -209,44 +207,6 @@ parse_address(int32& family, const char* argument, BNetworkAddress& address)
 }
 
 
-#if INET6
-static bool
-inet6_parse_address(const char* string, sockaddr* _address)
-{
-	sockaddr_in6& address = *(sockaddr_in6*)_address;
-
-	if (inet_pton(AF_INET6, string, &address.sin6_addr) != 1)
-		return false;
-
-	address.sin6_family = AF_INET6;
-	address.sin6_len = sizeof(sockaddr_in6);
-	address.sin6_port = 0;
-	address.sin6_flowinfo = 0;
-	address.sin6_scope_id = 0;
-
-	return true;
-}
-
-
-void
-inet6_set_any_address(sockaddr* _address)
-{
-	sockaddr_in6& address = *(sockaddr_in6*)_address;
-	memset(&address, 0, sizeof(sockaddr_in6));
-	address.sin6_family = AF_INET6;
-	address.sin6_len = sizeof(struct sockaddr_in6);
-}
-
-
-void
-inet6_set_port(sockaddr* _address, int32 port)
-{
-	sockaddr_in6& address = *(sockaddr_in6*)_address;
-	address.sin6_port = port;
-}
-#endif
-
-
 //	#pragma mark -
 
 
@@ -278,6 +238,7 @@ NetServer::AboutRequested()
 	font.SetFace(B_BOLD_FACE);
 	view->SetFontAndColor(0, 17, &font);
 
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go(NULL);
 }
 
@@ -307,7 +268,7 @@ NetServer::MessageReceived(BMessage* message)
 
 		case kMsgInterfaceSettingsUpdated:
 		{
-			_ConfigureInterfaces();
+			_ConfigureInterfacesFromSettings();
 			break;
 		}
 
@@ -360,6 +321,12 @@ NetServer::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case kMsgAutoJoinNetwork:
+		{
+			_AutoJoinNetwork(*message);
+			break;
+		}
+
 		case kMsgCountPersistentNetworks:
 		{
 			BMessage reply(B_REPLY);
@@ -390,9 +357,10 @@ NetServer::MessageReceived(BMessage* message)
 
 		case kMsgAddPersistentNetwork:
 		{
-			status_t result = _ConvertNetworkToSettings(*message);
+			BMessage network = *message;
+			status_t result = _ConvertNetworkToSettings(network);
 			if (result == B_OK)
-				result = fSettings.AddNetwork(*message);
+				result = fSettings.AddNetwork(network);
 
 			BMessage reply(B_REPLY);
 			reply.AddInt32("status", result);
@@ -417,6 +385,22 @@ NetServer::MessageReceived(BMessage* message)
 			BApplication::MessageReceived(message);
 			return;
 	}
+}
+
+
+/*!	Checks if provided address family is valid.
+	Families include AF_INET, AF_INET6, AF_APPLETALK, etc
+*/
+bool
+NetServer::_IsValidFamily(uint32 family)
+{
+	// Mostly verifies add-on is present
+	int socket = ::socket(family, SOCK_DGRAM, 0);
+	if (socket < 0)
+		return false;
+
+	close(socket);
+	return true;
 }
 
 
@@ -554,25 +538,8 @@ NetServer::_ConfigureInterface(BMessage& message)
 		}
 	}
 
-	BNetworkDevice device(name);
-	if (device.IsWireless()) {
-		const char* networkName;
-		if (message.FindString("network", &networkName) == B_OK) {
-			// join configured network
-			status_t status = _JoinNetwork(message, networkName);
-			if (status != B_OK) {
-				fprintf(stderr, "%s: joining network \"%s\" failed: %s\n",
-					interface.Name(), networkName, strerror(status));
-			}
-		} else {
-			// auto select network to join
-			status_t status = _AutoJoinNetwork(name);
-			if (status != B_OK) {
-				fprintf(stderr, "%s: auto joining network failed: %s\n",
-					interface.Name(), strerror(status));
-			}
-		}
-	}
+	// Set up IPv6 Link Local address (based on MAC, if not loopback)
+	_ConfigureIPv6LinkLocal(name);
 
 	BMessage addressMessage;
 	for (int32 index = 0; message.FindMessage("address", index,
@@ -619,7 +586,7 @@ NetServer::_ConfigureInterface(BMessage& message)
 			if (addressMessage.FindString("broadcast", &string) == B_OK)
 				parse_address(family, string, broadcast);
 		}
-		
+
 		if (autoConfig) {
 			_QuitLooperForDevice(name);
 			startAutoConfig = true;
@@ -686,6 +653,19 @@ NetServer::_ConfigureInterface(BMessage& message)
 			if (status != B_OK) {
 				fprintf(stderr, "%s: Setting metric failed: %s\n", Name(),
 					strerror(status));
+			}
+		}
+	}
+
+	const char* networkName;
+	if (message.FindString("network", &networkName) == B_OK) {
+		// We want to join a specific network.
+		BNetworkDevice device(name);
+		if (device.IsWireless() && !device.HasLink()) {
+			status_t status = _JoinNetwork(message, networkName);
+			if (status != B_OK) {
+				fprintf(stderr, "%s: joining network \"%s\" failed: %s\n",
+					interface.Name(), networkName, strerror(status));
 			}
 		}
 	}
@@ -806,7 +786,7 @@ NetServer::_ConfigureDevices(const char* startPath,
 
 
 void
-NetServer::_ConfigureInterfaces(BMessage* _missingDevice)
+NetServer::_ConfigureInterfacesFromSettings(BMessage* _missingDevice)
 {
 	BMessage interface;
 	uint32 cookie = 0;
@@ -844,21 +824,19 @@ void
 NetServer::_BringUpInterfaces()
 {
 	// we need a socket to talk to the networking stack
-	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
-	if (socket < 0) {
+	if (!_IsValidFamily(AF_LINK)) {
 		fprintf(stderr, "%s: The networking stack doesn't seem to be "
 			"available.\n", Name());
 		Quit();
 		return;
 	}
-	close(socket);
 
 	_RemoveInvalidInterfaces();
 
 	// First, we look into the settings, and try to bring everything up from there
 
 	BMessage missingDevice;
-	_ConfigureInterfaces(&missingDevice);
+	_ConfigureInterfacesFromSettings(&missingDevice);
 
 	// check configuration
 
@@ -866,11 +844,18 @@ NetServer::_BringUpInterfaces()
 		// there is no loopback interface, create one
 		BMessage interface;
 		interface.AddString("device", "loop");
-		BMessage address;
-		address.AddString("family", "inet");
-		address.AddString("address", "127.0.0.1");
-		interface.AddMessage("address", &address);
+		BMessage v4address;
+		v4address.AddString("family", "inet");
+		v4address.AddString("address", "127.0.0.1");
+		interface.AddMessage("address", &v4address);
 
+		// Check for IPv6 support and add ::1
+		if (_IsValidFamily(AF_INET6)) {
+			BMessage v6address;
+			v6address.AddString("family", "inet6");
+			v6address.AddString("address", "::1");
+			interface.AddMessage("address", &v6address);
+		}
 		_ConfigureInterface(interface);
 	}
 
@@ -882,6 +867,86 @@ NetServer::_BringUpInterfaces()
 		_ConfigureDevices("/dev/net",
 			missingDevice.HasString("device") ? &missingDevice : NULL);
 	}
+}
+
+
+/*!	Configure the link local address based on the network card's MAC address
+	if this isn't a loopback device.
+*/
+void
+NetServer::_ConfigureIPv6LinkLocal(const char* name)
+{
+	// Check for IPv6 support
+	if (!_IsValidFamily(AF_INET6))
+		return;
+
+	BNetworkInterface interface(name);
+
+	// Lets make sure this is *not* the loopback interface
+	if ((interface.Flags() & IFF_LOOPBACK) != 0)
+		return;
+
+	BNetworkAddress link;
+	status_t result = interface.GetHardwareAddress(link);
+
+	if (result != B_OK || link.LinkLevelAddressLength() != 6)
+		return;
+
+	const uint8* mac = link.LinkLevelAddress();
+
+	// Check for a few failure situations
+	static const uint8 zeroMac[6] = {0, 0, 0, 0, 0, 0};
+	static const uint8 fullMac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+	if (memcmp(mac, zeroMac, 6) == 0
+		|| memcmp(mac, fullMac, 6) == 0) {
+		// Mac address is all 0 or all FF's
+		syslog(LOG_DEBUG, "%s: MacAddress for interface '%s' is invalid.",
+			__func__, name);
+		return;
+	}
+
+	// Generate a Link Local Scope address
+	// (IPv6 address based on Mac address)
+	in6_addr addressRaw;
+	memset(addressRaw.s6_addr, 0, sizeof(addressRaw.s6_addr));
+	addressRaw.s6_addr[0] = 0xfe;
+	addressRaw.s6_addr[1] = 0x80;
+	addressRaw.s6_addr[8] = mac[0] ^ 0x02;
+	addressRaw.s6_addr[9] = mac[1];
+	addressRaw.s6_addr[10] = mac[2];
+	addressRaw.s6_addr[11] = 0xff;
+	addressRaw.s6_addr[12] = 0xfe;
+	addressRaw.s6_addr[13] = mac[3];
+	addressRaw.s6_addr[14] = mac[4];
+	addressRaw.s6_addr[15] = mac[5];
+
+	BNetworkAddress localLinkAddress(addressRaw, 0);
+	BNetworkAddress localLinkMask("ffff:ffff:ffff:ffff::"); // 64
+	BNetworkAddress localLinkBroadcast("fe80::ffff:ffff:ffff:ffff");
+
+	if (interface.FindAddress(localLinkAddress) >= 0) {
+		// uhoh... already has a local link address
+
+		/*	TODO: Check for any local link scope addresses assigned to card
+			There isn't any flag at the moment though for address scope
+		*/
+		syslog(LOG_DEBUG, "%s: Local Link address already assigned to %s\n",
+			__func__, name);
+		return;
+	}
+
+	BNetworkInterfaceAddress interfaceAddress;
+	interfaceAddress.SetAddress(localLinkAddress);
+	interfaceAddress.SetMask(localLinkMask);
+	interfaceAddress.SetBroadcast(localLinkMask);
+
+	/*	TODO: Duplicate Address Detection.  (DAD)
+		Need to blast an icmp packet over the IPv6 network from :: to ensure
+		there aren't duplicate MAC addresses on the network. (definitely an
+		edge case, but a possible issue)
+	*/
+
+	interface.AddAddress(interfaceAddress);
 }
 
 
@@ -906,27 +971,28 @@ NetServer::_HandleDeviceMonitor(BMessage* message)
 		|| message->FindString("path", &path) != B_OK)
 		return B_BAD_VALUE;
 
-	if (strncmp(path, "/dev/net", 9)) {
-		// not a device entry, ignore
+	if (strncmp(path, "/dev/net/", 9)) {
+		// not a valid device entry, ignore
 		return B_NAME_NOT_FOUND;
 	}
-			
+
 	if (opcode == B_ENTRY_CREATED)
 		_ConfigureDevice(path);
 	else
 		_RemoveInterface(path);
-		
+
 	return B_OK;
 }
 
 
 status_t
-NetServer::_AutoJoinNetwork(const char* name)
+NetServer::_AutoJoinNetwork(const BMessage& message)
 {
-	BNetworkDevice device(name);
+	const char* name = NULL;
+	if (message.FindString("device", &name) != B_OK)
+		return B_BAD_VALUE;
 
-	BMessage message;
-	message.AddString("device", name);
+	BNetworkDevice device(name);
 
 	// Choose among configured networks
 
@@ -1047,30 +1113,39 @@ NetServer::_JoinNetwork(const BMessage& message, const char* name)
 		}
 	}
 
-	if (!askForConfig
-		&& network.authentication_mode == B_NETWORK_AUTHENTICATION_NONE) {
-		// we join the network ourselves
-		status_t status = set_80211(deviceName, IEEE80211_IOC_SSID,
-			network.name, strlen(network.name));
-		if (status != B_OK) {
-			fprintf(stderr, "%s: joining SSID failed: %s\n", name,
-				strerror(status));
-			return status;
+	// We always try to join via the wpa_supplicant. Even if we could join
+	// ourselves, we need to make sure that the wpa_supplicant knows about
+	// our intention, as otherwise it would interfere with it.
+
+	BMessenger wpaSupplicant(kWPASupplicantSignature);
+	if (!wpaSupplicant.IsValid()) {
+		// The wpa_supplicant isn't running yet, we may join ourselves.
+		if (!askForConfig
+			&& network.authentication_mode == B_NETWORK_AUTHENTICATION_NONE) {
+			// We can join this network ourselves.
+			status_t status = set_80211(deviceName, IEEE80211_IOC_SSID,
+				network.name, strlen(network.name));
+			if (status != B_OK) {
+				fprintf(stderr, "%s: joining SSID failed: %s\n", name,
+					strerror(status));
+				return status;
+			}
 		}
 
-		return B_OK;
+		// We need the supplicant, try to launch it.
+		status_t status = be_roster->Launch(kWPASupplicantSignature);
+		if (status != B_OK && status != B_ALREADY_RUNNING)
+			return status;
+
+		wpaSupplicant.SetTo(kWPASupplicantSignature);
+		if (!wpaSupplicant.IsValid())
+			return B_ERROR;
 	}
-
-	// Join via wpa_supplicant
-
-	status_t status = be_roster->Launch(kWPASupplicantSignature);
-	if (status != B_OK && status != B_ALREADY_RUNNING)
-		return status;
 
 	// TODO: listen to notifications from the supplicant!
 
 	BMessage join(kMsgWPAJoinNetwork);
-	status = join.AddString("device", deviceName);
+	status_t status = join.AddString("device", deviceName);
 	if (status == B_OK)
 		status = join.AddString("name", network.name);
 	if (status == B_OK)
@@ -1082,7 +1157,6 @@ NetServer::_JoinNetwork(const BMessage& message, const char* name)
 	if (status != B_OK)
 		return status;
 
-	BMessenger wpaSupplicant(kWPASupplicantSignature);
 	status = wpaSupplicant.SendMessage(&join);
 	if (status != B_OK)
 		return status;
@@ -1094,8 +1168,50 @@ NetServer::_JoinNetwork(const BMessage& message, const char* name)
 status_t
 NetServer::_LeaveNetwork(const BMessage& message)
 {
-	// TODO: not yet implemented
-	return B_NOT_SUPPORTED;
+	const char* deviceName;
+	if (message.FindString("device", &deviceName) != B_OK)
+		return B_BAD_VALUE;
+
+	int32 reason;
+	if (message.FindInt32("reason", &reason) != B_OK)
+		reason = IEEE80211_REASON_AUTH_LEAVE;
+
+	// We always try to send the leave request to the wpa_supplicant.
+
+	BMessenger wpaSupplicant(kWPASupplicantSignature);
+	if (wpaSupplicant.IsValid()) {
+		BMessage leave(kMsgWPALeaveNetwork);
+		status_t status = leave.AddString("device", deviceName);
+		if (status == B_OK)
+			status = leave.AddInt32("reason", reason);
+		if (status != B_OK)
+			return status;
+
+		status = wpaSupplicant.SendMessage(&leave);
+		if (status == B_OK)
+			return B_OK;
+	}
+
+	// The wpa_supplicant doesn't seem to be running, check if this was an open
+	// network we connected ourselves.
+	BNetworkDevice device(deviceName);
+	wireless_network network;
+
+	uint32 cookie = 0;
+	if (device.GetNextAssociatedNetwork(cookie, network) != B_OK
+		|| network.authentication_mode != B_NETWORK_AUTHENTICATION_NONE) {
+		// We didn't join ourselves, we can't do much.
+		return B_ERROR;
+	}
+
+	// We joined ourselves, so we can just disassociate again.
+	ieee80211req_mlme mlmeRequest;
+	memset(&mlmeRequest, 0, sizeof(mlmeRequest));
+	mlmeRequest.im_op = IEEE80211_MLME_DISASSOC;
+	mlmeRequest.im_reason = reason;
+
+	return set_80211(deviceName, IEEE80211_IOC_MLME, &mlmeRequest,
+		sizeof(mlmeRequest));
 }
 
 

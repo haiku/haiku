@@ -22,8 +22,8 @@
 #include "WizardView.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "DrivesPage"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "DrivesPage"
 
 
 const uint32 kMsgSelectionChanged = 'slch';

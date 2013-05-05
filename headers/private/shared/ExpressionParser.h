@@ -3,8 +3,9 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		John Scipione <jscipione@gmail.com>
+ *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  */
 #ifndef EXPRESSION_PARSER_H
 #define EXPRESSION_PARSER_H
@@ -12,8 +13,6 @@
 
 #include <String.h>
 
-
-class Tokenizer;
 
 class ParseException {
  public:
@@ -34,13 +33,16 @@ class ParseException {
 };
 
 struct Function;
-struct Token;
 class MAPM;
 
 class ExpressionParser {
+
  public:
 								ExpressionParser();
 								~ExpressionParser();
+
+			bool				DegreeMode();
+			void				SetDegreeMode(bool degrees);
 
 			void				SetSupportHexInput(bool enabled);
 
@@ -49,7 +51,10 @@ class ExpressionParser {
 			double				EvaluateToDouble(const char* expressionString);
 
  private:
+			struct Token;
+			class Tokenizer;
 
+ private:
 			MAPM				_ParseBinary();
 			MAPM				_ParseSum();
 			MAPM				_ParseProduct();
@@ -64,6 +69,8 @@ class ExpressionParser {
 			void				_EatToken(int32 type);
 
 			Tokenizer*			fTokenizer;
+
+			bool				fDegreeMode;
 };
 
 #endif // EXPRESSION_PARSER_H

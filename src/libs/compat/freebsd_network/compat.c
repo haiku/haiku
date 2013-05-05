@@ -74,9 +74,9 @@ find_own_image()
 	int32 cookie = 0;
 	image_info info;
 	while (get_next_image_info(B_SYSTEM_TEAM, &cookie, &info) == B_OK) {
-		if (((uint32)info.text <= (uint32)find_own_image
-			&& (uint32)info.text + (uint32)info.text_size
-				> (uint32)find_own_image)) {
+		if (((addr_t)info.text <= (addr_t)find_own_image
+			&& (addr_t)info.text + (addr_t)info.text_size
+				> (addr_t)find_own_image)) {
 			// found our own image
 			return info.id;
 		}
@@ -172,6 +172,14 @@ device_t
 device_get_parent(device_t dev)
 {
 	return dev->parent;
+}
+
+
+devclass_t
+device_get_devclass(device_t dev)
+{
+	// TODO find out what to do
+	return 0;
 }
 
 
@@ -323,8 +331,10 @@ device_add_child(device_t parent, const char *name, int unit)
 			snprintf(symbol, sizeof(symbol), "__fbsd_%s_%s", name,
 				parent->driver->name);
 			if (get_image_symbol(find_own_image(), symbol, B_SYMBOL_TYPE_DATA,
-					(void **)&driver) == B_OK)
+					(void **)&driver) == B_OK) {
 				child = new_device(*driver);
+			} else
+				device_printf(parent, "couldn't find symbol %s\n", symbol);
 		}
 	} else
 		child = new_device(NULL);
@@ -362,6 +372,8 @@ device_delete_child(device_t parent, device_t child)
 
 	if (parent != NULL)
 		list_remove_item(&parent->children, child);
+	else
+		list_remove_item(&sRootDevices, child);
 
 	// We differentiate from the FreeBSD logic here - it will first delete
 	// the children, and will then detach the device.
@@ -631,9 +643,10 @@ pmap_kextract(vm_offset_t virtualAddress)
 	physical_entry entry;
 	status_t status = get_memory_map((void *)virtualAddress, 1, &entry, 1);
 	if (status < B_OK) {
-		panic("fbsd compat: get_memory_map failed for %p, error %08lx\n",
-			(void *)virtualAddress, status);
+		panic("fbsd compat: get_memory_map failed for %p, error %08" B_PRIx32
+			"\n", (void *)virtualAddress, status);
 	}
 
 	return (vm_paddr_t)entry.address;
 }
+

@@ -24,8 +24,8 @@
 #include "SpoolFolder.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "JobListView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "JobListView"
 
 
 // #pragma mark -- JobListView
@@ -42,7 +42,7 @@ JobListView::JobListView(BRect frame)
 JobListView::~JobListView()
 {
 	while (!IsEmpty())
-		delete RemoveItem(0L);
+		delete RemoveItem((int32)0);
 }
 
 
@@ -61,7 +61,7 @@ JobListView::SetSpoolFolder(SpoolFolder* folder)
 {
 	// clear list
 	while (!IsEmpty())
-		delete RemoveItem(0L);
+		delete RemoveItem((int32)0);
 
 	if (folder == NULL)
 		return;

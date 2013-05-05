@@ -648,6 +648,9 @@ Model::~Model()
 	delete[] fEvents;
 
 	free(fEventData);
+
+	for (int32 i = 0; void* data = fAssociatedData.ItemAt(i); i++)
+		free(data);
 }
 
 
@@ -692,6 +695,20 @@ Model::ClosestEventIndex(nanotime_t eventTime) const
 	}
 
 	return lower;
+}
+
+
+bool
+Model::AddAssociatedData(void* data)
+{
+	return fAssociatedData.AddItem(data);
+}
+
+
+void
+Model::RemoveAssociatedData(void* data)
+{
+	fAssociatedData.RemoveItem(data);
 }
 
 

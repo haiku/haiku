@@ -1,13 +1,13 @@
-1	swedish	x-vnd.Be-WORK	3592128290
-About Workspaces…	Workspaces		Om Arbetsytor
-Always on top	Workspaces		Alltid överst
-Auto-raise	Workspaces		Höj upp automatiskt
-Change workspace count…	Workspaces		Ändra antalet arbetsytor...
+1	swedish	x-vnd.Be-WORK	658966565
 Invalid argument: %s\n	Workspaces		Felaktigt argument: %s\n
-OK	Workspaces		OK
 Quit	Workspaces		Avsluta
-Show window border	Workspaces		Visa fönsterkant
-Show window tab	Workspaces		Visa fönsterflik
-Usage: %s [options] [workspace]\nwhere \"options\" is one of:\n  --notitle\t\ttitle bar removed.  border and resize kept.\n  --noborder\t\ttitle, border, and resize removed.\n  --avoidfocus\t\tprevents the window from being the target of keyboard events.\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen corner\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Usage: %s [alternativ] [arbetsyta]\n \"Options\" är en av:\n --notitle\t\ttitle utan fönsterlist, med ram och resize-hörn.\n --noborder\t\thelt ramlös.\n --avoidfocus\t\tfönstret undviker att bli fokus för inmatning.\n --alwaysontop\t\talltid i förgrunden\n --notmovable\t\tfönstrets position låst\n --autoraise\t\thöj fönstret automatiskt när muspekaren är i samma hörn\n --help\t\tvisa denna användarhandledning och avsluta\noch \"workspace\" är arbetsytans nummer, i serien 0-31, till vilken växling då sker.\n
 Workspaces	System name		Arbetsytor
-Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Arbetsytor\nskrivet av %1 och %2.\n\nCopyright %3, Haiku.\n\nFlytta fönster längst bak med alt-tangenten. Flytta fönster främst med ctrl-tangenten.\n
+Change workspace count…	Workspaces		Ändra antalet arbetsytor...
+Remove replicant	Workspaces		Ta bort replicant
+About Workspaces…	Workspaces		Om Arbetsytor
+Show window border	Workspaces		Visa fönsterkant
+Auto-raise	Workspaces		Höj upp automatiskt
+Always on top	Workspaces		Alltid överst
+Live in the Deskbar	Workspaces		Kör i Deskbaren
+Show window tab	Workspaces		Visa fönsterflik
+Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Användning: %s [options] [workspace]\ndär \"options\" är:\n  --notitle\t \t tittel baren borttagen, kant och resize kvar\n  --noborder\t \t tittel, kant och resize borttaget\n  --avoidfocus\t \t gör så fönstret inte får några keybord events\n  --alwaysontop\t \t behåll fönstret synligt helatiden\n  --notmovable\t \t fönstret kan inte flyttas runt\n  --autoraise\t \t automatisk höj workspace fönstret när den är vid skärmens kant\n  --help\t \t visa denna hjälp och avsluta\noch \"workspace\" är nummret på den Workspace vill ändra till (0-31)\n

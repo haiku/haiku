@@ -1,0 +1,95 @@
+1	lithuanian	x-vnd.Haiku-Devices	865240481
+Manufacturer	DeviceSCSI		Gamintojas
+Order by:	DevicesView		Rūšiuoti pagal:
+ACPI controller	Device		ACPI valdiklis
+Memory controller	Device		Atminties valdiklis
+Driver used	DevicePCI		Naudojama tvarkyklė
+CD-ROM	DeviceSCSI		CD kaupiklis
+ISA bus	Device		ISA magistralė
+ACPI bus	Device		ACPI magistralė
+ISA bus	DevicesView		ISA magistralė
+Docking station	Device		Jungčių replikatorius
+Computer	Device		Kompiuteris
+Unknown device	Device		Nežinomas įrenginys
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Informacija apie klasę:\t\t\t\t: %classInfo%
+Processor	DeviceSCSI		Procesorius
+RBC	DeviceSCSI		RBC
+Detailed	DevicesView		Išsamiai
+Category	DevicesView		kategoriją
+Quit	DevicesView		Baigti darbą
+Device paths	Device		Įrenginio kelias
+Scanner	DeviceSCSI		Skeneris
+Printer	DeviceSCSI		Spausdintuvas
+Processor	Device		Procesorius
+Optical Drive	DeviceSCSI		Optinis kaupiklis
+ACPI Processor Namespace '%2'	DeviceACPI		ACPI procesoriaus vardų sritis „%2“
+Bridge	DeviceSCSI		Tiltas
+unknown	Device		nežinoma
+ACPI Information	DeviceACPI		ACPI informacija
+Generic system peripheral	Device		Bendro pobūdžio periferiniai įrenginiai
+Not implemented	DevicePCI		funkcija nerealizuota
+Disk Drive	DeviceSCSI		Standusis diskas
+Not implemented	DeviceACPI		funkcija nerealizuota
+Device name	DevicePCI		Įrenginio pavadinimas
+Display controller	Device		Ekranų valdiklis
+Mass storage controller	Device		Kaupiklių valdiklis
+Input device controller	Device		Įvesties įrenginių valdiklis
+Network controller	Device		Tinklo valdiklis
+Device class	DeviceSCSI		Įrenginio klasė
+Device name	DeviceACPI		Įrenginio pavadinimas
+Driver used	Device		Naudojama tvarkyklė
+Other	DeviceSCSI		Kita
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Įrenginio pavadinimas\t\t\t\t: %Name%\nGamintojas\t\t\t: %Manufacturer%\nNaudojama tvarkyklė\t\t\t\t: %DriverUsed%\nĮrenginio kelias\t: %DevicePaths%
+ACPI Thermal Zone	DeviceACPI		ACPI temperatūros zona
+Communications	DeviceSCSI		Ryšio įrenginiai
+Bus	DevicesView		Magistralė
+Communication controller	Device		Ryšio įrenginių valdiklis
+Manufacturer	DeviceACPI		Gamintojas
+PCI bus	Device		PCI magistralė
+ACPI System Indicator	DeviceACPI		ACPI sistemos indikatorius
+None	Device		Nėra
+PCI bus	DevicesView		PCI magistralė
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Informacija apie klasę:\t\t\t\t: %classInfo%
+Basic information	DevicesView		Pagrindinė informacija
+PCI Information	DevicePCI		PCI informacija
+Manufacturer:	Device		Gamintojas:
+ACPI bus	DevicesView		ACPI magistralė
+Changer	DeviceSCSI		Keitiklis
+ACPI System Bus	DeviceACPI		ACPI sistemos magistralė
+Devices	System name		Įrenginiai
+Worm	DeviceSCSI		WORM
+Multimedia controller	Device		Įvairialypės terpės valdiklis
+Unknown	DevicePCI		nežinoma
+Device name:	Device		Įrenginio pavadinimas:
+Computer	DevicesView		Kompiuteris
+Value	PropertyList		Reikšmė
+Report compatibility	DevicesView		Pranešti apie suderinamumą
+Device	Device		Įrenginys
+Signal processing controller	Device		Signalų apdorojimo valdiklis
+Serial bus controller	Device		Nuosekliosios magistralės valdiklis
+Wireless controller	Device		Bevielio tinklo valdiklis
+ACPI node '%1'	DeviceACPI		ACPI mazgas „%1“
+Device name	Device		Įrenginio pavadinimas
+Manufacturer	Device		Gamintojas
+Name	PropertyList		Pavadinimas
+Manufacturer	DevicePCI		Gamintojas
+Intelligent controller	Device		Išmanusis valdiklis
+Satellite communications controller	Device		Palydovinio ryšio valdiklis
+SCSI Information	DeviceSCSI		SCSI informacija
+Enclosure	DeviceSCSI		Kasetė
+Array	DeviceSCSI		Masyvas
+Bridge	Device		Tiltas
+Refresh devices	DevicesView		Atnaujinti įrenginių sąrašą
+Unknown device	DevicesView		Nežinomas įrenginys
+Graphics Peripheral	DeviceSCSI		Periferinis grafikos įrenginys
+Tape Drive	DeviceSCSI		Juostų kaupiklis
+Bus Information	Device		Magistralės informacija
+Connection	DevicesView		ryšį
+Generate system information	DevicesView		Generuoti informaciją apie sistemą
+Encryption controller	Device		Šifravimo valdiklis
+Unclassified device	Device		Neklasifikuotas įrenginys
+Device name	DeviceSCSI		Įrenginio pavadinimas
+Card Reader	DeviceSCSI		Kortelių skaitytuvas
+Class info	DevicePCI		Informacija apie klasę
+Device paths	DevicePCI		Įrenginio kelias
+Devices	DevicesView		Įrenginiai

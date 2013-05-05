@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network via_rhine dev vr ;
+
+UseHeaders [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
+
+UsePrivateHeaders net system ;
+UsePrivateKernelHeaders ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
+
+KernelAddon via_rhine :
+	if_vr.c
+	glue.c
+	: libfreebsd_network.a via_rhine_mii.a
+	;
+

@@ -176,7 +176,7 @@ continue_thread(port_id nubPort, thread_id thread)
 			return;
 
 		if (error != B_INTERRUPTED) {
-			fprintf(stderr, "%s: Failed to run thread %ld: %s\n",
+			fprintf(stderr, "%s: Failed to run thread %" B_PRId32 ": %s\n",
 				kCommandName, thread, strerror(error));
 			exit(1);
 		}

@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!--
+ *
+ * Copyright 2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *              Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Adriano Duarte
+ *
+-->
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta http-equiv="Content-Style-Type" content="text/css" />
+        <meta name="robots" content="all" />
+        <title>Icon-O-Mático</title>
+        <link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../../fr/applications/icon-o-matic.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/icon-o-matic.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/icon-o-matic.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/icon-o-matic.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/icon-o-matic.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/icon-o-matic.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/icon-o-matic.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/icon-o-matic.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/icon-o-matic.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/icon-o-matic.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/icon-o-matic.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/icon-o-matic.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/applications/icon-o-matic.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../ca/applications/icon-o-matic.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../../en/applications/icon-o-matic.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="expander.html">Expansor</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos
+</a> 
+::  <a href="installer.html">Instalador</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Índice</td></tr>
+<tr class="index"><td><a href="#bitmap-vector">Bitmap BeOS versus ícones vetoriais Haiku</a><br />
+                <a href="#icons-attributes">Ícones são atributos</a><br />
+                <a href="#i-o-m">Criando ícones com o Icon-O-Mático</a><br />
+                  <a href="#i-o-m-path">Caminho</a><br />
+                  <a href="#i-o-m-shape">Forma</a><br />
+                  <a href="#i-o-m-style">Estilo</a><br />
+                  <a href="#i-o-m-transformer">Transformador</a><br />
+                  <a href="#i-o-m-save">Salvando um ícone</a><br />
+                  <a href="#i-o-m-tips">Dicas &amp; Truques</a></td></tr>
+</table>
+
+<h2><img src="../../images/apps-images/icon-o-matic-icon_64.png" alt="icon-o-matic-icon_64.png" width="64" height="64" />Icon-O-Mático</h2>
+
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplicativos</span></td></tr>
+<tr><td>Localização:</td><td></td><td><span class="path">/boot/system/apps/Icon-O-Matic</span></td></tr>
+<tr><td>Configurações:</td><td></td><td><span class="path">~/config/settings/Icon-O-Matic</span></td></tr>
+</table>
+
+<p><br /></p>
+
+<p>Antes de tratarmos sobre a real criação de ícones no Icon-O-Mático, umas poucas palavras sobre ícones no Haiku em geral.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="bitmap-vector" name="bitmap-vector">Bitmap BeOS versus ícones vetoriais Haiku</a></h2>
+<p>Ao contrário do BeOS, o Haiku utiliza ícones vetoriais ao invés de ícones de mapa de bits. Um Formato de Ícone Vetorial do Haiku (HVIF) especial foi desenvolvido para ser altamente otimizado para tamanhos de arquivo pequenos e renderização rápida. Eis o porquê de nossos ícones serem a maioria  <i>muito</i> menores do que um mapa de bits ou o largamente usado formato SVG. Também, diferente dos ícones em mapa de bits do BeOS, o Haiku não é limitado a uma paleta de 8 bits (256 cores).<br />
+Tomemos este ícone do Terminal, por exemplo:</p>
+<table border="0" cellpadding="10">
+        <tr align="center"><td><b>Bitmap</b></td><td><b>SVG</b></td><td><b>HVIF</b></td></tr>
+        <tr align="center"><td><img src="../../images/apps-images/i-o-m-terminal-bitmap32.png" alt="i-o-m-terminal-bitmap32" width="32" height="32" /> <img src="../../images/apps-images/i-o-m-terminal-bitmap16.png" alt="i-o-m-terminal-bitmap16" width="16" height="16" /></td><td style="width:100px"><img src="../../images/apps-images/terminal-icon_32.png" alt="terminal-icon_32" width="32" height="32" /></td><td><img src="../../images/apps-images/terminal-icon_32.png" alt="terminal-icon_32" width="32" height="32" /></td></tr>
+        <tr align="center"><td>1,024 byte<br />+ 256 byte</td><td> 7,192 byte </td><td> 768 byte </td></tr>
+</table>
+<p>Observe que o BeOS utilizou duas versões de um ícone, um de 16x16 e um de 32x32, para obter bons visuais nos modos Lista e Visão de Ícone.</p>
+<p>Este truque não é necessário com ícones vetoriais. Além de apenas ocupar umas poucas centenas de bytes em um arquivo, ícones vetoriais também se amplia muito melhor do que mapas de bits. (Observação: o BeOS oferecia apenas exibições em 16x16 e 32x32.)</p>
+<table border="0" cellpadding="10">
+        <tr align="center"><td> </td><td><b>16x16</b></td><td><b>32x32</b></td><td><b>64x64</b></td><td><b>128x128</b></td></tr>
+        <tr align="center"><td><b>Bitmap</b></td>
+                <td><img src="../../images/apps-images/i-o-m-bitmap16.png" alt="i-o-m-bitmap16" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-bitmap32.png" alt="i-o-m-bitmap32" width="32" height="32" /></td>
+                <td><img src="../../images/apps-images/i-o-m-bitmap64.png" alt="i-o-m-bitmap64" width="64" height="64" /></td>
+                <td><img src="../../images/apps-images/i-o-m-bitmap128.png" alt="i-o-m-bitmap128" width="128" height="128" /></td></tr>
+        <tr align="center"><td><b>Vetor</b></td>
+                <td><img src="../../images/apps-images/i-o-m-vector16.png" alt="i-o-m-vector16" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-vector32.png" alt="i-o-m-vector32" width="32" height="32" /></td>
+                <td><img src="../../images/apps-images/i-o-m-vector64.png" alt="i-o-m-vector64" width="64" height="64" /></td>
+                <td><img src="../../images/apps-images/i-o-m-vector128.png" alt="i-o-m-vector128" width="128" height="128" /></td></tr>
+
+</table>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="icons-attributes" name="icons-attributes">Ícones são atributos</a></h2>
+<p>Ícones são armazenados como atributos de seus arquivos. Contudo, isso não significa que todo arquivo tenha que ter seu atributo para aparecer com um ícone na janela do Rastreador: arquivos de dados herdam seus ícones de seus tipos de arquivos. Para mudar globalmente o ícone do tipo de arquivo utiliza-se as preferências dos <span class="app">Tipos de Arquivos</span>. Se apenas deseja adicionar um ícone especial a um arquivo individual, utilize o <span class="app">Adicional de tipo de arquivo</span> alternativamente. Veja o tópico <a href="../filetypes.html">Tipos de arquivos</a> para maiores informações.</p>
+<div class="box-info">Sendo um atributo, considere que apenas sistemas de arquivos com suporte a metadados podem reter um ícone individual de arquivo. Então, se mover arquivos fora de seu volume BFS, considere compactá-los juntos para não perder ícones ou outros atributos.</div>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="i-o-m" name="i-o-m">Criando ícones com o Icon-O-Mático</a></h2>
+<p>Icon-O-Mático é o editor de ícones do Haiku que salva seu trabalho como HVIF, SVG ou PNG. O ícone pode ser também diretamente anexado como atributo a um arquivo existente ou exportado como um recurso ou arquivo fonte utilizado por desenvolvedores. Uma vez que o aplicativo foi construído para o formato HVIF otimizado, sua utilização reflete os funcionamentos internos deste formato.</p>
+<p>Diferente do seu software normal de gráficos vetoriais, não lida com objetos separados onde cada qual inclui todas as suas propriedades específicas, como caminho, largura do traço, cor do traço e do preenchimento, etc. Antes, monta seus objetos ("formas") de caminhos e cores compartilhados ("estilos") e define certas propriedades. Esta reutilização de elementos é um segredo da eficiência do HVIF. Já que impõe algumas restrições ao criador de ícones, existem umas poucas vantagens, também.<br />
+Por exemplo, pelo reuso de um caminho, muitos objetos podem ser modificados juntos pela manipulação deste único caminho. Pense em um objeto e sua sombra. Modificar seu caminho compartilhado alterará o objeto em si e automaticamente sua (talvez ligeiramente distorcida/traduzida) sombra.</p>
+
+<p>Eis aqui uma visão rápida da janela do Icon-O-Mático:</p>
+<img src="../images/apps-images/i-o-m-overview.png" alt="i-o-m-overview.png" />
+
+<p>para criar qualqure objeto visível na tela, é preciso uma forma com um caminho e um estilo. Convenientemente, pode-se criar um, dois ou todos os três juntos a partir do menu <span class="menu">Forma</span>. Toda espécie de objeto (Caminhos, Formas, Transformadores e Estilos) tem um menu acima de sua lista de elementos, oferecendo vários comandos. Todo elemento tem certas opções que são definidas na visão de <span class="menu">Propriedades</span>.</p>
+
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="i-o-m-path" name="i-o-m-path">Caminho</a></h3>
+<p>Um caminho consiste de diversos pontos os quais são conectados com linhas ou curvas de Bezier. Para adicionar ou alterar pontos, certifique-se de que o caminho esteja selecionado na lista de caminhos.</p>
+
+<p>Simplesmente clicar na tela definirá o primeiro ponto. Enquanto estiver definindo um ponto, decida se a linha resultante será reta ou curva: um simples clicar e soltar produz uma linha reta, segurar o botão do mouse e movê-lo irá arrastar as alças de uma curva de Bezier. Naturalmente, pode-se também alterá-lo mais tarde.</p>
+
+<img src="../../images/apps-images/i-o-m-path-ab.png" alt="i-o-m-path-ab" />
+
+<p>Para ir de "A" para "B", transforme alguns pontos de pontos de ângulo para pontos de curva. O que é feito apertando <span class="key">ALT</span> enquanto clica em um ponto e arrasta suas alças. Isto resulta em um Bezier simétrico: a segunda alça segue o movimento da outra. Se necessita mover as alças independentemente, novamente clique e arraste uma alça Bezier enquanto aperta <span class="key">ALT</span>.<br />
+Inversamente, para fazer de um Bezier umponto de ângulo, aperte <span class="key">ALT</span> e clique em um ponto.</p>
+
+<p>Para mover um ponto, simplesmente clique nele e arraste. Para selecionar mais de um ponto, aperte <span class="key">SHIFT</span> e desenhe um retângulo de seleção. Pontos selecionados são marcados com uma borda vermelha ao invés do preto usual.<br />
+Para inserir um ponto num caminho, clique na linha de conexão entre dois pontos.<br />
+Pontos selecionados são eliminados pressionando <span class="key">DEL</span> ou clicando em qualquer ponto enquanto aperta <span class="key">CTRL</span>.</p>
+
+<p>O ponteiro do mouse indica o modo atual:</p>
+<table summary="Mouse pointer states, Path" border="0" cellpadding="10">
+        <tr align="center">
+                <td><img src="../../images/apps-images/i-o-m-pointer-move-path.png" alt="i-o-m-pointer-move-path" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-pointer-insert.png" alt="i-o-m-pointer-insert" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-pointer-add.png" alt="i-o-m-pointer-add" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-pointer-delete.png" alt="i-o-m-pointer-delete" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-pointer-bezier.png" alt="i-o-m-pointer-bezier" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-pointer-select.png" alt="i-o-m-pointer-select" width="16" height="16" /></td>
+        </tr>
+        <tr align="center">
+                <td>Mover ponto(s)</td>
+                <td>Inserir ponto</td>
+                <td>Adicionar ponto</td>
+                <td>Eliminar ponto<br /><span class="key">CTRL</span></td>
+                <td>Ângulo↔Bezier<br /><span class="key">ALT</span></td>
+                <td>Selecionar pontos<br /><span class="key">SHIFT</span></td>
+        </tr>
+</table>
+<p>Pode-se convocar um menu de contexto ao clicar com o botão direito do mouse em um ponto ou em uma seleção de pontos:</p>
+<table summary="Path context" border="0" cellspacing="0" cellpadding="2">
+<tr><td class="onelinetop"><span class="menu">Selecionar tudo</span></td><td style="width:70px"><span class="key">ALT</span> <span class="key">A</span></td><td>Seleciona todos os pontos do caminho atual.</td></tr>
+<tr><td><span class="menu">Transformar</span></td><td><span class="key">T</span></td><td>Põe todos os pontos selecionados em uma caixa de transformação, então pode-se mover, redimensionar e rodá-los juntos. Ele trabalha apenas com formas, descritas mais adiante.</td></tr>
+<tr><td><span class="menu">Dividir</span></td><td></td><td>Divide pontos selecionados em dois, um acima do outro.</td></tr>
+<tr><td><span class="menu">Girar</span></td><td></td><td>Gira pontos selecionados em 180º. Apenas surte efeito em pontos Bezier.</td></tr>
+<tr><td><span class="menu">Remover</span></td><td><span class="key">DEL</span></td><td>Elimina pontos selecionados.</td></tr>
+</table>
+
+<h4><a id="i-o-m-path-menu" name="i-o-m-path-menu">Menu Caminho</a></h4>
+<p>O menu <span class="menu">Caminho</span> oferece umas poucas entradas óbvias para <span class="menu">Adicionar retângulo</span> e <span class="menu">Adicionar círculo</span> ou para <span class="menu">Duplicar</span> ou <span class="menu">Remover</span> uma caminho. Aqui estão algumas outras que podem necessitar de um pouco mais de explicação:</p>
+
+<table summary="Path menu" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">Reverter</span></td><td style="width:15px;"></td><td>Se seu caminho não está "fechado" (veja Propriedade de Caminho abaixo), um clique na tela sempre cria um novo ponto, conectando-o com o último. "Reverter" irá, ao invés disso, reverter esta ordem e seu novo ponto será conectado ponto inicial.</td></tr>
+<tr><td><span class="menu">Limpar</span></td><td></td><td>Muito útil com SVGs importados, esta função removerá pontos redundantes.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Girar indicadores para a direita</span></td><td><span class="key">ALT</span> <span class="key">R</span></td><td>Na prática, isto gira a abertura de um caminho. É visualizado melhor quando utilizando um caminho não fechado com um estilo e uma forma com um transformador de linha. Agora, se seu caminho parece com um  ⊂ ele girará desta forma: ⊂ ∩ ⊃ ∪.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Girar indicadores para a esquerda</span></td><td><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">R</span></td><td>Faz o mesmo na direção contrária.</td></tr>
+</table>
+
+<h4><a id="i-o-m-path-properties" name="i-o-m-path-properties">Propriedades do Caminho</a></h4>
+<p><span class="menu">Propriedades</span> na parte inferior esquerda da janela oferecem todas as definições disponíveis do objeto atualmente selecionado. Uma caminha possui apenas duas: um <span class="menu">Nome</span> e se ela está <span class="menu">Fechada</span> ou não.</p>
+
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="i-o-m-shape" name="i-o-m-shape">Forma</a></h3>
+<p>Uma forma agrupa um ou mais caminhos com um estilo. Na prática, é o objeto que realmente se vê na tela. O agrupamento é feito com as caixas de seleção na frente dos caminhos e estilos: Apenas selecione sua forma e selecione o(s) caminho(s) desejado(s) e um estilo.</p>
+<p>Uma forma define como um caminho e estilo é aplicado, por exemplo se o objeto é preenchido ou apenas contornado (o que é feito pelos Transformadores utilizados na forma, veremos isso mais tarde). Além disso, uma forma pode ser movida, rotacionada ou redimensionada sem mexer no caminho utilizado. Assim, pode-se reutilizar e obter formas diferentes, embora relacionadas.</p>
+
+<img src="../../images/apps-images/i-o-m-shape.png" alt="i-o-m-shape" />
+
+<p>Quando uma forma é selecionada de uma lista, um retângulo é desenhado ao redor dela. Dependendo de onde exatamente o segura, a forma é movida, redimensionada ou rotacionada ao redor de um ponto em seu centro, o qual pode ser movido. Segurar <span class="key">SHIFT</span> irá travar a direção enquanto move, limita a rotação a ângulos de 45° e restringe a taxa de amostragem enquanto redimensiona. O ponteiro do mouse novamente indica o modo atual:</p>
+<table summary="Mouse pointer states, Shape" border="0" cellpadding="10">
+        <tr align="center">
+                <td><img src="../../images/apps-images/i-o-m-pointer-move-shape.png" alt="i-o-m- move-shape" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-pointer-resize.png" alt="i-o-m-pointer-resize" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-pointer-rotate.png" alt="i-o-m-pointer-rotate" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-pointer-move-path.png" alt="i-o-m-pointer-move-rotation" width="16" height="16" /></td>
+        </tr>
+        <tr align="center">
+                <td>Mover</td>
+                <td>Redimensionar</td>
+                <td>Rotacionar</td>
+                <td>Mover<br />ponto de rotação</td>
+        </tr>
+</table>
+
+<p>As formas ficam no topo umas das outras, cada qual em sua própria camada, caso deseje. Para reordená-los, arraste e solte suas entradas para uma diferente posição na lista.</p>
+
+<h4><a id="i-o-m-shape-menu" name="i-o-m-path-menu">Menu Forma</a></h4>
+<p>O menu <span class="menu">Forma</span> oferece a já mencionada possibilidade de <span class="menu">Adicionar vazio, com caminho/estilo/caminho &amp; estilo</span> e de <span class="menu">Duplicar</span> ou <span class="menu">Remover</span> uma forma. Então, existe:</p>
+<table summary="Shape menu" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">Desfazer transformação</span></td><td style="width:15px;"></td><td>Reverte todas as transformações de deslocamento, redimensionamento e rotação que tenham sido aplicadas à forma.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Congelar transformação</span></td><td></td><td>Quando se transforma uma forma, seu(s) caminho(s) atribuído(s) permanece(m) em sua(s) posição(ões) original(is). Isto pode ser proposital; talvez mais de uma forma esteja utilizando aquele caminho, talvez você intencionalmente usou <span class="menu">Opções | Alinhar à grade</span> para definir os pontos em bordas com precisão de pixel.<br />
+Se não, "Congelar transformação" irá plicar a transformação de forma atual para o(s) caminho(s) atribuído(s). Um futuro "Desfazer transformação" irá então voltar a este novo estado.</td></tr>
+</table>
+
+<h4><a id="i-o-m-shape-properties" name="i-o-m-shape-properties">Propriedades de Forma</a></h4>
+<p>Além de um <span class="menu">Nome</span>, a visão de <span class="menu">Propriedades</span> para uma forma tem estas opções:</p>
+
+<table summary="Shape properties" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">Min LOD</span></td><td></td><td>Mínimo Nível de Detalhe</td></tr>
+<tr><td><span class="menu">Max LOD</span></td><td></td><td>Máximo Nível de Detalhe</td></tr>
+</table>
+
+<h5><a id="i-o-m-shape-lod" name="i-o-m-shape-lod">Nível de Detalhe (LOD)</a></h5>
+<table summary="LOD example" border="0" cellpadding="10">
+        <tr align="center"><td><b>16x16</b></td><td><b>32x32</b></td><td><b>64x64</b></td></tr>
+        <tr align="center">
+                <td><img src="../../images/apps-images/i-o-m-lod-icon_16.png" alt="i-o-m-lod-icon_16" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-lod-icon_32.png" alt="i-o-m-lod-icon_32" width="32" height="32" /></td>
+                <td><img src="../../images/apps-images/i-o-m-lod-icon_64.png" alt="i-o-m-lod-icon_64" width="64" height="64" /></td></tr>
+</table>
+<p>Viu como não existem números na versão 16px do ícone BeVexed? isto é feito com a definição de "Nível de Detalhe" de suas formas.<br />
+Com o LOD controla-se a visibilidade de uma forma dependendo de seu tamanho. Daquela maneira, pode-se deixar de lado detalhes de um ícone que parecem bons num ícone maior, mas talvez nem tento em sua versão menor.</p>
+<p>Eis como ele funciona: Um LOD de 1.0 é definido como um ícone de tamanho 64px. Para obter o LOD de um tamanho de ícone em particular simplesmente divida-o por 64, por exemplo um ícone de 16px tem um LOD de 16/64 = 0.25. Uma forma não será visível abaixo do seu <span class="menu">Min LOD</span> e acima do seu <span class="menu">Max LOD</span>.</p>
+<p>Então, se definir um <span class="menu">Min LOD</span> de uma forma para 0.0 e o <span class="menu">Max LOD</span> para 0.5, significa que a forma será apenas visível para tamanhos de ícone menores ou  <i>igual</i> a 32px. Se quiser excluir o tamanho de ícone de 32px, tem que permanecer abaixo de 0.5, como 0.49.</p>
+<p>O LOD não é apenas para deixar de fora formas de detalhes, mas também para, por exemplo, alterar a largura da linha em diferentes tamanhos, caso julgue necessário. Simplesmente duplique uma forma, faça suas alterações e defina ambas as definições de  LOD para exibir também um ou outro. Aqui reside a única fonte de confusão potencial, quando involuntariamente sobrepor LODs de formas, e pensar porque em alguns tamanhos ambos são visíveis...<br />
+Por exemplo, se a Forma 1 era pra ser exibida abaixo de 48px e a Forma 2 a partir de 48px pra cima (LOD: 48/64 = 0.75):</p>
+
+<table summary="LOD values example" border="0" cellpadding="5">
+<tr align="center"><td></td><td colspan="2"><b>OK</b></td><td style="width:25px" rowspan="6"></td><td colspan="2"><b>Nada OK!</b></td></tr>
+<tr style="background-color:#F1F1F1"><td rowspan="2" style="vertical-align:middle ; background-color:#FFFFFF"><b>Forma 1</b></td><td>Min LOD</td><td>0.00</td><td>Min LOD</td><td>0.00</td></tr>
+<tr style="background-color:#F1F1F1"><td>Max LOD</td><td><span style="background-color:#33FF33">0.74</span></td><td>Max LOD</td><td><span style="background-color:#FF9977">0.75</span></td></tr>
+<tr><td colspan="6"></td></tr>
+<tr style="background-color:#F8F8F8"><td rowspan="2" style="vertical-align:middle ; background-color:#FFFFFF"><b>Forma 2</b></td><td>Min LOD</td><td>0.75</td><td>Min LOD</td><td>0.75</td></tr>
+<tr style="background-color:#F8F8F8"><td>Max LOD</td><td>4.00</td><td>Max LOD</td><td>4.00</td></tr>
+</table>
+
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="i-o-m-style" name="i-o-m-style">Estilo</a></h3>
+<p>Um estilo pode também ser uma cor sólida ou algum tipo de gradiente.<br />
+Além das cores predefinidas em <span class="menu">Amostras</span>, pode-se criar suas próprias clicando na cor atual. Também, observe o botão deslizante sob o espectro de cores o qual define o canal alfa (transparência).</p>
+<img src="../images/apps-images/i-o-m-gradients.png" alt="i-o-m-gradients" />
+<p>Crie rapidamente um novo estilo misturando suas cores e simplesmente arrastando e soltando-o dentro da lista de estilos.</p>
+<p>Se for para um gradiente, defina o tipo (<span class="menu">Linear</span>, <span class="menu">Radial</span>, <span class="menu">Diamante</span>, <span class="menu">Cone</span>) e então defina as cores iniciais e finais. Isto é feito com um arrastar e soltar de um balde de cor dentro do respectivo indicador de cor sob o gradiente.<br />
+Naturalmente pode-se mover estes indicadores para alterar o gradiente ao seu gosto. Pode-se também inserir mais indicadores para adicionar mais cores pelo duplo clique no gradiente. Pressionar <span class="key">DEL</span> remove o indicador selecionado.</p>
+<p>Pode-se mover, redimensionar e rotacionar a caixa de representação de um gradiente na tela até ela atender suas necessidades. Isto funciona justo como nas formas.</p>
+
+<h4><a id="i-o-m-style-menu" name="i-o-m-style-menu">Menu de Estilo</a></h4>
+<p>O menu <span class="menu">Estilo</span> oferece as entradas usuais para <span class="menu">Adicionar</span>, <span class="menu">Duplicar</span> ou <span class="menu">Remover</span> um estilo e para <span class="menu">Desfazer transformação</span>.</p>
+
+<h4><a id="i-o-m-style-properties" name="i-o-m-style-properties">Propriedades de Estilo</a></h4>
+<p>O <span class="menu">Nome</span> é a única <span class="menu">Propriedade</span> de um estilo.</p>
+
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="i-o-m-transformer" name="i-o-m-transformer">Transformador</a></h3>
+<p>Uma forma pode ter Transformadores os quais alteram sua aparência. Os efeitos, contudo, são mais sutís que um caminhão se transformando em um robô de batalha...</p>
+
+<h4><a id="i-o-m-transformer-menu" name="i-o-m-transformer-menu">Menu Adicionar Transformador</a></h4>
+<table summary=" Transformer Add menu" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">Contorno</span></td><td></td><td>Adiciona um contorno à forma.</td></tr>
+<tr><td><span class="menu">Linha</span></td><td></td><td>Desenha o caminho de uma forma ao invés de preenchê-lo com um estilo.</td></tr>
+</table>
+
+<p>Dependendo do tipo de Transformador, obterá um conjunto diferente de propriedades.</p>
+
+<h4><a id="i-o-m-transformer-properties" name="i-o-m-transformer-properties">Propriedades de Transformador</a></h4>
+<p>Além de um <span class="menu">Nome</span> e a atual <span class="menu">Largura</span> para o transformador, a visão de <span class="menu">Propriedades</span> tem estas (dependendo do seu tipo, diferindo levemente) opções:</p>
+<table summary="Transformer properties" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">Ponteiras</span></td><td style="width:15px;"></td><td><i>Apenas Linhas</i>. Define as ponteiras finais de uma linha: <span class="menu">Coronha</span>, <span class="menu">Quadrado</span> ou <span class="menu">Redondo</span>.</td></tr>
+<tr><td><span class="menu">Detectar orientação</span></td><td></td><td><i>Apenas no Contorno</i>. Determina se o contorno está do lado de dentro ou do lado de fora do caminho.</td></tr>
+<tr><td><span class="menu">Juntar</span></td><td></td><td>Define como as linhas são unidas a um ponto: <span class="menu">Mitra</span>, <span class="menu">Redondo</span> ou <span class="menu">Chanfrado</span>.</td></tr>
+<tr><td><span class="menu">Limite de Mitra</span></td><td></td><td>apneas quando o <span class="menu">Juntar</span> acima é definido para "Mitra", esta definição influencia o visual da junção mitra. </td></tr>
+</table>
+
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="i-o-m-save" name="i-o-m-save">Salvando um ícone</a></h3>
+<p>Existe a sua já conhecida barra de menu no topo, <span class="menu">Arquivo</span>, <span class="menu">Editar</span>, <span class="menu">Opções</span>. A utilização é totalmente auto-explicativa, portanto iremos apenas ver como salvar seu trabalho.</p>
+<p><span class="menu">Arquivo | Salvar como...</span> salvará num formato especial do Icon-O-Mático que retém informação como os nomes dos caminhos, formas e estilos. Estes serão removidos do ícone atual uma vez que seja exportado para o espaço de armazenamento. É uma boa ideia fazer uma cópia de segurança de seu trabalho, porque sem objetos nomeados, tudo é nomeado como "&lt;path&gt;/&lt;shape&gt;/&lt;style&gt;", o que torna tediosas alterações específicas.</p>
+
+<p><span class="menu">Arquivo | Exportar como...</span> abre uma caixa de diálogo salvar com um menu pop-up de formato de arquivo na base, oferecendo estas opções:</p>
+<table summary="file formats" border="0" cellspacing="0" cellpadding="2">
+<tr><td>HVIF</td><td style="width:15px;"></td><td>Formato de Ícone de Vetor do Haiku</td></tr>
+<tr><td>HVIF RDef</td><td></td><td>Salva como recurso utilizado por programadores</td></tr>
+<tr><td>código fonte HVIF</td><td></td><td>Salva como código fonte utilizado por programadores</td></tr>
+<tr><td>SVG</td><td></td><td>Salva como SVG</td></tr>
+<tr><td>PNG</td><td></td><td>Salva como um PNG de 64px de tamanho</td></tr>
+<tr><td>conjunto PNG</td><td></td><td>Salva como PNGs de 16, 32 e 64px de tamanho</td></tr>
+<tr><td>atributo BEOS:ICON</td><td></td><td>Escolhe um arquivo e define seu atributo de ícone diretamente</td></tr>
+<tr><td>atributo META:ICON</td><td></td><td>Escolhe um arquivo e anexa o ícone como meros metadados</td></tr>
+</table>
+
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="i-o-m-tips" name="i-o-m-tips">Dicas &amp; Truques</a></h3>
+<p>Mantenha em mente umas poucas coisas quando trabalhar com o Icon-O-Mático e algumas dicas gerais para sua utilização:</p>
+<ul>
+<li><p>Leia os <a href="https://www.haiku-os.org/development/icon-guidelines">Parâmetros para Ícones</a> para aprender sobre importantes características dos ícones do Haiku, por exemplo perspectiva, cores e sombras.</p></li>
+<li><p>Deve sempre tentar minimizar o uso de caminhos, aqueles que são mais custosos, racionalizando o tamanho do arquivo. Reutilize caminhos onde for possível e ao invés disso trabalhe com formas manipuladas e seus transformadores. O uso inteligente de gradientes também pode economizar espaço.</p></li>
+<li><p>Onde for possível, deve ativar Alinhar à grade a partir do menu <span class="menu">Opções</span> quando editar caminhos. Pontos de caminho alinhados com a grade de 64x64 pixels utiliza menos espaço de armazenamento. Também poderá obter o visual mais crespo se os pontos forem definidos nas bordas de pixel exatas. Por exemplo, é importante alinhar os contornos mais proeminentes com a grade de 16x16.</p></li>
+<li><p>Confira a pré-visualização para ver se seu ícone ainda aparenta bem em 16x16. Poderá querer utilizar as definições de <a href="#i-o-m-shape-lod">Nível De Detalhe</a> descritas na seção Formas.</p></li>
+<li><p>Existe um modo fácil para produzir letras, mesmo que o Icon-O-Mático não ofereça uma ferramenta. Apenas entre com o texto em um editor de texto como o StyledEdit, ajuste o tipo de fonte e o estilo e arraste e solte ou copie e cole o texto selecionado dentro do Icon-O-Mático. Isto criará os caminhos e formas relacionados.</p></li>
+<li><p>Se atribuir mais de um caminho a uma forma, suas áreas sobrepostas serão canceladas uma pela outra. Quando um caminho está completamente dentro de outro, ele cria praticamente um buraco na forma resultante.</p></li>
+<li><p>Pode-se aproximar e afastar da tela com a roda do mouse. O panning é feito também clicando e arrastando com o botão do meio do mouse ou com um clique com o botão esquerdo e arrastar enquanto segura a tecla de <span class="key">ESPAÇO</span>.</p></li>
+</ul>
+
+
+<!--
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="i-o-m-workshops" name="i-o-m-workshops">Workshops</a></h3>
+<p>The above is of course quite theoretical. The best way to learn using Icon-O-Matic is by experimenting. To get you started and once more show the basics, have a look at these short clips:</p>
+<ul>
+<li><a href="">Paths</a></li>
+<li><a href="">Shapes</a></li>
+<li><a href="">Styles</a></li>
+<li><a href="">Transformers</a></li>
+<li><a href="">Optimizing icons</a></li>
+<li><a href=""></a></li>
+</ul>
+-->
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="expander.html">Expansor</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos
+</a> 
+::  <a href="installer.html">Instalador</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

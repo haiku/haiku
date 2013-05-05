@@ -50,6 +50,7 @@ public:
 
 	virtual	void				InvalidateLayout(bool children = false);
 	virtual	void				Relayout(bool immediate = false);
+									// from BLayoutItem
 			void				RequireLayout();
 			bool				IsValid();
 			void				EnableLayoutInvalidation();
@@ -59,21 +60,24 @@ public:
 			BRect				LayoutArea();
 			BLayoutContext*		LayoutContext() const;
 
-	// Archiving methods
-
 	virtual status_t			Archive(BMessage* into, bool deep = true) const;
+
+	virtual status_t			Perform(perform_code d, void* arg);
+
+protected:
+	// Archiving hook methods
+	virtual	status_t			AllArchived(BMessage* archive) const;
 	virtual	status_t			AllUnarchived(const BMessage* from);
 
 	virtual status_t			ItemArchived(BMessage* into, BLayoutItem* item,
 									int32 index) const;
 	virtual	status_t			ItemUnarchived(const BMessage* from,
 									BLayoutItem* item, int32 index);
-
-protected:
 	// BLayout hook methods
 	virtual	bool				ItemAdded(BLayoutItem* item, int32 atIndex);
 	virtual	void				ItemRemoved(BLayoutItem* item, int32 fromIndex);
-	virtual	void				DerivedLayoutItems() = 0;
+	virtual	void				LayoutInvalidated(bool children);
+	virtual	void				DoLayout() = 0;
 	virtual	void				OwnerChanged(BView* was);
 
 	// BLayoutItem hook methods
@@ -87,11 +91,25 @@ protected:
 			void				ResetLayoutInvalidation();
 
 private:
+
+	// FBC padding
+	virtual	void				_ReservedLayout1();
+	virtual	void				_ReservedLayout2();
+	virtual	void				_ReservedLayout3();
+	virtual	void				_ReservedLayout4();
+	virtual	void				_ReservedLayout5();
+	virtual	void				_ReservedLayout6();
+	virtual	void				_ReservedLayout7();
+	virtual	void				_ReservedLayout8();
+	virtual	void				_ReservedLayout9();
+	virtual	void				_ReservedLayout10();
+
+	// forbidden methods
+								BLayout(const BLayout&);
+			void				operator =(const BLayout&);
+
 			friend class BView;
 
-			bool				RemoveViewRecursive(BView* view);
-			bool				InvalidateLayoutsForView(BView* view);
-			bool				InvalidationLegal();
 			void				SetOwner(BView* owner);
 			void				SetTarget(BView* target);
 
@@ -106,6 +124,8 @@ private:
 			BView*				fTarget;
 			BList				fItems;
 			BList				fNestedLayouts;
+
+			uint32				_reserved[10];
 };
 
 

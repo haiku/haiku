@@ -56,6 +56,9 @@ typedef struct ISOVolDate {
  	int8	offsetGMT;
 } ISOVolDate;
 
+// Size of volume date and time data
+#define ISO_VOL_DATE_SIZE 17
+
 typedef struct ISORecDate {
 	uint8	year;			// Year - 1900
 	uint8	month;
@@ -183,28 +186,28 @@ struct iso9660_volume {
 	uint8			volDescType;		// Volume Descriptor type								byte1
 	char			stdIDString[6];		// Standard ID, 1 extra for null						byte2-6
 	uint8			volDescVersion;		// Volume Descriptor version							byte7
-																			// 8th byte unused
+	uint8			unused1;			// Unused Field											byte8
 	char			systemIDString[33];	// System ID, 1 extra for null							byte9-40
 	char			volIDString[33];	// Volume ID, 1 extra for null							byte41-72
-																			// bytes 73-80 unused
-	uint32			volSpaceSize[2];	// #logical blocks, lsb and msb									byte81-88
-																		// bytes 89-120 unused
+	char			unused2[9];			// Unused Field											byte73-80
+	uint32			volSpaceSize[2];	// #logical blocks, lsb and msb							byte81-88
+	char			unused3[33];		// Unused Field											byte89-120
 	uint16			volSetSize[2];		// Assigned Volume Set Size of Vol						byte121-124
 	uint16			volSeqNum[2];		// Ordinal number of volume in Set						byte125-128
 	uint16			logicalBlkSize[2];	// Logical blocksize, usually 2048						byte129-132
 	uint32			pathTblSize[2];		// Path table size										byte133-149
-	uint16			lPathTblLoc[2];		// Loc (Logical block #) of "Type L" path table		byte141-144
-	uint16			optLPathTblLoc[2];	// Loc (Logical block #) of optional Type L path tbl		byte145-148
-	uint16			mPathTblLoc[2];		// Loc (Logical block #) of "Type M" path table		byte149-152
-	uint16			optMPathTblLoc[2];		// Loc (Logical block #) of optional Type M path tbl	byte153-156
-	iso9660_inode			rootDirRec;			// Directory record for root directory					byte157-190
+	uint16			lPathTblLoc[2];		// Loc (Logical block #) of "Type L" path table			byte141-144
+	uint16			optLPathTblLoc[2];	// Loc (Logical block #) of optional Type L path tbl	byte145-148
+	uint16			mPathTblLoc[2];		// Loc (Logical block #) of "Type M" path table			byte149-152
+	uint16			optMPathTblLoc[2];	// Loc (Logical block #) of optional Type M path tbl	byte153-156
+	iso9660_inode	rootDirRec;			// Directory record for root directory					byte157-190
 	char			volSetIDString[129]; // Name of multi-volume set where vol is member		byte191-318
 	char			pubIDString[129];	// Name of publisher									byte319-446
 	char			dataPreparer[129];	// Name of data preparer								byte447-574
 	char			appIDString[129];	// Identifies data fomrat								byte575-702
 	char			copyright[38];		// Copyright string										byte703-739
 	char			abstractFName[38];	// Name of file in root that has abstract				byte740-776
-	char			biblioFName[38];	// Name of file in root that has biblio				byte777-813
+	char			biblioFName[38];	// Name of file in root that has biblio					byte777-813
 
 	ISOVolDate		createDate;			// Creation date										byte
 	ISOVolDate		modDate;			// Modification date
@@ -214,6 +217,8 @@ struct iso9660_volume {
 	uint8			fileStructVers;		// File structure version								byte882
 };
 
+// Size of root directory record
+#define ISO_ROOT_DIR_REC_SIZE 34
 
 status_t ISOMount(const char *path, uint32 flags, iso9660_volume** _newVolume,
 	bool allowJoliet);

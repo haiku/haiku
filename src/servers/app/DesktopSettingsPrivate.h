@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2009, Haiku.
+ * Copyright 2005-2013, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -48,7 +48,14 @@ public:
 			void				SetFocusFollowsMouseMode(
 									mode_focus_follows_mouse mode);
 			mode_focus_follows_mouse FocusFollowsMouseMode() const;
-			bool				FocusFollowsMouse() const;
+			bool				NormalMouse() const
+									{ return MouseMode() == B_NORMAL_MOUSE; }
+			bool				FocusFollowsMouse() const
+									{ return MouseMode()
+										== B_FOCUS_FOLLOWS_MOUSE; }
+			bool				ClickToFocusMouse() const
+									{ return MouseMode()
+										== B_CLICK_TO_FOCUS_MOUSE; }
 			void				SetAcceptFirstClick(bool acceptFirstClick);
 			bool				AcceptFirstClick() const;
 

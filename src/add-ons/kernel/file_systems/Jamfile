@@ -11,6 +11,7 @@ SubInclude HAIKU_TOP src add-ons kernel file_systems googlefs ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems iso9660 ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems netfs ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems nfs ;
+SubInclude HAIKU_TOP src add-ons kernel file_systems nfs4 ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems ntfs ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems packagefs ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems ramfs ;

@@ -1,11 +1,15 @@
 /*
- * Copyright 2007-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2013, Haiku, Inc. All rights reserved.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
  * Distributed under the terms of the MIT license.
  *
+ * Authors:
+ *		Kian Duffy, myob@users.sourceforge.net
+ *		Daniel Furrer, assimil8or@users.sourceforge.net
+ *		Siarzhuk Zharski, zharik@gmx.li
  */
 
 
@@ -68,7 +72,9 @@
 #define CSWTCH 0
 #endif
 
+// TODO: should extract from /etc/passwd instead???
 const char *kDefaultShell = "/bin/sh";
+const char *kTerminalType = "xterm";
 
 /*
  * Set environment variable.
@@ -113,8 +119,8 @@ typedef struct
 {
 	int status;		/* status of child */
 	char msg[128];	/* error message */
-	int row;		/* terminal rows */
-	int col;		/* Terminal columns */
+	unsigned short row;		/* terminal rows */
+	unsigned short col;		/* Terminal columns */
 } handshake_t;
 
 /* status of handshake */
@@ -379,8 +385,9 @@ initialize_termios(struct termios &tio)
 	tio.c_cc[VSUSP]  = CSUSP;		/* '^Z' */
 }
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Terminal Shell"
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Terminal Shell"
 
 status_t
 Shell::_Spawn(int row, int col, const ShellParameters& parameters)
@@ -404,6 +411,8 @@ Shell::_Spawn(int row, int col, const ShellParameters& parameters)
 		fShellInfo.SetDefaultShell(true);
 	} else
 		fShellInfo.SetDefaultShell(false);
+
+	fShellInfo.SetEncoding(parameters.Encoding());
 
 	signal(SIGTTOU, SIG_IGN);
 
@@ -539,9 +548,9 @@ Shell::_Spawn(int row, int col, const ShellParameters& parameters)
 		/*
 		 * setenv TERM and TTY.
 		 */
-		setenv("TERM", "xterm", true);
+		setenv("TERM", kTerminalType, true);
 		setenv("TTY", ttyName, true);
-		setenv("TTYPE", parameters.Encoding(), true);
+		setenv("TTYPE", fShellInfo.EncodingName(), true);
 
 		// set the current working directory, if one is given
 		if (parameters.CurrentDirectory().Length() > 0)

@@ -1,6 +1,7 @@
 /*
  * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
  * Copyright 2008 Mika Lindqvist, monni1995_at_gmail.com
+ * Copyright 2012 Fredrik Modéen, [firstname]@[lastname]
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -147,9 +148,29 @@ LocalDevice::GetProperty(const char* property, uint32* value)
 
 int
 LocalDevice::GetDiscoverable()
-{
+{	
+	if (fMessenger == NULL)
+		return -1;
+	
+	size_t	size;
+	void* command = buildReadScan(&size);
+	if (command == NULL)
+		return -1;
 
-	return 0;
+	BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
+	request.AddInt32("hci_id", fHid);
+	request.AddData("raw command", B_ANY_TYPE, command, size);
+	request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
+	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_CONTROL_BASEBAND,
+		OCF_READ_SCAN_ENABLE));
+
+	int8 discoverable;
+	BMessage reply;
+	if (fMessenger->SendMessage(&request, &reply) == B_OK
+		&& reply.FindInt8("scan_enable", &discoverable) == B_OK)
+		return discoverable;
+	
+	return -1;
 }
 
 
@@ -184,7 +205,6 @@ LocalDevice::SetDiscoverable(int mode)
 			return bt_status;
 
 		}
-
 	}
 
 	return B_ERROR;

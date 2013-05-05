@@ -10,6 +10,7 @@
 #include "Column.h"
 
 #include "ALMLayout.h"
+#include "Area.h"
 #include "Tab.h"
 
 
@@ -51,9 +52,9 @@ Column::~Column()
  */
 Column::Column(LinearSpec* ls, XTab* left, XTab* right)
 	:
-	fLS(ls),
 	fLeft(left),
 	fRight(right),
+	fLS(ls),
 	fPrefSizeConstraint(NULL)
 {
 

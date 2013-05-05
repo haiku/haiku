@@ -22,7 +22,6 @@ Application netfs_server
 	:
 	DebugSupport.cpp
 
-	driver_settings.c
 	DriverSettings.cpp
 	String.cpp
 

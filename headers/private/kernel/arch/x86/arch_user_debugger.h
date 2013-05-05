@@ -9,8 +9,12 @@
 #define ARCH_INIT_USER_DEBUG x86_init_user_debug
 
 // number of breakpoints the CPU supports
-// Actually it supports 4, but DR3 is used to hold the Thread*.
-#define X86_BREAKPOINT_COUNT	3
+// On 32-bit, DR3 is used to hold the Thread*.
+#ifdef __x86_64__
+#	define X86_BREAKPOINT_COUNT		4
+#else
+#	define X86_BREAKPOINT_COUNT		3
+#endif
 
 // debug status register DR6
 enum {
@@ -95,14 +99,14 @@ enum {
 
 struct arch_breakpoint {
 	void	*address;	// NULL, if deactivated
-	uint32	type;		// one of the architecture types above
-	uint32	length;		// one of the length values above
+	size_t	type;		// one of the architecture types above
+	size_t	length;		// one of the length values above
 };
 
 struct arch_team_debug_info {
 	struct arch_breakpoint	breakpoints[X86_BREAKPOINT_COUNT];
 
-	uint32					dr7;	// debug control register DR7
+	size_t					dr7;	// debug control register DR7
 };
 
 struct arch_thread_debug_info {

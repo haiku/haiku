@@ -48,7 +48,8 @@ DelayedTask::~DelayedTask()
 {
 }
 
-OneShotDelayedTask::OneShotDelayedTask(FunctionObject *functor, bigtime_t delay)
+OneShotDelayedTask::OneShotDelayedTask(FunctionObject* functor,
+	bigtime_t delay)
 	:	DelayedTask(delay),
 		fFunctor(functor)
 {
@@ -72,8 +73,9 @@ OneShotDelayedTask::RunIfNeeded(bigtime_t currentTime)
 }
 
 
-PeriodicDelayedTask::PeriodicDelayedTask(FunctionObjectWithResult<bool> *functor,
-	bigtime_t initialDelay, bigtime_t period)
+PeriodicDelayedTask::PeriodicDelayedTask(
+	FunctionObjectWithResult<bool>* functor, bigtime_t initialDelay,
+	bigtime_t period)
 	:	DelayedTask(initialDelay),
 		fPeriod(period),
 		fFunctor(functor)
@@ -100,7 +102,7 @@ PeriodicDelayedTask::RunIfNeeded(bigtime_t currentTime)
 
 
 PeriodicDelayedTaskWithTimeout::PeriodicDelayedTaskWithTimeout(
-	FunctionObjectWithResult<bool> *functor, bigtime_t initialDelay,
+	FunctionObjectWithResult<bool>* functor, bigtime_t initialDelay,
 	bigtime_t period, bigtime_t timeout)
 	:	PeriodicDelayedTask(functor, initialDelay, period),
 		fTimeoutAfter(system_time() + timeout)
@@ -124,8 +126,8 @@ PeriodicDelayedTaskWithTimeout::RunIfNeeded(bigtime_t currentTime)
 }
 
 
-RunWhenIdleTask::RunWhenIdleTask(FunctionObjectWithResult<bool> *functor, bigtime_t
-	initialDelay, bigtime_t idleFor, bigtime_t heartBeat)
+RunWhenIdleTask::RunWhenIdleTask(FunctionObjectWithResult<bool>* functor,
+	bigtime_t initialDelay, bigtime_t idleFor, bigtime_t heartBeat)
 	:	PeriodicDelayedTask(functor, initialDelay, heartBeat),
 		fIdleFor(idleFor),
 		fState(kInitialDelay)
@@ -251,21 +253,21 @@ TaskLoop::~TaskLoop()
 
 
 void
-TaskLoop::RunLater(DelayedTask *task)
+TaskLoop::RunLater(DelayedTask* task)
 {
 	AddTask(task);
 }
 
 
 void
-TaskLoop::RunLater(FunctionObject *functor, bigtime_t delay)
+TaskLoop::RunLater(FunctionObject* functor, bigtime_t delay)
 {
 	RunLater(new OneShotDelayedTask(functor, delay));
 }
 
 
 void
-TaskLoop::RunLater(FunctionObjectWithResult<bool> *functor,
+TaskLoop::RunLater(FunctionObjectWithResult<bool>* functor,
 	bigtime_t delay, bigtime_t period)
 {
 	RunLater(new PeriodicDelayedTask(functor, delay, period));
@@ -273,16 +275,17 @@ TaskLoop::RunLater(FunctionObjectWithResult<bool> *functor,
 
 
 void
-TaskLoop::RunLater(FunctionObjectWithResult<bool> *functor, bigtime_t delay,
+TaskLoop::RunLater(FunctionObjectWithResult<bool>* functor, bigtime_t delay,
 	bigtime_t period, bigtime_t timeout)
 {
-	RunLater(new PeriodicDelayedTaskWithTimeout(functor, delay, period, timeout));
+	RunLater(new PeriodicDelayedTaskWithTimeout(functor, delay, period,
+		timeout));
 }
 
 
 void
-TaskLoop::RunWhenIdle(FunctionObjectWithResult<bool> *functor, bigtime_t initialDelay,
-	bigtime_t idleTime, bigtime_t heartBeat)
+TaskLoop::RunWhenIdle(FunctionObjectWithResult<bool>* functor,
+	bigtime_t initialDelay, bigtime_t idleTime, bigtime_t heartBeat)
 {
 	RunLater(new RunWhenIdleTask(functor, initialDelay, idleTime, heartBeat));
 }
@@ -291,8 +294,9 @@ TaskLoop::RunWhenIdle(FunctionObjectWithResult<bool> *functor, bigtime_t initial
 class AccumulatedOneShotDelayedTask : public OneShotDelayedTask {
 	// supports accumulating functors
 public:
-	AccumulatedOneShotDelayedTask(AccumulatingFunctionObject *functor, bigtime_t delay,
-		bigtime_t maxAccumulatingTime = 0, int32 maxAccumulateCount = 0)
+	AccumulatedOneShotDelayedTask(AccumulatingFunctionObject* functor,
+		bigtime_t delay, bigtime_t maxAccumulatingTime = 0,
+		int32 maxAccumulateCount = 0)
 		:	OneShotDelayedTask(functor, delay),
 			maxAccumulateCount(maxAccumulateCount),
 			accumulateCount(1),
@@ -300,25 +304,30 @@ public:
 			initialTime(system_time())
 		{}
 
-	bool CanAccumulate(const AccumulatingFunctionObject *accumulateThis) const
+	bool CanAccumulate(const AccumulatingFunctionObject* accumulateThis) const
 		{
 			if (maxAccumulateCount && accumulateCount > maxAccumulateCount)
 				// don't accumulate if too may accumulated already
 				return false;
 
-			if (maxAccumulatingTime && system_time() > initialTime + maxAccumulatingTime)
+			if (maxAccumulatingTime && system_time() > initialTime
+					+ maxAccumulatingTime) {
 				// don't accumulate if too late past initial task
 				return false;
+			}
 
-			return static_cast<AccumulatingFunctionObject *>(fFunctor)->CanAccumulate(accumulateThis);
+			return static_cast<AccumulatingFunctionObject*>(fFunctor)->
+				CanAccumulate(accumulateThis);
 		}
 
-	virtual void Accumulate(AccumulatingFunctionObject *accumulateThis, bigtime_t delay)
+	virtual void Accumulate(AccumulatingFunctionObject* accumulateThis,
+		bigtime_t delay)
 		{
 			fRunAfter = system_time() + delay;
 				// reset fRunAfter
 			accumulateCount++;
-			static_cast<AccumulatingFunctionObject *>(fFunctor)->Accumulate(accumulateThis);
+			static_cast<AccumulatingFunctionObject*>(fFunctor)->
+				Accumulate(accumulateThis);
 		}
 
 private:
@@ -329,8 +338,8 @@ private:
 };
 
 void
-TaskLoop::AccumulatedRunLater(AccumulatingFunctionObject *functor, bigtime_t delay,
-	bigtime_t maxAccumulatingTime, int32 maxAccumulateCount)
+TaskLoop::AccumulatedRunLater(AccumulatingFunctionObject* functor,
+	bigtime_t delay, bigtime_t maxAccumulatingTime, int32 maxAccumulateCount)
 {
 	AutoLock<BLocker> autoLock(&fLock);
 	if (!autoLock.IsLocked()) {
@@ -338,8 +347,9 @@ TaskLoop::AccumulatedRunLater(AccumulatingFunctionObject *functor, bigtime_t del
 	}
 	int32 count = fTaskList.CountItems();
 	for (int32 index = 0; index < count; index++) {
-		AccumulatedOneShotDelayedTask *task = dynamic_cast<AccumulatedOneShotDelayedTask *>
-			(fTaskList.ItemAt(index));
+		AccumulatedOneShotDelayedTask* task
+			= dynamic_cast<AccumulatedOneShotDelayedTask*>(
+				fTaskList.ItemAt(index));
 		if (!task)
 			continue;
 
@@ -348,8 +358,8 @@ TaskLoop::AccumulatedRunLater(AccumulatingFunctionObject *functor, bigtime_t del
 			return;
 		}
 	}
-	RunLater(new AccumulatedOneShotDelayedTask(functor, delay, maxAccumulatingTime,
-		maxAccumulateCount));
+	RunLater(new AccumulatedOneShotDelayedTask(functor, delay,
+		maxAccumulatingTime, maxAccumulateCount));
 }
 
 
@@ -362,7 +372,7 @@ TaskLoop::Pulse()
 	if (count > 0) {
 		bigtime_t currentTime = system_time();
 		for (int32 index = 0; index < count; ) {
-			DelayedTask *task = fTaskList.ItemAt(index);
+			DelayedTask* task = fTaskList.ItemAt(index);
 			// give every task a try
 			if (task->RunIfNeeded(currentTime)) {
 				// if done, remove from list
@@ -384,7 +394,7 @@ TaskLoop::LatestRunTime() const
 	bigtime_t result = kInfinity;
 
 #if xDEBUG
-	DelayedTask *nextTask = 0;
+	DelayedTask* nextTask = 0;
 #endif
 	int32 count = fTaskList.CountItems();
 	for (int32 index = 0; index < count; index++) {
@@ -411,7 +421,7 @@ TaskLoop::LatestRunTime() const
 
 
 void
-TaskLoop::RemoveTask(DelayedTask *task)
+TaskLoop::RemoveTask(DelayedTask* task)
 {
 	ASSERT(fLock.IsLocked());
 	// remove the task
@@ -419,7 +429,7 @@ TaskLoop::RemoveTask(DelayedTask *task)
 }
 
 void
-TaskLoop::AddTask(DelayedTask *task)
+TaskLoop::AddTask(DelayedTask* task)
 {
 	AutoLock<BLocker> autoLock(&fLock);
 	if (!autoLock.IsLocked()) {
@@ -476,8 +486,8 @@ StandAloneTaskLoop::StartPulsingIfNeeded()
 	ASSERT(fLock.IsLocked());
 	if (fScanThread < 0) {
 		// no loop thread yet, spawn one
-		fScanThread = spawn_thread(StandAloneTaskLoop::RunBinder, "TrackerTaskLoop",
-			B_LOW_PRIORITY, this);
+		fScanThread = spawn_thread(StandAloneTaskLoop::RunBinder,
+			"TrackerTaskLoop", B_LOW_PRIORITY, this);
 		resume_thread(fScanThread);
 	}
 }
@@ -489,9 +499,9 @@ StandAloneTaskLoop::KeepPulsingWhenEmpty() const
 }
 
 status_t
-StandAloneTaskLoop::RunBinder(void *castToThis)
+StandAloneTaskLoop::RunBinder(void* castToThis)
 {
-	StandAloneTaskLoop *self = (StandAloneTaskLoop *)castToThis;
+	StandAloneTaskLoop* self = (StandAloneTaskLoop*)castToThis;
 	self->Run();
 	return B_OK;
 }
@@ -535,7 +545,7 @@ StandAloneTaskLoop::Run()
 }
 
 void
-StandAloneTaskLoop::AddTask(DelayedTask *delayedTask)
+StandAloneTaskLoop::AddTask(DelayedTask* delayedTask)
 {
 	_inherited::AddTask(delayedTask);
 	if (fScanThread < 0)
@@ -589,4 +599,3 @@ PiggybackTaskLoop::StartPulsingIfNeeded()
 {
 	fPulseMe = true;
 }
-

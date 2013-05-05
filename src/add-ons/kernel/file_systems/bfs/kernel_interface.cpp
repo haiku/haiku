@@ -527,7 +527,8 @@ bfs_get_file_map(fs_volume* _volume, fs_vnode* _node, off_t offset, size_t size,
 			return status;
 
 		vecs[index].offset = volume->ToOffset(run) + offset - fileOffset;
-		vecs[index].length = (run.Length() << blockShift) - offset + fileOffset;
+		vecs[index].length = ((uint32)run.Length() << blockShift)
+			- offset + fileOffset;
 
 		// are we already done?
 		if ((uint64)size <= (uint64)vecs[index].length
@@ -1189,13 +1190,11 @@ bfs_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 		newDirectory->ID(), newName);
 
 	// update the name only when they differ
-	bool nameUpdated = false;
 	if (strcmp(oldName, newName)) {
 		status = inode->SetName(transaction, newName);
 		if (status == B_OK) {
 			Index index(volume);
 			index.UpdateName(transaction, oldName, newName, inode);
-			nameUpdated = true;
 		}
 	}
 
@@ -1635,25 +1634,44 @@ bfs_read_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	FUNCTION();
 
 	TreeIterator* iterator = (TreeIterator*)_cookie;
-
-	uint16 length;
-	ino_t id;
-	status_t status = iterator->GetNextEntry(dirent->d_name, &length,
-		bufferSize, &id);
-	if (status == B_ENTRY_NOT_FOUND) {
-		*_num = 0;
-		return B_OK;
-	} else if (status != B_OK)
-		RETURN_ERROR(status);
-
 	Volume* volume = (Volume*)_volume->private_volume;
 
-	dirent->d_dev = volume->ID();
-	dirent->d_ino = id;
+	uint32 maxCount = *_num;
+	uint32 count = 0;
 
-	dirent->d_reclen = sizeof(struct dirent) + length;
+	while (count < maxCount && bufferSize > sizeof(struct dirent)) {
+		ino_t id;
+		uint16 length;
+		size_t nameBufferSize = bufferSize - sizeof(struct dirent) + 1;
 
-	*_num = 1;
+		status_t status = iterator->GetNextEntry(dirent->d_name, &length,
+			nameBufferSize, &id);
+
+		if (status == B_ENTRY_NOT_FOUND)
+			break;
+
+		if (status == B_BUFFER_OVERFLOW) {
+			// the remaining name buffer length was too small
+			if (count == 0)
+				RETURN_ERROR(B_BUFFER_OVERFLOW);
+			break;
+		}
+
+		if (status != B_OK)
+			RETURN_ERROR(status);
+
+		ASSERT(length < nameBufferSize);
+
+		dirent->d_dev = volume->ID();
+		dirent->d_ino = id;
+		dirent->d_reclen = sizeof(struct dirent) + length;
+
+		bufferSize -= dirent->d_reclen;
+		dirent = (struct dirent*)((uint8*)dirent + dirent->d_reclen);
+		count++;
+	}
+
+	*_num = count;
 	return B_OK;
 }
 

@@ -1,0 +1,417 @@
+/*!
+	\file MidiRoster.h
+	\ingroup midi2
+	\ingroup libbe
+	\brief Defines the heart of the MIDI Kit: the MIDI Roster.
+*/
+
+
+/*!
+	\enum BMidiOp
+	\ingroup midi2
+	\brief Defines the status codes for MIDI Server notification messages.
+
+	These codes are used when you request notification as in
+	BMidiRoster::StartWatching(). Check against these codes to determine what
+	is happening. See the StartWatching() method for a more complete
+	description of the codes and their meaning.
+*/
+
+
+/*!
+	\var B_MIDI_EVENT
+	\brief BMessage identifier of MIDI messages.
+*/
+
+
+/*!
+	\class BMidiRoster MidiRoster.h
+	\ingroup midi2
+	\ingroup libmidi2
+	\ingroup libbe
+	\brief Interface to the system-wide Midi Roster.
+
+	BMidiRoster allows you to find available MIDI consumer and producer
+	objects. You can locate these objects using the iterative NextEndpoint(),
+	NextProducer(), and NextConsumer() methods or by requesting notification
+	messages to be sent with StartWatching(). Notification messages may
+	contain object IDs which can be resolved using the FindEndpoint(),
+	FindProducer(), and FindConsumer() methods.
+
+	The constructor and destructor of BMidiRoster are private, which means
+	that you cannot create or delete your own BMidiRoster objects. Every
+	application can have only one instance of BMidiRoster, which is
+	automatically created the very first time you use a Midi Kit function.
+	You can call BMidiRoster's functions like this:
+\code
+producer = BMidiRoster::FindProducer(someID);
+\endcode
+Or using the slightly more annoying:
+\code
+BMidiRoster* roster = BMidiRoster::MidiRoster();
+if (roster != NULL)
+{
+    producer = roster->FindProducer(someID);
+}
+\endcode
+*/
+
+
+/*!
+	\fn BMidiEndpoint* BMidiRoster::NextEndpoint(int32* id)
+	\brief Returns the next endpoint from the roster
+
+	The "next endpoint" means: the endpoint with the ID that follows \a id.
+	So if you set id to 3, the first possible endpoint it returns is
+	endpoint 4. No endpoint can have ID 0, so passing 0 gives you the first
+	endpoint. If you pass \c NULL instead of an ID, NextEndpoint() always
+	returns \c NULL. When the function returns, it sets \a id to the ID of the
+	endpoint that was found. If no more endpoints exist, NextEndpoint()
+	returns \c NULL and id is not changed. NextEndpoint() does <b>not</b>
+	return locally created endpoints, even if they are Register()'ed.
+
+	Usage example:
+\code
+int32 id = 0;
+BMidiEndpoint* endp;
+while ((endp = BMidiRoster::NextEndpoint(&id)) != NULL)
+{
+    ... do something with endpoint ...
+    endp->Release();  // don't forget!
+}
+\endcode
+	Remember that NextEndpoint() bumps the endpoint's reference count, so you
+	should always \link BMidiEndpoint::Release() Release() \endlink it when
+	you are done.
+*/
+
+
+/*!
+	\fn BMidiProducer* BMidiRoster::NextProducer(int32* id)
+	\brief Returns the next producer from the roster.
+
+	Like NextEndpoint(), but only returns producer endpoints.
+
+	\sa NextConsumer
+	\sa NextEndpoint
+*/
+
+
+/*!
+	\fn BMidiConsumer* BMidiRoster::NextConsumer(int32* id)
+	\brief Returns the next consumer from the roster.
+
+	Like NextEndpoint(), but only returns consumer endpoints.
+
+	\sa NextProducer
+	\sa NextEndpoint
+*/
+
+
+/*!
+	\fn BMidiEndpoint* BMidiRoster::FindEndpoint(int32 id,
+		bool localOnly = false)
+	\brief Returns the endpoint with the specified \a id.
+
+	FindEndpoint() will always find <b>any</b> local endpoints created by this
+	application; they do not have to be published with Register() first. If
+	localOnly is false, FindEndpoint() also looks at remote endpoints,
+	otherwise only local endpoints will be resolved. Returns NULL if no such
+	endpoint could be found.
+
+	You should use a dynamic_cast to convert the BMidiEndpoint into a producer
+	or consumer:
+\code
+BMidiEndpoint* endp = ...;
+BMidiProducer* prod = NULL;
+BMidiConsumer* cons = NULL;
+if (endp->IsProducer())
+{
+    prod = dynamic_cast<BMidiProducer*>(endp);
+}
+else if (endp->IsConsumer())
+{
+    cons = dynamic_cast<BMidiConsumer*>(endp);
+}
+\endcode
+
+	Remember that FindEndpoint() increments the endpoint's reference count,
+	so you should always \link BMidiEndpoint::Release() Release() \endlink
+	an endpoint when you are done with it:
+\code
+BMidiEndpoint* endp = BMidiRoster::FindEndpoint(someID);
+if (endp != NULL)
+{
+    ...do stuff with the endpoint...
+    endp->Release();
+}
+\endcode
+*/
+
+
+/*!
+	\fn BMidiProducer* BMidiRoster::FindProducer(int32 id,
+		bool localOnly = false)
+	\brief Finds the producer with the specified \a id.
+
+	Like FindEndpoint(), but only looks for producer endpoints. Returns
+	\c NULL if no endpoint with that ID exists, or if that endpoint is not
+	a producer.
+
+	\sa FindConsumer
+	\sa FindEndpoint
+*/
+
+
+/*!
+	\fn BMidiConsumer* BMidiRoster::FindConsumer(int32 id,
+		bool localOnly = false)
+	\brief Finds the consumer with the specified \a id.
+
+	Like FindEndpoint(), but only looks for consumer endpoints. Returns
+	\c NULL if no endpoint with that ID exists, or if that endpoint is not
+	a consumer.
+
+	\sa FindProducer
+	\sa FindEndpoint
+*/
+
+
+/*!
+	\fn void BMidiRoster::StartWatching(const BMessenger* msngr)
+	\brief Start receiving notifications from the Midi Roster
+
+	When you start watching, BMidiRoster sends you notifications for all
+	currently \b published \c remote endpoints, and all the current
+	connections between them. (At this point, BMidiRoster does not let you
+	know about connections between unpublished endpoints, nor does it tell
+	you anything about your local endpoints, even though they may be
+	published.)
+
+	Thereafter, you'll receive notifications any time something important
+	happens to an object. The application that performs these operations is
+	itself not notified. The assumption here is that you already know about
+	these changes, because you are the one that is performing them.
+
+	The notifications are BMessages with code B_MIDI_EVENT. You specify the
+	BMessenger that will be used to send these messages. Each message contains
+	a field called be:op that describes the type of notification.
+
+	The "registered" and "unregistered" notifications are sent when a remote
+	endpoint Register()'s or Unregister()'s, respectively. You don't receive
+	these notifications when you register or unregister your local endpoints,
+	but the other apps will.
+
+	<table border="1">
+		<tr>
+			<td>be:op</td>
+			<td>int32</td>
+			<td>\c B_MIDI_REGISTERED</td>
+		</tr>
+		<tr>
+			<td>be:id</td>
+			<td>int32</td>
+			<td>id of the endpoint</td>
+		</tr>
+		<tr>
+			<td>be:type</td>
+			<td>string</td>
+			<td>"producer" or "consumer"</td>
+		</tr>
+	</table>
+	<table border="1">
+		<tr>
+			<td>be:op</td>
+			<td>int32</td>
+			<td>\c B_MIDI_UNREGISTERED</td>
+		</tr>
+		<tr>
+			<td>be:id</td>
+			<td>int32</td>
+			<td>id of the endpoint</td>
+		</tr>
+		<tr>
+			<td>be:type</td>
+			<td>string</td>
+			<td>"producer" or "consumer"</td>
+		</tr>
+	</table>
+
+	The "connected" and "disconnected" notifications are sent when a consumer
+	\link BMidiProducer::Connect() Connect()\endlink's to a producer, or when
+	they \link BMidiProducer::Disconnect() Disconnect() \endlink. You will
+	receive these notifications when \b any two endpoints connect or
+	disconnect, even if they are not published. (The purpose of which is
+	debatable.) You won't receive the notifications if you are the one making
+	the connection, even if both endpoints are remote. You \b will be notified
+	when another app connects one of your published endpoints.
+	<table border="1">
+		<tr>
+			<td>be:op</td>
+			<td>\c int32</td>
+			<td>\c B_MIDI_CONNECTED</td>
+		</tr>
+		<tr>
+			<td>be:producer</td>
+			<td>\c int32</td>
+			<td>id of the connector</td>
+		</tr>
+		<tr>
+			<td>be:consumer</td>
+			<td>\c int32</td>
+			<td>id of the connectee</td>
+		</tr>
+	</table>
+
+	<table border="1">
+		<tr>
+			<td>be:op</td>
+			<td>\c int32</td>
+			<td>\c B_MIDI_DISCONNECTED</td>
+		</tr>
+		<tr>
+			<td>be:producer</td>
+			<td>\c int32</td>
+			<td>id of the connector</td>
+		</tr>
+		<tr>
+			<td>be:consumer</td>
+			<td>int32</td>
+			<td>id of the connectee</td>
+		</tr>
+	</table>
+
+	the following notifications are sent when an endpoint's attributes are
+	changed. you receive these notifications only if another application is
+	changing one of its published endpoints.
+
+	<table border="1">
+		<tr>
+			<td>be:op</td>
+			<td>\c int32</td>
+			<td>\c B_MIDI_CHANGED_NAME</td>
+		</tr>
+		<tr>
+			<td>be:id</td>
+			<td>\c int32</td>
+			<td>id of the endpoint</td>
+		</tr>
+		<tr>
+			<td>be:type</td>
+			<td>string</td>
+			<td>"producer" or "consumer"</td>
+		</tr>
+		<tr>
+			<td>be:name</td>
+			<td>string</td>
+			<td>the endpoint's new name</td>
+		</tr>
+	</table>
+
+	<table border="1">
+		<tr>
+			<td>be:op</td>
+			<td>\c int32</td>
+			<td>\c B_MIDI_CHANGED_LATENCY</td>
+		</tr>
+		<tr>
+			<td>be:id</td>
+			<td>\c int32</td>
+			<td>id of the endpoint</td>
+		</tr>
+		<tr>
+			<td>be:type</td>
+			<td>string</td>
+			<td>"producer" or "consumer"</td>
+		</tr>
+		<tr>
+			<td>be:latency</td>
+			<td>int64</td>
+			<td>the new latency (microseconds)</td>
+		</tr>
+	</table>
+
+	<table border="1">
+		<tr>
+			<td>be:op</td>
+			<td>int32</td>
+			<td>\c B_MIDI_CHANGED_PROPERTIES</td>
+		</tr>
+		<tr>
+			<td>be:id</td>
+			<td>\c int32</td>
+			<td>id of the endpoint</td>
+		</tr>
+		<tr>
+			<td>be:type</td>
+			<td>string</td>
+			<td>"producer" or "consumer"</td>
+		</tr>
+		<tr>
+			<td>be:properties</td>
+			<td>bmessage</td>
+			<td>the new properties</td>
+		</tr>
+	</table>
+
+	Typical usage example:
+
+\code
+void MyView::AttachedToWindow()
+{
+    BMessenger msgr(this);
+    BMidiRoster::StartWatching(&msgr);
+}
+void MyView::MessageReceived(BMessage* msg)
+{
+    switch (msg->what)
+    {
+        case B_MIDI_EVENT:
+            HandleMidiEvent(msg);
+            break;
+        default:
+            super::MessageReceived(msg);
+            break;
+    }
+}
+\endcode
+
+	For the possible midi options, see #BMidiOp
+*/
+
+
+/*!
+	\fn void BMidiRoster::StopWatching()
+	\brief Stop receiving notifications from the Midi Roster.
+
+	\sa StartWatching()
+*/
+
+
+/*!
+	\fn status_t BMidiRoster::Register(BMidiEndpoint* object)
+	\brief Publishes an endpoint to other applications.
+
+	Calls BMidiEndpoint's \link BMidiEndpoint::Register() Register() \endlink
+	method to publish an endpoint, which makes it visible to other
+	applications.
+*/
+
+
+/*!
+	\fn status_t BMidiRoster::Unregister(BMidiEndpoint* object)
+	\brief Hides an endpoint from other applications.
+
+	Calls BMidiEndpoint's
+	\link BMidiEndpoint::Unregister() Unregister() \endlink method to hide
+	a previously published endpoint from other applications.
+*/
+
+
+/*!
+	\fn BMidiRoster* BMidiRoster::MidiRoster()
+	\brief Returns a pointer to the only instance of BMidiRoster.
+
+	There is no real reason use this function, since all BMidiRoster's public
+	function are static.
+*/

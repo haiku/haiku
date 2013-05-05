@@ -1,61 +1,66 @@
-1	swedish	x-vnd.Haiku.PoorMan	412131821
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		En förinställd hemsidemapp har skapats som \"/boot/home/public_html.\"\nSe till att det finns en HTML fil döpt \"index.html\" i mappen.
-About PoorMan…	PoorMan		Om FattigMan...
-Advanced	PoorMan		Avancerat
-Cancel	PoorMan		Avbryt
-Cannot start the server	PoorMan		Kan inte starta servern
-Clear console log	PoorMan		Rensa konsolloggen
-Clear hit counter	PoorMan		Nollställ träffräknaren
-Clear log file	PoorMan		Rensa loggfil
-Console Logging	PoorMan		Konsollogg
-Controls	PoorMan		Kontroller
-Copy	PoorMan		Kopiera
-Create	PoorMan		Skapa
-Create PoorMan log	PoorMan		Skapa loggfil
-Create log file	PoorMan		Skapa loggfil
-Default	PoorMan		Använd förvald
-Dir Created	PoorMan		Mapp skapad
-Directory: 	PoorMan		Mapp:
-Directory: (none)	PoorMan		Katalog: (ingen)
-Done	PoorMan		Klar
-Edit	PoorMan		Redigera
-Error Dir	PoorMan		Katalogfel
-Error Server	PoorMan		Serverfel
-File	PoorMan		Arkiv
-File Name	PoorMan		Filnamn
-File logging	PoorMan		Fillogg
-Hits: %lu	PoorMan		Träffar: %lu
-Hits: 0	PoorMan		Träffar: 0
-Log To Console	PoorMan		Skriv logg till konsol
-Log To File	PoorMan		Skriv logg till fil
-Log file name:	PoorMan		Loggfilsnamn:
-Logging	PoorMan		Loggar
-Logging view	PoorMan		Loggningsvy
-Max. simultaneous connections:	PoorMan		Maximalt antal samtidiga anslutningar:
-OK	PoorMan		OK
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Vänligen välj en mapp för hemsidepublicering.\n\nDu kan låta Fattigman skapa en förinställd \"public_html\" i din hemmapp eller välja en egen map.
-PoorMan	System name		FattigMan
-PoorMan settings	PoorMan		Fattigmans inställningar
-Quit	PoorMan		Avsluta
-Run server	PoorMan		Kör server
-Save console as…	PoorMan		Spara konsol som...
-Save console selections as…	PoorMan		Spara konsolmarkeringar som...
-Save log console	PoorMan		Spara konsollogg
-Save log console selection	PoorMan		Spara konsolloggsmarkering
-Select	PoorMan		Välj mapp
-Select all	PoorMan		Markera allt
-Select web folder	PoorMan		Välj hemsidesmapp
-Send file listing if there's no start page	PoorMan		Visa fillista om startsida saknas
-Settings…	PoorMan		Inställningar...
-Shutting down.	PoorMan		Stänger ner.
-Shutting down.\n	PoorMan		Stänger ner.\n
-Site	PoorMan		Hemsida
-Start page:	PoorMan		Startsida:
-Starting up... 	PoorMan		Startar...
-Status: Running	PoorMan		Status: Körs
-Status: Stopped	PoorMan		Status: Stoppad
-Web folder:	PoorMan		Hemsidemapp:
+1	swedish	x-vnd.Haiku-PoorMan	1267330937
 Website location	PoorMan		Hemsidans mapp
-Website options	PoorMan		Hemsidesalternativ
-connections	PoorMan		anslutningar
+Error Server	PoorMan		Serverfel
+Settings…	PoorMan		Inställningar...
+Create PoorMan log	PoorMan		Skapa loggfil
+Shutting down.\n	PoorMan		Stänger ner.\n
+Hits: %lu	PoorMan		Träffar: %lu
+Web folder:	PoorMan		Hemsidemapp:
+Default	PoorMan		Använd förvald
+Save log console selection	PoorMan		Spara konsolloggsmarkering
+Run server	PoorMan		Kör server
+PoorMan settings	PoorMan		Fattigmans inställningar
+Clear hit counter	PoorMan		Nollställ träffräknaren
+Copy	PoorMan		Kopiera
+Max. simultaneous connections:	PoorMan		Maximalt antal samtidiga anslutningar:
+Start page:	PoorMan		Startsida:
 done.\n	PoorMan		klar.\n
+Create	PoorMan		Skapa
+Shutting down.	PoorMan		Stänger ner.
+Website options	PoorMan		Hemsidesalternativ
+File Name	PoorMan		Filnamn
+Clear console log	PoorMan		Rensa konsolloggen
+Advanced	PoorMan		Avancerat
+OK	PoorMan		OK
+Status: Stopped	PoorMan		Status: Stoppad
+Dir Created	PoorMan		Mapp skapad
+Log to file	PoorMan		Skriv logg till fil
+Quit	PoorMan		Avsluta
+Hits: 0	PoorMan		Träffar: 0
+Save log console	PoorMan		Spara konsollogg
+Edit	PoorMan		Redigera
+Create Log File	PoorMan		Skapa loggfil
+Log to console	PoorMan		Skriv logg till konsol
+Directory: (none)	PoorMan		Katalog: (ingen)
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Vänligen välj en mapp för hemsidepublicering.\n\nDu kan låta Fattigman skapa en förinställd \"public_html\" i din hemmapp eller välja en egen map.
+Log To Console	PoorMan		Skriv logg till konsol
+Connections	PoorMan		Anslutningar
+Status: Running	PoorMan		Status: Körs
+connections	PoorMan		anslutningar
+Controls	PoorMan		Kontroller
+Send file listing if there's no start page	PoorMan		Visa fillista om startsida saknas
+Error Dir	PoorMan		Katalogfel
+Select all	PoorMan		Markera allt
+File	PoorMan		Arkiv
+File Logging	PoorMan		Filloggning
+Save console selections as…	PoorMan		Spara konsolmarkeringar som...
+File logging	PoorMan		Fillogg
+Select web folder	PoorMan		Välj hemsidesmapp
+Logging view	PoorMan		Loggningsvy
+Logging	PoorMan		Loggar
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		En förinställd hemsidemapp har skapats som \"/boot/home/public_html.\"\nSe till att det finns en HTML fil döpt \"index.html\" i mappen.
+Clear log file	PoorMan		Rensa loggfil
+Log file name:	PoorMan		Loggfilsnamn:
+Directory: 	PoorMan		Mapp:
+Log To File	PoorMan		Skriv logg till fil
+Done	PoorMan		Klar
+Create log file	PoorMan		Skapa loggfil
+Starting up... 	PoorMan		Startar...
+Site	PoorMan		Hemsida
+Cancel	PoorMan		Avbryt
+Console logging	PoorMan		Konsolloggning
+Cannot start the server	PoorMan		Kan inte starta servern
+Select	PoorMan		Välj mapp
+Save console as…	PoorMan		Spara konsol som...
+PoorMan	System name		PoorMan
+Console Logging	PoorMan		Konsollogg

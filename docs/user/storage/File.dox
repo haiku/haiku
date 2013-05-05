@@ -1,0 +1,397 @@
+/*
+ * Copyright 2009-2012 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ *		John Scipione, jscipione@gmail.com
+ *		Ingo Weinhold, bonefish@users.sf.net
+ *
+ * Corresponds to:
+ *		headers/os/storage/File.h  hrev45060
+ *		src/kits/storage/File.cpp  hrev45060
+ */
+
+
+/*!
+	\file File.h
+	\ingroup storage
+	\ingroup libbe
+	\brief Provides the BFile class.
+*/
+
+
+/*!
+	\class BFile
+	\ingroup storage
+	\ingroup libbe
+	\brief Provides the ability to read and write the data of a file.
+
+	The file is automatically opened when you initialize a BFile and is 
+	automatically closed when you re-initialize or destroy the object.
+
+	Symbolic links are automatically transversed by opening a BFile.
+	The node that the BFile ends up opening will be the file or directory
+	that the link points to, not the symbolic link file itself.
+*/
+
+
+/*!
+	\fn BFile::BFile()
+	\brief Creates an uninitialized BFile object.
+
+	Should be followed by a call to one of the SetTo() methods, or an
+	assignment:
+	- SetTo(const entry_ref* ref, uint32 openMode)
+	- SetTo(const BEntry* entry, uint32 openMode)
+	- SetTo(const char* path, uint32 openMode)
+	- SetTo(const BDirectory* dir, const char* path, uint32 openMode)
+	- operator=(const BFile &file)
+*/
+
+
+/*!
+	\fn BFile::BFile(const BFile& file)
+	\brief Creates a copy of the supplied BFile.
+
+	If \a file is uninitialized, the newly constructed BFile will be too.
+
+	\param file The BFile object to be copied.
+*/
+
+
+/*!
+	\fn BFile::BFile(const entry_ref* ref, uint32 openMode)
+	\brief Creates a BFile and initializes it to the file referred to by
+		   the supplied entry_ref and according to the specified open mode.
+
+	\param ref The entry_ref referring to the file.
+	\param openMode The mode in which the file should be opened.
+
+	\see SetTo(const entry_ref* ref, uint32 openMode)
+*/
+
+
+/*!
+	\fn BFile::BFile(const BEntry* entry, uint32 openMode)
+	\brief Creates a BFile and initializes it to the file referred to by
+		   the supplied BEntry and according to the specified open mode.
+
+	\param entry The BEntry referring to the file.
+	\param openMode The mode in which the file should be opened.
+
+	\see SetTo(const BEntry* entry, uint32 openMode)
+*/
+
+
+/*!
+	\fn BFile::BFile(const char* path, uint32 openMode)
+	\brief Creates a BFile and initializes it to the file referred to by
+		   the supplied path name and according to the specified open mode.
+
+	\param path The file's path name.
+	\param openMode The mode in which the file should be opened.
+
+	\see SetTo(const char* path, uint32 openMode)
+*/
+
+
+/*!
+	\fn BFile::BFile(const BDirectory *dir, const char* path, uint32 openMode)
+	\brief Creates a BFile and initializes it to the file referred to by
+		   the supplied path name relative to the specified BDirectory and
+		   according to the specified open mode.
+
+	\param dir The BDirectory, relative to which the file's path name is
+		   given.
+	\param path The file's path name relative to \a dir.
+	\param openMode The mode in which the file should be opened.
+
+	\see SetTo(const BDirectory* dir, const char* path, uint32 openMode)
+*/
+
+
+/*!
+	\fn BFile::~BFile()
+	\brief Destroys the BFile object and frees all allocated resources.
+
+	If the file is properly initialized, the file descriptor is closed.
+*/
+
+
+/*!
+	\fn status_t BFile::SetTo(const entry_ref* ref, uint32 openMode)
+	\brief Re-initializes the BFile to the file referred to by the
+		   supplied entry_ref and according to the specified open mode.
+
+	\param ref The entry_ref referring to the file.
+	\param openMode The mode in which the file should be opened
+		\a openMode must be a bitwise or of exactly one of the flags.
+		- \c B_READ_ONLY: The file is opened read only.
+		- \c B_WRITE_ONLY: The file is opened write only.
+		- \c B_READ_WRITE: The file is opened for random read/write access.
+		and any number of the flags
+		- \c B_CREATE_FILE: A new file will be created, if it does not already
+			exist.
+		- \c B_FAIL_IF_EXISTS: If the file does already exist and
+			\c B_CREATE_FILE is set, SetTo() fails.
+		- \c B_ERASE_FILE: An already existing file is truncated to zero size.
+		- \c B_OPEN_AT_END: Seek() to the end of the file after opening.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a ref or bad \a openMode.
+	\retval B_ENTRY_NOT_FOUND File not found or failed to create file.
+	\retval B_FILE_EXISTS File exists and \c B_FAIL_IF_EXISTS was passed.
+	\retval B_PERMISSION_DENIED File permissions didn't allow operation.
+	\retval B_NO_MEMORY Insufficient memory for operation.
+	\retval B_LINK_LIMIT Indicates a cyclic loop within the file system.
+	\retval B_BUSY A node was busy.
+	\retval B_FILE_ERROR A general file error.
+	\retval B_NO_MORE_FDS The application has run out of file descriptors.
+*/
+
+
+/*!
+	\fn status_t BFile::SetTo(const BEntry* entry, uint32 openMode)
+	\brief Re-initializes the BFile to the file referred to by the
+		   supplied BEntry and according to the specified open mode.
+
+	\param entry the BEntry referring to the file
+	\param openMode the mode in which the file should be opened
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a entry or bad \a openMode.
+	\retval B_ENTRY_NOT_FOUND File not found or failed to create file.
+	\retval B_FILE_EXISTS File exists and \c B_FAIL_IF_EXISTS was passed.
+	\retval B_PERMISSION_DENIED File permissions didn't allow operation.
+	\retval B_NO_MEMORY Insufficient memory for operation.
+	\retval B_LINK_LIMIT Indicates a cyclic loop within the file system.
+	\retval B_BUSY A node was busy.
+	\retval B_FILE_ERROR A general file error.
+	\retval B_NO_MORE_FDS The application has run out of file descriptors.
+
+	\todo Implemented using SetTo(entry_ref*, uint32). Check, if necessary
+		  to re-implement!
+*/
+
+
+/*!
+	\fn status_t BFile::SetTo(const char* path, uint32 openMode)
+	\brief Re-initializes the BFile to the file referred to by the
+		   supplied path name and according to the specified open mode.
+
+	\param path The file's path name.
+	\param openMode The mode in which the file should be opened.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a path or bad \a openMode.
+	\retval B_ENTRY_NOT_FOUND File not found or failed to create file.
+	\retval B_FILE_EXISTS File exists and \c B_FAIL_IF_EXISTS was passed.
+	\retval B_PERMISSION_DENIED File permissions didn't allow operation.
+	\retval B_NO_MEMORY Insufficient memory for operation.
+	\retval B_LINK_LIMIT Indicates a cyclic loop within the file system.
+	\retval B_BUSY A node was busy.
+	\retval B_FILE_ERROR A general file error.
+	\retval B_NO_MORE_FDS The application has run out of file descriptors.
+*/
+*/
+
+
+/*!
+	\fn status_t BFile::SetTo(const BDirectory* dir, const char* path,
+		uint32 openMode)
+	\brief Re-initializes the BFile to the file referred to by the
+		   supplied path name relative to the specified BDirectory and
+		   according to the specified open mode.
+
+	\param dir The BDirectory, relative to which the file's path name is
+		   given.
+	\param path The file's path name relative to \a dir.
+	\param openMode The mode in which the file should be opened.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a dir or \a path or bad \a openMode.
+	\retval B_ENTRY_NOT_FOUND File not found or failed to create file.
+	\retval B_FILE_EXISTS File exists and \c B_FAIL_IF_EXISTS was passed.
+	\retval B_PERMISSION_DENIED File permissions didn't allow operation.
+	\retval B_NO_MEMORY Insufficient memory for operation.
+	\retval B_LINK_LIMIT Indicates a cyclic loop within the file system.
+	\retval B_BUSY A node was busy.
+	\retval B_FILE_ERROR A general file error.
+	\retval B_NO_MORE_FDS The application has run out of file descriptors.
+
+	\todo Implemented using SetTo(BEntry*, uint32). Check, if necessary
+		  to re-implement!
+*/
+
+
+/*!
+	\fn bool BFile::IsReadable() const
+	\brief Reports whether or not the file is readable.
+
+	\return
+	- \c true, if the BFile has been initialized properly and the file has
+	  been been opened for reading,
+	- \c false, otherwise.
+*/
+
+
+/*!
+	\fn bool BFile::IsWritable() const
+	\brief Reports whether or not the file is writable.
+
+	\return
+	- \c true, if the BFile has been initialized properly and the file has
+	  been opened for writing,
+	- \c false, otherwise.
+*/
+
+
+/*!
+	ssize_t BFile::Read(void* buffer, size_t size)
+	\brief Reads a number of bytes from the file into a buffer.
+
+	\param buffer The buffer the data from the file shall be written to.
+	\param size The number of bytes that shall be read.
+
+	\returns The number of bytes read or an error code.
+*/
+
+
+/*!
+	\fn ssize_t BFile::ReadAt(off_t location, void* buffer, size_t size)
+	\brief Reads a number of bytes from a certain position within the file
+		   into a buffer.
+
+	\param location The position (in bytes) within the file from which the
+		   data shall be read.
+	\param buffer The buffer the data from the file shall be written to.
+	\param size The number of bytes that shall be read.
+
+	\returns The number of bytes read or an error code.
+*/
+
+
+/*!
+	\fn ssize_t BFile::Write(const void* buffer, size_t size)
+	\brief Writes a number of bytes from a buffer into the file.
+
+	\param buffer The buffer containing the data to be written to the file.
+	\param size The number of bytes that shall be written.
+
+	\returns The number of bytes actually written or an error code.
+*/
+
+
+/*!
+	\fn ssize_t BFile::WriteAt(off_t location, const void* buffer, size_t size)
+	\brief \brief Writes a number of bytes from a buffer at a certain position
+		   into the file.
+
+	\param location The position (in bytes) within the file at which the data
+		   shall be written.
+	\param buffer The buffer containing the data to be written to the file.
+	\param size The number of bytes that shall be written.
+
+	\returns The number of bytes actually written or an error code.
+*/
+
+
+/*!
+	\fn off_t BFile::Seek(off_t offset, uint32 seekMode)
+	\brief Seeks to another read/write position within the file.
+
+	It is allowed to seek past the end of the file. A subsequent call to
+	Write() will pad the file with undefined data. Seeking before the
+	beginning of the file will fail and the behavior of subsequent Read()
+	or Write() invocations will be undefined.
+
+	\param offset New read/write position, depending on \a seekMode relative
+		   to the beginning or the end of the file or the current position.
+	\param seekMode
+		- \c SEEK_SET: move relative to the beginning of the file
+		- \c SEEK_CUR: move relative to the current position
+		- \c SEEK_END: move relative to the end of the file
+
+	\returns The new read/write position relative to the beginning of the
+		file or an error code.
+	\retval B_ERROR Trying to seek before the beginning of the file.
+	\retval B_FILE_ERROR The file is not properly initialized.
+*/
+
+
+/*!
+	\fn off_t BFile::Position() const
+	\brief Gets the current read/write position within the file.
+
+	\returns The current read/write position relative to the beginning of the
+		file or an error code.
+	\retval B_ERROR After a Seek() before the beginning of the file.
+	\retval B_FILE_ERROR The file has not been initialized.
+*/
+
+
+/*!
+	\fn status_t BFile::SetSize(off_t size)
+	\brief Sets the size of the file.
+
+	If the file is shorter than \a size bytes it will be padded with
+	unspecified data to the requested size. If it is larger, it will be
+	truncated.
+
+	\note There's no problem with setting the size of a BFile opened in
+		  \c B_READ_ONLY mode, unless the file resides on a read only volume.
+
+	\param size The new file size.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NOT_ALLOWED Trying to set the size of a file on a read only
+			volume.
+	\retval B_DEVICE_FULL There's not enough space left on the volume.
+*/
+
+
+/*!
+	\fn status_t BFile::GetSize(off_t* size) const
+	\brief Gets the size of the file.
+
+	\param size The file size to fill out.
+
+	\returns A status code.
+
+	\see BStatable::GetSize()
+*/
+
+
+/*!
+	\fn BFile& BFile::operator=(const BFile &file)
+	\brief Assigns another BFile to this BFile.
+
+	If the other BFile is uninitialized, this one will be too. Otherwise it
+	will refer to the same file using the same mode, unless an error occurs.
+
+	\param file The original BFile to assign from.
+
+	\returns A reference to the assigned BFile.
+*/
+
+
+/*!
+	\fn int BFile::get_fd() const
+	\brief Gets the file descriptor of the BFile.
+
+	To be used instead of accessing the BNode's private \c fFd member directly.
+
+	\returns The file descriptor, or -1 if not properly initialized.
+*/
+
+
+/*!
+	\fn void BFile::close_fd()
+	\brief Overrides BNode::close_fd() for binary compatibility with BeOS R5.
+*/

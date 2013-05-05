@@ -63,14 +63,12 @@ struct DM9601NotifyData {
 
 
 struct DeviceInfo {
-	union Id {
-		uint16	fIds[2];
-		uint32	fKey;
-	}			fId;
+	uint16	fIds[2];
+
 	const char* fName;
-	inline uint16		VendorId()	{ return fId.fIds[0]; }
-	inline uint16		ProductId()	{ return fId.fIds[1]; }
-	inline uint32		Key()		{ return fId.fKey;    }
+	inline uint16		VendorId()	{ return fIds[0]; }
+	inline uint16		ProductId()	{ return fIds[1]; }
+	inline uint32		Key()		{ return fIds[0] << 16 | fIds[1]; }
 };
 
 class DavicomDevice {

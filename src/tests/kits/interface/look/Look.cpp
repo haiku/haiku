@@ -71,9 +71,9 @@ void
 add_menu_fields(BGridLayout* layout, int32& row)
 {
 	BPopUpMenu* menu1 = new BPopUpMenu("Selection");
-	BMenuField* control1 = new BMenuField("Enabled", menu1, NULL);
+	BMenuField* control1 = new BMenuField("Enabled", menu1);
 	BPopUpMenu* menu2 = new BPopUpMenu("Selection");
-	BMenuField* control2 = new BMenuField("Disabled", menu2, NULL);
+	BMenuField* control2 = new BMenuField("Disabled", menu2);
 	control2->SetEnabled(false);
 
 #if USE_LAYOUT_ITEMS

@@ -13,6 +13,7 @@
 
 #include <StorageDefs.h>
 
+#include <errno_private.h>
 #include "LocaleBackend.h"
 
 
@@ -58,7 +59,7 @@ extern "C" struct tm*
 localtime_r(const time_t* inTime, struct tm* tmOut)
 {
 	if (inTime == NULL) {
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		return NULL;
 	}
 
@@ -67,12 +68,12 @@ localtime_r(const time_t* inTime, struct tm* tmOut)
 		status_t status = gLocaleBackend->Localtime(inTime, tmOut);
 
 		if (status != B_OK)
-			errno = EOVERFLOW;
+			__set_errno(EOVERFLOW);
 
 		return tmOut;
 	}
 
-	errno = ENOSYS;
+	__set_errno(ENOSYS);
 	return NULL;
 }
 
@@ -90,7 +91,7 @@ extern "C" struct tm*
 gmtime_r(const time_t* inTime, struct tm* tmOut)
 {
 	if (inTime == NULL) {
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		return NULL;
 	}
 
@@ -99,12 +100,12 @@ gmtime_r(const time_t* inTime, struct tm* tmOut)
 		status_t status = gLocaleBackend->Gmtime(inTime, tmOut);
 
 		if (status != B_OK)
-			errno = EOVERFLOW;
+			__set_errno(EOVERFLOW);
 
 		return tmOut;
 	}
 
-	errno = ENOSYS;
+	__set_errno(ENOSYS);
 	return NULL;
 }
 
@@ -113,7 +114,7 @@ extern "C" time_t
 mktime(struct tm* inTm)
 {
 	if (inTm == NULL) {
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		return -1;
 	}
 
@@ -123,13 +124,13 @@ mktime(struct tm* inTm)
 		status_t status = gLocaleBackend->Mktime(inTm, timeOut);
 
 		if (status != B_OK) {
-			errno = EOVERFLOW;
+			__set_errno(EOVERFLOW);
 			return -1;
 		}
 
 		return timeOut;
 	}
 
-	errno = ENOSYS;
+	__set_errno(ENOSYS);
 	return -1;
 }

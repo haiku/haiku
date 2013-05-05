@@ -34,8 +34,8 @@
 const uint32 SCROLL_X_DRAG = 'sxdr';
 const uint32 SCROLL_Y_DRAG = 'sydr';
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "TouchpadPrefView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "TouchpadPrefView"
 
 
 TouchpadView::TouchpadView(BRect frame)
@@ -106,6 +106,7 @@ TouchpadView::MouseUp(BPoint point)
 			"normal mouse operation. Do you really want to change it?"),
 			B_TRANSLATE("OK"), B_TRANSLATE("Cancel"),
 			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetShortcut(1, B_ESCAPE);
 		result = alert->Go();
 	}
 	if (result == 0) {
@@ -375,6 +376,7 @@ TouchpadPrefView::SetupView()
 	fScrollAccelSlider->SetHashMarkCount(7);
 	fScrollAccelSlider->SetLimitLabels(B_TRANSLATE("Slow"),
 		B_TRANSLATE("Fast"));
+	fScrollAccelSlider->SetExplicitMinSize(BSize(150, B_SIZE_UNSET));
 
 	fScrollStepXSlider = new BSlider("scroll_stepX",
 		B_TRANSLATE("Horizontal"),

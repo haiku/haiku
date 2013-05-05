@@ -265,7 +265,7 @@ OverlayInode::OverlayInode(OverlayVolume *volume, fs_vnode *superVnode,
 		fIsDataModified(false),
 		fFileCache(NULL)
 {
-	TRACE("inode created %lld\n", fInodeNumber);
+	TRACE("inode created %" B_PRIdINO "\n", fInodeNumber);
 
 	recursive_lock_init(&fLock, "write overlay inode lock");
 	if (superVnode != NULL)
@@ -290,7 +290,7 @@ OverlayInode::OverlayInode(OverlayVolume *volume, fs_vnode *superVnode,
 
 OverlayInode::~OverlayInode()
 {
-	TRACE("inode destroyed %lld\n", fInodeNumber);
+	TRACE("inode destroyed %" B_PRIdINO "\n", fInodeNumber);
 	if (fFileCache != NULL)
 		file_cache_delete(fFileCache);
 
@@ -687,7 +687,7 @@ OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length,
 
 	uint8 *pointer = (uint8 *)buffer;
 	write_buffer *element = fWriteBuffers;
-	size_t bytesLeft = MIN(fStat.st_size - position, *length);
+	size_t bytesLeft = (size_t)MIN(fStat.st_size - position, (off_t)*length);
 	*length = bytesLeft;
 
 	void *superCookie = _cookie;
@@ -697,14 +697,15 @@ OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length,
 	while (bytesLeft > 0) {
 		size_t gapSize = bytesLeft;
 		if (element != NULL) {
-			gapSize = MIN(bytesLeft, element->position > position ?
+			gapSize = (size_t)MIN((off_t)bytesLeft, element->position > position ?
 				element->position - position : 0);
 		}
 
 		if (gapSize > 0 && !fIsVirtual && position < fOriginalNodeLength) {
 			// there's a part missing between the read position and our
 			// next position, fill the gap with original file content
-			size_t readLength = MIN(fOriginalNodeLength - position, gapSize);
+			size_t readLength = (size_t)MIN(fOriginalNodeLength - position,
+				(off_t)gapSize);
 			status_t result = B_ERROR;
 			if (readPages) {
 				iovec vector;
@@ -767,7 +768,8 @@ OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length,
 
 		off_t elementEnd = element->position + element->length;
 		if (elementEnd > position) {
-			size_t copyLength = MIN(elementEnd - position, bytesLeft);
+			size_t copyLength = (size_t)MIN(elementEnd - position,
+				(off_t)bytesLeft);
 
 			const void *source = element->buffer + (position
 				- element->position);

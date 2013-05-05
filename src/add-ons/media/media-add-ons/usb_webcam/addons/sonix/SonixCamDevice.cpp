@@ -407,8 +407,8 @@ SonixCamDevice::ReadIIC(uint8 address, uint8 *data)
 	if (!Sensor())
 		return B_NO_INIT;
 	//dprintf(ID "sonix_i2c_write_multi(, %02x, %d, {%02x, %02x, %02x, %02x, %02x})\n", slave, count, d0, d1, d2, d3, d4);
-	buffer[0] = (1 << 4) | Sensor()->Use400kHz()?0x01:0
-						 | Sensor()->UseRealIIC()?0x80:0;
+	buffer[0] = (1 << 4) | (Sensor()->Use400kHz()?0x01:0)
+						| (Sensor()->UseRealIIC()?0x80:0);
 	buffer[1] = Sensor()->IICWriteAddress();
 	buffer[2] = address;
 	buffer[7] = 0x10; /* absolutely no idea why V4L2 driver use that value */
@@ -421,8 +421,8 @@ SonixCamDevice::ReadIIC(uint8 address, uint8 *data)
 
 
 	//dprintf(ID "sonix_i2c_write_multi(, %02x, %d, {%02x, %02x, %02x, %02x, %02x})\n", slave, count, d0, d1, d2, d3, d4);
-	buffer[0] = (1 << 4) | Sensor()->Use400kHz()?0x01:0
-				  | 0x02 | Sensor()->UseRealIIC()?0x80:0; /* read 1 byte */
+	buffer[0] = (1 << 4) | (Sensor()->Use400kHz()?0x01:0)
+				  | 0x02 | (Sensor()->UseRealIIC()?0x80:0); /* read 1 byte */
 	buffer[1] = Sensor()->IICReadAddress();//IICWriteAddress
 	buffer[7] = 0x10; /* absolutely no idea why V4L2 driver use that value */
 	err = WriteReg(SN9C102_I2C_SETUP, buffer, 8);

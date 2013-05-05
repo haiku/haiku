@@ -62,3 +62,23 @@ BGridView::Instantiate(BMessage* from)
 		return new BGridView(from);
 	return NULL;
 }
+
+
+status_t
+BGridView::Perform(perform_code code, void* _data)
+{
+	return BView::Perform(code, _data);
+}
+
+
+void BGridView::_ReservedGridView1() {}
+void BGridView::_ReservedGridView2() {}
+void BGridView::_ReservedGridView3() {}
+void BGridView::_ReservedGridView4() {}
+void BGridView::_ReservedGridView5() {}
+void BGridView::_ReservedGridView6() {}
+void BGridView::_ReservedGridView7() {}
+void BGridView::_ReservedGridView8() {}
+void BGridView::_ReservedGridView9() {}
+void BGridView::_ReservedGridView10() {}
+

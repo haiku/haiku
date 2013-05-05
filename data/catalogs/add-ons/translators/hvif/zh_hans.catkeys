@@ -1,8 +1,0 @@
-1	simplified_chinese	x-vnd.Haiku-HVIFTranslator	813066125
-HVIF Settings	HVIFMain		HVIF 设置
-HVIF icons	HVIFTranslator		HVIF 图标
-HVIFTranslator Settings	HVIFTranslator		HVIF 转换器设置
-Native Haiku icon format translator	HVIFView		原生 Haiku 图标格式转换器
-Native Haiku vector icon translator	HVIFTranslator		原生 Haiku 矢量图标转换器
-Render size:	HVIFView		渲染尺寸：
-Version %d.%d.%d, %s	HVIFView		版本 %d.%d.%d，%s

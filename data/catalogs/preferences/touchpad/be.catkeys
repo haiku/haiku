@@ -1,20 +1,20 @@
 1	belarusian	x-vnd.Haiku-Touchpad	607725922
-Acceleration	TouchpadPrefView		Паскарэнне
-Cancel	TouchpadPrefView		Адмова
-Defaults	TouchpadPrefView		Прадвызначаныя
-Fast	TouchpadPrefView		Хутка
-High	TouchpadPrefView		Высока
-Horizontal	TouchpadPrefView		Гарызантальны
-Horizontal scrolling	TouchpadPrefView		Гарызантальная пракрутка
-OK	TouchpadPrefView		ОК
-Off	TouchpadPrefView		Выкл.
-Please confirm	TouchpadPrefView		Падцвердзіце, калі ласка
-Revert	TouchpadPrefView		Вярнуць
 Scrolling	TouchpadPrefView		Пракрутка
-Sensitivity	TouchpadPrefView		Адчувальнасць
-Slow	TouchpadPrefView		Павольна
-Tapping	TouchpadPrefView		Тапінг
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Абшар пракруткі занадта вялікі і можа перашкаджаць працы указальніка мышы. Насамрэч жадаеце яго змяніць?
 Touchpad	System name		Тачпад
+Revert	TouchpadPrefView		Вярнуць
+Tapping	TouchpadPrefView		Тапінг
+Please confirm	TouchpadPrefView		Падцвердзіце, калі ласка
 Two finger scrolling	TouchpadPrefView		Двухпальцавая пракрутка
+Defaults	TouchpadPrefView		Прадвызначаныя
+Slow	TouchpadPrefView		Павольна
 Vertical	TouchpadPrefView		Вертыкальны
+High	TouchpadPrefView		Высока
+Horizontal scrolling	TouchpadPrefView		Гарызантальная пракрутка
+Fast	TouchpadPrefView		Хутка
+OK	TouchpadPrefView		ОК
+Acceleration	TouchpadPrefView		Паскарэнне
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Абшар пракруткі занадта вялікі і можа перашкаджаць працы указальніка мышы. Насамрэч жадаеце яго змяніць?
+Horizontal	TouchpadPrefView		Гарызантальны
+Off	TouchpadPrefView		Выкл.
+Sensitivity	TouchpadPrefView		Адчувальнасць
+Cancel	TouchpadPrefView		Адмова

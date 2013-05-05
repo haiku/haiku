@@ -16,6 +16,7 @@ if $(CHECK_MALLOC) {
 SharedLibrary libmedia.so :
 	# Private Media Kit
 	!missing_symbols.cpp
+	SoundConsumer.cpp
 
 	# Public Media Kit
 	Buffer.cpp
@@ -59,6 +60,7 @@ SharedLibrary libmedia.so :
 	TimeSourceObject.cpp
 	TimeSourceObjectManager.cpp
 	SoundPlayNode.cpp
+	SoundUtils.cpp
 
 	# Old (R3) Media Kit (built only for GCC2)
 	OldAudioModule.cpp

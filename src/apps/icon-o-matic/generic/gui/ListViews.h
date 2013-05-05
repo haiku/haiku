@@ -111,8 +111,10 @@ class DragSortableListView : public MouseWheelTarget,
 	virtual	void			SetItemFocused(int32 index);
 
 	virtual	bool			AcceptDragMessage(const BMessage* message) const;
+	virtual	bool			HandleDropMessage(const BMessage* message,
+								int32 dropIndex);
 	virtual	void			SetDropTargetRect(const BMessage* message,
-											  BPoint where);
+								BPoint where);
 
 							// autoscrolling
 			void			SetAutoScrolling(bool enable);

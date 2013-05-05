@@ -1,0 +1,133 @@
+1	croatian	x-vnd.Haiku-FileTypes	1777928056
+%1 application type	Application Type Window		%1 vrsta programa
+%ld Application type%s could be removed.	Application Types Window		%ld Vsta programa%s se može ukloniti.
+%s file type	FileType Window		%s vrsta datoteke
+(from application)	FileTypes Window		(iz programa)
+Abort	Application Types Window		Prekini
+Add	Attribute Window		Dodaj
+Add	Extension Window		Dodaj
+Add group	New File Type Window		Dodaj grupu
+Add icon…	Icon View		Dodaj ikonu...
+Add new group	New File Type Window		Dodaj novu grupu
+Add type	New File Type Window		Dodaj vrstu
+Add…	Application Type Window		Dodaj...
+Add…	FileTypes Window		Dodaj...
+Alignment:	Attribute Window		Poravnanje:
+Alpha	Application Type Window		Alfa
+Alpha	Application Types Window		Alfa
+Application flags	Application Type Window		Zastave programa
+Application type	Application Type Window		Vrsta programa
+Application types	Application Types Window		Vrste programa
+Application types…	FileTypes Window		Vrste programa...
+Attribute	Attribute Window		Atribut
+Attribute name:	Attribute Window		Ime atributa:
+Background app	Application Type Window		Pozadinski program
+Beta	Application Type Window		Beta
+Beta	Application Types Window		Beta
+Cancel	Application Type Window		Otkaži
+Cancel	Attribute Window		Otkaži
+Cancel	Extension Window		Otkaži
+Cancel	FileTypes Window		Otkaži
+Cancel	New File Type Window		Otkaži
+Cancel	Preferred App Menu		Otkaži
+Cancel	Type List Window		Otkaži
+Center	Attribute Window	Attribute column alignment in Tracker	Središte
+Choose type	Type List Window		izaberi vrstu
+Close	Application Type Window		Zatvori
+Could not change attributes	Attribute Window		Ne mogu promjeniti atribute
+Could not change file extensions	Extension Window		Ne mogu promijeniti proširenja datoteke
+Could not install file type	New File Type Window		Ne mogu instalirati datotečnu vrstu
+Could not open \"%s\":\n%s	FileTypes		Ne mogu otvoriti \"%s\":\n%s
+Could not open file	FileType Window		Ne mogu otvoriti datoteku
+Could not remove file type: %s\n	FileTypes Window		Ne mogu ukloniti vrstu datoteke: %s\n
+Could not set preferred application	FileTypes Window		Ne mogu postaviti poželjni program
+Default application	FileType Window		Zadani program
+Description	FileTypes Window		Opis
+Description:	Application Types Window		Opis:
+Description:	FileTypes Window		Opis:
+Development	Application Type Window		Razvoj
+Development	Application Types Window		Razvoj
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	Prikaži kao...
+Do you want to save the changes?	Application Type Window		Želite li spremiti promjene?
+Done	Attribute Window		Učinjeno
+Done	Extension Window		Učinjeno
+Done	Type List Window		Učinjeno
+Edit icon…	Icon View		Uredi ikonu...
+Edit…	Application Types Window		Uredi...
+Extension	Extension Window		Proširenje
+Extension:	Extension Window		Proširenje:
+Extensions:	FileTypes Window		Proširenja:
+Extra attributes	FileTypes Window		Posebni atributi
+File	Application Type Window		Datoteka
+File	FileTypes Window		Datoteka
+File could not be opened	Preferred App Menu		Datoteka se ne može otvoriti
+File type	FileType Window		Vrsta datoteke
+FileTypes	FileTypes		Datotečnevrste
+FileTypes	System name		Datotečnevrste
+Final	Application Type Window		Završno
+Final	Application Types Window		Završno
+Gamma	Application Type Window		Gama
+Gamma	Application Types Window		Gama
+Group name:	New File Type Window		Ime grupe:
+Group:	New File Type Window		Grupa:
+Icon	Application Type Window		Ikona
+Icon	FileType Window		Ikona
+Icon	FileTypes Window		Ikona
+Information	Application Types Window		Informacija
+Launch	Application Types Window		Pokreni
+Left	Attribute Window	Attribute column alignment in Tracker	Lijevo
+Long description:	Application Type Window		Dugački opis:
+Move down	FileTypes Window		Pomakni dolje
+Move up	FileTypes Window		Pomakni gore
+Multiple files from \"%s\" file type	FileType Window		Višestruke datoteke iz \"%s\" datotečne vrste
+Multiple launch	Application Type Window		Višestruko pokretanje
+Name:	Application Types Window		Ime:
+New file type	New File Type Window		Nova datotečna vrsta
+None	FileTypes Window		Nijedan
+OK	FileTypes		U redu
+Open file	FileTypes		Otvori datoteku
+Open…	FileTypes Window		Otvori...
+Path:	Application Types Window		Putanja:
+Preferred application	FileType Window		Poželjni program
+Preferred application	FileTypes Window		Poželjni program
+Progress	Application Types Window		Napredak
+Quit	FileTypes Window		Završi
+Quit, don't save	Application Type Window		Završi,nemoj spremiti
+Remove	Application Type Window		Ukloni
+Remove	FileTypes Window		Ukloni
+Remove icon	Icon View		Ukloni ikonu
+Remove uninstalled	Application Types Window		Ukloni deinstalirano
+Removing uninstalled application types	Application Types Window		Uklanjam deinstalirane vrste programa
+Right	Attribute Window	Attribute column alignment in Tracker	Desno
+Rule:	FileTypes Window		Pravilo:
+Same as…	FileType Window	The same APPLICATION as ...	Isto kao...
+Same as…	FileType Window	The same TYPE as ...	Isto kao...
+Same as…	FileTypes Window		Isto kao...
+Save	Application Type Window		Spremi
+Save request	Application Type Window		Spremi zahtjev
+Select preferred application	FileTypes Window		Odaberi poželjni program
+Select same preferred application as	FileType Window		Odaberi isti poželjni program kao
+Select same preferred application as	FileTypes Window		Odaberi isti poželjni program kao
+Select same type as	FileType Window		Odaberi istu vrstu kao
+Select…	FileType Window		Odaberi...
+Select…	FileTypes Window		Odaberi...
+Set Preferred Application	Preferred App Menu		Postavi poželjni program
+Settings	FileTypes Window		Postavke
+Short description:	Application Type Window		Kratki opis:
+Show icons in list	FileTypes Window		Pokaži ikone u listi
+Signature:	Application Type Window		Potpis:
+Signature:	Application Types Window		Potpis:
+Single launch	Application Type Window		Jedostruko pokretanje
+Special:	Attribute Window		Posebno:
+Supported types	Application Type Window		Podržane vrste
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Program \"%s\" ne podržava ovu vrstu datoteke.\nJeste li sigurni da je ipak želite postaviti?
+This file type already exists	New File Type Window		Vrsta datoteke već postoji
+Type name:	FileTypes Window		Ime vrste:
+Type:	Attribute Window		Vrsta:
+Version	Application Types Window		Verzija
+Version info	Application Type Window		Informacije o verziji
+Version:	Application Type Window		Verzija:
+Version:	Application Types Window		Verzija:
+Visible	Attribute Window		Vidljivo
+Width:	Attribute Window	Default column width in Tracker for this attribute.	Širina:
+no icon	FileTypes Window		bez ikone

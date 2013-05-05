@@ -25,8 +25,8 @@
 #include <Window.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MediaPlayer-PeakView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MediaPlayer-PeakView"
 
 
 using std::nothrow;

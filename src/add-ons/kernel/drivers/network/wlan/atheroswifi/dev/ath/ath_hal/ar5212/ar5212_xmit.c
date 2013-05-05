@@ -48,16 +48,19 @@ ar5212UpdateTxTrigLevel(struct ath_hal *ah, HAL_BOOL bIncTrigLevel)
 	uint32_t txcfg, curLevel, newLevel;
 	HAL_INT omask;
 
+	if (ahp->ah_txTrigLev >= ahp->ah_maxTxTrigLev)
+		return AH_FALSE;
+
 	/*
 	 * Disable interrupts while futzing with the fifo level.
 	 */
-	omask = ar5212SetInterrupts(ah, ahp->ah_maskReg &~ HAL_INT_GLOBAL);
+	omask = ath_hal_setInterrupts(ah, ahp->ah_maskReg &~ HAL_INT_GLOBAL);
 
 	txcfg = OS_REG_READ(ah, AR_TXCFG);
 	curLevel = MS(txcfg, AR_FTRIG);
 	newLevel = curLevel;
 	if (bIncTrigLevel) {		/* increase the trigger level */
-		if (curLevel < MAX_TX_FIFO_THRESHOLD)
+		if (curLevel < ahp->ah_maxTxTrigLev)
 			newLevel++;
 	} else if (curLevel > MIN_TX_FIFO_THRESHOLD)
 		newLevel--;
@@ -66,8 +69,10 @@ ar5212UpdateTxTrigLevel(struct ath_hal *ah, HAL_BOOL bIncTrigLevel)
 		OS_REG_WRITE(ah, AR_TXCFG,
 			(txcfg &~ AR_FTRIG) | SM(newLevel, AR_FTRIG));
 
+	ahp->ah_txTrigLev = newLevel;
+
 	/* re-enable chip interrupts */
-	ar5212SetInterrupts(ah, omask);
+	ath_hal_setInterrupts(ah, omask);
 
 	return (newLevel != curLevel);
 }
@@ -411,9 +416,9 @@ ar5212ResetTxQueue(struct ath_hal *ah, u_int q)
 			 * here solely for backwards compatibility.
 			 */
 			value = (ahp->ah_beaconInterval
-				- (ath_hal_sw_beacon_response_time -
-					ath_hal_dma_beacon_response_time)
-				- ath_hal_additional_swba_backoff) * 1024;
+				- (ah->ah_config.ah_sw_beacon_response_time -
+					ah->ah_config.ah_dma_beacon_response_time)
+				- ah->ah_config.ah_additional_swba_backoff) * 1024;
 			OS_REG_WRITE(ah, AR_QRDYTIMECFG(q), value | AR_Q_RDYTIMECFG_ENA);
 		}
 		dmisc |= SM(AR_D_MISC_ARB_LOCKOUT_CNTRL_GLOBAL,
@@ -913,3 +918,24 @@ ar5212GetTxIntrQueue(struct ath_hal *ah, uint32_t *txqs)
 	*txqs &= ahp->ah_intrTxqs;
 	ahp->ah_intrTxqs &= ~(*txqs);
 }
+
+/*
+ * Retrieve the rate table from the given TX completion descriptor
+ */
+HAL_BOOL
+ar5212GetTxCompletionRates(struct ath_hal *ah, const struct ath_desc *ds0, int *rates, int *tries)
+{ 
+	const struct ar5212_desc *ads = AR5212DESC_CONST(ds0);
+
+	rates[0] = MS(ads->ds_ctl3, AR_XmitRate0);
+	rates[1] = MS(ads->ds_ctl3, AR_XmitRate1);
+	rates[2] = MS(ads->ds_ctl3, AR_XmitRate2);
+	rates[3] = MS(ads->ds_ctl3, AR_XmitRate3);
+
+	tries[0] = MS(ads->ds_ctl2, AR_XmitDataTries0);
+	tries[1] = MS(ads->ds_ctl2, AR_XmitDataTries1);
+	tries[2] = MS(ads->ds_ctl2, AR_XmitDataTries2);
+	tries[3] = MS(ads->ds_ctl2, AR_XmitDataTries3);
+
+	return AH_TRUE;
+}  

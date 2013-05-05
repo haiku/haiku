@@ -36,6 +36,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <errno_private.h>
+
 
 /* internal flags */
 #define	NEED_GROUPING		0x01	/* print digits grouped (default) */
@@ -384,11 +386,11 @@ strfmon(char *s, size_t maxsize, const char *format,
 	return dst - s - 1;	/* return size of put data except trailing '\0' */
 
 e2big_error:
-	errno = E2BIG;
+	__set_errno(E2BIG);
 	goto end_error;
 
 format_error:
-	errno = EINVAL;
+	__set_errno(EINVAL);
 
 end_error:
 	sverrno = errno;
@@ -396,7 +398,7 @@ end_error:
 		free(asciivalue);
 	if (currency_symbol != NULL)
 		free(currency_symbol);
-	errno = sverrno;
+	__set_errno(sverrno);
 	va_end(ap);
 	return -1;
 }

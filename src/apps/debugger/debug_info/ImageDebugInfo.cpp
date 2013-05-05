@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,9 +8,11 @@
 
 #include <new>
 
+#include "DebuggerInterface.h"
 #include "FunctionDebugInfo.h"
 #include "FunctionInstance.h"
 #include "SpecificImageDebugInfo.h"
+#include "SymbolInfo.h"
 
 
 ImageDebugInfo::ImageDebugInfo(const ImageInfo& imageInfo)
@@ -35,14 +37,21 @@ ImageDebugInfo::AddSpecificInfo(SpecificImageDebugInfo* info)
 
 
 status_t
-ImageDebugInfo::FinishInit()
+ImageDebugInfo::FinishInit(DebuggerInterface* interface)
 {
+	BObjectList<SymbolInfo> symbols(50, true);
+	status_t error = interface->GetSymbolInfos(fImageInfo.TeamID(),
+		fImageInfo.ImageID(), symbols);
+	if (error != B_OK)
+		return error;
+	symbols.SortItems(&_CompareSymbols);
+
 	// get functions -- get them from most expressive debug info first and add
 	// missing functions from less expressive debug infos
 	for (int32 i = 0; SpecificImageDebugInfo* specificInfo
 			= fSpecificInfos.ItemAt(i); i++) {
 		BObjectList<FunctionDebugInfo> functions;
-		status_t error = specificInfo->GetFunctions(functions);
+		error = specificInfo->GetFunctions(symbols, functions);
 		if (error != B_OK)
 			return error;
 
@@ -174,4 +183,12 @@ ImageDebugInfo::_CompareAddressFunction(const target_addr_t* address,
 	if (*address < function->Address())
 		return -1;
 	return *address < function->Address() + function->Size() ? 0 : 1;
+}
+
+
+/*static*/ int
+ImageDebugInfo::_CompareSymbols(const SymbolInfo* a, const SymbolInfo* b)
+{
+	return a->Address() < b->Address()
+		? -1 : (a->Address() == b->Address() ? 0 : 1);
 }

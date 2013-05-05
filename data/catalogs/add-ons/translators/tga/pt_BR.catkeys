@@ -1,0 +1,16 @@
+1	portuguese (brazil)	x-vnd.Haiku-TGATranslator	3289993499
+Targa image (%d bits truecolor)	TGATranslator		imagem Targa (%d bits truecolor)
+Version %d.%d.%d %s	TGAView		Versão %d.%d.%d %s
+Ignore TGA alpha channel	TGAView		Ignorar canal alfa de TGA
+Targa image (%d bits colormap)	TGATranslator		imagem Targa (%d bits mapa de cor)
+TGA image translator	TGAView		tradutor de imagem TGA
+Targa image (%d bits RLE colormap)	TGATranslator		imagem Targa (%d bits mapa de cor RLE)
+Targa image (%d bits gray)	TGATranslator		imagem Targa (%d bits cinza)
+Written by the Haiku Translation Kit Team	TGAView		Escrito pela Equipe do Kit de Tradução do Haiku
+Targa image (%d bits RLE truecolor)	TGATranslator		imagem Targa (%d bits RLE truecolor)
+TGA images	TGATranslator		imagens TGA
+TGATranslator Settings	TGATranslator		Definições do Tradutor TGA
+Save with RLE Compression	TGAView		Salvar com Compressão RLE
+TGA image translator	TGATranslator		tradutor de imagem TGA
+Targa image (%d bits RLE gray)	TGATranslator		imagem Targa (%d bits cinza RLE)
+TGA Settings	TGAMain		Definições TGA

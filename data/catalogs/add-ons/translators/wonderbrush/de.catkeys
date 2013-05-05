@@ -1,9 +1,9 @@
 1	german	x-vnd.Haiku-WonderBrushTranslator	491575314
-Version %d.%d.%d %s	WonderBrushView		Version %d.%d.%d %s
-WBI Settings	WonderBrushMain		WBI-Einstellungen
-WBI Settings	WonderBrushTranslator		WBI-Einstellungen
-WonderBrush image	WonderBrushTranslator		WonderBrush-Bild
 WonderBrush image translator	WonderBrushTranslator		WonderBrush-Bild-Translator
-WonderBrush image translator	WonderBrushView		WonderBrush-Bild-Translator
+WBI Settings	WonderBrushTranslator		WBI-Einstellungen
+WBI Settings	WonderBrushMain		WBI-Einstellungen
+Version %d.%d.%d %s	WonderBrushView		Version %d.%d.%d %s
 WonderBrush images	WonderBrushTranslator		WonderBrush-Bilder
+WonderBrush image	WonderBrushTranslator		WonderBrush-Bild
+WonderBrush image translator	WonderBrushView		WonderBrush-Bild-Translator
 written by:	WonderBrushView		von:

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010 Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2012 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _ARCH_SIGNAL_H_
@@ -21,7 +21,7 @@ struct vregs
    double f0,                                         /* fp scratch */
 	      f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13; /* fp volatile regs */
 };
-#endif /* __M68K__ */ 
+#endif /* __M68K__ */
 
 
 #endif /* _ARCH_SIGNAL_H_ */

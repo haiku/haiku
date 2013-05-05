@@ -1,0 +1,16 @@
+1	hindi	x-vnd.Haiku-NewMailNotification	3624191291
+%num new message	filter		%num नए सन्देश 
+%num new messages	filter		%num नए सन्देश
+Keyboard LEDs	ConfigView		कीबोर्ड
+You have %num new messages for %name.	filter		आप के पास %num नए सन्देश के लिए %name.
+You have %num new message for %name.	filter		आप के पास %num नए सन्देश के लिए %name.
+Log window	ConfigView		लोग विंडो
+Central beep	ConfigView		सेंट्रल बीप
+Beep	ConfigView		बीप
+Method:	ConfigView		तरीका:
+Central alert	ConfigView		सेंट्रल अलर्ट
+Alert	ConfigView		चेतावनी
+none	ConfigView		कोई नहीं
+New messages	filter		नए सन्देश
+New mails notification	ConfigView		नयी मेल की नोटिफिकेशन आई है
+OK	filter		ठीक है

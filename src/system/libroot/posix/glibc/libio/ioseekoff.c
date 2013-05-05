@@ -28,12 +28,6 @@
 #include <libioP.h>
 #include <stdlib.h>
 #include <errno.h>
-#ifndef errno
-extern int errno;
-#endif
-#ifndef __set_errno
-# define __set_errno(Val) errno = (Val)
-#endif
 
 _IO_off64_t
 _IO_seekoff_unlocked (fp, offset, dir, mode)

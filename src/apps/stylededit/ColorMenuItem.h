@@ -18,8 +18,8 @@ class BMessage;
 
 class ColorMenuItem: public BMenuItem {
 	public:
-						ColorMenuItem(const char *label, rgb_color color, 
-							BMessage *message);
+						ColorMenuItem(const char* label, rgb_color color, 
+							BMessage* message);
 
 	protected:
 		virtual void	DrawContent();

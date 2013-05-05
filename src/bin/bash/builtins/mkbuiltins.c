@@ -19,7 +19,7 @@
    along with Bash.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#if !defined (CROSS_COMPILING) 
+#if !defined (CROSS_COMPILING)
 #  include <config.h>
 #else	/* CROSS_COMPILING */
 /* A conservative set of defines based on POSIX/SUS3/XPG6 */
@@ -221,6 +221,8 @@ main (argc, argv)
 
       if (strcmp (arg, "-externfile") == 0)
 	extern_filename = argv[arg_index++];
+      else if (strcmp (arg, "-tempstructfile") == 0)
+	temp_struct_filename = argv[arg_index++];
       else if (strcmp (arg, "-structfile") == 0)
 	struct_filename = argv[arg_index++];
       else if (strcmp (arg, "-noproduction") == 0)
@@ -287,8 +289,11 @@ main (argc, argv)
       /* Open the files. */
       if (struct_filename)
 	{
-	  temp_struct_filename = xmalloc (15);
-	  sprintf (temp_struct_filename, "mk-%ld", (long) getpid ());
+	  if (!temp_struct_filename)
+	  {
+	    temp_struct_filename = xmalloc (15);
+	    sprintf (temp_struct_filename, "mk-%ld", (long) getpid ());
+	  }
 	  structfile = fopen (temp_struct_filename, "w");
 
 	  if (!structfile)
@@ -1448,7 +1453,7 @@ write_documentation (stream, documentation, indentation, flags)
 	{
 	  if (filename_p == 0)
 	    {
-	      if (line[0])	      
+	      if (line[0])
 		fprintf (stream, "  N_(\"");
 	      else
 		fprintf (stream, "  N_(\" ");		/* the empty string translates specially. */

@@ -156,6 +156,23 @@ GlobalTypeCache::GetType(const BString& name,
 		if (constraints.HasTypeKind()
 			&& typeEntry->type->Kind() != constraints.TypeKind())
 			typeEntry = NULL;
+		else if (constraints.HasSubtypeKind()) {
+			if (typeEntry->type->Kind() == TYPE_ADDRESS) {
+					AddressType* type = dynamic_cast<AddressType*>(
+						typeEntry->type);
+					if (type == NULL)
+						typeEntry = NULL;
+					else if (type->AddressKind() != constraints.SubtypeKind())
+						typeEntry = NULL;
+			} else if (typeEntry->type->Kind() == TYPE_COMPOUND) {
+					CompoundType* type = dynamic_cast<CompoundType*>(
+						typeEntry->type);
+					if (type == NULL)
+						typeEntry = NULL;
+					else if (type->CompoundKind() != constraints.SubtypeKind())
+						typeEntry = NULL;
+			}
+		}
 	}
 	return typeEntry != NULL ? typeEntry->type : NULL;
 }

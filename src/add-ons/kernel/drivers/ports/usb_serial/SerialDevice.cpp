@@ -4,7 +4,12 @@
  *
  * Copyright (c) 2003 by Siarzhuk Zharski <imker@gmx.li>
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
+
+
 #include <new>
 
 #include "SerialDevice.h"
@@ -13,6 +18,7 @@
 #include "ACM.h"
 #include "FTDI.h"
 #include "KLSI.h"
+#include "Option.h"
 #include "Prolific.h"
 #include "Silicon.h"
 
@@ -714,451 +720,57 @@ SerialDevice *
 SerialDevice::MakeDevice(usb_device device, uint16 vendorID,
 	uint16 productID)
 {
-	const char *description = NULL;
-
-	switch (vendorID) {
-		case VENDOR_IODATA:
-		case VENDOR_ATEN:
-		case VENDOR_TDK:
-		case VENDOR_RATOC:
-		case VENDOR_PROLIFIC:
-		case VENDOR_ELECOM:
-		case VENDOR_SOURCENEXT:
-		case VENDOR_HAL:
-		{
-			switch (productID) {
-				case PRODUCT_PROLIFIC_RSAQ2:
-					description = "PL2303 Serial adapter (IODATA USB-RSAQ2)";
-					break;
-				case PRODUCT_IODATA_USBRSAQ:
-					description = "I/O Data USB serial adapter USB-RSAQ1";
-					break;
-				case PRODUCT_ATEN_UC232A:
-					description = "Aten Serial adapter";
-					break;
-				case PRODUCT_TDK_UHA6400:
-					description = "TDK USB-PHS Adapter UHA6400";
-					break;
-				case PRODUCT_RATOC_REXUSB60:
-					description = "Ratoc USB serial adapter REX-USB60";
-					break;
-				case PRODUCT_PROLIFIC_PL2303:
-					description = "PL2303 Serial adapter (ATEN/IOGEAR UC232A)";
-					break;
-				case PRODUCT_ELECOM_UCSGT:
-					description = "Elecom UC-SGT";
-					break;
-				case PRODUCT_SOURCENEXT_KEIKAI8:
-					description = "SOURCENEXT KeikaiDenwa 8";
-					break;
-				case PRODUCT_SOURCENEXT_KEIKAI8_CHG:
-					description = "SOURCENEXT KeikaiDenwa 8 with charger";
-					break;
-				case PRODUCT_HAL_IMR001:
-					description = "HAL Corporation Crossam2+USB";
-					break;
-			}
-
-			if (description == NULL)
-				break;
-
-			return new(std::nothrow) ProlificDevice(device, vendorID, productID,
-				description);
-		}
-
-		case VENDOR_FTDI:
-		{
-			switch (productID) {
-				case PRODUCT_FTDI_8U100AX:
-					description = "FTDI 8U100AX serial converter";
-					break;
-				case PRODUCT_FTDI_8U232AM:
-					description = "FTDI 8U232AM serial converter";
-					break;
-			}
-
-			if (description == NULL)
-				break;
-
+	// FTDI Serial Device
+	for (uint32 i = 0; i < sizeof(kFTDIDevices)
+		/ sizeof(kFTDIDevices[0]); i++) {
+		if (vendorID == kFTDIDevices[i].vendorID
+			&& productID == kFTDIDevices[i].productID) {
 			return new(std::nothrow) FTDIDevice(device, vendorID, productID,
-				description);
+				kFTDIDevices[i].deviceName);
 		}
-
-		case VENDOR_PALM:
-		case VENDOR_KLSI:
-		{
-			switch (productID) {
-				case PRODUCT_PALM_CONNECT:
-					description = "PalmConnect RS232";
-					break;
-				case PRODUCT_KLSI_KL5KUSB105D:
-					description = "KLSI KL5KUSB105D";
-					break;
-			}
-
-			if (description == NULL)
-				break;
-
-			return new(std::nothrow) KLSIDevice(device, vendorID, productID,
-				description);
-		}
-
-		case VENDOR_RENESAS:
-		{
-			switch (productID) {
-				case 0x0053:
-					description = "Renesas RX610 RX-Stick";
-					break;
-			}
-
-			if (description != NULL)
-				goto SILICON;
-			break;
-		}
-		case VENDOR_AKATOM:
-		{
-			switch (productID) {
-				case 0x066A:
-					description = "AKTAKOM ACE-1001";
-					break;
-			}
-
-			if (description != NULL)
-				goto SILICON;
-			break;
-		}
-		case VENDOR_PIRELLI:
-		{
-			switch (productID) {
-				case 0xE000:
-				case 0xE003:
-					description = "Pirelli DP-L10 GSM Mobile";
-					break;
-			}
-
-			if (description != NULL)
-				goto SILICON;
-			break;
-		}
-		case VENDOR_CYPHERLAB:
-		{
-			switch (productID) {
-				case 0x1000:
-					description = "Cipherlab CCD Barcode Scanner";
-					break;
-			}
-
-			if (description != NULL)
-				goto SILICON;
-			break;
-		}
-		case VENDOR_GEMALTO:
-		{
-			switch (productID) {
-				case 0x5501:
-					description = "Gemalto contactless smartcard reader";
-					break;
-			}
-
-			if (description != NULL)
-				goto SILICON;
-			break;
-		}
-		case VENDOR_DIGIANSWER:
-		{
-			switch (productID) {
-				case 0x000A:
-					description = "Digianswer ZigBee MAC device";
-					break;
-			}
-
-			if (description != NULL)
-				goto SILICON;
-			break;
-		}
-		case VENDOR_MEI:
-		{
-			switch (productID) {
-				case 0x1100:
-				case 0x1101:
-					description = "MEI Acceptor";
-					break;
-			}
-
-			if (description != NULL)
-				goto SILICON;
-			break;
-		}
-		case VENDOR_DYNASTREAM:
-		{
-			switch (productID) {
-				case 0x1003:
-				case 0x1004:
-				case 0x1006:
-					description = "Dynastream ANT development board";
-					break;
-			}
-
-			if (description != NULL)
-				goto SILICON;
-			break;
-		}
-		case VENDOR_KNOCKOFF:
-		{
-			switch (productID) {
-				case 0xAA26:
-					description = "Knock-off DCU-11";
-					break;
-			}
-
-			if (description != NULL)
-				goto SILICON;
-			break;
-		}
-		case VENDOR_SIEMENS:
-		{
-			switch (productID) {
-				case 0x10C5:
-					description = "Siemens MC60";
-					break;
-			}
-
-			if (description != NULL)
-				goto SILICON;
-			break;
-		}
-		case VENDOR_NOKIA:
-		{
-			switch (productID) {
-				case 0xAC70:
-					description = "Nokia CA-42";
-					break;
-			}
-
-			if (description != NULL)
-				goto SILICON;
-			break;
-		}
-		case VENDOR_SILICON:
-		{
-			switch (productID) {
-				case 0x0F91:
-				case 0x1101:
-				case 0x1601:
-				case 0x800A:
-				case 0x803B:
-				case 0x8044:
-				case 0x804E:
-				case 0x8053:
-				case 0x8054:
-				case 0x8066:
-				case 0x806F:
-				case 0x807A:
-				case 0x80CA:
-				case 0x80DD:
-				case 0x80F6:
-				case 0x8115:
-				case 0x813D:
-				case 0x813F:
-				case 0x814A:
-				case 0x814B:
-				case 0x8156:
-				case 0x815E:
-				case 0x818B:
-				case 0x819F:
-				case 0x81A6:
-				case 0x81AC:
-				case 0x81AD:
-				case 0x81C8:
-				case 0x81E2:
-				case 0x81E7:
-				case 0x81E8:
-				case 0x81F2:
-				case 0x8218:
-				case 0x822B:
-				case 0x826B:
-				case 0x8293:
-				case 0x82F9:
-				case 0x8341:
-				case 0x8382:
-				case 0x83A8:
-				case 0x83D8:
-				case 0x8411:
-				case 0x8418:
-				case 0x846E:
-				case 0x8477:
-				case 0x85EA:
-				case 0x85EB:
-				case 0x8664:
-				case 0x8665:
-				case 0xEA60:
-				case 0xEA61:
-				case 0xEA71:
-				case 0xF001:
-				case 0xF002:
-				case 0xF003:
-				case 0xF004:
-					description = "Silicon Labs CP210x USB UART converter";
-					break;
-			}
-
-			if (description != NULL)
-				goto SILICON;
-			break;
-		}
-		case VENDOR_SILICON2:
-		{
-			switch (productID) {
-				case 0xEA61:
-					description = "Silicon Labs GPRS USB Modem";
-					break;
-			}
-
-			if (description != NULL)
-				goto SILICON;
-			break;
-		}
-		case VENDOR_SILICON3:
-		{
-			switch (productID) {
-				case 0xEA6A:
-					description = "Silicon Labs GPRS USB Modem 100EU";
-					break;
-			}
-
-			if (description != NULL)
-				goto SILICON;
-			break;
-		}
-		case VENDOR_BALTECH:
-		{
-			switch (productID) {
-				case 0x9999:
-					description = "Balteck card reader";
-					break;
-			}
-
-			if (description != NULL)
-				goto SILICON;
-			break;
-		}
-		case VENDOR_OWEN:
-		{
-			switch (productID) {
-				case 0x0004:
-					description = "Owen AC4 USB-RS485 Converter";
-					break;
-			}
-
-			if (description != NULL)
-				goto SILICON;
-			break;
-		}
-		case VENDOR_CLIPSAL:
-		{
-			switch (productID) {
-				case 0x0303:
-					description = "Clipsal 5500PCU C-Bus USB interface";
-					break;
-			}
-
-			if (description != NULL)
-				goto SILICON;
-			break;
-		}
-		case VENDOR_JABLOTRON:
-		{
-			switch (productID) {
-				case 0x0001:
-					description = "Jablotron serial interface";
-					break;
-			}
-
-			if (description != NULL)
-				goto SILICON;
-			break;
-		}
-		case VENDOR_WIENER:
-		{
-			switch (productID) {
-				case 0x0010:
-				case 0x0011:
-				case 0x0012:
-				case 0x0015:
-					description = "W-IE-NE-R Plein & Baus GmbH device";
-					break;
-			}
-
-			if (description != NULL)
-				goto SILICON;
-			break;
-		}
-		case VENDOR_WAVESENSE:
-		{
-			switch (productID) {
-				case 0xAAAA:
-					description = "Wavesense Jazz blood glucose meter";
-					break;
-			}
-
-			if (description != NULL)
-				goto SILICON;
-			break;
-		}
-		case VENDOR_VAISALA:
-		{
-			switch (productID) {
-				case 0x0200:
-					description = "Vaisala USB instrument";
-					break;
-			}
-
-			if (description != NULL)
-				goto SILICON;
-			break;
-		}
-		case VENDOR_ELV:
-		{
-			switch (productID) {
-				case 0xE00F:
-					description = "ELV USB I²C interface";
-					break;
-			}
-
-			if (description != NULL)
-				goto SILICON;
-			break;
-		}
-		case VENDOR_WAGO:
-		{
-			switch (productID) {
-				case 0x07A6:
-					description = "WAGO 750-923 USB Service";
-					break;
-			}
-
-			if (description != NULL)
-				goto SILICON;
-			break;
-		}
-		case VENDOR_DW700:
-		{
-			switch (productID) {
-				case 0x9500:
-					description = "DW700 GPS USB interface";
-					break;
-			}
-
-			if (description != NULL)
-				goto SILICON;
-			break;
-		}
-
-SILICON:
-		return new(std::nothrow) SiliconDevice(device, vendorID, productID,
-			description);
 	}
 
+	// KLSI Serial Device
+	for (uint32 i = 0; i < sizeof(kKLSIDevices)
+		/ sizeof(kKLSIDevices[0]); i++) {
+		if (vendorID == kKLSIDevices[i].vendorID
+			&& productID == kKLSIDevices[i].productID) {
+			return new(std::nothrow) KLSIDevice(device, vendorID, productID,
+				kKLSIDevices[i].deviceName);
+		}
+	}
+
+	// Prolific Serial Device
+	for (uint32 i = 0; i < sizeof(kProlificDevices)
+		/ sizeof(kProlificDevices[0]); i++) {
+		if (vendorID == kProlificDevices[i].vendorID
+			&& productID == kProlificDevices[i].productID) {
+			return new(std::nothrow) ProlificDevice(device, vendorID, productID,
+				kProlificDevices[i].deviceName);
+		}
+	}
+
+	// Silicon Serial Device
+	for (uint32 i = 0; i < sizeof(kSiliconDevices)
+		/ sizeof(kSiliconDevices[0]); i++) {
+		if (vendorID == kSiliconDevices[i].vendorID
+			&& productID == kSiliconDevices[i].productID) {
+			return new(std::nothrow) SiliconDevice(device, vendorID, productID,
+				kSiliconDevices[i].deviceName);
+		}
+	}
+
+	// Option Serial Device
+	for (uint32 i = 0; i < sizeof(kOptionDevices)
+		/ sizeof(kOptionDevices[0]); i++) {
+		if (vendorID == kOptionDevices[i].vendorID
+			&& productID == kOptionDevices[i].productID) {
+			return new(std::nothrow) OptionDevice(device, vendorID, productID,
+				kOptionDevices[i].deviceName);
+		}
+	}
+
+	// Otherwise, return standard ACM device
 	return new(std::nothrow) ACMDevice(device, vendorID, productID,
 		"CDC ACM compatible device");
 }

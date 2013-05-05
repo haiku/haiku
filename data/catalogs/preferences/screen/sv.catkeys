@@ -1,52 +1,52 @@
 1	swedish	x-vnd.Haiku-Screen	2033930135
-%.1f Hz	Screen		%.1f Hz
-%sSerial no.: %s	Screen		%sSerienummer: %s
-/other…	Screen		/annan...
-15 bits/pixel, 32768 colors	Screen		15 bitar/pixel, 32768 färger
-16 bits/pixel, 65536 colors	Screen		16 bitar/pixel, 65536 färger
-24 bits/pixel, 16 Million colors	Screen		24 bitar/pixel, 16 miljoner färger
-32 bits/pixel, 16 Million colors	Screen		32 bitar/pixel, 16 miljoner färger
-8 bits/pixel, 256 colors	Screen		8 bitar/pixel, 256 färger
-About	Screen		Om
-All workspaces	Screen		Alla arbetsytor
-Apply	Screen		Använd
-Cancel	Screen		Avbryt
-Colors:	Screen		Färger:
-Columns:	Screen		Kolumner:
-Combine displays:	Screen		Kombinera skärmar:
-Could not write VESA mode settings file:\n\t	Screen		Kunde inte skriva VESA-lägesinställningar till fil:\n\t
-Current workspace	Screen		Nuvarande arbetsyta
-Do you wish to keep these settings?	Screen		Vill du behålla inställningarna?
-Done	Screen		Klar
-Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Horisontal frekvens:\t%lu - %lu kHz\nVertikal frekvens:\t%lu - %lu Hz\n\nMaximal pixelklocka:\t%g MHz
-Hz	Screen		Hz
-Keep	Screen		Behåll
-OK	Screen		OK
-Other…	Screen		Andra...
-Refresh rate	Screen		uppdateringsfrekvens
-Refresh rate:	Screen		Uppdateringsfrekvens:
-Resolution:	Screen		Upplösning:
-Revert	Screen		Återställ
-Rows:	Screen		Rader:
-Screen	Screen		Skärm
-Screen	System name		Skärm
-Screen preferences by the Haiku team	Screen		Skärm, skrivet av Haiku-teamet
-Set background…	Screen		Bakgrundsinställningar...
-Settings will revert in %seconds seconds.	Screen		Inställningarna kommer att återställas inom %seconds sekunder.
-Swap displays:	Screen		Växla skärmar:
-The screen mode could not be set:\n\t%s\n	Screen		Skärmläget kunde inte användas:\n\t%s\n
-Type or use the left and right arrow keys.	Screen		Skriv eller använd höger och vänster piltangenterna.
-Undo	Screen		Ångra
-Unknown mode	Screen		Okänt läge
-Use laptop panel:	Screen		Använd bärbar panel:
-Video format:	Screen		Videoformat:
-Warning	Screen		Varning
-Workspaces	Screen		Arbetsytor
-always	Screen		alltid
-bits/pixel	Screen		bitar/pixel
-disable	Screen		inaktivera
-horizontally	Screen		horisontellt
-if needed	Screen		om det behövs
-no	Screen		nej
-vertically	Screen		vertikalt
 yes	Screen		ja
+Use laptop panel:	Screen		Använd bärbar panel:
+15 bits/pixel, 32768 colors	Screen		15 bitar/pixel, 32768 färger
+/other…	Screen		/annan...
+16 bits/pixel, 65536 colors	Screen		16 bitar/pixel, 65536 färger
+Revert	Screen		Återställ
+Swap displays:	Screen		Växla skärmar:
+Combine displays:	Screen		Kombinera skärmar:
+Done	Screen		Klar
+Set background…	Screen		Bakgrundsinställningar...
+Undo	Screen		Ångra
+if needed	Screen		om det behövs
+Screen preferences by the Haiku team	Screen		Skärm, skrivet av Haiku-teamet
+Screen	System name		Skärm
+OK	Screen		OK
+Workspaces	Screen		Arbetsytor
+The screen mode could not be set:\n\t%s\n	Screen		Skärmläget kunde inte användas:\n\t%s\n
+no	Screen		nej
+Could not write VESA mode settings file:\n\t	Screen		Kunde inte skriva VESA-lägesinställningar till fil:\n\t
+Type or use the left and right arrow keys.	Screen		Skriv eller använd höger och vänster piltangenterna.
+Warning	Screen		Varning
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Horisontal frekvens:\t%lu - %lu kHz\nVertikal frekvens:\t%lu - %lu Hz\n\nMaximal pixelklocka:\t%g MHz
+Keep	Screen		Behåll
+Unknown mode	Screen		Okänt läge
+disable	Screen		inaktivera
+Columns:	Screen		Kolumner:
+All workspaces	Screen		Alla arbetsytor
+always	Screen		alltid
+32 bits/pixel, 16 Million colors	Screen		32 bitar/pixel, 16 miljoner färger
+Current workspace	Screen		Nuvarande arbetsyta
+About	Screen		Om
+24 bits/pixel, 16 Million colors	Screen		24 bitar/pixel, 16 miljoner färger
+horizontally	Screen		horisontellt
+Other…	Screen		Andra...
+Cancel	Screen		Avbryt
+bits/pixel	Screen		bitar/pixel
+Settings will revert in %seconds seconds.	Screen		Inställningarna kommer att återställas inom %seconds sekunder.
+Refresh rate:	Screen		Uppdateringsfrekvens:
+Hz	Screen		Hz
+Do you wish to keep these settings?	Screen		Vill du behålla inställningarna?
+Rows:	Screen		Rader:
+vertically	Screen		vertikalt
+Resolution:	Screen		Upplösning:
+Screen	Screen		Skärm
+%.1f Hz	Screen		%.1f Hz
+8 bits/pixel, 256 colors	Screen		8 bitar/pixel, 256 färger
+Apply	Screen		Använd
+Refresh rate	Screen		uppdateringsfrekvens
+%sSerial no.: %s	Screen		%sSerienummer: %s
+Colors:	Screen		Färger:
+Video format:	Screen		Videoformat:

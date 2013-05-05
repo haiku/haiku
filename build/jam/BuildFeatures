@@ -1,0 +1,894 @@
+# This file contains setup for build features that are not available for all
+# architectures/setups or that are optional for the build. For features that
+# require downloading a zip file from somewhere it is likely the same file used
+# for an optional package.
+
+
+# Add the target architecture as a build feature.
+EnableBuildFeatures $(HAIKU_ARCH) ;
+
+if $(HAIKU_GCC_VERSION[1]) = 2 {
+	EnableBuildFeatures gcc2 ;
+}
+
+
+local baseURL = http://www.haiku-files.org/files/optional-packages ;
+local hpkgBaseURL = http://haiku-files.org/files/hpkg ;
+
+
+# SSL
+
+# Automatically enable the SSL feature, when the optional OpenSSL optional
+# package is enabled.
+if [ IsOptionalHaikuImagePackageAdded OpenSSL ] {
+	HAIKU_BUILD_FEATURE_SSL = 1 ;
+}
+
+if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	if $(TARGET_ARCH) = x86_64 {
+		HAIKU_OPENSSL_PACKAGE = openssl-1.0.0j-x86_64-2012-12-18.zip ;
+	} else {
+		HAIKU_OPENSSL_PACKAGE = openssl-1.0.0j-r1a4-x86-gcc4-2012-08-29.zip ;
+	}
+} else {
+	HAIKU_OPENSSL_PACKAGE = openssl-1.0.0j-1-x86_gcc2.hpkg ;
+}
+
+HAIKU_OPENSSL_URL = $(hpkgBaseURL)/$(HAIKU_OPENSSL_PACKAGE) ;
+
+if $(HAIKU_BUILD_FEATURE_SSL) {
+	if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
+		# Download the package.
+		local zipFile = [ DownloadFile $(HAIKU_OPENSSL_PACKAGE)
+			: $(HAIKU_OPENSSL_URL) ] ;
+
+		# zip file and output directory
+		HAIKU_OPENSSL_ZIP_FILE = $(zipFile) ;
+		HAIKU_OPENSSL_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+			$(HAIKU_OPENSSL_PACKAGE:B) ] ;
+
+		# extract headers and libraries
+		HAIKU_OPENSSL_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_OPENSSL_DIR)
+			: develop/headers/ : $(zipFile) : extracted-openssl
+		] ;
+
+		HAIKU_OPENSSL_LIBS = [ ExtractArchive $(HAIKU_OPENSSL_DIR)
+			:
+			develop/lib/libcrypto.so
+			develop/lib/libssl.so
+			: $(zipFile)
+			: extracted-openssl
+		] ;
+
+		HAIKU_OPENSSL_HEADERS
+			= [ FDirName $(HAIKU_OPENSSL_DIR) develop/headers ] ;
+
+		EnableBuildFeatures openssl ;
+	} else {
+		Echo "SSL build feature not available for $(TARGET_ARCH)" ;
+	}
+}
+
+
+# ICU
+
+# Note ICU isn't actually optional, but is still an external package
+HAIKU_ICU_GCC_2_PACKAGE = icu-4.8.1.1-2-x86_gcc2.hpkg ;
+HAIKU_ICU_GCC_4_PACKAGE = icu-4.8.1.1-r1a4-x86-gcc4-2012-08-29.zip ;
+	# TODO: Make hpkg!
+HAIKU_ICU_PPC_PACKAGE = icu-4.8.1-ppc-2011-08-20.zip ;
+HAIKU_ICU_ARM_PACKAGE = icu-4.8.1.1-arm-2012-11-21.zip ;
+HAIKU_ICU_X86_64_PACKAGE = icu-4.8.1.1-x86_64-2012-07-30.zip ;
+
+if $(TARGET_ARCH) in arm ppc x86 x86_64 {
+	local icu_package ;
+	if $(TARGET_ARCH) = ppc {
+		icu_package = $(HAIKU_ICU_PPC_PACKAGE) ;
+		HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1-ppc-2011-12-19.zip ;
+	} else if $(TARGET_ARCH) = arm {
+		icu_package = $(HAIKU_ICU_ARM_PACKAGE) ;
+		HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1.1-arm-2012-11-21.zip ;
+	} else if $(TARGET_ARCH) = x86_64 {
+		icu_package = $(HAIKU_ICU_X86_64_PACKAGE) ;
+		HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1.1-x86_64-2012-07-30.zip ;
+	} else if $(HAIKU_GCC_VERSION[1]) = 2 {
+		icu_package = $(HAIKU_ICU_GCC_2_PACKAGE) ;
+		HAIKU_ICU_DEVEL_PACKAGE = icu_devel-4.8.1.1-2-x86_gcc2.hpkg ;
+	} else {
+		icu_package = $(HAIKU_ICU_GCC_4_PACKAGE) ;
+		HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1.1-x86-gcc4-2011-12-20.zip ;
+	}
+	local packageFile = [ DownloadFile $(icu_package)
+		: $(hpkgBaseURL)/$(icu_package) ] ;
+
+	# zip file and output directory
+	HAIKU_ICU_PACKAGE_FILE = $(packageFile) ;
+	HAIKU_ICU_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(icu_package:B) ] ;
+
+	# extract libraries
+	if $(TARGET_ARCH) = ppc {
+		HAIKU_ICU_LIBS = [ ExtractArchive $(HAIKU_ICU_DIR)
+			:
+			libicudata.so.48.1
+			libicui18n.so.48.1
+			libicuio.so.48.1
+			libicule.so.48.1
+			libiculx.so.48.1
+			libicutu.so.48.1
+			libicuuc.so.48.1
+			: $(packageFile)
+			: extracted-icu
+		] ;
+	} else {
+		HAIKU_ICU_LIBS = [ ExtractArchive $(HAIKU_ICU_DIR)
+			:
+			develop/lib/libicudata.so.48.1.1
+			develop/lib/libicui18n.so.48.1.1
+			develop/lib/libicuio.so.48.1.1
+			develop/lib/libicule.so.48.1.1
+			develop/lib/libiculx.so.48.1.1
+			develop/lib/libicutu.so.48.1.1
+			develop/lib/libicuuc.so.48.1.1
+			: $(packageFile)
+			: extracted-icu
+		] ;
+	}
+
+	# zip file and output directory
+	HAIKU_ICU_DEVEL_ZIP_FILE = [ DownloadFile $(HAIKU_ICU_DEVEL_PACKAGE)
+			: $(hpkgBaseURL)/$(HAIKU_ICU_DEVEL_PACKAGE) ] ;
+	HAIKU_ICU_DEVEL_DIR = $(HAIKU_ICU_DIR) ;
+
+	# extract headers
+	HAIKU_ICU_HEADERS_DEPENDENCY = [ ExtractArchive
+		$(HAIKU_ICU_DEVEL_DIR:G=icu_devel)
+			# We need a grist here, so it's a different target than the one for the
+			# main package, even though it's the same directory.
+		: develop/headers : $(HAIKU_ICU_DEVEL_ZIP_FILE)
+		: extracted-icu-devel ] ;
+
+	HAIKU_ICU_HEADERS
+		= [ FDirName $(HAIKU_ICU_DEVEL_DIR) develop headers ] ;
+
+	EnableBuildFeatures icu ;
+} else  {
+	Echo "ICU not available for $(TARGET_ARCH)" ;
+}
+
+
+# CLucene
+
+# Automatically install the CLucene feature, when the optional CLucene optional
+# package is enabled.
+if [ IsOptionalHaikuImagePackageAdded CLucene ] {
+	HAIKU_BUILD_FEATURE_CLUCENE = 1 ;
+}
+
+
+HAIKU_CLUCENE_PACKAGE = clucene-0.9.21-x86-gcc4-haiku-2009-08-11.zip ;
+HAIKU_CLUCENE_URL = $(baseURL)/$(HAIKU_CLUCENE_PACKAGE) ;
+
+if $(HAIKU_BUILD_FEATURE_CLUCENE) {
+	if $(TARGET_ARCH) != x86 {
+		Echo "CLucene build feature not available for $(TARGET_ARCH)" ;
+	} else {
+		# Download the zip archive.
+		local zipFile = [ DownloadFile $(HAIKU_CLUCENE_PACKAGE)
+			: $(HAIKU_CLUCENE_URL) ] ;
+
+		# zip file and output directory
+		HAIKU_CLUCENE_ZIP_FILE = $(zipFile) ;
+		HAIKU_CLUCENE_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+			$(HAIKU_CLUCENE_PACKAGE:B) ] ;
+
+		# extract headers and libraries
+		HAIKU_CLUCENE_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_CLUCENE_DIR)
+			: common/include/ : $(zipFile) : extracted-clucene
+		] ;
+
+		HAIKU_CLUCENE_LIBS = [ ExtractArchive $(HAIKU_CLUCENE_DIR)
+			:
+			common/lib/libclucene.a
+			: $(zipFile)
+			 : extracted-clucene
+		] ;
+
+		HAIKU_CLUCENE_HEADERS
+			= [ FDirName $(HAIKU_CLUCENE_DIR) common include ] ;
+
+		EnableBuildFeatures clucene ;
+	}
+}
+
+
+# LLVM
+if $(TARGET_ARCH) = x86 {
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		HAIKU_LLVM_FILE = llvm-3.2-x86-gcc4-2012-12-21.zip ;
+		local zipFile = [ DownloadFile $(HAIKU_LLVM_FILE)
+			: $(baseURL)/$(HAIKU_LLVM_FILE) ] ;
+
+		HAIKU_LLVM_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+			$(HAIKU_LLVM_FILE:B) ] ;
+
+		HAIKU_LLVM_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_LLVM_DIR)
+			: common/include/ : $(zipFile) : extracted-llvm ] ;
+		HAIKU_LLVM_HEADERS = [ FDirName $(HAIKU_LLVM_DIR) common include ] ;
+
+		# We can't Glob these because they aren't extracted yet.
+		HAIKU_LLVM_LIBS = [ ExtractArchive $(HAIKU_LLVM_DIR)
+			:
+			common/lib/libLLVMAsmParser.a
+			common/lib/libLLVMInstrumentation.a
+			common/lib/libLLVMLinker.a
+			common/lib/libLLVMArchive.a
+			common/lib/libLLVMBitReader.a
+			common/lib/libLLVMDebugInfo.a
+			common/lib/libLLVMJIT.a
+			common/lib/libLLVMipo.a
+			common/lib/libLLVMVectorize.a
+			common/lib/libLLVMBitWriter.a
+			common/lib/libLLVMTableGen.a
+			#common/lib/libLLVMHexagonCodeGen.a
+			#common/lib/libLLVMHexagonAsmPrinter.a
+			#common/lib/libLLVMHexagonDesc.a
+			#common/lib/libLLVMHexagonInfo.a
+			#common/lib/libLLVMNVPTXCodeGen.a
+			#common/lib/libLLVMNVPTXDesc.a
+			#common/lib/libLLVMNVPTXInfo.a
+			#common/lib/libLLVMNVPTXAsmPrinter.a
+			#common/lib/libLLVMMBlazeCodeGen.a
+			#common/lib/libLLVMMBlazeAsmParser.a
+			#common/lib/libLLVMMBlazeDisassembler.a
+			#common/lib/libLLVMMBlazeDesc.a
+			#common/lib/libLLVMMBlazeInfo.a
+			#common/lib/libLLVMMBlazeAsmPrinter.a
+			common/lib/libLLVMCppBackendCodeGen.a
+			common/lib/libLLVMCppBackendInfo.a
+			#common/lib/libLLVMMSP430CodeGen.a
+			#common/lib/libLLVMMSP430Desc.a
+			#common/lib/libLLVMMSP430AsmPrinter.a
+			#common/lib/libLLVMMSP430Info.a
+			#common/lib/libLLVMXCoreCodeGen.a
+			#common/lib/libLLVMXCoreDesc.a
+			#common/lib/libLLVMXCoreInfo.a
+			#common/lib/libLLVMCellSPUCodeGen.a
+			#common/lib/libLLVMCellSPUDesc.a
+			#common/lib/libLLVMCellSPUInfo.a
+			#common/lib/libLLVMMipsAsmParser.a
+			#common/lib/libLLVMMipsCodeGen.a
+			#common/lib/libLLVMMipsDesc.a
+			#common/lib/libLLVMMipsAsmPrinter.a
+			#common/lib/libLLVMMipsDisassembler.a
+			#common/lib/libLLVMMipsInfo.a
+			#common/lib/libLLVMARMAsmParser.a
+			#common/lib/libLLVMARMCodeGen.a
+			#common/lib/libLLVMARMDisassembler.a
+			#common/lib/libLLVMARMDesc.a
+			#common/lib/libLLVMARMInfo.a
+			#common/lib/libLLVMARMAsmPrinter.a
+			#common/lib/libLLVMPowerPCCodeGen.a
+			#common/lib/libLLVMPowerPCDesc.a
+			#common/lib/libLLVMPowerPCInfo.a
+			#common/lib/libLLVMPowerPCAsmPrinter.a
+			#common/lib/libLLVMSparcCodeGen.a
+			#common/lib/libLLVMSparcDesc.a
+			#common/lib/libLLVMSparcInfo.a
+			common/lib/libLLVMX86AsmParser.a
+			common/lib/libLLVMX86CodeGen.a
+			common/lib/libLLVMSelectionDAG.a
+			common/lib/libLLVMAsmPrinter.a
+			common/lib/libLLVMX86Disassembler.a
+			common/lib/libLLVMX86Desc.a
+			common/lib/libLLVMX86Info.a
+			common/lib/libLLVMX86AsmPrinter.a
+			common/lib/libLLVMX86Utils.a
+			common/lib/libLLVMMCDisassembler.a
+			common/lib/libLLVMMCParser.a
+			common/lib/libLLVMInterpreter.a
+			common/lib/libLLVMCodeGen.a
+			common/lib/libLLVMScalarOpts.a
+			common/lib/libLLVMInstCombine.a
+			common/lib/libLLVMTransformUtils.a
+			common/lib/libLLVMipa.a
+			common/lib/libLLVMAnalysis.a
+			common/lib/libLLVMMCJIT.a
+			common/lib/libLLVMRuntimeDyld.a
+			common/lib/libLLVMExecutionEngine.a
+			common/lib/libLLVMTarget.a
+			common/lib/libLLVMMC.a
+			common/lib/libLLVMObject.a
+			common/lib/libLLVMCore.a
+			common/lib/libLLVMSupport.a
+			: $(zipFile) : extracted-llvm ]
+		;
+
+		EnableBuildFeatures llvm ;
+	} else {
+		# Nor will it ever be
+		Echo "LLVM not available on GCC2" ;
+	}
+} else {
+	Echo "LLVM not yet available on $(TARGET_ARCH)" ;
+}
+
+
+# GLU (GL Utilities)
+if $(TARGET_ARCH) = x86 {
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		HAIKU_GLU_FILE = glu-9.0-x86-gcc4-2012-11-13.zip ;
+	} else {
+		HAIKU_GLU_FILE = glu-9.0-x86-gcc2-2012-11-13.zip ;
+	}
+
+	local zipFile = [ DownloadFile $(HAIKU_GLU_FILE)
+		: $(baseURL)/lib/$(HAIKU_GLU_FILE) ] ;
+
+	HAIKU_GLU_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_GLU_FILE:B) ] ;
+	HAIKU_GLU_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_GLU_DIR)
+		: develop/headers/os/opengl/GL : $(zipFile) : extracted-glu-headers ] ;
+	HAIKU_GLU_LIBS = [ ExtractArchive $(HAIKU_GLU_DIR)
+		: system/lib/libGLU.a : $(zipFile) : extracted-glu ] ;
+	HAIKU_GLU_HEADERS = [ FDirName $(HAIKU_GLU_DIR) develop headers os opengl ] ;
+
+	EnableBuildFeatures glu ;
+} else {
+	Echo "GLU not yet available on $(TARGET_ARCH)" ;
+}
+
+
+# Mesa
+if $(TARGET_ARCH) = x86 {
+	local zipFile ;
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		HAIKU_MESA_FILE = mesa-9.1.1-x86-gcc4-2013-04-27.zip ;
+	} else {
+		HAIKU_MESA_FILE = mesa-7.8.2-x86-gcc2-2013-04-28.zip ;
+	}
+
+	zipFile = [ DownloadFile $(HAIKU_MESA_FILE)
+		: $(baseURL)/$(HAIKU_MESA_FILE) ] ;
+
+	HAIKU_MESA_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_MESA_FILE:B) ] ;
+
+	HAIKU_MESA_HEADERS = [ FDirName $(HAIKU_MESA_DIR) include ] ;
+	HAIKU_MESA_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_MESA_DIR)
+		: include/ : $(zipFile) : extracted-mesa ] ;
+
+	# Base Mesa libraries
+	HAIKU_MESA_LIB = [ ExtractArchive $(HAIKU_MESA_DIR)
+		:
+		lib.haiku/libmesa.a
+		: $(zipFile)
+		: extracted-mesa ] ;
+	HAIKU_GLAPI_LIB = [ ExtractArchive $(HAIKU_MESA_DIR)
+		:
+		lib.haiku/libglapi.a
+		: $(zipFile)
+		: extracted-mesa ] ;
+
+	Depends $(HAIKU_MESA_HEADERS_DEPENDENCY) : $(HAIKU_GLU_HEADERS_DEPENDENCY) ;
+	Depends $(HAIKU_GLAPI_LIBS) : $(HAIKU_GLU_LIBS) ;
+
+	# Extended Mesa libraries for newer versions
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		HAIKU_GLSL_LIB = [ ExtractArchive $(HAIKU_MESA_DIR)
+			:
+			lib.haiku/libglsl.a
+			: $(zipFile)
+			: extracted-mesa ] ;
+		HAIKU_GALLIUM_LIB = [ ExtractArchive $(HAIKU_MESA_DIR)
+			:
+			lib.haiku/libgallium.a
+			: $(zipFile)
+			: extracted-mesa ] ;
+
+		if FIsBuildFeatureEnabled(llvm) {
+			HAIKU_GALLIUM_LLVMPIPE_LIB = [ ExtractArchive $(HAIKU_MESA_DIR)
+				:
+				lib.haiku/libllvmpipe.a
+				: $(zipFile)
+				: extracted-mesa ] ;
+			Depends $(HAIKU_GALLIUM_LLVMPIPE_LIB) : $(HAIKU_LLVM_LIBS) ;
+		} else {
+			HAIKU_GALLIUM_SOFTPIPE_LIB = [ ExtractArchive $(HAIKU_MESA_DIR)
+				:
+				lib.haiku/libsoftpipe.a
+				: $(zipFile)
+				: extracted-mesa ] ;
+		}
+	}
+
+	EnableBuildFeatures mesa ;
+} else {
+	Echo "Mesa 3D rendering support not available on $(TARGET_ARCH)" ;
+}
+
+
+# FFmpeg
+local ffmpegBaseURL = $(baseURL)/lib ;
+if $(TARGET_ARCH) = x86 {
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		HAIKU_FFMPEG_FILE = ffmpeg-0.10.2-r1a4-x86-gcc4-2012-09-02.zip ;
+		HAIKU_SPEEX_FILE = speex-1.2rc1-r1a4-x86-gcc4-2012-09-02.zip ;
+		HAIKU_LIBTHEORA_FILE = libtheora-1.1.1-r1a4-x86-gcc4-2012-09-02.zip ;
+		HAIKU_LIBVORBIS_FILE = libvorbis-1.3.2-r1a4-x86-gcc4-2012-09-02.zip ;
+		HAIKU_LIBOGG_FILE = libogg-1.3.0-r1a4-x86-gcc4-2012-09-02.zip ;
+		HAIKU_LIBVPX_FILE = libvpx-1.0.0-r1a4-x86-gcc4-2012-09-02.zip ;
+	} else {
+		HAIKU_FFMPEG_FILE = ffmpeg-0.10.2-r1a4-x86-gcc2-2012-08-30.zip ;
+		HAIKU_SPEEX_FILE = speex-1.2rc1-r1a4-x86-gcc2-2012-08-29.zip ;
+		HAIKU_LIBTHEORA_FILE = libtheora-1.1.1-r1a4-x86-gcc2-2012-08-29.zip ;
+		HAIKU_LIBVORBIS_FILE = libvorbis-1.3.2-r1a4-x86-gcc2-2012-08-29.zip ;
+		HAIKU_LIBOGG_FILE = libogg-1.3.0-r1a4-x86-gcc2-2012-08-29.zip ;
+		HAIKU_LIBVPX_FILE = libvpx-1.0.0-r1a4-x86-gcc2-2012-08-29.zip ;
+	}
+
+	local ffmpegZipFile = [ DownloadFile $(HAIKU_FFMPEG_FILE)
+		: $(ffmpegBaseURL)/$(HAIKU_FFMPEG_FILE) ] ;
+	local speexZipFile = [ DownloadFile $(HAIKU_SPEEX_FILE)
+		: $(ffmpegBaseURL)/$(HAIKU_SPEEX_FILE) ] ;
+	local libtheoraZipFile = [ DownloadFile $(HAIKU_LIBTHEORA_FILE)
+		: $(ffmpegBaseURL)/$(HAIKU_LIBTHEORA_FILE) ] ;
+	local libvorbisZipFile = [ DownloadFile $(HAIKU_LIBVORBIS_FILE)
+		: $(ffmpegBaseURL)/$(HAIKU_LIBVORBIS_FILE) ] ;
+	local liboggZipFile = [ DownloadFile $(HAIKU_LIBOGG_FILE)
+		: $(ffmpegBaseURL)/$(HAIKU_LIBOGG_FILE) ] ;
+	local libvpxZipFile = [ DownloadFile $(HAIKU_LIBVPX_FILE)
+		: $(ffmpegBaseURL)/$(HAIKU_LIBVPX_FILE) ] ;
+
+	HAIKU_FFMPEG_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_FFMPEG_FILE:B) ] ;
+	HAIKU_SPEEX_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_SPEEX_FILE:B) ] ;
+	HAIKU_LIBTHEORA_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_LIBTHEORA_FILE:B) ] ;
+	HAIKU_LIBVORBIS_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_LIBVORBIS_FILE:B) ] ;
+	HAIKU_LIBOGG_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_LIBOGG_FILE:B) ] ;
+	HAIKU_LIBVPX_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_LIBVPX_FILE:B) ] ;
+
+	HAIKU_FFMPEG_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_FFMPEG_DIR)
+		: common/include/ : $(ffmpegZipFile) : extracted-ffmpeg ] ;
+	HAIKU_SPEEX_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_SPEEX_DIR)
+		: common/include/ : $(speexZipFile) : extracted-speex ] ;
+	HAIKU_LIBTHEORA_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_LIBTHEORA_DIR)
+		: common/include/ : $(libtheoraZipFile) : extracted-libtheora ] ;
+	HAIKU_LIBVORBIS_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_LIBVORBIS_DIR)
+		: common/include/ : $(libvorbisZipFile) : extracted-libvorbis ] ;
+	HAIKU_LIBOGG_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_LIBOGG_DIR)
+		: common/include/ : $(liboggZipFile) : extracted-libogg ] ;
+	HAIKU_LIBVPX_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_LIBVPX_DIR)
+		: common/include/ : $(libvpxZipFile) : extracted-libvpx ] ;
+
+	HAIKU_FFMPEG_LIBS = [ ExtractArchive $(HAIKU_FFMPEG_DIR)
+		:
+		common/lib/libavformat.a
+		common/lib/libavcodec.a
+		common/lib/libavdevice.a
+		common/lib/libavfilter.a
+		common/lib/libswscale.a
+		common/lib/libavutil.a
+		: $(ffmpegZipFile)
+		: extracted-ffmpeg ] ;
+	Depends $(HAIKU_FFMPEG_LIBS) : $(HAIKU_FFMPEG_HEADERS_DEPENDENCY) ;
+
+	HAIKU_SPEEX_LIBS = [ ExtractArchive $(HAIKU_SPEEX_DIR)
+		:
+		common/lib/libspeex.a
+		: $(speexZipFile)
+		: extracted-speex ] ;
+	Depends $(HAIKU_SPEEX_LIBS) : $(HAIKU_SPEEX_HEADERS_DEPENDENCY) ;
+
+	HAIKU_LIBTHEORA_LIBS = [ ExtractArchive $(HAIKU_LIBTHEORA_DIR)
+		:
+		common/lib/libtheora.a
+		common/lib/libtheoradec.a
+		common/lib/libtheoraenc.a
+		: $(libtheoraZipFile)
+		: extracted-libtheora ] ;
+	Depends $(HAIKU_LIBTHEORA_LIBS) : $(HAIKU_LIBTHEORA_HEADERS_DEPENDENCY) ;
+
+
+	HAIKU_LIBVORBIS_LIBS = [ ExtractArchive $(HAIKU_LIBVORBIS_DIR)
+		:
+		common/lib/libvorbis.a
+		common/lib/libvorbisenc.a
+		: $(libvorbisZipFile)
+		: extracted-libvorbis ] ;
+	Depends $(HAIKU_LIBVORBIS_LIBS) : $(HAIKU_LIBVORBIS_HEADERS_DEPENDENCY) ;
+
+
+	HAIKU_LIBOGG_LIBS = [ ExtractArchive $(HAIKU_LIBOGG_DIR)
+		:
+		common/lib/libogg.a
+		: $(liboggZipFile)
+		: extracted-libogg ] ;
+	Depends $(HAIKU_LIBOGG_LIBS) : $(HAIKU_LIBOGG_HEADERS_DEPENDENCY) ;
+
+	HAIKU_LIBVPX_LIBS = [ ExtractArchive $(HAIKU_LIBVPX_DIR)
+		:
+		common/lib/libvpx.a
+		: $(libvpxZipFile)
+		: extracted-libvpx ] ;
+	Depends $(HAIKU_LIBVPX_LIBS) : $(HAIKU_LIBVPX_HEADERS_DEPENDENCY) ;
+
+	HAIKU_FFMPEG_HEADERS = [ FDirName $(HAIKU_FFMPEG_DIR) common include ] ;
+	HAIKU_SPEEX_HEADERS = [ FDirName $(HAIKU_SPEEX_DIR) common include ] ;
+	HAIKU_LIBTHEORA_HEADERS = [ FDirName $(HAIKU_LIBTHEORA_DIR) common include ] ;
+	HAIKU_LIBVORBIS_HEADERS = [ FDirName $(HAIKU_LIBVORBIS_DIR) common include ] ;
+	HAIKU_LIBOGG_HEADERS = [ FDirName $(HAIKU_LIBOGG_DIR) common include ] ;
+	HAIKU_LIBVPX_HEADERS = [ FDirName $(HAIKU_LIBVPX_DIR) common include ] ;
+
+	EnableBuildFeatures ffmpeg ;
+} else {
+	Echo "FFMpeg support not available on $(TARGET_ARCH)" ;
+}
+
+
+# MikMod
+local mikmodBaseURL = http://haiku-files.org/files/optional-packages/lib ;
+if $(TARGET_ARCH) = x86 {
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		HAIKU_MIKMOD_FILE = libmikmod-3.1.11-r1a4-x86-gcc4-2012-09-02.zip ;
+	} else {
+		HAIKU_MIKMOD_FILE = libmikmod-3.1.11-r1a4-x86-gcc2-2012-08-29.zip ;
+	}
+
+	local mikmodZipFile = [ DownloadFile $(HAIKU_MIKMOD_FILE)
+		: $(mikmodBaseURL)/$(HAIKU_MIKMOD_FILE) ] ;
+
+	HAIKU_MIKMOD_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_MIKMOD_FILE:B) ] ;
+
+	HAIKU_MIKMOD_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_MIKMOD_DIR)
+		: common/include/ : $(mikmodZipFile) : extracted-mikmod ] ;
+
+	HAIKU_MIKMOD_LIBS = [ ExtractArchive $(HAIKU_MIKMOD_DIR)
+		:
+		common/lib/libmikmod.a
+		: $(mikmodZipFile)
+		: extracted-ffmpeg ] ;
+	Depends $(HAIKU_MIKMOD_LIBS) : $(HAIKU_MIKMOD_HEADERS_DEPENDENCY) ;
+
+	HAIKU_MIKMOD_HEADERS = [ FDirName $(HAIKU_MIKMOD_DIR) common include ] ;
+
+	EnableBuildFeatures mikmod ;
+} else {
+	Echo "MikMod support not available on $(TARGET_ARCH)" ;
+}
+
+
+# Freetype
+local freetypeBaseURL = $(baseURL)/lib ;
+if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 || $(TARGET_ARCH) = arm {
+	if $(TARGET_ARCH) = arm {
+		HAIKU_FREETYPE_FILE = freetype-2.4.9-arm-2012-11-21.zip ;
+	} else if $(TARGET_ARCH) = ppc {
+		HAIKU_FREETYPE_FILE = freetype-2.4.9-ppc-gcc4-2012-06-26.zip ;
+	} else if $(TARGET_ARCH) = x86_64 {
+		HAIKU_FREETYPE_FILE = freetype-2.4.9-x86_64-2012-08-04.zip ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		HAIKU_FREETYPE_FILE = freetype-2.4.9-r1a4-x86-gcc4-2012-09-02.zip ;
+	} else {
+		HAIKU_FREETYPE_FILE = freetype-2.4.9-r1a4-x86-gcc2-2012-08-28.zip ;
+	}
+
+	local freetypeZipFile = [ DownloadFile $(HAIKU_FREETYPE_FILE)
+		: $(freetypeBaseURL)/$(HAIKU_FREETYPE_FILE) ] ;
+
+	HAIKU_FREETYPE_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_FREETYPE_FILE:B) ] ;
+
+	HAIKU_FREETYPE_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_FREETYPE_DIR)
+		: develop/headers/3rdparty/freetype2 : $(freetypeZipFile)
+		: extracted-freetype ] ;
+
+	HAIKU_FREETYPE_LIB = [ ExtractArchive $(HAIKU_FREETYPE_DIR)
+		:
+		common/lib/libfreetype.so
+		: $(freetypeZipFile)
+		: extracted-freetype ] ;
+	HAIKU_FREETYPE_CURRENT_LIB = [ ExtractArchive $(HAIKU_FREETYPE_DIR)
+		:
+		common/lib/libfreetype.so.6.8.1
+		: $(freetypeZipFile)
+		: extracted-freetype ] ;
+	Depends $(HAIKU_FREETYPE_LIB) $(HAIKU_FREETYPE_CURRENT_LIB) : $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
+
+	HAIKU_FREETYPE_CURRENT_LINK = libfreetype.so.6 ;
+
+	HAIKU_FREETYPE_HEADERS = [ FDirName $(HAIKU_FREETYPE_DIR) develop
+		headers 3rdparty ] [ FDirName $(HAIKU_FREETYPE_DIR) develop
+		headers 3rdparty freetype2 ] ;
+
+	EnableBuildFeatures freetype ;
+} else {
+	Echo "Freetype support not available on $(TARGET_ARCH)" ;
+}
+
+
+# TagLib
+
+# Automatically install the TagLib feature, when the optional TagLib optional
+# package is enabled.
+if [ IsOptionalHaikuImagePackageAdded TagLib ] {
+	HAIKU_BUILD_FEATURE_TAGLIB = 1 ;
+}
+
+HAIKU_TAGLIB_PACKAGE = taglib-1.6.3-r1a4-x86-gcc2-2012-09-03.zip ;
+HAIKU_TAGLIB_URL = $(baseURL)/$(HAIKU_TAGLIB_PACKAGE) ;
+
+if $(HAIKU_BUILD_FEATURE_TAGLIB) {
+	if $(TARGET_ARCH) != x86 {
+		Echo "TagLib build feature not available for $(TARGET_ARCH)" ;
+	} else {
+		# Download the zip archive.
+		local zipFile = [ DownloadFile $(HAIKU_TAGLIB_PACKAGE)
+			: $(HAIKU_TAGLIB_URL) ] ;
+
+		# zip file and output directory
+		HAIKU_TAGLIB_ZIP_FILE = $(zipFile) ;
+		HAIKU_TAGLIB_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+			$(HAIKU_TAGLIB_PACKAGE:B) ] ;
+
+		# extract headers and libraries
+		HAIKU_TAGLIB_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_TAGLIB_DIR)
+			: common/include/ : $(zipFile) : extracted-taglib
+		] ;
+
+		HAIKU_TAGLIB_LIBS = [ ExtractArchive $(HAIKU_TAGLIB_DIR)
+			:
+			common/lib/libtag.so
+			common/lib/libtag_c.so
+			: $(zipFile)
+			: extracted-taglib
+		] ;
+
+		HAIKU_TAGLIB_HEADERS
+			= [ FDirName $(HAIKU_TAGLIB_DIR) common include taglib ] ;
+
+		EnableBuildFeatures taglib ;
+	}
+}
+
+
+# WebKit
+# Automatically install the WebKit feature, when the optional WebPositive
+# optional package is enabled.
+if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
+	HAIKU_BUILD_FEATURE_WEBKIT = 1 ;
+}
+
+if $(TARGET_ARCH) = x86 {
+	HAIKU_WEBKIT_FILE = haikuwebkit-1.1.3-x86-gcc4-2012-08-31a.zip ;
+} else if $(TARGET_ARCH) = x86_64 {
+	HAIKU_WEBKIT_FILE = haikuwebkit-1.1.3-x86_64-gcc4-2012-12-22.zip ;
+}
+if $(HAIKU_BUILD_FEATURE_WEBKIT) {
+	if $(TARGET_ARCH) != x86 && $(TARGET_ARCH) != x86_64 {
+		Echo "WebKit support not available on $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) < 4 {
+		if ! $(isHybridBuild) {
+			Echo "WebKit support not available on gcc $(HAIKU_GCC_VERSION[1])" ;
+		} else {
+			Echo "WebKit to be utilized by gcc4 inside $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR)" ;
+		}
+	} else {
+		local zipFile = [ DownloadFile $(HAIKU_WEBKIT_FILE)
+			: $(baseURL)/$(HAIKU_WEBKIT_FILE) ] ;
+
+		HAIKU_WEBKIT_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+			$(HAIKU_WEBKIT_FILE:B) ] ;
+
+		HAIKU_WEBKIT_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_WEBKIT_DIR)
+			: include/ : $(zipFile) : extracted-webkit ] ;
+
+		HAIKU_WEBKIT_LIBS = [ ExtractArchive $(HAIKU_WEBKIT_DIR)
+			:
+			lib/libwtf.so
+			lib/libjavascriptcore.so
+			lib/libwebcore.so
+			lib/libwebkit.so
+			: $(zipFile)
+			: extracted-webkit
+		] ;
+
+		HAIKU_WEBKIT_HEADERS = [ FDirName $(HAIKU_WEBKIT_DIR) include ] ;
+
+		EnableBuildFeatures webkit ;
+	}
+}
+
+# libpng
+local libpngBaseURL = $(baseURL)/lib ;
+if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 || $(TARGET_ARCH) = arm {
+	if $(TARGET_ARCH) = arm {
+		HAIKU_LIBPNG_FILE = libpng-1.5.12-arm-2012-11-21.zip ;
+	} else if $(TARGET_ARCH) = ppc {
+		HAIKU_LIBPNG_FILE = libpng-1.5.12-ppc-gcc4-2012-08-27.zip ;
+	} else if $(TARGET_ARCH) = x86_64 {
+		HAIKU_LIBPNG_FILE = libpng-1.5.12-x86_64-2012-11-18.zip ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		HAIKU_LIBPNG_FILE = libpng-1.5.12-x86-gcc4-2012-08-23.zip ;
+	} else {
+		HAIKU_LIBPNG_FILE = libpng-1.5.12-x86-gcc2-2012-08-23.zip ;
+	}
+
+	local libpngZipFile = [ DownloadFile $(HAIKU_LIBPNG_FILE)
+		: $(libpngBaseURL)/$(HAIKU_LIBPNG_FILE) ] ;
+
+	HAIKU_LIBPNG_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_LIBPNG_FILE:B) ] ;
+
+	HAIKU_LIBPNG_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_LIBPNG_DIR)
+		: common/include : $(libpngZipFile)
+		: extracted-libpng ] ;
+
+	HAIKU_LIBPNG_LIB = [ ExtractArchive $(HAIKU_LIBPNG_DIR)
+		:
+		common/lib/libpng.so
+		: $(libpngZipFile)
+		: extracted-libpng ] ;
+	HAIKU_LIBPNG_CURRENT_LIB = [ ExtractArchive $(HAIKU_LIBPNG_DIR)
+		:
+		common/lib/libpng15.so.15.12.0
+		: $(libpngZipFile)
+		: extracted-libpng ] ;
+	Depends $(HAIKU_LIBPNG_LIB) $(HAIKU_LIBPNG_CURRENT_LIB) : $(HAIKU_LIBPNG_HEADERS_DEPENDENCY) ;
+
+	HAIKU_LIBPNG_CURRENT_LINK = libpng15.so.15 ;
+
+	HAIKU_LIBPNG_HEADERS = [ FDirName $(HAIKU_LIBPNG_DIR) common include ] ;
+
+	EnableBuildFeatures libpng ;
+} else {
+	Echo "libpng support not available on $(TARGET_ARCH)" ;
+}
+
+# jpeg
+local jpegBaseURL = $(baseURL)/lib ;
+if $(TARGET_ARCH) in arm ppc x86 x86_64 {
+	if $(TARGET_ARCH) = arm {
+		HAIKU_JPEG_FILE = jpeg-8d-arm-2012-11-21.zip ;
+	} else if $(TARGET_ARCH) = ppc {
+		HAIKU_JPEG_FILE = jpeg-8d-ppc-gcc4-2012-08-27.zip ;
+	} else if $(TARGET_ARCH) = x86_64 {
+		HAIKU_JPEG_FILE = jpeg-8d-x86_64-2012-11-18.zip ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		HAIKU_JPEG_FILE = jpeg-8d-x86-gcc4-2012-08-23.zip ;
+	} else {
+		HAIKU_JPEG_FILE = jpeg-8d-x86-gcc2-2012-08-23.zip ;
+	}
+
+	local jpegZipFile = [ DownloadFile $(HAIKU_JPEG_FILE)
+		: $(jpegBaseURL)/$(HAIKU_JPEG_FILE) ] ;
+
+	HAIKU_JPEG_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_JPEG_FILE:B) ] ;
+
+	HAIKU_JPEG_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_JPEG_DIR)
+		: common/include : $(jpegZipFile)
+		: extracted-jpeg ] ;
+
+	HAIKU_JPEG_LIB = [ ExtractArchive $(HAIKU_JPEG_DIR)
+		:
+		common/lib/libjpeg.so
+		: $(jpegZipFile)
+		: extracted-jpeg ] ;
+	HAIKU_JPEG_CURRENT_LIB = [ ExtractArchive $(HAIKU_JPEG_DIR)
+		:
+		common/lib/libjpeg.so.8.4.0
+		: $(jpegZipFile)
+		: extracted-jpeg ] ;
+	Depends $(HAIKU_JPEG_LIB) $(HAIKU_JPEG_CURRENT_LIB) : $(HAIKU_JPEG_HEADERS_DEPENDENCY) ;
+
+	HAIKU_JPEG_CURRENT_LINK = libjpeg.so.8 ;
+
+	HAIKU_JPEG_HEADERS = [ FDirName $(HAIKU_JPEG_DIR) common include ] ;
+
+	EnableBuildFeatures libjpeg ;
+} else {
+	Echo "jpeg support not available on $(TARGET_ARCH)" ;
+}
+
+# zlib
+local zlibBaseURL = $(baseURL)/lib ;
+if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 || $(TARGET_ARCH) = arm {
+	if $(TARGET_ARCH) = arm {
+		HAIKU_ZLIB_FILE = zlib-1.2.7-arm-2012-11-21.zip ;
+	} else if $(TARGET_ARCH) = ppc {
+		HAIKU_ZLIB_FILE = zlib-1.2.7-ppc-gcc4-2012-10-30.zip ;
+	} else if $(TARGET_ARCH) = x86_64 {
+		HAIKU_ZLIB_FILE = zlib-1.2.7-x86_64-2012-11-18.zip ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		HAIKU_ZLIB_FILE = zlib-1.2.7-x86-gcc4-2012-10-30.zip ;
+	} else {
+		HAIKU_ZLIB_FILE = zlib-1.2.7-x86-gcc2-2012-10-30.zip ;
+	}
+
+	local zlibZipFile = [ DownloadFile $(HAIKU_ZLIB_FILE)
+		: $(zlibBaseURL)/$(HAIKU_ZLIB_FILE) ] ;
+
+	HAIKU_ZLIB_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_ZLIB_FILE:B) ] ;
+
+	HAIKU_ZLIB_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_ZLIB_DIR)
+		: common/include : $(zlibZipFile)
+		: extracted-zlib ] ;
+
+	HAIKU_ZLIB_LIB = [ ExtractArchive $(HAIKU_ZLIB_DIR)
+		:
+		common/lib/libz.so
+		: $(zlibZipFile)
+		: extracted-zlib ] ;
+	HAIKU_ZLIB_CURRENT_LIB = [ ExtractArchive $(HAIKU_ZLIB_DIR)
+		:
+		common/lib/libz.so.1.2.7
+		: $(zlibZipFile)
+		: extracted-zlib ] ;
+	Depends $(HAIKU_ZLIB_LIB) $(HAIKU_ZLIB_CURRENT_LIB) : $(HAIKU_ZLIB_HEADERS_DEPENDENCY) ;
+
+	HAIKU_ZLIB_CURRENT_LINK = libz.so.1 ;
+
+	HAIKU_ZLIB_HEADERS = [ FDirName $(HAIKU_ZLIB_DIR) common include ] ;
+
+	EnableBuildFeatures zlib ;
+} else {
+	Echo "zlib support not available on $(TARGET_ARCH)" ;
+}
+
+
+# LibSolv
+
+if $(TARGET_ARCH) != x86 {
+	Echo "Libsolv not available for $(TARGET_ARCH)." ;
+} else if $(HAIKU_GCC_VERSION[1]) = 2 {
+	HAIKU_LIBSOLV_PACKAGE
+		= libsolv-0.3.0_haiku_2013_04_18-2-x86_gcc2.hpkg ;
+} else {
+	Echo "Libsolv not available for gcc4." ;
+}
+
+if $(HAIKU_LIBSOLV_PACKAGE) {
+	# download package
+	HAIKU_LIBSOLV_PACKAGE_FILE = [ DownloadFile $(HAIKU_LIBSOLV_PACKAGE)
+			: $(hpkgBaseURL)/$(HAIKU_LIBSOLV_PACKAGE) ] ;
+	HAIKU_LIBSOLV_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_LIBSOLV_PACKAGE:B) ] ;
+
+	# extract headers and libraries
+	HAIKU_LIBSOLV_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_LIBSOLV_DIR)
+		: develop/headers/ : $(HAIKU_LIBSOLV_PACKAGE_FILE) : extracted-libsolv
+	] ;
+
+	HAIKU_LIBSOLV_LIBS = [ ExtractArchive $(HAIKU_LIBSOLV_DIR)
+		:
+		develop/lib/libsolv.so
+		develop/lib/libsolvext.so
+		: $(HAIKU_LIBSOLV_PACKAGE_FILE)
+		: extracted-libsolv
+	] ;
+
+	HAIKU_LIBSOLV_HEADERS = [ FDirName $(HAIKU_LIBSOLV_DIR) develop/headers ] ;
+}
+
+
+# GPL add-ons
+if $(HAIKU_INCLUDE_GPL_ADDONS) = 1 {
+	EnableBuildFeatures gpl ;
+}
+
+
+# ATA vs. IDE
+#HACK: remove when old ide code is removed!
+if $(HAIKU_ATA_STACK) = 1 {
+	EnableBuildFeatures ata ;
+} else {
+	EnableBuildFeatures ide ;
+}

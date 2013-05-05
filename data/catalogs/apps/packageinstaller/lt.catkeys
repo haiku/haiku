@@ -1,0 +1,58 @@
+1	lithuanian	x-vnd.Haiku-PackageInstaller	1396489627
+Install to:	PackageView		Diegti į:
+OK	PackageView		Gerai
+Accept	PackageTextViewer		Priimti
+Continue	PackageInstall		Tęsti
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Pasirinktojo paketo į sistemą įdiegti nepavyko. Tai gali būti paties paketo problema. Siūlome dėl jos susisiekti su paketo tiekėju.
+Image not loaded correctly	PackageImageViewer		Paveikslo įkelti nepavyko
+Install 	PackageView		Diegti
+No package selected.	PackageInfo		Nepasirinktas nė vienas paketas.
+Install	PackageView		Diegti
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Panašu, jog pasirinktasis paketas jau yra įdiegtas. Ar norėtumėte išdiegti esamą paketą ir tęsti diegimą?
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Ar įsiminti šį atsakymą likusiai diegimo proceso daliai?\n
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Panašu, kad failų dydžiai pakete nesutampa. Paketas gali būti sugadintas arba pakeistas po to, kai buvo sukurtas. Ar vis dar norite tęsti?
+Error while installing the package\n	PackageView		Klaida diegiant paketą\n
+Disclaimer	PackageTextViewer		Atsakomybės išsižadėjimas
+%.1f GiB	PackageView		%.1f GiB
+The installation of the package has been aborted.	PackageView		Paketo diegimas nutrauktas.
+Done	PackageInstall		Atlikta
+All existing files will be replaced?	PackageView		Ar tikrai norite perrašyti visus egzistuojančius failus?
+Preparing package	PackageInstall		Paketas ruošiamas
+No package available.	PackageInfo		Nėra paketo.
+none	PackageView		nieko
+Stop	PackageStatus		Stabdyti
+Other…	PackageView		Kitą vietą…
+No installation type selected	PackageView		Diegimo tipas nenurodytas
+The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		Simbolinė nuoroda vardu „%s“ duotąjame kelyje jau yra.\nPakeisti nuorodą esančia šiame pakete, ar palikti esamą?
+Installing files and folders	PackageInstall		Diegiami failai ir aplankai
+Package installer	PackageView		Paketų diegyklė
+Skip all	PackageView		Praleisti visus
+The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Objektas vardu „%s“ duotąjame kelyje jau yra.\nPakeisti objektą esančiu šiame pakete, ar palikti esamą?
+The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Scenarijus vardu „%s“ duotąjame kelyje jau yra.\nPakeisti scenarijų esančiu šiame pakete, ar palikti esamą?
+Running post-installation scripts	PackageInstall		Vykdomi podiegiminiai scenarijai.
+%llu bytes	PackageView		%llu B
+Skip	PackageView		Praleisti
+%.1f MiB	PackageView		%.1f MiB
+The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Aplankas vardu „%s“ duotąjame kelyje jau yra.\nPakeisti aplanką esančiu šiame pakete, ar palikti esamą?
+The package you requested has been successfully installed on your system.	PackageView		Nurodytas paketas sėkmingai įdiegtas šiame kompiuteryje.
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Klaida! „%s“ nėra galimas kelias.\n
+Installation type:	PackageView		Diegimo tipas:
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Klaida (%s)! Nepavyko atverti „%s“.\n
+Finishing installation	PackageInstall		Diegimas užbaigiamas
+Installing package	PackageStatus		Paketas diegiamas
+Ask again	PackageView		Klausti vėl
+Abort	PackageView		Nutraukti diegimą
+Replace all	PackageView		Pakeisti visus
+Decline	PackageTextViewer		Atmesti
+The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Failas vardu „%s“ duotąjame kelyje jau yra.\nPakeisti failą esančiu šiame pakete, ar palikti esamą?
+All existing files will be skipped?	PackageView		Ar tikrai norite praleisti visus jau egzistuojančius failus?
+Continue	PackageInfo		Tęsti
+%.1f KiB	PackageView		%.1f KiB
+(%s free)	PackageView		(%s laisva)
+Abort	PackageInfo		Nutraukti
+PackageInstaller	System name		Paketų diegyklė
+Abort	PackageInstall		Nutraukti
+Continue	PackageTextViewer		Tęsti
+Replace	PackageView		Pakeisti
+Installation progress	PackageView		Diegimo eiga
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Paketo failo nepavyko perskaityti.\nGali būti, jog nurodytas failas nėra BeOS .pkg paketas arba yra pažeistas.

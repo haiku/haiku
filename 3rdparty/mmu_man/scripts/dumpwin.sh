@@ -30,7 +30,7 @@ dumpview () {
     local C=0
 
     while [ $C -lt $CNT ]; do
-	local INAME="$(hey "$APP" get InternalName of View $C of $1 Window $WIN | grep result | cut -d" " -f 7)"
+	local INAME="$(hey "$APP" get InternalName of View $C of $1 Window $WIN | grep result | sed 's/.* : //')"
 	echo "$2:: View $C/$CNT ($INAME) ( View $C of ${1}Window $WIN )"
 #	hey "$APP" get View $C of $1 Window $WIN | awk " { print \"  $2\" \$0 } "
 #	hey "$APP" getsuites of View $C of $1 Window $WIN | grep Label >/dev/null

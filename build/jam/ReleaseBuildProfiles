@@ -16,20 +16,17 @@ switch $(HAIKU_BUILD_PROFILE) {
 		HAIKU_ROOT_USER_REAL_NAME = "Yourself" ;
 		AddGroupToHaikuImage party : 101 : user sshd ;
 		HAIKU_IMAGE_HOST_NAME = shredder ;
-		HAIKU_IMAGE_SIZE = 750 ;
 		HAIKU_STRIP_DEBUG_FROM_OPTIONAL_PACKAGES = 1 ;
+		HAIKU_IMAGE_SIZE = 800 ;
 
 		AddOptionalHaikuImagePackages TimGMSoundFont WQY-MicroHei ;
 		AddOptionalHaikuImagePackages BePDF Pe Vision
 			WebPositive WonderBrush ;
 		AddOptionalHaikuImagePackages CVS Development Git Mercurial
 			Python Subversion OpenSSH OpenSSL ;
-		AddOptionalHaikuImagePackages Nano P7zip Welcome BeBook XZ-Utils ;
-
-		local releaseNotesURL = http://dev.haiku-os.org/wiki/R1/Alpha3/ReleaseNotes?format=txt ;
-		local releaseNotesName = "Release Notes" ;
-		local releaseNotesFile = [ DownloadFile $(releaseNotesName) : $(releaseNotesURL) ] ;
-		AddFilesToHaikuImage home Desktop : $(releaseNotesFile) ;
+		AddOptionalHaikuImagePackages KeymapSwitcher Nano P7zip Welcome
+			BeBook XZ-Utils ;
+		AddOptionalHaikuImagePackages wpa_supplicant ;
 	}
 
 	case "beta-*" : {
@@ -41,12 +38,13 @@ switch $(HAIKU_BUILD_PROFILE) {
 		HAIKU_ROOT_USER_NAME = user ;
 		HAIKU_ROOT_USER_REAL_NAME = "Yourself" ;
 		AddGroupToHaikuImage party : 101 : user sshd ;
-		HAIKU_IMAGE_HOST_NAME = shredder ;
-		HAIKU_IMAGE_SIZE = 500 ;
 		HAIKU_STRIP_DEBUG_FROM_OPTIONAL_PACKAGES = 1 ;
+		HAIKU_IMAGE_HOST_NAME = shredder ;
+		HAIKU_IMAGE_SIZE = 600 ;
 
 		AddOptionalHaikuImagePackages Pe Nano Vision P7zip XZ-Utils ;
-		AddOptionalHaikuImagePackages Development Subversion OpenSSH OpenSSL ;
+		AddOptionalHaikuImagePackages Development Git OpenSSH OpenSSL ;
+		AddOptionalHaikuImagePackages wpa_supplicant WebPositive ;
 	}
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2010-2012, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002-2003, Marcus Overhagen, <Marcus@Overhagen.de>.
  * Distributed under the terms of the MIT License.
  */
@@ -82,7 +82,7 @@ BBufferProducer::GetLatency(bigtime_t* _latency)
 {
 	CALLED();
 	// The default implementation of GetLatency() finds the maximum
-	// latency of your currently-available outputs by iterating over 
+	// latency of your currently-available outputs by iterating over
 	// them, and returns that value in outLatency
 
 	int32 cookie;
@@ -95,7 +95,7 @@ BBufferProducer::GetLatency(bigtime_t* _latency)
 	while (GetNextOutput(&cookie, &output) == B_OK) {
 		if (output.destination == media_destination::null)
 			continue;
-		
+
 		if (output.node.node == fNodeID) {
 			// avoid port writes (deadlock) if loopback connection
 			if (fConsumerThis == NULL)
@@ -113,7 +113,8 @@ BBufferProducer::GetLatency(bigtime_t* _latency)
 			*_latency = latency;
 		}
 	}
-	printf("BBufferProducer::GetLatency: node %ld, name \"%s\" has max latency %Ld\n", fNodeID, fName, *_latency);
+	printf("BBufferProducer::GetLatency: node %" B_PRId32 ", name \"%s\" has "
+		"max latency %" B_PRId64 "\n", fNodeID, fName, *_latency);
 	return B_OK;
 }
 
@@ -276,7 +277,7 @@ BBufferProducer::HandleMessage(int32 message, const void* data, size_t size)
 				= media_request_info::B_SET_OUTPUT_BUFFERS_FOR;
 			replycommand.info.change_tag = command->change_tag;
 			replycommand.info.status = status;
-			replycommand.info.cookie = (int32)group;
+			replycommand.info.cookie = group;
 			replycommand.info.user_data = command->user_data;
 			replycommand.info.source = command->source;
 			replycommand.info.destination = command->destination;
@@ -544,7 +545,7 @@ BBufferProducer::FindSeekTag(const media_destination& destination,
 	request.destination = destination;
 	request.target_time = targetTime;
 	request.flags = flags;
-	
+
 	status_t status = QueryPort(destination.port, CONSUMER_SEEK_TAG_REQUESTED,
 		&request, sizeof(request), &reply, sizeof(reply));
 	if (status != B_OK)

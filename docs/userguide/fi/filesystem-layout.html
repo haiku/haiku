@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Tiedostojärjestelmäsijoittelu</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Käyttäjäopas</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/fi.png" alt="" /> Suomi</li>
+<li><a href="../fr/filesystem-layout.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/filesystem-layout.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/filesystem-layout.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/filesystem-layout.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/filesystem-layout.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/filesystem-layout.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/filesystem-layout.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/filesystem-layout.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/filesystem-layout.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/filesystem-layout.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../sk/filesystem-layout.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../hu/filesystem-layout.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../pt_BR/filesystem-layout.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../ca/filesystem-layout.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../en/filesystem-layout.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="bootloader.html">Alkukäynnistyslataaja</a> 
+::  <a href="contents.html" class="uplink">Sisältö</a> 
+::  <a href="gui.html">Haikun graafinen käyttöliittymä</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h1>Tiedostojärjestelmäsijoittelu</h1>
+
+<p>Haikun tiedostojärjestelmäsijoittelu on aika läpinäkyvä, yrittäen aina käyttää salaamattomia tiedosto- ja kansionimiä, mikä ei jätä käyttäjille arvaamisen tarvetta. Tiedostot ja kansiot, jotka ovat tärkeitä järjestelmän toimimiseksi kunnolla, on suojattu vahingossa tapahtuvalta käsitttelyltä yhdellä näistä hälytyksistä:</p>
+<img src="images/filesystem-layout-images/achtung-user.png" alt="achtung-user.png" /> 
+<img src="images/filesystem-layout-images/achtung-system.png" alt="achtung-system.png" />
+<p>Toinen hälytys ponnahtaa esiin, jos yrität nimetä uudelleen tai poistaa jotain järjestelmähierarkiasta. Tässä painiketta <span class="button">Nimeä uudelleen</span> on napsautettava vain, jos pidät <span class="button">VAIHTO</span>-näppäintä alhaalla.</p>
+<p>Yleensä alkulataustaltion juurihakemistosta erkanee kolme haaraa:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="path">/boot/system/</span></td><td> </td><td>kuuluu järjestelmään. Älä koske!</td></tr>
+<tr><td><span class="path">/boot/common/</span></td><td> </td><td>säilyttää käyttäjien kesken jaetut tiedostot.</td></tr>
+<tr><td><span class="path">/boot/home/</span></td><td> </td><td>on henkilökohtainen kansiosi omien tietojen ja asetusten säilyttämiseksi.</td></tr>
+</table>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="system" name="system">Järjestelmäkansio - <span class="path">/boot/system/</span></a></h2>
+<p>Haikun edeltäjässä BeOS-käyttöjärjestelmässä tämä kansio oli nimeltään <span class="path">/boot/beos/</span>. Saatat yhä löytää sen joissakin vanhemmissa dokumenteissa (esimerkiksi alkuperäisessä BeBook-kirjassa).<br />Mikä sen nimi sitten onkaan, sinun ei pitäisi muuttaa mitään sen sisällä. Haikun jokainen päivitys voi lisätä, poista tai korvata mitä tahansa sen sisällä. Jos haluat lisätä toiminnallisuutta, ehkä toisen Seuraajalisäosan tai Tietomuuntimen tai ehkä toisen toisen laitteistoajurin, asenna nämä asiat omaan <span class="path">/boot/home/</span>-hierarkiaan, tai jos sen otaksutaan olevan kaikille käyttäjille, kansioon <span class="path">/boot/common/</span>. Niin kauan kuin Haiku ei ole monikäyttäjäjärjestelmä, tällä erottelulla ei ole näkyvää vaikutusta, koska on vain yksi käyttäjä yhdellä <i>koti</i>-kansiolla. Mutta koska mahdollisesti myöhemmin tulee tuki useammalle käyttäjälle, on järkevää oppia oikea tapa heti aluksi.</p>
+<p>Joten sanotaan, että haluat asentaa uuden Tietomuuntimen viimeisintä kuvatieodstomuotoa varten, <b>älä</b> yksinkertaisesti kopioi sitä vastaavaan järjestelmäkansioon. Muista: Älä koske siihen!<br />Laita se sen sijaan peilihierarkiaan kansioon <span class="path">/boot/common/</span> tai kansioon <span class="path">/boot/home/config/</span>.</p>
+<p>Esimerkissämme Tietomuuntimen järjestelmäkansio olisi</p>
+<p><span class="path">/boot/system/add-ons/Translators/</span></p>
+<p>Joten käyttäjän "peili"-kansio on joko</p>
+<p><span class="path">/boot/home/config/add-ons/Translators/</span><br />
+tai<br />
+<span class="path">/boot/common/add-ons/Translators/</span></p>
+<p>Tällä on toinen etu: Jos asentamasi komponentti sotkee asioita (mikä on mahdollista, kun asennat myös laitteistoajureita kuten tämä), voit valita <i>Ota pois käytöstä käyttäjälisäosat</i> <a href="bootloader.html">Alkulataus</a>-valikosta ja kykenevät aina alkukäynnistämään ilman viallista komponenttia.</p>
+<p>Useimmiten et joudu käsittelemään tällaisia asioita ollenkaan, koska jokainen ohjelmisto tulee turvatusta lähteestä ja pitäisi sisältää asennusrutiinit, jotka käsittelevät tällaisia asioita.<br />
+Most of the time, however, you won't have to deal with these things at all, since every software that comes from a trusted source should include an installation routine that handles these things.<br /><!--
+Jos haluat tietää enemmän siitä, kuinka moottori tikittää Haikussa, sinun on vilkaistava järjestelmäkansion kokoonpanokuvausta:</p>
+<p><i>TODO.... Lisättävä taulukko ....</i>
+<table>
+</table>
+--></p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="common" name="common">Yhteiskansio - <span class="path">/boot/common/</span></a></h2>
+<p>Haiku ei ole vielä monikäyttäjäjärjestelmä. Kun näin on laita, jokaisella käyttäjällä on oma <i>koti</i>-kansio, johon muut eivät pääse käsiksi. Jokainen sovellus ja lisätyt komponentit, kuten Seuraajalisäosat, Tietomuuntimet, jne samoin kuin kaikki eri käyttäjien kesken jaettavat tiedot on laitettava kansion <span class="path">/boot/common/</span> alle.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="home" name="home">Kotikansio - <span class="path">/boot/home/</span></a></h2>
+<p>Tämä kansio kuuluu sinulle. Täällä voit luoda ja poista tiedostoja ja kansiota mielesi mukaan. Sinun ei kuitenkaan pitäisi sotkea liikaa <span class="path">~/config/</span>-kansiota ja sen alikansioita. <i>Voisit</i> poistaa esimerkiksi <span class="path">~/config/settings/</span>-kansion vaurioittamatta itse käyttöjärjestelmää, mutta kuka haluaa menettää kaikki asetuksensa ja sovellusasetukset? Missä tapauksessa tahansa, järjestelmä varoittaa sinua sivun ylälaidassa mainitulla hälytyksellä.</p>
+<p>Paitsi <span class="path">~/config/add-ons/</span>-kansio, joka peilaa järjestelmän lisäosakansiota lisäkomponentteja varten, kuten kuvattiin yllä, on myös muutamia muita kiinnostavia kansioita. (Muuten, aaltoviiva ("<tt>~</tt>") on oikotie kotihakemistoon, joten sinune ei tarvitse aina kirjoittaa "<span class="path">/boot/home/</span>" Pääteikkunassa.)</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="path">~/mail</span></td><td style="width:10px;"> </td>
+<td>Oletuksena tämä on kansio, jossa sähköpostisi säilytetään.</td></tr>
+
+<tr><td><span class="path">~/queries</span></td><td style="width:10px;"> </td>
+<td><a href="queries.html">Kyselyt</a> tallennetaan oletuksena tilapäisesti 7 päiväksi tähäh kansioon.</td></tr>
+
+<tr><td><span class="path">~/config/be/</span></td><td> </td>
+<td>Taas BeOS-perinne, <span class="path">be</span>-kansio sisältää mitä nähdään <a href="deskbar.html#deskbar-menu">Työpöytäpalkkivalikossa</a>. Voit lisätä ja poistaa valikkorivejä laittamalla tiedostoja, kansioita, linkkejä ja kyselyjä tähän kansioon.</td></tr>
+
+<tr><td><span class="path">~/config/bin/</span></td><td> </td>
+<td>Täydentää järjestelmän <span class="path">/boot/system/bin/</span>-kansiota ja säilyttää kaikki komentoriviohjelmasi.</td></tr>
+
+<tr><td><span class="path">~/config/boot/</span></td><td> </td>
+<td>Tämä kansio on paikka <a href="bash-scripting.html#user-scripts">Käyttäjäskripteille</a>, jotka suoritetaan ennen alkulatausta tai sammuttamista tai niiden jälkeen.</td></tr>
+
+<tr><td><span class="path">~/config/boot/launch/</span></td><td> </td>
+<td>Linkit ohjelmiin tai asiakirjoihin tässä kansiossa käynnistetään automaattisesti jokaisen alkulatauksen yhteydessä.</td></tr>
+
+<tr><td><span class="path">~/config/data/fonts/</span></td><td> </td>
+<td>Kopioi yksinkertaisesti TrueType tai Postscript -kirjasimet tähän kansioon ja se on heti käytettävissä.</td></tr>
+
+<tr><td><span class="path">~/config/settings/</span></td><td> </td>
+<td>Tämä kansio sisältää asetuksia kaikkiin sovelluksiin ja muutamia järjestelmän asetuksia. Jotkut sovellukset käsittelevät asetuksiaan omissa alikansioisssa, toiset laittavat yksinkertaisesti asetustiedostonsa tänne.</td></tr>
+
+<tr><td><span class="path">~/config/settings/beos_mime/</span></td><td> </td>
+<td>Tässä <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym>-tietokannassa Haiku säilyttää kaikkien eri <a href="filetypes.html">tiedostotyyppien</a> jäljet ja niiden asetuksia.</td></tr>
+
+<tr><td class="onelinetop"><span class="path">~/config/settings/kernel/drivers/</span></td><td> </td>
+<td>Yksi asetustiedosto saattaa olla kiinnostava: <span class="cli">kernel</span> tarjoaa joitakin alemman tason asetuksia kuten <acronym title="Symmetric Multi Processing">SMP</acronym>:n ottamisen pois käytöstä, sarjavianjäljityksen aktivoinnin tai kehittyneen virranhallinnan (APM) käyttöönoton. Voit aktivoida asetusrivin poistamalla kommenttimerkin "<tt>#</tt>" rivin alusta. Ole varovainen tässä!</td></tr>
+
+<tr><td><span class="path">~/config/settings/Tracker/</span></td><td> </td>
+<td>Paitsi Seuraajan eri asetustiedostoja, tässä on joitakin kiinnostavia alikansioita:</td></tr>
+
+<tr><td align="right"><span class="path">DefaultFolderTemplate/</span></td><td style="width:10px;"></td><td>Näyttää ja järjestää kaikki attribuutit ja ikkunakoot haluamallasi tavalla. Jokainen uusi luomasi kansio käyttää sitä mallinteena.</td></tr>
+
+<tr><td align="right"><span class="path">DefaultQueryTemplates/</span></td><td></td><td>Voit määritellä kyselytulosikkunan asettelun tietyille tiedostotyypeille. Katso aihe <a href="queries.html#result-window">Kysely: Tulosikkuna</a>.</td></tr>
+
+<tr><td align="right"><span class="path">Go/</span></td><td></td><td>Laita linkkejä suosikkipaikkaasi tässä tehdäksesi käytettäväksi esimerkiksi paneelien avaamisessa ja sulkemisessa. Katso aihe <a href="gui.html#favorites-recent">Haiku graafinen käyttöliittymä: Suosikit ja äskettäiset kansiot</a>.</td></tr>
+
+<tr><td align="right"><span class="path">Tracker New Template/</span></td><td></td><td>Lisää mallinne jokaiselle tiedostotyypille, joka on käytettävissä Seuraajan <span class="menu">Tiedosto | Uusi...</span>-valikossa. Katso aihe <a href="tracker.html#working-with-files">Seuraaja: Työskentely tiedostoilla</a>.</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="bootloader.html">Alkukäynnistyslataaja</a> 
+::  <a href="contents.html" class="uplink">Sisältö</a> 
+::  <a href="gui.html">Haikun graafinen käyttöliittymä</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

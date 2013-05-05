@@ -13,14 +13,20 @@ SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ]
 
 UseHeaders [ FDirName $(SUBDIR) ] : true ;
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev rt2860 ] ;
+UseHeaders [ FDirName $(SUBDIR) dev rt2860 ] : true ;
+
 KernelAddon ralink2860 :
 	glue.c
 	rt2860.c
-	rt2860_io.c
-	rt2860_read_eeprom.c
-	rt2860_led.c
-	rt2860_rf.c
 	rt2860_amrr.c
+	rt2860_io.c
+	rt2860_led.c
+	rt2860_nexus.c
+	rt2860_pci.c
+	rt2860_read_eeprom.c
+	rt2860_rf.c
+	
 	:
 	libfreebsd_wlan.a
 	libfreebsd_network.a

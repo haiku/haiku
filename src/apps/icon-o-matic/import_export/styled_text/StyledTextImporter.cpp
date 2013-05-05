@@ -35,8 +35,8 @@
 #include "VectorPath.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Icon-O-Matic-StyledTextImport"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Icon-O-Matic-StyledTextImport"
 //#define CALLED() printf("%s()\n", __FUNCTION__);
 #define CALLED() do {} while (0)
 

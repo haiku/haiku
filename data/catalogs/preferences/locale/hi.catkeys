@@ -1,0 +1,31 @@
+1	hindi	x-vnd.Haiku-Locale	1488345554
+Available languages	Locale Preflet Window		उपलब्ध भाषाएँ
+Negative:	TimeFormatSettings		नकारात्मक:
+already chosen	LanguageListView		पहले ही चुना
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		असमर्थ उपलब्ध भाषाओं को खोजने के लिए! आप इस प्रेफ्लेट उपयोग नहीं कर सकते!
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		डेस्कबार और तरसकर को फिर से शुरू हूने की आवशकता है अपना प्रभाव डालनी के लिए. क्या आप रिस्टार्ट करना चाहेंगे उन्हें?
+Long format:	TimeFormatSettings		लंबे प्रारूप:
+Currency	TimeFormatSettings		मुद्रा
+Locale	System name		लोकेल
+Short format:	TimeFormatSettings		छोटा प्रारूप:
+Language	Locale Preflet Window		भाषा
+Preferred languages	Locale Preflet Window		पसंदीदा भाषाएँ
+Use month/day-names from preferred language	TimeFormatSettings		उपयोग / पसंदीदा भाषा से महीने के दिन के नाम
+Formatting	Locale Preflet Window		स्वरूपण
+Locale	Locale Preflet Window		लोकेल
+Numbers	TimeFormatSettings		संख्या
+24 hour	TimeFormatSettings		24 घंटे
+OK	Locale Preflet Window		ठीक है
+Restart	Locale Preflet Window		पुन: शुरु करें
+Full format:	TimeFormatSettings		पूर्ण स्वरूप:
+Defaults	Locale Preflet Window		डिफ़ॉल्ट्स
+Cancel	Locale Preflet Window		रद्द करें
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		अनुवाद करें अप्प्लिकेशन और फोल्डर के नाम का डेस्कबार और तरसकर में.
+Revert	Locale Preflet Window		पलटें
+Medium format:	TimeFormatSettings		मध्यम प्रारूप:
+12 hour	TimeFormatSettings		12 घंटे
+Time	TimeFormatSettings		समय
+Date	TimeFormatSettings		तारीख
+Positive:	TimeFormatSettings		सकारात्मक:
+Locale	Locale Preflet		लोकेल
+Options	Locale Preflet Window		विकल्प

@@ -41,13 +41,14 @@ DwarfManager::LoadFile(const char* fileName, DwarfFile*& _file)
 	if (file == NULL)
 		return B_NO_MEMORY;
 
+	BReference<DwarfFile> fileReference(file, true);
 	status_t error = file->Load(fileName);
 	if (error != B_OK) {
-		delete file;
 		return error;
 	}
 
 	fFiles.Add(file);
+	fileReference.Detach();
 		// we keep the initial reference for ourselves
 
 	file->AcquireReference();

@@ -1,0 +1,16 @@
+1	croatian	application/x-vnd.Haiku-Registrar	623010359
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Program \"%appName%\" je prekinuo proces isključivanja.
+Cancel	ShutdownProcess		Otkaži
+Cancel shutdown	ShutdownProcess		Otkaži isključivanje
+Do you really want to restart the system?	ShutdownProcess		Želite li doista ponovno pokrenuti sustav?
+Do you really want to shut down the system?	ShutdownProcess		 Želite li doista isključiti sustav?
+It's now safe to turn off the computer.	ShutdownProcess		Sada je sigurno isključiti računalo.
+Restart	ShutdownProcess		Ponovno pokreni
+Restart system	ShutdownProcess		Ponovno pokrenite sustav
+Restarting…	ShutdownProcess		Ponovno pokrećem...
+Shut down	ShutdownProcess		Isključi
+Shutdown aborted	ShutdownProcess		Iskjlučivanje prekinuto
+Shutdown status	ShutdownProcess		Stanje isključivanja
+Shutting down…	ShutdownProcess		Isključivanje...
+System is shut down	ShutdownProcess		Sustav će se isključiti
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Program \"%appName%\" je možda blokiran na modalnom panelu.

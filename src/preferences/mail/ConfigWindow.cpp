@@ -53,8 +53,8 @@
 #include "CenterContainer.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Config Window"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Config Window"
 
 
 using std::nothrow;
@@ -866,8 +866,10 @@ ConfigWindow::_RevertToLastSettings()
 				"\nThe general settings couldn't be reverted.\n\n"
 				"Error retrieving general settings:\n%s\n"),
 			strerror(status));
-		(new BAlert(B_TRANSLATE("Error"), text, B_TRANSLATE("OK"), NULL, NULL,
-			B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+		BAlert* alert = new BAlert(B_TRANSLATE("Error"), text,
+			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 	}
 
 	// revert account data

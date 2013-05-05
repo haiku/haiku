@@ -25,8 +25,8 @@
 #include "MessageConstants.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MediaConverter"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MediaConverter"
 
 
 const char APP_SIGNATURE[] = "application/x-vnd.Haiku-MediaConverter";
@@ -146,7 +146,7 @@ MediaConverterApp::RefsReceived(BMessage* msg)
 		BAlert* alert = new BAlert((errors > 1) ? 
 			B_TRANSLATE("Error loading files") : 
 			B_TRANSLATE("Error loading a file"), 
-			alertText.String(),	B_TRANSLATE("Continue")	, NULL, NULL, 
+			alertText.String(),	B_TRANSLATE("Continue"), NULL, NULL, 
 			B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		alert->Go();
 	}
@@ -359,8 +359,6 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 	int32 width = -1;
 	int32 height = -1;
 
-	short audioFrameSize = 1;
-
 	uint8* videoBuffer = NULL;
 	uint8* audioBuffer = NULL;
 
@@ -384,7 +382,7 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 
 			audioBuffer = new uint8[raf->buffer_size];
 //			audioFrameSize = (raf->format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
-			audioFrameSize = (raf->format & 0xf) * raf->channel_count;
+//			audioFrameSize = (raf->format & 0xf) * raf->channel_count;
 			outAudTrack = outFile->CreateTrack(&outAudFormat, audioCodec);
 
 			if (outAudTrack != NULL) {
@@ -527,10 +525,10 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 		for (int64 i = start; (i <= end) && !fCancel; i += framesRead) {
 			if ((ret = inVidTrack->ReadFrames(videoBuffer, &framesRead,
 					&mh)) != B_OK) {
-				fprintf(stderr, "Error reading video frame %Ld: %s\n", i,
+				fprintf(stderr, "Error reading video frame %" B_PRId64 ": %s\n", i,
 						strerror(ret));
 				snprintf(status.LockBuffer(128), 128,
-						B_TRANSLATE("Error read video frame %Ld"), i);
+						B_TRANSLATE("Error read video frame %" B_PRId64), i);
 				status.UnlockBuffer();
 				SetStatusMessage(status.String());
 
@@ -539,10 +537,10 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 
 			if ((ret = outVidTrack->WriteFrames(videoBuffer, framesRead,
 					mh.u.encoded_video.field_flags)) != B_OK) {
-				fprintf(stderr, "Error writing video frame %Ld: %s\n", i,
+				fprintf(stderr, "Error writing video frame %" B_PRId64 ": %s\n", i,
 						strerror(ret));
 				snprintf(status.LockBuffer(128), 128,
-						B_TRANSLATE("Error writing video frame %Ld"), i);
+						B_TRANSLATE("Error writing video frame %" B_PRId64), i);
 				status.UnlockBuffer();
 				SetStatusMessage(status.String());
 
@@ -553,7 +551,7 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 			if (currPercent > lastPercent) {
 				lastPercent = currPercent;
 				snprintf(status.LockBuffer(128), 128,
-					B_TRANSLATE("Writing video track: %ld%% complete"),
+					B_TRANSLATE("Writing video track: %" B_PRId32 "%% complete"),
 					currPercent);
 				status.UnlockBuffer();
 				SetStatusMessage(status.String());
@@ -589,7 +587,7 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 				&mh)) != B_OK) {
 				fprintf(stderr, "Error reading audio frames: %s\n", strerror(ret));
 				snprintf(status.LockBuffer(128), 128,
-					B_TRANSLATE("Error read audio frame %Ld"), i);
+					B_TRANSLATE("Error read audio frame %" B_PRId64), i);
 				status.UnlockBuffer();
 				SetStatusMessage(status.String());
 
@@ -600,7 +598,7 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 				framesRead)) != B_OK) {
 				fprintf(stderr, "Error writing audio frames: %s\n",	strerror(ret));
 				snprintf(status.LockBuffer(128), 128,
-					B_TRANSLATE("Error writing audio frame %Ld"), i);
+					B_TRANSLATE("Error writing audio frame %" B_PRId64), i);
 				status.UnlockBuffer();
 				SetStatusMessage(status.String());
 
@@ -611,7 +609,7 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 			if (currPercent > lastPercent) {
 				lastPercent = currPercent;
 				snprintf(status.LockBuffer(128), 128,
-					B_TRANSLATE("Writing audio track: %ld%% complete"),
+					B_TRANSLATE("Writing audio track: %" B_PRId32 "%% complete"),
 					currPercent);
 				status.UnlockBuffer();
 				SetStatusMessage(status.String());

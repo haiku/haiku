@@ -1,29 +1,40 @@
 /*
- * Copyright 2008-2010, François Revol, revol@free.fr. All rights reserved.
+ * Copyright 2008-2011, François Revol, revol@free.fr. All rights reserved.
  * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
  * Copyright 2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  */
 
-/**	This file contains the boot floppy and BFS boot block entry points for
- *	the stage 2 boot loader.
- * x86 ahead:
- *	The floppy entry point is at offset 0. It's loaded at 0x07c0:0x000. It
- *	will load the rest of the loader to 0x1000:0x0200 and execute it.
- *	The BFS boot block will load the whole stage 2 loader to 0x1000:0x0000
- *	and will then jump to 0x1000:0x0200 as its entry point.
- *	This code will then switch to protected mode and will directly call
- *	the entry function of the embedded ELF part of the loader.
- */
-
-/*
- * generate boot floppy:
- * cd src/system/boot/platform/atari_m68k/ ; make fixup_tos_floppy_chksum; cd -
- * dd if=generated/objects/haiku/m68k/release/system/boot/haiku_loader of=~/floppy.img bs=512 count=20 conv=notrunc
- * src/system/boot/platform/atari_m68k/fixup_tos_floppy_chksum ~/floppy.img
- * generate .prg:
- * generated.m68k/cross-tools/bin/m68k-unknown-haiku-ld -o haiku.prg -T src/system/ldscripts/m68k/boot_prg_atari_m68k.ld generated/objects/haiku/m68k/release/system/boot/boot_loader_atari_m68k
+/**	This file contains the boot floppy, .PRG and BFS boot block entry points
+ *	for the stage 2 boot loader. All 3 entry points load and relocate the
+ *	loader so that it ends up being at ATARI_ZBEOS_BASE.
+ *	This file is built as PIC so it works wherever it is executed.
+ *	Some arithmetic is thus needed to set variables in the relocated code.
+ *	The loader .PRG file is created from the bootloader by a custom ldscript.
+ *
+ *	Known load addresses:
+ *	floppy:	0x00a34c (EmuTOS in ARAnyM)
+ *	.prg:	0x03543e (depends on the TOS memory)
+ *	BFS:	is set in the MBR code.
+ *
+ *	The floppy and .PRG code is entered at _bs_entry, which jumps further on
+ *	to skip some fake FAT descriptor.
+ *	It first determines which way it was loaded (floppy boot happens in
+ *	supervisor mode, while .PRG are loaded as user code), and jumps to
+ *	the specific part.
+ *
+ *	The floppy code comes first as it must be in the first sector,
+ *	and loads the rest of the loader at ATARI_ZBEOS_BASE+0x200,
+ *	sets up the new stack and jumps to _start after setting some variables.
+ *	The end of the floppy code contains a placeholder for a checksum which
+ *	is calculated at build-time by the <build>fixup_tos_floppy_chksum tool.
+ *
+ *	The .PRG code switches to supervisor mode, copies the whole loader
+ *	which is already in memory to ATARI_ZBEOS_BASE. It then sets up the new
+ *	stack and some variables and jumps to _start.
+ *
+ *	The BFS code is yet to be fully written.
  */
 
 /*
@@ -76,11 +87,10 @@ _fat_spt:
 	// we're done
 
 sNumSectors:
-	// this location will contain the length of the boot loader as
-	// written by the "makeflop" command in 512 byte blocks
-	// 0x180 is the allowed maximum, as the zipped TAR with the
-	// kernel and the boot module might start at offset 192 kB
-	//.word	0x0300 //0x0180
+	// This location will contain the max length of the boot loader
+	// as written by the build system in 512 byte blocks and depends
+	// on the offset of the zipped TAR with the kernel and the boot
+	// modules will start at offset BOOT_ARCHIVE_IMAGE_OFFSET kB.
 	.word	BOOT_ARCHIVE_IMAGE_OFFSET*2
 
 real_entry:
@@ -89,11 +99,16 @@ real_entry:
 // http://ftp.netbsd.org/pub/NetBSD/NetBSD-release-3-0/src/sys/arch/atari/stand/xxboot/fdboot/fdboot.S
 	movem.l		%d1-%d7/%a0-%a6,-(%sp)
 
+//DEBUG: determine load location
+//	lea		_bs_entry(%pc),%a0
+//	move.l		%a0,%d0
+//	bsr		putx
+
 	lea		str,%a0
 	bsr		puts
 
 	// first, determine if .prg (user) or bootsect (super)
-	// Super()
+	// Super(SUP_INQUIRE)
 	move.l		#SUP_INQUIRE,-(%sp)
 	move.w		#0x20,-(%sp)
 	trap		#GEMDOS_TRAP
@@ -108,46 +123,39 @@ real_entry:
  */
 
 floppy_start:
-	lea		label_floppy,%a0
-	bsr		puts
-	//bra floppy_start
+	//lea		label_floppy,%a0
+	//bsr		puts
 
-	// no interrupt
-	//or.w		#0x0700,%sr
-
-	//XXX: check for enough RAM
-
-	// load the rest
-	//move.w		sNumSectors,%d2
-	// load at base + this code.
-	//move.l		#(ATARI_ZBEOS_BASE+512),%a2
-	//move.l		%a2,%d0
-	//bsr putx
 	bsr			load_sectors
 	tst.w			%d0
 	bne			load_failed
-floppy_done:
-	// setup stack
-	move.l		#ATARI_ZBEOS_STACK_END,%sp
-	//jmp			ATARI_ZBEOS_BASE+512
 
+floppy_done:
 	move.b		#ATARI_BOOT_DRVAPI_FLOPPY,ATARI_ZBEOS_BASE + gBootDriveAPI - _bs_entry 
 	move.w		TOSVAR_bootdev,%d0
 	// XXX:	 use uint16 ??
 	move.b		%d0,ATARI_ZBEOS_BASE + gBootDriveID - _bs_entry 
 	move.b		#1,ATARI_ZBEOS_BASE + gBootedFromImage - _bs_entry 
 
+
+all_done:
+
+	// setup stack
+	move.l		#ATARI_ZBEOS_STACK_END,%sp
+
+	// say goodbye to TOS
 	lea		msg_j1,%a0
 	bsr		puts
-	move.l		#0,%d0
 
+	//bra spin
+	// say hello to haiku_loader
 	jmp		_start
 
 load_failed:
 	//bra			_exit
 
 spin:	
-	//bra			spin
+	bra			spin
 _exit:	/*  */
 	lea			failure_string,%a0
 	bsr			puts
@@ -163,43 +171,6 @@ _exit:	/*  */
 
 load_sectors:
 	
-#if 0
-	/* it seems to skip 9 every 9 sectors, buggy side handling ? */
-	// Rwabs
-	//move.l		#1,-(%sp)
-	move.w		#0,-(%sp)	// A:
-	//move.w		#2,-(%sp)	// C:
-	//move.w		#-1,-(%sp)	// 2nd sector
-	move.w		#1,-(%sp)	// 2nd sector
-	move.w		%d2,-(%sp)
-	move.l		%a2,-(%sp)
-	//move.w		#RW_READ+RW_NOTRANSLATE,-(%sp)
-	move.w		#RW_READ+RW_NOMEDIACH,-(%sp)
-	move.w		#4,-(%sp)
-	trap		#13
-	add.l		#14,%sp
-#endif
-#if 0
-	// d2:	
-
-	//move.w		%d2,-(%sp)
-	move.w		#1,-(%sp) // count
-	move.w		#0,-(%sp) // sideno
-	move.w		#0,-(%sp) // trackno
-	move.w		#1,-(%sp) // sectno
-	move.w		TOSVAR_bootdev,-(%sp) // devno
-	clr.l		-(%sp) // filler
-	//move.w		#0,-(%sp)
-	//move.l		%a2,-(%sp)
-	move.l		#ATARI_ZBEOS_BASE,-(%sp)
-	move.w		#8,-(%sp)	// floprd
-	trap		#XBIOS_TRAP
-	add.l		#20,%sp
-#endif
-
-	//bsr	putx
-	//rts
-
 	/*
 	 * %d3:	remaining sects
 	 * %d4:	sectno
@@ -233,19 +204,6 @@ read_sectors_loop:
 
 	// compute next track/side/sector
 read_sectors_next:
-#if 0	//DEBUG
-	// [TRAK][SIDE]
-	move.w		%d5,%d0
-	swap		%d0
-	move.w		%d6,%d0
-	bsr		putx
-	// [SECT][S/TK]
-	move.w		%d4,%d0
-	swap		%d0
-	move.w		%d7,%d0
-	bsr		putx
-	//bsr		getc
-#endif	//!DEBUG
 	add.l		#SECTSIZE,%a5
 	addq.w		#1,%d4	// sectno++
 	cmp.w		%d7,%d4	// if (sectno == spt)
@@ -286,12 +244,7 @@ read_sect:	/* read 1 sector */
 	 * %a5:	buffer
 	 *
 	 */
-#if 1
-	//move.w		%d2,-(%sp)
-	//move.w		#1,-(%sp) // count
-	//move.w		#0,-(%sp) // sideno
-	//move.w		#0,-(%sp) // trackno
-	//move.w		#2,-(%sp) // sectno
+
 	move.w		#1,-(%sp)
 	movem.w		%d4-%d6,-(%sp)
 	move.w		TOSVAR_bootdev,-(%sp) // devno
@@ -301,8 +254,6 @@ read_sect:	/* read 1 sector */
 	trap		#XBIOS_TRAP
 	add.l		#20,%sp
 	tst.l		%d0
-	
-#endif
 	rts
 
 floppy_end:
@@ -312,10 +263,6 @@ failure_string:
 	.string " Loading failed! Press key.\r\n"
 //	.string "FAIL"
 	
-//	.org	DOT_STRING
-//	.string	"."
-
-
 
 
 putx:
@@ -325,15 +272,11 @@ putx:
 putxloop:
 	move.l	%d1,%d0
 	lsl.l	#4,%d1
-	//swap	%d0
-	//lsr.l	#8,%d0
-	//lsr.l	#4,%d0
 	rol.l	#4,%d0
 	and.l	#0x0f,%d0
 	cmp.b	#9,%d0
 	ble	putx0
 	add.b	#'a'-'0'-10,%d0
-	//bra	putxdisp
 putx0:
 	add.b	#'0',%d0
 putxdisp:
@@ -382,35 +325,36 @@ getc:
 
 str:
 	.string "Haiku!"
-label_prg:
-	.string "P" //"RG boot"
-label_floppy:
-	.string "F" //"loppy boot"
-h4:
-	.string "H4"
-h5:
-	.string "H5"
+//label_prg:
+//	.string "P" //"RG boot"
+//label_floppy:
+//	.string "F" //"loppy boot"
 msg_j1:
 	.string "Jumping to haiku_loader."
 
 shell_end:
 	//.fill	(0x01fe - shell_end), 1, 0x55
 	.org	0x01fe
+boot_code_checksum:
 	.word	0xaa55-1	// will be replaced by the one calculated by the build.
 		// we make sure PCs don't try to execute it.
 		// this bumps the "start" label to offset 0x0200 as
 		// expected by the BFS boot loader, and also marks
 		// this block as valid boot block for the BIOS
 
+
 //XXX: put bfs_start here
+bfs_start:
+	//FIXME:write BFS code
+
 
 /*
  * \AUTO\HAIKU.PRG and ARAnyM BOOTSTRAP() support code
  */
 
 prg_start:
-	lea		label_prg,%a0
-	bsr		puts
+	//lea		label_prg,%a0
+	//bsr		puts
 
 	// .prg:
 	// we need to switch to supervisor mode anyway
@@ -420,34 +364,9 @@ prg_start:
 	addq.l		#6,%sp
 	move.l		%d0,saved_super_stack
 	
-#if 0
-			//_membot
-	move.l		#0x432,%a0
-	move.l		(%a0),%d0
-	bsr		putx
-
-			//_memtop
-	move.l		#0x436,%a0
-	move.l		(%a0),%d0
-	bsr		putx
-
-			//_v_bas_ad
-	move.l		#0x44e,%a0
-	move.l		(%a0),%d0
-	bsr		putx
-#endif
 	// disable interrupts
 	//or.w		#0x0700,%sr
 	
-	// setup stack
-	move.l		#ATARI_ZBEOS_STACK_END,%sp
-
-	lea		h5,%a0
-	bsr		puts
-	lea		_bs_entry,%a0
-	move.l		%a0,%d0
-	bsr		putx
-
 	// copy the rest of the prg
 
 	// load counter
@@ -467,22 +386,16 @@ copysect_loop:
 	//bsr		putx
 	dbf		%d0,nextsect
 
-	lea		msg_j1,%a0
-	bsr		puts
-	// all done
 super_done:
 	// XXX: copy the rest !
-#if 1
+
 	// XXX: force floppy boot for testing to get the kernel tgz for now
 	move.b		#ATARI_BOOT_DRVAPI_FLOPPY,ATARI_ZBEOS_BASE + gBootDriveAPI - _bs_entry 
 	move.b		#0,ATARI_ZBEOS_BASE + gBootDriveID - _bs_entry 
 	move.b		#1,ATARI_ZBEOS_BASE + gBootedFromImage - _bs_entry 
-#endif
 
-	move.l		#0,%d0
-
-	//jmp			ATARI_ZBEOS_BASE+512
-	jmp			_start
+	// all done, go to _start
+	bra			all_done
 
 saved_super_stack:
 	.long	0

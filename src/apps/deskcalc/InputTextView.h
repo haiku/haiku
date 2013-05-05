@@ -5,12 +5,13 @@
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef INPUT_TEXT_VIEW_H
 #define INPUT_TEXT_VIEW_H
 
+
 #include <Invoker.h>
 #include <TextView.h>
+
 
 class InputTextView : public BTextView, public BInvoker {
  public:
@@ -35,7 +36,7 @@ class InputTextView : public BTextView, public BInvoker {
 	virtual	void				RevertChanges() = 0;
 	virtual	void				ApplyChanges() = 0;
 
-protected:
+ protected:
 								// BTextView
 	virtual	void				Select(int32 start, int32 finish);
 
@@ -52,5 +53,3 @@ protected:
 };
 
 #endif // INPUT_TEXT_VIEW_H
-
-

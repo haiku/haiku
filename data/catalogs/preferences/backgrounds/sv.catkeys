@@ -1,25 +1,25 @@
 1	swedish	x-vnd.Haiku-Backgrounds	3513602073
-All workspaces	Main View		Alla arbetsytor
-Apply	Main View		Använd
 Backgrounds	System name		Bakgrunder
-Center	Main View		Centrera
-Current workspace	Main View		Nuvarande arbetsyta
+X:	Main View		X:
+Resolution: 	Image Filepanel		Upplösning:
+pick one	Main View		Välj en
 Default	Main View		Standard
-Default folder	Main View		Standardmappen
-Folder: 	Main View		Mapp:
-Icon label outline	Main View		Filnamnskontur
-Image:	Main View		Bild:
+Center	Main View		Centrera
 Manual	Main View		Manuell
+Default folder	Main View		Standardmappen
+Revert	Main View		Återställ
 None	Main View		Ingen
-Other folder…	Main View		Annan mapp…
+All workspaces	Main View		Alla arbetsytor
+Icon label outline	Main View		Filnamnskontur
 Other…	Main View		Annan…
+Current workspace	Main View		Nuvarande arbetsyta
+Folder: 	Main View		Mapp:
+Apply	Main View		Använd
+Other folder…	Main View		Annan mapp…
+Y:	Main View		Y:
+Tile	Main View		Upprepa
+Select	Main View		Välj
+Scale to fit	Main View		Anpassa
 Placement:	Main View		Placering:
 Preview	Main View		Förhandsvisning
-Resolution: 	Image Filepanel		Upplösning:
-Revert	Main View		Återställ
-Scale to fit	Main View		Anpassa
-Select	Main View		Välj
-Tile	Main View		Upprepa
-X:	Main View		X:
-Y:	Main View		Y:
-pick one	Main View		Välj en
+Image:	Main View		Bild:

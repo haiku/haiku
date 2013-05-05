@@ -496,6 +496,20 @@ BGridLayout::Archive(BMessage* into, bool deep) const
 }
 
 
+status_t
+BGridLayout::AllArchived(BMessage* into) const
+{
+	return BTwoDimensionalLayout::AllArchived(into);
+}
+
+
+status_t
+BGridLayout::AllUnarchived(const BMessage* from)
+{
+	return BTwoDimensionalLayout::AllUnarchived(from);
+}
+
+
 BArchivable*
 BGridLayout::Instantiate(BMessage* from)
 {
@@ -787,3 +801,23 @@ BGridLayout::_LayoutDataForItem(BLayoutItem* item) const
 		return NULL;
 	return (ItemLayoutData*)item->LayoutData();
 }
+
+
+status_t
+BGridLayout::Perform(perform_code d, void* arg)
+{
+	return BTwoDimensionalLayout::Perform(d, arg);
+}
+
+
+void BGridLayout::_ReservedGridLayout1() {}
+void BGridLayout::_ReservedGridLayout2() {}
+void BGridLayout::_ReservedGridLayout3() {}
+void BGridLayout::_ReservedGridLayout4() {}
+void BGridLayout::_ReservedGridLayout5() {}
+void BGridLayout::_ReservedGridLayout6() {}
+void BGridLayout::_ReservedGridLayout7() {}
+void BGridLayout::_ReservedGridLayout8() {}
+void BGridLayout::_ReservedGridLayout9() {}
+void BGridLayout::_ReservedGridLayout10() {}
+

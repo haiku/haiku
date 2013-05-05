@@ -1,18 +1,20 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		John Scipione, jscipione@gmail.com
  * 
  * Corresponds to:
- *		/trunk/headers/os/app/Application.h	 rev 42794
- *		/trunk/src/kits/app/Application.cpp	 rev 42794
+ *		headers/os/app/Application.h	rev 42794
+ *		src/kits/app/Application.cpp	rev 42794
  */
 
 
 /*!
 	\file Application.h
+	\ingroup app
+	\ingroup libbe
 	\brief Provides the BApplication class.
 */
 
@@ -387,10 +389,10 @@ main()
 
 /*!
 	\fn BWindow* BApplication::WindowAt(int32 index) const
-	\brief Returns the BWindow object at the specified index in the
+	\brief Returns the BWindow object at the specified \a index in the
 		application's window list.
-		
-	If index is out of range, this function returns \c NULL.
+
+	If \a index is out of range, this function returns \c NULL.
 
 	\warning Locking the BApplication object doesn't lock the window list.
 
@@ -520,7 +522,8 @@ main()
 	If the \a rate is set to 0 then the \c B_PULSE messages are not sent.
 	The pulse rate can be no faster than once per 100,000 microseconds or so.
 
-	\param rate The rate \a B_PULSE messages are sent to the application.
+	\param rate The rate at which \c B_PULSE messages are sent to the
+		application.
 */
 
 

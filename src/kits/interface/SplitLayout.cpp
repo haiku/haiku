@@ -462,6 +462,13 @@ BSplitLayout::SetItemWeight(BLayoutItem* item, float weight)
 }
 
 
+bool
+BSplitLayout::IsCollapsible(int32 index) const
+{
+	return _ItemLayoutInfo(ItemAt(index))->isCollapsible;
+}
+
+
 void
 BSplitLayout::SetCollapsible(bool collapsible)
 {
@@ -479,13 +486,24 @@ BSplitLayout::SetCollapsible(int32 index, bool collapsible)
 void
 BSplitLayout::SetCollapsible(int32 first, int32 last, bool collapsible)
 {
-	if (first < 0)
-		first = 0;
-	if (last < 0 || last > CountItems())
-		last = CountItems() - 1;
-
 	for (int32 i = first; i <= last; i++)
 		_ItemLayoutInfo(ItemAt(i))->isCollapsible = collapsible;
+}
+
+
+bool
+BSplitLayout::IsItemCollapsed(int32 index) const
+{
+	return _ItemLayoutInfo(ItemAt(index))->isVisible;
+}
+
+
+void
+BSplitLayout::SetItemCollapsed(int32 index, bool collapsed)
+{
+	ItemAt(index)->SetVisible(collapsed);
+
+	InvalidateLayout(true);
 }
 
 
@@ -546,14 +564,26 @@ BSplitLayout::GetHeightForWidth(float width, float* min, float* max,
 
 
 void
-BSplitLayout::InvalidateLayout(bool children)
+BSplitLayout::LayoutInvalidated(bool children)
 {
-	_InvalidateLayout(true, children);
+	delete fHorizontalLayouter;
+	delete fVerticalLayouter;
+	delete fHorizontalLayoutInfo;
+	delete fVerticalLayoutInfo;
+
+	fHorizontalLayouter = NULL;
+	fVerticalLayouter = NULL;
+	fHorizontalLayoutInfo = NULL;
+	fVerticalLayoutInfo = NULL;
+
+	_InvalidateCachedHeightForWidth();
+
+	fLayoutValid = false;
 }
 
 
 void
-BSplitLayout::DerivedLayoutItems()
+BSplitLayout::DoLayout()
 {
 	_ValidateMinMax();
 
@@ -817,28 +847,6 @@ BSplitLayout::ItemRemoved(BLayoutItem* item, int32 atIndex)
 
 	delete _ItemLayoutInfo(item);
 	item->SetLayoutData(NULL);
-}
-
-
-void
-BSplitLayout::_InvalidateLayout(bool invalidateView, bool children)
-{
-	if (invalidateView)
-		BAbstractLayout::InvalidateLayout(children);
-
-	delete fHorizontalLayouter;
-	delete fVerticalLayouter;
-	delete fHorizontalLayoutInfo;
-	delete fVerticalLayoutInfo;
-
-	fHorizontalLayouter = NULL;
-	fVerticalLayouter = NULL;
-	fHorizontalLayoutInfo = NULL;
-	fVerticalLayoutInfo = NULL;
-
-	_InvalidateCachedHeightForWidth();
-
-	fLayoutValid = false;
 }
 
 
@@ -1440,3 +1448,4 @@ BSplitLayout::_SubtractInsets(BSize size)
 
 	return size;
 }
+

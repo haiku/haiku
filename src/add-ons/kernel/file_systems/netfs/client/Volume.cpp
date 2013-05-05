@@ -172,7 +172,9 @@ Volume::SendNotification(port_id port, int32 token, uint32 what, int32 op,
 	nspace_id nsida, nspace_id nsidb, vnode_id vnida, vnode_id vnidb,
 	vnode_id vnidc, const char *name)
 {
-PRINT(("Volume::SendNotification(%ld, %ld, 0x%lx, 0x%lx, %ld, %ld, %lld, %lld, %lld, \"%s\")\n", port, token, what, op, nsida, nsidb, vnida, vnidb, vnidc, name));
+	PRINT("Volume::SendNotification(%ld, %ld, 0x%lx, 0x%lx, %ld, %ld, %lld,"
+		" %lld, %lld, \"%s\")\n", port, token, what, op, nsida, nsidb,
+		vnida, vnidb, vnidc, name);
 	return send_notification(port, token, what, op, nsida, nsidb, vnida,
 		vnidb, vnidc, name);
 }

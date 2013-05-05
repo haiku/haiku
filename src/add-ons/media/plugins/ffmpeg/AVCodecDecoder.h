@@ -98,7 +98,7 @@ private:
 			size_t				fChunkBufferSize;
 			bool				fAudioDecodeError;
 
-			char*				fOutputBuffer;
+			AVFrame*			fOutputFrame;
 			int32				fOutputBufferOffset;
 			int32				fOutputBufferSize;
 

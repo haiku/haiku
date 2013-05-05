@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Francisco Dourado
+ *		tiagoms
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Bash e Scripting</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../fr/bash-scripting.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/bash-scripting.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/bash-scripting.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/bash-scripting.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/bash-scripting.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/bash-scripting.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/bash-scripting.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/bash-scripting.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/bash-scripting.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/bash-scripting.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/bash-scripting.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/bash-scripting.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../hu/bash-scripting.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../ca/bash-scripting.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../en/bash-scripting.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="preferences.html">Preferências</a> 
+::  <a href="contents.html" class="uplink">Conteúdo</a> 
+<!-- ::  <a href="filesystem-layout.html">Disposição do sistema de arquivos</a>  » -->
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h1>Bash e Scripting</h1>
+
+<p>"Scripting" é a técnica de encadear comandos formando um procedimento automatizado e salvar isso em arquivos texto, chamados "scripts". Sempre que você executa um script os comandos são processados um após o outro, como se você os digitasse num <a href="applications/terminal.html">Terminal</a>.<br />
+Scripts podem executar simples comandos numa ordem específica, ou resultarem em sofisticadas peças de código que resolvem tarefas complexas.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="bash" name="bash">O Bash</a></h2>
+<p>Como os scripts naturalmente dependem bastante do shell em que são interpretados, você deve primeiro se familiarizar com o BASH, que é o utilizado pelo Haiku. Há muitas fontes de informação online já que este é um shell usado amplamente. Um belo documento é de Johan Jansson <a href="http://www.beforever.com/bashtut.htm" class="printurl">Introduction to bash - a tutorial for bash under BeOS</a>.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="scripting-bible" name="scripting-bible">A Bíblia do Scripting</a></h2>
+<p>Depois de ter aprendido umas noções básicas sobre como trabalhar no shell, é hora de lentamente adentrar no mundo do scripting. Novamente, você encontrará muitos tutoriais e materiais de referência online como também em livrarias. Uma introdução muito boa que foi praticamente feita sob medida para o Haiku está disponível online, é o <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting1.html" class="printurl">capítulo sobre scripting</a> (<a href="http://www.birdhouse.org/beos/bible/bos/BeOS.scripting.PDF">PDF, 900kb</a>) do livro BeOS Bible de Scot Hacker.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="user-scripts" name="user-scripts">Scripts no Haiku</a></h2>
+<p>No Haiku, o sistema obviamente também faz uso de scripting. O Boot e o desligamento são   típicos procedimentos que fazem uso de scripting. Essas sequências definidas podem ser ampliadas pelo usuário com determinados  scritps.<br />
+Se eles já não existirem, você terá que criar os arquivos necessários por si. Senão, simplesmente adicione seus comandos nas posições do procedimento às quais desejar que eles sejam executados.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="userbootscript" name="userbootscript">O UserBootscript</a></h3>
+<p><span class="path">/boot/home/config/boot/UserBootscript</span> será executado depois do sistema ter terminado seu processo de boot. Por exemplo, você poderá lançar uma série de programas que seriam então automaticamente iniciados a cada novo boot do sistema:</p>
+<pre># Iniciar o LaunchBox
+/boot/system/apps/LaunchBox &amp;
+
+# Iniciar o Applet Workspaces
+/boot/system/apps/Workspaces &amp;</pre>
+<p>Lembre-se de terminar o comando com um "<tt>&amp;</tt>" para iniciá-lo como um processo em segundo plano (background process), ou o script ficará suspenso até este comando ter sido concluído (neste caso: o aplicativo aberto ser fechado novamente).</p>
+
+<p>Uma alternativa simples à anterior para iniciar aplicativos durante o boot é adicionar links para os mesmos no diretório <span class="path">/boot/home/config/boot/launch</span> . Isso pode ser feito simplesmente clicando-se com botão direito no aplicativo que você deseja que seja iniciado automaticamente, indo até <span class="menu">Criar Link</span> e depois <a href="tracker.html#navigating">navegando</a> até o diretório mencionado.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="usershutdownscript" name="usershutdownscript">O UserShutdownScript</a></h3>
+<p><span class="path">/boot/home/config/boot/UserShutdownScript</span> será executado como a primeira etapa no procedimento de desligamento. Se o script retornar um status de saída diferente de zero, o desligamento será abortado.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="usershutdownfinishscript" name="usershutdownfinishscript">O UserShutdownFinishScript</a></h3>
+<p><span class="path">/boot/home/config/boot/UserShutdownFinishScript</span> será executado como a última etapa do procedimento de desligamento. Note que a maior parte do sistema já estará finalizada no momento da execução deste script.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="preferences.html">Preferências</a> 
+::  <a href="contents.html" class="uplink">Conteúdo</a> 
+<!-- ::  <a href="filesystem-layout.html">Disposição do sistema de arquivos</a>  » -->
+</span></div>
+</div>
+
+</body>
+</html>

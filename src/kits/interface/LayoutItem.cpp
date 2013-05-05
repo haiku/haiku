@@ -1,14 +1,16 @@
 /*
- * Copyright 2010, Haiku, Inc.
+ * Copyright 2010-2012, Haiku, Inc.
  * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+
 
 #include <LayoutItem.h>
 
 #include <Layout.h>
 #include <LayoutUtils.h>
 #include <View.h>
+#include <ViewPrivate.h>
 
 #include <algorithm>
 
@@ -45,6 +47,15 @@ BLayoutItem::Layout() const
 }
 
 
+void
+BLayoutItem::SetExplicitSize(BSize size)
+{
+	SetExplicitMinSize(size);
+	SetExplicitMaxSize(size);
+	SetExplicitPreferredSize(size);
+}
+
+
 bool
 BLayoutItem::HasHeightForWidth()
 {
@@ -71,6 +82,7 @@ BLayoutItem::View()
 void
 BLayoutItem::InvalidateLayout(bool children)
 {
+	LayoutInvalidated(children);
 	if (fLayout)
 		fLayout->InvalidateLayout(children);
 }
@@ -120,7 +132,7 @@ BLayoutItem::AlignInFrame(BRect frame)
 
 		float minHeight;
 		GetHeightForWidth(frame.Width(), &minHeight, NULL, NULL);
-		
+
 		frame.bottom = frame.top + max_c(frame.Height(), minHeight);
 		maxSize.height = minHeight;
 	}
@@ -163,12 +175,36 @@ BLayoutItem::SetLayout(BLayout* layout)
 	if (layout == fLayout)
 		return;
 
-	std::swap(fLayout, layout);
-	if (layout)
-		DetachedFromLayout(layout);
-		
+	BLayout* oldLayout = fLayout;
+	fLayout = layout;
+
+	if (oldLayout)
+		DetachedFromLayout(oldLayout);
+
+	if (BView* view = View()) {
+		if (oldLayout && !fLayout) {
+			BView::Private(view).DeregisterLayoutItem(this);
+		} else if (fLayout && !oldLayout) {
+			BView::Private(view).RegisterLayoutItem(this);
+		}
+	}
+
 	if (fLayout)
 		AttachedToLayout();
+}
+
+
+status_t
+BLayoutItem::Perform(perform_code code, void* _data)
+{
+	return BArchivable::Perform(code, _data);
+}
+
+
+void
+BLayoutItem::LayoutInvalidated(bool children)
+{
+	// hook method
 }
 
 
@@ -191,4 +227,19 @@ BLayoutItem::AncestorVisibilityChanged(bool shown)
 {
 	// hook method
 }
+
+
+// Binary compatibility stuff
+
+
+void BLayoutItem::_ReservedLayoutItem1() {}
+void BLayoutItem::_ReservedLayoutItem2() {}
+void BLayoutItem::_ReservedLayoutItem3() {}
+void BLayoutItem::_ReservedLayoutItem4() {}
+void BLayoutItem::_ReservedLayoutItem5() {}
+void BLayoutItem::_ReservedLayoutItem6() {}
+void BLayoutItem::_ReservedLayoutItem7() {}
+void BLayoutItem::_ReservedLayoutItem8() {}
+void BLayoutItem::_ReservedLayoutItem9() {}
+void BLayoutItem::_ReservedLayoutItem10() {}
 

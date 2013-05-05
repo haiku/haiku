@@ -21,65 +21,70 @@
 
 #include "wrapper.h"
 
-#define PROMISE_TX2_CONTROLLER_MODULE_NAME "busses/ata/promise_tx2/device_v1"
+#define PROMISE_TX2_CONTROLLER_MODULE_NAME "busses/ata/promise_tx2/driver_v1"
 #define PROMISE_TX2_CHANNEL_MODULE_NAME "busses/ata/promise_tx2/channel/v1"
 
 
-static ata_for_controller_interface *ide;
-static ata_adapter_interface *ata_adapter;
-static device_manager_info *pnp;
+static ata_for_controller_interface *sATA;
+static ata_adapter_interface *sATAAdapter;
+static device_manager_info *sDeviceManager;
+
+
+static void
+set_channel(void *cookie, ata_channel channel)
+{
+	sATAAdapter->set_channel((ata_adapter_channel_info *)cookie, channel);
+}
 
 
 static status_t
 write_command_block_regs(void *channel_cookie, ata_task_file *tf, ata_reg_mask mask)
 {
-	return ata_adapter->write_command_block_regs((ata_adapter_channel_info *)channel_cookie, tf, mask);
+	return sATAAdapter->write_command_block_regs((ata_adapter_channel_info *)channel_cookie, tf, mask);
 }
 
 
 static status_t
 read_command_block_regs(void *channel_cookie, ata_task_file *tf, ata_reg_mask mask)
 {
-	return ata_adapter->read_command_block_regs((ata_adapter_channel_info *)channel_cookie, tf, mask);
+	return sATAAdapter->read_command_block_regs((ata_adapter_channel_info *)channel_cookie, tf, mask);
 }
 
 
 static uint8
 get_altstatus(void *channel_cookie)
 {
-	return ata_adapter->get_altstatus((ata_adapter_channel_info *)channel_cookie);
+	return sATAAdapter->get_altstatus((ata_adapter_channel_info *)channel_cookie);
 }
 
 
 static status_t
 write_device_control(void *channel_cookie, uint8 val)
 {
-	return ata_adapter->write_device_control((ata_adapter_channel_info *)channel_cookie, val);
+	return sATAAdapter->write_device_control((ata_adapter_channel_info *)channel_cookie, val);
 }
 
 
 static status_t
 write_pio(void *channel_cookie, uint16 *data, int count, bool force_16bit)
 {
-	return ata_adapter->write_pio((ata_adapter_channel_info *)channel_cookie, data, count, force_16bit);
+	return sATAAdapter->write_pio((ata_adapter_channel_info *)channel_cookie, data, count, force_16bit);
 }
 
 
 static status_t
 read_pio(void *channel_cookie, uint16 *data, int count, bool force_16bit)
 {
-	return ata_adapter->read_pio((ata_adapter_channel_info *)channel_cookie, data, count, force_16bit);
+	return sATAAdapter->read_pio((ata_adapter_channel_info *)channel_cookie, data, count, force_16bit);
 }
 
 
 static int32
-inthand(void *arg)
+handle_interrupt(void *arg)
 {
 	ata_adapter_channel_info *channel = (ata_adapter_channel_info *)arg;
 	pci_device_module_info *pci = channel->pci;
-	pci_device device = channel->device;
-	ide_bm_status bm_status;
-	uint8 status;
+	pci_device *device = channel->device;
 
 	SHOW_FLOW0( 3, "" );
 
@@ -91,7 +96,7 @@ inthand(void *arg)
 	if ((pci->read_io_8(device, channel->bus_master_base + 3) & 0x20) == 0)
 		return B_UNHANDLED_INTERRUPT;
 
-	return ata_adapter->inthand(arg);
+	return sATAAdapter->inthand(arg);
 }
 
 
@@ -99,88 +104,86 @@ static status_t
 prepare_dma(void *channel_cookie, const physical_entry *sg_list,
 	size_t sg_list_count, bool to_device)
 {
-	return ata_adapter->prepare_dma((ata_adapter_channel_info *)channel_cookie, sg_list, sg_list_count, to_device);
+	return sATAAdapter->prepare_dma((ata_adapter_channel_info *)channel_cookie, sg_list, sg_list_count, to_device);
 }
 
 
 static status_t
 start_dma(void *channel_cookie)
 {
-	return ata_adapter->start_dma((ata_adapter_channel_info *)channel_cookie);
+	return sATAAdapter->start_dma((ata_adapter_channel_info *)channel_cookie);
 }
 
 
 static status_t
 finish_dma(void *channel_cookie)
 {
-	return ata_adapter->finish_dma((ata_adapter_channel_info *)channel_cookie);
+	return sATAAdapter->finish_dma((ata_adapter_channel_info *)channel_cookie);
 }
 
 
 static status_t
-init_channel(device_node_handle node, ata_channel ata_channel,
-	void **channel_cookie)
+init_channel(device_node *node, void **channel_cookie)
 {
-	return ata_adapter->init_channel(node, ata_channel, (ata_adapter_channel_info **)channel_cookie,
-		sizeof(ata_adapter_channel_info), inthand);
-}
-
-
-static status_t
-uninit_channel(void *channel_cookie)
-{
-	return ata_adapter->uninit_channel((ata_adapter_channel_info *)channel_cookie);
-}
-
-
-static void channel_removed(device_node_handle node, void *channel_cookie)
-{
-	return ata_adapter->channel_removed(node, (ata_adapter_channel_info *)channel_cookie);
-}
-
-
-static status_t
-init_controller(device_node_handle node, void *user_cookie,
-	ata_adapter_controller_info **cookie)
-{
-	return ata_adapter->init_controller(node, user_cookie, cookie,
-		sizeof(ata_adapter_controller_info));
-}
-
-
-static status_t
-uninit_controller(ata_adapter_controller_info *controller)
-{
-	return ata_adapter->uninit_controller(controller);
+	return sATAAdapter->init_channel(node,
+		(ata_adapter_channel_info **)channel_cookie,
+		sizeof(ata_adapter_channel_info), handle_interrupt);
 }
 
 
 static void
-controller_removed(device_node_handle node, ata_adapter_controller_info *controller)
+uninit_channel(void *channel_cookie)
 {
-	return ata_adapter->controller_removed(node, controller);
+	sATAAdapter->uninit_channel((ata_adapter_channel_info *)channel_cookie);
+}
+
+
+static void channel_removed(void *channel_cookie)
+{
+	return sATAAdapter->channel_removed(
+		(ata_adapter_channel_info *)channel_cookie);
+}
+
+
+static status_t
+init_controller(device_node *node, void **cookie)
+{
+	return sATAAdapter->init_controller(node,
+		(ata_adapter_controller_info **)cookie,
+		sizeof(ata_adapter_controller_info));
+}
+
+
+static void
+uninit_controller(void *controller)
+{
+	sATAAdapter->uninit_controller(
+		(ata_adapter_controller_info *)controller);
+}
+
+
+static void
+controller_removed(void *controller)
+{
+	return sATAAdapter->controller_removed(
+		(ata_adapter_controller_info *)controller);
 }
 
 
 // publish node of ide controller
 
 static status_t
-publish_controller(device_node_handle parent, uint16 bus_master_base, uint8 intnum,
-	io_resource_handle *resources, device_node_handle *node)
+publish_controller(device_node *parent, uint16 bus_master_base, uint8 intnum,
+	io_resource *resources, device_node **node)
 {
 	device_attr attrs[] = {
-		// info about ourself and our consumer
-		{ B_DRIVER_MODULE, B_STRING_TYPE, { string: PROMISE_TX2_CONTROLLER_MODULE_NAME }},
-
 		// properties of this controller for ide bus manager
 		// there are always max. 2 devices
-		{ IDE_CONTROLLER_MAX_DEVICES_ITEM, B_UINT8_TYPE, { ui8: 2 }},
+		{ ATA_CONTROLLER_MAX_DEVICES_ITEM, B_UINT8_TYPE, { ui8: 2 }},
 		// of course we can DMA
-		{ IDE_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { ui8: 1 }},
-		// command queuing always works
-		{ IDE_CONTROLLER_CAN_CQ_ITEM, B_UINT8_TYPE, { ui8: 1 }},
+		{ ATA_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { ui8: 1 }},
 		// choose any name here
-		{ IDE_CONTROLLER_CONTROLLER_NAME_ITEM, B_STRING_TYPE, { string: "Promise TX2" }},
+		{ ATA_CONTROLLER_CONTROLLER_NAME_ITEM, B_STRING_TYPE, { string: "Promise TX2" }},
 
 		// DMA properties
 		// some say it must be dword-aligned, others that it can be byte-aligned;
@@ -203,19 +206,18 @@ publish_controller(device_node_handle parent, uint16 bus_master_base, uint8 intn
 
 	SHOW_FLOW0(2, "");
 
-	return pnp->register_device(parent, attrs, resources, node);
+	return sDeviceManager->register_node(parent,
+		PROMISE_TX2_CONTROLLER_MODULE_NAME, attrs, resources, node);
 }
 
 
 // detect pure IDE controller, i.e. without channels
 
 static status_t
-detect_controller(pci_device_module_info *pci, pci_device pci_device,
-	device_node_handle parent, uint16 bus_master_base, int8 intnum,
-	device_node_handle *node)
+detect_controller(pci_device_module_info *pci, pci_device *pci_device,
+	device_node *parent, uint16 bus_master_base, int8 intnum,
+	device_node **node)
 {
-	io_resource_handle resource_handles[2];
-
 	SHOW_FLOW0(3, "");
 
 	if ((bus_master_base & PCI_address_space) != 1)
@@ -225,33 +227,33 @@ detect_controller(pci_device_module_info *pci, pci_device pci_device,
 
 	{
 		io_resource resources[2] = {
-			{ IO_PORT, bus_master_base, 16 },
+			{ B_IO_PORT, bus_master_base, 16 },
 			{}
 		};
 
-		if (pnp->acquire_io_resources(resources, resource_handles) != B_OK)
-			return B_ERROR;
+		return publish_controller(parent, bus_master_base, intnum, resources,
+			node);
 	}
-
-	return publish_controller(parent, bus_master_base, intnum, resource_handles, node);
 }
 
 
 static status_t
-probe_controller(device_node_handle parent)
+probe_controller(device_node *parent)
 {
 	pci_device_module_info *pci;
-	pci_device device;
+	pci_device *device;
 	uint16 command_block_base[2];
 	uint16 control_block_base[2];
 	uint16 bus_master_base;
-	device_node_handle controller_node, channels[2];
+	device_node *controller_node;
+	device_node *channels[2];
 	uint8 intnum;
-	status_t res;
+	status_t status;
 
 	SHOW_FLOW0(3, "");
 
-	if (pnp->init_driver(parent, NULL, (driver_module_info **)&pci, (void **)&device) != B_OK)
+	if (sDeviceManager->get_driver(parent, (driver_module_info **)&pci,
+			(void **)&device) != B_OK)
 		return B_ERROR;
 
 	command_block_base[0] = pci->read_pci_config(device, PCI_base_registers, 4);
@@ -267,99 +269,86 @@ probe_controller(device_node_handle parent)
 	control_block_base[1] &= PCI_address_io_mask;
 	bus_master_base &= PCI_address_io_mask;
 
-	res = detect_controller(pci, device, parent, bus_master_base, intnum, &controller_node);
-	if (res != B_OK || controller_node == NULL)
-		goto err;
+	status = detect_controller(pci, device, parent, bus_master_base, intnum,
+		&controller_node);
+	if (status != B_OK || controller_node == NULL)
+		return status;
 
-	ata_adapter->detect_channel(pci, device, controller_node,
+	sATAAdapter->detect_channel(pci, device, controller_node,
 		PROMISE_TX2_CHANNEL_MODULE_NAME, true,
 		command_block_base[0], control_block_base[0], bus_master_base, intnum,
 		0, "Primary Channel", &channels[0], false);
 
-	ata_adapter->detect_channel(pci, device, controller_node,
+	sATAAdapter->detect_channel(pci, device, controller_node,
 		PROMISE_TX2_CHANNEL_MODULE_NAME, true,
 		command_block_base[1], control_block_base[1], bus_master_base, intnum,
 		1, "Secondary Channel", &channels[1], false);
 
-	pnp->uninit_driver(parent);
-
 	return B_OK;
-
-err:
-	pnp->uninit_driver(parent);
-	return res;
-}
-
-
-static status_t
-std_ops(int32 op, ...)
-{
-	switch (op) {
-		case B_MODULE_INIT:
-		case B_MODULE_UNINIT:
-			return B_OK;
-
-		default:
-			return B_ERROR;
-	}
 }
 
 
 module_dependency module_dependencies[] = {
-	{ IDE_FOR_CONTROLLER_MODULE_NAME, (module_info **)&ide },
-	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
-	{ ATA_ADAPTER_MODULE_NAME, (module_info **)&ata_adapter },
+	{ ATA_FOR_CONTROLLER_MODULE_NAME, (module_info **)&sATA },
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&sDeviceManager },
+	{ ATA_ADAPTER_MODULE_NAME, (module_info **)&sATAAdapter },
 	{}
 };
 
 
 // exported interface
-static ide_controller_interface channel_interface = {
+static ata_controller_interface sChannelInterface = {
 	{
 		{
 			PROMISE_TX2_CHANNEL_MODULE_NAME,
 			0,
-			std_ops
+			NULL
 		},
 
-		NULL,	// supported devices
-		NULL,
-		(status_t (*)( device_node_handle , void *, void ** ))	init_channel,
+		NULL,	// supports_device()
+		NULL,	// register_device()
+		init_channel,
 		uninit_channel,
+		NULL,	// register_child_devices()
+		NULL,	// rescan_child_devices()
 		channel_removed
 	},
 
-	&write_command_block_regs,
-	&read_command_block_regs,
+	set_channel,
 
-	&get_altstatus,
-	&write_device_control,
+	write_command_block_regs,
+	read_command_block_regs,
 
-	&write_pio,
-	&read_pio,
+	get_altstatus,
+	write_device_control,
 
-	&prepare_dma,
-	&start_dma,
-	&finish_dma,
+	write_pio,
+	read_pio,
+
+	prepare_dma,
+	start_dma,
+	finish_dma,
 };
 
 
-static driver_module_info controller_interface = {
+static driver_module_info sControllerInterface = {
 	{
 		PROMISE_TX2_CONTROLLER_MODULE_NAME,
 		0,
-		std_ops
+		NULL
 	},
 
 	NULL,
 	probe_controller,
-	(status_t (*)(device_node_handle, void *, void **))	init_controller,
-	(status_t (*)(void *))								uninit_controller,
-	(void (*)(device_node_handle, void *))				controller_removed
+	init_controller,
+	uninit_controller,
+	NULL,
+	NULL,
+	controller_removed
 };
 
 module_info *modules[] = {
-	(module_info *)&controller_interface,
-	(module_info *)&channel_interface,
+	(module_info *)&sControllerInterface,
+	(module_info *)&sChannelInterface,
 	NULL
 };

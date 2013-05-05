@@ -43,6 +43,12 @@ enum address_type_kind {
 };
 
 
+enum template_type_kind {
+	TEMPLATE_TYPE_TYPE,
+	TEMPLATE_TYPE_VALUE
+};
+
+
 enum {
 	TYPE_MODIFIER_CONST		= 0x01,
 	TYPE_MODIFIER_VOLATILE	= 0x02,
@@ -52,7 +58,9 @@ enum {
 };
 
 
+class AddressType;
 class ArrayIndexPath;
+class ArrayType;
 class BString;
 class Type;
 class ValueLocation;
@@ -104,6 +112,16 @@ public:
 };
 
 
+class TemplateParameter : public BReferenceable {
+public:
+	virtual						~TemplateParameter();
+
+	virtual	template_type_kind	Kind() const = 0;
+	virtual Type*				GetType() const = 0;
+	virtual	BVariant			Value() const = 0;
+};
+
+
 class Type : public BReferenceable {
 public:
 	virtual						~Type();
@@ -116,6 +134,23 @@ public:
 	virtual	Type*				ResolveRawType(bool nextOneOnly) const;
 									// strips modifiers and typedefs (only one,
 									// if requested)
+
+
+	virtual status_t			CreateDerivedAddressType(
+									address_type_kind kind,
+									AddressType*& _resultType);
+
+	virtual	status_t			CreateDerivedArrayType(
+									int64 lowerBound,
+									int64 elementCount,
+									bool extendExisting,
+										// if the current object is already
+										// an array type, attach an extra
+										// dimension to it rather than
+										// creating a new encapsulating
+										// type object
+									ArrayType*& _resultType);
+
 
 	virtual	status_t			ResolveObjectDataLocation(
 									const ValueLocation& objectLocation,
@@ -143,12 +178,17 @@ public:
 	virtual						~CompoundType();
 
 	virtual	type_kind			Kind() const;
+	virtual compound_type_kind	CompoundKind() const = 0;
 
 	virtual	int32				CountBaseTypes() const = 0;
 	virtual	BaseType*			BaseTypeAt(int32 index) const = 0;
 
 	virtual	int32				CountDataMembers() const = 0;
 	virtual	DataMember*			DataMemberAt(int32 index) const = 0;
+
+	virtual int32				CountTemplateParameters() const = 0;
+	virtual TemplateParameter*	TemplateParameterAt(int32 index) const = 0;
+
 
 	virtual	status_t			ResolveBaseTypeLocation(BaseType* baseType,
 									const ValueLocation& parentLocation,

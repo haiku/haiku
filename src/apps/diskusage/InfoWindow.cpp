@@ -28,8 +28,8 @@ using std::string;
 using std::vector;
 using std::pair;
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Info Window"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Info Window"
 
 LeftView::LeftView(BRect frame, BBitmap* icon)
 	:

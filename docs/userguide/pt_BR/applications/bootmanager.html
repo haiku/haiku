@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Adriano Duarte
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Gerenciador de Inicialização</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../../fr/applications/bootmanager.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/bootmanager.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/bootmanager.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/bootmanager.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/bootmanager.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/bootmanager.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/bootmanager.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/bootmanager.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/bootmanager.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/bootmanager.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/bootmanager.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/bootmanager.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/applications/bootmanager.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../ca/applications/bootmanager.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../../en/applications/bootmanager.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="activitymonitor.html">Monitor de Atividade</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos
+</a> 
+::  <a href="cdplayer.html">CDPlayer</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/bootmanager-icon_64.png" alt="bootmanager-icon_64.png" width="64" height="64" />Gerenciador de Inicialização</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><i>nenhuma entrada, normalmente inicia a partir do menu <span class="menu">Ferramentas</span> do Instalador</i></td></tr>
+<tr><td>Localização:</td><td></td><td><span class="path">/boot/system/apps/BootManager</span></td></tr>
+<tr><td>Configurações:</td><td></td><td><i>nenhum</i><br />Cópias de segurança do MBR são salvos por padrão em <span class="path">~/config/settings/bootman/</span></td></tr>
+</table>
+<p><br /></p>
+<p>Se não adicionou a partição do Haiku a um gerenciador de inicialização pré-existente como o GRUB, o Gerenciador de Inicialização pode instalar um pequeno menu de inicialização na Master Boot Record (MBR) que mostra algo como isto:</p>
+<img src="../images/apps-images/bootmenu.png" alt="bootmenu.png" />
+<div class="box-info">O Gerenciador de Inicialização não é ainda suficientemente testado e tem algumas restrições que causarão problemas se não forem atendidas: o menu só pode ser instalado no primeiro disco rígido e tem que haver um espaço de 2 KB após a MBR.</div>
+<p>O Gerenciador de Inicialização o guia através do processo de instalação do menu de inicialização.</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="1-drives" id="1-drives">Escolhendo o disco de destino</a></h2>
+<img src="../images/apps-images/bootmanager-1.png" alt="bootmanager-1.png" />
+<p>O Gerenciador de Inicialização começa com uma lista de todos os dispositivos de armazenamento disponíveis dos quais pode-se escolher o destino. Se já existe um menu de inicialização naquele dispositivo, o botão  <span class="button">Desinstalar</span> torna-se ativo, conduzindo-o através de um procedimento simples para restaurar um antigo MBR salvo, assim removendo o menu de inicialização novamente.<br />
+Caso contrário, escolha <span class="button">Instalar</span> para continuar.</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="2-backup" id="2-backup">Criando uma cópia de segurança da Master Boot Record (MBR)</a></h2>
+<p>No caso de alguma coisa dar errado ou desejar remover o menu de inicialização novamente, a Master Boot Record (MBR) é agora salva. Este é obviamente um passo muito importante, assegure-se de não sobrescrever acidentalmente alguma outra cópia de segurança da MBR talvez de alguma experiência recente, por exemplo!</p>
+<img src="../images/apps-images/bootmanager-2.png" alt="bootmanager-2.png" /> 
+<img src="../images/apps-images/bootmanager-3.png" alt="bootmanager-3.png" />
+<p>Apenas selecione um destino para o arquivo da cópia de segurança "<tt>MBR</tt>" ou deixe o caminho padrão. Após clicar em  <span class="button">Próximo</span> receberá uma confirmação se a cópia foi gerada com sucesso.</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="3-menu" id="3-menu">Configurando o menu de inicialização</a></h2>
+<img src="../images/apps-images/bootmanager-4.png" alt="bootmanager-4.png" /> 
+<img src="../images/apps-images/bootmanager-5.png" alt="bootmanager-5.png" />
+<p>A seguir é apresentada uma lista de todas as partições do dispositivo de destino. Next you're presented with a list of all partitions on the destination drive. Ao selecionar as caixas de verificação decide-se quais entradas irão aparecer no menu de inicialização; as caixas de texto permitem renomear uma entrada.</p>
+<p>Após isso, selecione do menu pop-up qual partição será inicializada por padrão e defina um tempo limite com o botão deslizante abaixo. Aqui, "<i>Imediatamente</i>" irá pular o menu de inicialização inteiramente, "<i>Nunca</i>" irá parar no menu de inicialização. Pode-se passar por cima da definição de tempo limite segurando <span class="key">ALT</span> enquanto inicializa.</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="4-mbr" id="4-mbr">Gravando o menu de inicialização</a></h2>
+<img src="../images/apps-images/bootmanager-6.png" alt="bootmanager-6.png" /> 
+<img src="../images/apps-images/bootmanager-7.png" alt="bootmanager-7.png" />
+<p>Antes do menu de inicialização ser gravado na MBR, é mostrado um resumo da sua configuração e então uma última chance de abortar a operação. Não se preocupe, uma vez que mantenha a cópia de segurança da MBR a salvo, poderá facilmente reverter as mudanças. Caso as coisas fiquem completamente estragadas, poderá sempre inicializar a partir de um CD ou pendrive USB de instalação do Haiku e recuperar a MBR com o Gerenciador de Inicialização.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="activitymonitor.html">Monitor de Atividade</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos
+</a> 
+::  <a href="cdplayer.html">CDPlayer</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

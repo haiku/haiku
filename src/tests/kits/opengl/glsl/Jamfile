@@ -1,4 +1,5 @@
 SubDir HAIKU_TOP src tests kits opengl glsl ;
+SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
@@ -9,8 +10,14 @@ if $(TARGET_PLATFORM) != haiku {
 	UsePublicHeaders opengl ;
 }
 
-StaticLibrary libshaderutil.a :
+local shadersources =
 	shaderutil.c
+;
+
+Includes [ FGristFiles $(shadersources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+
+StaticLibrary libshaderutil.a :
+	$(shadersources)
 ;
 
 SimpleTest brick :

@@ -18,8 +18,8 @@
 #include <kernel/OS.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PackageInfo"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PackageInfo"
 
 #define RETURN_AND_SET_STATUS(err) fStatus = err; \
 	fprintf(stderr, "err at %s():%d: %x\n", __FUNCTION__, __LINE__, err); \
@@ -1044,6 +1044,7 @@ PackageInfo::Parse()
 				B_TRANSLATE("Continue"),
 				B_TRANSLATE("Abort"), NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		warning->SetShortcut(1, B_ESCAPE);
 		selection = warning->Go();
 
 		if (selection == 1) {

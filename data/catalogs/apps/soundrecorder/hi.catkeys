@@ -1,0 +1,41 @@
+1	hindi	x-vnd.Haiku-SoundRecorder	3223747972
+Loop	RecorderWindow		लूप
+Cannot find default audio hardware	RecorderWindow		डिफ़ॉल्ट ऑडियो हार्डवेयर नहीं मिल सका
+Cannot find the temporary file created to hold the new recording	RecorderWindow		नई रिकॉर्डिंग पकड़ने के लिए बनायी गई अस्थायी फ़ाइल को नहीं खोज सका
+Nothing to play	RecorderWindow		खेलने के लिए कुछ भी नहीं
+Duration: 	RecorderWindow		अवधि: 
+Some of the files don't appear to be audio files	RecorderWindow		कुछ फ़ाइलें ऑडियो फ़ाइल प्रतीत नहीं होती हैं
+File info	RecorderWindow		फ़ाइल की जानकारी
+Drop files here	SoundListView		फ़ाइलें यहाँ ड्रॉप करे
+Input	RecorderWindow		इनपुट
+Stop	RecorderWindow		विराम
+Sound List	RecorderWindow		ध्वनि सूची
+Compression: 	RecorderWindow		संक्षिप्त करें: 
+Rewind	RecorderWindow		उल्टा करें
+Sample rate:	RecorderWindow		नमूना दर:
+Invalid audio files	RecorderWindow		अवैध ऑडियो फाइले
+ seconds	RecorderWindow		सेकंड
+OK	RecorderWindow		ठीक है
+Cannot open the temporary file created to hold the new recording	RecorderWindow		नई रिकॉर्डिंग पकड़ने के लिए बनायी गई अस्थायी फ़ाइल को नहीं खोल सकता
+None of the files appear to be audio files	RecorderWindow		फ़ाइलों में से कोई भी फ़ाइल ऑडियो नही दिखाई देते हैं
+Input:	RecorderWindow		आगत:
+Forward	RecorderWindow		आगे करें
+Play	RecorderWindow		चलाएं
+SoundRecorder	System name		SoundRecorder
+Channels:	RecorderWindow		प्रणालिया:
+ bits	RecorderWindow		 बिट्स
+None	RecorderWindow		कुछ भी नहीं
+Record	RecorderWindow		रिकॉर्ड
+Sample size: 	RecorderWindow		सैम्पल आकार: 
+Cannot recognize this file as a media file	RecorderWindow		इस फाइल को मीडिया फाइल पहचान नहीं सकते
+Format: 	RecorderWindow		संरूप: 
+File name: 	RecorderWindow		फ़ाइल का नाम:
+Cannot connect to the selected sound input	RecorderWindow		चयनित ध्वनि इनपुट करने से कनेक्ट नहीं कर सकते
+Cannot get the file to play	RecorderWindow		प्ले करने के लिए फ़ाइल प्राप्त नहीं हो पा रही हैं
+Cannot record a sound that long	RecorderWindow		इतनी लम्बी ध्वनि रिकॉर्ड नही हो सकती
+Duration:	RecorderWindow		अवधि:
+Compression:	RecorderWindow		संक्षिप्त करें:
+Cannot find an unused name to use for the new recording	RecorderWindow		नई रिकॉर्डिंग के उपयोग के लिए एक अप्रयुक्त नाम नहीं खोज सका
+Channels: 	RecorderWindow		प्रणालियां: 
+Sample rate: 	RecorderWindow		नमूना दर: 
+File name:	RecorderWindow		फ़ाइल का नाम:

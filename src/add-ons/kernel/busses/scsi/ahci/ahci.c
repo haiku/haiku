@@ -14,6 +14,8 @@
 
 #define AHCI_ID_GENERATOR "ahci/id"
 #define AHCI_ID_ITEM "ahci/id"
+#define AHCI_BRIDGE_PRETTY_NAME "AHCI Bridge"
+#define AHCI_CONTROLLER_PRETTY_NAME "AHCI Controller"
 
 
 const device_info kSupportedDevices[] = {
@@ -171,6 +173,8 @@ register_sim(device_node *parent)
 		device_attr attrs[] = {
 			{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE,
 				{ string: SCSI_FOR_SIM_MODULE_NAME }},
+			{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
+				{ string: AHCI_CONTROLLER_PRETTY_NAME }},
 
 			{ SCSI_DESCRIPTION_CONTROLLER_NAME, B_STRING_TYPE,
 				{ string: AHCI_DEVICE_MODULE_NAME }},
@@ -260,6 +264,8 @@ ahci_register_device(device_node *parent)
 	device_attr attrs[] = {
 		{ SCSI_DEVICE_MAX_TARGET_COUNT, B_UINT32_TYPE,
 			{ ui32: 33 }},
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
+			{ string: AHCI_BRIDGE_PRETTY_NAME }},
 
 		// DMA properties
 		// data must be word-aligned;

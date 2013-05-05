@@ -96,6 +96,62 @@ rule FSplitPath
 	return $(components) ;
 }
 
+
+rule FSetConditionsHold conditions : set
+{
+	# FSetConditionsHold <conditions> : <set> ;
+	# Checks whether the conditions <conditions> are satisfied by the list of
+	# elements <set> and returns a respective result (if so: "1", if not: empty
+	# list). The conditions are satisfied when <conditions> is not empty and
+	# * none of the negative conditions it contains hold and
+	# * if <conditions> contains any positive conditions, at least one one of
+	#   those holds.
+	# A positive condition is an element not starting with a "!". It holds when
+	# the element is contained in <set>.
+	# A negative condition is an element that starts with a "!". It holds when
+	# the string resulting from removing the leading "!" is not contained in
+	# <set>.
+	#
+	# <conditions> - The list of conditions.
+	# <set> - The elements against which the conditions are tested.
+	#
+	# Examples:
+	# For set { a b c } the following conditions hold:
+	# { a }, { a d }, { !d }, { !d !e }, { a !d }, { b !e !f }
+	# The following conditions don't hold:
+	# { }, { d }, { d e }, { !a }, { !a b }, { !d e } { a b !c !d }
+
+	local hasPositive ;
+	local hasNegative ;
+	local positiveMatch ;
+	local condition ;
+	for condition in $(conditions) {
+		switch $(condition) {
+			case !* :
+			{
+				hasNegative = 1 ;
+				condition = [ Match "!(.*)" : $(condition) ] ;
+				if $(condition) in $(set) {
+					return ;
+				}
+			}
+			case * :
+			{
+				hasPositive = 1 ;
+				if $(condition) in $(set) {
+					positiveMatch = 1 ;
+				}
+			}
+		}
+	}
+
+	if $(hasPositive) {
+		return $(positiveMatch) ;
+	}
+	return $(hasNegative) ;
+}
+
+
 rule SetPlatformCompatibilityFlagVariables
 {
 	# SetPlatformCompatibilityFlagVariables <platform var> : <var prefix>

@@ -3,9 +3,9 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "application/x-msaccess";
 
-resource(2, "META:S:DESC") #'MSDC' "Access Database";
+resource(2, "META:S:DESC") #'MSDC' "Access database";
 
-resource(3, "META:L:DESC") #'MLDC' "Microsoft® Access® Database";
+resource(3, "META:L:DESC") #'MLDC' "Microsoft® Access® database";
 
 resource(4, "META:EXTENS") message(234) {
 	"extensions" = "mdb",

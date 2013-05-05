@@ -6,6 +6,7 @@
 #define _BITMAP_PRIVATE_H
 
 
+#include <Bitmap.h>
 #include <OS.h>
 
 
@@ -14,6 +15,18 @@
 struct overlay_client_data {
 	sem_id	lock;
 	uint8*	buffer;
+};
+
+
+void reconnect_bitmaps_to_app_server();
+
+
+class BBitmap::Private {
+public:
+								Private(BBitmap* bitmap);
+			void				ReconnectToAppServer();
+private:
+			BBitmap*			fBitmap;
 };
 
 #endif // _BITMAP_PRIVATE_H

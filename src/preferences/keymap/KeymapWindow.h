@@ -31,7 +31,7 @@ class KeymapListItem;
 class KeymapWindow : public BWindow {
 public:
 								KeymapWindow();
-								~KeymapWindow();
+	virtual						~KeymapWindow();
 
 	virtual	bool				QuitRequested();
 	virtual void				MessageReceived(BMessage* message);

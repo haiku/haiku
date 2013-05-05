@@ -39,7 +39,8 @@
 #include "KeymapListItem.h"
 
 
-#define B_TRANSLATE_CONTEXT "Keymap window"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Keymap window"
 
 
 static const uint32 kMsgMenuFileOpen = 'mMFO';
@@ -55,7 +56,7 @@ static const uint32 kMsgSystemMapSelected = 'SmST';
 static const uint32 kMsgUserMapSelected = 'UmST';
 
 static const uint32 kMsgRevertKeymap = 'Rvrt';
-static const uint32 kMsgKeymapUpdated = 'upkM';
+static const uint32 kMsgKeymapUpdated = 'kMup';
 
 static const uint32 kMsgDeadKeyAcuteChanged = 'dkAc';
 static const uint32 kMsgDeadKeyCircumflexChanged = 'dkCc';
@@ -222,6 +223,9 @@ KeymapWindow::MessageReceived(BMessage* message)
 		case kMsgMenuFileSaveAs:
 			fSavePanel->Show();
 			break;
+		case kMsgShowModifierKeysWindow:
+			be_app->PostMessage(kMsgShowModifierKeysWindow);
+			break;
 
 		case kChangeKeyboardLayout:
 		{
@@ -292,6 +296,39 @@ KeymapWindow::MessageReceived(BMessage* message)
 			_RevertKeymap();
 			_UpdateButtons();
 			break;
+
+		case kMsgUpdateModifierKeys:
+		{
+			uint32 keycode;
+
+			if (message->FindUInt32("left_shift_key", &keycode) == B_OK)
+				fCurrentMap.SetModifier(keycode, B_LEFT_SHIFT_KEY);
+
+			if (message->FindUInt32("right_shift_key", &keycode) == B_OK)
+				fCurrentMap.SetModifier(keycode, B_RIGHT_SHIFT_KEY);
+
+			if (message->FindUInt32("left_control_key", &keycode) == B_OK)
+				fCurrentMap.SetModifier(keycode, B_LEFT_CONTROL_KEY);
+
+			if (message->FindUInt32("right_control_key", &keycode) == B_OK)
+				fCurrentMap.SetModifier(keycode, B_RIGHT_CONTROL_KEY);
+
+			if (message->FindUInt32("left_option_key", &keycode) == B_OK)
+				fCurrentMap.SetModifier(keycode, B_LEFT_OPTION_KEY);
+
+			if (message->FindUInt32("right_option_key", &keycode) == B_OK)
+				fCurrentMap.SetModifier(keycode, B_RIGHT_OPTION_KEY);
+
+			if (message->FindUInt32("left_command_key", &keycode) == B_OK)
+				fCurrentMap.SetModifier(keycode, B_LEFT_COMMAND_KEY);
+
+			if (message->FindUInt32("right_command_key", &keycode) == B_OK)
+				fCurrentMap.SetModifier(keycode, B_RIGHT_COMMAND_KEY);
+
+			_UpdateButtons();
+			fKeyboardLayoutView->SetKeymap(&fCurrentMap);
+			break;
+		}
 
 		case kMsgKeymapUpdated:
 			_UpdateButtons();
@@ -380,9 +417,12 @@ KeymapWindow::_CreateMenu()
 	BMenu* menu = new BMenu(B_TRANSLATE("File"));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Open" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgMenuFileOpen), 'O'));
-	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Save as" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgMenuFileSaveAs)));
+	menu->AddSeparatorItem();
+	menu->AddItem(new BMenuItem(
+		B_TRANSLATE("Set modifier keys" B_UTF8_ELLIPSIS),
+		new BMessage(kMsgShowModifierKeysWindow)));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(B_QUIT_REQUESTED), 'Q'));

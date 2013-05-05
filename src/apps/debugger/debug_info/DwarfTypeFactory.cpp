@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -98,6 +98,17 @@ struct HasBaseTypesPredicate {
 	inline bool operator()(DIEClassBaseType* entry) const
 	{
 		return !entry->BaseTypes().IsEmpty();
+	}
+};
+
+
+// #pragma mark - HasTemplateParametersPredicate
+
+
+struct HasTemplateParametersPredicate {
+	inline bool operator()(DIEClassBaseType* entry) const
+	{
+		return !entry->TemplateParameters().IsEmpty();
 	}
 };
 
@@ -374,7 +385,9 @@ DwarfTypeFactory::_CreateTypeInternal(const BString& name,
 		case DW_TAG_union_type:
 		case DW_TAG_interface_type:
 			return _CreateCompoundType(name,
-				dynamic_cast<DIECompoundType*>(typeEntry), _type);
+				dynamic_cast<DIECompoundType*>(typeEntry),
+				(compound_type_kind)dwarf_tag_to_subtype_kind(
+					typeEntry->Tag()), _type);
 
 		case DW_TAG_base_type:
 			return _CreatePrimitiveType(name,
@@ -451,14 +464,14 @@ DwarfTypeFactory::_CreateTypeInternal(const BString& name,
 
 status_t
 DwarfTypeFactory::_CreateCompoundType(const BString& name,
-	DIECompoundType* typeEntry, DwarfType*& _type)
+	DIECompoundType* typeEntry, compound_type_kind compoundKind, DwarfType*& _type)
 {
-	TRACE_LOCALS("DwarfTypeFactory::_CreateCompoundType(\"%s\", %p)\n",
-		name.String(), typeEntry);
+	TRACE_LOCALS("DwarfTypeFactory::_CreateCompoundType(\"%s\", %p, %d)\n",
+		name.String(), typeEntry, compoundKind);
 
 	// create the type
 	DwarfCompoundType* type = new(std::nothrow) DwarfCompoundType(fTypeContext,
-		name, typeEntry);
+		name, typeEntry, compoundKind);
 	if (type == NULL)
 		return B_NO_MEMORY;
 	BReference<DwarfCompoundType> typeReference(type, true);
@@ -514,7 +527,7 @@ printf("  -> failed to add type to cache\n");
 	}
 
 	// If the type is a class/struct/interface type, we also need to add its
-	// base types.
+	// base types, and possibly template parameters.
 	if (DIEClassBaseType* classTypeEntry
 			= dynamic_cast<DIEClassBaseType*>(typeEntry)) {
 		// find the abstract origin or specification that defines the base types
@@ -547,6 +560,53 @@ printf("  -> failed to add type to cache\n");
 				}
 			}
 		}
+
+		// find the abstract origin or specification that defines the template
+		// parameters
+		classTypeEntry = DwarfUtils::GetDIEByPredicate(
+			dynamic_cast<DIEClassBaseType*>(typeEntry),
+			HasTemplateParametersPredicate());
+
+		if (classTypeEntry != NULL) {
+			for (DebugInfoEntryList::ConstIterator it
+						= classTypeEntry->TemplateParameters()
+							.GetIterator();
+					DebugInfoEntry* _typeEntry = it.Next();) {
+				DIETemplateTypeParameter* templateTypeEntry
+					= dynamic_cast<DIETemplateTypeParameter*>(_typeEntry);
+				DwarfType* templateType;
+				if (templateTypeEntry != NULL) {
+					if (templateTypeEntry->GetType() == NULL
+						|| CreateType(templateTypeEntry->GetType(),
+							templateType) != B_OK) {
+						continue;
+					}
+				} else {
+					DIETemplateValueParameter* templateValueEntry
+						= dynamic_cast<DIETemplateValueParameter*>(_typeEntry);
+					if (CreateType(templateValueEntry->GetType(), templateType)
+						!= B_OK) {
+						continue;
+					}
+				}
+				BReference<DwarfType> templateTypeReference(templateType,
+					true);
+				DwarfTemplateParameter* parameter
+					= new(std::nothrow) DwarfTemplateParameter(_typeEntry,
+						templateType);
+				if (parameter == NULL) {
+					cacheLocker.Lock();
+					fTypeCache->RemoveType(type);
+					return B_NO_MEMORY;
+				}
+
+				if (!type->AddTemplateParameter(parameter)) {
+					cacheLocker.Lock();
+					fTypeCache->RemoveType(type);
+					return B_NO_MEMORY;
+				}
+			}
+		}
 	}
 
 	_type = typeReference.Detach();
@@ -566,8 +626,9 @@ DwarfTypeFactory::_CreatePrimitiveType(const BString& name,
 	if (byteSizeValue->IsValid()) {
 		BVariant value;
 		status_t error = fTypeContext->File()->EvaluateDynamicValue(
-			fTypeContext->GetCompilationUnit(), fTypeContext->SubprogramEntry(),
-			byteSizeValue, fTypeContext->TargetInterface(),
+			fTypeContext->GetCompilationUnit(), fTypeContext->AddressSize(),
+			fTypeContext->SubprogramEntry(), byteSizeValue,
+			fTypeContext->TargetInterface(),
 			fTypeContext->InstructionPointer(), fTypeContext->FramePointer(),
 			value);
 		if (error == B_OK && value.IsInteger())
@@ -575,8 +636,9 @@ DwarfTypeFactory::_CreatePrimitiveType(const BString& name,
 	} else if (bitSizeValue->IsValid()) {
 		BVariant value;
 		status_t error = fTypeContext->File()->EvaluateDynamicValue(
-			fTypeContext->GetCompilationUnit(), fTypeContext->SubprogramEntry(),
-			bitSizeValue, fTypeContext->TargetInterface(),
+			fTypeContext->GetCompilationUnit(), fTypeContext->AddressSize(),
+			fTypeContext->SubprogramEntry(), bitSizeValue,
+			fTypeContext->TargetInterface(),
 			fTypeContext->InstructionPointer(), fTypeContext->FramePointer(),
 			value);
 		if (error == B_OK && value.IsInteger())
@@ -914,6 +976,7 @@ DwarfTypeFactory::_CreateEnumerationType(const BString& name,
 			BVariant value;
 			status_t error = fTypeContext->File()->EvaluateConstantValue(
 				fTypeContext->GetCompilationUnit(),
+				fTypeContext->AddressSize(),
 				fTypeContext->SubprogramEntry(), enumeratorEntry->ConstValue(),
 				fTypeContext->TargetInterface(),
 				fTypeContext->InstructionPointer(),
@@ -960,10 +1023,12 @@ DwarfTypeFactory::_CreateSubrangeType(const BString& name,
 		// evaluate it
 		DIEType* valueType;
 		status_t error = fTypeContext->File()->EvaluateDynamicValue(
-			fTypeContext->GetCompilationUnit(), fTypeContext->SubprogramEntry(),
-			lowerBoundOwnerEntry->LowerBound(), fTypeContext->TargetInterface(),
-			fTypeContext->InstructionPointer(), fTypeContext->FramePointer(),
-			lowerBound, &valueType);
+			fTypeContext->GetCompilationUnit(), fTypeContext->AddressSize(),
+			fTypeContext->SubprogramEntry(),
+			lowerBoundOwnerEntry->LowerBound(),
+			fTypeContext->TargetInterface(),
+			fTypeContext->InstructionPointer(),
+			fTypeContext->FramePointer(), lowerBound, &valueType);
 		if (error != B_OK) {
 			WARNING("  failed to evaluate lower bound: %s\n", strerror(error));
 			return error;
@@ -987,8 +1052,10 @@ DwarfTypeFactory::_CreateSubrangeType(const BString& name,
 		// evaluate it
 		DIEType* valueType;
 		status_t error = fTypeContext->File()->EvaluateDynamicValue(
-			fTypeContext->GetCompilationUnit(), fTypeContext->SubprogramEntry(),
-			upperBoundOwnerEntry->UpperBound(), fTypeContext->TargetInterface(),
+			fTypeContext->GetCompilationUnit(), fTypeContext->AddressSize(),
+			fTypeContext->SubprogramEntry(),
+			upperBoundOwnerEntry->UpperBound(),
+			fTypeContext->TargetInterface(),
 			fTypeContext->InstructionPointer(), fTypeContext->FramePointer(),
 			upperBound, &valueType);
 		if (error != B_OK) {
@@ -1010,10 +1077,10 @@ DwarfTypeFactory::_CreateSubrangeType(const BString& name,
 			DIEType* valueType;
 			status_t error = fTypeContext->File()->EvaluateDynamicValue(
 				fTypeContext->GetCompilationUnit(),
-				fTypeContext->SubprogramEntry(), countOwnerEntry->Count(),
-				fTypeContext->TargetInterface(),
-				fTypeContext->InstructionPointer(), fTypeContext->FramePointer(),
-				count, &valueType);
+				fTypeContext->AddressSize(), fTypeContext->SubprogramEntry(),
+				countOwnerEntry->Count(), fTypeContext->TargetInterface(),
+				fTypeContext->InstructionPointer(),
+				fTypeContext->FramePointer(), count, &valueType);
 			if (error != B_OK) {
 				WARNING("  failed to evaluate count: %s\n", strerror(error));
 				return error;
@@ -1302,7 +1369,8 @@ DwarfTypeFactory::_ResolveTypeByteSize(DIEType* typeEntry,
 			case DW_TAG_ptr_to_member_type:
 				_size = fTypeContext->GetCompilationUnit()->AddressSize();
 
-				TRACE_LOCALS("  pointer/reference type: size: %llu\n", _size);
+				TRACE_LOCALS("  pointer/reference type: size: %" B_PRIu64 "\n",
+					_size);
 
 				return B_OK;
 			default:
@@ -1315,9 +1383,10 @@ DwarfTypeFactory::_ResolveTypeByteSize(DIEType* typeEntry,
 	// get the actual value
 	BVariant size;
 	status_t error = fTypeContext->File()->EvaluateDynamicValue(
-		fTypeContext->GetCompilationUnit(), fTypeContext->SubprogramEntry(),
-		sizeValue, fTypeContext->TargetInterface(),
-		fTypeContext->InstructionPointer(), fTypeContext->FramePointer(), size);
+		fTypeContext->GetCompilationUnit(), fTypeContext->AddressSize(),
+		fTypeContext->SubprogramEntry(), sizeValue,
+		fTypeContext->TargetInterface(), fTypeContext->InstructionPointer(),
+		fTypeContext->FramePointer(), size);
 	if (error != B_OK) {
 		TRACE_LOCALS("  failed to resolve attribute: %s\n", strerror(error));
 		return error;
@@ -1325,7 +1394,7 @@ DwarfTypeFactory::_ResolveTypeByteSize(DIEType* typeEntry,
 
 	_size = size.ToUInt64();
 
-	TRACE_LOCALS("  -> size: %llu\n", _size);
+	TRACE_LOCALS("  -> size: %" B_PRIu64 "\n", _size);
 
 	return B_OK;
 }

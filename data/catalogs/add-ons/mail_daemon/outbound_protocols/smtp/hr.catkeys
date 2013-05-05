@@ -1,0 +1,15 @@
+1	croatian	x-vnd.Haiku-SMTP	3852746446
+. The server said:\n	smtp		. Poslužitelj  je rekao:\n
+. The server says:\n	smtp		. Poslužitelj je rekao:\n
+: Connection refused or host not found.	smtp		: Veza odbijena ili računalo nije pronađeno
+Connecting to server…	smtp		Spajanje sa poslužiteljem...
+Destination:	ConfigView		Odredište:
+ESMTP	ConfigView		ESMTP
+Error while logging in to %serv	smtp		Greška pri prijavi u %serv
+Error while opening connection to %serv	smtp		Greška pri otvaranju veze za %serv
+None	ConfigView		NIjedan
+POP3 authentication failed. The server said:\n	smtp		POP3 provjera valjanosti neuspjela. Poslužitelj je rekao:\n
+POP3 before SMTP	ConfigView		POP3 prije SMTP
+SMTP server:	ConfigView		SMTP poslužitelj:
+SSL	ConfigView		SSL
+Unencrypted	ConfigView		Nekodirano

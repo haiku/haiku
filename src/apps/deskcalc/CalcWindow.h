@@ -4,15 +4,16 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Timothy Wayper <timmy@wunderbear.com>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		John Scipione <jscipione@gmail.com>
+ *		Timothy Wayper <timmy@wunderbear.com>
  */
-
-
 #ifndef _CALC_WINDOW_H
 #define _CALC_WINDOW_H
 
+
 #include <Window.h>
+
 
 class CalcView;
 
@@ -21,6 +22,7 @@ class CalcWindow : public BWindow {
 								CalcWindow(BRect frame, BMessage* settings);
 	virtual						~CalcWindow();
 
+	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				Show();
 	virtual	bool				QuitRequested();
 
@@ -28,6 +30,8 @@ class CalcWindow : public BWindow {
 
 			void				SetFrame(BRect frame,
 									bool forceCenter = false);
+
+			CalcView*			View() const { return fCalcView; };
 
  private:
 			CalcView*			fCalcView;

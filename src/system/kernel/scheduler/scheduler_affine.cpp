@@ -25,6 +25,7 @@
 #include <smp.h>
 #include <thread.h>
 #include <timer.h>
+#include <util/Random.h>
 
 #include "scheduler_common.h"
 #include "scheduler_tracing.h"
@@ -90,32 +91,19 @@ struct scheduler_thread_data {
 
 
 static int
-_rand(void)
-{
-	static int next = 0;
-
-	if (next == 0)
-		next = system_time();
-
-	next = next * 1103515245 + 12345;
-	return (next >> 16) & 0x7FFF;
-}
-
-
-static int
 dump_run_queue(int argc, char **argv)
 {
 	Thread *thread = NULL;
 
 	for (int32 i = 0; i < smp_get_num_cpus(); i++) {
 		thread = sRunQueue[i];
-		kprintf("Run queue for cpu %ld (%ld threads)\n", i,
+		kprintf("Run queue for cpu %" B_PRId32 " (%" B_PRId32 " threads)\n", i,
 			sRunQueueSize[i]);
 		if (sRunQueueSize[i] > 0) {
 			kprintf("thread      id      priority  avg. quantum  name\n");
 			while (thread) {
-				kprintf("%p  %-7ld %-8ld  %-12ld  %s\n", thread, thread->id,
-					thread->priority,
+				kprintf("%p  %-7" B_PRId32 " %-8" B_PRId32 "  %-12" B_PRId32
+					"  %s\n", thread, thread->id, thread->priority,
 					thread->scheduler_data->GetAverageQuantumUsage(),
 					thread->name);
 				thread = thread->queue_next;
@@ -422,7 +410,7 @@ affine_reschedule(void)
 
 			// skip normal threads sometimes
 			// (twice as probable per priority level)
-			if ((_rand() >> (15 - priorityDiff)) != 0)
+			if ((fast_random_value() >> (15 - priorityDiff)) != 0)
 				break;
 
 			nextThread = lowerNextThread;
@@ -500,8 +488,10 @@ affine_reschedule(void)
 			&& nextThread->priority < B_NORMAL_PRIORITY)
 			quantum = kMaxThreadQuantum;
 
-		add_timer(quantumTimer, &reschedule_event, quantum,
-			B_ONE_SHOT_RELATIVE_TIMER | B_TIMER_ACQUIRE_SCHEDULER_LOCK);
+		if (!thread_is_idle_thread(nextThread)) {
+			add_timer(quantumTimer, &reschedule_event, quantum,
+				B_ONE_SHOT_RELATIVE_TIMER | B_TIMER_ACQUIRE_SCHEDULER_LOCK);
+		}
 
 		if (nextThread != oldThread)
 			scheduler_switch_thread(oldThread, nextThread);

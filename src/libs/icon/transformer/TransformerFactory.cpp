@@ -17,8 +17,8 @@
 #include <Catalog.h>
 #include <Message.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Transformation"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Transformation"
 #endif
 
 

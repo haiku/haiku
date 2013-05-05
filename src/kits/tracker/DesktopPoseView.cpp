@@ -55,7 +55,7 @@ All rights reserved.
 //	#pragma mark -
 
 
-DesktopPoseView::DesktopPoseView(Model *model, BRect frame, uint32 viewMode,
+DesktopPoseView::DesktopPoseView(Model* model, BRect frame, uint32 viewMode,
 	uint32 resizeMask)
 	:
 	BPoseView(model, frame, viewMode, resizeMask)
@@ -64,9 +64,9 @@ DesktopPoseView::DesktopPoseView(Model *model, BRect frame, uint32 viewMode,
 }
 
 
-EntryListBase *
-DesktopPoseView::InitDesktopDirentIterator(BPoseView *nodeMonitoringTarget,
-	const entry_ref *ref)
+EntryListBase*
+DesktopPoseView::InitDesktopDirentIterator(BPoseView* nodeMonitoringTarget,
+	const entry_ref* ref)
 {
 	// the desktop dirent iterator knows how to iterate over all the volumes,
 	// integrated onto the desktop
@@ -75,23 +75,24 @@ DesktopPoseView::InitDesktopDirentIterator(BPoseView *nodeMonitoringTarget,
 	if (sourceModel.InitCheck() != B_OK)
 		return NULL;
 
-	CachedEntryIteratorList *result = new CachedEntryIteratorList();
+	CachedEntryIteratorList* result = new CachedEntryIteratorList();
 
 	ASSERT(!sourceModel.IsQuery());
 	ASSERT(sourceModel.Node());
-	BDirectory *sourceDirectory = dynamic_cast<BDirectory *>(sourceModel.Node());
+	BDirectory* sourceDirectory
+		= dynamic_cast<BDirectory*>(sourceModel.Node());
 
 	ASSERT(sourceDirectory);
 
 	// build an iterator list, start with boot
-	EntryListBase *perDesktopIterator = new CachedDirectoryEntryList(
-		*sourceDirectory);
+	EntryListBase* perDesktopIterator
+		= new CachedDirectoryEntryList(*sourceDirectory);
 
 	result->AddItem(perDesktopIterator);
 	if (nodeMonitoringTarget) {
 		TTracker::WatchNode(sourceModel.NodeRef(),
-				B_WATCH_DIRECTORY | B_WATCH_NAME | B_WATCH_STAT | B_WATCH_ATTR,
-				nodeMonitoringTarget);
+			B_WATCH_DIRECTORY | B_WATCH_NAME | B_WATCH_STAT | B_WATCH_ATTR,
+			nodeMonitoringTarget);
 	}
 
 	if (result->Rewind() != B_OK) {
@@ -106,15 +107,15 @@ DesktopPoseView::InitDesktopDirentIterator(BPoseView *nodeMonitoringTarget,
 }
 
 
-EntryListBase *
-DesktopPoseView::InitDirentIterator(const entry_ref *ref)
+EntryListBase*
+DesktopPoseView::InitDirentIterator(const entry_ref* ref)
 {
 	return InitDesktopDirentIterator(this, ref);
 }
 
 
 bool
-DesktopPoseView::FSNotification(const BMessage *message)
+DesktopPoseView::FSNotification(const BMessage* message)
 {
 	switch (message->FindInt32("opcode")) {
 		case B_DEVICE_MOUNTED:
@@ -131,7 +132,8 @@ DesktopPoseView::FSNotification(const BMessage *message)
 				break;
 
 			if (settings.MountVolumesOntoDesktop()
-				&& (!volume.IsShared() || settings.MountSharedVolumesOntoDesktop())) {
+				&& (!volume.IsShared()
+					|| settings.MountSharedVolumesOntoDesktop())) {
 				// place an icon for the volume onto the desktop
 				CreateVolumePose(&volume, true);
 			}
@@ -144,7 +146,7 @@ DesktopPoseView::FSNotification(const BMessage *message)
 
 
 bool
-DesktopPoseView::AddPosesThreadValid(const entry_ref *) const
+DesktopPoseView::AddPosesThreadValid(const entry_ref*) const
 {
 	return true;
 }
@@ -159,17 +161,17 @@ DesktopPoseView::AddPosesCompleted()
 
 
 bool
-DesktopPoseView::Represents(const node_ref *ref) const
+DesktopPoseView::Represents(const node_ref* ref) const
 {
-	//	When the Tracker is set up to integrate non-boot beos volumes,
-	//	it represents the home/Desktop folders of all beos volumes
+	// When the Tracker is set up to integrate non-boot beos volumes,
+	// it represents the home/Desktop folders of all beos volumes
 
 	return _inherited::Represents(ref);
 }
 
 
 bool
-DesktopPoseView::Represents(const entry_ref *ref) const
+DesktopPoseView::Represents(const entry_ref* ref) const
 {
 	BEntry entry(ref);
 	node_ref nref;
@@ -183,7 +185,7 @@ DesktopPoseView::ShowVolumes(bool visible, bool showShared)
 {
 	if (LockLooper()) {
 		SavePoseLocations();
-		if (!visible) 
+		if (!visible)
 			RemoveRootPoses();
 		else
 			AddRootPoses(true, showShared);
@@ -215,9 +217,9 @@ DesktopPoseView::StopSettingsWatch()
 
 
 void
-DesktopPoseView::AdaptToVolumeChange(BMessage *message)
+DesktopPoseView::AdaptToVolumeChange(BMessage* message)
 {
-	TTracker *tracker = dynamic_cast<TTracker *>(be_app);
+	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
 	if (!tracker)
 		return;
 
@@ -227,7 +229,8 @@ DesktopPoseView::AdaptToVolumeChange(BMessage *message)
 
 	message->FindBool("ShowDisksIcon", &showDisksIcon);
 	message->FindBool("MountVolumesOntoDesktop", &mountVolumesOnDesktop);
-	message->FindBool("MountSharedVolumesOntoDesktop", &mountSharedVolumesOntoDesktop);
+	message->FindBool("MountSharedVolumesOntoDesktop",
+		&mountSharedVolumesOntoDesktop);
 
 	BEntry entry("/");
 	Model model(&entry);
@@ -241,7 +244,8 @@ DesktopPoseView::AdaptToVolumeChange(BMessage *message)
 			entryMessage.AddInt32("opcode", B_ENTRY_REMOVED);
 			entry_ref ref;
 			if (entry.GetRef(&ref) == B_OK) {
-				BContainerWindow *disksWindow = tracker->FindContainerWindow(&ref);
+				BContainerWindow* disksWindow
+					= tracker->FindContainerWindow(&ref);
 				if (disksWindow) {
 					disksWindow->Lock();
 					disksWindow->Close();
@@ -252,7 +256,8 @@ DesktopPoseView::AdaptToVolumeChange(BMessage *message)
 		entryMessage.AddInt64("node", model.NodeRef()->node);
 		entryMessage.AddInt64("directory", model.EntryRef()->directory);
 		entryMessage.AddString("name", model.EntryRef()->name);
-		BContainerWindow *deskWindow = dynamic_cast<BContainerWindow*>(Window());
+		BContainerWindow* deskWindow
+			= dynamic_cast<BContainerWindow*>(Window());
 		if (deskWindow)
 			deskWindow->PostMessage(&entryMessage, deskWindow->PoseView());
 	}
@@ -262,14 +267,15 @@ DesktopPoseView::AdaptToVolumeChange(BMessage *message)
 
 
 void
-DesktopPoseView::AdaptToDesktopIntegrationChange(BMessage *message)
+DesktopPoseView::AdaptToDesktopIntegrationChange(BMessage* message)
 {
 	bool mountVolumesOnDesktop = true;
 	bool mountSharedVolumesOntoDesktop = true;
-	
+
 	message->FindBool("MountVolumesOntoDesktop", &mountVolumesOnDesktop);
-	message->FindBool("MountSharedVolumesOntoDesktop", &mountSharedVolumesOntoDesktop);
-	
+	message->FindBool("MountSharedVolumesOntoDesktop",
+		&mountSharedVolumesOntoDesktop);
+
 	ShowVolumes(false, mountSharedVolumesOntoDesktop);
 	ShowVolumes(mountVolumesOnDesktop, mountSharedVolumesOntoDesktop);
 }

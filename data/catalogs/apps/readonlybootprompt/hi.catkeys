@@ -1,0 +1,8 @@
+1	hindi	x-vnd.Haiku-ReadOnlyBootPrompt	2544294242
+Custom	BootPromptWindow		कस्टम 
+Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	धन्यवाद हाइकु को इस्तमाल करने के लिए! हम आशा करते हैं की आप को यह पसंद आया होगा!\n\nआप अपने मनपसंद भाषा और कीबोर्ड लेयाओउट चुन सकते है लिस्ट में से. आप बाद में दोंनो चीज़ बदल सकते है डेस्कटॉप पर से.\n\nक्या आप इंस्टॉलर रन करना चाहेंगे या फिर डेस्कटॉप को बूट करना जारी रखना चाहेंगे?\n
+Desktop (Live-CD)	BootPromptWindow		डेस्कटॉप (लाइव सीडी)
+Language	BootPromptWindow		भाषा
+Welcome to Haiku!	BootPromptWindow		हाइकू में आपका स्वागत है!
+Run Installer	BootPromptWindow		इंस्टॉलर चलाएँ
+Keymap	BootPromptWindow		कीमैप

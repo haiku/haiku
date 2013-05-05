@@ -1,34 +1,34 @@
 1	japanese	x-vnd.Haiku-Sudoku	2463385585
-Abort	ProgressWindow		中断
-Advanced	SudokuWindow		中級
-Blank	SudokuWindow		空のフィールド
-Copy	SudokuWindow		コピー
-Could not open \"%s\":\n%s\n	SudokuWindow		\"%s\" を開けませんでした。\n%s\n
-Could not set Sudoku:\n%s\n	SudokuWindow		数独を設定できませんでした:\n%s\n
-Creating solvable field	SudokuGenerator		回答可能なフィールドを作成中
-Easy	SudokuWindow		初級
-Export as…	SudokuWindow		別形式でエクスポート…
-File	SudokuWindow		ファイル
-HTML	SudokuWindow		HTML
-Hard	SudokuWindow		上級
-Help	SudokuWindow		ヘルプ
-Mark invalid values	SudokuWindow		正しくない値を表示
-Mark valid hints	SudokuWindow		正解のヒントを表示
-New	SudokuWindow		新規ゲーム
-OK	SudokuWindow		OK
-Open file…	SudokuWindow		ファイルを開く…
-Progress monitor	ProgressWindow		進行モニター
-Quit	SudokuWindow		終了
-Redo	SudokuWindow		やり直し
 Restore snapshot	SudokuWindow		スナップショットを戻す
-Searching for removable values	SudokuGenerator		除ける数値を探索中
-Snapshot current	SudokuWindow		スナップショットを作成
-Solve	SudokuWindow		回答を表示
-Solve single field	SudokuWindow		1箇所回答を表示
-Start again	SudokuWindow		ゲームをやり直す
+Could not set Sudoku:\n%s\n	SudokuWindow		数独を設定できませんでした:\n%s\n
+Export as…	SudokuWindow		別形式でエクスポート…
+OK	SudokuWindow		OK
+New	SudokuWindow		新規ゲーム
+Abort	ProgressWindow		中断
 Sudoku	System name		数独
+Could not open \"%s\":\n%s\n	SudokuWindow		\"%s\" を開けませんでした。\n%s\n
+Easy	SudokuWindow		初級
+Open file…	SudokuWindow		ファイルを開く…
+Solve single field	SudokuWindow		1箇所回答を表示
+Solve	SudokuWindow		回答を表示
+Redo	SudokuWindow		やり直し
+File	SudokuWindow		ファイル
+Advanced	SudokuWindow		中級
+Start again	SudokuWindow		ゲームをやり直す
+HTML	SudokuWindow		HTML
 Sudoku request	SudokuWindow		数独リクエスト
+Copy	SudokuWindow		コピー
+Mark valid hints	SudokuWindow		正解のヒントを表示
 Sudoku solved - congratulations!\n	SudokuWindow		数独が解けました - おめでとう!\n
+Hard	SudokuWindow		上級
+Snapshot current	SudokuWindow		スナップショットを作成
 Text	SudokuWindow		テキスト
-Undo	SudokuWindow		元に戻す
+Creating solvable field	SudokuGenerator		回答可能なフィールドを作成中
 View	SudokuWindow		表示
+Progress monitor	ProgressWindow		進行モニター
+Mark invalid values	SudokuWindow		正しくない値を表示
+Blank	SudokuWindow		空のフィールド
+Help	SudokuWindow		ヘルプ
+Searching for removable values	SudokuGenerator		除ける数値を探索中
+Undo	SudokuWindow		元に戻す
+Quit	SudokuWindow		終了

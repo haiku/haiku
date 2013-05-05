@@ -301,6 +301,64 @@ X86VMTranslationMapPAE::Unmap(addr_t start, addr_t end)
 }
 
 
+status_t
+X86VMTranslationMapPAE::DebugMarkRangePresent(addr_t start, addr_t end,
+	bool markPresent)
+{
+	start = ROUNDDOWN(start, B_PAGE_SIZE);
+	if (start >= end)
+		return B_OK;
+
+	do {
+		pae_page_directory_entry* pageDirEntry
+			= X86PagingMethodPAE::PageDirEntryForAddress(
+				fPagingStructures->VirtualPageDirs(), start);
+		if ((*pageDirEntry & X86_PAE_PDE_PRESENT) == 0) {
+			// no page table here, move the start up to access the next page
+			// table
+			start = ROUNDUP(start + 1, kPAEPageTableRange);
+			continue;
+		}
+
+		Thread* thread = thread_get_current_thread();
+		ThreadCPUPinner pinner(thread);
+
+		pae_page_table_entry* pageTable
+			= (pae_page_table_entry*)fPageMapper->GetPageTableAt(
+				*pageDirEntry & X86_PAE_PDE_ADDRESS_MASK);
+
+		uint32 index = start / B_PAGE_SIZE % kPAEPageTableEntryCount;
+		for (; index < kPAEPageTableEntryCount && start < end;
+				index++, start += B_PAGE_SIZE) {
+
+			if ((pageTable[index] & X86_PAE_PTE_PRESENT) == 0) {
+				if (!markPresent)
+					continue;
+
+				X86PagingMethodPAE::SetPageTableEntryFlags(
+					&pageTable[index], X86_PAE_PTE_PRESENT);
+			} else {
+				if (markPresent)
+					continue;
+
+				pae_page_table_entry oldEntry
+					= X86PagingMethodPAE::ClearPageTableEntryFlags(
+						&pageTable[index], X86_PAE_PTE_PRESENT);
+
+				if ((oldEntry & X86_PAE_PTE_ACCESSED) != 0) {
+					// Note, that we only need to invalidate the address, if the
+					// accessed flags was set, since only then the entry could
+					// have been in any TLB.
+					InvalidatePage(start);
+				}
+			}
+		}
+	} while (start != 0 && start < end);
+
+	return B_OK;
+}
+
+
 /*!	Caller must have locked the cache of the page to be unmapped.
 	This object shouldn't be locked.
 */
@@ -629,17 +687,20 @@ X86VMTranslationMapPAE::Query(addr_t virtualAddress,
 	// translate the page state flags
 	if ((entry & X86_PAE_PTE_USER) != 0) {
 		*_flags |= ((entry & X86_PAE_PTE_WRITABLE) != 0 ? B_WRITE_AREA : 0)
-			| B_READ_AREA;
+			| B_READ_AREA
+			| ((entry & X86_PAE_PTE_NOT_EXECUTABLE) == 0 ? B_EXECUTE_AREA : 0);
 	}
 
 	*_flags |= ((entry & X86_PAE_PTE_WRITABLE) != 0 ? B_KERNEL_WRITE_AREA : 0)
 		| B_KERNEL_READ_AREA
+		| ((entry & X86_PAE_PTE_NOT_EXECUTABLE) == 0
+			? B_KERNEL_EXECUTE_AREA : 0)
 		| ((entry & X86_PAE_PTE_DIRTY) != 0 ? PAGE_MODIFIED : 0)
 		| ((entry & X86_PAE_PTE_ACCESSED) != 0 ? PAGE_ACCESSED : 0)
 		| ((entry & X86_PAE_PTE_PRESENT) != 0 ? PAGE_PRESENT : 0);
 
 	TRACE("X86VMTranslationMapPAE::Query(%#" B_PRIxADDR ") -> %#"
-		B_PRIxPHYSADDR ":\n", *_physicalAddress, virtualAddress);
+		B_PRIxPHYSADDR ":\n", virtualAddress, *_physicalAddress);
 
 	return B_OK;
 }
@@ -675,11 +736,14 @@ X86VMTranslationMapPAE::QueryInterrupt(addr_t virtualAddress,
 	// translate the page state flags
 	if ((entry & X86_PAE_PTE_USER) != 0) {
 		*_flags |= ((entry & X86_PAE_PTE_WRITABLE) != 0 ? B_WRITE_AREA : 0)
-			| B_READ_AREA;
+			| B_READ_AREA
+			| ((entry & X86_PAE_PTE_NOT_EXECUTABLE) == 0 ? B_EXECUTE_AREA : 0);
 	}
 
 	*_flags |= ((entry & X86_PAE_PTE_WRITABLE) != 0 ? B_KERNEL_WRITE_AREA : 0)
 		| B_KERNEL_READ_AREA
+		| ((entry & X86_PAE_PTE_NOT_EXECUTABLE) == 0
+			? B_KERNEL_EXECUTE_AREA : 0)
 		| ((entry & X86_PAE_PTE_DIRTY) != 0 ? PAGE_MODIFIED : 0)
 		| ((entry & X86_PAE_PTE_ACCESSED) != 0 ? PAGE_ACCESSED : 0)
 		| ((entry & X86_PAE_PTE_PRESENT) != 0 ? PAGE_PRESENT : 0);
@@ -708,6 +772,10 @@ X86VMTranslationMapPAE::Protect(addr_t start, addr_t end, uint32 attributes,
 		newProtectionFlags = X86_PAE_PTE_USER;
 		if ((attributes & B_WRITE_AREA) != 0)
 			newProtectionFlags |= X86_PAE_PTE_WRITABLE;
+		if ((attributes & B_EXECUTE_AREA) == 0
+			&& x86_check_feature(IA32_FEATURE_AMD_EXT_NX, FEATURE_EXT_AMD)) {
+			newProtectionFlags |= X86_PAE_PTE_NOT_EXECUTABLE;
+		}
 	} else if ((attributes & B_KERNEL_WRITE_AREA) != 0)
 		newProtectionFlags = X86_PAE_PTE_WRITABLE;
 
@@ -812,7 +880,7 @@ X86VMTranslationMapPAE::ClearAccessedAndModified(VMArea* area, addr_t address,
 {
 	ASSERT(address % B_PAGE_SIZE == 0);
 
-	TRACE("X86VMTranslationMap32Bit::ClearAccessedAndModified(%#" B_PRIxADDR
+	TRACE("X86VMTranslationMapPAE::ClearAccessedAndModified(%#" B_PRIxADDR
 		")\n", address);
 
 	pae_page_directory_entry* pageDirEntry

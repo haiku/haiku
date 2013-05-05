@@ -350,6 +350,12 @@ Registrar::_MessageReceived(BMessage *message)
 			}
 			break;
 
+		case kMsgRestartAppServer:
+		{
+			fRoster->HandleRestartAppServer(message);
+			break;
+		}
+
 		default:
 			BApplication::MessageReceived(message);
 			break;

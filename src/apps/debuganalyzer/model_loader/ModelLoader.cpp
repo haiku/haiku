@@ -890,7 +890,7 @@ ModelLoader::_HandleTeamRemoved(system_profiler_team_removed* event)
 	if (Model::Team* team = fModel->TeamByID(event->team))
 		team->SetDeletionTime(fState->LastEventTime());
 	else
-		printf("Removed event for unknown team: %ld\n", event->team);
+		printf("Warning: Removed event for unknown team: %ld\n", event->team);
 }
 
 
@@ -904,11 +904,7 @@ ModelLoader::_HandleTeamExec(system_profiler_team_exec* event)
 void
 ModelLoader::_HandleThreadAdded(system_profiler_thread_added* event)
 {
-	ExtendedThreadSchedulingState* thread = _AddThread(event);
-	if (thread == NULL)
-		throw std::bad_alloc();
-
-	thread->IncrementEventCount();
+	_AddThread(event)->IncrementEventCount();
 }
 
 
@@ -916,11 +912,14 @@ void
 ModelLoader::_HandleThreadRemoved(system_profiler_thread_removed* event)
 {
 	ExtendedThreadSchedulingState* thread = fState->LookupThread(event->thread);
-	if (thread != NULL) {
-		thread->thread->SetDeletionTime(fState->LastEventTime());
-		thread->IncrementEventCount();
-	} else
-		printf("Removed event for unknown team: %ld\n", event->thread);
+	if (thread == NULL) {
+		printf("Warning: Removed event for unknown thread: %ld\n",
+			event->thread);
+		thread = _AddUnknownThread(event->thread);
+	}
+
+	thread->thread->SetDeletionTime(fState->LastEventTime());
+	thread->IncrementEventCount();
 }
 
 
@@ -932,7 +931,9 @@ ModelLoader::_HandleThreadScheduled(uint32 cpu,
 
 	ExtendedThreadSchedulingState* thread = fState->LookupThread(event->thread);
 	if (thread == NULL) {
-		printf("Schedule event for unknown thread: %ld\n", event->thread);
+		printf("Warning: Schedule event for unknown thread: %ld\n",
+			event->thread);
+		thread = _AddUnknownThread(event->thread);
 		return;
 	}
 
@@ -965,9 +966,9 @@ ModelLoader::_HandleThreadScheduled(uint32 cpu,
 
 	thread = fState->LookupThread(event->previous_thread);
 	if (thread == NULL) {
-		printf("Schedule event for unknown previous thread: %ld\n",
+		printf("Warning: Schedule event for unknown previous thread: %ld\n",
 			event->previous_thread);
-		return;
+		thread = _AddUnknownThread(event->previous_thread);
 	}
 
 	diffTime = fState->LastEventTime() - thread->lastTime;
@@ -1034,9 +1035,9 @@ ModelLoader::_HandleThreadEnqueuedInRunQueue(
 
 	ExtendedThreadSchedulingState* thread = fState->LookupThread(event->thread);
 	if (thread == NULL) {
-		printf("Enqueued in run queue event for unknown thread: %ld\n",
+		printf("Warning: Enqueued in run queue event for unknown thread: %ld\n",
 			event->thread);
-		return;
+		thread = _AddUnknownThread(event->thread);
 	}
 
 	if (thread->state == RUNNING || thread->state == STILL_RUNNING) {
@@ -1071,9 +1072,9 @@ ModelLoader::_HandleThreadRemovedFromRunQueue(uint32 cpu,
 
 	ExtendedThreadSchedulingState* thread = fState->LookupThread(event->thread);
 	if (thread == NULL) {
-		printf("Removed from run queue event for unknown thread: %ld\n",
-			event->thread);
-		return;
+		printf("Warning: Removed from run queue event for unknown thread: "
+			"%ld\n", event->thread);
+		thread = _AddUnknownThread(event->thread);
 	}
 
 	// This really only happens when the thread priority is changed
@@ -1111,7 +1112,7 @@ ModelLoader::_HandleIOSchedulerAdded(system_profiler_io_scheduler_added* event)
 {
 	Model::IOScheduler* scheduler = fModel->IOSchedulerByID(event->scheduler);
 	if (scheduler != NULL) {
-		printf("Duplicate added event for I/O scheduler %ld\n",
+		printf("Warning: Duplicate added event for I/O scheduler %ld\n",
 			event->scheduler);
 		return;
 	}
@@ -1126,18 +1127,21 @@ ModelLoader::_HandleIORequestScheduled(io_request_scheduled* event)
 {
 	IORequest* request = fIORequests->Lookup(event->request);
 	if (request != NULL) {
-		printf("Duplicate schedule event for I/O request %p\n", event->request);
+		printf("Warning: Duplicate schedule event for I/O request %p\n",
+			event->request);
 		return;
 	}
 
 	ExtendedThreadSchedulingState* thread = fState->LookupThread(event->thread);
 	if (thread == NULL) {
-		printf("I/O request for unknown thread %ld\n", event->thread);
-		return;
+		printf("Warning: I/O request for unknown thread %ld\n", event->thread);
+		thread = _AddUnknownThread(event->thread);
 	}
 
 	if (fModel->IOSchedulerByID(event->scheduler) == NULL) {
-		printf("I/O requests for unknown scheduler %ld\n", event->scheduler);
+		printf("Warning: I/O requests for unknown scheduler %ld\n",
+			event->scheduler);
+		// TODO: Add state for unknown scheduler, as we do for threads.
 		return;
 	}
 
@@ -1170,7 +1174,7 @@ ModelLoader::_HandleIOOperationStarted(io_operation_started* event)
 {
 	IORequest* request = fIORequests->Lookup(event->request);
 	if (request == NULL) {
-		printf("ModelLoader::_HandleIOOperationStarted(): I/O request for operation %p not found\n",
+		printf("Warning: I/O request for operation %p not found\n",
 			event->operation);
 		return;
 	}
@@ -1188,15 +1192,14 @@ ModelLoader::_HandleIOOperationFinished(io_operation_finished* event)
 {
 	IORequest* request = fIORequests->Lookup(event->request);
 	if (request == NULL) {
-		printf("ModelLoader::_HandleIOOperationFinished(): I/O request for "
-			"operation %p not found\n", event->operation);
+		printf("Warning: I/O request for operation %p not found\n",
+			event->operation);
 		return;
 	}
 
 	IOOperation* operation = request->FindOperation(event->operation);
 	if (operation == NULL) {
-		printf("ModelLoader::_HandleIOOperationFinished(): operation %p not "
-			"found\n", event->operation);
+		printf("Warning: operation %p not found\n", event->operation);
 		return;
 	}
 
@@ -1210,19 +1213,20 @@ ModelLoader::_AddThread(system_profiler_thread_added* event)
 	// do we know the thread already?
 	ExtendedThreadSchedulingState* info = fState->LookupThread(event->thread);
 	if (info != NULL) {
-		// TODO: ?
+		printf("Warning: Duplicate thread added event for thread %" B_PRId32
+			"\n", event->thread);
 		return info;
 	}
 
 	// add the thread to the model
 	Model::Thread* thread = fModel->AddThread(event, fState->LastEventTime());
 	if (thread == NULL)
-		return NULL;
+		throw std::bad_alloc();
 
 	// create and add a ThreadSchedulingState
 	info = new(std::nothrow) ExtendedThreadSchedulingState(thread);
 	if (info == NULL)
-		return NULL;
+		throw std::bad_alloc();
 
 	// TODO: The priority is missing from the system_profiler_thread_added
 	// struct. For now guess at least whether this is an idle thread.
@@ -1234,6 +1238,64 @@ ModelLoader::_AddThread(system_profiler_thread_added* event)
 	fState->InsertThread(info);
 
 	return info;
+}
+
+
+ModelLoader::ExtendedThreadSchedulingState*
+ModelLoader::_AddUnknownThread(thread_id threadID)
+{
+	// create a dummy "add thread" event
+	system_profiler_thread_added* event = (system_profiler_thread_added*)
+		malloc(sizeof(system_profiler_thread_added));
+	if (event == NULL)
+		throw std::bad_alloc();
+
+	if (!fModel->AddAssociatedData(event)) {
+		free(event);
+		throw std::bad_alloc();
+	}
+
+	try {
+		event->team = _AddUnknownTeam()->ID();
+		event->thread = threadID;
+		snprintf(event->name, sizeof(event->name), "unknown thread %" B_PRId32,
+			threadID);
+
+		// add the thread to the model
+		ExtendedThreadSchedulingState* state = _AddThread(event);
+		return state;
+	} catch (...) {
+		throw;
+	}
+}
+
+Model::Team*
+ModelLoader::_AddUnknownTeam()
+{
+	team_id teamID = 0;
+	Model::Team* team = fModel->TeamByID(teamID);
+	if (team != NULL)
+		return team;
+
+	// create a dummy "add team" event
+	static const char* const kUnknownThreadsTeamName = "unknown threads";
+	size_t nameLength = strlen(kUnknownThreadsTeamName);
+
+	system_profiler_team_added* event = (system_profiler_team_added*)
+		malloc(sizeof(system_profiler_team_added) + nameLength);
+	if (event == NULL)
+		throw std::bad_alloc();
+
+	event->team = teamID;
+	event->args_offset = nameLength;
+	strlcpy(event->name, kUnknownThreadsTeamName, nameLength + 1);
+
+	// add the team to the model
+	team = fModel->AddTeam(event, fState->LastEventTime());
+	if (team == NULL)
+		throw std::bad_alloc();
+
+	return team;
 }
 
 

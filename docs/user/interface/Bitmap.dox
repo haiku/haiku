@@ -1,17 +1,21 @@
 /*
- * Copyright 2011, Haiku inc.
- * Distributed under the terms of the MIT Licence.
+ * Copyright 2011 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  *
- * Documentation by:
- *		Axel Dörfler <axeld@pinc-software.de>
- *		John Scipione <jscipione@gmail.com>
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		John Scipione, jscipione@gmail.com
+ *
  * Corresponds to:
- *		/trunk/headers/os/interface/Bitmap.h	 rev 42274
- *		/trunk/src/kits/interface/Bitmap.cpp	 rev 42274
+ *		headers/os/interface/Bitmap.h	 rev 42274
+ *		src/kits/interface/Bitmap.cpp	 rev 42274
  */
+
 
 /*!
 	\file Bitmap.h
+	\ingroup interface
+	\ingroup libbe
 	\brief Defines the BBitmap class and global operators and functions for
 		handling bitmaps.
 */
@@ -34,10 +38,11 @@
 
 	An example of creating a new 32x32 pixel BBitmap object and assigning the
 	icon of the current application looks like this:
-	\code
+
+\code
 BBitmap iconBitmap = new BBitmap(BRect(0, 0, 31, 31), B_RGBA32));
 appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
-	\endcode
+\endcode
 
 	You can access the properties of a bitmap by calling the Bounds(),
 	Flags(), ColorSpace(), Area(), Bits(), BitsLength(), BytesPerRow(),

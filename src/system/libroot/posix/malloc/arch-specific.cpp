@@ -58,8 +58,13 @@ static const size_t kInitialHeapSize = 64 * B_PAGE_SIZE;
 static const size_t kHeapIncrement = 16 * B_PAGE_SIZE;
 	// the steps in which to increase the heap size (must be a power of 2)
 
+#if B_HAIKU_64_BIT
+static const addr_t kHeapReservationBase = 0x1000000000;
+static const addr_t kHeapReservationSize = 0x1000000000;
+#else
 static const addr_t kHeapReservationBase = 0x18000000;
 static const addr_t kHeapReservationSize = 0x48000000;
+#endif
 
 static area_id sHeapArea;
 static hoardLockType sHeapLock;
@@ -76,8 +81,9 @@ init_after_fork(void)
 	sHeapArea = area_for((void*)sFreeHeapBase);
 	if (sHeapArea < 0) {
 		// Where is it gone?
-		debug_printf("hoard: init_after_fork(): thread %ld, Heap area not "
-			"found! Base address: %p\n", find_thread(NULL), sHeapBase);
+		debug_printf("hoard: init_after_fork(): thread %" B_PRId32 ", Heap "
+			"area not found! Base address: %p\n", find_thread(NULL),
+			sHeapBase);
 		exit(1);
 	}
 }
@@ -93,12 +99,12 @@ __init_heap(void)
 	// size of the heap is guaranteed until the space is really needed.
 	sHeapBase = (void *)kHeapReservationBase;
 	status_t status = _kern_reserve_address_range((addr_t *)&sHeapBase,
-		B_EXACT_ADDRESS, kHeapReservationSize);
+		B_RANDOMIZED_BASE_ADDRESS, kHeapReservationSize);
 	if (status != B_OK)
 		sHeapBase = NULL;
 
 	sHeapArea = create_area("heap", (void **)&sHeapBase,
-		status == B_OK ? B_EXACT_ADDRESS : B_BASE_ADDRESS,
+		status == B_OK ? B_EXACT_ADDRESS : B_RANDOMIZED_BASE_ADDRESS,
 		kInitialHeapSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (sHeapArea < B_OK)
 		return sHeapArea;
@@ -179,7 +185,7 @@ hoardSbrk(long size)
 
 		if (chunk->size > (size_t)size + sizeof(free_chunk)) {
 			// divide this chunk into smaller bits
-			uint32 newSize = chunk->size - size;
+			size_t newSize = chunk->size - size;
 			free_chunk *next = chunk->next;
 
 			chunk = (free_chunk *)((addr_t)chunk + size);
@@ -265,8 +271,8 @@ hoardSbrk(long size)
 		// allocation.
 		if (area < 0) {
 			base = (void*)(sFreeHeapBase + sHeapAreaSize);
-			area = create_area("heap", &base, B_BASE_ADDRESS, newHeapSize,
-				B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+			area = create_area("heap", &base, B_RANDOMIZED_BASE_ADDRESS,
+				newHeapSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 		}
 
 		if (area < 0) {

@@ -45,6 +45,8 @@ of their respective holders. All rights reserved.
 
 #include <Autolock.h>
 #include <Catalog.h>
+#include <CharacterSet.h>
+#include <CharacterSetRoster.h>
 #include <Clipboard.h>
 #include <Debug.h>
 #include <E-mail.h>
@@ -87,7 +89,7 @@ using namespace BPrivate ;
 #include "Words.h"
 
 
-#define B_TRANSLATE_CONTEXT "Mail"
+#define B_TRANSLATION_CONTEXT "Mail"
 
 
 static const char *kDictDirectory = "word_dictionary";
@@ -114,7 +116,7 @@ TMailApp::TMailApp()
 	fWarnAboutUnencodableCharacters(true),
 	fStartWithSpellCheckOn(false),
 	fShowSpamGUI(true),
-	fMailCharacterSet(B_MS_WINDOWS_CONVERSION),
+	fMailCharacterSet(B_MAIL_UTF8_CONVERSION),
 	fContentFont(be_fixed_font)
 {
 	// set default values
@@ -128,6 +130,17 @@ TMailApp::TMailApp()
 	fSignatureWindowFrame.Set(6, TITLE_BAR_HEIGHT, 6 + kSigWidth,
 		TITLE_BAR_HEIGHT + kSigHeight);
 	fPrefsWindowPos.Set(6, TITLE_BAR_HEIGHT);
+
+	const BCharacterSet *defaultComposeEncoding =
+		BCharacterSetRoster::FindCharacterSetByName(
+		B_TRANSLATE_COMMENT("UTF-8", "This string is used as a key to set "
+		"default message compose encoding. It must be correct IANA name from "
+		"http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding"
+		"/character_sets.cpp Translate it only if you want to change default "
+		"message compose encoding for your locale. If you don't know what is "
+		"it and why it may needs changing, just leave \"UTF-8\"."));
+	if (defaultComposeEncoding != NULL)
+		fMailCharacterSet = defaultComposeEncoding->GetConversionID();
 
 	// Find and read settings file.
 	LoadSettings();
@@ -447,27 +460,42 @@ TMailApp::ReadyToRun()
 	fs_create_index(volume.Device(), "MAIL:draft", B_INT32_TYPE, 0);
 	fs_create_index(volume.Device(), INDEX_SIGNATURE, B_STRING_TYPE, 0);
 	fs_create_index(volume.Device(), INDEX_STATUS, B_STRING_TYPE, 0);
+	fs_create_index(volume.Device(), B_MAIL_ATTR_FLAGS, B_INT32_TYPE, 0);
 
 	// Load dictionaries
 	BPath indexDir;
 	BPath dictionaryDir;
+	BPath userDictionaryDir;
+	BPath userIndexDir;
 	BPath dataPath;
 	BPath indexPath;
 	BDirectory directory;
 	BEntry entry;
 
-	// Locate user settings directory
+	// Locate dictionaries directory
 	find_directory(B_SYSTEM_DATA_DIRECTORY, &indexDir, true);
 	indexDir.Append("spell_check");
 	dictionaryDir = indexDir;
 
+	//Locate user dictionary directory
+	find_directory(B_USER_CONFIG_DIRECTORY, &userIndexDir, true);
+	userIndexDir.Append("data/spell_check");
+	userDictionaryDir = userIndexDir;
+
+	// Create directory if needed
+	directory.CreateDirectory(userIndexDir.Path(),  NULL);
+
 	// Setup directory paths
 	indexDir.Append(kIndexDirectory);
 	dictionaryDir.Append(kDictDirectory);
+	userIndexDir.Append(kIndexDirectory);
+	userDictionaryDir.Append(kDictDirectory);
 
 	// Create directories if needed
 	directory.CreateDirectory(indexDir.Path(), NULL);
 	directory.CreateDirectory(dictionaryDir.Path(), NULL);
+	directory.CreateDirectory(userIndexDir.Path(), NULL);
+	directory.CreateDirectory(userDictionaryDir.Path(), NULL);
 
 	dataPath = dictionaryDir;
 	dataPath.Append("words");
@@ -487,14 +515,6 @@ TMailApp::ReadyToRun()
 			BNodeInfo(&copy).SetType("text/plain");
 		}
 
-		// Create user dictionary if it does not exist
-		dataPath = dictionaryDir;
-		dataPath.Append("user");
-		if (!BEntry(dataPath.Path()).Exists()) {
-			BFile user(dataPath.Path(), B_WRITE_ONLY | B_CREATE_FILE);
-			BNodeInfo(&user).SetType("text/plain");
-		}
-
 		// Load dictionaries
 		directory.SetTo(dictionaryDir.Path());
 
@@ -505,12 +525,6 @@ TMailApp::ReadyToRun()
 			&& directory.GetNextEntry(&entry) != B_ENTRY_NOT_FOUND) {
 			dataPath.SetTo(&entry);
 
-			// Identify the user dictionary
-			if (strcmp("user", dataPath.Leaf()) == 0) {
-				gUserDictFile = new BFile(dataPath.Path(), B_WRITE_ONLY | B_OPEN_AT_END);
-				gUserDict = gDictCount;
-			}
-
 			indexPath = indexDir;
 			leafName.SetTo(dataPath.Leaf());
 			leafName.Append(kMetaphone);
@@ -518,6 +532,33 @@ TMailApp::ReadyToRun()
 			gWords[gDictCount] = new Words(dataPath.Path(), indexPath.Path(), true);
 
 			indexPath = indexDir;
+			leafName.SetTo(dataPath.Leaf());
+			leafName.Append(kExact);
+			indexPath.Append(leafName.String());
+			gExactWords[gDictCount] = new Words(dataPath.Path(), indexPath.Path(), false);
+			gDictCount++;
+		}		
+
+		// Create user dictionary if it does not exist
+		dataPath = userDictionaryDir;
+		dataPath.Append("user");
+		if (!BEntry(dataPath.Path()).Exists()) {
+			BFile user(dataPath.Path(), B_WRITE_ONLY | B_CREATE_FILE);
+			BNodeInfo(&user).SetType("text/plain");
+		}
+
+		// Load user dictionary
+		if (BEntry(userDictionaryDir.Path()).Exists()) {
+			gUserDictFile = new BFile(dataPath.Path(), B_WRITE_ONLY | B_OPEN_AT_END);
+			gUserDict = gDictCount;
+
+			indexPath = userIndexDir;
+			leafName.SetTo(dataPath.Leaf());
+			leafName.Append(kMetaphone);
+			indexPath.Append(leafName.String());
+			gWords[gDictCount] = new Words(dataPath.Path(), indexPath.Path(), true);
+
+			indexPath = userIndexDir;
 			leafName.SetTo(dataPath.Leaf());
 			leafName.Append(kExact);
 			indexPath.Append(leafName.String());

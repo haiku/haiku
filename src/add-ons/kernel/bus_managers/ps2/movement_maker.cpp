@@ -483,7 +483,7 @@ TouchpadMovement::_EdgeMotion(mouse_movement *movement, touch_event *event,
 	Also, it sets the button state from movement->buttons.
 */
 void
-TouchpadMovement::_UpdateButtons(mouse_movement *movement)
+TouchpadMovement::UpdateButtons(mouse_movement *movement)
 {
 	// set click count correctly according to double click timeout
 	if (movement->buttons != 0 && fButtonsState == 0) {
@@ -549,7 +549,7 @@ TouchpadMovement::_NoTouchToMovement(touch_event *event,
 	}
 
 	movement->buttons = buttons;
-	_UpdateButtons(movement);
+	UpdateButtons(movement);
 }
 
 
@@ -601,7 +601,7 @@ TouchpadMovement::_MoveToMovement(touch_event *event, mouse_movement *movement)
 		fTapDeltaY = 0;
 	}
 
-	_UpdateButtons(movement);
+	UpdateButtons(movement);
 }
 
 

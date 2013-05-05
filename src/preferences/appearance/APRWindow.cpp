@@ -5,6 +5,7 @@
  * Authors:
  *		DarkWyrm (darkwyrm@earthlink.net)
  *		Alexander von Gluck, kallisti5@unixzen.com
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 
@@ -18,12 +19,15 @@
 #include <SpaceLayoutItem.h>
 #include <TabView.h>
 
+#include "AntialiasingSettingsView.h"
 #include "APRView.h"
 #include "defs.h"
+#include "FontView.h"
+#include "LookAndFeelSettingsView.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "APRWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "APRWindow"
 
 
 static const uint32 kMsgSetDefaults = 'dflt';
@@ -33,9 +37,9 @@ static const uint32 kMsgRevert = 'rvrt';
 APRWindow::APRWindow(BRect frame)
 	:
 	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("Appearance"), B_TITLED_WINDOW,
-		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS, B_ALL_WORKSPACES)
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS
+			| B_QUIT_ON_WINDOW_CLOSE, B_ALL_WORKSPACES)
 {
-
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
 	fDefaultsButton = new BButton("defaults", B_TRANSLATE("Defaults"),
@@ -46,32 +50,33 @@ APRWindow::APRWindow(BRect frame)
 
 	BTabView* tabView = new BTabView("tabview", B_WIDTH_FROM_LABEL);
 
+	fFontSettings = new FontView(B_TRANSLATE("Fonts"));
+
+	fColorsView = new APRView(B_TRANSLATE("Colors"));
+
+	fLookAndFeelSettings = new LookAndFeelSettingsView(
+		B_TRANSLATE("Look and feel"));
+
 	fAntialiasingSettings = new AntialiasingSettingsView(
 		B_TRANSLATE("Antialiasing"));
 
-	fDecorSettings = new DecorSettingsView(
-		B_TRANSLATE("Window Decorator"));
-
-	fColorsView = new APRView(B_TRANSLATE("Colors"), B_WILL_DRAW);
-
+	tabView->AddTab(fFontSettings);
 	tabView->AddTab(fColorsView);
+	tabView->AddTab(fLookAndFeelSettings);
 	tabView->AddTab(fAntialiasingSettings);
-	tabView->AddTab(fDecorSettings);
 
-	fDefaultsButton->SetEnabled(fColorsView->IsDefaultable()
-		|| fAntialiasingSettings->IsDefaultable()
-		|| fDecorSettings->IsDefaultable());
-	fRevertButton->SetEnabled(false);
+	_UpdateButtons();
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
 		.Add(tabView)
 		.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+			.Add(fDefaultsButton)
 			.Add(fRevertButton)
 			.AddGlue()
-			.Add(fDefaultsButton)
 		)
-		.SetInsets(5, 5, 5, 5)
+		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
+			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 	);
 }
 
@@ -81,23 +86,25 @@ APRWindow::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		case kMsgUpdate:
-			fDefaultsButton->SetEnabled(fColorsView->IsDefaultable()
-								|| fAntialiasingSettings->IsDefaultable());
-			fRevertButton->SetEnabled(true);
+			_UpdateButtons();
 			break;
+
 		case kMsgSetDefaults:
-			fColorsView -> MessageReceived(new BMessage(DEFAULT_SETTINGS));
+			fFontSettings->SetDefaults();
+			fColorsView->SetDefaults();
+			fLookAndFeelSettings->SetDefaults();
 			fAntialiasingSettings->SetDefaults();
-			fDefaultsButton->SetEnabled(false);
-			fRevertButton->SetEnabled(true);
+
+			_UpdateButtons();
 			break;
 
 		case kMsgRevert:
-			fColorsView -> MessageReceived(new BMessage(REVERT_SETTINGS));
+			fFontSettings->Revert();
+			fColorsView->Revert();
+			fLookAndFeelSettings->Revert();
 			fAntialiasingSettings->Revert();
-			fDefaultsButton->SetEnabled(fColorsView->IsDefaultable()
-								|| fAntialiasingSettings->IsDefaultable());
-			fRevertButton->SetEnabled(false);
+
+			_UpdateButtons();
 			break;
 
 		default:
@@ -107,9 +114,37 @@ APRWindow::MessageReceived(BMessage *message)
 }
 
 
-bool
-APRWindow::QuitRequested(void)
+void
+APRWindow::_UpdateButtons()
 {
-	be_app->PostMessage(B_QUIT_REQUESTED);
-	return(true);
+	fDefaultsButton->SetEnabled(_IsDefaultable());
+	fRevertButton->SetEnabled(_IsRevertable());
+}	
+
+
+bool
+APRWindow::_IsDefaultable() const
+{
+//	printf("fonts defaultable: %d\n", fFontSettings->IsDefaultable());
+//	printf("colors defaultable: %d\n", fColorsView->IsDefaultable());
+//	printf("AA defaultable: %d\n", fAntialiasingSettings->IsDefaultable());
+//	printf("decor defaultable: %d\n", fLookAndFeelSettings->IsDefaultable());
+	return fFontSettings->IsDefaultable()
+		|| fColorsView->IsDefaultable()
+		|| fLookAndFeelSettings->IsDefaultable()
+		|| fAntialiasingSettings->IsDefaultable();
+}
+
+
+bool
+APRWindow::_IsRevertable() const
+{
+//	printf("fonts revertable: %d\n", fFontSettings->IsRevertable());
+//	printf("colors revertable: %d\n", fColorsView->IsRevertable());
+//	printf("AA revertable: %d\n", fAntialiasingSettings->IsRevertable());
+//	printf("decor revertable: %d\n", fLookAndFeelSettings->IsRevertable());
+	return fFontSettings->IsRevertable()
+		|| fColorsView->IsRevertable()
+		|| fLookAndFeelSettings->IsRevertable()
+		|| fAntialiasingSettings->IsRevertable();
 }

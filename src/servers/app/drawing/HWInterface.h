@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2009, Haiku.
+ * Copyright 2005-2012, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -174,7 +174,7 @@ public:
 	// It seems to me BeOS hides the cursor (in laymans words) before
 	// BView::Draw() is called (if the cursor is within that views clipping region),
 	// then, after all drawing commands that triggered have been caried out,
-	// it shows the cursor again. This approach would have the adventage of
+	// it shows the cursor again. This approach would have the advantage of
 	// the code not cluttering/slowing down DrawingEngine.
 	// For now, we hide the cursor for any drawing operation that has
 	// a bounding box containing the cursor (in DrawingEngine) so
@@ -249,6 +249,7 @@ protected:
 			ServerCursor*		fCursorAndDragBitmap;
 			bool				fCursorVisible;
 			bool				fCursorObscured;
+			bool				fHardwareCursorEnabled;
 			BPoint				fCursorLocation;
 
 			BRect				fTrackingRect;

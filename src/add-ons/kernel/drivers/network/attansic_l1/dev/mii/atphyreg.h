@@ -31,7 +31,7 @@
 #define	_DEV_MII_ATPHYREG_H_
 
 /*
- * Registers for the Atheros/Attansic Gigabit PHY.
+ * Registers for the Attansic/Atheros Gigabit PHY.
  */
 
 /* Special Control Register */

@@ -1,14 +1,17 @@
+/*
+ * Copyright 1994-1997 Mark Kilgard, All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *      Mark Kilgard
+ */
 #ifndef __glut_h__
 #define __glut_h__
 
-/* Copyright (c) Mark J. Kilgard, 1994, 1995, 1996, 1998. */
-
-/* This program is freely distributable without licensing fees  and is
-   provided without guarantee or warrantee expressed or  implied. This
-   program is -not- in the public domain. */
 
 #include <GL/gl.h>
 #include <GL/glu.h>
+
 
 #if defined(__MINGW32__)
 #include <GL/mesa_wgl.h>
@@ -751,5 +754,6 @@ GLUTAPI int GLUTAPIENTRY glutGameModeGet(GLenum mode);
 #ifdef __cplusplus
 }
 #endif
+
 
 #endif                  /* __glut_h__ */

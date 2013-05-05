@@ -83,7 +83,7 @@ struct _IO_codecvt __libio_codecvt =
 #ifdef _LIBC
 struct __gconv_trans_data __libio_translit attribute_hidden =
 {
-  .__trans_fct = __gconv_transliterate
+  .__trans_fct = NULL
 };
 #endif
 

@@ -1,14 +1,22 @@
 SubDir HAIKU_TOP src apps glteapot ;
+SubDirSysHdrs $(HAIKU_GLU_HEADERS) ;
+SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-Application GLTeapot :
+local sources =
 	FPS.cpp
 	GLObject.cpp
 	ObjectView.cpp
 	error.cpp
 	TeapotWindow.cpp
 	TeapotApp.cpp
+;
+
+Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+
+Application GLTeapot :
+	$(sources)
 	: be GL game $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
 	: GLTeapot.rdef
 ;

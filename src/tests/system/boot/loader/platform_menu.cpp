@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2012, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -40,7 +40,7 @@ print_item_at(int32 line, MenuItem *item, bool clearHelp = true)
 		printf(" ");
 
 	printf(item->Label());
-	
+
 	if (item->Submenu() && item->Submenu()->Type() == CHOICE_MENU) {
 		// show the current choice (if any)
 		Menu *subMenu = item->Submenu();
@@ -165,11 +165,16 @@ platform_run_menu(Menu *menu)
 		char buffer[32];
 		if (fgets(buffer, sizeof(buffer), stdin) == NULL)
 			return;
-	
+
 		if (buffer[0] != '\n')
 			selected = atoi(buffer);
 
 		item = menu->ItemAt(selected);
+		if (item == NULL) {
+			printf("Invalid choice.");
+			continue;
+		}
+
 		item->Select(true);
 
 		// leave the menu
@@ -194,3 +199,10 @@ platform_run_menu(Menu *menu)
 	}
 }
 
+
+size_t
+platform_get_user_input_text(Menu* menu, MenuItem* item, char* buffer,
+	size_t bufferSize)
+{
+	return 0;
+}

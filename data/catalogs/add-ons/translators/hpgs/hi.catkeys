@@ -1,0 +1,12 @@
+1	hindi	x-vnd.Haiku-HPGSTranslator	3633584048
+Based on HPGS (http://hpgs.berlios.de)	ConfigView		अचपिजीअस पे आधारित (http://hpgs.berlios.de)
+Version %d.%d.%d, %s	ConfigView		संस्करण %d.%d.%d, %s
+Error: Cannot process plot data %s\n	HPGSTranslator		त्रुटि: साजिश डेटा की प्रक्रिया नहीं कर सकता %s\n
+HPGS image	HPGSTranslator		अचपिजीअस चित्र
+HPGSTranslator Settings	ConfigView		अचपिजीअस अनुवादक सेटिंग्स
+Error: Cannot imbue plot device to reader: %s\n	HPGSTranslator		त्रुटि: पाठक को साजिश डिवाइस रंग नहीं सकते: %s\n
+HPGS images	ConfigView		अचपिजीअस चित्र 
+HPGS images	HPGSTranslator		अचपिजीअस चित्र
+no hpgs\n	HPGSTranslator		कोई अचपिजीअस नहीं\n
+HPGS image translator	HPGSTranslator		अचपिजीअस चित्र अनुवादक
+Write error %s\n	HPGSTranslator		त्रुटि: लिखें %s\n

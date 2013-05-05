@@ -96,7 +96,7 @@ BCheckBox::Archive(BMessage *archive, bool deep) const
 void
 BCheckBox::Draw(BRect updateRect)
 {
-	if (be_control_look) {
+	if (be_control_look != NULL) {
 		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 
 		uint32 flags = be_control_look->Flags(this);
@@ -440,16 +440,6 @@ BCheckBox::ResizeToPreferred()
 }
 
 
-void
-BCheckBox::InvalidateLayout(bool descendants)
-{
-	// invalidate cached preferred size
-	fPreferredSize.Set(B_SIZE_UNSET, B_SIZE_UNSET);
-
-	BControl::InvalidateLayout(descendants);
-}
-
-
 BSize
 BCheckBox::MinSize()
 {
@@ -558,11 +548,11 @@ BCheckBox::Perform(perform_code code, void* _data)
 			BCheckBox::SetLayout(data->layout);
 			return B_OK;
 		}
-		case PERFORM_CODE_INVALIDATE_LAYOUT:
+		case PERFORM_CODE_LAYOUT_INVALIDATED:
 		{
-			perform_data_invalidate_layout* data
-				= (perform_data_invalidate_layout*)_data;
-			BCheckBox::InvalidateLayout(data->descendants);
+			perform_data_layout_invalidated* data
+				= (perform_data_layout_invalidated*)_data;
+			BCheckBox::LayoutInvalidated(data->descendants);
 			return B_OK;
 		}
 		case PERFORM_CODE_DO_LAYOUT:
@@ -573,6 +563,14 @@ BCheckBox::Perform(perform_code code, void* _data)
 	}
 
 	return BControl::Perform(code, _data);
+}
+
+
+void
+BCheckBox::LayoutInvalidated(bool descendants)
+{
+	// invalidate cached preferred size
+	fPreferredSize.Set(B_SIZE_UNSET, B_SIZE_UNSET);
 }
 
 
@@ -623,5 +621,16 @@ BCheckBox &
 BCheckBox::operator=(const BCheckBox &)
 {
 	return *this;
+}
+
+
+extern "C" void
+B_IF_GCC_2(InvalidateLayout__9BCheckBoxb, _ZN9BCheckBox16InvalidateLayoutEb)(
+	BCheckBox* box, bool descendants)
+{
+	perform_data_layout_invalidated data;
+	data.descendants = descendants;
+
+	box->Perform(PERFORM_CODE_LAYOUT_INVALIDATED, &data);	
 }
 

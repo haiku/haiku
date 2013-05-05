@@ -1,0 +1,27 @@
+1	hindi	x-vnd.Haiku-mixer.media_addon	3450667169
+Input gain controls represent	AudioMixer		अंदरी लाभ कंट्रोल्स दिखातें है 
+Linear interpolation	AudioMixer		लिनिअर इन्तेर्पोलाशन
+Virtual output channels	AudioMixer		विर्तुअल आउटपुट चंनेल्स
+Refuse output format changes	AudioMixer		आउटपुट फॉर्मेट बदलाव को मन कर दो
+Output mapping	AudioMixer		आउटपुट मप्पिंग
+Allow input channel remapping	AudioMixer		इनपुट चैनल रेमप्पिंग को अनुमति दो
+Resampling algorithm	AudioMixer		रेसम्प्लिंग अल्गोरिथम
+Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		अत्तेनुअते मिक्सेर ओउत्पुट 3dB (like BeOS R5) से
+Display balance control for stereo connections	AudioMixer		बालंस कण्ट्रोल सस्टीरियो कोन्नेक्टिओंस के लिए दिखाओ
+To output	AudioMixer		आउटपुट के लिए
+not connected	AudioMixer		कोन्नेक्ट नहीं है
+Refuse input format changes	AudioMixer		इनपुट फॉर्मेट बदलाव को मना कर दें
+Drop/repeat samples	AudioMixer		डालें/वापस करें सम्प्लेस
+Output channel sources	AudioMixer		ओउत्पुत चैनल सोर्सेस
+dB	AudioMixer		dB
+Gain controls	AudioMixer		गेन नियंत्रक
+Input mapping	AudioMixer		इनपुट मप्पिंग
+Mute	AudioMixer		मूयट
+Input channel destinations	AudioMixer		इनपुट चैनल देस्तिनास्हंस 
+To master	AudioMixer		मास्टर के लिए
+Master output	AudioMixer		मास्टर ओउत्पुट 
+Setup	AudioMixer		सेटअप
+Use non linear gain sliders (like BeOS R5)	AudioMixer		नॉन लिनिअर गईं स्लिदेर्स का इस्तमाल करें (जैसे BeOS R5)
+Gain	AudioMixer		लाभ
+Allow output channel remapping	AudioMixer		आउटपुट चैनल रेमप्पिंग को अनुमति दें
+Physical input channels	AudioMixer		भौतिक इनपुट चंनेल्स

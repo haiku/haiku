@@ -1,0 +1,9 @@
+1	dutch; flemish	x-vnd.Haiku-IMAP	3892875357
+Destination:	imap_config		Doel:
+status	IMAPFolderConfig		status
+Apply	IMAPFolderConfig		Toepassen
+IMAP Folders	imap_config		IMAP mappen
+Fetching IMAP folders, have patience...	IMAPFolderConfig		IMAP mappen ophalen, heb geduld...
+IMAP Folders	IMAPFolderConfig		IMAP Mappen
+Subcribe / Unsuscribe IMAP folders, have patience...	IMAPFolderConfig		Abonneer / De-abonneer IMAP mappen, heb geduld...
+Failed to fetch available storage.	IMAPFolderConfig		Fout bij het ophalen van de beschikbare opslag.

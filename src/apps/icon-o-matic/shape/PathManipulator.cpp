@@ -37,8 +37,8 @@
 #include "TransformPointsBox.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Icon-O-Matic-PathManipulator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Icon-O-Matic-PathManipulator"
 #define POINT_EXTEND 3.0
 #define CONTROL_POINT_EXTEND 2.0
 #define INSERT_DIST_THRESHOLD 7.0

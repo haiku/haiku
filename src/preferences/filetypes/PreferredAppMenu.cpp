@@ -21,8 +21,8 @@
 #include <string.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Preferred App Menu"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Preferred App Menu"
 
 
 static int
@@ -291,8 +291,9 @@ retrieve_preferred_app(BMessage* message, bool sameAs, const char* forType,
 			description[0] ? description : preferred);
 
 		BAlert* alert = new BAlert(B_TRANSLATE("FileTypes request"), warning,
-			B_TRANSLATE("Set Preferred Application"), B_TRANSLATE("Cancel"),
+			B_TRANSLATE("Set preferred application"), B_TRANSLATE("Cancel"),
 			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetShortcut(1, B_ESCAPE);
 		if (alert->Go() == 1)
 			return B_ERROR;
 	}

@@ -152,6 +152,13 @@ BSplitView::SetItemWeight(BLayoutItem* item, float weight)
 }
 
 
+bool
+BSplitView::IsCollapsible(int32 index) const
+{
+	return fSplitLayout->IsCollapsible(index);
+}
+
+
 void
 BSplitView::SetCollapsible(bool collapsible)
 {
@@ -170,6 +177,20 @@ void
 BSplitView::SetCollapsible(int32 first, int32 last, bool collapsible)
 {
 	fSplitLayout->SetCollapsible(first, last, collapsible);
+}
+
+
+bool
+BSplitView::IsItemCollapsed(int32 index) const
+{
+	return fSplitLayout->IsItemCollapsed(index);
+}
+
+
+void
+BSplitView::SetItemCollapsed(int32 index, bool collapsed)
+{
+	fSplitLayout->SetItemCollapsed(index, collapsed);
 }
 
 
@@ -230,6 +251,13 @@ BSplitView::Draw(BRect updateRect)
 
 
 void
+BSplitView::DrawAfterChildren(BRect r)
+{
+	return BView::DrawAfterChildren(r);
+}
+
+
+void
 BSplitView::MouseDown(BPoint where)
 {
 	SetMouseEventMask(B_POINTER_EVENTS,
@@ -277,6 +305,13 @@ BSplitView::MouseMoved(BPoint where, uint32 transit, const BMessage* message)
 
 
 void
+BSplitView::MessageReceived(BMessage* message)
+{
+	return BView::MessageReceived(message);
+}
+
+
+void
 BSplitView::SetLayout(BLayout* layout)
 {
 	// not allowed
@@ -287,6 +322,13 @@ status_t
 BSplitView::Archive(BMessage* into, bool deep) const
 {
 	return BView::Archive(into, deep);
+}
+
+
+status_t
+BSplitView::AllArchived(BMessage* archive) const
+{
+	return BView::AllArchived(archive);
 }
 
 
@@ -330,3 +372,23 @@ BSplitView::_DrawDefaultSplitter(BView* view, BRect frame,
 	be_control_look->DrawSplitter(view, frame, updateRect, view->ViewColor(),
 		orientation, flags, 0);
 }
+
+
+status_t
+BSplitView::Perform(perform_code d, void* arg)
+{
+	return BView::Perform(d, arg);
+}
+
+
+void BSplitView::_ReservedSplitView1() {}
+void BSplitView::_ReservedSplitView2() {}
+void BSplitView::_ReservedSplitView3() {}
+void BSplitView::_ReservedSplitView4() {}
+void BSplitView::_ReservedSplitView5() {}
+void BSplitView::_ReservedSplitView6() {}
+void BSplitView::_ReservedSplitView7() {}
+void BSplitView::_ReservedSplitView8() {}
+void BSplitView::_ReservedSplitView9() {}
+void BSplitView::_ReservedSplitView10() {}
+

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DATA_READER_H
@@ -100,7 +100,7 @@ public:
 	template<typename Type>
 	Type Read(const Type& defaultValue)
 	{
-		if (fSize < sizeof(Type)) {
+		if (fSize < (off_t)sizeof(Type)) {
 			fOverflow = true;
 			fSize = 0;
 			return defaultValue;

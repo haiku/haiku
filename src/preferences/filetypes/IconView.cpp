@@ -4,11 +4,13 @@
  */
 
 
+#include "FileTypes.h"
 #include "IconView.h"
 #include "MimeTypeListView.h"
 
 #include <Application.h>
 #include <AppFileInfo.h>
+#include <Attributes.h>
 #include <Bitmap.h>
 #include <Catalog.h>
 #include <IconEditorProtocol.h>
@@ -27,8 +29,8 @@
 #include <string.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Icon View"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Icon View"
 
 
 using namespace std;
@@ -616,7 +618,9 @@ IconView::MessageReceived(BMessage* message)
 			if (message->FindString("attr", &name) != B_OK)
 				break;
 
-			if (!strcmp(name, "BEOS:L:STD_ICON"))
+			if (!strcmp(name, kAttrMiniIcon)
+				|| !strcmp(name, kAttrLargeIcon)
+				|| !strcmp(name, kAttrIcon))
 				Update();
 			break;
 		}
@@ -810,6 +814,7 @@ IconView::MouseDown(BPoint where)
 			// start tracking - this icon might be dragged around
 			fDragPoint = where;
 			fTracking = true;
+			SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 		}
 	}
 
@@ -900,7 +905,6 @@ IconView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 		DragMessage(&message, dragBitmap, B_OP_ALPHA,
 			fDragPoint - BitmapRect().LeftTop(), this);
 		fDragging = true;
-		SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 	}
 
 	if (dragMessage != NULL && !fDragging && AcceptsDrag(dragMessage)) {
@@ -1023,12 +1027,12 @@ IconView::Update()
 		if (file.InitCheck() != B_OK)
 			return;
 
-		BAppFileInfo info;
+		BNodeInfo info;
 		if (info.SetTo(&file) != B_OK)
 			return;
 
 		icon = Icon::AllocateBitmap(fIconSize);
-		if (icon != NULL && info.GetIconForType(fType.Type(), icon,
+		if (icon != NULL && info.GetTrackerIcon(icon,
 				(icon_size)fIconSize) != B_OK) {
 			delete icon;
 			return;
@@ -1231,14 +1235,26 @@ IconView::_SetIcon(BBitmap* large, BBitmap* mini, const uint8* data,
 	if (fHasRef) {
 		BFile file(&fRef, B_READ_WRITE);
 
-		BAppFileInfo info(&file);
-		if (info.InitCheck() == B_OK) {
-			if (large != NULL || force)
-				info.SetIconForType(fType.Type(), large, B_LARGE_ICON);
-			if (mini != NULL || force)
-				info.SetIconForType(fType.Type(), mini, B_MINI_ICON);
-			if (data != NULL || force)
-				info.SetIconForType(fType.Type(), data, size);
+		if (is_application(file)) {
+			BAppFileInfo info(&file);
+			if (info.InitCheck() == B_OK) {
+				if (large != NULL || force)
+					info.SetIconForType(fType.Type(), large, B_LARGE_ICON);
+				if (mini != NULL || force)
+					info.SetIconForType(fType.Type(), mini, B_MINI_ICON);
+				if (data != NULL || force)
+					info.SetIconForType(fType.Type(), data, size);
+			}
+		} else {
+			BNodeInfo info(&file);
+			if (info.InitCheck() == B_OK) {
+				if (large != NULL || force)
+					info.SetIcon(large, B_LARGE_ICON);
+				if (mini != NULL || force)
+					info.SetIcon(mini, B_MINI_ICON);
+				if (data != NULL || force)
+					info.SetIcon(data, size);
+			}
 		}
 		// the icon shown will be updated using node monitoring
 	} else if (fHasType) {

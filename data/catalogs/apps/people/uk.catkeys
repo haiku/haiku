@@ -1,38 +1,48 @@
-1	ukrainian	x-vnd.Be-PEPL	2118114394
-Address	People		Адреса
-Cancel	People		Відмінити
+1	ukrainian	x-vnd.Be-PEPL	3273435274
+Edit	People		Редагувати
+Error	People		Помилка
 City	People		Місто
-Close	People		Закрити
+The file '%name%' could not be written.	People		Файл '%name%' не може бути записаний.
+none	Groups list		нічого
+Configure attributes	People		Встановити атрибути
 Company	People		Компанія
-Contact information for a person.	Long mimetype description		Контактна інформація особи
-Contact name	People		Контактне ім'я
-Copy	People		Копіювати
+%name% picture	People		%name% малюнок
+Work phone	People		Робочий телефон
+People	System name		Люди
+New person	People		Нова персона
+Select all	People		Вибрати всіх
+File	People		Файл
+Unnamed person	People		Безіменна особа
 Could not create %s.	People		Не вдалося створити %s.
 Country	People		Країна
-Cut	People		Вирізати
-E-mail	People		E-mail
-Edit	People		Редагувати
-Fax	People		Факс
-File	People		Файл
+Close	People		Закрити
 Group	People		Група
-Home phone	People		Домашній телефон
-Name	People		Ім'я
-New person	People		Нова персона
-New person…	People		Нова особа
 Nickname	People		Нік
-OK	People		Гаразд
-Paste	People		Вставити
-Person	Short mimetype description		Особа
 Quit	People		Вийти
-Redo	People		Переробити
+Name	People		Ім'я
 Revert	People		Повернути
-Save	People		Зберегти
-Save changes before quitting?	People		Зберегти настройки перед виходом?
-Select all	People		Вибрати всіх
-Sorry	People		Вибачте
-State	People		Держава
-URL	People		URL
 Undo	People		Cкасувати
-Work phone	People		Робочий телефон
+E-mail	People		E-mail
+Load image…	People		Завантажити зображення…
+OK	People		Гаразд
+Remove image	People		Видалити зображення
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Підключення префлету Типи Файлів призупинене.\n\nПомилка:
+Home phone	People		Домашній телефон
+Save as…	People		Зберегти як…
+Redo	People		Переробити
+Paste	People		Вставити
+Drop an image here,\nor use the contextual menu.	People		Перемістіть зображення сюди,\nабо використайте контекстне меню.
+Save	People		Зберегти
+Person	Short mimetype description		Особа
+New person…	People		Нова особа
+Address	People		Адреса
+URL	People		URL
+Sorry	People		Вибачте
 Zip	People		Індекс
-none	Groups list		нічого
+Contact information for a person.	Long mimetype description		Контактна інформація особи
+Fax	People		Факс
+Contact name	People		Контактне ім'я
+Cut	People		Вирізати
+Cancel	People		Відмінити
+State	People		Держава
+Copy	People		Копіювати

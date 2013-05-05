@@ -14,4 +14,4 @@
 //#define ATOMIC64_FUNCS_ARE_SYSCALLS
 
 
-#endif	/* _KERNEL_ARCH_M68K_CONFIG_H */
+#endif	/* _KERNEL_ARCH_ARM_CONFIG_H */

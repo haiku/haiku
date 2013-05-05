@@ -1,0 +1,1329 @@
+/*
+ * Copyright 2001-2013 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Stephan Aßmus <superstippi@gmx.de>
+ *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/TextView.h	 hrev45377
+ *		src/kits/interface/TextView.cpp	 hrev45377
+ */
+
+
+/*!
+	\file TextView.h
+	\ingroup interface
+	\ingroup libbe
+	\brief Provides the BTextView class and associated structs.
+*/
+
+
+/*!
+	\struct text_run
+	\ingroup interface
+	\ingroup libbe
+	\brief text run struct
+*/
+
+
+/*!
+	\var text_run::offset
+*/
+
+
+/*!
+	\var text_run::font
+*/
+
+
+/*!
+	\var text_run::color
+*/
+
+
+/*!
+	\struct text_run_array
+	\ingroup interface
+	\ingroup libbe
+	\brief text run array struct
+*/
+
+
+/*!
+	\var text_run_array::count
+*/
+
+
+/*!
+	\var text_run_array::runs
+*/
+
+
+/*!
+	\enum undo_state
+	\ingroup interface
+
+	Undo state flags.
+*/
+
+
+/*!
+	\var undo_state B_UNDO_UNAVAILABLE
+*/
+
+
+/*!
+	\var undo_state B_UNDO_TYPING
+*/
+
+
+/*!
+	\var undo_state B_UNDO_CUT
+*/
+
+
+/*!
+	\var undo_state B_UNDO_PASTE
+*/
+
+
+/*!
+	\var undo_state B_UNDO_CLEAR
+*/
+
+
+/*!
+	\var undo_state B_UNDO_DROP
+*/
+
+
+/*!
+	\class BTextView
+	\ingroup interface
+	\ingroup libbe
+	\brief Displays and manipulates styled text.
+*/
+
+
+/*!
+	\fn BTextView::BTextView(BRect frame, const char* name, BRect textRect,
+		uint32 resizeMask, uint32 flags)
+	\brief Creates a new BTextView object.
+
+	\param frame The frame rectangle of the view.
+	\param name The name of the view.
+	\param textRect The area of the text within the view.
+	\param resizeMask Resizing mask, passed to BView.
+	\param flags \a flags passed to BView, \c B_FRAME_EVENTS,
+		\c B_PULSE_NEEDED and \c B_INPUT_METHOD_AWARE are always set.
+*/
+
+
+/*!
+	\fn BTextView::BTextView(BRect frame, const char* name, BRect textRect,
+		const BFont* initialFont, const rgb_color* initialColor,
+		uint32 resizeMask, uint32 flags)
+	\brief Creates a new BTextView object and sets the initial font and color.
+
+	\param frame The BTextView frame rectangle.
+	\param name The name of the object.
+	\param textRect The area of the text within the BTextView object.
+	\param initialFont The text font to display.
+	\param initialColor The text color to display.
+	\param resizeMask Resizing mask, passed to BView.
+	\param flags \a flags passed to BView, \c B_FRAME_EVENTS,
+		\c B_PULSE_NEEDED and \c B_INPUT_METHOD_AWARE are always set.
+*/
+
+
+/*!
+	\fn BTextView::BTextView(const char* name, uint32 flags)
+	\brief Creates a BTextView object, dynamic layout version.
+
+	\param name The name of the object.
+	\param flags \a flags passed to BView, \c B_FRAME_EVENTS,
+		\c B_PULSE_NEEDED and \c B_INPUT_METHOD_AWARE are always set.
+*/
+
+
+/*!
+	\fn BTextView::BTextView(const char* name, const BFont* initialFont,
+		const rgb_color* initialColor, uint32 flags)
+	\brief Creates a new BTextView object and sets the initial font and color,
+	       dynamic layout version.
+
+	\param name The name of the object.
+	\param initialFont The text font to display.
+	\param initialColor The text color to display.
+	\param flags \a flags passed to BView, \c B_FRAME_EVENTS,
+		\c B_PULSE_NEEDED and \c B_INPUT_METHOD_AWARE are always set.
+*/
+
+
+/*!
+	\fn BTextView::BTextView(BMessage* archive)
+	\brief Creates a BTextView object from the passed in \a archive.
+
+	\param archive The BMessage object from which the object is created.
+*/
+
+
+/*!
+	\fn BTextView::~BTextView()
+	\brief Frees the memory allocated and destroys the object.
+*/
+
+
+/*!
+	\name Archiving
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BArchivable* BTextView::Instantiate(BMessage* archive)
+	\brief Instantiates a BTextView object from the passed in \a archive.
+
+	\param archive The BMessage object that the object is created from.
+
+	\return A new BTextView object as a BArchivable.
+*/
+
+
+/*!
+	\fn status_t BTextView::Archive(BMessage* data, bool deep) const
+	\brief Archives the object into the \a data message.
+
+	\param data A pointer to the BMessage object to archive the object into.
+	\param deep Whether or not to archive child views as well.
+
+	\return A status code, \c B_OK if everything went well or an error code
+	        otherwise.
+	\retval B_OK The object was archived.
+	\retval B_NO_MEMORY Ran out of memory while archiving the object.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Hook methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BTextView::AttachedToWindow()
+	\brief Hook method called when the text view is added to the view hierarchy.
+
+	Sets the pulse rate to 2 per second and adjust scrollbars if needed.
+
+	\see BView::AttachedToWindow()
+*/
+
+
+/*!
+	\fn void BTextView::DetachedFromWindow()
+	\brief Hook method that is called when the text view is removed from the
+	       view hierarchy.
+
+	\see BView::DetachedFromWindow()
+*/
+
+
+/*!
+	\fn void BTextView::Draw(BRect updateRect)
+	\brief Hook method called to draw the contents of the text view.
+
+	\param updateRect The rectangular area to draw.
+
+	\see BView::Draw()
+*/
+
+
+/*!
+	\fn void BTextView::MouseDown(BPoint where)
+	\brief Hook method that is called when a mouse button is pushed down while
+	       the cursor is contained in the view.
+
+	\param where The location where the mouse button was pushed down.
+
+	\see BView::MouseDown()
+*/
+
+
+/*!
+	\fn void BTextView::MouseUp(BPoint where)
+	\brief Hook method that is called when a mouse button is released while
+	       the cursor is contained in the view.
+
+	This method stops asynchronous mouse tracking.
+
+	\param where The location that the mouse button was released.
+
+	\see BView::MouseUp()
+*/
+
+
+/*!
+	\fn void BTextView::MouseMoved(BPoint where, uint32 code,
+		const BMessage* message)
+	\brief Hook method that is called whenever the mouse cursor enters, exits
+	       or moves inside the view.
+
+	\param where The point where the mouse cursor has moved to.
+	\param code A code which indicates if the mouse entered or exited the view.
+	\param message A message containing drag and drop information.
+
+	\see BView::MouseMoved()
+*/
+
+
+/*!
+	\fn void BTextView::WindowActivated(bool state)
+	\brief Hook method that is called when the window becomes the active window
+	       or gives up that status.
+
+	\param state If \c true, window has just been activated. If \c false the
+	       window has just been deactivated.
+
+	\see BView::WindowActivated()
+*/
+
+
+/*!
+	\fn void BTextView::KeyDown(const char* bytes, int32 numBytes)
+	\brief Hook method that is called when a key is pressed while the view is
+	       the focus view of the active window.
+
+	\see BView::KeyDown()
+*/
+
+
+/*!
+	\fn void BTextView::Pulse()
+	\brief Hook method that is called at a set interval.
+
+	This method is used to make the I-beam blink.
+
+	\see BView::Pulse()
+*/
+
+
+/*!
+	\fn void BTextView::FrameResized(float width, float height)
+	\brief Hook method that is called when the frame is resized.
+
+	This method updates any associated scrollbars.
+
+	\param width The new view width.
+	\param height The new view height.
+
+	\see BView::FrameResized()
+*/
+
+
+/*!
+	\fn void BTextView::MessageReceived(BMessage* message)
+	\brief Hook method called with a message is received by the text view.
+
+	\param message The message received by the text view.
+
+	\see BView::MessageReceived()
+*/
+
+
+//! @}
+
+
+/*!
+	\fn void BTextView::MakeFocus(bool focusState)
+	\brief Highlight or unhighlight the selection when the text view acquires
+		or loses its focus state.
+
+	\param focusState \c true to receive focus or \c false to lose it.
+
+	\see BView::MakeFocus()
+*/
+
+
+/*!
+	\fn BHandler* BTextView::ResolveSpecifier(BMessage* message, int32 index,
+		BMessage* specifier, int32 what, const char* property)
+	\brief Returns the proper handler for the passed in scripting \a message.
+
+	\param message The scripting message to determine the handler.
+	\param index The index of the specifier.
+	\param specifier The message which contains the specifier.
+	\param what The 'what' field of the specifier message.
+	\param property The name of the target property.
+
+	\return The proper BHandler for the passed in scripting \a message.
+
+	\see BView::ResolveSpecifier()
+*/
+
+
+/*!
+	\name SetText
+
+	The BTextView doesn't keep a reference to the \a text buffer, \a file, or
+	\a runs array you pass in, you can \c delete them after SetText() returns.
+
+	If the BTextView supports multiple character styles and a
+	\c text_run_array is passed in it will be used to set the font and color
+	formats of the new text.
+
+	If the BTextView does not support multiple character styles, then the
+	\c text_run_array parameter is ignored.
+
+	\see IsStylable()
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BTextView::SetText(const char* text, const text_run_array* runs)
+	\brief Copies text from the \a text buffer replacing any text currently
+	       set in the BTextView with the font and color formats set by \a runs.
+
+	\param text The text to set.
+	\param runs The text styling to set, can be \c NULL.
+*/
+
+
+/*!
+	\fn void BTextView::SetText(const char* text, int32 length,
+		const text_run_array* runs)
+	\brief Copies text from the \a text buffer up to \a length characters
+	       replacing any text currently set in the BTextView with the font and
+	       color formats set by \a runs.
+
+	\a text must be at least \a length characters long. \a length may be set
+	to 0 to clear the text from the BTextView.
+
+	\param text The text to set.
+	\param length The number of bytes of text to set.
+	\param runs The text styling to use, can be \c NULL.
+*/
+
+
+/*!
+	\fn void BTextView::SetText(BFile* file, int32 offset, int32 length,
+		const text_run_array* runs)
+	\brief Copies text from the \a file starting at the given \a offset up to
+	       \a length characters replacing any text currently set in the
+	       BTextView with the font and color formats set by \a runs.
+
+	\param file The file to set the text from.
+	\param offset The position in the file to start reading text.
+	\param length The number of bytes of text to read from the file.
+	\param runs The text styling to use, can be \c NULL.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Insert
+
+	The BTextView doesn't keep a reference to the \a text buffer or
+	\a runs array you pass in, you can \c delete them after Insert() returns.
+
+	If the BTextView supports multiple character styles and a
+	\c text_run_array is passed in it will be used to set the font and color
+	formats of the new text.
+
+	If the BTextView does not support multiple character styles, then the
+	\c text_run_array parameter is ignored.
+
+	\see IsStylable()
+*/
+
+
+/*!
+	\fn void BTextView::Insert(const char* text, const text_run_array* runs)
+	\brief Inserts text from the \a text buffer at the end of the BTextView
+	       with the font and color formats set by \a runs.
+
+	\param text The text to insert.
+	\param runs The text styling to set, can be \c NULL.
+*/
+
+
+/*!
+	\fn void BTextView::Insert(const char* text, int32 length,
+		const text_run_array* runs)
+	\brief Inserts text from the \a text buffer up to \a length characters
+	       at the end of the BTextView with the font and color formats set by
+	       \a runs.
+
+	\param text The text to insert.
+	\param length The number of bytes of text to insert.
+	\param runs The text styling to use, can be \c NULL.
+*/
+
+
+/*!
+	\fn void BTextView::Insert(int32 offset, const char* text, int32 length,
+		const text_run_array* runs)
+	\brief Inserts text starting at the given \a offset from the \a text buffer
+	       up to \a length characters into the BTextView with the font and
+	       color formats set by \a runs.
+
+	\param offset The position to start inserting text.
+	\param text The text to set.
+	\param length The number of bytes of text to insert.
+	\param runs The text styling to use, can be \c NULL.
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BTextView::SetText(const char* text, const text_run_array* runs)
+*/
+
+
+/*!
+	\fn void BTextView::SetText(const char* text, int32 length,
+		const text_run_array* runs)
+*/
+
+
+/*!
+	\fn void BTextView::SetText(BFile* file, int32 offset, int32 length,
+		const text_run_array* runs)
+*/
+
+//! @}
+
+
+/*!
+	\name Delete
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BTextView::Delete()
+	\brief Deletes the text within the current selection.
+*/
+
+
+/*!
+	\fn void BTextView::Delete(int32 startOffset, int32 endOffset)
+	\brief Deletes the text enclosed within the given offsets.
+	\param startOffset The offset where the text to delete starts.
+	\param endOffset The offset where the text to delete ends.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Text information
+*/
+
+
+//! @{
+
+
+/*!
+	\fn const char* BTextView::Text() const
+	\brief Returns the BTextView text as a byte array.
+
+	\warning It is possible that the BTextView object had to do some operations
+	         on the text, to be able to return it as a C string. If you need to
+	         call Text() repeatedly, you'd better use GetText() instead.
+
+	\returns A pointer to the text as a byte array.
+*/
+
+
+/*!
+	\fn int32 BTextView::TextLength() const
+	\brief Returns the text length of the BTextView text.
+
+	\return The text length of the BTextView text.
+*/
+
+
+/*!
+	\fn BTextView::GetText(int32 offset, int32 length, char* buffer) const
+	\brief Fills out \a buffer with the text of the BTextView starting at
+	       \a offset and grabbing at most \a length bytes.
+
+	You must provide a \a buffer that is large enough to hold at least
+	\a length bytes.
+
+	\param offset Where to start grabbing text from.
+	\param length The number of bytes of text to grab.
+	\param buffer A \a buffer to write the text to.
+
+	\see BString::GetString(int32 offset, int32 length, char* buffer)
+*/
+
+
+/*!
+	\fn uchar BTextView::ByteAt(int32 offset) const
+	\brief Returns the character at the given offset.
+
+	\param offset The offset to the desired character.
+
+	\return The character at the given offset.
+*/
+
+
+/*!
+	\fn int32 BTextView::CountLines() const
+	\brief Returns the number of lines that the BTextView object contains.
+
+	\return The number of lines contained in the BTextView object.
+*/
+
+
+/*!
+	\fn int32 BTextView::CurrentLine() const
+	\brief Returns the index of the current line.
+
+	\return The index of the current line.
+*/
+
+
+/*!
+	\fn void BTextView::GoToLine(int32 index)
+	\brief Moves the caret to the specified line.
+
+	\param index The index of the line.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Clipboard
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BTextView::Cut(BClipboard* clipboard)
+	\brief Moves the current selection to the clipboard.
+
+	\param clipboard The clipboard object to move the text to.
+*/
+
+
+/*!
+	\fn void BTextView::Copy(BClipboard* clipboard)
+	\brief Copies the current selection to the clipboard.
+
+	\param clipboard The clipboard object to copy the selected text to.
+*/
+
+
+/*!
+	\fn void BTextView::Paste(BClipboard* clipboard)
+	\brief Copy the text contained in the clipboard to the BTextView.
+
+	\param clipboard A pointer to the clipboard.
+*/
+
+
+/*!
+	\fn bool BTextView::AcceptsPaste(BClipboard* clipboard)
+	\brief Returns whether or not the BTextView can accept the
+	       \a clipboard data.
+
+	\returns \c true if the BTextView can accept the pasted clipboard data,
+	         \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BTextView::AcceptsDrop(const BMessage* message)
+	\brief Returns whether or not the BTextView can accept the dropped
+	       \a message data.
+
+	\returns \c true if the BTextView can accept the dropped message data,
+	         \c false otherwise.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Selection
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BTextView::Clear()
+	\brief Deletes the currently selected text.
+*/
+
+
+/*!
+	\fn void BTextView::Select(int32 startOffset, int32 endOffset)
+	\brief Selects the text contained within the given offsets.
+
+	\param startOffset The offset where the text to select starts.
+	\param endOffset The offset where the text to select ends.
+*/
+
+
+/*!
+	\fn void BTextView::SelectAll()
+	\brief Selects all text contained in the BTextView.
+*/
+
+
+/*!
+	\fn void BTextView::GetSelection(int32* _start, int32* _end) const
+	\brief Fills out \a _start and \a _end with the start and end offsets of
+	       the current selection.
+
+	\param _start A pointer to an int32 to contain the selection's start
+	       offset.
+	\param _end A pointer to an int32 to contain the selection's end offset.
+*/
+
+
+/*!
+	\fn text_run_array* BTextView::RunArray(int32 startOffset, int32 endOffset,
+		int32* _size) const
+	\brief Returns a \c text_run_array for the text within the given offsets.
+
+	The returned \c text_run_array belongs to the caller, so you must
+	free it once you no longer need it.
+
+	\param startOffset The text start offset.
+	\param endOffset The text end offset.
+	\param _size A pointer to an int32 to fill out the run array size.
+
+	\return A \c text_run_array for the text in the given offsets.
+*/
+
+
+
+/*!
+	\fn int32 BTextView::LineAt(int32 offset) const
+	\brief Returns the line number of the character at the given offset.
+
+	\param offset The offset of the wanted character.
+
+	\return The line number of the character at the given offset.
+*/
+
+
+/*!
+	\fn int32 BTextView::LineAt(BPoint point) const
+	\brief Returns the line number for the passed point.
+
+	\param point The point to get the line number of.
+	\return The line number for the passed in point.
+*/
+
+
+/*!
+	\fn BPoint BTextView::PointAt(int32 offset, float* _height) const
+	\brief Returns the location of the character at the given offset.
+
+	\param offset The offset of the character.
+	\param _height A pointer to write the height of the character.
+
+	\return A BPoint object set to the location of the character.
+*/
+
+
+/*!
+	\fn int32 BTextView::OffsetAt(BPoint point) const
+	\brief Returns the offset at the passed in point.
+
+	\param point The desired point.
+
+	\return The offset for the passed in point.
+*/
+
+
+
+/*!
+	\fn int32 BTextView::OffsetAt(int32 line) const
+	\brief Returns the offset of the given line.
+
+	\param line A line number.
+
+	\return The offset of the passed line.
+*/
+
+
+/*!
+	\fn void BTextView::FindWord(int32 offset, int32* _fromOffset,
+		int32* _toOffset)
+	\brief Fills out \a _fromOffset and \a _toOffset for a sequence of
+	       character that qualifies as a word starting at \a offset.
+
+	A word is a sequence of characters that the user can select by double-
+	clicking.
+
+	\param offset The offset where to start looking.
+	\param _fromOffset A pointer to an integer to write the starting offset.
+	\param _toOffset A pointer to an integer to write the ending offset.
+*/
+
+
+/*!
+	\fn bool BTextView::CanEndLine(int32 offset)
+	\brief Returns whether or not the character at the given offset can be
+	       the last character of a line.
+
+	\param offset The offset of the character.
+
+	\returns \c true if the character can be the last character of a line,
+	         \c false otherwise.
+*/
+
+
+/*!
+	\fn float BTextView::LineWidth(int32 lineNum) const
+	\brief Returns the width of the line at the given index.
+
+	\param lineNum The index of the line to get the width of.
+*/
+
+
+/*!
+	\fn float BTextView::LineHeight(int32 lineNum) const
+	\brief Returns the height of the line at the given index.
+
+	\param lineNum The index of the line to get the height of.
+*/
+
+
+/*!
+	\fn float BTextView::TextHeight(int32 startLine, int32 endLine) const
+	\brief Returns the height of the text enclosed within the given lines.
+
+	\param startLine The index of the starting line.
+	\param endLine The index of the ending line.
+*/
+
+
+/*!
+	\fn void BTextView::Highlight(int32 startOffset, int32 endOffset)
+	\brief Highlight the text enclosed within the given offsets.
+
+	\param startOffset The start offset of the text to highlight.
+	\param endOffset The end offset of the text to highlight.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Scrolling
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BTextView::ScrollToOffset(int32 offset)
+	\brief Scrolls the text so that the character at \a offset is visible.
+
+	\param offset The offset of the character to scroll to.
+*/
+
+
+/*!
+	\fn void BTextView::ScrollToSelection()
+	\brief Scrolls the text so that the character that begins the selection
+	       is visible.
+*/
+
+
+//! @}
+
+
+/*!
+	\name TextRect
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BTextView::SetTextRect(BRect rect)
+	\brief Sets the object's text frame to the passed in \a rect.
+
+	\param rect A BRect object to set the text frame to.
+*/
+
+
+/*!
+	\fn BRect BTextView::TextRect() const
+	\brief Returns the BTextView's text frame.
+
+	\return The BTextView's text frame.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Insets
+*/
+
+
+//! @{
+
+
+
+/*!
+	\fn void BTextView::SetInsets(float left, float top, float right,
+		float bottom)
+	\brief Sets the insets within the bounds for the object's text frame.
+
+	\note Insets cannot be negative, will result in 0 inset.
+
+	\param left The left inset to set.
+	\param top The top inset to set.
+	\param right The right inset to set.
+	\param bottom The bottom inset to set.
+*/
+
+
+/*!
+	\fn void BTextView::GetInsets(float* _left, float* _top, float* _right,
+		float* _bottom) const
+	\brief Fills out the parameters with the objects's text insets.
+
+	\param _left A pointer to set to the frame's left inset.
+	\param _top A pointer to set to the frame's top inset.
+	\param _right A pointer to set to the frame's right inset.
+	\param _bottom A pointer to set to the frame's bottom inset.
+*/
+
+
+
+//! @}
+
+
+/*!
+	\name Stylable
+*/
+
+
+//! @{
+
+
+
+/*!
+	\fn void BTextView::SetStylable(bool stylable)
+	\brief Sets whether or not the object accepts multiple character styles.
+
+	\param stylable Pass in \c true to accept multiple character styles,
+	       \c false to NOT accept multiple character styles
+*/
+
+
+/*!
+	\fn bool BTextView::IsStylable() const
+	\brief Returns whether or not the object is stylable.
+
+	If the object is stylable, it can show multiple fonts symultaneously.
+
+	\return \c true if the object is stylable, \c false otherwise.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Tab width
+*/
+
+
+//! @{
+
+
+
+/*! 
+	\fn void BTextView::SetTabWidth(float width)
+	\brief Sets the distance between tab stops in pixels.
+
+	\param width The distance in pixel between tab stops to set.
+*/
+
+
+/*!
+	\fn float BTextView::TabWidth() const
+	\brief Returns the tab width of the BTextView.
+
+	\return The tab width of the BTextView.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Selectable state
+*/
+
+
+//! @{
+
+
+
+/*!
+	\fn void BTextView::MakeSelectable(bool selectable)
+	\brief Sets whether or not the text is selectable.
+
+	\param selectable Pass in \c true to set the text to be selectable,
+	       \c false to set the text to be not selectable.
+*/
+
+
+/*!
+	\fn bool BTextView::IsSelectable() const
+	\brief Returns whether or not the text is selectable.
+
+	\return \c true if the text is selectable,
+			\c false if the text is not selectable.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Editable state
+*/
+
+
+//! @{
+
+
+
+/*!
+	\fn void BTextView::MakeEditable(bool editable)
+	\brief Sets whether or not the text is editable.
+
+	\param editable Pass in \c true to set the text to be editable,
+	       \c false to set the object to be not editable.
+*/
+
+
+/*!
+	\fn bool BTextView::IsEditable() const
+	\brief Returns whether or not the text is editable.
+
+	\return \c true if the text is editable,
+			\c false if the text is not editable.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Word wrap
+*/
+
+
+//! @{
+
+
+
+/*!
+	\fn void BTextView::SetWordWrap(bool wrap)
+	\brief Activate or deactivate word wrapping mode.
+
+	\param wrap Pass in \c true to turn on word wrapping mode,
+	       \c false to turn off word wrapping mode.
+*/
+
+
+/*!
+	\fn bool BTextView::DoesWordWrap() const
+	\brief Returns whether or not word wrapping is activated.
+
+	\return \c true if word wrapping is activated, \c false is word wrapping
+	        if not activated.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Max bytes
+*/
+
+
+//! @{
+
+
+
+/*!
+	\fn void BTextView::SetMaxBytes(int32 max)
+	\brief Sets the maximum number of bytes that the BTextView can contain.
+
+	\param max The maximum number of bytes to set.
+*/
+
+
+/*!
+	\fn int32 BTextView::MaxBytes() const
+	\brief Returns the maximum number of bytes that the BTextView can contain.
+
+	\return the maximum number of bytes that the BTextView can contain.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Character filtering
+*/
+
+
+//! @{
+
+
+
+/*!
+	\fn void BTextView::DisallowChar(uint32 character)
+	\brief Adds the \a character to the disallowed characters list.
+
+	After this method returns, the \a character won't be accepted
+	by the textview anymore.
+
+	\param character The character to disallow.
+*/
+
+
+/*!
+	\fn void BTextView::AllowChar(uint32 character)
+	\brief Removes the \a character from the disallowed characters list.
+
+	After this method returns, the \a character will be accepted
+	by the textview.
+
+	\param character The character to allow.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Alignment
+*/
+
+
+//! @{
+
+
+
+/*!
+	\fn void BTextView::SetAlignment(alignment flag)
+	\brief Sets the way text is aligned within the frame.
+
+	Choices are:
+	- \c B_ALIGN_LEFT
+	- \c B_ALIGN_RIGHT
+	- \c B_ALIGN_CENTER
+
+	\param flag The text alignment to set.
+*/
+
+
+/*!
+	\fn alignment BTextView::Alignment() const
+	\brief Returns the current text alignment.
+
+	\return The current alignment flag.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Auto-indent
+*/
+
+
+//! @{
+
+
+
+/*!
+	\fn void BTextView::SetAutoindent(bool state)
+	\brief Sets whether or not new lines of text are automatically indented.
+
+	\param state Pass in \c true to automatically indent the text,
+	       \c false to turn off automatic text indenting.
+*/
+
+
+/*!
+	\fn bool BTextView::DoesAutoindent() const
+	\brief Returns whether or not automatic indenting is active.
+
+	\return \c true if automatic indenting is activated, \c false otherwise.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Color space
+*/
+
+
+//! @{
+
+
+
+/*!
+	\fn void BTextView::SetColorSpace(color_space colors)
+	\brief Set the color space of the offscreen BBitmap object.
+
+	\param colors The colorspace to set on the offscreen BBitmap object.
+*/
+
+
+/*!
+	\fn color_space BTextView::ColorSpace() const
+	\brief Returns the colorspace set to the offscreen BBitmap object.
+
+	\return The colorspace of the offscreen BBitmap object.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Resizable
+*/
+
+
+//! @{
+
+
+
+/*!
+	\fn void BTextView::MakeResizable(bool resize, BView* resizeView)
+	\brief Activates and deactivates automatic resizing.
+
+	The resizing mechanism is alternative to BView resizing. The container
+	view (the one passed to this function) should not automatically resize
+	itself when the parent is resized.
+
+	\param resize Pass in \c true to set the the BTextView to automatically
+	       resize itself, \c false to disable automatic resizing.
+	\param resizeView The BTextView object's parent view that resizes itself.
+*/
+
+
+/*!
+	\fn bool BTextView::IsResizable() const
+	\brief Returns whether or not the object is resizable.
+
+	\returns \c true if the object is resizable, \c false otherwise.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Undo state
+*/
+
+
+//! @{
+
+
+
+/*!
+	\fn void BTextView::SetDoesUndo(bool undo)
+	\brief Enables and disables the undo mechanism.
+
+	\param undo Pass in \c true to enable the undo mechanism,
+	       \c false to disable it.
+*/
+
+
+/*!
+	\fn bool BTextView::DoesUndo() const
+	\brief Returns whether or not the undo mechanism is enabled.
+
+	\return \c true if undo is enabled, \c false otherwise.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Hide typing
+*/
+
+
+//! @{
+
+
+
+/*!
+	\fn void BTextView::HideTyping(bool enabled)
+	\brief Enables and disables type hiding.
+
+	\param enabled Pass in \c true to enable type hiding,
+	       \c false to disable it.
+*/
+
+
+/*!
+	\fn bool BTextView::IsTypingHidden() const
+	\brief Returns whether or not typing is hidden.
+
+	\return \c true if typing is hidden, \c false otherwise.
+*/
+
+
+//! @}

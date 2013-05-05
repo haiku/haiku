@@ -1,18 +1,18 @@
 1	slovak	x-vnd.haiku.zip-o-matic	2207848100
-%ld files added.	file:ZipOMaticWindow.cpp		Pridaných %ld súborov.
 1 file added.	file:ZipOMaticWindow.cpp		Pridaný 1 súbor.
-Archive	file:ZipperThread.cpp		Archív
-Archive created OK	file:ZipOMaticWindow.cpp		Archív úspešne vytvorený
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Ste si istý, že chcete zastaviť vytvorenie tohto archívu?
-Continue	file:ZipOMaticWindow.cpp		Pokračovať
+Stop	file:ZipOMaticWindow.cpp		Zastaviť
 Creating archive: %s	file:ZipOMaticWindow.cpp		Vytvára sa archív: %s
-Do you want to stop them?	file:ZipOMatic.cpp		Chcete ich zastaviť?
+Continue	file:ZipOMaticWindow.cpp		Pokračovať
+Preparing to archive	file:ZipperThread.cpp		Pripravuje sa na archiváciu
 Drop files here.	file:ZipOMaticWindow.cpp		Sem pretiahnite súbory.
-Error creating archive	file:ZipOMaticWindow.cpp		Chyba pri vytváraní archívu
 Filename: %s	file:ZipOMaticWindow.cpp		Názov súboru: %s
 Let them continue	file:ZipOMatic.cpp		Nechať ich pokračovať
-Preparing to archive	file:ZipperThread.cpp		Pripravuje sa na archiváciu
-Stop	file:ZipOMaticWindow.cpp		Zastaviť
-Stop them	file:ZipOMatic.cpp		Zastaviť ich
+Do you want to stop them?	file:ZipOMatic.cpp		Chcete ich zastaviť?
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Ste si istý, že chcete zastaviť vytvorenie tohto archívu?
+%ld files added.	file:ZipOMaticWindow.cpp		Pridaných %ld súborov.
 Stopped	file:ZipOMaticWindow.cpp		Zastavené
+Archive	file:ZipperThread.cpp		Archív
+Error creating archive	file:ZipOMaticWindow.cpp		Chyba pri vytváraní archívu
 You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Beží vám %ld Zip-O-Matic.\n\n
+Archive created OK	file:ZipOMaticWindow.cpp		Archív úspešne vytvorený
+Stop them	file:ZipOMatic.cpp		Zastaviť ich

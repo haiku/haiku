@@ -7,11 +7,13 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <arch/real_time_clock.h>
 
 #include <real_time_clock.h>
 #include <real_time_data.h>
 #include <smp.h>
+
 
 status_t
 arch_rtc_init(kernel_args *args, struct real_time_data *data)

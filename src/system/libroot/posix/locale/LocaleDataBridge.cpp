@@ -36,6 +36,12 @@ LocaleCtypeDataBridge::LocaleCtypeDataBridge()
 }
 
 
+void LocaleCtypeDataBridge::setMbCurMax(unsigned short mbCurMax)
+{
+	__ctype_mb_cur_max = mbCurMax;
+}
+
+
 LocaleMessagesDataBridge::LocaleMessagesDataBridge()
 	:
 	posixLanginfo(gPosixLanginfo)

@@ -36,6 +36,7 @@
 #define INTEL_TYPE_IGD			(INTEL_TYPE_9xx | 0x0800)
 #define INTEL_TYPE_ILK			(INTEL_TYPE_9xx | 0x1000)
 #define INTEL_TYPE_SNB			(INTEL_TYPE_9xx | 0x2000)
+#define INTEL_TYPE_IVB			(INTEL_TYPE_9xx | 0x4000)
 // models
 #define INTEL_TYPE_SERVER		0x0004
 #define INTEL_TYPE_MOBILE		0x0008
@@ -55,6 +56,9 @@
 #define INTEL_TYPE_SNBG			(INTEL_TYPE_SNB)
 #define INTEL_TYPE_SNBGM		(INTEL_TYPE_SNB | INTEL_TYPE_MOBILE)
 #define INTEL_TYPE_SNBGS		(INTEL_TYPE_SNB | INTEL_TYPE_SERVER)
+#define INTEL_TYPE_IVBG			(INTEL_TYPE_IVB)
+#define INTEL_TYPE_IVBGM		(INTEL_TYPE_IVB | INTEL_TYPE_MOBILE)
+#define INTEL_TYPE_IVBGS		(INTEL_TYPE_IVB | INTEL_TYPE_SERVER)
 
 #define DEVICE_NAME				"intel_extreme"
 #define INTEL_ACCELERANT_NAME	"intel_extreme.accelerant"
@@ -124,7 +128,8 @@ struct DeviceType {
 
 	bool HasPlatformControlHub() const
 	{
-		return InGroup(INTEL_TYPE_ILK) || InGroup(INTEL_TYPE_SNB);
+		return InGroup(INTEL_TYPE_ILK) || InGroup(INTEL_TYPE_SNB)
+			|| InGroup(INTEL_TYPE_IVB);
 	}
 };
 

@@ -13,6 +13,9 @@ HAIKU_BOARD_LOADER_BASE = 0x80008000 ;
 HAIKU_BOARD_LOADER_ENTRY_RAW = 0x80008000 ;
 HAIKU_BOARD_LOADER_ENTRY_NBSD = 0x80008008 ;
 
+HAIKU_BOARD_LOADER_ENTRY = $(HAIKU_BOARD_LOADER_ENTRY_NBSD) ;
+HAIKU_BOARD_LOADER_FAKE_OS = netbsd ;
+
 # load address for haiku_loader uimage
 # (must be different than real load address)
 HAIKU_BOARD_LOADER_UIBASE = 0x84000000 ;
@@ -55,9 +58,9 @@ HAIKU_BOARD_SDIMAGE_FILES =
 # gcc flags for the specific cpu
 #
 
-TARGET_KERNEL_CCFLAGS += -mcpu=cortex-a8 -mfpu=vfp -mfloat-abi=soft ;
-TARGET_KERNEL_C++FLAGS += -mcpu=cortex-a8 -mfpu=vfp -mfloat-abi=soft ;
-TARGET_CCFLAGS += -mcpu=cortex-a8 -mfpu=vfp -mfloat-abi=soft ;
-TARGET_C++FLAGS += -mcpu=cortex-a8 -mfpu=vfp -mfloat-abi=soft ;
+HAIKU_KERNEL_CCFLAGS += -mcpu=cortex-a8 -mfpu=vfp -mfloat-abi=soft ;
+HAIKU_KERNEL_C++FLAGS += -mcpu=cortex-a8 -mfpu=vfp -mfloat-abi=soft ;
+HAIKU_CCFLAGS += -mcpu=cortex-a8 -mfpu=vfp -mfloat-abi=soft ;
+HAIKU_C++FLAGS += -mcpu=cortex-a8 -mfpu=vfp -mfloat-abi=soft ;
 
 

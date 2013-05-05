@@ -31,6 +31,9 @@ VideoView::VideoView(BRect frame, const char* name, uint32 resizeMask)
 	fOverlayMode(false),
 	fIsPlaying(false),
 	fIsFullscreen(false),
+	fFullscreenControlsVisible(false),
+	fFirstPulseAfterFullscreen(false),
+	fSendHideCounter(0),
 	fLastMouseMove(system_time()),
 
 	fSubtitleBitmap(new SubtitleBitmap),
@@ -113,6 +116,9 @@ VideoView::MessageReceived(BMessage* message)
 }
 
 
+/*!
+	Disables the screen saver, and hides the full screen controls.
+*/
 void
 VideoView::Pulse()
 {
@@ -122,15 +128,26 @@ VideoView::Pulse()
 	bigtime_t now = system_time();
 	if (now - fLastMouseMove > 1500000) {
 		fLastMouseMove = now;
-		// take care of disabling the screen saver
 		BPoint where;
 		uint32 buttons;
 		GetMouse(&where, &buttons, false);
 		if (buttons == 0) {
-			BMessage message(M_HIDE_FULL_SCREEN_CONTROLS);
-			message.AddPoint("where", where);
-			Window()->PostMessage(&message, Window());
+			// Hide the full screen controls (and the mouse pointer)
+			// after a while
+			if (fFullscreenControlsVisible || fFirstPulseAfterFullscreen) {
+				if (fSendHideCounter == 0 || fSendHideCounter == 3) {
+					// Send after 1.5s and after 4.5s
+					BMessage message(M_HIDE_FULL_SCREEN_CONTROLS);
+					message.AddPoint("where", where);
+					if (fSendHideCounter > 0)
+						message.AddBool("force", true);
+					Window()->PostMessage(&message, Window());
+				}
+				fSendHideCounter++;
+				fFirstPulseAfterFullscreen = false;
+			}
 
+			// Take care of disabling the screen saver
 			ConvertToScreen(&where);
 			set_mouse_position((int32)where.x, (int32)where.y);
 		}
@@ -292,6 +309,16 @@ void
 VideoView::SetFullscreen(bool fullScreen)
 {
 	fIsFullscreen = fullScreen;
+	fSendHideCounter = 0;
+	fFirstPulseAfterFullscreen = true;
+}
+
+
+void
+VideoView::SetFullscreenControlsVisible(bool visible)
+{
+	fFullscreenControlsVisible = visible;
+	fSendHideCounter = 0;
 }
 
 

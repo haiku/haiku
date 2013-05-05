@@ -15,8 +15,8 @@
 #include <Alert.h>
 #include <Screen.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MouseApplication"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MouseApplication"
 
 const char* kSignature = "application/x-vnd.Haiku-Mouse";
 
@@ -34,8 +34,10 @@ MouseApplication::MouseApplication()
 void
 MouseApplication::AboutRequested()
 {
-	(new BAlert("about", B_TRANSLATE("...by Andrew Edward McCall"),
-		B_TRANSLATE("Dig Deal")))->Go();
+	BAlert* alert = new BAlert("about",
+		B_TRANSLATE("...by Andrew Edward McCall"), B_TRANSLATE("Dig Deal"));
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+	alert->Go();
 }
 
 

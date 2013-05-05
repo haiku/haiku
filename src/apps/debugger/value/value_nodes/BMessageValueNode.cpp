@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Rene Gollent, rene@gollent.com
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com
  * Distributed under the terms of the MIT License.
  */
 
@@ -20,6 +20,9 @@
 #include "ValueLoader.h"
 #include "ValueLocation.h"
 #include "ValueNodeContainer.h"
+
+
+static const int64 kMaxStringSize = 64;
 
 
 // #pragma mark - BMessageWhatNodeChild
@@ -183,66 +186,62 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 			if (strcmp(member->Name(), "fHeader") == 0) {
 				error = baseType->ResolveDataMemberLocation(member,
 					*location, memberLocation);
+				BReference<ValueLocation> locationRef(memberLocation, true);
 				if (error != B_OK) {
 					TRACE_LOCALS(
 						"BMessageValueNode::ResolvedLocationAndValue(): "
 						"failed to resolve location of header member: %s\n",
 						strerror(error));
-					delete memberLocation;
 					return error;
 				}
 
 				error = valueLoader->LoadValue(memberLocation, valueType,
 					false, headerAddress);
-				delete memberLocation;
 				if (error != B_OK)
 					return error;
 			} else if (strcmp(member->Name(), "what") == 0) {
 				error = baseType->ResolveDataMemberLocation(member,
 					*location, memberLocation);
+				BReference<ValueLocation> locationRef(memberLocation, true);
 				if (error != B_OK) {
 					TRACE_LOCALS(
 						"BMessageValueNode::ResolvedLocationAndValue(): "
 						"failed to resolve location of header member: %s\n",
 							strerror(error));
-					delete memberLocation;
 					return error;
 				}
 				error = valueLoader->LoadValue(memberLocation, valueType,
 					false, what);
-				delete memberLocation;
 				if (error != B_OK)
 					return error;
 			} else if (strcmp(member->Name(), "fFields") == 0) {
 				error = baseType->ResolveDataMemberLocation(member,
 					*location, memberLocation);
+				BReference<ValueLocation> locationRef(memberLocation, true);
 				if (error != B_OK) {
 					TRACE_LOCALS(
 						"BMessageValueNode::ResolvedLocationAndValue(): "
 						"failed to resolve location of field member: %s\n",
 							strerror(error));
-					delete memberLocation;
 					return error;
 				}
 				error = valueLoader->LoadValue(memberLocation, valueType,
 					false, fieldAddress);
-				delete memberLocation;
 				if (error != B_OK)
 					return error;
 			} else if (strcmp(member->Name(), "fData") == 0) {
 				error = baseType->ResolveDataMemberLocation(member,
 					*location, memberLocation);
+				BReference<ValueLocation> locationRef(memberLocation, true);
 				if (error != B_OK) {
 					TRACE_LOCALS(
 						"BMessageValueNode::ResolvedLocationAndValue(): "
 						"failed to resolve location of data member: %s\n",
 							strerror(error));
-					delete memberLocation;
 					return error;
 				}
 				error = valueLoader->LoadValue(memberLocation, valueType,
 					false, fDataLocation);
-				delete memberLocation;
 				if (error != B_OK)
 					return error;
 			}
@@ -255,8 +254,8 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 		return B_NO_MEMORY;
 	error = valueLoader->LoadRawValue(headerAddress, sizeof(
 		BMessage::message_header), fHeader);
-	TRACE_LOCALS("BMessage: Header Address: 0x%" B_PRIx64 ", result: %ld\n",
-		headerAddress.ToUInt64(), error);
+	TRACE_LOCALS("BMessage: Header Address: 0x%" B_PRIx64 ", result: %s\n",
+		headerAddress.ToUInt64(), strerror(error));
 	if (error != B_OK)
 		return error;
 
@@ -269,18 +268,22 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 	else
 		fHeader->what = what.ToUInt32();
 
-	TRACE_LOCALS("BMessage: what: 0x%" B_PRIx32 ", result: %ld\n",
-		what.ToUInt32(), error);
+	TRACE_LOCALS("BMessage: what: 0x%" B_PRIx32 ", result: %s\n",
+		what.ToUInt32(), strerror(error));
 
 	size_t fieldsSize = fHeader->field_count * sizeof(
 		BMessage::field_header);
 	if (fIsFlatMessage)
 		fDataLocation.SetTo(fieldAddress.ToUInt64() + fieldsSize);
 
-	size_t totalSize = sizeof(BMessage::message_header) + fieldsSize + fHeader->data_size;
+	size_t totalSize = sizeof(BMessage::message_header) + fieldsSize
+		+ fHeader->data_size;
 	uint8* messageBuffer = new(std::nothrow) uint8[totalSize];
 	if (messageBuffer == NULL)
 		return B_NO_MEMORY;
+
+	ArrayDeleter<uint8> deleter(messageBuffer);
+
 	memset(messageBuffer, 0, totalSize);
 	memcpy(messageBuffer, fHeader, sizeof(BMessage::message_header));
 	uint8* tempBuffer = messageBuffer + sizeof(BMessage::message_header);
@@ -293,7 +296,7 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 		error = valueLoader->LoadRawValue(fieldAddress, fieldsSize,
 			fFields);
 		TRACE_LOCALS("BMessage: Field Header Address: 0x%" B_PRIx64
-			", result: %ld\n",	headerAddress.ToUInt64(), error);
+			", result: %s\n",	headerAddress.ToUInt64(), strerror(error));
 		if (error != B_OK)
 			return error;
 
@@ -304,7 +307,7 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 		error = valueLoader->LoadRawValue(fDataLocation, fHeader->data_size,
 			fData);
 		TRACE_LOCALS("BMessage: Data Address: 0x%" B_PRIx64
-			", result: %ld\n",	fDataLocation.ToUInt64(), error);
+			", result: %s\n",	fDataLocation.ToUInt64(), strerror(error));
 		if (error != B_OK)
 			return error;
 		memcpy(tempBuffer, fFields, fieldsSize);
@@ -313,7 +316,6 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 	}
 
 	error = fMessage.Unflatten((const char*)messageBuffer);
-	delete[] messageBuffer;
 	if (error != B_OK)
 		return error;
 
@@ -330,9 +332,6 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 status_t
 BMessageValueNode::CreateChildren()
 {
-	if (!fChildren.IsEmpty())
-		return B_OK;
-
 	DataMember* member = NULL;
 	CompoundType* messageType = dynamic_cast<CompoundType*>(fType);
 	for (int32 i = 0; i < messageType->CountDataMembers(); i++) {
@@ -373,6 +372,8 @@ BMessageValueNode::CreateChildren()
 		node->SetContainer(fContainer);
 		fChildren.AddItem(node);
 	}
+
+	fChildrenCreated = true;
 
 	if (fContainer != NULL)
 		fContainer->NotifyValueNodeChildrenCreated(this);
@@ -473,12 +474,6 @@ BMessageValueNode::_GetTypeForTypeCode(type_code type,
 			constraints.SetTypeKind(TYPE_COMPOUND);
 			break;
 
-		case B_POINTER_TYPE:
-			typeName = "";
-			constraints.SetTypeKind(TYPE_ADDRESS);
-			constraints.SetBaseTypeName("void");
-			break;
-
 		case B_RECT_TYPE:
 			typeName = "BRect";
 			constraints.SetTypeKind(TYPE_COMPOUND);
@@ -495,13 +490,30 @@ BMessageValueNode::_GetTypeForTypeCode(type_code type,
 			break;
 
 		case B_STRING_TYPE:
-			typeName = "";
-			constraints.SetTypeKind(TYPE_ARRAY);
-			constraints.SetBaseTypeName("char");
-			break;
+		{
+			typeName = "char";
+			constraints.SetTypeKind(TYPE_PRIMITIVE);
+			Type* baseType = NULL;
+			status_t result = fLoader->LookupTypeByName(typeName, constraints,
+				baseType);
+			if (result != B_OK)
+				return result;
+			BReference<Type> typeReference(baseType, true);
+			ArrayType* arrayType;
+			result = baseType->CreateDerivedArrayType(0, kMaxStringSize, true,
+				arrayType);
+			if (result == B_OK)
+				_type = arrayType;
 
+			return result;
+			break;
+		}
+
+		case B_POINTER_TYPE:
 		default:
-			return B_BAD_VALUE;
+			typeName = "";
+			constraints.SetTypeKind(TYPE_ADDRESS);
+			constraints.SetBaseTypeName("void");
 			break;
 	}
 
@@ -656,6 +668,8 @@ BMessageValueNode::BMessageFieldNode::CreateChildren()
 		fChildren.AddItem(child);
 	}
 
+	fChildrenCreated = true;
+
 	if (fContainer != NULL)
 		fContainer->NotifyValueNodeChildrenCreated(this);
 
@@ -707,7 +721,7 @@ BMessageValueNode::BMessageFieldNodeChild::BMessageFieldNodeChild(
 	fType->AcquireReference();
 
 	if (fFieldIndex >= 0)
-		fPresentationName.SetToFormat("[%ld]", fFieldIndex);
+		fPresentationName.SetToFormat("[%" B_PRId32 "]", fFieldIndex);
 }
 
 

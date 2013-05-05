@@ -1,10 +1,11 @@
 /*
- * Copyright 2006-2009 Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2012 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		John Scipione <jscipione@gmail.com>
+ *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  */
 
 #include <ExpressionParser.h>
@@ -46,7 +47,7 @@ enum {
 	TOKEN_END_OF_LINE
 };
 
-struct Token {
+struct ExpressionParser::Token {
 	Token()
 		: string(""),
 		  type(TOKEN_NONE),
@@ -88,7 +89,7 @@ struct Token {
 };
 
 
-class Tokenizer {
+class ExpressionParser::Tokenizer {
  public:
 	Tokenizer()
 		: fString(""),
@@ -159,7 +160,7 @@ class Tokenizer {
 			}
 
 			// optional exponent part
-			if (*fCurrentChar == 'e' || *fCurrentChar == 'E') {
+			if (*fCurrentChar == 'E') {
 				temp << *fCurrentChar;
 				fCurrentChar++;
 
@@ -205,6 +206,13 @@ class Tokenizer {
 			int32 length = fCurrentChar - begin;
 			fCurrentToken = Token(begin, length, _CurrentPos() - length,
 				TOKEN_IDENTIFIER);
+
+		} else if ((unsigned char)fCurrentChar[0] == 0xCF
+			&& (unsigned char)fCurrentChar[1] == 0x80) {
+			// UTF-8 small greek letter PI
+			fCurrentToken = Token(fCurrentChar, 2, _CurrentPos() - 1,
+				TOKEN_IDENTIFIER);
+			fCurrentChar += 2;
 
 		} else {
 			int32 type = TOKEN_NONE;
@@ -331,7 +339,8 @@ class Tokenizer {
 
 
 ExpressionParser::ExpressionParser()
-	: fTokenizer(new Tokenizer())
+	:	fTokenizer(new Tokenizer()),
+		fDegreeMode(false)
 {
 }
 
@@ -339,6 +348,20 @@ ExpressionParser::ExpressionParser()
 ExpressionParser::~ExpressionParser()
 {
 	delete fTokenizer;
+}
+
+
+bool
+ExpressionParser::DegreeMode()
+{
+	return fDegreeMode;
+}
+
+
+void
+ExpressionParser::SetDegreeMode(bool degrees)
+{
+	fDegreeMode = degrees;
 }
 
 
@@ -568,10 +591,14 @@ ExpressionParser::_InitArguments(MAPM values[], int32 argumentCount)
 MAPM
 ExpressionParser::_ParseFunction(const Token& token)
 {
-	if (strcasecmp("e", token.string.String()) == 0)
+	if (strcmp("e", token.string.String()) == 0)
 		return _ParseFactorial(MAPM(MM_E));
-	else if (strcasecmp("pi", token.string.String()) == 0)
+	else if (strcasecmp("pi", token.string.String()) == 0
+		|| ((unsigned char)token.string.String()[0] == 0xCF
+			&& (unsigned char)token.string.String()[1] == 0x80)) {
+		// UTF-8 small greek letter PI
 		return _ParseFactorial(MAPM(MM_PI));
+	}
 
 	// hard coded cases for different count of arguments
 	// supports functions with 3 arguments at most
@@ -583,19 +610,36 @@ ExpressionParser::_ParseFunction(const Token& token)
 		return _ParseFactorial(values[0].abs());
 	} else if (strcasecmp("acos", token.string.String()) == 0) {
 		_InitArguments(values, 1);
+		if (fDegreeMode)
+			values[0] = values[0] * MM_PI / 180;
+
 		if (values[0] < -1 || values[0] > 1)
 			throw ParseException("out of domain", token.position);
+
 		return _ParseFactorial(values[0].acos());
 	} else if (strcasecmp("asin", token.string.String()) == 0) {
 		_InitArguments(values, 1);
+		if (fDegreeMode)
+			values[0] = values[0] * MM_PI / 180;
+
 		if (values[0] < -1 || values[0] > 1)
 			throw ParseException("out of domain", token.position);
+
 		return _ParseFactorial(values[0].asin());
 	} else if (strcasecmp("atan", token.string.String()) == 0) {
 		_InitArguments(values, 1);
+		if (fDegreeMode)
+			values[0] = values[0] * MM_PI / 180;
+
 		return _ParseFactorial(values[0].atan());
 	} else if (strcasecmp("atan2", token.string.String()) == 0) {
 		_InitArguments(values, 2);
+
+		if (fDegreeMode) {
+			values[0] = values[0] * MM_PI / 180;
+			values[1] = values[1] * MM_PI / 180;
+		}
+
 		return _ParseFactorial(values[0].atan2(values[1]));
 	} else if (strcasecmp("cbrt", token.string.String()) == 0) {
 		_InitArguments(values, 1);
@@ -605,9 +649,13 @@ ExpressionParser::_ParseFunction(const Token& token)
 		return _ParseFactorial(values[0].ceil());
 	} else if (strcasecmp("cos", token.string.String()) == 0) {
 		_InitArguments(values, 1);
+		if (fDegreeMode)
+			values[0] = values[0] * MM_PI / 180;
+
 		return _ParseFactorial(values[0].cos());
 	} else if (strcasecmp("cosh", token.string.String()) == 0) {
 		_InitArguments(values, 1);
+		// This function always uses radians
 		return _ParseFactorial(values[0].cosh());
 	} else if (strcasecmp("exp", token.string.String()) == 0) {
 		_InitArguments(values, 1);
@@ -619,31 +667,46 @@ ExpressionParser::_ParseFunction(const Token& token)
 		_InitArguments(values, 1);
 		if (values[0] <= 0)
 			throw ParseException("out of domain", token.position);
+
 		return _ParseFactorial(values[0].log());
 	} else if (strcasecmp("log", token.string.String()) == 0) {
 		_InitArguments(values, 1);
 		if (values[0] <= 0)
 			throw ParseException("out of domain", token.position);
+
 		return _ParseFactorial(values[0].log10());
 	} else if (strcasecmp("pow", token.string.String()) == 0) {
 		_InitArguments(values, 2);
 		return _ParseFactorial(values[0].pow(values[1]));
 	} else if (strcasecmp("sin", token.string.String()) == 0) {
 		_InitArguments(values, 1);
+		if (fDegreeMode)
+			values[0] = values[0] * MM_PI / 180;
+
 		return _ParseFactorial(values[0].sin());
 	} else if (strcasecmp("sinh", token.string.String()) == 0) {
 		_InitArguments(values, 1);
+		// This function always uses radians
 		return _ParseFactorial(values[0].sinh());
 	} else if (strcasecmp("sqrt", token.string.String()) == 0) {
 		_InitArguments(values, 1);
 		if (values[0] < 0)
 			throw ParseException("out of domain", token.position);
+
 		return _ParseFactorial(values[0].sqrt());
 	} else if (strcasecmp("tan", token.string.String()) == 0) {
 		_InitArguments(values, 1);
+		if (fDegreeMode)
+			values[0] = values[0] * MM_PI / 180;
+
+		MAPM divided_by_half_pi = values[0] / MM_HALF_PI;
+		if (divided_by_half_pi.is_integer() && divided_by_half_pi.is_odd())
+			throw ParseException("out of domain", token.position);
+
 		return _ParseFactorial(values[0].tan());
 	} else if (strcasecmp("tanh", token.string.String()) == 0) {
 		_InitArguments(values, 1);
+		// This function always uses radians
 		return _ParseFactorial(values[0].tanh());
 	}
 

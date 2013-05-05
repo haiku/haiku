@@ -1,13 +1,13 @@
-1	norwegian_bokmål	x-vnd.Haiku-Magnify	2249277198
-Copy image	Magnify-Main		Kopier bilde
-Decrease pixel size	Magnify-Main		Reduser pikselstørrelse
-Decrease window size	Magnify-Main		Forminsk vindu
-Help	Magnify-Main		Hjelp
-Hide/Show info	Magnify-Main		Skjul/Vis info
-Increase pixel size	Magnify-Main		Øk pikselstørrelse
-Increase window size	Magnify-Main		Forstørr vindu
-Info	Magnify-Main		Info
-Magnify	System name		Forstørr
-Magnify help	Magnify-Help		Magnify-hjelp
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Magnify	2249277198
 Make square	Magnify-Main		Lag firkant
+Copy image	Magnify-Main		Kopier bilde
+Magnify help	Magnify-Help		Magnify-hjelp
+Help	Magnify-Main		Hjelp
+Decrease pixel size	Magnify-Main		Reduser pikselstørrelse
+Magnify	System name		Forstørr
+Info	Magnify-Main		Info
+Hide/Show info	Magnify-Main		Skjul/Vis info
 Save image	Magnify-Main		Lagre bilde
+Increase window size	Magnify-Main		Forstørr vindu
+Decrease window size	Magnify-Main		Forminsk vindu
+Increase pixel size	Magnify-Main		Øk pikselstørrelse

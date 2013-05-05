@@ -90,7 +90,8 @@ status_t
 ProxyAudioSupplier::GetFrames(void* buffer, int64 frameCount,
 	bigtime_t startTime, bigtime_t endTime)
 {
-	TRACE("GetFrames(%p, frameCount: %lld, time interval: %lld - %lld)\n",
+	TRACE("GetFrames(%p, frameCount: %" B_PRId64 ", time interval: %"
+		B_PRIdBIGTIME " - %" B_PRIdBIGTIME ")\n",
 		buffer, frameCount, startTime, endTime);
 
 	// Create a list of playing intervals which compose the supplied
@@ -114,7 +115,7 @@ ProxyAudioSupplier::GetFrames(void* buffer, int64 frameCount,
 				delete interval;
 				error = B_ERROR;
 				ERROR("GetFrames() - zero duration audio interval! start "
-					"time: %lld\n", intervalStartTime);
+					"time: %" B_PRIdBIGTIME "\n", intervalStartTime);
 				break;
 			}
 			if (!playingIntervals.AddItem(interval)) {
@@ -144,7 +145,7 @@ ProxyAudioSupplier::GetFrames(void* buffer, int64 frameCount,
 	int64 framesRead = 0;
 	while (!playingIntervals.IsEmpty()) {
 		PlayingInterval* interval
-			= (PlayingInterval*)playingIntervals.RemoveItem(0L);
+			= (PlayingInterval*)playingIntervals.RemoveItem((int32)0);
 		if (error != B_OK) {
 			delete interval;
 			continue;

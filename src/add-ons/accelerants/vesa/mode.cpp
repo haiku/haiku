@@ -115,7 +115,7 @@ create_mode_list(void)
 uint32
 vesa_accelerant_mode_count(void)
 {
-	TRACE(("vesa_accelerant_mode_count()\n"));
+	TRACE(("vesa_accelerant_mode_count() = %d\n", gInfo->shared_info->mode_count));
 	return gInfo->shared_info->mode_count;
 }
 

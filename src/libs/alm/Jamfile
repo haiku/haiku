@@ -1,18 +1,21 @@
 SubDir HAIKU_TOP src libs alm ;
 
 
-UseLibraryHeaders lp_solve linprog alm ;
+UseLibraryHeaders linprog alm ;
 UsePrivateHeaders shared ;
 UseHeaders [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) kits interface ] ;
 
 
 SharedLibrary libalm.so :
+	ALMGroup.cpp
 	ALMLayout.cpp
+	ALMLayoutBuilder.cpp
 	Area.cpp
 	Column.cpp
 	Row.cpp
 	RowColumnManager.cpp
+	SharedSolver.cpp
+	Tab.cpp
 	:
-	liblpsolve55.so liblinprog.a
-	be $(TARGET_LIBSTDC++)
+	liblinprog.a be $(TARGET_LIBSTDC++)
 ;

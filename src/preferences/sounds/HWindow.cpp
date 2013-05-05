@@ -38,8 +38,8 @@
 #include <Sound.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "HWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "HWindow"
 
 static const char kSettingsFile[] = "Sounds_Settings";
 
@@ -109,10 +109,10 @@ HWindow::InitGUI()
 		new BMessage(M_NONE_MESSAGE)));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Other" B_UTF8_ELLIPSIS),
 		new BMessage(M_OTHER_MESSAGE)));
-	BMenuField* menuField = new BMenuField("filemenu",
-		B_TRANSLATE("Sound File:"), menu);
-	menuField->SetDivider(menuField->StringWidth(B_TRANSLATE("Sound File:"))
-		+ 10);
+
+	BString label(B_TRANSLATE("Sound file:"));
+	BMenuField* menuField = new BMenuField("filemenu", label, menu);
+	menuField->SetDivider(menuField->StringWidth(label) + 10);
 
 	BButton* stopbutton = new BButton("stop", B_TRANSLATE("Stop"),
 		new BMessage(M_STOP_MESSAGE));
@@ -212,6 +212,7 @@ HWindow::MessageReceived(BMessage* message)
 						B_TRANSLATE("This is not an audio file."),
 						B_TRANSLATE("OK"), NULL, NULL,
 						B_WIDTH_AS_USUAL, B_STOP_ALERT);
+					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 					alert->Go();
 					break;
 				}

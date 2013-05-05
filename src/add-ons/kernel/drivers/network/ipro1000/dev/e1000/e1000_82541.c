@@ -1,6 +1,6 @@
 /******************************************************************************
 
-  Copyright (c) 2001-2010, Intel Corporation 
+  Copyright (c) 2001-2011, Intel Corporation 
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without 
@@ -30,7 +30,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 
 ******************************************************************************/
-/*$FreeBSD: src/sys/dev/e1000/e1000_82541.c,v 1.4.2.2.4.1 2010/12/21 17:09:25 kensmith Exp $*/
+/*$FreeBSD$*/
 
 /*
  * 82541EI Gigabit Ethernet Controller
@@ -549,8 +549,6 @@ static s32 e1000_setup_copper_link_82541(struct e1000_hw *hw)
 	ctrl &= ~(E1000_CTRL_FRCSPD | E1000_CTRL_FRCDPX);
 	E1000_WRITE_REG(hw, E1000_CTRL, ctrl);
 
-	hw->phy.reset_disable = FALSE;
-
 	/* Earlier revs of the IGP phy require us to force MDI. */
 	if (hw->mac.type == e1000_82541 || hw->mac.type == e1000_82547) {
 		dev_spec->dsp_config = e1000_dsp_config_disabled;
@@ -644,7 +642,7 @@ static s32 e1000_check_for_link_82541(struct e1000_hw *hw)
 	 * of MAC speed/duplex configuration.  So we only need to
 	 * configure Collision Distance in the MAC.
 	 */
-	e1000_config_collision_dist_generic(hw);
+	mac->ops.config_collision_dist(hw);
 
 	/*
 	 * Configure Flow Control now that Auto-Neg has completed.

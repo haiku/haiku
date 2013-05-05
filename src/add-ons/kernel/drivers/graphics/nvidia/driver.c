@@ -256,6 +256,7 @@ static uint16 nvidia_device_list[] = {
 	0x028c, /* Nvidia Quadro4 700 GoGL */
 	0x0290, /* Nvidia Geforce 7900 GTX */
 	0x0291, /* Nvidia Geforce 7900 GT */
+	0x0292, /* Nvidia Geforce 7900 GS */
 	0x0293, /* Nvidia Geforce 7900 GX2 */
 	0x0294, /* Nvidia Geforce 7950 GX2 */
 	0x0295, /* Nvidia Geforce 7950 GT */

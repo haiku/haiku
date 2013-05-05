@@ -14,8 +14,8 @@
 
 #include "DiskUsage.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "DiskUsage"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "DiskUsage"
 
 entry_ref helpFileRef;
 bool helpFileWasFound = false;

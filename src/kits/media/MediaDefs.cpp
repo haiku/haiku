@@ -114,7 +114,7 @@ media_source::~media_source()
 media_source media_source::null(-1, -1);
 
 
-// #pragma mark - 
+// #pragma mark -
 
 
 bool
@@ -183,7 +183,7 @@ operator<(const media_node& a, const media_node& b)
 }
 
 
-// #pragma mark - 
+// #pragma mark -
 
 
 media_multi_audio_format media_raw_audio_format::wildcard;
@@ -352,7 +352,7 @@ multistream_format_matches(const media_multistream_format& a,
 	switch ((a.format != 0) ? a.format : b.format) {
 		default:
 			return true; // TODO: really?
-					
+
 		case media_multistream_format::B_VID:
 			if (a.u.vid.frame_rate != 0 && b.u.vid.frame_rate != 0
 				&& a.u.vid.frame_rate != b.u.vid.frame_rate) {
@@ -387,7 +387,7 @@ multistream_format_matches(const media_multistream_format& a,
 				return false;
 			}
 			return true;
-					
+
 		case media_multistream_format::B_AVI:
 			if (a.u.avi.us_per_frame != 0 && b.u.avi.us_per_frame != 0
 				&& a.u.avi.us_per_frame != b.u.avi.us_per_frame) {
@@ -444,10 +444,10 @@ encoded_audio_format_matches(const media_encoded_audio_format& a,
 		return false;
 	if (!multi_audio_info_matches(a.multi_info, b.multi_info))
 		return false;
-		
+
 	if (a.encoding == 0 && b.encoding == 0)
 		return true; // can't compare
-		
+
 	switch((a.encoding != 0) ? a.encoding : b.encoding) {
 		case media_encoded_audio_format::B_ANY:
 		default:
@@ -488,7 +488,7 @@ encoded_video_format_matches(const media_encoded_video_format& a,
 
 	if (a.encoding == 0 && b.encoding == 0)
 		return true; // can't compare
-		
+
 	switch((a.encoding != 0) ? a.encoding : b.encoding) {
 		case media_encoded_video_format::B_ANY:
 		default:
@@ -592,7 +592,7 @@ multistream_format_specialize(media_multistream_format* format,
 		format->flags = other->flags;
 	if (format->format == 0)
 		format->format = other->format;
-		
+
 	switch (format->format) {
 		case media_multistream_format::B_VID:
 			if (format->u.vid.frame_rate == 0)
@@ -636,7 +636,8 @@ multistream_format_specialize(media_multistream_format* format,
 
 		default:
 			ERROR("media_format::SpecializeTo can't specialize "
-				"media_multistream_format of format %ld\n", format->format);
+				"media_multistream_format of format %" B_PRId32 "\n",
+				format->format);
 	}
 }
 
@@ -688,21 +689,21 @@ media_format::Matches(const media_format* other) const
 		// TODO: How do we compare two formats with no type?
 		return true;
 	}
-		
+
 	if (type != 0 && other->type != 0 && type != other->type)
 		return false;
-	
+
 	switch ((type != 0) ? type : other->type) {
 		case B_MEDIA_RAW_AUDIO:
 			return multi_audio_format_matches(u.raw_audio, other->u.raw_audio);
-			
+
 		case B_MEDIA_RAW_VIDEO:
 			return raw_video_format_matches(u.raw_video, other->u.raw_video);
 
 		case B_MEDIA_MULTISTREAM:
 			return multistream_format_matches(u.multistream,
 				other->u.multistream);
-				
+
 		case B_MEDIA_ENCODED_AUDIO:
 			return encoded_audio_format_matches(u.encoded_audio,
 				other->u.encoded_audio);
@@ -710,7 +711,7 @@ media_format::Matches(const media_format* other) const
 		case B_MEDIA_ENCODED_VIDEO:
 			return encoded_video_format_matches(u.encoded_video,
 				other->u.encoded_video);
-		
+
 		default:
 			return true; // TODO: really?
 	}
@@ -727,16 +728,16 @@ media_format::SpecializeTo(const media_format* otherFormat)
 			"wildcard format\n");
 		return;
 	}
-		
+
 	if (type == 0)
 		type = otherFormat->type;
-	
+
 	switch (type) {
 		case B_MEDIA_RAW_AUDIO:
 			multi_audio_format_specialize(&u.raw_audio,
 				&otherFormat->u.raw_audio);
 			return;
-			
+
 		case B_MEDIA_RAW_VIDEO:
 			raw_video_format_specialize(&u.raw_video,
 				&otherFormat->u.raw_video);
@@ -746,7 +747,7 @@ media_format::SpecializeTo(const media_format* otherFormat)
 			multistream_format_specialize(&u.multistream,
 				&otherFormat->u.multistream);
 			return;
-	
+
 		case B_MEDIA_ENCODED_AUDIO:
 			encoded_audio_format_specialize(&u.encoded_audio,
 				&otherFormat->u.encoded_audio);
@@ -756,7 +757,7 @@ media_format::SpecializeTo(const media_format* otherFormat)
 			encoded_video_format_specialize(&u.encoded_video,
 				&otherFormat->u.encoded_video);
 			return;
-		
+
 		default:
 			ERROR("media_format::SpecializeTo can't specialize format "
 				"type %d\n", type);
@@ -769,7 +770,7 @@ media_format::SetMetaData(const void* data, size_t size)
 {
 	if (!data || size < 0 || size > META_DATA_MAX_SIZE)
 		return B_BAD_VALUE;
-	
+
 	void* new_addr;
 	area_id new_area;
 	if (size < META_DATA_AREA_MIN_SIZE) {
@@ -792,9 +793,9 @@ media_format::SetMetaData(const void* data, size_t size)
 	meta_data = new_addr;
 	meta_data_size = size;
 	meta_data_area = new_area;
-	
+
 	memcpy(meta_data, data, size);
-	
+
 	if (meta_data_area > 0)
 		set_area_protection(meta_data_area, B_READ_AREA);
 
@@ -857,7 +858,7 @@ media_format::operator=(const media_format& clone)
 	// clone or copy the meta data
 	if (clone.meta_data) {
 		if (clone.meta_data_area != B_BAD_VALUE) {
-			meta_data_area = clone_area("meta_data_clone_area", &meta_data, 
+			meta_data_area = clone_area("meta_data_clone_area", &meta_data,
 				B_ANY_ADDRESS, B_READ_AREA, clone.meta_data_area);
 			if (meta_data_area < 0) {
 				// whoops, we just lost our meta data
@@ -1011,7 +1012,7 @@ operator==(const media_multistream_format& a,
 	switch (a.format) {
 		case media_multistream_format::B_VID:
 			return a.u.vid == b.u.vid;
-			
+
 		case media_multistream_format::B_AVI:
 			return a.u.avi == b.u.avi;
 
@@ -1031,30 +1032,30 @@ operator==(const media_format& a, const media_format& b)
 		|| a.deny_flags != b.deny_flags) {
 		return false;
 	}
-		
+
 	switch (a.type) {
 		case B_MEDIA_RAW_AUDIO:
 			return a.u.raw_audio == b.u.raw_audio;
-			
+
 		case B_MEDIA_RAW_VIDEO:
 			return a.u.raw_video == b.u.raw_video;
-			
+
 		case B_MEDIA_MULTISTREAM:
 			return a.u.multistream == b.u.multistream;
-			
+
 		case B_MEDIA_ENCODED_AUDIO:
 			return a.u.encoded_audio == b.u.encoded_audio;
-			
+
 		case B_MEDIA_ENCODED_VIDEO:
 			return a.u.encoded_video == b.u.encoded_video;
-			
+
 		default:
 			return true; // TODO: really?
 	}
 }
 
 
-// #pragma mark - 
+// #pragma mark -
 
 
 /*! return \c true if a and b are compatible (accounting for wildcards)
@@ -1072,17 +1073,18 @@ string_for_format(const media_format& f, char* buf, size_t size)
 {
 	char encoding[10]; /* maybe Be wanted to use some 4CCs ? */
 	const char* videoOrientation = "0"; /* I'd use "NC", R5 uses 0. */
-	
+
 	if (buf == NULL)
 		return false;
 	switch (f.type) {
 	case B_MEDIA_RAW_AUDIO:
 		snprintf(buf, size,
-			"raw_audio;%g;%ld;0x%lx;%ld;0x%lx;0x%08lx;%d;0x%04x", 
-			f.u.raw_audio.frame_rate, 
-			f.u.raw_audio.channel_count, 
-			f.u.raw_audio.format, 
-			f.u.raw_audio.byte_order, 
+			"raw_audio;%g;%" B_PRIu32 ";0x%" B_PRIx32 ";%" B_PRIu32 ";0x%"
+				B_PRIxSIZE ";0x%#" B_PRIx32 ";%d;0x%04x",
+			f.u.raw_audio.frame_rate,
+			f.u.raw_audio.channel_count,
+			f.u.raw_audio.format,
+			f.u.raw_audio.byte_order,
 			f.u.raw_audio.buffer_size,
 			f.u.raw_audio.channel_mask,
 			f.u.raw_audio.valid_bits,
@@ -1093,9 +1095,8 @@ string_for_format(const media_format& f, char* buf, size_t size)
 			videoOrientation = "TopLR";
 		else if (f.u.raw_video.orientation == B_VIDEO_BOTTOM_LEFT_RIGHT)
 			videoOrientation = "BotLR";
-//		snprintf(buf, size, "raw_video;%g;%ld;%ld;%ld;%s;%d;%d;%d;%d;%d;%d;"
-//			"%d;%d",
-		snprintf(buf, size, "raw_video;%g;0x%x;%ld;%ld;%ld;%ld;%s;%d;%d",
+		snprintf(buf, size, "raw_video;%g;0x%x;%" B_PRIu32 ";%" B_PRIu32 ";%"
+				B_PRIu32 ";%" B_PRIu32 ";%s;%d;%d",
 			f.u.raw_video.field_rate,
 			f.u.raw_video.display.format,
 			f.u.raw_video.interlace,
@@ -1108,21 +1109,20 @@ string_for_format(const media_format& f, char* buf, size_t size)
 		return true;
 	case B_MEDIA_ENCODED_AUDIO:
 		snprintf(encoding, 10, "%d", f.u.encoded_audio.encoding);
-		snprintf(buf, size, 
-			"caudio;%s;%g;%ld;(%g;%ld;0x%lx;%ld;0x%lx;0x%08lx;%d;0x%04x)", 
-			encoding, // f.u.encoded_audio.encoding, 
-			f.u.encoded_audio.bit_rate, 
-			f.u.encoded_audio.frame_size, 
-			// (
-			f.u.encoded_audio.output.frame_rate, 
-			f.u.encoded_audio.output.channel_count, 
-			f.u.encoded_audio.output.format, 
-			f.u.encoded_audio.output.byte_order, 
+		snprintf(buf, size,
+			"caudio;%s;%g;%ld;(%g;%" B_PRIu32 ";0x%" B_PRIx32 ";%" B_PRIu32
+				";0x%" B_PRIxSIZE ";0x%08" B_PRIx32 ";%d;0x%04x)",
+			encoding,
+			f.u.encoded_audio.bit_rate,
+			f.u.encoded_audio.frame_size,
+			f.u.encoded_audio.output.frame_rate,
+			f.u.encoded_audio.output.channel_count,
+			f.u.encoded_audio.output.format,
+			f.u.encoded_audio.output.byte_order,
 			f.u.encoded_audio.output.buffer_size,
 			f.u.encoded_audio.multi_info.channel_mask,
 			f.u.encoded_audio.multi_info.valid_bits,
 			f.u.encoded_audio.multi_info.matrix_mask);
-			// )
 		return true;
 	case B_MEDIA_ENCODED_VIDEO:
 		snprintf(encoding, 10, "%d", f.u.encoded_video.encoding);
@@ -1130,23 +1130,22 @@ string_for_format(const media_format& f, char* buf, size_t size)
 			videoOrientation = "TopLR";
 		else if (f.u.encoded_video.output.orientation == B_VIDEO_BOTTOM_LEFT_RIGHT)
 			videoOrientation = "BotLR";
-		snprintf(buf, size, 
-			"cvideo;%s;%g;%g;%ld;(%g;0x%x;%ld;%ld;%ld;%ld;%s;%d;%d)",
-			encoding, 
-			f.u.encoded_video.avg_bit_rate, 
-			f.u.encoded_video.max_bit_rate, 
+		snprintf(buf, size,
+			"cvideo;%s;%g;%g;%" B_PRIuSIZE ";(%g;0x%x;%" B_PRIu32 ";%" B_PRIu32
+				";%" B_PRIu32 ";%" B_PRIu32 ";%s;%d;%d)",
+			encoding,
+			f.u.encoded_video.avg_bit_rate,
+			f.u.encoded_video.max_bit_rate,
 			f.u.encoded_video.frame_size,
-			// (
 			f.u.encoded_video.output.field_rate,
 			f.u.encoded_video.output.display.format,
 			f.u.encoded_video.output.interlace,
-			f.u.encoded_video.output.display.line_width, 
+			f.u.encoded_video.output.display.line_width,
 			f.u.encoded_video.output.display.line_count,
 			f.u.encoded_video.output.first_active,
 			videoOrientation,
 			f.u.encoded_video.output.pixel_width_aspect,
 			f.u.encoded_video.output.pixel_height_aspect);
-			// )
 		return true;
 	default:
 		snprintf(buf, size, "%d-", f.type);
@@ -1232,7 +1231,7 @@ shutdown_media_server(bigtime_t timeout,
 	BMessage msg(B_QUIT_REQUESTED);
 	BMessage reply;
 	status_t err;
-	
+
 	if ((err = msg.AddBool("be:_user_request", true)) != B_OK)
 		return err;
 
@@ -1266,7 +1265,7 @@ shutdown_media_server(bigtime_t timeout,
 		progress(40, "Waiting for media_server to quit.", cookie);
 		snooze(200000);
 	}
-	
+
 	if (be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE)) {
 		progress(50, "Waiting for media_addon_server to quit.", cookie);
 		snooze(200000);
@@ -1310,7 +1309,7 @@ launch_media_server(uint32 flags)
 	err = B_MEDIA_SYSTEM_FAILURE;
 	for (int i = 0; i < 15; i++) {
 		snooze(2000000);
-		
+
 		BMessage msg(1); // this is a hack
 		BMessage reply;
 		BMessenger messenger(B_MEDIA_ADDON_SERVER_SIGNATURE);

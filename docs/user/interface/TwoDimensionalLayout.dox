@@ -1,17 +1,21 @@
 /*
- * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation by:
- *   Alex Wilson <yourpalal2@gmail.com>
+ * Authors:
+ *		Alex Wilson, yourpalal2@gmail.com
+ *
  * Corresponds to:
- *   /trunk/headers/os/interface/TwoDimensionalLayout.h  rev 38207
- *   /trunk/src/kits/interface/TwoDimensionalLayout.cpp  rev 38207
+ *		headers/os/interface/TwoDimensionalLayout.h	rev 38207
+ *		src/kits/interface/TwoDimensionalLayout.cpp	rev 38207
  */
 
 
 /*!
 	\file TwoDimensionalLayout.h
+	\ingroup interface
+	\ingroup layout
+	\ingroup libbe
 	\brief Defines the BTwoDimensionalLayout class.
 */
 
@@ -21,7 +25,6 @@
 	\ingroup interface
 	\ingroup layout
 	\ingroup libbe
-
 	\brief Abstract BLayout subclass arranging items within rows and columns.
 
 	This class manages all the tricky work of actually positioning/resizing

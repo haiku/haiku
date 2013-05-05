@@ -22,7 +22,6 @@
 #include <thread.h>
 #include <vm/vm.h>
 #include <vm/VMAddressSpace.h>
-#include <arm_mmu.h>
 
 #include "paging/32bit/ARMPagingStructures32Bit.h"
 #include "paging/32bit/ARMVMTranslationMap32Bit.h"
@@ -30,7 +29,7 @@
 #include "paging/arm_physical_page_mapper_large_memory.h"
 
 
-#define TRACE_ARM_PAGING_METHOD_32_BIT
+//#define TRACE_ARM_PAGING_METHOD_32_BIT
 #ifdef TRACE_ARM_PAGING_METHOD_32_BIT
 #	define TRACE(x...) dprintf(x)
 #else
@@ -118,7 +117,7 @@ ARMPagingMethod32Bit::PhysicalPageSlotPool::InitInitialPostArea(
 	area_id area = create_area("physical page pool", &temp,
 		B_EXACT_ADDRESS, areaSize, B_ALREADY_WIRED,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	if (area < B_OK) {
+	if (area < 0) {
 		panic("LargeMemoryPhysicalPageMapper::InitPostArea(): Failed to "
 			"create area for physical page pool.");
 		return area;
@@ -169,9 +168,10 @@ void
 ARMPagingMethod32Bit::PhysicalPageSlotPool::Map(phys_addr_t physicalAddress,
 	addr_t virtualAddress)
 {
-	page_table_entry& pte = fPageTable[(virtualAddress - fVirtualBase) / B_PAGE_SIZE];
+	page_table_entry& pte = fPageTable[
+		(virtualAddress - fVirtualBase) / B_PAGE_SIZE];
 	pte = (physicalAddress & ARM_PTE_ADDRESS_MASK)
-		| ARM_PTE_TYPE_SMALL_PAGE;
+		| ARM_MMU_L2_TYPE_SMALLEXT;
 
 	arch_cpu_invalidate_TLB_range(virtualAddress, virtualAddress + B_PAGE_SIZE);
 //	invalidate_TLB(virtualAddress);
@@ -197,7 +197,7 @@ ARMPagingMethod32Bit::PhysicalPageSlotPool::AllocatePool(
 	physical_address_restrictions physicalRestrictions = {};
 	area_id dataArea = create_area_etc(B_SYSTEM_TEAM, "physical page pool",
 		PAGE_ALIGN(areaSize), B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, CREATE_AREA_DONT_WAIT,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, CREATE_AREA_DONT_WAIT, 0,
 		&virtualRestrictions, &physicalRestrictions, &data);
 	if (dataArea < 0)
 		return dataArea;
@@ -298,7 +298,7 @@ ARMPagingMethod32Bit::Init(kernel_args* args,
 		x86_write_cr4(x86_read_cr4() | IA32_CR4_GLOBAL_PAGES);
 	}
 #endif
-	TRACE("vm_translation_map_init: done\n");
+	TRACE("ARMPagingMethod32Bit::Init(): done\n");
 
 	*_physicalPageMapper = fPhysicalPageMapper;
 	return B_OK;
@@ -313,8 +313,9 @@ ARMPagingMethod32Bit::InitPostArea(kernel_args* args)
 	area_id area;
 
 	temp = (void*)fKernelVirtualPageDirectory;
-	area = create_area("kernel_pgdir", &temp, B_EXACT_ADDRESS, MMU_L1_TABLE_SIZE,
-		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	area = create_area("kernel_pgdir", &temp, B_EXACT_ADDRESS,
+		ARM_MMU_L1_TABLE_SIZE, B_ALREADY_WIRED, B_KERNEL_READ_AREA
+			| B_KERNEL_WRITE_AREA);
 	if (area < B_OK)
 		return area;
 
@@ -371,7 +372,7 @@ ARMPagingMethod32Bit::MapEarly(kernel_args* args, addr_t virtualAddress,
 		memset((void*)pgtable, 0, B_PAGE_SIZE);
 	}
 
-	page_table_entry *ptEntry = (page_table_entry*)
+	page_table_entry* ptEntry = (page_table_entry*)
 		(fKernelVirtualPageDirectory[index] & ARM_PDE_ADDRESS_MASK);
 	ptEntry += VADDR_TO_PTENT(virtualAddress);
 
@@ -460,8 +461,7 @@ ARMPagingMethod32Bit::IsKernelPageAccessible(addr_t virtualAddress,
 ARMPagingMethod32Bit::PutPageTableInPageDir(page_directory_entry* entry,
 	phys_addr_t pgtablePhysical, uint32 attributes)
 {
-	*entry = (pgtablePhysical & ARM_PDE_ADDRESS_MASK)
-		| ARM_PDE_TYPE_COARSE_L2_PAGE_TABLE;
+	*entry = (pgtablePhysical & ARM_PDE_ADDRESS_MASK) | ARM_MMU_L1_TYPE_COARSE;
 		// TODO: we ignore the attributes of the page table - for compatibility
 		// with BeOS we allow having user accessible areas in the kernel address
 		// space. This is currently being used by some drivers, mainly for the
@@ -478,7 +478,7 @@ ARMPagingMethod32Bit::PutPageTableEntryInTable(page_table_entry* entry,
 	bool globalPage)
 {
 	page_table_entry page = (physicalAddress & ARM_PTE_ADDRESS_MASK)
-		| ARM_PTE_TYPE_SMALL_PAGE;
+		| ARM_MMU_L2_TYPE_SMALLEXT;
 #if 0 //IRA
 		| ARM_PTE_PRESENT | (globalPage ? ARM_PTE_GLOBAL : 0)
 		| MemoryTypeToPageTableEntryFlags(memoryType);

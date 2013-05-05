@@ -53,8 +53,8 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libjasper/jasper.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "JPEG2000Translator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "JPEG2000Translator"
 
 // Settings
 #define JP2_SETTINGS_FILE	"JPEG2000Translator"

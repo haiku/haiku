@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -21,15 +21,17 @@
 
 class NetNotificationService : public DefaultUserNotificationService {
 public:
-							NetNotificationService();
-	virtual					~NetNotificationService();
+								NetNotificationService();
+	virtual						~NetNotificationService();
 
-			void			Notify(const KMessage& event);
+			void				Notify(const KMessage& event);
 
 protected:
-	virtual	void			FirstAdded();
-	virtual	void			LastRemoved();
+	virtual	void				LastReferenceReleased();
+	virtual	void				FirstAdded();
+	virtual	void				LastRemoved();
 };
+
 
 static NetNotificationService sNotificationService;
 
@@ -38,7 +40,8 @@ static NetNotificationService sNotificationService;
 
 
 NetNotificationService::NetNotificationService()
-	: DefaultUserNotificationService("network")
+	:
+	DefaultUserNotificationService("network")
 {
 }
 
@@ -58,6 +61,13 @@ NetNotificationService::Notify(const KMessage& event)
 	TRACE("notify for %lx\n", opcode);
 
 	DefaultUserNotificationService::Notify(event, opcode);
+}
+
+
+void
+NetNotificationService::LastReferenceReleased()
+{
+	// don't delete us here
 }
 
 
@@ -120,19 +130,32 @@ notifications_std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
+		{
 			TRACE("init\n");
 
 			new(&sNotificationService) NetNotificationService();
+			status_t result = sNotificationService.Register();
+			if (result != B_OK)
+				return result;
 
 			register_generic_syscall(NET_NOTIFICATIONS_SYSCALLS,
 				net_notifications_control, 1, 0);
 			return B_OK;
-
+		}
 		case B_MODULE_UNINIT:
 			TRACE("uninit\n");
 
 			unregister_generic_syscall(NET_NOTIFICATIONS_SYSCALLS, 1);
 
+			// TODO: due to the way the locking in the notification
+			// manager works, there's a potential race condition here
+			// where someone attempts to add a listener right as
+			// we're uninitializing. Needs to be looked at/resolved.
+			sNotificationService.Unregister();
+
+			// we need to release the reference that was acquired
+			// on our behalf by the NotificationManager.
+			sNotificationService.ReleaseReference();
 			sNotificationService.~NetNotificationService();
 			return B_OK;
 

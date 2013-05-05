@@ -35,6 +35,7 @@ All rights reserved.
 #ifndef SWITCHER_H
 #define SWITCHER_H
 
+
 #include <Box.h>
 #include <List.h>
 #include <OS.h>
@@ -62,7 +63,6 @@ public:
 			int32			CurrentWindow();
 			int32			CurrentSlot();
 			BList*			GroupList();
-			int32			CountVisibleGroups();
 
 			void			QuitApp();
 			void			HideApp();
@@ -103,5 +103,5 @@ private:
 			int32			fWindowID;
 };
 
-#endif	/* SWITCHER_H */
 
+#endif	/* SWITCHER_H */

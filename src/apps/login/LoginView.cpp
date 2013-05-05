@@ -15,8 +15,8 @@
 #include "LoginApp.h"
 #include "LoginView.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Login View"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Login View"
 
 #define LW 120
 #define CSEP 15

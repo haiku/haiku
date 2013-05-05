@@ -12,7 +12,7 @@
 #include <sys/types.h>
 
 
-#define time_uptime system_time() / 1000000
+#define time_uptime (system_time() / 1000000)
 
 
 int	ppsratecheck(struct timeval*, int*, int);

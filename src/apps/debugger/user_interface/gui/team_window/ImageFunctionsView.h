@@ -31,6 +31,9 @@ public:
 									ImageDebugInfo* imageDebugInfo);
 			void				SetFunction(FunctionInstance* function);
 
+			void				LoadSettings(const BMessage& settings);
+			status_t			SaveSettings(BMessage& settings);
+
 private:
 			class FunctionsTableModel;
 

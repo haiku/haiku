@@ -121,24 +121,20 @@ BSoundPlayer::~BSoundPlayer()
 		// nodes that we're using. We *are* supposed to do that even for global
 		// nodes like the Mixer.
 		err = roster->Disconnect(fMediaOutput, fMediaInput);
-#if DEBUG > 0
 		if (err != B_OK) {
 			TRACE("BSoundPlayer::~BSoundPlayer: Error disconnecting nodes: "
 				"%ld (%s)\n", err, strerror(err));
 		}
-#endif
 	}
 
 	if ((fFlags & F_MUST_RELEASE_MIXER) != 0) {
 		// Release the mixer as it was acquired
 		// through BMediaRoster::GetAudioMixer()
 		err = roster->ReleaseNode(fMediaInput.node);
-#if DEBUG > 0
 		if (err != B_OK) {
 			TRACE("BSoundPlayer::~BSoundPlayer: Error releasing input node: "
 				"%ld (%s)\n", err, strerror(err));
 		}
-#endif
 	}
 
 cleanup:

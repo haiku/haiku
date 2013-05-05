@@ -3,9 +3,9 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "audio/ogg";
 
-resource(2, "META:S:DESC") #'MSDC' "Ogg Audio";
+resource(2, "META:S:DESC") #'MSDC' "Ogg audio file";
 
-resource(3, "META:L:DESC") #'MLDC' "Ogg Audio Profile (audio in Ogg container)";
+resource(3, "META:L:DESC") #'MLDC' "Ogg audio profile (audio in Ogg container)";
 
 resource(4, "META:EXTENS") message(234) {
 	"extensions" = "oga",

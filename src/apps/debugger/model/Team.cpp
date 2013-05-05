@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -22,6 +22,7 @@
 #include "Statement.h"
 #include "TeamDebugInfo.h"
 #include "Tracing.h"
+#include "Watchpoint.h"
 
 
 // #pragma mark - BreakpointByAddressPredicate
@@ -44,6 +45,26 @@ private:
 	target_addr_t	fAddress;
 };
 
+
+// #pragma mark - WatchpointByAddressPredicate
+
+
+struct Team::WatchpointByAddressPredicate
+	: UnaryPredicate<Watchpoint> {
+	WatchpointByAddressPredicate(target_addr_t address)
+		:
+		fAddress(address)
+	{
+	}
+
+	virtual int operator()(const Watchpoint* watchpoint) const
+	{
+		return -Watchpoint::CompareAddressWatchpoint(&fAddress, watchpoint);
+	}
+
+private:
+	target_addr_t	fAddress;
+};
 
 
 // #pragma mark - Team
@@ -70,6 +91,9 @@ Team::~Team()
 
 	for (int32 i = 0; Breakpoint* breakpoint = fBreakpoints.ItemAt(i); i++)
 		breakpoint->ReleaseReference();
+
+	for (int32 i = 0; Watchpoint* watchpoint = fWatchpoints.ItemAt(i); i++)
+		watchpoint->ReleaseReference();
 
 	while (Image* image = fImages.RemoveHead())
 		image->ReleaseReference();
@@ -363,11 +387,72 @@ Team::RemoveUserBreakpoint(UserBreakpoint* userBreakpoint)
 }
 
 
+bool
+Team::AddWatchpoint(Watchpoint* watchpoint)
+{
+	if (fWatchpoints.BinaryInsert(watchpoint, &Watchpoint::CompareWatchpoints))
+		return true;
+
+	watchpoint->ReleaseReference();
+	return false;
+}
+
+
+void
+Team::RemoveWatchpoint(Watchpoint* watchpoint)
+{
+	int32 index = fWatchpoints.BinarySearchIndex(*watchpoint,
+		&Watchpoint::CompareWatchpoints);
+	if (index < 0)
+		return;
+
+	fWatchpoints.RemoveItemAt(index);
+	watchpoint->ReleaseReference();
+}
+
+
+int32
+Team::CountWatchpoints() const
+{
+	return fWatchpoints.CountItems();
+}
+
+
+Watchpoint*
+Team::WatchpointAt(int32 index) const
+{
+	return fWatchpoints.ItemAt(index);
+}
+
+
+Watchpoint*
+Team::WatchpointAtAddress(target_addr_t address) const
+{
+	return fWatchpoints.BinarySearchByKey(address,
+		&Watchpoint::CompareAddressWatchpoint);
+}
+
+
+void
+Team::GetWatchpointsInAddressRange(TargetAddressRange range,
+	BObjectList<Watchpoint>& watchpoints) const
+{
+	int32 index = fWatchpoints.FindBinaryInsertionIndex(
+		WatchpointByAddressPredicate(range.Start()));
+	for (; Watchpoint* watchpoint = fWatchpoints.ItemAt(index); index++) {
+		if (watchpoint->Address() > range.End())
+			break;
+
+		watchpoints.AddItem(watchpoint);
+	}
+}
+
+
 status_t
 Team::GetStatementAtAddress(target_addr_t address, FunctionInstance*& _function,
 	Statement*& _statement)
 {
-	TRACE_CODE("Team::GetStatementAtAddress(%#llx)\n", address);
+	TRACE_CODE("Team::GetStatementAtAddress(%#" B_PRIx64 ")\n", address);
 
 	// get the image at the address
 	Image* image = ImageByAddress(address);
@@ -422,8 +507,8 @@ status_t
 Team::GetStatementAtSourceLocation(SourceCode* sourceCode,
 	const SourceLocation& location, Statement*& _statement)
 {
-	TRACE_CODE("Team::GetStatementAtSourceLocation(%p, (%ld, %ld))\n",
-		sourceCode, location.Line(), location.Column());
+	TRACE_CODE("Team::GetStatementAtSourceLocation(%p, (%" B_PRId32 ", %"
+		B_PRId32 "))\n", sourceCode, location.Line(), location.Column());
 
 	// If we're lucky the source code can provide us with a statement.
 	if (DisassembledCode* code = dynamic_cast<DisassembledCode*>(sourceCode)) {
@@ -540,6 +625,28 @@ Team::NotifyUserBreakpointChanged(UserBreakpoint* breakpoint)
 
 
 void
+Team::NotifyWatchpointChanged(Watchpoint* watchpoint)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->WatchpointChanged(WatchpointEvent(
+			TEAM_EVENT_WATCHPOINT_CHANGED, this, watchpoint));
+	}
+}
+
+
+void
+Team::NotifyDebugReportChanged(const char* reportPath)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->DebugReportChanged(DebugReportEvent(
+			TEAM_EVENT_DEBUG_REPORT_CHANGED, this, reportPath));
+	}
+}
+
+
+void
 Team::_NotifyThreadAdded(Thread* thread)
 {
 	for (ListenerList::Iterator it = fListeners.GetIterator();
@@ -575,28 +682,6 @@ Team::_NotifyImageRemoved(Image* image)
 	for (ListenerList::Iterator it = fListeners.GetIterator();
 			Listener* listener = it.Next();) {
 		listener->ImageRemoved(ImageEvent(TEAM_EVENT_IMAGE_REMOVED, image));
-	}
-}
-
-
-void
-Team::_NotifyBreakpointAdded(Breakpoint* breakpoint)
-{
-	for (ListenerList::Iterator it = fListeners.GetIterator();
-			Listener* listener = it.Next();) {
-		listener->BreakpointAdded(BreakpointEvent(
-			TEAM_EVENT_BREAKPOINT_ADDED, this, breakpoint));
-	}
-}
-
-
-void
-Team::_NotifyBreakpointRemoved(Breakpoint* breakpoint)
-{
-	for (ListenerList::Iterator it = fListeners.GetIterator();
-			Listener* listener = it.Next();) {
-		listener->BreakpointRemoved(BreakpointEvent(
-			TEAM_EVENT_BREAKPOINT_REMOVED, this, breakpoint));
 	}
 }
 
@@ -642,6 +727,30 @@ Team::BreakpointEvent::BreakpointEvent(uint32 type, Team* team,
 	:
 	Event(type, team),
 	fBreakpoint(breakpoint)
+{
+}
+
+
+// #pragma mark - DebugReportEvent
+
+
+Team::DebugReportEvent::DebugReportEvent(uint32 type, Team* team,
+	const char* reportPath)
+	:
+	Event(type, team),
+	fReportPath(reportPath)
+{
+}
+
+
+// #pragma mark - WatchpointEvent
+
+
+Team::WatchpointEvent::WatchpointEvent(uint32 type, Team* team,
+	Watchpoint* watchpoint)
+	:
+	Event(type, team),
+	fWatchpoint(watchpoint)
 {
 }
 
@@ -728,5 +837,29 @@ Team::Listener::BreakpointRemoved(const Team::BreakpointEvent& event)
 
 void
 Team::Listener::UserBreakpointChanged(const Team::UserBreakpointEvent& event)
+{
+}
+
+
+void
+Team::Listener::WatchpointAdded(const Team::WatchpointEvent& event)
+{
+}
+
+
+void
+Team::Listener::WatchpointRemoved(const Team::WatchpointEvent& event)
+{
+}
+
+
+void
+Team::Listener::WatchpointChanged(const Team::WatchpointEvent& event)
+{
+}
+
+
+void
+Team::Listener::DebugReportChanged(const Team::DebugReportEvent& event)
 {
 }

@@ -117,7 +117,8 @@ ps2_selftest()
 	uint8 in;
 	res = ps2_command(PS2_CTRL_SELF_TEST, NULL, 0, &in, 1);
 	if (res != B_OK || in != 0x55) {
-		INFO("ps2: controller self test failed, status 0x%08lx, data 0x%02x\n", res, in);
+		INFO("ps2: controller self test failed, status 0x%08" B_PRIx32 ", data "
+			"0x%02x\n", res, in);
 		return B_ERROR;
 	}
 	return B_OK;
@@ -131,7 +132,8 @@ ps2_setup_command_byte(bool interruptsEnabled)
 	uint8 cmdbyte;
 
 	res = ps2_command(PS2_CTRL_READ_CMD, NULL, 0, &cmdbyte, 1);
-	TRACE("ps2: get command byte: res 0x%08lx, cmdbyte 0x%02x\n", res, cmdbyte);
+	TRACE("ps2: get command byte: res 0x%08" B_PRIx32 ", cmdbyte 0x%02x\n",
+		res, cmdbyte);
 	if (res != B_OK)
 		cmdbyte = 0x47;
 
@@ -144,7 +146,8 @@ ps2_setup_command_byte(bool interruptsEnabled)
 		cmdbyte &= ~(PS2_BITS_KEYBOARD_INTERRUPT | PS2_BITS_AUX_INTERRUPT);
 
 	res = ps2_command(PS2_CTRL_WRITE_CMD, &cmdbyte, 1, NULL, 0);
-	TRACE("ps2: set command byte: res 0x%08lx, cmdbyte 0x%02x\n", res, cmdbyte);
+	TRACE("ps2: set command byte: res 0x%08" B_PRIx32 ", cmdbyte 0x%02x\n",
+		res, cmdbyte);
 
 	return res;
 }
@@ -205,7 +208,8 @@ done:
 	// This fixes bug report #1175
 	res = ps2_command(0xae, NULL, 0, NULL, 0);
 	if (res != B_OK) {
-		INFO("ps2: active multiplexing d3 workaround failed, status 0x%08lx\n", res);
+		INFO("ps2: active multiplexing d3 workaround failed, status 0x%08"
+			B_PRIx32 "\n", res);
 	}
 	return B_OK;
 
@@ -256,7 +260,7 @@ ps2_command(uint8 cmd, const uint8 *out, int outCount, uint8 *in, int inCount)
 #ifdef TRACE_PS2
 	for (i = 0; i < inCount; i++)
 		TRACE("ps2: ps2_command in 0x%02x\n", in[i]);
-	TRACE("ps2: ps2_command result 0x%08lx\n", res);
+	TRACE("ps2: ps2_command result 0x%08" B_PRIx32 "\n", res);
 #endif
 
 	atomic_add(&sIgnoreInterrupts, -1);

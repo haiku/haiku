@@ -80,12 +80,12 @@ class BNavMenu : public BSlowMenu {
 			BWindow *parentWindow = NULL, const BObjectList<BString> *list = NULL);
 			// parentWindow, if specified, will be closed if nav menu item invoked
 			// with option held down
-							
+
 		virtual ~BNavMenu();
-	
+
 		virtual	void AttachedToWindow();
 		virtual	void DetachedFromWindow();
-				
+
 		void SetNavDir(const entry_ref *);
 		void ForceRebuild();
 		bool NeedsToRebuild() const;
@@ -96,7 +96,7 @@ class BNavMenu : public BSlowMenu {
 		BMessenger Target();
 
 		void SetTypesList(const BObjectList<BString> *list);
-		const BObjectList<BString> *TypesList() const;	
+		const BObjectList<BString> *TypesList() const;
 
 		void AddNavDir(const Model *model, uint32 what, BHandler *target,
 			bool populateSubmenu);
@@ -121,7 +121,7 @@ class BNavMenu : public BSlowMenu {
 	protected:
 		virtual bool StartBuildingItemList();
 		virtual bool AddNextItem();
-		virtual void DoneBuildingItemList();	
+		virtual void DoneBuildingItemList();
 		virtual void  ClearMenuBuildingState();
 
 		void BuildVolumeMenu();
@@ -142,7 +142,7 @@ class BNavMenu : public BSlowMenu {
 		EntryListBase *fContainer;
 		bool		fIteratingDesktop;
 
-		const BObjectList<BString> *fTypesList;
+		BObjectList<BString> *fTypesList;
 
 		TrackingHookData fTrackingHook;
 };

@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src apps soundrecorder ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders shared ;
+UsePrivateHeaders shared media ;
 
 Application SoundRecorder :
 	DrawButton.cpp
@@ -11,9 +11,7 @@ Application SoundRecorder :
 	RecorderApp.cpp
 	RecorderWindow.cpp
 	ScopeView.cpp
-	SoundConsumer.cpp
 	SoundListView.cpp
-	SoundUtils.cpp
 	TrackSlider.cpp
 	TransportButton.cpp
 	UpDownButton.cpp

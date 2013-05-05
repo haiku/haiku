@@ -528,8 +528,8 @@ main(int argc, const char *const *argv)
 		thread_info threadInfo;
 		status_t error = get_thread_info(threadID, &threadInfo);
 		if (error != B_OK) {
-			fprintf(stderr, "%s: Failed to get info for thread %ld: %s\n",
-				kCommandName, threadID, strerror(error));
+			fprintf(stderr, "%s: Failed to get info for thread %" B_PRId32
+				": %s\n", kCommandName, threadID, strerror(error));
 			exit(1);
 		}
 		teamID = threadInfo.team;

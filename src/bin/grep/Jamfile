@@ -1,4 +1,0 @@
-SubDir HAIKU_TOP src bin grep ;
-
-SubInclude HAIKU_TOP src bin grep lib ;
-SubInclude HAIKU_TOP src bin grep src ; 

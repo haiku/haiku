@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku.
+ * Copyright 2006-2012, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -89,7 +89,7 @@ class VectorPath {
 
 	// VectorPath
 			VectorPath&			operator=(const VectorPath& from);
-//			bool				operator==(const VectorPath& from) const;
+			bool				operator==(const VectorPath& from) const;
 
 			void				MakeEmpty();
 

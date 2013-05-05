@@ -1,23 +1,28 @@
 /*
- * Copyright 2011, Haiku inc.
+ * Copyright 2011 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation by:
- *		John Scipione <jscipione@gmail.com>
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
  * Corresponds to:
- *		/trunk/headers/os/interface/Alert.h	 rev 42274
- *		/trunk/src/kits/interface/Alert.cpp	 rev 42274
+ *		headers/os/interface/Alert.h	 rev 42274
+ *		src/kits/interface/Alert.cpp	 rev 42274
  */
 
 
 /*!
 	\file Alert.h
+	\ingroup interface
+	\ingroup libbe
 	\brief BAlert class definition and support enums.
 */
 
 
 /*!
 	\enum alert_type
+	\ingroup interface
+
 	Determines which icon (if any) is displayed in the alert dialog.
 	Choose one option. If the constructor doesn't include an
 	alert_type argument than \c B_EMPTY_ALERT is used.
@@ -25,35 +30,46 @@
 
 /*!
 	\var alert_type B_EMPTY_ALERT
+
 	No icon
 */
 
 /*!
 	\var alert_type B_INFO_ALERT
+
 	\image html http://api.haiku-os.org/images/alert_info_32.png
+
 	Info icon
 */
 
 /*!
 	\var alert_type B_IDEA_ALERT
+
 	\image html http://api.haiku-os.org/images/alert_idea_32.png
+
 	Idea icon
 */
 
 /*!
 	\var alert_type B_WARNING_ALERT
+
 	\image html http://api.haiku-os.org/images/alert_warning_32.png
+
 	Warning icon
 */
 
 /*!
 	\var alert_type B_STOP_ALERT
+
 	\image html http://api.haiku-os.org/images/alert_stop_32.png
+
 	Stop icon
 */
 
 /*!
 	\enum button_spacing
+	\ingroup interface
+
 	Determines how the buttons on the alert dialog are spaced relative
 	to each other. Choose one option. If the constructor doesn't include a
 	button_spacing argument than \c B_EVEN_SPACING is used.
@@ -61,12 +77,14 @@
 
 /*!
 	\var button_spacing B_EVEN_SPACING
+
 	If the alert dialog has more than one button than the buttons are
 	spaced evenly across the bottom of the alert dialog.
 */
 
 /*!
 	\var button_spacing B_OFFSET_SPACING
+
 	If the alert dialog has more than one button than the leftmost button
 	is offset to the left-hand side of the dialog while the rest of the
 	buttons are grouped on the right. This is useful to separate off a
@@ -104,13 +122,13 @@
 	The code used to create and display an alert dialog like the one shown
 	above is shown below:
 
-	\code
+\code
 BAlert* alert = new BAlert("Close and save dialog", "Save changes to...",
-	"Cancel", "Don't save", "Save", B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
-	B_WARNING_ALERT);
+    "Cancel", "Don't save", "Save", B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
+    B_WARNING_ALERT);
 alert->SetShortcut(0, B_ESCAPE);
 int32 button_index = alert->Go();
-	\endcode
+\endcode
 
 	The messaged displayed in the dialog window along with the button labels
 	are set by the strings in the contructor. The Cancel button is offset to

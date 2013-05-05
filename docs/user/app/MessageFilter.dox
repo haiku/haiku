@@ -1,14 +1,20 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ * 
+ * Corresponds to:
+ *		headers/os/app/MessageFilter.h
+ *		src/kits/app/MessageFilter.cpp
  */
 
 
 /*!
 	\file MessageFilter.h
+	\ingroup app
+	\ingroup libbe
 	\brief Provides BMessageFilter class.
 */
 
@@ -18,7 +24,7 @@
 	\brief Return Codes and Protocol of the #filter_hook.
 
 	These return codes should be used in your own filter_hook function, or by
-	your overrided BMessageFilter::Filter() function.
+	your overridden BMessageFilter::Filter() method.
 */
 
 
@@ -137,6 +143,7 @@
 /*!
 	\class BMessageFilter
 	\ingroup app
+	\ingroup libbe
 	\brief Describes a message filter for BLooper and BHandler.
 
 	Objects of this class serve as a description of properties that incoming
@@ -327,4 +334,3 @@ looper->AddCommonFilter(filter);
 	\fn BLooper *BMessageFilter::Looper() const
 	\brief Return the looper this filter is associated with.
 */
-

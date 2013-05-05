@@ -32,13 +32,17 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+
+#include <ControlLook.h>
+#include <InterfaceDefs.h>
 #include <PopUpMenu.h>
 #include <Window.h>
 
 #include "MiniMenuField.h"
 #include "Utilities.h"
 
-MiniMenuField::MiniMenuField(BRect frame, const char *name, BPopUpMenu *menu,
+
+MiniMenuField::MiniMenuField(BRect frame, const char* name, BPopUpMenu* menu,
 	uint32 resizeFlags, uint32 flags)
 	:	BView(frame, name, resizeFlags, flags),
 		fMenu(menu)
@@ -46,12 +50,14 @@ MiniMenuField::MiniMenuField(BRect frame, const char *name, BPopUpMenu *menu,
 	SetFont(be_plain_font, B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE);
 }
 
+
 MiniMenuField::~MiniMenuField()
 {
 	delete fMenu;
 }
 
-void 
+
+void
 MiniMenuField::AttachedToWindow()
 {
 	if (Parent()) {
@@ -61,16 +67,18 @@ MiniMenuField::AttachedToWindow()
 	SetHighColor(0, 0, 0);
 }
 
-void 
+
+void
 MiniMenuField::MakeFocus(bool on)
 {
 	Invalidate();
 	BView::MakeFocus(on);
 }
 
+
 void
-MiniMenuField::KeyDown(const char *bytes, int32 numBytes)
-{	
+MiniMenuField::KeyDown(const char* bytes, int32 numBytes)
+{
 	switch (bytes[0]) {
 		case B_SPACE:
 		case B_DOWN_ARROW:
@@ -85,76 +93,59 @@ MiniMenuField::KeyDown(const char *bytes, int32 numBytes)
 	}
 }
 
-void 
+
+void
 MiniMenuField::Draw(BRect)
 {
 	BRect bounds(Bounds());
-	bounds.InsetBy(2, 2);
+	bounds.OffsetBy(1, 2);
+	bounds.right--;
+	bounds.bottom -= 2;
+	if (IsFocus()) {
+		// draw the focus indicator border
+		SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
+		StrokeRect(bounds);
+	}
+	bounds.right--;
+	bounds.bottom--;
 	BRect rect(bounds);
-	rect.right--;
-	rect.bottom--;
-	
+	rect.InsetBy(1, 1);
+
 	rgb_color darkest = tint_color(kBlack, 0.6f);
 	rgb_color dark = tint_color(kBlack, 0.4f);
 	rgb_color medium = dark;
 	rgb_color light = tint_color(kBlack, 0.03f);
-	
+
 	SetHighColor(medium);
-	
+
 	// draw frame and shadow
 	BeginLineArray(10);
-	AddLine(rect.RightTop(), rect.RightBottom(), darkest); 
-	AddLine(rect.RightBottom(), rect.LeftBottom(), darkest); 
-	AddLine(rect.LeftBottom(), rect.LeftTop(), medium); 
+	AddLine(rect.RightTop(), rect.RightBottom(), darkest);
+	AddLine(rect.RightBottom(), rect.LeftBottom(), darkest);
+	AddLine(rect.LeftBottom(), rect.LeftTop(), medium);
 	AddLine(rect.LeftTop(), rect.RightTop(), medium);
-	AddLine(bounds.LeftBottom() + BPoint(2, 0), bounds.RightBottom(), dark); 
-	AddLine(bounds.RightTop() + BPoint(0, 1), bounds.RightBottom(), dark); 
+	AddLine(bounds.LeftBottom() + BPoint(2, 0), bounds.RightBottom(), dark);
+	AddLine(bounds.RightTop() + BPoint(0, 1), bounds.RightBottom(), dark);
 	rect.InsetBy(1, 1);
-	AddLine(rect.RightTop(), rect.RightBottom(), medium); 
-	AddLine(rect.RightBottom(), rect.LeftBottom(), medium); 
-	AddLine(rect.LeftBottom(), rect.LeftTop(), light); 
+	AddLine(rect.RightTop(), rect.RightBottom(), medium);
+	AddLine(rect.RightBottom(), rect.LeftBottom(), medium);
+	AddLine(rect.LeftBottom(), rect.LeftTop(), light);
 	AddLine(rect.LeftTop(), rect.RightTop(), light);
-
 	EndLineArray();
-	
+
 	// draw triangle
-	rect = BRect(5, 5, 15, 15);
-	const rgb_color outlineColor = kBlack;
-	const rgb_color middleColor = {150, 150, 150, 255};
+	rect = BRect(0, 0, 12, 12);
+	rect.OffsetBy(4, 4);
+	const rgb_color arrowColor = {150, 150, 150, 255};
+	float tint = Window()->IsActive() ? B_DARKEN_3_TINT : B_DARKEN_1_TINT;
 
-	BeginLineArray(5);
-	AddLine(BPoint(rect.left + 3, rect.top + 1), 
-		BPoint(rect.left + 3, rect.top + 7), outlineColor);
-	AddLine(BPoint(rect.left + 3, rect.top + 1), 
-		BPoint(rect.left + 6, rect.top + 4), outlineColor);
-	AddLine(BPoint(rect.left + 6, rect.top + 4), 
-		BPoint(rect.left + 3, rect.top + 7), outlineColor);
-		
-	AddLine(BPoint(rect.left + 4, rect.top + 3), 
-		BPoint(rect.left + 4, rect.top + 5), middleColor);
-	AddLine(BPoint(rect.left + 5, rect.top + 4), 
-		BPoint(rect.left + 5, rect.top + 4), middleColor);
-	EndLineArray();
-
-	// draw focus if focused, else erase focus
-	bounds = Bounds();
-	bool focused = IsFocus() && Window()->IsActive();
-	rgb_color markColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
-	rgb_color viewColor = ViewColor();
-	BeginLineArray(4);
-	AddLine(BPoint(bounds.left, bounds.top),
-		BPoint(bounds.right, bounds.top), focused ? markColor : viewColor);
-	AddLine(BPoint(bounds.right, bounds.top),
-		BPoint(bounds.right, bounds.bottom), focused ? markColor : viewColor);
-	AddLine(BPoint(bounds.right, bounds.bottom),
-		BPoint(bounds.left, bounds.bottom), focused ? markColor : viewColor);
-	AddLine(BPoint(bounds.left, bounds.bottom),
-		BPoint(bounds.left, bounds.top), focused ? markColor : viewColor);
-	EndLineArray();
-
+	SetDrawingMode(B_OP_COPY);
+	be_control_look->DrawArrowShape(this, rect, rect, arrowColor,
+		BControlLook::B_RIGHT_ARROW, 0, tint);
 }
 
-void 
+
+void
 MiniMenuField::MouseDown(BPoint)
 {
 	fMenu->Go(ConvertToScreen(BPoint(4, 4)), true);

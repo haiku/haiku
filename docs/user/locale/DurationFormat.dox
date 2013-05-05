@@ -1,58 +1,119 @@
 /*
- * Copyright 2011, Haiku. All rights reserved.
+ * Copyright 2011 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Adrien Destugues, pulkomandy@pulkomandy.ath.cx
+ *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		/trunk/headers/os/locale/DurationFormat.h	 rev 42944
- *		/trunk/src/kits/locale/DurationFormat.cpp	 rev 42944
+ *		headers/os/locale/DurationFormat.h	 hrev45084
+ *		src/kits/locale/DurationFormat.cpp	 hrev45084
  */
 
 
 /*!
-  \class BDurationFormat
-  \ingroup locale
-  \brief Formatter for time interfals
-
-  BDurationFormat is a formatter for time intervals. A time interval is defined
-  by its start and end values, and the result is a string such as
-  "1 hour, 2 minutes, 28 seconds".
+	\file DurationFormat.h
+	\ingroup locale
+	\ingroup libbe
+	\brief Contains BDurationFormat class, a time interval formatter.
 */
 
 
 /*!
-  \fn BDurationFormat::BDurationFormat(const BString& separator)
-  \brief Constructor.
+	\class BDurationFormat
+	\ingroup locale
+	\ingroup libbe
+	\brief Formatter for time intervals.
 
-  \warning Creating a BDurationFormat is a costly operation. Most of the time,
-  you most likely want to use the default one through the BLocale class.
-
-  The separator string will be appended between the elements of formated
-  durations.
+	BDurationFormat is a formatter for time intervals. A time interval is
+	defined by its start and end values, and the result is a string such as
+	"1 hour, 2 minutes, 28 seconds".
 */
 
 
 /*!
-  \fn void BDurationFormat::SetSeparator(cosnt BString& separator)
-  \brief Replace the spearator for this formatter.
+	\fn BDurationFormat::BDurationFormat(const BString& separator)
+	\brief Constructor.
+
+	\warning Creating a BDurationFormat is a costly operation. Most of the
+		time want to use the default one through the BLocale class.
+
+	\param separator String appended between the duration elements.
 */
 
 
 /*!
-  \fn status_t BDurationForamt::SetLocale(const BLocale* locale)
-  \brief Sets the locale for this formatter.
+	\fn BDurationFormat::BDurationFormat(const BDurationFormat& other)
+	\brief Copy Constructor.
+
+	\param other The BDurationFormat object to copy from.
 */
 
 
 /*!
-  \fn status_t BDurationFormat::Format(bigtime_t startValue,
-  	bigtime_t endValue, BString* buffer, time_unit_style = B_TIME_UNIT_FULL)
-	const;
-  \brief Formats a duration defined by its start and end values.
+	\fn BDurationFormat::~BDurationFormat()
+	\brief Destructor.
+*/
 
-The start and end values are in milliseconds. The result is appeded to the
-buffer. The full time style uses full words (hours, minuts, seconds), while the
-shot one uses units (h, m, s).
+
+/*!
+	\fn BDurationFormat& BDurationFormat::operator=(const BDurationFormat& other)
+	\brief Assignment overload.
+
+	\param other The BDurationFormat object to copy from.
+
+	\returns The resulting BDurationFormat object.
+*/
+
+
+/*!
+	\fn void BDurationFormat::SetSeparator(const BString& separator)
+	\brief Replace the separator for this formatter.
+
+	\param separator The separator string to set.
+*/
+
+
+/*!
+	\fn status_t BDurationFormat::SetLocale(const BLocale* locale)
+	\brief Sets the locale for this formatter.
+
+	\param locale The BLocale object to set.
+
+	\returns A status code, \c B_OK on success or an error code on error.
+*/
+
+
+/*!
+	\fn status_t BDurationFormat::SetTimeZone(const BTimeZone* timeZone)
+	\brief Sets the timezone for this formatter.
+
+	\param timeZone The BTimeZone object to set.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_INIT Format object is \c NULL.
+	\retval B_ERROR Other errors.
+*/
+
+
+/*!
+	\fn status_t BDurationFormat::Format(bigtime_t startValue,
+		bigtime_t stopValue, BString* buffer, time_unit_style style) const
+	\brief Formats a duration defined by its start and end values.
+
+	The start and end values are in milliseconds. The result is appended to
+	the buffer. The full time style uses full words (hours, minutes, seconds),
+	while the short one uses units (h, m, s).
+
+	\param startValue The start value in milliseconds.
+	\param stopValue The stop value in milliseconds.
+	\param buffer The buffer to fill out.
+	\param style The time unit style to use.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE Buffer was \c NULL.
+	\retval B_ERROR Formatting error.
 */

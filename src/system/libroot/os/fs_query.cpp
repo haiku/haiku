@@ -13,6 +13,7 @@
 #include <string.h>
 
 #include <dirent_private.h>
+#include <errno_private.h>
 #include <syscalls.h>
 #include <syscall_utils.h>
 
@@ -22,14 +23,14 @@ open_query_etc(dev_t device, const char *query,
 	uint32 flags, port_id port, int32 token)
 {
 	if (device < 0 || query == NULL || query[0] == '\0') {
-		errno = B_BAD_VALUE;
+		__set_errno(B_BAD_VALUE);
 		return NULL;
 	}
 
 	// open
 	int fd = _kern_open_query(device, query, strlen(query), flags, port, token);
 	if (fd < 0) {
-		errno = fd;
+		__set_errno(fd);
 		return NULL;
 	}
 
@@ -57,7 +58,7 @@ fs_open_live_query(dev_t device, const char *query,
 {
 	// check parameters
 	if (port < 0) {
-		errno = B_BAD_VALUE;
+		__set_errno(B_BAD_VALUE);
 		return NULL;
 	}
 

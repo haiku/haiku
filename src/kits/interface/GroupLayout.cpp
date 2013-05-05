@@ -199,6 +199,13 @@ BGroupLayout::Archive(BMessage* into, bool deep) const
 
 
 status_t
+BGroupLayout::AllArchived(BMessage* into) const
+{
+	return BTwoDimensionalLayout::AllArchived(into);
+}
+
+
+status_t
 BGroupLayout::AllUnarchived(const BMessage* from)
 {
 	return BTwoDimensionalLayout::AllUnarchived(from);
@@ -326,3 +333,23 @@ BGroupLayout::_LayoutDataForItem(BLayoutItem* item) const
 		return NULL;
 	return (ItemLayoutData*)item->LayoutData();
 }
+
+
+status_t
+BGroupLayout::Perform(perform_code code, void* _data)
+{
+	return BTwoDimensionalLayout::Perform(code, _data);
+}
+
+
+void BGroupLayout::_ReservedGroupLayout1() {}
+void BGroupLayout::_ReservedGroupLayout2() {}
+void BGroupLayout::_ReservedGroupLayout3() {}
+void BGroupLayout::_ReservedGroupLayout4() {}
+void BGroupLayout::_ReservedGroupLayout5() {}
+void BGroupLayout::_ReservedGroupLayout6() {}
+void BGroupLayout::_ReservedGroupLayout7() {}
+void BGroupLayout::_ReservedGroupLayout8() {}
+void BGroupLayout::_ReservedGroupLayout9() {}
+void BGroupLayout::_ReservedGroupLayout10() {}
+

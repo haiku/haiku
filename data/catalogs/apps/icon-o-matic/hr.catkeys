@@ -1,0 +1,99 @@
+1	croatian	x-vnd.haiku-icon_o_matic	3380935061
+<modify path>	Icon-O-Matic-PathCmd		<izmjeni putanju>
+<unavailable>	Icon-O-Matic-StyleTypes		<nedostupno>
+<unkown property>	Icon-O-Matic-PropertyNames		<nepoznato svojstvo>
+Add	Icon-O-Matic-PathsList		Dodaj
+Add	Icon-O-Matic-StylesList		Dodaj
+Add	Icon-O-Matic-TransformersList		Dodaj
+Add Control Point	Icon-O-Matic-AddPointCmd		Dodaj kontrolnu točku
+Add Path	Icon-O-Matic-AddPathsCmd		Dodaj putanju
+Add Paths	Icon-O-Matic-AddPathsCmd		Dodaj putanje
+Add Style	Icon-O-Matic-AddStylesCmd		Dodaj stil
+Add Styles	Icon-O-Matic-AddStylesCmd		Dodaj stilove
+Add circle	Icon-O-Matic-PathsList		Dodaj krug
+Add empty	Icon-O-Matic-ShapesList		Dodaj prazno
+Add with path	Icon-O-Matic-ShapesList		Dodaj sa putanjom
+Add with path & style	Icon-O-Matic-ShapesList		Dodaj sa putanjom i stilom
+Add with style	Icon-O-Matic-ShapesList		Dodaj sa stilom
+All	Icon-O-Matic-Properties		Sve
+Assign Path	Icon-O-Matic-AddPathsCmd		Dodjeli putanju
+Assign Paths	Icon-O-Matic-AddPathsCmd		Dodjeli putanje
+Assign Style	Icon-O-Matic-AssignStyleCmd		Dodjeli stil
+Cancel	Icon-O-Matic-ColorPicker		Odustani
+Cancel	Icon-O-Matic-SVGExport		Odustani
+Change Color	Icon-O-Matic-SetColorCmd		Promjeeni boju
+Closed	Icon-O-Matic-PropertyNames		Zatvoreno
+Color	Icon-O-Matic-PropertyNames		Boja
+Color	Icon-O-Matic-StyleTypes		Boja
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Boja (#%02x%02x%02x)
+Color (#%02x%02x%02x)	Style name after dropping a color		Boja (#%02x%02x%02x)
+Copy	Icon-O-Matic-Properties		Kopiraj
+Duplicate	Icon-O-Matic-PathsList		Udvostruči
+Duplicate	Icon-O-Matic-ShapesList		Udvostruči
+Duplicate	Icon-O-Matic-StylesList		Udvostruči
+Edit	Icon-O-Matic-Menus		Uredi
+Error: 	Icon-O-Matic-Exporter		Greška:
+Error: 	Icon-O-Matic-Main		Greška:
+Export	Icon-O-Matic-Menu-File		Izvoz
+Export Icon	Dialog title		Izvezi ikonu
+Export as…	Icon-O-Matic-Menu-File		Izvezi kao...
+Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Neuspjelo otvaranje datoteke '%s' kao SVG dokumenta.\n\nError: %s
+File	Icon-O-Matic-Menus		Datoteka
+Format	Icon-O-Matic-SavePanel		Format
+HVIF Source Code	Icon-O-Matic-SavePanel		HVIF izvorni kod
+Height	Icon-O-Matic-PropertyNames		Visina
+Insert Control Point	Icon-O-Matic-InsertPointCmd		Unesi kontrolnu točku
+Invert selection	Icon-O-Matic-Properties		Obrnuti odabir
+Modify Control Point	Icon-O-Matic-ChangePointCmd		Izmjeni kontrolnu točku
+Move	Icon-O-Matic-TransformationBoxStates		Premjesti
+Move Paths	Icon-O-Matic-MovePathsCmd		Premjesti putanje
+Move Style	Icon-O-Matic-MoveStylesCmd		Premjesti stil
+Move Styles	Icon-O-Matic-MoveStylesCmd		Ukloni stilove
+Name	Icon-O-Matic-PropertyNames		Ime
+New	Icon-O-Matic-Menu-File		Novi
+No	Icon-O-Matic-StyledTextImport		Ne
+None	Icon-O-Matic-Properties		Nijedan
+OK	Icon-O-Matic-ColorPicker		U redu
+OK	Icon-O-Matic-SVGImport		U redu
+Opacity	Icon-O-Matic-PropertyNames		Neprozirnost
+Opening the document failed!	Icon-O-Matic-Main		Neuspjelo otvaranje dokumenta!
+Opening the icon failed!	Icon-O-Matic-Main		Neuspjelo otvaranje ikone!
+Open…	Icon-O-Matic-Menu-File		Otvori...
+Options	Icon-O-Matic-Menus		Opcije
+Paste	Icon-O-Matic-Properties		Zalijepi
+Path	Icon-O-Matic-Menus		Putanja
+Path	Icon-O-Matic-PropertyNames		Putanja
+Pick a color	Icon-O-Matic-ColorPicker		Odaberi boju
+Properties	Icon-O-Matic-Menus		Osobitosti
+Quit	Icon-O-Matic-Menu-File		Isključi
+Remove	Icon-O-Matic-PathManipulator		Ukloni
+Remove	Icon-O-Matic-PathsList		Ukloni
+Remove	Icon-O-Matic-ShapesList		Ukloni
+Remove	Icon-O-Matic-StylesList		Ukloni
+Remove Control Point	Icon-O-Matic-RemovePointsCmd		Ukloni kontrolnu točku
+Remove Control Points	Icon-O-Matic-RemovePointsCmd		Ukloni kontrolne točke
+Remove Path	Icon-O-Matic-RemovePathsCmd		Ukloni putanju
+Remove Paths	Icon-O-Matic-RemovePathsCmd		Ukloni putanje
+Remove Style	Icon-O-Matic-RemoveStylesCmd		Ukloni stil
+Remove Styles	Icon-O-Matic-RemoveStylesCmd		Ukloni stilove
+Reverse	Icon-O-Matic-PathsList		Obrnuto
+Rotate	Icon-O-Matic-TransformationBoxStates		Rotiraj
+Rotation	Icon-O-Matic-PropertyNames		Rotacija
+Save	Icon-O-Matic-Menu-File		Spremi
+Save Icon	Dialog title		Spremi ikonu
+Save as…	Icon-O-Matic-Menu-File		Spremi kao...
+Saving your document failed!	Icon-O-Matic-Exporter		Neuspjelo spremanje vašeg dokumenta!
+Select	Icon-O-Matic-Properties		Odaberi
+Select All	Icon-O-Matic-PathManipulator		Odaberi sve
+Settings…	Icon-O-Matic-SavePanel		Postavke...
+Style	Icon-O-Matic-Menus		Stil
+Style type	Icon-O-Matic-StyleTypes		Tip stila
+The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		Tekst koji pokušavate uvesti je dugačak,jeste li sigurni?
+Width	Icon-O-Matic-PropertyNames		Širina
+Yes	Icon-O-Matic-StyledTextImport		Da
+bad news	Icon-O-Matic-Exporter		loše vijesti
+bad news	Title of error alert		loše vijesti
+edit it's properties here.	Empty property list - 3rd line		uredi njegova svojstva ovdje
+load error	Icon-O-Matic-SVGImport		greška učitavanja
+too big	Icon-O-Matic-StyledTextImport		prevelik
+warning	Icon-O-Matic-SVGExport		upozorenje

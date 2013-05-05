@@ -13,14 +13,11 @@ KernelStaticLibrary dec21xxx_mii.a
 	:
 	acphy.c
 	amphy.c
-	dcphy.c
-	pnphy.c
 	ukphy.c
 	ukphy_subr.c
 	;
 
-ObjectHdrs [ FGristFiles acphy$(SUFOBJ) amphy$(SUFOBJ) dcphy$(SUFOBJ)
-							pnphy$(SUFOBJ) ukphy$(SUFOBJ) ]
+ObjectHdrs [ FGristFiles acphy$(SUFOBJ) amphy$(SUFOBJ) ukphy$(SUFOBJ) ]
 	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) libs compat freebsd_network ] ;
-Includes [ FGristFiles dcphy.c pnphy.c ]
+Includes [ FGristFiles acphy.c amphy.c amphy.c ]
 	: <src!libs!compat!freebsd_network>miidevs.h ;

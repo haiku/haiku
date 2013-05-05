@@ -1,18 +1,21 @@
 /*
- * Copyright 2010, Haiku inc.
- * Distributed under the terms of the MIT Licence.
+ * Copyright 2011 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  *
- * Documentation by:
+ * Authors:
  *		Clark Gaeble
  *		Adrien Destugues <pulkomandy@pulkomandy.ath.cx>
  *		John Scipione <jscipione@gmail.com>
+ *
  * Corresponds to:
- *		/trunk/headers/os/interface/Box.h	 rev 42274
- *		/trunk/src/kits/interface/Box.cpp	 rev 42274
+ *		headers/os/interface/Box.h	 rev 42274
+ *		src/kits/interface/Box.cpp	 rev 42274
 
 
 /*!
 	\file Box.h
+	\ingroup interface
+	\ingroup libbe
 	\brief Defines the BBox class
 */
 
@@ -20,6 +23,7 @@
 /*!
 	\class BBox
 	\ingroup interface
+	\ingroup libbe
 	\brief A rectangular view with a border and an optional label to group
 		related subviews visually.
 

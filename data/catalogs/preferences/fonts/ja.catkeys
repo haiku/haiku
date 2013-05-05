@@ -1,12 +1,12 @@
 1	japanese	x-vnd.Haiku-Fonts	4164233892
-Bold font:	Font view		太字フォント：
-Defaults	Main window		デフォルト
-Fixed font:	Font view		等幅フォント：
-Fonts	System name		フォント
-Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		フォント\n\tCopyright 2004 - 2005, Haiku.\n\n
-Menu font:	Font view		メニューフォント：
-OK	main		Ok
 Plain font:	Font view		標準フォント：
+Defaults	Main window		デフォルト
+OK	main		OK
+Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		フォント\n\tCopyright 2004 - 2005, Haiku.\n\n
 Revert	Main window		元に戻す
 Size:	Font Selection view		サイズ：
+Menu font:	Font view		メニューフォント：
+Fixed font:	Font view		等幅フォント：
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	古池や A frog jumps in, 水の音。
+Bold font:	Font view		太字フォント：
+Fonts	System name		フォント

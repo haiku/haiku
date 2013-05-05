@@ -98,33 +98,7 @@ BMessenger::BMessenger(const BHandler* handler, const BLooper* looper,
 	fHandlerToken(B_NULL_TOKEN),
 	fTeam(-1)
 {
-	status_t error = (handler || looper ? B_OK : B_BAD_VALUE);
-	if (error == B_OK) {
-		if (handler) {
-			// BHandler is given, check/retrieve the looper.
-			if (looper) {
-				if (handler->Looper() != looper)
-					error = B_MISMATCHED_VALUES;
-			} else {
-				looper = handler->Looper();
-				if (looper == NULL)
-					error = B_MISMATCHED_VALUES;
-			}
-		}
-		// set port, token,...
-		if (error == B_OK) {
-			AutoLocker<BLooperList> locker(gLooperList);
-			if (locker.IsLocked() && gLooperList.IsLooperValid(looper)) {
-				fPort = looper->fMsgPort;
-				fHandlerToken = (handler
-					? _get_object_token_(handler) : B_PREFERRED_TOKEN);
-				fTeam = looper->Team();
-			} else
-				error = B_BAD_VALUE;
-		}
-	}
-	if (_result)
-		*_result = error;
+	_InitData(handler, looper, _result);
 }
 
 
@@ -203,7 +177,7 @@ BMessenger::Target(BLooper** _looper) const
 
 	\see BLooper::Lock() for details.
 
-	\return \c true, if the looper could be locked sucessfully, \c false, if
+	\return \c true, if the looper could be locked successfully, \c false, if
 			the messenger is not properly initialized, the target is remote,
 			or the targeted looper is invalid.
 */
@@ -232,7 +206,7 @@ BMessenger::LockTarget() const
 	\see BLooper::LockWithTimeout() for details.
 
 	\return
-	- \c B_OK, if the looper could be locked sucessfully,
+	- \c B_OK, if the looper could be locked successfully,
 	- \c B_BAD_VALUE, if the messenger is not properly initialized,
 	  the target is remote, or the targeted looper is invalid,
 	- other error codes returned by BLooper::LockWithTimeout().
@@ -427,6 +401,50 @@ BMessenger::SendMessage(BMessage *message, BMessage *reply,
 //	#pragma mark - Operators and misc
 
 
+/*!	\brief Reinitializes a BMessenger to target the already running application
+	identified by the supplied signature and/or team ID.
+
+	When only a signature is given, and multiple instances of the application
+	are running it is undeterminate which one is chosen as the target. In case
+	only a team ID is passed, the target application is identified uniquely.
+	If both are supplied, the application identified by the team ID must have
+	a matching signature, otherwise the initilization fails.
+
+	\param signature The target application's signature. May be \c NULL.
+	\param team The target application's team ID. May be < 0.
+	\return The result of the reinitialization.
+*/
+status_t
+BMessenger::SetTo(const char *signature, team_id team)
+{
+	status_t result = B_OK;
+	_InitData(signature, team, &result);
+	return result;
+}
+
+
+/*!	\brief Reinitializes a BMessenger to target the local BHandler and/or
+	BLooper.
+
+	When a \c NULL handler is supplied, the preferred handler in the given
+	looper is targeted. If no looper is supplied the looper the given handler
+	belongs to is used -- that means in particular, that the handler must
+	already belong to a looper. If both are supplied the handler must actually
+	belong to looper.
+
+	\param handler The target handler. May be \c NULL.
+	\param looper The target looper. May be \c NULL.
+	\return The result of the reinitialization.
+*/
+status_t
+BMessenger::SetTo(const BHandler* handler, const BLooper* looper)
+{
+	status_t result = B_OK;
+	_InitData(handler, looper, &result);
+	return result;
+}
+
+
 /*!	\brief Makes this BMessenger a copy of the supplied one.
 
 	\param from the messenger to be copied.
@@ -559,6 +577,54 @@ BMessenger::_InitData(const char* signature, team_id team, status_t* _result)
 	}
 
 	// return the error
+	if (_result)
+		*_result = error;
+}
+
+
+/*!	\brief Initializes the BMessenger to target the local BHandler and/or
+	BLooper.
+
+	When a \c NULL handler is supplied, the preferred handler in the given
+	looper is targeted. If no looper is supplied the looper the given handler
+	belongs to is used -- that means in particular, that the handler must
+	already belong to a looper. If both are supplied the handler must actually
+	belong to looper.
+
+	\param handler The target handler. May be \c NULL.
+	\param looper The target looper. May be \c NULL.
+	\param result An optional pointer to a pre-allocated status_t into which
+		   the result of the initialization is written.
+*/
+void
+BMessenger::_InitData(const BHandler* handler, const BLooper* looper,
+	status_t* _result)
+{
+	status_t error = (handler || looper ? B_OK : B_BAD_VALUE);
+	if (error == B_OK) {
+		if (handler) {
+			// BHandler is given, check/retrieve the looper.
+			if (looper) {
+				if (handler->Looper() != looper)
+					error = B_MISMATCHED_VALUES;
+			} else {
+				looper = handler->Looper();
+				if (looper == NULL)
+					error = B_MISMATCHED_VALUES;
+			}
+		}
+		// set port, token,...
+		if (error == B_OK) {
+			AutoLocker<BLooperList> locker(gLooperList);
+			if (locker.IsLocked() && gLooperList.IsLooperValid(looper)) {
+				fPort = looper->fMsgPort;
+				fHandlerToken = (handler
+					? _get_object_token_(handler) : B_PREFERRED_TOKEN);
+				fTeam = looper->Team();
+			} else
+				error = B_BAD_VALUE;
+		}
+	}
 	if (_result)
 		*_result = error;
 }

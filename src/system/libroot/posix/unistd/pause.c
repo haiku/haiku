@@ -13,6 +13,8 @@
 #include <pthread.h>
 #include <signal.h>
 
+#include <errno_private.h>
+
 
 int
 pause(void)
@@ -20,7 +22,7 @@ pause(void)
 	sigset_t mask;
 	sigemptyset(&mask);
 
-	errno = _kern_sigsuspend(&mask);
+	__set_errno(_kern_sigsuspend(&mask));
 
 	pthread_testcancel();
 

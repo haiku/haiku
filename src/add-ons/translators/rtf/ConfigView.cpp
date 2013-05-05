@@ -12,8 +12,8 @@
 
 #include <stdio.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ConfigView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ConfigView"
 
 
 ConfigView::ConfigView(const BRect &frame, uint32 resize, uint32 flags)
@@ -27,7 +27,7 @@ ConfigView::ConfigView(const BRect &frame, uint32 resize, uint32 flags)
 
 	BRect rect(10, 10, 200, 10 + height);
 	BStringView *stringView = new BStringView(rect, "title", 
-		B_TRANSLATE("Rich Text Format (RTF) files"));
+		B_TRANSLATE("Rich Text Format (RTF) translator"));
 	stringView->SetFont(be_bold_font);
 	stringView->ResizeToPreferred();
 	AddChild(stringView);

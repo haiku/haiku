@@ -9,6 +9,7 @@
 
 #include <OS.h>
 
+#include <errno_private.h>
 #include <syscalls.h>
 
 
@@ -18,7 +19,7 @@ kill(pid_t pid, int sig)
 	status_t status;
 
 	if (sig < 0) {
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		return -1;
 	}
 
@@ -28,7 +29,7 @@ kill(pid_t pid, int sig)
 		if (status == B_BAD_THREAD_ID || status == B_BAD_TEAM_ID)
 			status = ESRCH;
 
-		errno = status;
+		__set_errno(status);
 		return -1;
 	}
 

@@ -26,6 +26,9 @@
 //					this time. Use at your own risk.
 //------------------------------------------------------------------------------
 
+
+#include "GameSoundDevice.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -33,15 +36,15 @@
 #include <Autolock.h>
 #include <List.h>
 #include <Locker.h>
-#include <MediaRoster.h>
 #include <MediaAddOn.h>
-#include <TimeSource.h>
+#include <MediaRoster.h>
 #include <MediaTheme.h>
+#include <TimeSource.h>
 
-#include "GSUtility.h"
-#include "GameSoundDevice.h"
 #include "GameSoundBuffer.h"
 #include "GameProducer.h"
+#include "GSUtility.h"
+
 
 // BGameSoundDevice definitions ------------------------------------
 const int32 kInitSoundCount = 32;
@@ -137,7 +140,7 @@ BGameSoundDevice::SetInitError(status_t error)
 
 
 status_t
-BGameSoundDevice::CreateBuffer(gs_id* sound, const gs_audio_format* format, 
+BGameSoundDevice::CreateBuffer(gs_id* sound, const gs_audio_format* format,
 	const void* data, int64 frames)
 {
 	if (frames <= 0 || !sound)
@@ -160,7 +163,7 @@ BGameSoundDevice::CreateBuffer(gs_id* sound, const gs_audio_format* format,
 
 
 status_t
-BGameSoundDevice::CreateBuffer(gs_id* sound, const void* object, 
+BGameSoundDevice::CreateBuffer(gs_id* sound, const void* object,
 	const gs_audio_format* format, size_t inBufferFrameCount,
 	size_t inBufferCount)
 {
@@ -179,7 +182,7 @@ BGameSoundDevice::CreateBuffer(gs_id* sound, const void* object,
 	}
 
 	if (err == B_OK)
-		*sound = gs_id(position+1);
+		*sound = gs_id(position + 1);
 	return err;
 }
 
@@ -192,7 +195,7 @@ BGameSoundDevice::ReleaseBuffer(gs_id sound)
 
 	if (fSounds[sound - 1]) {
 		// We must stop playback befor destroying the sound or else
-		// we may recieve fatel errors.
+		// we may receive fatal errors.
 		fSounds[sound - 1]->StopPlaying();
 
 		delete fSounds[sound - 1];
@@ -207,10 +210,10 @@ BGameSoundDevice::Buffer(gs_id sound, gs_audio_format* format, void*& data)
 	if (!format || sound <= 0)
 		return B_BAD_VALUE;
 
-	memcpy(format, &fSounds[sound-1]->Format(), sizeof(gs_audio_format));
-	if (fSounds[sound-1]->Data()) {
+	memcpy(format, &fSounds[sound - 1]->Format(), sizeof(gs_audio_format));
+	if (fSounds[sound - 1]->Data()) {
 		data = malloc(format->buffer_size);
-		memcpy(data, fSounds[sound-1]->Data(), format->buffer_size);
+		memcpy(data, fSounds[sound - 1]->Data(), format->buffer_size);
 	} else
 		data = NULL;
 

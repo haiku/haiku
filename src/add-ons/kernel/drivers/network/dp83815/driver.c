@@ -111,7 +111,7 @@ typedef struct dp83815_properties
 
 static pci_info *m_devices[MAX_CARDS];
 static pci_module_info *m_pcimodule = 0;	//To call methods of pci
-static char *dp83815_names[MAX_CARDS +1];
+static char *dp83815_names[MAX_CARDS + 1];
 static int32 m_openmask = 0;					//Is the thing already opened?
 static uint32 pages_needed(uint32 mem_size);
 static int32 dp83815_interrupt_hook(void *data);    /* interrupt handler */
@@ -120,8 +120,8 @@ static status_t allocate_resources(dp83815_properties_t *data);     	   /* alloc
 static void     free_resources(dp83815_properties_t *data);                /* deallocate semaphores & spinlocks */
 static status_t init_ring_buffers(dp83815_properties_t *data);             /* allocate and initialize frame buffer rings */
 static status_t domulti(dp83815_properties_t *data, uint8 *addr);		   /* add multicast address to hardware filter list */
-static status_t free_hook( void *cookie );
-static status_t close_hook( void * );
+static status_t free_hook(void *cookie);
+static status_t close_hook(void *);
 
 #ifdef __INTEL__
 	#define write8(  offset , value)	(m_pcimodule->write_io_8 ((data->reg_base + (offset)), (value) ) )
@@ -132,7 +132,8 @@ static status_t close_hook( void * );
 	#define read16( offset )			(m_pcimodule->read_io_16((data->reg_base + offset)))
 	#define read32( offset )			(m_pcimodule->read_io_32((data->reg_base + offset)))
 
-	static void dp83815_init_registers( dp83815_properties_t *data )
+	static void
+	dp83815_init_registers(dp83815_properties_t *data)
 	{
 		data->reg_base = data->pcii->u.h0.base_registers[0];
 	}
@@ -146,21 +147,23 @@ static status_t close_hook( void * );
 	#define read16( offset )			B_LENDIAN_TO_HOST_INT16(*((volatile uint16*)(data->reg_base + (offset))))
 	#define read32( offset )			B_LENDIAN_TO_HOST_INT32(*((volatile uint32*)(data->reg_base + (offset))))
 
-	static void dp83815_init_registers( rtl8139_properties_t *data )
+	static void
+	dp83815_init_registers(rtl8139_properties_t *data)
 	{
 		int32 base, size, offset;
 		base = data->pcii->u.h0.base_registers[0];
 		size = data->pcii->u.h0.base_register_sizes[0];
 
 		/* Round down to nearest page boundary */
-		base = base & ~(B_PAGE_SIZE-1);
+		base = base & ~(B_PAGE_SIZE - 1);
 
 		/* Adjust the size */
 		offset = data->pcii->u.h0.base_registers[0] - base;
 		size += offset;
-		size = (size +(B_PAGE_SIZE-1)) & ~(B_PAGE_SIZE-1);
+		size = (size + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1);
 
-		TRACE(( kDevName " _open_hook(): PCI base=%lx size=%lx offset=%lx\n", base, size, offset));
+		TRACE(( kDevName " _open_hook(): PCI base=%lx size=%lx offset=%lx\n",
+			base, size, offset));
 
 		data->ioarea = map_physical_memory(kDevName " Regs", base, size,
 			B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA,
@@ -170,23 +173,28 @@ static status_t close_hook( void * );
 	}
 #endif
 
-uint32 pages_needed(uint32 mem_size)
+
+uint32
+pages_needed(uint32 mem_size)
 {
-	uint32 pages = mem_size/B_PAGE_SIZE;
-	if( pages%B_PAGE_SIZE != 0 ) pages += 1;
+	uint32 pages = mem_size / B_PAGE_SIZE;
+	if (pages % B_PAGE_SIZE != 0)
+		pages += 1;
 	return pages;
 }
 
+
 status_t
-init_hardware (void)
+init_hardware(void)
 {
 	// Nielx: no special requirements here...
 	TRACE(( kDevName ": init_hardware\n" ));
 	return B_OK;
 }
 
+
 status_t
-init_driver (void)
+init_driver(void)
 {
 	status_t status; 		//Storage for statuses
 	pci_info *item;			//Storage used while looking through pci
@@ -194,46 +202,47 @@ init_driver (void)
 
 	TRACE(( kDevName ": init_driver()\n" ));
 
-	// Try if the PCI module is loaded (it would be weird if it wouldn't, but alas)
-	if( ( status = get_module( B_PCI_MODULE_NAME, (module_info **)&m_pcimodule )) != B_OK)
-	{
-		TRACE(( kDevName " init_driver(): Get PCI module failed! %lu \n", status));
+	// Try if the PCI module is loaded (it would be weird if it wouldn't,
+	// but alas)
+	if ((status = get_module(B_PCI_MODULE_NAME, (module_info **)&m_pcimodule))
+		!= B_OK) {
+		TRACE((kDevName " init_driver(): Get PCI module failed! %lu \n",
+			status));
 		return status;
 	}
 
-	//
 	i = 0;
 	item = (pci_info *)malloc(sizeof(pci_info));
-	for ( i = found = 0 ; m_pcimodule->get_nth_pci_info(i, item) == B_OK ; i++ )
-	{
+	for (i = found = 0; m_pcimodule->get_nth_pci_info(i, item) == B_OK; i++) {
 		supported_device_t *supported;
 
-		for (supported  = m_supported_devices; supported->name; supported++) {
-			if ( (item->vendor_id == supported->vendor_id) &&
-			     (item->device_id == supported->device_id) )
-			{
+		for (supported = m_supported_devices; supported->name; supported++) {
+			if ((item->vendor_id == supported->vendor_id)
+				&& (item->device_id == supported->device_id)) {
 				//Also done in etherpci sample code
-				if ((item->u.h0.interrupt_line == 0) || (item->u.h0.interrupt_line == 0xFF))
-				{
-					TRACE(( kDevName " init_driver(): found %s with invalid IRQ - check IRQ assignement\n", supported->name));
+				if ((item->u.h0.interrupt_line == 0)
+					|| (item->u.h0.interrupt_line == 0xFF)) {
+					TRACE(( kDevName " init_driver(): found %s with invalid IRQ"
+						" - check IRQ assignement\n", supported->name));
 					continue;
 				}
 
-				TRACE(( kDevName " init_driver(): found %s at IRQ %u \n", supported->name, item->u.h0.interrupt_line));
+				TRACE(( kDevName " init_driver(): found %s at IRQ %u \n",
+					supported->name, item->u.h0.interrupt_line));
 				m_devices[found] = item;
 				item = (pci_info *)malloc(sizeof(pci_info));
+				
 				found++;
 			}
 		}
 	}
 
-	free( item );
+	free(item);
 
 	//Check if we have found any devices:
-	if ( found == 0 )
-	{
+	if (found == 0) {
 		TRACE(( kDevName " init_driver(): no device found\n" ));
-		put_module(B_PCI_MODULE_NAME ); //dereference module
+		put_module(B_PCI_MODULE_NAME); //dereference module
 		return ENODEV;
 	}
 
@@ -241,9 +250,8 @@ init_driver (void)
 	{
 		char name[32];
 
-		for (i = 0; i < found; i++)
-		{
-			sprintf(name, "%s%ld", kDevDir, i);
+		for (i = 0; i < found; i++) {
+			snprintf(name, 32, "%s%ld", kDevDir, i);
 			dp83815_names[i] = strdup(name);
 		}
 		dp83815_names[i] = NULL;
@@ -257,7 +265,7 @@ init_driver (void)
 	is unloaded
 ----- */
 void
-uninit_driver (void)
+uninit_driver(void)
 {
 	int index;
 	void *item;
@@ -269,8 +277,9 @@ uninit_driver (void)
 		free(m_devices[index]);
 	}
 
-	put_module( B_PCI_MODULE_NAME );
+	put_module(B_PCI_MODULE_NAME);
 }
+
 
 static status_t
 open_hook(const char *name, uint32 flags, void** cookie)
@@ -304,47 +313,49 @@ open_hook(const char *name, uint32 flags, void** cookie)
 	}
 
 	//Create a structure that contains the internals
-	if (!(*cookie = data = (dp83815_properties_t *)malloc(sizeof(dp83815_properties_t))))
-	{
+	if (!(*cookie = data =
+		(dp83815_properties_t *)malloc(sizeof(dp83815_properties_t)))) {
 		TRACE(( kDevName " open_hook(): Out of memory\n" ));
 		return B_NO_MEMORY;
 	}
 
 	//Set status to open:
-	m_openmask &= ~( 1L << temp8 );
+	m_openmask &= ~(1L << temp8);
 
 	//Clear memory
-	memset( data , 0 , sizeof( dp83815_properties_t ) );
+	memset(data, 0, sizeof(dp83815_properties_t));
 
 	//Set the ID
 	data->device_id = temp8;
 
 	// Create lock
-	data->lock = create_sem( 1 , kDevName " data protect" );
-	set_sem_owner( data->lock , B_SYSTEM_TEAM );
-	data->Rx.Sem = create_sem( 0 , kDevName " read wait" );
-	set_sem_owner( data->Rx.Sem , B_SYSTEM_TEAM );
-	data->Tx.Sem = create_sem( 1 , kDevName " write wait" );
-	set_sem_owner( data->Tx.Sem , B_SYSTEM_TEAM );
+	data->lock = create_sem(1, kDevName " data protect");
+	set_sem_owner(data->lock, B_SYSTEM_TEAM);
+	data->Rx.Sem = create_sem(0, kDevName " read wait");
+	set_sem_owner(data->Rx.Sem, B_SYSTEM_TEAM);
+	data->Tx.Sem = create_sem(1, kDevName " write wait");
+	set_sem_owner(data->Tx.Sem, B_SYSTEM_TEAM);
 
 	//Set up the cookie
 	data->pcii = m_devices[data->device_id];
 
 	//Enable the registers
-	dp83815_init_registers( data );
+	dp83815_init_registers(data);
 
 	/* enable pci address access */
-	cmd = m_pcimodule->read_pci_config(data->pcii->bus, data->pcii->device, data->pcii->function, PCI_command, 2);
+	cmd = m_pcimodule->read_pci_config(data->pcii->bus, data->pcii->device,
+		data->pcii->function, PCI_command, 2);
 	cmd = cmd | PCI_command_io | PCI_command_master | PCI_command_memory;
-	m_pcimodule->write_pci_config(data->pcii->bus, data->pcii->device, data->pcii->function, PCI_command, 2, cmd );
+	m_pcimodule->write_pci_config(data->pcii->bus, data->pcii->device,
+		data->pcii->function, PCI_command, 2, cmd);
 
 	if (allocate_resources(data) != B_OK)
 		goto err1;
 
 	/* We want interrupts! */
-	if ( install_io_interrupt_handler( data->pcii->u.h0.interrupt_line , dp83815_interrupt_hook , data , 0 ) != B_OK )
-	{
-		TRACE(( kDevName " open_hook(): Error installing interrupt handler\n" ));
+	if (install_io_interrupt_handler(data->pcii->u.h0.interrupt_line,
+		dp83815_interrupt_hook, data, 0) != B_OK) {
+		TRACE((kDevName " open_hook(): Error installing interrupt handler\n"));
 		return B_ERROR;
 	}
 
@@ -355,19 +366,19 @@ open_hook(const char *name, uint32 flags, void** cookie)
 
 	write32(REG_CR, CR_RXR|CR_TXR);			/*	Reset Tx & Rx		*/
 
-	if ( init_ring_buffers(data) != B_OK )		/*	Init ring buffers	*/
+	if (init_ring_buffers(data) != B_OK)		/*	Init ring buffers	*/
 		goto err1;
 
-	write32(REG_RFCR, RFCR_RFEN|RFCR_AAB|RFCR_AAM|RFCR_AAU);
+	write32(REG_RFCR, RFCR_RFEN | RFCR_AAB | RFCR_AAM | RFCR_AAU);
 
-	write32(REG_RXCFG, RXCFG_ATP|RXCFG_DRTH(31));					/*	Set the drth		*/
+	write32(REG_RXCFG, RXCFG_ATP | RXCFG_DRTH(31));	/*	Set the drth		*/
 
-	write32(REG_TXCFG, TXCFG_CSI|
-						TXCFG_HBI|
-						TXCFG_ATP|
-						TXCFG_MXDMA_256|
-						TXCFG_FLTH(16)|
-						TXCFG_DRTH(16) );
+	write32(REG_TXCFG, TXCFG_CSI |
+						TXCFG_HBI |
+						TXCFG_ATP |
+						TXCFG_MXDMA_256 |
+						TXCFG_FLTH(16) |
+						TXCFG_DRTH(16));
 
 	write32(REG_IMR, ISR_RXIDLE | ISR_TXOK | ISR_RXOK );
 
@@ -382,6 +393,7 @@ open_hook(const char *name, uint32 flags, void** cookie)
 		return B_ERROR;
 }
 
+
 static status_t
 read_hook (void* cookie, off_t position, void *buf, size_t* num_bytes)
 {
@@ -393,44 +405,47 @@ read_hook (void* cookie, off_t position, void *buf, size_t* num_bytes)
 	TRACE(( kDevName ": read_hook()\n" ));
 
 	//if( !data->nonblocking )
-		acquire_sem_etc( data->Rx.Sem, 1, B_CAN_INTERRUPT|data->blockFlag, NONBLOCK_WAIT );
+		acquire_sem_etc(data->Rx.Sem, 1, B_CAN_INTERRUPT | data->blockFlag,
+			NONBLOCK_WAIT);
 
 	{
 		former = disable_interrupts();
 		acquire_spinlock(&data->Rx.Lock);
-			desc = data->Rx.Curr;
-			data->Rx.Curr = desc->virt_next;
+		desc = data->Rx.Curr;
+		data->Rx.Curr = desc->virt_next;
 		release_spinlock(&data->Rx.Lock);
 		restore_interrupts(former);
 	}
 
-	length= DESC_LENGTH&desc->cmd;
+	length = DESC_LENGTH&desc->cmd;
 
-	if( desc->cmd & (DESC_RXA|DESC_RXO|DESC_LONG|DESC_RUNT|DESC_ISE|DESC_CRCE|DESC_FAE|DESC_LBP|DESC_COL) )
+	if (desc->cmd & (DESC_RXA | DESC_RXO | DESC_LONG | DESC_RUNT | DESC_ISE
+			| DESC_CRCE | DESC_FAE | DESC_LBP | DESC_COL))
 		TRACE(( "desc cmd: %x\n", desc->cmd ));
 
-	if( length < 64 ) {
+	if (length < 64) {
 		*num_bytes = 0;
 		return B_ERROR;
 	}
 
-	if( *num_bytes < length )
+	if (*num_bytes < length)
 		length = *num_bytes;
 
-	memcpy(buf, desc->virt_buff,length);
+	memcpy(buf, desc->virt_buff, length);
 	desc->cmd = DESC_LENGTH&MAX_PACKET_SIZE;
 	*num_bytes = length;
 
 	atomic_add(&data->stats.rx_att, 1);
 
-	if( length == 0 )
+	if (length == 0)
 		return B_ERROR;
 
 	return B_OK;
 }
 
+
 static status_t
-write_hook (void* cookie, off_t position, const void* buffer, size_t* num_bytes)
+write_hook(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 {
 	dp83815_properties_t *data = cookie;
 	cpu_status former;
@@ -438,39 +453,42 @@ write_hook (void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 
 	TRACE(( kDevName " write_hook()\n" ));
 
-	acquire_sem( data->lock );
-	acquire_sem_etc( data->Tx.Sem, 1, B_CAN_INTERRUPT|data->blockFlag, NONBLOCK_WAIT );
+	acquire_sem(data->lock);
+	acquire_sem_etc(data->Tx.Sem, 1, B_CAN_INTERRUPT | data->blockFlag,
+		NONBLOCK_WAIT);
 
 	{
 		former = disable_interrupts();
 		acquire_spinlock(&data->Tx.Lock);
-			desc = data->Tx.Curr;
-			data->Tx.Curr = desc->virt_next;
+		desc = data->Tx.Curr;
+		data->Tx.Curr = desc->virt_next;
 		release_spinlock(&data->Tx.Lock);
 		restore_interrupts(former);
 	}
 
-	if ( *num_bytes > MAX_PACKET_SIZE ) {			/* if needed						*/
-		TRACE(( "Had to truncate the packet from %d to %d\n", *num_bytes, MAX_PACKET_SIZE));
-		*num_bytes = MAX_PACKET_SIZE;				/*   truncate the packet			*/
+	if (*num_bytes > MAX_PACKET_SIZE) {			/* if needed				*/
+		TRACE(( "Had to truncate the packet from %d to %d\n", *num_bytes,
+			MAX_PACKET_SIZE));
+		*num_bytes = MAX_PACKET_SIZE;			/*   truncate the packet	*/
 	}
 
 
-	while( desc->cmd&DESC_OWN )	{			/* make sure a buffer is available	*/
+	while (desc->cmd & DESC_OWN) {		/* make sure a buffer is available	*/
 		TRACE(( "spinning in the write hook\n"));
 		spin(1000);						/* wait a while if not				*/
 	}
 
-	memcpy(desc->virt_buff, buffer, *num_bytes);		/* now copy the data				*/
-	desc->cmd = DESC_OWN|*num_bytes;				/* update the cmd bits				*/
+	memcpy(desc->virt_buff, buffer, *num_bytes);	/* now copy the data	*/
+	desc->cmd = DESC_OWN | *num_bytes;				/* update the cmd bits	*/
 
-	write32(REG_CR, CR_TXE);				/* tell the card to start tx		*/
+	write32(REG_CR, CR_TXE);				/* tell the card to start tx	*/
 	atomic_add(&data->stats.tx_att, 1);
 
-	release_sem_etc( data->lock , 1 , B_DO_NOT_RESCHEDULE );
+	release_sem_etc(data->lock, 1, B_DO_NOT_RESCHEDULE);
 
 	return B_OK;
 }
+
 
 static status_t
 control_hook (void* cookie, uint32 op, void* arg, size_t len)
@@ -478,52 +496,52 @@ control_hook (void* cookie, uint32 op, void* arg, size_t len)
 	dp83815_properties_t *data = (dp83815_properties_t *)cookie;
 	TRACE(( kDevName " control_hook()\n" ));
 
-	switch ( op )
-	{
-	case ETHER_INIT:
-		TRACE(( kDevName " control_hook(): Wants us to init... ;-)\n" ));
-		return B_NO_ERROR;
+	switch (op) {
+		case ETHER_INIT:
+			TRACE((kDevName " control_hook(): Wants us to init... ;-)\n"));
+			return B_NO_ERROR;
 
-	case ETHER_GETADDR:
-		if ( data == NULL )
-			return B_ERROR;
+		case ETHER_GETADDR:
+			if (data == NULL)
+				return B_ERROR;
 
-		TRACE(( kDevName " control_hook(): Wants our address...\n" ));
-		memcpy( arg , (void *) &(data->address) , sizeof( ether_address_t ) );
-		return B_OK;
+			TRACE((kDevName " control_hook(): Wants our address...\n"));
+			memcpy(arg, (void *) &(data->address), sizeof(ether_address_t));
+			return B_OK;
 
-	case ETHER_ADDMULTI:
-		return domulti(data, (unsigned char *)arg);
+		case ETHER_ADDMULTI:
+			return domulti(data, (unsigned char *)arg);
 
-	case ETHER_NONBLOCK:
-		if ( data == NULL )
-			return B_ERROR;
+		case ETHER_NONBLOCK:
+			if (data == NULL)
+				return B_ERROR;
 
-		TRACE(( kDevName " control_hook(): Wants to set block/nonblock\n" ));
+			TRACE((kDevName " control_hook(): Wants to set block/nonblock\n"));
 
-		if (*((int32 *)arg))
-			data->blockFlag = B_RELATIVE_TIMEOUT;
-		else
-			data->blockFlag = 0;
+			if (*((int32 *)arg))
+				data->blockFlag = B_RELATIVE_TIMEOUT;
+			else
+				data->blockFlag = 0;
 
-		return B_NO_ERROR;
+			return B_NO_ERROR;
 
-	case ETHER_REMMULTI:
-		TRACE(( kDevName " control_hook(): Wants REMMULTI\n" ));
-		return B_OK;
+		case ETHER_REMMULTI:
+			TRACE((kDevName " control_hook(): Wants REMMULTI\n"));
+			return B_OK;
 
-	case ETHER_SETPROMISC:
-		TRACE(( kDevName " control_hook(): Wants PROMISC\n" ));
-		return B_OK;
+		case ETHER_SETPROMISC:
+			TRACE((kDevName " control_hook(): Wants PROMISC\n"));
+			return B_OK;
 
-	case ETHER_GETFRAMESIZE:
-		TRACE(( kDevName " control_hook(): Wants GETFRAMESIZE\n" ));
-		*( (unsigned int *)arg ) = 1514;
-		return B_OK;
+		case ETHER_GETFRAMESIZE:
+			TRACE((kDevName " control_hook(): Wants GETFRAMESIZE\n"));
+			*((unsigned int *)arg) = 1514;
+			return B_OK;
 	}
 
 	return B_BAD_VALUE;
 }
+
 
 static int32
 dp83815_interrupt_hook(void *cookie)
@@ -532,76 +550,80 @@ dp83815_interrupt_hook(void *cookie)
 	uint32		isr;
 	isr = read32(REG_ISR);
 
-	if ( isr == 0 )	return B_UNHANDLED_INTERRUPT;
+	if (isr == 0)
+		return B_UNHANDLED_INTERRUPT;
 
-	if ( isr & ISR_RXOK ) {
+	if (isr & ISR_RXOK) {
 		int				num_packets = 0;
 		descriptor_t	*curr = data->Rx.CurrInt;
 
-		while( curr->cmd & DESC_OWN ) {
+		while (curr->cmd & DESC_OWN) {
 			curr = curr->virt_next;
 			num_packets++;
 		}
 
 		data->Rx.CurrInt = curr;
 		data->stats.rx_ok += num_packets;
-		if( num_packets > 1 )
+		if (num_packets > 1)
 			TRACE(( "received %d descriptors\n", num_packets));
-		if( num_packets )
+		if (num_packets)
 			release_sem_etc(data->Rx.Sem, num_packets, B_DO_NOT_RESCHEDULE);
 	}
 
-	if( isr & ISR_TXOK ) {
+	if (isr & ISR_TXOK) {
 		data->stats.tx_ok++;
 		release_sem_etc(data->Tx.Sem, 1, B_DO_NOT_RESCHEDULE);
 	}
 
-	if( isr & ISR_RXIDLE )
-		TRACE(( "RX IS IDLE!\n"));
+	if (isr & ISR_RXIDLE)
+		TRACE(("RX IS IDLE!\n"));
 
-	if( isr & ~(ISR_TXIDLE|ISR_TXOK|ISR_RXOK|ISR_RXIDLE|ISR_RXEARLY) )
-		TRACE(( "ISR: %x\n", isr));
+	if (isr & ~(ISR_TXIDLE | ISR_TXOK | ISR_RXOK | ISR_RXIDLE | ISR_RXEARLY))
+		TRACE(("ISR: %x\n", isr));
 
 	return B_INVOKE_SCHEDULER;
 }
 
+
 static status_t
-close_hook (void* cookie)
+close_hook(void* cookie)
 {
 	dp83815_properties_t * data = (dp83815_properties_t *) cookie;
 
-	write32(REG_IER, 0);				/*	Disable interrupts		*/
-	write32(REG_CR, CR_RXD|CR_TXD);		/*	Disable Rx & Tx			*/
+	write32(REG_IER, 0);					/*	Disable interrupts		*/
+	write32(REG_CR, CR_RXD | CR_TXD);		/*	Disable Rx & Tx			*/
 
 	return B_OK;
 }
 
+
 static status_t
-free_hook (void* cookie)
+free_hook(void* cookie)
 {
 	dp83815_properties_t *data = (dp83815_properties_t *) cookie;
 
 	TRACE(( kDevName " free_hook()\n" ));
 
-	while ( data->Tx.Lock );				/*	wait for any current writes to finish	*/
-	while ( data->Rx.Lock );				/*	wait for any current reads to finish	*/
+	while (data->Tx.Lock);		/*	wait for any current writes to finish	*/
+	while (data->Rx.Lock);		/*	wait for any current reads to finish	*/
 
 	//Remove interrupt handler
-	remove_io_interrupt_handler( data->pcii->u.h0.interrupt_line ,
-	                             dp83815_interrupt_hook , cookie );
+	remove_io_interrupt_handler(data->pcii->u.h0.interrupt_line,
+		dp83815_interrupt_hook, cookie);
 
 	m_openmask &= ~(1L << data->device_id);
 
 	free_resources(data);					/*	unblock waiting threads		*/
 
 	//Finally, free the cookie
-	free( data );
+	free(data);
 
 	//Put the pci module
-	put_module( B_PCI_MODULE_NAME );
+	put_module(B_PCI_MODULE_NAME);
 
 	return B_OK;
 }
+
 
 device_hooks dp83815_hooks = {
 	open_hook,	 			/* -> open entry point */
@@ -612,11 +634,13 @@ device_hooks dp83815_hooks = {
 	write_hook				/* -> write entry point */
 };
 
+
 const char**
 publish_devices()
 {
 	return (const char **)dp83815_names;
 }
+
 
 device_hooks*
 find_device(const char* name)
@@ -624,7 +648,9 @@ find_device(const char* name)
 	return &dp83815_hooks;
 }
 
-static status_t init_ring_buffers(dp83815_properties_t *data)
+
+static status_t
+init_ring_buffers(dp83815_properties_t *data)
 {
 	uint32			i;
 	area_info		info;
@@ -645,39 +671,45 @@ static status_t init_ring_buffers(dp83815_properties_t *data)
 
 #define NUM_BUFFS	2*MAX_DESC
 
-	pages = pages_needed(2*MAX_DESC*sizeof(descriptor_t) + NUM_BUFFS*BUFFER_SIZE);
+	pages = pages_needed(2 * MAX_DESC * sizeof(descriptor_t)
+		+ NUM_BUFFS * BUFFER_SIZE);
 
 	data->mem_area = create_area(kDevName " desc buffer", (void**)&RxDescRing,
 		B_ANY_KERNEL_ADDRESS, pages * B_PAGE_SIZE, B_32_BIT_CONTIGUOUS,
 		B_READ_AREA | B_WRITE_AREA);
-	if( data->mem_area < 0 )
-		return -1;
+	if (data->mem_area < 0)
+		return B_ERROR;
 
 	get_area_info(data->mem_area, &info);
 	get_memory_map(info.address, info.size, map, 4);
 
-	desc_base_phys_addr = map[0].address + NUM_BUFFS*BUFFER_SIZE;
-	desc_base_virt_addr = info.address + NUM_BUFFS*BUFFER_SIZE;
+	desc_base_phys_addr = map[0].address + NUM_BUFFS * BUFFER_SIZE;
+	desc_base_virt_addr = info.address + NUM_BUFFS * BUFFER_SIZE;
 
 	buff_base_phys_addr = map[0].address;
 	buff_base_virt_addr = info.address;
 
 	RxDescRing = desc_base_virt_addr;
-	for( i = 0; i < MAX_DESC; i++ ) {
-		RxDescRing[i].link = desc_base_phys_addr + ((i+1)%MAX_DESC)*sizeof(descriptor_t);
+	for (i = 0; i < MAX_DESC; i++) {
+		RxDescRing[i].link = desc_base_phys_addr
+			+ ((i + 1) % MAX_DESC) * sizeof(descriptor_t);
 		RxDescRing[i].cmd = MAX_PACKET_SIZE;
-		RxDescRing[i].ptr = buff_base_phys_addr +i*BUFFER_SIZE;
-		RxDescRing[i].virt_next = &RxDescRing[(i+1)%MAX_DESC];
-		RxDescRing[i].virt_buff = buff_base_virt_addr + i*BUFFER_SIZE;
+		RxDescRing[i].ptr = buff_base_phys_addr + i * BUFFER_SIZE;
+		RxDescRing[i].virt_next = &RxDescRing[(i + 1) % MAX_DESC];
+		RxDescRing[i].virt_buff = buff_base_virt_addr + i * BUFFER_SIZE;
 	}
 
 	TxDescRing = desc_base_virt_addr + MAX_DESC;
-	for( i = 0; i < MAX_DESC; i++ ) {
-		TxDescRing[i].link = desc_base_phys_addr + MAX_DESC*sizeof(descriptor_t)+ ((i+1)%MAX_DESC)*sizeof(descriptor_t);
+	for (i = 0; i < MAX_DESC; i++) {
+		TxDescRing[i].link = desc_base_phys_addr
+			+ MAX_DESC * sizeof(descriptor_t)
+			+ ((i + 1) % MAX_DESC) * sizeof(descriptor_t);
 		TxDescRing[i].cmd = MAX_PACKET_SIZE;
-		TxDescRing[i].ptr = buff_base_phys_addr + ((i+MAX_DESC)*BUFFER_SIZE);
-		TxDescRing[i].virt_next = &TxDescRing[(i+1)%MAX_DESC];
-		TxDescRing[i].virt_buff = buff_base_virt_addr + ((i+MAX_DESC)*BUFFER_SIZE);
+		TxDescRing[i].ptr = buff_base_phys_addr
+			+ ((i + MAX_DESC) * BUFFER_SIZE);
+		TxDescRing[i].virt_next = &TxDescRing[(i + 1) % MAX_DESC];
+		TxDescRing[i].virt_buff = buff_base_virt_addr
+			+ ((i + MAX_DESC) * BUFFER_SIZE);
 	}
 
 	data->Rx.Curr = RxDescRing;
@@ -687,15 +719,17 @@ static status_t init_ring_buffers(dp83815_properties_t *data)
 	data->Tx.CurrInt = TxDescRing;
 
 
-	write32(REG_RXDP, desc_base_phys_addr);		/* set the initial rx descriptor	*/
+	write32(REG_RXDP, desc_base_phys_addr);	/* set the initial rx descriptor */
 
-	i = desc_base_phys_addr+MAX_DESC*sizeof(descriptor_t);
-	write32(REG_TXDP, i);							/* set the initial tx descriptor	*/
+	i = desc_base_phys_addr + MAX_DESC * sizeof(descriptor_t);
+	write32(REG_TXDP, i);				/* set the initial tx descriptor	*/
 
 	return B_OK;
 }
 
-static status_t allocate_resources(dp83815_properties_t *data)
+
+static status_t
+allocate_resources(dp83815_properties_t *data)
 {
 	/* intialize rx semaphore with zero received packets		*/
 	if ((data->Rx.Sem = create_sem(0, kDevName " rx")) < 0) {
@@ -719,11 +753,13 @@ static status_t allocate_resources(dp83815_properties_t *data)
 	return (B_OK);
 }
 
+
 static void free_resources(dp83815_properties_t *data)
 {
 		delete_sem(data->Rx.Sem);
 		delete_sem(data->Tx.Sem);
 }
+
 
 static status_t domulti(dp83815_properties_t *data, uint8 *addr)
 {

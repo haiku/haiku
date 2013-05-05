@@ -12,6 +12,8 @@ SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 
 SubDirHdrs $(HAIKU_TOP) src system libroot posix glibc arch generic ;
 
+UsePrivateHeaders libroot ;
+
 
 if $(OPTIM) = -O0 {
 	OPTIM = -O ;

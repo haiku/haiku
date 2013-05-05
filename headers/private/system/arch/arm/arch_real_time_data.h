@@ -10,7 +10,12 @@
 
 #warning ARM: fix system_time()
 
+struct arm_real_time_data {
+	vint64	system_time_offset;
+};
+
 struct arch_real_time_data {
+	struct arm_real_time_data	data[2];
 	vint32						system_time_conversion_factor;
 	vint32						version;
 };

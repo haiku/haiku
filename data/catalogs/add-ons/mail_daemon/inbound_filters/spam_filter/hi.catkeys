@@ -1,0 +1,9 @@
+1	hindi	x-vnd.Haiku-SpamFilter	1975155212
+or empty e-mail	SpamFilterConfig		या फिर खाली ई-मेल 
+Spam Filter (AGMS Bayesian)	SpamFilter		स्पैम फ़िल्टर (AGMS Bayesian)
+Genuine below and uncertain above:	SpamFilterConfig		निचे सारे सही है और गलत ऊपर:
+Spam above:	SpamFilterConfig		ऊपर दिए गए को स्पैम कीजिए:
+Add spam rating to start of subject	SpamFilterConfig		स्पैम रटिंग को विषय के प्रारम्भ को जोड़ें
+Learn from all incoming e-mail	SpamFilterConfig		सारें अन्दर आने वाले ई-मेल से सीखें
+Sorry, unable to launch the spamdbm program to let you edit the server settings.	SpamFilterConfig		माफ करें, spamdbm प्रोग्रेम को हम लॉन्च करने में असफल रहे जिससे आप एडिट कर सकें सर्वर सेट्टिंग.
+Close	SpamFilterConfig		बंद करें

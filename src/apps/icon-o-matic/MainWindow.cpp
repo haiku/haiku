@@ -82,8 +82,8 @@
 #include "StyledTextImporter.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Icon-O-Matic-Main"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Icon-O-Matic-Main"
 
 
 using std::nothrow;
@@ -126,9 +126,9 @@ MainWindow::MainWindow(BRect frame, IconEditorApp* app,
 
 MainWindow::~MainWindow()
 {
-	delete fState;
-
 	SetIcon(NULL);
+
+	delete fState;
 
 	// Make sure there are no listeners attached to the document anymore.
 	while (BView* child = ChildAt(0L)) {
@@ -184,7 +184,7 @@ MainWindow::MessageReceived(BMessage* message)
 				continue;
 			char name[30];
 			sprintf(name, 
-				B_TRANSLATE_WITH_CONTEXT("Color (#%02x%02x%02x)", 
+				B_TRANSLATE_CONTEXT("Color (#%02x%02x%02x)", 
 					"Style name after dropping a color"), 
 				color->red, color->green, color->blue);
 			Style* style = new (nothrow) Style(*color);
@@ -359,7 +359,7 @@ MainWindow::MessageReceived(BMessage* message)
 			if (fUndoMI->IsEnabled())
 				fUndoMI->SetLabel(label.String());
 			else {
-				fUndoMI->SetLabel(B_TRANSLATE_WITH_CONTEXT("<nothing to undo>",
+				fUndoMI->SetLabel(B_TRANSLATE_CONTEXT("<nothing to undo>",
 					"Icon-O-Matic-Menu-Edit"));
 			}
 	
@@ -369,7 +369,7 @@ MainWindow::MessageReceived(BMessage* message)
 			if (fRedoMI->IsEnabled())
 				fRedoMI->SetLabel(label.String());
 			else {
-				fRedoMI->SetLabel(B_TRANSLATE_WITH_CONTEXT("<nothing to redo>",
+				fRedoMI->SetLabel(B_TRANSLATE_CONTEXT("<nothing to redo>",
 					"Icon-O-Matic-Menu-Edit"));
 			}
 			break;
@@ -424,7 +424,7 @@ MainWindow::MessageReceived(BMessage* message)
 					commands[1] = pathCommand;
 					commands[2] = shapeCommand;
 					command = new CompoundCommand(commands, 3,
-						B_TRANSLATE_WITH_CONTEXT("Add shape with path & style",
+						B_TRANSLATE_CONTEXT("Add shape with path & style",
 							"Icon-O-Matic-Menu-Shape"),
 						0);
 				} else if (styleCommand) {
@@ -432,7 +432,7 @@ MainWindow::MessageReceived(BMessage* message)
 					commands[0] = styleCommand;
 					commands[1] = shapeCommand;
 					command = new CompoundCommand(commands, 2,
-						B_TRANSLATE_WITH_CONTEXT("Add shape with style",
+						B_TRANSLATE_CONTEXT("Add shape with style",
 							"Icon-O-Matic-Menu-Shape"), 
 						0);
 				} else {
@@ -440,7 +440,7 @@ MainWindow::MessageReceived(BMessage* message)
 					commands[0] = pathCommand;
 					commands[1] = shapeCommand;
 					command = new CompoundCommand(commands, 2,
-						B_TRANSLATE_WITH_CONTEXT("Add shape with path",
+						B_TRANSLATE_CONTEXT("Add shape with path",
 							"Icon-O-Matic-Menu-Shape"), 
 						0);
 				}
@@ -712,12 +712,13 @@ MainWindow::Open(const entry_ref& ref, bool append)
 		BString helper(B_TRANSLATE("Opening the document failed!"));
 		helper << "\n\n" << B_TRANSLATE("Error: ") << strerror(ret);
 		BAlert* alert = new BAlert(
-			B_TRANSLATE_WITH_CONTEXT("bad news", "Title of error alert"),
+			B_TRANSLATE_CONTEXT("bad news", "Title of error alert"),
 			helper.String(), 
-			B_TRANSLATE_WITH_CONTEXT("Bummer", 
+			B_TRANSLATE_CONTEXT("Bummer", 
 				"Cancel button - error alert"),	
 			NULL, NULL);
 		// launch alert asynchronously
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go(NULL);
 
 		delete icon;
@@ -790,12 +791,13 @@ MainWindow::Open(const BMessenger& externalObserver, const uint8* data,
 			BString helper(B_TRANSLATE("Opening the icon failed!"));
 			helper << "\n\n" << B_TRANSLATE("Error: ") << strerror(ret);
 			BAlert* alert = new BAlert(
-				B_TRANSLATE_WITH_CONTEXT("bad news", "Title of error alert"),
+				B_TRANSLATE_CONTEXT("bad news", "Title of error alert"),
 				helper.String(), 
-				B_TRANSLATE_WITH_CONTEXT("Bummer", 
+				B_TRANSLATE_CONTEXT("Bummer", 
 					"Cancel button - error alert"),	
 				NULL, NULL);
 			// launch alert asynchronously
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go(NULL);
 
 			delete icon;
@@ -844,6 +846,8 @@ MainWindow::SetIcon(Icon* icon)
 	fStyleListView->SetShapeContainer(fIcon != NULL ? fIcon->Shapes() : NULL);
 
 	fShapeListView->SetShapeContainer(fIcon != NULL ? fIcon->Shapes() : NULL);
+	fShapeListView->SetStyleContainer(fIcon != NULL ? fIcon->Styles() : NULL);
+	fShapeListView->SetPathContainer(fIcon != NULL ? fIcon->Paths() : NULL);
 
 	// icon previews
 	fIconPreview16Folder->SetIcon(fIcon);
@@ -1134,13 +1138,13 @@ MainWindow::_CreateMenuBar()
 	BMenuBar* menuBar = new BMenuBar("main menu");
 
 
-	#undef B_TRANSLATE_CONTEXT
-	#define B_TRANSLATE_CONTEXT "Icon-O-Matic-Menus"
+	#undef B_TRANSLATION_CONTEXT
+	#define B_TRANSLATION_CONTEXT "Icon-O-Matic-Menus"
 	
 	
 	BMenu* fileMenu = new BMenu(B_TRANSLATE("File"));
 	BMenu* editMenu = new BMenu(B_TRANSLATE("Edit"));
-	BMenu* settingsMenu = new BMenu(B_TRANSLATE("Options"));
+	BMenu* settingsMenu = new BMenu(B_TRANSLATE("Settings"));
 	fPathMenu = new BMenu(B_TRANSLATE("Path"));
 	fStyleMenu = new BMenu(B_TRANSLATE("Style"));
 	fShapeMenu = new BMenu(B_TRANSLATE("Shape"));
@@ -1154,8 +1158,8 @@ MainWindow::_CreateMenuBar()
 
 
 	// File
-	#undef B_TRANSLATE_CONTEXT
-	#define B_TRANSLATE_CONTEXT "Icon-O-Matic-Menu-File"
+	#undef B_TRANSLATION_CONTEXT
+	#define B_TRANSLATION_CONTEXT "Icon-O-Matic-Menu-File"
 	
 
 	BMenuItem* item = new BMenuItem(B_TRANSLATE("New"),
@@ -1190,8 +1194,8 @@ MainWindow::_CreateMenuBar()
 	item->SetTarget(be_app);
 
 	// Edit
-	#undef B_TRANSLATE_CONTEXT
-	#define B_TRANSLATE_CONTEXT "Icon-O-Matic-Menu-Edit"
+	#undef B_TRANSLATION_CONTEXT
+	#define B_TRANSLATION_CONTEXT "Icon-O-Matic-Menu-Edit"
 	
 	
 	fUndoMI = new BMenuItem(B_TRANSLATE("<nothing to undo>"),
@@ -1207,8 +1211,8 @@ MainWindow::_CreateMenuBar()
 
 
 	// Settings
-	#undef B_TRANSLATE_CONTEXT
-	#define B_TRANSLATE_CONTEXT "Icon-O-Matic-Menu-Settings"
+	#undef B_TRANSLATION_CONTEXT
+	#define B_TRANSLATION_CONTEXT "Icon-O-Matic-Menu-Settings"
 	
 	
 	BMenu* filterModeMenu = new BMenu(B_TRANSLATE("Snap to grid"));
@@ -1270,16 +1274,21 @@ MainWindow::_CheckSaveIcon(const BMessage* currentMessage)
 	Activate();
 
 	BAlert* alert = new BAlert("save", 
-		B_TRANSLATE("Save changes to current icon?"), B_TRANSLATE("Discard"),
-		 B_TRANSLATE("Cancel"), B_TRANSLATE("Save"));
+		B_TRANSLATE("Save changes to current icon before closing?"),
+			B_TRANSLATE("Cancel"), B_TRANSLATE("Don't save"),
+			B_TRANSLATE("Save"), B_WIDTH_AS_USUAL,	B_OFFSET_SPACING,
+			B_WARNING_ALERT);
+	alert->SetShortcut(0, B_ESCAPE);
+	alert->SetShortcut(1, 'd');
+	alert->SetShortcut(2, 's');
 	int32 choice = alert->Go();
 	switch (choice) {
 		case 0:
-			// discard
-			return true;
-		case 1:
 			// cancel
 			return false;
+		case 1:
+			// don't save
+			return true;
 		case 2:
 		default:
 			// cancel (save first) but pick up what we were doing before

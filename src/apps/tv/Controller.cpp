@@ -147,7 +147,7 @@ Controller::ConnectInterface(int i)
 		printf("  name '%s'\n", parameter->Name());
 		printf("  kind '%s'\n", parameter->Kind());
 		printf("  unit '%s'\n", parameter->Unit());
-		printf("  flags 0x%08lx\n", parameter->Flags());
+		printf("  flags 0x%08" B_PRIx32 "\n", parameter->Flags());
 		
 		// XXX TODO: matching on Name is weak
 		if (strcmp(parameter->Name(), "Channel") == 0 || strcmp(parameter->Kind(), B_TUNER_CHANNEL) == 0) {

@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include <fs_volume.h>
 #include <Alert.h>
 #include <Debug.h>
 #include <NodeInfo.h>
@@ -58,6 +59,7 @@ UrlWrapper::_Warn(const char* url)
 	message << "Proceed anyway?";
 	BAlert* alert = new BAlert("Warning", message.String(), "Proceed", "Stop", NULL,
 		B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+	alert->SetShortcut(1, B_ESCAPE);
 	int32 button;
 	button = alert->Go();
 	if (button == 0)
@@ -220,6 +222,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 	const char* failc = " || read -p 'Press any key'";
 	const char* pausec = " ; read -p 'Press any key'";
 	char* args[] = { (char *)"/bin/sh", (char *)"-c", NULL, NULL};
+	status_t err;
 
 	BPrivate::Support::BUrl url(argv[1]);
 
@@ -465,6 +468,60 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 		return;
 	}
 
+	if (proto == "nfs") {
+		BString parameter(host);
+		_DecodeUrlString(path);
+		if (url.HasPort())
+			parameter << ":" << port;
+		//XXX: should not always be absolute! FIXME
+		parameter << ":/" << path;
+		BString prettyPath(path);
+		prettyPath.Remove(0, prettyPath.FindLast("/") + 1);
+		if (path == "" || path == "/")
+			prettyPath = "root";
+		prettyPath << " on " << host;
+		prettyPath.Prepend("/");
+		if (mkdir(prettyPath.String(), 0755) < 0) {
+			perror("mkdir");
+			return;
+		}
+		dev_t volume;
+		uint32 flags = 0;
+		fprintf(stderr, "parms:'%s'\n", parameter.String());
+		volume = fs_mount_volume(prettyPath.String(), NULL, "nfs4", flags,
+			parameter.String());
+		if (volume < B_OK) {
+			fprintf(stderr, "fs_mount_volume: %s\n", strerror(volume));
+			return;
+		}
+
+		BMessage m(B_REFS_RECEIVED);
+		entry_ref ref;
+		if (get_ref_for_path(prettyPath.String(), &ref) < B_OK)
+			return;
+		m.AddRef("refs", &ref);
+		be_roster->Launch(kTrackerSig, &m);
+		return;
+	}
+
+	if (proto == "doi") {
+		BString url("http://dx.doi.org/");
+		BString mimetype;
+
+		url << full;
+		BPrivate::Support::BUrl u(url.String());
+		args[0] = const_cast<char*>("urlwrapper"); //XXX
+		args[1] = (char*)u.String();
+		args[2] = NULL;
+		mimetype = kURLHandlerSigBase;
+		mimetype += u.Proto();
+
+		err = be_roster->Launch(mimetype.String(), 1, args + 1);
+		if (err != B_OK && err != B_ALREADY_RUNNING)
+			err = be_roster->Launch(kAppSig, 1, args + 1);
+		// TODO: handle errors
+		return;
+	}
 
 	/*
 

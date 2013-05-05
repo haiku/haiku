@@ -568,7 +568,7 @@ BlockAllocator::AllocateBlocks(Transaction *transaction, int32 group, uint16 sta
 
 				fVolume->SuperBlock().used_blocks =
 					HOST_ENDIAN_TO_BFS_INT64(fVolume->UsedBlocks() + numBlocks);
-					// We are not writing back the disk's super block - it's
+					// We are not writing back the disk's superblock - it's
 					// either done by the journaling code, or when the disk
 					// is unmounted.
 					// If the value is not correct at mount time, it will be

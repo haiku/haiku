@@ -29,9 +29,6 @@
 #define _LIBIO_P_H_
 
 #include <errno.h>
-#ifndef __set_errno
-# define __set_errno(Val) errno = (Val)
-#endif
 #if defined __GLIBC__ && __GLIBC__ >= 2
 # include <bits/libc-lock.h>
 #else

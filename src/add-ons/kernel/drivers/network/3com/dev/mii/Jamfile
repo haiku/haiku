@@ -12,13 +12,12 @@ SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
 KernelStaticLibrary 3com_mii.a
 	:
 	bmtphy.c
-	exphy.c
 	ukphy.c
 	ukphy_subr.c
 	;
 
-ObjectHdrs [ FGristFiles bmtphy$(SUFOBJ) exphy$(SUFOBJ) ukphy$(SUFOBJ) ]
+ObjectHdrs [ FGristFiles bmtphy$(SUFOBJ) ukphy$(SUFOBJ) ]
 	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) libs compat
 			freebsd_network ] ;
-Includes [ FGristFiles bmtphy.c exphy.c ukphy.c ]
+Includes [ FGristFiles bmtphy.c ukphy.c ]
 	: <src!libs!compat!freebsd_network>miidevs.h ;

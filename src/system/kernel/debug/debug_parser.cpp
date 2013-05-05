@@ -130,8 +130,8 @@ parse_exception(const char* message, int32 position)
 {
 	if (sNextJumpBufferIndex == 0) {
 		kprintf_unfiltered("parse_exception(): No jump buffer!\n");
-		kprintf_unfiltered("exception: \"%s\", position: %lu\n", message,
-			position);
+		kprintf_unfiltered("exception: \"%s\", position: %" B_PRId32 "\n",
+			message, position);
 		return;
 	}
 
@@ -845,7 +845,7 @@ ExpressionParser::_ParseArgument(int& argc, char** argv)
 			fTokenizer.SetCommandMode(true);
 			_EatToken(TOKEN_CLOSING_PARENTHESIS);
 
-			snprintf(sTempBuffer, sizeof(sTempBuffer), "%llu", value);
+			snprintf(sTempBuffer, sizeof(sTempBuffer), "%" B_PRIu64, value);
 			_AddArgument(argc, argv, sTempBuffer);
 			return true;
 		}
@@ -857,7 +857,7 @@ ExpressionParser::_ParseArgument(int& argc, char** argv)
 			uint64 value = _ParseCommandPipe(returnValue);
 			_EatToken(TOKEN_CLOSING_BRACKET);
 
-			snprintf(sTempBuffer, sizeof(sTempBuffer), "%llu", value);
+			snprintf(sTempBuffer, sizeof(sTempBuffer), "%" B_PRIu64, value);
 			_AddArgument(argc, argv, sTempBuffer);
 			return true;
 		}
@@ -1050,7 +1050,7 @@ ExpressionParser::_ParseDereference(void** _address, uint32* _size)
 
 		if (size != 1 && size != 2 && size != 4 && size != 8) {
 			snprintf(sTempBuffer, sizeof(sTempBuffer),
-				"invalid size (%llu) for unary * operator", size);
+				"invalid size (%" B_PRIu64 ") for unary * operator", size);
 			parse_exception(sTempBuffer, position);
 		}
 

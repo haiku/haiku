@@ -8,13 +8,19 @@
 #ifndef _USB_KLSI_H_
 #define _USB_KLSI_H_
 
+
 #include "SerialDevice.h"
 
+
 /* supported vendor and product ids */
-#define VENDOR_PALM					0x0830
-#define VENDOR_KLSI					0x05e9
-#define PRODUCT_PALM_CONNECT		0x0080
-#define PRODUCT_KLSI_KL5KUSB105D	0x00c0
+#define VENDOR_PALM		0x0830
+#define VENDOR_KLSI		0x05e9
+
+const usb_serial_device kKLSIDevices[] = {
+	{VENDOR_PALM, 0x0080, "PalmConnect RS232"},
+	{VENDOR_KLSI, 0x00c0, "KLSI KL5KUSB105D"}
+};
+
 
 /* protocol defines */
 #define KLSI_SET_REQUEST			0x01
@@ -57,5 +63,6 @@ virtual	void					OnWrite(const char *buffer, size_t *numBytes,
 									size_t *packetBytes);
 virtual	void					OnClose();
 };
+
 
 #endif //_USB_KLSI_H_

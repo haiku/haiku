@@ -3,7 +3,7 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "audio/midi";
 
-resource(2, "META:S:DESC") #'MSDC' "MIDI File";
+resource(2, "META:S:DESC") #'MSDC' "MIDI file";
 
 resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-MidiPlayer";
 

@@ -89,11 +89,11 @@ public:
 	virtual	bool			MoveTab(int32 from, int32 to, bool isMoving,
 								BRegion* updateRegion = NULL);
 	virtual int32			TabAt(const BPoint& where) const;
-			Decorator::Tab*	TabAt(int32 index) const 
+			Decorator::Tab*	TabAt(int32 index) const
 								{ return fTabList.ItemAt(index); }
 			int32			CountTabs() const
 								{ return fTabList.CountItems(); }
-			void			SetTopTap(int32 tab);
+			void			SetTopTab(int32 tab);
 
 			void			SetDrawingEngine(DrawingEngine *driver);
 	inline	DrawingEngine*	GetDrawingEngine() const

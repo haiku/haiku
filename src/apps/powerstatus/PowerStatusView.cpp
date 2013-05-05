@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2012, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -16,7 +16,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <Alert.h>
+#include <AboutWindow.h>
 #include <Application.h>
 #include <Catalog.h>
 #include <ControlLook.h>
@@ -37,8 +37,8 @@
 #include "PowerStatus.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PowerStatus"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PowerStatus"
 
 
 extern "C" _EXPORT BView *instantiate_deskbar_item(void);
@@ -419,6 +419,10 @@ PowerStatusView::FromMessage(const BMessage* archive)
 		fShowStatusIcon = value;
 	if (archive->FindBool("show time", &value) == B_OK)
 		fShowTime = value;
+	
+	//Incase we have a bad saving and none are showed..
+	if (!fShowLabel && !fShowStatusIcon)
+		fShowLabel = true;
 
 	int32 intValue;
 	if (archive->FindInt32("battery id", &intValue) == B_OK)
@@ -499,9 +503,8 @@ PowerStatusReplicant::PowerStatusReplicant(BMessage* archive)
 
 PowerStatusReplicant::~PowerStatusReplicant()
 {
-	if (fMessengerExist) {
+	if (fMessengerExist)
 		delete fExtWindowMessenger;
-	}
 
 	fDriverInterface->StopWatching(this);
 	fDriverInterface->Disconnect();
@@ -539,7 +542,11 @@ PowerStatusReplicant::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		case kMsgToggleLabel:
-			fShowLabel = !fShowLabel;
+			if (fShowStatusIcon)
+				fShowLabel = !fShowLabel;
+			else
+				fShowLabel = true;
+				
 			Update(true);
 			break;
 
@@ -549,7 +556,11 @@ PowerStatusReplicant::MessageReceived(BMessage *message)
 			break;
 
 		case kMsgToggleStatusIcon:
-			fShowStatusIcon = !fShowStatusIcon;
+			if (fShowLabel)
+				fShowStatusIcon = !fShowStatusIcon;
+			else
+				fShowStatusIcon = true;
+
 			Update(true);
 			break;
 
@@ -609,21 +620,20 @@ PowerStatusReplicant::MouseDown(BPoint point)
 void
 PowerStatusReplicant::_AboutRequested()
 {
-	BAlert* alert = new BAlert(B_TRANSLATE("About"),
-		B_TRANSLATE("PowerStatus\n"
-			"written by Axel Dörfler, Clemens Zeidler\n"
-			"Copyright 2006, Haiku, Inc.\n"), B_TRANSLATE("OK"));
-	BTextView *view = alert->TextView();
-	BFont font;
+	BAboutWindow* window = new BAboutWindow(
+		B_TRANSLATE_SYSTEM_NAME("PowerStatus"), kSignature);
 
-	view->SetStylable(true);
+	const char* authors[] = {
+		"Axel Dörfler",
+		"Alexander von Gluck",
+		"Clemens Zeidler",
+		NULL
+	};
 
-	view->GetFont(&font);
-	font.SetSize(18);
-	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, strlen(B_TRANSLATE("PowerStatus")), &font);
+	window->AddCopyright(2006, "Haiku, Inc.");
+	window->AddAuthors(authors);
 
-	alert->Go();
+	window->Show();
 }
 
 

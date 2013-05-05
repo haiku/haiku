@@ -339,7 +339,8 @@ mmu_allocate(void *virtualAddress, size_t size)
 		addr_t address = (addr_t)virtualAddress;
 
 		// is the address within the valid range?
-		if (address < KERNEL_BASE || address + size >= KERNEL_BASE + kMaxKernelSize)
+		if (address < KERNEL_BASE || address + size * B_PAGE_SIZE
+			>= KERNEL_BASE + kMaxKernelSize)
 			return NULL;
 
 		for (uint32 i = 0; i < size; i++) {
@@ -503,9 +504,9 @@ mmu_init_for_kernel(void)
 	gKernelArgs.num_virtual_allocated_ranges = 1;
 
 	// sort the address ranges
-	sort_physical_address_ranges(gKernelArgs.physical_memory_range,
+	sort_address_ranges(gKernelArgs.physical_memory_range,
 		gKernelArgs.num_physical_memory_ranges);
-	sort_physical_address_ranges(gKernelArgs.physical_allocated_range,
+	sort_address_ranges(gKernelArgs.physical_allocated_range,
 		gKernelArgs.num_physical_allocated_ranges);
 	sort_address_ranges(gKernelArgs.virtual_allocated_range,
 		gKernelArgs.num_virtual_allocated_ranges);
@@ -516,17 +517,23 @@ mmu_init_for_kernel(void)
 
 		dprintf("phys memory ranges:\n");
 		for (i = 0; i < gKernelArgs.num_physical_memory_ranges; i++) {
-			dprintf("    base 0x%08lx, length 0x%08lx\n", gKernelArgs.physical_memory_range[i].start, gKernelArgs.physical_memory_range[i].size);
+			dprintf("    base 0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
+				gKernelArgs.physical_memory_range[i].start,
+				gKernelArgs.physical_memory_range[i].size);
 		}
 
 		dprintf("allocated phys memory ranges:\n");
 		for (i = 0; i < gKernelArgs.num_physical_allocated_ranges; i++) {
-			dprintf("    base 0x%08lx, length 0x%08lx\n", gKernelArgs.physical_allocated_range[i].start, gKernelArgs.physical_allocated_range[i].size);
+			dprintf("    base 0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
+				gKernelArgs.physical_allocated_range[i].start,
+				gKernelArgs.physical_allocated_range[i].size);
 		}
 
 		dprintf("allocated virt memory ranges:\n");
 		for (i = 0; i < gKernelArgs.num_virtual_allocated_ranges; i++) {
-			dprintf("    base 0x%08lx, length 0x%08lx\n", gKernelArgs.virtual_allocated_range[i].start, gKernelArgs.virtual_allocated_range[i].size);
+			dprintf("    base 0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
+				gKernelArgs.virtual_allocated_range[i].start,
+				gKernelArgs.virtual_allocated_range[i].size);
 		}
 	}
 #endif

@@ -11,16 +11,14 @@
 
 #include <Catalog.h>
 #include <CheckBox.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
-#include <SpaceLayoutItem.h>
+#include <LayoutBuilder.h>
 #include <StringView.h>
 
 #include <stdio.h>
 #include <string.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ConfigView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ConfigView"
 
 
 ConfigView::ConfigView(uint32 flags)
@@ -28,7 +26,8 @@ ConfigView::ConfigView(uint32 flags)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	BStringView *fTitle = new BStringView("title", B_TRANSLATE("EXR Images"));
+	BStringView *fTitle = new BStringView("title",
+		B_TRANSLATE("EXR image translator"));
 	fTitle->SetFont(be_bold_font);
 
 	char version[256];
@@ -52,10 +51,9 @@ ConfigView::ConfigView(uint32 flags)
 		B_TRANSLATE("a division of Lucasfilm Entertainment Company Ltd"));
 
 	// Build the layout
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 7)
-		.Add(fTitle)
+    BLayoutBuilder::Group<>(this, B_VERTICAL, 7)
+		.SetInsets(5)
+        .Add(fTitle)
 		.Add(fVersion)
 		.AddGlue()
 		.Add(fCopyright)
@@ -63,9 +61,7 @@ ConfigView::ConfigView(uint32 flags)
 		.AddGlue()
 		.Add(fCopyright3)
 		.Add(fCopyright4)
-		.AddGlue()
-		.SetInsets(5, 5, 5, 5)
-	);
+		.AddGlue();
 
 	BFont font;
 	GetFont(&font);

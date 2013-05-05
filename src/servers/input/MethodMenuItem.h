@@ -24,8 +24,8 @@
 
 class MethodMenuItem : public BMenuItem {
 	public:
-		MethodMenuItem(int32 cookie, const char *label, const uchar *icon, BMenu *subMenu, BMessenger &messenger);
-		MethodMenuItem(int32 cookie, const char *label, const uchar *icon);
+		MethodMenuItem(void *cookie, const char *label, const uchar *icon, BMenu *subMenu, BMessenger &messenger);
+		MethodMenuItem(void *cookie, const char *label, const uchar *icon);
 
 		virtual ~MethodMenuItem();
 
@@ -38,10 +38,10 @@ class MethodMenuItem : public BMenuItem {
 		void SetIcon(const uchar *icon);
 		const uchar *Icon() { return(uchar *)fIcon.Bits(); };
 
-		int32 Cookie() { return fCookie; };
+		void *Cookie() { return fCookie; };
 	private:
 		BBitmap fIcon;
-		int32 fCookie;
+		void *fCookie;
 		BMessenger fMessenger;
 };
 

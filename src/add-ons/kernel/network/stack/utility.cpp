@@ -312,7 +312,7 @@ Fifo::Dequeue(bool clone)
 }
 
 
-ssize_t
+status_t
 Fifo::Clear()
 {
 	return base_fifo_clear(this);
@@ -632,7 +632,7 @@ dump_timer(int argc, char** argv)
 		if (timer == NULL)
 			break;
 
-		kprintf("%p  %p  %p  %Ld\n", timer, timer->hook, timer->data,
+		kprintf("%p  %p  %p  %" B_PRId64 "\n", timer, timer->hook, timer->data,
 			timer->due > 0 ? timer->due - system_time() : -1);
 	}
 
@@ -681,12 +681,13 @@ void
 uninit_timers(void)
 {
 	delete_sem(sTimerWaitSem);
-	mutex_lock(&sTimerLock);
-
-	mutex_destroy(&sTimerLock);
 
 	status_t status;
 	wait_for_thread(sTimerThread, &status);
+
+	mutex_lock(&sTimerLock);
+
+	mutex_destroy(&sTimerLock);
 
 	remove_debugger_command("net_timer", dump_timer);
 }

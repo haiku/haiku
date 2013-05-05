@@ -1,0 +1,22 @@
+SubDir HAIKU_TOP src apps firstbootprompt ;
+
+UsePrivateHeaders interface locale shared ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src preferences keymap ] ;
+
+Application FirstBootPrompt :
+	BootPrompt.cpp
+	BootPromptWindow.cpp
+	Keymap.cpp
+	KeymapListItem.cpp
+	: be translation libshared.a $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
+	: BootPrompt.rdef
+;
+
+DoCatalogs FirstBootPrompt :
+	x-vnd.Haiku-FirstBootPrompt
+	:
+	BootPrompt.cpp
+	BootPromptWindow.cpp
+;
+

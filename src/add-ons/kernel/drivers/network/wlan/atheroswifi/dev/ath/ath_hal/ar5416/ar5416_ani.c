@@ -156,6 +156,8 @@ ar5416AniAttach(struct ath_hal *ah, const struct ar5212AniParams *params24,
 
 /*
  * Cleanup any ANI state setup.
+ *
+ * This doesn't restore registers to their default settings!
  */
 void
 ar5416AniDetach(struct ath_hal *ah)
@@ -173,16 +175,60 @@ ar5416AniControl(struct ath_hal *ah, HAL_ANI_CMD cmd, int param)
 	typedef int TABLE[];
 	struct ath_hal_5212 *ahp = AH5212(ah);
 	struct ar5212AniState *aniState = ahp->ah_curani;
-	const struct ar5212AniParams *params = aniState->params;
+	const struct ar5212AniParams *params = AH_NULL;
+
+	/*
+	 * This function may be called before there's a current
+	 * channel (eg to disable ANI.)
+	 */
+	if (aniState != AH_NULL)
+		params = aniState->params;
 
 	OS_MARK(ah, AH_MARK_ANI_CONTROL, cmd);
+
+	/* These commands can't be disabled */
+	if (cmd == HAL_ANI_PRESENT)
+		return AH_TRUE;
+
+	if (cmd == HAL_ANI_MODE) {
+		if (param == 0) {
+			ahp->ah_procPhyErr &= ~HAL_ANI_ENA;
+			/* Turn off HW counters if we have them */
+			ar5416AniDetach(ah);
+		} else {			/* normal/auto mode */
+			/* don't mess with state if already enabled */
+			if (! (ahp->ah_procPhyErr & HAL_ANI_ENA)) {
+				/* Enable MIB Counters */
+				/*
+				 * XXX use 2.4ghz params if no channel is
+				 * available
+				 */
+				enableAniMIBCounters(ah,
+				    ahp->ah_curani != AH_NULL ?
+				      ahp->ah_curani->params:
+				      &ahp->ah_aniParams24);
+				ahp->ah_procPhyErr |= HAL_ANI_ENA;
+			}
+		}
+		return AH_TRUE;
+	}
+
+	/* Check whether the particular function is enabled */
+	if (((1 << cmd) & AH5416(ah)->ah_ani_function) == 0) {
+		HALDEBUG(ah, HAL_DEBUG_ANI, "%s: command %d disabled\n",
+		    __func__, cmd);
+		HALDEBUG(ah, HAL_DEBUG_ANI, "%s: cmd %d; mask %x\n", __func__, cmd, AH5416(ah)->ah_ani_function);
+		return AH_FALSE;
+	}
+
 
 	switch (cmd) {
 	case HAL_ANI_NOISE_IMMUNITY_LEVEL: {
 		u_int level = param;
 
+		HALDEBUG(ah, HAL_DEBUG_ANI, "%s: HAL_ANI_NOISE_IMMUNITY_LEVEL: set level = %d\n", __func__, level);
 		if (level >= params->maxNoiseImmunityLevel) {
-			HALDEBUG(ah, HAL_DEBUG_ANY,
+			HALDEBUG(ah, HAL_DEBUG_ANI,
 			    "%s: immunity level out of range (%u > %u)\n",
 			    __func__, level, params->maxNoiseImmunityLevel);
 			return AH_FALSE;
@@ -213,6 +259,7 @@ ar5416AniControl(struct ath_hal *ah, HAL_ANI_CMD cmd, int param)
 		static const TABLE m2CountThrLow = {  63,   48 };
 		u_int on = param ? 1 : 0;
 
+		HALDEBUG(ah, HAL_DEBUG_ANI, "%s: HAL_ANI_OFDM_WEAK_SIGNAL_DETECTION: %s\n", __func__, on ? "enabled" : "disabled");
 		OS_REG_RMW_FIELD(ah, AR_PHY_SFCORR_LOW,
 			AR_PHY_SFCORR_LOW_M1_THRESH_LOW, m1ThreshLow[on]);
 		OS_REG_RMW_FIELD(ah, AR_PHY_SFCORR_LOW,
@@ -253,6 +300,7 @@ ar5416AniControl(struct ath_hal *ah, HAL_ANI_CMD cmd, int param)
 		static const TABLE weakSigThrCck = { 8, 6 };
 		u_int high = param ? 1 : 0;
 
+		HALDEBUG(ah, HAL_DEBUG_ANI, "%s: HAL_ANI_CCK_WEAK_SIGNAL_THR: %s\n", __func__, high ? "high" : "low");
 		OS_REG_RMW_FIELD(ah, AR_PHY_CCK_DETECT,
 		    AR_PHY_CCK_DETECT_WEAK_SIG_THR_CCK, weakSigThrCck[high]);
 		if (high)
@@ -265,8 +313,9 @@ ar5416AniControl(struct ath_hal *ah, HAL_ANI_CMD cmd, int param)
 	case HAL_ANI_FIRSTEP_LEVEL: {
 		u_int level = param;
 
+		HALDEBUG(ah, HAL_DEBUG_ANI, "%s: HAL_ANI_FIRSTEP_LEVEL: level = %d\n", __func__, level);
 		if (level >= params->maxFirstepLevel) {
-			HALDEBUG(ah, HAL_DEBUG_ANY,
+			HALDEBUG(ah, HAL_DEBUG_ANI,
 			    "%s: firstep level out of range (%u > %u)\n",
 			    __func__, level, params->maxFirstepLevel);
 			return AH_FALSE;
@@ -283,14 +332,21 @@ ar5416AniControl(struct ath_hal *ah, HAL_ANI_CMD cmd, int param)
 	case HAL_ANI_SPUR_IMMUNITY_LEVEL: {
 		u_int level = param;
 
+		HALDEBUG(ah, HAL_DEBUG_ANI, "%s: HAL_ANI_SPUR_IMMUNITY_LEVEL: level = %d\n", __func__, level);
 		if (level >= params->maxSpurImmunityLevel) {
-			HALDEBUG(ah, HAL_DEBUG_ANY,
+			HALDEBUG(ah, HAL_DEBUG_ANI,
 			    "%s: spur immunity level out of range (%u > %u)\n",
 			    __func__, level, params->maxSpurImmunityLevel);
 			return AH_FALSE;
 		}
 		OS_REG_RMW_FIELD(ah, AR_PHY_TIMING5,
 		    AR_PHY_TIMING5_CYCPWR_THR1, params->cycPwrThr1[level]);
+
+		/* Only set the ext channel cycpwr_thr1 field for ht/40 */
+		if (IEEE80211_IS_CHAN_HT40(AH_PRIVATE(ah)->ah_curchan))
+			OS_REG_RMW_FIELD(ah, AR_PHY_EXT_CCA,
+			    AR_PHY_EXT_TIMING5_CYCPWR_THR1, params->cycPwrThr1[level]);
+
 		if (level > aniState->spurImmunityLevel)
 			ahp->ah_stats.ast_ani_spurup++;
 		else if (level < aniState->spurImmunityLevel)
@@ -298,27 +354,6 @@ ar5416AniControl(struct ath_hal *ah, HAL_ANI_CMD cmd, int param)
 		aniState->spurImmunityLevel = level;
 		break;
 	}
-	case HAL_ANI_PRESENT:
-		break;
-	case HAL_ANI_MODE:
-		if (param == 0) {
-			ahp->ah_procPhyErr &= ~HAL_ANI_ENA;
-			/* Turn off HW counters if we have them */
-			ar5416AniDetach(ah);
-			ar5212SetRxFilter(ah,
-				ar5212GetRxFilter(ah) &~ HAL_RX_FILTER_PHYERR);
-		} else {			/* normal/auto mode */
-			/* don't mess with state if already enabled */
-			if (ahp->ah_procPhyErr & HAL_ANI_ENA)
-				break;
-			ar5212SetRxFilter(ah,
-				ar5212GetRxFilter(ah) &~ HAL_RX_FILTER_PHYERR);
-			/* Enable MIB Counters */
-			enableAniMIBCounters(ah, ahp->ah_curani != AH_NULL ?
-			    ahp->ah_curani->params: &ahp->ah_aniParams24 /*XXX*/);
-			ahp->ah_procPhyErr |= HAL_ANI_ENA;
-		}
-		break;
 #ifdef AH_PRIVATE_DIAG
 	case HAL_ANI_PHYERR_RESET:
 		ahp->ah_stats.ast_ani_ofdmerrs = 0;
@@ -326,7 +361,7 @@ ar5416AniControl(struct ath_hal *ah, HAL_ANI_CMD cmd, int param)
 		break;
 #endif /* AH_PRIVATE_DIAG */
 	default:
-		HALDEBUG(ah, HAL_DEBUG_ANY, "%s: invalid cmd %u\n",
+		HALDEBUG(ah, HAL_DEBUG_ANI, "%s: invalid cmd %u\n",
 		    __func__, cmd);
 		return AH_FALSE;
 	}
@@ -349,13 +384,15 @@ ar5416AniOfdmErrTrigger(struct ath_hal *ah)
 	aniState = ahp->ah_curani;
 	params = aniState->params;
 	/* First, raise noise immunity level, up to max */
-	if (aniState->noiseImmunityLevel+1 < params->maxNoiseImmunityLevel) {
+	if ((AH5416(ah)->ah_ani_function & (1 << HAL_ANI_NOISE_IMMUNITY_LEVEL)) &&
+	    (aniState->noiseImmunityLevel+1 < params->maxNoiseImmunityLevel)) {
 		ar5416AniControl(ah, HAL_ANI_NOISE_IMMUNITY_LEVEL, 
 				 aniState->noiseImmunityLevel + 1);
 		return;
 	}
 	/* then, raise spur immunity level, up to max */
-	if (aniState->spurImmunityLevel+1 < params->maxSpurImmunityLevel) {
+	if ((AH5416(ah)->ah_ani_function & (1 << HAL_ANI_SPUR_IMMUNITY_LEVEL)) &&
+	    (aniState->spurImmunityLevel+1 < params->maxSpurImmunityLevel)) {
 		ar5416AniControl(ah, HAL_ANI_SPUR_IMMUNITY_LEVEL,
 				 aniState->spurImmunityLevel + 1);
 		return;
@@ -434,7 +471,8 @@ ar5416AniCckErrTrigger(struct ath_hal *ah)
 	/* first, raise noise immunity level, up to max */
 	aniState = ahp->ah_curani;
 	params = aniState->params;
-	if (aniState->noiseImmunityLevel+1 < params->maxNoiseImmunityLevel) {
+	if ((AH5416(ah)->ah_ani_function & (1 << HAL_ANI_NOISE_IMMUNITY_LEVEL) &&
+	    aniState->noiseImmunityLevel+1 < params->maxNoiseImmunityLevel)) {
 		ar5416AniControl(ah, HAL_ANI_NOISE_IMMUNITY_LEVEL,
 				 aniState->noiseImmunityLevel + 1);
 		return;
@@ -481,7 +519,7 @@ ar5416AniRestart(struct ath_hal *ah, struct ar5212AniState *aniState)
 	OS_REG_WRITE(ah, AR_PHY_ERR_1, params->ofdmPhyErrBase);
 	OS_REG_WRITE(ah, AR_PHY_ERR_2, params->cckPhyErrBase);
 	OS_REG_WRITE(ah, AR_PHY_ERR_MASK_1, AR_PHY_ERR_OFDM_TIMING);
-	OS_REG_WRITE(ah, AR_PHY_ERR_MASK_1, AR_PHY_ERR_CCK_TIMING);
+	OS_REG_WRITE(ah, AR_PHY_ERR_MASK_2, AR_PHY_ERR_CCK_TIMING);
 
 	/* Clear the mib counters and save them in the stats */
 	ar5212UpdateMibCounters(ah, &ahp->ah_mibStats);
@@ -530,8 +568,21 @@ ar5416AniReset(struct ath_hal *ah, const struct ieee80211_channel *chan,
 	/*
 	 * Turn off PHY error frame delivery while we futz with settings.
 	 */
-	rxfilter = ar5212GetRxFilter(ah);
-	ar5212SetRxFilter(ah, rxfilter &~ HAL_RX_FILTER_PHYERR);
+	rxfilter = ah->ah_getRxFilter(ah);
+	ah->ah_setRxFilter(ah, rxfilter &~ HAL_RX_FILTER_PHYERR);
+
+	/*
+	 * If ANI is disabled at this point, don't set the default
+	 * ANI parameter settings - leave the HAL settings there.
+	 * This is (currently) needed for reliable radar detection.
+	 */
+	if (! ANI_ENA(ah)) {
+		HALDEBUG(ah, HAL_DEBUG_ANI, "%s: ANI disabled\n",
+		    __func__);
+		goto finish;
+	}
+
+
 	/*
 	 * Automatic processing is done only in station mode right now.
 	 */
@@ -565,10 +616,16 @@ ar5416AniReset(struct ath_hal *ah, const struct ieee80211_channel *chan,
 		ar5416AniControl(ah, HAL_ANI_FIRSTEP_LEVEL, 0);
 		ichan->privFlags |= CHANNEL_ANI_SETUP;
 	}
+
+	/*
+	 * In case the counters haven't yet been setup; set them up.
+	 */
+	enableAniMIBCounters(ah, aniState->params);
 	ar5416AniRestart(ah, aniState);
 
+finish:
 	/* restore RX filter mask */
-	ar5212SetRxFilter(ah, rxfilter);
+	ah->ah_setRxFilter(ah, rxfilter);
 }
 
 /*
@@ -793,20 +850,25 @@ updateMIBStats(struct ath_hal *ah, struct ar5212AniState *aniState)
 	aniState->cckPhyErrCount = cckPhyErrCnt;
 }
 
+void
+ar5416RxMonitor(struct ath_hal *ah, const HAL_NODE_STATS *stats,
+		const struct ieee80211_channel *chan)
+{
+	struct ath_hal_5212 *ahp = AH5212(ah);
+	ahp->ah_stats.ast_nodestats.ns_avgbrssi = stats->ns_avgbrssi;
+}
+
 /*
  * Do periodic processing.  This routine is called from the
  * driver's rx interrupt handler after processing frames.
  */
 void
-ar5416AniPoll(struct ath_hal *ah, const HAL_NODE_STATS *stats,
-		const struct ieee80211_channel *chan)
+ar5416AniPoll(struct ath_hal *ah, const struct ieee80211_channel *chan)
 {
 	struct ath_hal_5212 *ahp = AH5212(ah);
 	struct ar5212AniState *aniState = ahp->ah_curani;
 	const struct ar5212AniParams *params;
 	int32_t listenTime;
-
-	ahp->ah_stats.ast_nodestats.ns_avgbrssi = stats->ns_avgbrssi;
 
 	/* XXX can aniState be null? */
 	if (aniState == AH_NULL)
@@ -843,10 +905,16 @@ ar5416AniPoll(struct ath_hal *ah, const HAL_NODE_STATS *stats,
 		/* check to see if need to raise immunity */
 		if (aniState->ofdmPhyErrCount > aniState->listenTime *
 		    params->ofdmTrigHigh / 1000) {
+                        HALDEBUG(ah, HAL_DEBUG_ANI,
+                            "%s: OFDM err %u listenTime %u\n", __func__,
+                            aniState->ofdmPhyErrCount, aniState->listenTime);
 			ar5416AniOfdmErrTrigger(ah);
 			ar5416AniRestart(ah, aniState);
 		} else if (aniState->cckPhyErrCount > aniState->listenTime *
 			   params->cckTrigHigh / 1000) {
+                        HALDEBUG(ah, HAL_DEBUG_ANI,
+                            "%s: CCK err %u listenTime %u\n", __func__,
+                            aniState->ofdmPhyErrCount, aniState->listenTime);
 			ar5416AniCckErrTrigger(ah);
 			ar5416AniRestart(ah, aniState);
 		}

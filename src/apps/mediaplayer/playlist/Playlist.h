@@ -55,7 +55,7 @@ public:
 
 		virtual	void			ItemsSorted();
 
-		virtual	void			CurrentItemChanged(int32 newIndex);
+		virtual	void			CurrentItemChanged(int32 newIndex, bool play);
 
 		virtual	void			ImportFailed();
 	};
@@ -91,7 +91,8 @@ public:
 			PlaylistItem*		ItemAtFast(int32 index) const;
 
 			// navigating current ref
-			bool				SetCurrentItemIndex(int32 index);
+			bool				SetCurrentItemIndex(int32 index,
+									bool notify = true);
 			int32				CurrentItemIndex() const;
 
 			void				GetSkipInfo(bool* canSkipPrevious,
@@ -136,7 +137,8 @@ private:
 									int32 index) const;
 			void				_NotifyItemRemoved(int32 index) const;
 			void				_NotifyItemsSorted() const;
-			void				_NotifyCurrentItemChanged(int32 newIndex) const;
+			void				_NotifyCurrentItemChanged(int32 newIndex,
+									bool play) const;
 			void				_NotifyImportFailed() const;
 
 private:

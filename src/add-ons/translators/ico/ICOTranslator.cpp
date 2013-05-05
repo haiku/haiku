@@ -17,14 +17,15 @@
 #include "ICO.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ICOTranslator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ICOTranslator"
 
 
 const char *kDocumentCount = "/documentCount";
 const char *kDocumentIndex = "/documentIndex";
 
 #define kICOMimeType "image/vnd.microsoft.icon"
+#define kICOName "Windows icon"
 	// I'm lazy - structure initializers don't like const variables...
 
 
@@ -36,7 +37,7 @@ static const translation_format sInputFormats[] = {
 		ICO_IN_QUALITY,
 		ICO_IN_CAPABILITY,
 		kICOMimeType,
-		"Windows Icon image"
+		kICOName
 	},
 	{
 		B_TRANSLATOR_BITMAP,
@@ -56,7 +57,7 @@ static const translation_format sOutputFormats[] = {
 		ICO_OUT_QUALITY,
 		ICO_OUT_CAPABILITY,
 		kICOMimeType,
-		"Windows Icon image"
+		kICOName
 	},
 	{
 		B_TRANSLATOR_BITMAP,
@@ -80,7 +81,7 @@ const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / sizeof(TranSetting
 
 
 ICOTranslator::ICOTranslator()
-	: BaseTranslator(B_TRANSLATE("Windows icon images"), 
+	: BaseTranslator(B_TRANSLATE("Windows icons"), 
 		B_TRANSLATE("Windows icon translator"),
 		ICO_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,

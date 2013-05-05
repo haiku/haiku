@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku, Inc.
+ * Copyright 2001-2013, Haiku, Inc.
  * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
  * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai.
  * All rights reserved. Distributed under the terms of the MIT license.
@@ -10,6 +10,7 @@
  *		Y.Hayakawa, hida@sawada.riec.tohoku.ac.jp
  *		Ingo Weinhold, ingo_weinhold@gmx.de
  *		Clemens Zeidler, haiku@Clemens-Zeidler.de
+ *		Siarzhuk Zharski, zharik@gmx.li
  */
 
 
@@ -23,8 +24,8 @@
 
 #include <algorithm>
 #include <new>
+#include <vector>
 
-#include "ActiveProcessInfo.h"
 #include <Alert.h>
 #include <Application.h>
 #include <Beep.h>
@@ -48,12 +49,16 @@
 #include <ScrollView.h>
 #include <String.h>
 #include <StringView.h>
+#include <UTF8.h>
 #include <Window.h>
 
-#include "Encoding.h"
+#include "ActiveProcessInfo.h"
+#include "Colors.h"
 #include "InlineInput.h"
+#include "PrefHandler.h"
 #include "Shell.h"
 #include "ShellParameters.h"
+#include "TermApp.h"
 #include "TermConst.h"
 #include "TerminalBuffer.h"
 #include "TerminalCharClassifier.h"
@@ -63,268 +68,6 @@
 // defined in VTKeyTbl.c
 extern int function_keycode_table[];
 extern char *function_key_char_table[];
-
-static rgb_color kTermColorTable[256] = {
-	{ 40,  40,  40, 0},	// black
-	{204,   0,   0, 0},	// red
-	{ 78, 154,   6, 0},	// green
-	{218, 168,   0, 0},	// yellow
-	{ 51, 102, 152, 0},	// blue
-	{115,  68, 123, 0},	// magenta
-	{  6, 152, 154, 0},	// cyan
-	{245, 245, 245, 0},	// white
-
-	{128, 128, 128, 0},	// black
-	{255,   0,   0, 0},	// red
-	{  0, 255,   0, 0},	// green
-	{255, 255,   0, 0},	// yellow
-	{  0,   0, 255, 0},	// blue
-	{255,   0, 255, 0},	// magenta
-	{  0, 255, 255, 0},	// cyan
-	{255, 255, 255, 0},	// white
-
-	{  0,   0,   0, 0},
-	{  0,   0,  51, 0},
-	{  0,   0, 102, 0},
-	{  0,   0, 153, 0},
-	{  0,   0, 204, 0},
-	{  0,   0, 255, 0},
-	{  0,  51,   0, 0},
-	{  0,  51,  51, 0},
-	{  0,  51, 102, 0},
-	{  0,  51, 153, 0},
-	{  0,  51, 204, 0},
-	{  0,  51, 255, 0},
-	{  0, 102,   0, 0},
-	{  0, 102,  51, 0},
-	{  0, 102, 102, 0},
-	{  0, 102, 153, 0},
-	{  0, 102, 204, 0},
-	{  0, 102, 255, 0},
-	{  0, 153,   0, 0},
-	{  0, 153,  51, 0},
-	{  0, 153, 102, 0},
-	{  0, 153, 153, 0},
-	{  0, 153, 204, 0},
-	{  0, 153, 255, 0},
-	{  0, 204,   0, 0},
-	{  0, 204,  51, 0},
-	{  0, 204, 102, 0},
-	{  0, 204, 153, 0},
-	{  0, 204, 204, 0},
-	{  0, 204, 255, 0},
-	{  0, 255,   0, 0},
-	{  0, 255,  51, 0},
-	{  0, 255, 102, 0},
-	{  0, 255, 153, 0},
-	{  0, 255, 204, 0},
-	{  0, 255, 255, 0},
-	{ 51,   0,   0, 0},
-	{ 51,   0,  51, 0},
-	{ 51,   0, 102, 0},
-	{ 51,   0, 153, 0},
-	{ 51,   0, 204, 0},
-	{ 51,   0, 255, 0},
-	{ 51,  51,   0, 0},
-	{ 51,  51,  51, 0},
-	{ 51,  51, 102, 0},
-	{ 51,  51, 153, 0},
-	{ 51,  51, 204, 0},
-	{ 51,  51, 255, 0},
-	{ 51, 102,   0, 0},
-	{ 51, 102,  51, 0},
-	{ 51, 102, 102, 0},
-	{ 51, 102, 153, 0},
-	{ 51, 102, 204, 0},
-	{ 51, 102, 255, 0},
-	{ 51, 153,   0, 0},
-	{ 51, 153,  51, 0},
-	{ 51, 153, 102, 0},
-	{ 51, 153, 153, 0},
-	{ 51, 153, 204, 0},
-	{ 51, 153, 255, 0},
-	{ 51, 204,   0, 0},
-	{ 51, 204,  51, 0},
-	{ 51, 204, 102, 0},
-	{ 51, 204, 153, 0},
-	{ 51, 204, 204, 0},
-	{ 51, 204, 255, 0},
-	{ 51, 255,   0, 0},
-	{ 51, 255,  51, 0},
-	{ 51, 255, 102, 0},
-	{ 51, 255, 153, 0},
-	{ 51, 255, 204, 0},
-	{ 51, 255, 255, 0},
-	{102,   0,   0, 0},
-	{102,   0,  51, 0},
-	{102,   0, 102, 0},
-	{102,   0, 153, 0},
-	{102,   0, 204, 0},
-	{102,   0, 255, 0},
-	{102,  51,   0, 0},
-	{102,  51,  51, 0},
-	{102,  51, 102, 0},
-	{102,  51, 153, 0},
-	{102,  51, 204, 0},
-	{102,  51, 255, 0},
-	{102, 102,   0, 0},
-	{102, 102,  51, 0},
-	{102, 102, 102, 0},
-	{102, 102, 153, 0},
-	{102, 102, 204, 0},
-	{102, 102, 255, 0},
-	{102, 153,   0, 0},
-	{102, 153,  51, 0},
-	{102, 153, 102, 0},
-	{102, 153, 153, 0},
-	{102, 153, 204, 0},
-	{102, 153, 255, 0},
-	{102, 204,   0, 0},
-	{102, 204,  51, 0},
-	{102, 204, 102, 0},
-	{102, 204, 153, 0},
-	{102, 204, 204, 0},
-	{102, 204, 255, 0},
-	{102, 255,   0, 0},
-	{102, 255,  51, 0},
-	{102, 255, 102, 0},
-	{102, 255, 153, 0},
-	{102, 255, 204, 0},
-	{102, 255, 255, 0},
-	{153,   0,   0, 0},
-	{153,   0,  51, 0},
-	{153,   0, 102, 0},
-	{153,   0, 153, 0},
-	{153,   0, 204, 0},
-	{153,   0, 255, 0},
-	{153,  51,   0, 0},
-	{153,  51,  51, 0},
-	{153,  51, 102, 0},
-	{153,  51, 153, 0},
-	{153,  51, 204, 0},
-	{153,  51, 255, 0},
-	{153, 102,   0, 0},
-	{153, 102,  51, 0},
-	{153, 102, 102, 0},
-	{153, 102, 153, 0},
-	{153, 102, 204, 0},
-	{153, 102, 255, 0},
-	{153, 153,   0, 0},
-	{153, 153,  51, 0},
-	{153, 153, 102, 0},
-	{153, 153, 153, 0},
-	{153, 153, 204, 0},
-	{153, 153, 255, 0},
-	{153, 204,   0, 0},
-	{153, 204,  51, 0},
-	{153, 204, 102, 0},
-	{153, 204, 153, 0},
-	{153, 204, 204, 0},
-	{153, 204, 255, 0},
-	{153, 255,   0, 0},
-	{153, 255,  51, 0},
-	{153, 255, 102, 0},
-	{153, 255, 153, 0},
-	{153, 255, 204, 0},
-	{153, 255, 255, 0},
-	{204,   0,   0, 0},
-	{204,   0,  51, 0},
-	{204,   0, 102, 0},
-	{204,   0, 153, 0},
-	{204,   0, 204, 0},
-	{204,   0, 255, 0},
-	{204,  51,   0, 0},
-	{204,  51,  51, 0},
-	{204,  51, 102, 0},
-	{204,  51, 153, 0},
-	{204,  51, 204, 0},
-	{204,  51, 255, 0},
-	{204, 102,   0, 0},
-	{204, 102,  51, 0},
-	{204, 102, 102, 0},
-	{204, 102, 153, 0},
-	{204, 102, 204, 0},
-	{204, 102, 255, 0},
-	{204, 153,   0, 0},
-	{204, 153,  51, 0},
-	{204, 153, 102, 0},
-	{204, 153, 153, 0},
-	{204, 153, 204, 0},
-	{204, 153, 255, 0},
-	{204, 204,   0, 0},
-	{204, 204,  51, 0},
-	{204, 204, 102, 0},
-	{204, 204, 153, 0},
-	{204, 204, 204, 0},
-	{204, 204, 255, 0},
-	{204, 255,   0, 0},
-	{204, 255,  51, 0},
-	{204, 255, 102, 0},
-	{204, 255, 153, 0},
-	{204, 255, 204, 0},
-	{204, 255, 255, 0},
-	{255,   0,   0, 0},
-	{255,   0,  51, 0},
-	{255,   0, 102, 0},
-	{255,   0, 153, 0},
-	{255,   0, 204, 0},
-	{255,   0, 255, 0},
-	{255,  51,   0, 0},
-	{255,  51,  51, 0},
-	{255,  51, 102, 0},
-	{255,  51, 153, 0},
-	{255,  51, 204, 0},
-	{255,  51, 255, 0},
-	{255, 102,   0, 0},
-	{255, 102,  51, 0},
-	{255, 102, 102, 0},
-	{255, 102, 153, 0},
-	{255, 102, 204, 0},
-	{255, 102, 255, 0},
-	{255, 153,   0, 0},
-	{255, 153,  51, 0},
-	{255, 153, 102, 0},
-	{255, 153, 153, 0},
-	{255, 153, 204, 0},
-	{255, 153, 255, 0},
-	{255, 204,   0, 0},
-	{255, 204,  51, 0},
-	{255, 204, 102, 0},
-	{255, 204, 153, 0},
-	{255, 204, 204, 0},
-	{255, 204, 255, 0},
-	{255, 255,   0, 0},
-	{255, 255,  51, 0},
-	{255, 255, 102, 0},
-	{255, 255, 153, 0},
-	{255, 255, 204, 0},
-	{255, 255, 255, 0},
-
-	{ 10,  10,  10, 0},
-	{ 20,  20,  20, 0},
-	{ 30,  30,  30, 0},
-	{ 40,  40,  40, 0},
-	{ 50,  50,  50, 0},
-	{ 60,  60,  60, 0},
-	{ 70,  70,  70, 0},
-	{ 80,  80,  80, 0},
-	{ 90,  90,  90, 0},
-	{100, 100, 100, 0},
-	{110, 110, 110, 0},
-	{120, 120, 120, 0},
-	{130, 130, 130, 0},
-	{140, 140, 140, 0},
-	{150, 150, 150, 0},
-	{160, 160, 160, 0},
-	{170, 170, 170, 0},
-	{180, 180, 180, 0},
-	{190, 190, 190, 0},
-	{200, 200, 200, 0},
-	{210, 210, 210, 0},
-	{220, 220, 220, 0},
-	{230, 230, 230, 0},
-	{240, 240, 240, 0},
-};
 
 #define ROWS_DEFAULT 25
 #define COLUMNS_DEFAULT 80
@@ -336,8 +79,8 @@ enum {
 	SELECT_LINES
 };
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Terminal TermView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Terminal TermView"
 
 static property_info sPropList[] = {
 	{ "encoding",
@@ -398,28 +141,34 @@ restrict_value(const Type& value, const Type& min, const Type& max)
 class TermView::CharClassifier : public TerminalCharClassifier {
 public:
 	CharClassifier(const char* specialWordChars)
-		:
-		fSpecialWordChars(specialWordChars)
 	{
+		const char* p = specialWordChars;
+		while (p != NULL && *p) {
+			int count = UTF8Char::ByteCount(*p);
+			if (count <= 0 || count > 4)
+				break;
+			fSpecialWordChars.push_back(UTF8Char(p, count));
+			p += count;
+		}
 	}
 
-	virtual int Classify(const char* character)
+	virtual int Classify(const UTF8Char& character)
 	{
-		// TODO: Deal correctly with non-ASCII chars.
-		char c = *character;
-		if (UTF8Char::ByteCount(c) > 1)
+		if (character.IsSpace())
+			return CHAR_TYPE_SPACE;
+
+		if (character.IsAlNum())
 			return CHAR_TYPE_WORD_CHAR;
 
-		if (isspace(c))
-			return CHAR_TYPE_SPACE;
-		if (isalnum(c) || strchr(fSpecialWordChars, c) != NULL)
+		if (std::find(fSpecialWordChars.begin(), fSpecialWordChars.end(),
+			character) != fSpecialWordChars.end())
 			return CHAR_TYPE_WORD_CHAR;
 
 		return CHAR_TYPE_WORD_DELIMITER;
 	}
 
 private:
-	const char*	fSpecialWordChars;
+	std::vector<UTF8Char> fSpecialWordChars;
 };
 
 
@@ -549,11 +298,14 @@ TermView::_InitObject(const ShellParameters& shellParameters)
 	fFontWidth = 0;
 	fFontHeight = 0;
 	fFontAscent = 0;
+	fEmulateBold = false;
 	fFrameResized = false;
 	fResizeViewDisableCount = 0;
 	fLastActivityTime = 0;
 	fCursorState = 0;
-	fCursorHeight = 0;
+	fCursorStyle = BLOCK_CURSOR;
+	fCursorBlinking = true;
+	fCursorHidden = false;
 	fCursor = TermPos(0, 0);
 	fTextBuffer = NULL;
 	fVisibleTextBuffer = NULL;
@@ -608,7 +360,7 @@ TermView::_InitObject(const ShellParameters& shellParameters)
 
 	// set the shell parameters' encoding
 	ShellParameters modifiedShellParameters(shellParameters);
-	modifiedShellParameters.SetEncoding(EncodingAsShortString(fEncoding));
+	modifiedShellParameters.SetEncoding(fEncoding);
 
 	error = fShell->Open(fRows, fColumns, modifiedShellParameters);
 
@@ -619,7 +371,7 @@ TermView::_InitObject(const ShellParameters& shellParameters)
 	if (error < B_OK)
 		return error;
 
-	SetLowColor(kTermColorTable[8]);
+	SetLowColor(fTextBackColor);
 	SetViewColor(B_TRANSPARENT_32_BIT);
 
 	return B_OK;
@@ -746,8 +498,9 @@ TermView::_ConvertFromTerminal(const TermPos &pos)
 inline void
 TermView::_InvalidateTextRect(int32 x1, int32 y1, int32 x2, int32 y2)
 {
+	// assume the worst case with full-width characters - invalidate 2 cells
 	BRect rect(x1 * fFontWidth, _LineOffset(y1),
-		(x2 + 1) * fFontWidth - 1, _LineOffset(y2 + 1) - 1);
+		(x2 + 1) * fFontWidth * 2 - 1, _LineOffset(y2 + 1) - 1);
 //debug_printf("Invalidate((%f, %f) - (%f, %f))\n", rect.left, rect.top,
 //rect.right, rect.bottom);
 	Invalidate(rect);
@@ -799,7 +552,7 @@ TermView::Columns() const
 
 //! Set number of rows and columns in terminal
 BRect
-TermView::SetTermSize(int rows, int columns)
+TermView::SetTermSize(int rows, int columns, bool notifyShell)
 {
 //debug_printf("TermView::SetTermSize(%d, %d)\n", rows, columns);
 	if (rows > 0)
@@ -839,6 +592,9 @@ TermView::SetTermSize(int rows, int columns)
 			offset + rows + 2);
 	}
 
+	if (notifyShell)
+		fFrameResized = true;
+
 	return rect;
 }
 
@@ -850,7 +606,7 @@ TermView::SetTermSize(BRect rect)
 	int columns;
 
 	GetTermSizeFromRect(rect, &rows, &columns);
-	SetTermSize(rows, columns);
+	SetTermSize(rows, columns, false);
 }
 
 
@@ -871,10 +627,18 @@ TermView::GetTermSizeFromRect(const BRect &rect, int *_rows,
 void
 TermView::SetTextColor(rgb_color fore, rgb_color back)
 {
-	kTermColorTable[0] = back;
-	kTermColorTable[7] = fore;
+	fTextBackColor = back;
+	fTextForeColor = fore;
 
-	SetLowColor(back);
+	SetLowColor(fTextBackColor);
+}
+
+
+void
+TermView::SetCursorColor(rgb_color fore, rgb_color back)
+{
+	fCursorForeColor = fore;
+	fCursorBackColor = back;
 }
 
 
@@ -883,6 +647,38 @@ TermView::SetSelectColor(rgb_color fore, rgb_color back)
 {
 	fSelectForeColor = fore;
 	fSelectBackColor = back;
+}
+
+
+void
+TermView::SetTermColor(uint index, rgb_color color, bool dynamic)
+{
+	if (!dynamic) {
+		if (index < kTermColorCount)
+			fTextBuffer->SetPaletteColor(index, color);
+		return;
+	}
+
+	switch (index) {
+		case 10:
+			fTextForeColor = color;
+			break;
+		case 11:
+			fTextBackColor = color;
+			SetLowColor(fTextBackColor);
+			break;
+		case 110:
+			fTextForeColor = PrefHandler::Default()->getRGB(
+								PREF_TEXT_FORE_COLOR);
+			break;
+		case 111:
+			fTextBackColor = PrefHandler::Default()->getRGB(
+								PREF_TEXT_BACK_COLOR);
+			SetLowColor(fTextBackColor);
+			break;
+		default:
+			break;
+	}
 }
 
 
@@ -897,6 +693,9 @@ void
 TermView::SetEncoding(int encoding)
 {
 	fEncoding = encoding;
+
+	if (fShell != NULL)
+		fShell->SetEncoding(fEncoding);
 
 	BAutolock _(fTextBuffer);
 	fTextBuffer->SetEncoding(fEncoding);
@@ -925,12 +724,15 @@ TermView::SetTermFont(const BFont *font)
 	int halfWidth = 0;
 
 	fHalfFont = font;
+	fBoldFont = font;
+	uint16 face = fBoldFont.Face();
+	fBoldFont.SetFace(B_BOLD_FACE | (face & ~B_REGULAR_FACE));
 
 	fHalfFont.SetSpacing(B_FIXED_SPACING);
 
 	// calculate half font's max width
-	// Not Bounding, check only A-Z(For case of fHalfFont is KanjiFont. )
-	for (int c = 0x20 ; c <= 0x7e; c++){
+	// Not Bounding, check only A-Z (For case of fHalfFont is KanjiFont.)
+	for (int c = 0x20; c <= 0x7e; c++) {
 		char buf[4];
 		sprintf(buf, "%c", c);
 		int tmpWidth = (int)fHalfFont.StringWidth(buf);
@@ -953,7 +755,12 @@ TermView::SetTermFont(const BFont *font)
 	fFontAscent = font_ascent;
 	fFontHeight = font_ascent + font_descent + font_leading + 1;
 
-	fCursorHeight = fFontHeight;
+	fCursorStyle = PrefHandler::Default() == NULL ? BLOCK_CURSOR
+		: PrefHandler::Default()->getCursor(PREF_CURSOR_STYLE);
+	fCursorBlinking = PrefHandler::Default()->getBool(PREF_BLINK_CURSOR);
+
+	fEmulateBold = PrefHandler::Default() == NULL ? false
+		: PrefHandler::Default()->getBool(PREF_EMULATE_BOLD);
 
 	_ScrollTo(0, false);
 	if (fScrollBar != NULL)
@@ -1087,15 +894,29 @@ TermView::_DetachShell()
 
 
 void
+TermView::_SwitchCursorBlinking(bool blinkingOn)
+{
+	if (blinkingOn) {
+		if (fCursorBlinkRunner == NULL) {
+			BMessage blinkMessage(kBlinkCursor);
+			fCursorBlinkRunner = new (std::nothrow) BMessageRunner(
+				BMessenger(this), &blinkMessage, kCursorBlinkInterval);
+		}
+	} else {
+		// make sure the cursor becomes visible
+		fCursorState = 0;
+		_InvalidateTextRect(fCursor.x, fCursor.y, fCursor.x, fCursor.y);
+		delete fCursorBlinkRunner;
+		fCursorBlinkRunner = NULL;
+	}
+}
+
+
+void
 TermView::_Activate()
 {
 	fActive = true;
-
-	if (fCursorBlinkRunner == NULL) {
-		BMessage blinkMessage(kBlinkCursor);
-		fCursorBlinkRunner = new (std::nothrow) BMessageRunner(
-			BMessenger(this), &blinkMessage, kCursorBlinkInterval);
-	}
+	_SwitchCursorBlinking(fCursorBlinking);
 }
 
 
@@ -1105,8 +926,8 @@ TermView::_Deactivate()
 	// make sure the cursor becomes visible
 	fCursorState = 0;
 	_InvalidateTextRect(fCursor.x, fCursor.y, fCursor.x, fCursor.y);
-	delete fCursorBlinkRunner;
-	fCursorBlinkRunner = NULL;
+
+	_SwitchCursorBlinking(false);
 
 	fActive = false;
 }
@@ -1117,29 +938,28 @@ void
 TermView::_DrawLinePart(int32 x1, int32 y1, uint32 attr, char *buf,
 	int32 width, bool mouse, bool cursor, BView *inView)
 {
-	rgb_color rgb_fore, rgb_back;
-
-	inView->SetFont(&fHalfFont);
+	inView->SetFont(IS_BOLD(attr) && !fEmulateBold ? &fBoldFont : &fHalfFont);
 
 	// Set pen point
 	int x2 = x1 + fFontWidth * width;
 	int y2 = y1 + fFontHeight;
 
+	rgb_color rgb_fore = fTextForeColor;
+	rgb_color rgb_back = fTextBackColor;
+
 	// color attribute
 	int forecolor = IS_FORECOLOR(attr);
 	int backcolor = IS_BACKCOLOR(attr);
-	rgb_fore = kTermColorTable[forecolor];
-	rgb_back = kTermColorTable[backcolor];
+
+	if (IS_FORESET(attr))
+		rgb_fore = fTextBuffer->PaletteColor(forecolor);
+	if (IS_BACKSET(attr))
+		rgb_back = fTextBuffer->PaletteColor(backcolor);
 
 	// Selection check.
 	if (cursor) {
-		rgb_fore.red = 255 - rgb_fore.red;
-		rgb_fore.green = 255 - rgb_fore.green;
-		rgb_fore.blue = 255 - rgb_fore.blue;
-
-		rgb_back.red = 255 - rgb_back.red;
-		rgb_back.green = 255 - rgb_back.green;
-		rgb_back.blue = 255 - rgb_back.blue;
+		rgb_fore = fCursorForeColor;
+		rgb_back = fCursorBackColor;
 	} else if (mouse) {
 		rgb_fore = fSelectForeColor;
 		rgb_back = fSelectBackColor;
@@ -1156,21 +976,18 @@ TermView::_DrawLinePart(int32 x1, int32 y1, uint32 attr, char *buf,
 	inView->SetHighColor(rgb_back);
 	inView->FillRect(BRect(x1, y1, x2 - 1, y2 - 1));
 	inView->SetLowColor(rgb_back);
-
 	inView->SetHighColor(rgb_fore);
 
 	// Draw character.
-	inView->MovePenTo(x1, y1 + fFontAscent);
-	inView->DrawString((char *) buf);
-
-	// bold attribute.
-	if (IS_BOLD(attr)) {
-		inView->MovePenTo(x1 + 1, y1 + fFontAscent);
-
-		inView->SetDrawingMode(B_OP_OVER);
+	if (IS_BOLD(attr) && fEmulateBold) {
+		inView->MovePenTo(x1 - 1, y1 + fFontAscent - 1);
 		inView->DrawString((char *)buf);
-		inView->SetDrawingMode(B_OP_COPY);
+		inView->SetDrawingMode(B_OP_BLEND);
 	}
+
+	inView->MovePenTo(x1, y1 + fFontAscent);
+	inView->DrawString((char *)buf);
+	inView->SetDrawingMode(B_OP_COPY);
 
 	// underline attribute
 	if (IS_UNDER(attr)) {
@@ -1188,7 +1005,7 @@ TermView::_DrawCursor()
 {
 	BRect rect(fFontWidth * fCursor.x, _LineOffset(fCursor.y), 0, 0);
 	rect.right = rect.left + fFontWidth - 1;
-	rect.bottom = rect.top + fCursorHeight - 1;
+	rect.bottom = rect.top + fFontHeight - 1;
 	int32 firstVisible = _LineAt(0);
 
 	UTF8Char character;
@@ -1196,15 +1013,26 @@ TermView::_DrawCursor()
 
 	bool cursorVisible = _IsCursorVisible();
 
+	if (cursorVisible) {
+		switch (fCursorStyle) {
+			case UNDERLINE_CURSOR:
+				rect.top = rect.bottom - 2;
+				break;
+			case IBEAM_CURSOR:
+				rect.right = rect.left + 1;
+				break;
+			case BLOCK_CURSOR:
+			default:
+				break;
+		}
+	}
+
 	bool selected = _CheckSelectedRegion(TermPos(fCursor.x, fCursor.y));
 	if (fVisibleTextBuffer->GetChar(fCursor.y - firstVisible, fCursor.x,
-			character, attr) == A_CHAR) {
-		int32 width;
-		if (IS_WIDTH(attr))
-			width = 2;
-		else
-			width = 1;
+			character, attr) == A_CHAR
+			&& (fCursorStyle == BLOCK_CURSOR || !cursorVisible)) {
 
+		int32 width = IS_WIDTH(attr) ? FULL_WIDTH : HALF_WIDTH;
 		char buffer[5];
 		int32 bytes = UTF8Char::ByteCount(character.bytes[0]);
 		memcpy(buffer, character.bytes, bytes);
@@ -1215,15 +1043,26 @@ TermView::_DrawCursor()
 	} else {
 		if (selected)
 			SetHighColor(fSelectBackColor);
+		else if (cursorVisible )
+			SetHighColor(fCursorBackColor );
 		else {
-			rgb_color color = kTermColorTable[IS_BACKCOLOR(attr)];
-			if (cursorVisible) {
-				color.red = 255 - color.red;
-				color.green = 255 - color.green;
-				color.blue = 255 - color.blue;
-			}
-			SetHighColor(color);
+			uint32 count = 0;
+			rgb_color rgb_back = fTextBackColor;
+			if (fTextBuffer->IsAlternateScreenActive())
+				// alternate screen uses cell attributes beyond the line ends
+				fTextBuffer->GetCellAttributes(
+						fCursor.y, fCursor.x, attr, count);
+			else
+				attr = fVisibleTextBuffer->GetLineColor(
+						fCursor.y - firstVisible);
+
+			if (IS_BACKSET(attr))
+				rgb_back = fTextBuffer->PaletteColor(IS_BACKCOLOR(attr));
+			SetHighColor(rgb_back);
 		}
+
+		if (IS_WIDTH(attr) && fCursorStyle != IBEAM_CURSOR)
+			rect.right += fFontWidth;
 
 		FillRect(rect);
 	}
@@ -1233,7 +1072,7 @@ TermView::_DrawCursor()
 bool
 TermView::_IsCursorVisible() const
 {
-	return fCursorState < kCursorVisibleIntervals;
+	return !fCursorHidden && fCursorState < kCursorVisibleIntervals;
 }
 
 
@@ -1311,10 +1150,7 @@ TermView::AttachedToWindow()
 	// update the terminal size because it may have changed while the TermView
 	// was detached from the window. On such conditions FrameResized was not
 	// called when the resize occured
-	int rows;
-	int columns;
-	GetTermSizeFromRect(Bounds(), &rows, &columns);
-	SetTermSize(rows, columns);
+	SetTermSize(Bounds());
 	MakeFocus(true);
 	if (fScrollBar) {
 		fScrollBar->SetSteps(fFontHeight, fFontHeight * fRows);
@@ -1374,7 +1210,7 @@ TermView::Draw(BRect updateRect)
 		if (clearLeft <= updateRect.right) {
 			BRect rect(clearLeft, updateRect.top, updateRect.right,
 				updateRect.bottom);
-			SetHighColor(kTermColorTable[0]);
+			SetHighColor(fTextBackColor);
 			FillRect(rect);
 		}
 	}
@@ -1385,7 +1221,7 @@ TermView::Draw(BRect updateRect)
 		if (clearTop <= updateRect.bottom) {
 			BRect rect(updateRect.left, clearTop, updateRect.right,
 				updateRect.bottom);
-			SetHighColor(kTermColorTable[0]);
+			SetHighColor(fTextBackColor);
 			FillRect(rect);
 		}
 	}
@@ -1419,30 +1255,45 @@ TermView::Draw(BRect updateRect)
 				if (count == 0) {
 					// No chars to draw : we just fill the rectangle with the
 					// back color of the last char at the left
+					int nextColumn = lastColumn + 1;
 					BRect rect(fFontWidth * i, _LineOffset(j),
-						fFontWidth * (lastColumn + 1) - 1, 0);
+						fFontWidth * nextColumn - 1, 0);
 					rect.bottom = rect.top + fFontHeight - 1;
 
-					if (insideSelection) {
-						// This area is selected, fill it with the select color
-						SetHighColor(fSelectBackColor);
-						FillRect(rect);
-					} else {
-						int lineIndexInHistory = j + fTextBuffer->HistorySize();
-						uint32 backcolor = IS_BACKCOLOR(fVisibleTextBuffer->GetLineColor(
-							lineIndexInHistory));
-						rgb_color rgb_back = kTermColorTable[backcolor];
-						SetHighColor(rgb_back);
-						FillRect(rect);
+					rgb_color rgb_back = insideSelection
+						? fSelectBackColor : fTextBackColor;
+
+					if (fTextBuffer->IsAlternateScreenActive()) {
+						// alternate screen uses cell attributes
+						// beyond the line ends
+						uint32 count = 0;
+						fTextBuffer->GetCellAttributes(j, i, attr, count);
+						rect.right = rect.left + fFontWidth * count - 1;
+						nextColumn = i + count;
+					} else
+						attr = fVisibleTextBuffer->GetLineColor(j - firstVisible);
+
+					if (IS_BACKSET(attr)) {
+						int backcolor = IS_BACKCOLOR(attr);
+						rgb_back = fTextBuffer->PaletteColor(backcolor);
 					}
 
+					SetHighColor(rgb_back);
+					rgb_back = HighColor();
+					FillRect(rect);
+
 					// Go on to the next block
-					i = lastColumn + 1;
+					i = nextColumn;
 					continue;
 				}
 
+				// Note: full-width characters GetString()-ed always
+				// with count 1, so this hardcoding is safe. From the other
+				// side - drawing the whole string with one call render the
+				// characters not aligned to cells grid - that looks much more
+				// inaccurate for full-width strings than for half-width ones.
 				if (IS_WIDTH(attr))
-					count = 2;
+					count = FULL_WIDTH;
 
 				_DrawLinePart(fFontWidth * i, (int32)_LineOffset(j),
 					attr, buf, count, insideSelection, false, this);
@@ -1552,8 +1403,8 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 	if (numBytes > 1) {
 		if (fEncoding != M_UTF8) {
 			char destBuffer[16];
-			int32 destLen;
-			long state = 0;
+			int32 destLen = sizeof(destBuffer);
+			int32 state = 0;
 			convert_from_utf8(fEncoding, bytes, &numBytes, destBuffer,
 				&destLen, &state, '?');
 			_ScrollTo(0, true);
@@ -1735,9 +1586,7 @@ TermView::FrameResized(float width, float height)
 	if (fResizeViewDisableCount > 0)
 		fResizeViewDisableCount--;
 
-	SetTermSize(rows, columns);
-
-	fFrameResized = true;
+	SetTermSize(rows, columns, true);
 }
 
 
@@ -1751,7 +1600,7 @@ TermView::MessageReceived(BMessage *msg)
 	if (msg->WasDropped() && (msg->what == B_SIMPLE_DATA
 			|| msg->what == B_MIME_DATA)) {
 		char *text;
-		int32 numBytes;
+		ssize_t numBytes;
 		//rgb_color *color;
 
 		int32 i = 0;
@@ -1777,19 +1626,19 @@ TermView::MessageReceived(BMessage *msg)
 #if 0
 		} else if (msg->FindData("RGBColor", B_RGB_COLOR_TYPE,
 				(const void **)&color, &numBytes) == B_OK
-				 && numBytes == sizeof(color)) {
+				&& numBytes == sizeof(color)) {
 			// TODO: handle color drop
 			// maybe only on replicants ?
 			return;
 #endif
 		} else if (msg->FindData("text/plain", B_MIME_TYPE,
-			 	(const void **)&text, &numBytes) == B_OK) {
+				(const void **)&text, &numBytes) == B_OK) {
 			_WritePTY(text, numBytes);
 			return;
 		}
 	}
 
-	switch (msg->what){
+	switch (msg->what) {
 		case B_SIMPLE_DATA:
 		case B_REFS_RECEIVED:
 		{
@@ -1851,8 +1700,9 @@ TermView::MessageReceived(BMessage *msg)
 			int32 i;
 			int32 encodingID;
 			BMessage specifier;
-			msg->GetCurrentSpecifier(&i, &specifier);
-			if (!strcmp("encoding", specifier.FindString("property", i))){
+			if (msg->GetCurrentSpecifier(&i, &specifier) == B_OK
+				&& !strcmp("encoding",
+					specifier.FindString("property", i)) == 0) {
 				msg->FindInt32 ("data", &encodingID);
 				SetEncoding(encodingID);
 				msg->SendReply(B_REPLY);
@@ -1866,12 +1716,14 @@ TermView::MessageReceived(BMessage *msg)
 		{
 			int32 i;
 			BMessage specifier;
-			msg->GetCurrentSpecifier(&i, &specifier);
-			if (!strcmp("encoding", specifier.FindString("property", i))){
+			if (msg->GetCurrentSpecifier(&i, &specifier) == B_OK
+				&& strcmp("encoding",
+					specifier.FindString("property", i)) == 0) {
 				BMessage reply(B_REPLY);
 				reply.AddInt32("result", Encoding());
 				msg->SendReply(&reply);
-			} else if (!strcmp("tty", specifier.FindString("property", i))) {
+			} else if (strcmp("tty",
+					specifier.FindString("property", i)) == 0) {
 				BMessage reply(B_REPLY);
 				reply.AddString("result", TerminalName());
 				msg->SendReply(&reply);
@@ -1989,13 +1841,71 @@ TermView::MessageReceived(BMessage *msg)
 			_SynchronizeWithTextBuffer(0, -1);
 			break;
 		}
-		case MSG_SET_TERMNAL_TITLE:
+		case MSG_SET_TERMINAL_TITLE:
 		{
 			const char* title;
 			if (msg->FindString("title", &title) == B_OK) {
 				if (fListener != NULL)
 					fListener->SetTermViewTitle(this, title);
 			}
+			break;
+		}
+		case MSG_SET_TERMINAL_COLORS:
+		{
+			int32 count  = 0;
+			if (msg->FindInt32("count", &count) != B_OK)
+				break;
+			bool dynamic  = false;
+			if (msg->FindBool("dynamic", &dynamic) != B_OK)
+				break;
+			for (int i = 0; i < count; i++) {
+				uint8 index = 0;
+				if (msg->FindUInt8("index", i, &index) != B_OK)
+					break;
+
+				ssize_t bytes = 0;
+				rgb_color* color = 0;
+				if (msg->FindData("color", B_RGB_COLOR_TYPE,
+							i, (const void**)&color, &bytes) != B_OK)
+					break;
+				SetTermColor(index, *color, dynamic);
+			}
+			break;
+		}
+		case MSG_RESET_TERMINAL_COLORS:
+		{
+			int32 count  = 0;
+			if (msg->FindInt32("count", &count) != B_OK)
+				break;
+			bool dynamic  = false;
+			if (msg->FindBool("dynamic", &dynamic) != B_OK)
+				break;
+			for (int i = 0; i < count; i++) {
+				uint8 index = 0;
+				if (msg->FindUInt8("index", i, &index) != B_OK)
+					break;
+
+				if (index < kTermColorCount)
+					SetTermColor(index,
+						TermApp::DefaultPalette()[index], dynamic);
+			}
+			break;
+		}
+		case MSG_SET_CURSOR_STYLE:
+		{
+			int32 style = BLOCK_CURSOR;
+			if (msg->FindInt32("style", &style) == B_OK)
+				fCursorStyle = style;
+
+			bool blinking = fCursorBlinking;
+			if (msg->FindBool("blinking", &blinking) == B_OK) {
+				fCursorBlinking = blinking;
+				_SwitchCursorBlinking(fCursorBlinking);
+			}
+
+			bool hidden = fCursorHidden;
+			if (msg->FindBool("hidden", &hidden) == B_OK)
+				fCursorHidden = hidden;
 			break;
 		}
 		case MSG_REPORT_MOUSE_EVENT:
@@ -2540,7 +2450,7 @@ TermView::_SendMouseEvent(int32 buttons, int32 mode, int32 x, int32 y,
 	char xtermButtons;
 	if (buttons == B_PRIMARY_MOUSE_BUTTON)
 		xtermButtons = 32 + 0;
- 	else if (buttons == B_SECONDARY_MOUSE_BUTTON)
+	else if (buttons == B_SECONDARY_MOUSE_BUTTON)
 		xtermButtons = 32 + 1;
 	else if (buttons == B_TERTIARY_MOUSE_BUTTON)
 		xtermButtons = 32 + 2;
@@ -2579,8 +2489,8 @@ TermView::MouseDown(BPoint where)
 
 	if (fReportAnyMouseEvent || fReportButtonMouseEvent
 		|| fReportNormalMouseEvent || fReportX10MouseEvent) {
-  		TermPos clickPos = _ConvertToTerminal(where);
-  		_SendMouseEvent(buttons, modifier, clickPos.x, clickPos.y, false);
+		TermPos clickPos = _ConvertToTerminal(where);
+		_SendMouseEvent(buttons, modifier, clickPos.x, clickPos.y, false);
 		return;
 	}
 
@@ -2673,17 +2583,17 @@ TermView::MouseMoved(BPoint where, uint32 transit, const BMessage *message)
 		int32 modifier;
 		Window()->CurrentMessage()->FindInt32("modifiers", &modifier);
 
-  		TermPos clickPos = _ConvertToTerminal(where);
+		TermPos clickPos = _ConvertToTerminal(where);
 
-  		if (fReportButtonMouseEvent) {
-  			if (fPrevPos.x != clickPos.x || fPrevPos.y != clickPos.y) {
-		  		_SendMouseEvent(fMouseButtons, modifier, clickPos.x, clickPos.y,
+		if (fReportButtonMouseEvent) {
+			if (fPrevPos.x != clickPos.x || fPrevPos.y != clickPos.y) {
+				_SendMouseEvent(fMouseButtons, modifier, clickPos.x, clickPos.y,
 					true);
-  			}
-  			fPrevPos = clickPos;
-  			return;
-  		}
-  		_SendMouseEvent(fMouseButtons, modifier, clickPos.x, clickPos.y, true);
+			}
+			fPrevPos = clickPos;
+			return;
+		}
+		_SendMouseEvent(fMouseButtons, modifier, clickPos.x, clickPos.y, true);
 		return;
 	}
 
@@ -2765,8 +2675,8 @@ TermView::MouseUp(BPoint where)
 
 	if (fReportAnyMouseEvent || fReportButtonMouseEvent
 		|| fReportNormalMouseEvent) {
-	  	TermPos clickPos = _ConvertToTerminal(where);
-	  	_SendMouseEvent(0, 0, clickPos.x, clickPos.y, false);
+		TermPos clickPos = _ConvertToTerminal(where);
+		_SendMouseEvent(0, 0, clickPos.x, clickPos.y, false);
 	} else {
 		if ((buttons & B_PRIMARY_MOUSE_BUTTON) == 0
 			&& (fMouseButtons & B_PRIMARY_MOUSE_BUTTON) != 0) {
@@ -3163,15 +3073,15 @@ TermView::_DrawInlineMethodString()
 	BRect eraseRect(startPoint, endPoint);
 
 	PushState();
-	SetHighColor(kTermColorTable[7]);
+	SetHighColor(fTextForeColor);
 	FillRect(eraseRect);
 	PopState();
 
 	BPoint loc = _ConvertFromTerminal(fCursor);
 	loc.y += fFontHeight;
 	SetFont(&fHalfFont);
-	SetHighColor(kTermColorTable[0]);
-	SetLowColor(kTermColorTable[7]);
+	SetHighColor(fTextBackColor);
+	SetLowColor(fTextForeColor);
 	DrawString(fInline->String(), loc);
 }
 
@@ -3291,7 +3201,6 @@ TermView::_HandleInputMethodLocationRequest()
 }
 
 
-
 void
 TermView::_CancelInputMethod()
 {
@@ -3343,3 +3252,25 @@ void
 TermView::Listener::NextTermView(TermView* view)
 {
 }
+
+
+#ifdef USE_DEBUG_SNAPSHOTS
+
+void
+TermView::MakeDebugSnapshots()
+{
+	BAutolock _(fTextBuffer);
+	time_t timeStamp = time(NULL);
+	fTextBuffer->MakeLinesSnapshots(timeStamp, ".TextBuffer.dump");
+	fVisibleTextBuffer->MakeLinesSnapshots(timeStamp, ".VisualTextBuffer.dump");
+}
+
+
+void
+TermView::StartStopDebugCapture()
+{
+	BAutolock _(fTextBuffer);
+	fTextBuffer->StartStopDebugCapture();
+}
+
+#endif

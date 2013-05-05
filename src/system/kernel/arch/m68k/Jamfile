@@ -4,19 +4,35 @@ SubDirHdrs $(SUBDIR) $(DOTDOT) generic ;
 UsePrivateKernelHeaders ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) paging ] ;
+#SEARCH_SOURCE += [ FDirName $(SUBDIR) paging 030 ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) paging 040 ] ;
+#SEARCH_SOURCE += [ FDirName $(SUBDIR) paging 060 ] ;
 
 # cpu-specific stuff
 KernelMergeObject arch_m68k_030.o :
 	arch_030_cpu.cpp
-	arch_030_mmu.cpp
+	#arch_030_mmu.cpp
 	arch_030_asm.S
+
+	# paging/030
+	#M68KPagingMethod030.cpp
+	#M68KPagingStructures030.cpp
+	#M68KVMTranslationMap030.cpp
+
 	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused -m68030
 ;
 
 KernelMergeObject arch_m68k_040.o :
 	arch_040_cpu.cpp
-	arch_040_mmu.cpp
+	#arch_040_mmu.cpp
 	arch_040_asm.S
+
+	# paging/040
+	M68KPagingMethod040.cpp
+	M68KPagingStructures040.cpp
+	M68KVMTranslationMap040.cpp
+
 	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused -m68040
 ;
 
@@ -46,8 +62,15 @@ KernelMergeObject kernel_arch_m68k.o :
 	arch_vm_translation_map.cpp
 	arch_asm.S
 
-	generic_vm_physical_page_mapper.cpp
-	generic_vm_physical_page_ops.cpp
+	#generic_vm_physical_page_mapper.cpp
+	#generic_vm_physical_page_ops.cpp
+
+	# paging
+	m68k_physical_page_mapper.cpp
+	m68k_physical_page_mapper_large_memory.cpp
+	M68KPagingMethod.cpp
+	M68KPagingStructures.cpp
+	M68KVMTranslationMap.cpp
 
 	:
 	$(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused

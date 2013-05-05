@@ -36,7 +36,7 @@ public:
 	// BMediaNode interface
 public:
 	
-	virtual	BMediaAddOn*		AddOn(long* cookie) const;
+	virtual	BMediaAddOn*		AddOn(int32* cookie) const;
 	
 protected:
 	virtual void				NodeRegistered();
@@ -100,7 +100,7 @@ private:
 			void				_UnsetTargetBuffer();
 
 private:
-			uint32				fInternalID;
+			int32				fInternalID;
 			BMediaAddOn*		fAddOn;
 
 			bool				fConnectionActive;

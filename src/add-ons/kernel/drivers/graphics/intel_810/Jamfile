@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src add-ons kernel drivers graphics intel_810 ;
+
+UsePrivateHeaders [ FDirName graphics intel_810 ] ;
+UsePrivateHeaders [ FDirName graphics common ] ;
+UsePrivateHeaders graphics kernel ;
+
+KernelAddon intel_810 :
+	driver.cpp
+;

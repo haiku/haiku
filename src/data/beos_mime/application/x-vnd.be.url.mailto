@@ -5,7 +5,7 @@ resource(1, "META:TYPE") "application/x-vnd.Be.URL.mailto";
 
 resource(2, "META:S:DESC") #'MSDC' "Mailto URL";
 
-resource(3, "META:L:DESC") #'MLDC' "Email Recipient URL";
+resource(3, "META:L:DESC") #'MLDC' "Email recipient URL";
 
 resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.Be-MAIL";
 

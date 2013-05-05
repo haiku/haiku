@@ -41,7 +41,7 @@ struct perform_data_set_layout {
 	BLayout*	layout;
 };
 
-struct perform_data_invalidate_layout {
+struct perform_data_layout_invalidated {
 	bool	descendants;
 };
 

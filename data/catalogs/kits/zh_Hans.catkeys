@@ -1,0 +1,40 @@
+1	english	x-vnd.Haiku-libbe	677628532
+gamma	AboutWindow		伽马
+beta	AboutWindow		beta
+%3.2f GiB	StringForSize		%3.2f GiB
+Written by:	AboutWindow		编写：
+About %app%	AboutMenuItem		关于 %app%
+Cut	TextView		剪切
+Version	AboutWindow		版本
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		无法为 \"%description\" 创建克隆控件。\n%error
+Copy	TextView		复制
+%3.2f KiB	StringForSize		%3.2f KiB
+%d bytes	StringForSize		%d bytes
+alpha	AboutWindow		测试
+Error	PrintJob		错误
+No Pages to print!	PrintJob		无打印页面！
+All Rights Reserved.	AboutWindow		保留所有权利
+OK	Dragger		确定
+OK	PrintJob		确定
+Green:	ColorControl		绿色:
+Version history:	AboutWindow		版本历史：
+Remove replicant	Dragger		删除克隆控件
+OK	ZombieReplicantView		确定
+Print Server is not responding.	PrintJob		打印服务未响应。
+Paste	TextView		粘贴
+Special Thanks:	AboutWindow		特别感谢：
+%.2f TiB	StringForSize		%.2f TiB
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		无法定位克隆控件应用。未提供应用程序署名。\n%error
+Redo	TextView		恢复
+<empty>	Menu		<空>
+Select All	TextView		全选
+Warning	Dragger		警告
+Undo	TextView		撤销
+Red:	ColorControl		红色:
+%3.2f MiB	StringForSize		%3.2f MiB
+About %app…	Dragger		关于 %app...
+development	AboutWindow		开发
+Error	ZombieReplicantView		错误
+Blue:	ColorControl		蓝色:
+gold master	AboutWindow		最终测试版
+Can't delete this replicant from its original application. Life goes on.	Dragger		无法从原始应用中删除克隆控件。它将继续存在。

@@ -1,0 +1,14 @@
+1	hindi	x-vnd.Haiku-Keyboard	1711838804
+Written by Andrew Edward McCall	KeyboardApplication		एंड्रयू एडवर्ड मक्काल के दवारा लिखा गया
+Typing test area	KeyboardView		टाइपिंग टेस्ट एरिया
+Defaults	KeyboardWindow		डिफ़ॉल्ट्स
+Key repeat rate	KeyboardView		की रिपीट रेट
+Revert	KeyboardWindow		पलटें
+Delay until key repeat	KeyboardView		डिले अनटील की रीपीट
+Keyboard	System name		कीबोर्ड
+OK	KeyboardApplication		ठीक है
+Fast	KeyboardView		तेज
+Slow	KeyboardView		धीमा
+Something has gone wrong!	KeyboardApplication		कुछ गलत हो गया है!
+Long	KeyboardView		लंबा
+Short	KeyboardView		शोर्ट

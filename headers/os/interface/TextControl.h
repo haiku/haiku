@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2012, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_TEXT_CONTROL_H
@@ -8,6 +8,7 @@
 
 #include <Control.h>
 #include <TextView.h>
+
 
 class BLayoutItem;
 namespace BPrivate {
@@ -22,22 +23,20 @@ public:
 									BMessage* message,
 									uint32 resizeMode
 										= B_FOLLOW_LEFT | B_FOLLOW_TOP,
-									uint32 flags = B_WILL_DRAW | B_NAVIGABLE); 
+									uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 								BTextControl(const char* name,
 									const char* label, const char* initialText,
 									BMessage* message,
-									uint32 flags = B_WILL_DRAW | B_NAVIGABLE); 
+									uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 								BTextControl(const char* label,
 									const char* initialText,
-									BMessage* message); 
+									BMessage* message);
 	virtual						~BTextControl();
 
 								BTextControl(BMessage* archive);
 	static	BArchivable*		Instantiate(BMessage* archive);
 	virtual	status_t			Archive(BMessage* archive,
 									bool deep = true) const;
-	virtual	status_t			AllArchived(BMessage* into) const;
-	virtual	status_t			AllUnarchived(const BMessage* from);
 
 	virtual	void				SetText(const char* text);
 			const char*			Text() const;
@@ -88,12 +87,14 @@ public:
 	virtual	BSize				MaxSize();
 	virtual	BSize				PreferredSize();
 
-	virtual	void				InvalidateLayout(bool descendants = false);
-
 			BLayoutItem*		CreateLabelLayoutItem();
 			BLayoutItem*		CreateTextViewLayoutItem();
 
 protected:
+	virtual	status_t			AllArchived(BMessage* into) const;
+	virtual	status_t			AllUnarchived(const BMessage* from);
+
+	virtual	void				LayoutInvalidated(bool descendants);
 	virtual	void				DoLayout();
 
 private:

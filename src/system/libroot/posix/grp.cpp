@@ -13,6 +13,7 @@
 
 #include <OS.h>
 
+#include <errno_private.h>
 #include <libroot_private.h>
 #include <RegistrarDefs.h>
 #include <user_group.h>
@@ -130,7 +131,7 @@ getgrent(void)
 	int status = getgrent_r(&sGroupBuffer, sGroupStringBuffer,
 		sizeof(sGroupStringBuffer), &result);
 	if (status != 0)
-		errno = status;
+		__set_errno(status);
 	return result;
 }
 
@@ -190,7 +191,7 @@ getgrnam(const char *name)
 	int status = getgrnam_r(name, &sGroupBuffer, sGroupStringBuffer,
 		sizeof(sGroupStringBuffer), &result);
 	if (status != 0)
-		errno = status;
+		__set_errno(status);
 	return result;
 }
 
@@ -210,7 +211,7 @@ getgrgid(gid_t gid)
 	int status = getgrgid_r(gid, &sGroupBuffer, sGroupStringBuffer,
 		sizeof(sGroupStringBuffer), &result);
 	if (status != 0)
-		errno = status;
+		__set_errno(status);
 	return result;
 }
 

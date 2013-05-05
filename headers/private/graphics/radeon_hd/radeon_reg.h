@@ -24,9 +24,7 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
- */
-
-/*
+ *
  * Authors:
  *   Kevin E. Martin <martin@xfree86.org>
  *   Rickard E. Faith <faith@valinux.com>
@@ -48,8 +46,9 @@
 /* !!!! FIXME !!!!  NOTE: THIS FILE HAS BEEN CONVERTED FROM r128_reg.h
  * AND CONTAINS REGISTERS AND REGISTER DEFINITIONS THAT ARE NOT CORRECT
  * ON THE RADEON.  A FULL AUDIT OF THIS CODE IS NEEDED!  */
-#ifndef _RADEON_REG_H_
-#define _RADEON_REG_H_
+#ifndef __RADEON_REG_H_
+#define __RADEON_REG_H_
+
 
 #define RADEON_MC_AGP_LOCATION		0x014c
 #define		RADEON_MC_AGP_START_MASK	0x0000FFFF
@@ -64,25 +63,8 @@
 #define RADEON_AGP_BASE_2		0x015c /* r200+ only */
 #define RADEON_AGP_BASE			0x0170
 
-#define ATI_DATATYPE_VQ				0
-#define ATI_DATATYPE_CI4			1
-#define ATI_DATATYPE_CI8			2
-#define ATI_DATATYPE_ARGB1555			3
-#define ATI_DATATYPE_RGB565			4
-#define ATI_DATATYPE_RGB888			5
-#define ATI_DATATYPE_ARGB8888			6
-#define ATI_DATATYPE_RGB332			7
-#define ATI_DATATYPE_Y8				8
-#define ATI_DATATYPE_RGB8			9
-#define ATI_DATATYPE_CI16			10
-#define ATI_DATATYPE_VYUY_422			11
-#define ATI_DATATYPE_YVYU_422			12
-#define ATI_DATATYPE_AYUV_444			14
-#define ATI_DATATYPE_ARGB4444			15
-
-				/* Registers for 2D/Video/Overlay */
+/* Registers for 2D/Video/Overlay */
 #define RADEON_ADAPTER_ID                   0x0f2c /* PCI */
-#define RADEON_AGP_BASE                     0x0170
 #define RADEON_AGP_CNTL                     0x0174
 #       define RADEON_AGP_APER_SIZE_256MB   (0x00 << 0)
 #       define RADEON_AGP_APER_SIZE_128MB   (0x20 << 0)

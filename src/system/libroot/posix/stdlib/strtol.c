@@ -37,6 +37,8 @@
 #include <errno.h>
 #include <stdlib.h>
 
+#include <errno_private.h>
+
 
 /*
  * Convert a string to a long integer.
@@ -125,10 +127,10 @@ strtol(const char * __restrict nptr, char ** __restrict endptr, int base)
 	}
 	if (any < 0) {
 		acc = neg ? LONG_MIN : LONG_MAX;
-		errno = ERANGE;
+		__set_errno(ERANGE);
 	} else if (!any) {
 noconv:
-		errno = EINVAL;
+		__set_errno(EINVAL);
 	} else if (neg)
 		acc = -acc;
 	if (endptr != NULL)

@@ -191,7 +191,7 @@ common_getgroups(int groupCount, gid_t* groupList, bool kernel)
 
 	// copy
 	if (kernel) {
-		memcpy(groupList, groups, actualCount);
+		memcpy(groupList, groups, actualCount * sizeof(gid_t));
 	} else {
 		if (!IS_USER_ADDRESS(groupList)
 			|| user_memcpy(groupList, groups,

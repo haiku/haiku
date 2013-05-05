@@ -265,7 +265,7 @@ find_debugger_command(const char *name, bool partialMatch, bool& ambiguous)
 }
 
 
-/*!	Returns wether or not a debugger command is currently being invoked.
+/*!	Returns whether or not a debugger command is currently being invoked.
 */
 bool
 in_command_invocation(void)

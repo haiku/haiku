@@ -25,8 +25,8 @@
 #include "Prefs.h"
 #include "PulseApp.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "DeskbarPulseView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "DeskbarPulseView"
 
 
 DeskbarPulseView::DeskbarPulseView(BRect rect) : MiniPulseView(rect, "DeskbarPulseView") {
@@ -182,7 +182,7 @@ void DeskbarPulseView::Remove() {
 		str.UnlockBuffer();
 		BAlert *alert = new BAlert(B_TRANSLATE("Info"), str.String(),
 			B_TRANSLATE("OK"));
-		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go(NULL);
 	}
 	delete deskbar;

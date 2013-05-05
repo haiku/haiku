@@ -20,6 +20,7 @@
 #include <unistd.h>
 #include <string.h>
 
+
 #ifndef BOOT_ARCH
 #	error BOOT_ARCH has to be defined to differentiate the kernel per platform
 #endif
@@ -28,11 +29,23 @@
 #define KERNEL_IMAGE	"kernel_" BOOT_ARCH
 #define KERNEL_PATH		SYSTEM_DIRECTORY_PREFIX KERNEL_IMAGE
 
+#ifdef ALTERNATE_BOOT_ARCH
+# define ALTERNATE_KERNEL_IMAGE	"kernel_" ALTERNATE_BOOT_ARCH
+# define ALTERNATE_KERNEL_PATH	"system/" ALTERNATE_KERNEL_IMAGE
+#endif
+
 
 static const char* const kSystemDirectoryPrefix = SYSTEM_DIRECTORY_PREFIX;
 
+static const char *sKernelPaths[][2] = {
+	{ KERNEL_PATH, KERNEL_IMAGE },
+#ifdef ALTERNATE_BOOT_ARCH
+	{ ALTERNATE_KERNEL_PATH, ALTERNATE_KERNEL_IMAGE },
+#endif
+	{ NULL, NULL },
+};
 
-static const char *sPaths[] = {
+static const char *sAddonPaths[] = {
 	kVolumeLocalSystemKernelAddonsDirectory,
 	kVolumeLocalCommonNonpackagedKernelAddonsDirectory,
 	kVolumeLocalCommonKernelAddonsDirectory,
@@ -55,6 +68,23 @@ open_maybe_packaged(BootVolume& volume, const char* path, int openMode)
 }
 
 
+static int
+find_kernel(BootVolume& volume, const char** name = NULL)
+{
+	for (int32 i = 0; sKernelPaths[i][0] != NULL; i++) {
+		int fd = open_maybe_packaged(volume, sKernelPaths[i][0], O_RDONLY);
+		if (fd >= 0) {
+			if (name)
+				*name = sKernelPaths[i][1];
+
+			return fd;
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
 bool
 is_bootable(Directory *volume)
 {
@@ -66,7 +96,7 @@ is_bootable(Directory *volume)
 		return false;
 
 	// check for the existance of a kernel (for our platform)
-	int fd = open_maybe_packaged(bootVolume, KERNEL_PATH, O_RDONLY);
+	int fd = find_kernel(bootVolume);
 	if (fd < 0)
 		return false;
 
@@ -79,14 +109,16 @@ is_bootable(Directory *volume)
 status_t
 load_kernel(stage2_args* args, BootVolume& volume)
 {
-	int fd = open_maybe_packaged(volume, KERNEL_PATH, O_RDONLY);
+	const char *name;
+	int fd = find_kernel(volume, &name);
 	if (fd < B_OK)
 		return fd;
 
-	dprintf("load kernel...\n");
+	dprintf("load kernel %s...\n", name);
 
 	elf_init();
-	status_t status = elf_load_image(fd, &gKernelArgs.kernel_image);
+	preloaded_image *image;
+	status_t status = elf_load_image(fd, &image);
 
 	close(fd);
 
@@ -95,13 +127,15 @@ load_kernel(stage2_args* args, BootVolume& volume)
 		return status;
 	}
 
-	status = elf_relocate_image(&gKernelArgs.kernel_image);
+	gKernelArgs.kernel_image = image;
+
+	status = elf_relocate_image(gKernelArgs.kernel_image);
 	if (status < B_OK) {
 		dprintf("relocating kernel failed: %lx!\n", status);
 		return status;
 	}
 
-	gKernelArgs.kernel_image.name = kernel_args_strdup(KERNEL_IMAGE);
+	gKernelArgs.kernel_image->name = kernel_args_strdup(name);
 
 	return B_OK;
 }
@@ -152,9 +186,9 @@ load_module(BootVolume& volume, const char* name)
 	if (strlcpy(moduleName, name, sizeof(moduleName)) > sizeof(moduleName))
 		return B_NAME_TOO_LONG;
 
-	for (int32 i = 0; sPaths[i]; i++) {
+	for (int32 i = 0; sAddonPaths[i]; i++) {
 		// get base path
-		int baseFD = open_maybe_packaged(volume, sPaths[i], O_RDONLY);
+		int baseFD = open_maybe_packaged(volume, sAddonPaths[i], O_RDONLY);
 		if (baseFD < B_OK)
 			continue;
 
@@ -202,9 +236,9 @@ load_modules(stage2_args* args, BootVolume& volume)
 	// ToDo: this should be mostly replaced by a hardware oriented detection mechanism
 
 	int32 i = 0;
-	for (; sPaths[i]; i++) {
+	for (; sAddonPaths[i]; i++) {
 		char path[B_FILE_NAME_LENGTH];
-		snprintf(path, sizeof(path), "%s/boot", sPaths[i]);
+		snprintf(path, sizeof(path), "%s/boot", sAddonPaths[i]);
 
 		if (load_modules_from(volume, path) != B_OK)
 			failed++;
@@ -218,7 +252,7 @@ load_modules(stage2_args* args, BootVolume& volume)
 
 		for (int32 i = 0; paths[i]; i++) {
 			char path[B_FILE_NAME_LENGTH];
-			snprintf(path, sizeof(path), "%s/%s", sPaths[0], paths[i]);
+			snprintf(path, sizeof(path), "%s/%s", sAddonPaths[0], paths[i]);
 			load_modules_from(volume, path);
 		}
 	}
@@ -226,8 +260,7 @@ load_modules(stage2_args* args, BootVolume& volume)
 	// and now load all partitioning and file system modules
 	// needed to identify the boot volume
 
-	if (!gKernelArgs.boot_volume.GetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE,
-			false)) {
+	if (!gBootVolume.GetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, false)) {
 		// iterate over the mounted volumes and load their file system
 		Partition *partition;
 		if (gRoot->GetPartitionFor(volume.RootDirectory(), &partition)
@@ -244,7 +277,7 @@ load_modules(stage2_args* args, BootVolume& volume)
 		//	as this piece will survive a more intelligent module
 		//	loading approach...
 		char path[B_FILE_NAME_LENGTH];
-		snprintf(path, sizeof(path), "%s/%s", sPaths[0], "file_systems");
+		snprintf(path, sizeof(path), "%s/%s", sAddonPaths[0], "file_systems");
 		load_modules_from(volume, path);
 	}
 

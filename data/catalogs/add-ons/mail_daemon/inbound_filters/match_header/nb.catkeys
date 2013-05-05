@@ -1,0 +1,13 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MatchHeader	1828559781
+<Choose action>	ConfigView		<Velg handling>
+has	ConfigView		har
+Move to	ConfigView		Flytt til
+Then	ConfigView		Så
+this field is based on the action	ConfigView		dette feltet er basert på handlingen
+Delete message	ConfigView		Slett melding
+Rule filter	RuleFilter		Regelfilter
+<Choose account>	ConfigView		<Velg konto>
+Set as read	ConfigView		Merk som lest
+Reply with	ConfigView		Svar med
+If	ConfigView		Hvis
+header (e.g. Subject)	ConfigView		header (Emne)

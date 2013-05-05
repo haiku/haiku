@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -15,7 +16,9 @@
 #include <ObjectList.h>
 #include <ToolTip.h>
 
+#include "GuiSettingsUtils.h"
 #include "table/TableColumns.h"
+#include "UiUtils.h"
 
 
 enum {
@@ -92,7 +95,7 @@ public:
 
 	virtual int32 CountColumns() const
 	{
-		return 3;
+		return 4;
 	}
 
 	virtual int32 CountRows() const
@@ -112,39 +115,22 @@ public:
 				return true;
 			case 1:
 			{
-				switch (thread->State()) {
-					case THREAD_STATE_RUNNING:
-						value.SetTo("Running", B_VARIANT_DONT_COPY_DATA);
-						return true;
-					case THREAD_STATE_STOPPED:
-						break;
-					case THREAD_STATE_UNKNOWN:
-					default:
-						value.SetTo("?", B_VARIANT_DONT_COPY_DATA);
-						return true;
-				}
-
-				// thread is stopped -- get the reason
-				switch (thread->StoppedReason()) {
-					case THREAD_STOPPED_DEBUGGER_CALL:
-						value.SetTo("Call", B_VARIANT_DONT_COPY_DATA);
-						return true;
-					case THREAD_STOPPED_EXCEPTION:
-						value.SetTo("Exception", B_VARIANT_DONT_COPY_DATA);
-						return true;
-					case THREAD_STOPPED_BREAKPOINT:
-					case THREAD_STOPPED_WATCHPOINT:
-					case THREAD_STOPPED_SINGLE_STEP:
-					case THREAD_STOPPED_DEBUGGED:
-					case THREAD_STOPPED_UNKNOWN:
-					default:
-						value.SetTo("Debugged", B_VARIANT_DONT_COPY_DATA);
-						return true;
-				}
+				const char* string = UiUtils::ThreadStateToString(
+					thread->State(), thread->StoppedReason());
+				value.SetTo(string, B_VARIANT_DONT_COPY_DATA);
+				return true;
 			}
 			case 2:
 				value.SetTo(thread->Name(), B_VARIANT_DONT_COPY_DATA);
 				return true;
+			case 3:
+			{
+				if (thread->State() != THREAD_STATE_RUNNING) {
+					value.SetTo(thread->StoppedReasonInfo(),
+						B_VARIANT_DONT_COPY_DATA);
+				}
+				return true;
+			}
 			default:
 				return false;
 		}
@@ -307,6 +293,34 @@ ThreadListView::MessageReceived(BMessage* message)
 
 
 void
+ThreadListView::LoadSettings(const BMessage& settings)
+{
+	BMessage tableSettings;
+	if (settings.FindMessage("threadsTable", &tableSettings) == B_OK) {
+		GuiSettingsUtils::UnarchiveTableSettings(tableSettings,
+			fThreadsTable);
+	}
+}
+
+
+status_t
+ThreadListView::SaveSettings(BMessage& settings)
+{
+	settings.MakeEmpty();
+
+	BMessage tableSettings;
+	status_t result = GuiSettingsUtils::ArchiveTableSettings(tableSettings,
+		fThreadsTable);
+	if (result == B_OK)
+		result = settings.AddMessage("threadsTable", &tableSettings);
+
+	return result;
+}
+
+
+
+
+void
 ThreadListView::ThreadAdded(const Team::ThreadEvent& event)
 {
 	Looper()->PostMessage(MSG_SYNC_THREAD_LIST, this);
@@ -357,6 +371,8 @@ ThreadListView::_Init()
 		B_TRUNCATE_END, B_ALIGN_LEFT));
 	fThreadsTable->AddColumn(new StringTableColumn(2, "Name", 200, 40, 1000,
 		B_TRUNCATE_END, B_ALIGN_LEFT));
+	fThreadsTable->AddColumn(new StringTableColumn(3, "Stop Reason",
+		200, 40, 1000, B_TRUNCATE_END, B_ALIGN_LEFT));
 
 	fThreadsTable->SetSelectionMode(B_SINGLE_SELECTION_LIST);
 	fThreadsTable->AddTableListener(this);

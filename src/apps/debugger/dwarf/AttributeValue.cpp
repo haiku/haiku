@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -15,13 +15,14 @@ AttributeValue::ToString(char* buffer, size_t size)
 {
 	switch (attributeClass) {
 		case ATTRIBUTE_CLASS_ADDRESS:
-			snprintf(buffer, size, "%#llx", address);
+			snprintf(buffer, size, "%#" B_PRIx64, address);
 			return buffer;
 		case ATTRIBUTE_CLASS_BLOCK:
-			snprintf(buffer, size, "(%p, %#llx)", block.data, block.length);
+			snprintf(buffer, size, "(%p, %#" B_PRIx64 ")", block.data,
+				block.length);
 			return buffer;
 		case ATTRIBUTE_CLASS_CONSTANT:
-			snprintf(buffer, size, "%#llx", constant);
+			snprintf(buffer, size, "%#" B_PRIx64, constant);
 			return buffer;
 		case ATTRIBUTE_CLASS_FLAG:
 			snprintf(buffer, size, "%s", flag ? "true" : "false");
@@ -30,7 +31,7 @@ AttributeValue::ToString(char* buffer, size_t size)
 		case ATTRIBUTE_CLASS_LOCLISTPTR:
 		case ATTRIBUTE_CLASS_MACPTR:
 		case ATTRIBUTE_CLASS_RANGELISTPTR:
-			snprintf(buffer, size, "%#llx", pointer);
+			snprintf(buffer, size, "%#" B_PRIx64, pointer);
 			return buffer;
 		case ATTRIBUTE_CLASS_REFERENCE:
 			snprintf(buffer, size, "%p", reference);

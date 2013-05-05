@@ -36,8 +36,8 @@
 #include "MainWindow.h"
 #include "Scanner.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Pie View"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Pie View"
 
 static const int32 kIdxGetInfo = 0;
 static const int32 kIdxOpen = 1;
@@ -136,10 +136,10 @@ PieView::PieView(BVolume* volume)
 	fMouseOverInfo(),
 	fClicked(false),
 	fDragging(false),
-	fOutdated(false)
+	fUpdateFileAt(false)
 {
 	fMouseOverMenu = new BPopUpMenu(kEmptyStr, false, false);
-	fMouseOverMenu->AddItem(new BMenuItem(B_TRANSLATE("Get Info"), NULL),
+	fMouseOverMenu->AddItem(new BMenuItem(B_TRANSLATE("Get info"), NULL),
 		kIdxGetInfo);
 	fMouseOverMenu->AddItem(new BMenuItem(B_TRANSLATE("Open"), NULL),
 		kIdxOpen);
@@ -181,33 +181,26 @@ void
 PieView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case kBtnCancel:
+			if (fScanner != NULL)
+				fScanner->Cancel();
+			break;
 		case kBtnRescan:
 			if (fVolume != NULL) {
 				if (fScanner != NULL)
 					fScanner->Refresh();
 				else
 					_ShowVolume(fVolume);
-
-				fOutdated = false;
+				fWindow->EnableCancel();
 				Invalidate();
 			}
 			break;
-
-		case kScanProgress:
+		
 		case kScanDone:
-		{
+			fWindow->EnableRescan();
+		case kScanProgress:
 			Invalidate();
 			break;
-		}
-
-		case kOutdatedMsg:
-		{
-			if (!fScanner->IsBusy()) {
-				fOutdated = true;
-				Invalidate();
-			}
-			break;
-		}
 
 		default:
 			BView::MessageReceived(message);
@@ -250,11 +243,13 @@ PieView::MouseUp(BPoint where)
 		if (info != NULL) {
 			if (info == fScanner->CurrentDir()) {
 				fScanner->ChangeDir(info->parent);
-				fOutdated = fScanner->IsOutdated();
+				fLastWhere = where;
+				fUpdateFileAt = true;
 				Invalidate();
 			} else if (info->children.size() > 0) {
 				fScanner->ChangeDir(info);
-				fOutdated = fScanner->IsOutdated();
+				fLastWhere = where;
+				fUpdateFileAt = true;
 				Invalidate();
 			}
 		}
@@ -308,12 +303,12 @@ PieView::Draw(BRect updateRect)
 		if (fScanner->IsBusy()) {
 			// Show progress of scanning.
 			_DrawProgressBar(updateRect);
-			if (fWindow != NULL)
-				fWindow->SetRescanEnabled(false);
-		} else {
+		} else if (fScanner->Snapshot() != NULL) {
 			_DrawPieChart(updateRect);
-			if (fWindow != NULL)
-				fWindow->SetRescanEnabled(true);
+			if (fUpdateFileAt) {
+				fWindow->ShowInfo(_FileAt(fLastWhere));
+				fUpdateFileAt = false;
+			}
 		}
 	}
 }
@@ -366,8 +361,7 @@ PieView::_DrawProgressBar(BRect updateRect)
 	float by = floorf((b.top + b.Height() - kProgBarHeight) / 2.0);
 	float ex = bx + kProgBarWidth;
 	float ey = by + kProgBarHeight;
-	float mx = bx + floorf((kProgBarWidth - 2.0)
-		* fScanner->Progress() / 100.0 + 0.5);
+	float mx = bx + floorf((kProgBarWidth - 2.0) * fScanner->Progress() + 0.5);
 
 	const rgb_color kBarColor = {50, 150, 255, 255};
 	BRect barFrame(bx, by, ex, ey);
@@ -415,21 +409,6 @@ PieView::_DrawPieChart(BRect updateRect)
 	}
 	_DrawDirectory(pieRect, currentDir, 0.0, 0.0,
 		colorIdx % kBasePieColorCount, 0);
-
-	if (fOutdated) {
-
-		BRect b = Bounds();
-
-		float strWidth = StringWidth(B_TRANSLATE("Outdated view"));
-		float bx = (b.Width() - strWidth - kSmallHMargin);
-
-		struct font_height fh;
-		be_plain_font->GetHeight(&fh);
-
-		float by = (b.Height() - ceil(fh.descent) - kSmallVMargin);
-		SetHighColor(0x00, 0x00, 0x00);
-		DrawString(B_TRANSLATE("Outdated view"), BPoint(bx, by));
-	}
 }
 
 
@@ -534,38 +513,20 @@ PieView::_DrawDirectory(BRect b, FileInfo* info, float parentSpan,
 
 		mySpan = parentSpan * (float)info->size / parentSize;
 		if (mySpan >= kMinSegmentSpan) {
-			rgb_color color = kBasePieColor[colorIdx];
-			color.red += kLightenFactor * level;
-			color.green += kLightenFactor * level;
-			color.blue += kLightenFactor * level;
-			SetHighColor(color);
-			SetPenSize(kPieRingSize);
+			const float tint = 1.4f - level * 0.08f;
 			float radius = kPieCenterSize + level * kPieRingSize
 				- kPieRingSize / 2.0;
-			StrokeArc(BPoint(cx, cy), radius, radius, beginAngle, mySpan);
 
-			SetHighColor(kOutlineColor);
-			SetPenSize(0.0);
-			float segBeginRadius = kPieCenterSize + (level - 1)
-				* kPieRingSize + 0.5;
-			float segLength = kPieRingSize - 0.5;
-			float rad = deg2rad(beginAngle);
-			float bx = cx + segBeginRadius * cos(rad);
-			float by = cy - segBeginRadius * sin(rad);
-			float ex = bx + segLength * cos(rad);
-			float ey = by - segLength * sin(rad);
-			StrokeLine(BPoint(bx, by), BPoint(ex, ey));
+			// Draw the grey border
+			SetHighColor(tint_color(kOutlineColor, tint));
+			SetPenSize(kPieRingSize + 1.5f);
+			StrokeArc(BPoint(cx, cy), radius, radius,
+				beginAngle - 0.001f * radius, mySpan  + 0.002f * radius);
 
-			rad = deg2rad(beginAngle + mySpan);
-			bx = cx + segBeginRadius * cos(rad);
-			by = cy - segBeginRadius * sin(rad);
-			ex = bx + segLength * cos(rad);
-			ey = by - segLength * sin(rad);
-			StrokeLine(BPoint(bx, by), BPoint(ex, ey));
-
-			SetPenSize(0.0);
-			SetHighColor(kOutlineColor);
-			radius += kPieRingSize / 2.0;
+			// Draw the colored area
+			rgb_color color = tint_color(kBasePieColor[colorIdx], tint);
+			SetHighColor(color);
+			SetPenSize(kPieRingSize);
 			StrokeArc(BPoint(cx, cy), radius, radius, beginAngle, mySpan);
 
 			// Record the segment for use during MouseMoved().
@@ -700,7 +661,7 @@ PieView::_BuildOpenWithMenu(FileInfo* info)
 
 	delete type;
 
-	BMenu* openWith = new BMenu(B_TRANSLATE("Open With"));
+	BMenu* openWith = new BMenu(B_TRANSLATE("Open with"));
 
 	if (appList.size() == 0) {
 		BMenuItem* item = new BMenuItem(B_TRANSLATE("no supporting apps"),

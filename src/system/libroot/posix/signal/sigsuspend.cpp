@@ -18,6 +18,7 @@
 #include <symbol_versioning.h>
 #include <syscalls.h>
 
+#include <errno_private.h>
 #include <signal_private.h>
 
 
@@ -32,7 +33,7 @@ __sigsuspend_beos(const sigset_t_beos* beosMask)
 int
 __sigsuspend(const sigset_t* mask)
 {
-	errno = _kern_sigsuspend(mask);
+	__set_errno(_kern_sigsuspend(mask));
 
 	pthread_testcancel();
 

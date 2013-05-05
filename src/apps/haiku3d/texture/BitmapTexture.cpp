@@ -10,8 +10,8 @@
 
 #include <Bitmap.h>
 
-#include <opengl/GL/gl.h>
-#include <opengl/GL/glu.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 #include <stdio.h>
 
 

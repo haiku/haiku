@@ -1,14 +1,14 @@
 1	russian	x-vnd.Haiku-Pairs	1981673050
 %app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\tразработал Ralf Schülke\n\tВсе права защищены © 2008-2010 Haiku, Inc.\n\nВы прошли игру за %num% кликов.\n
-Beginner (4x4)	PairsWindow		Новичок (4x4)
 Expert (8x8)	PairsWindow		Эксперт (8x8)
-Game	PairsWindow		Игра
-Intermediate (6x6)	PairsWindow		Средний (6x6)
-New	PairsWindow		Новая
-New game	PairsWindow		Новая игра
-OK	PairsView		ОК
-Pairs	System name		Пары
-Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Найдено недостаточное количество векторных иконок; требуется как минимум %d.
-Quit	PairsWindow		Выход
+Beginner (4x4)	PairsWindow		Новичок (4x4)
 Quit game	PairsWindow		Выход
+Game	PairsWindow		Игра
 Size	PairsWindow		Размер
+New	PairsWindow		Новая
+OK	PairsView		ОК
+Intermediate (6x6)	PairsWindow		Средний (6x6)
+Quit	PairsWindow		Выход
+Pairs	System name		Пары
+New game	PairsWindow		Новая игра
+Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Найдено недостаточное количество векторных иконок; требуется как минимум %d.

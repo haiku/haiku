@@ -13,8 +13,8 @@
 #include <MediaFile.h>
 #include <MediaTrack.h>
 
-#include <opengl/GL/gl.h>
-#include <opengl/GL/glu.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 #include <string.h>
 #include <stdio.h>
 

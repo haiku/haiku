@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -476,7 +477,10 @@ DIEClassBaseType::AddChild(DebugInfoEntry* child)
 		case DW_TAG_subprogram:
 			fMemberFunctions.Add(child);
 			return B_OK;
-// TODO: Templates!
+		case DW_TAG_template_type_parameter:
+		case DW_TAG_template_value_parameter:
+			fTemplateParameters.Add(child);
+			return B_OK;
 // TODO: Variants!
 		default:
 		{
@@ -836,7 +840,8 @@ DIEEnumerationType::AddAttribute_specification(uint16 attributeName,
 DIEFormalParameter::DIEFormalParameter()
 	:
 	fAbstractOrigin(NULL),
-	fType(NULL)
+	fType(NULL),
+	fArtificial(false)
 {
 }
 
@@ -867,6 +872,15 @@ DIEFormalParameter::AddAttribute_abstract_origin(uint16 attributeName,
 	const AttributeValue& value)
 {
 	fAbstractOrigin = value.reference;
+	return B_OK;
+}
+
+
+status_t
+DIEFormalParameter::AddAttribute_artificial(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fArtificial = value.flag;
 	return B_OK;
 }
 
@@ -1825,7 +1839,9 @@ DIESubprogram::DIESubprogram()
 	fReturnType(NULL),
 	fAddressClass(0),
 	fPrototyped(false),
-	fInline(DW_INL_not_inlined)
+	fInline(DW_INL_not_inlined),
+	fArtificial(false),
+	fCallingConvention(DW_CC_normal)
 {
 }
 
@@ -1870,6 +1886,12 @@ DIESubprogram::AddChild(DebugInfoEntry* child)
 			return B_OK;
 		case DW_TAG_lexical_block:
 			fBlocks.Add(child);
+			return B_OK;
+		case DW_TAG_template_type_parameter:
+			fTemplateTypeParameters.Add(child);
+			return B_OK;
+		case DW_TAG_template_value_parameter:
+			fTemplateValueParameters.Add(child);
 			return B_OK;
 		default:
 			return DIEDeclaredNamedBase::AddChild(child);
@@ -1975,6 +1997,24 @@ DIESubprogram::AddAttribute_frame_base(uint16 attributeName,
 	}
 
 	return B_BAD_DATA;
+}
+
+
+status_t
+DIESubprogram::AddAttribute_artificial(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fArtificial = value.flag;
+	return B_OK;
+}
+
+
+status_t
+DIESubprogram::AddAttribute_calling_convention(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fCallingConvention = value.constant;
+	return B_OK;
 }
 
 
@@ -2169,6 +2209,12 @@ DIEVariable::AddAttribute_specification(uint16 attributeName,
 	const AttributeValue& value)
 {
 	fSpecification = dynamic_cast<DIEVariable*>(value.reference);
+	// in the case of static variables declared within a compound type,
+	// the specification may point to a member entry rather than
+	// a variable entry
+	if (fSpecification == NULL)
+		fSpecification = dynamic_cast<DIEMember*>(value.reference);
+
 	return fSpecification != NULL ? B_OK : B_BAD_DATA;
 }
 
@@ -2468,6 +2514,96 @@ DIESharedType::AddAttribute_decl_column(uint16 attributeName,
 }
 
 
+// #pragma mark - DIETemplateTypeParameterPack
+
+
+DIETemplateTypeParameterPack::DIETemplateTypeParameterPack()
+	:
+	fName(NULL)
+{
+}
+
+
+uint16
+DIETemplateTypeParameterPack::Tag() const
+{
+	return DW_TAG_GNU_template_parameter_pack;
+}
+
+
+const char*
+DIETemplateTypeParameterPack::Name() const
+{
+	return fName;
+}
+
+
+status_t
+DIETemplateTypeParameterPack::AddAttribute_name(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fName = value.string;
+	return B_OK;
+}
+
+
+status_t
+DIETemplateTypeParameterPack::AddChild(DebugInfoEntry* child)
+{
+	if (child->Tag() == DW_TAG_template_type_parameter) {
+		fChildren.Add(child);
+		return B_OK;
+	}
+
+	return DIEDeclaredBase::AddChild(child);
+}
+
+
+// #pragma mark - DIETemplateValueParameterPack
+
+
+DIETemplateValueParameterPack::DIETemplateValueParameterPack()
+	:
+	fName(NULL)
+{
+}
+
+
+uint16
+DIETemplateValueParameterPack::Tag() const
+{
+	return DW_TAG_GNU_formal_parameter_pack;
+}
+
+
+const char*
+DIETemplateValueParameterPack::Name() const
+{
+	return fName;
+}
+
+
+status_t
+DIETemplateValueParameterPack::AddAttribute_name(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fName = value.string;
+	return B_OK;
+}
+
+
+status_t
+DIETemplateValueParameterPack::AddChild(DebugInfoEntry* child)
+{
+	if (child->Tag() == DW_TAG_formal_parameter) {
+		fChildren.Add(child);
+		return B_OK;
+	}
+
+	return DIEDeclaredBase::AddChild(child);
+}
+
+
 // #pragma mark - DebugInfoEntryFactory
 
 
@@ -2653,7 +2789,14 @@ DebugInfoEntryFactory::CreateDebugInfoEntry(uint16 tag, DebugInfoEntry*& _entry)
 		case DW_TAG_shared_type:
 			entry = new(std::nothrow) DIESharedType;
 			break;
+		case DW_TAG_GNU_template_parameter_pack:
+			entry = new(std::nothrow) DIETemplateTypeParameterPack;
+			break;
+		case DW_TAG_GNU_formal_parameter_pack:
+			entry = new(std::nothrow) DIETemplateValueParameterPack;
+			break;
 		default:
+			return B_ENTRY_NOT_FOUND;
 			break;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku.
+ * Copyright 2001-2012, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -65,6 +65,7 @@ enum {
 	AS_DELETE_BITMAP,
 	AS_GET_BITMAP_OVERLAY_RESTRICTIONS,
 	AS_GET_BITMAP_SUPPORT_FLAGS,
+	AS_RECONNECT_BITMAP,
 
 	// Cursor commands
 	AS_SET_CURSOR,
@@ -86,8 +87,8 @@ enum {
 	AS_GET_CURSOR_BITMAP,
 
 	// Window definitions
-	AS_SHOW_WINDOW,
-	AS_HIDE_WINDOW,
+	AS_SHOW_OR_HIDE_WINDOW,
+	AS_INTERNAL_HIDE_WINDOW,
 	AS_MINIMIZE_WINDOW,
 	AS_QUIT_WINDOW,
 	AS_SEND_BEHIND,
@@ -341,6 +342,12 @@ enum {
 	AS_DUMP_BITMAPS,
 
 	AS_LAST_CODE
+};
+
+// TODO: move this into a private app header, together with the rest of the
+//		private message definitions in AppDefs.h
+enum {
+	kMsgDeleteServerMemoryArea		= '_DSA',
 };
 
 // bitmap allocation flags

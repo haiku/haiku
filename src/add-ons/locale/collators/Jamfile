@@ -12,11 +12,11 @@ Depends LocaleKitCollatorAddons
 
 Addon <collator-addon>GermanDIN-2
 	: GermanDIN-2.cpp
-	: be liblocale.so $(TARGET_LIBSUPC++)
+	: be $(TARGET_LIBSUPC++)
 	;
 
 Addon <collator-addon>French
 	: French.cpp
-	: be liblocale.so $(TARGET_LIBSUPC++)
+	: be $(TARGET_LIBSUPC++)
 	;
 

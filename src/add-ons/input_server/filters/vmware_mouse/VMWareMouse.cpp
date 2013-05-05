@@ -104,6 +104,26 @@ VMWareMouseFilter::_ExecuteCommand(union packet_u &packet)
 	packet.command.port = VMWARE_PORT_NUMBER;
 
 	int dummy;
+#ifdef __x86_64__
+	asm volatile (
+			"pushq %%rbx;"
+			"pushq %%rax;"
+			"movl 12(%%rax), %%edx;"
+			"movl 8(%%rax), %%ecx;"
+			"movl 4(%%rax), %%ebx;"
+			"movl (%%rax), %%eax;"
+			"inl %%dx, %%eax;"
+			"xchgq %%rax, (%%rsp);"
+			"movl %%edx, 12(%%rax);"
+			"movl %%ecx, 8(%%rax);"
+			"movl %%ebx, 4(%%rax);"
+			"popq %%rbx;"
+			"movl %%ebx, (%%rax);"
+			"popq %%rbx;"
+		: "=a"(dummy)
+		: "0"(&packet)
+		: "rcx", "rdx", "memory");
+#else
 	asm volatile (
 			"pushl %%ebx;"
 			"pushl %%eax;"
@@ -121,6 +141,7 @@ VMWareMouseFilter::_ExecuteCommand(union packet_u &packet)
 		: "=a"(dummy)
 		: "0"(&packet)
 		: "ecx", "edx", "memory");
+#endif
 }
 
 

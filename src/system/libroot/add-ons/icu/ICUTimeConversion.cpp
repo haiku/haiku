@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Oliver Tappe, zooey@hirschkaefer.de.
+ * Copyright 2010-2011, Oliver Tappe, zooey@hirschkaefer.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -10,8 +10,6 @@
 #include <strings.h>
 
 #include <unicode/gregocal.h>
-
-#include <AutoDeleter.h>
 
 
 namespace BPrivate {
@@ -124,8 +122,8 @@ ICUTimeConversion::TZSet(const char* timeZoneID, const char* tz)
 			strcpy(fDataBridge->addrOfTZName[0], fTimeZoneID);
 		} else {
 			UnicodeString icuString;
-			fTimeZone->getDisplayName(i == 1, TimeZone::SHORT_COMMONLY_USED,
-				fTimeData.ICULocale(), icuString);
+			fTimeZone->getDisplayName(i == 1, TimeZone::SHORT,
+				fTimeData.ICULocaleForStrings(), icuString);
 			CheckedArrayByteSink byteSink(fDataBridge->addrOfTZName[i],
 				sizeof(fTimeZoneID));
 			icuString.toUTF8(byteSink);

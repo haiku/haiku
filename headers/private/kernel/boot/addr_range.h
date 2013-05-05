@@ -11,15 +11,9 @@
 
 
 typedef struct addr_range {
-	addr_t start;
-	size_t size;
-} addr_range;
-
-
-typedef struct phys_addr_range {
-	phys_addr_t	start;
-	phys_size_t	size;
-} phys_addr_range;
+	uint64 start;
+	uint64 size;
+} _PACKED addr_range;
 
 
 #ifdef __cplusplus
@@ -27,28 +21,18 @@ extern "C" {
 #endif
 
 status_t insert_address_range(addr_range* ranges, uint32* _numRanges,
-	uint32 maxRanges, addr_t start, size_t size);
+	uint32 maxRanges, uint64 start, uint64 size);
 status_t remove_address_range(addr_range* ranges, uint32* _numRanges,
-	uint32 maxRanges, addr_t start, size_t size);
-bool get_free_address_range(addr_range* ranges, uint32 numRanges, addr_t base,
-	size_t size, addr_t* _rangeBase);
-bool is_address_range_covered(addr_range* ranges, uint32 numRanges, addr_t base,
-	size_t size);
+	uint32 maxRanges, uint64 start, uint64 size);
+bool get_free_address_range(addr_range* ranges, uint32 numRanges, uint64 base,
+	uint64 size, uint64* _rangeBase);
+bool is_address_range_covered(addr_range* ranges, uint32 numRanges, uint64 base,
+	uint64 size);
 void sort_address_ranges(addr_range* ranges, uint32 numRanges);
 
-status_t insert_physical_address_range(phys_addr_range* ranges,
-	uint32* _numRanges, uint32 maxRanges, phys_addr_t start, phys_size_t size);
-status_t remove_physical_address_range(phys_addr_range* ranges,
-	uint32* _numRanges, uint32 maxRanges, phys_addr_t start, phys_size_t size);
-bool get_free_physical_address_range(phys_addr_range* ranges, uint32 numRanges,
-	phys_addr_t base, phys_size_t size, phys_addr_t* _rangeBase);
-bool is_physical_address_range_covered(phys_addr_range* ranges,
-	uint32 numRanges, phys_addr_t base, phys_size_t size);
-void sort_physical_address_ranges(phys_addr_range* ranges, uint32 numRanges);
-
-status_t insert_physical_memory_range(phys_addr_t start, phys_size_t size);
-status_t insert_physical_allocated_range(phys_addr_t start, phys_size_t size);
-status_t insert_virtual_allocated_range(addr_t start, size_t size);
+status_t insert_physical_memory_range(uint64 start, uint64 size);
+status_t insert_physical_allocated_range(uint64 start, uint64 size);
+status_t insert_virtual_allocated_range(uint64 start, uint64 size);
 void ignore_physical_memory_ranges_beyond_4gb();
 
 #ifdef __cplusplus

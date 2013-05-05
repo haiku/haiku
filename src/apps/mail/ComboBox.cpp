@@ -1417,7 +1417,6 @@ BComboBox::Draw(BRect /*updateRect*/)
 	BRect bounds = Bounds();
 	font_height	fInfo;
 	rgb_color high = HighColor();
-	rgb_color low = LowColor();
 	rgb_color base = ViewColor();
 	bool focused;
 	bool enabled;
@@ -1473,8 +1472,6 @@ BComboBox::Draw(BRect /*updateRect*/)
 
 	StrokeRect(fr);
 	SetHighColor(high);	
-
-	rgb_color oldCol = HighColor();
 
 	bounds.right = bounds.left + fDivider;
 	if ((Label()) && (fDivider > 0.0)) {

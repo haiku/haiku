@@ -49,7 +49,7 @@ static int
 ShowMessage(char* string)
 {
 	BAlert *alert = new BAlert("Message", string, "OK");
-	alert->SetShortcut(1, B_ESCAPE);
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	return alert->Go();
 }
 
@@ -437,7 +437,7 @@ JoyWin::_ShowNoCompatibleJoystickMessage()
 	str << " for a driver designed for Haiku or BeOS.";
 
 	BAlert *alert = new BAlert("test1", str.String(), "OK");
-	alert->SetShortcut(0, B_ENTER);
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 }
 
@@ -448,7 +448,7 @@ JoyWin::_ShowNoDeviceConnectedMessage(const char* joy, const char* port)
 	str << joy << " device connected to the port '" << port << "'.";
 
 	BAlert *alert = new BAlert("test1", str.String(), "Stop");
-	alert->SetShortcut(0, B_ENTER);
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 }
 

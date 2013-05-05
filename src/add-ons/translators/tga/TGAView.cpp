@@ -30,8 +30,7 @@
 /*****************************************************************************/
 
 #include <Catalog.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <SpaceLayoutItem.h>
 
 #include <stdio.h>
@@ -40,8 +39,8 @@
 #include "TGAView.h"
 #include "TGATranslator.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "TGAView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "TGAView"
 
 
 TGAView::TGAView(const char *name, uint32 flags, TranslatorSettings *settings)
@@ -52,7 +51,7 @@ TGAView::TGAView(const char *name, uint32 flags, TranslatorSettings *settings)
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ViewColor());
 
- 	fTitle = new BStringView("title", B_TRANSLATE("TGA Image Translator"));
+ 	fTitle = new BStringView("title", B_TRANSLATE("TGA image translator"));
  	fTitle->SetFont(be_bold_font);
 
  	char detail[100];
@@ -78,9 +77,8 @@ TGAView::TGAView(const char *name, uint32 flags, TranslatorSettings *settings)
  	fpchkRLE->SetViewColor(ViewColor());
 
  	// Build the layout
- 	SetLayout(new BGroupLayout(B_HORIZONTAL));
-
- 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 7)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 7)
+		.SetInsets(5)
  		.Add(fTitle)
  		.Add(fDetail)
  		.AddGlue()
@@ -88,9 +86,7 @@ TGAView::TGAView(const char *name, uint32 flags, TranslatorSettings *settings)
  		.Add(fpchkRLE)
  		.AddGlue()
  		.Add(fWrittenBy)
- 		.AddGlue()
- 		.SetInsets(5, 5, 5, 5)
- 	);
+		.AddGlue();
 
  	BFont font;
  	GetFont(&font);

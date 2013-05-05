@@ -1,11 +1,43 @@
-1	romanian	x-vnd.Haiku-Time	2453220961
+1	romanian	x-vnd.Haiku-Time	1859841283
+GMT (UNIX compatible)	Time		GMT (compatibil cu UNIX)
+OK	Time		OK
+Asia	Time		Asia
+\nNow: 	Time		\nAcum:
+Africa	Time		Africa
+Stop	Time		Oprește
+Could not contact server	Time		Nu s-a putut contacta serverul
+Australia	Time		Australia
+Preview time:	Time		Previzualizare oră:
+Synchronize	Time		Sincronizează
+Revert	Time		Inversează
+Pacific	Time		Pacific
+Add	Time		Adaugă
+Date and time	Time		Dată și oră
+about	Time		despre
+Local time (Windows compatible)	Time		Ora locală (compatibil cu Windows)
+Message receiving failed	Time		Primirea mesajului a eșuat
+Set time zone	Time		Configurează fusul orar
+Waiting for answer failed	Time		Așteptarea pentru răspuns a eșuat
+Hardware clock set to:	Time		Ceasul hardware stabilit la:
+The following error occured while synchronizing:r\n%s	Time		Următoarea eroare a apărut în timpul sincronizării:r\n%s
+Europe	Time		Europa
+Remove	Time		Elimină
+Time	Time		Oră
+Indian	Time		Indian
+Sending request failed	Time		Trimiterea cererii a eșuat
+Arctic	Time		Arctic
+Time	System name		Oră
+America	Time		America
+Reset	Time		Resetează
+Synchronize at boot	Time		Sincronizează la pornirea sistemului
+Received invalid time	Time		S-a primit o oră invalidă
+Antarctica	Time		Antarctica
+The following error occured while synchronizing:r\n%s: %s	Time		Următoarea eroare a apărut în timpul sincronizării:r\n%s: %s
 <Other>	Time		<Altele>
 Current time:	Time		Oră curentă:
-Etc	Time		Etc
-OK	Time		OK
-Preview time:	Time		Previzualizare oră:
-Revert	Time		Inversează
-Set time zone	Time		Configurează fusul orar
-Time	Time		Oră
+Try all servers	Time		Încearcă toate serverele
 Time zone	Time		Fus orar
-about	Time		despre
+Could not create socket	Time		Nu s-a putut crea socketul
+Synchronize again	Time		Sincronizează din nou
+Network time	Time		Oră rețea
+Atlantic	Time		Atlantic

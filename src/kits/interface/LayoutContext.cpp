@@ -17,6 +17,13 @@ BLayoutContextListener::~BLayoutContextListener()
 }
 
 
+void BLayoutContextListener::_ReservedLayoutContextListener1() {}
+void BLayoutContextListener::_ReservedLayoutContextListener2() {}
+void BLayoutContextListener::_ReservedLayoutContextListener3() {}
+void BLayoutContextListener::_ReservedLayoutContextListener4() {}
+void BLayoutContextListener::_ReservedLayoutContextListener5() {}
+
+
 // #pragma mark -
 
 

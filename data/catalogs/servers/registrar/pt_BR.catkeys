@@ -1,0 +1,23 @@
+1	portuguese (brazil)	x-vnd.haiku-registrar	2599857937
+Restart system	ShutdownProcess		Reiniciar sistema
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		A aplicação \"%appName%\" deve ser bloqueada em um painel modal.
+OK	ShutdownProcess		OK
+System is shut down	ShutdownProcess		Sistema está desligado
+It's now safe to turn off the computer.	ShutdownProcess		Agora é seguro desligar o computador.
+Cancel	ShutdownProcess		Cancelar
+Do you really want to shut down the system?	ShutdownProcess		Deseja realmente desligar o computador?
+Asking other processes to quit.	ShutdownProcess		Solicitando o encerramento de outros processos.
+Asking \"%appName%\" to quit.	ShutdownProcess		Solicitando o encerramento de \"%appName%\".
+%action%?	ShutdownProcess		%action%?
+Shutdown aborted	ShutdownProcess		Desligamento abortado
+Restarting…	ShutdownProcess		Reiniciando…
+Asking background applications to quit.	ShutdownProcess		Solicitando o encerramento de aplicações em segundo plano.
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Aplicação \"%appname%\" abortou o processo de desligamento.
+Tidying things up a bit.	ShutdownProcess		Arrumando um pouco as coisas.
+Do you really want to restart the system?	ShutdownProcess		Deseja realmente reiniciar o sistema?
+Shutdown status	ShutdownProcess		Status do desligamento
+Cancel shutdown	ShutdownProcess		Cancelar o desligamento
+Kill application	ShutdownProcess		Matar aplicação
+Shut down	ShutdownProcess		Desligar
+Restart	ShutdownProcess		Reiniciar
+Shutting down…	ShutdownProcess		Desligando...

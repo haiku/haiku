@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		helix84
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Rozloženie súborového systému Haiku</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Používateľská príručka</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/sk.png" alt="" /> Slovenčina</li>
+<li><a href="../fr/filesystem-layout.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/filesystem-layout.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/filesystem-layout.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/filesystem-layout.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/filesystem-layout.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/filesystem-layout.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/filesystem-layout.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/filesystem-layout.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/filesystem-layout.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/filesystem-layout.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/filesystem-layout.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../hu/filesystem-layout.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../pt_BR/filesystem-layout.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../ca/filesystem-layout.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../en/filesystem-layout.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="bootloader.html">Zavádzač systému</a> 
+::  <a href="contents.html" class="uplink">Obsah</a> 
+::  <a href="gui.html">Používateľské rozhranie Haiku</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h1>Rozloženie súborového systému Haiku</h1>
+
+<p>Rozloženie súborového systému Haiku je dosť zrozumiteľné a vždy sa snačí používať nekryptické názvy súborov a priečinkov, aby nemusel používateľ hádať, čo znamenajú. Súbory a priečinky, ktoré sú dôležité na správne fungovanie systému sú chránené proti neúmyselnému poškodeniu tak, že zobrazujú jednu z týchto výstrah:</p>
+<img src="images/filesystem-layout-images/achtung-user.png" alt="achtung-user.png" /> 
+<img src="images/filesystem-layout-images/achtung-system.png" alt="achtung-system.png" />
+<p>Druhá výstraha  vyskočí, keď sa pokúsite premenovať alebo zmazať niečo v hierarchii system. Tu sa na tlačidlo „<span class="button">Premenovať</span>“ bude dať kliknúť iba ak podržíte kláves <span class="key">SHIFT</span>.</p>
+<p>Vo všeobecnosti existujú tri samostatné vetvy začínajúce v koreňovom priečinku zavádzacieho zväzku:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="path">/boot/system/</span></td><td> </td><td>patrí systému. Nedotýkajte sa ho!</td></tr>
+<tr><td><span class="path">/boot/common/</span></td><td> </td><td>obsahuje súbory, ktoré môžu využívať všetci používatelia súčasne.</td></tr>
+<tr><td><span class="path">/boot/home/</span></td><td> </td><td>je váš osobný priečinok, kde máte svoje dáta a nastavenia.</td></tr>
+</table>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="system" name="system">Systémový priečinok - <span class="path">/boot/system/</span></a></h2>
+<p>V predchodcovi Haiku - BeOS - sa tento priečinok nazýval <span class="path">/boot/beos/</span>. Ešte stále ho môžete nájsť v staršej dokumentácii (napr. v pôvodnej BeBook).<br />
+Bez ohľadu na jeho názov, nemali by ste meniť jeho obsah. Každá aktualizácia Haiku však môže pridať, odstrániť alebo zmeniť čokoľvek v ňom. Ak chcete pridať funkcie, povedzme ďalšími Doplnkami alebo Prekladačmi Trackera alebo povedzme ďalší ovládač hardvéru, tieto veci inštalujte do vašej vlastnej hierarchie <span class="path">/boot/home/</span> alebo ak majú byť dostupné každému používateľovu, pod <span class="path">/boot/common/</span>. Pokým Haiku nemá podporu pre viacerých používateľov, takéto rozlíšenie zjavne nemá žiaden zmysel, pretože existuje len jeden používateľ s jedným domovským priečinkom. Ale preto, že podpora viacerých používateľov bude nakoniec pridaná, je rozumné naučiť sa správny postup hneď od začiatku.</p>
+<p>Takže povedzme, že chcete nainštalovať nový Prekladač pre najnovší formát obrázkov. <b>Nekopírujte</b> ho jednoducho do príslušného systémového priečinka. Pamätajte: Nedotýkať sa!<br />
+Namiesto toho ho dajte do zodpovedajúceho priečinka v hierarchie <span class="path">/boot/common/</span> alebo <span class="path">/boot/home/config/</span>.</p>
+<p>V našom príklade by bolo umiestnenie Prekladačov v systémovom priečinku</p>
+<p><span class="path">/boot/system/add-ons/Translators/</span></p>
+<p>Takže zodpovedajúci priečinok je buď</p>
+<p><span class="path">/boot/home/config/add-ons/Translators/</span><br />
+alebo<br />
+<span class="path">/boot/common/add-ons/Translators/</span></p>
+<p>To má ďalšiu výhodu: Ak komponent, ktorý ste nainštalovali niečo pokazí (čo je možné, pretože takto sa inštalujú aj ovládače hardvéru) budete môcť vybrať voľbu „<i>Vypnúť používateľské doplnky</i>“ z menu <a href="bootloader.html">Zavádzača systému</a> a tak budete vždy môcť zaviesť systém bez problematického komponentu.</p>
+<p>Väčšinou sa však týmito vecami nebudete musieť vôbec zaoberať, pretože každý softvér, ktorý pochádza z dôveryhodného zdroja  by mal obsahovať inštalačný program,  ktorý sa o tieto veci postará.<br />
+<!--
+If you do want to know more about how things tick in Haiku, have a look at this layout chart of the system folder:
+</p>
+<p><i>TODO.... Table to be added ....</i>
+<table>
+</table>
+-->
+</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="common" name="common">Spoločný priečinok - <span class="path">/boot/common/</span></a></h2>
+<p>Haiku zatiaľ nie je viacpoužívateľský systém. Keď však bude, každý používateľ bude má vlastný <i>domovský</i> priečinok, ktorý je neprístupný komukoľvek inému. Každá aplikácia alebo pridaný komponent ako Doplnky Trackera, Prekladače atď. ako aj akékoľvek dáta, ktoré majú byť zdieľané medzi používateľmi musí byť pod <span class="path">/boot/common/</span>.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="home" name="home">Domovský priečinok - <span class="path">/boot/home/</span></a></h2>
+<p>Tento priečinok patrí vám. Tu môžete vytvárať a mazať súbory a priečinky ako si želáte. Nemali by ste sa však príliš babrať s priečinkom <span class="path">~/config/</span> a jeho podpriečinkami. Hoci by ste <i>mohli</i> zmazať napr. priečinok <span class="path">~/config/settings/</span> bez poškodenia samotného operačného systému, ale kto chce stratiť všetku konfiguráciu a nastavenia aplikácií? V každom prípade vás predtým systém upozorní hore spomínanou výstrahou.</p>
+<p>Okrem priečinka <span class="path">~/config/add-ons/</span> ktorý zrkadlí štruktúru priečinka doplnkov systému pre ďalšie komponenty ako je popísané vyššie, existuje niekoľˇko ďalších zaujímavých priečinkov. (Mimochodom, tilda („<tt>~</tt>“) je skratka pre váš domovský priečinok, takže nemusíte zakaždým v Termináli písať „<span class="path">/boot/home/</span>“)</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="path">~/mail</span></td><td style="width:10px;"> </td>
+<td>Tu sa štandardne uchováva vaša pošta.</td></tr>
+
+<tr><td><span class="path">~/queries</span></td><td style="width:10px;"> </td>
+<td><a href="queries.html">Požiadavky</a> sa ukladajú v tomto priečinku, štandardne na 7 dní.</td></tr>
+
+<tr><td><span class="path">~/config/be/</span></td><td> </td>
+<td>Opäť dedičstvo z BeOS. Priečinok <span class="path">be</span> obsahuje, čo sa zobrazuje v <a href="deskbar.html#deskbar-menu">menu Panelu</a>. Položky môžete pridávať a odstraňovať vkladaním súborov, priečinkov, odkazov alebo požiadaviek do tohto priečinka.</td></tr>
+
+<tr><td><span class="path">~/config/bin/</span></td><td> </td>
+<td>Dopĺňa systémový priečinok <span class="path">/boot/system/bin/</span> a obsahuje všetky vaše programy príkazového riadka.</td></tr>
+
+<tr><td><span class="path">~/config/boot/</span></td><td> </td>
+<td>Tento priečinok je miestom pre <a href="bash-scripting.html#user-scripts">Používateľské skripty</a>, ktoré sa spúšťajú pred alebo po štarte či vypnutí systému.</td></tr>
+
+<tr><td><span class="path">~/config/boot/launch/</span></td><td> </td>
+<td>Odkazy na programy alebo dokumenty v tomto priečinku sa automaticky spúšťajú pri každom štarte.</td></tr>
+
+<tr><td><span class="path">~/config/data/fonts/</span></td><td> </td>
+<td>Do tohto priečinka jednoducho skopírujte písmo TrueType alebo Postscript a bude okamžite použiteľné.</td></tr>
+
+<tr><td><span class="path">~/config/settings/</span></td><td> </td>
+<td>Tento priečinok obsahuje nastavenia všetkých aplikácií a časť konfigurácie systému. Niektoré aplikácie svoje  nastavenia ukladajú do vlastných podpriečinkov, iné jednoducho umiestnia svoj konfiguračný súbor sem.</td></tr>
+
+<tr><td><span class="path">~/config/settings/beos_mime/</span></td><td> </td>
+<td>V tejto databáze <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> Haiku sleduje všetky rozličné <a href="filetypes.html">typy súborov</a> a ich nastavenia.</td></tr>
+
+<tr><td class="onelinetop"><span class="path">~/config/settings/kernel/drivers/</span></td><td> </td>
+<td>Jeden zo súbory nastavení môže byť zaujímavý: <span class="cli">kernel</span> ponúka niektoré nízkoúrovňové konfiguračné voľby ako vypnutie <acronym title="Symmetric Multi Processing">SMP</acronym>, výstup ladiacich informácií na sériový port alebo zapnutie pokročilej správy napájania. Riadok konfigurácie aktivujete odstránením symbolu komentára „<tt>#</tt>“. Buďte tu opatrní!</td></tr>
+
+<tr><td><span class="path">~/config/settings/Tracker/</span></td><td> </td>
+<td>Okrem rozličných konfiguračných súborov Trackera sú tu niektoré zaujímavé podpriečinky:</td></tr>
+
+<tr><td align="right"><span class="path">DefaultFolderTemplate/</span></td><td style="width:10px;"></td><td>Zobrazenie a prispôsobenie všetkých atribútov a veľkosti okna vaším potrebám. Každý nový priečinok, ktorý vytvoríte ho použije ako šablónu.</td></tr>
+
+<tr><td align="right"><span class="path">DefaultQueryTemplates/</span></td><td></td><td>Môžete definovať rozloženie okien výsledkov požiadaviek pre niektoré typy súborov. Pozri tému <a href="queries.html#result-window">Požiadavka: Okno výsledkov</a>.</td></tr>
+
+<tr><td align="right"><span class="path">Go/</span></td><td></td><td>Sem dajte odkazy na vaše obľúbené miesta, aby boli prístupné napr. v paneloch Otvoriť a Uložiť. Pozri tému <a href="gui.html#favorites-recent">Používateľské rozhranie Haiku: Priečinky Obľúbené a Nedávno použité</a>.</td></tr>
+
+<tr><td align="right"><span class="path">Tracker New Template/</span></td><td></td><td>Pridanie šablóny pre nový typ súborov, ktorý bude potom dostupný z menu Trackera <span class="menu">Súbor | Nový...</span>. Pozri tému <a href="tracker.html#working-with-files">Tracker: Práca so súbormi</a>.</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="bootloader.html">Zavádzač systému</a> 
+::  <a href="contents.html" class="uplink">Obsah</a> 
+::  <a href="gui.html">Používateľské rozhranie Haiku</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

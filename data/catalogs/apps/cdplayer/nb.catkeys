@@ -1,14 +1,14 @@
-1	norwegian_bokmål	x-vnd.Haiku-CDPlayer	592310631
-Audio CD	CDPlayer		Lyd-CD
-CD	CDPlayer		CD
-CD drive is empty	CDPlayer		CD-spilleren er tom
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-CDPlayer	592310631
 CDPlayer	System name		CD-spiller
+CD	CDPlayer		CD
 Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		Disk: %ld:%.2ld / %ld:%.2ld
-Disc: --:-- / --:--	CDPlayer		Disk: --:-- / --:--
-Disc: 88:88 / 88:88	CDPlayer		Disk: 88:88 / 88:88
-It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Det ser ut som om det ikke er noen CD-spiller i maskinen din, eller ingen drivere til å støtte den. Beklager.
 OK	CDPlayer		OK
 Track %whichTrack%: %trackAt%	CDPlayer		Spor %whichTrack%: %trackAt%
+Audio CD	CDPlayer		Lyd-CD
+It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Det ser ut som om det ikke er noen CD-spiller i maskinen din, eller ingen drivere til å støtte den. Beklager.
 Track: %ld:%.2ld / %ld:%.2ld	CDPlayer		Spor: %ld:%.2ld / %ld:%.2ld
-Track: --:-- / --:--	CDPlayer		Spor: --:-- / --:--
 Track: 88:88 / 88:88	CDPlayer		Spor: 88:88 / 88:88
+Track: --:-- / --:--	CDPlayer		Spor: --:-- / --:--
+Disc: 88:88 / 88:88	CDPlayer		Disk: 88:88 / 88:88
+Disc: --:-- / --:--	CDPlayer		Disk: --:-- / --:--
+CD drive is empty	CDPlayer		CD-spilleren er tom

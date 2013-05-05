@@ -216,8 +216,10 @@ int ntfs_mft_record_check(const ntfs_volume *vol, const MFT_REF mref,
 	int ret = -1;
 	
 	if (!ntfs_is_file_record(m->magic)) {
-		ntfs_log_error("Record %llu has no FILE magic (0x%x)\n",
-			       (unsigned long long)MREF(mref), *(le32 *)m);
+		if (!NVolNoFixupWarn(vol))
+			ntfs_log_error("Record %llu has no FILE magic (0x%x)\n",
+				(unsigned long long)MREF(mref),
+				(int)le32_to_cpu(*(le32*)m));
 		goto err_out;
 	}
 	
@@ -1190,7 +1192,7 @@ undo_alloc:
 static int ntfs_mft_record_init(ntfs_volume *vol, s64 size)
 {
 	int ret = -1;
-	ntfs_attr *mft_na, *mftbmp_na;
+	ntfs_attr *mft_na;
 	s64 old_data_initialized, old_data_size;
 	ntfs_attr_search_ctx *ctx;
 	
@@ -1199,7 +1201,6 @@ static int ntfs_mft_record_init(ntfs_volume *vol, s64 size)
 	/* NOTE: Caller must sanity check vol, vol->mft_na and vol->mftbmp_na */
 	
 	mft_na = vol->mft_na;
-	mftbmp_na = vol->mftbmp_na;
 	
 	/*
 	 * The mft record is outside the initialized data. Extend the mft data
@@ -1295,14 +1296,13 @@ undo_data_init:
 static int ntfs_mft_rec_init(ntfs_volume *vol, s64 size)
 {
 	int ret = -1;
-	ntfs_attr *mft_na, *mftbmp_na;
+	ntfs_attr *mft_na;
 	s64 old_data_initialized, old_data_size;
 	ntfs_attr_search_ctx *ctx;
 	
 	ntfs_log_enter("Entering\n");
 	
 	mft_na = vol->mft_na;
-	mftbmp_na = vol->mftbmp_na;
 	
 	if (size > mft_na->allocated_size || size > mft_na->initialized_size) {
 		errno = EIO;

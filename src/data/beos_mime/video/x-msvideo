@@ -5,7 +5,7 @@ resource(1, "META:TYPE") "video/x-msvideo";
 
 resource(2, "META:SNIFF_RULE") "0.50 (\"RIFF????AVI \" & 0xffffffff00000000ffffffff)";
 
-resource(3, "META:S:DESC") #'MSDC' "AVI Movie";
+resource(3, "META:S:DESC") #'MSDC' "AVI video file";
 
 resource(4, "META:EXTENS") message(234) {
 	"extensions" = "avi",

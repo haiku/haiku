@@ -1,0 +1,9 @@
+1	lithuanian	x-vnd.Haiku-IMAP	3892875357
+Destination:	imap_config		Paskirties aplankas:
+status	IMAPFolderConfig		būsena
+Apply	IMAPFolderConfig		Taikyti
+IMAP Folders	imap_config		IMAP aplankai
+Fetching IMAP folders, have patience...	IMAPFolderConfig		Gaunamas IMAP aplankų sąrašas, luktelėkite…
+IMAP Folders	IMAPFolderConfig		IMAP aplankai
+Subcribe / Unsuscribe IMAP folders, have patience...	IMAPFolderConfig		Keičiamos IMAP aplankų prenumeratos, luktelėkite…
+Failed to fetch available storage.	IMAPFolderConfig		Aplankų sąrašo gauti nepavyko.

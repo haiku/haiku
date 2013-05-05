@@ -1,0 +1,26 @@
+1	hindi	x-vnd.haiku-screenshot	1697748405
+seconds	ScreenshotWindow		सेकंडस
+Desktop	ScreenshotWindow		डेस्कटॉप
+Include window border	ScreenshotWindow		विंडो बॉर्डर को शामिल करे
+Screenshot	System name		स्क्रीनशॉट
+Select	ScreenshotWindow		चयन करें
+Capture active window	ScreenshotWindow		सक्रिय विंडो को कैप्चर करे
+Cancel	ScreenshotWindow		रद्द करे
+Name:	ScreenshotWindow		नाम:
+Choose folder	ScreenshotWindow		फ़ोल्डर को चुनें
+Save	ScreenshotWindow		सहेजें
+Choose folder...	ScreenshotWindow		फ़ोल्डर को चुनें...
+Please select	ScreenshotWindow		कृपया चुनें
+Save as:	ScreenshotWindow		इस रूप में सहेजें:
+Copy to clipboard	ScreenshotWindow		क्लिपबोर्ड पर प्रतिलिपि करे
+Save in:	ScreenshotWindow		इसमें सहेजें
+screenshot	Screenshot	Base filename of screenshot files	स्क्रीनशॉट
+New screenshot	ScreenshotWindow		नया स्क्रीनशॉट
+Artwork folder	ScreenshotWindow		कलाकृति का फ़ोल्डर
+Home folder	ScreenshotWindow		होम फ़ोल्डर
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		यह फ़ाइल पहले से मौजूद है.\n क्या आप इसे अधिलेखित करना चाहते हैं?
+Settings…	ScreenshotWindow		रूपरेखाएँ...
+overwrite	ScreenshotWindow		अधिलेखित
+Delay:	ScreenshotWindow		विलंब:
+Include mouse pointer	ScreenshotWindow		माउस सूचक को शामिल करें
+Translator Settings	ScreenshotWindow		अनुवादक की सेटिंग्स

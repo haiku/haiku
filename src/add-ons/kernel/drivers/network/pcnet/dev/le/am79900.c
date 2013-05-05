@@ -110,7 +110,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/dev/le/am79900.c,v 1.1.2.3 2006/06/18 15:43:18 marius Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <sys/param.h>
 #include <sys/bus.h>
@@ -171,8 +171,6 @@ am79900_config(struct am79900_softc *sc, const char* name, int unit)
 
 	if (mem > sc->lsc.sc_memsize)
 		panic("%s: memsize", __func__);
-
-	sc->lsc.sc_flags |= LE_DEBUG;
 
 	lance_attach(&sc->lsc);
 
@@ -425,7 +423,7 @@ am79900_tint(struct lance_softc *sc)
 
 	sc->sc_first_td = bix;
 
-	ifp->if_timer = sc->sc_no_td > 0 ? 5 : 0;
+	sc->sc_wdog_timer = sc->sc_no_td > 0 ? 5 : 0;
 }
 
 /*
@@ -447,9 +445,9 @@ am79900_intr(void *arg)
 		return;
 	}
 
-#if 0
+#ifndef __HAIKU__
 	isr = (*sc->sc_rdcsr)(sc, LE_CSR0);
-#endif
+#else
 	{
 		HAIKU_INTR_REGISTER_STATE;
 		HAIKU_INTR_REGISTER_ENTER();
@@ -457,7 +455,7 @@ am79900_intr(void *arg)
 		sc->sc_lastisr = 0;
 		HAIKU_INTR_REGISTER_LEAVE();
 	}
-
+#endif
 #if defined(LEDEBUG) && LEDEBUG > 1
 	if (sc->sc_flags & LE_DEBUG)
 		if_printf(ifp, "%s: entering with isr=%04x\n", __func__, isr);
@@ -471,10 +469,9 @@ am79900_intr(void *arg)
 	 * Clear interrupt source flags and turn off interrupts. If we
 	 * don't clear these flags before processing their sources we
 	 * could completely miss some interrupt events as the NIC can
-	 * change these flags while we're in this handler. We turn off
-	 * interrupts so we don't get another RX interrupt while still
-	 * processing the previous one in ifp->if_input() with the
-	 * driver lock dropped.
+	 * change these flags while we're in this handler. We toggle
+	 * the interrupt enable bit in order to keep receiving them
+	 * (some chips work without this, some don't).
 	 */
 	(*sc->sc_wrcsr)(sc, LE_CSR0, isr & ~(LE_C0_INEA | LE_C0_TDMD |
 	    LE_C0_STOP | LE_C0_STRT | LE_C0_INIT));
@@ -626,7 +623,7 @@ am79900_start_locked(struct lance_softc *sc)
 	sc->sc_last_td = bix;
 
 	if (enq > 0)
-		ifp->if_timer = 5;
+		sc->sc_wdog_timer = 5;
 }
 
 #ifdef LEDEBUG

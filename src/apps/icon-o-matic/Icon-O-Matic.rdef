@@ -20,6 +20,11 @@ resource app_version {
 
 resource app_flags B_SINGLE_LAUNCH;
 
+resource file_types message {
+	"types" = "application/x-vnd.Haiku-icon",
+	"types" = "image/svg+xml"
+};
+
 resource vector_icon {
 	$"6E6369660E050102000603399E0F3D9C0ABF82B23B84A94B88504910C900A5B1"
 	$"FFBCEAF1FFFFB3B8FF020106023E49240000000000003CAAAA4940004A8000FF"

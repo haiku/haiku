@@ -16,6 +16,7 @@
 
 struct pci_info;
 struct pci_module_info;
+struct pci_x86_module_info;
 class OHCIRootHub;
 
 typedef struct transfer_data {
@@ -140,6 +141,8 @@ inline	uint32						_ReadReg(uint32 reg);
 										ohci_general_td *topDescriptor);
 
 static	pci_module_info *			sPCIModule;
+static	pci_x86_module_info *		sPCIx86Module;
+
 		pci_info *					fPCIInfo;
 		Stack *						fStack;
 

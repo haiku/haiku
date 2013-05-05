@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2012, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -25,79 +25,88 @@
 #include "AddShapesCommand.h"
 #include "AddStylesCommand.h"
 #include "CommandStack.h"
+#include "CompoundCommand.h"
 #include "FreezeTransformationCommand.h"
 #include "MoveShapesCommand.h"
 #include "Observer.h"
+#include "PathContainer.h"
 #include "RemoveShapesCommand.h"
 #include "ResetTransformationCommand.h"
 #include "Selection.h"
 #include "Shape.h"
+#include "Style.h"
+#include "StyleContainer.h"
 #include "Util.h"
+#include "VectorPath.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Icon-O-Matic-ShapesList"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Icon-O-Matic-ShapesList"
 
 
 using std::nothrow;
 
-class ShapeListItem : public SimpleItem,
-					  public Observer {
- public:
-					ShapeListItem(Shape* s,
-								  ShapeListView* listView)
-						: SimpleItem(""),
-						  shape(NULL),
-						  fListView(listView)
-					{
-						SetClip(s);
-					}
+class ShapeListItem : public SimpleItem, public Observer {
+public:
+	ShapeListItem(Shape* s, ShapeListView* listView)
+		:
+		SimpleItem(""),
+		shape(NULL),
+		fListView(listView)
+	{
+		SetShape(s);
+	}
 
-	virtual			~ShapeListItem()
-					{
-						SetClip(NULL);
-					}
 
-	virtual	void	ObjectChanged(const Observable* object)
-					{
-						UpdateText();
-					}
+	virtual	~ShapeListItem()
+	{
+		SetShape(NULL);
+	}
 
-			void	SetClip(Shape* s)
-					{
-						if (s == shape)
-							return;
 
-						if (shape) {
-							shape->RemoveObserver(this);
-							shape->Release();
-						}
+	virtual	void ObjectChanged(const Observable* object)
+	{
+		UpdateText();
+	}
 
-						shape = s;
+	void SetShape(Shape* s)
+	{
+		if (s == shape)
+			return;
 
-						if (shape) {
-							shape->Acquire();
-							shape->AddObserver(this);
-							UpdateText();
-						}
-					}
-			void	UpdateText()
-					{
-						SetText(shape->Name());
-						// :-/
-						if (fListView->LockLooper()) {
-							fListView->InvalidateItem(
-								fListView->IndexOf(this));
-							fListView->UnlockLooper();
-						}
-					}
+		if (shape) {
+			shape->RemoveObserver(this);
+			shape->Release();
+		}
 
+		shape = s;
+
+		if (shape) {
+			shape->Acquire();
+			shape->AddObserver(this);
+			UpdateText();
+		}
+	}
+
+	void UpdateText()
+	{
+		SetText(shape->Name());
+		if (fListView->LockLooper()) {
+			fListView->InvalidateItem(fListView->IndexOf(this));
+			fListView->UnlockLooper();
+		}
+	}
+
+public:
 	Shape* 			shape;
- private:
+
+private:
 	ShapeListView*	fListView;
 };
 
+
 // #pragma mark -
+
 
 enum {
 	MSG_REMOVE						= 'rmsh',
@@ -108,31 +117,32 @@ enum {
 	MSG_DRAG_SHAPE					= 'drgs',
 };
 
-// constructor
-ShapeListView::ShapeListView(BRect frame,
-							 const char* name,
-							 BMessage* message, BHandler* target)
-	: SimpleListView(frame, name,
-					 NULL, B_MULTIPLE_SELECTION_LIST),
-	  fMessage(message),
-	  fShapeContainer(NULL),
-	  fCommandStack(NULL)
+
+ShapeListView::ShapeListView(BRect frame, const char* name, BMessage* message,
+	BHandler* target)
+	:
+	SimpleListView(frame, name, NULL, B_MULTIPLE_SELECTION_LIST),
+	fMessage(message),
+	fShapeContainer(NULL),
+	fStyleContainer(NULL),
+	fPathContainer(NULL),
+	fCommandStack(NULL)
 {
 	SetDragCommand(MSG_DRAG_SHAPE);
 	SetTarget(target);
 }
 
-// destructor
+
 ShapeListView::~ShapeListView()
 {
 	_MakeEmpty();
 	delete fMessage;
 
-	if (fShapeContainer)
+	if (fShapeContainer != NULL)
 		fShapeContainer->RemoveListener(this);
 }
 
-// SelectionChanged
+
 void
 ShapeListView::SelectionChanged()
 {
@@ -151,7 +161,7 @@ ShapeListView::SelectionChanged()
 	_UpdateMenu();
 }
 
-// MessageReceived
+
 void
 ShapeListView::MessageReceived(BMessage* message)
 {
@@ -159,7 +169,9 @@ ShapeListView::MessageReceived(BMessage* message)
 		case MSG_REMOVE:
 			RemoveSelected();
 			break;
-		case MSG_DUPLICATE: {
+
+		case MSG_DUPLICATE:
+		{
 			int32 count = CountSelectedItems();
 			int32 index = 0;
 			BList items;
@@ -172,7 +184,9 @@ ShapeListView::MessageReceived(BMessage* message)
 			CopyItems(items, index + 1);
 			break;
 		}
-		case MSG_RESET_TRANSFORMATION: {
+		
+		case MSG_RESET_TRANSFORMATION:
+		{
 			BList shapes;
 			_GetSelectedShapes(shapes);
 			int32 count = shapes.CountItems();
@@ -191,27 +205,30 @@ ShapeListView::MessageReceived(BMessage* message)
 			fCommandStack->Perform(command);
 			break;
 		}
-		case MSG_FREEZE_TRANSFORMATION: {
+		
+		case MSG_FREEZE_TRANSFORMATION:
+		{
 			BList shapes;
 			_GetSelectedShapes(shapes);
 			int32 count = shapes.CountItems();
 			if (count < 0)
 				break;
 
-			FreezeTransformationCommand* command = 
-				new FreezeTransformationCommand((Shape**)shapes.Items(),
+			FreezeTransformationCommand* command
+				= new FreezeTransformationCommand((Shape**)shapes.Items(),
 					count);
 
 			fCommandStack->Perform(command);
 			break;
 		}
+
 		default:
 			SimpleListView::MessageReceived(message);
 			break;
 	}
 }
 
-// MakeDragMessage
+
 void
 ShapeListView::MakeDragMessage(BMessage* message) const
 {
@@ -221,51 +238,199 @@ ShapeListView::MakeDragMessage(BMessage* message) const
 	for (int32 i = 0; i < count; i++) {
 		ShapeListItem* item = dynamic_cast<ShapeListItem*>(
 			ItemAt(CurrentSelection(i)));
-		if (item)
+		if (item != NULL && item->shape != NULL) {
 			message->AddPointer("shape", (void*)item->shape);
-		else
+			
+			// Add archives of everything this Shape uses
+			BMessage archive;
+			
+			BMessage styleArchive;
+			item->shape->Style()->Archive(&styleArchive, true);
+			archive.AddMessage("style", &styleArchive);
+
+			PathContainer* paths = item->shape->Paths();
+			for (int32 j = 0; j < paths->CountPaths(); j++) {
+				BMessage pathArchive;
+				paths->PathAt(j)->Archive(&pathArchive, true);
+				archive.AddMessage("path", &pathArchive);
+			}
+
+			BMessage shapeArchive;
+			item->shape->Archive(&shapeArchive, true);
+			archive.AddMessage("shape", &shapeArchive);
+
+			message->AddMessage("shape archive", &archive);
+		} else
 			break;
 	}
-
-//		message->AddInt32("be:actions", B_COPY_TARGET);
-//		message->AddInt32("be:actions", B_TRASH_TARGET);
-//
-//		message->AddString("be:types", B_FILE_MIME_TYPE);
-////		message->AddString("be:filetypes", "");
-////		message->AddString("be:type_descriptions", "");
-//
-//		message->AddString("be:clip_name", item->shape->Name());
-//
-//		message->AddString("be:originator", "Icon-O-Matic");
-//		message->AddPointer("be:originator_data", (void*)item->shape);
 }
 
-// AcceptDragMessage
+
 bool
 ShapeListView::AcceptDragMessage(const BMessage* message) const
 {
 	return SimpleListView::AcceptDragMessage(message);
 }
 
-// SetDropTargetRect
+
 void
 ShapeListView::SetDropTargetRect(const BMessage* message, BPoint where)
 {
 	SimpleListView::SetDropTargetRect(message, where);
 }
 
+
+bool
+ShapeListView::HandleDropMessage(const BMessage* message, int32 dropIndex)
+{
+	// Let SimpleListView handle drag-sorting (when drag came from ourself)
+	if (SimpleListView::HandleDropMessage(message, dropIndex))
+		return true;
+
+	if (fCommandStack == NULL || fShapeContainer == NULL
+		|| fStyleContainer == NULL || fPathContainer == NULL) {
+		return false;
+	}
+
+	// Drag may have come from another instance, like in another window.
+	// Reconstruct the Shapes from the archive and add them at the drop
+	// index.
+	int index = 0;
+	BList styles;
+	BList paths;
+	BList shapes;
+	while (true) {
+		BMessage archive;
+		if (message->FindMessage("shape archive", index, &archive) != B_OK)
+			break;
+
+		// Extract the shape archive		
+		BMessage shapeArchive;
+		if (archive.FindMessage("shape", &shapeArchive) != B_OK)
+			break;
+
+		// Extract the style
+		BMessage styleArchive;
+		if (archive.FindMessage("style", &styleArchive) != B_OK)
+			break;
+
+		Style* style = new Style(&styleArchive);
+		if (style == NULL)
+			break;
+		
+		Style* styleToAssign = style;
+		// Try to find an existing style that is the same as the extracted
+		// style and use that one instead.
+		for (int32 i = 0; i < fStyleContainer->CountStyles(); i++) {
+			Style* other = fStyleContainer->StyleAtFast(i);
+			if (*other == *style) {
+				styleToAssign = other;
+				delete style;
+				style = NULL;
+				break;
+			}
+		}
+		
+		if (style != NULL && !styles.AddItem(style)) {
+			delete style;
+			break;
+		}
+
+		// Create the shape using the given style
+		Shape* shape = new(std::nothrow) Shape(styleToAssign);
+		if (shape == NULL)
+			break;
+
+		if (shape->Unarchive(&shapeArchive) != B_OK
+			|| !shapes.AddItem(shape)) {
+			delete shape;
+			if (style != NULL) {
+				styles.RemoveItem(style);
+				delete style;
+			}
+			break;
+		}
+		
+		// Extract the paths
+		int pathIndex = 0;
+		while (true) {
+			BMessage pathArchive;
+			if (archive.FindMessage("path", pathIndex, &pathArchive) != B_OK)
+				break;
+			
+			VectorPath* path = new(nothrow) VectorPath(&pathArchive);
+			if (path == NULL)
+				break;
+			
+			VectorPath* pathToInclude = path;
+			for (int32 i = 0; i < fPathContainer->CountPaths(); i++) {
+				VectorPath* other = fPathContainer->PathAtFast(i);
+				if (*other == *path) {
+					pathToInclude = other;
+					delete path;
+					path = NULL;
+					break;
+				}
+			}
+			
+			if (path != NULL && !paths.AddItem(path)) {
+				delete path;
+				break;
+			}
+			
+			shape->Paths()->AddPath(pathToInclude);
+			
+			pathIndex++;
+		}
+
+		index++;
+	}
+
+	int32 shapeCount = shapes.CountItems();
+	if (shapeCount == 0)
+		return false;
+
+	// TODO: Add allocation checks beyond this point.
+
+	AddStylesCommand* stylesCommand = new(std::nothrow) AddStylesCommand(
+		fStyleContainer, (Style**)styles.Items(), styles.CountItems(),
+		fStyleContainer->CountStyles());
+
+	AddPathsCommand* pathsCommand = new(std::nothrow) AddPathsCommand(
+		fPathContainer, (VectorPath**)paths.Items(), paths.CountItems(),
+		true, fPathContainer->CountPaths());
+
+	AddShapesCommand* shapesCommand = new(std::nothrow) AddShapesCommand(
+		fShapeContainer, (Shape**)shapes.Items(), shapeCount, dropIndex,
+		fSelection);
+
+	::Command** commands = new(std::nothrow) ::Command*[3];
+
+	commands[0] = stylesCommand;
+	commands[1] = pathsCommand;
+	commands[2] = shapesCommand;
+
+	CompoundCommand* command = new CompoundCommand(commands, 3,
+		B_TRANSLATE("Drop shapes"), -1);
+
+	fCommandStack->Perform(command);
+
+	return true;
+}
+
+
 // #pragma mark -
 
-// MoveItems
+
 void
 ShapeListView::MoveItems(BList& items, int32 toIndex)
 {
-	if (!fCommandStack || !fShapeContainer)
+	if (fCommandStack == NULL || fShapeContainer == NULL)
 		return;
 
 	int32 count = items.CountItems();
-	Shape** shapes = new (nothrow) Shape*[count];
-	if (!shapes)
+	Shape** shapes = new(nothrow) Shape*[count];
+	if (shapes == NULL)
 		return;
 
 	for (int32 i = 0; i < count; i++) {
@@ -274,10 +439,9 @@ ShapeListView::MoveItems(BList& items, int32 toIndex)
 		shapes[i] = item ? item->shape : NULL;
 	}
 
-	MoveShapesCommand* command
-		= new (nothrow) MoveShapesCommand(fShapeContainer,
-										  shapes, count, toIndex);
-	if (!command) {
+	MoveShapesCommand* command = new (nothrow) MoveShapesCommand(
+		fShapeContainer, shapes, count, toIndex);
+	if (command == NULL) {
 		delete[] shapes;
 		return;
 	}
@@ -289,7 +453,7 @@ ShapeListView::MoveItems(BList& items, int32 toIndex)
 void
 ShapeListView::CopyItems(BList& items, int32 toIndex)
 {
-	if (!fCommandStack || !fShapeContainer)
+	if (fCommandStack == NULL || fShapeContainer == NULL)
 		return;
 
 	int32 count = items.CountItems();
@@ -298,14 +462,12 @@ ShapeListView::CopyItems(BList& items, int32 toIndex)
 	for (int32 i = 0; i < count; i++) {
 		ShapeListItem* item
 			= dynamic_cast<ShapeListItem*>((BListItem*)items.ItemAtFast(i));
-		shapes[i] = item ? new (nothrow) Shape(*item->shape) : NULL;
+		shapes[i] = item ? new(nothrow) Shape(*item->shape) : NULL;
 	}
 
-	AddShapesCommand* command
-		= new (nothrow) AddShapesCommand(fShapeContainer,
-										 shapes, count, toIndex,
-										 fSelection);
-	if (!command) {
+	AddShapesCommand* command = new(nothrow) AddShapesCommand(fShapeContainer,
+		shapes, count, toIndex, fSelection);
+	if (command == NULL) {
 		for (int32 i = 0; i < count; i++)
 			delete shapes[i];
 		return;
@@ -314,11 +476,11 @@ ShapeListView::CopyItems(BList& items, int32 toIndex)
 	fCommandStack->Perform(command);
 }
 
-// RemoveItemList
+
 void
 ShapeListView::RemoveItemList(BList& items)
 {
-	if (!fCommandStack || !fShapeContainer)
+	if (fCommandStack == NULL || fShapeContainer == NULL)
 		return;
 
 	int32 count = items.CountItems();
@@ -326,43 +488,44 @@ ShapeListView::RemoveItemList(BList& items)
 	for (int32 i = 0; i < count; i++)
 	 	indices[i] = IndexOf((BListItem*)items.ItemAtFast(i));
 
-	RemoveShapesCommand* command
-		= new (nothrow) RemoveShapesCommand(fShapeContainer,
-											indices, count);
+	RemoveShapesCommand* command = new(nothrow) RemoveShapesCommand(
+		fShapeContainer, indices, count);
+
 	fCommandStack->Perform(command);
 }
 
-// CloneItem
+
 BListItem*
 ShapeListView::CloneItem(int32 index) const
 {
-	if (ShapeListItem* item = dynamic_cast<ShapeListItem*>(ItemAt(index))) {
+	ShapeListItem* item = dynamic_cast<ShapeListItem*>(ItemAt(index));
+	if (item != NULL) {
 		return new ShapeListItem(item->shape,
-								 const_cast<ShapeListView*>(this));
+			const_cast<ShapeListView*>(this));
 	}
 	return NULL;
 }
 
-// IndexOfSelectable
+
 int32
 ShapeListView::IndexOfSelectable(Selectable* selectable) const
 {
 	Shape* shape = dynamic_cast<Shape*>(selectable);
-	if (!shape) {
+	if (shape == NULL) {
 		Transformer* transformer = dynamic_cast<Transformer*>(selectable);
-		if (!transformer)
+		if (transformer == NULL)
 			return -1;
-		for (int32 i = 0;
-			 ShapeListItem* item = dynamic_cast<ShapeListItem*>(ItemAt(i));
-			 i++) {
-			if (item->shape->HasTransformer(transformer))
+		int32 count = CountItems();
+		for (int32 i = 0; i < count; i++) {
+			ShapeListItem* item = dynamic_cast<ShapeListItem*>(ItemAt(i));
+			if (item != NULL && item->shape->HasTransformer(transformer))
 				return i;
 		}
 	} else {
-		for (int32 i = 0;
-			 ShapeListItem* item = dynamic_cast<ShapeListItem*>(ItemAt(i));
-			 i++) {
-			if (item->shape == shape)
+		int32 count = CountItems();
+		for (int32 i = 0; i < count; i++) {
+			ShapeListItem* item = dynamic_cast<ShapeListItem*>(ItemAt(i));
+			if (item != NULL && item->shape == shape)
 				return i;
 		}
 	}
@@ -370,19 +533,20 @@ ShapeListView::IndexOfSelectable(Selectable* selectable) const
 	return -1;
 }
 
-// SelectableFor
+
 Selectable*
 ShapeListView::SelectableFor(BListItem* item) const
 {
 	ShapeListItem* shapeItem = dynamic_cast<ShapeListItem*>(item);
-	if (shapeItem)
+	if (shapeItem != NULL)
 		return shapeItem->shape;
 	return NULL;
 }
 
+
 // #pragma mark -
 
-// ShapeAdded
+
 void
 ShapeListView::ShapeAdded(Shape* shape, int32 index)
 {
@@ -399,7 +563,7 @@ ShapeListView::ShapeAdded(Shape* shape, int32 index)
 	UnlockLooper();
 }
 
-// ShapeRemoved
+
 void
 ShapeListView::ShapeRemoved(Shape* shape)
 {
@@ -416,9 +580,10 @@ ShapeListView::ShapeRemoved(Shape* shape)
 	UnlockLooper();
 }
 
+
 // #pragma mark -
 
-// SetMenu
+
 void
 ShapeListView::SetMenu(BMenu* menu)
 {
@@ -426,6 +591,7 @@ ShapeListView::SetMenu(BMenu* menu)
 		return;
 
 	fMenu = menu;
+
 	if (fMenu == NULL)
 		return;
 
@@ -480,7 +646,7 @@ ShapeListView::SetMenu(BMenu* menu)
 	_UpdateMenu();
 }
 
-// SetShapeContainer
+
 void
 ShapeListView::SetShapeContainer(ShapeContainer* container)
 {
@@ -488,14 +654,14 @@ ShapeListView::SetShapeContainer(ShapeContainer* container)
 		return;
 
 	// detach from old container
-	if (fShapeContainer)
+	if (fShapeContainer != NULL)
 		fShapeContainer->RemoveListener(this);
 
 	_MakeEmpty();
 
 	fShapeContainer = container;
 
-	if (!fShapeContainer)
+	if (fShapeContainer == NULL)
 		return;
 
 	fShapeContainer->AddListener(this);
@@ -506,54 +672,79 @@ ShapeListView::SetShapeContainer(ShapeContainer* container)
 		_AddShape(fShapeContainer->ShapeAtFast(i), i);
 }
 
-// SetCommandStack
+
+void
+ShapeListView::SetStyleContainer(StyleContainer* container)
+{
+	fStyleContainer = container;
+}
+
+
+void
+ShapeListView::SetPathContainer(PathContainer* container)
+{
+	fPathContainer = container;
+}
+
+
 void
 ShapeListView::SetCommandStack(CommandStack* stack)
 {
 	fCommandStack = stack;
 }
 
+
 // #pragma mark -
 
-// _AddShape
+
 bool
 ShapeListView::_AddShape(Shape* shape, int32 index)
 {
-	if (shape)
-		 return AddItem(new ShapeListItem(shape, this), index);
-	return false;
+	if (shape == NULL)
+		return false;
+	
+	ShapeListItem* item = new(std::nothrow) ShapeListItem(shape, this);
+	if (item == NULL)
+		return false;
+	
+	if (!AddItem(item, index)) {
+		delete item;
+		return false;
+	}
+	
+	return true;
 }
 
-// _RemoveShape
+
 bool
 ShapeListView::_RemoveShape(Shape* shape)
 {
 	ShapeListItem* item = _ItemForShape(shape);
-	if (item && RemoveItem(item)) {
+	if (item != NULL && RemoveItem(item)) {
 		delete item;
 		return true;
 	}
 	return false;
 }
 
-// _ItemForShape
+
 ShapeListItem*
 ShapeListView::_ItemForShape(Shape* shape) const
 {
-	for (int32 i = 0;
-		 ShapeListItem* item = dynamic_cast<ShapeListItem*>(ItemAt(i));
-		 i++) {
-		if (item->shape == shape)
+	int32 count = CountItems();
+	for (int32 i = 0; i < count; i++) {
+		ShapeListItem* item = dynamic_cast<ShapeListItem*>(ItemAt(i));
+		if (item != NULL && item->shape == shape)
 			return item;
 	}
 	return NULL;
 }
 
-// _UpdateMenu
+
 void
 ShapeListView::_UpdateMenu()
 {
-	if (!fMenu)
+	if (fMenu == NULL)
 		return;
 
 	bool gotSelection = CurrentSelection(0) >= 0;
@@ -564,7 +755,7 @@ ShapeListView::_UpdateMenu()
 	fRemoveMI->SetEnabled(gotSelection);
 }
 
-// _GetSelectedShapes
+
 void
 ShapeListView::_GetSelectedShapes(BList& shapes) const
 {
@@ -572,7 +763,7 @@ ShapeListView::_GetSelectedShapes(BList& shapes) const
 	for (int32 i = 0; i < count; i++) {
 		ShapeListItem* item = dynamic_cast<ShapeListItem*>(
 			ItemAt(CurrentSelection(i)));
-		if (item && item->shape) {
+		if (item != NULL && item->shape != NULL) {
 			if (!shapes.AddItem((void*)item->shape))
 				break;
 		}

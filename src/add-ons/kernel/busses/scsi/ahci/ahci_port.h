@@ -33,6 +33,7 @@ private:
 	void		ScsiTestUnitReady(scsi_ccb *request);
 	void		ScsiInquiry(scsi_ccb *request);
 	void		ScsiReadCapacity(scsi_ccb *request);
+	void		ScsiReadCapacity16(scsi_ccb *request);
 	void		ScsiReadWrite(scsi_ccb *request, uint64 lba, size_t sectorCount, bool isWrite);
 	void		ScsiSynchronizeCache(scsi_ccb *request);
 
@@ -70,6 +71,7 @@ private:
 	bool							fTestUnitReadyActive;
 	bool							fResetPort;
 	bool							fError;
+	bool							fTrim;
 
 	volatile fis *					fFIS;
 	volatile command_list_entry *	fCommandList;

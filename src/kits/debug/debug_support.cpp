@@ -1,6 +1,6 @@
 /*
  * Copyright 2005-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -345,7 +345,7 @@ debug_get_stack_frame(debug_context *context, void *stackFrameAddress,
 
 // debug_create_symbol_lookup_context
 status_t
-debug_create_symbol_lookup_context(team_id team,
+debug_create_symbol_lookup_context(team_id team, image_id image,
 	debug_symbol_lookup_context **_lookupContext)
 {
 	if (team < 0 || !_lookupContext)
@@ -359,7 +359,7 @@ debug_create_symbol_lookup_context(team_id team,
 	ObjectDeleter<debug_symbol_lookup_context> contextDeleter(lookupContext);
 
 	// create and init symbol lookup
-	SymbolLookup *lookup = new(std::nothrow) SymbolLookup(team);
+	SymbolLookup *lookup = new(std::nothrow) SymbolLookup(team, image);
 	if (lookup == NULL)
 		return B_NO_MEMORY;
 	ObjectDeleter<SymbolLookup> lookupDeleter(lookup);

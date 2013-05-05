@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 Haiku Inc.
+ * Copyright 2008-2012 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SEMAPHORE_H_

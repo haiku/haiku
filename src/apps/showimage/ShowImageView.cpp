@@ -90,8 +90,8 @@ ShowImageView::fTransformation[ImageProcessor::kNumberOfAffineTransformations]
 	{k0V, k90V, k0H, k270V, k0, k90, k180, k270}
 };
 
-const rgb_color kAlphaLow = (rgb_color){ 0xbb, 0xbb, 0xbb, 0xff };
-const rgb_color kAlphaHigh = (rgb_color){ 0xe0, 0xe0, 0xe0, 0xff };
+const rgb_color kAlphaLow = (rgb_color) { 0xbb, 0xbb, 0xbb, 0xff };
+const rgb_color kAlphaHigh = (rgb_color) { 0xe0, 0xe0, 0xe0, 0xff };
 
 const uint32 kMsgPopUpMenuClosed = 'pmcl';
 
@@ -129,17 +129,16 @@ compose_checker_background(const BBitmap* bitmap)
 				p[3] = 255;
 				alpha = 255 - alpha;
 				if (x % 10 >= 5) {
-					if (i % 10 >= 5) {
+					if (i % 10 >= 5)
 						blend_colors(p, kAlphaLow.red, kAlphaLow.green, kAlphaLow.blue, alpha);
-					} else {
+					else
 						blend_colors(p, kAlphaHigh.red, kAlphaHigh.green, kAlphaHigh.blue, alpha);
-					}
+					
 				} else {
-					if (i % 10 >= 5) {
+					if (i % 10 >= 5)
 						blend_colors(p, kAlphaHigh.red, kAlphaHigh.green, kAlphaHigh.blue, alpha);
-					} else {
+					else
 						blend_colors(p, kAlphaLow.red, kAlphaLow.green, kAlphaLow.blue, alpha);
-					}
 				}
 			}
 			p += 4;
@@ -171,7 +170,7 @@ PopUpMenu::~PopUpMenu()
 //	#pragma mark -
 
 
-ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
+ShowImageView::ShowImageView(BRect rect, const char* name, uint32 resizingMode,
 		uint32 flags)
 	:
 	BView(rect, name, resizingMode, flags),
@@ -245,14 +244,16 @@ ShowImageView::Pulse()
 	}
 
 	if (fHideCursor && !fHasSelection && !fShowingPopUpMenu && fIsActiveWin) {
-		if (fHideCursorCountDown <= 0) {
+		if (fHideCursorCountDown == 0) {
+			// Go negative so this isn't triggered again
+			fHideCursorCountDown--;
+
 			BPoint mousePos;
 			uint32 buttons;
 			GetMouse(&mousePos, &buttons, false);
-			if (Bounds().Contains(mousePos)) {
+			if (Bounds().Contains(mousePos))
 				be_app->ObscureCursor();
-			}
-		} else
+		} else if (fHideCursorCountDown > 0)
 			fHideCursorCountDown--;
 	}
 
@@ -263,7 +264,7 @@ ShowImageView::Pulse()
 
 
 void
-ShowImageView::_SendMessageToWindow(BMessage *message)
+ShowImageView::_SendMessageToWindow(BMessage* message)
 {
 	BMessenger target(Window());
 	target.SendMessage(message);
@@ -349,12 +350,13 @@ ShowImageView::SetImage(const BMessage* message)
 		|| message->FindRef("ref", &ref) != B_OK || bitmap == NULL)
 		return B_ERROR;
 
-	status_t status = SetImage(&ref, bitmap);
+	BitmapOwner* bitmapOwner;
+	message->FindPointer("bitmapOwner", (void**)&bitmapOwner);
+
+	status_t status = SetImage(&ref, bitmap, bitmapOwner);
 	if (status == B_OK) {
 		fFormatDescription = message->FindString("type");
 		fMimeType = message->FindString("mime");
-
-		message->FindPointer("bitmapOwner", (void**)&fBitmapOwner);
 	}
 
 	return status;
@@ -362,15 +364,16 @@ ShowImageView::SetImage(const BMessage* message)
 
 
 status_t
-ShowImageView::SetImage(const entry_ref* ref, BBitmap* bitmap)
+ShowImageView::SetImage(const entry_ref* ref, BBitmap* bitmap,
+		BitmapOwner* bitmapOwner)
 {
 	// Delete the old one, and clear everything
-	fUndo.Clear();
 	_SetHasSelection(false);
 	fCreatingSelection = false;
 	_DeleteBitmap();
 
 	fBitmap = bitmap;
+	fBitmapOwner = bitmapOwner;
 	if (ref == NULL)
 		fCurrentRef.device = -1;
 	else
@@ -530,7 +533,6 @@ void
 ShowImageView::AttachedToWindow()
 {
 	FitToBounds();
-	fUndo.SetWindow(Window());
 	FixupScrollBars();
 }
 
@@ -605,18 +607,18 @@ ShowImageView::_DrawBackground(BRect border)
 {
 	BRect bounds(Bounds());
 	// top
-	FillRect(BRect(0, 0, bounds.right, border.top-1), B_SOLID_LOW);
+	FillRect(BRect(0, 0, bounds.right, border.top - 1), B_SOLID_LOW);
 	// left
-	FillRect(BRect(0, border.top, border.left-1, border.bottom), B_SOLID_LOW);
+	FillRect(BRect(0, border.top, border.left - 1, border.bottom), B_SOLID_LOW);
 	// right
-	FillRect(BRect(border.right+1, border.top, bounds.right, border.bottom), B_SOLID_LOW);
+	FillRect(BRect(border.right + 1, border.top, bounds.right, border.bottom), B_SOLID_LOW);
 	// bottom
-	FillRect(BRect(0, border.bottom+1, bounds.right, bounds.bottom), B_SOLID_LOW);
+	FillRect(BRect(0, border.bottom + 1, bounds.right, bounds.bottom), B_SOLID_LOW);
 }
 
 
 void
-ShowImageView::_LayoutCaption(BFont &font, BPoint &pos, BRect &rect)
+ShowImageView::_LayoutCaption(BFont& font, BPoint& pos, BRect& rect)
 {
 	font_height fontHeight;
 	float width, height;
@@ -790,7 +792,7 @@ ShowImageView::_CopySelection(uchar alpha, bool imageSize)
 bool
 ShowImageView::_AddSupportedTypes(BMessage* msg, BBitmap* bitmap)
 {
-	BTranslatorRoster *roster = BTranslatorRoster::Default();
+	BTranslatorRoster* roster = BTranslatorRoster::Default();
 	if (roster == NULL)
 		return false;
 
@@ -812,9 +814,9 @@ ShowImageView::_AddSupportedTypes(BMessage* msg, BBitmap* bitmap)
 			int32 count;
 			roster->GetOutputFormats(info[i].translator, &formats, &count);
 			for (int32 j = 0; j < count; j++) {
-				if (fMimeType == formats[j].MIME) {
+				if (fMimeType == formats[j].MIME)
 					foundCurrent = true;
-				} else if (strcmp(formats[j].MIME, "image/x-be-bitmap") != 0) {
+				else if (strcmp(formats[j].MIME, "image/x-be-bitmap") != 0) {
 					foundOther = true;
 					// needed to send data in message
 					msg->AddString("be:types", formats[j].MIME);
@@ -915,8 +917,8 @@ ShowImageView::_OutputFormatForType(BBitmap* bitmap, const char* type,
 }
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "SaveToFile"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "SaveToFile"
 
 
 void
@@ -932,7 +934,7 @@ ShowImageView::SaveToFile(BDirectory* dir, const char* name, BBitmap* bitmap,
 
 	bool loop = true;
 	while (loop) {
-		BTranslatorRoster *roster = BTranslatorRoster::Default();
+		BTranslatorRoster* roster = BTranslatorRoster::Default();
 		if (!roster)
 			break;
 		// write data
@@ -954,7 +956,8 @@ ShowImageView::SaveToFile(BDirectory* dir, const char* name, BBitmap* bitmap,
 		char buffer[512];
 		snprintf(buffer, sizeof(buffer), B_TRANSLATE("The file '%s' could not "
 			"be written."), name);
-		BAlert *palert = new BAlert("", buffer, B_TRANSLATE("OK"));
+		BAlert* palert = new BAlert("", buffer, B_TRANSLATE("OK"));
+		palert->SetFlags(palert->Flags() | B_CLOSE_ON_ESCAPE);
 		palert->Go();
 	}
 
@@ -965,14 +968,16 @@ ShowImageView::SaveToFile(BDirectory* dir, const char* name, BBitmap* bitmap,
 
 
 void
-ShowImageView::_SendInMessage(BMessage* msg, BBitmap* bitmap, translation_format* format)
+ShowImageView::_SendInMessage(BMessage* msg, BBitmap* bitmap,
+	translation_format* format)
 {
 	BMessage reply(B_MIME_DATA);
 	BBitmapStream stream(bitmap); // destructor deletes bitmap
-	BTranslatorRoster *roster = BTranslatorRoster::Default();
+	BTranslatorRoster* roster = BTranslatorRoster::Default();
 	BMallocIO memStream;
 	if (roster->Translate(&stream, NULL, NULL, &memStream, format->type) == B_OK) {
-		reply.AddData(format->MIME, B_MIME_TYPE, memStream.Buffer(), memStream.BufferLength());
+		reply.AddData(format->MIME, B_MIME_TYPE, memStream.Buffer(),
+			memStream.BufferLength());
 		msg->SendReply(&reply);
 	}
 }
@@ -1172,7 +1177,7 @@ ShowImageView::MouseMoved(BPoint point, uint32 state, const BMessage* message)
 	fHideCursorCountDown = HIDE_CURSOR_DELAY_TIME;
 	if (fHideCursor) {
 		// Show toolbar when mouse hits top 15 pixels, hide otherwise
-		_ShowToolBarIfEnabled(point.y <= 15);
+		_ShowToolBarIfEnabled(ConvertToScreen(point).y <= 15);
 	}
 	if (fCreatingSelection)
 		_UpdateSelectionRect(point, false);
@@ -1335,7 +1340,7 @@ ShowImageView::KeyDown(const char* bytes, int32 numBytes)
 
 
 void
-ShowImageView::_MouseWheelChanged(BMessage *msg)
+ShowImageView::_MouseWheelChanged(BMessage* msg)
 {
 	// The BeOS driver does not currently support
 	// X wheel scrolling, therefore, dx is zero.
@@ -1379,14 +1384,14 @@ void
 ShowImageView::_ShowPopUpMenu(BPoint screen)
 {
 	if (!fShowingPopUpMenu) {
-	  PopUpMenu* menu = new PopUpMenu("PopUpMenu", this);
+		PopUpMenu* menu = new PopUpMenu("PopUpMenu", this);
 
-	  ShowImageWindow* window = dynamic_cast<ShowImageWindow*>(Window());
-	  if (window != NULL)
-		  window->BuildContextMenu(menu);
+		ShowImageWindow* window = dynamic_cast<ShowImageWindow*>(Window());
+		if (window != NULL)
+			window->BuildContextMenu(menu);
 
-	  menu->Go(screen, true, true, true);
-	  fShowingPopUpMenu = true;
+		menu->Go(screen, true, true, true);
+		fShowingPopUpMenu = true;
 	}
 }
 
@@ -1430,18 +1435,18 @@ ShowImageView::FixupScrollBar(orientation o, float bitmapLength,
 	float viewLength)
 {
 	float prop, range;
-	BScrollBar *psb;
+	BScrollBar* psb;
 
 	psb = ScrollBar(o);
 	if (psb) {
 		range = bitmapLength - viewLength;
-		if (range < 0.0) {
+		if (range < 0.0)
 			range = 0.0;
-		}
+
 		prop = viewLength / bitmapLength;
-		if (prop > 1.0) {
+		if (prop > 1.0)
 			prop = 1.0;
-		}
+
 		psb->SetRange(0, range);
 		psb->SetProportion(prop);
 		psb->SetSteps(10, 100);
@@ -1469,46 +1474,6 @@ ShowImageView::SetSelectionMode(bool selectionMode)
 {
 	// The mode only has an effect in MouseDown()
 	fSelectionMode = selectionMode;
-}
-
-
-void
-ShowImageView::Undo()
-{
-	int32 undoType = fUndo.GetType();
-	if (undoType != UNDO_UNDO && undoType != UNDO_REDO)
-		return;
-
-	// backup current selection
-	BRect undoneSelRect;
-	BBitmap *undoneSelection;
-	undoneSelRect = fSelectionBox.Bounds();
-	undoneSelection = _CopySelection();
-
-	if (undoType == UNDO_UNDO) {
-		BBitmap *undoRestore;
-		undoRestore = fUndo.GetRestoreBitmap();
-		if (undoRestore)
-			_MergeWithBitmap(undoRestore, fUndo.GetRect());
-	}
-
-	// restore previous image/selection
-	BBitmap *undoSelection;
-	undoSelection = fUndo.GetSelectionBitmap();
-		// NOTE: ShowImageView is responsible for deleting this bitmap
-		// (Which it will, as it would with a fSelectionBitmap that it allocated itself)
-	if (!undoSelection)
-		_SetHasSelection(false);
-	else {
-		fCopyFromRect = BRect();
-		fSelectionBox.SetBounds(this, fUndo.GetRect());
-		_SetHasSelection(true);
-		fSelectionBitmap = undoSelection;
-	}
-
-	fUndo.Undo(undoneSelRect, NULL, undoneSelection);
-
-	Invalidate();
 }
 
 
@@ -1683,10 +1648,14 @@ ShowImageView::_DoImageOperation(ImageProcessor::operation op, bool quiet)
 	// update orientation state
 	if (op != ImageProcessor::kInvert) {
 		// Note: If one of these fails, check its definition in class ImageProcessor.
-//		ASSERT(ImageProcessor::kRotateClockwise < ImageProcessor::kNumberOfAffineTransformations);
-//		ASSERT(ImageProcessor::kRotateCounterClockwise < ImageProcessor::kNumberOfAffineTransformations);
-//		ASSERT(ImageProcessor::kFlipLeftToRight < ImageProcessor::kNumberOfAffineTransformations);
-//		ASSERT(ImageProcessor::kFlipTopToBottom < ImageProcessor::kNumberOfAffineTransformations);
+//		ASSERT(ImageProcessor::kRotateClockwise <
+//			ImageProcessor::kNumberOfAffineTransformations);
+//		ASSERT(ImageProcessor::kRotateCounterClockwise <
+//			ImageProcessor::kNumberOfAffineTransformations);
+//		ASSERT(ImageProcessor::kFlipLeftToRight <
+//			ImageProcessor::kNumberOfAffineTransformations);
+//		ASSERT(ImageProcessor::kFlipTopToBottom <
+//			ImageProcessor::kNumberOfAffineTransformations);
 		fImageOrientation = fTransformation[op][fImageOrientation];
 	}
 
@@ -1697,14 +1666,16 @@ ShowImageView::_DoImageOperation(ImageProcessor::operation op, bool quiet)
 		if (orientation != k0) {
 			node.WriteAttr(SHOW_IMAGE_ORIENTATION_ATTRIBUTE, B_INT32_TYPE, 0,
 				&orientation, sizeof(orientation));
-		} else {
+		} else
 			node.RemoveAttr(SHOW_IMAGE_ORIENTATION_ATTRIBUTE);
-		}
 	}
 
 	// set new bitmap
 	_DeleteBitmap();
 	fBitmap = bm;
+
+	if (fBitmap->ColorSpace() == B_RGBA32)
+		fDisplayBitmap = compose_checker_background(fBitmap);
 
 	if (!quiet) {
 		// remove selection
@@ -1718,7 +1689,6 @@ ShowImageView::_DoImageOperation(ImageProcessor::operation op, bool quiet)
 void
 ShowImageView::_UserDoImageOperation(ImageProcessor::operation op, bool quiet)
 {
-	fUndo.Clear();
 	_DoImageOperation(op, quiet);
 }
 
@@ -1749,7 +1719,7 @@ ShowImageView::ResizeImage(int w, int h)
 	if (fBitmap == NULL || w < 1 || h < 1)
 		return;
 
-	Scaler scaler(fBitmap, BRect(0, 0, w-1, h-1), BMessenger(), 0, false);
+	Scaler scaler(fBitmap, BRect(0, 0, w - 1, h - 1), BMessenger(), 0, false);
 	scaler.Start(false);
 	BBitmap* scaled = scaler.DetachBitmap();
 	if (scaled == NULL) {
@@ -1759,7 +1729,6 @@ ShowImageView::ResizeImage(int w, int h)
 
 	// remove selection
 	_SetHasSelection(false);
-	fUndo.Clear();
 	_DeleteBitmap();
 	fBitmap = scaled;
 
@@ -1784,17 +1753,17 @@ ShowImageView::_SetIcon(bool clear, icon_size which)
 
 	BRect rect(fBitmap->Bounds());
 	float s;
-	s = size / (rect.Width()+1.0);
+	s = size / (rect.Width() + 1.0);
 
-	if (s * (rect.Height()+1.0) <= size) {
-		rect.right = size-1;
-		rect.bottom = static_cast<int>(s * (rect.Height()+1.0))-1;
+	if (s * (rect.Height() + 1.0) <= size) {
+		rect.right = size - 1;
+		rect.bottom = static_cast<int>(s * (rect.Height() + 1.0)) - 1;
 		// center vertically
 		rect.OffsetBy(0, (size - rect.IntegerHeight()) / 2);
 	} else {
-		s = size / (rect.Height()+1.0);
-		rect.right = static_cast<int>(s * (rect.Width()+1.0))-1;
-		rect.bottom = size-1;
+		s = size / (rect.Height() + 1.0);
+		rect.right = static_cast<int>(s * (rect.Width() + 1.0)) - 1;
+		rect.bottom = size - 1;
 		// center horizontally
 		rect.OffsetBy((size - rect.IntegerWidth()) / 2, 0);
 	}
@@ -1806,7 +1775,7 @@ ShowImageView::_SetIcon(bool clear, icon_size which)
 	scaler.Start(false);
 	ASSERT(thumbnail->ColorSpace() == B_CMAP8);
 	// create icon from thumbnail
-	BBitmap icon(BRect(0, 0, size-1, size-1), B_CMAP8);
+	BBitmap icon(BRect(0, 0, size - 1, size - 1), B_CMAP8);
 	memset(icon.Bits(), B_TRANSPARENT_MAGIC_CMAP8, icon.BitsLength());
 	BScreen screen;
 	const uchar* src = (uchar*)thumbnail->Bits();
@@ -1816,10 +1785,10 @@ ShowImageView::_SetIcon(bool clear, icon_size which)
 	const int32 dx = (int32)rect.left;
 	const int32 dy = (int32)rect.top;
 
-	for (int32 y = 0; y <= rect.IntegerHeight(); y ++) {
-		for (int32 x = 0; x <= rect.IntegerWidth(); x ++) {
+	for (int32 y = 0; y <= rect.IntegerHeight(); y++) {
+		for (int32 x = 0; x <= rect.IntegerWidth(); x++) {
 			const uchar* s = src + y * srcBPR + x;
-			uchar* d = dest + (y+dy) * destBPR + (x+dx);
+			uchar* d = dest + (y + dy) * destBPR + (x + dx);
 			*d = *s;
 		}
 	}

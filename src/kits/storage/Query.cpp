@@ -32,8 +32,7 @@ using namespace std;
 using namespace BPrivate::Storage;
 
 
-/*!	\brief Creates an uninitialized BQuery.
-*/
+// Creates an uninitialized BQuery.
 BQuery::BQuery()
 	:
 	BEntryList(),
@@ -48,17 +47,14 @@ BQuery::BQuery()
 }
 
 
-/*!	\brief Frees all resources associated with the object.
-*/
+// Frees all resources associated with the object.
 BQuery::~BQuery()
 {
 	Clear();
 }
 
 
-/*!	\brief Resets the object to a uninitialized state.
-	\return \c B_OK
-*/
+// Resets the object to a uninitialized state.
 status_t
 BQuery::Clear()
 {
@@ -82,20 +78,7 @@ BQuery::Clear()
 }
 
 
-/*!	\brief Pushes an attribute name onto the BQuery's predicate stack.
-	\param attrName the attribute name
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_NO_MEMORY: Not enough memory.
-	- \c B_NOT_ALLOWED: PushAttribute() was called after Fetch().
-	\note In BeOS R5 this method returns \c void. That is checking the return
-		  value will render your code source and binary incompatible!
-		  Calling PushXYZ() after a Fetch() does change the predicate on R5,
-		  but it doesn't affect the active query and the newly created
-		  predicate can not even be used for the next query, since in order
-		  to be able to reuse the BQuery object for another query, Clear() has
-		  to be called and Clear() also deletes the predicate.
-*/
+// Pushes an attribute name onto the predicate stack.
 status_t
 BQuery::PushAttr(const char* attrName)
 {
@@ -103,20 +86,7 @@ BQuery::PushAttr(const char* attrName)
 }
 
 
-/*!	\brief Pushes an operator onto the BQuery's predicate stack.
-	\param op the code representing the operator
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_NO_MEMORY: Not enough memory.
-	- \c B_NOT_ALLOWED: PushOp() was called after Fetch().
-	\note In BeOS R5 this method returns \c void. That is checking the return
-		  value will render your code source and binary incompatible!
-		  Calling PushXYZ() after a Fetch() does change the predicate on R5,
-		  but it doesn't affect the active query and the newly created
-		  predicate can not even be used for the next query, since in order
-		  to be able to reuse the BQuery object for another query, Clear() has
-		  to be called and Clear() also deletes the predicate.
-*/
+// Pushes an operator onto the predicate stack.
 status_t
 BQuery::PushOp(query_op op)
 {
@@ -146,20 +116,7 @@ BQuery::PushOp(query_op op)
 }
 
 
-/*!	\brief Pushes a uint32 value onto the BQuery's predicate stack.
-	\param value the value
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_NO_MEMORY: Not enough memory.
-	- \c B_NOT_ALLOWED: PushUInt32() was called after Fetch().
-	\note In BeOS R5 this method returns \c void. That is checking the return
-		  value will render your code source and binary incompatible!
-		  Calling PushXYZ() after a Fetch() does change the predicate on R5,
-		  but it doesn't affect the active query and the newly created
-		  predicate can not even be used for the next query, since in order
-		  to be able to reuse the BQuery object for another query, Clear() has
-		  to be called and Clear() also deletes the predicate.
-*/
+// Pushes a uint32 onto the predicate stack.
 status_t
 BQuery::PushUInt32(uint32 value)
 {
@@ -167,20 +124,7 @@ BQuery::PushUInt32(uint32 value)
 }
 
 
-/*!	\brief Pushes an int32 value onto the BQuery's predicate stack.
-	\param value the value
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_NO_MEMORY: Not enough memory.
-	- \c B_NOT_ALLOWED: PushInt32() was called after Fetch().
-	\note In BeOS R5 this method returns \c void. That is checking the return
-		  value will render your code source and binary incompatible!
-		  Calling PushXYZ() after a Fetch() does change the predicate on R5,
-		  but it doesn't affect the active query and the newly created
-		  predicate can not even be used for the next query, since in order
-		  to be able to reuse the BQuery object for another query, Clear() has
-		  to be called and Clear() also deletes the predicate.
-*/
+// Pushes an int32 onto the predicate stack.
 status_t
 BQuery::PushInt32(int32 value)
 {
@@ -188,20 +132,7 @@ BQuery::PushInt32(int32 value)
 }
 
 
-/*!	\brief Pushes a uint64 value onto the BQuery's predicate stack.
-	\param value the value
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_NO_MEMORY: Not enough memory.
-	- \c B_NOT_ALLOWED: PushUInt64() was called after Fetch().
-	\note In BeOS R5 this method returns \c void. That is checking the return
-		  value will render your code source and binary incompatible!
-		  Calling PushXYZ() after a Fetch() does change the predicate on R5,
-		  but it doesn't affect the active query and the newly created
-		  predicate can not even be used for the next query, since in order
-		  to be able to reuse the BQuery object for another query, Clear() has
-		  to be called and Clear() also deletes the predicate.
-*/
+// Pushes a uint64 onto the predicate stack.
 status_t
 BQuery::PushUInt64(uint64 value)
 {
@@ -209,20 +140,7 @@ BQuery::PushUInt64(uint64 value)
 }
 
 
-/*!	\brief Pushes an int64 value onto the BQuery's predicate stack.
-	\param value the value
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_NO_MEMORY: Not enough memory.
-	- \c B_NOT_ALLOWED: PushInt64() was called after Fetch().
-	\note In BeOS R5 this method returns \c void. That is checking the return
-		  value will render your code source and binary incompatible!
-		  Calling PushXYZ() after a Fetch() does change the predicate on R5,
-		  but it doesn't affect the active query and the newly created
-		  predicate can not even be used for the next query, since in order
-		  to be able to reuse the BQuery object for another query, Clear() has
-		  to be called and Clear() also deletes the predicate.
-*/
+// Pushes an int64 onto the predicate stack.
 status_t
 BQuery::PushInt64(int64 value)
 {
@@ -230,20 +148,7 @@ BQuery::PushInt64(int64 value)
 }
 
 
-/*!	\brief Pushes a float value onto the BQuery's predicate stack.
-	\param value the value
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_NO_MEMORY: Not enough memory.
-	- \c B_NOT_ALLOWED: PushFloat() was called after Fetch().
-	\note In BeOS R5 this method returns \c void. That is checking the return
-		  value will render your code source and binary incompatible!
-		  Calling PushXYZ() after a Fetch() does change the predicate on R5,
-		  but it doesn't affect the active query and the newly created
-		  predicate can not even be used for the next query, since in order
-		  to be able to reuse the BQuery object for another query, Clear() has
-		  to be called and Clear() also deletes the predicate.
-*/
+// Pushes a float onto the predicate stack.
 status_t
 BQuery::PushFloat(float value)
 {
@@ -251,20 +156,7 @@ BQuery::PushFloat(float value)
 }
 
 
-/*!	\brief Pushes a double value onto the BQuery's predicate stack.
-	\param value the value
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_NO_MEMORY: Not enough memory.
-	- \c B_NOT_ALLOWED: PushDouble() was called after Fetch().
-	\note In BeOS R5 this method returns \c void. That is checking the return
-		  value will render your code source and binary incompatible!
-		  Calling PushXYZ() after a Fetch() does change the predicate on R5,
-		  but it doesn't affect the active query and the newly created
-		  predicate can not even be used for the next query, since in order
-		  to be able to reuse the BQuery object for another query, Clear() has
-		  to be called and Clear() also deletes the predicate.
-*/
+// Pushes a double onto the predicate stack.
 status_t
 BQuery::PushDouble(double value)
 {
@@ -272,22 +164,7 @@ BQuery::PushDouble(double value)
 }
 
 
-/*!	\brief Pushes a string value onto the BQuery's predicate stack.
-	\param value the value
-	\param caseInsensitive \c true, if the case of the string should be
-		   ignored, \c false otherwise
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_NO_MEMORY: Not enough memory.
-	- \c B_NOT_ALLOWED: PushString() was called after Fetch().
-	\note In BeOS R5 this method returns \c void. That is checking the return
-		  value will render your code source and binary incompatible!
-		  Calling PushXYZ() after a Fetch() does change the predicate on R5,
-		  but it doesn't affect the active query and the newly created
-		  predicate can not even be used for the next query, since in order
-		  to be able to reuse the BQuery object for another query, Clear() has
-		  to be called and Clear() also deletes the predicate.
-*/
+// Pushes a string onto the predicate stack.
 status_t
 BQuery::PushString(const char* value, bool caseInsensitive)
 {
@@ -295,20 +172,7 @@ BQuery::PushString(const char* value, bool caseInsensitive)
 }
 
 
-/*!	\brief Pushes a date value onto the BQuery's predicate stack.
-	The supplied date can be any string understood by the POSIX function
-	parsedate().
-	\param date the date string
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_ERROR: Error parsing the string.
-	- \c B_NOT_ALLOWED: PushDate() was called after Fetch().
-	\note Calling PushXYZ() after a Fetch() does change the predicate on R5,
-		  but it doesn't affect the active query and the newly created
-		  predicate can not even be used for the next query, since in order
-		  to be able to reuse the BQuery object for another query, Clear() has
-		  to be called and Clear() also deletes the predicate.
-*/
+// Pushes a date onto the predicate stack.
 status_t
 BQuery::PushDate(const char* date)
 {
@@ -319,15 +183,7 @@ BQuery::PushDate(const char* date)
 }
 
 
-/*!	\brief Sets the BQuery's volume.
-	A query is restricted to one volume. This method sets this volume. It
-	fails, if called after Fetch(). To reuse a BQuery object it has to be
-	reset via Clear().
-	\param volume the volume
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_NOT_ALLOWED: SetVolume() was called after Fetch().
-*/
+// Assigns a volume to the BQuery object.
 status_t
 BQuery::SetVolume(const BVolume* volume)
 {
@@ -345,18 +201,7 @@ BQuery::SetVolume(const BVolume* volume)
 }
 
 
-/*!	\brief Sets the BQuery's predicate.
-	A predicate can be set either using this method or constructing one on
-	the predicate stack. The two methods can not be mixed. The letter one
-	has precedence over this one.
-	The method fails, if called after Fetch(). To reuse a BQuery object it has
-	to be reset via Clear().
-	\param predicate the predicate string
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_NOT_ALLOWED: SetPredicate() was called after Fetch().
-	- \c B_NO_MEMORY: Insufficient memory to store the predicate.
-*/
+// Assigns the passed-in predicate expression.
 status_t
 BQuery::SetPredicate(const char* expression)
 {
@@ -369,16 +214,7 @@ BQuery::SetPredicate(const char* expression)
 }
 
 
-/*!	\brief Sets the BQuery's target and makes the query live.
-	The query update messages are sent to the specified target. They might
-	roll in immediately after calling Fetch().
-	This methods fails, if called after Fetch(). To reuse a BQuery object it
-	has to be reset via Clear().
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_BAD_VALUE: \a messenger was not properly initialized.
-	- \c B_NOT_ALLOWED: SetTarget() was called after Fetch().
-*/
+// Assigns the target messenger and makes the query live.
 status_t
 BQuery::SetTarget(BMessenger messenger)
 {
@@ -396,9 +232,7 @@ BQuery::SetTarget(BMessenger messenger)
 }
 
 
-/*!	\brief Returns whether the query associated with this object is live.
-	\return \c true, if the query is live, \c false otherwise
-*/
+// Gets whether the query associated with this object is live.
 bool
 BQuery::IsLive() const
 {
@@ -406,20 +240,7 @@ BQuery::IsLive() const
 }
 
 
-/*!	\brief Returns the BQuery's predicate.
-	Regardless of whether the predicate has been constructed using the
-	predicate stack or set via SetPredicate(), this method returns a
-	string representation.
-	\param buffer a pointer to a buffer into which the predicate shall be
-		   written
-	\param length the size of the provided buffer
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_NO_INIT: The predicate isn't set.
-	- \c B_BAD_VALUE: \a buffer is \c NULL or too short.
-	\note This method causes the predicate stack to be evaluated and cleared.
-		  You can't interleave Push*() and GetPredicate() calls.
-*/
+// Fills out buffer with the predicate string assigned to the BQuery object.
 status_t
 BQuery::GetPredicate(char* buffer, size_t length)
 {
@@ -436,19 +257,8 @@ BQuery::GetPredicate(char* buffer, size_t length)
 }
 
 
-/*!	\brief Returns the BQuery's predicate.
-	Regardless of whether the predicate has been constructed using the
-	predicate stack or set via SetPredicate(), this method returns a
-	string representation.
-	\param predicate a pointer to a BString which shall be set to the
-		   predicate string
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_NO_INIT: The predicate isn't set.
-	- \c B_BAD_VALUE: \c NULL \a predicate.
-	\note This method causes the predicate stack to be evaluated and cleared.
-		  You can't interleave Push*() and GetPredicate() calls.
-*/
+// Fills out the passed-in BString object with the predicate string
+// assigned to the BQuery object.
 status_t
 BQuery::GetPredicate(BString* predicate)
 {
@@ -463,16 +273,7 @@ BQuery::GetPredicate(BString* predicate)
 }
 
 
-/*!	\brief Returns the length of the BQuery's predicate string.
-	Regardless of whether the predicate has been constructed using the
-	predicate stack or set via SetPredicate(), this method returns the length
-	of its string representation (counting the terminating null).
-	\return
-	- the length of the predicate string (counting the terminating null) or
-	- 0, if an error occured
-	\note This method causes the predicate stack to be evaluated and cleared.
-		  You can't interleave Push*() and PredicateLength() calls.
-*/
+// Gets the length of the predicate string.
 size_t
 BQuery::PredicateLength()
 {
@@ -486,10 +287,7 @@ BQuery::PredicateLength()
 }
 
 
-/*!	\brief Returns the device ID identifying the BQuery's volume.
-	\return the device ID of the BQuery's volume or \c B_NO_INIT, if the
-			volume isn't set.
-*/
+// Gets the device ID identifying the volume of the BQuery object.
 dev_t
 BQuery::TargetDevice() const
 {
@@ -497,18 +295,7 @@ BQuery::TargetDevice() const
 }
 
 
-/*!	\brief Tells the BQuery to start fetching entries satisfying the predicate.
-	After Fetch() has been called GetNextEntry(), GetNextRef() and
-	GetNextDirents() can be used to retrieve the enties. Live query updates
-	may be sent immediately after this method has been called.
-	Fetch() fails, if it has already been called. To reuse a BQuery object it
-	has to be reset via Clear().
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_NO_INIT: The predicate or the volume aren't set.
-	- \c B_BAD_VALUE: The predicate is invalid.
-	- \c B_NOT_ALLOWED: Fetch() has already been called.
-*/
+// Start fetching entries satisfying the predicate.
 status_t
 BQuery::Fetch()
 {
@@ -538,20 +325,7 @@ BQuery::Fetch()
 //	#pragma mark - BEntryList interface
 
 
-/*!	\brief Returns the BQuery's next entry as a BEntry.
-	Places the next entry in the list in \a entry, traversing symlinks if
-	\a traverse is \c true.
-	\param entry a pointer to a BEntry to be initialized with the found entry
-	\param traverse specifies whether to follow it, if the found entry
-		   is a symbolic link.
-	\note The iterator used by this method is the same one used by
-		  GetNextRef() and GetNextDirents().
-	\return
-	- \c B_OK if successful,
-	- \c B_ENTRY_NOT_FOUND when at the end of the list,
-	- \c B_BAD_VALUE: The queries predicate includes unindexed attributes.
-	- \c B_FILE_ERROR: Fetch() has not been called before.
-*/
+// Fills out entry with the next entry traversing symlinks if traverse is true.
 status_t
 BQuery::GetNextEntry(BEntry* entry, bool traverse)
 {
@@ -566,18 +340,7 @@ BQuery::GetNextEntry(BEntry* entry, bool traverse)
 }
 
 
-/*!	\brief Returns the BQuery's next entry as an entry_ref.
-	Places an entry_ref to the next entry in the list into \a ref.
-	\param ref a pointer to an entry_ref to be filled in with the data of the
-		   found entry
-	\note The iterator used by this method is the same one used by
-		  GetNextEntry() and GetNextDirents().
-	\return
-	- \c B_OK if successful,
-	- \c B_ENTRY_NOT_FOUND when at the end of the list,
-	- \c B_BAD_VALUE: The queries predicate includes unindexed attributes.
-	- \c B_FILE_ERROR: Fetch() has not been called before.
-*/
+// Fills out ref with the next entry as an entry_ref.
 status_t
 BQuery::GetNextRef(entry_ref* ref)
 {
@@ -605,22 +368,8 @@ BQuery::GetNextRef(entry_ref* ref)
 }
 
 
-/*!	\brief Returns the BQuery's next entries as dirent structures.
-	Reads a number of entries into the array of dirent structures pointed to by
-	\a buf. Reads as many but no more than \a count entries, as many entries as
-	remain, or as many entries as will fit into the array at \a buf with given
-	length \a length (in bytes), whichever is smallest.
-	\param buf a pointer to a buffer to be filled with dirent structures of
-		   the found entries
-	\param length the maximal number of entries to be read.
-	\note The iterator used by this method is the same one used by
-		  GetNextEntry() and GetNextRef().
-	\return
-	- The number of dirent structures stored in the buffer, 0 when there are
-	  no more entries to be read.
-	- \c B_BAD_VALUE: The queries predicate includes unindexed attributes.
-	- \c B_FILE_ERROR: Fetch() has not been called before.
-*/
+// Fill out up to count entries into the array of dirent structs pointed
+// to by buffer.
 int32
 BQuery::GetNextDirents(struct dirent* buffer, size_t length, int32 count)
 {
@@ -632,14 +381,7 @@ BQuery::GetNextDirents(struct dirent* buffer, size_t length, int32 count)
 }
 
 
-/*!	\brief Rewinds the entry list back to the first entry.
-
-	Unlike R5 Haiku implements this method for BQuery.
-
-	\return
-	- \c B_OK on success,
-	- \c B_FILE_ERROR, if Fetch() has not yet been called.
-*/
+// Rewinds the entry list back to the first entry.
 status_t
 BQuery::Rewind()
 {
@@ -649,9 +391,7 @@ BQuery::Rewind()
 }
 
 
-/*!	\brief Unimplemented method of the BEntryList interface.
-	\return 0.
-*/
+// Unimplemented method of the BEntryList interface.
 int32
 BQuery::CountEntries()
 {
@@ -659,10 +399,7 @@ BQuery::CountEntries()
 }
 
 
-/*!	Returns whether Fetch() has already been called on this object.
-	\return \c true, if Fetch() has successfully been invoked, \c false
-			otherwise.
-*/
+// Gets whether Fetch() has already been called on this object.
 bool
 BQuery::_HasFetched() const
 {
@@ -670,22 +407,7 @@ BQuery::_HasFetched() const
 }
 
 
-/*!	\brief Pushs a node onto the predicate stack.
-	If the stack has not been allocate until this time, this method does
-	allocate it.
-	If the supplied node is \c NULL, it is assumed that there was not enough
-	memory to allocate the node and thus \c B_NO_MEMORY is returned.
-	In case the method fails, the caller retains the ownership of the supplied
-	node and thus is responsible for deleting it, if \a deleteOnError is
-	\c false. If it is \c true, the node is deleted, if an error occurs.
-	\param node the node to be pushed
-	\param deleteOnError
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_NO_MEMORY: \c NULL \a node or insuffient memory to allocate the
-	  predicate stack or push the node.
-	- \c B_NOT_ALLOWED: _PushNode() was called after Fetch().
-*/
+// Pushes a node onto the predicate stack.
 status_t
 BQuery::_PushNode(QueryNode* node, bool deleteOnError)
 {
@@ -706,13 +428,7 @@ BQuery::_PushNode(QueryNode* node, bool deleteOnError)
 }
 
 
-/*!	\brief Helper method to set the BQuery's predicate.
-	It is not checked whether Fetch() has already been invoked.
-	\param predicate the predicate string
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_NO_MEMORY: Insufficient memory to store the predicate.
-*/
+// Helper method to set the predicate.
 status_t
 BQuery::_SetPredicate(const char* expression)
 {
@@ -732,16 +448,7 @@ BQuery::_SetPredicate(const char* expression)
 }
 
 
-/*!	Evaluates the query's predicate stack.
-	The method does nothing (and returns \c B_OK), if the stack is \c NULL.
-	If the stack is non-null and Fetch() has already been called, the method
-	fails.
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_NO_MEMORY: Insufficient memory.
-	- \c B_NOT_ALLOWED: _EvaluateStack() was called after Fetch().
-	- another error code
-*/
+// Evaluates the predicate stack.
 status_t
 BQuery::_EvaluateStack()
 {

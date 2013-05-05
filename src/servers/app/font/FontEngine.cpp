@@ -620,9 +620,11 @@ FontEngine::GlyphIndexForGlyphCode(uint32 glyphCode) const
 bool
 FontEngine::PrepareGlyph(uint32 glyphIndex)
 {
-	fLastError = FT_Load_Glyph(fFace, glyphIndex,
-		(fHinting ? (FT_LOAD_DEFAULT | FT_LOAD_TARGET_LCD)
-			: FT_LOAD_NO_HINTING));
+	FT_Int32 loadFlags = fHinting ? FT_LOAD_DEFAULT : FT_LOAD_NO_HINTING;
+	loadFlags |= fGlyphRendering == glyph_ren_subpix ?
+		FT_LOAD_TARGET_LCD : FT_LOAD_TARGET_NORMAL;
+
+	fLastError = FT_Load_Glyph(fFace, glyphIndex, loadFlags);
 
 	if (fLastError != 0)
 		return false;

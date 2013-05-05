@@ -14,8 +14,6 @@
 #include <sstream>
 #include <string>
 
-#include <syslog.h>
-
 #include <Application.h>
 #include <Directory.h>
 #include <File.h>
@@ -32,6 +30,8 @@
 #include <Catalog.h>
 
 
+using BPrivate::HashMapCatalog;
+using BPrivate::PlainTextCatalog;
 using std::auto_ptr;
 using std::min;
 using std::max;
@@ -77,7 +77,7 @@ escapeQuotedChars(BString& stringToEscape)
 PlainTextCatalog::PlainTextCatalog(const char *signature, const char *language,
 	uint32 fingerprint)
 	:
-	BHashMapCatalog(signature, language, fingerprint)
+	HashMapCatalog(signature, language, fingerprint)
 {
 	// give highest priority to catalog living in sub-folder of app's folder:
 	app_info appInfo;
@@ -123,9 +123,6 @@ PlainTextCatalog::PlainTextCatalog(const char *signature, const char *language,
 	}
 
 	fInitCheck = status;
-	log_team(LOG_DEBUG,
-		"trying to load default-catalog(sig=%s, lang=%s) results in %s",
-		signature, language, strerror(fInitCheck));
 }
 
 
@@ -137,7 +134,7 @@ PlainTextCatalog::PlainTextCatalog(const char *signature, const char *language,
 PlainTextCatalog::PlainTextCatalog(const char *path, const char *signature,
 	const char *language)
 	:
-	BHashMapCatalog(signature, language, 0),
+	HashMapCatalog(signature, language, 0),
 	fPath(path)
 {
 	fInitCheck = B_OK;
@@ -159,10 +156,8 @@ PlainTextCatalog::ReadFromFile(const char *path)
 		path = fPath.String();
 
 	catalogFile.open(path, std::fstream::in);
-	if (!catalogFile.is_open()) {
-		log_team(LOG_DEBUG, "couldn't open catalog at %s", path);
+	if (!catalogFile.is_open())
 		return B_ENTRY_NOT_FOUND;
-	}
 
 	// Now read all the data from the file
 
@@ -175,50 +170,35 @@ PlainTextCatalog::ReadFromFile(const char *path)
 		ss >> arcver;
 		if (ss.fail()) {
 			// can't convert to int
-			log_team(LOG_DEBUG,
-				"Unable to extract archive version ( string: %s ) from %s",
-				currentItem.c_str(), path);
 			return B_ERROR;
 		}
 
 		if (arcver != kCatArchiveVersion) {
 			// wrong version
-			log_team(LOG_DEBUG,
-				"Wrong archive version ! Got %d instead of %d from %s", arcver,
-				kCatArchiveVersion, path);
 			return B_ERROR;
 		}
-	} else {
-		log_team(LOG_DEBUG, "Unable to read from catalog %s", path);
+	} else
 		return B_ERROR;
-	}
 
 	if (std::getline(catalogFile, currentItem, '\t').good()) {
 		// Get the language
 		fLanguageName = currentItem.c_str() ;
-	} else {
-		log_team(LOG_DEBUG, "Unable to get language from %s", path);
+	} else
 		return B_ERROR;
-	}
 
 	if (std::getline(catalogFile, currentItem, '\t').good()) {
 		// Get the signature
 		fSignature = currentItem.c_str() ;
-	} else {
-		log_team(LOG_DEBUG, "Unable to get signature from %s", path);
+	} else
 		return B_ERROR;
-	}
 
 	if (std::getline(catalogFile, currentItem).good()) {
 		// Get the fingerprint
 		std::istringstream ss(currentItem);
 		uint32 foundFingerprint;
 		ss >> foundFingerprint;
-		if (ss.fail()) {
-			log_team(LOG_DEBUG, "Unable to get fingerprint (%s) from %s",
-					currentItem.c_str(), path);
+		if (ss.fail())
 			return B_ERROR;
-		}
 
 		if (fFingerprint == 0)
 			fFingerprint = foundFingerprint;
@@ -226,14 +206,11 @@ PlainTextCatalog::ReadFromFile(const char *path)
 		if (fFingerprint != foundFingerprint) {
 			return B_MISMATCHED_VALUES;
 		}
-	} else {
-		log_team(LOG_DEBUG, "Unable to get fingerprint from %s", path);
+	} else
 		return B_ERROR;
-	}
 
 	// We managed to open the file, so we remember it's the one we are using
 	fPath = path;
-	log_team(LOG_DEBUG, "found plaintext catalog at %s", path);
 
 	std::string originalString;
 	std::string context;
@@ -243,24 +220,14 @@ PlainTextCatalog::ReadFromFile(const char *path)
 	while (std::getline(catalogFile, originalString,'\t').good()) {
 		// Each line is : "original string \t context \t comment \t translation"
 
-		if (!std::getline(catalogFile, context,'\t').good()) {
-			log_team(LOG_DEBUG, "Unable to get context for string %s from %s",
-				originalString.c_str(), path);
+		if (!std::getline(catalogFile, context,'\t').good())
 			return B_ERROR;
-		}
 
-		if (!std::getline(catalogFile, comment,'\t').good()) {
-			log_team(LOG_DEBUG, "Unable to get comment for string %s from %s",
-				originalString.c_str(), path);
+		if (!std::getline(catalogFile, comment,'\t').good())
 			return B_ERROR;
-		}
 
-		if (!std::getline(catalogFile, translated).good()) {
-			log_team(LOG_DEBUG,
-				"Unable to get translated text for string %s from %s",
-				originalString.c_str(), path);
+		if (!std::getline(catalogFile, translated).good())
 			return B_ERROR;
-		}
 
 		// We could do that :
 		// SetString(key, translated.c_str());
@@ -268,22 +235,13 @@ PlainTextCatalog::ReadFromFile(const char *path)
 		// happen, you know. (and CatKey::== will fail)
 		SetString(originalString.c_str(), translated.c_str(), context.c_str(),
 			comment.c_str());
-		log_team(LOG_DEBUG, "Added string %s from file %s",
-			originalString.c_str(), path);
 	}
 
 	catalogFile.close();
 
 	uint32 checkFP = ComputeFingerprint();
-	if (fFingerprint != checkFP) {
-		log_team(LOG_DEBUG, "plaintext-catalog(sig=%s, lang=%s) "
-			"has wrong fingerprint after load (%lu instead of %lu). "
-			"The catalog data may be corrupted, so this catalog is "
-			"skipped.\n",
-			fSignature.String(), fLanguageName.String(), checkFP,
-			fFingerprint);
+	if (fFingerprint != checkFP)
 		return B_BAD_DATA;
-	}
 
 	// some information living in member variables needs to be copied
 	// to attributes. Although these attributes should have been written
@@ -394,7 +352,7 @@ PlainTextCatalog::UpdateAttributes(const char* path)
 }
 
 
-BCatalogAddOn *
+BCatalogData *
 PlainTextCatalog::Instantiate(const char *signature, const char *language,
 	uint32 fingerprint)
 {
@@ -408,7 +366,7 @@ PlainTextCatalog::Instantiate(const char *signature, const char *language,
 }
 
 
-extern "C" BCatalogAddOn *
+extern "C" BCatalogData *
 instantiate_catalog(const char *signature, const char *language,
 	uint32 fingerprint)
 {
@@ -422,7 +380,7 @@ instantiate_catalog(const char *signature, const char *language,
 }
 
 
-extern "C" BCatalogAddOn *
+extern "C" BCatalogData *
 create_catalog(const char *signature, const char *language)
 {
 	PlainTextCatalog *catalog

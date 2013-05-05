@@ -111,11 +111,12 @@ public:
 			bool				TapDragStarted() { return fTapdragStarted; }
 			bool				WasEdgeMotion() { return fValidEdgeMotion; }
 
+			void				UpdateButtons(mouse_movement *movement);
+
 			bigtime_t			click_speed;
 private:
 			bool				_EdgeMotion(mouse_movement *movement,
 									touch_event *event, bool validStart);
-	inline	void				_UpdateButtons(mouse_movement *movement);
 	inline	void				_NoTouchToMovement(touch_event *event,
 									mouse_movement *movement);
 	inline	void				_MoveToMovement(touch_event *event,

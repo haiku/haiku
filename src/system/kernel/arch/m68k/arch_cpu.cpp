@@ -171,6 +171,8 @@ arch_cpu_user_TLB_invalidate(void)
 }
 
 
+// TODO: all functions that use fault handlers need to be implemented
+// in assembly due to problems passing in label addresses in gcc4.
 status_t
 arch_cpu_user_memcpy(void *to, const void *from, size_t size,
 	addr_t *faultHandler)

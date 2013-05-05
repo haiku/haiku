@@ -10,7 +10,7 @@
 
 #include <Referenceable.h>
 
-#include <opengl/GL/gl.h>
+#include <GL/gl.h>
 
 
 class Texture : public BReferenceable {

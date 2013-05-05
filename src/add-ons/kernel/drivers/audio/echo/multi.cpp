@@ -226,7 +226,7 @@ echo_create_controls_list(multi_dev *multi)
 		parent2 = echo_create_group_control(multi, &index, parent, S_null, "Output");
 
 		echo_create_channel_control(multi, &index, parent2, 0, channel, 
-			card->caps.dwBusOutCaps[i*2] & ECHOCAPS_NOMINAL_LEVEL);
+			card->caps.dwBusOutCaps[i * 2] & ECHOCAPS_NOMINAL_LEVEL);
 	}
 	
 	parent = echo_create_group_control(multi, &index, 0, S_INPUT, NULL);
@@ -238,13 +238,14 @@ echo_create_controls_list(multi_dev *multi)
 		parent2 = echo_create_group_control(multi, &index, parent, S_null, "Input");
 		
 		echo_create_channel_control(multi, &index, parent2, 0, channel, 
-			card->caps.dwBusInCaps[i*2] & ECHOCAPS_NOMINAL_LEVEL);
+			card->caps.dwBusInCaps[i * 2] & ECHOCAPS_NOMINAL_LEVEL);
 	}
 
 	multi->control_count = index;
 	PRINT(("multi->control_count %lu\n", multi->control_count));
 	return B_OK;
 }
+
 
 static status_t 
 echo_get_mix(echo_dev *card, multi_mix_value_info * mmvi)
@@ -303,7 +304,7 @@ echo_set_mix(echo_dev *card, multi_mix_value_info * mmvi)
 					
 		if (control->mix_control.flags & B_MULTI_MIX_GAIN) {
 			multi_mixer_control *control2 = NULL;
-			if (i+1<mmvi->item_count) {
+			if (i + 1 < mmvi->item_count) {
 				id = mmvi->values[i + 1].id - MULTI_CONTROL_FIRSTID;
 				if (id < 0 || id >= card->multi.control_count) {
 					PRINT(("echo_set_mix : invalid control id requested : %li\n", id));
@@ -325,7 +326,7 @@ echo_set_mix(echo_dev *card, multi_mix_value_info * mmvi)
 					values[1] = mmvi->values[i].gain;
 					
 				if (control2 && control2->mix_control.master != MULTI_CONTROL_MASTERID)
-					values[1] = mmvi->values[i+1].gain;
+					values[1] = mmvi->values[i + 1].gain;
 					
 				control->set(card, control->channel, control->type, values);
 			}
@@ -507,8 +508,8 @@ echo_get_description(echo_dev *card, multi_description *data)
 	data->interface_version = B_CURRENT_INTERFACE_VERSION;
 	data->interface_minimum = B_CURRENT_INTERFACE_VERSION;
 
-	strncpy(data->friendly_name, card->caps.szName, sizeof(data->friendly_name));
-	strncpy(data->vendor_info, AUTHOR, sizeof(data->vendor_info));
+	strlcpy(data->friendly_name, card->caps.szName, sizeof(data->friendly_name));
+	strlcpy(data->vendor_info, AUTHOR, sizeof(data->vendor_info));
 
 	data->output_channel_count = card->multi.output_channel_count;
 	data->input_channel_count = card->multi.input_channel_count;
@@ -666,10 +667,10 @@ echo_get_buffers(echo_dev *card, multi_buffer_list *data)
 			LOG(("not enough channels\n"));
 		}
 		for (i = 0; i < current_settings.buffer_count; i++)
-			for (j=0; j<stream->channels; j++)
+			for (j = 0; j < stream->channels; j++)
 				echo_stream_get_nth_buffer(stream, j, i, 
-					&data->record_buffers[i][channels+j].base,
-					&data->record_buffers[i][channels+j].stride);
+					&data->record_buffers[i][channels + j].base,
+					&data->record_buffers[i][channels + j].stride);
 	}
 		
 	return B_OK;
@@ -1024,7 +1025,7 @@ echo_open(const char *name, uint32 flags, void** cookie)
 	}
 #endif
 	
-	for (; i >=0 ; i-=2) {
+	for (; i >= 0 ; i -= 2) {
 		stream = echo_stream_new(card, ECHO_USE_PLAY, current_settings.buffer_frames, current_settings.buffer_count);
 		if (!card->pstream)
 			card->pstream = stream;
@@ -1086,7 +1087,7 @@ echo_free(void* cookie)
 		echo_stream_halt(stream);
 	}
 	
-	while(!LIST_EMPTY(&card->streams)) {
+	while (!LIST_EMPTY(&card->streams)) {
 		echo_stream_delete(LIST_FIRST(&card->streams));
 	}
 

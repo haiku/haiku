@@ -15,8 +15,8 @@
 #include <Slider.h>
 #include <String.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "SettingsWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "SettingsWindow"
 
 
 static const uint32 kMsgUpdateTimeInterval = 'upti';
@@ -48,7 +48,7 @@ public:
 		interval /= 1000;
 
 		// Find closest index
-		int32 bestDiff = LONG_MAX;
+		int32 bestDiff = INT32_MAX;
 		uint32 bestIndex = 0;
 		for (uint32 i = 0; i < kNumUpdateIntervals; i++) {
 			int32 diff = abs(kUpdateIntervals[i] - interval);
@@ -90,7 +90,7 @@ private:
 
 SettingsWindow::SettingsWindow(ActivityWindow* target)
 	: BWindow(_RelativeTo(target),
-		B_TRANSLATE_WITH_CONTEXT("Settings", "ActivityWindow"), B_FLOATING_WINDOW,
+		B_TRANSLATE_CONTEXT("Settings", "ActivityWindow"), B_FLOATING_WINDOW,
 	   	B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fTarget(target)
 {

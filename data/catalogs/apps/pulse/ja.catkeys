@@ -1,47 +1,48 @@
-1	japanese	x-vnd.Haiku-Pulse	2753760391
-%.2f GHz	NormalPulseView		%.2f GHz
-%ld MHz	NormalPulseView		%ld MHz
-About Pulse…	CPUButton		Pulse について…
-About Pulse…	PulseView		Pulse について…
-Active color	ConfigView		アクティブ色
-Bar colors	ConfigView		配色
-CPU progress bar	NormalPulseView		CPU プログレスバー
-Defaults	PrefsWindow		デフォルト
-Deskbar	CPUButton		Deskbar
-Deskbar menu	CPUButton		Deskbar メニュー
-Deskbar mode	MiniPulseView		Deskbar モード
-Deskbar mode	NormalPulseView		Deskbar モード
-Deskbar mode	PrefsWindow		Deskbar モード
-Error	PulseApp		エラー
-Fade colors	ConfigView		フェード色
-Frame color	ConfigView		フレーム色
-Idle color	ConfigView		アイドル色
-Info	CPUButton		情報
-Info	DeskbarPulseView		情報
-Info	PulseApp		情報
-Info	PulseView		情報
-Installing in Deskbar failed\n%s	PulseApp		Deskbar へのインストールに失敗しました\n%s
-Mini mode	DeskbarPulseView		ミニモード
-Mini mode	NormalPulseView		ミニモード
-Mini mode	PrefsWindow		ミニモード
-Normal mode	DeskbarPulseView		ウィンドウモード
-Normal mode	MiniPulseView		ウィンドウモード
-Normal mode	PrefsWindow		ウィンドウモード
-OK	CPUButton		Ok
-OK	DeskbarPulseView		Ok
+1	japanese	x-vnd.Haiku-Pulse	2324471783
 OK	PrefsWindow		Ok
-OK	PulseApp		Ok
-OK	PulseView		Ok
-Pulse	NormalPulseView		Pulse
-Pulse	PulseApp		Pulse
-Pulse	System name		Pulse
-Pulse settings	PulseWindow		Pulse の設定
 Quit	DeskbarPulseView		終了
-Quit	MiniPulseView		終了
+Mini mode	DeskbarPulseView		ミニモード
 Remove replicant	CPUButton		レプリカントを外す
-Removing from Deskbar failed.\n%s	DeskbarPulseView		Deskbar からの削除に失敗しました.\n%s
-Settings…	PulseView		設定…
+Active color	ConfigView		アクティブ色
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Usage: [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
+Fade colors	ConfigView		フェード色
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nDavid Ramsey および Arve Hjønnevåg 作\nDaniel Switkin による修正\n
+OK	DeskbarPulseView		Ok
+Deskbar mode	PrefsWindow		Deskbar モード
+%.2f GHz	NormalPulseView		%.2f GHz
+Normal mode	PrefsWindow		ウィンドウモード
+Defaults	PrefsWindow		デフォルト
+Normal mode	MiniPulseView		ウィンドウモード
+Error	PulseApp		エラー
+Info	PulseView		情報
+Deskbar	CPUButton		Deskbar
+Frame color	ConfigView		フレーム色
+Mini mode	PrefsWindow		ミニモード
+OK	PulseApp		Ok
+Bar colors	ConfigView		配色
+Settings…	PulseView		設定…
+You can't disable the last active CPU.	PulseView		最後の CPU は無効にできません。
+Info	PulseApp		情報
+Info	CPUButton		情報
+OK	PulseView		Ok
+Deskbar menu	CPUButton		Deskbar メニュー
+About Pulse…	PulseView		Pulse について…
+Deskbar mode	MiniPulseView		Deskbar モード
+Quit	MiniPulseView		終了
+Pulse	System name		Pulse
+Pulse	NormalPulseView		Pulse
+%ld MHz	NormalPulseView		%ld MHz
+Deskbar mode	NormalPulseView		Deskbar モード
+Pulse	PulseApp		Pulse
 Width of icon:	ConfigView		アイコンの幅
 You can't disable the last active CPU.	CPUButton		最後の CPU は無効にできません。
-You can't disable the last active CPU.	PulseView		最後の CPU は無効にできません。
+Normal mode	DeskbarPulseView		ウィンドウモード
+OK	CPUButton		Ok
+About Pulse…	CPUButton		Pulse について…
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Deskbar からの削除に失敗しました.\n%s
+Mini mode	NormalPulseView		ミニモード
+Info	DeskbarPulseView		情報
+Pulse settings	PulseWindow		Pulse の設定
+Idle color	ConfigView		アイドル色
+Installing in Deskbar failed\n%s	PulseApp		Deskbar へのインストールに失敗しました\n%s
+CPU progress bar	NormalPulseView		CPU プログレスバー

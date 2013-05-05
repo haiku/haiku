@@ -10,24 +10,27 @@
 #include "intel_extreme.h"
 
 #include "AreaKeeper.h"
-#include "driver.h"
-#include "utility.h"
-
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-
 #include <driver_settings.h>
 #include <util/kernel_cpp.h>
+#include "utility.h"
+
+#include "driver.h"
+#include "power.h"
 
 
-#define TRACE_DEVICE
-#ifdef TRACE_DEVICE
-#	define TRACE(x) dprintf x
+#define TRACE_INTELEXTREME
+#ifdef TRACE_INTELEXTREME
+#	define TRACE(x...) dprintf("intel_extreme: " x)
 #else
 #	define TRACE(x) ;
 #endif
+
+#define ERROR(x...) dprintf("intel_extreme: " x)
+#define CALLED(x...) TRACE("intel_extreme: CALLED %s\n", __PRETTY_FUNCTION__)
 
 
 static void
@@ -161,8 +164,7 @@ init_interrupt_handler(intel_info &info)
 		info.fake_interrupts = true;
 
 		// TODO: fake interrupts!
-		TRACE((DEVICE_NAME "Fake interrupt mode (no PCI interrupt line "
-			"assigned)"));
+		TRACE("Fake interrupt mode (no PCI interrupt line assigned\n");
 		status = B_ERROR;
 	}
 
@@ -195,10 +197,13 @@ intel_allocate_memory(intel_info &info, size_t size, size_t alignment,
 status_t
 intel_extreme_init(intel_info &info)
 {
+	CALLED();
 	info.aperture = gGART->map_aperture(info.pci->bus, info.pci->device,
 		info.pci->function, 0, &info.aperture_base);
-	if (info.aperture < B_OK)
+	if (info.aperture < B_OK) {
+		ERROR("error: could not map GART aperture!\n");
 		return info.aperture;
+	}
 
 	AreaKeeper sharedCreator;
 	info.shared_area = sharedCreator.Create("intel extreme shared info",
@@ -206,6 +211,7 @@ intel_extreme_init(intel_info &info)
 		ROUND_TO_PAGE_SIZE(sizeof(intel_shared_info)) + 3 * B_PAGE_SIZE,
 		B_FULL_LOCK, 0);
 	if (info.shared_area < B_OK) {
+		ERROR("error: could not create shared area!\n");
 		gGART->unmap_aperture(info.aperture);
 		return info.shared_area;
 	}
@@ -238,7 +244,7 @@ intel_extreme_init(intel_info &info)
 		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 		(void**)&info.registers);
 	if (mmioMapper.InitCheck() < B_OK) {
-		dprintf(DEVICE_NAME ": could not map memory I/O!\n");
+		ERROR("error: could not map memory I/O!\n");
 		gGART->unmap_aperture(info.aperture);
 		return info.registers_area;
 	}
@@ -290,35 +296,11 @@ intel_extreme_init(intel_info &info)
 		primary.offset = (addr_t)primary.base - info.aperture_base;
 	}
 
-	// Clock gating
-	// Fix some problems on certain chips (taken from X driver)
-	// TODO: clean this up
-	if (info.pci->device_id == 0x2a02 || info.pci->device_id == 0x2a12) {
-		dprintf("i965GM/i965GME quirk\n");
-		write32(info, 0x6204, (1L << 29));
-	} else if (info.device_type.InGroup(INTEL_TYPE_SNB)) {
-		dprintf("SandyBridge clock gating\n");
-		write32(info, 0x42020, (1L << 28) | (1L << 7) | (1L << 5));
-	} else if (info.device_type.InGroup(INTEL_TYPE_ILK)) {
-		dprintf("IronLake clock gating\n");
-		write32(info, 0x42020, (1L << 7) | (1L << 5));
-	} else if (info.device_type.InGroup(INTEL_TYPE_G4x)) {
-		dprintf("G4x clock gating\n");
-		write32(info, 0x6204, 0);
-		write32(info, 0x6208, (1L << 9) | (1L << 7) | (1L << 6));
-		write32(info, 0x6210, 0);
+	// Enable clock gating
+	intel_en_gating(info);
 
-		uint32 gateValue = (1L << 28) | (1L << 3) | (1L << 2);
-		if ((info.device_type.type & INTEL_TYPE_MOBILE) == INTEL_TYPE_MOBILE) {
-			dprintf("G4x mobile clock gating\n");
-		    gateValue |= 1L << 18;
-		}
-		write32(info, 0x6200, gateValue);
-	} else {
-		dprintf("i965 quirk\n");
-		write32(info, 0x6204, (1L << 29) | (1L << 23));
-	}
-	write32(info, 0x7408, 0x10);
+	// Enable automatic gpu downclocking if we can to save power
+	intel_en_downclock(info);
 
 	// no errors, so keep areas and mappings
 	sharedCreator.Detach();
@@ -384,7 +366,7 @@ intel_extreme_init(intel_info &info)
 
 	init_interrupt_handler(info);
 
-	TRACE((DEVICE_NAME "_init() completed successfully!\n"));
+	TRACE("%s: completed successfully!\n", __func__);
 	return B_OK;
 }
 
@@ -392,7 +374,7 @@ intel_extreme_init(intel_info &info)
 void
 intel_extreme_uninit(intel_info &info)
 {
-	TRACE((DEVICE_NAME": intel_extreme_uninit()\n"));
+	CALLED();
 
 	if (!info.fake_interrupts && info.shared_info->vblank_sem > 0) {
 		// disable interrupt generation

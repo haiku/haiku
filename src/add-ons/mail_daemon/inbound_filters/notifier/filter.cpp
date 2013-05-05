@@ -18,8 +18,8 @@
 #include "ConfigView.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "filter"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "filter"
 
 
 class NotifyFilter : public MailFilter
@@ -79,6 +79,7 @@ NotifyFilter::MailboxSynced(status_t status)
 
 		BAlert *alert = new BAlert(B_TRANSLATE("New messages"), text.String(),
 			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->SetFeel(B_NORMAL_WINDOW_FEEL);
 		alert->Go(NULL);
 	}

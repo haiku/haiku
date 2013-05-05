@@ -57,12 +57,12 @@ All rights reserved.
 #include "Utilities.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "FavoritesMenu"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "FavoritesMenu"
 
-FavoritesMenu::FavoritesMenu(const char *title, BMessage *openFolderMessage,
-	BMessage *openFileMessage, const BMessenger &target,
-	bool isSavePanel, BRefFilter *filter)
+FavoritesMenu::FavoritesMenu(const char* title, BMessage* openFolderMessage,
+	BMessage* openFileMessage, const BMessenger &target,
+	bool isSavePanel, BRefFilter* filter)
 	:	BSlowMenu(title),
 		fOpenFolderMessage(openFolderMessage),
 		fOpenFileMessage(openFileMessage),
@@ -84,7 +84,7 @@ FavoritesMenu::~FavoritesMenu()
 
 
 void
-FavoritesMenu::SetRefFilter(BRefFilter *filter)
+FavoritesMenu::SetRefFilter(BRefFilter* filter)
 {
 	fRefFilter = filter;
 }
@@ -124,7 +124,8 @@ FavoritesMenu::AddNextItem()
 
 		try {
 			BPath path;
-			ThrowOnError( find_directory (B_USER_SETTINGS_DIRECTORY, &path, true) );
+			ThrowOnError(find_directory(B_USER_SETTINGS_DIRECTORY,
+				&path, true));
 			path.Append(kGoDirectory);
 			mkdir(path.Path(), 0777);
 
@@ -138,7 +139,7 @@ FavoritesMenu::AddNextItem()
 			if (startModel.IsQuery())
 				fContainer = new QueryEntryListCollection(&startModel);
 			else
-				fContainer = new DirectoryEntryList(*dynamic_cast<BDirectory *>
+				fContainer = new DirectoryEntryList(*dynamic_cast<BDirectory*>
 					(startModel.Node()));
 
 			ThrowOnInitCheckError(fContainer);
@@ -162,14 +163,15 @@ FavoritesMenu::AddNextItem()
 			if (!ShouldShowModel(&model))
 				return true;
 
-			BMenuItem *item = BNavMenu::NewModelItem(&model,
+			BMenuItem* item = BNavMenu::NewModelItem(&model,
 				model.IsDirectory() ? fOpenFolderMessage : fOpenFileMessage,
 				fTarget);
-				
+
 			if (item == NULL)
 				return true;
 
-			item->SetLabel(ref.name);		// this is the name of the link in the Go dir
+			item->SetLabel(ref.name);
+				// this is the name of the link in the Go dir
 
 			if (!fAddedSeparatorForSection) {
 				fAddedSeparatorForSection = true;
@@ -214,7 +216,8 @@ FavoritesMenu::AddNextItem()
 				if (!ShouldShowModel(&model))
 					return true;
 
-				BMenuItem *item = BNavMenu::NewModelItem(&model, fOpenFileMessage, fTarget);
+				BMenuItem* item = BNavMenu::NewModelItem(&model,
+					fOpenFileMessage, fTarget);
 				if (item) {
 					if (!fAddedSeparatorForSection) {
 						fAddedSeparatorForSection = true;
@@ -252,8 +255,10 @@ FavoritesMenu::AddNextItem()
 
 			// don't add folders that are already in the GoTo section
 			if (find_if(fUniqueRefCheck.begin(), fUniqueRefCheck.end(),
-				bind2nd(std::equal_to<entry_ref>(), ref)) != fUniqueRefCheck.end())
+				bind2nd(std::equal_to<entry_ref>(), ref))
+					!= fUniqueRefCheck.end()) {
 				continue;
+			}
 
 			Model model(&ref, true);
 			if (model.InitCheck() != B_OK)
@@ -262,8 +267,8 @@ FavoritesMenu::AddNextItem()
 			if (!ShouldShowModel(&model))
 				return true;
 
-			BMenuItem *item = BNavMenu::NewModelItem(&model, fOpenFolderMessage,
-				fTarget, true);
+			BMenuItem* item = BNavMenu::NewModelItem(&model,
+				fOpenFolderMessage, fTarget, true);
 			if (item) {
 				if (!fAddedSeparatorForSection) {
 					fAddedSeparatorForSection = true;
@@ -302,14 +307,14 @@ FavoritesMenu::ClearMenuBuildingState()
 
 
 bool
-FavoritesMenu::ShouldShowModel(const Model *model)
+FavoritesMenu::ShouldShowModel(const Model* model)
 {
 	if (fIsSavePanel && model->IsFile())
 		return false;
 
 	if (!fRefFilter || model->Node() == NULL)
 		return true;
-	
+
 	struct stat_beos statBeOS;
 	convert_to_stat_beos(model->StatBuf(), &statBeOS);
 
@@ -321,7 +326,8 @@ FavoritesMenu::ShouldShowModel(const Model *model)
 //	#pragma mark -
 
 
-RecentsMenu::RecentsMenu(const char *name,int32 which,uint32 what,BHandler *target)
+RecentsMenu::RecentsMenu(const char* name, int32 which, uint32 what,
+	BHandler* target)
 	: BNavMenu(name, what, target),
 	fWhich(which),
 	fRecentsCount(0),
@@ -356,7 +362,7 @@ RecentsMenu::StartBuildingItemList()
 {
 	int32 count = CountItems()-1;
 	for (int32 index = count; index >= 0; index--) {
-		BMenuItem *item = ItemAt(index);
+		BMenuItem* item = ItemAt(index);
 		ASSERT(item);
 
 		RemoveItem(index);
@@ -413,7 +419,7 @@ RecentsMenu::AddRecents(int32 count)
 
 		if (ref.name && strlen(ref.name) > 0) {
 			Model model(&ref, true);
-			ModelMenuItem *item = BNavMenu::NewModelItem(&model,
+			ModelMenuItem* item = BNavMenu::NewModelItem(&model,
 					new BMessage(fMessage.what),
 					Target(), false, NULL, TypesList());
 
@@ -459,4 +465,3 @@ RecentsMenu::ClearMenuBuildingState()
 	fMenuBuilt = false;
 	BNavMenu::ClearMenuBuildingState();
 }
-

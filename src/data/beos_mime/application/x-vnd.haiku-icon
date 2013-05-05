@@ -1,0 +1,12 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Haiku-icon";
+
+resource(1, "META:TYPE") "application/hvif";
+
+resource(2, "META:SNIFF_RULE") "0.50          (\"IMSGHMF1\")";
+
+resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.haiku-icon_o_matic";
+
+resource(4, "META:S:DESC") #'MSDC' "HVIF document";
+
+resource(5, "META:L:DESC") #'MLDC' "Haiku vector icon";

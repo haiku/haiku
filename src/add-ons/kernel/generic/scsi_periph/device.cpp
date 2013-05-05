@@ -38,7 +38,7 @@ periph_compose_device_name(device_node *node, const char *prefix)
 		// this is actually an IDE device, so we ignore the prefix
 
 		// a bus device for those
-		snprintf(name, sizeof(name), "disk/ata%s/%ld/%s/raw",
+		snprintf(name, sizeof(name), "disk/ata%s/%" B_PRId32 "/%s/raw",
 			type == scsi_dev_CDROM ? "pi" : "", channel,
 			targetID == 0 ? "master" : "slave");
 	} else {

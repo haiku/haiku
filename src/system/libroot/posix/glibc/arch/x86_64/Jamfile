@@ -1,0 +1,136 @@
+SubDir HAIKU_TOP src system libroot posix glibc arch x86_64 ;
+
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch $(TARGET_ARCH) ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch generic ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc libio ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc stdlib ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc math ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
+
+SubDirHdrs $(HAIKU_TOP) src system libroot posix glibc arch generic ;
+
+UsePrivateHeaders libroot ;
+
+if $(OPTIM) = -O0 {
+	OPTIM = -O ;
+}
+
+# don't compile with debugging
+DEBUG = 0 ;
+
+SubDirCcFlags -D_GNU_SOURCE -D_IEEE_LIBM -DPIC ;
+SubDirAsFlags -DPIC ;
+
+local genericSources =
+	cmp.c dbl2mpn.c divrem.c 
+	memrchr.c
+	mpn2dbl.c mpn2flt.c mpn2ldbl.c
+	mul.c mul_n.c
+
+	branred.c doasin.c dosincos.c halfulp.c mpa.c mpatan.c mpatan2.c mpexp.c
+	mplog.c mpsqrt.c mptan.c sincos32.c slowexp.c slowpow.c
+
+	e_acos.c e_acosf.c e_acosh.c e_acoshf.c e_acoshl.c e_asin.c e_asinf.c
+	e_asinl.c e_atan2.c e_atan2f.c e_atanh.c e_atanhf.c e_atanhl.c e_cosh.c
+	e_coshf.c e_coshl.c e_exp.c e_exp10.c e_exp10f.c e_exp10l.c e_exp2.c
+	e_exp2f.c e_expf.c e_fmod.c e_fmodf.c e_gamma_r.c e_gammaf_r.c e_gammal_r.c
+	e_hypot.c e_hypotf.c e_hypotl.c e_j0.c e_j0f.c e_j0l.c e_j1.c e_j1f.c
+	e_j1l.c e_jn.c e_jnf.c e_jnl.c e_lgamma_r.c e_lgammaf_r.c e_lgammal_r.c
+	e_log.c e_log10.c e_log10f.c e_log2.c e_log2f.c e_logf.c e_pow.c e_powf.c
+	e_rem_pio2.c e_rem_pio2f.c e_remainder.c e_remainderf.c e_scalb.c
+	e_scalbf.c e_sinh.c e_sinhf.c e_sinhl.c
+
+	k_cos.c k_cosf.c k_rem_pio2.c k_rem_pio2f.c k_sin.c k_sinf.c k_tan.c
+	k_tanf.c
+
+	s_asinh.c s_asinhf.c s_asinhl.c s_atan.c s_atanf.c s_cacos.c s_cacosf.c
+	s_cacosh.c s_cacoshf.c s_cacoshl.c s_cacosl.c s_casin.c s_casinf.c
+	s_casinh.c s_casinhf.c s_casinhl.c s_casinl.c s_catan.c s_catanf.c
+	s_catanh.c s_catanhf.c s_catanhl.c s_catanl.c s_cbrt.c s_cbrtf.c
+	s_cbrtl.c s_ccos.c s_ccosf.c s_ccosh.c s_ccoshf.c s_ccoshl.c s_ccosl.c
+	s_ceil.c s_ceilf.c s_cexp.c s_cexpf.c s_cexpl.c s_clog.c s_clog10.c
+	s_clog10f.c s_clog10l.c s_clogf.c s_clogl.c s_cos.c s_cosf.c s_cpow.c
+	s_cpowf.c s_cpowl.c s_cproj.c s_cprojf.c s_cprojl.c s_csin.c s_csinf.c
+	s_csinh.c s_csinhf.c s_csinhl.c s_csinl.c s_csqrt.c s_csqrtf.c s_csqrtl.c
+	s_ctan.c s_ctanf.c s_ctanh.c s_ctanhf.c s_ctanhl.c s_ctanl.c s_erf.c
+	s_erff.c s_erfl.c s_expm1.c s_expm1f.c s_fdim.c s_fdimf.c s_finite.c
+	s_finitef.c s_floor.c s_floorf.c s_fma.c s_fmaf.c s_fmal.c s_fpclassify.c
+	s_fpclassifyf.c s_frexp.c s_frexpf.c s_frexpl.c s_ilogb.c s_ilogbf.c
+	s_isinf.c s_isinff.c s_isnan.c s_isnanf.c s_ldexp.c s_ldexpf.c s_ldexpl.c
+	s_llround.c s_llroundf.c s_llroundl.c s_log1p.c s_log1pf.c s_logb.c
+	s_logbf.c s_lround.c s_lroundf.c s_lroundl.c s_matherr.c s_modf.c s_modff.c
+	s_modfl.c s_nan.c s_nanf.c s_nanl.c s_nearbyint.c s_nearbyintf.c
+	s_nextafter.c s_nextafterf.c s_nexttowardl.c s_remquo.c s_remquof.c
+	s_remquol.c s_rint.c s_rintf.c s_round.c s_roundf.c s_roundl.c s_scalbln.c
+	s_scalblnf.c s_scalblnl.c s_scalbn.c s_scalbnf.c s_signbit.c s_signbitf.c
+	s_signbitl.c s_signgam.c s_significand.c s_significandf.c s_sin.c
+	s_sincosf.c s_sinf.c s_tan.c s_tanf.c s_tanh.c s_tanhf.c s_tanhl.c
+	s_trunc.c s_truncf.c
+
+	t_exp.c
+
+	w_acos.c w_acosf.c w_acosh.c w_acoshf.c w_acoshl.c w_acosl.c w_asin.c
+	w_asinf.c w_asinl.c w_atan2.c w_atan2f.c w_atan2l.c w_atanh.c w_atanhf.c
+	w_atanhl.c w_cosh.c w_coshf.c w_coshl.c w_drem.c w_dremf.c w_dreml.c
+	w_exp.c w_exp10.c w_exp10f.c w_exp10l.c w_exp2.c w_exp2f.c w_exp2l.c
+	w_expf.c w_expl.c w_fmod.c w_fmodf.c w_fmodl.c w_hypot.c w_hypotf.c
+	w_hypotl.c w_j0.c w_j0f.c w_j0l.c w_j1.c w_j1f.c w_j1l.c w_jn.c w_jnf.c
+	w_jnl.c w_lgamma.c w_lgamma_r.c w_lgammaf.c w_lgammaf_r.c w_lgammal.c
+	w_lgammal_r.c w_log.c w_log10.c w_log10f.c w_log10l.c w_log2.c w_log2f.c
+	w_log2l.c w_logf.c w_logl.c w_pow.c w_powf.c w_powl.c w_remainder.c
+	w_remainderf.c w_remainderl.c w_scalb.c w_scalbf.c w_scalbl.c w_sinh.c
+	w_sinhf.c w_sinhl.c w_sqrt.c w_sqrtf.c w_sqrtl.c w_tgamma.c w_tgammaf.c
+	w_tgammal.c
+;
+
+
+MergeObject posix_gnu_arch_$(TARGET_ARCH)_e.o :
+	e_acosl.c e_atan2l.c e_exp2l.S e_expl.c e_fmodl.S e_log10l.S e_log2l.S
+	e_logl.S e_powl.S e_remainderl.S e_rem_pio2l.c e_scalbl.S e_sqrt.c
+	e_sqrtf.c e_sqrtl.c
+;
+
+
+MergeObject posix_gnu_arch_$(TARGET_ARCH)_k.o :
+	k_cosl.c k_rem_pio2l.c k_sinl.c k_tanl.c
+;
+
+MergeObject posix_gnu_arch_$(TARGET_ARCH)_s.o :
+	s_atanl.c s_ceill.S s_copysignf.S s_copysignl.S s_copysign.S s_cosl.S
+	s_expm1l.S s_fabs.c s_fabsf.c s_fabsl.S s_fdiml.S s_finitel.S s_floorl.S
+	s_fmaxf.S s_fmaxl.S s_fmax.S s_fminf.S s_fminl.S s_fmin.S s_fpclassifyl.c
+	s_ilogbl.S s_isinfl.c s_isnanl.c s_llrintf.S s_llrintl.S s_llrint.S
+	s_log1pl.S s_logbl.c s_lrintf.S s_lrintl.S s_lrint.S s_nearbyintl.S
+	s_nextafterl.c s_nexttoward.c s_nexttowardf.c s_rintl.c s_scalbnl.S
+	s_significandl.c s_sincosl.S s_sincos.S s_sinl.S s_tanl.S s_truncl.S
+;
+
+MergeObject posix_gnu_arch_$(TARGET_ARCH)_other.o :
+	add_n.S
+	addmul_1.S
+	fegetround.c
+	fesetenv.c
+	fesetround.c
+	ldbl2mpn.c
+	
+	mul_1.S
+	lshift.S rshift.S
+	sub_n.S
+	submul_1.S
+;
+
+MergeObject posix_gnu_arch_$(TARGET_ARCH)_generic.o :
+	$(genericSources)
+;
+
+MergeObjectFromObjects posix_gnu_arch_$(TARGET_ARCH).o : :
+	posix_gnu_arch_$(TARGET_ARCH)_e.o
+	posix_gnu_arch_$(TARGET_ARCH)_k.o
+	posix_gnu_arch_$(TARGET_ARCH)_s.o
+	posix_gnu_arch_$(TARGET_ARCH)_other.o
+	posix_gnu_arch_$(TARGET_ARCH)_generic.o
+;
+
+SEARCH on [ FGristFiles $(genericSources) ]
+	= [ FDirName $(HAIKU_TOP) src system libroot posix glibc arch generic ] ;

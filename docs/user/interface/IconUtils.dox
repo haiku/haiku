@@ -1,17 +1,20 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation by:
- *		Adrien Destugues <pulkomandy@pulkomandy.ath.cx>
+ * Authors:
+ *		Adrien Destugues, pulkomandy@pulkomandy.ath.cx
+ *
  * Corresponds to:
- *		/trunk/headers/os/interface/IconUtils.h  rev 42600
- *		/trunk/src/kits/interface/IconUtils.cpp  rev 42600
+ *		headers/os/interface/IconUtils.h	rev 42600
+ *		src/kits/interface/IconUtils.cpp	rev 42600
  */
 
 
 /*!
 	\file IconUtils.h
+	\ingroup interface
+	\ingroup libbe
 	\brief Vector icon handling utility class
 */
 

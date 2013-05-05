@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <errno_private.h>
 #include <syscalls.h>
 #include <syscall_utils.h>
 
@@ -41,7 +42,7 @@ do_seek_dir(DIR* dir)
 	if (dir->seek_position < dir->current_position) {
 		status_t status = _kern_rewind_dir(dir->fd);
 		if (status < 0) {
-			errno = status;
+			__set_errno(status);
 			return -1;
 		}
 
@@ -81,7 +82,7 @@ do_seek_dir(DIR* dir)
 			(char*)dir + DIR_BUFFER_SIZE - (char*)&dir->first_entry, USHRT_MAX);
 		if (count <= 0) {
 			if (count < 0)
-				errno = count;
+				__set_errno(count);
 
 			// end of directory
 			return -1;
@@ -105,7 +106,7 @@ __create_dir_struct(int fd)
 
 	DIR* dir = (DIR*)malloc(DIR_BUFFER_SIZE);
 	if (dir == NULL) {
-		errno = B_NO_MEMORY;
+		__set_errno(B_NO_MEMORY);
 		return NULL;
 	}
 
@@ -130,7 +131,7 @@ fdopendir(int fd)
 	// descriptors, we have to open a fresh one explicitly.
 	int dirFD = _kern_open_dir(fd, NULL);
 	if (dirFD < 0) {
-		errno = dirFD;
+		__set_errno(dirFD);
 		return NULL;
 	}
 
@@ -164,7 +165,7 @@ opendir(const char* path)
 
 	int fd = _kern_open_dir(-1, path);
 	if (fd < 0) {
-		errno = fd;
+		__set_errno(fd);
 		return NULL;
 	}
 
@@ -184,7 +185,7 @@ closedir(DIR* dir)
 	int status;
 
 	if (dir == NULL) {
-		errno = B_BAD_VALUE;
+		__set_errno(B_BAD_VALUE);
 		return -1;
 	}
 
@@ -224,7 +225,7 @@ readdir(DIR* dir)
 		(char*)dir + DIR_BUFFER_SIZE - (char*)&dir->first_entry, USHRT_MAX);
 	if (count <= 0) {
 		if (count < 0)
-			errno = count;
+			__set_errno(count);
 
 		// end of directory
 		return NULL;

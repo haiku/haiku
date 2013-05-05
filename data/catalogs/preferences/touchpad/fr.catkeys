@@ -1,20 +1,20 @@
 1	french	x-vnd.Haiku-Touchpad	607725922
-Acceleration	TouchpadPrefView		Accélération
-Cancel	TouchpadPrefView		Annuler
-Defaults	TouchpadPrefView		Par défaut
-Fast	TouchpadPrefView		Rapide
-High	TouchpadPrefView		Haut
-Horizontal	TouchpadPrefView		Horizontale
-Horizontal scrolling	TouchpadPrefView		Défilement horizontal
-OK	TouchpadPrefView		OK
-Off	TouchpadPrefView		Désactivé
-Please confirm	TouchpadPrefView		Veuillez confirmer
-Revert	TouchpadPrefView		Rétablir
 Scrolling	TouchpadPrefView		Défilement
-Sensitivity	TouchpadPrefView		Sensibilité
-Slow	TouchpadPrefView		Lente
-Tapping	TouchpadPrefView		Tapotement
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La nouvelle zone de défilement est très grande, ce qui peut nuire au fonctionnement normal de la souris. Voulez-vous vraiment la changer ?
 Touchpad	System name		Pavé tactile
+Revert	TouchpadPrefView		Rétablir
+Tapping	TouchpadPrefView		Tapotement
+Please confirm	TouchpadPrefView		Veuillez confirmer
 Two finger scrolling	TouchpadPrefView		Défilement à deux doigts
+Defaults	TouchpadPrefView		Par défaut
+Slow	TouchpadPrefView		Lente
 Vertical	TouchpadPrefView		Verticale
+High	TouchpadPrefView		Haut
+Horizontal scrolling	TouchpadPrefView		Défilement horizontal
+Fast	TouchpadPrefView		Rapide
+OK	TouchpadPrefView		OK
+Acceleration	TouchpadPrefView		Accélération
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La nouvelle zone de défilement est très grande, ce qui peut nuire au fonctionnement normal de la souris. Voulez-vous vraiment la changer ?
+Horizontal	TouchpadPrefView		Horizontale
+Off	TouchpadPrefView		Désactivé
+Sensitivity	TouchpadPrefView		Sensibilité
+Cancel	TouchpadPrefView		Annuler

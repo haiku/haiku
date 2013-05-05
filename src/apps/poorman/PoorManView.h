@@ -12,11 +12,11 @@
 #include <View.h>
 #endif
 
-class PoorManView: public BView
-{
+class PoorManView: public BView {
 public:
-				PoorManView(BRect, const char *name);
-virtual	void	AttachedToWindow();
+							PoorManView(BRect, const char *name);
+
+	virtual	void		AttachedToWindow();
 };
 
 #endif

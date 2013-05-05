@@ -4,17 +4,36 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Timothy Wayper <timmy@wunderbear.com>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		John Scipione <jscipione@gmail.com>
+ *		Timothy Wayper <timmy@wunderbear.com>
  */
-
 #ifndef _CALC_VIEW_H
 #define _CALC_VIEW_H
 
+
 #include <View.h>
+
+
+enum {
+	MSG_OPTIONS_AUTO_NUM_LOCK				= 'oanl',
+	MSG_OPTIONS_AUDIO_FEEDBACK				= 'oafb',
+	MSG_OPTIONS_ANGLE_MODE_RADIAN			= 'oamr',
+	MSG_OPTIONS_ANGLE_MODE_DEGREE			= 'oamd',
+	MSG_OPTIONS_KEYPAD_MODE_COMPACT			= 'okmc',
+	MSG_OPTIONS_KEYPAD_MODE_BASIC			= 'okmb',
+	MSG_OPTIONS_KEYPAD_MODE_SCIENTIFIC		= 'okms',
+	MSG_UNFLASH_KEY							= 'uflk'
+};
+
+static const float kMinimumWidthBasic		= 130.0f;
+static const float kMaximumWidthBasic		= 400.0f;
+static const float kMinimumHeightBasic		= 130.0f;
+static const float kMaximumHeightBasic		= 400.0f;
 
 class BString;
 class BMenuItem;
+class BMessage;
 class BPopUpMenu;
 class CalcOptions;
 class CalcOptionsWindow;
@@ -30,9 +49,7 @@ class CalcView : public BView {
 								CalcView(BRect frame,
 									rgb_color rgbBaseColor,
 									BMessage* settings);
-
 								CalcView(BMessage* archive);
-
 	virtual						~CalcView();
 
 	virtual	void				AttachedToWindow();
@@ -42,10 +59,8 @@ class CalcView : public BView {
 	virtual	void				MouseUp(BPoint point);
 	virtual	void				KeyDown(const char* bytes, int32 numBytes);
 	virtual	void				MakeFocus(bool focused = true);
+	virtual	void				ResizeTo(float width, float height);
 	virtual	void				FrameResized(float width, float height);
-
-			// Present about box for view (replicant).
-	virtual	void				AboutRequested();
 
 			// Archive this view.
 	virtual	status_t			Archive(BMessage* archive, bool deep) const;
@@ -62,11 +77,28 @@ class CalcView : public BView {
 			// Save current settings
 			status_t			SaveSettings(BMessage* archive) const;
 
+			// Evaluate the expression
 			void				Evaluate();
 
+			// Flash the key on the keypad
 			void				FlashKey(const char* bytes, int32 numBytes);
 
+			// Toggle whether or not the Num Lock key starts on
+			void				ToggleAutoNumlock(void);
+
+			// Toggle whether or not to provide audio feedback
+			// (option currently disabled)
+			void				ToggleAudioFeedback(void);
+
+			// Set the angle mode to degrees or radians
+			void				SetDegreeMode(bool degrees);
+
+			// Set the keypad mode
+			void				SetKeypadMode(uint8 mode);
+
  private:
+			void				_Init(BMessage* settings);
+			status_t			_LoadSettings(BMessage* archive);
 			void				_ParseCalcDesc(const char* keypadDescription);
 
 			void				_PressKey(int key);
@@ -77,18 +109,17 @@ class CalcView : public BView {
 
 			void				_Colorize();
 
-			void				_CreatePopUpMenu();
+			void				_CreatePopUpMenu(bool addKeypadModeMenuItems);
 
 			BRect				_ExpressionRect() const;
 			BRect				_KeypadRect() const;
 
-			void				_ShowKeypad(bool show);
+			void				_MarkKeypadItems(uint8 mode);
+
 			void				_FetchAppIcon(BBitmap* into);
 
-			status_t			_LoadSettings(BMessage* archive);
-
 			// grid dimensions
-			int16				fColums;
+			int16				fColumns;
 			int16				fRows;
 
 			// color scheme
@@ -119,11 +150,16 @@ class CalcView : public BView {
 			BPopUpMenu*			fPopUpMenu;
 			BMenuItem*			fAutoNumlockItem;
 			BMenuItem*			fAudioFeedbackItem;
-			BMenuItem*			fShowKeypadItem;
+
+			BMenuItem*			fAngleModeRadianItem;
+			BMenuItem*			fAngleModeDegreeItem;
+
+			BMenuItem*			fKeypadModeCompactItem;
+			BMenuItem*			fKeypadModeBasicItem;
+			BMenuItem*			fKeypadModeScientificItem;
 
 			// calculator options.
 			CalcOptions*		fOptions;
-			bool				fShowKeypad;
 };
 
 #endif // _CALC_VIEW_H

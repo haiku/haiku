@@ -1,0 +1,24 @@
+1	hindi	x-vnd.Haiku-Mouse	1033564338
+Mouse type:	SettingsView		माउस के प्रकार
+Warp	SettingsView		वार्प
+2-Button	SettingsView		2-बटन
+Double-click test area	SettingsView		डबल-क्लिक परीक्षण क्षेत्र
+Revert	MouseWindow		रिवर्ट
+...by Andrew Edward McCall	MouseApplication		...एंड्रयू एडवर्ड मककॉल द्वारा
+Mouse acceleration	SettingsView		माउस गतिवृद्धि
+Click to focus	SettingsView		क्लिक करें फ़ोकस करने के लिए
+Click to focus and raise	SettingsView		क्लिक करें फ़ोकस और उठाने के लिए
+3-Button	SettingsView		3-बटन
+Mouse speed	SettingsView		माउस गति
+Focus mode:	SettingsView		फोकस मोड:
+Instant warp	SettingsView		तत्काल वार्प
+Dig Deal	MouseApplication		दिग डील
+1-Button	SettingsView		1-बटन
+Double-click speed	SettingsView		डबल क्लिक-गति
+Defaults	MouseWindow		चूक
+Focus follows mouse	SettingsView		फोकस फोल्स माउस
+Accept first click	SettingsView		पहले क्लिक स्वीकारें
+Fast	SettingsView		तेज
+Normal	SettingsView		सामान्य
+Mouse	System name		माउस
+Slow	SettingsView		धीमा

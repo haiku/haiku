@@ -1,21 +1,38 @@
-1	polish	x-vnd.Haiku-Keymap	3858687220
-(Current)	Keymap window		(Bieżący)
-Acute trigger	Keymap window		Wywołanie ostre
+1	polish	x-vnd.Haiku-Keymap	4022885915
+Shift:	Modifier keys window	Shift key role name	Shift:
+Revert	Modifier keys window		Przywróć
+Tilde trigger	Keymap window		Wywołanie tyldy
+Grave trigger	Keymap window		Wywołanie ciężkie
+Role	Modifier keys window	As in the role of a modifier key	Rola
+Select dead keys	Keymap window		Wybierz martwe klawisze
+Cancel	Modifier keys window		Anuluj
+Quit	Keymap window		Zakończ
+Switch shortcut keys to Haiku mode	Keymap window		Zmień klawisze skrótów w tryb Haiku
 Circumflex trigger	Keymap window		Wywołanie akcentu
 Diaeresis trigger	Keymap window		Wywołanie diarezy
-File	Keymap window		Plik
-Font	Keymap window		Czcionka
-Grave trigger	Keymap window		Wywołanie ciężkie
-Layout	Keymap window		Układ
+Disabled	Modifier keys window	Do nothing	Wyłączony
 Open…	Keymap window		Otwórz…
-Quit	Keymap window		Zakończ
-Revert	Keymap window		Przywróć
-Sample and clipboard:	Keymap window		Przykład i schowek:
-Save as…	Keymap window		Zapisz jako…
-Select dead keys	Keymap window		Wybierz martwe klawisze
-Switch shortcut keys	Keymap window		Zmień klawisze skrótów
-Switch shortcut keys to Haiku mode	Keymap window		Zmień klawisze skrótów w tryb Haiku
-Switch shortcut keys to Windows/Linux mode	Keymap window		Zmień klawisze skrótów w tryb Windows/Linuks
 System:	Keymap window		System:
-Tilde trigger	Keymap window		Wywołanie tyldy
+Set modifier keys…	Keymap window		Ustaw klawisze modyfikujące…
+Option:	Modifier keys window	Option key role name	Opcja:
+Switch shortcut keys	Keymap window		Zmień klawisze skrótów
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Klawisz Shift
 User:	Keymap window		Użytkownik:
+Key	Modifier keys window	As in a computer keyboard key	Klawisz
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Klawisz Ctrl
+Control:	Modifier keys window	Control key role name	Kontrol:
+Sample and clipboard:	Keymap window		Przykład i schowek:
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Klawisz Alt/Opt
+Layout	Keymap window		Układ
+Switch shortcut keys to Windows/Linux mode	Keymap window		Zmień klawisze skrótów w tryb Windows/Linuks
+Revert	Keymap window		Przywróć
+Command:	Modifier keys window	Command key role name	Polecenie:
+Save as…	Keymap window		Zapisz jako…
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Klawisz Win/Cmd 
+File	Keymap window		Plik
+(Current)	Keymap window		(Bieżący)
+Font	Keymap window		Czcionka
+Keymap	System name		Układ klawiatury
+Set modifier keys	Modifier keys window		Ustaw klawisze kodyfikujące
+Modifier keys	Modifier keys window		Klawisze modyfikujące
+Acute trigger	Keymap window		Wywołanie ostre

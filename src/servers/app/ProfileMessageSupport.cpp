@@ -66,8 +66,8 @@ string_for_message_code(uint32 code, BString& string)
 		CODE(AS_GET_CURSOR_BITMAP);
 
 		// Window definitions
-		CODE(AS_SHOW_WINDOW);
-		CODE(AS_HIDE_WINDOW);
+		CODE(AS_SHOW_OR_HIDE_WINDOW);
+		CODE(AS_INTERNAL_HIDE_WINDOW);
 		CODE(AS_MINIMIZE_WINDOW);
 		CODE(AS_QUIT_WINDOW);
 		CODE(AS_SEND_BEHIND);

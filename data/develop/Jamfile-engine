@@ -1,4 +1,4 @@
-##	Haiku Generic Jamfile Engine v1.0.1
+##	Haiku Generic Jamfile Engine v1.0.2
 ##	Does all the hard work for the Generic Jamfile
 ##	which simply defines the project parameters.
 ##	Most of the real work is done in the Jambase
@@ -6,9 +6,10 @@
 ##	
 ##	Inspired by the Be Makefile Engine
 ##
-##	Supports Generic Jamfile v1.0
+##	Supports Generic Jamfile v1.0.1
 ##
 ##	Copyright (c) 2002-2010 Ryan Leavengood
+##	Copyright (c) 2011 Peter Poláčik
 ##	Released under the Terms of the MIT License, see
 ##	http://www.opensource.org/licenses/mit-license.html
 
@@ -68,6 +69,95 @@ rule MkObjectDirs
 		Depends $(i:S=$(SUFOBJ)) : $(dir) ;
 		MkDir $(dir) ;
 	}
+}
+
+# CollectCatKeys <Pseudotarget Name> : <Source Files> ;
+#   Collects catalog keys for localization from sources into per-locale files
+rule CollectCatKeys
+{
+	Depends $(<) : $(>) ;
+	Depends $(<) : $(LOCATE_TARGET) ;
+	#Depends $(<) : $(SRCS) ;
+	Depends $(CATKEYS_DIR)/en.catkeys : $(<) ;
+}
+
+actions CollectCatKeys
+{
+	cat $(SRCS) | gcc -E -x c++ $(HDRS) $(CCFLAGS) \
+		-DB_COLLECTING_CATKEYS - > $(LOCATE_TARGET)/$(NAME).pre
+	mkdir -p "$(CATKEYS_DIR)"
+	collectcatkeys -s $(APP_MIME_SIG) $(LOCATE_TARGET)/$(NAME).pre \
+		-o $(CATKEYS_DIR)/en.catkeys
+}
+
+# Catalogs <Pseudotarget Name> : <CollectCatKeys Target> ;
+#    Compiles .catkeys files into .catalog files, one per locale
+rule Catalogs
+{
+	Depends $(<) : $(>) ;
+	Depends $(<) : $(SRCS) ;
+	for lng in $(LOCALES)
+	{
+		Depends $(<) : $(CATKEYS_DIR)/$(lng:S=.catkeys) ;
+		Depends $(CATKEYS_DIR)/$(lng:S=.catkeys) : $(>) ;
+		#Clean clean : $(CATKEYS_DIR)/$(lng:S=.catkeys) ;
+		Clean clean : 
+			$(LOCATE_TARGET)/$(APP_MIME_SIG)/$(lng:S=.catalog) ;
+	}
+	Clean clean : $(LOCATE_TARGET)/$(NAME).pre ;
+}
+
+actions Catalogs
+{
+	mkdir -p $(LOCATE_TARGET)/$(APP_MIME_SIG)
+	TMP=`echo "$(LOCALES)" | tr ';' ' '`
+	
+	for lang in $TMP ; do
+		if [ ! -f $(CATKEYS_DIR)/$lang.catkeys ]; then 
+			cp $(CATKEYS_DIR)/en.catkeys \
+				$(CATKEYS_DIR)/$lang.catkeys; fi
+		linkcatkeys \
+	       	-o $(LOCATE_TARGET)/$(APP_MIME_SIG)/$lang.catalog \
+		-s $(APP_MIME_SIG) \
+		-l `basename $(LOCATE_TARGET)/$(APP_MIME_SIG)/$lang.catalog` \
+		$(CATKEYS_DIR)/$lang.catkeys
+	done
+}
+
+# CatalogsInstall <Pseudotarget Name> : <Catalog Files> ;
+#    Copies .catalog files into system locale directory
+rule CatalogsInstall
+{
+	Depends $(<) : $(>) ;
+	Depends $(>) : catalogs ;
+}
+
+actions CatalogsInstall
+{
+	mkdir -p "/boot/home/config/data/locale/catalogs/$(APP_MIME_SIG)" ;
+	cp $(LOCATE_TARGET)/$(APP_MIME_SIG)/*.catalog \
+	/boot/home/config/data/locale/catalogs/$(APP_MIME_SIG)
+}
+
+# BindCatalogs <Pseudotarget Name> : <Catalog Files> ;
+#    Binds .catalog files into program executable
+rule BindCatalogs
+{
+	Depends $(<) : $(>) ;
+	Depends $(<) : $(NAME) ;
+	Depends $(<) : $(LOCATE_TARGET)/$(NAME) ;
+	Depends $(LOCATE_TARGET)/$(NAME) : $(NAME) ;
+	Clean clean : $(<) ;
+}
+
+actions BindCatalogs
+{
+	TMP=`echo $(LOCALES) | tr ';' ' '`
+	for lc in $TMP; do 
+		linkcatkeys -o $(LOCATE_TARGET)/$(NAME) \
+	       	-s $(APP_MIME_SIG) -tr \
+	       	-l $lc $(CATKEYS_DIR)/$lc.catkeys
+	done
 }
 
 # RmApp <Pseudotarget Name> : <Application Name> ;
@@ -151,7 +241,12 @@ rule BeMain
 	{
 		AddResources $(<) : $(RSRCS) ;
 	}
-	
+
+	if ( $(LOCALES) )
+	{
+		CollectCatKeys ;
+	}
+
 	MimeSet $(<) ;
 }
 
@@ -322,6 +417,21 @@ CCFLAGS += $(COMPILER_FLAGS) ;
 C++FLAGS += $(COMPILER_FLAGS) ;
 LINKFLAGS += $(LINKER_FLAGS) ;
 
+# Localization specific variables
+
+if ( ! $(APP_MIME_SIG) )
+{
+	ECHO "No mime signature defined! Defaulting to x.vnd-Haiku-$(NAME)" ;
+	APP_MIME_SIG = x.vnd-Haiku-$(NAME) ;
+}
+
+CATKEYS_DIR = locales ;
+if ( $(APP_MIME_SIG) )
+{
+	CATALOGS_DIR = $(LOCATE_TARGET)/$(APP_MIME_SIG) ;
+	CATALOGS = $(LOCALES:D=$(CATALOGS_DIR):S=.catalog) ;
+}
+
 # Define some tools
 XRES = xres ;
 MIMESET = mimeset ;
@@ -347,8 +457,25 @@ RmApp rmapp : $(NAME) ;
 NotFile test ;
 RunApp test : $(NAME) ;
 
+Always catkeys ;
+NotFile catkeys ;
+CollectCatKeys catkeys : $(SRCS) ;
+
+#Always catalogs ;
+NotFile catalogs ;
+Catalogs catalogs : catkeys ;
+
+#Always catalogsinstall ;
+NotFile catalogsinstall ;
+CatalogsInstall catalogsinstall : $(CATALOGS_DIR)/$(LOCALES:S=.catalog) ;
+
+#Always bindcatalogs ;
+NotFile bindcatalogs ;
+BindCatalogs bindcatalogs : $(CATALOGS_DIR)/$(LOCALES:S=.catalog) ;
+
 ##-------------------------------------------------------------------
 ## OK, let's build
 ##-------------------------------------------------------------------
 
 BeMain $(NAME) : $(SRCS) ;
+

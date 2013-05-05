@@ -36,6 +36,9 @@
 
 #include <stdio.h>
 #include <errno.h>
+
+#include <errno_private.h>
+
 #include "local.h"
 
 /*
@@ -51,7 +54,7 @@ putc_unlocked(c, fp)
 	register FILE *fp;
 {
 	if (cantwrite(fp)) {
-		errno = EBADF;
+		__set_errno(EBADF);
 		return (EOF);
 	}
 	return (__sputc(c, fp));

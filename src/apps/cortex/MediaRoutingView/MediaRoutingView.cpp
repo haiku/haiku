@@ -988,6 +988,7 @@ void MediaRoutingView::showErrorMessage(
 	 || (messenger.SendMessage(&message) != B_OK)) {
 		BAlert *alert = new BAlert("Error", text.String(), "OK", 0, 0,
 								   B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 	}
 }

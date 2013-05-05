@@ -15,8 +15,8 @@
 
 #include <BuildScreenSaverDefaultSettingsView.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Screensaver DebugNow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Screensaver DebugNow"
 
 
 const rgb_color kMediumBlue = {0, 0, 100};

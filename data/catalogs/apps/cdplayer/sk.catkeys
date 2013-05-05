@@ -1,14 +1,14 @@
 1	slovak	x-vnd.Haiku-CDPlayer	592310631
-Audio CD	CDPlayer		Zvukové CD
-CD	CDPlayer		CD
-CD drive is empty	CDPlayer		Mechanika CD je prázdna
 CDPlayer	System name		Prehrávač CD
+CD	CDPlayer		CD
 Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		Disk: %ld:%.2ld / %ld:%.2ld
-Disc: --:-- / --:--	CDPlayer		Disk: --:-- / --:--
-Disc: 88:88 / 88:88	CDPlayer		Disk: 88:88 / 88:88
-It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Zdá sa, že váš počítač neobsahuje mechaniky CD a nemáte systémový softvér, ktorý by ich poskytol. Ľutujeme.
 OK	CDPlayer		OK
 Track %whichTrack%: %trackAt%	CDPlayer		Stopa %whichTrack%: %trackAt%
+Audio CD	CDPlayer		Zvukové CD
+It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Zdá sa, že váš počítač neobsahuje mechaniky CD alebo nemáte systémový softvér, ktorý by ich podporoval. Ľutujeme.
 Track: %ld:%.2ld / %ld:%.2ld	CDPlayer		Stopa: %ld:%.2ld / %ld:%.2ld
-Track: --:-- / --:--	CDPlayer		Stopa: --:-- / --:--
 Track: 88:88 / 88:88	CDPlayer		Stopa: 88:88 / 88:88
+Track: --:-- / --:--	CDPlayer		Stopa: --:-- / --:--
+Disc: 88:88 / 88:88	CDPlayer		Disk: 88:88 / 88:88
+Disc: --:-- / --:--	CDPlayer		Disk: --:-- / --:--
+CD drive is empty	CDPlayer		Mechanika CD je prázdna

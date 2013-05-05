@@ -32,15 +32,17 @@ brand product names are registered trademarks or trademarks of their respective
 holders.
 All rights reserved.
 */
+#ifndef BARMENUTITLE_H
+#define BARMENUTITLE_H
+
 
 //
 //	Be Menu - 	Be Logo menu item in expanded mode
 //				Team/App menu item in mini mode
 
-#ifndef BARMENUTITLE_H
-#define BARMENUTITLE_H
 
 #include <MenuItem.h>
+
 
 class BBitmap;
 class BMenu;
@@ -48,10 +50,10 @@ class BMenu;
 class TBarMenuTitle : public BMenuItem {
 public:
 	TBarMenuTitle(float width, float height, const BBitmap* icon,
-		BMenu* menu, bool inexpando = false);
+		BMenu* menu, bool expando = false);
 	virtual ~TBarMenuTitle();
 
-	void SetWidthHeight(float width, float height);
+	void SetContentSize(float width, float height);
 	void Draw();
 
 	status_t Invoke(BMessage* message);
@@ -67,5 +69,5 @@ private:
 	const BBitmap* fIcon;
 };
 
-#endif /* BARMENUTITLE_H */
 
+#endif	// BARMENUTITLE_H

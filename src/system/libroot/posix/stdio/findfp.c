@@ -41,6 +41,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <errno_private.h>
+
 #include "local.h"
 #include "glue.h"
 
@@ -55,7 +57,7 @@ int	__sdidinit;
  * must be cast to any desired pointer type.
  */
 #define ALIGNBYTES      (sizeof(int) - 1)
-#define ALIGN(p)        (((u_int)(p) + ALIGNBYTES) &~ ALIGNBYTES) 
+#define ALIGN(p)        (((u_int)(p) + ALIGNBYTES) &~ ALIGNBYTES)
 
 #define	NDYNAMIC 10		/* add ten more whenever necessary */
 

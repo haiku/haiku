@@ -63,12 +63,14 @@ public:
 	virtual	status_t			GetSupportedSuites(BMessage* message);
 	virtual	status_t			Perform(perform_code d, void* arg);
 
-	virtual	void				InvalidateLayout(bool descendants = false);
 
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
 	virtual	BSize				PreferredSize();
 
+
+protected:
+	virtual	void				LayoutInvalidated(bool descendants = false);
 
 private:
 	virtual	void				_ReservedButton1();

@@ -1,11 +1,14 @@
-1	norwegian_bokmål	x-vnd.Haiku-GIFTranslator	1121369485
-Automatic (from alpha channel)	GIFView		Automatisk (fra alfa-kanal)
-BeOS system	GIFView		BeOS-system
-Colors	GIFView		Farger
-GIF Settings	GIFTranslator		GIF-innstillinger
-GIF image	GIFTranslator		GIF-bilde
-Greyscale	GIFView		Gråtone
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-GIFTranslator	3529699712
+Websafe	GIFView		Web-sikker
 Optimal	GIFView		Optimal
+Greyscale	GIFView		Gråtone
+Be Bitmap Format (GIFTranslator)	GIFTranslator		Be Bitmap Format (GIFTranslator)
+GIF image	GIFTranslator		GIF-bilde
+Write transparent images	GIFView		Skriv gjennomsiktige bilder
 Palette	GIFView		Palett
 Use RGB color	GIFView		Bruk RGB-farger
-Websafe	GIFView		Web-sikker
+Use dithering	GIFView		Bruk nyansesimulering
+GIF Settings	GIFTranslator		GIF-innstillinger
+BeOS system	GIFView		BeOS-system
+Automatic (from alpha channel)	GIFView		Automatisk (fra alfa-kanal)
+Colors	GIFView		Farger

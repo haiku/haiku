@@ -117,6 +117,7 @@ public:
 		// install signal handlers so we can exit gracefully
 		struct sigaction action;
 		action.sa_handler = (__sighandler_t)_SignalHandler;
+		action.sa_flags = 0;
 		sigemptyset(&action.sa_mask);
 		action.sa_userdata = this;
 		if (sigaction(SIGHUP, &action, NULL) < 0
@@ -177,7 +178,7 @@ public:
 					|| _ProcessEventBuffer(bufferBase, remainingSize);
 			}
 
-			if (quit)
+			if (quit || fCaughtDeadlySignal)
 				break;
 
 			// get next buffer
@@ -186,11 +187,8 @@ public:
 				&droppedEvents);
 
 			if (error != B_OK) {
-				if (error == B_INTERRUPTED) {
-					if (fCaughtDeadlySignal)
-						break;
+				if (error == B_INTERRUPTED)
 					continue;
-				}
 
 				fprintf(stderr, "%s: Failed to get next sample buffer: %s\n",
 					kCommandName, strerror(error));

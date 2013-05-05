@@ -50,6 +50,7 @@ private:
 			void			_CheckRefreshMenu();
 
 			void			_UpdateActiveMode();
+			void			_UpdateActiveMode(int32 workspace);
 			void			_UpdateWorkspaceButtons();
 			void			_UpdateRefreshControl();
 			void			_UpdateMonitorView();

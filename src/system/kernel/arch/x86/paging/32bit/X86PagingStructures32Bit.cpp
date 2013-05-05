@@ -100,8 +100,7 @@ X86PagingStructures32Bit::Delete()
 #if 0
 	// this sanity check can be enabled when corruption due to
 	// overwriting an active page directory is suspected
-	uint32 activePageDirectory;
-	read_cr3(activePageDirectory);
+	uint32 activePageDirectory = x86_read_cr3();
 	if (activePageDirectory == pgdir_phys)
 		panic("deleting a still active page directory\n");
 #endif

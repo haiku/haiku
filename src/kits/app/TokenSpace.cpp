@@ -94,7 +94,7 @@ BTokenSpace::RemoveToken(int32 token)
 }
 
 
-/*!	Checks wether or not the \a token exists with the specified
+/*!	Checks whether or not the \a token exists with the specified
 	\a type in the token space or not.
 */
 bool

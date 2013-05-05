@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2013, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,7 +9,7 @@
 #define CLIENT_MEMORY_ALLOCATOR_H
 
 
-#include "MultiLocker.h"
+#include <Locker.h>
 
 #include <util/DoublyLinkedList.h>
 
@@ -39,17 +39,11 @@ public:
 								ClientMemoryAllocator(ServerApp* application);
 								~ClientMemoryAllocator();
 
-			status_t			InitCheck();
-
-			void*				Allocate(size_t size, void** _address,
+			void*				Allocate(size_t size, block** _address,
 									bool& newArea);
-			void				Free(void* cookie);
+			void				Free(block* cookie);
 
-			area_id				Area(void* cookie);
-			uint32				AreaOffset(void* cookie);
-
-			bool				Lock();
-			void				Unlock();
+			void				Detach();
 
 			void				Dump();
 
@@ -58,9 +52,57 @@ private:
 
 private:
 			ServerApp*			fApplication;
-			MultiLocker			fLock;
+			BLocker				fLock;
 			chunk_list			fChunks;
 			block_list			fFreeBlocks;
+};
+
+
+class AreaMemory {
+public:
+	virtual						~AreaMemory() {}
+
+	virtual area_id				Area() = 0;
+	virtual uint8*				Address() = 0;
+	virtual uint32				AreaOffset() = 0;
+};
+
+
+class ClientMemory : public AreaMemory {
+public:
+								ClientMemory();
+
+	virtual						~ClientMemory();
+
+			void*				Allocate(ClientMemoryAllocator* allocator,
+									size_t size, bool& newArea);
+
+	virtual area_id				Area();
+	virtual uint8*				Address();
+	virtual uint32				AreaOffset();
+
+private:
+			ClientMemoryAllocator*	fAllocator;
+			block*				fBlock;
+};
+
+
+/*! Just clones an existing area. */
+class ClonedAreaMemory  : public AreaMemory{
+public:
+								ClonedAreaMemory();
+	virtual						~ClonedAreaMemory();
+
+			void*				Clone(area_id area, uint32 offset);
+
+	virtual area_id				Area();
+	virtual uint8*				Address();
+	virtual uint32				AreaOffset();
+
+private:
+			area_id		fClonedArea;
+			uint32		fOffset;
+			uint8*		fBase;
 };
 
 

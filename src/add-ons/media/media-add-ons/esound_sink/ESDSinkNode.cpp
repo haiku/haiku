@@ -413,7 +413,7 @@ status_t ESDSinkNode::GetLatencyFor(
 	bigtime_t intl = EventLatency();
 	bigtime_t netl = 0LL;
 	if (fDevice)
-		netl = fDevice->GetLatency();
+		netl = fDevice->Latency();
 	// I don't want to swap
 	if (netl > 500000)
 		netl = 500000;

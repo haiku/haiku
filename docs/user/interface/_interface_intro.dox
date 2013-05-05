@@ -1,26 +1,26 @@
 /*
- * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation by:
- *		Alex Wilson <yourpalal2@gmail.com>
+ * Authors:
+ *		Alex Wilson, yourpalal2@gmail.com
  */
 
 
 /*!
 	\page interface_intro Introduction to the Interface Kit.
-  
+
 	The Interface Kit holds all the classes you'll need to develop a GUI.
 	Building on the messaging facilities provided by the Application Kit,
-	the Inteface Kit can be used to create a responsive and attractive graphical
-	user interface.
+	the Interface Kit can be used to create a responsive and attractive
+	graphical user interface.
 
- 	The most important class in the Interface Kit is the BView class, which
+	The most important class in the Interface Kit is the BView class, which
 	handles drawing and user interaction. Pointer and keyboard events are
 	processed in this class. 
 
 	Another important class is the BWindow class, which holds BViews and makes
-	them visibile to the user. The BWindow class also handles BView focusing
+	them visible to the user. The BWindow class also handles BView focusing
 	and BMessage dispatching, among other things.
 
 	A new addition Haiku has added over the BeOS API is the Layout API, which

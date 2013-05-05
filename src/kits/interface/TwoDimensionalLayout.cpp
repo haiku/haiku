@@ -407,14 +407,6 @@ BTwoDimensionalLayout::SetFrame(BRect frame)
 }
 
 
-void
-BTwoDimensionalLayout::InvalidateLayout(bool children)
-{
-	BLayout::InvalidateLayout(children);
-	fLocalLayouter->InvalidateLayout();
-}
-
-
 status_t
 BTwoDimensionalLayout::Archive(BMessage* into, bool deep) const
 {
@@ -464,8 +456,33 @@ BTwoDimensionalLayout::AllUnarchived(const BMessage* from)
 }
 
 
+status_t
+BTwoDimensionalLayout::ItemArchived(BMessage* into, BLayoutItem* item,
+	int32 index) const
+{
+	return BAbstractLayout::ItemArchived(into, item, index);
+}
+
+
+status_t
+BTwoDimensionalLayout::ItemUnarchived(const BMessage* from, BLayoutItem* item,
+	int32 index)
+{
+	return BAbstractLayout::ItemUnarchived(from, item, index);
+}
+
+
+
+
 void
-BTwoDimensionalLayout::DerivedLayoutItems()
+BTwoDimensionalLayout::LayoutInvalidated(bool children)
+{
+	fLocalLayouter->InvalidateLayout();
+}
+
+
+void
+BTwoDimensionalLayout::DoLayout()
 {
 	_ValidateMinMax();
 
@@ -1408,3 +1425,23 @@ BTwoDimensionalLayout::LocalLayouter::LayoutContextLeft(BLayoutContext* context)
 	fHorizontalLayoutContext = NULL;
 	fHorizontalLayoutWidth = -1;
 }
+
+
+status_t
+BTwoDimensionalLayout::Perform(perform_code code, void* _data)
+{
+	return BAbstractLayout::Perform(code, _data);
+}
+
+
+void BTwoDimensionalLayout::_ReservedTwoDimensionalLayout1() {}
+void BTwoDimensionalLayout::_ReservedTwoDimensionalLayout2() {}
+void BTwoDimensionalLayout::_ReservedTwoDimensionalLayout3() {}
+void BTwoDimensionalLayout::_ReservedTwoDimensionalLayout4() {}
+void BTwoDimensionalLayout::_ReservedTwoDimensionalLayout5() {}
+void BTwoDimensionalLayout::_ReservedTwoDimensionalLayout6() {}
+void BTwoDimensionalLayout::_ReservedTwoDimensionalLayout7() {}
+void BTwoDimensionalLayout::_ReservedTwoDimensionalLayout8() {}
+void BTwoDimensionalLayout::_ReservedTwoDimensionalLayout9() {}
+void BTwoDimensionalLayout::_ReservedTwoDimensionalLayout10() {}
+

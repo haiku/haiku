@@ -1,24 +1,25 @@
-1	polish	x-vnd.Haiku-Backgrounds	4220509773
-All workspaces	Main View		Wszystkie obszary robocze
-Apply	Main View		Zastosuj
-Center	Main View		Wyśrodkuj
-Current workspace	Main View		Obecny obszar roboczy
+1	polish	x-vnd.Haiku-Backgrounds	3513602073
+Backgrounds	System name		Tła
+X:	Main View		X:
+Resolution: 	Image Filepanel		Rozdzielczość: 
+pick one	Main View		wybierz jeden
 Default	Main View		Domyślne
-Default folder	Main View		Domyślny folder
-Folder: 	Main View		Folder: 
-Icon label outline	Main View		Zarys etykiet ikon
-Image:	Main View		Obraz:
+Center	Main View		Wyśrodkuj
 Manual	Main View		Ręcznie
+Default folder	Main View		Domyślny folder
+Revert	Main View		Przywróć
 None	Main View		Żaden
-Other folder…	Main View		Inny folder…
+All workspaces	Main View		Wszystkie obszary robocze
+Icon label outline	Main View		Zarys etykiet ikon
 Other…	Main View		Inne…
+Current workspace	Main View		Obecny obszar roboczy
+Folder: 	Main View		Folder: 
+Apply	Main View		Zastosuj
+Other folder…	Main View		Inny folder…
+Y:	Main View		Y:
+Tile	Main View		Kafelkuj
+Select	Main View		Wybierz
+Scale to fit	Main View		Dopasuj rozmiar
 Placement:	Main View		Położenie:
 Preview	Main View		Podgląd
-Resolution: 	Image Filepanel		Rozdzielczość: 
-Revert	Main View		Przywróć
-Scale to fit	Main View		Dopasuj rozmiar
-Select	Main View		Wybierz
-Tile	Main View		Kafelkuj
-X:	Main View		X:
-Y:	Main View		Y:
-pick one	Main View		wybierz jeden
+Image:	Main View		Obraz:

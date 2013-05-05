@@ -1,0 +1,27 @@
+1	portuguese (brazil)	x-vnd.Haiku-Network	1341378870
+Choose automatically	EthernetSettingsView		Escolher automaticamente
+Gateway:	EthernetSettingsView		Gateway:
+Netmask:	EthernetSettingsView		Máscara de rede:
+DHCP	EthernetSettingsView		DHCP
+DNS #2:	EthernetSettingsView		DNS #2:
+Apply	EthernetSettingsView		Aplicar
+Netmask is invalid	EthernetSettingsView		Máscara de rede é inválida
+OK	EthernetSettingsView		OK
+DNS #1:	EthernetSettingsView		DNS #1:
+IP address:	EthernetSettingsView		Endereço de IP:
+Adapter:	EthernetSettingsView		Adaptador:
+Domain:	EthernetSettingsView		Domínio:
+Gateway is invalid	EthernetSettingsView		O Gateway é inválido
+DNS #1 is invalid	EthernetSettingsView		DNS #1 é inválido
+Revert	EthernetSettingsView		Reverter
+<no wireless networks found>	EthernetSettingsView		<nenhuma rede sem fio encontrada>
+Network	System name		Rede
+Mode:	EthernetSettingsView		Modo:
+IP address is invalid	EthernetSettingsView		O endereço IP é inválido
+Network:	EthernetSettingsView		Rede:
+The net_server needs to run for the auto configuration!	EthernetSettingsView		É preciso abrir o net_server para efetuar a configuração automática!
+Disabled	EthernetSettingsView		Desativado
+Auto-configuring failed: 	EthernetSettingsView		Auto-configuração falhou: 
+Static	EthernetSettingsView		Estático
+DNS #2 is invalid	EthernetSettingsView		DNS #2 é inválido
+<no adapter>	EthernetSettingsView		<nenhum adaptador>

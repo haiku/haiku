@@ -32,16 +32,18 @@ brand product names are registered trademarks or trademarks of their respective
 holders.
 All rights reserved.
 */
+#ifndef WINDOWMENU_H
+#define WINDOWMENU_H
+
 
 // list of windows for a specific application
 // always submenu for a TeamMenuItem
 // all DB positions
 
-#ifndef WINDOWMENU_H
-#define WINDOWMENU_H
 
 #include <Menu.h>
 #include <String.h>
+#include <WindowInfo.h>
 
 
 class TWindowMenu : public BMenu {
@@ -53,7 +55,7 @@ class TWindowMenu : public BMenu {
 
 		BPoint			ScreenLocation();
 		void			SetExpanded(bool status, int addAtIndex);
-		static bool		WindowShouldBeListed(uint32 behavior);
+		static bool		WindowShouldBeListed(client_window_info* info);
 
 	private:
 		const BList		*fTeam;
@@ -62,5 +64,5 @@ class TWindowMenu : public BMenu {
 		int				fExpandedIndex;
 };
 
-#endif /* WINDOWMENU_H */
 
+#endif	/* WINDOWMENU_H */

@@ -1,48 +1,48 @@
 1	swedish	x-vnd.Haiku-ProcessController	2887520383
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
-About ProcessController…	ProcessController		Om ProcessKontroll...
-Cancel	ProcessController		Avbryt
-Custom priority	ProcessController		Annan prioritet
-Damned!	ProcessController		Attans!
-Debug this thread!	ProcessController		Felsök tråden!
-Debug thread	ProcessController		Felsök tråd
-Display priority	ProcessController		Visningsprioritet
-Do you really want to kill the team \"%s\"?	ProcessController		Vill du verkligen avsluta processen "%s"?
-Error saving file	ProcessController		Fel vid sparning av fil
-Gone teams…	ProcessController		Avslutade processer...
-Idle priority	ProcessController		Overksam prioritet
-Info	ProcessController		Information
-Install in Deskbar	ProcessController		Installera i Deskbar
-Kill this thread!	ProcessController		Avsluta tråden!
-Live in the Deskbar	ProcessController		Lev i Deskbar
-Low priority	ProcessController		Låg prioritet
-Lowest active priority	ProcessController		Lägsta aktiva prioritet
 Memory usage	ProcessController		Minnesanvändning
-New Terminal	ProcessController		Ny terminal
-Normal priority	ProcessController		Normal prioritet
-OK	ProcessController		OK
-Ok!	ProcessController		OK!
-Please confirm	ProcessController		Vänligen bekräfta
-ProcessController	System name		ProcessKontroll
-ProcessController is already installed in Deskbar.	ProcessController		ProcessKontroll är redan installerad i Deskbar.
-Processor %d	ProcessController		Processor %d
-Quit an application	ProcessController		Avsluta ett program
-Quit application	ProcessController		Avsluta program
-Real-time display priority	ProcessController		Realtidsvisningprioritet
-Real-time priority	ProcessController		Realtidsprioritet
+Do you really want to kill the team \"%s\"?	ProcessController		Vill du verkligen avsluta processen "%s"?
+Idle priority	ProcessController		Overksam prioritet
 Restart Deskbar	ProcessController		Starta om Deskbar
-Restart Tracker	ProcessController		Starta om Tracker
-Run in window	ProcessController		Kör i fönster
-System resources & caches…	ProcessController		Systemresurser & filsystemscache…
-That's no Fun!	ProcessController		Det var inte roligt!
-This is the last active processor...\nYou can't turn it off!	ProcessController		Detta är den sista aktiva processorn...\nDen kan inte stängas av!
+Custom priority	ProcessController		Annan prioritet
+Debug thread	ProcessController		Felsök tråd
 This team is already gone…	ProcessController		Processen är redan avslutad...
+Error saving file	ProcessController		Fel vid sparning av fil
+Real-time priority	ProcessController		Realtidsprioritet
+Your setting file could not be saved!\n(%s)	ProcessController		Inställningsfilen kunde inte sparas!\n(%s)
 This thread is already gone…	ProcessController		Tråden är redan avslutad
+Cancel	ProcessController		Avbryt
+Display priority	ProcessController		Visningsprioritet
+Run in window	ProcessController		Kör i fönster
+Processor %d	ProcessController		Processor %d
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+ProcessController is already installed in Deskbar.	ProcessController		ProcessKontroll är redan installerad i Deskbar.
+This is the last active processor...\nYou can't turn it off!	ProcessController		Detta är den sista aktiva processorn...\nDen kan inte stängas av!
+Info	ProcessController		Information
+Quit application	ProcessController		Avsluta program
+Low priority	ProcessController		Låg prioritet
+What do you want to do with the thread \"%s\"?	ProcessController		Vad vill du göra med tråden "%s"?
+Gone teams…	ProcessController		Avslutade processer...
+Lowest active priority	ProcessController		Lägsta aktiva prioritet
+Restart Tracker	ProcessController		Starta om Tracker
+Live in the Deskbar	ProcessController		Lev i Deskbar
+Kill this thread!	ProcessController		Avsluta tråden!
+Debug this thread!	ProcessController		Felsök tråden!
+Normal priority	ProcessController		Normal prioritet
+New Terminal	ProcessController		Ny terminal
+Urgent priority	ProcessController		Brådskande prioritet
+About ProcessController…	ProcessController		Om ProcessKontroll...
+Ok!	ProcessController		OK!
+Quit an application	ProcessController		Avsluta ett program
+Install in Deskbar	ProcessController		Installera i Deskbar
 Threads and CPU usage	ProcessController		Tråd och CPU användning
 Urgent display priority	ProcessController		Brådskande visningsprioritet
-Urgent priority	ProcessController		Brådskande prioritet
+OK	ProcessController		OK
+Damned!	ProcessController		Attans!
 Usage: %s [-deskbar]\n	ProcessController		Hantering: %s [-deskbar]\n
-What do you want to do with the thread \"%s\"?	ProcessController		Vad vill du göra med tråden "%s"?
+ProcessController	System name		ProcessKontroll
+Real-time display priority	ProcessController		Realtidsvisningprioritet
+Please confirm	ProcessController		Vänligen bekräfta
 Yes, kill this team!	ProcessController		Ja, avsluta den här processen!
+System resources & caches…	ProcessController		Systemresurser & filsystemscache…
+That's no Fun!	ProcessController		Det var inte roligt!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Du kan köra ProcessKontroll i ett fönster eller installera den i Deskbar.
-Your setting file could not be saved!\n(%s)	ProcessController		Inställningsfilen kunde inte sparas!\n(%s)

@@ -17,8 +17,8 @@
 #include "PlaylistItem.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MediaPlayer-ImportPLItemsCmd"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MediaPlayer-ImportPLItemsCmd"
 
 
 using std::nothrow;
@@ -162,7 +162,7 @@ ImportPLItemsCommand::Undo()
 		}
 		// Restore previously playing item
 		if (fPlaylingIndex >= 0)
-			fPlaylist->SetCurrentItemIndex(fPlaylingIndex);
+			fPlaylist->SetCurrentItemIndex(fPlaylingIndex, false);
 	} else {
 		// remove new items from playlist
 		for (int32 i = 0; i < fNewCount; i++) {

@@ -35,7 +35,7 @@ static const mail_header_field gDefaultFields[] = {
 	{ "Reply-To",     	B_MAIL_ATTR_REPLY,		B_STRING_TYPE },
 	{ "Subject",      	B_MAIL_ATTR_SUBJECT,	B_STRING_TYPE },
 	{ "X-Priority",		B_MAIL_ATTR_PRIORITY,	B_STRING_TYPE },
-		// Priorities with prefered
+		// Priorities with preferred
 	{ "Priority",		B_MAIL_ATTR_PRIORITY,	B_STRING_TYPE },
 		// one first - the numeric
 	{ "X-Msmail-Priority", B_MAIL_ATTR_PRIORITY, B_STRING_TYPE },

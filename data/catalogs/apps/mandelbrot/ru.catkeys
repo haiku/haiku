@@ -1,10 +1,10 @@
 1	russian	x-vnd.Haiku-Mandelbrot	3766380907
 File	Mandelbrot		Файл
-Iterations	Mandelbrot		Итерации
-Mandelbrot	System name		Мандельброт
-Palette	Mandelbrot		Палитра
-Palette 1	Mandelbrot		Палитра 1
-Palette 2	Mandelbrot		Палитра 2
 Palette 3	Mandelbrot		Палитра 3
-Palette 4	Mandelbrot		Палитра 4
 Quit	Mandelbrot		Выход
+Palette 2	Mandelbrot		Палитра 2
+Palette 4	Mandelbrot		Палитра 4
+Palette	Mandelbrot		Палитра
+Mandelbrot	System name		Мандельброт
+Palette 1	Mandelbrot		Палитра 1
+Iterations	Mandelbrot		Итерации

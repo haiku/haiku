@@ -4,7 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UseLibraryHeaders icon ;
-UsePrivateHeaders shared ;
+UsePrivateHeaders shared tracker ;
 SubDirSysHdrs $(HAIKU_TOP) src kits tracker ;
 
 Preference FileTypes :

@@ -14,6 +14,8 @@
 
 #include <arch_thread.h>
 
+#include <string.h>
+
 #include <arch_cpu.h>
 #include <arch/thread.h>
 #include <boot/stage2.h>
@@ -24,7 +26,10 @@
 #include <arch_vm.h>
 //#include <arch/vm_translation_map.h>
 
-#include <string.h>
+#include "paging/M68KPagingMethod.h"
+#include "paging/M68KPagingStructures.h"
+#include "paging/M68KVMTranslationMap.h"
+
 
 #warning M68K: writeme!
 // Valid initial arch_thread state. We just memcpy() it when initializing
@@ -90,29 +95,20 @@ m68k_get_user_iframe(void)
 }
 
 
-void *
+uint32
 m68k_next_page_directory(Thread *from, Thread *to)
 {
-	if (from->team->address_space != NULL && to->team->address_space != NULL) {
-		// they are both user space threads
-		if (from->team == to->team) {
-			// dont change the pgdir, same address space
-			return NULL;
-		}
-		// switching to a new address space
-		return m68k_translation_map_get_pgdir(
-			to->team->address_space->TranslationMap());
-	} else if (from->team->address_space == NULL && to->team->address_space == NULL) {
-		// they must both be kernel space threads
-		return NULL;
-	} else if (to->team->address_space == NULL) {
-		// the one we're switching to is kernel space
-		return m68k_translation_map_get_pgdir(
-			VMAddressSpace::Kernel()->TranslationMap());
+	VMAddressSpace* toAddressSpace = to->team->address_space;
+	if (from->team->address_space == toAddressSpace) {
+		// don't change the pgdir, same address space
+		return 0;
 	}
 
-	return m68k_translation_map_get_pgdir(
-		to->team->address_space->TranslationMap());
+	if (toAddressSpace == NULL)
+		toAddressSpace = VMAddressSpace::Kernel();
+
+	return static_cast<M68KVMTranslationMap*>(toAddressSpace->TranslationMap())
+		->PagingStructures()->pgroot_phys;
 }
 
 // #pragma mark -
@@ -211,7 +207,10 @@ arch_thread_context_switch(Thread *from, Thread *to)
 	if ((newPageDirectory % B_PAGE_SIZE) != 0)
 		panic("arch_thread_context_switch: bad pgdir 0x%lx\n", newPageDirectory);
 #warning M68K: export from arch_vm.c
-	m68k_set_pgdir((void *)newPageDirectory);
+
+	//m68k_set_pgdir((void *)newPageDirectory);
+	gM68KPagingMethod->SetPageRoot(newPageDirectory);
+
 	m68k_context_switch(&from->arch_info.sp, to->arch_info.sp);
 }
 

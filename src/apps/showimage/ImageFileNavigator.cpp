@@ -374,14 +374,16 @@ AutoAdjustingNavigator::~AutoAdjustingNavigator()
 
 
 bool
-AutoAdjustingNavigator::FindNextImage(const entry_ref& currentRef, entry_ref& nextRef,
-	bool next, bool rewind)
+AutoAdjustingNavigator::FindNextImage(const entry_ref& currentRef,
+	entry_ref& nextRef,	bool next, bool rewind)
 {
 	if (_CheckForTracker(currentRef))
-		return fTrackerNavigator->FindNextImage(currentRef, nextRef, next, rewind);
+		return fTrackerNavigator->FindNextImage(currentRef, nextRef, next,
+			rewind);
 
 	if (fFolderNavigator != NULL)
-		return fFolderNavigator->FindNextImage(currentRef, nextRef, next, rewind);
+		return fFolderNavigator->FindNextImage(currentRef, nextRef, next,
+			rewind);
 
 	return false;
 }

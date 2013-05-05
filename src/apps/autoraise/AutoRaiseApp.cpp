@@ -70,6 +70,7 @@ void AutoRaiseApp::ReadyToRun()
 		BAlert *alert = new BAlert("usage box", APP_NAME ", (c) 2002, mmu_man\nUsage: " APP_NAME " [options]\n\t--deskbar\twill not open window, will just put " APP_NAME " into tray\n\t--persist will put "APP_NAME" into tray such that it remains between bootings\n", "OK", NULL, NULL,
             B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_INFO_ALERT);
         alert->SetShortcut(0, B_ENTER);
+        alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
    	    alert->Go();
 		be_app_messenger.SendMessage(B_QUIT_REQUESTED);
 	}

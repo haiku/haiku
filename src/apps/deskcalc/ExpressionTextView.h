@@ -5,14 +5,15 @@
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef EXPRESSION_TEXT_VIEW_H
 #define EXPRESSION_TEXT_VIEW_H
+
 
 #include <List.h>
 #include <String.h>
 
 #include "InputTextView.h"
+
 
 class CalcView;
 
@@ -62,7 +63,7 @@ class ExpressionTextView : public InputTextView {
 			int32				fHistoryPos;
 			BString				fCurrentExpression;
 			BString				fCurrentValue;
-			
+
 			bool				fChangesApplied;
 };
 

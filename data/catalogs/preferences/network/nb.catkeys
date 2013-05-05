@@ -1,21 +1,21 @@
-1	norwegian_bokmål	x-vnd.Haiku-Network	2324385456
-<no wireless networks found>	EthernetSettingsView		<ingen trådløse nettverk funnet>
-Adapter:	EthernetSettingsView		Nettverkskort:
-Apply	EthernetSettingsView		Bruk
-Auto-configuring failed: 	EthernetSettingsView		Automatisk konfigurering mislyktes: 
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Network	2324385456
 Choose automatically	EthernetSettingsView		Velg automatisk
-DHCP	EthernetSettingsView		DHCP
-DNS #1:	EthernetSettingsView		Primær DNS:
-DNS #2:	EthernetSettingsView		Sekundær DNS:
-Disabled	EthernetSettingsView		Deaktivert
-Domain:	EthernetSettingsView		Domene:
 Gateway:	EthernetSettingsView		Gateway:
-IP address:	EthernetSettingsView		IP-adresse:
-Mode:	EthernetSettingsView		Modus:
 Netmask:	EthernetSettingsView		Nettverksmaske:
-Network	System name		Nettverk
-Network:	EthernetSettingsView		Nettverk:
+DHCP	EthernetSettingsView		DHCP
+DNS #2:	EthernetSettingsView		Sekundær DNS:
+Apply	EthernetSettingsView		Bruk
 OK	EthernetSettingsView		OK
+DNS #1:	EthernetSettingsView		Primær DNS:
+IP address:	EthernetSettingsView		IP-adresse:
+Adapter:	EthernetSettingsView		Nettverkskort:
+Domain:	EthernetSettingsView		Domene:
 Revert	EthernetSettingsView		Tilbakestill
-Static	EthernetSettingsView		Statisk
+<no wireless networks found>	EthernetSettingsView		<ingen trådløse nettverk funnet>
+Network	System name		Nettverk
+Mode:	EthernetSettingsView		Modus:
+Network:	EthernetSettingsView		Nettverk:
 The net_server needs to run for the auto configuration!	EthernetSettingsView		Automatisk konfigurering kan ikke gjennomføres uten at net_server kjører!
+Disabled	EthernetSettingsView		Deaktivert
+Auto-configuring failed: 	EthernetSettingsView		Automatisk konfigurering mislyktes: 
+Static	EthernetSettingsView		Statisk

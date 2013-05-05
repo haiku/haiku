@@ -15,9 +15,7 @@
 
 
 static area_id	sCommPageArea;
-static area_id	sUserCommPageArea;
 static addr_t*	sCommPageAddress;
-static addr_t*	sUserCommPageAddress;
 static void*	sFreeCommPageSpace;
 static image_id	sCommPageImage;
 
@@ -30,19 +28,19 @@ allocate_commpage_entry(int entry, size_t size)
 {
 	void* space = sFreeCommPageSpace;
 	sFreeCommPageSpace = ALIGN_ENTRY((addr_t)sFreeCommPageSpace + size);
-	sCommPageAddress[entry] = (addr_t)sUserCommPageAddress
-		+ ((addr_t)space - (addr_t)sCommPageAddress);
-dprintf("allocate_commpage_entry(%d, %lu) -> %p\n", entry, size, (void*)sCommPageAddress[entry]);
+	sCommPageAddress[entry] = (addr_t)space - (addr_t)sCommPageAddress;
+	dprintf("allocate_commpage_entry(%d, %lu) -> %p\n", entry, size,
+		(void*)sCommPageAddress[entry]);
 	return space;
 }
 
 
-void*
+addr_t
 fill_commpage_entry(int entry, const void* copyFrom, size_t size)
 {
 	void* space = allocate_commpage_entry(entry, size);
 	memcpy(space, copyFrom, size);
-	return space;
+	return (addr_t)space - (addr_t)sCommPageAddress;
 }
 
 
@@ -53,19 +51,23 @@ get_commpage_image()
 }
 
 
+area_id
+clone_commpage_area(team_id team, void** address)
+{
+	*address = (void*)KERNEL_USER_DATA_BASE;
+	return vm_clone_area(team, "commpage", address,
+		B_RANDOMIZED_BASE_ADDRESS, B_READ_AREA | B_EXECUTE_AREA | B_KERNEL_AREA,
+		REGION_PRIVATE_MAP, sCommPageArea, true);
+}
+
+
 status_t
 commpage_init(void)
 {
 	// create a read/write kernel area
-	sCommPageArea = create_area("commpage", (void **)&sCommPageAddress,
+	sCommPageArea = create_area("kernel_commpage", (void **)&sCommPageAddress,
 		B_ANY_ADDRESS, COMMPAGE_SIZE, B_FULL_LOCK,
 		B_KERNEL_WRITE_AREA | B_KERNEL_READ_AREA);
-
-	// clone it at a fixed address with user read/only permissions
-	sUserCommPageAddress = (addr_t*)USER_COMMPAGE_ADDR;
-	sUserCommPageArea = clone_area("user_commpage",
-		(void **)&sUserCommPageAddress, B_EXACT_ADDRESS,
-		B_READ_AREA | B_EXECUTE_AREA, sCommPageArea);
 
 	// zero it out
 	memset(sCommPageAddress, 0, COMMPAGE_SIZE);
@@ -78,10 +80,10 @@ commpage_init(void)
 	sFreeCommPageSpace = ALIGN_ENTRY(&sCommPageAddress[COMMPAGE_TABLE_ENTRIES]);
 
 	// create the image for the commpage
-	sCommPageImage = elf_create_memory_image("commpage", USER_COMMPAGE_ADDR,
-		COMMPAGE_SIZE, 0, 0);
+	sCommPageImage = elf_create_memory_image("commpage", 0, COMMPAGE_SIZE, 0,
+		0);
 	elf_add_memory_image_symbol(sCommPageImage, "commpage_table",
-		USER_COMMPAGE_ADDR, COMMPAGE_TABLE_ENTRIES * sizeof(addr_t),
+		0, COMMPAGE_TABLE_ENTRIES * sizeof(addr_t),
 		B_SYMBOL_TYPE_DATA);
 
 	arch_commpage_init();

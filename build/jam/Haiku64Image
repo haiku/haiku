@@ -1,0 +1,626 @@
+# This file defines what ends up on the Haiku image (respectively in the Haiku
+# installation directory) and it executes the rules building the image
+# (respectively installing the files in the installation directory).
+
+# This is only temporary while x86_64 is still a work in progress, so I can
+# easily add things to the image as I port them.
+
+
+SYSTEM_BIN = "["
+	addattr alert arp
+	base64 basename bash bc beep
+	cal cat catattr checkfs chgrp chmod chown chroot cksum clear clockconfig
+	cmp collectcatkeys comm compress copyattr CortexAddOnHost cp csplit cut
+	date dd diff diff3 dircolors dirname df du dumpcatalog
+	echo eject env error expand expr
+	factor false find finddir FirstBootPrompt fmt fold fortune ftp
+	gawk gdb gzip gzexe getlimits groups
+	head hostname
+	id ifconfig <bin>install isvolume
+	join
+	kernel_debugger kill
+	less lessecho lesskey link linkcatkeys listdev ln locale locate logger
+	logname ls
+	makebootable md5sum mimeset mkdir mkfifo mkfs mktemp mount mountvolume mv
+	nl nohup notify nproc
+	od open
+	paste patch pathchk ping pr printenv printf ps ptx pwd
+	query
+	rc readlink rm rmattr rmdir
+	safemode sdiff seq sha1sum shred shuf shutdown sleep sort split stat
+	strace stty su sum sync sysinfo
+	tac tail tee test timeout touch tr true truncate tsort tty
+	unexpand uname uniq unlink unmount unzip <bin>updatedb
+	waitfor wc wget whoami
+	xargs xres
+	yes
+	zdiff zforce zgrep zip zipcloak <bin>zipgrep zipnote zipsplit zmore znew
+;
+
+SYSTEM_APPS = AboutSystem ActivityMonitor CDPlayer CharacterMap Debugger DeskCalc
+	Devices DiskUsage DriveSetup Expander Installer LaunchBox MediaConverter
+	NetworkStatus PoorMan Pulse ProcessController Screenshot ShowImage
+	SoundRecorder StyledEdit Terminal TV Workspaces
+;
+
+SYSTEM_PREFERENCES = Appearance Backgrounds DataTranslations <preference>Deskbar
+	FileTypes Keyboard Keymap Locale Media Mouse Network Notifications
+	Printers Screen ScreenSaver Time Touchpad <preference>Tracker
+	VirtualMemory
+;
+
+SYSTEM_DEMOS = BSnow Cortex FontDemo OverlayImage Pairs Sudoku ;
+
+SYSTEM_LIBS = libbe.so libbsd.so libbnetapi.so libgame.so libdebug.so libmedia.so
+	libmidi2.so libnetwork.so <revisioned>libroot.so libroot-addon-icu.so
+	libtextencoding.so libtiff.so libtracker.so libtranslation.so
+	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
+;
+
+PRIVATE_SYSTEM_LIBS =
+	$(HAIKU_JPEG_CURRENT_LIB)
+	$(HAIKU_LIBPNG_CURRENT_LIB)
+	$(HAIKU_ZLIB_CURRENT_LIB)
+	$(HAIKU_FREETYPE_CURRENT_LIB)
+	libilmimf.so
+;
+
+SYSTEM_SERVERS = app_server cddb_daemon debug_server input_server midi_server
+	mount_server net_server notification_server power_daemon print_server
+	print_addon_server registrar syslog_daemon dns_resolver_server
+	nfs4_idmapper_server
+;
+
+SYSTEM_NETWORK_DEVICES = ethernet loopback ;
+SYSTEM_NETWORK_DATALINK_PROTOCOLS = ethernet_frame <module>arp loopback_frame
+	ipv6_datagram ;
+SYSTEM_NETWORK_PROTOCOLS = ipv4 tcp udp icmp unix icmp6 ipv6 ;
+
+SYSTEM_ADD_ONS_ACCELERANTS = vesa.accelerant ;
+SYSTEM_ADD_ONS_TRANSLATORS = BMPTranslator EXRTranslator GIFTranslator
+	HVIFTranslator ICOTranslator JPEGTranslator JPEG2000Translator
+	PCXTranslator PNGTranslator PPMTranslator
+	RAWTranslator RTFTranslator SGITranslator STXTTranslator TGATranslator
+	TIFFTranslator WebPTranslator WonderBrushTranslator
+;
+
+SYSTEM_ADD_ONS_PRINT =
+	Canon\ LIPS3\ Compatible
+	Canon\ LIPS4\ Compatible
+	Gutenprint
+	PCL5\ Compatible
+	PCL6\ Compatible
+	PDF\ Writer
+	PS\ Compatible
+
+;
+
+SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = vesa ;
+SYSTEM_ADD_ONS_DRIVERS_NET = 3com atheros813x ar81xx attansic_l1 attansic_l2
+	broadcom440x broadcom570x dec21xxx etherpci ipro100 ipro1000 jmicron2x0
+	marvell_yukon nforce pcnet pegasus rtl8139 rtl81xx sis19x sis900 syskonnect
+	via_rhine wb840
+;
+
+SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
+	ata@ata pci ps2 isa scsi config_manager usb
+] ;
+SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs iso9660 nfs4 attribute_overlay write_overlay ;
+
+# modules
+AddFilesToHaikuImage system add-ons kernel bus_managers
+	: $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
+
+if $(HAIKU_ATA_STACK) = 1 {
+	AddFilesToHaikuImage system add-ons kernel busses ata
+		: generic_ide_pci legacy_sata ;
+}
+
+AddFilesToHaikuImage system add-ons kernel busses scsi
+	: ahci ;
+AddFilesToHaikuImage system add-ons kernel busses usb
+	: <usb>uhci <usb>ohci <usb>ehci ;
+AddFilesToHaikuImage system add-ons kernel debugger
+	: <kdebug>demangle <kdebug>invalidate_on_exit <kdebug>usb_keyboard ;
+AddFilesToHaikuImage system add-ons kernel file_systems
+	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
+AddFilesToHaikuImage system add-ons kernel generic
+	: ata_adapter@ata bios dpc locked_pool scsi_periph <module>tty ;
+AddFilesToHaikuImage system add-ons kernel partitioning_systems
+	: intel session ;
+
+AddFilesToHaikuImage system add-ons kernel cpu : generic_x86 ;
+
+# drivers
+AddNewDriversToHaikuImage disk scsi	: scsi_cd scsi_disk ;
+
+# legacy drivers
+AddDriversToHaikuImage				: console dprintf null
+									  random <driver>tty zero ;
+AddDriversToHaikuImage graphics		: $(SYSTEM_ADD_ONS_DRIVERS_GRAPHICS) ;
+AddDriversToHaikuImage disk usb		: usb_disk ;
+AddDriversToHaikuImage input		: ps2_hid usb_hid ;
+AddDriversToHaikuImage net			: $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
+
+# kernel
+AddFilesToHaikuImage system : <revisioned>kernel_$(TARGET_ARCH) ;
+
+# libs
+AddLibrariesToHaikuHybridImage system lib
+	: $(SYSTEM_LIBS) $(PRIVATE_SYSTEM_LIBS) ;
+
+OPTIONAL_LIBS_ALIASES =
+        libfreetype.so
+        libjpeg.so
+        libpng.so
+        libz.so
+;
+
+# libfreetype.so links to the current freetype lib
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_FREETYPE_CURRENT_LIB:BS)
+	: $(HAIKU_FREETYPE_CURRENT_LINK) : : true ;
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_FREETYPE_CURRENT_LINK)
+	: libfreetype.so : : true ;
+
+# libpng.so links to the current libpng
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_LIBPNG_CURRENT_LIB:BS)
+	: $(HAIKU_LIBPNG_CURRENT_LINK) : : true ;
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_LIBPNG_CURRENT_LINK)
+	: libpng.so : : true ;
+
+# libjpeg.so links to the current libjpeg
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_JPEG_CURRENT_LIB:BS)
+	: $(HAIKU_JPEG_CURRENT_LINK) : : true ;
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_JPEG_CURRENT_LINK)
+	: libjpeg.so : : true ;
+
+# zlib.so links to the current zlib
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_ZLIB_CURRENT_LIB:BS)
+	: $(HAIKU_ZLIB_CURRENT_LINK) : : true ;
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_ZLIB_CURRENT_LINK)
+	: libz.so : : true ;
+
+# servers
+AddFilesToHaikuImage system servers : $(SYSTEM_SERVERS) ;
+
+# apps
+AddFilesToHaikuImage system				: runtime_loader Deskbar Tracker ;
+AddFilesToHaikuImage system bin			: $(SYSTEM_BIN) consoled ;
+AddFilesToHaikuImage system apps		: $(SYSTEM_APPS) ;
+AddFilesToHaikuImage system preferences	: $(SYSTEM_PREFERENCES) ;
+AddFilesToHaikuImage system demos		: $(SYSTEM_DEMOS) ;
+
+SEARCH on which = [ FDirName $(HAIKU_TOP) data bin ] ;
+AddFilesToHaikuImage system bin			: which ;
+SEARCH on installoptionalpackage = [ FDirName $(HAIKU_TOP) data bin ] ;
+AddFilesToHaikuImage system bin			: installoptionalpackage ;
+SEARCH on install-wifi-firmwares.sh = [ FDirName $(HAIKU_TOP) data bin ] ;
+AddFilesToHaikuImage system bin			: install-wifi-firmwares.sh ;
+
+# Add the files to be used by installoptionalpackage.
+AddDirectoryToHaikuImage common data optional-packages ;
+local optional-pkg-files = BuildFeatures OptionalPackageDependencies
+	OptionalPackages OptionalLibPackages ;
+for name in $(optional-pkg-files) {
+	local file = [ FDirName $(HAIKU_TOP) build jam $(name) ] ;
+	AddFilesToHaikuImage common data optional-packages : $(file) ;
+}
+AddInstalledPackagesFileToHaikuImage ;
+
+AddSymlinkToHaikuImage system bin : bash : sh ;
+AddSymlinkToHaikuImage system bin : trash : untrash ;
+
+AddSymlinkToHaikuImage home Desktop : /boot/home : Home ;
+
+# Mailbox folders and symlink
+AddDirectoryToHaikuImage home mail draft ;
+AddDirectoryToHaikuImage home mail in ;
+AddDirectoryToHaikuImage home mail out ;
+
+AddSymlinkToHaikuImage home config : settings/deskbar : be ;
+# Deskbar Application links
+AddDirectoryToHaikuImage home config settings deskbar Applications ;
+DESKBAR_APPLICATIONS = ActivityMonitor DriveSetup Installer StyledEdit
+	Terminal ;
+local linkTarget ;
+for linkTarget in $(DESKBAR_APPLICATIONS) {
+	AddSymlinkToHaikuImage home config settings deskbar Applications
+		: /boot/system/apps/$(linkTarget) : $(linkTarget) ;
+}
+
+# Deskbar Desktop applets links
+AddDirectoryToHaikuImage home config settings deskbar Desktop\ applets ;
+DESKBAR_DESKTOP_APPLETS = NetworkStatus ProcessController ;
+for linkTarget in $(DESKBAR_DESKTOP_APPLETS) {
+	AddSymlinkToHaikuImage home config settings deskbar Desktop\ applets
+		: /boot/system/apps/$(linkTarget) : $(linkTarget) ;
+}
+
+# Deskbar Preferences links
+AddDirectoryToHaikuImage home config settings deskbar Preferences ;
+DESKBAR_PREFERENCES = $(SYSTEM_PREFERENCES:B) ;
+for linkTarget in $(DESKBAR_PREFERENCES) {
+	AddSymlinkToHaikuImage home config settings deskbar Preferences
+		: /boot/system/preferences/$(linkTarget)
+		: $(linkTarget) ;
+}
+
+# Deskbar Demo links
+AddDirectoryToHaikuImage home config settings deskbar Demos ;
+for linkTarget in $(SYSTEM_DEMOS) {
+	AddSymlinkToHaikuImage home config settings deskbar Demos
+		: /boot/system/demos/$(linkTarget) : $(linkTarget) ;
+}
+
+AddSymlinkToHaikuImage system bin : less : more ;
+AddSymlinkToHaikuImage system bin : gzip : gunzip ;
+AddSymlinkToHaikuImage system bin : gzip : zcat ;
+AddSymlinkToHaikuImage system bin : zdiff : zcmp ;
+AddSymlinkToHaikuImage system bin : unzip : zipinfo ;
+AddSymlinkToHaikuImage system bin : gawk : awk ;
+
+
+# scripts and data files
+local bootScripts = Bootscript Bootscript.cd SetupEnvironment Netscript
+	InstallerInitScript InstallerFinishScript ;
+SEARCH on $(bootScripts) = [ FDirName $(HAIKU_TOP) data system boot ] ;
+AddFilesToHaikuImage system boot : $(bootScripts) ;
+
+local userBootScripts = UserBootscript UserSetupEnvironment.sample ;
+SEARCH on $(userBootScripts) = [ FDirName $(HAIKU_TOP) data config boot ] ;
+AddFilesToHaikuImage home config boot : $(userBootScripts) ;
+
+# Add boot launch directory
+AddDirectoryToHaikuImage home config boot launch ;
+
+local logoArtwork =
+	$(HAIKU_INCLUDE_TRADEMARKS)"HAIKU logo - white on blue - big.png"
+	$(HAIKU_INCLUDE_TRADEMARKS)"HAIKU logo - white on blue - normal.png" ;
+SEARCH on $(logoArtwork) = [ FDirName $(HAIKU_TOP) data artwork ] ;
+AddFilesToHaikuImage system data artwork : $(logoArtwork) ;
+
+local etcDir = [ FDirName $(HAIKU_TOP) data etc ] ;
+local etcFiles = inputrc profile ;
+etcFiles = $(etcFiles:G=etc) ;
+SEARCH on $(etcFiles) = [ FDirName $(etcDir) ] ;
+etcFiles += <etc>termcap <etc>sysless <etc>sysless.in ;
+AddFilesToHaikuImage common etc : $(etcFiles) ;
+
+local profileFiles = [ Glob $(etcDir)/profile.d : *.sh ] ;
+profileFiles = $(profileFiles:G=profile-d) ;
+AddDirectoryToHaikuImage common etc profile.d ;
+AddFilesToHaikuImage common etc profile.d : $(profileFiles) ;
+
+local fortuneFiles = [ Glob $(HAIKU_TOP)/data/system/data/fortunes
+	: [a-zA-Z0-9]* ] ;
+fortuneFiles = $(fortuneFiles:G=data!fortunes) ;
+AddFilesToHaikuImage system data fortunes : $(fortuneFiles) ;
+
+local fontDir = [ FDirName $(HAIKU_TOP) data system data fonts ] ;
+local psFonts = [ Glob $(fontDir)/psfonts : *.afm *.pfb ] ;
+local ttFonts = [ Glob $(fontDir)/ttfonts : *.ttf ] ;
+AddFilesToHaikuImage system data fonts psfonts : $(psFonts) ;
+AddFilesToHaikuImage system data fonts ttfonts : $(ttFonts) ;
+
+local keymapFiles = [ Glob [ FDirName $(HAIKU_TOP) src data keymaps ]
+	: *.keymap ] ;
+keymapFiles = $(keymapFiles:BG=keymap) ;
+AddFilesToHaikuImage system data Keymaps : $(keymapFiles) ;
+AddSymlinkToHaikuImage system data Keymaps : Swedish : Finnish ;
+AddSymlinkToHaikuImage system data Keymaps : Slovene : Croatian ;
+AddSymlinkToHaikuImage system data Keymaps : US-International : Brazilian ;
+
+# Copy keyboard layout files to the image one-by-one.
+local keyboardLayoutsDir
+	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts ] ;
+local keyboardLayoutFiles =
+	"Generic 104-key"
+	"Generic 105-key International"
+	"Kinesis Advantage"
+	"Kinesis Ergo Elan International"
+	"TypeMatrix 2030" ;
+keyboardLayoutFiles = $(keyboardLayoutFiles:G=keyboard-layout) ;
+SEARCH on $(keyboardLayoutFiles) = $(keyboardLayoutsDir) ;
+AddFilesToHaikuImage system data KeyboardLayouts
+	: $(keyboardLayoutFiles) ;
+
+# Add Apple Aluminum keyboard layout files to the image in an Apple Aluminum
+# subdirectory. The subdirectory is turned into a submenu in the Layout menu
+# of the Keymap preference app.
+local appleAluminumDir
+	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts
+		Apple\ Aluminum ] ;
+local appleAluminumFiles =
+	"Apple Aluminium Extended International"
+	"Apple Aluminium International"
+	"Apple Aluminum (US)"
+	"Apple Aluminum Extended (US)" ;
+appleAluminumFiles = $(appleAluminumFiles:G=keyboard-layout) ;
+SEARCH on $(appleAluminumFiles) = $(appleAluminumDir) ;
+AddFilesToHaikuImage system data KeyboardLayouts Apple\ Aluminum
+	: $(appleAluminumFiles) ;
+
+# Add ThinkPad keyboard layout files to the image in a ThinkPad
+# subdirectory. The subdirectory is turned into a submenu in the Layout menu
+# of the Keymap preference app.
+local thinkpadDir
+	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts ThinkPad ] ;
+local thinkPadFiles =
+	"ThinkPad (US)"
+	"ThinkPad International"
+	"ThinkPad T400s (US)"
+	"ThinkPad T400s International"
+	"ThinkPad X1 (US)"
+	"ThinkPad X1 International"
+	"ThinkPad X100e (US)"
+	"ThinkPad X100e International" ;
+thinkPadFiles = $(thinkPadFiles:G=keyboard-layout) ;
+SEARCH on $(thinkPadFiles) = $(thinkpadDir) ;
+AddFilesToHaikuImage system data KeyboardLayouts ThinkPad
+	: $(thinkPadFiles) ;
+
+local driverSettingsFiles = <driver-settings>kernel ;
+SEARCH on $(driverSettingsFiles)
+	= [ FDirName $(HAIKU_TOP) data settings kernel drivers ] ;
+AddFilesToHaikuImage home config settings kernel drivers
+	: $(driverSettingsFiles) ;
+
+# post install scripts and fresh install indicator file
+local postInstallFiles = add_catalog_entry_attributes.sh
+	default_deskbar_items.sh mime_update.sh ;
+postInstallFiles = $(postInstallFiles:G=post-install) ;
+SEARCH on $(postInstallFiles)
+	= [ FDirName $(HAIKU_TOP) data common boot post_install ] ;
+SEARCH on <post-install>fresh_install
+	= [ FDirName $(HAIKU_TOP) data common settings ] ;
+AddFilesToHaikuImage common boot post_install : $(postInstallFiles) ;
+AddFilesToHaikuImage common settings : <post-install>fresh_install ;
+
+# boot loader
+AddFilesToHaikuImage system : haiku_loader ;
+
+# boot module links
+AddBootModuleSymlinksToHaikuImage
+	ata@ata pci config_manager dpc scsi usb ata_adapter@ata
+	locked_pool scsi_periph ahci generic_ide_pci legacy_sata
+	<usb>uhci <usb>ohci <usb>ehci
+	scsi_cd scsi_disk usb_disk
+	intel
+	bfs
+;
+
+# add-ons
+AddFilesToHaikuImage system add-ons accelerants
+	: $(SYSTEM_ADD_ONS_ACCELERANTS) ;
+
+AddFilesToHaikuHybridImage system add-ons Translators
+	: $(SYSTEM_ADD_ONS_TRANSLATORS) : : true ;
+AddFilesToHaikuImage system add-ons input_server devices
+	: <input>keyboard <input>mouse <input>tablet <input>wacom ;
+AddFilesToHaikuImage system add-ons kernel network
+	: <net>notifications stack ;
+AddFilesToHaikuImage system add-ons kernel network : dns_resolver ;
+AddFilesToHaikuImage system add-ons kernel network devices
+	: $(SYSTEM_NETWORK_DEVICES) ;
+AddFilesToHaikuImage system add-ons kernel network datalink_protocols
+	: $(SYSTEM_NETWORK_DATALINK_PROTOCOLS) ;
+AddFilesToHaikuImage system add-ons kernel network protocols
+	: $(SYSTEM_NETWORK_PROTOCOLS) ;
+
+AddFilesToHaikuImage system add-ons disk_systems
+	: <disk_system>intel <disk_system>bfs ;
+
+# create directories that will remain empty
+AddDirectoryToHaikuImage common bin ;
+AddDirectoryToHaikuImage common include ;
+AddDirectoryToHaikuImage common lib ;
+AddDirectoryToHaikuImage home Desktop ;
+AddDirectoryToHaikuImage home config bin ;
+AddDirectoryToHaikuImage home config lib ;
+AddDirectoryToHaikuImage home mail ;
+AddDirectoryToHaikuImage common var empty ;
+AddDirectoryToHaikuImage common var log ;
+AddDirectoryToHaikuImage common cache tmp ;
+
+AddDirectoryToHaikuImage home config add-ons kernel drivers bin ;
+AddDirectoryToHaikuImage home config add-ons kernel drivers dev ;
+AddDirectoryToHaikuImage home config add-ons input_server devices ;
+AddDirectoryToHaikuImage home config add-ons input_server filters ;
+AddDirectoryToHaikuImage home config add-ons input_server methods ;
+AddDirectoryToHaikuImage home config add-ons media plugins ;
+AddDirectoryToHaikuImage home config add-ons Tracker ;
+AddDirectoryToHaikuImage home config add-ons Print ;
+AddDirectoryToHaikuImage home config add-ons Screen\ Savers ;
+AddDirectoryToHaikuImage home config add-ons Translators ;
+AddDirectoryToHaikuImage system data synth ;
+AddDirectoryToHaikuImage system add-ons input_server methods ;
+
+# licenses
+CopyDirectoryToHaikuImage system data
+	: [ FDirName $(HAIKU_TOP) data system data licenses ]
+	: licenses : -x .svn ;
+
+# Copy documentation as per DiskUsage's license requirement.
+CopyDirectoryToHaikuImage system documentation
+	: [ FDirName $(HAIKU_TOP) docs apps diskusage ]
+	: diskusage : -x .svn ;
+
+
+#pragma mark - Optional Packages
+
+
+HAIKU_IMAGE_OPTIONAL_PACKAGE_DESCRIPTIONS = ;
+
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalPackages ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalTestPackages ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalLibPackages ] ;
+
+local optionalPackageDescriptions ;
+if $(HAIKU_IMAGE_OPTIONAL_PACKAGE_DESCRIPTIONS) {
+	optionalPackageDescriptions = <haiku-image>optional_package_descriptions ;
+	MakeLocate $(optionalPackageDescriptions)
+		: $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) ;
+
+	Depends $(optionalPackageDescriptions)
+		: $(HAIKU_IMAGE_OPTIONAL_PACKAGE_DESCRIPTIONS) ;
+
+	actions together BuildOptionalPackageDescriptions
+	{
+		cat $(2) > $(1)
+	}
+
+	BuildOptionalPackageDescriptions $(optionalPackageDescriptions)
+		: $(HAIKU_IMAGE_OPTIONAL_PACKAGE_DESCRIPTIONS) ;
+}
+
+
+#pragma mark - User/Group Setup
+
+
+# add the root user and the root and users groups
+AddUserToHaikuImage $(HAIKU_ROOT_USER_NAME:E=baron) : 0 : 0 : /boot/home
+	: /bin/bash : $(HAIKU_ROOT_USER_REAL_NAME:E="Root User") ;
+AddGroupToHaikuImage root : 0 : ;
+AddGroupToHaikuImage users : 100 : ;
+
+
+#pragma mark - Host Name
+
+
+if $(HAIKU_IMAGE_HOST_NAME) {
+	actions BuildHaikuImageHostnameFile
+	{
+		echo "$(HAIKU_IMAGE_HOST_NAME)" > $(1)
+	}
+
+	local file = <haiku-image>hostname ;
+	Always $(file) ;
+	MakeLocate $(file) : $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) ;
+	BuildHaikuImageHostnameFile $(file) ;
+	AddFilesToHaikuImage common settings network : $(file) ;
+}
+
+
+#pragma mark - Build The Image
+
+
+# Execute pre-image user config rules.
+UserBuildConfigRulePreImage	;
+
+# Set image name and directory defaults and locate the image.
+HAIKU_IMAGE_NAME ?= $(HAIKU_DEFAULT_IMAGE_NAME) ;
+HAIKU_IMAGE_DIR ?= $(HAIKU_DEFAULT_IMAGE_DIR) ;
+HAIKU_IMAGE = $(HAIKU_IMAGE_NAME) ;
+HAIKU_IMAGE_SIZE ?= $(HAIKU_DEFAULT_IMAGE_SIZE) ; # 300 MB
+HAIKU_IMAGE_LABEL ?= $(HAIKU_DEFAULT_IMAGE_LABEL) ;
+MakeLocate $(HAIKU_IMAGE) : $(HAIKU_IMAGE_DIR) ;
+
+# Set the default installation directory.
+HAIKU_INSTALL_DIR ?= $(HAIKU_DEFAULT_INSTALL_DIR) ;
+
+# the pseudo target all image contents is attached to
+NotFile $(HAIKU_IMAGE_CONTAINER_NAME) ;
+
+# prepare the script that initializes the shell variables
+HAIKU_IMAGE_INIT_VARIABLES_SCRIPT = <HaikuImage>haiku.image-init-vars ;
+local script = $(HAIKU_IMAGE_INIT_VARIABLES_SCRIPT) ;
+MakeLocate $(script) : $(HAIKU_OUTPUT_DIR) ;
+Always $(script) ;
+
+AddVariableToScript $(script) : sourceDir : $(HAIKU_TOP) ;
+AddVariableToScript $(script) : outputDir : $(HAIKU_OUTPUT_DIR) ;
+AddVariableToScript $(script) : tmpDir : $(HAIKU_TMP_DIR) ;
+AddVariableToScript $(script) : installDir : $(HAIKU_INSTALL_DIR) ;
+#AddVariableToScript $(script) : isImage : 1 ;
+AddVariableToScript $(script) : imageSize : $(HAIKU_IMAGE_SIZE) ;
+AddVariableToScript $(script) : imageLabel : $(HAIKU_IMAGE_LABEL) ;
+AddVariableToScript $(script) : addBuildCompatibilityLibDir
+	: $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ;
+AddVariableToScript $(script) : dontClearImage : $(HAIKU_DONT_CLEAR_IMAGE) ;
+AddVariableToScript $(script) : updateOnly : [ IsUpdateHaikuImageOnly ] ;
+AddVariableToScript $(script) : stripOptionalPackageDebugSymbols
+	: $(HAIKU_STRIP_DEBUG_FROM_OPTIONAL_PACKAGES) ;
+AddTargetVariableToScript $(script) : <build>addattr ;
+AddTargetVariableToScript $(script) : <build>bfs_shell : bfsShell ;
+AddTargetVariableToScript $(script) : <build>fs_shell_command : fsShellCommand ;
+AddTargetVariableToScript $(script) : <build>copyattr ;
+AddTargetVariableToScript $(script) : <build>create_image : createImage ;
+AddTargetVariableToScript $(script) : <build>makebootable ;
+AddTargetVariableToScript $(script) : <build>rc ;
+AddTargetVariableToScript $(script) : <build>resattr ;
+AddTargetVariableToScript $(script) : <build>unzip ;
+AddTargetVariableToScript $(script) : <build>vmdkimage ;
+AddVariableToScript $(script) : stripCommand : $(HAIKU_STRIP) ;
+if $(HOST_RM_ATTRS_TARGET) {
+	AddTargetVariableToScript $(script) : $(HOST_RM_ATTRS_TARGET) : rmAttrs ;
+} else {
+	AddVariableToScript $(script) : rmAttrs : rm ;
+}
+if $(optionalPackageDescriptions) {
+	AddTargetVariableToScript $(script) : $(optionalPackageDescriptions)
+		: optionalPackageDescriptions ;
+}
+
+
+# create the other scripts
+HAIKU_IMAGE_MAKE_DIRS_SCRIPT = <HaikuImage>haiku.image-make-dirs ;
+HAIKU_IMAGE_COPY_FILES_SCRIPT = <HaikuImage>haiku.image-copy-files ;
+HAIKU_IMAGE_EXTRACT_FILES_SCRIPT = <HaikuImage>haiku.image-extract-files ;
+MakeLocate $(HAIKU_IMAGE_MAKE_DIRS_SCRIPT) $(HAIKU_IMAGE_COPY_FILES_SCRIPT)
+	$(HAIKU_IMAGE_EXTRACT_FILES_SCRIPT) : $(HAIKU_OUTPUT_DIR) ;
+
+CreateHaikuImageMakeDirectoriesScript $(HAIKU_IMAGE_MAKE_DIRS_SCRIPT) ;
+CreateHaikuImageCopyFilesScript $(HAIKU_IMAGE_COPY_FILES_SCRIPT) ;
+CreateHaikuImageExtractFilesScript $(HAIKU_IMAGE_EXTRACT_FILES_SCRIPT) ;
+
+# Convenience wrapper rule around BuildHaikuImage.
+rule _BuildHaikuImage image : isImage : isVMwareImage
+{
+	# _BuildHaikuImage <image target> : <isImage> : <isVMwareImage> ;
+	#
+
+	# build the image
+	# HAIKU_IMAGE_EARLY_USER_SCRIPTS, HAIKU_IMAGE_LATE_USER_SCRIPTS can be
+	# specified by the user.
+	BuildHaikuImage $(image) :
+		$(HAIKU_IMAGE_INIT_VARIABLES_SCRIPT)
+		$(HAIKU_IMAGE_EARLY_USER_SCRIPTS)
+		$(HAIKU_IMAGE_MAKE_DIRS_SCRIPT)
+		$(HAIKU_IMAGE_COPY_FILES_SCRIPT)
+		$(HAIKU_IMAGE_EXTRACT_FILES_SCRIPT)
+		$(HAIKU_IMAGE_LATE_USER_SCRIPTS)
+		: $(isImage)
+		: $(isVMwareImage)
+	;
+
+	# remove the scripts we have generated
+	RmTemps $(image) :
+		$(HAIKU_IMAGE_INIT_VARIABLES_SCRIPT)
+		$(HAIKU_IMAGE_MAKE_DIRS_SCRIPT)
+		$(HAIKU_IMAGE_COPY_FILES_SCRIPT)
+		$(HAIKU_IMAGE_EXTRACT_FILES_SCRIPT)
+	;
+}
+
+# build the image
+_BuildHaikuImage $(HAIKU_IMAGE) : true ;
+NotFile haiku-image ;
+Depends haiku-image : $(HAIKU_IMAGE) ;
+
+
+# install Haiku into a directory
+NotFile install-haiku ;
+_BuildHaikuImage install-haiku : 0 ;
+
+
+# build the VMware image
+HAIKU_VMWARE_IMAGE_NAME ?= $(HAIKU_DEFAULT_VMWARE_IMAGE_NAME) ;
+HAIKU_VMWARE_IMAGE = $(HAIKU_VMWARE_IMAGE_NAME) ;
+MakeLocate $(HAIKU_VMWARE_IMAGE) : $(HAIKU_IMAGE_DIR) ;
+
+_BuildHaikuImage $(HAIKU_VMWARE_IMAGE) : true : true ;
+NotFile haiku-vmware-image ;
+Depends haiku-vmware-image : $(HAIKU_VMWARE_IMAGE) ;
+
+# Execute post-image user config rules.
+UserBuildConfigRulePostImage ;

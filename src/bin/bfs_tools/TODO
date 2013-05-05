@@ -1,0 +1,32 @@
+BFS-Tools ToDo
+--
+
+0.7 development release
+ - done!
+
+inbetween (0.8 release?) and more:
+ - try to find a way to perform special actions on a cache miss (like a sanity check
+   for b+tree nodes)
+ - Have an option in chkindex which let it try if there is an inode at that point
+ - if files will be saved to the same disk, make sure you reserve their space on the disk's
+   bitmap first (in case someone run chkbfs) [you currently can't recover to the same
+   partition (and it makes sense until you can select the files to recover)]
+ - have an option that recovers only certain files (like those with a specific
+   path, or file extension)
+ - try to make the Cache class easier to use -> like the one in BFS!
+ - incorporate changes from the BFS BPlusTree (BPlusTree::Find(), TreeIterator), duplicates, etc.
+ - test the B+tree code with hand-corrupted trees
+ - try to unify the BFS BPlusTree code to only maintain *one* file
+ - recreate indices on target disk (all) -> chkindex should get that functionality
+
+
+1.0 final release
+ - GUI
+ - the name index scanner could use its own tree iterator functions, which directly
+   visit every single node and use some heuristics to determine the node type
+ - better cache buffer management in the Disk class? Reading from an image is much
+   faster than reading from a real disk currently...
+ - reduce memory overhead: use just the block_run references instead of real Inodes
+   in the hashtables (not in the missing table, of course)
+ - sort hashtables before copying after block_run
+

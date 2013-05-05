@@ -1480,14 +1480,14 @@ tty_write_to_tty_slave_unsafe(tty_cookie* sourceCookie, const char* data,
 static void
 dump_tty_settings(struct tty_settings& settings)
 {
-	kprintf("  pgrp_id:      %ld\n", settings.pgrp_id);
-	kprintf("  session_id:   %ld\n", settings.session_id);
+	kprintf("  pgrp_id:      %" B_PRId32 "\n", settings.pgrp_id);
+	kprintf("  session_id:   %" B_PRId32 "\n", settings.session_id);
 
 	kprintf("  termios:\n");
-	kprintf("    c_iflag:    0x%08lx\n", settings.termios.c_iflag);
-	kprintf("    c_oflag:    0x%08lx\n", settings.termios.c_oflag);
-	kprintf("    c_cflag:    0x%08lx\n", settings.termios.c_cflag);
-	kprintf("    c_lflag:    0x%08lx\n", settings.termios.c_lflag);
+	kprintf("    c_iflag:    0x%08" B_PRIx32 "\n", settings.termios.c_iflag);
+	kprintf("    c_oflag:    0x%08" B_PRIx32 "\n", settings.termios.c_oflag);
+	kprintf("    c_cflag:    0x%08" B_PRIx32 "\n", settings.termios.c_cflag);
+	kprintf("    c_lflag:    0x%08" B_PRIx32 "\n", settings.termios.c_lflag);
 	kprintf("    c_line:     %d\n", settings.termios.c_line);
 	kprintf("    c_ispeed:   %u\n", settings.termios.c_ispeed);
 	kprintf("    c_ospeed:   %u\n", settings.termios.c_ospeed);
@@ -1504,15 +1504,15 @@ static void
 dump_tty_struct(struct tty& tty)
 {
 	kprintf("  tty @:        %p\n", &tty);
-	kprintf("  index:        %ld\n", tty.index);
+	kprintf("  index:        %" B_PRId32 "\n", tty.index);
 	kprintf("  is_master:    %s\n", tty.is_master ? "true" : "false");
-	kprintf("  open_count:   %ld\n", tty.open_count);
+	kprintf("  open_count:   %" B_PRId32 "\n", tty.open_count);
 	kprintf("  select_pool:  %p\n", tty.select_pool);
-	kprintf("  pending_eof:  %lu\n", tty.pending_eof);
+	kprintf("  pending_eof:  %" B_PRIu32 "\n", tty.pending_eof);
 	kprintf("  lock:         %p\n", tty.lock);
 
 	kprintf("  input_buffer:\n");
-	kprintf("    first:      %ld\n", tty.input_buffer.first);
+	kprintf("    first:      %" B_PRId32 "\n", tty.input_buffer.first);
 	kprintf("    in:         %lu\n", tty.input_buffer.in);
 	kprintf("    size:       %lu\n", tty.input_buffer.size);
 	kprintf("    buffer:     %p\n", tty.input_buffer.buffer);
@@ -1782,7 +1782,7 @@ tty_ioctl(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 								// wait for event (timeout if !NULL)
 		case TCVTIME:			// BeOS (bigtime_t*) set highrez VTIME
 		case 'ochr':			// BeOS (int*) same as ichr for write
-			dprintf("tty: unsupported legacy opcode %lu\n", op);
+			dprintf("tty: unsupported legacy opcode %" B_PRIu32 "\n", op);
 			// TODO ?
 			break;
 
@@ -1791,7 +1791,7 @@ tty_ioctl(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 			break;
 
 		case TCQUERYCONNECTED:	// BeOS
-			dprintf("tty: unsupported legacy opcode %lu\n", op);
+			dprintf("tty: unsupported legacy opcode %" B_PRIu32 "\n", op);
 			// BeOS didn't implement them anyway
 			break;
 

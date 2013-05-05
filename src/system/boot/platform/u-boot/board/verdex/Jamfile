@@ -1,4 +1,0 @@
-SubDir HAIKU_TOP src system boot platform u-boot board $(TARGET_BOOT_BOARD) ;
-
-BOARD_UBOOT_LOADER_ADDRESS = 0xa2000000 ;
-

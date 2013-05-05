@@ -87,8 +87,8 @@ MatchPattern(const char* string, const char* pattern)
 //	#pragma mark -
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "EthernetSettingsView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "EthernetSettingsView"
 
 
 EthernetSettingsView::EthernetSettingsView()
@@ -98,7 +98,6 @@ EthernetSettingsView::EthernetSettingsView()
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	fSocket = socket(AF_INET, SOCK_DGRAM, 0);
 	_GatherInterfaces();
 
 	// build the GUI
@@ -114,7 +113,7 @@ EthernetSettingsView::EthernetSettingsView()
 	rootLayout->SetSpacing(inset);
 	layout->SetSpacing(inset, inset);
 
-	BPopUpMenu* deviceMenu = new BPopUpMenu("<No adapter>");
+	BPopUpMenu* deviceMenu = new BPopUpMenu(B_TRANSLATE("<no adapter>"));
 	for (int32 i = 0; i < fInterfaces.CountItems(); i++) {
 		BString& name = *fInterfaces.ItemAt(i);
 		BString label = name;
@@ -216,7 +215,6 @@ EthernetSettingsView::EthernetSettingsView()
 
 EthernetSettingsView::~EthernetSettingsView()
 {
-	close(fSocket);
 }
 
 
@@ -589,12 +587,16 @@ EthernetSettingsView::_TriggerAutoConfig(const char* device)
 	status_t status = interface.AutoConfigure(AF_INET);
 
 	if (status == B_BAD_PORT_ID) {
-		(new BAlert("error", B_TRANSLATE("The net_server needs to run for "
-			"the auto configuration!"), B_TRANSLATE("OK")))->Go();
+		BAlert* alert = new BAlert("error", B_TRANSLATE("The net_server needs to run for "
+			"the auto configuration!"), B_TRANSLATE("OK"));
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 	} else if (status != B_OK) {
 		BString errorMessage(B_TRANSLATE("Auto-configuring failed: "));
 		errorMessage << strerror(status);
-		(new BAlert("error", errorMessage.String(), "OK"))->Go();
+		BAlert* alert = new BAlert("error", errorMessage.String(), "OK");
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 	}
 
 	return status;
@@ -625,9 +627,19 @@ EthernetSettingsView::_ValidateControl(BTextControl* control)
 	if (control->IsEnabled() && !MatchPattern(control->Text(), pattern)) {
 		control->MakeFocus();
 		BString errorMessage;
-		errorMessage << control->Label();
-		errorMessage.RemoveLast(":");
-		errorMessage << " is invalid";
+
+		if (control == fIPTextControl) {
+			errorMessage << B_TRANSLATE("IP address is invalid");
+		} else if (control == fNetMaskTextControl) {
+			errorMessage << B_TRANSLATE("Netmask is invalid");
+		} else if (control == fGatewayTextControl) {
+			errorMessage << B_TRANSLATE("Gateway is invalid");
+		} else if (control == fPrimaryDNSTextControl) {
+			errorMessage << B_TRANSLATE("DNS #1 is invalid");
+		} else if (control == fSecondaryDNSTextControl) {
+			errorMessage << B_TRANSLATE("DNS #2 is invalid");
+		}
+
 		fErrorMessage->SetText(errorMessage.String());
 		beep();
 		return false;

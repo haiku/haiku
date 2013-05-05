@@ -14,7 +14,7 @@
 class BMessage;
 class Team;
 class BreakpointSetting;
-class TeamUISettings;
+class TeamUiSettings;
 
 
 class TeamSettings {
@@ -33,24 +33,24 @@ public:
 			int32				CountBreakpoints() const;
 			const BreakpointSetting* BreakpointAt(int32 index) const;
 
-			int32				CountUISettings() const;
-			const TeamUISettings*	UISettingAt(int32 index) const;
-			const TeamUISettings*	UISettingFor(const char* id) const;
-			status_t			AddUISettings(TeamUISettings* settings);
+			int32				CountUiSettings() const;
+			const TeamUiSettings*	UiSettingAt(int32 index) const;
+			const TeamUiSettings*	UiSettingFor(const char* id) const;
+			status_t			AddUiSettings(TeamUiSettings* settings);
 
 			TeamSettings&		operator=(const TeamSettings& other);
 									// throws std::bad_alloc
 
 private:
 			typedef BObjectList<BreakpointSetting> BreakpointList;
-			typedef BObjectList<TeamUISettings> UISettingsList;
+			typedef BObjectList<TeamUiSettings> UiSettingsList;
 
 private:
 			void				_Unset();
 
 private:
 			BreakpointList		fBreakpoints;
-			UISettingsList		fUISettings;
+			UiSettingsList		fUiSettings;
 			BString				fTeamName;
 };
 

@@ -19,8 +19,8 @@
 #include "SVGParser.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Icon-O-Matic-SVGImport"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Icon-O-Matic-SVGImport"
 
 
 // constructor
@@ -80,6 +80,7 @@ SVGImporter::Import(Icon* icon, const entry_ref* ref)
 		BAlert* alert = new BAlert(B_TRANSLATE("load error"),
 								   error, B_TRANSLATE("OK"), NULL, NULL,
 								   B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go(NULL);
 		ret = B_ERROR;
 	}

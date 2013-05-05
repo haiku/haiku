@@ -61,10 +61,14 @@ public:
 									bool invalidateLayout);
 			void				SetItemWeight(BLayoutItem* item, float weight);
 
+			bool				IsCollapsible(int32 index) const;
 			void				SetCollapsible(bool collapsible);
 			void				SetCollapsible(int32 index, bool collapsible);
 			void				SetCollapsible(int32 first, int32 last,
 									bool collapsible);
+
+			bool				IsItemCollapsed(int32 index) const;
+			void				SetItemCollapsed(int32 index, bool visible);
 
 	virtual	BSize				BaseMinSize();
 	virtual	BSize				BaseMaxSize();
@@ -75,9 +79,8 @@ public:
 	virtual	void				GetHeightForWidth(float width, float* min,
 									float* max, float* preferred);
 
-	virtual	void				InvalidateLayout(bool children = false);
-
-	virtual	void				DerivedLayoutItems();
+	virtual	void				LayoutInvalidated(bool children);
+	virtual	void				DoLayout();
 
 	// interface for BSplitView
 			BRect				SplitterItemFrame(int32 index) const;

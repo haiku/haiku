@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku, Inc.
+ * Copyright 2001-2013, Haiku, Inc.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
@@ -8,6 +8,7 @@
  *		Stefano Ceccherini, stefano.ceccherini@gmail.com
  *		Kian Duffy, myob@users.sourceforge.net
  *		Ingo Weinhold, ingo_weinhold@gmx.de
+ *		Siarzhuk Zharski, zharik@gmx.li
  */
 #ifndef TERMVIEW_H
 #define TERMVIEW_H
@@ -59,7 +60,7 @@ public:
 			bool				IsShellBusy() const;
 			bool				GetActiveProcessInfo(
 									ActiveProcessInfo& _info) const;
-			bool			GetShellInfo(ShellInfo& _info) const;
+			bool				GetShellInfo(ShellInfo& _info) const;
 
 			const char*			TerminalName() const;
 
@@ -71,13 +72,17 @@ public:
 			void				GetFontSize(int* width, int* height);
 			int					Rows() const;
 			int					Columns() const;
-			BRect				SetTermSize(int rows, int cols);
+			BRect				SetTermSize(int rows, int cols,
+									bool notifyShell);
 			void				SetTermSize(BRect rect);
 			void				GetTermSizeFromRect(const BRect &rect,
 									int *rows, int *columns);
 
 			void				SetTextColor(rgb_color fore, rgb_color back);
+			void				SetCursorColor(rgb_color fore, rgb_color back);
 			void				SetSelectColor(rgb_color fore, rgb_color back);
+			void				SetTermColor(uint index, rgb_color color,
+									bool dynamic = false);
 
 			int					Encoding() const;
 			void				SetEncoding(int encoding);
@@ -86,6 +91,9 @@ public:
 			BScrollBar*			ScrollBar() const { return fScrollBar; };
 
 			void				SetMouseClipboard(BClipboard *);
+
+			void				MakeDebugSnapshots();
+			void				StartStopDebugCapture();
 
 			// edit functions
 			void				Copy(BClipboard* clipboard);
@@ -153,6 +161,7 @@ private:
 
 			void				_Activate();
 			void				_Deactivate();
+			void				_SwitchCursorBlinking(bool blinkingOn);
 
 			void				_DrawLinePart(int32 x1, int32 y1, uint32 attr,
 									char* buffer, int32 width, bool mouse,
@@ -222,10 +231,12 @@ private:
 
 			// Font and Width
 			BFont				fHalfFont;
+			BFont				fBoldFont;
 			int					fFontWidth;
 			int					fFontHeight;
 			int					fFontAscent;
 			struct escapement_delta fEscapement;
+			bool				fEmulateBold;
 
 			// frame resized flag.
 			bool				fFrameResized;
@@ -234,7 +245,9 @@ private:
 			// Cursor Blinking, draw flag.
 			bigtime_t			fLastActivityTime;
 			int32				fCursorState;
-			int					fCursorHeight;
+			int					fCursorStyle;
+			bool				fCursorBlinking;
+			bool				fCursorHidden;
 
 			// Cursor position.
 			TermPos				fCursor;
@@ -255,6 +268,10 @@ private:
 			InlineInput*		fInline;
 
 			// Color and Attribute.
+			rgb_color			fTextForeColor;
+			rgb_color			fTextBackColor;
+			rgb_color			fCursorForeColor;
+			rgb_color			fCursorBackColor;
 			rgb_color			fSelectForeColor;
 			rgb_color			fSelectBackColor;
 

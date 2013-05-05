@@ -1,0 +1,169 @@
+/*
+ * Copyright 2013 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold, bonefish@users.sf.net
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/storage/Mime.h	 hrev45224
+ *		src/kits/storage/Mime.cpp	 hrev45224
+ */
+
+
+/*!
+	\file Mime.h
+	\ingroup storage
+	\ingroup libbe
+	\brief Provides C and Haiku-only C++ MIME-type handling functions.
+*/
+
+
+/*!
+	\enum icon_size
+	\ingroup storage
+	\brief Legacy BeOS icon size constants.
+*/
+
+
+/*!
+	\var icon_size B_LARGE_ICON
+
+	32x32 "Large" icon.
+*/
+
+
+/*!
+	\var icon_size B_MINI_ICON
+
+	16x16 "Mini" icon.
+*/
+
+
+/*!
+	\var B_UPDATE_MIME_INFO_NO_FORCE
+
+	Files that already have a \c BEOS:TYPE attribute won't be updated.
+*/
+
+
+/*!
+	\var B_UPDATE_MIME_INFO_FORCE_KEEP_TYPE
+
+	Files that already have a \c BEOS:TYPE attribute will be updated too, but
+	\c BEOS:TYPE itself will remain untouched.
+*/
+
+
+/*!
+	\var B_UPDATE_MIME_INFO_FORCE_UPDATE_ALL
+
+	Similar to \c B_UPDATE_MIME_INFO_FORCE_KEEP_TYPE, but the \c BEOS:TYPE
+	attribute will be updated too.
+*/
+
+
+/*!
+	\fn int update_mime_info(const char *path, int recursive, int synchronous,
+		int force)
+	\brief Updates the MIME information (i.e MIME type) for one or more files.
+
+	If \a path points to a file, the MIME information for this file are
+	updated only. If it points to a directory and \a recursive is non-null,
+	the information for all the files in the given directory tree are updated.
+	If path is \c NULL all files are considered; \a recursive is ignored in
+	this case.
+
+	\param path The path to a file or directory, or \c NULL.
+	\param recursive Triggers recursive behavior if not \c NULL.
+	\param synchronous If not \c NULL update_mime_info() waits until the
+		operation is finished, otherwise it returns immediately and the
+		update is done asynchronously.
+	\param force Specifies how to handle files that already have MIME
+		   information. See enum definitions for more information.
+		- \c B_UPDATE_MIME_INFO_NO_FORCE
+		- \c B_UPDATE_MIME_INFO_FORCE_KEEP_TYPE
+		- \c B_UPDATE_MIME_INFO_FORCE_UPDATE_ALL
+
+	\returns A status code. \c B_OK if everything went fine, an error code
+		otherwise.
+*/
+
+
+/*!
+	\fn status_t create_app_meta_mime(const char *path, int recursive,
+		int synchronous, int force)
+	\brief Creates a MIME database entry for one or more applications.
+
+	If \a path points to an application file, a MIME DB entry is create for
+	the application. If it points to a directory and \a recursive is not
+	\c NULL then entries are created for all application files in the given
+	directory tree. If path is \c NULL then all files are considered and
+	\a recursive is ignored.
+
+	\param path The path to an application file, a directory, or \c NULL.
+	\param recursive Trigger recursive behavior if not \c NULL.
+	\param synchronous Waits until the operation is finished if not \c NULL,
+		otherwise it returns immediately and the operation is done
+		asynchronously.
+	\param force Entries are created even if they do already exist if not
+		\c NULL.
+
+	\returns A status code. \c B_OK if everything went fine, an error code
+		otherwise.
+*/
+
+
+/*!
+	\fn status_t get_device_icon(const char *device, void *icon, int32 size)
+	\brief Retrieves an icon associated with a given device.
+
+	\param device The path to the device.
+	\param icon A pointer to a buffer the icon data shall be written to.
+	\param size The size of the icon to retrieve. Currently 16
+		(\c B_MINI_ICON) and 32 (\c B_LARGE_ICON) are supported.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \a device or \a icon was \c NULL.
+	\retval B_NO_MEMORY Ran out of memory allocating bitmap.
+*/
+
+
+/*!
+	\fn status_t get_device_icon(const char *device, BBitmap *icon,
+		icon_size which)
+	\brief Retrieves an icon associated with a given device into a BBitmap.
+
+	\param device The path to the device.
+	\param icon A pointer to a pre-allocated BBitmap of the correct dimension
+		   to store the requested icon (16x16 for the mini and 32x32 for the
+		   large icon).
+	\param which The size of the icon to retrieve. Currently 16
+		(\c B_MINI_ICON) and 32 (\c B_LARGE_ICON) are supported.
+
+	\returns A status code. \c B_OK if everything went fine, an error code
+		otherwise.
+*/
+
+
+/*!
+	\fn status_t get_device_icon(const char* device, uint8** _data,
+		size_t* _size, type_code* _type);
+	\brief Undocumented.
+*/
+
+
+/*!
+	\fn status_t get_named_icon(const char* name, BBitmap* icon,
+		icon_size which);
+	\brief Undocumented.
+*/
+
+
+/*!
+	\fn status_t get_named_icon(const char* name, uint8** _data, 
+		size_t* _size, type_code* _type);
+	\brief Undocumented.
+*/

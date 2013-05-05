@@ -6,6 +6,13 @@
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
+ *
+ * Copyright 2011-2012 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Hamish Morrison, hamish@lavabit.com
+ *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
 
 
@@ -17,13 +24,20 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <FindDirectory.h>
 #include <KernelExport.h>
 #include <NodeMonitor.h>
 
 #include <arch_config.h>
 #include <boot_device.h>
+#include <disk_device_manager/KDiskDevice.h>
+#include <disk_device_manager/KDiskDeviceManager.h>
+#include <disk_device_manager/KDiskSystem.h>
+#include <disk_device_manager/KPartitionVisitor.h>
 #include <driver_settings.h>
 #include <fs/fd.h>
+#include <fs/KPath.h>
+#include <fs_info.h>
 #include <fs_interface.h>
 #include <heap.h>
 #include <kernel_daemon.h>
@@ -68,6 +82,8 @@
 #define SWAP_BLOCK_SHIFT 5		/* 1 << SWAP_BLOCK_SHIFT == SWAP_BLOCK_PAGES */
 #define SWAP_BLOCK_MASK  (SWAP_BLOCK_PAGES - 1)
 
+
+static const char* const kDefaultSwapPath = "/var/swap";
 
 struct swap_file : DoublyLinkedListLinkImpl<swap_file> {
 	int				fd;
@@ -159,7 +175,7 @@ protected:
 class ReadPage : public SwapTraceEntry {
 public:
 	ReadPage(VMAnonymousCache* cache, page_num_t pageIndex,
-			swap_addr_t swapSlotIndex)
+		swap_addr_t swapSlotIndex)
 		:
 		SwapTraceEntry(cache),
 		fPageIndex(pageIndex),
@@ -183,7 +199,7 @@ private:
 class WritePage : public SwapTraceEntry {
 public:
 	WritePage(VMAnonymousCache* cache, page_num_t pageIndex,
-			swap_addr_t swapSlotIndex)
+		swap_addr_t swapSlotIndex)
 		:
 		SwapTraceEntry(cache),
 		fPageIndex(pageIndex),
@@ -220,10 +236,10 @@ dump_swap_info(int argc, char** argv)
 	kprintf("swap files:\n");
 
 	for (SwapFileList::Iterator it = sSwapFileList.GetIterator();
-			swap_file* file = it.Next();) {
+		swap_file* file = it.Next();) {
 		swap_addr_t total = file->last_slot - file->first_slot;
-		kprintf("  vnode: %p, pages: total: %lu, free: %lu\n",
-			file->vnode, total, file->bmp->free_slots);
+		kprintf("  vnode: %p, pages: total: %" B_PRIu32 ", free: %" B_PRIu32
+			"\n", file->vnode, total, file->bmp->free_slots);
 
 		totalSwapPages += total;
 		freeSwapPages += file->bmp->free_slots;
@@ -231,12 +247,12 @@ dump_swap_info(int argc, char** argv)
 
 	kprintf("\n");
 	kprintf("swap space in pages:\n");
-	kprintf("total:     %9lu\n", totalSwapPages);
-	kprintf("available: %9llu\n", sAvailSwapSpace / B_PAGE_SIZE);
-	kprintf("reserved:  %9llu\n",
+	kprintf("total:     %9" B_PRIu32 "\n", totalSwapPages);
+	kprintf("available: %9" B_PRIdOFF "\n", sAvailSwapSpace / B_PAGE_SIZE);
+	kprintf("reserved:  %9" B_PRIdOFF "\n",
 		totalSwapPages - sAvailSwapSpace / B_PAGE_SIZE);
-	kprintf("used:      %9lu\n", totalSwapPages - freeSwapPages);
-	kprintf("free:      %9lu\n", freeSwapPages);
+	kprintf("used:      %9" B_PRIu32 "\n", totalSwapPages - freeSwapPages);
+	kprintf("free:      %9" B_PRIu32 "\n", freeSwapPages);
 
 	return 0;
 }
@@ -283,9 +299,10 @@ swap_slot_alloc(uint32 count)
 
 	// if this swap file has used more than 90% percent of its space
 	// switch to another
-    if (sSwapFileAlloc->bmp->free_slots
-			< (sSwapFileAlloc->last_slot - sSwapFileAlloc->first_slot) / 10)
+	if (sSwapFileAlloc->bmp->free_slots
+		< (sSwapFileAlloc->last_slot - sSwapFileAlloc->first_slot) / 10) {
 		sSwapFileAlloc = sSwapFileList.GetNext(sSwapFileAlloc);
+	}
 
 	mutex_unlock(&sSwapFileListLock);
 
@@ -297,13 +314,15 @@ static swap_file*
 find_swap_file(swap_addr_t slotIndex)
 {
 	for (SwapFileList::Iterator it = sSwapFileList.GetIterator();
-			swap_file* swapFile = it.Next();) {
+		swap_file* swapFile = it.Next();) {
 		if (slotIndex >= swapFile->first_slot
-				&& slotIndex < swapFile->last_slot)
+			&& slotIndex < swapFile->last_slot) {
 			return swapFile;
+		}
 	}
 
-	panic("find_swap_file(): can't find swap file for slot %ld\n", slotIndex);
+	panic("find_swap_file(): can't find swap file for slot %" B_PRIu32 "\n",
+		slotIndex);
 	return NULL;
 }
 
@@ -426,7 +445,7 @@ VMAnonymousCache::~VMAnonymousCache()
 {
 	// free allocated swap space and swap block
 	for (off_t offset = virtual_base, toFree = fAllocatedSwapSize;
-			offset < virtual_end && toFree > 0; offset += B_PAGE_SIZE) {
+		offset < virtual_end && toFree > 0; offset += B_PAGE_SIZE) {
 		swap_addr_t slotIndex = _SwapBlockGetAddress(offset >> PAGE_SHIFT);
 		if (slotIndex == SWAP_SLOT_NONE)
 			continue;
@@ -447,8 +466,9 @@ VMAnonymousCache::Init(bool canOvercommit, int32 numPrecommittedPages,
 	int32 numGuardPages, uint32 allocationFlags)
 {
 	TRACE("%p->VMAnonymousCache::Init(canOvercommit = %s, "
-		"numPrecommittedPages = %ld, numGuardPages = %ld)\n", this,
-		canOvercommit ? "yes" : "no", numPrecommittedPages, numGuardPages);
+		"numPrecommittedPages = %" B_PRId32 ", numGuardPages = %" B_PRId32
+		")\n", this, canOvercommit ? "yes" : "no", numPrecommittedPages,
+		numGuardPages);
 
 	status_t error = VMCache::Init(CACHE_TYPE_RAM, allocationFlags);
 	if (error != B_OK)
@@ -470,12 +490,12 @@ VMAnonymousCache::Resize(off_t newSize, int priority)
 {
 	// If the cache size shrinks, drop all swap pages beyond the new size.
 	if (fAllocatedSwapSize > 0) {
-		page_num_t oldPageCount = (virtual_end + B_PAGE_SIZE - 1) >> PAGE_SHIFT;
+		off_t oldPageCount = (virtual_end + B_PAGE_SIZE - 1) >> PAGE_SHIFT;
 		swap_block* swapBlock = NULL;
 
-		for (page_num_t pageIndex = (newSize + B_PAGE_SIZE - 1) >> PAGE_SHIFT;
-				pageIndex < oldPageCount && fAllocatedSwapSize > 0;
-				pageIndex++) {
+		for (off_t pageIndex = (newSize + B_PAGE_SIZE - 1) >> PAGE_SHIFT;
+			pageIndex < oldPageCount && fAllocatedSwapSize > 0; pageIndex++) {
+
 			WriteLocker locker(sSwapHashLock);
 
 			// Get the swap slot index for the page.
@@ -527,7 +547,7 @@ VMAnonymousCache::Resize(off_t newSize, int priority)
 status_t
 VMAnonymousCache::Commit(off_t size, int priority)
 {
-	TRACE("%p->VMAnonymousCache::Commit(%lld)\n", this, size);
+	TRACE("%p->VMAnonymousCache::Commit(%" B_PRIdOFF ")\n", this, size);
 
 	// If we can overcommit, we don't commit here, but in Fault(). We always
 	// unreserve memory, if we're asked to shrink our commitment, though.
@@ -559,7 +579,7 @@ VMAnonymousCache::HasPage(off_t offset)
 bool
 VMAnonymousCache::DebugHasPage(off_t offset)
 {
-	page_num_t pageIndex = offset >> PAGE_SHIFT;
+	off_t pageIndex = offset >> PAGE_SHIFT;
 	swap_hash_key key = { this, pageIndex };
 	swap_block* swap = sSwapHashTable.Lookup(key);
 	if (swap == NULL)
@@ -718,7 +738,7 @@ VMAnonymousCache::WriteAsync(off_t offset, const generic_io_vec* vecs,
 
 	// create our callback
 	WriteCallback* callback = (flags & B_VIP_IO_REQUEST) != 0
- 		? new(malloc_flags(HEAP_PRIORITY_VIP)) WriteCallback(this, _callback)
+		? new(malloc_flags(HEAP_PRIORITY_VIP)) WriteCallback(this, _callback)
 		: new(std::nothrow) WriteCallback(this, _callback);
 	if (callback == NULL) {
 		if (newSlot) {
@@ -731,8 +751,8 @@ VMAnonymousCache::WriteAsync(off_t offset, const generic_io_vec* vecs,
 		_callback->IOFinished(B_NO_MEMORY, true, 0);
 		return B_NO_MEMORY;
 	}
-// TODO: If the page already had swap space assigned, we don't need an own
-// callback.
+	// TODO: If the page already had swap space assigned, we don't need an own
+	// callback.
 
 	callback->SetTo(pageIndex, slotIndex, newSlot);
 
@@ -767,25 +787,24 @@ VMAnonymousCache::MaxPagesPerAsyncWrite() const
 status_t
 VMAnonymousCache::Fault(struct VMAddressSpace* aspace, off_t offset)
 {
-	if (fCanOvercommit && LookupPage(offset) == NULL && !HasPage(offset)) {
-		if (fGuardedSize > 0) {
-			uint32 guardOffset;
+	if (fGuardedSize > 0) {
+		uint32 guardOffset;
 
 #ifdef STACK_GROWS_DOWNWARDS
-			guardOffset = 0;
+		guardOffset = 0;
 #elif defined(STACK_GROWS_UPWARDS)
-			guardOffset = virtual_size - fGuardedSize;
+		guardOffset = virtual_size - fGuardedSize;
 #else
 #	error Stack direction has not been defined in arch_config.h
 #endif
-
-			// report stack fault, guard page hit!
-			if (offset >= guardOffset && offset < guardOffset + fGuardedSize) {
-				TRACE(("stack overflow!\n"));
-				return B_BAD_ADDRESS;
-			}
+		// report stack fault, guard page hit!
+		if (offset >= guardOffset && offset < guardOffset + fGuardedSize) {
+			TRACE(("stack overflow!\n"));
+			return B_BAD_ADDRESS;
 		}
+	}
 
+	if (fCanOvercommit && LookupPage(offset) == NULL && !HasPage(offset)) {
 		if (fPrecommittedPages == 0) {
 			// never commit more than needed
 			if (committed_size / B_PAGE_SIZE > page_count)
@@ -949,8 +968,9 @@ VMAnonymousCache::_SwapBlockGetAddress(off_t pageIndex)
 status_t
 VMAnonymousCache::_Commit(off_t size, int priority)
 {
-	TRACE("%p->VMAnonymousCache::_Commit(%lld), already committed: %lld "
-		"(%lld swap)\n", this, size, committed_size, fCommittedSwapSize);
+	TRACE("%p->VMAnonymousCache::_Commit(%" B_PRIdOFF "), already committed: "
+		"%" B_PRIdOFF " (%" B_PRIdOFF " swap)\n", this, size, committed_size,
+		fCommittedSwapSize);
 
 	// Basic strategy: reserve swap space first, only when running out of swap
 	// space, reserve real memory.
@@ -964,8 +984,8 @@ VMAnonymousCache::_Commit(off_t size, int priority)
 		fCommittedSwapSize += swap_space_reserve(size - fCommittedSwapSize);
 		committed_size = fCommittedSwapSize + committedMemory;
 		if (size > fCommittedSwapSize) {
-			TRACE("%p->VMAnonymousCache::_Commit(%lld), reserved only %lld "
-				"swap\n", this, size, fCommittedSwapSize);
+			TRACE("%p->VMAnonymousCache::_Commit(%" B_PRIdOFF "), reserved "
+				"only %" B_PRIdOFF " swap\n", this, size, fCommittedSwapSize);
 		}
 	}
 
@@ -998,8 +1018,8 @@ VMAnonymousCache::_Commit(off_t size, int priority)
 
 	off_t toReserve = size - committed_size;
 	if (vm_try_reserve_memory(toReserve, priority, 1000000) != B_OK) {
-		dprintf("%p->VMAnonymousCache::_Commit(%lld): Failed to reserve %lld "
-			"bytes of RAM\n", this, size, toReserve);
+		dprintf("%p->VMAnonymousCache::_Commit(%" B_PRIdOFF "): Failed to "
+			"reserve %" B_PRIdOFF " bytes of RAM\n", this, size, toReserve);
 		return B_NO_MEMORY;
 	}
 
@@ -1038,7 +1058,7 @@ VMAnonymousCache::_MergePagesSmallerConsumer(VMAnonymousCache* source)
 	// all pages of the source back to the consumer.
 
 	for (VMCachePagesTree::Iterator it = pages.GetIterator();
-			vm_page* page = it.Next();) {
+		vm_page* page = it.Next();) {
 		// If a source page is in the way, remove and free it.
 		vm_page* sourcePage = source->LookupPage(
 			(off_t)page->cache_offset << PAGE_SHIFT);
@@ -1067,13 +1087,13 @@ VMAnonymousCache::_MergeSwapPages(VMAnonymousCache* source)
 		return;
 
 	for (off_t offset = source->virtual_base
-				& ~(off_t)(B_PAGE_SIZE * SWAP_BLOCK_PAGES - 1);
-			offset < source->virtual_end;
-			offset += B_PAGE_SIZE * SWAP_BLOCK_PAGES) {
+		& ~(off_t)(B_PAGE_SIZE * SWAP_BLOCK_PAGES - 1);
+		offset < source->virtual_end;
+		offset += B_PAGE_SIZE * SWAP_BLOCK_PAGES) {
 
 		WriteLocker locker(sSwapHashLock);
 
-		page_num_t swapBlockPageIndex = offset >> PAGE_SHIFT;
+		off_t swapBlockPageIndex = offset >> PAGE_SHIFT;
 		swap_hash_key key = { source, swapBlockPageIndex };
 		swap_block* sourceSwapBlock = sSwapHashTable.Lookup(key);
 
@@ -1163,6 +1183,93 @@ VMAnonymousCache::_MergeSwapPages(VMAnonymousCache* source)
 
 
 // #pragma mark -
+
+
+// TODO: This can be removed if we get BFS uuid's
+struct VolumeInfo {
+	char name[B_FILE_NAME_LENGTH];
+	char device[B_FILE_NAME_LENGTH];
+	char filesystem[B_OS_NAME_LENGTH];
+	off_t capacity;
+};
+
+
+class PartitionScorer : public KPartitionVisitor {
+public:
+	PartitionScorer(VolumeInfo& volumeInfo)
+		:
+		fBestPartition(NULL),
+		fBestScore(-1),
+		fVolumeInfo(volumeInfo)
+	{
+	}
+
+	virtual bool VisitPre(KPartition* partition)
+	{
+		if (!partition->ContainsFileSystem())
+			return false;
+
+		KPath path;
+		partition->GetPath(&path);
+
+		int score = 0;
+		if (strcmp(fVolumeInfo.name, partition->ContentName()) == 0)
+			score += 4;
+		if (strcmp(fVolumeInfo.device, path.Path()) == 0)
+			score += 3;
+		if (fVolumeInfo.capacity == partition->Size())
+			score += 2;
+		if (strcmp(fVolumeInfo.filesystem,
+			partition->DiskSystem()->ShortName()) == 0) {
+			score += 1;
+		}
+		if (score >= 4 && score > fBestScore) {
+			fBestPartition = partition;
+			fBestScore = score;
+		}
+
+		return false;
+	}
+
+	KPartition* fBestPartition;
+
+private:
+	int32		fBestScore;
+	VolumeInfo	fVolumeInfo;
+};
+
+
+status_t
+get_mount_point(KPartition* partition, KPath* mountPoint)
+{
+	if (!mountPoint || !partition->ContainsFileSystem())
+		return B_BAD_VALUE;
+
+	const char* volumeName = partition->ContentName();
+	if (!volumeName || strlen(volumeName) == 0)
+		volumeName = partition->Name();
+	if (!volumeName || strlen(volumeName) == 0)
+		volumeName = "unnamed volume";
+
+	char basePath[B_PATH_NAME_LENGTH];
+	int32 len = snprintf(basePath, sizeof(basePath), "/%s", volumeName);
+	for (int32 i = 1; i < len; i++)
+		if (basePath[i] == '/')
+		basePath[i] = '-';
+	char* path = mountPoint->LockBuffer();
+	int32 pathLen = mountPoint->BufferSize();
+	strncpy(path, basePath, pathLen);
+
+	struct stat dummy;
+	for (int i = 1; ; i++) {
+		if (stat(path, &dummy) != 0)
+			break;
+		snprintf(path, pathLen, "%s%d", basePath, i);
+	}
+
+	mountPoint->UnlockBuffer();
+	return B_OK;
+}
 
 
 status_t
@@ -1291,8 +1398,8 @@ void
 swap_init(void)
 {
 	// create swap block cache
-	sSwapBlockCache = create_object_cache("swapblock",
-			sizeof(swap_block), sizeof(void*), NULL, NULL, NULL);
+	sSwapBlockCache = create_object_cache("swapblock", sizeof(swap_block),
+		sizeof(void*), NULL, NULL, NULL);
 	if (sSwapBlockCache == NULL)
 		panic("swap_init(): can't create object cache for swap blocks\n");
 
@@ -1338,44 +1445,173 @@ swap_init_post_modules()
 	if (gReadOnlyBootDevice)
 		return;
 
-	off_t size = 0;
+	bool swapEnabled = true;
+	bool swapAutomatic = true;
+	off_t swapSize = 0;
+
+	dev_t swapDeviceID = -1;
+	VolumeInfo selectedVolume = {};
 
 	void* settings = load_driver_settings("virtual_memory");
+
 	if (settings != NULL) {
-		if (!get_driver_boolean_parameter(settings, "vm", false, false))
-			return;
+		// We pass a lot of information on the swap device, this is mostly to
+		// ensure that we are dealing with the same device that was configured.
 
-		const char* string = get_driver_parameter(settings, "swap_size", NULL,
-			NULL);
-		size = string ? atoll(string) : 0;
+		// TODO: Some kind of BFS uuid would be great here :)
+		const char* enabled = get_driver_parameter(settings, "vm", NULL, NULL);
 
-		unload_driver_settings(settings);
-	} else
-		size = (off_t)vm_page_num_pages() * B_PAGE_SIZE * 2;
+		if (enabled != NULL) {
+			swapEnabled = get_driver_boolean_parameter(settings, "vm",
+				true, false);
+			swapAutomatic = get_driver_boolean_parameter(settings, "swap_auto",
+				true, false);
 
-	if (size < B_PAGE_SIZE)
+			if (swapEnabled && !swapAutomatic) {
+				const char* size = get_driver_parameter(settings, "swap_size",
+					NULL, NULL);
+				const char* volume = get_driver_parameter(settings,
+					"swap_volume_name", NULL, NULL);
+				const char* device = get_driver_parameter(settings,
+					"swap_volume_device", NULL, NULL);
+				const char* filesystem = get_driver_parameter(settings,
+					"swap_volume_filesystem", NULL, NULL);
+				const char* capacity = get_driver_parameter(settings,
+					"swap_volume_capacity", NULL, NULL);
+
+				if (size != NULL && device != NULL && volume != NULL
+					&& filesystem != NULL && capacity != NULL) {
+					// User specified a size / volume that seems valid
+					swapAutomatic = false;
+					swapSize = atoll(size);
+					strncpy(selectedVolume.name, volume,
+						sizeof(selectedVolume.name));
+					strncpy(selectedVolume.device, device,
+						sizeof(selectedVolume.device));
+					strncpy(selectedVolume.filesystem, filesystem,
+						sizeof(selectedVolume.filesystem));
+					selectedVolume.capacity = atoll(capacity);
+				} else {
+					// Something isn't right with swap config, go auto
+					swapAutomatic = true;
+					dprintf("%s: virtual_memory configuration is invalid, "
+						"using automatic swap\n", __func__);
+				}
+			}
+			unload_driver_settings(settings);
+		}
+	}
+
+	if (swapAutomatic) {
+		swapSize = (off_t)vm_page_num_pages() * B_PAGE_SIZE;
+		if (swapSize <= (1024 * 1024 * 1024)) {
+			// Memory under 1GB? double the swap
+			swapSize *= 2;
+		}
+		// Automatic swap defaults to the boot device
+		swapDeviceID = gBootDevice;
+	}
+
+	if (!swapEnabled || swapSize < B_PAGE_SIZE) {
+		dprintf("%s: virtual_memory is disabled\n", __func__);
 		return;
+	}
 
-	int fd = open("/var/swap", O_RDWR | O_CREAT | O_NOCACHE, S_IRUSR | S_IWUSR);
+	if (!swapAutomatic && swapDeviceID < 0) {
+		// If user-specified swap, and no swap device has been chosen yet...
+		KDiskDeviceManager::CreateDefault();
+		KDiskDeviceManager* manager = KDiskDeviceManager::Default();
+		PartitionScorer visitor(selectedVolume);
+
+		KDiskDevice* device;
+		int32 cookie = 0;
+		while ((device = manager->NextDevice(&cookie)) != NULL) {
+			if (device->IsReadOnlyMedia() || device->IsWriteOnce()
+				|| device->IsRemovable()) {
+				continue;
+			}
+			device->VisitEachDescendant(&visitor);
+		}
+
+		if (!visitor.fBestPartition) {
+			dprintf("%s: Can't find configured swap partition '%s'\n",
+				__func__, selectedVolume.name);
+		} else {
+			if (visitor.fBestPartition->IsMounted())
+				swapDeviceID = visitor.fBestPartition->VolumeID();
+			else {
+				KPath devPath, mountPoint;
+				visitor.fBestPartition->GetPath(&devPath);
+				get_mount_point(visitor.fBestPartition, &mountPoint);
+				const char* mountPath = mountPoint.Path();
+				mkdir(mountPath, S_IRWXU | S_IRWXG | S_IRWXO);
+				swapDeviceID = _kern_mount(mountPath, devPath.Path(),
+					NULL, 0, NULL, 0);
+				if (swapDeviceID < 0) {
+					dprintf("%s: Can't mount configured swap partition '%s'\n",
+						__func__, selectedVolume.name);
+				}
+			}
+		}
+	}
+
+	if (swapDeviceID < 0)
+		swapDeviceID = gBootDevice;
+
+	// We now have a swapDeviceID which is used for the swap file
+
+	KPath path;
+	struct fs_info info;
+	_kern_read_fs_info(swapDeviceID, &info);
+	if (swapDeviceID == gBootDevice)
+		path = kDefaultSwapPath;
+	else {
+		vfs_entry_ref_to_path(info.dev, info.root, ".", true, path.LockBuffer(),
+			path.BufferSize());
+		path.UnlockBuffer();
+		path.Append("swap");
+	}
+
+	const char* swapPath = path.Path();
+
+	// Swap size limits prevent oversized swap files
+	if (swapAutomatic) {
+		off_t existingSwapSize = 0;
+		struct stat existingSwapStat;
+		if (stat(swapPath, &existingSwapStat) == 0)
+			existingSwapSize = existingSwapStat.st_size;
+
+		off_t freeSpace = info.free_blocks * info.block_size + existingSwapSize;
+
+		// Adjust automatic swap to a maximum of 25% of the free space
+		if (swapSize > (freeSpace / 4))
+			swapSize = (freeSpace / 4);
+	}
+
+	// Create swap file
+	int fd = open(swapPath, O_RDWR | O_CREAT | O_NOCACHE, S_IRUSR | S_IWUSR);
 	if (fd < 0) {
-		dprintf("Can't open/create /var/swap: %s\n", strerror(errno));
+		dprintf("%s: Can't open/create %s: %s\n", __func__,
+			swapPath, strerror(errno));
 		return;
 	}
 
 	struct stat stat;
-	stat.st_size = size;
+	stat.st_size = swapSize;
 	status_t error = _kern_write_stat(fd, NULL, false, &stat,
 		sizeof(struct stat), B_STAT_SIZE | B_STAT_SIZE_INSECURE);
 	if (error != B_OK) {
-		dprintf("Failed to resize /var/swap to %lld bytes: %s\n", size,
-			strerror(error));
+		dprintf("%s: Failed to resize %s to %" B_PRIdOFF " bytes: %s\n",
+			__func__, swapPath, swapSize, strerror(error));
 	}
 
 	close(fd);
 
-	error = swap_file_add("/var/swap");
-	if (error != B_OK)
-		dprintf("Failed to add swap file /var/swap: %s\n", strerror(error));
+	error = swap_file_add(swapPath);
+	if (error != B_OK) {
+		dprintf("%s: Failed to add swap file %s: %s\n", __func__, swapPath,
+			strerror(error));
+	}
 }
 
 
@@ -1395,7 +1631,7 @@ swap_free_page_swap_space(vm_page* page)
 	cache->fAllocatedSwapSize -= B_PAGE_SIZE;
 	cache->_SwapBlockFree(page->cache_offset, 1);
 
-  	return true;
+	return true;
 }
 
 
@@ -1417,15 +1653,18 @@ swap_total_swap_pages()
 
 	uint32 totalSwapSlots = 0;
 	for (SwapFileList::Iterator it = sSwapFileList.GetIterator();
-			swap_file* swapFile = it.Next();)
+		swap_file* swapFile = it.Next();) {
 		totalSwapSlots += swapFile->last_slot - swapFile->first_slot;
+	}
 
 	mutex_unlock(&sSwapFileListLock);
 
 	return totalSwapSlots;
 }
 
+
 #endif	// ENABLE_SWAP_SUPPORT
+
 
 void
 swap_get_info(struct system_memory_info* info)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2012, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -19,6 +19,7 @@
 
 #include <map>
 #include <new>
+#include <vector>
 
 #include <AutoDeleter.h>
 #include <Button.h>
@@ -41,7 +42,6 @@
 #include <String.h>
 #include <StringView.h>
 #include <TimeZone.h>
-#include <ToolTip.h>
 #include <View.h>
 #include <Window.h>
 
@@ -51,11 +51,12 @@
 
 #include "TimeMessages.h"
 #include "TimeZoneListItem.h"
+#include "TimeZoneListView.h"
 #include "TZDisplay.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Time"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Time"
 
 
 using BPrivate::MutableLocaleRoster;
@@ -83,7 +84,6 @@ TimeZoneView::TimeZoneView(const char* name)
 	:
 	BGroupView(name, B_HORIZONTAL, B_USE_DEFAULT_SPACING),
 	fGmtTime(NULL),
-	fToolTip(NULL),
 	fUseGmtTime(false),
 	fCurrentZoneItem(NULL),
 	fOldZoneItem(NULL),
@@ -106,8 +106,6 @@ TimeZoneView::CheckCanRevert()
 
 TimeZoneView::~TimeZoneView()
 {
-	if (fToolTip != NULL)
-		fToolTip->ReleaseReference();
 	_WriteRTCSettings();
 }
 
@@ -167,7 +165,6 @@ TimeZoneView::MessageReceived(BMessage* message)
 		case H_SET_TIME_ZONE:
 		{
 			_SetSystemTimeZone();
-			_NotifyClockSettingChanged();
 			break;
 		}
 
@@ -186,41 +183,6 @@ TimeZoneView::MessageReceived(BMessage* message)
 			BGroupView::MessageReceived(message);
 			break;
 	}
-}
-
-
-bool
-TimeZoneView::GetToolTipAt(BPoint point, BToolTip** _tip)
-{
-	TimeZoneListItem* item = static_cast<TimeZoneListItem*>(
-		fZoneList->ItemAt(fZoneList->IndexOf(point)));
-	if (item == NULL || !item->HasTimeZone())
-		return false;
-
-	BString nowInTimeZone;
-	time_t now = time(NULL);
-	BLocale::Default()->FormatTime(&nowInTimeZone, now, B_SHORT_TIME_FORMAT,
-		&item->TimeZone());
-
-	BString dateInTimeZone;
-	BLocale::Default()->FormatDate(&dateInTimeZone, now, B_SHORT_DATE_FORMAT,
-		&item->TimeZone());
-
-	BString toolTip = item->Text();
-	toolTip << '\n' << item->TimeZone().ShortName() << " / "
-			<< item->TimeZone().ShortDaylightSavingName()
-			<< B_TRANSLATE("\nNow: ") << nowInTimeZone
-			<< " (" << dateInTimeZone << ')';
-
-	if (fToolTip != NULL)
-		fToolTip->ReleaseReference();
-	fToolTip = new (std::nothrow) BTextToolTip(toolTip.String());
-	if (fToolTip == NULL)
-		return false;
-
-	*_tip = fToolTip;
-
-	return true;
 }
 
 
@@ -243,7 +205,7 @@ TimeZoneView::_UpdateDateTime(BMessage* message)
 void
 TimeZoneView::_InitView()
 {
-	fZoneList = new BOutlineListView("cityList", B_SINGLE_SELECTION_LIST);
+	fZoneList = new TimeZoneListView();
 	fZoneList->SetSelectionMessage(new BMessage(H_CITY_CHANGED));
 	fZoneList->SetInvocationMessage(new BMessage(H_SET_TIME_ZONE));
 	_BuildZoneMenu();
@@ -260,8 +222,6 @@ TimeZoneView::_InitView()
 	fSetZone->SetExplicitAlignment(
 		BAlignment(B_ALIGN_RIGHT, B_ALIGN_BOTTOM));
 
-	BStringView* text = new BStringView("clockSetTo",
-		B_TRANSLATE("Hardware clock set to:"));
 	fLocalTime = new BRadioButton("localTime",
 		B_TRANSLATE("Local time (Windows compatible)"), new BMessage(kRTCUpdate));
 	fGmtTime = new BRadioButton("greenwichMeanTime",
@@ -274,22 +234,27 @@ TimeZoneView::_InitView()
 	_ShowOrHidePreview();
 	fOldUseGmtTime = fUseGmtTime;
 
-
-	const float kInset = be_control_look->DefaultItemSpacing();
+	const float kIndentSpacing
+		= be_control_look->DefaultItemSpacing() * 2;
 	BLayoutBuilder::Group<>(this)
 		.Add(scrollList)
-		.AddGroup(B_VERTICAL, kInset)
-			.Add(text)
-			.AddGroup(B_VERTICAL, kInset)
+		.AddGroup(B_VERTICAL, 0)
+			.Add(new BStringView("clockSetTo",
+				B_TRANSLATE("Hardware clock set to:")))
+			.AddGroup(B_VERTICAL, 0)
 				.Add(fLocalTime)
 				.Add(fGmtTime)
+				.SetInsets(kIndentSpacing, 0, 0, 0)
 			.End()
 			.AddGlue()
-			.Add(fCurrent)
-			.Add(fPreview)
+			.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING)
+				.Add(fCurrent)
+				.Add(fPreview)
+			.End()
 			.Add(fSetZone)
 		.End()
-		.SetInsets(kInset, kInset, kInset, kInset);
+		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
+			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
 }
 
 
@@ -301,10 +266,6 @@ TimeZoneView::_BuildZoneMenu()
 
 	BLanguage language;
 	BLocale::Default()->GetLanguage(&language);
-
-	BMessage countryList;
-	BLocaleRoster::Default()->GetAvailableCountries(&countryList);
-	countryList.AddString("country", "");
 
 	/*
 	 * Group timezones by regions, but filter out unwanted (duplicate) regions
@@ -336,68 +297,71 @@ TimeZoneView::_BuildZoneMenu()
 		zoneItemMap[translatedRegion] = regionItem;
 	}
 
+	// Get all time zones
+	BMessage zoneList;
+	BLocaleRoster::Default()->GetAvailableTimeZonesWithRegionInfo(&zoneList);
+
+	typedef std::map<BString, std::vector<const char*> > ZonesByCountyMap;
+	ZonesByCountyMap zonesByCountryMap;
+	const char *zoneID;
 	BString countryCode;
-	for (int c = 0; countryList.FindString("country", c, &countryCode)
-			== B_OK; c++) {
-		BCountry country(countryCode);
+	for (int tz = 0; zoneList.FindString("timeZone", tz, &zoneID) == B_OK
+			&& zoneList.FindString("region", tz, &countryCode) == B_OK; tz++) {
+		// From the global ("001") timezones, we only accept the generic GMT
+		// timezones, as all the other world-zones are duplicates of others.
+		if (countryCode == "001" && strncmp(zoneID, "Etc/GMT", 7) != 0)
+			continue;
+		zonesByCountryMap[countryCode].push_back(zoneID);
+	}
+
+	ZonesByCountyMap::const_iterator countryIter = zonesByCountryMap.begin();
+	for (; countryIter != zonesByCountryMap.end(); ++countryIter) {
+		BCountry country(countryIter->first.String());
 		BString countryName;
 		country.GetName(countryName);
 
-		// Now list the timezones for this country
-		BMessage zoneList;
-		BLocaleRoster::Default()->GetAvailableTimeZonesForCountry(&zoneList,
-			countryCode.Length() == 0 ? NULL : countryCode.String());
-
-		int32 count = 0;
-		type_code dummy;
-		zoneList.GetInfo("timeZone", &dummy, &count);
-
-		BString zoneID;
-		for (int tz = 0; zoneList.FindString("timeZone", tz, &zoneID) == B_OK;
-			tz++) {
+		size_t zoneCountInCountry = countryIter->second.size();
+		for (size_t tz = 0; tz < zoneCountInCountry; tz++) {
+			BString zoneID(countryIter->second[tz]);
 			int32 slashPos = zoneID.FindFirst('/');
 
-			// ignore any "global" timezones, as those are just aliases of
-			// regional ones
-			if (slashPos <= 0)
-				continue;
-
 			BString region(zoneID, slashPos);
-
 			if (region == "Etc")
 				region = kOtherRegion;
-			else if (countryName.Length() == 0) {
-				// skip global timezones from other regions, we are just
-				// interested in the generic GMT-based ones under "Etc/"
-				continue;
-			}
 
 			// just accept timezones from our supported regions, others are
 			// aliases and would just make the list even longer
 			TranslatedRegionMap::iterator regionIter = regionMap.find(region);
 			if (regionIter == regionMap.end())
 				continue;
-			const BString& regionName = regionIter->second;
 
-			BString fullCountryID = regionName;
-			bool countryIsRegion = countryName == regionName;
+			BString fullCountryID = regionIter->second;
+			bool countryIsRegion
+				= countryName == regionIter->second || region == kOtherRegion;
 			if (!countryIsRegion)
 				fullCountryID << "/" << countryName;
 
 			BTimeZone* timeZone = new BTimeZone(zoneID, &language);
-			BString tzName = timeZone->Name();
-			if (tzName == "GMT+00:00")
-				tzName = "GMT";
-
-			int32 openParenthesisPos = tzName.FindFirst('(');
-			if (openParenthesisPos >= 0) {
-				tzName.Remove(0, openParenthesisPos + 1);
-				int32 closeParenthesisPos = tzName.FindLast(')');
-				if (closeParenthesisPos >= 0)
-					tzName.Truncate(closeParenthesisPos);
-			}
+			BString tzName;
 			BString fullZoneID = fullCountryID;
-			fullZoneID << "/" << tzName;
+			if (zoneCountInCountry > 1)
+			{
+				// we can't use the country name as timezone name, since there
+				// are more than one timezones in this country - fetch the
+				// localized name of the timezone and use that
+				tzName = timeZone->Name();
+				int32 openParenthesisPos = tzName.FindFirst('(');
+				if (openParenthesisPos >= 0) {
+					tzName.Remove(0, openParenthesisPos + 1);
+					int32 closeParenthesisPos = tzName.FindLast(')');
+					if (closeParenthesisPos >= 0)
+						tzName.Truncate(closeParenthesisPos);
+				}
+				fullZoneID << "/" << tzName;
+			} else {
+				tzName = countryName;
+				fullZoneID << "/" << zoneID;
+			}
 
 			// skip duplicates
 			ZoneItemMap::iterator zoneIter = zoneItemMap.find(fullZoneID);
@@ -408,7 +372,7 @@ TimeZoneView::_BuildZoneMenu()
 
 			TimeZoneListItem* countryItem = NULL;
 			TimeZoneListItem* zoneItem = NULL;
-			if (count > 1 && countryName.Length() > 0) {
+			if (zoneCountInCountry > 1) {
 				ZoneItemMap::iterator countryIter
 					= zoneItemMap.find(fullCountryID);
 				if (countryIter == zoneItemMap.end()) {
@@ -421,8 +385,7 @@ TimeZoneView::_BuildZoneMenu()
 				zoneItem = new TimeZoneListItem(tzName, NULL, timeZone);
 				zoneItem->SetOutlineLevel(countryIsRegion ? 1 : 2);
 			} else {
-				BString& name = countryName.Length() > 0 ? countryName : tzName;
-				zoneItem = new TimeZoneListItem(name, NULL, timeZone);
+				zoneItem = new TimeZoneListItem(tzName, NULL, timeZone);
 				zoneItem->SetOutlineLevel(1);
 			}
 			zoneItemMap[fullZoneID] = zoneItem;
@@ -432,7 +395,7 @@ TimeZoneView::_BuildZoneMenu()
 				if (countryItem != NULL)
 					countryItem->SetExpanded(true);
 				ZoneItemMap::iterator regionItemIter
-					= zoneItemMap.find(regionName);
+					= zoneItemMap.find(regionIter->second);
 				if (regionItemIter != zoneItemMap.end())
 					regionItemIter->second->SetExpanded(true);
 			}
@@ -537,7 +500,7 @@ TimeZoneView::_UpdateCurrent()
 void
 TimeZoneView::_SetSystemTimeZone()
 {
-	/*	Set sytem timezone for all different API levels. How to do this?
+	/*	Set system timezone for all different API levels. How to do this?
 	 *	1) tell locale-roster about new default timezone
 	 *	2) tell kernel about new timezone offset
 	 */
@@ -634,7 +597,6 @@ TimeZoneView::_UpdateGmtSettings()
 	_WriteRTCSettings();
 
 	_ShowOrHidePreview();
-	_NotifyClockSettingChanged();
 
 	_kern_set_real_time_clock_is_gmt(fUseGmtTime);
 }
@@ -655,12 +617,3 @@ TimeZoneView::_ShowOrHidePreview()
 		fPreview->Hide();
 	}
 }
-
-
-void
-TimeZoneView::_NotifyClockSettingChanged()
-{
-	BMessage msg(kMsgClockSettingChanged);
-	Window()->PostMessage(&msg);
-}
-

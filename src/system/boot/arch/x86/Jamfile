@@ -6,28 +6,31 @@ local kernelArchSources =
 	arch_elf.cpp
 ;
 
-local kernelArchObjects =
-	<src!system!kernel!arch!$(TARGET_ARCH)>cpuid.o
+local kernelArch32Sources =
+	cpuid.S
 ;
 
 local kernelLibArchSources =
 	arch_string.S
 ;
 
-local kernelLibArchObjects =
-	<src!system!kernel!lib!arch!$(TARGET_ARCH)>byteorder.o
+local librootOsArchSources =
+	byteorder.S
 ;
 
-KernelMergeObject boot_arch_$(TARGET_ARCH).o :
+BootMergeObject boot_arch_$(TARGET_KERNEL_ARCH).o :
 	$(kernelArchSources)
+	$(kernelArch32Sources)
 	$(kernelLibArchSources)
+	$(librootOsArchSources)
 	: # additional flags
-	:
-	$(kernelArchObjects)
-	$(kernelLibArchObjects)
 ;
 
 SEARCH on [ FGristFiles $(kernelArchSources) ]
-    = [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_ARCH) ] ;
+    = [ FDirName $(HAIKU_TOP) src system kernel arch x86 ] ;
+SEARCH on [ FGristFiles $(kernelArch32Sources) ]
+    = [ FDirName $(HAIKU_TOP) src system kernel arch x86 32 ] ;
 SEARCH on [ FGristFiles $(kernelLibArchSources) ]
-    = [ FDirName $(HAIKU_TOP) src system kernel lib arch $(TARGET_ARCH) ] ;
+    = [ FDirName $(HAIKU_TOP) src system kernel lib arch x86 ] ;
+SEARCH on [ FGristFiles $(librootOsArchSources) ]
+    = [ FDirName $(HAIKU_TOP) src system libroot os arch x86 ] ;

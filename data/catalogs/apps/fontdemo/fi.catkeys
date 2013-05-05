@@ -1,0 +1,22 @@
+1	finnish	x-vnd.Haiku-FontDemo	3522850500
+Outline:	ControlView		Ääriviiva:
+Size: 50	ControlView		Koko: 50
+Stop cycling	ControlView		Lopeta kierros
+Shear: 90	ControlView		Leikkaus: 90
+Spacing: 0	ControlView		Riviväli: 0
+Haiku, Inc.	FontDemoView		Haiku, Inc.
+Rotation: %d	ControlView		Kierto: %d
+Shear: %d	ControlView		Leikkaus: %d
+Spacing: %d	ControlView		Riviväli: %d
+Cycle fonts	ControlView		Kierroskirjasimet
+Font:	ControlView		Kirjasin:
+Rotation: 0	ControlView		Kierto: 0
+Drawing mode:	ControlView		Piirrostila:
+Haiku, Inc.	ControlView		Haiku, Inc.
+Controls	FontDemo		Ohjaimet
+FontDemo	System name		FontDemo
+Outline: %d	ControlView		Ääriviiva: %d
+Text:	ControlView		Teksti:
+Antialiased text	ControlView		Peitenimetön teksti
+Bounding boxes	ControlView		Reunustavat laatikot
+Size: %d	ControlView		Koko: %d

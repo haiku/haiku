@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2011 Haiku Inc. All Rights Reserved.
+ * Copyright 2005-2012 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _WCTYPE_H_

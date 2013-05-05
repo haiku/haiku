@@ -1,0 +1,295 @@
+/*
+ * Copyright 2012 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ * 
+ * Corresponds to:
+ *		headers/os/app/Cursor.h	 hrev45039
+ *		src/kits/app/Cursor.cpp	 hrev45039
+ */
+
+
+/*!
+	\file Cursor.h
+	\ingroup app
+	\ingroup libbe
+	\brief Provides the BCursor class.
+*/
+
+
+/*!
+	\enum BCursorID
+	List of predefined cursor IDs
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_SYSTEM_DEFAULT
+	System default cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_CONTEXT_MENU
+	Context menu cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_COPY
+	Copy cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_CREATE_LINK
+	Symlink cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_CROSS_HAIR
+	Cross hairs cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_FOLLOW_LINK
+	Follow html link cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_GRAB
+	Grab cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_GRABBING
+	Grabbing cursor (mouse down)
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_HELP
+	Help cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_I_BEAM
+	I beam cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_I_BEAM_HORIZONTAL
+	Horizontal I beam cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_MOVE
+	Move cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_NO_CURSOR
+	No cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_NOT_ALLOWED
+	Not allowed cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_PROGRESS
+	Progress cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_RESIZE_NORTH
+	Resize north cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_RESIZE_EAST
+	Resize east cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_RESIZE_SOUTH
+	Resize south cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_RESIZE_WEST
+	Resize west cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_RESIZE_NORTH_EAST
+	Resize north east cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_RESIZE_NORTH_WEST
+	Resize north west cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_RESIZE_SOUTH_EAST
+	Resize south east cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_RESIZE_SOUTH_WEST
+	Resize south west cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_RESIZE_NORTH_SOUTH
+	Resize north south cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_RESIZE_EAST_WEST
+	Resize east west cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_RESIZE_NORTH_EAST_SOUTH_WEST
+	Resize north east south west cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_RESIZE_NORTH_WEST_SOUTH_EAST
+	Resize north west south east cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_ZOOM_IN
+	Zoom in cursor
+*/
+
+
+/*!
+	\var BCursorID B_CURSOR_ID_ZOOM_OUT
+	Zoom out cursor
+*/
+
+
+/*!
+	\class BCursor
+	\ingroup app
+	\ingroup libbe
+	\brief BCursor describes a view-wide or application-wide cursor.
+
+	\note As BeOS only supports 16x16 monochrome cursors, to see a nice
+		  shadowed one we will need to extend this.
+*/
+
+
+/*!
+	\fn BCursor::BCursor(const void* cursorData)
+	\brief Initializes a new cursor object.
+
+	If the \a cursorData parameter is not \c NULL then the cursor is initialized
+	with the cursor data.
+
+	\param cursorData The cursor data.
+*/
+
+
+/*!
+	\fn BCursor::BCursor(BCursorID id)
+	\brief Initializes a new cursor object from a predefined cursor \a id.
+
+	\param id The predefined \a id to initialize to.
+*/
+
+
+/*!
+	\fn BCursor::BCursor(const BCursor& other)
+	\brief Initializes a new cursor object from another cursor object.
+
+	\param other The cursor object to initialize from.
+*/
+
+
+/*!
+	\fn BCursor::BCursor(BMessage* data)
+	\brief Initializes a new cursor object from a message archive.
+
+	\param data The message data to initialize from.
+*/
+
+
+/*!
+	\fn BCursor::~BCursor()
+	\brief Destroy the cursor and free it's memory.
+*/
+
+
+/*!
+	status_t BCursor::Archive(BMessage *into, bool deep) const
+	\brief Archive the cursor. Not implemented.
+*/
+
+
+/*!
+	BArchivable* BCursor::Instantiate(BMessage *data)
+	\brief Instantiate the cursor from a message. Not implemented.
+*/
+
+
+/*!
+	BCursor& BCursor::operator=(const BCursor& other)
+	\brief Set the cursor to another cursor object.
+
+	\param other The cursor object to copy from.
+
+	\returns the new cursor object.
+*/
+
+
+/*!
+	bool BCursor::operator==(const BCursor& other) const
+	\brief Compare a cursor object to another and return if they are equal.
+
+	\param other The cursor object to compare to.
+
+	\returns \c true if the cursor objects are equal, \c false if the cursor
+		objects are not equal.
+*/
+
+
+/*!
+	bool BCursor::operator!=(const BCursor& other) const
+	\brief Compare a cursor object to another and return if they are not equal.
+
+	\param other The cursor object to compare to.
+
+	\returns \c true if the cursor objects are not equal, \c false if the cursor
+		objects are equal.
+*/

@@ -1,0 +1,34 @@
+1	dutch; flemish	x-vnd.Haiku-Sudoku	2463385585
+Restore snapshot	SudokuWindow		Momentopname terugzetten
+Could not set Sudoku:\n%s\n	SudokuWindow		Sudoku kon niet ingesteld worden:\n%s\n
+Export as…	SudokuWindow		Exporteren als...
+OK	SudokuWindow		OK
+New	SudokuWindow		Nieuw
+Abort	ProgressWindow		Afbreken
+Sudoku	System name		Sudoku
+Could not open \"%s\":\n%s\n	SudokuWindow		\"%s\" kon niet geopend worden:\n%s\n
+Easy	SudokuWindow		Gemakkelijk
+Open file…	SudokuWindow		Bestand openen...
+Solve single field	SudokuWindow		Eén veld oplossen
+Solve	SudokuWindow		Oplossen
+Redo	SudokuWindow		Opnieuw uitvoeren
+File	SudokuWindow		Bestand
+Advanced	SudokuWindow		Geavanceerd
+Start again	SudokuWindow		Opnieuw beginnen
+HTML	SudokuWindow		HTML
+Sudoku request	SudokuWindow		Sudokuverzoek
+Copy	SudokuWindow		Kopiëren
+Mark valid hints	SudokuWindow		Geldige hints markeren
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku opgelost - Gefeliciteerd!\n
+Hard	SudokuWindow		Moeilijk
+Snapshot current	SudokuWindow		Momentopname opslaan
+Text	SudokuWindow		Tekst
+Creating solvable field	SudokuGenerator		Een oplosbaar veld creëren
+View	SudokuWindow		Beeld
+Progress monitor	ProgressWindow		Voortgangsmonitor
+Mark invalid values	SudokuWindow		Ongeldige waarden markeren
+Blank	SudokuWindow		Leeg
+Help	SudokuWindow		Help
+Searching for removable values	SudokuGenerator		Zoeken naar verwijderbare waarden
+Undo	SudokuWindow		Ongedaan maken
+Quit	SudokuWindow		Afsluiten

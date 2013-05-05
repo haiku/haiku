@@ -1,0 +1,6 @@
+1	hindi	x-vnd.Haiku-cmd-dstconfig	2337923203
+Use this time	dstcheck		इस समय का उपयोग करें
+Ask me later	dstcheck		मुझ से बाद में पूछो
+Manually adjust time…	dstcheck		मैन्युअल रूप से समय
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		सावधान!\n\nक्योंकी दिन बचत समय से स्विच करने से डे लाइट सेविंग टाइम, आपके कंप्यूटर की घड़ी एक घंटे आगे हो सकता है.\nआपका कंप्यूटर यह सोचता है कि यह एक घंटे आगे है
+.\n\nIs this the correct time?	dstcheck		.\n\nक्या यह सही समय हैं?

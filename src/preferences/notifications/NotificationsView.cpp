@@ -26,8 +26,8 @@
 
 #include "NotificationsView.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "NotificationView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "NotificationView"
 
 const float kEdgePadding = 5.0;
 const float kCLVTitlePadding = 8.0;
@@ -118,6 +118,7 @@ NotificationsView::NotificationsView()
 		.End()
 		.Add(fApplications)
 		.Add(fNotifications)
+		.SetInsets(inset, inset, inset, inset)
 	);
 }
 
@@ -183,6 +184,7 @@ NotificationsView::_LoadAppUsage()
 				"It's possible you don't have write access to the "
 				"settings directory."), B_TRANSLATE("OK"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		(void)alert->Go();
 		return B_ERROR;
 	}

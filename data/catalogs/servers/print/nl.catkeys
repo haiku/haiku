@@ -1,54 +1,54 @@
-1	dutch	x-vnd.Be-PSRV	1761631281
-A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Er bestaat al een printer met deze naam, maar hij is niet bruikbaar! Wilt u hem vervangen?
-A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Er bestaat al een printer met deze naam, maar diens stuurprogramma werd niet gevonden! Wilt u hem vervangen?
-A0	ConfigWindow	ISO 216 paper size	A0
-A1	ConfigWindow	ISO 216 paper size	A1
-A2	ConfigWindow	ISO 216 paper size	A2
-A3	ConfigWindow	ISO 216 paper size	A3
-A4	ConfigWindow	ISO 216 paper size	A4
-A5	ConfigWindow	ISO 216 paper size	A5
-A6	ConfigWindow	ISO 216 paper size	A6
-All pages	ConfigWindow		Alle pagina's
-All pages, %1 copies	ConfigWindow		Alle pagina's, %1 kopieën
-B5	ConfigWindow	ISO 216 paper size	B5
-Cancel	ConfigWindow		Annuleren
-Cancel	PrintServerApp		Annuleren
-Create a new printer	PrintServerApp Scripting		Maak een nieuwe printer aan
-Delete a specific printer	PrintServerApp Scripting		Verwijder een specifieke printer
-Get comments about this printer	Printer Scripting		Haal opmerkingen op over deze printer
-Get currently available ports/devices	Transport Scripting		Haal het huidige aantal beschikbare poorten/apparaten
-Get name of printer	Printer Scripting		Haal de naam van de printer op
-Get name of the printer add-on used for this printer	Printer Scripting		Haal de naam op van de gebruikte add-on voor deze printer
-Get name of the transport add-on used for this printer	Printer Scripting		Haal de naam op van de transportadd-on voor deze printer
-Get name of transport	Transport Scripting		Haal de naam van het transport op
-Get the transport configuration for this printer	Printer Scripting		Haal de transportconfiguratie op voor deze printer
-Landscape	ConfigWindow		Landschap
-Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger
-Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
-Letter	ConfigWindow	ANSI A (letter), a North American paper size	Brief
-No	PrintServerApp		Nee
-OK	ConfigWindow		Oké
-OK	PrintServerApp		Oké
-Page %1 to %2	ConfigWindow		Pagina %1 to %2
-Page %1 to %2, %3 copies	ConfigWindow		Pagina %1 tot en met %2, %3 kopieën
-Page setup	ConfigWindow		Pagina-instelling
-Page setup:	ConfigWindow		Paginaset-up:
-Paper setup:	ConfigWindow		Papierinstelling:
-Portrait	ConfigWindow		Portret
-Print setup	ConfigWindow		Afdrukinstelling
-Printer server	ConfigWindow		Printerserver
-Printer:	ConfigWindow		Printer:
-Retrieve a specific printer	PrintServerApp Scripting		Haal een specifieke printer op
-Retrieve a specific transport	PrintServerApp Scripting		Haal een specifiek transport op
-Retrieve or select the active printer	PrintServerApp Scripting		Haal de actieve printer op, of selecteer hem
-Return the number of available printers	PrintServerApp Scripting		Geef het aantal beschikbare printers
+1	dutch; flemish	x-vnd.Be-PSRV	1761631281
+Undefined	ConfigWindow		Ongedefinieerd
 Return the number of available transports	PrintServerApp Scripting		Geef het aantal beschikbare transporten
+Return the number of available printers	PrintServerApp Scripting		Geef het aantal beschikbare printers
+Get currently available ports/devices	Transport Scripting		Haal het huidige aantal beschikbare poorten/apparaten
+Retrieve or select the active printer	PrintServerApp Scripting		Haal de actieve printer op, of selecteer hem
+Cancel	PrintServerApp		Annuleren
+Retrieve a specific printer	PrintServerApp Scripting		Haal een specifieke printer op
+Page %1 to %2	ConfigWindow		Pagina %1 to %2
+Get name of the printer add-on used for this printer	Printer Scripting		Haal de naam op van de gebruikte add-on voor deze printer
+Page setup:	ConfigWindow		Paginaset-up:
+OK	ConfigWindow		Oké
+Cancel	ConfigWindow		Annuleren
+Printer server	ConfigWindow		Printerserver
+Page %1 to %2, %3 copies	ConfigWindow		Pagina %1 tot en met %2, %3 kopieën
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Er bestaat al een printer met deze naam, maar diens stuurprogramma werd niet gevonden! Wilt u hem vervangen?
+Yes	PrintServerApp		Ja
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger
+Would you like to set one up now?	PrintServerApp		Wilt u er nu een instellen?
+A6	ConfigWindow	ISO 216 paper size	A6
+Portrait	ConfigWindow		Portret
+All pages	ConfigWindow		Alle pagina's
+There is no default printer set up.	PrintServerApp		Er is geen standaardprinter ingesteld.
+B5	ConfigWindow	ISO 216 paper size	B5
+A0	ConfigWindow	ISO 216 paper size	A0
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	Brief
+Printer:	ConfigWindow		Printer:
+A2	ConfigWindow	ISO 216 paper size	A2
 Select a printer	ConfigWindow		Selecteer een printer
 Show configuration window	PrintServerApp Scripting		Toon het configuratiescherm
-Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid
+A4	ConfigWindow	ISO 216 paper size	A4
+Get comments about this printer	Printer Scripting		Haal opmerkingen op over deze printer
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Er bestaat al een printer met deze naam, maar hij is niet bruikbaar! Wilt u hem vervangen?
+No	PrintServerApp		Nee
+Get the transport configuration for this printer	Printer Scripting		Haal de transportconfiguratie op voor deze printer
+Landscape	ConfigWindow		Landschap
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
 There are no printers set up.	PrintServerApp		Er zijn geen printers ingesteld.
-There is no default printer set up.	PrintServerApp		Er is geen standaardprinter ingesteld.
-Undefined	ConfigWindow		Ongedefinieerd
+Get name of the transport add-on used for this printer	Printer Scripting		Haal de naam op van de transportadd-on voor deze printer
+All pages, %1 copies	ConfigWindow		Alle pagina's, %1 kopieën
+Delete a specific printer	PrintServerApp Scripting		Verwijder een specifieke printer
+Create a new printer	PrintServerApp Scripting		Maak een nieuwe printer aan
+OK	PrintServerApp		Oké
+Print setup	ConfigWindow		Afdrukinstelling
+A1	ConfigWindow	ISO 216 paper size	A1
+Retrieve a specific transport	PrintServerApp Scripting		Haal een specifiek transport op
+Get name of printer	Printer Scripting		Haal de naam van de printer op
+A3	ConfigWindow	ISO 216 paper size	A3
+Get name of transport	Transport Scripting		Haal de naam van het transport op
+A5	ConfigWindow	ISO 216 paper size	A5
 Would you like to make @ the default printer?	PrintServerApp		Wilt u van @ de standaardprinter maken?
-Would you like to set one up now?	PrintServerApp		Wilt u er nu een instellen?
-Yes	PrintServerApp		Ja
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid
+Page setup	ConfigWindow		Pagina-instelling
+Paper setup:	ConfigWindow		Papierinstelling:

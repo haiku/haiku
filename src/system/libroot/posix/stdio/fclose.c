@@ -41,6 +41,9 @@ static char rcsid[] = "$OpenBSD: fclose.c,v 1.2 1996/08/19 08:32:19 tholo Exp $"
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <errno_private.h>
+
 #include "local.h"
 
 int
@@ -50,7 +53,7 @@ fclose(fp)
 	register int r;
 
 	if (fp->_flags == 0) {	/* not open! */
-		errno = EBADF;
+		__set_errno(EBADF);
 		return (EOF);
 	}
 	r = fp->_flags & __SWR ? __sflush(fp) : 0;

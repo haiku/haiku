@@ -1,0 +1,22 @@
+1	hungarian	x-vnd.Haiku-NetworkStatus	1729819859
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Hálózat állapota opciói:\n\t--deskbar\tautomatikusan hozzáad egy replikánst az Asztalsávhoz\n\t--help\t\tkiírja ezt és kilép\n
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		A Hálózat állapota futtatható ablakban, vagy telepíthető az Asztalsávra.
+<no wireless networks found>	NetworkStatusView		<nem található vezeték nélküli hálózat>
+Run in window	NetworkStatus		Futtatás ablakban
+No link	NetworkStatusView		Nincs kapcsolat
+Install in Deskbar	NetworkStatus		Telepítés az Asztalsávra
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Nem sikerült elindítani a hálózati prefletet.\n\nHiba:
+Netmask	NetworkStatusView		Hálózati maszk
+Broadcast	NetworkStatusView		Broadcast
+Unknown	NetworkStatusView		Ismeretlen
+Network Status	NetworkStatusView		Hálózat állapota
+Ready	NetworkStatusView		Kész
+No stateful configuration	NetworkStatusView		Nincs konfiguráció
+%ifaceName information:\n	NetworkStatusView		%ifaceName információi:\n
+Configuring	NetworkStatusView		Konfigurálás
+Address	NetworkStatusView		Cím
+OK	NetworkStatusView		Rendben
+NetworkStatus	System name		Hálózat állapot
+Open network preferences…	NetworkStatusView		Hálózati beállítások megnyitása…
+Could not join wireless network:\n	NetworkStatusView		Nem lehet csatlakozni a vezeték nélküli hálózatra:\n
+Quit	NetworkStatusView		Kilépés

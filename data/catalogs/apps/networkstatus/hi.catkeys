@@ -1,0 +1,21 @@
+1	hindi	x-vnd.Haiku-NetworkStatus	3946594365
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		नेटवर्कसटेटस विकल्प:\n\t--डेस्कबार\tअपनेआप रेप्लिकान्त को डेस्कबार मैं जोड़ें\n\t--मदद\t\tइस जानकारी के प्रिंट करें और बाहर निकलें\n   
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		आप एक विंडो में नेटवर्कसटेटस चलाने या डेस्कबार में स्थापित कर सकते हैं.
+<no wireless networks found>	NetworkStatusView		<कोई वायरलेस नेटवर्क नहीं मिले> 
+Run in window	NetworkStatus		विंडो में चलाने 
+No link	NetworkStatusView		कोई लिंक नहीं 
+Install in Deskbar	NetworkStatus		डेस्कबार में स्थापित करें 
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		नेटवर्क preflet शुभारंभ विफल.\n\nत्रुटि:
+Netmask	NetworkStatusView		नेटमास्क 
+Broadcast	NetworkStatusView		बरोदकास्ट 
+Unknown	NetworkStatusView		अज्ञात 
+Ready	NetworkStatusView		तैयार
+No stateful configuration	NetworkStatusView		कोई स्टेटफुल विन्यास 
+%ifaceName information:\n	NetworkStatusView		%iface नाम की जानकारी:\n 
+Configuring	NetworkStatusView		कॉन्फ़िगर करना 
+Address	NetworkStatusView		पता
+OK	NetworkStatusView		ठीक है 
+NetworkStatus	System name		नेटवर्क स्टेटस  
+Open network preferences…	NetworkStatusView		खुला नेटवर्क वरीयताओं... 
+Could not join wireless network:\n	NetworkStatusView		वायरलेस नेटवर्क में शामिल नहीं किया जा सका:\n 
+Quit	NetworkStatusView		छोड़ना 

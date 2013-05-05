@@ -9,7 +9,7 @@
 #include <View.h>
 
 
-class BStringView : public BView{
+class BStringView : public BView {
 public:
 								BStringView(BRect bounds, const char* name,
 									const char* text, uint32 resizeFlags
@@ -41,8 +41,8 @@ public:
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
 	virtual	BSize				PreferredSize();
-	virtual	void				InvalidateLayout(bool descendants = false);
 	virtual	void				ResizeToPreferred();
+	virtual	BAlignment			LayoutAlignment();
 	virtual	void				FrameMoved(BPoint newPosition);
 	virtual	void				FrameResized(float newWidth, float newHeight);
 
@@ -62,6 +62,8 @@ public:
 	virtual	void				SetFont(const BFont* font,
 									uint32 mask = B_FONT_ALL);
 
+protected:
+	virtual	void				LayoutInvalidated(bool descendants = false);
 
 private:
 	// FBC padding and forbidden methods

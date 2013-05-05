@@ -1,25 +1,25 @@
 1	russian	x-vnd.Haiku-Backgrounds	3513602073
-All workspaces	Main View		Все рабочие столы
-Apply	Main View		Применить
 Backgrounds	System name		Фон
-Center	Main View		По центру
-Current workspace	Main View		Текущий рабочий стол
+X:	Main View		X:
+Resolution: 	Image Filepanel		Разрешение: 
+pick one	Main View		Выбрать
 Default	Main View		По умолчанию
-Default folder	Main View		Папка по умолчанию
-Folder: 	Main View		Папка: 
-Icon label outline	Main View		Контурный текст значков
-Image:	Main View		Изображение:
+Center	Main View		По центру
 Manual	Main View		Вручную
+Default folder	Main View		Папка по умолчанию
+Revert	Main View		Вернуть
 None	Main View		Не выбрано
-Other folder…	Main View		Другая папка…
+All workspaces	Main View		Все рабочие столы
+Icon label outline	Main View		Контурный текст значков
 Other…	Main View		Другое…
+Current workspace	Main View		Текущий рабочий стол
+Folder: 	Main View		Папка: 
+Apply	Main View		Применить
+Other folder…	Main View		Другая папка…
+Y:	Main View		Y:
+Tile	Main View		Плиткой
+Select	Main View		Выбрать
+Scale to fit	Main View		Растянуть
 Placement:	Main View		Расположить:
 Preview	Main View		Предпросмотр
-Resolution: 	Image Filepanel		Разрешение: 
-Revert	Main View		Вернуть
-Scale to fit	Main View		Растянуть
-Select	Main View		Выбрать
-Tile	Main View		Плиткой
-X:	Main View		X:
-Y:	Main View		Y:
-pick one	Main View		Выбрать
+Image:	Main View		Изображение:

@@ -131,7 +131,7 @@ public:
 		fDryRun(dryRun),
 		fSubpixelAntiAliased(subpixelAntiAliased),
 		fVector(false),
-		fBounds(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN),
+		fBounds(INT32_MAX, INT32_MAX, INT32_MIN, INT32_MIN),
 		fNextCharPos(nextCharPos),
 
 		fTransformedGlyph(transformedGlyph),
@@ -334,8 +334,9 @@ AGGTextRenderer::RenderString(const char* string, uint32 length,
 	// for when we bypass the transformation pipeline
 	BPoint transformOffset(0.0, 0.0);
 	transform.Transform(&transformOffset);
+	IntRect clippingIntFrame(clippingFrame);
 
-	StringRenderer renderer(clippingFrame, dryRun,
+	StringRenderer renderer(clippingIntFrame, dryRun,
 		gSubpixelAntialiasing && fAntialias,
 		transformedOutline, transformedContourOutline,
 		transform, transformOffset, nextCharPos, *this);
@@ -369,8 +370,9 @@ AGGTextRenderer::RenderString(const char* string, uint32 length,
 	// for when we bypass the transformation pipeline
 	BPoint transformOffset(0.0, 0.0);
 	transform.Transform(&transformOffset);
+	IntRect clippingIntFrame(clippingFrame);
 
-	StringRenderer renderer(clippingFrame, dryRun,
+	StringRenderer renderer(clippingIntFrame, dryRun,
 		gSubpixelAntialiasing && fAntialias,
 		transformedOutline, transformedContourOutline,
 		transform, transformOffset, nextCharPos, *this);

@@ -29,7 +29,7 @@ UseHeaders [ FDirName $(appServerDir) drawing Painter drawing_modes ] ;
 UseHeaders [ FDirName $(appServerDir) drawing Painter font_support ] ;
 UseHeaders [ FDirName $(appServerDir) font ] ;
 UseHeaders [ FDirName $(appServerDir) stackandtile ] ;
-UseFreeTypeHeaders ;
+UseHeaders $(HAIKU_FREETYPE_HEADERS) : true ;
 UseLibraryHeaders agg lp_solve linprog ;
 
 # This overrides the definitions in private/servers/app/ServerConfig.h

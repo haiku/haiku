@@ -2,11 +2,12 @@ SubDir HAIKU_TOP src system kernel arch arm ;
 
 SubDirHdrs $(SUBDIR) $(DOTDOT) generic ;
 UsePrivateKernelHeaders ;
-UsePrivateHeaders [ FDirName kernel arch $(TARGET_ARCH) board $(TARGET_BOOT_BOARD) ] ;
+UsePrivateHeaders [ FDirName kernel arch $(TARGET_KERNEL_ARCH) board $(TARGET_BOOT_BOARD) ] ;
 
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) paging ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) paging 32bit ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
 KernelMergeObject kernel_arch_arm.o :
 #	arch_atomic.c
@@ -16,7 +17,7 @@ KernelMergeObject kernel_arch_arm.o :
 	arch_debug_console.cpp
 	arch_debug.cpp
 	arch_elf.cpp
-#	arch_exceptions.S
+	arch_exceptions.S
 	arch_int.cpp
 	arch_platform.cpp
 	arch_real_time_clock.cpp
@@ -28,7 +29,9 @@ KernelMergeObject kernel_arch_arm.o :
 	arch_vm.cpp
 	arch_vm_translation_map.cpp
 	arch_asm.S
-	uart.cpp
+	debug_uart_8250.cpp
+	arch_uart_8250.cpp
+	arch_uart_pl011.cpp
 
 	# paging
 	arm_physical_page_mapper.cpp

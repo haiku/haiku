@@ -52,8 +52,6 @@ public:
 									float* _height);
 	virtual	void				ResizeToPreferred();
 
-	virtual	void				InvalidateLayout(bool descendants = false);
-
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
 	virtual	BSize				PreferredSize();
@@ -69,6 +67,9 @@ public:
 	virtual	status_t			GetSupportedSuites(BMessage* message);
 
 	virtual	status_t			Perform(perform_code code, void* data);
+
+protected:
+	virtual	void				LayoutInvalidated(bool descendants = false);
 
 private:
 	// FBC padding

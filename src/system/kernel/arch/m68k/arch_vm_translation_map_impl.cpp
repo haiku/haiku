@@ -354,7 +354,7 @@ destroy_tmap(vm_translation_map *map)
 				return;
 			}
 			// suboptimal (done 8 times)
-			pgdir_pn = PRE_TO_PA(map->arch_data->rtdir_virt[i]);
+			pgdir_pn = PRE_TO_PN(map->arch_data->rtdir_virt[i]);
 			dirpage = vm_lookup_page(pgdir_pn);
 			pgdir = &(((page_directory_entry *)dirpage)[i%NUM_DIRTBL_PER_PAGE]);
 

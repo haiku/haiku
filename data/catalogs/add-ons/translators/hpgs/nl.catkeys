@@ -1,0 +1,12 @@
+1	dutch; flemish	x-vnd.Haiku-HPGSTranslator	3633584048
+Based on HPGS (http://hpgs.berlios.de)	ConfigView		Gebaseerd op HPGS (http://hpgs.berlios.de)
+Version %d.%d.%d, %s	ConfigView		Versie %d.%d.%d, %s
+Error: Cannot process plot data %s\n	HPGSTranslator		Fout: kan plot data niet verwerken %s\n
+HPGS image	HPGSTranslator		HPGS afbeelding
+HPGSTranslator Settings	ConfigView		HPGSTranslator instellingen
+Error: Cannot imbue plot device to reader: %s\n	HPGSTranslator		Fout: kan niet doordringen tot lees apparaat: %s\n
+HPGS images	ConfigView		HPGS afbeeldingen
+HPGS images	HPGSTranslator		HPGS-afbeeldingen
+no hpgs\n	HPGSTranslator		geen hpgs\n
+HPGS image translator	HPGSTranslator		HPGS afbeelding vertaler
+Write error %s\n	HPGSTranslator		Schrijffout %s\n

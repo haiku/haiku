@@ -49,6 +49,7 @@ public:
 
 			void				SetPlaying(bool playing);
 			void				SetFullscreen(bool fullScreen);
+			void				SetFullscreenControlsVisible(bool visible);
 			void				SetVideoFrame(const BRect& frame);
 
 			void				SetSubTitle(const char* text);
@@ -68,6 +69,9 @@ private:
 			rgb_color			fOverlayKeyColor;
 			bool				fIsPlaying;
 			bool				fIsFullscreen;
+			bool				fFullscreenControlsVisible;
+			bool				fFirstPulseAfterFullscreen;
+			uint8				fSendHideCounter;
 			bigtime_t			fLastMouseMove;
 
 			SubtitleBitmap*		fSubtitleBitmap;

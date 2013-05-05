@@ -14,9 +14,7 @@
 
 #include <Catalog.h>
 #include <CheckBox.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Message.h>
@@ -31,8 +29,8 @@
 #include "WebPTranslator.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ConfigView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ConfigView"
 
 
 static const uint32 kMsgQuality	= 'qlty';
@@ -60,7 +58,8 @@ ConfigView::ConfigView(TranslatorSettings* settings, uint32 flags)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	BStringView* title = new BStringView("title", B_TRANSLATE("WebP Images"));
+	BStringView* title = new BStringView("title",
+		B_TRANSLATE("WebP image translator"));
 	title->SetFont(be_bold_font);
 
 	char versionString[256];
@@ -121,26 +120,23 @@ ConfigView::ConfigView(TranslatorSettings* settings, uint32 flags)
 		fPreprocessingCheckBox->SetValue(B_CONTROL_ON);
 
 	// Build the layout
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
-	AddChild(BGroupLayoutBuilder(B_VERTICAL)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(5)
+		.AddGroup(B_HORIZONTAL)
 			.Add(title)
 			.Add(version)
 			.AddGlue()
-		)
+		.End()
 		.Add(copyrights)
 		.AddGlue()
 
-		.Add(BGridLayoutBuilder()
+		.AddGrid()
 			.Add(presetsField->CreateLabelLayoutItem(), 0, 0)
 			.Add(presetsField->CreateMenuBarLayoutItem(), 1, 0)
-		)
+		.End()
 		.Add(fQualitySlider)
 		.Add(fMethodSlider)
-		.Add(fPreprocessingCheckBox)
-		.SetInsets(5, 5, 5, 5)
-	);
+		.Add(fPreprocessingCheckBox);
 }
 
 

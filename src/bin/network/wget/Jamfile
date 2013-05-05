@@ -12,7 +12,7 @@ SubDirSysHdrs [ FDirName $(SUBDIR) md5 ] ;
 # use OpenSSL, if enabled
 local sslSources ;
 
-if $(HAIKU_OPENSSL_ENABLED) {
+if $(HAIKU_BUILD_FEATURE_OPENSSL_ENABLED) {
 	SubDirCcFlags -DHAVE_LIBSSL ;
 	SubDirSysHdrs $(HAIKU_OPENSSL_HEADERS) ;
 	sslSources = openssl.c ;

@@ -30,7 +30,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 
 ******************************************************************************/
-/*$FreeBSD: src/sys/dev/e1000/e1000_mbx.c,v 1.1.2.2.2.1 2010/12/21 17:09:25 kensmith Exp $*/
+/*$FreeBSD$*/
 
 #include "e1000_mbx.h"
 
@@ -736,7 +736,9 @@ s32 e1000_init_mbx_params_pf(struct e1000_hw *hw)
 {
 	struct e1000_mbx_info *mbx = &hw->mbx;
 
-	if (hw->mac.type == e1000_82576) {
+	switch (hw->mac.type) {
+	case e1000_82576:
+	case e1000_i350:
 		mbx->timeout = 0;
 		mbx->usec_delay = 0;
 
@@ -755,8 +757,8 @@ s32 e1000_init_mbx_params_pf(struct e1000_hw *hw)
 		mbx->stats.reqs = 0;
 		mbx->stats.acks = 0;
 		mbx->stats.rsts = 0;
+	default:
+		return E1000_SUCCESS;
 	}
-
-	return E1000_SUCCESS;
 }
 

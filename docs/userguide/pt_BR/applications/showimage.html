@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2010-2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		tiagoms
+ *		Adriano Duarte
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Exibir Imagem</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../../fr/applications/showimage.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/showimage.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/showimage.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/showimage.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/showimage.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/showimage.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/showimage.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/showimage.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/showimage.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/showimage.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/showimage.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/showimage.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/applications/showimage.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../ca/applications/showimage.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../../en/applications/showimage.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="screenshot.html">Captura de Tela</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos
+</a> 
+::  <a href="soundrecorder.html">Gravador de Som</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/showimage-icon_64.png" alt="showimage-icon_64.png" width="64" height="64" />Exibir Imagem</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><i>Sem entrada, normalmente carregado via duplo clique em um arquivo suportado.</i></td></tr>
+<tr><td>Localização:</td><td></td><td><span class="path">/boot/system/apps/ShowImage</span></td></tr>
+<tr><td>Configurações:</td><td></td><td><span class="path">~/config/settings/ShowImage_settings</span></td></tr>
+</table>
+<p><br /></p>
+<p>Exibir Imagem permite ver imagens em todos os formatos que são suportados através dos <a href="../preferences/datatranslation.html">Tradutores de Dados</a>. Novos formatos são automaticamente reconhecidos quando seu tradutor é adicionado ao sistema. Isto é feito para arquivos de ícones vetoriais do Haiku, imagens do WonderBrush ou quando imagens WebP tornam-se disponíveis, por exemplo.<br />
+Exibir Imagem proporciona funcionalidades de edição mínimas para cortas, rotacionar e inverter imagens e para salvá-las em outro formato.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Visualização</h2>
+<img src="../images/apps-images/showimage-view.jpg" alt="showimage-view.jpg" />
+<p>O menu <span class="menu">Visualizar</span> permite iniciar um <span class="menu">Slide show</span> de todas as imagens em uma pasta (ou janela de resultado de consulta) e definir um <span class="menu">Atraso de slide</span> de 2 a 20 segundos.</p>
+<p>Outros comandos aplicados à imagem atualmente mostrada (sem alterar o tamanho da janela):<br />
+<span class="menu">Tamanho original</span> exibe a imagem com um fator de aproximação de 100%.<br />
+<span class="menu">Ajustar à janela</span> encolhe a imagem dentro do quadro da janela, isto é após ter aproximado dentro dele ou após redimensionar a janela.<br />
+<span class="menu">Aproximar</span> e <span class="menu">Afastar</span> aproxima ou afasta a imagem em etapas de 10%. A aproximação também é feita com a roda do mouse; para rotacionar horizontalmente uma imagem maior do que a janela, simplesmente clique com o botão esquerdo e arraste o mouse.</p>
+<p>Duas definições não se aplicam apenas à imagem atualmente exibida e são lembradas ao navegar de uma imagem para a próxima:<br />
+<span class="menu">Aproximação em alta qualidade</span> aplica um filtro muito rápido ao aproximar para reduzir linhas denteadas e produzir um resultado mais suave.<br />
+<span class="menu">Esticar para a janela</span> esticará imagens menores para preencher o quadro da janela atual.</p>
+<p>E há um modo <span class="menu">Tela cheia</span> com uma opção para <span class="menu">Exibir legenda no modo de tela cheia</span> a qual sobrepõe o nome do arquivo na parte inferior da imagem.</p>
+<p>Por último, <span class="menu">Exibir barra de ferramentas</span> irá exibir/ocultar os controles gráficos:</p>
+<img src="../images/apps-images/showimage-toolbar.png" alt="showimage-toolbar.png" />
+<p>Da esquerda para a direita: Imagem anterior, próxima imagem, iniciar show de slides (em modo de tela cheia), modo de seleção, tamanho original, ajustar para janela, aproximar, afastar.</p>
+<p>Muitos dos comandos mais frequentemente utilizados também estão disponíveis a partir de um menu de contexto acionado pelo clique com o botão direito do mouse sobre a imagem. Conveniente quando em modo de tela cheia.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Navegando</h2>
+<img src="../images/apps-images/showimage-browse.jpg" alt="showimage-browse.jpg" />
+<p>Após abrir uma imagem pode-se rapidamente navegar através de todas as imagens na sua pasta (ou janela de resultado de consulta) pressionando <span class="key">↑</span>/<span class="key">↓</span> ou <span class="key">←</span>/<span class="key">→</span>. Pode-se ver na janela do Rastreador a seleção mudar de acordo.</p>
+<p>Existe uma maneira rápida para abrir a pasta de uma imagem atual e então navegar pela sua principal e subpastas. Ela funciona semelhantemente à <a href="../tracker.html#drill-down">navegação de pesquisa</a> no Rastreador pelo clique na área de informação na barra de estado que exibe tamanho e formato da imagem atual.</p>
+<p>Olhar no menu <span class="menu">Navegar</span>, exibe outro tipo de navegação: Alguns formatos de imagem, como o TIFF, podem conter muita páginas em um arquivo. Comandos como <span class="menu">Primeira página</span> e <span class="menu">Próxima página</span> permitem navegar por aquelas páginas.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Editando</h2>
+<img src="../images/apps-images/showimage-edit.jpg" alt="showimage-edit.jpg" />
+<p>O menu <span class="menu">Imagem</span> oferece umas poucas manipulações de imagem necessárias para um visualizador de imagem: rotacionar e inverter a imagem. Observe, contudo, que a imaem real não será alterada. Apenas um atributo é adicionado ao arquivo, então ele será exibido rotacionado ou invertido da próxima vez que for aberto.</p>
+<p><span class="menu">Utilizar como papel de parede...</span> irá abrir as preferências do <a href="../preferences/backgrounds.html">Papel de parede</a> para definir a imagem atual como fundo de seus espaços de trabalho.</p>
+<p>Cortar é outra funcionalidade necessária algumas vezes. Para definir o quadro para cortar, pode-se alternar para <span class="menu">Modo de seleção</span> a partir do menu <span class="menu">Editar</span> e arrastar uma caixa com o botão esquerdo do mouse. Se não deseja alterar os modos primeiro, pode criar esta caixa no "modo normal" simplesmente segurando <span class="key">CTRL</span> enquanto arrasta com o botão esquerdo, o que de outra maneira apenas rotacionaria horizontalmente a imagem.<br />
+<span class="menu">Limpar seleção</span> ou <span class="key">ESC</span> removerá a caixa de seleção.</p>
+<p>O capítulo seguinte exibe como realmente salvar uma área recortada.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Salvando e convertendo</h2>
+<p>Para salvar ou converter uma imagem em qualquer formato disponível, pode-se chamar o item normal <span class="menu">Salvar como...</span> a partir do menu <span class="menu">Arquivo</span>, selecionar o formato e escolher um nome de arquivo.<br />
+Frequentemente mais rápido, especialmente quando a janela do Rastreador com a pasta de destino já está aberta, é usar o arrastar e soltar.</p>
+<img src="../images/apps-images/showimage-dnd.jpg" alt="showimage-dnd.jpg" />
+<p>Esta é também a forma como o recorte acima mencionado é finalizado. Também selecione um quadro como descrito acima, ou escolha <span class="menu">Editar | Selecionar tudo</span> para a imagem inteira. Então arraste e solte a seleção na Área de Trabalho ou alguma janela do Rastreador para criar uma nova imagem do recorte no mesmo formato da imagem original.</p>
+<p>Para salvar em outro formato de arquivo, arraste como botão direito do mouse e escolha um formato do menu de contexto quando soltar a imagem.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Atalhos de teclado</h2>
+<p>Aqui está uma lista dos atalhos mais úteis:</p>
+<table summary="keycombos" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="key">←</span> / <span class="key">↑</span></td><td style="width:15px;"></td><td>Imagem anterior</td></tr>
+<tr><td><span class="key">→</span> / <span class="key">↓</span></td><td></td><td>Próxima imagem</td></tr>
+<tr><td><span class="key">DEL</span></td><td></td><td>Mover para a Lixeira</td></tr>
+<tr><td><span class="key">+</span></td><td></td><td>Mais zoom</td></tr>
+<tr><td><span class="key">-</span></td><td></td><td>Menos zoom</td></tr>
+<tr><td><span class="key">0</span></td><td></td><td>Tamanho original (zoom em 100%)</td></tr>
+<tr><td><span class="key">1</span></td><td></td><td>Ajustar à janela</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>Alternar para o modo de tela inteira (também via clique duplo)</td></tr>
+<tr><td><span class="key">CTRL</span></td><td></td><td>Enquanto pressionar <span class="key">CTRL</span>, você poderá criar um quadro de seleção sem explicitamente alternar para o modo de seleção.</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="screenshot.html">Captura de Tela</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos
+</a> 
+::  <a href="soundrecorder.html">Gravador de Som</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

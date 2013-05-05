@@ -51,7 +51,7 @@ All rights reserved.
 
 #define ENCLOSURES_HEIGHT	65
 
-#define ENCLOSE_TEXT		B_TRANSLATE_WITH_CONTEXT("Attachments:", "Mail")
+#define ENCLOSE_TEXT		B_TRANSLATE_CONTEXT("Attachments:", "Mail")
 #define ENCLOSE_TEXT_H		7
 #define ENCLOSE_TEXT_V		3
 #define ENCLOSE_FIELD_V		3

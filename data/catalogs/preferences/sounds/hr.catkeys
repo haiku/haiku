@@ -1,0 +1,17 @@
+1	croatian	x-vnd.Haiku-Sounds	3924145958
+<none>	HEventList		<nijedan>
+<none>	HWindow		<nijedan>
+About Sounds	SoundsHApp		O zvukovima
+Event	HEventList		Događaj
+No such file or directory	HEventList		Nema datoteke ili direktorija sa takvim imenom
+OK	HEventList		U redu
+OK	HWindow		U redu
+OK	SoundsHApp		U redu
+Other…	HWindow		Drugo...
+Play	HWindow		Pokreni
+Sound	HEventList		Zvuk
+Sound File:	HWindow		Zvučna datoteka:
+Sounds	System name		Zvukovi
+Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Zvukovi\n Donijeli su vam :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n Originalni program napravio Atsushi Takamatsu.\nAutorska prava ©2003-2006 Haiku
+Stop	HWindow		Zaustavi
+This is not an audio file.	HWindow		Ovo nije zvučna datoteka.

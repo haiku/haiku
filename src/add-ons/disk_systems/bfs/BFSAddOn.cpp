@@ -1,6 +1,6 @@
 /*
  * Copyright 2007, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2008-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2012, Axel Dörfler, axeld@pinc-software.de.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -230,14 +230,16 @@ BFSPartitionHandle::Repair(bool checkOnly)
 	if (fd < 0)
 	    return errno;
 
+	FileDescriptorCloser closer(fd);
+
 	struct check_control result;
 	memset(&result, 0, sizeof(result));
 	result.magic = BFS_IOCTL_CHECK_MAGIC;
-	result.flags = !checkOnly ? BFS_FIX_BITMAP_ERRORS : 0;
+	result.flags = 0;
 	if (!checkOnly) {
 		//printf("will fix any severe errors!\n");
-		result.flags |= BFS_REMOVE_WRONG_TYPES | BFS_REMOVE_INVALID
-			| BFS_FIX_NAME_MISMATCHES;
+		result.flags |= BFS_FIX_BITMAP_ERRORS | BFS_REMOVE_WRONG_TYPES
+			| BFS_REMOVE_INVALID | BFS_FIX_NAME_MISMATCHES | BFS_FIX_BPLUSTREES;
 	}
 
 	// start checking
@@ -247,50 +249,58 @@ BFSPartitionHandle::Repair(bool checkOnly)
 	uint64 attributeDirectories = 0, attributes = 0;
 	uint64 files = 0, directories = 0, indices = 0;
 	uint64 counter = 0;
+	uint32 previousPass = result.pass;
 
 	// check all files and report errors
 	while (ioctl(fd, BFS_IOCTL_CHECK_NEXT_NODE, &result,
 			sizeof(result)) == 0) {
 		if (++counter % 50 == 0)
-			printf("%9Ld nodes processed\x1b[1A\n", counter);
+			printf("%9" B_PRId64 " nodes processed\x1b[1A\n", counter);
 
-		if (result.errors) {
-			printf("%s (inode = %lld)", result.name, result.inode);
-			if (result.errors & BFS_MISSING_BLOCKS)
-				printf(", some blocks weren't allocated");
-			if (result.errors & BFS_BLOCKS_ALREADY_SET)
-				printf(", has blocks already set");
-			if (result.errors & BFS_INVALID_BLOCK_RUN)
-				printf(", has invalid block run(s)");
-			if (result.errors & BFS_COULD_NOT_OPEN)
-				printf(", could not be opened");
-			if (result.errors & BFS_WRONG_TYPE)
-				printf(", has wrong type");
-			if (result.errors & BFS_NAMES_DONT_MATCH)
-				printf(", names don't match");
-			putchar('\n');
+		if (result.pass == BFS_CHECK_PASS_BITMAP) {
+			if (result.errors) {
+				printf("%s (inode = %" B_PRIdINO ")", result.name, result.inode);
+				if ((result.errors & BFS_MISSING_BLOCKS) != 0)
+					printf(", some blocks weren't allocated");
+				if ((result.errors & BFS_BLOCKS_ALREADY_SET) != 0)
+					printf(", has blocks already set");
+				if ((result.errors & BFS_INVALID_BLOCK_RUN) != 0)
+					printf(", has invalid block run(s)");
+				if ((result.errors & BFS_COULD_NOT_OPEN) != 0)
+					printf(", could not be opened");
+				if ((result.errors & BFS_WRONG_TYPE) != 0)
+					printf(", has wrong type");
+				if ((result.errors & BFS_NAMES_DONT_MATCH) != 0)
+					printf(", names don't match");
+				if ((result.errors & BFS_INVALID_BPLUSTREE) != 0)
+					printf(", invalid b+tree");
+				putchar('\n');
+			}
+
+			if ((result.mode & (S_INDEX_DIR | 0777)) == S_INDEX_DIR)
+				indices++;
+			else if (result.mode & S_ATTR_DIR)
+				attributeDirectories++;
+			else if (result.mode & S_ATTR)
+				attributes++;
+			else if (S_ISDIR(result.mode))
+				directories++;
+			else
+				files++;
+		} else if (result.pass == BFS_CHECK_PASS_INDEX) {
+			if (previousPass != result.pass) {
+				printf("Recreating broken index b+trees...\n");
+				previousPass = result.pass;
+				counter = 0;
+			}
 		}
-		if ((result.mode & (S_INDEX_DIR | 0777)) == S_INDEX_DIR)
-			indices++;
-		else if (result.mode & S_ATTR_DIR)
-			attributeDirectories++;
-		else if (result.mode & S_ATTR)
-			attributes++;
-		else if (S_ISDIR(result.mode))
-			directories++;
-		else
-			files++;
 	}
 
 	// stop checking
-	if (ioctl(fd, BFS_IOCTL_STOP_CHECKING, &result, sizeof(result)) != 0) {
-		close(fd);
+	if (ioctl(fd, BFS_IOCTL_STOP_CHECKING, &result, sizeof(result)) != 0)
 		return errno;
-	}
 
-	close(fd);
-
-	printf("\t%" B_PRIu64 " nodes checked,\n\t%" B_PRIu64 " blocks not "
+	printf("        %" B_PRIu64 " nodes checked,\n\t%" B_PRIu64 " blocks not "
 		"allocated,\n\t%" B_PRIu64 " blocks already set,\n\t%" B_PRIu64
 		" blocks could be freed\n\n", counter, result.stats.missing,
 		result.stats.already_set, result.stats.freed);

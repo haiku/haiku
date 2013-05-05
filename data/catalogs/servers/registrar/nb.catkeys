@@ -1,21 +1,21 @@
-1	norwegian_bokmål	application/x-vnd.Haiku-Registrar	681880312
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Programmet \"%appName%\" har avbrutt nedstengningen.
-Asking \"%appName%\" to quit.	ShutdownProcess		Ber \"%appName%\" om å avslutte
-Asking background applications to quit.	ShutdownProcess		Ber bakgrunnsprogrammer om å avslutte.
-Asking other processes to quit.	ShutdownProcess		Ber andre prosesser om å avslutte
-Cancel	ShutdownProcess		Avbryt
-Cancel shutdown	ShutdownProcess		Avbryt nedstengning
-Do you really want to restart the system?	ShutdownProcess		Vil du virkelig starte maskinen på nytt?
-Do you really want to shut down the system?	ShutdownProcess		Vil du virkelig slå av maskinen?
-It's now safe to turn off the computer.	ShutdownProcess		Det er trygt å skru av datamaskinen.
-Kill application	ShutdownProcess		Drep program
-OK	ShutdownProcess		OK
-Restart	ShutdownProcess		Start på nytt
+1	bokmål, norwegian; norwegian bokmål	x-vnd.haiku-registrar	681880312
 Restart system	ShutdownProcess		Start systemet på nytt
-Restarting…	ShutdownProcess		Starter på nytt...
-Shut down	ShutdownProcess		Steng ned
-Shutdown aborted	ShutdownProcess		Nedstengning avbrutt
-Shutdown status	ShutdownProcess		Nedstengningsstatus
-Shutting down…	ShutdownProcess		Stenger ned...
+OK	ShutdownProcess		OK
 System is shut down	ShutdownProcess		Systemet er stengt ned
+It's now safe to turn off the computer.	ShutdownProcess		Det er trygt å skru av datamaskinen.
+Cancel	ShutdownProcess		Avbryt
+Do you really want to shut down the system?	ShutdownProcess		Vil du virkelig slå av maskinen?
+Asking other processes to quit.	ShutdownProcess		Ber andre prosesser om å avslutte
+Asking \"%appName%\" to quit.	ShutdownProcess		Ber \"%appName%\" om å avslutte
+Shutdown aborted	ShutdownProcess		Nedstengning avbrutt
+Restarting…	ShutdownProcess		Starter på nytt...
+Asking background applications to quit.	ShutdownProcess		Ber bakgrunnsprogrammer om å avslutte.
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Programmet \"%appName%\" har avbrutt nedstengningen.
 Tidying things up a bit.	ShutdownProcess		Rydder opp litt.
+Do you really want to restart the system?	ShutdownProcess		Vil du virkelig starte maskinen på nytt?
+Shutdown status	ShutdownProcess		Nedstengningsstatus
+Cancel shutdown	ShutdownProcess		Avbryt nedstengning
+Kill application	ShutdownProcess		Drep program
+Shut down	ShutdownProcess		Steng ned
+Restart	ShutdownProcess		Start på nytt
+Shutting down…	ShutdownProcess		Stenger ned...

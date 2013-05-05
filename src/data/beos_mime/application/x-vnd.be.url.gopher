@@ -5,7 +5,7 @@ resource(1, "META:TYPE") "application/x-vnd.Be.URL.gopher";
 
 resource(2, "META:S:DESC") #'MSDC' "Gopher URL";
 
-resource(3, "META:L:DESC") #'MLDC' "Gopher Protocol URL";
+resource(3, "META:L:DESC") #'MLDC' "Gopher protocol URL";
 
 resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.Mozilla-Firefox";
 

@@ -1,0 +1,26 @@
+1	spanish	x-vnd.Haiku-3DRendering	899836772
+Attributes stack size:	Capabilities		Tamaño de pila de atributos:
+Auxiliary buffer(s):	Capabilities		Búfer(es) auxiliares:
+Available	Extensions		Disponible
+Capabilities	Capabilities		Capacidades
+Extensions	Extensions		Extensiones
+GLU version:	InfoView		Versión de GLU:
+GLUT API version:	InfoView		Versión de API de GLUT:
+Information	InfoView		Información
+List stack size:	Capabilities		Tamaño de pila de listas:
+Max. 2D texture size:	Capabilities		Tamaño máx. texturas 2D:
+Max. 3D texture size:	Capabilities		Tamaño máx. de textura 3D:
+Max. clipping planes:	Capabilities		Nº máx. de planos de corte:
+Max. convolution:	Capabilities		Nº máx. convoluciones:
+Max. evaluators equation order:	Capabilities		Orden máx. de evaluadores de ecuación:
+Max. lights:	Capabilities		Nº máx. Luces:
+Max. recommended index elements:	Capabilities		Nº máx. recomendado de elementos índice:
+Max. recommended vertex elements:	Capabilities		Nº máx. recomendado de vértices:
+Max. texture units:	Capabilities		Nº máx. de unidades de textura:
+Model stack size:	Capabilities		Tamaño de pila de modelo:
+Name stack size:	Capabilities		Tamaño de pila de nombre:
+OpenGL version:	InfoView		Versión de OpenGL:
+Projection stack size:	Capabilities		Tamaño de pila de proyección:
+Renderer name:	InfoView		Nombre del renderizador:
+Texture stack size:	Capabilities		Tamaño de pila de textura:
+Vendor name:	InfoView		Nombre del suministrador:

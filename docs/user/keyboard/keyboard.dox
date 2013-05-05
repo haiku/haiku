@@ -1,0 +1,440 @@
+/*!
+\page keyboard Keyboard
+
+This page details how Haiku reads keys from the keyboard including modifier
+key and special characters, and how you can read and process these encoded
+characters in your application.
+
+\section unicode Haiku and UTF-8
+
+Haiku encodes all characters using UTF-8. UTF-8 allows Haiku to represent
+characters from all over the world while still maintaining backwards
+compatibility with 7-bit ASCII codes. This means that the most commonly
+used characters are encoded in just one byte while less common characters
+can  be encoded by extending the character encoding to use two, three, or,
+rarely, four bytes.
+
+\section keycodes Key Codes
+
+Each key on the keyboard is assigned a numeric code to identify it to the
+operating system. Most of the time you should not have to access these
+codes directly, instead use one of the constants defined in InterfaceDefs.h
+such \c B_BACKSPACE or \c B_ENTER or read the character from the \c key_map
+struct.
+
+The following diagram shows the key codes as they appear on a US 104-key
+keyboard.
+
+\image html US_PC_keyboard_keycodes.png
+
+International keyboards each differ a bit but generally share an extra key
+located in-between the left shift key and Z with the key code 0x69.
+
+Mac keyboards have an equal sign in the keypad with key code 0x6a and some
+other differences. Often times the keys produce the same key code but appear in
+different locations.
+
+
+\section modifiers Modifier Keys
+
+Modifier keys are keys which have no effect on their own but when combined with
+another key modify the usual behavior of that key.
+
+The following modifier keys are defined in InterfaceDefs.h
+
+<table>
+	<tr>
+		<td>\c B_SHIFT_KEY</td>
+		<td>
+			Transforms lowercase case characters into uppercase characters
+			or chooses alternative punctuation characters. The shift key
+			is also used in combination with \c B_COMMAND_KEY to produce
+			keyboard shortcuts.
+		</td>
+	</tr>
+	<tr>
+		<td>\c B_COMMAND_KEY</td>
+		<td>
+			Produces keyboard shortcuts for common operations such as
+			cut, copy, paste, print, and find.
+		</td>
+	</tr>
+	<tr>
+		<td>\c B_CONTROL_KEY</td>
+		<td>
+			Outputs control characters in terminal. The control key is
+			sometimes also used as an alternative to \c B_COMMAND_KEY
+			to produce keyboard shortcuts in applications.
+		</td>
+	</tr>
+	<tr>
+		<td>\c B_OPTION_KEY</td>
+		<td>
+			Used to in combination with other keys to output special
+			characters such as accented letters and symbols. Because
+			\c B_OPTION_KEY is not found on all keyboards it should not
+			be used for essential functions.
+		</td>
+	</tr>
+	<tr>
+		<td>\c B_MENU_KEY</td>
+		<td>
+			The Menu key is used to produce contextual menus. Like
+			\c B_OPTION_KEY, the Menu key should not be used for essential
+			functions since it is not available on all keyboards.
+		</td>
+	</tr>
+</table>
+
+In addition you can access the left and right modifier keys individually with
+the following constants:
+<table>
+	<tr>
+		<td>\c B_LEFT_SHIFT_KEY</td>
+		<td>\c B_RIGHT_SHIFT_KEY</td>
+		<td>\c B_LEFT_COMMAND_KEY</td>
+		<td>\c B_RIGHT_COMMAND_KEY</td>
+	</tr>
+	<tr>
+		<td>\c B_LEFT_CONTROL_KEY</td>
+		<td>\c B_RIGHT_CONTROL_KEY</td>
+		<td>\c B_LEFT_OPTION_KEY</td>
+		<td>\c B_RIGHT_OPTION_KEY</td>
+	</tr>
+</table>
+
+Scroll lock, num lock, and caps lock alter other keys pressed after they are
+released. They are defined by the following constants:
+
+<table>
+	<tr>
+		<td>\c B_CAPS_LOCK</td>
+		<td>
+			Produces uppercase characters. Reverses the effect of
+			\c B_SHIFT_KEY for letters.
+		</td>
+	</tr>
+	<tr>
+		<td>\c B_SCROLL_LOCK</td>
+		<td>
+			Prevents the terminal from scrolling.
+		</td>
+	</tr>
+	<tr>
+		<td>\c B_NUM_LOCK</td>
+		<td>
+			Informs the numeric keypad to output numbers when on. Reverses
+			the function of \c B_SHIFT_KEY for keys on the numeric keypad.
+		</td>
+	</tr>
+</table>
+
+To get the currently active modifiers use the modifiers() function defined
+in InterfaceDefs.h. This function returns a bitmap containing the currently
+active modifier keys. You can create a bit mask of the above constants to
+determine which modifiers are active.
+
+
+\section other_constants Other Constants
+
+The Interface Kit also defines constants for keys that are aren't represented by
+a symbol, these include:
+
+<table>
+	<tr>
+		<td>\c B_BACKSPACE</td>
+		<td>\c B_RETURN</td>
+		<td>\c B_ENTER</td>
+		<td>\c B_SPACE</td>
+		<td>\c B_TAB</td>
+		<td>\c B_ESCAPE</td>
+	</tr>
+	<tr>
+		<td>\c B_SUBSTITUTE</td>
+		<td>\c B_LEFT_ARROW</td>
+		<td>\c B_RIGHT_ARROW</td>
+		<td>\c B_UP_ARROW</td>
+		<td>\c B_DOWN_ARROW</td>
+		<td>\c B_INSERT</td>
+	</tr>
+	<tr>
+		<td>\c B_DELETE</td>
+		<td>\c B_HOME</td>
+		<td>\c B_END</td>
+		<td>\c B_PAGE_UP</td>
+		<td>\c B_PAGE_DOWN</td>
+		<td>\c B_FUNCTION_KEY</td>
+	</tr>
+</table>
+
+The \c B_FUNCTION_KEY constant can further be broken down into the following
+constants:
+<table>
+	<tr>
+		<td>\c B_F1_KEY</td>
+		<td>\c B_F4_KEY</td>
+		<td>\c B_F7_KEY</td>
+		<td>\c B_F10_KEY</td>
+		<td>\c B_PRINT_KEY (Print Screen)</td>
+	</tr>
+	<tr>
+		<td>\c B_F2_KEY</td>
+		<td>\c B_F5_KEY</td>
+		<td>\c B_F8_KEY</td>
+		<td>\c B_F11_KEY</td>
+		<td>\c B_SCROLL_KEY (Scroll Lock)</td>
+	</tr>
+	<tr>
+		<td>\c B_F3_KEY</td>
+		<td>\c B_F6_KEY</td>
+		<td>\c B_F9_KEY</td>
+		<td>\c B_F12_KEY</td>
+		<td>\c B_PAUSE_KEY (Pause/Break)</td>
+	</tr>
+</table>
+
+For Japanese keyboard two more constants are defined:
+	- \c B_KATAKANA_HIRAGANA
+	- \c B_HANKAKU_ZENKAKU
+
+
+\section keymap The Keymap
+
+The characters produced by each of the key codes is determined by the keymap.
+The usual way to for the user to choose and modify their keymap is the
+Keymap preference application. A number of alternative keymaps such as dvorak
+and keymaps for different locales are available.
+
+\image html keymap.png
+
+A full description of the Keymap preflet can be found in the 
+<a href="http://haiku-os.org/docs/userguide/en/preferences/keymap.html">User Guide</a>.
+
+The keymap is a map of the characters produced by each key on the keyboard
+including the characters produced when combined with the modifier constants
+described above. The keymap also contains the codes of the modifier keys
+and tables for dead keys.
+
+To get the current system keymap create a pointer to a \c key_map struct and
+\c char array and pass their addresses to the get_key_map() function. The
+\c key_map struct will be filled out with the current system keymap and the
+\c char array will be filled out with the UTF-8 character encodings.
+
+The \c key_map struct contains a number of fields. Each field is described
+in several sections below.
+
+The first section contains a version number and the code assigned to each of
+the modifier keys.
+
+<table>
+	<tr>
+		<td>\c version</td>
+		<td>The version number of the keymap</td>
+	</tr>
+	<tr>
+		<td>
+			\c caps_key<br>
+			\c scroll_key<br>
+			\c num_key
+		</td>
+		<td>Lock key codes</td>
+	</tr>
+	<tr>
+		<td>
+			\c left_shift_key<br>
+			\c right_shift_key
+		</td>
+		<td>Left and right shift key codes</td>
+	</tr>
+	<tr>
+		<td>
+			\c left_command_key<br>
+			\c right_command_key
+		</td>
+		<td>Left and right command key codes</td>
+	</tr>
+	<tr>
+		<td>
+			\c left_control_key<br>
+			\c right_control_key
+		</td>
+		<td>Left and right control key codes</td>
+	</tr>
+	<tr>
+		<td>
+			\c left_option_key<br>
+			\c right_option_key
+		</td>
+		<td>Left and right option key codes</td>
+	</tr>
+	<tr>
+		<td>\c menu_key</td>
+		<td>Menu key code</td>
+	</tr>
+	<tr>
+		<td>\c lock_settings</td>
+		<td>A bitmap containing the default state of the lock keys</td>
+	</tr>
+</table>
+
+To programmatically set a modifier key in the system keymap use the
+set_modifier_key() function. You can also programmatically set the
+state of the num lock, caps lock, and scroll lock keys by calling the
+set_keyboard_locks() function.
+
+\section character_maps Character Maps
+
+The next section of the \c key_map struct contains maps of offsets
+into the array of UTF-8 character encodings filled out in the second
+parameter of get_key_map(). Since the character maps are filled with UTF-8
+characters they may be 1, 2, 3, or rarely 4 bytes long. The characters are
+contained in non-\c NUL terminated Pascal strings. The first byte of the
+string indicates how many bytes the character is made up of. For example the
+string for a horizontal ellipses (...) character looks like this:
+
+\code
+x03xE2x80xA6
+\endcode
+
+The first byte is 03 meaning that the character is 3 bytes long. The
+remaining bytes E2 80 A6 are the UTF-8 byte representation of the horizontal
+ellipses character. Recall that there is no terminating \c NUL character for
+these strings.
+
+Not every key is mapped to a character. If a key is unmapped the character
+array contains a 0-byte string. Unmapped keys do not produce \c B_KEY_DOWN
+messages.
+
+Modifier keys should not be mapped into the character array.
+
+The following character maps are defined:
+<table>
+	<tr>
+		<td>\c control_map</td>
+		<td>Map of characters when the control key is pressed</td>
+	</tr>
+	<tr>
+		<td>\c option_caps_shift_map</td>
+		<td>
+			Map of characters when caps lock is turned on and both the
+			option key and shift keys are pressed.
+		</td>
+	</tr>
+	<tr>
+		<td>\c option_caps_map</td>
+		<td>
+			Map of characters when caps lock is turned on and the option key
+			is pressed
+		</td>
+	</tr>
+	<tr>
+		<td>\c option_shift_map</td>
+		<td>Map of characters when both shift and option keys are pressed</td>
+	</tr>
+	<tr>
+		<td>\c option_map</td>
+		<td>Map of characters when the option key is pressed</td>
+	</tr>
+	<tr>
+		<td>\c caps_shift_map</td>
+		<td>
+			Map of characters when caps lock is on and the shift key is
+			pressed
+		</td>
+	</tr>
+	<tr>
+		<td>\c caps_map</td>
+		<td>Map of characters when caps lock is turned on</td>
+	</tr>
+	<tr>
+		<td>\c shift_map</td>
+		<td>Map of characters when shift is pressed</td>
+	</tr>
+	<tr>
+		<td>\c normal_map</td>
+		<td>Map of characters when no modifiers keys are pressed</td>
+	</tr>
+</table>
+
+\section dead_keys Dead Keys
+
+Dead keys are keys that do not produce a character until they are combined
+with another key. Because these keys do not produce a character on their own
+they are considered "dead" until they are "brought to life" by being combined
+with another key. Dead keys are generally used to produce accented
+characters.
+
+Each of the fields below is a 32-byte array of dead key characters. The dead
+keys are organized into pairs in the array. Each dead key array can contain
+up to 16 pairs of dead key characters. The first pair in the array should
+contain \c B_SPACE followed by and the accent character in the second offset.
+This serves to identify which accent character is contained in the array
+and serves to define a space followed by accent pair to represent the unadorned
+accent character.
+
+The rest of the array is filled with pairs containing an unaccented character
+followed by the accent character.
+
+<table>
+	<tr>
+		<td>\c acute_dead_key</td>
+		<td>Acute dead keys array</td>
+	</tr>
+	<tr>
+		<td>\c grave_dead_key</td>
+		<td>Grave dead keys array</td>
+	</tr>
+	<tr>
+		<td>\c circumflex_dead_key</td>
+		<td>Circumflex dead keys array</td>
+	</tr>
+	<tr>
+		<td>\c dieresis_dead_key</td>
+		<td>Dieresis dead keys array</td>
+	</tr>
+	<tr>
+		<td>\c tilde_dead_key</td>
+		<td>Tilde dead keys array</td>
+	</tr>
+</table>
+
+The final section contains bitmaps that indicate which character table is
+used for each of the above dead keys. The bitmap can contain any of the
+following constants:
+	- \c B_CONTROL_TABLE
+	- \c B_CAPS_SHIFT_TABLE
+	- \c B_OPTION_CAPS_SHIFT_TABLE
+	- \c B_CAPS_TABLE
+	- \c B_OPTION_CAPS_TABLE
+	- \c B_SHIFT_TABLE
+	- \c B_OPTION_SHIFT_TABLE
+	- \c B_NORMAL_TABLE
+	- \c B_OPTION_TABLE
+
+The bitmaps often contain \c B_OPTION_TABLE because accent characters are
+generally produced by combining a letter with \c B_OPTION_KEY.
+
+<table>
+	<tr>
+		<td>\c acute_tables</td>
+		<td>Acute dead keys table bitmap</td>
+	</tr>
+	<tr>
+		<td>\c grave_tables</td>
+		<td>Grave dead keys table bitmap</td>
+	</tr>
+	<tr>
+		<td>\c circumflex_tables</td>
+		<td>Circumflex dead keys table bitmap</td>
+	</tr>
+	<tr>
+		<td>\c dieresis_tables</td>
+		<td>Dieresis dead keys table bitmap</td>
+	</tr>
+	<tr>
+		<td>\c tilde_tables</td>
+		<td>Tilde dead keys table bitmap</td>
+	</tr>
+</table>
+
+*/

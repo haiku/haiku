@@ -1,11 +1,11 @@
 1	finnish	x-vnd.Haiku-PNGTranslator	2504765797
-Interlace Option	PNGTranslator		Limitysvalitsin
-Interlacing type:	PNGTranslator		Limitystyyppi:
-None	PNGTranslator		Ei mitään
-PNG Interlace Menu	PNGTranslator		PNG-limitysvalikko
-PNG Settings	PNGTranslator		PNG-asetukset
-PNG image	PNGTranslator		PNG-kuva
-PNG image translator	PNGTranslator		PNG-kuvamuunnin
-PNG images	PNGTranslator		PNG-kuvat
-PNGTranslator Settings	PNGTranslator		PNG-muunninasetukset
 Version %d.%d.%d, %s	PNGTranslator		Versio %d.%d.%d, %s
+Interlace Option	PNGTranslator		Limitysvalitsin
+PNG Interlace Menu	PNGTranslator		PNG-limitysvalikko
+PNG image	PNGTranslator		PNG-kuva
+PNG Settings	PNGTranslator		PNG-asetukset
+PNG image translator	PNGTranslator		PNG-kuvamuunnin
+None	PNGTranslator		Ei mitään
+PNG images	PNGTranslator		PNG-kuvat
+Interlacing type:	PNGTranslator		Limitystyyppi:
+PNGTranslator Settings	PNGTranslator		PNG-muunninasetukset

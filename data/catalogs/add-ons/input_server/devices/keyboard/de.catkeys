@@ -1,10 +1,10 @@
 1	german	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
-(This team is a system component)	Team monitor		(Dieses Team ist eine Systemkomponente)
-Cancel	Team monitor		Abbrechen
-Force reboot	Team monitor		Neustart erzwingen
-If the application will not quit you may have to kill it.	Team monitor		Falls sich ein Team nicht normal beenden lässt, sollte versucht werden das Beenden zu erzwingen.
 Kill application	Team monitor		Beenden erzwingen
 Quit application	Team monitor		Beenden
-Restart the desktop	Team monitor		Desktop neu starten
 Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Um ein Team zu beenden, den Eintrag in der Liste markieren und "Beenden" oder "Beenden erzwingen" klicken.\n\nSTRG+ALT+ENTF für %ld Sekunden halten, um einen Neustart zu erzwingen.
+If the application will not quit you may have to kill it.	Team monitor		Falls sich ein Team nicht normal beenden lässt, sollte versucht werden das Beenden zu erzwingen.
+Force reboot	Team monitor		Neustart erzwingen
 Team monitor	Team monitor		Teammonitor
+(This team is a system component)	Team monitor		(Dieses Team ist eine Systemkomponente)
+Restart the desktop	Team monitor		Desktop neu starten
+Cancel	Team monitor		Abbrechen

@@ -1,32 +1,32 @@
-1	norwegian_bokmål	x.vnd.OBOS-Inspector	2075781936
-Active Translators	ImageWindow		Aktive oversettere
-Active Translators	InspectorApp		Aktive oversettere
-Bummer	ImageWindow		Synd
-File	ImageWindow		Fil
-First Page	ImageWindow		Første side
-Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Image: %1\nColor Space: %2 (%3)\nDimensjoner: %4 x %5\nByte per rad: %6\n Byte totalt: %7\n\nIdentify Info:\nID-streng: %8\nMIME-type: %9\nType: '%10' (%11)\nOversetter-ID: %12\nGruppe: '%13' (%14)\nKvalitet: %15\nKapasitet: %16\n\nExtension Info:\n
-Info	ImageWindow		Info
-Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Infovindu
-Last Page	ImageWindow		Siste side
-Next Page	ImageWindow		Neste side
+1	bokmål, norwegian; norwegian bokmål	x.vnd.OBOS-Inspector	2075781936
+User Translators	ActiveTranslatorsWindow		Brukeroversettere
 No image available to save.	ImageWindow		Ikke noe bilde å lagre
-Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Antall dokumenter: %1\n\nOversetter Brukt:\nNavn: %2\nInfo: %3\nVersjon: %4\n
-OK	ImageView		OK
-OK	ImageWindow		OK
-Open...	ImageWindow		Åpne...
-Previous Page	ImageWindow		Forrige side
-Quit	ImageWindow		Avslutt
-Save feature not implemented yet.	ImageWindow		Lagre-funksjonen er ikke implementert ennå.
-Save...	ImageWindow		Lagre...
-Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Valgt dokument: %1\n\nOversetter brukt:\nNavn: %2\nInfo: %3\nVersjon: %4\n
-Sorry, unable to load the image.	ImageView		Beklager, kunne ikke laste bilde
 Sorry, unable to write the image file.	ImageView		Beklager, klarer ikke skrive bildefilen
+Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Antall dokumenter: %1\n\nOversetter Brukt:\nNavn: %2\nInfo: %3\nVersjon: %4\n
+\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nType: '%1' (%2)\nGruppe: '%3' (%4)\nKvalitet: %5\nKapasitet: %6\nMIME-type: %7\nNavn: %8\n
+Bummer	ImageWindow		Synd
+Last Page	ImageWindow		Siste side
+\nInput Formats:	ImageView		\nInndataformater
+Sorry, unable to load the image.	ImageView		Beklager, kunne ikke laste bilde
+Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Infovindu
+Active Translators	InspectorApp		Aktive oversettere
+Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Image: %1\nColor Space: %2 (%3)\nDimensjoner: %4 x %5\nByte per rad: %6\n Byte totalt: %7\n\nIdentify Info:\nID-streng: %8\nMIME-type: %9\nType: '%10' (%11)\nOversetter-ID: %12\nGruppe: '%13' (%14)\nKvalitet: %15\nKapasitet: %16\n\nExtension Info:\n
+\nOutput Formats:	ImageView		\nUtdataformater
+Save feature not implemented yet.	ImageWindow		Lagre-funksjonen er ikke implementert ennå.
+First Page	ImageWindow		Første side
+Next Page	ImageWindow		Neste side
+Open...	ImageWindow		Åpne...
+\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nOversetter brukt:\nNavn: %1\nInfo: %2\nVersjon: %3\n
+Save...	ImageWindow		Lagre...
+Info	ImageWindow		Info
+OK	ImageWindow		OK
+Window	ImageWindow		Vindu
+Quit	ImageWindow		Avslutt
+Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Valgt dokument: %1\n\nOversetter brukt:\nNavn: %2\nInfo: %3\nVersjon: %4\n
+Active Translators	ImageWindow		Aktive oversettere
+View	ImageWindow		Vis
+Previous Page	ImageWindow		Forrige side
+OK	ImageView		OK
 System Translators	ActiveTranslatorsWindow		Systemoversettere
 Unknown	ImageView		Ukjent
-User Translators	ActiveTranslatorsWindow		Brukeroversettere
-View	ImageWindow		Vis
-Window	ImageWindow		Vindu
-\nInput Formats:	ImageView		\nInndataformater
-\nOutput Formats:	ImageView		\nUtdataformater
-\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nOversetter brukt:\nNavn: %1\nInfo: %2\nVersjon: %3\n
-\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nType: '%1' (%2)\nGruppe: '%3' (%4)\nKvalitet: %5\nKapasitet: %6\nMIME-type: %7\nNavn: %8\n
+File	ImageWindow		Fil

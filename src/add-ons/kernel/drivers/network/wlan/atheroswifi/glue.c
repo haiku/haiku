@@ -15,7 +15,7 @@
 #include <dev/ath/if_athvar.h>
 
 
-HAIKU_FBSD_WLAN_DRIVER_GLUE(atheroswifi, ath, pci)
+HAIKU_FBSD_WLAN_DRIVER_GLUE(atheroswifi, ath_pci, pci)
 NO_HAIKU_FBSD_MII_DRIVER();
 HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_WLAN);
 

@@ -53,10 +53,11 @@ PlaylistObserver::ItemsSorted()
 
 
 void
-PlaylistObserver::CurrentItemChanged(int32 newIndex)
+PlaylistObserver::CurrentItemChanged(int32 newIndex, bool play)
 {
 	BMessage message(MSG_PLAYLIST_CURRENT_ITEM_CHANGED);
 	message.AddInt32("index", newIndex);
+	message.AddBool("play", play);
 
 	DeliverMessage(message);
 }

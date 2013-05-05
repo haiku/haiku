@@ -17,8 +17,6 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <ControlLook.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayoutBuilder.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuField.h>
@@ -43,8 +41,8 @@
 // TODO: think about adopting Tracker's info window style here (pressable path)
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Application Types Window"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Application Types Window"
 
 
 class ProgressWindow : public BWindow {
@@ -110,7 +108,7 @@ ProgressWindow::ProgressWindow(const char* message,
 	fQuitListener(signalQuit)
 {
 	char count[100];
-	snprintf(count, sizeof(count), "/%ld", max);
+	snprintf(count, sizeof(count), "/%" B_PRId32, max);
 
 	fStatusBar = new BStatusBar("status", message, count);
 	fStatusBar->SetMaxValue(max);
@@ -143,7 +141,8 @@ ProgressWindow::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case B_UPDATE_STATUS_BAR:
 			char count[100];
-			snprintf(count, sizeof(count), "%ld", (int32)fStatusBar->CurrentValue() + 1);
+			snprintf(count, sizeof(count), "%" B_PRId32,
+				(int32)fStatusBar->CurrentValue() + 1);
 
 			fStatusBar->Update(1, NULL, count);
 			break;
@@ -205,15 +204,14 @@ ApplicationTypesWindow::ApplicationTypesWindow(const BMessage& settings)
 	fPathView->TextView()->SetExplicitAlignment(labelAlignment);
 	fPathView->LabelView()->SetExplicitAlignment(labelAlignment);
 
-	infoBox->AddChild(BGridLayoutBuilder(padding, padding)
+	BLayoutBuilder::Grid<>(infoBox, padding, padding)
+		.SetInsets(padding, padding * 2, padding, padding)
 		.Add(fNameView->LabelView(), 0, 0)
 		.Add(fNameView->TextView(), 1, 0, 2)
 		.Add(fSignatureView->LabelView(), 0, 1)
 		.Add(fSignatureView->TextView(), 1, 1, 2)
 		.Add(fPathView->LabelView(), 0, 2)
-		.Add(fPathView->TextView(), 1, 2, 2)
-		.SetInsets(padding, padding, padding, padding)
-		.View());
+		.Add(fPathView->TextView(), 1, 2, 2);
 
 	// "Version" group
 
@@ -231,13 +229,12 @@ ApplicationTypesWindow::ApplicationTypesWindow(const BMessage& settings)
 	fDescriptionView->SetLowColor(fDescriptionView->ViewColor());
 	fDescriptionView->MakeEditable(false);
 
-	versionBox->AddChild(BGridLayoutBuilder(padding, padding)
+	BLayoutBuilder::Grid<>(versionBox, padding, padding)
+		.SetInsets(padding, padding * 2, padding, padding)
 		.Add(fVersionView->LabelView(), 0, 0)
 		.Add(fVersionView->TextView(), 1, 0)
 		.Add(fDescriptionLabel->LabelView(), 0, 1)
-		.Add(fDescriptionView, 1, 1, 2, 2)
-		.SetInsets(padding, padding, padding, padding)
-		.View());
+		.Add(fDescriptionView, 1, 1, 2, 2);
 
 	// Launch and Tracker buttons
 
@@ -435,7 +432,8 @@ ApplicationTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 					&& appInfo.GetVersionInfo(&versionInfo, B_APP_VERSION_KIND)
 						== B_OK) {
 					char version[256];
-					snprintf(version, sizeof(version), "%lu.%lu.%lu, %s/%lu",
+					snprintf(version, sizeof(version),
+						"%" B_PRIu32 ".%" B_PRIu32 ".%" B_PRIu32 ", %s/%" B_PRIu32,
 						versionInfo.major, versionInfo.middle,
 						versionInfo.minor,
 						variety_to_text(versionInfo.variety),

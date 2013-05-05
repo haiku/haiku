@@ -12,7 +12,6 @@
 // #pragma mark - BDiskSystemAddOn
 
 
-// constructor
 BDiskSystemAddOn::BDiskSystemAddOn(const char* name, uint32 flags)
 	:
 	fName(name),
@@ -21,13 +20,11 @@ BDiskSystemAddOn::BDiskSystemAddOn(const char* name, uint32 flags)
 }
 
 
-// destructor
 BDiskSystemAddOn::~BDiskSystemAddOn()
 {
 }
 
 
-// Name
 const char*
 BDiskSystemAddOn::Name() const
 {
@@ -35,7 +32,6 @@ BDiskSystemAddOn::Name() const
 }
 
 
-// Flags
 uint32
 BDiskSystemAddOn::Flags() const
 {
@@ -43,7 +39,6 @@ BDiskSystemAddOn::Flags() const
 }
 
 
-// CanInitialize
 bool
 BDiskSystemAddOn::CanInitialize(const BMutablePartition* partition)
 {
@@ -51,7 +46,6 @@ BDiskSystemAddOn::CanInitialize(const BMutablePartition* partition)
 }
 
 
-// GetInitializationParameterEditor
 status_t
 BDiskSystemAddOn::GetParameterEditor(B_PARAMETER_EDITOR_TYPE type,
 	BPartitionParameterEditor** editor)
@@ -60,7 +54,6 @@ BDiskSystemAddOn::GetParameterEditor(B_PARAMETER_EDITOR_TYPE type,
 }
 
 
-// ValidateInitialize
 status_t
 BDiskSystemAddOn::ValidateInitialize(const BMutablePartition* partition,
 	BString* name, const char* parameters)
@@ -69,7 +62,6 @@ BDiskSystemAddOn::ValidateInitialize(const BMutablePartition* partition,
 }
 
 
-// Initialize
 status_t
 BDiskSystemAddOn::Initialize(BMutablePartition* partition, const char* name,
 	const char* parameters, BPartitionHandle** handle)
@@ -78,7 +70,6 @@ BDiskSystemAddOn::Initialize(BMutablePartition* partition, const char* name,
 }
 
 
-// GetTypeForContentType
 status_t
 BDiskSystemAddOn::GetTypeForContentType(const char* contentType, BString* type)
 {
@@ -86,7 +77,6 @@ BDiskSystemAddOn::GetTypeForContentType(const char* contentType, BString* type)
 }
 
 
-// IsSubSystemFor
 bool
 BDiskSystemAddOn::IsSubSystemFor(const BMutablePartition* child)
 {
@@ -97,7 +87,6 @@ BDiskSystemAddOn::IsSubSystemFor(const BMutablePartition* child)
 // #pragma mark - BPartitionHandle
 
 
-// constructor
 BPartitionHandle::BPartitionHandle(BMutablePartition* partition)
 	:
 	fPartition(partition)
@@ -105,13 +94,11 @@ BPartitionHandle::BPartitionHandle(BMutablePartition* partition)
 }
 
 
-// destructor
 BPartitionHandle::~BPartitionHandle()
 {
 }
 
 
-// Partition
 BMutablePartition*
 BPartitionHandle::Partition() const
 {
@@ -119,7 +106,6 @@ BPartitionHandle::Partition() const
 }
 
 
-// SupportedOperations
 uint32
 BPartitionHandle::SupportedOperations(uint32 mask)
 {
@@ -127,7 +113,6 @@ BPartitionHandle::SupportedOperations(uint32 mask)
 }
 
 
-// SupportedChildOperations
 uint32
 BPartitionHandle::SupportedChildOperations(const BMutablePartition* child,
 	uint32 mask)
@@ -136,7 +121,6 @@ BPartitionHandle::SupportedChildOperations(const BMutablePartition* child,
 }
 
 
-// SupportsInitializingChild
 bool
 BPartitionHandle::SupportsInitializingChild(const BMutablePartition* child,
 	const char* diskSystem)
@@ -145,7 +129,6 @@ BPartitionHandle::SupportsInitializingChild(const BMutablePartition* child,
 }
 
 
-// GetNextSupportedType
 status_t
 BPartitionHandle::GetNextSupportedType(const BMutablePartition* child,
 	int32* cookie, BString* type)
@@ -154,7 +137,6 @@ BPartitionHandle::GetNextSupportedType(const BMutablePartition* child,
 }
 
 
-// GetPartitioningInfo
 status_t
 BPartitionHandle::GetPartitioningInfo(BPartitioningInfo* info)
 {
@@ -162,7 +144,6 @@ BPartitionHandle::GetPartitioningInfo(BPartitioningInfo* info)
 }
 
 
-// Defragment
 status_t
 BPartitionHandle::Defragment()
 {
@@ -170,7 +151,6 @@ BPartitionHandle::Defragment()
 }
 
 
-// Repair
 status_t
 BPartitionHandle::Repair(bool checkOnly)
 {
@@ -178,7 +158,6 @@ BPartitionHandle::Repair(bool checkOnly)
 }
 
 
-// ValidateResize
 status_t
 BPartitionHandle::ValidateResize(off_t* size)
 {
@@ -186,7 +165,6 @@ BPartitionHandle::ValidateResize(off_t* size)
 }
 
 
-// ValidateResizeChild
 status_t
 BPartitionHandle::ValidateResizeChild(const BMutablePartition* child,
 	off_t* size)
@@ -195,7 +173,6 @@ BPartitionHandle::ValidateResizeChild(const BMutablePartition* child,
 }
 
 
-// Resize
 status_t
 BPartitionHandle::Resize(off_t size)
 {
@@ -203,7 +180,6 @@ BPartitionHandle::Resize(off_t size)
 }
 
 
-// ResizeChild
 status_t
 BPartitionHandle::ResizeChild(BMutablePartition* child, off_t size)
 {
@@ -211,7 +187,6 @@ BPartitionHandle::ResizeChild(BMutablePartition* child, off_t size)
 }
 
 
-// ValidateMove
 status_t
 BPartitionHandle::ValidateMove(off_t* offset)
 {
@@ -221,7 +196,6 @@ BPartitionHandle::ValidateMove(off_t* offset)
 }
 
 
-// ValidateMoveChild
 status_t
 BPartitionHandle::ValidateMoveChild(const BMutablePartition* child,
 	off_t* offset)
@@ -230,7 +204,6 @@ BPartitionHandle::ValidateMoveChild(const BMutablePartition* child,
 }
 
 
-// Move
 status_t
 BPartitionHandle::Move(off_t offset)
 {
@@ -240,7 +213,6 @@ BPartitionHandle::Move(off_t offset)
 }
 
 
-// MoveChild
 status_t
 BPartitionHandle::MoveChild(BMutablePartition* child, off_t offset)
 {
@@ -248,7 +220,6 @@ BPartitionHandle::MoveChild(BMutablePartition* child, off_t offset)
 }
 
 
-// ValidateSetContentName
 status_t
 BPartitionHandle::ValidateSetContentName(BString* name)
 {
@@ -256,7 +227,6 @@ BPartitionHandle::ValidateSetContentName(BString* name)
 }
 
 
-// ValidateSetName
 status_t
 BPartitionHandle::ValidateSetName(const BMutablePartition* child,
 	BString* name)
@@ -265,7 +235,6 @@ BPartitionHandle::ValidateSetName(const BMutablePartition* child,
 }
 
 
-// SetContentName
 status_t
 BPartitionHandle::SetContentName(const char* name)
 {
@@ -273,7 +242,6 @@ BPartitionHandle::SetContentName(const char* name)
 }
 
 
-// SetName
 status_t
 BPartitionHandle::SetName(BMutablePartition* child, const char* name)
 {
@@ -281,7 +249,6 @@ BPartitionHandle::SetName(BMutablePartition* child, const char* name)
 }
 
 
-// ValidateSetType
 status_t
 BPartitionHandle::ValidateSetType(const BMutablePartition* child,
 	const char* type)
@@ -290,7 +257,6 @@ BPartitionHandle::ValidateSetType(const BMutablePartition* child,
 }
 
 
-// SetType
 status_t
 BPartitionHandle::SetType(BMutablePartition* child, const char* type)
 {
@@ -298,7 +264,6 @@ BPartitionHandle::SetType(BMutablePartition* child, const char* type)
 }
 
 
-// GetContentParameterEditor
 status_t
 BPartitionHandle::GetContentParameterEditor(BPartitionParameterEditor** editor)
 {
@@ -306,7 +271,6 @@ BPartitionHandle::GetContentParameterEditor(BPartitionParameterEditor** editor)
 }
 
 
-// GetParameterEditor
 status_t
 BPartitionHandle::GetParameterEditor(B_PARAMETER_EDITOR_TYPE type,
 	BPartitionParameterEditor** editor)
@@ -315,7 +279,6 @@ BPartitionHandle::GetParameterEditor(B_PARAMETER_EDITOR_TYPE type,
 }
 
 
-// ValidateSetContentParameters
 status_t
 BPartitionHandle::ValidateSetContentParameters(const char* parameters)
 {
@@ -323,7 +286,6 @@ BPartitionHandle::ValidateSetContentParameters(const char* parameters)
 }
 
 
-// ValidateSetParameters
 status_t
 BPartitionHandle::ValidateSetParameters(const BMutablePartition* child,
 	const char* parameters)
@@ -332,7 +294,6 @@ BPartitionHandle::ValidateSetParameters(const BMutablePartition* child,
 }
 
 
-// SetContentParameters
 status_t
 BPartitionHandle::SetContentParameters(const char* parameters)
 {
@@ -340,7 +301,6 @@ BPartitionHandle::SetContentParameters(const char* parameters)
 }
 
 
-// SetParameters
 status_t
 BPartitionHandle::SetParameters(BMutablePartition* child,
 	const char* parameters)
@@ -349,7 +309,6 @@ BPartitionHandle::SetParameters(BMutablePartition* child,
 }
 
 
-// ValidateCreateChild
 status_t
 BPartitionHandle::ValidateCreateChild(off_t* offset, off_t* size,
 	const char* type, BString* name, const char* parameters)
@@ -358,7 +317,6 @@ BPartitionHandle::ValidateCreateChild(off_t* offset, off_t* size,
 }
 
 
-// CreateChild
 status_t
 BPartitionHandle::CreateChild(off_t offset, off_t size, const char* type,
 	const char* name, const char* parameters, BMutablePartition** child)
@@ -367,7 +325,6 @@ BPartitionHandle::CreateChild(off_t offset, off_t size, const char* type,
 }
 
 
-// DeleteChild
 status_t
 BPartitionHandle::DeleteChild(BMutablePartition* child)
 {

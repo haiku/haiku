@@ -1,33 +1,48 @@
-1	romanian	x-vnd.Haiku-ProcessController	2585863409
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
-About ProcessController…	ProcessController		Despre ControlerProces
-Cancel	ProcessController		Anulează
-Damned!	ProcessController		Aiurea!
-Debug this thread!	ProcessController		Depanează acest fir de execuție!
-Debug thread	ProcessController		Depanează firul de execuție
-Do you really want to kill the team \"%s\"?	ProcessController		Doriți să terminați forțat echipa „%s”?
-Error saving file	ProcessController		Eroare la salvarea fișierului
-Gone teams…	ProcessController		Echipe plecate...
-Install in Deskbar	ProcessController		Instalează pe bara de desktop
-Kill this thread!	ProcessController		Termină forțat acest fir de execuție!
-Live in the Deskbar	ProcessController		Activ pe bara de desktop
+1	romanian	x-vnd.Haiku-ProcessController	2887520383
 Memory usage	ProcessController		Utilizarea memoriei
-New Terminal	ProcessController		Terminal nou
-OK	ProcessController		OK
-Ok!	ProcessController		OK!
-ProcessController is already installed in Deskbar.	ProcessController		ControlerProces este instalat deja pe bara de desktop.
-Processor %d	ProcessController		Procesor %d
-Quit an application	ProcessController		Părăsește o aplicație
-Quit application	ProcessController		Părăsește aplicația
+Do you really want to kill the team \"%s\"?	ProcessController		Doriți să terminați forțat echipa „%s”?
+Idle priority	ProcessController		Prioritate în așteptare
 Restart Deskbar	ProcessController		Repornește bara de desktop
-Restart Tracker	ProcessController		Repornește Tracker
-Run in window	ProcessController		Pornește în fereastră
-That's no Fun!	ProcessController		Nu e amuzant!
-This is the last active processor...\nYou can't turn it off!	ProcessController		Acesta este ultimul procesor activ...\nNu puteți să îl opriți!
+Custom priority	ProcessController		Prioritate personalizată
+Debug thread	ProcessController		Depanează firul de execuție
 This team is already gone…	ProcessController		Această echipă este plecată deja...
+Error saving file	ProcessController		Eroare la salvarea fișierului
+Real-time priority	ProcessController		Prioritate în timp real
+Your setting file could not be saved!\n(%s)	ProcessController		Fișierul de configurare nu a putut fi salvat!\n(%s)
 This thread is already gone…	ProcessController		Acest fir de execuție este plecat deja...
-Threads and CPU usage	ProcessController		Utilizare fire de execuție și procesor
-Usage: %s [-deskbar]\n	ProcessController		Utilizare: %s [-deskbar]\n
+Cancel	ProcessController		Anulează
+Display priority	ProcessController		Prioritate afișaj
+Run in window	ProcessController		Pornește în fereastră
+Processor %d	ProcessController		Procesor %d
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+ProcessController is already installed in Deskbar.	ProcessController		ControlerProces este instalat deja pe bara de desktop.
+This is the last active processor...\nYou can't turn it off!	ProcessController		Acesta este ultimul procesor activ...\nNu puteți să îl opriți!
+Info	ProcessController		Detalii
+Quit application	ProcessController		Părăsește aplicația
+Low priority	ProcessController		Prioritate scăzută
 What do you want to do with the thread \"%s\"?	ProcessController		Ce doriți să faceți cu firul de execuție „%s”?
+Gone teams…	ProcessController		Echipe plecate...
+Lowest active priority	ProcessController		Cea mai scăzută prioritate activă
+Restart Tracker	ProcessController		Repornește Tracker
+Live in the Deskbar	ProcessController		Activ pe bara de desktop
+Kill this thread!	ProcessController		Termină forțat acest fir de execuție!
+Debug this thread!	ProcessController		Depanează acest fir de execuție!
+Normal priority	ProcessController		Prioritate normală
+New Terminal	ProcessController		Terminal nou
+Urgent priority	ProcessController		Prioritate urgentă
+About ProcessController…	ProcessController		Despre ControlerProces
+Ok!	ProcessController		OK!
+Quit an application	ProcessController		Părăsește o aplicație
+Install in Deskbar	ProcessController		Instalează pe bara de desktop
+Threads and CPU usage	ProcessController		Utilizare fire de execuție și procesor
+Urgent display priority	ProcessController		Prioritate afișaj urgent
+OK	ProcessController		OK
+Damned!	ProcessController		Aiurea!
+Usage: %s [-deskbar]\n	ProcessController		Utilizare: %s [-deskbar]\n
+ProcessController	System name		ControlProcese
+Real-time display priority	ProcessController		Prioritate afișaj în timp real
+Please confirm	ProcessController		Confirmați
 Yes, kill this team!	ProcessController		Da, termină forțat această echipă!
+System resources & caches…	ProcessController		Resurse de sistem & cache-uri
+That's no Fun!	ProcessController		Nu e amuzant!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Puteți să rulați ControlerProces într-o fereastră sau să îl instalați pe bara de desktop.

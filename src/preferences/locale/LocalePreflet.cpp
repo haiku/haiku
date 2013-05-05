@@ -17,10 +17,11 @@
 #include "LocaleWindow.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Locale Preflet"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Locale Preflet"
 
 
+const char* kAppName = B_TRANSLATE("Locale");
 const char* kSignature = "application/x-vnd.Haiku-Locale";
 
 
@@ -29,7 +30,6 @@ class LocalePreflet : public BApplication {
 							LocalePreflet();
 		virtual				~LocalePreflet();
 
-		virtual	void		AboutRequested();
 		virtual	void		MessageReceived(BMessage* message);
 
 private:
@@ -44,10 +44,9 @@ private:
 
 LocalePreflet::LocalePreflet()
 	:
-	BApplication(kSignature)
+	BApplication(kSignature),
+	fLocaleWindow(new LocaleWindow())
 {
-	fLocaleWindow = new LocaleWindow();
-
 	fLocaleWindow->Show();
 }
 
@@ -58,30 +57,41 @@ LocalePreflet::~LocalePreflet()
 
 
 void
-LocalePreflet::AboutRequested()
-{
-	const char* authors[] = {
-		"Axel Dörfler",
-		"Adrien Destugues",
-		"Oliver Tappe",
-		NULL
-	};
-	BAboutWindow about(B_TRANSLATE("Locale"), 2005, authors);
-	about.Show();
-}
-
-
-void
 LocalePreflet::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case B_LOCALE_CHANGED:
+			BLocaleRoster::Default()->Refresh();
+			fLocaleWindow->PostMessage(message);
+			break;
+
 		case kMsgRestartTrackerAndDeskbar:
 			if (message->FindInt32("which") == 1) {
 				_RestartApp("application/x-vnd.Be-TRAK");
 				_RestartApp("application/x-vnd.Be-TSKB");
 			}
 			break;
-		
+
+		case B_ABOUT_REQUESTED:
+		{
+			BAboutWindow* window = new BAboutWindow(kAppName, kSignature);
+
+			const char* authors[] = {
+				"Axel Dörfler",
+				"Adrien Destugues",
+				"Oliver Tappe",
+				NULL
+			};
+
+			window = new BAboutWindow(kAppName, kSignature);
+			window->AddCopyright(2005, "Haiku, Inc.");
+			window->AddAuthors(authors);
+
+			window->Show();
+
+			break;
+		}
+
 		default:
 			BApplication::MessageReceived(message);
 			break;

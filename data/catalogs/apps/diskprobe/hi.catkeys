@@ -1,0 +1,132 @@
+1	hindi	x-vnd.Haiku-DiskProbe	2706202187
+File offset: 	ProbeView		फ़ाइल ऑफसेट: 
+%ld (native)	ProbeView		%ld (पैतृक)
+64 bit unsigned value:	TypeEditors		64 बिट अहस्ताक्षरित मूल्य:
+Find again	ProbeView		फिर से प्राप्त करें
+Text	FindWindow		पाठ
+Find…	ProbeView		खोजें ...
+Case sensitive	FindWindow		संवेदनशील मामले
+Cancel	OpenWindow		रद्द
+Close	AttributeWindow		बंद
+File	ProbeView		फ़ाइल
+Attribute	ProbeView		गुण
+Floating-point value:	TypeEditors		चल बिन्दु मान:
+16 bit	TypeEditors		16 बिट
+Attributes	ProbeView		गुण
+Device offset: 	ProbeView		उपकरण ऑफसेट: 
+Selection	ProbeView		चयन
+DiskProbe	System name		डिस्क की जांच
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	क्या: '%.4 s'\n\n
+File	FileWindow		फ़ाइल
+OK	DiskProbe		ठीक है
+Boolean	TypeEditors	This is the type of editor	बूलियन नोट: यह संपादक के प्रकार है
+Paste	ProbeView		पेस्ट
+PNG format	TypeEditors		PNG प्रारूप
+Font size	ProbeView		फ़ॉन्ट का आकार
+Attribute type: 	ProbeView		गुण के प्रकार: 
+Attribute	AttributeWindow		गुण
+8 bit signed value:	TypeEditors		8 बिट मूल्य पर हस्ताक्षर किए:
+Number:	TypeEditors		संख्या:
+Save	ProbeView		सहेजें
+Stop	ProbeView		रोक
+Number editor	TypeEditors		संख्या संपादक
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	हेक्स नोट: एक मेनू आइटम के रूप में संभव के रूप में कम, अगर यह संज्ञा विशेषण तुलना में कम है की सिफारिश की है.
+No type editor available	AttributeWindow		कोई प्रकार संपादक उपलब्ध
+Double precision floating-point value:	TypeEditors		डबल परिशुद्धता चल बिन्दु मान:
+Device: 	ProbeView		युक्ति: 
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		क्या आप वास्तव में गुण निकालना चाहते हैं \"%s\" फ़ाइल से \"%s\"? \n\n आप इस क्रिया को पूर्ववत नहीं कर सकते.
+Text	TypeEditors	This is the type of editor	पाठ नोट: यह संपादक के प्रकार है
+8 bit unsigned value:	TypeEditors		8 बिट अहस्ताक्षरित मूल्य:
+Block	ProbeView		खंड
+Back	ProbeView		वापस
+Device	ProbeView		युक्ति
+Unknown type	TypeEditors		अज्ञात प्रकार
+Block 0x%Lx	ProbeView		ब्लॉक 0x%Lx
+Quit	FileWindow		छोड़ना
+Undo	ProbeView		पूर्ववत्
+Close	ProbeView		बंद
+Number	TypeEditors	This is the type of editor	संख्या नोट: यह संपादक के प्रकार है
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	दशमलव नोट: एक मेनू आइटम के रूप में संभव के रूप में कम, अगर यह संज्ञा विशेषण तुलना में कम है की सिफारिश की है.
+16 bit signed value:	TypeEditors		16 बिट मूल्य पर हस्ताक्षर किए:
+String editor	TypeEditors		स्ट्रिंग संपादक
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	0x0 का
+64 bit signed offset:	TypeEditors		64 बिट ऑफसेट पर हस्ताक्षर किए:
+Boolean editor	TypeEditors		बूलियन संपादक
+Copy	ProbeView		प्रति
+none	ProbeView	No attributes	कोई नहीं नोट: नहीं विशेषताओं
+Boolean value:	TypeEditors		बूलियन मान:
+32 bit size or status:	TypeEditors		32 बिट आकार या स्थिति:
+8 bit palette	TypeEditors		8 बिट पैलेट
+Fit	ProbeView	Size of fonts, fits to available room	फिट नोट: फ़ॉन्ट का आकार, उपलब्ध कमरे में फिट बैठता है
+Probe device	OpenWindow		जांच उपकरण
+Unknown format	TypeEditors		अज्ञात प्रारूप
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	हेक्ज़ाडेसिमल नोट: एक मेनू आइटम के रूप में संभव के रूप में कम, अगर यह संज्ञा विशेषण तुलना में कम है की सिफारिश की है.
+MIME type:	TypeEditors		MIME प्रकार:
+Page setup…	ProbeView		पृष्ठ सेटअप ...
+New…	FileWindow		नई ...
+DiskProbe request	AttributeWindow		दिस्क्प्रोबे अनुरोध
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	छवि को पढ़ नहीं पाया नोट: छवि यहाँ एक चित्र, एक डिस्क छवि फ़ाइल नहीं है मतलब है.
+BlockSize	ProbeView	A menu item, a shortened form from 'block size'. This is in the same menu windowthan 'Base' and 'Font size'	ब्लॉक का आकार
+Save changes before closing?	ProbeView		बंद करने से पहले परिवर्तन सहेजें?
+Type editor	AttributeWindow		प्रकार संपादक
+Native: 0x%0*Lx	ProbeView		मूल:0x%0*Lx
+Raw editor	AttributeWindow		कच्चे संपादक
+Message View	TypeEditors		देखें संदेश
+DiskProbe request	ProbeView		दिस्क्प्रोबे अनुरोध
+32 bit unsigned size:	TypeEditors		32 बिट अहस्ताक्षरित आकार:
+Flattened bitmap	TypeEditors		चपटा बिटमैप
+Open file…	FileWindow		फ़ाइल खोलने ...
+Next	ProbeView		अगला
+Close	FileWindow		बंद
+Attribute: 	ProbeView		विशेषता: 
+Remove from file	AttributeWindow		फ़ाइल से निकालें
+Don't save	ProbeView		न सहेजें
+Previous	ProbeView		पिछला
+64 bit signed value:	TypeEditors		64 बिट मूल्य पर हस्ताक्षर किए:
+Icon	TypeEditors		चिह्न
+Block: 	ProbeView		ब्लॉक: 
+Examine device:	OpenWindow		जांच उपकरण:
+Offset: 	ProbeView		ऑफसेट: 
+OK	ProbeView		ठीक है
+Add	ProbeView		जोड़ें
+Edit	ProbeView		संपादित करें
+Native: %Ld (0x%0*Lx)	ProbeView		देशी:%Ld(0x%0*Lx)
+32 bit unsigned value:	TypeEditors		32 बिट अहस्ताक्षरित मूल्य:
+Message	TypeEditors	This is the type of view	संदेश नोट: यह देखने के प्रकार है
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	खुला नहीं कर सका \"%s\":\n%s
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	आधार
+Image view	TypeEditors	Image means here a picture file, not a disk image.	छवि को देखने के नोट: छवि यहाँ एक चित्र, एक डिस्क छवि फ़ाइल नहीं है मतलब है.
+Cancel	AttributeWindow		रद्द
+Type editor not supported	ProbeView		प्रकार समर्थित नहीं संपादक
+MIME type editor	TypeEditors		MIME प्रकार संपादक
+Swapped: %Ld (0x%0*Lx)	ProbeView		बदली:%Ld(0x%0*Lx)
+Find	FindWindow		खोजें
+Remove	AttributeWindow		हटायें
+Print…	ProbeView		प्रिंट ...
+Block %Ld (0x%Lx)	ProbeView		ब्लॉक %Ld(0x%Lx)
+Image	TypeEditors	This is the type of view	 नोट: यह देखने के प्रकार है
+Could not open file \"%s\": %s\n	DiskProbe		खुली फ़ाइल नहीं \"%s\":%s\n
+Select all	ProbeView		सभी का चयन करें
+Probe file…	OpenWindow		जांच फाइल ...
+Icon view	TypeEditors		चिह्न दृश्य
+Bookmarks	ProbeView		बुकमार्क्स
+Mode:	FindWindow		विधि:
+15 bit	TypeEditors		15 बिट
+Open device	FileWindow		खुला उपकरण
+Could not find search string.	ProbeView		खोज स्ट्रिंग नहीं मिल सका.
+16 bit unsigned value:	TypeEditors		16 बिट अहस्ताक्षरित मूल्य:
+Attribute offset: 	ProbeView		गुण ऑफसेट: 
+View	ProbeView	This is the last menubar item 'File Edit Block View'	दृश्य
+Redo	ProbeView		फिर से करना
+File: 	ProbeView		फ़ाइल: 
+32 bit unsigned pointer:	TypeEditors		32 बिट अहस्ताक्षरित सूचक:
+of 	ProbeView		की 
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		फाइल करने के लिए लेखन विफल: \n%s\nबीच का सभी परिवर्तन नष्ट हो जाएगा जब आप बाहर निकलें.
+32 bit	TypeEditors		32 बिट
+Cancel	ProbeView		रद्द
+Swapped: 0x%0*Lx	ProbeView		बदली:0x%0*Lx
+Grayscale	TypeEditors		ग्रेस्केल
+32 bit signed value:	TypeEditors		32 बिट मूल्य पर हस्ताक्षर किए:
+DiskProbe request	DiskProbe		दिस्क्प्रोबे अनुरोध
+Type editor	ProbeView		प्रकार संपादक
+Contents:	TypeEditors		सामग्री:

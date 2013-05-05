@@ -1,8 +1,8 @@
 1	finnish	x-vnd.Haiku-InstalledPackages	4131220089
-InstalledPackages	System name		Asennetut paketit
 No package selected.	UninstallView		Pakettia ei ole valittu.
-OK	UninstallView		Valmis
-Package description	UninstallView		Pakettikuvaus
 Remove	UninstallView		Poista
+Package description	UninstallView		Pakettikuvaus
+InstalledPackages	System name		Asennetut paketit
 The package you selected has been successfully removed from your system.	UninstallView		Valitsemasi paketin poistaminen järjestelmästäsi onnistui.
+OK	UninstallView		Valmis
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Valittua pakettia ei poistettu järjestelmästäsi. Annetun asennetun paketin tiedot voivat olla rikkinäisiä.

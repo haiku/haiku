@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src system libroot add-ons icu ;
 
 UsePrivateHeaders
+	kernel
 	libroot
 	[ FDirName libroot locale ]
 	[ FDirName libroot time ]
@@ -16,6 +17,7 @@ local sources =
 	ICUMessagesData.cpp
 	ICUMonetaryData.cpp
 	ICUNumericData.cpp
+	ICUThreadLocalStorageValue.cpp
 	ICUTimeConversion.cpp
 	ICUTimeData.cpp
 ;
@@ -28,6 +30,6 @@ Includes [ FGristFiles $(sources) ] : $(HAIKU_ICU_HEADERS_DEPENDENCY) ;
 SharedLibrary libroot-addon-icu.so
 	: $(sources)
 	:
-	$(TARGET_LIBSTDC++) $(HAIKU_ICU_LIBS)
+	libreferenceable.a $(TARGET_LIBSTDC++) $(HAIKU_ICU_LIBS)
 ;
 

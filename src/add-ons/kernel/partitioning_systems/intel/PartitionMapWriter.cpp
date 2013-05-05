@@ -73,29 +73,30 @@ check_logical_location(const LogicalPartition* child,
 	const PrimaryPartition* parent)
 {
 	if (child->PartitionTableOffset() % child->BlockSize() != 0) {
-		TRACE(("check_logical_location() - PartitionTableOffset: %lld not a "
-			"multiple of media's block size: %ld\n",
+		TRACE(("check_logical_location() - PartitionTableOffset: %" B_PRId64 " "
+			"not a multiple of media's block size: %" B_PRId32 "\n",
 			child->PartitionTableOffset(), child->BlockSize()));
 		return false;
 	}
 	if (child->Offset() % child->BlockSize() != 0) {
-		TRACE(("check_logical_location() - Parition offset: %lld "
-			"is not a multiple of block size: %ld\n", child->Offset(),
+		TRACE(("check_logical_location() - Parition offset: %" B_PRId64 " "
+			"is not a multiple of block size: %" B_PRId32 "\n", child->Offset(),
 			child->BlockSize()));
 		return false;
 	}
 	if (child->Size() % child->BlockSize() != 0) {
-		TRACE(("check_logical_location() - Size: (%lld) is not a multiple of"
-			" block size: (%ld)\n", child->Size(), child->BlockSize()));
+		TRACE(("check_logical_location() - Size: (%" B_PRId64 ") is not a "
+			"multiple of block size: (%" B_PRId32 ")\n", child->Size(),
+			child->BlockSize()));
 		return false;
 	}
 	if (child->PartitionTableOffset() < parent->Offset()
 		|| child->PartitionTableOffset() >= parent->Offset()
 		+ parent->Size()) {
-		TRACE(("check_logical_location() - Partition table: (%lld) not within "
-			"extended partition (start: %lld), (end: %lld)\n",
-			child->PartitionTableOffset(), parent->Offset(), parent->Offset()
-			+ parent->Size()));
+		TRACE(("check_logical_location() - Partition table: (%" B_PRId64 ") not"
+			" within extended partition (start: %" B_PRId64 "), (end: "
+			"%" B_PRId64 ")\n", child->PartitionTableOffset(), parent->Offset(),
+			parent->Offset() + parent->Size()));
 		return false;
 	}
 	if (child->Offset() + child->Size() > parent->Offset() + parent->Size()) {

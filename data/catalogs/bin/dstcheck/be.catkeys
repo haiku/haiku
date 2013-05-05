@@ -1,6 +1,6 @@
 1	belarusian	x-vnd.Haiku-cmd-dstconfig	2337923203
-.\n\nIs this the correct time?	dstcheck		.\n\nЦі гэта правільны час?
-Ask me later	dstcheck		Спытаць пазней
-Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Увага!\n\nЗ-за пераходу на зімні час, гадзіннік вашага кампутара можа спяшацца на гадзіну.\nВаш кампутар мяркуе, што
-Manually adjust time…	dstcheck		Паправіць час уручную…
 Use this time	dstcheck		Скарыстаць бягучы час
+Ask me later	dstcheck		Спытаць пазней
+Manually adjust time…	dstcheck		Паправіць час уручную…
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Увага!\n\nЗ-за пераходу на зімні час, гадзіннік вашага кампутара можа спяшацца на гадзіну.\nВаш кампутар мяркуе, што
+.\n\nIs this the correct time?	dstcheck		.\n\nЦі гэта правільны час?

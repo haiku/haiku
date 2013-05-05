@@ -16,6 +16,7 @@
 #include <Catalog.h>
 #include <ControlLook.h>
 #include <FilePanel.h>
+#include <FindDirectory.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
 #include <Menu.h>
@@ -36,8 +37,8 @@
 #include "MessageConstants.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MediaConverter"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MediaConverter"
 #define VERSION "1.3.0"
 
 
@@ -122,8 +123,10 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 	fConverting(false),
 	fCancelling(false)
 {
-	const char* defaultDirectory = "/boot/home";
-	fOutputDir.SetTo(defaultDirectory);
+	BPath outputDir;
+	if (find_directory(B_USER_DIRECTORY, &outputDir) != B_OK)
+		outputDir.SetTo("/boot/home");	
+	fOutputDir.SetTo(outputDir.Path());
 
 	fMenuBar = new BMenuBar("menubar");
 	_CreateMenu();
@@ -165,7 +168,7 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 	fDestButton = new BButton(B_TRANSLATE("Output folder"),
 		new BMessage(OUTPUT_FOLDER_MESSAGE));
 	BAlignment labelAlignment(be_control_look->DefaultLabelAlignment());
-	fOutputFolder = new BStringView(NULL, defaultDirectory);
+	fOutputFolder = new BStringView(NULL, outputDir.Path());
 	fOutputFolder->SetExplicitAlignment(labelAlignment);
 
 	// start/end duration
@@ -425,8 +428,10 @@ MediaConverterWindow::MessageReceived(BMessage* msg)
 			if (status != B_OK && status != B_ALREADY_RUNNING) {
 				BString errorString(B_TRANSLATE("Error launching: %strError%"));
 				errorString.ReplaceFirst("%strError%", strerror(status));
-				(new BAlert(B_TRANSLATE("Error"), errorString.String(), 
-					B_TRANSLATE("OK")))->Go();
+				BAlert* alert = new BAlert(B_TRANSLATE("Error"),
+					errorString.String(), B_TRANSLATE("OK"));
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+				alert->Go();
 			}
 			break;
 		}
@@ -496,7 +501,7 @@ MediaConverterWindow::BuildAudioVideoMenus()
 	BMenu* menu = fAudioMenu->Menu();
 	BMenuItem* item;
 	// clear out old audio codec menu items
-	while ((item = menu->RemoveItem(0L)) != NULL)
+	while ((item = menu->RemoveItem((int32)0)) != NULL)
 		delete item;
 
 	bool separator = true;
@@ -519,7 +524,7 @@ MediaConverterWindow::BuildAudioVideoMenus()
 		== B_OK) {
 		if (separator) {
 			menu->AddItem(new BMenuItem(
-				B_TRANSLATE_WITH_CONTEXT("No audio", "Audio codecs list"),
+				B_TRANSLATE_CONTEXT("No audio", "Audio codecs list"),
 				new BMessage(AUDIO_CODEC_SELECT_MESSAGE)));
 			menu->AddSeparatorItem();
 			separator = false;
@@ -543,7 +548,7 @@ MediaConverterWindow::BuildAudioVideoMenus()
 		((BInvoker *)item)->Invoke();
 	} else {
 		item = new BMenuItem(
-			B_TRANSLATE_WITH_CONTEXT("None available", "Audio codecs"),
+			B_TRANSLATE_CONTEXT("None available", "Audio codecs"),
 			NULL);
 		menu->AddItem(item);
 		item->SetMarked(true);
@@ -553,7 +558,7 @@ MediaConverterWindow::BuildAudioVideoMenus()
 
 	// clear out old video codec menu items
 	menu = fVideoMenu->Menu();
-	while ((item = menu->RemoveItem(0L)) != NULL)
+	while ((item = menu->RemoveItem((int32)0)) != NULL)
 		delete item;
 
 	separator = true;
@@ -575,7 +580,7 @@ MediaConverterWindow::BuildAudioVideoMenus()
 	while (get_next_encoder(&cookie, mf_format, &format, &outfmt, &codec_info) == B_OK) {
 		if (separator) {
 			menu->AddItem(new BMenuItem(
-				B_TRANSLATE_WITH_CONTEXT("No video", "Video codecs list"),
+				B_TRANSLATE_CONTEXT("No video", "Video codecs list"),
 				new BMessage(VIDEO_CODEC_SELECT_MESSAGE)));
 			menu->AddSeparatorItem();
 			separator = false;
@@ -594,7 +599,7 @@ MediaConverterWindow::BuildAudioVideoMenus()
 		((BInvoker *)item)->Invoke();
 	} else {
 		item = new BMenuItem(
-			B_TRANSLATE_WITH_CONTEXT("None available", "Video codecs"), 
+			B_TRANSLATE_CONTEXT("None available", "Video codecs"), 
 			NULL);
 		menu->AddItem(item);
 		item->SetMarked(true);
@@ -912,13 +917,13 @@ MediaConverterWindow::_CreateMenu()
 	BMenuItem* item;
 	BMenu* menu;
 
-	menu = new BMenu(B_TRANSLATE_WITH_CONTEXT("File", "Menu"));
-	item = new BMenuItem(B_TRANSLATE_WITH_CONTEXT(
+	menu = new BMenu(B_TRANSLATE_CONTEXT("File", "Menu"));
+	item = new BMenuItem(B_TRANSLATE_CONTEXT(
 		"Open" B_UTF8_ELLIPSIS, "Menu"),
 		new BMessage(OPEN_FILE_MESSAGE), 'O');
 	menu->AddItem(item);
 	menu->AddSeparatorItem();
-	item = new BMenuItem(B_TRANSLATE_WITH_CONTEXT("Quit", "Menu"), 
+	item = new BMenuItem(B_TRANSLATE_CONTEXT("Quit", "Menu"), 
 		new BMessage(QUIT_MESSAGE), 'Q');
 	menu->AddItem(item);
 

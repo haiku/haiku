@@ -1,0 +1,312 @@
+/*
+ * Copyright 2012 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		src/kits/game/DirectWindow.cpp  hrev45044
+ *		src/kits/game/DirectWindow.h    hrev45044
+ */
+
+
+/*!
+	\file DirectWindow.h
+	\ingroup game
+	\ingroup libbe
+	\brief Provides the BDirectWindow class.
+*/
+
+
+/*!
+	\enum direct_buffer_state
+
+	Direct buffer state constants
+*/
+
+
+/*!
+	\enum direct_driver_state
+
+	Direct driver state constants
+*/
+
+
+/*!
+	\struct direct_buffer_info
+	\ingroup game
+	\ingroup libbe
+
+	Direct butter info struct
+*/
+
+
+/*!
+	\var direct_buffer_info::buffer_state
+
+	State of the direct buffer access privileges.
+	It can have one of the following values:
+	- \c B_DIRECT_MODE_MASK
+	- \c B_DIRECT_START
+	- \c B_DIRECT_MODIFY
+	- \c B_DIRECT_STOP
+	- \c B_BUFFER_MOVED
+	- \c B_BUFFER_RESET
+	- \c B_BUFFER_RESIZED
+	- \c B_CLIPPING_MODIFIED
+*/
+
+
+/*!
+	\var direct_buffer_info::driver_state
+
+	State of the graphics card on which your direct window is displayed.
+	There are two possible values:
+		- \c B_MODE_CHANGED The resolution or color depth has changed.
+		- \c B_DRIVER_CHANGED The window was moved onto another monitor.
+*/
+
+
+/*!
+	\var direct_buffer_info::bits
+
+	Pointer to the frame buffer in your team's memory space.
+*/
+
+
+/*!
+	\var direct_buffer_info::pci_bits
+
+	Pointer to the frame buffer in the PCI memory space. This value is
+	typically needed to control DMA.
+*/
+
+/*!
+	\var direct_buffer_info::bytes_per_row
+
+	Number of bytes used to represent a single row of pixels in the frame buffer.
+*/
+
+
+/*!
+	\var direct_buffer_info::bits_per_pixel
+
+	Number of bits actually used to store a single pixel, including reserved,
+	unused, or alpha channel bits. This value is usually a multiple of eight.
+*/
+
+
+/*!
+	\var direct_buffer_info::pixel_format
+
+	The format used to encode a pixel as defined by the \c color_space type.
+*/
+
+
+/*!
+	\var direct_buffer_info::layout
+
+	Reserved for future use.
+*/
+
+
+/*!
+	\var direct_buffer_info::orientation
+
+	Reserved for future use.
+*/
+
+
+/*!
+	\var direct_buffer_info::_reserved[9]
+
+	Reserved for future use.
+*/
+
+
+/*!
+	\var direct_buffer_info::_dd_type_
+
+	Reserved for future use.
+*/
+
+
+/*!
+	\var direct_buffer_info::_dd_token_
+
+	Reserved for future use.
+*/
+
+
+/*!
+	\var direct_buffer_info::clip_list_count
+
+	Number of rectangles in \c clip_list.
+*/
+
+
+/*!
+	\var direct_buffer_info::window_bounds
+
+	Rectangle that defines the full content area of the window in screen
+	coordinates.
+*/
+
+
+/*!
+	\var direct_buffer_info::clip_bounds
+
+	Bounding rectangle of the visible part of the content area of the window
+	in screen coordinates.
+*/
+
+
+/*!
+	\var direct_buffer_info::clip_list
+
+	List of rectangles that together define the visible region of the content
+	area of the window in screen coordinates.
+*/
+
+
+/*!
+	\class BDirectWindow
+	\ingroup game
+	\ingroup libbe
+	\brief Provides direct access to the video card graphics frame buffer.
+*/
+
+
+/*!
+	\fn BDirectWindow::BDirectWindow(BRect frame, const char *title,
+		window_type type, uint32 flags, uint32 workspace)
+	\brief Creates and initializes a BDirectWindow object.
+
+	\param frame The initial frame rectangle of the window.
+	\param title The title of the Window.
+	\param type Window type (see BWindow).
+	\param flags Window flags (see BWindow).
+	\param workspace Workspace of the direct window (see BWindow).
+*/
+
+
+/*!
+	\fn BDirectWindow::BDirectWindow(BRect frame, const char *title,
+		window_look look, window_feel feel, uint32 flags, uint32 workspace)
+	\brief Creates and initializes a BDirectWindow object.
+
+	\param frame The initial frame rectangle of the window.
+	\param title The title of the Window.
+	\param look Window look (see BWindow).
+	\param feel Window feel (see BWindow).
+	\param flags Window flags (see BWindow).
+	\param workspace Workspace of the direct window (see BWindow).
+*/
+
+
+/*!
+	\fn BDirectWindow::~BDirectWindow()
+	\brief Destroys the BDirectWindow and frees all memory used by it.
+
+	Do not delete a BDirectWindow object directly, call Quit() instead.
+
+	Destroying a BDirectWindow involves a few steps to make sure that it
+	is disconnected and cleaned up.
+
+	Set the fConnectionDisabled flag to \c true to prevent DirectConnected()
+	from attempting to reconnect while it's being destroyed.
+
+	next call Hide() and finally Sync() to force the direct window to
+	disconnect from direct access.
+
+	Once these steps are complete you may do your usual destructor work.
+*/
+
+
+/*!
+	\fn BArchivable* BDirectWindow::Instantiate(BMessage *data)
+	\brief Instantiate window from message \a data. Not implemented.
+*/
+
+
+/*!
+	\fn status_t BDirectWindow::Archive(BMessage *data, bool deep) const
+	\brief Archive window into message \a data. Not implemented.
+*/
+
+
+/*!
+	\fn void BDirectWindow::DirectConnected(direct_buffer_info *info)
+	\brief hook function called when your application learns about the state
+		of the graphics display and changes occur.
+
+	This is the heart of BDirectWindow.
+
+	\param info The \c direct_buffer_info struct
+*/
+
+
+/*!
+	\fn status_t BDirectWindow::GetClippingRegion(BRegion *region,
+		BPoint *origin) const
+	\brief Sets \a region to the current clipping region of the direct window.
+
+	If \a origin is not \c NULL, the \a region is offset by \a origin.
+
+	\warning GetClippingRegion() should only be called from within the
+		DirectConnected() method. If called outside GetClippingRegion() will
+		return \c B_ERROR.
+
+	\param region The clipping region to fill out.
+	\param origin An origin to offset the region by.
+
+	\returns A status code.
+	\retval B_OK Everything went as expected.
+	\retval B_BAD_VALUE \a region was NULL.
+	\retval B_ERROR Window not locked or not in DirectConnected() method.
+	\retval B_NO_MEMORY Not enough memory to fill \a region
+*/
+
+
+/*!
+	\fn status_t BDirectWindow::SetFullScreen(bool enable)
+	\brief Enables or disables full-screen mode.
+
+	The SupportsWindowMode() method determines whether or not the video card
+	is capable of supporting windowed mode.
+
+	When the window is in full screen mode it will always have the focus and
+	no other window can be in front of it.
+
+	\param enable \c true to enable fullscreen mode, \c false for windowed mode.
+
+	\returns A status code.
+	\retval B_OK Everything went as expected.
+	\retval B_ERROR An error occurred while trying to switch between full screen
+		and windowed mode.
+
+	\see BDirectWindow::SupportsWindowMode()
+*/
+
+
+/*!
+	\fn bool BDirectWindow::IsFullScreen() const
+	\brief Returns whether the window is in full-screen or windowed mode.
+
+	\returns \c true if in full-screen mode, \c false if in windowed mode.
+*/
+
+
+/*!
+	\fn static bool BDirectWindow::SupportsWindowMode(screen_id id)
+	\brief Returns whether or not the specified screen supports windowed mode.
+
+	Because this is a static function you don't have to construct a
+	BDirectWindow object to call it.
+
+	\param id The id of the screen you want to check, \c B_MAIN_SCREEN_ID by
+		default.
+
+	\returns \c true if the screen support windowed mode, \c false otherwise.
+*/

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Oliver Tappe, zooey@hirschkaefer.de.
+ * Copyright 2010-2011, Oliver Tappe, zooey@hirschkaefer.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -28,9 +28,13 @@ CreateInstance()
 
 ICULocaleBackend::ICULocaleBackend()
 	:
-	fMonetaryData(fLocaleConv),
-	fNumericData(fLocaleConv),
-	fTimeData(fLCTimeInfo),
+	fThreadLocalStorageKey(_CreateThreadLocalStorageKey()),
+	fCollateData(fThreadLocalStorageKey),
+	fCtypeData(fThreadLocalStorageKey),
+	fMessagesData(fThreadLocalStorageKey),
+	fMonetaryData(fThreadLocalStorageKey, fLocaleConv),
+	fNumericData(fThreadLocalStorageKey, fLocaleConv),
+	fTimeData(fThreadLocalStorageKey, fLCTimeInfo, fMessagesData),
 	fTimeConversion(fTimeData)
 {
 }
@@ -38,6 +42,7 @@ ICULocaleBackend::ICULocaleBackend()
 
 ICULocaleBackend::~ICULocaleBackend()
 {
+	pthread_key_delete(fThreadLocalStorageKey);
 }
 
 
@@ -147,6 +152,50 @@ ICULocaleBackend::ToWCTrans(wint_t wc, wctrans_t transition, wint_t& result)
 }
 
 
+status_t
+ICULocaleBackend::MultibyteToWchar(wchar_t* wcOut, const char* mb,
+	size_t mbLength, mbstate_t* mbState, size_t& lengthOut)
+{
+	ErrnoMaintainer errnoMaintainer;
+
+	return fCtypeData.MultibyteToWchar(wcOut, mb, mbLength, mbState, lengthOut);
+}
+
+
+status_t
+ICULocaleBackend::MultibyteStringToWchar(wchar_t* wcDest, size_t wcDestLength,
+	const char** mbSource, size_t mbSourceLength, mbstate_t* mbState,
+	size_t& lengthOut)
+{
+	ErrnoMaintainer errnoMaintainer;
+
+	return fCtypeData.MultibyteStringToWchar(wcDest, wcDestLength, mbSource,
+		mbSourceLength, mbState, lengthOut);
+}
+
+
+status_t
+ICULocaleBackend::WcharToMultibyte(char* mbOut, wchar_t wc, mbstate_t* mbState,
+	size_t& lengthOut)
+{
+	ErrnoMaintainer errnoMaintainer;
+
+	return fCtypeData.WcharToMultibyte(mbOut, wc, mbState, lengthOut);
+}
+
+
+status_t
+ICULocaleBackend::WcharStringToMultibyte(char* mbDest, size_t mbDestLength,
+	const wchar_t** wcSource, size_t wcSourceLength, mbstate_t* mbState,
+	size_t& lengthOut)
+{
+	ErrnoMaintainer errnoMaintainer;
+
+	return fCtypeData.WcharStringToMultibyte(mbDest, mbDestLength, wcSource,
+		wcSourceLength, mbState, lengthOut);
+}
+
+
 const char*
 ICULocaleBackend::GetLanginfo(int index)
 {
@@ -242,6 +291,25 @@ ICULocaleBackend::Strxfrm(char* out, const char* in, size_t size,
 	ErrnoMaintainer errnoMaintainer;
 
 	return fCollateData.Strxfrm(out, in, size, outSize);
+}
+
+
+status_t
+ICULocaleBackend::Wcscoll(const wchar_t* a, const wchar_t* b, int& result)
+{
+	ErrnoMaintainer errnoMaintainer;
+
+	return fCollateData.Wcscoll(a, b, result);
+}
+
+
+status_t
+ICULocaleBackend::Wcsxfrm(wchar_t* out, const wchar_t* in, size_t size,
+	size_t& outSize)
+{
+	ErrnoMaintainer errnoMaintainer;
+
+	return fCollateData.Wcsxfrm(out, in, size, outSize);
 }
 
 
@@ -368,6 +436,26 @@ ICULocaleBackend::_SetPosixLocale(int category)
 	}
 
 	return "POSIX";
+}
+
+
+pthread_key_t
+ICULocaleBackend::_CreateThreadLocalStorageKey()
+{
+	pthread_key_t key;
+
+	pthread_key_create(&key, ICULocaleBackend::_DestroyThreadLocalStorageValue);
+
+	return key;
+}
+
+
+void ICULocaleBackend::_DestroyThreadLocalStorageValue(void* value)
+{
+	ICUThreadLocalStorageValue* tlsValue
+		= static_cast<ICUThreadLocalStorageValue*>(value);
+
+	delete tlsValue;
 }
 
 

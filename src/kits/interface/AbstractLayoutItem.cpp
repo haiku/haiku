@@ -152,3 +152,65 @@ BAbstractLayoutItem::Archive(BMessage* into, bool deep) const
 
 	return archiver.Finish(err);
 }
+
+
+status_t
+BAbstractLayoutItem::AllUnarchived(const BMessage* archive)
+{
+	return BLayoutItem::AllUnarchived(archive);
+}
+
+
+status_t
+BAbstractLayoutItem::AllArchived(BMessage* archive) const
+{
+	return BLayoutItem::AllArchived(archive);
+}
+
+
+void
+BAbstractLayoutItem::LayoutInvalidated(bool children)
+{
+	BLayoutItem::LayoutInvalidated(children);
+}
+
+
+void
+BAbstractLayoutItem::AttachedToLayout()
+{
+	BLayoutItem::AttachedToLayout();
+}
+
+
+void
+BAbstractLayoutItem::DetachedFromLayout(BLayout* layout)
+{
+	BLayoutItem::DetachedFromLayout(layout);
+}
+
+
+void
+BAbstractLayoutItem::AncestorVisibilityChanged(bool shown)
+{
+	BLayoutItem::AncestorVisibilityChanged(shown);
+}
+
+
+status_t
+BAbstractLayoutItem::Perform(perform_code d, void* arg)
+{
+	return BLayoutItem::Perform(d, arg);
+}
+
+
+void BAbstractLayoutItem::_ReservedAbstractLayoutItem1() {}
+void BAbstractLayoutItem::_ReservedAbstractLayoutItem2() {}
+void BAbstractLayoutItem::_ReservedAbstractLayoutItem3() {}
+void BAbstractLayoutItem::_ReservedAbstractLayoutItem4() {}
+void BAbstractLayoutItem::_ReservedAbstractLayoutItem5() {}
+void BAbstractLayoutItem::_ReservedAbstractLayoutItem6() {}
+void BAbstractLayoutItem::_ReservedAbstractLayoutItem7() {}
+void BAbstractLayoutItem::_ReservedAbstractLayoutItem8() {}
+void BAbstractLayoutItem::_ReservedAbstractLayoutItem9() {}
+void BAbstractLayoutItem::_ReservedAbstractLayoutItem10() {}
+

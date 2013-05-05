@@ -1,8 +1,9 @@
 /*
- * Copyright 2009-2010 Haiku Inc. All rights reserved.
+ * Copyright 2009-2013 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
+ *		Rene Gollent
  *		Philippe Houdoin
  */
 #ifndef TEAMS_LIST_ITEM_H
@@ -86,7 +87,8 @@ private:
 class TeamsListView : public BColumnListView {
 	typedef BColumnListView Inherited;
 public:
-								TeamsListView(BRect frame, const char* name);
+								TeamsListView(const char* name,
+									team_id currentTeam);
 	virtual 					~TeamsListView();
 
 			TeamRow* 			FindTeamRow(team_id teamId);
@@ -103,9 +105,8 @@ private:
 
 private:
 			BMessageRunner*		fUpdateRunner;
-			team_id				fThisTeam;
+			team_id				fCurrentTeam;
 };
 
-static const uint32 kMsgUpdateTeamsList = 'uptl';
 
 #endif	// TEAMS_LIST_VIEW_H

@@ -4,7 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UseLibraryHeaders agg ;
-UsePrivateHeaders shared libbe ;
+UsePrivateHeaders shared locale ;
 UseHeaders [ FDirName $(HAIKU_COMMON_DEBUG_OBJECT_DIR) servers input ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src kits ] ;
 
@@ -15,6 +15,7 @@ UsePrivateHeaders kernel libroot ;
 StaticLibrary libshared.a :
 	AboutMenuItem.cpp
 	AboutWindow.cpp
+	ArgumentVector.cpp
 	CalendarView.cpp
 	ColorQuantizer.cpp
 	CommandPipe.cpp
@@ -25,10 +26,12 @@ StaticLibrary libshared.a :
 	Keymap.cpp
 	LongAndDragTrackingFilter.cpp
 	NaturalCompare.cpp
+	PromptWindow.cpp
 	QueryFile.cpp
 	RWLockManager.cpp
 	SHA256.cpp
 	ShakeTrackingFilter.cpp
+	StringForRate.cpp
 	StringForSize.cpp
 	Variant.cpp
 ;

@@ -158,8 +158,8 @@ const uint16 maxFrameSize = 1536;
 
 
 AX88178Device::AX88178Device(usb_device device, DeviceInfo& deviceInfo)
-		:
-		ASIXDevice(device, deviceInfo)
+	:
+	ASIXDevice(device, deviceInfo)
 {
 	fStatus = InitDevice();
 }
@@ -202,8 +202,8 @@ AX88178Device::SetupDevice(bool deviceReplugged)
 	size_t actualLength = 0;
 	// get the "magic" word from EEPROM
 	result = gUSBModule->send_request(fDevice,
-						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-						WRITE_SROM_ENABLE, 0, 0, 0, 0, &actualLength);
+		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT, WRITE_SROM_ENABLE,
+		0, 0, 0, 0, &actualLength);
 
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of enabling SROM access:%#010x\n", result);
@@ -212,9 +212,8 @@ AX88178Device::SetupDevice(bool deviceReplugged)
 
 	uint16 eepromData = 0;
 	status_t op_result = gUSBModule->send_request(fDevice,
-							USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN,
-							READ_SROM, 0x17, 0,
-							sizeof(eepromData), &eepromData, &actualLength);
+		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN, READ_SROM,
+		0x17, 0, sizeof(eepromData), &eepromData, &actualLength);
 
 	if (op_result != B_OK) {
 		TRACE_ALWAYS("Error of reading SROM data:%#010x\n", result);
@@ -222,13 +221,12 @@ AX88178Device::SetupDevice(bool deviceReplugged)
 
 	if (actualLength != sizeof(eepromData)) {
 		TRACE_ALWAYS("Mismatch of reading SROM data."
-						"Read %d bytes instead of %d\n",
-						actualLength, sizeof(eepromData));
+			"Read %d bytes instead of %d\n", actualLength, sizeof(eepromData));
 	}
 
 	result = gUSBModule->send_request(fDevice,
-						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-						WRITE_SROM_DISABLE, 0, 0, 0, 0, &actualLength);
+		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT, WRITE_SROM_DISABLE,
+		0, 0, 0, 0, &actualLength);
 
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of disabling SROM access: %#010x\n", result);
@@ -261,15 +259,14 @@ AX88178Device::SetupDevice(bool deviceReplugged)
 
 	for (size_t i = from; i <= to; i++) {
 		result = gUSBModule->send_request(fDevice,
-					USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-					WRITE_GPIOS, GPIOCommands[i].value,
-					0, 0, 0, &actualLength);
+			USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT, WRITE_GPIOS,
+			GPIOCommands[i].value, 0, 0, 0, &actualLength);
 
 		snooze(GPIOCommands[i].delay);
 
 		if (result != B_OK) {
 			TRACE_ALWAYS("Error of GPIO setup command %d:[%#04x]: %#010x\n",
-										i, GPIOCommands[i].value, result);
+				i, GPIOCommands[i].value, result);
 			return result;
 		}
 	}
@@ -277,8 +274,8 @@ AX88178Device::SetupDevice(bool deviceReplugged)
 	uint8 uSWReset = 0;
 	// finally a bit of exercises for SW reset register...
 	result = gUSBModule->send_request(fDevice,
-						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-						WRITE_SOFT_RESET, uSWReset, 0, 0, 0, &actualLength);
+		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT, WRITE_SOFT_RESET,
+		uSWReset, 0, 0, 0, &actualLength);
 
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of SW reset to %#02x: %#010x\n", uSWReset, result);
@@ -289,8 +286,8 @@ AX88178Device::SetupDevice(bool deviceReplugged)
 
 	uSWReset = SW_RESET_PRL | SW_RESET_BIT6;
 	result = gUSBModule->send_request(fDevice,
-						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-						WRITE_SOFT_RESET, uSWReset,	0, 0, 0, &actualLength);
+		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT, WRITE_SOFT_RESET,
+		uSWReset, 0, 0, 0, &actualLength);
 
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of SW reset to %#02x: %#010x\n", uSWReset, result);
@@ -317,8 +314,8 @@ AX88178Device::StartDevice()
 {
 	size_t actualLength = 0;
 	status_t result = gUSBModule->send_request(fDevice,
-						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-						WRITE_IPGS, 0, 0, sizeof(fIPG), fIPG, &actualLength);
+		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT, WRITE_IPGS,
+		0, 0, sizeof(fIPG), fIPG, &actualLength);
 
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of writing IPGs:%#010x\n", result);
@@ -327,14 +324,14 @@ AX88178Device::StartDevice()
 
 	if (actualLength != sizeof(fIPG)) {
 		TRACE_ALWAYS("Mismatch of written IPGs data. "
-				"%d bytes of %d written.\n", actualLength, sizeof(fIPG));
+			"%d bytes of %d written.\n", actualLength, sizeof(fIPG));
 	}
 
 	uint16 rxcontrol = RXCTL_START | RXCTL_BROADCAST;
 	result = WriteRXControlRegister(rxcontrol);
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of writing %#04x RX Control:%#010x\n",
-				rxcontrol, result);
+			rxcontrol, result);
 	}
 
 	TRACE_RET(result);
@@ -347,15 +344,15 @@ AX88178Device::OnNotify(uint32 actualLength)
 {
 	if (actualLength < sizeof(AX88178_Notify)) {
 		TRACE_ALWAYS("Data underrun error. %d of %d bytes received\n",
-										actualLength, sizeof(AX88178_Notify));
+			actualLength, sizeof(AX88178_Notify));
 		return B_BAD_DATA;
 	}
 
-	AX88178_Notify *notification	= (AX88178_Notify *)fNotifyBuffer;
+	AX88178_Notify *notification = (AX88178_Notify *)fNotifyBuffer;
 
 	if (notification->btA1 != 0xa1) {
 		TRACE_ALWAYS("Notify magic byte is invalid: %#02x\n",
-									notification->btA1);
+			notification->btA1);
 	}
 
 	uint phyIndex = 0;
@@ -363,11 +360,13 @@ AX88178Device::OnNotify(uint32 actualLength)
 	switch(fMII.ActivePHY()) {
 		case PrimaryPHY:
 			phyIndex = 1;
-			linkIsUp = (notification->btBB & LINK_STATE_PPLS) == LINK_STATE_PPLS;
+			linkIsUp = (notification->btBB & LINK_STATE_PPLS)
+				== LINK_STATE_PPLS;
 			break;
 		case SecondaryPHY:
 			phyIndex = 2;
-			linkIsUp = (notification->btBB & LINK_STATE_SPLS) == LINK_STATE_SPLS;
+			linkIsUp = (notification->btBB & LINK_STATE_SPLS)
+				== LINK_STATE_SPLS;
 			break;
 		default:
 		case CurrentPHY:
@@ -380,7 +379,7 @@ AX88178Device::OnNotify(uint32 actualLength)
 
 	if (linkStateChange) {
 		TRACE("Link state of PHY%d has been changed to '%s'\n",
-									phyIndex, fHasConnection ? "up" : "down");
+			phyIndex, fHasConnection ? "up" : "down");
 	}
 
 	if (linkStateChange && fLinkStateChangeSem >= B_OK)
@@ -396,9 +395,8 @@ AX88178Device::GetLinkState(ether_link_state *linkState)
 	size_t actualLength = 0;
 	uint16 mediumStatus = 0;
 	status_t result = gUSBModule->send_request(fDevice,
-						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN,
-						READ_MEDIUM_STATUS, 0, 0, sizeof(mediumStatus),
-						&mediumStatus, &actualLength);
+		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN, READ_MEDIUM_STATUS,
+		0, 0, sizeof(mediumStatus), &mediumStatus, &actualLength);
 
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of reading medium status:%#010x.\n", result);
@@ -415,19 +413,18 @@ AX88178Device::GetLinkState(ether_link_state *linkState)
 
 	linkState->quality = 1000;
 
-	linkState->media   = IFM_ETHER | (fHasConnection ? IFM_ACTIVE : 0);
-	linkState->media  |= (mediumStatus & MEDIUM_STATE_FD) ?
-							IFM_FULL_DUPLEX : IFM_HALF_DUPLEX;
+	linkState->media = IFM_ETHER | (fHasConnection ? IFM_ACTIVE : 0);
+	linkState->media |= (mediumStatus & MEDIUM_STATE_FD)
+		? IFM_FULL_DUPLEX : IFM_HALF_DUPLEX;
 
-	linkState->speed   = (mediumStatus & MEDIUM_STATE_PS_100)
-							? 100000000 : 10000000;
-	linkState->speed   = (mediumStatus & MEDIUM_STATE_GM) ?
-												1000000000 : linkState->speed;
+	linkState->speed = (mediumStatus & MEDIUM_STATE_PS_100)
+		? 100000000 : 10000000;
+	linkState->speed = (mediumStatus & MEDIUM_STATE_GM)
+		? 1000000000 : linkState->speed;
 
 	TRACE_FLOW("Medium state: %s, %lld MBit/s, %s duplex.\n",
-						(linkState->media & IFM_ACTIVE) ? "active" : "inactive",
-						linkState->speed / 1000000,
-						(linkState->media & IFM_FULL_DUPLEX) ? "full" : "half");
+		(linkState->media & IFM_ACTIVE) ? "active" : "inactive",
+		linkState->speed / 1000000,
+		(linkState->media & IFM_FULL_DUPLEX) ? "full" : "half");
 	return B_OK;
 }
-

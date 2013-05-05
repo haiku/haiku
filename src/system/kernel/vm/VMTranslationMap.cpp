@@ -31,6 +31,14 @@ VMTranslationMap::~VMTranslationMap()
 }
 
 
+status_t
+VMTranslationMap::DebugMarkRangePresent(addr_t start, addr_t end,
+	bool markPresent)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
 /*!	Unmaps a range of pages of an area.
 
 	The default implementation just iterates over all virtual pages of the

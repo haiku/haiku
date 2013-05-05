@@ -77,7 +77,7 @@ void forbid_page_faults(void);
 
 // private kernel only extension (should be moved somewhere else):
 area_id create_area_etc(team_id team, const char *name, uint32 size,
-			uint32 lock, uint32 protection, uint32 flags,
+			uint32 lock, uint32 protection, uint32 flags, uint32 guardSize,
 			const virtual_address_restrictions* virtualAddressRestrictions,
 			const physical_address_restrictions* physicalAddressRestrictions,
 			void **_address);
@@ -86,12 +86,16 @@ area_id transfer_area(area_id id, void** _address, uint32 addressSpec,
 
 const char* vm_cache_type_to_string(int32 type);
 
+status_t vm_prepare_kernel_area_debug_protection(area_id id, void** cookie);
+status_t vm_set_kernel_area_debug_protection(void* cookie, void* _address,
+			size_t size, uint32 protection);
+
 status_t vm_block_address_range(const char* name, void* address, addr_t size);
 status_t vm_unreserve_address_range(team_id team, void *address, addr_t size);
 status_t vm_reserve_address_range(team_id team, void **_address,
 			uint32 addressSpec, addr_t size, uint32 flags);
 area_id vm_create_anonymous_area(team_id team, const char* name, addr_t size,
-			uint32 wiring, uint32 protection, uint32 flags,
+			uint32 wiring, uint32 protection, uint32 flags, addr_t guardSize,
 			const virtual_address_restrictions* virtualAddressRestrictions,
 			const physical_address_restrictions* physicalAddressRestrictions,
 			bool kernel, void** _address);
@@ -117,6 +121,8 @@ status_t vm_delete_area(team_id teamID, area_id areaID, bool kernel);
 status_t vm_create_vnode_cache(struct vnode *vnode, struct VMCache **_cache);
 status_t vm_set_area_memory_type(area_id id, phys_addr_t physicalBase,
 			uint32 type);
+status_t vm_set_area_protection(team_id team, area_id areaID,
+			uint32 newProtection, bool kernel);
 status_t vm_get_page_mapping(team_id team, addr_t vaddr, phys_addr_t *paddr);
 bool vm_test_map_modification(struct vm_page *page);
 void vm_clear_map_flags(struct vm_page *page, uint32 flags);
@@ -172,7 +178,7 @@ status_t _user_get_memory_properties(team_id teamID, const void *address,
 area_id _user_area_for(void *address);
 area_id _user_find_area(const char *name);
 status_t _user_get_area_info(area_id area, area_info *info);
-status_t _user_get_next_area_info(team_id team, int32 *cookie, area_info *info);
+status_t _user_get_next_area_info(team_id team, ssize_t *cookie, area_info *info);
 status_t _user_resize_area(area_id area, size_t newSize);
 area_id _user_transfer_area(area_id area, void **_address, uint32 addressSpec,
 			team_id target);

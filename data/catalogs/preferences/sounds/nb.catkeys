@@ -1,17 +1,17 @@
-1	norwegian_bokmål	x-vnd.Haiku-Sounds	3924145958
-<none>	HEventList		<ingen>
-<none>	HWindow		<ingen>
-About Sounds	SoundsHApp		Om Lyder
-Event	HEventList		Hendelse 
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Sounds	3924145958
+Sounds	System name		Lyder
 No such file or directory	HEventList		Filen eller mappen eksisterer ikke
+OK	SoundsHApp		OK
+Sound File:	HWindow		Lydfil:
 OK	HEventList		OK
 OK	HWindow		OK
-OK	SoundsHApp		OK
+This is not an audio file.	HWindow		Dette er ingen lydfil.
+Stop	HWindow		Avbryt
+About Sounds	SoundsHApp		Om Lyder
+Sound	HEventList		Lyd
+Event	HEventList		Hendelse 
+<none>	HEventList		<ingen>
+Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sound\nGitt til deg av:\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\nOriginalt fra Atsushi Takamatsu.\nOpphavsrett ©2003-2006 Haiku
+<none>	HWindow		<ingen>
 Other…	HWindow		Andre...
 Play	HWindow		Spill
-Sound	HEventList		Lyd
-Sound File:	HWindow		Lydfil:
-Sounds	System name		Lyder
-Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sound\nGitt til deg av:\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\nOriginalt fra Atsushi Takamatsu.\nOpphavsrett ©2003-2006 Haiku
-Stop	HWindow		Avbryt
-This is not an audio file.	HWindow		Dette er ingen lydfil.

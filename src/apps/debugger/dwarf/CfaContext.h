@@ -14,9 +14,11 @@
 
 class CfaContext {
 public:
-								CfaContext(target_addr_t targetLocation,
-									target_addr_t initialLocation);
+								CfaContext();
 								~CfaContext();
+
+			void				SetLocation(target_addr_t targetLocation,
+									target_addr_t initialLocation);
 
 			status_t			Init(uint32 registerCount);
 			status_t			SaveInitialRuleSet();

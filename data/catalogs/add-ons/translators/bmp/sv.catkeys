@@ -1,9 +1,9 @@
 1	swedish	x-vnd.Haiku-BMPTranslator	2497639570
-BMP Settings	BMPMain		BMP inställningar
-BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	BMP bild (MS format, %d bitar
-BMP image (OS/2 format, %d bits)	BMPTranslator		BMP bild (OS/2 format, %d bitar)
-BMP image translator	BMPTranslator		BMP bildöversättare
-BMP image translator	BMPView		BMP bildöversättare
 BMP images	BMPTranslator		BMP bilder
 BMPTranslator Settings	BMPTranslator		BMPTranslator inställningar
+BMP image (OS/2 format, %d bits)	BMPTranslator		BMP bild (OS/2 format, %d bitar)
+BMP image translator	BMPView		BMP bildöversättare
+BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	BMP bild (MS format, %d bitar
+BMP Settings	BMPMain		BMP inställningar
 Version %d.%d.%d, %s	BMPView		Version %d,%d,%d, %s
+BMP image translator	BMPTranslator		BMP bildöversättare

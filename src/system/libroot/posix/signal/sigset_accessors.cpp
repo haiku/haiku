@@ -17,6 +17,7 @@
 
 #include <symbol_versioning.h>
 
+#include <errno_private.h>
 #include <signal_private.h>
 
 
@@ -43,7 +44,7 @@ int
 __sigismember_beos(const sigset_t_beos* set, int signal)
 {
 	if (signal <= 0 || signal > MAX_SIGNAL_NUMBER_BEOS) {
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		return -1;
 	}
 
@@ -55,7 +56,7 @@ int
 __sigaddset_beos(sigset_t_beos* set, int signal)
 {
 	if (signal <= 0 || signal > MAX_SIGNAL_NUMBER_BEOS) {
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		return -1;
 	}
 
@@ -68,7 +69,7 @@ int
 __sigdelset_beos(sigset_t_beos* set, int signal)
 {
 	if (signal <= 0 || signal > MAX_SIGNAL_NUMBER_BEOS) {
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		return -1;
 	}
 
@@ -100,7 +101,7 @@ int
 __sigismember(const sigset_t* set, int signal)
 {
 	if (signal <= 0 || signal > MAX_SIGNAL_NUMBER) {
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		return -1;
 	}
 
@@ -112,7 +113,7 @@ int
 __sigaddset(sigset_t* set, int signal)
 {
 	if (signal <= 0 || signal > MAX_SIGNAL_NUMBER) {
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		return -1;
 	}
 
@@ -125,7 +126,7 @@ int
 __sigdelset(sigset_t* set, int signal)
 {
 	if (signal <= 0 || signal > MAX_SIGNAL_NUMBER) {
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		return -1;
 	}
 

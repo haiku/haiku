@@ -64,7 +64,7 @@ of their respective holders. All rights reserved.
 #include "Messages.h"
 
 
-#define B_TRANSLATE_CONTEXT "Mail"
+#define B_TRANSLATION_CONTEXT "Mail"
 
 
 static const float kPlainFontSizeScale = 0.9;
@@ -249,10 +249,12 @@ TEnclosuresView::MessageReceived(BMessage *msg)
 					if (window && window->Mail())
 						window->Mail()->RemoveComponent(item->Component());
 
-					(new BAlert("", B_TRANSLATE(
+					BAlert* alert = new BAlert("", B_TRANSLATE(
 						"Removing attachments from a forwarded mail is not yet "
 						"implemented!\nIt will not yet work correctly."),
-						B_TRANSLATE("OK")))->Go();
+						B_TRANSLATE("OK"));
+					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+					alert->Go();
 				}
 				else
 					watch_node(item->NodeRef(), B_STOP_WATCHING, this);
@@ -302,9 +304,11 @@ TEnclosuresView::MessageReceived(BMessage *msg)
 				if (badType)
 				{
 					beep();
-					(new BAlert("",
+					BAlert* alert = new BAlert("",
 						B_TRANSLATE("Only files can be added as attachments."),
-						B_TRANSLATE("OK")))->Go();
+						B_TRANSLATE("OK"));
+					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+					alert->Go();
 				}
 			}
 			break;
@@ -426,7 +430,9 @@ TListView::MouseDown(BPoint point)
 	int32 buttons;
 	Looper()->CurrentMessage()->FindInt32("buttons", &buttons);
 
-	if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
+	BListView::MouseDown(point);
+
+	if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0 && IndexOf(point) >= 0) {
 		BPopUpMenu menu("enclosure", false, false);
 		menu.SetFont(be_plain_font);
 		menu.AddItem(new BMenuItem(B_TRANSLATE("Open attachment"),
@@ -448,8 +454,7 @@ TListView::MouseDown(BPoint point)
 				Window()->PostMessage(item->Command(),fParent);
 			}
 		}
-	} else
-		BListView::MouseDown(point);
+	}
 }
 
 

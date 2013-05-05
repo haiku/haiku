@@ -180,14 +180,14 @@ BQueryFile::SetPredicate(const char* predicate)
 status_t
 BQueryFile::AddVolume(const BVolume& volume)
 {
-	return fVolumes.AddItem((void*)volume.Device()) ? B_OK : B_NO_MEMORY;
+	return fVolumes.AddItem((void*)(addr_t)volume.Device()) ? B_OK : B_NO_MEMORY;
 }
 
 
 status_t
 BQueryFile::AddVolume(dev_t device)
 {
-	return fVolumes.AddItem((void*)device) ? B_OK : B_NO_MEMORY;
+	return fVolumes.AddItem((void*)(addr_t)device) ? B_OK : B_NO_MEMORY;
 }
 
 
@@ -211,7 +211,7 @@ BQueryFile::VolumeAt(int32 index) const
 	if (index < 0 || index >= fVolumes.CountItems())
 		return -1;
 
-	return (dev_t)fVolumes.ItemAt(index);
+	return (dev_t)(addr_t)fVolumes.ItemAt(index);
 }
 
 

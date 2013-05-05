@@ -158,13 +158,6 @@ BViewLayoutItem::View()
 
 
 void
-BViewLayoutItem::InvalidateLayout(bool children)
-{
-	fView->InvalidateLayout(children);
-}
-
-
-void
 BViewLayoutItem::Relayout(bool immediate)
 {
 	if (immediate)
@@ -217,6 +210,13 @@ BViewLayoutItem::Instantiate(BMessage* from)
 	if (validate_instantiation(from, "BViewLayoutItem"))
 		return new(std::nothrow) BViewLayoutItem(from);
 	return NULL;
+}
+
+
+void
+BViewLayoutItem::LayoutInvalidated(bool children)
+{
+	fView->InvalidateLayout(children);
 }
 
 

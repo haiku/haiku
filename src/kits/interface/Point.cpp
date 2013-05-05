@@ -8,7 +8,6 @@
 
 #include <Point.h>
 
-#include <math.h>
 #include <stdio.h>
 
 #include <SupportDefs.h>

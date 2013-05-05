@@ -1,6 +1,11 @@
 /*
+ * Copyright 2013, Haiku, Inc. All rights reserved.
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
+ *		Siarzhuk Zharski, zharik@gmx.li
  */
 #ifndef TERMINAL_LINE_H
 #define TERMINAL_LINE_H
@@ -24,11 +29,13 @@ struct TerminalLine {
 	uint32			attributes;
 	TerminalCell	cells[1];
 
-	inline void Clear()
+	inline void Clear(uint32 attr = 0, size_t count = 0)
 	{
 		length = 0;
-		attributes = 0;
+		attributes = attr;
 		softBreak = false;
+		for (size_t i = 0; i < count; i++)
+			cells[i].attributes = attr;
 	}
 };
 

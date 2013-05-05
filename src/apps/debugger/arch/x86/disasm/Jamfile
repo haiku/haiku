@@ -3,9 +3,12 @@ SubDir HAIKU_TOP src apps debugger arch x86 disasm ;
 CCFLAGS +=  -Werror ;
 C++FLAGS += -Werror ;
 
+UsePrivateHeaders shared ;
+
 UseHeaders [ LibraryHeaders udis86 ] ;
 UseHeaders [ LibraryHeaders [ FDirName udis86 libudis86 ] ] ;
 
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) $(DOTDOT) types ] ;
 

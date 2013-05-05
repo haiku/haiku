@@ -1,10 +1,10 @@
 1	japanese	x-vnd.Haiku-Mandelbrot	3766380907
 File	Mandelbrot		ファイル
-Iterations	Mandelbrot		反復回数
-Mandelbrot	System name		マンデルブロ
-Palette	Mandelbrot		パレット
-Palette 1	Mandelbrot		パレット 1
-Palette 2	Mandelbrot		パレット 2
 Palette 3	Mandelbrot		パレット 3
-Palette 4	Mandelbrot		パレット 4
 Quit	Mandelbrot		終了
+Palette 2	Mandelbrot		パレット 2
+Palette 4	Mandelbrot		パレット 4
+Palette	Mandelbrot		パレット
+Mandelbrot	System name		マンデルブロ
+Palette 1	Mandelbrot		パレット 1
+Iterations	Mandelbrot		反復回数

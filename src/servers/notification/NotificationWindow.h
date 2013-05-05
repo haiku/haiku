@@ -12,20 +12,17 @@
 #include <vector>
 #include <map>
 
-#include <Directory.h>
-#include <Deskbar.h>
-#include <Entry.h>
-#include <FindDirectory.h>
-#include <Message.h>
-#include <Notifications.h>
-#include <PropertyInfo.h>
+#include <AppFileInfo.h>
 #include <String.h>
 #include <Window.h>
 
 #include "NotificationView.h"
 
+
 class AppGroupView;
 class AppUsage;
+
+struct property_info;
 
 typedef std::map<BString, AppGroupView*> appview_t;
 typedef std::map<BString, AppUsage*> appfilter_t;
@@ -37,6 +34,9 @@ extern const float kCloseSize;
 extern const float kExpandSize;
 extern const float kPenSize;
 
+const uint32 kRemoveGroupView = 'RGVi';
+
+
 class NotificationWindow : public BWindow {
 public:
 									NotificationWindow();
@@ -44,23 +44,25 @@ public:
 
 	virtual	bool					QuitRequested();
 	virtual	void					MessageReceived(BMessage*);
-	virtual	void 					WorkspaceActivated(int32, bool);
+	virtual	void					WorkspaceActivated(int32, bool);
+	virtual	void					FrameResized(float width, float height);
 	virtual	BHandler*				ResolveSpecifier(BMessage*, int32, BMessage*,
 										int32, const char*);
 										
-			void					Show();
-
 			icon_size				IconSize();
 			int32					Timeout();
 			float					Width();
 
-			void					_ResizeAll();
+			void					_ShowHide();
 
 private:
 	friend class AppGroupView;
 
+			void					NotificationViewSwapped(
+										NotificationView* stale,
+										NotificationView* fresh);
+
 			void					SetPosition();
-			void					PopupAnimation();
 			void					_LoadSettings(bool startMonitor = false);
 			void					_LoadAppFilters(bool startMonitor = false);
 			void					_SaveAppFilters();

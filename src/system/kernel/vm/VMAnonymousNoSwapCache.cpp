@@ -120,25 +120,24 @@ VMAnonymousNoSwapCache::Write(off_t offset, const iovec* vecs, size_t count,
 status_t
 VMAnonymousNoSwapCache::Fault(struct VMAddressSpace* aspace, off_t offset)
 {
-	if (fCanOvercommit) {
-		if (fGuardedSize > 0) {
-			uint32 guardOffset;
+	if (fGuardedSize > 0) {
+		uint32 guardOffset;
 
 #ifdef STACK_GROWS_DOWNWARDS
-			guardOffset = 0;
+		guardOffset = 0;
 #elif defined(STACK_GROWS_UPWARDS)
-			guardOffset = virtual_size - fGuardedSize;
+		guardOffset = virtual_size - fGuardedSize;
 #else
 #	error Stack direction has not been defined in arch_config.h
 #endif
-
-			// report stack fault, guard page hit!
-			if (offset >= guardOffset && offset < guardOffset + fGuardedSize) {
-				TRACE(("stack overflow!\n"));
-				return B_BAD_ADDRESS;
-			}
+		// report stack fault, guard page hit!
+		if (offset >= guardOffset && offset < guardOffset + fGuardedSize) {
+			TRACE(("stack overflow!\n"));
+			return B_BAD_ADDRESS;
 		}
+	}
 
+	if (fCanOvercommit) {
 		if (fPrecommittedPages == 0) {
 			// never commit more than needed
 			if (committed_size / B_PAGE_SIZE > page_count)

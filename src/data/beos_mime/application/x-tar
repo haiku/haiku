@@ -3,6 +3,8 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "application/x-tar";
 
+resource(2, "META:S:DESC") #'MSDC' "TAR archive";
+
 //resource(2, "META:SNIFF_RULE") "0.40 (\"\\037\\213\")";
 
 resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-Expander";

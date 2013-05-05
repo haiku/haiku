@@ -56,18 +56,15 @@ main (int argc, char *argv[])
         /* Locale encoding is UTF-8.  */
     	printf("UTF-8 ...\n");
 
-       	if (setlocale (LC_ALL, "en_US.ISO8859-1") == NULL) {
-       	  fprintf(stderr, "unable to set ISO8859-1 locale, skipping\n");
+       	if (setlocale (LC_ALL, "en_US.utf-8") == NULL) {
+       	  fprintf(stderr, "unable to set en_US.UTF-8 locale, skipping\n");
        	  break;
        	}
 
     	for (c = 0; c < 0x80; c++)
           assert (btowc (c) == (wint_t)c);
         for (c = 0x80; c < 0x100; c++)
-{
-printf("btowc(%d) = %x\n", c, btowc(c));
         	assert (btowc (c) == WEOF);
-}
         break;
       }
   }

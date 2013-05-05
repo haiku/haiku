@@ -26,8 +26,7 @@
 #include <File.h>
 #include <FilePanel.h>
 #include <FindDirectory.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <Menu.h>
 #include <MenuField.h>
@@ -42,12 +41,11 @@
 #include <TranslationUtils.h>
 #include <TranslatorRoster.h>
 
-#include "PreviewView.h"
 #include "Utility.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ScreenshotWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ScreenshotWindow"
 
 
 enum {
@@ -175,11 +173,13 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 
 	BMenuField* menuLocation = new BMenuField(B_TRANSLATE("Save in:"),
 		fOutputPathMenu);
+	menuLocation->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	fTranslatorMenu = new BMenu(B_TRANSLATE("Please select"));
 	_SetupTranslatorMenu();
 	BMenuField* menuFormat = new BMenuField(B_TRANSLATE("Save as:"),
 		fTranslatorMenu);
+	menuFormat->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	BButton* showSettings =  new BButton("", B_TRANSLATE("Settings"B_UTF8_ELLIPSIS),
 			new BMessage(kSettings));
@@ -194,37 +194,35 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 	const float kSpacing = be_control_look->DefaultItemSpacing();
 	const float kLabelSpacing = be_control_look->DefaultLabelSpacing();
 
-	fPreview = new PreviewView();
-	
-	BGridLayout* gridLayout = BGridLayoutBuilder(0.0, kSpacing / 2)
-		.Add(fDelayControl->CreateLabelLayoutItem(), 0, 0)
-		.Add(fDelayControl->CreateTextViewLayoutItem(), 1, 0)
-		.Add(BSpaceLayoutItem::CreateHorizontalStrut(kLabelSpacing), 2, 0)
-		.Add(seconds, 3, 0)	
-		.Add(fNameControl->CreateLabelLayoutItem(), 0, 1)
-		.Add(fNameControl->CreateTextViewLayoutItem(), 1, 1, 3, 1)
-		.Add(menuLocation->CreateLabelLayoutItem(), 0, 2)
-		.Add(menuLocation->CreateMenuBarLayoutItem(), 1, 2, 3, 1)
-		.Add(menuFormat->CreateLabelLayoutItem(), 0, 3)
-		.Add(menuFormat->CreateMenuBarLayoutItem(), 1, 3, 3, 1);
-	
-	gridLayout->SetMinColumnWidth(1,
-		menuFormat->StringWidth("SomethingLongHere"));
+	fPreview = new BView("preview", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE);
+	BBox *previewBox = new BBox(B_FANCY_BORDER, fPreview);
 
-	SetLayout(new BGroupLayout(B_HORIZONTAL, 0));
-
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, kSpacing)
-			.Add(fPreview)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(kSpacing)
+		.AddGroup(B_HORIZONTAL, kSpacing)
+			.Add(previewBox)
 			.AddGroup(B_VERTICAL, 0)
 				.Add(fActiveWindow)
 				.Add(fWindowBorder)
 				.Add(fShowCursor)
 				.AddStrut(kSpacing)
-				.Add(gridLayout)
+				.AddGrid(0.0, kSpacing/2)
+					.Add(fDelayControl->CreateLabelLayoutItem(), 0, 0)
+					.Add(fDelayControl->CreateTextViewLayoutItem(), 1, 0)
+					.Add(BSpaceLayoutItem::CreateHorizontalStrut(kLabelSpacing),
+						2, 0)
+					.Add(seconds, 3, 0)
+					.Add(fNameControl->CreateLabelLayoutItem(), 0, 1)
+					.Add(fNameControl->CreateTextViewLayoutItem(), 1, 1, 3, 1)
+					.Add(menuLocation->CreateLabelLayoutItem(), 0, 2)
+					.Add(menuLocation->CreateMenuBarLayoutItem(), 1, 2, 3, 1)
+					.Add(menuFormat->CreateLabelLayoutItem(), 0, 3)
+					.Add(menuFormat->CreateMenuBarLayoutItem(), 1, 3, 3, 1)
+				.End()
 				.Add(showSettings)
 				.AddGlue()
-				.End())
+			.End()
+		.End()
 		.AddStrut(kSpacing)
 		.Add(divider)
 		.AddStrut(kSpacing)
@@ -234,10 +232,7 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 			.Add(new BButton("", B_TRANSLATE("New screenshot"),
 				new BMessage(kNewScreenshot)))
 			.AddGlue()
-			.Add(saveScreenshot)
-			.End()
-		.SetInsets(kSpacing, kSpacing, kSpacing, kSpacing)
-	);
+			.Add(saveScreenshot);
 
 	saveScreenshot->MakeDefault(true);
 
@@ -674,6 +669,7 @@ ScreenshotWindow::_ShowSettings(bool activate)
 		&rect);
 	if (err < B_OK || view == NULL) {
 		BAlert *alert = new BAlert(NULL, strerror(err), "OK");
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 	} else {
 		if (fSettingsWindow) {
@@ -713,7 +709,7 @@ ScreenshotWindow::_FindValidFileName(const char* name)
 	if (orgPath == NULL)
 		return baseName;
 
-	fExtension = BString(fUtility.GetFileNameExtension(fImageFileType));
+	fExtension = fUtility.GetFileNameExtension(fImageFileType);
 
 	BPath outputPath = orgPath;
 	BString fileName;

@@ -26,8 +26,8 @@
 #include "PulseView.h"
 #include "Common.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "CPUButton"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CPUButton"
 
 
 CPUButton::CPUButton(BRect rect, const char *name, const char *label, BMessage *message)
@@ -243,7 +243,7 @@ CPUButton::Invoke(BMessage *message)
 		BAlert *alert = new BAlert(B_TRANSLATE("Info"),
 			B_TRANSLATE("You can't disable the last active CPU."),
 			B_TRANSLATE("OK"));
-		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go(NULL);
 		SetValue(!Value());
 	}
@@ -317,7 +317,7 @@ CPUButton::AttachedToWindow()
 	fReplicantInDeskbar = false;
 
 	if (fReplicant) {
-		if (strcmp(Window()->Title(), B_TRANSLATE("Deskbar")) == 0) {
+		if (strcmp(Window()->Title(), B_TRANSLATE("Deskbar"))) {
 			// Make room for dragger
 			ResizeBy(4, 4);
 

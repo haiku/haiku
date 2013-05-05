@@ -40,6 +40,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+
+#include <errno_private.h>
+
 #include "local.h"
 
 #define	POS_ERR	(-(fpos_t)1)
@@ -68,7 +71,7 @@ fseeko(fp, offset, whence)
 	 * Have to be able to seek.
 	 */
 	if ((seekfn = fp->_seek) == NULL) {
-		errno = ESPIPE;			/* historic practice */
+		__set_errno(ESPIPE);			/* historic practice */
 		return (EOF);
 	}
 
@@ -111,7 +114,7 @@ fseeko(fp, offset, whence)
 		break;
 
 	default:
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		return (EOF);
 	}
 

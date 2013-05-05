@@ -1,0 +1,46 @@
+SubDir HAIKU_TOP src add-ons opengl swpipe ;
+SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
+
+UsePrivateHeaders interface ;
+
+local sources =
+	SoftwareRenderer.cpp
+	SoftwareWinsys.cpp
+	GalliumContext.cpp
+	GalliumFramebuffer.cpp
+	bitmap_wrapper.cpp ;
+
+Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src gallium auxiliary ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src gallium drivers ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src gallium include ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa ] ;
+
+AddResources Software\ Renderer : SoftwareRenderer.rdef ;
+
+if FIsBuildFeatureEnabled(llvm) {
+	Depends Software\ Renderer : $(HAIKU_LLVM_HEADERS_DEPENDENCY) ;
+	SubDirC++Flags [ FDefines HAVE_LLVM=0x0302 ] ;
+}
+
+# LLVM Pipe enabled Gallium Software Renderer
+#   Requires:
+#     - LLVM optional package
+#     - Mesa optional package compiled with LLVM installed
+# SoftPipe enabled Gallium Software Renderer
+#    Requires:
+#     - Mesa optional package compiled *without* LLVM installed
+Addon Software\ Renderer :
+	$(sources)
+	:
+	libGL.so
+	$(HAIKU_GALLIUM_SOFTPIPE_LIB)
+	$(HAIKU_GALLIUM_LLVMPIPE_LIB)
+	$(HAIKU_MESA_LIB)
+	$(HAIKU_GLSL_LIB)
+	$(HAIKU_GALLIUM_LIB)
+	$(HAIKU_LLVM_LIBS)
+	be translation stdc++ $(TARGET_LIBSUPC++)
+;

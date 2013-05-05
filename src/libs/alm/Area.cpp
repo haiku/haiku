@@ -8,108 +8,17 @@
 
 #include "Area.h"
 
-#include <algorithm>	// for max
-
-#include <Button.h>
-#include <CheckBox.h>
-#include <PictureButton.h>
-#include <RadioButton.h>
-#include <StatusBar.h>
-#include <StringView.h>
+#include <Alignment.h>
+#include <ControlLook.h>
+#include <View.h>
 
 #include "ALMLayout.h"
 #include "RowColumnManager.h"
+#include "Row.h"
+#include "Column.h"
 
 
 using namespace LinearProgramming;
-using namespace std;
-
-
-GroupItem::GroupItem(BLayoutItem* item)
-{
-	_Init(item, NULL);
-}
-
-
-GroupItem::GroupItem(BView* view)
-{
-	_Init(NULL, view);
-}
-
-
-BLayoutItem*
-GroupItem::LayoutItem()
-{
-	return fLayoutItem;
-}
-
-
-BView*
-GroupItem::View()
-{
-	return fView;
-}
-
-
-const std::vector<GroupItem>&
-GroupItem::GroupItems()
-{
-	return fGroupItems;
-}
-
-
-enum orientation
-GroupItem::Orientation()
-{
-	return fOrientation;
-}
-
-
-GroupItem&
-GroupItem::operator|(const GroupItem& right)
-{
-	return _AddItem(right, B_HORIZONTAL);
-}
-
-
-GroupItem&
-GroupItem::operator/(const GroupItem& bottom)
-{
-	return _AddItem(bottom, B_VERTICAL);
-}
-
-
-GroupItem::GroupItem()
-{
-	_Init(NULL, NULL);
-}
-
-
-void
-GroupItem::_Init(BLayoutItem* item, BView* view, enum orientation orien)
-{
-	fLayoutItem = item;
-	fView = view;
-	fOrientation = orien;
-}
-
-
-GroupItem&
-GroupItem::_AddItem(const GroupItem& item, enum orientation orien)
-{
-	if (fGroupItems.size() == 0)
-		fGroupItems.push_back(*this);
-	else if (fOrientation != orien) {
-		GroupItem clone = *this;
-		fGroupItems.clear();
-		_Init(NULL, NULL, orien);
-		fGroupItems.push_back(clone);
-	}
-
-	_Init(NULL, NULL, orien);
-	fGroupItems.push_back(item);
-	return *this;
-}
 
 
 BLayoutItem*
@@ -169,7 +78,7 @@ Area::Bottom() const
  * @param left	the left tab of the area
  */
 void
-Area::SetLeft(XTab* left)
+Area::SetLeft(BReference<XTab> left)
 {
 	fLeft = left;
 
@@ -188,7 +97,7 @@ Area::SetLeft(XTab* left)
  * @param right	the right tab of the area
  */
 void
-Area::SetRight(XTab* right)
+Area::SetRight(BReference<XTab> right)
 {
 	fRight = right;
 
@@ -205,7 +114,7 @@ Area::SetRight(XTab* right)
  * Sets the top tab of the area.
  */
 void
-Area::SetTop(YTab* top)
+Area::SetTop(BReference<YTab> top)
 {
 	fTop = top;
 
@@ -222,7 +131,7 @@ Area::SetTop(YTab* top)
  * Sets the bottom tab of the area.
  */
 void
-Area::SetBottom(YTab* bottom)
+Area::SetBottom(BReference<YTab> bottom)
 {
 	fBottom = bottom;
 
@@ -318,12 +227,27 @@ Area::SetContentAspectRatio(double ratio)
 	} else if (fContentAspectRatioC == NULL) {
 		fContentAspectRatioC = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight,
 			ratio, fTop, -ratio, fBottom, kEQ, 0.0);
-		fConstraints.AddItem(fContentAspectRatioC);
 	} else {
 		fContentAspectRatioC->SetLeftSide(-1.0, fLeft, 1.0, fRight, ratio,
 			fTop, -ratio, fBottom);
 	}
-	fLayoutItem->Layout()->InvalidateLayout();
+	/* called during BALMLayout::ItemUnarchived */
+	if (BLayout* layout = fLayoutItem->Layout())
+		layout->InvalidateLayout();
+}
+
+
+void
+Area::GetInsets(float* left, float* top, float* right, float* bottom) const
+{
+	if (left)
+		*left = fLeftTopInset.Width();
+	if (top)
+		*top = fLeftTopInset.Height();
+	if (right)
+		*right = fRightBottomInset.Width();
+	if (bottom)
+		*bottom = fRightBottomInset.Height();
 }
 
 
@@ -333,13 +257,11 @@ Area::SetContentAspectRatio(double ratio)
 float
 Area::LeftInset() const
 {
-	if (fTopLeftInset.IsWidthSet())
-		return fTopLeftInset.Width();
+	if (fLeftTopInset.IsWidthSet())
+		return fLeftTopInset.Width();
 
 	BALMLayout* layout = static_cast<BALMLayout*>(fLayoutItem->Layout());
-	if (fLeft == layout->Left())
-		return layout->Inset();
-	return layout->Spacing() / 2;
+	return layout->InsetForTab(fLeft.Get());
 }
 
 
@@ -349,13 +271,11 @@ Area::LeftInset() const
 float
 Area::TopInset() const
 {
-	if (fTopLeftInset.IsHeightSet())
-		return fTopLeftInset.Height();
+	if (fLeftTopInset.IsHeightSet())
+		return fLeftTopInset.Height();
 
 	BALMLayout* layout = static_cast<BALMLayout*>(fLayoutItem->Layout());
-	if (fTop == layout->Top())
-		return layout->Inset();
-	return layout->Spacing() / 2;
+	return layout->InsetForTab(fTop.Get());
 }
 
 
@@ -369,9 +289,7 @@ Area::RightInset() const
 		return fRightBottomInset.Width();
 
 	BALMLayout* layout = static_cast<BALMLayout*>(fLayoutItem->Layout());
-	if (fRight == layout->Right())
-		return layout->Inset();
-	return layout->Spacing() / 2;
+	return layout->InsetForTab(fRight.Get());
 }
 
 
@@ -385,9 +303,51 @@ Area::BottomInset() const
 		return fRightBottomInset.Height();
 
 	BALMLayout* layout = static_cast<BALMLayout*>(fLayoutItem->Layout());
-	if (fBottom == layout->Bottom())
-		return layout->Inset();
-	return layout->Spacing() / 2;
+	return layout->InsetForTab(fBottom.Get());
+}
+
+
+void
+Area::SetInsets(float insets)
+{
+	if (insets != B_SIZE_UNSET)
+		insets = BControlLook::ComposeSpacing(insets);
+
+	fLeftTopInset.Set(insets, insets);
+	fRightBottomInset.Set(insets, insets);
+	fLayoutItem->Layout()->InvalidateLayout();
+}
+
+
+void
+Area::SetInsets(float horizontal, float vertical)
+{
+	if (horizontal != B_SIZE_UNSET)
+		horizontal = BControlLook::ComposeSpacing(horizontal);
+	if (vertical != B_SIZE_UNSET)
+		vertical = BControlLook::ComposeSpacing(vertical);
+
+	fLeftTopInset.Set(horizontal, horizontal);
+	fRightBottomInset.Set(vertical, vertical);
+	fLayoutItem->Layout()->InvalidateLayout();
+}
+
+
+void
+Area::SetInsets(float left, float top, float right, float bottom)
+{
+	if (left != B_SIZE_UNSET)
+		left = BControlLook::ComposeSpacing(left);
+	if (right != B_SIZE_UNSET)
+		right = BControlLook::ComposeSpacing(right);
+	if (top != B_SIZE_UNSET)
+		top = BControlLook::ComposeSpacing(top);
+	if (bottom != B_SIZE_UNSET)
+		bottom = BControlLook::ComposeSpacing(bottom);
+
+	fLeftTopInset.Set(left, top);
+	fRightBottomInset.Set(right, bottom);
+	fLayoutItem->Layout()->InvalidateLayout();
 }
 
 
@@ -397,7 +357,7 @@ Area::BottomInset() const
 void
 Area::SetLeftInset(float left)
 {
-	fTopLeftInset.width = left;
+	fLeftTopInset.width = left;
 	fLayoutItem->Layout()->InvalidateLayout();
 }
 
@@ -408,7 +368,7 @@ Area::SetLeftInset(float left)
 void
 Area::SetTopInset(float top)
 {
-	fTopLeftInset.height = top;
+	fLeftTopInset.height = top;
 	fLayoutItem->Layout()->InvalidateLayout();
 }
 
@@ -497,17 +457,10 @@ Area::InvalidateSizeConstraints()
 
 
 BRect
-Area::Frame()
+Area::Frame() const
 {
-	return BRect(fLeft->Value(), fTop->Value(), fRight->Value(),
-		fBottom->Value());
-}
-
-
-BRect
-Area::ItemFrame()
-{
-	return fLayoutItem->Frame();
+	return BRect(round(fLeft->Value()), round(fTop->Value()),
+		round(fRight->Value()), round(fBottom->Value()));
 }
 
 
@@ -517,8 +470,20 @@ Area::ItemFrame()
  */
 Area::~Area()
 {
-	for (int32 i = 0; i < fConstraints.CountItems(); i++)
-		delete fConstraints.ItemAt(i);
+	delete fMinContentWidth;
+	delete fMaxContentWidth;
+	delete fMinContentHeight;
+	delete fMaxContentHeight;
+	delete fContentAspectRatioC;
+}
+
+
+static int32 sAreaID = 0;
+
+static int32
+new_area_id()
+{
+	return sAreaID++;
 }
 
 
@@ -529,28 +494,38 @@ Area::~Area()
 Area::Area(BLayoutItem* item)
 	:
 	fLayoutItem(item),
-
 	fLS(NULL),
 	fLeft(NULL),
 	fRight(NULL),
 	fTop(NULL),
 	fBottom(NULL),
-
 	fRow(NULL),
 	fColumn(NULL),
-
 	fShrinkPenalties(5, 5),
 	fGrowPenalties(5, 5),
-
+	fContentAspectRatio(-1),
+	fRowColumnManager(NULL),
 	fMinContentWidth(NULL),
 	fMaxContentWidth(NULL),
 	fMinContentHeight(NULL),
 	fMaxContentHeight(NULL),
-
-	fContentAspectRatio(-1),
 	fContentAspectRatioC(NULL)
 {
+	fID = new_area_id();
+}
 
+
+int32
+Area::ID() const
+{
+	return fID;
+}
+
+
+void
+Area::SetID(int32 id)
+{
+	fID = id;
 }
 
 
@@ -575,15 +550,15 @@ Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom,
 	fMinContentWidth = ls->AddConstraint(-1.0, fLeft, 1.0, fRight, kGE, 0);
 	fMinContentHeight = ls->AddConstraint(-1.0, fTop, 1.0, fBottom, kGE, 0);
 
-	fConstraints.AddItem(fMinContentWidth);
-	fConstraints.AddItem(fMinContentHeight);
+	InvalidateSizeConstraints();
 }
 
 
 void
 Area::_Init(LinearSpec* ls, Row* row, Column* column, RowColumnManager* manager)
 {
-	_Init(ls, column->Left(), row->Top(), column->Right(), row->Bottom(), manager);
+	_Init(ls, column->Left(), row->Top(), column->Right(),
+		row->Bottom(), manager);
 
 	fRow = row;
 	fColumn = column;
@@ -594,26 +569,34 @@ Area::_Init(LinearSpec* ls, Row* row, Column* column, RowColumnManager* manager)
  * Perform layout on the area.
  */
 void
-Area::_DoLayout()
+Area::_DoLayout(const BPoint& offset)
 {
 	// check if if we are initialized
 	if (!fLeft)
 		return;
 
-	BRect areaFrame(round(fLeft->Value()), round(fTop->Value()),
-		round(fRight->Value()), round(fBottom->Value()));
+	if (!fLayoutItem->IsVisible())
+		fLayoutItem->AlignInFrame(BRect(0, 0, -1, -1));
+
+	BRect areaFrame(Frame());
 	areaFrame.left += LeftInset();
 	areaFrame.right -= RightInset();
 	areaFrame.top += TopInset();
 	areaFrame.bottom -= BottomInset();
 
-	fLayoutItem->AlignInFrame(areaFrame);
+	fLayoutItem->AlignInFrame(areaFrame.OffsetBySelf(offset));
 }
 
 
 void
 Area::_UpdateMinSizeConstraint(BSize min)
 {
+	if (!fLayoutItem->IsVisible()) {
+		fMinContentHeight->SetRightSide(-1);
+		fMinContentWidth->SetRightSide(-1);
+		return;
+	}
+
 	float width = 0.;
 	float height = 0.;
 	if (min.width > 0)
@@ -629,36 +612,53 @@ Area::_UpdateMinSizeConstraint(BSize min)
 void
 Area::_UpdateMaxSizeConstraint(BSize max)
 {
+	if (!fLayoutItem->IsVisible()) {
+		if (fMaxContentHeight != NULL)
+			fMaxContentHeight->SetRightSide(B_SIZE_UNLIMITED);
+		if (fMaxContentWidth != NULL)
+			fMaxContentWidth->SetRightSide(B_SIZE_UNLIMITED);
+		return;
+	}
+
 	max.width += LeftInset() + RightInset();
 	max.height += TopInset() + BottomInset();
 
+	const double kPriority = 100;
 	// we only need max constraints if the alignment is full height/width
 	// otherwise we can just align the item in the free space
 	BAlignment alignment = fLayoutItem->Alignment();
-	if (alignment.Vertical() == B_ALIGN_USE_FULL_HEIGHT) {
+	double priority = kPriority;
+	if (alignment.Vertical() == B_ALIGN_USE_FULL_HEIGHT)
+		priority = -1;
+
+	if (max.Height() < 20000) {
 		if (fMaxContentHeight == NULL) {
 			fMaxContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0, fBottom,
-				kLE, max.Height());
-			fConstraints.AddItem(fMaxContentHeight);
-		} else
+				kLE, max.Height(), priority, priority);
+		} else {
 			fMaxContentHeight->SetRightSide(max.Height());
-	}
-	else {
-		fConstraints.RemoveItem(fMaxContentHeight);
+			fMaxContentHeight->SetPenaltyNeg(priority);
+			fMaxContentHeight->SetPenaltyPos(priority);
+		}
+	} else {
 		delete fMaxContentHeight;
 		fMaxContentHeight = NULL;
 	}
 
-	if (alignment.Horizontal() == B_ALIGN_USE_FULL_WIDTH) {
+	priority = kPriority;
+	if (alignment.Horizontal() == B_ALIGN_USE_FULL_WIDTH)
+		priority = -1;
+
+	if (max.Width() < 20000) {
 		if (fMaxContentWidth == NULL) {
 			fMaxContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight, kLE,
-				max.Width());
-			fConstraints.AddItem(fMaxContentWidth);
-		} else
+				max.Width(), priority, priority);
+		} else {
 			fMaxContentWidth->SetRightSide(max.Width());
-	}
-	else {
-		fConstraints.RemoveItem(fMaxContentWidth);
+			fMaxContentWidth->SetPenaltyNeg(priority);
+			fMaxContentWidth->SetPenaltyPos(priority);
+		}
+	} else {
 		delete fMaxContentWidth;
 		fMaxContentWidth = NULL;
 	}

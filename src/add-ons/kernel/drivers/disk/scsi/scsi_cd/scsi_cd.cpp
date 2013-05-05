@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2004-2012, Haiku, Inc. All rights reserved.
  * Copyright 2002-2003, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -21,6 +21,7 @@
 
 #include <algorithm>
 
+#include <fs/devfs.h>
 #include <io_requests.h>
 #include <vm/vm_page.h>
 
@@ -184,8 +185,8 @@ test_capacity(cd_driver_info *info)
 	}
 
 	if (info->capacity != info->original_capacity) {
-		dprintf("scsi_cd: adjusted capacity from %llu to %llu blocks.\n",
-			info->original_capacity, info->capacity);
+		dprintf("scsi_cd: adjusted capacity from %" B_PRIu64 " to %" B_PRIu64
+			" blocks.\n", info->original_capacity, info->capacity);
 	}
 
 	return B_OK;
@@ -205,10 +206,8 @@ get_geometry(cd_handle *handle, device_geometry *geometry)
 	if (status == B_DEV_MEDIA_CHANGED)
 		return B_DEV_MEDIA_CHANGED;
 
-	geometry->bytes_per_sector = info->block_size;
-	geometry->sectors_per_track = 1;
-	geometry->cylinder_count = info->capacity;
-	geometry->head_count = 1;
+	devfs_compute_geometry_size(geometry, info->capacity, info->block_size);
+
 	geometry->device_type = info->device_type;
 	geometry->removable = info->removable;
 
@@ -981,7 +980,8 @@ cd_set_capacity(cd_driver_info* info, uint64 capacity, uint32 blockSize)
 		}
 
 		if (info->block_size != 0) {
-			dprintf("old %ld, new %ld\n", info->block_size, blockSize);
+			dprintf("old %" B_PRId32 ", new %" B_PRId32 "\n", info->block_size,
+				blockSize);
 			panic("updating DMAResource not yet implemented...");
 		}
 

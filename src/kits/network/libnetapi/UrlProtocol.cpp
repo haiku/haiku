@@ -28,9 +28,9 @@ static const char* kProtocolThreadStrStatus[B_PROT_THREAD_STATUS__END+1]
 
 
 BUrlProtocol::BUrlProtocol(const BUrl& url, BUrlProtocolListener* listener,
-	BUrlContext* context, BUrlResult* result, const char* threadName, 
+	BUrlContext* context, BUrlResult* result, const char* threadName,
 	const char* protocolName)
-	: 
+	:
 	fUrl(url),
 	fResult(result),
 	fContext(context),
@@ -40,6 +40,11 @@ BUrlProtocol::BUrlProtocol(const BUrl& url, BUrlProtocolListener* listener,
 	fThreadId(0),
 	fThreadName(threadName),
 	fProtocol(protocolName)
+{
+}
+
+
+BUrlProtocol::~BUrlProtocol()
 {
 }
 
@@ -56,20 +61,20 @@ BUrlProtocol::Run()
 			"[urlProtocol=%p]!\n", this));
 		return fThreadId;
 	}
-		
-	fThreadId = spawn_thread(BUrlProtocol::_ThreadEntry, fThreadName, 
+
+	fThreadId = spawn_thread(BUrlProtocol::_ThreadEntry, fThreadName,
 		B_NORMAL_PRIORITY, this);
-	
+
 	if (fThreadId < B_OK)
 		return fThreadId;
-	
+
 	status_t launchErr = resume_thread(fThreadId);
 	if (launchErr < B_OK) {
-		PRINT(("BUrlProtocol::Run() : Failed to resume thread %ld\n", 
+		PRINT(("BUrlProtocol::Run() : Failed to resume thread %ld\n",
 			fThreadId));
 		return launchErr;
 	}
-		
+
 	fRunning = true;
 	return fThreadId;
 }
@@ -96,11 +101,11 @@ BUrlProtocol::Stop()
 {
 	if (!fRunning)
 		return B_ERROR;
-			
+
 	status_t threadStatus = B_OK;
 	fQuit = true;
-	
-	wait_for_thread(fThreadId, &threadStatus);	
+
+	wait_for_thread(fThreadId, &threadStatus);
 	return threadStatus;
 }
 
@@ -114,7 +119,7 @@ BUrlProtocol::SetUrl(const BUrl& url)
 	// We should avoid to change URL while the thread is running ...
 	if (IsRunning())
 		return B_ERROR;
-		
+
 	fUrl = url;
 	return B_OK;
 }
@@ -125,7 +130,7 @@ BUrlProtocol::SetResult(BUrlResult* result)
 {
 	if (IsRunning())
 		return B_ERROR;
-		
+
 	fResult = result;
 	return B_OK;
 }
@@ -133,10 +138,10 @@ BUrlProtocol::SetResult(BUrlResult* result)
 
 status_t
 BUrlProtocol::SetContext(BUrlContext* context)
-{	
+{
 	if (IsRunning())
 		return B_ERROR;
-		
+
 	fContext = context;
 	return B_OK;
 }
@@ -147,7 +152,7 @@ BUrlProtocol::SetListener(BUrlProtocolListener* listener)
 {
 	if (IsRunning())
 		return B_ERROR;
-		
+
 	fListener = listener;
 	return B_OK;
 }
@@ -221,23 +226,23 @@ BUrlProtocol::StatusString(status_t threadStatus) const
 
 
 // #pragma mark Thread management
- 
+
 
 /*static*/ int32
 BUrlProtocol::_ThreadEntry(void* arg)
 {
-	BUrlProtocol* urlProtocol = reinterpret_cast<BUrlProtocol*>(arg);	
+	BUrlProtocol* urlProtocol = reinterpret_cast<BUrlProtocol*>(arg);
 	urlProtocol->fThreadStatus = B_PROT_RUNNING;
-	
+
 	status_t protocolLoopExitStatus = urlProtocol->_ProtocolLoop();
-		
+
 	urlProtocol->fRunning = false;
 	urlProtocol->fThreadStatus = protocolLoopExitStatus;
-	
+
 	if (urlProtocol->fListener != NULL)
-		urlProtocol->fListener->RequestCompleted(urlProtocol, 
+		urlProtocol->fListener->RequestCompleted(urlProtocol,
 			protocolLoopExitStatus == B_PROT_SUCCESS);
-	
+
 	return B_OK;
 }
 
@@ -248,13 +253,13 @@ BUrlProtocol::_ProtocolLoop()
 	// Dummy _ProtocolLoop
 	while (!fQuit)
 		snooze(1000);
-		
+
 	return B_PROT_SUCCESS;
 }
 
 
 void
-BUrlProtocol::_EmitDebug(BUrlProtocolDebugMessage type, 
+BUrlProtocol::_EmitDebug(BUrlProtocolDebugMessage type,
 	const char* format, ...)
 {
 	if (fListener == NULL)
@@ -262,7 +267,7 @@ BUrlProtocol::_EmitDebug(BUrlProtocolDebugMessage type,
 
 	va_list arguments;
 	va_start(arguments, format);
-	
+
 	char debugMsg[256];
 	vsnprintf(debugMsg, 256, format, arguments);
 	fListener->DebugMessage(this, type, debugMsg);
@@ -270,7 +275,7 @@ BUrlProtocol::_EmitDebug(BUrlProtocolDebugMessage type,
 }
 
 
-BMallocIO&			
+BMallocIO&
 BUrlProtocol::_ResultRawData()
 {
 	return fResult->fRawData;

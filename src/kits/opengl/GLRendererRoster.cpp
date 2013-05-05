@@ -1,9 +1,11 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2012 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Philippe Houdoin <philippe.houdoin@free.fr>
  */
+
 
 #include <driver_settings.h>
 #include <image.h>
@@ -20,17 +22,13 @@
 #include <string.h>
 
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-extern "C" status_t _kern_get_safemode_option(const char *parameter,
-        char *buffer, size_t *_bufferSize);
-#else
-extern "C" status_t _kget_safemode_option_(const char *parameter,
-        char *buffer, size_t *_bufferSize);
-#endif
+extern "C" status_t _kern_get_safemode_option(const char* parameter,
+	char* buffer, size_t* _bufferSize);
 
 
-GLRendererRoster::GLRendererRoster(BGLView *view, ulong options)
-	: fNextID(0),
+GLRendererRoster::GLRendererRoster(BGLView* view, ulong options)
+	:
+	fNextID(0),
 	fView(view),
 	fOptions(options),
 	fSafeMode(false),
@@ -39,24 +37,16 @@ GLRendererRoster::GLRendererRoster(BGLView *view, ulong options)
 	char parameter[32];
 	size_t parameterLength = sizeof(parameter);
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-	if (_kern_get_safemode_option(B_SAFEMODE_SAFE_MODE, parameter, &parameterLength) == B_OK)
-#else
-	if (_kget_safemode_option_(B_SAFEMODE_SAFE_MODE, parameter, &parameterLength) == B_OK)
-#endif
-	{
+	if (_kern_get_safemode_option(B_SAFEMODE_SAFE_MODE,
+		parameter, &parameterLength) == B_OK) {
 		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
 			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
 			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1"))
 			fSafeMode = true;
 	}
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-	if (_kern_get_safemode_option(B_SAFEMODE_DISABLE_USER_ADD_ONS, parameter, &parameterLength) == B_OK)
-#else
-	if (_kget_safemode_option_(B_SAFEMODE_DISABLE_USER_ADD_ONS, parameter, &parameterLength) == B_OK)
-#endif
-	{
+	if (_kern_get_safemode_option(B_SAFEMODE_DISABLE_USER_ADD_ONS,
+		parameter, &parameterLength) == B_OK) {
 		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
 			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
 			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1"))
@@ -90,7 +80,7 @@ GLRendererRoster::~GLRendererRoster()
 }
 
 
-BGLRenderer *
+BGLRenderer*
 GLRendererRoster::GetRenderer(int32 id)
 {
 	RendererMap::const_iterator iterator = fRenderers.find(id);
@@ -114,7 +104,8 @@ GLRendererRoster::AddDefaultPaths()
 		B_SYSTEM_ADDONS_DIRECTORY,
 	};
 
-	for (uint32 i = fSafeMode ? 4 : 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
+	for (uint32 i = fSafeMode ? 4 : 0;
+		i < sizeof(paths) / sizeof(paths[0]); i++) {
 		BPath path;
 		status_t status = find_directory(paths[i], &path, true);
 		if (status == B_OK && path.Append("opengl") == B_OK)
@@ -206,12 +197,14 @@ GLRendererRoster::CreateRenderer(const entry_ref& ref)
 	if (image < B_OK)
 		return image;
 
-	BGLRenderer *(*instantiate_renderer)(BGLView *view, ulong options, BGLDispatcher *dispatcher);
+	BGLRenderer* (*instantiate_renderer)
+		(BGLView* view, ulong options, BGLDispatcher* dispatcher);
 
 	status = get_image_symbol(image, "instantiate_gl_renderer",
 		B_SYMBOL_TYPE_TEXT, (void**)&instantiate_renderer);
 	if (status == B_OK) {
-		BGLRenderer *renderer = instantiate_renderer(fView, fOptions, new BGLDispatcher());
+		BGLRenderer* renderer
+			= instantiate_renderer(fView, fOptions, new BGLDispatcher());
 		if (!renderer) {
 			unload_add_on(image);
 			return B_UNSUPPORTED;
@@ -228,4 +221,3 @@ GLRendererRoster::CreateRenderer(const entry_ref& ref)
 
 	return status;
 }
-

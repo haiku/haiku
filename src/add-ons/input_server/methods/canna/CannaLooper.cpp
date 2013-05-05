@@ -109,8 +109,8 @@ CannaLooper::ReadSettings(char* basePath)
 
 	font_family family;
 	font_style style;
-	strcpy(family, "Haru");
-	strcpy(style, "Regular");
+	strcpy(family, "VL PGothic");
+	strcpy(style, "regular");
 
 	fKouhoFont.SetFamilyAndStyle(family, style);
 	fKouhoFont.SetSize(12);
@@ -178,6 +178,7 @@ CannaLooper::MessageReceived(BMessage* msg)
 				"  Copyright 1992 NEC Corporation, Tokyo, Japan\n"
 				"  Special thanks to T.Murai for porting\n",
 				"OK");
+			panel->SetFlags(panel->Flags() | B_CLOSE_ON_ESCAPE);
 			panel->Go();
 			break;
 		}
@@ -233,7 +234,7 @@ CannaLooper::_HandleKeyDown(BMessage* msg)
 	}
 
 	SERIAL_PRINT(("CannaLooper: HandleKeyDown() calling "
-		"CannaInterface::KeyIn()...\n", result));
+		"CannaInterface::KeyIn()...\n"));
 
 	uint32 result = fCanna->KeyIn(character, modifier, key);
 

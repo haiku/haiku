@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <errno_private.h>
 #include <user_group.h>
 
 /* use pwents to find home */
@@ -169,7 +170,7 @@ create_path(const char *path, mode_t mode)
 
 		strlcpy(buffer, path, i + 1);
 		if (stat(buffer, &st) < 0) {
-			errno = 0;
+			__set_errno(0);
 			if (mkdir(buffer, mode) < 0)
 				return errno;
 		}

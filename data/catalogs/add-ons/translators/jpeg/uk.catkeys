@@ -1,22 +1,21 @@
 1	ukrainian	x-vnd.Haiku-JPEGTranslator	965709535
-About	JPEGTranslator		Про
-Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Формат Be Bitmap (Перетворювач JPEG)
-High	JPEGTranslator		Високе
-JPEG Library Error: %s\n	be_jerror		Помилка бібліотеки JPEG: %s\n
-JPEG Library Warning: %s\n	be_jerror		Попередження бібліотеки JPEG: %s\n
+Output quality	JPEGTranslator		Вихідна якість
 JPEG images	JPEGTranslator		Зображення JPEG
+Prevent colors 'washing out'	JPEGTranslator		попереджати втрату 'насичення' кольорів
+JPEG Library Error: %s\n	be_jerror		Помилка бібліотеки JPEG: %s\n
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Використовувати код CMYK 0 для 100% охоплення чорнила
+About	JPEGTranslator		Про
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\n На основі бібліотеки IJG © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nз заплаткою для \"lossless\" кодування Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nЗ деякою зміною передачі кольору від Magnus Hellman\n\thttp://www.bebits.com/app/802\n
 Low	JPEGTranslator		Низьке
 Make file smaller (sligthtly worse quality)	JPEGTranslator		Зробити файл меньшим (можлива втрата якості)
 None	JPEGTranslator		Жоден
-Output quality	JPEGTranslator		Вихідна якість
-Output smoothing strength	JPEGTranslator		Інтенсивність зглажування
-Prevent colors 'washing out'	JPEGTranslator		попереджати втрату 'насичення' кольорів
-Read	JPEGTranslator		Читати
-Read greyscale images as RGB32	JPEGTranslator		Читати сірі зображення як RGB32
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Формат Be Bitmap (Перетворювач JPEG)
 Show warning messages	JPEGTranslator		Показувати попередження
-Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Використовувати код CMYK 0 для 100% охоплення чорнила
-Use progressive compression	JPEGTranslator		Використовувати прогресивний зтиск
+Output smoothing strength	JPEGTranslator		Інтенсивність зглажування
+High	JPEGTranslator		Високе
 Write	JPEGTranslator		Записати
 Write black-and-white images as RGB24	JPEGTranslator		Записувати чорно-білі зображення як RGB24
-©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\n На основі бібліотеки IJG © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nз заплаткою для \"lossless\" кодування Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nЗ деякою зміною передачі кольору від Magnus Hellman\n\thttp://www.bebits.com/app/802\n
-
+Read greyscale images as RGB32	JPEGTranslator		Читати сірі зображення як RGB32
+Read	JPEGTranslator		Читати
+JPEG Library Warning: %s\n	be_jerror		Попередження бібліотеки JPEG: %s\n
+Use progressive compression	JPEGTranslator		Використовувати прогресивний зтиск

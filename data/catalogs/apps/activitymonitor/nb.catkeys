@@ -1,48 +1,48 @@
-1	norwegian_bokmål	x-vnd.Haiku-ActivityMonitor	3704566709
-%.1f KB/s	DataSource		%.1f KB/s
-%.1f MB	DataSource		%.1f MB
-%.1f faults/s	DataSource		%.1f feil/s
-%lld ms	SettingsWindow		%lld ms
-%lld sec.	SettingsWindow		%lld sek.
-ActivityMonitor	System name		Aktivitetsoversikt
-Add graph	ActivityWindow		Legg til graf
-Additional items	ActivityView		Tilleggsobjekter
-Apps	DataSource		Programmer
-Block cache	DataSource		Blokk-hurtigbuffer
-Block cache memory	DataSource		Blokkhurtigbufferminne
-CPU	DataSource		CPU
-CPU usage	DataSource		CPU-bruk
-CPU usage (combined)	DataSource		CPU-bruk (sammenlagt)
-Cache	DataSource		Hurtigbuffer
-Cached memory	DataSource		Hurtigbufferminne
-File	ActivityWindow		Fil
-Hide legend	ActivityView		Skjul forklaring
-MB	DataSource		MB
-Media nodes	DataSource		Medianoder
-Memory	DataSource		Minne
-Network receive	DataSource		Mottatt nettverk
-Network send	DataSource		Sendt nettverk
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-ActivityMonitor	3704566709
 P-faults	DataSource		P-feil
-Page faults	DataSource		Sidefeil
-Ports	DataSource		Porter
-Quit	ActivityWindow		Avslutt
-RX	DataSource	Shorter version for Receiving.	RX
-Raw clipboard	DataSource		Data på utklippstavle
+Media nodes	DataSource		Medianoder
+Threads	DataSource		Tråder
+MB	DataSource		MB
+Add graph	ActivityWindow		Legg til graf
+Teams	DataSource		Lag
+Hide legend	ActivityView		Skjul forklaring
+Network send	DataSource		Sendt nettverk
+CPU usage (combined)	DataSource		CPU-bruk (sammenlagt)
+CPU	DataSource		CPU
+Used memory	DataSource		Brukt minne
+Cached memory	DataSource		Hurtigbufferminne
+Apps	DataSource		Programmer
+Show legend	ActivityView		Vis forklaring
+Text clipboard	DataSource		Tekst på utklippstavle
+Settings	ActivityWindow		Innstillinger
 Receiving	DataSource		Mottar
+Settings…	ActivityWindow		Innstillinger...
+Ports	DataSource		Porter
+Page faults	DataSource		Sidefeil
+Sending	DataSource		Sender
+Cache	DataSource		Hurtigbuffer
+%.1f faults/s	DataSource		%.1f feil/s
+Update time interval:	SettingsWindow		Oppdateringsintervall:
+TX	DataSource	Shorter version for Sending	TX
+Quit	ActivityWindow		Avslutt
+Block cache memory	DataSource		Blokkhurtigbufferminne
 Remove graph	ActivityView		Fjern graf
+%.1f MB	DataSource		%.1f MB
+%lld sec.	SettingsWindow		%lld sek.
+%lld ms	SettingsWindow		%lld ms
+CPU usage	DataSource		CPU-bruk
+Raw clipboard	DataSource		Data på utklippstavle
+Sems	DataSource		Semaforer
+ActivityMonitor	System name		Aktivitetsoversikt
 Running applications	DataSource		Kjørende programmer
 Semaphores	DataSource		Semaforer
-Sems	DataSource		Semaforer
-Sending	DataSource		Sender
-Settings	ActivityWindow		Innstillinger
-Settings…	ActivityWindow		Innstillinger...
-Show legend	ActivityView		Vis forklaring
-Swap	DataSource		Utveksling
+Block cache	DataSource		Blokk-hurtigbuffer
 Swap space	DataSource		Veksleminne
-TX	DataSource	Shorter version for Sending	TX
-Teams	DataSource		Lag
-Text clipboard	DataSource		Tekst på utklippstavle
-Threads	DataSource		Tråder
-Update time interval:	SettingsWindow		Oppdateringsintervall:
-Used memory	DataSource		Brukt minne
+Swap	DataSource		Utveksling
+File	ActivityWindow		Fil
 usage	DataSource		bruk
+Additional items	ActivityView		Tilleggsobjekter
+Network receive	DataSource		Mottatt nettverk
+%.1f KB/s	DataSource		%.1f KB/s
+Memory	DataSource		Minne
+RX	DataSource	Shorter version for Receiving.	RX

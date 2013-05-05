@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Adriano Duarte
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Correio Eletrônico</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../../fr/preferences/e-mail.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/preferences/e-mail.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/preferences/e-mail.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/preferences/e-mail.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/preferences/e-mail.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/preferences/e-mail.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/preferences/e-mail.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/preferences/e-mail.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/preferences/e-mail.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/preferences/e-mail.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/preferences/e-mail.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/preferences/e-mail.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/preferences/e-mail.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../ca/preferences/e-mail.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../../en/preferences/e-mail.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="deskbar.html">Deskbar</a> 
+::  <a href="../preferences.html" class="uplink">Preferências</a> 
+::  <a href="filetypes.html">Tipos de Arquivos</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Índice</td></tr>
+<tr class="index"><td>
+	<a href="#creating">Criando uma nova conta de correio</a><br />
+	<a href="#account-settings">Definições de conta</a><br />
+	<a href="#incoming">Configurando a entrada de correio</a><br />
+	<a href="#outgoing">Configurando a saída de correio</a><br />
+	<a href="#filters">Notificações e filtros de correio</a><br />
+	<a href="#settings">Configurando um Serviço de Correio</a>
+</td></tr>
+</table>
+
+<h2><img src="../../images/prefs-images/e-mail-icon_64.png" alt="e-mail-icon_64.png" width="64" height="64" />Correio Eletrônico</h2>
+<table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferências</span></td></tr>
+<tr><td>Localização:</td><td></td><td><span class="path">/boot/system/preferences/E-mail</span></td></tr>
+<tr><td>Configurações:</td><td></td><td><span class="path">~/config/settings/Mail/*</span></td></tr>
+</table>
+<p>O Haiku provê um sistema que recupera correio eletrônico regularmente através de um Serviço de Correio Eletrônico (também conhecido como mail_daemon) e salva cada mensagem como um arquivo de texto simples. Ele analisa a mensagem e preenche seus atributos com todas as informações principais e necessárias, como De, Para, Assunto e seu status de não lido. Agora ele pode ser consultado por você ou por qualquer aplicativo. Este sistema também torna fácil alternar clientes de correio eletrônico como todos os dados e sua configuração permanece a mesma.<br />
+A configuração é feita no painel Preferências de Correio Eletrônico.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="creating" name="creating">Criando uma nova conta de correio</a></h2>
+<p>Vamos passar pelo processo de definir uma conta de correio eletrônico.<br />
+Comece clicando no botão <span class="button">Adicionar</span> para criar uma conta nova, sem nome. Isto abre um painel onde você preenche as informações de sua conta:</p>
+<img src="../images/prefs-images/e-mail-new-account.png" alt="e-mail-new-account.png" />
+<p>Primeiro, defina como receber seu correio,  via <span class="menu">POP3</span> ou <span class="menu">IMAP</span>.</p>
+<p>Agora entre com seu <i>Endereço de Correio Eletrônico</i>, <i>Nome de Autenticação</i> e <i>Senha</i>, dê um <i>Nome da Conta</i> sob o qual será conhecido no Haiku e seu <i>Nome verdadeiro</i>.</p>
+<p>Se sua conta é de um provedor de correio eletrônico de grande porte, o Haiku já conhece todos os detalhes técnicos como endereços IP do servidor. Se não for o caso, clicar <span class="button">Próximo</span> abrirá outra janela para entrar com esta informação manualmente:</p>
+<img src="../images/prefs-images/e-mail-new-account-2.png" alt="e-mail-new-account-2.png" />
+<p>Primeiro defina o <i>Nome do Servidor</i>, <i>Tipo de autenticação</i> e <i>Tipo de conexão</i> para a caixa de entrada, abaixo os dados para a caixa de saída. As informações necessárias são encontradas no sítio web do seu provedor de correio eletrônico.<br />
+Veja abaixo mais informações sobre as várias definições e opções adicionais.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="account-settings" name="account-settings">Definições de conta</a></h2>
+<p>Selecionando o nome de uma conta na lista à esquerda, pode-se mudar algumas definições gerais:</p>
+<img src="../images/prefs-images/e-mail-accounts.png" alt="e-mail-accounts.png" />
+<p>O <i>Nome da conta</i> é o nome que é mostrado, por exemplo, na lista de contas nas Preferências de Correio Eletrônico. <i>Nome verdadeiro</i> é o nome que alguém vê quando ele recebe uma mensagem sua. <i>Endereço de resposta</i> é o endereço de correio eletrônico que é utilizado quando alguém responde sua mensagem. Normalmente é o mesmo endereço de onde você enviou sua mensagem.</p>
+<p>Se deseja utilizar uma conta de correio para apenas enviar ou apenas receber mensagens, pode-se a (des)ativar aquela utilização clicando com o botão direito do mouse no nome da conta na lista da esquerda para definir as caixas de seleção de acordo com sua escolha.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="incoming" name="incoming">Mais sobre configurar a entrada de correio</a></h2>
+<p>Clique em <span class="menu">Entrada</span> sob o nome da sua conta para configurar como as mensagens são recebidas.</p>
+<img src="../images/prefs-images/e-mail-in.png" alt="e-mail-in.png" />
+<p>Primeiro é o endereço do <span class="menu">Servidor de correio</span> para mensagens recebidas. Se seu provedor necessita que você logue em uma porta específica, adicione-a ao endereço, separada por dois pontos. Por exemplo, <tt>pop.your-provider.org:1400</tt>.</p>
+<p>Então entre com seus dados de autenticação, <i>Nome de autenticação</i> e <i>Senha</i>, e se necessário altere o <i>Tipo de autenticação</i> do padrão <span class="menu">Texto simples</span> para <span class="menu">APOP</span>.</p>
+<p>Se utilizar <i>POP3</i> recuperar mensagens destas conta a partir de diferentes computadores, você pode querer ativar a opção para <span class="menu">Deixar correio no servidor</span> e somente <span class="menu">Remover correio do servidor quando eliminado</span> localmente.</p>
+<p>Se utilizar <i>IMAP</i> ao invés disso, existe a opção para <span class="menu">Remover correio do servidor quando eliminado</span> localmente. Pode-se especificar <span class="menu">Pastas IMAP</span> para apenas sincronizar com uma pasta específica e suas subpastas.</p>
+<p>Igualmente, pode-se optar por somente <span class="menu">Baixar parcialmente mensagens maiores que</span> um determinado tamanho. Isto irá apenas obter o cabeçalho e pode-se decidir se deseja baixar o restante da mensagem mais possíveis anexos após ver o assunto e quem enviou. Útil caso tenha uma conexão lenta.</p>
+<p>Pode-se mudar o <i>Destino</i> da sua Caixa de Entrada (padrão: <span class="path">/boot/home/mail/in/</span>), o que é útil se deseja separar as mensagens de diferentes contas para suas próprias pastas. Contudo, consultas permitem ordenar as coisas muito bem.</p>
+
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="outgoing" name="outgoing">Mais sobre configurar a saída de correio</a></h2>
+<p>Clique em <span class="menu">Saída</span> abaixo do nome da sua conta para configurar como as mensagens são enviadas.</p>
+<img src="../images/prefs-images/e-mail-out.png" alt="e-mail-out.png" />
+<p>Primeiro é o endereço do <i>Servidor SMTP</i> para mensagens enviada. Assim como o servidor de entrada anterior, pode-se usar uma porta específica se necessário, por exemplo <tt>mail.your-provider.org:1200</tt>.</p>
+<p>Se precisa autenticar-se, modifique o <i>Tipo de Autenticação</i> para <span class="menu">ESMTP</span> e entre com o nome de usuário e senha acima. O outro tipo é usado para provedores que precisam de checagem por correio com <span class="menu">POP3 antes de SMTP</span> para identificação.</p>
+<p>Assim como o correio de entrada, pode-se também mudar o <i>Destino</i> da caixa de saída (padrão: <span class="path">/boot/home/mail/out/</span>).</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="filters" name="filters">Notificações e outros filtros de correio</a></h2>
+<p>Notificações para mensagens recém-chegadas e métodos de ordenar e filtrar o correio são encontrados em <span class="menu">Filtros de Correio Eletrônico</span> sob um nome de conta. Pode-se adicionar qualquer número de filtros que são aplicados um após o outro e rearranjá-los arrastando e soltando-os para sua nova posição.<br />
+Atualmente existem três <span class="menu">Filtros de Correio Recebido</span> que poderá adicionar. Após adicionar um filtro, selecione-o para ver suas opções.</p>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+Filtro de Spam (AGMS Bayesiano)</h3>
+<img src="../images/prefs-images/e-mail-filter-spam.png" alt="e-mail-filter-spam.png" />
+<p>O filtro de mensagens indesejadas utiliza métodos estatísticos para classificar uma mensagem como indesejada. Ele atribui um valor entre zero e 1 a ela e pode-se decidir o que são os limites para uma mensagem genuína e que será considerado indesejado.<br />
+Pode-se ter aquela classificação de spam adicionada ao início do assunto.<br />Igualmente, o filtro de mensagens indesejadas pode aprender de todo o correio de entrada. Naturalmente, terá que ensiná-lo a ordenar os falso positivos, correios que foram erroneamente marcados como indesejados. Encontrará mais sobre o assunto quando discutirmos o aplicativo <span class="app">Correio</span>.</p>
+<p>Junto com o <span class="menu">Filtro de Regra</span> seguinte, você será capaz de automaticamente ordenar correios indesejados detectados.</p>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+Filtro de regra</h3>
+<img src="../images/prefs-images/e-mail-filter-header.png" alt="e-mail-filter-header.png" />
+<p>Este filtro compara o cabeçalho da mensagem a um padrão de pesquisa e realiza alguma ação de acordo com as regras definidas.<br />
+Com o primeiro campo de texto especifique qual cabeçalho verificar. Estes estão disponíveis:</p>
+<table summary="match header" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><span class="menu">Nome</span></td><td style="width:5px;"> </td>
+		<td>o nome do remetente</td></tr>
+	<tr><td><span class="menu">De</span></td><td> </td>
+		<td>o endereço de correio do remetente</td></tr>
+	<tr><td><span class="menu">Para</span></td><td> </td>
+		<td>seu endereço de correio (diferente para cada conta de correio)</td></tr>
+	<tr><td><span class="menu">Responder para</span></td><td> </td>
+		<td>o endereço de correio para o qual são enviadas respostas</td></tr>
+	<tr><td><span class="menu">Quando</span></td><td> </td>
+		<td>a data e hora que o correio foi recebido</td></tr>
+	<tr><td><span class="menu">Assunto</span></td><td> </td>
+		<td>a linha de assunto</td></tr>
+	<tr><td><span class="menu">Com cópia para</span></td><td> </td>
+		<td>endereços de qualquer pessoa que receba uma cópia (Cc)</td></tr>
+	<tr><td><span class="menu">Conta</span></td><td> </td>
+		<td>o nome da conta de correio</td></tr>
+	<tr><td><span class="menu">Status</span></td><td> </td>
+		<td>O status atual do correio. Normalmente, este pode ser "Lido", "Respondido", "Enviado", "Encaminhado", "Novo", ou qualquer coisa que você mesmo tenha definido. Contudo, a menos que você mesmo tenha mudado num filtro, ele sempre será "Novo" após o Serviço de Correio ter buscado a mensagem.</td></tr>
+	<tr><td><span class="menu">Prioridade</span></td><td> </td>
+		<td>é definido pelo programa de correio do remetente (por exemplo, "urgente")</td></tr>
+	<tr><td><span class="menu">Tarefa</span></td><td> </td>
+		<td>essencialmente o mesmo que "Assunto", mas sem coisas como Re: ou Fwd:</td></tr>
+	<tr><td><span class="menu">Grupo de classificação</span></td><td> </td>
+		<td>dependendo em como o filtro de correio indesejado o classificou, isto irá ou ser vazio (se incerto) ou conter a palavra "Genuíno" ou "Spam"</td></tr>
+	<tr><td class="onelinetop"><span class="menu">Estimativa de Spam/Genuíno </span></td><td> </td>
+		<td>esta é uma estimativa numérica que o filtro de correio indesejado atribui ao correio. Eles são exibidos em notação científica, onde 1.065e-12 se traduz em 1.065 dividido por 10 à 12ª potência, o que neste caso significa 0.000000000001065.</td></tr>
+</table>
+<p>O segundo campo de texto abriga seu padrão de pesquisa. Ele aceita <a href="http://pt.wikipedia.org/wiki/Express%C3%A3o_regular" class="external free" title="Wikipedia: Expressão Regular" rel="nofollow">expressões regulares</a> os quais lhe dá grande flexibilidade, enquanto infelizmente complica um pouco as coisas. Leia um pouco sobre o assunto, vale a pena e padrões de pesquisa simples não são <i>tão</i> complicados assim.</p>
+<p>Com o menu pop-up abaixo dele, atribua uma ação quando o padrão corresponder. Pode-se mover ou eliminar uma mensagem, definir o status para "Lido" ou qualquer outra coisa ou definir a conta de correio que usará para responder.</p>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+Notificação de novos correios</h3>
+<img src="../images/prefs-images/e-mail-filter-notification.png" alt="e-mail-filter-notification.png" />
+<p>Existem diversos modos para escolher ser notificado de mensagens recém-chegadas. Em <span class="menu">Método</span> encontra-se um número de opções que podem ser combinadas como segue:</p>
+<table summary="notofications" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><span class="menu">nenhum</span></td><td style="width:5px;"> </td>
+		<td>Nenhuma notificação</td></tr>
+	<tr><td><span class="menu">Bip</span></td><td> </td>
+		<td>Toca o arquivo de som do evento "Novo Correio" definido nas preferências de <a href="sounds.html">Sons</a> para <i>todo</i> novo correio</td></tr>
+	<tr><td><span class="menu">Alerta</span></td><td> </td>
+		<td>Exibe uma janela de alerta para <i>todo</i> novo correio</td></tr>
+	<tr><td><span class="menu">LEDs do teclado</span></td><td> </td>
+		<td>Pisca alguns LEDs como o indicador de trava de maiúscula</td></tr>
+	<tr><td class="onelinetop"><span class="menu">Alerta central</span></td><td> </td>
+		<td>Exibe <i>uma</i> janela de alerta para todos os novos correios</td></tr>
+	<tr><td><span class="menu">Bip central</span></td><td> </td>
+		<td>Toca o arquivo de som do evento "Novo Correio" definido nas preferências de <a href="sounds.html">Sons</a> <i>uma vez</i> para novos correios</td></tr>
+	<tr><td><span class="menu">Janela de Relatório</span></td><td> </td>
+		<td>Exibe a janela de relatório</td></tr>
+</table>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+Filtros de Saída de Correio</h3>
+<p>Neste momento, existe apenas um filtro que trata com o correio recebido: <span class="cli">biscoito da sorte</span>.
+<br />Ele irá anexar um engraçado ou sábio "biscoito da sorte" escolhido aleatoriamente no final de cada correio antes de ser enviado. Pode-se experimentá-lo digitando o comando <span class="cli">fortune</span> num Terminal.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="settings" name="settings">Configurando um Serviço de Correio</a></h2>
+<p>Agora que seus servidores de entrada e saída de correio (e talvez alguns filtros também) estão configurados, diga ao Serviço de Correio que faça toda a verificação e busca, como é o seu trabalho.</p>
+<img src="../images/prefs-images/e-mail-settings.png" alt="e-mail-settings.png" />
+<p>Em <i>Verificação de correio</i> configure o intervalo no qual o servidor da conta de correio é sondado sobre novas mensagens.<br />
+Se estiver em uma conexão discada, pode desejar fazer com que acesse <span class="menu">Apenas quando a conexão discada estiver conectada</span> e também <span class="menu">Agendar correio enviado quando a conexão discada estiver conectada</span> para evitar discar automaticamente com regularidade apenas para verificar o correio.</p>
+<p>O serviço de Correio tem uma janela de status a qual pode ser definida para ser exibida <span class="menu">Nunca</span>, <span class="menu">Enquanto estiver enviando</span>, <span class="menu">Enquanto estiver enviando e recebendo</span> ou <span class="menu">Sempre</span>.</p>
+<p>Certifique-se de <span class="menu">Carregar os serviços de correio na inicialização</span> ou não haverá mail_daemon executando para atender seu pedido...</p>
+<img src="../images/prefs-images/e-mail-mailbox.png" alt="e-mail-mailbox.png" />
+<p><span class="menu">Editar menu da caixa de correio...</span> irá abrir a pasta <span class="path">/boot/home/config/Mail/Menu Links/</span>. Todas as pastas ou consultas (!) ou seus vínculos colocados nesta pasta irão aparecer no menu de contexto do ícone da caixa de correio de Serviços de Correio na bandeja da Deskbar.</p>
+<p>A partir daquele menu, pode-se também <span class="menu">Criar nova mensagem...</span>, <span class="menu">Verificar mensagens agora</span> ou editar as <span class="menu">Preferências...</span>.</p>
+<p>Se segurar a tecla <span class="key">SHIFT</span> quando chamar o menu de contexto, obterá comandos adicionais:</p>
+<table summary="notofications" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><span class="menu">Checar apenas por correios</span></td><td style="width:5px;"> </td>
+		<td>Oferece um submenu para verificar apenas uma conta específica</td></tr>
+	<tr><td><span class="menu">Enviar correios pendentes</span></td><td> </td>
+		<td>Permite enviar correios pendentes sem  verificar também novas mensagens</td></tr>
+	<tr><td><span class="menu">Desligar serviços de correio</span></td><td> </td>
+		<td>Desliga toda a infraestrutura de correio eletrônico (mail_daemon)</td></tr>
+</table>
+<p>O ícone da caixa de correio por si mesma mostra se existem mensagens não lidas (status "Novo") quando existem envelopes dentro.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="deskbar.html">Deskbar</a> 
+::  <a href="../preferences.html" class="uplink">Preferências</a> 
+::  <a href="filetypes.html">Tipos de Arquivos</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

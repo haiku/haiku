@@ -186,7 +186,11 @@ HIDDevice::HIDDevice(usb_device device, const usb_configuration_info *config,
 		return;
 	}
 
-	fTransferBuffer = (uint8 *)malloc(fTransferBufferSize);
+	// We pad the allocation size so that we can always read 32 bits at a time
+	// (as done in HIDReportItem) without the need for an additional boundary
+	// check. We don't increase the transfer buffer size though as to not expose
+	// this implementation detail onto the device when scheduling transfers.
+	fTransferBuffer = (uint8 *)malloc(fTransferBufferSize + 3);
 	if (fTransferBuffer == NULL) {
 		TRACE_ALWAYS("failed to allocate transfer buffer\n");
 		fStatus = B_NO_MEMORY;
@@ -269,7 +273,8 @@ HIDDevice::MaybeScheduleTransfer()
 	status_t result = gUSBModule->queue_interrupt(fInterruptPipe,
 		fTransferBuffer, fTransferBufferSize, _TransferCallback, this);
 	if (result != B_OK) {
-		TRACE_ALWAYS("failed to schedule interrupt transfer 0x%08lx\n", result);
+		TRACE_ALWAYS("failed to schedule interrupt transfer 0x%08" B_PRIx32 "\n",
+			result);
 		return result;
 	}
 

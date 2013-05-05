@@ -45,6 +45,8 @@ struct fd_info {
 	fssh_ino_t	node;
 };
 
+struct vnode;
+
 /* macro to allocate a iovec array on the stack */
 #define IOVECS(name, size) \
 	uint8_t _##name[sizeof(fssh_iovecs) + (size)*sizeof(fssh_iovec)]; \
@@ -69,7 +71,7 @@ void			vfs_vnode_to_node_ref(void *_vnode, fssh_mount_id *_mountID,
 					fssh_vnode_id *_vnodeID);
 
 fssh_status_t	vfs_lookup_vnode(fssh_mount_id mountID, fssh_vnode_id vnodeID,
-					void **_vnode);
+					struct vnode **_vnode);
 void			vfs_put_vnode(void *vnode);
 void			vfs_acquire_vnode(void *vnode);
 fssh_status_t	vfs_get_cookie_from_fd(int fd, void **_cookie);

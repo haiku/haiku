@@ -1,54 +1,54 @@
 1	slovak	x-vnd.Be-PSRV	1761631281
-A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Tlačiareň s týmto názvom už existuje, ale nie je vôbec použiteľná! Nahradiť?
-A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Tlačiareň s týmto názvom už existuje, ale jej ovládač nebol nájdený! Nahradiť?
-A0	ConfigWindow	ISO 216 paper size	A0
-A1	ConfigWindow	ISO 216 paper size	A1
-A2	ConfigWindow	ISO 216 paper size	A2
-A3	ConfigWindow	ISO 216 paper size	A3
-A4	ConfigWindow	ISO 216 paper size	A4
-A5	ConfigWindow	ISO 216 paper size	A5
-A6	ConfigWindow	ISO 216 paper size	A6
-All pages	ConfigWindow		Všetky stránky
-All pages, %1 copies	ConfigWindow		Všetky strany, %1 kópií
-B5	ConfigWindow	ISO 216 paper size	B5
-Cancel	ConfigWindow		Zrušiť
-Cancel	PrintServerApp		Zrušiť
-Create a new printer	PrintServerApp Scripting		Vytvoriť novú tlačiareň
-Delete a specific printer	PrintServerApp Scripting		Zmazať konkrétnu tlačiareň
-Get comments about this printer	Printer Scripting		Získať komentáre o tejto tlačiarni
+Undefined	ConfigWindow		Nedefinované
+Return the number of available transports	PrintServerApp Scripting		Vrátiť počet dostupných transportov
+Return the number of available printers	PrintServerApp Scripting		Vrátiť počet dostupných tlačiarní
 Get currently available ports/devices	Transport Scripting		Zistiť práve dostupné porty/zariadenia
-Get name of printer	Printer Scripting		Získať názov tlačiarne
-Get name of the printer add-on used for this printer	Printer Scripting		Zistiť názov doplnku tejto tlačiarene
-Get name of the transport add-on used for this printer	Printer Scripting		Získať názov transportného doplnku tejto tlačiarne
-Get name of transport	Transport Scripting		Získať názov transportu
-Get the transport configuration for this printer	Printer Scripting		Získať transportnú konfiguráciu tejto tlačiarne
-Landscape	ConfigWindow		Krajinka
-Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	ANSI B (ledger)
-Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
-Letter	ConfigWindow	ANSI A (letter), a North American paper size	ANSI A (letter)
-No	PrintServerApp		Nie
-OK	ConfigWindow		OK
-OK	PrintServerApp		OK
-Page %1 to %2	ConfigWindow		Strany %1 až %2
-Page %1 to %2, %3 copies	ConfigWindow		Strany %1 až %2, %3 kópií
-Page setup	ConfigWindow		Nastavenie stránky
-Page setup:	ConfigWindow		Nastavenie stránky:
-Paper setup:	ConfigWindow		Nastavenie papiera:
-Portrait	ConfigWindow		Portrét
-Print setup	ConfigWindow		Nastavenie tlače
-Printer server	ConfigWindow		Tlačový server
-Printer:	ConfigWindow		Tlačiareň:
-Retrieve a specific printer	PrintServerApp Scripting		Zistiť konkrétnu tlačiareň
-Retrieve a specific transport	PrintServerApp Scripting		Získať konkrétny transport
 Retrieve or select the active printer	PrintServerApp Scripting		Zistiť alebo vybrať aktívnu tlačiareň
-Return the number of available printers	PrintServerApp Scripting		Vrátiť počet dostupných tlačiarní:
-Return the number of available transports	PrintServerApp Scripting		Vrátiť počet dostupných transportov:
+Cancel	PrintServerApp		Zrušiť
+Retrieve a specific printer	PrintServerApp Scripting		Zistiť konkrétnu tlačiareň
+Page %1 to %2	ConfigWindow		Strany %1 až %2
+Get name of the printer add-on used for this printer	Printer Scripting		Zistiť názov doplnku tejto tlačiarene
+Page setup:	ConfigWindow		Nastavenie stránky:
+OK	ConfigWindow		OK
+Cancel	ConfigWindow		Zrušiť
+Printer server	ConfigWindow		Tlačový server
+Page %1 to %2, %3 copies	ConfigWindow		Strany %1 až %2, %3 kópií
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Tlačiareň s týmto názvom už existuje, ale jej ovládač nebol nájdený! Nahradiť?
+Yes	PrintServerApp		Áno
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	ANSI B (ledger)
+Would you like to set one up now?	PrintServerApp		Chcete ju teraz nastaviť?
+A6	ConfigWindow	ISO 216 paper size	A6
+Portrait	ConfigWindow		Portrét
+All pages	ConfigWindow		Všetky stránky
+There is no default printer set up.	PrintServerApp		Predvolená tlačiareň nie je nastavená.
+B5	ConfigWindow	ISO 216 paper size	B5
+A0	ConfigWindow	ISO 216 paper size	A0
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	ANSI A (letter)
+Printer:	ConfigWindow		Tlačiareň:
+A2	ConfigWindow	ISO 216 paper size	A2
 Select a printer	ConfigWindow		Vyberte tlačiareň
 Show configuration window	PrintServerApp Scripting		Zobraziť konfiguračné okno
-Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	ANSI B (tabloid)
+A4	ConfigWindow	ISO 216 paper size	A4
+Get comments about this printer	Printer Scripting		Získať komentáre o tejto tlačiarni
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Tlačiareň s týmto názvom už existuje, ale nie je vôbec použiteľná! Nahradiť?
+No	PrintServerApp		Nie
+Get the transport configuration for this printer	Printer Scripting		Získať transportnú konfiguráciu tejto tlačiarne
+Landscape	ConfigWindow		Krajinka
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
 There are no printers set up.	PrintServerApp		Nie sú nastavené žiadne tlačiarne.
-There is no default printer set up.	PrintServerApp		Predvolená tlačiareň nie je nastavená.
-Undefined	ConfigWindow		Nedefinované
+Get name of the transport add-on used for this printer	Printer Scripting		Získať názov transportného doplnku tejto tlačiarne
+All pages, %1 copies	ConfigWindow		Všetky strany, %1 kópií
+Delete a specific printer	PrintServerApp Scripting		Zmazať konkrétnu tlačiareň
+Create a new printer	PrintServerApp Scripting		Vytvoriť novú tlačiareň
+OK	PrintServerApp		OK
+Print setup	ConfigWindow		Nastavenie tlače
+A1	ConfigWindow	ISO 216 paper size	A1
+Retrieve a specific transport	PrintServerApp Scripting		Získať konkrétny transport
+Get name of printer	Printer Scripting		Získať názov tlačiarne
+A3	ConfigWindow	ISO 216 paper size	A3
+Get name of transport	Transport Scripting		Získať názov transportu
+A5	ConfigWindow	ISO 216 paper size	A5
 Would you like to make @ the default printer?	PrintServerApp		Chcete nastaviť @ ako predvolenú tlačiareň?
-Would you like to set one up now?	PrintServerApp		Chcete ju teraz nastaviť?
-Yes	PrintServerApp		Áno
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	ANSI B (tabloid)
+Page setup	ConfigWindow		Nastavenie stránky
+Paper setup:	ConfigWindow		Nastavenie papiera:

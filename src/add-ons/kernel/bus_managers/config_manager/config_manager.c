@@ -29,7 +29,7 @@ static pci_module_info *gPCI = NULL;
 static status_t
 driver_get_next_device_info(bus_type bus, uint64 *cookie, struct device_info *info, uint32 size)
 {
-	FUNCTION("(bus = %d, cookie = %lld)\n", bus, *cookie);
+	FUNCTION("(bus = %d, cookie = %" B_PRId64 ")\n", bus, *cookie);
 	return B_ENTRY_NOT_FOUND;
 }
 
@@ -37,7 +37,7 @@ driver_get_next_device_info(bus_type bus, uint64 *cookie, struct device_info *in
 static status_t
 driver_get_device_info_for(uint64 id, struct device_info *info, uint32 size)
 {
-	FUNCTION("(id = %Ld)\n", id);
+	FUNCTION("(id = %" B_PRId64 ")\n", id);
 	return B_ENTRY_NOT_FOUND;
 }
 
@@ -45,7 +45,7 @@ driver_get_device_info_for(uint64 id, struct device_info *info, uint32 size)
 static status_t
 driver_get_size_of_current_configuration_for(uint64 id)
 {
-	FUNCTION("(id = %Ld)\n", id);
+	FUNCTION("(id = %" B_PRId64 ")\n", id);
 	return B_ENTRY_NOT_FOUND;
 }
 
@@ -53,7 +53,8 @@ driver_get_size_of_current_configuration_for(uint64 id)
 static status_t
 driver_get_current_configuration_for(uint64 id, struct device_configuration *current, uint32 size)
 {
-	FUNCTION("(id = %Ld, current = %p, size = %lu)\n", id, current, size);
+	FUNCTION("(id = %" B_PRId64 ", current = %p, size = %" B_PRIu32 ")\n", id,
+		current, size);
 	return B_ENTRY_NOT_FOUND;
 }
 
@@ -61,7 +62,7 @@ driver_get_current_configuration_for(uint64 id, struct device_configuration *cur
 static status_t
 driver_get_size_of_possible_configurations_for(uint64 id)
 {
-	FUNCTION("(id = %Ld)\n", id);
+	FUNCTION("(id = %" B_PRId64 ")\n", id);
 	return B_ENTRY_NOT_FOUND;
 }
 
@@ -69,7 +70,8 @@ driver_get_size_of_possible_configurations_for(uint64 id)
 static status_t
 driver_get_possible_configurations_for(uint64 id, struct possible_device_configurations *possible, uint32 size)
 {
-	FUNCTION("(id = %Ld, possible = %p, size = %lu)\n", id, possible, size);
+	FUNCTION("(id = %" B_PRId64 ", possible = %p, size = %" B_PRIu32 ")\n", id,
+		possible, size);
 	return B_ENTRY_NOT_FOUND;
 }
 
@@ -86,7 +88,7 @@ static status_t
 driver_get_nth_resource_descriptor_of_type(const struct device_configuration *config, uint32 num,
 	resource_type type, resource_descriptor *descr, uint32 size)
 {
-	FUNCTION("(config = %p, num = %ld)\n", config, num);
+	FUNCTION("(config = %p, num = %" B_PRId32 ")\n", config, num);
 	return B_ENTRY_NOT_FOUND;
 }
 

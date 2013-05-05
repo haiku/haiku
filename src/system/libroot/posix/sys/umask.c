@@ -7,6 +7,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 
+#include <errno_private.h>
 #include <syscalls.h>
 #include <umask.h>
 

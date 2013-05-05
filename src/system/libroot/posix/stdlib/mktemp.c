@@ -42,6 +42,8 @@
 #include <unistd.h>
 #include <stdint.h>
 
+#include <errno_private.h>
+
 
 static int _gettemp(char *, int *, int, int);
 
@@ -96,7 +98,7 @@ _gettemp(char *path, int *doopen, int domkdir, int slen)
 	int rval;
 
 	if (doopen != NULL && domkdir) {
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		return 0;
 	}
 
@@ -107,7 +109,7 @@ _gettemp(char *path, int *doopen, int domkdir, int slen)
 	suffp = trv;
 	--trv;
 	if (trv < path) {
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		return 0;
 	}
 
@@ -130,7 +132,7 @@ _gettemp(char *path, int *doopen, int domkdir, int slen)
 				if (rval != 0)
 					return 0;
 				if (!S_ISDIR(sbuf.st_mode)) {
-					errno = ENOTDIR;
+					__set_errno(ENOTDIR);
 					return 0;
 				}
 				break;

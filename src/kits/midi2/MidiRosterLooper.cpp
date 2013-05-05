@@ -47,8 +47,8 @@ BMidiRosterLooper::~BMidiRosterLooper()
 		BMidiEndpoint* endp = EndpointAt(t);
 		if (endp->fRefCount > 0) {
 			fprintf(
-				stderr, "[midi] WARNING: Endpoint %ld (%p) has "
-				"not been Release()d properly (refcount = %ld)\n", 
+				stderr, "[midi] WARNING: Endpoint %" B_PRId32 " (%p) has "
+				"not been Release()d properly (refcount = %" B_PRId32 ")\n",
 				endp->ID(), endp, endp->fRefCount);
 		} else {
 			delete endp;

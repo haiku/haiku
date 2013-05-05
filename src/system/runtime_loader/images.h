@@ -50,7 +50,7 @@ void		delete_image_struct(image_t* image);
 void		delete_image(image_t* image);
 void		put_image(image_t* image);
 
-status_t	map_image(int fd, char const* path, image_t* image, bool fixed);
+status_t	map_image(int fd, char const* path, image_t* image);
 void		unmap_image(image_t* image);
 void		remap_images();
 

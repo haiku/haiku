@@ -1,0 +1,21 @@
+1	hindi	x-vnd.Haiku-Network	2324385456
+Choose automatically	EthernetSettingsView		अपनेआप बंद कर दें
+Gateway:	EthernetSettingsView		गेटवे:
+Netmask:	EthernetSettingsView		नेटमास्क:
+DHCP	EthernetSettingsView		डीअचसीपी
+DNS #2:	EthernetSettingsView		डीअनअस #2:
+Apply	EthernetSettingsView		लागू
+OK	EthernetSettingsView		ठीक है
+DNS #1:	EthernetSettingsView		डीअनअस #1:
+IP address:	EthernetSettingsView		आईपी एड्रेस:
+Adapter:	EthernetSettingsView		अडैप्टर:
+Domain:	EthernetSettingsView		डोमेन
+Revert	EthernetSettingsView		रीवर्ट
+<no wireless networks found>	EthernetSettingsView		<कोई भी वायरलेस नेटवर्क नहीं मिले> 
+Network	System name		नेटवर्क
+Mode:	EthernetSettingsView		मोड
+Network:	EthernetSettingsView		नेटवर्क:
+The net_server needs to run for the auto configuration!	EthernetSettingsView		नेट_सर्वर को जरुरत है ऑटो विन्यास के लिए चालने की जरूरत है!
+Disabled	EthernetSettingsView		विकलांग
+Auto-configuring failed: 	EthernetSettingsView		ऑटो-कोंफिगुरेंग में विफल
+Static	EthernetSettingsView		स्टेटिक

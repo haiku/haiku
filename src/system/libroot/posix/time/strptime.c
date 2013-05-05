@@ -37,6 +37,8 @@
 #include <string.h>
 #include "timelocal.h"
 
+#include <errno_private.h>
+
 static char * _strptime(const char *, const char *, struct tm *, int *);
 
 #define asizeof(a)	(sizeof (a) / sizeof ((a)[0]))
@@ -414,13 +416,13 @@ label:
 			time_t t;
 
 			sverrno = errno;
-			errno = 0;
+			__set_errno(0);
 			n = strtol(buf, &cp, 10);
 			if (errno == ERANGE || (long)(t = n) != n) {
-				errno = sverrno;
+				__set_errno(sverrno);
 				return 0;
 			}
-			errno = sverrno;
+			__set_errno(sverrno);
 			buf = cp;
 			gmtime_r(&t, tm);
 			*GMTp = 1;

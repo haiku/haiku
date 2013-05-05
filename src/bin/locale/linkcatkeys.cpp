@@ -7,16 +7,21 @@
 #include <cstdlib>
 #include <vector>
 
-#include <Catalog.h>
 #include <Entry.h>
 #include <File.h>
 #include <String.h>
 
+#include <EditableCatalog.h>
 #include <DefaultCatalog.h>
 #include <HashMapCatalog.h>
-#include <PlainTextCatalog.h>
 
+
+using BPrivate::CatKey;
+using BPrivate::DefaultCatalog;
+using BPrivate::EditableCatalog;
+using BPrivate::HashMapCatalog;
 using std::vector;
+
 
 void
 usage()
@@ -95,7 +100,7 @@ main(int argc, char **argv)
 		exit(-1);
 	}
 	DefaultCatalog* targetCatImpl
-		= dynamic_cast<DefaultCatalog*>(targetCatalog.CatalogAddOn());
+		= dynamic_cast<DefaultCatalog*>(targetCatalog.CatalogData());
 	if (!targetCatImpl) {
 		fprintf(stderr, "couldn't access impl of target-catalog %s\n",
 			outputFile.String());
@@ -110,8 +115,8 @@ main(int argc, char **argv)
 				inputFiles[i], strerror(res));
 			exit(-1);
 		}
-		BHashMapCatalog* inputCatImpl
-			= dynamic_cast<BHashMapCatalog*>(inputCatalog.CatalogAddOn());
+		HashMapCatalog* inputCatImpl
+			= dynamic_cast<HashMapCatalog*>(inputCatalog.CatalogData());
 		if (!inputCatImpl) {
 			fprintf(stderr, "couldn't access impl of input-catalog %s\n",
 				inputFiles[i]);
@@ -120,7 +125,7 @@ main(int argc, char **argv)
 
 		// now walk over all entries in input-catalog and add them to
 		// target catalog, unless they already exist there.
-		BHashMapCatalog::CatWalker walker(inputCatImpl);
+		HashMapCatalog::CatWalker walker(inputCatImpl);
 		while (!walker.AtEnd()) {
 			const CatKey &plainTextKey(walker.GetKey());
 			BString keyString, keyComment, keyContext;
@@ -175,7 +180,7 @@ main(int argc, char **argv)
 	if (showSummary) {
 		int32 count = targetCatalog.CountItems();
 		if (count) {
-			fprintf(stderr, "%ld key%s found and written to %s\n",
+			fprintf(stderr, "%" B_PRId32 " key%s found and written to %s\n",
 				count, (count==1 ? "": "s"), outputFile.String());
 		} else
 			fprintf(stderr, "no keys found\n");

@@ -74,15 +74,14 @@ dlerror(void)
 int
 dladdr(void *address, Dl_info *info)
 {
-	static char sImageName[MAXPATHLEN];
-	static char sSymbolName[NAME_MAX];
-
 	image_id image;
-	int32 nameLength = sizeof(sSymbolName);
+	char* imagePath;
+	char* symbolName;
 	void* location;
 	image_info imageInfo;
-	sStatus = __gRuntimeLoader->get_symbol_at_address(address, &image,
-		sSymbolName, &nameLength, NULL, &location);
+
+	sStatus = __gRuntimeLoader->get_nearest_symbol_at_address(address, &image,
+		&imagePath, &symbolName, NULL, &location);
 	if (sStatus != B_OK)
 		return 0;
 
@@ -90,10 +89,9 @@ dladdr(void *address, Dl_info *info)
 	if (sStatus != B_OK)
 		return 0;
 
-	strlcpy(sImageName, imageInfo.name, MAXPATHLEN);
-	info->dli_fname = sImageName;
+	info->dli_fname = imagePath;
 	info->dli_fbase = imageInfo.text;
-	info->dli_sname = sSymbolName;
+	info->dli_sname = symbolName;
 	info->dli_saddr = location;
 
 	return 1;

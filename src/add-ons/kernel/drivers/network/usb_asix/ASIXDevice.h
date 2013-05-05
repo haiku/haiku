@@ -21,22 +21,21 @@
 
 
 struct DeviceInfo {
-	union Id {
-		uint16	fIds[2];
-		uint32	fKey;
-	}			fId;
+	uint16	fIds[2];
 
 	enum Type {
 		AX88172 = 0,
 		AX88772 = 1,
-		AX88178 = 2
+		AX88178 = 2,
+		AX88772A = 3,
+		AX88772B = 4
 	}			fType;
 
 	const char* fName;
 
-	inline uint16		VendorId()	{ return fId.fIds[0]; }
-	inline uint16		ProductId()	{ return fId.fIds[1]; }
-	inline uint32		Key()		{ return fId.fKey;    }
+	inline uint16		VendorId()	{ return fIds[0]; }
+	inline uint16		ProductId()	{ return fIds[1]; }
+	inline uint32		Key()		{ return fIds[0] << 16 | fIds[1]; }
 };
 
 
@@ -83,7 +82,7 @@ virtual	status_t			SetPromiscuousMode(bool bOn);
 		uint32				EthernetCRC32(const uint8* buffer, size_t length);
 virtual	status_t			ModifyMulticastTable(bool add,
 								ether_address_t* group);
-		status_t			ReadMACAddress(ether_address_t *address);
+virtual	status_t			ReadMACAddress(ether_address_t *address);
 		status_t			ReadRXControlRegister(uint16 *rxcontrol);
 		status_t			WriteRXControlRegister(uint16 rxcontrol);
 
@@ -115,7 +114,7 @@ virtual	status_t			ModifyMulticastTable(bool add,
 		int32				fStatusWrite;
 		sem_id				fNotifyReadSem;
 		sem_id				fNotifyWriteSem;
-		
+
 		uint8 *				fNotifyBuffer;
 		uint32				fNotifyBufferLength;
 		sem_id				fLinkStateChangeSem;

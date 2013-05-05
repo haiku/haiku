@@ -29,8 +29,8 @@
 #include "Panel.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Icon-O-Matic-SavePanel"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Icon-O-Matic-SavePanel"
 
 
 enum {
@@ -71,7 +71,7 @@ SavePanel::SavePanel(const char* name,
 	if (!window || !window->Lock())
 		return;
 
-	window->SetTitle("Save Image");
+	window->SetTitle(B_TRANSLATE("Save image"));
 
 	// add this instance as BHandler to the window's looper
 	window->AddHandler(this);
@@ -206,7 +206,7 @@ SavePanel::SetExportMode(bool exportMode)
 		fFormatMF->SetEnabled(true);
 		SetExportMode(fExportMode);
 		_EnableSettings();
-		helper << B_TRANSLATE_WITH_CONTEXT("Export Icon", "Dialog title");
+		helper << B_TRANSLATE_CONTEXT("Export Icon", "Dialog title");
 	} else {
 		fExportMode = ExportMode();
 			// does not overwrite fExportMode in case we already were
@@ -215,7 +215,7 @@ SavePanel::SetExportMode(bool exportMode)
 
 		fFormatMF->SetEnabled(false);
 		fSettingsB->SetEnabled(false);
-		helper << B_TRANSLATE_WITH_CONTEXT("Save Icon", "Dialog title");
+		helper << B_TRANSLATE_CONTEXT("Save Icon", "Dialog title");
 	}
 
 	window->Unlock();
@@ -365,6 +365,7 @@ SavePanel::_ExportSettings()
 //	status_t err = roster->MakeConfigurationView(item->id, NULL, &view, &rect);
 //	if (err < B_OK || view == NULL) {
 //		BAlert *alert = new BAlert(NULL, strerror(err), "OK");
+//		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 //		alert->Go();
 //	} else {
 //		if (fConfigWindow != NULL) {

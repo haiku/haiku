@@ -1,14 +1,22 @@
 /*
- * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Author:
  *		Alex Wilson, yourpalal2@gmail.com
  *
  * Corresponds to:
- *		/trunk/headers/os/support/Archivable.h rev 37751 
- *		/trunk/src/kits/support/Archivable.cpp rev 37751
+ *		headers/os/support/Archivable.h rev 37751 
+ *		src/kits/support/Archivable.cpp rev 37751
  */
+
+
+/*!
+	\file Archivable.h
+	\ingroup support
+	\ingroup libbe
+	\brief Contains BArchiver class.
+*/
 
 
 /*!

@@ -26,8 +26,8 @@
 #include <View.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "VideoConsumer.cpp"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "VideoConsumer.cpp"
 
 #define M1 ((double)1000000.0)
 #define JITTER		20000

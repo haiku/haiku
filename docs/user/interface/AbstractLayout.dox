@@ -1,3 +1,16 @@
+/*
+ * Copyright 2010 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Alex Wilson, yourpalal2@gmail.com
+ * 
+ * Corresponds to:
+ *		headers/os/interface/AbstractLayout.h	rev 39055
+ *		src/kits/inteface/AbstractLayout.cpp	rev 39055
+ */
+
+
 /*!
 	\class BAbstractLayout
 	\ingroup interface
@@ -6,7 +19,7 @@
 
 	\brief BLayout subclass providing convenience methods for derived
 	implementations.
-	
+
 	This class is designed to reduce the amount of boilerplate code required to
 	write a BLayout subclass. In most cases, you classes should derive from
 	BAbstractLayout rather than BLayout.

@@ -278,6 +278,19 @@ debug_malloc(size_t size)
 }
 
 
+void*
+debug_calloc(size_t num, size_t size)
+{
+	size_t allocationSize = num * size;
+	void* allocation = debug_malloc(allocationSize);
+	if (allocation == NULL)
+		return NULL;
+
+	memset(allocation, 0, allocationSize);
+	return allocation;
+}
+
+
 void
 debug_free(void* address)
 {
@@ -296,7 +309,7 @@ debug_heap_init()
 	physical_address_restrictions physicalRestrictions = {};
 	area_id area = create_area_etc(B_SYSTEM_TEAM, "kdebug heap", KDEBUG_HEAP,
 		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
-		CREATE_AREA_DONT_WAIT, &virtualRestrictions, &physicalRestrictions,
+		CREATE_AREA_DONT_WAIT, 0, &virtualRestrictions, &physicalRestrictions,
 		(void**)&base);
 	if (area < 0)
 		return;

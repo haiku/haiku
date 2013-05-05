@@ -9,6 +9,7 @@
  * Maps a Network Block Device as virtual partitions.
  */
 
+
 #include <ByteOrder.h>
 #include <KernelExport.h>
 #include <Drivers.h>
@@ -226,6 +227,7 @@ err0:
 	return err;
 }
 
+
 status_t nbd_queue_request(struct nbd_device *dev, struct nbd_request_entry *req)
 {
 	PRINT((DP ">%s(handle:%Ld)\n", __FUNCTION__, req->handle));
@@ -233,6 +235,7 @@ status_t nbd_queue_request(struct nbd_device *dev, struct nbd_request_entry *req
 	dev->reqs = req;
 	return B_OK;
 }
+
 
 status_t nbd_dequeue_request(struct nbd_device *dev, uint64 handle, struct nbd_request_entry **req)
 {
@@ -256,6 +259,7 @@ status_t nbd_dequeue_request(struct nbd_device *dev, uint64 handle, struct nbd_r
 	return B_OK;
 }
 
+
 status_t nbd_free_request(struct nbd_device *dev, struct nbd_request_entry *req)
 {
 	PRINT((DP ">%s(handle:%Ld)\n", __FUNCTION__, req->handle));
@@ -263,7 +267,6 @@ status_t nbd_free_request(struct nbd_device *dev, struct nbd_request_entry *req)
 	free(req);
 	return B_OK;
 }
-
 
 
 #if 0
@@ -355,6 +358,7 @@ err:
 	return err;
 }
 
+
 status_t nbd_connect(struct nbd_device *dev)
 {
 	struct nbd_init_packet initpkt;
@@ -415,16 +419,18 @@ err0:
 	return err;
 }
 
+
 status_t nbd_teardown(struct nbd_device *dev)
 {
-	status_t err, ret;
+	status_t ret;
 	PRINT((DP ">%s()\n", __FUNCTION__));
 	kshutdown(dev->sock, SHUT_RDWR);
 	kclosesocket(dev->sock);
 	dev->sock = -1;
-	err = wait_for_thread(dev->postoffice, &ret);
+	wait_for_thread(dev->postoffice, &ret);
 	return B_OK;
 }
+
 
 status_t nbd_post_request(struct nbd_device *dev, struct nbd_request_entry *req)
 {
@@ -455,8 +461,8 @@ static struct nbd_device nbd_devices[MAX_NBDS];
 
 status_t nbd_open(const char *name, uint32 flags, cookie_t **cookie) {
 	status_t err;
-	int32 refcnt;
 #ifdef MOUNT_KLUDGE
+	int32 refcnt;
 	int kfd;
 #endif
 	struct nbd_device *dev = NULL;
@@ -479,8 +485,8 @@ status_t nbd_open(const char *name, uint32 flags, cookie_t **cookie) {
 		err = nbd_connect(dev);
 	if (err)
 		goto err2;
-	refcnt = dev->refcnt++;
 #ifdef MOUNT_KLUDGE
+	refcnt = dev->refcnt++;
 	kfd = dev->kludge;
 	dev->kludge = -1;
 #endif
@@ -506,6 +512,7 @@ err0:
 	dprintf(DP " %s: error 0x%08lx\n", __FUNCTION__, err);
 	return err;
 }
+
 
 status_t nbd_close(cookie_t *cookie) {
 	struct nbd_device *dev = cookie->dev;
@@ -535,6 +542,7 @@ status_t nbd_close(cookie_t *cookie) {
 	return B_OK;
 }
 
+
 status_t nbd_free(cookie_t *cookie) {
 	struct nbd_device *dev = cookie->dev;
 	status_t err;
@@ -553,6 +561,7 @@ status_t nbd_free(cookie_t *cookie) {
 	free(cookie);
 	return err;
 }
+
 
 status_t nbd_control(cookie_t *cookie, uint32 op, void *data, size_t len) {
 	PRINT((DP ">%s(%d, %lu, , %ld)\n", __FUNCTION__, WHICH(cookie->dev), op, len));
@@ -608,6 +617,7 @@ status_t nbd_control(cookie_t *cookie, uint32 op, void *data, size_t len) {
 	}
 	return B_NOT_ALLOWED;
 }
+
 
 status_t nbd_read(cookie_t *cookie, off_t position, void *data, size_t *numbytes) {
 	struct nbd_device *dev = cookie->dev;
@@ -676,6 +686,7 @@ err0:
 	*numbytes = 0;
 	return err;
 }
+
 
 status_t nbd_write(cookie_t *cookie, off_t position, const void *data, size_t *numbytes) {
 	struct nbd_device *dev = cookie->dev;
@@ -748,6 +759,7 @@ err0:
 	return err;
 }
 
+
 device_hooks nbd_hooks={
 	(device_open_hook)nbd_open,
 	(device_close_hook)nbd_close,
@@ -771,12 +783,14 @@ static char *nbd_name[MAX_NBDS+1] = {
 	NULL
 };
 
+
 status_t
 init_hardware (void)
 {
 	PRINT((DP ">%s()\n", __FUNCTION__));
 	return B_OK;
 }
+
 
 status_t
 init_driver (void)
@@ -849,21 +863,22 @@ init_driver (void)
 	return B_OK;
 }
 
+
 void
 uninit_driver (void)
 {
-	status_t err;
 	int i;
 	PRINT((DP ">%s()\n", __FUNCTION__));
 	for (i = 0; i < MAX_NBDS; i++) {
 		free(nbd_name[i]);
 		mutex_destroy(&nbd_devices[i].ben);
 	}
-	err = ksocket_cleanup();
+	ksocket_cleanup();
 	/* HACK */
 	if (gDelayUnload)
 		snooze(BONE_TEARDOWN_DELAY);
 }
+
 
 const char**
 publish_devices()
@@ -872,12 +887,14 @@ publish_devices()
 	return (const char **)nbd_name;
 }
 
+
 device_hooks*
 find_device(const char* name)
 {
 	PRINT((DP ">%s(%s)\n", __FUNCTION__, name));
 	return &nbd_hooks;
 }
+
 
 struct nbd_device*
 nbd_find_device(const char* name)
@@ -892,3 +909,4 @@ nbd_find_device(const char* name)
 	}
 	return NULL;
 }
+

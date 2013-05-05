@@ -1,5 +1,7 @@
 
-resource app_signature "application/x-vnd.Be.ChartDemo";
+resource app_signature "application/x-vnd.Haiku-ChartDemo";
+
+resource app_name_catalog_entry "x-vnd.Haiku-ChartDemo:System name:Chart";
 
 resource app_flags B_MULTIPLE_LAUNCH;
 

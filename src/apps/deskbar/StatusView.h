@@ -32,9 +32,9 @@ brand product names are registered trademarks or trademarks of their respective
 holders.
 All rights reserved.
 */
-
 #ifndef __STATUS_VIEW__
 #define __STATUS_VIEW__
+
 
 #include <Control.h>
 #include <Node.h>
@@ -45,18 +45,20 @@ All rights reserved.
 #include "BarView.h"
 #include "TimeView.h"
 
+
 const float kMaxReplicantHeight = 16.0f;
 const float kMaxReplicantWidth = 16.0f;
 const int32 kMinimumReplicantCount = 6;
-const int32	kIconGap = 2;
+const int32 kIconGap = 2;
 const int32 kGutter = 1;
 const int32 kDragRegionWidth = 6;
 
-// 1 pixel left gutter
+// 1 pixel for left gutter
 // space for replicant tray (6 items)
 // 6 pixel drag region
-const float kMinimumTrayWidth = kIconGap + (kMinimumReplicantCount * kIconGap)
-	+ (kMinimumReplicantCount * kMaxReplicantWidth) + kGutter;
+const float kMinimumTrayWidth = kIconGap
+		+ (kMinimumReplicantCount * kIconGap)
+		+ (kMinimumReplicantCount * kMaxReplicantWidth) + kGutter;
 const float kMinimumTrayHeight = kGutter + kMaxReplicantHeight + kGutter;
 
 extern float sMinimumWindowWidth;
@@ -74,86 +76,98 @@ class TReplicantShelf;
 
 class TReplicantTray : public BView {
 public:
-	TReplicantTray(TBarView* bv, bool vertical);
-	virtual ~TReplicantTray();
+									TReplicantTray(TBarView* barView,
+										bool vertical);
+		virtual						~TReplicantTray();
 
-	virtual void AttachedToWindow();
-	virtual void DetachedFromWindow();
-	virtual void MouseDown(BPoint point);
-	virtual void MessageReceived(BMessage*);
-	virtual void GetPreferredSize(float*, float*);
+		virtual	void				AttachedToWindow();
+		virtual	void				DetachedFromWindow();
+		virtual	void				MouseDown(BPoint point);
+		virtual	void				MessageReceived(BMessage*);
+		virtual	void				GetPreferredSize(float*, float*);
 
-	void AdjustPlacement();
+				void				AdjustPlacement();
+				void				ShowReplicantMenu(BPoint);
 
-	void ShowReplicantMenu(BPoint);
+				void				SetMultiRow(bool state);
+				bool				IsMultiRow() const
+										{ return fMultiRowMode; }
 
-	void SetMultiRow(bool state);
-	bool IsMultiRow() const { return fMultiRowMode; }
+				TTimeView*			Time() const { return fTime; }
+				void				ShowHideTime();
 
-	status_t ItemInfo(int32 target, const char** name);
-	status_t ItemInfo(const char* name, int32* id);
-	status_t ItemInfo(int32 index, const char** name, int32* id);
+				status_t			ItemInfo(int32 target, const char** name);
+				status_t			ItemInfo(const char* name, int32* id);
+				status_t			ItemInfo(int32 index, const char** name,
+										int32* id);
 
-	bool IconExists(int32 target, bool byIndex = false);
-	bool IconExists(const char* name);
+				bool				IconExists(int32 target, bool byIndex = false);
+				bool				IconExists(const char* name);
 
-	int32  IconCount() const;
+				int32				IconCount() const;
 
-	status_t AddIcon(BMessage*, int32* id, const entry_ref* = NULL);
+				status_t			AddIcon(BMessage*, int32* id,
+										const entry_ref* = NULL);
 
-	void RemoveIcon(int32 target, bool byIndex = false);
-	void RemoveIcon(const char* name);
+				void				RemoveIcon(int32 target,
+										bool byIndex = false);
+				void				RemoveIcon(const char* name);
 
-	BRect IconFrame(int32 target, bool byIndex = false);
-	BRect IconFrame(const char* name);
+				BRect				IconFrame(int32 target,
+										bool byIndex = false);
+				BRect				IconFrame(const char* name);
 
-	bool AcceptAddon(BRect frame, BMessage* message);
-	void RealignReplicants(int32 startIndex = -1);
+				bool				AcceptAddon(BRect frame,
+										BMessage* message);
+				void				RealignReplicants(int32 startIndex = -1);
 
-	bool ShowingSeconds(void);
-	bool ShowingMiltime(void);
-
-	void RememberClockSettings();
-	void DealWithClock(bool);
+				void				SaveTimeSettings();
 
 #ifdef DB_ADDONS
-	status_t LoadAddOn(BEntry* entry, int32* id, bool addToSettings = true);
+				status_t			LoadAddOn(BEntry* entry, int32* id,
+										bool addToSettings = true);
 #endif
 
 private:
-	BView* ViewAt(int32* index, int32* id, int32 target, bool byIndex = false);
-	BView* ViewAt(int32* index, int32* id, const char* name);
+				BView*				ViewAt(int32* index, int32* id,
+										int32 target,
+										bool byIndex = false);
+				BView*				ViewAt(int32* index, int32* id,
+										const char* name);
 
-	void RealReplicantAdjustment(int32 startindex);
+				void				RealReplicantAdjustment(int32 startindex);
 
 #ifdef DB_ADDONS
-	void InitAddOnSupport();
-	void DeleteAddOnSupport();
+				void				InitAddOnSupport();
+				void				DeleteAddOnSupport();
 
-	DeskbarItemInfo* DeskbarItemFor(node_ref &nodeRef);
-	DeskbarItemInfo* DeskbarItemFor(int32 id);
-	bool NodeExists(node_ref &nodeRef);
+				DeskbarItemInfo*	DeskbarItemFor(node_ref &nodeRef);
+				DeskbarItemInfo*	DeskbarItemFor(int32 id);
+				bool				NodeExists(node_ref &nodeRef);
 
-	void HandleEntryUpdate(BMessage*);
-	status_t AddItem(int32 id, node_ref nodeRef, BEntry &entry, bool isAddon);
+				void				HandleEntryUpdate(BMessage*);
+				status_t			AddItem(int32 id, node_ref nodeRef,
+										BEntry &entry, bool isAddon);
 
-	void UnloadAddOn(node_ref*, dev_t*, bool which, bool removeAll);
-	void RemoveItem(int32 id);
+				void				UnloadAddOn(node_ref*, dev_t*, bool which,
+										bool removeAll);
+				void				RemoveItem(int32 id);
 
-	void MoveItem(entry_ref*, ino_t toDirectory);
+				void				MoveItem(entry_ref*, ino_t toDirectory);
 #endif
 
-	BPoint LocationForReplicant(int32 index, float width);
-	BShelf* Shelf() const;
+				BPoint				LocationForReplicant(int32 index,
+										float width);
+				BShelf*				Shelf() const;
 
-	status_t _SaveSettings();
+				status_t			_SaveSettings();
 
 	friend class TReplicantShelf;
 
-	TTimeView* fClock;
-	TBarView* fBarView;
-	TReplicantShelf* fShelf;
-	BRect fRightBottomReplicant;
+				TTimeView*			fTime;
+				TBarView*			fBarView;
+				TReplicantShelf*	fShelf;
+				BRect				fRightBottomReplicant;
 	int32 fLastReplicant;
 
 	bool fMultiRowMode;
@@ -207,5 +221,5 @@ private:
 	int32 fDragLocation;
 };
 
-#endif
 
+#endif	/* __STATUS_VIEW__ */

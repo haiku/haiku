@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <signal.h>
 
+#include <errno_private.h>
 #include <syscalls.h>
 
 
@@ -15,7 +16,7 @@ sigaltstack(const stack_t *alternateStack, stack_t *oldAlternateStack)
 {
 	status_t status =_kern_set_signal_stack(alternateStack, oldAlternateStack);
 	if (status < B_OK) {
-		errno = status;
+		__set_errno(status);
 		return -1;
 	}
 

@@ -1,0 +1,6 @@
+1	croatian	x-vnd.Haiku-cmd-dstconfig	2337923203
+.\n\nIs this the correct time?	dstcheck		.\n\nDa li je ovo ispravno vrijeme?
+Ask me later	dstcheck		Pitaj me kasnije
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Pažnja!\n\nZbog prelaska na ljetno računanje vremena sat vašeg računal može biti jedan sat natrag.\nVaše računalo misli da je tako
+Manually adjust time…	dstcheck		Ručno podesi vrijeme...
+Use this time	dstcheck		Koristi ovo vrijeme

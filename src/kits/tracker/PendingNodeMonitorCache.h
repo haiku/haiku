@@ -39,14 +39,15 @@ All rights reserved.
 //	The respective node montior messages are stored in a list and applied
 //  later, when their target shows up. They get nuked when they become too
 //  old.
-
 #ifndef __PENDING_NODEMONITOR_CACHE_H__
 #define __PENDING_NODEMONITOR_CACHE_H__
+
 
 #include <Message.h>
 #include <Node.h>
 
 #include "ObjectList.h"
+
 
 namespace BPrivate {
 
@@ -55,27 +56,28 @@ class BPose;
 
 class PendingNodeMonitorEntry {
 public:
-	PendingNodeMonitorEntry(const node_ref *node, const BMessage *);
-	const BMessage *NodeMonitor() const;
-	bool Match(const node_ref *) const;
+	PendingNodeMonitorEntry(const node_ref* node, const BMessage*);
+	const BMessage* NodeMonitor() const;
+	bool Match(const node_ref*) const;
 	bool TooOld(bigtime_t now) const;
-	
+
 private:
 	bigtime_t fExpiresAfter;
 	BMessage fNodeMonitor;
 	node_ref fNode;
 };
 
+
 class PendingNodeMonitorCache {
 public:
 	PendingNodeMonitorCache();
 	~PendingNodeMonitorCache();
 
-	void Add(const BMessage *);
-	void RemoveEntries(const node_ref *);
+	void Add(const BMessage*);
+	void RemoveEntries(const node_ref*);
 	void RemoveOldEntries();
 
-	void PoseCreatedOrMoved(BPoseView *, const BPose *);
+	void PoseCreatedOrMoved(BPoseView*, const BPose*);
 
 private:
 	BObjectList<PendingNodeMonitorEntry> fList;
@@ -85,5 +87,4 @@ private:
 
 using namespace BPrivate;
 
-#endif
-
+#endif	// __PENDING_NODEMONITOR_CACHE_H__

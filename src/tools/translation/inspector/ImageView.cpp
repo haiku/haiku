@@ -61,8 +61,8 @@
 #define BORDER_HEIGHT 16
 #define PEN_SIZE 1.0f
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ImageView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ImageView"
 
 
 ImageView::ImageView(BRect rect, const char *name)

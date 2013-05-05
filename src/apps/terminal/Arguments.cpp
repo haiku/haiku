@@ -14,8 +14,8 @@
 #include <Locale.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Terminal arguments parsing"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Terminal arguments parsing"
 
 
 Arguments::Arguments(int defaultArgsNum, const char* const* defaultArgs)

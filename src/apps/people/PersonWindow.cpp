@@ -37,8 +37,8 @@
 #include "PersonView.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "People"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "People"
 
 
 PersonWindow::PersonWindow(BRect frame, const char* title,
@@ -216,7 +216,9 @@ PersonWindow::MessageReceived(BMessage* msg)
 					}
 					else {
 						sprintf(str, B_TRANSLATE("Could not create %s."), name);
-						(new BAlert("", str, B_TRANSLATE("Sorry")))->Go();
+						BAlert* alert = new BAlert("", str, B_TRANSLATE("Sorry"));
+						alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+						alert->Go();
 					}
 				}
 			}
@@ -294,9 +296,15 @@ PersonWindow::QuitRequested()
 	status_t result;
 
 	if (!fView->IsSaved()) {
-		result = (new BAlert("", B_TRANSLATE("Save changes before quitting?"),
-							B_TRANSLATE("Cancel"), B_TRANSLATE("Quit"),
-							B_TRANSLATE("Save")))->Go();
+		BAlert* alert = new BAlert("",
+			B_TRANSLATE("Save changes before closing?"), B_TRANSLATE("Cancel"),
+			B_TRANSLATE("Don't save"), B_TRANSLATE("Save"),
+			B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_WARNING_ALERT);
+		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetShortcut(1, 'd');
+		alert->SetShortcut(2, 's');
+		result = alert->Go();
+
 		if (result == 2) {
 			if (fRef)
 				fView->Save();

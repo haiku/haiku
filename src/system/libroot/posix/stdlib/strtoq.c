@@ -38,6 +38,9 @@
 //#include <limits.h>
 #include <stdlib.h>
 
+#include <errno_private.h>
+
+
 #define QUAD_MIN   (-0x7fffffffffffffffLL - 1)
 #define QUAD_MAX   0x7fffffffffffffffLL
 /*
@@ -126,7 +129,7 @@ strtoq(nptr, endptr, base)
 			if (acc < cutoff || (acc == cutoff && c > cutlim)) {
 				any = -1;
 				acc = QUAD_MIN;
-				errno = ERANGE;
+				__set_errno(ERANGE);
 			} else {
 				any = 1;
 				acc *= base;
@@ -136,7 +139,7 @@ strtoq(nptr, endptr, base)
 			if (acc > cutoff || (acc == cutoff && c > cutlim)) {
 				any = -1;
 				acc = QUAD_MAX;
-				errno = ERANGE;
+				__set_errno(ERANGE);
 			} else {
 				any = 1;
 				acc *= base;

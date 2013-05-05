@@ -80,9 +80,9 @@ private:
 			void				_InitData();
 			void				_InitMenuData(BMenu* menu);
 
-			void				_DrawMarkSymbol(rgb_color backgroundColor);
+			void				_DrawMarkSymbol();
 			void				_DrawShortcutSymbol();
-			void				_DrawSubmenuSymbol(rgb_color backgroundColor);
+			void				_DrawSubmenuSymbol();
 			void				_DrawControlChar(char shortcut, BPoint where);
 
 private:

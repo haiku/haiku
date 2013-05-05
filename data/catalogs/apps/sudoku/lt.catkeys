@@ -1,0 +1,34 @@
+1	lithuanian	x-vnd.Haiku-Sudoku	2463385585
+Restore snapshot	SudokuWindow		Atkurti įsimintą būseną
+Could not set Sudoku:\n%s\n	SudokuWindow		Nepavyko nustatyti sudoku:\n%s\n
+Export as…	SudokuWindow		Eksportuoti kaip…
+OK	SudokuWindow		Gerai
+New	SudokuWindow		Naujas
+Abort	ProgressWindow		Nutraukti
+Sudoku	System name		Sudoku
+Could not open \"%s\":\n%s\n	SudokuWindow		Nepavyko atverti „%s“:\n%s\n
+Easy	SudokuWindow		Lengvas
+Open file…	SudokuWindow		Atverti failą…
+Solve single field	SudokuWindow		Išspręsti vieną langelį
+Solve	SudokuWindow		Išspręsti
+Redo	SudokuWindow		Grąžinti
+File	SudokuWindow		Žaidimas
+Advanced	SudokuWindow		Vidutinis
+Start again	SudokuWindow		Pradėti iš naujo
+HTML	SudokuWindow		HTML failą
+Sudoku request	SudokuWindow		Sudoku užklausa
+Copy	SudokuWindow		Kopijuoti
+Mark valid hints	SudokuWindow		Paryškinti galimus variantus
+Sudoku solved - congratulations!\n	SudokuWindow		Sveikiname – sudoku išspręstas!\n
+Hard	SudokuWindow		Sudėtingas
+Snapshot current	SudokuWindow		Įsiminti būseną
+Text	SudokuWindow		Tekstą
+Creating solvable field	SudokuGenerator		Kuriamas spręstinas langelis
+View	SudokuWindow		Rodymas
+Progress monitor	ProgressWindow		Eigos indikatorius
+Mark invalid values	SudokuWindow		Išskirti negalimas reikšmes
+Blank	SudokuWindow		Tuščias
+Help	SudokuWindow		Pagalba
+Searching for removable values	SudokuGenerator		Ieškoma galimų pašalinti reikšmų
+Undo	SudokuWindow		Atšaukti
+Quit	SudokuWindow		Baigti

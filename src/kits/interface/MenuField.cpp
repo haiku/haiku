@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2011, Haiku, Inc.
+ * Copyright 2001-2013, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -362,45 +362,16 @@ BMenuField::Draw(BRect update)
 
 	BRect frame(fMenuBar->Frame());
 
-	if (be_control_look != NULL) {
-		frame.InsetBy(-kVMargin, -kVMargin);
-		rgb_color base = fMenuBar->LowColor();
-		rgb_color background = LowColor();
-		uint32 flags = 0;
-		if (!fMenuBar->IsEnabled())
-			flags |= BControlLook::B_DISABLED;
-		if (active)
-			flags |= BControlLook::B_FOCUSED;
-		be_control_look->DrawMenuFieldFrame(this, frame, update, base,
-			background, flags);
-		return;
-	}
-
-	if (frame.InsetByCopy(-kVMargin, -kVMargin).Intersects(update)) {
-		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));
-		StrokeLine(BPoint(frame.left - 1.0f, frame.top - 1.0f),
-			BPoint(frame.left - 1.0f, frame.bottom - 1.0f));
-		StrokeLine(BPoint(frame.left - 1.0f, frame.top - 1.0f),
-			BPoint(frame.right - 1.0f, frame.top - 1.0f));
-
-		StrokeLine(BPoint(frame.left + 1.0f, frame.bottom + 1.0f),
-			BPoint(frame.right + 1.0f, frame.bottom + 1.0f));
-		StrokeLine(BPoint(frame.right + 1.0f, frame.top + 1.0f));
-
-		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_4_TINT));
-		StrokeLine(BPoint(frame.left - 1.0f, frame.bottom),
-			BPoint(frame.left - 1.0f, frame.bottom));
-		StrokeLine(BPoint(frame.right, frame.top - 1.0f),
-			BPoint(frame.right, frame.top - 1.0f));
-	}
-
-	if (active || fTransition) {
-		SetHighColor(active ? ui_color(B_KEYBOARD_NAVIGATION_COLOR) :
-			ViewColor());
-		StrokeRect(frame.InsetByCopy(-kVMargin, -kVMargin));
-
-		fTransition = false;
-	}
+	frame.InsetBy(-kVMargin, -kVMargin);
+	rgb_color base = fMenuBar->LowColor();
+	rgb_color background = LowColor();
+	uint32 flags = 0;
+	if (!fMenuBar->IsEnabled())
+		flags |= BControlLook::B_DISABLED;
+	if (active)
+		flags |= BControlLook::B_FOCUSED;
+	be_control_look->DrawMenuFieldFrame(this, frame, update, base,
+		background, flags);
 }
 
 
@@ -408,17 +379,19 @@ void
 BMenuField::AttachedToWindow()
 {
 	CALLED();
+	rgb_color color;
 
 	BView* parent = Parent();
 	if (parent != NULL) {
 		// inherit the color from parent
-		rgb_color color = parent->ViewColor();
+		color = parent->ViewColor();
 		if (color == B_TRANSPARENT_COLOR)
 			color = ui_color(B_PANEL_BACKGROUND_COLOR);
+	} else
+		color = ui_color(B_PANEL_BACKGROUND_COLOR);
 
-		SetViewColor(color);
-		SetLowColor(color);
-	}
+	SetViewColor(color);
+	SetLowColor(color);
 }
 
 
@@ -801,17 +774,6 @@ BMenuField::PreferredSize()
 }
 
 
-void
-BMenuField::InvalidateLayout(bool descendants)
-{
-	CALLED();
-
-	fLayoutData->valid = false;
-
-	BView::InvalidateLayout(descendants);
-}
-
-
 BLayoutItem*
 BMenuField::CreateLabelLayoutItem()
 {
@@ -872,11 +834,11 @@ BMenuField::Perform(perform_code code, void* _data)
 			BMenuField::SetLayout(data->layout);
 			return B_OK;
 		}
-		case PERFORM_CODE_INVALIDATE_LAYOUT:
+		case PERFORM_CODE_LAYOUT_INVALIDATED:
 		{
-			perform_data_invalidate_layout* data
-				= (perform_data_invalidate_layout*)_data;
-			BMenuField::InvalidateLayout(data->descendants);
+			perform_data_layout_invalidated* data
+				= (perform_data_layout_invalidated*)_data;
+			BMenuField::LayoutInvalidated(data->descendants);
 			return B_OK;
 		}
 		case PERFORM_CODE_DO_LAYOUT:
@@ -903,6 +865,15 @@ BMenuField::Perform(perform_code code, void* _data)
 	}
 
 	return BView::Perform(code, _data);
+}
+
+
+void
+BMenuField::LayoutInvalidated(bool descendants)
+{
+	CALLED();
+
+	fLayoutData->valid = false;
 }
 
 
@@ -1510,5 +1481,16 @@ BMenuField::MenuBarLayoutItem::Instantiate(BMessage* from)
 	if (validate_instantiation(from, "BMenuField::MenuBarLayoutItem"))
 		return new MenuBarLayoutItem(from);
 	return NULL;
+}
+
+
+extern "C" void
+B_IF_GCC_2(InvalidateLayout__10BMenuFieldb, _ZN10BMenuField16InvalidateLayoutEb)(
+	BMenuField* field, bool descendants)
+{
+	perform_data_layout_invalidated data;
+	data.descendants = descendants;
+
+	field->Perform(PERFORM_CODE_LAYOUT_INVALIDATED, &data);
 }
 

@@ -6,7 +6,11 @@
 
 #include <stdbool.h>
 #include <string.h>
+#include <SupportDefs.h>
 
+
+#define LACKS_ZERO_BYTE(value) \
+	(((value - 0x01010101) & ~value & 0x80808080) == 0)
 
 int
 strcmp(char const *a, char const *b)

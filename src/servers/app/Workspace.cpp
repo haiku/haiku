@@ -79,13 +79,14 @@ Workspace::Private::_SetDefaults()
 //	#pragma mark -
 
 
-Workspace::Workspace(Desktop& desktop, int32 index)
+Workspace::Workspace(Desktop& desktop, int32 index, bool readOnly)
 	:
 	fWorkspace(desktop.WorkspaceAt(index)),
 	fDesktop(desktop),
 	fCurrentWorkspace(index == desktop.CurrentWorkspace())
 {
-	ASSERT(desktop.IsLocked());
+	ASSERT(desktop.WindowLocker().IsWriteLocked()
+		|| ( readOnly && desktop.WindowLocker().IsReadLocked()));
 	RewindWindows();
 }
 

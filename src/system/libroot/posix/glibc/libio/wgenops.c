@@ -115,14 +115,14 @@ _IO_wsetb (f, b, eb, a)
      wchar_t *eb;
      int a;
 {
-  if (f->_wide_data->_IO_buf_base && !(f->_flags & _IO_USER_BUF))
-    FREE_BUF (f->_wide_data->_IO_buf_base, _IO_wblen (f));
+  if (f->_wide_data->_IO_buf_base && !(f->_flags2 & _IO_FLAGS2_USER_WBUF))
+	FREE_BUF (f->_wide_data->_IO_buf_base, _IO_wblen (f));
   f->_wide_data->_IO_buf_base = b;
   f->_wide_data->_IO_buf_end = eb;
   if (a)
-    f->_flags &= ~_IO_USER_BUF;
+    f->_flags2 &= ~_IO_FLAGS2_USER_WBUF;
   else
-    f->_flags |= _IO_USER_BUF;
+    f->_flags2 |= _IO_FLAGS2_USER_WBUF;
 }
 INTDEF(_IO_wsetb)
 
@@ -198,7 +198,7 @@ _IO_wdefault_finish (fp, dummy)
      int dummy;
 {
   struct _IO_marker *mark;
-  if (fp->_wide_data->_IO_buf_base && !(fp->_flags & _IO_USER_BUF))
+  if (fp->_wide_data->_IO_buf_base && !(fp->_flags2 & _IO_FLAGS2_USER_WBUF))
     {
       FREE_BUF (fp->_wide_data->_IO_buf_base,
 		_IO_wblen (fp) * sizeof (wchar_t));

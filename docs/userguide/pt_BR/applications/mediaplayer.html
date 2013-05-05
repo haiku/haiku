@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!--
+ *
+ * Copyright 2010-2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *		Szymon Barczak (Google Code-In student)
+ * Translators:
+ *		Adriano Duarte
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Tocador de Mídia</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../../fr/applications/mediaplayer.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/mediaplayer.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/mediaplayer.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/mediaplayer.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/mediaplayer.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/mediaplayer.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/mediaplayer.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/mediaplayer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/mediaplayer.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/mediaplayer.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/mediaplayer.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/mediaplayer.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/applications/mediaplayer.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../ca/applications/mediaplayer.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../../en/applications/mediaplayer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="mail.html">Correio</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos
+</a> 
+::  <a href="midiplayer.html">Tocador de Midi</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/mediaplayer-icon_64.png" alt="mediaplayer-icon_64.png" width="64" height="64" />Tocador de Mídia</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplicativos</span></td></tr>
+<tr><td>Localização:</td><td></td><td><span class="path">/boot/system/apps/MediaPlayer</span></td></tr>
+<tr><td>Configurações:</td><td></td><td><span class="path">~/config/settings/MediaPlayer</span></td></tr>
+</table>
+<p><br /></p>
+<p>O Tocador de Mídia é o tocador padrão para todos os arquivos de áudio e vídeo. Graças ao seu backend <a href="http://www.ffmpeg.org/">ffmpeg</a>, um grande número de formatos amplamente utilizados são suportados. Sua interface simples possui todos os controles esperados:</p>
+<img src="../images/apps-images/mediaplayer.png" alt="mediaplayer.png" />
+<p>A botão deslizante da barra de progresso permite rapidamente mover a uma posição, deixar o mouse sobre ele mostra o tempo atual e restante do clipe. Clicando na exibição de tempo à direita dele, alterna entre tempo total, atual e restante.<br />
+Abaixo encontram-se os controles usuais para pular para a faixa anterior, tocar/pausar, parar e saltar para a próxima faixa. Então segue o controle de volume (clicando no símbolo do alto-falante alterna para mudo) e um indicador  VU.</p>
+
+<h2>Reprodução de áudio e vídeo</h2>
+<p>Uma vez que não existem quaisquer funcionalidades específicas para reprodução de áudio, iremos direto para as funcionalidades de vídeo ou gerais.</p>
+<img src="../images/apps-images/mediaplayer-info.png" alt="mediaplayer-info.png" />
+<p>Disponível para todas as mídias está a <span class="menu">Informação de arquivo...</span> (<span class="key">ALT</span> <span class="key">I</span>). Ela exibe informações sobre o arquivo atualmente carregado, como tempo de exibição ou detalhes da faixa de áudio/vídeo e seu codec.</p>
+<p>A maioria dos comandos frequentemente utilizados dos menus estão também disponíveis a partir do menu de contexto, com clique no botão direito do mouse, na área do vídeo. Útil quando em modo de tela cheia.<br />
+Em <span class="menu">Vídeo</span> podemos encontrar opções para ampliar a janela em vários níveis ou forçar a taxa de aspecto para alguns valores padrão. Deixando a taxa de aspecto para as <span class="menu">Definições de fluxo</span> padrão, deverá trabalhar melhor para os arquivos corretamente codificados.</p>
+<p>O Tocador de Mídia suporta legendas em formato <a href="http://en.wikipedia.org/wiki/SubRip">SRT</a>. Para tê-las exibidas sob o menu <span class="menu">Legendas</span>, seus nomes de arquivos tem que ser idênticos ao de seus arquivos de vídeo, com um nome de idioma sufixado e a extensão ".srt" ao invés da extensão do vídeo. Por exemplo:</p>
+<pre>MeuFilme.avi
+MeuFilme.Alemao.srt
+MeuFilme.Ingles.srt
+MeuFilme.Frances.srt</pre>
+<p>Faixas de áudio múltiplas, muito frequentemente utilizadas por vários idiomas dentro de um único arquivo de vídeo, estão disoníveis a partir do submenu <span class="menu">Faixa de áudio</span>. O submernu <span class="menu">Vídeo | Faixa</span> oferece o mesmo quando existem múltiplas transmissões de vpideo disponíveis.</p>
+<p>Pode-se fixar o modo <span class="menu">Tela cheia</span> (<span class="key">ALT</span> <span class="key">ENTER</span> ou <span class="key">F</span> ou um clique duplo com o botão esquerdo do mouse), ocultar as bordas da janela e os controles do Tocador de Mídia with <span class="menu">Ocultar interface</span> (<span class="key">ALT</span> <span class="key">H</span> ou um duplo clique com o botão direito do mouse) ou ter sua janela <span class="menu">Sempre no topo</span> (<span class="key">ALT</span> <span class="key">A</span>).</p>
+
+<h2>Listas de Reprodução</h2>
+<p><span class="menu">Tocador de Mídia | Lista de Reprodução...</span> (<span class="key">ALT</span> <span class="key">P</span>) abre uma janela com os arquivos atualmente listados para reprodução. O clique duplo em uma entrada faz com que comece a tocar.</p>
+<img src="../images/apps-images/mediaplayer-playlist.png" alt="mediaplayer-playlist.png" />
+<p>Pode-se adicionar mais arquivos soltando-os dentro da lista e rearranjando sua posição via arrastar e soltar. A patir do menu <span class="menu">Editar</span> pode-se <span class="menu">Randomizar</span> ou <span class="menu">Remover</span> (<span class="key">DEL</span>) uma entrada da lista ou eliminar o arquivo atual com <span class="menu">Mover para o Lixo</span> (<span class="key">ALT</span> <span class="key">T</span>).</p>
+<p>Naturalmente, pode-se <span class="menu">Salvar</span> uma lista de reprodução e mais tarde <span class="menu">Abrir</span> novamente, ou iniciá-la simplesmente com um duplo clique no arquivo da lista de reprodução.</p>
+
+<h2>Definições</h2>
+<p>Existem muitas definições para o ajuste fino do comportamento do Tocador de Mídia:</p>
+<img src="../images/apps-images/mediaplayer-settings.png" alt="mediaplayer-settings.png" />
+<p>A primeira parte, <span class="menu">Modo de reprodução</span>, é bastante autoexplicativo. Iniciar reprodução automaticamente, fechar janelas quando terminar ou reproduzir clipes continuamente.</p>
+<p>Os próximos são diferentes <span class="menu">Opções de visualização</span>.<br />
+Pode-se optar por <span class="menu">Usar sobreposição de hardware se disponível</span>, o qual reduz o uso da CPU mas funciona para apenas uma janela de vídeo e necessita do driver de uma placa de vídeo suportada.<br />
+Pode-se <span class="menu">Escalar filmes suavemente</span> (quando não está em modo de sobreposição) o qual utiliza filtragem ultrarrápida para suavizar ao invés de quadricular os pixels quando ampliando o vídeo ou assistindo em modo de tela cheia.<br />
+<span class="menu">Escalar controles em modo de tela cheia</span> se preferir controles ligeiramente maiores, talvez por que veja a tela de muito longe em modo de tela cheia.<br />
+Existem, então, definições para <span class="menu">Tamanho da legenda</span> e <span class="menu">Localização da legenda</span>. Eles podem ser exibidos no <span class="menu">Final do vídeo</span>, o qual irá sempre tê-los sobrepostos sobre a imagem. Ou <span class="menu">Final da janela</span>, o qual permite redimensionar a janela verticalmente e ter, inversamente, as legendas aparecendo na barra preta no final.</p>
+<p>a última definição determina o volume de áudio dos clipes cujas janelas não estão atualmente ativas. Pode-se tê-las todas tocando em <span class="menu">Volume total</span>, no menos confuso <span class="menu">Volume baixo</span> ou silenciosamente <span class="menu">Mudo</span>.</p>
+
+<h2>Controles de teclado</h2>
+<p>O Tocador de Mídia oferece convenientes combinações de teclas para controlar a reprodução sem utilizar o mouse.</p>
+<table summary="keycombos" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="key">Z</span></td><td style="width:15px;"></td><td>Pular para a faixa anterior</td></tr>
+<tr><td><span class="key">X</span></td><td></td><td>Tocar</td></tr>
+<tr><td><span class="key">C</span></td><td></td><td>Pausar</td></tr>
+<tr><td><span class="key">V</span></td><td></td><td>Parar</td></tr>
+<tr><td><span class="key">B</span></td><td></td><td>Pular para a próxima faixa</td></tr>
+</table>
+<p>Estas teclas são atribuídas para as funções de botões de controle. Elas são sempre as teclas de letras na parte inferior esquerda do teclado, ou seja, são utilizadas independentemente do seu atual mapeamento de teclado. As teclas acima correspondem ao mapa de teclado US americano padrão.</p>
+<table summary="keycombos" border="0" cellspacing="0" cellpadding="2">
+<tr><td align="right"><span class="key">→</span></td><td style="width:15px;"></td><td>Procurar adiante</td></tr>
+<tr><td align="right"><span class="key">SHIFT</span> <span class="key">→</span></td><td></td><td>Pular adiante 10 segundos</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">→</span></td><td></td><td>Pular adiante 30 segundos</td></tr>
+<tr><td align="right"><span class="key">←</span></td><td></td><td>Procurar para trás</td></tr>
+<tr><td align="right"><span class="key">SHIFT</span> <span class="key">←</span></td><td></td><td>Pular para trás 10 segundos</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">←</span></td><td></td><td>Pular para trás 30 segundos</td></tr>
+
+<tr><td align="right"><span class="key">↑</span></td><td></td><td>Aumentar o volume</td></tr>
+<tr><td align="right"><span class="key">↓</span></td><td></td><td>Diminuir o volume</td></tr>
+
+<tr><td align="right"><span class="key">ALT</span> <span class="key">↑</span></td><td></td><td>Pular para a faixa anterior</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">↓</span></td><td></td><td>Pular para a próxima faixa</td></tr>
+
+<tr><td align="right"><span class="key">Spacebar</span></td><td></td><td>Alternar tocar/pausar</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>Alternar para modo de tela cheia (também feito pelo duplo clique na área de vídeo)</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="mail.html">Correio</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos
+</a> 
+::  <a href="midiplayer.html">Tocador de Midi</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

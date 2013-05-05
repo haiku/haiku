@@ -26,31 +26,30 @@ for driver in $(SYSTEM_ADD_ONS_DRIVERS_NET) {
 
 # modules
 AddFilesToPackage add-ons kernel bus_managers : $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
-AddFilesToPackage add-ons kernel busses agp_gart : $(X86_ONLY)<agp_gart>intel ;
+AddFilesToPackage add-ons kernel busses agp_gart : <agp_gart>intel@x86 ;
 
 if $(HAIKU_ATA_STACK) = 1 {
 	AddFilesToPackage add-ons kernel busses ata
-		: generic_ide_pci it8211 legacy_sata silicon_image_3112
-			$(X86_ONLY)ide_isa ;
+		: generic_ide_pci it8211 legacy_sata silicon_image_3112 ide_isa@x86 ;
 } else {
 	AddFilesToPackage add-ons kernel busses ide
-		: generic_ide_pci it8211 legacy_sata silicon_image_3112
-			$(X86_ONLY)ide_isa ;
+		: generic_ide_pci it8211 legacy_sata silicon_image_3112 ide_isa@x86 ;
 }
 
 AddFilesToPackage add-ons kernel busses scsi : ahci ;
 AddFilesToPackage add-ons kernel busses usb : <usb>uhci <usb>ohci <usb>ehci ;
 AddFilesToPackage add-ons kernel console : vga_text ;
 AddFilesToPackage add-ons kernel debugger
-	: <kdebug>demangle $(X86_ONLY)<kdebug>disasm <kdebug>hangman
-	  <kdebug>invalidate_on_exit <kdebug>usb_keyboard <kdebug>run_on_exit ;
+	: <kdebug>demangle <kdebug>disasm@x86 <kdebug>hangman
+	  <kdebug>invalidate_on_exit <kdebug>usb_keyboard <kdebug>qrencode
+	  <kdebug>run_on_exit ;
 AddFilesToPackage add-ons kernel file_systems : $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToPackage add-ons kernel generic
-	: $(ATA_ONLY)ata_adapter dpc $(IDE_ONLY)ide_adapter locked_pool mpu401
-		scsi_periph <module>tty ;
+	: ata_adapter@ata bios@x86 dpc ide_adapter@ide
+		locked_pool mpu401 scsi_periph <module>tty ;
 AddFilesToPackage add-ons kernel partitioning_systems
 	: amiga_rdb apple efi_gpt intel session ;
-AddFilesToPackage add-ons kernel interrupt_controllers : $(PPC_ONLY)openpic ;
+AddFilesToPackage add-ons kernel interrupt_controllers : openpic@ppc ;
 
 if $(TARGET_ARCH) = x86 {
 	AddFilesToPackage add-ons kernel cpu : generic_x86 ;
@@ -58,8 +57,9 @@ if $(TARGET_ARCH) = x86 {
 
 # drivers
 AddNewDriversToPackage disk scsi	: scsi_cd scsi_disk ;
-AddNewDriversToPackage power		: $(X86_ONLY)enhanced_speedstep ;
-AddNewDriversToPackage power		: $(X86_ONLY)acpi_battery ;
+AddNewDriversToPackage power		: enhanced_speedstep@x86 ;
+AddNewDriversToPackage power		: acpi_battery@x86 ;
+#AddNewDriversToPackage display		: display_controls@x86 ;
 
 # legacy drivers
 AddDriversToPackage					: console dprintf null random <driver>tty
@@ -68,7 +68,7 @@ AddDriversToPackage audio hmulti	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO) ;
 AddDriversToPackage audio old		: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD) ;
 AddDriversToPackage midi			: $(SYSTEM_ADD_ONS_DRIVERS_MIDI) ;
 AddDriversToPackage bus				: usb_raw fw_raw ;
-AddDriversToPackage disk floppy		: $(X86_ONLY)pc_floppy ;
+AddDriversToPackage disk floppy		: pc_floppy@x86 ;
 AddDriversToPackage disk usb		: usb_disk ;
 AddDriversToPackage disk usb		: usb_floppy ;
 AddDriversToPackage printer usb		: usb_printer ;
@@ -100,9 +100,8 @@ if $(HAIKU_GCC_VERSION[1]) = 2 {
 }
 
 
-# libGL.so has GLU (like BeOS) *and* GLUT API built-in
-SYSTEM_LIBS_LIBGL_ALIASES
-	= libGLU.so libglut.so ;
+# libGL.so has GLU (like BeOS) built-in
+SYSTEM_LIBS_LIBGL_ALIASES = libGLU.so ;
 
 if $(TARGET_ARCH) = x86 {
 	local lib ;
@@ -117,12 +116,44 @@ SYSTEM_LIBS_ALIASES =
 	$(SYSTEM_LIBS_LIBGL_ALIASES)
 ;
 
+OPTIONAL_LIBS_ALIASES =
+	libfreetype.so
+	libjpeg.so
+	libpng.so
+	libz.so
+;
+
+# TODO: Remove the following symlinks when the libraries have been packaged
+# properly!
+# libfreetype.so links to the current freetype lib
+AddSymlinkToPackage lib : $(HAIKU_FREETYPE_CURRENT_LIB:BS)
+	: $(HAIKU_FREETYPE_CURRENT_LINK) : : true ;
+AddSymlinkToPackage lib : $(HAIKU_FREETYPE_CURRENT_LINK)
+	: libfreetype.so : : true ;
+
+# libpng.so links to the current libpng
+AddSymlinkToPackage lib : $(HAIKU_LIBPNG_CURRENT_LIB:BS)
+	: $(HAIKU_LIBPNG_CURRENT_LINK) : : true ;
+AddSymlinkToPackage lib : $(HAIKU_LIBPNG_CURRENT_LINK)
+	: libpng.so : : true ;
+
+# libjpeg.so links to the current libjpeg
+AddSymlinkToPackage lib : $(HAIKU_JPEG_CURRENT_LIB:BS)
+	: $(HAIKU_JPEG_CURRENT_LINK) : : true ;
+AddSymlinkToPackage lib : $(HAIKU_JPEG_CURRENT_LINK)
+	: libjpeg.so : : true ;
+
+# zlib.so links to the current zlib
+AddSymlinkToPackage lib : $(HAIKU_ZLIB_CURRENT_LIB:BS)
+	: $(HAIKU_ZLIB_CURRENT_LINK) : : true ;
+AddSymlinkToPackage lib : $(HAIKU_ZLIB_CURRENT_LINK)
+	: libz.so : : true ;
+
 # servers
 AddFilesToPackage servers : $(SYSTEM_SERVERS) ;
 
 # apps
-AddFilesToPackage  				: runtime_loader ;
-AddFilesToPackage  				: Deskbar Tracker ;
+AddFilesToPackage  				: runtime_loader Deskbar Tracker ;
 AddFilesToPackage bin			: $(SYSTEM_BIN) consoled ;
 AddFilesToPackage apps			: $(SYSTEM_APPS) ;
 AddFilesToPackage preferences	: $(SYSTEM_PREFERENCES) ;
@@ -135,16 +166,12 @@ AddFilesToPackage bin : install-wifi-firmwares.sh ;
 
 AddSymlinkToPackage bin : bash : sh ;
 AddSymlinkToPackage bin : trash : untrash ;
-
-AddSymlinkToPackage bin : bzip2 : bunzip2 ;
 AddSymlinkToPackage bin : less : more ;
 AddSymlinkToPackage bin : gzip : gunzip ;
 AddSymlinkToPackage bin : gzip : zcat ;
 AddSymlinkToPackage bin : zdiff : zcmp ;
 AddSymlinkToPackage bin : unzip : zipinfo ;
 AddSymlinkToPackage bin : gawk : awk ;
-AddSymlinkToPackage bin : grep : egrep ;
-AddSymlinkToPackage bin : grep : fgrep ;
 
 # scripts and data files
 local bootScripts = Bootscript Bootscript.cd SetupEnvironment Netscript
@@ -163,7 +190,7 @@ AddFilesToPackage boot post_install : $(postInstallFiles) ;
 # Gutenprint data files
 CopyDirectoryToPackage data
 	: [ FDirName $(HAIKU_TOP) src libs print libgutenprint src xml ]
-	: gutenprint : -x .svn -x *.c -x Makefile.am -x Makefile.in ;
+	: gutenprint : -x *.c -x Makefile.am -x Makefile.in ;
 
 # artwork and sounds
 local logoArtwork =
@@ -177,11 +204,6 @@ local spellFiles = words geekspeak ;
 spellFiles = $(spellFiles:G=spell) ;
 SEARCH on $(spellFiles) = [ FDirName $(HAIKU_TOP) src apps mail ] ;
 AddFilesToPackage data spell_check word_dictionary : $(spellFiles) ;
-
-local dataFiles = teapot.data ;
-dataFiles = $(dataFiles:G=data) ;
-SEARCH on $(dataFiles) = [ FDirName $(HAIKU_TOP) data system data ] ;
-AddFilesToPackage data : $(dataFiles) ;
 
 local fortuneFiles = [ Glob $(HAIKU_TOP)/data/system/data/fortunes
 	: [a-zA-Z0-9]* ] ;
@@ -269,23 +291,30 @@ AddFilesToPackage : haiku_loader ;
 
 # boot module links
 AddBootModuleSymlinksToPackage
-	$(X86_ONLY)acpi $(ATA_ONLY)ata pci $(X86_ONLY)isa config_manager dpc
-	$(IDE_ONLY)ide scsi usb
-	$(PPC_ONLY)openpic
-	$(ATA_ONLY)ata_adapter $(IDE_ONLY)ide_adapter locked_pool scsi_periph
+	acpi@x86 ata@ata pci isa@x86 config_manager dpc
+	ide@ide scsi usb
+	openpic@ppc
+	ata_adapter@ata ide_adapter@ide locked_pool scsi_periph
 	ahci generic_ide_pci it8211 legacy_sata silicon_image_3112
-	$(X86_ONLY)ide_isa
+	ide_isa@x86
 	<usb>uhci <usb>ohci <usb>ehci
 	scsi_cd scsi_disk usb_disk
+	efi_gpt
 	intel
 	bfs packagefs
 ;
 
 # add-ons
 AddFilesToPackage add-ons accelerants	: $(SYSTEM_ADD_ONS_ACCELERANTS) ;
-AddFilesToPackage add-ons opengl		: Mesa\ Software\ Renderer ;
 AddFilesToPackage add-ons Translators	: $(SYSTEM_ADD_ONS_TRANSLATORS) ;
 AddFilesToPackage add-ons locale catalogs : $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) ;
+
+AddFilesToPackage add-ons opengl :
+	x86 @{
+		Legacy\ Software\ Rasterizer@gcc2
+		Software\ Rasterizer@!gcc2
+	}@ # x86
+;
 
 AddFilesToPackage add-ons mail_daemon inbound_protocols		: POP3 IMAP ;
 AddFilesToPackage add-ons mail_daemon outbound_protocols 	: SMTP ;
@@ -295,6 +324,7 @@ AddFilesToPackage add-ons mail_daemon outbound_filters		: Fortune ;
 
 AddFilesToPackage add-ons media : $(SYSTEM_ADD_ONS_MEDIA) ;
 AddFilesToPackage add-ons media plugins : $(SYSTEM_ADD_ONS_MEDIA_PLUGINS) ;
+
 AddFilesToPackage add-ons Tracker
 	: FileType-F Mark\ as… Mark\ as\ Read-R Open\ Target\ Folder-O
 		Open\ Terminal-T ZipOMatic-Z ;
@@ -304,25 +334,28 @@ AddSymlinkToPackage add-ons Tracker
 	: /boot/system/apps/TextSearch : TextSearch-G ;
 AddSymlinkToPackage add-ons Tracker
 	: /boot/system/apps/DiskUsage : DiskUsage-I ;
+
 AddFilesToPackage add-ons input_server devices
 	: <input>keyboard <input>mouse <input>tablet <input>wacom ;
 AddFilesToPackage add-ons input_server filters
 	: screen_saver shortcut_catcher ;
-AddFilesToPackage add-ons kernel network
-	: <net>notifications stack ;
-AddFilesToPackage add-ons kernel network devices
-	: $(SYSTEM_NETWORK_DEVICES) ;
+
+AddFilesToPackage add-ons kernel network : <net>notifications stack ;
+AddFilesToPackage add-ons kernel network : dns_resolver ;
+AddFilesToPackage add-ons kernel network devices : $(SYSTEM_NETWORK_DEVICES) ;
 AddFilesToPackage add-ons kernel network datalink_protocols
 	: $(SYSTEM_NETWORK_DATALINK_PROTOCOLS) ;
 AddFilesToPackage add-ons kernel network ppp: $(SYSTEM_NETWORK_PPP) ;
 AddFilesToPackage add-ons kernel network protocols
 	: $(SYSTEM_NETWORK_PROTOCOLS) ;
+
 AddFilesToPackage add-ons Print : $(SYSTEM_ADD_ONS_PRINT) ;
 AddFilesToPackage add-ons Print transport
 	: $(SYSTEM_ADD_ONS_PRINT_TRANSPORT) ;
 AddFilesToPackage add-ons Screen\ Savers : $(SYSTEM_ADD_ONS_SCREENSAVERS) ;
 
-AddFilesToPackage add-ons disk_systems : <disk_system>intel <disk_system>bfs ;
+AddFilesToPackage add-ons disk_systems
+	: <disk_system>intel <disk_system>gpt <disk_system>bfs <disk_system>ntfs ;
 
 
 # optional
@@ -334,22 +367,26 @@ AddFilesToPackage optional add-ons input_server methods : canna ;
 # PDF Writer enconding files
 CopyDirectoryToPackage data
 	: [ FDirName $(HAIKU_TOP) src add-ons print drivers pdf encoding ]
-	: "PDF Writer" : -x .svn -x Jamfile ;
+	: "PDF Writer" : -x Jamfile ;
 
 # licenses
 CopyDirectoryToPackage data
 	: [ FDirName $(HAIKU_TOP) data system data licenses ]
-	: licenses : -x .svn ;
+	: licenses ;
 
 # Copy documentation as per DiskUsage's license requirement.
 CopyDirectoryToPackage documentation
 	: [ FDirName $(HAIKU_TOP) docs apps diskusage ]
-	: diskusage : -x .svn ;
+	: diskusage ;
 
-# Copy documentation as per PDFlib Lite's license requirement.
+# Copy documentation and sample programs as per PDFlib Lite's license
+# requirement.
 CopyDirectoryToPackage documentation
 	: [ FDirName $(HAIKU_TOP) src libs pdflib doc ]
-	: pdflib : -x .svn ;
+	: pdflib ;
+CopyDirectoryToPackage develop sample-code
+	: [ FDirName $(HAIKU_TOP) src libs pdflib bind pdflib ]
+	: pdflib ;
 
 
 BuildHaikuPackage $(haikuPackage) : haiku ;
@@ -428,18 +465,28 @@ AddHeaderDirectoryToPackage compatibility bsd : bsd ;
 AddHeaderDirectoryToPackage compatibility gnu : gnu ;
 
 # third party libs headers
-AddHeaderDirectoryToPackage libs freetype2 : 3rdparty ;
-AddHeaderDirectoryToPackage libs jpeg : 3rdparty ;
-AddHeaderDirectoryToPackage libs png : 3rdparty ;
 AddHeaderDirectoryToPackage libs termcap : 3rdparty ;
 AddHeaderDirectoryToPackage libs tiff : 3rdparty ;
-AddHeaderDirectoryToPackage libs zlib : 3rdparty ;
+
+CopyDirectoryToPackage develop headers :
+	[ FDirName $(HAIKU_FREETYPE_DIR) develop headers 3rdparty ] ;
+CopyDirectoryToPackage develop headers : $(HAIKU_JPEG_HEADERS) : 3rdparty ;
+CopyDirectoryToPackage develop headers : $(HAIKU_LIBPNG_HEADERS) : 3rdparty ;
+CopyDirectoryToPackage develop headers : $(HAIKU_ZLIB_HEADERS) : 3rdparty ;
 
 # cpp headers
 if $(HAIKU_GCC_VERSION[1]) = 2 {
 	# GCC 2 only -- for GCC 4 they come with the DevelopmentBase package
 	CopyDirectoryToPackage $(developDirTokens) headers c++
-		: [ FDirName $(HAIKU_TOP) headers cpp ] : 2.95.3 : -x .svn ;
+		: [ FDirName $(HAIKU_TOP) headers cpp ] : 2.95.3 ;
+}
+
+# OpenGL headers
+if $(TARGET_ARCH) = x86 {
+	CopyDirectoryToPackage $(developDirTokens) headers os opengl
+		: [ FDirName $(HAIKU_MESA_HEADERS) GL ] ;
+	CopyDirectoryToPackage $(developDirTokens) headers os opengl
+		: [ FDirName $(HAIKU_GLU_HEADERS) GL ] ;
 }
 
 BuildHaikuPackage $(haikuDevelPackage) : haiku_devel ;
@@ -452,7 +499,7 @@ local haikuUserGuidePackage = haiku_userguide.hpkg ;
 HaikuPackage $(haikuUserGuidePackage) ;
 
 CopyDirectoryToPackage documentation : [ FDirName $(HAIKU_TOP) docs userguide ]
-	: userguide : -x .svn ;
+	: userguide ;
 SEARCH on userguide = [ FDirName $(HAIKU_TOP) data bin ] ;
 AddFilesToPackage bin : userguide ;
 
@@ -466,7 +513,7 @@ local haikuWelcomePackage = haiku_welcome.hpkg ;
 HaikuPackage $(haikuWelcomePackage) ;
 
 CopyDirectoryToPackage documentation : [ FDirName $(HAIKU_TOP) docs welcome ]
-	: welcome : -x .svn ;
+	: welcome ;
 SEARCH on welcome = [ FDirName $(HAIKU_TOP) data bin ] ;
 AddFilesToPackage bin : welcome ;
 

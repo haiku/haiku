@@ -61,7 +61,7 @@ status_t	GetServerInfo();
 
 	/*  */
 
-bigtime_t	GetLatency() const { return fLatency; };
+bigtime_t	Latency() const { return fLatency; };
 const char	*Host() const { return fHost.String(); };
 uint16		Port() const { return fPort; };
 void		GetFriendlyName(BString &name);

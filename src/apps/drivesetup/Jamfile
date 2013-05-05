@@ -5,10 +5,12 @@ AddSubDirSupportedPlatforms libbe_test ;
 UsePrivateHeaders interface shared storage tracker ;
 
 Preference DriveSetup :
-	CreateParamsPanel.cpp
+	AbstractParametersPanel.cpp
+	ChangeParametersPanel.cpp
+	CreateParametersPanel.cpp
 	DiskView.cpp
 	DriveSetup.cpp
-	InitParamsPanel.cpp
+	InitParametersPanel.cpp
 	MainWindow.cpp
 	PartitionList.cpp
 	Support.cpp
@@ -21,9 +23,11 @@ Preference DriveSetup :
 DoCatalogs DriveSetup :
 	x-vnd.Haiku-DriveSetup
 	:
-	CreateParamsPanel.cpp
+	AbstractParametersPanel.cpp
+	ChangeParametersPanel.cpp
+	CreateParametersPanel.cpp
 	DiskView.cpp
-	InitParamsPanel.cpp
+	InitParametersPanel.cpp
 	MainWindow.cpp
 	PartitionList.cpp
 	Support.cpp

@@ -19,8 +19,8 @@
 #include "MainWindow.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "DiskView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "DiskView"
 
 using BPrivate::HashMap;
 using BPrivate::HashKey32;
@@ -202,7 +202,13 @@ public:
 
 	virtual bool Visit(BDiskDevice* device)
 	{
-		PartitionView* view = new PartitionView(B_TRANSLATE("Device"), 1.0,
+		const char* name;
+		if (device->Name() != NULL && device->Name()[0] != '\0')
+			name = device->Name();
+		else
+			name = B_TRANSLATE("Device");
+
+		PartitionView* view = new PartitionView(name, 1.0,
 			device->Offset(), 0, device->ID());
 		fViewMap.Put(device->ID(), view);
 		fView->GetLayout()->AddView(view);
@@ -281,8 +287,8 @@ public:
 			off_t offset;
 			off_t size;
 			for (int32 i = 0;
-				info.GetPartitionableSpaceAt(i, &offset, &size) >= B_OK;
-				i++) {
+					info.GetPartitionableSpaceAt(i, &offset, &size) >= B_OK;
+					i++) {
 				// TODO: remove again once Disk Device API is fixed
 				if (!is_valid_partitionable_space(size))
 					continue;

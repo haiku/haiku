@@ -41,8 +41,8 @@
 #include "MountServer.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "AutoMounter"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "AutoMounter"
 
 
 static const char* kMountServerSettings = "mount_server";
@@ -569,8 +569,10 @@ AutoMounter::_MountVolume(const BMessage* message)
 		char text[512];
 		snprintf(text, sizeof(text),
 			B_TRANSLATE("Error mounting volume:\n\n%s"), strerror(status));
-		(new BAlert(B_TRANSLATE("Mount error"), text,
-			B_TRANSLATE("OK")))->Go(NULL);
+		BAlert* alert = new BAlert(B_TRANSLATE("Mount error"), text,
+			B_TRANSLATE("OK"));
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go(NULL);
 	}
 }
 
@@ -603,8 +605,10 @@ AutoMounter::_ReportUnmountError(const char* name, status_t error)
 	snprintf(text, sizeof(text), B_TRANSLATE("Could not unmount disk "
 		"\"%s\":\n\t%s"), name, strerror(error));
 
-	(new BAlert(B_TRANSLATE("Unmount error"), text, B_TRANSLATE("OK"),
-		NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
+	BAlert* alert = new BAlert(B_TRANSLATE("Unmount error"), text,
+		B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+	alert->Go(NULL);
 }
 
 
@@ -714,7 +718,7 @@ AutoMounter::_UnmountAndEjectVolume(BMessage* message)
 		if (status == B_OK)
 			status = volume.GetName(name);
 		if (status < B_OK)
-			snprintf(name, sizeof(name), "device:%ld", device);
+			snprintf(name, sizeof(name), "device:%" B_PRIdDEV, device);
 
 		BPath path;
 		if (status == B_OK) {
@@ -808,7 +812,7 @@ AutoMounter::_ReadSettings()
 	BMessage message('stng');
 	status_t result = message.Unflatten(buffer);
 	if (result != B_OK) {
-		PRINT(("error %s unflattening automounter settings, size %d\n",
+		PRINT(("error %s unflattening automounter settings, size %" B_PRIdSSIZE "\n",
 			strerror(result), settingsSize));
 		delete [] buffer;
 		return;

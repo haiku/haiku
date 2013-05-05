@@ -253,6 +253,13 @@ hash_remove_current(struct hash_table *table, struct hash_iterator *iterator)
 			} else {
 				table->table[index] = (struct hash_element *)NEXT(table,
 					element);
+
+				// We need to rewind the bucket, as hash_next() advances to the
+				// next bucket when iterator->current is NULL. With this we
+				// basically move the iterator between the end of the last
+				// bucket and before the start of this one so hash_next()
+				// doesn't skip the rest of this bucket.
+				iterator->bucket--;
 			}
 
 			table->num_elements--;
@@ -417,13 +424,13 @@ hash_dump_table(struct hash_table* table)
 {
 	uint32 i;
 
-	dprintf("hash table %p, table size: %lu, elements: %u\n", table,
+	dprintf("hash table %p, table size: %" B_PRIu32 ", elements: %u\n", table,
 		table->table_size, table->num_elements);
 
 	for (i = 0; i < table->table_size; i++) {
 		struct hash_element* element = table->table[i];
 		if (element != NULL) {
-			dprintf("%6lu:", i);
+			dprintf("%6" B_PRIu32 ":", i);
 			while (element != NULL) {
 				dprintf(" %p", element);
 				element = (hash_element*)NEXT(table, element);

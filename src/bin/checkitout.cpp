@@ -57,6 +57,7 @@ CheckItOut::_Warn(const char* url)
 	message << "Proceed anyway?";
 	BAlert* alert = new BAlert("Warning", message.String(), "Proceed", "Stop", NULL,
 		B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+	alert->SetShortcut(1, B_ESCAPE);
 	int32 button;
 	button = alert->Go();
 	if (button == 0)

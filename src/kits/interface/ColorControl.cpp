@@ -23,18 +23,16 @@
 #include <TextControl.h>
 #include <Region.h>
 #include <Screen.h>
+#include <SystemCatalog.h>
 #include <Window.h>
 
-#include <Catalog.h>
-#include <LocaleBackend.h>
-using BPrivate::gLocaleBackend;
-using BPrivate::LocaleBackend;
+using BPrivate::gSystemCatalog;
 
 #include <binary_compatibility/Interface.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ColorControl"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ColorControl"
 
 static const uint32 kMsgColorEntered = 'ccol';
 static const uint32 kMinCellSize = 6;
@@ -78,11 +76,6 @@ void
 BColorControl::_InitData(color_control_layout layout, float size,
 	bool useOffscreen, BMessage* archive)
 {
-	// we need to translate some strings, and in order to do so, we need
-	// to use the LocaleBackend to reache liblocale.so
-	if (gLocaleBackend == NULL)
-		LocaleBackend::LoadBackend();
-
 	fPaletteMode = BScreen(B_MAIN_SCREEN_ID).ColorSpace() == B_CMAP8;
 		//TODO: we don't support workspace and colorspace changing for now
 		//		so we take the main_screen colorspace at startup
@@ -97,11 +90,9 @@ BColorControl::_InitData(color_control_layout layout, float size,
 	const char* red = B_TRANSLATE_MARK("Red:");
 	const char* green = B_TRANSLATE_MARK("Green:");
 	const char* blue = B_TRANSLATE_MARK("Blue:");
-	if (gLocaleBackend) {
-		red = gLocaleBackend->GetString(red, "ColorControl");
-		green = gLocaleBackend->GetString(green, "ColorControl");
-		blue = gLocaleBackend->GetString(blue, "ColorControl");
-	}
+	red = gSystemCatalog.GetString(red, "ColorControl");
+	green = gSystemCatalog.GetString(green, "ColorControl");
+	blue = gSystemCatalog.GetString(blue, "ColorControl");
 
 	if (archive) {
 		fRedText = (BTextControl*)FindView("_red");
@@ -937,11 +928,11 @@ BColorControl::Perform(perform_code code, void* _data)
 			BColorControl::SetLayout(data->layout);
 			return B_OK;
 		}
-		case PERFORM_CODE_INVALIDATE_LAYOUT:
+		case PERFORM_CODE_LAYOUT_INVALIDATED:
 		{
-			perform_data_invalidate_layout* data
-				= (perform_data_invalidate_layout*)_data;
-			BColorControl::InvalidateLayout(data->descendants);
+			perform_data_layout_invalidated* data
+				= (perform_data_layout_invalidated*)_data;
+			BColorControl::LayoutInvalidated(data->descendants);
 			return B_OK;
 		}
 		case PERFORM_CODE_DO_LAYOUT:

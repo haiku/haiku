@@ -8,6 +8,7 @@
 
 #include <errno.h>
 
+#include <errno_private.h>
 #include <syscalls.h>
 
 
@@ -23,7 +24,7 @@ set_signal_stack(void *ptr, size_t size)
 
 	status = _kern_set_signal_stack(&alternateStack, NULL);
 	if (status < B_OK)
-		errno = status;
+		__set_errno(status);
 }
 
 

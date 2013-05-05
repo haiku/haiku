@@ -1288,7 +1288,7 @@ Operator::Copy() const
 void
 Operator::PrintToStream()
 {
-	D(__out("( "));
+	__out("( ");
 	if (fLeft != NULL)
 		fLeft->PrintToStream();
 
@@ -1298,12 +1298,12 @@ Operator::PrintToStream()
 		case OP_AND: op = "AND"; break;
 		default: op = "?"; break;
 	}
-	D(__out(" %s ", op));
+	__out(" %s ", op);
 
 	if (fRight != NULL)
 		fRight->PrintToStream();
 
-	D(__out(" )"));
+	__out(" )");
 }
 
 
@@ -1319,7 +1319,7 @@ Equation::PrintToStream()
 		case OP_LESS_THAN: symbol = "<"; break;
 		case OP_LESS_THAN_OR_EQUAL: symbol = "<="; break;
 	}
-	D(__out("[\"%s\" %s \"%s\"]", fAttribute, symbol, fString));
+	__out("[\"%s\" %s \"%s\"]", fAttribute, symbol, fString);
 }
 
 #endif	// DEBUG

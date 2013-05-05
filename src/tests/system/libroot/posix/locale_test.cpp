@@ -410,7 +410,7 @@ test_localeconv()
 		(char*)",",
 		(char*)"\x03\x02",
 		(char*)"INR ",
-		(char*)"રુ",
+		(char*)"\xE2\x82\xB9",
 		(char*)".",
 		(char*)",",
 		(char*)"\x03\x02",
@@ -534,12 +534,12 @@ test_strftime(const char* locale, const strftime_data data[])
 	setlocale(LC_TIME, locale);
 	printf("strftime for '%s'\n", locale);
 
-	time_t nowSecs = 1279391169;	// pure magic
-	tm* now = localtime(&nowSecs);
+	time_t testTimeInSecs = 1279391169;	// Sat Jul 17 18:26:09 2010 UTC
+	tm* testTime = localtime(&testTimeInSecs);
 	int problemCount = 0;
 	for(int i = 0; data[i].format != NULL; ++i) {
 		char buf[100];
-		strftime(buf, 100, data[i].format, now);
+		strftime(buf, 100, data[i].format, testTime);
 		if (strcmp(buf, data[i].result) != 0) {
 			printf("\tPROBLEM: strftime(\"%s\") = \"%s\" (expected \"%s\")\n",
 				data[i].format, buf, data[i].result);
@@ -631,7 +631,7 @@ test_strftime()
 	test_strftime("nl_NL", strftime_nl);
 
 	const strftime_data strftime_nb[] = {
-		{ "%c", "lørdag 17. juli 2010 kl. 18:26:09 GMT" },
+		{ "%c", "kl. 18:26:09 GMT lørdag 17. juli 2010" },
 		{ "%x", "17. juli 2010" },
 		{ "%X", "18:26:09" },
 		{ "%a", "lør." },
@@ -643,6 +643,135 @@ test_strftime()
 	test_strftime("nb_NO", strftime_nb);
 }
 
+
+// #pragma mark - strftime -----------------------------------------------------
+
+
+struct strptime_data {
+	const char* format;
+	const char* dateString;
+};
+
+
+void
+test_strptime(const char* locale, const strptime_data data[])
+{
+	setlocale(LC_TIME, locale);
+	printf("strptime for '%s'\n", locale);
+
+	time_t expectedTimeInSecs = 1279391169;	// Sat Jul 17 18:26:09 2010 UTC
+	int problemCount = 0;
+	for(int i = 0; data[i].format != NULL; ++i) {
+		struct tm resultTime;
+		if (strptime(data[i].dateString, data[i].format, &resultTime) == NULL) {
+			printf("\tPROBLEM: strptime(\"%s\", \"%s\") failed\n",
+				data[i].dateString, data[i].format);
+			problemCount++;
+		} else {
+			time_t resultTimeInSecs = mktime(&resultTime);
+			if (resultTimeInSecs != expectedTimeInSecs) {
+				printf("\tPROBLEM: strptime(\"%s\", \"%s\") = \"%d\" (expected \"%d\")\n",
+					data[i].dateString, data[i].format, resultTimeInSecs, expectedTimeInSecs);
+				problemCount++;
+			}
+		}
+	}
+	if (problemCount)
+		printf("\t%d problem(s) found!\n", problemCount);
+	else
+		printf("\tall fine\n");
+}
+
+
+void
+test_strptime()
+{
+	setenv("TZ", "GMT", 1);
+
+	const strptime_data strptime_posix[] = {
+		{ "%c", "Sat Jul 17 18:26:09 2010" },
+		{ "%x", "07/17/10" },
+		{ "%X", "18:26:09" },
+		{ "%a", "Sat" },
+		{ "%A", "Saturday" },
+		{ "%b", "Jul" },
+		{ "%B", "July" },
+		{ NULL, NULL }
+	};
+	test_strptime("POSIX", strptime_posix);
+
+	const strptime_data strptime_de[] = {
+		{ "%c", "Samstag, 17. Juli 2010 18:26:09 GMT" },
+		{ "%x", "17.07.2010" },
+		{ "%X", "18:26:09" },
+		{ "%a", "Sa." },
+		{ "%A", "Samstag" },
+		{ "%b", "Jul" },
+		{ "%B", "Juli" },
+		{ NULL, NULL }
+	};
+	test_strptime("de_DE.UTF-8", strptime_de);
+
+	const strptime_data strptime_hr[] = {
+		{ "%c", "subota, 17. srpnja 2010. 18:26:09 GMT" },
+		{ "%x", "17. 07. 2010." },
+		{ "%X", "18:26:09" },
+		{ "%a", "sub" },
+		{ "%A", "subota" },
+		{ "%b", "srp" },
+		{ "%B", "srpnja" },
+		{ NULL, NULL }
+	};
+	test_strptime("hr_HR.ISO8859-2", strptime_hr);
+
+	const strptime_data strptime_gu[] = {
+		{ "%c", "શનિવાર, 17 જુલાઈ, 2010 06:26:09 PM GMT" },
+		{ "%x", "17 જુલાઈ, 2010" },
+		{ "%X", "06:26:09 PM" },
+		{ "%a", "શનિ" },
+		{ "%A", "શનિવાર" },
+		{ "%b", "જુલાઈ" },
+		{ "%B", "જુલાઈ" },
+		{ NULL, NULL }
+	};
+	test_strptime("gu_IN", strptime_gu);
+
+	const strptime_data strptime_it[] = {
+		{ "%c", "sabato 17 luglio 2010 18:26:09 GMT" },
+		{ "%x", "17/lug/2010" },
+		{ "%X", "18:26:09" },
+		{ "%a", "sab" },
+		{ "%A", "sabato" },
+		{ "%b", "lug" },
+		{ "%B", "luglio" },
+		{ NULL, NULL }
+	};
+	test_strptime("it_IT", strptime_it);
+
+	const strptime_data strptime_nl[] = {
+		{ "%c", "zaterdag 17 juli 2010 18:26:09 GMT" },
+		{ "%x", "17 jul. 2010" },
+		{ "%X", "18:26:09" },
+		{ "%a", "za" },
+		{ "%A", "zaterdag" },
+		{ "%b", "jul." },
+		{ "%B", "juli" },
+		{ NULL, NULL }
+	};
+	test_strptime("nl_NL", strptime_nl);
+
+	const strptime_data strptime_nb[] = {
+		{ "%c", "kl. 18:26:09 GMT lørdag 17. juli 2010" },
+		{ "%x", "17. juli 2010" },
+		{ "%X", "18:26:09" },
+		{ "%a", "lør." },
+		{ "%A", "lørdag" },
+		{ "%b", "juli" },
+		{ "%B", "juli" },
+		{ NULL, NULL }
+	};
+	test_strptime("nb_NO", strptime_nb);
+}
 
 // #pragma mark - ctype --------------------------------------------------------
 
@@ -1461,13 +1590,13 @@ static int sign (int a)
 
 
 void
-test_coll(bool useStrxfrm, const char* locale, const coll_data coll[])
+test_coll(bool useStrxfrm, const char* locale, const coll_data* coll)
 {
 	setlocale(LC_COLLATE, locale);
 	printf("%s in %s locale\n", useStrxfrm ? "strxfrm" : "strcoll", locale);
 
 	int problemCount = 0;
-	for (unsigned int i = 0; i < sizeof(coll) / sizeof(coll_data); ++i) {
+	for (unsigned int i = 0; coll[i].a != NULL; ++i) {
 		errno = 0;
 		int result;
 		char funcCall[100];
@@ -1508,6 +1637,7 @@ test_collation()
 		{ "test", "tester", -1, 0 },
 		{ "tast", "täst", -1, EINVAL },
 		{ "tæst", "test", 1, EINVAL },
+		{ NULL, NULL, 0, 0 },
 	};
 	test_coll(0, "POSIX", coll_posix);
 	test_coll(1, "POSIX", coll_posix);
@@ -1535,6 +1665,7 @@ test_collation()
 		{ "cote", "coté", -1, 0 },
 		{ "coté", "côte", -1, 0 },
 		{ "côte", "côté", -1, 0 },
+		{ NULL, NULL, 0, 0 },
 	};
 	test_coll(0, "en_US.UTF-8", coll_en);
 	test_coll(1, "en_US.UTF-8", coll_en);
@@ -1562,6 +1693,7 @@ test_collation()
 		{ "cote", "coté", -1, 0 },
 		{ "coté", "côte", -1, 0 },
 		{ "côte", "côté", -1, 0 },
+		{ NULL, NULL, 0, 0 },
 	};
 	test_coll(0, "de_DE.UTF-8", coll_de);
 	test_coll(1, "de_DE.UTF-8", coll_de);
@@ -1589,6 +1721,7 @@ test_collation()
 		{ "cote", "coté", -1, 0 },
 		{ "coté", "côte", -1, 0 },
 		{ "côte", "côté", -1, 0 },
+		{ NULL, NULL, 0, 0 },
 	};
 	test_coll(0, "de_DE.UTF-8@collation=phonebook", coll_de_phonebook);
 	test_coll(1, "de_DE.UTF-8@collation=phonebook", coll_de_phonebook);
@@ -1616,9 +1749,13 @@ test_collation()
 		{ "cote", "coté", -1, 0 },
 		{ "coté", "côte", 1, 0 },
 		{ "côte", "côté", -1, 0 },
+		{ NULL, NULL, 0, 0 },
 	};
-	test_coll(0, "fr_FR.UTF-8", coll_fr);
-	test_coll(1, "fr_FR.UTF-8", coll_fr);
+	// CLDR-1.9 has adjusted the defaults of fr_FR to no longer do reverse
+	// ordering of secondary differences (accents), but fr_CA still does that
+	// by default
+	test_coll(0, "fr_CA.UTF-8", coll_fr);
+	test_coll(1, "fr_CA.UTF-8", coll_fr);
 }
 
 
@@ -1808,7 +1945,7 @@ test_mktime(const char* tz, tm& tm, time_t expected, int expectedWeekDay,
 void
 test_timeconversions()
 {
-	setlocale(LC_ALL, "");
+	setlocale(LC_ALL, "en_US");
 	{
 		time_t testTime = 1279391169;	// Sat Jul 17 18:26:09 GMT 2010
 		tm gtm = {
@@ -1866,7 +2003,7 @@ test_timeconversions()
 		test_mktime(":America/Los_Angeles", latm, testTime, 6, 197);
 
 		tm ttm = {
-			9, 26, 3, 18, 6, 110, 0, 198, 0, 9 * 3600, (char*)"JST"
+			9, 26, 3, 18, 6, 110, 0, 198, 0, 9 * 3600, (char*)"GMT+09:00"
 		};
 		test_localtime(":Asia/Tokyo", testTime, ttm);
 		test_gmtime(":Asia/Tokyo", testTime, gtm);
@@ -1914,7 +2051,7 @@ test_timeconversions()
 		test_mktime(":America/Los_Angeles", latm, testTime, 2, 67);
 
 		tm ttm = {
-			9, 26, 3, 10, 2, 110, 3, 68, 0, 9 * 3600, (char*)"JST"
+			9, 26, 3, 10, 2, 110, 3, 68, 0, 9 * 3600, (char*)"GMT+09:00"
 		};
 		test_localtime(":Asia/Tokyo", testTime, ttm);
 		test_gmtime(":Asia/Tokyo", testTime, gtm);
@@ -1962,7 +2099,7 @@ test_timeconversions()
 		test_mktime(":America/Los_Angeles", latm, testTime, 3, 364);
 
 		tm ttm = {
-			0, 0, 9, 1, 0, 70, 4, 0, 0, 9 * 3600, (char*)"JST"
+			0, 0, 9, 1, 0, 70, 4, 0, 0, 9 * 3600, (char*)"GMT+09:00"
 		};
 		test_localtime(":Asia/Tokyo", testTime, ttm);
 		test_gmtime(":Asia/Tokyo", testTime, gtm);
@@ -2079,6 +2216,7 @@ main(void)
 	test_setlocale();
 	test_localeconv();
 	test_strftime();
+	test_strptime();
 	test_ctype();
 	test_wctype();
 	test_wctrans();

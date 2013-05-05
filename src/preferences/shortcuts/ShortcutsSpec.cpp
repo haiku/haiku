@@ -32,8 +32,8 @@
 
 #define CLASS "ShortcutsSpec : "
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ShortcutsSpec"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ShortcutsSpec"
 
 const float _height = 20.0f;
 
@@ -862,7 +862,7 @@ ShortcutsSpec::_InitModifierNames()
 		"Name for modifier on keyboard");
 // TODO: Wrapping in __INTEL__ define probably won't work to extract catkeys?
 #if __INTEL__
-	sOptionName = B_TRANSLATE_COMMENT("Window",
+	sOptionName = B_TRANSLATE_COMMENT("Option",
 		"Name for modifier on keyboard");
 	sCommandName = B_TRANSLATE_COMMENT("Alt",
 		"Name for modifier on keyboard");

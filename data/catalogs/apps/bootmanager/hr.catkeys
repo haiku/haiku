@@ -1,0 +1,37 @@
+1	croatian	x-vnd.Haiku-BootManager	522739330
+After five seconds	DefaultPartitionPage		Nakon pet sekundi
+After four seconds	DefaultPartitionPage		Nakon četiri sekunde
+After one minute	DefaultPartitionPage		Nakon jedne minute
+After one second	DefaultPartitionPage		Nakon jedne sekunde
+After three seconds	DefaultPartitionPage		Nakon tri sekunde
+After two seconds	DefaultPartitionPage		Nakon dvije sekunde
+At least one partition must be selected!	BootManagerController		Barem jedna particija mora biti odabrana!
+Back	BootManagerController	Button	Natrag
+Boot Manager is unable to read the partition table!	BootManagerController		Upravitelj podizanja sustava ne može čitati particijsku tablicu!
+BootManager	System name		Upravitelj podizanja sustava
+Default Partition	DefaultPartitionPage	Title	Zadana particija
+Default Partition:	DefaultPartitionPage	Menu field label	Zadana particija:
+Done	BootManagerController	Button	Učinjeno
+Drives	DrivesPage	Title	Pogoni
+Error reading partition table	BootManagerController	Title	Greška pri čitanju particijske tablice
+File:	FileSelectionPage	Text control label	Datoteka:
+Immediately	DefaultPartitionPage		Odmah
+Install	DrivesPage	Button	Instaliraj
+Installation of boot menu completed	BootManagerController	Title	Završena instalacija upravitelja podizanja sustava
+Next	WizardView	Button	Slijedeće
+No space available!	DrivesPage	Cannot install	Nema dostupnog prostora
+OK	BootManagerController	Button	U redu
+Partitions	DefaultPartitionPage	Pop up menu title	Particije
+Partitions	PartitionsPage	Title	Particije
+Previous	WizardView	Button	Prethodno
+Quit	DrivesPage	Button	Isključi
+Select	FileSelectionPage	Button	Odaberi
+The boot manager has been successfully installed on your system.	BootManagerController		Upravitelj podizanja sustava uspješno je instaliran u vaš sustav.
+The old Master Boot Record could not be saved to %s	BootManagerController		Stari Master Boot Record ne može se spremiti u %s
+Uninstall	DrivesPage	Button	Deinstaliraj
+Uninstall Boot Manager	UninstallPage	Title	Deinstaliraj Upravitelj podizanja sustava
+Uninstall boot manager	BootManagerController	Title	Deinstaliraj upravitelja podizanja sustava
+Uninstallation of boot menu failed	BootManagerController	Title	Neuspjela deinstalacija upravitelja podizanja sustava
+Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Nepoznato
+Update	DrivesPage	Button	Dopune
+Write boot menu	BootManagerController	Button	Zapiši izbornik podizanja sustava

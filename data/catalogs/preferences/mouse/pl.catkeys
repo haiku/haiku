@@ -1,23 +1,24 @@
-1	polish	x-vnd.Haiku-Mouse	3904912604
-...by Andrew Edward McCall	MouseApplication		...stworzone przez Andrew Edward McCall
-1-Button	SettingsView		Jednoprzyciskowa
+1	polish	x-vnd.Haiku-Mouse	1033564338
+Mouse type:	SettingsView		Rodzaj myszy:
+Warp	SettingsView		Przeniesienie
 2-Button	SettingsView		Dwuprzyciskowa
-3-Button	SettingsView		Trójprzyciskowa
-Accept first click	SettingsView		Akceptuj pierwsze klinięcie
+Double-click test area	SettingsView		Strefa testowania podw. kliknięcia
+Revert	MouseWindow		Przywróć
+...by Andrew Edward McCall	MouseApplication		...stworzone przez Andrew Edward McCall
+Mouse acceleration	SettingsView		Przyspieszenie wskaźnika
 Click to focus	SettingsView		Kliknij by zaznaczyć
 Click to focus and raise	SettingsView		Kliknij aby zaznaczyć i podnieść
-Defaults	MouseWindow		Domyślne
-Dig Deal	MouseApplication		Dig Deal
-Double-click speed	SettingsView		Prędkość dwukrotnego kliknięcia
-Double-click test area	SettingsView		Strefa testowania podw. kliknięcia
-Fast	SettingsView		Szybko
-Focus follows mouse	SettingsView		Podążaj za wskaźnikiem myszy
+3-Button	SettingsView		Trójprzyciskowa
+Mouse speed	SettingsView		Prędkość wskaźnika
 Focus mode:	SettingsView		Tryb zaznaczania:
 Instant warp	SettingsView		Natychmiastowe przeniesienie
-Mouse acceleration	SettingsView		Przyspieszenie wskaźnika
-Mouse speed	SettingsView		Prędkość wskaźnika
-Mouse type:	SettingsView		Rodzaj myszy:
+Dig Deal	MouseApplication		Dig Deal
+1-Button	SettingsView		Jednoprzyciskowa
+Double-click speed	SettingsView		Prędkość dwukrotnego kliknięcia
+Defaults	MouseWindow		Domyślne
+Focus follows mouse	SettingsView		Podążaj za wskaźnikiem myszy
+Accept first click	SettingsView		Akceptuj pierwsze klinięcie
+Fast	SettingsView		Szybko
 Normal	SettingsView		Normalna
-Revert	MouseWindow		Przywróć
+Mouse	System name		Mysz
 Slow	SettingsView		Wolno
-Warp	SettingsView		Przeniesienie

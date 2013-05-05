@@ -19,14 +19,11 @@
 #include <unistd.h>
 
 #include <arpa/inet.h>
-#include <sys/select.h>
 
 #if USE_SSL
-#	include <openssl/ssl.h>
-#	include <openssl/rand.h>
-#	include <openssl/md5.h>
+#include <openssl/md5.h>
 #else
-#	include "md5.h"
+#include "md5.h"
 #endif
 
 #include <Alert.h>
@@ -35,6 +32,7 @@
 #include <Directory.h>
 #include <fs_attr.h>
 #include <Path.h>
+#include <SecureSocket.h>
 #include <String.h>
 #include <VolumeRoster.h>
 #include <Query.h>
@@ -44,8 +42,18 @@
 #include "MessageIO.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "pop3"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "pop3"
+
+
+static void NotHere(BStringList &that, BStringList &otherList,
+	BStringList *results)
+{
+	for (int32 i = 0; i < otherList.CountStrings(); i++) {
+		if (!that.HasString(otherList.StringAt(i)))
+			results->Add(otherList.StringAt(i));
+	}
+}
 
 
 #define POP3_RETRIEVAL_TIMEOUT 60000000
@@ -56,15 +64,13 @@ POP3Protocol::POP3Protocol(BMailAccountSettings* settings)
 	:
 	InboundProtocol(settings),
 	fNumMessages(-1),
-	fMailDropSize(0)
+	fMailDropSize(0),
+	fServerConnection(NULL)
 {
 	printf("POP3Protocol::POP3Protocol(BMailAccountSettings* settings)\n");
 	fSettings = fAccountSettings.InboundSettings().Settings();
-#ifdef USE_SSL
-	fUseSSL = (fSettings.FindInt32("flavor") == 1);
-	fSSL = NULL;
-	fSSLContext = NULL;
-#endif
+
+	fUseSSL = fSettings.FindInt32("flavor") == 1 ? true : false;
 
 	if (fSettings.FindString("destination", &fDestinationDir) != B_OK)
 		fDestinationDir = "/boot/home/mail/in";
@@ -97,6 +103,8 @@ POP3Protocol::Connect()
 		fSettings.FindInt32("auth_method"));
 	delete[] password;
 
+	if (error != B_OK)
+		fServerConnection->Disconnect();
 	return error;
 }
 
@@ -104,28 +112,15 @@ POP3Protocol::Connect()
 status_t
 POP3Protocol::Disconnect()
 {
-#ifdef USE_SSL
-	if (!fUseSSL || fSSL)
-#endif
+	if (fServerConnection == NULL)
+		return B_OK;
+
 	SendCommand("QUIT" CRLF);
 
-#ifdef USE_SSL
-	if (fUseSSL) {
-		if (fSSL)
-			SSL_shutdown(fSSL);
-		if (fSSLContext)
-			SSL_CTX_free(fSSLContext);
-		if (fSSLBio)
-			BIO_free(fSSLBio);
+	fServerConnection->Disconnect();
+	delete fServerConnection;
+	fServerConnection = NULL;
 
-		fSSL = NULL;
-		fSSLContext = NULL;
-		fSSLBio = NULL;
-	}
-#endif
-
-	close(fSocket);
-	fSocket = -1;
 	return B_OK;
 }
 
@@ -155,25 +150,27 @@ POP3Protocol::SyncMessages()
 	error = _UniqueIDs();
 	if (error < B_OK) {
 		ResetProgress();
+		Disconnect();
 		return error;
 	}
 
 	BStringList toDownload;
-	fManifest.NotHere(fUniqueIDs, &toDownload);
+	NotHere(fManifest, fUniqueIDs, &toDownload);
 
-	int32 numMessages = toDownload.CountItems();
+	int32 numMessages = toDownload.CountStrings();
 	if (numMessages == 0) {
 		CheckForDeletedMessages();
 		ResetProgress();
+		Disconnect();
 		return B_OK;
 	}
 
 	ResetProgress();
-	SetTotalItems(toDownload.CountItems());
+	SetTotalItems(toDownload.CountStrings());
 
-	printf("POP3: Messages to download: %i\n", (int)toDownload.CountItems());
-	for (int32 i = 0; i < toDownload.CountItems(); i++) {
-		const char* uid = toDownload.ItemAt(i);
+	printf("POP3: Messages to download: %i\n", (int)toDownload.CountStrings());
+	for (int32 i = 0; i < toDownload.CountStrings(); i++) {
+		const char* uid = toDownload.StringAt(i);
 		int32 toRetrieve = fUniqueIDs.IndexOf(uid);
 
 		if (toRetrieve < 0) {
@@ -236,7 +233,7 @@ POP3Protocol::SyncMessages()
 		file.WriteAttr("MAIL:size", B_INT32_TYPE, 0, &size, sizeof(int32));
 
 		// save manifest in case we get disturbed
-		fManifest += uid;
+		fManifest.Add(uid);
 		_WriteManifest();
 	}
 
@@ -259,22 +256,30 @@ POP3Protocol::FetchBody(const entry_ref& ref)
 		return error;
 
 	error = _UniqueIDs();
-	if (error < B_OK)
+	if (error < B_OK) {
+		Disconnect();
 		return error;
+	}
 
 	BFile file(&ref, B_READ_WRITE);
 	status_t status = file.InitCheck();
-	if (status != B_OK)
+	if (status != B_OK) {
+		Disconnect();
 		return status;
+	}
 
 	char uidString[256];
 	BNode node(&ref);
-	if (node.ReadAttr("MAIL:unique_id", B_STRING_TYPE, 0, uidString, 256) < 0)
+	if (node.ReadAttr("MAIL:unique_id", B_STRING_TYPE, 0, uidString, 256) < 0) {
+		Disconnect();
 		return B_ERROR;
+	}
 
 	int32 toRetrieve = fUniqueIDs.IndexOf(uidString);
-	if (toRetrieve < 0)
+	if (toRetrieve < 0) {
+		Disconnect();
 		return B_NAME_NOT_FOUND;
+	}
 
 	bool leaveOnServer;
 	if (fSettings.FindBool("leave_mail_on_server", &leaveOnServer) != B_OK)
@@ -284,8 +289,10 @@ POP3Protocol::FetchBody(const entry_ref& ref)
 	BMailMessageIO io(this, &file, toRetrieve);
 	// read body
 	status = io.Seek(0, SEEK_END);
-	if (status < 0)
+	if (status < 0) {
+		Disconnect();
 		return status;
+	}
 
 	NotifyBodyFetched(ref, &file);
 
@@ -308,17 +315,22 @@ POP3Protocol::DeleteMessage(const entry_ref& ref)
 		return error;
 
 	error = _UniqueIDs();
-	if (error < B_OK)
+	if (error < B_OK) {
+		Disconnect();
 		return error;
+	}
 
-#if DEBUG
-	printf("DeleteMessage: ID is %d\n", (int)unique_ids->IndexOf(uid));
-		// What should we use for int32 instead of %d?
-#endif
 	char uidString[256];
 	BNode node(&ref);
-	if (node.ReadAttr("MAIL:unique_id", B_STRING_TYPE, 0, uidString, 256) < 0)
+	if (node.ReadAttr("MAIL:unique_id", B_STRING_TYPE, 0, uidString, 256) < 0) {
+		Disconnect();
 		return B_ERROR;
+	}
+
+	#if DEBUG
+	printf("DeleteMessage: ID is %d\n", (int)fUniqueIDs.IndexOf(uidString));
+		// What should we use for int32 instead of %d?
+	#endif
 	Delete(fUniqueIDs.IndexOf(uidString));
 
 	Disconnect();
@@ -327,18 +339,13 @@ POP3Protocol::DeleteMessage(const entry_ref& ref)
 
 
 status_t
-POP3Protocol::Open(const char *server, int port, int)
+POP3Protocol::Open(const char* server, int port, int)
 {
 	ReportProgress(0, 0, B_TRANSLATE("Connecting to POP3 server"
 		B_UTF8_ELLIPSIS));
 
-	if (port <= 0) {
-#ifdef USE_SSL
+	if (port <= 0)
 		port = fUseSSL ? 995 : 110;
-#else
-		port = 110;
-#endif
-	}
 
 	fLog = "";
 
@@ -366,63 +373,26 @@ POP3Protocol::Open(const char *server, int port, int)
 		return B_NAME_NOT_FOUND;
 	}
 
-	fSocket = socket(AF_INET, SOCK_STREAM, 0);
-	if (fSocket >= 0) {
-		struct sockaddr_in saAddr;
-		memset(&saAddr, 0, sizeof(saAddr));
-		saAddr.sin_family = AF_INET;
-		saAddr.sin_port = htons(port);
-		saAddr.sin_addr.s_addr = hostIP;
-		int result = connect(fSocket, (struct sockaddr *) &saAddr,
-			sizeof(saAddr));
-		if (result < 0) {
-			close(fSocket);
-			fSocket = -1;
-			error_msg << ": " << strerror(errno);
-			ShowError(error_msg.String());
-			return errno;
-		}
-	} else {
-		error_msg << B_TRANSLATE(": Could not allocate socket.");
-		ShowError(error_msg.String());
-		return B_ERROR;
-	}
-
-#ifdef USE_SSL
+	delete fServerConnection;
+	fServerConnection = NULL;
 	if (fUseSSL) {
-		SSL_library_init();
-		SSL_load_error_strings();
-		RAND_seed(this,sizeof(POP3Protocol));
-		/*--- Because we're an add-on loaded at an unpredictable time, all
-			the memory addresses and things contained in ourself are
-			esssentially random. */
-
-		fSSLContext = SSL_CTX_new(SSLv23_method());
-		fSSL = SSL_new(fSSLContext);
-		fSSLBio = BIO_new_socket(fSocket, BIO_NOCLOSE);
-		SSL_set_bio(fSSL, fSSLBio, fSSLBio);
-
-		if (SSL_connect(fSSL) <= 0) {
-			BString error;
-			error << "Could not connect to POP3 server "
-				<< fSettings.FindString("server");
-			if (port != 995)
-				error << ":" << port;
-			error << ". (SSL connection error)";
-			ShowError(error.String());
-			SSL_CTX_free(fSSLContext);
-			close(fSocket);
-			return B_ERROR;
-		}
+		fServerConnection = new(std::nothrow) BSecureSocket(
+			BNetworkAddress(server, port));
+	} else {
+		fServerConnection = new(std::nothrow) BSocket(BNetworkAddress(
+			server,	port));
 	}
-#endif
+
+	if (fServerConnection == NULL)
+		return B_NO_MEMORY;
+	if (fServerConnection->InitCheck() != B_OK)
+		return fServerConnection->InitCheck();
 
 	BString line;
 	status_t err = ReceiveLine(line);
 
 	if (err < 0) {
-		close(fSocket);
-		fSocket = -1;
+		fServerConnection->Disconnect();
 		error_msg << ": " << strerror(err);
 		ShowError(error_msg.String());
 		return B_ERROR;
@@ -436,6 +406,7 @@ POP3Protocol::Open(const char *server, int port, int)
 			error_msg << B_TRANSLATE(": No reply.\n");
 
 		ShowError(error_msg.String());
+		fServerConnection->Disconnect();
 		return B_ERROR;
 	}
 
@@ -560,17 +531,17 @@ POP3Protocol::CheckForDeletedMessages()
 	{
 		//---Delete things from the manifest no longer on the server
 		BStringList temp;
-		fManifest.NotThere(fUniqueIDs, &temp);
-		fManifest -= temp;
+		NotHere(fUniqueIDs, fManifest, &temp);
+		fManifest.Remove(temp);
 	}
 
 	if (!fSettings.FindBool("delete_remote_when_local")
-		|| fManifest.CountItems() == 0)
+		|| fManifest.CountStrings() == 0)
 		return;
 
-	BStringList to_delete;
+	BStringList toDelete;
 
-	BStringList query_contents;
+	BStringList queryContents;
 	BVolumeRoster volumes;
 	BVolume volume;
 
@@ -588,20 +559,22 @@ POP3Protocol::CheckForDeletedMessages()
 		BString uid;
 		while (fido.GetNextRef(&entry) == B_OK) {
 			BNode(&entry).ReadAttrString("MAIL:unique_id", &uid);
-			query_contents.AddItem(uid.String());
+			queryContents.Add(uid);
 		}
 	}
-	query_contents.NotHere(fManifest, &to_delete);
+	NotHere(queryContents, fManifest, &toDelete);
 
-	for (int32 i = 0; i < to_delete.CountItems(); i++) {
-		printf("delete mail on server uid %s\n", to_delete[i]);
-		Delete(fUniqueIDs.IndexOf(to_delete[i]));
+	for (int32 i = 0; i < toDelete.CountStrings(); i++) {
+		printf("delete mail on server uid %s\n", toDelete.StringAt(i).String());
+		Delete(fUniqueIDs.IndexOf(toDelete.StringAt(i)));
 	}
 
-	//*(unique_ids) -= to_delete; --- This line causes bad things to
-	// happen (POP3 client uses the wrong indices to retrieve
-	// messages).  Without it, bad things don't happen.
-	fManifest -= to_delete;
+	// Don't remove ids from fUniqueIDs, the indices have to stay the same when
+	// retrieving new messages.
+	fManifest.Remove(toDelete);
+
+	// TODO: at some point the purged manifest should be written to disk
+	// otherwise it will grow forever
 }
 
 
@@ -667,37 +640,20 @@ POP3Protocol::RetrieveInternal(const char *command, int32 message,
 	if (SendCommand(command) != B_OK)
 		return B_ERROR;
 
-	struct timeval tv;
-	tv.tv_sec = POP3_RETRIEVAL_TIMEOUT / 1000000;
-	tv.tv_usec = POP3_RETRIEVAL_TIMEOUT % 1000000;
-
-	struct fd_set readSet;
-	FD_ZERO(&readSet);
-	FD_SET(fSocket, &readSet);
-
 	while (cont) {
-		int result = 0;
-
-#ifdef USE_SSL
-		if (fUseSSL && SSL_pending(fSSL))
-			result = 1;
-		else
-#endif
-		result = select(fSocket + 1, &readSet, NULL, NULL, &tv);
-		if (result == 0) {
+		status_t result = fServerConnection->WaitForReadable(
+			POP3_RETRIEVAL_TIMEOUT);
+		if (result == B_TIMED_OUT) {
 			// No data available, even after waiting a minute.
 			fLog = "POP3 timeout - no data received after a long wait.";
 			return B_ERROR;
 		}
 		if (amountToReceive > bufSize - 1 - amountInBuffer)
 			amountToReceive = bufSize - 1 - amountInBuffer;
-#ifdef USE_SSL
-		if (fUseSSL) {
-			amountReceived = SSL_read(fSSL, buf + amountInBuffer,
-				amountToReceive);
-		} else
-#endif
-		amountReceived = recv(fSocket, buf + amountInBuffer, amountToReceive, 0);
+
+		amountReceived = fServerConnection->Read(buf + amountInBuffer,
+			amountToReceive);
+
 		if (amountReceived < 0) {
 			fLog = strerror(errno);
 			return errno;
@@ -811,94 +767,54 @@ POP3Protocol::ReceiveLine(BString &line)
 
 	line = "";
 
-	struct timeval tv;
-	tv.tv_sec = POP3_RETRIEVAL_TIMEOUT / 1000000;
-	tv.tv_usec = POP3_RETRIEVAL_TIMEOUT % 1000000;
-
-	struct fd_set readSet;
-	FD_ZERO(&readSet);
-	FD_SET(fSocket, &readSet);
-
-	int result;
-#ifdef USE_SSL
-	if (fUseSSL && SSL_pending(fSSL))
-		result = 1;
-	else
-#endif
-	result = select(fSocket + 1, &readSet, NULL, NULL, &tv);
-
-	if (result > 0) {
-		while (true) {
-			// Hope there's an end of line out there else this gets stuck.
-			int32 bytesReceived;
-			uint8 c = 0;
-#ifdef USE_SSL
-			if (fUseSSL)
-				bytesReceived = SSL_read(fSSL, (char*)&c, 1);
-			else
-#endif
-			bytesReceived = recv(fSocket, &c, 1, 0);
-			if (bytesReceived < 0)
-				return errno;
-
-			if (c == '\n' || bytesReceived == 0 /* EOF */)
-				break;
-
-			if (c == '\r') {
-				flag = true;
-			} else {
-				if (flag) {
-					len++;
-					line += '\r';
-					flag = false;
-				}
-				len++;
-				line += (char)c;
-			}
-		}
-	} else
+	status_t result = fServerConnection->WaitForReadable(
+		POP3_RETRIEVAL_TIMEOUT);
+	if (result == B_TIMED_OUT)
 		return errno;
+
+	while (true) {
+		// Hope there's an end of line out there else this gets stuck.
+		int32 bytesReceived;
+		uint8 c = 0;
+
+		bytesReceived = fServerConnection->Read((char*)&c, 1);
+		if (bytesReceived < 0)
+			return errno;
+
+		if (c == '\n' || bytesReceived == 0 /* EOF */)
+			break;
+
+		if (c == '\r') {
+			flag = true;
+		} else {
+			if (flag) {
+				len++;
+				line += '\r';
+				flag = false;
+			}
+			len++;
+			line += (char)c;
+		}
+	}
 
 	return len;
 }
 
 
 status_t
-POP3Protocol::SendCommand(const char *cmd)
+POP3Protocol::SendCommand(const char* cmd)
 {
-	if (fSocket < 0 || fSocket >= FD_SETSIZE)
-		return B_FILE_ERROR;
-
 	//printf(cmd);
 	// Flush any accumulated garbage data before we send our command, so we
 	// don't misinterrpret responses from previous commands (that got left over
 	// due to bugs) as being from this command.
 
-	struct timeval tv;
-	tv.tv_sec = 0;
-	tv.tv_usec = 1000;
-		/* very short timeout, hangs with 0 in R5 */
-
-	struct fd_set readSet;
-	FD_ZERO(&readSet);
-	FD_SET(fSocket, &readSet);
-	int result;
-#ifdef USE_SSL
-	if (fUseSSL && SSL_pending(fSSL))
-		result = 1;
-	else
-#endif
-	result = select(fSocket + 1, &readSet, NULL, NULL, &tv);
-
-	if (result > 0) {
+	while (fServerConnection->WaitForReadable(1000) == B_OK) {
 		int amountReceived;
-		char tempString [1025];
-#ifdef USE_SSL
-		if (fUseSSL)
-			amountReceived = SSL_read(fSSL, tempString, sizeof(tempString) - 1);
-		else
-#endif
-		amountReceived = recv(fSocket, tempString, sizeof(tempString) - 1, 0);
+		char tempString [1024];
+
+		amountReceived = fServerConnection->Read(tempString,
+			sizeof(tempString) - 1);
 		if (amountReceived < 0)
 			return errno;
 
@@ -909,12 +825,7 @@ POP3Protocol::SendCommand(const char *cmd)
 		//	break;
 	}
 
-#ifdef USE_SSL
-	if (fUseSSL) {
-		SSL_write(fSSL, cmd,::strlen(cmd));
-	} else
-#endif
-	if (send(fSocket, cmd, ::strlen(cmd), 0) < 0) {
+	if (fServerConnection->Write(cmd, ::strlen(cmd)) < 0) {
 		fLog = strerror(errno);
 		printf("POP3Protocol::SendCommand Send \"%s\" failed, code %d: %s\n",
 			cmd, errno, fLog.String());
@@ -982,14 +893,14 @@ POP3Protocol::_UniqueIDs()
 		return ret;
 
 	BString result;
-	int32 uid_offset;
+	int32 uidOffset;
 	while (ReceiveLine(result) > 0) {
 		if (result.ByteAt(0) == '.')
 			break;
 
-		uid_offset = result.FindFirst(' ') + 1;
-		result.Remove(0,uid_offset);
-		fUniqueIDs.AddItem(result.String());
+		uidOffset = result.FindFirst(' ') + 1;
+		result.Remove(0, uidOffset);
+		fUniqueIDs.Add(result);
 	}
 
 	if (SendCommand("LIST" CRLF) != B_OK)

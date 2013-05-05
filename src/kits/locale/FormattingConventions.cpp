@@ -465,7 +465,7 @@ BFormattingConventions::GetTimeFormat(BTimeFormatStyle style,
 	icuString.toUTF8(stringConverter);
 
 	int8 use24HourClock = fExplicitUse24HourClock != CLOCK_HOURS_UNSET
-		?  fExplicitUse24HourClock : fCachedUse24HourClock;
+		? fExplicitUse24HourClock : fCachedUse24HourClock;
 	if (use24HourClock != CLOCK_HOURS_UNSET) {
 		// adjust to 12/24-hour clock as requested
 		bool localeUses24HourClock = !FormatUsesAmPm(outFormat);
@@ -478,8 +478,10 @@ BFormattingConventions::GetTimeFormat(BTimeFormatStyle style,
 		}
 	}
 
-	// use abbreviated timezone in short timezone format
-	CoerceFormatToAbbreviatedTimezone(outFormat);
+	if (style != B_FULL_TIME_FORMAT) {
+		// use abbreviated timezone in short timezone format
+		CoerceFormatToAbbreviatedTimezone(outFormat);
+	}
 
 	fCachedTimeFormats[style] = outFormat;
 
@@ -558,9 +560,10 @@ BFormattingConventions::Use24HourClock() const
 		GetTimeFormat(B_MEDIUM_TIME_FORMAT, format);
 		fCachedUse24HourClock
 			= FormatUsesAmPm(format) ? CLOCK_HOURS_12 : CLOCK_HOURS_24;
+		return fCachedUse24HourClock == CLOCK_HOURS_24;
 	}
 
-	return fCachedUse24HourClock == CLOCK_HOURS_24;
+	return fExplicitUse24HourClock == CLOCK_HOURS_24;
 }
 
 

@@ -1,24 +1,25 @@
-1	lithuanian	x-vnd.Haiku-Backgrounds	4220509773
-All workspaces	Main View		Visi darbalaukiai
-Apply	Main View		Taikyti
-Center	Main View		Centruoti
-Current workspace	Main View		Šis darbalaukis
-Default	Main View		Numatytasis
+1	lithuanian	x-vnd.Haiku-Backgrounds	3513602073
+Backgrounds	System name		Fonas
+X:	Main View		X:
+Resolution: 	Image Filepanel		Raiška: 
+pick one	Main View		pasirinkite
+Default	Main View		numatytasis
+Center	Main View		centruoti
+Manual	Main View		tinkinta
 Default folder	Main View		Numatytasis aplankas
-Folder: 	Main View		Aplankas:
+Revert	Main View		Atšaukti pakeitimus
+None	Main View		jokio
+All workspaces	Main View		Visi darbalaukiai
 Icon label outline	Main View		Piktogramų vardai turi mesti šešėlį
-Image:	Main View		Paveikslas:
-Manual	Main View		Tinkinta
-None	Main View		Jokio
+Other…	Main View		kitas…
+Current workspace	Main View		Šis darbalaukis
+Folder: 	Main View		Aplankas: 
+Apply	Main View		Taikyti
 Other folder…	Main View		Kitas aplankas…
-Other…	Main View		Kitas…
+Y:	Main View		Y:
+Tile	Main View		iškloti
+Select	Main View		Rinktis
+Scale to fit	Main View		įtalpinti
 Placement:	Main View		Padėtis:
 Preview	Main View		Peržiūra
-Resolution: 	Image Filepanel		Raiška:
-Revert	Main View		Atsisakyti pakeitimų
-Scale to fit	Main View		Įtalpinti
-Select	Main View		Parinkti
-Tile	Main View		Iškloti
-X:	Main View		X:
-Y:	Main View		Y:
-pick one	Main View		pasirinkite
+Image:	Main View		Paveikslas:

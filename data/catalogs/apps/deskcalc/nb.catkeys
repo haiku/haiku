@@ -1,5 +1,9 @@
-1	norwegian_bokmål	x-vnd.Haiku-DeskCalc	2547506672
-Audio Feedback	CalcView		Lyd-feedback
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DeskCalc	3276968552
+Compact	CalcView		Kompakt
+Scientific	CalcView		Vitenskapelig
 DeskCalc	System name		Kalkulator
+Basic	CalcView		Enkel
+Radians	CalcView		Radianer
 Enable Num Lock on startup	CalcView		Aktiver Num Lock ved oppstart
-Show keypad	CalcView		Vis tastaturfelt
+Degrees	CalcView		Grader
+Audio Feedback	CalcView		Lyd-feedback

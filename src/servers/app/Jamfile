@@ -5,9 +5,10 @@ UsePrivateHeaders app graphics input interface kernel shared storage support ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing interface local ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing interface remote ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing interface html5 ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app stackandtile ] ;
-UseFreeTypeHeaders ;
-
 
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app decorator ] ;
 local decorator_src =
@@ -28,6 +29,20 @@ local font_src =
 	FontManager.cpp
 	FontStyle.cpp
 	;
+
+UseHeaders $(HAIKU_FREETYPE_HEADERS) : true ;
+Includes [ FGristFiles AppServer.cpp BitmapManager.cpp
+	ClientMemoryAllocator.cpp Desktop.cpp DesktopSettings.cpp DrawState.cpp 
+	ServerApp.cpp ServerBitmap.cpp ServerFont.cpp ServerPicture.cpp
+	ServerWindow.cpp View.cpp Window.cpp WorkspacesView.cpp
+	$(decorator_src) $(font_src) ]
+	: $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
+
+
+local BROKEN_64 = ;
+if $(TARGET_ARCH) != x86_64 {
+    BROKEN_64 = "" ;
+}
 
 Server app_server :
 	Angle.cpp
@@ -80,7 +95,8 @@ Server app_server :
 	# libraries
 	:
 	libtranslation.so libbe.so libbnetapi.so
-	libasdrawing.a libasremote.a libpainter.a libagg.a libfreetype.so
+	libaslocal.a $(BROKEN_64)libasremote.a $(BROKEN_64)libashtml5.a 
+	libasdrawing.a libpainter.a libagg.a $(HAIKU_FREETYPE_LIB)
 	libstackandtile.a liblinprog.a libtextencoding.so libshared.a
 	$(TARGET_LIBSTDC++)
 

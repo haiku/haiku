@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 Haiku Inc. All rights reserved.
+ * Copyright 2002-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  */
 #ifndef SUPPORT_H
@@ -21,13 +21,6 @@ void dump_partition_info(const BPartition* partition);
 
 bool is_valid_partitionable_space(size_t size);
 
-enum {
-	GO_CANCELED	= 0,
-	GO_SUCCESS
-};
-
-
-static const uint32 kMegaByte = 0x100000;
 
 class SpaceIDMap : public HashMap<HashString, partition_id> {
 public:
@@ -41,23 +34,31 @@ private:
 			partition_id		fNextSpaceID;
 };
 
+
 class SizeSlider : public BSlider {
 public:
 								SizeSlider(const char* name, const char* label,
-        							BMessage* message, int32 minValue,
-        							int32 maxValue);
+									BMessage* message, off_t offset,
+									off_t size, uint32 minGranularity);
 	virtual						~SizeSlider();
 
+	virtual	void				SetValue(int32 value);
 	virtual const char*			UpdateText() const;
-			int32				Size();
-			int32				Offset();
-			int32				MaxPartitionSize();
+
+			off_t				Size() const;
+			void				SetSize(off_t size);
+
+			off_t				Offset() const;
+			off_t				MaxPartitionSize() const;
 
 private:
 			off_t				fStartOffset;
 			off_t				fEndOffset;
+			off_t				fSize;
 			off_t				fMaxPartitionSize;
+			uint32				fGranularity;
 	mutable	char				fStatusLabel[64];
 };
+
 
 #endif // SUPPORT_H

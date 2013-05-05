@@ -1,0 +1,6 @@
+SubDir HAIKU_TOP src add-ons screen_savers shelf ;
+
+ScreenSaver Shelf :
+	Shelf.cpp : 
+	be libscreensaver.so ;
+

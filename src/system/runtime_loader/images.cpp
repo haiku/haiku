@@ -23,8 +23,16 @@
 #include "runtime_loader_private.h"
 
 
-#define RLD_PROGRAM_BASE 0x00200000
-	/* keep in sync with app ldscript */
+// keep in sync with app ldscript
+#ifdef __x86_64__
+	// runtime_loader potentially occupies 0x200000 - 0x600000 due to large
+	// page segment alignment.
+#	define RLD_PROGRAM_BASE	0x600000
+#	define MAX_PAGE_SIZE	0x200000
+#else
+#	define RLD_PROGRAM_BASE	0x200000
+#	define MAX_PAGE_SIZE	B_PAGE_SIZE
+#endif
 
 
 bool gInvalidImageIDs;
@@ -50,7 +58,7 @@ update_image_id(image_t* image)
 		}
 	}
 
-	FATAL("Could not update image ID %ld after fork()!\n", image->id);
+	FATAL("Could not update image ID %" B_PRId32 " after fork()!\n", image->id);
 	return B_ENTRY_NOT_FOUND;
 }
 
@@ -157,15 +165,15 @@ topological_sort(image_t* image, uint32 slot, image_t** initList,
 /*!	Finds the load address and address specifier of the given image region.
 */
 static void
-get_image_region_load_address(image_t* image, uint32 index, int32 lastDelta,
-	bool fixed, addr_t& loadAddress, uint32& addressSpecifier)
+get_image_region_load_address(image_t* image, uint32 index, long lastDelta,
+	addr_t& loadAddress, uint32& addressSpecifier)
 {
-	if (image->dynamic_ptr != 0 && !fixed) {
+	if (image->dynamic_ptr != 0) {
 		// relocatable image... we can afford to place wherever
 		if (index == 0) {
 			// but only the first segment gets a free ride
 			loadAddress = RLD_PROGRAM_BASE;
-			addressSpecifier = B_BASE_ADDRESS;
+			addressSpecifier = B_RANDOMIZED_BASE_ADDRESS;
 		} else {
 			loadAddress = image->regions[index].vmstart + lastDelta;
 			addressSpecifier = B_EXACT_ADDRESS;
@@ -275,7 +283,7 @@ put_image(image_t* image)
 
 
 status_t
-map_image(int fd, char const* path, image_t* image, bool fixed)
+map_image(int fd, char const* path, image_t* image)
 {
 	// cut the file name from the path as base name for the created areas
 	const char* baseName = strrchr(path, '/');
@@ -290,19 +298,13 @@ map_image(int fd, char const* path, image_t* image, bool fixed)
 	addr_t loadAddress;
 	size_t reservedSize = 0;
 	size_t length = 0;
-	uint32 addressSpecifier = B_ANY_ADDRESS;
+	uint32 addressSpecifier = B_RANDOMIZED_ANY_ADDRESS;
 
 	for (uint32 i = 0; i < image->num_regions; i++) {
-		// for BeOS compatibility: if we load an old BeOS executable, we
-		// have to relocate it, if possible - we recognize it because the
-		// vmstart is set to 0 (hopefully always)
-		if (fixed && image->regions[i].vmstart == 0)
-			fixed = false;
-
 		uint32 regionAddressSpecifier;
 		get_image_region_load_address(image, i,
 			i > 0 ? loadAddress - image->regions[i - 1].vmstart : 0,
-			fixed, loadAddress, regionAddressSpecifier);
+			loadAddress, regionAddressSpecifier);
 		if (i == 0) {
 			reservedAddress = loadAddress;
 			addressSpecifier = regionAddressSpecifier;
@@ -319,7 +321,7 @@ map_image(int fd, char const* path, image_t* image, bool fixed)
 
 	// Check whether the segments have an unreasonable amount of unused space
 	// inbetween.
-	if (reservedSize > length + 8 * 1024)
+	if (reservedSize > length + MAX_PAGE_SIZE * 2)
 		return B_BAD_DATA;
 
 	// reserve that space and allocate the areas from that one
@@ -330,11 +332,11 @@ map_image(int fd, char const* path, image_t* image, bool fixed)
 	for (uint32 i = 0; i < image->num_regions; i++) {
 		char regionName[B_OS_NAME_LENGTH];
 
-		snprintf(regionName, sizeof(regionName), "%s_seg%lu%s",
+		snprintf(regionName, sizeof(regionName), "%s_seg%" B_PRIu32 "%s",
 			baseName, i, (image->regions[i].flags & RFLAG_RW) ? "rw" : "ro");
 
 		get_image_region_load_address(image, i,
-			i > 0 ? image->regions[i - 1].delta : 0, fixed, loadAddress,
+			i > 0 ? image->regions[i - 1].delta : 0, loadAddress,
 			addressSpecifier);
 
 		// If the image position is arbitrary, we must let it point to the start

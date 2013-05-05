@@ -45,7 +45,7 @@ public:
 		status_t					RemoveTransfer(uhci_qh *transfer,
 										bool lock = true);
 
-		addr_t						PhysicalAddress();
+		uint32						PhysicalAddress();
 
 		void						PrintToStream();
 

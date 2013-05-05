@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2012, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -176,6 +176,9 @@ InodeAllocator::~InodeAllocator()
 			fInode->Node().flags &= ~HOST_ENDIAN_TO_BFS_INT32(INODE_IN_USE);
 				// this unblocks any pending bfs_read_vnode() calls
 			fInode->Free(*fTransaction);
+
+			if (fInode->fTree != NULL)
+				fTransaction->RemoveListener(fInode->fTree);
 			fTransaction->RemoveListener(fInode);
 
 			remove_vnode(volume->FSVolume(), fInode->ID());
@@ -400,6 +403,7 @@ Inode::~Inode()
 	delete fTree;
 
 	rw_lock_destroy(&fLock);
+	recursive_lock_destroy(&fSmallDataLock);
 }
 
 
@@ -1487,11 +1491,11 @@ Inode::FindBlockRun(off_t pos, block_run& run, off_t& offset)
 					if (indirect[current].IsZero())
 						break;
 
-					runBlockEnd += indirect[current].Length()
+					runBlockEnd += (uint32)indirect[current].Length()
 						<< cached.BlockShift();
 					if (runBlockEnd > pos) {
 						run = indirect[current];
-						offset = runBlockEnd - (run.Length()
+						offset = runBlockEnd - ((uint32)run.Length()
 							<< cached.BlockShift());
 						return fVolume->ValidateBlockRun(run);
 					}
@@ -1509,11 +1513,12 @@ Inode::FindBlockRun(off_t pos, block_run& run, off_t& offset)
 			if (data->direct[current].IsZero())
 				break;
 
-			runBlockEnd += data->direct[current].Length()
+			runBlockEnd += (uint32)data->direct[current].Length()
 				<< fVolume->BlockShift();
 			if (runBlockEnd > pos) {
 				run = data->direct[current];
-				offset = runBlockEnd - (run.Length() << fVolume->BlockShift());
+				offset = runBlockEnd
+					- ((uint32)run.Length() << fVolume->BlockShift());
 				return fVolume->ValidateBlockRun(run);
 			}
 		}
@@ -1874,7 +1879,7 @@ Inode::_GrowStream(Transaction& transaction, off_t size)
 
 				data->max_indirect_range = HOST_ENDIAN_TO_BFS_INT64(
 					data->MaxIndirectRange()
-					+ (run.Length() << fVolume->BlockShift()));
+					+ ((uint32)run.Length() << fVolume->BlockShift()));
 				data->size = HOST_ENDIAN_TO_BFS_INT64(blocksNeeded > 0
 					? data->MaxIndirectRange() : size);
 				continue;
@@ -2551,7 +2556,7 @@ Inode::Remove(Transaction& transaction, const char* name, ino_t* _id,
 	adds the created inode to that parent directory. If an attribute directory
 	is created, it will also automatically  be added to the \a parent inode as
 	such. However, the indices root node, and the regular root node won't be
-	added to the super block.
+	added to the superblock.
 	It will also create the initial B+tree for the inode if it's a directory
 	of any kind.
 	\a name may be \c NULL, but only if no \a parent is given.

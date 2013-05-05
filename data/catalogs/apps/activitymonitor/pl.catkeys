@@ -1,36 +1,49 @@
-1	polish	x-vnd.Haiku-ActivityMonitor	1437495034
-Add graph	ActivityWindow		Dodaj wykres
-Additional items	ActivityView		Dodatki
-Apps	DataSource		Aplikacje
-Block cache	DataSource		Blok pamięci cache
-Block cache memory	DataSource		Pamięć bloku cache
-CPU	DataSource		CPU
-CPU usage	DataSource		Użycie CPU
-CPU usage (combined)	DataSource		Użycie CPU (całkowite)
-Cache	DataSource		Cache
-Cached memory	DataSource		Pamięć cache
-File	ActivityWindow		Plik
-Hide legend	ActivityView		Ukryj legendę
-Media nodes	DataSource		Węzły multimedialne
-Memory	DataSource		Pamięć
-Network receive	DataSource		Odebrano
-Network send	DataSource		Wysłano
+1	polish	x-vnd.Haiku-ActivityMonitor	1913625522
 P-faults	DataSource		P-błędy
-Page faults	DataSource		Błędy stronicowania
-Ports	DataSource		Porty
-Quit	ActivityWindow		Wyjdź
+Media nodes	DataSource		Węzły multimedialne
+Threads	DataSource		Wątki
+MB	DataSource		MB
+Always on top	ActivityWindow		Zawsze na wierzchu
+Add graph	ActivityWindow		Dodaj wykres
+Teams	DataSource		Zespoły
+Hide legend	ActivityView		Ukryj legendę
+Network send	DataSource		Wysłano
+CPU usage (combined)	DataSource		Użycie CPU (całkowite)
+CPU	DataSource		CPU
+Used memory	DataSource		Użyta pamięć
+Cached memory	DataSource		Pamięć cache
+Apps	DataSource		Aplikacje
+Show legend	ActivityView		Pokaż legendę
+Text clipboard	DataSource		Schowek tekstowy
+Settings	ActivityWindow		Ustawienia
 Receiving	DataSource		Otrzymano
+Settings…	ActivityWindow		Ustawienia…
+Ports	DataSource		Porty
+Page faults	DataSource		Błędy stronicowania
+Sending	DataSource		Wysyłanie
+Cache	DataSource		Cache
+%.1f faults/s	DataSource		%.1f błędów/s
+Update time interval:	SettingsWindow		Częstotliwość odświeżania:
+TX	DataSource	Shorter version for Sending	TX
+Quit	ActivityWindow		Wyjdź
+Block cache memory	DataSource		Pamięć bloku cache
 Remove graph	ActivityView		Usuń wykres
+%.1f MB	DataSource		%.1f MB
+%lld sec.	SettingsWindow		%lld sek.
+%lld ms	SettingsWindow		%lld ms
+CPU usage	DataSource		Użycie CPU
+Raw clipboard	DataSource		Surowy schowek
+Sems	DataSource		Semy
+ActivityMonitor	System name		Monitor Aktywności
 Running applications	DataSource		Uruchomione aplikacje
 Semaphores	DataSource		Semafory
-Sems	DataSource		Semy
-Sending	DataSource		Wysyłanie
-Settings	ActivityWindow		Ustawienia
-Settings…	ActivityWindow		Ustawienia...
-Show legend	ActivityView		Pokaż legendę
-Swap	DataSource		Swap
+Block cache	DataSource		Blok pamięci cache
 Swap space	DataSource		Przestrzeń wymiany
-Teams	DataSource		Zespoły
-Threads	DataSource		Wątki
-Update time interval:	SettingsWindow		Częstotliwość odświeżania:
-Used memory	DataSource		Użyta pamięć
+Swap	DataSource		Swap
+File	ActivityWindow		Plik
+usage	DataSource		zużycie
+Additional items	ActivityView		Dodatki
+Network receive	DataSource		Odebrano
+%.1f KB/s	DataSource		%.1f KB/s
+Memory	DataSource		Pamięć
+RX	DataSource	Shorter version for Receiving.	RX

@@ -1,20 +1,23 @@
-1	romanian	x-vnd.Haiku-Keymap	749384872
-(Current)	Keymap window		(Curent)
+1	romanian	x-vnd.Haiku-Keymap	140876782
+Revert	Modifier keys window		Revenire
+Tilde trigger	Keymap window		Declanșator tildă
+Grave trigger	Keymap window		Declanșator grav
+Select dead keys	Keymap window		Selectează chei moarte
+Quit	Keymap window		Părăsește
+Switch shortcut keys to Haiku mode	Keymap window		Schimbă scurtăturile la modul Haiku
 Circumflex trigger	Keymap window		Declanșator circumflex
 Diaeresis trigger	Keymap window		Declanșator tremă
-File	Keymap window		Fișier
-Font	Keymap window		Font
-Grave trigger	Keymap window		Declanșator grav
-Layout	Keymap window		Aranjament
 Open…	Keymap window		Deschide…
-Quit	Keymap window		Părăsește
-Revert	Keymap window		Revenire
-Sample and clipboard:	Keymap window		Mostră și clipboard:
-Save as…	Keymap window		Salvează ca…
-Select dead keys	Keymap window		Selectează chei moarte
-Switch shortcut keys	Keymap window		Schimbă scurtături
-Switch shortcut keys to Haiku mode	Keymap window		Schimbă scurtăturile la modul Haiku
-Switch shortcut keys to Windows/Linux mode	Keymap window		Schimbă scurtăturile la modul Windows/Linux
 System:	Keymap window		Sistem:
-Tilde trigger	Keymap window		Declanșator tildă
+Switch shortcut keys	Keymap window		Schimbă scurtături
 User:	Keymap window		Utilizator:
+Sample and clipboard:	Keymap window		Mostră și clipboard:
+Layout	Keymap window		Aranjament
+Switch shortcut keys to Windows/Linux mode	Keymap window		Schimbă scurtăturile la modul Windows/Linux
+Revert	Keymap window		Revenire
+Save as…	Keymap window		Salvează ca…
+File	Keymap window		Fișier
+(Current)	Keymap window		(Curent)
+Font	Keymap window		Font
+Keymap	System name		HartăTaste
+Acute trigger	Keymap window		Declanșator ascuțit

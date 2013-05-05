@@ -1,33 +1,33 @@
 1	german	x-vnd.Haiku.TextSearch	1180598828
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME konnte mindestens einen Ordner nicht öffnen.
 %s: Not enough room to escape the filename.	Grepper		%s: Nicht genügend Platz für Escape-Sequenzen für den Dateinamen.
-%s: There was a problem running grep.	Grepper		%s: Es gab ein Problem beim Ausführen von grep.
-Actions	GrepWindow		Aktionen
-Cancel	GrepWindow		Abbrechen
-Case-sensitive	GrepWindow		Groß-/Kleinschreibung beachten
-Close	GrepWindow		Schließen
-Copy text to clipboard	GrepWindow		Text in Ablage kopieren
-Encoding	GrepWindow		Kodierung
-Escape search text	GrepWindow		Escape-Sequenzen benutzen
-File	GrepWindow		Datei
-Follow symbolic links	GrepWindow		Verknüpfungen folgen
-History	GrepWindow		Historie
-Look in sub-folders	GrepWindow		Unterordner durchsuchen
-New window	GrepWindow		Neues Fenster
-OK	GrepWindow		OK
-Open files in Pe	GrepWindow		Dateien in Pe öffnen
-Open selection	GrepWindow		Auswahl öffnen
-Please select the files you wish to have selected for you in Tracker.	GrepWindow		Bitte die Dateien auswählen, die im Tracker markiert werden sollen.
-Please select the files you wish to keep searching.	GrepWindow		Bitte die Dateien auswählen, die weiterhin durchsucht werden sollen.
-Quit	GrepWindow		Beenden
-Search	GrepWindow		Suchen
-Select all	GrepWindow		Alles auswählen
-Set target…	GrepWindow		Ziel wählen...
-Settings	GrepWindow		Einstellungen
-Show files in Tracker	GrepWindow		Dateien im Tracker zeigen
-Show lines	GrepWindow		Treffer-Zeilen anzeigen
-Skip folders starting with a dot	GrepWindow		Mit Punkt beginnende Ordner ignorieren
-Text files only	GrepWindow		Nur Textdateien
-TextSearch	GrepWindow		TextSearch
-The unselected files will be removed from the list.	GrepWindow		Die nicht ausgewählten Dateien werden aus der Liste entfernt.
 Trim to selection	GrepWindow		Auf Auswahl begrenzen
+Follow symbolic links	GrepWindow		Verknüpfungen folgen
+Close	GrepWindow		Schließen
+Cancel	GrepWindow		Abbrechen
+The unselected files will be removed from the list.	GrepWindow		Die nicht ausgewählten Dateien werden aus der Liste entfernt.
+Set target…	GrepWindow		Ziel wählen...
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Bitte die Dateien auswählen, die im Tracker markiert werden sollen.
+Open files in Pe	GrepWindow		Dateien in Pe öffnen
+Copy text to clipboard	GrepWindow		Text in Ablage kopieren
+Settings	GrepWindow		Einstellungen
+Select all	GrepWindow		Alles auswählen
+OK	GrepWindow		OK
+Skip folders starting with a dot	GrepWindow		Mit Punkt beginnende Ordner ignorieren
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME konnte mindestens einen Ordner nicht öffnen.
+Escape search text	GrepWindow		Escape-Sequenzen benutzen
+Search	GrepWindow		Suchen
+Open selection	GrepWindow		Auswahl öffnen
+Look in sub-folders	GrepWindow		Unterordner durchsuchen
+Actions	GrepWindow		Aktionen
+File	GrepWindow		Datei
+Encoding	GrepWindow		Kodierung
+History	GrepWindow		Historie
+%s: There was a problem running grep.	Grepper		%s: Es gab ein Problem beim Ausführen von grep.
+New window	GrepWindow		Neues Fenster
+Please select the files you wish to keep searching.	GrepWindow		Bitte die Dateien auswählen, die weiterhin durchsucht werden sollen.
+TextSearch	GrepWindow		TextSearch
+Quit	GrepWindow		Beenden
+Show files in Tracker	GrepWindow		Dateien im Tracker zeigen
+Case-sensitive	GrepWindow		Groß-/Kleinschreibung beachten
+Text files only	GrepWindow		Nur Textdateien
+Show lines	GrepWindow		Treffer-Zeilen anzeigen

@@ -21,7 +21,6 @@ Application userlandfs_server
 	:
 	AreaSupport.cpp
 	Debug.cpp
-	driver_settings.c
 	LazyInitializable.cpp
 	ObjectTracker.cpp
 	Port.cpp

@@ -1,0 +1,4 @@
+1	croatian	x-vnd.Haiku-debug_server	1035915338
+Debug	DebugServer		Uklanjanje grešaka
+OK	DebugServer		U redu
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		Program:\n\n %app\n\nje doživio grešku koja ga spriječava da nastavi sa radom.Haiku će prekinuti program i počistiti.

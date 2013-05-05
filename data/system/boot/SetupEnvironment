@@ -16,7 +16,7 @@ BeMac|BeBox)
 	BE_HOST_CPU=ppc
 	;;
 *)
-	BE_HOST_CPU=unknown
+	BE_HOST_CPU=`uname -m`
 esac
 
 # not used by Haiku, but by (legacy) applications (e.g. Pe)
@@ -37,6 +37,14 @@ else
 	export LIBRARY_PATH="%A/lib:/boot/system/lib"
 	export ADDON_PATH="%A/add-ons:/boot/system/add-ons"
 fi
+
+# Locale
+export LC_MESSAGES=`locale -m`
+export LC_NUMERIC=`locale -f`
+export LC_TIME=`locale -t`
+export LC_COLLATE=$LC_MESSAGES
+export LC_CTYPE=$LC_MESSAGES
+export LC_MONETARY=$LC_NUMERIC
 
 # media kit
 if [ -f $HOME/config/settings/use_old_audio ]

@@ -1,3 +1,10 @@
+/*
+ * Copyright 2012, Jérôme Duval, korli@users.berlios.de.
+ * Copyright 2003, Tyler Dauwalder, tyler@dauwalder.net.
+ * Distributed under the terms of the MIT License.
+ */
+
+
 #include "Recognition.h"
 
 #include "UdfString.h"
@@ -18,6 +25,7 @@ walk_volume_recognition_sequence(int device, off_t offset, uint32 blockSize,
 static status_t
 walk_anchor_volume_descriptor_sequences(int device, off_t offset, off_t length,
 	uint32 blockSize, uint32 blockShift,
+	primary_volume_descriptor &primaryVolumeDescriptor,
 	logical_volume_descriptor &logicalVolumeDescriptor,
 	partition_descriptor partitionDescriptors[],
 	uint8 &partitionDescriptorCount);
@@ -25,6 +33,7 @@ walk_anchor_volume_descriptor_sequences(int device, off_t offset, off_t length,
 static status_t
 walk_volume_descriptor_sequence(extent_address descriptorSequence, int device,
 	uint32 blockSize, uint32 blockShift,
+	primary_volume_descriptor &primaryVolumeDescriptor,
 	logical_volume_descriptor &logicalVolumeDescriptor,
 	partition_descriptor partitionDescriptors[],
 	uint8 &partitionDescriptorCount);
@@ -40,7 +49,8 @@ walk_integrity_sequence(int device, uint32 blockSize, uint32 blockShift,
 
 status_t
 udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
-	uint32 &blockShift, logical_volume_descriptor &logicalVolumeDescriptor,
+	uint32 &blockShift, primary_volume_descriptor &primaryVolumeDescriptor,
+	logical_volume_descriptor &logicalVolumeDescriptor,
 	partition_descriptor partitionDescriptors[],
 	uint8 &partitionDescriptorCount)
 {
@@ -66,7 +76,8 @@ udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
 	// Now hunt down a volume descriptor sequence from one of
 	// the anchor volume pointers (if there are any).
 	status = walk_anchor_volume_descriptor_sequences(device, offset, length,
-		blockSize, blockShift, logicalVolumeDescriptor, partitionDescriptors,
+		blockSize, blockShift, primaryVolumeDescriptor,
+		logicalVolumeDescriptor, partitionDescriptors,
 		partitionDescriptorCount);
 	if (status != B_OK) {
 		TRACE_ERROR(("udf_recognize: cannot find volume descriptor. status = %ld\n",
@@ -109,11 +120,9 @@ walk_volume_recognition_sequence(int device, off_t offset, uint32 blockSize,
 		return B_ERROR;
 	}
 
-	bool foundISO = false;
 	bool foundExtended = false;
 	bool foundECMA167 = false;
 	bool foundECMA168 = false;
-	bool foundBoot = false;
 	for (uint32 block = 16; true; block++) {
 		off_t address = (offset + block) << blockShift;
 		TRACE(("walk_volume_recognition_sequence: block = %ld, "
@@ -124,7 +133,6 @@ walk_volume_recognition_sequence(int device, off_t offset, uint32 blockSize,
 				= (volume_structure_descriptor_header *)(chunk.Data());
 			if (descriptor->id_matches(kVSDID_ISO)) {
 				TRACE(("found ISO9660 descriptor\n"));
-				foundISO = true;
 			} else if (descriptor->id_matches(kVSDID_BEA)) {
 				TRACE(("found BEA descriptor\n"));
 				foundExtended = true;
@@ -139,7 +147,6 @@ walk_volume_recognition_sequence(int device, off_t offset, uint32 blockSize,
 				foundECMA167 = true;
 			} else if (descriptor->id_matches(kVSDID_BOOT)) {
 				TRACE(("found boot descriptor\n"));
-				foundBoot = true;
 			} else if (descriptor->id_matches(kVSDID_ECMA168)) {
 				TRACE(("found ECMA-168 descriptor\n"));
 				foundECMA168 = true;
@@ -165,6 +172,7 @@ walk_volume_recognition_sequence(int device, off_t offset, uint32 blockSize,
 static status_t
 walk_anchor_volume_descriptor_sequences(int device, off_t offset, off_t length,
 	uint32 blockSize, uint32 blockShift, 
+	primary_volume_descriptor &primaryVolumeDescriptor,
 	logical_volume_descriptor &logicalVolumeDescriptor,
 	partition_descriptor partitionDescriptors[],
 	uint8 &partitionDescriptorCount)
@@ -204,13 +212,15 @@ walk_anchor_volume_descriptor_sequences(int device, off_t offset, off_t length,
 			// Found an avds, so try the main sequence first, then
 			// the reserve sequence if the main one fails.
 			anchorErr = walk_volume_descriptor_sequence(anchor->main_vds(),
-				device, blockSize, blockShift, logicalVolumeDescriptor,
-				partitionDescriptors, partitionDescriptorCount);
+				device, blockSize, blockShift, primaryVolumeDescriptor,
+				logicalVolumeDescriptor, partitionDescriptors,
+				partitionDescriptorCount);
 
 			if (anchorErr)
 				anchorErr = walk_volume_descriptor_sequence(anchor->reserve_vds(),
-					device,	blockSize, blockShift, logicalVolumeDescriptor,
-					partitionDescriptors, partitionDescriptorCount);				
+					device,	blockSize, blockShift, primaryVolumeDescriptor,
+					logicalVolumeDescriptor, partitionDescriptors,
+					partitionDescriptorCount);				
 		}
 		if (!anchorErr) {
 			PRINT(("block %Ld: found valid vds\n", avds_locations[i]));
@@ -229,6 +239,7 @@ static
 status_t
 walk_volume_descriptor_sequence(extent_address descriptorSequence,
 	int device, uint32 blockSize, uint32 blockShift,
+	primary_volume_descriptor &primaryVolumeDescriptor,
 	logical_volume_descriptor &logicalVolumeDescriptor,
 	partition_descriptor partitionDescriptors[],
 	uint8 &partitionDescriptorCount)
@@ -275,7 +286,7 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 				{
 					primary_volume_descriptor *primary = reinterpret_cast<primary_volume_descriptor*>(tag);
 					PDUMP(primary);				
-					(void)primary;	// kill the warning		
+					primaryVolumeDescriptor = *primary;
 					break;
 				}
 
@@ -529,7 +540,11 @@ walk_integrity_sequence(int device, uint32 blockSize, uint32 blockShift,
 	}
 	if (!error)
 		error = lastDescriptorWasClosed ? B_OK : B_BAD_DATA;
-	if (!error) 
-		error = highestMinimumUDFReadRevision <= UDF_MAX_READ_REVISION ? B_OK : B_ERROR;
+	if (error == B_OK
+		&& highestMinimumUDFReadRevision > UDF_MAX_READ_REVISION) {
+		error = B_ERROR;
+		FATAL(("found udf revision 0x%x more than max 0x%x\n",
+			highestMinimumUDFReadRevision, UDF_MAX_READ_REVISION));
+	}
 	RETURN(error);					
 }

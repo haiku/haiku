@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src system runtime_loader arch arm ;
+
+UsePrivateHeaders runtime_loader ;
+UsePrivateSystemHeaders ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
+
+StaticLibrary libruntime_loader_$(TARGET_ARCH).a :
+	arch_relocate.cpp
+	:
+	<src!system!libroot!os!arch!$(TARGET_ARCH)>atomic.o
+	<src!system!libroot!os!arch!$(TARGET_ARCH)>thread.o
+
+	<src!system!libroot!posix!string!arch!$(TARGET_ARCH)>arch_string.o
+	<src!system!libroot!posix!string!arch!$(TARGET_ARCH)>memset.o
+;

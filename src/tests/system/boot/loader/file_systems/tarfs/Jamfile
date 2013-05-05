@@ -2,8 +2,10 @@ SubDir HAIKU_TOP src tests system boot loader file_systems tarfs ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+UsePrivateKernelHeaders ;
+UsePrivateSystemHeaders ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
-UsePrivateHeaders kernel shared storage ;
+UsePrivateHeaders shared storage ;
 SubDirSysHdrs $(HAIKU_TOP) src tests system boot loader ;
 SubDirSysHdrs $(HAIKU_TOP) headers libs zlib ;
 SubDirHdrs $(HAIKU_TOP) src system boot loader file_systems tarfs ;
@@ -15,7 +17,7 @@ if $(TARGET_PLATFORM) != haiku {
 	ObjectDefines tarfs.cpp : B_BUFFER_OVERFLOW=B_BAD_VALUE ;
 }
 
-ObjectDefines 
+ObjectDefines
 	tarfs.cpp
 	:
 	read_pos=boot_read_pos fstat=boot_fstat open=boot_open close=boot_close _BOOT_MODE

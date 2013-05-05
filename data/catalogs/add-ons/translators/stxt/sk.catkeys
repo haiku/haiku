@@ -1,7 +1,8 @@
-1	slovak	x-vnd.Haiku-STXTTranslator	4053395273
+1	slovak	x-vnd.Haiku-STXTTranslator	274886668
 Be styled text file	STXTTranslator		Textový súbor so štýlom Be
 Plain text file	STXTTranslator		Čistý textový súbor
-STXT Settings	STXTMain		Nastavenia STXT
 STXTTranslator Settings	STXTTranslator		Nastavenia STXTTranslator
+StyledEdit file translator	STXTView		Prekladač súborov StyledEdit
 StyledEdit files	STXTTranslator		Súbory StyledEdit
-StyledEdit files translator	STXTTranslator		Prekladač súborov StyledEdit
+StyledEdit file translator	STXTTranslator		Prekladač súborov StyledEdit
+STXT Settings	STXTMain		Nastavenia STXT

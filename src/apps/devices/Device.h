@@ -81,14 +81,10 @@ public:
 								const BString& devPathsPublished = "unknown");
 	virtual					~Device();
 
-	virtual BString			GetName()
-								{ return fAttributeMap["Device name"]; }
-	virtual BString			GetManufacturer()
-								{ return fAttributeMap["Manufacturer"]; }
-	virtual BString			GetDriverUsed()
-								{ return fAttributeMap["Driver used"]; }
-	virtual BString			GetDevPathsPublished()
-								{ return fAttributeMap["Device paths"]; }
+	virtual BString			GetName();
+	virtual BString			GetManufacturer();
+	virtual BString			GetDriverUsed();
+	virtual BString			GetDevPathsPublished();
 	virtual Category		GetCategory() const
 								{ return fCategory; }
 	virtual Device*			GetPhysicalParent() const

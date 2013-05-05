@@ -9,6 +9,9 @@
 #define _VIDEO_CONFIGURATION_H
 
 
+#include <SupportDefs.h>
+
+
 // Video connector types
 #define VIDEO_CONNECTOR_UNKNOWN 	0x00
 #define VIDEO_CONNECTOR_VGA			0x01

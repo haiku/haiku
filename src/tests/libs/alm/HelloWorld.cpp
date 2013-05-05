@@ -7,11 +7,16 @@
 
 #include <Application.h>
 #include <Button.h>
+#include <GroupLayout.h>
 #include <List.h>
+#include <StringView.h>
 #include <Window.h>
 
 // include this for ALM
 #include "ALMLayout.h"
+
+
+const uint32 kMsgClone = 'clne';
 
 
 class HelloWorldWindow : public BWindow {
@@ -25,7 +30,11 @@ public:
 
 		// create a new BALMLayout and use  it for this window
 		fLayout = new BALMLayout();
-		SetLayout(fLayout);
+		BView* view = new BView("alm view", 0, fLayout);
+		fLayout->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
+			B_ALIGN_USE_FULL_HEIGHT));
+		SetLayout(new BGroupLayout(B_VERTICAL));
+		AddChild(view);
 
 		// add an area containing the button
 		// use the borders of the layout as the borders for the area
@@ -40,9 +49,39 @@ public:
 		BSize min = fLayout->MinSize();
 		BSize max = fLayout->MaxSize();
 		SetSizeLimits(min.Width(), max.Width(), min.Height(), max.Height());
+
+		AddShortcut('c', B_COMMAND_KEY, new BMessage(kMsgClone));
+	}
+
+	void MessageReceived(BMessage* message)
+	{
+		switch (message->what) {
+			case kMsgClone:
+			{
+				BView* view = fLayout->View();
+				BMessage archive;
+				view->Archive(&archive, true);
+				BWindow* window = new BWindow(BRect(30, 30, 100, 100),
+					"ALM HelloWorld Clone", B_TITLED_WINDOW,
+					B_QUIT_ON_WINDOW_CLOSE | B_AUTO_UPDATE_SIZE_LIMITS);
+				window->SetLayout(new BGroupLayout(B_VERTICAL));
+				BView* clone;
+				status_t err = BUnarchiver::InstantiateObject(&archive, clone);
+				if (err != B_OK)
+					window->AddChild(new BStringView("", "An error occurred!"));
+				else
+					window->AddChild(clone);
+				window->Show();
+
+				break;
+			}
+			default:
+				BWindow::MessageReceived(message);
+		}
 	}
 	
 private:
+
 	BALMLayout* fLayout;
 	BButton* button1;
 };

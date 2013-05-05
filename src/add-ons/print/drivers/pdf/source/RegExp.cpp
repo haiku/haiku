@@ -1254,7 +1254,7 @@ RegExp::Dump()
 char *
 RegExp::Prop(const char *op) const
 {
-	char *p = NULL;
+	const char *p = NULL;
 	static char buf[50];
 
 	(void) strcpy(buf, ":");

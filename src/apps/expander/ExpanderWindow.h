@@ -54,6 +54,7 @@ private:
 			void				_ExpandListingText();
 			void				StartListing();
 			void				StopListing();
+			void				SetStatus(BString text);
 			bool				ValidateDest();
 
 private:

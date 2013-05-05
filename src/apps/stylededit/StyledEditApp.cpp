@@ -32,7 +32,7 @@
 using namespace BPrivate;
 
 
-BRect gWindowRect(7-15, 26-15, 507, 426);
+BRect gWindowRect(7 - 15, 26 - 15, 507, 426);
 
 
 namespace
@@ -80,8 +80,8 @@ namespace
 //	#pragma mark -
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Open_and_SaveAsPanel"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Open_and_SaveAsPanel"
 
 
 StyledEditApp::StyledEditApp()
@@ -89,8 +89,8 @@ StyledEditApp::StyledEditApp()
 	BApplication(APP_SIGNATURE),
 	fOpenPanel(NULL)
 {
-	B_TRANSLATE_MARK_SYSTEM_NAME("StyledEdit");
-	
+	B_TRANSLATE_MARK_SYSTEM_NAME_VOID("StyledEdit");
+
 	fOpenPanel = new BFilePanel();
 	fOpenAsEncoding = 0;
 
@@ -117,8 +117,8 @@ StyledEditApp::StyledEditApp()
 				name.Append(mime);
 				name.Append(")");
 			}
-			BMenuItem* item =
-				new BMenuItem(name.String(), new BMessage(OPEN_AS_ENCODING));
+			BMenuItem* item
+				= new BMenuItem(name.String(), new BMessage(OPEN_AS_ENCODING));
 			item->SetTarget(this);
 			fOpenPanelEncodingMenu->AddItem(item);
 			if (charset.GetFontID() == fOpenAsEncoding)
@@ -178,7 +178,7 @@ StyledEditApp::OpenDocument()
 
 
 status_t
-StyledEditApp::OpenDocument(entry_ref* ref)
+StyledEditApp::OpenDocument(entry_ref* ref, BMessage* message)
 {
 	// traverse eventual symlink
 	BEntry entry(ref, true);
@@ -217,13 +217,19 @@ StyledEditApp::OpenDocument(entry_ref* ref)
 			if (document->Lock()) {
 				document->Activate();
 				document->Unlock();
+				if (message != NULL)
+					document->PostMessage(message);
 				return B_OK;
 			}
 		}
 	}
 
 	cascade();
-	new StyledEditWindow(gWindowRect, ref, fOpenAsEncoding);
+	document = new StyledEditWindow(gWindowRect, ref, fOpenAsEncoding);
+
+	if (message != NULL)
+		document->PostMessage(message);
+
 	fWindowCount++;
 
 	return B_OK;
@@ -248,8 +254,31 @@ StyledEditApp::RefsReceived(BMessage* message)
 	int32 index = 0;
 	entry_ref ref;
 
-	while (message->FindRef("refs", index++, &ref) == B_OK) {
-		OpenDocument(&ref);
+	while (message->FindRef("refs", index, &ref) == B_OK) {
+		int32 line;
+		if (message->FindInt32("be:line", index, &line) != B_OK)
+			line = -1;
+		int32 start, length;
+		if (message->FindInt32("be:selection_length", index, &length) != B_OK
+			|| message->FindInt32("be:selection_offset", index, &start) != B_OK)
+		{
+			start = -1;
+			length = -1;
+		}
+
+		BMessage* selection = NULL;
+		if (line >= 0 || (start >= 0 && length >= 0)) {
+			selection = new BMessage(UPDATE_LINE_SELECTION);
+			if (line >= 0)
+				selection->AddInt32("be:line", line);
+			if (start >= 0) {
+				selection->AddInt32("be:selection_offset", start);
+				selection->AddInt32("be:selection_length", max_c(0, length));
+			}
+		}
+
+		OpenDocument(&ref, selection);
+		index++;
 	}
 }
 
@@ -309,7 +338,7 @@ StyledEditApp::ReadyToRun()
 int32
 StyledEditApp::NumberOfWindows()
 {
- 	return fWindowCount;
+	return fWindowCount;
 }
 
 

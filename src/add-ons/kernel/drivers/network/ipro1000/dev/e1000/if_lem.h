@@ -1,6 +1,6 @@
 /******************************************************************************
 
-  Copyright (c) 2001-2010, Intel Corporation 
+  Copyright (c) 2001-2011, Intel Corporation 
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without 
@@ -30,7 +30,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 
 ******************************************************************************/
-/*$FreeBSD: src/sys/dev/e1000/if_lem.h,v 1.2.2.5.2.1 2010/12/21 17:09:25 kensmith Exp $*/
+/*$FreeBSD$*/
 
 
 #ifndef _LEM_H_DEFINED_
@@ -216,6 +216,12 @@
 #define EM_BAR_MEM_TYPE_32BIT	0x00000000
 #define EM_BAR_MEM_TYPE_64BIT	0x00000004
 #define EM_MSIX_BAR		3	/* On 82575 */
+
+#ifndef __HAIKU__
+#if __FreeBSD_version < 900000
+#define SYSCTL_ADD_UQUAD SYSCTL_ADD_QUAD
+#endif
+#endif
 
 /* Defines for printing debug information */
 #define DEBUG_INIT  0

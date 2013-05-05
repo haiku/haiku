@@ -1,12 +1,14 @@
 /*
- * Copyright 2006 Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2012 Haiku, Inc. All Rights Reserved.
  * Copyright 1997, 1998 R3 Software Ltd. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Timothy Wayper <timmy@wunderbear.com>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		John Scipione <jscipione@gmail.com>
+ *		Timothy Wayper <timmy@wunderbear.com>
  */
+
 
 #include "CalcApplication.h"
 
@@ -14,19 +16,23 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <Catalog.h> 
+#include <Catalog.h>
 #include <Directory.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <Path.h>
 
+#include "CalcView.h"
 #include "CalcWindow.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "CalcApplication"
 
-static const char* kSettingsFileName	= "DeskCalc_settings";
-const char* kAppSig				= "application/x-vnd.Haiku-DeskCalc";
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CalcApplication"
+
+
+static const char* kSettingsFileName = "DeskCalc_settings";
+const char* kAppName = B_TRANSLATE_SYSTEM_NAME("DeskCalc");
+const char* kSignature = "application/x-vnd.Haiku-DeskCalc";
 
 static const float kDefaultWindowWidth	= 220.0;
 static const float kDefaultWindowHeight	= 140.0;
@@ -34,7 +40,7 @@ static const float kDefaultWindowHeight	= 140.0;
 
 CalcApplication::CalcApplication()
 	:
-	BApplication(kAppSig),
+	BApplication(kSignature),
 	fCalcWindow(NULL)
 {
 }
@@ -62,8 +68,7 @@ CalcApplication::ReadyToRun()
 void
 CalcApplication::AboutRequested()
 {
-	// TODO: implement me!
-	return BApplication::AboutRequested();
+	fCalcWindow->View()->MessageReceived(new BMessage(B_ABOUT_REQUESTED));
 }
 
 
@@ -154,5 +159,3 @@ CalcApplication::_InitSettingsFile(BFile* file, bool write)
 
 	return ret;
 }
-
-

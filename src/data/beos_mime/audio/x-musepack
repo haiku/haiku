@@ -3,7 +3,7 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "audio/x-musepack";
 
-resource(2, "META:S:DESC") #'MSDC' "Musepack Sound File";
+resource(2, "META:S:DESC") #'MSDC' "Musepack audio file";
 
 resource(3, "META:EXTENS") message(234) {
 	"extensions" = "mpc",

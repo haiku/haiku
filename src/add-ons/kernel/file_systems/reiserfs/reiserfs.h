@@ -220,7 +220,7 @@ struct reiserfs_de_head
 //
 
 //
-// super block's field values
+// superblock's field values
 //
 #define REISERFS_VERSION_0 0 /* undistributed bitmap */
 #define REISERFS_VERSION_1 1 /* distributed bitmap and resizer*/
@@ -232,7 +232,7 @@ struct reiserfs_de_head
 #define R5_HASH   3
 #define DEFAULT_HASH R5_HASH
 
-/* this is the on disk super block */
+/* this is the on disk superblock */
 
 struct reiserfs_super_block
 {

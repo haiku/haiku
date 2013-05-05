@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Oliver Tappe, zooey@hirschkaefer.de.
+ * Copyright 2010-2011, Oliver Tappe, zooey@hirschkaefer.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _ICU_MONETARY_DATA_H
@@ -18,6 +18,7 @@ namespace Libroot {
 
 class ICUMonetaryData : public ICULocaleconvData {
 	typedef	ICULocaleconvData	inherited;
+
 public:
 	static	const int32			kParenthesesAroundCurrencyAndValue = 0;
 	static	const int32			kSignPrecedesCurrencyAndValue      = 1;
@@ -25,7 +26,8 @@ public:
 	static	const int32			kSignImmediatelyPrecedesCurrency   = 3;
 	static	const int32			kSignImmediatelySucceedsCurrency   = 4;
 
-								ICUMonetaryData(struct lconv& localeConv);
+								ICUMonetaryData(pthread_key_t tlsKey,
+									struct lconv& localeConv);
 
 			void				Initialize(
 									LocaleMonetaryDataBridge* dataBridge);

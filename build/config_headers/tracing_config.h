@@ -28,6 +28,8 @@
 #define BMESSAGE_TRACING						0
 #define FILE_DESCRIPTOR_TRACING					0
 #define FILE_DESCRIPTOR_TRACING_STACK_TRACE		0	/* stack trace depth */
+#define GUARDED_HEAP_TRACING					0
+#define GUARDED_HEAP_TRACING_STACK_TRACE		0	/* stack trace depth */
 #define IO_CONTEXT_TRACING						0
 #define IO_CONTEXT_TRACING_STACK_TRACE			0	/* stack trace depth */
 #define KERNEL_HEAP_TRACING						0
@@ -35,6 +37,7 @@
 #define NET_BUFFER_TRACING						0
 #define NET_BUFFER_TRACING_STACK_TRACE			0	/* stack trace depth */
 #define PAGE_ALLOCATION_TRACING					0
+#define PAGE_ALLOCATION_TRACING_STACK_TRACE		0	/* stack trace depth */
 #define PAGE_DAEMON_TRACING						0
 #define PAGE_STATE_TRACING						0
 #define PAGE_STATE_TRACING_STACK_TRACE			0	/* stack trace depth */

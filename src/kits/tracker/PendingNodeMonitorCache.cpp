@@ -32,32 +32,38 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+
 #include "PendingNodeMonitorCache.h"
 #include "PoseView.h"
+
 
 const bigtime_t kDelayedNodeMonitorLifetime = 10000000;
 	// after this much the pending node monitor gets discarded as
 	// too old
 
-PendingNodeMonitorEntry::PendingNodeMonitorEntry(const node_ref *node,
-	const BMessage *nodeMonitor)
+
+PendingNodeMonitorEntry::PendingNodeMonitorEntry(const node_ref* node,
+	const BMessage* nodeMonitor)
 	:	fExpiresAfter(system_time() + kDelayedNodeMonitorLifetime),
 		fNodeMonitor(*nodeMonitor),
 		fNode(*node)
 {
 }
 
-const BMessage *
+
+const BMessage*
 PendingNodeMonitorEntry::NodeMonitor() const
 {
 	return &fNodeMonitor;
 }
 
+
 bool
-PendingNodeMonitorEntry::Match(const node_ref *node) const
+PendingNodeMonitorEntry::Match(const node_ref* node) const
 {
 	return fNode == *node;
 }
+
 
 bool
 PendingNodeMonitorEntry::TooOld(bigtime_t now) const
@@ -76,8 +82,9 @@ PendingNodeMonitorCache::~PendingNodeMonitorCache()
 {
 }
 
+
 void
-PendingNodeMonitorCache::Add(const BMessage *message)
+PendingNodeMonitorCache::Add(const BMessage* message)
 {
 #if xDEBUG
 	PRINT(("adding pending node monitor\n"));
@@ -85,20 +92,22 @@ PendingNodeMonitorCache::Add(const BMessage *message)
 #endif
 	node_ref node;
 	if (message->FindInt32("device", &node.device) != B_OK
-		|| message->FindInt64("node", (int64 *)&node.node) != B_OK)
+		|| message->FindInt64("node", (int64*)&node.node) != B_OK)
 		return;
 
 	fList.AddItem(new PendingNodeMonitorEntry(&node, message));
 }
 
+
 void
-PendingNodeMonitorCache::RemoveEntries(const node_ref *nodeRef)
+PendingNodeMonitorCache::RemoveEntries(const node_ref* nodeRef)
 {
 	int32 count = fList.CountItems();
 	for (int32 index = count - 1; index >= 0; index--)
 		if (fList.ItemAt(index)->Match(nodeRef))
 			delete fList.RemoveItemAt(index);
 }
+
 
 void
 PendingNodeMonitorCache::RemoveOldEntries()
@@ -112,12 +121,14 @@ PendingNodeMonitorCache::RemoveOldEntries()
 		}
 }
 
+
 void
-PendingNodeMonitorCache::PoseCreatedOrMoved(BPoseView *poseView, const BPose *pose)
+PendingNodeMonitorCache::PoseCreatedOrMoved(BPoseView* poseView,
+	const BPose* pose)
 {
 	bigtime_t now = system_time();
 	for (int32 index = 0; index < fList.CountItems();) {
-		PendingNodeMonitorEntry *item = fList.ItemAt(index);
+		PendingNodeMonitorEntry* item = fList.ItemAt(index);
 		if (item->TooOld(now)) {
 			PRINT(("removing old entry from pending node monitor cache\n"));
 			delete fList.RemoveItemAt(index);
@@ -136,4 +147,3 @@ PendingNodeMonitorCache::PoseCreatedOrMoved(BPoseView *poseView, const BPose *po
 			index++;
 	}
 }
-

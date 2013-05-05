@@ -18,16 +18,16 @@ Addon <disk_system>intel :
 	IntelDiskSystem.cpp
 	ExtendedPartitionAddOn.cpp
 	PartitionMapAddOn.cpp
-	CreationParameterEditor.cpp
+	PrimaryParameterEditor.cpp
 
 	# kernel sources
 	PartitionMap.cpp
 
-	: be $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	: be libshared.a $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
 ;
 
 DoCatalogs <disk_system>intel :
 	x-vnd.Haiku-IntelDiskAddOn
 	:
-	CreationParameterEditor.cpp
+	PrimaryParameterEditor.cpp
 ;

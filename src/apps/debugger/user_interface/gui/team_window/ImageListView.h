@@ -29,6 +29,9 @@ public:
 
 	virtual	void				MessageReceived(BMessage* message);
 
+			void				LoadSettings(const BMessage& settings);
+			status_t			SaveSettings(BMessage& settings);
+
 private:
 			class ImagesTableModel;
 

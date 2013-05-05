@@ -1,13 +1,13 @@
 1	finnish	x-vnd.Haiku-JPEG2000Translator	547915409
-About	JPEG2000Translator		Ohjelmasta
-Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Be-bittikarttamuoto (JPEG2000-muunnin)
-High	JPEG2000Translator		Korkea
+Write	JPEG2000Translator		Kirjoita
 JPEG2000 images	JPEG2000Translator		JPEG2000-kuvat
-Low	JPEG2000Translator		Matala
 Output only codestream (.jpc)	JPEG2000Translator		Tulosta vain koodivirta (.jpc)
+Write black-and-white images as RGB24	JPEG2000Translator		Kirjoita mustavalkoiset kuvat RGB24-kuvina
 Output quality	JPEG2000Translator		Tulostuslaatu
 Read	JPEG2000Translator		Lue
-Read greyscale images as RGB32	JPEG2000Translator		Lue harmaaväriskaalakuvat RGB32-kuvina
-Write	JPEG2000Translator		Kirjoita
-Write black-and-white images as RGB24	JPEG2000Translator		Kirjoita mustavalkoiset kuvat RGB24-kuvina
 ©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nPerustuu JasPer-kirjastoon:\n© 1999-2000, Image Power, Inc. ja\nBritish Columbian yliopisto, Kanada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\n”Johdatuskurssina” käytettiin ImageMagick jp2-koodekkia.\n\thttp://www.imagemagick.org/\n
+Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Be-bittikarttamuoto (JPEG2000-muunnin)
+Low	JPEG2000Translator		Matala
+About	JPEG2000Translator		Ohjelmasta
+High	JPEG2000Translator		Korkea
+Read greyscale images as RGB32	JPEG2000Translator		Lue harmaaväriskaalakuvat RGB32-kuvina

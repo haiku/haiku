@@ -1,12 +1,12 @@
 1	ukrainian	x-vnd.Haiku-Fonts	4164233892
-Bold font:	Font view		Виділений шрифт:
-Defaults	Main window		По замовчуванню
-Fixed font:	Font view		Моноширний шрифт:
-Fonts	System name		Шрифти
-Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Шрифти\n\tCopyright 2004-2005, Haiku.\n\n
-Menu font:	Font view		Шрифт меню:
-OK	main		Гаразд
 Plain font:	Font view		Простий шрифт:
+Defaults	Main window		По замовчуванню
+OK	main		Гаразд
+Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Шрифти\n\tCopyright 2004-2005, Haiku.\n\n
 Revert	Main window		Повернутись
 Size:	Font Selection view		Розмір:
+Menu font:	Font view		Шрифт меню:
+Fixed font:	Font view		Моноширний шрифт:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Гей, хлопці, не смію - на ґанку ваша файна їжа знищується бурундучком.
+Bold font:	Font view		Виділений шрифт:
+Fonts	System name		Шрифти

@@ -79,7 +79,7 @@ struct AddressHashDefinition {
 typedef BOpenHashTable<AddressHashDefinition, true, false> AddressTable;
 
 
-static mutex sLock;
+static recursive_lock sLock;
 static InterfaceList sInterfaces;
 static mutex sHashLock;
 static AddressTable sAddressTable;
@@ -91,7 +91,7 @@ static uint32 sInterfaceIndex;
 void
 dump_interface_refs(void)
 {
-	MutexLocker locker(sLock);
+	RecursiveLocker locker(sLock);
 
 	InterfaceList::Iterator iterator = sInterfaces.GetIterator();
 	while (Interface* interface = iterator.Next()) {
@@ -148,7 +148,7 @@ dump_local(int argc, char** argv)
 	size_t i = 0;
 	while (InterfaceAddress* address = iterator.Next()) {
 		address->Dump(++i);
-		dprintf("    hash:          %lu\n",
+		dprintf("    hash:          %" B_PRIu32 "\n",
 			address->domain->address_module->hash_address(address->local,
 				false));
 	}
@@ -933,6 +933,12 @@ Interface::SetDown()
 	if ((flags & IFF_UP) == 0)
 		return;
 
+	// TODO: We acquire also the net_interfaces lock here
+	// to avoid a lock inversion in the ipv6 protocol implementation
+	// (see ticket #9377).
+	// A better solution would be to avoid locking the interface lock (fLock)
+	// when calling the lower layers.
+	RecursiveLocker interfacesLocker(sLock);
 	RecursiveLocker locker(fLock);
 
 	DatalinkTable::Iterator iterator = fDatalinkTable.GetIterator();
@@ -1173,7 +1179,7 @@ Interface::_ChangeAddress(RecursiveLocker& locker, InterfaceAddress* address,
 static struct Interface*
 find_interface(const char* name)
 {
-	ASSERT_LOCKED_MUTEX(&sLock);
+	ASSERT_LOCKED_RECURSIVE(&sLock);
 
 	InterfaceList::Iterator iterator = sInterfaces.GetIterator();
 	while (Interface* interface = iterator.Next()) {
@@ -1208,7 +1214,7 @@ status_t
 add_interface(const char* name, net_domain_private* domain,
 	const ifaliasreq& request, net_device_interface* deviceInterface)
 {
-	MutexLocker locker(sLock);
+	RecursiveLocker locker(sLock);
 
 	if (find_interface(name) != NULL)
 		return B_NAME_IN_USE;
@@ -1249,7 +1255,7 @@ remove_interface(Interface* interface)
 	interface->SetDown();
 	interface->RemoveAddresses();
 
-	MutexLocker locker(sLock);
+	RecursiveLocker locker(sLock);
 	sInterfaces.Remove(interface);
 	locker.Unlock();
 
@@ -1265,7 +1271,7 @@ remove_interface(Interface* interface)
 void
 interface_removed_device_interface(net_device_interface* deviceInterface)
 {
-	MutexLocker locker(sLock);
+	RecursiveLocker locker(sLock);
 
 	Interface* interface = find_interface(deviceInterface->device->name);
 	if (interface != NULL)
@@ -1396,7 +1402,7 @@ update_interface_address(InterfaceAddress* interfaceAddress, int32 option,
 Interface*
 get_interface(net_domain* domain, uint32 index)
 {
-	MutexLocker locker(sLock);
+	RecursiveLocker locker(sLock);
 
 	Interface* interface;
 	if (index == 0)
@@ -1417,7 +1423,7 @@ get_interface(net_domain* domain, uint32 index)
 Interface*
 get_interface(net_domain* domain, const char* name)
 {
-	MutexLocker locker(sLock);
+	RecursiveLocker locker(sLock);
 
 	Interface* interface = find_interface(name);
 	if (interface == NULL)
@@ -1434,7 +1440,7 @@ get_interface(net_domain* domain, const char* name)
 Interface*
 get_interface_for_device(net_domain* domain, uint32 index)
 {
-	MutexLocker locker(sLock);
+	RecursiveLocker locker(sLock);
 
 	InterfaceList::Iterator iterator = sInterfaces.GetIterator();
 	while (Interface* interface = iterator.Next()) {
@@ -1460,7 +1466,7 @@ get_interface_for_link(net_domain* domain, const sockaddr* _linkAddress)
 {
 	sockaddr_dl& linkAddress = *(sockaddr_dl*)_linkAddress;
 
-	MutexLocker locker(sLock);
+	RecursiveLocker locker(sLock);
 
 	InterfaceList::Iterator iterator = sInterfaces.GetIterator();
 	while (Interface* interface = iterator.Next()) {
@@ -1506,7 +1512,7 @@ InterfaceAddress*
 get_interface_address_for_destination(net_domain* domain,
 	const sockaddr* destination)
 {
-	MutexLocker locker(sLock);
+	RecursiveLocker locker(sLock);
 
 	InterfaceList::Iterator iterator = sInterfaces.GetIterator();
 	while (Interface* interface = iterator.Next()) {
@@ -1533,7 +1539,7 @@ get_interface_address_for_link(net_domain* domain, const sockaddr* address,
 {
 	sockaddr_dl& linkAddress = *(sockaddr_dl*)address;
 
-	MutexLocker locker(sLock);
+	RecursiveLocker locker(sLock);
 
 	InterfaceList::Iterator iterator = sInterfaces.GetIterator();
 	while (Interface* interface = iterator.Next()) {
@@ -1558,7 +1564,7 @@ get_interface_address_for_link(net_domain* domain, const sockaddr* address,
 uint32
 count_interfaces()
 {
-	MutexLocker locker(sLock);
+	RecursiveLocker locker(sLock);
 
 	return sInterfaces.Count();
 }
@@ -1571,7 +1577,7 @@ count_interfaces()
 status_t
 list_interfaces(int family, void* _buffer, size_t* bufferSize)
 {
-	MutexLocker locker(sLock);
+	RecursiveLocker locker(sLock);
 
 	UserBuffer buffer(_buffer, *bufferSize);
 
@@ -1619,7 +1625,7 @@ list_interfaces(int family, void* _buffer, size_t* bufferSize)
 status_t
 init_interfaces()
 {
-	mutex_init(&sLock, "net interfaces");
+	recursive_lock_init(&sLock, "net interfaces");
 	mutex_init(&sHashLock, "net local addresses");
 
 	new (&sInterfaces) InterfaceList;
@@ -1650,7 +1656,7 @@ uninit_interfaces()
 	remove_debugger_command("net_route", &dump_route);
 #endif
 
-	mutex_destroy(&sLock);
+	recursive_lock_destroy(&sLock);
 	mutex_destroy(&sHashLock);
 	return B_OK;
 }

@@ -2703,6 +2703,7 @@ ls( httpd_conn* hc )
 	poorman_log(logString, true, hc->client_addr.sa_in.sin_addr.s_addr, RED);
 //	syslog( LOG_ERR, "opendir %.80s - %m", hc->expnfilename );
 	httpd_send_err( hc, 404, err404title, "", err404form, hc->encodedurl );
+	free(de);
 	return -1;
 	}
 
@@ -2712,6 +2713,7 @@ ls( httpd_conn* hc )
 	send_mime(
 	    hc, 200, ok200title, "", "", "text/html; charset=%s", (off_t) -1,
 	    hc->sb.st_mtime );
+	free(de);
 	}
     else if ( hc->method == METHOD_GET )
 	{
@@ -2758,6 +2760,7 @@ ls( httpd_conn* hc )
 		    hc, 500, err500title, "", err500form, hc->encodedurl );
 		httpd_write_response( hc );
 		closedir( dirp );
+		free(de);
 		return  -1;
 		}
 
@@ -2918,7 +2921,7 @@ ls( httpd_conn* hc )
 
 		/* And print. */
 		(void)  fprintf( fp,
-		   "%10lld  %s  <A HREF=\"/%.500s%s\">%.80s</A>%s%s%s\n",
+		   "%10" B_PRId64 "  %s  <A HREF=\"/%.500s%s\">%.80s</A>%s%s%s\n",
 		    (int64_t) lsb.st_size,
 		    timestr, encrname, S_ISDIR(sb.st_mode) ? "/" : "",
 		    nameptrs[i], linkprefix, link, fileclass );
@@ -2942,10 +2945,10 @@ ls( httpd_conn* hc )
 	closedir( dirp );
 	httpd_send_err(
 	    hc, 501, err501title, "", err501form, httpd_method_str( hc->method ) );
+	free(de);
 	return -1;
 	}
-
-    return 0;
+	return 0;
     }
 
 #endif /* GENERATE_INDEXES */

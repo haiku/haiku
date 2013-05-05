@@ -1,100 +1,101 @@
-1	norwegian_bokmål	x-vnd.Haiku-Terminal	3554483392
-%app% settings	Terminal PrefWindow	window title	%app%innstillinger
--h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help skriver ut denne hjelpen\n -t, --title setter vindustittelen\n -f, --fullscreen starter fullskjerm\n
-Abort	Terminal Shell		Avbryt
-Appearance	Terminal PrefWindow		Utseende
-Background	Terminal AppearancePrefView		Bakgrunn
-Black on White	Terminal colors schema		Svart på hvitt
-Cancel	Terminal PrefWindow		Avbryt
-Cancel	Terminal SetTitleWindow		Avbryt
-Cancel	Terminal TermView		Avbryt
-Cancel	Terminal TermWindow		Avbryt
-Cannot execute \"%command\":\n\t%error	Terminal Shell		Kunne ikke utføre "\%command\":\n\t%error
-Change directory	Terminal TermView		Bytt mappe
-Clear all	Terminal TermWindow		Fjern alt
-Close	Terminal TermWindow		Lukk
-Close active tab	Terminal TermWindow		Lukk aktiv fane
-Close other tabs	Terminal TermWindow		Lukk andre faner
-Close tab	Terminal TermWindow		Lukk fane
-Close window	Terminal TermWindow		Lukk vindu
-Color schema:	Terminal AppearancePrefView		Fargeskjema:
-Color:	Terminal AppearancePrefView		Farge:
-Confirm exit if active programs exist	Terminal AppearancePrefView		Bekreft avslutning hvis det finnes aktive programmer
-Copy	Terminal TermWindow		Kopier
-Copy here	Terminal TermView		Kopier her
-Create link here	Terminal TermView		Opprett lenke her
-Custom	Terminal colors schema		Spesiallaget
-Decrease	Terminal TermWindow		Forminsk
-Don't save	Terminal PrefWindow		Ikke lagre
-Edit	Terminal TermWindow		Rediger
-Edit tab title…	Terminal TermWindow		Rediger fanetittel...
-Error!	Terminal getString		Feil!
-Find	Terminal FindWindow		Finn
-Find failed	Terminal TermWindow		Søk feilet
-Find next	Terminal TermWindow		Finn neste
-Find previous	Terminal TermWindow		Søk bakover
-Find…	Terminal TermWindow		Finn...
-Font:	Terminal AppearancePrefView		Font:
-Full screen	Terminal TermWindow		Fullskjerm
-Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nOpphavsrett 2001-2009 Haiku, Inc.\nOpphavsrett(C) 1999 Kazuho Okui og Takashi Murai.\n\nBruk: %s [VALG] [SHELL]\n
-Increase	Terminal TermWindow		Øk
-Insert path	Terminal TermView		Sett inn sti
-Match case	Terminal FindWindow		Skille store og små bokstaver
-Match word	Terminal FindWindow		Sammenlign ord
-Move here	Terminal TermView		Flytt hit
-New Terminal	Terminal TermWindow		Ny Terminal
-New tab	Terminal TermWindow		Ny fane
-No search string was entered.	Terminal TermWindow		Ingen søkestreng ble angitt.
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Terminal	1054657081
 Not found.	Terminal TermWindow		Ikke funnet
-Nothing is selected.	Terminal TermWindow		Ingenting er valgt.
-OK	Terminal PrefWindow		OK
-OK	Terminal SetTitleWindow		OK
-OK	Terminal TermApp		OK
-OK	Terminal TermWindow		OK
-Page setup…	Terminal TermWindow		Sideoppsett...
-Paste	Terminal TermWindow		Lim inn
-Print	Terminal TermWindow		Skriv ut
-Print cancelled.	Terminal TermWindow		Utskrift kansellert.
-Quit	Terminal TermWindow		Avslutt
-Really close?	Terminal TermWindow		Virkelig lukke?
-Save	Terminal PrefWindow		Lagre
-Save as default	Terminal TermWindow		Lagre som standard
-Save changes to this settings panel?	Terminal PrefWindow		Lagre endringer i innstillingspanelet?
-Save to file…	Terminal PrefWindow		Lagre som fil...
-Search forward	Terminal FindWindow		Søk fremover
-Select all	Terminal TermWindow		Merk alt
-Selected background	Terminal AppearancePrefView		Valgt bakgrunn
-Selected text	Terminal AppearancePrefView		Merket tekst
-Set tab title	Terminal TermWindow		Sett fanetittel
-Set window title	Terminal TermWindow		Sett vindustittel
-Settings	Terminal TermWindow		Innstillinger
-Settings…	Terminal TermWindow		Innstillinger...
-Shell 	Terminal TermWindow		Skall
-Size:	Terminal AppearancePrefView		Størrelse:
 Switch Terminals	Terminal TermWindow		Bytt terminaler
-Tab title:	Terminal AppearancePrefView		Fanetittel:
-Tab title:	Terminal TermWindow		Fanetittel:
-Terminal	System name		Terminal
+Change directory	Terminal TermView		Bytt mappe
+OK	Terminal TermWindow		OK
+New Terminal	Terminal TermWindow		Ny Terminal
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal kunne ikke starte skallet. Beklager.
-Text	Terminal AppearancePrefView		Tekst
-Text encoding	Terminal TermWindow		Tekstkoding
-Text not found.	Terminal TermWindow		Tekst ikke funnet.
 Text size	Terminal TermWindow		Tekststørrelse
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Følgende prosesser kjører fremdeles:\n\n\t%1\n\nHvis du lukker Termina il prosessene bli drept.
-The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Mønsteret som angir nåværende fanetittel. Følgende plassholdere\nkan brukes:\n
-The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Mønster som angir fanetitlene. Følgende plassholderne\nkan brukes:\n
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Mønsteret som angir vindustittelen. Følgende plassholdere\nkan brukes:\n
-The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Mønsteret som angir vindustitlene. De følgende plassholderne\nkan brukes:\n
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		\"%1\"-prosessen kjører fremdeles.\nHvis du lukker Terminal vil prosessen bli drept.
-The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		\"%1\"-prosessen kjører fremdeles.\nHvis du lukker fanen vil prosessen bli drept.
-Unrecognized option \"%s\"\n	Terminal arguments parsing		Ukjent valg \"%s\"\n
-Use default	Terminal SetTitleWindow		Bruk standard
+Match case	Terminal FindWindow		Skille store og små bokstaver
+Quit	Terminal TermWindow		Avslutt
 Use default shell	Terminal Shell		Bruk standard skall
-Use selection	Terminal FindWindow		Bruk valgte
-Use text:	Terminal FindWindow		Bruk tekst:
-White on Black	Terminal colors schema		Hvitt på svart
-Window size	Terminal TermWindow		Vindustørrelse
+Confirm exit if active programs exist	Terminal AppearancePrefView		Bekreft avslutning hvis det finnes aktive programmer
+The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Mønsteret som angir nåværende fanetittel. Følgende plassholdere\nkan brukes:\n
+Select all	Terminal TermWindow		Merk alt
+Close tab	Terminal TermWindow		Lukk fane
+Custom	Terminal colors schema		Spesiallaget
+Save to file…	Terminal PrefWindow		Lagre som fil...
+OK	Terminal PrefWindow		OK
+Black on White	Terminal colors schema		Svart på hvitt
 Window title:	Terminal AppearancePrefView		Vindustittel:
+Font:	Terminal AppearancePrefView		Font:
+Copy here	Terminal TermView		Kopier her
+Really close?	Terminal TermWindow		Virkelig lukke?
+Copy	Terminal TermWindow		Kopier
 Window title:	Terminal TermWindow		Vindustittel:
+Unrecognized option \"%s\"\n	Terminal arguments parsing		Ukjent valg \"%s\"\n
+%app% settings	Terminal PrefWindow	window title	%app%innstillinger
+Cancel	Terminal SetTitleWindow		Avbryt
+Increase	Terminal TermWindow		Øk
+Settings	Terminal TermWindow		Innstillinger
+Window size	Terminal TermWindow		Vindustørrelse
+Selected text	Terminal AppearancePrefView		Merket tekst
+Find	Terminal FindWindow		Finn
+Appearance	Terminal PrefWindow		Utseende
+Tab title:	Terminal AppearancePrefView		Fanetittel:
+The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Mønsteret som angir vindustitlene. De følgende plassholderne\nkan brukes:\n
+Color schema:	Terminal AppearancePrefView		Fargeskjema:
+OK	Terminal SetTitleWindow		OK
+Background	Terminal AppearancePrefView		Bakgrunn
+Use selection	Terminal FindWindow		Bruk valgte
+Green on Black	Terminal colors schema		Grønn på svart
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		\"%1\"-prosessen kjører fremdeles.\nHvis du lukker fanen vil prosessen bli drept.
+Size:	Terminal AppearancePrefView		Størrelse:
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Kunne ikke utføre "\%command\":\n\t%error
+Full screen	Terminal TermWindow		Fullskjerm
 Window title…	Terminal TermWindow		Vindustittel...
+Page setup…	Terminal TermWindow		Sideoppsett...
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Følgende prosesser kjører fremdeles:\n\n\t%1\n\nHvis du lukker Termina il prosessene bli drept.
+Insert path	Terminal TermView		Sett inn sti
+Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nOpphavsrett 2001-2009 Haiku, Inc.\nOpphavsrett(C) 1999 Kazuho Okui og Takashi Murai.\n\nBruk: %s [VALG] [SHELL]\n
+No search string was entered.	Terminal TermWindow		Ingen søkestreng ble angitt.
+Don't save	Terminal PrefWindow		Ikke lagre
+Set window title	Terminal TermWindow		Sett vindustittel
+Terminal	System name		Terminal
+Close other tabs	Terminal TermWindow		Lukk andre faner
+Match word	Terminal FindWindow		Sammenlign ord
+Nothing is selected.	Terminal TermWindow		Ingenting er valgt.
+Text not found.	Terminal TermWindow		Tekst ikke funnet.
+Find…	Terminal TermWindow		Finn...
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		\"%1\"-prosessen kjører fremdeles.\nHvis du lukker Terminal vil prosessen bli drept.
+Move here	Terminal TermView		Flytt hit
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\ t% d \ t \ t Den nåværende arbeidskatalog av den aktive prosessen i \ n \ t \ t \ tcurrent tab. Alternativt maksimalt antall banekomponenter \ n \ t \ t \ tcan angis. F.eks '% 2d "for høyst to komponentene. \ N \ t% i \ t \ t Indeksen av vinduet. \ N \ t% p \ t \ t Navnet på den aktive prosessen i den aktive fanen. \ n \ t% t \ t \ t tittelen på den aktive fanen. \ n \ t%% \ t \ t tegnet '%'.
+White on Black	Terminal colors schema		Hvitt på svart
+Error!	Terminal getString		Feil!
+New tab	Terminal TermWindow		Ny fane
+The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Mønster som angir fanetitlene. Følgende plassholderne\nkan brukes:\n
+Selected background	Terminal AppearancePrefView		Valgt bakgrunn
+Decrease	Terminal TermWindow		Forminsk
+Create link here	Terminal TermView		Opprett lenke her
+Close	Terminal TermWindow		Lukk
+Text	Terminal AppearancePrefView		Tekst
+Clear all	Terminal TermWindow		Fjern alt
+Text encoding	Terminal TermWindow		Tekstkoding
 size	Terminal TermView		størrelse
+Close window	Terminal TermWindow		Lukk vindu
+Save as default	Terminal TermWindow		Lagre som standard
+Set tab title	Terminal TermWindow		Sett fanetittel
+Settings…	Terminal TermWindow		Innstillinger...
+Abort	Terminal Shell		Avbryt
+Edit	Terminal TermWindow		Rediger
+Color:	Terminal AppearancePrefView		Farge:
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Mønsteret som angir vindustittelen. Følgende plassholdere\nkan brukes:\n
+Print	Terminal TermWindow		Skriv ut
+Use text:	Terminal FindWindow		Bruk tekst:
+Cancel	Terminal TermWindow		Avbryt
+OK	Terminal TermApp		OK
+Find failed	Terminal TermWindow		Søk feilet
+Search forward	Terminal FindWindow		Søk fremover
+Edit tab title…	Terminal TermWindow		Rediger fanetittel...
+Find previous	Terminal TermWindow		Søk bakover
+Tab title:	Terminal TermWindow		Fanetittel:
+Find next	Terminal TermWindow		Finn neste
+Close active tab	Terminal TermWindow		Lukk aktiv fane
+Paste	Terminal TermWindow		Lim inn
+Save changes to this settings panel?	Terminal PrefWindow		Lagre endringer i innstillingspanelet?
+Cancel	Terminal PrefWindow		Avbryt
+Shell 	Terminal TermWindow		Skall
+Save	Terminal PrefWindow		Lagre
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\ t% d \ t \ t Den nåværende arbeidskatalog av den aktive prosessen. \ n \ t \ t \ t Alternativt maksimalt antall av banen komponenter kan \ n \ t \ t \ tspecified. F.eks '% 2d "for høyst to komponentene. \ N \ t% i \ t \ tthe indeks av fanen. \ N \ t% p \ t \ t Navnet på den aktive prosessen. \ N \ t%% \ t \ t tegnet '%'.
+Cancel	Terminal TermView		Avbryt
+Use default	Terminal SetTitleWindow		Bruk standard

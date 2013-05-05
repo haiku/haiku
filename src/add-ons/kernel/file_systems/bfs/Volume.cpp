@@ -1,9 +1,10 @@
 /*
- * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2012, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
-//! super block, mounting, etc.
+
+//! superblock, mounting, etc.
 
 
 #include "Attribute.h"
@@ -189,7 +190,7 @@ DeviceOpener::GetSize(off_t* _size, uint32* _blockSize)
 
 
 bool
-disk_super_block::IsValid()
+disk_super_block::IsValid() const
 {
 	if (Magic1() != (int32)SUPER_BLOCK_MAGIC1
 		|| Magic2() != (int32)SUPER_BLOCK_MAGIC2
@@ -296,9 +297,18 @@ Volume::~Volume()
 
 
 bool
-Volume::IsValidSuperBlock()
+Volume::IsValidSuperBlock() const
 {
 	return fSuperBlock.IsValid();
+}
+
+
+/*!	Checks whether the given block number may be the location of an inode block.
+*/
+bool
+Volume::IsValidInodeBlock(off_t block) const
+{
+	return block > fSuperBlock.LogEnd() && block < NumBlocks();
 }
 
 
@@ -332,13 +342,13 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	if (opener.IsReadOnly())
 		fFlags |= VOLUME_READ_ONLY;
 
-	// read the super block
+	// read the superblock
 	if (Identify(fDevice, &fSuperBlock) != B_OK) {
-		FATAL(("invalid super block!\n"));
+		FATAL(("invalid superblock!\n"));
 		return B_BAD_VALUE;
 	}
 
-	// initialize short hands to the super block (to save byte swapping)
+	// initialize short hands to the superblock (to save byte swapping)
 	fBlockSize = fSuperBlock.BlockSize();
 	fBlockShift = fSuperBlock.BlockShift();
 	fAllocationGroupShift = fSuperBlock.AllocationGroupShift();
@@ -421,16 +431,6 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		status = B_BAD_VALUE;
 		FATAL(("could not create root node!\n"));
 		return status;
-	}
-
-	if (!(fFlags & VOLUME_READ_ONLY)) {
-		Attribute attr(fRootNode);
-		if (attr.Get("be:volume_id") == B_ENTRY_NOT_FOUND) {
-			Transaction transaction(this, fRootNode->BlockNumber());
-			fRootNode->WriteLockInTransaction(transaction);
-			CreateVolumeID(transaction);
-			transaction.Done();
-		}
 	}
 
 	// all went fine
@@ -633,7 +633,7 @@ Volume::CheckSuperBlock(const uint8* data, uint32* _offset)
 	}
 
 #ifndef BFS_LITTLE_ENDIAN_ONLY
-	// For PPC, the super block might be located at offset 0
+	// For PPC, the superblock might be located at offset 0
 	superBlock = (disk_super_block*)data;
 	if (superBlock->IsValid()) {
 		if (_offset != NULL)
@@ -692,11 +692,11 @@ Volume::Initialize(int fd, const char* name, uint32 blockSize,
 
 	off_t numBlocks = deviceSize / blockSize;
 
-	// create valid super block
+	// create valid superblock
 
 	fSuperBlock.Initialize(name, numBlocks, blockSize);
 
-	// initialize short hands to the super block (to save byte swapping)
+	// initialize short hands to the superblock (to save byte swapping)
 	fBlockSize = fSuperBlock.BlockSize();
 	fBlockShift = fSuperBlock.BlockShift();
 	fAllocationGroupShift = fSuperBlock.AllocationGroupShift();

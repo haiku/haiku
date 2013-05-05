@@ -43,7 +43,6 @@ All rights reserved.
 class TDeskbarMenu;
 class TBarView;
 
-
 class TBarWindow : public BWindow {
 public:
 								TBarWindow();
@@ -84,13 +83,16 @@ public:
 
 			void				GetIconFrame(BMessage* message);
 
+			bool				IsShowingMenu() const;
+
 private:
 			bool				_IsFocusMessage(BMessage* message);
 
 private:
-	static	TDeskbarMenu*			sDeskbarMenu;
+	static	TDeskbarMenu*		sDeskbarMenu;
 			TBarView*			fBarView;
+			bool				fShowingMenu;
 };
 
-#endif	/* BAR_WINDOW_H */
 
+#endif	/* BAR_WINDOW_H */

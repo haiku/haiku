@@ -31,8 +31,8 @@
 
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "VolumeControl"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "VolumeControl"
 
 
 static const char* kMediaServerSignature = "application/x-vnd.Be.media-server";
@@ -78,6 +78,8 @@ VolumeControl::VolumeControl(BMessage* archive)
 		volumeWhich = VOLUME_USE_MIXER;
 
 	fMixerControl = new MixerControl(volumeWhich);
+
+	archive->SendReply(new BMessage(B_QUIT_REQUESTED));
 }
 
 
@@ -328,6 +330,10 @@ VolumeControl::MessageReceived(BMessage* msg)
 			}
 			break;
 		}
+
+		case B_QUIT_REQUESTED:
+			Window()->MessageReceived(msg);
+			break;
 
 		case kMsgReconnectVolume:
 			_ConnectVolume();

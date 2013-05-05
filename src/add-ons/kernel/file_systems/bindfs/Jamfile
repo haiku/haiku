@@ -16,7 +16,7 @@ HAIKU_BIND_FS_SOURCES =
 KernelAddon bindfs
 	:
 	$(HAIKU_BIND_FS_SOURCES)
-	: $(HAIKU_STATIC_LIBSUPC++)
+	: $(HAIKU_KERNEL_LIBSUPC++)
 ;
 
 

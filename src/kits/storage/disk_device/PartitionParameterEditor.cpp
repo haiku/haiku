@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2009, Bryce Groff, brycegroff@gmail.com.
  * Distributed under the terms of the MIT License.
  */
@@ -10,12 +11,52 @@
 
 
 BPartitionParameterEditor::BPartitionParameterEditor()
+	:
+	fModificationMessage(NULL)
 {
 }
 
 
 BPartitionParameterEditor::~BPartitionParameterEditor()
 {
+	delete fModificationMessage;
+}
+
+
+/*!	\brief Sets the controls of the editor to match the parameters
+		of the given \a partition.
+
+	For \c B_CREATE_PARAMETER_EDITOR editors, this will be the parent
+	partition.
+*/
+void
+BPartitionParameterEditor::SetTo(BPartition* partition)
+{
+}
+
+
+/*!	\brief Sets the modification message.
+
+	This message needs to be sent whenever an internal parameter changed.
+	This call takes over ownership of the provided message.
+
+	The message may contain a string field "parameter" with the value set
+	to the name of the changed parameter.
+*/
+void
+BPartitionParameterEditor::SetModificationMessage(BMessage* message)
+{
+	delete fModificationMessage;
+	fModificationMessage = message;
+}
+
+
+/*!	\brief The currently set modification message, if any.
+*/
+BMessage*
+BPartitionParameterEditor::ModificationMessage() const
+{
+	return fModificationMessage;
 }
 
 
@@ -40,7 +81,6 @@ BPartitionParameterEditor::View()
 }
 
 
-// FinishedEditing
 /*!	\brief Called when the user finishes editing the parameters.
 
 	To be overridden by derived classes.
@@ -52,9 +92,31 @@ BPartitionParameterEditor::View()
 	\return \c true, if the current parameters are valid, \c false otherwise.
 */
 bool
-BPartitionParameterEditor::FinishedEditing()
+BPartitionParameterEditor::ValidateParameters() const
 {
-	return false;
+	return true;
+}
+
+
+/*!	\brief Called when a parameter has changed.
+
+	Each editor type comes with a number of predefined parameters that
+	may be changed from the outside while the editor is open. You can
+	either accept the changes, and update your controls correspondingly,
+	or else reject the change by returning an appropriate error code.
+
+	To be overridden by derived classes.
+	The base class version returns B_OK.
+
+	\param name The name of the changed parameter.
+	\param variant The new value of the parameter.
+	\return \c B_OK, if everything went fine, another error code otherwise.
+*/
+status_t
+BPartitionParameterEditor::ParameterChanged(const char* name,
+	const BVariant& variant)
+{
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -68,43 +130,8 @@ BPartitionParameterEditor::FinishedEditing()
 	\return \c B_OK, if everything went fine, another error code otherwise.
 */
 status_t
-BPartitionParameterEditor::GetParameters(BString* parameters)
+BPartitionParameterEditor::GetParameters(BString& parameters)
 {
-	status_t error = (parameters ? B_OK : B_BAD_VALUE);
-	if (error == B_OK)
-		parameters->SetTo("");
-	return error;
+	parameters.SetTo("");
+	return B_OK;
 }
-
-
-/*!	\brief Called when type information has changed.
-
-	To be overridden by derived classes.
-	The base class version returns B_OK.
-
-	\param type A string that is the new type.
-
-	\return \c B_OK, if everything went fine, another error code otherwise.
-*/
-status_t
-BPartitionParameterEditor::PartitionTypeChanged(const char* type)
-{
-	return B_NOT_SUPPORTED;
-}
-
-
-/*!	\brief Called when name information has changed.
-
-	To be overridden by derived classes.
-	The base class version returns B_OK.
-
-	\param name A string that is the new name.
-
-	\return \c B_OK, if everything went fine, another error code otherwise.
-*/
-status_t
-BPartitionParameterEditor::PartitionNameChanged(const char* name)
-{
-	return B_NOT_SUPPORTED;
-}
-

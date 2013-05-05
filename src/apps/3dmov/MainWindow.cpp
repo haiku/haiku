@@ -112,7 +112,7 @@ void MainWindow :: SetupMenuBar(BRect frame)
 	menu_shape->AddItem(new BMenuItem("Sphere", new BMessage(MSG_SHAPE_SPHERE), '3'));
 	
 	//	Options
-	BMenu *menu_options = new BMenu("Options");
+	BMenu *menu_options = new BMenu("Settings");
 	menu_options->AddItem(new BMenuItem("Wireframe", new BMessage(MSG_OPTION_WIREFRAME), 'S'));
 	//menu_options->AddItem(new BMenuItem("Fullscreen", new BMessage(MSG_FULLSCREEN), 'F'));
 	
@@ -187,6 +187,8 @@ void MainWindow :: MessageReceived(BMessage *message)
 */
 bool MainWindow :: QuitRequested()
 {
+	if (fCurrentView != NULL)
+		fCurrentView->EnableDirectMode(false);
 	//be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
 }
@@ -198,20 +200,14 @@ bool MainWindow :: QuitRequested()
 */
 void MainWindow :: DirectConnected(direct_buffer_info *info)
 {
-	switch (info->buffer_state & B_DIRECT_MODE_MASK)
-	{
-		// start a direct screen connection.
-		case B_DIRECT_START :
-			break;
-		// stop a direct screen connection.
-		case B_DIRECT_STOP :
-			break;
-		// modify the state of a direct screen connection.
-		case B_DIRECT_MODIFY :
-			break;
-	default :
-		break;
+	// TODO: Direct rendering causes mouse to flicker due to lack
+	// of a hardware cursor.
+	#if 0
+	if (fCurrentView != NULL) {
+		fCurrentView->DirectConnected(info);
+		fCurrentView->EnableDirectMode(true);
 	}
+	#endif
 }
 
 /*	FUNCTION:		animation_thread

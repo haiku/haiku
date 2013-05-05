@@ -13,7 +13,7 @@
 // these methods are bit unfriendly, a bit too much panic() around
 
 struct mtx Giant;
-struct mtx ifnet_lock;
+struct rw_lock ifnet_rwlock;
 struct mtx gIdStoreLock;
 
 
@@ -21,14 +21,13 @@ void
 mtx_init(struct mtx *mutex, const char *name, const char *type,
 	int options)
 {
-	if (options == MTX_DEF) {
-		mutex_init_etc(&mutex->u.mutex.lock, name, MUTEX_FLAG_CLONE_NAME);
-		mutex->u.mutex.owner = -1;
-	} else if (options == MTX_RECURSE) {
+	if ((options & MTX_RECURSE) != 0) {
 		recursive_lock_init_etc(&mutex->u.recursive, name,
 			MUTEX_FLAG_CLONE_NAME);
-	} else
-		panic("fbsd: unsupported mutex type");
+	} else {
+		mutex_init_etc(&mutex->u.mutex.lock, name, MUTEX_FLAG_CLONE_NAME);
+		mutex->u.mutex.owner = -1;
+	}
 
 	mutex->type = options;
 }
@@ -37,10 +36,10 @@ mtx_init(struct mtx *mutex, const char *name, const char *type,
 void
 mtx_destroy(struct mtx *mutex)
 {
-	if (mutex->type == MTX_DEF)
-		mutex_destroy(&mutex->u.mutex.lock);
-	else if (mutex->type == MTX_RECURSE)
+	if ((mutex->type & MTX_RECURSE) != 0)
 		recursive_lock_destroy(&mutex->u.recursive);
+	else
+		mutex_destroy(&mutex->u.mutex.lock);
 }
 
 
@@ -48,7 +47,7 @@ status_t
 init_mutexes()
 {
 	mtx_init(&Giant, "Banana Giant", NULL, MTX_DEF);
-	mtx_init(&ifnet_lock, "gDevices", NULL, MTX_DEF);
+	rw_lock_init(&ifnet_rwlock, "gDevices");
 	mtx_init(&gIdStoreLock, "Identity Store", NULL, MTX_DEF);
 
 	return B_OK;
@@ -59,6 +58,6 @@ void
 uninit_mutexes()
 {
 	mtx_destroy(&Giant);
-	mtx_destroy(&ifnet_lock);
+	rw_lock_destroy(&ifnet_rwlock);
 	mtx_destroy(&gIdStoreLock);
 }

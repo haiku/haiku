@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2011, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Adriano Duarte
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Correio</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../../fr/applications/mail.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/mail.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/mail.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/mail.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/mail.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/mail.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/mail.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/mail.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/mail.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/mail.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/mail.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/mail.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/applications/mail.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../ca/applications/mail.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../../en/applications/mail.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="magnify.html">Ampliação</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos
+</a> 
+::  <a href="mediaplayer.html">Tocador de Mídia</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Índice</td></tr>
+<tr class="index"><td><a href="#reading">Lendo mensagens</a><br />
+	<a href="#creating">Criando novas mensagens</a><br />
+	<a href="#preferences">Preferências</a></td></tr>
+</table>
+
+<h2><img src="../../images/apps-images/mail-icon_64.png" alt="mail-icon_64.png" width="64" height="64" />Correio</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplicativos</span></td></tr>
+<tr><td>Localização:</td><td></td><td><span class="path">/boot/system/apps/Mail</span></td></tr>
+<tr><td>Configurações:</td><td></td><td><span class="path">~/config/settings/Mail/</span><br />
+<span class="path">~/config/settings/Mail/Menu Links/</span> - Objetos colocados aqui aparecem no menu de contexto da caixa de correio<br />
+<span class="path">~/config/settings/Mail/signatures/</span> - Local para armazenar assinaturas<br />
+<span class="path">~/config/settings/Mail/status/</span> - Local para armazenar estados personalizados</td></tr>
+</table>
+<p><br /></p>
+<p>Correio é o visualizador padrão e editor de correios eletrônicos do Haiku. ele nada tem a ver com busca e envio de correios, que é feito pelo daemon de correio e pode ser configurado através das preferências de <a href="../preferences/e-mail.html">Correio Eletrônico</a>.</p>
+<p>Esta página é uma visão geral do aplicativo Correio. Para mais informação de como o correio eletrônico funciona, consulte <a href="../workshop-email.html">Oficina sobre gerenciamento de correio eletrônico</a>.</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="reading" name="reading">Lendo mensagens</a></h2>
+<p>Dê um clique duplo num arquivo de correio eletrônico para abrí-lo no Correio. A interface é bem simples:</p>
+<img src="../images/apps-images/mail-read.png" alt="email-read.png" /> 
+<p>Um menu e uma barra de ferramentas opcional no topo, com uma área dos atributos interessantes de um correio (para, de, assunto, data) abaixo dele, e então o corpo atual do correio. Se o correio aparecer com caracteres estranhos ou vazio, tente alterar a <span class="menu">Decodificação</span> a partir do menu pop-up.</p>
+<p>Se existem arquivos anexados a um correio eletrônico, eles são listados ao fim da mensagem. Um clique com o botão direito do mouse em um arquivo abre um menu de contexto para <span class="menu">Salvar anexo...</span> ou <span class="menu">Abrir anexo</span>. Pode-se também arrastar e soltar diretamente para a Área de Trabalho ou outra janela do Rastreador.</p>
+<p>A mairia dos itens do menu e da barra de ferramentas são bastante auto-explicativos, então nos concentraremos apenas nos destaques.</p>
+<h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Arquivo</h3>
+<p>Quando fecha a janela de uma nova mensagem, seu estado é normalmente alterado de "Novo" para "Lido". Mas pode-se definir outros estados, selecionando do submenu <span class="menu">Fechar e ...</span> Lá encontra-se também a opção <span class="menu">Definir para...</span> para criar seus próprios estados personalizados, os quais são salvos em <span class="path">~/config/settings/Mail/status/</span>.</p>
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Editar</h3>
+<p>Aqui encontrará um ítem para abrir as <span class="menu">Preferências...</span> do Correio (<a href="#preferences">ver abaixo</a>) e um atalho para gerenciar suas <span class="menu">Contas...</span>, o qual abrirá a janela de diálogo de preferências do <a href="../preferences/e-mail.html">Correio Eletrônico</a>.</p>
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Ver</h3>
+<p>Precisar-se-á muito raramente destes dois itens, se em tudo:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">Exibir cabeçalho</span></td><td class="onelinetop"><span class="key">ALT</span> <span class="key">H</span></td><td style="width:10px;"></td><td>Exibe o cabeçalho completo de uma mensagem, no caso de precisar rastrear o caminho da sua mensagem, por exemplo.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Exibir mensagem base</span></td><td></td><td></td><td>Mostra uma mensagem em seu estado bruto, ou seja, com todos os seus caracteres de controle e sem a colorização de citações ou URLs, por exemplo.</td></tr>
+</table>
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Mensagem</h3>
+<p>A diferentes opções para responder a um correio podem necessitar de uma breve explicação.</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">Responder</span></td><td><span class="key">ALT</span> <span class="key">R</span></td><td style="width:10px;"></td><td>A resposta padrão para o servidor que enviou a mensagem para você. NOTA: No caso de uma postagem de lista de discussão, isto normalmente replica de volta à lista, <i>não</i> apenas para a pessoa que escreveu a postagem!</td></tr>
+<tr><td class="onelinetop"><span class="menu">Reponder ao remetente</span></td><td><span class="key">OPT</span> <span class="key">ALT</span> <span class="key">R</span></td><td></td><td>Este, por outro lado, envia diretamente para a pessoa listada no atributo "De".</td></tr>
+<tr><td><span class="menu">Responder a todos</span></td><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">R</span></td><td></td><td>Responde para o remetente original mais todos os outros destinatários (em cc:) da mensagem original.</td></tr>
+</table>
+<div class="box-info">Se marcar uma passagem na mensagem antes de respondê-la, apenas o texto marcado será citado na sua mensagem de resposta. Um modo agradável para reduzir uma citação extensa, o qual é desaprovado pela maioria das pessoas...</div>
+<p>Os itens de <span class="menu">Encaminhar</span>, <span class="menu">Reenviar</span> e <span class="menu">Copiar para nova</span> são novamente bastante auto-explicativas.</p>
+<p>Quando tiver aberto uma mensagem a partir de um Rastreador ou janela de resultado de consulta, <span class="menu">Mensagem anterior</span> e <span class="menu">Próxima mensagem</span> irá mover para a anterior/próxima mensagem na lista.</p>
+<p><span class="menu">Salvar endereço</span> coleta todos os endereços de correio eletrônico do cabeçalho e o corpo da mensagem em um submenu. Escolhendo um endereço abrirá o aplicativo <a href="people.html">Pessoas</a> de maneira a completar e salvar a informação do contato.</p>
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Consultas</h3>
+<p>Isto não funciona ainda, mas planeja-se abrigar consultas que exibiriam todas as mensagens relacionadas à mensagem atualmente aberta, assim como todas a partir do mesmo remetente ou de mesmo assunto/encadeamento.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="creating" name="creating">Criando novas mensagens</a></h2>
+<p>Uma nova mensagem é criada chamando o menu <span class="menu">Nova mensagem de correio</span> ou pelo ícone correspondente a partir da barra de ferramentas de uma mensagem aberta. Ou apenas inicie o aplicativo de Correio ou escolha <span class="menu">Criar nova mensagem...</span> a partir do menu de contexto do ícone da caixa de correio na Deskbar.</p>
+<img src="../images/apps-images/mail-write.png" alt="email-write.png" /> 
+<p>A janela é muito similar ao da leitura de mensagens. Os ítens do menu e da barra de ferramentas são ligeiramente diferentes e as caixas de texto devem ser preenchidas com o endereço do destinatário, assunto e assim por diante, naturalmente.</p>
+<p><span class="menu">Cc</span> é uma abreviatura para o termo anacrônico "<i>com cópia</i>" e resulta em cópias da sua mensagem sendo enviadas para as pessoas listadas. A diferença de apenas listar uma floresta de endereços no campo "Para" é que não se endereça diretamente para as pessoasi copiadas, assim sinalizando que provavelmente não espera uma resposta deles.<br />
+<span class="menu">Cco</span> significa "<i>com cópia oculta</i>" o qual faz praticamente o mesmo que "Cc", mas oculta os destinatários dos demais.</p>
+<p>Pode-se inserir vários destinatários separando seus endereços com uma vírgula.
+<span class="menu">Para</span>, <span class="menu">CC</span>, e <span class="menu">CCO</span> são menus pop-up. Eles contém todos os endereços de correio eletrônico no seu sistema encontrados por uma consulta aos arquivos do <a href="people.html">Pessoas</a>. Seus atributos de "Grupo" os ordenarão em submenus correspondentes.</p>
+<p>Novamente, iremos focar nas funcionalidades mais interessantes nos menus.</p>
+<h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Arquivo</h3>
+<p>Com o <span class="menu">Salvar como rascunho</span> pode-se armazenar seu trabalho de até então e voltar a ele mais tarde. Para carregá-lo novamente, escolha-o a partir do submenu <span class="menu">Abrir rascunho</span> que listará o resultado de uma consulta a todas as mensagens com o estado "Rascunho".</p>
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Editar</h3>
+<p><span class="menu">Citar</span> e <span class="menu">Remover citação</span> ou seus respectivos atalhos <span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span> são utilizados para adicionar/remover um nível de citação pelo ajuste do número de símbolos "&gt;" na frente das linhas citadas. Apenas selecione algum texto em todas as linhas que deseja (ou não) citar e chame o ítem de menu.</p>
+
+<img src="../images/apps-images/mail-spellcheck.png" alt="email-spellcheck.png" /> 
+
+<p><span class="menu">Verificar ortografia</span> atualmente apenas oferece correções de textos em inglês marcando de vermelho palavras erradas ou desconhecidas e exibindo-as em itálico.
+Clicar com o botão direito do mouse numa palavra abre um menu de contexto oferecendo sugestões para corrigir a palavra ou para <span class="menu">Adicionar</span> ao vocabulário aceito.</p>
+<p>Então, existem novamente os itens para abrir as <span class="menu">Preferências...</span> (<a href="#preferences">veja abaixo</a>) do Correio e um atalho para gerenciar suas <span class="menu">Contas...</span>, as quais irão abrir o painel de preferências do <a href="../preferences/e-mail.html">Correio Eletrônico</a>.</p>
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Mensagem</h3>
+<p>Com <span class="menu">Adicionar assinatura</span> pode-se adicionar textos predefinidos ao fim de seu correio. A partir do seu submenu pode-se escolher uma assinatura específica ou <span class="menu">Aleatória</span>.</p>
+
+<img src="../images/apps-images/mail-signature.png" alt="email-signature.png" /> 
+
+<p>Cria-se assintauras novas ou edita-se existentes com <span class="menu">Editar assinaturas...</span>, o qual abrirá uma janela onde se insere o texto em si e o título da sua nova assintaura. Lá, no menu <span class="menu">Assinatura</span>, encontram-se itens para <span class="menu">Abrir</span> uma assinatura específica ou <span class="menu">Salvar</span> ou <span class="menu">Eliminar</span> a atualmente carregada. Assinaturas devem ser salvas em <span class="path">~/config/settings/Mail/signatures</span>.</p>
+<p>Utilize <span class="menu">Adicionar anexos...</span> e <span class="menu">Remover anexos</span> para adicionar/remover arquivos como anexos. Pode-se também arrastar e soltar arquivos a partir de uma janela do Rastreador. Ainda assim, seja cuidadoso ao soltá-los na seção do cabeçalho (área do Para/De/Assunto no topo) ou eles serão colados dentro do corpo da mensagem se forem arquivos de texto.</p>
+
+<img src="../images/apps-images/mail-attachments.png" alt="email-attachments.png" /> 
+
+<p>Arquivos anexados são listados abaixo da seção do cabeçalho. Pode-se remover um arquivo ao chamar um menu de contexto ou selecionando-o e teclando  <span class="key">DEL</span>.</p>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Consultas</h3>
+<p>Isto não funciona ainda, mas está planejado para manter consultas que deveriam exibir todos os correios relacionados ao correio atualmente aberto, como todos para o mesmo destinatário ou mesmo assunto/objetivo.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="preferences" name="preferences">Preferências</a></h2>
+<img src="../images/apps-images/mail-preferences.png" alt="email-preferences.png" /> 
+<p>As preferências do Correio vem em duas partes:</p>
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Interface de usuário</h3>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">Barra de botões</span></td><td style="width:10px;"></td><td>Opções para exibir rótulos sob os ícones ou ocultar a barra de ferramentas completamente.</td></tr>
+<tr><td><span class="menu">Fonte</span></td><td></td><td>Define o tipo de fonte utilizado para o texto da mensagem.</td></tr>
+<tr><td><span class="menu">Tamanho</span></td><td></td><td>Define o tamanho da fonte.</td></tr>
+<tr><td><span class="menu">Citações coloridas</span></td><td></td><td>Colore diferentes níveis de citação.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Modo de verificação ortográfica inicial</span></td><td></td><td>Liga/desliga a verificação de ortografia na inicialização.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Marcar automaticamente correio como lido</span></td><td></td><td>Se fechar uma mensagem com o estado "Novo", o terá automaticamente marcado como "Lido".</td></tr>
+</table>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Correspondência</h3>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">Conta padrão</span></td><td style="width:10px;"></td><td>Se tiver muitas contas de correio eletrônico, isto especifica qual utilizar por padrão quando criar uma nova mensagem.</td></tr>
+<tr><td><span class="menu">Conta de resposta</span></td><td></td><td>Quando responder uma mensagem, pode sempre também <span class="menu">Utilizar conta padrão</span> definida no menu pop-up acima, ou utilizar <span class="menu">Conta do correio</span>, o qual enviará a mensagem a partir da mesma conta que recebeu a mensagem original.</td></tr>
+<tr><td><span class="menu">Preâmbulo de resposta</span></td><td></td><td>Isto é inserido antes do texto citado na sua resposta. Pode-se utilizar diversas variáveis a partir do menu pop-up próximo ao campo de texto. Exemplo: "<i>Olá %n!\n\nEm %d você escreveu:\n</i>" produz isto:
+<pre>Olá Dr. Hawking!
+
+Em Mon, 18 Jan 1998 02:55:16 +0800 você escreveu:
+&gt; so thanks again for the inspiration concerning the cosmological constant.
+&gt; ...and the rest of the quoted text following...</pre></td></tr>
+<tr><td><span class="menu">Auto assinatura</span></td><td></td><td>Adiciona uma assinatura automaticamente no final da mensagem.</td></tr>
+<tr><td><span class="menu">Codificação</span></td><td></td><td>Define a codificação padrão.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Alertar não codificável</span></td><td></td><td>Se sua mensagem contém caracteres que não podem ser codificados com o método de condificação atualmente definido, pode-se ativá-lo para alertar sobre isso. O que dá a oportunidade para alterar a codificação antes de enviar. Do contrário, caracteres não codificáveis serão substituídos por símbolos retangulares.</td></tr>
+<tr><td><span class="menu">Quebra de texto</span></td><td></td><td>Insere quebras de linha a cada 76 caracteres, o que torna as mensagens fáceis de ler.</td></tr>
+<tr><td><span class="menu">Atributos do anexo</span></td><td></td><td>Pode-se escolher enviar atributos do BFS de um arquivo junto com os anexos. Isto é bom para outros usuários do Haiku, pois receberão um arquivo "completo" (como atributos de artista, álbum, título de arquivos MP3), mas pode causar confusão (ou ainda suspeita) em outros, que irão pensar o que devem ser os anexos adicionais de "Atributos BeOS"...<br />
+Caso opte por não enviar atributos com seus anexos, lembre-se de compactar seus arquivos antes de enviá-los ou perderá os atributos BFS.</td></tr>
+</table>
+
+</div>
+</div>
+
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="magnify.html">Ampliação</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos
+</a> 
+::  <a href="mediaplayer.html">Tocador de Mídia</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

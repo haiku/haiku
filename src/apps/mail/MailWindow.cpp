@@ -87,7 +87,7 @@ of their respective holders. All rights reserved.
 #include "Utilities.h"
 
 
-#define B_TRANSLATE_CONTEXT "Mail"
+#define B_TRANSLATION_CONTEXT "Mail"
 
 
 using namespace BPrivate;
@@ -157,6 +157,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	fRef(NULL),
 	fFieldState(0),
 	fPanel(NULL),
+	fLeaveStatusMenu(NULL),
 	fSendButton(NULL),
 	fSaveButton(NULL),
 	fPrintButton(NULL),
@@ -171,7 +172,6 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	fSent(false),
 	fDraft(false),
 	fChanged(false),
-	fStartingText(NULL),
 	fOriginatingWindow(NULL),
 	fReadButton(NULL),
 	fNextButton(NULL),
@@ -244,7 +244,9 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		read_read_attr(file, flag);
 
 		if (flag == B_UNREAD) {
-			subMenu->AddItem(item = new BMenuItem(B_TRANSLATE("Leave as New"),
+			subMenu->AddItem(item = new BMenuItem(
+				B_TRANSLATE_COMMENT("Leave as 'New'",
+				"Do not translate New - this is non-localizable e-mail status"),
 				new BMessage(kMsgQuitAndKeepAllStatus), 'W', B_SHIFT_KEY));
 		} else {
 			BString status;
@@ -287,6 +289,8 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 			new BMessage(M_CLOSE_CUSTOM)));
 #endif
 		menu->AddItem(subMenu);
+
+		fLeaveStatusMenu = subMenu;
 	} else {
 		menu->AddSeparatorItem();
 		menu->AddItem(new BMenuItem(B_TRANSLATE("Close"),
@@ -351,7 +355,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	}
 	menu->AddSeparatorItem();
 	menu->AddItem(item = new BMenuItem(
-		B_TRANSLATE("Preferences" B_UTF8_ELLIPSIS),
+		B_TRANSLATE("Settings" B_UTF8_ELLIPSIS),
 		new BMessage(M_PREFS),','));
 	item->SetTarget(be_app);
 	fMenuBar->AddItem(menu);
@@ -466,20 +470,20 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 
 	// Button Bar
 
+	BuildButtonBar();
+
 	float bbwidth = 0, bbheight = 0;
 
 	bool showButtonBar = fApp->ShowButtonBar();
 
 	if (showButtonBar) {
-		BuildButtonBar();
 		fButtonBar->ShowLabels(showButtonBar);
 		fButtonBar->Arrange(true);
 		fButtonBar->GetPreferredSize(&bbwidth, &bbheight);
 		fButtonBar->ResizeTo(Bounds().right, bbheight);
 		fButtonBar->MoveTo(0, height);
 		fButtonBar->Show();
-	} else
-		fButtonBar = NULL;
+	}
 
 	r.top = r.bottom = height + bbheight + 1;
 	fHeaderView = new THeaderView (r, rect, fIncoming, resending,
@@ -529,22 +533,15 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 			// If we find the named query, add it to the text.
 			BEntry entry;
 			if (query.GetNextEntry(&entry) == B_NO_ERROR) {
-				off_t size;
 				BFile file;
 				file.SetTo(&entry, O_RDWR);
 				if (file.InitCheck() == B_NO_ERROR) {
-					file.GetSize(&size);
-					char *str = (char *)malloc(size);
-					size = file.Read(str, size);
+					entry_ref ref;
+					entry.GetRef(&ref);
 
-					fContentView->fTextView->Insert(str, size);
-					fContentView->fTextView->GoToLine(0);
-					fContentView->fTextView->ScrollToSelection();
-
-					fStartingText = (char *)malloc(size
-						= strlen(fContentView->fTextView->Text()) + 1);
-					if (fStartingText != NULL)
-						strcpy(fStartingText, fContentView->fTextView->Text());
+					BMessage msg(M_SIGNATURE);
+					msg.AddRef("ref", &ref);
+					PostMessage(&msg);
 				}
 			} else {
 				char tempString [2048];
@@ -790,6 +787,30 @@ TMailWindow::SetTrackerSelectionToCurrent()
 
 
 void
+TMailWindow::PreserveReadingPos(bool save)
+{
+	BScrollBar *scroll = fContentView->fTextView->ScrollBar(B_VERTICAL);
+	if (scroll == NULL || fRef == NULL)
+		return;
+
+	BNode node(fRef);
+	float pos = scroll->Value();
+
+	const char* name = "MAIL:read_pos";
+	if (save) {
+		node.WriteAttr(name, B_FLOAT_TYPE, 0, &pos, sizeof(pos));
+		return;
+	}
+
+	if (node.ReadAttr(name, B_FLOAT_TYPE, 0, &pos, sizeof(pos)) == sizeof(pos)) {
+		Lock();
+		scroll->SetValue(pos);
+		Unlock();
+	}
+}
+
+
+void
 TMailWindow::MarkMessageRead(entry_ref* message, read_flags flag)
 {
 	BNode node(message);
@@ -804,6 +825,9 @@ TMailWindow::MarkMessageRead(entry_ref* message, read_flags flag)
 
 	// don't wait for the server write the attribute directly
 	write_read_attr(node, flag);
+
+	// preserve the read position in the node attribute
+	PreserveReadingPos(true);
 
 	BMailDaemon::MarkAsRead(account, *message, flag);
 }
@@ -906,6 +930,22 @@ TMailWindow::MenusBeginning()
 //	fUndo->SetLabel((isRedo)
 //	? kRedoStrings[undoState] : kUndoStrings[undoState]);
 	fUndo->SetEnabled(undoState != B_UNDO_UNAVAILABLE);
+
+	if (fLeaveStatusMenu != NULL && fRef != NULL) {
+		BFile file(fRef, B_READ_ONLY);
+		BString status;
+		file.ReadAttrString(B_MAIL_ATTR_STATUS, &status);
+
+		BMenuItem* LeaveStatus = fLeaveStatusMenu->FindItem(B_QUIT_REQUESTED);
+		if (LeaveStatus == NULL)
+			LeaveStatus = fLeaveStatusMenu->FindItem(kMsgQuitAndKeepAllStatus);
+
+		if (LeaveStatus != NULL && status.Length() > 0) {
+			BString label;
+			label.SetToFormat(B_TRANSLATE("Leave as '%s'"), status.String());
+			LeaveStatus->SetLabel(label.String());
+		}
+	}
 }
 
 
@@ -1137,9 +1177,11 @@ TMailWindow::MessageReceived(BMessage *msg)
 						msg.AddRef("refs", fRef);
 						tracker.SendMessage(&msg);
 					} else {
-						(new BAlert("",
+						BAlert* alert = new BAlert("",
 							B_TRANSLATE("Need Tracker to move items to trash"),
-							B_TRANSLATE("Sorry")))->Go();
+							B_TRANSLATE("Sorry"));
+						alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+						alert->Go();
 					}
 				}
 			} else {
@@ -1304,17 +1346,21 @@ TMailWindow::MessageReceived(BMessage *msg)
 					1, &arg);
 
 				if (result != B_NO_ERROR) {
-					(new BAlert("",	B_TRANSLATE(
+					BAlert* alert = new BAlert("", B_TRANSLATE(
 						"Sorry, could not find an application that "
 						"supports the 'Person' data type."),
-						B_TRANSLATE("OK")))->Go();
+						B_TRANSLATE("OK"));
+					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+					alert->Go();
 				}
-
 			}
-
 			free(arg);
 			break;
 		}
+
+		case M_READ_POS:
+			PreserveReadingPos(false);
+			break;
 
 		case M_PRINT_SETUP:
 			PrintSetup();
@@ -1457,6 +1503,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 		case M_UNREAD:
 			MarkMessageRead(fRef, B_SEEN);
 			_UpdateReadButton();
+			PostMessage(M_NEXTMSG);
 			break;
 		case M_READ:
 			wasReadMsg = true;
@@ -1536,10 +1583,12 @@ TMailWindow::MessageReceived(BMessage *msg)
 				snooze (1500000);
 			if (!gDictCount) {
 				beep();
-				(new BAlert("",
+				BAlert* alert = new BAlert("",
 					B_TRANSLATE("Mail couldn't find its dictionary."),
 					B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
-					B_OFFSET_SPACING, B_STOP_ALERT))->Go();
+					B_OFFSET_SPACING, B_STOP_ALERT);
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+				alert->Go();
 			} else {
 				fSpelling->SetMarked(!fSpelling->IsMarked());
 				fContentView->fTextView->EnableSpellCheck(
@@ -1581,6 +1630,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 					B_TRANSLATE("Put your favorite e-mail queries and query "
 					"templates in this folder."), B_TRANSLATE("OK"), NULL, NULL,
 					B_WIDTH_AS_USUAL, B_IDEA_ALERT);
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 				alert->Go(NULL);
 			}
 
@@ -1641,47 +1691,47 @@ TMailWindow::QuitRequested()
 			|| strlen(fHeaderView->fSubject->Text())
 			|| (fHeaderView->fCc && strlen(fHeaderView->fCc->Text()))
 			|| (fHeaderView->fBcc && strlen(fHeaderView->fBcc->Text()))
-			|| (strlen(fContentView->fTextView->Text()) && (!fStartingText
-				|| (fStartingText
-					&& strcmp(fContentView->fTextView->Text(), fStartingText))))
+			|| (fContentView->fTextView
+				&& strlen(fContentView->fTextView->Text()))
 			|| (fEnclosuresView != NULL
 				&& fEnclosuresView->fList->CountItems()))) {
 		if (fResending) {
 			BAlert *alert = new BAlert("", B_TRANSLATE(
-					"Do you wish to send this message before closing?"),
-				B_TRANSLATE("Discard"),
+					"Send this message before closing?"),
 				B_TRANSLATE("Cancel"),
+				B_TRANSLATE("Don't send"),
 				B_TRANSLATE("Send"),
 				B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_WARNING_ALERT);
-			alert->SetShortcut(0, 'd');
-			alert->SetShortcut(1, B_ESCAPE);
+			alert->SetShortcut(0, B_ESCAPE);
+			alert->SetShortcut(1, 'd');
+			alert->SetShortcut(2, 's');
 			result = alert->Go();
 
 			switch (result) {
-				case 0:	// Discard
-					break;
-				case 1:	// Cancel
+				case 0:	// Cancel
 					return false;
+				case 1:	// Don't send
+					break;
 				case 2:	// Send
 					Send(true);
 					break;
 			}
 		} else {
 			BAlert *alert = new BAlert("",
-				B_TRANSLATE("Do you wish to save this message as a draft "
-					"before closing?"),
-				B_TRANSLATE("Don't save"),
+				B_TRANSLATE("Save this message as a draft before closing?"),
 				B_TRANSLATE("Cancel"),
+				B_TRANSLATE("Don't save"),
 				B_TRANSLATE("Save"),
 				B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_WARNING_ALERT);
-			alert->SetShortcut(0, 'd');
-			alert->SetShortcut(1, B_ESCAPE);
+			alert->SetShortcut(0, B_ESCAPE);
+			alert->SetShortcut(1, 'd');
+			alert->SetShortcut(2, 's');
 			result = alert->Go();
 			switch (result) {
-				case 0:	// Don't Save
-					break;
-				case 1:	// Cancel
+				case 0:	// Cancel
 					return false;
+				case 1:	// Don't Save
+					break;
 				case 2:	// Save
 					Send(false);
 					break;
@@ -2119,7 +2169,7 @@ TMailWindow::Reply(entry_ref *ref, TMailWindow *window, uint32 type)
 	BString date(mail->Date());
 	if (date.Length() <= 0)
 		date = B_TRANSLATE("(Date unavailable)");
-			
+
 	preamble.ReplaceAll("%n", name);
 	preamble.ReplaceAll("%e", address);
 	preamble.ReplaceAll("%d", date);
@@ -2183,8 +2233,10 @@ TMailWindow::Send(bool now)
 		status_t status = SaveAsDraft();
 		if (status != B_OK) {
 			beep();
-			(new BAlert("", B_TRANSLATE("E-mail draft could not be saved!"),
-				B_TRANSLATE("OK")))->Go();
+			BAlert* alert = new BAlert("", B_TRANSLATE("E-mail draft could "
+				"not be saved!"), B_TRANSLATE("OK"));
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
 		}
 		return status;
 	}
@@ -2273,11 +2325,14 @@ TMailWindow::Send(bool now)
 						"the unencodable ones), or choose Cancel to go back "
 						"and try fixing it up.");
 					messageString.ReplaceFirst("%ld", countString);
-					userAnswer = (new BAlert("Question", messageString.String(),
+					BAlert* alert = new BAlert("Question", messageString.String(),
 						B_TRANSLATE("Send"),
 						B_TRANSLATE("Cancel"),
 						NULL, B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
-						B_WARNING_ALERT))->Go();
+						B_WARNING_ALERT);
+					alert->SetShortcut(1, B_ESCAPE);
+					userAnswer = alert->Go();
+
 					if (userAnswer == 1) {
 						// Cancel was picked.
 						return -1;
@@ -2408,10 +2463,12 @@ TMailWindow::Send(bool now)
 			close = true;
 			fSent = true;
 
-			int32 start = (new BAlert("no daemon",
+			BAlert* alert = new BAlert("no daemon",
 				B_TRANSLATE("The mail_daemon is not running. The message is "
 				"queued and will be sent when the mail_daemon is started."),
-				B_TRANSLATE("Start now"), B_TRANSLATE("OK")))->Go();
+				B_TRANSLATE("Start now"), B_TRANSLATE("OK"));
+			alert->SetShortcut(1, B_ESCAPE);
+			int32 start = alert->Go();
 
 			if (start == 0) {
 				result = be_roster->Launch("application/x-vnd.Be-POST");
@@ -2447,7 +2504,9 @@ TMailWindow::Send(bool now)
 
 	if (result != B_NO_ERROR && result != B_MAIL_NO_DAEMON) {
 		beep();
-		(new BAlert("", errorMessage.String(), B_TRANSLATE("OK")))->Go();
+		BAlert* alert = new BAlert("", errorMessage.String(), B_TRANSLATE("OK"));
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 	}
 	if (close) {
 		PostMessage(B_QUIT_REQUESTED);
@@ -2492,15 +2551,16 @@ TMailWindow::SaveAsDraft()
 					return status;
 			case B_OK:
 			{
-				char fileName[512], *eofn;
-				int32 i;
-
+				char fileName[B_FILE_NAME_LENGTH];
 				// save as some version of the message's subject
-				strncpy(fileName, fHeaderView->fSubject->Text(),
-					sizeof(fileName)-10);
-				fileName[sizeof(fileName)-10]='\0';
-					// terminate like strncpy doesn't
-				eofn = fileName + strlen(fileName);
+				if (strlen(fHeaderView->fSubject->Text()) == 0)
+					strlcpy(fileName, B_TRANSLATE("Untitled"),
+						sizeof(fileName));
+				else
+					strlcpy(fileName, fHeaderView->fSubject->Text(),
+						sizeof(fileName));
+
+				uint32 originalLength = strlen(fileName);
 
 				// convert /, \ and : to -
 				for (char *bad = fileName; (bad = strchr(bad, '/')) != NULL;
@@ -2512,12 +2572,19 @@ TMailWindow::SaveAsDraft()
 
 				// Create the file; if the name exists, find a unique name
 				flags = B_WRITE_ONLY | B_CREATE_FILE | B_FAIL_IF_EXISTS;
-				for (i = 1; (status = draft.SetTo(&dir, fileName, flags))
-					!= B_OK; i++) {
-					if (status != B_FILE_EXISTS)
-						return status;
-					sprintf(eofn, "%ld", i);
-				}
+				int32 i = 1;
+				do {
+					status = draft.SetTo(&dir, fileName, flags);
+					if (status == B_OK)
+						break;
+					char appendix[B_FILE_NAME_LENGTH];
+					sprintf(appendix, " %ld", i++);
+					int32 pos = min_c(sizeof(fileName) - strlen(appendix),
+						originalLength);
+					sprintf(fileName + pos, "%s", appendix);
+				} while (status == B_FILE_EXISTS);
+				if (status != B_OK)
+					return status;
 
 				// Cache the ref
 				if (fRef == NULL)
@@ -2545,12 +2612,12 @@ TMailWindow::SaveAsDraft()
 		WriteAttrString(&draft, B_MAIL_ATTR_CC, fHeaderView->fCc->Text());
 	if (fHeaderView->fBcc != NULL)
 		WriteAttrString(&draft, B_MAIL_ATTR_BCC, fHeaderView->fBcc->Text());
-	
+
 	// Add account
 	BMenuItem* menuItem = fHeaderView->fAccountMenu->FindMarked();
 	if (menuItem != NULL)
 		WriteAttrString(&draft, B_MAIL_ATTR_ACCOUNT, menuItem->Label());
-	
+
 	// Add encoding
 	menuItem = fHeaderView->fEncodingMenu->FindMarked();
 	if (menuItem != NULL)
@@ -2588,6 +2655,8 @@ TMailWindow::SaveAsDraft()
 
 	fDraft = true;
 	fChanged = false;
+
+	fSaveButton->SetEnabled(false);
 
 	return B_OK;
 }
@@ -2679,8 +2748,10 @@ ErrorExit:
 	sprintf(errorString, "Unable to train the message file \"%s\" as %s.  "
 		"Possibly useful error code: %s (%ld).",
 		filePath.Path(), CommandWord, strerror (errorCode), errorCode);
-	(new BAlert("", errorString,
-		B_TRANSLATE("OK")))->Go();
+	BAlert* alert = new BAlert("", errorString,	B_TRANSLATE("OK"));
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+	alert->Go();
+
 	return errorCode;
 }
 
@@ -2745,10 +2816,6 @@ TMailWindow::OpenMessage(const entry_ref *ref, uint32 characterSetForDecoding)
 	delete fRef;
 	fRef = new entry_ref(*ref);
 
-	if (fStartingText) {
-		free(fStartingText);
-		fStartingText = NULL;
-	}
 	fPrevTrackerPositionSaved = false;
 	fNextTrackerPositionSaved = false;
 
@@ -2795,21 +2862,21 @@ TMailWindow::OpenMessage(const entry_ref *ref, uint32 characterSetForDecoding)
 			fHeaderView->fCc->SetText(string.String());
 		if (node.ReadAttrString(B_MAIL_ATTR_BCC, &string) == B_OK)
 			fHeaderView->fBcc->SetText(string.String());
-		
+
 		// Restore account
 		if (node.ReadAttrString(B_MAIL_ATTR_ACCOUNT, &string) == B_OK) {
 			BMenuItem* accountItem = fHeaderView->fAccountMenu->FindItem(string.String());
 			if (accountItem != NULL)
 				accountItem->SetMarked(true);
 		}
-		
+
 		// Restore encoding
 		if (node.ReadAttrString("MAIL:encoding", &string) == B_OK) {
 			BMenuItem* encodingItem = fHeaderView->fEncodingMenu->FindItem(string.String());
 			if (encodingItem != NULL)
 				encodingItem->SetMarked(true);
 		}
-		
+
 		// Restore attachments
 		if (node.ReadAttrString("MAIL:attachments", &string) == B_OK) {
 			BMessage msg(REFS_RECEIVED);
@@ -2826,6 +2893,10 @@ TMailWindow::OpenMessage(const entry_ref *ref, uint32 characterSetForDecoding)
 			}
 			AddEnclosure(&msg);
 		}
+
+		// restore the reading position if available
+		PostMessage(M_READ_POS);
+
 		PostMessage(RESET_BUTTONS);
 		fIncoming = false;
 		fDraft = true;
@@ -3169,7 +3240,7 @@ TMailWindow::_UpdateReadButton()
 	if (fApp->ShowButtonBar()) {
 		fButtonBar->RemoveButton(fReadButton);
 		fReadButton = NULL;
-		if (!fAutoMarkRead)
+		if (!fAutoMarkRead && fIncoming)
 			_AddReadButton();
 	}
 	UpdateViews();

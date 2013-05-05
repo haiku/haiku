@@ -5,7 +5,7 @@
  */
 
 
-//! Super block, mounting, etc.
+//! Superblock, mounting, etc.
 
 
 #include "Volume.h"
@@ -300,7 +300,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		fSuperBlock.CompatibleFeatures(), fSuperBlock.IncompatibleFeatures(),
 		fSuperBlock.ReadOnlyFeatures());
 
-	// read the super block
+	// read the superblock
 	status_t status = Identify(fDevice, &fSuperBlock);
 	if (status != B_OK) {
 		FATAL("Volume::Mount(): Identify() failed\n");
@@ -311,7 +311,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	if (!IsReadOnly() && _UnsupportedReadOnlyFeatures(fSuperBlock) != 0)
 		return B_UNSUPPORTED;
 
-	// initialize short hands to the super block (to save byte swapping)
+	// initialize short hands to the superblock (to save byte swapping)
 	fBlockShift = fSuperBlock.BlockShift();
 	if (fBlockShift < 10 || fBlockShift > 16)
 		return B_ERROR;
@@ -930,7 +930,7 @@ Volume::Identify(int fd, ext2_super_block* superBlock)
 		return B_IO_ERROR;
 
 	if (!superBlock->IsValid()) {
-		FATAL("invalid super block!\n");
+		FATAL("invalid superblock!\n");
 		return B_BAD_VALUE;
 	}
 

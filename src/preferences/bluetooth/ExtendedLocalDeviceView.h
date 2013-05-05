@@ -34,6 +34,7 @@ public:
 	virtual void AttachedToWindow();
 	virtual void SetTarget(BHandler* target);
 	virtual void SetEnabled(bool value);
+			void ClearDevice();
 
 protected:
 	LocalDevice*		fDevice;

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2007, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
@@ -43,4 +43,3 @@ arch_smp_send_broadcast_ici()
 {
 	panic("called arch_smp_send_broadcast_ici\n");
 }
-

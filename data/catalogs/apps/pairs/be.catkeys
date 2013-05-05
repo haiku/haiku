@@ -1,14 +1,14 @@
 1	belarusian	x-vnd.Haiku-Pairs	1981673050
 %app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\tраспрацавана Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nВыВы скончылі гульню ў %num% клікаў.\n
-Beginner (4x4)	PairsWindow		Пачаткоўца (4x4)
 Expert (8x8)	PairsWindow		Майстар (8x8)
-Game	PairsWindow		Гульня
-Intermediate (6x6)	PairsWindow		Сярэднячок (6x6)
-New	PairsWindow		Новая
-New game	PairsWindow		Новая гульня
-OK	PairsView		ОК
-Pairs	System name		Пары
-Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Праграма Пары не знайшла дастаткова вектарных іконак у вашай сістэме. Патрэбна хаця б %d.
-Quit	PairsWindow		Выйсці
+Beginner (4x4)	PairsWindow		Пачаткоўца (4x4)
 Quit game	PairsWindow		Выйсці з гульні
+Game	PairsWindow		Гульня
 Size	PairsWindow		Памер
+New	PairsWindow		Новая
+OK	PairsView		ОК
+Intermediate (6x6)	PairsWindow		Сярэднячок (6x6)
+Quit	PairsWindow		Выйсці
+Pairs	System name		Пары
+New game	PairsWindow		Новая гульня
+Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Праграма Пары не знайшла дастаткова вектарных іконак у вашай сістэме. Патрэбна хаця б %d.

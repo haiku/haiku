@@ -1,7 +1,3 @@
-/*
- * BFSAddOn.rdef
- */
-
 resource app_signature "application/x-vnd.Haiku-BFSAddOn";
 
 resource app_version {
@@ -11,5 +7,5 @@ resource app_version {
 	variety = 0,
 	internal = 0,
 	short_info = "1.0.0",
-	long_info = "Haiku BFS disk add-on."
+	long_info = "BFS disk add-on."
 };

@@ -14,6 +14,7 @@
 /*!
 	\file fs_interface.h
 	\ingroup drivers
+	\ingroup libbe
 	\brief Provides an interface for file system modules.
 
 	See the \ref fs_modules "introduction to file system modules" for a guide on
@@ -324,8 +325,11 @@
 
 	Invoked by the VFS when it is asked to unmount the volume. The function must
 	free all resources associated with the mounted volume, including the volume
-	handle. Although the mount() hook called publish_vnode() for the root node
-	of the volume, unmount() must not invoke put_vnode().
+	handle. Before unmount() is called, the VFS calls
+	file_system_module_info::put_vnode() respectively
+	file_system_module_info::remove_vnode() for each of the volume's nodes. That
+	is although the mount() hook called publish_vnode() for the volume's root
+	node, unmount() must not invoke put_vnode().
 
 	\param volume The volume object.
 	\return \c B_OK if everything went fine, another error code otherwise. The

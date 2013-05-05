@@ -1,9 +1,13 @@
 /*
- * Copyright 2001-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2013, Haiku, Inc. All rights reserved.
  * Copyright (c) 2003-2004 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
  * Distributed unter the terms of the MIT license.
+ *
+ * Authors:
+ *		Kian Duffy, myob@users.sourceforge.net
+ *		Siarzhuk Zharski, zharik@gmx.li
  */
 
 
@@ -37,6 +41,7 @@
 static bool sUsageRequested = false;
 //static bool sGeometryRequested = false;
 
+rgb_color TermApp::fDefaultPalette[kTermColorCount];
 
 int
 main()
@@ -47,8 +52,8 @@ main()
 	return 0;
 }
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Terminal TermApp"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Terminal TermApp"
 
 TermApp::TermApp()
 	: BApplication(TERM_SIGNATURE),
@@ -57,6 +62,8 @@ TermApp::TermApp()
 	fArgs(NULL)
 {
 	fArgs = new Arguments(0, NULL);
+
+	_InitDefaultPalette();
 }
 
 
@@ -104,7 +111,7 @@ TermApp::ReadyToRun()
 			B_TRANSLATE("Terminal couldn't start the shell. Sorry."),
 			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_FROM_LABEL,
 			B_INFO_ALERT);
-		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go(NULL);
 		PostMessage(B_QUIT_REQUESTED);
 		return;
@@ -200,7 +207,7 @@ TermApp::RefsReceived(BMessage* message)
 	info.GetType(mimetype);
 
 	// if App opened by Pref file
-	if (!strcmp(mimetype, PREFFILE_MIMETYPE)) {
+	if (strcmp(mimetype, PREFFILE_MIMETYPE) == 0) {
 
 		BEntry ent(&ref);
 		BPath path(&ent);
@@ -209,7 +216,7 @@ TermApp::RefsReceived(BMessage* message)
 	}
 
 	// if App opened by Shell Script
-	if (!strcmp(mimetype, "text/x-haiku-shscript")){
+	if (strcmp(mimetype, "text/x-haiku-shscript") == 0) {
 		// Not implemented.
 		//    beep();
 		return;
@@ -289,7 +296,6 @@ TermApp::_ChildCleanupThread(void* data)
 }
 
 
-
 void
 TermApp::_Usage(char *name)
 {
@@ -309,3 +315,42 @@ TermApp::_Usage(char *name)
 		);
 }
 
+
+void
+TermApp::_InitDefaultPalette()
+{
+	// 0 - 15 are system ANSI colors
+	const char * keys[kANSIColorCount] = {
+		PREF_ANSI_BLACK_COLOR,
+		PREF_ANSI_RED_COLOR,
+		PREF_ANSI_GREEN_COLOR,
+		PREF_ANSI_YELLOW_COLOR,
+		PREF_ANSI_BLUE_COLOR,
+		PREF_ANSI_MAGENTA_COLOR,
+		PREF_ANSI_CYAN_COLOR,
+		PREF_ANSI_WHITE_COLOR,
+		PREF_ANSI_BLACK_HCOLOR,
+		PREF_ANSI_RED_HCOLOR,
+		PREF_ANSI_GREEN_HCOLOR,
+		PREF_ANSI_YELLOW_HCOLOR,
+		PREF_ANSI_BLUE_HCOLOR,
+		PREF_ANSI_MAGENTA_HCOLOR,
+		PREF_ANSI_CYAN_HCOLOR,
+		PREF_ANSI_WHITE_HCOLOR
+	};
+
+	rgb_color* color = fDefaultPalette;
+	PrefHandler* handler = PrefHandler::Default();
+	for (uint i = 0; i < kANSIColorCount; i++)
+		*color++ = handler->getRGB(keys[i]);
+
+	// 16 - 231 are 6x6x6 color "cubes" in xterm color model
+	for (uint red = 0; red < 256; red += (red == 0) ? 95 : 40)
+		for (uint green = 0; green < 256; green += (green == 0) ? 95 : 40)
+			for (uint blue = 0; blue < 256; blue += (blue == 0) ? 95 : 40)
+				(*color++).set_to(red, green, blue);
+
+	// 232 - 255 are grayscale ramp in xterm color model
+	for (uint gray = 8; gray < 240; gray += 10)
+		(*color++).set_to(gray, gray, gray);
+}

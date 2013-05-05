@@ -12,7 +12,7 @@ if $(TARGET_ARCH) = ppc {
 	iscsi = iSCSITarget.cpp ;
 }
 
-KernelStaticLibrary boot_net :
+BootStaticLibrary boot_net :
 	ARP.cpp
 	ChainBuffer.cpp
 	Ethernet.cpp

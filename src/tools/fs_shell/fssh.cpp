@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "compatibility.h"
 
 #include "fssh.h"
@@ -1194,6 +1195,9 @@ command_ioctl(int argc, const char* const* argv)
 		return rootDir;
 
 	fssh_status_t status = _kern_ioctl(rootDir, atoi(argv[1]), NULL, 0);
+
+	_kern_close(rootDir);
+
 	if (status != FSSH_B_OK) {
 		fprintf(stderr, "Error: ioctl failed: %s\n", fssh_strerror(status));
 		return status;
@@ -1471,6 +1475,7 @@ standard_session(const char* device, const char* fsName, bool interactive)
 
 	// register commands
 	register_commands();
+	register_additional_commands();
 
 	// process commands
 	input_loop(interactive);

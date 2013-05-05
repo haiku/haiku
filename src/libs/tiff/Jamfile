@@ -1,6 +1,8 @@
 SubDir HAIKU_TOP src libs tiff ;
 
-UseLibraryHeaders jpeg tiff zlib ;
+UseLibraryHeaders tiff ;
+UseHeaders $(HAIKU_JPEG_HEADERS) : true ;
+UseHeaders $(HAIKU_ZLIB_HEADERS) : true ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
@@ -44,8 +46,14 @@ local shared_files =
 	tif_zip.c 
 	;
 
+Includes [ FGristFiles tif_jpeg.c tif_ojpeg.c ]
+	: $(HAIKU_JPEG_HEADERS_DEPENDENCY) ;
+Includes [ FGristFiles tif_pixarlog.c tif_zip.c ]
+	: $(HAIKU_ZLIB_HEADERS_DEPENDENCY) ;
+
 Objects $(shared_files) ;
 
-SharedLibrary libtiff.so : [ FGristFiles $(shared_files:S=.o) ] : libjpeg.so z : 3.8 ;
+SharedLibrary libtiff.so : [ FGristFiles $(shared_files:S=.o) ]
+	: $(HAIKU_JPEG_LIB) $(HAIKU_ZLIB_LIB) : 3.8 ;
 
 StaticLibrary libtiff.a : [ FGristFiles $(shared_files:S=.o) ] ;

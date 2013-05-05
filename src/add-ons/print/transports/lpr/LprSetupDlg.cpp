@@ -142,6 +142,7 @@ LprSetupView::UpdateViewData()
 
 		catch (LPSException &err) {
 			BAlert *alert = new BAlert("", err.what(), "OK");
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 			return false;
 		}
@@ -155,6 +156,7 @@ LprSetupView::UpdateViewData()
 
 	BAlert *alert = new BAlert("", "Please enter server address and printer"
 		"queue name.", "OK");
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 	return false;
 }

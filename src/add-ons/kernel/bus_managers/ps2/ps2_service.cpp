@@ -128,7 +128,8 @@ ps2_service_thread(void *arg)
 					break;
 			}
 		} else {
-			INFO("ps2: ps2_service_thread: Error, status 0x%08lx, terminating\n", status);
+			INFO("ps2: ps2_service_thread: Error, status 0x%08" B_PRIx32 ", "
+				"terminating\n", status);
 			break;
 		}
 	}
@@ -193,5 +194,9 @@ ps2_service_exit(void)
 	wait_for_thread(sServiceThread, NULL);
 	delete_sem(sServiceSem);
 	delete_packet_buffer(sServiceCmdBuffer);
+
+#ifdef DEBUG_PUBLISHING
+	remove_debugger_command("ps2republish", &ps2_republish);
+#endif
 	TRACE("ps2: ps2_service_exit done\n");
 }

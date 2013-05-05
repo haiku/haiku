@@ -11,6 +11,7 @@
 
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 
@@ -102,7 +103,7 @@ static const char*
 FindSpecialKeyLabelFor(uint8 keyCode, int& last)
 {
 	while ((keyLabels[last].fKeyCode < keyCode) 
-		&& (last < (sizeof(keyLabels)/sizeof(struct KeyLabelMap))-1)) 
+		&& (last < (sizeof(keyLabels) / sizeof(struct KeyLabelMap)) - 1)) 
 		last++;
 
 	if (keyLabels[last].fKeyCode == keyCode)
@@ -151,6 +152,8 @@ InitKeyIndices()
 		} else
 			utfDescriptions[j * MAX_UTF8_LENGTH] = 0x00;
 	}
+	free(keys);
+	free(map);
 }
 
 

@@ -61,12 +61,16 @@ public:
 	virtual	status_t			Archive(BMessage* into, bool deep = true) const;
 	static	BArchivable*		Instantiate(BMessage* from);
 
+	virtual	status_t			Perform(perform_code d, void* arg);
+
+protected:
+	virtual status_t			AllArchived(BMessage* into) const;
+	virtual	status_t			AllUnarchived(const BMessage* from);
 	virtual status_t			ItemArchived(BMessage* into,
 									BLayoutItem* item, int32 index) const;
 	virtual status_t			ItemUnarchived(const BMessage* from,
 									BLayoutItem* item, int32 index);
 
-protected:
 	virtual	bool				ItemAdded(BLayoutItem* item, int32 atIndex);
 	virtual	void				ItemRemoved(BLayoutItem* item, int32 fromIndex);
 
@@ -81,7 +85,6 @@ protected:
 									ColumnRowConstraints* constraints);
 	virtual	void				GetItemDimensions(BLayoutItem* item,
 									Dimensions* dimensions);
-
 private:
 			class DummyLayoutItem;
 			class RowInfoArray;
@@ -97,6 +100,23 @@ private:
 			ItemLayoutData*		_LayoutDataForItem(BLayoutItem* item) const;
 
 private:
+
+	// FBC padding
+	virtual	void				_ReservedGridLayout1();
+	virtual	void				_ReservedGridLayout2();
+	virtual	void				_ReservedGridLayout3();
+	virtual	void				_ReservedGridLayout4();
+	virtual	void				_ReservedGridLayout5();
+	virtual	void				_ReservedGridLayout6();
+	virtual	void				_ReservedGridLayout7();
+	virtual	void				_ReservedGridLayout8();
+	virtual	void				_ReservedGridLayout9();
+	virtual	void				_ReservedGridLayout10();
+
+	// forbidden methods
+								BGridLayout(const BGridLayout&);
+			void				operator =(const BGridLayout&);
+
 			BLayoutItem***		fGrid;
 			int32				fColumnCount;
 			int32				fRowCount;
@@ -106,6 +126,8 @@ private:
 
 			int32				fMultiColumnItems;
 			int32				fMultiRowItems;
+
+			uint32				_reserved[5];
 };
 
 

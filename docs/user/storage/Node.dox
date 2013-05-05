@@ -1,25 +1,30 @@
 /*
- * Copyright 2002-2011, Haiku Inc.
+ * Copyright 2002-2011 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Tyler Dauwalder, tylerdauwalder@users.sf.net
  *		John Scipione, jscipione@gmail.com
  *		Ingo Weinhold, bonefish@users.sf.net
+ *
  * Corresponds to:
- *		/trunk/headers/os/app/Node.h		 rev 42803
- *		/trunk/src/kits/app/Node.cpp		 rev 42803
+ *		headers/os/storage/Node.h	rev 42803
+ *		src/kits/storage/Node.cpp	rev 42803
  */
 
 
 /*!
 	\file Node.h
+	\ingroup storage
+	\ingroup libbe
 	\brief Provides the BNode class and node_ref structure.
 */
 
 
 /*!
 	\struct node_ref
+	\ingroup storage
+	\ingroup libbe
 	\brief Reference structure to a particular vnode on a device.
 */
 
@@ -71,6 +76,7 @@
 /*!
 	\class BNode
 	\ingroup storage
+	\ingroup libbe
 	\brief A BNode represents a chunk of data in the filesystem.
 
 	The BNode class provides an interface for manipulating the data and
@@ -82,18 +88,22 @@
 
 /*!
 	\var BNode::fFd
+
 	File descriptor for the given node.
 */
 
 
 /*!
 	\var BNode::fAttrFd
-	File descriptor for the attribute directory of the node. Initialized lazily.
+
+	File descriptor for the attribute directory of the node.
+	Initialized lazily.
 */
 
 
 /*!
 	\var BNode::fCStatus
+
 	The object's initialization status.
 */
 

@@ -11,6 +11,7 @@
 
 #include <syscall_utils.h>
 
+#include <errno_private.h>
 #include <syscalls.h>
 
 
@@ -26,7 +27,7 @@ sync(void)
 {
 	int status = _kern_sync();
 	if (status < 0) {
-		errno = status;
+		__set_errno(status);
 		status = -1;
 	}
 

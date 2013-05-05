@@ -31,12 +31,13 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef __COUNT_VIEW__
 #define __COUNT_VIEW__
 
+
 #include <String.h>
 #include <View.h>
+
 
 namespace BPrivate {
 
@@ -46,7 +47,7 @@ class BCountView : public BView {
 	// displays the item count and a barber pole while the view is updating
 
 public:
-	BCountView(BRect, BPoseView *);
+	BCountView(BRect, BPoseView*);
 	~BCountView();
 
 	virtual	void Draw(BRect);
@@ -59,14 +60,14 @@ public:
 	void StartBarberPole();
 	void EndBarberPole();
 
-	void SetTypeAhead(const char *);
-	const char *TypeAhead() const;
+	void SetTypeAhead(const char*);
+	const char* TypeAhead() const;
 	bool IsTypingAhead() const;
 
-	void AddFilterCharacter(const char *character);
+	void AddFilterCharacter(const char* character);
 	void RemoveFilterCharacter();
 	void CancelFilter();
-	const char *Filter() const;
+	const char* Filter() const;
 	bool IsFiltering() const;
 
 	void SetBorderHighlighted(bool highlighted);
@@ -79,10 +80,10 @@ private:
 	void TrySpinningBarberPole();
 
 	int32 fLastCount;
-	BPoseView *fPoseView;
+	BPoseView* fPoseView;
 	bool fShowingBarberPole : 1;
 	bool fBorderHighlighted : 1;
-	BBitmap *fBarberPoleMap;
+	BBitmap* fBarberPoleMap;
 	float fLastBarberPoleOffset;
 	bigtime_t fStartSpinningAfter;
 	BString fTypeAheadString;

@@ -95,8 +95,8 @@
 #include <FileConfigView.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "SpamFilterConfig"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "SpamFilterConfig"
 
 
 static const char *kServerSignature = "application/x-vnd.agmsmith.spamdbm";
@@ -421,9 +421,11 @@ AGMSBayesianSpamFilterConfig::ShowSpamServerConfigurationWindow () {
 	return; // Successful.
 
 ErrorExit:
-	(new BAlert ("SpamFilterConfig Error", B_TRANSLATE("Sorry, unable to "
-		"launch the spamdbm program to let you edit the server settings."),
-		B_TRANSLATE("Close")))->Go ();
+	BAlert* alert = new BAlert ("SpamFilterConfig Error", B_TRANSLATE("Sorry, "
+		"unable to launch the spamdbm program to let you edit the server "
+		"settings."), B_TRANSLATE("Close"));
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+	alert->Go ();
 	return;
 }
 

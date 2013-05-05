@@ -12,14 +12,17 @@ UsePrivateHeaders [ FDirName graphics common ] ;
 Addon radeon_hd.accelerant :
 	accelerant.cpp
 	atom.cpp
-	create_display_modes.cpp
 	bios.cpp
+	connector.cpp
+	create_display_modes.cpp
 	display.cpp
+	displayport.cpp
 	encoder.cpp
 	engine.cpp
 	gpu.cpp
 	hooks.cpp
 	mode.cpp
 	pll.cpp
-	: be libaccelerantscommon.a
+	ringqueue.cpp
+	: be libaccelerantscommon.a $(TARGET_LIBSUPC++)
 ;

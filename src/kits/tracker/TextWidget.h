@@ -32,7 +32,7 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-#ifndef	_TEXT_WIDGET_H
+#ifndef _TEXT_WIDGET_H
 #define _TEXT_WIDGET_H
 
 #include "Model.h"
@@ -44,38 +44,48 @@ class BPose;
 class BPoseView;
 class BColumn;
 
+
+struct MouseUpParams {
+	BPose* 		pose;
+	BRect 		bounds;
+	BPoseView* 	poseView;
+};
+
+
 class BTextWidget {
 public:
-	BTextWidget(Model *, BColumn *, BPoseView *);
+	BTextWidget(Model*, BColumn*, BPoseView*);
 	virtual ~BTextWidget();
 
-	void Draw(BRect widgetRect, BRect widgetTextRect, float width, BPoseView *,
+	void Draw(BRect widgetRect, BRect widgetTextRect, float width, BPoseView*,
 		bool selected, uint32 clipboardMode);
-	void Draw(BRect widgetRect, BRect widgetTextRect, float width, BPoseView *,
-		BView *drawView, bool selected, uint32 clipboardMode, BPoint offset, bool direct);
+	void Draw(BRect widgetRect, BRect widgetTextRect, float width, BPoseView*,
+		BView* drawView, bool selected, uint32 clipboardMode, BPoint offset,
+		bool direct);
 		// second call is used for offscreen drawing, where PoseView
 		// and current drawing view are different
 
-	void MouseUp(BRect bounds, BPoseView *, BPose *, BPoint mouseLoc);
-	
-	BRect CalcRect(BPoint poseLoc, const BColumn *, const BPoseView *);
+	void MouseUp(BRect bounds, BPoseView*, BPose*, BPoint mouseLoc);
+
+	BRect CalcRect(BPoint poseLoc, const BColumn*, const BPoseView*);
 		// returns the rect derived from the formatted string width
 		// may force WidgetAttributeText recalculation
-	BRect CalcClickRect(BPoint poseLoc, const BColumn *, const BPoseView *);
+	BRect CalcClickRect(BPoint poseLoc, const BColumn*, const BPoseView*);
 		// calls CalcRect, if result too narow, returns a wider rect for
 		// easy clicking
-	BRect ColumnRect(BPoint poseLoc, const BColumn *, const BPoseView *);
+	BRect ColumnRect(BPoint poseLoc, const BColumn*, const BPoseView*);
 		// returns the rect of the widget in a column, regardless
 		// of the string width; faster than CalcRect
-	BRect CalcOldRect(BPoint poseLoc, const BColumn *, const BPoseView *);
+	BRect CalcOldRect(BPoint poseLoc, const BColumn*, const BPoseView*);
 		// after an update call this to determine the old rect so that
 		// we can invalidate properly
-		
-	void StartEdit(BRect bounds, BPoseView *, BPose *);
-	void StopEdit(bool saveChanges, BPoint loc, BPoseView *, BPose *, int32 index);
 
-	void SelectAll(BPoseView *view);
-	void CheckAndUpdate(BPoint, const BColumn *, BPoseView *, bool visible);
+	void StartEdit(BRect bounds, BPoseView*, BPose*);
+	void StopEdit(bool saveChanges, BPoint loc, BPoseView*, BPose*,
+		int32 index);
+
+	void SelectAll(BPoseView* view);
+	void CheckAndUpdate(BPoint, const BColumn*, BPoseView*, bool visible);
 
 	uint32 AttrHash() const;
 	bool IsEditable() const;
@@ -84,26 +94,35 @@ public:
 	void SetVisible(bool);
 	bool IsActive() const;
 	void SetActive(bool);
-	
-	const char *Text(const BPoseView *view) const;
-		// returns the untruncated version of the text
-	float TextWidth(const BPoseView *) const;
-	float PreferredWidth(const BPoseView *) const;
-	int	Compare(const BTextWidget &, BPoseView *) const;
-		// used for sorting in PoseViews
-	
-private:
-	BRect CalcRectCommon(BPoint poseLoc, const BColumn *, const BPoseView *, float width);
 
-	WidgetAttributeText *fText;
-	uint32 fAttrHash;	// ToDo: get rid of this
+	const char* Text(const BPoseView* view) const;
+		// returns the untruncated version of the text
+	float TextWidth(const BPoseView*) const;
+	float PreferredWidth(const BPoseView*) const;
+	int Compare(const BTextWidget&, BPoseView*) const;
+		// used for sorting in PoseViews
+
+	void CheckExpiration();
+	void CancelWait();
+
+private:
+	BRect CalcRectCommon(BPoint poseLoc, const BColumn*, const BPoseView*,
+		float width);
+
+	WidgetAttributeText* fText;
+	uint32 fAttrHash;
+		// TODO: get rid of this
 	alignment fAlignment;
 
 	bool fEditable : 1;
 	bool fVisible : 1;
 	bool fActive : 1;
 	bool fSymLink : 1;
+
+	bigtime_t fLastClickedTime;
+	struct MouseUpParams fParams;
 };
+
 
 inline uint32
 BTextWidget::AttrHash() const
@@ -111,11 +130,13 @@ BTextWidget::AttrHash() const
 	return fAttrHash;
 }
 
+
 inline void
 BTextWidget::SetEditable(bool on)
 {
 	fEditable = on;
 }
+
 
 inline bool
 BTextWidget::IsEditable() const
@@ -123,11 +144,13 @@ BTextWidget::IsEditable() const
 	return fEditable && fText->IsEditable();
 }
 
+
 inline bool
 BTextWidget::IsVisible() const
 {
 	return fVisible;
 }
+
 
 inline void
 BTextWidget::SetVisible(bool on)
@@ -135,11 +158,13 @@ BTextWidget::SetVisible(bool on)
 	fVisible = on;
 }
 
+
 inline bool
 BTextWidget::IsActive() const
 {
 	return fActive;
 }
+
 
 inline void
 BTextWidget::SetActive(bool on)
@@ -150,9 +175,9 @@ BTextWidget::SetActive(bool on)
 
 inline void
 BTextWidget::Draw(BRect widgetRect, BRect widgetTextRect, float width,
-	BPoseView *view, bool selected, uint32 clipboardMode)
+	BPoseView* view, bool selected, uint32 clipboardMode)
 {
-	Draw(widgetRect, widgetTextRect, width, view, (BView *)view, selected,
+	Draw(widgetRect, widgetTextRect, width, view, (BView*)view, selected,
 		clipboardMode, BPoint(0, 0), true);
 }
 
@@ -160,4 +185,4 @@ BTextWidget::Draw(BRect widgetRect, BRect widgetTextRect, float width,
 
 using namespace BPrivate;
 
-#endif
+#endif	// _TEXT_WIDGET_H

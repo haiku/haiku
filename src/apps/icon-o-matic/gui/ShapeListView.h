@@ -17,6 +17,8 @@ class BMenu;
 class BMenuItem;
 class CommandStack;
 class ShapeListItem;
+class StyleContainer;
+class PathContainer;
 class Selection;
 
 _BEGIN_ICON_NAMESPACE
@@ -48,7 +50,9 @@ class ShapeListView : public SimpleListView,
 
 	virtual	bool				AcceptDragMessage(const BMessage* message) const;
 	virtual	void				SetDropTargetRect(const BMessage* message,
-												  BPoint where);
+									BPoint where);
+	virtual	bool				HandleDropMessage(const BMessage* message,
+									int32 dropIndex);
 
 	virtual	void				MoveItems(BList& items, int32 toIndex);
 	virtual	void				CopyItems(BList& items, int32 toIndex);
@@ -66,6 +70,8 @@ class ShapeListView : public SimpleListView,
 	// ShapeListView
 			void				SetMenu(BMenu* menu);
 			void				SetShapeContainer(ShapeContainer* container);
+			void				SetStyleContainer(StyleContainer* container);
+			void				SetPathContainer(PathContainer* container);
 			void				SetCommandStack(CommandStack* stack);
 
  private:
@@ -80,6 +86,8 @@ class ShapeListView : public SimpleListView,
 			BMessage*			fMessage;
 
 			ShapeContainer*		fShapeContainer;
+			StyleContainer*		fStyleContainer;
+			PathContainer*		fPathContainer;
 			CommandStack*		fCommandStack;
 
 			BMenu*				fMenu;

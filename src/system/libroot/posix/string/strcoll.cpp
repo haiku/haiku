@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <string.h>
 
+#include <errno_private.h>
 #include "LocaleBackend.h"
 
 
@@ -21,7 +22,7 @@ strcoll(const char *a, const char *b)
 		status_t status = gLocaleBackend->Strcoll(a, b, result);
 
 		if (status != B_OK)
-			errno = EINVAL;
+			__set_errno(EINVAL);
 
 		return result;
 	}

@@ -1,13 +1,19 @@
 SubDir HAIKU_TOP src add-ons decorators MacDecorator ;
 
-UseFreeTypeHeaders ;
+UseHeaders $(HAIKU_FREETYPE_HEADERS) : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app decorator ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app font ] ;
 UsePrivateHeaders app shared interface graphics ;
 UseLibraryHeaders agg ;
+UsePrivateHeaders kernel ;
 
 AddResources MacDecorator : resources.rdef ;
+
+Includes [ FGristFiles MacDecorator.cpp ]
+	: $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
 
 Addon MacDecorator :
 	MacDecorator.cpp

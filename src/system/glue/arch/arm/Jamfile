@@ -1,0 +1,7 @@
+SubDir HAIKU_TOP src system glue arch arm ;
+
+KernelObjects
+	crti.S
+	crtn.S
+	;
+

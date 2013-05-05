@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src system kernel lib zlib ;
+
+# TODO: Remove zlib from the tree and build from the source package!
+UseLibraryHeaders zlib ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src libs zlib ] ;
+
+
+KernelStaticLibrary kernel_libz.a :
+	inflate.c
+	inffast.c
+	inftrees.c
+	adler32.c
+	crc32.c
+	zutil.c
+	: -fno-pic
+	;

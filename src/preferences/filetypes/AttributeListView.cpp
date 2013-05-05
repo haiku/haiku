@@ -8,31 +8,36 @@
 
 #include <stdio.h>
 
+#include <Catalog.h>
+#include <Locale.h>
 #include <ObjectList.h>
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Attribute ListView"
 
 const struct type_map kTypeMap[] = {
-	{"String",			B_STRING_TYPE},
-	{"Boolean",			B_BOOL_TYPE},
-	{"Integer 8 bit",	B_INT8_TYPE},
-	{"Integer 16 bit",	B_INT16_TYPE},
-	{"Integer 32 bit",	B_INT32_TYPE},
-	{"Integer 64 bit",	B_INT64_TYPE},
-	{"Float",			B_FLOAT_TYPE},
-	{"Double",			B_DOUBLE_TYPE},
-	{"Time",			B_TIME_TYPE},
-	{NULL,				0}
+	{B_TRANSLATE("String"),		B_STRING_TYPE},
+	{B_TRANSLATE("Boolean"),		B_BOOL_TYPE},
+	{B_TRANSLATE("Integer 8 bit"),	B_INT8_TYPE},
+	{B_TRANSLATE("Integer 16 bit"),	B_INT16_TYPE},
+	{B_TRANSLATE("Integer 32 bit"),	B_INT32_TYPE},
+	{B_TRANSLATE("Integer 64 bit"),	B_INT64_TYPE},
+	{B_TRANSLATE("Float"),			B_FLOAT_TYPE},
+	{B_TRANSLATE("Double"),			B_DOUBLE_TYPE},
+	{B_TRANSLATE("Time"),			B_TIME_TYPE},
+	{NULL,							0}
 };
 
 // TODO: in the future, have a (private) Tracker API that exports these
 //	as well as a nice GUI for them.
 const struct display_as_map kDisplayAsMap[] = {
-	{"Default",		NULL,		{}},
-	{"Checkbox",	"checkbox",
+	{B_TRANSLATE("Default"),	NULL,		{}},
+	{B_TRANSLATE("Checkbox"),	B_TRANSLATE("checkbox"),
 		{B_BOOL_TYPE, B_INT8_TYPE, B_INT16_TYPE, B_INT32_TYPE}},
-	{"Duration",	"duration",
+	{B_TRANSLATE("Duration"),	B_TRANSLATE("duration"),
 		{B_TIME_TYPE, B_INT8_TYPE, B_INT16_TYPE, B_INT32_TYPE, B_INT64_TYPE}},
-	{"Rating",		"rating",	{B_INT8_TYPE, B_INT16_TYPE, B_INT32_TYPE}},
+	{B_TRANSLATE("Rating"),		B_TRANSLATE("rating"),
+		{B_INT8_TYPE, B_INT16_TYPE, B_INT32_TYPE}},
 	{NULL,			NULL,		{}}
 };
 
@@ -82,7 +87,7 @@ name_for_type(BString& string, type_code type, const char* displayAs)
 			buffer[i] = '.';
 	}
 
-	snprintf(buffer + 6, sizeof(buffer), " (0x%lx)", type);
+	snprintf(buffer + 6, sizeof(buffer), " (0x%" B_PRIx32 ")", type);
 	string = buffer;
 }
 
@@ -278,7 +283,7 @@ AttributeListView::SetTo(BMimeType* type)
 	// Remove the current items but remember them for now. Also remember
 	// the currently selected item.
 	BObjectList<AttributeItem> previousItems(CountItems(), true);
-	while (AttributeItem* item = (AttributeItem*)RemoveItem(0L))
+	while (AttributeItem* item = (AttributeItem*)RemoveItem((int32)0))
 		previousItems.AddItem(item);
 
 	// fill it again

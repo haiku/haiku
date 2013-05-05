@@ -1,18 +1,18 @@
 /**
  *
  * TODO: description
- * 
- * This file is a part of USB SCSI CAM for Haiku OS.
+ *
+ * This file is a part of USB SCSI CAM for Haiku.
  * May be used under terms of the MIT License
  *
  * Author(s):
  * 	Siarzhuk Zharski <imker@gmx.li>
- * 	
- * 	
+ *
+ *
  */
 /** Main part of USB SIM implementation */
 
-#include "usb_scsi.h" 
+#include "usb_scsi.h"
 
 #include <KernelExport.h>
 #include <module.h>
@@ -21,22 +21,22 @@
 #include <stdio.h>
 #include <device_manager.h>
 #include <bus/SCSI.h>
-#include "device_info.h" 
-#include "settings.h" 
-#include "transform_procs.h" 
-#include "tracing.h" 
-#include "scsi_commands.h" 
+#include "device_info.h"
+#include "settings.h"
+#include "transform_procs.h"
+#include "tracing.h"
+#include "scsi_commands.h"
 #include "proto_common.h"
-#include "proto_bulk.h" 
-#include "proto_cbi.h" 
-#include "usb_defs.h" 
-#include "fake_device.h" 
-#include "sg_buffer.h" 
+#include "proto_bulk.h"
+#include "proto_cbi.h"
+#include "usb_defs.h"
+#include "fake_device.h"
+#include "sg_buffer.h"
 
 
 #if 0
 status_t device_added(const usb_device device, void **cookie);
-											
+
 status_t device_removed(void *cookie);
 
 static long sim_action(CCB_HEADER *ccbh);
@@ -55,11 +55,11 @@ static long sim_init();
 
 static long path_id		= -1;
 static int32 load_count	= 0;
- 
+
 static char sim_vendor_name[]	= "Haiku";		/* who wrote this driver */
 static char hba_vendor_name[]	= "USB";		/* who made the hardware */
 static char controller_family[]	= "USB SCSI";	/* what family of products */
- 
+
 struct usb_support_descriptor supported_devices[] = {
 	{0, 0, 0, 0, 0}
 };
@@ -69,7 +69,7 @@ struct usb_support_descriptor supported_devices[] = {
 usb_device_info *usb_devices[MAX_DEVICES_COUNT];
 /* main devices table locking semaphore */
 sem_id usb_serial_lock = -1;
- 
+
 usb_module_info *usb;
 static cam_for_sim_module_info *cam;
 
@@ -95,7 +95,7 @@ static status_t xpt_extended_path_inquiry(CCB_EXTENDED_PATHINQ *ccbep);
 	\param uii:???
 	\param pproperties:???
 	\return:B_BAD_TYPE , B_ENTRY_NOT_FOUND, B_OK
-	
+
 	??
 */
 status_t get_interface_properties(usb_interface_info *uii, uint32 *pproperties)
@@ -105,12 +105,12 @@ status_t get_interface_properties(usb_interface_info *uii, uint32 *pproperties)
 		status = B_OK;
 		switch(uii->descr->interface_subclass){
 		case USB_DEV_SUBCLASS_RBC:		*pproperties |= CMDSET_RBC; break;
-		case USB_DEV_SUBCLASS_UFI:		*pproperties |= CMDSET_UFI;	break;	 
-		case USB_DEV_SUBCLASS_SFF8020I: 
+		case USB_DEV_SUBCLASS_UFI:		*pproperties |= CMDSET_UFI;	break;
+		case USB_DEV_SUBCLASS_SFF8020I:
 		case USB_DEV_SUBCLASS_SFF8070I: *pproperties |= CMDSET_ATAPI;	break;
 		case USB_DEV_SUBCLASS_SCSI:		*pproperties |= CMDSET_SCSI;	break;
 		case USB_DEV_SUBCLASS_QIC157:	*pproperties |= CMDSET_QIC157;	break;
-		default: 
+		default:
 			TRACE_ALWAYS("get_interface_properties:unknown USB subclass:%02x\n",
 									 uii->descr->interface_subclass);
 			/*status = B_ENTRY_NOT_FOUND;*/ /*B_BAD_TYPE assumed*/
@@ -120,7 +120,7 @@ status_t get_interface_properties(usb_interface_info *uii, uint32 *pproperties)
 		case USB_DEV_PROTOCOL_CBI:	*pproperties |= PROTO_CBI;	break;
 		case USB_DEV_PROTOCOL_CB:	*pproperties |= PROTO_CB;	break;
 		case USB_DEV_PROTOCOL_BULK:	*pproperties |= PROTO_BULK_ONLY; break;
-		default: 
+		default:
 			TRACE_ALWAYS("get_interface_properties:unknown USB protocol:%02x\n",
 									 uii->descr->interface_protocol);
 			/*status = B_ENTRY_NOT_FOUND;*/ /*B_BAD_TYPE assumed*/
@@ -134,7 +134,7 @@ status_t get_interface_properties(usb_interface_info *uii, uint32 *pproperties)
 }
 /**
 	\fn:
-	
+
 */
 status_t load_vendor_module(char **path, const char *path_mask,
 							const char *prop, module_info **mi)
@@ -154,7 +154,7 @@ status_t load_vendor_module(char **path, const char *path_mask,
 }
 /**
 	\fn:
-	
+
 */
 status_t setup_transport_modules(usb_device_info *udi,
 									 usb_device_settings *uds)
@@ -286,7 +286,7 @@ status_t setup_endpoints(usb_interface_info *uii, usb_device_info *udi)
 	\param device:???
 	\param ppudi:???
 	\return:???
-	
+
 	???
 */
 status_t allocate_resources(usb_device_info *udi)
@@ -310,11 +310,11 @@ status_t allocate_resources(usb_device_info *udi)
 				udi->dev_num = dev;
 				release_sem(udi->lock_sem);
 				status = B_OK;
-			}else 
+			}else
 				status = udi->trans_sem;
-		} else 
+		} else
 			status = udi->lock_sem;
-			
+
 		if(status != B_OK){
 			TRACE_ALWAYS("allocate_resources:error:%s", strerror(status));
 			if(udi->lock_sem >= 0)
@@ -333,7 +333,7 @@ status_t allocate_resources(usb_device_info *udi)
 }
 /**
 	\fn:
-	
+
 */
 void release_resources(usb_device_info *udi)
 {
@@ -352,7 +352,7 @@ void release_resources(usb_device_info *udi)
 	\param device:??
 	\param cookie:??
 	\return:??
-	
+
 	??
 */
 status_t device_added(const usb_device device, void **cookie){
@@ -364,10 +364,10 @@ status_t device_added(const usb_device device, void **cookie){
 	const usb_device_descriptor *udd = (*usb->get_device_descriptor)(device);
 	usb_device_info *udi = (usb_device_info *)malloc(sizeof(usb_device_info));
 	TRACE("device_added: probing canidate: "
-		"%04x/%04x %02d/%02d/%02d\n", 
+		"%04x/%04x %02d/%02d/%02d\n",
 			udd->vendor_id, udd->product_id,
-			udd->device_class, 
-			udd->device_subclass, 
+			udd->device_class,
+			udd->device_subclass,
 			udd->device_protocol);
 	if(udi){
 		status = B_NO_INIT;
@@ -405,7 +405,7 @@ status_t device_added(const usb_device device, void **cookie){
 						if( B_OK == setup_transport_modules(udi, &ud_settings)){
 							break;
 						} /* else - no break - fall through */
-					default: 
+					default:
 						continue; /* skip to next interface */
 					}
 					if(alt != 0){ /*TODO: are we need this ???*/
@@ -413,7 +413,7 @@ status_t device_added(const usb_device device, void **cookie){
 							TRACE_ALWAYS("device_added:setting alt interface failed:%s",
 												strerror(status));
 							goto Failed;/* Break - is it right?*/
-						}	
+						}
 					}
 					if((*usb->get_configuration)(device) != uci){
 						if((status = (*usb->set_configuration)(device, uci)) != B_OK){
@@ -421,7 +421,7 @@ status_t device_added(const usb_device device, void **cookie){
 											 (*usb->get_configuration)(device), uci);
 							TRACE_ALWAYS("device_added:setting configuration failed:%s\n",
 													strerror(status));
-			
+
 							goto Failed;/* Break - is it right?*/
 						}
 					}
@@ -432,7 +432,7 @@ status_t device_added(const usb_device device, void **cookie){
 						udi->b_trace = b_log_protocol;
 						udi->trace = usb_scsi_trace;
 						udi->trace_bytes = usb_scsi_trace_bytes;
-						udi->trans_timeout = TRANS_TIMEOUT; 
+						udi->trans_timeout = TRANS_TIMEOUT;
 						udi->usb_m = usb;
 						udi->not_ready_luns = 0xff; /*assume all LUNs initially not ready */
 						if((status = (*udi->protocol_m->init)(udi)) == B_OK){
@@ -440,7 +440,7 @@ status_t device_added(const usb_device device, void **cookie){
 							*cookie = udi;
 							b_found = true; /* we have found something useful - time to go out! */
 							break;					/* ... now break alternatives iteration.*/
-						} else { 
+						} else {
 							release_resources(udi);
 						}
 					}
@@ -457,26 +457,26 @@ status_t device_added(const usb_device device, void **cookie){
 	if(status != B_OK){
 		TRACE("device_added: probing failed (%s) for: %04x/%04x\n",
 				strerror(status), udd->vendor_id, udd->product_id);
-	}	
-Failed:	
+	}
+Failed:
 	return status;
 }
 /**
 	\fn:device_removed
 	\param cookie:???
 	\return:???
-	
+
 	???
 */
 status_t device_removed(void *cookie)
 {
 	status_t status = B_OK;
 	usb_device_info *udi = (usb_device_info *)cookie;
-	acquire_sem(udi->lock_sem); /* wait for possible I/O operation complete */	
+	acquire_sem(udi->lock_sem); /* wait for possible I/O operation complete */
 	release_resources(udi);
 	/* no corresponding call of release_sem(udi->lock_sem);
 		 - semaphore was deleted in release_resources, any waiting thread
-		   was failed with BAD_SEM_ID. 
+		   was failed with BAD_SEM_ID.
 	*/
 	TRACE_ALWAYS("device_removed[%d]:All The Best !!!\n", udi->dev_num);
 	free(udi);
@@ -486,7 +486,7 @@ status_t device_removed(void *cookie)
 /**
 	\fn:sim_init
 	\return: ???
-	
+
 	called on SIM init
 */
 static long sim_init(void)
@@ -506,7 +506,7 @@ pre_check_scsi_io_request(usb_device_info *udi, CCB_SCSIIO *ccbio,
 	uint8 target_lun = ccbio->cam_ch.cam_target_lun;
 	*ret_status 	 = B_OK;
 	/* handle reserved device and luns entries */
-	if(b_reservation_on && udi == NULL && 
+	if(b_reservation_on && udi == NULL &&
 		 target_id < reserved_devices &&
 		 target_lun < reserved_luns)
 	{
@@ -535,7 +535,7 @@ pre_check_scsi_io_request(usb_device_info *udi, CCB_SCSIIO *ccbio,
 		memset(&udi->autosense_data, 0, sizeof(udi->autosense_data));
 	} else {
 		memset(ccbio->cam_sense_ptr, 0, ccbio->cam_sense_len);
-	} 
+	}
 	return true;
 }
 /**
@@ -547,7 +547,7 @@ pre_handle_features(usb_device_info *udi, CCB_SCSIIO *ccbio,
 {
 	uint8 target_lun = ccbio->cam_ch.cam_target_lun;
 	*ret_status = B_OK;
-	udi->trans_timeout = TRANS_TIMEOUT; 
+	udi->trans_timeout = TRANS_TIMEOUT;
 	switch(command->opcode){
 	case MODE_SELECT_6:
 	case MODE_SENSE_6:{
@@ -572,18 +572,18 @@ pre_handle_features(usb_device_info *udi, CCB_SCSIIO *ccbio,
 				}
 				TRACE_MODE_SENSE_SGB("MODE SELECT 6:", &sgb_sense_6);
 				if(B_OK != sg_memcpy(sgb, 1, &sgb_sense_6, 0, 3) ||
-					 B_OK != sg_memcpy(sgb, 7, &sgb_sense_6, 3, 1) ||	 
+					 B_OK != sg_memcpy(sgb, 7, &sgb_sense_6, 3, 1) ||
 					 B_OK != sg_memcpy(sgb, 8, &sgb_sense_6, 4, ccbio->cam_dxfer_len - sizeof(scsi_mode_param_header_6)))
 				{
 					/* In case of error TRACE-ing was already performed in sg_ functions */
 					goto set_REQ_INVALID_and_return;
 				}
 				TRACE_MODE_SENSE_SGB("MODE SELECT 10:", sgb);
-			} 
+			}
 		} /*else {
 			if(b_select){ / * trace data if configured in settings * /
 				TRACE_MODE_SENSE_DATA("MODE_SELECT:", ccbio->cam_data_ptr, ccbio->cam_dxfer_len);
-			}	
+			}
 		}*/
 	}break;
 	case INQUIRY: /* fake INQUIRY request */
@@ -605,7 +605,7 @@ pre_handle_features(usb_device_info *udi, CCB_SCSIIO *ccbio,
 	default: break;
 	}
 	return true;
-	
+
 set_REQ_CMP_and_return:
 	ccbio->cam_ch.cam_status = CAM_REQ_CMP;
 	return false;//*ret_status = B_OK;
@@ -625,11 +625,11 @@ post_handle_features(usb_device_info *udi, CCB_SCSIIO *ccbio,
 	bool b_cmd_ok = (ccbio->cam_ch.cam_status == CAM_REQ_CMP);
 	uint8 target_lun = ccbio->cam_ch.cam_target_lun;
 	switch(command->opcode){
-	case READ_6: 
+	case READ_6:
 	case WRITE_6:
-#if 0	 
+#if 0
 /* Disabled - single problem can switch to 6-bytes mode. If device doesn't
-	 support 6-bytes command all goes totally wrong. That's bad. */	
+	 support 6-bytes command all goes totally wrong. That's bad. */
 		if(!b_cmd_ok && !HAS_FEATURES(udi->descr.properties, PROP_FORCE_RW_TO_6)){
 			TRACE("post_handle_features:READ(10)/WRITE(10) failed - retry 6-byte one\n");
 			udi->descr.properties |= PROP_FORCE_RW_TO_6;
@@ -668,13 +668,13 @@ post_handle_features(usb_device_info *udi, CCB_SCSIIO *ccbio,
 				}
 				TRACE_MODE_SENSE_SGB("MODE SENSE 10:", sgb);
 				if( B_OK != sg_memcpy(&sgb_sense_6, 0, sgb, 1, 3) ||
-						B_OK != sg_memcpy(&sgb_sense_6, 3, sgb, 7, 1) ||	 
+						B_OK != sg_memcpy(&sgb_sense_6, 3, sgb, 7, 1) ||
 						B_OK != sg_memcpy(&sgb_sense_6, 4, sgb, 8, ccbio->cam_dxfer_len - sizeof(scsi_mode_param_header_6)))
 				{
 					/* In case of error TRACE-ing was already performed in sg_ functions */
 					TRACE_ALWAYS("MODE_SENSE 10->6 conversion failed\n");
 					goto set_REQ_INVALID_and_return;
-				}		
+				}
 			}
 			/* set write-protected flag if required by user */
 			if(HAS_FIXES(udi->properties, FIX_FORCE_READ_ONLY)){
@@ -719,14 +719,14 @@ post_handle_features(usb_device_info *udi, CCB_SCSIIO *ccbio,
 set_REQ_INVALID_and_return:
 	ccbio->cam_ch.cam_status = CAM_REQ_INVALID;
 	*ret_status = B_BAD_VALUE;
-	return false; /* do not retry - fatal error */	
+	return false; /* do not retry - fatal error */
 }
 /**
 	\fn:xpt_scsi_io
 	\param ccbio: ????
 	\return: ???
-		
-	xpt_scsi_io - handle XPT_SCSI_IO sim action 
+
+	xpt_scsi_io - handle XPT_SCSI_IO sim action
 */
 status_t xpt_scsi_io(CCB_SCSIIO *ccbio)
 {
@@ -743,12 +743,12 @@ status_t xpt_scsi_io(CCB_SCSIIO *ccbio)
 	}
 
 #if 0 /* activate if you need detailed logging of CCB_SCSI request*/
-	usb_scsi_trace_CCB_SCSIIO(ccbio); 
+	usb_scsi_trace_CCB_SCSIIO(ccbio);
 #endif
 
 
 	/* acquire semaphore - avoid re-enters */
-/*	if((status = acquire_sem_etc(udi->lock_sem, 1,	
+/*	if((status = acquire_sem_etc(udi->lock_sem, 1,
 								B_RELATIVE_TIMEOUT,
 								udi->trans_timeout)) != B_OK) */
 //	TRACE_ALWAYS("sem before acq:%08x\n",udi->lock_sem);
@@ -756,14 +756,14 @@ status_t xpt_scsi_io(CCB_SCSIIO *ccbio)
 		/* disabled - CAM_BUSY flag is not recognized by BeOS ... :-(
 		if(status == B_WOULD_BLOCK){
 			TRACE("locked sema bypass OK\n");
-			ccbio->cam_ch.cam_status = CAM_BUSY;	
+			ccbio->cam_ch.cam_status = CAM_BUSY;
 			return B_OK;
-		}*/ 
+		}*/
 		TRACE("xpt_scsi_io:acquire_sem_etc() failed:%08x\n", status);
 		ccbio->cam_ch.cam_status = CAM_DEV_NOT_THERE;
 		return B_DEV_BAD_DRIVE_NUM;
 	}
-	/* set the command data pointer */		
+	/* set the command data pointer */
 	if(ccbio->cam_ch.cam_flags & CAM_CDB_POINTER){
 		cmd = ccbio->cam_cdb_io.cam_cdb_ptr;
 	}else{
@@ -773,7 +773,7 @@ status_t xpt_scsi_io(CCB_SCSIIO *ccbio)
 					 *_handle_features() functions! Twice reallocation is also not awaited!
 					 Note this on refactoring!!! */
 	/*TODO returns!*/
-	init_sg_buffer(&sgb, ccbio); 
+	init_sg_buffer(&sgb, ccbio);
 	do{ /* <-- will be repeated if 6-byte RW/MS commands failed */
 		uint8 *rcmd;
 		uint8 rcmdlen;
@@ -801,11 +801,11 @@ status_t xpt_scsi_io(CCB_SCSIIO *ccbio)
 		case CAM_DIR_OUT:	dir = eDirOut;	break;
 		default:			dir = eDirNone;	break;
 		}
-		
+
 		TRACE_DATA_IO_SG(sgb.piov, sgb.count);
-		
+
 		/*TODO: return!*/
-		sg_buffer_len(&sgb, &transfer_len);			 
+		sg_buffer_len(&sgb, &transfer_len);
 		/* transfer command to device. SCSI status will be handled in callback */
 		(*udi->protocol_m->transfer)(udi, rcmd, rcmdlen, sgb.piov, sgb.count,
 									 transfer_len/*ccbio->cam_dxfer_len*/,
@@ -820,26 +820,26 @@ status_t xpt_scsi_io(CCB_SCSIIO *ccbio)
 	\fn:xpt_path_inquiry
 	\param ccbp:
 	\return:
-	
-	xpt_path_inquiry - handle XPT_PATH_INQ sim action 
+
+	xpt_path_inquiry - handle XPT_PATH_INQ sim action
 */
 status_t xpt_path_inquiry(CCB_PATHINQ *ccbp)
 {
 	status_t status			= B_OK;
-	
+
 	ccbp->cam_version_num	= SIM_VERSION;
 	ccbp->cam_target_sprt	= 0;
 	ccbp->cam_hba_eng_cnt	= 0;
 	memset (ccbp->cam_vuhba_flags, 0, VUHBA);
 	ccbp->cam_sim_priv		= SIM_PRIV;
 	ccbp->cam_async_flags	= 0;
-	ccbp->cam_initiator_id	= CONTROLLER_SCSI_ID; 
+	ccbp->cam_initiator_id	= CONTROLLER_SCSI_ID;
 	ccbp->cam_hba_inquiry	= CONTROLLER_SCSI_BUS; /* Narrow SCSI bus */
 	ccbp->cam_hba_misc		= PIM_NOINQUIRY;
 	ccbp->cam_osd_usage		= 0;
 	/* There should be special handling of path_id == 0xff
 		 but looks like it's not used by BeOS now */
-	/*ccbp->cam_hpath_id = path_id;*/ 
+	/*ccbp->cam_hpath_id = path_id;*/
 	strncpy(ccbp->cam_sim_vid, sim_vendor_name, SIM_ID);
 	strncpy(ccbp->cam_hba_vid, hba_vendor_name, HBA_ID);
 	ccbp->cam_ch.cam_status = CAM_REQ_CMP;
@@ -849,13 +849,13 @@ status_t xpt_path_inquiry(CCB_PATHINQ *ccbp)
 	\fn:xpt_extended_path_inquiry
 	\param ccbep: ???
 	\return:???
-	
-	xpt_extended_path_inquiry - handle XPT_EXTENDED_PATH_INQ sim action 
+
+	xpt_extended_path_inquiry - handle XPT_EXTENDED_PATH_INQ sim action
 */
 status_t xpt_extended_path_inquiry(CCB_EXTENDED_PATHINQ *ccbep)
 {
 	status_t status = B_OK;
-	xpt_path_inquiry((CCB_PATHINQ *)ccbep); 
+	xpt_path_inquiry((CCB_PATHINQ *)ccbep);
 	sprintf(ccbep->cam_sim_version, "%d.0", SIM_VERSION);
 	sprintf(ccbep->cam_hba_version, "%d.0", HBA_VERSION);
 	strncpy(ccbep->cam_controller_family, controller_family, FAM_ID);
@@ -866,7 +866,7 @@ status_t xpt_extended_path_inquiry(CCB_EXTENDED_PATHINQ *ccbep)
 	\fn:sim_action
 	\param ccbh: ????
 	\return: ????
-	
+
 	This fucntion performs SCSI interface module actions -
 	calls corresponding xpt_* - functions.
 */
@@ -904,9 +904,9 @@ static long sim_action(CCB_HEADER *ccbh)
 	\param op: operation to be performed on this module
 	\param ...: possible additional arguments
 	\return: B_OK on success, error status on failure
-	
+
 	This function deals with standard module operations. Currently, the only
-	two things that entails are initialization and uninitialization. 
+	two things that entails are initialization and uninitialization.
 	- get the SCSI Bus Manager Module and USB Manager Module
 	- put them when we're finished
 */
@@ -920,15 +920,15 @@ static status_t std_ops(int32 op, ...)
 		TRACE_ALWAYS("std_ops: B_MODULE_INIT called!\n");
 	/*	if(0 == atomic_add(&load_count, 1)){
 			thread_info tinfo = {0}; */
-			load_module_settings();		 
+			load_module_settings();
 /*			get_thread_info(find_thread(0), &tinfo);
 			if(!b_ignore_sysinit2 || (0 != strcmp(tinfo.name, "sysinit2"))){
-				create_log();							
-				if(get_module(B_USB_MODULE_NAME, (module_info **)&usb) == B_OK){ 
-					if(get_module(B_CAM_FOR_SIM_MODULE_NAME, (module_info **)&cam) == B_OK){ 
+				create_log();
+				if(get_module(B_USB_MODULE_NAME, (module_info **)&usb) == B_OK){
+					if(get_module(B_CAM_FOR_SIM_MODULE_NAME, (module_info **)&cam) == B_OK){
 						for(i = 0; i < MAX_DEVICES_COUNT; i++)
-							usb_devices[i] = NULL; 
-	
+							usb_devices[i] = NULL;
+
 						if((*usb->register_driver)(MODULE_NAME, supported_devices, SIZEOF(supported_devices), "usb_dsk") == B_OK){
 							if((*usb->install_notify)(MODULE_NAME, &notify_hooks) == B_OK){
 								entry.sim_init = sim_init;
@@ -936,9 +936,9 @@ static status_t std_ops(int32 op, ...)
 								path_id =(*cam->xpt_bus_register)(&entry);
 								usb_serial_lock = create_sem(1, MODULE_NAME"_devices_table_lock");
 								status = B_OK;
-								break; 
-							} 
-						} 
+								break;
+							}
+						}
 						put_module(B_CAM_FOR_SIM_MODULE_NAME);
 					}
 					put_module(B_USB_MODULE_NAME);
@@ -948,7 +948,7 @@ static status_t std_ops(int32 op, ...)
 			}
 		} else {
 			atomic_add(&load_count, -1);
-		}*/	
+		}*/
 		break;
 	case B_MODULE_UNINIT:
 		TRACE_ALWAYS("std_ops: B_MODULE_UNINIT called!\n");
@@ -961,7 +961,7 @@ static status_t std_ops(int32 op, ...)
 			}
 			delete_sem(usb_serial_lock);
 			put_module(B_USB_MODULE_NAME);
-			put_module(B_CAM_FOR_SIM_MODULE_NAME); 
+			put_module(B_CAM_FOR_SIM_MODULE_NAME);
 		} else {
 			atomic_add(&load_count, 1);
 		}*/
@@ -971,12 +971,12 @@ static status_t std_ops(int32 op, ...)
 }
 
 /**
- * \fn: 
+ * \fn:
  * \param :
  * \return:
  *  TODO
  */
-static float 
+static float
 supports_device(device_node_handle parent, bool *_noConnection)
 {
 	TRACE_ALWAYS("supports_device\n");
@@ -984,7 +984,7 @@ supports_device(device_node_handle parent, bool *_noConnection)
 }
 
 /**
- * \fn: 
+ * \fn:
  * \param :
  * \return:
  *  TODO
@@ -997,7 +997,7 @@ register_device(device_node_handle parent)
 }
 
 /**
- * \fn: 
+ * \fn:
  * \param :
  * \return:
  *  TODO
@@ -1010,7 +1010,7 @@ init_module(device_node_handle node, void *user_cookie, void **_cookie)
 }
 
 /**
- * \fn: 
+ * \fn:
  * \param :
  * \return:
  *  TODO
@@ -1023,7 +1023,7 @@ uninit_module(void *cookie)
 }
 
 /**
- * \fn: 
+ * \fn:
  * \param :
  *  TODO
  */
@@ -1034,7 +1034,7 @@ device_removed(device_node_handle node, void *cookie)
 }
 
 /**
- * \fn: 
+ * \fn:
  * \param :
  *  TODO
  */
@@ -1045,7 +1045,7 @@ device_cleanup(device_node_handle node)
 }
 
 /**
- * \fn: 
+ * \fn:
  * \param :
  *  TODO
  */
@@ -1056,7 +1056,7 @@ get_supported_paths(const char ***_busses, const char ***_devices)
 }
 
 /**
- * \fn: 
+ * \fn:
  * \param :
  *  TODO
  */
@@ -1067,7 +1067,7 @@ scsi_io( scsi_sim_cookie cookie, scsi_ccb *ccb )
 }
 
 /**
- * \fn: 
+ * \fn:
  * \param :
  * \return:
  *  TODO
@@ -1080,7 +1080,7 @@ abort( scsi_sim_cookie cookie, scsi_ccb *ccb_to_abort )
 }
 
 /**
- * \fn: 
+ * \fn:
  * \param :
  * \return:
  *  TODO
@@ -1093,7 +1093,7 @@ reset_device( scsi_sim_cookie cookie, uchar target_id, uchar target_lun )
 }
 
 /**
- * \fn: 
+ * \fn:
  * \param :
  * \return:
  *  TODO
@@ -1106,7 +1106,7 @@ term_io( scsi_sim_cookie cookie, scsi_ccb *ccb_to_terminate )
 }
 
 /**
- * \fn: 
+ * \fn:
  * \param :
  * \return:
  *  TODO
@@ -1119,7 +1119,7 @@ path_inquiry( scsi_sim_cookie cookie, scsi_path_inquiry *inquiry_data )
 }
 
 /**
- * \fn: 
+ * \fn:
  * \param :
  * \return:
  *  TODO
@@ -1132,7 +1132,7 @@ scan_bus( scsi_sim_cookie cookie )
 }
 
 /**
- * \fn: 
+ * \fn:
  * \param :
  * \return:
  *  TODO
@@ -1145,7 +1145,7 @@ reset_bus( scsi_sim_cookie cookie )
 }
 
 /**
- * \fn: 
+ * \fn:
  * \param :
  *  TODO
  */
@@ -1156,7 +1156,7 @@ get_restrictions(scsi_sim_cookie cookie, uchar target_id, bool *is_atapi, bool *
 }
 
 /**
- * \fn: 
+ * \fn:
  * \param :
  * \return:
  *  TODO
@@ -1173,41 +1173,41 @@ module_ioctl(scsi_sim_cookie cookie, uint8 targetID, uint32 op, void *buffer, si
 	Declare our module_info so we can be loaded as a kernel module
 */
 static scsi_sim_interface usb_scsi_sim = {
-	{	//driver_module_info 
+	{	//driver_module_info
 		{ // module_info
 			"busses/scsi/usb/device_v1", // is device_v1 really required? or v1 is enough?
-			0, 
+			0,
 			&std_ops
 		},
-		
+
 		supports_device,
 		register_device,
 
-		init_module,	// init_driver, 
+		init_module,	// init_driver,
 		uninit_module,	// uninit_driver,
-		
+
 		device_removed,
 		device_cleanup,
 
 		get_supported_paths,
 	},
-	
+
 	scsi_io,
 	abort,
 	reset_device,
 	term_io,
-	
+
 	path_inquiry,
 	scan_bus,
 	reset_bus,
-	
+
 	get_restrictions,
-	
-	module_ioctl //ioctl	
+
+	module_ioctl //ioctl
 };
 
 /**
-	Export module_info-s list 
+	Export module_info-s list
 */
 _EXPORT module_info *modules[] = {
 	(module_info *) &usb_scsi_sim,

@@ -3,7 +3,7 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "application/postscript";
 
-resource(2, "META:S:DESC") #'MSDC' "Postscript File";
+resource(2, "META:S:DESC") #'MSDC' "Postscript file";
 
 resource(3, "META:EXTENS") message(234) {
 	"extensions" = "ai",

@@ -1,20 +1,34 @@
-1	norwegian_bokmål	x-vnd.Haiku-Sudoku	2334644121
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Sudoku	2463385585
+Restore snapshot	SudokuWindow		Gjenopprette øyeblikksbilde
+Could not set Sudoku:\n%s\n	SudokuWindow		Kunne ikke sette Suduku:\n%s\n
+Export as…	SudokuWindow		Eksporter som...
+OK	SudokuWindow		OK
+New	SudokuWindow		Ny
 Abort	ProgressWindow		Avbryt
-Advanced	SudokuWindow		Avansert
-Copy	SudokuWindow		Kopier
+Sudoku	System name		Sudoku
 Could not open \"%s\":\n%s\n	SudokuWindow		Kunne ikke åpne \"%s\":\n%s\n
 Easy	SudokuWindow		Lett
-Export as…	SudokuWindow		Eksporter som...
-File	SudokuWindow		Fil
-HTML	SudokuWindow		HTML
-Hard	SudokuWindow		Vanskelig
-Help	SudokuWindow		Hjelp
-New	SudokuWindow		Ny
-OK	SudokuWindow		OK
 Open file…	SudokuWindow		Åpne fil...
-Quit	SudokuWindow		Avslutt
+Solve single field	SudokuWindow		Løs enkelte felt
+Solve	SudokuWindow		Løs
+Redo	SudokuWindow		Gjennomfør på nytt
+File	SudokuWindow		Fil
+Advanced	SudokuWindow		Avansert
 Start again	SudokuWindow		Start på nytt
-Sudoku	System name		Sudoku
+HTML	SudokuWindow		HTML
+Sudoku request	SudokuWindow		Sudoku forespørsel
+Copy	SudokuWindow		Kopier
+Mark valid hints	SudokuWindow		Marker gyldig tips
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku løst - gratulere!\n
+Hard	SudokuWindow		Vanskelig
+Snapshot current	SudokuWindow		Øyeblikksbilde nåværende
 Text	SudokuWindow		Tekst
-Undo	SudokuWindow		Tilbakestill
+Creating solvable field	SudokuGenerator		Lager løselig felt
 View	SudokuWindow		Vis
+Progress monitor	ProgressWindow		Fremgang oversikt
+Mark invalid values	SudokuWindow		Marker ugyldig verdier
+Blank	SudokuWindow		Blank
+Help	SudokuWindow		Hjelp
+Searching for removable values	SudokuGenerator		Søker etter fjernbare verdier
+Undo	SudokuWindow		Tilbakestill
+Quit	SudokuWindow		Avslutt

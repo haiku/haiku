@@ -1,0 +1,35 @@
+SubDir HAIKU_TOP src servers app drawing interface html5 ;
+
+UseLibraryHeaders agg ;
+UsePrivateHeaders app graphics interface kernel shared ;
+UsePrivateHeaders [ FDirName graphics common ] ;
+UsePrivateSystemHeaders ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app font ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter font_support ] ;
+UseHeaders $(HAIKU_FREETYPE_HEADERS) : true ;
+
+Includes [ FGristFiles HTML5HWInterface.cpp HTML5DrawingEngine.cpp CanvasMessage.cpp ]
+	: $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
+
+StaticLibrary libashtml5.a :
+	base64.cpp
+
+	#NetReceiver.cpp
+	#NetSender.cpp
+
+	HTML5DrawingEngine.cpp
+	CanvasEventStream.cpp
+	HTML5HWInterface.cpp
+	CanvasMessage.cpp
+
+	StreamingRingBuffer.cpp
+
+	WebHandler.cpp
+	WebServer.cpp
+	WebWorker.cpp
+;

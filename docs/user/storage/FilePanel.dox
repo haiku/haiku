@@ -1,0 +1,437 @@
+/*
+ * Copyright 2009-2012 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/storage/FilePanel.h  hrev45162
+ *		src/kits/tracker/FilePanel.cpp  hrev45162
+ */
+
+
+/*!
+	\file FilePanel.h
+	\ingroup storage
+	\ingroup libbe
+	\brief Provides the BFilePanel and BRefFilter classes and support enums.
+*/
+
+
+/*!
+	\enum file_panel_mode
+	\ingroup storage
+	\brief Whether the file panel is a save or open panel.
+*/
+
+
+/*!
+	\var file_panel_mode B_OPEN_PANEL
+
+	Open panel
+*/
+
+
+/*!
+	\var file_panel_mode B_SAVE_PANEL
+
+	Save panel
+*/
+
+
+/*!
+	\enum file_panel_button
+	\ingroup storage
+	\brief List of buttons used by the file panel
+*/
+
+
+/*!
+	\var file_panel_button B_CANCEL_BUTTON
+
+	Cancel button
+*/
+
+
+/*!
+	\var file_panel_button B_DEFAULT_BUTTON
+
+	Default button
+*/
+
+
+/*!
+	\class BRefFilter
+	\ingroup storage
+	\ingroup libbe
+	\brief Allows you to filter the items displayed in a file panel.
+*/
+
+
+/*!
+	\fn virtual bool BRefFilter::Filter(const entry_ref* ref, BNode* node,
+		struct stat_beos* stat, const char* mimeType)
+	\brief Hook method that's called on each file in the target directory
+		displayed by a file panel.
+
+	\param ref The file currently under consideration.
+	\param node The node currently under consideration.
+	\param stat The stat information of the file.
+	\param mimeType The MIME type of the file.
+
+	\returns Whether or not the entry is a valid candidate for an open/save
+		dialog.
+
+	\see BFilePanel::SetRefFilter()
+*/
+
+
+/*!
+	\class BFilePanel
+	\ingroup storage
+	\ingroup libbe
+	\brief Displays a standard Open/Save dialog.
+
+	A save panel looks like this:
+
+	\image html BFilePanel_example.png
+
+	An open dialog looks similar but doesn't have a text box for the file name.
+
+	You generally construct a BFilePanel object in response to a user action
+	for example the user clicks on a "Open" or "Save"/"Save As" menu item.
+	Constructing an open or save panel is easy:
+
+\code
+	BFilePanel* openPanel = new BFilePanel(B_OPEN_PANEL);
+	BFilePanel* savePanel = new BFilePanel(B_SAVE_PANEL);
+\endcode
+
+	You can then call methods to indicate what directory to display, whether
+	or not multiple selections are allowed, whether or not the user is
+	allowed to open a directory, what target view to send send notifications,
+	and more. See the constructor for details.
+
+	You can modify the look of your BFilePanel object by calling the
+	SetButtonLabel() and SetSaveText() methods. If you want to change the look
+	even more radically you can get alter the panel's BWindow and BView
+	objects. You get the window by calling the Window() method. With a pointer
+	to the panel's BWindow object you can drill down to the various views
+	contained therein.
+
+	Once you have constructed and customized your BFilePanel object you should
+	call the Show() method to display the panel to the user.
+
+	When the user confirms or cancels a BMessage object is constructed and sent
+	to the target of the BFilePanel object. You can specify a different
+	target in the constructor or by calling the SetTarget() method.
+
+	<b>Open Notifications</b>
+
+	For open notifications the default target is \c be_app_messenger and is
+	caught by the RefsReceived() method The \c what field is set to
+	\c B_REFS_RECEIVED. You can set your own message by calling the
+	SetMessage() method; in this case the message will be sent to the target's
+	MessageReceived() method instead.
+
+	The \c refs field of the message contains an \c entry_ref structure
+	for each entry that the user has selected. The \c refs field is of
+	type \c B_REF_TYPE. If the selected entry is a symlink to a file you'll 
+	need to dereference the file yourself. You can do this more easily by
+	turning the \c ref into a BEntry passing \c true into the \c traverse
+	argument like this:
+
+\code
+	BEntry entry(ref, true);
+\endcode
+
+	<b>Save Notifications</b>
+
+	Save notifications are always sent to the target's MessageReceived()
+	method unlike open notifications. The \c what field of the message is
+	set to \c B_SAVE_REQUESTED. The \c directory field contain a single
+	\c entry_ref structure that points to the directory that the entry is
+	saved to. The text that the user typed in the save panel's text view
+	is put in the \c name field and is of type \c B_STRING_TYPE.
+
+	<b>Cancel Notifications</b>
+
+	Cancel notifications are sent when the panel is hidden whether by the
+	user clicking the cancel button, closing the dialog, or confirming the
+	action (assuming hide-when-done is turned on).
+
+	Cancel notifications can be caught by the MessageReceived() method of
+	the target. The \c what field is set to \c B_CANCEL. The \c old_what
+	field is set to the previous what value which is useful if you have
+	overridden the default message. The \c what field of the message you
+	sent is put in the \c old_what field.
+
+	The \c source field is a pointer of \c B_POINTER_TYPE to the closed
+	BFilePanel object. When the BFilePanel object is closed it is not
+	destroyed, it is hidden instead. You can then delete the BFilePanel
+	object or leave it be and simply call Show() to use the panel next time
+	you need it.
+*/
+
+
+/*!
+	\fn BFilePanel::BFilePanel(file_panel_mode mode, BMessenger* target,
+		const entry_ref* ref, uint32 nodeFlavors, bool multipleSelection,
+		BMessage* message, BRefFilter* filter, bool modal, bool hideWhenDone)
+	\brief Creates and initializes a BFilePanel object.
+
+	The constructor has many parameters but they may generally be set after
+	the object has been constructed. The only parameters that must be set
+	during construction are the \a mode, \a nodeFlavors, \a multipleSelection,
+	and \a modal parameters. The rest may be set after the object has been
+	constructed by the SetTarget(), SetPanelDirectory(), SetMessage(),
+	SetRefFilter(), and SetHideWhenDone() methods.
+
+	\param mode Set to \c B_OPEN_PANEL for an open panal or \c B_SAVE_PANEL
+		for a save panel. Default is \c B_OPEN_PANEL.
+	\param target The BMessenger object that sends messages to the BLooper
+		or BHandler controlled by the file panel.
+	\param ref The directory to display, by default the current working
+		directory.
+	\param nodeFlavors One or more option flags, this applies to open panels only.
+		- \c B_FILE_NODE Can select files and symlinks to files.
+		- \c B_DIRECTORY_NODE Can select directories and symlinks to directories.
+		- \c B_SYMLINK_NODE Can select symlinks only.
+	\param multipleSelection Whether or not the user is allowed to select more
+		than one item to open. Save panels should always set this to \c false.
+	\param message Message sent by the file panel on confirms or cancels.
+	\param filter Hook method to call.
+	\param modal Whether or not the panel is modal, defaults to \c false.
+	\param hideWhenDone Set to \c false to keep the panel even after the user
+		confirms or cancels. The close button will hide the panel regardless.
+*/
+
+
+/*!
+	\fn BFilePanel::~BFilePanel()
+	\brief Destroys the file panel object.
+
+	If file panel is currently being displayed it is closed. The BRefFilter
+	object references by this panel is not destroyed by this method.
+*/
+
+
+/*!
+	\fn void BFilePanel::Show()
+	\brief Displays the file panel on screen.
+*/
+
+
+/*!
+	\fn void BFilePanel::Hide()
+	\brief Hides the file panel.
+*/
+
+
+/*!
+	\fn bool BFilePanel::IsShowing() const
+	\brief Determines whether or not the file panel is shown.
+
+	\returns \c true if visible, \c false if hidden.
+*/
+
+
+/*!
+	\fn void BFilePanel::SendMessage(const BMessenger* messenger,
+		BMessage* message)
+	\brief Sends the \a message to the target BHandler \a messenger.
+
+	\param messenger The target BHandler to send the message to.
+	\param message The message to send.
+
+	\see BMessenger::SendMessage()
+*/
+
+
+/*!
+	\fn file_panel_mode BFilePanel::PanelMode() const
+	\brief Gets the panel mode, either \c B_OPEN_PANEL or \c B_SAVE_PANEL.
+
+	\returns \c B_OPEN_PANEL if the panel is an open panel or \c B_SAVE_PANEL
+		if the panel is a save panel.
+*/
+
+
+/*!
+	\fn BMessenger BFilePanel::Messenger() const
+	\brief Gets the panel's target messenger object.
+
+	\returns The BMessenger object that sends messages for this panel.
+*/
+
+
+/*!
+	\fn void BFilePanel::SetTarget(BMessenger target)
+	\brief Sets the target messenger.
+
+	\param target the target BMessenger object to set.
+*/
+
+
+/*!
+	\fn void BFilePanel::SetMessage(BMessage* message)
+	\brief Sets the target messenge.
+
+	\param message The BMessage object to send on confirm.
+*/
+
+
+/*!
+	\fn void BFilePanel::Refresh()
+	\brief Refresh the directory or the panel causing the entries to be re-run
+		through the BRefFilter::Filter() method.
+*/
+
+
+/*!
+	\fn BRefFilter* BFilePanel::RefFilter() const
+	\brief Gets the BRefFilter object associated with the panel.
+
+	\returns The BRefFilter set to the panel.
+
+	\see BRefFilter::Filter()
+*/
+
+
+/*!
+	\fn void BFilePanel::SetRefFilter(BRefFilter* filter)
+	\brief Sets the BRefFilter used by the panel to filter entries.
+
+	\param filter The BRefFilter object to set.
+
+	\see BRefFilter::Filter()
+*/
+
+
+/*!
+	\fn void BFilePanel::SetButtonLabel(file_panel_button button,
+		const char* text)
+	\brief Set the button label specified by \a button to \a text.
+
+	\param button The button to set the label of.
+	\param text The text to set the button label to.
+*/
+
+
+/*!
+	\fn void BFilePanel::GetPanelDirectory(entry_ref* ref) const
+	\brief Gets the entry ref of the panel and sets \a ref to point to it.
+
+	\param ref The \c entry_ref pointer you want set.
+*/
+
+
+/*!
+	\fn void BFilePanel::SetSaveText(const char* text)
+	\brief Set some save text to display in the save dialog.
+
+	\param text The text to display.
+*/
+
+
+/*!
+	\fn void BFilePanel::SetPanelDirectory(const entry_ref* ref)
+	\brief Sets the entry ref of the panel to the directory contained
+		by \a ref.
+
+	\param ref The entry contained by the desired panel directory.
+*/
+
+
+/*!
+	\fn void BFilePanel::SetPanelDirectory(const char* path)
+	\brief Sets the entry ref of the panel to the directory referenced
+		by \a path.
+
+	\param path The path of the desired directory.
+*/
+
+
+/*!
+	\fn void BFilePanel::SetPanelDirectory(const BEntry* entry)
+	\brief Sets the entry ref of the panel to the directory referenced
+		by \a entry.
+
+	\param entry The BEntry object pointing to the desired directory.
+*/
+
+
+/*!
+	\fn void BFilePanel::SetPanelDirectory(const BDirectory* dir)
+	\brief Sets the entry ref of the panel to the directory referenced
+		by \a dir.
+
+	\param dir The BDirectory object pointing to the desired directory.
+*/
+
+
+/*!
+	\fn BWindow* BFilePanel::Window() const
+	\brief Gets a pointer to the BWindow object used by the file panel.
+
+	\returns A pointer to the BWindow object used by the file panel.
+*/
+
+
+/*!
+	\fn void BFilePanel::Rewind()
+	\brief Sets the entry ref back to the top of the list.
+
+	\see SelectionChanged()
+*/
+
+
+/*!
+	\fn status_t BFilePanel::GetNextSelectedRef(entry_ref* ref)
+	\brief Sets the \a ref pointer to the next entry in the directory.
+
+	\returns a status message.
+	\retval B_OK Everything went fine.
+	\retval B_ERROR Couldn't attain a lock on the window.
+	\retval B_ENTRY_NOT_FOUND End of the entry list.
+
+	\see SelectionChanged()
+*/
+
+
+/*!
+	\fn void BFilePanel::SetHideWhenDone(bool on)
+	\brief Sets whether or not the panel should hide on confirm or cancel.
+
+	\param on \c true to hide, \c false to not hide when done.
+*/
+
+
+/*!
+	\fn bool BFilePanel::HidesWhenDone(void) const
+	\brief Gets whether or not the panel should hide on confirm or cancel.
+
+	Panel always hides if the user clicks the window's close button.
+
+	\returns \c true if panel will hide, \c false if panel will not hide.
+*/
+
+
+/*!
+	\fn void BFilePanel::WasHidden()
+	\brief Hook method that gets called when the file panel is hidden due to
+		a user action.
+
+	WasHidden() is not called if you call Hide() manually.
+*/
+
+
+/*!
+	\fn void BFilePanel::SelectionChanged()
+	\brief Hook method that gets called when the entry ref references by the
+		file panel changes.
+
+	\see GetNextSelectedRef()
+	\see Rewind()
+*/

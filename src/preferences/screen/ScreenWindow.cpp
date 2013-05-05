@@ -1,15 +1,17 @@
 /*
- * Copyright 2001-2011, Haiku.
+ * Copyright 2001-2013, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Rafael Romo
- *		Stefano Ceccherini (burton666@libero.it)
+ *		Stephan Aßmus, superstippi@gmx.de
  *		Andrew Bachmann
- *		Thomas Kurschel
- *		Axel Dörfler, axeld@pinc-software.de
- *		Stephan Aßmus <superstippi@gmx.de>
+ *		Stefano Ceccherini, burton666@libero.it
  *		Alexandre Deckner, alex@zappotek.com
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		Rene Gollent, rene@gollent.com
+ *		Thomas Kurschel
+ *		Rafael Romo
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -24,6 +26,7 @@
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Directory.h>
 #include <File.h>
 #include <FindDirectory.h>
@@ -36,6 +39,7 @@
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <Screen.h>
+#include <SpaceLayoutItem.h>
 #include <String.h>
 #include <StringView.h>
 #include <Roster.h>
@@ -62,8 +66,8 @@
 #include "multimon.h"	// the usual: DANGER WILL, ROBINSON!
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Screen"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Screen"
 
 
 const char* kBackgroundsSignature = "application/x-vnd.Haiku-Backgrounds";
@@ -166,10 +170,11 @@ screen_errors(status_t status)
 ScreenWindow::ScreenWindow(ScreenSettings* settings)
 	:
 	BWindow(settings->WindowFrame(), B_TRANSLATE_SYSTEM_NAME("Screen"),
-		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS,
-		B_ALL_WORKSPACES),
+		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
+		| B_AUTO_UPDATE_SIZE_LIMITS, B_ALL_WORKSPACES),
 	fIsVesa(false),
 	fBootWorkspaceApplied(false),
+	fOtherRefresh(NULL),
 	fScreenMode(this),
 	fUndoScreenMode(this),
 	fModified(false)
@@ -207,11 +212,13 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 	// box on the left with workspace count and monitor view
 
 	BBox* screenBox = new BBox("screen box");
-	BGroupLayout* layout = new BGroupLayout(B_VERTICAL, 5.0);
-	layout->SetInsets(10, 10, 10, 10);
+	BGroupLayout* layout = new BGroupLayout(B_VERTICAL, B_USE_SMALL_SPACING);
+	layout->SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
+		B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
 	screenBox->SetLayout(layout);
 
 	fMonitorInfo = new BStringView("monitor info", "");
+	fMonitorInfo->SetAlignment(B_ALIGN_CENTER);
 	screenBox->AddChild(fMonitorInfo);
 
 	fMonitorView = new MonitorView(BRect(0.0, 0.0, 80.0, 80.0),
@@ -219,22 +226,39 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 		screen.Frame().IntegerHeight() + 1);
 	screenBox->AddChild(fMonitorView);
 
+	BStringView* workspaces = new BStringView("workspaces",
+		B_TRANSLATE("Workspaces"));
+	workspaces->SetAlignment(B_ALIGN_CENTER);
+
 	fColumnsControl = new BTextControl(B_TRANSLATE("Columns:"), "0",
 		new BMessage(kMsgWorkspaceColumnsChanged));
+	fColumnsControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	fRowsControl = new BTextControl(B_TRANSLATE("Rows:"), "0",
 		new BMessage(kMsgWorkspaceRowsChanged));
+	fRowsControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 
-	screenBox->AddChild(BLayoutBuilder::Grid<>(5.0, 5.0)
-		.Add(new BStringView("", B_TRANSLATE("Workspaces")), 0, 0, 3)
-		.AddTextControl(fColumnsControl, 0, 1, B_ALIGN_RIGHT)
-		.AddGroup(B_HORIZONTAL, 0, 2, 1)
-			.Add(_CreateColumnRowButton(true, false))
-			.Add(_CreateColumnRowButton(true, true))
-			.End()
-		.AddTextControl(fRowsControl, 0, 2, B_ALIGN_RIGHT)
-		.AddGroup(B_HORIZONTAL, 0, 2, 2)
-			.Add(_CreateColumnRowButton(false, false))
-			.Add(_CreateColumnRowButton(false, true))
+	float tiny = be_control_look->DefaultItemSpacing() / 4;
+	screenBox->AddChild(BLayoutBuilder::Group<>()
+		.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
+			.Add(workspaces)
+			.AddGrid(0.0, tiny)
+				// columns
+				.Add(fColumnsControl->CreateLabelLayoutItem(), 0, 0)
+				.Add(BSpaceLayoutItem::CreateHorizontalStrut(
+					B_USE_SMALL_SPACING), 1, 0)
+				.Add(fColumnsControl->CreateTextViewLayoutItem(), 2, 0)
+				.Add(BSpaceLayoutItem::CreateHorizontalStrut(tiny), 3, 0)
+				.Add(_CreateColumnRowButton(true, false), 4, 0)
+				.Add(_CreateColumnRowButton(true, true), 5, 0)
+				// rows
+				.Add(fRowsControl->CreateLabelLayoutItem(), 0, 1)
+				.Add(BSpaceLayoutItem::CreateHorizontalStrut(
+					B_USE_SMALL_SPACING), 1, 1)
+				.Add(fRowsControl->CreateTextViewLayoutItem(), 2, 1)
+				.Add(BSpaceLayoutItem::CreateHorizontalStrut(tiny), 3, 1)
+				.Add(_CreateColumnRowButton(false, false), 4, 1)
+				.Add(_CreateColumnRowButton(false, true), 5, 1)
+				.End()
 			.End()
 		.View());
 
@@ -308,19 +332,24 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 
 	fRefreshMenu = new BPopUpMenu("refresh rate", true, true);
 
-	BMessage *message;
-
 	float min, max;
-	if (fScreenMode.GetRefreshLimits(fActive, min, max) && min == max) {
+	if (fScreenMode.GetRefreshLimits(fActive, min, max) != B_OK) {
+		// if we couldn't obtain the refresh limits, reset to the default
+		// range. Constraints from detected monitors will fine-tune this
+		// later.
+		min = kRefreshRates[0];
+		max = kRefreshRates[kRefreshRateCount - 1];
+	}
+
+	if (min == max) {
 		// This is a special case for drivers that only support a single
 		// frequency, like the VESA driver
 		BString name;
-		name << min << " " << B_TRANSLATE("Hz");
-
-		message = new BMessage(POP_REFRESH_MSG);
+		refresh_rate_to_string(min, name);
+		BMessage *message = new BMessage(POP_REFRESH_MSG);
 		message->AddFloat("refresh", min);
-
-		fRefreshMenu->AddItem(item = new BMenuItem(name.String(), message));
+		BMenuItem *item = new BMenuItem(name.String(), message);
+		fRefreshMenu->AddItem(item);
 		item->SetEnabled(false);
 	} else {
 		monitor_info info;
@@ -336,16 +365,14 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 			BString name;
 			name << kRefreshRates[i] << " " << B_TRANSLATE("Hz");
 
-			message = new BMessage(POP_REFRESH_MSG);
+			BMessage *message = new BMessage(POP_REFRESH_MSG);
 			message->AddFloat("refresh", kRefreshRates[i]);
 
 			fRefreshMenu->AddItem(new BMenuItem(name.String(), message));
 		}
 
-		message = new BMessage(POP_OTHER_REFRESH_MSG);
-
 		fOtherRefresh = new BMenuItem(B_TRANSLATE("Other" B_UTF8_ELLIPSIS),
-			message);
+			new BMessage(POP_OTHER_REFRESH_MSG));
 		fRefreshMenu->AddItem(fOtherRefresh);
 	}
 
@@ -374,7 +401,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 			true, true);
 
 		for (int32 i = 0; i < kCombineModeCount; i++) {
-			message = new BMessage(POP_COMBINE_DISPLAYS_MSG);
+			BMessage *message = new BMessage(POP_COMBINE_DISPLAYS_MSG);
 			message->AddInt32("mode", kCombineModes[i].mode);
 
 			fCombineMenu->AddItem(new BMenuItem(kCombineModes[i].name,
@@ -391,7 +418,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 			true, true);
 
 		// !order is important - we rely that boolean value == idx
-		message = new BMessage(POP_SWAP_DISPLAYS_MSG);
+		BMessage *message = new BMessage(POP_SWAP_DISPLAYS_MSG);
 		message->AddBool("swap", false);
 		fSwapDisplaysMenu->AddItem(new BMenuItem(B_TRANSLATE("no"), message));
 
@@ -482,7 +509,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 		.SetInsets(10, 10, 10, 10)
 		.AddGroup(B_HORIZONTAL, 10.0)
 			.AddGroup(B_VERTICAL)
-				.AddStrut(controlsBox->TopBorderOffset() - 1)
+				.AddStrut(floor(controlsBox->TopBorderOffset() / 16) - 1)
 				.Add(screenBox)
 			.End()
 			.Add(controlsBox)
@@ -515,8 +542,11 @@ ScreenWindow::QuitRequested()
 			BString warning = B_TRANSLATE("Could not write VESA mode settings"
 				" file:\n\t");
 			warning << strerror(status);
-			(new BAlert(B_TRANSLATE("Warning"), warning.String(), B_TRANSLATE("OK"), NULL,
-				NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+			BAlert* alert = new BAlert(B_TRANSLATE("Warning"),
+				warning.String(), B_TRANSLATE("OK"), NULL,
+				NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
 		}
 	}
 
@@ -663,28 +693,28 @@ ScreenWindow::_CheckRefreshMenu()
 void
 ScreenWindow::_UpdateRefreshControl()
 {
-	BString string;
-	refresh_rate_to_string(fSelected.refresh, string);
-
-	BMenuItem* item = fRefreshMenu->FindItem(string.String());
-	if (item) {
-		if (!item->IsMarked())
+	for (int32 i = 0; i < fRefreshMenu->CountItems(); i++) {
+		BMenuItem* item = fRefreshMenu->ItemAt(i);
+		if (item->Message()->FindFloat("refresh") == fSelected.refresh) {
 			item->SetMarked(true);
-
-		// "Other" items only contains a refresh rate when active
-		fOtherRefresh->SetLabel(B_TRANSLATE("Other" B_UTF8_ELLIPSIS));
-		return;
+			// "Other" items only contains a refresh rate when active
+			fOtherRefresh->SetLabel(B_TRANSLATE("Other" B_UTF8_ELLIPSIS));
+			return;
+		}
 	}
 
 	// this is a non-standard refresh rate
+	if (fOtherRefresh != NULL) {
+		fOtherRefresh->Message()->ReplaceFloat("refresh", fSelected.refresh);
+		fOtherRefresh->SetMarked(true);
 
-	fOtherRefresh->Message()->ReplaceFloat("refresh", fSelected.refresh);
-	fOtherRefresh->SetMarked(true);
+		BString string;
+		refresh_rate_to_string(fSelected.refresh, string);
+		fRefreshMenu->Superitem()->SetLabel(string.String());
 
-	fRefreshMenu->Superitem()->SetLabel(string.String());
-
-	string.Append(B_TRANSLATE("/other" B_UTF8_ELLIPSIS));
-	fOtherRefresh->SetLabel(string.String());
+		string.Append(B_TRANSLATE("/other" B_UTF8_ELLIPSIS));
+		fOtherRefresh->SetLabel(string.String());
+	}
 }
 
 
@@ -705,11 +735,11 @@ ScreenWindow::_UpdateControls()
 	_UpdateWorkspaceButtons();
 
 	BMenuItem* item = fSwapDisplaysMenu->ItemAt((int32)fSelected.swap_displays);
-	if (item && !item->IsMarked())
+	if (item != NULL && !item->IsMarked())
 		item->SetMarked(true);
 
 	item = fUseLaptopPanelMenu->ItemAt((int32)fSelected.use_laptop_panel);
-	if (item && !item->IsMarked())
+	if (item != NULL && !item->IsMarked())
 		item->SetMarked(true);
 
 	for (int32 i = 0; i < fTVStandardMenu->CountItems(); i++) {
@@ -760,7 +790,7 @@ ScreenWindow::_UpdateControls()
 	for (int32 i = 0; i < kCombineModeCount; i++) {
 		if (kCombineModes[i].mode == fSelected.combine) {
 			item = fCombineMenu->ItemAt(i);
-			if (item && !item->IsMarked())
+			if (item != NULL && !item->IsMarked())
 				item->SetMarked(true);
 			break;
 		}
@@ -780,7 +810,7 @@ ScreenWindow::_UpdateControls()
 		index++;
 	}
 
-	if (item && !item->IsMarked())
+	if (item != NULL && !item->IsMarked())
 		item->SetMarked(true);
 
 	_UpdateColorLabel();
@@ -795,15 +825,24 @@ ScreenWindow::_UpdateControls()
 void
 ScreenWindow::_UpdateActiveMode()
 {
+	_UpdateActiveMode(current_workspace());
+}
+
+
+void
+ScreenWindow::_UpdateActiveMode(int32 workspace)
+{
 	// Usually, this function gets called after a mode
 	// has been set manually; still, as the graphics driver
 	// is free to fiddle with mode passed, we better ask
 	// what kind of mode we actually got
-	fScreenMode.Get(fActive);
-	fSelected = fActive;
+	if (fScreenMode.Get(fActive, workspace) == B_OK) {
+		fSelected = fActive;
 
-	_UpdateMonitor();
-	_UpdateControls();
+		_UpdateMonitor();
+		_BuildSupportedColorSpaces();
+		_UpdateControls();
+	}
 }
 
 
@@ -815,10 +854,10 @@ ScreenWindow::_UpdateWorkspaceButtons()
 	BPrivate::get_workspaces_layout(&columns, &rows);
 
 	char text[32];
-	snprintf(text, sizeof(text), "%ld", columns);
+	snprintf(text, sizeof(text), "%" B_PRId32, columns);
 	fColumnsControl->SetText(text);
 
-	snprintf(text, sizeof(text), "%ld", rows);
+	snprintf(text, sizeof(text), "%" B_PRId32, rows);
 	fRowsControl->SetText(text);
 
 	_GetColumnRowButton(true, false)->SetEnabled(columns != 1 && rows != 32);
@@ -843,11 +882,12 @@ ScreenWindow::ScreenChanged(BRect frame, color_space mode)
 void
 ScreenWindow::WorkspaceActivated(int32 workspace, bool state)
 {
-	fScreenMode.GetOriginalMode(fOriginal, workspace);
-	_UpdateActiveMode();
+	if (fScreenMode.GetOriginalMode(fOriginal, workspace) == B_OK) {
+		_UpdateActiveMode(workspace);
 
-	BMessage message(UPDATE_DESKTOP_COLOR_MSG);
-	PostMessage(&message, fMonitorView);
+		BMessage message(UPDATE_DESKTOP_COLOR_MSG);
+		PostMessage(&message, fMonitorView);
+	}
 }
 
 
@@ -1099,8 +1139,8 @@ ScreenWindow::_WriteVesaModeFile(const screen_mode& mode) const
 		return status;
 
 	char buffer[256];
-	snprintf(buffer, sizeof(buffer), "mode %ld %ld %ld\n",
-		mode.width, mode.height, mode.BitsPerPixel());
+	snprintf(buffer, sizeof(buffer), "mode %" B_PRId32 " %" B_PRId32 " %"
+		B_PRId32 "\n", mode.width, mode.height, mode.BitsPerPixel());
 
 	ssize_t bytesWritten = file.Write(buffer, strlen(buffer));
 	if (bytesWritten < B_OK)
@@ -1298,7 +1338,7 @@ ScreenWindow::_Apply()
 		BAlert* alert = new BAlert(B_TRANSLATE("Warning"), message,
 			B_TRANSLATE("OK"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 	}
 }
-

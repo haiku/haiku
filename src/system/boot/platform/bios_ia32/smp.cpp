@@ -20,12 +20,13 @@
 #include <boot/menu.h>
 #include <arch/x86/apic.h>
 #include <arch/x86/arch_acpi.h>
+#include <arch/x86/arch_cpu.h>
 #include <arch/x86/arch_smp.h>
 #include <arch/x86/arch_system_info.h>
+#include <arch/x86/descriptors.h>
 
 #include "mmu.h"
 #include "acpi.h"
-#include "hpet.h"
 
 
 #define NO_SMP 0
@@ -37,10 +38,6 @@
 #	define TRACE(x) ;
 #endif
 
-struct gdt_idt_descr {
-	uint16 a;
-	uint32 *b;
-} _PACKED;
 
 static struct scan_spots_struct smp_scan_spots[] = {
 	{ 0x9fc00, 0xa0000, 0xa0000 - 0x9fc00 },
@@ -54,36 +51,17 @@ extern "C" void smp_trampoline(void);
 extern "C" void smp_trampoline_end(void);
 
 
-static int smp_get_current_cpu(void);
-
-
 static uint32
 apic_read(uint32 offset)
 {
-	return *(volatile uint32 *)((uint32)gKernelArgs.arch_args.apic + offset);
+	return *(volatile uint32 *)((addr_t)(void *)gKernelArgs.arch_args.apic + offset);
 }
 
 
 static void
 apic_write(uint32 offset, uint32 data)
 {
-	*(volatile uint32 *)((uint32)gKernelArgs.arch_args.apic + offset) = data;
-}
-
-
-static int
-smp_get_current_cpu(void)
-{
-	if (gKernelArgs.arch_args.apic == NULL)
-		return 0;
-
-	uint8 apicID = apic_read(APIC_ID) >> 24;
-	for (uint32 i = 0; i < gKernelArgs.num_cpus; i++) {
-		if (gKernelArgs.arch_args.cpu_apic_id[i] == apicID)
-			return i;
-	}
-
-	return 0;
+	*(volatile uint32 *)((addr_t)(void *)gKernelArgs.arch_args.apic + offset) = data;
 }
 
 
@@ -106,6 +84,12 @@ smp_mp_probe(uint32 base, uint32 limit)
 static status_t
 smp_do_mp_config(mp_floating_struct *floatingStruct)
 {
+	if (floatingStruct->config_length != 1) {
+		TRACE(("smp: unsupported structure length of %" B_PRIu8 " units\n",
+			floatingStruct->config_length));
+		return B_UNSUPPORTED;
+	}
+
 	TRACE(("smp: intel mp version %s, %s",
 		(floatingStruct->spec_revision == 1) ? "1.1" : "1.4",
 		(floatingStruct->mp_feature_2 & 0x80)
@@ -139,6 +123,18 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 	mp_config_table *config = floatingStruct->config_table;
 	gKernelArgs.num_cpus = 0;
 
+	if (config->signature != MP_CONFIG_TABLE_SIGNATURE) {
+		TRACE(("smp: invalid config table signature, aborting\n"));
+		return B_ERROR;
+	}
+
+	if (config->base_table_length < sizeof(mp_config_table)) {
+		TRACE(("smp: config table length %" B_PRIu16
+			" too short for structure, aborting\n",
+			config->base_table_length));
+		return B_ERROR;
+	}
+
 	// print our new found configuration.
 	TRACE(("smp: oem id: %.8s product id: %.12s\n", config->oem,
 		config->product));
@@ -146,6 +142,12 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 		config->num_base_entries, config->ext_length));
 
 	gKernelArgs.arch_args.apic_phys = (uint32)config->apic;
+	if ((gKernelArgs.arch_args.apic_phys % 4096) != 0) {
+		// MP specs mandate a 4K alignment for the local APIC(s)
+		TRACE(("smp: local apic %p has bad alignment, aborting\n",
+			(void *)gKernelArgs.arch_args.apic_phys));
+		return B_ERROR;
+	}
 
 	char *pointer = (char *)((uint32)config + sizeof(struct mp_config_table));
 	for (int32 i = 0; i < config->num_base_entries; i++) {
@@ -203,8 +205,15 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 				struct mp_base_ioapic *io = (struct mp_base_ioapic *)pointer;
 				pointer += sizeof(struct mp_base_ioapic);
 
-				if (gKernelArgs.arch_args.ioapic_phys == 0)
+				if (gKernelArgs.arch_args.ioapic_phys == 0) {
 					gKernelArgs.arch_args.ioapic_phys = (uint32)io->addr;
+					if (gKernelArgs.arch_args.ioapic_phys % 1024) {
+						// MP specs mandate a 1K alignment for the IO-APICs
+						TRACE(("smp: io apic %p has bad alignment, aborting\n",
+							(void *)gKernelArgs.arch_args.ioapic_phys));
+						return B_ERROR;
+					}
+				}
 
 				TRACE(("smp: found io apic with apic id %d, version %d\n",
 					io->ioapic_id, io->ioapic_version));
@@ -230,12 +239,17 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 		}
 	}
 
+	if (gKernelArgs.num_cpus == 0) {
+		TRACE(("smp: didn't find any processors, aborting\n"));
+		return B_ERROR;
+	}
+
 	dprintf("smp: apic @ %p, i/o apic @ %p, total %ld processors detected\n",
 		(void *)gKernelArgs.arch_args.apic_phys,
 		(void *)gKernelArgs.arch_args.ioapic_phys,
 		gKernelArgs.num_cpus);
 
-	return gKernelArgs.num_cpus > 0 ? B_OK : B_ERROR;
+	return B_OK;
 }
 
 
@@ -305,53 +319,6 @@ smp_do_acpi_config(void)
 }
 
 
-/*!	Target function of the trampoline code.
-	The trampoline code should have the pgdir and a gdt set up for us,
-	along with us being on the final stack for this processor. We need
-	to set up the local APIC and load the global idt and gdt. When we're
-	done, we'll jump into the kernel with the cpu number as an argument.
-*/
-static int
-smp_cpu_ready(void)
-{
-	uint32 curr_cpu = smp_get_current_cpu();
-	struct gdt_idt_descr idt_descr;
-	struct gdt_idt_descr gdt_descr;
-
-	//TRACE(("smp_cpu_ready: entry cpu %ld\n", curr_cpu));
-
-	// Important.  Make sure supervisor threads can fault on read only pages...
-	asm("movl %%eax, %%cr0" : : "a" ((1 << 31) | (1 << 16) | (1 << 5) | 1));
-	asm("cld");
-	asm("fninit");
-
-	// Set up the final idt
-	idt_descr.a = IDT_LIMIT - 1;
-	idt_descr.b = (uint32 *)gKernelArgs.arch_args.vir_idt;
-
-	asm("lidt	%0;"
-		: : "m" (idt_descr));
-
-	// Set up the final gdt
-	gdt_descr.a = GDT_LIMIT - 1;
-	gdt_descr.b = (uint32 *)gKernelArgs.arch_args.vir_gdt;
-
-	asm("lgdt	%0;"
-		: : "m" (gdt_descr));
-
-	asm("pushl  %0; "					// push the cpu number
-		"pushl 	%1;	"					// kernel args
-		"pushl 	$0x0;"					// dummy retval for call to main
-		"pushl 	%2;	"					// this is the start address
-		"ret;		"					// jump.
-		: : "g" (curr_cpu), "g" (&gKernelArgs),
-			"g" (gKernelArgs.kernel_image.elf_header.e_entry));
-
-	// no where to return to
-	return 0;
-}
-
-
 static void
 calculate_apic_timer_conversion_factor(void)
 {
@@ -390,6 +357,22 @@ calculate_apic_timer_conversion_factor(void)
 //	#pragma mark -
 
 
+int
+smp_get_current_cpu(void)
+{
+	if (gKernelArgs.arch_args.apic == NULL)
+		return 0;
+
+	uint8 apicID = apic_read(APIC_ID) >> 24;
+	for (uint32 i = 0; i < gKernelArgs.num_cpus; i++) {
+		if (gKernelArgs.arch_args.cpu_apic_id[i] == apicID)
+			return i;
+	}
+
+	return 0;
+}
+
+
 void
 smp_init_other_cpus(void)
 {
@@ -415,10 +398,10 @@ smp_init_other_cpus(void)
 		(void *)gKernelArgs.arch_args.ioapic_phys));
 
 	// map in the apic
-	gKernelArgs.arch_args.apic = (uint32 *)mmu_map_physical_memory(
+	gKernelArgs.arch_args.apic = (void *)mmu_map_physical_memory(
 		gKernelArgs.arch_args.apic_phys, B_PAGE_SIZE, kDefaultPageFlags);
 
-	TRACE(("smp: apic (mapped) = %p\n", gKernelArgs.arch_args.apic));
+	TRACE(("smp: apic (mapped) = %p\n", (void *)gKernelArgs.arch_args.apic));
 
 	// calculate how fast the apic timer is
 	calculate_apic_timer_conversion_factor();
@@ -437,7 +420,7 @@ smp_init_other_cpus(void)
 
 
 void
-smp_boot_other_cpus(void)
+smp_boot_other_cpus(void (*entryFunc)(void))
 {
 	if (gKernelArgs.num_cpus < 2)
 		return;
@@ -477,7 +460,7 @@ smp_boot_other_cpus(void)
 		tempStack = (finalStack
 			+ (KERNEL_STACK_SIZE + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE)
 				/ sizeof(uint32)) - 1;
-		*tempStack = (uint32)&smp_cpu_ready;
+		*tempStack = (uint32)entryFunc;
 
 		// set the trampoline stack up
 		tempStack = (uint32 *)(trampolineStack + B_PAGE_SIZE - 4);
@@ -486,15 +469,20 @@ smp_boot_other_cpus(void)
 			+ KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE - sizeof(uint32);
 		tempStack--;
 		// page dir
-		*tempStack = gKernelArgs.arch_args.phys_pgdir;
+		*tempStack = x86_read_cr3() & 0xfffff000;
 
 		// put a gdt descriptor at the bottom of the stack
 		*((uint16 *)trampolineStack) = 0x18 - 1; // LIMIT
 		*((uint32 *)(trampolineStack + 2)) = trampolineStack + 8;
 
-		// put the gdt at the bottom
-		memcpy(&((uint32 *)trampolineStack)[2],
-			(void *)gKernelArgs.arch_args.vir_gdt, 6 * 4);
+		// construct a temporary gdt at the bottom
+		segment_descriptor* tempGDT
+			= (segment_descriptor*)&((uint32 *)trampolineStack)[2];
+		clear_segment_descriptor(&tempGDT[0]);
+		set_segment_descriptor(&tempGDT[1], 0, 0xffffffff, DT_CODE_READABLE,
+			DPL_KERNEL);
+		set_segment_descriptor(&tempGDT[2], 0, 0xffffffff, DT_DATA_WRITEABLE,
+			DPL_KERNEL);
 
 		/* clear apic errors */
 		if (gKernelArgs.arch_args.cpu_apic_version[i] & 0xf0) {
@@ -637,6 +625,9 @@ smp_init(void)
 			return;
 	}
 
-	// everything failed or we are not running an SMP system
+	// Everything failed or we are not running an SMP system, reset anything
+	// that might have been set through an incomplete configuration attempt.
+	gKernelArgs.arch_args.apic_phys = 0;
+	gKernelArgs.arch_args.ioapic_phys = 0;
 	gKernelArgs.num_cpus = 1;
 }

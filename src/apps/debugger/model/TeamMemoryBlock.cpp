@@ -93,11 +93,14 @@ TeamMemoryBlock::SetWritable(bool writable)
 
 
 void
-TeamMemoryBlock::NotifyDataRetrieved()
+TeamMemoryBlock::NotifyDataRetrieved(status_t result)
 {
 	for (ListenerList::Iterator it = fListeners.GetIterator();
 			Listener* listener = it.Next();) {
-		listener->MemoryBlockRetrieved(this);
+		if (result == B_OK)
+			listener->MemoryBlockRetrieved(this);
+		else
+			listener->MemoryBlockRetrievalFailed(this, result);
 	}
 }
 
@@ -121,5 +124,12 @@ TeamMemoryBlock::Listener::~Listener()
 
 void
 TeamMemoryBlock::Listener::MemoryBlockRetrieved(TeamMemoryBlock* block)
+{
+}
+
+
+void
+TeamMemoryBlock::Listener::MemoryBlockRetrievalFailed(TeamMemoryBlock* block,
+	status_t result)
 {
 }

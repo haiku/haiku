@@ -34,8 +34,8 @@
 #include <string.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "People"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "People"
 
 
 struct DefaultAttribute {
@@ -73,7 +73,7 @@ TPeopleApp::TPeopleApp()
 	fWindowCount(0),
 	fAttributes(20, true)
 {
-	B_TRANSLATE_MARK_SYSTEM_NAME("People");
+	B_TRANSLATE_MARK_SYSTEM_NAME_VOID("People");
 
 	fPosition.Set(6, TITLE_BAR_HEIGHT, 6 + WIND_WIDTH,
 		TITLE_BAR_HEIGHT + WIND_HEIGHT);
@@ -147,9 +147,9 @@ TPeopleApp::TPeopleApp()
 	}
 	if (!valid) {
 		mime.Install();
-		mime.SetShortDescription(B_TRANSLATE_WITH_CONTEXT("Person",
+		mime.SetShortDescription(B_TRANSLATE_CONTEXT("Person",
 			"Short mimetype description"));
-		mime.SetLongDescription(B_TRANSLATE_WITH_CONTEXT(
+		mime.SetLongDescription(B_TRANSLATE_CONTEXT(
 			"Contact information for a person.",
 			"Long mimetype description"));
 		mime.SetIcon(kPersonIcon, sizeof(kPersonIcon));
@@ -247,6 +247,7 @@ TPeopleApp::MessageReceived(BMessage* message)
 				BAlert* alert = new BAlert(B_TRANSLATE("Error"),
 					errorMsg.String(), B_TRANSLATE("OK"), NULL, NULL,
 					B_WIDTH_AS_USUAL, B_STOP_ALERT);
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 				alert->Go(NULL);
 			}
 			break;

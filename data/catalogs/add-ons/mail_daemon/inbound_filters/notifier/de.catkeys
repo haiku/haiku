@@ -1,16 +1,16 @@
 1	german	x-vnd.Haiku-NewMailNotification	3624191291
 %num new message	filter		%num neue Nachricht
 %num new messages	filter		%num neue Nachrichten
-Alert	ConfigView		Hinweisfenster
-Beep	ConfigView		Tonsignal
-Central alert	ConfigView		Hinweisfenster (alle Konten)
-Central beep	ConfigView		Tonsignal (alle Konten)
 Keyboard LEDs	ConfigView		Tastatur-LEDs
-Log window	ConfigView		Statusfenster
-Method:	ConfigView		Methode:
-New mails notification	ConfigView		Ankündigung neuer E-Mails
-New messages	filter		Neue Nachrichten
-OK	filter		OK
-You have %num new message for %name.	filter		%num neue Nachricht für %name.
 You have %num new messages for %name.	filter		%num neue Nachrichten für %name.
+You have %num new message for %name.	filter		%num neue Nachricht für %name.
+Log window	ConfigView		Statusfenster
+Central beep	ConfigView		Tonsignal (alle Konten)
+Beep	ConfigView		Tonsignal
+Method:	ConfigView		Methode:
+Central alert	ConfigView		Hinweisfenster (alle Konten)
+Alert	ConfigView		Hinweisfenster
 none	ConfigView		keine
+New messages	filter		Neue Nachrichten
+New mails notification	ConfigView		Ankündigung neuer E-Mails
+OK	filter		OK

@@ -52,8 +52,8 @@ All rights reserved.
 const bigtime_t kBarberPoleDelay = 500000;
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "CountView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CountView"
 
 BCountView::BCountView(BRect bounds, BPoseView* view)
 	: BView(bounds, "CountVw", B_FOLLOW_LEFT + B_FOLLOW_BOTTOM,
@@ -229,7 +229,7 @@ BCountView::Draw(BRect updateRect)
 		else {
 			itemString.SetTo(B_TRANSLATE("%num items"));
 			char numString[256];
-			snprintf(numString, sizeof(numString), "%ld", fLastCount);
+			snprintf(numString, sizeof(numString), "%" B_PRId32, fLastCount);
 			itemString.ReplaceFirst("%num", numString);
 		}
 	}
@@ -242,7 +242,8 @@ BCountView::Draw(BRect updateRect)
 
 	if (IsTypingAhead()) {
 		// use a muted gray for the typeahead
-		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_4_TINT));
+		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+			B_DARKEN_4_TINT));
 	} else
 		SetHighColor(0, 0, 0);
 
@@ -263,7 +264,8 @@ BCountView::Draw(BRect updateRect)
 		bounds.top--;
 
 		AddLine(bounds.LeftTop(), bounds.RightTop(), shadow);
-		AddLine(BPoint(bounds.right, bounds.top + 2), bounds.RightBottom(), lightShadow);
+		AddLine(BPoint(bounds.right, bounds.top + 2), bounds.RightBottom(),
+			lightShadow);
 		AddLine(bounds.LeftBottom(), bounds.RightBottom(), lightShadow);
 	}
 
@@ -282,8 +284,10 @@ BCountView::Draw(BRect updateRect)
 
 	barberPoleRect.InsetBy(1, 1);
 
-	BRect destRect(fBarberPoleMap ? fBarberPoleMap->Bounds() : BRect(0, 0, 0, 0));
-	destRect.OffsetTo(barberPoleRect.LeftTop() - BPoint(0, fLastBarberPoleOffset));
+	BRect destRect(fBarberPoleMap
+		? fBarberPoleMap->Bounds() : BRect(0, 0, 0, 0));
+	destRect.OffsetTo(barberPoleRect.LeftTop()
+		- BPoint(0, fLastBarberPoleOffset));
 	fLastBarberPoleOffset -= 1;
 	if (fLastBarberPoleOffset < 0)
 		fLastBarberPoleOffset = 5;
@@ -300,7 +304,7 @@ BCountView::Draw(BRect updateRect)
 void
 BCountView::MouseDown(BPoint)
 {
-	BContainerWindow *window = dynamic_cast<BContainerWindow *>(Window());
+	BContainerWindow* window = dynamic_cast<BContainerWindow*>(Window());
 	window->Activate();
 	window->UpdateIfNeeded();
 
@@ -308,7 +312,7 @@ BCountView::MouseDown(BPoint)
 		return;
 
 	if (!window->TargetModel()->IsRoot()) {
-		BDirMenu *menu = new BDirMenu(NULL, be_app, B_REFS_RECEIVED);
+		BDirMenu* menu = new BDirMenu(NULL, be_app, B_REFS_RECEIVED);
 		BEntry entry;
 		if (entry.SetTo(window->TargetModel()->EntryRef()) == B_OK)
 			menu->Populate(&entry, Window(), false, false, true, false, true);
@@ -340,14 +344,14 @@ BCountView::AttachedToWindow()
 
 
 void
-BCountView::SetTypeAhead(const char *string)
+BCountView::SetTypeAhead(const char* string)
 {
 	fTypeAheadString = string;
 	Invalidate();
 }
 
 
-const char *
+const char*
 BCountView::TypeAhead() const
 {
 	return fTypeAheadString.String();
@@ -362,7 +366,7 @@ BCountView::IsTypingAhead() const
 
 
 void
-BCountView::AddFilterCharacter(const char *character)
+BCountView::AddFilterCharacter(const char* character)
 {
 	fFilterString.AppendChars(character, 1);
 	Invalidate();
@@ -385,7 +389,7 @@ BCountView::CancelFilter()
 }
 
 
-const char *
+const char*
 BCountView::Filter() const
 {
 	return fFilterString.String();

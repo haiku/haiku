@@ -1,13 +1,13 @@
 /*
- * Copyright 2010, Oliver Tappe, zooey@hirschkaefer.de
+ * Copyright 2010-2011, Oliver Tappe, zooey@hirschkaefer.de
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-#include <wchar.h>
+#include <wchar_private.h>
 
 
 int
-wcswidth(const wchar_t* wcstring, size_t n)
+__wcswidth(const wchar_t* wcstring, size_t n)
 {
 	int width = 0;
 
@@ -21,3 +21,6 @@ wcswidth(const wchar_t* wcstring, size_t n)
 
 	return width;
 }
+
+
+B_DEFINE_WEAK_ALIAS(__wcswidth, wcswidth);

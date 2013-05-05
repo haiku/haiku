@@ -10,9 +10,8 @@
 #include "Row.h"
 
 #include "ALMLayout.h"
+#include "Area.h"
 #include "Tab.h"
-
-#include <SupportDefs.h>
 
 
 using namespace LinearProgramming;
@@ -53,9 +52,9 @@ Row::~Row()
  */
 Row::Row(LinearSpec* ls, YTab* top, YTab* bottom)
 	:
-	fLS(ls),
 	fTop(top),
 	fBottom(bottom),
+	fLS(ls),
 	fPrefSizeConstraint(NULL)
 {
 

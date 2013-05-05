@@ -194,10 +194,11 @@ BArchiveManager::ArchiverLeaving(const BArchiver* archiver, status_t err)
 		}
 	}
 
-	if (archiver == fCreator)
+	status_t result = fError;
+	if (archiver == fCreator) 
 		delete this;
 
-	return fError;
+	return result;
 }
 
 
@@ -298,10 +299,8 @@ BUnarchiveManager::GetArchivableForToken(int32 token,
 		}
 	}
 
-	if (!info.adopted && owning == BUnarchiver::B_ASSUME_OWNERSHIP)
+	if (owning == BUnarchiver::B_ASSUME_OWNERSHIP)
 		info.adopted = true;
-	else if (info.adopted && owning == BUnarchiver::B_ASSUME_OWNERSHIP)
-		debugger("Cannot assume ownership of an object that is already owned");
 
 	_archivable = info.archivable;
 	return err;
@@ -366,8 +365,9 @@ BUnarchiveManager::UnarchiverLeaving(const BUnarchiver* unarchiver,
 		}
 	}
 
+	status_t result = fError;
 	delete this;
-	return fError;
+	return result;
 }
 
 
@@ -397,11 +397,7 @@ BUnarchiveManager::AssumeOwnership(BArchivable* archivable)
 		|| fObjects[token].archivable != archivable)
 		return;
 
-	if (!fObjects[token].adopted)
-		fObjects[token].adopted = true;
-	else {
-		debugger("Cannot assume ownership of an object that is already owned");
-	}
+	fObjects[token].adopted = true;
 }
 
 

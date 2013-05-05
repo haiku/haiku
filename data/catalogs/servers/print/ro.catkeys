@@ -1,28 +1,28 @@
 1	romanian	x-vnd.Be-PSRV	2276824566
-All pages	ConfigWindow		Toate paginile
-Cancel	ConfigWindow		Anulează
-Cancel	PrintServerApp		Anulează
-Get currently available ports/devices	Transport Scripting		Obține porturile/dispozitivele disponibile curent
-Get name of the printer add-on used for this printer	Printer Scripting		Obține numele unui supliment de imprimantă utilizat pentru această imprimantă
-Landscape	ConfigWindow		Peisaj
-No	PrintServerApp		Nu
-OK	ConfigWindow		OK
-OK	PrintServerApp		OK
-Page setup	ConfigWindow		Configurare pagină
-Page setup:	ConfigWindow		Configurare pagină:
-Paper setup:	ConfigWindow		Configurare hărtie
-Portrait	ConfigWindow		Portret
-Print setup	ConfigWindow		Configurare de imprimare
-Printer server	ConfigWindow		Server de imprimantă
-Printer:	ConfigWindow		Imprimantă:
-Retrieve a specific printer	PrintServerApp Scripting		Obține o imprimantă specifică
-Retrieve or select the active printer	PrintServerApp Scripting		Obține sau selectează imprimanta activă
-Return the number of available printers	PrintServerApp Scripting		Întoarce numărul de imprimante disponibile
-Return the number of available transports	PrintServerApp Scripting		Întoarce numărul de transporturi disponibile
-Select a printer	ConfigWindow		Alege o imprimantă
-There are no printers set up.	PrintServerApp		Nu există imprimante configurate.
-There is no default printer set up.	PrintServerApp		Nu există o imprimantă implicită configurată.
 Undefined	ConfigWindow		Nedefinit
-Would you like to make @ the default printer?	PrintServerApp		Doriți să stabiliți @ ca imprimantă implicită?
-Would you like to set one up now?	PrintServerApp		Doriți să configurați una acum?
+Return the number of available transports	PrintServerApp Scripting		Întoarce numărul de transporturi disponibile
+Return the number of available printers	PrintServerApp Scripting		Întoarce numărul de imprimante disponibile
+Get currently available ports/devices	Transport Scripting		Obține porturile/dispozitivele disponibile curent
+Retrieve or select the active printer	PrintServerApp Scripting		Obține sau selectează imprimanta activă
+Cancel	PrintServerApp		Anulează
+Retrieve a specific printer	PrintServerApp Scripting		Obține o imprimantă specifică
+Get name of the printer add-on used for this printer	Printer Scripting		Obține numele unui supliment de imprimantă utilizat pentru această imprimantă
+Page setup:	ConfigWindow		Configurare pagină:
+OK	ConfigWindow		OK
+Cancel	ConfigWindow		Anulează
+Printer server	ConfigWindow		Server de imprimantă
 Yes	PrintServerApp		Da
+Would you like to set one up now?	PrintServerApp		Doriți să configurați una acum?
+Portrait	ConfigWindow		Portret
+All pages	ConfigWindow		Toate paginile
+There is no default printer set up.	PrintServerApp		Nu există o imprimantă implicită configurată.
+Printer:	ConfigWindow		Imprimantă:
+Select a printer	ConfigWindow		Alege o imprimantă
+No	PrintServerApp		Nu
+Landscape	ConfigWindow		Peisaj
+There are no printers set up.	PrintServerApp		Nu există imprimante configurate.
+OK	PrintServerApp		OK
+Print setup	ConfigWindow		Configurare de imprimare
+Would you like to make @ the default printer?	PrintServerApp		Doriți să stabiliți @ ca imprimantă implicită?
+Page setup	ConfigWindow		Configurare pagină
+Paper setup:	ConfigWindow		Configurare hărtie

@@ -124,8 +124,8 @@ const uint16 maxFrameSize = 1518;
 
 
 AX88172Device::AX88172Device(usb_device device, DeviceInfo& deviceInfo)
-		:
-		ASIXDevice(device, deviceInfo)
+	:
+	ASIXDevice(device, deviceInfo)
 {
 	fStatus = InitDevice();
 }
@@ -175,8 +175,8 @@ AX88172Device::StartDevice()
 
 	for (size_t i = 0; i < sizeof(fIPG) / sizeof(fIPG[0]); i++) {
 		status_t result = gUSBModule->send_request(fDevice,
-					USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-					WRITE_IPG0, 0, 0, sizeof(fIPG[i]), &fIPG[i], &actualLength);
+			USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT, WRITE_IPG0,
+			0, 0, sizeof(fIPG[i]), &fIPG[i], &actualLength);
 
 		if (result != B_OK) {
 			TRACE_ALWAYS("Error writing IPG%d: %#010x\n", i, result);
@@ -193,7 +193,7 @@ AX88172Device::StartDevice()
 	status_t result = WriteRXControlRegister(rxcontrol);
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of writing %#04x RX Control:%#010x\n",
-				rxcontrol, result);
+			rxcontrol, result);
 	}
 
 	TRACE_RET(result);
@@ -206,7 +206,7 @@ AX88172Device::OnNotify(uint32 actualLength)
 {
 	if (actualLength < sizeof(AX88172Notify)) {
 		TRACE_ALWAYS("Data underrun error. %d of %d bytes received\n",
-										actualLength, sizeof(AX88172Notify));
+			actualLength, sizeof(AX88172Notify));
 		return B_BAD_DATA;
 	}
 
@@ -214,7 +214,7 @@ AX88172Device::OnNotify(uint32 actualLength)
 
 	if (notification->btA1 != 0xa1) {
 		TRACE_ALWAYS("Notify magic byte is invalid: %#02x\n",
-														notification->btA1);
+			notification->btA1);
 	}
 
 	uint phyIndex = 0;
@@ -222,11 +222,13 @@ AX88172Device::OnNotify(uint32 actualLength)
 	switch(fMII.ActivePHY()) {
 		case PrimaryPHY:
 			phyIndex = 1;
-			linkIsUp = (notification->btNN & LINK_STATE_PHY1) == LINK_STATE_PHY1;
+			linkIsUp = (notification->btNN & LINK_STATE_PHY1)
+				== LINK_STATE_PHY1;
 			break;
 		case SecondaryPHY:
 			phyIndex = 2;
-			linkIsUp = (notification->btNN & LINK_STATE_PHY2) == LINK_STATE_PHY2;
+			linkIsUp = (notification->btNN & LINK_STATE_PHY2)
+				== LINK_STATE_PHY2;
 			break;
 		default:
 		case CurrentPHY:
@@ -239,7 +241,7 @@ AX88172Device::OnNotify(uint32 actualLength)
 
 	if (linkStateChange) {
 		TRACE("Link state of PHY%d has been changed to '%s'\n",
-									phyIndex, fHasConnection ? "up" : "down");
+			phyIndex, fHasConnection ? "up" : "down");
 	}
 
 	if (linkStateChange && fLinkStateChangeSem >= B_OK)
@@ -274,16 +276,15 @@ AX88172Device::GetLinkState(ether_link_state *linkState)
 	linkState->quality = 1000;
 
 	linkState->media   = IFM_ETHER | (fHasConnection ? IFM_ACTIVE : 0);
-	linkState->media  |= mediumStatus & (ANLPAR_TX_FD | ANLPAR_10_FD) ?
-											IFM_FULL_DUPLEX : IFM_HALF_DUPLEX;
+	linkState->media  |= mediumStatus & (ANLPAR_TX_FD | ANLPAR_10_FD)
+		? IFM_FULL_DUPLEX : IFM_HALF_DUPLEX;
 
 	linkState->speed   = mediumStatus & (ANLPAR_TX_FD | ANLPAR_TX_HD)
-							? 100000000 : 10000000;
+		? 100000000 : 10000000;
 
 	TRACE_FLOW("Medium state: %s, %lld MBit/s, %s duplex.\n",
-						(linkState->media & IFM_ACTIVE) ? "active" : "inactive",
-						linkState->speed / 1000000,
-						(linkState->media & IFM_FULL_DUPLEX) ? "full" : "half");
+		(linkState->media & IFM_ACTIVE) ? "active" : "inactive",
+		linkState->speed / 1000000,
+		(linkState->media & IFM_FULL_DUPLEX) ? "full" : "half");
 	return B_OK;
 }
-

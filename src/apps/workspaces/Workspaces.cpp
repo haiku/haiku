@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2002-2012, Haiku, Inc. All rights reserved.
  * Copyright 2002, François Revol, revol@free.fr.
  * This file is distributed under the terms of the MIT License.
  *
@@ -11,9 +11,10 @@
  */
 
 
-#include <Alert.h>
+#include <AboutWindow.h>
 #include <Application.h>
 #include <Catalog.h>
+#include <Deskbar.h>
 #include <Dragger.h>
 #include <Entry.h>
 #include <File.h>
@@ -36,11 +37,13 @@
 #include <ViewPrivate.h>
 #include <WindowPrivate.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Workspaces"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Workspaces"
 
 
+static const char* kDeskbarItemName = "workspaces";
 static const char* kSignature = "application/x-vnd.Be-WORK";
+static const char* kDeskbarSignature = "application/x-vnd.Be-TSKB";
 static const char* kScreenPrefletSignature = "application/x-vnd.Haiku-Screen";
 static const char* kOldSettingFile = "Workspace_data";
 static const char* kSettingsFile = "Workspaces_settings";
@@ -50,9 +53,11 @@ static const uint32 kMsgToggleTitle = 'tgTt';
 static const uint32 kMsgToggleBorder = 'tgBd';
 static const uint32 kMsgToggleAutoRaise = 'tgAR';
 static const uint32 kMsgToggleAlwaysOnTop = 'tgAT';
+static const uint32 kMsgToggleLiveInDeskbar = 'tgDb';
 
 static const float kScreenBorderOffset = 10.0;
 
+extern "C" _EXPORT BView* instantiate_deskbar_item();
 
 class WorkspacesSettings {
 	public:
@@ -89,7 +94,7 @@ class WorkspacesSettings {
 
 class WorkspacesView : public BView {
 	public:
-		WorkspacesView(BRect frame);
+		WorkspacesView(BRect frame, bool showDragger);
 		WorkspacesView(BMessage* archive);
 		~WorkspacesView();
 
@@ -331,19 +336,21 @@ WorkspacesSettings::SetWindowFrame(BRect frame)
 //	#pragma mark -
 
 
-WorkspacesView::WorkspacesView(BRect frame)
+WorkspacesView::WorkspacesView(BRect frame, bool showDragger=true)
 	:
-	BView(frame, "workspaces", B_FOLLOW_ALL,
+	BView(frame, kDeskbarItemName, B_FOLLOW_ALL,
 		kWorkspacesViewFlag | B_FRAME_EVENTS),
 	fParentWhichDrawsOnChildren(NULL),
 	fCurrentFrame(frame)
 {
-	frame.OffsetTo(B_ORIGIN);
-	frame.top = frame.bottom - 7;
-	frame.left = frame.right - 7;
-	BDragger* dragger = new BDragger(frame, this,
-		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	AddChild(dragger);
+	if(showDragger) {
+		frame.OffsetTo(B_ORIGIN);
+		frame.top = frame.bottom - 7;
+		frame.left = frame.right - 7;
+		BDragger* dragger = new BDragger(frame, this,
+			B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+		AddChild(dragger);
+	}
 }
 
 
@@ -393,27 +400,31 @@ WorkspacesView::Archive(BMessage* archive, bool deep) const
 void
 WorkspacesView::_AboutRequested()
 {
-	BString text = B_TRANSLATE("Workspaces\n"
-		"written by %1, and %2.\n\n"
-		"Copyright %3, Haiku.\n\n"
-		"Send windows behind using the Option key. "
-		"Move windows to front using the Control key.\n");
-	text.ReplaceFirst("%1", "François Revol, Axel Dörfler");
-	text.ReplaceFirst("%2", "Matt Madia");
-	text.ReplaceFirst("%3", "2002-2008");
-		
-	BAlert *alert = new BAlert("about", text.String(), B_TRANSLATE("OK"));
-	BTextView *view = alert->TextView();
-	BFont font;
+	BAboutWindow* window = new BAboutWindow(
+		B_TRANSLATE_SYSTEM_NAME("Workspaces"), kSignature);
 
-	view->SetStylable(true);
+	const char* authors[] = {
+		"Axel Dörfler",
+		"Oliver \"Madison\" Kohl",
+		"Matt Madia",
+		"François Revol",
+		NULL
+	};
 
-	view->GetFont(&font);
-	font.SetSize(18);
-	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, 10, &font);
+	const char* extraCopyrights[] = {
+		"2002 François Revol",
+		NULL
+	};
 
-	alert->Go();
+	const char* extraInfo = "Send windows behind using the Option key. "
+		"Move windows to front using the Control key.\n";
+
+	window->AddCopyright(2002, "Haiku, Inc.",
+			extraCopyrights);
+	window->AddAuthors(authors);
+	window->AddExtraInfo(extraInfo);
+
+	window->Show();
 }
 
 
@@ -498,6 +509,16 @@ WorkspacesView::MessageReceived(BMessage* message)
 			be_roster->Launch(kScreenPrefletSignature);
 			break;
 
+		case kMsgToggleLiveInDeskbar:
+		{
+			// only actually used from the replicant itself
+			// since HasItem() locks up we just remove directly.
+			BDeskbar deskbar;
+			// we shouldn't do this here actually, but it works for now...
+			deskbar.RemoveItem (kDeskbarItemName);
+			break;
+		}
+
 		default:
 			BView::MessageReceived(message);
 			break;
@@ -554,6 +575,7 @@ WorkspacesView::MouseDown(BPoint where)
 
 	WorkspacesWindow* window = dynamic_cast<WorkspacesWindow*>(Window());
 	if (window != NULL) {
+		// inside Workspaces app
 		BMenuItem* item;
 
 		menu->AddSeparatorItem();
@@ -576,6 +598,12 @@ WorkspacesView::MouseDown(BPoint where)
 			new BMessage(kMsgToggleAutoRaise)));
 		if (window->IsAutoRaising())
 			item->SetMarked(true);
+		if (be_roster->IsRunning(kDeskbarSignature)) {
+			menu->AddItem(item = new BMenuItem(B_TRANSLATE("Live in the Deskbar"),
+				new BMessage(kMsgToggleLiveInDeskbar)));
+			BDeskbar deskbar;
+			item->SetMarked(deskbar.HasItem(kDeskbarItemName));
+		}
 
 		menu->AddSeparatorItem();
 		menu->AddItem(new BMenuItem(B_TRANSLATE("About Workspaces" 
@@ -583,6 +611,25 @@ WorkspacesView::MouseDown(BPoint where)
 		menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"), 
 			new BMessage(B_QUIT_REQUESTED)));
 		menu->SetTargetForItems(window);
+	} else {
+		// we're replicated in some way...
+		BMenuItem* item;
+
+		menu->AddSeparatorItem();
+
+		// check which way
+		BDragger *dragger = dynamic_cast<BDragger*>(ChildAt(0));
+		if (dragger) {
+			// replicant
+			menu->AddItem(item = new BMenuItem(B_TRANSLATE("Remove replicant"),
+				new BMessage(B_TRASH_TARGET)));
+			item->SetTarget(dragger);
+		} else {
+			// Deskbar item
+			menu->AddItem(item = new BMenuItem(B_TRANSLATE("Remove replicant"),
+				new BMessage(kMsgToggleLiveInDeskbar)));
+			item->SetTarget(this);
+		}
 	}
 
 	changeItem->SetTarget(this);
@@ -773,6 +820,19 @@ WorkspacesWindow::MessageReceived(BMessage *message)
 			break;
 		}
 
+		case kMsgToggleLiveInDeskbar:
+		{
+			BDeskbar deskbar;
+			if (deskbar.HasItem (kDeskbarItemName))
+				deskbar.RemoveItem (kDeskbarItemName);
+			else {
+				entry_ref ref;
+				be_roster->FindApp(kSignature, &ref);
+				deskbar.AddItem(&ref);
+			}
+			break;
+		}
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -830,15 +890,15 @@ void
 WorkspacesApp::Usage(const char *programName)
 {
 	printf(B_TRANSLATE("Usage: %s [options] [workspace]\n"
-		"where \"options\" is one of:\n"
-		"  --notitle\t\ttitle bar removed.  border and resize kept.\n"
-		"  --noborder\t\ttitle, border, and resize removed.\n"
+		"where \"options\" are:\n"
+		"  --notitle\t\ttitle bar removed, border and resize kept\n"
+		"  --noborder\t\ttitle, border, and resize removed\n"
 		"  --avoidfocus\t\tprevents the window from being the target of "
-		"keyboard events.\n"
+		"keyboard events\n"
 		"  --alwaysontop\t\tkeeps window on top\n"
 		"  --notmovable\t\twindow can't be moved around\n"
 		"  --autoraise\t\tauto-raise the workspace window when it's at the "
-		"screen corner\n"
+		"screen edge\n"
 		"  --help\t\tdisplay this help and exit\n"
 		"and \"workspace\" is the number of the Workspace to which to switch "
 		"(0-31)\n"),
@@ -901,6 +961,40 @@ WorkspacesApp::ArgvReceived(int32 argc, char **argv)
 				Quit();
 		}
 	}
+}
+
+
+BView* instantiate_deskbar_item()
+{
+	// Calculate the correct size of the Deskbar replicant first
+	
+	BScreen screen;
+	float screenWidth = screen.Frame().Width();
+	float screenHeight = screen.Frame().Height();
+	float aspectRatio = screenWidth / screenHeight;
+	uint32 columns, rows;
+	BPrivate::get_workspaces_layout(&columns, &rows);
+
+	// ╔═╤═╕ A Deskbar replicant can be 16px tall and 129px wide at most.
+	// ║ │ │ We use 1px for the top and left borders (shown as double)
+	// ╟─┼─┤ and divide the remainder equally. However, we keep in mind
+	// ║ │ │ that the actual width and height of each workspace is smaller
+	// ╙─┴─┘ by 1px, because of bottom/right borders (shown as single).
+	// When calculating workspace width, we must ensure that the assumed
+	// actual workspace height is not negative. Zero is OK.
+
+	float height = 16;
+	float rowHeight = floor((height - 1) / rows);
+	if (rowHeight < 1)
+		rowHeight = 1;
+
+	float columnWidth = floor((rowHeight - 1) * aspectRatio) + 1;
+
+	float width = columnWidth * columns + 1;
+	if (width > 129)
+		width = 129;
+
+	return new WorkspacesView(BRect (0, 0, width - 1, height - 1), false);
 }
 
 

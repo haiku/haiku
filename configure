@@ -63,6 +63,8 @@ options:
                               as first option!]
   --use-gcc-pipe              Build with GCC option -pipe. Speeds up the build
                               process, but uses more memory.
+  --use-gcc-graphite          Build with GCC Graphite engine for loop
+                              optimizations. Only for gcc 4.
   --use-32bit                 Use -m32 flag on 64bit host gcc compiler.
   --use-xattr                 Use Linux xattr support for BeOS attribute
                               emulation. Warning: Make sure your file system
@@ -76,6 +78,7 @@ environment variables:
   HAIKU_OBJCOPY               The objcopy to be used. Defaults to "objcopy".
   HAIKU_RANLIB                The static library indexer. Defaults to "ranlib".
   HAIKU_YASM                  The yasm assembler (x86 only).
+  HAIKU_STRIP                 The strip command. Defaults to "strip".
   HAIKU_CPPFLAGS              The preprocessor flags. Defaults to "".
   HAIKU_CCFLAGS               The C flags. Defaults to "".
   HAIKU_CXXFLAGS              The C++ flags. Defaults to "".
@@ -155,6 +158,13 @@ standard_gcc_settings()
 
 	HAIKU_GCC_RAW_VERSION=`$HAIKU_CC -dumpversion`
 	HAIKU_GCC_MACHINE=`$HAIKU_CC -dumpmachine`
+	if [ "$HAIKU_USE_GCC_GRAPHITE" != 0 ]; then
+		UNUSED=`echo "int main() {}" | $HAIKU_CC -xc -c -floop-block - 2>&1`
+		if [ $? != 0 ]; then
+			echo "GCC Graphite loop optimizations cannot be used"
+			HAIKU_USE_GCC_GRAPHITE=0
+		fi
+	fi
 
 	HAIKU_GCC_LIB_DIR=${gccdir}
 	HAIKU_GCC_LIBGCC=${gccdir}/libgcc.a
@@ -173,6 +183,17 @@ standard_gcc_settings()
 			HAIKU_SHARED_LIBSTDCXX=`$HAIKU_CC -print-file-name=libstdc++.so`
 			HAIKU_STATIC_LIBSUPCXX=`$HAIKU_CC -print-file-name=libsupc++.a`
 			HAIKU_SHARED_LIBSUPCXX=`$HAIKU_CC -print-file-name=libsupc++.so`
+
+			# If the architecture has separate runtime libraries for the
+			# kernel, use them.
+			HAIKU_KERNEL_LIBGCC=`$HAIKU_CC -print-file-name=libgcc-kernel.a`
+			if [ $HAIKU_KERNEL_LIBGCC = libgcc-kernel.a ]; then
+				HAIKU_KERNEL_LIBGCC=$HAIKU_GCC_LIBGCC
+			fi
+			HAIKU_KERNEL_LIBSUPCXX=`$HAIKU_CC -print-file-name=libsupc++-kernel.a`
+			if [ $HAIKU_KERNEL_LIBSUPCXX = libsupc++-kernel.a ]; then
+				HAIKU_KERNEL_LIBSUPCXX=$HAIKU_STATIC_LIBSUPCXX
+			fi
 
 			local headers
 			if [ -d $gccdir/../../../../$HAIKU_GCC_MACHINE/include/c++/$HAIKU_GCC_RAW_VERSION ]; then
@@ -226,6 +247,21 @@ standard_gcc_settings()
 				echo "Please download it from www.haiku-os.org...";
 				exit 1;
 			fi
+
+			HAIKU_KERNEL_LIBGCC=$HAIKU_GCC_LIBGCC
+			HAIKU_KERNEL_LIBSUPCXX=
+		;;
+	esac
+
+	case $HAIKU_GCC_MACHINE in
+		x86_64-*)
+			# Boot loader is 32-bit, need the 32-bit libs.
+			HAIKU_BOOT_LIBGCC=`$HAIKU_CC -m32 -print-libgcc-file-name`
+			HAIKU_BOOT_LIBSUPCXX=`$HAIKU_CC -m32 -print-file-name=libsupc++.a`
+		;;
+		*)
+			HAIKU_BOOT_LIBGCC=$HAIKU_GCC_LIBGCC
+			HAIKU_BOOT_LIBSUPCXX=$HAIKU_STATIC_LIBSUPCXX
 		;;
 	esac
 }
@@ -304,6 +340,7 @@ HAIKU_ENABLE_MULTIUSER=0
 HAIKU_DISTRO_COMPATIBILITY=default
 TARGET_PLATFORM=haiku
 HAIKU_USE_GCC_PIPE=0
+HAIKU_USE_GCC_GRAPHITE=0
 HAIKU_HOST_USE_32BIT=0
 HAIKU_HOST_USE_XATTR=0
 HOST_GCC_LD=`gcc -print-prog-name=ld`
@@ -311,7 +348,7 @@ HOST_GCC_OBJCOPY=`gcc -print-prog-name=objcopy`
 SFDISK_BINARY=sfdisk
 HOST_SFDISK=$SFDISK_BINARY
 
-haikuRequiredLegacyGCCVersion="2.95.3-haiku-130425"
+haikuRequiredLegacyGCCVersion="2.95.3-haiku-130504"
 export haikuRequiredLegacyGCCVersion
 	# version of legacy gcc required to build haiku
 
@@ -320,7 +357,9 @@ set_default_value HAIKU_CC			gcc
 set_default_value HAIKU_LD			ld
 set_default_value HAIKU_OBJCOPY		objcopy
 set_default_value HAIKU_RANLIB		ranlib
+set_default_value HAIKU_ELFEDIT		elfedit
 set_default_value HAIKU_YASM		yasm
+set_default_value HAIKU_STRIP		strip
 set_default_value HAIKU_CPPFLAGS	""
 set_default_value HAIKU_CCFLAGS		""
 set_default_value HAIKU_CXXFLAGS	""
@@ -368,9 +407,9 @@ while [ $# -gt 0 ] ; do
 			buildCrossToolsScript="${buildCrossToolsScript}_gcc4"
 			case "$2" in
 				x86)	HAIKU_GCC_MACHINE=i586-pc-haiku;;
-				x86_64)	HAIKU_GCC_MACHINE=x86_64-pc-haiku; targetArch=x86_64;;
+				x86_64)	HAIKU_GCC_MACHINE=x86_64-unknown-haiku; targetArch=x86_64;;
 				ppc)	HAIKU_GCC_MACHINE=powerpc-apple-haiku; targetArch=ppc;;
-				m68k)	HAIKU_GCC_MACHINE=m68k-unknown-haiku; targetArch=m86k;;
+				m68k)	HAIKU_GCC_MACHINE=m68k-unknown-haiku; targetArch=m68k;;
 				arm)	HAIKU_GCC_MACHINE=arm-unknown-haiku; targetArch=arm;;
 				mipsel)	HAIKU_GCC_MACHINE=mipsel-unknown-haiku; targetArch=mips;;
 				*)		echo "Unsupported target architecture: $2"
@@ -406,6 +445,7 @@ while [ $# -gt 0 ] ; do
         -j*)				buildCrossToolsJobs="$1"; shift 1;;
 		--target=*)     TARGET_PLATFORM=`echo $1 | cut -d'=' -f2-`; shift 1;;
 		--use-gcc-pipe)	HAIKU_USE_GCC_PIPE=1; shift 1;;
+		--use-gcc-graphite)	HAIKU_USE_GCC_GRAPHITE=1; shift 1;;
 		--use-32bit)	HAIKU_HOST_USE_32BIT=1; shift 1;;
 		--use-xattr)	HAIKU_HOST_USE_XATTR=1; shift 1;;
 		*)				echo Invalid argument: \`$1\'; exit 1;;
@@ -447,15 +487,18 @@ for sfdiskDir in /sbin /usr/sbin /usr/local/sbin ; do
 	fi
 done
 
-# check for case-sensitive filesystem if on darwin
-if [ $HOST_PLATFORM = "darwin" ]; then
-	diskutil info $(pwd) | grep -i "case-sensitive" > /dev/null
-	if [ $? != 0 ]; then
-		echo "You need a case-sensitive file-system to build Haiku."
-		echo "Please see the following guide on how to set one up:"
-		echo "http://haiku-os.org/documents/dev/how_to_build_haiku_on_mac_os_x"
-		exit 1
+# check for case-sensitive filesystem
+mkdir haikuCaseTest 2>/dev/null
+mkdir haikucasetest 2>/dev/null
+caseInsensitive=$?
+rmdir haikuCaseTest haikucasetest 2>/dev/null
+if [ $caseInsensitive != 0 ]; then
+	echo "You need a case-sensitive file-system to build Haiku."
+	if [ $HOST_PLATFORM = "darwin" ]; then
+		echo "You can create a case-sensitive disk image using Disk Utility and use"
+		echo "it to store the Haiku sources on."
 	fi
+	exit 1
 fi
 
 # create output directory
@@ -463,6 +506,7 @@ mkdir -p "$buildOutputDir" || exit 1
 
 # build cross tools from sources
 if [ -n "$buildCrossTools" ]; then
+	export HAIKU_USE_GCC_GRAPHITE
 	"$buildCrossToolsScript" $buildCrossToolsMachine "$sourceDir" \
 		"$buildCrossTools" "$outputDir" $buildCrossToolsJobs || exit 1
 	crossToolsPrefix="$outputDir/cross-tools/bin/${HAIKU_GCC_MACHINE}-"
@@ -475,10 +519,20 @@ if [ -n "$crossToolsPrefix" ]; then
 	get_build_tool_path LD ld
 	get_build_tool_path OBJCOPY objcopy
 	get_build_tool_path RANLIB ranlib
+	get_build_tool_path STRIP strip
 fi
 
 # prepare gcc settings
 standard_gcc_settings
+
+# cross tools for gcc4 builds
+if [ -n "$crossToolsPrefix" ]; then
+	case $HAIKU_GCC_RAW_VERSION in
+		4.*)
+			get_build_tool_path ELFEDIT elfedit
+		;;
+	esac
+fi
 
 # check whether the Haiku compiler really targets Haiku or BeOS
 case "$HAIKU_GCC_MACHINE" in
@@ -508,6 +562,7 @@ HAIKU_INCLUDE_3RDPARTY				?= "${HAIKU_INCLUDE_3RDPARTY}" ;
 HAIKU_ENABLE_MULTIUSER				?= "${HAIKU_ENABLE_MULTIUSER}" ;
 HAIKU_DISTRO_COMPATIBILITY			?= "${HAIKU_DISTRO_COMPATIBILITY}" ;
 HAIKU_USE_GCC_PIPE					?= "${HAIKU_USE_GCC_PIPE}" ;
+HAIKU_USE_GCC_GRAPHITE				?= "${HAIKU_USE_GCC_GRAPHITE}" ;
 HAIKU_HOST_USE_32BIT				?= "${HAIKU_HOST_USE_32BIT}" ;
 HAIKU_HOST_USE_XATTR				?= "${HAIKU_HOST_USE_XATTR}" ;
 
@@ -523,6 +578,11 @@ HAIKU_STATIC_LIBSUPC++		?= ${HAIKU_STATIC_LIBSUPCXX} ;
 HAIKU_SHARED_LIBSUPC++		?= ${HAIKU_SHARED_LIBSUPCXX} ;
 HAIKU_C++_HEADERS_DIR		?= ${HAIKU_CXX_HEADERS_DIR} ;
 
+HAIKU_KERNEL_LIBGCC			?= ${HAIKU_KERNEL_LIBGCC} ;
+HAIKU_KERNEL_LIBSUPC++		?= ${HAIKU_KERNEL_LIBSUPCXX} ;
+HAIKU_BOOT_LIBGCC			?= ${HAIKU_BOOT_LIBGCC} ;
+HAIKU_BOOT_LIBSUPC++		?= ${HAIKU_BOOT_LIBSUPCXX} ;
+
 HAIKU_BUILD_ATTRIBUTES_DIR	?= ${HAIKU_BUILD_ATTRIBUTES_DIR} ;
 
 HAIKU_AR					?= ${HAIKU_AR} ;
@@ -530,10 +590,12 @@ HAIKU_CC					?= ${HAIKU_CC} ;
 HAIKU_LD					?= ${HAIKU_LD} ;
 HAIKU_OBJCOPY				?= ${HAIKU_OBJCOPY} ;
 HAIKU_RANLIB				?= ${HAIKU_RANLIB} ;
+HAIKU_ELFEDIT				?= ${HAIKU_ELFEDIT} ;
 HAIKU_YASM					?= ${HAIKU_YASM} ;
+HAIKU_STRIP					?= ${HAIKU_STRIP} ;
 HAIKU_CPPFLAGS				?= ${HAIKU_CPPFLAGS} ;
 HAIKU_CCFLAGS				?= ${HAIKU_CCFLAGS} ;
-HAIKU_CXXFLAGS				?= ${HAIKU_CXXFLAGS} ;
+HAIKU_C++FLAGS				?= ${HAIKU_CXXFLAGS} ;
 HAIKU_LDFLAGS				?= ${HAIKU_LDFLAGS} ;
 HAIKU_ARFLAGS				?= ${HAIKU_ARFLAGS} ;
 HAIKU_UNARFLAGS				?= ${HAIKU_UNARFLAGS} ;

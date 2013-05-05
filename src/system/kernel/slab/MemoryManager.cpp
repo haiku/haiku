@@ -22,7 +22,6 @@
 #include "kernel_debug_config.h"
 
 #include "ObjectCache.h"
-#include "slab_private.h"
 
 
 //#define TRACE_MEMORY_MANAGER
@@ -628,7 +627,7 @@ MemoryManager::AllocateRaw(size_t size, uint32 flags, void*& _pages)
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 			((flags & CACHE_DONT_WAIT_FOR_MEMORY) != 0
 					? CREATE_AREA_DONT_WAIT : 0)
-				| CREATE_AREA_DONT_CLEAR,
+				| CREATE_AREA_DONT_CLEAR, 0,
 			&virtualRestrictions, &physicalRestrictions, &_pages);
 
 		status_t result = area >= 0 ? B_OK : area;
@@ -849,15 +848,13 @@ MemoryManager::PerformMaintenance()
 			if (_AllocateArea(0, area) != B_OK)
 				return;
 
-			_push(sFreeAreas, area);
-			if (++sFreeAreaCount > 2)
+			_PushFreeArea(area);
+			if (sFreeAreaCount > 2)
 				sMaintenanceNeeded = true;
 		} else {
 			// free until we only have two free ones
-			while (sFreeAreaCount > 2) {
-				Area* area = _pop(sFreeAreas);
-				_FreeArea(area, true, 0);
-			}
+			while (sFreeAreaCount > 2)
+				_FreeArea(_PopFreeArea(), true, 0);
 
 			if (sFreeAreaCount == 0)
 				sMaintenanceNeeded = true;
@@ -956,8 +953,7 @@ MemoryManager::_AllocateChunks(size_t chunkSize, uint32 chunkCount,
 		return B_OK;
 
 	if (sFreeAreas != NULL) {
-		_AddArea(_pop(sFreeAreas));
-		sFreeAreaCount--;
+		_AddArea(_PopFreeArea());
 		_RequestMaintenance();
 
 		_GetChunks(metaChunkList, chunkSize, chunkCount, _metaChunk, _chunk);
@@ -1409,16 +1405,14 @@ MemoryManager::_FreeArea(Area* area, bool areaRemoved, uint32 flags)
 
 	// We want to keep one or two free areas as a reserve.
 	if (sFreeAreaCount <= 1) {
-		_push(sFreeAreas, area);
-		sFreeAreaCount++;
+		_PushFreeArea(area);
 		return;
 	}
 
 	if (area->vmArea == NULL || (flags & CACHE_DONT_LOCK_KERNEL_SPACE) != 0) {
 		// This is either early in the boot process or we aren't allowed to
 		// delete the area now.
-		_push(sFreeAreas, area);
-		sFreeAreaCount++;
+		_PushFreeArea(area);
 		_RequestMaintenance();
 		return;
 	}
@@ -1766,7 +1760,8 @@ MemoryManager::_CheckMetaChunk(MetaChunk* metaChunk)
 /*static*/ int
 MemoryManager::_DumpRawAllocations(int argc, char** argv)
 {
-	kprintf("area        meta chunk  chunk  base        size (KB)\n");
+	kprintf("%-*s    meta chunk  chunk  %-*s    size (KB)\n",
+		B_PRINTF_POINTER_WIDTH, "area", B_PRINTF_POINTER_WIDTH, "base");
 
 	size_t totalSize = 0;
 
@@ -1798,8 +1793,8 @@ MemoryManager::_DumpRawAllocations(int argc, char** argv)
 		}
 	}
 
-	kprintf("total:                                     %9" B_PRIuSIZE "\n",
-		totalSize / 1024);
+	kprintf("total:%*s%9" B_PRIuSIZE "\n", (2 * B_PRINTF_POINTER_WIDTH) + 21,
+		"", totalSize / 1024);
 
 	return 0;
 }
@@ -1976,7 +1971,8 @@ MemoryManager::_DumpArea(int argc, char** argv)
 /*static*/ int
 MemoryManager::_DumpAreas(int argc, char** argv)
 {
-	kprintf("      base        area   meta      small   medium  large\n");
+	kprintf("  %*s    %*s   meta      small   medium  large\n",
+		B_PRINTF_POINTER_WIDTH, "base", B_PRINTF_POINTER_WIDTH, "area");
 
 	size_t totalTotalSmall = 0;
 	size_t totalUsedSmall = 0;
@@ -2041,7 +2037,7 @@ MemoryManager::_DumpAreas(int argc, char** argv)
 	kprintf("  medium:   %" B_PRIuSIZE "/%" B_PRIuSIZE "\n", totalUsedMedium,
 		totalTotalMedium);
 	kprintf("  large:    %" B_PRIuSIZE "\n", totalUsedLarge);
-	kprintf("  memory:   %" B_PRIuSIZE "/%" B_PRIuSIZE " KB\n",
+	kprintf("  memory:   %" B_PRIuSIZE "/%" B_PRIu32 " KB\n",
 		(totalUsedSmall * SLAB_CHUNK_SIZE_SMALL
 			+ totalUsedMedium * SLAB_CHUNK_SIZE_MEDIUM
 			+ totalUsedLarge * SLAB_CHUNK_SIZE_LARGE) / 1024,

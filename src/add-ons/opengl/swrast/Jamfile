@@ -1,0 +1,34 @@
+SubDir HAIKU_TOP src add-ons opengl swrast ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os opengl ] : true ;
+		# We need our public GL headers also when not compiling for Haiku.
+}
+
+
+local defines = BEOS_THREADS GNU_ASSEMBLER ;
+SubDirC++Flags [ FDefines $(defines) ] ;
+
+local sources = MesaSoftwareRenderer.cpp ;
+
+UsePrivateHeaders interface ;
+SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
+Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) include ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa main ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi glapi ] ;
+
+AddResources Software\ Rasterizer : MesaSoftwareRenderer.rdef ;
+
+Addon Software\ Rasterizer :
+	MesaSoftwareRenderer.cpp
+	:
+	$(HAIKU_MESA_LIB)
+	$(HAIKU_GLSL_LIB)
+	libGL.so be $(TARGET_LIBSUPC++)
+;

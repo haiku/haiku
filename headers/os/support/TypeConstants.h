@@ -52,6 +52,7 @@ enum {
 	B_SIZE_T_TYPE					= 'SIZT',
 	B_SSIZE_T_TYPE					= 'SSZT',
 	B_STRING_TYPE					= 'CSTR',
+	B_STRING_LIST_TYPE				= 'STRL',
 	B_TIME_TYPE						= 'TIME',
 	B_UINT16_TYPE					= 'USHT',
 	B_UINT32_TYPE					= 'ULNG',

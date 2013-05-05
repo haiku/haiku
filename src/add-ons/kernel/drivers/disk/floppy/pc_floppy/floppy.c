@@ -345,7 +345,6 @@ static status_t
 flo_open(const char *name, uint32 flags, floppy_cookie **cookie)
 {
 	int i;
-	status_t err;
 	TRACE("open(%s)\n", name);
 	if (flags & O_NONBLOCK)
 		return EINVAL;
@@ -361,7 +360,7 @@ flo_open(const char *name, uint32 flags, floppy_cookie **cookie)
 	(*cookie)->flp = &(floppies[i]);
 	/* if we don't know yet if there's something in, check that */
 	if ((*cookie)->flp->status <= FLOP_MEDIA_CHANGED)
-		err = query_media((*cookie)->flp, false);
+		query_media((*cookie)->flp, false);
 	return B_OK;
 }
 

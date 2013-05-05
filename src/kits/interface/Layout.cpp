@@ -11,6 +11,7 @@
 #include <new>
 #include <syslog.h>
 
+#include <AutoDeleter.h>
 #include <LayoutContext.h>
 #include <Message.h>
 #include <View.h>
@@ -18,6 +19,8 @@
 
 #include "ViewLayoutItem.h"
 
+
+using BPrivate::AutoDeleter;
 
 using std::nothrow;
 using std::swap;
@@ -40,6 +43,14 @@ namespace {
 		= B_LAYOUT_INVALID | B_LAYOUT_IN_PROGRESS;
 
 	const char* const kLayoutItemField = "BLayout:items";
+
+
+	struct ViewRemover {
+		inline void operator()(BView* view) {
+			if (view)
+				BView::Private(view).RemoveSelf();
+		}
+	};
 }
 
 
@@ -121,14 +132,17 @@ BLayoutItem*
 BLayout::AddView(int32 index, BView* child)
 {
 	BLayoutItem* item = child->GetLayout();
-	if (!item)
+	ObjectDeleter<BLayoutItem> itemDeleter(NULL);
+	if (!item) {
 		item = new(nothrow) BViewLayoutItem(child);
+		itemDeleter.SetTo(item);
+	}
 
-	if (item && AddItem(index, item))
+	if (item && AddItem(index, item)) {
+		itemDeleter.Detach();
 		return item;
+	}
 
-	if (!child->GetLayout())
-		delete item;
 	return NULL;
 }
 
@@ -148,31 +162,35 @@ BLayout::AddItem(int32 index, BLayoutItem* item)
 
 	// if the item refers to a BView, we make sure it is added to the parent
 	// view
-	bool addedView = false;
 	BView* view = item->View();
-	if (view && view->fParent != fTarget
-		&& !(addedView = fTarget->_AddChild(view, NULL)))
-		return false;
+	AutoDeleter<BView, ViewRemover> remover(NULL);
+		// In case of errors, we don't want to leave this view added where it
+		// shouldn't be.
+	if (view && view->fParent != fTarget) {
+		if (!fTarget->_AddChild(view, NULL))
+			return false;
+		else
+			remover.SetTo(view);
+	}
 
 	// validate the index
 	if (index < 0 || index > fItems.CountItems())
 		index = fItems.CountItems();
 
-	if (fItems.AddItem(item, index) && ItemAdded(item, index)) {
-		item->SetLayout(this);
-		if (!fAncestorsVisible)
-			item->AncestorVisibilityChanged(fAncestorsVisible);
-		InvalidateLayout();
-		return true;
-	} else {
-		// this check is necessary so that if an addition somewhere other
-		// than the end of the list fails, we don't remove the wrong item
-		if (fItems.ItemAt(index) == item)
-			fItems.RemoveItem(index);
-		if (addedView)
-			view->_RemoveSelf();
+	if (!fItems.AddItem(item, index))
+		return false;
+
+	if (!ItemAdded(item, index)) {
+		fItems.RemoveItem(index);
 		return false;
 	}
+
+	item->SetLayout(this);
+	if (!fAncestorsVisible)
+		item->AncestorVisibilityChanged(fAncestorsVisible);
+	InvalidateLayout();
+	remover.Detach();
+	return true;
 }
 
 
@@ -182,15 +200,18 @@ BLayout::RemoveView(BView* child)
 	bool removed = false;
 
 	// a view can have any number of layout items - we need to remove them all
-	for (int32 i = fItems.CountItems(); i-- > 0;) {
+	int32 remaining = BView::Private(child).CountLayoutItems();
+	for (int32 i = CountItems() - 1; i >= 0 && remaining > 0; i--) {
 		BLayoutItem* item = ItemAt(i);
 
 		if (item->View() != child)
 			continue;
 
 		RemoveItem(i);
-		removed = true;
 		delete item;
+
+		remaining--;
+		removed = true;
 	}
 
 	return removed;
@@ -201,7 +222,7 @@ bool
 BLayout::RemoveItem(BLayoutItem* item)
 {
 	int32 index = IndexOfItem(item);
-	return (index >= 0 ? RemoveItem(index) : false);
+	return (index >= 0 ? RemoveItem(index) != NULL : false);
 }
 
 
@@ -212,17 +233,17 @@ BLayout::RemoveItem(int32 index)
 		return NULL;
 
 	BLayoutItem* item = (BLayoutItem*)fItems.RemoveItem(index);
-
-	// if the item refers to a BView, we make sure, it is removed from the
-	// parent view
-	BView* view = item->View();
-	if (view && view->fParent == fTarget)
-		view->_RemoveSelf();
-
 	ItemRemoved(item, index);
 	item->SetLayout(NULL);
-	InvalidateLayout();
 
+	// If this is the last item in use that refers to its BView,
+	// that BView now needs to be removed. UNLESS fTarget is NULL,
+	// in which case we leave the view as is. (See SetTarget() for more info)
+	BView* view = item->View();
+	if (fTarget && view && BView::Private(view).CountLayoutItems() == 0)
+		view->_RemoveSelf();
+
+	InvalidateLayout();
 	return item;
 }
 
@@ -254,14 +275,15 @@ BLayout::IndexOfView(BView* child) const
 	if (child == NULL)
 		return -1;
 
-	int itemCount = fItems.CountItems();
+	// A BView can have many items, so we just do our best and return the
+	// index of the first one in this layout.
+	BView::Private viewPrivate(child);
+	int32 itemCount = viewPrivate.CountLayoutItems();
 	for (int32 i = 0; i < itemCount; i++) {
-		BLayoutItem* item = (BLayoutItem*)fItems.ItemAt(i);
-		if (item->View() == child && (dynamic_cast<BViewLayoutItem*>(item)
-				|| dynamic_cast<BLayout*>(item)))
-			return i;
+		BLayoutItem* item = viewPrivate.LayoutItemAt(i);
+		if (item->Layout() == this)
+			return IndexOfItem(item);
 	}
-
 	return -1;
 }
 
@@ -279,33 +301,30 @@ BLayout::InvalidateLayout(bool children)
 	// printf("BLayout(%p)::InvalidateLayout(%i) : state %x, disabled %li\n",
 	// this, children, (unsigned int)fState, fInvalidationDisabled);
 
-	if (!InvalidationLegal())
+	if (fTarget && fTarget->IsLayoutInvalidationDisabled())
 		return;
+	if (fInvalidationDisabled > 0
+		|| (fState & B_LAYOUT_INVALIDATION_ILLEGAL) != 0) {
+		return;
+	}
 
 	fState |= B_LAYOUT_NECESSARY;
+	LayoutInvalidated(children);
 
 	if (children) {
 		for (int32 i = CountItems() - 1; i >= 0; i--)
 			ItemAt(i)->InvalidateLayout(children);
 	}
 
-	if (fOwner && BView::Private(fOwner).MinMaxValid())
+	if (fOwner)
 		fOwner->InvalidateLayout(children);
 
 	if (BLayout* nestedIn = Layout()) {
-		if (nestedIn->InvalidationLegal())
-			nestedIn->InvalidateLayout();
+		nestedIn->InvalidateLayout();
 	} else if (fOwner) {
 		// If we weren't added as a BLayoutItem, we still have to invalidate
 		// whatever layout our owner is in.
-		BView* ownerParent = fOwner->fParent;
-		if (ownerParent) {
-			BLayout* layout = ownerParent->GetLayout();
-			if (layout && layout->fNestedLayouts.CountItems() > 0)
-				layout->InvalidateLayoutsForView(fOwner);
-			else if (BView::Private(ownerParent).MinMaxValid())
-				ownerParent->InvalidateLayout(false);
-		}
+		fOwner->_InvalidateParentLayout();
 	}
 }
 
@@ -366,7 +385,6 @@ BLayout::Relayout(bool immediate)
 }
 
 
-
 void
 BLayout::_LayoutWithinContext(bool force, BLayoutContext* context)
 {
@@ -385,7 +403,7 @@ BLayout::_LayoutWithinContext(bool force, BLayoutContext* context)
 		fOwner->_Layout(force, context);
 	} else {
 		fState |= B_LAYOUT_IN_PROGRESS;
-		DerivedLayoutItems();
+		DoLayout();
 		// we must ensure that all items are laid out, layouts with a view will
 		// have their layout process triggered by their view, but nested
 		// view-less layouts must have their layout triggered here (if it hasn't
@@ -438,6 +456,13 @@ BLayout::Archive(BMessage* into, bool deep) const
 
 
 status_t
+BLayout::AllArchived(BMessage* archive) const
+{
+	return BLayoutItem::AllArchived(archive);
+}
+
+
+status_t
 BLayout::AllUnarchived(const BMessage* from)
 {
 	BUnarchiver unarchiver(from);
@@ -445,7 +470,7 @@ BLayout::AllUnarchived(const BMessage* from)
 	if (err != B_OK)
 		return err;
 
-	int32 itemCount;
+	int32 itemCount = 0;
 	unarchiver.ArchiveMessage()->GetInfo(kLayoutItemField, NULL, &itemCount);
 	for (int32 i = 0; i < itemCount && err == B_OK; i++) {
 		BLayoutItem* item;
@@ -498,6 +523,12 @@ BLayout::ItemAdded(BLayoutItem* item, int32 atIndex)
 
 void
 BLayout::ItemRemoved(BLayoutItem* item, int32 fromIndex)
+{
+}
+
+
+void
+BLayout::LayoutInvalidated(bool children)
 {
 }
 
@@ -564,51 +595,6 @@ BLayout::LayoutContext() const
 }
 
 
-bool
-BLayout::RemoveViewRecursive(BView* view)
-{
-	bool removed = RemoveView(view);
-	for (int32 i = fNestedLayouts.CountItems() - 1; i >= 0; i--) {
-		BLayout* nested = (BLayout*)fNestedLayouts.ItemAt(i);
-		removed |= nested->RemoveViewRecursive(view);
-	}
-	return removed;
-}
-
-
-bool
-BLayout::InvalidateLayoutsForView(BView* view)
-{
-	bool found = false;
-	for (int32 i = fNestedLayouts.CountItems() - 1; i >= 0; i--) {
-		BLayout* layout = (BLayout*)fNestedLayouts.ItemAt(i);
-		found |= layout->InvalidateLayoutsForView(view);
-	}
-
-	if (found)
-		return found;
-
-	if (!InvalidationLegal())
-		return false;
-
-	for (int32 i = CountItems() - 1; i >= 0; i--) {
-		if (ItemAt(i)->View() == view) {
-			InvalidateLayout();
-			return true;
-		}
-	}
-	return found;
-}
-
-
-bool
-BLayout::InvalidationLegal()
-{
-	return fInvalidationDisabled <= 0
-		&& (fState & B_LAYOUT_INVALIDATION_ILLEGAL) == 0;
-}
-
-
 void
 BLayout::SetOwner(BView* owner)
 {
@@ -627,8 +613,10 @@ void
 BLayout::SetTarget(BView* target)
 {
 	if (fTarget != target) {
+		/* With fTarget NULL, RemoveItem() will not remove the views from their
+		 * parent. This ensures that the views are not lost to the void.
+		 */
 		fTarget = NULL;
-			// only remove items, not views
 
 		// remove and delete all items
 		for (int32 i = CountItems() - 1; i >= 0; i--)
@@ -639,3 +627,26 @@ BLayout::SetTarget(BView* target)
 		InvalidateLayout();
 	}
 }
+
+
+// Binary compatibility stuff
+
+
+status_t
+BLayout::Perform(perform_code code, void* _data)
+{
+	return BLayoutItem::Perform(code, _data);
+}
+
+
+void BLayout::_ReservedLayout1() {}
+void BLayout::_ReservedLayout2() {}
+void BLayout::_ReservedLayout3() {}
+void BLayout::_ReservedLayout4() {}
+void BLayout::_ReservedLayout5() {}
+void BLayout::_ReservedLayout6() {}
+void BLayout::_ReservedLayout7() {}
+void BLayout::_ReservedLayout8() {}
+void BLayout::_ReservedLayout9() {}
+void BLayout::_ReservedLayout10() {}
+

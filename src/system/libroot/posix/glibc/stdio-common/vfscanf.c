@@ -605,12 +605,12 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	{
 	  /* Eat whitespace.  */
 	  int save_errno = errno;
-	  errno = 0;
+	  __set_errno(0);
 	  do
 	    if (inchar () == EOF && errno == EINTR)
 	      input_error ();
 	  while (ISSPACE (c));
-	  errno = save_errno;
+	  __set_errno(save_errno);
 	  ungetc (c, s);
 	  skip_space = 0;
 	}

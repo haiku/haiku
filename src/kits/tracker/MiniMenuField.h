@@ -31,20 +31,20 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef __MINI_MENU_FIELD__
 #define __MINI_MENU_FIELD__
 
+
 #include <View.h>
+
 
 class BPopUpMenu;
 
 namespace BPrivate {
 
-
 class MiniMenuField : public BView {
 public:
-	MiniMenuField(BRect frame, const char *name, BPopUpMenu *menu,
+	MiniMenuField(BRect frame, const char* name, BPopUpMenu* menu,
 		uint32 resizeFlags = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 		uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 	// ToDo:
@@ -57,14 +57,14 @@ protected:
 	virtual void Draw(BRect);
 	virtual void MouseDown(BPoint );
 	virtual	void MakeFocus(bool);
-	virtual	void KeyDown(const char *, int32);
+	virtual	void KeyDown(const char*, int32);
 
 private:
-	BPopUpMenu *fMenu;
+	BPopUpMenu* fMenu;
 };
 
 } // namespace BPrivate
 
 using namespace BPrivate;
 
-#endif
+#endif	// __MINI_MENU_FIELD__

@@ -1,3 +1,4 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network via_rhine dev ;
 
 SubInclude HAIKU_TOP src add-ons kernel drivers network via_rhine dev mii ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network via_rhine dev vr ;

@@ -2,22 +2,24 @@ SubDir HAIKU_TOP src kits locale ;
 
 AddSubDirSupportedPlatforms libbe_test ;
 
-UsePrivateHeaders libbe locale shared ;
+UsePrivateHeaders locale shared ;
 UsePublicHeaders locale storage ;
 
 local sources =
 	cat.cpp
 	Catalog.cpp
+	CatalogData.cpp
 	Collator.cpp
 	Country.cpp
 	DefaultCatalog.cpp
+	EditableCatalog.cpp
 	FormattingConventions.cpp
 	HashMapCatalog.cpp
+	InitLocaleKit.cpp
 	Language.cpp
-	LibbeLocaleBackend.cpp
-	LibraryInit.cpp
 	Locale.cpp
 	LocaleRoster.cpp
+	LocaleRosterData.cpp
 	MutableLocaleRoster.cpp
 	TimeZone.cpp
 
@@ -28,7 +30,7 @@ local sources =
 	TimeFormat.cpp
 	TimeUnitFormat.cpp
 	Format.cpp # Used by some of the above.
-	UnicodeChar.cpp # Already used in ReadOnlyBootPrompt.
+	UnicodeChar.cpp # Already used in FirstBootPrompt.
 
 	# old, needs investigation
 	# Currency.cpp
@@ -52,37 +54,10 @@ Includes [ FGristFiles $(sources) ] : $(HAIKU_ICU_HEADERS_DEPENDENCY) ;
 	# Dependency needed to trigger downloading/unzipping the package before
 	# compiling the files.
 
-AddResources liblocale.so : CountryFlags.rdef LanguageFlags.rdef ;
-
-SharedLibrary liblocale.so
-	: $(sources)
-	: be $(TARGET_LIBSTDC++) $(HAIKU_ICU_LIBS)
+MergeObject <libbe>locale_kit.o :
+	$(sources)
 	;
 
 StaticLibrary liblocalestub.a
 	: CatalogStub.cpp
-	;
-
-SEARCH on [ FGristFiles AboutMenuItem.cpp ] += [ FDirName $(HAIKU_TOP) src kits shared ] ;
-SEARCH on [ FGristFiles AboutWindow.cpp ] += [ FDirName $(HAIKU_TOP) src kits shared ] ;
-SEARCH on [ FGristFiles ColorControl.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
-SEARCH on [ FGristFiles StringForSize.cpp ] += [ FDirName $(HAIKU_TOP) src kits shared ] ;
-SEARCH on [ FGristFiles TextView.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
-SEARCH on [ FGristFiles Dragger.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
-SEARCH on [ FGristFiles Menu.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
-SEARCH on [ FGristFiles PrintJob.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
-SEARCH on [ FGristFiles ZombieReplicantView.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
-
-DoCatalogs liblocale.so
-	: x-vnd.Haiku-libbe
-	:
-	AboutMenuItem.cpp
-	AboutWindow.cpp
-	ColorControl.cpp
-	Dragger.cpp
-	Menu.cpp
-	PrintJob.cpp
-	StringForSize.cpp
-	TextView.cpp
-	ZombieReplicantView.cpp
 	;

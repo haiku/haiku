@@ -203,7 +203,7 @@ bool KaxInternalBlock::AddFrame(const KaxTrackEntry & track, uint64 timecode, Da
 		return false;
 
 	if (lacing == LACING_XIPH)
-		// decide wether a new frame can be added or not
+		// decide whether a new frame can be added or not
 		// a frame in a lace is not efficient when the place necessary to code it in a lace is bigger 
 		// than the size of a simple Block. That means more than 6 bytes (4 in struct + 2 for EBML) to code the size
 		return (buffer.Size() < 6*0xFF);

@@ -177,7 +177,6 @@ BButton::Draw(BRect updateRect)
 	rgb_color buttonBgColor = tint_color(panelBgColor, B_LIGHTEN_1_TINT);
 	rgb_color lightColor;
 	rgb_color maxLightColor;
-	rgb_color maxShadowColor = tint_color(panelBgColor, B_DARKEN_MAX_TINT);
 
 	rgb_color dark1BorderColor;
 	rgb_color dark2BorderColor;
@@ -650,11 +649,11 @@ BButton::Perform(perform_code code, void* _data)
 			BButton::SetLayout(data->layout);
 			return B_OK;
 		}
-		case PERFORM_CODE_INVALIDATE_LAYOUT:
+		case PERFORM_CODE_LAYOUT_INVALIDATED:
 		{
-			perform_data_invalidate_layout* data
-				= (perform_data_invalidate_layout*)_data;
-			BButton::InvalidateLayout(data->descendants);
+			perform_data_layout_invalidated* data
+				= (perform_data_layout_invalidated*)_data;
+			BButton::LayoutInvalidated(data->descendants);
 			return B_OK;
 		}
 		case PERFORM_CODE_DO_LAYOUT:
@@ -665,16 +664,6 @@ BButton::Perform(perform_code code, void* _data)
 	}
 
 	return BControl::Perform(code, _data);
-}
-
-
-void
-BButton::InvalidateLayout(bool descendants)
-{
-	// invalidate cached preferred size
-	fPreferredSize.Set(-1, -1);
-
-	BControl::InvalidateLayout(descendants);
 }
 
 
@@ -699,6 +688,14 @@ BButton::PreferredSize()
 {
 	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(),
 		_ValidatePreferredSize());
+}
+
+
+void
+BButton::LayoutInvalidated(bool descendants)
+{
+	// invalidate cached preferred size
+	fPreferredSize.Set(-1, -1);
 }
 
 
@@ -783,4 +780,14 @@ BButton::_DrawFocusLine(float x, float y, float width, bool visible)
 	StrokeLine(BPoint(x, y + 1.0f), BPoint(x + width, y + 1.0f));
 }
 
+
+extern "C" void
+B_IF_GCC_2(InvalidateLayout__7BButtonb, _ZN7BButton16InvalidateLayoutEb)(
+	BView* view, bool descendants)
+{
+	perform_data_layout_invalidated data;
+	data.descendants = descendants;
+
+	view->Perform(PERFORM_CODE_LAYOUT_INVALIDATED, &data);
+}
 

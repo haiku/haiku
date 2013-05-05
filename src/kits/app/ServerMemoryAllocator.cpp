@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2012, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -131,6 +131,7 @@ status_t
 ServerMemoryAllocator::AreaAndBaseFor(area_id serverArea, area_id& _area,
 	uint8*& _base)
 {
+	// TODO: why not use a map?
 	for (int32 i = fAreas.CountItems(); i-- > 0;) {
 		area_mapping* mapping = (area_mapping*)fAreas.ItemAt(i);
 

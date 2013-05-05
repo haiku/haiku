@@ -1,18 +1,18 @@
-1	norwegian_bokmål	x-vnd.Haiku-DataTranslations	3820343452
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Et element kalt '%name' finnes allerede i oversettermappen! Skal den eksisterende oversetteren overskrives?
-Cancel	DataTranslations		Avbryt
-Could not install %s:\n%s	DataTranslations		Kunne ikke installere %s:\n%s
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DataTranslations	3820343452
 DataTranslations	System name		Formatoversetter
-DataTranslations - Error	DataTranslations		Formatoverstter - Feil
-DataTranslations - Note	DataTranslations		Formatoversetter - Notiser
-Info	DataTranslations		info
-Info:	DataTranslations		Info:
+Cancel	DataTranslations		Avbryt
 Name:	DataTranslations		Navn:
 Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Navn: %s \nVersjon: %ld.%ld.%ld\n\nInfo:\n%s\n\nSti:\n%s\n
-OK	DataTranslations		OK
-Overwrite	DataTranslations		Overskriv
-Path:	DataTranslations		Sti:
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Elementet '%name' ser ikke ut til å være en oversetter og vil ikke bli installert.
-The new translator has been installed successfully.	DataTranslations		Installasjonen av den nye oversetteren var vellykket.
+Could not install %s:\n%s	DataTranslations		Kunne ikke installere %s:\n%s
 Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Bruk dete kontrollpanelet for å sette standardvalg for oversettere som skal brukes når et program ikke spseifiserer andre innstillinger.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Et element kalt '%name' finnes allerede i oversettermappen! Skal den eksisterende oversetteren overskrives?
+DataTranslations - Note	DataTranslations		Formatoversetter - Notiser
+Overwrite	DataTranslations		Overskriv
+Info:	DataTranslations		Info:
+Info	DataTranslations		info
+Path:	DataTranslations		Sti:
+The new translator has been installed successfully.	DataTranslations		Installasjonen av den nye oversetteren var vellykket.
+DataTranslations - Error	DataTranslations		Formatoverstter - Feil
+OK	DataTranslations		OK
 Version:	DataTranslations		Versjon:

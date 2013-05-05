@@ -12,8 +12,6 @@
  *		ASIX AX88172/AX88772/AX88178 USB 2.0 Ethernet Driver
  *			(c) 2008 by S.Zharski, <imker@gmx.li>
  */
-
-
 #ifndef _USB_BECEEM_DEVICE_H_
 #define _USB_BECEEM_DEVICE_H_
 

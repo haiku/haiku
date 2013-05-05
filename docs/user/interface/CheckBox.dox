@@ -1,18 +1,22 @@
 /*
- * Copyright 2011, Haiku inc.
- * Distributed under the terms of the MIT Licence.
+ * Copyright 2011 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  *
- * Documentation by:
+ * Authors:
  *		Stephan Aßmus, superstippi@gmx.de
  *		Marc Flerackers, mflerackers@androme.be
  *		John Scipione, jscipione@gmail.com
+ *
  * Corresponds to:
- *		/trunk/headers/os/interface/CheckBox.h	 rev 42794
- *		/trunk/src/kits/interface/CheckBox.cpp	 rev 42794
+ *		headers/os/interface/CheckBox.h	 rev 42794
+ *		src/kits/interface/CheckBox.cpp	 rev 42794
  */
+
 
 /*!
 	\file CheckBox.h
+	\ingroup interface
+	\ingroup libbe
 	\brief Defines the BCheckBox class
 */
 
@@ -127,28 +131,6 @@
 
 
 /*!
-	\fn void BCheckBox::FrameMoved(BPoint newLocation)
-	\brief Hook method that gets called when the checkbox is moved.
-
-	\param newLocation The point that the top left corner of the frame
-		is moved to.
-
-	\sa BView::FrameMoved()
-*/
-
-
-/*!
-	\fn void BCheckBox::FrameResized(float width, float height)
-	\brief Hook method that gets called when the checkbox is resized.
-
-	\param width The new \a width of the checkbox.
-	\param height The new \a height of the checkbox.
-
-	\sa BView::FrameResized()
-*/
-
-
-/*!
 	\fn void BCheckBox::GetPreferredSize(float* _width, float* _height)
 	\brief Fill out the preferred width and height of the checkbox
 		into the \a _width and \a _height parameters.
@@ -161,64 +143,6 @@
 
 
 /*!
-	\fn void BCheckBox::ResizeToPreferred()
-	\brief Resize the checkbox to its preferred size.
-
-	\sa BView::ResizeToPreferred()
-*/
-
-
-/*!
-	\fn void BCheckBox::InvalidateLayout(bool descendants)
-	\brief \brief Redraws the checkbox.
-
-	\param descendants Redraw child views as well.
-
-	\sa BLayout::InvalidateLayout()
-*/
-
-
-/*!
-	\fn BSize BCheckBox::MinSize()
-	\brief Get the minimum size of the checkbox.
-
-	\return The minimum size of the checkbox as a BSize.
-
-	\sa BAbstractLayout::MinSize()
-*/
-
-
-/*!
-	\fn BSize BCheckBox::MaxSize()
-	\brief Get the maximum size of the checkbox.
-
-	\return The maximum size of the checkbox as a BSize.
-
-	\sa BAbstractLayout::MaxSize()
-*/
-
-
-/*!
-	\fn BSize BCheckBox::PreferredSize()
-	\brief Get the preferred size of the checkbox.
-
-	\return The preferred size of the checkbox as a BSize.
-
-	\sa BAbstractLayout::PreferredSize()
-*/
-
-
-/*!
-	\fn void BCheckBox::MakeFocus(bool focused)
-	\brief Gives or removes focus from the checkbox.
-
-	\param focused \a true to set focus, \a false to remove it.
-
-	\sa BControl::MakeFocus()
-*/
-
-
-/*!
 	\fn void BCheckBox::SetValue(int32 value)
 	\brief Turn the checkbox on or off.
 
@@ -226,14 +150,4 @@
 		either \c B_CONTROL_ON or \c B_CONTROL_OFF.
 
 	\sa BControl::SetValue()
-*/
-
-
-/*!
-	\fn status_t BCheckBox::Invoke(BMessage *message)
-	\brief Tells the messenger to send a message.
-
-	\param message The \a message to send.
-
-	\sa BInvoker::Invoke()
 */

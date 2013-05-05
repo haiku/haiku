@@ -19,8 +19,8 @@
 
 #include "CenterContainer.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Config Views"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Config Views"
 
 
 // FiltersConfigView
@@ -460,8 +460,11 @@ FiltersConfigView::MessageReceived(BMessage *msg)
 
 			MailAddonSettings* mailSettings = _GetCurrentMailSettings();
 			if (!mailSettings->MoveFilterSettings(from, to)) {
-				(new BAlert("E-mail", B_TRANSLATE("The filter could not be "
-					"moved. Deleting filter."), B_TRANSLATE("OK")))->Go();
+				BAlert* alert = new BAlert("E-mail",
+					B_TRANSLATE("The filter could not be moved. Deleting "
+					"filter."), B_TRANSLATE("OK"));
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+				alert->Go();
 				fListView->RemoveItem(to);
 				break;
 			}    

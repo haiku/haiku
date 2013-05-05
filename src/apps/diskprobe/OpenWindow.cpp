@@ -13,7 +13,7 @@
 #include <Directory.h>
 #include <Entry.h>
 #include <GroupLayout.h>
-#include <GridLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -24,8 +24,8 @@
 #include "DiskProbe.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "OpenWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "OpenWindow"
 
 static const uint32 kMsgProbeFile = 'prDv';
 static const uint32 kMsgProbeDevice = 'prFl';
@@ -58,12 +58,15 @@ OpenWindow::OpenWindow()
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
-	AddChild(BGridLayoutBuilder(8, 8)
-		.Add(field, 0, 0, 3)
-		.Add(cancelButton, 0, 1)
-		.Add(probeFileButton, 1, 1)
-		.Add(probeDeviceButton, 2, 1)
-		.SetInsets(8, 8, 8, 8)
+	AddChild(BLayoutBuilder::Group<>(B_VERTICAL, B_USE_SMALL_SPACING)
+		.Add(field)
+		.AddGroup(B_HORIZONTAL)
+			.Add(cancelButton)
+			.Add(probeFileButton)
+			.AddGlue()
+			.Add(probeDeviceButton)
+			.End()
+		.SetInsets(B_USE_DEFAULT_SPACING)
 	);
 
 	CenterOnScreen();

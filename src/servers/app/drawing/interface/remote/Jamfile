@@ -1,0 +1,30 @@
+SubDir HAIKU_TOP src servers app drawing interface remote ;
+
+UseLibraryHeaders agg ;
+UsePrivateHeaders app graphics interface kernel shared ;
+UsePrivateHeaders [ FDirName graphics common ] ;
+UsePrivateSystemHeaders ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app font ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter font_support ] ;
+UseHeaders $(HAIKU_FREETYPE_HEADERS) : true ;
+
+Includes [ FGristFiles RemoteDrawingEngine.cpp RemoteMessage.cpp
+	RemoteHWInterface.cpp ]
+	: $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
+
+StaticLibrary libasremote.a :
+	NetReceiver.cpp
+	NetSender.cpp
+
+	RemoteDrawingEngine.cpp
+	RemoteEventStream.cpp
+	RemoteHWInterface.cpp
+	RemoteMessage.cpp
+
+	StreamingRingBuffer.cpp
+;

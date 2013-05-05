@@ -96,6 +96,12 @@ fi
 # We must wait for the app_server and registrar to be ready
 launch $SERVERS/registrar _roster_thread_	# launch registrar
 
+# If app_server doesn't exist, just run consoled.
+if [ ! -f "/boot/$SERVERS/app_server" ]; then
+	/bin/consoled
+	exit
+fi
+
 launch $SERVERS/debug_server				# launch debug_server
 
 launch $SERVERS/package_daemon
@@ -105,7 +111,7 @@ if [ "$SAFEMODE" != "yes" ]; then
 	launch $SERVERS/net_server				# launch net_server
 fi
 
-launch $SERVERS/app_server picasso		# launch app_server
+launch $SERVERS/app_server picasso			# launch app_server
 
 if [ "$SAFEMODE" != "yes" ]; then
 	launch $SERVERS/syslog_daemon
@@ -113,14 +119,15 @@ if [ "$SAFEMODE" != "yes" ]; then
 fi
 
 # Now ask the user if he wants to run the Installer or continue to the Desktop.
-if [ "$isReadOnly" = "yes" ]; then
-	# Create Installer link (using the write overlay)
-	ln -sf /boot/system/apps/Installer /boot/home/Desktop/Installer
-
-	/bin/ReadOnlyBootPrompt
+localeSettings=/boot/home/config/settings/Locale\ settings
+if [ "$isReadOnly" = "yes" -o ! -e "$localeSettings" ]; then
+	/bin/FirstBootPrompt
 	if [ $? -eq 0 ]; then
 		launchscript $SCRIPTS/Bootscript.cd
 		exit 0 # and return
+	elif [ "$isReadOnly" = "yes" ] ; then
+		# Create Installer link (using the write overlay)
+		ln -sf /boot/system/apps/Installer /boot/home/Desktop/Installer
 	fi
 fi
 
@@ -185,8 +192,8 @@ if [ "$SAFEMODE" != "yes" ]; then
 fi
 
 # Check for fresh install and run post install scripts.
-postInstallDir=boot/post_install
 freshInstallIndicator=/boot/common/settings/fresh_install
+postInstallDir=boot/post_install
 if [ -e $freshInstallIndicator ]; then
 	# wait a moment for things to calm down a bit
 	sleep 3

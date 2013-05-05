@@ -1,0 +1,28 @@
+SubDir HAIKU_TOP src bin writembr ;
+
+UsePrivateHeaders shared storage ;
+
+Application writembr :
+	writembr.cpp
+
+	: be $(TARGET_LIBSUPC+++) $(TARGET_LIBSTDC++)
+;
+
+# Assemble the MBR code, and convert it into a header file
+
+rule AssembleYasmBin object : source
+{
+	SEARCH on $(source) = $(SUBDIR) ;
+	MakeLocateDebug $(object) ;
+	Depends $(object) : $(source) ;
+}
+
+actions AssembleYasmBin
+{
+	$(HAIKU_YASM) -f bin -O5 -o $(1) $(2)
+}
+
+AssembleYasmBin [ FGristFiles mbr.bin ] : mbr.S ;
+
+DataFileToSourceFile [ FGristFiles MBR.h ] : [ FGristFiles mbr.bin ]
+	: kMBR : kMBRSize ;

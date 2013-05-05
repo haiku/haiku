@@ -1,5 +1,6 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -15,7 +16,9 @@
 
 #include "Architecture.h"
 #include "CpuState.h"
+#include "GuiSettingsUtils.h"
 #include "Register.h"
+#include "UiUtils.h"
 
 
 // #pragma mark - RegisterValueColumn
@@ -37,7 +40,7 @@ protected:
 	{
 		char buffer[64];
 		return StringTableColumn::PrepareField(
-			BVariant(_ToString(value, buffer, sizeof(buffer)),
+			BVariant(UiUtils::VariantToString(value, buffer, sizeof(buffer)),
 				B_VARIANT_DONT_COPY_DATA));
 	}
 
@@ -51,9 +54,11 @@ protected:
 			char bufferA[64];
 			char bufferB[64];
 			return StringTableColumn::CompareValues(
-				BVariant(_ToString(a, bufferA, sizeof(bufferA)),
+				BVariant(UiUtils::VariantToString(a, bufferA,
+						sizeof(bufferA)),
 					B_VARIANT_DONT_COPY_DATA),
-				BVariant(_ToString(b, bufferB, sizeof(bufferB)),
+				BVariant(UiUtils::VariantToString(b, bufferB,
+						sizeof(bufferB)),
 					B_VARIANT_DONT_COPY_DATA));
 		}
 
@@ -70,40 +75,6 @@ protected:
 		uint64 valueA = a.ToUInt64();
 		uint64 valueB = b.ToUInt64();
 		return valueA < valueB ? -1 : (valueA == valueB ? 0 : 1);
-	}
-
-private:
-	const char* _ToString(const BVariant& value, char* buffer,
-		size_t bufferSize) const
-	{
-		if (!value.IsNumber())
-			return value.ToString();
-
-		switch (value.Type()) {
-			case B_FLOAT_TYPE:
-			case B_DOUBLE_TYPE:
-				snprintf(buffer, bufferSize, "%g", value.ToDouble());
-				break;
-			case B_INT8_TYPE:
-			case B_UINT8_TYPE:
-				snprintf(buffer, bufferSize, "0x%02x", value.ToUInt8());
-				break;
-			case B_INT16_TYPE:
-			case B_UINT16_TYPE:
-				snprintf(buffer, bufferSize, "0x%04x", value.ToUInt16());
-				break;
-			case B_INT32_TYPE:
-			case B_UINT32_TYPE:
-				snprintf(buffer, bufferSize, "0x%08lx", value.ToUInt32());
-				break;
-			case B_INT64_TYPE:
-			case B_UINT64_TYPE:
-			default:
-				snprintf(buffer, bufferSize, "0x%016llx", value.ToUInt64());
-				break;
-		}
-
-		return buffer;
 	}
 };
 
@@ -223,6 +194,32 @@ RegistersView::SetCpuState(CpuState* cpuState)
 		fCpuState->AcquireReference();
 
 	fRegisterTableModel->SetCpuState(fCpuState);
+}
+
+
+void
+RegistersView::LoadSettings(const BMessage& settings)
+{
+	BMessage tableSettings;
+	if (settings.FindMessage("registerTable", &tableSettings) == B_OK) {
+		GuiSettingsUtils::UnarchiveTableSettings(tableSettings,
+			fRegisterTable);
+	}
+}
+
+
+status_t
+RegistersView::SaveSettings(BMessage& settings)
+{
+	settings.MakeEmpty();
+
+	BMessage tableSettings;
+	status_t result = GuiSettingsUtils::ArchiveTableSettings(tableSettings,
+		fRegisterTable);
+	if (result == B_OK)
+		result = settings.AddMessage("registerTable", &tableSettings);
+
+	return result;
 }
 
 

@@ -1,0 +1,15 @@
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "image/x-wpg";
+
+resource(2, "META:SNIFF_RULE") "0.5 (0xFF575043)";
+
+resource(3, "META:S:DESC") #'MSDC' "WPG image";
+
+resource(4, "META:L:DESC") #'MLDC' "WordPerfect Graphics image";
+
+resource(5, "META:EXTENS") message(234) {
+	"extensions" = "wpg",
+	"type" = "image/x-wpg",
+	"type" = "image/wpg"
+};

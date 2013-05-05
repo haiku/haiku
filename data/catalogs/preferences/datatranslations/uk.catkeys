@@ -1,18 +1,18 @@
 1	ukrainian	x-vnd.Haiku-DataTranslations	3820343452
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		 Елемент з назвою '%name' повністю присутній у папці Перетворювачів! Переписати існуючий Перетворювач?
-Cancel	DataTranslations		Відміна
-Could not install %s:\n%s	DataTranslations		Неможливо встановити %s:\n%s
 DataTranslations	System name		Перетворення даних
-DataTranslations - Error	DataTranslations		Перетворення даних - Помилка
-DataTranslations - Note	DataTranslations		Перетворення даних — Заувага
-Info	DataTranslations		інформація
-Info:	DataTranslations		Інформація:
+Cancel	DataTranslations		Відміна
 Name:	DataTranslations		І’мя:
 Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Ім'я: %s \nВерсія: %ld.%ld.%ld\n\nІнфо:\n%s\n\nШлях:\n%s\n
-OK	DataTranslations		Гаразд
-Overwrite	DataTranslations		Перезаписати
-Path:	DataTranslations		Шлях:
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Елемент '%name' не є перетворювачем і його не буде встановлено.
-The new translator has been installed successfully.	DataTranslations		Новий транслятор був успішно встановлений.
+Could not install %s:\n%s	DataTranslations		Неможливо встановити %s:\n%s
 Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Використовуйте цю панель для встановлення параметрів по замовчуванню для перетворювачів, особливо коли вони не визначені додатком.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		 Елемент з назвою '%name' повністю присутній у папці Перетворювачів! Переписати існуючий Перетворювач?
+DataTranslations - Note	DataTranslations		Перетворення даних — Заувага
+Overwrite	DataTranslations		Перезаписати
+Info:	DataTranslations		Інформація:
+Info	DataTranslations		інформація
+Path:	DataTranslations		Шлях:
+The new translator has been installed successfully.	DataTranslations		Новий транслятор був успішно встановлений.
+DataTranslations - Error	DataTranslations		Перетворення даних - Помилка
+OK	DataTranslations		Гаразд
 Version:	DataTranslations		Версія:

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2011, Haiku.
+ * Copyright 2001-2013, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -203,7 +203,7 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 			if ((modifiers & B_CONTROL_KEY) != 0)
 #endif
 			{
-				STRACE(("Set Workspace %ld\n", key - 1));
+				STRACE(("Set Workspace %" B_PRId32 "\n", key - 1));
 
 				fDesktop->SetWorkspaceAsync(key - B_F1_KEY, takeWindow);
 				return B_SKIP_MESSAGE;
@@ -1017,7 +1017,7 @@ Desktop::RemoveWorkspacesView(WorkspacesView* view)
 void
 Desktop::SelectWindow(Window* window)
 {
-	if (fSettings->MouseMode() == B_CLICK_TO_FOCUS_MOUSE) {
+	if (fSettings->ClickToFocusMouse()) {
 		// Only bring the window to front when it is not the window under the
 		// mouse pointer. This should result in sensible behaviour.
 		if (window != fWindowUnderMouse
@@ -1201,9 +1201,9 @@ Desktop::SendWindowBehind(Window* window, Window* behindOf, bool sendStack)
 	}
 
 	_UpdateFronts();
-	if (fSettings->MouseMode() == B_FOCUS_FOLLOWS_MOUSE)
+	if (fSettings->FocusFollowsMouse())
 		SetFocusWindow(WindowAt(fLastMousePosition));
-	else if (fSettings->MouseMode() == B_NORMAL_MOUSE)
+	else if (fSettings->NormalMouse())
 		SetFocusWindow(NULL);
 
 	bool sendFakeMouseMoved = false;
@@ -1357,21 +1357,30 @@ Desktop::MoveWindowBy(Window* window, float x, float y, int32 workspace)
 	AutoWriteLocker _(fWindowLock);
 
 	Window* topWindow = window->TopLayerStackWindow();
-	if (topWindow)
+	if (topWindow != NULL)
 		window = topWindow;
 
 	if (workspace == -1)
 		workspace = fCurrentWorkspace;
 	if (!window->IsVisible() || workspace != fCurrentWorkspace) {
 		if (workspace != fCurrentWorkspace) {
-			// move the window on another workspace - this doesn't change it's
-			// current position
-			if (window->Anchor(workspace).position == kInvalidWindowPosition)
-				window->Anchor(workspace).position = window->Frame().LeftTop();
+			WindowStack* stack = window->GetWindowStack();
+			if (stack != NULL) {
+				for (int32 s = 0; s < stack->CountWindows(); s++) {
+					Window* stackWindow = stack->WindowAt(s);
+					// move the window on another workspace - this doesn't
+					// change it's current position
+					if (stackWindow->Anchor(workspace).position
+						== kInvalidWindowPosition) {
+						stackWindow->Anchor(workspace).position
+							= stackWindow->Frame().LeftTop();
+					}
 
-			window->Anchor(workspace).position += BPoint(x, y);
-			window->SetCurrentWorkspace(workspace);
-			_WindowChanged(window);
+					stackWindow->Anchor(workspace).position += BPoint(x, y);
+					stackWindow->SetCurrentWorkspace(workspace);
+					_WindowChanged(stackWindow);
+				}
+			}
 		} else
 			window->MoveBy((int32)x, (int32)y);
 
@@ -1532,11 +1541,16 @@ Desktop::SetWindowWorkspaces(Window* window, uint32 workspaces)
 	if (window->IsNormal() && workspaces == B_CURRENT_WORKSPACE)
 		workspaces = workspace_to_workspaces(CurrentWorkspace());
 
-	uint32 oldWorkspaces = window->Workspaces();
+	WindowStack* stack = window->GetWindowStack();
+	if (stack != NULL) {
+		for (int32 s = 0; s < stack->CountWindows(); s++) {
+			window = stack->LayerOrder().ItemAt(s);
 
-	window->WorkspacesChanged(oldWorkspaces, workspaces);
-	_ChangeWindowWorkspaces(window, oldWorkspaces, workspaces);
-
+			uint32 oldWorkspaces = window->Workspaces();
+			window->WorkspacesChanged(oldWorkspaces, workspaces);
+			_ChangeWindowWorkspaces(window, oldWorkspaces, workspaces);
+		}
+	}
 	UnlockAllWindows();
 }
 
@@ -1854,24 +1868,24 @@ Desktop::KeyboardEventTarget()
 	is any window at all, that is.
 */
 void
-Desktop::SetFocusWindow(Window* focus)
+Desktop::SetFocusWindow(Window* nextFocus)
 {
 	if (!LockAllWindows())
 		return;
 
 	// test for B_LOCK_WINDOW_FOCUS
-	if (fLockedFocusWindow && focus != fLockedFocusWindow) {
+	if (fLockedFocusWindow && nextFocus != fLockedFocusWindow) {
 		UnlockAllWindows();
 		return;
 	}
 
-	bool hasModal = _WindowHasModal(focus);
+	bool hasModal = _WindowHasModal(nextFocus);
 	bool hasWindowScreen = false;
 
-	if (!hasModal && focus != NULL) {
+	if (!hasModal && nextFocus != NULL) {
 		// Check whether or not a window screen is in front of the window
 		// (if it has a modal, the right thing is done, anyway)
-		Window* window = focus;
+		Window* window = nextFocus;
 		while (true) {
 			window = window->NextWindow(fCurrentWorkspace);
 			if (window == NULL || window->Feel() == kWindowScreenFeel)
@@ -1881,35 +1895,38 @@ Desktop::SetFocusWindow(Window* focus)
 			hasWindowScreen = true;
 	}
 
-	if (focus == fFocus && focus != NULL && !focus->IsHidden()
-		&& (focus->Flags() & B_AVOID_FOCUS) == 0
+	if (nextFocus == fFocus && nextFocus != NULL && !nextFocus->IsHidden()
+		&& (nextFocus->Flags() & B_AVOID_FOCUS) == 0
 		&& !hasModal && !hasWindowScreen) {
 		// the window that is supposed to get focus already has focus
 		UnlockAllWindows();
 		return;
 	}
 
-	uint32 list = /*fCurrentWorkspace;
-	if (fSettings->FocusFollowsMouse())
-		list = */kFocusList;
+	uint32 list = fCurrentWorkspace;
+	if (!fSettings->NormalMouse())
+		list = kFocusList;
 
-	if (focus == NULL || hasModal || hasWindowScreen) {
-		/*if (!fSettings->FocusFollowsMouse())
-			focus = CurrentWindows().LastWindow();
-		else*/
-			focus = fFocusList.LastWindow();
+	if (nextFocus == NULL || hasModal || hasWindowScreen) {
+		nextFocus = _Windows(list).LastWindow();
+
+		if (fSettings->NormalMouse()) {
+			// If the last window having focus is a window that cannot make it
+			// to the front, we use that as the next focus
+			Window* lastFocus = fFocusList.LastWindow();
+			if (lastFocus != NULL && !lastFocus->SupportsFront()
+				&& _WindowCanHaveFocus(lastFocus)) {
+				nextFocus = lastFocus;
+			}
+		}
 	}
 
 	// make sure no window is chosen that doesn't want focus or cannot have it
-	while (focus != NULL
-		&& (!focus->InWorkspace(fCurrentWorkspace)
-			|| (focus->Flags() & B_AVOID_FOCUS) != 0
-			|| _WindowHasModal(focus)
-			|| focus->IsHidden())) {
-		focus = focus->PreviousWindow(list);
+	while (nextFocus != NULL && !_WindowCanHaveFocus(nextFocus)) {
+		nextFocus = nextFocus->PreviousWindow(list);
 	}
 
-	if (fFocus == focus) {
+	if (fFocus == nextFocus) {
 		// turns out the window that is supposed to get focus now already has it
 		UnlockAllWindows();
 		return;
@@ -1923,7 +1940,7 @@ Desktop::SetFocusWindow(Window* focus)
 		oldActiveApp = fFocus->ServerWindow()->App()->ClientTeam();
 	}
 
-	fFocus = focus;
+	fFocus = nextFocus;
 
 	if (fFocus != NULL) {
 		fFocus->SetFocus(true);
@@ -2640,8 +2657,8 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		}
 
 		default:
-			printf("Desktop %d:%s received unexpected code %ld\n", 0, "baron",
-				code);
+			printf("Desktop %d:%s received unexpected code %" B_PRId32 "\n", 0,
+				"baron", code);
 
 			if (link.NeedsReply()) {
 				// the client is now blocking and waiting for a reply!
@@ -2797,7 +2814,7 @@ Desktop::_UpdateFronts(bool updateFloating)
 
 
 bool
-Desktop::_WindowHasModal(Window* window)
+Desktop::_WindowHasModal(Window* window) const
 {
 	if (window == NULL)
 		return false;
@@ -2813,6 +2830,19 @@ Desktop::_WindowHasModal(Window* window)
 	}
 
 	return false;
+}
+
+
+/*!	Determines whether or not the specified \a window can have focus at all.
+*/
+bool
+Desktop::_WindowCanHaveFocus(Window* window) const
+{
+	return window != NULL
+		&& window->InWorkspace(fCurrentWorkspace)
+		&& (window->Flags() & B_AVOID_FOCUS) == 0
+		&& !_WindowHasModal(window)
+		&& !window->IsHidden();
 }
 
 
@@ -3366,8 +3396,8 @@ Desktop::_SetCurrentWorkspaceConfiguration()
 	if (status != B_OK) {
 		// The application having the direct screen lock didn't give it up in
 		// time, make it crash
-		syslog(LOG_ERR, "Team %ld did not give up its direct screen lock.\n",
-			fDirectScreenTeam);
+		syslog(LOG_ERR, "Team %" B_PRId32 " did not give up its direct screen "
+			"lock.\n", fDirectScreenTeam);
 
 		debug_thread(fDirectScreenTeam);
 		fDirectScreenTeam = -1;
@@ -3415,18 +3445,25 @@ Desktop::_SetWorkspace(int32 index, bool moveFocusWindow)
 				// But only normal windows are following
 				uint32 oldWorkspaces = movedWindow->Workspaces();
 
-				_Windows(previousIndex).RemoveWindow(movedWindow);
-				_Windows(index).AddWindow(movedWindow,
-					movedWindow->Frontmost(_Windows(index).FirstWindow(),
-					index));
+				WindowStack* stack = movedWindow->GetWindowStack();
+				if (stack != NULL) {
+					for (int32 s = 0; s < stack->CountWindows(); s++) {
+						Window* stackWindow = stack->LayerOrder().ItemAt(s);
 
+						_Windows(previousIndex).RemoveWindow(stackWindow);
+						_Windows(index).AddWindow(stackWindow,
+							stackWindow->Frontmost(
+								_Windows(index).FirstWindow(), index));
+
+						// send B_WORKSPACES_CHANGED message
+						stackWindow->WorkspacesChanged(oldWorkspaces,
+							stackWindow->Workspaces());
+					}
+				}
 				// TODO: subset windows will always flicker this way
 
 				movedMouseEventWindow = true;
 
-				// send B_WORKSPACES_CHANGED message
-				movedWindow->WorkspacesChanged(oldWorkspaces,
-					movedWindow->Workspaces());
 				NotifyWindowWorkspacesChanged(movedWindow,
 					movedWindow->Workspaces());
 			} else {

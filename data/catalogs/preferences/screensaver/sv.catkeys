@@ -1,29 +1,29 @@
 1	swedish	x-vnd.Haiku-ScreenSaver	215605989
-30 seconds	ScreenSaver		30 sekunder
-Add…	ScreenSaver		Lägg till...
-Blackness	ScreenSaver		Svärta
-Cancel	ScreenSaver		Avbryt
-Confirm password:	ScreenSaver		Bekräfta lösenord:
 Could not load screen saver	ScreenSaver		Kunde inte läsa in skärmsläckaren
-Display Power Management Signaling not available	ScreenSaver		Stöd för att sätta skärm i strömsparläge saknas
-Don't fade when	ScreenSaver		Tona inte ner när
-Done	ScreenSaver		Klar
-Enable screensaver	ScreenSaver		Aktivera skärmsläckare
-Fade now when	ScreenSaver		Tona ner när
-General	ScreenSaver		Allmänt
-No options available	ScreenSaver		Inga alternativ tillgängliga
-OK	ScreenSaver		OK
-Password Window	ScreenSaver		Lösenordsfönster
-Password lock	ScreenSaver		Lösenordsskydd
-Password:	ScreenSaver		Lösenord:
-Passwords don't match. Please try again.	ScreenSaver		Lösenorden stämmer inte överens. Vänligen försök igen.
-Password…	ScreenSaver		Lösenord...
-ScreenSaver	System name		Skärmsläckare
-Screensaver settings	ScreenSaver		Inställningar
-Screensavers	ScreenSaver		Skrämsläckare
+30 seconds	ScreenSaver		30 sekunder
 Start screensaver	ScreenSaver		Starta skärmsläckare
-Test	ScreenSaver		Testa
-Turn off screen	ScreenSaver		Stäng av skärmen
-Use custom password	ScreenSaver		Använd anpassat lösenord
-Use network password	ScreenSaver		Använd nätverkslösenordet
+Password…	ScreenSaver		Lösenord...
+Password:	ScreenSaver		Lösenord:
+Password lock	ScreenSaver		Lösenordsskydd
+Add…	ScreenSaver		Lägg till...
+Screensavers	ScreenSaver		Skrämsläckare
 mouse is here	ScreenSaver		muspekaren är här
+Display Power Management Signaling not available	ScreenSaver		Stöd för att sätta skärm i strömsparläge saknas
+ScreenSaver	System name		Skärmsläckare
+Test	ScreenSaver		Testa
+General	ScreenSaver		Allmänt
+Enable screensaver	ScreenSaver		Aktivera skärmsläckare
+Cancel	ScreenSaver		Avbryt
+Turn off screen	ScreenSaver		Stäng av skärmen
+No options available	ScreenSaver		Inga alternativ tillgängliga
+Password Window	ScreenSaver		Lösenordsfönster
+Fade now when	ScreenSaver		Tona ner när
+Screensaver settings	ScreenSaver		Inställningar
+Passwords don't match. Please try again.	ScreenSaver		Lösenorden stämmer inte överens. Vänligen försök igen.
+OK	ScreenSaver		OK
+Don't fade when	ScreenSaver		Tona inte ner när
+Blackness	ScreenSaver		Svärta
+Use custom password	ScreenSaver		Använd anpassat lösenord
+Done	ScreenSaver		Klar
+Confirm password:	ScreenSaver		Bekräfta lösenord:
+Use network password	ScreenSaver		Använd nätverkslösenordet

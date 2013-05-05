@@ -23,8 +23,8 @@
 #include <MailSettings.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "E-Mail"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "E-Mail"
 
 
 AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)

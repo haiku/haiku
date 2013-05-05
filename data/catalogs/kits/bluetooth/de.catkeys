@@ -1,88 +1,88 @@
 1	german	x-vnd.Haiku-Bluetooth	3550394259
-#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed# Ungültiger Name
-#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError# Ungültiger Name
-#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest# Ungültiger Name
-#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady# Ungültiger Name
-(reserved)	DeviceClass		(reserviert)
-1-17% utilized	DeviceClass		1-17% verwendet
-17-33% utilized	DeviceClass		17-33% verwendet
-33-50% utilized	DeviceClass		33-50% verwendet
-50-67% utilized	DeviceClass		50-67% verwendet
-67-83% utilized	DeviceClass		67-83% verwendet
-83-99% utilized	DeviceClass		83-99% verwendet
-Audio	DeviceClass		Audio
-Audio/Video	DeviceClass		Audio/Video
-Camcorder	DeviceClass		Camcorder
-Camera	DeviceClass		Kamera
-Capturing	DeviceClass		Erfassung
-Car audio	DeviceClass		Fahrzeug-Audiosystem
-Card reader	DeviceClass		Kartenleser
-Cellular	DeviceClass		Mobilfunk
-Combo keyboard/pointing device	DeviceClass		Tastatur-Maus-Kombination
-Common ISDN access	DeviceClass		Gemeisamer ISDN-Zugriff
-Computer	DeviceClass		Computer
-Controller	DeviceClass		Kontroller
-Cordless	DeviceClass		Schnurlos
-Desktop workstation	DeviceClass		Desktop-Arbeitsstation
-Device conforms to the headset profile	DeviceClass		Gerät ist konform zum Headset-Profil
-Digitizer tablet	DeviceClass		Grafiktablett
 Display	DeviceClass		Anzeige
-Doll/Action figure	DeviceClass		Puppe/Action-Figur
-Fully available	DeviceClass		Vollständig verfügbar
+Capturing	DeviceClass		Erfassung
+Printer	DeviceClass		Drucker
+Uncategorized	DeviceClass		Sonstiges
+1-17% utilized	DeviceClass		1-17% verwendet
+Positioning	DeviceClass		Positionierung
+Rendering	DeviceClass		Rendering
+Phone	DeviceClass		Telefon
+17-33% utilized	DeviceClass		17-33% verwendet
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady# Ungültiger Name
+Combo keyboard/pointing device	DeviceClass		Tastatur-Maus-Kombination
+Controller	DeviceClass		Kontroller
+No service available	DeviceClass		Kein Dienst verfügbar
+Wearable	DeviceClass	A wearable computer	Transportabler Computer
+Handheld	DeviceClass		Handheld
+Invalid device class!\n	DeviceClass		Ungültige Geräteklasse!\n
+Sensing device	DeviceClass		Wahrnehmungsgerät
+Computer	DeviceClass		Computer
+Cellular	DeviceClass		Mobilfunk
+Microphone	DeviceClass		Mikrofon
+Unknown (reserved) minor device class	DeviceClass		Unbekannte (reservierte) Geräteklasse
+Cordless	DeviceClass		Schnurlos
+Common ISDN access	DeviceClass		Gemeisamer ISDN-Zugriff
+83-99% utilized	DeviceClass		83-99% verwendet
+Scanner	DeviceClass		Scanner
 Game	DeviceClass		Spiel
 Gamepad	DeviceClass		Gamepad
-Gaming/Toy	DeviceClass		Spielen/Spielzeug
+(reserved)	DeviceClass		(reserviert)
+Desktop workstation	DeviceClass		Desktop-Arbeitsstation
+Audio/Video	DeviceClass		Audio/Video
 Glasses	DeviceClass		Brillen
-Handheld	DeviceClass		Handheld
-Hands-free	DeviceClass		Freisprecheinrichtung
-Headphones	DeviceClass		Kopfhörer
-Helmet	DeviceClass		Helm
-HiFi audio device	DeviceClass		HiFi-Audiogerät
-Imaging	DeviceClass		Bildbearbeitung
-Information	DeviceClass		Informationen
-Invalid device class!\n	DeviceClass		Ungültige Geräteklasse!\n
-Jacket	DeviceClass		Jacke
-Joystick	DeviceClass		Joystick
 Keyboard	DeviceClass		Tastatur
-LAN access	DeviceClass		LAN-Zugriff
-Laptop	DeviceClass		Laptop
-Loudspeaker	DeviceClass		Lautsprecher
+Camera	DeviceClass		Kamera
 Major class: 	DeviceClass		Hauptklasse:
-Microphone	DeviceClass		Mikrofon
-Minor class: 	DeviceClass		Unterklasse:
-Miscellaneous	DeviceClass		Verschiedenes
-Networking	DeviceClass		Netzwerk
-No service available	DeviceClass		Kein Dienst verfügbar
-Not implemented	RemoteDevice		Nicht implementiert
-Object transfer	DeviceClass		Objekt-Transfer
-Pager	DeviceClass	A small radio device to receive short text messages	Pager
-Palm	DeviceClass	A palm-held device	PDA
-Peripheral	DeviceClass		Peripheriegerät
-Phone	DeviceClass		Telefon
-Pointing device	DeviceClass		Zeigegerät
-Portable audio	DeviceClass		Tragbares Audiosystem
-Positioning	DeviceClass		Positionierung
-Printer	DeviceClass		Drucker
-Remote control	DeviceClass		Fernbedienung
-Rendering	DeviceClass		Rendering
-Robot	DeviceClass		Roboter
-SIM card reader	DeviceClass		SIM-Kartenleser
-Scanner	DeviceClass		Scanner
-Sensing device	DeviceClass		Wahrnehmungsgerät
-Server	DeviceClass		Server
-Service classes: 	DeviceClass		Dienstklassen:
+50-67% utilized	DeviceClass		50-67% verwendet
+Card reader	DeviceClass		Kartenleser
 Set-top box	DeviceClass		Set-Top-Box
+Helmet	DeviceClass		Helm
+Laptop	DeviceClass		Laptop
+Car audio	DeviceClass		Fahrzeug-Audiosystem
+SIM card reader	DeviceClass		SIM-Kartenleser
+Headphones	DeviceClass		Kopfhörer
+Information	DeviceClass		Informationen
+Remote control	DeviceClass		Fernbedienung
+Service classes: 	DeviceClass		Dienstklassen:
+Pager	DeviceClass	A small radio device to receive short text messages	Pager
+Object transfer	DeviceClass		Objekt-Transfer
+Gaming/Toy	DeviceClass		Spielen/Spielzeug
+Audio	DeviceClass		Audio
+Robot	DeviceClass		Roboter
+Camcorder	DeviceClass		Camcorder
+Digitizer tablet	DeviceClass		Grafiktablett
+Loudspeaker	DeviceClass		Lautsprecher
+Joystick	DeviceClass		Joystick
+LAN access	DeviceClass		LAN-Zugriff
+Wrist watch	DeviceClass		Armbanduhr
+Minor class: 	DeviceClass		Unterklasse:
+Networking	DeviceClass		Netzwerk
+Portable audio	DeviceClass		Tragbares Audiosystem
+Device conforms to the headset profile	DeviceClass		Gerät ist konform zum Headset-Profil
+Hands-free	DeviceClass		Freisprecheinrichtung
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed# Ungültiger Name
+Vehicle	DeviceClass		Fahrzeug
+Palm	DeviceClass	A palm-held device	PDA
+Video display and loudspeaker	DeviceClass		Videoanzeige und Lautsprecher
+Peripheral	DeviceClass		Peripheriegerät
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError# Ungültiger Name
+Wired modem or voice gateway	DeviceClass		Funkmodem oder Sprachzugang
+Jacket	DeviceClass		Jacke
+Unspecified	DeviceClass		Nicht angegeben
+Fully available	DeviceClass		Vollständig verfügbar
+67-83% utilized	DeviceClass		67-83% verwendet
+Not implemented	RemoteDevice		Nicht implementiert
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest# Ungültiger Name
+Server	DeviceClass		Server
+Video conferencing	DeviceClass		Videokonferenz
+Video camera	DeviceClass		Videokamera
+HiFi audio device	DeviceClass		HiFi-Audiogerät
 Smart phone	DeviceClass		Smartphone
 Telephony	DeviceClass		Telefonie
-Uncategorized	DeviceClass		Sonstiges
-Unknown (reserved) minor device class	DeviceClass		Unbekannte (reservierte) Geräteklasse
-Unspecified	DeviceClass		Nicht angegeben
+Doll/Action figure	DeviceClass		Puppe/Action-Figur
 VCR	DeviceClass		Videorecorder
-Vehicle	DeviceClass		Fahrzeug
-Video camera	DeviceClass		Videokamera
-Video conferencing	DeviceClass		Videokonferenz
-Video display and loudspeaker	DeviceClass		Videoanzeige und Lautsprecher
 Video monitor	DeviceClass		Videomonitor
-Wearable	DeviceClass	A wearable computer	Transportabler Computer
-Wired modem or voice gateway	DeviceClass		Funkmodem oder Sprachzugang
-Wrist watch	DeviceClass		Armbanduhr
+Pointing device	DeviceClass		Zeigegerät
+Miscellaneous	DeviceClass		Verschiedenes
+33-50% utilized	DeviceClass		33-50% verwendet
+Imaging	DeviceClass		Bildbearbeitung

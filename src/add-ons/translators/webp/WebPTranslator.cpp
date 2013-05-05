@@ -25,8 +25,8 @@
 #include "TranslatorSettings.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "WebPTranslator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "WebPTranslator"
 
 
 class FreeAllocation {

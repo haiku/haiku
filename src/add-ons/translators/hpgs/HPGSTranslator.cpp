@@ -18,8 +18,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "HPGSTranslator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "HPGSTranslator"
 
 
 typedef struct my_hpgs_png_image_st {

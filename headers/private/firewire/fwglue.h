@@ -41,7 +41,7 @@ typedef uint32_t bus_size_t;
 #define wakeup(i) release_sem_etc(i->Sem, 0, B_RELEASE_IF_WAITING_ONLY | B_RELEASE_ALL)
 
 #define splfw() 0
-#define splx(s) 
+#define splx(s) (void)s
 
 #define hz 1000000LL
 

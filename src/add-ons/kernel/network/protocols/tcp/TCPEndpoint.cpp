@@ -1703,7 +1703,11 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 
 	bool notify = false;
 
-	if ((buffer->size > 0 || (segment.flags & TCP_FLAG_FINISH) != 0)
+	// The buffer may be freed if its data is added to the queue, so cache
+	// the size as we still need it later.
+	uint32 bufferSize = buffer->size;
+
+	if ((bufferSize > 0 || (segment.flags & TCP_FLAG_FINISH) != 0)
 		&& _ShouldReceive())
 		notify = _AddData(segment, buffer);
 	else {
@@ -1757,7 +1761,7 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 	if (notify)
 		_NotifyReader();
 
-	if (buffer->size > 0 || (segment.flags & TCP_FLAG_SYNCHRONIZE) != 0)
+	if (bufferSize > 0 || (segment.flags & TCP_FLAG_SYNCHRONIZE) != 0)
 		action |= ACKNOWLEDGE;
 
 	_UpdateTimestamps(segment, segmentLength);
@@ -2326,45 +2330,50 @@ TCPEndpoint::Dump() const
 {
 	kprintf("TCP endpoint %p\n", this);
 	kprintf("  state: %s\n", name_for_state(fState));
-	kprintf("  flags: 0x%lx\n", fFlags);
+	kprintf("  flags: 0x%" B_PRIx32 "\n", fFlags);
 #if KDEBUG
-	kprintf("  lock: { %p, holder: %ld }\n", &fLock, fLock.holder);
+	kprintf("  lock: { %p, holder: %" B_PRId32 " }\n", &fLock, fLock.holder);
 #endif
-	kprintf("  accept sem: %ld\n", fAcceptSemaphore);
-	kprintf("  options: 0x%lx\n", (uint32)fOptions);
+	kprintf("  accept sem: %" B_PRId32 "\n", fAcceptSemaphore);
+	kprintf("  options: 0x%" B_PRIx32 "\n", (uint32)fOptions);
 	kprintf("  send\n");
 	kprintf("    window shift: %u\n", fSendWindowShift);
-	kprintf("    unacknowledged: %lu\n", fSendUnacknowledged.Number());
-	kprintf("    next: %lu\n", fSendNext.Number());
-	kprintf("    max: %lu\n", fSendMax.Number());
-	kprintf("    urgent offset: %lu\n", fSendUrgentOffset.Number());
-	kprintf("    window: %lu\n", fSendWindow);
-	kprintf("    max window: %lu\n", fSendMaxWindow);
-	kprintf("    max segment size: %lu\n", fSendMaxSegmentSize);
+	kprintf("    unacknowledged: %" B_PRIu32 "\n",
+		fSendUnacknowledged.Number());
+	kprintf("    next: %" B_PRIu32 "\n", fSendNext.Number());
+	kprintf("    max: %" B_PRIu32 "\n", fSendMax.Number());
+	kprintf("    urgent offset: %" B_PRIu32 "\n", fSendUrgentOffset.Number());
+	kprintf("    window: %" B_PRIu32 "\n", fSendWindow);
+	kprintf("    max window: %" B_PRIu32 "\n", fSendMaxWindow);
+	kprintf("    max segment size: %" B_PRIu32 "\n", fSendMaxSegmentSize);
 	kprintf("    queue: %lu / %lu\n", fSendQueue.Used(), fSendQueue.Size());
 #if DEBUG_BUFFER_QUEUE
 	fSendQueue.Dump();
 #endif
-	kprintf("    last acknowledge sent: %lu\n", fLastAcknowledgeSent.Number());
-	kprintf("    initial sequence: %lu\n", fInitialSendSequence.Number());
+	kprintf("    last acknowledge sent: %" B_PRIu32 "\n",
+		fLastAcknowledgeSent.Number());
+	kprintf("    initial sequence: %" B_PRIu32 "\n",
+		fInitialSendSequence.Number());
 	kprintf("  receive\n");
 	kprintf("    window shift: %u\n", fReceiveWindowShift);
-	kprintf("    next: %lu\n", fReceiveNext.Number());
-	kprintf("    max advertised: %lu\n", fReceiveMaxAdvertised.Number());
-	kprintf("    window: %lu\n", fReceiveWindow);
-	kprintf("    max segment size: %lu\n", fReceiveMaxSegmentSize);
+	kprintf("    next: %" B_PRIu32 "\n", fReceiveNext.Number());
+	kprintf("    max advertised: %" B_PRIu32 "\n",
+		fReceiveMaxAdvertised.Number());
+	kprintf("    window: %" B_PRIu32 "\n", fReceiveWindow);
+	kprintf("    max segment size: %" B_PRIu32 "\n", fReceiveMaxSegmentSize);
 	kprintf("    queue: %lu / %lu\n", fReceiveQueue.Available(),
 		fReceiveQueue.Size());
 #if DEBUG_BUFFER_QUEUE
 	fReceiveQueue.Dump();
 #endif
-	kprintf("    initial sequence: %lu\n", fInitialReceiveSequence.Number());
-	kprintf("    duplicate acknowledge count: %lu\n",
+	kprintf("    initial sequence: %" B_PRIu32 "\n",
+		fInitialReceiveSequence.Number());
+	kprintf("    duplicate acknowledge count: %" B_PRIu32 "\n",
 		fDuplicateAcknowledgeCount);
-	kprintf("  round trip time: %ld (deviation %ld)\n", fRoundTripTime,
-		fRoundTripDeviation);
-	kprintf("  retransmit timeout: %lld\n", fRetransmitTimeout);
-	kprintf("  congestion window: %lu\n", fCongestionWindow);
-	kprintf("  slow start threshold: %lu\n", fSlowStartThreshold);
+	kprintf("  round trip time: %" B_PRId32 " (deviation %" B_PRId32 ")\n",
+		fRoundTripTime, fRoundTripDeviation);
+	kprintf("  retransmit timeout: %" B_PRId64 "\n", fRetransmitTimeout);
+	kprintf("  congestion window: %" B_PRIu32 "\n", fCongestionWindow);
+	kprintf("  slow start threshold: %" B_PRIu32 "\n", fSlowStartThreshold);
 }
 

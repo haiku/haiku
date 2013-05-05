@@ -13,6 +13,7 @@
 
 #include <OS.h>
 
+#include <errno_private.h>
 #include <libroot_private.h>
 #include <RegistrarDefs.h>
 #include <user_group.h>
@@ -128,7 +129,7 @@ getpwent(void)
 	int status = getpwent_r(&sPasswdBuffer, sPasswdStringBuffer,
 		sizeof(sPasswdStringBuffer), &result);
 	if (status != 0)
-		errno = status;
+		__set_errno(status);
 	return result;
 }
 
@@ -188,7 +189,7 @@ getpwnam(const char *name)
 	int status = getpwnam_r(name, &sPasswdBuffer, sPasswdStringBuffer,
 		sizeof(sPasswdStringBuffer), &result);
 	if (status != 0)
-		errno = status;
+		__set_errno(status);
 	return result;
 }
 
@@ -208,7 +209,7 @@ getpwuid(uid_t uid)
 	int status = getpwuid_r(uid, &sPasswdBuffer, sPasswdStringBuffer,
 		sizeof(sPasswdStringBuffer), &result);
 	if (status != 0)
-		errno = status;
+		__set_errno(status);
 	return result;
 }
 

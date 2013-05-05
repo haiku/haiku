@@ -3,7 +3,7 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "application/x-bittorrent";
 
-resource(2, "META:S:DESC") #'MSDC' "Torrent File";
+resource(2, "META:S:DESC") #'MSDC' "Torrent file";
 
 resource(3, "META:EXTENS") message(234) {
 	"extensions" = "torrent",

@@ -1,9 +1,9 @@
 1	ukrainian	x-vnd.Haiku-WonderBrushTranslator	491575314
-Version %d.%d.%d %s	WonderBrushView		Версія %d.%d.%d %s
-WBI Settings	WonderBrushMain		Настройки WBI
-WBI Settings	WonderBrushTranslator		Настройки WBI
-WonderBrush image	WonderBrushTranslator		Зображення WonderBrush
 WonderBrush image translator	WonderBrushTranslator		Перетворювач зображень WonderBrush
-WonderBrush image translator	WonderBrushView		Перетворювач зображень WonderBrush
+WBI Settings	WonderBrushTranslator		Настройки WBI
+WBI Settings	WonderBrushMain		Настройки WBI
+Version %d.%d.%d %s	WonderBrushView		Версія %d.%d.%d %s
 WonderBrush images	WonderBrushTranslator		Зображення WonderBrush
+WonderBrush image	WonderBrushTranslator		Зображення WonderBrush
+WonderBrush image translator	WonderBrushView		Перетворювач зображень WonderBrush
 written by:	WonderBrushView		автор:

@@ -60,7 +60,7 @@ bool _rtDebugFlag = true;
 void
 debugger(const char *message)
 {
-	debug_printf("%ld: DEBUGGER: %s\n", find_thread(NULL), message);
+	debug_printf("%" B_PRId32 ": DEBUGGER: %s\n", find_thread(NULL), message);
 	_kern_debugger(message);
 }
 
@@ -261,8 +261,8 @@ _debuggerAssert(const char *file, int line, const char *message)
 		"Assert failed: File: %s, Line: %d, %s",
 		file, line, message);
 
-	debug_printf("%ld: ASSERT: %s:%d %s\n", find_thread(NULL), file, line,
-		buffer);
+	debug_printf("%" B_PRId32 ": ASSERT: %s:%d %s\n", find_thread(NULL), file,
+		line, buffer);
 	_kern_debugger(buffer);
 
 	return 0;

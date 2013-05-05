@@ -16,6 +16,7 @@ enum {
 	MSG_CLEAR_SLOT				= 'clsl',
 	MSG_REMOVE_SLOT				= 'rmsl',
 	MSG_LAUNCH					= 'lnch',
+	MSG_OPEN_CONTAINING_FOLDER		= 'opcf',
 };
 
 

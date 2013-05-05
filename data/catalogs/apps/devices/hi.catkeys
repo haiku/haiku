@@ -1,0 +1,95 @@
+1	hindi	x-vnd.Haiku-Devices	865240481
+Manufacturer	DeviceSCSI		उत्पादक
+Order by:	DevicesView		क्रम द्वारा:
+ACPI controller	Device		ऐ०सी०पि०आई नियंत्रक
+Memory controller	Device		स्मृति नियंत्रक
+Driver used	DevicePCI		ड्राइवर का इस्तेमाल
+CD-ROM	DeviceSCSI		सीडी -रॉम
+ISA bus	Device		इसा बस
+ACPI bus	Device		एसीपीआई बस
+ISA bus	DevicesView		इसा बस
+Docking station	Device		डॉकिंग स्टेशन
+Computer	Device		कंप्यूटर
+Unknown device	Device		अज्ञात यंत्र
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		वर्ग की जानकारी:\t\t\t\t: %classInfo%
+Processor	DeviceSCSI		प्रक्रमक
+RBC	DeviceSCSI		आरबीसी
+Detailed	DevicesView		विस्तृत
+Category	DevicesView		श्रेणी
+Quit	DevicesView		छोड़ना
+Device paths	Device		दीवाइस पथ
+Scanner	DeviceSCSI		अवलोकन करने वाला
+Printer	DeviceSCSI		मुद्रक
+Processor	Device		प्रोसेसर
+Optical Drive	DeviceSCSI		दृष्टिगत ड्राइव
+ACPI Processor Namespace '%2'	DeviceACPI		एसीपीआई प्रोसेसर का नामस्थान  '%2'
+Bridge	DeviceSCSI		पुल
+unknown	Device		अज्ञात
+ACPI Information	DeviceACPI		ऐसीपिआई जानकारी
+Generic system peripheral	Device		सामान्य प्रणाली परिधीय
+Not implemented	DevicePCI		लागू नहीं किया
+Disk Drive	DeviceSCSI		डिस्क ड्राइव
+Not implemented	DeviceACPI		लागू नहीं किया
+Device name	DevicePCI		युक्ति का नाम
+Display controller	Device		प्रदर्शन नियंत्रक
+Mass storage controller	Device		विपुल भंडारण नियंत्रक
+Input device controller	Device		इनपुट डिवाइस नियंत्रक
+Network controller	Device		नेटवर्क नियंत्रक
+Device class	DeviceSCSI		डिवाइस का वर्ग
+Device name	DeviceACPI		युक्ति का नाम
+Driver used	Device		द्रइवर उसड
+Other	DeviceSCSI		अन्य
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		यंत्र का नाम \t\t\t\t: %Name%\nनिर्माता\t\t\t: %Manufacturer%\nचालक का इस्तेमाल \t\t\t\t: %DriverUsed%\nडिवाइस के पथ \t: %DevicePaths%
+ACPI Thermal Zone	DeviceACPI		एसीपीआई थर्मल जोन
+Communications	DeviceSCSI		संचार
+Bus	DevicesView		बस
+Communication controller	Device		संचार नियंत्रक
+Manufacturer	DeviceACPI		निर्माता
+PCI bus	Device		पीसीआई बस
+ACPI System Indicator	DeviceACPI		एसीपीआई सिस्टम संकेतक
+None	Device		कोई नहीं
+PCI bus	DevicesView		पीसीआई बस
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		वर्ग की जानकारी :\t\t\t\t: %classInfo%
+Basic information	DevicesView		बुनियादी जानकारी
+PCI Information	DevicePCI		पीसीआई जानकारी
+Manufacturer:	Device		निर्माता:
+ACPI bus	DevicesView		एसीपीआई बस
+Changer	DeviceSCSI		परिवर्तक
+ACPI System Bus	DeviceACPI		एसीपीआई सिस्टम बस
+Devices	System name		उपकरण
+Worm	DeviceSCSI		कीड़ा
+Multimedia controller	Device		मल्टीमीडिया नियंत्रक
+Unknown	DevicePCI		अज्ञात
+Device name:	Device		डिवाइस का नाम:
+Computer	DevicesView		कंप्यूटर
+Value	PropertyList		मूल्य
+Report compatibility	DevicesView		रिपोर्ट अनुकूलता
+Device	Device		यंत्र 
+Signal processing controller	Device		संकेत प्रसंस्करण नियंत्रक 
+Serial bus controller	Device		सीरियल बस नियंत्रक
+Wireless controller	Device		वायरलेस नियंत्रक 
+ACPI node '%1'	DeviceACPI		एसीपीआई नोड '%1'
+Device name	Device		उपकरण का नाम 
+Manufacturer	Device		निर्माता
+Name	PropertyList		नाम
+Manufacturer	DevicePCI		निर्माता
+Intelligent controller	Device		बुद्धिमान नियंत्रक 
+Satellite communications controller	Device		उपग्रह संचार नियंत्रक
+SCSI Information	DeviceSCSI		एससीएसआई की जानकारी
+Enclosure	DeviceSCSI		घेरा
+Array	DeviceSCSI		ऐरे
+Bridge	Device		ब्रिज
+Refresh devices	DevicesView		ताज़ा उपकरणों
+Unknown device	DevicesView		अज्ञात उपकरण
+Graphics Peripheral	DeviceSCSI		ग्राफिक्स के परिधीय
+Tape Drive	DeviceSCSI		टेप ड्राइव
+Bus Information	Device		बस की सूचना
+Connection	DevicesView		कनेक्शन
+Generate system information	DevicesView		उत्पन्न प्रणाली की जानकारी
+Encryption controller	Device		एन्क्रिप्शन नियंत्रक
+Unclassified device	Device		अवर्गीकृत उपकरण
+Device name	DeviceSCSI		यंत्र का नाम
+Card Reader	DeviceSCSI		कार्ड का पाठक
+Class info	DevicePCI		वर्ग की जानकारी
+Device paths	DevicePCI		डिवाइस के पथ
+Devices	DevicesView		उपकरणों

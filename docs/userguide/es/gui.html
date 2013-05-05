@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2011, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -39,6 +39,11 @@
 <li><a href="../uk/gui.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/gui.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/gui.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/gui.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/gui.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../hu/gui.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../pt_BR/gui.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../ca/gui.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../en/gui.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -51,6 +56,15 @@
 <div id="content">
 <div>
 <div class="box-info">La traducción de esta página no está completa aún. Hasta que esté, las partes sin terminar vienen en su inglés original.</div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+		<a href="#move-resize">Easy moving and resizing</a><br />
+                <a href="#stack-tile">Stack &amp; Tile</a><br />
+                <a href="#open-save-panel">Open and save panels</a><br />
+                <a href="#replicants">Replicants</a></td></tr>
+</table>
 
 <h1>La interfaz gráfica de usuario de Haiku</h1>
 
@@ -66,17 +80,37 @@
 <li>Se puede enviar una ventana al fondo con un clic derecho en su pestaña (o su borde).</li></ul></li>
 <li><p>El botón de cierre.</p></li>
 <li><p>El botón "zoom" (o con <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). En la mayoría de las aplicaciones, esto expandirá una ventana a su tamaño máximo. Sin embargo, no siempre es así. Las ventanas del Tracker, por ejemplo, se retamañarán para ajustar mejor a los contenidos.</p></li>
-<li><p>La esquina de retamañado. Arrastrándola a cualquier otro lugar en un borde de ventana moverá las dimensiones de la ventana.</p></li>
+<li><p>The window border. Left-dragging moves the window, right-dragging resizes.</p></li>
+<li><p>The resize corner.</p></li>
 </ol>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="move-resize" name="move-resize">A quick way to move or resize windows</a></h2>
-<p>Moving and resizing windows is a large part of interacting with several concurrently running applications. Instead of aiming at the small yellow title tab or the even tinier window border, there's a more convenient way to move a window. Also, additionally to its small size, the resize corner has another limitation: It only allows resizing at and in the direction of the lower right corner.</p>
+<p>Moving and resizing windows is a large part of interacting with several concurrently running applications. Instead of aiming at the small yellow title tab or the even tinier window border, there's a more convenient way to move a window. Also, additionally to its small size, the resize corner has another limitation: It only allows resizing at and in the direction of the lower right corner. <br />Right-dragging a border for resizing works, but again you'll have to aim carefully.</p>
 <p>To address these issues, Haiku provides a neat solution using the window management key combo <span class="key">CTRL</span> <span class="key">ALT</span> and the mouse. See also chapter <a href="keyboard-shortcuts.html#general">Shortcuts and key combinations</a> for more shortcuts concerning window management.</p>
 <img src="images/gui-images/resizing.png" alt="resizing.png" />
 <p>Holding down <span class="key">CTRL</span> <span class="key">ALT</span> will highlight the window borders nearest to the mouse pointer. Move the mouse in the direction of another border to change the target. Click and dragging with the <i>right mouse button</i> will resize the window along the highlighted border(s).</p>
 <p>Hold down <span class="key">CTRL</span> <span class="key">ALT</span> and click and drag with the <i>left mouse button</i> anywhere in a window to move it around. A quick click with the <i>right mouse button</i> sends it to the back.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="stack-tile" name="stack-tile">Stack &amp; Tile</a></h2>
+<p>Haiku's user interface provides a unique feature that puts the fact that windows have a yellow tab instead of a full-width title bar to perfect use. It's called "Stack &amp; Tile".<br />
+In the example below, a Tracker window with bookmarks is tiled to the left of a WebPositive window, which itself is stacked with another Tracker window showing the source folder <tt>haiku</tt>. In this animation, the user clicks on the tabs of the stacked windows to alternately bring one or  the other to the front.</p> 
+<img src="images/gui-images/gui-s+t.gif" alt="gui-s+t.gif" />
+<p>Connected like this, the group of windows can be moved and resized together - a nice arrangement to work in a more project centric environment. Instead of looking for the right browser window with documentation, editor and Tracker windows and maybe a related email concerning one project you are currently working on, just stack&amp;tile them together.</p>
+<p>Doing the actual arranging of windows is easy: Hold down <span class="key">OPT</span> while dragging a window by its tab close to another window's tab or border until it's highlighted and release the mouse button.</p>
+<p>Stack &amp; Tile consists of two related parts.</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><img src="images/gui-images/gui-stacking.png" alt="gui-stacking.png" /></td><td width="10"></td>
+<td><p>"<i>Stacking</i>" is putting windows on top of each other, automatically moving the yellow tabs into position.<br />
+While holding <span class="key">OPT</span>, tabs change color when they overlap; drop the window to establish the stacking.</p></td></tr></table>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2" vspace="10">
+<tr><td><img src="images/gui-images/gui-tiling.png" alt="gui-tilinging.png" /></td><td></td>
+<td><p>"<i>Tiling</i>" means gluing windows horizontally or vertically together.<br />
+Again, while holding <span class="key">OPT</span>, the borders that'll fuse together when you drop the window change color when brought near each other.</p></td></tr></table>
+<p>Separation is done in the same way, by holding <span class="key">OPT</span> while dragging a window by its tab out of the group.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>

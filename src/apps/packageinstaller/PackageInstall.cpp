@@ -19,8 +19,8 @@
 #include <stdio.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PackageInstall"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PackageInstall"
 
 
 static int32
@@ -125,6 +125,7 @@ PackageInstall::_Install()
 				"and continue the installation?"),
 			B_TRANSLATE("Continue"),
 			B_TRANSLATE("Abort"));
+		reinstall->SetShortcut(1, B_ESCAPE);
 
 		if (reinstall->Go() == 0) {
 			// Uninstall the package

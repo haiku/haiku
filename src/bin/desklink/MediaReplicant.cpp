@@ -40,8 +40,8 @@
 #include "VolumeWindow.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MediaReplicant"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MediaReplicant"
 
 
 static const uint32 kMsgOpenMediaSettings = 'mese';
@@ -390,8 +390,10 @@ MediaReplicant::_Launch(const char* prettyName, const char* signature,
 		BString message = B_TRANSLATE("Couldn't launch ");
 		message << prettyName;
 
-		(new BAlert(B_TRANSLATE("desklink"), message.String(),
-			B_TRANSLATE("OK")))->Go();
+		BAlert* alert = new BAlert(B_TRANSLATE("desklink"), message.String(),
+			B_TRANSLATE("OK"));
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 	}
 }
 

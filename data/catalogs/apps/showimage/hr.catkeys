@@ -1,0 +1,56 @@
+1	croatian	x-vnd.Haiku-ShowImage	1346873032
+Browse	Menus		Pregledaj
+Cancel	ClosePrompt		Otkaži
+Clear selection	Menus		Očisti odabir
+Close	ClosePrompt		Zatvori
+Close	Menus		Zatvori
+Close document	ClosePrompt		Zatvori dokument
+Copy	Menus		Kopiraj
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Ne mogu učitati sliku!Ne postoji datoteka ili prevoditelj slike.
+DPI:	PrintOptionsWindow		DPI:
+Edit	Menus		Uredi
+File	Menus		Datoteka
+First page	Menus		Prva stranica
+Fit image to page	PrintOptionsWindow		Postavi sliku u stranicu
+Flip left to right	Menus		Preokreni sa lijeva u desno
+Flip top to bottom	Menus		Okreni od vrha prema dnu
+Full screen	Menus		Cijeli zaslon
+Go to page	Menus		Idi na stranicu
+Height: 	PrintOptionsWindow		Visina:
+High-quality zooming	Menus		Visoko kvalitetno povećavanje
+Image	Menus		Slika
+Job setup	PrintOptionsWindow		Postavljanje posla
+Last page	Menus		Zadanja stranica
+Leave full screen	Menus		Napusti cijeli zaslon
+Next file	Menus		Slijedeća datoteka
+Next page	Menus		Slijedeća stranica
+OK	Alerts		U redu
+OK	SaveToFile		U redu
+Open…	Menus		Otvori...
+Original size	Menus		Izvorna veličina
+Page setup…	Menus		Postavljanje stranice...
+Previous file	Menus		Prethodna datoteka
+Previous page	Menus		Prethodna stranica
+Print options	PrintOptionsWindow		Opcije ispisa
+Print…	Menus		Ispis...
+Quit	Menus		Isključi
+Resize to (in 1/72 inches):	PrintOptionsWindow		Promjeni veličinu (u 1/72 inča):
+Rotate clockwise	Menus		Rotiraj u smjeru kazaljke na satu
+Rotate counterclockwise	Menus		Rotiraj obrnuto smjeru kazaljke na satu
+Save as…	Menus		Spremi kao...
+Select all	Menus		Odaberi sve
+Show caption in full screen mode	Menus		Prikaži naslov u "cijeli ekran" modu
+Show tool bar	Menus		Prikaži alatnu traku
+ShowImage	System name		Prikaži sliku
+Slide show	Menus		Klizni prikaz
+Stretch to window	Menus		Rastegni po prozoru
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokument '%s' (stranica %d) je promjenjen. Želite li zatvoriti dokument?
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokument '%s'je promijenjen.Želite li zatvoriti dokument?
+The file '%s' could not be written.	SaveToFile		Datoteka '%s' ne može biti zapisana.
+Undo	Menus		Ukini
+Use as background…	Menus		Koristi kao pozadinu...
+View	Menus		Pogled
+Width:	PrintOptionsWindow		Širina:
+Zoom factor in %:	PrintOptionsWindow		Zoom u %:
+Zoom in	Menus		Povećaj
+Zoom out	Menus		Smanji

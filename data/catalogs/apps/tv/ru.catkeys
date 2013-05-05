@@ -1,27 +1,27 @@
 1	russian	x-vnd.Haiku.TV	1995288111
-Always on top	MainWin		Всегда сверху
+TV	MainWin		Телевидение
 Channel	MainWin		Канал
-DVB - Digital Video Broadcasting TV	MainWin		DVB - Цифровое Видео Вещание
-Debug	MainWin		Отладка
-Error, connecting to interface failed:\n\n	MainWin		Ошибка, не удалось подключиться к интерфейсу:\n\n
-Error, interface is busy:\n\n	MainWin		Ошибка, интерфейс занят:\n\n
-Full screen	MainWin		На весь экран
+Settings…	MainWin		Настройки…
 Interface	MainWin		Интерфейс
 Keep aspect ratio	MainWin		Поддерживать соотношение сторон
-Next channel	MainWin		Следующий канал
-No border	MainWin		Без рамки
-No menu	MainWin		Без меню
-None	MainWin		Нет
-OK	MainWin		ОК
 Previous channel	MainWin		Предыдущий канал
-Quit	MainWin		Выход
-Scale to native size	MainWin		Оригинальный размер
 Settings	MainWin		Настройки
-Settings…	MainWin		Настройки…
-TV	MainWin		Телевидение
 TV	System name		Телевидение
-force 544 x 576, display aspect 4:3	MainWin		Форсировать 544 x 576, соотношение 4:3
-force 704 x 576, display aspect 4:3	MainWin		Форсировать 704 x 576, соотношение 4:3
-force 720 x 576, display aspect 4:3	MainWin		Форсировать 720 x 576, соотношение 4:3
-pixel aspect ratio	MainWin		Пиксельное соотношение сторон
+No border	MainWin		Без рамки
+Always on top	MainWin		Всегда сверху
+OK	MainWin		ОК
+Quit	MainWin		Выход
+Full screen	MainWin		На весь экран
+Debug	MainWin		Отладка
+Scale to native size	MainWin		Оригинальный размер
 unknown	MainWin		неизвестно
+Next channel	MainWin		Следующий канал
+Error, interface is busy:\n\n	MainWin		Ошибка, интерфейс занят:\n\n
+None	MainWin		Нет
+force 704 x 576, display aspect 4:3	MainWin		Форсировать 704 x 576, соотношение 4:3
+DVB - Digital Video Broadcasting TV	MainWin		DVB - Цифровое Видео Вещание
+force 544 x 576, display aspect 4:3	MainWin		Форсировать 544 x 576, соотношение 4:3
+pixel aspect ratio	MainWin		Пиксельное соотношение сторон
+No menu	MainWin		Без меню
+Error, connecting to interface failed:\n\n	MainWin		Ошибка, не удалось подключиться к интерфейсу:\n\n
+force 720 x 576, display aspect 4:3	MainWin		Форсировать 720 x 576, соотношение 4:3

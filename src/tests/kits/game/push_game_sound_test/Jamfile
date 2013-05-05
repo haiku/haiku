@@ -4,3 +4,8 @@ SimpleTest push_game_sound_test
 	: push_game_sound_test.cpp
 	: game media be $(TARGET_LIBSUPC++)
 ;
+
+SimpleTest push_game_sound_sine
+	: push_game_sound_sine.cpp
+	: game be $(TARGET_LIBSUPC++)
+;

@@ -1,6 +1,6 @@
 /******************************************************************************
 
-  Copyright (c) 2001-2010, Intel Corporation 
+  Copyright (c) 2001-2011, Intel Corporation 
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without 
@@ -30,7 +30,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 
 ******************************************************************************/
-/*$FreeBSD: src/sys/dev/e1000/if_em.h,v 1.5.2.5.2.1 2010/12/21 17:09:25 kensmith Exp $*/
+/*$FreeBSD$*/
 
 
 #ifndef _EM_H_DEFINED_
@@ -211,6 +211,13 @@
 #define EM_BAR_MEM_TYPE_32BIT	0x00000000
 #define EM_BAR_MEM_TYPE_64BIT	0x00000004
 #define EM_MSIX_BAR		3	/* On 82575 */
+
+/* More backward compatibility */
+#ifndef __HAIKU__
+#if __FreeBSD_version < 900000
+#define SYSCTL_ADD_UQUAD SYSCTL_ADD_QUAD
+#endif
+#endif
 
 /* Defines for printing debug information */
 #define DEBUG_INIT  0
@@ -414,11 +421,11 @@ struct adapter {
 	u32		shadow_vfta[EM_VFTA_SIZE];
 
 	/* Info about the interface */
-	u8		link_active;
+	u16		link_active;
+	u16		fc;
 	u16		link_speed;
 	u16		link_duplex;
 	u32		smartspeed;
-	u32		fc_setting;
 
 	struct em_int_delay_info tx_int_delay;
 	struct em_int_delay_info tx_abs_int_delay;
@@ -458,6 +465,22 @@ struct em_buffer {
         struct mbuf    *m_head;
         bus_dmamap_t    map;         /* bus_dma map for packet */
 };
+
+
+/*
+** Find the number of unrefreshed RX descriptors
+*/
+static inline u16
+e1000_rx_unrefreshed(struct rx_ring *rxr)
+{
+	struct adapter	*adapter = rxr->adapter;
+
+	if (rxr->next_to_check > rxr->next_to_refresh)
+		return (rxr->next_to_check - rxr->next_to_refresh - 1);
+	else
+		return ((adapter->num_rx_desc + rxr->next_to_check) -
+		    rxr->next_to_refresh - 1); 
+}
 
 #define	EM_CORE_LOCK_INIT(_sc, _name) \
 	mtx_init(&(_sc)->core_mtx, _name, "EM Core Lock", MTX_DEF)

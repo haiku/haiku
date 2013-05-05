@@ -1,22 +1,38 @@
-1	japanese	x-vnd.Haiku-Keymap	1259868356
-(Current)	Keymap window		(使用中キーマップ)
-Acute trigger	Keymap window		アキュートアクセントのトリガー
+1	japanese	x-vnd.Haiku-Keymap	4022885915
+Shift:	Modifier keys window	Shift key role name	Shift:
+Revert	Modifier keys window		元に戻す
+Tilde trigger	Keymap window		チルダのトリガー
+Grave trigger	Keymap window		グレイヴアクセントのトリガー
+Role	Modifier keys window	As in the role of a modifier key	役割
+Select dead keys	Keymap window		デッドキーの選択
+Cancel	Modifier keys window		中止
+Quit	Keymap window		終了
+Switch shortcut keys to Haiku mode	Keymap window		ショートカットキースイッチを Haiku モードにする
 Circumflex trigger	Keymap window		サーカムフレックスのトリガー
 Diaeresis trigger	Keymap window		ウムラウトのトリガー
-File	Keymap window		ファイル
-Font	Keymap window		フォント
-Grave trigger	Keymap window		グレイヴアクセントのトリガー
-Keymap	System name		キーマップ
-Layout	Keymap window		レイアウト
+Disabled	Modifier keys window	Do nothing	無効
 Open…	Keymap window		開く…
-Quit	Keymap window		終了
-Revert	Keymap window		元に戻す
-Sample and clipboard:	Keymap window		サンプル＆クリップボード
-Save as…	Keymap window		名前をつけて保存…
-Select dead keys	Keymap window		デッドキーの選択
-Switch shortcut keys	Keymap window		ショートカットキーのスイッチ
-Switch shortcut keys to Haiku mode	Keymap window		ショートカットキースイッチを Haiku モードにする
-Switch shortcut keys to Windows/Linux mode	Keymap window		ショートカットキースイッチを Windows/Linux モードにする
 System:	Keymap window		システム：
-Tilde trigger	Keymap window		チルダのトリガー
+Set modifier keys…	Keymap window		修飾キーを設定…
+Option:	Modifier keys window	Option key role name	Option:
+Switch shortcut keys	Keymap window		ショートカットキーのスイッチ
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift キー
 User:	Keymap window		ユーザー：
+Key	Modifier keys window	As in a computer keyboard key	キー
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl キー
+Control:	Modifier keys window	Control key role name	Control:
+Sample and clipboard:	Keymap window		サンプル＆クリップボード
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt キー
+Layout	Keymap window		レイアウト
+Switch shortcut keys to Windows/Linux mode	Keymap window		ショートカットキースイッチを Windows/Linux モードにする
+Revert	Keymap window		元に戻す
+Command:	Modifier keys window	Command key role name	Command:
+Save as…	Keymap window		名前を付けて保存…
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd キー
+File	Keymap window		ファイル
+(Current)	Keymap window		(使用中キーマップ)
+Font	Keymap window		フォント
+Keymap	System name		キーマップ
+Set modifier keys	Modifier keys window		修飾キーを設定
+Modifier keys	Modifier keys window		修飾キー
+Acute trigger	Keymap window		アキュートアクセントのトリガー

@@ -1,6 +1,11 @@
 /*
+ * Copyright 2013, Haiku, Inc. All rights reserved.
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
+ *		Siarzhuk Zharski, zharik@gmx.li
  */
 
 #include "HistoryBuffer.h"
@@ -88,7 +93,11 @@ HistoryBuffer::GetTerminalLineAt(int32 index, TerminalLine* buffer) const
 	for (int32 i = 0; i < line->byteLength;) {
 		// get attributes
 		if (charCount == nextAttributesAt) {
-			if (attributesRunCount > 0) {
+			if (charCount < attributesRun->offset) {
+				// the "hole" in attributes run
+				attributes = 0;
+				nextAttributesAt = attributesRun->offset;
+			} else if (attributesRunCount > 0) {
 				attributes = attributesRun->attributes;
 				nextAttributesAt = attributesRun->offset
 					+ attributesRun->length;
@@ -112,7 +121,9 @@ HistoryBuffer::GetTerminalLineAt(int32 index, TerminalLine* buffer) const
 		// full width char?
 		if (cell.character.IsFullWidth()) {
 			cell.attributes |= A_WIDTH;
-			charCount++;
+			// attributes of the second, "invisible" cell must be
+			// cleared to let full-width chars detection work properly
+			buffer->cells[charCount++].attributes = 0;
 		}
 	}
 

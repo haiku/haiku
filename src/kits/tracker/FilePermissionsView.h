@@ -31,21 +31,22 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef FILE_PERMISSIONS_VIEW_H
 #define FILE_PERMISSIONS_VIEW_H
+
 
 #include <CheckBox.h>
 #include <TextControl.h>
 
 #include "Model.h"
 
+
 namespace BPrivate {
 
 class FocusCheckBox : public BCheckBox {
 	public:
-		FocusCheckBox(BRect rect, const char *name, const char *label,
-			BMessage *message)
+		FocusCheckBox(BRect rect, const char* name, const char* label,
+			BMessage* message)
 			:	BCheckBox(rect, name, label, message)
 			{
 			}
@@ -56,44 +57,46 @@ class FocusCheckBox : public BCheckBox {
 
 			if (IsFocus()) {
 				SetHighColor(0, 0, 255);
-				StrokeRect(BRect(2 , 4, 12, 14));			
-			}	
+				StrokeRect(BRect(2 , 4, 12, 14));
+			}
 		}
 };
 
+
 class FilePermissionsView : public BView {
 	public:
-		FilePermissionsView(BRect, Model *);
+		FilePermissionsView(BRect, Model*);
 
-		void ModelChanged(Model *);
+		void ModelChanged(Model*);
 
 	protected:
-		virtual void MessageReceived(BMessage *);
+		virtual void MessageReceived(BMessage*);
 		virtual void AttachedToWindow();
 
 	private:
-		Model *fModel;
+		Model* fModel;
 
-		FocusCheckBox *fReadUserCheckBox;
-		FocusCheckBox *fReadGroupCheckBox;
-		FocusCheckBox *fReadOtherCheckBox;
+		FocusCheckBox* fReadUserCheckBox;
+		FocusCheckBox* fReadGroupCheckBox;
+		FocusCheckBox* fReadOtherCheckBox;
 
-		FocusCheckBox *fWriteUserCheckBox;
-		FocusCheckBox *fWriteGroupCheckBox;
-		FocusCheckBox *fWriteOtherCheckBox;
+		FocusCheckBox* fWriteUserCheckBox;
+		FocusCheckBox* fWriteGroupCheckBox;
+		FocusCheckBox* fWriteOtherCheckBox;
 
-		FocusCheckBox *fExecuteUserCheckBox;
-		FocusCheckBox *fExecuteGroupCheckBox;
-		FocusCheckBox *fExecuteOtherCheckBox;
+		FocusCheckBox* fExecuteUserCheckBox;
+		FocusCheckBox* fExecuteGroupCheckBox;
+		FocusCheckBox* fExecuteOtherCheckBox;
 
-		BTextControl *fOwnerTextControl;
-		BTextControl *fGroupTextControl;
+		BTextControl* fOwnerTextControl;
+		BTextControl* fGroupTextControl;
 
 		typedef BView _inherited;
 };
+
 
 } // namespace BPrivate
 
 using namespace BPrivate;
 
-#endif	/* FILE_PERMISSIONS_VIEW_H */
+#endif	// FILE_PERMISSIONS_VIEW_H

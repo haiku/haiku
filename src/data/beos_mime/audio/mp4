@@ -3,7 +3,7 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "audio/mp4";
 
-resource(2, "META:S:DESC") #'MSDC' "MP4 Sound File";
+resource(2, "META:S:DESC") #'MSDC' "MP4 audio file";
 
 resource(3, "META:EXTENS") message(234) {
 	"extensions" = "m4a",

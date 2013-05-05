@@ -1117,7 +1117,8 @@ _user_xsi_semop(int semaphoreID, struct sembuf *ops, size_t numOps)
 		for (; i < numOps; i++) {
 			short semaphoreNumber = operations[i].sem_num;
 			if (semaphoreNumber >= numberOfSemaphores) {
-				TRACE_ERROR(("xsi_semop: %ld invalid semaphore number\n", i));
+				TRACE_ERROR(("xsi_semop: %" B_PRIu32 " invalid semaphore number"
+					"\n", i));
 				result = EINVAL;
 				break;
 			}
@@ -1188,8 +1189,9 @@ _user_xsi_semop(int semaphoreID, struct sembuf *ops, size_t numOps)
 			semaphoreSet = sSemaphoreHashTable.Lookup(semaphoreID);
 			if (result == EIDRM || semaphoreSet == NULL || (semaphoreSet != NULL
 				&& sequenceNumber != semaphoreSet->SequenceNumber())) {
-				TRACE_ERROR(("xsi_semop: semaphore set id %d (sequence = %ld) "
-					"got destroyed\n", semaphoreID, sequenceNumber));
+				TRACE_ERROR(("xsi_semop: semaphore set id %d (sequence = "
+					"%" B_PRIu32 ") got destroyed\n", semaphoreID,
+					sequenceNumber));
 				notDone = false;
 				result = EIDRM;
 			} else if (result == B_INTERRUPTED) {

@@ -6,10 +6,10 @@ UsePublicHeaders locale ;
 UsePrivateHeaders locale shared ;
 
 BinCommand collectcatkeys : collectcatkeys.cpp RegExp.cpp 
-	: be liblocale.so $(TARGET_LIBSUPC++) ;
+	: be $(TARGET_LIBSUPC++) ;
 
-BinCommand linkcatkeys : linkcatkeys.cpp : be liblocale.so $(TARGET_LIBSTDC++) ;
+BinCommand linkcatkeys : linkcatkeys.cpp : be  $(TARGET_LIBSTDC++) ;
 
-BinCommand dumpcatalog : dumpcatalog.cpp : be liblocale.so $(TARGET_LIBSUPC++) ;
+BinCommand dumpcatalog : dumpcatalog.cpp : be  $(TARGET_LIBSUPC++) ;
 
-BinCommand locale : locale.cpp : be liblocale.so $(TARGET_LIBSUPC++) ;
+BinCommand locale : locale.cpp : be $(TARGET_LIBSUPC++) ;
