@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Rene Gollent, rene@gollent.com. All rights reserved.
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef INSPECTOR_WINDOW_H
@@ -8,6 +8,7 @@
 
 #include <Window.h>
 
+#include "MemoryView.h"
 #include "TeamMemoryBlock.h"
 #include "Types.h"
 
@@ -17,13 +18,13 @@ class BMenuField;
 class BMessenger;
 class BTextControl;
 class GuiTeamUiSettings;
-class MemoryView;
 class Team;
 class UserInterfaceListener;
 
 
 class InspectorWindow : public BWindow,
-	public TeamMemoryBlock::Listener {
+	public TeamMemoryBlock::Listener,
+	public MemoryView::Listener {
 public:
 								InspectorWindow(::Team* team,
 									UserInterfaceListener* listener,
@@ -38,7 +39,11 @@ public:
 	virtual void				MessageReceived(BMessage* message);
 	virtual bool				QuitRequested();
 
+	// TeamMemoryBlock::Listener
 	virtual void				MemoryBlockRetrieved(TeamMemoryBlock* block);
+
+	// MemoryView::Listener
+	virtual	void				TargetAddressChanged(target_addr_t address);
 
 			status_t			LoadSettings(
 									const GuiTeamUiSettings& settings);
