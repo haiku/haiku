@@ -161,7 +161,7 @@ rule KernelStaticLibrary
 {
 	# Usage KernelStaticLibrary <name> : <sources> : <extra cc flags>  ;
 	# This is designed to take a set of sources and libraries and create
-	# a file called lib<name>.a
+	# a static library.
 
 	SetupKernel $(2) : $(3) : false ;
 	Library $(1) : $(2) ;
