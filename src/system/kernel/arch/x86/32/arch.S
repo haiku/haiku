@@ -264,9 +264,12 @@ FUNCTION(arch_cpu_user_strlcpy):
 	/* count remaining bytes in src */
 .L_user_strlcpy_source_count:
 	not		%ecx
+		# %ecx was 0 and is now max
 	xor		%al,%al
+	movl	%esi,%edi
 	repnz
 	scasb
+	movl	%edi,%esi
 
 .L_user_strlcpy_source_done:
 	movl	%esi,%eax
