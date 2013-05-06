@@ -37,8 +37,7 @@ class _BMCMenuBar_ : public BMenuBar {
 public:
 								_BMCMenuBar_(BRect frame, bool fixedSize,
 									BMenuField* menuField);
-								_BMCMenuBar_(bool fixedSize,
-									BMenuField* menuField);
+								_BMCMenuBar_(BMenuField* menuField);
 								_BMCMenuBar_(BMessage* data);
 	virtual						~_BMCMenuBar_();
 

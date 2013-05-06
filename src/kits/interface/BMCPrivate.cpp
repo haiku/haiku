@@ -69,11 +69,11 @@ _BMCMenuBar_::_BMCMenuBar_(BRect frame, bool fixedSize, BMenuField* menuField)
 }
 
 
-_BMCMenuBar_::_BMCMenuBar_(bool fixedSize, BMenuField* menuField)
+_BMCMenuBar_::_BMCMenuBar_(BMenuField* menuField)
 	:
-	BMenuBar("_mc_mb_", B_ITEMS_IN_ROW, !fixedSize),
+	BMenuBar("_mc_mb_", B_ITEMS_IN_ROW),
 	fMenuField(menuField),
-	fFixedSize(fixedSize),
+	fFixedSize(true),
 	fRunner(NULL),
 	fShowPopUpMarker(true)
 {
