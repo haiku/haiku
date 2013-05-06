@@ -278,14 +278,15 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	}
 	
 	fBlockSize = fSuperBlock.BlockSize();
-	TRACE("block size %ld\n", fBlockSize);
+	TRACE("block size %" B_PRIu32 "\n", fBlockSize);
 
 	uint8* start = (uint8*)&fSuperBlock.system_chunk_array[0];
 	uint8* end = (uint8*)&fSuperBlock.system_chunk_array[2048];
 	while (start < end) {
 		struct btrfs_key* key = (struct btrfs_key*)start;
-		TRACE("system_chunk_array object_id 0x%llx offset 0x%llx type 0x%x\n",
-			key->ObjectID(), key->Offset(), key->Type());
+		TRACE("system_chunk_array object_id 0x%" B_PRIx64 " offset 0x%"
+			B_PRIx64 " type 0x%x\n", key->ObjectID(), key->Offset(),
+			key->Type());
 		if (key->Type() != BTRFS_KEY_TYPE_CHUNK_ITEM) {
 			break;
 		}
@@ -297,16 +298,17 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		start += sizeof(struct btrfs_key) + fChunk->Size();
 	}
 
-	TRACE("Volume::Mount() generation: %lld\n",	fSuperBlock.Generation());
+	TRACE("Volume::Mount() generation: %" B_PRIu64 "\n",
+		fSuperBlock.Generation());
 	fsblock_t physical = 0;
 	FindBlock(fSuperBlock.Root(), physical);
-	TRACE("Volume::Mount() root: %lld (physical %lld)\n",
+	TRACE("Volume::Mount() root: %" B_PRIu64 " (physical %" B_PRIu64 ")\n",
 		fSuperBlock.Root(), physical);
 	FindBlock(fSuperBlock.ChunkRoot(), physical);
-	TRACE("Volume::Mount() chunk_root: %lld (physical %lld)\n",
-		fSuperBlock.ChunkRoot(), physical);
+	TRACE("Volume::Mount() chunk_root: %" B_PRIu64 " (physical %" B_PRIu64
+		")\n", fSuperBlock.ChunkRoot(), physical);
 	FindBlock(fSuperBlock.LogRoot(), physical);
-	TRACE("Volume::Mount() log_root: %lld (physical %lld)\n",
+	TRACE("Volume::Mount() log_root: %" B_PRIu64 " (physical %" B_PRIu64 ")\n",
 		fSuperBlock.LogRoot(), physical);
 		
 	// check if the device size is large enough to hold the file system
@@ -329,13 +331,13 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		return B_NO_MEMORY;
 
 	FindBlock(fSuperBlock.Root(), physical);
-	TRACE("Volume::Mount() root: %lld (physical %lld)\n",
+	TRACE("Volume::Mount() root: %" B_PRIu64 " (physical %" B_PRIu64 ")\n",
 		fSuperBlock.Root(), physical);
 	FindBlock(fSuperBlock.ChunkRoot(), physical);
-	TRACE("Volume::Mount() chunk_root: %lld (physical %lld)\n",
-		fSuperBlock.ChunkRoot(), physical);
+	TRACE("Volume::Mount() chunk_root: %" B_PRIu64 " (physical %" B_PRIu64
+		")\n", fSuperBlock.ChunkRoot(), physical);
 	FindBlock(fSuperBlock.LogRoot(), physical);
-	TRACE("Volume::Mount() log_root: %lld (physical %lld)\n",
+	TRACE("Volume::Mount() log_root: %" B_PRIu64 " (physical %" B_PRIu64 ")\n",
 		fSuperBlock.LogRoot(), physical);
 
 	fRootTree = new(std::nothrow) BPlusTree(this, fSuperBlock.Root());
@@ -351,7 +353,8 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		ERROR("Volume::Mount(): Couldn't find extent root\n");
 		return B_ERROR;
 	}
-	TRACE("Volume::Mount(): Found extent root: %lld\n", root->BlockNum());
+	TRACE("Volume::Mount(): Found extent root: %" B_PRIu64 "\n",
+		root->BlockNum());
 	fExtentTree = new(std::nothrow) BPlusTree(this, root->BlockNum());
 	free(root);
 	if (fExtentTree == NULL)
@@ -363,7 +366,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		ERROR("Volume::Mount(): Couldn't find fs root\n");
 		return B_ERROR;
 	}
-	TRACE("Volume::Mount(): Found fs root: %lld\n", root->BlockNum());
+	TRACE("Volume::Mount(): Found fs root: %" B_PRIu64 "\n", root->BlockNum());
 	fFSTree = new(std::nothrow) BPlusTree(this, root->BlockNum());
 	free(root);
 	if (fFSTree == NULL)
@@ -375,7 +378,8 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		ERROR("Volume::Mount(): Couldn't find dev root\n");
 		return B_ERROR;
 	}
-	TRACE("Volume::Mount(): Found dev root: %lld\n", root->BlockNum());
+	TRACE("Volume::Mount(): Found dev root: %" B_PRIu64 "\n",
+		root->BlockNum());
 	fDevTree = new(std::nothrow) BPlusTree(this, root->BlockNum());
 	free(root);
 	if (fDevTree == NULL)
@@ -387,7 +391,8 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		ERROR("Volume::Mount(): Couldn't find checksum root\n");
 		return B_ERROR;
 	}
-	TRACE("Volume::Mount(): Found checksum root: %lld\n", root->BlockNum());
+	TRACE("Volume::Mount(): Found checksum root: %" B_PRIu64 "\n",
+		root->BlockNum());
 	fChecksumTree = new(std::nothrow) BPlusTree(this, root->BlockNum());
 	free(root);
 	if (fChecksumTree == NULL)
@@ -401,8 +406,8 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		return status;
 	}
 
-	TRACE("Volume::Mount(): Found root node: %lld (%s)\n", fRootNode->ID(),
-		strerror(fRootNode->InitCheck()));
+	TRACE("Volume::Mount(): Found root node: %" B_PRIu64 " (%s)\n",
+		fRootNode->ID(), strerror(fRootNode->InitCheck()));
 
 	// all went fine
 	opener.Keep();
@@ -488,7 +493,8 @@ status_t
 Volume::FindBlock(off_t logical, off_t &physical)
 {
 	if (fChunkTree == NULL
-		|| (logical >= fChunk->Offset() && logical < fChunk->End())) {
+		|| (logical >= (off_t)fChunk->Offset()
+			&& logical < (off_t)fChunk->End())) {
 		// try with fChunk
 		return fChunk->FindBlock(logical, physical);
 	}
@@ -509,8 +515,8 @@ Volume::FindBlock(off_t logical, off_t &physical)
 	status = _chunk.FindBlock(logical, physical);
 	if (status != B_OK)
 			return status;
-	TRACE("Volume::FindBlock(): logical: %lld, physical: %lld\n", logical,
-		physical);
+	TRACE("Volume::FindBlock(): logical: %" B_PRIdOFF ", physical: %" B_PRIdOFF
+		"\n", logical, physical);
 	return B_OK;
 }
 

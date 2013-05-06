@@ -89,14 +89,14 @@ status_t
 BPlusTree::_Find(struct btrfs_key &key, void** _value, size_t* _size,
 	bplustree_traversing type)
 {
-	TRACE("Find() objectid %lld type %d offset %lld \n", key.ObjectID(),
-		key.Type(), key.Offset());
+	TRACE("Find() objectid %" B_PRId64 " type %d offset %" B_PRId64 " \n",
+		key.ObjectID(),	key.Type(), key.Offset());
 	btrfs_stream *stream = fStream;
 	CachedBlock cached(fVolume);
 	fsblock_t physical;
 	if (stream == NULL) {
 		if (fVolume->FindBlock(fRootBlock, physical) != B_OK) {
-			ERROR("Find() unmapped block %lld\n", fRootBlock);
+			ERROR("Find() unmapped block %" B_PRId64 "\n", fRootBlock);
 			return B_ERROR;
 		}
 		stream = (btrfs_stream *)cached.SetTo(physical);
@@ -107,19 +107,19 @@ BPlusTree::_Find(struct btrfs_key &key, void** _value, size_t* _size,
 		uint32 i = 1;
 		for (; i < stream->header.ItemCount(); i++) {
 			int32 comp = _CompareKeys(stream->index[i].key, key);
-			TRACE("Find() found index %ld at %lld comp %ld\n", i,
-				stream->index[i].BlockNum(), comp);
+			TRACE("Find() found index %" B_PRIu32 " at %" B_PRId64 " comp %"
+				B_PRId32 "\n", i, stream->index[i].BlockNum(), comp);
 			if (comp < 0)
 				continue;
 			if (comp > 0 || type == BPLUSTREE_BACKWARD)
 				break;
 		}
-		TRACE("Find() getting index %ld at %lld\n", i - 1,
+		TRACE("Find() getting index %" B_PRIu32 " at %" B_PRId64 "\n", i - 1,
 			stream->index[i - 1].BlockNum());
 		
 		if (fVolume->FindBlock(stream->index[i - 1].BlockNum(), physical)
 			!= B_OK) {
-			ERROR("Find() unmapped block %lld\n",
+			ERROR("Find() unmapped block %" B_PRId64 "\n",
 				stream->index[i - 1].BlockNum());
 			return B_ERROR;
 		}
@@ -128,18 +128,19 @@ BPlusTree::_Find(struct btrfs_key &key, void** _value, size_t* _size,
 
 	uint32 i;
 #ifdef TRACE_BTRFS
-	TRACE("Find() dump count %ld\n", stream->header.ItemCount());
+	TRACE("Find() dump count %" B_PRId32 "\n", stream->header.ItemCount());
 	for (i = 0; i < stream->header.ItemCount(); i++) {
 		int32 comp = _CompareKeys(key, stream->entries[i].key);
-		TRACE("Find() dump %ld %ld offset %lld comp %ld\n",
-			stream->entries[i].Offset(), 
+		TRACE("Find() dump %" B_PRIu32 " %" B_PRIu32 " offset %" B_PRId64
+			" comp %" B_PRId32 "\n", stream->entries[i].Offset(), 
 			stream->entries[i].Size(), stream->entries[i].key.Offset(), comp);
 	}
 #endif
 
 	for (i = 0; i < stream->header.ItemCount(); i++) {
 		int32 comp = _CompareKeys(key, stream->entries[i].key);
-		TRACE("Find() found %ld %ld oid %lld type %d offset %lld comp %ld\n",
+		TRACE("Find() found %" B_PRIu32 " %" B_PRIu32 " oid %" B_PRId64 
+			" type %d offset %" B_PRId64 " comp %" B_PRId32 "\n",
 			stream->entries[i].Offset(), stream->entries[i].Size(),
 			stream->entries[i].key.ObjectID(), stream->entries[i].key.Type(),
 			stream->entries[i].key.Offset(), comp);
@@ -163,8 +164,8 @@ BPlusTree::_Find(struct btrfs_key &key, void** _value, size_t* _size,
 
 	if (i < stream->header.ItemCount() 
 		&& stream->entries[i].key.Type() == key.Type()) {
-		TRACE("Find() found %ld %ld\n", stream->entries[i].Offset(), 
-			stream->entries[i].Size());
+		TRACE("Find() found %" B_PRIu32 " %" B_PRIu32 "\n",
+			stream->entries[i].Offset(), stream->entries[i].Size());
 		if (_value != NULL) {
 			*_value = malloc(stream->entries[i].Size());
 			memcpy(*_value, ((uint8 *)&stream->entries[0] 
@@ -178,7 +179,8 @@ BPlusTree::_Find(struct btrfs_key &key, void** _value, size_t* _size,
 	}
 	
 
-	TRACE("Find() not found %lld %lld\n", key.Offset(), key.ObjectID());
+	TRACE("Find() not found %" B_PRId64 " %" B_PRId64 "\n", key.Offset(),
+		key.ObjectID());
 
 	return B_ENTRY_NOT_FOUND;
 }
