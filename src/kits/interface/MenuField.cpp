@@ -11,6 +11,7 @@
 
 #include <MenuField.h>
 
+#include <algorithm>
 #include <stdlib.h>
 #include <string.h>
 
@@ -987,35 +988,37 @@ BMenuField::DrawLabel(BRect bounds, BRect updateRect)
 	_ValidateLayoutData();
 	font_height& fh = fLayoutData->font_info;
 
-	if (Label()) {
-		SetLowColor(ViewColor());
+	const char* label = Label();
+	if (label == NULL)
+		return;
 
-		// horizontal alignment
-		float x;
-		switch (fAlign) {
-			case B_ALIGN_RIGHT:
-				x = fDivider - fLayoutData->label_width - 3.0;
-				break;
+	SetLowColor(ViewColor());
 
-			case B_ALIGN_CENTER:
-				x = fDivider - fLayoutData->label_width / 2.0;
-				break;
+	// horizontal alignment
+	float x;
+	switch (fAlign) {
+		case B_ALIGN_RIGHT:
+			x = fDivider - fLayoutData->label_width - 3.0;
+			break;
 
-			default:
-				x = 0.0;
-				break;
-		}
+		case B_ALIGN_CENTER:
+			x = fDivider - fLayoutData->label_width / 2.0;
+			break;
 
-		// vertical alignment
-		float y = Bounds().top
-			+ (Bounds().Height() + 1 - fh.ascent - fh.descent) / 2
-			+ fh.ascent;
-		y = floor(y + 0.5);
-
-		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			IsEnabled() ? B_DARKEN_MAX_TINT : B_DISABLED_LABEL_TINT));
-		DrawString(Label(), BPoint(x, y));
+		default:
+			x = 0.0;
+			break;
 	}
+
+	// vertical alignment
+	float y = Bounds().top
+		+ (Bounds().Height() + 1 - fh.ascent - fh.descent) / 2
+		+ fh.ascent;
+	y = floor(y + 0.5);
+
+	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		IsEnabled() ? B_DARKEN_MAX_TINT : B_DISABLED_LABEL_TINT));
+	DrawString(label, BPoint(x, y));
 }
 
 
@@ -1228,7 +1231,7 @@ BMenuField::_ValidateLayoutData()
 float
 BMenuField::_MenuBarOffset() const
 {
-	return max_c(kVMargin, fDivider + kVMargin);
+	return std::max(fDivider + kVMargin, kVMargin);
 }
 
 
