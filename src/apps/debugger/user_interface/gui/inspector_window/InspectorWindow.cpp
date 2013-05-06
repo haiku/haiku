@@ -126,7 +126,7 @@ InspectorWindow::_Init()
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.SetInsets(B_USE_DEFAULT_SPACING)
-		.AddGroup(B_HORIZONTAL, 4.0f)
+		.AddGroup(B_HORIZONTAL)
 			.Add(fAddressInput = new BTextControl("addrInput",
 			"Target Address:", "",
 			new BMessage(MSG_INSPECT_ADDRESS)))
@@ -135,7 +135,7 @@ InspectorWindow::_Init()
 			.Add(fNextBlockButton = new BButton("navNext", ">",
 				new BMessage(MSG_NAVIGATE_NEXT_BLOCK)))
 		.End()
-		.AddGroup(B_HORIZONTAL, 4.0f)
+		.AddGroup(B_HORIZONTAL)
 			.Add(fHexMode = new BMenuField("hexMode", "Hex Mode:",
 				hexMenu))
 			.AddGlue()
