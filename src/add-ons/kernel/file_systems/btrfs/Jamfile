@@ -5,6 +5,9 @@ UsePrivateHeaders shared storage ;
 UsePrivateKernelHeaders ;
 UseBuildFeatureHeaders zlib ;
 
+Includes [ FGristFiles Inode.cpp ]
+	: [ BuildFeatureAttribute zlib : headers ] ;
+
 KernelAddon btrfs :
 	kernel_interface.cpp
 	Attribute.cpp

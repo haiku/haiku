@@ -11,3 +11,6 @@ BootStaticLibrary boot_platform_generic :
 	video_splash.cpp
 	: -fno-pic
 ;
+
+Includes [ FGristFiles video_splash.cpp ] 
+	: [ BuildFeatureAttribute zlib : headers ] ;

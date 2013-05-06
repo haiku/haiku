@@ -75,6 +75,8 @@ HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES =
 	ZlibDecompressor.cpp
 ;
 
+Includes [ FGristFiles $(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES) ]
+	: [ BuildFeatureAttribute zlib : headers ] ;
 
 local libSharedSources =
 	NaturalCompare.cpp
