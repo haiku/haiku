@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2013, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2010, Clemens Zeidler <haiku@clemens-zeidler.de>
  * This file may be used under the terms of the MIT License.
  */
@@ -971,7 +971,7 @@ Equation::PrepareQuery(Volume* /*volume*/, Index& index,
 	if (tree == NULL)
 		return B_ERROR;
 
-	*iterator = new TreeIterator(tree);
+	*iterator = new(std::nothrow) TreeIterator(tree);
 	if (*iterator == NULL)
 		return B_NO_MEMORY;
 
@@ -1249,11 +1249,11 @@ Term*
 Operator::Copy() const
 {
 	if (fEquation != NULL) {
-		Equation* equation = new Equation(*fEquation);
+		Equation* equation = new(std::nothrow) Equation(*fEquation);
 		if (equation == NULL)
 			return NULL;
 
-		Term* term = new Term(equation);
+		Term* term = new(std::nothrow) Term(equation);
 		if (term == NULL)
 			delete equation;
 
@@ -1270,7 +1270,7 @@ Operator::Copy() const
 		return NULL;
 	}
 
-	Term* term = new Term(left, fOp, right);
+	Term* term = new(std::nothrow) Term(left, fOp, right);
 	if (term == NULL) {
 		delete left;
 		delete right;
@@ -1393,7 +1393,7 @@ Expression::ParseEquation(char** expr)
 		return term;
 	}
 
-	Equation* equation = new Equation(expr);
+	Equation* equation = new(std::nothrow) Equation(expr);
 	if (equation == NULL || equation->InitCheck() < B_OK) {
 		delete equation;
 		return NULL;
@@ -1413,8 +1413,8 @@ Expression::ParseAnd(char** expr)
 		Term* right = ParseAnd(expr);
 		Term* newParent = NULL;
 
-		if (right == NULL
-			|| (newParent = new Operator(left, OP_AND, right)) == NULL) {
+		if (right == NULL || (newParent = new(std::nothrow) Operator(left,
+				OP_AND, right)) == NULL) {
 			delete left;
 			delete right;
 
@@ -1438,8 +1438,8 @@ Expression::ParseOr(char** expr)
 		Term* right = ParseAnd(expr);
 		Term* newParent = NULL;
 
-		if (right == NULL
-			|| (newParent = new Operator(left, OP_OR, right)) == NULL) {
+		if (right == NULL || (newParent = new(std::nothrow) Operator(left,
+				OP_OR, right)) == NULL) {
 			delete left;
 			delete right;
 
