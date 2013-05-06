@@ -1,8 +1,11 @@
 SubDir HAIKU_TOP src add-ons media plugins matroska libMatroskaParser ;
 
-UseLibraryHeaders zlib ;
+UseBuildFeatureHeaders zlib ;
 
-StaticLibrary libMatroskaParser.a :
+local sources =
 	MatroskaParser.c
 	StreamIO.cpp
-;
+	;
+Includes [ FGristFiles $(sources) ] : [ BuildFeatureAttribute zlib : headers ] ;
+
+StaticLibrary libMatroskaParser.a : $(sources) ;

@@ -1,6 +1,9 @@
 SubDir HAIKU_TOP src add-ons media plugins mov_reader libMOV ;
 
-UseLibraryHeaders zlib ;
+UseBuildFeatureHeaders zlib ;
+
+Includes [ FGristFiles MOVParser.cpp ]
+	: [ BuildFeatureAttribute zlib : headers ] ;
 
 StaticLibrary libmovreader.a :
 	MOVParser.cpp

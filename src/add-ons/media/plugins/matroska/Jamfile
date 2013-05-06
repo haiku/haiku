@@ -16,7 +16,7 @@ Addon matroska :
 #	libebml.a
 #	libmatroska.a
 	libMatroskaParser.a
-	libz.a
+	[ BuildFeatureAttribute zlib : library ]
 	libmedia.so be $(TARGET_LIBSTDC++)
 ;
 

@@ -797,9 +797,10 @@ if $(TARGET_ARCH) in arm ppc x86 x86_64 {
 	Echo "jpeg support not available on $(TARGET_ARCH)" ;
 }
 
+
 # zlib
-local zlibBaseURL = $(baseURL)/lib ;
-if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 || $(TARGET_ARCH) = arm {
+local zlibBaseURL = $(hpkgBaseURL) ;
+if $(TARGET_ARCH) in arm ppc x86 x86_64 {
 	if $(TARGET_ARCH) = arm {
 		HAIKU_ZLIB_FILE = zlib-1.2.7-arm-2012-11-21.zip ;
 	} else if $(TARGET_ARCH) = ppc {
@@ -809,34 +810,22 @@ if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 || $(
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		HAIKU_ZLIB_FILE = zlib-1.2.7-x86-gcc4-2012-10-30.zip ;
 	} else {
-		HAIKU_ZLIB_FILE = zlib-1.2.7-x86-gcc2-2012-10-30.zip ;
+		HAIKU_ZLIB_FILE = zlib-1.2.8-1-x86_gcc2.hpkg ;
+		HAIKU_ZLIB_DEVEL_FILE = zlib_devel-1.2.8-1-x86_gcc2.hpkg ;
 	}
+	HAIKU_ZLIB_SOURCE_FILE = zlib_source-1.2.8-1-x86_gcc2.hpkg ;
+		# TODO: Wrong architecture! Should be "any".
 
-	local zlibZipFile = [ DownloadFile $(HAIKU_ZLIB_FILE)
-		: $(zlibBaseURL)/$(HAIKU_ZLIB_FILE) ] ;
-
-	HAIKU_ZLIB_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
-		$(HAIKU_ZLIB_FILE:B) ] ;
-
-	HAIKU_ZLIB_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_ZLIB_DIR)
-		: common/include : $(zlibZipFile)
-		: extracted-zlib ] ;
-
-	HAIKU_ZLIB_LIB = [ ExtractArchive $(HAIKU_ZLIB_DIR)
-		:
-		common/lib/libz.so
-		: $(zlibZipFile)
-		: extracted-zlib ] ;
-	HAIKU_ZLIB_CURRENT_LIB = [ ExtractArchive $(HAIKU_ZLIB_DIR)
-		:
-		common/lib/libz.so.1.2.7
-		: $(zlibZipFile)
-		: extracted-zlib ] ;
-	Depends $(HAIKU_ZLIB_LIB) $(HAIKU_ZLIB_CURRENT_LIB) : $(HAIKU_ZLIB_HEADERS_DEPENDENCY) ;
-
-	HAIKU_ZLIB_CURRENT_LINK = libz.so.1 ;
-
-	HAIKU_ZLIB_HEADERS = [ FDirName $(HAIKU_ZLIB_DIR) common include ] ;
+	ExtractBuildFeatureArchives zlib :
+		file: base $(zlibBaseURL)/$(HAIKU_ZLIB_FILE)
+			runtime: lib
+		file: devel $(zlibBaseURL)/$(HAIKU_ZLIB_DEVEL_FILE)
+			depends: base
+			library: develop/lib/libz.so
+			headers: develop/headers
+		file: source $(zlibBaseURL)/$(HAIKU_ZLIB_SOURCE_FILE)
+			sources: source/zlib-1.2.8
+		;
 
 	EnableBuildFeatures zlib ;
 } else {

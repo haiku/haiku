@@ -11,10 +11,10 @@ if $(HAIKU_LIBSTDC++) = libstdc++.r4.so {
 	SubDirC++Flags -Dios_base=ios -ftemplate-depth-24 ;
 }
 
-UseHeaders $(HAIKU_ZLIB_HEADERS) : true ;
+UseBuildFeatureHeaders zlib ;
 
 Includes [ FGristFiles ImfPxr24Compressor.cpp ImfZipCompressor.cpp ]
-	: $(HAIKU_ZLIB_HEADERS_DEPENDENCY) ;
+	: [ BuildFeatureAttribute zlib : headers ] ;
 
 #StaticLibrary libilmimf.a :
 SharedLibrary libilmimf.so :
@@ -77,6 +77,6 @@ ImfVersion.cpp
 ImfWav.cpp
 ImfZipCompressor.cpp
 : libhalf.a libiex.a libimath.a libilmthread.a $(TARGET_LIBSTDC++)
-	$(HAIKU_ZLIB_LIB)
+	[ BuildFeatureAttribute zlib : library ]
 ;
 

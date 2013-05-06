@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src kits package ;
 
-UseHeaders $(HAIKU_ZLIB_HEADERS) : true ;
+UseBuildFeatureHeaders zlib ;
 
 UsePrivateHeaders
 	kernel
@@ -43,7 +43,7 @@ HPKG_SOURCES =
 	;
 
 Includes [ FGristFiles $(HPKG_SOURCES) ]
-	: $(HAIKU_ZLIB_HEADERS_DEPENDENCY) ;
+	: [ BuildFeatureAttribute zlib : headers ] ;
 
 SharedLibrary libpackage.so
 	:
@@ -94,7 +94,9 @@ SharedLibrary libpackage.so
 	SolverRepository.cpp
 	SolverResult.cpp
 	:
-	libshared.a be $(HAIKU_ZLIB_LIB) $(TARGET_LIBSTDC++)
+	libshared.a be
+	[ BuildFeatureAttribute zlib : library ]
+	$(TARGET_LIBSTDC++)
 ;
 
 HaikuSubInclude solver ;

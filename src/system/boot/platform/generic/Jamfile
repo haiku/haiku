@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src system boot platform generic ;
 
-SubDirSysHdrs $(HAIKU_TOP) headers libs zlib ;
+UseBuildFeatureHeaders zlib ;
 UsePrivateKernelHeaders ;
 
 SubDirC++Flags -D_BOOT_MODE -fno-rtti ;

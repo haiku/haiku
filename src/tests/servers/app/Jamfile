@@ -12,7 +12,8 @@ SetSubDirSupportedPlatforms libbe_test ;
 # No need to define any of those targets, when not building for libbe_test
 if $(TARGET_PLATFORM) = libbe_test {
 
-UseLibraryHeaders agg png zlib ;
+UseLibraryHeaders agg png ;
+UseBuildFeatureHeaders zlib ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 
 # headers/build/private/kernel is needed for safemode.h and syscalls.h.
@@ -171,7 +172,7 @@ Server test_app_server :
 
 	# libraries
 	:
-	z libtestappserver.so be
+	[ BuildFeatureAttribute zlib : library ] libtestappserver.so be
 	libhwinterface.so libhwinterfaceimpl.so liblinprog.a
 	libfreetype.so libtextencoding.so
 	$(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)

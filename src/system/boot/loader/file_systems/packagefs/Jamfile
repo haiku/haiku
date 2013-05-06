@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src system boot loader file_systems packagefs ;
 
 UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 UsePrivateHeaders kernel shared ;
-SubDirSysHdrs $(HAIKU_TOP) headers libs zlib ;
+UseBuildFeatureHeaders zlib ;
 
 DEFINES += _BOOT_MODE ;
 

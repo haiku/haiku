@@ -44,6 +44,7 @@ OptionalPackageDependencies Vim : GetText LibIconv ;
 OptionalPackageDependencies WebPositive : Curl LibXML2 SQLite WebKit WebPositiveBookmarks ;
 OptionalPackageDependencies wpa_supplicant : OpenSSL ;
 OptionalPackageDependencies XZ-Utils : Tar ;
+OptionalPackageDependencies Zlib-devel : Zlib ;
 
 OptionalPackageDependencies MandatoryPackages
 	: Bzip Ctags Grep ICU LibSolv Sed Tar ;

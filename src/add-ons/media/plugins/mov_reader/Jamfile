@@ -10,7 +10,8 @@ Addon mov_reader :
 	mov_reader.cpp
 	:
 	libmovreader.a
-	libz.a be libmedia.so $(TARGET_LIBSTDC++)
+	[ BuildFeatureAttribute zlib : library ]
+	be libmedia.so $(TARGET_LIBSTDC++)
 ;
 
 SubInclude HAIKU_TOP src add-ons media plugins mov_reader libMOV ;

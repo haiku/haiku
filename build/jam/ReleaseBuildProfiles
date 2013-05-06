@@ -27,6 +27,7 @@ switch $(HAIKU_BUILD_PROFILE) {
 		AddOptionalHaikuImagePackages KeymapSwitcher Nano P7zip Welcome
 			BeBook XZ-Utils ;
 		AddOptionalHaikuImagePackages wpa_supplicant Man ;
+		AddOptionalHaikuImagePackages Zlib Zlib-devel ;
 	}
 
 	case "beta-*" : {
@@ -45,6 +46,7 @@ switch $(HAIKU_BUILD_PROFILE) {
 		AddOptionalHaikuImagePackages Pe Nano Vision P7zip XZ-Utils ;
 		AddOptionalHaikuImagePackages Development Git OpenSSH OpenSSL ;
 		AddOptionalHaikuImagePackages wpa_supplicant WebPositive Man ;
+		AddOptionalHaikuImagePackages Zlib Zlib-devel ;
 	}
 }
 

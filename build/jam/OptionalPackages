@@ -108,6 +108,8 @@
 #	WQY-MicroHei			- Chinese font
 #	XZ-Utils				- file archiving utility
 #	Yasm					- the assembler utility
+#	Zlib					- the zlib library
+#	Zlib-devel				- the zlib library development files
 
 local baseURL = http://haiku-files.org/files/optional-packages ;
 local hpkgBaseURL = http://haiku-files.org/files/hpkg ;
@@ -2079,4 +2081,20 @@ if [ IsOptionalHaikuImagePackageAdded Yasm ] {
 	} else {
 		Echo "No optional package Yasm available for $(TARGET_ARCH)" ;
 	}
+}
+
+
+# Zlib
+if [ IsOptionalHaikuImagePackageAdded Zlib ] {
+	InstallOptionalHaikuImagePackage
+		$(hpkgBaseURL)/$(HAIKU_ZLIB_FILE)
+		: system ;
+}
+
+
+# Zlib-devel
+if [ IsOptionalHaikuImagePackageAdded Zlib-devel ] {
+	InstallOptionalHaikuImagePackage
+		$(hpkgBaseURL)/$(HAIKU_ZLIB_DEVEL_FILE)
+		: system ;
 }

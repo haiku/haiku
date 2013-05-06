@@ -75,7 +75,6 @@ CopyDirectoryToPackage develop headers :
 	[ FDirName $(HAIKU_FREETYPE_DIR) develop headers 3rdparty ] ;
 CopyDirectoryToPackage develop headers : $(HAIKU_JPEG_HEADERS) : 3rdparty ;
 CopyDirectoryToPackage develop headers : $(HAIKU_LIBPNG_HEADERS) : 3rdparty ;
-CopyDirectoryToPackage develop headers : $(HAIKU_ZLIB_HEADERS) : 3rdparty ;
 
 # cpp headers
 if $(HAIKU_GCC_VERSION[1]) = 2 {

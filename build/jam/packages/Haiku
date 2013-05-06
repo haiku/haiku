@@ -140,12 +140,6 @@ AddSymlinkToPackage lib : $(HAIKU_JPEG_CURRENT_LIB:BS)
 AddSymlinkToPackage lib : $(HAIKU_JPEG_CURRENT_LINK)
 	: libjpeg.so : : true ;
 
-# zlib.so links to the current zlib
-AddSymlinkToPackage lib : $(HAIKU_ZLIB_CURRENT_LIB:BS)
-	: $(HAIKU_ZLIB_CURRENT_LINK) : : true ;
-AddSymlinkToPackage lib : $(HAIKU_ZLIB_CURRENT_LINK)
-	: libz.so : : true ;
-
 # TODO: Remove when the packages have been rebuilt!
 AddSymlinkToPackage lib : libbe.so : liblocale.so ;
 
