@@ -82,7 +82,8 @@ _BMCMenuBar_::_BMCMenuBar_(bool fixedSize, BMenuField* menuField)
 
 
 _BMCMenuBar_::_BMCMenuBar_(BMessage* data)
-	:	BMenuBar(data),
+	:
+	BMenuBar(data),
 	fMenuField(NULL),
 	fFixedSize(true),
 	fRunner(NULL),
