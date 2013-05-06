@@ -62,6 +62,8 @@ private:
 
 			void				_Init(bool setMaxContentWidth);
 
+			void				_DrawItems(BRect updateRect);
+
 			BMenuField*			fMenuField;
 			bool				fFixedSize;	
 			BMessageRunner*		fRunner;

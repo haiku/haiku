@@ -399,28 +399,9 @@ BMenuItem::DrawContent()
 	fSuper->MovePenBy(0, menuPrivate.Ascent());
 	BPoint lineStart = fSuper->PenLocation();
 
-	float labelWidth, labelHeight;
-	GetContentSize(&labelWidth, &labelHeight);
-
 	fSuper->SetDrawingMode(B_OP_OVER);
 
-	float frameWidth = fBounds.Width();
-	if (menuPrivate.State() == MENU_STATE_CLOSED) {
-		float leftMargin;
-		float rightMargin;
-		menuPrivate.GetItemMargins(&leftMargin, NULL, &rightMargin, NULL);
-		frameWidth = fSuper->Frame().Width() - rightMargin + leftMargin;
-	}
-
-	if (frameWidth >= labelWidth)
-		fSuper->DrawString(fLabel);
-	else {
-		// truncate the label to fit
-		char* truncatedLabel = new char[strlen(fLabel) + 4];
-		TruncateLabel(frameWidth, truncatedLabel);
-		fSuper->DrawString(truncatedLabel);
-		delete[] truncatedLabel;
-	}
+	fSuper->DrawString(fLabel);
 
 	if (fSuper->AreTriggersEnabled() && fTriggerIndex != -1) {
 		float escapements[fTriggerIndex + 1];

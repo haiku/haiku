@@ -12,15 +12,20 @@
 #include <BMCPrivate.h>
 
 #include <stdio.h>
+#include <string.h>
 
 #include <ControlLook.h>
+#include <Font.h>
 #include <LayoutUtils.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Message.h>
 #include <MessageRunner.h>
 #include <Region.h>
+#include <String.h>
 #include <Window.h>
+
+#include <MenuPrivate.h>
 
 
 static const float kPopUpIndicatorWidth = 10.0f;
@@ -59,6 +64,7 @@ _BMCFilter_::Filter(BMessage* message, BHandler** handler)
 
 // #pragma mark -
 
+using BPrivate::MenuPrivate;
 
 _BMCMenuBar_::_BMCMenuBar_(BRect frame, bool fixedSize, BMenuField* menuField)
 	:
@@ -331,3 +337,56 @@ _BMCMenuBar_::_Init(bool setMaxContentWidth)
 		SetMaxContentWidth(fPreviousWidth - (left + right));
 }
 
+
+void
+_BMCMenuBar_::_DrawItems(BRect updateRect)
+{
+	MenuPrivate menuPrivate(this);
+	menuPrivate.CacheFontInfo();
+	const BRect& padding = menuPrivate.Padding();
+	float frameWidth = fMenuField->_MenuBarWidth()
+		- (padding.left + padding.right);
+	int32 itemCount = CountItems();
+
+	for (int32 i = 0; i < itemCount; i++) {
+		BMenuItem* item = ItemAt(i);
+		if (item == NULL)
+			continue;
+
+		if (!item->Frame().Intersects(updateRect))
+			continue;
+
+		const char* label = item->Label();
+		if (label == NULL)
+			continue;
+
+		BPoint contentLocation(item->Frame().left + padding.left,
+			item->Frame().top + padding.top);
+		MovePenTo(contentLocation);
+		MovePenBy(0, menuPrivate.Ascent());
+
+		if (item->IsEnabled())
+			SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
+		else
+			SetHighColor(tint_color(LowColor(), B_DISABLED_LABEL_TINT));
+
+		SetDrawingMode(B_OP_OVER);
+
+		if (frameWidth >= StringWidth(label))
+			DrawString(label);
+		else {
+			// truncate label to fit
+			char* truncatedLabel = new char[strlen(label) + 4];
+			BFont font;
+			GetFont(&font);
+			BString labelString(label);
+			font.TruncateString(&labelString, B_TRUNCATE_MIDDLE, frameWidth);
+			labelString.CopyInto(truncatedLabel, 0, labelString.Length());
+			truncatedLabel[labelString.Length()] = '\0';
+			DrawString(truncatedLabel);
+			delete[] truncatedLabel;
+		}
+
+		SetDrawingMode(B_OP_COPY);
+	}
+}
