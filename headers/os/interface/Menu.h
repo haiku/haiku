@@ -10,6 +10,7 @@
 #include <List.h>
 #include <View.h>
 
+
 class BMenu;
 class BMenuBar;
 class BMenuItem;
@@ -216,7 +217,7 @@ private:
 			void				_ComputeColumnLayout(int32 index, bool bestFit,
 									bool moveItems, BRect* override, BRect& outRect);
 			void				_ComputeRowLayout(int32 index, bool bestFit,
-									bool moveItems, BRect& outRect);		
+									bool moveItems, BRect& outRect);
 			void				_ComputeMatrixLayout(BRect& outRect);
 
 			BRect				_CalcFrame(BPoint where, bool* scrollOn);

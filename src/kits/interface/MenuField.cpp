@@ -353,12 +353,12 @@ BMenuField::AllUnarchived(const BMessage* from)
 
 
 void
-BMenuField::Draw(BRect update)
+BMenuField::Draw(BRect updateRect)
 {
 	BRect bounds(Bounds());
 	bool active = IsFocus() && Window()->IsActive();
 
-	DrawLabel(bounds, update);
+	DrawLabel(bounds, updateRect);
 
 	BRect frame(fMenuBar->Frame());
 
@@ -370,7 +370,7 @@ BMenuField::Draw(BRect update)
 		flags |= BControlLook::B_DISABLED;
 	if (active)
 		flags |= BControlLook::B_FOCUSED;
-	be_control_look->DrawMenuFieldFrame(this, frame, update, base,
+	be_control_look->DrawMenuFieldFrame(this, frame, updateRect, base,
 		background, flags);
 }
 
@@ -423,7 +423,7 @@ BMenuField::MouseDown(BPoint where)
 	fMenuBar->StartMenuBar(-1, false, true, &bounds);
 
 	fMenuTaskID = spawn_thread((thread_func)_thread_entry,
-			 	"_m_task_", B_NORMAL_PRIORITY, this);
+		"_m_task_", B_NORMAL_PRIORITY, this);
 	if (fMenuTaskID >= 0)
 		resume_thread(fMenuTaskID);
 }
@@ -473,9 +473,9 @@ BMenuField::MakeFocus(bool state)
 
 
 void
-BMenuField::MessageReceived(BMessage* msg)
+BMenuField::MessageReceived(BMessage* message)
 {
-	BView::MessageReceived(msg);
+	BView::MessageReceived(message);
 }
 
 
@@ -980,7 +980,7 @@ BMenuField::InitObject2()
 
 
 void
-BMenuField::DrawLabel(BRect bounds, BRect update)
+BMenuField::DrawLabel(BRect bounds, BRect updateRect)
 {
 	CALLED();
 
@@ -1107,8 +1107,8 @@ BMenuField::_InitMenuBar(BMenu* menu, BRect frame, bool fixedSize)
 	fMenu = menu;
 	InitMenu(menu);
 
-	if ((Flags() & B_SUPPORTS_LAYOUT)) {
-		fMenuBar = new _BMCMenuBar_(fixedSize, this);
+	if ((Flags() & B_SUPPORTS_LAYOUT) != 0) {
+		fMenuBar = new _BMCMenuBar_(this);
 	} else {
 		frame.left = _MenuBarOffset();
 		frame.top = kVMargin;
@@ -1147,7 +1147,7 @@ BMenuField::_InitMenuBar(const BMessage* archive)
 		fFixedSizeMB = fixed;
 
 	fMenuBar = (BMenuBar*)FindView("_mc_mb_");
-	if (!fMenuBar) {
+	if (fMenuBar == NULL) {
 		_InitMenuBar(new BMenu(""), BRect(0, 0, 100, 15), fFixedSizeMB);
 		InitObject2();
 	} else {
@@ -1194,8 +1194,8 @@ BMenuField::_ValidateLayoutData()
 		divider = fLayoutData->label_width + 5;
 
 	// If we shan't do real layout, we let the current divider take influence.
-	if (!(Flags() & B_SUPPORTS_LAYOUT))
-		divider = max_c(divider, fDivider);
+	if ((Flags() & B_SUPPORTS_LAYOUT) == 0)
+		divider = std::max(divider, fDivider);
 
 	// get the minimal (== preferred) menu bar size
 	// TODO: BMenu::MinSize() is using the ResizeMode() to decide the

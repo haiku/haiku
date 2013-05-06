@@ -35,7 +35,7 @@ public:
 	virtual	status_t			Archive(BMessage* archive,
 									bool deep = true) const;
 
-	virtual	void				Draw(BRect update);
+	virtual	void				Draw(BRect updateRect);
 	virtual	void				AttachedToWindow();
 	virtual	void				AllAttached();
 	virtual	void				MouseDown(BPoint where);
@@ -121,7 +121,7 @@ private:
 
 			void				InitObject(const char* label);
 			void				InitObject2();
-			void				DrawLabel(BRect bounds, BRect update);
+			void				DrawLabel(BRect bounds, BRect updateRect);
 	static	void				InitMenu(BMenu* menu);
 
 			int32				_MenuTask();

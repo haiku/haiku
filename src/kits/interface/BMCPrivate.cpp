@@ -271,7 +271,6 @@ _BMCMenuBar_::FrameResized(float width, float height)
 			dirty = Bounds();
 			dirty.left = dirty.right - diff - 12;
 			Invalidate(dirty);
-
 		} else if (diff < 0) {
 			// clean up the dirty right line of
 			// the menu field when shrinking
@@ -295,6 +294,7 @@ _BMCMenuBar_::FrameResized(float width, float height)
 		diff = Frame().right + 2 - fMenuField->Bounds().right;
 		fMenuField->ResizeBy(diff, 0.0);
 	}
+
 	BMenuBar::FrameResized(width, height);
 }
 
