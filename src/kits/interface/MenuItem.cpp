@@ -401,7 +401,22 @@ BMenuItem::DrawContent()
 
 	fSuper->SetDrawingMode(B_OP_OVER);
 
-	fSuper->DrawString(fLabel);
+	float labelWidth;
+	float labelHeight;
+	GetContentSize(&labelWidth, &labelHeight);
+
+	const BRect& padding = menuPrivate.Padding();
+	float frameWidth = fSuper->Frame().Width() - padding.left - padding.right;
+
+	if (frameWidth >= labelWidth)
+		fSuper->DrawString(fLabel);
+	else {
+		// truncate label to fit
+		char* truncatedLabel = new char[strlen(fLabel) + 4];
+		TruncateLabel(frameWidth, truncatedLabel);
+		fSuper->DrawString(truncatedLabel);
+		delete[] truncatedLabel;
+	}
 
 	if (fSuper->AreTriggersEnabled() && fTriggerIndex != -1) {
 		float escapements[fTriggerIndex + 1];
