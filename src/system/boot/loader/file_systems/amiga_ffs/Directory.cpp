@@ -1,7 +1,7 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2013, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "Directory.h"
@@ -9,7 +9,6 @@
 #include "File.h"
 
 #include <StorageDefs.h>
-#include <util/kernel_cpp.h>
 
 #include <string.h>
 #include <unistd.h>
@@ -17,6 +16,7 @@
 
 
 namespace FFS {
+
 
 Directory::Directory(Volume &volume, int32 block)
 	:
@@ -45,14 +45,14 @@ Directory::~Directory()
 }
 
 
-status_t 
+status_t
 Directory::InitCheck()
 {
 	return fNode.ValidateCheckSum();
 }
 
 
-status_t 
+status_t
 Directory::Open(void **_cookie, int mode)
 {
 	_inherited::Open(_cookie, mode);
@@ -71,7 +71,7 @@ Directory::Open(void **_cookie, int mode)
 }
 
 
-status_t 
+status_t
 Directory::Close(void *cookie)
 {
 	_inherited::Close(cookie);
@@ -113,7 +113,7 @@ Directory::Lookup(const char *name, bool traverseLinks)
 }
 
 
-status_t 
+status_t
 Directory::GetNextEntry(void *cookie, char *name, size_t size)
 {
 	HashIterator *iterator = (HashIterator *)cookie;
@@ -127,7 +127,7 @@ Directory::GetNextEntry(void *cookie, char *name, size_t size)
 }
 
 
-status_t 
+status_t
 Directory::GetNextNode(void *cookie, Node **_node)
 {
 	return B_ERROR;
@@ -164,5 +164,6 @@ Directory::Inode() const
 {
 	return fNode.HeaderKey();
 }
+
 
 }	// namespace FFS

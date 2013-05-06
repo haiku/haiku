@@ -1,7 +1,8 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2013, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008, François Revol <revol@free.fr>
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "Volume.h"
@@ -10,7 +11,6 @@
 
 #include <boot/partitions.h>
 #include <boot/platform.h>
-#include <util/kernel_cpp.h>
 
 #include <string.h>
 #include <unistd.h>
@@ -18,8 +18,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 //#define TRACE(x) dprintf x
 #define TRACE(x) do {} while (0)
+
 
 using namespace FATFS;
 
@@ -33,7 +35,7 @@ Volume::Volume(boot::Partition *partition)
 	if ((fDevice = open_node(partition, O_RDONLY)) < B_OK)
 		return;
 
-	fCachedBlock = new CachedBlock(*this);
+	fCachedBlock = new(nothrow) CachedBlock(*this);
 	if (fCachedBlock == NULL)
 		return;
 
@@ -135,13 +137,13 @@ Volume::Volume(boot::Partition *partition)
 		fFatBits = 16;
 		goto err1;
 	}
-	TRACE(("%s: block size %d, sector size %d, sectors/cluster %d\n", __FUNCTION__,
-		fBlockSize, fBytesPerSector, fSectorsPerCluster));
-	TRACE(("%s: block shift %d, sector shift %d, cluster shift %d\n", __FUNCTION__,
-		fBlockShift, fSectorShift, fClusterShift));
-	TRACE(("%s: reserved %d, max root entries %d, media %02x, sectors/fat %d\n", __FUNCTION__,
-		fReservedSectors, fMaxRootEntries, fMediaDesc, fSectorsPerFat));
-
+	TRACE(("%s: block size %d, sector size %d, sectors/cluster %d\n",
+		__FUNCTION__, fBlockSize, fBytesPerSector, fSectorsPerCluster));
+	TRACE(("%s: block shift %d, sector shift %d, cluster shift %d\n",
+		__FUNCTION__, fBlockShift, fSectorShift, fClusterShift));
+	TRACE(("%s: reserved %d, max root entries %d, media %02x, sectors/fat %d\n",
+		__FUNCTION__, fReservedSectors, fMaxRootEntries, fMediaDesc,
+		fSectorsPerFat));
 
 	//if (fTotalSectors > partition->sectors_per_track * partition->cylinder_count * partition->head_count)
 	if ((off_t)fTotalSectors * fBytesPerSector > partition->size)
@@ -150,7 +152,7 @@ Volume::Volume(boot::Partition *partition)
 	TRACE(("%s: found fat%d filesystem, root dir at cluster %d\n", __FUNCTION__,
 		fFatBits, fRootDirCluster));
 
-	fRoot = new Directory(*this, 0, fRootDirCluster, "/");
+	fRoot = new(nothrow) Directory(*this, 0, fRootDirCluster, "/");
 	return;
 
 err1:
@@ -413,7 +415,7 @@ static status_t
 dosfs_get_file_system(boot::Partition *partition, ::Directory **_root)
 {
 	TRACE(("%s()\n", __FUNCTION__));
-	Volume *volume = new Volume(partition);
+	Volume *volume = new(nothrow) Volume(partition);
 	if (volume == NULL)
 		return B_NO_MEMORY;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -10,7 +10,6 @@
 
 #include <StorageDefs.h>
 #include <KernelExport.h>
-#include <util/kernel_cpp.h>
 
 #include <string.h>
 #include <unistd.h>
@@ -52,14 +51,14 @@ Directory::~Directory()
 }
 
 
-status_t 
+status_t
 Directory::InitCheck()
 {
 	return fStream.InitCheck();
 }
 
 
-status_t 
+status_t
 Directory::Open(void **_cookie, int mode)
 {
 	_inherited::Open(_cookie, mode);
@@ -72,7 +71,7 @@ Directory::Open(void **_cookie, int mode)
 }
 
 
-status_t 
+status_t
 Directory::Close(void *cookie)
 {
 	_inherited::Close(cookie);
@@ -118,7 +117,7 @@ Directory::Lookup(const char *name, bool traverseLinks)
 }
 
 
-status_t 
+status_t
 Directory::GetNextEntry(void *cookie, char *name, size_t size)
 {
 	TreeIterator *iterator = (TreeIterator *)cookie;
@@ -129,7 +128,7 @@ Directory::GetNextEntry(void *cookie, char *name, size_t size)
 }
 
 
-status_t 
+status_t
 Directory::GetNextNode(void *cookie, Node **_node)
 {
 	TreeIterator *iterator = (TreeIterator *)cookie;
@@ -149,7 +148,7 @@ Directory::GetNextNode(void *cookie, Node **_node)
 }
 
 
-status_t 
+status_t
 Directory::Rewind(void *cookie)
 {
 	TreeIterator *iterator = (TreeIterator *)cookie;
@@ -158,7 +157,7 @@ Directory::Rewind(void *cookie)
 }
 
 
-bool 
+bool
 Directory::IsEmpty()
 {
 	TreeIterator iterator(&fTree);

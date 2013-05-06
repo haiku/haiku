@@ -9,15 +9,11 @@
 #define CACHED_BLOCK_H
 
 
-#include <SupportDefs.h>
-#include <sys/stat.h>
-#include <stdlib.h>
-#include <unistd.h>
-
 #include "Volume.h"
 
 
 namespace FATFS {
+
 
 class CachedBlock {
 	public:

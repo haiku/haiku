@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2013, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -11,8 +11,6 @@
 #include "Directory.h"
 #include "File.h"
 #include "Link.h"
-
-#include <util/kernel_cpp.h>
 
 #include <stdlib.h>
 #include <unistd.h>

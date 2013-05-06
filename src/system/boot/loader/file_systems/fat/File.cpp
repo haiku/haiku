@@ -1,15 +1,14 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2013, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008, François Revol <revol@free.fr>
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "File.h"
 
 #include <sys/stat.h>
 #include <unistd.h>
-
-#include <util/kernel_cpp.h>
 
 #include "Directory.h"
 
@@ -136,5 +135,6 @@ File::Inode() const
 {
 	return fStream.FirstCluster() << 16;
 }
+
 
 }	// namespace FATFS

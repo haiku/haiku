@@ -1,7 +1,8 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2013, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008, François Revol <revol@free.fr>
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "Directory.h"
@@ -14,7 +15,6 @@
 #include <new>
 
 #include <StorageDefs.h>
-#include <util/kernel_cpp.h>
 
 #include "CachedBlock.h"
 #include "File.h"
@@ -24,7 +24,9 @@
 //#define TRACE(x) dprintf x
 #define TRACE(x) do {} while (0)
 
+
 namespace FATFS {
+
 
 struct dir_entry {
 	void *Buffer() const { return (void *)fName; };
@@ -328,7 +330,7 @@ Directory::Open(void **_cookie, int mode)
 	TRACE(("FASFS::Directory::%s(, %d)\n", __FUNCTION__, mode));
 	_inherited::Open(_cookie, mode);
 
-	struct dir_cookie *c = new struct dir_cookie;
+	dir_cookie *c = new(nothrow) dir_cookie;
 	if (c == NULL)
 		return B_NO_MEMORY;
 

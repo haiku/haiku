@@ -1,6 +1,6 @@
 /*
  * Copyright 2005-2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
- * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2005-2013, Axel Dörfler, axeld@pinc-software.de.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -21,7 +21,6 @@
 
 #include <boot/partitions.h>
 #include <boot/platform.h>
-#include <util/kernel_cpp.h>
 #include <util/DoublyLinkedList.h>
 
 
@@ -38,6 +37,7 @@ static const uint32 kFloppyArchiveOffset = BOOT_ARCHIVE_IMAGE_OFFSET * 1024;
 static const size_t kTarRegionSize = 8 * 1024 * 1024;	// 8 MB
 
 namespace TarFS {
+
 
 struct RegionDelete {
 	inline void operator()(void* memory)
@@ -811,7 +811,6 @@ TarFS::Volume::_Inflate(boot::Partition* partition, void* cookie, off_t offset,
 
 	return B_OK;
 }
-
 
 
 //	#pragma mark -
