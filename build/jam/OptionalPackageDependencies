@@ -1,8 +1,5 @@
 
 # package dependencies
-#
-# For transitive dependencies dependents should be listed before their
-# dependencies.
 
 OptionalPackageDependencies APR-util : APR Expat ;
 OptionalPackageDependencies AllegroLibs : XiphLibs ;
@@ -14,7 +11,7 @@ OptionalPackageDependencies Caya : Expat ;
 OptionalPackageDependencies CDRecord : GetText LibIconv ;
 OptionalPackageDependencies Curl : OpenSSL ;
 OptionalPackageDependencies DevelopmentBase : CDRecord DevelopmentMin Yasm ;
-OptionalPackageDependencies Development : DevelopmentBase Perl ;
+OptionalPackageDependencies Development : DevelopmentBase Perl Zlib-devel ;
 OptionalPackageDependencies DevelopmentPowerPC : DevelopmentMin ;
 OptionalPackageDependencies GetText : LibIconv ;
 OptionalPackageDependencies Git : Expat Curl OpenSSL LibIconv ;
@@ -47,4 +44,4 @@ OptionalPackageDependencies XZ-Utils : Tar ;
 OptionalPackageDependencies Zlib-devel : Zlib ;
 
 OptionalPackageDependencies MandatoryPackages
-	: Bzip Ctags Grep ICU LibSolv Sed Tar ;
+	: Bzip Ctags Grep ICU LibSolv Sed Tar Zlib ;
