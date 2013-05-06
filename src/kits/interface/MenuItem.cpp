@@ -1,12 +1,13 @@
 /*
- * Copyright 2001-2008, Haiku, Inc.
+ * Copyright 2001-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Marc Flerackers (mflerackers@androme.be)
- *		Bill Hayden (haydentech@users.sourceforge.net)
- *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
+ *		Stefano Ceccherini, stefano.ceccherini@gmail.com
+ *		Marc Flerackers, mflerackers@androme.be
+ *		Bill Hayden, haydentech@users.sourceforge.net
  *		Olivier Milla
+ *		John Scipione, jscipione@gmail.com
  */
 
 //!	Display item for BMenu class

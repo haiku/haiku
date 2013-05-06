@@ -1,12 +1,13 @@
 /*
- * Copyright 2001-2011, Haiku Inc. All rights reserved.
+ * Copyright 2001-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
- *		Marc Flerackers (mflerackers@androme.be)
- *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
- *		Rene Gollent (anevilyak@gmail.com)
- *		Stephan Aßmus <superstippi@gmx.de>
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		Stefano Ceccherini, stefano.ceccherini@gmail.com
+ *		Marc Flerackers, mflerackers@androme.be
+ *		Rene Gollent, anevilyak@gmail.com
+ *		John Scipione, jscipione@gmail.com
  */
 
 
