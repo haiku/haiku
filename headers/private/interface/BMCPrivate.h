@@ -13,8 +13,8 @@
 
 #include <BeBuild.h>
 #include <MenuBar.h>
-#include <MenuItem.h>
 #include <MessageFilter.h>
+
 
 class BMessageRunner;
 
@@ -54,7 +54,7 @@ public:
 			bool				IsPopUpMarkerShown() const
 									{ return fShowPopUpMarker; }
 
-	virtual BSize				MinSize();
+	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
 
 private:

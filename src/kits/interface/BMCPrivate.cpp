@@ -11,21 +11,13 @@
 
 #include <BMCPrivate.h>
 
-#include <stdio.h>
-#include <string.h>
-
 #include <ControlLook.h>
-#include <Font.h>
 #include <LayoutUtils.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Message.h>
 #include <MessageRunner.h>
-#include <Region.h>
-#include <String.h>
 #include <Window.h>
-
-#include <MenuPrivate.h>
 
 
 static const float kPopUpIndicatorWidth = 10.0f;
@@ -64,7 +56,6 @@ _BMCFilter_::Filter(BMessage* message, BHandler** handler)
 
 // #pragma mark -
 
-using BPrivate::MenuPrivate;
 
 _BMCMenuBar_::_BMCMenuBar_(BRect frame, bool fixedSize, BMenuField* menuField)
 	:
