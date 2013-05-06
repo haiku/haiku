@@ -454,15 +454,10 @@ BMenuItem::Draw()
 	// set low color and fill background if selected
 	bool activated = selected && (enabled || Submenu());
 	if (activated) {
-		if (be_control_look != NULL) {
-			BRect rect = Frame();
-			be_control_look->DrawMenuItemBackground(fSuper, rect, rect,
-				ui_color(B_MENU_SELECTED_BACKGROUND_COLOR),
-				BControlLook::B_ACTIVATED);
-		} else {
-			fSuper->SetLowColor(ui_color(B_MENU_SELECTED_BACKGROUND_COLOR));
-			fSuper->FillRect(Frame(), B_SOLID_LOW);
-		}
+		BRect rect = Frame();
+		be_control_look->DrawMenuItemBackground(fSuper, rect, rect,
+			ui_color(B_MENU_SELECTED_BACKGROUND_COLOR),
+			BControlLook::B_ACTIVATED);
 	}
 
 	// set high color

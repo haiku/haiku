@@ -136,119 +136,24 @@ _BMCMenuBar_::AttachedToWindow()
 void
 _BMCMenuBar_::Draw(BRect updateRect)
 {
-	if (be_control_look != NULL) {
-		BRect rect(Bounds());
-		rgb_color base = ui_color(B_MENU_BACKGROUND_COLOR);
-		uint32 flags = 0;
-		if (!IsEnabled())
-			flags |= BControlLook::B_DISABLED;
-		if (IsFocus())
-			flags |= BControlLook::B_FOCUSED;
-		be_control_look->DrawMenuFieldBackground(this, rect,
-			updateRect, base, fShowPopUpMarker, flags);
+	float height;
+	GetPreferredSize(NULL, &height);
+	ResizeTo(fMenuField->_MenuBarWidth(), height);
+		// Set the width to the menu field width because the menubar
+		// bounds are expanded by the selected menu item.
+	BRect rect(Bounds());
 
-		_DrawItems(updateRect);
+	rgb_color base = ui_color(B_MENU_BACKGROUND_COLOR);
+	uint32 flags = 0;
+	if (!IsEnabled())
+		flags |= BControlLook::B_DISABLED;
+	if (IsFocus())
+		flags |= BControlLook::B_FOCUSED;
 
-		return;
-	}
+	be_control_look->DrawMenuFieldBackground(this, rect,
+		updateRect, base, fShowPopUpMarker, flags);
 
-	if (!fShowPopUpMarker) {
-		BMenuBar::Draw(updateRect);
-		return;
-	}
-
-	// draw the right side with the popup marker
-
-	// prevent the original BMenuBar's Draw from
-	// drawing in those parts
-	BRect bounds(Bounds());
-	bounds.right -= 10.0;
-	bounds.bottom -= 1.0;
-
-	BRegion clipping(bounds);
-	ConstrainClippingRegion(&clipping);
-
-	BMenuBar::Draw(updateRect);
-
-	// restore clipping
-	ConstrainClippingRegion(NULL);
-	bounds.right += 10.0;
-	bounds.bottom += 1.0;
-
-	// prepare some colors
-	rgb_color normalNoTint = LowColor();
-	rgb_color noTint = tint_color(normalNoTint, 0.74);
-	rgb_color darken4;
-	rgb_color normalDarken4;
-	rgb_color darken1;
-	rgb_color lighten1;
-	rgb_color lighten2;
-
-	if (IsEnabled()) {
-		darken4 = tint_color(noTint, B_DARKEN_4_TINT);
-		normalDarken4 = tint_color(normalNoTint, B_DARKEN_4_TINT);
-		darken1 = tint_color(noTint, B_DARKEN_1_TINT);
-		lighten1 = tint_color(noTint, B_LIGHTEN_1_TINT);
-		lighten2 = tint_color(noTint, B_LIGHTEN_2_TINT);
-	} else {
-		darken4 = tint_color(noTint, B_DARKEN_2_TINT);
-		normalDarken4 = tint_color(normalNoTint, B_DARKEN_2_TINT);
-		darken1 = tint_color(noTint, (B_NO_TINT + B_DARKEN_1_TINT) / 2.0);
-		lighten1 = tint_color(noTint, (B_NO_TINT + B_LIGHTEN_1_TINT) / 2.0);
-		lighten2 = tint_color(noTint, B_LIGHTEN_1_TINT);
-	}
-
-	BRect r(bounds);
-	r.left = r.right - 10.0;
-
-	BeginLineArray(6);
-		// bottom below item text, darker then BMenuBar
-		// would normaly draw it
-		AddLine(BPoint(bounds.left, r.bottom),
-				BPoint(r.left - 1.0, r.bottom), normalDarken4);
-
-		// bottom below popup marker
-		AddLine(BPoint(r.left, r.bottom),
-				BPoint(r.right, r.bottom), darken4);
-		// right of popup marker
-		AddLine(BPoint(r.right, r.bottom - 1),
-				BPoint(r.right, r.top), darken4);
-		// top above popup marker
-		AddLine(BPoint(r.left, r.top),
-				BPoint(r.right - 2, r.top), lighten2);
-
-		r.top += 1;
-		r.bottom -= 1;
-		r.right -= 1;
-
-		// bottom below popup marker
-		AddLine(BPoint(r.left, r.bottom),
-				BPoint(r.right, r.bottom), darken1);
-		// right of popup marker
-		AddLine(BPoint(r.right, r.bottom - 1),
-				BPoint(r.right, r.top), darken1);
-	EndLineArray();
-
-	r.bottom -= 1;
-	r.right -= 1;
-	SetHighColor(noTint);
-	FillRect(r);
-
-	// popup marker
-	BPoint center(roundf((r.left + r.right) / 2.0),
-				  roundf((r.top + r.bottom) / 2.0));
-	BPoint triangle[3];
-	triangle[0] = center + BPoint(-2.5, -0.5);
-	triangle[1] = center + BPoint(2.5, -0.5);
-	triangle[2] = center + BPoint(0.0, 2.0);
-
-	uint32 flags = Flags();
-	SetFlags(flags | B_SUBPIXEL_PRECISE);
-
-	SetHighColor(normalDarken4);
-	FillTriangle(triangle[0], triangle[1], triangle[2]);
-
-	SetFlags(flags);
+	_DrawItems(updateRect);
 }
 
 

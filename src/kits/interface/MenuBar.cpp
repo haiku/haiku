@@ -279,44 +279,14 @@ BMenuBar::Draw(BRect updateRect)
 		return;
 	}
 
-	if (be_control_look != NULL) {
-		BRect rect(Bounds());
-		rgb_color base = LowColor();
-		uint32 flags = 0;
+	BRect rect(Bounds());
+	rgb_color base = LowColor();
+	uint32 flags = 0;
 
-		be_control_look->DrawBorder(this, rect, updateRect, base,
-			B_PLAIN_BORDER, flags, BControlLook::B_BOTTOM_BORDER);
+	be_control_look->DrawBorder(this, rect, updateRect, base,
+		B_PLAIN_BORDER, flags, BControlLook::B_BOTTOM_BORDER);
 
-		be_control_look->DrawMenuBarBackground(this, rect, updateRect, base);
-
-		_DrawItems(updateRect);
-		return;
-	}
-
-	// TODO: implement additional border styles
-	rgb_color color = HighColor();
-
-	BRect bounds(Bounds());
-	// Restore the background of the previously selected menuitem
-	DrawBackground(bounds & updateRect);
-
-	rgb_color noTint = LowColor();
-
-	SetHighColor(tint_color(noTint, B_LIGHTEN_2_TINT));
-	StrokeLine(BPoint(0.0f, bounds.bottom - 2.0f), BPoint(0.0f, 0.0f));
-	StrokeLine(BPoint(bounds.right, 0.0f));
-
-	SetHighColor(tint_color(noTint, B_DARKEN_1_TINT));
-	StrokeLine(BPoint(1.0f, bounds.bottom - 1.0f),
-		BPoint(bounds.right, bounds.bottom - 1.0f));
-
-	SetHighColor(tint_color(noTint, B_DARKEN_2_TINT));
-	StrokeLine(BPoint(0.0f, bounds.bottom),
-		BPoint(bounds.right, bounds.bottom));
-	StrokeLine(BPoint(bounds.right, 0.0f), BPoint(bounds.right, bounds.bottom));
-
-	SetHighColor(color);
-		// revert to previous used color (cheap PushState()/PopState())
+	be_control_look->DrawMenuBarBackground(this, rect, updateRect, base);
 
 	_DrawItems(updateRect);
 }
