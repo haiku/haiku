@@ -23,6 +23,10 @@
 #include <Window.h>
 
 
+static const float kPopUpIndicatorWidth = 10.0f;
+static const float kMarginWidth = 3.0f;
+
+
 _BMCFilter_::_BMCFilter_(BMenuField* menuField, uint32 what)
 	:
 	BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, what),
@@ -271,7 +275,7 @@ _BMCMenuBar_::MinSize()
 
 	if (fShowPopUpMarker) {
 		// account for popup indicator + a few pixels margin
-		size.width += 13.0;
+		size.width += kPopUpIndicatorWidth + kMarginWidth;
 	}
 
 	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
@@ -317,7 +321,9 @@ _BMCMenuBar_::_Init(bool setMaxContentWidth)
 	if (be_control_look != NULL)
 		left = right = be_control_look->DefaultLabelSpacing();
 
-	SetItemMargins(left, top, right + fShowPopUpMarker ? 10 : 0, bottom);
+	SetItemMargins(left, top,
+		right + fShowPopUpMarker ? kPopUpIndicatorWidth + kMarginWidth : 0,
+		bottom);
 
 	fPreviousWidth = Bounds().Width();
 
