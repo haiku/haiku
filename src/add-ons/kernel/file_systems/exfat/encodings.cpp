@@ -98,14 +98,14 @@
 static status_t
 _lendian_unicode_to_utf8(
 	const char *src,
-	int32 *srcLen,
+	size_t *srcLen,
 	char *dst,
-	uint32 *dstLen)
+	size_t *dstLen)
 {
-	int32 srcLimit = *srcLen;
-	int32 dstLimit = *dstLen;
-	int32 srcCount = 0;
-	int32 dstCount = 0;
+	size_t srcLimit = *srcLen;
+	size_t dstLimit = *dstLen;
+	size_t srcCount = 0;
+	size_t dstCount = 0;
 	status_t status = B_ERROR;
 
 	for (srcCount = 0; srcCount < srcLimit; srcCount += 2) {
@@ -142,14 +142,14 @@ _lendian_unicode_to_utf8(
 static status_t
 _utf8_to_lendian_unicode(
 	const char	*src,
-	int32		*srcLen,
+	size_t		*srcLen,
 	char		*dst,
-	uint32		*dstLen)
+	size_t		*dstLen)
 {
-	int32 srcLimit = *srcLen;
-	int32 dstLimit = *dstLen - 1;
-	int32 srcCount = 0;
-	int32 dstCount = 0;
+	size_t srcLimit = *srcLen;
+	size_t dstLimit = *dstLen - 1;
+	size_t srcCount = 0;
+	size_t dstCount = 0;
 	status_t status = B_ERROR;
 
 	while ((srcCount < srcLimit) && (dstCount < dstLimit)) {
@@ -186,12 +186,12 @@ _utf8_to_lendian_unicode(
 
 // takes a unicode name of unilen uchar's and converts to a utf8 name of at
 // most utf8len uint8's
-status_t unicode_to_utf8(const uchar *uni, uint32 unilen, uint8 *utf8,
-	uint32 *utf8len)
+status_t unicode_to_utf8(const uchar *uni, size_t unilen, uint8 *utf8,
+	size_t *utf8len)
 {
-	uint32 origlen = unilen;
+	//size_t origlen = unilen;
 	status_t result = _lendian_unicode_to_utf8((char *)uni,
-			(int32 *)&unilen, (char *)utf8, utf8len);
+			&unilen, (char *)utf8, utf8len);
 
 	/*if (unilen < origlen) {
 		panic("Name is too long (%lx < %lx)\n", unilen, origlen);
@@ -202,13 +202,13 @@ status_t unicode_to_utf8(const uchar *uni, uint32 unilen, uint8 *utf8,
 }
 
 
-status_t utf8_to_unicode(const char *utf8, uchar *uni, uint32 *unilen)
+status_t utf8_to_unicode(const char *utf8, uchar *uni, size_t *unilen)
 {
-	uint32 origlen = strlen(utf8) + 1;
-	uint32 utf8len = origlen;
+	size_t origlen = strlen(utf8) + 1;
+	size_t utf8len = origlen;
 
 	status_t result = _utf8_to_lendian_unicode(utf8,
-			(int32 *)&utf8len, (char *)uni, unilen);
+			&utf8len, (char *)uni, unilen);
 
 	/*if (origlen < utf8len) {
 		panic("Name is too long (%lx < %lx)\n", *unilen, origlen);

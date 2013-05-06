@@ -9,9 +9,9 @@
 extern "C" {
 #endif
 
-status_t unicode_to_utf8(const uchar *uni, uint32 unilen, uint8 *utf8,
-	uint32 *utf8len);
-status_t utf8_to_unicode(const char *utf8, uchar *uni, uint32 *unilen);
+status_t unicode_to_utf8(const uchar *uni, size_t unilen, uint8 *utf8,
+	size_t *utf8len);
+status_t utf8_to_unicode(const char *utf8, uchar *uni, size_t *unilen);
 
 #ifdef __cplusplus
 }

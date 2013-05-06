@@ -62,8 +62,8 @@ DataStream::FindBlock(off_t pos, off_t& physical, off_t *_length)
 	}
 	*_length = min_c((cluster - clusterIndex + 1) * kClusterSize - offset,
 		fSize - pos);
-	TRACE("inode %" B_PRIdINO ": cluster %ld, pos %lld, %lld\n",
-		fInode->ID(), clusterIndex, pos, physical);
+	TRACE("inode %" B_PRIdINO ": cluster %" B_PRIu32 ", pos %" B_PRIdOFF ", %"
+		B_PRIdOFF "\n", fInode->ID(), clusterIndex, pos, physical);
 	return B_OK;
 }
 

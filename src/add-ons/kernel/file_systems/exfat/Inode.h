@@ -40,7 +40,7 @@ public:
 			ino_t		ID() const { return fID; }
 			ino_t		Parent() const { return fParent; }
 			cluster_t	Cluster() const { return fCluster; }
-			uint32_t	Offset() const { return fOffset; }
+			uint32		Offset() const { return fOffset; }
 			cluster_t	StartCluster() const
 							{ return fFileInfoEntry.file_info.StartCluster(); }
 			bool		IsContiguous() const

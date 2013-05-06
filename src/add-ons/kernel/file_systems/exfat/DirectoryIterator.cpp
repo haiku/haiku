@@ -27,7 +27,7 @@ DirectoryIterator::DirectoryIterator(Inode* inode)
 	fBlock(inode->GetVolume()),
 	fCurrent(NULL)
 {
-	TRACE("DirectoryIterator::DirectoryIterator() %ld\n", fCluster);
+	TRACE("DirectoryIterator::DirectoryIterator() %" B_PRIu32 "\n", fCluster);
 }
 
 
@@ -78,7 +78,7 @@ DirectoryIterator::GetNext(char* name, size_t* _nameLength, ino_t* _id,
 	if (status == B_OK && name != NULL) {
 		status = unicode_to_utf8(unicodeName, nameLength, (uint8 *)name,
 			_nameLength);
-		TRACE("DirectoryIterator::GetNext() %ld %s, %" B_PRIdINO "\n", 
+		TRACE("DirectoryIterator::GetNext() %" B_PRIu32 " %s, %" B_PRIdINO "\n", 
 			fInode->Cluster(), name, *_id);
 	}
 
@@ -184,8 +184,9 @@ DirectoryIterator::_GetNext(uchar* name, size_t* _nameLength, ino_t* _id,
 	status_t status;
 	int32 chunkCount = 1;
 	while ((status = _NextEntry()) == B_OK) {
-		TRACE("DirectoryIterator::_GetNext() %ld/%p, type 0x%x, offset %lld\n",
-			fInode->Cluster(), fCurrent, fCurrent->type, fOffset);
+		TRACE("DirectoryIterator::_GetNext() %" B_PRIu32 "/%p, type 0x%x, "
+			"offset %" B_PRId64 "\n", fInode->Cluster(), fCurrent,
+			fCurrent->type, fOffset);
 		if (fCurrent->type == EXFAT_ENTRY_TYPE_FILE) {
 			chunkCount = fCurrent->file.chunkCount;
 			if (_id != NULL) {
@@ -194,8 +195,8 @@ DirectoryIterator::_GetNext(uchar* name, size_t* _nameLength, ino_t* _id,
 			}
 			if (visitor != NULL)
 				visitor->VisitFile(fCurrent);
-			TRACE("DirectoryIterator::_GetNext() File chunkCount %ld\n",
-				chunkCount);
+			TRACE("DirectoryIterator::_GetNext() File chunkCount %" B_PRId32
+				"\n", chunkCount);
 		} else if (fCurrent->type == EXFAT_ENTRY_TYPE_FILEINFO) {
 			chunkCount--;
 			TRACE("DirectoryIterator::_GetNext() Filename length %d\n",
@@ -241,7 +242,8 @@ DirectoryIterator::_NextEntry()
 		fInode->GetVolume()->ClusterToBlock(fCluster, block);
 		block += (fOffset / fInode->GetVolume()->EntriesPerBlock())
 			% (1 << fInode->GetVolume()->SuperBlock().BlocksPerClusterShift());
-		TRACE("DirectoryIterator::_NextEntry() init to block %lld\n", block);
+		TRACE("DirectoryIterator::_NextEntry() init to block %" B_PRIu64 "\n",
+			block);
 		fCurrent = (struct exfat_entry*)fBlock.SetTo(block)
 			+ fOffset % fInode->GetVolume()->EntriesPerBlock();
 	} else if ((fOffset % fInode->GetVolume()->EntriesPerBlock()) == 0) {	
@@ -253,7 +255,7 @@ DirectoryIterator::_NextEntry()
 			fInode->GetVolume()->ClusterToBlock(fCluster, block);
 		} else
 			block = fBlock.BlockNumber() + 1;
-		TRACE("DirectoryIterator::_NextEntry() block %lld\n", block);
+		TRACE("DirectoryIterator::_NextEntry() block %" B_PRIu64 "\n", block);
 		fCurrent = (struct exfat_entry*)fBlock.SetTo(block);
 	} else
 		fCurrent++;
