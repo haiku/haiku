@@ -412,6 +412,20 @@ rule UsePrivateSystemHeaders
 }
 
 
+rule UseBuildFeatureHeaders feature : attribute 
+{
+	# UseBuildFeatureHeaders <feature> : [ <attribute> ] ;
+	# A shorthand for
+	# UseHeaders [ BuildFeatureAttribute <feature> : <attribute> ] : true ;
+	# Moreover the default value for <attribute> is "headers", which usually
+	# allows the rule to be called with the feature name as the only parameter.
+
+	local headers = [ BuildFeatureAttribute $(feature) : $(attribute:E=headers)
+		: path ] ;
+	UseHeaders $(headers) : true ;
+}
+
+
 rule FStandardOSHeaders
 {
 	local osIncludes = add-ons add-ons/file_system add-ons/graphics
