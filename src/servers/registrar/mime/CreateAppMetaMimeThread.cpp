@@ -46,8 +46,6 @@ CreateAppMetaMimeThread::DoMimeUpdate(const entry_ref* ref, bool* _entryIsDir)
 	if (ref == NULL)
 		return B_BAD_VALUE;
 
-	BNode typeNode;
-
 	BFile file;
 	status_t status = file.SetTo(ref, B_READ_ONLY | O_NOTRAVERSE);
 	if (status < B_OK)
@@ -85,14 +83,8 @@ CreateAppMetaMimeThread::DoMimeUpdate(const entry_ref* ref, bool* _entryIsDir)
 	if (!mime.IsInstalled())
 		mime.Install();
 
-	BString path = "/";
-	path.Append(signature);
-	path.ToLower();
-		// Signatures and MIME types are case insensitive, but we want to
-		// preserve the case wherever possible
-	path.Prepend(get_database_directory().c_str());
-
-	status = typeNode.SetTo(path.String());
+	BNode typeNode;
+	status = open_type(signature, &typeNode);
 	if (status < B_OK)
 		return status;
 
