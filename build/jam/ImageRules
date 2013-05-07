@@ -318,7 +318,8 @@ rule CopyDirectoryToContainer container : directoryTokens : sourceDirectory
 	#	: <sourceDirectory> : <targetDirectoryName> : <excludePatterns>
 	#	[ : <flags> ] ;
 	#
-	# Supported flags: alwaysUpdate
+	# Supported flags: alwaysUpdate, isTarget
+	# isTarget: <sourceDirectory> is a target, not a path
 
 	# If the image shall only be updated, we don't copy any directories
 	if [ on $(container) return $(HAIKU_CONTAINER_UPDATE_ONLY) ]
@@ -328,14 +329,22 @@ rule CopyDirectoryToContainer container : directoryTokens : sourceDirectory
 	}
 
 	if ! $(targetDirectoryName) {
-		local path = [ FReverse [ FSplitPath $(sourceDirectory) ] ] ;
-		targetDirectoryName = $(path[1]) ;
+		targetDirectoryName = $(sourceDirectory[1]:BS) ;
+	}
+
+	# If sourceDirectory is a path, not a target, make it a target, so we can
+	# tree them the same way.
+	if ! isTarget in $(flags) {
+		sourceDirectory = $(sourceDirectory:G=copy-directory-to-container) ;
+		SEARCH on $(sourceDirectory) = ;
+		TARGET on $(sourceDirectory) = ;
 	}
 
 	local directory = [ AddDirectoryToContainer $(container)
 		: $(directoryTokens) $(targetDirectoryName) ] ;
 
 	local targetDir = $(directory)/-/$(sourceDirectory) ;
+	Depends $(targetDir) : $(sourceDirectory) ;
 	EXCLUDE_PATTERNS on $(targetDir) = $(excludePatterns) ;
 	SOURCE_DIRECTORY on $(targetDir) = $(sourceDirectory) ;
 	TARGET_DIRECTORY on $(targetDir) = $(directory) ;
@@ -719,7 +728,7 @@ actions AddSymlinkToContainerCopyFilesScript
 }
 
 
-actions AddDirectoryToContainerCopyFilesScript
+actions AddDirectoryToContainerCopyFilesScript bind SOURCE_DIRECTORY
 {
 	echo \$cp -r $(EXCLUDE_PATTERNS) "\"\${sPrefix}$(SOURCE_DIRECTORY)/.\"" \
 		"\"\${tPrefix}$(TARGET_DIRECTORY:G=)\"" >> $(2[1])
