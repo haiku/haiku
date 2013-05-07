@@ -7,13 +7,18 @@
  */
 
 
-#include "DatabaseDirectory.h"
+#include <mime/DatabaseDirectory.h>
 
 #include <fs_attr.h>
 #include <Node.h>
 #include <StringList.h>
 
 #include <mime/database_support.h>
+
+
+namespace BPrivate {
+namespace Storage {
+namespace Mime {
 
 
 DatabaseDirectory::DatabaseDirectory()
@@ -67,3 +72,8 @@ DatabaseDirectory::_IsValidMimeTypeEntry(const entry_ref& entry)
 	return node.SetTo(&entry) == B_OK
 		&& node.GetAttrInfo(BPrivate::Storage::Mime::kTypeAttr, &info) == B_OK;
 }
+
+
+} // namespace Mime
+} // namespace Storage
+} // namespace BPrivate

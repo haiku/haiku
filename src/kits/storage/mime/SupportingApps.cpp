@@ -9,7 +9,7 @@
  */
 
 
-#include "SupportingApps.h"
+#include <mime/SupportingApps.h>
 
 #include <stdio.h>
 
@@ -23,9 +23,8 @@
 #include <String.h>
 
 #include <mime/database_support.h>
+#include <mime/DatabaseDirectory.h>
 #include <storage_support.h>
-
-#include "DatabaseDirectory.h"
 
 
 #define DBG(x) x

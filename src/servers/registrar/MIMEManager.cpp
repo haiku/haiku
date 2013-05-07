@@ -22,6 +22,7 @@
 #include <TypeConstants.h>
 
 #include "CreateAppMetaMimeThread.h"
+#include "MessageDeliverer.h"
 #include "MimeSnifferAddonManager.h"
 #include "TextSnifferAddon.h"
 #include "UpdateMimeInfoThread.h"
@@ -38,23 +39,27 @@ using namespace BPrivate;
 */
 
 
+static MimeSnifferAddonManager*
+init_mime_sniffer_add_on_manager()
+{
+	if (MimeSnifferAddonManager::CreateDefault() != B_OK)
+		return NULL;
+
+	MimeSnifferAddonManager* manager = MimeSnifferAddonManager::Default();
+	manager->AddMimeSnifferAddon(new(nothrow) TextSnifferAddon());
+	return manager;
+}
+
+
 /*!	\brief Creates and initializes a MIMEManager.
 */
 MIMEManager::MIMEManager()
 	:
 	BLooper("main_mime"),
-	fDatabase(),
+	fDatabase(init_mime_sniffer_add_on_manager(), this),
 	fThreadManager()
 {
 	AddHandler(&fThreadManager);
-
-	// prepare the MimeSnifferAddonManager and the built-in add-ons
-	status_t error = MimeSnifferAddonManager::CreateDefault();
-	if (error == B_OK) {
-		MimeSnifferAddonManager* addonManager
-			= MimeSnifferAddonManager::Default();
-		addonManager->AddMimeSnifferAddon(new(nothrow) TextSnifferAddon());
-	}
 }
 
 
@@ -295,6 +300,13 @@ MIMEManager::MessageReceived(BMessage *message)
 			BLooper::MessageReceived(message);
 			break;
 	}
+}
+
+
+status_t
+MIMEManager::Notify(BMessage* message, const BMessenger& target)
+{
+	return MessageDeliverer::Default()->DeliverMessage(message, target);
 }
 
 

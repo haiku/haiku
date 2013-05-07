@@ -8,7 +8,7 @@
  */
 
 
-#include "Database.h"
+#include <mime/Database.h>
 
 #include <stdio.h>
 #include <string>
@@ -34,7 +34,6 @@
 #include <mime/database_support.h>
 #include <storage_support.h>
 
-#include "MessageDeliverer.h"
 
 //#define DBG(x) x
 #define DBG(x)
@@ -44,6 +43,12 @@
 namespace BPrivate {
 namespace Storage {
 namespace Mime {
+
+
+Database::NotificationListener::~NotificationListener()
+{
+}
+
 
 /*!
 	\class Database
@@ -59,9 +64,13 @@ namespace Mime {
 // constructor
 /*!	\brief Creates and initializes a Mime::Database object.
 */
-Database::Database()
+Database::Database(MimeSniffer* mimeSniffer,
+	NotificationListener* notificationListener)
 	:
 	fStatus(B_NO_INIT),
+	fNotificationListener(notificationListener),
+	fAssociatedTypes(mimeSniffer),
+	fSnifferRules(mimeSniffer),
 	fDeferredInstallNotificationsLocker("deferred install notifications"),
 	fDeferredInstallNotifications()
 {
@@ -1472,16 +1481,17 @@ Database::_SendMonitorUpdate(int32 which, const char *type, int32 action)
 status_t
 Database::_SendMonitorUpdate(BMessage &msg)
 {
-//	DBG(OUT("Database::_SendMonitorUpdate(BMessage&)\n"));
+	if (fNotificationListener == NULL)
+		return B_OK;
+
 	status_t err;
 	std::set<BMessenger>::const_iterator i;
 	for (i = fMonitorMessengers.begin(); i != fMonitorMessengers.end(); i++) {
-		status_t err =  MessageDeliverer::Default()->DeliverMessage(&msg, *i);
+		status_t err = fNotificationListener->Notify(&msg, *i);
 		if (err) {
 			DBG(OUT("Database::_SendMonitorUpdate(BMessage&): DeliverMessage failed, 0x%lx\n", err));
 		}
 	}
-//	DBG(OUT("Database::_SendMonitorUpdate(BMessage&) done\n"));
 	err = B_OK;
 	return err;
 }

@@ -7,7 +7,7 @@
 	AssociatedTypes class implementation
 */
 
-#include "AssociatedTypes.h"
+#include <mime/AssociatedTypes.h>
 
 #include <stdio.h>
 
@@ -16,14 +16,13 @@
 #include <Directory.h>
 #include <Entry.h>
 #include <Message.h>
+#include <mime/database_support.h>
+#include <mime/DatabaseDirectory.h>
+#include <mime/MimeSniffer.h>
 #include <MimeType.h>
 #include <Path.h>
 #include <String.h>
-#include <mime/database_support.h>
 #include <storage_support.h>
-
-#include "DatabaseDirectory.h"
-#include "MimeSnifferAddonManager.h"
 
 
 #define DBG(x) x
@@ -41,8 +40,10 @@ namespace Mime {
 
 // Constructor
 //! Constructs a new AssociatedTypes object
-AssociatedTypes::AssociatedTypes()
-	: fHaveDoneFullBuild(false)
+AssociatedTypes::AssociatedTypes(MimeSniffer* mimeSniffer)
+	:
+	fMimeSniffer(mimeSniffer),
+	fHaveDoneFullBuild(false)
 {
 }
 
@@ -106,16 +107,13 @@ AssociatedTypes::GuessMimeType(const char *filename, BString *result)
 	if (!err && !fHaveDoneFullBuild)
 		err = BuildAssociatedTypesTable();
 
-	// if we have an MimeSnifferAddonManager, let's give it a shot first
-	if (!err) {
-		MimeSnifferAddonManager* manager = MimeSnifferAddonManager::Default();
-		if (manager) {
-			BMimeType mimeType;
-			float priority = manager->GuessMimeType(filename, &mimeType);
-			if (priority >= 0) {
-				*result = mimeType.Type();
-				return B_OK;
-			}
+	// if we have a mime sniffer, let's give it a shot first
+	if (!err && fMimeSniffer != NULL) {
+		BMimeType mimeType;
+		float priority = fMimeSniffer->GuessMimeType(filename, &mimeType);
+		if (priority >= 0) {
+			*result = mimeType.Type();
+			return B_OK;
 		}
 	}
 

@@ -12,6 +12,11 @@
 #include <MergedDirectory.h>
 
 
+namespace BPrivate {
+namespace Storage {
+namespace Mime {
+
+
 class DatabaseDirectory : public BMergedDirectory {
 public:
 								DatabaseDirectory();
@@ -27,6 +32,11 @@ protected:
 private:
 			bool				_IsValidMimeTypeEntry(const entry_ref& entry);
 };
+
+
+} // namespace Mime
+} // namespace Storage
+} // namespace BPrivate
 
 
 #endif	// DATABASE_DIRECTORY_H

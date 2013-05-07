@@ -25,9 +25,12 @@ namespace Sniffer {
 
 namespace Mime {
 
+class MimeSniffer;
+
+
 class SnifferRules {
 public:
-	SnifferRules();
+	SnifferRules(MimeSniffer* mimeSniffer);
 	~SnifferRules();
 	
 	status_t GuessMimeType(const entry_ref *ref, BString *type);
@@ -54,8 +57,11 @@ private:
 	status_t ProcessType(const char *type, ssize_t *bytesNeeded);
 
 	std::list<sniffer_rule> fRuleList;
-	ssize_t fMaxBytesNeeded;
-	bool fHaveDoneFullBuild;
+
+private:
+	MimeSniffer*	fMimeSniffer;
+	ssize_t			fMaxBytesNeeded;
+	bool			fHaveDoneFullBuild;
 };
 
 } // namespace Mime

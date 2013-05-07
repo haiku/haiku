@@ -44,10 +44,6 @@ MergeObject <libbe>storage_kit.o :
 	VolumeRoster.cpp
 	storage_support.cpp
 
-	# mime
-	database_access.cpp
-	database_support.cpp
-
 	# sniffer
 	CharStream.cpp
 	Err.cpp
@@ -90,3 +86,5 @@ MergeObject <libbe>storage_kit.o :
 	SetStringJob.cpp
 	UninitializeJob.cpp
 ;
+
+HaikuSubInclude mime ;

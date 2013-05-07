@@ -35,6 +35,8 @@ SharedLibrary libbe.so : :
 	<libbe>storage_kit.o
 	<libbe>support_kit.o
 
+	libstorage_kit_mime.a
+
 	libicon.a
 	libagg.a
 

@@ -10,11 +10,14 @@
 #ifndef _MIME_INSTALLED_TYPES_H
 #define _MIME_INSTALLED_TYPES_H
 
-#include "Supertype.h"
+
+#include <map>
+#include <string>
+
 #include <SupportDefs.h>
 
-#include <string>
-#include <map>
+#include <mime/Supertype.h>
+
 
 class BMessage;
 

@@ -1,0 +1,23 @@
+SubDir HAIKU_TOP src kits storage mime ;
+
+SetSubDirSupportedPlatforms haiku libbe_test ;
+
+UsePrivateHeaders app shared storage ;
+#UsePrivateHeaders app libroot shared storage ;
+#UsePrivateSystemHeaders ;
+
+# for libbe_test
+#UsePublicHeaders [ FDirName add-ons registrar ] ;
+
+StaticLibrary libstorage_kit_mime.a :
+	AssociatedTypes.cpp
+	Database.cpp
+	DatabaseDirectory.cpp
+	database_access.cpp
+	database_support.cpp
+	InstalledTypes.cpp
+	MimeSniffer.cpp
+	SnifferRules.cpp
+	Supertype.cpp
+	SupportingApps.cpp
+;

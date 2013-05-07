@@ -21,9 +21,12 @@ namespace BPrivate {
 namespace Storage {
 namespace Mime {
 
+class MimeSniffer;
+
+
 class AssociatedTypes {
 public:
-	AssociatedTypes();
+	AssociatedTypes(MimeSniffer* mimeSniffer);
 	~AssociatedTypes();
 		
 	status_t GetAssociatedTypes(const char *extension, BMessage *types);	
@@ -45,8 +48,10 @@ private:
 
 	std::map<std::string, std::set<std::string> > fFileExtensions;	// mime type => set of associated file extensions
 	std::map<std::string, std::set<std::string> > fAssociatedTypes;	// file extension => set of associated mime types
-	
-	bool fHaveDoneFullBuild;
+
+private:
+	MimeSniffer*	fMimeSniffer;
+	bool			fHaveDoneFullBuild;
 };
 
 } // namespace Mime

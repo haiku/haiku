@@ -12,7 +12,7 @@
 	SnifferRules class implementation
 */
 
-#include "SnifferRules.h"
+#include <mime/SnifferRules.h>
 
 #include <stdio.h>
 #include <sys/stat.h>
@@ -22,14 +22,14 @@
 #include <File.h>
 #include <MimeType.h>
 #include <mime/database_support.h>
+#include <mime/DatabaseDirectory.h>
+#include <mime/MimeSniffer.h>
 #include <sniffer/Parser.h>
 #include <sniffer/Rule.h>
 #include <StorageDefs.h>
 #include <storage_support.h>
 #include <String.h>
 
-#include "DatabaseDirectory.h"
-#include "MimeSnifferAddonManager.h"
 
 #define DBG(x) x
 //#define DBG(x)
@@ -112,8 +112,11 @@ bool operator<(SnifferRules::sniffer_rule &left, SnifferRules::sniffer_rule &rig
 
 // Constructor
 //! Constructs a new SnifferRules object
-SnifferRules::SnifferRules()
-	: fHaveDoneFullBuild(false)
+SnifferRules::SnifferRules(MimeSniffer* mimeSniffer)
+	:
+	fMimeSniffer(mimeSniffer),
+	fMaxBytesNeeded(0),
+	fHaveDoneFullBuild(false)
 {
 }
 
@@ -449,15 +452,12 @@ SnifferRules::GuessMimeType(BFile* file, const void *buffer, int32 length,
 	if (!err && !fHaveDoneFullBuild)
 		err = BuildRuleList();
 
-	// first ask the MimeSnifferAddonManager for a suitable type
+	// first ask the MIME sniffer for a suitable type
 	float addonPriority = -1;
 	BMimeType mimeType;
-	if (!err) {
-		MimeSnifferAddonManager* manager = MimeSnifferAddonManager::Default();
-		if (manager) {
-			addonPriority = manager->GuessMimeType(file, buffer, length,
-				&mimeType);
-		}
+	if (!err && fMimeSniffer != NULL) {
+		addonPriority = fMimeSniffer->GuessMimeType(file, buffer, length,
+			&mimeType);
 	}
 
 	if (!err) {
@@ -520,10 +520,10 @@ SnifferRules::MaxBytesNeeded()
 	ssize_t err = fHaveDoneFullBuild ? B_OK : BuildRuleList();
 	if (!err) {
 		err = fMaxBytesNeeded;
-		MimeSnifferAddonManager* manager = MimeSnifferAddonManager::Default();
-		if (manager) {
+
+		if (fMimeSniffer != NULL) {
 			fMaxBytesNeeded = max_c(fMaxBytesNeeded,
-				(ssize_t)manager->MinimalBufferSize());
+				(ssize_t)fMimeSniffer->MinimalBufferSize());
 		}
 	}
 	return err;

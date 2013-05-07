@@ -18,12 +18,11 @@
 #include <Messenger.h>
 #include <StorageDefs.h>
 
+#include <mime/AssociatedTypes.h>
 #include <mime/database_access.h>
-
-#include "AssociatedTypes.h"
-#include "InstalledTypes.h"
-#include "SnifferRules.h"
-#include "SupportingApps.h"
+#include <mime/InstalledTypes.h>
+#include <mime/SnifferRules.h>
+#include <mime/SupportingApps.h>
 
 
 class BNode;
@@ -37,6 +36,8 @@ namespace BPrivate {
 namespace Storage {
 namespace Mime {
 
+class MimeSniffer;
+
 // types of mime update functions that may be run asynchronously
 typedef enum {
 	B_REG_UPDATE_MIME_INFO,
@@ -45,7 +46,11 @@ typedef enum {
 
 class Database {
 	public:
-		Database();
+		class NotificationListener;
+
+	public:
+		Database(MimeSniffer* mimeSniffer,
+			NotificationListener* notificationListener);
 		~Database();
 	
 		status_t InitCheck() const;
@@ -137,6 +142,7 @@ class Database {
 
 	private:
 		status_t fStatus;
+		NotificationListener* fNotificationListener;
 		std::set<BMessenger> fMonitorMessengers;
 		AssociatedTypes fAssociatedTypes;
 		InstalledTypes fInstalledTypes;
@@ -168,6 +174,16 @@ class InstallNotificationDeferrer {
 		Database*	fDatabase;
 		const char*	fType;
 };
+
+
+class Database::NotificationListener {
+public:
+	virtual						~NotificationListener();
+
+	virtual	status_t			Notify(BMessage* message,
+									const BMessenger& target) = 0;
+};
+
 
 } // namespace Mime
 } // namespace Storage

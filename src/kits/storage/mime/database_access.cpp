@@ -12,6 +12,8 @@
 	Mime database atomic read functions
 */
 
+#include <mime/database_access.h>
+
 #include <Bitmap.h>
 #include <Entry.h>
 #include <Directory.h>
@@ -30,7 +32,6 @@
 #include <stdio.h>
 #include <string>
 
-#include "mime/database_access.h"
 
 #define DBG(x) x
 //#define DBG(x)

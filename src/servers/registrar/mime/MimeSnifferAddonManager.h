@@ -8,6 +8,9 @@
 #include <List.h>
 #include <Locker.h>
 
+#include <mime/MimeSniffer.h>
+
+
 class BFile;
 class BMimeSnifferAddon;
 class BMimeType;
@@ -17,7 +20,7 @@ namespace Storage {
 namespace Mime {
 
 
-class MimeSnifferAddonManager {
+class MimeSnifferAddonManager : public BPrivate::Storage::Mime::MimeSniffer {
 private:
 								MimeSnifferAddonManager();
 								~MimeSnifferAddonManager();
@@ -29,14 +32,14 @@ public:
 
 			status_t			AddMimeSnifferAddon(BMimeSnifferAddon* addon);
 
-			size_t				MinimalBufferSize();
+	virtual	size_t				MinimalBufferSize();
 
-			float				GuessMimeType(const char* fileName,
+	virtual	float				GuessMimeType(const char* fileName,
 									BMimeType* type);
-			float				GuessMimeType(BFile* file,
+	virtual	float				GuessMimeType(BFile* file,
 									const void* buffer, int32 length,
 									BMimeType* type);
-								
+
 private:
 			struct AddonReference;
 

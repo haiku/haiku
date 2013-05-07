@@ -21,9 +21,8 @@
 #include <Path.h>
 #include <String.h>
 
+#include <mime/Database.h>
 #include <mime/database_support.h>
-
-#include "Database.h"
 
 
 namespace BPrivate {

@@ -7,7 +7,7 @@
 	Supertype class implementation
 */
 
-#include "Supertype.h"
+#include <mime/Supertype.h>
 
 #include <Message.h>
 #include <mime/database_support.h>
