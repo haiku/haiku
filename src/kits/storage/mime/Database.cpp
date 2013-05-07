@@ -30,8 +30,8 @@
 #include <TypeConstants.h>
 
 #include <AutoLocker.h>
-#include <mime/database_access.h>
 #include <mime/database_support.h>
+#include <mime/DatabaseLocation.h>
 #include <storage_support.h>
 
 
@@ -64,18 +64,21 @@ Database::NotificationListener::~NotificationListener()
 // constructor
 /*!	\brief Creates and initializes a Mime::Database object.
 */
-Database::Database(MimeSniffer* mimeSniffer,
+Database::Database(DatabaseLocation* databaseLocation, MimeSniffer* mimeSniffer,
 	NotificationListener* notificationListener)
 	:
 	fStatus(B_NO_INIT),
+	fLocation(databaseLocation),
 	fNotificationListener(notificationListener),
-	fAssociatedTypes(mimeSniffer),
-	fSnifferRules(mimeSniffer),
+	fAssociatedTypes(databaseLocation, mimeSniffer),
+	fInstalledTypes(databaseLocation),
+	fSnifferRules(databaseLocation, mimeSniffer),
+	fSupportingApps(databaseLocation),
 	fDeferredInstallNotificationsLocker("deferred install notifications"),
 	fDeferredInstallNotifications()
 {
 	// make sure the user's MIME DB directory exists
-	fStatus = create_directory(get_writable_database_directory(),
+	fStatus = create_directory(fLocation->WritableDirectory(),
 		S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
 }
 
@@ -116,14 +119,14 @@ Database::Install(const char *type)
 		return B_BAD_VALUE;
 
 	BEntry entry;
-	status_t err = entry.SetTo(type_to_writable_filename(type));
+	status_t err = entry.SetTo(fLocation->WritablePathForType(type));
 	if (!err) {
 		if (entry.Exists())
 			err = B_FILE_EXISTS;
 		else {
 			bool didCreate = false;
 			BNode node;
-			err = open_or_create_type(type, &node, &didCreate);
+			err = fLocation->OpenOrCreateType(type, node, &didCreate);
 			if (!err && didCreate) {
 				fInstalledTypes.AddType(type);
 				_SendInstallNotification(type);
@@ -148,7 +151,7 @@ Database::Delete(const char *type)
 
 	// Open the type
 	BEntry entry;
-	status_t status = entry.SetTo(type_to_writable_filename(type));
+	status_t status = entry.SetTo(fLocation->WritablePathForType(type));
 	if (status != B_OK)
 		return status;
 
@@ -198,7 +201,7 @@ Database::_SetStringValue(const char *type, int32 what, const char* attribute,
 		return B_BAD_VALUE;
 
 	char oldValue[maxLength];
-	status_t status = read_mime_attr(type, attribute, oldValue,
+	status_t status = fLocation->ReadAttribute(type, attribute, oldValue,
 		maxLength, attributeType);
 	if (status >= B_OK && !strcmp(value, oldValue)) {
 		// nothing has changed, no need to write back the data
@@ -206,7 +209,7 @@ Database::_SetStringValue(const char *type, int32 what, const char* attribute,
 	}
 
 	bool didCreate = false;
-	status = write_mime_attr(type, attribute, value, length + 1,
+	status = fLocation->WriteAttribute(type, attribute, value, length + 1,
 		attributeType, &didCreate);
 
 	if (status == B_OK) {
@@ -267,7 +270,8 @@ Database::SetAttrInfo(const char *type, const BMessage *info)
 		return B_BAD_VALUE;
 
 	bool didCreate = false;
-	status_t status = write_mime_attr_message(type, kAttrInfoAttr, info, &didCreate);
+	status_t status = fLocation->WriteMessageAttribute(type, kAttrInfoAttr,
+		*info, &didCreate);
 	if (status == B_OK) {
 		if (didCreate)
 			_SendInstallNotification(type);
@@ -334,8 +338,8 @@ Database::SetFileExtensions(const char *type, const BMessage *extensions)
 		return B_BAD_VALUE;
 
 	bool didCreate = false;
-	status_t status = write_mime_attr_message(type, kFileExtensionsAttr,
-		extensions, &didCreate);
+	status_t status = fLocation->WriteMessageAttribute(type,
+		kFileExtensionsAttr, *extensions, &didCreate);
 
 	if (status == B_OK) {
 		if (didCreate) {
@@ -439,7 +443,7 @@ Database::SetIconForType(const char *type, const char *fileType,
 	BNode node;
 	bool didCreate = false;
 
-	status_t err = open_or_create_type(type, &node, &didCreate);
+	status_t err = fLocation->OpenOrCreateType(type, node, &didCreate);
 	if (err != B_OK)
 		return err;
 
@@ -500,7 +504,7 @@ Database::SetIconForType(const char *type, const char *fileType,
 	BNode node;
 	bool didCreate = false;
 
-	status_t err = open_or_create_type(type, &node, &didCreate);
+	status_t err = fLocation->OpenOrCreateType(type, node, &didCreate);
 	if (err != B_OK)
 		return err;
 
@@ -556,8 +560,8 @@ Database::SetSnifferRule(const char *type, const char *rule)
 		return B_BAD_VALUE;
 
 	bool didCreate = false;
-	status_t status = write_mime_attr(type, kSnifferRuleAttr, rule, strlen(rule) + 1,
-		kSnifferRuleType, &didCreate);
+	status_t status = fLocation->WriteAttribute(type, kSnifferRuleAttr, rule,
+		strlen(rule) + 1, kSnifferRuleType, &didCreate);
 
 	if (status == B_OK)
 		status = fSnifferRules.SetSnifferRule(type, rule);
@@ -597,7 +601,7 @@ Database::SetSupportedTypes(const char *type, const BMessage *types, bool fullSy
 	// Install the types
 	const char *supportedType;
 	for (int32 i = 0; types->FindString("types", i, &supportedType) == B_OK; i++) {
-		if (!is_installed(supportedType)) {
+		if (!fLocation->IsInstalled(supportedType)) {
 			if (Install(supportedType) != B_OK)
 				break;
 
@@ -610,8 +614,8 @@ Database::SetSupportedTypes(const char *type, const BMessage *types, bool fullSy
 
 	// Write the attr
 	bool didCreate = false;
-	status_t status = write_mime_attr_message(type, kSupportedTypesAttr, types,
-		&didCreate);
+	status_t status = fLocation->WriteMessageAttribute(type,
+		kSupportedTypesAttr, *types, &didCreate);
 
 	// Notify the monitor if we created the type when we opened it
 	if (status != B_OK)
@@ -976,7 +980,7 @@ Database::StopWatching(BMessenger target)
 status_t
 Database::DeleteAppHint(const char *type)
 {
-	status_t status = delete_attribute(type, kAppHintAttr);
+	status_t status = fLocation->DeleteAttribute(type, kAppHintAttr);
 	if (status == B_OK)
 		_SendMonitorUpdate(B_APP_HINT_CHANGED, type, B_META_MIME_DELETED);
 	else if (status == B_ENTRY_NOT_FOUND)
@@ -998,7 +1002,7 @@ Database::DeleteAppHint(const char *type)
 status_t
 Database::DeleteAttrInfo(const char *type)
 {
-	status_t status = delete_attribute(type, kAttrInfoAttr);
+	status_t status = fLocation->DeleteAttribute(type, kAttrInfoAttr);
 	if (status == B_OK)
 		_SendMonitorUpdate(B_ATTR_INFO_CHANGED, type, B_META_MIME_DELETED);
 	else if (status == B_ENTRY_NOT_FOUND)
@@ -1020,7 +1024,7 @@ Database::DeleteAttrInfo(const char *type)
 status_t
 Database::DeleteShortDescription(const char *type)
 {
-	status_t status = delete_attribute(type, kShortDescriptionAttr);
+	status_t status = fLocation->DeleteAttribute(type, kShortDescriptionAttr);
 	if (status == B_OK)
 		_SendMonitorUpdate(B_SHORT_DESCRIPTION_CHANGED, type, B_META_MIME_DELETED);
 	else if (status == B_ENTRY_NOT_FOUND)
@@ -1042,7 +1046,7 @@ Database::DeleteShortDescription(const char *type)
 status_t
 Database::DeleteLongDescription(const char *type)
 {
-	status_t status = delete_attribute(type, kLongDescriptionAttr);
+	status_t status = fLocation->DeleteAttribute(type, kLongDescriptionAttr);
 	if (status == B_OK)
 		_SendMonitorUpdate(B_LONG_DESCRIPTION_CHANGED, type, B_META_MIME_DELETED);
 	else if (status == B_ENTRY_NOT_FOUND)
@@ -1064,7 +1068,7 @@ Database::DeleteLongDescription(const char *type)
 status_t
 Database::DeleteFileExtensions(const char *type)
 {
-	status_t status = delete_attribute(type, kFileExtensionsAttr);
+	status_t status = fLocation->DeleteAttribute(type, kFileExtensionsAttr);
 	if (status == B_OK)
 		_SendMonitorUpdate(B_FILE_EXTENSIONS_CHANGED, type, B_META_MIME_DELETED);
 	else if (status == B_ENTRY_NOT_FOUND)
@@ -1088,7 +1092,7 @@ status_t
 Database::DeleteIcon(const char *type, icon_size which)
 {
 	const char *attr = which == B_MINI_ICON ? kMiniIconAttr : kLargeIconAttr;
-	status_t status = delete_attribute(type, attr);
+	status_t status = fLocation->DeleteAttribute(type, attr);
 	if (status == B_OK)
 		_SendMonitorUpdate(B_ICON_CHANGED, type, which, B_META_MIME_DELETED);
 	else if (status == B_ENTRY_NOT_FOUND)
@@ -1111,7 +1115,7 @@ status_t
 Database::DeleteIcon(const char *type)
 {
 	// TODO: extra notification for vector icon (uses B_LARGE_ICON now)
-	status_t status = delete_attribute(type, kIconAttr);
+	status_t status = fLocation->DeleteAttribute(type, kIconAttr);
 	if (status == B_OK) {
 		_SendMonitorUpdate(B_ICON_CHANGED, type, B_LARGE_ICON,
 						   B_META_MIME_DELETED);
@@ -1146,7 +1150,7 @@ Database::DeleteIconForType(const char *type, const char *fileType, icon_size wh
 	std::string attr = (which == B_MINI_ICON
 		? kMiniIconAttrPrefix : kLargeIconAttrPrefix) + BPrivate::Storage::to_lower(fileType);
 
-	status_t status = delete_attribute(type, attr.c_str());
+	status_t status = fLocation->DeleteAttribute(type, attr.c_str());
 	if (status == B_OK) {
 		_SendMonitorUpdate(B_ICON_FOR_TYPE_CHANGED, type, fileType,
 			which == B_LARGE_ICON, B_META_MIME_DELETED);
@@ -1181,7 +1185,7 @@ Database::DeleteIconForType(const char *type, const char *fileType)
 
 	// TODO: introduce extra notification for vector icons?
 	// (uses B_LARGE_ICON now)
-	status_t status = delete_attribute(type, attr.c_str());
+	status_t status = fLocation->DeleteAttribute(type, attr.c_str());
 	if (status == B_OK) {
 		_SendMonitorUpdate(B_ICON_FOR_TYPE_CHANGED, type, fileType,
 			true, B_META_MIME_DELETED);
@@ -1209,7 +1213,7 @@ Database::DeletePreferredApp(const char *type, app_verb verb)
 
 	switch (verb) {
 		case B_OPEN:
-			status = delete_attribute(type, kPreferredAppAttr);
+			status = fLocation->DeleteAttribute(type, kPreferredAppAttr);
 			break;
 
 		default:
@@ -1242,7 +1246,7 @@ Database::DeletePreferredApp(const char *type, app_verb verb)
 status_t
 Database::DeleteSnifferRule(const char *type)
 {
-	status_t status = delete_attribute(type, kSnifferRuleAttr);
+	status_t status = fLocation->DeleteAttribute(type, kSnifferRuleAttr);
 	if (status == B_OK) {
 		status = fSnifferRules.DeleteSnifferRule(type);
 		if (status == B_OK) {
@@ -1274,7 +1278,7 @@ Database::DeleteSnifferRule(const char *type)
 status_t
 Database::DeleteSupportedTypes(const char *type, bool fullSync)
 {
-	status_t status = delete_attribute(type, kSupportedTypesAttr);
+	status_t status = fLocation->DeleteAttribute(type, kSupportedTypesAttr);
 
 	// Update the supporting apps database. If fullSync is specified,
 	// do so even if the supported types attribute didn't exist, as

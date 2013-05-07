@@ -24,6 +24,7 @@
 
 #include <mime/database_support.h>
 #include <mime/DatabaseDirectory.h>
+#include <mime/DatabaseLocation.h>
 #include <storage_support.h>
 
 
@@ -42,8 +43,10 @@ namespace Mime {
 
 // Constructor
 //! Constructs a new SupportingApps object
-SupportingApps::SupportingApps()
-	: fHaveDoneFullBuild(false)
+SupportingApps::SupportingApps(DatabaseLocation* databaseLocation)
+	:
+	fDatabaseLocation(databaseLocation),
+	fHaveDoneFullBuild(false)
 {
 }
 
@@ -266,7 +269,7 @@ SupportingApps::BuildSupportingAppsTable()
 	fStrandedTypes.clear();
 
 	DatabaseDirectory dir;
-	status_t status = dir.Init("application");
+	status_t status = dir.Init(fDatabaseLocation, "application");
 
 	// Build the supporting apps table based on the mime database
 	if (status == B_OK) {
@@ -290,8 +293,8 @@ SupportingApps::BuildSupportingAppsTable()
 					&appSignature) >= B_OK) {
 				// Read in the list of supported types
 				BMessage msg;
-				if (read_mime_attr_message(appSignature.String(), kSupportedTypesAttr,
-						&msg) == B_OK) {
+				if (fDatabaseLocation->ReadMessageAttribute(appSignature,
+						kSupportedTypesAttr, msg) == B_OK) {
 					// Iterate through the supported types, adding them to the list of
 					// supported types for the application and adding the application's
 					// signature to the list of supporting apps for each type

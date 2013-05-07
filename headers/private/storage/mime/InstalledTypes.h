@@ -25,9 +25,13 @@ namespace BPrivate {
 namespace Storage {
 namespace Mime {
 
+
+class DatabaseLocation;
+
+
 class InstalledTypes {
 	public:
-		InstalledTypes();
+		InstalledTypes(DatabaseLocation* databaseLocation);
 		~InstalledTypes();
 
 		status_t GetInstalledTypes(BMessage *types);
@@ -55,6 +59,8 @@ class InstalledTypes {
 
 		status_t _BuildInstalledTypesList();
 
+private:
+		DatabaseLocation* fDatabaseLocation;
 		std::map<std::string, Supertype> fSupertypes;
 		BMessage *fCachedMessage;	
 		BMessage *fCachedSupertypesMessage;

@@ -17,12 +17,16 @@ namespace Storage {
 namespace Mime {
 
 
+class DatabaseLocation;
+
+
 class DatabaseDirectory : public BMergedDirectory {
 public:
 								DatabaseDirectory();
 	virtual						~DatabaseDirectory();
 
-			status_t			Init(const char* superType = NULL);
+			status_t			Init(DatabaseLocation* databaseLocation,
+									const char* superType = NULL);
 
 protected:
 	virtual	bool				ShallPreferFirstEntry(const entry_ref& entry1,

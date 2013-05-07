@@ -22,11 +22,15 @@ namespace BPrivate {
 namespace Storage {
 namespace Mime {
 
+
+class DatabaseLocation;
+
+
 class SupportingApps {
 public:
-	SupportingApps();
+	SupportingApps(DatabaseLocation* databaseLocation);
 	~SupportingApps();
-		
+
 	status_t GetSupportingApps(const char *type, BMessage *apps);	
 
 	status_t SetSupportedTypes(const char *app, const BMessage *types, bool fullSync);
@@ -41,6 +45,9 @@ private:
 	std::map<std::string, std::set<std::string> > fSupportingApps;	// mime type => set of supporting apps
 	std::map<std::string, std::set<std::string> > fStrandedTypes;	// app sig => set of no longer supported types for whom the
 																	//            given app is still listed as a supporting app
+
+private:
+	DatabaseLocation* fDatabaseLocation;
 	bool fHaveDoneFullBuild;
 };
 

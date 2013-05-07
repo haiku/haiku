@@ -21,6 +21,8 @@
 #include <String.h>
 #include <TypeConstants.h>
 
+#include <mime/database_support.h>
+
 #include "CreateAppMetaMimeThread.h"
 #include "MessageDeliverer.h"
 #include "MimeSnifferAddonManager.h"
@@ -56,7 +58,8 @@ init_mime_sniffer_add_on_manager()
 MIMEManager::MIMEManager()
 	:
 	BLooper("main_mime"),
-	fDatabase(init_mime_sniffer_add_on_manager(), this),
+	fDatabase(BPrivate::Storage::Mime::default_database_location(),
+		init_mime_sniffer_add_on_manager(), this),
 	fThreadManager()
 {
 	AddHandler(&fThreadManager);

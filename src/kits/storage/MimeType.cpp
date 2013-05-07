@@ -12,7 +12,8 @@
 #include "MimeType.h"
 
 #include <Bitmap.h>
-#include <mime/database_access.h>	
+#include <mime/database_support.h>
+#include <mime/DatabaseLocation.h>
 #include <sniffer/Rule.h>
 #include <sniffer/Parser.h>
 
@@ -176,7 +177,8 @@ BMimeType::IsSupertypeOnly() const
 bool
 BMimeType::IsInstalled() const
 {
-	return InitCheck() == B_OK && is_installed(Type());
+	return InitCheck() == B_OK
+		&& default_database_location()->IsInstalled(Type());
 }
 
 
@@ -307,9 +309,12 @@ BMimeType::Delete()
 status_t
 BMimeType::GetIcon(BBitmap *icon, icon_size size) const
 {
+	if (icon == NULL)
+		return B_BAD_VALUE;
+
 	status_t err = InitCheck();
 	if (!err)
-		err = get_icon(Type(), icon, size);
+		err = default_database_location()->GetIcon(Type(), *icon, size);
 
 	return err;
 }
@@ -319,9 +324,12 @@ BMimeType::GetIcon(BBitmap *icon, icon_size size) const
 status_t
 BMimeType::GetIcon(uint8** data, size_t* size) const
 {
+	if (data == NULL || size == NULL)
+		return B_BAD_VALUE;
+
 	status_t err = InitCheck();
 	if (!err)
-		err = get_icon(Type(), data, size);
+		err = default_database_location()->GetIcon(Type(), *data, *size);
 
 	return err;
 }
@@ -333,8 +341,10 @@ status_t
 BMimeType::GetPreferredApp(char *signature, app_verb verb) const
 {
 	status_t err = InitCheck();
-	if (!err)
-		err = get_preferred_app(Type(), signature, verb);
+	if (!err) {
+		err = default_database_location()->GetPreferredApp(Type(), signature,
+			verb);
+	}
 
 	return err;
 }
@@ -345,9 +355,12 @@ BMimeType::GetPreferredApp(char *signature, app_verb verb) const
 status_t
 BMimeType::GetAttrInfo(BMessage *info) const
 {
+	if (info == NULL)
+		return B_BAD_VALUE;
+
 	status_t err = InitCheck();
 	if (!err)
-		err = get_attr_info(Type(), info);
+		err = default_database_location()->GetAttributesInfo(Type(), *info);
 
 	return err;
 }
@@ -358,9 +371,14 @@ BMimeType::GetAttrInfo(BMessage *info) const
 status_t
 BMimeType::GetFileExtensions(BMessage *extensions) const
 {
+	if (extensions == NULL)
+		return B_BAD_VALUE;
+
 	status_t err = InitCheck();
-	if (!err)
-		err = get_file_extensions(Type(), extensions);
+	if (!err) {
+		err = default_database_location()->GetFileExtensions(Type(),
+			*extensions);
+	}
 
 	return err;
 }
@@ -371,8 +389,10 @@ status_t
 BMimeType::GetShortDescription(char *description) const
 {
 	status_t err = InitCheck();
-	if (!err)
-		err = get_short_description(Type(), description);
+	if (!err) {
+		err = default_database_location()->GetShortDescription(Type(),
+			description);
+	}
 
 	return err;
 }
@@ -383,8 +403,10 @@ status_t
 BMimeType::GetLongDescription(char *description) const
 {
 	status_t err = InitCheck();
-	if (!err)
-		err = get_long_description(Type(), description);
+	if (!err) {
+		err = default_database_location()->GetLongDescription(Type(),
+			description);
+	}
 
 	return err;
 }
@@ -703,9 +725,12 @@ BMimeType::IsValid(const char *string)
 status_t
 BMimeType::GetAppHint(entry_ref *ref) const
 {
+	if (ref == NULL)
+		return B_BAD_VALUE;
+
 	status_t err = InitCheck();
 	if (!err)
-		err = get_app_hint(Type(), ref);
+		err = default_database_location()->GetAppHint(Type(), *ref);
 	return err;
 }
 
@@ -745,13 +770,18 @@ BMimeType::SetAppHint(const entry_ref *ref)
 status_t
 BMimeType::GetIconForType(const char *type, BBitmap *icon, icon_size which) const
 {
+	if (icon == NULL)
+		return B_BAD_VALUE;
+
 	// If type is NULL, this function works just like GetIcon(), othewise,
 	// we need to make sure the give type is valid.
 	status_t err;
 	if (type) {
 		err = BMimeType::IsValid(type) ? B_OK : B_BAD_VALUE;
-		if (!err)
-			err = get_icon_for_type(Type(), type, icon, which);
+		if (!err) {
+			err = default_database_location()->GetIconForType(Type(), type,
+				*icon, which);
+		}
 	} else
 		err = GetIcon(icon, which);
 
@@ -764,6 +794,9 @@ BMimeType::GetIconForType(const char *type, BBitmap *icon, icon_size which) cons
 status_t
 BMimeType::GetIconForType(const char *type, uint8** _data, size_t* _size) const
 {
+	if (_data == NULL || _size == NULL)
+		return B_BAD_VALUE;
+
 	// If type is NULL, this function works just like GetIcon(), otherwise,
 	// we need to make sure the give type is valid.
 	if (type == NULL)
@@ -772,7 +805,8 @@ BMimeType::GetIconForType(const char *type, uint8** _data, size_t* _size) const
 	if (!BMimeType::IsValid(type))
 		return B_BAD_VALUE;
 
-	return get_icon_for_type(Type(), type, _data, _size);
+	return default_database_location()->GetIconForType(Type(), type, *_data,
+		*_size);
 }
 
 
@@ -871,9 +905,12 @@ BMimeType::SetIconForType(const char* type, const uint8* data, size_t dataSize)
 status_t
 BMimeType::GetSnifferRule(BString *result) const
 {
+	if (result == NULL)
+		return B_BAD_VALUE;
+
 	status_t err = InitCheck();
 	if (!err)
-		err = get_sniffer_rule(Type(), result);
+		err = default_database_location()->GetSnifferRule(Type(), *result);
 
 	return err;
 }
@@ -1096,9 +1133,12 @@ BMimeType::BMimeType(const BMimeType &)
 status_t
 BMimeType::GetSupportedTypes(BMessage *types)
 {
+	if (types == NULL)
+		return B_BAD_VALUE;
+
 	status_t err = InitCheck();
 	if (!err)
-		err = get_supported_types(Type(), types);
+		err = default_database_location()->GetSupportedTypes(Type(), *types);
 
 	return err;
 }

@@ -23,6 +23,7 @@
 
 #include <mime/Database.h>
 #include <mime/database_support.h>
+#include <mime/DatabaseLocation.h>
 
 
 namespace BPrivate {
@@ -83,7 +84,7 @@ CreateAppMetaMimeThread::DoMimeUpdate(const entry_ref* ref, bool* _entryIsDir)
 		mime.Install();
 
 	BNode typeNode;
-	status = open_type(signature, &typeNode);
+	status = fDatabase->Location()->OpenType(signature, typeNode);
 	if (status < B_OK)
 		return status;
 

@@ -13,7 +13,7 @@ StaticLibrary libstorage_kit_mime.a :
 	AssociatedTypes.cpp
 	Database.cpp
 	DatabaseDirectory.cpp
-	database_access.cpp
+	DatabaseLocation.cpp
 	database_support.cpp
 	InstalledTypes.cpp
 	MimeSniffer.cpp

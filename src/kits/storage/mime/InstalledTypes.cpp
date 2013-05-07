@@ -40,8 +40,9 @@ namespace Mime {
 */
 
 //! Constructs a new InstalledTypes object
-InstalledTypes::InstalledTypes()
+InstalledTypes::InstalledTypes(DatabaseLocation* databaseLocation)
 	:
+	fDatabaseLocation(databaseLocation),
 	fCachedMessage(NULL),
 	fCachedSupertypesMessage(NULL),
 	fHaveDoneFullBuild(false)
@@ -385,7 +386,7 @@ InstalledTypes::_BuildInstalledTypesList()
 
 	DatabaseDirectory root;
 	if (!err)
-		err = root.Init();
+		err = root.Init(fDatabaseLocation);
 	if (!err) {
 		root.Rewind();
 		while (true) {
@@ -417,7 +418,7 @@ InstalledTypes::_BuildInstalledTypesList()
 					// Now iterate through this supertype directory and add
 					// all of its subtypes
 					DatabaseDirectory dir;
-					if (dir.Init(supertype) == B_OK) {
+					if (dir.Init(fDatabaseLocation, supertype) == B_OK) {
 						dir.Rewind();
 						while (true) {
 							BEntry subEntry;

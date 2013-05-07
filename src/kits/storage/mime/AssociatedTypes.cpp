@@ -18,6 +18,7 @@
 #include <Message.h>
 #include <mime/database_support.h>
 #include <mime/DatabaseDirectory.h>
+#include <mime/DatabaseLocation.h>
 #include <mime/MimeSniffer.h>
 #include <MimeType.h>
 #include <Path.h>
@@ -40,8 +41,10 @@ namespace Mime {
 
 // Constructor
 //! Constructs a new AssociatedTypes object
-AssociatedTypes::AssociatedTypes(MimeSniffer* mimeSniffer)
+AssociatedTypes::AssociatedTypes(DatabaseLocation* databaseLocation,
+	MimeSniffer* mimeSniffer)
 	:
+	fDatabaseLocation(databaseLocation),
 	fMimeSniffer(mimeSniffer),
 	fHaveDoneFullBuild(false)
 {
@@ -333,7 +336,7 @@ AssociatedTypes::BuildAssociatedTypesTable()
 	fAssociatedTypes.clear();
 
 	DatabaseDirectory root;
-	status_t err = root.Init();
+	status_t err = root.Init(fDatabaseLocation);
 	if (!err) {
 		root.Rewind();
 		while (true) {
@@ -357,7 +360,7 @@ AssociatedTypes::BuildAssociatedTypesTable()
 					// First, iterate through this supertype directory and process
 					// all of its subtypes
 					DatabaseDirectory dir;
-					if (dir.Init(supertype) == B_OK) {
+					if (dir.Init(fDatabaseLocation, supertype) == B_OK) {
 						dir.Rewind();
 						while (true) {
 							BEntry subEntry;
@@ -424,7 +427,8 @@ AssociatedTypes::ProcessType(const char *type)
 	if (!err) {
 		// Read in the list of file extension types
 		BMessage msg;
-		if (read_mime_attr_message(type, kFileExtensionsAttr, &msg) == B_OK) {
+		if (fDatabaseLocation->ReadMessageAttribute(type, kFileExtensionsAttr,
+				msg) == B_OK) {
 			// Iterate through the file extesions, adding them to the list of
 			// file extensions for the mime type and adding the mime type
 			// to the list of associated types for each file extension

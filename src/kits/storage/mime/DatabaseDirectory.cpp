@@ -14,6 +14,7 @@
 #include <StringList.h>
 
 #include <mime/database_support.h>
+#include <mime/DatabaseLocation.h>
 
 
 namespace BPrivate {
@@ -34,14 +35,14 @@ DatabaseDirectory::~DatabaseDirectory()
 
 
 status_t
-DatabaseDirectory::Init(const char* superType)
+DatabaseDirectory::Init(DatabaseLocation* databaseLocation,
+	const char* superType)
 {
 	status_t error = BMergedDirectory::Init();
 	if (error != B_OK)
 		return error;
 
-	const BStringList& directories
-		= BPrivate::Storage::Mime::get_database_directories();
+	const BStringList& directories = databaseLocation->Directories();
 	int32 count = directories.CountStrings();
 	for (int32 i = 0; i < count; i++) {
 		BString directory = directories.StringAt(i);

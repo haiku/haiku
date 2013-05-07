@@ -25,12 +25,14 @@ namespace Sniffer {
 
 namespace Mime {
 
+
+class DatabaseLocation;
 class MimeSniffer;
 
 
 class SnifferRules {
 public:
-	SnifferRules(MimeSniffer* mimeSniffer);
+	SnifferRules(DatabaseLocation* databaseLocation, MimeSniffer* mimeSniffer);
 	~SnifferRules();
 	
 	status_t GuessMimeType(const entry_ref *ref, BString *type);
@@ -59,9 +61,10 @@ private:
 	std::list<sniffer_rule> fRuleList;
 
 private:
-	MimeSniffer*	fMimeSniffer;
-	ssize_t			fMaxBytesNeeded;
-	bool			fHaveDoneFullBuild;
+	DatabaseLocation*	fDatabaseLocation;
+	MimeSniffer*		fMimeSniffer;
+	ssize_t				fMaxBytesNeeded;
+	bool				fHaveDoneFullBuild;
 };
 
 } // namespace Mime

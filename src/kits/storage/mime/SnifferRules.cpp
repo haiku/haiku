@@ -23,6 +23,7 @@
 #include <MimeType.h>
 #include <mime/database_support.h>
 #include <mime/DatabaseDirectory.h>
+#include <mime/DatabaseLocation.h>
 #include <mime/MimeSniffer.h>
 #include <sniffer/Parser.h>
 #include <sniffer/Rule.h>
@@ -112,8 +113,10 @@ bool operator<(SnifferRules::sniffer_rule &left, SnifferRules::sniffer_rule &rig
 
 // Constructor
 //! Constructs a new SnifferRules object
-SnifferRules::SnifferRules(MimeSniffer* mimeSniffer)
+SnifferRules::SnifferRules(DatabaseLocation* databaseLocation,
+	MimeSniffer* mimeSniffer)
 	:
+	fDatabaseLocation(databaseLocation),
 	fMimeSniffer(mimeSniffer),
 	fMaxBytesNeeded(0),
 	fHaveDoneFullBuild(false)
@@ -338,7 +341,7 @@ SnifferRules::BuildRuleList()
 	ssize_t bytesNeeded = 0;
 	DatabaseDirectory root;
 
-	status_t err = root.Init();
+	status_t err = root.Init(fDatabaseLocation);
 	if (!err) {
 		root.Rewind();
 		while (true) {
@@ -362,7 +365,7 @@ SnifferRules::BuildRuleList()
 					// First, iterate through this supertype directory and process
 					// all of its subtypes
 					DatabaseDirectory dir;
-					if (dir.Init(supertype) == B_OK) {
+					if (dir.Init(fDatabaseLocation, supertype) == B_OK) {
 						dir.Rewind();
 						while (true) {
 							BEntry subEntry;
@@ -562,8 +565,10 @@ SnifferRules::ProcessType(const char *type, ssize_t *bytesNeeded)
 	if (!err)
 		err = rule.rule ? B_OK : B_NO_MEMORY;
 	// Read the attr
-	if (!err)
-		err = read_mime_attr_string(type, kSnifferRuleAttr, &str);
+	if (!err) {
+		err = fDatabaseLocation->ReadStringAttribute(type, kSnifferRuleAttr,
+			str);
+	}
 	// Parse the rule
 	if (!err) {
 		err = Sniffer::parse(str.String(), rule.rule, &errorMsg);

@@ -19,7 +19,6 @@
 #include <StorageDefs.h>
 
 #include <mime/AssociatedTypes.h>
-#include <mime/database_access.h>
 #include <mime/InstalledTypes.h>
 #include <mime/SnifferRules.h>
 #include <mime/SupportingApps.h>
@@ -36,7 +35,10 @@ namespace BPrivate {
 namespace Storage {
 namespace Mime {
 
+
+class DatabaseLocation;
 class MimeSniffer;
+
 
 // types of mime update functions that may be run asynchronously
 typedef enum {
@@ -49,16 +51,18 @@ class Database {
 		class NotificationListener;
 
 	public:
-		Database(MimeSniffer* mimeSniffer,
+		Database(DatabaseLocation* databaseLocation, MimeSniffer* mimeSniffer,
 			NotificationListener* notificationListener);
 		~Database();
-	
+
 		status_t InitCheck() const;
+
+		DatabaseLocation* Location() const	{ return fLocation; }
 
 		// Type management
 		status_t Install(const char *type);
 		status_t Delete(const char *type);
-	
+
 		// Set()
 		status_t SetAppHint(const char *type, const entry_ref *ref);
 		status_t SetAttrInfo(const char *type, const BMessage *info);
@@ -142,6 +146,7 @@ class Database {
 
 	private:
 		status_t fStatus;
+		DatabaseLocation* fLocation;
 		NotificationListener* fNotificationListener;
 		std::set<BMessenger> fMonitorMessengers;
 		AssociatedTypes fAssociatedTypes;
