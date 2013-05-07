@@ -2,4 +2,5 @@ SubDir HAIKU_TOP src data ;
 
 HaikuSubInclude etc ;
 HaikuSubInclude keymaps ;
+HaikuSubInclude mime_db ;
 HaikuSubInclude settings ;

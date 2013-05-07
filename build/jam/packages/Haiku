@@ -352,6 +352,10 @@ AddFilesToPackage add-ons disk_systems
 	: <disk_system>intel <disk_system>gpt <disk_system>bfs <disk_system>ntfs ;
 
 
+# the MIME DB
+CopyDirectoryToPackage data : <mimedb>mime_db : : : isTarget ;
+
+
 # optional
 # TODO: We should probably build another package (including the data files
 # above) that can be installed, if desired.

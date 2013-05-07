@@ -295,59 +295,6 @@ for packageFile in $packages; do
 done
 
 
-# install MIME database
-# TODO: It should be possible to do that in the build system too.
-
-if [ ! $updateOnly ]; then
-	mimeDBSource=$sourceDir/src/data/beos_mime
-	mimeDBDest=${tPrefix}home/config/settings/beos_mime
-
-	echo "Deleting old MIME database ..."
-
-	$rm -rf $mimeDBDest
-	$mkdir -p $mimeDBDest
-	mimeTmpDir=$tmpDir/mime
-	mimeDBTmpDir=$tmpDir/mime/db
-	mimeTmpIndex=0
-	mimeTmpFile=$mimeTmpDir/mimedb$$.rsrc
-
-	# create tmp dir for the MIME conversion stuff
-	mkdir -p $mimeDBTmpDir
-
-	echo "Installing MIME database ..."
-
-	for inSuperFile in $mimeDBSource/*.super; do
-		superType=$(basename $inSuperFile .super)
-		tmpSuperDir=$mimeDBTmpDir/$superType
-
-		# compile rdef to rsrc file and the rsrc file to attributes
-		$rc -o $mimeTmpFile $inSuperFile
-		mkdir -p $tmpSuperDir
-		$resattr -O -o $tmpSuperDir $mimeTmpFile
-		$rmAttrs $mimeTmpFile
-
-		# iterate through the sub types
-		for inSubFile in $mimeDBSource/$superType/*; do
-			# check, if the type exists
-			if test -f $inSubFile && grep META:TYPE $inSubFile > /dev/null 2>&1 ; then
-				subType=$(basename $inSubFile)
-				tmpSubFile=$mimeDBTmpDir/$superType/$subType
-
-				# compile rdef to rsrc file and the rsrc file to attributes
-				$rc -o $mimeTmpFile $inSubFile
-				$resattr -O -o $tmpSubFile $mimeTmpFile
-				$rmAttrs $mimeTmpFile
-			fi
-		done
-	done
-
-	$cp -r ${sPrefix}$mimeDBTmpDir/. $mimeDBDest
-
-	# cleanup tmp dir
-	$rmAttrs -rf $mimeTmpDir
-fi	# ! updateOnly
-
-
 # add the concatenated copyrights as an attribute to AboutSystem
 # TODO: That might not be necessary, when all third-party software everything
 # is packaged. Though we might not package everything.
