@@ -10,9 +10,11 @@
 
 
 #include "SupportingApps.h"
-#include <mime/database_support.h>
 
-#include <storage_support.h>
+#include <stdio.h>
+
+#include <new>
+#include <iostream>
 
 #include <Directory.h>
 #include <Message.h>
@@ -20,9 +22,11 @@
 #include <Path.h>
 #include <String.h>
 
-#include <new>
-#include <stdio.h>
-#include <iostream>
+#include <mime/database_support.h>
+#include <storage_support.h>
+
+#include "DatabaseDirectory.h"
+
 
 #define DBG(x) x
 //#define DBG(x)
@@ -262,8 +266,8 @@ SupportingApps::BuildSupportingAppsTable()
 	fSupportingApps.clear();
 	fStrandedTypes.clear();
 
-	BDirectory dir;
-	status_t status = dir.SetTo(get_application_database_directory().c_str());
+	DatabaseDirectory dir;
+	status_t status = dir.Init("application");
 
 	// Build the supporting apps table based on the mime database
 	if (status == B_OK) {

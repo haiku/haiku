@@ -11,8 +11,9 @@
 
 #include "InstalledTypes.h"
 
-#include <mime/database_support.h>
-#include <storage_support.h>
+#include <stdio.h>
+
+#include <new>
 
 #include <Directory.h>
 #include <Entry.h>
@@ -20,8 +21,11 @@
 #include <MimeType.h>
 #include <String.h>
 
-#include <new>
-#include <stdio.h>
+#include <mime/database_support.h>
+#include <storage_support.h>
+
+#include "DatabaseDirectory.h"
+
 
 #define DBG(x) x
 //#define DBG(x)
@@ -380,9 +384,9 @@ InstalledTypes::_BuildInstalledTypesList()
 		err = B_NO_MEMORY;
 	}
 
-	BDirectory root;
+	DatabaseDirectory root;
 	if (!err)
-		err = root.SetTo(get_database_directory().c_str());
+		err = root.Init();
 	if (!err) {
 		root.Rewind();
 		while (true) {
@@ -413,8 +417,8 @@ InstalledTypes::_BuildInstalledTypesList()
 
 					// Now iterate through this supertype directory and add
 					// all of its subtypes
-					BDirectory dir;
-					if (dir.SetTo(&entry) == B_OK) {
+					DatabaseDirectory dir;
+					if (dir.Init(supertype) == B_OK) {
 						dir.Rewind();
 						while (true) {
 							BEntry subEntry;
@@ -453,8 +457,7 @@ InstalledTypes::_BuildInstalledTypesList()
 		}
 	} else {
 		DBG(OUT("Mime::InstalledTypes::BuildInstalledTypesList(): "
-		          "Failed opening mime database directory '%s'\n",
-		            get_database_directory().c_str()));
+		          "Failed opening mime database directory.\n"));
 	}
 	fHaveDoneFullBuild = true;
 	return err;

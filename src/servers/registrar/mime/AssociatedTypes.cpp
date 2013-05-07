@@ -8,7 +8,10 @@
 */
 
 #include "AssociatedTypes.h"
-#include "MimeSnifferAddonManager.h"
+
+#include <stdio.h>
+
+#include <new>
 
 #include <Directory.h>
 #include <Entry.h>
@@ -19,8 +22,9 @@
 #include <mime/database_support.h>
 #include <storage_support.h>
 
-#include <new>
-#include <stdio.h>
+#include "DatabaseDirectory.h"
+#include "MimeSnifferAddonManager.h"
+
 
 #define DBG(x) x
 //#define DBG(x)
@@ -330,8 +334,8 @@ AssociatedTypes::BuildAssociatedTypesTable()
 	fFileExtensions.clear();
 	fAssociatedTypes.clear();
 
-	BDirectory root;
-	status_t err = root.SetTo(get_database_directory().c_str());
+	DatabaseDirectory root;
+	status_t err = root.Init();
 	if (!err) {
 		root.Rewind();
 		while (true) {
@@ -354,8 +358,8 @@ AssociatedTypes::BuildAssociatedTypesTable()
 
 					// First, iterate through this supertype directory and process
 					// all of its subtypes
-					BDirectory dir;
-					if (dir.SetTo(&entry) == B_OK) {
+					DatabaseDirectory dir;
+					if (dir.Init(supertype) == B_OK) {
 						dir.Rewind();
 						while (true) {
 							BEntry subEntry;
@@ -392,8 +396,7 @@ AssociatedTypes::BuildAssociatedTypesTable()
 		}
 	} else {
 		DBG(OUT("Mime::AssociatedTypes::BuildAssociatedTypesTable(): "
-		          "Failed opening mime database directory '%s'\n",
-		            get_database_directory().c_str()));
+		          "Failed opening mime database directory\n"));
 	}
 	if (!err) {
 		fHaveDoneFullBuild = true;

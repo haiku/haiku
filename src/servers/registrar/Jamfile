@@ -43,6 +43,7 @@ Server registrar
 	AssociatedTypes.cpp
 	CreateAppMetaMimeThread.cpp
 	Database.cpp
+	DatabaseDirectory.cpp
 	InstalledTypes.cpp
 	MimeSnifferAddon.cpp
 	MimeSnifferAddonManager.cpp

@@ -28,6 +28,7 @@
 #include <storage_support.h>
 #include <String.h>
 
+#include "DatabaseDirectory.h"
 #include "MimeSnifferAddonManager.h"
 
 #define DBG(x) x
@@ -332,9 +333,9 @@ SnifferRules::BuildRuleList()
 
 	ssize_t maxBytesNeeded = 0;
 	ssize_t bytesNeeded = 0;
-	BDirectory root;
+	DatabaseDirectory root;
 
-	status_t err = root.SetTo(get_database_directory().c_str());
+	status_t err = root.Init();
 	if (!err) {
 		root.Rewind();
 		while (true) {
@@ -357,8 +358,8 @@ SnifferRules::BuildRuleList()
 
 					// First, iterate through this supertype directory and process
 					// all of its subtypes
-					BDirectory dir;
-					if (dir.SetTo(&entry) == B_OK) {
+					DatabaseDirectory dir;
+					if (dir.Init(supertype) == B_OK) {
 						dir.Rewind();
 						while (true) {
 							BEntry subEntry;
@@ -399,8 +400,7 @@ SnifferRules::BuildRuleList()
 		}
 	} else {
 		DBG(OUT("Mime::SnifferRules::BuildRuleList(): "
-		          "Failed opening mime database directory '%s'\n",
-		            get_database_directory().c_str()));
+		          "Failed opening mime database directory.\n"));
 	}
 
 	if (!err) {

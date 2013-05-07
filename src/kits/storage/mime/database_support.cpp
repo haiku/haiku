@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Tyler Dauwalder
+ *		Ingo Weinhold <ingo_weinhold@gmx.de>
  */
 
 /*!
@@ -14,18 +15,23 @@
 #include <AppMisc.h>
 #include <DataIO.h>
 #include <Directory.h>
-#include <Entry.h>
+#include <File.h>
 #include <FindDirectory.h>
+#include <Entry.h>
 #include <Message.h>
 #include <Node.h>
 #include <Path.h>
 #include <storage_support.h>
+#include <StringList.h>
 #include <TypeConstants.h>
 
 #include <fs_attr.h>	// For struct attr_info
 #include <new>			// For new(nothrow)
 #include <stdio.h>
 #include <string.h>
+#include <syslog.h>
+
+#include <AutoDeleter.h>
 
 #include "mime/database_support.h"
 
@@ -94,48 +100,186 @@ const char *kMetaMimeType		= "application/x-vnd.Be-meta-mime";
 // Error codes
 const status_t kMimeGuessFailureError	= B_ERRORS_END+1;
 
+static const directory_which kBaseDirectoryConstants[] = {
+	B_USER_SETTINGS_DIRECTORY,
+	B_USER_NONPACKAGED_DATA_DIRECTORY,
+	B_USER_DATA_DIRECTORY,
+	B_COMMON_NONPACKAGED_DATA_DIRECTORY,
+	B_COMMON_DATA_DIRECTORY,
+	B_SYSTEM_DATA_DIRECTORY
+};
+
 static pthread_once_t sDatabaseDirectoryInitOnce = PTHREAD_ONCE_INIT;
-static std::string sDatabaseDirectory;
-static std::string sApplicationDatabaseDirectory;
+static BStringList sDatabaseDirectories;
 
 
 static void
 init_database_directories()
 {
-	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK)
-		sDatabaseDirectory = path.Path();
+	for (size_t i = 0;
+		i < sizeof(kBaseDirectoryConstants)
+			/ sizeof(kBaseDirectoryConstants[0]); i++) {
+		BString directoryPath;
+		BPath path;
+		if (find_directory(kBaseDirectoryConstants[i], &path) == B_OK)
+			directoryPath = path.Path();
+		else if (i == 0)
+			directoryPath = "/boot/home/config/settings";
+		else
+			continue;
+
+		directoryPath += "/mime_db";
+		sDatabaseDirectories.Add(directoryPath);
+	}
+}
+
+
+const BStringList&
+get_database_directories()
+{
+	pthread_once(&sDatabaseDirectoryInitOnce, &init_database_directories);
+	return sDatabaseDirectories;
+}
+
+
+BString
+get_writable_database_directory()
+{
+	return get_database_directories().StringAt(0);
+}
+
+
+static BString
+type_to_filename(const char* type, int32 index)
+{
+	BString path = get_database_directories().StringAt(index);
+	return path << '/' << BPrivate::Storage::to_lower(type).c_str();
+}
+
+
+/*! Converts the given MIME type to an absolute path in the user writeable MIME
+	database directory.
+*/
+BString
+type_to_writable_filename(const char* type)
+{
+	return type_to_filename(type, 0);
+}
+
+
+static status_t
+open_type(const char* type, BNode* _node, int32& _index)
+{
+	const BStringList& directories = get_database_directories();
+	int32 count = directories.CountStrings();
+	for (int32 i = 0; i < count; i++) {
+		status_t error = _node->SetTo(type_to_filename(type, i));
+		attr_info attrInfo;
+		if (error == B_OK && _node->GetAttrInfo(kTypeAttr, &attrInfo) == B_OK) {
+			_index = i;
+			return B_OK;
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+static status_t
+create_type_node(const char* type, BNode& _result)
+{
+	const char* slash = strchr(type, '/');
+	BString superTypeName;
+	if (slash != NULL)
+		superTypeName.SetTo(type, slash - type);
 	else
-		sDatabaseDirectory = "/boot/home/config/settings";
+		superTypeName = type;
+	superTypeName.ToLower();
 
-	sDatabaseDirectory += "/beos_mime";
-	sApplicationDatabaseDirectory = sDatabaseDirectory + "/application";
+	// open/create the directory for the supertype
+	BDirectory parent(get_writable_database_directory());
+	status_t error = parent.InitCheck();
+	if (error != B_OK)
+		return error;
+
+	BDirectory superTypeDirectory;
+	if (BEntry(&parent, superTypeName).Exists())
+		error = superTypeDirectory.SetTo(&parent, superTypeName);
+	else
+		error = parent.CreateDirectory(superTypeName, &superTypeDirectory);
+	if (error != B_OK)
+		return error;
+
+	// create the subtype
+	BFile subTypeFile;
+	if (slash != NULL) {
+		error = superTypeDirectory.CreateFile(BString(slash + 1).ToLower(),
+			&subTypeFile);
+		if (error != B_OK)
+			return error;
+	}
+
+	// assign the result
+	if (slash != NULL)
+		_result = subTypeFile;
+	else
+		_result = superTypeDirectory;
+	return _result.InitCheck();
 }
 
 
-const std::string
-get_database_directory()
+static status_t
+copy_type_node(BNode& source, const char* type, BNode& _target)
 {
-	pthread_once(&sDatabaseDirectoryInitOnce, &init_database_directories);
-	return sDatabaseDirectory;
+	status_t error = create_type_node(type, _target);
+	if (error != B_OK)
+		return error;
+
+	// copy the attributes
+	MemoryDeleter bufferDeleter;
+	size_t bufferSize = 0;
+
+	source.RewindAttrs();
+	char attribute[B_ATTR_NAME_LENGTH];
+	while (source.GetNextAttrName(attribute) == B_OK) {
+		attr_info info;
+		error = source.GetAttrInfo(attribute, &info);
+		if (error != B_OK) {
+			syslog(LOG_ERR, "Failed to get info for attribute \"%s\" of MIME "
+				"type \"%s\": %s", attribute, type, strerror(error));
+			continue;
+		}
+
+		// resize our buffer, if necessary
+		if (info.size > bufferSize) {
+			bufferDeleter.SetTo(malloc(info.size));
+			if (bufferDeleter.Get() == NULL)
+				return B_NO_MEMORY;
+			bufferSize = info.size;
+		}
+
+		ssize_t bytesRead = source.ReadAttr(attribute, info.type, 0,
+			bufferDeleter.Get(), info.size);
+		if (bytesRead != info.size) {
+			syslog(LOG_ERR, "Failed to read attribute \"%s\" of MIME "
+				"type \"%s\": %s", attribute, type,
+		  		bytesRead < 0 ? strerror(bytesRead) : "short read");
+			continue;
+		}
+
+		ssize_t bytesWritten = _target.WriteAttr(attribute, info.type, 0,
+			bufferDeleter.Get(), info.size);
+		if (bytesWritten < 0) {
+			syslog(LOG_ERR, "Failed to write attribute \"%s\" of MIME "
+				"type \"%s\": %s", attribute, type,
+		  		bytesWritten < 0 ? strerror(bytesWritten) : "short write");
+			continue;
+		}
+	}
+
+	return B_OK;
 }
 
-
-const std::string
-get_application_database_directory()
-{
-	pthread_once(&sDatabaseDirectoryInitOnce, &init_database_directories);
-	return sApplicationDatabaseDirectory;
-}
-
-
-// type_to_filename
-//! Converts the given MIME type to an absolute path in the MIME database.
-std::string
-type_to_filename(const char *type)
-{
-	return get_database_directory() + "/" + BPrivate::Storage::to_lower(type);
-}
 
 // open_type
 /*! \brief Opens a BNode on the given type, failing if the type has no
@@ -150,20 +294,8 @@ open_type(const char *type, BNode *result)
 	if (type == NULL || result == NULL)
 		return B_BAD_VALUE;
 
-	status_t status = result->SetTo(type_to_filename(type).c_str());
-
-	// TODO: this can be removed again later - we just didn't write this
-	//	attribute is before	at all...
-#if 1
-	if (status == B_OK) {
-		// check if the MIME:TYPE attribute exist, and create it if not
-		attr_info info;
-		if (result->GetAttrInfo(kTypeAttr, &info) != B_OK)
-			result->WriteAttr(kTypeAttr, B_STRING_TYPE, 0, type, strlen(type) + 1);
-	}
-#endif
-
-	return status;
+	int32 index;
+	return open_type(type, result, index);
 }
 
 // open_or_create_type
@@ -180,44 +312,47 @@ open_or_create_type(const char *type, BNode *result, bool *didCreate)
 {
 	if (didCreate)
 		*didCreate = false;
-	std::string filename;
-	std::string typeLower = BPrivate::Storage::to_lower(type);
-	status_t err = (type && result ? B_OK : B_BAD_VALUE);
-	if (!err) {
-		filename = type_to_filename(type);
-		err = result->SetTo(filename.c_str());
-	}
-	if (err == B_ENTRY_NOT_FOUND) {
-		// Figure out what type of node we need to create
-		// + Supertype == directory
-		// + Non-supertype == file
-		size_t pos = typeLower.find_first_of('/');
-		if (pos == std::string::npos) {
-			// Supertype == directory
-			BDirectory parent(get_database_directory().c_str());
-			err = parent.InitCheck();
-			if (!err)
-				err = parent.CreateDirectory(typeLower.c_str(), NULL);
-		} else {
-			// Non-supertype == file
-			std::string super(typeLower, 0, pos);
-			std::string sub(typeLower, pos+1);
-			BDirectory parent((get_database_directory() + "/" + super).c_str());
-			err = parent.InitCheck();
-			if (!err)
-				err = parent.CreateFile(sub.c_str(), NULL);
+
+	// See, if the type already exists.
+	int32 index;
+	status_t error = open_type(type, result, index);
+	if (error == B_OK) {
+		if (index == 0)
+			return B_OK;
+
+		// The caller wants a editable node, but the node found is not in the
+		// user's settings directory. Copy the node.
+		BNode nodeToClone(*result);
+		if (nodeToClone.InitCheck() != B_OK)
+			return nodeToClone.InitCheck();
+
+		error = copy_type_node(nodeToClone, type, *result);
+		if (error != B_OK) {
+			result->Unset();
+			return error;
 		}
-		// Now try opening again
-		if (err == B_OK)
-			err = result->SetTo(filename.c_str());
-		if (err == B_OK && didCreate)
+
+		if (didCreate != NULL)
 			*didCreate = true;
-		if (err == B_OK) {
-			// write META:TYPE attribute
-			result->WriteAttr(kTypeAttr, B_STRING_TYPE, 0, type, strlen(type) + 1);
-		}
+		return error;
 	}
-	return err;
+
+	// type doesn't exist yet -- create the respective node
+	error = create_type_node(type, *result);
+	if (error != B_OK)
+		return error;
+
+	// write the type attribute
+	error = result->WriteAttr(kTypeAttr, B_STRING_TYPE, 0, type,
+		strlen(type) + 1);
+	if (error != B_OK) {
+		result->Unset();
+		return error;
+	}
+
+	if (didCreate != NULL)
+		*didCreate = true;
+	return B_OK;
 }
 
 // read_mime_attr

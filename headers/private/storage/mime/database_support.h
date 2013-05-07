@@ -7,12 +7,12 @@
 
 
 #include <StorageDefs.h>
+#include <String.h>
 
-#include <string>
 
 class BNode;
 class BMessage;
-class BString;
+class BStringList;
 
 
 namespace BPrivate {
@@ -20,8 +20,8 @@ namespace Storage {
 namespace Mime {
 
 // Database directory
-const std::string get_database_directory();
-const std::string get_application_database_directory();
+const BStringList& get_database_directories();
+BString get_writable_database_directory();
 
 // Attribute Prefixes
 extern const char *kMiniIconAttrPrefix;
@@ -75,7 +75,7 @@ extern const char *kMetaMimeType;
 // Error codes (to be used only by BPrivate::Storage::Mime members)
 extern const status_t kMimeGuessFailureError;
 
-std::string type_to_filename(const char *type);
+BString type_to_writable_filename(const char *type);
 
 status_t open_type(const char *type, BNode *result);
 status_t open_or_create_type(const char *type, BNode *result, bool *didCreate);

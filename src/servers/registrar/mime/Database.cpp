@@ -65,9 +65,9 @@ Database::Database()
 	fDeferredInstallNotificationsLocker("deferred install notifications"),
 	fDeferredInstallNotifications()
 {
-	// Do some really minor error checking
-	BEntry entry(get_database_directory().c_str());
-	fStatus = entry.Exists() ? B_OK : B_BAD_VALUE;
+	// make sure the user's MIME DB directory exists
+	fStatus = create_directory(get_writable_database_directory(),
+		S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
 }
 
 // destructor
@@ -107,7 +107,7 @@ Database::Install(const char *type)
 		return B_BAD_VALUE;
 
 	BEntry entry;
-	status_t err = entry.SetTo(type_to_filename(type).c_str());
+	status_t err = entry.SetTo(type_to_writable_filename(type));
 	if (!err) {
 		if (entry.Exists())
 			err = B_FILE_EXISTS;
@@ -139,7 +139,7 @@ Database::Delete(const char *type)
 
 	// Open the type
 	BEntry entry;
-	status_t status = entry.SetTo(type_to_filename(type).c_str());
+	status_t status = entry.SetTo(type_to_writable_filename(type));
 	if (status != B_OK)
 		return status;
 
