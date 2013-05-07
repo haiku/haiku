@@ -376,18 +376,18 @@ rule AddSymlinkToPackage directoryTokens : linkTarget : linkName
 
 
 rule CopyDirectoryToPackage directoryTokens : sourceDirectory
-	: targetDirectoryName : excludePatterns : alwaysUpdate
+	: targetDirectoryName : excludePatterns : flags
 {
 	CopyDirectoryToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
 		: $(directoryTokens) : $(sourceDirectory) : $(targetDirectoryName)
-		: $(excludePatterns) : $(alwaysUpdate) ;
+		: $(excludePatterns) : $(flags) ;
 }
 
 
-rule AddHeaderDirectoryToPackage dirTokens : dirName : alwaysUpdate
+rule AddHeaderDirectoryToPackage dirTokens : dirName : flags
 {
 	AddHeaderDirectoryToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
-		: $(dirTokens) : $(dirName) : $(alwaysUpdate) ;
+		: $(dirTokens) : $(dirName) : $(flags) ;
 }
 
 
@@ -399,11 +399,10 @@ rule AddWifiFirmwareToPackage driver : subDirToExtract : archive
 }
 
 
-rule ExtractArchiveToPackage dirTokens : archiveFile : alwaysUpdate
-	: extractedSubDir
+rule ExtractArchiveToPackage dirTokens : archiveFile : flags : extractedSubDir
 {
 	ExtractArchiveToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
-		: $(dirTokens) : $(archiveFile) : $(alwaysUpdate) : $(extractedSubDir) ;
+		: $(dirTokens) : $(archiveFile) : $(flags) : $(extractedSubDir) ;
 }
 
 

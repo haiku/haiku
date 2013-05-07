@@ -109,7 +109,7 @@ AddFilesToHaikuImage home config settings : <keymap>US-International : Key_map ;
 # Note that the second directory will also be copied, if the image will only
 # be updated; the first one won't in that case.
 AddSourceDirectoryToHaikuImage src/kits/storage ;
-AddSourceDirectoryToHaikuImage src/tests/servers/debug : 1 ;
+AddSourceDirectoryToHaikuImage src/tests/servers/debug : alwaysUpdate ;
 
 # Copy the jam sources (assuming they are located ../buildtools/jam relatively
 # to your Haiku sources) to the image as /boot/home/Desktop/jam-src, excluding

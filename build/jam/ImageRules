@@ -312,17 +312,18 @@ rule FSymlinksInContainerDirectory container : directoryTokens
 }
 
 rule CopyDirectoryToContainer container : directoryTokens : sourceDirectory
-	: targetDirectoryName : excludePatterns : alwaysUpdate
+	: targetDirectoryName : excludePatterns : flags
 {
 	# CopyDirectoryToContainer <container> : <directoryTokens>
 	#	: <sourceDirectory> : <targetDirectoryName> : <excludePatterns>
-	#	: <alwaysUpdate> ;
+	#	[ : <flags> ] ;
 	#
+	# Supported flags: alwaysUpdate
 
 	# If the image shall only be updated, we don't copy any directories
 	if [ on $(container) return $(HAIKU_CONTAINER_UPDATE_ONLY) ]
 			&& ! [ IncludeAllTargetsInContainer $(container) ]
-			&& ! $(alwaysUpdate) {
+			&& ! alwaysUpdate in $(flags) {
 		return ;
 	}
 
@@ -343,17 +344,19 @@ rule CopyDirectoryToContainer container : directoryTokens : sourceDirectory
 
 
 rule AddHeaderDirectoryToContainer container : dirTokens : dirName
-	: alwaysUpdate
+	: flags
 {
 	# AddHeaderDirectoryToContainer <container> : <dirTokens> : [ <dirName> ]
-	#	: <alwaysUpdate> ;
+	#	[ : <flags> ] ;
+	#
+	# Supported flags: alwaysUpdate
 
 	local systemDirTokens
 		= [ on $(container) return $(HAIKU_CONTAINER_SYSTEM_DIR_TOKENS) ] ;
 
 	CopyDirectoryToContainer $(container) : $(systemDirTokens) develop headers
 		: [ FDirName $(HAIKU_TOP) headers $(dirTokens) ]
-		: $(dirName) : -x .svn : $(alwaysUpdate) ;
+		: $(dirName) : -x .svn : $(flags) ;
 }
 
 
@@ -380,20 +383,26 @@ rule AddWifiFirmwareToContainer container : driver : package : archive : extract
 
 
 rule ExtractArchiveToContainer container : directoryTokens : archiveFile
-	: alwaysUpdate : extractedSubDir : stripDebugSymbols
+	: flags : extractedSubDir
 {
 	# ExtractArchiveToContainer <container> : <directory> : <archiveFile>
-	#	: <alwaysUpdate> : <extractedSubDir> : <stripDebugSymbols> ;
+	#	: [ <flags> ] : <extractedSubDir> ;
+	#
+	# Supported flags: alwaysUpdate, stripDebugSymbols
 
 	# If the container shall only be updated, we extract only, if explicitely
 	# requested.
 	if [ on $(container) return $(HAIKU_CONTAINER_UPDATE_ONLY) ]
-		&& ! $(alwaysUpdate) {
+		&& ! alwaysUpdate in $(flags) {
 		return ;
 	}
 
 	local directory = [ AddDirectoryToContainer $(container)
 		: $(directoryTokens) ] ;
+	local stripDebugSymbols ;
+	if stripDebugSymbols in $(flags) {
+		stripDebugSymbols = 1 ;
+	}
 
 	ARCHIVE_FILES_TO_INSTALL on $(directory) += $(archiveFile) ;
 	ARCHIVE_SUBDIR_TO_INSTALL_FROM on $(archiveFile) = $(extractedSubDir) ;
@@ -828,29 +837,29 @@ rule FSymlinksInHaikuImageDirectory directoryTokens
 }
 
 rule CopyDirectoryToHaikuImage directoryTokens : sourceDirectory
-	: targetDirectoryName : excludePatterns : alwaysUpdate
+	: targetDirectoryName : excludePatterns : flags
 {
 	CopyDirectoryToContainer $(HAIKU_IMAGE_CONTAINER_NAME) : $(directoryTokens)
 		: $(sourceDirectory) : $(targetDirectoryName) : $(excludePatterns)
-		: $(alwaysUpdate) ;
+		: $(flags) ;
 }
 
-rule AddSourceDirectoryToHaikuImage dirTokens : alwaysUpdate
+rule AddSourceDirectoryToHaikuImage dirTokens : flags
 {
-	# AddSourceDirectoryToHaikuImage <dirTokens> : <alwaysUpdate> ;
+	# AddSourceDirectoryToHaikuImage <dirTokens> : <flags> ;
 
 	CopyDirectoryToHaikuImage home HaikuSources
 		: [ FDirName $(HAIKU_TOP) $(dirTokens) ]
-		: : : $(alwaysUpdate) ;
+		: : : $(flags) ;
 }
 
-rule AddHeaderDirectoryToHaikuImage dirTokens : dirName : alwaysUpdate
+rule AddHeaderDirectoryToHaikuImage dirTokens : dirName : flags
 {
 	# AddHeaderDirectoryToHaikuImage <dirTokens> : [ <dirName> ]
-	#	: <alwaysUpdate> ;
+	#	: <flags> ;
 
 	AddHeaderDirectoryToContainer $(HAIKU_IMAGE_CONTAINER_NAME) : $(dirTokens)
-		: $(dirName) : $(alwaysUpdate) ;
+		: $(dirName) : $(flags) ;
 }
 
 rule AddWifiFirmwareToHaikuImage driver : package : archive : extract
@@ -861,15 +870,14 @@ rule AddWifiFirmwareToHaikuImage driver : package : archive : extract
 		: $(package) : $(archive) : $(extract) ;
 }
 
-rule ExtractArchiveToHaikuImage dirTokens : archiveFile : alwaysUpdate
-	: extractedSubDir : stripDebugSymbols
+rule ExtractArchiveToHaikuImage dirTokens : archiveFile : flags
+	: extractedSubDir
 {
-	# ExtractArchiveToHaikuImage <dirTokens> : <archiveFile> : <alwaysUpdate>
+	# ExtractArchiveToHaikuImage <dirTokens> : <archiveFile> : <flags>
 	#	: <extractedSubDir> ;
 
 	ExtractArchiveToContainer $(HAIKU_IMAGE_CONTAINER_NAME) : $(dirTokens)
-		: $(archiveFile) : $(alwaysUpdate) : $(extractedSubDir)
-		: $(stripDebugSymbols) ;
+		: $(archiveFile) : $(flags) : $(extractedSubDir) ;
 }
 
 rule AddDriversToHaikuImage relativeDirectoryTokens : targets
@@ -962,20 +970,21 @@ rule InstallSourceArchive file : url
 	}
 }
 
-rule InstallOptionalHaikuImagePackage url : dirTokens : isCDPackage
-	: stripDebugSymbols
+rule InstallOptionalHaikuImagePackage url : dirTokens : flags
 {
 	# TODO: Remove the non-hpkg cases!
-	# Currently the semantics differs depending on isCDPackage and the type of
-	# the package file:
+	# Currently the semantics differs depending on whether the  cdPackage flag
+	# has been specified and the type of the package file:
 	# * For a hpkg <dirTokens> is "common" (default) or "system" and specifies
 	#   the installation location of the package (will be copied to the
 	#   packages/ subdirectory).
-	# * For a regular archive and isCDPackage true, <dirTokens> is ignored and
+	# * For a regular archive and cdPackage, <dirTokens> is ignored and
 	#   the package will be copied to the _package_ directory of the CD image.
-	# * For a regular archive and isCDPackage false, <dirTokens> specifies the
+	# * For a regular archive and without cdPackage, <dirTokens> specifies the
 	#   directory relative to the image's root directory where the content of
 	#   the archive will be extracted to.
+	#
+	# Supported flags: cdPackage, stripDebugSymbols/!stripDebugSymbols
 
 	local package = $(url:BS) ;
 
@@ -988,24 +997,19 @@ rule InstallOptionalHaikuImagePackage url : dirTokens : isCDPackage
 			HAIKU_INCLUDE_IN_IMAGE on $(archiveFile) = 1 ;
 		}
 		AddPackageFilesToHaikuImage $(location) : $(archiveFile) ;
-	} else if ( $(isCDPackage) = true || $(isCDPackage) = 1 )
-		&& $(HAIKU_CD_NAME) {
+	} else if cdPackage in $(flags) && $(HAIKU_CD_NAME) {
 		# TODO: If HAIKU_CD_NAME is set, that doesn't mean we're building a CD
 		# image!
 		# copy onto image
 		AddFilesToHaikuImage _packages_ : $(archiveFile) ;
 	} else {
-		if $(HAIKU_STRIP_DEBUG_FROM_OPTIONAL_PACKAGES) = 1 {
-			stripDebugSymbols ?= 1 ;
-			# The script will only test for = 1. This is in case someone
-			# manually set the flag 'true'
-			if $(stripDebugSymbols) = true {
-				stripDebugSymbols = 1 ;
-			}
+		if $(HAIKU_STRIP_DEBUG_FROM_OPTIONAL_PACKAGES) = 1
+			&& ! stripDebugSymbols in $(flags)
+			&& ! !stripDebugSymbols in $(flags) {
+			flags += stripDebugSymbols ;
 		}
 		# extract onto image
-		ExtractArchiveToHaikuImage $(dirTokens) : $(archiveFile)
-			: : : $(stripDebugSymbols) ;
+		ExtractArchiveToHaikuImage $(dirTokens) : $(archiveFile) : $(flags) ;
 	}
 }
 

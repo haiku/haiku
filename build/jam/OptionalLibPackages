@@ -53,7 +53,7 @@ if [ IsOptionalHaikuImagePackageAdded box2d ] {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
 				$(baseURL)/lib/box2d-2.1.2-r1a4-x86-gcc4-2012-09-09.zip
-				: : true ;
+				: : cdPackage ;
 		} else {
 			Echo "No optional package box2d available for $(TARGET_ARCH)-gcc2" ;
 		}
@@ -68,11 +68,11 @@ if [ IsOptionalHaikuImagePackageAdded fribidi ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
 			$(baseURL)/lib/fribidi-0.19.2-r1a4-x86-gcc4-2012-09-01.zip
-			: : true ;
+			: : cdPackage ;
 	} else {
 		InstallOptionalHaikuImagePackage
 			$(baseURL)/lib/fribidi-0.19.2-r1a4-x86-gcc2-2012-08-29.zip
-			: : true ;
+			: : cdPackage ;
 	}
 }
 
@@ -84,11 +84,11 @@ if [ IsOptionalHaikuImagePackageAdded lcms ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
 			$(baseURL)/lib/lcms-2.1-r1a4-x86-gcc4-2012-09-02.zip
-			: : true ;
+			: : cdPackage ;
 	} else {
 		InstallOptionalHaikuImagePackage
 			$(baseURL)/lib/lcms-2.1-r1a4-x86-gcc2-2012-08-29.zip
-			: : true ;
+			: : cdPackage ;
 	}
 }
 
@@ -100,11 +100,11 @@ if [ IsOptionalHaikuImagePackageAdded libart_lgpl ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
 			$(baseURL)/lib/libart_lgpl-2.3.21-r1a4-x86-gcc4-2012-09-02.zip
-			: : true ;
+			: : cdPackage ;
 	} else {
 		InstallOptionalHaikuImagePackage
 			$(baseURL)/lib/libart_lgpl-2.3.21-r1a4-x86-gcc2-2012-08-29.zip
-			: : true ;
+			: : cdPackage ;
 	}
 }
 
@@ -116,11 +116,11 @@ if [ IsOptionalHaikuImagePackageAdded libmad ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
 			$(baseURL)/lib/libmad-0.15.1b-r1a4-x86-gcc4-2012-09-02.zip
-			: : true ;
+			: : cdPackage ;
 	} else {
 		InstallOptionalHaikuImagePackage
 			$(baseURL)/lib/libmad-0.15.1b-r1a4-x86-gcc2-2012-08-29.zip
-			: : true ;
+			: : cdPackage ;
 	}
 }
 
@@ -132,11 +132,11 @@ if [ IsOptionalHaikuImagePackageAdded libmikmod ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
 			$(baseURL)/lib/libmikmod-3.1.11-r1a4-x86-gcc4-2012-09-02.zip
-			: : true ;
+			: : cdPackage ;
 	} else {
 		InstallOptionalHaikuImagePackage
 			$(baseURL)/lib/libmikmod-3.1.11-r1a4-x86-gcc2-2012-08-29.zip
-			: : true ;
+			: : cdPackage ;
 	}
 }
 
@@ -148,11 +148,11 @@ if [ IsOptionalHaikuImagePackageAdded libmodplug ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
 			$(baseURL)/lib/libmodplug-0.8.8.4-r1a4-x86-gcc4-2012-09-02.zip
-			: : true ;
+			: : cdPackage ;
 	} else {
 		InstallOptionalHaikuImagePackage
 			$(baseURL)/lib/libmodplug-0.8.8.4-r1a4-x86-gcc2-2012-08-29.zip
-			: : true ;
+			: : cdPackage ;
 	}
 }
 
@@ -164,11 +164,11 @@ if [ IsOptionalHaikuImagePackageAdded libpaper ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
 			$(baseURL)/lib/libpaper-1.1.24-r1a4-x86-gcc4-2012-09-01.zip
-			: : true ;
+			: : cdPackage ;
 	} else {
 		InstallOptionalHaikuImagePackage
 			$(baseURL)/lib/libpaper-1.1.24-r1a4-x86-gcc4-2012-09-01.zip
-			: : true ;
+			: : cdPackage ;
 	}
 }
 
@@ -180,11 +180,11 @@ if [ IsOptionalHaikuImagePackageAdded physfs ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
 			$(baseURL)/lib/physfs-2.0.1-r1a4-x86-gcc4-2012-09-09.zip
-			: : true ;
+			: : cdPackage ;
 	} else {
 		InstallOptionalHaikuImagePackage
 			$(baseURL)/lib/physfs-2.0.1-r1a4-x86-gcc2-2012-08-29.zip
-			: : true ;
+			: : cdPackage ;
 	}
 }
 
