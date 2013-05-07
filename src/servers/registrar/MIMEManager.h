@@ -23,10 +23,15 @@ private:
 	virtual status_t Notify(BMessage* message, const BMessenger& target);
 
 private:
+	class DatabaseLocker;
+
+private:
 	void HandleSetParam(BMessage *message);
 	void HandleDeleteParam(BMessage *message);
-	
+
+private:
 	BPrivate::Storage::Mime::Database fDatabase;
+	DatabaseLocker* fDatabaseLocker;
 	RegistrarThreadManager fThreadManager;
 	BMessenger fManagerMessenger;
 };

@@ -21,6 +21,7 @@
 #include <String.h>
 #include <TypeConstants.h>
 
+#include <mime/AppMetaMimeCreator.h>
 #include <mime/database_support.h>
 
 #include "CreateAppMetaMimeThread.h"
@@ -53,6 +54,30 @@ init_mime_sniffer_add_on_manager()
 }
 
 
+class MIMEManager::DatabaseLocker
+	: public BPrivate::Storage::Mime::AppMetaMimeCreator::DatabaseLocker {
+public:
+	DatabaseLocker(MIMEManager* manager)
+		:
+		fManager(manager)
+	{
+	}
+
+	virtual bool Lock()
+	{
+		return fManager->Lock();
+	}
+
+	virtual void Unlock()
+	{
+		fManager->Unlock();
+	}
+
+private:
+	MIMEManager*	fManager;
+};
+
+
 /*!	\brief Creates and initializes a MIMEManager.
 */
 MIMEManager::MIMEManager()
@@ -60,6 +85,7 @@ MIMEManager::MIMEManager()
 	BLooper("main_mime"),
 	fDatabase(BPrivate::Storage::Mime::default_database_location(),
 		init_mime_sniffer_add_on_manager(), this),
+	fDatabaseLocker(new(std::nothrow) DatabaseLocker(this)),
 	fThreadManager()
 {
 	AddHandler(&fThreadManager);
@@ -245,7 +271,7 @@ MIMEManager::MessageReceived(BMessage *message)
 						thread = new(nothrow) CreateAppMetaMimeThread(
 							synchronous ? "create_app_meta_mime (s)"
 								: "create_app_meta_mime (a)",
-							B_NORMAL_PRIORITY + 1, &fDatabase,
+							B_NORMAL_PRIORITY + 1, &fDatabase, fDatabaseLocker,
 							BMessenger(&fThreadManager), &root, recursive,
 							force, synchronous ? message : NULL);
 						break;

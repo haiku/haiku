@@ -158,7 +158,6 @@ class BMimeType	{
 			// for testing only
 
 		friend class BAppFileInfo;
-		friend class BPrivate::Storage::Mime::CreateAppMetaMimeThread;
 
 		virtual void _ReservedMimeType1();
 		virtual void _ReservedMimeType2();

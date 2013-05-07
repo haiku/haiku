@@ -10,6 +10,7 @@ UsePrivateHeaders app shared storage ;
 #UsePublicHeaders [ FDirName add-ons registrar ] ;
 
 StaticLibrary libstorage_kit_mime.a :
+	AppMetaMimeCreator.cpp
 	AssociatedTypes.cpp
 	Database.cpp
 	DatabaseDirectory.cpp
