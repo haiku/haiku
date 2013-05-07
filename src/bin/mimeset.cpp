@@ -1,31 +1,31 @@
 /*
- * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <Application.h>
 #include <Mime.h>
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
 
 #ifdef HAIKU_HOST_PLATFORM_SUNOS
-static const char *sProgramName = "mimeset";
+static const char* sProgramName = "mimeset";
 #else
-extern const char *__progname;
-static const char *sProgramName = __progname;
+extern const char* __progname;
+static const char* sProgramName = __progname;
 #endif
 
 // options
 bool gFiles = true;
 bool gApps = false;
-int gForce = 0; // B_UPDATE_MIME_INFO_NO_FORCE;
+int gForce = B_UPDATE_MIME_INFO_NO_FORCE;
 
 
-void
+static void
 usage(int status)
 {
 	printf("usage: %s [OPTION]... [PATH]...\n"
@@ -43,8 +43,8 @@ usage(int status)
 }
 
 
-status_t
-process_file(const char *path)
+static status_t
+process_file(const char* path)
 {
 	status_t status = B_OK;
 
@@ -52,12 +52,12 @@ process_file(const char *path)
 	if (!entry.Exists())
 		status = B_ENTRY_NOT_FOUND;
 
-	if (gFiles && status >= B_OK)
+	if (gFiles && status == B_OK)
 		status = update_mime_info(path, true, true, gForce);
-	if (gApps && status >= B_OK)
+	if (gApps && status == B_OK)
 		status = create_app_meta_mime(path, true, true, gForce);
 
-	if (status < B_OK) {
+	if (status != B_OK) {
 		fprintf(stderr, "%s: \"%s\": %s\n",
 			sProgramName, path, strerror(status));
 	}
@@ -66,28 +66,28 @@ process_file(const char *path)
 
 
 int
-main(int argc, char **argv)
+main(int argc, const char* const* argv)
 {
 	// parse arguments
 
 	if (argc < 2)
 		usage(1);
 
-	while (*++argv) {
-		char *arg = *argv;
+	while (*++argv != NULL) {
+		const char* arg = *argv;
 		if (*arg != '-')
 			break;
 
-		if (!strcmp(arg, "-all"))
+		if (strcmp(arg, "-all") == 0)
 			gApps = true;
-		else if (!strcmp(arg, "-apps")) {
+		else if (strcmp(arg, "-apps") == 0) {
 			gApps = true;
 			gFiles = false;
-		} else if (!strcmp(arg, "-f"))
-			gForce = 1; // B_UPDATE_MIME_INFO_FORCE_KEEP_TYPE;
-		else if (!strcmp(arg, "-F"))
-			gForce = 2; // B_UPDATE_MIME_INFO_FORCE_UPDATE_ALL;
-		else if (!strcmp(arg, "--help"))
+		} else if (strcmp(arg, "-f") == 0)
+			gForce = B_UPDATE_MIME_INFO_FORCE_KEEP_TYPE;
+		else if (strcmp(arg, "-F") == 0)
+			gForce = B_UPDATE_MIME_INFO_FORCE_UPDATE_ALL;
+		else if (strcmp(arg, "--help") == 0)
 			usage(0);
 		else {
 			fprintf(stderr, "unknown  option \"%s\"\n", arg);
@@ -99,10 +99,10 @@ main(int argc, char **argv)
 
 	BApplication app("application/x-vnd.haiku.mimeset");
 
-	while (*argv) {
-		char *arg = *argv++;
+	while (*argv != NULL) {
+		const char* arg = *argv++;
 
-		if (!strcmp(arg, "@")) {
+		if (strcmp(arg, "@") == 0) {
 			// read file names from stdin
 			char name[B_PATH_NAME_LENGTH];
 			while (fgets(name, sizeof(name), stdin) != NULL) {
@@ -119,4 +119,3 @@ main(int argc, char **argv)
 
 	return 0;
 }
-
