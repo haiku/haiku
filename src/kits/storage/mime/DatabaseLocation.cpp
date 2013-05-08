@@ -13,6 +13,8 @@
 #include <stdlib.h>
 #include <syslog.h>
 
+#include <new>
+
 #include <Bitmap.h>
 #include <DataIO.h>
 #include <Directory.h>
@@ -255,7 +257,8 @@ DatabaseLocation::WriteAttribute(const char* type, const char* attribute,
 	ssize_t bytesWritten = node.WriteAttr(attribute, datatype, 0, data, length);
 	if (bytesWritten < 0)
 		return bytesWritten;
-	return bytesWritten == (ssize_t)length ? B_OK : B_FILE_ERROR;
+	return bytesWritten == (ssize_t)length
+		? (status_t)B_OK : (status_t)B_FILE_ERROR;
 }
 
 
@@ -874,7 +877,7 @@ DatabaseLocation::_CopyTypeNode(BNode& source, const char* type, BNode& _target)
 		}
 
 		// resize our buffer, if necessary
-		if (info.size > bufferSize) {
+		if (info.size > (off_t)bufferSize) {
 			bufferDeleter.SetTo(malloc(info.size));
 			if (bufferDeleter.Get() == NULL)
 				return B_NO_MEMORY;
