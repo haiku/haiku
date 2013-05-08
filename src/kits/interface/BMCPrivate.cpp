@@ -137,13 +137,14 @@ _BMCMenuBar_::AttachedToWindow()
 void
 _BMCMenuBar_::Draw(BRect updateRect)
 {
-	float height;
-	GetPreferredSize(NULL, &height);
-	ResizeTo(fMenuField->_MenuBarWidth(), height);
-		// Set the width to the menu field width because the menubar
-		// bounds are expanded by the selected menu item.
+	if (fFixedSize) {
+		float height;
+		GetPreferredSize(NULL, &height);
+		ResizeTo(fMenuField->_MenuBarWidth(), height);
+			// Set the width to the menu field width because the menubar
+			// bounds are expanded by the selected menu item.
+	}
 	BRect rect(Bounds());
-
 	rgb_color base = ui_color(B_MENU_BACKGROUND_COLOR);
 	uint32 flags = 0;
 	if (!IsEnabled())
