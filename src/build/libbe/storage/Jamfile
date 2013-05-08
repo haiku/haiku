@@ -6,6 +6,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) mime ] ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits storage ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits storage mime ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits storage sniffer ] ;
 
 USES_BE_API on <libbe_build>storage_kit.o = true ;
 
@@ -17,6 +18,7 @@ BuildPlatformMergeObjectPIC <libbe_build>storage_kit.o :
 	File.cpp
 	FileIO.cpp
 	FindDirectory.cpp
+	MergedDirectory.cpp
 	Mime.cpp
 	MimeType.cpp
 	Node.cpp
@@ -33,7 +35,31 @@ BuildPlatformMergeObjectPIC <libbe_build>storage_kit.o :
 	Volume.cpp
 	storage_support.cpp
 
+	# mime
+	AppMetaMimeCreator.cpp
+	AssociatedTypes.cpp
+	Database.cpp
+	DatabaseDirectory.cpp
+	DatabaseLocation.cpp
 	database_support.cpp
+	InstalledTypes.cpp
+	MimeSniffer.cpp
+	SnifferRules.cpp
+	Supertype.cpp
+	SupportingApps.cpp
+
 	MimeUpdateThread.cpp
 	UpdateMimeInfoThread.cpp
+
+	# sniffer
+	CharStream.cpp
+	Err.cpp
+	DisjList.cpp
+	Pattern.cpp
+	PatternList.cpp
+	Parser.cpp
+	Range.cpp
+	RPattern.cpp
+	RPatternList.cpp
+	Rule.cpp
 ;

@@ -352,6 +352,16 @@ BEntry::Exists() const
 }
 
 
+const char*
+BEntry::Name() const
+{
+	if (fCStatus != B_OK)
+		return NULL;
+
+	return fName;
+}
+
+
 /*! \brief Fills in a stat structure for the entry. The information is copied into
 	the \c stat structure pointed to by \a result.
 

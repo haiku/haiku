@@ -61,10 +61,9 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 
 local mimesetSources =
 	mimeset.cpp
-	Mime.cpp
-	database_support.cpp
-	UpdateMimeInfoThread.cpp
-	MimeUpdateThread.cpp
+#	Mime.cpp
+#	UpdateMimeInfoThread.cpp
+#	MimeUpdateThread.cpp
 ;
 
 if $(HOST_PLATFORM) = haiku_host {

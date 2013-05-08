@@ -12,7 +12,8 @@
 	Mime type C functions implementation.
 */
 
-#include <mime/database_access.h>
+#include <Mime.h>
+
 #include <mime/UpdateMimeInfoThread.h>
 
 using namespace BPrivate;

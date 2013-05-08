@@ -1,0 +1,63 @@
+SubDir HAIKU_TOP src build libicon ;
+
+# source directories
+local sourceDirs =
+	$(DOT)
+	flat_icon
+	message
+	shape
+	style
+	transformable
+	transformer
+;
+
+local sourceDir ;
+for sourceDir in $(sourceDirs) {
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src libs icon $(sourceDir) ] ;
+}
+
+# system headers
+UseLibraryHeaders agg icon ;
+
+UsePrivateBuildHeaders shared ;
+
+USES_BE_API on libicon_build.a = true ;
+
+BuildPlatformStaticLibrary libicon_build.a :
+	# flat_icon
+	FlatIconFormat.cpp
+	FlatIconImporter.cpp
+	LittleEndianBuffer.cpp
+	PathCommandQueue.cpp
+
+	# message
+	Defines.cpp
+	MessageImporter.cpp
+
+	# shape
+	PathContainer.cpp
+	Shape.cpp
+	ShapeContainer.cpp
+	VectorPath.cpp
+
+	# style
+	GradientTransformable.cpp
+	Style.cpp
+	StyleContainer.cpp
+
+	# transformable
+	Transformable.cpp
+
+	# transformer
+	AffineTransformer.cpp
+	ContourTransformer.cpp
+	PathSource.cpp
+	PerspectiveTransformer.cpp
+	StrokeTransformer.cpp
+	Transformer.cpp
+	TransformerFactory.cpp
+
+	Icon.cpp
+	IconRenderer.cpp
+	IconUtils.cpp
+;

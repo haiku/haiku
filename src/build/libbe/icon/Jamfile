@@ -1,0 +1,92 @@
+SubDir HAIKU_TOP src build libbe icon ;
+
+# source directories
+local sourceDirs =
+	$(DOT)
+	flat_icon
+	message
+	shape
+	style
+	transformable
+	transformer
+;
+
+local sourceDir ;
+for sourceDir in $(sourceDirs) {
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src libs icon $(sourceDir) ] ;
+}
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src libs agg src ] ;
+
+# system headers
+UseLibraryHeaders agg icon ;
+
+UsePrivateBuildHeaders shared ;
+
+USES_BE_API on <libbe_build>icon_kit.o = true ;
+
+BuildPlatformMergeObjectPIC <libbe_build>icon_kit.o :
+	# flat_icon
+	FlatIconFormat.cpp
+	FlatIconImporter.cpp
+	LittleEndianBuffer.cpp
+	PathCommandQueue.cpp
+
+	# message
+	Defines.cpp
+	MessageImporter.cpp
+
+	# shape
+	PathContainer.cpp
+	Shape.cpp
+	ShapeContainer.cpp
+	VectorPath.cpp
+
+	# style
+	GradientTransformable.cpp
+	Style.cpp
+	StyleContainer.cpp
+
+	# transformable
+	Transformable.cpp
+
+	# transformer
+	AffineTransformer.cpp
+	ContourTransformer.cpp
+	PathSource.cpp
+	PerspectiveTransformer.cpp
+	StrokeTransformer.cpp
+	Transformer.cpp
+	TransformerFactory.cpp
+
+	Icon.cpp
+	IconRenderer.cpp
+	IconUtils.cpp
+
+	# agg
+	agg_arc.cpp
+	agg_arrowhead.cpp
+	agg_bezier_arc.cpp
+	agg_bspline.cpp
+	agg_curves.cpp
+	agg_embedded_raster_fonts.cpp
+	agg_gsv_text.cpp
+	agg_image_filters.cpp
+	agg_line_aa_basics.cpp
+	agg_line_profile_aa.cpp
+	agg_rounded_rect.cpp
+	agg_sqrt_tables.cpp
+	agg_trans_affine.cpp
+	agg_trans_double_path.cpp
+	agg_trans_single_path.cpp
+	agg_trans_warp_magnifier.cpp
+	agg_vcgen_bspline.cpp
+	agg_vcgen_contour.cpp
+	agg_vcgen_dash.cpp
+	agg_vcgen_markers_term.cpp
+	agg_vcgen_smooth_poly1.cpp
+	agg_vcgen_stroke.cpp
+	agg_vpgen_clip_polygon.cpp
+	agg_vpgen_clip_polyline.cpp
+	agg_vpgen_segmentator.cpp
+;
