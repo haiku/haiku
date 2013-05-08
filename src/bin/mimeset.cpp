@@ -11,6 +11,14 @@
 
 #include <Application.h>
 #include <Mime.h>
+#include <Path.h>
+
+#include <mime/AppMetaMimeCreator.h>
+#include <mime/Database.h>
+#include <mime/DatabaseLocation.h>
+
+
+using namespace BPrivate::Storage::Mime;
 
 
 #ifdef HAIKU_HOST_PLATFORM_SUNOS
@@ -24,6 +32,8 @@ static const char* sProgramName = __progname;
 bool gFiles = true;
 bool gApps = false;
 int gForce = B_UPDATE_MIME_INFO_NO_FORCE;
+
+static Database* sDatabase = NULL;
 
 
 static void
@@ -49,6 +59,11 @@ usage(int status)
 		"    type of a file.\n"
 		"  -h, --help\n"
 		"    Display this help information.\n"
+		"  -m, --mimedb <directory>\n"
+		"    Instead of the system MIME DB use the given directory\n"
+		"    <directory>. The option can occur multiple times to specify a\n"
+		"    list of directories. MIME DB changes are written to the first\n"
+		"    specified directory.\n"
 		"\n"
 		"Obsolete options:\n"
 		"  -all  (synonymous with --all)\n"
@@ -61,6 +76,31 @@ usage(int status)
 
 
 static status_t
+process_file_with_custom_mime_db(const BEntry& entry)
+{
+	// TODO: Support recursion!
+	// TODO: Support MIME update!
+	AppMetaMimeCreator creator(sDatabase, NULL, gForce);
+
+	entry_ref ref;
+	status_t error = entry.GetRef(&ref);
+	bool entryIsDir = false;
+	if (error == B_OK)
+		error = creator.Do(ref, &entryIsDir);
+	if (error != B_OK) {
+		BPath path;
+		fprintf(stderr, "%s: \"%s\": %s\n",
+			sProgramName,
+			entry.GetPath(&path) == B_OK ? path.Path() : entry.Name(),
+			strerror(error));
+		return error;
+	}
+
+	return B_OK;
+}
+
+
+static status_t
 process_file(const char* path)
 {
 	status_t status = B_OK;
@@ -68,6 +108,9 @@ process_file(const char* path)
 	BEntry entry(path);
 	if (!entry.Exists())
 		status = B_ENTRY_NOT_FOUND;
+
+	if (sDatabase != NULL)
+		return process_file_with_custom_mime_db(entry);
 
 	if (gFiles && status == B_OK)
 		status = update_mime_info(path, true, true, gForce);
@@ -98,16 +141,19 @@ main(int argc, const char** argv)
 			argv[i] = "--apps";
 	}
 
+	BStringList databaseDirectories;
+
 	for (;;) {
 		static struct option sLongOptions[] = {
 			{ "all", no_argument, 0, 'A' },
 			{ "apps", no_argument, 0, 'a' },
 			{ "help", no_argument, 0, 'h' },
+			{ "mimedb", required_argument, 0, 'm' },
 			{ 0, 0, 0, 0 }
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "aAfFh", sLongOptions,
+		int c = getopt_long(argc, (char**)argv, "aAfFhm:", sLongOptions,
 			NULL);
 		if (c == -1)
 			break;
@@ -130,6 +176,9 @@ main(int argc, const char** argv)
 			case 'h':
 				usage(0);
 				break;
+			case 'm':
+				databaseDirectories.Add(optarg);
+				break;
 			default:
 				usage(1);
 				break;
@@ -138,6 +187,35 @@ main(int argc, const char** argv)
 
 	if (argc - optind < 1)
 		usage(1);
+
+	// set up custom MIME DB, if specified
+	DatabaseLocation databaseLocation;
+	if (!databaseDirectories.IsEmpty()) {
+		// the first directory must exist
+		if (!BEntry(databaseDirectories.StringAt(0)).IsDirectory()) {
+			fprintf(stderr, "%s: Specified path \"%s\" doesn't exist or isn't "
+				"a directory.", sProgramName,
+				databaseDirectories.StringAt(0).String());
+			exit(1);
+		}
+
+		int32 count = databaseDirectories.CountStrings();
+		for (int32 i = 0; i < count; i++)
+			databaseLocation.AddDirectory(databaseDirectories.StringAt(i));
+
+		sDatabase = new(std::nothrow) Database(&databaseLocation, NULL, NULL);
+		if (sDatabase == NULL) {
+			fprintf(stderr, "%s: Out of memory!\n", sProgramName);
+			exit(1);
+		}
+
+		status_t error = sDatabase->InitCheck();
+		if (error != B_OK) {
+			fprintf(stderr, "%s: Failed to init MIME DB: %s\n", sProgramName,
+				strerror(error));
+			exit(1);
+		}
+	}
 
 	// process files
 

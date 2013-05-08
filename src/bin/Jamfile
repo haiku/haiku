@@ -91,7 +91,6 @@ StdBinCommands
 	listattr.cpp
 	listfont.cpp
 	listres.cpp
-	mimeset.cpp
 	mkindex.cpp
 	message.cpp
 	modifiers.cpp
@@ -224,6 +223,11 @@ StdBinCommands
 StdBinCommands
 	watch.c
 	: libncurses.a : $(haiku-utils_rsrc) ;
+
+# mimeset needs libstorage_kit_mime.a
+StdBinCommands
+	mimeset.cpp
+	: be libstorage_kit_mime.a $(TARGET_LIBSTDC++) : $(haiku-utils_rsrc) ;
 
 # Localization of some applications
 DoCatalogs dstcheck
