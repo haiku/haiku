@@ -224,10 +224,10 @@ public:
 		status_t status = B_OK;
 
 		if (!inode->IsSymLink() && volume->ID() >= 0) {
-			TRACEI("Vnode::Publish(): Publishing vnode: %d, %d, %p, %p, %x, "
-				"%x\n", (int)volume->FSVolume(), (int)inode->ID(), inode,
-				vnodeOps != NULL ? vnodeOps : &gExt2VnodeOps, (int)inode->Mode(),
-				(int)publishFlags);
+			TRACEI("Vnode::Publish(): Publishing volume: %p, %" B_PRIdINO
+				", %p, %p, %" B_PRIu16 ", %" B_PRIx32 "\n", volume->FSVolume(),
+				inode->ID(), inode, vnodeOps != NULL ? vnodeOps : &gExt2VnodeOps,
+				inode->Mode(), publishFlags);
 			status = publish_vnode(volume->FSVolume(), inode->ID(), inode,
 				vnodeOps != NULL ? vnodeOps : &gExt2VnodeOps, inode->Mode(),
 				publishFlags);

@@ -211,7 +211,7 @@ Attribute::Read(attr_cookie* cookie, off_t pos, uint8* buffer, size_t* _length)
 		start += EXT2_INODE_NORMAL_SIZE + fInode->Node().ExtraInodeSize()
 			+ sizeof(uint32);
 		pos += fBodyEntry->ValueOffset();
-		if ((pos + length) > (end - start) || length > fBodyEntry->ValueSize())
+		if ((off_t)(pos + length) > (end - start) || length > fBodyEntry->ValueSize())
 			return ERANGE;
 	}
 	memcpy(buffer, start + (uint32)pos, length);

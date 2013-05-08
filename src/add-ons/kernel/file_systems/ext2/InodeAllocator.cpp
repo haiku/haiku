@@ -139,7 +139,7 @@ InodeAllocator::_AllocateInGroup(Transaction& transaction, uint32 blockGroup,
 	uint32 freeInodes = group->FreeInodes(fVolume->Has64bitFeature());
 	if (freeInodes == 0)
 		return B_DEVICE_FULL;
-	TRACE("InodeAllocator::_Allocate() freeInodes %ld\n",
+	TRACE("InodeAllocator::_Allocate() freeInodes %" B_PRId32 "\n",
 		freeInodes);
 	group->SetFreeInodes(freeInodes - 1, fVolume->Has64bitFeature());
 	if (isDirectory) {
@@ -177,8 +177,8 @@ InodeAllocator::_MarkInBitmap(Transaction& transaction, fsblock_t bitmapBlock,
 	BitmapBlock inodeBitmap(fVolume, numInodes);
 
 	if (!inodeBitmap.SetToWritable(transaction, bitmapBlock)) {
-		ERROR("Unable to open inode bitmap (block number: %llu) for block group "
-			"%lu\n", bitmapBlock, blockGroup);
+		ERROR("Unable to open inode bitmap (block number: %" B_PRIu64
+			") for block group %" B_PRIu32 "\n", bitmapBlock, blockGroup);
 		return B_IO_ERROR;
 	}
 
@@ -186,15 +186,16 @@ InodeAllocator::_MarkInBitmap(Transaction& transaction, fsblock_t bitmapBlock,
 	inodeBitmap.FindNextUnmarked(pos);
 
 	if (pos == inodeBitmap.NumBits()) {
-		ERROR("Even though the block group %lu indicates there are free "
-			"inodes, no unmarked bit was found in the inode bitmap at block "
-			"%llu (numInodes %lu).\n", blockGroup, bitmapBlock, numInodes);
+		ERROR("Even though the block group %" B_PRIu32 " indicates there are "
+			"free inodes, no unmarked bit was found in the inode bitmap at "
+			"block %" B_PRIu64 " (numInodes %" B_PRIu32 ").\n", blockGroup,
+			bitmapBlock, numInodes);
 		return B_ERROR;
 	}
 
 	if (!inodeBitmap.Mark(pos, 1)) {
-		ERROR("Failed to mark bit %lu at bitmap block %llu\n", pos,
-			bitmapBlock);
+		ERROR("Failed to mark bit %" B_PRIu32 " at bitmap block %" B_PRIu64
+			"\n", pos, bitmapBlock);
 		return B_BAD_DATA;
 	}
 
@@ -209,14 +210,15 @@ InodeAllocator::_UnmarkInBitmap(Transaction& transaction, fsblock_t bitmapBlock,
 	BitmapBlock inodeBitmap(fVolume, numInodes);
 
 	if (!inodeBitmap.SetToWritable(transaction, bitmapBlock)) {
-		ERROR("Unable to open inode bitmap at block %llu\n", bitmapBlock);
+		ERROR("Unable to open inode bitmap at block %" B_PRIu64 "\n",
+			bitmapBlock);
 		return B_IO_ERROR;
 	}
 
 	uint32 pos = (id - 1) % fVolume->InodesPerGroup();
 	if (!inodeBitmap.Unmark(pos, 1)) {
-		ERROR("Unable to unmark bit %lu in inode bitmap block %llu\n", pos,
-			bitmapBlock);
+		ERROR("Unable to unmark bit %" B_PRIu32 " in inode bitmap block %" 
+			B_PRIu64 "\n", pos, bitmapBlock);
 		return B_BAD_DATA;
 	}
 

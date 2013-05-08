@@ -49,7 +49,7 @@ status_t
 ExtentStream::FindBlock(off_t offset, fsblock_t& block, uint32 *_count)
 {
 	fileblock_t index = offset >> fVolume->BlockShift();
-	TRACE("FindBlock(%lld, %lld)\n", offset, index);
+	TRACE("FindBlock(%" B_PRIdOFF ", %" B_PRIu64 ")\n", offset, index);
 
 	if (offset >= fSize) {
 		TRACE("FindBlock: offset larger than inode size\n");
@@ -69,8 +69,8 @@ ExtentStream::FindBlock(off_t offset, fsblock_t& block, uint32 *_count)
 			&& stream->extent_index[i].LogicalBlock() <= index) {
 			i++;
 		}
-		TRACE("FindBlock() getting index %ld at %lld\n", i - 1,
-			stream->extent_index[i - 1].PhysicalBlock());
+		TRACE("FindBlock() getting index %" B_PRId32 " at %" B_PRIu64 "\n",
+			i - 1, stream->extent_index[i - 1].PhysicalBlock());
 		stream = (ext2_extent_stream *)cached.SetTo(
 			stream->extent_index[i - 1].PhysicalBlock());
 		if (!stream->extent_header.IsValid())
@@ -97,8 +97,8 @@ ExtentStream::FindBlock(off_t offset, fsblock_t& block, uint32 *_count)
 			- stream->extent_entries[middle].LogicalBlock();
 		if (diff > stream->extent_entries[middle].Length()) {
 			// sparse block
-			TRACE("FindBlock() sparse block index %lld at %ld\n", index,
-				stream->extent_entries[middle].LogicalBlock());
+			TRACE("FindBlock() sparse block index %" B_PRIu64 " at %" B_PRIu32
+				"\n", index, stream->extent_entries[middle].LogicalBlock());
 			block = 0xffffffff;
 			return B_OK;
 		}
@@ -106,16 +106,16 @@ ExtentStream::FindBlock(off_t offset, fsblock_t& block, uint32 *_count)
 		block = stream->extent_entries[middle].PhysicalBlock() + diff;
 		if (_count)
 			*_count = stream->extent_entries[middle].Length() - diff;
-		TRACE("FindBlock(offset %lld): %lld %ld\n", offset, 
-			block, _count != NULL ? *_count : 1);
+		TRACE("FindBlock(offset %" B_PRIdOFF "): %" B_PRIu64 " %" B_PRIu32
+			"\n", offset, block, _count != NULL ? *_count : 1);
 		return B_OK;
 	}
 
 	for (int32 i = 0; i < stream->extent_header.NumEntries(); i++) {
 		if (stream->extent_entries[i].LogicalBlock() > index) {
 			// sparse block
-			TRACE("FindBlock() sparse block index %lld at %ld\n", index,
-				stream->extent_entries[i].LogicalBlock());
+			TRACE("FindBlock() sparse block index %" B_PRIu64 " at %" B_PRIu32
+				"\n", index, stream->extent_entries[i].LogicalBlock());
 			block = 0xffffffff;
 			return B_OK;
 		}
@@ -124,8 +124,8 @@ ExtentStream::FindBlock(off_t offset, fsblock_t& block, uint32 *_count)
 			block = stream->extent_entries[i].PhysicalBlock() + diff;
 			if (_count)
 				*_count = stream->extent_entries[i].Length() - diff;
-			TRACE("FindBlock(offset %lld): %lld %ld\n", offset, 
-				block, _count != NULL ? *_count : 1);
+			TRACE("FindBlock(offset %" B_PRIdOFF "): %" B_PRIu64 " %" B_PRIu32
+				"\n", offset, block, _count != NULL ? *_count : 1);
 			return B_OK;
 		}
 	}
@@ -137,8 +137,8 @@ ExtentStream::FindBlock(off_t offset, fsblock_t& block, uint32 *_count)
 status_t
 ExtentStream::Enlarge(Transaction& transaction, off_t& numBlocks)
 {
-	TRACE("Enlarge(): current size: %llu, target size: %llu\n",
-		fNumBlocks, numBlocks);
+	TRACE("Enlarge(): current size: %" B_PRIdOFF ", target size: %" B_PRIdOFF
+		"\n", fNumBlocks, numBlocks);
 	
 	off_t targetBlocks = numBlocks;
 	numBlocks = targetBlocks - fNumBlocks;
@@ -172,8 +172,8 @@ ExtentStream::Enlarge(Transaction& transaction, off_t& numBlocks)
 				panic("stream->extent_header.NumEntries() == 0\n");
 			int32 lastIndex = stream->extent_header.NumEntries() - 1;
 			TRACE("Enlarge() depth %d\n", stream->extent_header.Depth());
-			TRACE("Enlarge() getting index %ld at %lld\n", lastIndex,
-				stream->extent_index[lastIndex].PhysicalBlock());
+			TRACE("Enlarge() getting index %" B_PRId32 " at %" B_PRIu64 "\n",
+				lastIndex, stream->extent_index[lastIndex].PhysicalBlock());
 			path[++level] = stream->extent_index[lastIndex].PhysicalBlock();
 			stream = (ext2_extent_stream *)cached.SetTo(path[level]);
 			if (stream == NULL)
@@ -184,7 +184,7 @@ ExtentStream::Enlarge(Transaction& transaction, off_t& numBlocks)
 		if (stream->extent_header.NumEntries() > 0) {
 			ext2_extent_entry &last = stream->extent_entries[
 				stream->extent_header.NumEntries() - 1];
-			TRACE("Enlarge() last %lld allocatedPos %lld\n",
+			TRACE("Enlarge() last %" B_PRIu64 " allocatedPos %" B_PRIu64 "\n",
 				last.PhysicalBlock() + last.Length(), fAllocatedPos);
 			if (last.PhysicalBlock() + last.Length() == fAllocatedPos
 				&& (last.Length() + allocated) <= EXT2_EXTENT_MAX_LENGTH) {
@@ -205,8 +205,8 @@ ExtentStream::Enlarge(Transaction& transaction, off_t& numBlocks)
 
 		if (stream->extent_header.NumEntries()
 			>= stream->extent_header.MaxEntries()) {
-			TRACE("Enlarge() adding leaf and indexes at depth %d level %ld\n",
-				stream->extent_header.Depth(), level);
+			TRACE("Enlarge() adding leaf and indexes at depth %d level %"
+				B_PRId32 "\n", stream->extent_header.Depth(), level);
 			// try to add a leaf and indexes
 			while (--level >= 0) {
 				stream = (ext2_extent_stream *)cached.SetTo(path[level]);
@@ -216,7 +216,7 @@ ExtentStream::Enlarge(Transaction& transaction, off_t& numBlocks)
 					< stream->extent_header.MaxEntries()) {
 					break;
 				}
-				TRACE("Enlarge() going up from level %ld\n", level);
+				TRACE("Enlarge() going up from level %" B_PRId32 "\n", level);
 			}
 
 			if (level < 0 && fStream->extent_header.NumEntries()
@@ -231,7 +231,8 @@ ExtentStream::Enlarge(Transaction& transaction, off_t& numBlocks)
 					return status;
 				}
 				ASSERT(_CheckBlock(fStream, newBlock) == B_OK);
-				TRACE("Enlarge() move root to block %lld\n", newBlock);
+				TRACE("Enlarge() move root to block %" B_PRIu64 "\n",
+					newBlock);
 				numBlocks++;
 				stream = (ext2_extent_stream *)cached.SetToWritable(
 					transaction, newBlock);
@@ -277,7 +278,7 @@ ExtentStream::Enlarge(Transaction& transaction, off_t& numBlocks)
 				path[level++] = newBlock;
 
 				depth = stream->extent_header.Depth() - 1;
-				TRACE("Enlarge() init index block %lld at depth %d\n",
+				TRACE("Enlarge() init index block %" B_PRIu64 " at depth %d\n",
 					newBlock, depth);
 				stream = (ext2_extent_stream *)cached.SetToWritable(
 					transaction, newBlock);
@@ -293,12 +294,12 @@ ExtentStream::Enlarge(Transaction& transaction, off_t& numBlocks)
 				ASSERT(Check());
 			}
 
-			TRACE("Enlarge() depth %d level %ld\n", 
+			TRACE("Enlarge() depth %d level %" B_PRId32 "\n", 
 				stream->extent_header.Depth(), level);
 
 			if (stream->extent_header.Depth() == 1) {
-				TRACE("Enlarge() adding an entry block at depth %d level %ld\n",
-					depth, level);
+				TRACE("Enlarge() adding an entry block at depth %d level %"
+					B_PRId32 "\n", depth, level);
 				fsblock_t newBlock;
 				if (level >= 0)
 					newBlock = path[level];
@@ -319,8 +320,8 @@ ExtentStream::Enlarge(Transaction& transaction, off_t& numBlocks)
 				stream->extent_index[index].SetPhysicalBlock(newBlock);
 				stream->extent_header.SetNumEntries(index + 1);
 
-				TRACE("Enlarge() init entry block %lld at depth %d\n",
-					newBlock, depth);
+				TRACE("Enlarge() init entry block %" B_PRIu64
+					" at depth %d\n", newBlock, depth);
 				stream = (ext2_extent_stream *)cached.SetToWritable(
 					transaction, newBlock);
 				if (stream == NULL)
@@ -336,7 +337,7 @@ ExtentStream::Enlarge(Transaction& transaction, off_t& numBlocks)
 		}
 		
 		// add a new entry
-		TRACE("Enlarge() add entry %lld\n", fAllocatedPos);
+		TRACE("Enlarge() add entry %" B_PRIu64 "\n", fAllocatedPos);
 		if (stream != fStream) {
 			stream = (ext2_extent_stream *)cached.SetToWritable(
 				transaction, cached.BlockNumber());
@@ -348,7 +349,7 @@ ExtentStream::Enlarge(Transaction& transaction, off_t& numBlocks)
 		stream->extent_entries[index].SetLength(allocated);
 		stream->extent_entries[index].SetPhysicalBlock(fAllocatedPos);
 		stream->extent_header.SetNumEntries(index + 1);
-		TRACE("Enlarge() entry added at index %ld\n", index);
+		TRACE("Enlarge() entry added at index %" B_PRId32 "\n", index);
 		ASSERT(stream->extent_header.IsValid());
 
 		fNumBlocks += allocated;
@@ -362,8 +363,8 @@ ExtentStream::Enlarge(Transaction& transaction, off_t& numBlocks)
 status_t
 ExtentStream::Shrink(Transaction& transaction, off_t& numBlocks)
 {
-	TRACE("DataStream::Shrink(): current size: %llu, target size: %llu\n",
-		fNumBlocks, numBlocks);
+	TRACE("DataStream::Shrink(): current size: %" B_PRIdOFF ", target size: %"
+		B_PRIdOFF "\n", fNumBlocks, numBlocks);
 
 	off_t targetBlocks = numBlocks;
 	numBlocks = fNumBlocks - targetBlocks;
@@ -380,8 +381,8 @@ ExtentStream::Shrink(Transaction& transaction, off_t& numBlocks)
 				panic("stream->extent_header.NumEntries() == 0\n");
 			int32 lastIndex = stream->extent_header.NumEntries() - 1;
 			TRACE("Shrink() depth %d\n", stream->extent_header.Depth());
-			TRACE("Shrink() getting index %ld at %lld\n", lastIndex,
-				stream->extent_index[lastIndex].PhysicalBlock());
+			TRACE("Shrink() getting index %" B_PRId32 " at %" B_PRIu64 "\n",
+				lastIndex, stream->extent_index[lastIndex].PhysicalBlock());
 			path[++level] = stream->extent_index[lastIndex].PhysicalBlock();
 			stream = (ext2_extent_stream *)cached.SetToWritable(transaction, 
 				path[level]);
@@ -401,19 +402,20 @@ ExtentStream::Shrink(Transaction& transaction, off_t& numBlocks)
 			}
 			uint16 length = min_c(last.Length(), fNumBlocks - targetBlocks);
 			fsblock_t block = last.PhysicalBlock() + last.Length() - length;
-			TRACE("Shrink() free block %lld length %d\n", block, length); 
+			TRACE("Shrink() free block %" B_PRIu64 " length %d\n", block,
+				length); 
 			status = fVolume->FreeBlocks(transaction, block, length);
 			if (status != B_OK)
 				break;
 			fNumBlocks -= length;
 			stream->extent_entries[index].SetLength(last.Length() - length);
-			TRACE("Shrink() new length for %ld: %d\n", index, last.Length());
+			TRACE("Shrink() new length for %" B_PRId32 ": %d\n", index, last.Length());
 			if (last.Length() != 0)
 				break;
 			index--;
-			TRACE("Shrink() next index: %ld\n", index);
+			TRACE("Shrink() next index: %" B_PRId32 "\n", index);
 		}
-		TRACE("Shrink() new entry count: %ld\n", index + 1);
+		TRACE("Shrink() new entry count: %" B_PRId32 "\n", index + 1);
 		stream->extent_header.SetNumEntries(index + 1);
 		ASSERT(Check());
 		
@@ -476,8 +478,8 @@ ExtentStream::_Check(ext2_extent_stream *stream, fileblock_t &block)
 		for (int32 i = 0; i < stream->extent_header.NumEntries(); i++) {
 			ext2_extent_entry &entry = stream->extent_entries[i];
 			if (entry.LogicalBlock() < block) {
-				panic("_Check() entry %ld %lld %ld\n", i, block,
-					entry.LogicalBlock());
+				panic("_Check() entry %" B_PRId32 " %" B_PRIu64 " %" B_PRIu32
+					"\n", i, block, entry.LogicalBlock());
 				return B_BAD_VALUE;
 			}
 			block = entry.LogicalBlock() + entry.Length();
@@ -489,8 +491,8 @@ ExtentStream::_Check(ext2_extent_stream *stream, fileblock_t &block)
 	for (int32 i = 0; i < stream->extent_header.NumEntries(); i++) {
 		ext2_extent_index &index = stream->extent_index[i];
 		if (index.LogicalBlock() < block) {
-			panic("_Check() index %ld %lld %ld\n", i, block,
-				index.LogicalBlock());
+			panic("_Check() index %" B_PRId32 " %" B_PRIu64 " %" B_PRIu32
+				"\n", i, block, index.LogicalBlock());
 			return B_BAD_VALUE;
 		}
 		ext2_extent_stream *child = (ext2_extent_stream *)cached.SetTo(
@@ -519,8 +521,9 @@ ExtentStream::_CheckBlock(ext2_extent_stream *stream, fsblock_t block)
 			ext2_extent_entry &entry = stream->extent_entries[i];
 			if (entry.PhysicalBlock() <= block
 				&& (entry.PhysicalBlock() + entry.Length()) > block) {
-				panic("_CheckBlock() entry %ld %lld %lld %d\n", i, block,
-					entry.PhysicalBlock(), entry.Length());
+				panic("_CheckBlock() entry %" B_PRId32 " %" B_PRIu64 " %"
+					B_PRIu64 " %d\n", i, block, entry.PhysicalBlock(),
+					entry.Length());
 				return B_BAD_VALUE;
 			}
 		}
@@ -531,7 +534,7 @@ ExtentStream::_CheckBlock(ext2_extent_stream *stream, fsblock_t block)
 	for (int32 i = 0; i < stream->extent_header.NumEntries(); i++) {
 		ext2_extent_index &index = stream->extent_index[i];
 		if (index.PhysicalBlock() == block) {
-			panic("_CheckBlock() index %ld %lld\n", i, block);
+			panic("_CheckBlock() index %" B_PRId32 " %" B_PRIu64 "\n", i, block);
 			return B_BAD_VALUE;
 		}
 		ext2_extent_stream *child = (ext2_extent_stream *)cached.SetTo(
