@@ -5,8 +5,8 @@
  * Authors:
  *		Ingo Weinhold <ingo_weinhold@gmx.de>
  */
-#ifndef _MIME_MIME_ENTRY_PROCESSOR_H
-#define _MIME_MIME_ENTRY_PROCESSOR_H
+#ifndef _MIME_MIME_INFO_UPDATER_H
+#define _MIME_MIME_INFO_UPDATER_H
 
 
 #include <mime/MimeEntryProcessor.h>
@@ -17,12 +17,12 @@ namespace Storage {
 namespace Mime {
 
 
-class AppMetaMimeCreator : public MimeEntryProcessor {
+class MimeInfoUpdater : public MimeEntryProcessor {
 public:
-								AppMetaMimeCreator(Database* database,
+								MimeInfoUpdater(Database* database,
 									DatabaseLocker* databaseLocker,
 						   			int32 force);
-	virtual						~AppMetaMimeCreator();
+	virtual						~MimeInfoUpdater();
 
 	virtual	status_t			Do(const entry_ref& entry, bool* _entryIsDir);
 };
@@ -33,4 +33,4 @@ public:
 } // namespace BPrivate
 
 
-#endif	// _MIME_MIME_ENTRY_PROCESSOR_H
+#endif	// _MIME_MIME_INFO_UPDATER_H

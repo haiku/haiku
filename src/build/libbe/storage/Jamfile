@@ -43,6 +43,7 @@ BuildPlatformMergeObjectPIC <libbe_build>storage_kit.o :
 	DatabaseLocation.cpp
 	database_support.cpp
 	InstalledTypes.cpp
+	MimeEntryProcessor.cpp
 	MimeSniffer.cpp
 	SnifferRules.cpp
 	Supertype.cpp

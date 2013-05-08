@@ -32,15 +32,10 @@ namespace Storage {
 namespace Mime {
 
 
-// #pragma mark - AppMetaMimeCreator
-
-
 AppMetaMimeCreator::AppMetaMimeCreator(Database* database,
 	DatabaseLocker* databaseLocker, int32 force)
 	:
-	fDatabase(database),
-	fDatabaseLocker(databaseLocker),
-	fForce(force)
+	MimeEntryProcessor(database, databaseLocker, force)
 {
 }
 
@@ -200,14 +195,6 @@ AppMetaMimeCreator::Do(const entry_ref& entry, bool* _entryIsDir)
 		fDatabase->UndeferInstallNotification(type);
 
 	return status;
-}
-
-
-// #pragma mark - DatabaseLocker
-
-
-AppMetaMimeCreator::DatabaseLocker::~DatabaseLocker()
-{
 }
 
 

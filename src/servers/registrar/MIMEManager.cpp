@@ -55,7 +55,7 @@ init_mime_sniffer_add_on_manager()
 
 
 class MIMEManager::DatabaseLocker
-	: public BPrivate::Storage::Mime::AppMetaMimeCreator::DatabaseLocker {
+	: public BPrivate::Storage::Mime::MimeEntryProcessor::DatabaseLocker {
 public:
 	DatabaseLocker(MIMEManager* manager)
 		:
@@ -280,7 +280,7 @@ MIMEManager::MessageReceived(BMessage *message)
 						thread = new(nothrow) UpdateMimeInfoThread(synchronous
 								? "update_mime_info (s)"
 								: "update_mime_info (a)",
-							B_NORMAL_PRIORITY + 1, &fDatabase,
+							B_NORMAL_PRIORITY + 1, &fDatabase, fDatabaseLocker,
 							BMessenger(&fThreadManager), &root, recursive,
 							force, synchronous ? message : NULL);
 						break;

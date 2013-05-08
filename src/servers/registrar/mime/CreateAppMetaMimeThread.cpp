@@ -19,7 +19,7 @@ namespace Mime {
 
 CreateAppMetaMimeThread::CreateAppMetaMimeThread(const char* name,
 	int32 priority, Database* database,
-	AppMetaMimeCreator::DatabaseLocker* databaseLocker,
+	MimeEntryProcessor::DatabaseLocker* databaseLocker,
 	BMessenger managerMessenger, const entry_ref* root, bool recursive,
 	int32 force, BMessage* replyee)
 	:

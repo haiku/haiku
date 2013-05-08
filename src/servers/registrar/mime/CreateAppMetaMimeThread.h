@@ -25,7 +25,7 @@ class CreateAppMetaMimeThread : public MimeUpdateThread {
 public:
 								CreateAppMetaMimeThread(const char* name,
 									int32 priority, Database* database,
-									AppMetaMimeCreator::DatabaseLocker*
+									MimeEntryProcessor::DatabaseLocker*
 										databaseLocker,
 									BMessenger managerMessenger,
 									const entry_ref* root, bool recursive,

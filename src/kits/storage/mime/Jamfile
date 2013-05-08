@@ -17,6 +17,8 @@ StaticLibrary libstorage_kit_mime.a :
 	DatabaseLocation.cpp
 	database_support.cpp
 	InstalledTypes.cpp
+	MimeEntryProcessor.cpp
+	MimeInfoUpdater.cpp
 	MimeSniffer.cpp
 	SnifferRules.cpp
 	Supertype.cpp
