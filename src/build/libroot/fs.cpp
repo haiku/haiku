@@ -207,7 +207,7 @@ find_dir_entry(DIR *dir, const char *path, NodeRef ref, string &name,
 	// find the entry
 	bool found = false;
 	while (dirent *entry = readdir(dir)) {
-		if ((!skipDot && strcmp(entry->d_name, ".") == 0)
+		if ((strcmp(entry->d_name, ".") == 0 && skipDot)
 			|| strcmp(entry->d_name, "..") == 0) {
 			// skip "." and ".."
 		} else /*if (entry->d_ino == ref.node)*/ {
