@@ -764,10 +764,10 @@ TeamWindow::_Init()
 		.Add(fMenuBar = new BMenuBar("Menu"))
 		.AddSplit(B_VERTICAL, 3.0f)
 			.GetSplitView(&fFunctionSplitView)
-			.SetInsets(4.0f, 4.0f, 4.0f, 4.0f)
+			.SetInsets(B_USE_SMALL_INSETS)
 			.Add(fTabView = new BTabView("tab view"), 0.4f)
-			.AddGroup(B_VERTICAL, 4.0f)
-				.AddGroup(B_HORIZONTAL, 4.0f)
+			.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
+				.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
 					.Add(fRunButton = new BButton("Run"))
 					.Add(fStepOverButton = new BButton("Step Over"))
 					.Add(fStepIntoButton = new BButton("Step Into"))
@@ -808,11 +808,12 @@ TeamWindow::_Init()
 		.Add(fImageFunctionsView = ImageFunctionsView::Create(this));
 
 	// add breakpoints tab
-	BGroupView* breakpointsGroup = new BGroupView(B_HORIZONTAL, 4.0f);
+	BGroupView* breakpointsGroup = new BGroupView(B_HORIZONTAL,
+		B_USE_SMALL_SPACING);
 	breakpointsGroup->SetName("Breakpoints");
 	fTabView->AddTab(breakpointsGroup);
 	BLayoutBuilder::Group<>(breakpointsGroup)
-		.SetInsets(4.0f, 4.0f, 4.0f, 4.0f)
+		.SetInsets(B_USE_SMALL_INSETS)
 		.Add(fBreakpointsView = BreakpointsView::Create(fTeam, this));
 
 	// add local variables tab
