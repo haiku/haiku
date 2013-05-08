@@ -10,7 +10,11 @@
 
 #include <mime/database_support.h>
 
-#include <pthread.h>
+#if defined(__HAIKU__) && !defined(HAIKU_HOST_PLATFORM_HAIKU)
+#	include <pthread.h>
+#endif
+
+#include <new>
 
 #include <Bitmap.h>
 #include <FindDirectory.h>
@@ -79,6 +83,10 @@ const char *kMetaMimeType		= "application/x-vnd.Be-meta-mime";
 // Error codes
 const status_t kMimeGuessFailureError	= B_ERRORS_END+1;
 
+
+#if defined(__HAIKU__) && !defined(HAIKU_HOST_PLATFORM_HAIKU)
+
+
 static const directory_which kBaseDirectoryConstants[] = {
 	B_USER_SETTINGS_DIRECTORY,
 	B_USER_NONPACKAGED_DATA_DIRECTORY,
@@ -120,6 +128,23 @@ default_database_location()
 		&init_default_database_location);
 	return &sDefaultDatabaseLocation;
 }
+
+
+#else	// building for the host platform
+
+
+DatabaseLocation*
+default_database_location()
+{
+	// Should never actually be used, but make it valid, anyway.
+	static DatabaseLocation location;
+	if (location.Directories().IsEmpty())
+		location.AddDirectory("/tmp");
+	return &location;
+}
+
+
+#endif
 
 
 /*! \brief Returns properly formatted raw bitmap data, ready to be shipped off
