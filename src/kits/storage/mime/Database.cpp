@@ -120,7 +120,7 @@ Database::Install(const char *type)
 
 	BEntry entry;
 	status_t err = entry.SetTo(fLocation->WritablePathForType(type));
-	if (!err) {
+	if (err == B_OK || err == B_ENTRY_NOT_FOUND) {
 		if (entry.Exists())
 			err = B_FILE_EXISTS;
 		else {
