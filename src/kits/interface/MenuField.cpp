@@ -135,9 +135,9 @@ static float kVMargin = 2.0f;
 
 
 BMenuField::BMenuField(BRect frame, const char* name, const char* label,
-		BMenu* menu, uint32 resize, uint32 flags)
+	BMenu* menu, uint32 resizingMode, uint32 flags)
 	:
-	BView(frame, name, resize, flags)
+	BView(frame, name, resizingMode, flags)
 {
 	CALLED();
 
@@ -153,9 +153,9 @@ BMenuField::BMenuField(BRect frame, const char* name, const char* label,
 
 
 BMenuField::BMenuField(BRect frame, const char* name, const char* label,
-		BMenu* menu, bool fixedSize, uint32 resize, uint32 flags)
+	BMenu* menu, bool fixedSize, uint32 resizingMode, uint32 flags)
 	:
-	BView(frame, name, resize, flags)
+	BView(frame, name, resizingMode, flags)
 {
 	InitObject(label);
 
@@ -169,7 +169,7 @@ BMenuField::BMenuField(BRect frame, const char* name, const char* label,
 
 
 BMenuField::BMenuField(const char* name, const char* label, BMenu* menu,
-		uint32 flags)
+	uint32 flags)
 	:
 	BView(name, flags | B_FRAME_EVENTS)
 {
@@ -637,7 +637,7 @@ BMenuField::SetDivider(float divider)
 
 	fDivider = divider;
 
-	if (Flags() & B_SUPPORTS_LAYOUT) {
+	if ((Flags() & B_SUPPORTS_LAYOUT) != 0) {
 		// We should never get here, since layout support means, we also
 		// layout the divider, and don't use this method at all.
 		Relayout();
@@ -882,7 +882,7 @@ void
 BMenuField::DoLayout()
 {
 	// Bail out, if we shan't do layout.
-	if (!(Flags() & B_SUPPORTS_LAYOUT))
+	if ((Flags() & B_SUPPORTS_LAYOUT) == 0)
 		return;
 
 	CALLED();
@@ -1137,7 +1137,6 @@ BMenuField::_InitMenuBar(BMenu* menu, BRect frame, bool fixedSize)
 
 	AddChild(fMenuBar);
 	fMenuBar->AddItem(menu);
-
 	fMenuBar->SetFont(be_plain_font);
 }
 
