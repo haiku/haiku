@@ -236,7 +236,7 @@ if [ IsOptionalHaikuImagePackageAdded Beam ] {
 # bebook
 if [ IsOptionalHaikuImagePackageAdded BeBook ] {
 	InstallOptionalHaikuImagePackage
-		$(hpkgBaseURL)/be_book-20081026-1-any.hpkg
+		$(hpkgBaseURL)/be_book-20081026-2-any.hpkg
 		: system ;
 	AddSymlinkToHaikuImage home Desktop
 		: /boot/system/documentation/BeBook/index.html
@@ -1886,7 +1886,7 @@ if [ IsOptionalHaikuImagePackageAdded Vision ] {
 				$(baseURL)/vision-908-r1a4-x86-gcc4-2012-09-04.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/vision-908-2-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/vision-908-3-x86_gcc2.hpkg ;
 		}
 		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/Vision/Vision ;
