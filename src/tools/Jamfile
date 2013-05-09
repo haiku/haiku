@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tools ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) headers build ] : true ;
 UsePrivateBuildHeaders app storage ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src/bin ] ;
@@ -21,16 +20,6 @@ local tools =
 ;
 
 USES_BE_API on $(tools) = true ;
-
-# TODO: temporary kludge
-local libHaikuCompat ;
-if $(HOST_PLATFORM) in r5 bone dano {
-	ObjectC++Flags database_support.cpp UpdateMimeInfoThread.cpp
-		MimeUpdateThread.cpp
-		: -include [ FDirName $(HAIKU_TOP) headers build
-			HaikuBuildCompatibility.h ] ;
-	libHaikuCompat = libhaikucompat_build.a ;
-}
 
 BuildPlatformMain <build>catattr : catattr.cpp : $(HOST_LIBBE) ;
 
@@ -55,33 +44,10 @@ BuildPlatformMain <build>generate_boot_screen :
 
 BuildPlatformMain <build>listattr : listattr.cpp : $(HOST_LIBBE) ;
 
-if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
-	AddResources <build>mimeset : mimeset.rdef ;
-}
-
-local mimesetSources =
-	mimeset.cpp
-#	Mime.cpp
-#	UpdateMimeInfoThread.cpp
-#	MimeUpdateThread.cpp
-;
-
-if $(HOST_PLATFORM) = haiku_host {
-	mimesetSources += AppFileInfo.cpp ;
-}
-
 BuildPlatformMain <build>mimeset :
-	$(mimesetSources)
-	: $(HOST_LIBBE) $(HOST_LIBSTDC++) $(HOST_LIBSUPC++) $(libHaikuCompat)
+	mimeset.cpp
+	: $(HOST_LIBBE) $(HOST_LIBSTDC++) $(HOST_LIBSUPC++)
 ;
-
-if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
-	SEARCH on [ FGristFiles AppFileInfo.cpp ]
-		= [ FDirName $(HAIKU_TOP) src build libbe storage ] ;
-
-	SourceSysHdrs AppFileInfo.cpp UpdateMimeInfoThread.cpp
-		: [ FDirName  $(HAIKU_TOP) headers build os storage ] ;
-}
 
 BuildPlatformMain <build>mkindex : mkindex.cpp : $(HOST_LIBBE) ;
 
@@ -101,7 +67,7 @@ BuildPlatformMain <build>settype : settype.cpp : $(HOST_LIBBE)
 	$(HOST_LIBSTDC++) $(HOST_LIBSUPC++) ;
 
 BuildPlatformMain <build>setversion : setversion.cpp : $(HOST_LIBBE)
-	$(HOST_LIBSTDC++) $(HOST_LIBSUPC++) $(libHaikuCompat) ;
+	$(HOST_LIBSTDC++) $(HOST_LIBSUPC++) ;
 
 BuildPlatformMain <build>xres : xres.cpp : $(HOST_LIBBE) $(HOST_LIBSTDC++)
 	$(HOST_LIBSUPC++) ;

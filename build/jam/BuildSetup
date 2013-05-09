@@ -788,13 +788,6 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE)
 HOST_DEFINES += $(HOST_ARCH_MACRO_DEFINE) ;
 HOST_DEFINES += _NO_INLINE_ASM ;
 
-if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
-	# TODO: That's obviously not correct, but in the way the COMPILE_FOR_R5
-	# macro is used, it actually seems to mean r5/bone/dano.
-	# TODO: Deprecated. Remove!
-	HOST_DEFINES += COMPILE_FOR_R5 ;
-}
-
 # for builds of tools in the current environment
 HOST_BUILD_COMPATIBILITY_LIB_DIR = [ FDirName $(HOST_OBJECT_BASE_DIR) lib ] ;
 
@@ -814,8 +807,9 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 
 	HOST_LIBROOT = root ;
 	HOST_STATIC_LIBROOT = $(HOST_LIBROOT) ;
-	HOST_LIBBE = be ;
-	HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR = "export LIBRARY_PATH=$LIBRARY_PATH:$(HOST_BUILD_COMPATIBILITY_LIB_DIR)"  ;
+	HOST_LIBBE = libbe_build.so ;
+	HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR
+		= "export LIBRARY_PATH=$LIBRARY_PATH:$(HOST_BUILD_COMPATIBILITY_LIB_DIR)" ;
 	HOST_LIBRARY_NAME_MAP_input_server = /system/servers/input_server ;
 	HOST_DEFINES += __STDC_FORMAT_MACROS __STDC_LIMIT_MACROS ;
 
@@ -951,31 +945,26 @@ HOST_BE_API_HEADERS = ;
 HOST_BE_API_CCFLAGS = ;
 HOST_BE_API_C++FLAGS = ;
 
-if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
-	HOST_BE_API_HEADERS =
-		[ FDirName $(HAIKU_TOP) headers build ]
-		[ FDirName $(HAIKU_TOP) headers build os ]
-		[ FDirName $(HAIKU_TOP) headers build os app ]
-		[ FDirName $(HAIKU_TOP) headers build os drivers ]
-		[ FDirName $(HAIKU_TOP) headers build os kernel ]
-		[ FDirName $(HAIKU_TOP) headers build os interface ]
-		[ FDirName $(HAIKU_TOP) headers build os locale ]
-		[ FDirName $(HAIKU_TOP) headers build os opengl ]
-		[ FDirName $(HAIKU_TOP) headers build os storage ]
-		[ FDirName $(HAIKU_TOP) headers build os support ]
-		[ FDirName $(HAIKU_TOP) headers build private ]
-	;
-	HOST_BE_API_CCFLAGS = -include BeOSBuildCompatibility.h ;
-	HOST_BE_API_C++FLAGS = $(HOST_BE_API_CCFLAGS) ;
-}
-
 # Add directory with system headers we need when building something for the host
 # platform, e.g. containing missing POSIX/GNU headers.
 HOST_HDRS += [ FDirName $(HAIKU_TOP) headers build host $(HOST_PLATFORM) ] ;
 
-# For all versions of BeOS also add the common beos directory.
-if $(HOST_PLATFORM) in r5 bone dano {
-	HOST_HDRS += [ FDirName $(HAIKU_TOP) headers build host beos_common ] ;
+HOST_BE_API_HEADERS =
+	[ FDirName $(HAIKU_TOP) headers build ]
+	[ FDirName $(HAIKU_TOP) headers build os ]
+	[ FDirName $(HAIKU_TOP) headers build os app ]
+	[ FDirName $(HAIKU_TOP) headers build os drivers ]
+	[ FDirName $(HAIKU_TOP) headers build os kernel ]
+	[ FDirName $(HAIKU_TOP) headers build os interface ]
+	[ FDirName $(HAIKU_TOP) headers build os locale ]
+	[ FDirName $(HAIKU_TOP) headers build os opengl ]
+	[ FDirName $(HAIKU_TOP) headers build os storage ]
+	[ FDirName $(HAIKU_TOP) headers build os support ]
+	[ FDirName $(HAIKU_TOP) headers build private ]
+;
+if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+	HOST_BE_API_CCFLAGS = -include BeOSBuildCompatibility.h ;
+	HOST_BE_API_C++FLAGS = $(HOST_BE_API_CCFLAGS) ;
 }
 
 

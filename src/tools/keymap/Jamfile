@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tools keymap ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) headers build ] : true ;
 UsePrivateBuildHeaders shared storage ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin keymap ] ;
@@ -8,23 +7,17 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin keymap ] ;
 USES_BE_API on <build>keymap = true ;
 
 local regexSources ;
-local storageSources ;
 
 if $(HOST_PLATFORM) = cygwin || $(HOST_PLATFORM) = sunos {
 	UseHeaders [ FDirName $(HAIKU_TOP) src system libroot posix glibc regex ] ;
 	SubDirCcFlags -D__USE_GNU -DHAVE_STDBOOL_H ;
 	regexSources = regex.c ;
 }
-if $(HOST_PLATFORM) = haiku_host {
-	# those are missing from early Haiku builds
-	storageSources = FileIO.cpp ;
-}
 
 BuildPlatformMain <build>keymap :
 	main.cpp
 	Keymap.cpp
 	$(regexSources)
-	$(storageSources)
 	: libshared_build.a $(HOST_LIBSTDC++) $(HOST_LIBSUPC++)
 ;
 
@@ -32,6 +25,3 @@ LinkAgainst <build>keymap : $(HOST_LIBBE) ;
 
 SEARCH on [ FGristFiles $(regexSources) ]
 	= [ FDirName $(HAIKU_TOP) src system libroot posix glibc regex ] ;
-
-SEARCH on [ FGristFiles $(storageSources) ]
-	= [ FDirName $(HAIKU_TOP) src kits storage ] ;
