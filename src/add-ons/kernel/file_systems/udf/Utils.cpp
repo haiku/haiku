@@ -153,8 +153,8 @@ decode_time(timestamp &timestamp, struct timespec &timespec)
 long_address
 to_long_address(ino_t id, uint32 length)
 {
-	TRACE(("udf_to_long_address: ino_t = %Ld (0x%Lx), length = %ld",
-		id, id, length));
+	TRACE(("udf_to_long_address: ino_t = %" B_PRIdINO ", length = %" B_PRIu32,
+		id, length));
 	long_address result;
 	result.set_block((id >> 16) & 0xffffffff);
 	result.set_partition(id & 0xffff);
@@ -171,9 +171,11 @@ to_vnode_id(long_address address)
 	ino_t result = address.block();
 	result <<= 16;
 	result |= address.partition();
-	TRACE(("block:     %ld, 0x%lx\n", address.block(), address.block())); 
+	TRACE(("block:     %" B_PRIu32 ", 0x%" B_PRIx32 "\n", address.block(),
+		address.block()));
 	TRACE(("partition: %d, 0x%x\n", address.partition(), address.partition())); 
-	TRACE(("length:    %ld, 0x%lx\n", address.length(), address.length()));
-	TRACE(("ino_t:     %Ld, 0x%Lx\n", result, result));
+	TRACE(("length:    %" B_PRIu32 ", 0x%" B_PRIx32 "\n", address.length(),
+		address.length()));
+	TRACE(("ino_t:     %" B_PRIdINO "\n", result));
 	return result;
 }

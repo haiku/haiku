@@ -54,23 +54,24 @@ udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
 	partition_descriptor partitionDescriptors[],
 	uint8 &partitionDescriptorCount)
 {
-	TRACE(("udf_recognize: device: = %d, offset = %Ld, length = %Ld, "
-		"blockSize = %ld, ", device, offset, length, blockSize));
-
+	TRACE(("udf_recognize: device: = %d, offset = %" B_PRIdOFF ", length = %"
+		B_PRIdOFF ", blockSize = %" B_PRIu32 "\n", device, offset, length,
+		blockSize));
 	// Check the block size
 	status_t status = get_block_shift(blockSize, blockShift);
 	if (status != B_OK) {
 		TRACE_ERROR(("\nudf_recognize: Block size must be a positive power of "
-			"two! (blockSize = %ld)\n", blockSize));
+			"two! (blockSize = %" B_PRIu32 ")\n", blockSize));
 		return status;
 	}
-	TRACE(("blockShift: %ld\n", blockShift));
+	TRACE(("blockShift: %" B_PRIu32 "\n", blockShift));
 
 	// Check for a valid volume recognition sequence
 	status = walk_volume_recognition_sequence(device, offset, blockSize,
 		blockShift);
 	if (status != B_OK) {
-		TRACE_ERROR(("udf_recognize: Invalid sequence. status = %ld\n", status));
+		TRACE_ERROR(("udf_recognize: Invalid sequence. status = %" B_PRId32
+			"\n", status));
 		return status;
 	}
 	// Now hunt down a volume descriptor sequence from one of
@@ -80,8 +81,8 @@ udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
 		logicalVolumeDescriptor, partitionDescriptors,
 		partitionDescriptorCount);
 	if (status != B_OK) {
-		TRACE_ERROR(("udf_recognize: cannot find volume descriptor. status = %ld\n",
-			status));
+		TRACE_ERROR(("udf_recognize: cannot find volume descriptor. status = %"
+			B_PRId32 "\n", status));
 		return status;
 	}
 	// Now walk the integrity sequence and make sure the last integrity
@@ -90,7 +91,7 @@ udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
 		logicalVolumeDescriptor.integrity_sequence_extent());
 	if (status != B_OK) {
 		TRACE_ERROR(("udf_recognize: last integrity descriptor not closed. "
-			"status = %ld\n", status));
+			"status = %" B_PRId32 "\n", status));
 		return status;
 	}
 
@@ -106,9 +107,9 @@ status_t
 walk_volume_recognition_sequence(int device, off_t offset, uint32 blockSize,
 	uint32 blockShift)
 {
-	TRACE(("walk_volume_recognition_sequence: device = %d, offset = %Ld, "
-		"blockSize = %ld, blockShift = %lu\n", device, offset, blockSize,
-		blockShift));
+	TRACE(("walk_volume_recognition_sequence: device = %d, offset = %"
+		B_PRIdOFF ", blockSize = %" B_PRIu32 ", blockShift = %" B_PRIu32 "\n",
+		device, offset, blockSize, blockShift));
 
 	// vrs starts at block 16. Each volume structure descriptor (vsd)
 	// should be one block long. We're expecting to find 0 or more iso9660
@@ -125,8 +126,8 @@ walk_volume_recognition_sequence(int device, off_t offset, uint32 blockSize,
 	bool foundECMA168 = false;
 	for (uint32 block = 16; true; block++) {
 		off_t address = (offset + block) << blockShift;
-		TRACE(("walk_volume_recognition_sequence: block = %ld, "
-			"address = %Ld, ", block, address));
+		TRACE(("walk_volume_recognition_sequence: block = %" B_PRIu32 ", "
+			"address = %" B_PRIdOFF ", ", block, address));
 		ssize_t bytesRead = read_pos(device, address, chunk.Data(), blockSize);
 		if (bytesRead == (ssize_t)blockSize) {
 			volume_structure_descriptor_header* descriptor
@@ -155,8 +156,8 @@ walk_volume_recognition_sequence(int device, off_t offset, uint32 blockSize,
 				break;
 			}
 		} else {
-			TRACE_ERROR(("read_pos(pos:%Ld, len:%ld) failed with: 0x%lx\n", address,
-				blockSize, bytesRead));
+			TRACE_ERROR(("read_pos(pos:%" B_PRIdOFF ", len:%" B_PRIu32 ") "
+				"failed with: 0x%lx\n", address, blockSize, bytesRead));
 			break;
 		}
 	}

@@ -410,8 +410,8 @@ udf_open_dir(fs_volume *volume, fs_vnode *vnode, void **cookie)
 	DirectoryIterator *iterator = NULL;
 	status_t status = dir->GetDirectoryIterator(&iterator);
 	if (status != B_OK) {
-		TRACE_ERROR(("udf_open_dir: error getting directory iterator: 0x%lx, "
-			"`%s'\n", status, strerror(status)));
+		TRACE_ERROR(("udf_open_dir: error getting directory iterator: 0x%"
+			B_PRIx32 ", `%s'\n", status, strerror(status)));
 		return status;
 	}
 	*cookie = (void *)iterator;
