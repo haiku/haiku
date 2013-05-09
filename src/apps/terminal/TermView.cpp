@@ -62,22 +62,13 @@
 #include "TermConst.h"
 #include "TerminalBuffer.h"
 #include "TerminalCharClassifier.h"
+#include "TermViewStates.h"
 #include "VTkeymap.h"
 
-
-// defined in VTKeyTbl.c
-extern int function_keycode_table[];
-extern char *function_key_char_table[];
 
 #define ROWS_DEFAULT 25
 #define COLUMNS_DEFAULT 80
 
-// selection granularity
-enum {
-	SELECT_CHARS,
-	SELECT_WORDS,
-	SELECT_LINES
-};
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Terminal TermView"
@@ -101,7 +92,6 @@ static property_info sPropList[] = {
 
 static const uint32 kUpdateSigWinch = 'Rwin';
 static const uint32 kBlinkCursor = 'BlCr';
-static const uint32 kAutoScroll = 'AScr';
 
 static const bigtime_t kSyncUpdateGranularity = 100000;	// 0.1 s
 
@@ -320,14 +310,15 @@ TermView::_InitObject(const ShellParameters& shellParameters)
 	fConsiderClockedSync = false;
 	fSelStart = TermPos(-1, -1);
 	fSelEnd = TermPos(-1, -1);
-	fMouseTracking = false;
-	fCheckMouseTracking = false;
 	fPrevPos = TermPos(-1, - 1);
 	fReportX10MouseEvent = false;
 	fReportNormalMouseEvent = false;
 	fReportButtonMouseEvent = false;
 	fReportAnyMouseEvent = false;
 	fMouseClipboard = be_clipboard;
+	fDefaultState = new(std::nothrow) DefaultState(this);
+	fSelectState = new(std::nothrow) SelectState(this);
+	fActiveState = NULL;
 
 	fTextBuffer = new(std::nothrow) TerminalBuffer;
 	if (fTextBuffer == NULL)
@@ -371,8 +362,13 @@ TermView::_InitObject(const ShellParameters& shellParameters)
 	if (error < B_OK)
 		return error;
 
+	if (fDefaultState == NULL || fSelectState == NULL)
+		return B_NO_MEMORY;
+
 	SetLowColor(fTextBackColor);
 	SetViewColor(B_TRANSPARENT_32_BIT);
+
+	_NextState(fDefaultState);
 
 	return B_OK;
 }
@@ -385,6 +381,8 @@ TermView::~TermView()
 
 	_DetachShell();
 
+	delete fDefaultState;
+	delete fSelectState;
 	delete fSyncRunner;
 	delete fAutoScrollRunner;
 	delete fCharClassifier;
@@ -1388,165 +1386,7 @@ TermView::MakeFocus(bool focusState)
 void
 TermView::KeyDown(const char *bytes, int32 numBytes)
 {
-	int32 key, mod, rawChar;
-	BMessage *currentMessage = Looper()->CurrentMessage();
-	if (currentMessage == NULL)
-		return;
-
-	currentMessage->FindInt32("modifiers", &mod);
-	currentMessage->FindInt32("key", &key);
-	currentMessage->FindInt32("raw_char", &rawChar);
-
-	_ActivateCursor(true);
-
-	// handle multi-byte chars
-	if (numBytes > 1) {
-		if (fEncoding != M_UTF8) {
-			char destBuffer[16];
-			int32 destLen = sizeof(destBuffer);
-			int32 state = 0;
-			convert_from_utf8(fEncoding, bytes, &numBytes, destBuffer,
-				&destLen, &state, '?');
-			_ScrollTo(0, true);
-			fShell->Write(destBuffer, destLen);
-			return;
-		}
-
-		_ScrollTo(0, true);
-		fShell->Write(bytes, numBytes);
-		return;
-	}
-
-	// Terminal filters RET, ENTER, F1...F12, and ARROW key code.
-	const char *toWrite = NULL;
-
-	switch (*bytes) {
-		case B_RETURN:
-			if (rawChar == B_RETURN)
-				toWrite = "\r";
-			break;
-
-		case B_DELETE:
-			toWrite = DELETE_KEY_CODE;
-			break;
-
-		case B_BACKSPACE:
-			// Translate only the actual backspace key to the backspace
-			// code. CTRL-H shall just be echoed.
-			if (!((mod & B_CONTROL_KEY) && rawChar == 'h'))
-				toWrite = BACKSPACE_KEY_CODE;
-			break;
-
-		case B_LEFT_ARROW:
-			if (rawChar == B_LEFT_ARROW) {
-				if ((mod & B_SHIFT_KEY) != 0) {
-					if (fListener != NULL)
-						fListener->PreviousTermView(this);
-					return;
-				}
-				if ((mod & B_CONTROL_KEY) || (mod & B_COMMAND_KEY))
-					toWrite = CTRL_LEFT_ARROW_KEY_CODE;
-				else
-					toWrite = LEFT_ARROW_KEY_CODE;
-			}
-			break;
-
-		case B_RIGHT_ARROW:
-			if (rawChar == B_RIGHT_ARROW) {
-				if ((mod & B_SHIFT_KEY) != 0) {
-					if (fListener != NULL)
-						fListener->NextTermView(this);
-					return;
-				}
-				if ((mod & B_CONTROL_KEY) || (mod & B_COMMAND_KEY))
-					toWrite = CTRL_RIGHT_ARROW_KEY_CODE;
-				else
-					toWrite = RIGHT_ARROW_KEY_CODE;
-			}
-			break;
-
-		case B_UP_ARROW:
-			if (mod & B_SHIFT_KEY) {
-				_ScrollTo(fScrollOffset - fFontHeight, true);
-				return;
-			}
-			if (rawChar == B_UP_ARROW) {
-				if (mod & B_CONTROL_KEY)
-					toWrite = CTRL_UP_ARROW_KEY_CODE;
-				else
-					toWrite = UP_ARROW_KEY_CODE;
-			}
-			break;
-
-		case B_DOWN_ARROW:
-			if (mod & B_SHIFT_KEY) {
-				_ScrollTo(fScrollOffset + fFontHeight, true);
-				return;
-			}
-
-			if (rawChar == B_DOWN_ARROW) {
-				if (mod & B_CONTROL_KEY)
-					toWrite = CTRL_DOWN_ARROW_KEY_CODE;
-				else
-					toWrite = DOWN_ARROW_KEY_CODE;
-			}
-			break;
-
-		case B_INSERT:
-			if (rawChar == B_INSERT)
-				toWrite = INSERT_KEY_CODE;
-			break;
-
-		case B_HOME:
-			if (rawChar == B_HOME)
-				toWrite = HOME_KEY_CODE;
-			break;
-
-		case B_END:
-			if (rawChar == B_END)
-				toWrite = END_KEY_CODE;
-			break;
-
-		case B_PAGE_UP:
-			if (mod & B_SHIFT_KEY) {
-				_ScrollTo(fScrollOffset - fFontHeight  * fRows, true);
-				return;
-			}
-			if (rawChar == B_PAGE_UP)
-				toWrite = PAGE_UP_KEY_CODE;
-			break;
-
-		case B_PAGE_DOWN:
-			if (mod & B_SHIFT_KEY) {
-				_ScrollTo(fScrollOffset + fFontHeight * fRows, true);
-				return;
-			}
-			if (rawChar == B_PAGE_DOWN)
-				toWrite = PAGE_DOWN_KEY_CODE;
-			break;
-
-		case B_FUNCTION_KEY:
-			for (int32 i = 0; i < 12; i++) {
-				if (key == function_keycode_table[i]) {
-					toWrite = function_key_char_table[i];
-					break;
-				}
-			}
-			break;
-	}
-
-	// If the above code proposed an alternative string to write, we get it's
-	// length. Otherwise we write exactly the bytes passed to this method.
-	size_t toWriteLen;
-	if (toWrite != NULL) {
-		toWriteLen = strlen(toWrite);
-	} else {
-		toWrite = bytes;
-		toWriteLen = numBytes;
-	}
-
-	_ScrollTo(0, true);
-	fShell->Write(toWrite, toWriteLen);
+	fActiveState->KeyDown(bytes, numBytes);
 }
 
 
@@ -1593,6 +1433,9 @@ TermView::FrameResized(float width, float height)
 void
 TermView::MessageReceived(BMessage *msg)
 {
+	if (fActiveState->MessageReceived(msg))
+		return;
+
 	entry_ref ref;
 	const char *ctrl_l = "\x0c";
 
@@ -1828,9 +1671,6 @@ TermView::MessageReceived(BMessage *msg)
 			break;
 		case kUpdateSigWinch:
 			_UpdateSIGWINCH();
-			break;
-		case kAutoScroll:
-			_AutoScrollUpdate();
 			break;
 		case kSecondaryMouseDropAction:
 			_DoSecondaryMouseDropAction(msg);
@@ -2480,98 +2320,13 @@ TermView::MouseDown(BPoint where)
 	if (!IsFocus())
 		MakeFocus();
 
-	int32 buttons;
-	int32 modifier;
-	Window()->CurrentMessage()->FindInt32("buttons", &buttons);
-	Window()->CurrentMessage()->FindInt32("modifiers", &modifier);
+	BMessage* currentMessage = Window()->CurrentMessage();
+	int32 buttons = currentMessage->GetInt32("buttons", 0);
+	int32 modifiers = currentMessage->GetInt32("modifiers", 0);
+
+	fActiveState->MouseDown(where, buttons, modifiers);
 
 	fMouseButtons = buttons;
-
-	if (fReportAnyMouseEvent || fReportButtonMouseEvent
-		|| fReportNormalMouseEvent || fReportX10MouseEvent) {
-		TermPos clickPos = _ConvertToTerminal(where);
-		_SendMouseEvent(buttons, modifier, clickPos.x, clickPos.y, false);
-		return;
-	}
-
-	// paste button
-	if ((buttons & (B_SECONDARY_MOUSE_BUTTON | B_TERTIARY_MOUSE_BUTTON)) != 0) {
-		Paste(fMouseClipboard);
-		fLastClickPoint = where;
-		return;
-	}
-
-	// Select Region
-	if (buttons == B_PRIMARY_MOUSE_BUTTON) {
-		int32 clicks;
-		Window()->CurrentMessage()->FindInt32("clicks", &clicks);
-
-		if (_HasSelection()) {
-			TermPos inPos = _ConvertToTerminal(where);
-			if (_CheckSelectedRegion(inPos)) {
-				if (modifier & B_CONTROL_KEY) {
-					BPoint p;
-					uint32 bt;
-					do {
-						GetMouse(&p, &bt);
-
-						if (bt == 0) {
-							_Deselect();
-							return;
-						}
-
-						snooze(40000);
-
-					} while (abs((int)(where.x - p.x)) < 4
-						&& abs((int)(where.y - p.y)) < 4);
-
-					InitiateDrag();
-					return;
-				}
-			}
-		}
-
-		// If mouse has moved too much, disable double/triple click.
-		if (_MouseDistanceSinceLastClick(where) > 8)
-			clicks = 1;
-
-		SetMouseEventMask(B_POINTER_EVENTS | B_KEYBOARD_EVENTS,
-			B_NO_POINTER_HISTORY | B_LOCK_WINDOW_FOCUS);
-
-		TermPos clickPos = _ConvertToTerminal(where);
-
-		if (modifier & B_SHIFT_KEY) {
-			fInitialSelectionStart = clickPos;
-			fInitialSelectionEnd = clickPos;
-			_ExtendSelection(fInitialSelectionStart, true, false);
-		} else {
-			_Deselect();
-			fInitialSelectionStart = clickPos;
-			fInitialSelectionEnd = clickPos;
-		}
-
-		// If clicks larger than 3, reset mouse click counter.
-		clicks = (clicks - 1) % 3 + 1;
-
-		switch (clicks) {
-			case 1:
-				fCheckMouseTracking = true;
-				fSelectGranularity = SELECT_CHARS;
-				break;
-
-			case 2:
-				_SelectWord(where, (modifier & B_SHIFT_KEY) != 0, false);
-				fMouseTracking = true;
-				fSelectGranularity = SELECT_WORDS;
-				break;
-
-			case 3:
-				_SelectLine(where, (modifier & B_SHIFT_KEY) != 0, false);
-				fMouseTracking = true;
-				fSelectGranularity = SELECT_LINES;
-				break;
-		}
-	}
 	fLastClickPoint = where;
 }
 
@@ -2579,111 +2334,17 @@ TermView::MouseDown(BPoint where)
 void
 TermView::MouseMoved(BPoint where, uint32 transit, const BMessage *message)
 {
-	if (fReportAnyMouseEvent || fReportButtonMouseEvent) {
-		int32 modifier;
-		Window()->CurrentMessage()->FindInt32("modifiers", &modifier);
-
-		TermPos clickPos = _ConvertToTerminal(where);
-
-		if (fReportButtonMouseEvent) {
-			if (fPrevPos.x != clickPos.x || fPrevPos.y != clickPos.y) {
-				_SendMouseEvent(fMouseButtons, modifier, clickPos.x, clickPos.y,
-					true);
-			}
-			fPrevPos = clickPos;
-			return;
-		}
-		_SendMouseEvent(fMouseButtons, modifier, clickPos.x, clickPos.y, true);
-		return;
-	}
-
-	if (fCheckMouseTracking) {
-		if (_MouseDistanceSinceLastClick(where) > 9)
-			fMouseTracking = true;
-	}
-	if (!fMouseTracking)
-		return;
-
-	bool doAutoScroll = false;
-
-	if (where.y < 0) {
-		doAutoScroll = true;
-		fAutoScrollSpeed = where.y;
-		where.x = 0;
-		where.y = 0;
-	}
-
-	BRect bounds(Bounds());
-	if (where.y > bounds.bottom) {
-		doAutoScroll = true;
-		fAutoScrollSpeed = where.y - bounds.bottom;
-		where.x = bounds.right;
-		where.y = bounds.bottom;
-	}
-
-	if (doAutoScroll) {
-		if (fAutoScrollRunner == NULL) {
-			BMessage message(kAutoScroll);
-			fAutoScrollRunner = new (std::nothrow) BMessageRunner(
-				BMessenger(this), &message, 10000);
-		}
-	} else {
-		delete fAutoScrollRunner;
-		fAutoScrollRunner = NULL;
-	}
-
-	switch (fSelectGranularity) {
-		case SELECT_CHARS:
-		{
-			// If we just start selecting, we first select the initially
-			// hit char, so that we get a proper initial selection -- the char
-			// in question, which will thus always be selected, regardless of
-			// whether selecting forward or backward.
-			if (fInitialSelectionStart == fInitialSelectionEnd) {
-				_Select(fInitialSelectionStart, fInitialSelectionEnd, true,
-					true);
-			}
-
-			_ExtendSelection(_ConvertToTerminal(where), true, true);
-			break;
-		}
-		case SELECT_WORDS:
-			_SelectWord(where, true, true);
-			break;
-		case SELECT_LINES:
-			_SelectLine(where, true, true);
-			break;
-	}
+	fActiveState->MouseMoved(where, transit, message);
 }
 
 
 void
 TermView::MouseUp(BPoint where)
 {
-	fCheckMouseTracking = false;
-	fMouseTracking = false;
+	int32 buttons = Window()->CurrentMessage()->GetInt32("buttons", 0);
 
-	if (fAutoScrollRunner != NULL) {
-		delete fAutoScrollRunner;
-		fAutoScrollRunner = NULL;
-	}
+	fActiveState->MouseUp(where, buttons);
 
-	// When releasing the first mouse button, we copy the selected text to the
-	// clipboard.
-	int32 buttons;
-	Window()->CurrentMessage()->FindInt32("buttons", &buttons);
-
-	if (fReportAnyMouseEvent || fReportButtonMouseEvent
-		|| fReportNormalMouseEvent) {
-		TermPos clickPos = _ConvertToTerminal(where);
-		_SendMouseEvent(0, 0, clickPos.x, clickPos.y, false);
-	} else {
-		if ((buttons & B_PRIMARY_MOUSE_BUTTON) == 0
-			&& (fMouseButtons & B_PRIMARY_MOUSE_BUTTON) != 0) {
-			Copy(fMouseClipboard);
-		}
-
-	}
 	fMouseButtons = buttons;
 }
 
@@ -2841,22 +2502,6 @@ TermView::_SelectLine(BPoint where, bool extend, bool useInitialSelection)
 			_Select(start, end, false, false);
 	} else
 		_Select(start, end, false, !useInitialSelection);
-}
-
-
-void
-TermView::_AutoScrollUpdate()
-{
-	if (fMouseTracking && fAutoScrollRunner != NULL && fScrollBar != NULL) {
-		float value = fScrollBar->Value();
-		_ScrollTo(value + fAutoScrollSpeed, true);
-		if (fAutoScrollSpeed < 0) {
-			_ExtendSelection(_ConvertToTerminal(BPoint(0, 0)), true, true);
-		} else {
-			_ExtendSelection(_ConvertToTerminal(Bounds().RightBottom()), true,
-				true);
-		}
-	}
 }
 
 
@@ -3219,6 +2864,18 @@ TermView::_CancelInputMethod()
 	}
 
 	delete inlineInput;
+}
+
+
+void
+TermView::_NextState(State* state)
+{
+	if (state != fActiveState) {
+		if (fActiveState != NULL)
+			fActiveState->Exited();
+		fActiveState = state;
+		fActiveState->Entered();
+	}
 }
 
 

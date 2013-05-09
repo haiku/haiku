@@ -33,6 +33,7 @@ Application Terminal :
 	TermParse.cpp
 	TermScrollView.cpp
 	TermView.cpp
+	TermViewStates.cpp
 	TermWindow.cpp
 	TitlePlaceholderMapper.cpp
 	VTKeyTbl.c

@@ -143,6 +143,16 @@ protected:
 private:
 			class CharClassifier;
 
+			class State;
+			class StandardBaseState;
+			class DefaultState;
+			class SelectState;
+
+			friend class State;
+			friend class StandardBaseState;
+			friend class DefaultState;
+			friend class SelectState;
+
 private:
 			// point and text offset conversion
 	inline	int32				_LineAt(float y);
@@ -199,8 +209,6 @@ private:
 			void				_SelectLine(BPoint where, bool extend,
 									bool useInitialSelection);
 
-			void				_AutoScrollUpdate();
-
 			bool				_CheckSelectedRegion(const TermPos& pos) const;
 			bool				_CheckSelectedRegion(int32 row,
 									int32 firstColumn, int32& lastColumn) const;
@@ -217,6 +225,8 @@ private:
 			void				_HandleInputMethodChanged(BMessage* message);
 			void				_HandleInputMethodLocationRequest();
 			void				_CancelInputMethod();
+
+			void				_NextState(State* state);
 
 private:
 			Listener*			fListener;
@@ -251,8 +261,6 @@ private:
 
 			// Cursor position.
 			TermPos				fCursor;
-
-			int32				fMouseButtons;
 
 			// Terminal rows and columns.
 			int					fColumns;
@@ -293,18 +301,21 @@ private:
 			TermPos				fSelEnd;
 			TermPos				fInitialSelectionStart;
 			TermPos				fInitialSelectionEnd;
-			bool				fMouseTracking;
-			bool				fCheckMouseTracking;
-			int					fSelectGranularity;
 			BPoint				fLastClickPoint;
 
 			// mouse
+			int32				fMouseButtons;
 			TermPos				fPrevPos;
 			bool				fReportX10MouseEvent;
 			bool				fReportNormalMouseEvent;
 			bool				fReportButtonMouseEvent;
 			bool				fReportAnyMouseEvent;
 			BClipboard*			fMouseClipboard;
+
+			// states
+			DefaultState*		fDefaultState;
+			SelectState*		fSelectState;
+			State*				fActiveState;
 };
 
 
