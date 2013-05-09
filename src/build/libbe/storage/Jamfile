@@ -2,8 +2,6 @@ SubDir HAIKU_TOP src build libbe storage ;
 
 UsePrivateBuildHeaders app kernel shared storage ;
 
-SEARCH_SOURCE += [ FDirName $(SUBDIR) mime ] ;
-
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits storage ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits storage mime ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits storage sniffer ] ;
@@ -49,9 +47,6 @@ BuildPlatformMergeObjectPIC <libbe_build>storage_kit.o :
 	SnifferRules.cpp
 	Supertype.cpp
 	SupportingApps.cpp
-
-	MimeUpdateThread.cpp
-	UpdateMimeInfoThread.cpp
 
 	# sniffer
 	CharStream.cpp
