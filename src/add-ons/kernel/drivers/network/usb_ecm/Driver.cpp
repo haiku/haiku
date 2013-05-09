@@ -38,7 +38,7 @@ usb_ecm_device_added(usb_device device, void **cookie)
 		if (gECMDevices[i]->CompareAndReattach(device) != B_OK)
 			continue;
 
-		TRACE_ALWAYS("ecm device %ld replugged\n", i);
+		TRACE_ALWAYS("ecm device %" B_PRId32 " replugged\n", i);
 		*cookie = gECMDevices[i];
 		mutex_unlock(&gDriverLock);
 		return B_OK;
@@ -60,7 +60,7 @@ usb_ecm_device_added(usb_device device, void **cookie)
 		gECMDevices[i] = ecmDevice;
 		*cookie = ecmDevice;
 
-		TRACE_ALWAYS("ecm device %ld added\n", i);
+		TRACE_ALWAYS("ecm device %" B_PRId32 " added\n", i);
 		mutex_unlock(&gDriverLock);
 		return B_OK;
 	}
@@ -258,7 +258,8 @@ publish_devices()
 
 		gDeviceNames[deviceCount] = (char *)malloc(strlen(sDeviceBaseName) + 4);
 		if (gDeviceNames[deviceCount]) {
-			sprintf(gDeviceNames[deviceCount], "%s%ld", sDeviceBaseName, i);
+			sprintf(gDeviceNames[deviceCount], "%s%" B_PRId32, sDeviceBaseName,
+				i);
 			TRACE("publishing %s\n", gDeviceNames[deviceCount]);
 			deviceCount++;
 		} else
