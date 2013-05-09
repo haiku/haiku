@@ -28,7 +28,11 @@
  *
  */
 
+
+#include "VTKeyTbl.h"
+
 #include "VTkeymap.h"
+
 
 int function_keycode_table[] =
 {
