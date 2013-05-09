@@ -37,6 +37,9 @@ class BAboutWindow : public BWindow {
 			void			AddVersionHistory(const char** history);
 			void			AddExtraInfo(const char* extraInfo);
 
+			void			AddText(const char* header,
+								const char** contents = NULL);
+
 			BBitmap*		Icon();
 			void			SetIcon(BBitmap* icon);
 
