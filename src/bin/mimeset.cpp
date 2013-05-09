@@ -16,6 +16,7 @@
 #include <mime/AppMetaMimeCreator.h>
 #include <mime/Database.h>
 #include <mime/DatabaseLocation.h>
+#include <mime/MimeInfoUpdater.h>
 
 
 using namespace BPrivate::Storage::Mime;
@@ -78,15 +79,23 @@ usage(int status)
 static status_t
 process_file_with_custom_mime_db(const BEntry& entry)
 {
-	// TODO: Support recursion!
-	// TODO: Support MIME update!
-	AppMetaMimeCreator creator(sDatabase, NULL, gForce);
+	AppMetaMimeCreator appMetaMimeCreator(sDatabase, NULL, gForce);
+	MimeInfoUpdater mimeInfoUpdater(sDatabase, NULL, gForce);
 
 	entry_ref ref;
 	status_t error = entry.GetRef(&ref);
-	bool entryIsDir = false;
-	if (error == B_OK)
-		error = creator.Do(ref, &entryIsDir);
+
+	if (gFiles && error == B_OK)
+		error = mimeInfoUpdater.DoRecursively(ref);
+	if (gApps && error == B_OK) {
+		error = appMetaMimeCreator.DoRecursively(ref);
+		if (error == B_BAD_TYPE) {
+			// Ignore B_BAD_TYPE silently. The most likely cause is that the
+			// file doesn't have a "BEOS:APP_SIG" attribute.
+			error = B_OK;
+		}
+	}
+
 	if (error != B_OK) {
 		BPath path;
 		fprintf(stderr, "%s: \"%s\": %s\n",
@@ -191,14 +200,6 @@ main(int argc, const char** argv)
 	// set up custom MIME DB, if specified
 	DatabaseLocation databaseLocation;
 	if (!databaseDirectories.IsEmpty()) {
-		// the first directory must exist
-		if (!BEntry(databaseDirectories.StringAt(0)).IsDirectory()) {
-			fprintf(stderr, "%s: Specified path \"%s\" doesn't exist or isn't "
-				"a directory.", sProgramName,
-				databaseDirectories.StringAt(0).String());
-			exit(1);
-		}
-
 		int32 count = databaseDirectories.CountStrings();
 		for (int32 i = 0; i < count; i++)
 			databaseLocation.AddDirectory(databaseDirectories.StringAt(i));
