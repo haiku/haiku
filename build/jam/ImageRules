@@ -257,6 +257,21 @@ rule AddFilesToContainer container : directoryTokens : targets : destName
 				: $(systemDirTokens) data locale catalogs $(signature)
 				: $(catalogs) ;
 		}
+
+		# If the target is associated with MIME DB entries, add those, too.
+		local mimeDBEntries = [ on $(target) return $(HAIKU_MIME_DB_ENTRIES) ] ;
+		if $(mimeDBEntries) {
+			# Make sure we add the entries only once by tracking the containers
+			# we have already added it to.
+			local containers = [ on $(mimeDBEntries)
+				return $(HAIKU_MIME_DB_ENTRIES_IN_CONTAINERS) ] ;
+			if ! $(container) in $(containers) {
+				HAIKU_MIME_DB_ENTRIES_IN_CONTAINERS on $(mimeDBEntries)
+					= $(containers) $(container) ;
+	 			CopyDirectoryToContainer $(container) : data
+ 					: $(mimeDBEntries) : mime_db : : alwaysUpdate isTarget ;
+ 			}
+		}
 	}
 }
 

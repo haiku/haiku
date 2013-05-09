@@ -34,8 +34,14 @@ rule Link
 	on $(1) XRes $(1) : $(RESFILES) ;
 	if ! [ on $(1) return $(DONT_USE_BEOS_RULES) ] {
 		SetType $(1) ;
-		MimeSet $(1) ;
+		MimeSet $(1) : sharedObject ;
 		SetVersion $(1) ;
+
+		# For applications for the target also generate the MIME DB entries.
+		if [ on $(1) return $(PLATFORM) ] != host
+			&& [ on $(1) return $(RESFILES) ] {
+			CreateAppMimeDBEntries $(1) ;
+		}
 
 		# If the generic attribute emulation is enabled, make sure the tool to
 		# remove the attributes is built first.

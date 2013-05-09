@@ -314,6 +314,8 @@ rule BuildHaikuPackage package : packageInfo
 		: [ on $(package) return $(HAIKU_CONTAINER_UPDATE_ONLY) ] ;
 	AddTargetVariableToScript $(script) : <build>addattr ;
 	AddTargetVariableToScript $(script) : <build>copyattr ;
+	AddTargetVariableToScript $(script) : <mimedb>mime_db : mimeDB ;
+	AddTargetVariableToScript $(script) : <build>mimeset ;
 	AddTargetVariableToScript $(script) : <build>package ;
 	AddTargetVariableToScript $(script) : <build>rc ;
 	AddTargetVariableToScript $(script) : <build>resattr ;

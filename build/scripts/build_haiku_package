@@ -2,14 +2,16 @@
 set -o errexit
 
 # The first argument is the shell script that initializes the variables:
-# sourceDir
-# outputDir
-# tmpDir
 # addBuildCompatibilityLibDir
+# mimeDB
+# outputDir
+# sourceDir
+# tmpDir
 # updateOnly
 #
 # addattr
 # copyattr
+# mimeset
 # package
 # rc
 # rmAttrs
@@ -58,6 +60,10 @@ while [ $# -gt 0 ]; do
 	. $1
 	shift
 done
+
+
+# mimeset the whole package content
+$mimeset --mimedb "$mimeDB" "$contentsDir"
 
 
 # create the package
