@@ -429,9 +429,23 @@ rule AddDriversToContainer container : relativeDirectoryTokens : targets
 
 	targets = [ FFilterByBuildFeatures $(targets) ] ;
 
+	# A driver can be in multiple categories. Avoid adding it to the bin/
+	# directory more than once.
+	local binTargets ;
+	local target ;
+	for target in $(targets) {
+		local containers
+			= [ on $(target) return $(HAIKU_DRIVER_IN_CONTAINERS) ] ;
+		if ! $(container) in $(containers) {
+			HAIKU_DRIVER_IN_CONTAINERS on $(target)
+				= $(containers) $(container) ;
+			binTargets += $(target) ;
+		}
+	}
+
 	AddFilesToContainer $(container)
 		: $(systemDirTokens) add-ons kernel drivers bin
-		: $(targets) ;
+		: $(binTargets) ;
 
 	# If the image shall only be updated, we don't add any symlinks.
 	if [ on $(container) return $(HAIKU_CONTAINER_UPDATE_ONLY) ]
