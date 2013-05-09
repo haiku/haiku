@@ -333,7 +333,7 @@ rule CopyDirectoryToContainer container : directoryTokens : sourceDirectory
 	}
 
 	# If sourceDirectory is a path, not a target, make it a target, so we can
-	# tree them the same way.
+	# treat both the same way.
 	if ! isTarget in $(flags) {
 		sourceDirectory = $(sourceDirectory:G=copy-directory-to-container) ;
 		SEARCH on $(sourceDirectory) = ;
