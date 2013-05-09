@@ -921,7 +921,7 @@ AttributeView::AttributeView(BRect rect, Model* model)
 				fTitleRect.bottom + (lineHeight * 7),
 				Bounds().Width() - 5, fTitleRect.bottom + (lineHeight * 8));
 			fPreferredAppMenu = new BMenuField(preferredAppRect, "", "",
-				new BPopUpMenu(""), true);
+				new BPopUpMenu(""));
 			fDivider = currentFont.StringWidth(B_TRANSLATE("Opens with:"))
 				+ 5;
 			fPreferredAppMenu->SetDivider(fDivider);
