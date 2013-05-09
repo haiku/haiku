@@ -351,7 +351,7 @@ publish_devices()
 		if (gSerialDevices[i]) {
 			gDeviceNames[j] = (char *)malloc(strlen(sDeviceBaseName) + 4);
 			if (gDeviceNames[j]) {
-				sprintf(gDeviceNames[j], "%s%ld", sDeviceBaseName, i);
+				sprintf(gDeviceNames[j], "%s%" B_PRId32, sDeviceBaseName, i);
 				j++;
 			} else
 				TRACE_ALWAYS("publish_devices - no memory to allocate device names\n");
