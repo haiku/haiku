@@ -9,6 +9,9 @@
 
 #include <mime/AppMetaMimeCreator.h>
 
+#include <Directory.h>
+#include <Entry.h>
+
 
 namespace BPrivate {
 namespace Storage {
@@ -38,6 +41,29 @@ MimeEntryProcessor::MimeEntryProcessor(Database* database,
 
 MimeEntryProcessor::~MimeEntryProcessor()
 {
+}
+
+
+status_t
+MimeEntryProcessor::DoRecursively(const entry_ref& entry)
+{
+	bool entryIsDir = false;
+	status_t error = Do(entry, &entryIsDir);
+	if (error != B_OK)
+		return error;
+
+	if (entryIsDir) {
+		BDirectory directory;
+		error = directory.SetTo(&entry);
+		if (error != B_OK)
+			return error;
+
+		entry_ref childEntry;
+		while (directory.GetNextRef(&childEntry) == B_OK)
+			DoRecursively(childEntry);
+	}
+
+	return B_OK;
 }
 
 

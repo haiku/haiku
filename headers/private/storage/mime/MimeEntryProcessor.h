@@ -36,6 +36,8 @@ public:
 	virtual	status_t			Do(const entry_ref& entry, bool* _entryIsDir)
 									= 0;
 
+			status_t			DoRecursively(const entry_ref& entry);
+
 protected:
 			Database*			fDatabase;
 			DatabaseLocker*		fDatabaseLocker;
