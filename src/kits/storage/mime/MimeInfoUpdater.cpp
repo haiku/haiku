@@ -64,7 +64,7 @@ update_icon(BAppFileInfo &appFileInfoRead, BAppFileInfo &appFileInfoWrite,
 static bool
 is_shared_object_mime_type(const BString &type)
 {
-	return (type == B_APP_MIME_TYPE);
+	return type.ICompare(B_APP_MIME_TYPE) == 0;
 }
 
 
