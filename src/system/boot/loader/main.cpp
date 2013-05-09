@@ -133,6 +133,7 @@ main(stage2_args *args)
 			gKernelArgs.boot_volume_size = gBootVolume.ContentSize();
 
 			// ToDo: cleanup, heap_release() etc.
+			heap_print_statistics();
 			platform_start_kernel();
 		}
 	}

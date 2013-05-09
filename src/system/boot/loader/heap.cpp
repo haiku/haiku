@@ -8,6 +8,8 @@
 #include <boot/platform.h>
 #include <util/kernel_cpp.h>
 
+#include <algorithm>
+
 #ifdef HEAP_TEST
 #	include <stdio.h>
 #endif
@@ -41,6 +43,9 @@
 
 #define DEBUG_ALLOCATIONS
 	// if defined, freed memory is filled with 0xcc
+#define DEBUG_MAX_HEAP_USAGE
+	// if defined, the maximum heap usage is determined and printed before
+	// entering the kernel
 
 class FreeChunk {
 public:
@@ -72,7 +77,7 @@ const static uint32 kAlignment = 4;
 	// all memory chunks will be a multiple of this
 
 static void* sHeapBase;
-static uint32 /*sHeapSize,*/ sMaxHeapSize, sAvailable;
+static uint32 /*sHeapSize,*/ sMaxHeapSize, sAvailable, sMaxHeapUsage;
 static FreeChunk sFreeAnchor;
 
 
@@ -214,6 +219,15 @@ heap_release(stage2_args* args)
 }
 
 
+void
+heap_print_statistics()
+{
+#ifdef DEBUG_MAX_HEAP_USAGE
+	dprintf("maximum boot loader heap usage: %" B_PRIu32 "\n", sMaxHeapUsage);
+#endif
+}
+
+
 status_t
 heap_init(stage2_args* args)
 {
@@ -225,6 +239,9 @@ heap_init(stage2_args* args)
 	sHeapBase = base;
 	sMaxHeapSize = (uint8*)top - (uint8*)base;
 	sAvailable = sMaxHeapSize - FreeChunk::NextOffset();
+#ifdef DEBUG_MAX_HEAP_USAGE
+	sMaxHeapUsage = sMaxHeapSize - sAvailable;
+#endif
 
 	// declare the whole heap as one chunk, and add it
 	// to the free list
@@ -323,6 +340,9 @@ malloc(size_t size)
 	}
 
 	sAvailable -= size + sizeof(uint32);
+#ifdef DEBUG_MAX_HEAP_USAGE
+	sMaxHeapUsage = std::max(sMaxHeapUsage, sMaxHeapSize - sAvailable);
+#endif
 
 	TRACE("malloc(%lu) -> %p\n", size, chunk->AllocatedAddress());
 	return chunk->AllocatedAddress();
@@ -394,6 +414,9 @@ free(void* allocated)
 #endif
 
 	sAvailable += freedChunk->CompleteSize();
+#ifdef DEBUG_MAX_HEAP_USAGE
+	sMaxHeapUsage = std::max(sMaxHeapUsage, sMaxHeapSize - sAvailable);
+#endif
 
 	// try to join the new free chunk with an existing one
 	// it may be joined with up to two chunks
