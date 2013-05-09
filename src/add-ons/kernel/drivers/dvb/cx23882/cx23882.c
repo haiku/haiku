@@ -244,7 +244,9 @@ cx23882_int(void *data)
 
 	if (mstat & (PCI_INT_STAT_HST_INT | PCI_INT_STAT_VIP_INT | PCI_INT_STAT_AUD_INT | PCI_INT_STAT_VID_INT)) {
 		// serious error, these bits should not be set
-		dprintf("cx23882_int error: msk 0x%08lx, stat 0x%08lx, mstat 0x%08lx\n", reg_read32(REG_PCI_INT_MSK), reg_read32(REG_PCI_INT_STAT), mstat);
+		dprintf("cx23882_int error: msk 0x%08" B_PRIx32 ", stat 0x%08" B_PRIx32
+			", mstat 0x%08" B_PRIx32 "\n", reg_read32(REG_PCI_INT_MSK),
+			reg_read32(REG_PCI_INT_STAT), mstat);
 		reg_write32(REG_PCI_INT_MSK, 0);
 		return B_HANDLED_INTERRUPT;
 	}
@@ -254,7 +256,7 @@ cx23882_int(void *data)
 		reg_write32(REG_PCI_INT_STAT, wmstat);
 
 	if (wmstat)
-		dprintf("cx23882_int got 0x%08lx\n", wmstat);
+		dprintf("cx23882_int got 0x%08" B_PRIx32 "\n", wmstat);
 
 	if (mstat & PCI_INT_STAT_TS_INT) {
 		cx23882_mpegts_int(device);

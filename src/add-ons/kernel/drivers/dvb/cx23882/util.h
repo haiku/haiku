@@ -27,8 +27,10 @@
 
 #include <OS.h>
 
-area_id	map_mem(void **virt, void *phy, size_t size, uint32 protection, const char *name);
-area_id alloc_mem(void **virt, void **phy, size_t size, uint32 protection, const char *name);
+area_id	map_mem(void **virt, phys_addr_t phy, size_t size, uint32 protection,
+	const char *name);
+area_id alloc_mem(void **virt, phys_addr_t *phy, size_t size, uint32 protection,
+	const char *name);
 
 // generic macro for rounding, can only be used for power of 2 blocksize
 #define ROUNDUP(size, blocksize) 	(((size) + (blocksize) - 1) & ~((blocksize) - 1))
