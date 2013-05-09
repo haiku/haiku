@@ -321,7 +321,7 @@ publish_devices()
 
 		gDeviceNames[deviceCount] = (char *)malloc(strlen(sDeviceBaseName) + 4);
 		if (gDeviceNames[deviceCount]) {
-			sprintf(gDeviceNames[deviceCount], "%s%ld", sDeviceBaseName, i);
+			sprintf(gDeviceNames[deviceCount], "%s%" B_PRId32, sDeviceBaseName, i);
 			TRACE("publishing %s\n", gDeviceNames[deviceCount]);
 			deviceCount++;
 		} else
