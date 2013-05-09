@@ -119,7 +119,8 @@ efi_gpt_scan_partition(int fd, partition_data* partition, void* _cookie)
 			partition->offset + entry.StartBlock() * partition->block_size,
 			entry.BlockCount() * partition->block_size, -1);
 		if (child == NULL) {
-			TRACE(("efi_gpt: Creating child at index %ld failed\n", index - 1));
+			TRACE(("efi_gpt: Creating child at index %" B_PRIu32 " failed\n",
+				index - 1));
 			return B_ERROR;
 		}
 
@@ -128,7 +129,7 @@ efi_gpt_scan_partition(int fd, partition_data* partition, void* _cookie)
 		child->name = strdup(name);
 		child->type = strdup(get_partition_type(entry.partition_type));
 		child->block_size = partition->block_size;
-		child->cookie = (void*)i;
+		child->cookie = (void*)(addr_t)i;
 	}
 
 	return B_OK;
@@ -492,7 +493,7 @@ efi_gpt_resize_child(int fd, partition_id partitionID, off_t size,
 	if (header == NULL)
 		return B_BAD_VALUE;
 
-	uint32 entryIndex = (uint32)child->cookie;
+	uint32 entryIndex = (uint32)(addr_t)child->cookie;
 	if (entryIndex >= header->EntryCount())
 		return B_BAD_VALUE;
 
@@ -553,7 +554,7 @@ efi_gpt_move_child(int fd, partition_id partitionID, partition_id childID,
 	if (header == NULL)
 		return B_BAD_VALUE;
 
-	uint32 entryIndex = (uint32)child->cookie;
+	uint32 entryIndex = (uint32)(addr_t)child->cookie;
 	if (entryIndex >= header->EntryCount())
 		return B_BAD_VALUE;
 
@@ -614,7 +615,7 @@ efi_gpt_set_content_name(int fd, partition_id partitionID, const char* name,
 	if (header == NULL)
 		return B_BAD_VALUE;
 
-	uint32 entryIndex = (uint32)child->cookie;
+	uint32 entryIndex = (uint32)(addr_t)child->cookie;
 	if (entryIndex >= header->EntryCount())
 		return B_BAD_VALUE;
 
@@ -660,7 +661,7 @@ efi_gpt_set_type(int fd, partition_id partitionID, const char* type,
 	if (header == NULL)
 		return B_BAD_VALUE;
 
-	uint32 entryIndex = (uint32)child->cookie;
+	uint32 entryIndex = (uint32)(addr_t)child->cookie;
 	if (entryIndex >= header->EntryCount())
 		return B_BAD_VALUE;
 
@@ -777,7 +778,7 @@ efi_gpt_create_child(int fd, partition_id partitionID, off_t offset,
 	child->name = strdup(name);
 	child->type = strdup(type);
 	child->parameters = strdup(parameters);
-	child->cookie = (void*)entryIndex;
+	child->cookie = (void*)(addr_t)entryIndex;
 
 	if (child->type == NULL || child->parameters == NULL) {
 		delete_partition(child->id);
@@ -813,7 +814,7 @@ efi_gpt_delete_child(int fd, partition_id partitionID, partition_id childID,
 	if (header == NULL)
 		return B_BAD_VALUE;
 
-	uint32 entryIndex = (uint32)child->cookie;
+	uint32 entryIndex = (uint32)(addr_t)child->cookie;
 	if (entryIndex >= header->EntryCount())
 		return B_BAD_VALUE;
 
