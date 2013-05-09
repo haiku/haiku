@@ -37,8 +37,6 @@ public:
 		fSourceFile(sourceFile),
 		fFunction(function)
 	{
-		if (fParent != NULL)
-			fParent->AcquireReference();
 		if (fSourceFile != NULL)
 			fSourceFile->AcquireReference();
 		if (fFunction != NULL)
@@ -50,14 +48,11 @@ public:
 		for (int32 i = 0; i < fChildPathComponents.CountItems(); i++)
 			fChildPathComponents.ItemAt(i)->ReleaseReference();
 
-		if (fParent != NULL)
-			fParent->ReleaseReference();
-
 		if (fSourceFile != NULL)
 			fSourceFile->ReleaseReference();
 
 		if (fFunction != NULL)
-			fFunction->AcquireReference();
+			fFunction->ReleaseReference();
 	}
 
 	const BString& ComponentName() const
@@ -223,8 +218,8 @@ public:
 
 		SourcePathComponentNode* sourcelessNode = new(std::nothrow)
 			SourcePathComponentNode(NULL, "<no source file>", NULL, NULL);
-		ObjectDeleter<SourcePathComponentNode> sourceNodeDeleter(
-			sourcelessNode);
+		BReference<SourcePathComponentNode> sourceNodeRef(
+			sourcelessNode, true);
 
 
 		for (int32 i = 0; i < functionCount; i++) {
@@ -236,7 +231,7 @@ public:
 			if (fChildPathComponents.BinaryInsert(sourcelessNode,
 					&SourcePathComponentNode::CompareComponents)) {
 				fSourcelessNode = sourcelessNode;
-				sourceNodeDeleter.Detach();
+				sourceNodeRef.Detach();
 			}
 		}
 
@@ -404,7 +399,8 @@ private:
 				pathComponent, NULL, NULL);
 			if (currentNode == NULL)
 				return false;
-			ObjectDeleter<SourcePathComponentNode> nodeDeleter(currentNode);
+			BReference<SourcePathComponentNode> nodeReference(currentNode,
+				true);
 			if (parent != NULL) {
 				if (!parent->AddChild(currentNode))
 					return false;
@@ -413,8 +409,9 @@ private:
 					&SourcePathComponentNode::CompareComponents)) {
 					return false;
 				}
+
+				nodeReference.Detach();
 			}
-			nodeDeleter.Detach();
 		}
 
 		if (pathSeparatorIndex == -1)
@@ -433,12 +430,10 @@ private:
 		if (functionNode == NULL)
 			return B_NO_MEMORY;
 
-		ObjectDeleter<SourcePathComponentNode> nodeDeleter(functionNode);
-
+		BReference<SourcePathComponentNode> nodeReference(functionNode, true);
 		if (!parent->AddChild(functionNode))
 			return false;
 
-		nodeDeleter.Detach();
 		return true;
 	}
 
