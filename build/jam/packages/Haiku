@@ -175,7 +175,7 @@ AddFilesToPackage boot : $(bootScripts) ;
 
 # post install scripts
 local postInstallFiles = add_catalog_entry_attributes.sh
-	default_deskbar_items.sh mime_update.sh ;
+	default_deskbar_items.sh ;
 postInstallFiles = $(postInstallFiles:G=post-install) ;
 SEARCH on $(postInstallFiles)
 	= [ FDirName $(HAIKU_TOP) data common boot post_install ] ;
