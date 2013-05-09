@@ -128,6 +128,8 @@ public:
 	}
 
 private:
+	friend class ImageFunctionsView::FunctionsTableModel;
+
 	static int CompareByComponentName(const BString* name, const
 		SourcePathComponentNode* node)
 	{
