@@ -158,7 +158,7 @@ public:
 
 		// make sure all buffers are recycled, or we might hang
 		// when told to quit
-		while (BBuffer* buffer = (BBuffer*)fBuffers.RemoveItem(0L))
+		while (BBuffer* buffer = (BBuffer*)fBuffers.RemoveItem((int32)0))
 			buffer->Recycle();
 	}
 
@@ -325,7 +325,7 @@ OpenSoundNode::OpenSoundNode(BMediaAddOn* addon, const char* name,
 	  fTimeSourceStartTime(0),
 
 	  fWeb(NULL),
-	  fConfig(0UL)
+	  fConfig((uint32)0)
 {
 	CALLED();
 
@@ -488,7 +488,7 @@ OpenSoundNode::NodeRegistered()
 			const char *prefix = "";
 			if (strstr(engine->Info()->name, "SPDIF"))
 				prefix = "S/PDIF ";
-			sprintf(mediaInput.name, "%sOutput %ld (%s)", prefix,
+			sprintf(mediaInput.name, "%sOutput %" B_PRId32 " (%s)", prefix,
 				mediaInput.destination.id, gSupportedFormatsNames[f]);
 
 			NodeInput* input = new (nothrow) NodeInput(mediaInput, i, fmt,
@@ -536,7 +536,7 @@ OpenSoundNode::NodeRegistered()
 			const char *prefix = "";
 			if (strstr(engine->Info()->name, "SPDIF"))
 				prefix = "S/PDIF ";
-			sprintf(mediaOutput.name, "%sInput %ld (%s)", prefix,
+			sprintf(mediaOutput.name, "%sInput %" B_PRId32 " (%s)", prefix,
 				mediaOutput.source.id, gSupportedFormatsNames[f]);
 
 			NodeOutput* output = new (nothrow) NodeOutput(mediaOutput,
@@ -1282,8 +1282,9 @@ OpenSoundNode::Disconnect(const media_source& what,
 		channel->FreeBuffers();
 	} else {
 		fprintf(stderr, "\tDisconnect() called with wrong source/destination "
-			"(%ld/%ld), ours is (%ld/%ld)\n", what.id, where.id,
-			channel->fOutput.source.id, channel->fOutput.destination.id);
+			"(%" B_PRId32 "/%" B_PRId32 "), ours is (%" B_PRId32 "/%" B_PRId32
+			")\n", what.id, where.id, channel->fOutput.source.id,
+			channel->fOutput.destination.id);
 	}
 }
 
@@ -1315,7 +1316,7 @@ OpenSoundNode::LateNoticeReceived(const media_source& what, bigtime_t how_much,
 		fInternalLatency += how_much;
 		SetEventLatency(fLatency + fInternalLatency);
 
-		fprintf(stderr, "\tincreasing latency to %Ld\n",
+		fprintf(stderr, "\tincreasing latency to %" B_PRIdBIGTIME "\n",
 			fLatency + fInternalLatency);
 	} else {
 		// The other run modes dictate various strategies for sacrificing data
@@ -1396,7 +1397,8 @@ OpenSoundNode::HandleEvent(const media_timed_event* event, bigtime_t lateness,
 			HandleParameter(event,lateness,realTimeEvent);
 			break;
 		default:
-			fprintf(stderr,"  unknown event type: %li\n",event->type);
+			fprintf(stderr,"  unknown event type: %" B_PRId32 "\n",
+				event->type);
 			break;
 	}
 }
@@ -1448,7 +1450,7 @@ OpenSoundNode::HandleBuffer(const media_timed_event* event,
 			// TODO: Debug
 		//mLateBuffers++;
 		NotifyLateProducer(channel->fInput.source, -how_early, perf_time);
-		fprintf(stderr,"	<- LATE BUFFER : %lli\n", how_early);
+		fprintf(stderr,"	<- LATE BUFFER : %" B_PRIdBIGTIME "\n", how_early);
 		buffer->Recycle();
 	} else {
 		fDevice->Locker()->Lock();
@@ -1610,8 +1612,8 @@ OpenSoundNode::TimeSourceOp(const time_source_op_info& op, void* _reserved)
 			break;
 		case B_TIMESOURCE_SEEK:
 //			TRACE("TimeSourceOp op B_TIMESOURCE_SEEK\n");
-printf("TimeSourceOp op B_TIMESOURCE_SEEK, real %lld, "
-	"perf %lld\n", op.real_time, op.performance_time);
+printf("TimeSourceOp op B_TIMESOURCE_SEEK, real %" B_PRIdBIGTIME ", "
+	"perf %" B_PRIdBIGTIME "\n", op.real_time, op.performance_time);
 			BroadcastTimeWarp(op.real_time, op.performance_time);
 			break;
 		default:
@@ -2257,7 +2259,7 @@ OpenSoundNode::_PlayThread(NodeInput* input)
 		TRACE("OpenSoundNode::_PlayThread: buffers: %ld\n",
 			input->fBuffers.CountItems());
 
-		BBuffer* buffer = (BBuffer*)input->fBuffers.RemoveItem(0L);
+		BBuffer* buffer = (BBuffer*)input->fBuffers.RemoveItem((int32)0);
 
 		fDevice->Locker()->Unlock();
 
