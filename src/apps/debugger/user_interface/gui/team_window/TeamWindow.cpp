@@ -766,23 +766,23 @@ TeamWindow::_Init()
 			.GetSplitView(&fFunctionSplitView)
 			.SetInsets(B_USE_SMALL_INSETS)
 			.Add(fTabView = new BTabView("tab view"), 0.4f)
-			.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
-				.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
-					.Add(fRunButton = new BButton("Run"))
-					.Add(fStepOverButton = new BButton("Step Over"))
-					.Add(fStepIntoButton = new BButton("Step Into"))
-					.Add(fStepOutButton = new BButton("Step Out"))
-					.AddGlue()
-				.End()
-				.Add(fSourcePathView = new BStringView(
-					"source path",
-					"Source path unavailable."), 4.0f)
-				.AddSplit(B_HORIZONTAL, 3.0f)
-					.GetSplitView(&fSourceSplitView)
+			.AddSplit(B_HORIZONTAL, 3.0f)
+				.GetSplitView(&fSourceSplitView)
+				.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
+					.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
+						.Add(fRunButton = new BButton("Run"))
+						.Add(fStepOverButton = new BButton("Step Over"))
+						.Add(fStepIntoButton = new BButton("Step Into"))
+						.Add(fStepOutButton = new BButton("Step Out"))
+						.AddGlue()
+					.End()
+					.Add(fSourcePathView = new BStringView(
+						"source path",
+						"Source path unavailable."), 4.0f)
 					.Add(sourceScrollView = new BScrollView("source scroll",
 						NULL, 0, true, true), 3.0f)
-					.Add(fLocalsTabView = new BTabView("locals view"))
 				.End()
+				.Add(fLocalsTabView = new BTabView("locals view"))
 			.End()
 		.End();
 
