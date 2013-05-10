@@ -12,6 +12,7 @@
 #include "KeyboardLayout.h"
 
 
+class BMenuItem;
 class Keymap;
 
 
@@ -91,6 +92,10 @@ private:
 			void				_SetFontSize(BView* view, key_kind keyKind);
 			void				_EvaluateDropTarget(BPoint point);
 			void				_SendFakeKeyDown(const Key* key);
+			BMenuItem*			_SwapModifiersMenuItem(uint32 old_code,
+									uint32 new_code);
+			const char*			_NameForModifier(uint32 modifier,
+									bool pretty = false) const;
 
 			BBitmap*			fOffscreenBitmap;
 			BView*				fOffscreenView;

@@ -13,10 +13,17 @@
 #include <Bitmap.h>
 #include <ControlLook.h>
 #include <LayoutUtils.h>
+#include <MenuItem.h>
+#include <PopUpMenu.h>
 #include <Region.h>
 #include <Window.h>
 
 #include "Keymap.h"
+#include "KeymapApplication.h"
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Keyboard Layout View"
 
 
 static const rgb_color kBrightColor = {230, 230, 230, 255};
@@ -146,28 +153,105 @@ KeyboardLayoutView::MouseDown(BPoint point)
 	fDragKey = NULL;
 	fDropPoint.x = -1;
 
-	Key* key = _KeyAt(point);
-	if (key == NULL)
-		return;
-
 	int32 buttons = 0;
 	if (Looper() != NULL && Looper()->CurrentMessage() != NULL)
 		Looper()->CurrentMessage()->FindInt32("buttons", &buttons);
 
-	if ((buttons & B_TERTIARY_MOUSE_BUTTON) != 0
+	Key* key = _KeyAt(point);
+	if (fKeymap == NULL || key == NULL) {
+		fButtons = buttons;
+		return;
+	}
+
+	if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
+		if (fKeymap->IsModifierKey(key->code)) {
+			// pop up the modifier keys menu
+			BPopUpMenu* modifiersPopUp = new BPopUpMenu("Modifiers pop up",
+				true, true, B_ITEMS_IN_COLUMN);
+			const key_map& map = fKeymap->Map();
+			BMenuItem* item = NULL;
+
+			item = _SwapModifiersMenuItem(key->code, map.left_shift_key);
+			modifiersPopUp->AddItem(item);
+			if (key->code == map.left_shift_key)
+				item->SetMarked(true);
+
+			item = _SwapModifiersMenuItem(key->code, map.left_control_key);
+			modifiersPopUp->AddItem(item);
+			if (key->code == map.left_control_key)
+				item->SetMarked(true);
+
+			item = _SwapModifiersMenuItem(key->code, map.left_option_key);
+			modifiersPopUp->AddItem(item);
+			if (key->code == map.left_option_key)
+				item->SetMarked(true);
+
+			item = _SwapModifiersMenuItem(key->code, map.left_command_key);
+			modifiersPopUp->AddItem(item);
+			if (key->code == map.left_command_key)
+				item->SetMarked(true);
+
+			modifiersPopUp->AddSeparatorItem();
+
+			item = _SwapModifiersMenuItem(key->code, map.right_shift_key);
+			modifiersPopUp->AddItem(item);
+			if (key->code == map.right_shift_key)
+				item->SetMarked(true);
+
+			item = _SwapModifiersMenuItem(key->code, map.right_control_key);
+			modifiersPopUp->AddItem(item);
+			if (key->code == map.right_control_key)
+				item->SetMarked(true);
+
+			item = _SwapModifiersMenuItem(key->code, map.menu_key);
+			modifiersPopUp->AddItem(item);
+			if (key->code == map.menu_key)
+				item->SetMarked(true);
+
+			item = _SwapModifiersMenuItem(key->code, map.right_option_key);
+			modifiersPopUp->AddItem(item);
+			if (key->code == map.right_option_key)
+				item->SetMarked(true);
+
+			item = _SwapModifiersMenuItem(key->code, map.right_command_key);
+			modifiersPopUp->AddItem(item);
+			if (key->code == map.right_command_key)
+				item->SetMarked(true);
+
+			modifiersPopUp->AddSeparatorItem();
+
+			item = _SwapModifiersMenuItem(key->code, map.caps_key);
+			modifiersPopUp->AddItem(item);
+			if (key->code == map.caps_key)
+				item->SetMarked(true);
+
+			item = _SwapModifiersMenuItem(key->code, map.num_key);
+			modifiersPopUp->AddItem(item);
+			if (key->code == map.num_key)
+				item->SetMarked(true);
+
+			item = _SwapModifiersMenuItem(key->code, map.scroll_key);
+			modifiersPopUp->AddItem(item);
+			if (key->code == map.scroll_key)
+				item->SetMarked(true);
+
+			modifiersPopUp->SetAsyncAutoDestruct(true);
+			if (modifiersPopUp->SetTargetForItems(Window()) == B_OK)
+				modifiersPopUp->Go(ConvertToScreen(point), true);
+		}
+	} else if ((buttons & B_TERTIARY_MOUSE_BUTTON) != 0
 		&& (fButtons & B_TERTIARY_MOUSE_BUTTON) == 0) {
 		// toggle the "deadness" of dead keys via middle mouse button
-		if (fKeymap != NULL) {
-			bool isEnabled = false;
-			uint8 deadKey
-				= fKeymap->DeadKey(key->code, fModifiers, &isEnabled);
-			if (deadKey > 0) {
-				fKeymap->SetDeadKeyEnabled(key->code, fModifiers, !isEnabled);
-				_InvalidateKey(key);
-			}
+		bool isEnabled = false;
+		uint8 deadKey
+			= fKeymap->DeadKey(key->code, fModifiers, &isEnabled);
+		if (deadKey > 0) {
+			fKeymap->SetDeadKeyEnabled(key->code, fModifiers, !isEnabled);
+			_InvalidateKey(key);
 		}
 	} else {
-		if (fKeymap != NULL && fKeymap->IsModifierKey(key->code)) {
+		// primary mouse button
+		if (fKeymap->IsModifierKey(key->code)) {
 			if (_KeyState(key->code)) {
 				uint32 modifier = fKeymap->Modifier(key->code);
 				if ((modifier & modifiers()) == 0) {
@@ -201,32 +285,37 @@ KeyboardLayoutView::MouseUp(BPoint point)
 	if (Looper() != NULL && Looper()->CurrentMessage() != NULL)
 		Looper()->CurrentMessage()->FindInt32("buttons", &buttons);
 
-	if (key != NULL) {
-		if ((fButtons & B_TERTIARY_MOUSE_BUTTON) != 0
-			&& (buttons & B_TERTIARY_MOUSE_BUTTON) == 0) {
-			_SetKeyState(key->code, false);
-			_InvalidateKey(key);
-			fButtons = buttons;
-		} else {
-			fButtons = buttons;
-
-			// modifier keys are sticky when used with the mouse
-			if (fKeymap != NULL && fKeymap->IsModifierKey(key->code))
-				return;
-
-			_SetKeyState(key->code, false);
-
-			if (_HandleDeadKey(key->code, fModifiers) && fDeadKey != 0)
-				return;
-
-			_InvalidateKey(key);
-
-			if (fDragKey == NULL && fKeymap != NULL) {
-				// Send fake key down message to target
-				_SendFakeKeyDown(key);
-			}
-		}
+	if (fKeymap == NULL || key == NULL) {
+		fDragKey = NULL;
+		return;
 	}
+
+	if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
+		// do nothing
+	} else if ((fButtons & B_TERTIARY_MOUSE_BUTTON) != 0
+		&& (buttons & B_TERTIARY_MOUSE_BUTTON) == 0) {
+		_SetKeyState(key->code, false);
+		_InvalidateKey(key);
+		fButtons = buttons;
+	} else {
+		// primary mouse button
+		fButtons = buttons;
+
+		// modifier keys are sticky when used with the mouse
+		if (fKeymap->IsModifierKey(key->code))
+			return;
+
+		_SetKeyState(key->code, false);
+
+		if (_HandleDeadKey(key->code, fModifiers) && fDeadKey != 0)
+			return;
+
+		_InvalidateKey(key);
+
+		if (fDragKey == NULL && fKeymap != NULL)
+			_SendFakeKeyDown(key);
+	}
+
 	fDragKey = NULL;
 }
 
@@ -915,7 +1004,7 @@ KeyboardLayoutView::_GetKeyLabel(const Key* key, char* text, size_t textSize,
 bool
 KeyboardLayoutView::_IsKeyPressed(uint32 code)
 {
-	if (fDropTarget != NULL && fDropTarget->code == (int32)code)
+	if (fDropTarget != NULL && fDropTarget->code == code)
 		return true;
 
 	return _KeyState(code);
@@ -952,7 +1041,7 @@ KeyboardLayoutView::_KeyForCode(uint32 code)
 
 	for (int32 i = 0; i < fLayout->CountKeys(); i++) {
 		Key* key = fLayout->KeyAt(i);
-		if (key->code == (int32)code)
+		if (key->code == code)
 			return key;
 	}
 
@@ -1167,4 +1256,51 @@ KeyboardLayoutView::_SendFakeKeyDown(const Key* key)
 	}
 
 	fTarget.SendMessage(&message);
+}
+
+
+BMenuItem*
+KeyboardLayoutView::_SwapModifiersMenuItem(uint32 oldCode, uint32 newCode)
+{
+	int32 mask = B_SHIFT_KEY | B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY;
+	uint32 oldModifier = fKeymap->Modifier(oldCode) & ~mask;
+	uint32 newModifier = fKeymap->Modifier(newCode) & ~mask;
+
+	BMessage* message = new BMessage(kMsgUpdateModifierKeys);
+	message->AddUInt32(_NameForModifier(newModifier), oldCode);
+	message->AddUInt32(_NameForModifier(oldModifier), newCode);
+
+	return new BMenuItem(_NameForModifier(newModifier, true), message);
+}
+
+
+const char*
+KeyboardLayoutView::_NameForModifier(uint32 modifier, bool pretty) const
+{
+	if (modifier == B_CAPS_LOCK)
+		return pretty ? B_TRANSLATE("Caps lock") : "caps_key";
+	else if (modifier == B_NUM_LOCK)
+		return pretty ? B_TRANSLATE("Num lock") : "num_key";
+	else if (modifier == B_SCROLL_LOCK)
+		return pretty ? B_TRANSLATE("Scroll lock") : "scroll_key";
+	else if (modifier == B_LEFT_SHIFT_KEY)
+		return pretty ? B_TRANSLATE("Left shift") : "left_shift_key";
+	else if (modifier == B_RIGHT_SHIFT_KEY)
+		return pretty ? B_TRANSLATE("Right shift") : "right_shift_key";
+	else if (modifier == B_LEFT_COMMAND_KEY)
+		return pretty ? B_TRANSLATE("Left command") : "left_command_key";
+	else if (modifier == B_RIGHT_COMMAND_KEY)
+		return pretty ? B_TRANSLATE("Right command") : "right_command_key";
+	else if (modifier == B_LEFT_CONTROL_KEY)
+		return pretty ? B_TRANSLATE("Left control") : "left_control_key";
+	else if (modifier == B_RIGHT_CONTROL_KEY)
+		return pretty ? B_TRANSLATE("Right control") : "right_control_key";
+	else if (modifier == B_LEFT_OPTION_KEY)
+		return pretty ? B_TRANSLATE("Left option") : "left_option_key";
+	else if (modifier == B_RIGHT_OPTION_KEY)
+		return pretty ? B_TRANSLATE("Right option") : "right_option_key";
+	else if (modifier == B_MENU_KEY)
+		return pretty ? B_TRANSLATE_COMMENT("Menu", "Menu key") : "menu_key";
+
+	return NULL;
 }

@@ -22,9 +22,9 @@ enum key_shape {
 };
 
 struct Key {
-	int32		code;
-	int32		alternate_code[3];
-	int32		alternate_modifier[3];
+	uint32		code;
+	uint32		alternate_code[3];
+	uint32		alternate_modifier[3];
 	key_shape	shape;
 	BRect		frame;
 	float		second_row;

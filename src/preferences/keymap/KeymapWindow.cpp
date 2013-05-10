@@ -346,6 +346,18 @@ KeymapWindow::MessageReceived(BMessage* message)
 			if (message->FindUInt32("right_command_key", &keycode) == B_OK)
 				fCurrentMap.SetModifier(keycode, B_RIGHT_COMMAND_KEY);
 
+			if (message->FindUInt32("menu_key", &keycode) == B_OK)
+				fCurrentMap.SetModifier(keycode, B_MENU_KEY);
+
+			if (message->FindUInt32("caps_key", &keycode) == B_OK)
+				fCurrentMap.SetModifier(keycode, B_CAPS_LOCK);
+
+			if (message->FindUInt32("num_key", &keycode) == B_OK)
+				fCurrentMap.SetModifier(keycode, B_NUM_LOCK);
+
+			if (message->FindUInt32("scroll_key", &keycode) == B_OK)
+				fCurrentMap.SetModifier(keycode, B_SCROLL_LOCK);
+
 			_UpdateButtons();
 			fKeyboardLayoutView->SetKeymap(&fCurrentMap);
 			break;

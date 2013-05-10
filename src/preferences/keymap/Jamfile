@@ -20,6 +20,7 @@ Preference Keymap :
 DoCatalogs Keymap :
 	x-vnd.Haiku-Keymap
 	:
+	KeyboardLayoutView.cpp
 	KeymapWindow.cpp
 	ModifierKeysWindow.cpp
 ;
