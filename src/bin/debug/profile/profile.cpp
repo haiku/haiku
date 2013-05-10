@@ -467,7 +467,9 @@ private:
 
 				error = sharedImage->Init(name.String());
 			}
-		} else
+		} else if (strcmp(imageInfo.name, "commpage") == 0)
+			error = sharedImage->Init(teamID, imageInfo.id);
+		else
 			error = sharedImage->Init(imageInfo.name);
 		if (error != B_OK)
 			return error;
