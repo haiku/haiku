@@ -138,8 +138,8 @@ Bitmap::BackupSetAt(off_t block, bool used)
 {
 	uint32 index = block / 32;
 	if (index > fByteSize / 4) {
-		fprintf(stderr, "Bitmap::BackupSetAt(): Block %Ld outside bitmap!\n",
-			block);
+		fprintf(stderr, "Bitmap::BackupSetAt(): Block %" B_PRIdOFF " outside "
+			"bitmap!\n", block);
 		return false;
 	}
 
@@ -251,7 +251,9 @@ Bitmap::CompareWithBackup()
 {
 	for (int32 i = fByteSize / 4;i-- > 0;) {
 		if (fBitmap[i] != fBackupBitmap[i]) {
-			printf("differ at %ld (block %ld) -> bitmap = %08lx, backup = %08lx\n",i,i*32,fBitmap[i],fBackupBitmap[i]);
+			printf("differ at %" B_PRId32 " (block %" B_PRId32 ") -> bitmap = "
+				"%08" B_PRIx32 ", backup = %08" B_PRIx32 "\n", i, i * 32,
+				fBitmap[i], fBackupBitmap[i]);
 		}
 	}
 	return B_OK;

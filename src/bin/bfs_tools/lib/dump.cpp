@@ -38,7 +38,7 @@ get_tupel(uint32 id)
 void
 dump_block_run(const char *prefix, const block_run &run, const char *postfix)
 {
-	Print("%s(%ld, %d, %d)%s\n", prefix, run.allocation_group,
+	Print("%s(%" B_PRId32 ", %d, %d)%s\n", prefix, run.allocation_group,
 		run.start, run.length, postfix);
 }
 
@@ -48,29 +48,29 @@ dump_super_block(const disk_super_block *superBlock)
 {
 	Print("disk_super_block:\n");
 	Print("  name           = %s\n", superBlock->name);
-	Print("  magic1         = %#08lx (%s) %s\n", superBlock->magic1,
+	Print("  magic1         = %#08" B_PRIx32 " (%s) %s\n", superBlock->magic1,
 		get_tupel(superBlock->magic1),
 		superBlock->magic1 == SUPER_BLOCK_MAGIC1 ? "valid" : "INVALID");
-	Print("  fs_byte_order  = %#08lx (%s, %s endian)\n",
+	Print("  fs_byte_order  = %#08" B_PRIx32 " (%s, %s endian)\n",
 		superBlock->fs_byte_order, get_tupel(superBlock->fs_byte_order),
 		superBlock->fs_byte_order == SUPER_BLOCK_FS_LENDIAN ? "little" : "big");
-	Print("  block_size     = %lu\n", superBlock->block_size);
-	Print("  block_shift    = %lu\n", superBlock->block_shift);
-	Print("  num_blocks     = %Lu\n", superBlock->num_blocks);
-	Print("  used_blocks    = %Lu\n", superBlock->used_blocks);
-	Print("  inode_size     = %lu\n", superBlock->inode_size);
-	Print("  magic2         = %#08lx (%s) %s\n", superBlock->magic2,
+	Print("  block_size     = %" B_PRIu32 "\n", superBlock->block_size);
+	Print("  block_shift    = %" B_PRIu32 "\n", superBlock->block_shift);
+	Print("  num_blocks     = %" B_PRIdOFF "\n", superBlock->num_blocks);
+	Print("  used_blocks    = %" B_PRIdOFF "\n", superBlock->used_blocks);
+	Print("  inode_size     = %" B_PRId32 "\n", superBlock->inode_size);
+	Print("  magic2         = %#08" B_PRIx32 " (%s) %s\n", superBlock->magic2,
 		get_tupel(superBlock->magic2),
 		superBlock->magic2 == (int)SUPER_BLOCK_MAGIC2 ? "valid" : "INVALID");
-	Print("  blocks_per_ag  = %lu\n", superBlock->blocks_per_ag);
-	Print("  ag_shift       = %lu\n", superBlock->ag_shift);
-	Print("  num_ags        = %lu\n", superBlock->num_ags);
-	Print("  flags          = %#08lx (%s)\n", superBlock->flags,
+	Print("  blocks_per_ag  = %" B_PRId32 "\n", superBlock->blocks_per_ag);
+	Print("  ag_shift       = %" B_PRId32 "\n", superBlock->ag_shift);
+	Print("  num_ags        = %" B_PRId32 "\n", superBlock->num_ags);
+	Print("  flags          = %#08" B_PRIx32 " (%s)\n", superBlock->flags,
 		get_tupel(superBlock->flags));
 	dump_block_run("  log_blocks     = ", superBlock->log_blocks);
-	Print("  log_start      = %Lu\n", superBlock->log_start);
-	Print("  log_end        = %Lu\n", superBlock->log_end);
-	Print("  magic3         = %#08lx (%s) %s\n", superBlock->magic3,
+	Print("  log_start      = %" B_PRIdOFF "\n", superBlock->log_start);
+	Print("  log_end        = %" B_PRIdOFF "\n", superBlock->log_end);
+	Print("  magic3         = %#08" B_PRIx32 " (%s) %s\n", superBlock->magic3,
 		get_tupel(superBlock->magic3),
 		superBlock->magic3 == SUPER_BLOCK_MAGIC3 ? "valid" : "INVALID");
 	dump_block_run("  root_dir       = ", superBlock->root_dir);
@@ -91,7 +91,7 @@ dump_data_stream(const bfs_inode *inode, const data_stream *stream, bool showOff
 
 			char buffer[256];
 			if (showOffsets)
-				snprintf(buffer, sizeof(buffer), " %16lld", offset);
+				snprintf(buffer, sizeof(buffer), " %16" B_PRIdOFF, offset);
 			else
 				buffer[0] = '\0';
 
@@ -100,21 +100,23 @@ dump_data_stream(const bfs_inode *inode, const data_stream *stream, bool showOff
 			offset += stream->direct[i].length * inode->inode_size;
 		}
 	}
-	Print("  max_direct_range          = %Lu\n", stream->max_direct_range);
+	Print("  max_direct_range          = %" B_PRIdOFF "\n",
+		stream->max_direct_range);
 
 	if (!stream->indirect.IsZero())
 		dump_block_run("  indirect                  = ", stream->indirect);
 
-	Print("  max_indirect_range        = %Lu\n", stream->max_indirect_range);
+	Print("  max_indirect_range        = %" B_PRIdOFF "\n",
+		stream->max_indirect_range);
 
 	if (!stream->double_indirect.IsZero()) {
 		dump_block_run("  double_indirect           = ",
 			stream->double_indirect);
 	}
 
-	Print("  max_double_indirect_range = %Lu\n",
+	Print("  max_double_indirect_range = %" B_PRIdOFF "\n",
 		stream->max_double_indirect_range);
-	Print("  size                      = %Lu\n", stream->size);
+	Print("  size                      = %" B_PRIdOFF "\n", stream->size);
 }
 
 
@@ -126,13 +128,14 @@ dump_inode(const Inode *nameNode, const bfs_inode *inode, bool showOffsets)
 	else
 		Print("inode:\n");
 
-	Print("  magic1             = %08lx (%s) %s\n",inode->magic1,
-			get_tupel(inode->magic1), (inode->magic1 == INODE_MAGIC1 ? "valid" : "INVALID"));
+	Print("  magic1             = %08" B_PRIx32 " (%s) %s\n",inode->magic1,
+		get_tupel(inode->magic1),
+		(inode->magic1 == INODE_MAGIC1 ? "valid" : "INVALID"));
 	dump_block_run(	"  inode_num          = ",inode->inode_num);
-	Print("  uid                = %lu\n",inode->uid);
-	Print("  gid                = %lu\n",inode->gid);
-	Print("  mode               = %10lo (octal)\n",inode->mode);
-	Print("  flags              = %08lx\n",inode->flags);
+	Print("  uid                = %" B_PRIu32 "\n",inode->uid);
+	Print("  gid                = %" B_PRIu32 "\n",inode->gid);
+	Print("  mode               = %10" B_PRIo32 " (octal)\n",inode->mode);
+	Print("  flags              = %08" B_PRIx32 "\n",inode->flags);
 
 	time_t time;
 	time = (time_t)(inode->create_time >> 16);
@@ -142,9 +145,9 @@ dump_inode(const Inode *nameNode, const bfs_inode *inode, bool showOffsets)
 
 	dump_block_run(	"  parent             = ",inode->parent);
 	dump_block_run(	"  attributes         = ",inode->attributes);
-	Print("  type               = %lu\n",inode->type);
-	Print("  inode_size         = %lu\n",inode->inode_size);
-	Print("  etc                = %#08lx\n",inode->etc);
+	Print("  type               = %" B_PRIu32 "\n",inode->type);
+	Print("  inode_size         = %" B_PRId32 "\n",inode->inode_size);
+	Print("  etc                = %#08" B_PRIx32 "\n",inode->etc);
 	Print("  short_symlink      = %s\n",
 		S_ISLNK(inode->mode) && (inode->flags & INODE_LONG_SYMLINK) == 0
 			? inode->short_symlink : "-");
@@ -172,7 +175,8 @@ dump_small_data(Inode *inode)
 		inode->InodeBuffer()->inode_size - sizeof(struct bfs_inode));
 
 	while (inode->GetNextSmallData(&item) == B_OK) {
-		printf("%#08lx (%s), name = \"%s\", ", item->type, get_tupel(item->type), item->Name());
+		printf("%#08" B_PRIx32 " (%s), name = \"%s\", ", item->type,
+			get_tupel(item->type), item->Name());
 		if (item->type == FILE_NAME_TYPE
 			|| item->type == B_STRING_TYPE
 			|| item->type == B_MIME_STRING_TYPE)
@@ -187,15 +191,19 @@ void
 dump_bplustree_header(const bplustree_header* header)
 {
 	printf("bplustree_header:\n");
-	printf("  magic                = %#08lx (%s) %s\n", header->magic,
-		get_tupel(header->magic),
+	printf("  magic                = %#08" B_PRIx32 " (%s) %s\n",
+		header->magic, get_tupel(header->magic),
 		header->magic == BPLUSTREE_MAGIC ? "valid" : "INVALID");
-	printf("  node_size            = %lu\n", header->node_size);
-	printf("  max_number_of_levels = %lu\n", header->max_number_of_levels);
-	printf("  data_type            = %lu\n", header->data_type);
-	printf("  root_node_pointer    = %Ld\n", header->root_node_pointer);
-	printf("  free_node_pointer    = %Ld\n", header->free_node_pointer);
-	printf("  maximum_size         = %Lu\n", header->maximum_size);
+	printf("  node_size            = %" B_PRIu32 "\n", header->node_size);
+	printf("  max_number_of_levels = %" B_PRIu32 "\n",
+		header->max_number_of_levels);
+	printf("  data_type            = %" B_PRIu32 "\n", header->data_type);
+	printf("  root_node_pointer    = %" B_PRIdOFF "\n",
+		header->root_node_pointer);
+	printf("  free_node_pointer    = %" B_PRIdOFF "\n",
+		header->free_node_pointer);
+	printf("  maximum_size         = %" B_PRIdOFF "\n",
+		header->maximum_size);
 }
 
 
@@ -205,9 +213,9 @@ dump_bplustree_node(const bplustree_node* node, const bplustree_header* header,
 {
 	Print("bplustree_node (%s node):\n",
 		node->overflow_link == BPLUSTREE_NULL ? "leaf" : "index");
-	Print("  left_link      = %Ld\n", node->left_link);
-	Print("  right_link     = %Ld\n", node->right_link);
-	Print("  overflow_link  = %Ld\n", node->overflow_link);
+	Print("  left_link      = %" B_PRIdOFF "\n", node->left_link);
+	Print("  right_link     = %" B_PRIdOFF "\n", node->right_link);
+	Print("  overflow_link  = %" B_PRIdOFF "\n", node->overflow_link);
 	Print("  all_key_count  = %u\n", node->all_key_count);
 	Print("  all_key_length = %u\n", node->all_key_length);
 
@@ -226,7 +234,7 @@ dump_bplustree_node(const bplustree_node* node, const bplustree_header* header,
 		uint16 length;
 		char* key = (char *)node->KeyAt(i, &length);
 		if (length > 255) {
-			Print("  %2ld. Invalid length (%u)!!\n", i, length);
+			Print("  %2" B_PRId32 ". Invalid length (%u)!!\n", i, length);
 			dump_block((char *)node, header->node_size, sizeof(off_t));
 			break;
 		}
@@ -236,33 +244,35 @@ dump_bplustree_node(const bplustree_node* node, const bplustree_header* header,
 		buffer[length] = '\0';
 
 		off_t *value = node->Values() + i;
-		if ((uint32)value < (uint32)node || (uint32)value > (uint32)node + header->node_size)
-			Print("  %2ld. Invalid Offset!!\n",i);
-		else {
-			Print("  %2ld. ",i);
+		if ((addr_t)value < (addr_t)node
+			|| (addr_t)value > (addr_t)node + header->node_size) {
+			Print("  %2" B_PRId32 ". Invalid Offset!!\n", i);
+		} else {
+			Print("  %2" B_PRId32 ". ",i);
 			if (header->data_type == BPLUSTREE_STRING_TYPE)
 				Print("\"%s\"",buffer);
 			else if (header->data_type == BPLUSTREE_INT32_TYPE) {
-				Print("int32 = %ld (0x%lx)", *(int32 *)&buffer,
-					*(int32 *)&buffer);
+				Print("int32 = %" B_PRId32 " (0x%" B_PRIx32 ")",
+					*(int32 *)&buffer, *(int32 *)&buffer);
 			} else if (header->data_type == BPLUSTREE_UINT32_TYPE) {
-				Print("uint32 = %lu (0x%lx)", *(uint32 *)&buffer,
-					*(uint32 *)&buffer);
+				Print("uint32 = %" B_PRIu32 " (0x%" B_PRIx32 ")",
+					*(uint32 *)&buffer, *(uint32 *)&buffer);
 			} else if (header->data_type == BPLUSTREE_INT64_TYPE) {
-				Print("int64 = %Ld (0x%Lx)", *(int64 *)&buffer,
-					*(int64 *)&buffer);
+				Print("int64 = %" B_PRId64 " (0x%" B_PRIx64 ")",
+					*(int64 *)&buffer, *(int64 *)&buffer);
 			} else
 				Print("???");
 
 			off_t offset = *value & 0x3fffffffffffffffLL;
-			Print(" (%d bytes) -> %Ld",length,offset);
+			Print(" (%d bytes) -> %" B_PRIdOFF,length,offset);
 			if (disk != NULL) {
 				block_run run = disk->ToBlockRun(offset);
-				Print(" (%ld, %d)", run.allocation_group, run.start);
+				Print(" (%" B_PRId32 ", %d)", run.allocation_group, run.start);
 			}
 			if (bplustree_node::LinkType(*value)
 					== BPLUSTREE_DUPLICATE_FRAGMENT) {
-				Print(" (duplicate fragment %Ld)\n", *value & 0x3ff);
+				Print(" (duplicate fragment %" B_PRIdOFF ")\n",
+					*value & 0x3ff);
 			} else if (bplustree_node::LinkType(*value)
 					== BPLUSTREE_DUPLICATE_NODE) {
 				Print(" (duplicate node)\n");
@@ -310,7 +320,7 @@ dump_block(const char *buffer, uint32 size, int8 valueSize)
 			for (uint32 offset = start; offset < start + kBlockSize;
 					offset += valueSize) {
 				if (valueSize == sizeof(off_t))
-					Print("%s%Ld", offset == start ? "" : ", ",
+					Print("%s%" B_PRIdOFF, offset == start ? "" : ", ",
 						*(off_t *)(buffer + offset));
 			}
 			Print(")");
