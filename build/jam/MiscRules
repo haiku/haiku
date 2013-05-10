@@ -502,7 +502,7 @@ rule FFilterByBuildFeatures list
 		switch $(element) {
 			case }@ :
 			{
-				# Pop the topmost specificaton off the stack.
+				# Pop the topmost specification off the stack.
 				evaluationStack = $(evaluationStack[2-]) ;
 				if ! $(evaluationStack) {
 					Exit "FFilterByBuildFeatures: Unbalanced @( in: " $(list) ;
