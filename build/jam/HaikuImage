@@ -97,14 +97,16 @@ SYSTEM_NETWORK_DATALINK_PROTOCOLS = ethernet_frame <module>arp loopback_frame
 SYSTEM_NETWORK_PROTOCOLS = ipv4 tcp udp icmp unix icmp6 ipv6 ;
 
 SYSTEM_ADD_ONS_ACCELERANTS = [ FFilterByBuildFeatures
+	x86,x86_64 @{
+		vesa.accelerant
+	}@ # x86,x86_64
 	x86 @{
 		3dfx.accelerant ati.accelerant matrox.accelerant neomagic.accelerant
 		nvidia.accelerant intel_810.accelerant intel_extreme.accelerant
-		radeon.accelerant radeon_hd.accelerant s3.accelerant vesa.accelerant
+		radeon.accelerant radeon_hd.accelerant s3.accelerant 
 		#via.accelerant vmware.accelerant
 	}@ # x86
 ] ;
-SYSTEM_ADD_ONS_ACCELERANTS += [ FFilterByBuildFeatures vesa.accelerant@x86_64 ] ;
 SYSTEM_ADD_ONS_TRANSLATORS = BMPTranslator EXRTranslator GIFTranslator
 	HVIFTranslator ICOTranslator JPEGTranslator JPEG2000Translator
 	PCXTranslator PNGTranslator PPMTranslator
@@ -153,12 +155,14 @@ SYSTEM_ADD_ONS_SCREENSAVERS = [ FFilterByBuildFeatures
 SYSTEM_ADD_ONS_DRIVERS_AUDIO = auich auvia echo3g emuxki hda ice1712 sis7018 ;
 SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD = ; #cmedia usb_audio ;
 SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = [ FFilterByBuildFeatures
+	x86,x86_64 @{
+		vesa
+	}@ # x86,x86_64
 	x86 @{
 		ati 3dfx intel_810 intel_extreme matrox neomagic nvidia radeon radeon_hd
-		s3 vesa  #via vmware
+		s3 #via vmware
 	}@ # x86
 ] ;
-SYSTEM_ADD_ONS_DRIVERS_GRAPHICS += [ FFilterByBuildFeatures vesa@x86_64 ] ;
 SYSTEM_ADD_ONS_DRIVERS_MIDI = emuxki ice1712 usb_midi ;
 SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 	x86 @{
