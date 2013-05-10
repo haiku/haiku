@@ -65,7 +65,7 @@ public:
 
 	virtual	void				SetAlignment(alignment label);
 			alignment			Alignment() const;
-	virtual	void				SetDivider(float dividing_line);
+	virtual	void				SetDivider(float position);
 			float				Divider() const;
 
 			void				ShowPopUpMarker();

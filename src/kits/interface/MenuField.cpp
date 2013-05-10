@@ -626,16 +626,16 @@ BMenuField::Alignment() const
 
 
 void
-BMenuField::SetDivider(float divider)
+BMenuField::SetDivider(float position)
 {
-	divider = floorf(divider + 0.5);
+	position = floorf(position + 0.5);
 
-	float dx = fDivider - divider;
+	float delta = fDivider - position;
 
-	if (dx == 0.0f)
+	if (delta == 0.0f)
 		return;
 
-	fDivider = divider;
+	fDivider = position;
 
 	if ((Flags() & B_SUPPORTS_LAYOUT) != 0) {
 		// We should never get here, since layout support means, we also
