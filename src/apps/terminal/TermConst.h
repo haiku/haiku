@@ -145,6 +145,10 @@ static const char* const PREF_WINDOW_TITLE = "Window title";
 extern const char* const kTooTipSetTabTitlePlaceholders;
 extern const char* const kTooTipSetWindowTitlePlaceholders;
 
+extern const char* const kShellEscapeCharacters;
+extern const char* const kDefaultAdditionalWordCharacters;
+extern const char* const kURLAdditionalWordCharacters;
+
 
 // Cursor style
 enum {

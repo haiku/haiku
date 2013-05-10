@@ -16,10 +16,12 @@
 
 #include <Autolock.h>
 #include <Messenger.h>
+#include <ObjectList.h>
 #include <String.h>
 #include <View.h>
 
 #include "TermPos.h"
+#include "TermViewHighlight.h"
 
 
 class ActiveProcessInfo;
@@ -30,6 +32,7 @@ class BScrollView;
 class BString;
 class BStringView;
 class BasicTerminalBuffer;
+class DefaultCharClassifier;
 class InlineInput;
 class ResizeWindow;
 class ShellInfo;
@@ -38,9 +41,13 @@ class TermBuffer;
 class TerminalBuffer;
 class Shell;
 
-class TermView : public BView {
+
+class TermView : public BView, private TermViewHighlighter {
 public:
 			class Listener;
+
+			typedef TermViewHighlighter Highlighter;
+			typedef TermViewHighlight Highlight;
 
 public:
 								TermView(BRect frame,
@@ -141,17 +148,29 @@ protected:
 									const char* property);
 
 private:
-			class CharClassifier;
+			class TextBufferSyncLocker;
+			friend class TextBufferSyncLocker;
 
 			class State;
 			class StandardBaseState;
 			class DefaultState;
 			class SelectState;
+			class HyperLinkState;
+			class HyperLinkMenuState;
 
 			friend class State;
 			friend class StandardBaseState;
 			friend class DefaultState;
 			friend class SelectState;
+			friend class HyperLinkState;
+			friend class HyperLinkMenuState;
+
+			typedef BObjectList<Highlight> HighlightList;
+
+private:
+			// TermViewHighlighter
+	virtual	rgb_color			ForegroundColor();
+	virtual	rgb_color			BackgroundColor();
 
 private:
 			// point and text offset conversion
@@ -174,8 +193,9 @@ private:
 			void				_SwitchCursorBlinking(bool blinkingOn);
 
 			void				_DrawLinePart(int32 x1, int32 y1, uint32 attr,
-									char* buffer, int32 width, bool mouse,
-									bool cursor, BView* inView);
+									char* buffer, int32 width,
+									Highlight* highlight, bool cursor,
+									BView* inView);
 			void				_DrawCursor();
 			void				_InvalidateTextRange(TermPos start,
 									TermPos end);
@@ -193,6 +213,7 @@ private:
 			void				_SynchronizeWithTextBuffer(
 									int32 visibleDirtyTop,
 									int32 visibleDirtyBottom);
+			void				_VisibleTextBufferChanged();
 
 			void				_WritePTY(const char* text, int32 numBytes);
 
@@ -209,8 +230,12 @@ private:
 			void				_SelectLine(BPoint where, bool extend,
 									bool useInitialSelection);
 
-			bool				_CheckSelectedRegion(const TermPos& pos) const;
-			bool				_CheckSelectedRegion(int32 row,
+			void				_AddHighlight(Highlight* highlight);
+			void				_RemoveHighlight(Highlight* highlight);
+			bool				_ClearHighlight(Highlight* highlight);
+
+			Highlight*			_CheckHighlightRegion(const TermPos& pos) const;
+			Highlight*			_CheckHighlightRegion(int32 row,
 									int32 firstColumn, int32& lastColumn) const;
 
 			void				_UpdateSIGWINCH();
@@ -237,7 +262,7 @@ private:
 			BMessageRunner*		fAutoScrollRunner;
 			BMessageRunner*		fResizeRunner;
 			BStringView*		fResizeView;
-			CharClassifier*		fCharClassifier;
+			DefaultCharClassifier* fCharClassifier;
 
 			// Font and Width
 			BFont				fHalfFont;
@@ -272,6 +297,7 @@ private:
 			// Object pointer.
 			TerminalBuffer*		fTextBuffer;
 			BasicTerminalBuffer* fVisibleTextBuffer;
+			bool				fVisibleTextBufferChanged;
 			BScrollBar*			fScrollBar;
 			InlineInput*		fInline;
 
@@ -297,14 +323,16 @@ private:
 			bool				fConsiderClockedSync;
 
 			// selection
-			TermPos				fSelStart;
-			TermPos				fSelEnd;
+			Highlight			fSelection;
 			TermPos				fInitialSelectionStart;
 			TermPos				fInitialSelectionEnd;
 			BPoint				fLastClickPoint;
 
+			HighlightList		fHighlights;
+
 			// mouse
 			int32				fMouseButtons;
+			int32				fModifiers;
 			TermPos				fPrevPos;
 			bool				fReportX10MouseEvent;
 			bool				fReportNormalMouseEvent;
@@ -315,6 +343,8 @@ private:
 			// states
 			DefaultState*		fDefaultState;
 			SelectState*		fSelectState;
+			HyperLinkState*		fHyperLinkState;
+			HyperLinkMenuState*	fHyperLinkMenuState;
 			State*				fActiveState;
 };
 

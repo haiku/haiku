@@ -16,15 +16,28 @@
 
 #include "TermViewStates.h"
 
+#include <stdio.h>
+#include <sys/stat.h>
+
+#include <Catalog.h>
+#include <Clipboard.h>
+#include <Cursor.h>
+#include <LayoutBuilder.h>
 #include <MessageRunner.h>
+#include <PopUpMenu.h>
 #include <ScrollBar.h>
 #include <UTF8.h>
 #include <Window.h>
 
 #include "Shell.h"
 #include "TermConst.h"
+#include "TerminalBuffer.h"
 #include "VTkeymap.h"
 #include "VTKeyTbl.h"
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Terminal TermView"
 
 
 // selection granularity
@@ -35,6 +48,13 @@ enum {
 };
 
 static const uint32 kAutoScroll = 'AScr';
+
+static const uint32 kMessageOpenLink = 'OLnk';
+static const uint32 kMessageCopyLink = 'CLnk';
+static const uint32 kMessageMenuClosed = 'MClo';
+
+
+static const char* const kKnownURLProtocols = "http:https:ftp:mailto";
 
 
 // #pragma mark - State
@@ -72,6 +92,12 @@ TermView::State::MessageReceived(BMessage* message)
 
 
 void
+TermView::State::ModifiersChanged(int32 oldModifiers, int32 modifiers)
+{
+}
+
+
+void
 TermView::State::KeyDown(const char* bytes, int32 numBytes)
 {
 }
@@ -85,13 +111,25 @@ TermView::State::MouseDown(BPoint where, int32 buttons, int32 modifiers)
 
 void
 TermView::State::MouseMoved(BPoint where, uint32 transit,
-	const BMessage* message)
+	const BMessage* message, int32 modifiers)
 {
 }
 
 
 void
 TermView::State::MouseUp(BPoint where, int32 buttons)
+{
+}
+
+
+void
+TermView::State::WindowActivated(bool active)
+{
+}
+
+
+void
+TermView::State::VisibleTextBufferChanged()
 {
 }
 
@@ -107,25 +145,22 @@ TermView::StandardBaseState::StandardBaseState(TermView* view)
 
 
 bool
-TermView::StandardBaseState::_StandardMouseMoved(BPoint where)
+TermView::StandardBaseState::_StandardMouseMoved(BPoint where, int32 modifiers)
 {
 	if (!fView->fReportAnyMouseEvent && !fView->fReportButtonMouseEvent)
 		return false;
-
-	int32 modifier;
-	fView->Window()->CurrentMessage()->FindInt32("modifiers", &modifier);
 
 	TermPos clickPos = fView->_ConvertToTerminal(where);
 
 	if (fView->fReportButtonMouseEvent) {
 		if (fView->fPrevPos.x != clickPos.x
 			|| fView->fPrevPos.y != clickPos.y) {
-			fView->_SendMouseEvent(fView->fMouseButtons, modifier,
+			fView->_SendMouseEvent(fView->fMouseButtons, modifiers,
 				clickPos.x, clickPos.y, true);
 		}
 		fView->fPrevPos = clickPos;
 	} else {
-		fView->_SendMouseEvent(fView->fMouseButtons, modifier, clickPos.x,
+		fView->_SendMouseEvent(fView->fMouseButtons, modifiers, clickPos.x,
 			clickPos.y, true);
 	}
 
@@ -140,6 +175,13 @@ TermView::DefaultState::DefaultState(TermView* view)
 	:
 	StandardBaseState(view)
 {
+}
+
+
+void
+TermView::DefaultState::ModifiersChanged(int32 oldModifiers, int32 modifiers)
+{
+	_CheckEnterHyperLinkState(modifiers);
 }
 
 
@@ -341,9 +383,32 @@ TermView::DefaultState::MouseDown(BPoint where, int32 buttons, int32 modifiers)
 
 void
 TermView::DefaultState::MouseMoved(BPoint where, uint32 transit,
-	const BMessage* message)
+	const BMessage* message, int32 modifiers)
 {
-	_StandardMouseMoved(where);
+	if (_CheckEnterHyperLinkState(modifiers))
+		return;
+
+	_StandardMouseMoved(where, modifiers);
+}
+
+
+void
+TermView::DefaultState::WindowActivated(bool active)
+{
+	if (active)
+		_CheckEnterHyperLinkState(fView->fModifiers);
+}
+
+
+bool
+TermView::DefaultState::_CheckEnterHyperLinkState(int32 modifiers)
+{
+	if ((modifiers & B_COMMAND_KEY) != 0 && fView->Window()->IsActive()) {
+		fView->_NextState(fView->fHyperLinkState);
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -368,7 +433,7 @@ TermView::SelectState::Prepare(BPoint where, int32 modifiers)
 
 	if (fView->_HasSelection()) {
 		TermPos inPos = fView->_ConvertToTerminal(where);
-		if (fView->_CheckSelectedRegion(inPos)) {
+		if (fView->fSelection.RangeContains(inPos)) {
 			if (modifiers & B_CONTROL_KEY) {
 				BPoint p;
 				uint32 bt;
@@ -448,9 +513,9 @@ TermView::SelectState::MessageReceived(BMessage* message)
 
 void
 TermView::SelectState::MouseMoved(BPoint where, uint32 transit,
-	const BMessage* message)
+	const BMessage* message, int32 modifiers)
 {
-	if (_StandardMouseMoved(where))
+	if (_StandardMouseMoved(where, modifiers))
 		return;
 
 	if (fCheckMouseTracking) {
@@ -561,3 +626,376 @@ TermView::SelectState::_AutoScrollUpdate()
 		}
 	}
 }
+
+
+// #pragma mark - HyperLinkState
+
+
+TermView::HyperLinkState::HyperLinkState(TermView* view)
+	:
+	State(view),
+	fURLCharClassifier(kURLAdditionalWordCharacters),
+	fPathComponentCharClassifier(
+		BString(kDefaultAdditionalWordCharacters).RemoveFirst("/")),
+	fHighlight(),
+	fHighlightActive(false)
+{
+	fHighlight.SetHighlighter(this);
+}
+
+
+void
+TermView::HyperLinkState::Entered()
+{
+	_UpdateHighlight();
+}
+
+
+void
+TermView::HyperLinkState::Exited()
+{
+	_DeactivateHighlight();
+}
+
+
+void
+TermView::HyperLinkState::ModifiersChanged(int32 oldModifiers, int32 modifiers)
+{
+	if ((modifiers & B_COMMAND_KEY) == 0)
+		fView->_NextState(fView->fDefaultState);
+	else
+		_UpdateHighlight();
+}
+
+
+void
+TermView::HyperLinkState::MouseDown(BPoint where, int32 buttons,
+	int32 modifiers)
+{
+	TermPos start;
+	TermPos end;
+	HyperLink link;
+	bool pathPrefixOnly = (modifiers & B_SHIFT_KEY) != 0;
+	if (!_GetHyperLinkAt(where, pathPrefixOnly, link, start, end))
+		return;
+
+	if ((buttons & B_PRIMARY_MOUSE_BUTTON) != 0) {
+		link.Open();
+	} else if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
+		fView->fHyperLinkMenuState->Prepare(where, link);
+		fView->_NextState(fView->fHyperLinkMenuState);
+	}
+}
+
+
+void
+TermView::HyperLinkState::MouseMoved(BPoint where, uint32 transit,
+	const BMessage* message, int32 modifiers)
+{
+	_UpdateHighlight(where, modifiers);
+}
+
+
+void
+TermView::HyperLinkState::WindowActivated(bool active)
+{
+	if (!active)
+		fView->_NextState(fView->fDefaultState);
+}
+
+
+void
+TermView::HyperLinkState::VisibleTextBufferChanged()
+{
+	_UpdateHighlight();
+}
+
+
+rgb_color
+TermView::HyperLinkState::ForegroundColor()
+{
+	return make_color(0, 0, 255);
+}
+
+
+rgb_color
+TermView::HyperLinkState::BackgroundColor()
+{
+	return fView->fTextBackColor;
+}
+
+
+uint32
+TermView::HyperLinkState::AdjustTextAttributes(uint32 attributes)
+{
+	return attributes | UNDERLINE;
+}
+
+
+bool
+TermView::HyperLinkState::_GetHyperLinkAt(BPoint where, bool pathPrefixOnly,
+	HyperLink& _link, TermPos& _start, TermPos& _end)
+{
+	TerminalBuffer* textBuffer = fView->fTextBuffer;
+	BAutolock textBufferLocker(textBuffer);
+
+	TermPos pos = fView->_ConvertToTerminal(where);
+
+	// try to get a URL first
+	BString text;
+	if (!textBuffer->FindWord(pos, &fURLCharClassifier, false, _start, _end))
+		return false;
+
+	text.Truncate(0);
+	textBuffer->GetStringFromRegion(text, _start, _end);
+	text.Trim();
+
+	// We're only happy, if it has a protocol part which we know.
+	int32 colonIndex = text.FindFirst(':');
+	if (colonIndex >= 0) {
+		BString protocol(text, colonIndex);
+		if (strstr(kKnownURLProtocols, protocol) != NULL) {
+			_link = HyperLink(text, HyperLink::TYPE_URL);
+			return true;
+		}
+	}
+
+	// no obvious URL -- try file name
+	if (!textBuffer->FindWord(pos, fView->fCharClassifier, false, _start, _end))
+		return false;
+
+	// In path-prefix-only mode we determine the end position anew by omitting
+	// the '/' in the allowed word chars.
+	if (pathPrefixOnly) {
+		TermPos componentStart;
+		TermPos componentEnd;
+		if (textBuffer->FindWord(pos, &fPathComponentCharClassifier, false,
+				componentStart, componentEnd)) {
+			_end = componentEnd;
+		} else {
+			// That means pos points to a '/'. We simply use the previous
+			// position.
+			_end = pos;
+			if (_start == _end) {
+				// Well, must be just "/". Advance to the next position.
+				if (!textBuffer->NextLinePos(_end, false))
+					return false;
+			}
+		}
+	}
+
+	text.Truncate(0);
+	textBuffer->GetStringFromRegion(text, _start, _end);
+	text.Trim();
+	if (text.IsEmpty())
+		return false;
+
+	// check, whether the file exists
+	struct stat st;
+	if (lstat(text, &st) == 0) {
+		_link = HyperLink(text, HyperLink::TYPE_PATH);
+		return true;
+	}
+
+	// As such this isn't an existing path. Try a few common alternative cases:
+	// * "<path>:"
+	// * "<path>:<line>"
+	// * "<path>:<line>:"
+	// * "<path>:<line>:<column>"
+	// * "<path>:<line>:<column>:"
+
+	if (text.Length() <= 1)
+		return false;
+
+	if (text[text.Length() - 1] == ':') {
+		text.Truncate(text.Length() - 1);
+		if (!textBuffer->PreviousLinePos(_end))
+			return false;
+
+		if (lstat(text, &st) == 0) {
+			_link = HyperLink(text, HyperLink::TYPE_PATH);
+			return true;
+		}
+	}
+
+	BString path = text;
+
+	for (int32 i = 0; i < 2; i++) {
+		int32 colonIndex = path.FindLast(':');
+		if (colonIndex <= 0 || colonIndex == path.Length() - 1)
+			return false;
+
+		char* numberEnd;
+		strtol(path.String() + colonIndex + 1, &numberEnd, 0);
+		if (*numberEnd != '\0')
+			return false;
+
+		path.Truncate(colonIndex);
+		if (lstat(path, &st) == 0) {
+			_link = HyperLink(text,
+				i == 0
+					? HyperLink::TYPE_PATH_WITH_LINE
+					: HyperLink::TYPE_PATH_WITH_LINE_AND_COLUMN,
+				path);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+void
+TermView::HyperLinkState::_UpdateHighlight()
+{
+	BPoint where;
+	uint32 buttons;
+	fView->GetMouse(&where, &buttons, false);
+	_UpdateHighlight(where, fView->fModifiers);
+}
+
+void
+TermView::HyperLinkState::_UpdateHighlight(BPoint where, int32 modifiers)
+{
+	TermPos start;
+	TermPos end;
+	HyperLink link;
+	bool pathPrefixOnly = (modifiers & B_SHIFT_KEY) != 0;
+	if (_GetHyperLinkAt(where, pathPrefixOnly, link, start, end))
+		_ActivateHighlight(start, end);
+	else
+		_DeactivateHighlight();
+}
+
+
+void
+TermView::HyperLinkState::_ActivateHighlight(const TermPos& start,
+	const TermPos& end)
+{
+	if (fHighlightActive) {
+		if (fHighlight.Start() == start && fHighlight.End() == end)
+			return;
+		_DeactivateHighlight();
+	}
+
+	fHighlight.SetRange(start, end);
+	fView->_AddHighlight(&fHighlight);
+	BCursor cursor(B_CURSOR_ID_FOLLOW_LINK);
+	fView->SetViewCursor(&cursor);
+	fHighlightActive = true;
+}
+
+
+void
+TermView::HyperLinkState::_DeactivateHighlight()
+{
+	if (fHighlightActive) {
+		fView->_RemoveHighlight(&fHighlight);
+		BCursor cursor(B_CURSOR_ID_SYSTEM_DEFAULT);
+		fView->SetViewCursor(&cursor);
+		fHighlightActive = false;
+	}
+}
+
+
+// #pragma mark - HyperLinkMenuState
+
+
+class TermView::HyperLinkMenuState::PopUpMenu : public BPopUpMenu {
+public:
+	PopUpMenu(const BMessenger& messageTarget)
+		:
+		BPopUpMenu("open hyperlink"),
+		fMessageTarget(messageTarget)
+	{
+		SetAsyncAutoDestruct(true);
+	}
+
+	~PopUpMenu()
+	{
+		fMessageTarget.SendMessage(kMessageMenuClosed);
+	}
+
+private:
+	BMessenger	fMessageTarget;
+};
+
+
+TermView::HyperLinkMenuState::HyperLinkMenuState(TermView* view)
+	:
+	State(view),
+	fLink()
+{
+}
+
+
+void
+TermView::HyperLinkMenuState::Prepare(BPoint point, const HyperLink& link)
+{
+	fLink = link;
+
+	// open context menu
+	PopUpMenu* menu = new PopUpMenu(fView);
+	BLayoutBuilder::Menu<> menuBuilder(menu);
+	switch (link.GetType()) {
+		case HyperLink::TYPE_URL:
+			menuBuilder
+				.AddItem(B_TRANSLATE("Open link"), kMessageOpenLink)
+				.AddItem(B_TRANSLATE("Copy link location"), kMessageCopyLink);
+			break;
+
+		case HyperLink::TYPE_PATH:
+		case HyperLink::TYPE_PATH_WITH_LINE:
+		case HyperLink::TYPE_PATH_WITH_LINE_AND_COLUMN:
+			menuBuilder
+				.AddItem(B_TRANSLATE("Open path"), kMessageOpenLink)
+				.AddItem(B_TRANSLATE("Copy path"), kMessageCopyLink);
+			break;
+	}
+	menu->SetTargetForItems(fView);
+	menu->Go(fView->ConvertToScreen(point), true, true, true);
+}
+
+
+void
+TermView::HyperLinkMenuState::Exited()
+{
+	fLink = HyperLink();
+}
+
+
+bool
+TermView::HyperLinkMenuState::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case kMessageOpenLink:
+			if (fLink.IsValid())
+				fLink.Open();
+			return true;
+
+		case kMessageCopyLink:
+			if (fLink.IsValid()) {
+				if (!be_clipboard->Lock())
+					return true;
+
+				be_clipboard->Clear();
+
+				if (BMessage *data = be_clipboard->Data()) {
+					data->AddData("text/plain", B_MIME_TYPE,
+						fLink.Address().String(),
+						fLink.Address().Length());
+					be_clipboard->Commit();
+				}
+
+				be_clipboard->Unlock();
+			}
+			return true;
+
+		case kMessageMenuClosed:
+			fView->_NextState(fView->fDefaultState);
+			return true;
+	}
+
+	return false;
+}
+

@@ -31,3 +31,7 @@ const char* const kTooTipSetWindowTitlePlaceholders = B_TRANSLATE(
 	"\t%p\t-\tThe name of the active process in the current tab.\n"
 	"\t%t\t-\tThe title of the current tab.\n"
 	"\t%%\t-\tThe character '%'.");
+
+const char* const kShellEscapeCharacters = " ~`#$&*()\\|[]{};'\"<>?!";
+const char* const kDefaultAdditionalWordCharacters = ":@-./_~";
+const char* const kURLAdditionalWordCharacters = ":/-._~[]?#@!$&'()*+,;=";
