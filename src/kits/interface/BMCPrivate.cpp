@@ -137,12 +137,10 @@ _BMCMenuBar_::AttachedToWindow()
 void
 _BMCMenuBar_::Draw(BRect updateRect)
 {
-	if (fFixedSize) {
-		float height;
-		GetPreferredSize(NULL, &height);
-		ResizeTo(fMenuField->_MenuBarWidth(), height);
-			// Set the width to the menu field width because the menubar
-			// bounds are expanded by the selected menu item.
+	if (fFixedSize || Bounds().Width() > fMenuField->_MenuBarWidth()) {
+		// Set the width of the menu bar because the menu bar bounds have
+		// been expanded by the selected menu item.
+		ResizeTo(fMenuField->_MenuBarWidth(), Bounds().Height());
 	}
 	BRect rect(Bounds());
 	rgb_color base = ui_color(B_MENU_BACKGROUND_COLOR);
@@ -193,15 +191,6 @@ _BMCMenuBar_::FrameResized(float width, float height)
 			dirty.left = dirty.right - 12;
 			Invalidate(dirty);
 		}
-	}
-
-	if (!fFixedSize && ResizingMode() == (B_FOLLOW_LEFT | B_FOLLOW_TOP)) {
-		// we have been shrinked or enlarged and need to take care
-		// of the size of the parent menu field as well
-		// NOTE: no worries about follow mode, we follow left and top
-		// in autosize mode
-		diff = Frame().right + 2 - fMenuField->Bounds().right;
-		fMenuField->ResizeBy(diff, 0.0);
 	}
 
 	BMenuBar::FrameResized(width, height);
