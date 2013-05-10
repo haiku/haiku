@@ -356,22 +356,19 @@ BMenuField::AllUnarchived(const BMessage* from)
 void
 BMenuField::Draw(BRect updateRect)
 {
-	BRect bounds(Bounds());
-	bool active = IsFocus() && Window()->IsActive();
+	DrawLabel(updateRect);
 
-	DrawLabel(bounds, updateRect);
-
-	BRect frame(fMenuBar->Frame());
-
-	frame.InsetBy(-kVMargin, -kVMargin);
+	BRect rect(fMenuBar->Frame());
+	rect.InsetBy(-kVMargin, -kVMargin);
 	rgb_color base = fMenuBar->LowColor();
 	rgb_color background = LowColor();
 	uint32 flags = 0;
 	if (!fMenuBar->IsEnabled())
 		flags |= BControlLook::B_DISABLED;
-	if (active)
+	if (IsFocus() && Window()->IsActive())
 		flags |= BControlLook::B_FOCUSED;
-	be_control_look->DrawMenuFieldFrame(this, frame, updateRect, base,
+
+	be_control_look->DrawMenuFieldFrame(this, rect, updateRect, base,
 		background, flags);
 }
 
@@ -981,7 +978,7 @@ BMenuField::InitObject2()
 
 
 void
-BMenuField::DrawLabel(BRect bounds, BRect updateRect)
+BMenuField::DrawLabel(BRect updateRect)
 {
 	CALLED();
 

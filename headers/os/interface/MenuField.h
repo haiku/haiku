@@ -123,7 +123,7 @@ private:
 
 			void				InitObject(const char* label);
 			void				InitObject2();
-			void				DrawLabel(BRect bounds, BRect updateRect);
+			void				DrawLabel(BRect updateRect);
 	static	void				InitMenu(BMenu* menu);
 
 			int32				_MenuTask();
