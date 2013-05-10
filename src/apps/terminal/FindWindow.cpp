@@ -98,8 +98,6 @@ FindWindow::FindWindow(BMessenger messenger, const BString& str,
 	fFindButton->MakeDefault(true);
 
 	AddShortcut((uint32)'W', B_COMMAND_KEY, new BMessage(MSG_FIND_HIDE));
-
-	Show();
 }
 
 
