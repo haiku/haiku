@@ -1,8 +1,11 @@
 /*
- * Copyright 2007-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2013 Haiku, Inc. All rights reserved.
  * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
  * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai.
  * All rights reserved. Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
  */
 
 #include "FindWindow.h"
@@ -26,11 +29,13 @@ const uint32 MSG_FIND_HIDE = 'Fhid';
 const uint32 TOGGLE_FIND_CONTROL = 'MTFG';
 const BRect kWindowFrame(10, 30, 250, 200);
 
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Terminal FindWindow"
 
+
 FindWindow::FindWindow(BMessenger messenger, const BString& str,
-		bool findSelection, bool matchWord, bool matchCase, bool forwardSearch)
+	bool findSelection, bool matchWord, bool matchCase, bool forwardSearch)
 	:
 	BWindow(kWindowFrame, B_TRANSLATE("Find"), B_FLOATING_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_CLOSE_ON_ESCAPE
@@ -39,7 +44,7 @@ FindWindow::FindWindow(BMessenger messenger, const BString& str,
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	BBox *separator = new BBox("separator");
+	BBox* separator = new BBox("separator");
 	separator->SetExplicitMinSize(BSize(250.0, B_SIZE_UNSET));
 	separator->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1.0));
 

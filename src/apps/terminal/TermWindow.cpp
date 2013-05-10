@@ -9,6 +9,7 @@
  * Authors:
  *		Kian Duffy, myob@users.sourceforge.net
  *		Daniel Furrer, assimil8or@users.sourceforge.net
+ *		John Scipione, jscipione@gmail.com
  *		Siarzhuk Zharski, zharik@gmx.li
  */
 
