@@ -760,7 +760,7 @@ TeamWindow::_Init()
 {
 	BScrollView* sourceScrollView;
 
-	BLayoutBuilder::Group<>(this, B_VERTICAL)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
 		.Add(fMenuBar = new BMenuBar("Menu"))
 		.AddSplit(B_VERTICAL, 3.0f)
 			.GetSplitView(&fFunctionSplitView)
