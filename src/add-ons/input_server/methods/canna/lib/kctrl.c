@@ -2039,7 +2039,7 @@ KC_changeServer(uiContext d, char *arg)
       return 0;
     }
   }
-  return (int)RkwGetServerName();
+  return (int)(addr_t)RkwGetServerName();
 }
 
 static int
@@ -2103,7 +2103,7 @@ KC_setUserInfo(uiContext d, jrUserInfoStruct *arg)
                     sprintf(buf, "%s/%s",
 			    uinfo->topdir ? uinfo->topdir : "", "default.can");
                   }
-                  wcKanjiControl((int)d, KC_SETINITFILENAME, buf);
+                  wcKanjiControl((int)(addr_t)d, KC_SETINITFILENAME, buf);
 		  RkwSetUserInfo(uinfo->uname, uinfo->gname, uinfo->topdir);
                   ret = 1;
 		  goto return_ret;
