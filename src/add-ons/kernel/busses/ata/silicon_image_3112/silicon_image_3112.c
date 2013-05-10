@@ -69,7 +69,7 @@ typedef struct controller_data {
 	uint32 int_num;
 
 	area_id mmio_area;
-	uint32 mmio_addr;
+	addr_t mmio_addr;
 
 	uint32 lost;			// != 0 if device got removed, i.e. if it must not
 							// be accessed anymore
@@ -251,7 +251,7 @@ controller_init(device_node *node, void **_controllerCookie)
 	pci_device *device;
 	uint32 asicIndex;
 	uint32 mmioBase;
-	uint32 mmioAddr;
+	addr_t mmioAddr;
 	area_id mmioArea;
 	uint32 interruptNumber;
 	status_t res;
@@ -286,10 +286,10 @@ controller_init(device_node *node, void **_controllerCookie)
 	sDeviceManager->get_driver(parent, (driver_module_info **)&pci, (void **)&device);
 	sDeviceManager->put_node(parent);
 
-	TRACE("asic index %ld\n", asicIndex);
+	TRACE("asic index %" B_PRId32 "\n", asicIndex);
 	TRACE("asic name %s\n", kASICData[asicIndex].asic_name);
-	TRACE("int num %ld\n", interruptNumber);
-	TRACE("mmio addr %p\n", (void *)mmioAddr);
+	TRACE("int num %" B_PRId32 "\n", interruptNumber);
+	TRACE("mmio addr %" B_PRIxADDR"\n", mmioAddr);
 
 	controller->pci = pci;
 	controller->device = device;
@@ -437,7 +437,7 @@ channel_init(device_node *node, void **_channelCookie)
 	}
 #endif
 
-	TRACE("channel_index %ld\n", channelIndex);
+	TRACE("channel_index %" B_PRId32 "\n", channelIndex);
 	TRACE("channel name: %s\n", kControllerChannelData[channelIndex].name);
 
 	TRACE("channel %p\n", channel);
@@ -685,19 +685,19 @@ dma_prepare(void *channelCookie, const physical_entry *sg_list,
 
 	for (i = sg_list_count - 1, prd = channel->prdt; i >= 0;
 			--i, ++prd, ++sg_list ) {
-		prd->address = B_HOST_TO_LENDIAN_INT32((uint32)pci->ram_address(device,
+		prd->address = B_HOST_TO_LENDIAN_INT32((uint32)(addr_t)pci->ram_address(device,
 			(void*)(addr_t)sg_list->address));
 
 		// 0 means 64K - this is done automatically by discarding upper 16 bits
 		prd->count = B_HOST_TO_LENDIAN_INT16((uint16)sg_list->size);
 		prd->EOT = i == 0;
 
-		FLOW("%x, %x, %d\n", (int)prd->address, prd->count, prd->EOT);
+		FLOW("%" B_PRIx32", %" B_PRId16", %" B_PRId8"\n", prd->address, prd->count, prd->EOT);
 	}
 
 	// XXX move this to chan init?
 	temp = (*channel->bm_prdt_address) & 3;
-	temp |= B_HOST_TO_LENDIAN_INT32((uint32)pci->ram_address(device,
+	temp |= B_HOST_TO_LENDIAN_INT32((uint32)(addr_t)pci->ram_address(device,
 		(void *)(addr_t)channel->prdt_phys)) & ~3;
 	*channel->bm_prdt_address = temp;
 
