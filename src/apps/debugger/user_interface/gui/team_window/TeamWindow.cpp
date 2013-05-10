@@ -841,10 +841,10 @@ TeamWindow::_Init()
 		fSourcePathView->AddFilter(filter);
 
 	// add menus and menu items
-	BMenu* menu = new BMenu("File");
+	BMenu* menu = new BMenu("Team");
 	fMenuBar->AddItem(menu);
-	BMenuItem* item = new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED),
-		'Q');
+	BMenuItem* item = new BMenuItem("Close", new BMessage(B_QUIT_REQUESTED),
+		'W');
 	menu->AddItem(item);
 	item->SetTarget(this);
 	menu = new BMenu("Edit");
