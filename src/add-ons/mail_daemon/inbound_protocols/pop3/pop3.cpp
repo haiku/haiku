@@ -494,8 +494,9 @@ POP3Protocol::Stat()
 	if (SendCommand("STAT" CRLF) < B_OK)
 		return B_ERROR;
 
-	int32 messages,dropSize;
-	if (sscanf(fLog.String(), "+OK %ld %ld", &messages, &dropSize) < 2)
+	int32 messages, dropSize;
+	if (sscanf(fLog.String(), "+OK %" B_SCNd32" %" B_SCNd32, &messages,
+		&dropSize) < 2)
 		return B_ERROR;
 
 	fNumMessages = messages;
@@ -591,11 +592,11 @@ POP3Protocol::Retrieve(int32 message, BPositionIO *write_to)
 		int32 message_len = MessageSize(message);
  		write_to->Seek (0, SEEK_END);
 		if (write_to->Position() != message_len) {
-			printf ("POP3Protocol::Retrieve Note: message size is %d, was "
-			"expecting %ld, for message #%ld.  Could be a transmission error "
-			"or a bad POP server implementation (does it remove escape codes "
-			"when it counts size?).\n",
-			(int) write_to->Position(), message_len, message);
+			printf ("POP3Protocol::Retrieve Note: message size is %" B_PRIdOFF
+				", was expecting %" B_PRId32 ", for message #%" B_PRId32 ".  "
+				"Could be a transmission error or a bad POP server "
+				"implementation (does it remove escape codes when it counts "
+				"size?).\n", write_to->Position(), message_len, message);
 		}
 	}
 
@@ -916,7 +917,7 @@ POP3Protocol::_UniqueIDs()
 			b = atol(&(result.String()[b]));
 		else
 			b = 0;
-		fSizes.AddItem((void *)(b));
+		fSizes.AddItem((void *)(addr_t)b);
 	}
 
 	return ret;

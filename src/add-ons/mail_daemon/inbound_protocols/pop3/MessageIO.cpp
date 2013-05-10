@@ -102,7 +102,7 @@ BMailMessageIO::ReadAt(off_t pos, void* buffer, size_t amountToRead)
 
 	// Put the file position back at where it was, if possible.  That's because
 	// ReadAt isn't supposed to affect the file position.
-	if (oldPosition < fSize)
+	if (oldPosition < (off_t)fSize)
 		fSlave->Seek (oldPosition, SEEK_SET);
 	else
 		fSlave->Seek (0, SEEK_END);
