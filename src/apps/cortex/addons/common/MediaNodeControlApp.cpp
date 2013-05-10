@@ -82,7 +82,7 @@ MediaNodeControlApp::MediaNodeControlApp(
 	if(err < B_OK) {
 		char buffer[512];
 		sprintf(buffer,
-			"MediaNodeControlApp: couldn't find node (%ld):\n%s\n",
+			"MediaNodeControlApp: couldn't find node (%" B_PRId32 "):\n%s\n",
 			nodeID, strerror(err));
 		BAlert* alert = new BAlert("error", buffer, "OK");
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
@@ -96,8 +96,8 @@ MediaNodeControlApp::MediaNodeControlApp(
 	if(err < B_OK) {
 		char buffer[512];
 		sprintf(buffer,
-			"MediaNodeControlApp: couldn't get node info (%ld):\n%s\n",
-			nodeID, strerror(err));
+			"MediaNodeControlApp: couldn't get node info (%" B_PRId32
+			"):\n%s\n", nodeID, strerror(err));
 		BAlert* alert = new BAlert("error", buffer, "OK");
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
@@ -113,8 +113,8 @@ MediaNodeControlApp::MediaNodeControlApp(
 	if(err < B_OK) {
 		char buffer[512];
 		sprintf(buffer,
-			"MediaNodeControlApp: no parameters for node (%ld):\n%s\n",
-			nodeID, strerror(err));
+			"MediaNodeControlApp: no parameters for node (%" B_PRId32
+			"):\n%s\n", nodeID, strerror(err));
 		BAlert* alert = new BAlert("error", buffer, "OK");
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();

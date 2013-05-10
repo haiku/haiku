@@ -295,7 +295,7 @@ uint32 AudioBuffer::findMin(uint32 fromFrame, uint32 frameCount,
 	if(pAt) {
 		// reset pAt
 		for(n = 0; n < channels; n++)
-			pAt[n] = ULONG_MAX;
+			pAt[n] = UINT32_MAX;
 	}
 	
 	// find minimum for each channel
@@ -348,7 +348,7 @@ uint32 AudioBuffer::findMax(uint32 fromFrame, uint32 frameCount,
 	if(pAt) {
 		// reset pAt
 		for(n = 0; n < channels; n++)
-			pAt[n] = ULONG_MAX;
+			pAt[n] = UINT32_MAX;
 	}
 	
 	// find minimum for each channel
@@ -400,7 +400,7 @@ uint32 AudioBuffer::findPeaks(uint32 fromFrame, uint32 frameCount,
 	if(pAt) {
 		// reset pAt
 		for(n = 0; n < channels; n++)
-			pAt[n] = ULONG_MAX;
+			pAt[n] = UINT32_MAX;
 	}
 
 	// find peaks in both directions
