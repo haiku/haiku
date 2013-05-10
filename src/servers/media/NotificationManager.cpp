@@ -257,7 +257,7 @@ NotificationManager::CleanupTeam(team_id team)
 
 	if (debugCount != 0) {
 		ERROR("NotificationManager::CleanupTeam: removed  %d notifications for "
-			"team %ld\n", debugCount, team);
+			"team %" B_PRId32 "\n", debugCount, team);
 	}
 }
 
@@ -302,9 +302,9 @@ NotificationManager::Dump()
 	printf("NotificationManager: list of subscribers follows:\n");
 	Notification *n;	
 	for (fNotificationList.Rewind(); fNotificationList.GetNext(&n); ) {
-		printf(" team %ld, what %#08lx, node-id %ld, node-port %ld, messenger "
-			"%svalid\n", n->team, n->what, n->node.node, n->node.port,
-			n->messenger.IsValid() ? "" : "NOT ");
+		printf(" team %" B_PRId32 ", what %#08" B_PRIx32 ", node-id %" B_PRId32
+			", node-port %" B_PRId32 ", messenger %svalid\n", n->team, n->what,
+			 n->node.node, n->node.port, n->messenger.IsValid() ? "" : "NOT ");
 	}
 	printf("NotificationManager: list end\n");
 }

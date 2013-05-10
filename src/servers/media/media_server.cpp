@@ -275,7 +275,7 @@ ServerApp::_QuitAddOnServer()
 void
 ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 {
-	TRACE("ServerApp::HandleMessage %#lx enter\n", code);
+	TRACE("ServerApp::HandleMessage %#" B_PRIx32 " enter\n", code);
 	switch (code) {
 		case SERVER_CHANGE_FLAVOR_INSTANCES_COUNT:
 		{
@@ -493,7 +493,7 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 					B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, request.area);
 				if (clone < B_OK) {
 					ERROR("SERVER_PUBLISH_INPUTS: failed to clone area, "
-						"error %#lx\n", clone);
+						"error %#" B_PRIx32 "\n", clone);
 					status = clone;
 				} else {
 					status = gNodeManager->PublishInputs(request.node, inputs,
@@ -522,7 +522,7 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 					B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, request.area);
 				if (clone < B_OK) {
 					ERROR("SERVER_PUBLISH_OUTPUTS: failed to clone area, "
-						"error %#lx\n", clone);
+						"error %#" B_PRIx32 "\n", clone);
 					status = clone;
 				} else {
 					status = gNodeManager->PublishOutputs(request.node, outputs,
@@ -961,10 +961,10 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 		}
 
 		default:
-			printf("media_server: received unknown message code %#08lx\n",
-				code);
+			printf("media_server: received unknown message code %#08" B_PRIx32
+				"\n", code);
 	}
-	TRACE("ServerApp::HandleMessage %#lx leave\n", code);
+	TRACE("ServerApp::HandleMessage %#" B_PRIx32 " leave\n", code);
 }
 
 

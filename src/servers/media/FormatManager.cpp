@@ -173,8 +173,8 @@ FormatManager::GetFormats(BMessage& message)
 	reply.AddInt64("timestamp", system_time());
 
 	int32 count = fList.CountItems();
-	printf("FormatManager::GetFormats(): put %ld formats into message\n",
-		count);
+	printf("FormatManager::GetFormats(): put %" B_PRId32 " formats into "
+		"message\n", count);
 	for (int32 i = 0; i < count; i++) {
 		meta_format* format = fList.ItemAt(i);
 		reply.AddData("formats", MEDIA_META_FORMAT_TYPE, format,
@@ -289,7 +289,7 @@ FormatManager::RemoveFormat(const media_format& format)
 		if (metaFormat->format == format) {
 			if (foundIndex != -1) {
 				printf("FormatManager::RemoveFormat() - format already "
-					"present at previous index: %ld\n", foundIndex);
+					"present at previous index: %" B_PRId32 "\n", foundIndex);
 			}
 			foundIndex = i;
 		}
