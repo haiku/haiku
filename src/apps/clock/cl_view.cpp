@@ -333,7 +333,7 @@ void
 TOnscreenView::MouseDown( BPoint point )
 {
 	BPoint	cursor;
-	ulong	buttons;
+	uint32	buttons;
 	BRect	bounds = Bounds();
 	
 	GetMouse(&cursor,&buttons);
