@@ -205,9 +205,10 @@ BreakpointsView::WatchpointSelectionChanged(Watchpoint* watchpoint)
 void
 BreakpointsView::_Init()
 {
-	BLayoutBuilder::Group<>(this)
+	BLayoutBuilder::Group<>(this, B_HORIZONTAL, 0.0f)
 		.Add(fListView = BreakpointListView::Create(fTeam, this))
-		.AddGroup(B_VERTICAL, 4.0f)
+		.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
+			.SetInsets(B_USE_SMALL_SPACING)
 			.Add(fToggleBreakpointButton = new BButton("Toggle"))
 			.Add(fRemoveBreakpointButton = new BButton("Remove"))
 			.AddGlue()

@@ -760,13 +760,15 @@ TeamWindow::_Init()
 {
 	BScrollView* sourceScrollView;
 
+	const float splitSpacing = 3.0f;
+
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
 		.Add(fMenuBar = new BMenuBar("Menu"))
-		.AddSplit(B_VERTICAL, 3.0f)
+		.AddSplit(B_VERTICAL, splitSpacing)
 			.GetSplitView(&fFunctionSplitView)
 			.SetInsets(B_USE_SMALL_INSETS)
 			.Add(fTabView = new BTabView("tab view"), 0.4f)
-			.AddSplit(B_HORIZONTAL, 3.0f)
+			.AddSplit(B_HORIZONTAL, splitSpacing)
 				.GetSplitView(&fSourceSplitView)
 				.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
 					.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
@@ -780,7 +782,7 @@ TeamWindow::_Init()
 						"source path",
 						"Source path unavailable."), 4.0f)
 					.Add(sourceScrollView = new BScrollView("source scroll",
-						NULL, 0, true, true), 3.0f)
+						NULL, 0, true, true), splitSpacing)
 				.End()
 				.Add(fLocalsTabView = new BTabView("locals view"))
 			.End()
@@ -790,7 +792,7 @@ TeamWindow::_Init()
 	sourceScrollView->SetTarget(fSourceView = SourceView::Create(fTeam, this));
 
 	// add threads tab
-	BSplitView* threadGroup = new BSplitView(B_HORIZONTAL);
+	BSplitView* threadGroup = new BSplitView(B_HORIZONTAL, splitSpacing);
 	threadGroup->SetName("Threads");
 	fTabView->AddTab(threadGroup);
 	BLayoutBuilder::Split<>(threadGroup)
@@ -799,7 +801,7 @@ TeamWindow::_Init()
 		.Add(fStackTraceView = StackTraceView::Create(this));
 
 	// add images tab
-	BSplitView* imagesGroup = new BSplitView(B_HORIZONTAL);
+	BSplitView* imagesGroup = new BSplitView(B_HORIZONTAL, splitSpacing);
 	imagesGroup->SetName("Images");
 	fTabView->AddTab(imagesGroup);
 	BLayoutBuilder::Split<>(imagesGroup)
@@ -813,7 +815,7 @@ TeamWindow::_Init()
 	breakpointsGroup->SetName("Breakpoints");
 	fTabView->AddTab(breakpointsGroup);
 	BLayoutBuilder::Group<>(breakpointsGroup)
-		.SetInsets(B_USE_SMALL_INSETS)
+//		.SetInsets(0.0f)
 		.Add(fBreakpointsView = BreakpointsView::Create(fTeam, this));
 
 	// add local variables tab
