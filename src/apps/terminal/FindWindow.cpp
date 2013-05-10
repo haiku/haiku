@@ -21,6 +21,7 @@
 #include <GroupLayoutBuilder.h>
 #include <Locale.h>
 #include <RadioButton.h>
+#include <SpaceLayoutItem.h>
 #include <String.h>
 #include <TextControl.h>
 
@@ -50,20 +51,25 @@ FindWindow::FindWindow(BMessenger messenger, const BString& str,
 
 	BRadioButton* useSelection = NULL;
 	const float spacing = be_control_look->DefaultItemSpacing();
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 5.0)
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, B_USE_SMALL_SPACING)
 		.SetInsets(spacing, spacing, spacing, spacing)
-		.Add(BGridLayoutBuilder()
+		.Add(BGridLayoutBuilder(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
 			.Add(fTextRadio = new BRadioButton(B_TRANSLATE("Use text:"),
 				new BMessage(TOGGLE_FIND_CONTROL)), 0, 0)
 			.Add(fFindLabel = new BTextControl(NULL, NULL, NULL), 1, 0)
 			.Add(useSelection = new BRadioButton(B_TRANSLATE("Use selection"),
 				new BMessage(TOGGLE_FIND_CONTROL)), 0, 1))
+		.Add(BSpaceLayoutItem::CreateVerticalStrut(spacing / 4))
 		.Add(separator)
+		.Add(BSpaceLayoutItem::CreateVerticalStrut(spacing / 4))
 		.Add(fForwardSearchBox = new BCheckBox(B_TRANSLATE("Search forward")))
 		.Add(fMatchCaseBox = new BCheckBox(B_TRANSLATE("Match case")))
 		.Add(fMatchWordBox = new BCheckBox(B_TRANSLATE("Match word")))
-		.Add(fFindButton = new BButton(B_TRANSLATE("Find"),
+		.AddGroup(B_HORIZONTAL)
+			.AddGlue()
+			.Add(fFindButton = new BButton(B_TRANSLATE("Find"),
 				new BMessage(MSG_FIND)))
+			.End()
 		.TopView());
 
 	fFindLabel->SetDivider(0.0);
