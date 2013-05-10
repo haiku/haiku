@@ -956,7 +956,7 @@ BMenuField::InitObject(const char* label)
 	SetLabel(label);
 
 	if (label)
-		fDivider = (float)floor(Frame().Width() / 2.0f);
+		fDivider = floorf(Frame().Width() / 2.0f);
 	else
 		fDivider = 0;
 }
