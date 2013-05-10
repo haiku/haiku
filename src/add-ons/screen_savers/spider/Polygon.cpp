@@ -39,7 +39,7 @@ Polygon::Polygon(BRect bounds, BList points)
 // destructor
 Polygon::~Polygon()
 {
-	while (point_vector* pv = (point_vector*)fPoints.RemoveItem(0L))
+	while (point_vector* pv = (point_vector*)fPoints.RemoveItem((int32)0))
 		delete pv;
 }
 
