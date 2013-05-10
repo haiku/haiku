@@ -77,7 +77,9 @@ BUrl::OpenWithPreferredApplication(bool onProblemAskUser) const
 		// TODO: BAlert
 		//	if (onProblemAskUser)
 		//		BAlert ... Too long URL!
+#if DEBUG
 		fprintf(stderr, "URL too long");
+#endif
 		return B_NAME_TOO_LONG;
 	}
 	
@@ -96,7 +98,9 @@ BUrl::OpenWithPreferredApplication(bool onProblemAskUser) const
 
 	status = be_roster->Launch(_UrlMimeType().String(), 1, argv+1);
 	if (status != B_OK) {
+#if DEBUG
 		fprintf(stderr, "Opening URL failed: %s\n", strerror(status));
+#endif
 	}
 
 	return status;
