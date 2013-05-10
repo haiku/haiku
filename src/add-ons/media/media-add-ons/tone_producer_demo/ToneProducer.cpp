@@ -662,7 +662,8 @@ ToneProducer::Stop(bigtime_t performance_time, bool immediate)
 {
 	// send 'data not available' message
 	if(mOutput.destination != media_destination::null) {
-		printf("ToneProducer: B_PRODUCER_STOPPED at %Ld\n", performance_time);
+		printf("ToneProducer: B_PRODUCER_STOPPED at %" B_PRIdBIGTIME "\n",
+			performance_time);
 		SendDataStatus(B_PRODUCER_STOPPED, mOutput.destination, performance_time);
 	}
 
