@@ -85,7 +85,7 @@ RuleFilterConfig::RuleFilterConfig(const BMessage *settings)
 		chain = settings->FindInt32("argument");
 	else
 		chain = -1;
-	printf("Chain: %ld\n",chain);
+	printf("Chain: %" B_PRId32 "\n",chain);
 
 	BMailAccounts accounts;
 	for (int32 i = 0; i < accounts.CountAccounts(); i++) {
