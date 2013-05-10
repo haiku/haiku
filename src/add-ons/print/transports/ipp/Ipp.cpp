@@ -93,7 +93,8 @@ IPPPrinterRoster::Listen()
 		packet[len] = '\0';
 
 		// Verify packet format
-		if (sscanf(packet, "%lx%lx%1023s", &type, &state, uri) == 3) {
+		if (sscanf(packet, "%" B_SCNx32 "%" B_SCNx32 "%1023s", &type, &state,
+			uri) == 3) {
 			IPPPrinter *printer = fPrinters.Get(uri);
 			if (!printer) {
 				printer = new IPPPrinter(uri, type);
