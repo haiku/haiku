@@ -6,6 +6,18 @@ UsePrivateKernelHeaders ;
 UsePrivateHeaders package shared storage ;
 
 
+local subDirs = 
+	indices
+	nodes
+	package
+	package_links
+	resolvables
+	util
+	volume
+;
+SEARCH_SOURCE += $(subDirs:D=$(SUBDIR)) ;
+
+
 HAIKU_PACKAGE_FS_SOURCES =
 	AttributeCookie.cpp
 	AttributeDirectoryCookie.cpp
