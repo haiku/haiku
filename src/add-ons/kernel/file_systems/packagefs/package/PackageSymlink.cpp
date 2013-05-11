@@ -13,29 +13,24 @@
 PackageSymlink::PackageSymlink(Package* package, mode_t mode)
 	:
 	PackageLeafNode(package, mode),
-	fSymlinkPath(NULL)
+	fSymlinkPath()
 {
 }
 
 
 PackageSymlink::~PackageSymlink()
 {
-	free(fSymlinkPath);
 }
 
 
-status_t
-PackageSymlink::SetSymlinkPath(const char* path)
+void
+PackageSymlink::SetSymlinkPath(const String& path)
 {
-	if (path == NULL)
-		return B_OK;
-
-	fSymlinkPath = strdup(path);
-	return fSymlinkPath != NULL ? B_OK : B_NO_MEMORY;
+	fSymlinkPath = path;
 }
 
 
-const char*
+String
 PackageSymlink::SymlinkPath() const
 {
 	return fSymlinkPath;

@@ -14,6 +14,7 @@
 
 #include "IndexedAttributeOwner.h"
 #include "PackageNodeAttribute.h"
+#include "StringKey.h"
 
 
 class AttributeIndexer;
@@ -34,10 +35,10 @@ public:
 									// must otherwise make sure the package
 									// still exists.
 			PackageDirectory*	Parent() const		{ return fParent; }
-			const char*			Name() const		{ return fName; }
+			const String&		Name() const		{ return fName; }
 
 	virtual	status_t			Init(PackageDirectory* parent,
-									const char* name);
+									const String& name);
 
 	virtual	status_t			VFSInit(dev_t deviceID, ino_t nodeID);
 	virtual	void				VFSUninit();
@@ -65,11 +66,12 @@ public:
 			const PackageNodeAttributeList& Attributes() const
 									{ return fAttributes; }
 
-			PackageNodeAttribute* FindAttribute(const char* name) const;
+			PackageNodeAttribute* FindAttribute(const StringKey& name) const;
 
 	virtual	void				UnsetIndexCookie(void* attributeCookie);
 
-	inline	void*				IndexCookieForAttribute(const char* name) const;
+	inline	void*				IndexCookieForAttribute(const StringKey& name)
+									const;
 
 protected:
 			void				NonVirtualVFSUninit()
@@ -80,7 +82,7 @@ protected:
 protected:
 			Package*			fPackage;
 			PackageDirectory*	fParent;
-			char*				fName;
+			String				fName;
 			mode_t				fMode;
 			uid_t				fUserID;
 			gid_t				fGroupID;
@@ -90,7 +92,7 @@ protected:
 
 
 void*
-PackageNode::IndexCookieForAttribute(const char* name) const
+PackageNode::IndexCookieForAttribute(const StringKey& name) const
 {
 	PackageNodeAttribute* attribute = FindAttribute(name);
 	return attribute != NULL ? attribute->IndexCookie() : NULL;

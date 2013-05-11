@@ -16,11 +16,7 @@
 #include "AttributeCookie.h"
 #include "DebugSupport.h"
 #include "Package.h"
-
-
-static const char* const kAttributeNames[AUTO_PACKAGE_ATTRIBUTE_ENUM_COUNT] = {
-	"SYS:PACKAGE"
-};
+#include "StringConstants.h"
 
 
 class AutoPackageAttributeCookie : public AttributeCookie {
@@ -81,11 +77,11 @@ private:
 
 
 /*static*/ bool
-AutoPackageAttributes::AttributeForName(const char* name,
+AutoPackageAttributes::AttributeForName(const StringKey& name,
 	AutoPackageAttribute& _attribute)
 {
 	for (int i = 0; i < AUTO_PACKAGE_ATTRIBUTE_ENUM_COUNT; i++) {
-		if (strcmp(name, kAttributeNames[i]) == 0) {
+		if (name == StringConstants::Get().kAutoPackageAttributeNames[i]) {
 			_attribute = (AutoPackageAttribute)i;
 			return true;
 		}
@@ -95,12 +91,11 @@ AutoPackageAttributes::AttributeForName(const char* name,
 }
 
 
-/*static*/ const char*
+/*static*/ const String&
 AutoPackageAttributes::NameForAttribute(AutoPackageAttribute attribute)
 {
-	if (attribute >= 0 && attribute < AUTO_PACKAGE_ATTRIBUTE_ENUM_COUNT)
-		return kAttributeNames[attribute];
-	return NULL;
+	ASSERT(attribute >= 0 && attribute < AUTO_PACKAGE_ATTRIBUTE_ENUM_COUNT);
+	return StringConstants::Get().kAutoPackageAttributeNames[attribute];
 }
 
 
@@ -124,7 +119,7 @@ AutoPackageAttributes::GetAttributeValue(const Package* package,
 
 
 /*static*/ status_t
-AutoPackageAttributes::OpenCookie(Package* package, const char* name,
+AutoPackageAttributes::OpenCookie(Package* package, const StringKey& name,
 	int openMode, AttributeCookie*& _cookie)
 {
 	if (package == NULL)

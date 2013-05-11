@@ -31,9 +31,9 @@ Directory::~Directory()
 
 
 status_t
-Directory::Init(Directory* parent, const char* name, uint32 flags)
+Directory::Init(Directory* parent, const String& name)
 {
-	status_t error = Node::Init(parent, name, flags);
+	status_t error = Node::Init(parent, name);
 	if (error != B_OK)
 		return error;
 
@@ -104,7 +104,7 @@ Directory::RemoveChild(Node* node)
 
 
 Node*
-Directory::FindChild(const char* name)
+Directory::FindChild(const StringKey& name)
 {
 	return fChildTable.Lookup(name);
 }

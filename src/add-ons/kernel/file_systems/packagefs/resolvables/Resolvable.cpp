@@ -15,7 +15,7 @@ Resolvable::Resolvable(::Package* package)
 	:
 	fPackage(package),
 	fFamily(NULL),
-	fName(NULL),
+	fName(),
 	fVersion(NULL),
 	fCompatibleVersion(NULL)
 {
@@ -24,7 +24,6 @@ Resolvable::Resolvable(::Package* package)
 
 Resolvable::~Resolvable()
 {
-	free(fName);
 	delete fVersion;
 	delete fCompatibleVersion;
 }
@@ -37,8 +36,7 @@ Resolvable::Init(const char* name, ::Version* version,
 	fVersion = version;
 	fCompatibleVersion = compatibleVersion;
 
-	fName = strdup(name);
-	if (fName == NULL)
+	if (!fName.SetTo(name))
 		return B_NO_MEMORY;
 
 	return B_OK;

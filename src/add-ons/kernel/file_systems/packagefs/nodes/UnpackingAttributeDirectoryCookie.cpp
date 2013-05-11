@@ -75,12 +75,10 @@ UnpackingAttributeDirectoryCookie::Read(dev_t volumeID, ino_t nodeID,
 		}
 
 		// get the attribute name
-		const char* name;
-		if (fState < AUTO_PACKAGE_ATTRIBUTE_ENUM_COUNT) {
-			name = AutoPackageAttributes::NameForAttribute(
-				(AutoPackageAttribute)fState);
-		} else
-			name = fAttribute->Name();
+		const String& name = fState < AUTO_PACKAGE_ATTRIBUTE_ENUM_COUNT
+			? AutoPackageAttributes::NameForAttribute(
+				(AutoPackageAttribute)fState)
+			: fAttribute->Name();
 
 		// fill in the entry name -- checks whether the entry fits into the
 		// buffer

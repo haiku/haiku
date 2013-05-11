@@ -18,7 +18,7 @@
 Index::Index()
 	:
 	fVolume(NULL),
-	fName(NULL),
+	fName(),
 	fType(0),
 	fKeyLength(0),
 	fFixedKeyLength(true)
@@ -28,7 +28,6 @@ Index::Index()
 
 Index::~Index()
 {
-	free(fName);
 }
 
 
@@ -36,8 +35,7 @@ status_t
 Index::Init(Volume* volume, const char* name, uint32 type, bool fixedKeyLength,
 	size_t keyLength)
 {
-	fName = strdup(name);
-	if (fName == NULL)
+	if (!fName.SetTo(name))
 		return B_NO_MEMORY;
 
 	fVolume = volume;

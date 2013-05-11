@@ -8,6 +8,8 @@
 
 #include <SupportDefs.h>
 
+#include "String.h"
+
 
 class AttributeIndex;
 class AttributeIndexTreeValue;
@@ -28,12 +30,12 @@ public:
 			AttributeIndexTreeValue* Cookie() const
 									{ return fCookie; }
 
-			const char*			IndexName() const
+			const String&		IndexName() const
 									{ return fIndexName; }
 
 private:
 			AttributeIndex*		fIndex;
-			const char*			fIndexName;
+			const String&		fIndexName;
 			uint32				fIndexType;
 			AttributeIndexTreeValue* fCookie;
 };

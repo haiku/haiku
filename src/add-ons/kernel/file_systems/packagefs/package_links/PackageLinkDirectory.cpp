@@ -14,13 +14,10 @@
 
 #include "DebugSupport.h"
 #include "PackageLinksListener.h"
+#include "StringConstants.h"
 #include "Utils.h"
 #include "Version.h"
 #include "Volume.h"
-
-
-static const char* const kSelfLinkName = ".self";
-static const char* const kSettingsLinkName = ".settings";
 
 
 PackageLinkDirectory::PackageLinkDirectory()
@@ -63,6 +60,7 @@ PackageLinkDirectory::Init(Directory* parent, Package* package)
 	char* name = (char*)malloc(size);
 	if (name == NULL)
 		return B_NO_MEMORY;
+	MemoryDeleter nameDeleter(name);
 
 	memcpy(name, package->Name(), nameLength + 1);
 	if (version != NULL) {
@@ -70,8 +68,12 @@ PackageLinkDirectory::Init(Directory* parent, Package* package)
 		version->ToString(name + nameLength + 1, size - nameLength - 1);
 	}
 
+	String nameString;
+	if (!nameString.SetTo(name))
+		return B_NO_MEMORY;
+
 	// init the directory/node
-	status_t error = Init(parent, name, NODE_FLAG_KEEP_NAME);
+	status_t error = Init(parent, nameString);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
@@ -83,9 +85,9 @@ PackageLinkDirectory::Init(Directory* parent, Package* package)
 
 
 status_t
-PackageLinkDirectory::Init(Directory* parent, const char* name, uint32 flags)
+PackageLinkDirectory::Init(Directory* parent, const String& name)
 {
-	return Directory::Init(parent, name, flags);
+	return Directory::Init(parent, name);
 }
 
 
@@ -176,12 +178,13 @@ PackageLinkDirectory::_Update(PackageLinksListener* listener)
 
 	// create/update self and settings link
 	status_t error = _CreateOrUpdateLink(fSelfLink, package,
-		Link::TYPE_INSTALLATION_LOCATION, kSelfLinkName, listener);
+		Link::TYPE_INSTALLATION_LOCATION, StringConstants::Get().kSelfLinkName,
+		listener);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
 	error = _CreateOrUpdateLink(fSettingsLink, package, Link::TYPE_SETTINGS,
-		kSettingsLinkName, listener);
+		StringConstants::Get().kSettingsLinkName, listener);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
@@ -219,7 +222,7 @@ PackageLinkDirectory::_UpdateDependencies(PackageLinksListener* listener)
 			if (link == NULL)
 				return B_NO_MEMORY;
 
-			status_t error = link->Init(this, dependency->Name(), 0);
+			status_t error = link->Init(this, dependency->Name());
 			if (error != B_OK) {
 				delete link;
 				RETURN_ERROR(error);
@@ -256,14 +259,14 @@ PackageLinkDirectory::_RemoveLink(Link* link, PackageLinksListener* listener)
 
 status_t
 PackageLinkDirectory::_CreateOrUpdateLink(Link*& link, Package* package,
-	Link::Type type, const char* name, PackageLinksListener* listener)
+	Link::Type type, const String& name, PackageLinksListener* listener)
 {
 	if (link == NULL) {
 		link = new(std::nothrow) Link(package, type);
 		if (link == NULL)
 			return B_NO_MEMORY;
 
-		status_t error = link->Init(this, name, NODE_FLAG_CONST_NAME);
+		status_t error = link->Init(this, name);
 		if (error != B_OK)
 			RETURN_ERROR(error);
 

@@ -16,7 +16,7 @@ OldNodeAttributes::~OldNodeAttributes()
 
 
 void*
-OldNodeAttributes::IndexCookieForAttribute(const char* name) const
+OldNodeAttributes::IndexCookieForAttribute(const StringKey& name) const
 {
 	return NULL;
 }

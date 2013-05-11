@@ -80,7 +80,7 @@ UnpackingAttributeCookie::~UnpackingAttributeCookie()
 
 
 /*static*/ status_t
-UnpackingAttributeCookie::Open(PackageNode* packageNode, const char* name,
+UnpackingAttributeCookie::Open(PackageNode* packageNode, const StringKey& name,
 	int openMode, AttributeCookie*& _cookie)
 {
 	if (packageNode == NULL)

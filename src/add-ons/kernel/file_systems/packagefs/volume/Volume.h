@@ -85,7 +85,7 @@ public:
 									const void* oldKey, size_t oldLength,
 									const void* newKey, size_t newLength);
 
-			Index*				FindIndex(const char* name) const
+			Index*				FindIndex(const StringKey& name) const
 									{ return fIndices.Lookup(name); }
 			IndexDirIterator	GetIndexDirIterator() const
 									{ return fIndices.GetIterator(); }
@@ -139,7 +139,7 @@ private:
 									bool notify);
 
 			status_t			_CreateUnpackingNode(mode_t mode,
-									Directory* parent, const char* name,
+									Directory* parent, const String& name,
 									UnpackingNode*& _node);
 									// does *not* return a reference
 			void				_RemoveNode(Node* node);

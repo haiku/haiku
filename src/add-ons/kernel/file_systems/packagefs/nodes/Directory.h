@@ -27,8 +27,7 @@ public:
 								Directory(ino_t id);
 	virtual						~Directory();
 
-	virtual	status_t			Init(Directory* parent, const char* name,
-									uint32 flags);
+	virtual	status_t			Init(Directory* parent, const String& name);
 
 	virtual	mode_t				Mode() const;
 	virtual	off_t				FileSize() const;
@@ -41,7 +40,7 @@ public:
 
 			void				AddChild(Node* node);
 			void				RemoveChild(Node* node);
-			Node*				FindChild(const char* name);
+			Node*				FindChild(const StringKey& name);
 
 	inline	Node*				FirstChild() const;
 	inline	Node*				NextChild(Node* node) const;

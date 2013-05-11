@@ -170,7 +170,7 @@ UnpackingDirectory::OpenAttributeDirectory(AttributeDirectoryCookie*& _cookie)
 
 
 status_t
-UnpackingDirectory::OpenAttribute(const char* name, int openMode,
+UnpackingDirectory::OpenAttribute(const StringKey& name, int openMode,
 	AttributeCookie*& _cookie)
 {
 	return UnpackingAttributeCookie::Open(fPackageDirectories.Head(), name,
@@ -187,7 +187,7 @@ UnpackingDirectory::IndexAttribute(AttributeIndexer* indexer)
 
 
 void*
-UnpackingDirectory::IndexCookieForAttribute(const char* name) const
+UnpackingDirectory::IndexCookieForAttribute(const StringKey& name) const
 {
 	if (PackageDirectory* packageDirectory = fPackageDirectories.Head())
 		return packageDirectory->IndexCookieForAttribute(name);

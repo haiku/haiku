@@ -37,7 +37,7 @@ public:
 			ResolvableFamily*	Family() const
 									{ return fFamily; }
 
-			const char*			Name() const	{ return fName; }
+			const String&		Name() const	{ return fName; }
 			::Version*			Version() const	{ return fVersion; }
 			::Version*			CompatibleVersion() const
 									{ return fCompatibleVersion; }
@@ -50,7 +50,7 @@ public:
 private:
 			::Package*			fPackage;
 			ResolvableFamily*	fFamily;
-			char*				fName;
+			String				fName;
 			::Version*			fVersion;
 			::Version*			fCompatibleVersion;
 			ResolvableDependencyList fDependencies;

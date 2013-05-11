@@ -13,6 +13,9 @@
 #include <util/khash.h>
 #include <util/OpenHashTable.h>
 
+#include "String.h"
+#include "StringKey.h"
+
 
 class AbstractIndexIterator;
 class IndexIterator;
@@ -34,7 +37,7 @@ public:
 
 			Volume*				GetVolume() const		{ return fVolume; }
 
-			const char*			Name() const			{ return fName; }
+			const String&		Name() const			{ return fName; }
 			uint32				Type() const			{ return fType; }
 			bool				HasFixedKeyLength() const
 									{ return fFixedKeyLength; }
@@ -64,7 +67,7 @@ protected:
 protected:
 			Index*				fHashLink;
 			Volume*				fVolume;
-			char*				fName;
+			String				fName;
 			uint32				fType;
 			size_t				fKeyLength;
 			bool				fFixedKeyLength;
@@ -98,22 +101,22 @@ private:
 
 
 struct IndexHashDefinition {
-	typedef const char*	KeyType;
+	typedef StringKey	KeyType;
 	typedef	Index		ValueType;
 
-	size_t HashKey(const char* key) const
+	size_t HashKey(const StringKey& key) const
 	{
-		return key != NULL ? hash_hash_string(key) : 0;
+		return key.Hash();
 	}
 
 	size_t Hash(const Index* value) const
 	{
-		return HashKey(value->Name());
+		return value->Name().Hash();
 	}
 
-	bool Compare(const char* key, const Index* value) const
+	bool Compare(const StringKey& key, const Index* value) const
 	{
-		return strcmp(value->Name(), key) == 0;
+		return key == value->Name();
 	}
 
 	Index*& GetLink(Index* value) const

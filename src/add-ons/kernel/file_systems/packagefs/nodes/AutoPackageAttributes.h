@@ -8,6 +8,8 @@
 
 #include <SupportDefs.h>
 
+#include "StringKey.h"
+
 
 class AttributeCookie;
 class Package;
@@ -22,16 +24,17 @@ enum AutoPackageAttribute {
 
 
 struct AutoPackageAttributes {
-	static	bool				AttributeForName(const char* name,
+	static	bool				AttributeForName(const StringKey& name,
 									AutoPackageAttribute& _attribute);
-	static	const char*			NameForAttribute(
+	static	const String&		NameForAttribute(
 									AutoPackageAttribute attribute);
 	static	const void*			GetAttributeValue(const Package* package,
 									AutoPackageAttribute attribute,
 									off_t& _size, uint32& _type);
 
-	static	status_t			OpenCookie(Package* package, const char* name,
-									int openMode, AttributeCookie*& _cookie);
+	static	status_t			OpenCookie(Package* package,
+									const StringKey& name, int openMode,
+									AttributeCookie*& _cookie);
 };
 
 

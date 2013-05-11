@@ -14,12 +14,12 @@ public:
 								PackageSymlink(Package* package, mode_t mode);
 	virtual						~PackageSymlink();
 
-			status_t			SetSymlinkPath(const char* path);
+			void				SetSymlinkPath(const String& path);
 
-	virtual	const char*			SymlinkPath() const;
+	virtual	String				SymlinkPath() const;
 
 private:
-				char*			fSymlinkPath;
+				String			fSymlinkPath;
 };
 
 

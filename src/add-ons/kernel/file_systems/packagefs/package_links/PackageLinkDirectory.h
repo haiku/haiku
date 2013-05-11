@@ -20,8 +20,7 @@ public:
 	virtual						~PackageLinkDirectory();
 
 			status_t			Init(Directory* parent, Package* package);
-	virtual	status_t			Init(Directory* parent, const char* name,
-									uint32 flags);
+	virtual	status_t			Init(Directory* parent, const String& name);
 
 	virtual	timespec			ModifiedTime() const;
 
@@ -60,7 +59,7 @@ private:
 
 			status_t			_CreateOrUpdateLink(Link*& link,
 									Package* package, Link::Type type,
-									const char* name,
+									const String& name,
 									PackageLinksListener* listener);
 			void				_RemoveLink(Link* link,
 									PackageLinksListener* listener);

@@ -17,7 +17,7 @@ Dependency::Dependency(::Package* package)
 	fPackage(package),
 	fFamily(NULL),
 	fResolvable(NULL),
-	fName(NULL),
+	fName(),
 	fVersion(NULL),
 	fVersionOperator(B_PACKAGE_RESOLVABLE_OP_EQUAL)
 {
@@ -26,7 +26,6 @@ Dependency::Dependency(::Package* package)
 
 Dependency::~Dependency()
 {
-	free(fName);
 	delete fVersion;
 }
 
@@ -34,8 +33,7 @@ Dependency::~Dependency()
 status_t
 Dependency::Init(const char* name)
 {
-	fName = strdup(name);
-	if (fName == NULL)
+	if (!fName.SetTo(name))
 		return B_NO_MEMORY;
 
 	return B_OK;

@@ -12,6 +12,7 @@
 
 #include "DebugSupport.h"
 #include "PackageLinksDirectory.h"
+#include "StringConstants.h"
 
 
 //#define TRACE_DEPENDENCIES_ENABLED
@@ -20,9 +21,6 @@
 #else
 #	define TRACE_DEPENDENCIES(x...)	do {} while (false)
 #endif
-
-
-static const char* const kPackageLinksDirectoryName = "package-links";
 
 
 mutex PackageFSRoot::sRootListLock = MUTEX_INITIALIZER("packagefs root list");
@@ -71,7 +69,7 @@ PackageFSRoot::Init()
 		return B_NO_MEMORY;
 
 	status_t error = fPackageLinksDirectory->Init(NULL,
-		kPackageLinksDirectoryName, 0);
+		StringConstants::Get().kPackageLinksDirectoryName);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
@@ -243,7 +241,7 @@ PackageFSRoot::_RemoveVolume(Volume* volume)
 status_t
 PackageFSRoot::_AddPackage(Package* package)
 {
-	TRACE_DEPENDENCIES("adding package \"%s\"\n", package->Name());
+	TRACE_DEPENDENCIES("adding package \"%s\"\n", package->Name().Data());
 
 	ResolvableDependencyList dependenciesToUpdate;
 
@@ -306,7 +304,7 @@ PackageFSRoot::_AddPackage(Package* package)
 void
 PackageFSRoot::_RemovePackage(Package* package)
 {
-	TRACE_DEPENDENCIES("removing package \"%s\"\n", package->Name());
+	TRACE_DEPENDENCIES("removing package \"%s\"\n", package->Name().Data());
 
 	fPackageLinksDirectory->RemovePackage(package);
 

@@ -10,6 +10,8 @@
 
 #include <package/hpkg/PackageData.h>
 
+#include "String.h"
+
 
 using BPackageKit::BHPKG::BPackageData;
 
@@ -23,11 +25,11 @@ public:
 									const BPackageData& data);
 								~PackageNodeAttribute();
 
-			const char*			Name() const	{ return fName; }
+			const String&		Name() const	{ return fName; }
 			uint32				Type() const	{ return fType; }
 			const BPackageData&	Data() const	{ return fData; }
 
-			status_t			Init(const char* name);
+			void				Init(const String& name);
 
 			void				SetIndexCookie(void* cookie)
 									{ fIndexCookie = cookie; }
@@ -36,7 +38,7 @@ public:
 
 protected:
 			BPackageData		fData;
-			char*				fName;
+			String				fName;
 			void*				fIndexCookie;
 			uint32				fType;
 };

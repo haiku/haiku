@@ -19,10 +19,10 @@ PackageLeafNode::~PackageLeafNode()
 }
 
 
-const char*
+String
 PackageLeafNode::SymlinkPath() const
 {
-	return NULL;
+	return String();
 }
 
 

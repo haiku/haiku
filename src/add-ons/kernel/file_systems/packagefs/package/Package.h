@@ -19,6 +19,7 @@
 #include "Dependency.h"
 #include "PackageNode.h"
 #include "Resolvable.h"
+#include "String.h"
 
 
 using BPackageKit::BPackageArchitecture;
@@ -40,18 +41,18 @@ public:
 			status_t			Load();
 
 			::Volume*			Volume() const		{ return fVolume; }
-			const char*			FileName() const	{ return fFileName; }
+			const String&		FileName() const	{ return fFileName; }
 
-			status_t			SetName(const char* name);
-			const char*			Name() const		{ return fName; }
+			void				SetName(const String& name);
+			const String&		Name() const		{ return fName; }
 
 			dev_t				DeviceID() const
 									{ return fDeviceID; }
 			ino_t				NodeID() const
 									{ return fNodeID; }
 
-			status_t			SetInstallPath(const char* installPath);
-			const char*			InstallPath() const	{ return fInstallPath; }
+			void				SetInstallPath(const String& installPath);
+			const String&		InstallPath() const	{ return fInstallPath; }
 
 			void				SetVersion(::Version* version);
 									// takes over object ownership
@@ -94,9 +95,9 @@ private:
 private:
 			mutex				fLock;
 			::Volume*			fVolume;
-			char*				fFileName;
-			char*				fName;
-			char*				fInstallPath;
+			String				fFileName;
+			String				fName;
+			String				fInstallPath;
 			::Version*			fVersion;
 			BPackageArchitecture fArchitecture;
 			PackageLinkDirectory* fLinkDirectory;
@@ -145,7 +146,7 @@ struct PackageFileNameHashDefinition {
 
 	size_t Hash(const Package* value) const
 	{
-		return HashKey(value->FileName());
+		return value->FileName().Hash();
 	}
 
 	bool Compare(const char* key, const Package* value) const

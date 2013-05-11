@@ -216,7 +216,7 @@ UnpackingLeafNode::CloneTransferPackageNodes(ino_t id, UnpackingNode*& _newNode)
 	if (clone == NULL)
 		return B_NO_MEMORY;
 
-	status_t error = clone->Init(Parent(), Name(), 0);
+	status_t error = clone->Init(Parent(), Name());
 	if (error != B_OK) {
 		delete clone;
 		return error;
@@ -260,8 +260,8 @@ UnpackingLeafNode::ReadSymlink(void* buffer, size_t* bufferSize)
 	if (packageNode == NULL)
 		return B_BAD_VALUE;
 
-	const char* linkPath = packageNode->SymlinkPath();
-	if (linkPath == NULL) {
+	const String& linkPath = packageNode->SymlinkPath();
+	if (linkPath[0] == '\0') {
 		*bufferSize = 0;
 		return B_OK;
 	}
@@ -283,7 +283,7 @@ UnpackingLeafNode::OpenAttributeDirectory(AttributeDirectoryCookie*& _cookie)
 
 
 status_t
-UnpackingLeafNode::OpenAttribute(const char* name, int openMode,
+UnpackingLeafNode::OpenAttribute(const StringKey& name, int openMode,
 	AttributeCookie*& _cookie)
 {
 	return UnpackingAttributeCookie::Open(_ActivePackageNode(), name, openMode,
@@ -300,7 +300,7 @@ UnpackingLeafNode::IndexAttribute(AttributeIndexer* indexer)
 
 
 void*
-UnpackingLeafNode::IndexCookieForAttribute(const char* name) const
+UnpackingLeafNode::IndexCookieForAttribute(const StringKey& name) const
 {
 	if (PackageLeafNode* packageNode = _ActivePackageNode())
 		return packageNode->IndexCookieForAttribute(name);

@@ -36,7 +36,7 @@ OldUnpackingNodeAttributes::FileSize() const
 
 
 void*
-OldUnpackingNodeAttributes::IndexCookieForAttribute(const char* name) const
+OldUnpackingNodeAttributes::IndexCookieForAttribute(const StringKey& name) const
 {
 	return fPackageNode != NULL
 		? fPackageNode->IndexCookieForAttribute(name) : NULL;

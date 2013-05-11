@@ -88,8 +88,6 @@ struct Package::LoaderContentHandler : BPackageContentHandler {
 				RETURN_ERROR(B_BAD_DATA);
 		}
 
-		status_t error;
-
 		// get the file mode -- filter out write permissions
 		mode_t mode = entry->Mode() & ~(mode_t)(S_IWUSR | S_IWGRP | S_IWOTH);
 
@@ -100,17 +98,16 @@ struct Package::LoaderContentHandler : BPackageContentHandler {
 			node = new(std::nothrow) PackageFile(fPackage, mode, entry->Data());
 		} else if (S_ISLNK(mode)) {
 			// symlink
+			String path;
+			if (!path.SetTo(entry->SymlinkPath()))
+				RETURN_ERROR(B_NO_MEMORY);
+
 			PackageSymlink* symlink = new(std::nothrow) PackageSymlink(
 				fPackage, mode);
 			if (symlink == NULL)
 				RETURN_ERROR(B_NO_MEMORY);
 
-			error = symlink->SetSymlinkPath(entry->SymlinkPath());
-			if (error != B_OK) {
-				delete symlink;
-				return error;
-			}
-
+			symlink->SetSymlinkPath(path);
 			node = symlink;
 		} else if (S_ISDIR(mode)) {
 			// directory
@@ -122,7 +119,11 @@ struct Package::LoaderContentHandler : BPackageContentHandler {
 			RETURN_ERROR(B_NO_MEMORY);
 		BReference<PackageNode> nodeReference(node, true);
 
-		error = node->Init(parentDir, entry->Name());
+		String entryName;
+		if (!entryName.SetTo(entry->Name()))
+			RETURN_ERROR(B_NO_MEMORY);
+
+		status_t error = node->Init(parentDir, entryName);
 		if (error != B_OK)
 			RETURN_ERROR(error);
 
@@ -147,17 +148,16 @@ struct Package::LoaderContentHandler : BPackageContentHandler {
 
 		PackageNode* node = (PackageNode*)entry->UserToken();
 
+		String name;
+		if (!name.SetTo(attribute->Name()))
+			RETURN_ERROR(B_NO_MEMORY);
+
 		PackageNodeAttribute* nodeAttribute = new(std::nothrow)
 			PackageNodeAttribute(attribute->Type(), attribute->Data());
 		if (nodeAttribute == NULL)
 			RETURN_ERROR(B_NO_MEMORY)
 
-		status_t error = nodeAttribute->Init(attribute->Name());
-		if (error != B_OK) {
-			delete nodeAttribute;
-			RETURN_ERROR(error);
-		}
-
+		nodeAttribute->Init(name);
 		node->AddAttribute(nodeAttribute);
 
 		return B_OK;
@@ -173,10 +173,22 @@ struct Package::LoaderContentHandler : BPackageContentHandler {
 	{
 		switch (value.attributeID) {
 			case B_PACKAGE_INFO_NAME:
-				return fPackage->SetName(value.string);
+			{
+				String name;
+				if (!name.SetTo(value.string))
+					return B_NO_MEMORY;
+				fPackage->SetName(name);
+				return B_OK;
+			}
 
 			case B_PACKAGE_INFO_INSTALL_PATH:
-				return fPackage->SetInstallPath(value.string);
+			{
+				String path;
+				if (!path.SetTo(value.string))
+					return B_NO_MEMORY;
+				fPackage->SetInstallPath(path);
+				return B_OK;
+			}
 
 			case B_PACKAGE_INFO_VERSION:
 			{
@@ -303,9 +315,9 @@ private:
 Package::Package(::Volume* volume, dev_t deviceID, ino_t nodeID)
 	:
 	fVolume(volume),
-	fFileName(NULL),
-	fName(NULL),
-	fInstallPath(NULL),
+	fFileName(),
+	fName(),
+	fInstallPath(),
 	fVersion(NULL),
 	fArchitecture(B_PACKAGE_ARCHITECTURE_ENUM_COUNT),
 	fLinkDirectory(NULL),
@@ -329,9 +341,6 @@ Package::~Package()
 	while (Dependency* dependency = fDependencies.RemoveHead())
 		delete dependency;
 
-	free(fFileName);
-	free(fName);
-	free(fInstallPath);
 	delete fVersion;
 
 	mutex_destroy(&fLock);
@@ -341,8 +350,7 @@ Package::~Package()
 status_t
 Package::Init(const char* fileName)
 {
-	fFileName = strdup(fileName);
-	if (fFileName == NULL)
+	if (!fFileName.SetTo(fileName))
 		RETURN_ERROR(B_NO_MEMORY);
 
 	return B_OK;
@@ -379,31 +387,17 @@ Package::Load()
 }
 
 
-status_t
-Package::SetName(const char* name)
+void
+Package::SetName(const String& name)
 {
-	if (fName != NULL)
-		free(fName);
-
-	fName = strdup(name);
-	if (fName == NULL)
-		RETURN_ERROR(B_NO_MEMORY);
-
-	return B_OK;
+	fName = name;
 }
 
 
-status_t
-Package::SetInstallPath(const char* installPath)
+void
+Package::SetInstallPath(const String& installPath)
 {
-	if (fInstallPath != NULL)
-		free(fInstallPath);
-
-	fInstallPath = strdup(installPath);
-	if (fInstallPath == NULL)
-		RETURN_ERROR(B_NO_MEMORY);
-
-	return B_OK;
+	fInstallPath = installPath;
 }
 
 
@@ -463,14 +457,14 @@ Package::Open()
 	// open the file
 	fFD = openat(fVolume->PackagesDirectoryFD(), fFileName, O_RDONLY);
 	if (fFD < 0) {
-		ERROR("Failed to open package file \"%s\"\n", fFileName);
+		ERROR("Failed to open package file \"%s\"\n", fFileName.Data());
 		return errno;
 	}
 
 	// stat it to verify that it's still the same file
 	struct stat st;
 	if (fstat(fFD, &st) < 0) {
-		ERROR("Failed to stat package file \"%s\"\n", fFileName);
+		ERROR("Failed to stat package file \"%s\"\n", fFileName.Data());
 		close(fFD);
 		fFD = -1;
 		return errno;

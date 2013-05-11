@@ -98,7 +98,7 @@ PackageLinkSymlink::Update(Package* package, PackageLinksListener* listener)
 
 	if (package != NULL) {
 		fLinkPath = package->InstallPath();
-		if (fLinkPath != NULL) {
+		if (fLinkPath[0] != '\0') {
 			if (fType == TYPE_SETTINGS)
 				fLinkPath = ".self/settings";
 		} else {

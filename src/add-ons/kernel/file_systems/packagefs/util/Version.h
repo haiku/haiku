@@ -9,6 +9,8 @@
 #include <package/PackageResolvableOperator.h>
 #include <SupportDefs.h>
 
+#include "String.h"
+
 
 using namespace BPackageKit;
 
@@ -35,10 +37,10 @@ public:
 									// been (excluding the terminating null)
 
 private:
-			char*				fMajor;
-			char*				fMinor;
-			char*				fMicro;
-			char*				fPreRelease;
+			String				fMajor;
+			String				fMinor;
+			String				fMicro;
+			String				fPreRelease;
 			uint32				fRevision;
 };
 

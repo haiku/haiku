@@ -19,7 +19,7 @@ public:
 								PackageLeafNode(Package* package, mode_t mode);
 	virtual						~PackageLeafNode();
 
-	virtual	const char*			SymlinkPath() const;
+	virtual	String				SymlinkPath() const;
 
 	virtual	status_t			Read(off_t offset, void* buffer,
 									size_t* bufferSize);

@@ -22,11 +22,11 @@ static const char* const kVersionPartPlaceholder = "_";
 
 
 static int
-compare_version_part(const char* a, const char* b)
+compare_version_part(const String& a, const String& b)
 {
-	if (a == NULL)
-		return b != NULL ? -1 : 0;
-	if (b == NULL)
+	if (a.IsEmpty())
+		return b.IsEmpty() ? 0 : -1;
+	if (b.IsEmpty())
 		return 1;
 
 	return BPrivate::NaturalCompare(a, b);
@@ -35,10 +35,10 @@ compare_version_part(const char* a, const char* b)
 
 Version::Version()
 	:
-	fMajor(NULL),
-	fMinor(NULL),
-	fMicro(NULL),
-	fPreRelease(NULL),
+	fMajor(),
+	fMinor(),
+	fMicro(),
+	fPreRelease(),
 	fRevision(0)
 {
 }
@@ -46,10 +46,6 @@ Version::Version()
 
 Version::~Version()
 {
-	free(fMajor);
-	free(fMinor);
-	free(fMicro);
-	free(fPreRelease);
 }
 
 
@@ -58,26 +54,22 @@ Version::Init(const char* major, const char* minor, const char* micro,
 	const char* preRelease, uint32 revision)
 {
 	if (major != NULL) {
-		fMajor = strdup(major);
-		if (fMajor == NULL)
+		if (!fMajor.SetTo(major))
 			return B_NO_MEMORY;
 	}
 
 	if (minor != NULL) {
-		fMinor = strdup(minor);
-		if (fMinor == NULL)
+		if (!fMinor.SetTo(minor))
 			return B_NO_MEMORY;
 	}
 
 	if (micro != NULL) {
-		fMicro = strdup(micro);
-		if (fMicro == NULL)
+		if (!fMicro.SetTo(micro))
 			return B_NO_MEMORY;
 	}
 
 	if (preRelease != NULL) {
-		fPreRelease = strdup(preRelease);
-		if (fPreRelease == NULL)
+		if (!fPreRelease.SetTo(preRelease))
 			return B_NO_MEMORY;
 	}
 
@@ -124,10 +116,10 @@ Version::Compare(const Version& other) const
 	// The pre-version works differently: The empty string is greater than any
 	// non-empty string (e.g. "R1" is newer than "R1-rc2"). So we catch the
 	// empty string cases first.
-	if (fPreRelease == NULL) {
-		if (other.fPreRelease != NULL)
+	if (fPreRelease.IsEmpty()) {
+		if (!other.fPreRelease.IsEmpty())
 			return 1;
-	} else if (other.fPreRelease == NULL) {
+	} else if (other.fPreRelease.IsEmpty()) {
 		return -1;
 	} else {
 		// both are non-null -- compare normally
@@ -180,27 +172,27 @@ Version::ToString(char* buffer, size_t bufferSize) const
 	const char* minor = fMinor;
 	const char* micro = fMicro;
 
-	if (micro != NULL && minor == NULL)
+	if (micro[0] != '\0' && minor[0] == '\0')
 		minor = kVersionPartPlaceholder;
-	if (minor != NULL && major == NULL)
+	if (minor[0] != '\0' && major[0] == '\0')
 		major = kVersionPartPlaceholder;
 
 	size_t size = strlcpy(buffer, major, bufferSize);
 
-	if (minor != NULL) {
+	if (minor[0] != '\0') {
 		size_t offset = std::min(bufferSize, size);
 		size += snprintf(buffer + offset, bufferSize - offset, ".%s", minor);
 	}
 
-	if (micro != NULL) {
+	if (micro[0] != '\0') {
 		size_t offset = std::min(bufferSize, size);
 		size += snprintf(buffer + offset, bufferSize - offset, ".%s", micro);
 	}
 
-	if (fPreRelease != NULL) {
+	if (fPreRelease[0] != '\0') {
 		size_t offset = std::min(bufferSize, size);
 		size += snprintf(buffer + offset, bufferSize - offset, "~%s",
-			fPreRelease);
+			fPreRelease.Data());
 	}
 
 	if (fRevision != 0) {

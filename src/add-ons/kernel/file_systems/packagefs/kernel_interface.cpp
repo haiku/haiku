@@ -24,6 +24,8 @@
 #include "GlobalFactory.h"
 #include "Query.h"
 #include "PackageFSRoot.h"
+#include "StringConstants.h"
+#include "StringPool.h"
 #include "Utils.h"
 #include "Volume.h"
 
@@ -181,7 +183,8 @@ packagefs_lookup(fs_volume* fsVolume, fs_vnode* fsDir, const char* entryName,
 
 	// resolve normal entries -- look up the node
 	NodeReadLocker dirLocker(dir);
-	Node* node = dynamic_cast<Directory*>(dir)->FindChild(entryName);
+	String entryNameString;
+	Node* node = dynamic_cast<Directory*>(dir)->FindChild(StringKey(entryName));
 	if (node == NULL)
 		return B_ENTRY_NOT_FOUND;
 	BReference<Node> nodeReference(node);
@@ -792,7 +795,7 @@ packagefs_open_attr(fs_volume* fsVolume, fs_vnode* fsNode, const char* name,
 		return error;
 
 	AttributeCookie* cookie;
-	error = node->OpenAttribute(name, openMode, cookie);
+	error = node->OpenAttribute(StringKey(name), openMode, cookie);
 	if (error != B_OK)
 		return error;
 
@@ -976,7 +979,7 @@ packagefs_read_index_stat(fs_volume* fsVolume, const char* name,
 
 	FUNCTION("volume: %p, name: \"%s\", stat: %p\n", volume, name, stat);
 
-	Index* index = volume->FindIndex(name);
+	Index* index = volume->FindIndex(StringKey(name));
 	if (index == NULL)
 		return B_ENTRY_NOT_FOUND;
 
@@ -1093,9 +1096,25 @@ packagefs_std_ops(int32 op, ...)
 			init_debugging();
 			PRINT("package_std_ops(): B_MODULE_INIT\n");
 
-			status_t error = GlobalFactory::CreateDefault();
+			status_t error = StringPool::Init();
+			if (error != B_OK) {
+				ERROR("Failed to init StringPool\n");
+				exit_debugging();
+				return error;
+			}
+
+			if (!StringConstants::Init()) {
+				ERROR("Failed to init string constants\n");
+				StringPool::Cleanup();
+				exit_debugging();
+				return error;
+			}
+
+			error = GlobalFactory::CreateDefault();
 			if (error != B_OK) {
 				ERROR("Failed to init GlobalFactory\n");
+				StringConstants::Cleanup();
+				StringPool::Cleanup();
 				exit_debugging();
 				return error;
 			}
@@ -1104,6 +1123,8 @@ packagefs_std_ops(int32 op, ...)
 			if (error != B_OK) {
 				ERROR("Failed to init PackageFSRoot\n");
 				GlobalFactory::DeleteDefault();
+				StringConstants::Cleanup();
+				StringPool::Cleanup();
 				exit_debugging();
 				return error;
 			}
@@ -1116,6 +1137,8 @@ packagefs_std_ops(int32 op, ...)
 			PRINT("package_std_ops(): B_MODULE_UNINIT\n");
 			PackageFSRoot::GlobalUninit();
 			GlobalFactory::DeleteDefault();
+			StringConstants::Cleanup();
+			StringPool::Cleanup();
 			exit_debugging();
 			return B_OK;
 		}

@@ -485,12 +485,16 @@ Volume::Mount(const char* parameterString)
 		}
 	}
 
+	String volumeNameString;
+	if (!volumeNameString.SetTo(volumeName))
+		RETURN_ERROR(B_NO_MEMORY);
+
 	// create the root node
 	fRootDirectory
 		= new(std::nothrow) ::RootDirectory(kRootDirectoryID, st.st_mtim);
 	if (fRootDirectory == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
-	fRootDirectory->Init(NULL, volumeName, 0);
+	fRootDirectory->Init(NULL, volumeNameString);
 	fNodes.Insert(fRootDirectory);
 	fRootDirectory->AcquireReference();
 		// one reference for the table
@@ -528,6 +532,8 @@ Volume::Mount(const char* parameterString)
 	error = _PublishShineThroughDirectories();
 	if (error != B_OK)
 		RETURN_ERROR(error);
+
+	StringPool::DumpUsageStatistics();
 
 	return B_OK;
 }
@@ -1318,7 +1324,7 @@ Volume::_RemovePackageNode(Directory* directory, PackageNode* packageNode,
 
 
 status_t
-Volume::_CreateUnpackingNode(mode_t mode, Directory* parent, const char* name,
+Volume::_CreateUnpackingNode(mode_t mode, Directory* parent, const String& name,
 	UnpackingNode*& _node)
 {
 	UnpackingNode* unpackingNode;
@@ -1335,7 +1341,7 @@ Volume::_CreateUnpackingNode(mode_t mode, Directory* parent, const char* name,
 	Node* node = unpackingNode->GetNode();
 	BReference<Node> nodeReference(node, true);
 
-	status_t error = node->Init(parent, name, 0);
+	status_t error = node->Init(parent, name);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
@@ -1541,7 +1547,7 @@ INFORM("Volume::_ChangeActivation(): %" B_PRId32 " new packages, %" B_PRId32 " o
 		oldPackageReferences[oldPackageIndex++].SetTo(package);
 		_RemovePackageContent(package, NULL, true);
 		_RemovePackage(package);
-INFORM("package \"%s\" deactivated\n", package->FileName());
+INFORM("package \"%s\" deactivated\n", package->FileName().Data());
 	}
 // TODO: Since package removal cannot fail, consider adding the new packages
 // first. The reactivation case may make that problematic, since two packages
@@ -1560,7 +1566,7 @@ INFORM("package \"%s\" deactivated\n", package->FileName());
 			_RemovePackage(package);
 			break;
 		}
-INFORM("package \"%s\" activated\n", package->FileName());
+INFORM("package \"%s\" activated\n", package->FileName().Data());
 	}
 
 	// Try to roll back the changes, if an error occurred.
@@ -1579,7 +1585,7 @@ INFORM("package \"%s\" activated\n", package->FileName());
 				// nothing we can do here
 				ERROR("Volume::_ChangeActivation(): failed to roll back "
 					"deactivation of package \"%s\" after error\n",
-		  			package->FileName());
+		  			package->FileName().Data());
 				_RemovePackage(package);
 			}
 		}
@@ -1619,7 +1625,11 @@ Volume::_CreateShineThroughDirectory(Directory* parent, const char* name,
 		RETURN_ERROR(B_NO_MEMORY);
 	BReference<ShineThroughDirectory> directoryReference(directory, true);
 
-	status_t error = directory->Init(parent, name, 0);
+	String nameString;
+	if (!nameString.SetTo(name))
+		RETURN_ERROR(B_NO_MEMORY);
+
+	status_t error = directory->Init(parent, nameString);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 

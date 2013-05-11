@@ -23,7 +23,7 @@ public:
 
 			bool				ResolveDependency(Dependency* dependency);
 
-			const char*			Name() const;
+			String				Name() const;
 
 			bool				IsLastResolvable(Resolvable* resolvable) const;
 
@@ -35,11 +35,11 @@ private:
 };
 
 
-inline const char*
+inline String
 ResolvableFamily::Name() const
 {
 	Resolvable* head = fResolvables.Head();
-	return head != NULL ? head->Name() : NULL;
+	return head != NULL ? head->Name() : String();
 }
 
 
@@ -55,22 +55,22 @@ ResolvableFamily::IsLastResolvable(Resolvable* resolvable) const
 
 
 struct ResolvableFamilyHashDefinition {
-	typedef const char*			KeyType;
+	typedef String				KeyType;
 	typedef	ResolvableFamily	ValueType;
 
-	size_t HashKey(const char* key) const
+	size_t HashKey(const String& key) const
 	{
-		return key != NULL ? hash_hash_string(key) : 0;
+		return key.Hash();
 	}
 
 	size_t Hash(const ResolvableFamily* value) const
 	{
-		return HashKey(value->Name());
+		return value->Name().Hash();
 	}
 
-	bool Compare(const char* key, const ResolvableFamily* value) const
+	bool Compare(const String& key, const ResolvableFamily* value) const
 	{
-		return strcmp(value->Name(), key) == 0;
+		return key == value->Name();
 	}
 
 	ResolvableFamily*& GetLink(ResolvableFamily* value) const

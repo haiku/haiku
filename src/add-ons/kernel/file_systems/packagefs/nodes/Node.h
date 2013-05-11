@@ -16,6 +16,9 @@
 #include <util/khash.h>
 #include <util/OpenHashTable.h>
 
+#include "String.h"
+#include "StringKey.h"
+
 
 class AttributeCookie;
 class AttributeDirectoryCookie;
@@ -26,14 +29,7 @@ class PackageNode;
 
 // node flags
 enum {
-	NODE_FLAG_KEEP_NAME		= 0x01,
-		// Init(): Take over ownership of the given name (i.e. free in
-		// destructor).
-	NODE_FLAG_CONST_NAME	= 0x02,
-		// Init(): The given name is a constant that won't go away during the
-		// lifetime of the object. No need to copy.
-	NODE_FLAG_OWNS_NAME		= NODE_FLAG_KEEP_NAME,
-	NODE_FLAG_KNOWN_TO_VFS	= 0x04,
+	NODE_FLAG_KNOWN_TO_VFS	= 0x01
 		// internal flag
 };
 
@@ -50,17 +46,14 @@ public:
 
 			ino_t				ID() const		{ return fID; }
 			Directory*			Parent() const	{ return fParent; }
-			const char*			Name() const	{ return fName; }
+			const String&		Name() const	{ return fName; }
 
 			Node*&				NameHashTableNext()
 									{ return fNameHashTableNext; }
 			Node*&				IDHashTableNext()
 									{ return fIDHashTableNext; }
 
-	virtual	status_t			Init(Directory* parent, const char* name,
-									uint32 flags);
-									// If specified to keep the name, it does
-									// so also on error.
+	virtual	status_t			Init(Directory* parent, const String& name);
 
 	virtual	status_t			VFSInit(dev_t deviceID);
 									// base class version must be called on
@@ -87,17 +80,18 @@ public:
 
 	virtual	status_t			OpenAttributeDirectory(
 									AttributeDirectoryCookie*& _cookie);
-	virtual	status_t			OpenAttribute(const char* name, int openMode,
-									AttributeCookie*& _cookie);
+	virtual	status_t			OpenAttribute(const StringKey& name,
+									int openMode, AttributeCookie*& _cookie);
 
 	virtual	status_t			IndexAttribute(AttributeIndexer* indexer);
-	virtual	void*				IndexCookieForAttribute(const char* name) const;
+	virtual	void*				IndexCookieForAttribute(const StringKey& name)
+									const;
 
 protected:
 			rw_lock				fLock;
 			ino_t				fID;
 			Directory*			fParent;
-			char*				fName;
+			String				fName;
 			Node*				fNameHashTableNext;
 			Node*				fIDHashTableNext;
 			uint32				fFlags;
@@ -143,22 +137,22 @@ Node::IsKnownToVFS() const
 
 
 struct NodeNameHashDefinition {
-	typedef const char*		KeyType;
-	typedef	Node			ValueType;
+	typedef StringKey	KeyType;
+	typedef	Node		ValueType;
 
-	size_t HashKey(const char* key) const
+	size_t HashKey(const StringKey& key) const
 	{
-		return hash_hash_string(key);
+		return key.Hash();
 	}
 
 	size_t Hash(const Node* value) const
 	{
-		return HashKey(value->Name());
+		return value->Name().Hash();
 	}
 
-	bool Compare(const char* key, const Node* value) const
+	bool Compare(const StringKey& key, const Node* value) const
 	{
-		return strcmp(value->Name(), key) == 0;
+		return key == value->Name();
 	}
 
 	Node*& GetLink(Node* value) const

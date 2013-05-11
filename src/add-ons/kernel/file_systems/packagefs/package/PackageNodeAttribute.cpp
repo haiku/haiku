@@ -14,7 +14,7 @@ PackageNodeAttribute::PackageNodeAttribute(uint32 type,
 	const BPackageData& data)
 	:
 	fData(data),
-	fName(NULL),
+	fName(),
 	fIndexCookie(NULL),
 	fType(type)
 {
@@ -23,13 +23,11 @@ PackageNodeAttribute::PackageNodeAttribute(uint32 type,
 
 PackageNodeAttribute::~PackageNodeAttribute()
 {
-	free(fName);
 }
 
 
-status_t
-PackageNodeAttribute::Init(const char* name)
+void
+PackageNodeAttribute::Init(const String& name)
 {
-	fName = strdup(name);
-	return fName != NULL ? B_OK : B_NO_MEMORY;
+	fName = name;
 }

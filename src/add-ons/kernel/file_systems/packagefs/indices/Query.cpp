@@ -84,7 +84,7 @@ struct Query::QueryPolicy {
 
 	static status_t IndexSetTo(Index& index, const char* attribute)
 	{
-		index.index = index.query->fVolume->FindIndex(attribute);
+		index.index = index.query->fVolume->FindIndex(StringKey(attribute));
 		return index.index != NULL ? B_OK : B_ENTRY_NOT_FOUND;
 	}
 
@@ -181,7 +181,8 @@ struct Query::QueryPolicy {
 	{
 		// TODO: Creating a cookie is quite a bit of overhead.
 		AttributeCookie* cookie;
-		status_t error = node->OpenAttribute(attribute, O_RDONLY, cookie);
+		status_t error = node->OpenAttribute(StringKey(attribute), O_RDONLY,
+			cookie);
 		if (error != B_OK)
 			return error;
 

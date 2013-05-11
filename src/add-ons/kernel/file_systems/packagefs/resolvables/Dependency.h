@@ -12,6 +12,8 @@
 
 #include <util/DoublyLinkedList.h>
 
+#include "String.h"
+
 
 class DependencyFamily;
 class Package;
@@ -52,13 +54,13 @@ public:
 			bool				ResolvableCompatibleVersionMatches(
 									Version* resolvableVersion) const;
 
-			const char*			Name() const	{ return fName; }
+			const String&		Name() const	{ return fName; }
 
 private:
 			::Package*			fPackage;
 			DependencyFamily*	fFamily;
 			::Resolvable*		fResolvable;
-			char*				fName;
+			String				fName;
 			Version*			fVersion;
 			BPackageResolvableOperator fVersionOperator;
 

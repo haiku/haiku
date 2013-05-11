@@ -11,6 +11,8 @@
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 
+#include "StringKey.h"
+
 
 class Node;
 
@@ -24,7 +26,8 @@ public:
 
 	virtual	timespec			ModifiedTime() const = 0;
 	virtual	off_t				FileSize() const = 0;
-	virtual	void*				IndexCookieForAttribute(const char* name) const;
+	virtual	void*				IndexCookieForAttribute(const StringKey& name)
+									const;
 };
 
 

@@ -20,7 +20,7 @@ public:
 			void				AddDependenciesToList(
 									ResolvableDependencyList& list) const;
 
-			const char*			Name() const;
+			String				Name() const;
 
 			bool				IsLastDependency(Dependency* dependency) const;
 
@@ -58,11 +58,11 @@ DependencyFamily::AddDependenciesToList(ResolvableDependencyList& list) const
 }
 
 
-inline const char*
+inline String
 DependencyFamily::Name() const
 {
 	Dependency* head = fDependencies.Head();
-	return head != NULL ? head->Name() : NULL;
+	return head != NULL ? head->Name() : String();
 }
 
 
@@ -78,22 +78,22 @@ DependencyFamily::IsLastDependency(Dependency* dependency) const
 
 
 struct DependencyFamilyHashDefinition {
-	typedef const char*			KeyType;
+	typedef String				KeyType;
 	typedef	DependencyFamily	ValueType;
 
-	size_t HashKey(const char* key) const
+	size_t HashKey(const String& key) const
 	{
-		return key != NULL ? hash_hash_string(key) : 0;
+		return key.Hash();
 	}
 
 	size_t Hash(const DependencyFamily* value) const
 	{
-		return HashKey(value->Name());
+		return value->Name().Hash();
 	}
 
-	bool Compare(const char* key, const DependencyFamily* value) const
+	bool Compare(const String& key, const DependencyFamily* value) const
 	{
-		return strcmp(value->Name(), key) == 0;
+		return key == value->Name();
 	}
 
 	DependencyFamily*& GetLink(DependencyFamily* value) const

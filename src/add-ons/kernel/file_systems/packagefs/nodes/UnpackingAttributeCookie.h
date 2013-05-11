@@ -7,6 +7,7 @@
 
 
 #include "AttributeCookie.h"
+#include "StringKey.h"
 
 
 class AttributeIndexer;
@@ -23,8 +24,9 @@ public:
 									int openMode);
 	virtual						~UnpackingAttributeCookie();
 
-	static	status_t			Open(PackageNode* packageNode, const char* name,
-									int openMode, AttributeCookie*& _cookie);
+	static	status_t			Open(PackageNode* packageNode,
+									const StringKey& name, int openMode,
+									AttributeCookie*& _cookie);
 
 	virtual	status_t			ReadAttribute(off_t offset, void* buffer,
 									size_t* bufferSize);

@@ -17,7 +17,7 @@ PackageNode::PackageNode(Package* package, mode_t mode)
 	:
 	fPackage(package),
 	fParent(NULL),
-	fName(NULL),
+	fName(),
 	fMode(mode),
 	fUserID(0),
 	fGroupID(0)
@@ -29,19 +29,14 @@ PackageNode::~PackageNode()
 {
 	while (PackageNodeAttribute* attribute = fAttributes.RemoveHead())
 		delete attribute;
-
-	free(fName);
 }
 
 
 status_t
-PackageNode::Init(PackageDirectory* parent, const char* name)
+PackageNode::Init(PackageDirectory* parent, const String& name)
 {
 	fParent = parent;
-	fName = strdup(name);
-	if (fName == NULL)
-		RETURN_ERROR(B_NO_MEMORY);
-
+	fName = name;
 	return B_OK;
 }
 
@@ -83,11 +78,11 @@ PackageNode::RemoveAttribute(PackageNodeAttribute* attribute)
 
 
 PackageNodeAttribute*
-PackageNode::FindAttribute(const char* name) const
+PackageNode::FindAttribute(const StringKey& name) const
 {
 	for (PackageNodeAttributeList::ConstIterator it = fAttributes.GetIterator();
 			PackageNodeAttribute* attribute = it.Next();) {
-		if (strcmp(attribute->Name(), name) == 0)
+		if (name == attribute->Name())
 			return attribute;
 	}
 

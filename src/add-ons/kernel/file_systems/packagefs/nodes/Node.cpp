@@ -17,7 +17,7 @@ Node::Node(ino_t id)
 	:
 	fID(id),
 	fParent(NULL),
-	fName(NULL),
+	fName(),
 	fFlags(0)
 {
 	rw_lock_init(&fLock, "packagefs node");
@@ -26,29 +26,16 @@ Node::Node(ino_t id)
 
 Node::~Node()
 {
-	if ((fFlags & NODE_FLAG_OWNS_NAME) != 0)
-		free(fName);
-
 	rw_lock_destroy(&fLock);
 }
 
 
 status_t
-Node::Init(Directory* parent, const char* name, uint32 flags)
+Node::Init(Directory* parent, const String& name)
 {
 	fParent = parent;
-	fFlags = flags;
-
-	if ((flags & NODE_FLAG_CONST_NAME) != 0
-		|| (flags & NODE_FLAG_KEEP_NAME) != 0) {
-		fName = const_cast<char*>(name);
-	} else {
-		fName = strdup(name);
-		if (fName == NULL)
-			RETURN_ERROR(B_NO_MEMORY);
-		fFlags |= NODE_FLAG_OWNS_NAME;
-	}
-
+	fName = name;
+	fFlags = 0;
 	return B_OK;
 }
 
@@ -110,7 +97,8 @@ Node::OpenAttributeDirectory(AttributeDirectoryCookie*& _cookie)
 
 
 status_t
-Node::OpenAttribute(const char* name, int openMode, AttributeCookie*& _cookie)
+Node::OpenAttribute(const StringKey& name, int openMode,
+	AttributeCookie*& _cookie)
 {
 	return B_ENTRY_NOT_FOUND;
 }
@@ -124,7 +112,7 @@ Node::IndexAttribute(AttributeIndexer* indexer)
 
 
 void*
-Node::IndexCookieForAttribute(const char* name) const
+Node::IndexCookieForAttribute(const StringKey& name) const
 {
 	return NULL;
 }
