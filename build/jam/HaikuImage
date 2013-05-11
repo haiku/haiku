@@ -252,10 +252,10 @@ for linkTarget in $(SYSTEM_DEMOS) {
 # scripts and data files
 local userBootScripts = UserBootscript UserSetupEnvironment.sample ;
 SEARCH on $(userBootScripts) = [ FDirName $(HAIKU_TOP) data config boot ] ;
-AddFilesToHaikuImage home config boot : $(userBootScripts) ;
+AddFilesToHaikuImage home config settings boot : $(userBootScripts) ;
 
 # Add boot launch directory
-AddDirectoryToHaikuImage home config boot launch ;
+AddDirectoryToHaikuImage home config settings boot launch ;
 
 # Add mail provider infos.
 AddFilesToHaikuImage home config settings Mail ProviderInfo :

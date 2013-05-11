@@ -186,8 +186,8 @@ launch system/preferences/Time "" --update
 
 if [ "$SAFEMODE" != "yes" ]; then
 	# Start user boot script
-	if [ -f $HOME/config/boot/UserBootscript ]; then
-		. $HOME/config/boot/UserBootscript
+	if [ -f $HOME/config/settings/boot/UserBootscript ]; then
+		. $HOME/config/settings/boot/UserBootscript
 	fi
 fi
 

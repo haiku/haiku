@@ -54,8 +54,8 @@ fi
 
 if [ "$SAFEMODE" != "yes" ]
 then
-	if [ -f $HOME/config/boot/UserSetupEnvironment ]
+	if [ -f $HOME/config/settings/boot/UserSetupEnvironment ]
 	then
-     	. $HOME/config/boot/UserSetupEnvironment
+     	. $HOME/config/settings/boot/UserSetupEnvironment
 	fi
 fi
