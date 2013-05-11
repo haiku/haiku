@@ -730,8 +730,8 @@ ThreadHandler::_HandleSingleStepStep(CpuState* cpuState)
 						TRACE_CONTROL("ThreadHandler::_HandleSingleStepStep() "
 							" - adding return value for STEP_OVER\n");
 						ReturnValueInfo* info = new(std::nothrow)
-							ReturnValueInfo(cpuState->InstructionPointer(),
-								cpuState);
+							ReturnValueInfo(fStepStatement
+								->CoveringAddressRange().Start(), cpuState);
 						if (info == NULL)
 							return false;
 						BReference<ReturnValueInfo> infoReference(info, true);
