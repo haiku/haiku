@@ -313,7 +313,7 @@ AddFilesToHaikuImage common settings : <post-install>fresh_install ;
 AddFilesToHaikuImage system : haiku_loader ;
 
 # decorators
-AddDirectoryToHaikuImage home config add-ons decorators ;
+AddDirectoryToHaikuImage home config non-packaged add-ons decorators ;
 #AddFilesToHaikuImage home config add-ons decorators : ;
 
 # create directories that will remain empty
@@ -322,21 +322,20 @@ AddDirectoryToHaikuImage common non-packaged ;
 AddDirectoryToHaikuImage common var empty ;
 AddDirectoryToHaikuImage common var log ;
 AddDirectoryToHaikuImage home Desktop ;
-AddDirectoryToHaikuImage home config bin ;
-AddDirectoryToHaikuImage home config lib ;
-AddDirectoryToHaikuImage home config non-packaged ;
 AddDirectoryToHaikuImage home mail ;
 
-AddDirectoryToHaikuImage home config add-ons kernel drivers bin ;
-AddDirectoryToHaikuImage home config add-ons kernel drivers dev ;
-AddDirectoryToHaikuImage home config add-ons input_server devices ;
-AddDirectoryToHaikuImage home config add-ons input_server filters ;
-AddDirectoryToHaikuImage home config add-ons input_server methods ;
-AddDirectoryToHaikuImage home config add-ons media plugins ;
-AddDirectoryToHaikuImage home config add-ons Tracker ;
-AddDirectoryToHaikuImage home config add-ons Print ;
-AddDirectoryToHaikuImage home config add-ons Screen\ Savers ;
-AddDirectoryToHaikuImage home config add-ons Translators ;
+AddDirectoryToHaikuImage home config non-packaged bin ;
+AddDirectoryToHaikuImage home config non-packaged lib ;
+AddDirectoryToHaikuImage home config non-packaged add-ons kernel drivers bin ;
+AddDirectoryToHaikuImage home config non-packaged add-ons kernel drivers dev ;
+AddDirectoryToHaikuImage home config non-packaged add-ons input_server devices ;
+AddDirectoryToHaikuImage home config non-packaged add-ons input_server filters ;
+AddDirectoryToHaikuImage home config non-packaged add-ons input_server methods ;
+AddDirectoryToHaikuImage home config non-packaged add-ons media plugins ;
+AddDirectoryToHaikuImage home config non-packaged add-ons Tracker ;
+AddDirectoryToHaikuImage home config non-packaged add-ons Print ;
+AddDirectoryToHaikuImage home config non-packaged add-ons Screen\ Savers ;
+AddDirectoryToHaikuImage home config non-packaged add-ons Translators ;
 
 # printers
 AddDirectoryToHaikuImage home config settings printers Preview
