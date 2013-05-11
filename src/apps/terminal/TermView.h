@@ -176,7 +176,7 @@ private:
 			// point and text offset conversion
 	inline	int32				_LineAt(float y);
 	inline	float				_LineOffset(int32 index);
-	inline	TermPos				_ConvertToTerminal(const BPoint& point);
+			TermPos				_ConvertToTerminal(const BPoint& point);
 	inline	BPoint				_ConvertFromTerminal(const TermPos& pos);
 
 	inline	void				_InvalidateTextRect(int32 x1, int32 y1,

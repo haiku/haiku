@@ -485,7 +485,7 @@ TermView::_LineOffset(int32 index)
 
 
 // convert view coordinates to terminal text buffer position
-inline TermPos
+TermPos
 TermView::_ConvertToTerminal(const BPoint &p)
 {
 	return TermPos(p.x >= 0 ? (int32)p.x / fFontWidth : -1, _LineAt(p.y));
@@ -2626,14 +2626,14 @@ TermView::_CheckHighlightRegion(int32 row, int32 firstColumn,
 			}
 			continue;
 		}
-	
+
 		if (row == highlight->End().y && firstColumn < highlight->End().x
 				&& lastColumn >= highlight->End().x) {
 			// region starts in the highlight, but exceeds the end
 			lastColumn = highlight->End().x - 1;
 			return highlight;
 		}
-	
+
 		TermPos pos(firstColumn, row);
 		if (highlight->RangeContains(pos))
 			return highlight;
