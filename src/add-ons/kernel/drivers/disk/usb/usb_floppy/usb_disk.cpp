@@ -669,8 +669,8 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 
 	mutex_init(&device->lock, "usb_disk device lock");
 
-	status_t result = device->notify =
-		create_sem(0, "usb_disk callback notify");
+	status_t result = device->notify
+		= create_sem(0, "usb_disk callback notify");
 
 	if (result < B_OK) {
 		mutex_destroy(&device->lock);
