@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	4167158175
+1	finnish	x-vnd.Haiku-libtracker	1638733886
 common	B_COMMON_DIRECTORY		yhteinen
 OK	WidgetAttributeText		Valmis
 Icon view	VolumeWindow		Kuvakenäkymä
@@ -212,7 +212,6 @@ Resize to fit	VolumeWindow		Muunna koko sopimaan
 Could not find application \"%appname\"	OpenWithWindow		Ei voitu löytää sovellusta ”%appname”
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Valittua kohdetta ei voida siirtää roskakoriin. Haluaisitko sen sijaan poistaa sen? (Tätä toimintoa ei voida palauttaa.)
 Invert	SelectionWindow		Käänteinen
-Save Query as template…	FindPanel		Tallenna kysely mallinteena...
 rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	nimeä uudelleen
 Find	FindPanel		Haku
 Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Siirrä

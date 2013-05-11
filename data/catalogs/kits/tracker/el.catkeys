@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	3015739927
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	487315638
 common	B_COMMON_DIRECTORY		κοινό
 OK	WidgetAttributeText		Εντάξει
 Icon view	VolumeWindow		Προβολή εικονιδίου
@@ -197,7 +197,6 @@ Resize to fit	VolumeWindow		Αλλαγή μεγέθους για να χωράε
 Could not find application \"%appname\"	OpenWithWindow		Αδυναμία εύρεσης της εφαρμογής  \"%appname\"
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		To επιλεγμένο στοιχείο δε μπορεί να μετακινηθεί στον κάδο απορριμμάτων. Θα θέλατε να το διαγράψετε αντ' αυτού; (Αυτή η λειτουργία δεν μπορεί να επανέλθει.)
 Invert	SelectionWindow		Αντιστροφή
-Save Query as template…	FindPanel		Αποθήκευση του ερωτήματος ως πρότυπο...
 rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	μετονομασία
 Find	FindPanel		Εύρεση
 Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Μετακίνηση

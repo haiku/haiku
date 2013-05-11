@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libbe	672385853
+1	finnish	x-vnd.Haiku-libbe	677628532
 gamma	AboutWindow		gamma
 beta	AboutWindow		beeta
 %3.2f GiB	StringForSize		%3.2f gibitavua
@@ -7,7 +7,6 @@ About %app%	AboutMenuItem		Ohjelmasta %app%
 Cut	TextView		Leikkaa
 Version	AboutWindow		Versio
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Ei voida luoda replikanttia kohteelle ”%description”.\n%error
-About	AboutWindow		Ohjelmasta
 Copy	TextView		Kopioi
 %3.2f KiB	StringForSize		%3.2f kibitavua
 %d bytes	StringForSize		%d tavua
