@@ -100,6 +100,3 @@ SEARCH on [ FGristFiles $(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES) ]
 	+= [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
 SEARCH on [ FGristFiles $(libSharedSources) ]
 	+= [ FDirName $(HAIKU_TOP) src kits shared ] ;
-
-
-HaikuSubInclude userland ;
