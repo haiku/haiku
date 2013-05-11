@@ -239,7 +239,7 @@ intel_extreme_init(intel_info &info)
 
 	AreaKeeper mmioMapper;
 	info.registers_area = mmioMapper.Map("intel extreme mmio",
-		(void*)info.pci->u.h0.base_registers[mmioIndex],
+		info.pci->u.h0.base_registers[mmioIndex],
 		info.pci->u.h0.base_register_sizes[mmioIndex],
 		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 		(void**)&info.registers);

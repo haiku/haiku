@@ -13,9 +13,6 @@
 #include <KernelExport.h>
 
 
-//#define TRACE_EXT2
-
-
 typedef uint64 fileblock_t;		// file block number
 typedef uint64 fsblock_t;		// filesystem block number
 

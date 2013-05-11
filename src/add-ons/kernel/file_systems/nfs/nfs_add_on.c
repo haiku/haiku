@@ -229,7 +229,8 @@ postoffice_func(fs_nspace *ns)
 
 				while (release_sem (call->sem) == B_INTERRUPTED);
 			} else {
-				dprintf("nfs: postoffice: can't find pending call to remove for xid %ld\n", xid);
+				dprintf("nfs: postoffice: can't find pending call to remove "
+					"for xid %" B_PRId32 "\n", xid);
 			}
 		}
 	}
@@ -324,7 +325,7 @@ send_rpc_call(fs_nspace *ns, const struct sockaddr_in *addr, int32 prog,
 
 	call = RPCPendingCallsFindAndRemovePendingCall(&ns->pendingCalls, xid, addr);
 
-	dprintf("nfs: xid %ld timed out, removing from queue", xid);
+	dprintf("nfs: xid %" B_PRId32 " timed out, removing from queue", xid);
 
 #if 0
 	if (call==NULL)
@@ -375,14 +376,15 @@ is_successful_reply(struct XDRInPacket *reply)
 		rpc_reject_stat rejectStat = (rpc_reject_stat)XDRInPacketGetInt32(reply);
 
 		if (rejectStat == RPC_RPC_MISMATCH) {
-			int32 low=XDRInPacketGetInt32(reply);
-			int32 high=XDRInPacketGetInt32(reply);
+			int32 low = XDRInPacketGetInt32(reply);
+			int32 high = XDRInPacketGetInt32(reply);
 
-			dprintf ("nfs: RPC_MISMATCH (%ld,%ld)", low, high);
+			dprintf("nfs: RPC_MISMATCH (%" B_PRId32 ",%" B_PRId32 ")", low,
+				high);
 		} else {
 			rpc_auth_stat authStat = (rpc_auth_stat)XDRInPacketGetInt32(reply);
 
-			dprintf  ("nfs: RPC_AUTH_ERROR (%d)", authStat);
+			dprintf("nfs: RPC_AUTH_ERROR (%d)", authStat);
 		}
 	} else {
 		rpc_auth_flavor flavor = (rpc_auth_flavor)XDRInPacketGetInt32(reply);
@@ -397,9 +399,10 @@ is_successful_reply(struct XDRInPacket *reply)
 			int32 low = XDRInPacketGetInt32(reply);
 			int32 high = XDRInPacketGetInt32(reply);
 
-			dprintf ("nfs: RPC_PROG_MISMATCH (%ld,%ld)", low, high);
+			dprintf("nfs: RPC_PROG_MISMATCH (%" B_PRId32 ",%" B_PRId32 ")",
+				low, high);
 		} else if (acceptStat != RPC_SUCCESS)
-			dprintf ("nfs: Accepted but failed (%d)", acceptStat);
+			dprintf("nfs: Accepted but failed (%d)", acceptStat);
 		else
 			success = true;
 	}
@@ -1217,7 +1220,8 @@ fs_mount(fs_volume *_vol, const char *devname, uint32 flags, const char *_parms,
 	if (_parms == NULL)
 		return EINVAL;
 
-	dprintf("nfs: mount(%ld, %s, %08lx)\n", _vol->id, devname, flags);
+	dprintf("nfs: mount(%" B_PRId32 ", %s, %08" B_PRIx32 ")\n", _vol->id,
+		devname, flags);
 	dprintf("nfs: nfs_params: %s\n", _parms);
 
 	// HAIKU: this should go to std_ops
@@ -1244,18 +1248,18 @@ fs_mount(fs_volume *_vol, const char *devname, uint32 flags, const char *_parms,
 	memset(ns->mountAddr.sin_zero, 0, sizeof(ns->mountAddr.sin_zero));
 
 	if ((result = create_socket(ns)) < B_OK) {
-		dprintf( "nfs: could not create socket (%d)\n", (int)result );
+		dprintf("nfs: could not create socket (%" B_PRId32 ")\n", result);
 		goto err_socket;
 	}
 
 	if ((result = init_postoffice(ns)) < B_OK) {
-		dprintf( "nfs: could not init_postoffice() (%d)\n", (int)result );
+		dprintf("nfs: could not init_postoffice() (%" B_PRId32 ")\n", result);
 		goto err_postoffice;
 	}
 
 	if ((result = get_remote_address(ns, MOUNT_PROGRAM, MOUNT_VERSION,
 			PMAP_IPPROTO_UDP, &ns->mountAddr)) < B_OK) {
-		dprintf( "could not get_remote_address() (%d)\n", (int)result );
+		dprintf("could not get_remote_address() (%" B_PRId32 ")\n", result);
 		goto err_sem;
 	}
 

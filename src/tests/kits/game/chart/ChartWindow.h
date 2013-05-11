@@ -292,8 +292,8 @@ static	BWindow		*GetAppWindow(const char *name);
 	
 	/* Engine processing related functions. */
 		/* those functions are the two processing threads launcher */
-static	long		Animation(void *data);
-static	long		Animation2(void *data);
+static	int32		Animation(void *data);
+static	int32		Animation2(void *data);
 		/* After every camera move or rotation, reprocess the torus
 		   cycle of the starfield to maintain the pyramid of vision
 		   of the camera completly inside a 1x1x1 iteration of the

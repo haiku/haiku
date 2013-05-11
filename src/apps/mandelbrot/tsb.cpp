@@ -243,7 +243,7 @@ char	t2_done;
 
 /*------------------------------------------------------------*/
 
-long	__calc1(void *arg)
+int32	__calc1(void *arg)
 {
 	tsbb->manda(vvx, vvy, ssx, ssx);
 	return B_NO_ERROR;
@@ -251,7 +251,7 @@ long	__calc1(void *arg)
 
 /*------------------------------------------------------------*/
 
-long	__calc2(void *arg)
+int32	__calc2(void *arg)
 {
 	tsbb->mandb(vvx, vvy, ssx, ssx);
 	return B_NO_ERROR;
@@ -526,7 +526,7 @@ char	TShowBit::has_selection()
 
 void	TShowBit::change_selection(long h, long v)
 {
-	ulong	buttons;
+	uint32	buttons;
 	long	h0;
 	long	v0;
 	BRect	new_select;

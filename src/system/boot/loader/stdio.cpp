@@ -1,12 +1,11 @@
 /*
- * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include <boot/vfs.h>
 #include <boot/stdio.h>
-#include <util/kernel_cpp.h>
 
 #include <errno.h>
 #include <stdarg.h>

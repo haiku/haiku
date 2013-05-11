@@ -1,7 +1,7 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2013, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "Directory.h"
@@ -9,7 +9,6 @@
 #include "File.h"
 
 #include <StorageDefs.h>
-#include <util/kernel_cpp.h>
 
 #include <string.h>
 #include <unistd.h>
@@ -17,6 +16,7 @@
 
 
 namespace FFS {
+
 
 Directory::Directory(Volume &volume, int32 block)
 	:
@@ -164,5 +164,6 @@ Directory::Inode() const
 {
 	return fNode.HeaderKey();
 }
+
 
 }	// namespace FFS

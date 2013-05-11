@@ -84,8 +84,8 @@ NoJournal::Unlock(Transaction* owner, bool success)
 status_t
 NoJournal::_WriteTransactionToLog()
 {
-	TRACE("NoJournal::_WriteTransactionToLog(): Ending transaction %ld\n",
-		fTransactionID);
+	TRACE("NoJournal::_WriteTransactionToLog(): Ending transaction %" B_PRId32
+		"\n", fTransactionID);
 
 	fTransactionID = cache_end_transaction(fFilesystemBlockCache,
 		fTransactionID, _TransactionWritten, NULL);
@@ -97,5 +97,5 @@ NoJournal::_WriteTransactionToLog()
 /*static*/ void
 NoJournal::_TransactionWritten(int32 transactionID, int32 event, void* param)
 {
-	TRACE("Transaction %ld checkpointed\n", transactionID);
+	TRACE("Transaction %" B_PRId32" checkpointed\n", transactionID);
 }

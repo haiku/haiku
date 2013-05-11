@@ -132,8 +132,8 @@ DirectoryIterator::Lookup(const char* name, size_t nameLength, ino_t* _id)
 	status_t status = fInode->GetVolume()->FSTree()->FindExact(key,
 		(void**)&entries, &length);
 	if (status != B_OK) {
-		TRACE("DirectoryIterator::Lookup(): Couldn't find entry with hash %lu "
-			"\"%s\"\n", hash, name);
+		TRACE("DirectoryIterator::Lookup(): Couldn't find entry with hash %" B_PRIu32
+			" \"%s\"\n", hash, name);
 		return status;
 	}
 

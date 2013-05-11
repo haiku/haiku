@@ -328,7 +328,7 @@ DragSortableListView::MessageReceived(BMessage* message)
 			BList indices;
 			int32 index;
 			for (int32 i = 0; message->FindInt32("index", i, &index) == B_OK; i++)
-				indices.AddItem((void*)index);
+				indices.AddItem((void*)(addr_t)index);
 			if (indices.CountItems() > 0) {
 				if (modifiers() & B_SHIFT_KEY)
 					CopyItems(indices, fDropIndex);
@@ -636,7 +636,7 @@ DragSortableListView::MoveItems(const BList& indices, int32 index)
 	BList removedItems;
 	int32 count = indices.CountItems();
 	for (int32 i = 0; i < count; i++) {
-		int32 removeIndex = (int32)indices.ItemAtFast(i) - i;
+		int32 removeIndex = (int32)(addr_t)indices.ItemAtFast(i) - i;
 		BListItem* item = RemoveItem(removeIndex);
 		if (item && removedItems.AddItem((void*)item)) {
 			if (removeIndex < index)
@@ -669,9 +669,9 @@ DragSortableListView::CopyItems(const BList& indices, int32 toIndex)
 	BList clonedItems;
 	int32 count = indices.CountItems();
 	for (int32 i = 0; i < count; i++) {
-		int32 index = (int32)indices.ItemAtFast(i);
+		int32 index = (int32)(addr_t)indices.ItemAtFast(i);
 		BListItem* item = CloneItem(index);
-		if (item && !clonedItems.AddItem((void*)item))
+		if (item && !clonedItems.AddItem((void*)(addr_t)item))
 			delete item;
 	}
 	count = clonedItems.CountItems();
@@ -693,7 +693,7 @@ DragSortableListView::RemoveItemList(const BList& indices)
 {
 	int32 count = indices.CountItems();
 	for (int32 i = 0; i < count; i++) {
-		int32 index = (int32)indices.ItemAtFast(i) - i;
+		int32 index = (int32)(addr_t)indices.ItemAtFast(i) - i;
 		delete RemoveItem(index);
 	}
 }
@@ -706,7 +706,7 @@ DragSortableListView::GetSelectedItems(BList& indices)
 		int32 index = CurrentSelection(i);
 		if (index < 0)
 			break;
-		if (!indices.AddItem((void*)index))
+		if (!indices.AddItem((void*)(addr_t)index))
 			break;
 	}
 }
@@ -731,7 +731,7 @@ DragSortableListView::RemoveAll()
 	BList indices;
 	int32 count = CountItems();
 	for (int32 i = 0; i < count; i++) {
-		if (!indices.AddItem((void*)i))
+		if (!indices.AddItem((void*)(addr_t)i))
 			break;
 	}
 

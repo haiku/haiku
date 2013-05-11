@@ -975,7 +975,7 @@ ConvertRecDate(ISORecDate* inDate, time_t* outDate)
 	time_t	time;
 	int		days, i, year, tz;
 
-	year = inDate->year -70;
+	year = inDate->year - 70;
 	tz = inDate->offsetGMT;
 
 	if (year < 0) {
@@ -1002,7 +1002,7 @@ ConvertRecDate(ISORecDate* inDate, time_t* outDate)
 			tz |= (-1 << 8);
 
 		if (-48 <= tz && tz <= 52)
-			time += tz *15 * 60;
+			time -= tz * 15 * 60;
 	}
 	*outDate = time;
 	return 0;

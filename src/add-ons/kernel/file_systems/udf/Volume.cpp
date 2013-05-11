@@ -48,9 +48,9 @@ status_t
 Volume::Mount(const char *deviceName, off_t offset, off_t length,
 	uint32 blockSize, uint32 flags)
 {
-	TRACE(("Volume::Mount: deviceName = `%s', offset = %Ld, length = %Ld, "
-		"blockSize: %ld, flags: %ld\n", deviceName, offset, length, blockSize,
-		flags));
+	TRACE(("Volume::Mount: deviceName = `%s', offset = %" B_PRIdOFF ", length "
+		"= %" B_PRIdOFF ", blockSize: %" B_PRIu32 ", flags: %" B_PRIu32 "\n",
+		deviceName, offset, length, blockSize, flags));
 	if (!deviceName)
 		return B_BAD_VALUE;
 	if (Mounted())
@@ -134,8 +134,9 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 				status = partition ? B_OK : B_NO_MEMORY;
 				if (!status) {
 					TRACE(("Volume::Mount: adding PhysicalPartition(number: %d, "
-						"start: %ld, length: %ld)\n", map->partition_number(),
-						descriptor->start(), descriptor->length()));
+						"start: %" B_PRIu32 ", length: %" B_PRIu32 ")\n",
+						map->partition_number(), descriptor->start(),
+						descriptor->length()));
 					status = _SetPartition(i, partition);
 					if (!status)
 						physicalCount++;
@@ -197,7 +198,7 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 							metadataCount++;
 					} else {
 						TRACE_ERROR(("Volume::Mount: metadata partition "
-							"creation failed! 0x%lx\n", status));
+							"creation failed! 0x%" B_PRIx32 "\n", status));
 					}
 				} else {
 					TRACE_ERROR(("Volume::Mount: no matching partition descriptor found!\n"));
@@ -241,9 +242,9 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 		fBlockSize = blockSize;
 		fBlockShift = blockShift;
 	}
-	TRACE(("Volume::Mount: device = %d, offset = %Ld, length = %Ld, "
-		"blockSize = %ld, blockShift = %ld\n", device, offset, length,
-		blockSize, blockShift));
+	TRACE(("Volume::Mount: device = %d, offset = %" B_PRIdOFF ", length = %"
+		B_PRIdOFF ", blockSize = %" B_PRIu32 ", blockShift = %" B_PRIu32 "\n",
+		device, offset, length, blockSize, blockShift));
 	// At this point we've found a valid set of volume descriptors and
 	// our partitions are all set up. We now need to investigate the file
 	// set descriptor pointed to by the logical volume descriptor.
@@ -265,8 +266,9 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 					= read_pos(device, address, chunk.Data(), blockSize);
 				if (bytesRead != ssize_t(blockSize)) {
 					status = B_IO_ERROR;
-					TRACE_ERROR(("read_pos(pos:%Ld, len:%ld) failed with: 0x%lx\n",
-						address, blockSize, bytesRead));
+					TRACE_ERROR(("read_pos(pos:%" B_PRIdOFF ", len:%" B_PRIu32
+						") failed with: 0x%lx\n", address, blockSize,
+						bytesRead));
 				}
 			}
 			// See if it's valid, and if so, create the root icb
@@ -286,21 +288,22 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 						return B_NO_MEMORY;
 				}
 
-				TRACE(("Volume::Mount: Root Node id = %Ld\n", fRootIcb->Id()));
+				TRACE(("Volume::Mount: Root Node id = %" B_PRIdINO "\n",
+					fRootIcb->Id()));
 				if (!status) {
 					status = publish_vnode(fFSVolume, fRootIcb->Id(), fRootIcb,
 						&gUDFVnodeOps, fRootIcb->Mode(), 0);
 					if (status != B_OK) {
 						TRACE_ERROR(("Error creating vnode for root icb! "
-						       "status = 0x%lx, `%s'\n", status,
+						       "status = 0x%" B_PRIx32 ", `%s'\n", status,
 						       strerror(status)));
 						// Clean up the icb we created, since _Unset()
 						// won't do this for us.
 						delete fRootIcb;
 						fRootIcb = NULL;
 					}
-					TRACE(("Volume::Mount: Root vnode published. Id = %Ld\n",
-						fRootIcb->Id()));
+					TRACE(("Volume::Mount: Root vnode published. Id = %"
+						B_PRIdINO "\n", fRootIcb->Id()));
 				}
 			}
 		}
@@ -330,10 +333,12 @@ Volume::Name() const {
 status_t
 Volume::MapBlock(long_address address, off_t *mappedBlock)
 {
-	TRACE(("Volume::MapBlock: partition = %d, block = %ld, mappedBlock = %p\n",
-		address.partition(), address.block(), mappedBlock));
-	DEBUG_INIT_ETC("Volume", ("partition = %d, block = %ld, mappedBlock = %p",
-		address.partition(), address.block(), mappedBlock));
+	TRACE(("Volume::MapBlock: partition = %d, block = %" B_PRIu32
+		", mappedBlock = %p\n", address.partition(), address.block(),
+		mappedBlock));
+	DEBUG_INIT_ETC("Volume", ("partition = %d, block = %" B_PRIu32
+		", mappedBlock = %p", address.partition(), address.block(),
+		mappedBlock));
 	status_t error = mappedBlock ? B_OK : B_BAD_VALUE;
 	if (!error) {
 		Partition *partition = _GetPartition(address.partition());

@@ -18,7 +18,7 @@
 
 #define DRIVER_NAME			"usb_printer"
 #define DEVICE_NAME_BASE	"printer/usb/"
-#define DEVICE_NAME			DEVICE_NAME_BASE"%ld"
+#define DEVICE_NAME			DEVICE_NAME_BASE "%" B_PRId32
 
 #define SECONDS             ((bigtime_t)1000 * 1000)
 #define MINUTES             (60 * SECONDS)
@@ -142,7 +142,7 @@ usb_printer_callback(void *cookie, status_t status, void *data,
 static status_t
 usb_printer_device_added(usb_device newDevice, void **cookie)
 {
-	TRACE("device_added(0x%08lx)\n", newDevice);
+	TRACE("device_added(0x%08" B_PRIx32 ")\n", newDevice);
 	printer_device *device = (printer_device *)malloc(sizeof(printer_device));
 	device->device = newDevice;
 	device->removed = false;
@@ -261,7 +261,7 @@ usb_printer_device_added(usb_device newDevice, void **cookie)
 	sprintf(device->name, DEVICE_NAME, deviceNumber);
 	mutex_unlock(&gDeviceListLock);
 
-	TRACE("new device: 0x%08lx\n", (uint32)device);
+	TRACE("new device: 0x%p\n", device);
 	*cookie = (void *)device;
 	return B_OK;
 }
@@ -270,7 +270,7 @@ usb_printer_device_added(usb_device newDevice, void **cookie)
 static status_t
 usb_printer_device_removed(void *cookie)
 {
-	TRACE("device_removed(0x%08lx)\n", (uint32)cookie);
+	TRACE("device_removed(0x%p)\n", cookie);
 	printer_device *device = (printer_device *)cookie;
 
 	mutex_lock(&gDeviceListLock);
@@ -412,7 +412,7 @@ usb_printer_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 		}
 
 		default:
-			TRACE_ALWAYS("unhandled ioctl %ld\n", op);
+			TRACE_ALWAYS("unhandled ioctl %" B_PRIu32 "\n", op);
 			break;
 	}
 
@@ -459,7 +459,7 @@ usb_printer_read(void *cookie, off_t position, void *buffer, size_t *length)
 	if (buffer == NULL || length == NULL)
 		return B_BAD_VALUE;
 
-	TRACE("read(%lld, %ld)\n", position, *length);
+	TRACE("read(%" B_PRIdOFF ", %" B_PRIuSIZE ")\n", position, *length);
 	printer_device *device = (printer_device *)cookie;
 	mutex_lock(&device->lock);
 	if (device->removed) {
@@ -472,12 +472,12 @@ usb_printer_read(void *cookie, off_t position, void *buffer, size_t *length)
 
 	mutex_unlock(&device->lock);
 	if (result == B_OK) {
-		TRACE("read successful with %ld bytes\n", *length);
+		TRACE("read successful with %" B_PRIuSIZE " bytes\n", *length);
 		return B_OK;
 	}
 
 	*length = 0;
-	TRACE_ALWAYS("read fails with 0x%08lx\n", result);
+	TRACE_ALWAYS("read fails with 0x%08" B_PRIx32 "\n", result);
 	return result;
 }
 
@@ -489,7 +489,7 @@ usb_printer_write(void *cookie, off_t position, const void *buffer,
 	if (buffer == NULL || length == NULL)
 		return B_BAD_VALUE;
 
-	TRACE("write(%lld, %ld)\n", position, *length);
+	TRACE("write(%" B_PRIdOFF ", %" B_PRIuSIZE ")\n", position, *length);
 	printer_device *device = (printer_device *)cookie;
 	mutex_lock(&device->lock);
 	if (device->removed) {
@@ -503,12 +503,12 @@ usb_printer_write(void *cookie, off_t position, const void *buffer,
 
 	mutex_unlock(&device->lock);
 	if (result == B_OK) {
-		TRACE("write successful with %ld bytes\n", *length);
+		TRACE("write successful with %" B_PRIuSIZE " bytes\n", *length);
 		return B_OK;
 	}
 
 	*length = 0;
-	TRACE_ALWAYS("write fails with 0x%08lx\n", result);
+	TRACE_ALWAYS("write fails with 0x%08" B_PRIx32 "\n", result);
 	return result;
 }
 
@@ -551,7 +551,7 @@ init_driver()
 	status_t result = get_module(B_USB_MODULE_NAME,
 		(module_info **)&gUSBModule);
 	if (result < B_OK) {
-		TRACE_ALWAYS("getting module failed 0x%08lx\n", result);
+		TRACE_ALWAYS("getting module failed 0x%08" B_PRIx32 "\n", result);
 		mutex_destroy(&gDeviceListLock);
 		return result;
 	}

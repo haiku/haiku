@@ -137,6 +137,7 @@ typedef	generic_addr_t			generic_size_t;
 /* off_t */
 #define B_PRIdOFF		B_PRId64
 #define B_PRIiOFF		B_PRIi64
+#define B_PRIxOFF		B_PRIx64
 /* dev_t */
 #define B_PRIdDEV		B_PRId32
 #define B_PRIiDEV		B_PRIi32

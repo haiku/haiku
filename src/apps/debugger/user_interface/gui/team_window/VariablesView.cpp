@@ -1953,19 +1953,19 @@ VariablesView::_GetContextActionsForNode(ModelNode* node,
 	ContextActionList* actions)
 {
 	ValueLocation* location = node->NodeChild()->Location();
-
-	// if the location's stored somewhere other than in memory,
-	// then we won't be able to inspect it this way.
-	if (location->PieceAt(0).type != VALUE_PIECE_LOCATION_MEMORY)
-		return B_OK;
-
+	status_t result = B_OK;
 	BMessage* message = NULL;
-	status_t result = _AddContextAction("Inspect", MSG_SHOW_INSPECTOR_WINDOW,
-		actions, message);
-	if (result != B_OK)
-		return result;
 
-	message->AddUInt64("address", location->PieceAt(0).address);
+	// only show the Inspect option if the value is in fact located
+	// in memory.
+	if (location->PieceAt(0).type == VALUE_PIECE_LOCATION_MEMORY) {
+		result = _AddContextAction("Inspect", MSG_SHOW_INSPECTOR_WINDOW,
+			actions, message);
+		if (result != B_OK)
+			return result;
+		message->AddUInt64("address", location->PieceAt(0).address);
+	}
+
 
 	result = _AddContextAction("Cast as" B_UTF8_ELLIPSIS,
 		MSG_SHOW_TYPECAST_NODE_PROMPT, actions, message);

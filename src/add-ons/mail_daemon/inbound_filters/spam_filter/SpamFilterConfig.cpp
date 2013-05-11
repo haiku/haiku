@@ -414,7 +414,7 @@ AGMSBayesianSpamFilterConfig::ShowSpamServerConfigurationWindow () {
 	maximizeCommand.what = B_SET_PROPERTY;
 	maximizeCommand.AddBool ("data", false);
 	maximizeCommand.AddSpecifier ("Minimize");
-	maximizeCommand.AddSpecifier ("Window", 0L);
+	maximizeCommand.AddSpecifier ("Window", (int32)0);
 	errorCode = messengerToServer.SendMessage (&maximizeCommand, &replyMessage);
 	if (errorCode != B_OK)
 		goto ErrorExit;

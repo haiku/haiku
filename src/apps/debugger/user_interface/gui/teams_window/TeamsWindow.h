@@ -25,6 +25,7 @@ public:
 	static	TeamsWindow*		Create(SettingsManager* settingsManager);
 									// throws
 
+	virtual	void				Zoom(BPoint origin, float width, float height);
 	virtual void				MessageReceived(BMessage* message);
 	virtual bool				QuitRequested();
 

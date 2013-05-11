@@ -1255,7 +1255,7 @@ bool ColumnListView::RemoveItems(int32 fullListIndex, int32 count)
 	CLVListItem* TheItem;
 	if(fHierarchical)
 	{
-		uint32 LastSuperItemLevel = ULONG_MAX;
+		uint32 LastSuperItemLevel = UINT32_MAX;
 		int32 Counter;
 		int32 DisplayItemsToRemove = 0;
 		int32 FirstDisplayItemToRemove = -1;

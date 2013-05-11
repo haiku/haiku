@@ -43,7 +43,7 @@ RuleFilter::RuleFilter(MailProtocol& protocol, AddonSettings* addonSettings)
 	fMatcher.SetPattern(regex, false);
 	
 	settings->FindString("argument",&fArg);
-	settings->FindInt32("do_what",(long *)&fDoWhat);
+	settings->FindInt32("do_what", (int32*)&fDoWhat);
 	if (fDoWhat == Z_SET_REPLY)
 		settings->FindInt32("argument", &fReplyAccount);
 }

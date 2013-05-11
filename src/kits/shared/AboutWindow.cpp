@@ -176,6 +176,7 @@ AboutView::AboutView(const char* appName, const char* signature)
 	fInfoView->SetInsets(5.0, 5.0, 5.0, 5.0);
 	fInfoView->SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
 	fInfoView->SetHighColor(ui_color(B_DOCUMENT_TEXT_COLOR));
+	fInfoView->SetStylable(true);
 
 	BScrollView* infoViewScroller = new BScrollView(
 		"infoViewScroller", fInfoView, B_WILL_DRAW | B_FRAME_EVENTS,
@@ -435,16 +436,7 @@ BAboutWindow::AddDescription(const char* description)
 	if (description == NULL)
 		return;
 
-	const char* appDesc = B_TRANSLATE_MARK(description);
-	appDesc = gSystemCatalog.GetString(appDesc, "AboutWindow");
-
-	BString desc("");
-	if (fAboutView->InfoView()->TextLength() > 0)
-		desc << "\n\n";
-
-	desc << appDesc;
-
-	fAboutView->InfoView()->Insert(desc.String());
+	AddText(description);
 }
 
 
@@ -501,16 +493,7 @@ BAboutWindow::AddAuthors(const char** authors)
 	const char* writtenBy = B_TRANSLATE_MARK("Written by:");
 	writtenBy = gSystemCatalog.GetString(writtenBy, "AboutWindow");
 
-	BString text("");
-	if (fAboutView->InfoView()->TextLength() > 0)
-		text << "\n\n";
-
-	text << writtenBy;
-	text << "\n";
-	for (int32 i = 0; authors[i]; i++)
-		text << "    " << authors[i] << "\n";
-
-	fAboutView->InfoView()->Insert(text.String());
+	AddText(writtenBy, authors);
 }
 
 
@@ -523,15 +506,7 @@ BAboutWindow::AddSpecialThanks(const char** thanks)
 	const char* specialThanks = B_TRANSLATE_MARK("Special Thanks:");
 	specialThanks = gSystemCatalog.GetString(specialThanks, "AboutWindow");
 
-	BString text("");
-	if (fAboutView->InfoView()->TextLength() > 0)
-		text << "\n\n";
-
-	text << specialThanks << "\n";
-	for (int32 i = 0; thanks[i]; i++)
-		text << "    " << thanks[i] << "\n";
-
-	fAboutView->InfoView()->Insert(text.String());
+	AddText(specialThanks, thanks);
 }
 
 
@@ -544,15 +519,7 @@ BAboutWindow::AddVersionHistory(const char** history)
 	const char* versionHistory = B_TRANSLATE_MARK("Version history:");
 	versionHistory = gSystemCatalog.GetString(versionHistory, "AboutWindow");
 
-	BString text("");
-	if (fAboutView->InfoView()->TextLength() > 0)
-		text << "\n\n";
-
-	text << versionHistory << "\n";
-	for (int32 i = 0; history[i]; i++)
-		text << "    " << history[i] << "\n";
-
-	fAboutView->InfoView()->Insert(text.String());
+	AddText(versionHistory, history);
 }
 
 
@@ -572,6 +539,39 @@ BAboutWindow::AddExtraInfo(const char* extraInfo)
 	extra << appExtraInfo;
 
 	fAboutView->InfoView()->Insert(extra.String());
+}
+
+
+void
+BAboutWindow::AddText(const char* header, const char** contents)
+{
+	BTextView* infoView = fAboutView->InfoView();
+	int32 textLength = infoView->TextLength();
+	BString text("");
+
+	if (textLength > 0) {
+		text << "\n\n";
+		textLength += 2;
+	}
+
+	const char* indent = "";
+	if (header != NULL) {
+		indent = "    ";
+		text << header;
+	}
+
+	if (contents != NULL) {
+		text << "\n";
+		for (int32 i = 0; contents[i]; i++)
+			text << indent << contents[i] << "\n";
+	}
+
+	infoView->Insert(text.String());
+
+	if (contents != NULL && header != NULL) {
+		infoView->SetFontAndColor(textLength, textLength + strlen(header),
+			be_bold_font);
+	}
 }
 
 

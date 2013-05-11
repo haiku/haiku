@@ -16,6 +16,7 @@ Application Terminal :
 	FindWindow.cpp
 	Globals.cpp
 	HistoryBuffer.cpp
+	HyperLink.cpp
 	InlineInput.cpp
 	PatternEvaluator.cpp
 	PrefHandler.cpp
@@ -33,6 +34,8 @@ Application Terminal :
 	TermParse.cpp
 	TermScrollView.cpp
 	TermView.cpp
+	TermViewHighlight.cpp
+	TermViewStates.cpp
 	TermWindow.cpp
 	TitlePlaceholderMapper.cpp
 	VTKeyTbl.c

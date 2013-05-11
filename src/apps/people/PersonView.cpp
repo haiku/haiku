@@ -217,7 +217,7 @@ PersonView::BuildGroupMenu()
 			if (file.InitCheck() == B_OK
 				&& file.GetAttrInfo(fCategoryAttribute, &info) == B_OK
 				&& info.size > 1) {
-				if (info.size > sizeof(buffer))
+				if (info.size > (off_t)sizeof(buffer))
 					info.size = sizeof(buffer);
 
 				if (file.ReadAttr(fCategoryAttribute.String(), B_STRING_TYPE,

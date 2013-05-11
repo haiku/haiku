@@ -37,8 +37,8 @@ Inode::Inode(Volume* volume, cluster_t cluster, uint32 offset)
 	fCache(NULL),
 	fMap(NULL)
 {
-	TRACE("Inode::Inode(%ld, %d) inode %" B_PRIdINO "\n", Cluster(), Offset(),
-		ID());
+	TRACE("Inode::Inode(%" B_PRIu32 ", %" B_PRIu32 ") inode %" B_PRIdINO "\n",
+		Cluster(), Offset(), ID());
 	_Init();
 
 	if (ID() == 1) {
@@ -72,7 +72,8 @@ Inode::Inode(Volume* volume, ino_t ino)
 		fOffset = key->offset;
 		fInitStatus = B_OK;
 	}
-	TRACE("Inode::Inode(%" B_PRIdINO ") cluster %ld\n", ID(), Cluster());
+	TRACE("Inode::Inode(%" B_PRIdINO ") cluster %" B_PRIu32 "\n", ID(),
+		Cluster());
 	_Init();
 
 	if (fInitStatus == B_OK && ID() != 1) {
@@ -204,14 +205,14 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 
 	// set/check boundaries for pos/length
 	if (pos < 0) {
-		ERROR("inode %" B_PRIdINO ": ReadAt failed(pos %lld, length %lu)\n",
-			ID(), pos, length);
+		ERROR("inode %" B_PRIdINO ": ReadAt failed(pos %" B_PRIdOFF", length %"
+			B_PRIuSIZE ")\n", ID(), pos, length);
 		return B_BAD_VALUE;
 	}
 
 	if (pos >= Size() || length == 0) {
-		TRACE("inode %" B_PRIdINO ": ReadAt 0 (pos %lld, length %lu)\n",
-			ID(), pos, length);
+		TRACE("inode %" B_PRIdINO ": ReadAt 0 (pos %" B_PRIdOFF", length %"
+			B_PRIuSIZE ")\n", ID(), pos, length);
 		*_length = 0;
 		return B_NO_ERROR;
 	}
@@ -269,9 +270,11 @@ Inode::_GetTimespec(uint16 date, uint16 time, struct timespec &timespec) const
 	if (tzoffset == -1)
 		tzoffset = get_timezone_offset() / 60;
 
-	time_t days = daze[(date>>5)&15] + ((date>>9)+10)*365 + leaps((date>>9)+10,((date>>5)&15)-1)+(date&31)-1;
+	time_t days = daze[(date >> 5) & 15] + ((date >> 9) + 10) * 365
+		+ leaps((date >> 9) + 10, ((date >> 5) & 15) - 1) + (date & 31) -1;
 
-	timespec.tv_sec = ((days * 24 + (time >> 11)) * 60 + ((time>>5)&63) + tzoffset) * 60 + 2*(time&31);
+	timespec.tv_sec = ((days * 24 + (time >> 11)) * 60 + ((time >> 5) & 63)
+		- tzoffset) * 60 + 2 * (time & 31);
 	timespec.tv_nsec = 0;
 }
 

@@ -183,22 +183,24 @@ MixerInput::BufferReceived(BBuffer* buffer)
 				offset = expected_frame;
 			} else {
 				printf("MixerInput::BufferReceived: GLITCH! last frame was "
-					"%4ld, expected frame was %4d, new frame is %4d\n",
-					fLastDataFrameWritten, expected_frame, offset);
+					"%4" B_PRId32 ", expected frame was %4d, new frame is %4d"
+					"\n", fLastDataFrameWritten, expected_frame, offset);
 
 				if (start > fLastDataAvailableTime) {
 					if ((start - fLastDataAvailableTime)
 						< (buffer_duration / 10)) {
 						// buffer is less than 10% of buffer duration too late
 						printf("short glitch, buffer too late, time delta "
-							"%Ld\n", start - fLastDataAvailableTime);
+							"%" B_PRIdBIGTIME "\n", start
+							- fLastDataAvailableTime);
 						offset = expected_frame;
 						out_frames++;
 					} else {
 						// buffer more than 10% of buffer duration too late
 						// TODO: zerofill buffer
 						printf("MAJOR glitch, buffer too late, time delta "
-							"%Ld\n", start - fLastDataAvailableTime);
+							"%" B_PRIdBIGTIME "\n", start
+							- fLastDataAvailableTime);
 					}
 				} else { // start <= fLastDataAvailableTime
 					// the new buffer is too early
@@ -206,7 +208,8 @@ MixerInput::BufferReceived(BBuffer* buffer)
 						< (buffer_duration / 10)) {
 						// buffer is less than 10% of buffer duration too early
 						printf("short glitch, buffer too early, time delta "
-							"%Ld\n", fLastDataAvailableTime - start);
+							"%" B_PRIdBIGTIME "\n", fLastDataAvailableTime
+							- start);
 						offset = expected_frame;
 						out_frames--;
 						if (out_frames < 1)
@@ -215,7 +218,8 @@ MixerInput::BufferReceived(BBuffer* buffer)
 						// buffer more than 10% of buffer duration too early
 						// TODO: zerofill buffer
 						printf("MAJOR glitch, buffer too early, time delta "
-							"%Ld\n", fLastDataAvailableTime - start);
+							"%" B_PRIdBIGTIME "\n", fLastDataAvailableTime
+							- start);
 					}
 				}
 			}

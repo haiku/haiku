@@ -65,7 +65,7 @@ ErrorAlert(const char* message, status_t err, BWindow *window = NULL)
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 
-	printf("%s\n%s [%lx]", message, strerror(err), err);
+	printf("%s\n%s [%" B_PRIx32 "]", message, strerror(err), err);
 }
 
 
@@ -541,7 +541,7 @@ VideoWindow::MessageReceived(BMessage* message)
 
 		case msg_upl_client:
 			message->FindInt32("client", &(fFtpInfo.uploadClient));
-			FTPINFO("upl client = %ld\n", fFtpInfo.uploadClient);
+			FTPINFO("upl client = %" B_PRId32 "\n", fFtpInfo.uploadClient);
 			_UploadClientChanged();
 			break;
 

@@ -53,7 +53,7 @@ StringForChannelMask(char *str, uint32 mask)
 	DECODE(B_CHANNEL_MONO, "Mono");
 	#undef DECODE
 	if (mask)
-		sprintf(str + strlen(str), "0x%08lX", mask);
+		sprintf(str + strlen(str), "0x%08" B_PRIx32, mask);
 	return str;
 }
 

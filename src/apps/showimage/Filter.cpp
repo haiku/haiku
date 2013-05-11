@@ -829,6 +829,7 @@ Scaler::Dither(int32 fromRow, int32 toRow)
 			color.red = Limit(srcData[2] + error[0] / 16);
 			color.green = Limit(srcData[1] + error[1] / 16);
 			color.blue = Limit(srcData[0] + error[2] / 16);
+			color.alpha = UINT8_MAX;
 
 			index = screen.IndexForColor(color);
 			actualColor = screen.ColorForIndex(index);
@@ -879,6 +880,7 @@ Scaler::Dither(int32 fromRow, int32 toRow)
 			color.red = Limit(srcData[2] + error[0] / 16);
 			color.green = Limit(srcData[1] + error[1] / 16);
 			color.blue = Limit(srcData[0] + error[2] / 16);
+			color.alpha = UINT8_MAX;
 
 			index = screen.IndexForColor(color);
 			actualColor = screen.ColorForIndex(index);

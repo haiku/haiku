@@ -176,7 +176,7 @@ MainWindow::MessageReceived(BMessage* message)
 
 	if (message->WasDropped()) {
 		const rgb_color* color;
-		int32 length;
+		ssize_t length;
 		// create styles from dropped colors
 		for (int32 i = 0; message->FindData("RGBColor", B_RGB_COLOR_TYPE, i, 
 			(const void**)&color, &length) == B_OK; i++) {

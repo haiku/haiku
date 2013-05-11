@@ -168,9 +168,10 @@ NodeManager::RegisterNode(media_addon_id addOnID, int32 flavorID,
 
 	*_nodeID = fNextNodeID++;
 
-	TRACE("NodeManager::RegisterNode: node %ld, addon_id %ld, flavor_id %ld, "
-		"name \"%s\", kinds %#Lx, port %ld, team %ld\n", *_nodeID, addOnID,
-		flavorID, name, kinds, port, team);
+	TRACE("NodeManager::RegisterNode: node %" B_PRId32 ", addon_id %" B_PRId32
+		", flavor_id %" B_PRId32 ", name \"%s\", kinds %#Lx, port %" B_PRId32
+		", team %" B_PRId32 "\n", *_nodeID, addOnID, flavorID, name, kinds,
+		port, team);
 	return B_OK;
 }
 
@@ -179,28 +180,30 @@ status_t
 NodeManager::UnregisterNode(media_node_id id, team_id team,
 	media_addon_id* _addOnID, int32* _flavorID)
 {
-	TRACE("NodeManager::UnregisterNode enter: node %ld, team %ld\n", id, team);
+	TRACE("NodeManager::UnregisterNode enter: node %" B_PRId32 ", team %"
+		B_PRId32 "\n", id, team);
 
 	BAutolock _(this);
 
 	NodeMap::iterator found = fNodeMap.find(id);
 	if (found == fNodeMap.end()) {
-		ERROR("NodeManager::UnregisterNode: couldn't find node %ld (team "
-			"%ld)\n", id, team);
+		ERROR("NodeManager::UnregisterNode: couldn't find node %" B_PRId32 
+			" (team %" B_PRId32 ")\n", id, team);
 		return B_ERROR;
 	}
 
 	registered_node& node = found->second;
 
 	if (node.containing_team != team) {
-		ERROR("NodeManager::UnregisterNode: team %ld tried to unregister "
-			"node %ld, but it was instantiated by team %ld\n", team, id,
-			node.containing_team);
+		ERROR("NodeManager::UnregisterNode: team %" B_PRId32 " tried to "
+			"unregister node %" B_PRId32 ", but it was instantiated by team %"
+			B_PRId32 "\n", team, id, node.containing_team);
 		return B_ERROR;
 	}
 	if (node.ref_count != 1) {
-		ERROR("NodeManager::UnregisterNode: node %ld, team %ld has ref count "
-			"%ld (should be 1)\n", id, team, node.ref_count);
+		ERROR("NodeManager::UnregisterNode: node %" B_PRId32 ", team %"
+			B_PRId32 " has ref count %" B_PRId32 " (should be 1)\n", id, team,
+			node.ref_count);
 		//return B_ERROR;
 	}
 
@@ -209,8 +212,9 @@ NodeManager::UnregisterNode(media_node_id id, team_id team,
 
 	fNodeMap.erase(found);
 
-	TRACE("NodeManager::UnregisterNode leave: node %ld, addon_id %ld, "
-		"flavor_id %ld team %ld\n", id, *_addOnID, *_flavorID, team);
+	TRACE("NodeManager::UnregisterNode leave: node %" B_PRId32 ", addon_id %"
+		B_PRId32 ", flavor_id %" B_PRId32 " team %" B_PRId32 "\n", id,
+		*_addOnID, *_flavorID, team);
 	return B_OK;
 }
 
@@ -218,14 +222,15 @@ NodeManager::UnregisterNode(media_node_id id, team_id team,
 status_t
 NodeManager::ReleaseNodeReference(media_node_id id, team_id team)
 {
-	TRACE("NodeManager::ReleaseNodeReference enter: node %ld, team %ld\n", id,
-		team);
+	TRACE("NodeManager::ReleaseNodeReference enter: node %" B_PRId32 ", team %"
+		B_PRId32 "\n", id, team);
 
 	BAutolock _(this);
 
 	NodeMap::iterator found = fNodeMap.find(id);
 	if (found == fNodeMap.end()) {
-		ERROR("NodeManager::ReleaseNodeReference: node %ld not found\n", id);
+		ERROR("NodeManager::ReleaseNodeReference: node %" B_PRId32 " not "
+			"found\n", id);
 		return B_ERROR;
 	}
 
@@ -246,8 +251,8 @@ NodeManager::ReleaseNodeReference(media_node_id id, team_id team)
 			node.creator = -1; // invalidate!
 			team = addOnServer;
 		} else {
-			ERROR("NodeManager::ReleaseNodeReference: node %ld has no team "
-				"%ld references\n", id, team);
+			ERROR("NodeManager::ReleaseNodeReference: node %" B_PRId32 " has "
+				"no team %" B_PRId32 " references\n", id, team);
 			return B_ERROR;
 		}
 	}
@@ -261,8 +266,8 @@ NodeManager::ReleaseNodeReference(media_node_id id, team_id team)
 		node.team_ref_count.erase(teamRef);
 
 	if (--node.ref_count == 0) {
-		PRINT(1, "NodeManager::ReleaseNodeReference: detected released node is "
-			"now unused, node %ld\n", id);
+		PRINT(1, "NodeManager::ReleaseNodeReference: detected released node is"
+			" now unused, node %" B_PRId32 "\n", id);
 
 		// TODO: remove!
 		node_final_release_command command;
@@ -270,13 +275,14 @@ NodeManager::ReleaseNodeReference(media_node_id id, team_id team)
 			sizeof(command));
 		if (status != B_OK) {
 			ERROR("NodeManager::ReleaseNodeReference: can't send command to "
-				"node %ld\n", id);
+				"node %" B_PRId32 "\n", id);
 			// ignore error
 		}
 	}
 
-	TRACE("NodeManager::ReleaseNodeReference leave: node %ld, team %ld, "
-		"ref %ld, team ref %ld\n", id, team, node.ref_count, teamCount);
+	TRACE("NodeManager::ReleaseNodeReference leave: node %" B_PRId32 ", team %"
+		B_PRId32 ", ref %" B_PRId32 ", team ref %" B_PRId32 "\n", id, team,
+		node.ref_count, teamCount);
 	return B_OK;
 }
 
@@ -284,13 +290,14 @@ NodeManager::ReleaseNodeReference(media_node_id id, team_id team)
 status_t
 NodeManager::ReleaseNodeAll(media_node_id id)
 {
-	TRACE("NodeManager::ReleaseNodeAll enter: node %ld\n", id);
+	TRACE("NodeManager::ReleaseNodeAll enter: node %" B_PRId32 "\n", id);
 
 	BAutolock _(this);
 	
 	NodeMap::iterator found = fNodeMap.find(id);
 	if (found == fNodeMap.end()) {
-		ERROR("NodeManager::ReleaseNodeAll: node %ld not found\n", id);
+		ERROR("NodeManager::ReleaseNodeAll: node %" B_PRId32 " not found\n",
+			id);
 		return B_ERROR;
 	}
 	
@@ -303,11 +310,11 @@ NodeManager::ReleaseNodeAll(media_node_id id)
 		sizeof(command));
 	if (status != B_OK) {
 		ERROR("NodeManager::ReleaseNodeAll: can't send command to "
-			"node %ld\n", id);
+			"node %" B_PRId32 "\n", id);
 		// ignore error
 	}
 
-	TRACE("NodeManager::ReleaseNodeAll leave: node %ld\n", id);
+	TRACE("NodeManager::ReleaseNodeAll leave: node %" B_PRId32 "\n", id);
 	return B_OK;
 }
 
@@ -315,21 +322,23 @@ NodeManager::ReleaseNodeAll(media_node_id id)
 status_t
 NodeManager::SetNodeCreator(media_node_id id, team_id creator)
 {
-	TRACE("NodeManager::SetNodeCreator node %ld, creator %ld\n", id, creator);
+	TRACE("NodeManager::SetNodeCreator node %" B_PRId32 ", creator %" B_PRId32
+		"\n", id, creator);
 
 	BAutolock _(this);
 
 	NodeMap::iterator found = fNodeMap.find(id);
 	if (found == fNodeMap.end()) {
-		ERROR("NodeManager::SetNodeCreator: node %ld not found\n", id);
+		ERROR("NodeManager::SetNodeCreator: node %" B_PRId32 " not found\n",
+			id);
 		return B_ERROR;
 	}
 
 	registered_node& node = found->second;
 
 	if (node.creator != -1) {
-		ERROR("NodeManager::SetNodeCreator: node %ld is already assigned "
-			"creator %ld\n", id, node.creator);
+		ERROR("NodeManager::SetNodeCreator: node %" B_PRId32 " is already"
+			" assigned creator %" B_PRId32 "\n", id, node.creator);
 		return B_ERROR;
 	}
 
@@ -341,20 +350,22 @@ NodeManager::SetNodeCreator(media_node_id id, team_id creator)
 status_t
 NodeManager::GetCloneForID(media_node_id id, team_id team, media_node* node)
 {
-	TRACE("NodeManager::GetCloneForID enter: node %ld team %ld\n", id, team);
+	TRACE("NodeManager::GetCloneForID enter: node %" B_PRId32 " team %"
+		B_PRId32 "\n", id, team);
 
 	BAutolock _(this);
 
 	status_t status = _AcquireNodeReference(id, team);
 	if (status != B_OK) {
 		ERROR("NodeManager::GetCloneForID: couldn't increment ref count, "
-			"node %ld team %ld\n", id, team);
+			"node %" B_PRId32 " team %" B_PRId32 "\n", id, team);
 		return status;
 	}
 
 	NodeMap::iterator found = fNodeMap.find(id);
 	if (found == fNodeMap.end()) {
-		ERROR("NodeManager::GetCloneForID: node %ld not found\n", id);
+		ERROR("NodeManager::GetCloneForID: node %" B_PRId32 " not found\n",
+			id);
 		return B_ERROR;
 	}
 
@@ -364,7 +375,8 @@ NodeManager::GetCloneForID(media_node_id id, team_id team, media_node* node)
 	node->port = registeredNode.port;
 	node->kind = registeredNode.kinds;
 
-	TRACE("NodeManager::GetCloneForID leave: node %ld team %ld\n", id, team);
+	TRACE("NodeManager::GetCloneForID leave: node %" B_PRId32 " team %"
+		B_PRId32 "\n", id, team);
 	return B_OK;
 }
 
@@ -382,13 +394,14 @@ NodeManager::GetClone(node_type type, team_id team, media_node* node,
 {
 	BAutolock _(this);
 
-	TRACE("NodeManager::GetClone enter: team %ld, type %d (%s)\n", team, type, get_node_type(type));
+	TRACE("NodeManager::GetClone enter: team %" B_PRId32 ", type %d (%s)\n",
+		team, type, get_node_type(type));
 
 	media_node_id id;
 	status_t status = GetDefaultNode(type, &id, inputName, _inputID);
 	if (status != B_OK) {
-		ERROR("NodeManager::GetClone: couldn't GetDefaultNode, team %ld, "
-			"type %d (%s)\n", team, type, get_node_type(type));
+		ERROR("NodeManager::GetClone: couldn't GetDefaultNode, team %" B_PRId32
+			", type %d (%s)\n", team, type, get_node_type(type));
 		*node = media_node::null;
 		return status;
 	}
@@ -396,15 +409,16 @@ NodeManager::GetClone(node_type type, team_id team, media_node* node,
 
 	status = GetCloneForID(id, team, node);
 	if (status != B_OK) {
-		ERROR("NodeManager::GetClone: couldn't GetCloneForID, id %ld, team "
-			"%ld, type %d (%s)\n", id, team, type, get_node_type(type));
+		ERROR("NodeManager::GetClone: couldn't GetCloneForID, id %" B_PRId32
+			", team %" B_PRId32 ", type %d (%s)\n", id, team, type,
+			get_node_type(type));
 		*node = media_node::null;
 		return status;
 	}
 	ASSERT(id == node->node);
 
-	TRACE("NodeManager::GetClone leave: node id %ld, node port %ld, node "
-		"kind %#lx\n", node->node, node->port, node->kind);
+	TRACE("NodeManager::GetClone leave: node id %" B_PRId32 ", node port %"
+		B_PRId32 ", node kind %#lx\n", node->node, node->port, node->kind);
 	return B_OK;
 }
 
@@ -412,12 +426,12 @@ NodeManager::GetClone(node_type type, team_id team, media_node* node,
 status_t
 NodeManager::ReleaseNode(const media_node& node, team_id team)
 {
-	TRACE("NodeManager::ReleaseNode enter: node %ld team %ld\n", node.node,
-		team);
+	TRACE("NodeManager::ReleaseNode enter: node %" B_PRId32 " team %" B_PRId32
+		"\n", node.node, team);
 
 	if (ReleaseNodeReference(node.node, team) != B_OK) {
-		ERROR("NodeManager::ReleaseNode: couldn't decrement node %ld team %ld "
-			"ref count\n", node.node, team);
+		ERROR("NodeManager::ReleaseNode: couldn't decrement node %" B_PRId32
+			" team %" B_PRId32 " ref count\n", node.node, team);
 	}
 
 	return B_OK;
@@ -432,7 +446,8 @@ NodeManager::PublishInputs(const media_node& node, const media_input* inputs,
 
 	NodeMap::iterator found = fNodeMap.find(node.node);
 	if (found == fNodeMap.end()) {
-		ERROR("NodeManager::PublishInputs: node %ld not found\n", node.node);
+		ERROR("NodeManager::PublishInputs: node %" B_PRId32 " not found\n",
+			node.node);
 		return B_ERROR;
 	}
 
@@ -459,7 +474,8 @@ NodeManager::PublishOutputs(const media_node &node, const media_output* outputs,
 
 	NodeMap::iterator found = fNodeMap.find(node.node);
 	if (found == fNodeMap.end()) {
-		ERROR("NodeManager::PublishOutputs: node %ld not found\n", node.node);
+		ERROR("NodeManager::PublishOutputs: node %" B_PRId32 " not found\n",
+			node.node);
 		return B_ERROR;
 	}
 
@@ -489,8 +505,8 @@ NodeManager::FindNodeID(port_id port, media_node_id* _id)
 
 		if (node.port == port) {
 			*_id = node.node_id;
-			TRACE("NodeManager::FindNodeID found port %ld, node %ld\n", port,
-				node.node_id);
+			TRACE("NodeManager::FindNodeID found port %" B_PRId32 ", node %"
+				B_PRId32 "\n", port, node.node_id);
 			return B_OK;
 		}
 
@@ -498,8 +514,8 @@ NodeManager::FindNodeID(port_id port, media_node_id* _id)
 		for (; outIterator != node.output_list.end(); outIterator++) {
 			if (outIterator->source.port == port) {
 				*_id = node.node_id;
-				TRACE("NodeManager::FindNodeID found output port %ld, node "
-					"%ld\n", port, node.node_id);
+				TRACE("NodeManager::FindNodeID found output port %" B_PRId32
+					", node %" B_PRId32 "\n", port, node.node_id);
 				return B_OK;
 			}
 		}
@@ -508,14 +524,14 @@ NodeManager::FindNodeID(port_id port, media_node_id* _id)
 		for (; inIterator != node.input_list.end(); inIterator++) {
 			if (inIterator->destination.port == port) {
 				*_id = node.node_id;
-				TRACE("NodeManager::FindNodeID found input port %ld, node "
-					"%ld\n", port, node.node_id);
+				TRACE("NodeManager::FindNodeID found input port %" B_PRId32
+					", node %" B_PRId32 "\n", port, node.node_id);
 				return B_OK;
 			}
 		}
 	}
 
-	ERROR("NodeManager::FindNodeID failed, port %ld\n", port);
+	ERROR("NodeManager::FindNodeID failed, port %" B_PRId32 "\n", port);
 	return B_ERROR;
 }
 
@@ -529,8 +545,8 @@ NodeManager::GetDormantNodeInfo(const media_node& node,
 
 	NodeMap::iterator found = fNodeMap.find(node.node);
 	if (found == fNodeMap.end()) {
-		ERROR("NodeManager::GetDormantNodeInfo: node %ld not found\n",
-			node.node);
+		ERROR("NodeManager::GetDormantNodeInfo: node %" B_PRId32 " not found"
+			"\n", node.node);
 		return B_ERROR;
 	}
 
@@ -540,9 +556,9 @@ NodeManager::GetDormantNodeInfo(const media_node& node,
 		&& node.node != NODE_SYSTEM_TIMESOURCE_ID) {
 		// This function must return an error if the node is application owned
 		TRACE("NodeManager::GetDormantNodeInfo NODE IS APPLICATION OWNED! "
-			"node %ld, add_on_id %ld, flavor_id %ld, name \"%s\"\n", node.node,
-			registeredNode.add_on_id, registeredNode.flavor_id,
-			registeredNode.name);
+			"node %" B_PRId32 ", add_on_id %" B_PRId32 ", flavor_id %" B_PRId32
+			", name \"%s\"\n", node.node, registeredNode.add_on_id,
+			registeredNode.flavor_id, registeredNode.name);
 		return B_ERROR;
 	}
 
@@ -554,9 +570,10 @@ NodeManager::GetDormantNodeInfo(const media_node& node,
 	nodeInfo->flavor_id = registeredNode.flavor_id;
 	strlcpy(nodeInfo->name, registeredNode.name, sizeof(nodeInfo->name));
 
-	TRACE("NodeManager::GetDormantNodeInfo node %ld, add_on_id %ld, "
-		"flavor_id %ld, name \"%s\"\n", node.node, registeredNode.add_on_id,
-		registeredNode.flavor_id, registeredNode.name);
+	TRACE("NodeManager::GetDormantNodeInfo node %" B_PRId32 ", add_on_id %"
+		B_PRId32 ", flavor_id %" B_PRId32 ", name \"%s\"\n", node.node,
+		registeredNode.add_on_id, registeredNode.flavor_id,
+		registeredNode.name);
 	return B_OK;
 }
 
@@ -568,7 +585,7 @@ NodeManager::GetLiveNodeInfo(const media_node& node, live_node_info* liveInfo)
 
 	NodeMap::iterator found = fNodeMap.find(node.node);
 	if (found == fNodeMap.end()) {
-		ERROR("NodeManager::GetLiveNodeInfo: node %ld not found\n",
+		ERROR("NodeManager::GetLiveNodeInfo: node %" B_PRId32 " not found\n",
 			node.node);
 		return B_ERROR;
 	}
@@ -583,8 +600,8 @@ NodeManager::GetLiveNodeInfo(const media_node& node, live_node_info* liveInfo)
 	liveInfo->hint_point = BPoint(0, 0);
 	strlcpy(liveInfo->name, registeredNode.name, sizeof(liveInfo->name));
 
-	TRACE("NodeManager::GetLiveNodeInfo node %ld, name = \"%s\"\n", node.node,
-		registeredNode.name);
+	TRACE("NodeManager::GetLiveNodeInfo node %" B_PRId32 ", name = \"%s\"\n",
+		node.node, registeredNode.name);
 	return B_OK;
 }
 
@@ -604,8 +621,9 @@ NodeManager::GetInstances(media_addon_id addOnID, int32 flavorID,
 			ids[count++] = node.node_id;
 	}
 
-	TRACE("NodeManager::GetInstances found %ld instances for addon_id %ld, "
-		"flavor_id %ld\n", count, addOnID, flavorID);
+	TRACE("NodeManager::GetInstances found %" B_PRId32 " instances for "
+		"addon_id %" B_PRId32 ", flavor_id %" B_PRId32 "\n", count, addOnID,
+		flavorID);
 	*_count = count;
 	return B_OK;
 }
@@ -616,9 +634,9 @@ NodeManager::GetLiveNodes(LiveNodeList& liveNodes, int32 maxCount,
 	const media_format* inputFormat, const media_format* outputFormat,
 	const char* name, uint64 requireKinds)
 {
-	TRACE("NodeManager::GetLiveNodes: maxCount %ld, in-format %p, out-format "
-		"%p, name %s, require kinds 0x%Lx\n", maxCount, inputFormat,
-		outputFormat, name != NULL ? name : "NULL", requireKinds);
+	TRACE("NodeManager::GetLiveNodes: maxCount %" B_PRId32 ", in-format %p, "
+		"out-format %p, name %s, require kinds 0x%" B_PRIx64 "\n", maxCount,
+		inputFormat, outputFormat, name != NULL ? name : "NULL", requireKinds);
 
 	BAutolock _(this);
 
@@ -694,7 +712,7 @@ NodeManager::GetLiveNodes(LiveNodeList& liveNodes, int32 maxCount,
 		count++;
 	}
 
-	TRACE("NodeManager::GetLiveNodes found %ld\n", count);
+	TRACE("NodeManager::GetLiveNodes found %" B_PRId32 "\n", count);
 	return B_OK;
 }
 
@@ -729,8 +747,8 @@ NodeManager::RegisterAddOn(const entry_ref& ref, media_addon_id* _newID)
 
 	media_addon_id id = fNextAddOnID++;
 
-//	printf("NodeManager::RegisterAddOn: ref-name \"%s\", assigning id %ld\n",
-//		ref.name, id);
+//	printf("NodeManager::RegisterAddOn: ref-name \"%s\", assigning id %" 
+//		B_PRId32 "\n", ref.name, id);
 
 	try {
 		fPathMap.insert(std::make_pair(id, ref));
@@ -744,7 +762,7 @@ NodeManager::RegisterAddOn(const entry_ref& ref, media_addon_id* _newID)
 void
 NodeManager::UnregisterAddOn(media_addon_id addOnID)
 {
-	PRINT(1, "NodeManager::UnregisterAddOn: id %ld\n", addOnID);
+	PRINT(1, "NodeManager::UnregisterAddOn: id %" B_PRId32 "\n", addOnID);
 
 	BAutolock _(this);
 
@@ -774,10 +792,11 @@ NodeManager::GetAddOnRef(media_addon_id addOnID, entry_ref* ref)
 status_t
 NodeManager::AddDormantFlavorInfo(const dormant_flavor_info& flavorInfo)
 {
-	PRINT(1, "NodeManager::AddDormantFlavorInfo, addon-id %ld, flavor-id %ld, "
-		"name \"%s\", flavor-name \"%s\", flavor-info \"%s\"\n",
-		flavorInfo.node_info.addon, flavorInfo.node_info.flavor_id,
-		flavorInfo.node_info.name, flavorInfo.name, flavorInfo.info);
+	PRINT(1, "NodeManager::AddDormantFlavorInfo, addon-id %" B_PRId32 ", "
+		"flavor-id %" B_PRId32 ", name \"%s\", flavor-name \"%s\", flavor-info"
+		" \"%s\"\n", flavorInfo.node_info.addon,
+		flavorInfo.node_info.flavor_id, flavorInfo.node_info.name,
+		flavorInfo.name, flavorInfo.info);
 
 	BAutolock _(this);
 
@@ -794,13 +813,13 @@ NodeManager::AddDormantFlavorInfo(const dormant_flavor_info& flavorInfo)
 			continue;
 
 		if (info.info_valid) {
-			ERROR("NodeManager::AddDormantFlavorInfo, addon-id %ld, "
-				"flavor-id %ld does already exist\n", info.info.node_info.addon,
-				info.info.node_info.flavor_id);
+			ERROR("NodeManager::AddDormantFlavorInfo, addon-id %" B_PRId32 ", "
+				"flavor-id %" B_PRId32 " does already exist\n",
+				info.info.node_info.addon, info.info.node_info.flavor_id);
 		}
 
-		TRACE("NodeManager::AddDormantFlavorInfo, updating addon-id %ld, "
-			"flavor-id %ld\n", info.info.node_info.addon,
+		TRACE("NodeManager::AddDormantFlavorInfo, updating addon-id %" B_PRId32
+			", flavor-id %" B_PRId32 "\n", info.info.node_info.addon,
 			info.info.node_info.flavor_id);
 
 		info.max_instances_count = flavorInfo.possible_count > 0
@@ -842,9 +861,9 @@ NodeManager::InvalidateDormantFlavorInfo(media_addon_id addOnID)
 		dormant_add_on_flavor_info& info = *iterator;
 
 		if (info.add_on_id == addOnID && info.info_valid) {
-			PRINT(1, "NodeManager::InvalidateDormantFlavorInfo, addon-id %ld, "
-				"flavor-id %ld, name \"%s\", flavor-name \"%s\", flavor-info "
-				"\"%s\"\n", info.info.node_info.addon,
+			PRINT(1, "NodeManager::InvalidateDormantFlavorInfo, addon-id %"
+				B_PRId32 ", flavor-id %" B_PRId32 ", name \"%s\", flavor-name "
+				"\"%s\", flavor-info \"%s\"\n", info.info.node_info.addon,
 				info.info.node_info.flavor_id, info.info.node_info.name,
 				info.info.name, info.info.info);
 
@@ -864,9 +883,9 @@ NodeManager::RemoveDormantFlavorInfo(media_addon_id addOnID)
 		dormant_add_on_flavor_info& info = fDormantFlavors[index];
 
 		if (info.add_on_id == addOnID) {
-			PRINT(1, "NodeManager::RemoveDormantFlavorInfo, addon-id %ld, "
-				"flavor-id %ld, name \"%s\", flavor-name \"%s\", flavor-info "
-				"\"%s\"\n", info.info.node_info.addon,
+			PRINT(1, "NodeManager::RemoveDormantFlavorInfo, addon-id %"
+				B_PRId32 ", flavor-id %" B_PRId32 ", name \"%s\", flavor-name "
+				"\"%s\", flavor-info \"%s\"\n", info.info.node_info.addon,
 				info.info.node_info.flavor_id, info.info.node_info.name,
 				info.info.name, info.info.info);
 			fDormantFlavors.erase(fDormantFlavors.begin() + index--);
@@ -890,9 +909,9 @@ NodeManager::IncrementFlavorInstancesCount(media_addon_id addOnID,
 
 		if (info.instances_count >= info.max_instances_count) {
 			// maximum (or more) instances already exist
-			ERROR("NodeManager::IncrementFlavorInstancesCount addon-id %ld, "
-				"flavor-id %ld maximum (or more) instances already exist\n",
-				addOnID, flavorID);
+			ERROR("NodeManager::IncrementFlavorInstancesCount addon-id %"
+				B_PRId32 ", flavor-id %" B_PRId32 " maximum (or more) "
+				"instances already exist\n", addOnID, flavorID);
 			return B_ERROR;
 		}
 
@@ -914,8 +933,8 @@ NodeManager::IncrementFlavorInstancesCount(media_addon_id addOnID,
 		return B_OK;
 	}
 
-	ERROR("NodeManager::IncrementFlavorInstancesCount addon-id %ld, "
-		"flavor-id %ld not found\n", addOnID, flavorID);
+	ERROR("NodeManager::IncrementFlavorInstancesCount addon-id %" B_PRId32 ", "
+		"flavor-id %" B_PRId32 " not found\n", addOnID, flavorID);
 	return B_ERROR;
 }
 
@@ -936,9 +955,9 @@ NodeManager::DecrementFlavorInstancesCount(media_addon_id addOnID,
 		TeamCountMap::iterator teamInstance
 			= info.team_instances_count.find(team);
 		if (teamInstance == info.team_instances_count.end()) {
-			ERROR("NodeManager::DecrementFlavorInstancesCount addon-id %ld, "
-				"flavor-id %ld team %ld has no references\n", addOnID, flavorID,
-				team);
+			ERROR("NodeManager::DecrementFlavorInstancesCount addon-id %"
+				B_PRId32 ", flavor-id %" B_PRId32 " team %" B_PRId32 " has no "
+				"references\n", addOnID, flavorID, team);
 			return B_ERROR;
 		}
 		if (--teamInstance->second == 0)
@@ -948,8 +967,8 @@ NodeManager::DecrementFlavorInstancesCount(media_addon_id addOnID,
 		return B_OK;
 	}
 
-	ERROR("NodeManager::DecrementFlavorInstancesCount addon-id %ld, "
-		"flavor-id %ld not found\n", addOnID, flavorID);
+	ERROR("NodeManager::DecrementFlavorInstancesCount addon-id %" B_PRId32 ", "
+		"flavor-id %" B_PRId32 " not found\n", addOnID, flavorID);
 	return B_ERROR;
 }
 
@@ -1070,7 +1089,7 @@ NodeManager::CleanupTeam(team_id team)
 
 	fDefaultManager->CleanupTeam(team);
 
-	PRINT(1, "NodeManager::CleanupTeam: team %ld\n", team);
+	PRINT(1, "NodeManager::CleanupTeam: team %" B_PRId32 "\n", team);
 
 	// TODO: send notifications after removing nodes
 
@@ -1091,8 +1110,8 @@ NodeManager::CleanupTeam(team_id team)
 
 		// If the team hosting this node is gone, remove node from database
 		if (node.containing_team == team) {
-			PRINT(1, "NodeManager::CleanupTeam: removing node id %ld, team "
-				"%ld\n", node.node_id, team);
+			PRINT(1, "NodeManager::CleanupTeam: removing node id %" B_PRId32
+				", team %" B_PRId32 "\n", node.node_id, team);
 			fNodeMap.erase(remove);
 			continue;
 		}
@@ -1101,12 +1120,13 @@ NodeManager::CleanupTeam(team_id team)
 		// remove the team
 		TeamCountMap::iterator teamRef = node.team_ref_count.find(team);
 		if (teamRef != node.team_ref_count.end()) {
-			PRINT(1, "NodeManager::CleanupTeam: removing %ld refs from node "
-				"id %ld, team %ld\n", teamRef->second, node.node_id, team);
+			PRINT(1, "NodeManager::CleanupTeam: removing %" B_PRId32 " refs "
+				"from node id %" B_PRId32 ", team %" B_PRId32 "\n",
+				teamRef->second, node.node_id, team);
 			node.ref_count -= teamRef->second;
 			if (node.ref_count == 0) {
-				PRINT(1, "NodeManager::CleanupTeam: removing node id %ld that "
-					"has no teams\n", node.node_id);
+				PRINT(1, "NodeManager::CleanupTeam: removing node id %"
+					B_PRId32 " that has no teams\n", node.node_id);
 
 				fNodeMap.erase(remove);
 			} else
@@ -1122,9 +1142,10 @@ NodeManager::CleanupTeam(team_id team)
 		TeamCountMap::iterator instanceCount
 			= flavorInfo.team_instances_count.find(team);
 		if (instanceCount != flavorInfo.team_instances_count.end()) {
-			PRINT(1, "NodeManager::CleanupTeam: removing %ld instances from "
-				"addon %ld, flavor %ld\n", instanceCount->second,
-				flavorInfo.add_on_id, flavorInfo.flavor_id);
+			PRINT(1, "NodeManager::CleanupTeam: removing %" B_PRId32 " "
+				"instances from addon %" B_PRId32 ", flavor %" B_PRId32 "\n",
+				instanceCount->second, flavorInfo.add_on_id,
+				flavorInfo.flavor_id);
 
 			flavorInfo.instances_count -= instanceCount->second;
 			if (flavorInfo.instances_count <= 0)
@@ -1163,7 +1184,7 @@ NodeManager::Dump()
 	for (PathMap::iterator iterator = fPathMap.begin();
 			iterator != fPathMap.end(); iterator++) {
 		BPath path(&iterator->second);
-		printf(" addon-id %ld, path \"%s\"\n", iterator->first,
+		printf(" addon-id %" B_PRId32 ", path \"%s\"\n", iterator->first,
 			path.InitCheck() == B_OK ? path.Path() : "INVALID");
 	}
 
@@ -1177,24 +1198,27 @@ NodeManager::Dump()
 			iterator != fNodeMap.end(); iterator++) {
 		registered_node& node = iterator->second;
 
-		printf("  node-id %ld, addon-id %ld, addon-flavor-id %ld, port %ld, "
-			"creator %ld, team %ld, kinds %#08Lx, name \"%s\", ref_count %ld\n",
-			node.node_id, node.add_on_id, node.flavor_id, node.port, 
-			node.creator, node.containing_team, node.kinds, node.name,
-			node.ref_count);
+		printf("  node-id %" B_PRId32 ", addon-id %" B_PRId32 ", addon-flavor-"
+			"id %" B_PRId32 ", port %" B_PRId32 ", creator %" B_PRId32 ", "
+			"team %" B_PRId32 ", kinds %#08" B_PRIx64 ", name \"%s\", "
+			"ref_count %" B_PRId32 "\n", node.node_id, node.add_on_id,
+			node.flavor_id, node.port, node.creator, node.containing_team, 
+			node.kinds, node.name, node.ref_count);
 
 		printf("    teams (refcount): ");
 		for (TeamCountMap::iterator refsIterator = node.team_ref_count.begin();
 				refsIterator != node.team_ref_count.end(); refsIterator++) {
-			printf("%ld (%ld), ", refsIterator->first, refsIterator->second);
+			printf("%" B_PRId32 " (%" B_PRId32 "), ", refsIterator->first, 
+				refsIterator->second);
 		}
 		printf("\n");
 
 		for (InputList::iterator inIterator = node.input_list.begin();
 				inIterator != node.input_list.end(); inIterator++) {
 			media_input& input = *inIterator;
-			printf("    media_input: node-id %ld, node-port %ld, source-port "
-				"%ld, source-id  %ld, dest-port %ld, dest-id %ld, name "
+			printf("    media_input: node-id %" B_PRId32 ", node-port %"
+				B_PRId32 ", source-port %" B_PRId32 ", source-id  %" B_PRId32
+				", dest-port %" B_PRId32 ", dest-id %" B_PRId32 ", name "
 				"\"%s\"\n", input.node.node, input.node.port, input.source.port,
 				input.source.id, input.destination.port, input.destination.id,
 				input.name);
@@ -1205,8 +1229,9 @@ NodeManager::Dump()
 		for (OutputList::iterator outIterator = node.output_list.begin();
 				outIterator != node.output_list.end(); outIterator++) {
 			media_output& output = *outIterator;
-			printf("    media_output: node-id %ld, node-port %ld, source-port "
-				"%ld, source-id  %ld, dest-port %ld, dest-id %ld, name "
+			printf("    media_output: node-id %" B_PRId32 ", node-port %"
+				B_PRId32 ", source-port %" B_PRId32 ", source-id  %" B_PRId32
+				", dest-port %" B_PRId32 ", dest-id %" B_PRId32 ", name "
 				"\"%s\"\n", output.node.node, output.node.port,
 				output.source.port, output.source.id, output.destination.port,
 				output.destination.id, output.name);
@@ -1226,9 +1251,9 @@ NodeManager::Dump()
 			iterator != fDormantFlavors.end(); iterator++) {
 		dormant_add_on_flavor_info& flavorInfo = *iterator;
 
-		printf("  addon-id %ld, flavor-id %ld, max instances count %ld, "
-			"instances count %ld, info valid %s\n",
-			flavorInfo.add_on_id, flavorInfo.flavor_id,
+		printf("  addon-id %" B_PRId32 ", flavor-id %" B_PRId32 ", max "
+			"instances count %" B_PRId32 ", instances count %" B_PRId32 ", "
+			"info valid %s\n", flavorInfo.add_on_id, flavorInfo.flavor_id,
 			flavorInfo.max_instances_count, flavorInfo.instances_count,
 			flavorInfo.info_valid ? "yes" : "no");
 		printf("    teams (instances): ");
@@ -1236,18 +1261,20 @@ NodeManager::Dump()
 					= flavorInfo.team_instances_count.begin();
 				countIterator != flavorInfo.team_instances_count.end();
 				countIterator++) {
-			printf("%ld (%ld), ", countIterator->first, countIterator->second);
+			printf("%" B_PRId32 " (%" B_PRId32 "), ", countIterator->first,
+				countIterator->second);
 		}
 		printf("\n");
 		if (!flavorInfo.info_valid)
 			continue;
 
-		printf("    addon-id %ld, addon-flavor-id %ld, addon-name \"%s\"\n",
-			flavorInfo.info.node_info.addon,
+		printf("    addon-id %" B_PRId32 ", addon-flavor-id %" B_PRId32 ", "
+			"addon-name \"%s\"\n", flavorInfo.info.node_info.addon,
 			flavorInfo.info.node_info.flavor_id,
 			flavorInfo.info.node_info.name);
-		printf("    flavor-kinds %#08Lx, flavor_flags %#08lx, internal_id %ld, "
-			"possible_count %ld, in_format_count %ld, out_format_count %ld\n",
+		printf("    flavor-kinds %#08" B_PRIx64 ", flavor_flags %#08" B_PRIx32
+			", internal_id %" B_PRId32 ", possible_count %" B_PRId32 ", "
+			"in_format_count %" B_PRId32 ", out_format_count %" B_PRId32 "\n",
 			flavorInfo.info.kinds, flavorInfo.info.flavor_flags,
 			flavorInfo.info.internal_id, flavorInfo.info.possible_count,
 			flavorInfo.info.in_format_count, flavorInfo.info.out_format_count);
@@ -1266,14 +1293,15 @@ NodeManager::Dump()
 status_t
 NodeManager::_AcquireNodeReference(media_node_id id, team_id team)
 {
-	TRACE("NodeManager::_AcquireNodeReference enter: node %ld, team %ld\n", id,
-		team);
+	TRACE("NodeManager::_AcquireNodeReference enter: node %" B_PRId32 ", team "
+		"%" B_PRId32 "\n", id, team);
 
 	BAutolock _(this);
 
 	NodeMap::iterator found = fNodeMap.find(id);
 	if (found == fNodeMap.end()) {
-		ERROR("NodeManager::_AcquireNodeReference: node %ld not found\n", id);
+		ERROR("NodeManager::_AcquireNodeReference: node %" B_PRId32 " not "
+			"found\n", id);
 		return B_ERROR;
 	}
 
@@ -1294,8 +1322,8 @@ NodeManager::_AcquireNodeReference(media_node_id id, team_id team)
 
 	node.ref_count++;
 
-	TRACE("NodeManager::_AcquireNodeReference leave: node %ld, team %ld, "
-		"ref %ld, team ref %ld\n", id, team, node.ref_count,
-		node.team_ref_count.find(team)->second);
+	TRACE("NodeManager::_AcquireNodeReference leave: node %" B_PRId32 ", team "
+		"%" B_PRId32 ", ref %" B_PRId32 ", team ref %" B_PRId32 "\n", id, team,
+		node.ref_count, node.team_ref_count.find(team)->second);
 	return B_OK;
 }

@@ -105,7 +105,7 @@ extern void save_lvds_mode(void);
 extern status_t create_mode_list(void);
 
 // memory.cpp
-extern void intel_free_memory(uint32 base);
-extern status_t intel_allocate_memory(size_t size, uint32 flags, uint32 &base);
+extern void intel_free_memory(addr_t base);
+extern status_t intel_allocate_memory(size_t size, uint32 flags, addr_t &base);
 
 #endif	/* INTEL_EXTREME_ACCELERANT_H */

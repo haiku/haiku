@@ -147,8 +147,8 @@ UdfString::SetTo(const char *utf8)
 	// First copy the utf8 string
 	fUtf8String = new(nothrow) char[length + 1];
 	if (fUtf8String == NULL) {
-		TRACE_ERROR(("UdfString::SetTo: fUtf8String[%ld] allocation failed\n",
-			length + 1));
+		TRACE_ERROR(("UdfString::SetTo: fUtf8String[%" B_PRIu32
+			"] allocation failed\n", length + 1));
 		return;
 	}
 
@@ -159,8 +159,8 @@ UdfString::SetTo(const char *utf8)
 	// or have to use burly 16-bit unicode.
 	uint32 *raw = new(nothrow) uint32[length];
 	if (raw == NULL) {
-		TRACE_ERROR(("UdfString::SetTo: uint32 raw[%ld] temporary string "
-			"allocation failed\n", length));
+		TRACE_ERROR(("UdfString::SetTo: uint32 raw[%" B_PRIu32 "] temporary"
+			" string allocation failed\n", length));
 		_Clear();
 		return;
 	}
@@ -201,8 +201,8 @@ UdfString::SetTo(const char *utf8)
 			for (uint32 i = 0; i < rawLength; i++)
 				fCs0String[i + 1] = raw[i] % 256;
 		} else {
-			TRACE_ERROR(("UdfString::SetTo: fCs0String[%ld] allocation failed\n",
-				fCs0Length));
+			TRACE_ERROR(("UdfString::SetTo: fCs0String[%" B_PRIu32
+				"] allocation failed\n", fCs0Length));
 			_Clear();
 			return;
 		}
@@ -221,8 +221,8 @@ UdfString::SetTo(const char *utf8)
 				fCs0String[pos++] = low;
 			}
 		} else {
-			TRACE_ERROR(("UdfString::SetTo: fCs0String[%ld] allocation failed\n",
-				fCs0Length));
+			TRACE_ERROR(("UdfString::SetTo: fCs0String[%" B_PRIu32
+				"] allocation failed\n", fCs0Length));
 			_Clear();
 			return;
 		}

@@ -64,11 +64,11 @@ virtual	status_t			SetupDevice(bool deviceReplugged);
 
 private:
 static	void				_ReadCallback(void *cookie, int32 status,
-								void *data, uint32 actualLength);
+								void *data, size_t actualLength);
 static	void				_WriteCallback(void *cookie, int32 status,
-								void *data, uint32 actualLength);
+								void *data, size_t actualLength);
 static	void				_NotifyCallback(void *cookie, int32 status,
-								void *data, uint32 actualLength);
+								void *data, size_t actualLength);
 
 		status_t			_SetupEndpoints();
 

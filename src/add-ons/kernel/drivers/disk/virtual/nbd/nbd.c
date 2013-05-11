@@ -174,7 +174,8 @@ status_t nbd_alloc_request(struct nbd_device *dev, struct nbd_request_entry **re
 	struct nbd_request_entry *r;
 	status_t err = EINVAL;
 	uint64 handle;
-	PRINT((DP ">%s(%ld, %Ld, %ld)\n", __FUNCTION__, type, from, len));
+	PRINT((DP ">%s(%" B_PRIu32 ", %" B_PRIdOFF ", %ld)\n", __FUNCTION__, type,
+		from, len));
 	
 	if (type != NBD_CMD_READ && type != NBD_CMD_WRITE && type != NBD_CMD_DISC)
 		return err;
@@ -223,14 +224,14 @@ status_t nbd_alloc_request(struct nbd_device *dev, struct nbd_request_entry **re
 err1:
 	free(r);
 err0:
-	dprintf(DP " %s: error 0x%08lx\n", __FUNCTION__, err);
+	dprintf(DP " %s: error 0x%08" B_PRIx32 "\n", __FUNCTION__, err);
 	return err;
 }
 
 
 status_t nbd_queue_request(struct nbd_device *dev, struct nbd_request_entry *req)
 {
-	PRINT((DP ">%s(handle:%Ld)\n", __FUNCTION__, req->handle));
+	PRINT((DP ">%s(handle:%" B_PRIu64 ")\n", __FUNCTION__, req->handle));
 	req->next = dev->reqs;
 	dev->reqs = req;
 	return B_OK;
@@ -240,7 +241,7 @@ status_t nbd_queue_request(struct nbd_device *dev, struct nbd_request_entry *req
 status_t nbd_dequeue_request(struct nbd_device *dev, uint64 handle, struct nbd_request_entry **req)
 {
 	struct nbd_request_entry *r, *prev;
-	PRINT((DP ">%s(handle:%Ld)\n", __FUNCTION__, handle));
+	PRINT((DP ">%s(handle:%" B_PRIu64 ")\n", __FUNCTION__, handle));
 	r = dev->reqs;
 	prev = NULL;
 	while (r && r->handle != handle) {
@@ -262,7 +263,7 @@ status_t nbd_dequeue_request(struct nbd_device *dev, uint64 handle, struct nbd_r
 
 status_t nbd_free_request(struct nbd_device *dev, struct nbd_request_entry *req)
 {
-	PRINT((DP ">%s(handle:%Ld)\n", __FUNCTION__, req->handle));
+	PRINT((DP ">%s(handle:%" B_PRIu64 ")\n", __FUNCTION__, req->handle));
 	delete_sem(req->sem);
 	free(req);
 	return B_OK;
@@ -354,7 +355,7 @@ int32 nbd_postoffice(void *arg)
 	return 0;
 
 err:
-	dprintf(DP "%s: %s: error 0x%08lx\n", __FUNCTION__, reason, err);
+	dprintf(DP "%s: %s: error 0x%08" B_PRIx32 "\n", __FUNCTION__, reason, err);
 	return err;
 }
 
@@ -397,7 +398,8 @@ status_t nbd_connect(struct nbd_device *dev)
 	
 	dev->size = B_BENDIAN_TO_HOST_INT64(initpkt.device_size);
 	
-	dprintf(DP " %s: connected, device size %Ld bytes.\n", __FUNCTION__, dev->size);
+	dprintf(DP " %s: connected, device size %" B_PRIu64 " bytes.\n",
+		__FUNCTION__, dev->size);
 
 	err = dev->postoffice = spawn_kernel_thread(nbd_postoffice, "nbd postoffice", B_REAL_TIME_PRIORITY, dev);
 	if (err < B_OK)
@@ -415,7 +417,7 @@ err1:
 	kclosesocket(dev->sock);
 	dev->sock = -1;
 err0:
-	dprintf(DP "<%s: error 0x%08lx\n", __FUNCTION__, err);
+	dprintf(DP "<%s: error 0x%08" B_PRIx32 "\n", __FUNCTION__, err);
 	return err;
 }
 
@@ -435,7 +437,7 @@ status_t nbd_teardown(struct nbd_device *dev)
 status_t nbd_post_request(struct nbd_device *dev, struct nbd_request_entry *req)
 {
 	status_t err;
-	PRINT((DP ">%s(handle:%Ld)\n", __FUNCTION__, req->handle));
+	PRINT((DP ">%s(handle:%" B_PRIu64 ")\n", __FUNCTION__, req->handle));
 	
 	err = ksend(dev->sock, &req->req, sizeof(req->req), 0);
 	if (err < 0)
@@ -466,7 +468,7 @@ status_t nbd_open(const char *name, uint32 flags, cookie_t **cookie) {
 	int kfd;
 #endif
 	struct nbd_device *dev = NULL;
-	PRINT((DP ">%s(%s, %lx, )\n", __FUNCTION__, name, flags));
+	PRINT((DP ">%s(%s, %" B_PRIx32 ", )\n", __FUNCTION__, name, flags));
 	(void)name; (void)flags;
 	dev = nbd_find_device(name);
 	if (!dev || !dev->valid)
@@ -509,7 +511,7 @@ err2:
 err1:
 	free(*cookie);
 err0:
-	dprintf(DP " %s: error 0x%08lx\n", __FUNCTION__, err);
+	dprintf(DP " %s: error 0x%08" B_PRIx32 "\n", __FUNCTION__, err);
 	return err;
 }
 
@@ -564,7 +566,8 @@ status_t nbd_free(cookie_t *cookie) {
 
 
 status_t nbd_control(cookie_t *cookie, uint32 op, void *data, size_t len) {
-	PRINT((DP ">%s(%d, %lu, , %ld)\n", __FUNCTION__, WHICH(cookie->dev), op, len));
+	PRINT((DP ">%s(%d, %" B_PRIu32 ", , %ld)\n", __FUNCTION__,
+		WHICH(cookie->dev), op, len));
 	switch (op) {
 	case B_GET_DEVICE_SIZE: /* this one is broken anyway... */
 		if (data) {
@@ -623,7 +626,8 @@ status_t nbd_read(cookie_t *cookie, off_t position, void *data, size_t *numbytes
 	struct nbd_device *dev = cookie->dev;
 	struct nbd_request_entry *req;
 	status_t err, semerr;
-	PRINT((DP ">%s(%d, %Ld, , )\n", __FUNCTION__, WHICH(cookie->dev), position));
+	PRINT((DP ">%s(%d, %" B_PRIdOFF ", , )\n", __FUNCTION__,
+		WHICH(cookie->dev), position));
 	
 	if (position < 0)
 		return EINVAL;
@@ -692,7 +696,8 @@ status_t nbd_write(cookie_t *cookie, off_t position, const void *data, size_t *n
 	struct nbd_device *dev = cookie->dev;
 	struct nbd_request_entry *req;
 	status_t err, semerr;
-	PRINT((DP ">%s(%d, %Ld, %ld, )\n", __FUNCTION__, WHICH(cookie->dev), position, *numbytes));
+	PRINT((DP ">%s(%d, %" B_PRIdOFF ", %ld, )\n", __FUNCTION__,
+		WHICH(cookie->dev), position, *numbytes));
 	
 	if (position < 0)
 		return EINVAL;

@@ -42,13 +42,13 @@ AddFilesToPackage add-ons kernel debugger
 	  <kdebug>run_on_exit ;
 AddFilesToPackage add-ons kernel file_systems : $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToPackage add-ons kernel generic
-	: ata_adapter@ata bios@x86 dpc ide_adapter@ide
+	: ata_adapter@ata bios@x86,x86_64 dpc ide_adapter@ide
 		locked_pool mpu401 scsi_periph <module>tty ;
 AddFilesToPackage add-ons kernel partitioning_systems
 	: amiga_rdb apple efi_gpt intel session ;
 AddFilesToPackage add-ons kernel interrupt_controllers : openpic@ppc ;
 
-if $(TARGET_ARCH) = x86 {
+if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
 	AddFilesToPackage add-ons kernel cpu : generic_x86 ;
 }
 
@@ -64,7 +64,7 @@ AddDriversToPackage					: console dprintf null random <driver>tty
 AddDriversToPackage audio hmulti	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO) ;
 AddDriversToPackage audio old		: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD) ;
 AddDriversToPackage midi			: $(SYSTEM_ADD_ONS_DRIVERS_MIDI) ;
-AddDriversToPackage bus				: usb_raw fw_raw ;
+AddDriversToPackage bus				: usb_raw fw_raw@x86 ;
 AddDriversToPackage disk floppy		: pc_floppy@x86 ;
 AddDriversToPackage disk usb		: usb_disk ;
 AddDriversToPackage disk usb		: usb_floppy ;

@@ -101,7 +101,7 @@ WatchPromptWindow::_Init()
 	BLayoutItem* labelItem = fTypeField->CreateLabelLayoutItem();
 	labelItem->View()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.SetInsets(4.0f, 4.0f, 4.0f, 4.0f)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.AddGroup(B_HORIZONTAL, 4.0f)
 			.Add(fAddressInput)
 		.End()

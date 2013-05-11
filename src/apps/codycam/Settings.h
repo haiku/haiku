@@ -61,7 +61,7 @@ public:
 									int32 defaultValue,
 									const char* valueExpectedErrorString,
 									const char* wrongValueErrorString,
-									int32 min = LONG_MIN, int32 max = LONG_MAX);
+									int32 min = INT32_MIN, int32 max = INT32_MAX);
 	virtual						~ScalarValueSetting();
 
 			void				ValueChanged(int32 newValue);

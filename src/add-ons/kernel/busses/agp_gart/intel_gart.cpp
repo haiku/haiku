@@ -385,7 +385,7 @@ intel_map(intel_info &info)
 
 	AreaKeeper mmioMapper;
 	info.registers_area = mmioMapper.Map("intel GMCH mmio",
-		(void*)info.display.u.h0.base_registers[mmioIndex],
+		info.display.u.h0.base_registers[mmioIndex],
 		info.display.u.h0.base_register_sizes[mmioIndex], B_ANY_KERNEL_ADDRESS,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&info.registers);
 	if (mmioMapper.InitCheck() < B_OK) {
@@ -444,7 +444,7 @@ intel_map(intel_info &info)
 
 	AreaKeeper gttMapper;
 	info.gtt_area = gttMapper.Map("intel GMCH gtt",
-		(void*)info.gtt_physical_base, gttSize, B_ANY_KERNEL_ADDRESS,
+		info.gtt_physical_base, gttSize, B_ANY_KERNEL_ADDRESS,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&info.gtt_base);
 	if (gttMapper.InitCheck() < B_OK) {
 		dprintf("intel_gart: could not map GTT!\n");
@@ -467,7 +467,7 @@ intel_map(intel_info &info)
 
 	AreaKeeper apertureMapper;
 	info.aperture_area = apertureMapper.Map("intel graphics aperture",
-		(void*)info.aperture_physical_base, info.aperture_size,
+		info.aperture_physical_base, info.aperture_size,
 		B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
 		B_READ_AREA | B_WRITE_AREA, (void**)&info.aperture_base);
 	if (apertureMapper.InitCheck() < B_OK) {
@@ -475,7 +475,7 @@ intel_map(intel_info &info)
 		dprintf(DEVICE_NAME ": enabling write combined mode failed.\n");
 
 		info.aperture_area = apertureMapper.Map("intel graphics aperture",
-			(void*)info.aperture_physical_base, info.aperture_size,
+			info.aperture_physical_base, info.aperture_size,
 			B_ANY_KERNEL_BLOCK_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 			(void**)&info.aperture_base);
 	}

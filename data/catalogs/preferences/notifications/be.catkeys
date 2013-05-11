@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Notifications	814394708
+1	belarusian	x-vnd.Haiku-Notifications	2177286129
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Адбылася памылка пры захаванні наладак.\nМагчыма, не хапае месца на дыску.
 Notifications	GeneralView		Паведамленні
 seconds of inactivity	GeneralView		секунд прастою
@@ -17,6 +17,7 @@ Cannot disable notifications because the server can't be reached.	GeneralView		�
 Progress	NotificationView		Прагрэс
 Last Received	NotificationView		Апошняе атрыманае
 General	PrefletView		Агульныя
+Apply	PrefletWin		Ужыць
 Display	PrefletView		Экран
 Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Не ўдалося занесці паведамленні ў аўтазапуск, магчыма, вы не маеце правоў на змяненне дырэкторыі аўтазапуску.
 Search:	NotificationView		Пошук:

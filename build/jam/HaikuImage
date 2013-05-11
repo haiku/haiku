@@ -100,10 +100,13 @@ SYSTEM_NETWORK_DATALINK_PROTOCOLS = ethernet_frame <module>arp loopback_frame
 SYSTEM_NETWORK_PROTOCOLS = ipv4 tcp udp icmp unix icmp6 ipv6 ;
 
 SYSTEM_ADD_ONS_ACCELERANTS = [ FFilterByBuildFeatures
+	x86,x86_64 @{
+		vesa.accelerant
+	}@ # x86,x86_64
 	x86 @{
 		3dfx.accelerant ati.accelerant matrox.accelerant neomagic.accelerant
 		nvidia.accelerant intel_810.accelerant intel_extreme.accelerant
-		radeon.accelerant radeon_hd.accelerant s3.accelerant vesa.accelerant
+		radeon.accelerant radeon_hd.accelerant s3.accelerant 
 		#via.accelerant vmware.accelerant
 	}@ # x86
 ] ;
@@ -125,7 +128,7 @@ SYSTEM_ADD_ONS_MEDIA = [ FFilterByBuildFeatures
 	usb_webcam.media_addon
 	video_producer_demo.media_addon
 	video_window_demo.media_addon
-	firewire_dv.media_addon
+	firewire_dv.media_addon@x86
 	#legacy.media_addon
 	equalizer.media_addon
 	vst_host.media_addon
@@ -155,18 +158,21 @@ SYSTEM_ADD_ONS_SCREENSAVERS = [ FFilterByBuildFeatures
 SYSTEM_ADD_ONS_DRIVERS_AUDIO = auich auvia echo3g emuxki hda ice1712 sis7018 ;
 SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD = ; #cmedia usb_audio ;
 SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = [ FFilterByBuildFeatures
+	x86,x86_64 @{
+		vesa
+	}@ # x86,x86_64
 	x86 @{
 		ati 3dfx intel_810 intel_extreme matrox neomagic nvidia radeon radeon_hd
-		s3 vesa  #via vmware
+		s3 #via vmware
 	}@ # x86
 ] ;
 SYSTEM_ADD_ONS_DRIVERS_MIDI = emuxki ice1712 usb_midi ;
 SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
-	x86 @{
+	x86,x86_64 @{
 		3com atheros813x ar81xx attansic_l1 attansic_l2 broadcom440x
 		broadcom570x dec21xxx ipro100 ipro1000 jmicron2x0 marvell_yukon nforce
 		pcnet rtl8139 rtl81xx sis19x syskonnect via_rhine vt612x
-	}@ # x86
+	}@ # x86_64
 
 	etherpci pegasus sis900 usb_davicom usb_asix usb_ecm wb840
 
@@ -183,11 +189,12 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 ] ;
 SYSTEM_ADD_ONS_DRIVERS_POWER = [ FFilterByBuildFeatures acpi_button@x86 ] ;
 SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
-	ata@ata pci ps2@x86 isa@x86
-	ide@ide scsi config_manager agp_gart usb firewire acpi@x86
+	ata@ata pci ps2@x86,x86_64 isa@x86,x86_64
+	ide@ide scsi config_manager agp_gart@x86 usb firewire@x86 acpi@x86
 ] ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs bindfs btrfs cdda exfat ext2 fat iso9660 nfs
-	nfs4 attribute_overlay write_overlay ntfs packagefs reiserfs udf googlefs ;
+	nfs4 attribute_overlay write_overlay ntfs packagefs reiserfs@x86 udf
+	googlefs ;
 
 
 # build the haiku system package and add it

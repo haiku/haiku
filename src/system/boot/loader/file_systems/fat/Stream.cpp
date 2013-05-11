@@ -17,11 +17,11 @@
 #include <algorithm>
 
 #include <boot/FileMapDisk.h>
-#include <util/kernel_cpp.h>
 
 #include "CachedBlock.h"
 #include "Directory.h"
 #include "File.h"
+
 
 //#define TRACE(x) dprintf x
 #define TRACE(x) do {} while (0)

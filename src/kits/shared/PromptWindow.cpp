@@ -30,21 +30,26 @@ PromptWindow::PromptWindow(const char* title, const char* label,
 	BButton* acceptButton = new BButton("Accept", new
 		BMessage(kAcceptInput));
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(fInfoView)
 		.Add(fTextControl)
 		.AddGroup(B_HORIZONTAL)
+			.AddGlue()
+			.Add(cancelButton)
 			.Add(acceptButton)
-			.Add(cancelButton);
+		.End()
+	.End();
 
 	if (info == NULL)
 		fInfoView->Hide();
 
-	fTextControl->TextView()->SetExplicitMinSize(BSize(
-			fTextControl->TextView()->StringWidth("1234567890"), B_SIZE_UNSET));
+	fTextControl->TextView()->SetExplicitMinSize(BSize(200.0, B_SIZE_UNSET));
 	fTextControl->SetTarget(this);
 	acceptButton->SetTarget(this);
 	cancelButton->SetTarget(this);
 	fTextControl->MakeFocus(true);
+
+	SetDefaultButton(acceptButton);
 }
 
 

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Time	3544635877
+1	belarusian	x-vnd.Haiku-Time	3259467657
 GMT (UNIX compatible)	Time		GMT (як у UNIX)
 OK	Time		ОК
 Asia	Time		Азія
@@ -11,6 +11,7 @@ Preview time:	Time		Праглядзець час:
 Synchronize	Time		Сінхранізаваць
 Revert	Time		Адвярнуць
 Pacific	Time		Ціхі акіян
+Show day of week	Time		Паказваць дзень тыдню
 Add	Time		Дадаць
 Date and time	Time		Дата і Час
 about	Time		пра праграму
@@ -26,6 +27,7 @@ Time	Time		Час
 Indian	Time		Індыя
 Sending request failed	Time		Немагчыма адаслаць запыт
 Arctic	Time		Арктыка
+Display time with seconds	Time		Паказваць час з секундамі
 Time	System name		Дата і Час
 America	Time		Амерыка
 Reset	Time		Скінуць
@@ -33,6 +35,8 @@ Synchronize at boot	Time		Сінхранізаваць падчас старту
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date, распрацавана:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Received invalid time	Time		Атрыманы несапраўдны час
 Antarctica	Time		Антарктыка
+Show time zone	Time		Паказаць часавы пояс
+Show clock in Deskbar	Time		Паказваць гадзіннік у Deskbar-ы
 The following error occured while synchronizing:r\n%s: %s	Time		Памылка падчас сінхранізацыі:r\n%s: %s
 <Other>	Time		<Іншае>
 Current time:	Time		Сапраўдны час:

@@ -29,7 +29,7 @@ using std::nothrow;
 Model::Model()
 	:
 	fDirectory(),
-	fSelectedFiles(0UL),
+	fSelectedFiles((uint32)0),
 
 	fRecurseDirs(true),
 	fRecurseLinks(false),
@@ -204,7 +204,7 @@ Model::AddToHistory(const char* text)
 	}
 
 	while (items.CountItems() >= HISTORY_LIMIT)
-		delete static_cast<BString*>(items.RemoveItem(0L));
+		delete static_cast<BString*>(items.RemoveItem((int32)0));
 
 	_SaveHistory(items);
 	_FreeHistory(items);

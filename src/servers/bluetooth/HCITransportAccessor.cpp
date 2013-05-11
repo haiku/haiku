@@ -20,11 +20,11 @@ HCITransportAccessor::HCITransportAccessor(BPath* path) : HCIDelegate(path)
 	if (fDescriptor > 0) {
 		// find out which ID was assigned
 		status = ioctl(fDescriptor, GET_HCI_ID, &fIdentifier, 0);
-		printf("%s: hid retrieved %lx status=%ld\n", __FUNCTION__,
-			fIdentifier, status);
+		printf("%s: hid retrieved %" B_PRIx32 " status=%" B_PRId32 "\n",
+			__FUNCTION__, fIdentifier, status);
 	} else {
-		printf("%s: Device driver %s could not be opened %ld\n", __FUNCTION__,
-			path->Path(), fIdentifier);
+		printf("%s: Device driver %s could not be opened %" B_PRId32 "\n",
+			__FUNCTION__, path->Path(), fIdentifier);
 		fIdentifier = B_ERROR;
 	}
 

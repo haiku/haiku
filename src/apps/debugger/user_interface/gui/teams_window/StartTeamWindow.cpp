@@ -73,7 +73,7 @@ StartTeamWindow::_Init()
 	fCancelButton = new BButton("Cancel", new BMessage(B_QUIT_REQUESTED));
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.SetInsets(4.0f, 4.0f, 4.0f, 4.0f)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(fGuideText)
 		.AddGroup(B_HORIZONTAL, 4.0f)
 			.Add(fTeamTextControl)

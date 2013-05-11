@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	419889716
+1	japanese	x-vnd.Haiku-libtracker	1188087477
 common	B_COMMON_DIRECTORY		一般
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		アイコン表示
@@ -141,6 +141,7 @@ Add-ons	ContainerWindow		アドオン
 Edit templates…	TemplatesMenu		テンプレートを編集…
 Finish: %time - Over %finishtime left	StatusWindow		終了: %time - 残り %finishtime 以上
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		このフォルダーにすでに \"%name\" という項目があります。作成しようとしているシンボリックリンクと置き換えますか?
+Fewer options	FindPanel		検索オプションを隠す
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		コピー先ディスクの空き容量が不足しています。コピーができません。
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		アプリケーション \"%app\" を使って \"%document\" を開けませんでした (%error)。
 Sorry, saving more than one item is not allowed.	FilePanelPriv		2 項目以上は保存できません。
@@ -234,6 +235,7 @@ Temporary	FindPanel		一時的なクエリ
 Version	OpenWithWindow		バージョン
 Default application	InfoWindow		デフォルトアプリケーション
 Preparing to copy items…	StatusWindow		コピーの準備をしています…
+Save query as template…	FindPanel		クエリテンプレートとして保存…
 Show folder location in title tab	SettingsView		タイトルタブにフォルダー位置を表示
 Proceed	FSUtils		続行
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		%verbしようとしているものと同じ名前の項目がすでにフォルダーの中に存在します。\n \n%verbして置き換えますか？それとも、一つずつ確認しますか？
@@ -331,6 +333,7 @@ The specified name is already used as the name of a folder. Please choose anothe
 Clean up	ContainerWindow		アイコンの整列
 after	FindPanel		以降
 Select…	QueryContainerWindow		選択…
+More options	FindPanel		検索オプションを表示
 link	FSUtils	filename link	リンク
 At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		%func にて\nfind_directory() が失敗。\nエラー: %error
 The specified name is illegal. Please choose another name.	FilePanelPriv		指定された名前は利用できない文字を含んでいます。他の名前を指定してください。

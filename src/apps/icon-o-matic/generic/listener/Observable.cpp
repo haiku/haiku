@@ -29,8 +29,8 @@ Observable::~Observable()
 	if (fObservers.CountItems() > 0) {
 		char message[256];
 		Observer* o = (Observer*)fObservers.ItemAt(0);
-		sprintf(message, "Observable::~Observable() - %ld "
-						 "observers still watching, first: %s\n",
+		sprintf(message, "Observable::~Observable() - %" B_PRId32
+						 " observers still watching, first: %s\n",
 						 fObservers.CountItems(), typeid(*o).name());
 		debugger(message);
 	}

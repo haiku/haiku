@@ -134,8 +134,8 @@ HashRevokeManager::Compare(void* _revoked, const void *_block)
 /*static*/ uint32
 HashRevokeManager::Hash(void* _revoked, const void* _block, uint32 range)
 {
-	TRACE("HashRevokeManager::Hash(): revoked: %p, block: %p, range: %lu\n",
-		_revoked, _block, range);
+	TRACE("HashRevokeManager::Hash(): revoked: %p, block: %p, range: %"
+		B_PRIu32 "\n", _revoked, _block, range);
 	RevokeElement* revoked = (RevokeElement*)_revoked;
 
 	if (revoked != NULL)
@@ -161,8 +161,8 @@ HashRevokeManager::_ForceInsert(uint32 block, uint32 commitID)
 
 	if (retValue == B_OK) {
 		fRevokeCount++;
-		TRACE("HashRevokeManager::_ForceInsert(): revoke count: %lu\n",
-			fRevokeCount);
+		TRACE("HashRevokeManager::_ForceInsert(): revoke count: %" B_PRIu32
+			"\n", fRevokeCount);
 	}
 
 	return retValue;

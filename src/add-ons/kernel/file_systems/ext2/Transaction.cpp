@@ -187,11 +187,11 @@ Transaction::NotifyListeners(bool success)
 	TRACE("Transaction::NotifyListeners(): fListeners.First(): %p\n",
 		fListeners.First());
 	if (success) {
-		TRACE("Transaction::NotifyListeners(true): Number of listeners: %ld\n",
-			fListeners.Count());
+		TRACE("Transaction::NotifyListeners(true): Number of listeners: %"
+			B_PRId32 "\n", fListeners.Count());
 	} else {
-		TRACE("Transaction::NotifyListeners(false): Number of listeners: %ld\n",
-			fListeners.Count());
+		TRACE("Transaction::NotifyListeners(false): Number of listeners: %"
+			B_PRId32 "\n", fListeners.Count());
 	}
 	TRACE("Transaction::NotifyListeners(): Finished counting\n");
 

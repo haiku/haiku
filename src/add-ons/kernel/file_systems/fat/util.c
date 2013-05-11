@@ -106,7 +106,7 @@ dos2time_t(uint32 t)
 
 	days = daze[(t>>21)&15] + ((t>>25)+10)*365 + leaps((t>>25)+10,((t>>21)&15)-1)+((t>>16)&31)-1;
 
-	return (((days * 24) + ((t>>11)&31)) * 60 + ((t>>5)&63) + tzoffset) * 60 + 2*(t&31);
+	return (((days * 24) + ((t>>11)&31)) * 60 + ((t>>5)&63) - tzoffset) * 60 + 2*(t&31);
 }
 
 
@@ -118,7 +118,7 @@ time_t2dos(time_t s)
 
 	get_tzoffset();
 
-	t = (s % 60) / 2;	s /= 60; s -= tzoffset;
+	t = (s % 60) / 2;	s /= 60; s += tzoffset;
 	t += (s % 60) << 5;	s /= 60;
 	t += (s % 24) << 11;s /= 24;
 

@@ -44,12 +44,13 @@ BufferManager::RegisterBuffer(team_id team, media_buffer_id bufferID,
 {
 	BAutolock lock(fLocker);
 
-	TRACE("RegisterBuffer team = %ld, bufferid = %ld\n", team, bufferID);
+	TRACE("RegisterBuffer team = %" B_PRId32 ", bufferid = %" B_PRId32 "\n",
+		team, bufferID);
 
 	buffer_info* info;
 	if (!fBufferInfoMap.Get(bufferID, info)) {
-		ERROR("failed to register buffer! team = %ld, bufferid = %ld\n", team,
-			bufferID);
+		ERROR("failed to register buffer! team = %" B_PRId32 ", bufferid = %"
+			B_PRId32 "\n", team, bufferID);
 		return B_ERROR;
 	}
 
@@ -74,8 +75,9 @@ BufferManager::RegisterBuffer(team_id team, size_t size, int32 flags,
 
 	area_id clonedArea = _CloneArea(area);
 	if (clonedArea < 0) {
-		ERROR("RegisterBuffer: failed to clone buffer! error = %#lx, team = "
-			"%ld, area = %ld, offset = %ld, size = %ld\n", clonedArea, team,
+		ERROR("RegisterBuffer: failed to clone buffer! error = %#" B_PRIx32
+			", team = %" B_PRId32 ", area = %" B_PRId32 ", offset = %"
+			B_PRIuSIZE ", size = %" B_PRIuSIZE "\n", clonedArea, team,
 			area, offset, size);
 		return clonedArea;
 	}
@@ -107,31 +109,32 @@ status_t
 BufferManager::UnregisterBuffer(team_id team, media_buffer_id bufferID)
 {
 	BAutolock lock(fLocker);
-	TRACE("UnregisterBuffer: team = %ld, bufferID = %ld\n", team, bufferID);
+	TRACE("UnregisterBuffer: team = %" B_PRId32 ", bufferID = %" B_PRId32 "\n",
+		team, bufferID);
 
 	buffer_info* info;
 	if (!fBufferInfoMap.Get(bufferID, info)) {
-		ERROR("UnregisterBuffer: failed to unregister buffer! team = %ld, "
-			"bufferID = %ld\n", team, bufferID);
+		ERROR("UnregisterBuffer: failed to unregister buffer! team = %"
+			B_PRId32 ", bufferID = %" B_PRId32 "\n", team, bufferID);
 		return B_ERROR;
 	}
 
 	if (info->teams.find(team) == info->teams.end()) {
-		ERROR("UnregisterBuffer: failed to find team = %ld belonging to "
-			"bufferID = %ld\n", team, bufferID);
+		ERROR("UnregisterBuffer: failed to find team = %" B_PRId32 " belonging"
+			" to bufferID = %" B_PRId32 "\n", team, bufferID);
 		return B_ERROR;
 	}
 
 	info->teams.erase(team);
 
-	TRACE("UnregisterBuffer: team = %ld removed from bufferID = %ld\n", team,
-		bufferID);
+	TRACE("UnregisterBuffer: team = %" B_PRId32 " removed from bufferID = %"
+		B_PRId32 "\n", team, bufferID);
 
 	if (info->teams.empty()) {
 		_ReleaseClonedArea(info->area);
 		fBufferInfoMap.Remove(bufferID);
 
-		TRACE("UnregisterBuffer: bufferID = %ld removed\n", bufferID);
+		TRACE("UnregisterBuffer: bufferID = %" B_PRId32 " removed\n", bufferID);
 	}
 
 	return B_OK;
@@ -143,7 +146,7 @@ BufferManager::CleanupTeam(team_id team)
 {
 	BAutolock lock(fLocker);
 
-	TRACE("BufferManager::CleanupTeam: team %ld\n", team);
+	TRACE("BufferManager::CleanupTeam: team %" B_PRId32 "\n", team);
 
 	BufferInfoMap::Iterator iterator = fBufferInfoMap.GetIterator();
 	while (iterator.HasNext()) {
@@ -152,8 +155,8 @@ BufferManager::CleanupTeam(team_id team)
 		entry.value.teams.erase(team);
 
 		if (entry.value.teams.empty()) {
-			PRINT(1, "BufferManager::CleanupTeam: removing buffer id %ld that "
-				"has no teams\n", entry.key.GetHashCode());
+			PRINT(1, "BufferManager::CleanupTeam: removing buffer id %"
+				B_PRId32 " that has no teams\n", entry.key.GetHashCode());
 			_ReleaseClonedArea(entry.value.area);
 			iterator.Remove();
 		}
@@ -172,13 +175,14 @@ BufferManager::Dump()
 	BufferInfoMap::Iterator iterator = fBufferInfoMap.GetIterator();
 	while (iterator.HasNext()) {
 		buffer_info& info = *iterator.NextValue();
-		printf(" buffer-id %ld, area-id %ld, offset %ld, size %ld, flags "
-			"%#08lx\n", info.id, info.area, info.offset, info.size, info.flags);
+		printf(" buffer-id %" B_PRId32 ", area-id %" B_PRId32 ", offset %ld, "
+			"size %ld, flags %#08" B_PRIx32 "\n", info.id, info.area,
+			info.offset, info.size, info.flags);
 		printf("   assigned teams: ");
 
 		std::set<team_id>::iterator teamIterator = info.teams.begin();
 		for (; teamIterator != info.teams.end(); teamIterator++) {
-			printf("%ld, ", *teamIterator);
+			printf("%" B_PRId32 ", ", *teamIterator);
 		}
 		printf("\n");
 	}
@@ -193,8 +197,8 @@ BufferManager::_CloneArea(area_id area)
 		clone_info* info;
 		if (fCloneInfoMap.Get(area, info)) {
 			// we have already cloned this particular area
-			TRACE("BufferManager::_CloneArea() area %ld has already been "
-				"cloned (id %ld)\n", area, info->clone);
+			TRACE("BufferManager::_CloneArea() area %" B_PRId32 " has already"
+				" been cloned (id %" B_PRId32 ")\n", area, info->clone);
 
 			info->ref_count++;
 			return info->clone;
@@ -205,8 +209,8 @@ BufferManager::_CloneArea(area_id area)
 	area_id clonedArea = clone_area("media_server cloned buffer", &address,
 		B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, area);
 
-	TRACE("BufferManager::_CloneArea() cloned area %ld, clone id %ld\n",
-		area, clonedArea);
+	TRACE("BufferManager::_CloneArea() cloned area %" B_PRId32 ", clone id %"
+		B_PRId32 "\n", area, clonedArea);
 
 	if (clonedArea < 0)
 		return clonedArea;
@@ -235,19 +239,19 @@ BufferManager::_ReleaseClonedArea(area_id clone)
 	clone_info* info;
 	if (!fCloneInfoMap.Get(source, info)) {
 		ERROR("BufferManager::_ReleaseClonedArea(): could not find clone info "
-			"for id %ld (clone %ld)\n", source, clone);
+			"for id %" B_PRId32 " (clone %" B_PRId32 ")\n", source, clone);
 		return;
 	}
 
 	if (--info->ref_count == 0) {
-		TRACE("BufferManager::_ReleaseClonedArea(): delete cloned area %ld "
-			"(source %ld)\n", clone, source);
+		TRACE("BufferManager::_ReleaseClonedArea(): delete cloned area %"
+			B_PRId32 " (source %" B_PRId32 ")\n", clone, source);
 
 		fSourceInfoMap.Remove(clone);
 		fCloneInfoMap.Remove(source);
 		delete_area(clone);
 	} else {
-		TRACE("BufferManager::_ReleaseClonedArea(): released cloned area %ld "
-			"(source %ld)\n", clone, source);
+		TRACE("BufferManager::_ReleaseClonedArea(): released cloned area %"
+			B_PRId32 " (source %" B_PRId32 ")\n", clone, source);
 	}
 }

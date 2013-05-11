@@ -19,8 +19,9 @@ SparablePartition::SparablePartition(uint16 number, uint32 start, uint32 length,
 	fTableCount(tableCount),
 	fInitStatus(B_NO_INIT)
 {
-	TRACE(("SparablePartition::SparablePartition: number = %d, start = %lu,"
-		"length = %lu, packetLength = %d\n", number, start, length, packetLength));
+	TRACE(("SparablePartition::SparablePartition: number = %d, start = %"
+		B_PRIu32 ",length = %" B_PRIu32 ", packetLength = %d\n", number, start,
+		length, packetLength));
 
 	status_t status = (0 < TableCount() && TableCount() <= kMaxSparingTableCount)
 		? B_OK : B_BAD_VALUE;

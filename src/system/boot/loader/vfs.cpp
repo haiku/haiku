@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -18,7 +18,6 @@
 #include <boot/partitions.h>
 #include <boot/stdio.h>
 #include <boot/stage2.h>
-#include <util/kernel_cpp.h>
 #include <syscall_utils.h>
 
 #include "RootFileSystem.h"

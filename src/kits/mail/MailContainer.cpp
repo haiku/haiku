@@ -425,8 +425,10 @@ status_t BMIMEMultipartMailContainer::RenderToRFC822(BPositionIO *render_to) {
 			ssize_t amountWritten, length;
 			message_part *part = (message_part *)_components_in_raw.ItemAt(i);
 
-			for (off_t begin = part->start; begin < part->end; begin += sizeof(buffer)) {
-				length = ((part->end - begin) >= sizeof(buffer)) ? sizeof(buffer) : (part->end - begin);
+			for (off_t begin = part->start; begin < part->end;
+				begin += sizeof(buffer)) {
+				length = (((off_t)part->end - begin) >= (off_t)sizeof(buffer))
+					? sizeof(buffer) : (part->end - begin);
 
 				_io_data->ReadAt(begin,buffer,length);
 				amountWritten = render_to->Write(buffer,length);

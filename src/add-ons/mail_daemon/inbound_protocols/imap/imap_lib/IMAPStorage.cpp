@@ -240,7 +240,7 @@ IMAPStorage::DeleteMessage(int32 uid)
 	BPath filePath = fMailboxPath;
 	filePath.Append(storageEntry.fileName);
 	BEntry entry(filePath.Path());
-	TRACE("IMAPStorage::DeleteMessage %s, %ld\n", filePath.Path(), uid);
+	TRACE("IMAPStorage::DeleteMessage %s, %" B_PRId32 "\n", filePath.Path(), uid);
 
 	status_t status = entry.Remove();
 	if (status != B_OK)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku, Inc.
+ * Copyright 2007-2013 Haiku, Inc. All rights reserved.
  * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
  * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai.
  * All rights reserved. Distributed under the terms of the MIT license.
@@ -29,8 +29,8 @@ public:
 								bool matchCase, bool forwardSearch);
 	virtual					~FindWindow();
 
-	virtual	void			Quit();
 	virtual	void			MessageReceived(BMessage* msg);
+	virtual	void			Quit();
 
 private:
 			void			_SendFindMessage();

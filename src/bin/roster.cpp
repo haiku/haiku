@@ -79,7 +79,7 @@ output_team(team_id id, int32 mode)
 	if ((mode & kNoTruncateMode) == 0)
 		truncate_string(name, kNameFieldWidth);
 
-	printf("%6ld %*s %5ld %5lx (%s)\n", 
+	printf("%6" B_PRId32 " %*s %5" B_PRId32 " %5" B_PRIx32 " (%s)\n", 
 		id, (int)kNameFieldWidth, name.String(), 
 		info.port, info.flags, info.signature);
 }
@@ -141,7 +141,7 @@ main(int argc, char **argv)
 
 	// Iterate through the list.
 	for (int32 i = 0; i < applicationList.CountItems(); i++)
-		output_team((team_id)applicationList.ItemAt(i), mode);
+		output_team((team_id)(addr_t)applicationList.ItemAt(i), mode);
 
 	return 0;
 }

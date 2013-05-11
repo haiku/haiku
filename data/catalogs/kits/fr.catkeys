@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libbe	672385853
+1	french	x-vnd.Haiku-libbe	677628532
 gamma	AboutWindow		gamma
 beta	AboutWindow		bêta
 %3.2f GiB	StringForSize		%3.2f Gio
@@ -7,7 +7,6 @@ About %app%	AboutMenuItem		À propos de %app%
 Cut	TextView		Couper
 Version	AboutWindow		Version
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Impossible de créer le réplicant pour « %description ».\n%error
-About	AboutWindow		À propos
 Copy	TextView		Copier
 %3.2f KiB	StringForSize		%3.2f Kio
 %d bytes	StringForSize		%d octets

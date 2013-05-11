@@ -69,8 +69,8 @@ strdup_to_utf8(uint32 encode, const char* src, int32 length)
 	char* dup = strdup(dst);
 	delete[] dst;
 	if (srcLen != length) {
-		fprintf(stderr, "strdup_to_utf8(%ld, %ld) dst allocate smalled(%ld)\n",
-			encode, length, dstLen);
+		fprintf(stderr, "strdup_to_utf8(%" B_PRId32 ", %" B_PRId32
+			") dst allocate smalled(%" B_PRId32 ")\n", encode, length, dstLen);
 	}
 	return dup;
 }
@@ -91,8 +91,8 @@ strdup_from_utf8(uint32 encode, const char* src, int32 length)
 	char* dup = strdup(dst);
 	delete[] dst;
 	if (srcLen != length) {
-		fprintf(stderr, "strdup_from_utf8(%ld, %ld) dst allocate "
-			"smalled(%ld)\n", encode, length, dstLen);
+		fprintf(stderr, "strdup_from_utf8(%" B_PRId32 ", %" B_PRId32
+			") dst allocate smalled(%" B_PRId32 ")\n", encode, length, dstLen);
 	}
 	return dup;
 }
@@ -183,7 +183,7 @@ Grepper::_GrepperThread()
 	char command[B_PATH_NAME_LENGTH + 32];
 
 	BPath tempFile;
-	sprintf(fileName, "/tmp/SearchText%ld", fThreadId);
+	sprintf(fileName, "/tmp/SearchText%" B_PRId32, fThreadId);
 	tempFile.SetTo(fileName);
 
 	while (!fMustQuit && fIterator->GetNextName(fileName)) {

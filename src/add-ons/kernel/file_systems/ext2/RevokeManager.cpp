@@ -31,14 +31,16 @@ RevokeManager::~RevokeManager()
 
 
 status_t
-RevokeManager::ScanRevokeBlock(JournalRevokeHeader* revokeBlock, uint32 commitID)
+RevokeManager::ScanRevokeBlock(JournalRevokeHeader* revokeBlock,
+	uint32 commitID)
 {
-	TRACE("RevokeManager::ScanRevokeBlock(): Commit ID: %lu\n", commitID);
+	TRACE("RevokeManager::ScanRevokeBlock(): Commit ID: %" B_PRIu32 "\n",
+		commitID);
 	int count = revokeBlock->NumBytes() / 4;
 	
 	for (int i = 0; i < count; ++i) {
-		TRACE("RevokeManager::ScanRevokeBlock(): Found a revoked block: %lu\n",
-			revokeBlock->RevokeBlock(i));
+		TRACE("RevokeManager::ScanRevokeBlock(): Found a revoked block: %"
+			B_PRIu32 "\n", revokeBlock->RevokeBlock(i));
 		status_t status = Insert(revokeBlock->RevokeBlock(i), commitID);
 		
 		if (status != B_OK) {

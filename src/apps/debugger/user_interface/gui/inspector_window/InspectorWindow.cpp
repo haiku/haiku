@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Rene Gollent, rene@gollent.com. All rights reserved.
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -125,8 +125,8 @@ InspectorWindow::_Init()
 	textMenu->AddItem(item);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.SetInsets(4.0f, 4.0f, 4.0f, 4.0f)
-		.AddGroup(B_HORIZONTAL, 4.0f)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.AddGroup(B_HORIZONTAL)
 			.Add(fAddressInput = new BTextControl("addrInput",
 			"Target Address:", "",
 			new BMessage(MSG_INSPECT_ADDRESS)))
@@ -135,7 +135,7 @@ InspectorWindow::_Init()
 			.Add(fNextBlockButton = new BButton("navNext", ">",
 				new BMessage(MSG_NAVIGATE_NEXT_BLOCK)))
 		.End()
-		.AddGroup(B_HORIZONTAL, 4.0f)
+		.AddGroup(B_HORIZONTAL)
 			.Add(fHexMode = new BMenuField("hexMode", "Hex Mode:",
 				hexMenu))
 			.AddGlue()
@@ -156,7 +156,7 @@ InspectorWindow::_Init()
 	int32 targetEndian = fTeam->GetArchitecture()->IsBigEndian()
 		? EndianModeBigEndian : EndianModeLittleEndian;
 
-	scrollView->SetTarget(fMemoryView = MemoryView::Create(fTeam));
+	scrollView->SetTarget(fMemoryView = MemoryView::Create(fTeam, this));
 
 	fAddressInput->SetTarget(this);
 	fPreviousBlockButton->SetTarget(this);
@@ -221,6 +221,7 @@ InspectorWindow::MessageReceived(BMessage* msg)
 			}
 
 			if (addressValid) {
+				fCurrentAddress = address;
 				if (fCurrentBlock != NULL
 					&& !fCurrentBlock->Contains(address)) {
 					fCurrentBlock->ReleaseReference();
@@ -231,11 +232,6 @@ InspectorWindow::MessageReceived(BMessage* msg)
 					fListener->InspectRequested(address, this);
 				else
 					fMemoryView->SetTargetAddress(fCurrentBlock, address);
-
-				fCurrentAddress = address;
-				BString computedAddress;
-				computedAddress.SetToFormat("0x%" B_PRIx64, address);
-				fAddressInput->SetText(computedAddress.String());
 			}
 			break;
 		}
@@ -285,6 +281,19 @@ InspectorWindow::MemoryBlockRetrieved(TeamMemoryBlock* block)
 		fMemoryView->SetTargetAddress(block, fCurrentAddress);
 		fPreviousBlockButton->SetEnabled(true);
 		fNextBlockButton->SetEnabled(true);
+	}
+}
+
+
+void
+InspectorWindow::TargetAddressChanged(target_addr_t address)
+{
+	AutoLocker<BLooper> lock(this);
+	if (lock.IsLocked()) {
+		fCurrentAddress = address;
+		BString computedAddress;
+		computedAddress.SetToFormat("0x%" B_PRIx64, address);
+		fAddressInput->SetText(computedAddress.String());
 	}
 }
 

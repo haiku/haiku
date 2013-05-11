@@ -1171,7 +1171,7 @@ ChartWindow::ButtonPicture(bool active, int32 button_type)
 		   than what a standard BButton would allow) with the current value
 		   of the star density pourcentage. */
 		value = (fCurrentSettings.star_density*100 + STAR_DENSITY_MAX/2) / STAR_DENSITY_MAX;
-		sprintf(word, "%3ld", value);
+		sprintf(word, "%3" B_PRId32, value);
 	draw_string:
 		fOffwindowButton->SetFont(be_bold_font);
 		fOffwindowButton->SetFontSize(14.0);
@@ -2135,7 +2135,7 @@ ChartWindow::SetPatternBits(buffer *buf)
 	That's the main thread controling the animation and synchronising
 	the engine state with the changes coming from the UI.
 */
-long
+int32
 ChartWindow::Animation(void *data)
 {
 	int32			i, cur_4_frames_index, cur_last_fps, count_fps;
@@ -2253,7 +2253,7 @@ ChartWindow::Animation(void *data)
    slave of the Animation thread. It's directly synchronised with its
    master, and will only do some star animation processing whenever
    its master allows him to do so. */
-long
+int32
 ChartWindow::Animation2(void *data)
 {
 	ChartWindow *w = (ChartWindow*)data;

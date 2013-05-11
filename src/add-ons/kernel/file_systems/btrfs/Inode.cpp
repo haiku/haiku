@@ -133,7 +133,6 @@ Inode::CheckPermissions(int accessMode) const
 	}
 
 	return (accessMode & ~permissions) == 0 ? B_OK : B_NOT_ALLOWED;
-	return B_OK;
 }
 
 
@@ -149,12 +148,13 @@ Inode::FindBlock(off_t pos, off_t& physical, off_t *_length)
 	status_t status = fVolume->FSTree()->FindPrevious(search_key,
 		(void**)&extent_data);
 	if (status != B_OK) {
-		ERROR("Inode::FindBlock(): Couldn't find extent_data 0x%lx\n", status);
+		ERROR("Inode::FindBlock(): Couldn't find extent_data 0x%" B_PRIx32
+			"\n", status);
 		return status;
 	}
 
-	TRACE("Inode::FindBlock(%" B_PRIdINO ") key.Offset() %lld\n", ID(),
-		search_key.Offset());
+	TRACE("Inode::FindBlock(%" B_PRIdINO ") key.Offset() %" B_PRId64 "\n",
+		ID(), search_key.Offset());
 
 	off_t diff = pos - search_key.Offset();
 	off_t logical = 0;
@@ -165,8 +165,8 @@ Inode::FindBlock(off_t pos, off_t& physical, off_t *_length)
 	status = fVolume->FindBlock(logical, physical);	
 	if (_length != NULL)
 		*_length = extent_data->Size() - diff;
-	TRACE("Inode::FindBlock(%" B_PRIdINO ") %lld physical %lld\n", ID(),
-		pos, physical);
+	TRACE("Inode::FindBlock(%" B_PRIdINO ") %" B_PRIdOFF " physical %"
+		B_PRIdOFF "\n", ID(), pos, physical);
 	
 	free(extent_data);
 	return status;
@@ -180,14 +180,14 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 
 	// set/check boundaries for pos/length
 	if (pos < 0) {
-		ERROR("inode %" B_PRIdINO ": ReadAt failed(pos %lld, length %lu)\n",
-			ID(), pos, length);
+		ERROR("inode %" B_PRIdINO ": ReadAt failed(pos %" B_PRIdOFF 
+			", length %lu)\n", ID(), pos, length);
 		return B_BAD_VALUE;
 	}
 
 	if (pos >= Size() || length == 0) {
-		TRACE("inode %" B_PRIdINO ": ReadAt 0 (pos %lld, length %lu)\n",
-			ID(), pos, length);
+		TRACE("inode %" B_PRIdINO ": ReadAt 0 (pos %" B_PRIdOFF
+			", length %lu)\n", ID(), pos, length);
 		*_length = 0;
 		return B_NO_ERROR;
 	}
@@ -204,14 +204,15 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 	status_t status = fVolume->FSTree()->FindPrevious(search_key,
 		(void**)&extent_data, &item_size);
 	if (status != B_OK) {
-		ERROR("Inode::FindBlock(): Couldn't find extent_data 0x%lx\n", status);
+		ERROR("Inode::FindBlock(): Couldn't find extent_data 0x%" B_PRIx32
+			"\n", status);
 		return status;
 	}
 
 	uint8 compression = extent_data->Compression();
 	if (FileCache() != NULL
 		&& extent_data->Type() == BTRFS_EXTENT_DATA_REGULAR) {
-		TRACE("inode %" B_PRIdINO ": ReadAt cache (pos %lld, length %lu)\n", 
+		TRACE("inode %" B_PRIdINO ": ReadAt cache (pos %" B_PRIdOFF ", length %lu)\n", 
 			ID(), pos, length);
 		free(extent_data);
 		if (compression == BTRFS_EXTENT_COMPRESS_NONE)
@@ -222,7 +223,7 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 			panic("unknown extent compression; %d\n", compression);
 	}
 
-	TRACE("Inode::ReadAt(%" B_PRIdINO ") key.Offset() %lld\n", ID(),
+	TRACE("Inode::ReadAt(%" B_PRIdINO ") key.Offset() %" B_PRId64 "\n", ID(),
 		search_key.Offset());
 
 	off_t diff = pos - search_key.Offset();
@@ -256,8 +257,8 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 		size_t inline_size = item_size - 13;
 		bool headerRead = false;
 
-		TRACE("Inode::ReadAt(%" B_PRIdINO ") diff %lld size %ld\n", ID(),
-			diff, item_size);
+		TRACE("Inode::ReadAt(%" B_PRIdINO ") diff %" B_PRIdOFF " size %"
+			B_PRIuSIZE "\n", ID(), diff, item_size);
 
 		do {
 			ssize_t bytesRead = min_c(sizeof(in), inline_size - offset);

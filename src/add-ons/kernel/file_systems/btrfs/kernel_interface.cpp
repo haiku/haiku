@@ -235,7 +235,7 @@ btrfs_read_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 
 	while (true) {
 		file_io_vec fileVecs[8];
-		uint32 fileVecCount = 8;
+		size_t fileVecCount = 8;
 
 		status = file_map_translate(inode->Map(), pos, bytesLeft, fileVecs,
 			&fileVecCount, 0);
@@ -321,10 +321,10 @@ btrfs_get_file_map(fs_volume* _volume, fs_vnode* _node, off_t offset,
 		offset += blockLength;
 		size -= blockLength;
 
-		if (size <= vecs[index - 1].length || offset >= inode->Size()) {
+		if ((off_t)size <= vecs[index - 1].length || offset >= inode->Size()) {
 			// We're done!
 			*_count = index;
-			TRACE("btrfs_get_file_map for inode %lld\n", inode->ID());
+			TRACE("btrfs_get_file_map for inode %" B_PRIdINO "\n", inode->ID());
 			return B_OK;
 		}
 	}
@@ -362,7 +362,7 @@ static status_t
 btrfs_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 cmd,
 	void* buffer, size_t bufferLength)
 {
-	TRACE("ioctl: %lu\n", cmd);
+	TRACE("ioctl: %" B_PRIu32 "\n", cmd);
 
 	/*Volume* volume = (Volume*)_volume->private_volume;*/
 	return B_DEV_INVALID_IOCTL;

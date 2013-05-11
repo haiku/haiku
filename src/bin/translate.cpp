@@ -131,21 +131,21 @@ print_translation_format(const translation_format &format)
 void
 TypeList::Add(uint32 type)
 {
-	fList.AddItem((void *)type, 0);
+	fList.AddItem((void *)(addr_t)type, 0);
 }
 
 
 bool
 TypeList::Remove(uint32 type)
 {
-	return fList.RemoveItem((void *)type);
+	return fList.RemoveItem((void *)(addr_t)type);
 }
 
 
 bool
 TypeList::FindType(uint32 type)
 {
-	return fList.IndexOf((void *)type) >= 0;
+	return fList.IndexOf((void *)(addr_t)type) >= 0;
 }
 
 
@@ -155,7 +155,7 @@ TypeList::SetTo(TypeList &types)
 	fList.MakeEmpty();
 
 	for (int32 i = 0; i < types.Count(); i++)
-		fList.AddItem((void *)types.TypeAt(i));
+		fList.AddItem((void *)(addr_t)types.TypeAt(i));
 }
 
 
@@ -169,7 +169,7 @@ TypeList::Count()
 uint32
 TypeList::TypeAt(int32 index)
 {
-	return (uint32)fList.ItemAt(index);
+	return (uint32)(addr_t)fList.ItemAt(index);
 }
 
 
@@ -612,7 +612,8 @@ TranslateApp::ListTranslators(uint32 type)
 				continue;
 		}
 
-		printf("name: %s\ninfo: %s\nversion: %ld.%ld.%ld\n", name, info,
+		printf("name: %s\ninfo: %s\nversion: %" B_PRId32 ".%" B_PRId32 ".%"
+			B_PRId32 "\n", name, info,
 			B_TRANSLATION_MAJOR_VERSION(version),
 			B_TRANSLATION_MINOR_VERSION(version),
 			B_TRANSLATION_REVISION_VERSION(version)); 

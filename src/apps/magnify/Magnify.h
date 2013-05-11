@@ -119,7 +119,7 @@ class TMagnify : public BView {
 		void			EndSave();
 
 	private:
-		static long		MagnifyTask(void *);
+		static status_t	MagnifyTask(void *);
 
 		bool			fNeedToUpdate;
 		long			fThread;				//	magnify thread id

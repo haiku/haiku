@@ -1,10 +1,11 @@
 /*
- * Copyright 2001-2009 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Marc Flerackers (mflerackers@androme.be)
- *		Stephan Aßmus <superstippi@gmx.de>
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		Marc Flerackers, mflerackers@androme.be
+ *		John Scipione, jscipione@gmail.com
  */
 #ifndef _BMC_PRIVATE_H
 #define _BMC_PRIVATE_H
@@ -12,8 +13,8 @@
 
 #include <BeBuild.h>
 #include <MenuBar.h>
-#include <MenuItem.h>
 #include <MessageFilter.h>
+
 
 class BMessageRunner;
 
@@ -36,8 +37,7 @@ class _BMCMenuBar_ : public BMenuBar {
 public:
 								_BMCMenuBar_(BRect frame, bool fixedSize,
 									BMenuField* menuField);
-								_BMCMenuBar_(bool fixedSize,
-									BMenuField* menuField);
+								_BMCMenuBar_(BMenuField* menuField);
 								_BMCMenuBar_(BMessage* data);
 	virtual						~_BMCMenuBar_();
 
@@ -54,7 +54,7 @@ public:
 			bool				IsPopUpMarkerShown() const
 									{ return fShowPopUpMarker; }
 
-	virtual BSize				MinSize();
+	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
 
 private:

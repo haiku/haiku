@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -10,7 +10,6 @@
 
 #include <StorageDefs.h>
 #include <KernelExport.h>
-#include <util/kernel_cpp.h>
 
 #include <string.h>
 #include <unistd.h>

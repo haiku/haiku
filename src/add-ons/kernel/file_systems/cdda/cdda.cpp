@@ -557,7 +557,7 @@ read_cdtext(int fd, struct cdtext &cdtext)
 
 	scsi_toc_general *header = (scsi_toc_general *)buffer;
 
-	size_t packLength = B_BENDIAN_TO_HOST_INT16(header->data_length) - 2;
+	uint32 packLength = B_BENDIAN_TO_HOST_INT16(header->data_length) - 2;
 	cdtext_pack_data *pack = (cdtext_pack_data *)(header + 1);
 	cdtext_pack_data *lastPack = NULL;
 	uint8 state = 0;
@@ -656,8 +656,8 @@ status_t
 read_cdda_data(int fd, off_t endFrame, off_t offset, void *data, size_t length,
 	off_t bufferOffset, void *buffer, size_t bufferSize)
 {
-	if (bufferOffset >= 0 && bufferOffset <= offset + length
-		&& bufferOffset + bufferSize > offset) {
+	if (bufferOffset >= 0 && bufferOffset <= offset + (off_t)length
+		&& bufferOffset + (off_t)bufferSize > offset) {
 		if (offset >= bufferOffset) {
 			// buffer reaches into the beginning of the request
 			off_t dataOffset = offset - bufferOffset;

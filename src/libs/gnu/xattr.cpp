@@ -43,7 +43,9 @@ struct AttributeName {
 			// printable, just use them as the type string, otherwise convert
 			// to hex
 			char typeString[9];
-			uint8 typeBytes[4] = { type >> 24, type >> 16, type >> 8, type };
+			uint8 typeBytes[4] = { (uint8)((type >> 24) & 0xff),
+				(uint8)((type >> 16) & 0xff), (uint8)((type >> 8) & 0xff),
+				(uint8)(type & 0xff) };
 			if (isprint(typeBytes[0]) && isprint(typeBytes[1])
 				&& isprint(typeBytes[2]) && isprint(typeBytes[3])) {
 				typeString[0] = typeBytes[0];

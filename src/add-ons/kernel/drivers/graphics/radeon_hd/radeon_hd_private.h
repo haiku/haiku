@@ -34,7 +34,7 @@ struct radeon_info {
 	status_t		init_status;
 	int32			id;
 	pci_info*		pci;
-	uint8*			registers;
+	addr_t			registers;
 
 	uint8*			atom_buffer;	// buffer for atombios
 

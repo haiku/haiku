@@ -569,7 +569,8 @@ ShortcutsWindow::MessageReceived(BMessage* msg)
 				if (fLastOpenWasAppend == false) {
 					// Clear the menu...
 					while (ShortcutsSpec* item
-						= ((ShortcutsSpec*)fColumnListView->RemoveItem(0L))) {
+						= ((ShortcutsSpec*)
+							fColumnListView->RemoveItem((int32)0))) {
 						delete item;
 					}
 				}

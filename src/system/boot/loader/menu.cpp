@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2013, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
@@ -21,7 +21,6 @@
 #include <boot/platform/generic/text_console.h>
 #include <boot/stdio.h>
 #include <safemode.h>
-#include <util/kernel_cpp.h>
 #include <util/ring_buffer.h>
 
 #include "kernel_debug_config.h"

@@ -111,7 +111,7 @@ append_float(BString& string, float n, int32 maxDigits)
 		n = n - rounded;
 		rounded = (int32)(n * pow(10, maxDigits));
 		char tmp[maxDigits + 1];
-		sprintf(tmp, "%0*ld", (int)maxDigits, rounded);
+		sprintf(tmp, "%0*" B_PRId32, (int)maxDigits, rounded);
 		tmp[maxDigits] = 0;
 		int32 digits = strlen(tmp);
 		for (int32 i = strlen(tmp) - 1; i >= 0; i--) {

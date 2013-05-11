@@ -177,7 +177,7 @@ ScalarValueSetting::Value() const
 void
 ScalarValueSetting::GetValueAsString(char* buffer) const
 {
-	sprintf(buffer, "%ld", fValue);
+	sprintf(buffer, "%" B_PRId32, fValue);
 }
 
 

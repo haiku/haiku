@@ -94,7 +94,7 @@ create_device(const usb_device* dev, uint16 ifno)
 
 	midiDevice->sem_lock = sem = create_sem(1, DRIVER_NAME "_lock");
 	if (sem < 0) {
-		DPRINTF_ERR((MY_ID "create_sem() failed 0x%lx\n", sem));
+		DPRINTF_ERR((MY_ID "create_sem() failed 0x%" B_PRIx32 "\n", sem));
 		free(midiDevice);
 		return NULL;
 	}
@@ -104,7 +104,7 @@ create_device(const usb_device* dev, uint16 ifno)
 		(void**)&midiDevice->buffer, B_ANY_KERNEL_ADDRESS,
 		B_PAGE_SIZE, B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
 	if (area < 0) {
-		DPRINTF_ERR((MY_ID "create_area() failed 0x%lx\n", area));
+		DPRINTF_ERR((MY_ID "create_area() failed 0x%" B_PRIx32 "\n", area));
 		delete_sem(midiDevice->sem_lock);
 		free(midiDevice);
 		return NULL;
@@ -114,7 +114,7 @@ create_device(const usb_device* dev, uint16 ifno)
 		(usb_midi_event_packet*)((uint8*)midiDevice->buffer + B_PAGE_SIZE / 2);
 	midiDevice->sem_send =  sem = create_sem(1, DRIVER_NAME "_send");
 	if (sem < 0) {
-		DPRINTF_ERR((MY_ID "create_sem() failed 0x%lx\n", sem));
+		DPRINTF_ERR((MY_ID "create_sem() failed 0x%" B_PRIx32 "\n", sem));
 		delete_sem(midiDevice->sem_lock);
 		delete_area(area);
 		free(midiDevice);
@@ -278,7 +278,7 @@ midi_usb_read_callback(void* cookie, status_t status,
 		(usb_callback_func)midi_usb_read_callback, midiDevice);
 	if (st != B_OK) {
 		/* probably endpoint stall */
-		DPRINTF_ERR((MY_ID "queue_bulk() error 0x%lx\n", st));
+		DPRINTF_ERR((MY_ID "queue_bulk() error 0x%" B_PRIx32 "\n", st));
 	}
 }
 
@@ -358,7 +358,8 @@ usb_midi_added(const usb_device* dev, void** cookie)
 got_one:
 
 	if ((status = usb->set_configuration(dev, conf)) != B_OK) {
-		DPRINTF_ERR((MY_ID "set_configuration() failed 0x%lx\n", status));
+		DPRINTF_ERR((MY_ID "set_configuration() failed 0x%" B_PRIx32 "\n",
+			status));
 		return B_ERROR;
 	}
 
@@ -430,7 +431,7 @@ got_one:
 		midiDevice->inMaxPkt,
 		(usb_callback_func)midi_usb_read_callback, midiDevice);
 	if (status != B_OK) {
-		DPRINTF_ERR((MY_ID "queue_bulk() error 0x%lx\n", status));
+		DPRINTF_ERR((MY_ID "queue_bulk() error 0x%" B_PRIx32 "\n", status));
 		return B_ERROR;
 	}
 
@@ -504,7 +505,8 @@ usb_midi_open(const char* name, uint32 flags,
 
 	assert(name != NULL);
 	assert(out_cookie != NULL);
-	DPRINTF_INFO((MY_ID "usb_midi_open(%s) flags=%lx\n", name, flags));
+	DPRINTF_INFO((MY_ID "usb_midi_open(%s) flags=%" B_PRIx32 "\n", name,
+		flags));
 
 	if ((port = search_port_info(name)) == NULL)
 		return B_ENTRY_NOT_FOUND;
@@ -519,7 +521,8 @@ usb_midi_open(const char* name, uint32 flags,
 
 	cookie->sem_cb = create_sem(0, DRIVER_NAME "_cb");
 	if (cookie->sem_cb < 0) {
-		DPRINTF_ERR((MY_ID "create_sem() failed 0x%lx\n", cookie->sem_cb));
+		DPRINTF_ERR((MY_ID "create_sem() failed 0x%" B_PRIx32 "\n",
+			cookie->sem_cb));
 		free(cookie);
 		return B_ERROR;
 	}
@@ -674,8 +677,8 @@ usb_midi_write(driver_cookie* cookie, off_t position,
 			* packet_count, (usb_callback_func)midi_usb_write_callback,
 			midiDevice);
 		if (status != B_OK) {
-			DPRINTF_ERR((MY_ID "midi write queue_bulk() error 0x%lx\n",
-				status));
+			DPRINTF_ERR((MY_ID "midi write queue_bulk() error 0x%" B_PRIx32
+				"\n", status));
 			return B_ERROR;
 		}
 	}

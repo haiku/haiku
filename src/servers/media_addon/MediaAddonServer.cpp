@@ -428,8 +428,8 @@ MediaAddonServer::_HandleMessage(int32 code, const void* data, size_t size)
 			break;
 
 		default:
-			ERROR("media_addon_server: received unknown message code %#08lx\n",
-				code);
+			ERROR("media_addon_server: received unknown message code %#08"
+				B_PRIx32 "\n", code);
 			break;
 	}
 }
@@ -607,13 +607,14 @@ MediaAddonServer::_AddOnAdded(const char* path, ino_t fileNode)
 void
 MediaAddonServer::_DestroyInstantiatedFlavors(AddOnInfo& info)
 {
-	printf("MediaAddonServer::_DestroyInstantiatedFlavors addon %ld\n", info.id);
+	printf("MediaAddonServer::_DestroyInstantiatedFlavors addon %" B_PRId32
+		"\n", info.id);
 
 	NodeVector::iterator iterator = info.active_flavors.begin();
 	for (; iterator != info.active_flavors.end(); iterator++) {
 		media_node& node = *iterator;
 		
-		printf("node %ld\n", node.node);
+		printf("node %" B_PRId32 "\n", node.node);
 		
 		if ((node.kind & B_TIME_SOURCE) != 0
 			&& (fMediaRoster->StopTimeSource(node, 0, true) != B_OK)) {
@@ -711,7 +712,7 @@ MediaAddonServer::_InstantiatePhysicalInputsAndOutputs(AddOnInfo& info)
 		const flavor_info* flavorinfo;
 		if (info.addon->GetFlavorAt(i, &flavorinfo) != B_OK) {
 			ERROR("MediaAddonServer::InstantiatePhysialInputsAndOutputs "
-				"GetFlavorAt failed for index %ld!\n", i);
+				"GetFlavorAt failed for index %" B_PRId32 "!\n", i);
 			continue;
 		}
 		if ((flavorinfo->kinds & (B_PHYSICAL_INPUT | B_PHYSICAL_OUTPUT)) != 0) {
@@ -728,8 +729,8 @@ MediaAddonServer::_InstantiatePhysicalInputsAndOutputs(AddOnInfo& info)
 				dormantNodeInfo, &node);
 			if (status != B_OK) {
 				ERROR("MediaAddonServer::InstantiatePhysialInputsAndOutputs "
-					"Couldn't instantiate node flavor, internal_id %ld, "
-					"name %s\n", flavorinfo->internal_id, flavorinfo->name);
+					"Couldn't instantiate node flavor, internal_id %" B_PRId32
+					", name %s\n", flavorinfo->internal_id, flavorinfo->name);
 			} else {
 				TRACE("Node created!\n");
 				info.active_flavors.push_back(node);
@@ -758,12 +759,12 @@ MediaAddonServer::_InstantiateAutostartFlavors(AddOnInfo& info)
 		else if (status != B_OK)
 			break;
 			
-		printf("started node %ld\n", index);
+		printf("started node %" B_PRId32 "\n", index);
 						
 		status = MediaRosterEx(fMediaRoster)->RegisterNode(node, info.id,
 			internalID);
 		if (status != B_OK) {
-			ERROR("failed to register node %ld\n", index);
+			ERROR("failed to register node %" B_PRId32 "\n", index);
 			node->Release();
 		} else {
 			MediaRosterEx(fMediaRoster)->IncrementAddonFlavorInstancesCount(
@@ -784,7 +785,7 @@ MediaAddonServer::_AddOnRemoved(ino_t fileNode)
 
 	FileMap::iterator foundFile = fFileMap.find(fileNode);
 	if (foundFile == fFileMap.end()) {
-		ERROR("MediaAddonServer::_AddOnRemoved: inode %Ld removed, but no "
+		ERROR("MediaAddonServer::_AddOnRemoved: inode %" B_PRIdINO " removed, but no "
 			"media add-on found\n", fileNode);
 		return;
 	}
@@ -797,7 +798,7 @@ MediaAddonServer::_AddOnRemoved(ino_t fileNode)
 
 	if (foundInfo == fInfoMap.end()) {
 		ERROR("MediaAddonServer::_AddOnRemoved: couldn't get addon info for "
-			"add-on %ld\n", id);
+			"add-on %" B_PRId32 "\n", id);
 		oldFlavorCount = 1000;
 	} else {
 		AddOnInfo& info = foundInfo->second;
@@ -808,7 +809,7 @@ MediaAddonServer::_AddOnRemoved(ino_t fileNode)
 
 		if (info.addon) {
 			ERROR("MediaAddonServer::_AddOnRemoved: couldn't unload addon "
-				"%ld since flavors are in use\n", id);
+				"%" B_PRId32 " since flavors are in use\n", id);
 		}
 
 		fInfoMap.erase(foundInfo);

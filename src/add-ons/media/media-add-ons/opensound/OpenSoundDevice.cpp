@@ -364,8 +364,8 @@ status_t OpenSoundDevice::InitDriver()
 {
 
 	CALLED();
-	PRINT(("OpenSoundDevice::InitDriver: %ld engines, %ld mixers\n",
-		CountEngines(), CountMixers()));
+	PRINT(("OpenSoundDevice::InitDriver: %" B_PRId32 " engines, %" B_PRId32
+		" mixers\n", CountEngines(), CountMixers()));
 	
 	if (CountMixers()) {
 		;//...

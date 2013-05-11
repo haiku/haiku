@@ -688,7 +688,7 @@ _RkRealizeDD(struct DD	*dd)
 	int ret = -1;
 	int tmpres;
 	int			fdes;
-	long		tloc;
+	time_t		tloc;
 	
 	char *whattime, *header, *dicsdir, *backup;
 	whattime = (char *)malloc(RK_LINE_BMAX);

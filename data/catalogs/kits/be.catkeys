@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libbe	672385853
+1	belarusian	x-vnd.Haiku-libbe	677628532
 gamma	AboutWindow		гамма
 beta	AboutWindow		бэта
 %3.2f GiB	StringForSize		%3.2f ГіБ
@@ -7,7 +7,6 @@ About %app%	AboutMenuItem		Пра %app%
 Cut	TextView		Выразаць
 Version	AboutWindow		Версія
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Немагчыма стварыць рэплікант \"%description\".\n%error
-About	AboutWindow		Пра праграму
 Copy	TextView		Капіяваць
 %3.2f KiB	StringForSize		%3.2f КіБ
 %d bytes	StringForSize		%d байтаў

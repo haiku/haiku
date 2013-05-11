@@ -1,7 +1,7 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2013, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "File.h"
@@ -10,10 +10,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <util/kernel_cpp.h>
-
 
 namespace FFS {
+
 
 class Stream {
 	public:
@@ -254,5 +253,6 @@ File::Inode() const
 {
 	return fNode.HeaderKey();
 }
+
 
 }	// namespace FFS

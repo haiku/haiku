@@ -131,13 +131,15 @@ midi_read(void* cookie, off_t pos, void* ptr, size_t* nread)
 
 
 static status_t
-midi_write(void* cookie, off_t pos, const void* ptr, size_t* nwritten)
+midi_write(void* cookie, off_t pos, const void* ptr, size_t* _nwritten)
 {
 	echo_dev *card = (echo_dev *) cookie;
 	ECHOSTATUS err;
+	DWORD nwritten = *_nwritten;
 	
 	LOG(("midi_write()\n"));
 	
-	err = card->pEG->WriteMidi(*nwritten, (PBYTE)ptr, nwritten);
+	err = card->pEG->WriteMidi(nwritten, (PBYTE)ptr, &nwritten);
+	*_nwritten = nwritten;
 	return (err != ECHOSTATUS_OK) ? B_ERROR : B_OK;
 }

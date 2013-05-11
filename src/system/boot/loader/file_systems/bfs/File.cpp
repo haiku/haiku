@@ -1,15 +1,14 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2013, Axel Dörfler, axeld@pinc-software.de.
+ * This file may be used under the terms of the MIT License.
+ */
 
 
 #include "File.h"
 
-#include <util/kernel_cpp.h>
-
 
 namespace BFS {
+
 
 File::File(Volume &volume, block_run run)
 	:
@@ -37,14 +36,14 @@ File::~File()
 }
 
 
-status_t 
+status_t
 File::InitCheck()
 {
 	return fStream.InitCheck();
 }
 
 
-ssize_t 
+ssize_t
 File::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 {
 	status_t status = fStream.ReadAt(pos, (uint8 *)buffer, &bufferSize);
@@ -55,7 +54,7 @@ File::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 }
 
 
-ssize_t 
+ssize_t
 File::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
 {
 	return EROFS;
@@ -88,5 +87,6 @@ File::Inode() const
 {
 	return fStream.ID();
 }
+
 
 }	// namespace BFS

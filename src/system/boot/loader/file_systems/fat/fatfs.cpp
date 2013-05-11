@@ -1,14 +1,13 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2008, François Revol <revol@free.fr>
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "fatfs.h"
 
 #include <boot/partitions.h>
 #include <boot/platform.h>
-#include <util/kernel_cpp.h>
 
 #include <string.h>
 #include <unistd.h>

@@ -1,10 +1,11 @@
-1	belarusian	x-vnd.Haiku-Network	365183238
+1	belarusian	x-vnd.Haiku-Network	781877986
 Choose automatically	EthernetSettingsView		Выбіраць аўтаматычна
 Gateway:	EthernetSettingsView		Шлюз:
 Netmask:	EthernetSettingsView		Маска сеткі:
 DHCP	EthernetSettingsView		DHCP
 DNS #2:	EthernetSettingsView		DNS #2:
 Apply	EthernetSettingsView		Ужыць
+Netmask is invalid	EthernetSettingsView		Няслушная маска падсеткі.
 OK	EthernetSettingsView		ОК
 DNS #1:	EthernetSettingsView		DNS #1:
 IP address:	EthernetSettingsView		IP адрас:

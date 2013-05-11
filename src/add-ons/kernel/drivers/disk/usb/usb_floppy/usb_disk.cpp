@@ -18,7 +18,7 @@
 
 #define DRIVER_NAME			"usb_floppy"
 #define DEVICE_NAME_BASE	"disk/ufi/"
-#define DEVICE_NAME			DEVICE_NAME_BASE"%ld/%d/raw"
+#define DEVICE_NAME			DEVICE_NAME_BASE "%" B_PRId32 "/%d/raw"
 
 
 //#define TRACE_USB_DISK
@@ -113,7 +113,7 @@ status_t	usb_disk_transfer_data(disk_device *device, bool directionIn,
 status_t	usb_disk_receive_csw(disk_device *device,
 				command_status_wrapper *status);
 status_t	usb_disk_operation(device_lun *lun, uint8* operation,
-				void *data, uint32 *dataLength,
+				void *data, size_t *dataLength,
 				bool directionIn);
 
 status_t	usb_disk_send_diagnostic(device_lun *lun);
@@ -194,7 +194,7 @@ usb_disk_transfer_data(disk_device *device, bool directionIn, void *data,
 
 
 void
-usb_disk_interrupt(void* cookie, int32 status, void* data, uint32 length)
+usb_disk_interrupt(void* cookie, int32 status, void* data, size_t length)
 {
 	disk_device* dev = (disk_device*)cookie;
 	// We release the lock even if the interrupt is invalid. This way there
@@ -202,7 +202,8 @@ usb_disk_interrupt(void* cookie, int32 status, void* data, uint32 length)
 	release_sem(dev->interruptLock);
 
 	if (length != 2) {
-		TRACE_ALWAYS("interrupt of length %ld! (expected 2)\n", length);
+		TRACE_ALWAYS("interrupt of length %" B_PRIuSIZE "! (expected 2)\n",
+			length);
 		// In this case we do not reschedule the interrupt. This means the
 		// driver will be locked. The interrupt should perhaps be scheduled
 		// when starting a transfer instead. But getting there means something
@@ -234,7 +235,7 @@ usb_disk_receive_csw(disk_device *device, command_status_wrapper *status)
 
 status_t
 usb_disk_operation(device_lun *lun, uint8* operation,
-	void *data,	uint32 *dataLength, bool directionIn)
+	void *data,	size_t *dataLength, bool directionIn)
 {
 	// TODO: remove transferLength
 	TRACE("operation: lun: %u; op: 0x%x; data: %p; dlen: %p (%lu); in: %c\n",
@@ -342,7 +343,7 @@ usb_disk_send_diagnostic(device_lun *lun)
 status_t
 usb_disk_request_sense(device_lun *lun)
 {
-	uint32 dataLength = sizeof(scsi_request_sense_6_parameter);
+	size_t dataLength = sizeof(scsi_request_sense_6_parameter);
 	uint8 commandBlock[12];
 	memset(commandBlock, 0, sizeof(commandBlock));
 
@@ -413,7 +414,7 @@ usb_disk_request_sense(device_lun *lun)
 status_t
 usb_disk_mode_sense(device_lun *lun)
 {
-	uint32 dataLength = sizeof(scsi_mode_sense_6_parameter);
+	size_t dataLength = sizeof(scsi_mode_sense_6_parameter);
 
 	uint8 commandBlock[12];
 	memset(commandBlock, 0, sizeof(commandBlock));
@@ -459,7 +460,7 @@ usb_disk_test_unit_ready(device_lun *lun)
 status_t
 usb_disk_inquiry(device_lun *lun)
 {
-	uint32 dataLength = sizeof(scsi_inquiry_6_parameter);
+	size_t dataLength = sizeof(scsi_inquiry_6_parameter);
 
 	uint8 commandBlock[12];
 	memset(commandBlock, 0, sizeof(commandBlock));
@@ -526,7 +527,7 @@ usb_disk_reset_capacity(device_lun *lun)
 status_t
 usb_disk_update_capacity(device_lun *lun)
 {
-	uint32 dataLength = sizeof(scsi_read_capacity_10_parameter);
+	size_t dataLength = sizeof(scsi_read_capacity_10_parameter);
 	scsi_read_capacity_10_parameter parameter;
 	status_t result = B_ERROR;
 
@@ -668,8 +669,8 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 
 	mutex_init(&device->lock, "usb_disk device lock");
 
-	status_t result = device->notify =
-		create_sem(0, "usb_disk callback notify");
+	status_t result = device->notify
+		= create_sem(0, "usb_disk callback notify");
 
 	if (result < B_OK) {
 		mutex_destroy(&device->lock);
@@ -1172,7 +1173,7 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 #endif
 
 		default:
-			TRACE_ALWAYS("unhandled ioctl %ld\n", op);
+			TRACE_ALWAYS("unhandled ioctl %" B_PRIu32 "\n", op);
 			break;
 	}
 
@@ -1223,7 +1224,7 @@ usb_disk_read(void *cookie, off_t position, void *buffer, size_t *length)
 	}
 
 	*length = 0;
-	TRACE_ALWAYS("read fails with 0x%08lx\n", result);
+	TRACE_ALWAYS("read fails with 0x%08" B_PRIx32 "\n", result);
 	return result;
 }
 
@@ -1274,7 +1275,7 @@ usb_disk_write(void *cookie, off_t position, const void *buffer,
 	}
 
 	*length = 0;
-	TRACE_ALWAYS("write fails with 0x%08lx\n", result);
+	TRACE_ALWAYS("write fails with 0x%08" B_PRIx32 "\n", result);
 	return result;
 }
 
@@ -1314,7 +1315,7 @@ init_driver()
 	status_t result = get_module(B_USB_MODULE_NAME,
 		(module_info **)&gUSBModule);
 	if (result < B_OK) {
-		TRACE_ALWAYS("getting module failed 0x%08lx\n", result);
+		TRACE_ALWAYS("getting module failed 0x%08" B_PRIx32 "\n", result);
 		mutex_destroy(&gDeviceListLock);
 		return result;
 	}

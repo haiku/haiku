@@ -56,6 +56,7 @@ void
 KeyboardLayoutView::SetKeyboardLayout(KeyboardLayout* layout)
 {
 	fLayout = layout;
+	_InitOffscreen();
 	_LayoutKeyboard();
 	Invalidate();
 }

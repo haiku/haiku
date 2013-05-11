@@ -492,7 +492,7 @@ MixerCore::_MixThread()
 
 	if (!LockFromMixThread())
 		return;
-	bigtime_t latency = max(3600LL, bigtime_t(0.4 * buffer_duration(
+	bigtime_t latency = max((bigtime_t)3600, bigtime_t(0.4 * buffer_duration(
 		fOutput->MediaOutput().format.u.raw_audio)));
 
 	// TODO: when the format changes while running, everything is wrong!

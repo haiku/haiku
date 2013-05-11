@@ -164,6 +164,6 @@ BMidiText::_WaitAndPrint(uint32 time)
 
 	SnoozeUntil(time);
 
-	printf("%lu: ", time - fStartTime);	
+	printf("%" B_PRIu32 ": ", time - fStartTime);	
 }
 

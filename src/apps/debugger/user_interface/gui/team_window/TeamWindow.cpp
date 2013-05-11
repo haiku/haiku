@@ -760,29 +760,31 @@ TeamWindow::_Init()
 {
 	BScrollView* sourceScrollView;
 
-	BLayoutBuilder::Group<>(this, B_VERTICAL)
+	const float splitSpacing = 3.0f;
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
 		.Add(fMenuBar = new BMenuBar("Menu"))
-		.AddSplit(B_VERTICAL, 3.0f)
+		.AddSplit(B_VERTICAL, splitSpacing)
 			.GetSplitView(&fFunctionSplitView)
-			.SetInsets(4.0f, 4.0f, 4.0f, 4.0f)
+			.SetInsets(B_USE_SMALL_INSETS)
 			.Add(fTabView = new BTabView("tab view"), 0.4f)
-			.AddGroup(B_VERTICAL, 4.0f)
-				.AddGroup(B_HORIZONTAL, 4.0f)
-					.Add(fRunButton = new BButton("Run"))
-					.Add(fStepOverButton = new BButton("Step Over"))
-					.Add(fStepIntoButton = new BButton("Step Into"))
-					.Add(fStepOutButton = new BButton("Step Out"))
-					.AddGlue()
-				.End()
-				.Add(fSourcePathView = new BStringView(
-					"source path",
-					"Source path unavailable."), 4.0f)
-				.AddSplit(B_HORIZONTAL, 3.0f)
-					.GetSplitView(&fSourceSplitView)
+			.AddSplit(B_HORIZONTAL, splitSpacing)
+				.GetSplitView(&fSourceSplitView)
+				.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
+					.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
+						.Add(fRunButton = new BButton("Run"))
+						.Add(fStepOverButton = new BButton("Step Over"))
+						.Add(fStepIntoButton = new BButton("Step Into"))
+						.Add(fStepOutButton = new BButton("Step Out"))
+						.AddGlue()
+					.End()
+					.Add(fSourcePathView = new BStringView(
+						"source path",
+						"Source path unavailable."), 4.0f)
 					.Add(sourceScrollView = new BScrollView("source scroll",
-						NULL, 0, true, true), 3.0f)
-					.Add(fLocalsTabView = new BTabView("locals view"))
+						NULL, 0, true, true), splitSpacing)
 				.End()
+				.Add(fLocalsTabView = new BTabView("locals view"))
 			.End()
 		.End();
 
@@ -790,7 +792,7 @@ TeamWindow::_Init()
 	sourceScrollView->SetTarget(fSourceView = SourceView::Create(fTeam, this));
 
 	// add threads tab
-	BSplitView* threadGroup = new BSplitView(B_HORIZONTAL);
+	BSplitView* threadGroup = new BSplitView(B_HORIZONTAL, splitSpacing);
 	threadGroup->SetName("Threads");
 	fTabView->AddTab(threadGroup);
 	BLayoutBuilder::Split<>(threadGroup)
@@ -799,7 +801,7 @@ TeamWindow::_Init()
 		.Add(fStackTraceView = StackTraceView::Create(this));
 
 	// add images tab
-	BSplitView* imagesGroup = new BSplitView(B_HORIZONTAL);
+	BSplitView* imagesGroup = new BSplitView(B_HORIZONTAL, splitSpacing);
 	imagesGroup->SetName("Images");
 	fTabView->AddTab(imagesGroup);
 	BLayoutBuilder::Split<>(imagesGroup)
@@ -808,11 +810,12 @@ TeamWindow::_Init()
 		.Add(fImageFunctionsView = ImageFunctionsView::Create(this));
 
 	// add breakpoints tab
-	BGroupView* breakpointsGroup = new BGroupView(B_HORIZONTAL, 4.0f);
+	BGroupView* breakpointsGroup = new BGroupView(B_HORIZONTAL,
+		B_USE_SMALL_SPACING);
 	breakpointsGroup->SetName("Breakpoints");
 	fTabView->AddTab(breakpointsGroup);
 	BLayoutBuilder::Group<>(breakpointsGroup)
-		.SetInsets(4.0f, 4.0f, 4.0f, 4.0f)
+//		.SetInsets(0.0f)
 		.Add(fBreakpointsView = BreakpointsView::Create(fTeam, this));
 
 	// add local variables tab
@@ -840,10 +843,10 @@ TeamWindow::_Init()
 		fSourcePathView->AddFilter(filter);
 
 	// add menus and menu items
-	BMenu* menu = new BMenu("File");
+	BMenu* menu = new BMenu("Team");
 	fMenuBar->AddItem(menu);
-	BMenuItem* item = new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED),
-		'Q');
+	BMenuItem* item = new BMenuItem("Close", new BMessage(B_QUIT_REQUESTED),
+		'W');
 	menu->AddItem(item);
 	item->SetTarget(this);
 	menu = new BMenu("Edit");

@@ -353,12 +353,12 @@ emuxki_mem_free(emuxki_dev *card, void *ptr)
 static void
 emuxki_chanparms_set_defaults(emuxki_channel *chan)
 {
-	chan->fxsend.a.level = chan->fxsend.b.level =
-	chan->fxsend.c.level = chan->fxsend.d.level =
+	chan->fxsend.a.level = chan->fxsend.b.level
+		= chan->fxsend.c.level = chan->fxsend.d.level
 	/* for audigy */
-	chan->fxsend.e.level = chan->fxsend.f.level =
-	chan->fxsend.g.level = chan->fxsend.h.level =
-		IS_AUDIGY(&chan->voice->stream->card->config) ? 0xc0 : 0xff;	/* not max */
+		= chan->fxsend.e.level = chan->fxsend.f.level
+		= chan->fxsend.g.level = chan->fxsend.h.level
+		= IS_AUDIGY(&chan->voice->stream->card->config) ? 0xc0 : 0xff;	/* not max */
 
 	chan->fxsend.a.dest = 0x0;
 	chan->fxsend.b.dest = 0x1;

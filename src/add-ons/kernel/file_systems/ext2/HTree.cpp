@@ -62,8 +62,8 @@ HTree::HTree(Volume* volume, Inode* directory)
 	fHashSeed[2] = superBlock.HashSeed(2);
 	fHashSeed[3] = superBlock.HashSeed(3);
 
-	TRACE("HTree::HTree() %lx %lx %lx %lx\n", fHashSeed[0],
-		fHashSeed[1], fHashSeed[2], fHashSeed[3]);
+	TRACE("HTree::HTree() %" B_PRIx32 " %" B_PRIx32 " %" B_PRIx32 " %" B_PRIx32
+		"\n", fHashSeed[0], fHashSeed[1], fHashSeed[2], fHashSeed[3]);
 	
 	if (fHashSeed[0] == 0 && fHashSeed[1] == 0 && fHashSeed[2] == 0
 		&& fHashSeed[3] == 0) {
@@ -179,7 +179,7 @@ HTree::Hash(const char* name, uint8 length)
 	hash = 0;
 #endif
 
-	TRACE("HTree::_Hash(): filename hash 0x%lX\n", hash);
+	TRACE("HTree::_Hash(): filename hash 0x%" B_PRIx32 "\n", hash);
 	
 	return hash & ~1;
 }
@@ -366,7 +366,8 @@ HTree::_HashTEA(const char* name, uint8 _length)
 		uint32 blocks[4];
 		
 		_PrepareBlocksForHash(name, (uint32)length, blocks, 4);
-		TRACE("_HashTEA %lx %lx %lx\n", blocks[0], blocks[1], blocks[2]);
+		TRACE("_HashTEA %" B_PRIx32 " %" B_PRIx32 " %" B_PRIx32 "\n",
+			blocks[0], blocks[1], blocks[2]);
 		_TEATransform(buffer, blocks);
 		
 		name += 16;

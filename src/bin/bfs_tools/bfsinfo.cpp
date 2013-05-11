@@ -37,10 +37,10 @@ dump_bplustree(Disk &disk, BPositionIO *file, off_t size, bool hexDump)
 	dump_bplustree_header(header);
 
 	bplustree_node *node = (bplustree_node *)(buffer + nodeSize);
-	while ((int32)node < (int32)buffer + size) {
+	while ((addr_t)node < (addr_t)buffer + size) {
 		printf("\n\n-------------------\n"
-			"** node at offset: %ld\n** used: %ld bytes\n",
-			int32(node) - int32(buffer), node->Used());
+			"** node at offset: %" B_PRIuADDR "\n** used: %" B_PRId32 " bytes"
+			"\n", (addr_t)node - (addr_t)buffer, node->Used());
 		dump_bplustree_node(node, header, &disk);
 
 		if (hexDump) {
@@ -48,7 +48,7 @@ dump_bplustree(Disk &disk, BPositionIO *file, off_t size, bool hexDump)
 			dump_block((char *)node, header->node_size, 0);
 		}
 
-		node = (bplustree_node *)(int32(node) + nodeSize);
+		node = (bplustree_node *)((addr_t)node + nodeSize);
 	}
 }
 
@@ -79,11 +79,11 @@ dump_indirect_stream(Disk &disk, bfs_inode *node, bool showOffsets)
 		if (runs[i].IsZero())
 			return;
 
-		printf("  indirect[%02ld]              = ", i);
+		printf("  indirect[%02" B_PRId32 "]              = ", i);
 
 		char buffer[256];
 		if (showOffsets)
-			snprintf(buffer, sizeof(buffer), " %16lld", offset);
+			snprintf(buffer, sizeof(buffer), " %16" B_PRIdOFF, offset);
 		else
 			buffer[0] = '\0';
 
@@ -184,25 +184,27 @@ main(int argc, char **argv)
 		printf("  Name:\t\t\t\"%s\"\n", disk.SuperBlock()->name);
 		printf("    (disk is %s)\n\n",
 			disk.ValidateSuperBlock() == B_OK ? "valid" : "invalid!!");
-		printf("  Block Size:\t\t%ld bytes\n", disk.BlockSize());
-		printf("  Number of Blocks:\t%12Lu\t%10g MB\n", disk.NumBlocks(),
-			disk.NumBlocks() * disk.BlockSize() / (1024.0*1024));
+		printf("  Block Size:\t\t%" B_PRIu32 " bytes\n", disk.BlockSize());
+		printf("  Number of Blocks:\t%12" B_PRIdOFF "\t%10g MB\n",
+			disk.NumBlocks(), disk.NumBlocks() * disk.BlockSize()
+				/ (1024.0*1024));
 		if (disk.BlockBitmap() != NULL) {
-			printf("  Used Blocks:\t\t%12Lu\t%10g MB\n",
+			printf("  Used Blocks:\t\t%12" B_PRIdOFF "\t%10g MB\n",
 				disk.BlockBitmap()->UsedBlocks(),
 				disk.BlockBitmap()->UsedBlocks() * disk.BlockSize()
 					/ (1024.0*1024));
-			printf("  Free Blocks:\t\t%12Lu\t%10g MB\n",
+			printf("  Free Blocks:\t\t%12" B_PRIdOFF "\t%10g MB\n",
 				disk.BlockBitmap()->FreeBlocks(),
 				disk.BlockBitmap()->FreeBlocks() * disk.BlockSize()
 					/ (1024.0*1024));
 		}
 		int32 size
 			= (disk.AllocationGroups() * disk.SuperBlock()->blocks_per_ag);
-		printf("  Bitmap Size:\t\t%ld bytes (%ld blocks, %ld per allocation "
-			"group)\n", disk.BlockSize() * size, size,
+		printf("  Bitmap Size:\t\t%" B_PRIu32 " bytes (%" B_PRId32 " blocks, %"
+			B_PRId32 " per allocation group)\n", disk.BlockSize() * size, size,
 			disk.SuperBlock()->blocks_per_ag);
-		printf("  Allocation Groups:\t%lu\n\n", disk.AllocationGroups());
+		printf("  Allocation Groups:\t%" B_PRIu32 "\n\n",
+			disk.AllocationGroups());
 		dump_block_run("  Log:\t\t\t", disk.Log());
 		printf("    (was %s)\n\n", disk.SuperBlock()->flags == SUPER_BLOCK_CLEAN
 			? "cleanly unmounted" : "not unmounted cleanly!");
@@ -260,8 +262,8 @@ main(int argc, char **argv)
 	}
 
 	if (dumpInode) {
-		printf("Inode at block %Ld:\n-----------------------------------------"
-			"\n", disk.ToBlock(run));
+		printf("Inode at block %" B_PRIdOFF ":\n------------------------------"
+			"-----------\n", disk.ToBlock(run));
 		dump_inode(inode, (bfs_inode *)buffer, showOffsets);
 		dump_indirect_stream(disk, (bfs_inode *)buffer, showOffsets);
 		dump_small_data(inode);
@@ -269,8 +271,8 @@ main(int argc, char **argv)
 	}
 
 	if (dumpBTree && inode) {
-		printf("B+Tree at block %Ld:\n----------------------------------------"
-			"-\n", disk.ToBlock(run));
+		printf("B+Tree at block %" B_PRIdOFF ":\n-----------------------------"
+			"------------\n", disk.ToBlock(run));
 		if (inode->IsDirectory() || inode->IsAttributeDirectory()) {
 			dump_bplustree(disk, (Directory *)inode, inode->Size(), dumpHex);
 			putchar('\n');
@@ -279,8 +281,8 @@ main(int argc, char **argv)
 	}
 
 	if (validateBTree && inode) {
-		printf("Validating B+Tree at block %Ld:\n-----------------------------"
-			"------------\n", disk.ToBlock(run));
+		printf("Validating B+Tree at block %" B_PRIdOFF ":\n------------------"
+			"-----------------------\n", disk.ToBlock(run));
 		if (inode->IsDirectory() || inode->IsAttributeDirectory()) {
 			BPlusTree *tree;
 			if (((Directory *)inode)->GetTree(&tree) == B_OK) {
@@ -294,8 +296,8 @@ main(int argc, char **argv)
 	}
 
 	if (dumpHex) {
-		printf("Hexdump from inode at block %Ld:\n-----------------------------"
-			"------------\n", disk.ToBlock(run));
+		printf("Hexdump from inode at block %" B_PRIdOFF ":\n-----------------"
+			"------------------------\n", disk.ToBlock(run));
 		dump_block(buffer, disk.BlockSize());
 		putchar('\n');
 	}
