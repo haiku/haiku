@@ -165,11 +165,11 @@ SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = [ FFilterByBuildFeatures
 ] ;
 SYSTEM_ADD_ONS_DRIVERS_MIDI = emuxki ice1712 usb_midi ;
 SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
-	x86 @{
+	x86,x86_64 @{
 		3com atheros813x ar81xx attansic_l1 attansic_l2 broadcom440x
 		broadcom570x dec21xxx ipro100 ipro1000 jmicron2x0 marvell_yukon nforce
 		pcnet rtl8139 rtl81xx sis19x syskonnect via_rhine vt612x
-	}@ # x86
+	}@ # x86_64
 
 	etherpci pegasus sis900 usb_davicom usb_asix usb_ecm wb840
 
