@@ -120,7 +120,7 @@ static const char *kUserDirectories[] = {
 	HOME CONFIG "/data/fonts",
 	HOME CONFIG "/lib",
 	HOME CONFIG "/settings",
-	HOME CONFIG "/settings/deskbar",
+	HOME CONFIG "/settings/deskbar/menu",
 	HOME CONFIG "/settings/printers",
 	HOME CONFIG "/add-ons/Translators",
 	HOME CONFIG "/add-ons/media",
