@@ -528,9 +528,12 @@ fill_stat_buffer(Volume* volume, Inode* inode, Attribute* attribute,
 	stat.st_uid = inode->UserID();
 	stat.st_gid = inode->GroupID();
 
-	stat.st_atime = time(NULL);
-	stat.st_mtime = stat.st_ctime = inode->ModificationTime();
-	stat.st_crtime = inode->CreationTime();
+	stat.st_atim.tv_sec = time(NULL);
+	stat.st_atim.tv_nsec = 0;
+	stat.st_mtim.tv_sec = stat.st_ctim.tv_sec = inode->ModificationTime();
+	stat.st_ctim.tv_nsec = stat.st_mtim.tv_nsec = 0;
+	stat.st_crtim.tv_sec = inode->CreationTime();
+	stat.st_crtim.tv_nsec = 0;
 }
 
 

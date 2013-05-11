@@ -492,8 +492,10 @@ fs_read_stat(fs_volume* _volume, fs_vnode* _node, struct stat* st)
 	// Same for file/dir in ISO9660
 	st->st_size = node->dataLen[FS_DATA_FORMAT];
 	st->st_blocks = (st->st_size + 511) / 512;
-	if (ConvertRecDate(&(node->recordDate), &time) == B_NO_ERROR)
-		st->st_ctime = st->st_mtime = st->st_atime = time;
+	if (ConvertRecDate(&(node->recordDate), &time) == B_NO_ERROR) {
+		st->st_ctim.tv_sec = st->st_mtim.tv_sec = st->st_atim.tv_sec = time;
+		st->st_ctim.tv_nsec = st->st_mtim.tv_nsec = st->st_atim.tv_nsec = 0;
+	}
 
 	TRACE(("fs_read_stat - EXIT, result is %s\n", strerror(result)));
 
