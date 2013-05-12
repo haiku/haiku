@@ -345,8 +345,9 @@ KeyboardLayoutView::MouseMoved(BPoint point, uint32 transit,
 	int32 buttons;
 	if (Window()->CurrentMessage() == NULL
 		|| Window()->CurrentMessage()->FindInt32("buttons", &buttons) != B_OK
-		|| buttons == 0)
+		|| buttons == 0) {
 		return;
+	}
 
 	if (fDragKey == NULL && (fabs(point.x - fClickPoint.x) > 4
 		|| fabs(point.y - fClickPoint.y) > 4)) {
@@ -505,8 +506,9 @@ KeyboardLayoutView::MessageReceived(BMessage* message)
 				// switch keys if the dropped object came from us
 				Key* key = _KeyForCode(keyCode);
 				if (key == NULL
-					|| (key == fDropTarget && fDragModifiers == fModifiers))
+					|| (key == fDropTarget && fDragModifiers == fModifiers)) {
 					return;
+				}
 
 				char* string;
 				int32 numBytes;
@@ -1098,10 +1100,11 @@ KeyboardLayoutView::_KeyChanged(const BMessage* message)
 	const uint8* state;
 	ssize_t size;
 	int32 key;
-	if (message->FindData("states", B_UINT8_TYPE, (const void**)&state, &size)
-			!= B_OK
-		|| message->FindInt32("key", &key) != B_OK)
+	if (message->FindInt32("key", &key) != B_OK
+		|| message->FindData("states", B_UINT8_TYPE,
+			(const void**)&state, &size) != B_OK) {
 		return;
+	}
 
 	// Update key state, and invalidate change keys
 

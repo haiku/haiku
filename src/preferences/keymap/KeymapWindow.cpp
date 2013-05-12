@@ -947,7 +947,8 @@ KeymapWindow::_GetCurrentKeymap(entry_ref& ref)
 BString
 KeymapWindow::_GetActiveKeymapName()
 {
-	BString mapName = kCurrentKeymapName;	// safe default
+	BString mapName = kCurrentKeymapName;
+		// safe default
 
 	entry_ref ref;
 	_GetCurrentKeymap(ref);
