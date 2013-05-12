@@ -503,7 +503,7 @@ KeyboardLayoutView::MessageReceived(BMessage* message)
 			int32 buttons;
 			if (!message->IsSourceRemote()
 				&& message->FindInt32("buttons", &buttons) == B_OK
-				&& (buttons & B_SECONDARY_MOUSE_BUTTON) != 0
+				&& (buttons & B_PRIMARY_MOUSE_BUTTON) != 0
 				&& message->FindInt32("key", &keyCode) == B_OK) {
 				// switch keys if the dropped object came from us
 				Key* key = _KeyForCode(keyCode);
