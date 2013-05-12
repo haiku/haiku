@@ -20,11 +20,19 @@ HyperLink::HyperLink()
 }
 
 
-HyperLink::HyperLink(const BString& address, Type type,
-	const BString& baseAddress)
+HyperLink::HyperLink(const BString& address, Type type)
 	:
+	fText(address),
 	fAddress(address),
-	fBaseAddress(baseAddress.IsEmpty() ? address : baseAddress),
+	fType(type)
+{
+}
+
+
+HyperLink::HyperLink(const BString& text, const BString& address, Type type)
+	:
+	fText(text),
+	fAddress(address),
 	fType(type)
 {
 }

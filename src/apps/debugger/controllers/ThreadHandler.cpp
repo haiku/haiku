@@ -269,6 +269,7 @@ ThreadHandler::HandleThreadAction(uint32 action)
 
 	TRACE_CONTROL("  ip: %#" B_PRIx64 "\n", frame->InstructionPointer());
 
+	target_addr_t frameIP = frame->GetCpuState()->InstructionPointer();
 	// When the thread is in a syscall, do the same for all step kinds: Stop it
 	// when it returns by means of a breakpoint.
 	if (frame->Type() == STACK_FRAME_TYPE_SYSCALL) {
@@ -284,15 +285,14 @@ ThreadHandler::HandleThreadAction(uint32 action)
 // The second issue is that the temporary breakpoint is probably not necessary
 // anymore, since single-stepping over "syscall" instructions should just work
 // as expected.
-		status_t error = _InstallTemporaryBreakpoint(
-			frame->GetCpuState()->InstructionPointer());
+		status_t error = _InstallTemporaryBreakpoint(frameIP);
 		if (error != B_OK) {
 			_StepFallback();
 			return;
 		}
 
 		fStepMode = STEP_OUT;
-		_RunThread(frame->GetCpuState()->InstructionPointer());
+		_RunThread(frameIP);
 		return;
 	}
 
@@ -303,9 +303,10 @@ ThreadHandler::HandleThreadAction(uint32 action)
 			_StepFallback();
 			return;
 		}
+		fPreviousInstructionPointer = frameIP;
 		fPreviousFrameAddress = frame->FrameAddress();
 		fStepMode = STEP_OUT;
-		_RunThread(frame->GetCpuState()->InstructionPointer());
+		_RunThread(frameIP);
 		return;
 	}
 
@@ -324,7 +325,7 @@ ThreadHandler::HandleThreadAction(uint32 action)
 	if (action == MSG_THREAD_STEP_INTO) {
 		// step into
 		fStepMode = STEP_INTO;
-		_SingleStepThread(frame->GetCpuState()->InstructionPointer());
+		_SingleStepThread(frameIP);
 	} else {
 		fPreviousFrameAddress = frame->FrameAddress();
 		// step over
@@ -648,7 +649,7 @@ ThreadHandler::_HandleBreakpointHitStep(CpuState* cpuState)
 				" - step out adding return value\n", cpuState
 					->StackFramePointer(), fPreviousFrameAddress);
 			ReturnValueInfo* info = new(std::nothrow) ReturnValueInfo(
-				cpuState->InstructionPointer(), cpuState);
+				fPreviousInstructionPointer, cpuState);
 			if (info == NULL)
 				return false;
 			BReference<ReturnValueInfo> infoReference(info, true);
@@ -730,8 +731,8 @@ ThreadHandler::_HandleSingleStepStep(CpuState* cpuState)
 						TRACE_CONTROL("ThreadHandler::_HandleSingleStepStep() "
 							" - adding return value for STEP_OVER\n");
 						ReturnValueInfo* info = new(std::nothrow)
-							ReturnValueInfo(cpuState->InstructionPointer(),
-								cpuState);
+							ReturnValueInfo(fStepStatement
+								->CoveringAddressRange().Start(), cpuState);
 						if (info == NULL)
 							return false;
 						BReference<ReturnValueInfo> infoReference(info, true);

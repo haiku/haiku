@@ -30,6 +30,9 @@
 #include <UTF8.h>
 #include <Window.h>
 
+#include <Array.h>
+
+#include "ActiveProcessInfo.h"
 #include "Shell.h"
 #include "TermConst.h"
 #include "TerminalBuffer.h"
@@ -52,6 +55,7 @@ static const uint32 kAutoScroll = 'AScr';
 
 static const uint32 kMessageOpenLink = 'OLnk';
 static const uint32 kMessageCopyLink = 'CLnk';
+static const uint32 kMessageCopyAbsolutePath = 'CAbs';
 static const uint32 kMessageMenuClosed = 'MClo';
 
 
@@ -638,6 +642,7 @@ TermView::HyperLinkState::HyperLinkState(TermView* view)
 	fURLCharClassifier(kURLAdditionalWordCharacters),
 	fPathComponentCharClassifier(
 		BString(kDefaultAdditionalWordCharacters).RemoveFirst("/")),
+	fCurrentDirectory(),
 	fHighlight(),
 	fHighlightActive(false)
 {
@@ -648,6 +653,12 @@ TermView::HyperLinkState::HyperLinkState(TermView* view)
 void
 TermView::HyperLinkState::Entered()
 {
+	ActiveProcessInfo activeProcessInfo;
+	if (fView->GetActiveProcessInfo(activeProcessInfo))
+		fCurrentDirectory = activeProcessInfo.CurrentDirectory();
+	else
+		fCurrentDirectory.Truncate(0);
+
 	_UpdateHighlight();
 }
 
@@ -791,58 +802,131 @@ TermView::HyperLinkState::_GetHyperLinkAt(BPoint where, bool pathPrefixOnly,
 	if (text.IsEmpty())
 		return false;
 
-	// check, whether the file exists
-	struct stat st;
-	if (lstat(text, &st) == 0) {
-		_link = HyperLink(text, HyperLink::TYPE_PATH);
-		return true;
-	}
-
-	// As such this isn't an existing path. Try a few common alternative cases:
-	// * "<path>:"
-	// * "<path>:<line>"
-	// * "<path>:<line>:"
-	// * "<path>:<line>:<column>"
-	// * "<path>:<line>:<column>:"
-
-	if (text.Length() <= 1)
-		return false;
-
-	if (text[text.Length() - 1] == ':') {
-		text.Truncate(text.Length() - 1);
-		if (!textBuffer->PreviousLinePos(_end))
+	// Collect a list of colons in the string and their respective positions in
+	// the text buffer. We do this up-front so we can unlock the text buffer
+	// while we're doing all the entry existence tests.
+	typedef Array<CharPosition> ColonList;
+	ColonList colonPositions;
+	TermPos searchPos = _start;
+	for (int32 index = 0; (index = text.FindFirst(':', index)) >= 0;) {
+		TermPos foundStart;
+		TermPos foundEnd;
+		if (!textBuffer->Find(":", searchPos, true, true, false, foundStart,
+				foundEnd)) {
 			return false;
-
-		if (lstat(text, &st) == 0) {
-			_link = HyperLink(text, HyperLink::TYPE_PATH);
-			return true;
 		}
+
+		CharPosition colonPosition;
+		colonPosition.index = index;
+		colonPosition.position = foundStart;
+		if (!colonPositions.Add(colonPosition))
+			return false;
+
+		index++;
+		searchPos = foundEnd;
 	}
 
-	BString path = text;
+	textBufferLocker.Unlock();
 
-	for (int32 i = 0; i < 2; i++) {
-		int32 colonIndex = path.FindLast(':');
-		if (colonIndex <= 0 || colonIndex == path.Length() - 1)
-			return false;
+	// Since we also want to consider ':' a potential path delimiter, in two
+	// nested loops we chop off components from the beginning respective the
+	// end.
+	BString originalText = text;
+	TermPos originalStart = _start;
+	TermPos originalEnd = _end;
 
-		char* numberEnd;
-		strtol(path.String() + colonIndex + 1, &numberEnd, 0);
-		if (*numberEnd != '\0')
-			return false;
+	int32 colonCount = colonPositions.Count();
+	for (int32 startColonIndex = -1; startColonIndex < colonCount;
+			startColonIndex++) {
+		int32 startIndex;
+		if (startColonIndex < 0) {
+			startIndex = 0;
+			_start = originalStart;
+		} else {
+			startIndex = colonPositions[startColonIndex].index + 1;
+			_start = colonPositions[startColonIndex].position;
+			if (_start >= pos)
+				break;
+			_start.x++;
+				// Note: This is potentially a non-normalized position (i.e.
+				// the end of a soft-wrapped line). While not that nice, it
+				// works anyway.
+		}
 
-		path.Truncate(colonIndex);
-		if (lstat(path, &st) == 0) {
-			_link = HyperLink(text,
-				i == 0
-					? HyperLink::TYPE_PATH_WITH_LINE
-					: HyperLink::TYPE_PATH_WITH_LINE_AND_COLUMN,
-				path);
-			return true;
+		for (int32 endColonIndex = colonCount; endColonIndex > startColonIndex;
+				endColonIndex--) {
+			int32 endIndex;
+			if (endColonIndex == colonCount) {
+				endIndex = originalText.Length();
+				_end = originalEnd;
+			} else {
+				endIndex = colonPositions[endColonIndex].index;
+				_end = colonPositions[endColonIndex].position;
+				if (_end <= pos)
+					break;
+			}
+
+			originalText.CopyInto(text, startIndex, endIndex - startIndex);
+			if (text.IsEmpty())
+				continue;
+
+			// check, whether the file exists
+			BString actualPath;
+			if (_EntryExists(text, actualPath)) {
+				_link = HyperLink(text, actualPath, HyperLink::TYPE_PATH);
+				return true;
+			}
+
+			// As such this isn't an existing path. We also want to recognize:
+			// * "<path>:<line>"
+			// * "<path>:<line>:<column>"
+
+			BString path = text;
+
+			for (int32 i = 0; i < 2; i++) {
+				int32 colonIndex = path.FindLast(':');
+				if (colonIndex <= 0 || colonIndex == path.Length() - 1)
+					break;
+
+				char* numberEnd;
+				strtol(path.String() + colonIndex + 1, &numberEnd, 0);
+				if (*numberEnd != '\0')
+					break;
+
+				path.Truncate(colonIndex);
+				if (_EntryExists(path, actualPath)) {
+					BString address = path == actualPath
+						? text : BString(fCurrentDirectory)  << '/' << text;
+					_link = HyperLink(text, address,
+						i == 0
+							? HyperLink::TYPE_PATH_WITH_LINE
+							: HyperLink::TYPE_PATH_WITH_LINE_AND_COLUMN);
+					return true;
+				}
+			}
 		}
 	}
 
 	return false;
+}
+
+
+bool
+TermView::HyperLinkState::_EntryExists(const BString& path,
+	BString& _actualPath) const
+{
+	if (path.IsEmpty())
+		return false;
+
+	if (path[0] == '/' || fCurrentDirectory.IsEmpty()) {
+		_actualPath = path;
+	} else {
+		_actualPath.Truncate(0);
+		_actualPath << fCurrentDirectory << '/' << path;
+	}
+
+	struct stat st;
+	return lstat(_actualPath, &st) == 0;
 }
 
 
@@ -948,9 +1032,12 @@ TermView::HyperLinkMenuState::Prepare(BPoint point, const HyperLink& link)
 		case HyperLink::TYPE_PATH:
 		case HyperLink::TYPE_PATH_WITH_LINE:
 		case HyperLink::TYPE_PATH_WITH_LINE_AND_COLUMN:
-			menuBuilder
-				.AddItem(B_TRANSLATE("Open path"), kMessageOpenLink)
-				.AddItem(B_TRANSLATE("Copy path"), kMessageCopyLink);
+			menuBuilder.AddItem(B_TRANSLATE("Open path"), kMessageOpenLink);
+			menuBuilder.AddItem(B_TRANSLATE("Copy path"), kMessageCopyLink);
+			if (fLink.Text() != fLink.Address()) {
+				menuBuilder.AddItem(B_TRANSLATE("Copy absolute path"),
+					kMessageCopyAbsolutePath);
+			}
 			break;
 	}
 	menu->SetTargetForItems(fView);
@@ -975,22 +1062,27 @@ TermView::HyperLinkMenuState::MessageReceived(BMessage* message)
 			return true;
 
 		case kMessageCopyLink:
+		case kMessageCopyAbsolutePath:
+		{
 			if (fLink.IsValid()) {
+				BString toCopy = message->what == kMessageCopyLink
+					? fLink.Text() : fLink.Address();
+
 				if (!be_clipboard->Lock())
 					return true;
 
 				be_clipboard->Clear();
 
 				if (BMessage *data = be_clipboard->Data()) {
-					data->AddData("text/plain", B_MIME_TYPE,
-						fLink.Address().String(),
-						fLink.Address().Length());
+					data->AddData("text/plain", B_MIME_TYPE, toCopy.String(),
+						toCopy.Length());
 					be_clipboard->Commit();
 				}
 
 				be_clipboard->Unlock();
 			}
 			return true;
+		}
 
 		case kMessageMenuClosed:
 			fView->_NextState(fView->fDefaultState);

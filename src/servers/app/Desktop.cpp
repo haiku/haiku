@@ -2704,6 +2704,7 @@ Desktop::WindowForClientLooperPort(port_id port)
 WindowList&
 Desktop::_Windows(int32 index)
 {
+	ASSERT(index >= 0 && index < kMaxWorkspaces);
 	return fWorkspaces[index].Windows();
 }
 
