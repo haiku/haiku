@@ -312,7 +312,7 @@ KeyboardLayoutView::MouseUp(BPoint point)
 
 		_InvalidateKey(key);
 
-		if (fDragKey == NULL && fKeymap != NULL)
+		if (fDragKey == NULL)
 			_SendFakeKeyDown(key);
 	}
 
