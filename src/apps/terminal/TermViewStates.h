@@ -132,6 +132,8 @@ private:
 			bool				_GetHyperLinkAt(BPoint where,
 									bool pathPrefixOnly, HyperLink& _link,
 									TermPos& _start, TermPos& _end);
+			bool				_EntryExists(const BString& path,
+									BString& _actualPath) const;
 
 			void				_UpdateHighlight();
 			void				_UpdateHighlight(BPoint where, int32 modifiers);
@@ -142,6 +144,7 @@ private:
 private:
 			DefaultCharClassifier fURLCharClassifier;
 			DefaultCharClassifier fPathComponentCharClassifier;
+			BString				fCurrentDirectory;
 			TermViewHighlight	fHighlight;
 			bool				fHighlightActive;
 };

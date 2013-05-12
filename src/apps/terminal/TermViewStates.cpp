@@ -30,6 +30,7 @@
 #include <UTF8.h>
 #include <Window.h>
 
+#include "ActiveProcessInfo.h"
 #include "Shell.h"
 #include "TermConst.h"
 #include "TerminalBuffer.h"
@@ -52,6 +53,7 @@ static const uint32 kAutoScroll = 'AScr';
 
 static const uint32 kMessageOpenLink = 'OLnk';
 static const uint32 kMessageCopyLink = 'CLnk';
+static const uint32 kMessageCopyAbsolutePath = 'CAbs';
 static const uint32 kMessageMenuClosed = 'MClo';
 
 
@@ -638,6 +640,7 @@ TermView::HyperLinkState::HyperLinkState(TermView* view)
 	fURLCharClassifier(kURLAdditionalWordCharacters),
 	fPathComponentCharClassifier(
 		BString(kDefaultAdditionalWordCharacters).RemoveFirst("/")),
+	fCurrentDirectory(),
 	fHighlight(),
 	fHighlightActive(false)
 {
@@ -648,6 +651,12 @@ TermView::HyperLinkState::HyperLinkState(TermView* view)
 void
 TermView::HyperLinkState::Entered()
 {
+	ActiveProcessInfo activeProcessInfo;
+	if (fView->GetActiveProcessInfo(activeProcessInfo))
+		fCurrentDirectory = activeProcessInfo.CurrentDirectory();
+	else
+		fCurrentDirectory.Truncate(0);
+
 	_UpdateHighlight();
 }
 
@@ -792,9 +801,9 @@ TermView::HyperLinkState::_GetHyperLinkAt(BPoint where, bool pathPrefixOnly,
 		return false;
 
 	// check, whether the file exists
-	struct stat st;
-	if (lstat(text, &st) == 0) {
-		_link = HyperLink(text, HyperLink::TYPE_PATH);
+	BString actualPath;
+	if (_EntryExists(text, actualPath)) {
+		_link = HyperLink(text, actualPath, HyperLink::TYPE_PATH);
 		return true;
 	}
 
@@ -813,8 +822,8 @@ TermView::HyperLinkState::_GetHyperLinkAt(BPoint where, bool pathPrefixOnly,
 		if (!textBuffer->PreviousLinePos(_end))
 			return false;
 
-		if (lstat(text, &st) == 0) {
-			_link = HyperLink(text, HyperLink::TYPE_PATH);
+		if (_EntryExists(text, actualPath)) {
+			_link = HyperLink(text, actualPath, HyperLink::TYPE_PATH);
 			return true;
 		}
 	}
@@ -832,8 +841,10 @@ TermView::HyperLinkState::_GetHyperLinkAt(BPoint where, bool pathPrefixOnly,
 			return false;
 
 		path.Truncate(colonIndex);
-		if (lstat(path, &st) == 0) {
-			_link = HyperLink(text,
+		if (_EntryExists(path, actualPath)) {
+			BString address = path == actualPath
+				? text : BString(fCurrentDirectory)  << '/' << text;
+			_link = HyperLink(text, address,
 				i == 0
 					? HyperLink::TYPE_PATH_WITH_LINE
 					: HyperLink::TYPE_PATH_WITH_LINE_AND_COLUMN);
@@ -842,6 +853,25 @@ TermView::HyperLinkState::_GetHyperLinkAt(BPoint where, bool pathPrefixOnly,
 	}
 
 	return false;
+}
+
+
+bool
+TermView::HyperLinkState::_EntryExists(const BString& path,
+	BString& _actualPath) const
+{
+	if (path.IsEmpty())
+		return false;
+
+	if (path[0] == '/' || fCurrentDirectory.IsEmpty()) {
+		_actualPath = path;
+	} else {
+		_actualPath.Truncate(0);
+		_actualPath << fCurrentDirectory << '/' << path;
+	}
+
+	struct stat st;
+	return lstat(_actualPath, &st) == 0;
 }
 
 
@@ -947,9 +977,12 @@ TermView::HyperLinkMenuState::Prepare(BPoint point, const HyperLink& link)
 		case HyperLink::TYPE_PATH:
 		case HyperLink::TYPE_PATH_WITH_LINE:
 		case HyperLink::TYPE_PATH_WITH_LINE_AND_COLUMN:
-			menuBuilder
-				.AddItem(B_TRANSLATE("Open path"), kMessageOpenLink)
-				.AddItem(B_TRANSLATE("Copy path"), kMessageCopyLink);
+			menuBuilder.AddItem(B_TRANSLATE("Open path"), kMessageOpenLink);
+			menuBuilder.AddItem(B_TRANSLATE("Copy path"), kMessageCopyLink);
+			if (fLink.Text() != fLink.Address()) {
+				menuBuilder.AddItem(B_TRANSLATE("Copy absolute path"),
+					kMessageCopyAbsolutePath);
+			}
 			break;
 	}
 	menu->SetTargetForItems(fView);
@@ -974,22 +1007,27 @@ TermView::HyperLinkMenuState::MessageReceived(BMessage* message)
 			return true;
 
 		case kMessageCopyLink:
+		case kMessageCopyAbsolutePath:
+		{
 			if (fLink.IsValid()) {
+				BString toCopy = message->what == kMessageCopyLink
+					? fLink.Text() : fLink.Address();
+
 				if (!be_clipboard->Lock())
 					return true;
 
 				be_clipboard->Clear();
 
 				if (BMessage *data = be_clipboard->Data()) {
-					data->AddData("text/plain", B_MIME_TYPE,
-						fLink.Address().String(),
-						fLink.Address().Length());
+					data->AddData("text/plain", B_MIME_TYPE, toCopy.String(),
+						toCopy.Length());
 					be_clipboard->Commit();
 				}
 
 				be_clipboard->Unlock();
 			}
 			return true;
+		}
 
 		case kMessageMenuClosed:
 			fView->_NextState(fView->fDefaultState);
