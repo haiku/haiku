@@ -20,20 +20,21 @@ public:
 
 public:
 								HyperLink();
-								HyperLink(const BString& address, Type type,
-									const BString& baseAddress = BString());
+								HyperLink(const BString& address, Type type);
+								HyperLink(const BString& text,
+									const BString& address, Type type);
 
 			bool				IsValid() const	{ return !fAddress.IsEmpty(); }
 
+			const BString&		Text() const		{ return fText; }
 			const BString&		Address() const		{ return fAddress; }
-			const BString&		BaseAddress() const	{ return fBaseAddress; }
 			Type				GetType() const		{ return fType; }
 
 			status_t			Open();
 
 private:
+			BString				fText;
 			BString				fAddress;
-			BString				fBaseAddress;
 			Type				fType;
 };
 

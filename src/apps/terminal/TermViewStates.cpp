@@ -836,8 +836,7 @@ TermView::HyperLinkState::_GetHyperLinkAt(BPoint where, bool pathPrefixOnly,
 			_link = HyperLink(text,
 				i == 0
 					? HyperLink::TYPE_PATH_WITH_LINE
-					: HyperLink::TYPE_PATH_WITH_LINE_AND_COLUMN,
-				path);
+					: HyperLink::TYPE_PATH_WITH_LINE_AND_COLUMN);
 			return true;
 		}
 	}
