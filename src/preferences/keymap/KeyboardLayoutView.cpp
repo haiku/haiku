@@ -349,56 +349,58 @@ KeyboardLayoutView::MouseMoved(BPoint point, uint32 transit,
 		return;
 	}
 
-	if (fDragKey == NULL && (fabs(point.x - fClickPoint.x) > 4
+	if (fDragKey != NULL || !(fabs(point.x - fClickPoint.x) > 4
 		|| fabs(point.y - fClickPoint.y) > 4)) {
-		// start dragging
-		Key* key = _KeyAt(fClickPoint);
-		if (key == NULL)
-			return;
-
-		BRect frame = _FrameFor(key);
-		BPoint offset = fClickPoint - frame.LeftTop();
-		frame.OffsetTo(B_ORIGIN);
-
-		BRect rect = frame;
-		rect.right--;
-		rect.bottom--;
-		BBitmap* bitmap = new BBitmap(rect, B_RGBA32, true);
-		bitmap->Lock();
-
-		BView* view = new BView(rect, "drag", B_FOLLOW_NONE, 0);
-		bitmap->AddChild(view);
-
-		view->SetHighColor(0, 0, 0, 0);
-		view->FillRect(view->Bounds());
-		view->SetDrawingMode(B_OP_ALPHA);
-		view->SetHighColor(0, 0, 0, 128);
-		// set the level of transparency by value
-		view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
-		_DrawKey(view, frame, key, frame, false);
-
-		view->Sync();
-		bitmap->Unlock();
-
-		BMessage drag(B_MIME_DATA);
-		drag.AddInt32("key", key->code);
-
-		char* string;
-		int32 numBytes;
-		fKeymap->GetChars(key->code, fModifiers, fDeadKey, &string,
-			&numBytes);
-		if (string != NULL) {
-			drag.AddData("text/plain", B_MIME_DATA, string, numBytes);
-			delete[] string;
-		}
-
-		DragMessage(&drag, bitmap, B_OP_ALPHA, offset);
-		fDragKey = key;
-		fDragModifiers = fModifiers;
-
-		fKeyState[key->code / 8] &= ~(1 << (7 - (key->code & 7)));
-		_InvalidateKey(key);
+		return;
 	}
+
+	// start dragging
+	Key* key = _KeyAt(fClickPoint);
+	if (key == NULL)
+		return;
+
+	BRect frame = _FrameFor(key);
+	BPoint offset = fClickPoint - frame.LeftTop();
+	frame.OffsetTo(B_ORIGIN);
+
+	BRect rect = frame;
+	rect.right--;
+	rect.bottom--;
+	BBitmap* bitmap = new BBitmap(rect, B_RGBA32, true);
+	bitmap->Lock();
+
+	BView* view = new BView(rect, "drag", B_FOLLOW_NONE, 0);
+	bitmap->AddChild(view);
+
+	view->SetHighColor(0, 0, 0, 0);
+	view->FillRect(view->Bounds());
+	view->SetDrawingMode(B_OP_ALPHA);
+	view->SetHighColor(0, 0, 0, 128);
+	// set the level of transparency by value
+	view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
+	_DrawKey(view, frame, key, frame, false);
+
+	view->Sync();
+	bitmap->Unlock();
+
+	BMessage drag(B_MIME_DATA);
+	drag.AddInt32("key", key->code);
+
+	char* string;
+	int32 numBytes;
+	fKeymap->GetChars(key->code, fModifiers, fDeadKey, &string,
+		&numBytes);
+	if (string != NULL) {
+		drag.AddData("text/plain", B_MIME_DATA, string, numBytes);
+		delete[] string;
+	}
+
+	DragMessage(&drag, bitmap, B_OP_ALPHA, offset);
+	fDragKey = key;
+	fDragModifiers = fModifiers;
+
+	fKeyState[key->code / 8] &= ~(1 << (7 - (key->code & 7)));
+	_InvalidateKey(key);
 }
 
 
