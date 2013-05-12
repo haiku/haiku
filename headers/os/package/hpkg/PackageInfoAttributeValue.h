@@ -8,6 +8,8 @@
 
 #include <SupportDefs.h>
 
+#include <string.h>
+
 #include <package/PackageArchitecture.h>
 #include <package/PackageInfoAttributes.h>
 #include <package/PackageResolvableOperator.h>

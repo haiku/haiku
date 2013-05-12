@@ -73,11 +73,13 @@ enum {
 
 // maximum number of bytes of data to be encoded inline; more will be allocated
 // on the heap
-#define B_HPKG_MAX_INLINE_DATA_SIZE	8
+enum {
+	B_HPKG_MAX_INLINE_DATA_SIZE	= 8
+};
 
 
 // name of file containing package information (in package's root folder)
-#define B_HPKG_PACKAGE_INFO_FILE_NAME	".PackageInfo"
+extern const char* const B_HPKG_PACKAGE_INFO_FILE_NAME;
 
 
 // package attribute IDs

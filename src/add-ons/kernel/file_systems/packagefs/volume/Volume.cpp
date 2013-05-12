@@ -956,8 +956,10 @@ Volume::_AddPackageContent(Package* package, bool notify)
 	for (PackageNodeList::Iterator it = package->Nodes().GetIterator();
 			PackageNode* node = it.Next();) {
 		// skip over ".PackageInfo" file, it isn't part of the package content
-		if (strcmp(node->Name(), B_HPKG_PACKAGE_INFO_FILE_NAME) == 0)
+		if (strcmp(node->Name(),
+				BPackageKit::BHPKG::B_HPKG_PACKAGE_INFO_FILE_NAME) == 0) {
 			continue;
+		}
 		error = _AddPackageContentRootNode(package, node, notify);
 		if (error != B_OK) {
 			_RemovePackageContent(package, node, notify);
@@ -981,8 +983,10 @@ Volume::_RemovePackageContent(Package* package, PackageNode* endNode,
 		PackageNode* nextNode = package->Nodes().GetNext(node);
 
 		// skip over ".PackageInfo" file, it isn't part of the package content
-		if (strcmp(node->Name(), B_HPKG_PACKAGE_INFO_FILE_NAME) != 0)
+		if (strcmp(node->Name(),
+				BPackageKit::BHPKG::B_HPKG_PACKAGE_INFO_FILE_NAME) != 0) {
 			_RemovePackageContentRootNode(package, node, NULL, notify);
+		}
 
 		node = nextNode;
 	}

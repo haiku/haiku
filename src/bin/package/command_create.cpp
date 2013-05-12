@@ -150,8 +150,8 @@ command_create(int argc, const char* const* argv)
 	}
 
 	// add the .PackageInfo
-	result = packageWriter.AddEntry(B_HPKG_PACKAGE_INFO_FILE_NAME,
-		packageInfoFD);
+	result = packageWriter.AddEntry(
+		BPackageKit::BHPKG::B_HPKG_PACKAGE_INFO_FILE_NAME, packageInfoFD);
 	if (result != B_OK)
 		return 1;
 

@@ -36,7 +36,8 @@ add_current_directory_entries(BPackageWriter& packageWriter,
 
 		// skip the .PackageInfo, if requested
 		if (skipPackageInfo
-			&& strcmp(entry->d_name, B_HPKG_PACKAGE_INFO_FILE_NAME) == 0) {
+			&& strcmp(entry->d_name,
+				BPackageKit::BHPKG::B_HPKG_PACKAGE_INFO_FILE_NAME) == 0) {
 			continue;
 		}
 

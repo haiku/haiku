@@ -77,6 +77,7 @@ HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES =
 	DataReader.cpp
 	ErrorOutput.cpp
 	FDDataReader.cpp
+	HPKGDefs.cpp
 	PackageContentHandler.cpp
 	PackageData.cpp
 	PackageDataReader.cpp

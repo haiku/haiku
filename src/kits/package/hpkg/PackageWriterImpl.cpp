@@ -1442,7 +1442,7 @@ PackageWriterImpl::_WriteAttributeChildren(Attribute* attribute)
 	while (Attribute* child = it.Next()) {
 		// write tag
 		uint8 encoding = child->value.ApplicableEncoding();
-		WriteUnsignedLEB128(HPKG_ATTRIBUTE_TAG_COMPOSE(child->id,
+		WriteUnsignedLEB128(compose_attribute_tag(child->id,
 			child->value.type, encoding, !child->children.IsEmpty()));
 
 		// write value

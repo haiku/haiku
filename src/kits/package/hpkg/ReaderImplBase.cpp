@@ -799,7 +799,7 @@ ReaderImplBase::_ReadAttribute(uint8& _id, AttributeValue& _value,
 
 	if (tag != 0) {
 		// get the type
-		uint16 type = HPKG_ATTRIBUTE_TAG_TYPE(tag);
+		uint16 type = attribute_tag_type(tag);
 		if (type >= B_HPKG_ATTRIBUTE_TYPE_ENUM_COUNT) {
 			fErrorOutput->PrintError("Error: Invalid %s section: attribute "
 				"type %d not supported!\n", fCurrentSection->name, type);
@@ -807,12 +807,12 @@ ReaderImplBase::_ReadAttribute(uint8& _id, AttributeValue& _value,
 		}
 
 		// get the value
-		error = ReadAttributeValue(type, HPKG_ATTRIBUTE_TAG_ENCODING(tag),
+		error = ReadAttributeValue(type, attribute_tag_encoding(tag),
 			_value);
 		if (error != B_OK)
 			return error;
 
-		_id = HPKG_ATTRIBUTE_TAG_ID(tag);
+		_id = attribute_tag_id(tag);
 		if (_id >= B_HPKG_ATTRIBUTE_ID_ENUM_COUNT) {
 			fErrorOutput->PrintError("Error: Invalid %s section: "
 				"attribute id %d not supported!\n", fCurrentSection->name, _id);
@@ -821,7 +821,7 @@ ReaderImplBase::_ReadAttribute(uint8& _id, AttributeValue& _value,
 	}
 
 	if (_hasChildren != NULL)
-		*_hasChildren = HPKG_ATTRIBUTE_TAG_HAS_CHILDREN(tag);
+		*_hasChildren = attribute_tag_has_children(tag);
 	if (_tag != NULL)
 		*_tag = tag;
 

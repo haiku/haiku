@@ -782,7 +782,7 @@ WriterImplBase::_WritePackageAttributes(
 		uint8 encoding = attribute->ApplicableEncoding();
 
 		// write tag
-		WriteUnsignedLEB128(HPKG_ATTRIBUTE_TAG_COMPOSE(
+		WriteUnsignedLEB128(compose_attribute_tag(
 			attribute->id, attribute->type, encoding,
 			!attribute->children.IsEmpty()));
 

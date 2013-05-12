@@ -433,18 +433,18 @@ PackageReaderImpl::Init(int fd, bool keepFD)
 		return B_BAD_DATA;
 	}
 
+	// version
+	if (B_BENDIAN_TO_HOST_INT16(header.version) != B_HPKG_VERSION) {
+		ErrorOutput()->PrintError("Error: Invalid/unsupported package file "
+			"version (%d)\n", B_BENDIAN_TO_HOST_INT16(header.version));
+		return B_MISMATCHED_VALUES;
+	}
+
 	// header size
 	fHeapOffset = B_BENDIAN_TO_HOST_INT16(header.header_size);
 	if ((size_t)fHeapOffset < sizeof(hpkg_header)) {
 		ErrorOutput()->PrintError("Error: Invalid package file: Invalid header "
 			"size (%llu)\n", fHeapOffset);
-		return B_BAD_DATA;
-	}
-
-	// version
-	if (B_BENDIAN_TO_HOST_INT16(header.version) != B_HPKG_VERSION) {
-		ErrorOutput()->PrintError("Error: Invalid/unsupported package file "
-			"version (%d)\n", B_BENDIAN_TO_HOST_INT16(header.version));
 		return B_BAD_DATA;
 	}
 

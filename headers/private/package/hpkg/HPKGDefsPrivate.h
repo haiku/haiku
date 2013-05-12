@@ -64,17 +64,41 @@ struct hpkg_repo_header {
 
 // attribute tag arithmetics
 // (using 6 bits for id, 3 for type, 1 for hasChildren and 2 for encoding)
-#define HPKG_ATTRIBUTE_TAG_COMPOSE(id, type, encoding, hasChildren) 	\
-	(((uint16(encoding) << 10) | (uint16((hasChildren) ? 1 : 0) << 9)	\
-		| (uint16(type) << 6) | (uint16(id))) + 1)
-#define HPKG_ATTRIBUTE_TAG_ENCODING(tag)		\
-	((uint16((tag) - 1) >> 10) & 0x3)
-#define HPKG_ATTRIBUTE_TAG_HAS_CHILDREN(tag)	\
-	(((uint16((tag) - 1) >> 9) & 0x1) != 0)
-#define HPKG_ATTRIBUTE_TAG_TYPE(tag)			\
-	((uint16((tag) - 1) >> 6) & 0x7)
-#define HPKG_ATTRIBUTE_TAG_ID(tag)				\
-	(uint16((tag) - 1) & 0x3f)
+static inline uint16
+compose_attribute_tag(uint16 id, uint16 type, uint16 encoding, bool hasChildren)
+{
+	return ((encoding << 10) | (uint16(hasChildren ? 1 : 0) << 9) | (type << 6)
+			| id)
+		+ 1;
+}
+
+
+static inline uint16
+attribute_tag_encoding(uint16 tag)
+{
+	return ((tag - 1) >> 10) & 0x3;
+}
+
+
+static inline bool
+attribute_tag_has_children(uint16 tag)
+{
+	return (((tag - 1) >> 9) & 0x1) != 0;
+}
+
+
+static inline uint16
+attribute_tag_type(uint16 tag)
+{
+	return ((tag - 1) >> 6) & 0x7;
+}
+
+
+static inline uint16
+attribute_tag_id(uint16 tag)
+{
+	return (tag - 1) & 0x3f;
+}
 
 
 }	// namespace BPrivate
