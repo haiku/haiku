@@ -51,6 +51,7 @@ protected:
 			void				_SwitchShortcutKeys();
 
 			void				_UseKeymap();
+			void				_DefaultKeymap();
 			void				_RevertKeymap();
 
 			BMenuField*			_CreateDeadKeyMenuField();
@@ -74,6 +75,7 @@ protected:
 private:
 			BListView*			fSystemListView;
 			BListView*			fUserListView;
+			BButton*			fDefaultsButton;
 			BButton*			fRevertButton;
 			BMenu*				fLayoutMenu;
 			BMenu*				fFontMenu;

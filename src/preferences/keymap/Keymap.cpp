@@ -17,6 +17,8 @@
 
 #include <ByteOrder.h>
 #include <File.h>
+#include <FindDirectory.h>
+#include <Path.h>
 
 #include <input_globals.h>
 
@@ -333,6 +335,23 @@ Keymap::SetDeadKeyTrigger(dead_key_index deadKeyIndex, const BString& trigger)
 		if (fModificationMessage != NULL)
 			fTarget.SendMessage(fModificationMessage);
 	}
+}
+
+
+status_t
+Keymap::RestoreSystemDefault()
+{
+	BPath path;
+	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
+	if (status != B_OK)
+		return status;
+
+	path.Append("Key_map");
+
+	BEntry entry(path.Path());
+	entry.Remove();
+
+	return Use();
 }
 
 

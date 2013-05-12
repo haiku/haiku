@@ -55,6 +55,7 @@ static const uint32 kMsgMenuFontChanged = 'mMFC';
 static const uint32 kMsgSystemMapSelected = 'SmST';
 static const uint32 kMsgUserMapSelected = 'UmST';
 
+static const uint32 kMsgDefaultKeymap = 'Dflt';
 static const uint32 kMsgRevertKeymap = 'Rvrt';
 static const uint32 kMsgKeymapUpdated = 'kMup';
 
@@ -67,6 +68,7 @@ static const uint32 kMsgDeadKeyTildeChanged = 'dkTc';
 static const char* kDeadKeyTriggerNone = "<none>";
 
 static const char* kCurrentKeymapName = "(Current)";
+static const char* kDefaultKeymapName = "US-International";
 
 
 KeymapWindow::KeymapWindow()
@@ -85,9 +87,6 @@ KeymapWindow::KeymapWindow()
 	fSwitchShortcutsButton = new BButton("switch", "",
 		new BMessage(kMsgSwitchShortcuts));
 
-	fRevertButton = new BButton("revertButton", B_TRANSLATE("Revert"),
-		new BMessage(kMsgRevertKeymap));
-
 	// controls pane
 	AddChild(BGroupLayoutBuilder(B_VERTICAL)
 		.Add(_CreateMenu())
@@ -103,8 +102,12 @@ KeymapWindow::KeymapWindow()
 				.Add(fTextControl)
 				.AddGlue(0.0)
 				.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
-					.AddGlue(0.0)
-					.Add(fRevertButton)))
+					.Add(fDefaultsButton = new BButton("defaultsButton",
+						B_TRANSLATE("Defaults"),
+							new BMessage(kMsgDefaultKeymap)))
+					.Add(fRevertButton = new BButton("revertButton",
+						B_TRANSLATE("Revert"), new BMessage(kMsgRevertKeymap)))
+					.AddGlue()))
 			.SetInsets(10, 10, 10, 10)));
 
 	fKeyboardLayoutView->SetTarget(fTextControl->TextView());
@@ -291,6 +294,11 @@ KeymapWindow::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+
+		case kMsgDefaultKeymap:
+			_DefaultKeymap();
+			_UpdateButtons();
+			break;
 
 		case kMsgRevertKeymap:
 			_RevertKeymap();
@@ -735,6 +743,8 @@ KeymapWindow::_UpdateButtons()
 		_UseKeymap();
 	}
 
+	fDefaultsButton->SetEnabled(
+		fCurrentMapName.ICompare(kDefaultKeymapName) != 0);
 	fRevertButton->SetEnabled(fCurrentMap != fPreviousMap);
 
 	_UpdateDeadKeyMenu();
@@ -760,6 +770,20 @@ KeymapWindow::_SwitchShortcutKeys()
 
 	fKeyboardLayoutView->SetKeymap(&fCurrentMap);
 	_UpdateButtons();
+}
+
+
+//!	Restores the default keymap.
+void
+KeymapWindow::_DefaultKeymap()
+{
+	fCurrentMap.RestoreSystemDefault();
+	fAppliedMap = fCurrentMap;
+
+	fKeyboardLayoutView->SetKeymap(&fCurrentMap);
+
+	fCurrentMapName = _GetActiveKeymapName();
+	_SelectCurrentMap();
 }
 
 

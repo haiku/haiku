@@ -48,6 +48,7 @@ public:
 			void				SetDeadKeyTrigger(dead_key_index deadKeyIndex,
 									const BString& trigger);
 
+			status_t			RestoreSystemDefault();
 			status_t			Use();
 
 			void				SetKey(uint32 keyCode, uint32 modifiers,
