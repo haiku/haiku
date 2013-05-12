@@ -53,7 +53,8 @@ public:
 			bool				HandleExceptionOccurred(
 									ExceptionOccurredEvent* event);
 
-			void				HandleThreadAction(uint32 action);
+			void				HandleThreadAction(uint32 action,
+									target_addr_t address);
 
 			void				HandleThreadStateChanged();
 			void				HandleCpuStateChanged();

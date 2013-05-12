@@ -16,9 +16,11 @@
 #include <Clipboard.h>
 #include <LayoutUtils.h>
 #include <Looper.h>
+#include <MenuItem.h>
 #include <Message.h>
 #include <MessageRunner.h>
 #include <Polygon.h>
+#include <PopUpMenu.h>
 #include <Region.h>
 #include <ScrollBar.h>
 #include <ScrollView.h>
@@ -27,6 +29,7 @@
 #include <AutoLocker.h>
 #include <ObjectList.h>
 
+#include "AutoDeleter.h"
 #include "Breakpoint.h"
 #include "DisassembledCode.h"
 #include "Function.h"
@@ -918,18 +921,11 @@ SourceView::MarkerView::MouseDown(BPoint where)
 		return;
 
 	int32 line = LineAtOffset(where.y);
-	if (line < 0)
-		return;
 
-	AutoLocker<Team> locker(fTeam);
 	Statement* statement;
-	if (fTeam->GetStatementAtSourceLocation(fSourceCode,
-			SourceLocation(line), statement) != B_OK) {
+	if (!fSourceView->GetStatementForLine(line, statement))
 		return;
-	}
 	BReference<Statement> statementReference(statement, true);
-	if (statement->StartSourceLocation().Line() != line)
-		return;
 
 	int32 modifiers;
 	if (Looper()->CurrentMessage()->FindInt32("modifiers", &modifiers) != B_OK)
@@ -1193,7 +1189,15 @@ SourceView::TextView::MessageReceived(BMessage* message)
 void
 SourceView::TextView::MouseDown(BPoint where)
 {
-	if (fSourceCode != NULL) {
+	if (fSourceCode == NULL)
+		return;
+
+	int32 buttons;
+	if (Looper()->CurrentMessage()->FindInt32("buttons", &buttons) != B_OK)
+		buttons = B_PRIMARY_MOUSE_BUTTON;
+
+
+	if (buttons == B_PRIMARY_MOUSE_BUTTON) {
 		if (!IsFocus())
 			MakeFocus(true);
 		fTrackState = kTracking;
@@ -1233,6 +1237,57 @@ SourceView::TextView::MouseDown(BPoint where)
 			Invalidate();
 			SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 		}
+	} else if (buttons == B_SECONDARY_MOUSE_BUTTON) {
+		int32 line = LineAtOffset(where.y);
+		if (line < 0)
+			return;
+
+		::Team* team = fSourceView->fTeam;
+		AutoLocker<Team> locker(team);
+		::Thread* activeThread = fSourceView->fActiveThread;
+
+		if (activeThread == NULL)
+			return;
+		else if (activeThread->State() != THREAD_STATE_STOPPED)
+			return;
+
+		Statement* statement;
+		if (!fSourceView->GetStatementForLine(line, statement))
+			return;
+		BReference<Statement> statementReference(statement, true);
+
+		BPopUpMenu* menu = new(std::nothrow) BPopUpMenu("");
+		if (menu == NULL)
+			return;
+		ObjectDeleter<BPopUpMenu> menuDeleter(menu);
+
+		BMessage* message = new(std::nothrow) BMessage(MSG_THREAD_RUN);
+		if (message == NULL)
+			return;
+		ObjectDeleter<BMessage> messageDeleter(message);
+
+		message->AddUInt64("address", statement->CoveringAddressRange()
+				.Start());
+		BMenuItem* item = new(std::nothrow) BMenuItem("Run to cursor",
+			message);
+		if (item == NULL)
+			return;
+		ObjectDeleter<BMenuItem> itemDeleter(item);
+		messageDeleter.Detach();
+
+		if (!menu->AddItem(item))
+			return;
+
+		itemDeleter.Detach();
+		messageDeleter.Detach();
+		menuDeleter.Detach();
+
+		BPoint screenWhere(where);
+		ConvertToScreen(&screenWhere);
+		menu->SetTargetForItems(fSourceView);
+		BRect mouseRect(screenWhere, screenWhere);
+		mouseRect.InsetBy(-4.0, -4.0);
+		menu->Go(screenWhere, true, false, mouseRect, true);
 	}
 }
 
@@ -1695,6 +1750,7 @@ SourceView::SourceView(Team* team, Listener* listener)
 	:
 	BView("source view", 0),
 	fTeam(team),
+	fActiveThread(NULL),
 	fStackTrace(NULL),
 	fStackFrame(NULL),
 	fSourceCode(NULL),
@@ -1713,7 +1769,7 @@ SourceView::SourceView(Team* team, Listener* listener)
 SourceView::~SourceView()
 {
 	SetStackFrame(NULL);
-	SetStackTrace(NULL);
+	SetStackTrace(NULL, NULL);
 	SetSourceCode(NULL);
 }
 
@@ -1735,6 +1791,27 @@ SourceView::Create(Team* team, Listener* listener)
 
 
 void
+SourceView::MessageReceived(BMessage* message)
+{
+	switch(message->what) {
+		case MSG_THREAD_RUN:
+		{
+			target_addr_t address;
+			if (message->FindUInt64("address", &address) != B_OK)
+				break;
+			fListener->ThreadActionRequested(fActiveThread, message->what,
+				address);
+			break;
+		}
+
+		default:
+			BView::MessageReceived(message);
+			break;
+	}
+}
+
+
+void
 SourceView::UnsetListener()
 {
 	fListener = NULL;
@@ -1742,12 +1819,20 @@ SourceView::UnsetListener()
 
 
 void
-SourceView::SetStackTrace(StackTrace* stackTrace)
+SourceView::SetStackTrace(StackTrace* stackTrace, Thread* activeThread)
 {
 	TRACE_GUI("SourceView::SetStackTrace(%p)\n", stackTrace);
 
 	if (stackTrace == fStackTrace)
 		return;
+
+	if (fActiveThread != NULL)
+		fActiveThread->ReleaseReference();
+
+	fActiveThread = activeThread;
+
+	if (fActiveThread != NULL)
+		fActiveThread->AcquireReference();
 
 	if (fStackTrace != NULL) {
 		fMarkerManager->SetStackTrace(NULL);
@@ -1946,6 +2031,29 @@ SourceView::DoLayout()
 	fTextView->ResizeTo(size.width - markerWidth - 1, size.height);
 
 	_UpdateScrollBars();
+}
+
+
+bool
+SourceView::GetStatementForLine(int32 line, Statement*& _statement)
+{
+	if (line < 0)
+		return false;
+
+	AutoLocker<Team> locker(fTeam);
+	Statement* statement;
+	if (fTeam->GetStatementAtSourceLocation(fSourceCode,	SourceLocation(line),
+		statement) != B_OK) {
+		return false;
+	}
+	BReference<Statement> statementReference(statement, true);
+	if (statement->StartSourceLocation().Line() != line)
+		return false;
+
+	_statement = statement;
+	statementReference.Detach();
+
+	return true;
 }
 
 

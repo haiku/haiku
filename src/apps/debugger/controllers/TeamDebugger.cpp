@@ -536,11 +536,15 @@ TeamDebugger::MessageReceived(BMessage* message)
 		case MSG_THREAD_STEP_OUT:
 		{
 			int32 threadID;
+			target_addr_t address;
 			if (message->FindInt32("thread", &threadID) != B_OK)
 				break;
 
+			if (message->FindUInt64("address", &address) != B_OK)
+				address = 0;
+
 			if (ThreadHandler* handler = _GetThreadHandler(threadID)) {
-				handler->HandleThreadAction(message->what);
+				handler->HandleThreadAction(message->what, address);
 				handler->ReleaseReference();
 			}
 			break;
@@ -801,10 +805,11 @@ TeamDebugger::ValueNodeValueRequested(CpuState* cpuState,
 
 void
 TeamDebugger::ThreadActionRequested(thread_id threadID,
-	uint32 action)
+	uint32 action, target_addr_t address)
 {
 	BMessage message(action);
 	message.AddInt32("thread", threadID);
+	message.AddUInt64("address", address);
 	PostMessage(&message);
 }
 

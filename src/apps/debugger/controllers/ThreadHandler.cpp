@@ -37,7 +37,8 @@ enum {
 	STEP_NONE,
 	STEP_OVER,
 	STEP_INTO,
-	STEP_OUT
+	STEP_OUT,
+	STEP_UNTIL
 };
 
 
@@ -124,7 +125,7 @@ ThreadHandler::HandleBreakpointHit(BreakpointHitEvent* event)
 	// check whether this is a temporary breakpoint we're waiting for
 	if (fBreakpointAddress != 0 && instructionPointer == fBreakpointAddress
 		&& fStepMode != STEP_NONE) {
-		if (_HandleBreakpointHitStep(cpuState))
+		if (fStepMode != STEP_UNTIL && _HandleBreakpointHitStep(cpuState))
 			return true;
 	} else {
 		// Might be a user breakpoint, but could as well be a temporary
@@ -199,7 +200,7 @@ ThreadHandler::HandleExceptionOccurred(ExceptionOccurredEvent* event)
 
 
 void
-ThreadHandler::HandleThreadAction(uint32 action)
+ThreadHandler::HandleThreadAction(uint32 action, target_addr_t address)
 {
 	AutoLocker<Team> locker(fThread->GetTeam());
 
@@ -230,7 +231,9 @@ ThreadHandler::HandleThreadAction(uint32 action)
 
 	switch (action) {
 		case MSG_THREAD_RUN:
-			fStepMode = STEP_NONE;
+			fStepMode = address != 0 ? STEP_UNTIL : STEP_NONE;
+			if (address != 0)
+				_InstallTemporaryBreakpoint(address);
 			_RunThread(0);
 			return;
 		case MSG_THREAD_STOP:

@@ -107,7 +107,11 @@ private:
 	// SourceView::Listener
 	virtual	void				SetBreakpointRequested(target_addr_t address,
 									bool enabled);
-	virtual	void				ClearBreakpointRequested(target_addr_t address);
+	virtual	void				ClearBreakpointRequested(
+									target_addr_t address);
+	virtual	void				ThreadActionRequested(::Thread* thread,
+									uint32 action, target_addr_t address);
+
 
 	// VariablesView::Listener
 	virtual	void				ValueNodeValueRequested(CpuState* cpuState,

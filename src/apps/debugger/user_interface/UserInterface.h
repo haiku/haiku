@@ -90,7 +90,8 @@ public:
 									ValueNodeContainer* container,
 									ValueNode* valueNode) = 0;
 	virtual	void				ThreadActionRequested(thread_id threadID,
-									uint32 action) = 0;
+									uint32 action,
+									target_addr_t address = 0) = 0;
 
 	virtual	void				SetBreakpointRequested(target_addr_t address,
 									bool enabled) = 0;

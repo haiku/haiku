@@ -646,6 +646,14 @@ TeamWindow::ClearBreakpointRequested(target_addr_t address)
 
 
 void
+TeamWindow::ThreadActionRequested(::Thread* thread, uint32 action,
+	target_addr_t address)
+{
+	fListener->ThreadActionRequested(thread->ID(), action, address);
+}
+
+
+void
 TeamWindow::WatchpointSelectionChanged(Watchpoint* watchpoint)
 {
 	fBreakpointsView->SetBreakpoint(NULL, watchpoint);
@@ -953,7 +961,7 @@ TeamWindow::_SetActiveStackTrace(StackTrace* stackTrace)
 		fActiveStackTrace->AcquireReference();
 
 	fStackTraceView->SetStackTrace(fActiveStackTrace);
-	fSourceView->SetStackTrace(fActiveStackTrace);
+	fSourceView->SetStackTrace(fActiveStackTrace, fActiveThread);
 
 	if (fActiveStackTrace != NULL)
 		_SetActiveStackFrame(fActiveStackTrace->FrameAt(0));
