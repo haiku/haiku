@@ -431,7 +431,7 @@ TeamDebugInfo::LoadImageDebugInfo(const ImageInfo& imageInfo,
 		imageInfo);
 	if (imageDebugInfo == NULL)
 		return B_NO_MEMORY;
-	ObjectDeleter<ImageDebugInfo> imageDebugInfoDeleter(imageDebugInfo);
+	BReference<ImageDebugInfo> imageDebugInfoReference(imageDebugInfo, true);
 
 	for (int32 i = 0; SpecificTeamDebugInfo* specificTeamInfo
 			= fSpecificInfos.ItemAt(i); i++) {
@@ -452,7 +452,7 @@ TeamDebugInfo::LoadImageDebugInfo(const ImageInfo& imageInfo,
 	if (error != B_OK)
 		return error;
 
-	_imageDebugInfo = imageDebugInfoDeleter.Detach();
+	_imageDebugInfo = imageDebugInfoReference.Detach();
 	return B_OK;
 }
 
