@@ -1,5 +1,5 @@
 /*
- * Copyright 2009,2011, Haiku, Inc.
+ * Copyright 2009-2013, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PACKAGE__HPKG__HPKG_DEFS_H_
@@ -17,7 +17,7 @@ namespace BHPKG {
 // magic & version of package and repository files
 enum {
 	B_HPKG_MAGIC	= 'hpkg',
-	B_HPKG_VERSION	= 1,
+	B_HPKG_VERSION	= 2,
 	//
 	B_HPKG_REPO_MAGIC	= 'hpkr',
 	B_HPKG_REPO_VERSION	= 1
