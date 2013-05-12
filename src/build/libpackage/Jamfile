@@ -4,6 +4,7 @@ UsePrivateBuildHeaders kernel package shared ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg v1 ] ;
 
 USES_BE_API on libpackage_build.so = true ;
 
@@ -45,6 +46,18 @@ HPKG_SOURCES =
 	RepositoryWriterImpl.cpp
 	Strings.cpp
 	WriterImplBase.cpp
+
+	# V1 support
+	HPKGDefsV1.cpp
+	PackageContentHandlerV1.cpp
+	PackageDataReaderV1.cpp
+	PackageDataV1.cpp
+	PackageEntryAttributeV1.cpp
+	PackageEntryV1.cpp
+	PackageInfoContentHandlerV1.cpp
+	PackageReaderImplV1.cpp
+	PackageReaderV1.cpp
+	ReaderImplBaseV1.cpp
 
 	# compression
 	ZlibCompressionBase.cpp
