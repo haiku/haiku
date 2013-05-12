@@ -129,6 +129,12 @@ private:
 	virtual	uint32				AdjustTextAttributes(uint32 attributes);
 
 private:
+			struct CharPosition {
+				int32	index;
+				TermPos	position;
+			};
+
+private:
 			bool				_GetHyperLinkAt(BPoint where,
 									bool pathPrefixOnly, HyperLink& _link,
 									TermPos& _start, TermPos& _end);

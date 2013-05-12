@@ -30,6 +30,8 @@
 #include <UTF8.h>
 #include <Window.h>
 
+#include <Array.h>
+
 #include "ActiveProcessInfo.h"
 #include "Shell.h"
 #include "TermConst.h"
@@ -800,55 +802,108 @@ TermView::HyperLinkState::_GetHyperLinkAt(BPoint where, bool pathPrefixOnly,
 	if (text.IsEmpty())
 		return false;
 
-	// check, whether the file exists
-	BString actualPath;
-	if (_EntryExists(text, actualPath)) {
-		_link = HyperLink(text, actualPath, HyperLink::TYPE_PATH);
-		return true;
-	}
-
-	// As such this isn't an existing path. Try a few common alternative cases:
-	// * "<path>:"
-	// * "<path>:<line>"
-	// * "<path>:<line>:"
-	// * "<path>:<line>:<column>"
-	// * "<path>:<line>:<column>:"
-
-	if (text.Length() <= 1)
-		return false;
-
-	if (text[text.Length() - 1] == ':') {
-		text.Truncate(text.Length() - 1);
-		if (!textBuffer->PreviousLinePos(_end))
+	// Collect a list of colons in the string and their respective positions in
+	// the text buffer. We do this up-front so we can unlock the text buffer
+	// while we're doing all the entry existence tests.
+	typedef Array<CharPosition> ColonList;
+	ColonList colonPositions;
+	TermPos searchPos = _start;
+	for (int32 index = 0; (index = text.FindFirst(':', index)) >= 0;) {
+		TermPos foundStart;
+		TermPos foundEnd;
+		if (!textBuffer->Find(":", searchPos, true, true, false, foundStart,
+				foundEnd)) {
 			return false;
-
-		if (_EntryExists(text, actualPath)) {
-			_link = HyperLink(text, actualPath, HyperLink::TYPE_PATH);
-			return true;
 		}
+
+		CharPosition colonPosition;
+		colonPosition.index = index;
+		colonPosition.position = foundStart;
+		if (!colonPositions.Add(colonPosition))
+			return false;
+
+		index++;
+		searchPos = foundEnd;
 	}
 
-	BString path = text;
+	textBufferLocker.Unlock();
 
-	for (int32 i = 0; i < 2; i++) {
-		int32 colonIndex = path.FindLast(':');
-		if (colonIndex <= 0 || colonIndex == path.Length() - 1)
-			return false;
+	// Since we also want to consider ':' a potential path delimiter, in two
+	// nested loops we chop off components from the beginning respective the
+	// end.
+	BString originalText = text;
+	TermPos originalStart = _start;
+	TermPos originalEnd = _end;
 
-		char* numberEnd;
-		strtol(path.String() + colonIndex + 1, &numberEnd, 0);
-		if (*numberEnd != '\0')
-			return false;
+	int32 colonCount = colonPositions.Count();
+	for (int32 startColonIndex = -1; startColonIndex < colonCount;
+			startColonIndex++) {
+		int32 startIndex;
+		if (startColonIndex < 0) {
+			startIndex = 0;
+			_start = originalStart;
+		} else {
+			startIndex = colonPositions[startColonIndex].index + 1;
+			_start = colonPositions[startColonIndex].position;
+			if (_start >= pos)
+				break;
+			_start.x++;
+				// Note: This is potentially a non-normalized position (i.e.
+				// the end of a soft-wrapped line). While not that nice, it
+				// works anyway.
+		}
 
-		path.Truncate(colonIndex);
-		if (_EntryExists(path, actualPath)) {
-			BString address = path == actualPath
-				? text : BString(fCurrentDirectory)  << '/' << text;
-			_link = HyperLink(text, address,
-				i == 0
-					? HyperLink::TYPE_PATH_WITH_LINE
-					: HyperLink::TYPE_PATH_WITH_LINE_AND_COLUMN);
-			return true;
+		for (int32 endColonIndex = colonCount; endColonIndex > startColonIndex;
+				endColonIndex--) {
+			int32 endIndex;
+			if (endColonIndex == colonCount) {
+				endIndex = originalText.Length();
+				_end = originalEnd;
+			} else {
+				endIndex = colonPositions[endColonIndex].index;
+				_end = colonPositions[endColonIndex].position;
+				if (_end <= pos)
+					break;
+			}
+
+			originalText.CopyInto(text, startIndex, endIndex - startIndex);
+			if (text.IsEmpty())
+				continue;
+
+			// check, whether the file exists
+			BString actualPath;
+			if (_EntryExists(text, actualPath)) {
+				_link = HyperLink(text, actualPath, HyperLink::TYPE_PATH);
+				return true;
+			}
+
+			// As such this isn't an existing path. We also want to recognize:
+			// * "<path>:<line>"
+			// * "<path>:<line>:<column>"
+
+			BString path = text;
+
+			for (int32 i = 0; i < 2; i++) {
+				int32 colonIndex = path.FindLast(':');
+				if (colonIndex <= 0 || colonIndex == path.Length() - 1)
+					break;
+
+				char* numberEnd;
+				strtol(path.String() + colonIndex + 1, &numberEnd, 0);
+				if (*numberEnd != '\0')
+					break;
+
+				path.Truncate(colonIndex);
+				if (_EntryExists(path, actualPath)) {
+					BString address = path == actualPath
+						? text : BString(fCurrentDirectory)  << '/' << text;
+					_link = HyperLink(text, address,
+						i == 0
+							? HyperLink::TYPE_PATH_WITH_LINE
+							: HyperLink::TYPE_PATH_WITH_LINE_AND_COLUMN);
+					return true;
+				}
+			}
 		}
 	}
 
