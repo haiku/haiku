@@ -74,6 +74,8 @@ public:
 	virtual	status_t			GetCpuState(thread_id thread,
 									CpuState*& _state);
 										// returns a reference to the caller
+	virtual	status_t			SetCpuState(thread_id thread,
+									const CpuState* state);
 
 	// TeamMemory
 	virtual	ssize_t				ReadMemory(target_addr_t address, void* buffer,
@@ -93,6 +95,9 @@ private:
 
 			status_t			_GetNextSystemWatchEvent(DebugEvent*& _event,
 									BPrivate::KMessage& message);
+
+			status_t			_GetDebugCpuState(thread_id thread,
+									debug_cpu_state& _state);
 
 private:
 			team_id				fTeamID;
