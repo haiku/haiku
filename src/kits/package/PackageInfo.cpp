@@ -18,6 +18,8 @@
 #include <Message.h>
 #include <package/hpkg/NoErrorOutput.h>
 #include <package/hpkg/PackageReader.h>
+#include <package/hpkg/v1/PackageInfoContentHandler.h>
+#include <package/hpkg/v1/PackageReader.h>
 #include <package/PackageInfoContentHandler.h>
 
 
@@ -1267,6 +1269,40 @@ private:
 };
 
 
+// #pragma mark - PackageFileLocation
+
+
+struct BPackageInfo::PackageFileLocation {
+	PackageFileLocation(const char* path)
+		:
+		fPath(path),
+		fFD(-1)
+	{
+	}
+
+	PackageFileLocation(int fd)
+		:
+		fPath(NULL),
+		fFD(fd)
+	{
+	}
+
+	const char* Path() const
+	{
+		return fPath;
+	}
+
+	int FD() const
+	{
+		return fFD;
+	}
+
+private:
+	const char*	fPath;
+	int			fFD;
+};
+
+
 // #pragma mark - BPackageInfo
 
 
@@ -1409,28 +1445,14 @@ BPackageInfo::ReadFromConfigString(const BString& packageInfoString,
 status_t
 BPackageInfo::ReadFromPackageFile(const char* path)
 {
-	BHPKG::BNoErrorOutput errorOutput;
-	BHPKG::BPackageReader packageReader(&errorOutput);
-	status_t error = packageReader.Init(path);
-	if (error != B_OK)
-		return error;
-	
-	BPackageInfoContentHandler handler(*this);
-	return packageReader.ParseContent(&handler);
+	return _ReadFromPackageFile(PackageFileLocation(path));
 }
 
 
 status_t
 BPackageInfo::ReadFromPackageFile(int fd)
 {
-	BHPKG::BNoErrorOutput errorOutput;
-	BHPKG::BPackageReader packageReader(&errorOutput);
-	status_t error = packageReader.Init(fd, false);
-	if (error != B_OK)
-		return error;
-	
-	BPackageInfoContentHandler handler(*this);
-	return packageReader.ParseContent(&handler);
+	return _ReadFromPackageFile(PackageFileLocation(fd));
 }
 
 
@@ -1968,6 +1990,39 @@ BPackageInfo::ParseVersionString(const BString& string, bool revisionIsOptional,
 	BPackageVersion& _version, ParseErrorListener* listener)
 {
 	return Parser(listener).ParseVersion(string, revisionIsOptional, _version);
+}
+
+
+status_t
+BPackageInfo::_ReadFromPackageFile(const PackageFileLocation& fileLocation)
+{
+	BHPKG::BNoErrorOutput errorOutput;
+
+	// try current package file format version
+	{
+		BHPKG::BPackageReader packageReader(&errorOutput);
+		status_t error = fileLocation.Path() != NULL
+			? packageReader.Init(fileLocation.Path())
+			: packageReader.Init(fileLocation.FD(), false);
+		if (error == B_OK) {
+			BPackageInfoContentHandler handler(*this);
+			return packageReader.ParseContent(&handler);
+		}
+
+		if (error != B_MISMATCHED_VALUES)
+			return error;
+	}
+
+	// try package file format version 1
+	BHPKG::V1::BPackageReader packageReader(&errorOutput);
+	status_t error = fileLocation.Path() != NULL
+		? packageReader.Init(fileLocation.Path())
+		: packageReader.Init(fileLocation.FD(), false);
+	if (error != B_OK)
+		return error;
+
+	BHPKG::V1::BPackageInfoContentHandler handler(*this);
+	return packageReader.ParseContent(&handler);
 }
 
 

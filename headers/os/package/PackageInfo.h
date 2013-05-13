@@ -167,12 +167,16 @@ private:
 			friend class Parser;
 			struct StringBuilder;
 			struct FieldName;
+			struct PackageFileLocation;
 
 			typedef BObjectList<BPackageResolvable> ResolvableList;
 			typedef BObjectList<BPackageResolvableExpression>
 				ResolvableExpressionList;
 
 private:
+			status_t			_ReadFromPackageFile(
+									const PackageFileLocation& fileLocation);
+
 	static	status_t			_AddVersion(BMessage* archive,
 									const char* field,
 									const BPackageVersion& version);
