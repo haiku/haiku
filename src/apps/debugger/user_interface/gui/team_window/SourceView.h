@@ -63,6 +63,10 @@ private:
 			class MarkerView;
 			class TextView;
 
+			// for gcc2
+			friend class TextView;
+			friend class MarkerView;
+
 			struct FontInfo {
 				BFont		font;
 				font_height	fontHeight;
