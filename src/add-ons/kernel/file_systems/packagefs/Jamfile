@@ -91,7 +91,20 @@ HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES =
 	ZlibDecompressor.cpp
 ;
 
-Includes [ FGristFiles $(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES) ]
+HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES_V1 =
+	HPKGDefsV1.cpp
+	PackageContentHandlerV1.cpp
+	PackageDataV1.cpp
+	PackageDataReaderV1.cpp
+	PackageEntryV1.cpp
+	PackageEntryAttributeV1.cpp
+	PackageReaderImplV1.cpp
+	ReaderImplBaseV1.cpp
+;
+
+Includes
+	[ FGristFiles $(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES)
+		$(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES_V1) ]
 	: [ BuildFeatureAttribute zlib : headers ] ;
 
 local libSharedSources =
@@ -104,6 +117,7 @@ KernelAddon packagefs
 	$(HAIKU_PACKAGE_FS_SOURCES)
 	$(HAIKU_PACKAGE_FS_SHARED_SOURCES)
 	$(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES)
+	$(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES_V1)
 	$(libSharedSources)
 
 	: $(HAIKU_STATIC_LIBSUPC++) kernel_libz.a
@@ -114,5 +128,7 @@ SEARCH on [ FGristFiles $(HAIKU_PACKAGE_FS_SHARED_SOURCES) ]
 	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
 SEARCH on [ FGristFiles $(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES) ]
 	+= [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
+SEARCH on [ FGristFiles $(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES_V1) ]
+	+= [ FDirName $(HAIKU_TOP) src kits package hpkg v1 ] ;
 SEARCH on [ FGristFiles $(libSharedSources) ]
 	+= [ FDirName $(HAIKU_TOP) src kits shared ] ;

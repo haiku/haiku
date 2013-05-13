@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,7 +8,9 @@
 
 #include <new>
 
-#include <package/hpkg/HPKGDefsPrivate.h>
+#include <package/hpkg/HPKGDefs.h>
+
+#include "PackageData.h"
 
 
 static const uint32 kMaxCachedBuffers = 32;
@@ -18,9 +20,13 @@ static const uint32 kMaxCachedBuffers = 32;
 
 GlobalFactory::GlobalFactory()
 	:
-	fBufferCache(B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB, kMaxCachedBuffers),
-	fPackageDataReaderFactory(&fBufferCache)
+	fBufferCache(BPackageKit::BHPKG::B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB,
+		kMaxCachedBuffers),
+	fPackageDataReaderFactoryV1(&fBufferCache),
+	fPackageDataReaderFactoryV2(&fBufferCache)
 {
+	STATIC_ASSERT((int)BPackageKit::BHPKG::B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB
+		== (int)BPackageKit::BHPKG::V1::B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB);
 }
 
 
@@ -67,10 +73,20 @@ GlobalFactory::Default()
 
 status_t
 GlobalFactory::CreatePackageDataReader(BDataReader* dataReader,
-	const BPackageData& data, BAbstractBufferedDataReader*& _reader)
+	const PackageData& data, BAbstractBufferedDataReader*& _reader)
 {
-	return fPackageDataReaderFactory.CreatePackageDataReader(dataReader, data,
-		_reader);
+	switch (data.Version()) {
+		case 1:
+			return fPackageDataReaderFactoryV1.CreatePackageDataReader(
+				dataReader, data.DataV1(), _reader);
+
+		case 2:
+			return fPackageDataReaderFactoryV2.CreatePackageDataReader(
+				dataReader, data.DataV2(), _reader);
+
+		default:
+			return B_NOT_SUPPORTED;
+	}
 }
 
 

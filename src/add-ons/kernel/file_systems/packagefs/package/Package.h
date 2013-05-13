@@ -91,6 +91,7 @@ public:
 private:
 			struct LoaderErrorOutput;
 			struct LoaderContentHandler;
+			struct LoaderContentHandlerV1;
 
 private:
 			mutex				fLock;

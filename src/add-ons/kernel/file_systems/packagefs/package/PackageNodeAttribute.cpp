@@ -11,7 +11,7 @@
 
 
 PackageNodeAttribute::PackageNodeAttribute(uint32 type,
-	const BPackageData& data)
+	const PackageData& data)
 	:
 	fData(data),
 	fName(),

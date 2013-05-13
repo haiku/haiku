@@ -8,12 +8,10 @@
 
 #include <util/DoublyLinkedList.h>
 
-#include <package/hpkg/PackageData.h>
+#include "PackageData.h"
 
 #include "String.h"
 
-
-using BPackageKit::BHPKG::BPackageData;
 
 class PackageNode;
 
@@ -22,12 +20,12 @@ class PackageNodeAttribute
 	: public DoublyLinkedListLinkImpl<PackageNodeAttribute> {
 public:
 								PackageNodeAttribute(uint32 type,
-									const BPackageData& data);
+									const PackageData& data);
 								~PackageNodeAttribute();
 
 			const String&		Name() const	{ return fName; }
 			uint32				Type() const	{ return fType; }
-			const BPackageData&	Data() const	{ return fData; }
+			const PackageData&	Data() const	{ return fData; }
 
 			void				Init(const String& name);
 
@@ -37,7 +35,7 @@ public:
 									{ return fIndexCookie; }
 
 protected:
-			BPackageData		fData;
+			PackageData			fData;
 			String				fName;
 			void*				fIndexCookie;
 			uint32				fType;

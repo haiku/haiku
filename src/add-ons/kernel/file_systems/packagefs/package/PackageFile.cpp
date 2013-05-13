@@ -48,7 +48,7 @@ private:
 
 
 struct PackageFile::DataAccessor {
-	DataAccessor(BPackageData* data)
+	DataAccessor(PackageData* data)
 		:
 		fData(data),
 		fDataReader(NULL),
@@ -128,7 +128,7 @@ struct PackageFile::DataAccessor {
 
 private:
 	mutex							fLock;
-	BPackageData*					fData;
+	PackageData*					fData;
 	BDataReader*					fDataReader;
 	BAbstractBufferedDataReader*	fReader;
 	void*							fFileCache;
@@ -138,7 +138,7 @@ private:
 // #pragma mark - PackageFile
 
 
-PackageFile::PackageFile(Package* package, mode_t mode, const BPackageData& data)
+PackageFile::PackageFile(Package* package, mode_t mode, const PackageData& data)
 	:
 	PackageLeafNode(package, mode),
 	fData(data),

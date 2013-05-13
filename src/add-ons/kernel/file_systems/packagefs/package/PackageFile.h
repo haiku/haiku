@@ -6,18 +6,14 @@
 #define PACKAGE_FILE_H
 
 
-#include <package/hpkg/PackageData.h>
-
+#include "PackageData.h"
 #include "PackageLeafNode.h"
-
-
-using BPackageKit::BHPKG::BPackageData;
 
 
 class PackageFile : public PackageLeafNode {
 public:
 								PackageFile(Package* package, mode_t mode,
-									const BPackageData& data);
+									const PackageData& data);
 	virtual						~PackageFile();
 
 	virtual	status_t			VFSInit(dev_t deviceID, ino_t nodeID);
@@ -34,7 +30,7 @@ private:
 			struct DataAccessor;
 
 private:
-			BPackageData		fData;
+			PackageData			fData;
 			DataAccessor*		fDataAccessor;
 };
 

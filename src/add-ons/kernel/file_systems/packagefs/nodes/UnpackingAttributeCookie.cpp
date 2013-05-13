@@ -28,7 +28,7 @@ using BPackageKit::BHPKG::BFDDataReader;
 
 
 static status_t
-read_package_data(const BPackageData& data, BDataReader* dataReader,
+read_package_data(const PackageData& data, BDataReader* dataReader,
 	off_t offset, void* buffer, size_t* bufferSize)
 {
 	// create a PackageDataReader
@@ -128,7 +128,7 @@ UnpackingAttributeCookie::ReadAttribute(PackageNode* packageNode,
 	PackageNodeAttribute* attribute, off_t offset, void* buffer,
 	size_t* bufferSize)
 {
-	const BPackageData& data = attribute->Data();
+	const PackageData& data = attribute->Data();
 	if (data.IsEncodedInline()) {
 		// inline data
 		BBufferDataReader dataReader(data.InlineData(), data.CompressedSize());
