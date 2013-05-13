@@ -11,9 +11,6 @@
 #include <io_requests.h>
 
 
-class BPackageData;
-
-
 class PackageLeafNode : public PackageNode {
 public:
 								PackageLeafNode(Package* package, mode_t mode);
