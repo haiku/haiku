@@ -639,30 +639,6 @@ BPackageInfo::Parser::_ParseResolvableList(
 					token.pos);
 			}
 
-			BPackageResolvableType type = B_PACKAGE_RESOLVABLE_TYPE_DEFAULT;
-			int32 colonPos = token.text.FindFirst(':');
-			if (colonPos >= 0) {
-				BString typeName(token.text, colonPos);
-				for (int i = 0; i < B_PACKAGE_RESOLVABLE_TYPE_ENUM_COUNT; ++i) {
-					if (typeName.ICompare(BPackageResolvable::kTypeNames[i])
-							== 0) {
-						type = (BPackageResolvableType)i;
-						break;
-					}
-				}
-				if (type == B_PACKAGE_RESOLVABLE_TYPE_DEFAULT) {
-					BString error("resolvable type (<type>:) must be one of [");
-					for (int i = 1; i < B_PACKAGE_RESOLVABLE_TYPE_ENUM_COUNT;
-							++i) {
-						if (i > 1)
-							error << ",";
-						error << BPackageResolvable::kTypeNames[i];
-					}
-					error << "]";
-					throw ParseError(error, token.pos);
-				}
-			}
-
 			int32 errorPos;
 			if (!_IsValidResolvableName(token.text, &errorPos)) {
 				throw ParseError("invalid character in resolvable name",
@@ -694,7 +670,7 @@ BPackageInfo::Parser::_ParseResolvableList(
 			} else
 				parser._RewindTo(compatible);
 
-			value->AddItem(new BPackageResolvable(token.text, type, version,
+			value->AddItem(new BPackageResolvable(token.text, version,
 				compatibleVersion));
 		}
 	} resolvableParser(*this, value);
@@ -2097,8 +2073,6 @@ BPackageInfo::_AddResolvables(BMessage* archive, const char* field,
 		const BPackageResolvable* resolvable = resolvables.ItemAt(i);
 		status_t error;
 		if ((error = archive->AddString(nameField, resolvable->Name())) != B_OK
-			|| (error = archive->AddInt32(typeField, resolvable->Type()))
-				!= B_OK
 			|| (error = _AddVersion(archive, versionField,
 				resolvable->Version())) != B_OK
 			|| (error = _AddVersion(archive, compatibleVersionField,
@@ -2239,13 +2213,6 @@ BPackageInfo::_ExtractResolvables(BMessage* archive, const char* field,
 		if (error != B_OK)
 			return error;
 
-		int32 type;
-		error = archive->FindInt32(typeField, i, &type);
-		if (error != B_OK)
-			return error;
-		if (type < 0 || type > B_PACKAGE_RESOLVABLE_TYPE_ENUM_COUNT)
-			return B_BAD_DATA;
-
 		BPackageVersion version;
 		error = _ExtractVersion(archive, versionField, i, version);
 		if (error != B_OK)
@@ -2258,7 +2225,7 @@ BPackageInfo::_ExtractResolvables(BMessage* archive, const char* field,
 			return error;
 
 		BPackageResolvable* resolvable = new(std::nothrow) BPackageResolvable(
-			name, (BPackageResolvableType)type, version, compatibleVersion);
+			name, version, compatibleVersion);
 		if (resolvable == NULL || !_resolvables.AddItem(resolvable)) {
 			delete resolvable;
 			return B_NO_MEMORY;

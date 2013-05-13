@@ -48,7 +48,6 @@ static const char* kAttributeNames[B_HPKG_ATTRIBUTE_ID_ENUM_COUNT + 1] = {
 	"package:copyright",
 	"package:license",
 	"package:provides",
-	"package:provides.type",
 	"package:requires",
 	"package:supplements",
 	"package:conflicts",

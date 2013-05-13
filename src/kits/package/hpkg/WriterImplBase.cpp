@@ -472,12 +472,6 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 		provides->string = fPackageStringCache.Get(resolvable->Name().String());
 		attributeList.Add(provides);
 
-		PackageAttribute* providesType = new PackageAttribute(
-			B_HPKG_ATTRIBUTE_ID_PACKAGE_PROVIDES_TYPE,
-			B_HPKG_ATTRIBUTE_TYPE_UINT, B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
-		providesType->unsignedInt = resolvable->Type();
-		provides->children.Add(providesType);
-
 		if (hasVersion)
 			RegisterPackageVersion(provides->children, resolvable->Version());
 

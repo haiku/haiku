@@ -8,7 +8,6 @@
 
 #include <String.h>
 
-#include <package/PackageResolvableType.h>
 #include <package/PackageVersion.h>
 
 
@@ -49,8 +48,6 @@ public:
 								BPackageResolvable(
 									const BPackageResolvableData& data);
 								BPackageResolvable(const BString& name,
-									BPackageResolvableType type
-										= B_PACKAGE_RESOLVABLE_TYPE_DEFAULT,
 									const BPackageVersion& version
 										= BPackageVersion(),
 									const BPackageVersion& compatibleVersion
@@ -59,27 +56,20 @@ public:
 			status_t			InitCheck() const;
 
 			const BString&		Name() const;
-			BPackageResolvableType	Type() const;
 			const BPackageVersion& Version() const;
 			const BPackageVersion& CompatibleVersion() const;
 
 			BString				ToString() const;
 
 			void				SetTo(const BString& name,
-									BPackageResolvableType type
-										= B_PACKAGE_RESOLVABLE_TYPE_DEFAULT,
 									const BPackageVersion& version
 										= BPackageVersion(),
 									const BPackageVersion& compatibleVersion
 										= BPackageVersion());
 			void				Clear();
 
-public:
-	static	const char*			kTypeNames[];
-
 private:
 			BString				fName;
-			BPackageResolvableType	fType;
 			BPackageVersion		fVersion;
 			BPackageVersion		fCompatibleVersion;
 };

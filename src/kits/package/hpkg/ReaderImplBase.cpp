@@ -185,11 +185,6 @@ ReaderImplBase::PackageResolvableAttributeHandler::HandleAttribute(
 	AttributeHandler** _handler)
 {
 	switch (id) {
-		case B_HPKG_ATTRIBUTE_ID_PACKAGE_PROVIDES_TYPE:
-			fPackageInfoValue.resolvable.type
-				= (BPackageResolvableType)value.unsignedInt;
-			break;
-
 		case B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MAJOR:
 			fPackageInfoValue.resolvable.haveVersion = true;
 			fPackageInfoValue.resolvable.version.major = value.string;

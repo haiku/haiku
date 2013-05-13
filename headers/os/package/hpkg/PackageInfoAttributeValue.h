@@ -13,7 +13,6 @@
 #include <package/PackageArchitecture.h>
 #include <package/PackageInfoAttributes.h>
 #include <package/PackageResolvableOperator.h>
-#include <package/PackageResolvableType.h>
 
 
 namespace BPackageKit {
@@ -31,7 +30,6 @@ struct BPackageVersionData {
 
 
 struct BPackageResolvableData {
-			BPackageResolvableType	type;
 			const char*			name;
 			bool				haveVersion;
 			bool				haveCompatibleVersion;
