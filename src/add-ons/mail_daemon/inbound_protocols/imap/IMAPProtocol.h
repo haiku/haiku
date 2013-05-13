@@ -52,6 +52,7 @@ protected:
 private:
 			IMAPFolder*			_CreateFolder(const BString& mailbox,
 									const BString& separator);
+			status_t			_EnqueueCheckMailboxes();
 
 protected:
 			Settings			fSettings;

@@ -111,11 +111,7 @@ IMAPProtocol::CheckSubscribedFolders(IMAP::Protocol& protocol, bool idle)
 	}
 
 	// Start waiting workers
-	for (int32 i = 0; i < fWorkers.CountItems(); i++) {
-		fWorkers.ItemAt(i)->EnqueueCheckMailboxes();
-	}
-
-	return B_OK;
+	return _EnqueueCheckMailboxes();
 }
 
 
@@ -154,7 +150,7 @@ IMAPProtocol::SyncMessages()
 		return worker->Run();
 	}
 
-	return B_OK;
+	return _EnqueueCheckMailboxes();
 }
 
 
@@ -241,6 +237,17 @@ IMAPProtocol::_CreateFolder(const BString& mailbox, const BString& separator)
 	}
 
 	return new IMAPFolder(*this, mailbox, ref);
+}
+
+
+status_t
+IMAPProtocol::_EnqueueCheckMailboxes()
+{
+	for (int32 i = 0; i < fWorkers.CountItems(); i++) {
+		fWorkers.ItemAt(i)->EnqueueCheckMailboxes();
+	}
+
+	return B_OK;
 }
 
 
