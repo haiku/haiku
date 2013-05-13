@@ -10,6 +10,7 @@ rule ExtractCatalogEntries target : sources : signature : regexp
 	local sysHeaders ;
 	local cc ;
 	local defines ;
+	local includesSeparator ;
 	local localIncludesOption ;
 	local systemIncludesOption ;
 
@@ -22,20 +23,20 @@ rule ExtractCatalogEntries target : sources : signature : regexp
 		if $(PLATFORM) = host {
 			sysHeaders += $(HOST_HDRS) ;
 			defines += $(HOST_DEFINES) ;
-
+			cc = $(HOST_CC) ;			
 			if $(USES_BE_API) {
 				sysHeaders += $(HOST_BE_API_HEADERS) ;
 			}
-
-			defines += $(HOST_DEFINES) ;
-			cc = $(HOST_CC) ;
+			
+			includesSeparator = $(HOST_INCLUDES_SEPARATOR) ;
 			localIncludesOption = $(HOST_LOCAL_INCLUDES_OPTION) ;
 			systemIncludesOption = $(HOST_SYSTEM_INCLUDES_OPTION) ;
 		} else {
 			sysHeaders += $(TARGET_HDRS) ;
 			defines += $(TARGET_DEFINES) ;
-			defines += $(TARGET_DEFINES) ;
 			cc = $(TARGET_CC) ;
+			
+			includesSeparator = $(TARGET_INCLUDES_SEPARATOR) ;
 			localIncludesOption = $(TARGET_LOCAL_INCLUDES_OPTION) ;
 			systemIncludesOption = $(TARGET_SYSTEM_INCLUDES_OPTION) ;
 		}
