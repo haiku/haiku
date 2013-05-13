@@ -6,6 +6,8 @@
 
 #include <package/hpkg/DataReader.h>
 
+#include <package/hpkg/DataOutput.h>
+
 #include <string.h>
 
 
@@ -19,6 +21,22 @@ namespace BHPKG {
 
 BDataReader::~BDataReader()
 {
+}
+
+
+// #pragma mark - BAbstractBufferedDataReader
+
+
+BAbstractBufferedDataReader::~BAbstractBufferedDataReader()
+{
+}
+
+
+status_t
+BAbstractBufferedDataReader::ReadData(off_t offset, void* buffer, size_t size)
+{
+	BBufferDataOutput output(buffer, size);
+	return ReadDataToOutput(offset, size, &output);
 }
 
 

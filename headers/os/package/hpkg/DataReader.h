@@ -14,12 +14,26 @@ namespace BPackageKit {
 namespace BHPKG {
 
 
+class BDataOutput;
+
+
 class BDataReader {
 public:
 	virtual						~BDataReader();
 
 	virtual	status_t			ReadData(off_t offset, void* buffer,
 									size_t size) = 0;
+};
+
+
+class BAbstractBufferedDataReader : public BDataReader {
+public:
+	virtual						~BAbstractBufferedDataReader();
+
+	virtual	status_t			ReadData(off_t offset, void* buffer,
+									size_t size);
+	virtual	status_t			ReadDataToOutput(off_t offset, size_t size,
+									BDataOutput* output) = 0;
 };
 
 
