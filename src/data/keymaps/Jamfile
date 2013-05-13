@@ -25,6 +25,36 @@ actions MkKeymapComp1
 	$(2[1]) -o "$(1)" -c "$(2[2-])" ;
 }
 
+
+rule AddKeymapAlias alias : keymap
+{
+	alias = $(alias:G=keymap) ;
+	HAIKU_KEYMAP_FILE on $(alias) = $(keymap:G=keymap) ;
+	HAIKU_KEYMAP_ALIASES += $(alias) ;
+}
+
+
+rule GenerateKeymapLocalizationHeader keymaps
+{
+	local keymapNames = $(HAIKU_KEYMAP_FILES:BSM) $(HAIKU_KEYMAP_ALIASES:BSM) ;
+	local header = <keymap-locale>KeymapNames.h ;
+	MakeLocateCommonPlatform $(header) ;
+	Always $(header) ;
+	HAIKU_KEYMAP_NAMES on $(header) = $(keymapNames) ;
+	GenerateKeymapLocalizationHeader1 $(header) ;
+	LocalClean clean : $(header) ;
+}
+
+
+actions GenerateKeymapLocalizationHeader1
+{
+	$(RM) $(1)
+	for name in "$(HAIKU_KEYMAP_NAMES)" ; do
+		echo "B_TRANSLATE_MARK_VOID(\"$name\")" >> $(1)
+	done
+}
+
+
 local keymapFiles = [ GLOB $(SUBDIR) : *.keymap ] ;
 
 # generate the binary file for the keymap files
@@ -32,5 +62,11 @@ local keymapFile ;
 for keymapFile in [ FGristFiles $(keymapFiles:D=) ] {
 	local binary = $(keymapFile:BG=keymap) ;
 	MkKeymapComp $(binary) : $(keymapFile) ;
+	HAIKU_KEYMAP_FILES += $(binary) ;
 }
 
+AddKeymapAlias Finnish : Swedish ;
+AddKeymapAlias Croatian : Slovene ;
+AddKeymapAlias Brazilian : US-International ;
+
+GenerateKeymapLocalizationHeader ;

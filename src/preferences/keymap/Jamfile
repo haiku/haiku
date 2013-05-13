@@ -1,8 +1,12 @@
 SubDir HAIKU_TOP src preferences keymap ;
 
+UseHeaders [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) data keymaps ] ;
+
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders interface shared ;
+
+Includes [ FGristFiles KeymapWindow.cpp ] : <keymap-locale>KeymapNames.h ;
 
 Preference Keymap :
 	KeyboardLayout.cpp

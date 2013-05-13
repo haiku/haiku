@@ -183,13 +183,13 @@ AddFilesToPackage data Canna dic canna	: $(cannaDicCanna) ;
 	# TODO: If those serve any purpose, they should probably live in a writable
 	# subtree.
 
-local keymapFiles = [ Glob [ FDirName $(HAIKU_TOP) src data keymaps ]
-	: *.keymap ] ;
-keymapFiles = $(keymapFiles:BG=keymap) ;
-AddFilesToPackage data Keymaps : $(keymapFiles) ;
-AddSymlinkToPackage data Keymaps : Swedish : Finnish ;
-AddSymlinkToPackage data Keymaps : Slovene : Croatian ;
-AddSymlinkToPackage data Keymaps : US-International : Brazilian ;
+# keymaps
+AddFilesToPackage data Keymaps : $(HAIKU_KEYMAP_FILES) ;
+local keymapAlias ;
+for keymapAlias in $(HAIKU_KEYMAP_ALIASES) {
+	local aliasedTo = [ on $(keymapAlias) return $(HAIKU_KEYMAP_FILE) ] ;
+	AddSymlinkToPackage data Keymaps : $(aliasedTo:BSM) : $(keymapAlias:BSM) ;
+}
 
 # Copy keyboard layout files to the image one-by-one.
 local keyboardLayoutsDir

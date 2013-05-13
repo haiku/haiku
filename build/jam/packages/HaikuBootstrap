@@ -148,13 +148,13 @@ local ttFonts = [ Glob $(fontDir)/ttfonts : *.ttf ] ;
 AddFilesToPackage data fonts psfonts : $(psFonts) ;
 AddFilesToPackage data fonts ttfonts : $(ttFonts) ;
 
-local keymapFiles = [ Glob [ FDirName $(HAIKU_TOP) src data keymaps ]
-	: *.keymap ] ;
-keymapFiles = $(keymapFiles:BG=keymap) ;
-AddFilesToPackage data Keymaps : $(keymapFiles) ;
-AddSymlinkToPackage data Keymaps : Swedish : Finnish ;
-AddSymlinkToPackage data Keymaps : Slovene : Croatian ;
-AddSymlinkToPackage data Keymaps : US-International : Brazilian ;
+# keymaps
+AddFilesToPackage data Keymaps : $(HAIKU_KEYMAP_FILES) ;
+local keymapAlias ;
+for keymapAlias in $(HAIKU_KEYMAP_ALIASES) {
+	local aliasedTo = [ on $(keymapAlias) return $(HAIKU_KEYMAP_FILE) ] ;
+	AddSymlinkToPackage data Keymaps : $(aliasedTo:BSM) : $(keymapAlias:BSM) ;
+}
 
 # Copy keyboard layout files to the image one-by-one.
 local keyboardLayoutsDir

@@ -38,6 +38,7 @@
 #include "KeyboardLayoutView.h"
 #include "KeymapApplication.h"
 #include "KeymapListItem.h"
+#include "KeymapNames.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -897,7 +898,8 @@ KeymapWindow::_FillSystemMaps()
 
 	if (directory.SetTo(path.Path()) == B_OK) {
 		while (directory.GetNextRef(&ref) == B_OK) {
-			fSystemListView->AddItem(new KeymapListItem(ref));
+			fSystemListView->AddItem(
+				new KeymapListItem(ref, B_TRANSLATE_NOCOLLECT(ref.name)));
 		}
 	}
 
