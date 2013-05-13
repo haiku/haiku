@@ -86,6 +86,7 @@ private:
 IMAPFolder::IMAPFolder(IMAPProtocol& protocol, const BString& mailboxName,
 	const entry_ref& ref)
 	:
+	BHandler(mailboxName.String()),
 	fProtocol(protocol),
 	fRef(ref),
 	fMailboxName(mailboxName),
