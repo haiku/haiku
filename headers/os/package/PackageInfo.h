@@ -64,6 +64,7 @@ public:
 			const BString&		Description() const;
 			const BString&		Vendor() const;
 			const BString&		Packager() const;
+			const BString&		BasePackage() const;
 			const BString&		Checksum() const;
 			const BString&		InstallPath() const;
 
@@ -96,6 +97,7 @@ public:
 			void				SetDescription(const BString& description);
 			void				SetVendor(const BString& vendor);
 			void				SetPackager(const BString& packager);
+			void				SetBasePackage(const BString& basePackage);
 			void				SetChecksum(const BString& checksum);
 			void				SetInstallPath(const BString& installPath);
 
@@ -205,6 +207,7 @@ private:
 			BString				fDescription;
 			BString				fVendor;
 			BString				fPackager;
+			BString				fBasePackage;
 
 			uint32				fFlags;
 

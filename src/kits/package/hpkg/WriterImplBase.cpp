@@ -399,6 +399,17 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 	packager->string = fPackageStringCache.Get(packageInfo.Packager().String());
 	attributeList.Add(packager);
 
+	// base package
+	if (!packageInfo.BasePackage().IsEmpty()) {
+		PackageAttribute* basePackage = new PackageAttribute(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_BASE_PACKAGE,
+			B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+		basePackage->string
+			= fPackageStringCache.Get(packageInfo.BasePackage());
+		attributeList.Add(basePackage);
+	}
+
 	// flags
 	PackageAttribute* flags = new PackageAttribute(
 		B_HPKG_ATTRIBUTE_ID_PACKAGE_FLAGS, B_HPKG_ATTRIBUTE_TYPE_UINT,

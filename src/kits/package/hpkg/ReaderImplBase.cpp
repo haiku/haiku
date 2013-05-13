@@ -335,6 +335,10 @@ ReaderImplBase::PackageAttributeHandler::HandleAttribute(
 			fPackageInfoValue.SetTo(B_PACKAGE_INFO_PACKAGER, value.string);
 			break;
 
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_BASE_PACKAGE:
+			fPackageInfoValue.SetTo(B_PACKAGE_INFO_BASE_PACKAGE, value.string);
+			break;
+
 		case B_HPKG_ATTRIBUTE_ID_PACKAGE_FLAGS:
 			fPackageInfoValue.SetTo(B_PACKAGE_INFO_FLAGS,
 				(uint32)value.unsignedInt);

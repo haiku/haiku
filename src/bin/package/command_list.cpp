@@ -159,6 +159,10 @@ struct PackageContentListHandler : VersionPolicy::PackageContentHandler {
 				printf("\tpackager: %s\n", value.string);
 				break;
 
+			case B_PACKAGE_INFO_BASE_PACKAGE:
+				printf("\tbase package: %s\n", value.string);
+				break;
+
 			case B_PACKAGE_INFO_FLAGS:
 				if (value.unsignedInt == 0)
 					break;

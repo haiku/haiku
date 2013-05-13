@@ -40,6 +40,7 @@ enum BPackageInfoAttributeID {
 	B_PACKAGE_INFO_CHECKSUM,	// sha256-checksum
 	B_PACKAGE_INFO_INSTALL_PATH, // package install path; only for package
 								// building
+	B_PACKAGE_INFO_BASE_PACKAGE, // name of the base package for this package
 	//
 	B_PACKAGE_INFO_ENUM_COUNT,
 };

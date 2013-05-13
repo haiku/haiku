@@ -106,7 +106,8 @@ private:
 									BObjectList<BPackageResolvable>* value);
 			void				_ParseResolvableExprList(
 									BObjectList<BPackageResolvableExpression>*
-										value);
+										value,
+									BString* _basePackage = NULL);
 
 			void				_Parse(BPackageInfo* packageInfo);
 
@@ -681,17 +682,20 @@ BPackageInfo::Parser::_ParseResolvableList(
 
 void
 BPackageInfo::Parser::_ParseResolvableExprList(
-	BObjectList<BPackageResolvableExpression>* value)
+	BObjectList<BPackageResolvableExpression>* value, BString* _basePackage)
 {
 	struct ResolvableExpressionParser : public ListElementParser {
 		Parser& parser;
 		BObjectList<BPackageResolvableExpression>* value;
+		BString* basePackage;
 
-		ResolvableExpressionParser(Parser& parser_,
-			BObjectList<BPackageResolvableExpression>* value_)
+		ResolvableExpressionParser(Parser& parser,
+			BObjectList<BPackageResolvableExpression>* value,
+			BString* basePackage)
 			:
-			parser(parser_),
-			value(value_)
+			parser(parser),
+			value(value),
+			basePackage(basePackage)
 		{
 		}
 
@@ -709,17 +713,31 @@ BPackageInfo::Parser::_ParseResolvableExprList(
 			}
 
 			BPackageVersion version;
-				Token op = parser._NextToken();
+			Token op = parser._NextToken();
 			if (op.type == TOKEN_OPERATOR_LESS
 				|| op.type == TOKEN_OPERATOR_LESS_EQUAL
 				|| op.type == TOKEN_OPERATOR_EQUAL
 				|| op.type == TOKEN_OPERATOR_NOT_EQUAL
 				|| op.type == TOKEN_OPERATOR_GREATER_EQUAL
 				|| op.type == TOKEN_OPERATOR_GREATER) {
-					parser._ParseVersionValue(&version, true);
+				parser._ParseVersionValue(&version, true);
+
+				if (basePackage != NULL) {
+					Token base = parser._NextToken();
+					if (base.type == TOKEN_WORD && base.text == "base") {
+						if (!basePackage->IsEmpty()) {
+						throw ParseError(
+							"multiple packages marked as base package",
+							token.pos);
+						}
+
+						*basePackage = token.text;
+					} else
+						parser._RewindTo(base);
+				}
 			} else if (op.type == TOKEN_ITEM_SEPARATOR
 				|| op.type == TOKEN_CLOSE_BRACE) {
-					parser._RewindTo(op);
+				parser._RewindTo(op);
 			} else {
 				throw ParseError(
 					"expected '<', '<=', '==', '!=', '>=', '>', comma or '}'",
@@ -730,9 +748,9 @@ BPackageInfo::Parser::_ParseResolvableExprList(
 				= (BPackageResolvableOperator)(op.type - TOKEN_OPERATOR_LESS);
 
 			value->AddItem(new BPackageResolvableExpression(token.text,
-			resolvableOperator, version));
-	}
-	} resolvableExpressionParser(*this, value);
+				resolvableOperator, version));
+		}
+	} resolvableExpressionParser(*this, value, _basePackage);
 
 	_ParseList(resolvableExpressionParser, false);
 }
@@ -811,6 +829,10 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 				_ParseStringValue(&packageInfo->fPackager);
 				break;
 
+			case B_PACKAGE_INFO_BASE_PACKAGE:
+				_ParseStringValue(&packageInfo->fBasePackage);
+				break;
+
 			case B_PACKAGE_INFO_ARCHITECTURE:
 				_ParseArchitectureValue(&packageInfo->fArchitecture);
 				break;
@@ -840,7 +862,9 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 				break;
 
 			case B_PACKAGE_INFO_REQUIRES:
-				_ParseResolvableExprList(&packageInfo->fRequiresList);
+				packageInfo->fBasePackage.Truncate(0);
+				_ParseResolvableExprList(&packageInfo->fRequiresList,
+					&packageInfo->fBasePackage);
 				break;
 
 			case B_PACKAGE_INFO_SUPPLEMENTS:
@@ -981,7 +1005,8 @@ struct BPackageInfo::StringBuilder {
 	StringBuilder()
 		:
 		fData(),
-		fError(B_OK)
+		fError(B_OK),
+		fBasePackage()
 	{
 	}
 
@@ -1034,6 +1059,18 @@ struct BPackageInfo::StringBuilder {
 		return *this;
 	}
 
+	StringBuilder& BeginRequires(const BString& basePackage)
+	{
+		fBasePackage = basePackage;
+		return *this;
+	}
+
+	StringBuilder& EndRequires()
+	{
+		fBasePackage.Truncate(0);
+		return *this;
+	}
+
 private:
 	void _WriteValue(const char* value)
 	{
@@ -1075,9 +1112,17 @@ private:
 	template<typename Value>
 	void _WriteValue(const BObjectList<Value>& value)
 	{
+		// Note: The fBasePackage solution is disgusting, but any attempt of
+		// encapsulating the stringification via templates seems to result in
+		// an Internal Compiler Error with gcc 2.
+
 		int32 count = value.CountItems();
 		if (count == 1) {
 			_Write(value.ItemAt(0)->ToString());
+			if (!fBasePackage.IsEmpty()
+				&& value.ItemAt(0)->Name() == fBasePackage) {
+				_Write(" base");
+			}
 		} else {
 			_Write("{\n", 2);
 
@@ -1085,6 +1130,10 @@ private:
 			for (int32 i = 0; i < count; i++) {
 				_Write('\t');
 				_Write(value.ItemAt(i)->ToString());
+				if (!fBasePackage.IsEmpty()
+					&& value.ItemAt(i)->Name() == fBasePackage) {
+					_Write(" base");
+				}
 				_Write('\n');
 			}
 
@@ -1196,6 +1245,7 @@ private:
 private:
 	BMallocIO	fData;
 	status_t	fError;
+	BString		fBasePackage;
 };
 
 
@@ -1324,6 +1374,7 @@ BPackageInfo::BPackageInfo(BMessage* archive, status_t* _error)
 		&& (error = archive->FindString("description", &fDescription)) == B_OK
 		&& (error = archive->FindString("vendor", &fVendor)) == B_OK
 		&& (error = archive->FindString("packager", &fPackager)) == B_OK
+		&& (error = archive->FindString("basePackage", &fBasePackage)) == B_OK
 		&& (error = archive->FindUInt32("flags", &fFlags)) == B_OK
 		&& (error = archive->FindInt32("architecture", &architecture)) == B_OK
 		&& (error = _ExtractVersion(archive, "version", 0, fVersion)) == B_OK
@@ -1484,6 +1535,13 @@ BPackageInfo::Packager() const
 
 
 const BString&
+BPackageInfo::BasePackage() const
+{
+	return fBasePackage;
+}
+
+
+const BString&
 BPackageInfo::Checksum() const
 {
 	return fChecksum;
@@ -1632,6 +1690,13 @@ void
 BPackageInfo::SetPackager(const BString& packager)
 {
 	fPackager = packager;
+}
+
+
+void
+BPackageInfo::SetBasePackage(const BString& basePackage)
+{
+	fBasePackage = basePackage;
 }
 
 
@@ -1843,6 +1908,7 @@ BPackageInfo::Clear()
 	fDescription.Truncate(0);
 	fVendor.Truncate(0);
 	fPackager.Truncate(0);
+	fBasePackage.Truncate(0);
 	fChecksum.Truncate(0);
 	fInstallPath.Truncate(0);
 	fFlags = 0;
@@ -1873,6 +1939,7 @@ BPackageInfo::Archive(BMessage* archive, bool deep) const
 		|| (error = archive->AddString("description", fDescription)) != B_OK
 		|| (error = archive->AddString("vendor", fVendor)) != B_OK
 		|| (error = archive->AddString("packager", fPackager)) != B_OK
+		|| (error = archive->AddString("basePackage", fBasePackage)) != B_OK
 		|| (error = archive->AddUInt32("flags", fFlags)) != B_OK
 		|| (error = archive->AddInt32("architecture", fArchitecture)) != B_OK
 		|| (error = _AddVersion(archive, "version", fVersion)) != B_OK
@@ -1926,7 +1993,9 @@ BPackageInfo::GetConfigString(BString& _string) const
 		.Write("urls", fURLList)
 		.Write("source-urls", fSourceURLList)
 		.Write("provides", fProvidesList)
-		.Write("requires", fRequiresList)
+		.BeginRequires(fBasePackage)
+			.Write("requires", fRequiresList)
+		.EndRequires()
 		.Write("supplements", fSupplementsList)
 		.Write("conflicts", fConflictsList)
 		.Write("freshens", fFreshensList)
