@@ -10,13 +10,16 @@
 #define KEYMAP_LIST_ITEM_H
 
 
+/*
+ * A BStringItem modified so that it holds the BEntry object of the
+ * corresponding keymap.
+ */
+
+
 #include <ListItem.h>
 #include <Entry.h>
 
 
-/*!	A BStringItem modified such that it holds
-	the BEntry object it corresponds with
-*/
 class KeymapListItem : public BStringItem {
 public:
 								KeymapListItem(entry_ref& keymap,
