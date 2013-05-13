@@ -31,13 +31,13 @@ static status_t
 read_package_data(const BPackageData& data, BDataReader* dataReader,
 	off_t offset, void* buffer, size_t* bufferSize)
 {
-	// create a BPackageDataReader
-	BPackageDataReader* reader;
+	// create a PackageDataReader
+	BAbstractBufferedDataReader* reader;
 	status_t error = GlobalFactory::Default()->CreatePackageDataReader(
 		dataReader, data, reader);
 	if (error != B_OK)
 		RETURN_ERROR(error);
-	ObjectDeleter<BPackageDataReader> readerDeleter(reader);
+	ObjectDeleter<BAbstractBufferedDataReader> readerDeleter(reader);
 
 	// check the offset
 	if (offset < 0 || (uint64)offset > data.UncompressedSize())

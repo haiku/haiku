@@ -15,25 +15,7 @@ namespace BHPKG {
 
 
 class BBufferCache;
-class BDataOutput;
 class BPackageData;
-
-
-class BPackageDataReader : public BDataReader {
-public:
-								BPackageDataReader(BDataReader* dataReader);
-	virtual						~BPackageDataReader();
-
-	virtual	status_t			Init(const BPackageData& data) = 0;
-
-	virtual	status_t			ReadData(off_t offset, void* buffer,
-									size_t size);
-	virtual	status_t			ReadDataToOutput(off_t offset, size_t size,
-									BDataOutput* output) = 0;
-
-protected:
-			BDataReader*			fDataReader;
-};
 
 
 class BPackageDataReaderFactory {
@@ -43,7 +25,7 @@ public:
 
 			status_t			CreatePackageDataReader(BDataReader* dataReader,
 									const BPackageData& data,
-									BPackageDataReader*& _reader);
+									BAbstractBufferedDataReader*& _reader);
 
 private:
 			BBufferCache*		fBufferCache;

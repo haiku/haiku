@@ -14,7 +14,7 @@
 
 using BPackageKit::BHPKG::BDataReader;
 using BPackageKit::BHPKG::BPackageData;
-using BPackageKit::BHPKG::BPackageDataReader;
+using BPackageKit::BHPKG::BAbstractBufferedDataReader;
 using BPackageKit::BHPKG::BPackageDataReaderFactory;
 using BPackageKit::BHPKG::B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB;
 
@@ -31,7 +31,7 @@ public:
 
 			status_t			CreatePackageDataReader(BDataReader* dataReader,
 									const BPackageData& data,
-									BPackageDataReader*& _reader);
+									BAbstractBufferedDataReader*& _reader);
 
 private:
 			status_t			_Init();

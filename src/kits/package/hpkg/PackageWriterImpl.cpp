@@ -887,9 +887,9 @@ PackageWriterImpl::_UpdateReadPackageInfo()
 			throw status_t(error);
 		}
 
-		// create a BPackageDataReader
+		// create a PackageDataReader
 		BFDDataReader packageFileReader(FD());
-		BPackageDataReader* reader;
+		BAbstractBufferedDataReader* reader;
 		error = BPackageDataReaderFactory(&bufferCache)
 			.CreatePackageDataReader(&packageFileReader, data, reader);
 		if (error != B_OK) {
@@ -897,7 +897,7 @@ PackageWriterImpl::_UpdateReadPackageInfo()
 				strerror(error));
 			throw status_t(error);
 		}
-		ObjectDeleter<BPackageDataReader> readerDeleter(reader);
+		ObjectDeleter<BAbstractBufferedDataReader> readerDeleter(reader);
 
 		// read the data
 		error = reader->ReadData(0, valueBuffer, size);

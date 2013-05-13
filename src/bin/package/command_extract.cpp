@@ -592,13 +592,13 @@ private:
 	status_t _ExtractFileData(BDataReader* dataReader, const BPackageData& data,
 		int fd)
 	{
-		// create a BPackageDataReader
-		BPackageDataReader* reader;
+		// create a PackageDataReader
+		BAbstractBufferedDataReader* reader;
 		status_t error = BPackageDataReaderFactory(&fBufferCache)
 			.CreatePackageDataReader(dataReader, data, reader);
 		if (error != B_OK)
 			return error;
-		ObjectDeleter<BPackageDataReader> readerDeleter(reader);
+		ObjectDeleter<BAbstractBufferedDataReader> readerDeleter(reader);
 
 		// write the data
 		off_t bytesRemaining = data.UncompressedSize();

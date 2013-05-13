@@ -67,7 +67,7 @@ GlobalFactory::Default()
 
 status_t
 GlobalFactory::CreatePackageDataReader(BDataReader* dataReader,
-	const BPackageData& data, BPackageDataReader*& _reader)
+	const BPackageData& data, BAbstractBufferedDataReader*& _reader)
 {
 	return fPackageDataReaderFactory.CreatePackageDataReader(dataReader, data,
 		_reader);

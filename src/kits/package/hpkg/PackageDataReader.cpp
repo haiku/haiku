@@ -41,35 +41,34 @@ static const size_t kUncompressedReaderBufferSize
 // #pragma mark - BPackageDataReader
 
 
-BPackageDataReader::BPackageDataReader(BDataReader* dataReader)
-	:
-	fDataReader(dataReader)
-{
-}
+class PackageDataReader : public BAbstractBufferedDataReader {
+public:
+	PackageDataReader(BDataReader* dataReader)
+		:
+		fDataReader(dataReader)
+	{
+	}
 
+	virtual ~PackageDataReader()
+	{
+	}
 
-BPackageDataReader::~BPackageDataReader()
-{
-}
+	virtual status_t Init(const BPackageData& data) = 0;
 
-
-status_t
-BPackageDataReader::ReadData(off_t offset, void* buffer, size_t size)
-{
-	BBufferDataOutput output(buffer, size);
-	return ReadDataToOutput(offset, size, &output);
-}
+protected:
+			BDataReader*			fDataReader;
+};
 
 
 // #pragma mark - UncompressedPackageDataReader
 
 
-class UncompressedPackageDataReader : public BPackageDataReader {
+class UncompressedPackageDataReader : public PackageDataReader {
 public:
 	UncompressedPackageDataReader(BDataReader* dataReader,
 		BBufferCache* bufferCache)
 		:
-		BPackageDataReader(dataReader),
+		PackageDataReader(dataReader),
 		fBufferCache(bufferCache)
 	{
 	}
@@ -144,11 +143,11 @@ private:
 // #pragma mark - ZlibPackageDataReader
 
 
-class ZlibPackageDataReader : public BPackageDataReader {
+class ZlibPackageDataReader : public PackageDataReader {
 public:
 	ZlibPackageDataReader(BDataReader* dataReader, BBufferCache* bufferCache)
 		:
-		BPackageDataReader(dataReader),
+		PackageDataReader(dataReader),
 		fBufferCache(bufferCache),
 		fUncompressBuffer(NULL),
 		fOffsetTable(NULL)
@@ -407,9 +406,9 @@ BPackageDataReaderFactory::BPackageDataReaderFactory(BBufferCache* bufferCache)
 
 status_t
 BPackageDataReaderFactory::CreatePackageDataReader(BDataReader* dataReader,
-	const BPackageData& data, BPackageDataReader*& _reader)
+	const BPackageData& data, BAbstractBufferedDataReader*& _reader)
 {
-	BPackageDataReader* reader;
+	PackageDataReader* reader;
 
 	switch (data.Compression()) {
 		case B_HPKG_COMPRESSION_NONE:

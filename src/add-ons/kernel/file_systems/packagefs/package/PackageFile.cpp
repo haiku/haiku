@@ -78,7 +78,7 @@ struct PackageFile::DataAccessor {
 		if (fDataReader == NULL)
 			RETURN_ERROR(B_NO_MEMORY);
 
-		// create a BPackageDataReader
+		// create a PackageDataReader
 		status_t error = GlobalFactory::Default()->CreatePackageDataReader(
 			fDataReader, *fData, fReader);
 		if (error != B_OK)
@@ -127,11 +127,11 @@ struct PackageFile::DataAccessor {
 	}
 
 private:
-	mutex				fLock;
-	BPackageData*		fData;
-	BDataReader*			fDataReader;
-	BPackageDataReader*	fReader;
-	void*				fFileCache;
+	mutex							fLock;
+	BPackageData*					fData;
+	BDataReader*					fDataReader;
+	BAbstractBufferedDataReader*	fReader;
+	void*							fFileCache;
 };
 
 

@@ -54,13 +54,13 @@ struct PackageEntryDataFetcher {
 
 	status_t ReadIntoString(BDataReader* dataReader, BString& _contents)
 	{
-		// create a BPackageDataReader
-		BPackageDataReader* reader;
+		// create a PackageDataReader
+		BAbstractBufferedDataReader* reader;
 		status_t result = BPackageDataReaderFactory(&fBufferCache)
 			.CreatePackageDataReader(dataReader, fPackageData, reader);
 		if (result != B_OK)
 			return result;
-		ObjectDeleter<BPackageDataReader> readerDeleter(reader);
+		ObjectDeleter<BAbstractBufferedDataReader> readerDeleter(reader);
 
 		// copy data into the given string
 		int32 bufferSize = fPackageData.UncompressedSize();
