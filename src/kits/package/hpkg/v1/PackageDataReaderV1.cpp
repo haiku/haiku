@@ -84,17 +84,6 @@ public:
 		return B_OK;
 	}
 
-	virtual uint64 Size() const
-	{
-		return fSize;
-	}
-
-	virtual size_t BlockSize() const
-	{
-		// TODO: Some other value?
-		return 64 * 1024;
-	}
-
 	virtual status_t ReadData(off_t offset, void* buffer, size_t size)
 	{
 		if (size == 0)
@@ -214,16 +203,6 @@ public:
 		fUncompressedChunk = -1;
 
 		return B_OK;
-	}
-
-	virtual uint64 Size() const
-	{
-		return fUncompressedSize;
-	}
-
-	virtual size_t BlockSize() const
-	{
-		return fChunkSize;
 	}
 
 	virtual status_t ReadDataToOutput(off_t offset, size_t size,
