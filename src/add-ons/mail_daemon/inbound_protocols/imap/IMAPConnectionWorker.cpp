@@ -64,6 +64,11 @@ public:
 		return fWorker._EnqueueCommand(command);
 	}
 
+	void SyncCommandDone()
+	{
+		fWorker._SyncCommandDone();
+	}
+
 	void Quit()
 	{
 		fWorker.fStopped = true;
@@ -81,6 +86,10 @@ public:
 
 	virtual	status_t			Process(IMAPConnectionWorker& worker) = 0;
 	virtual bool				IsDone() const { return true; }
+};
+
+
+class SyncCommand : public WorkerCommand {
 };
 
 
@@ -112,7 +121,7 @@ public:
 };
 
 
-class FetchHeadersCommand : public WorkerCommand, public IMAP::FetchListener {
+class FetchHeadersCommand : public SyncCommand, public IMAP::FetchListener {
 public:
 	FetchHeadersCommand(IMAPFolder& folder, IMAPMailbox& mailbox,
 		uint32 from, uint32 to)
@@ -133,9 +142,16 @@ public:
 		if (status != B_OK)
 			return status;
 
+		// TODO: this does not scale that well. Over time, the holes in the
+		// UIDs might become really large
+		uint32 to = fTo;
+		if (to - fFrom >= kMaxFetchEntries)
+			to = fFrom + kMaxFetchEntries - 1;
+
 		// TODO: trigger download of mails for all messages below the
 		// body fetch limit
-		IMAP::FetchCommand fetch(fFrom, fTo,
+		printf("IMAP: fetch headers from %lu to %lu\n", fFrom, to);
+		IMAP::FetchCommand fetch(fFrom, to,
 			IMAP::kFetchHeader | IMAP::kFetchFlags);
 		fetch.SetListener(this);
 
@@ -143,7 +159,13 @@ public:
 		if (status != B_OK)
 			return status;
 
+		fFrom = to + 1;
 		return B_OK;
+	}
+
+	virtual bool IsDone() const
+	{
+		return fFrom >= fTo;
 	}
 
 	virtual bool FetchData(uint32 fetchFlags, BDataIO& stream, size_t& length)
@@ -170,10 +192,11 @@ private:
 };
 
 
-class CheckMailboxesCommand : public WorkerCommand {
+class CheckMailboxesCommand : public SyncCommand {
 public:
-	CheckMailboxesCommand()
+	CheckMailboxesCommand(IMAPConnectionWorker& worker)
 		:
+		fWorker(worker),
 		fFolders(5, false),
 		fState(INIT),
 		fFolder(NULL),
@@ -188,8 +211,10 @@ public:
 		if (fState == INIT) {
 			// Collect folders
 			status_t status = WorkerPrivate(worker).AddFolders(fFolders);
-			if (status != B_OK || fFolders.IsEmpty())
+			if (status != B_OK || fFolders.IsEmpty()) {
+				fState = DONE;
 				return status;
+			}
 
 			fState = SELECT;
 		}
@@ -228,8 +253,8 @@ public:
 			// UIDs might become really large
 			uint32 from = fLastUID;
 			uint32 to = fNextUID;
-			if (to - from > kMaxFetchEntries)
-				to = from + kMaxFetchEntries;
+			if (to - from >= kMaxFetchEntries)
+				to = from + kMaxFetchEntries - 1;
 
 			printf("IMAP: get entries from %lu to %lu\n", from, to);
 			// TODO: we don't really need the flags at this point at all
@@ -248,13 +273,13 @@ public:
 			fTotalEntries += entries.size();
 			fMailboxEntries += entries.size();
 
-			fLastUID = to;
+			fLastUID = to + 1;
 
 			if (to == fNextUID) {
 				if (fMailboxEntries > 0) {
 					// Add pending command to fetch the message headers
 					WorkerCommand* command = new FetchHeadersCommand(*fFolder,
-						*fMailbox, fFirstUID, fLastUID);
+						*fMailbox, fFirstUID, fNextUID);
 					if (!fFetchCommands.AddItem(command))
 						delete command;
 				}
@@ -278,6 +303,7 @@ private:
 		DONE
 	};
 
+	IMAPConnectionWorker&	fWorker;
 	BObjectList<IMAPFolder>	fFolders;
 	State					fState;
 	IMAPFolder*				fFolder;
@@ -289,6 +315,38 @@ private:
 	uint64					fTotalEntries;
 	uint64					fTotalBytes;
 	WorkerCommandList		fFetchCommands;
+};
+
+
+struct CommandDelete
+{
+	inline void operator()(WorkerCommand* command)
+	{
+		delete command;
+	}
+};
+
+
+/*!	An auto deleter similar to ObjectDeleter that called SyncCommandDone()
+	for all SyncCommands.
+*/
+struct CommandDeleter : BPrivate::AutoDeleter<WorkerCommand, CommandDelete>
+{
+	CommandDeleter(IMAPConnectionWorker& worker, WorkerCommand* command)
+		:
+		BPrivate::AutoDeleter<WorkerCommand, CommandDelete>(command),
+		fWorker(worker)
+	{
+	}
+
+	~CommandDeleter()
+	{
+		if (dynamic_cast<SyncCommand*>(fObject) != NULL)
+			WorkerPrivate(fWorker).SyncCommandDone();
+	}
+
+private:
+	IMAPConnectionWorker&	fWorker;
 };
 
 
@@ -400,8 +458,13 @@ IMAPConnectionWorker::EnqueueCheckSubscribedFolders()
 status_t
 IMAPConnectionWorker::EnqueueCheckMailboxes()
 {
+	// Do not schedule checking mailboxes again if we're still working on
+	// those.
+	if (fSyncPending > 0)
+		return B_OK;
+
 	printf("IMAP: worker %p: enqueue check mailboxes\n", this);
-	return _EnqueueCommand(new CheckMailboxesCommand());
+	return _EnqueueCommand(new CheckMailboxesCommand(*this));
 }
 
 
@@ -450,7 +513,7 @@ IMAPConnectionWorker::_Worker()
 		if (command == NULL)
 			continue;
 
-		ObjectDeleter<WorkerCommand> deleter(command);
+		CommandDeleter deleter(*this, command);
 
 		status_t status = _Connect();
 		if (status != B_OK)
@@ -483,6 +546,9 @@ IMAPConnectionWorker::_EnqueueCommand(WorkerCommand* command)
 		delete command;
 		return B_NO_MEMORY;
 	}
+
+	if (dynamic_cast<SyncCommand*>(command) != NULL)
+		fSyncPending++;
 
 	locker.Unlock();
 	release_sem(fPendingCommandsSemaphore);
@@ -531,6 +597,13 @@ IMAPConnectionWorker::_MailboxFor(IMAPFolder& folder)
 		found->second = mailbox;
 	}
 	return mailbox;
+}
+
+
+void
+IMAPConnectionWorker::_SyncCommandDone()
+{
+	fSyncPending--;
 }
 
 

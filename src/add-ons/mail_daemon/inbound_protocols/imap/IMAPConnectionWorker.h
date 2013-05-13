@@ -61,6 +61,7 @@ private:
 									uint32* _nextUID);
 			IMAPMailbox*		_MailboxFor(IMAPFolder& folder);
 			IMAPFolder*			_Selected() const { return fSelectedBox; }
+			void				_SyncCommandDone();
 
 			status_t			_Connect();
 			void				_Disconnect();
@@ -76,6 +77,7 @@ private:
 			IMAP::Protocol		fProtocol;
 			sem_id				fPendingCommandsSemaphore;
 			WorkerCommandList	fPendingCommands;
+			uint32				fSyncPending;
 
 			IMAP::ExistsHandler	fExistsHandler;
 			IMAP::ExpungeHandler fExpungeHandler;
