@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -18,17 +18,39 @@
 #include <package/hpkg/PackageInfoAttributeValue.h>
 #include <package/hpkg/PackageReader.h>
 #include <package/hpkg/StandardErrorOutput.h>
+#include <package/hpkg/v1/PackageContentHandler.h>
+#include <package/hpkg/v1/PackageEntry.h>
+#include <package/hpkg/v1/PackageEntryAttribute.h>
+#include <package/hpkg/v1//PackageReader.h>
 
 #include <package/PackageInfo.h>
 
 #include "package.h"
 
 
-using namespace BPackageKit::BHPKG;
 using namespace BPackageKit;
+using BPackageKit::BHPKG::BPackageInfoAttributeValue;
 
 
-struct PackageContentListHandler : BPackageContentHandler {
+struct VersionPolicyV1 {
+	typedef BPackageKit::BHPKG::V1::BPackageContentHandler
+		PackageContentHandler;
+	typedef BPackageKit::BHPKG::V1::BPackageEntry PackageEntry;
+	typedef BPackageKit::BHPKG::V1::BPackageEntryAttribute
+		PackageEntryAttribute;
+	typedef BPackageKit::BHPKG::V1::BPackageReader PackageReader;
+};
+
+struct VersionPolicyV2 {
+	typedef BPackageKit::BHPKG::BPackageContentHandler PackageContentHandler;
+	typedef BPackageKit::BHPKG::BPackageEntry PackageEntry;
+	typedef BPackageKit::BHPKG::BPackageEntryAttribute PackageEntryAttribute;
+	typedef BPackageKit::BHPKG::BPackageReader PackageReader;
+};
+
+
+template<typename VersionPolicy>
+struct PackageContentListHandler : VersionPolicy::PackageContentHandler {
 	PackageContentListHandler(bool listAttributes)
 		:
 		fLevel(0),
@@ -36,7 +58,7 @@ struct PackageContentListHandler : BPackageContentHandler {
 	{
 	}
 
-	virtual status_t HandleEntry(BPackageEntry* entry)
+	virtual status_t HandleEntry(typename VersionPolicy::PackageEntry* entry)
 	{
 		fLevel++;
 
@@ -80,8 +102,9 @@ struct PackageContentListHandler : BPackageContentHandler {
 		return B_OK;
 	}
 
-	virtual status_t HandleEntryAttribute(BPackageEntry* entry,
-		BPackageEntryAttribute* attribute)
+	virtual status_t HandleEntryAttribute(
+		typename VersionPolicy::PackageEntry* entry,
+		typename VersionPolicy::PackageEntryAttribute* attribute)
 	{
 		if (!fListAttribute)
 			return B_OK;
@@ -104,7 +127,8 @@ struct PackageContentListHandler : BPackageContentHandler {
 		return B_OK;
 	}
 
-	virtual status_t HandleEntryDone(BPackageEntry* entry)
+	virtual status_t HandleEntryDone(
+		typename VersionPolicy::PackageEntry* entry)
 	{
 		fLevel--;
 		return B_OK;
@@ -274,27 +298,30 @@ private:
 };
 
 
-struct PackageContentListPathsHandler : BPackageContentHandler {
+template<typename VersionPolicy>
+struct PackageContentListPathsHandler : VersionPolicy::PackageContentHandler {
 	PackageContentListPathsHandler()
 		:
 		fPathComponents()
 	{
 	}
 
-	virtual status_t HandleEntry(BPackageEntry* entry)
+	virtual status_t HandleEntry(typename VersionPolicy::PackageEntry* entry)
 	{
 		fPathComponents.Add(entry->Name());
 		printf("%s\n", fPathComponents.Join("/").String());
 		return B_OK;
 	}
 
-	virtual status_t HandleEntryAttribute(BPackageEntry* entry,
-		BPackageEntryAttribute* attribute)
+	virtual status_t HandleEntryAttribute(
+		typename VersionPolicy::PackageEntry* entry,
+		typename VersionPolicy::PackageEntryAttribute* attribute)
 	{
 		return B_OK;
 	}
 
-	virtual status_t HandleEntryDone(BPackageEntry* entry)
+	virtual status_t HandleEntryDone(
+		typename VersionPolicy::PackageEntry* entry)
 	{
 		fPathComponents.Remove(fPathComponents.CountStrings() - 1);
 		return B_OK;
@@ -313,6 +340,36 @@ struct PackageContentListPathsHandler : BPackageContentHandler {
 private:
 	BStringList	fPathComponents;
 };
+
+
+template<typename VersionPolicy>
+static void
+do_list(const char* packageFileName, bool listAttributes, bool filePathsOnly,
+	bool ignoreVersionError)
+{
+	// open package
+	BHPKG::BStandardErrorOutput errorOutput;
+	typename VersionPolicy::PackageReader packageReader(&errorOutput);
+	status_t error = packageReader.Init(packageFileName);
+	if (error != B_OK) {
+		if (ignoreVersionError && error == B_MISMATCHED_VALUES)
+			return;
+		exit(1);
+	}
+
+	// list
+	if (filePathsOnly) {
+		PackageContentListPathsHandler<VersionPolicy> handler;
+		error = packageReader.ParseContent(&handler);
+	} else {
+		PackageContentListHandler<VersionPolicy> handler(listAttributes);
+		error = packageReader.ParseContent(&handler);
+	}
+	if (error != B_OK)
+		exit(1);
+
+	exit(0);
+}
 
 
 int
@@ -357,23 +414,13 @@ command_list(int argc, const char* const* argv)
 
 	const char* packageFileName = argv[optind++];
 
-	// open package
-	BStandardErrorOutput errorOutput;
-	BPackageReader packageReader(&errorOutput);
-	status_t error = packageReader.Init(packageFileName);
-	if (error != B_OK)
-		return 1;
+	BHPKG::BStandardErrorOutput errorOutput;
 
-	// list
-	if (filePathsOnly) {
-		PackageContentListPathsHandler handler;
-		error = packageReader.ParseContent(&handler);
-	} else {
-		PackageContentListHandler handler(listAttributes);
-		error = packageReader.ParseContent(&handler);
-	}
-	if (error != B_OK)
-		return 1;
+	// current package file format version
+	do_list<VersionPolicyV2>(packageFileName, listAttributes, filePathsOnly,
+		true);
+	do_list<VersionPolicyV1>(packageFileName, listAttributes, filePathsOnly,
+		false);
 
 	return 0;
 }

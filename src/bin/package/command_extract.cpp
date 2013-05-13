@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -25,19 +25,68 @@
 
 #include <util/OpenHashTable.h>
 
+#include <package/BlockBufferCacheNoLock.h>
 #include <package/hpkg/PackageContentHandler.h>
 #include <package/hpkg/PackageDataReader.h>
 #include <package/hpkg/PackageEntry.h>
 #include <package/hpkg/PackageEntryAttribute.h>
 #include <package/hpkg/PackageReader.h>
 #include <package/hpkg/StandardErrorOutput.h>
-#include <package/BlockBufferCacheNoLock.h>
+#include <package/hpkg/v1/PackageContentHandler.h>
+#include <package/hpkg/v1/PackageDataReader.h>
+#include <package/hpkg/v1/PackageEntry.h>
+#include <package/hpkg/v1/PackageEntryAttribute.h>
+#include <package/hpkg/v1//PackageReader.h>
 
 #include "package.h"
 
 
-using namespace BPackageKit::BHPKG;
 using BPackageKit::BBlockBufferCacheNoLock;
+using BPackageKit::BHPKG::BAbstractBufferedDataReader;
+using BPackageKit::BHPKG::BBufferDataReader;
+using BPackageKit::BHPKG::BDataReader;
+using BPackageKit::BHPKG::BFDDataReader;
+using BPackageKit::BHPKG::BPackageInfoAttributeValue;
+using BPackageKit::BHPKG::BStandardErrorOutput;
+
+
+struct VersionPolicyV1 {
+	typedef BPackageKit::BHPKG::V1::BPackageContentHandler
+		PackageContentHandler;
+	typedef BPackageKit::BHPKG::V1::BPackageData PackageData;
+	typedef BPackageKit::BHPKG::V1::BPackageDataReaderFactory
+		PackageDataReaderFactory;
+	typedef BPackageKit::BHPKG::V1::BPackageEntry PackageEntry;
+	typedef BPackageKit::BHPKG::V1::BPackageEntryAttribute
+		PackageEntryAttribute;
+	typedef BPackageKit::BHPKG::V1::BPackageReader PackageReader;
+
+	static const int kDefaultDataChunkSize
+		= BPackageKit::BHPKG::V1::B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB;
+
+	static inline const char* PackageInfoFileName()
+	{
+		return BPackageKit::BHPKG::V1::B_HPKG_PACKAGE_INFO_FILE_NAME;
+	}
+};
+
+struct VersionPolicyV2 {
+	typedef BPackageKit::BHPKG::BPackageContentHandler PackageContentHandler;
+	typedef BPackageKit::BHPKG::BPackageData PackageData;
+	typedef BPackageKit::BHPKG::BPackageDataReaderFactory
+		PackageDataReaderFactory;
+	typedef BPackageKit::BHPKG::BPackageEntry PackageEntry;
+	typedef BPackageKit::BHPKG::BPackageEntryAttribute PackageEntryAttribute;
+	typedef BPackageKit::BHPKG::BPackageReader PackageReader;
+
+	static const int kDefaultDataChunkSize
+		= BPackageKit::BHPKG::B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB;
+
+	static inline const char* PackageInfoFileName()
+	{
+		return BPackageKit::BHPKG::B_HPKG_PACKAGE_INFO_FILE_NAME;
+	}
+};
 
 
 struct Entry {
@@ -176,10 +225,11 @@ private:
 };
 
 
-struct PackageContentExtractHandler : BPackageContentHandler {
+template<typename VersionPolicy>
+struct PackageContentExtractHandler : VersionPolicy::PackageContentHandler {
 	PackageContentExtractHandler(int packageFileFD)
 		:
-		fBufferCache(B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB, 2),
+		fBufferCache(VersionPolicy::kDefaultDataChunkSize, 2),
 		fPackageFileReader(packageFileFD),
 		fDataBuffer(NULL),
 		fDataBufferSize(0),
@@ -280,7 +330,7 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 		return entry;
 	}
 
-	virtual status_t HandleEntry(BPackageEntry* entry)
+	virtual status_t HandleEntry(typename VersionPolicy::PackageEntry* entry)
 	{
 		// create a token
 		Token* token = new(std::nothrow) Token;
@@ -385,7 +435,7 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 
 			// write data
 			status_t error;
-			const BPackageData& data = entry->Data();
+			const typename VersionPolicy::PackageData& data = entry->Data();
 			if (data.IsEncodedInline()) {
 				BBufferDataReader dataReader(data.InlineData(),
 					data.CompressedSize());
@@ -452,8 +502,9 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 		return B_OK;
 	}
 
-	virtual status_t HandleEntryAttribute(BPackageEntry* entry,
-		BPackageEntryAttribute* attribute)
+	virtual status_t HandleEntryAttribute(
+		typename VersionPolicy::PackageEntry* entry,
+		typename VersionPolicy::PackageEntryAttribute* attribute)
 	{
 		// don't write attributes of ignored or implicit entries
 		Token* token = (Token*)entry->UserToken();
@@ -478,7 +529,7 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 
 		// write data
 		status_t error;
-		const BPackageData& data = attribute->Data();
+		const typename VersionPolicy::PackageData& data = attribute->Data();
 		if (data.IsEncodedInline()) {
 			BBufferDataReader dataReader(data.InlineData(),
 				data.CompressedSize());
@@ -491,7 +542,8 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 		return error;
 	}
 
-	virtual status_t HandleEntryDone(BPackageEntry* entry)
+	virtual status_t HandleEntryDone(
+		typename VersionPolicy::PackageEntry* entry)
 	{
 		Token* token = (Token*)entry->UserToken();
 
@@ -561,13 +613,13 @@ private:
 		return Entry::Create(parentEntry, name.String(), implicit, _entry);
 	}
 
-	void _GetParentFDAndEntryName(BPackageEntry* entry, int& _parentFD,
-		const char*& _entryName)
+	void _GetParentFDAndEntryName(typename VersionPolicy::PackageEntry* entry,
+		int& _parentFD, const char*& _entryName)
 	{
 		_entryName = entry->Name();
 
 		if (fInfoFileName != NULL
-			&& strcmp(_entryName, B_HPKG_PACKAGE_INFO_FILE_NAME) == 0) {
+			&& strcmp(_entryName, VersionPolicy::PackageInfoFileName()) == 0) {
 			_parentFD = AT_FDCWD;
 			_entryName = fInfoFileName;
 		} else {
@@ -576,11 +628,12 @@ private:
 		}
 	}
 
-	BString _EntryPath(const BPackageEntry* entry)
+	BString _EntryPath(const typename VersionPolicy::PackageEntry* entry)
 	{
 		BString path;
 
-		if (const BPackageEntry* parent = entry->Parent()) {
+		if (const typename VersionPolicy::PackageEntry* parent
+				= entry->Parent()) {
 			path = _EntryPath(parent);
 			path << '/';
 		}
@@ -589,12 +642,13 @@ private:
 		return path;
 	}
 
-	status_t _ExtractFileData(BDataReader* dataReader, const BPackageData& data,
-		int fd)
+	status_t _ExtractFileData(BDataReader* dataReader,
+		const typename VersionPolicy::PackageData& data, int fd)
 	{
 		// create a PackageDataReader
 		BAbstractBufferedDataReader* reader;
-		status_t error = BPackageDataReaderFactory(&fBufferCache)
+		status_t error = typename VersionPolicy::PackageDataReaderFactory(
+				&fBufferCache)
 			.CreatePackageDataReader(dataReader, data, reader);
 		if (error != B_OK)
 			return error;
@@ -645,6 +699,83 @@ private:
 };
 
 
+template<typename VersionPolicy>
+static void
+do_extract(const char* packageFileName, const char* changeToDirectory,
+	const char* packageInfoFileName, const char* const* explicitEntries,
+	int explicitEntryCount, bool ignoreVersionError)
+{
+	// open package
+	BStandardErrorOutput errorOutput;
+	typename VersionPolicy::PackageReader packageReader(&errorOutput);
+	status_t error = packageReader.Init(packageFileName);
+	if (error != B_OK) {
+		if (ignoreVersionError && error == B_MISMATCHED_VALUES)
+			return;
+		exit(1);
+	}
+
+	PackageContentExtractHandler<VersionPolicy> handler(
+		packageReader.PackageFileFD());
+	error = handler.Init();
+	if (error != B_OK)
+		exit(1);
+
+	// If entries to extract have been specified explicitly, add those to the
+	// filtered ones.
+	if (explicitEntryCount > 0) {
+		for (int i = 0; i < explicitEntryCount; i++) {
+			const char* entryName = explicitEntries[i];
+			if (entryName[0] == '\0' || entryName[0] == '/') {
+				fprintf(stderr, "Error: Invalid entry name: \"%s\".",
+					entryName);
+				exit(1);
+			}
+
+			if (handler.AddFilterEntry(entryName) != B_OK)
+				exit(1);
+		}
+	} else
+		handler.SetExtractAll();
+
+	// get the target directory, if requested
+	if (changeToDirectory != NULL) {
+		int currentDirFD = open(changeToDirectory, O_RDONLY);
+		if (currentDirFD < 0) {
+			fprintf(stderr, "Error: Failed to change the current working "
+				"directory to \"%s\": %s\n", changeToDirectory,
+				strerror(errno));
+			exit(1);
+		}
+
+		handler.SetBaseDirectory(currentDirFD);
+	}
+
+	// If a package info file name is given, set it.
+	if (packageInfoFileName != NULL)
+		handler.SetPackageInfoFile(packageInfoFileName);
+
+	// extract
+	error = packageReader.ParseContent(&handler);
+	if (error != B_OK)
+		exit(1);
+
+	// check whether all explicitly specified entries have been extracted
+	if (explicitEntryCount > 0) {
+		for (int i = 0; i < explicitEntryCount; i++) {
+			if (Entry* entry = handler.FindFilterEntry(explicitEntries[i])) {
+				if (!entry->Seen()) {
+					fprintf(stderr, "Warning: Entry \"%s\" not found.\n",
+						explicitEntries[i]);
+				}
+			}
+		}
+	}
+
+	exit(0);
+}
+
+
 int
 command_extract(int argc, const char* const* argv)
 {
@@ -681,75 +812,19 @@ command_extract(int argc, const char* const* argv)
 		}
 	}
 
-	// At least one argument should remain -- the package file name.
+	// At least one argument should remain -- the package file name. Any further
+	// arguments are the names of the entries to extract.
 	if (optind + 1 > argc)
 		print_usage_and_exit(true);
 
 	const char* packageFileName = argv[optind++];
+	const char* const* explicitEntries = argv + optind;
+	int explicitEntryCount = argc - optind;
 
-	// open package
-	BStandardErrorOutput errorOutput;
-	BPackageReader packageReader(&errorOutput);
-	status_t error = packageReader.Init(packageFileName);
-	if (error != B_OK)
-		return 1;
-
-	PackageContentExtractHandler handler(packageReader.PackageFileFD());
-	error = handler.Init();
-	if (error != B_OK)
-		return 1;
-
-	// If entries to extract have been specified explicitly, add those to the
-	// filtered ones.
-	int explicitEntriesIndex = optind;
-	if (optind < argc) {
-		while (optind < argc) {
-			const char* entryName = argv[optind++];
-			if (entryName[0] == '\0' || entryName[0] == '/') {
-				fprintf(stderr, "Error: Invalid entry name: \"%s\".",
-					entryName);
-				return 1;
-			}
-
-			if (handler.AddFilterEntry(entryName) != B_OK)
-				return 1;
-		}
-	} else
-		handler.SetExtractAll();
-
-	// get the target directory, if requested
-	if (changeToDirectory != NULL) {
-		int currentDirFD = open(changeToDirectory, O_RDONLY);
-		if (currentDirFD < 0) {
-			fprintf(stderr, "Error: Failed to change the current working "
-				"directory to \"%s\": %s\n", changeToDirectory,
-				strerror(errno));
-			return 1;
-		}
-
-		handler.SetBaseDirectory(currentDirFD);
-	}
-
-	// If a package info file name is given, set it.
-	if (packageInfoFileName != NULL)
-		handler.SetPackageInfoFile(packageInfoFileName);
-
-	// extract
-	error = packageReader.ParseContent(&handler);
-	if (error != B_OK)
-		return 1;
-
-	// check whether all explicitly specified entries have been extracted
-	if (explicitEntriesIndex < argc) {
-		for (int i = explicitEntriesIndex; i < argc; i++) {
-			if (Entry* entry = handler.FindFilterEntry(argv[i])) {
-				if (!entry->Seen()) {
-					fprintf(stderr, "Warning: Entry \"%s\" not found.\n",
-						argv[i]);
-				}
-			}
-		}
-	}
+	do_extract<VersionPolicyV2>(packageFileName, changeToDirectory,
+		packageInfoFileName, explicitEntries, explicitEntryCount, true);
+	do_extract<VersionPolicyV1>(packageFileName, changeToDirectory,
+		packageInfoFileName, explicitEntries, explicitEntryCount, false);
 
 	return 0;
 }
