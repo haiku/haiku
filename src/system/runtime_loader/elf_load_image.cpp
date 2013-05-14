@@ -536,6 +536,8 @@ load_image(char const* name, image_type type, const char* rpath,
 		#endif
 	}
 
+	set_abi_version(image->abi);
+
 	// init gcc version dependent image flags
 	// symbol resolution strategy
 	if (image->abi == B_HAIKU_ABI_GCC_2_ANCIENT)
