@@ -4,7 +4,7 @@
  */
 
 
-#include <package/hpkg/BufferCache.h>
+#include <package/hpkg/BufferPool.h>
 
 
 namespace BPackageKit {
@@ -12,12 +12,12 @@ namespace BPackageKit {
 namespace BHPKG {
 
 
-BBufferCache::~BBufferCache()
+BBufferPool::~BBufferPool()
 {
 }
 
 
-BBufferCacheLockable::~BBufferCacheLockable()
+BBufferPoolLockable::~BBufferPoolLockable()
 {
 }
 

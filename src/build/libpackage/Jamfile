@@ -21,10 +21,11 @@ USES_BE_API on libpackage_build.so = true ;
 
 HPKG_SOURCES =
 	AttributeDataReader.cpp
-	BlockBufferCache.cpp
-	BlockBufferCacheImpl.cpp
-	BufferCache.cpp
-	CachedBuffer.cpp
+	BlockBufferPool.cpp
+	BlockBufferPoolImpl.cpp
+	BlockBufferPoolNoLock.cpp
+	BufferPool.cpp
+	PoolBuffer.cpp
 	DataOutput.cpp
 	DataReader.cpp
 	ErrorOutput.cpp
@@ -75,7 +76,6 @@ BuildPlatformSharedLibrary libpackage_build.so
 	ActivationTransaction.cpp
 	AddRepositoryRequest.cpp
 	Attributes.cpp
-	BlockBufferCacheNoLock.cpp
 	ChecksumAccessors.cpp
 	Context.cpp
 	DownloadFileRequest.cpp

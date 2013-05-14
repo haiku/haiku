@@ -16,12 +16,12 @@
 #include <AutoDeleter.h>
 #include <HashSet.h>
 
+#include <package/hpkg/BlockBufferPoolNoLock.h>
 #include <package/hpkg/HPKGDefsPrivate.h>
 #include <package/hpkg/PackageDataReader.h>
 #include <package/hpkg/PackageEntry.h>
 #include <package/hpkg/PackageInfoAttributeValue.h>
 #include <package/hpkg/PackageReader.h>
-#include <package/BlockBufferCacheNoLock.h>
 #include <package/ChecksumAccessors.h>
 #include <package/HashableString.h>
 #include <package/PackageInfoContentHandler.h>
@@ -47,7 +47,7 @@ struct PackageEntryDataFetcher {
 		BPackageData& packageData)
 		:
 		fErrorOutput(errorOutput),
-		fBufferCache(B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB, 2),
+		fBufferPool(B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB, 2),
 		fPackageData(packageData)
 	{
 	}
@@ -56,7 +56,7 @@ struct PackageEntryDataFetcher {
 	{
 		// create a PackageDataReader
 		BAbstractBufferedDataReader* reader;
-		status_t result = BPackageDataReaderFactory(&fBufferCache)
+		status_t result = BPackageDataReaderFactory(&fBufferPool)
 			.CreatePackageDataReader(dataReader, fPackageData, reader);
 		if (result != B_OK)
 			return result;
@@ -81,7 +81,7 @@ struct PackageEntryDataFetcher {
 
 private:
 	BErrorOutput*			fErrorOutput;
-	BBlockBufferCacheNoLock fBufferCache;
+	BBlockBufferPoolNoLock	fBufferPool;
 	BPackageData&			fPackageData;
 };
 

@@ -14,21 +14,21 @@ namespace BPackageKit {
 namespace BHPKG {
 
 
-class BBufferCache;
+class BBufferPool;
 class BPackageData;
 
 
 class BPackageDataReaderFactory {
 public:
 								BPackageDataReaderFactory(
-									BBufferCache* bufferCache);
+									BBufferPool* bufferPool);
 
 			status_t			CreatePackageDataReader(BDataReader* dataReader,
 									const BPackageData& data,
 									BAbstractBufferedDataReader*& _reader);
 
 private:
-			BBufferCache*		fBufferCache;
+			BBufferPool*		fBufferPool;
 };
 
 

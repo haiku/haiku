@@ -5,14 +5,14 @@
  */
 
 
-#include <package/hpkg/BlockBufferCacheImpl.h>
+#include <package/hpkg/BlockBufferPoolImpl.h>
 
 #include <algorithm>
 #include <new>
 
 #include <AutoLocker.h>
 
-#include <package/hpkg/CachedBuffer.h>
+#include <package/hpkg/PoolBuffer.h>
 
 
 namespace BPackageKit {
@@ -22,11 +22,11 @@ namespace BHPKG {
 namespace BPrivate {
 
 
-// #pragma mark - BlockBufferCacheImpl
+// #pragma mark - BlockBufferPoolImpl
 
 
-BlockBufferCacheImpl::BlockBufferCacheImpl(size_t blockSize,
-	uint32 maxCachedBlocks, BBufferCacheLockable* lockable)
+BlockBufferPoolImpl::BlockBufferPoolImpl(size_t blockSize,
+	uint32 maxCachedBlocks, BBufferPoolLockable* lockable)
 	:
 	fBlockSize(blockSize),
 	fMaxCachedBlocks(maxCachedBlocks),
@@ -36,36 +36,36 @@ BlockBufferCacheImpl::BlockBufferCacheImpl(size_t blockSize,
 }
 
 
-BlockBufferCacheImpl::~BlockBufferCacheImpl()
+BlockBufferPoolImpl::~BlockBufferPoolImpl()
 {
 	// delete all cached blocks
-	while (CachedBuffer* block = fCachedBuffers.RemoveHead())
+	while (PoolBuffer* block = fCachedBuffers.RemoveHead())
 		delete block;
 
-	while (CachedBuffer* block = fUnusedBuffers.RemoveHead())
+	while (PoolBuffer* block = fUnusedBuffers.RemoveHead())
 		delete block;
 }
 
 
 status_t
-BlockBufferCacheImpl::Init()
+BlockBufferPoolImpl::Init()
 {
 	return B_OK;
 }
 
 
-CachedBuffer*
-BlockBufferCacheImpl::GetBuffer(size_t size, CachedBuffer** owner, bool* _newBuffer)
+PoolBuffer*
+BlockBufferPoolImpl::GetBuffer(size_t size, PoolBuffer** owner, bool* _newBuffer)
 {
 	// for sizes greater than the block size, we always allocate a new buffer
 	if (size > fBlockSize)
 		return _AllocateBuffer(size, owner, _newBuffer);
 
-	AutoLocker<BBufferCacheLockable> locker(fLockable);
+	AutoLocker<BBufferPoolLockable> locker(fLockable);
 
 	// if an owner is given and the buffer is still cached, return it
 	if (owner != NULL && *owner != NULL) {
-		CachedBuffer* buffer = *owner;
+		PoolBuffer* buffer = *owner;
 		fCachedBuffers.Remove(buffer);
 
 		if (_newBuffer != NULL)
@@ -74,7 +74,7 @@ BlockBufferCacheImpl::GetBuffer(size_t size, CachedBuffer** owner, bool* _newBuf
 	}
 
 	// we need a new buffer -- try unused ones first
-	CachedBuffer* buffer = fUnusedBuffers.RemoveHead();
+	PoolBuffer* buffer = fUnusedBuffers.RemoveHead();
 	if (buffer != NULL) {
 		buffer->SetOwner(owner);
 
@@ -108,9 +108,9 @@ BlockBufferCacheImpl::GetBuffer(size_t size, CachedBuffer** owner, bool* _newBuf
 
 
 void
-BlockBufferCacheImpl::PutBufferAndCache(CachedBuffer** owner)
+BlockBufferPoolImpl::PutBufferAndCache(PoolBuffer** owner)
 {
-	CachedBuffer* buffer = *owner;
+	PoolBuffer* buffer = *owner;
 
 	// always delete buffers with non-standard size
 	if (buffer->Size() != fBlockSize) {
@@ -119,7 +119,7 @@ BlockBufferCacheImpl::PutBufferAndCache(CachedBuffer** owner)
 		return;
 	}
 
-	AutoLocker<BBufferCacheLockable> locker(fLockable);
+	AutoLocker<BBufferPoolLockable> locker(fLockable);
 
 	// queue the cached buffer
 	buffer->SetOwner(owner);
@@ -128,7 +128,7 @@ BlockBufferCacheImpl::PutBufferAndCache(CachedBuffer** owner)
 
 	if (fAllocatedBlocks > fMaxCachedBlocks) {
 		// We have exceeded the limit -- we need to free a buffer.
-		CachedBuffer* otherBuffer = fUnusedBuffers.RemoveHead();
+		PoolBuffer* otherBuffer = fUnusedBuffers.RemoveHead();
 		if (otherBuffer == NULL) {
 			otherBuffer = fCachedBuffers.RemoveHead();
 			*otherBuffer->Owner() = NULL;
@@ -141,11 +141,11 @@ BlockBufferCacheImpl::PutBufferAndCache(CachedBuffer** owner)
 
 
 void
-BlockBufferCacheImpl::PutBuffer(CachedBuffer** owner)
+BlockBufferPoolImpl::PutBuffer(PoolBuffer** owner)
 {
-	AutoLocker<BBufferCacheLockable> locker(fLockable);
+	AutoLocker<BBufferPoolLockable> locker(fLockable);
 
-	CachedBuffer* buffer = *owner;
+	PoolBuffer* buffer = *owner;
 
 	if (buffer == NULL)
 		return;
@@ -165,11 +165,11 @@ BlockBufferCacheImpl::PutBuffer(CachedBuffer** owner)
 }
 
 
-CachedBuffer*
-BlockBufferCacheImpl::_AllocateBuffer(size_t size, CachedBuffer** owner,
+PoolBuffer*
+BlockBufferPoolImpl::_AllocateBuffer(size_t size, PoolBuffer** owner,
 	bool* _newBuffer)
 {
-	CachedBuffer* buffer = new(std::nothrow) CachedBuffer(
+	PoolBuffer* buffer = new(std::nothrow) PoolBuffer(
 		std::max(size, fBlockSize));
 	if (buffer == NULL || buffer->Buffer() == NULL) {
 		delete buffer;
@@ -181,7 +181,7 @@ BlockBufferCacheImpl::_AllocateBuffer(size_t size, CachedBuffer** owner,
 	if (_newBuffer != NULL)
 		*_newBuffer = true;
 
-	AutoLocker<BBufferCacheLockable> locker(fLockable);
+	AutoLocker<BBufferPoolLockable> locker(fLockable);
 	fAllocatedBlocks++;
 
 	if (owner != NULL)

@@ -9,7 +9,7 @@
 #include <errno.h>
 #include <unistd.h>
 
-#include <package/BlockBufferCacheNoLock.h>
+#include <package/hpkg/BlockBufferPoolNoLock.h>
 #include <package/hpkg/DataReader.h>
 #include <package/hpkg/ErrorOutput.h>
 #include <package/hpkg/PackageDataReader.h>
@@ -272,7 +272,7 @@ struct FileDataReader {
 private:
 	BFDDataReader		fDataReader;
 	BPackageData		fData;
-	BPackageDataReader*	fPackageDataReader;
+	BAbstractBufferedDataReader* fPackageDataReader;
 };
 
 
@@ -345,7 +345,7 @@ struct PackageVolume : BReferenceable {
 private:
 	ino_t						fNextNodeID;
 	PackageDirectory			fRootDirectory;
-	BBlockBufferCacheNoLock		fBufferCache;
+	BBlockBufferPoolNoLock		fBufferCache;
 	BPackageDataReaderFactory	fDataReaderFactory;
 	int							fFD;
 };

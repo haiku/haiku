@@ -9,7 +9,7 @@
 #include <package/hpkg/PackageDataReader.h>
 #include <package/hpkg/v1/PackageDataReader.h>
 
-#include "BlockBufferCacheKernel.h"
+#include "BlockBufferPoolKernel.h"
 
 
 using BPackageKit::BHPKG::BDataReader;
@@ -44,7 +44,7 @@ private:
 private:
 	static	GlobalFactory*		sDefaultInstance;
 
-			BlockBufferCacheKernel fBufferCache;
+			BlockBufferPoolKernel fBufferPool;
 			BPackageDataReaderFactoryV1 fPackageDataReaderFactoryV1;
 			BPackageDataReaderFactoryV2 fPackageDataReaderFactoryV2;
 };

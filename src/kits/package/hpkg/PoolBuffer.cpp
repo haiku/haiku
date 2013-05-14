@@ -4,7 +4,7 @@
  */
 
 
-#include <package/hpkg/CachedBuffer.h>
+#include <package/hpkg/PoolBuffer.h>
 
 #include <stdlib.h>
 
@@ -16,7 +16,7 @@ namespace BHPKG {
 namespace BPrivate {
 
 
-CachedBuffer::CachedBuffer(size_t size)
+PoolBuffer::PoolBuffer(size_t size)
 	:
 	fOwner(NULL),
 	fBuffer(malloc(size)),
@@ -26,7 +26,7 @@ CachedBuffer::CachedBuffer(size_t size)
 }
 
 
-CachedBuffer::~CachedBuffer()
+PoolBuffer::~PoolBuffer()
 {
 	free(fBuffer);
 }

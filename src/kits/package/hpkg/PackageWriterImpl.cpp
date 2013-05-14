@@ -26,8 +26,7 @@
 #include <fs_attr.h>
 #include <Path.h>
 
-#include <package/BlockBufferCacheNoLock.h>
-
+#include <package/hpkg/BlockBufferPoolNoLock.h>
 #include <package/hpkg/PackageAttributeValue.h>
 #include <package/hpkg/PackageContentHandler.h>
 #include <package/hpkg/PackageData.h>
@@ -879,7 +878,7 @@ PackageWriterImpl::_UpdateReadPackageInfo()
 		memcpy(valueBuffer, value.data.raw, value.data.size);
 	} else {
 		// data on heap -- read from there
-		BBlockBufferCacheNoLock	bufferCache(16 * 1024, 1);
+		BBlockBufferPoolNoLock	bufferCache(16 * 1024, 1);
 		status_t error = bufferCache.Init();
 		if (error != B_OK) {
 			fListener->PrintError("Failed to initialize buffer cache: %s\n",

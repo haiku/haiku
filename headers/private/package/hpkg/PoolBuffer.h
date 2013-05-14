@@ -3,15 +3,15 @@
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
-#ifndef _PACKAGE__HPKG__PRIVATE__BUFFER_CACHE_H_
-#define _PACKAGE__HPKG__PRIVATE__BUFFER_CACHE_H_
+#ifndef _PACKAGE__HPKG__PRIVATE__POOL_BUFFER_H_
+#define _PACKAGE__HPKG__PRIVATE__POOL_BUFFER_H_
 
 
 #include <stddef.h>
 
 #include <util/DoublyLinkedList.h>
 
-#include <package/hpkg/BufferCache.h>
+#include <package/hpkg/BufferPool.h>
 
 
 namespace BPackageKit {
@@ -21,63 +21,63 @@ namespace BHPKG {
 namespace BPrivate {
 
 
-class CachedBuffer : public DoublyLinkedListLinkImpl<CachedBuffer> {
+class PoolBuffer : public DoublyLinkedListLinkImpl<PoolBuffer> {
 public:
-								CachedBuffer(size_t size);
-								~CachedBuffer();
+								PoolBuffer(size_t size);
+								~PoolBuffer();
 
 			void*				Buffer() const	{ return fBuffer; }
 			size_t				Size() const	{ return fSize; }
 
 
 			// implementation private
-			CachedBuffer**		Owner() const	{ return fOwner; }
-			void				SetOwner(CachedBuffer** owner)
+			PoolBuffer**		Owner() const	{ return fOwner; }
+			void				SetOwner(PoolBuffer** owner)
 									{ fOwner = owner; }
 
 			void				SetCached(bool cached)	{ fCached = cached; }
 			bool				IsCached() const		{ return fCached; }
 
 private:
-			CachedBuffer**		fOwner;
+			PoolBuffer**		fOwner;
 			void*				fBuffer;
 			size_t				fSize;
 			bool				fCached;
 };
 
 
-class CachedBufferPutter {
+class PoolBufferPutter {
 public:
-	CachedBufferPutter(BBufferCache* cache, CachedBuffer** owner)
+	PoolBufferPutter(BBufferPool* pool, PoolBuffer** owner)
 		:
-		fCache(cache),
+		fPool(pool),
 		fOwner(owner),
 		fBuffer(NULL)
 	{
 	}
 
-	CachedBufferPutter(BBufferCache* cache, CachedBuffer* buffer)
+	PoolBufferPutter(BBufferPool* pool, PoolBuffer* buffer)
 		:
-		fCache(cache),
+		fPool(pool),
 		fOwner(NULL),
 		fBuffer(buffer)
 	{
 	}
 
-	~CachedBufferPutter()
+	~PoolBufferPutter()
 	{
-		if (fCache != NULL) {
+		if (fPool != NULL) {
 			if (fOwner != NULL)
-				fCache->PutBufferAndCache(fOwner);
+				fPool->PutBufferAndCache(fOwner);
 			else if (fBuffer != NULL)
-				fCache->PutBuffer(&fBuffer);
+				fPool->PutBuffer(&fBuffer);
 		}
 	}
 
 private:
-	BBufferCache*	fCache;
-	CachedBuffer**	fOwner;
-	CachedBuffer*	fBuffer;
+	BBufferPool*	fPool;
+	PoolBuffer**	fOwner;
+	PoolBuffer*		fBuffer;
 };
 
 
@@ -88,4 +88,4 @@ private:
 }	// namespace BPackageKit
 
 
-#endif	// _PACKAGE__HPKG__PRIVATE__BUFFER_CACHE_H_
+#endif	// _PACKAGE__HPKG__PRIVATE__POOL_BUFFER_H_

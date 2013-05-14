@@ -20,10 +20,10 @@ static const uint32 kMaxCachedBuffers = 32;
 
 GlobalFactory::GlobalFactory()
 	:
-	fBufferCache(BPackageKit::BHPKG::B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB,
+	fBufferPool(BPackageKit::BHPKG::B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB,
 		kMaxCachedBuffers),
-	fPackageDataReaderFactoryV1(&fBufferCache),
-	fPackageDataReaderFactoryV2(&fBufferCache)
+	fPackageDataReaderFactoryV1(&fBufferPool),
+	fPackageDataReaderFactoryV2(&fBufferPool)
 {
 	STATIC_ASSERT((int)BPackageKit::BHPKG::B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB
 		== (int)BPackageKit::BHPKG::V1::B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB);
@@ -93,7 +93,7 @@ GlobalFactory::CreatePackageDataReader(BDataReader* dataReader,
 status_t
 GlobalFactory::_Init()
 {
-	status_t error = fBufferCache.Init();
+	status_t error = fBufferPool.Init();
 	if (error != B_OK)
 		return error;
 

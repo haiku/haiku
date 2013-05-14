@@ -2,8 +2,8 @@
  * Copyright 2009,2011, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _PACKAGE__HPKG__BUFFER_CACHE_H_
-#define _PACKAGE__HPKG__BUFFER_CACHE_H_
+#ifndef _PACKAGE__HPKG__BUFFER_POOL_H_
+#define _PACKAGE__HPKG__BUFFER_POOL_H_
 
 
 #include <stddef.h>
@@ -15,31 +15,31 @@ namespace BHPKG {
 
 
 namespace BPrivate {
-	class CachedBuffer;
+	class PoolBuffer;
 }
-using BPrivate::CachedBuffer;
+using BPrivate::PoolBuffer;
 
 
-class BBufferCache {
+class BBufferPool {
 public:
-	virtual						~BBufferCache();
+	virtual						~BBufferPool();
 
-	virtual	CachedBuffer*		GetBuffer(size_t size,
-									CachedBuffer** owner = NULL,
+	virtual	PoolBuffer*			GetBuffer(size_t size,
+									PoolBuffer** owner = NULL,
 									bool* _newBuffer = NULL) = 0;
-	virtual	void				PutBufferAndCache(CachedBuffer** owner) = 0;
+	virtual	void				PutBufferAndCache(PoolBuffer** owner) = 0;
 									// caller is buffer owner and wants the
 									// buffer cached, if possible
-	virtual	void				PutBuffer(CachedBuffer** owner) = 0;
+	virtual	void				PutBuffer(PoolBuffer** owner) = 0;
 									// puts the buffer for good, owner might
 									// have called PutBufferAndCache() before
 									// and might not own a buffer anymore
 };
 
 
-class BBufferCacheLockable {
+class BBufferPoolLockable {
 public:
-	virtual						~BBufferCacheLockable();
+	virtual						~BBufferPoolLockable();
 
 	virtual	bool				Lock() = 0;
 	virtual	void				Unlock() = 0;
@@ -51,4 +51,4 @@ public:
 }	// namespace BPackageKit
 
 
-#endif	// _PACKAGE__HPKG__BUFFER_CACHE_H_
+#endif	// _PACKAGE__HPKG__BUFFER_POOL_H_

@@ -25,7 +25,7 @@
 
 #include <util/OpenHashTable.h>
 
-#include <package/BlockBufferCacheNoLock.h>
+#include <package/hpkg/BlockBufferPoolNoLock.h>
 #include <package/hpkg/PackageContentHandler.h>
 #include <package/hpkg/PackageDataReader.h>
 #include <package/hpkg/PackageEntry.h>
@@ -41,8 +41,8 @@
 #include "package.h"
 
 
-using BPackageKit::BBlockBufferCacheNoLock;
 using BPackageKit::BHPKG::BAbstractBufferedDataReader;
+using BPackageKit::BHPKG::BBlockBufferPoolNoLock;
 using BPackageKit::BHPKG::BBufferDataReader;
 using BPackageKit::BHPKG::BDataReader;
 using BPackageKit::BHPKG::BFDDataReader;
@@ -229,7 +229,7 @@ template<typename VersionPolicy>
 struct PackageContentExtractHandler : VersionPolicy::PackageContentHandler {
 	PackageContentExtractHandler(int packageFileFD)
 		:
-		fBufferCache(VersionPolicy::kDefaultDataChunkSize, 2),
+		fBufferPool(VersionPolicy::kDefaultDataChunkSize, 2),
 		fPackageFileReader(packageFileFD),
 		fDataBuffer(NULL),
 		fDataBufferSize(0),
@@ -247,7 +247,7 @@ struct PackageContentExtractHandler : VersionPolicy::PackageContentHandler {
 
 	status_t Init()
 	{
-		status_t error = fBufferCache.Init();
+		status_t error = fBufferPool.Init();
 		if (error != B_OK)
 			return error;
 
@@ -648,7 +648,7 @@ private:
 		// create a PackageDataReader
 		BAbstractBufferedDataReader* reader;
 		status_t error = typename VersionPolicy::PackageDataReaderFactory(
-				&fBufferCache)
+				&fBufferPool)
 			.CreatePackageDataReader(dataReader, data, reader);
 		if (error != B_OK)
 			return error;
@@ -688,7 +688,7 @@ private:
 	}
 
 private:
-	BBlockBufferCacheNoLock	fBufferCache;
+	BBlockBufferPoolNoLock	fBufferPool;
 	BFDDataReader			fPackageFileReader;
 	void*					fDataBuffer;
 	size_t					fDataBufferSize;

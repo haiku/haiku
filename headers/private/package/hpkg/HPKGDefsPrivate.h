@@ -25,6 +25,9 @@ struct hpkg_header {
 	uint16	version;
 	uint64	total_size;
 
+	// heap
+//	uint64	heap_compression;
+
 	// package attributes section
 	uint32	attributes_compression;
 	uint32	attributes_length_compressed;

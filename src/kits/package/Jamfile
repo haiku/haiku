@@ -12,10 +12,10 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package solver ] ;
 
 HPKG_SOURCES =
 	AttributeDataReader.cpp
-	BlockBufferCache.cpp
-	BlockBufferCacheImpl.cpp
-	BufferCache.cpp
-	CachedBuffer.cpp
+	BlockBufferPool.cpp
+	BlockBufferPoolImpl.cpp
+	BlockBufferPoolNoLock.cpp
+	BufferPool.cpp
 	DataOutput.cpp
 	DataReader.cpp
 	ErrorOutput.cpp
@@ -26,10 +26,12 @@ HPKG_SOURCES =
 	PackageDataReader.cpp
 	PackageEntry.cpp
 	PackageEntryAttribute.cpp
+	PackageFileHeapWriter.cpp
 	PackageReader.cpp
 	PackageReaderImpl.cpp
 	PackageWriter.cpp
 	PackageWriterImpl.cpp
+	PoolBuffer.cpp
 	ReaderImplBase.cpp
 	RepositoryReader.cpp
 	RepositoryReaderImpl.cpp
@@ -66,7 +68,6 @@ SharedLibrary libpackage.so
 	ActivationTransaction.cpp
 	AddRepositoryRequest.cpp
 	Attributes.cpp
-	BlockBufferCacheNoLock.cpp
 	ChecksumAccessors.cpp
 	Context.cpp
 	DaemonClient.cpp

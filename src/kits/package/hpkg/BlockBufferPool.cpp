@@ -4,11 +4,11 @@
  */
 
 
-#include <package/hpkg/BlockBufferCache.h>
+#include <package/hpkg/BlockBufferPool.h>
 
 #include <new>
 
-#include <package/hpkg/BlockBufferCacheImpl.h>
+#include <package/hpkg/BlockBufferPoolImpl.h>
 
 
 namespace BPackageKit {
@@ -16,22 +16,22 @@ namespace BPackageKit {
 namespace BHPKG {
 
 
-BBlockBufferCache::BBlockBufferCache(size_t blockSize, uint32 maxCachedBlocks)
+BBlockBufferPool::BBlockBufferPool(size_t blockSize, uint32 maxCachedBlocks)
 	:
-	fImpl(new (std::nothrow) BlockBufferCacheImpl(blockSize, maxCachedBlocks,
+	fImpl(new (std::nothrow) BlockBufferPoolImpl(blockSize, maxCachedBlocks,
 		this))
 {
 }
 
 
-BBlockBufferCache::~BBlockBufferCache()
+BBlockBufferPool::~BBlockBufferPool()
 {
 	delete fImpl;
 }
 
 
 status_t
-BBlockBufferCache::Init()
+BBlockBufferPool::Init()
 {
 	if (fImpl == NULL)
 		return B_NO_MEMORY;
@@ -40,8 +40,8 @@ BBlockBufferCache::Init()
 }
 
 
-CachedBuffer*
-BBlockBufferCache::GetBuffer(size_t size, CachedBuffer** owner,
+PoolBuffer*
+BBlockBufferPool::GetBuffer(size_t size, PoolBuffer** owner,
 	bool* _newBuffer)
 {
 	if (fImpl == NULL)
@@ -52,7 +52,7 @@ BBlockBufferCache::GetBuffer(size_t size, CachedBuffer** owner,
 
 
 void
-BBlockBufferCache::PutBufferAndCache(CachedBuffer** owner)
+BBlockBufferPool::PutBufferAndCache(PoolBuffer** owner)
 {
 	if (fImpl != NULL)
 		fImpl->PutBufferAndCache(owner);
@@ -60,7 +60,7 @@ BBlockBufferCache::PutBufferAndCache(CachedBuffer** owner)
 
 
 void
-BBlockBufferCache::PutBuffer(CachedBuffer** owner)
+BBlockBufferPool::PutBuffer(PoolBuffer** owner)
 {
 	if (fImpl != NULL)
 		fImpl->PutBuffer(owner);

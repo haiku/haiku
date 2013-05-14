@@ -11,8 +11,8 @@
 #include <algorithm>
 #include <new>
 
-#include <package/hpkg/BufferCache.h>
-#include <package/hpkg/CachedBuffer.h>
+#include <package/hpkg/BufferPool.h>
+#include <package/hpkg/PoolBuffer.h>
 #include <package/hpkg/DataOutput.h>
 #include <package/hpkg/v1/HPKGDefsPrivate.h>
 #include <package/hpkg/v1/PackageData.h>
@@ -26,7 +26,7 @@ namespace BHPKG {
 namespace V1 {
 
 
-using BHPKG::BPrivate::CachedBufferPutter;
+using BHPKG::BPrivate::PoolBufferPutter;
 using BHPKG::BPrivate::ZlibDecompressor;
 
 
@@ -69,10 +69,10 @@ protected:
 class UncompressedPackageDataReader : public PackageDataReader {
 public:
 	UncompressedPackageDataReader(BDataReader* dataReader,
-		BBufferCache* bufferCache)
+		BBufferPool* bufferPool)
 		:
 		PackageDataReader(dataReader),
-		fBufferCache(bufferCache)
+		fBufferPool(bufferPool)
 	{
 	}
 
@@ -110,11 +110,11 @@ public:
 			return B_BAD_VALUE;
 
 		// get a temporary buffer
-		CachedBuffer* buffer = fBufferCache->GetBuffer(
+		PoolBuffer* buffer = fBufferPool->GetBuffer(
 			kUncompressedReaderBufferSize);
 		if (buffer == NULL)
 			return B_NO_MEMORY;
-		CachedBufferPutter bufferPutter(fBufferCache, &buffer);
+		PoolBufferPutter bufferPutter(fBufferPool, &buffer);
 
 		while (size > 0) {
 			// read into the buffer
@@ -137,7 +137,7 @@ public:
 	}
 
 private:
-	BBufferCache*	fBufferCache;
+	BBufferPool*	fBufferPool;
 	uint64			fOffset;
 	uint64			fSize;
 };
@@ -148,10 +148,10 @@ private:
 
 class ZlibPackageDataReader : public PackageDataReader {
 public:
-	ZlibPackageDataReader(BDataReader* dataReader, BBufferCache* bufferCache)
+	ZlibPackageDataReader(BDataReader* dataReader, BBufferPool* bufferPool)
 		:
 		PackageDataReader(dataReader),
-		fBufferCache(bufferCache),
+		fBufferPool(bufferPool),
 		fUncompressBuffer(NULL),
 		fOffsetTable(NULL)
 	{
@@ -161,7 +161,7 @@ public:
 	{
 		delete[] fOffsetTable;
 
-		fBufferCache->PutBuffer(&fUncompressBuffer);
+		fBufferPool->PutBuffer(&fUncompressBuffer);
 	}
 
 	status_t Init(const BPackageData& data)
@@ -221,11 +221,11 @@ public:
 
 		// get our uncompressed chunk buffer back, if possible
 		bool newBuffer;
-		if (fBufferCache->GetBuffer(fChunkSize, &fUncompressBuffer, &newBuffer)
+		if (fBufferPool->GetBuffer(fChunkSize, &fUncompressBuffer, &newBuffer)
 				== NULL) {
 			return B_NO_MEMORY;
 		}
-		CachedBufferPutter uncompressBufferPutter(fBufferCache,
+		PoolBufferPutter uncompressBufferPutter(fBufferPool,
 			&fUncompressBuffer);
 
 		if (newBuffer)
@@ -284,10 +284,10 @@ private:
 				compressedSize);
 		} else {
 			// read to a read buffer and uncompress
-			CachedBuffer* readBuffer = fBufferCache->GetBuffer(fChunkSize);
+			PoolBuffer* readBuffer = fBufferPool->GetBuffer(fChunkSize);
 			if (readBuffer == NULL)
 				return B_NO_MEMORY;
-			CachedBufferPutter readBufferPutter(fBufferCache, readBuffer);
+			PoolBufferPutter readBufferPutter(fBufferPool, readBuffer);
 
 			error = fDataReader->ReadData(offset, readBuffer->Buffer(),
 				compressedSize);
@@ -381,8 +381,8 @@ private:
 	}
 
 private:
-	BBufferCache*	fBufferCache;
-	CachedBuffer*	fUncompressBuffer;
+	BBufferPool*	fBufferPool;
+	PoolBuffer*		fUncompressBuffer;
 	int64			fUncompressedChunk;
 
 	uint64			fOffset;
@@ -400,9 +400,9 @@ private:
 // #pragma mark - BPackageDataReaderFactory
 
 
-BPackageDataReaderFactory::BPackageDataReaderFactory(BBufferCache* bufferCache)
+BPackageDataReaderFactory::BPackageDataReaderFactory(BBufferPool* bufferPool)
 	:
-	fBufferCache(bufferCache)
+	fBufferPool(bufferPool)
 {
 }
 
@@ -416,11 +416,11 @@ BPackageDataReaderFactory::CreatePackageDataReader(BDataReader* dataReader,
 	switch (data.Compression()) {
 		case B_HPKG_COMPRESSION_NONE:
 			reader = new(std::nothrow) UncompressedPackageDataReader(
-				dataReader, fBufferCache);
+				dataReader, fBufferPool);
 			break;
 		case B_HPKG_COMPRESSION_ZLIB:
 			reader = new(std::nothrow) ZlibPackageDataReader(dataReader,
-				fBufferCache);
+				fBufferPool);
 			break;
 		default:
 			return B_BAD_VALUE;

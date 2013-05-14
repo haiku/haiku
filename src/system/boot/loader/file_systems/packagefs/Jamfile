@@ -19,13 +19,13 @@ BootStaticLibrary boot_packagefs :
 	packagefs.cpp
 
 	# package kit
-	BlockBufferCacheNoLock.cpp
 
 	# package kit/hpkg
-	BlockBufferCache.cpp
-	BlockBufferCacheImpl.cpp
-	BufferCache.cpp
-	CachedBuffer.cpp
+	BlockBufferPool.cpp
+	BlockBufferPoolImpl.cpp
+	BlockBufferPoolNoLock.cpp
+	BufferPool.cpp
+	PoolBuffer.cpp
 	DataOutput.cpp
 	DataReader.cpp
 	ErrorOutput.cpp
