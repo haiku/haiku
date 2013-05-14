@@ -399,7 +399,7 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 	packager->string = fPackageStringCache.Get(packageInfo.Packager().String());
 	attributeList.Add(packager);
 
-	// base package
+	// base package (optional)
 	if (!packageInfo.BasePackage().IsEmpty()) {
 		PackageAttribute* basePackage = new PackageAttribute(
 			B_HPKG_ATTRIBUTE_ID_PACKAGE_BASE_PACKAGE,

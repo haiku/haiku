@@ -390,6 +390,9 @@ private:
 };
 
 
+// #pragma mark - HeapAttributeOffsetter
+
+
 struct PackageWriterImpl::HeapAttributeOffsetter {
 	HeapAttributeOffsetter(const RangeArray<off_t>& ranges,
 		const Array<off_t>& deltas)
