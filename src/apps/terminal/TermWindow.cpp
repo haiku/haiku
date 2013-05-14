@@ -735,27 +735,7 @@ TermWindow::MessageReceived(BMessage *message)
 				fFindPanel = new FindWindow(this, fFindString, fFindSelection,
 					fMatchWord, fMatchCase, fForwardSearch);
 
-				// position the window under the mouse pointer
-				BPoint where;
-				uint32 buttons;
-				ChildAt(0)->GetMouse(&where, &buttons);
-				fFindPanel->MoveTo(ConvertToScreen(where));
-
-				// move window if outside of screen frame
-				BRect screenFrame = (BScreen(this)).Frame();
-				BRect frame = fFindPanel->Frame();
-				float extra = 30.0f;
-				if (frame.bottom + extra * 2 > screenFrame.bottom) {
-					fFindPanel->MoveBy(0,
-						screenFrame.bottom - frame.bottom - extra * 2);
-				} else if (frame.top - extra < screenFrame.top)
-					fFindPanel->MoveBy(0, screenFrame.top - frame.top + extra);
-
-				if (frame.right + extra > screenFrame.right) {
-					fFindPanel->MoveBy(screenFrame.right - frame.right
-						- extra, 0);
-				}
-
+				fFindPanel->CenterIn(Frame());
 				fFindPanel->Show();
 			} else
 				fFindPanel->Activate();
