@@ -11,6 +11,8 @@
 
 #include <BMCPrivate.h>
 
+#include <algorithm>
+
 #include <ControlLook.h>
 #include <LayoutUtils.h>
 #include <MenuField.h>
@@ -137,10 +139,16 @@ _BMCMenuBar_::AttachedToWindow()
 void
 _BMCMenuBar_::Draw(BRect updateRect)
 {
-	if (fFixedSize || Bounds().Width() > fMenuField->_MenuBarWidth()) {
-		// Set the width of the menu bar because the menu bar bounds have
-		// been expanded by the selected menu item.
+	// Set the width of the menu bar because the menu bar bounds may have
+	// been expanded by the selected menu item.
+	if (fFixedSize)
 		ResizeTo(fMenuField->_MenuBarWidth(), Bounds().Height());
+	else {
+		// For compatability with BeOS R5 set the height to the preferred height
+		// in auto-size mode ignoring the height of the menu field.
+		float height;
+		BMenuBar::GetPreferredSize(NULL, &height);
+		ResizeTo(std::min(Bounds().Width(), fMenuField->_MenuBarWidth()), height);
 	}
 	BRect rect(Bounds());
 	rgb_color base = ui_color(B_MENU_BACKGROUND_COLOR);
