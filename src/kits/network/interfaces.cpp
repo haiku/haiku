@@ -107,14 +107,14 @@ if_nameindex(void)
 		return NULL;
 
 	int i = 0;
-	while (i < count) {
+	while (count > 0) {
 		// retrieve interface index
 		ifreq request;	
 		strlcpy(((struct ifreq&)request).ifr_name, interfaces->ifr_name, 
 			IF_NAMESIZE);
 
 		if (ioctl(socket.FD(), SIOCGIFINDEX, &request, 
-			sizeof(struct ifreq)) >= 0) {
+				sizeof(struct ifreq)) >= 0) {
 			interfaceArray[i].if_index = request.ifr_index;
 			interfaceArray[i].if_name = strdup(interfaces->ifr_name);
 			i++;
@@ -122,6 +122,7 @@ if_nameindex(void)
 
 		interfaces
 			= (ifreq*)((char*)interfaces + _SIZEOF_ADDR_IFREQ(interfaces[0]));
+		count--;
 	}
 
 	interfaceArray[i].if_index = 0;
