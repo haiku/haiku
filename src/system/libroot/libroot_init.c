@@ -31,7 +31,7 @@ char *__progname = NULL;
 int __libc_argc;
 char **__libc_argv;
 
-int __gCompatibilityMode;
+int __gABIVersion;
 
 char _single_threaded = true;
 	// determines if I/O locking needed; needed for BeOS compatibility
@@ -50,8 +50,7 @@ initialize_before(image_id imageID)
 {
 	char *programPath = __gRuntimeLoader->program_args->args[0];
 	__gCommPageAddress = __gRuntimeLoader->commpage_address;
-	__gCompatibilityMode
-		= __gRuntimeLoader->abi_version < B_HAIKU_ABI_GCC_2_HAIKU;
+	__gABIVersion = __gRuntimeLoader->abi_version;
 
 	if (programPath) {
 		if ((__progname = strrchr(programPath, '/')) == NULL)

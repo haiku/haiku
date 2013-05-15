@@ -77,7 +77,7 @@ _thread_do_exit_work(void)
 void
 __set_stack_protection(void)
 {
-	if (__gCompatibilityMode == 1) {
+	if (__gABIVersion < B_HAIKU_ABI_GCC_2_HAIKU) {
 		area_info info;
 		ssize_t cookie = 0;
 

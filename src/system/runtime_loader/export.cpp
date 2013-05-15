@@ -74,6 +74,9 @@ rldexport_init(void)
 }
 
 
+/*!	Is called for all images, and sets the minimum ABI version found to the
+	gRuntimeLoader.abi_version field.
+*/
 void
 set_abi_version(int abi_version)
 {

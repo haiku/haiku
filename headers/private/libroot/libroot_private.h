@@ -18,7 +18,7 @@ struct real_time_data;
 extern "C" {
 #endif
 
-extern int __gCompatibilityMode;
+extern int __gABIVersion;
 
 extern char _single_threaded;
 	/* This determines if a process runs single threaded or not */
