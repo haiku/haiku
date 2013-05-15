@@ -63,6 +63,12 @@ TableModelListener::TableRowsChanged(TableModel* model, int32 rowIndex,
 }
 
 
+void
+TableModelListener::TableModelReset(TableModel* model)
+{
+}
+
+
 // #pragma mark - TableModel
 
 
@@ -114,6 +120,28 @@ TableModel::NotifyRowsChanged(int32 rowIndex, int32 count)
 	for (int32 i = listenerCount - 1; i >= 0; i--) {
 		TableModelListener* listener = fListeners.ItemAt(i);
 		listener->TableRowsChanged(this, rowIndex, count);
+	}
+}
+
+
+void
+TableModel::NotifyRowsCleared()
+{
+	int32 listenerCount = fListeners.CountItems();
+	for (int32 i = listenerCount - 1; i >= 0; i--) {
+		TableModelListener* listener = fListeners.ItemAt(i);
+		listener->TableRowsRemoved(this, 0, CountRows());
+	}
+}
+
+
+void
+TableModel::NotifyTableModelReset()
+{
+	int32 listenerCount = fListeners.CountItems();
+	for (int32 i = listenerCount - 1; i >= 0; i--) {
+		TableModelListener* listener = fListeners.ItemAt(i);
+		listener->TableModelReset(this);
 	}
 }
 
@@ -636,6 +664,14 @@ Table::TableRowsChanged(TableModel* model, int32 rowIndex, int32 count)
 		if (BRow* row = fRows.ItemAt(i))
 			UpdateRow(row);
 	}
+}
+
+
+void
+Table::TableModelReset(TableModel* model)
+{
+	Clear();
+	TableRowsAdded(model, 0, model->CountRows());
 }
 
 
