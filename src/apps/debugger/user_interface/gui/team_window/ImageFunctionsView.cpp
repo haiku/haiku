@@ -8,8 +8,8 @@
 
 #include <stdio.h>
 
-#include <algorithm>
 #include <new>
+#include <set>
 
 #include <AutoDeleter.h>
 
@@ -170,8 +170,6 @@ public:
 	{
 		// unset old functions
 		if (fImageDebugInfo != NULL) {
-			NotifyNodesRemoved(TreeTablePath(), 0,
-				fChildPathComponents.CountItems());
 			for (int32 i = 0; i < fChildPathComponents.CountItems(); i++)
 				fChildPathComponents.ItemAt(i)->ReleaseReference();
 
@@ -182,48 +180,34 @@ public:
 		fImageDebugInfo = imageDebugInfo;
 
 		// set new functions
-		if (fImageDebugInfo == NULL || fImageDebugInfo->CountFunctions() == 0)
+		if (fImageDebugInfo == NULL || fImageDebugInfo->CountFunctions()
+				== 0) {
+			NotifyNodesCleared();
 			return;
-
-		// create an array with the functions
-		int32 functionCount = fImageDebugInfo->CountFunctions();
-		FunctionInstance** functions
-			= new(std::nothrow) FunctionInstance*[functionCount];
-		if (functions == NULL)
-			return;
-		ArrayDeleter<FunctionInstance*> functionsDeleter(functions);
-
-		for (int32 i = 0; i < functionCount; i++)
-			functions[i] = fImageDebugInfo->FunctionAt(i);
-
-		// sort them
-		std::sort(functions, functions + functionCount, &_FunctionLess);
-
-		// eliminate duplicate function instances
-		if (functionCount > 0) {
-			Function* previousFunction = functions[0]->GetFunction();
-			int32 removed = 0;
-			for (int32 i = 1; i < functionCount; i++) {
-				if (functions[i]->GetFunction() == previousFunction) {
-					removed++;
-				} else {
-					functions[i - removed] = functions[i];
-					previousFunction = functions[i]->GetFunction();
-				}
-			}
-
-			functionCount -= removed;
-				// The array might now be too large, but we can live with that.
 		}
+
+		std::set<target_addr_t> functionAddresses;
 
 		SourcePathComponentNode* sourcelessNode = new(std::nothrow)
 			SourcePathComponentNode(NULL, "<no source file>", NULL, NULL);
 		BReference<SourcePathComponentNode> sourceNodeRef(
 			sourcelessNode, true);
 
-
+		int32 functionCount = fImageDebugInfo->CountFunctions();
 		for (int32 i = 0; i < functionCount; i++) {
-			if (!_BuildFunctionSourcePath(functions[i], sourcelessNode))
+			FunctionInstance* instance = fImageDebugInfo->FunctionAt(i);
+			target_addr_t address = instance->Address();
+			if (functionAddresses.find(address) != functionAddresses.end())
+				continue;
+			else {
+				try {
+					functionAddresses.insert(address);
+				} catch (...) {
+					return;
+				}
+			}
+
+			if (!_BuildFunctionSourcePath(instance, sourcelessNode))
 				return;
 		}
 
@@ -235,8 +219,7 @@ public:
 			}
 		}
 
-		NotifyNodesAdded(TreeTablePath(), 0,
-			fChildPathComponents.CountItems());
+		NotifyTableModelReset();
 	}
 
 	virtual int32 CountColumns() const
@@ -435,38 +418,6 @@ private:
 			return false;
 
 		return true;
-	}
-
-	static int _CompareSourceFileNames(LocatableFile* a, LocatableFile* b)
-	{
-		if (a == b)
-			return 0;
-
-		if (a == NULL)
-			return 1;
-		if (b == NULL)
-			return -1;
-
-		BString pathA;
-		a->GetPath(pathA);
-
-		BString pathB;
-		b->GetPath(pathB);
-
-		return pathA.Compare(pathB);
-	}
-
-	static bool _FunctionLess(const FunctionInstance* a,
-		const FunctionInstance* b)
-	{
-		// compare source file name first
-		int compared = _CompareSourceFileNames(a->SourceFile(),
-			b->SourceFile());
-		if (compared != 0)
-			return compared < 0;
-
-		// source file names are equal -- compare the function names
-		return strcasecmp(a->PrettyName(), b->PrettyName()) < 0;
 	}
 
 private:
