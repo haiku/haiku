@@ -169,8 +169,9 @@ public:
 	void SetImageDebugInfo(ImageDebugInfo* imageDebugInfo)
 	{
 		// unset old functions
+		int32 count = fChildPathComponents.CountItems();
 		if (fImageDebugInfo != NULL) {
-			for (int32 i = 0; i < fChildPathComponents.CountItems(); i++)
+			for (int32 i = 0; i < count; i++)
 				fChildPathComponents.ItemAt(i)->ReleaseReference();
 
 			fChildPathComponents.MakeEmpty();
@@ -182,7 +183,7 @@ public:
 		// set new functions
 		if (fImageDebugInfo == NULL || fImageDebugInfo->CountFunctions()
 				== 0) {
-			NotifyNodesCleared();
+			NotifyNodesRemoved(TreeTablePath(), 0, count);
 			return;
 		}
 
