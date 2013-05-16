@@ -11,6 +11,8 @@
 #include <new>
 #include <set>
 
+#include <StringList.h>
+
 #include <AutoDeleter.h>
 
 #include "table/TableColumns.h"
@@ -194,6 +196,8 @@ public:
 		BReference<SourcePathComponentNode> sourceNodeRef(
 			sourcelessNode, true);
 
+		LocatableFile* currentFile = NULL;
+		BStringList pathComponents;
 		int32 functionCount = fImageDebugInfo->CountFunctions();
 		for (int32 i = 0; i < functionCount; i++) {
 			FunctionInstance* instance = fImageDebugInfo->FunctionAt(i);
@@ -208,7 +212,22 @@ public:
 				}
 			}
 
-			if (!_BuildFunctionSourcePath(instance, sourcelessNode))
+			LocatableFile* sourceFile = instance->SourceFile();
+			if (sourceFile == NULL) {
+				if (!_AddFunctionNode(sourcelessNode, instance, NULL))
+					return;
+				continue;
+			}
+
+			if (sourceFile != currentFile) {
+				currentFile = sourceFile;
+				if (!_GetSourcePathComponents(currentFile,
+						pathComponents)) {
+					return;
+				}
+			}
+
+			if (!_AddFunctionByPath(pathComponents, instance, currentFile))
 				return;
 		}
 
@@ -276,30 +295,20 @@ public:
 			node = fSourcelessNode;
 			_path.AddComponent(fChildPathComponents.IndexOf(node));
 		} else {
-			BString sourcePath;
-			sourceFile->GetPath(sourcePath);
-
-			if (sourcePath.IsEmpty())
+			BStringList pathComponents;
+			if (!_GetSourcePathComponents(sourceFile, pathComponents))
 				return false;
 
-			BString searchPath;
-			while (!sourcePath.IsEmpty()) {
-				if (sourcePath[0] == '/')
-					sourcePath.Remove(0, 1);
-				int32 separatorIndex = sourcePath.FindFirst('/');
-				if (separatorIndex == -1) {
-					searchPath = sourcePath;
-					sourcePath.Truncate(0);
-				} else
-					sourcePath.MoveInto(searchPath, 0, separatorIndex);
+			for (int32 i = 0; i < pathComponents.CountStrings(); i++) {
+				BString component = pathComponents.StringAt(i);
 
 				if (node == NULL) {
 					childIndex = fChildPathComponents.BinarySearchIndexByKey(
-						searchPath,
+						component,
 						&SourcePathComponentNode::CompareByComponentName);
 					node = fChildPathComponents.ItemAt(childIndex);
 				} else {
-					childIndex = node->FindChildIndexByName(searchPath);
+					childIndex = node->FindChildIndexByName(component);
 					node = node->ChildAt(childIndex);
 				}
 
@@ -343,65 +352,73 @@ public:
 	}
 
 private:
-	bool _BuildFunctionSourcePath(FunctionInstance* function,
-		SourcePathComponentNode* sourcelessNode)
+	bool _GetSourcePathComponents(LocatableFile* currentFile,
+		BStringList& pathComponents)
 	{
-		LocatableFile* sourceFile = function->SourceFile();
-		if (sourceFile == NULL)
-			return _AddFunctionNode(sourcelessNode, function, NULL);
-
 		BString sourcePath;
-		sourceFile->GetPath(sourcePath);
+		currentFile->GetPath(sourcePath);
 		if (sourcePath.IsEmpty())
 			return false;
 
-		return _AddNextPathComponent(NULL, sourcePath, function, sourceFile);
-	}
+		pathComponents.MakeEmpty();
 
-	bool _AddNextPathComponent(SourcePathComponentNode* parent,
-		BString& childPath, FunctionInstance* function, LocatableFile* file)
-	{
-		if (childPath[0] == '/')
-			childPath.Remove(0, 1);
+		int32 startIndex = 0;
+		if (sourcePath[0] == '/')
+			startIndex = 1;
 
-		BString pathComponent;
-		int32 pathSeparatorIndex = childPath.FindFirst('/');
-		if (pathSeparatorIndex == -1)
-			pathComponent = childPath;
-		else
-			childPath.MoveInto(pathComponent, 0, pathSeparatorIndex);
+		while (startIndex < sourcePath.Length()) {
+			int32 searchIndex = sourcePath.FindFirst('/', startIndex);
+			BString data;
+			if (searchIndex < 0)
+				searchIndex = sourcePath.Length();
 
-		SourcePathComponentNode* currentNode = NULL;
-		if (parent == NULL) {
-			currentNode = fChildPathComponents.BinarySearchByKey(pathComponent,
-				SourcePathComponentNode::CompareByComponentName);
-		} else
-			currentNode = parent->FindChildByName(pathComponent);
-
-		if (currentNode == NULL) {
-			currentNode = new(std::nothrow) SourcePathComponentNode(parent,
-				pathComponent, NULL, NULL);
-			if (currentNode == NULL)
+			sourcePath.CopyInto(data, startIndex, searchIndex - startIndex);
+			if (!pathComponents.Add(data))
 				return false;
-			BReference<SourcePathComponentNode> nodeReference(currentNode,
-				true);
-			if (parent != NULL) {
-				if (!parent->AddChild(currentNode))
-					return false;
-			} else {
-				if (!fChildPathComponents.BinaryInsert(currentNode,
-					&SourcePathComponentNode::CompareComponents)) {
-					return false;
-				}
 
-				nodeReference.Detach();
-			}
+			startIndex = searchIndex + 1;
 		}
 
-		if (pathSeparatorIndex == -1)
-			return _AddFunctionNode(currentNode, function, file);
+		return true;
+	}
 
-		return _AddNextPathComponent(currentNode, childPath, function, file);
+	bool _AddFunctionByPath(const BStringList& pathComponents,
+		FunctionInstance* function, LocatableFile* file)
+	{
+		SourcePathComponentNode* parentNode = NULL;
+		SourcePathComponentNode* currentNode = NULL;
+		for (int32 i = 0; i < pathComponents.CountStrings(); i++) {
+			const BString pathComponent = pathComponents.StringAt(i);
+			if (parentNode == NULL) {
+				currentNode = fChildPathComponents.BinarySearchByKey(
+					pathComponent,
+					SourcePathComponentNode::CompareByComponentName);
+			} else
+				currentNode = parentNode->FindChildByName(pathComponent);
+
+			if (currentNode == NULL) {
+				currentNode = new(std::nothrow) SourcePathComponentNode(
+					parentNode,	pathComponent, NULL, NULL);
+				if (currentNode == NULL)
+					return false;
+				BReference<SourcePathComponentNode> nodeReference(currentNode,
+					true);
+				if (parentNode != NULL) {
+					if (!parentNode->AddChild(currentNode))
+						return false;
+				} else {
+					if (!fChildPathComponents.BinaryInsert(currentNode,
+						&SourcePathComponentNode::CompareComponents)) {
+						return false;
+					}
+
+					nodeReference.Detach();
+				}
+			}
+			parentNode = currentNode;
+		}
+
+		return _AddFunctionNode(currentNode, function, file);
 	}
 
 	bool _AddFunctionNode(SourcePathComponentNode* parent,
