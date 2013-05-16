@@ -125,17 +125,6 @@ TableModel::NotifyRowsChanged(int32 rowIndex, int32 count)
 
 
 void
-TableModel::NotifyRowsCleared()
-{
-	int32 listenerCount = fListeners.CountItems();
-	for (int32 i = listenerCount - 1; i >= 0; i--) {
-		TableModelListener* listener = fListeners.ItemAt(i);
-		listener->TableRowsRemoved(this, 0, CountRows());
-	}
-}
-
-
-void
 TableModel::NotifyTableModelReset()
 {
 	int32 listenerCount = fListeners.CountItems();
@@ -644,6 +633,12 @@ Table::TableRowsAdded(TableModel* model, int32 rowIndex, int32 count)
 void
 Table::TableRowsRemoved(TableModel* model, int32 rowIndex, int32 count)
 {
+	if (rowIndex == 0 && count == fRows.CountItems()) {
+		fRows.MakeEmpty();
+		Clear();
+		return;
+	}
+
 	for (int32 i = rowIndex + count - 1; i >= rowIndex; i--) {
 		if (BRow* row = fRows.RemoveItemAt(i)) {
 			RemoveRow(row);

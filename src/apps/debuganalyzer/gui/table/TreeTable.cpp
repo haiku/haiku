@@ -234,18 +234,6 @@ TreeTableModel::NotifyNodesChanged(const TreeTablePath& path, int32 childIndex,
 
 
 void
-TreeTableModel::NotifyNodesCleared()
-{
-	int32 listenerCount = fListeners.CountItems();
-	for (int32 i = listenerCount - 1; i >= 0; i--) {
-		TreeTableModelListener* listener = fListeners.ItemAt(i);
-		listener->TableNodesRemoved(this, TreeTablePath(), 0,
-			CountChildren(Root()));
-	}
-}
-
-
-void
 TreeTableModel::NotifyTableModelReset()
 {
 	int32 listenerCount = fListeners.CountItems();

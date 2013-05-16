@@ -52,7 +52,6 @@ protected:
 			void				NotifyRowsAdded(int32 rowIndex, int32 count);
 			void				NotifyRowsRemoved(int32 rowIndex, int32 count);
 			void				NotifyRowsChanged(int32 rowIndex, int32 count);
-			void				NotifyRowsCleared();
 			void				NotifyTableModelReset();
 
 protected:

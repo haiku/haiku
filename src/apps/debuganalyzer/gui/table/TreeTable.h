@@ -94,7 +94,6 @@ protected:
 									int32 childIndex, int32 count);
 			void				NotifyNodesChanged(const TreeTablePath& path,
 									int32 childIndex, int32 count);
-			void				NotifyNodesCleared();
 			void				NotifyTableModelReset();
 
 protected:
