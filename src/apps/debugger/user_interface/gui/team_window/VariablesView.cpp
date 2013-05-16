@@ -928,17 +928,17 @@ VariablesView::VariableTableModel::SetStackFrame(Thread* thread,
 
 	fNodeManager->SetStackFrame(thread, stackFrame);
 
+	int32 count = fNodes.CountItems();
 	fNodeTable.Clear(true);
 
 	if (!fNodes.IsEmpty()) {
-		int32 count = fNodes.CountItems();
 		for (int32 i = 0; i < count; i++)
 			fNodes.ItemAt(i)->ReleaseReference();
 		fNodes.MakeEmpty();
 	}
 
 	if (stackFrame == NULL) {
-		NotifyNodesCleared();
+		NotifyNodesRemoved(TreeTablePath(), 0, count);
 		return;
 	}
 
