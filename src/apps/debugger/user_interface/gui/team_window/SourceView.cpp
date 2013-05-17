@@ -314,6 +314,10 @@ private:
 			void				_ScrollToTop();
 			void				_ScrollToBottom();
 
+			bool				_AddContextItem(BPopUpMenu* menu,
+									const char* text, uint32 what,
+									target_addr_t address) const;
+
 private:
 
 			float				fMaxLineWidth;
@@ -1255,31 +1259,20 @@ SourceView::TextView::MouseDown(BPoint where)
 		if (!fSourceView->GetStatementForLine(line, statement))
 			return;
 		BReference<Statement> statementReference(statement, true);
+		target_addr_t address = statement->CoveringAddressRange().Start();
 
 		BPopUpMenu* menu = new(std::nothrow) BPopUpMenu("");
 		if (menu == NULL)
 			return;
 		ObjectDeleter<BPopUpMenu> menuDeleter(menu);
 
-		BMessage* message = new(std::nothrow) BMessage(MSG_THREAD_RUN);
-		if (message == NULL)
-			return;
-		ObjectDeleter<BMessage> messageDeleter(message);
-
-		message->AddUInt64("address", statement->CoveringAddressRange()
-				.Start());
-		BMenuItem* item = new(std::nothrow) BMenuItem("Run to cursor",
-			message);
-		if (item == NULL)
-			return;
-		ObjectDeleter<BMenuItem> itemDeleter(item);
-		messageDeleter.Detach();
-
-		if (!menu->AddItem(item))
+		if (!_AddContextItem(menu, "Run to cursor", MSG_THREAD_RUN, address))
 			return;
 
-		itemDeleter.Detach();
-		messageDeleter.Detach();
+		if (!_AddContextItem(menu, "Set next statement",
+			MSG_THREAD_SET_ADDRESS, address)) {
+			return;
+		}
 		menuDeleter.Detach();
 
 		BPoint screenWhere(where);
@@ -1743,6 +1736,30 @@ SourceView::TextView::_ScrollToBottom(void)
 }
 
 
+bool
+SourceView::TextView::_AddContextItem(BPopUpMenu* menu, const char* text,
+	uint32 what, target_addr_t address) const
+{
+	BMessage* message = new(std::nothrow) BMessage(what);
+	if (message == NULL)
+		return false;
+	ObjectDeleter<BMessage> messageDeleter(message);
+
+	message->AddUInt64("address", address);
+	BMenuItem* item = new(std::nothrow) BMenuItem(text, message);
+	if (item == NULL)
+		return false;
+	ObjectDeleter<BMenuItem> itemDeleter(item);
+	messageDeleter.Detach();
+
+	if (!menu->AddItem(item))
+		return false;
+
+	itemDeleter.Detach();
+	return true;
+}
+
+
 // #pragma mark - SourceView
 
 
@@ -1795,6 +1812,7 @@ SourceView::MessageReceived(BMessage* message)
 {
 	switch(message->what) {
 		case MSG_THREAD_RUN:
+		case MSG_THREAD_SET_ADDRESS:
 		{
 			target_addr_t address;
 			if (message->FindUInt64("address", &address) != B_OK)
