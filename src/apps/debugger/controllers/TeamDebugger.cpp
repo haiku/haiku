@@ -530,6 +530,7 @@ TeamDebugger::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MSG_THREAD_RUN:
+		case MSG_THREAD_SET_ADDRESS:
 		case MSG_THREAD_STOP:
 		case MSG_THREAD_STEP_OVER:
 		case MSG_THREAD_STEP_INTO:

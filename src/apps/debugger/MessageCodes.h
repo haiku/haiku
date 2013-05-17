@@ -8,6 +8,7 @@
 
 enum {
 	MSG_THREAD_RUN								= 'run_',
+	MSG_THREAD_SET_ADDRESS						= 'sead',
 	MSG_THREAD_STOP								= 'stop',
 	MSG_THREAD_STEP_OVER						= 'stov',
 	MSG_THREAD_STEP_INTO						= 'stin',

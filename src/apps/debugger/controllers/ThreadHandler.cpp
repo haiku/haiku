@@ -220,6 +220,11 @@ ThreadHandler::HandleThreadAction(uint32 action, target_addr_t address)
 	BReference<CpuState> cpuStateReference(cpuState);
 	BReference<StackTrace> stackTraceReference(stackTrace);
 
+	if (action == MSG_THREAD_SET_ADDRESS) {
+		_HandleSetAddress(cpuState, address);
+		return;
+	}
+
 	// When continuing the thread update thread state before actually issuing
 	// the command, since we need to unlock.
 	if (action != MSG_THREAD_STOP) {
@@ -407,6 +412,26 @@ ThreadHandler::_HandleThreadStopped(CpuState* cpuState, uint32 stoppedReason,
 
 	_SetThreadState(THREAD_STATE_STOPPED, cpuState, stoppedReason,
 		stoppedReasonInfo);
+
+	return true;
+}
+
+
+bool
+ThreadHandler::_HandleSetAddress(CpuState* state, target_addr_t address)
+{
+	CpuState* newState = NULL;
+	if (state->Clone(newState) != B_OK)
+		return false;
+	BReference<CpuState> stateReference(newState, true);
+
+	newState->SetInstructionPointer(address);
+	if (fDebuggerInterface->SetCpuState(fThread->ID(), newState) != B_OK)
+		return false;
+
+	AutoLocker<Team> locker(fThread->GetTeam());
+	fThread->SetStackTrace(NULL);
+	fThread->SetCpuState(newState);
 
 	return true;
 }

@@ -70,6 +70,9 @@ private:
 									const BString& stoppedReasonInfo
 										= BString());
 
+			bool				_HandleSetAddress(CpuState* cpuState,
+									target_addr_t address);
+
 			void				_SetThreadState(uint32 state,
 									CpuState* cpuState, uint32 stoppedReason,
 									const BString& stoppedReasonInfo);
