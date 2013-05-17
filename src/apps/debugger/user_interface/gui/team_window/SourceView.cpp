@@ -14,11 +14,13 @@
 #include <stdio.h>
 
 #include <Clipboard.h>
+#include <Entry.h>
 #include <LayoutUtils.h>
 #include <Looper.h>
 #include <MenuItem.h>
 #include <Message.h>
 #include <MessageRunner.h>
+#include <Path.h>
 #include <Polygon.h>
 #include <PopUpMenu.h>
 #include <Region.h>
@@ -55,6 +57,10 @@ static const char* kDisableBreakpointMessage = "Click to disable breakpoint at "
 	"line %" B_PRId32 ".";
 static const char* kEnableBreakpointMessage = "Click to enable breakpoint at "
 	"line %" B_PRId32 ".";
+
+static const uint32 MSG_OPEN_SOURCE_FILE = 'mosf';
+
+static const char* kTrackerSignature = "application/x-vnd.Be-TRAK";
 
 
 class SourceView::BaseView : public BView {
@@ -314,7 +320,16 @@ private:
 			void				_ScrollToTop();
 			void				_ScrollToBottom();
 
-			bool				_AddContextItem(BPopUpMenu* menu,
+			bool				_AddGeneralActions(BPopUpMenu* menu,
+									int32 line);
+			bool				_AddFlowControlActions(BPopUpMenu* menu,
+									int32 line);
+
+			bool				_AddGeneralActionItem(BPopUpMenu* menu,
+									const char* text, BMessage* message) const;
+										// takes ownership of message
+										// regardless of outcome
+			bool				_AddFlowControlActionItem(BPopUpMenu* menu,
 									const char* text, uint32 what,
 									target_addr_t address) const;
 
@@ -1255,24 +1270,17 @@ SourceView::TextView::MouseDown(BPoint where)
 		else if (activeThread->State() != THREAD_STATE_STOPPED)
 			return;
 
-		Statement* statement;
-		if (!fSourceView->GetStatementForLine(line, statement))
-			return;
-		BReference<Statement> statementReference(statement, true);
-		target_addr_t address = statement->CoveringAddressRange().Start();
-
 		BPopUpMenu* menu = new(std::nothrow) BPopUpMenu("");
 		if (menu == NULL)
 			return;
 		ObjectDeleter<BPopUpMenu> menuDeleter(menu);
 
-		if (!_AddContextItem(menu, "Run to cursor", MSG_THREAD_RUN, address))
+		if (!_AddGeneralActions(menu, line))
 			return;
 
-		if (!_AddContextItem(menu, "Set next statement",
-			MSG_THREAD_SET_ADDRESS, address)) {
+		if (!_AddFlowControlActions(menu, line))
 			return;
-		}
+
 		menuDeleter.Detach();
 
 		BPoint screenWhere(where);
@@ -1737,8 +1745,70 @@ SourceView::TextView::_ScrollToBottom(void)
 
 
 bool
-SourceView::TextView::_AddContextItem(BPopUpMenu* menu, const char* text,
-	uint32 what, target_addr_t address) const
+SourceView::TextView::_AddGeneralActions(BPopUpMenu* menu, int32 line)
+{
+	BMessage* message = new(std::nothrow) BMessage(MSG_OPEN_SOURCE_FILE);
+	if (message == NULL)
+		return false;
+	message->AddInt32("line", line);
+
+	if (!_AddGeneralActionItem(menu, "Open source file", message))
+		return false;
+
+	return true;
+}
+
+
+bool
+SourceView::TextView::_AddFlowControlActions(BPopUpMenu* menu, int32 line)
+{
+	Statement* statement;
+	if (!fSourceView->GetStatementForLine(line, statement))
+		return true;
+
+	BReference<Statement> statementReference(statement, true);
+	target_addr_t address = statement->CoveringAddressRange().Start();
+
+	if (menu->CountItems() > 0)
+		menu->AddSeparatorItem();
+
+	if (!_AddFlowControlActionItem(menu, "Run to cursor", MSG_THREAD_RUN,
+		address)) {
+		return false;
+	}
+
+	if (!_AddFlowControlActionItem(menu, "Set next statement",
+			MSG_THREAD_SET_ADDRESS, address)) {
+		return false;
+	}
+
+	return true;
+}
+
+
+bool
+SourceView::TextView::_AddGeneralActionItem(BPopUpMenu* menu, const char* text,
+	BMessage* message) const
+{
+	ObjectDeleter<BMessage> messageDeleter(message);
+
+	BMenuItem* item = new(std::nothrow) BMenuItem(text, message);
+	if (item == NULL)
+		return false;
+	ObjectDeleter<BMenuItem> itemDeleter(item);
+	messageDeleter.Detach();
+
+	if (!menu->AddItem(item))
+		return false;
+
+	itemDeleter.Detach();
+	return true;
+}
+
+
+bool
+SourceView::TextView::_AddFlowControlActionItem(BPopUpMenu* menu,
+	const char* text, uint32 what, target_addr_t address) const
 {
 	BMessage* message = new(std::nothrow) BMessage(what);
 	if (message == NULL)
@@ -1819,6 +1889,41 @@ SourceView::MessageReceived(BMessage* message)
 				break;
 			fListener->ThreadActionRequested(fActiveThread, message->what,
 				address);
+			break;
+		}
+
+		case MSG_OPEN_SOURCE_FILE:
+		{
+			int32 line;
+			if (message->FindInt32("line", &line) != B_OK)
+				break;
+			// be:line is 1-based.
+			++line;
+			if (fSourceCode == NULL)
+				break;
+			LocatableFile* file = fSourceCode->GetSourceFile();
+			if (file == NULL)
+				break;
+
+			BString sourcePath;
+			file->GetLocatedPath(sourcePath);
+			if (sourcePath.IsEmpty())
+				break;
+
+			BPath path(sourcePath);
+			entry_ref ref;
+			if (path.InitCheck() != B_OK)
+				break;
+
+			if (get_ref_for_path(path.Path(), &ref) != B_OK)
+				break;
+
+			BMessage trackerMessage(B_REFS_RECEIVED);
+			trackerMessage.AddRef("refs", &ref);
+			trackerMessage.AddInt32("be:line", line);
+
+			BMessenger messenger(kTrackerSignature);
+			messenger.SendMessage(&trackerMessage);
 			break;
 		}
 
