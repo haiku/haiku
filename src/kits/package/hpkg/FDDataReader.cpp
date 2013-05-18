@@ -22,6 +22,13 @@ BFDDataReader::BFDDataReader(int fd)
 }
 
 
+void
+BFDDataReader::SetFD(int fd)
+{
+	fFD = fd;
+}
+
+
 status_t
 BFDDataReader::ReadData(off_t offset, void* buffer, size_t size)
 {

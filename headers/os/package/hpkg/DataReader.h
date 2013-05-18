@@ -41,6 +41,8 @@ class BFDDataReader : public BDataReader {
 public:
 								BFDDataReader(int fd);
 
+			void				SetFD(int fd);
+
 	virtual	status_t			ReadData(off_t offset, void* buffer,
 									size_t size);
 
@@ -64,12 +66,14 @@ private:
 };
 
 
-class BBufferDataReader : public BDataReader {
+class BBufferDataReader : public BAbstractBufferedDataReader {
 public:
 								BBufferDataReader(const void* data, size_t size);
 
 	virtual	status_t			ReadData(off_t offset, void* buffer,
 									size_t size);
+	virtual	status_t			ReadDataToOutput(off_t offset, size_t size,
+									BDataOutput* output);
 
 private:
 			const void*			fData;

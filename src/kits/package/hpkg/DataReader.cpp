@@ -68,6 +68,23 @@ BBufferDataReader::ReadData(off_t offset, void* buffer, size_t size)
 }
 
 
+status_t
+BBufferDataReader::ReadDataToOutput(off_t offset, size_t size,
+	BDataOutput* output)
+{
+	if (size == 0)
+		return B_OK;
+
+	if (offset < 0)
+		return B_BAD_VALUE;
+
+	if (size > fSize || offset > (off_t)fSize - (off_t)size)
+		return B_ERROR;
+
+	return output->WriteData((const uint8*)fData + offset, size);
+}
+
+
 }	// namespace BHPKG
 
 }	// namespace BPackageKit
