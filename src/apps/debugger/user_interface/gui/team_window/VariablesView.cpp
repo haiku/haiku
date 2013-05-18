@@ -1110,7 +1110,7 @@ VariablesView::VariableTableModel::ValueNodeValueChanged(ValueNode* valueNode)
 int32
 VariablesView::VariableTableModel::CountColumns() const
 {
-	return 2;
+	return 3;
 }
 
 
@@ -1198,6 +1198,15 @@ VariablesView::VariableTableModel::GetValueAt(void* object, int32 columnIndex,
 
 			_value.SetTo(node, VALUE_NODE_TYPE);
 			return true;
+		case 2:
+		{
+			Type* type = node->GetType();
+			if (type == NULL)
+				return false;
+
+			_value.SetTo(type->Name(), B_VARIANT_DONT_COPY_DATA);
+			return true;
+		}
 		default:
 			return false;
 	}
@@ -1889,6 +1898,8 @@ VariablesView::_Init()
 		B_TRUNCATE_END, B_ALIGN_LEFT));
 	fVariableTable->AddColumn(new VariableValueColumn(1, "Value", 80, 40, 1000,
 		B_TRUNCATE_END, B_ALIGN_RIGHT));
+	fVariableTable->AddColumn(new StringTableColumn(2, "Type", 80, 40, 1000,
+		B_TRUNCATE_END, B_ALIGN_LEFT));
 
 	fVariableTableModel = new VariableTableModel;
 	if (fVariableTableModel->Init() != B_OK)
