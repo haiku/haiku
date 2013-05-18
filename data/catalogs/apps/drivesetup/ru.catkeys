@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-DriveSetup	2015202924
+1	russian	x-vnd.Haiku-DriveSetup	3460572565
 DriveSetup	System name		Разметка диска
 Cancel	AbstractParametersPanel		Отмена
 Delete	MainWindow		Удалить
@@ -45,6 +45,7 @@ Create…	MainWindow		Создать…
 Disk system \"%s\"\" not found!	MainWindow		Дисковая система \"%s\"\" не обнаружена!
 The disk has been successfully initialized.\n	MainWindow		Диск был успешно инициализирован.\n
 Could not unmount partition %s.	MainWindow		Невозможно отключить раздел %s.
+Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Не удалось изменить параметры раздела. Изменения не были записаны на диск.
 Failed to format the partition %s!\n	MainWindow		Не удалось инициализировать раздел %s!\n
 Mount	MainWindow		Подключить
 Partition type	PartitionList		Тип раздела
@@ -63,6 +64,7 @@ Mount all	MainWindow		Подключить все
 End: %s	Support		Конец: %s
 Cancel	MainWindow		Отмена
 Delete partition	MainWindow		Удалить раздел
+Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Вы уверены, что хотите изменить параметры выбранного раздела?\n\nРаздел может больше не распознаваться другими операционными системами!
 Eject	MainWindow		Извлечь
 Partition	MainWindow		Раздел
 Validation of the given parameters failed.	MainWindow		Проверка введённых параметров не удалась.
@@ -79,6 +81,7 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 The partition %s is currently mounted.	MainWindow		Раздел %s в данный момент подключен.
 Surface test (not implemented)	MainWindow		Тест поверхности (еще не реализовано)
 Format	MainWindow		Инициализировать
+Could not change the parameters of the selected partition.	MainWindow		Невозможно изменить параметры выбранного раздела.
 Parameters	PartitionList		Параметры
 Creation of the partition has failed.	MainWindow		Не удалось создать раздел.
 The currently selected partition is not empty.	MainWindow		Текущий выбранный раздел не является пустым.

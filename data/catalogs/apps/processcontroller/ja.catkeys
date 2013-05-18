@@ -1,10 +1,8 @@
-1	japanese	x-vnd.Haiku-ProcessController	2887520383
+1	japanese	x-vnd.Haiku-ProcessController	2886374724
 Memory usage	ProcessController		メモリ使用量
-Do you really want to kill the team \"%s\"?	ProcessController		本当に team \"%s\" を強制終了してよいですか?
 Idle priority	ProcessController		アイドル優先度
 Restart Deskbar	ProcessController		Deskbar を再起動
 Custom priority	ProcessController		カスタム優先度
-Debug thread	ProcessController		スレッドをデバッグ
 This team is already gone…	ProcessController		Team はすでに終了しています…
 Error saving file	ProcessController		ファイル保存中にエラーが発生しました
 Real-time priority	ProcessController		リアルタイム優先度
@@ -42,7 +40,6 @@ Usage: %s [-deskbar]\n	ProcessController		Usage: %s [-deskbar]\n
 ProcessController	System name		プロセスコントローラー
 Real-time display priority	ProcessController		リアルタイム表示優先度
 Please confirm	ProcessController		確認してください。
-Yes, kill this team!	ProcessController		はい、team を強制終了します !
 System resources & caches…	ProcessController		システムリソースとキャッシュ…
 That's no Fun!	ProcessController		そんなのおもしろくない!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		プロセスコントローラーをウィンドウモードで起動するか、または Deskbar にインストールできます。

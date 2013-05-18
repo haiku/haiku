@@ -1,10 +1,8 @@
-1	portuguese (brazil)	x-vnd.Haiku-ProcessController	2887520383
+1	portuguese (brazil)	x-vnd.Haiku-ProcessController	2886374724
 Memory usage	ProcessController		Uso de memória
-Do you really want to kill the team \"%s\"?	ProcessController		Deseja realmente matar a equipe \"%s\"?
 Idle priority	ProcessController		Prioridade ociosa
 Restart Deskbar	ProcessController		Reiniciar o Deskbar
 Custom priority	ProcessController		Prioridade personalizada
-Debug thread	ProcessController		Processo de depuração
 This team is already gone…	ProcessController		Esta equipe já se foi…
 Error saving file	ProcessController		Erro ao gravar o arquivo
 Real-time priority	ProcessController		Prioridade em tempo real
@@ -42,7 +40,6 @@ Usage: %s [-deskbar]\n	ProcessController		Utilização: %s [-deskbar]\n
 ProcessController	System name		Controlador de Processo
 Real-time display priority	ProcessController		Exibir prioridade de tempo real
 Please confirm	ProcessController		Favor confirmar
-Yes, kill this team!	ProcessController		Sim, mate esta equipe!
 System resources & caches…	ProcessController		Recursos & caches de sistema…
 That's no Fun!	ProcessController		Isso não é Engraçado!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		É possível executar o Controlador de Processo em uma janela ou instalá-lo no Deskbar.

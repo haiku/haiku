@@ -1,10 +1,8 @@
-1	hindi	x-vnd.Haiku-ProcessController	2887520383
+1	hindi	x-vnd.Haiku-ProcessController	2886374724
 Memory usage	ProcessController		स्मृति के उपयोग
-Do you really want to kill the team \"%s\"?	ProcessController		क्या आप वास्तव में टीम को मारना चाहते हैं \"%s\"?
 Idle priority	ProcessController		आइडल प्राथमिकता
 Restart Deskbar	ProcessController		डेस्कबार पुनः आरंभ करें
 Custom priority	ProcessController		प्राथमिकता कस्टम है
-Debug thread	ProcessController		डिबग थ्रेड
 This team is already gone…	ProcessController		यह टीम पहले से ही जा चुकी है...
 Error saving file	ProcessController		त्रुटि फ़ाइल सहेजने मैं
 Real-time priority	ProcessController		रियल-टाइम प्राथमिकता
@@ -42,7 +40,6 @@ Usage: %s [-deskbar]\n	ProcessController		प्रयोग: %s [-डेस्�
 ProcessController	System name		ProcessController
 Real-time display priority	ProcessController		प्राथमिकता रियल-टाइम डिस्प्ले है
 Please confirm	ProcessController		कृपया पक्का करें
-Yes, kill this team!	ProcessController		हाँ, यह टीम को मार डालो!
 System resources & caches…	ProcessController		सिस्टम रिसोर्से & कैशेस...
 That's no Fun!	ProcessController		वह कुछ भी मज़ा नहीं है!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		आप एक खिड़की में प्रक्रिया नियंत्रक रन कर सकते या उसको डेस्कबार में स्थापित कर सकते हैं.

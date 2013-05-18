@@ -1,10 +1,8 @@
-1	dutch; flemish	x-vnd.Haiku-ProcessController	2887520383
+1	dutch; flemish	x-vnd.Haiku-ProcessController	2886374724
 Memory usage	ProcessController		Geheugengebruik
-Do you really want to kill the team \"%s\"?	ProcessController		Wilt u echt team \"%s\" afbreken?
 Idle priority	ProcessController		Inactieve prioriteit
 Restart Deskbar	ProcessController		Deskbar herstarten
 Custom priority	ProcessController		Aangepaste prioriteit
-Debug thread	ProcessController		Thread debuggen
 This team is already gone…	ProcessController		Dit team is al verdwenen...
 Error saving file	ProcessController		Fout bij bestandsopslag
 Real-time priority	ProcessController		Real-time prioriteit
@@ -42,7 +40,6 @@ Usage: %s [-deskbar]\n	ProcessController		Gebruik: %s [-deskbar]\n
 ProcessController	System name		ProcessController
 Real-time display priority	ProcessController		Real-time weergave prioriteit
 Please confirm	ProcessController		Gelieve te bevestigen
-Yes, kill this team!	ProcessController		Ja, breek dit team af!
 System resources & caches…	ProcessController		Systeembronnen en -caches...
 That's no Fun!	ProcessController		Da's niet Leuk!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		U kunt ProcessController in een venster actief hebben, of in Deskbar installeren.
