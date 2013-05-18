@@ -1593,6 +1593,9 @@ VariablesView::MessageReceived(BMessage* message)
 				->SelectionModel()->NodeAt(0);
 			int32 lowerBound, upperBound;
 			ValueNode* valueNode = node->NodeChild()->Node();
+			if (!valueNode->IsRangedContainer())
+				valueNode = node->ChildAt(0)->NodeChild()->Node();
+
 			if (valueNode->SupportedChildRange(lowerBound, upperBound) != B_OK)
 				break;
 
@@ -1623,6 +1626,8 @@ VariablesView::MessageReceived(BMessage* message)
 				->SelectionModel()->NodeAt(0);
 			int32 lowerBound, upperBound;
 			ValueNode* valueNode = node->NodeChild()->Node();
+			if (!valueNode->IsRangedContainer())
+				valueNode = node->ChildAt(0)->NodeChild()->Node();
 			if (valueNode->SupportedChildRange(lowerBound, upperBound) != B_OK)
 				break;
 
@@ -1992,12 +1997,22 @@ VariablesView::_GetContextActionsForNode(ModelNode* node,
 		return result;
 
 	ValueNode* valueNode = node->NodeChild()->Node();
-	if (valueNode != NULL && valueNode->IsRangedContainer()) {
-		result = _AddContextAction("Set visible range" B_UTF8_ELLIPSIS,
-			MSG_SHOW_CONTAINER_RANGE_PROMPT, actions, message);
-		if (result != B_OK)
-			return result;
+	if (valueNode == NULL)
+		return B_OK;
+
+	if (!valueNode->IsRangedContainer()) {
+		if (node->CountChildren() == 1 && node->ChildAt(0)->IsHidden()) {
+			valueNode = node->ChildAt(0)->NodeChild()->Node();
+			if (valueNode == NULL || !valueNode->IsRangedContainer())
+				return B_OK;
+		} else
+			return B_OK;
 	}
+
+	result = _AddContextAction("Set visible range" B_UTF8_ELLIPSIS,
+		MSG_SHOW_CONTAINER_RANGE_PROMPT, actions, message);
+	if (result != B_OK)
+		return result;
 
 	return B_OK;
 }
