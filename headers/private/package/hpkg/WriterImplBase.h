@@ -11,6 +11,7 @@
 #include <package/hpkg/HPKGDefsPrivate.h>
 
 #include <package/hpkg/DataOutput.h>
+#include <package/hpkg/DataWriters.h>
 #include <package/hpkg/Strings.h>
 #include <package/hpkg/ZlibCompressor.h>
 
@@ -29,16 +30,19 @@ class BErrorOutput;
 namespace BPrivate {
 
 
+class AbstractDataWriter;
+class PackageFileHeapWriter;
+
 struct hpkg_header;
+
 
 class WriterImplBase {
 public:
-								WriterImplBase(BErrorOutput* errorOutput);
+								WriterImplBase(const char* fileType,
+									BErrorOutput* errorOutput);
 								~WriterImplBase();
 
 protected:
-
-
 			struct AttributeValue {
 				union {
 					int64			signedInt;
@@ -92,63 +96,10 @@ protected:
 				void _DeleteChildren();
 			};
 
-
-			struct AbstractDataWriter {
-				AbstractDataWriter();
-				virtual ~AbstractDataWriter();
-
-				uint64 BytesWritten() const;
-
-				virtual status_t WriteDataNoThrow(const void* buffer,
-					size_t size) = 0;
-
-				void WriteDataThrows(const void* buffer, size_t size);
-
-			protected:
-				uint64	fBytesWritten;
-			};
-
-
-			struct FDDataWriter : AbstractDataWriter {
-				FDDataWriter(int fd, off_t offset, BErrorOutput* errorOutput);
-
-				virtual status_t WriteDataNoThrow(const void* buffer,
-					size_t size);
-
-				off_t Offset() const;
-
-			private:
-				int				fFD;
-				off_t			fOffset;
-				BErrorOutput*	fErrorOutput;
-			};
-
-
-			struct ZlibDataWriter : AbstractDataWriter, private BDataOutput {
-				ZlibDataWriter(AbstractDataWriter* dataWriter);
-
-				void Init();
-
-				void Finish();
-
-				virtual status_t WriteDataNoThrow(const void* buffer,
-					size_t size);
-
-			private:
-				// BDataOutput
-				virtual status_t WriteData(const void* buffer, size_t size);
-
-			private:
-				AbstractDataWriter*	fDataWriter;
-				ZlibCompressor		fCompressor;
-			};
-
-
 			typedef DoublyLinkedList<PackageAttribute> PackageAttributeList;
 
 protected:
-			status_t			Init(const char* fileName, const char* type,
-									uint32 flags);
+			status_t			Init(const char* fileName, uint32 flags);
 
 			void				RegisterPackageInfo(
 									PackageAttributeList& attributeList,
@@ -180,13 +131,16 @@ protected:
 			void				WriteAttributeValue(const AttributeValue& value,
 									uint8 encoding);
 			void				WriteUnsignedLEB128(uint64 value);
-	inline	void				WriteString(const char* string);
 
 	template<typename Type>
 	inline	void				Write(const Type& value);
+	inline	void				WriteString(const char* string);
+	inline	void				WriteBuffer(const void* data, size_t size);
+									// appends data to the heap
 
-			void				WriteBuffer(const void* buffer, size_t size,
+			void				RawWriteBuffer(const void* buffer, size_t size,
 									off_t offset);
+									// writes to the file directly
 
 	inline	int					FD() const;
 	inline	uint32				Flags() const;
@@ -197,10 +151,10 @@ protected:
 	inline	const StringCache&	PackageStringCache() const;
 	inline	StringCache&		PackageStringCache();
 
-	inline	AbstractDataWriter*	DataWriter() const;
-	inline	void				SetDataWriter(AbstractDataWriter* dataWriter);
-
 	inline	void				SetFinished(bool finished);
+
+protected:
+			PackageFileHeapWriter* fHeapWriter;
 
 private:
 	static const BHPKGAttributeID kDefaultVersionAttributeID
@@ -211,6 +165,7 @@ private:
 									const PackageAttributeList& attributes);
 
 private:
+			const char*			fFileType;
 			BErrorOutput*		fErrorOutput;
 			const char*			fFileName;
 			uint32				fFlags;
@@ -224,41 +179,25 @@ private:
 };
 
 
-inline uint64
-WriterImplBase::AbstractDataWriter::BytesWritten() const
-{
-	return fBytesWritten;
-}
-
-
-inline void
-WriterImplBase::AbstractDataWriter::WriteDataThrows(const void* buffer,
-	size_t size)
-{
-	status_t error = WriteDataNoThrow(buffer, size);
-	if (error != B_OK)
-		throw status_t(error);
-}
-
-inline off_t
-WriterImplBase::FDDataWriter::Offset() const
-{
-	return fOffset;
-}
-
-
 template<typename Type>
 inline void
 WriterImplBase::Write(const Type& value)
 {
-	fDataWriter->WriteDataThrows(&value, sizeof(Type));
+	WriteBuffer(&value, sizeof(Type));
 }
 
 
 inline void
 WriterImplBase::WriteString(const char* string)
 {
-	fDataWriter->WriteDataThrows(string, strlen(string) + 1);
+	WriteBuffer(string, strlen(string) + 1);
+}
+
+
+inline void
+WriterImplBase::WriteBuffer(const void* data, size_t size)
+{
+	fDataWriter->WriteDataThrows(data, size);
 }
 
 
@@ -273,20 +212,6 @@ inline uint32
 WriterImplBase::Flags() const
 {
 	return fFlags;
-}
-
-
-inline WriterImplBase::AbstractDataWriter*
-WriterImplBase::DataWriter() const
-{
-	return fDataWriter;
-}
-
-
-inline void
-WriterImplBase::SetDataWriter(AbstractDataWriter* dataWriter)
-{
-	fDataWriter = dataWriter;
 }
 
 

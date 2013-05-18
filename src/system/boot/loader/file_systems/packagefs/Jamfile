@@ -35,6 +35,8 @@ BootStaticLibrary boot_packagefs :
 	PackageDataReader.cpp
 	PackageEntry.cpp
 	PackageEntryAttribute.cpp
+	PackageFileHeapAccessorBase.cpp
+	PackageFileHeapReader.cpp
 	PackageReaderImpl.cpp
 	ReaderImplBase.cpp
 

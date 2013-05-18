@@ -48,10 +48,10 @@ private:
 
 
 struct PackageFile::DataAccessor {
-	DataAccessor(PackageData* data)
+	DataAccessor(Package* package, PackageData* data)
 		:
+		fPackage(package),
 		fData(data),
-		fDataReader(NULL),
 		fReader(NULL),
 		fFileCache(NULL)
 	{
@@ -62,27 +62,15 @@ struct PackageFile::DataAccessor {
 	{
 		file_cache_delete(fFileCache);
 		delete fReader;
-		delete fDataReader;
 		mutex_destroy(&fLock);
 	}
 
 	status_t Init(dev_t deviceID, ino_t nodeID, int fd)
 	{
-		// create a BDataReader for the compressed data
-		if (fData->IsEncodedInline()) {
-			fDataReader = new(std::nothrow) BBufferDataReader(
-				fData->InlineData(), fData->CompressedSize());
-		} else
-			fDataReader = new(std::nothrow) BFDDataReader(fd);
-
-		if (fDataReader == NULL)
-			RETURN_ERROR(B_NO_MEMORY);
-
-		// create a PackageDataReader
-		status_t error = GlobalFactory::Default()->CreatePackageDataReader(
-			fDataReader, *fData, fReader);
+		// create a reader for the data
+		status_t error = fPackage->CreateDataReader(*fData, fReader);
 		if (error != B_OK)
-			RETURN_ERROR(error);
+			return error;
 
 		// create a file cache
 		fFileCache = file_cache_create(deviceID, nodeID,
@@ -128,8 +116,8 @@ struct PackageFile::DataAccessor {
 
 private:
 	mutex							fLock;
+	Package*						fPackage;
 	PackageData*					fData;
-	BDataReader*					fDataReader;
 	BAbstractBufferedDataReader*	fReader;
 	void*							fFileCache;
 };
@@ -168,7 +156,7 @@ PackageFile::VFSInit(dev_t deviceID, ino_t nodeID)
 	PackageCloser packageCloser(fPackage);
 
 	// create the data accessor
-	fDataAccessor = new(std::nothrow) DataAccessor(&fData);
+	fDataAccessor = new(std::nothrow) DataAccessor(GetPackage(), &fData);
 	if (fDataAccessor == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 

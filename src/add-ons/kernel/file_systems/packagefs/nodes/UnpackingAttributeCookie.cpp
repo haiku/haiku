@@ -28,17 +28,9 @@ using BPackageKit::BHPKG::BFDDataReader;
 
 
 static status_t
-read_package_data(const PackageData& data, BDataReader* dataReader,
-	off_t offset, void* buffer, size_t* bufferSize)
+read_package_data(const PackageData& data, BDataReader* reader, off_t offset,
+	void* buffer, size_t* bufferSize)
 {
-	// create a PackageDataReader
-	BAbstractBufferedDataReader* reader;
-	status_t error = GlobalFactory::Default()->CreatePackageDataReader(
-		dataReader, data, reader);
-	if (error != B_OK)
-		RETURN_ERROR(error);
-	ObjectDeleter<BAbstractBufferedDataReader> readerDeleter(reader);
-
 	// check the offset
 	if (offset < 0 || (uint64)offset > data.UncompressedSize())
 		return B_BAD_VALUE;
@@ -131,19 +123,20 @@ UnpackingAttributeCookie::ReadAttribute(PackageNode* packageNode,
 	const PackageData& data = attribute->Data();
 	if (data.IsEncodedInline()) {
 		// inline data
-		BBufferDataReader dataReader(data.InlineData(), data.CompressedSize());
+		BBufferDataReader dataReader(data.InlineData(),
+			data.UncompressedSize());
 		return read_package_data(data, &dataReader, offset, buffer, bufferSize);
 	}
 
-	// data not inline -- open the package
+	// data not inline -- let the package create a data reader for us
 	Package* package = packageNode->GetPackage();
-	int fd = package->Open();
-	if (fd < 0)
-		RETURN_ERROR(fd);
-	PackageCloser packageCloser(package);
+	BAbstractBufferedDataReader* reader;
+	status_t error = package->CreateDataReader(data, reader);
+	if (error != B_OK)
+		return error;
+	ObjectDeleter<BAbstractBufferedDataReader> readerDeleter(reader);
 
-	BFDDataReader dataReader(fd);
-	return read_package_data(data, &dataReader, offset, buffer, bufferSize);
+	return read_package_data(data, reader, offset, buffer, bufferSize);
 }
 
 

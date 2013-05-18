@@ -21,6 +21,7 @@
 
 #include <package/hpkg/DataOutput.h>
 #include <package/hpkg/ErrorOutput.h>
+#include <package/hpkg/PackageFileHeapReader.h>
 #include <package/hpkg/ZlibDecompressor.h>
 
 
@@ -536,12 +537,14 @@ ReaderImplBase::LowLevelAttributeHandler::Delete(
 // #pragma mark - ReaderImplBase
 
 
-ReaderImplBase::ReaderImplBase(BErrorOutput* errorOutput)
+ReaderImplBase::ReaderImplBase(const char* fileType, BErrorOutput* errorOutput)
 	:
 	fPackageAttributesSection("package attributes"),
+	fFileType(fileType),
 	fErrorOutput(errorOutput),
 	fFD(-1),
 	fOwnsFD(false),
+	fHeapReader(NULL),
 	fCurrentSection(NULL),
 	fScratchBuffer(NULL),
 	fScratchBufferSize(0)
@@ -551,6 +554,8 @@ ReaderImplBase::ReaderImplBase(BErrorOutput* errorOutput)
 
 ReaderImplBase::~ReaderImplBase()
 {
+	delete fHeapReader;
+
 	if (fOwnsFD && fFD >= 0)
 		close(fFD);
 
@@ -559,7 +564,7 @@ ReaderImplBase::~ReaderImplBase()
 
 
 status_t
-ReaderImplBase::Init(int fd, bool keepFD)
+ReaderImplBase::_Init(int fd, bool keepFD)
 {
 	fFD = fd;
 	fOwnsFD = keepFD;
@@ -576,27 +581,84 @@ ReaderImplBase::Init(int fd, bool keepFD)
 }
 
 
-const char*
-ReaderImplBase::CheckCompression(const SectionInfo& section) const
+status_t
+ReaderImplBase::InitHeapReader(uint32 compression, uint32 chunkSize,
+	off_t offset, uint64 compressedSize, uint64 uncompressedSize)
 {
-	switch (section.compression) {
-		case B_HPKG_COMPRESSION_NONE:
-			if (section.compressedLength != section.uncompressedLength) {
-				return "Uncompressed, but compressed and uncompressed length "
-					"don't match";
-			}
-			return NULL;
-
-		case B_HPKG_COMPRESSION_ZLIB:
-			if (section.compressedLength >= section.uncompressedLength) {
-				return "Compressed, but compressed length is not less than "
-					"uncompressed length";
-			}
-			return NULL;
-
-		default:
-			return "Invalid compression algorithm ID";
+	if (compression != B_HPKG_COMPRESSION_ZLIB) {
+		fErrorOutput->PrintError("Error: Invalid heap compression\n");
+		return B_BAD_DATA;
 	}
+
+	fHeapReader = new(std::nothrow) PackageFileHeapReader(fErrorOutput, fFD,
+		offset, compressedSize, uncompressedSize);
+	return fHeapReader->Init();
+}
+
+
+status_t
+ReaderImplBase::InitSection(PackageFileSection& section, uint64 endOffset,
+	uint64 length, uint64 maxSaneLength, uint64 stringsLength,
+	uint64 stringsCount)
+{
+	// check length vs. endOffset
+	if (length > endOffset) {
+		ErrorOutput()->PrintError("Error: %s file %s section size is %"
+			B_PRIu64 " bytes. This is greater than the available space\n",
+			fFileType, section.name, length);
+		return B_BAD_DATA;
+	}
+
+	// check sanity length
+	if (maxSaneLength > 0 && length > maxSaneLength) {
+		ErrorOutput()->PrintError("Error: %s file %s section size is %"
+			B_PRIu64 " bytes. This is beyond the reader's sanity limit\n",
+			fFileType, section.name, length);
+		return B_NOT_SUPPORTED;
+	}
+
+	// check strings subsection size/count
+	if ((stringsLength == 0) != (stringsCount == 0) || stringsLength > length) {
+		ErrorOutput()->PrintError("Error: strings subsection description of %s "
+			"file %s section is invalid (%" B_PRIu64 " strings, length: %"
+			B_PRIu64 ")\n",
+			fFileType, section.name, length, stringsCount, stringsLength);
+		return B_BAD_DATA;
+	}
+
+	section.uncompressedLength = length;
+	section.offset = endOffset - length;
+	section.currentOffset = 0;
+	section.stringsLength = stringsLength;
+	section.stringsCount = stringsCount;
+
+	return B_OK;
+}
+
+
+status_t
+ReaderImplBase::PrepareSection(PackageFileSection& section)
+{
+	// allocate memory for the section data and read it in
+	section.data = new(std::nothrow) uint8[section.uncompressedLength];
+	if (section.data == NULL) {
+		ErrorOutput()->PrintError("Error: Out of memory!\n");
+		return B_NO_MEMORY;
+	}
+
+	status_t error = ReadSection(section);
+	if (error != B_OK)
+		return error;
+
+	// parse the section strings
+	section.currentOffset = 0;
+	SetCurrentSection(&section);
+
+	error = ParseStrings();
+	if (error != B_OK)
+		return error;
+
+	return B_OK;
 }
 
 
@@ -982,8 +1044,9 @@ ReaderImplBase::_ReadSectionBuffer(void* buffer, size_t size)
 {
 	if (size > fCurrentSection->uncompressedLength
 			- fCurrentSection->currentOffset) {
-		fErrorOutput->PrintError("_ReadBuffer(%lu): read beyond %s end\n",
-			size, fCurrentSection->name);
+		fErrorOutput->PrintError(
+			"_ReadSectionBuffer(%lu): read beyond %s end\n", size,
+			fCurrentSection->name);
 		return B_BAD_DATA;
 	}
 
@@ -1014,63 +1077,11 @@ ReaderImplBase::ReadBuffer(off_t offset, void* buffer, size_t size)
 
 
 status_t
-ReaderImplBase::ReadCompressedBuffer(const SectionInfo& section)
+ReaderImplBase::ReadSection(const PackageFileSection& section)
 {
-	uint32 compressedSize = section.compressedLength;
-	uint64 offset = section.offset;
-
-	switch (section.compression) {
-		case B_HPKG_COMPRESSION_NONE:
-			return ReadBuffer(offset, section.data, compressedSize);
-
-		case B_HPKG_COMPRESSION_ZLIB:
-		{
-			// init the decompressor
-			BBufferDataOutput bufferOutput(section.data,
-				section.uncompressedLength);
-			ZlibDecompressor decompressor(&bufferOutput);
-			status_t error = decompressor.Init();
-			if (error != B_OK)
-				return error;
-
-			while (compressedSize > 0) {
-				// read compressed buffer
-				size_t toRead = std::min((size_t)compressedSize,
-					fScratchBufferSize);
-				error = ReadBuffer(offset, fScratchBuffer, toRead);
-				if (error != B_OK)
-					return error;
-
-				// uncompress
-				error = decompressor.DecompressNext(fScratchBuffer, toRead);
-				if (error != B_OK)
-					return error;
-
-				compressedSize -= toRead;
-				offset += toRead;
-			}
-
-			error = decompressor.Finish();
-			if (error != B_OK)
-				return error;
-
-			// verify that all data have been read
-			if (bufferOutput.BytesWritten() != section.uncompressedLength) {
-				fErrorOutput->PrintError("Error: Missing bytes in uncompressed "
-					"buffer!\n");
-				return B_BAD_DATA;
-			}
-
-			return B_OK;
-		}
-
-		default:
-		{
-			fErrorOutput->PrintError("Error: Invalid compression type: %u\n",
-				section.compression);
-			return B_BAD_DATA;
-		}
-	}
+	BBufferDataOutput output(section.data, section.uncompressedLength);
+	return fHeapReader->ReadDataToOutput(section.offset,
+		section.uncompressedLength, &output);
 }
 
 

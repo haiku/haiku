@@ -29,7 +29,9 @@
 
 
 using namespace BPackageKit;
+using BPackageKit::BHPKG::BErrorOutput;
 using BPackageKit::BHPKG::BPackageInfoAttributeValue;
+using BPackageKit::BHPKG::BStandardErrorOutput;
 
 
 struct VersionPolicyV1 {
@@ -39,6 +41,12 @@ struct VersionPolicyV1 {
 	typedef BPackageKit::BHPKG::V1::BPackageEntryAttribute
 		PackageEntryAttribute;
 	typedef BPackageKit::BHPKG::V1::BPackageReader PackageReader;
+
+	static inline uint64 PackageDataSize(
+		const BPackageKit::BHPKG::V1::BPackageData& data)
+	{
+		return data.UncompressedSize();
+	}
 };
 
 struct VersionPolicyV2 {
@@ -46,6 +54,12 @@ struct VersionPolicyV2 {
 	typedef BPackageKit::BHPKG::BPackageEntry PackageEntry;
 	typedef BPackageKit::BHPKG::BPackageEntryAttribute PackageEntryAttribute;
 	typedef BPackageKit::BHPKG::BPackageReader PackageReader;
+
+	static inline uint64 PackageDataSize(
+		const BPackageKit::BHPKG::BPackageData& data)
+	{
+		return data.Size();
+	}
 };
 
 
@@ -67,7 +81,8 @@ struct PackageContentListHandler : VersionPolicy::PackageContentHandler {
 
 		// name and size
 		printf("%-*s", indentation < 32 ? 32 - indentation : 0, entry->Name());
-		printf("  %8llu", (unsigned long long)entry->Data().UncompressedSize());
+		printf("  %8llu",
+			(unsigned long long)VersionPolicy::PackageDataSize(entry->Data()));
 
 		// time
 		struct tm* time = localtime(&entry->ModifiedTime().tv_sec);
@@ -113,7 +128,8 @@ struct PackageContentListHandler : VersionPolicy::PackageContentHandler {
 		printf("%*s<", indentation, "");
 		printf("%-*s  %8llu", indentation < 31 ? 31 - indentation : 0,
 			attribute->Name(),
-			(unsigned long long)attribute->Data().UncompressedSize());
+			(unsigned long long)VersionPolicy::PackageDataSize(
+				attribute->Data()));
 
 		uint32 type = attribute->Type();
 		if (isprint(type & 0xff) && isprint((type >> 8) & 0xff)
@@ -352,7 +368,7 @@ do_list(const char* packageFileName, bool listAttributes, bool filePathsOnly,
 	bool ignoreVersionError)
 {
 	// open package
-	BHPKG::BStandardErrorOutput errorOutput;
+	BStandardErrorOutput errorOutput;
 	typename VersionPolicy::PackageReader packageReader(&errorOutput);
 	status_t error = packageReader.Init(packageFileName);
 	if (error != B_OK) {

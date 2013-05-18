@@ -25,8 +25,7 @@ namespace BPrivate {
 class PackageReaderImpl : public ReaderImplBase {
 	typedef	ReaderImplBase		inherited;
 public:
-								PackageReaderImpl(
-									BErrorOutput* errorOutput);
+								PackageReaderImpl(BErrorOutput* errorOutput);
 								~PackageReaderImpl();
 
 			status_t			Init(const char* fileName);
@@ -41,13 +40,15 @@ public:
 			uint64				HeapOffset() const;
 			uint64				HeapSize() const;
 
+			PackageFileHeapReader* HeapReader() const
+									{ return inherited::HeapReader(); }
+
 protected:
 								// from ReaderImplBase
 	virtual	status_t			ReadAttributeValue(uint8 type, uint8 encoding,
 									AttributeValue& _value);
 
 private:
-			struct DataAttributeHandler;
 			struct AttributeAttributeHandler;
 			struct EntryAttributeHandler;
 			struct RootAttributeHandler;
@@ -59,11 +60,10 @@ private:
 			status_t			_GetTOCBuffer(size_t size,
 									const void*& _buffer);
 private:
-			uint64				fTotalSize;
 			uint64				fHeapOffset;
 			uint64				fHeapSize;
 
-			SectionInfo			fTOCSection;
+			PackageFileSection	fTOCSection;
 };
 
 

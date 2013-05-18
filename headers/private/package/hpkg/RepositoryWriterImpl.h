@@ -50,10 +50,9 @@ private:
 
 			status_t			_RegisterCurrentPackageInfo();
 			status_t			_WriteRepositoryInfo(hpkg_repo_header& header,
-									ssize_t& _infoLengthCompressed);
-			off_t				_WritePackageAttributes(
-									hpkg_repo_header& header, off_t startOffset,
-									ssize_t& _packagesLengthCompressed);
+									uint64& _length);
+			void				_WritePackageAttributes(
+									hpkg_repo_header& header, uint64& _length);
 
 			struct PackageNameSet;
 

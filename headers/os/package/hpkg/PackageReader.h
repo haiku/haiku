@@ -19,6 +19,8 @@ namespace BPrivate {
 }
 using BPrivate::PackageReaderImpl;
 
+
+class BAbstractBufferedDataReader;
 class BErrorOutput;
 class BLowLevelPackageContentHandler;
 class BPackageContentHandler;
@@ -26,8 +28,7 @@ class BPackageContentHandler;
 
 class BPackageReader {
 public:
-								BPackageReader(
-									BErrorOutput* errorOutput);
+								BPackageReader(BErrorOutput* errorOutput);
 								~BPackageReader();
 
 			status_t			Init(const char* fileName);
@@ -38,6 +39,10 @@ public:
 										contentHandler);
 
 			int					PackageFileFD();
+
+			BAbstractBufferedDataReader* HeapReader() const;
+									// Only valid as long as the reader lives.
+
 private:
 			PackageReaderImpl*	fImpl;
 };

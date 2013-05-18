@@ -39,6 +39,7 @@
 
 #include <package/hpkg/DataOutput.h>
 #include <package/hpkg/DataReader.h>
+#include <package/hpkg/PackageFileHeapWriter.h>
 #include <package/hpkg/PackageReaderImpl.h>
 #include <package/hpkg/Stacker.h>
 
@@ -156,12 +157,11 @@ struct PackageWriterImpl::Attribute
 struct PackageWriterImpl::PackageContentHandler
 	: BLowLevelPackageContentHandler {
 	PackageContentHandler(Attribute* rootAttribute, BErrorOutput* errorOutput,
-		StringCache& stringCache, uint64 heapOffset)
+		StringCache& stringCache)
 		:
 		fErrorOutput(errorOutput),
 		fStringCache(stringCache),
 		fRootAttribute(rootAttribute),
-		fHeapOffset(heapOffset),
 		fErrorOccurred(false)
 	{
 	}
@@ -212,7 +212,7 @@ struct PackageWriterImpl::PackageContentHandler
 			case B_HPKG_ATTRIBUTE_TYPE_RAW:
 				if (value.encoding == B_HPKG_ATTRIBUTE_ENCODING_RAW_HEAP) {
 					attribute->value.SetToData(value.data.size,
-						value.data.offset - fHeapOffset);
+						value.data.offset);
 				} else if (value.encoding
 						== B_HPKG_ATTRIBUTE_ENCODING_RAW_INLINE) {
 					attribute->value.SetToData(value.data.size, value.data.raw);
@@ -249,7 +249,6 @@ private:
 	BErrorOutput*	fErrorOutput;
 	StringCache&	fStringCache;
 	Attribute*		fRootAttribute;
-	uint64			fHeapOffset;
 	bool			fErrorOccurred;
 };
 
@@ -394,8 +393,8 @@ private:
 
 
 struct PackageWriterImpl::HeapAttributeOffsetter {
-	HeapAttributeOffsetter(const RangeArray<off_t>& ranges,
-		const Array<off_t>& deltas)
+	HeapAttributeOffsetter(const RangeArray<uint64>& ranges,
+		const Array<uint64>& deltas)
 		:
 		fRanges(ranges),
 		fDeltas(deltas)
@@ -409,7 +408,7 @@ struct PackageWriterImpl::HeapAttributeOffsetter {
 
 		if (value.type == B_HPKG_ATTRIBUTE_TYPE_RAW
 			&& value.encoding == B_HPKG_ATTRIBUTE_ENCODING_RAW_HEAP) {
-			off_t delta = fDeltas[fRanges.InsertionIndex(value.data.offset)];
+			uint64 delta = fDeltas[fRanges.InsertionIndex(value.data.offset)];
 			value.data.offset -= delta;
 		}
 
@@ -422,8 +421,8 @@ struct PackageWriterImpl::HeapAttributeOffsetter {
 	}
 
 private:
-	const RangeArray<off_t>&	fRanges;
-	const Array<off_t>&			fDeltas;
+	const RangeArray<uint64>&	fRanges;
+	const Array<uint64>&		fDeltas;
 };
 
 
@@ -445,11 +444,9 @@ PackageWriterImpl::_AddAttribute(BHPKGAttributeID attributeID, Type value)
 
 PackageWriterImpl::PackageWriterImpl(BPackageWriterListener* listener)
 	:
-	inherited(listener),
+	inherited("package", listener),
 	fListener(listener),
 	fHeapRangesToRemove(NULL),
-	fDataBuffer(NULL),
-	fDataBufferSize(2 * B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB),
 	fRootEntry(NULL),
 	fRootAttribute(NULL),
 	fTopAttribute(NULL),
@@ -461,10 +458,7 @@ PackageWriterImpl::PackageWriterImpl(BPackageWriterListener* listener)
 PackageWriterImpl::~PackageWriterImpl()
 {
 	delete fRootAttribute;
-
 	delete fRootEntry;
-
-	free(fDataBuffer);
 }
 
 
@@ -566,7 +560,7 @@ status_t
 PackageWriterImpl::Finish()
 {
 	try {
-		RangeArray<off_t> heapRangesToRemove;
+		RangeArray<uint64> heapRangesToRemove;
 		fHeapRangesToRemove = &heapRangesToRemove;
 
 		if ((Flags() & B_HPKG_WRITER_UPDATE_PACKAGE) != 0) {
@@ -610,14 +604,9 @@ PackageWriterImpl::Finish()
 status_t
 PackageWriterImpl::_Init(const char* fileName, uint32 flags)
 {
-	status_t result = inherited::Init(fileName, "package", flags);
+	status_t result = inherited::Init(fileName, flags);
 	if (result != B_OK)
 		return result;
-
-	// allocate data buffer
-	fDataBuffer = malloc(fDataBufferSize);
-	if (fDataBuffer == NULL)
-		throw std::bad_alloc();
 
 	if (fStringCache.Init() != B_OK)
 		throw std::bad_alloc();
@@ -627,7 +616,7 @@ PackageWriterImpl::_Init(const char* fileName, uint32 flags)
 
 	fRootAttribute = new Attribute();
 
-	fHeapOffset = fHeapEnd = sizeof(hpkg_header);
+	fHeapOffset = fHeaderSize = sizeof(hpkg_header);
 	fTopAttribute = fRootAttribute;
 
 	// in update mode, parse the TOC
@@ -638,19 +627,14 @@ PackageWriterImpl::_Init(const char* fileName, uint32 flags)
 			return result;
 
 		fHeapOffset = packageReader.HeapOffset();
-		fHeapEnd = fHeapOffset + packageReader.HeapSize();
 
-		PackageContentHandler handler(fRootAttribute, fListener, fStringCache,
-			fHeapOffset);
+		PackageContentHandler handler(fRootAttribute, fListener, fStringCache);
 
 		result = packageReader.ParseContent(&handler);
 		if (result != B_OK)
 			return result;
 
-		if ((uint64)fHeapOffset > packageReader.HeapOffset()) {
-			fListener->PrintError("Unexpected heap offset in package file.\n");
-			return B_BAD_DATA;
-		}
+		fHeapWriter->Reinit(packageReader.HeapReader());
 	}
 
 	return B_OK;
@@ -815,99 +799,22 @@ PackageWriterImpl::_UpdateReadPackageInfo()
 	if (value.encoding == B_HPKG_ATTRIBUTE_ENCODING_RAW_INLINE)
 		data.SetData(value.data.size, value.data.raw);
 	else
-		data.SetData(value.data.size, value.data.offset + fHeapOffset);
-
-	// get the compression
-	uint8 compression = B_HPKG_DEFAULT_DATA_COMPRESSION;
-	if (Attribute* compressionAttribute = dataAttribute->ChildWithID(
-			B_HPKG_ATTRIBUTE_ID_DATA_COMPRESSION)) {
-		if (compressionAttribute->value.type != B_HPKG_ATTRIBUTE_TYPE_UINT) {
-			fListener->PrintError("%s entry in package file has an invalid "
-				"data compression attribute (not of type uint).\n",
-				B_HPKG_PACKAGE_INFO_FILE_NAME);
-			throw status_t(B_BAD_DATA);
-		}
-		compression = compressionAttribute->value.unsignedInt;
-	}
-
-	data.SetCompression(compression);
-
-	// get the size
-	uint64 size;
-	Attribute* sizeAttribute = dataAttribute->ChildWithID(
-		B_HPKG_ATTRIBUTE_ID_DATA_SIZE);
-	if (sizeAttribute == NULL) {
-		size = value.data.size;
-	} else if (sizeAttribute->value.type != B_HPKG_ATTRIBUTE_TYPE_UINT) {
-		fListener->PrintError("%s entry in package file has an invalid data "
-			"size attribute (not of type uint).\n",
-			B_HPKG_PACKAGE_INFO_FILE_NAME);
-		throw status_t(B_BAD_DATA);
-	} else
-		size = sizeAttribute->value.unsignedInt;
-
-	data.SetUncompressedSize(size);
-
-	// get the chunk size
-	uint64 chunkSize = compression == B_HPKG_COMPRESSION_ZLIB
-		? B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB : 0;
-	if (Attribute* chunkSizeAttribute = dataAttribute->ChildWithID(
-			B_HPKG_ATTRIBUTE_ID_DATA_CHUNK_SIZE)) {
-		if (chunkSizeAttribute->value.type != B_HPKG_ATTRIBUTE_TYPE_UINT) {
-			fListener->PrintError("%s entry in package file has an invalid "
-				"data chunk size attribute (not of type uint).\n",
-				B_HPKG_PACKAGE_INFO_FILE_NAME);
-			throw status_t(B_BAD_DATA);
-		}
-		chunkSize = chunkSizeAttribute->value.unsignedInt;
-	}
-
-	data.SetChunkSize(chunkSize);
+		data.SetData(value.data.size, value.data.offset);
 
 	// read the value into a string
 	BString valueString;
-	char* valueBuffer = valueString.LockBuffer(size);
+	char* valueBuffer = valueString.LockBuffer(value.data.size);
 	if (valueBuffer == NULL)
 		throw std::bad_alloc();
 
 	if (value.encoding == B_HPKG_ATTRIBUTE_ENCODING_RAW_INLINE) {
 		// data encoded inline -- just copy to buffer
-		if (size != value.data.size) {
-			fListener->PrintError("%s entry in package file has an invalid "
-				"data attribute (mismatching size).\n",
-				B_HPKG_PACKAGE_INFO_FILE_NAME);
-			throw status_t(B_BAD_DATA);
-		}
 		memcpy(valueBuffer, value.data.raw, value.data.size);
 	} else {
 		// data on heap -- read from there
-		BBlockBufferPoolNoLock	bufferCache(16 * 1024, 1);
-		status_t error = bufferCache.Init();
-		if (error != B_OK) {
-			fListener->PrintError("Failed to initialize buffer cache: %s\n",
-				strerror(error));
-			throw status_t(error);
-		}
-
-		// create a PackageDataReader
-		BFDDataReader packageFileReader(FD());
-		BAbstractBufferedDataReader* reader;
-		error = BPackageDataReaderFactory(&bufferCache)
-			.CreatePackageDataReader(&packageFileReader, data, reader);
-		if (error != B_OK) {
-			fListener->PrintError("Failed to create package data reader: %s\n",
-				strerror(error));
-			throw status_t(error);
-		}
-		ObjectDeleter<BAbstractBufferedDataReader> readerDeleter(reader);
-
-		// read the data
-		error = reader->ReadData(0, valueBuffer, size);
-		if (error != B_OK) {
-			fListener->PrintError("Failed to read data of %s entry in package "
-				"file: %s\n", B_HPKG_PACKAGE_INFO_FILE_NAME, strerror(error));
-			throw status_t(error);
-		}
+		status_t error = fHeapWriter->ReadData(data.Offset(), valueBuffer,
+			data.Size());
+		throw error;
 	}
 
 	valueString.UnlockBuffer();
@@ -1101,8 +1008,8 @@ PackageWriterImpl::_CompactHeap()
 		return;
 
 	// compute the move deltas for the ranges
-	Array<off_t> deltas;
-	off_t delta = 0;
+	Array<uint64> deltas;
+	uint64 delta = 0;
 	for (int32 i = 0; i < count; i++) {
 		if (!deltas.Add(delta))
 			throw std::bad_alloc();
@@ -1117,73 +1024,8 @@ PackageWriterImpl::_CompactHeap()
 	HeapAttributeOffsetter(*fHeapRangesToRemove, deltas).ProcessAttribute(
 		fRootAttribute);
 
-	// move the heap chunks in the file around
-	off_t chunkOffset = fHeapOffset;
-	delta = 0;
-
-	for (int32 i = 0; i < count; i++) {
-		const Range<off_t>& range = fHeapRangesToRemove->RangeAt(i);
-
-		if (delta > 0 && chunkOffset < range.offset) {
-			// move chunk
-			_MoveHeapChunk(chunkOffset, chunkOffset - delta,
-				range.offset - chunkOffset);
-		}
-
-		chunkOffset = range.EndOffset();
-		delta += range.size;
-	}
-
-	// move the final chunk
-	off_t heapSize = fHeapEnd - fHeapOffset;
-	if (delta > 0 && chunkOffset < heapSize) {
-		_MoveHeapChunk(chunkOffset, chunkOffset - delta,
-			heapSize - chunkOffset);
-	}
-
-	fHeapEnd -= delta;
-}
-
-
-void
-PackageWriterImpl::_MoveHeapChunk(off_t fromOffset, off_t toOffset, off_t size)
-{
-	// convert heap offsets to file offsets
-	fromOffset += fHeapOffset;
-	toOffset += fHeapOffset;
-
-	while (size > 0) {
-		size_t toCopy = std::min(size, (off_t)fDataBufferSize);
-
-		// read data into buffer
-		ssize_t bytesRead = read_pos(FD(), fromOffset, fDataBuffer, toCopy);
-		if (bytesRead < 0) {
-			fListener->PrintError("Failed to read from package file: %s\n",
-				strerror(errno));
-			throw status_t(errno);
-		}
-		if ((size_t)bytesRead < toCopy) {
-			fListener->PrintError("Failed to read from package file (wanted "
-				"%zu bytes, got %zd).\n", toCopy, bytesRead);
-			throw status_t(B_IO_ERROR);
-		}
-
-		// write data to target offset
-		ssize_t bytesWritten = write_pos(FD(), toOffset, fDataBuffer, toCopy);
-		if (bytesWritten < 0) {
-			fListener->PrintError("Failed to write to package file: %s\n",
-				strerror(errno));
-			throw status_t(errno);
-		}
-		if ((size_t)bytesWritten < toCopy) {
-			fListener->PrintError("Failed to write to package file.\n");
-			throw status_t(B_IO_ERROR);
-		}
-
-		fromOffset += toCopy;
-		toOffset += toCopy;
-		size -= toCopy;
-	}
+	// remove the ranges from the heap
+	fHeapWriter->RemoveDataRanges(*fHeapRangesToRemove);
 }
 
 
@@ -1216,41 +1058,52 @@ PackageWriterImpl::_Finish()
 		_AddEntry(AT_FDCWD, entry, entry->Name(), pathBuffer);
 	}
 
-	off_t heapSize = fHeapEnd - fHeapOffset;
-
 	hpkg_header header;
 
 	// write the TOC and package attributes
-	_WriteTOC(header);
-	_WritePackageAttributes(header);
+	uint64 tocLength;
+	_WriteTOC(header, tocLength);
 
-	off_t totalSize = fHeapEnd;
+	uint64 attributesLength;
+	_WritePackageAttributes(header, attributesLength);
+
+	// flush the heap
+	status_t error = fHeapWriter->Finish();
+	if (error != B_OK)
+		return error;
+
+	uint64 compressedHeapSize = fHeapWriter->CompressedHeapSize();
+
+	header.heap_compression = B_HOST_TO_BENDIAN_INT32(B_HPKG_COMPRESSION_ZLIB);
+	header.heap_chunk_size = B_HOST_TO_BENDIAN_INT32(fHeapWriter->ChunkSize());
+	header.heap_size_compressed = B_HOST_TO_BENDIAN_INT64(
+		fHeapWriter->CompressedHeapSize());
+	header.heap_size_uncompressed = B_HOST_TO_BENDIAN_INT64(
+		fHeapWriter->UncompressedHeapSize());
 
 	// Truncate the file to the size it is supposed to have. In update mode, it
-	// can be greater when one or more files are shrunk. In creation mode, when
-	// writing compressed TOC or package attributes yields a larger size than
-	// uncompressed, the file size may also be greater than it should be.
+	// can be greater when one or more files are shrunk. In creation mode it
+	// should already have the correct size.
+	off_t totalSize = fHeapWriter->HeapOffset() + (off_t)compressedHeapSize;
 	if (ftruncate(FD(), totalSize) != 0) {
 		fListener->PrintError("Failed to truncate package file to new "
 			"size: %s\n", strerror(errno));
 		return errno;
 	}
 
-	fListener->OnPackageSizeInfo(fHeapOffset, heapSize,
-		B_BENDIAN_TO_HOST_INT64(header.toc_length_compressed),
-		B_BENDIAN_TO_HOST_INT32(header.attributes_length_compressed),
-		totalSize);
+	fListener->OnPackageSizeInfo(fHeaderSize, compressedHeapSize, tocLength,
+		attributesLength, totalSize);
 
 	// prepare the header
 
 	// general
 	header.magic = B_HOST_TO_BENDIAN_INT32(B_HPKG_MAGIC);
-	header.header_size = B_HOST_TO_BENDIAN_INT16((uint16)fHeapOffset);
+	header.header_size = B_HOST_TO_BENDIAN_INT16(fHeaderSize);
 	header.version = B_HOST_TO_BENDIAN_INT16(B_HPKG_VERSION);
 	header.total_size = B_HOST_TO_BENDIAN_INT64(totalSize);
 
 	// write the header
-	WriteBuffer(&header, sizeof(hpkg_header), 0);
+	RawWriteBuffer(&header, sizeof(hpkg_header), 0);
 
 	SetFinished(true);
 	return B_OK;
@@ -1332,107 +1185,32 @@ PackageWriterImpl::_RegisterEntry(Entry* parent, const char* name,
 
 
 void
-PackageWriterImpl::_WriteTOC(hpkg_header& header)
+PackageWriterImpl::_WriteTOC(hpkg_header& header, uint64& _length)
 {
-	// prepare the writer (zlib writer on top of a file writer)
-	off_t startOffset = fHeapEnd;
+	// write the subsections
+	uint64 startOffset = fHeapWriter->UncompressedHeapSize();
 
-	// write the sections
-	uint32 compression = B_HPKG_COMPRESSION_ZLIB;
-	uint64 uncompressedStringsSize;
-	uint64 uncompressedMainSize;
-	uint64 tocUncompressedSize;
-	int32 cachedStringsWritten = _WriteTOCCompressed(uncompressedStringsSize,
-		uncompressedMainSize, tocUncompressedSize);
-
-	off_t endOffset = fHeapEnd;
-
-	if (endOffset - startOffset >= (off_t)tocUncompressedSize) {
-		// the compressed section isn't shorter -- write uncompressed
-		fHeapEnd = startOffset;
-		compression = B_HPKG_COMPRESSION_NONE;
-		cachedStringsWritten = _WriteTOCUncompressed(uncompressedStringsSize,
-			uncompressedMainSize, tocUncompressedSize);
-
-		endOffset = fHeapEnd;
-	}
-
-	fListener->OnTOCSizeInfo(uncompressedStringsSize, uncompressedMainSize,
-		tocUncompressedSize);
-
-	// update the header
-
-	// TOC
-	header.toc_compression = B_HOST_TO_BENDIAN_INT32(compression);
-	header.toc_length_compressed = B_HOST_TO_BENDIAN_INT64(
-		endOffset - startOffset);
-	header.toc_length_uncompressed = B_HOST_TO_BENDIAN_INT64(
-		tocUncompressedSize);
-
-	// TOC subsections
-	header.toc_strings_length = B_HOST_TO_BENDIAN_INT64(
-		uncompressedStringsSize);
-	header.toc_strings_count = B_HOST_TO_BENDIAN_INT64(cachedStringsWritten);
-}
-
-
-int32
-PackageWriterImpl::_WriteTOCCompressed(uint64& _uncompressedStringsSize,
-	uint64& _uncompressedMainSize, uint64& _tocUncompressedSize)
-{
-	FDDataWriter realWriter(FD(), fHeapEnd, fListener);
-	ZlibDataWriter zlibWriter(&realWriter);
-	SetDataWriter(&zlibWriter);
-	zlibWriter.Init();
-
-	// write the sections
-	int32 cachedStringsWritten
-		= _WriteTOCSections(_uncompressedStringsSize, _uncompressedMainSize);
-
-	// finish the writer
-	zlibWriter.Finish();
-	fHeapEnd = realWriter.Offset();
-	SetDataWriter(NULL);
-
-	_tocUncompressedSize = zlibWriter.BytesWritten();
-	return cachedStringsWritten;
-}
-
-
-int32
-PackageWriterImpl::_WriteTOCUncompressed(uint64& _uncompressedStringsSize,
-	uint64& _uncompressedMainSize, uint64& _tocUncompressedSize)
-{
-	FDDataWriter realWriter(FD(), fHeapEnd, fListener);
-	SetDataWriter(&realWriter);
-
-	// write the sections
-	int32 cachedStringsWritten
-		= _WriteTOCSections(_uncompressedStringsSize, _uncompressedMainSize);
-
-	fHeapEnd = realWriter.Offset();
-	SetDataWriter(NULL);
-
-	_tocUncompressedSize = realWriter.BytesWritten();
-	return cachedStringsWritten;
-}
-
-
-int32
-PackageWriterImpl::_WriteTOCSections(uint64& _stringsSize, uint64& _mainSize)
-{
-	// write the cached strings
-	uint64 cachedStringsOffset = DataWriter()->BytesWritten();
+	// cached strings
+	uint64 cachedStringsOffset = fHeapWriter->UncompressedHeapSize();
 	int32 cachedStringsWritten = WriteCachedStrings(fStringCache, 2);
 
-	// write the main TOC section
-	uint64 mainOffset = DataWriter()->BytesWritten();
+	// main TOC section
+	uint64 mainOffset = fHeapWriter->UncompressedHeapSize();
 	_WriteAttributeChildren(fRootAttribute);
 
-	_stringsSize = mainOffset - cachedStringsOffset;
-	_mainSize = DataWriter()->BytesWritten() - mainOffset;
+	// notify the listener
+	uint64 endOffset = fHeapWriter->UncompressedHeapSize();
+	uint64 stringsSize = mainOffset - cachedStringsOffset;
+	uint64 mainSize = endOffset - mainOffset;
+	uint64 tocSize = endOffset - startOffset;
+	fListener->OnTOCSizeInfo(stringsSize, mainSize, tocSize);
 
-	return cachedStringsWritten;
+	// update the header
+	header.toc_length = B_HOST_TO_BENDIAN_INT64(tocSize);
+	header.toc_strings_length = B_HOST_TO_BENDIAN_INT64(stringsSize);
+	header.toc_strings_count = B_HOST_TO_BENDIAN_INT64(cachedStringsWritten);
+
+	_length = tocSize;
 }
 
 
@@ -1459,85 +1237,25 @@ PackageWriterImpl::_WriteAttributeChildren(Attribute* attribute)
 
 
 void
-PackageWriterImpl::_WritePackageAttributes(hpkg_header& header)
+PackageWriterImpl::_WritePackageAttributes(hpkg_header& header, uint64& _length)
 {
-	// write the package attributes (zlib writer on top of a file writer)
-	off_t startOffset = fHeapEnd;
+	// write cached strings and package attributes tree
+	off_t startOffset = fHeapWriter->UncompressedHeapSize();
 
-	uint32 compression = B_HPKG_COMPRESSION_ZLIB;
-	uint32 stringsLengthUncompressed;
-	uint32 attributesLengthUncompressed;
-	uint32 stringsCount = _WritePackageAttributesCompressed(
-		stringsLengthUncompressed, attributesLengthUncompressed);
+	uint32 stringsLength;
+	uint32 stringsCount = WritePackageAttributes(PackageAttributes(),
+		stringsLength);
 
-	off_t endOffset = fHeapEnd;
-
-	if ((off_t)attributesLengthUncompressed <= endOffset - startOffset) {
-		// the compressed section isn't shorter -- write uncompressed
-		fHeapEnd = startOffset;
-		compression = B_HPKG_COMPRESSION_NONE;
-		stringsCount = _WritePackageAttributesUncompressed(
-			stringsLengthUncompressed, attributesLengthUncompressed);
-
-		endOffset = fHeapEnd;
-	}
-
-	fListener->OnPackageAttributesSizeInfo(stringsCount,
-		attributesLengthUncompressed);
+	// notify listener
+	uint32 attributesLength = fHeapWriter->UncompressedHeapSize() - startOffset;
+	fListener->OnPackageAttributesSizeInfo(stringsCount, attributesLength);
 
 	// update the header
-	header.attributes_compression = B_HOST_TO_BENDIAN_INT32(compression);
-	header.attributes_length_compressed
-		= B_HOST_TO_BENDIAN_INT32(endOffset - startOffset);
-	header.attributes_length_uncompressed
-		= B_HOST_TO_BENDIAN_INT32(attributesLengthUncompressed);
+	header.attributes_length = B_HOST_TO_BENDIAN_INT32(attributesLength);
 	header.attributes_strings_count = B_HOST_TO_BENDIAN_INT32(stringsCount);
-	header.attributes_strings_length
-		= B_HOST_TO_BENDIAN_INT32(stringsLengthUncompressed);
-}
+	header.attributes_strings_length = B_HOST_TO_BENDIAN_INT32(stringsLength);
 
-
-uint32
-PackageWriterImpl::_WritePackageAttributesCompressed(
-	uint32& _stringsLengthUncompressed, uint32& _attributesLengthUncompressed)
-{
-	off_t startOffset = fHeapEnd;
-	FDDataWriter realWriter(FD(), startOffset, fListener);
-	ZlibDataWriter zlibWriter(&realWriter);
-	SetDataWriter(&zlibWriter);
-	zlibWriter.Init();
-
-	// write cached strings and package attributes tree
-	uint32 stringsCount = WritePackageAttributes(PackageAttributes(),
-		_stringsLengthUncompressed);
-
-	zlibWriter.Finish();
-	fHeapEnd = realWriter.Offset();
-	SetDataWriter(NULL);
-
-	_attributesLengthUncompressed = zlibWriter.BytesWritten();
-	return stringsCount;
-}
-
-
-uint32
-PackageWriterImpl::_WritePackageAttributesUncompressed(
-	uint32& _stringsLengthUncompressed, uint32& _attributesLengthUncompressed)
-{
-	off_t startOffset = fHeapEnd;
-	FDDataWriter realWriter(FD(), startOffset, fListener);
-
-	SetDataWriter(&realWriter);
-
-	// write cached strings and package attributes tree
-	uint32 stringsCount = WritePackageAttributes(PackageAttributes(),
-		_stringsLengthUncompressed);
-
-	fHeapEnd = realWriter.Offset();
-	SetDataWriter(NULL);
-
-	_attributesLengthUncompressed = realWriter.BytesWritten();
-	return stringsCount;
+	_length = attributesLength;
 }
 
 
@@ -1804,178 +1522,13 @@ PackageWriterImpl::_AddData(BDataReader& dataReader, off_t size)
 		return B_OK;
 	}
 
-	// longer data -- try to compress
-	uint64 dataOffset = fHeapEnd;
-
-	uint64 compression = B_HPKG_COMPRESSION_NONE;
-	uint64 compressedSize;
-
-	status_t error = _WriteZlibCompressedData(dataReader, size, dataOffset,
-		compressedSize);
-	if (error == B_OK) {
-		compression = B_HPKG_COMPRESSION_ZLIB;
-	} else {
-		error = _WriteUncompressedData(dataReader, size, dataOffset);
-		compressedSize = size;
-	}
+	// add data to heap
+	uint64 dataOffset;
+	status_t error = fHeapWriter->AddData(dataReader, size, dataOffset);
 	if (error != B_OK)
 		return error;
 
-	fHeapEnd = dataOffset + compressedSize;
-
-	// add data attribute
-	Attribute* dataAttribute = _AddDataAttribute(B_HPKG_ATTRIBUTE_ID_DATA,
-		compressedSize, dataOffset - fHeapOffset);
-	Stacker<Attribute> attributeAttributeStacker(fTopAttribute, dataAttribute);
-
-	// if compressed, add compression attributes
-	if (compression != B_HPKG_COMPRESSION_NONE) {
-		_AddAttribute(B_HPKG_ATTRIBUTE_ID_DATA_COMPRESSION, compression);
-		_AddAttribute(B_HPKG_ATTRIBUTE_ID_DATA_SIZE, (uint64)size);
-			// uncompressed size
-	}
-
-	return B_OK;
-}
-
-
-status_t
-PackageWriterImpl::_WriteUncompressedData(BDataReader& dataReader, off_t size,
-	uint64 writeOffset)
-{
-	// copy the data to the heap
-	off_t readOffset = 0;
-	off_t remainingSize = size;
-	while (remainingSize > 0) {
-		// read data
-		size_t toCopy = std::min(remainingSize, (off_t)fDataBufferSize);
-		status_t error = dataReader.ReadData(readOffset, fDataBuffer, toCopy);
-		if (error != B_OK) {
-			fListener->PrintError("Failed to read data: %s\n", strerror(error));
-			return error;
-		}
-
-		// write to heap
-		ssize_t bytesWritten = pwrite(FD(), fDataBuffer, toCopy, writeOffset);
-		if (bytesWritten < 0) {
-			fListener->PrintError("Failed to write data: %s\n",
-				strerror(errno));
-			return errno;
-		}
-		if ((size_t)bytesWritten != toCopy) {
-			fListener->PrintError("Failed to write all data\n");
-			return B_ERROR;
-		}
-
-		remainingSize -= toCopy;
-		readOffset += toCopy;
-		writeOffset += toCopy;
-	}
-
-	return B_OK;
-}
-
-
-status_t
-PackageWriterImpl::_WriteZlibCompressedData(BDataReader& dataReader, off_t size,
-	uint64 writeOffset, uint64& _compressedSize)
-{
-	// Use zlib compression only for data large enough.
-	if (size < (off_t)kZlibCompressionSizeThreshold)
-		return B_BAD_VALUE;
-
-	// fDataBuffer is 2 * B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB, so split it into
-	// two halves we can use for reading and compressing
-	const size_t chunkSize = B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB;
-	uint8* inputBuffer = (uint8*)fDataBuffer;
-	uint8* outputBuffer = (uint8*)fDataBuffer + chunkSize;
-
-	// account for the offset table
-	uint64 chunkCount = (size + (chunkSize - 1)) / chunkSize;
-	off_t offsetTableOffset = writeOffset;
-	uint64* offsetTable = NULL;
-	if (chunkCount > 1) {
-		offsetTable = new uint64[chunkCount - 1];
-		writeOffset = offsetTableOffset + (chunkCount - 1) * sizeof(uint64);
-	}
-	ArrayDeleter<uint64> offsetTableDeleter(offsetTable);
-
-	const uint64 dataOffset = writeOffset;
-	const uint64 dataEndLimit = offsetTableOffset + size;
-
-	// read the data, compress them and write them to the heap
-	off_t readOffset = 0;
-	off_t remainingSize = size;
-	uint64 chunkIndex = 0;
-	while (remainingSize > 0) {
-		// read data
-		size_t toCopy = std::min(remainingSize, (off_t)chunkSize);
-		status_t error = dataReader.ReadData(readOffset, inputBuffer, toCopy);
-		if (error != B_OK) {
-			fListener->PrintError("Failed to read data: %s\n", strerror(error));
-			return error;
-		}
-
-		// compress
-		size_t compressedSize;
-		error = ZlibCompressor::CompressSingleBuffer(inputBuffer, toCopy,
-			outputBuffer, toCopy, compressedSize);
-
-		const void* writeBuffer;
-		size_t bytesToWrite;
-		if (error == B_OK) {
-			writeBuffer = outputBuffer;
-			bytesToWrite = compressedSize;
-		} else {
-			if (error != B_BUFFER_OVERFLOW)
-				return error;
-			writeBuffer = inputBuffer;
-			bytesToWrite = toCopy;
-		}
-
-		// check the total compressed data size
-		if (writeOffset + bytesToWrite >= dataEndLimit)
-			return B_BUFFER_OVERFLOW;
-
-		if (chunkIndex > 0)
-			offsetTable[chunkIndex - 1] = writeOffset - dataOffset;
-
-		// write to heap
-		ssize_t bytesWritten = pwrite(FD(), writeBuffer, bytesToWrite,
-			writeOffset);
-		if (bytesWritten < 0) {
-			fListener->PrintError("Failed to write data: %s\n",
-				strerror(errno));
-			return errno;
-		}
-		if ((size_t)bytesWritten != bytesToWrite) {
-			fListener->PrintError("Failed to write all data\n");
-			return B_ERROR;
-		}
-
-		remainingSize -= toCopy;
-		readOffset += toCopy;
-		writeOffset += bytesToWrite;
-		chunkIndex++;
-	}
-
-	// write the offset table
-	if (chunkCount > 1) {
-		size_t bytesToWrite = (chunkCount - 1) * sizeof(uint64);
-		ssize_t bytesWritten = pwrite(FD(), offsetTable, bytesToWrite,
-			offsetTableOffset);
-		if (bytesWritten < 0) {
-			fListener->PrintError("Failed to write data: %s\n",
-				strerror(errno));
-			return errno;
-		}
-		if ((size_t)bytesWritten != bytesToWrite) {
-			fListener->PrintError("Failed to write all data\n");
-			return B_ERROR;
-		}
-	}
-
-	_compressedSize = writeOffset - offsetTableOffset;
+	_AddDataAttribute(B_HPKG_ATTRIBUTE_ID_DATA, size, dataOffset);
 	return B_OK;
 }
 

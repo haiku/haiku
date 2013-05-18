@@ -83,7 +83,7 @@ PackageData::CompressedSize() const
 {
 	if (fVersion == 1)
 		return DataV1().CompressedSize();
-	return DataV2().CompressedSize();
+	return DataV2().Size();
 }
 
 
@@ -92,7 +92,7 @@ PackageData::UncompressedSize() const
 {
 	if (fVersion == 1)
 		return DataV1().UncompressedSize();
-	return DataV2().UncompressedSize();
+	return DataV2().Size();
 }
 
 

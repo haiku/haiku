@@ -20,15 +20,12 @@ class BPackageData;
 
 class BPackageDataReaderFactory {
 public:
-								BPackageDataReaderFactory(
-									BBufferPool* bufferPool);
+								BPackageDataReaderFactory();
 
-			status_t			CreatePackageDataReader(BDataReader* dataReader,
+			status_t			CreatePackageDataReader(
+									BAbstractBufferedDataReader* dataReader,
 									const BPackageData& data,
 									BAbstractBufferedDataReader*& _reader);
-
-private:
-			BBufferPool*		fBufferPool;
 };
 
 

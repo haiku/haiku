@@ -397,6 +397,23 @@ private:
 };
 
 
+// #pragma mark - PackageDataHeapReader
+
+
+class PackageDataInlineReader : public BBufferDataReader {
+public:
+	PackageDataInlineReader(const BPackageData& data)
+		:
+		BBufferDataReader(fData.InlineData(), data.UncompressedSize()),
+		fData(data)
+	{
+	}
+
+private:
+	BPackageData	fData;
+};
+
+
 // #pragma mark - BPackageDataReaderFactory
 
 
@@ -411,6 +428,16 @@ status_t
 BPackageDataReaderFactory::CreatePackageDataReader(BDataReader* dataReader,
 	const BPackageData& data, BAbstractBufferedDataReader*& _reader)
 {
+	if (data.IsEncodedInline()) {
+		BAbstractBufferedDataReader* reader
+			= new(std::nothrow) PackageDataInlineReader(data);
+		if (reader == NULL)
+			return B_NO_MEMORY;
+
+		_reader = reader;
+		return B_OK;
+	}
+
 	PackageDataReader* reader;
 
 	switch (data.Compression()) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -9,6 +9,8 @@
 #include <new>
 
 #include <package/hpkg/ErrorOutput.h>
+
+#include <package/hpkg/PackageFileHeapReader.h>
 #include <package/hpkg/PackageReaderImpl.h>
 
 
@@ -77,6 +79,14 @@ BPackageReader::PackageFileFD()
 		return -1;
 
 	return fImpl->PackageFileFD();
+}
+
+
+
+BAbstractBufferedDataReader*
+BPackageReader::HeapReader() const
+{
+	return fImpl != NULL ? fImpl->HeapReader() : NULL;
 }
 
 

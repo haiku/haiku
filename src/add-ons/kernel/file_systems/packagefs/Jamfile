@@ -83,6 +83,8 @@ HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES =
 	PackageDataReader.cpp
 	PackageEntry.cpp
 	PackageEntryAttribute.cpp
+	PackageFileHeapAccessorBase.cpp
+	PackageFileHeapReader.cpp
 	PackageReaderImpl.cpp
 	ReaderImplBase.cpp
 

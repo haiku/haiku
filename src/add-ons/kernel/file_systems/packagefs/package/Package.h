@@ -6,6 +6,7 @@
 #define PACKAGE_H
 
 
+#include <package/hpkg/DataReader.h>
 #include <package/PackageArchitecture.h>
 
 #include <Referenceable.h>
@@ -23,6 +24,7 @@
 
 
 using BPackageKit::BPackageArchitecture;
+using BPackageKit::BHPKG::BAbstractBufferedDataReader;
 
 
 class PackageLinkDirectory;
@@ -82,6 +84,9 @@ public:
 			int					Open();
 			void				Close();
 
+			status_t			CreateDataReader(const PackageData& data,
+									BAbstractBufferedDataReader*& _reader);
+
 			const PackageNodeList& Nodes() const	{ return fNodes; }
 			const ResolvableList& Resolvables() const
 									{ return fResolvables; }
@@ -92,6 +97,9 @@ private:
 			struct LoaderErrorOutput;
 			struct LoaderContentHandler;
 			struct LoaderContentHandlerV1;
+			struct HeapReader;
+			struct HeapReaderV1;
+			struct HeapReaderV2;
 
 private:
 			mutex				fLock;
@@ -104,6 +112,7 @@ private:
 			PackageLinkDirectory* fLinkDirectory;
 			int					fFD;
 			uint32				fOpenCount;
+			HeapReader*			fHeapReader;
 			Package*			fFileNameHashTableNext;
 			ino_t				fNodeID;
 			dev_t				fDeviceID;

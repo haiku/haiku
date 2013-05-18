@@ -20,6 +20,7 @@
 #include <package/hpkg/HPKGDefsPrivate.h>
 #include <package/hpkg/PackageDataReader.h>
 #include <package/hpkg/PackageEntry.h>
+#include <package/hpkg/PackageFileHeapWriter.h>
 #include <package/hpkg/PackageInfoAttributeValue.h>
 #include <package/hpkg/PackageReader.h>
 #include <package/ChecksumAccessors.h>
@@ -42,28 +43,31 @@ using BPackageKit::BPrivate::HashableString;
 namespace {
 
 
+// #pragma mark - PackageEntryDataFetcher
+
+
 struct PackageEntryDataFetcher {
 	PackageEntryDataFetcher(BErrorOutput* errorOutput,
 		BPackageData& packageData)
 		:
 		fErrorOutput(errorOutput),
-		fBufferPool(B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB, 2),
 		fPackageData(packageData)
 	{
 	}
 
-	status_t ReadIntoString(BDataReader* dataReader, BString& _contents)
+	status_t ReadIntoString(BAbstractBufferedDataReader* heapReader,
+		BString& _contents)
 	{
 		// create a PackageDataReader
 		BAbstractBufferedDataReader* reader;
-		status_t result = BPackageDataReaderFactory(&fBufferPool)
-			.CreatePackageDataReader(dataReader, fPackageData, reader);
+		status_t result = BPackageDataReaderFactory()
+			.CreatePackageDataReader(heapReader, fPackageData, reader);
 		if (result != B_OK)
 			return result;
 		ObjectDeleter<BAbstractBufferedDataReader> readerDeleter(reader);
 
 		// copy data into the given string
-		int32 bufferSize = fPackageData.UncompressedSize();
+		int32 bufferSize = fPackageData.Size();
 		char* buffer = _contents.LockBuffer(bufferSize);
 		if (buffer == NULL)
 			return B_NO_MEMORY;
@@ -81,17 +85,20 @@ struct PackageEntryDataFetcher {
 
 private:
 	BErrorOutput*			fErrorOutput;
-	BBlockBufferPoolNoLock	fBufferPool;
 	BPackageData&			fPackageData;
 };
 
 
+// #pragma mark - PackageContentHandler
+
+
 struct PackageContentHandler : public BPackageInfoContentHandler {
 	PackageContentHandler(BErrorOutput* errorOutput, BPackageInfo* packageInfo,
-		int packageFileFD, BRepositoryInfo* repositoryInfo)
+		BAbstractBufferedDataReader* heapReader,
+		BRepositoryInfo* repositoryInfo)
 		:
 		BPackageInfoContentHandler(*packageInfo, errorOutput),
-		fPackageFileReader(packageFileFD),
+		fHeapReader(heapReader),
 		fRepositoryInfo(repositoryInfo)
 	{
 	}
@@ -132,16 +139,7 @@ struct PackageContentHandler : public BPackageInfoContentHandler {
 		PackageEntryDataFetcher dataFetcher(fErrorOutput, packageData);
 
 		BString licenseText;
-		status_t result;
-		if (packageData.IsEncodedInline()) {
-			BBufferDataReader dataReader(packageData.InlineData(),
-				packageData.CompressedSize());
-			result = dataFetcher.ReadIntoString(&dataReader, licenseText);
-		} else {
-			result
-				= dataFetcher.ReadIntoString(&fPackageFileReader, licenseText);
-		}
-
+		status_t result = dataFetcher.ReadIntoString(fHeapReader, licenseText);
 		if (result != B_OK)
 			return result;
 
@@ -165,13 +163,16 @@ struct PackageContentHandler : public BPackageInfoContentHandler {
 	}
 
 private:
-	BPackageReader*		fPackageReader;
-	BFDDataReader		fPackageFileReader;
-	BRepositoryInfo*	fRepositoryInfo;
+	BPackageReader*					fPackageReader;
+	BAbstractBufferedDataReader*	fHeapReader;
+	BRepositoryInfo*				fRepositoryInfo;
 };
 
 
 }	// anonymous namespace
+
+
+// #pragma mark - PackageNameSet
 
 
 struct RepositoryWriterImpl::PackageNameSet
@@ -179,10 +180,13 @@ struct RepositoryWriterImpl::PackageNameSet
 };
 
 
+// #pragma mark - RepositoryWriterImpl
+
+
 RepositoryWriterImpl::RepositoryWriterImpl(BRepositoryWriterListener* listener,
 	BRepositoryInfo* repositoryInfo)
 	:
-	inherited(listener),
+	inherited("repository", listener),
 	fListener(listener),
 	fRepositoryInfo(repositoryInfo),
 	fPackageCount(0),
@@ -246,7 +250,7 @@ RepositoryWriterImpl::Finish()
 status_t
 RepositoryWriterImpl::_Init(const char* fileName)
 {
-	return inherited::Init(fileName, "repository", 0);
+	return inherited::Init(fileName, 0);
 }
 
 
@@ -255,29 +259,34 @@ RepositoryWriterImpl::_Finish()
 {
 	hpkg_repo_header header;
 
-	// write repository header
-	ssize_t infoLengthCompressed;
-	status_t result = _WriteRepositoryInfo(header, infoLengthCompressed);
+	// write repository info
+	uint64 infoLength;
+	status_t result = _WriteRepositoryInfo(header, infoLength);
 	if (result != B_OK)
 		return result;
 
 	// write package attributes
-	ssize_t packagesLengthCompressed;
-	off_t totalSize = _WritePackageAttributes(header,
-		sizeof(header) + infoLengthCompressed, packagesLengthCompressed);
+	uint64 packagesLength;
+	_WritePackageAttributes(header, packagesLength);
 
-	fListener->OnRepositoryDone(sizeof(header), infoLengthCompressed,
+	// flush the heap writer
+	result = fHeapWriter->Finish();
+	if (result != B_OK)
+		return result;
+	uint64 totalSize = fHeapWriter->HeapOffset()
+		+ fHeapWriter->CompressedHeapSize();
+
+	fListener->OnRepositoryDone(sizeof(header), infoLength,
 		fRepositoryInfo->LicenseNames().CountStrings(), fPackageCount,
-		packagesLengthCompressed, totalSize);
+		packagesLength, totalSize);
 
-	// general
+	// update the general header info and write the header
 	header.magic = B_HOST_TO_BENDIAN_INT32(B_HPKG_REPO_MAGIC);
 	header.header_size = B_HOST_TO_BENDIAN_INT16((uint16)sizeof(header));
 	header.version = B_HOST_TO_BENDIAN_INT16(B_HPKG_REPO_VERSION);
 	header.total_size = B_HOST_TO_BENDIAN_INT64(totalSize);
 
-	// write the header
-	WriteBuffer(&header, sizeof(header), 0);
+	RawWriteBuffer(&header, sizeof(header), 0);
 
 	SetFinished(true);
 	return B_OK;
@@ -309,7 +318,7 @@ RepositoryWriterImpl::_AddPackage(const BEntry& packageEntry)
 
 	// parse package
 	PackageContentHandler contentHandler(fListener, &fPackageInfo,
-		packageReader.PackageFileFD(), fRepositoryInfo);
+		packageReader.HeapReader(), fRepositoryInfo);
 	if ((result = packageReader.ParseContent(&contentHandler)) != B_OK)
 		return result;
 
@@ -384,8 +393,9 @@ RepositoryWriterImpl::_RegisterCurrentPackageInfo()
 
 status_t
 RepositoryWriterImpl::_WriteRepositoryInfo(hpkg_repo_header& header,
-	ssize_t& _infoLengthCompressed)
+	uint64& _length)
 {
+	// archive and flatten the repository info and write it
 	BMessage archive;
 	status_t result = fRepositoryInfo->Archive(&archive);
 	if (result != B_OK) {
@@ -400,71 +410,40 @@ RepositoryWriterImpl::_WriteRepositoryInfo(hpkg_repo_header& header,
 		return result;
 	}
 
-	off_t startOffset = sizeof(hpkg_repo_header);
+	WriteBuffer(buffer, flattenedSize);
 
-	// write the package attributes (zlib writer on top of a file writer)
-	FDDataWriter realWriter(FD(), startOffset, fListener);
-	ZlibDataWriter zlibWriter(&realWriter);
-	SetDataWriter(&zlibWriter);
-	zlibWriter.Init();
-
-	DataWriter()->WriteDataThrows(buffer, flattenedSize);
-
-	zlibWriter.Finish();
-	SetDataWriter(NULL);
-
-	fListener->OnRepositoryInfoSectionDone(zlibWriter.BytesWritten());
-
-	_infoLengthCompressed = realWriter.BytesWritten();
+	// notify listener
+	fListener->OnRepositoryInfoSectionDone(flattenedSize);
 
 	// update the header
-	header.info_compression
-		= B_HOST_TO_BENDIAN_INT32(B_HPKG_COMPRESSION_ZLIB);
-	header.info_length_compressed
-		= B_HOST_TO_BENDIAN_INT32(_infoLengthCompressed);
-	header.info_length_uncompressed
-		= B_HOST_TO_BENDIAN_INT32(flattenedSize);
+	header.info_length = B_HOST_TO_BENDIAN_INT32(flattenedSize);
 
+	_length = flattenedSize;
 	return B_OK;
 }
 
 
-off_t
+void
 RepositoryWriterImpl::_WritePackageAttributes(hpkg_repo_header& header,
-	off_t startOffset, ssize_t& _packagesLengthCompressed)
+	uint64& _length)
 {
 	// write the package attributes (zlib writer on top of a file writer)
-	FDDataWriter realWriter(FD(), startOffset, fListener);
-	ZlibDataWriter zlibWriter(&realWriter);
-	SetDataWriter(&zlibWriter);
-	zlibWriter.Init();
+	uint64 startOffset = fHeapWriter->UncompressedHeapSize();
 
-	// write cached strings and package attributes tree
-	uint32 stringsLengthUncompressed;
+	uint32 stringsLength;
 	uint32 stringsCount = WritePackageAttributes(PackageAttributes(),
-		stringsLengthUncompressed);
+		stringsLength);
 
-	zlibWriter.Finish();
-	off_t endOffset = realWriter.Offset();
-	SetDataWriter(NULL);
+	uint64 sectionSize = fHeapWriter->UncompressedHeapSize() - startOffset;
 
-	fListener->OnPackageAttributesSectionDone(stringsCount,
-		zlibWriter.BytesWritten());
-
-	_packagesLengthCompressed = endOffset - startOffset;
+	fListener->OnPackageAttributesSectionDone(stringsCount, sectionSize);
 
 	// update the header
-	header.packages_compression
-		= B_HOST_TO_BENDIAN_INT32(B_HPKG_COMPRESSION_ZLIB);
-	header.packages_length_compressed
-		= B_HOST_TO_BENDIAN_INT64(_packagesLengthCompressed);
-	header.packages_length_uncompressed
-		= B_HOST_TO_BENDIAN_INT64(zlibWriter.BytesWritten());
+	header.packages_length = B_HOST_TO_BENDIAN_INT64(sectionSize);
 	header.packages_strings_count = B_HOST_TO_BENDIAN_INT64(stringsCount);
-	header.packages_strings_length
-		= B_HOST_TO_BENDIAN_INT64(stringsLengthUncompressed);
+	header.packages_strings_length = B_HOST_TO_BENDIAN_INT64(stringsLength);
 
-	return endOffset;
+	_length = sectionSize;
 }
 
 

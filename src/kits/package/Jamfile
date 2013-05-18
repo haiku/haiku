@@ -18,6 +18,7 @@ HPKG_SOURCES =
 	BufferPool.cpp
 	DataOutput.cpp
 	DataReader.cpp
+	DataWriters.cpp
 	ErrorOutput.cpp
 	FDDataReader.cpp
 	HPKGDefs.cpp
@@ -26,6 +27,8 @@ HPKG_SOURCES =
 	PackageDataReader.cpp
 	PackageEntry.cpp
 	PackageEntryAttribute.cpp
+	PackageFileHeapAccessorBase.cpp
+	PackageFileHeapReader.cpp
 	PackageFileHeapWriter.cpp
 	PackageReader.cpp
 	PackageReaderImpl.cpp

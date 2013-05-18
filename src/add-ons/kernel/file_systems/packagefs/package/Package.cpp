@@ -12,17 +12,21 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <AutoDeleter.h>
 #include <package/hpkg/ErrorOutput.h>
+#include <package/hpkg/PackageDataReader.h>
 #include <package/hpkg/PackageEntry.h>
 #include <package/hpkg/PackageEntryAttribute.h>
-#include <package/hpkg/PackageReaderImpl.h>
 #include <package/hpkg/v1/PackageEntry.h>
 #include <package/hpkg/v1/PackageEntryAttribute.h>
+
+#include <AutoDeleter.h>
+#include <package/hpkg/PackageFileHeapReader.h>
+#include <package/hpkg/PackageReaderImpl.h>
 #include <package/hpkg/v1/PackageReaderImpl.h>
 #include <util/AutoLock.h>
 
 #include "DebugSupport.h"
+#include "GlobalFactory.h"
 #include "PackageDirectory.h"
 #include "PackageFile.h"
 #include "PackageSymlink.h"
@@ -32,10 +36,12 @@
 
 using namespace BPackageKit;
 
-typedef BPackageKit::BHPKG::BErrorOutput BErrorOutput;
-typedef BPackageKit::BHPKG::BPackageInfoAttributeValue
-	BPackageInfoAttributeValue;
-typedef BPackageKit::BHPKG::BPackageVersionData BPackageVersionData;
+using BPackageKit::BHPKG::BDataOutput;
+using BPackageKit::BHPKG::BErrorOutput;
+using BPackageKit::BHPKG::BFDDataReader;
+using BPackageKit::BHPKG::BPackageInfoAttributeValue;
+using BPackageKit::BHPKG::BPackageVersionData;
+using BPackageKit::BHPKG::BPrivate::PackageFileHeapReader;
 
 // current format version types
 typedef BPackageKit::BHPKG::BPackageContentHandler BPackageContentHandler;
@@ -581,6 +587,129 @@ private:
 };
 
 
+// #pragma mark - HeapReader
+
+
+struct Package::HeapReader {
+	virtual ~HeapReader()
+	{
+	}
+
+	virtual void UpdateFD(int fd) = 0;
+
+	virtual status_t CreateDataReader(const PackageData& data,
+		BAbstractBufferedDataReader*& _reader) = 0;
+};
+
+
+// #pragma mark - HeapReaderV1
+
+
+struct Package::HeapReaderV1 : public HeapReader, private BDataReader {
+public:
+	HeapReaderV1(int fd)
+		:
+		fFileReader(fd)
+	{
+	}
+
+	~HeapReaderV1()
+	{
+	}
+
+	virtual void UpdateFD(int fd)
+	{
+		fFileReader.SetFD(fd);
+	}
+
+	virtual status_t CreateDataReader(const PackageData& data,
+		BAbstractBufferedDataReader*& _reader)
+	{
+		return GlobalFactory::Default()->CreatePackageDataReader(this,
+			data.DataV1(), _reader);
+	}
+
+private:
+	// BDataReader
+
+	virtual status_t ReadData(off_t offset, void* buffer, size_t size)
+	{
+		return fFileReader.ReadData(offset, buffer, size);
+	}
+
+private:
+	BFDDataReader	fFileReader;
+};
+
+
+// #pragma mark - HeapReaderV2
+
+
+struct Package::HeapReaderV2 : public HeapReader,
+	private BAbstractBufferedDataReader, private BErrorOutput {
+public:
+	HeapReaderV2()
+		:
+		fHeapReader(NULL)
+	{
+	}
+
+	~HeapReaderV2()
+	{
+		delete fHeapReader;
+	}
+
+	status_t Init(const PackageFileHeapReader* heapReader, int fd)
+	{
+		fHeapReader = heapReader->Clone();
+		if (fHeapReader == NULL)
+			return B_NO_MEMORY;
+
+		fHeapReader->SetErrorOutput(this);
+		fHeapReader->SetFD(fd);
+
+		return B_OK;
+	}
+
+	virtual void UpdateFD(int fd)
+	{
+		fHeapReader->SetFD(fd);
+	}
+
+	virtual status_t CreateDataReader(const PackageData& data,
+		BAbstractBufferedDataReader*& _reader)
+	{
+		return BPackageKit::BHPKG::BPackageDataReaderFactory()
+			.CreatePackageDataReader(this, data.DataV2(), _reader);
+	}
+
+private:
+	// BAbstractBufferedDataReader
+
+	virtual status_t ReadData(off_t offset, void* buffer, size_t size)
+	{
+		return fHeapReader->ReadData(offset, buffer, size);
+	}
+
+	virtual status_t ReadDataToOutput(off_t offset, size_t size,
+		BDataOutput* output)
+	{
+		return fHeapReader->ReadDataToOutput(offset, size, output);
+	}
+
+private:
+	// BErrorOutput
+
+	virtual void PrintErrorVarArgs(const char* format, va_list args)
+	{
+// TODO:...
+	}
+
+private:
+	PackageFileHeapReader*	fHeapReader;
+};
+
+
 // #pragma mark - Package
 
 
@@ -595,6 +724,7 @@ Package::Package(::Volume* volume, dev_t deviceID, ino_t nodeID)
 	fLinkDirectory(NULL),
 	fFD(-1),
 	fOpenCount(0),
+	fHeapReader(NULL),
 	fNodeID(nodeID),
 	fDeviceID(deviceID)
 {
@@ -604,6 +734,8 @@ Package::Package(::Volume* volume, dev_t deviceID, ino_t nodeID)
 
 Package::~Package()
 {
+	delete fHeapReader;
+
 	while (PackageNode* node = fNodes.RemoveHead())
 		node->ReleaseReference();
 
@@ -652,7 +784,22 @@ Package::Load()
 			if (error != B_OK)
 				RETURN_ERROR(error);
 		
-			RETURN_ERROR(packageReader.ParseContent(&handler));
+			error = packageReader.ParseContent(&handler);
+			if (error != B_OK)
+				RETURN_ERROR(error);
+
+			// create a heap reader
+			HeapReaderV2* heapReader = new(std::nothrow) HeapReaderV2;
+			if (heapReader == NULL)
+				RETURN_ERROR(B_NO_MEMORY);
+
+			error = heapReader->Init(packageReader.HeapReader(), fd);
+			if (error != B_OK) {
+				RETURN_ERROR(error);
+			}
+
+			fHeapReader = heapReader;
+			return B_OK;
 		}
 
 		if (error != B_MISMATCHED_VALUES)
@@ -671,7 +818,16 @@ Package::Load()
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
-	RETURN_ERROR(packageReader.ParseContent(&handler));
+	error = packageReader.ParseContent(&handler);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// create a heap reader
+	fHeapReader = new(std::nothrow) HeapReaderV1(fd);
+	if (fHeapReader == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+
+	return B_OK;
 }
 
 
@@ -765,6 +921,10 @@ Package::Open()
 	}
 
 	fOpenCount = 1;
+
+	if (fHeapReader != NULL)
+		fHeapReader->UpdateFD(fFD);
+
 	return fFD;
 }
 
@@ -781,5 +941,19 @@ Package::Close()
 	if (--fOpenCount == 0) {
 		close(fFD);
 		fFD = -1;
+
+		if (fHeapReader != NULL)
+			fHeapReader->UpdateFD(fFD);
 	}
+}
+
+
+status_t
+Package::CreateDataReader(const PackageData& data,
+	BAbstractBufferedDataReader*& _reader)
+{
+	if (fHeapReader == NULL)
+		return B_BAD_VALUE;
+
+	return fHeapReader->CreateDataReader(data, _reader);
 }

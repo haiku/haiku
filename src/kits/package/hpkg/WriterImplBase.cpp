@@ -18,10 +18,11 @@
 
 #include <AutoDeleter.h>
 
-#include <package/hpkg/HPKGDefsPrivate.h>
-
 #include <package/hpkg/DataReader.h>
 #include <package/hpkg/ErrorOutput.h>
+
+#include <package/hpkg/HPKGDefsPrivate.h>
+#include <package/hpkg/PackageFileHeapWriter.h>
 
 
 namespace BPackageKit {
@@ -176,105 +177,8 @@ WriterImplBase::AttributeValue::_ApplicableIntEncoding(uint64 value)
 }
 
 
-// #pragma mark - AbstractDataWriter
-
-
-WriterImplBase::AbstractDataWriter::AbstractDataWriter()
-	:
-	fBytesWritten(0)
-{
-}
-
-
-WriterImplBase::AbstractDataWriter::~AbstractDataWriter()
-{
-}
-
-
-// #pragma mark - FDDataWriter
-
-
-WriterImplBase::FDDataWriter::FDDataWriter(int fd, off_t offset,
-	BErrorOutput* errorOutput)
-	:
-	fFD(fd),
-	fOffset(offset),
-	fErrorOutput(errorOutput)
-{
-}
-
-
-status_t
-WriterImplBase::FDDataWriter::WriteDataNoThrow(const void* buffer, size_t size)
-{
-	ssize_t bytesWritten = pwrite(fFD, buffer, size, fOffset);
-	if (bytesWritten < 0) {
-		fErrorOutput->PrintError(
-			"WriteDataNoThrow(%p, %lu) failed to write data: %s\n", buffer,
-			size, strerror(errno));
-		return errno;
-	}
-	if ((size_t)bytesWritten != size) {
-		fErrorOutput->PrintError(
-			"WriteDataNoThrow(%p, %lu) failed to write all data\n", buffer,
-			size);
-		return B_ERROR;
-	}
-
-	fOffset += size;
-	fBytesWritten += size;
-	return B_OK;
-}
-
-
-// #pragma mark - ZlibDataWriter
-
-
-WriterImplBase::ZlibDataWriter::ZlibDataWriter(AbstractDataWriter* dataWriter)
-	:
-	fDataWriter(dataWriter),
-	fCompressor(this)
-{
-}
-
-
-void
-WriterImplBase::ZlibDataWriter::Init()
-{
-	status_t error = fCompressor.Init();
-	if (error != B_OK)
-		throw status_t(error);
-}
-
-
-void
-WriterImplBase::ZlibDataWriter::Finish()
-{
-	status_t error = fCompressor.Finish();
-	if (error != B_OK)
-		throw status_t(error);
-}
-
-
-status_t
-WriterImplBase::ZlibDataWriter::WriteDataNoThrow(const void* buffer,
-	size_t size)
-{
-	status_t error = fCompressor.CompressNext(buffer, size);
-	if (error == B_OK)
-		fBytesWritten += size;
-	return error;
-}
-
-
-status_t
-WriterImplBase::ZlibDataWriter::WriteData(const void* buffer, size_t size)
-{
-	return fDataWriter->WriteDataNoThrow(buffer, size);
-}
-
-
 // #pragma mark - PackageAttribute
+
 
 WriterImplBase::PackageAttribute::PackageAttribute(BHPKGAttributeID id_,
 	uint8 type_, uint8 encoding_)
@@ -310,8 +214,10 @@ WriterImplBase::PackageAttribute::_DeleteChildren()
 // #pragma mark - WriterImplBase
 
 
-WriterImplBase::WriterImplBase(BErrorOutput* errorOutput)
+WriterImplBase::WriterImplBase(const char* fileType, BErrorOutput* errorOutput)
 	:
+	fHeapWriter(NULL),
+	fFileType(fileType),
 	fErrorOutput(errorOutput),
 	fFileName(NULL),
 	fFlags(0),
@@ -324,6 +230,8 @@ WriterImplBase::WriterImplBase(BErrorOutput* errorOutput)
 
 WriterImplBase::~WriterImplBase()
 {
+	delete fHeapWriter;
+
 	if (fFD >= 0)
 		close(fFD);
 
@@ -335,7 +243,7 @@ WriterImplBase::~WriterImplBase()
 
 
 status_t
-WriterImplBase::Init(const char* fileName, const char* type, uint32 flags)
+WriterImplBase::Init(const char* fileName, uint32 flags)
 {
 	if (fPackageStringCache.Init() != B_OK)
 		throw std::bad_alloc();
@@ -347,13 +255,19 @@ WriterImplBase::Init(const char* fileName, const char* type, uint32 flags)
 
 	fFD = open(fileName, openMode, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (fFD < 0) {
-		fErrorOutput->PrintError("Failed to open %s file \"%s\": %s\n", type,
-			fileName, strerror(errno));
+		fErrorOutput->PrintError("Failed to open %s file \"%s\": %s\n",
+			fFileType, fileName, strerror(errno));
 		return errno;
 	}
 
 	fFileName = fileName;
 	fFlags = flags;
+
+	// create heap writer
+	fHeapWriter = new PackageFileHeapWriter(fErrorOutput, FD(),
+		sizeof(hpkg_header));
+	fHeapWriter->Init();
+	fDataWriter = fHeapWriter->DataWriter();
 
 	return B_OK;
 }
@@ -670,8 +584,10 @@ WriterImplBase::WritePackageAttributes(
 	uint32& _stringsLengthUncompressed)
 {
 	// write the cached strings
+	uint64 startOffset = fHeapWriter->UncompressedHeapSize();
 	uint32 stringsCount = WriteCachedStrings(fPackageStringCache, 2);
-	_stringsLengthUncompressed = DataWriter()->BytesWritten();
+	_stringsLengthUncompressed
+		= fHeapWriter->UncompressedHeapSize() - startOffset;
 
 	_WritePackageAttributes(packageAttributes);
 
@@ -760,18 +676,18 @@ WriterImplBase::WriteUnsignedLEB128(uint64 value)
 
 
 void
-WriterImplBase::WriteBuffer(const void* buffer, size_t size, off_t offset)
+WriterImplBase::RawWriteBuffer(const void* buffer, size_t size, off_t offset)
 {
 	ssize_t bytesWritten = pwrite(fFD, buffer, size, offset);
 	if (bytesWritten < 0) {
 		fErrorOutput->PrintError(
-			"WriteBuffer(%p, %lu) failed to write data: %s\n", buffer, size,
+			"RawWriteBuffer(%p, %lu) failed to write data: %s\n", buffer, size,
 			strerror(errno));
 		throw status_t(errno);
 	}
 	if ((size_t)bytesWritten != size) {
 		fErrorOutput->PrintError(
-			"WriteBuffer(%p, %lu) failed to write all data\n", buffer, size);
+			"RawWriteBuffer(%p, %lu) failed to write all data\n", buffer, size);
 		throw status_t(B_ERROR);
 	}
 }

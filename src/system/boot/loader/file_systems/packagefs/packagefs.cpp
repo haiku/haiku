@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -9,12 +9,12 @@
 #include <errno.h>
 #include <unistd.h>
 
-#include <package/hpkg/BlockBufferPoolNoLock.h>
 #include <package/hpkg/DataReader.h>
 #include <package/hpkg/ErrorOutput.h>
 #include <package/hpkg/PackageDataReader.h>
 #include <package/hpkg/PackageEntry.h>
 #include <package/hpkg/PackageEntryAttribute.h>
+#include <package/hpkg/PackageFileHeapReader.h>
 #include <package/hpkg/PackageReaderImpl.h>
 
 #include <AutoDeleter.h>
@@ -41,6 +41,7 @@
 
 using namespace BPackageKit;
 using namespace BPackageKit::BHPKG;
+using BPackageKit::BHPKG::BPrivate::PackageFileHeapReader;
 using BPackageKit::BHPKG::BPrivate::PackageReaderImpl;
 
 
@@ -143,7 +144,7 @@ struct PackageFile : PackageNode {
 
 	off_t Size() const
 	{
-		return fData.UncompressedSize();
+		return fData.Size();
 	}
 
 private:
@@ -232,84 +233,59 @@ private:
 };
 
 
-// #pragma mark - FileDataReader
+// #pragma mark - PackageLoaderErrorOutput
 
 
-struct FileDataReader {
-	FileDataReader(int fd, const BPackageData& data)
-		:
-		fDataReader(fd),
-		fData(data),
-		fPackageDataReader(NULL)
+struct PackageLoaderErrorOutput : BErrorOutput {
+	PackageLoaderErrorOutput()
 	{
 	}
 
-	~FileDataReader()
+	virtual void PrintErrorVarArgs(const char* format, va_list args)
 	{
-		delete fPackageDataReader;
 	}
-
-	status_t Init(BPackageDataReaderFactory* dataReaderFactory)
-	{
-		if (fData.IsEncodedInline())
-			return B_OK;
-
-		return dataReaderFactory->CreatePackageDataReader(&fDataReader,
-			fData, fPackageDataReader);
-	}
-
-	status_t ReadData(off_t offset, void* buffer, size_t bufferSize)
-	{
-		if (fData.IsEncodedInline()) {
-			BBufferDataReader dataReader(fData.InlineData(),
-				fData.CompressedSize());
-			return dataReader.ReadData(offset, buffer, bufferSize);
-		}
-
-		return fPackageDataReader->ReadData(offset, buffer, bufferSize);
-	}
-
-private:
-	BFDDataReader		fDataReader;
-	BPackageData		fData;
-	BAbstractBufferedDataReader* fPackageDataReader;
 };
 
 
 // #pragma mark - PackageVolume
 
 
-struct PackageVolume : BReferenceable {
+struct PackageVolume : BReferenceable, private PackageLoaderErrorOutput {
 	PackageVolume()
 		:
 		fNextNodeID(1),
 		fRootDirectory(this, S_IFDIR),
-		fBufferCache(B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB, 2),
-		fDataReaderFactory(&fBufferCache),
+		fHeapReader(NULL),
 		fFD(-1)
 	{
 	}
 
 	~PackageVolume()
 	{
+		delete fHeapReader;
+
 		if (fFD >= 0)
 			close(fFD);
 	}
 
-	status_t Init(int fd)
+	status_t Init(int fd, const PackageFileHeapReader* heapReader)
 	{
 		status_t error = fRootDirectory.Init(&fRootDirectory, ".",
 			NextNodeID());
 		if (error != B_OK)
 			return error;
 
-		error = fBufferCache.Init();
-		if (error != B_OK)
-			return error;
-
 		fFD = dup(fd);
 		if (fFD < 0)
 			return errno;
+
+		// clone a heap reader and adjust it for our use
+		fHeapReader = heapReader->Clone();
+		if (fHeapReader == NULL)
+			return B_NO_MEMORY;
+
+		fHeapReader->SetErrorOutput(this);
+		fHeapReader->SetFD(fFD);
 
 		return B_OK;
 	}
@@ -325,43 +301,17 @@ struct PackageVolume : BReferenceable {
 	}
 
 	status_t CreateFileDataReader(const BPackageData& data,
-		FileDataReader*& _fileDataReader)
+		BAbstractBufferedDataReader*& _reader)
 	{
-		// create the file reader object
-		FileDataReader* fileDataReader = new(std::nothrow) FileDataReader(fFD,
-			data);
-		if (fileDataReader == NULL)
-			return B_NO_MEMORY;
-		ObjectDeleter<FileDataReader> fileDataReaderDeleter(fileDataReader);
-
-		status_t error = fileDataReader->Init(&fDataReaderFactory);
-		if (error != B_OK)
-			return error;
-
-		_fileDataReader = fileDataReaderDeleter.Detach();
-		return B_OK;
+		return BPackageDataReaderFactory().CreatePackageDataReader(fHeapReader,
+			data, _reader);
 	}
 
 private:
 	ino_t						fNextNodeID;
 	PackageDirectory			fRootDirectory;
-	BBlockBufferPoolNoLock		fBufferCache;
-	BPackageDataReaderFactory	fDataReaderFactory;
+	PackageFileHeapReader*		fHeapReader;
 	int							fFD;
-};
-
-
-// #pragma mark - PackageLoaderErrorOutput
-
-
-struct PackageLoaderErrorOutput : BErrorOutput {
-	PackageLoaderErrorOutput()
-	{
-	}
-
-	virtual void PrintErrorVarArgs(const char* format, va_list args)
-	{
-	}
 };
 
 
@@ -503,7 +453,8 @@ struct File : ::Node {
 			bufferSize = size - pos;
 
 		if (bufferSize > 0) {
-			FileDataReader* dataReader = (FileDataReader*)cookie;
+			BAbstractBufferedDataReader* dataReader
+				= (BAbstractBufferedDataReader*)cookie;
 			status_t error = dataReader->ReadData(pos, buffer, bufferSize);
 			if (error != B_OK)
 				return error;
@@ -529,7 +480,7 @@ struct File : ::Node {
 		if ((mode & O_ACCMODE) != O_RDONLY && (mode & O_ACCMODE) != O_RDWR)
 			return B_NOT_ALLOWED;
 
-		FileDataReader* dataReader;
+		BAbstractBufferedDataReader* dataReader;
 		status_t error = fFile->Volume()->CreateFileDataReader(fFile->Data(),
 			dataReader);
 		if (error != B_OK)
@@ -542,7 +493,8 @@ struct File : ::Node {
 
 	virtual status_t Close(void* cookie)
 	{
-		FileDataReader* dataReader = (FileDataReader*)cookie;
+		BAbstractBufferedDataReader* dataReader
+			= (BAbstractBufferedDataReader*)cookie;
 		delete dataReader;
 		Release();
 		return B_OK;
@@ -807,7 +759,7 @@ packagefs_mount_file(int fd, ::Directory*& _mountedDirectory)
 {
 	PackageLoaderErrorOutput errorOutput;
  	PackageReaderImpl packageReader(&errorOutput);
- 	status_t error = packageReader.Init(fd, false);
+	status_t error = packageReader.Init(fd, false);
  	if (error != B_OK)
  		RETURN_ERROR(error);
 
@@ -817,7 +769,7 @@ packagefs_mount_file(int fd, ::Directory*& _mountedDirectory)
 		return B_NO_MEMORY;
 	BReference<PackageVolume> volumeReference(volume, true);
 
-	error = volume->Init(fd);
+	error = volume->Init(fd, packageReader.HeapReader());
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
