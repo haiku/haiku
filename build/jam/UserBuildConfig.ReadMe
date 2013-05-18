@@ -79,6 +79,18 @@ HAIKU_INSTALL_DIR = /Haiku ;
 # freshly be initialized with BFS. Useful when installing Haiku on a partition.
 HAIKU_DONT_CLEAR_IMAGE = 1 ;
 
+# Set the compression level for the creation and update of Haiku packages to 1.
+# Values from 0 to 9 are supported. 0 means no compression, 1 fastest, ..., and
+# 9 best. The default is 9 which should be used for official builds (release or
+# nightly) to achieve the smallest possible package files at the cost of long
+# package building times. For developers who frequently rebuild/update packages
+# level 1 is a good compromise. Depending on the package data it's about an
+# order of magnitude faster while still achieving acceptable compression ratios.
+# Using level 0 will make package creation mostly I/O bound. It can be used, if
+# package size is not a concern. Depending on the package data, files may be
+# several times larger than even with level 1.
+HAIKU_PACKAGE_COMPRESSION_LEVEL = 1 ;
+
 
 # Affects the haiku-image, haiku-vmware-image, and install-haiku targets. Only
 # targets on which the HAIKU_INCLUDE_IN_IMAGE variable has been set will be

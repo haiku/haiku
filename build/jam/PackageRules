@@ -310,6 +310,8 @@ rule BuildHaikuPackage package : packageInfo
 	AddVariableToScript $(script) : tmpDir : $(tempDir) ;
 	AddVariableToScript $(script) : addBuildCompatibilityLibDir
 		: $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ;
+	AddVariableToScript $(script) : compressionLevel
+		: $(HAIKU_PACKAGE_COMPRESSION_LEVEL) ;
 	AddVariableToScript $(script) : updateOnly
 		: [ on $(package) return $(HAIKU_CONTAINER_UPDATE_ONLY) ] ;
 	AddTargetVariableToScript $(script) : <build>addattr ;
@@ -434,3 +436,7 @@ rule AddLibrariesToPackage directory : libs
 	AddLibrariesToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
 		: $(directory) : $(libs) ;
 }
+
+
+# default value for the package compression level
+HAIKU_PACKAGE_COMPRESSION_LEVEL ?= 9 ;

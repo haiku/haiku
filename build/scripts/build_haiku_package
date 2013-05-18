@@ -7,6 +7,7 @@ set -o errexit
 # outputDir
 # sourceDir
 # tmpDir
+# compressionLevel
 # updateOnly
 #
 # addattr
@@ -69,7 +70,9 @@ $mimeset --mimedb "$mimeDB" "$contentsDir"
 # create the package
 if [ ! $updateOnly ]; then
 	rm -f "$packagePath"
-	$package create -q -i "$packageInfoPath" -C "$contentsDir" "$packagePath"
+	$package create -q "-$compressionLevel" -i "$packageInfoPath" \
+		-C "$contentsDir" "$packagePath"
 else
-	$package add -q -f -i "$packageInfoPath" -C "$contentsDir" "$packagePath" .
+	$package add -q -f "-$compressionLevel" -i "$packageInfoPath" \
+		-C "$contentsDir" "$packagePath" .
 fi
