@@ -166,6 +166,13 @@ enum {
 };
 
 
+enum {
+	B_HPKG_COMPRESSION_LEVEL_NONE		= 0,
+	B_HPKG_COMPRESSION_LEVEL_FASTEST	= 1,
+	B_HPKG_COMPRESSION_LEVEL_BEST		= 9
+};
+
+
 }	// namespace BHPKG
 
 }	// namespace BPackageKit

@@ -463,10 +463,11 @@ PackageWriterImpl::~PackageWriterImpl()
 
 
 status_t
-PackageWriterImpl::Init(const char* fileName, uint32 flags)
+PackageWriterImpl::Init(const char* fileName,
+	const BPackageWriterParameters& parameters)
 {
 	try {
-		return _Init(fileName, flags);
+		return _Init(fileName, parameters);
 	} catch (status_t error) {
 		return error;
 	} catch (std::bad_alloc) {
@@ -602,9 +603,10 @@ PackageWriterImpl::Finish()
 
 
 status_t
-PackageWriterImpl::_Init(const char* fileName, uint32 flags)
+PackageWriterImpl::_Init(const char* fileName,
+	const BPackageWriterParameters& parameters)
 {
-	status_t result = inherited::Init(fileName, flags);
+	status_t result = inherited::Init(fileName, parameters);
 	if (result != B_OK)
 		return result;
 

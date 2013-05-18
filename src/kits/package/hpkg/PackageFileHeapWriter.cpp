@@ -210,13 +210,14 @@ private:
 
 
 PackageFileHeapWriter::PackageFileHeapWriter(BErrorOutput* errorOutput, int fd,
-	off_t heapOffset)
+	off_t heapOffset, int32 compressionLevel)
 	:
 	PackageFileHeapAccessorBase(errorOutput, fd, heapOffset),
 	fPendingDataBuffer(NULL),
 	fCompressedDataBuffer(NULL),
 	fPendingDataSize(0),
-	fOffsets()
+	fOffsets(),
+	fCompressionLevel(compressionLevel)
 {
 }
 
@@ -566,9 +567,12 @@ PackageFileHeapWriter::_WriteChunk(const void* data, size_t size,
 status_t
 PackageFileHeapWriter::_WriteDataCompressed(const void* data, size_t size)
 {
+	if (fCompressionLevel == B_HPKG_COMPRESSION_LEVEL_NONE)
+		return B_BUFFER_OVERFLOW;
+
 	size_t compressedSize;
 	status_t error = ZlibCompressor::CompressSingleBuffer(data, size,
-		fCompressedDataBuffer, size, compressedSize);
+		fCompressedDataBuffer, size, compressedSize, fCompressionLevel);
 	if (error != B_OK)
 		return error;
 

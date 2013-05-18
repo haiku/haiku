@@ -12,6 +12,7 @@
 
 #include <package/hpkg/DataOutput.h>
 #include <package/hpkg/DataWriters.h>
+#include <package/hpkg/PackageWriter.h>
 #include <package/hpkg/Strings.h>
 #include <package/hpkg/ZlibCompressor.h>
 
@@ -99,7 +100,8 @@ protected:
 			typedef DoublyLinkedList<PackageAttribute> PackageAttributeList;
 
 protected:
-			status_t			Init(const char* fileName, uint32 flags);
+			status_t			Init(const char* fileName,
+									const BPackageWriterParameters& parameters);
 
 			void				RegisterPackageInfo(
 									PackageAttributeList& attributeList,
@@ -168,7 +170,7 @@ private:
 			const char*			fFileType;
 			BErrorOutput*		fErrorOutput;
 			const char*			fFileName;
-			uint32				fFlags;
+			BPackageWriterParameters fParameters;
 			int					fFD;
 			bool				fFinished;
 
@@ -211,7 +213,7 @@ WriterImplBase::FD() const
 inline uint32
 WriterImplBase::Flags() const
 {
-	return fFlags;
+	return fParameters.Flags();
 }
 
 

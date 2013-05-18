@@ -29,6 +29,7 @@ namespace BHPKG {
 
 class BDataReader;
 class BErrorOutput;
+class BPackageWriterParameters;
 
 
 namespace BPrivate {
@@ -46,7 +47,8 @@ public:
 									BPackageWriterListener* listener);
 								~PackageWriterImpl();
 
-			status_t			Init(const char* fileName, uint32 flags);
+			status_t			Init(const char* fileName,
+									const BPackageWriterParameters& parameters);
 			status_t			SetInstallPath(const char* installPath);
 			void				SetCheckLicenses(bool checkLicenses);
 			status_t			AddEntry(const char* fileName, int fd = -1);
@@ -62,7 +64,8 @@ private:
 			typedef DoublyLinkedList<Entry> EntryList;
 
 private:
-			status_t			_Init(const char* fileName, uint32 flags);
+			status_t			_Init(const char* fileName,
+									const BPackageWriterParameters& parameters);
 			status_t			_Finish();
 
 			status_t			_RegisterEntry(const char* fileName, int fd);

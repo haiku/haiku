@@ -35,7 +35,8 @@ class PackageFileHeapWriter : public PackageFileHeapAccessorBase,
 	private AbstractDataWriter {
 public:
 								PackageFileHeapWriter(BErrorOutput* errorOutput,
-									int fd, off_t heapOffset);
+									int fd, off_t heapOffset,
+									int32 compressionLevel);
 								~PackageFileHeapWriter();
 
 			void				Init();
@@ -86,6 +87,7 @@ private:
 			void*				fCompressedDataBuffer;
 			size_t				fPendingDataSize;
 			Array<uint64>		fOffsets;
+			int32				fCompressionLevel;
 };
 
 

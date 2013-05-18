@@ -41,13 +41,32 @@ public:
 };
 
 
+class BPackageWriterParameters {
+public:
+								BPackageWriterParameters();
+								~BPackageWriterParameters();
+
+			uint32				Flags() const;
+			void				SetFlags(uint32 flags);
+
+			int32				CompressionLevel() const;
+			void				SetCompressionLevel(int32 compressionLevel);
+
+private:
+			uint32				fFlags;
+			int32				fCompressionLevel;
+};
+
+
 class BPackageWriter {
 public:
 								BPackageWriter(
 									BPackageWriterListener* listener);
 								~BPackageWriter();
 
-			status_t			Init(const char* fileName, uint32 flags = 0);
+			status_t			Init(const char* fileName,
+									const BPackageWriterParameters* parameters
+										= NULL);
 			status_t			SetInstallPath(const char* installPath);
 			void				SetCheckLicenses(bool checkLicenses);
 			status_t			AddEntry(const char* fileName, int fd = -1);

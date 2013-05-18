@@ -250,7 +250,7 @@ RepositoryWriterImpl::Finish()
 status_t
 RepositoryWriterImpl::_Init(const char* fileName)
 {
-	return inherited::Init(fileName, 0);
+	return inherited::Init(fileName, BPackageWriterParameters());
 }
 
 

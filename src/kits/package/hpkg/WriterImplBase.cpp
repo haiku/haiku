@@ -220,7 +220,7 @@ WriterImplBase::WriterImplBase(const char* fileType, BErrorOutput* errorOutput)
 	fFileType(fileType),
 	fErrorOutput(errorOutput),
 	fFileName(NULL),
-	fFlags(0),
+	fParameters(),
 	fFD(-1),
 	fFinished(false),
 	fDataWriter(NULL)
@@ -236,21 +236,24 @@ WriterImplBase::~WriterImplBase()
 		close(fFD);
 
 	if (!fFinished && fFileName != NULL
-		&& (fFlags & B_HPKG_WRITER_UPDATE_PACKAGE) == 0) {
+		&& (Flags() & B_HPKG_WRITER_UPDATE_PACKAGE) == 0) {
 		unlink(fFileName);
 	}
 }
 
 
 status_t
-WriterImplBase::Init(const char* fileName, uint32 flags)
+WriterImplBase::Init(const char* fileName,
+	const BPackageWriterParameters& parameters)
 {
+	fParameters = parameters;
+
 	if (fPackageStringCache.Init() != B_OK)
 		throw std::bad_alloc();
 
 	// open file (don't truncate in update mode)
 	int openMode = O_RDWR;
-	if ((flags & B_HPKG_WRITER_UPDATE_PACKAGE) == 0)
+	if ((Flags() & B_HPKG_WRITER_UPDATE_PACKAGE) == 0)
 		openMode |= O_CREAT | O_TRUNC;
 
 	fFD = open(fileName, openMode, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
@@ -261,11 +264,10 @@ WriterImplBase::Init(const char* fileName, uint32 flags)
 	}
 
 	fFileName = fileName;
-	fFlags = flags;
 
 	// create heap writer
 	fHeapWriter = new PackageFileHeapWriter(fErrorOutput, FD(),
-		sizeof(hpkg_header));
+		sizeof(hpkg_header), fParameters.CompressionLevel());
 	fHeapWriter->Init();
 	fDataWriter = fHeapWriter->DataWriter();
 
