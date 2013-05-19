@@ -20,7 +20,6 @@
 #include <package/hpkg/HPKGDefsPrivate.h>
 
 #include <package/hpkg/DataOutput.h>
-#include <package/hpkg/ErrorOutput.h>
 #include <package/hpkg/PackageFileHeapReader.h>
 #include <package/hpkg/ZlibDecompressor.h>
 

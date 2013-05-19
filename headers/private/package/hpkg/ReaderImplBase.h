@@ -15,6 +15,7 @@
 
 #include <util/SinglyLinkedList.h>
 
+#include <package/hpkg/ErrorOutput.h>
 #include <package/hpkg/PackageAttributeValue.h>
 #include <package/hpkg/PackageContentHandler.h>
 #include <package/hpkg/PackageInfoAttributeValue.h>
