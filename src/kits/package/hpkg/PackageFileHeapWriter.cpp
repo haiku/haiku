@@ -18,8 +18,6 @@
 #include <AutoDeleter.h>
 #include <package/hpkg/DataReader.h>
 #include <package/hpkg/PackageFileHeapReader.h>
-#include <package/hpkg/ZlibCompressor.h>
-#include <package/hpkg/ZlibDecompressor.h>
 #include <RangeArray.h>
 
 
@@ -50,12 +48,9 @@ struct PackageFileHeapWriter::ChunkSegment {
 
 
 struct PackageFileHeapWriter::ChunkBuffer {
-	ChunkBuffer(BErrorOutput* errorOutput, int fd, off_t heapOffset,
-		size_t bufferSize)
+	ChunkBuffer(PackageFileHeapWriter* writer, size_t bufferSize)
 		:
-		fErrorOutput(errorOutput),
-		fFD(fd),
-		fHeapOffset(heapOffset),
+		fWriter(writer),
 		fChunks(),
 		fCurrentChunkIndex(0),
 		fNextReadIndex(0),
@@ -100,6 +95,11 @@ struct PackageFileHeapWriter::ChunkBuffer {
 		return fSegments.Add(segment);
 	}
 
+	bool IsEmpty() const
+	{
+		return fSegments.IsEmpty();
+	}
+
 	bool HasMoreSegments() const
 	{
 		return fCurrentSegmentIndex < fSegments.Count();
@@ -138,23 +138,10 @@ struct PackageFileHeapWriter::ChunkBuffer {
 		Chunk& chunk = fChunks[fNextReadIndex++];
 		chunk.buffer = _GetBuffer();
 
-		ssize_t bytesRead = pread(fFD, chunk.buffer, chunk.compressedSize,
-			fHeapOffset + chunk.offset);
-		if (bytesRead < 0) {
-			fErrorOutput->PrintError("PackageFileHeapWriter::ChunkBuffer::"
-				"ReadNextChunk(offset: %" B_PRIu64 ", size: %" B_PRIu32
-				") failed to read data: %s\n", chunk.offset,
-				chunk.compressedSize, strerror(errno));
-			throw status_t(errno);
-		}
-
-		if ((size_t)bytesRead != chunk.compressedSize) {
-			fErrorOutput->PrintError("PackageFileHeapWriter::ChunkBuffer::"
-				"ReadNextChunk(offset: %" B_PRIu64 ", size: %" B_PRIu32
-				") failed to read all data\n", chunk.offset,
-				chunk.compressedSize);
-			throw status_t(B_ERROR);
-		}
+		status_t error = fWriter->ReadFileData(chunk.offset, chunk.buffer,
+			chunk.compressedSize);
+		if (error != B_OK)
+			throw error;
 	}
 
 	void CurrentSegmentDone()
@@ -192,20 +179,18 @@ private:
 	}
 
 private:
-	BErrorOutput*		fErrorOutput;
-	int					fFD;
-	off_t				fHeapOffset;
+	PackageFileHeapWriter*	fWriter;
 
-	Array<Chunk>		fChunks;
-	ssize_t				fCurrentChunkIndex;
-	ssize_t				fNextReadIndex;
+	Array<Chunk>			fChunks;
+	ssize_t					fCurrentChunkIndex;
+	ssize_t					fNextReadIndex;
 
-	Array<ChunkSegment>	fSegments;
-	ssize_t				fCurrentSegmentIndex;
+	Array<ChunkSegment>		fSegments;
+	ssize_t					fCurrentSegmentIndex;
 
-	BList				fBuffers;
-	BList				fUnusedBuffers;
-	size_t				fBufferSize;
+	BList					fBuffers;
+	BList					fUnusedBuffers;
+	size_t					fBufferSize;
 };
 
 
@@ -257,18 +242,7 @@ PackageFileHeapWriter::Reinit(PackageFileHeapReader* heapReader)
 			fOffsets[i] = heapReader->Offsets()[i];
 	}
 
-	// If the last chunk is partial, read it in and remove it from the offsets.
-	size_t lastChunkSize = fUncompressedHeapSize % kChunkSize;
-	if (lastChunkSize != 0) {
-		status_t error = heapReader->ReadData(
-			fUncompressedHeapSize - lastChunkSize, fPendingDataBuffer,
-			lastChunkSize);
-		if (error != B_OK)
-			throw error;
-
-		fCompressedHeapSize = fOffsets[fOffsets.Count() - 1];
-		fOffsets.Remove(fOffsets.Count() - 1);
-	}
+	_UnwriteLastPartialChunk();
 }
 
 
@@ -322,6 +296,10 @@ PackageFileHeapWriter::RemoveDataRanges(
 		throw status_t(B_BAD_VALUE);
 	}
 
+	// Before we begin flush any pending data, so we don't need any special
+	// handling and also can use the pending data buffer.
+	_FlushPendingData();
+
 	// We potentially have to recompress all data from the first affected chunk
 	// to the end (minus the removed ranges, of course). As a basic algorithm we
 	// can use our usual data writing strategy, i.e. read a chunk, decompress it
@@ -338,7 +316,7 @@ PackageFileHeapWriter::RemoveDataRanges(
 	// Build a list of (possibly partial) chunks we want to keep.
 
 	// the first partial chunk (if any) and all chunks between ranges
-	ChunkBuffer chunkBuffer(fErrorOutput, fFD, fHeapOffset, kChunkSize);
+	ChunkBuffer chunkBuffer(this, kChunkSize);
 	uint64 writeOffset = ranges[0].offset - ranges[0].offset % kChunkSize;
 	uint64 readOffset = writeOffset;
 	for (ssize_t i = 0; i < rangeCount; i++) {
@@ -360,9 +338,10 @@ PackageFileHeapWriter::RemoveDataRanges(
 	// Reset our state to look like all chunks from the first affected one have
 	// been removed and re-add all data we want to keep.
 
-	// truncate the offsets array and reset the heap end offset
+	// truncate the offsets array and reset the heap sizes
 	ssize_t firstChunkIndex = ssize_t(writeOffset / kChunkSize);
 	fCompressedHeapSize = fOffsets[firstChunkIndex];
+	fUncompressedHeapSize = (uint64)firstChunkIndex * kChunkSize;
 	fOffsets.Remove(firstChunkIndex, fOffsets.Count() - firstChunkIndex);
 
 	// we need a decompression buffer
@@ -409,21 +388,11 @@ PackageFileHeapWriter::RemoveDataRanges(
 		} else if (decompressedChunk == &chunk) {
 			uncompressedData = decompressionBuffer;
 		} else {
-			size_t uncompressedSize;
-			status_t error = ZlibDecompressor::DecompressSingleBuffer(
-				chunk.buffer, chunk.compressedSize,
-				decompressionBuffer, chunk.uncompressedSize, uncompressedSize);
-			if (error != B_OK) {
-				fErrorOutput->PrintError("Failed to decompress data chunk: "
-					"%s\n", strerror(error));
+			status_t error = DecompressChunkData(chunk.buffer,
+				chunk.compressedSize, decompressionBuffer,
+				chunk.uncompressedSize);
+			if (error != B_OK)
 				throw error;
-			}
-	
-			if (uncompressedSize != chunk.uncompressedSize) {
-				fErrorOutput->PrintError("Failed to decompress data chunk: "
-					"chunk size mismatch\n");
-				throw status_t(B_ERROR);
-			}
 
 			decompressedChunk = &chunk;
 			uncompressedData = decompressionBuffer;
@@ -435,6 +404,13 @@ PackageFileHeapWriter::RemoveDataRanges(
 
 		chunkBuffer.CurrentSegmentDone();
 	}
+
+	// Make sure a last partial chunk ends up in the pending data buffer. This
+	// is only necessary when we didn't have to move any chunk segments, since
+	// the loop would otherwise have read it in and left it in the pending data
+	// buffer.
+	if (chunkBuffer.IsEmpty())
+		_UnwriteLastPartialChunk();
 }
 
 
@@ -617,14 +593,16 @@ PackageFileHeapWriter::_PushChunks(ChunkBuffer& chunkBuffer, uint64 startOffset,
 	uint64 uncompressedChunkOffset = (uint64)chunkIndex * kChunkSize;
 
 	while (startOffset < endOffset) {
+		bool isLastChunk = fUncompressedHeapSize - uncompressedChunkOffset
+			<= kChunkSize;
 		uint32 inChunkOffset = uint32(startOffset - uncompressedChunkOffset);
-		uint32 uncompressedChunkSize = chunkIndex + 1 < fOffsets.Count()
-			? kChunkSize
-			: fUncompressedHeapSize - uncompressedChunkOffset;
+		uint32 uncompressedChunkSize = isLastChunk
+			? fUncompressedHeapSize - uncompressedChunkOffset
+			: kChunkSize;
 		uint64 compressedChunkOffset = fOffsets[chunkIndex];
-		uint32 compressedChunkSize = chunkIndex + 1 < fOffsets.Count()
-			? fOffsets[chunkIndex + 1] - compressedChunkOffset
-			: fCompressedHeapSize - compressedChunkOffset;
+		uint32 compressedChunkSize = isLastChunk
+			? fCompressedHeapSize - compressedChunkOffset
+			: fOffsets[chunkIndex + 1] - compressedChunkOffset;
 		uint32 toKeepSize = uint32(std::min(
 			(uint64)uncompressedChunkSize - inChunkOffset,
 			endOffset - startOffset));
@@ -638,6 +616,24 @@ PackageFileHeapWriter::_PushChunks(ChunkBuffer& chunkBuffer, uint64 startOffset,
 		startOffset += toKeepSize;
 		chunkIndex++;
 		uncompressedChunkOffset += uncompressedChunkSize;
+	}
+}
+
+
+void
+PackageFileHeapWriter::_UnwriteLastPartialChunk()
+{
+	// If the last chunk is partial, read it in and remove it from the offsets.
+	size_t lastChunkSize = fUncompressedHeapSize % kChunkSize;
+	if (lastChunkSize != 0) {
+		status_t error = ReadData(fUncompressedHeapSize - lastChunkSize,
+			fPendingDataBuffer, lastChunkSize);
+		if (error != B_OK)
+			throw error;
+
+		fPendingDataSize = lastChunkSize;
+		fCompressedHeapSize = fOffsets[fOffsets.Count() - 1];
+		fOffsets.Remove(fOffsets.Count() - 1);
 	}
 }
 

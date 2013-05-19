@@ -68,6 +68,8 @@ private:
 			struct ChunkSegment;
 			struct ChunkBuffer;
 
+			friend struct ChunkBuffer;
+
 private:
 			void				_Uninit();
 
@@ -81,6 +83,7 @@ private:
 
 			void				_PushChunks(ChunkBuffer& chunkBuffer,
 									uint64 startOffset, uint64 endOffset);
+			void				_UnwriteLastPartialChunk();
 
 private:
 			void*				fPendingDataBuffer;
