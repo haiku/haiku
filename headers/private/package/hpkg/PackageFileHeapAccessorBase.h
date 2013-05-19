@@ -63,6 +63,11 @@ protected:
 									size_t uncompressedSize,
 									void* compressedDataBuffer,
 									void* uncompressedDataBuffer);
+			status_t			DecompressChunkData(
+									void* compressedDataBuffer,
+									size_t compressedSize,
+									void* uncompressedDataBuffer,
+									size_t uncompressedSize);
 			status_t			ReadFileData(uint64 offset, void* buffer,
 									size_t size);
 

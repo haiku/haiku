@@ -201,18 +201,29 @@ PackageFileHeapAccessorBase::ReadAndDecompressChunkData(uint64 offset,
 	if (error != B_OK)
 		return error;
 
+	return DecompressChunkData(compressedDataBuffer, compressedSize,
+		uncompressedDataBuffer, uncompressedSize);
+}
+
+
+status_t
+PackageFileHeapAccessorBase::DecompressChunkData(void* compressedDataBuffer,
+	size_t compressedSize, void* uncompressedDataBuffer,
+	size_t uncompressedSize)
+{
 	size_t actualSize;
-	error = ZlibDecompressor::DecompressSingleBuffer(compressedDataBuffer,
-		compressedSize, uncompressedDataBuffer, uncompressedSize, actualSize);
+	status_t error = ZlibDecompressor::DecompressSingleBuffer(
+		compressedDataBuffer, compressedSize, uncompressedDataBuffer,
+		uncompressedSize, actualSize);
 	if (error != B_OK) {
-		fErrorOutput->PrintError("Failed to decompress data chunk: %s\n",
+		fErrorOutput->PrintError("Failed to decompress chunk data: %s\n",
 			strerror(error));
 		return error;
 	}
 
 	if (actualSize != uncompressedSize) {
-		fErrorOutput->PrintError("Failed to decompress data chunk: chunk "
-			"size mismatch\n");
+		fErrorOutput->PrintError("Failed to decompress chunk data: size "
+			"mismatch\n");
 		return B_ERROR;
 	}
 
@@ -226,13 +237,13 @@ PackageFileHeapAccessorBase::ReadFileData(uint64 offset, void* buffer,
 {
 	ssize_t bytesRead = pread(fFD, buffer, size, fHeapOffset + (off_t)offset);
 	if (bytesRead < 0) {
-		fErrorOutput->PrintError("_ReadData(%" B_PRIu64 "%p, %zu) failed to "
+		fErrorOutput->PrintError("ReadFileData(%" B_PRIu64 "%p, %zu) failed to "
 			"read data: %s\n", offset, buffer, size, strerror(errno));
 		return errno;
 	}
 	if ((size_t)bytesRead != size) {
-		fErrorOutput->PrintError("_ReadData(%" B_PRIu64 "%p, %zu) failed to "
-			"read all data\n", offset, buffer, size);
+		fErrorOutput->PrintError("ReadFileData(%" B_PRIu64 ", %p, %zu) could "
+			"read only %zd bytes\n", offset, buffer, size, bytesRead);
 		return B_ERROR;
 	}
 
