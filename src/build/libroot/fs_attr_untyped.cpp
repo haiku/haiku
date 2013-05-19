@@ -523,8 +523,7 @@ fs_read_attr(int fd, const char *_attribute, uint32 type, off_t pos,
 
 	// read the attribute
 	char attributeBuffer[sizeof(AttributeHeader) + kMaxAttributeLength];
-	ssize_t bytesRead = min_c((size_t)kMaxAttributeLength, readBytes)
-		+ sizeof(AttributeHeader);
+	ssize_t bytesRead = sizeof(attributeBuffer);
 	if (localFD.Path()) {
 		bytesRead = get_attribute(-1, localFD.Path(), attribute.c_str(),
 			attributeBuffer, bytesRead);
@@ -549,12 +548,19 @@ fs_read_attr(int fd, const char *_attribute, uint32 type, off_t pos,
 	}
 
 	// copy the result into the provided buffer
-	bytesRead -= sizeof(AttributeHeader);
-	if (bytesRead > pos) {
+	bytesRead -= sizeof(AttributeHeader) + pos;
+	if (bytesRead < 0) {
+		// that means pos > <attribute size>
+		errno = B_BAD_VALUE;
+		return -1;
+	}
+
+	if (bytesRead > 0) {
+		if ((size_t)bytesRead > readBytes)
+			bytesRead = readBytes;
 		memcpy(buffer, attributeBuffer + sizeof(AttributeHeader) + pos,
-			bytesRead - pos);
-	} else
-		bytesRead = 0;
+			bytesRead);
+	}
 
 	return bytesRead;
 }
