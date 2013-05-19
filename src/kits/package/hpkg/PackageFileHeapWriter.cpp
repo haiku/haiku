@@ -414,14 +414,14 @@ PackageFileHeapWriter::RemoveDataRanges(
 				chunk.buffer, chunk.compressedSize,
 				decompressionBuffer, chunk.uncompressedSize, uncompressedSize);
 			if (error != B_OK) {
-				fErrorOutput->PrintError("Failed to decompress data chunk: %s\n",
-					strerror(error));
+				fErrorOutput->PrintError("Failed to decompress data chunk: "
+					"%s\n", strerror(error));
 				throw error;
 			}
 	
 			if (uncompressedSize != chunk.uncompressedSize) {
-				fErrorOutput->PrintError("Failed to decompress data chunk: chunk "
-					"size mismatch\n");
+				fErrorOutput->PrintError("Failed to decompress data chunk: "
+					"chunk size mismatch\n");
 				throw status_t(B_ERROR);
 			}
 
