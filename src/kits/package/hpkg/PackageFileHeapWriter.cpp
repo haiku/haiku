@@ -549,8 +549,13 @@ PackageFileHeapWriter::_WriteDataCompressed(const void* data, size_t size)
 	size_t compressedSize;
 	status_t error = ZlibCompressor::CompressSingleBuffer(data, size,
 		fCompressedDataBuffer, size, compressedSize, fCompressionLevel);
-	if (error != B_OK)
+	if (error != B_OK) {
+		if (error != B_BUFFER_OVERFLOW) {
+			fErrorOutput->PrintError("Failed to compress chunk data: %s\n",
+				strerror(error));
+		}
 		return error;
+	}
 
 	// only use compressed data when we've actually saved space
 	if (compressedSize == size)
