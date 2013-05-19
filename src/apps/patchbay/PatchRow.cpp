@@ -19,6 +19,7 @@
 #include <MidiConsumer.h>
 #include <MidiProducer.h>
 #include <Window.h>
+
 #include "MidiEventMeter.h"
 
 extern const float ROW_LEFT = 50.0f;
@@ -86,7 +87,7 @@ PatchRow::ID() const
 void
 PatchRow::Pulse()
 {
-	if (fEventMeter)
+	if (fEventMeter != NULL)
 		fEventMeter->Pulse(this);
 }
 
@@ -94,7 +95,7 @@ PatchRow::Pulse()
 void
 PatchRow::Draw(BRect)
 {
-	if (fEventMeter)
+	if (fEventMeter != NULL)
 		fEventMeter->Draw(this);
 }
 
@@ -121,12 +122,12 @@ PatchRow::RemoveColumn(int32 consumerID)
 	int32 numChildren = CountChildren();
 	for (int32 i = 0; i < numChildren; i++) {
 		PatchCheckBox* box = dynamic_cast<PatchCheckBox*>(ChildAt(i));
-		if (box && box->ConsumerID() == consumerID) {
+		if (box != NULL && box->ConsumerID() == consumerID) {
 			RemoveChild(box);
 			delete box;
 			while (i < numChildren) {
 				box = dynamic_cast<PatchCheckBox*>(ChildAt(i++));
-				if (box)
+				if (box != NULL)
 					box->MoveBy(-COLUMN_WIDTH, 0);
 			}
 			break;
@@ -141,7 +142,7 @@ PatchRow::Connect(int32 consumerID)
 	int32 numChildren = CountChildren();
 	for (int32 i = 0; i < numChildren; i++) {
 		PatchCheckBox* box = dynamic_cast<PatchCheckBox*>(ChildAt(i));
-		if (box && box->ConsumerID() == consumerID)
+		if (box != NULL && box->ConsumerID() == consumerID)
 			box->SetValue(1);
 	}
 }
@@ -153,7 +154,7 @@ PatchRow::Disconnect(int32 consumerID)
 	int32 numChildren = CountChildren();
 	for (int32 i = 0; i < numChildren; i++) {
 		PatchCheckBox* box = dynamic_cast<PatchCheckBox*>(ChildAt(i));
-		if (box && box->ConsumerID() == consumerID)
+		if (box != NULL && box->ConsumerID() == consumerID)
 			box->SetValue(0);
 	}
 }
@@ -167,7 +168,7 @@ PatchRow::AttachedToWindow()
 	int32 numChildren = CountChildren();
 	for (int32 i = 0; i < numChildren; i++) {
 		PatchCheckBox* box = dynamic_cast<PatchCheckBox*>(ChildAt(i));
-		if (box)
+		if (box != NULL)
 			box->SetTarget(this);
 	}
 }
@@ -182,7 +183,7 @@ PatchRow::MessageReceived(BMessage* msg)
 			BControl* ctrl;
 			if (msg->FindPointer("source", (void**) &ctrl) == B_OK) {
 				PatchCheckBox* box = dynamic_cast<PatchCheckBox*>(ctrl);
-				if (box)
+				if (box != NULL)
 					box->DoConnect();
 			}
 		}
@@ -208,9 +209,9 @@ PatchCheckBox::DoConnect()
 	
 	BMidiProducer* producer = roster->FindProducer(fProducerID);
 	BMidiConsumer* consumer = roster->FindConsumer(fConsumerID);	
-	if (producer && consumer) {
+	if (producer != NULL && consumer != NULL) {
 		status_t err;
-		if (value)
+		if (value != 0)
 			err = producer->Connect(consumer);
 		else
 			err = producer->Disconnect(consumer);
@@ -221,6 +222,8 @@ PatchCheckBox::DoConnect()
 	} else
 		SetValue(inverseValue);
 
-	if (producer) producer->Release();
-	if (consumer) consumer->Release();
+	if (producer != NULL)
+		producer->Release();
+	if (consumer != NULL)
+		consumer->Release();
 }

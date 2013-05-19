@@ -46,9 +46,9 @@ EndpointInfo::EndpointInfo(int32 id)
 	fIcon(NULL)
 {
 	BMidiRoster* roster = BMidiRoster::MidiRoster();
-	if (roster) {
+	if (roster != NULL) {
 		BMidiEndpoint* endpoint = roster->FindEndpoint(id);
-		if (endpoint) {
+		if (endpoint != NULL) {
 			printf("endpoint %ld = %p\n", id, endpoint);
 			BMessage msg;
 			if (endpoint->GetProperties(&msg) == B_OK) {
@@ -132,9 +132,7 @@ CreateIcon(const BMessage* msg, icon_size which)
 		return NULL;
 	}
 							
-	if (msg->FindData(iconName, iconType, &data, &size) == B_OK)
-	{
-		;
+	if (msg->FindData(iconName, iconType, &data, &size) == B_OK) {
 		bitmap = new BBitmap(BRect(0, 0, bmapSize, bmapSize),
 			ICON_COLOR_SPACE);
 		ASSERT((bitmap->BitsLength() == size));

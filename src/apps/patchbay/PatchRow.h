@@ -9,9 +9,8 @@
  * Copyright 1999, Be Incorporated.   All Rights Reserved.
  * This file may be used under the terms of the Be Sample Code License.
  */
-
-#ifndef _PatchRow_h
-#define _PatchRow_h
+#ifndef PATCHROW_H
+#define PATCHROW_H
 
 #include <View.h>
 
@@ -47,4 +46,4 @@ private:
 	MidiEventMeter* fEventMeter;
 };
 
-#endif /* _PatchRow_h */
+#endif /* PATCHROW_H */

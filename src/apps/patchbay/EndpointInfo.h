@@ -11,9 +11,8 @@
  * Copyright 1999, Be Incorporated.   All Rights Reserved.
  * This file may be used under the terms of the Be Sample Code License.
  */
- 
-#ifndef _EndpointInfo_h
-#define _EndpointInfo_h
+#ifndef ENDPOINTINFO_H
+#define ENDPOINTINFO_H
 
 #include <Mime.h> /* for icon_size */
 #include <GraphicsDefs.h> /* for color_space */
@@ -49,4 +48,4 @@ private:
 	BBitmap* fIcon;
 };
 
-#endif /* _EndpointInfo_h */
+#endif /* ENDPOINTINFO_H */

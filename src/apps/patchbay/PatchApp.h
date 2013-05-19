@@ -10,9 +10,8 @@
  * Copyright 1999, Be Incorporated.   All Rights Reserved.
  * This file may be used under the terms of the Be Sample Code License.
  */
- 
-#ifndef _PatchApp_h
-#define _PatchApp_h
+#ifndef PATCHAPP_H
+#define PATCHAPP_H
 
 #include <Application.h>
 
@@ -24,4 +23,4 @@ public:
 	void MessageReceived(BMessage* msg);
 };
 
-#endif /* _PatchApp_h */
+#endif /* PATCHAPP_H */

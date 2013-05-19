@@ -10,9 +10,8 @@
  * Copyright 1999, Be Incorporated.   All Rights Reserved.
  * This file may be used under the terms of the Be Sample Code License.
  */
-
-#ifndef _PatchWin_h
-#define _PatchWin_h
+#ifndef PATCHWIN_H
+#define PATCHWIN_H
 
 #include <Window.h>
 
@@ -27,4 +26,4 @@ private:
 	PatchView* fPatchView;
 };
 
-#endif /* _PatchWin_h */
+#endif /* PATCHWIN_H */

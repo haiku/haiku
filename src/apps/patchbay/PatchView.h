@@ -12,13 +12,13 @@
  * Copyright 1999, Be Incorporated.   All Rights Reserved.
  * This file may be used under the terms of the Be Sample Code License.
  */
- 
-#ifndef _PatchView_h
-#define _PatchView_h
+#ifndef PATCHVIEW_H
+#define PATCHVIEW_H
 
 #include <Rect.h>
 #include <View.h>
 #include <list>
+
 #include "EndpointInfo.h"
 
 class PatchRow;
@@ -70,4 +70,4 @@ private:
 	BBitmap* fUnknownDeviceIcon;
 };
 
-#endif /* _PatchView_h */
+#endif /* PATCHVIEW_H */

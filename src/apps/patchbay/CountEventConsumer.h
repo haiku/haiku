@@ -10,9 +10,8 @@
  * Copyright 1999, Be Incorporated.   All Rights Reserved.
  * This file may be used under the terms of the Be Sample Code License.
  */
- 
-#ifndef _CountEventConsumer_h
-#define _CountEventConsumer_h
+#ifndef COUNTEVENTCONSUMER_H
+#define COUNTEVENTCONSUMER_H
 
 #include <MidiConsumer.h>
 #include <SupportDefs.h>
@@ -43,4 +42,4 @@ private:
 	int32 fEventCount;
 };
 
-#endif /* _CountEventConsumer_h */
+#endif /* COUNTEVENTCONSUMER_H */

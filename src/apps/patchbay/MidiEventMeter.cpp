@@ -10,14 +10,16 @@
  * Copyright 1999, Be Incorporated.   All Rights Reserved.
  * This file may be used under the terms of the Be Sample Code License.
  */
+
+#include "MidiEventMeter.h"
  
 #include <stdio.h>
 #include <MidiRoster.h>
 #include <MidiProducer.h>
 #include <MidiConsumer.h>
 #include <View.h>
+
 #include "CountEventConsumer.h"
-#include "MidiEventMeter.h"
 
 static const BRect METER_BOUNDS(0, 0, 7, 31);
 
@@ -34,9 +36,9 @@ MidiEventMeter::MidiEventMeter(int32 producerID)
 	fMeterLevel(0)
 {
 	BMidiRoster* roster = BMidiRoster::MidiRoster();
-	if (roster) {
+	if (roster != NULL) {
 		BMidiProducer* producer = roster->FindProducer(producerID);
-		if (producer) {
+		if (producer != NULL) {
 			BString name;
 			name << producer->Name() << " Event Meter";
 			fCounter = new CountEventConsumer(name.String());
@@ -49,7 +51,7 @@ MidiEventMeter::MidiEventMeter(int32 producerID)
 
 MidiEventMeter::~MidiEventMeter()
 {
-	if (fCounter)
+	if (fCounter != NULL)
 		fCounter->Release();
 }
 
@@ -58,7 +60,7 @@ void
 MidiEventMeter::Pulse(BView* view)
 {
 	int32 newLevel = fMeterLevel;
-	if (fCounter) {
+	if (fCounter != NULL) {
 		newLevel = CalcMeterLevel(fCounter->CountEvents());
 		fCounter->Reset();
 	}
@@ -108,8 +110,7 @@ MidiEventMeter::Draw(BView* view)
 		 B_DARKEN_1_TINT,
 		 B_NO_TINT};
 	
-	for (int32 i = 4; i >= 0; i--)
-	{
+	for (int32 i = 4; i >= 0; i--) {
 		rgb_color color;
 		if (fMeterLevel > i) {
 			color = tint_color(METER_GREEN, kTintArray[i]);

@@ -14,6 +14,7 @@
 #include "PatchApp.h"
 
 #include <Roster.h>
+
 #include "PatchWin.h"
 
 PatchApp::PatchApp()

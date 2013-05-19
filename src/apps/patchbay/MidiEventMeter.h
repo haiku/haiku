@@ -11,9 +11,8 @@
  * Copyright 1999, Be Incorporated.   All Rights Reserved.
  * This file may be used under the terms of the Be Sample Code License.
  */
- 
-#ifndef _MidiEventMeter_h
-#define _MidiEventMeter_h
+#ifndef MIDIEVENTMETER_H
+#define MIDIEVENTMETER_H
 
 #include <Point.h>
 #include <Rect.h>
@@ -39,4 +38,4 @@ private:
 	int32 fMeterLevel;
 };
 
-#endif /* _MidiMeterWidget_h */
+#endif /* MIDIEVENTMETER_H */

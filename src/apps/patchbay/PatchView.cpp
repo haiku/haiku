@@ -22,6 +22,7 @@
 #include <Messenger.h>
 #include <MidiRoster.h>
 #include <Window.h>
+
 #include "EndpointInfo.h"
 #include "PatchRow.h"
 #include "UnknownDeviceIcons.h"
@@ -112,7 +113,8 @@ PatchView::GetToolTipAt(BPoint point, BToolTip** tip)
 
 	endpoint_itor itor;
 	for (itor = begin; itor != end; itor++, index--)
-		if (index <= 0) break;
+		if (index <= 0)
+			break;
 	
 	if (itor == end)
 		return false;
