@@ -2,6 +2,7 @@
 # subdirectory.
 local packages =
 	Haiku
+	HaikuCrossDevel
 	HaikuDevel
 	HaikuUserguide
 	HaikuWelcome

@@ -1,0 +1,62 @@
+# This package is like the HaikuDevel package, but it is meant for cross
+# development, i.e. it assumes that a specific cross compiler is installed
+# on the Haiku system where this package is being used.
+# The main use of this package is to provide HaikuPorter with a development
+# environment for a cross-build Haiku platform.
+
+local haikuCrossDevelPackage = haiku_cross_devel.hpkg ;
+HaikuPackage $(haikuCrossDevelPackage) ;
+
+local arch ;
+if $(HAIKU_GCC_VERSION[1]) = 2 {
+	arch = x86_gcc2 ;
+} else {
+	arch = $(TARGET_ARCH) ;
+}
+local developCrossLibDirTokens = develop cross lib $(arch) ;
+
+# glue code
+AddFilesToPackage $(developCrossLibDirTokens) :
+	<src!system!glue!arch!$(TARGET_ARCH)>crti.o
+	<src!system!glue!arch!$(TARGET_ARCH)>crtn.o
+	<src!system!glue>init_term_dyn.o
+	<src!system!glue>start_dyn.o
+	<src!system!glue>haiku_version_glue.o
+;
+
+# kernel
+AddFilesToPackage $(developCrossLibDirTokens) : kernel.so : _KERNEL_ ;
+
+# libraries
+AddLibrariesToPackage $(developCrossLibDirTokens) : 
+	<revisioned>libroot.so 
+;
+
+# static libraries
+AddFilesToPackage $(developCrossLibDirTokens) : liblocalestub.a ;
+
+# the POSIX error code mapper library
+AddFilesToPackage $(developCrossLibDirTokens) : libposix_error_mapper.a ;
+
+# headers
+local developCrossHeadersDirTokens = develop cross headers $(arch) ;
+local headerDir ;
+for headerDir in config glibc os posix {
+	CopyDirectoryToPackage $(developCrossHeadersDirTokens)
+		: [ FDirName $(HAIKU_TOP) headers $(headerDir) ] ;
+}
+
+# BSD and GNU compatibility headers
+#for headerDib in bsd gnu {
+#	CopyDirectoryToPackage $(developCrossHeadersDirTokens)
+#		: [ FDirName $(HAIKU_TOP) headers compatibility $(headerDir) ] ;
+#}
+
+# cpp headers
+if $(HAIKU_GCC_VERSION[1]) = 2 {
+	# GCC 2 only -- for GCC 4 they come with the DevelopmentBase package
+	CopyDirectoryToPackage $(developCrossHeadersDirTokens) c++
+		: [ FDirName $(HAIKU_TOP) headers cpp ] : 2.95.3 ;
+}
+
+BuildHaikuPackage $(haikuCrossDevelPackage) : haiku_cross_devel ;
