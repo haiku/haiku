@@ -1577,14 +1577,54 @@ VariablesView::MessageReceived(BMessage* message)
 				break;
 			}
 
+			BReference<Type> typeRef(type, true);
 			ValueNode* valueNode = NULL;
 			if (TypeHandlerRoster::Default()->CreateValueNode(
-				node->NodeChild(), type, valueNode) != B_OK) {
+					node->NodeChild(), type, valueNode) != B_OK) {
 				break;
 			}
 
+			typeRef.Detach();
 			node->NodeChild()->SetNode(valueNode);
 			node->SetCastedType(type);
+			fVariableTableModel->NotifyNodeChanged(node);
+			break;
+		}
+		case MSG_TYPECAST_TO_ARRAY:
+		{
+			ModelNode* node = NULL;
+			if (message->FindPointer("node", reinterpret_cast<void **>(&node))
+				!= B_OK) {
+				break;
+			}
+
+			Type* baseType = dynamic_cast<AddressType*>(node->NodeChild()
+					->Node()->GetType())->BaseType();
+			ArrayType* arrayType = NULL;
+			if (baseType->CreateDerivedArrayType(0, kMaxArrayElementCount,
+				false, arrayType) != B_OK) {
+				break;
+			}
+
+			AddressType* addressType = NULL;
+			BReference<Type> typeRef(arrayType, true);
+			if (arrayType->CreateDerivedAddressType(DERIVED_TYPE_POINTER,
+					addressType) != B_OK) {
+				break;
+			}
+
+			typeRef.Detach();
+			typeRef.SetTo(addressType, true);
+			ValueNode* valueNode = NULL;
+			if (TypeHandlerRoster::Default()->CreateValueNode(
+					node->NodeChild(), addressType, valueNode) != B_OK) {
+				break;
+			}
+
+			typeRef.Detach();
+			node->NodeChild()->SetNode(valueNode);
+			node->SetCastedType(addressType);
+			fVariableTableModel->NotifyNodeChanged(node);
 			break;
 		}
 		case MSG_SHOW_CONTAINER_RANGE_PROMPT:
@@ -2000,6 +2040,18 @@ VariablesView::_GetContextActionsForNode(ModelNode* node,
 		message->AddUInt64("address", location->PieceAt(0).address);
 	}
 
+	ValueNode* valueNode = node->NodeChild()->Node();
+
+	if (valueNode != NULL) {
+		AddressType* type = dynamic_cast<AddressType*>(valueNode->GetType());
+		if (type != NULL && type->BaseType() != NULL) {
+			result = _AddContextAction("Cast to array", MSG_TYPECAST_TO_ARRAY,
+				actions, message);
+			if (result != B_OK)
+				return result;
+			message->AddPointer("node", node);
+		}
+	}
 
 	result = _AddContextAction("Cast as" B_UTF8_ELLIPSIS,
 		MSG_SHOW_TYPECAST_NODE_PROMPT, actions, message);
@@ -2011,7 +2063,6 @@ VariablesView::_GetContextActionsForNode(ModelNode* node,
 	if (result != B_OK)
 		return result;
 
-	ValueNode* valueNode = node->NodeChild()->Node();
 	if (valueNode == NULL)
 		return B_OK;
 
