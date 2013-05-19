@@ -816,7 +816,8 @@ PackageWriterImpl::_UpdateReadPackageInfo()
 		// data on heap -- read from there
 		status_t error = fHeapWriter->ReadData(data.Offset(), valueBuffer,
 			data.Size());
-		throw error;
+		if (error != B_OK)
+			throw error;
 	}
 
 	valueString.UnlockBuffer();
