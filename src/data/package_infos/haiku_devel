@@ -1,5 +1,5 @@
 name			haiku_devel
-version			R1~alpha3_pm-1
+version			R1~alpha4_pm-1
 architecture	x86_gcc2
 summary			"The Haiku base system development files"
 
@@ -14,9 +14,9 @@ copyrights		"2001-2011 Haiku, Inc. et al"
 licenses		"MIT"
 
 provides {
-	haiku_devel = R1~alpha3_pm-1
+	haiku_devel = R1~alpha4_pm-1
 }
 
 requires {
-	haiku == R1~alpha3_pm-1
+	haiku == R1~alpha4_pm-1
 }
