@@ -72,12 +72,12 @@ void
 Index::Dump()
 {
 	D(
-		PRINT("Index: `%s', type: %" B_PRIx32 "\n", Name(), Type());
+		PRINT("Index: `%s', type: %" B_PRIx32 "\n", Name().Data(), Type());
 		IndexIterator it;
 		if (GetIterator(it)) {
 			while (Node* node = it.Next()) {
-				PRINT("  node: `%s', dir: %" B_PRIdINO "\n", node->Name(),
-					node->Parent()->ID());
+				PRINT("  node: `%s', dir: %" B_PRIdINO "\n",
+					node->Name().Data(), node->Parent()->ID());
 			}
 		}
 	)
