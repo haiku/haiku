@@ -1,11 +1,11 @@
-; Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
+; Copyright 2005-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
 ; Distributed under the terms of the MIT License.
 ;
 ; Stage 1 boot code for the good (?) old BIOS for use as boot block of HD
 ; partitions. The offset of the partition in 512 byte blocks must be written at
 ; position PARTITION_OFFSET_OFFSET (32 bit little endian; makebootable does
 ; that) or otherwise the code can't find the partition.
-; The partition must be a BFS formatted. The file "system/haiku_loader"
+; The partition must be BFS formatted. The file "system/haiku_loader"
 ; (the stage 2 boot loader) loaded into memory at 0x1000:0x0000 (linear address
 ; 0x10000) and entered at 0x:1000:0x0200 with parameters eax - partition offset
 ; in 512 byte blocks and dl - BIOS ID of the boot drive.
@@ -192,6 +192,12 @@ struc	BPlusTreeNode
 	.all_key_count		resw	1
 	.all_key_length		resw	1
 endstruc
+
+; The beginning of a HPKG header
+struc	HPKGHeader
+	.magic				resd	1
+	.header_size		resw	1
+	; ...
 
 ; That's what esp points to after a "pushad".
 struc	PushadStack
@@ -631,7 +637,7 @@ kReadErrorString			db	"read error", 0
 kBadSuperBlockMagicString	db	"bad superblock", 0
 kNotADirectoryString		db	"not a directory", 0
 kBadInodeMagicString		db	"bad inode", 0
-kNoZbeosString				db	"haiku_loader not found", 0
+kNoZbeosString				db	"no loader", 0
 %else
 kErrorString				db	"Failed to load OS. Press any key to reboot..."
 							db	0
@@ -640,7 +646,8 @@ kErrorString				db	"Failed to load OS. Press any key to reboot..."
 ; the path to the boot loader
 kPathComponents:
 pathComponent				"system"
-pathComponent				"haiku_loader"
+pathComponent				"packages"
+pathComponent				"haiku_loader.hpkg"
 							db	0
 
 
@@ -706,20 +713,65 @@ readBootLoader:
 	and			ax, ax
 	jnz			.read_loop
 
-	; We have successfully read the complete boot loader. Set up the
+	; We have successfully read the complete boot loader package. The actual
+	; code is located at the beginning of the package file heap which starts
+	; directly after the header. Since the boot loader code expects to be
+	; located at a fixed address, we have to move it there.
+
+	; First set up the source and target segment registers. We keep the current
+	; value also in bx, since it is easier to do arithmetics with it. We keep
+	; the increment value for the segment registers in dx.
+	mov			bx, 0x1000		; initial ds and es value
+	push		bx
+	pop			ds
+	push		bx
+	pop			es
+	mov			dx, bx			; the increment value for the segment registers
+
+	; Determine how much we have to copy and from where to where. si will be
+	; the source and di the destination pointer (both segment relative) and
+	; ecx is our byte count. To save instructions we only approximate the count.
+	; It may be almost a full segment greater than necessary. But that doesn't
+	; really harm.
+	mov			ecx, edi
+	shr			ecx, 12								; byte count
+	xor			di, di								; target
+	mov			ax, [di + HPKGHeader.header_size]	; header size (big endian)
+	xchg		ah, al
+	mov			si, ax								; source
+
+.move_loop:
+	movsb
+	test		si, si
+	jnz			.move_no_source_overflow
+	add			bx, dx
+	push		bx
+	pop			ds
+.move_no_source_overflow:
+	test		di, di
+	jnz			.move_no_destination_overflow
+	push		bx
+	pop			es
+				; Using bx (the value of ds) is fine, since we assume that the
+				; source is less than a segment ahead of the destination.
+.move_no_destination_overflow:
+	dec			ecx
+	jnz			.move_loop
+
+	; We have successfully prepared the boot loader code. Set up the
 	; environment for it.
 	; eax - partition offset in sectors
+	push		cs
+	pop			ds
+				; temporarily reset ds, so we can access our variables
 	mov dword	eax, [kPartitionOffset]
 
 	; dl - BIOS drive ID
 	xor			edx, edx
 	mov			dl, [bios_drive_id]
 
-	; ds, es
-	push 		0x07c0
-	pop			ds
-	push 		0x1000
-	pop			es
+	; Note: We don't have to set ds and es, since the stage 2 sets them
+	; anyway before accessing any data.
 
 	; enter the boot loader
 	jmp			0x1000:0x200
@@ -949,6 +1001,7 @@ bfsBlockToDiskBlock:
 	ret
 
 
+%if 0
 ; _writeInt32
 ; Writes the given number in 8 digit hexadecimal representation to screen.
 ; Used for debugging only.
@@ -988,6 +1041,7 @@ _writeInt32:
 
 	popad
 	ret
+%endif
 
 
 ; check whether we are small enough

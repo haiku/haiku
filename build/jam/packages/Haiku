@@ -280,9 +280,6 @@ SEARCH on $(thinkPadFiles) = $(thinkpadDir) ;
 AddFilesToPackage data KeyboardLayouts ThinkPad
 	: $(thinkPadFiles) ;
 
-# boot loader
-AddFilesToPackage : haiku_loader ;
-
 # boot module links
 AddBootModuleSymlinksToPackage
 	acpi@x86 ata@ata pci isa@x86 config_manager dpc

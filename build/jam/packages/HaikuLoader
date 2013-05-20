@@ -1,0 +1,13 @@
+local haikuLoaderPackage = haiku_loader.hpkg ;
+HaikuPackage $(haikuLoaderPackage) ;
+
+
+# boot loader
+AddFilesToPackage : haiku_loader ;
+
+
+# Force no compression, so the stage one loader can directly execute the boot
+# loader.
+HAIKU_PACKAGE_COMPRESSION_LEVEL on $(haikuLoaderPackage) = 0 ;
+
+BuildHaikuPackage $(haikuLoaderPackage) : haiku_loader ;

@@ -4,6 +4,7 @@ local packages =
 	Haiku
 	HaikuCrossDevel
 	HaikuDevel
+	HaikuLoader
 	HaikuUserguide
 	HaikuWelcome
 	MakefileEngine
