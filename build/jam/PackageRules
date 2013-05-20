@@ -289,6 +289,8 @@ rule HaikuPackage package
 
 rule BuildHaikuPackage package : packageInfo
 {
+	packageInfo = $(packageInfo:G=package-info) ;
+
 	local grist = [ FHaikuPackageGrist $(package) ] ;
 
 	local tempDir = [ FDirName $(HAIKU_PACKAGES_BUILD_DIR) $(grist) ] ;
@@ -311,7 +313,7 @@ rule BuildHaikuPackage package : packageInfo
 	AddVariableToScript $(script) : addBuildCompatibilityLibDir
 		: $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ;
 	AddVariableToScript $(script) : compressionLevel
-		: $(HAIKU_PACKAGE_COMPRESSION_LEVEL) ;
+		: [ on $(package) return $(HAIKU_PACKAGE_COMPRESSION_LEVEL) ] ;
 	AddVariableToScript $(script) : updateOnly
 		: [ on $(package) return $(HAIKU_CONTAINER_UPDATE_ONLY) ] ;
 	AddTargetVariableToScript $(script) : <build>addattr ;
