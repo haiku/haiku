@@ -55,6 +55,7 @@ public:
 	static	status_t			ParseRangeExpression(
 									const BString& rangeString,
 									int32 lowerBound, int32 upperBound,
+									bool fixedRange,
 									RangeList& _output);
 };
 

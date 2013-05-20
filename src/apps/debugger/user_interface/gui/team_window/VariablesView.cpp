@@ -1593,11 +1593,17 @@ VariablesView::MessageReceived(BMessage* message)
 				->SelectionModel()->NodeAt(0);
 			int32 lowerBound, upperBound;
 			ValueNode* valueNode = node->NodeChild()->Node();
-			if (!valueNode->IsRangedContainer())
+			if (!valueNode->IsRangedContainer()) {
 				valueNode = node->ChildAt(0)->NodeChild()->Node();
+				if (!valueNode->IsRangedContainer())
+					break;
+			}
 
-			if (valueNode->SupportedChildRange(lowerBound, upperBound) != B_OK)
+			bool fixedRange = valueNode->IsContainerRangeFixed();
+			if (valueNode->SupportedChildRange(lowerBound, upperBound)
+				!= B_OK) {
 				break;
+			}
 
 			BMessage* promptMessage = new(std::nothrow) BMessage(
 				MSG_SET_CONTAINER_RANGE);
@@ -1606,9 +1612,16 @@ VariablesView::MessageReceived(BMessage* message)
 
 			ObjectDeleter<BMessage> messageDeleter(promptMessage);
 			promptMessage->AddPointer("node", node);
+			promptMessage->AddBool("fixedRange", fixedRange);
 			BString infoText;
-			infoText.SetToFormat("Allowed range: %" B_PRId32
-				"-%" B_PRId32 ".", lowerBound, upperBound);
+			if (fixedRange) {
+				infoText.SetToFormat("Allowed range: %" B_PRId32
+					"-%" B_PRId32 ".", lowerBound, upperBound);
+			} else {
+				infoText.SetToFormat("Current range: %" B_PRId32
+					"-%" B_PRId32 ".", lowerBound, upperBound);
+			}
+
 			PromptWindow* promptWindow = new(std::nothrow) PromptWindow(
 				"Set Range", "Range: ", infoText.String(), BMessenger(this),
 				promptMessage);
@@ -1631,13 +1644,15 @@ VariablesView::MessageReceived(BMessage* message)
 			if (valueNode->SupportedChildRange(lowerBound, upperBound) != B_OK)
 				break;
 
+			bool fixedRange = message->FindBool("fixedRange");
+
 			BString rangeExpression = message->FindString("text");
 			if (rangeExpression.Length() == 0)
 				break;
 
 			RangeList ranges;
 			status_t result = UiUtils::ParseRangeExpression(
-				rangeExpression, lowerBound, upperBound, ranges);
+				rangeExpression, lowerBound, upperBound, fixedRange, ranges);
 			if (result != B_OK)
 				break;
 

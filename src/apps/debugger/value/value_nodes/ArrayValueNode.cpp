@@ -31,7 +31,10 @@ AbstractArrayValueNode::AbstractArrayValueNode(ValueNodeChild* nodeChild,
 	:
 	ValueNode(nodeChild),
 	fType(type),
-	fDimension(dimension)
+	fDimension(dimension),
+	fLowerBound(0),
+	fUpperBound(0),
+	fBoundsInitialized(false)
 {
 	fType->AcquireReference();
 }
@@ -106,6 +109,8 @@ void
 AbstractArrayValueNode::ClearChildren()
 {
 	fChildren.MakeEmpty();
+	fLowerBound = 0;
+	fUpperBound = 0;
 	if (fContainer != NULL)
 		fContainer->NotifyValueNodeChildrenDeleted(this);
 }
@@ -121,14 +126,22 @@ AbstractArrayValueNode::CreateChildrenInRange(int32 lowIndex,
 
 	int32 dimensionCount = fType->CountDimensions();
 	bool isFinalDimension = fDimension + 1 == dimensionCount;
+	status_t error = B_OK;
 
-	int32 lowerBound, upperBound;
-	if (SupportedChildRange(lowerBound, upperBound) == B_OK) {
-		// clamp inputs to supported range.
-		if (lowIndex < lowerBound)
-			lowIndex = lowerBound;
-		if (highIndex > upperBound)
-			highIndex = upperBound;
+	if (!fBoundsInitialized) {
+		int32 lowerBound, upperBound;
+		error = SupportedChildRange(lowerBound, upperBound);
+		if (error != B_OK)
+			return error;
+
+		fLowerBound = lowerBound;
+		fUpperBound = upperBound;
+		fBoundsInitialized = true;
+	} else {
+		if (lowIndex < fLowerBound)
+			fLowerBound = lowIndex;
+		if (highIndex > fUpperBound)
+			fUpperBound = highIndex;
 	}
 
 	// create children for the array elements
@@ -166,19 +179,23 @@ status_t
 AbstractArrayValueNode::SupportedChildRange(int32& lowIndex,
 	int32& highIndex) const
 {
-	ArrayDimension* dimension = fType->DimensionAt(fDimension);
+	if (!fBoundsInitialized) {
+		ArrayDimension* dimension = fType->DimensionAt(fDimension);
 
-	SubrangeType* dimensionType = dynamic_cast<SubrangeType*>(
-		dimension->GetType());
+		SubrangeType* dimensionType = dynamic_cast<SubrangeType*>(
+			dimension->GetType());
 
-	if (dimensionType != NULL) {
-		lowIndex = dimensionType->LowerBound().ToInt32();
-		highIndex = dimensionType->UpperBound().ToInt32();
-
-		return B_OK;
+		if (dimensionType != NULL) {
+			lowIndex = dimensionType->LowerBound().ToInt32();
+			highIndex = dimensionType->UpperBound().ToInt32();
+		} else
+			return B_UNSUPPORTED;
+	} else {
+		lowIndex = fLowerBound;
+		highIndex = fUpperBound;
 	}
 
-	return B_UNSUPPORTED;
+	return B_OK;
 }
 
 

@@ -411,7 +411,7 @@ static status_t ParseRangeString(BString& rangeString, int32& lowerBound,
 
 /*static*/ status_t
 UiUtils::ParseRangeExpression(const BString& rangeExpression, int32 lowerBound,
-	int32 upperBound, RangeList& _output)
+	int32 upperBound, bool fixedRange, RangeList& _output)
 {
 	if (rangeExpression.IsEmpty())
 		return B_BAD_DATA;
@@ -440,7 +440,8 @@ UiUtils::ParseRangeExpression(const BString& rangeExpression, int32 lowerBound,
 		if (result != B_OK)
 			return result;
 
-		if (lowValue < lowerBound || highValue > upperBound)
+
+		if (fixedRange && (lowValue < lowerBound || highValue > upperBound))
 			return B_BAD_VALUE;
 
 		result = _output.AddRange(lowValue, highValue);
