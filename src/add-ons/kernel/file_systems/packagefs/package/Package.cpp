@@ -75,7 +75,7 @@ struct Package::LoaderErrorOutput : BErrorOutput {
 
 	virtual void PrintErrorVarArgs(const char* format, va_list args)
 	{
-// TODO:...
+		ERRORV(format, args);
 	}
 
 private:
@@ -702,7 +702,7 @@ private:
 
 	virtual void PrintErrorVarArgs(const char* format, va_list args)
 	{
-// TODO:...
+		ERRORV(format, args);
 	}
 
 private:
