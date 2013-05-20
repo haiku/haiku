@@ -12,3 +12,4 @@ SubInclude HAIKU_TOP src add-ons kernel bus_managers ps2 ;
 SubInclude HAIKU_TOP src add-ons kernel bus_managers scsi ;
 SubInclude HAIKU_TOP src add-ons kernel bus_managers tty ;
 SubInclude HAIKU_TOP src add-ons kernel bus_managers usb ;
+SubInclude HAIKU_TOP src add-ons kernel bus_managers virtio ;

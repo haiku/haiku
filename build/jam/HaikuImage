@@ -188,6 +188,7 @@ SYSTEM_ADD_ONS_DRIVERS_POWER = [ FFilterByBuildFeatures acpi_button@x86 ] ;
 SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
 	ata@ata pci ps2@x86,x86_64 isa@x86,x86_64
 	ide@ide scsi config_manager agp_gart@x86 usb firewire@x86 acpi@x86
+	virtio
 ] ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs btrfs cdda exfat ext2 fat iso9660 nfs nfs4
 	attribute_overlay write_overlay ntfs reiserfs@x86 udf googlefs ;
@@ -229,6 +230,8 @@ AddFilesToHaikuImage system add-ons kernel busses scsi
 	: ahci ;
 AddFilesToHaikuImage system add-ons kernel busses usb
 	: <usb>uhci <usb>ohci <usb>ehci ;
+AddFilesToHaikuImage system add-ons kernel busses virtio
+	: virtio_pci@x86 ;
 AddFilesToHaikuImage system add-ons kernel console : vga_text ;
 AddFilesToHaikuImage system add-ons kernel debugger
 	: <kdebug>demangle <kdebug>disasm@x86 <kdebug>hangman
@@ -250,6 +253,7 @@ if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
 
 # drivers
 AddNewDriversToHaikuImage disk scsi	: scsi_cd scsi_disk ;
+AddNewDriversToHaikuImage disk virtual : virtio_block ;
 AddNewDriversToHaikuImage power : enhanced_speedstep@x86 ;
 AddNewDriversToHaikuImage power : acpi_battery@x86 ;
 #AddNewDriversToHaikuImage display : display_controls@x86 ;
@@ -607,6 +611,7 @@ AddBootModuleSymlinksToHaikuImage
 	ide_isa@x86
 	<usb>uhci <usb>ohci <usb>ehci
 	scsi_cd scsi_disk usb_disk
+	virtio virtio_pci virtio_block	
 	efi_gpt
 	intel
 	bfs
