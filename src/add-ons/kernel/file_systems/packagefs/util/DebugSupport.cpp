@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2003-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -127,24 +127,29 @@ dbg_printf_end()
 
 #if DEBUG_PRINT
 
+
 void
-dbg_printf(const char *format,...)
+dbg_vprintf(const char* format, va_list args)
 {
 	if (!dbg_printf_lock())
 		return;
+
 	char buffer[1024];
-	va_list args;
-	va_start(args, format);
-	// no vsnprintf() on PPC and in kernel
-	#if defined(__INTEL__) && USER
-		vsnprintf(buffer, sizeof(buffer) - 1, format, args);
-	#else
-		vsprintf(buffer, format, args);
-	#endif
-	va_end(args);
-	buffer[sizeof(buffer) - 1] = '\0';
+	vsnprintf(buffer, sizeof(buffer) - 1, format, args);
 	write(out, buffer, strlen(buffer));
+
 	dbg_printf_unlock();
 }
+
+
+void
+dbg_printf(const char* format,...)
+{
+	va_list args;
+	va_start(args, format);
+	dbg_vprintf(format, args);
+	va_end(args);
+}
+
 
 #endif	// DEBUG_PRINT

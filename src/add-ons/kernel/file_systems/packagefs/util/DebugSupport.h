@@ -44,16 +44,20 @@
 #	include <stdio.h>
 #	if DEBUG_PRINT
 #		define __out dbg_printf
+#		define __outv dbg_vprintf
 #	else
 #		define __out printf
+#		define __outv vprintf
 #	endif
 #else
 #	include <KernelExport.h>
 #	include <null.h>
 #	if DEBUG_PRINT
 #		define __out dbg_printf
+#		define __outv dbg_vprintf
 #	else
 #		define __out dprintf
+#		define __outv dvprintf
 #	endif
 #endif
 
@@ -74,18 +78,23 @@ status_t exit_debugging();
 void dbg_printf_begin();
 void dbg_printf_end();
 #if DEBUG_PRINT
-	void dbg_printf(const char *format,...);
+	void dbg_vprintf(const char* format, va_list args);
+	void dbg_printf(const char* format,...);
 #else
-	static inline void dbg_printf(const char *,...) {}
+	static inline void dbg_vprintf(const char*, va_list) {}
+	static inline void dbg_printf(const char*,...) {}
 #endif
 
 
-// Short overview over the debug output macros:
+// Short overview of the debug output macros:
 //	PRINT()
-//		is for general messages that very unlikely should appear in a release
-//		build
+//		general messages that shouldn't appear in a release build
 //	FATAL()
-//		this is for fatal messages, when something has really gone wrong
+//		fatal messages, when something has really gone wrong
+//	ERROR()
+//		non-fatal error messages
+//	WARN()
+//		warning messages
 //	INFORM()
 //		general information, as disk size, etc.
 //	REPORT_ERROR(status_t)
@@ -121,7 +130,8 @@ void dbg_printf_end();
 	dbg_printf_end();														\
 }
 
-#define TPRINT(x...)	DEBUG_CONTEXT( __out(x) )
+#define TPRINT(x...)			DEBUG_CONTEXT( __out(x) )
+#define TPRINTV(format, args)	DEBUG_CONTEXT( __outv(format, args) )
 #define TREPORT_ERROR(status)												\
 	DEBUG_CONTEXT_LINE( __out("%s\n", strerror(status)) )
 #define TRETURN_ERROR(err)													\
@@ -147,10 +157,6 @@ void dbg_printf_end();
 	#define REPORT_ERROR(status)	TREPORT_ERROR(status)
 	#define RETURN_ERROR(err)		TRETURN_ERROR(err)
 	#define SET_ERROR(var, err)		TSET_ERROR(var, err)
-	#define FATAL(x...)				DEBUG_CONTEXT( __out(x) )
-	#define ERROR(x...)				DEBUG_CONTEXT( __out(x) )
-	#define WARN(x...)				DEBUG_CONTEXT( __out(x) )
-	#define INFORM(x...)			DEBUG_CONTEXT( __out(x) )
 	#define FUNCTION(x...)			TFUNCTION(x)
 	#define FUNCTION_START()		TFUNCTION_START()
 	#define FUNCTION_END()			TFUNCTION_END()
@@ -161,16 +167,18 @@ void dbg_printf_end();
 	#define REPORT_ERROR(status)	;
 	#define RETURN_ERROR(status)	return status;
 	#define SET_ERROR(var, err)		var = err;
-	#define FATAL(x...)				DEBUG_CONTEXT( __out(x) )
-	#define ERROR(x...)				DEBUG_CONTEXT( __out(x) )
-	#define WARN(x...)				DEBUG_CONTEXT( __out(x) )
-	#define INFORM(x...)			DEBUG_CONTEXT( __out(x) )
 	#define FUNCTION(x...)			;
 	#define FUNCTION_START()		;
 	#define FUNCTION_END()			;
 	#define DARG(x)
 	#define D(x)					;
 #endif
+
+#define FATAL(x...)				TPRINT(x)
+#define ERROR(x...)				TPRINT(x)
+#define ERRORV(format, args)	TPRINTV(format, args)
+#define WARN(x...)				TPRINT(x)
+#define INFORM(x...)			TPRINT(x)
 
 #ifndef TOUCH
 #define TOUCH(var) (void)var
