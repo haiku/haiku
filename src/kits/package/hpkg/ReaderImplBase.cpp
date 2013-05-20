@@ -617,11 +617,11 @@ ReaderImplBase::InitSection(PackageFileSection& section, uint64 endOffset,
 	}
 
 	// check strings subsection size/count
-	if ((stringsLength == 0) != (stringsCount == 0) || stringsLength > length) {
+	if ((stringsLength <= 1) != (stringsCount == 0) || stringsLength > length) {
 		ErrorOutput()->PrintError("Error: strings subsection description of %s "
 			"file %s section is invalid (%" B_PRIu64 " strings, length: %"
-			B_PRIu64 ")\n",
-			fFileType, section.name, length, stringsCount, stringsLength);
+			B_PRIu64 ", section length: %" B_PRIu64 ")\n",
+			fFileType, section.name, stringsCount, stringsLength, length);
 		return B_BAD_DATA;
 	}
 
