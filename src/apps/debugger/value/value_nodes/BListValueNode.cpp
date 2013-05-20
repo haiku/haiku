@@ -330,6 +330,13 @@ BListValueNode::IsRangedContainer() const
 }
 
 
+bool
+BListValueNode::IsContainerRangeFixed() const
+{
+	return true;
+}
+
+
 void
 BListValueNode::ClearChildren()
 {

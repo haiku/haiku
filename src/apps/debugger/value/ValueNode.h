@@ -62,6 +62,10 @@ public:
 	// node types to allow the upper layers to be aware of this, and to be
 	// able to request that only a subset of children be created.
 	virtual	bool				IsRangedContainer() const;
+	virtual	bool				IsContainerRangeFixed() const;
+									// indicates that the user can't
+									// arbitrarily go outside of the
+									// specified/supported range.
 	virtual	void				ClearChildren();
 	virtual	status_t			CreateChildrenInRange(int32 lowIndex,
 									int32 highIndex);
