@@ -33,22 +33,22 @@ BPackageReader::~BPackageReader()
 
 
 status_t
-BPackageReader::Init(const char* fileName)
+BPackageReader::Init(const char* fileName, uint32 flags)
 {
 	if (fImpl == NULL)
 		return B_NO_INIT;
 
-	return fImpl->Init(fileName);
+	return fImpl->Init(fileName, flags);
 }
 
 
 status_t
-BPackageReader::Init(int fd, bool keepFD)
+BPackageReader::Init(int fd, bool keepFD, uint32 flags)
 {
 	if (fImpl == NULL)
 		return B_NO_INIT;
 
-	return fImpl->Init(fd, keepFD);
+	return fImpl->Init(fd, keepFD, flags);
 }
 
 

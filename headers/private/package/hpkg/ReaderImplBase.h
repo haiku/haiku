@@ -89,7 +89,8 @@ protected:
 
 protected:
 			template<typename Header, uint32 kMagic, uint16 kVersion>
-			status_t			Init(int fd, bool keepFD, Header& header);
+			status_t			Init(int fd, bool keepFD, Header& header,
+									uint32 flags);
 			status_t			InitHeapReader(uint32 compression,
 									uint32 chunkSize, off_t offset,
 									uint64 compressedSize,
@@ -316,7 +317,7 @@ private:
 
 template<typename Header, uint32 kMagic, uint16 kVersion>
 status_t
-ReaderImplBase::Init(int fd, bool keepFD, Header& header)
+ReaderImplBase::Init(int fd, bool keepFD, Header& header, uint32 flags)
 {
 	status_t error = _Init(fd, keepFD);
 	if (error != B_OK)
@@ -345,9 +346,11 @@ ReaderImplBase::Init(int fd, bool keepFD, Header& header)
 
 	// version
 	if (B_BENDIAN_TO_HOST_INT16(header.version) != kVersion) {
-		ErrorOutput()->PrintError("Error: Invalid/unsupported %s file "
-			"version (%d)\n", fFileType,
-			B_BENDIAN_TO_HOST_INT16(header.version));
+		if ((flags & B_HPKG_READER_DONT_PRINT_VERSION_MISMATCH_MESSAGE) == 0) {
+			ErrorOutput()->PrintError("Error: Invalid/unsupported %s file "
+				"version (%d)\n", fFileType,
+				B_BENDIAN_TO_HOST_INT16(header.version));
+		}
 		return B_MISMATCHED_VALUES;
 	}
 

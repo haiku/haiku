@@ -776,14 +776,15 @@ Package::Load()
 	// try current package file format version
 	{
 		PackageReaderImpl packageReader(&errorOutput);
-		status_t error = packageReader.Init(fd, false);
+		status_t error = packageReader.Init(fd, false,
+			BHPKG::B_HPKG_READER_DONT_PRINT_VERSION_MISMATCH_MESSAGE);
 		if (error == B_OK) {
 			// parse content
 			LoaderContentHandler handler(this);
 			error = handler.Init();
 			if (error != B_OK)
 				RETURN_ERROR(error);
-		
+
 			error = packageReader.ParseContent(&handler);
 			if (error != B_OK)
 				RETURN_ERROR(error);

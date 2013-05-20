@@ -624,7 +624,7 @@ PackageWriterImpl::_Init(const char* fileName,
 	// in update mode, parse the TOC
 	if ((Flags() & B_HPKG_WRITER_UPDATE_PACKAGE) != 0) {
 		PackageReaderImpl packageReader(fListener);
-		result = packageReader.Init(FD(), false);
+		result = packageReader.Init(FD(), false, 0);
 		if (result != B_OK)
 			return result;
 

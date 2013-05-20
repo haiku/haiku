@@ -28,8 +28,8 @@ public:
 								PackageReaderImpl(BErrorOutput* errorOutput);
 								~PackageReaderImpl();
 
-			status_t			Init(const char* fileName);
-			status_t			Init(int fd, bool keepFD);
+			status_t			Init(const char* fileName, uint32 flags);
+			status_t			Init(int fd, bool keepFD, uint32 flags);
 			status_t			ParseContent(
 									BPackageContentHandler* contentHandler);
 			status_t			ParseContent(BLowLevelPackageContentHandler*

@@ -318,7 +318,7 @@ PackageReaderImpl::~PackageReaderImpl()
 
 
 status_t
-PackageReaderImpl::Init(const char* fileName)
+PackageReaderImpl::Init(const char* fileName, uint32 flags)
 {
 	// open file
 	int fd = open(fileName, O_RDONLY);
@@ -328,16 +328,16 @@ PackageReaderImpl::Init(const char* fileName)
 		return errno;
 	}
 
-	return Init(fd, true);
+	return Init(fd, true, flags);
 }
 
 
 status_t
-PackageReaderImpl::Init(int fd, bool keepFD)
+PackageReaderImpl::Init(int fd, bool keepFD, uint32 flags)
 {
 	hpkg_header header;
 	status_t error = inherited::Init<hpkg_header, B_HPKG_MAGIC, B_HPKG_VERSION>(
-		fd, keepFD, header);
+		fd, keepFD, header, flags);
 	if (error != B_OK)
 		return error;
 	fHeapSize = HeapReader()->UncompressedHeapSize();

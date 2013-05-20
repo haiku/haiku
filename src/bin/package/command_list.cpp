@@ -47,6 +47,12 @@ struct VersionPolicyV1 {
 	{
 		return data.UncompressedSize();
 	}
+
+	static inline status_t InitReader(PackageReader& packageReader,
+		const char* fileName)
+	{
+		return packageReader.Init(fileName);
+	}
 };
 
 struct VersionPolicyV2 {
@@ -59,6 +65,14 @@ struct VersionPolicyV2 {
 		const BPackageKit::BHPKG::BPackageData& data)
 	{
 		return data.Size();
+	}
+
+	static inline status_t InitReader(PackageReader& packageReader,
+		const char* fileName)
+	{
+		return packageReader.Init(fileName,
+			BPackageKit::BHPKG
+				::B_HPKG_READER_DONT_PRINT_VERSION_MISMATCH_MESSAGE);
 	}
 };
 
@@ -370,7 +384,7 @@ do_list(const char* packageFileName, bool listAttributes, bool filePathsOnly,
 	// open package
 	BStandardErrorOutput errorOutput;
 	typename VersionPolicy::PackageReader packageReader(&errorOutput);
-	status_t error = packageReader.Init(packageFileName);
+	status_t error = VersionPolicy::InitReader(packageReader, packageFileName);
 	if (error != B_OK) {
 		if (ignoreVersionError && error == B_MISMATCHED_VALUES)
 			return;

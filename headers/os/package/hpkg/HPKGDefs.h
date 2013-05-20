@@ -166,6 +166,14 @@ enum {
 };
 
 
+// Reader Init() flags
+enum {
+	B_HPKG_READER_DONT_PRINT_VERSION_MISMATCH_MESSAGE	= 0x01
+		// Fail silently when encountering a package format version mismatch.
+		// Don't print anything to the error output.
+};
+
+
 enum {
 	B_HPKG_COMPRESSION_LEVEL_NONE		= 0,
 	B_HPKG_COMPRESSION_LEVEL_FASTEST	= 1,

@@ -759,7 +759,7 @@ packagefs_mount_file(int fd, ::Directory*& _mountedDirectory)
 {
 	PackageLoaderErrorOutput errorOutput;
  	PackageReaderImpl packageReader(&errorOutput);
-	status_t error = packageReader.Init(fd, false);
+	status_t error = packageReader.Init(fd, false, 0);
  	if (error != B_OK)
  		RETURN_ERROR(error);
 

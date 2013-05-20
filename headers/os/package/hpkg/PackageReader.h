@@ -31,8 +31,8 @@ public:
 								BPackageReader(BErrorOutput* errorOutput);
 								~BPackageReader();
 
-			status_t			Init(const char* fileName);
-			status_t			Init(int fd, bool keepFD);
+			status_t			Init(const char* fileName, uint32 flags = 0);
+			status_t			Init(int fd, bool keepFD, uint32 flags = 0);
 			status_t			ParseContent(
 									BPackageContentHandler* contentHandler);
 			status_t			ParseContent(BLowLevelPackageContentHandler*

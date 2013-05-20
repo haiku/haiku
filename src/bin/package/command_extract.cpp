@@ -82,6 +82,12 @@ struct VersionPolicyV1 {
 		return data.UncompressedSize();
 	}
 
+	static inline status_t InitReader(PackageReader& packageReader,
+		const char* fileName)
+	{
+		return packageReader.Init(fileName);
+	}
+
 	static status_t GetHeapReader(PackageReader& packageReader,
 		HeapReaderBase*& _heapReader, bool& _mustDelete)
 	{
@@ -126,6 +132,14 @@ struct VersionPolicyV2 {
 	static inline uint64 PackageDataUncompressedSize(const PackageData& data)
 	{
 		return data.Size();
+	}
+
+	static inline status_t InitReader(PackageReader& packageReader,
+		const char* fileName)
+	{
+		return packageReader.Init(fileName,
+			BPackageKit::BHPKG
+				::B_HPKG_READER_DONT_PRINT_VERSION_MISMATCH_MESSAGE);
 	}
 
 	static status_t GetHeapReader(PackageReader& packageReader,
@@ -755,7 +769,7 @@ do_extract(const char* packageFileName, const char* changeToDirectory,
 	}
 
 	typename VersionPolicy::PackageReader packageReader(&errorOutput);
-	status_t error = packageReader.Init(packageFileName);
+	status_t error = VersionPolicy::InitReader(packageReader, packageFileName);
 	if (error != B_OK) {
 		if (ignoreVersionError && error == B_MISMATCHED_VALUES)
 			return;
