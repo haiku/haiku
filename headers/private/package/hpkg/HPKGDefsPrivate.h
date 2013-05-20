@@ -35,6 +35,7 @@ struct hpkg_header {
 	uint32	attributes_length;
 	uint32	attributes_strings_length;
 	uint32	attributes_strings_count;
+	uint32	reserved1;
 
 	// TOC section
 	uint64	toc_length;
@@ -58,6 +59,7 @@ struct hpkg_repo_header {
 
 	// repository info section
 	uint32	info_length;
+	uint32	reserved1;
 
 	// package attributes section
 	uint64	packages_length;
