@@ -58,7 +58,7 @@ PackageData::PackageData(const PackageDataV1& data)
 inline
 PackageData::PackageData(const PackageDataV2& data)
 	:
-	fVersion(1)
+	fVersion(2)
 {
 	memcpy(&fData, &data, sizeof(data));
 }
