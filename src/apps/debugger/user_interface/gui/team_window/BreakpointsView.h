@@ -28,9 +28,6 @@ public:
 
 			void				UnsetListener();
 
-			void				SetBreakpoint(UserBreakpoint* breakpoint,
-									Watchpoint* watchpoint);
-
 			void				UserBreakpointChanged(
 									UserBreakpoint* breakpoint);
 			void				WatchpointChanged(
@@ -45,19 +42,18 @@ public:
 private:
 	// BreakpointListView::Listener
 	virtual	void				BreakpointSelectionChanged(
-									UserBreakpoint* breakpoint);
-	virtual	void				WatchpointSelectionChanged(
-									Watchpoint* watchpoint);
+									BreakpointProxyList& proxies);
 
 			void				_Init();
 
 			void				_UpdateButtons();
 
+			void				_SetSelection(BreakpointProxyList& proxies);
+			void				_HandleBreakpointAction(uint32 action);
 private:
 			Team*				fTeam;
-			UserBreakpoint*		fBreakpoint;
-			Watchpoint*			fWatchpoint;
 			BreakpointListView*	fListView;
+			BreakpointProxyList	fSelectedBreakpoints;
 			BButton*			fToggleBreakpointButton;
 			BButton*			fRemoveBreakpointButton;
 			Listener*			fListener;
@@ -70,15 +66,13 @@ public:
 	virtual						~Listener();
 
 	virtual	void				BreakpointSelectionChanged(
-									UserBreakpoint* breakpoint) = 0;
+									BreakpointProxyList& proxies) = 0;
 	virtual	void				SetBreakpointEnabledRequested(
 									UserBreakpoint* breakpoint,
 									bool enabled) = 0;
 	virtual	void				ClearBreakpointRequested(
 									UserBreakpoint* breakpoint) = 0;
 
-	virtual	void				WatchpointSelectionChanged(
-									Watchpoint* Watchpoint) = 0;
 	virtual	void				SetWatchpointEnabledRequested(
 									Watchpoint* breakpoint,
 									bool enabled) = 0;

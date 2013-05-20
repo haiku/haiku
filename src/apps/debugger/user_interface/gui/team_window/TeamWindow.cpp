@@ -610,9 +610,17 @@ TeamWindow::FunctionSelectionChanged(FunctionInstance* function)
 
 
 void
-TeamWindow::BreakpointSelectionChanged(UserBreakpoint* breakpoint)
+TeamWindow::BreakpointSelectionChanged(BreakpointProxyList &proxies)
 {
-	_SetActiveBreakpoint(breakpoint);
+	if (proxies.CountItems() == 0 && fActiveBreakpoint != NULL) {
+		fActiveBreakpoint->ReleaseReference();
+		fActiveBreakpoint = NULL;
+	} else if (proxies.CountItems() == 1) {
+		BreakpointProxy* proxy = proxies.ItemAt(0);
+		if (proxy->Type() == BREAKPOINT_PROXY_TYPE_BREAKPOINT)
+			_SetActiveBreakpoint(proxy->GetBreakpoint());
+	}
+	// if more than one item is selected, do nothing.
 }
 
 
@@ -650,13 +658,6 @@ TeamWindow::ThreadActionRequested(::Thread* thread, uint32 action,
 	target_addr_t address)
 {
 	fListener->ThreadActionRequested(thread->ID(), action, address);
-}
-
-
-void
-TeamWindow::WatchpointSelectionChanged(Watchpoint* watchpoint)
-{
-	fBreakpointsView->SetBreakpoint(NULL, watchpoint);
 }
 
 
@@ -1041,8 +1042,6 @@ TeamWindow::_SetActiveBreakpoint(UserBreakpoint* breakpoint)
 		// automatically, if the active function remains the same)
 		_ScrollToActiveFunction();
 	}
-
-	fBreakpointsView->SetBreakpoint(fActiveBreakpoint, NULL);
 }
 
 

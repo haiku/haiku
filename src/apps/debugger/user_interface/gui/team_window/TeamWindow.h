@@ -88,15 +88,13 @@ private:
 
 	// BreakpointsView::Listener
 	virtual	void				BreakpointSelectionChanged(
-									UserBreakpoint* breakpoint);
+									BreakpointProxyList& proxies);
 	virtual	void				SetBreakpointEnabledRequested(
 									UserBreakpoint* breakpoint,
 									bool enabled);
 	virtual	void				ClearBreakpointRequested(
 									UserBreakpoint* breakpoint);
 
-	virtual	void				WatchpointSelectionChanged(
-									Watchpoint* Watchpoint);
 	virtual	void				SetWatchpointEnabledRequested(
 									Watchpoint* breakpoint,
 									bool enabled);
