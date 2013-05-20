@@ -105,7 +105,8 @@ struct PackageFile::DataAccessor {
 
 		if (toRead > 0) {
 			IORequestOutput output(request);
-			MutexLocker locker(fLock);
+			MutexLocker locker(fLock, false, fData->Version() == 1);
+				// V2 readers are reentrant
 			status_t error = fReader->ReadDataToOutput(offset, toRead, &output);
 			if (error != B_OK)
 				RETURN_ERROR(error);
