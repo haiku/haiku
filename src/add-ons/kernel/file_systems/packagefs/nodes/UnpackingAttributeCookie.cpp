@@ -163,6 +163,15 @@ UnpackingAttributeCookie::IndexAttribute(PackageNode* packageNode,
 
 	// read the attribute
 	if (toRead > 0) {
+		// The package must be open or otherwise reading the attribute data
+		// may fail.
+		int fd = packageNode->GetPackage()->Open();
+		if (fd < 0) {
+			indexer->DeleteCookie();
+			return fd;
+		}
+		PackageCloser packageCloser(packageNode->GetPackage());
+
 		error = ReadAttribute(packageNode, attribute, 0, data, &toRead);
 		if (error != B_OK) {
 			indexer->DeleteCookie();

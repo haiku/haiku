@@ -949,6 +949,16 @@ Volume::_FindPackage(const char* fileName) const
 status_t
 Volume::_AddPackageContent(Package* package, bool notify)
 {
+	// Open the package. We don't need the FD here, but this is an optimization.
+	// The attribute indices may want to read the package nodes' attributes and
+	// the package file would be opened and closed for each attribute instance.
+	// Since Package keeps and shares the FD as long as at least one party has
+	// the package open, we prevent that.
+	int fd = package->Open();
+	if (fd < 0)
+		RETURN_ERROR(fd);
+	PackageCloser packageCloser(package);
+
 	status_t error = fPackageFSRoot->AddPackage(package);
 	if (error != B_OK)
 		RETURN_ERROR(error);
