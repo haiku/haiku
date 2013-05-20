@@ -237,8 +237,8 @@ PackageFileHeapAccessorBase::ReadFileData(uint64 offset, void* buffer,
 {
 	ssize_t bytesRead = pread(fFD, buffer, size, fHeapOffset + (off_t)offset);
 	if (bytesRead < 0) {
-		fErrorOutput->PrintError("ReadFileData(%" B_PRIu64 "%p, %zu) failed to "
-			"read data: %s\n", offset, buffer, size, strerror(errno));
+		fErrorOutput->PrintError("ReadFileData(%" B_PRIu64 ", %p, %zu) failed "
+			"to read data: %s\n", offset, buffer, size, strerror(errno));
 		return errno;
 	}
 	if ((size_t)bytesRead != size) {
