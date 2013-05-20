@@ -160,6 +160,7 @@ extern area_id		map_physical_memory(const char *areaName,
 
 /* kernel debugging facilities */
 extern void			dprintf(const char *format, ...) _PRINTFLIKE(1, 2);
+extern void			dvprintf(const char *format, va_list args);
 extern void			kprintf(const char *fmt, ...) _PRINTFLIKE(1, 2);
 
 extern void 		dump_block(const char *buffer, int size, const char *prefix);

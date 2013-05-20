@@ -2112,6 +2112,16 @@ dprintf(const char* format, ...)
 
 
 void
+dvprintf(const char* format, va_list args)
+{
+	if (!sSerialDebugEnabled && !sSyslogOutputEnabled && !sBlueScreenEnabled)
+		return;
+
+	dprintf_args(format, args, true);
+}
+
+
+void
 dprintf_no_syslog(const char* format, ...)
 {
 	va_list args;
