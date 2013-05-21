@@ -995,6 +995,7 @@ BPackageInfo::kArchitectureNames[B_PACKAGE_ARCHITECTURE_ENUM_COUNT] = {
 	"any",
 	"x86",
 	"x86_gcc2",
+	"source",
 };
 
 
