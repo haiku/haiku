@@ -175,6 +175,9 @@ public:
 
 	Type* GetType() const
 	{
+		if (fCastedType != NULL)
+			return fCastedType;
+
 		return fNodeChild->GetType();
 	}
 
