@@ -26,6 +26,7 @@ namespace BPackageKit {
 namespace BHPKG {
 
 
+class BAbstractBufferedDataReader;
 class BErrorOutput;
 
 
@@ -71,8 +72,23 @@ protected:
 
 			BErrorOutput*		ErrorOutput() const;
 
-			PackageFileHeapReader* HeapReader() const
+			uint64				UncompressedHeapSize() const;
+
+			PackageFileHeapReader* RawHeapReader() const
+									{ return fRawHeapReader; }
+			BAbstractBufferedDataReader* HeapReader() const
 									{ return fHeapReader; }
+									// equals RawHeapReader(), if uncached
+
+			BAbstractBufferedDataReader* DetachHeapReader(
+									PackageFileHeapReader** _rawHeapReader
+										= NULL);
+									// Detaches both raw and (if applicable)
+									// cached heap reader. The called gains
+									// ownership. The FD may need to be set on
+									// the raw heap reader, if it shall be used
+									// after destroying this object and Init()
+									// has been called with keepFD == true.
 
 protected:
 			class AttributeHandlerContext;
@@ -95,6 +111,10 @@ protected:
 									uint32 chunkSize, off_t offset,
 									uint64 compressedSize,
 									uint64 uncompressedSize);
+	virtual	status_t			CreateCachedHeapReader(
+									PackageFileHeapReader* heapReader,
+									BAbstractBufferedDataReader*&
+										_cachedReader);
 			status_t			InitSection(PackageFileSection& section,
 									uint64 endOffset, uint64 length,
 									uint64 maxSaneLength, uint64 stringsLength,
@@ -156,7 +176,8 @@ private:
 			int					fFD;
 			bool				fOwnsFD;
 
-			PackageFileHeapReader* fHeapReader;
+			PackageFileHeapReader* fRawHeapReader;
+			BAbstractBufferedDataReader* fHeapReader;
 
 			PackageFileSection*	fCurrentSection;
 

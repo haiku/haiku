@@ -25,6 +25,7 @@
 #include <package/hpkg/v1/PackageReaderImpl.h>
 #include <util/AutoLock.h>
 
+#include "CachedDataReader.h"
 #include "DebugSupport.h"
 #include "GlobalFactory.h"
 #include "PackageDirectory.h"
@@ -645,8 +646,8 @@ private:
 // #pragma mark - HeapReaderV2
 
 
-struct Package::HeapReaderV2 : public HeapReader,
-	private BAbstractBufferedDataReader, private BErrorOutput {
+struct Package::HeapReaderV2 : public HeapReader, public CachedDataReader,
+	private BErrorOutput {
 public:
 	HeapReaderV2()
 		:
@@ -668,6 +669,11 @@ public:
 		fHeapReader->SetErrorOutput(this);
 		fHeapReader->SetFD(fd);
 
+		status_t error = CachedDataReader::Init(fHeapReader,
+			fHeapReader->UncompressedHeapSize());
+		if (error != B_OK)
+			return error;
+
 		return B_OK;
 	}
 
@@ -684,20 +690,6 @@ public:
 	}
 
 private:
-	// BAbstractBufferedDataReader
-
-	virtual status_t ReadData(off_t offset, void* buffer, size_t size)
-	{
-		return fHeapReader->ReadData(offset, buffer, size);
-	}
-
-	virtual status_t ReadDataToOutput(off_t offset, size_t size,
-		BDataOutput* output)
-	{
-		return fHeapReader->ReadDataToOutput(offset, size, output);
-	}
-
-private:
 	// BErrorOutput
 
 	virtual void PrintErrorVarArgs(const char* format, va_list args)
@@ -707,6 +699,52 @@ private:
 
 private:
 	PackageFileHeapReader*	fHeapReader;
+};
+
+
+// #pragma mark - Package
+
+
+struct Package::CachingPackageReader : public PackageReaderImpl {
+	CachingPackageReader(BErrorOutput* errorOutput)
+		:
+		PackageReaderImpl(errorOutput),
+		fCachedHeapReader(NULL)
+	{
+	}
+
+	~CachingPackageReader()
+	{
+		delete fCachedHeapReader;
+	}
+
+	virtual status_t CreateCachedHeapReader(
+		PackageFileHeapReader* rawHeapReader,
+		BAbstractBufferedDataReader*& _cachedReader)
+	{
+		fCachedHeapReader = new(std::nothrow) HeapReaderV2;
+		if (fCachedHeapReader == NULL)
+			RETURN_ERROR(B_NO_MEMORY);
+
+		status_t error = fCachedHeapReader->Init(rawHeapReader, FD());
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		_cachedReader = fCachedHeapReader;
+		return B_OK;
+	}
+
+	HeapReaderV2* DetachCachedHeapReader()
+	{
+		DetachHeapReader();
+
+		HeapReaderV2* cachedHeapReader = fCachedHeapReader;
+		fCachedHeapReader = NULL;
+		return cachedHeapReader;
+	}
+
+private:
+	HeapReaderV2*	fCachedHeapReader;
 };
 
 
@@ -775,7 +813,7 @@ Package::Load()
 
 	// try current package file format version
 	{
-		PackageReaderImpl packageReader(&errorOutput);
+		CachingPackageReader packageReader(&errorOutput);
 		status_t error = packageReader.Init(fd, false,
 			BHPKG::B_HPKG_READER_DONT_PRINT_VERSION_MISMATCH_MESSAGE);
 		if (error == B_OK) {
@@ -789,17 +827,8 @@ Package::Load()
 			if (error != B_OK)
 				RETURN_ERROR(error);
 
-			// create a heap reader
-			HeapReaderV2* heapReader = new(std::nothrow) HeapReaderV2;
-			if (heapReader == NULL)
-				RETURN_ERROR(B_NO_MEMORY);
-
-			error = heapReader->Init(packageReader.HeapReader(), fd);
-			if (error != B_OK) {
-				RETURN_ERROR(error);
-			}
-
-			fHeapReader = heapReader;
+			// get the heap reader
+			fHeapReader = packageReader.DetachCachedHeapReader();
 			return B_OK;
 		}
 

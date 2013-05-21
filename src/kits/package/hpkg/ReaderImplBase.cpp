@@ -543,6 +543,7 @@ ReaderImplBase::ReaderImplBase(const char* fileType, BErrorOutput* errorOutput)
 	fErrorOutput(errorOutput),
 	fFD(-1),
 	fOwnsFD(false),
+	fRawHeapReader(NULL),
 	fHeapReader(NULL),
 	fCurrentSection(NULL),
 	fScratchBuffer(NULL),
@@ -554,6 +555,8 @@ ReaderImplBase::ReaderImplBase(const char* fileType, BErrorOutput* errorOutput)
 ReaderImplBase::~ReaderImplBase()
 {
 	delete fHeapReader;
+	if (fRawHeapReader != fHeapReader)
+		delete fRawHeapReader;
 
 	if (fOwnsFD && fFD >= 0)
 		close(fFD);
@@ -562,21 +565,24 @@ ReaderImplBase::~ReaderImplBase()
 }
 
 
-status_t
-ReaderImplBase::_Init(int fd, bool keepFD)
+uint64
+ReaderImplBase::UncompressedHeapSize() const
 {
-	fFD = fd;
-	fOwnsFD = keepFD;
+	return fRawHeapReader->UncompressedHeapSize();
+}
 
-	// allocate a scratch buffer
-	fScratchBuffer = new(std::nothrow) uint8[kScratchBufferSize];
-	if (fScratchBuffer == NULL) {
-		fErrorOutput->PrintError("Error: Out of memory!\n");
-		return B_NO_MEMORY;
-	}
-	fScratchBufferSize = kScratchBufferSize;
 
-	return B_OK;
+BAbstractBufferedDataReader*
+ReaderImplBase::DetachHeapReader(PackageFileHeapReader** _rawHeapReader)
+{
+	BAbstractBufferedDataReader* heapReader = fHeapReader;
+	fHeapReader = NULL;
+
+	if (_rawHeapReader != NULL)
+		*_rawHeapReader = fRawHeapReader;
+	fRawHeapReader = NULL;
+
+	return heapReader;
 }
 
 
@@ -589,9 +595,32 @@ ReaderImplBase::InitHeapReader(uint32 compression, uint32 chunkSize,
 		return B_BAD_DATA;
 	}
 
-	fHeapReader = new(std::nothrow) PackageFileHeapReader(fErrorOutput, fFD,
+	fRawHeapReader = new(std::nothrow) PackageFileHeapReader(fErrorOutput, fFD,
 		offset, compressedSize, uncompressedSize);
-	return fHeapReader->Init();
+	if (fRawHeapReader == NULL)
+		return B_NO_MEMORY;
+
+	status_t error = fRawHeapReader->Init();
+	if (error != B_OK)
+		return error;
+
+	error = CreateCachedHeapReader(fRawHeapReader, fHeapReader);
+	if (error != B_OK) {
+		if (error != B_NOT_SUPPORTED)
+			return error;
+
+		fHeapReader = fRawHeapReader;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+ReaderImplBase::CreateCachedHeapReader(PackageFileHeapReader* heapReader,
+	BAbstractBufferedDataReader*& _cachedReader)
+{
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -794,6 +823,24 @@ ReaderImplBase::ParseAttributeTree(AttributeHandlerContext* context,
 
 	_sectionHandled = true;
 	return error;
+}
+
+
+status_t
+ReaderImplBase::_Init(int fd, bool keepFD)
+{
+	fFD = fd;
+	fOwnsFD = keepFD;
+
+	// allocate a scratch buffer
+	fScratchBuffer = new(std::nothrow) uint8[kScratchBufferSize];
+	if (fScratchBuffer == NULL) {
+		fErrorOutput->PrintError("Error: Out of memory!\n");
+		return B_NO_MEMORY;
+	}
+	fScratchBufferSize = kScratchBufferSize;
+
+	return B_OK;
 }
 
 

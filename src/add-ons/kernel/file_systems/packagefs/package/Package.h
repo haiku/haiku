@@ -100,6 +100,7 @@ private:
 			struct HeapReader;
 			struct HeapReaderV1;
 			struct HeapReaderV2;
+			struct CachingPackageReader;
 
 private:
 			mutex				fLock;

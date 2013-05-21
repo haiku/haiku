@@ -769,7 +769,7 @@ packagefs_mount_file(int fd, ::Directory*& _mountedDirectory)
 		return B_NO_MEMORY;
 	BReference<PackageVolume> volumeReference(volume, true);
 
-	error = volume->Init(fd, packageReader.HeapReader());
+	error = volume->Init(fd, packageReader.RawHeapReader());
 	if (error != B_OK)
 		RETURN_ERROR(error);
 

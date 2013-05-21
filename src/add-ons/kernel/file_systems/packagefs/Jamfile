@@ -24,6 +24,7 @@ HAIKU_PACKAGE_FS_SOURCES =
 	AttributeIndex.cpp
 	AutoPackageAttributes.cpp
 	BlockBufferPoolKernel.cpp
+	CachedDataReader.cpp
 	DebugSupport.cpp
 	Dependency.cpp
 	Directory.cpp

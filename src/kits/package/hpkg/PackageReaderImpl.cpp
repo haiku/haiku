@@ -26,7 +26,6 @@
 #include <package/hpkg/PackageData.h>
 #include <package/hpkg/PackageEntry.h>
 #include <package/hpkg/PackageEntryAttribute.h>
-#include <package/hpkg/PackageFileHeapReader.h>
 #include <package/hpkg/ZlibDecompressor.h>
 
 
@@ -340,7 +339,7 @@ PackageReaderImpl::Init(int fd, bool keepFD, uint32 flags)
 		fd, keepFD, header, flags);
 	if (error != B_OK)
 		return error;
-	fHeapSize = HeapReader()->UncompressedHeapSize();
+	fHeapSize = UncompressedHeapSize();
 
 	// init package attributes section
 	error = InitSection(fPackageAttributesSection, fHeapSize,

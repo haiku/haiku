@@ -19,7 +19,6 @@
 #include <Message.h>
 
 #include <package/hpkg/HPKGDefsPrivate.h>
-#include <package/hpkg/PackageFileHeapReader.h>
 #include <package/hpkg/RepositoryContentHandler.h>
 
 
@@ -80,7 +79,7 @@ RepositoryReaderImpl::Init(int fd, bool keepFD)
 
 	// init package attributes section
 	error = InitSection(fPackageAttributesSection,
-		HeapReader()->UncompressedHeapSize(),
+		UncompressedHeapSize(),
 		B_BENDIAN_TO_HOST_INT64(header.packages_length),
 		kMaxPackageAttributesSize,
 		B_BENDIAN_TO_HOST_INT64(header.packages_strings_length),

@@ -40,7 +40,9 @@ public:
 			uint64				HeapOffset() const;
 			uint64				HeapSize() const;
 
-			PackageFileHeapReader* HeapReader() const
+			PackageFileHeapReader* RawHeapReader() const
+									{ return inherited::RawHeapReader(); }
+			BAbstractBufferedDataReader* HeapReader() const
 									{ return inherited::HeapReader(); }
 
 protected:

@@ -636,7 +636,7 @@ PackageWriterImpl::_Init(const char* fileName,
 		if (result != B_OK)
 			return result;
 
-		fHeapWriter->Reinit(packageReader.HeapReader());
+		fHeapWriter->Reinit(packageReader.RawHeapReader());
 	}
 
 	return B_OK;
