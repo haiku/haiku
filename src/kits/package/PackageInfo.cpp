@@ -966,7 +966,7 @@ BPackageInfo::Parser::_IsValidResolvableName(const char* string,
 }
 
 
-const char* BPackageInfo::kElementNames[B_PACKAGE_INFO_ENUM_COUNT] = {
+const char* const BPackageInfo::kElementNames[B_PACKAGE_INFO_ENUM_COUNT] = {
 	"name",
 	"summary",
 	"description",
@@ -990,7 +990,7 @@ const char* BPackageInfo::kElementNames[B_PACKAGE_INFO_ENUM_COUNT] = {
 };
 
 
-const char*
+const char* const
 BPackageInfo::kArchitectureNames[B_PACKAGE_ARCHITECTURE_ENUM_COUNT] = {
 	"any",
 	"x86",

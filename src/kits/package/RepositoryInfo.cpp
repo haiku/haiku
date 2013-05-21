@@ -26,14 +26,14 @@ namespace BPackageKit {
 
 const uint8 BRepositoryInfo::kDefaultPriority	= 50;
 
-const char* BRepositoryInfo::kNameField			= "name";
-const char* BRepositoryInfo::kURLField			= "url";
-const char* BRepositoryInfo::kVendorField		= "vendor";
-const char* BRepositoryInfo::kSummaryField		= "summary";
-const char* BRepositoryInfo::kPriorityField		= "priority";
-const char* BRepositoryInfo::kArchitectureField	= "architecture";
-const char* BRepositoryInfo::kLicenseNameField	= "licenseName";
-const char* BRepositoryInfo::kLicenseTextField	= "licenseText";
+const char* const BRepositoryInfo::kNameField			= "name";
+const char* const BRepositoryInfo::kURLField			= "url";
+const char* const BRepositoryInfo::kVendorField			= "vendor";
+const char* const BRepositoryInfo::kSummaryField		= "summary";
+const char* const BRepositoryInfo::kPriorityField		= "priority";
+const char* const BRepositoryInfo::kArchitectureField	= "architecture";
+const char* const BRepositoryInfo::kLicenseNameField	= "licenseName";
+const char* const BRepositoryInfo::kLicenseTextField	= "licenseText";
 
 
 BRepositoryInfo::BRepositoryInfo()

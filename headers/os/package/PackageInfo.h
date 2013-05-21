@@ -161,8 +161,8 @@ public:
 									ParseErrorListener* listener = NULL);
 
 public:
-	static	const char*			kElementNames[];
-	static	const char*			kArchitectureNames[];
+	static	const char*	const	kElementNames[];
+	static	const char*	const	kArchitectureNames[];
 
 private:
 			class Parser;
