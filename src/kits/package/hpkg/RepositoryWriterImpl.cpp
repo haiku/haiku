@@ -273,8 +273,14 @@ RepositoryWriterImpl::_Finish()
 	result = fHeapWriter->Finish();
 	if (result != B_OK)
 		return result;
-	uint64 totalSize = fHeapWriter->HeapOffset()
-		+ fHeapWriter->CompressedHeapSize();
+	uint64 compressedHeapSize = fHeapWriter->CompressedHeapSize();
+	uint64 totalSize = fHeapWriter->HeapOffset() + compressedHeapSize;
+
+	header.heap_compression = B_HOST_TO_BENDIAN_INT16(B_HPKG_COMPRESSION_ZLIB);
+	header.heap_chunk_size = B_HOST_TO_BENDIAN_INT32(fHeapWriter->ChunkSize());
+	header.heap_size_compressed = B_HOST_TO_BENDIAN_INT64(compressedHeapSize);
+	header.heap_size_uncompressed = B_HOST_TO_BENDIAN_INT64(
+		fHeapWriter->UncompressedHeapSize());
 
 	fListener->OnRepositoryDone(sizeof(header), infoLength,
 		fRepositoryInfo->LicenseNames().CountStrings(), fPackageCount,
