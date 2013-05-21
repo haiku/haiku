@@ -24,9 +24,10 @@ struct hpkg_header {
 	uint16	header_size;
 	uint16	version;
 	uint64	total_size;
+	uint16	minor_version;
 
 	// heap
-	uint32	heap_compression;
+	uint16	heap_compression;
 	uint32	heap_chunk_size;
 	uint64	heap_size_compressed;
 	uint64	heap_size_uncompressed;
@@ -50,9 +51,10 @@ struct hpkg_repo_header {
 	uint16	header_size;
 	uint16	version;
 	uint64	total_size;
+	uint16	minor_version;
 
 	// heap
-	uint32	heap_compression;
+	uint16	heap_compression;
 	uint32	heap_chunk_size;
 	uint64	heap_size_compressed;
 	uint64	heap_size_uncompressed;

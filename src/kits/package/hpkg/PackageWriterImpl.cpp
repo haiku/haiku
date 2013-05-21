@@ -1077,7 +1077,7 @@ PackageWriterImpl::_Finish()
 
 	uint64 compressedHeapSize = fHeapWriter->CompressedHeapSize();
 
-	header.heap_compression = B_HOST_TO_BENDIAN_INT32(B_HPKG_COMPRESSION_ZLIB);
+	header.heap_compression = B_HOST_TO_BENDIAN_INT16(B_HPKG_COMPRESSION_ZLIB);
 	header.heap_chunk_size = B_HOST_TO_BENDIAN_INT32(fHeapWriter->ChunkSize());
 	header.heap_size_compressed = B_HOST_TO_BENDIAN_INT64(
 		fHeapWriter->CompressedHeapSize());
@@ -1104,6 +1104,7 @@ PackageWriterImpl::_Finish()
 	header.header_size = B_HOST_TO_BENDIAN_INT16(fHeaderSize);
 	header.version = B_HOST_TO_BENDIAN_INT16(B_HPKG_VERSION);
 	header.total_size = B_HOST_TO_BENDIAN_INT64(totalSize);
+	header.minor_version = B_HOST_TO_BENDIAN_INT16(B_HPKG_MINOR_VERSION);
 
 	// write the header
 	RawWriteBuffer(&header, sizeof(hpkg_header), 0);

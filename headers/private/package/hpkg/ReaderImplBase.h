@@ -72,6 +72,9 @@ protected:
 
 			BErrorOutput*		ErrorOutput() const;
 
+			uint16				MinorFormatVersion() const
+									{ return fMinorFormatVersion; }
+
 			uint64				UncompressedHeapSize() const;
 
 			PackageFileHeapReader* RawHeapReader() const
@@ -175,6 +178,7 @@ private:
 			BErrorOutput*		fErrorOutput;
 			int					fFD;
 			bool				fOwnsFD;
+			uint16				fMinorFormatVersion;
 
 			PackageFileHeapReader* fRawHeapReader;
 			BAbstractBufferedDataReader* fHeapReader;
@@ -199,7 +203,8 @@ public:
 				BLowLevelPackageContentHandler*	lowLevelHandler;
 			};
 			bool					hasLowLevelHandler;
-		
+			bool					ignoreUnknownAttributes;
+
 			BHPKGPackageSectionID	section;
 
 public:
@@ -207,12 +212,14 @@ public:
 									BErrorOutput* errorOutput,
 									BPackageContentHandler*
 										packageContentHandler,
-									BHPKGPackageSectionID section);
+									BHPKGPackageSectionID section,
+									bool ignoreUnknownAttributes);
 								AttributeHandlerContext(
 									BErrorOutput* errorOutput,
 									BLowLevelPackageContentHandler*
 										lowLevelHandler,
-									BHPKGPackageSectionID section);
+									BHPKGPackageSectionID section,
+									bool ignoreUnknownAttributes);
 
 			void				ErrorOccurred();
 };
@@ -375,6 +382,8 @@ ReaderImplBase::Init(int fd, bool keepFD, Header& header, uint32 flags)
 		return B_MISMATCHED_VALUES;
 	}
 
+	fMinorFormatVersion = B_BENDIAN_TO_HOST_INT16(header.minor_version);
+
 	// header size
 	uint64 heapOffset = B_BENDIAN_TO_HOST_INT16(header.header_size);
 	if (heapOffset < (off_t)sizeof(header)) {
@@ -405,7 +414,7 @@ ReaderImplBase::Init(int fd, bool keepFD, Header& header, uint32 flags)
 	}
 
 	error = InitHeapReader(
-		B_BENDIAN_TO_HOST_INT32(header.heap_compression),
+		B_BENDIAN_TO_HOST_INT16(header.heap_compression),
 		B_BENDIAN_TO_HOST_INT32(header.heap_chunk_size), heapOffset,
 		compressedHeapSize,
 		B_BENDIAN_TO_HOST_INT64(header.heap_size_uncompressed));

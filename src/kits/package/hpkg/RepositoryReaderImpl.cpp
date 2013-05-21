@@ -141,7 +141,8 @@ RepositoryReaderImpl::ParseContent(BRepositoryContentHandler* contentHandler)
 	status_t result = contentHandler->HandleRepositoryInfo(fRepositoryInfo);
 	if (result == B_OK) {
 		AttributeHandlerContext context(ErrorOutput(), contentHandler,
-			B_HPKG_SECTION_PACKAGE_ATTRIBUTES);
+			B_HPKG_SECTION_PACKAGE_ATTRIBUTES,
+			MinorFormatVersion() > B_HPKG_REPO_MINOR_VERSION);
 		PackageAttributeHandler rootAttributeHandler;
 		result = ParsePackageAttributesSection(&context, &rootAttributeHandler);
 	}

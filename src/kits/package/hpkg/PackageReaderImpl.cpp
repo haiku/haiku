@@ -375,7 +375,8 @@ status_t
 PackageReaderImpl::ParseContent(BPackageContentHandler* contentHandler)
 {
 	AttributeHandlerContext context(ErrorOutput(), contentHandler,
-		B_HPKG_SECTION_PACKAGE_ATTRIBUTES);
+		B_HPKG_SECTION_PACKAGE_ATTRIBUTES,
+		MinorFormatVersion() > B_HPKG_MINOR_VERSION);
 	RootAttributeHandler rootAttributeHandler;
 
 	status_t error
@@ -394,7 +395,8 @@ status_t
 PackageReaderImpl::ParseContent(BLowLevelPackageContentHandler* contentHandler)
 {
 	AttributeHandlerContext context(ErrorOutput(), contentHandler,
-		B_HPKG_SECTION_PACKAGE_ATTRIBUTES);
+		B_HPKG_SECTION_PACKAGE_ATTRIBUTES,
+		MinorFormatVersion() > B_HPKG_MINOR_VERSION);
 	LowLevelAttributeHandler rootAttributeHandler;
 
 	status_t error

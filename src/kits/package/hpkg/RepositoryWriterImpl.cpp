@@ -285,6 +285,7 @@ RepositoryWriterImpl::_Finish()
 	header.header_size = B_HOST_TO_BENDIAN_INT16((uint16)sizeof(header));
 	header.version = B_HOST_TO_BENDIAN_INT16(B_HPKG_REPO_VERSION);
 	header.total_size = B_HOST_TO_BENDIAN_INT64(totalSize);
+	header.minor_version = B_HOST_TO_BENDIAN_INT16(B_HPKG_REPO_MINOR_VERSION);
 
 	RawWriteBuffer(&header, sizeof(header), 0);
 

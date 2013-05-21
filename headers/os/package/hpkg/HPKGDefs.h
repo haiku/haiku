@@ -16,11 +16,13 @@ namespace BHPKG {
 
 // magic & version of package and repository files
 enum {
-	B_HPKG_MAGIC	= 'hpkg',
-	B_HPKG_VERSION	= 2,
+	B_HPKG_MAGIC				= 'hpkg',
+	B_HPKG_VERSION				= 2,
+	B_HPKG_MINOR_VERSION		= 0,
 	//
-	B_HPKG_REPO_MAGIC	= 'hpkr',
-	B_HPKG_REPO_VERSION	= 2
+	B_HPKG_REPO_MAGIC			= 'hpkr',
+	B_HPKG_REPO_VERSION			= 2,
+	B_HPKG_REPO_MINOR_VERSION	= 0
 };
 
 

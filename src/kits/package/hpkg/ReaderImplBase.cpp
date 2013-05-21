@@ -39,11 +39,12 @@ static const size_t kScratchBufferSize = 64 * 1024;
 
 ReaderImplBase::AttributeHandlerContext::AttributeHandlerContext(
 	BErrorOutput* errorOutput, BPackageContentHandler* packageContentHandler,
-	BHPKGPackageSectionID section)
+	BHPKGPackageSectionID section, bool ignoreUnknownAttributes)
 	:
 	errorOutput(errorOutput),
 	packageContentHandler(packageContentHandler),
 	hasLowLevelHandler(false),
+	ignoreUnknownAttributes(ignoreUnknownAttributes),
 	section(section)
 {
 }
@@ -51,11 +52,12 @@ ReaderImplBase::AttributeHandlerContext::AttributeHandlerContext(
 
 ReaderImplBase::AttributeHandlerContext::AttributeHandlerContext(
 	BErrorOutput* errorOutput, BLowLevelPackageContentHandler* lowLevelHandler,
-	BHPKGPackageSectionID section)
+	BHPKGPackageSectionID section, bool ignoreUnknownAttributes)
 	:
 	errorOutput(errorOutput),
 	lowLevelHandler(lowLevelHandler),
 	hasLowLevelHandler(true),
+	ignoreUnknownAttributes(ignoreUnknownAttributes),
 	section(section)
 {
 }
@@ -140,6 +142,9 @@ ReaderImplBase::PackageVersionAttributeHandler::HandleAttribute(
 			break;
 
 		default:
+			if (context->ignoreUnknownAttributes)
+				break;
+
 			context->errorOutput->PrintError("Error: Invalid package "
 				"attribute section: unexpected package attribute id %d "
 				"encountered when parsing package version\n", id);
@@ -212,6 +217,9 @@ ReaderImplBase::PackageResolvableAttributeHandler::HandleAttribute(
 			break;
 
 		default:
+			if (context->ignoreUnknownAttributes)
+				break;
+
 			context->errorOutput->PrintError("Error: Invalid package "
 				"attribute section: unexpected package attribute id %d "
 				"encountered when parsing package resolvable\n", id);
@@ -281,6 +289,9 @@ ReaderImplBase::PackageResolvableExpressionAttributeHandler::HandleAttribute(
 			return B_OK;
 
 		default:
+			if (context->ignoreUnknownAttributes)
+				break;
+
 			context->errorOutput->PrintError("Error: Invalid package "
 				"attribute section: unexpected package attribute id %d "
 				"encountered when parsing package resolvable-expression\n",
@@ -445,6 +456,9 @@ ReaderImplBase::PackageAttributeHandler::HandleAttribute(
 			break;
 
 		default:
+			if (context->ignoreUnknownAttributes)
+				break;
+
 			context->errorOutput->PrintError(
 				"Error: Invalid package attribute section: unexpected "
 				"package attribute id %d encountered\n", id);
