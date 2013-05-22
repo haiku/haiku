@@ -588,7 +588,7 @@ second_chance:
 			}
 
 			// keep walking
-			while (next != NULL && next->Base() + size - 1 <= end) {
+			while (next != NULL && next->Base() + next->Size() - 1 <= end) {
 				addr_t alignedBase = ROUNDUP(last->Base() + last->Size(),
 					alignment);
 				addr_t nextBase = min_c(end, next->Base() - 1);
@@ -615,8 +615,8 @@ second_chance:
 
 			addr_t alignedBase = ROUNDUP(last->Base() + last->Size(),
 				alignment);
-			if (is_valid_spot(last->Base() + (last->Size() - 1), alignedBase,
-					size, end)) {
+			if (next == NULL && is_valid_spot(last->Base() + (last->Size() - 1),
+					alignedBase, size, end)) {
 
 				if (is_randomized(addressSpec)) {
 					alignedBase = _RandomizeAddress(alignedBase, end - size + 1,
