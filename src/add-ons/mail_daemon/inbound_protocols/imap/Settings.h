@@ -30,6 +30,7 @@ public:
 
 			int32				MaxConnections() const;
 			bool				IdleMode() const;
+			int32				BodyFetchLimit() const;
 
 private:
 			const BMessage		fMessage;

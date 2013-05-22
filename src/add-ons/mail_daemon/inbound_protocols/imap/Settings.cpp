@@ -101,3 +101,10 @@ Settings::IdleMode() const
 {
 	return fMessage.GetBool("idle", true);
 }
+
+
+int32
+Settings::BodyFetchLimit() const
+{
+	return fMessage.GetInt32("partial_download_limit", -1);
+}
