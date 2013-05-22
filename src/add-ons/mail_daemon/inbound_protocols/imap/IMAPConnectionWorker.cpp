@@ -59,6 +59,11 @@ public:
 		return fWorker._MailboxFor(folder);
 	}
 
+	int32 BodyFetchLimit()
+	{
+		return fWorker.fSettings.BodyFetchLimit();
+	}
+
 	status_t EnqueueCommand(WorkerCommand* command)
 	{
 		return fWorker._EnqueueCommand(command);
@@ -125,15 +130,78 @@ public:
 };
 
 
+class FetchBodiesCommand : public SyncCommand, public IMAP::FetchListener {
+public:
+	FetchBodiesCommand(IMAPFolder& folder, IMAPMailbox& mailbox,
+		std::vector<uint32>& entries)
+		:
+		fFolder(folder),
+		fMailbox(mailbox),
+		fEntries(entries)
+	{
+	}
+
+	virtual status_t Process(IMAPConnectionWorker& worker)
+	{
+		IMAP::Protocol& protocol = WorkerPrivate(worker).Protocol();
+
+		if (fEntries.empty())
+			return B_OK;
+
+		fUID = *fEntries.begin();
+		fEntries.erase(fEntries.begin());
+
+		// TODO: check nextUID if we get one
+		status_t status = WorkerPrivate(worker).SelectMailbox(fFolder);
+		if (status != B_OK)
+			return status;
+
+		printf("IMAP: fetch body for %lu\n", fUID);
+		// TODO: combine smaller messages together for faster retrieval
+		IMAP::FetchCommand fetch(fUID, fUID, IMAP::kFetchBody);
+		fetch.SetListener(this);
+
+		return protocol.ProcessCommand(fetch);
+	}
+
+	virtual bool IsDone() const
+	{
+		return fEntries.empty();
+	}
+
+	virtual bool FetchData(uint32 fetchFlags, BDataIO& stream, size_t& length)
+	{
+		fFetchStatus = fFolder.StoreBody(fUID, stream, length, fRef, fFile);
+		return true;
+	}
+
+	virtual void FetchedData(uint32 fetchFlags, uint32 uid, uint32 flags)
+	{
+		if (fFetchStatus == B_OK)
+			fFolder.BodyStored(fRef, fFile, uid);
+	}
+
+private:
+	IMAPFolder&				fFolder;
+	IMAPMailbox&			fMailbox;
+	std::vector<uint32>		fEntries;
+	uint32					fUID;
+	entry_ref				fRef;
+	BFile					fFile;
+	status_t				fFetchStatus;
+};
+
+
 class FetchHeadersCommand : public SyncCommand, public IMAP::FetchListener {
 public:
 	FetchHeadersCommand(IMAPFolder& folder, IMAPMailbox& mailbox,
-		uint32 from, uint32 to)
+		uint32 from, uint32 to, int32 bodyFetchLimit)
 		:
 		fFolder(folder),
 		fMailbox(mailbox),
 		fFrom(from),
-		fTo(to)
+		fTo(to),
+		fBodyFetchLimit(bodyFetchLimit)
 	{
 	}
 
@@ -152,8 +220,6 @@ public:
 		if (to - fFrom >= kMaxFetchEntries)
 			to = fFrom + kMaxFetchEntries - 1;
 
-		// TODO: trigger download of mails for all messages below the
-		// body fetch limit
 		printf("IMAP: fetch headers from %lu to %lu\n", fFrom, to);
 		IMAP::FetchCommand fetch(fFrom, to,
 			IMAP::kFetchHeader | IMAP::kFetchFlags);
@@ -164,6 +230,13 @@ public:
 			return status;
 
 		fFrom = to + 1;
+
+		if (IsDone() && !fFetchBodies.empty()) {
+			// Enqueue command to fetch the message bodies
+			WorkerPrivate(worker).EnqueueCommand(new FetchBodiesCommand(fFolder,
+				fMailbox, fFetchBodies));
+		}
+
 		return B_OK;
 	}
 
@@ -174,15 +247,20 @@ public:
 
 	virtual bool FetchData(uint32 fetchFlags, BDataIO& stream, size_t& length)
 	{
-		fFetchStatus = fFolder.StoreMessage(fFile, fetchFlags, stream,
-			length, fRef);
+		fFetchStatus = fFolder.StoreMessage(fetchFlags, stream, length,
+			fRef, fFile);
 		return true;
 	}
 
 	virtual void FetchedData(uint32 fetchFlags, uint32 uid, uint32 flags)
 	{
-		if (fFetchStatus == B_OK)
+		if (fFetchStatus == B_OK) {
 			fFolder.MessageStored(fRef, fFile, fetchFlags, uid, flags);
+
+			uint32 size = fMailbox.MessageSize(uid);
+			if (fBodyFetchLimit < 0 || size < fBodyFetchLimit)
+				fFetchBodies.push_back(uid);
+		}
 	}
 
 private:
@@ -190,6 +268,8 @@ private:
 	IMAPMailbox&			fMailbox;
 	uint32					fFrom;
 	uint32					fTo;
+	uint32					fBodyFetchLimit;
+	std::vector<uint32>		fFetchBodies;
 	entry_ref				fRef;
 	BFile					fFile;
 	status_t				fFetchStatus;
@@ -269,9 +349,13 @@ public:
 				return status;
 
 			// Determine how much we need to download
+			// TODO: also retrieve the header size, and only take the body
+			// size into account if it's below the limit
 			for (size_t i = 0; i < entries.size(); i++) {
 				printf("%10lu %8lu bytes, flags: %#lx\n", entries[i].uid,
 					entries[i].size, entries[i].flags);
+				fMailbox->AddMessageEntry(entries[i].uid, entries[i].flags,
+					entries[i].size);
 				fTotalBytes += entries[i].size;
 			}
 			fTotalEntries += entries.size();
@@ -283,7 +367,8 @@ public:
 				if (fMailboxEntries > 0) {
 					// Add pending command to fetch the message headers
 					WorkerCommand* command = new FetchHeadersCommand(*fFolder,
-						*fMailbox, fFirstUID, fNextUID);
+						*fMailbox, fFirstUID, fNextUID,
+						WorkerPrivate(worker).BodyFetchLimit());
 					if (!fFetchCommands.AddItem(command))
 						delete command;
 				}

@@ -22,6 +22,11 @@ public:
 
 			const BString&		MailboxName() const { return fMailboxName; }
 
+			void				AddMessageEntry(uint32 uid, uint32 flags,
+									uint32 size);
+			uint32				MessageFlags(uint32 uid) const;
+			uint32				MessageSize(uint32 uid) const;
+
 	// FolderListener interface
 	virtual	uint32				MessageAdded(const MessageToken& fromToken,
 									const entry_ref& ref);
@@ -32,8 +37,22 @@ public:
 									uint32 newFlags);
 
 protected:
+	struct MessageFlagsAndSize {
+		MessageFlagsAndSize(uint32 _flags, uint32 _size)
+			:
+			flags(_flags),
+			size(_size)
+		{
+		}
+
+		uint32	flags;
+		uint32	size;
+	};
+	typedef std::hash_map<uint32, MessageFlagsAndSize> MessageEntryMap;
+
 			IMAP::Protocol&		fProtocol;
 			BString				fMailboxName;
+			MessageEntryMap		fMessageEntries;
 };
 
 

@@ -132,7 +132,7 @@ IMAPFolder::IMAPFolder(IMAPProtocol& protocol, const BString& mailboxName,
 			uint32 uid = B_BENDIAN_TO_HOST_INT32(entries[i].uid);
 			uint32 flags = B_BENDIAN_TO_HOST_INT32(entries[i].flags);
 
-			fUIDMap.insert(std::make_pair(uid, flags));
+			fFlagsMap.insert(std::make_pair(uid, flags));
 		}
 	}
 
@@ -167,6 +167,29 @@ IMAPFolder::SetUIDValidity(uint32 uidValidity)
 }
 
 
+status_t
+IMAPFolder::GetMessageEntryRef(uint32 uid, entry_ref& ref) const
+{
+	UIDToRefMap::const_iterator found = fRefMap.find(uid);
+	if (found == fRefMap.end())
+		return B_ENTRY_NOT_FOUND;
+
+	ref = found->second;
+	return B_OK;
+}
+
+
+uint32
+IMAPFolder::MessageFlags(uint32 uid) const
+{
+	UIDToFlagsMap::const_iterator found = fFlagsMap.find(uid);
+	if (found == fFlagsMap.end())
+		return 0;
+
+	return found->second;
+}
+
+
 /*!	Stores the given \a stream into a temporary file using the provided
 	BFile object. A new file will be created, and the \a ref object will
 	point to it. The file will remain open when this method exits without
@@ -176,8 +199,8 @@ IMAPFolder::SetUIDValidity(uint32 uidValidity)
 	were an error.
 */
 status_t
-IMAPFolder::StoreMessage(BFile& file, uint32 fetchFlags, BDataIO& stream,
-	size_t& length, entry_ref& ref)
+IMAPFolder::StoreMessage(uint32 fetchFlags, BDataIO& stream,
+	size_t& length, entry_ref& ref, BFile& file)
 {
 	BPath path;
 	status_t status = path.SetTo(&fRef);
@@ -189,26 +212,11 @@ IMAPFolder::StoreMessage(BFile& file, uint32 fetchFlags, BDataIO& stream,
 	if (status != B_OK)
 		return status;
 
-	char buffer[65535];
-	while (length > 0) {
-		ssize_t bytesRead = stream.Read(buffer,
-			std::min(sizeof(buffer), length));
-		if (bytesRead < 0)
-			return bytesRead;
-		if (bytesRead <= 0)
-			break;
+	status = _WriteStream(file, stream, length);
+	if (status == B_OK)
+		temporaryFile.KeepFile();
 
-		length -= bytesRead;
-
-		ssize_t bytesWritten = file.Write(buffer, bytesRead);
-		if (bytesWritten < 0)
-			return bytesWritten;
-		if (bytesWritten != bytesRead)
-			return B_IO_ERROR;
-	}
-
-	temporaryFile.KeepFile();
-	return B_OK;
+	return status;
 }
 
 
@@ -223,9 +231,12 @@ IMAPFolder::MessageStored(entry_ref& ref, BFile& file, uint32 fetchFlags,
 	if ((fetchFlags & IMAP::kFetchFlags) != 0)
 		_WriteFlags(file, flags);
 
-	// TODO: the call below may move/rename the file
-	fProtocol.MessageStored(ref, file, fetchFlags);
+	// TODO: the call below may move/rename the file - this prevents downloading
+	// the body to the correct file!
+	fProtocol.MessageStored(*this, ref, file, fetchFlags);
 	file.Unset();
+
+	fRefMap.insert(std::make_pair(uid, ref));
 
 	if (uid > fLastUID) {
 		// Update last known UID
@@ -233,10 +244,48 @@ IMAPFolder::MessageStored(entry_ref& ref, BFile& file, uint32 fetchFlags,
 
 		BNode directory(&fRef);
 		status_t status = _WriteUInt32(directory, kLastUIDAttribute, uid);
-		if (status != B_OK)
+		if (status != B_OK) {
 			fprintf(stderr, "IMAP: Could not write last UID for mailbox "
 				"%s: %s\n", fMailboxName.String(), strerror(status));
+		}
 	}
+}
+
+
+/*!	Appends the given \a stream as body to the message file for the
+	specified unique ID. The file will remain open when this method exits
+	without an error.
+
+	\a length will reflect how many bytes are left to read in case there
+	were an error.
+*/
+status_t
+IMAPFolder::StoreBody(uint32 uid, BDataIO& stream, size_t& length,
+	entry_ref& ref, BFile& file)
+{
+	status_t status = GetMessageEntryRef(uid, ref);
+	if (status != B_OK)
+		return status;
+
+	status = file.SetTo(&ref, B_OPEN_AT_END | B_WRITE_ONLY);
+	if (status != B_OK)
+		return status;
+
+	BPath path(&ref);
+	printf("IMAP: write body to %s\n", path.Path());
+
+	return _WriteStream(file, stream, length);
+}
+
+
+/*!	Notifies the protocol that a body has been fetched.
+	This method also closes the \a file passed in.
+*/
+void
+IMAPFolder::BodyStored(entry_ref& ref, BFile& file, uint32 uid)
+{
+	fProtocol.MessageStored(*this, ref, file, IMAP::kFetchBody);
+	file.Unset();
 }
 
 
@@ -246,6 +295,9 @@ IMAPFolder::DeleteMessage(uint32 uid)
 }
 
 
+/*!	Called when the flags of a message changed on the server. This will update
+	the flags for the local file.
+*/
 void
 IMAPFolder::SetMessageFlags(uint32 uid, uint32 flags)
 {
@@ -264,8 +316,8 @@ IMAPFolder::_InitializeFolderState()
 	// Create set of the last known UID state - if an entry is found, it
 	// is being removed from the list. The remaining entries were deleted.
 	std::set<uint32> lastUIDs;
-	UIDToFlagsMap::iterator iterator = fUIDMap.begin();
-	for (; iterator != fUIDMap.end(); iterator++)
+	UIDToFlagsMap::iterator iterator = fFlagsMap.begin();
+	for (; iterator != fFlagsMap.end(); iterator++)
 		lastUIDs.insert(iterator->first);
 
 	BDirectory directory(&fRef);
@@ -286,12 +338,11 @@ IMAPFolder::_InitializeFolderState()
 			// The message is still around
 			lastUIDs.erase(found);
 
-			UIDToFlagsMap::iterator flagsFound = fUIDMap.find(uid);
-			ASSERT(flagsFound != fUIDMap.end());
-			if (flagsFound->second != flags) {
+			uint32 flagsFound = MessageFlags(uid);
+			if (flagsFound != flags) {
 				// Its flags have changed locally, and need to be updated
 				fListener->MessageFlagsChanged(_Token(uid), ref,
-					flagsFound->second, flags);
+					flagsFound, flags);
 			}
 		} else {
 			// This is a new message
@@ -375,4 +426,29 @@ IMAPFolder::_WriteUInt32(BNode& node, const char* attribute, uint32 value)
 		return B_OK;
 
 	return bytesWritten < 0 ? bytesWritten : B_IO_ERROR;
+}
+
+
+status_t
+IMAPFolder::_WriteStream(BFile& file, BDataIO& stream, size_t& length)
+{
+	char buffer[65535];
+	while (length > 0) {
+		ssize_t bytesRead = stream.Read(buffer,
+			std::min(sizeof(buffer), length));
+		if (bytesRead < 0)
+			return bytesRead;
+		if (bytesRead <= 0)
+			break;
+
+		length -= bytesRead;
+
+		ssize_t bytesWritten = file.Write(buffer, bytesRead);
+		if (bytesWritten < 0)
+			return bytesWritten;
+		if (bytesWritten != bytesRead)
+			return B_IO_ERROR;
+	}
+
+	return B_OK;
 }

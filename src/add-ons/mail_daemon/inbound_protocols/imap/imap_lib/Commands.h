@@ -34,12 +34,14 @@ struct MessageEntry {
 typedef std::vector<MessageEntry> MessageEntryList;
 
 enum MessageFlags {
-	kSeen		= 0x01,
-	kAnswered	= 0x02,
-	kFlagged	= 0x04,
-	kDeleted	= 0x08,
-	kDraft		= 0x10
+	kSeen				= 0x01,
+	kAnswered			= 0x02,
+	kFlagged			= 0x04,
+	kDeleted			= 0x08,
+	kDraft				= 0x10,
 	// \Recent doesn't really have any useful meaning, so we just ignore it
+
+	kServerFlagsMask	= 0x0000ffff
 };
 
 

@@ -24,6 +24,11 @@ struct MessageToken {
 	uint32	uid;
 };
 
+// Additional local only message flags
+enum FolderMessageFlags {
+	kPartialMessage = 0x00010000,
+};
+
 
 class FolderListener {
 public:
@@ -51,12 +56,22 @@ public:
 
 			uint32				LastUID() const { return fLastUID; }
 
-			status_t			StoreMessage(BFile& file, uint32 fetchFlags,
-									BDataIO& stream, size_t& length,
-									entry_ref& ref);
+			status_t			GetMessageEntryRef(uint32 uid,
+									entry_ref& ref) const;
+			uint32				MessageFlags(uint32 uid) const;
+
+			status_t			StoreMessage(uint32 fetchFlags, BDataIO& stream,
+									size_t& length, entry_ref& ref,
+									BFile& file);
 			void				MessageStored(entry_ref& ref, BFile& file,
 									uint32 fetchFlags, uint32 uid,
 									uint32 flags);
+
+			status_t			StoreBody(uint32 uid, BDataIO& stream,
+									size_t& length, entry_ref& ref,
+									BFile& file);
+			void				BodyStored(entry_ref& ref, BFile& file,
+									uint32 uid);
 
 			void				DeleteMessage(uint32 uid);
 			void				SetMessageFlags(uint32 uid, uint32 flags);
@@ -75,6 +90,9 @@ private:
 			status_t			_WriteUInt32(BNode& node,
 									const char* attribute, uint32 value);
 
+			status_t			_WriteStream(BFile& file, BDataIO& stream,
+									size_t& length);
+
 private:
 	typedef std::hash_map<uint32, uint32> UIDToFlagsMap;
 	typedef std::hash_map<uint32, entry_ref> UIDToRefMap;
@@ -86,7 +104,7 @@ private:
 			uint32				fLastUID;
 			FolderListener*		fListener;
 			UIDToRefMap			fRefMap;
-			UIDToFlagsMap		fUIDMap;
+			UIDToFlagsMap		fFlagsMap;
 };
 
 

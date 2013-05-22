@@ -123,7 +123,8 @@ IMAPProtocol::WorkerQuit(IMAPConnectionWorker* worker)
 
 
 void
-IMAPProtocol::MessageStored(entry_ref& ref, BFile& stream, uint32 fetchFlags)
+IMAPProtocol::MessageStored(IMAPFolder& folder, entry_ref& ref, BFile& stream,
+	uint32 fetchFlags)
 {
 	if ((fetchFlags & IMAP::kFetchHeader) != 0)
 		NotifyHeaderFetched(ref, &stream);

@@ -24,6 +24,36 @@ IMAPMailbox::~IMAPMailbox()
 }
 
 
+void
+IMAPMailbox::AddMessageEntry(uint32 uid, uint32 flags, uint32 size)
+{
+	fMessageEntries.insert(
+		std::make_pair(uid, MessageFlagsAndSize(flags, size)));
+}
+
+
+uint32
+IMAPMailbox::MessageFlags(uint32 uid) const
+{
+	MessageEntryMap::const_iterator found = fMessageEntries.find(uid);
+	if (found == fMessageEntries.end())
+		return 0;
+
+	return found->second.flags;
+}
+
+
+uint32
+IMAPMailbox::MessageSize(uint32 uid) const
+{
+	MessageEntryMap::const_iterator found = fMessageEntries.find(uid);
+	if (found == fMessageEntries.end())
+		return 0;
+
+	return found->second.size;
+}
+
+
 uint32
 IMAPMailbox::MessageAdded(const MessageToken& fromToken, const entry_ref& ref)
 {

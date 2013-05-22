@@ -34,7 +34,8 @@ public:
 									IMAP::Protocol& protocol, bool idle);
 			void				WorkerQuit(IMAPConnectionWorker* worker);
 
-			void				MessageStored(entry_ref& ref, BFile& stream,
+			void				MessageStored(IMAPFolder& folder,
+									entry_ref& ref, BFile& stream,
 									uint32 fetchFlags);
 
 	virtual	status_t			SyncMessages();
