@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2012, Haiku Inc. All rights reserved.
+ * Copyright 2004-2015, Haiku Inc. All rights reserved.
  * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -79,7 +79,7 @@ BMailSettings::Reload()
 	// Try directories from most specific to least
 	directory_which which[] = {
 		B_USER_SETTINGS_DIRECTORY,
-		B_COMMON_SETTINGS_DIRECTORY};
+		B_SYSTEM_SETTINGS_DIRECTORY};
 	status_t status = B_ENTRY_NOT_FOUND;
 
 	for (size_t i = 0; i < sizeof(which) / sizeof(which[0]); i++) {
@@ -434,7 +434,6 @@ BMailAddOnSettings::Load(const BMessage& message)
 	if (!path.IsAbsolute()) {
 		directory_which which[] = {
 			B_USER_ADDONS_DIRECTORY,
-			B_COMMON_ADDONS_DIRECTORY,
 			B_SYSTEM_ADDONS_DIRECTORY
 		};
 

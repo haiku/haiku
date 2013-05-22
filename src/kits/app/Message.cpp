@@ -3205,39 +3205,6 @@ BMessage::SetString(const char* name, const char* value)
 }
 
 
-const char*
-BMessage::GetString(const char *name, const char *defaultValue) const
-{
-	return GetString(name, 0, defaultValue);
-}
-
-
-const char*
-BMessage::GetString(const char *name, int32 index,
-	const char *defaultValue) const
-{
-	const char* value;
-	if (FindString(name, index, &value) == B_OK)
-		return value;
-
-	return defaultValue;
-}
-
-
-status_t
-BMessage::SetString(const char *name, const BString& value)
-{
-	return SetData(name, B_STRING_TYPE, value.String(), value.Length() + 1);
-}
-
-
-status_t
-BMessage::SetString(const char *name, const char* value)
-{
-	return SetData(name, B_STRING_TYPE, value, strlen(value) + 1);
-}
-
-
 status_t
 BMessage::SetData(const char* name, type_code type, const void* data,
 	ssize_t numBytes)

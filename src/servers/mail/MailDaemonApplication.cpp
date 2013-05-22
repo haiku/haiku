@@ -40,7 +40,12 @@
 #define B_TRANSLATION_CONTEXT "MailDaemon"
 
 
+static const uint32 kMsgStartAutoCheck = 'stAC';
 static const uint32 kMsgAutoCheck = 'moto';
+
+static const bigtime_t kStartAutoCheckDelay = 30000000;
+	// Wait 30 seconds before the first auto check - this usually lets the
+	// boot process settle down, and give the network a chance to come up.
 
 
 struct send_mails_info {
@@ -213,53 +218,20 @@ MailDaemonApplication::ReadyToRun()
 	InstallDeskbarIcon();
 
 	_InitAccounts();
-	_UpdateAutoCheck(fSettingsFile.AutoCheckInterval());
 
-	BVolume volume;
-	BVolumeRoster roster;
+	// Start auto mail check with a delay
+	BMessage startAutoCheck(kMsgStartAutoCheck);
+	BMessageRunner::StartSending(this, &startAutoCheck,
+		kStartAutoCheckDelay, 1);
 
-	fNewMessages = 0;
-
-	while (roster.GetNextVolume(&volume) == B_OK) {
-		BQuery* query = new BQuery;
-
-		query->SetTarget(this);
-		query->SetVolume(&volume);
-		query->PushAttr(B_MAIL_ATTR_STATUS);
-		query->PushString("New");
-		query->PushOp(B_EQ);
-		query->PushAttr("BEOS:TYPE");
-		query->PushString("text/x-email");
-		query->PushOp(B_EQ);
-		query->PushAttr("BEOS:TYPE");
-		query->PushString("text/x-partial-email");
-		query->PushOp(B_EQ);
-		query->PushOp(B_OR);
-		query->PushOp(B_AND);
-		query->Fetch();
-
-		BEntry entry;
-		while (query->GetNextEntry(&entry) == B_OK)
-			fNewMessages++;
-
-		fQueries.AddItem(query);
-	}
-
-	BString string;
-	if (fNewMessages > 0) {
-		BMessageFormat format(B_TRANSLATE(
-			"{0, plural, one{One new message} other{# new messages}}"));
-
-		format.Format(string, fNewMessages);
-	} else
-		string = B_TRANSLATE("No new messages");
+	_InitNewMessagesCount();
 
 	fCentralBeep = false;
 
 	fNotification = new BNotification(B_INFORMATION_NOTIFICATION);
 	fNotification->SetGroup(B_TRANSLATE("Mail status"));
-	fNotification->SetTitle(string);
 	fNotification->SetMessageID("daemon_status");
+	_UpdateNewMessagesNotification();
 
 	app_info info;
 	be_roster->GetAppInfo(B_MAIL_DAEMON_SIGNATURE, &info);
@@ -268,7 +240,7 @@ MailDaemonApplication::ReadyToRun()
 	BIconUtils::GetVectorIcon(&node, "BEOS:ICON", &icon);
 	fNotification->SetIcon(&icon);
 
-	fLEDAnimation = new LEDAnimation;
+	fLEDAnimation = new LEDAnimation();
 	SetPulseRate(1000000);
 }
 
@@ -305,6 +277,10 @@ void
 MailDaemonApplication::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
+		case kMsgStartAutoCheck:
+			_UpdateAutoCheckRunner();
+			break;
+
 		case kMsgAutoCheck:
 			// TODO: check whether internet is up and running!
 			// supposed to fall through
@@ -322,7 +298,7 @@ MailDaemonApplication::MessageReceived(BMessage* msg)
 
 		case kMsgSettingsUpdated:
 			fSettingsFile.Reload();
-			_UpdateAutoCheck(fSettingsFile.AutoCheckInterval());
+			_UpdateAutoCheckRunner();
 			break;
 
 		case kMsgAccountsChanged:
@@ -435,16 +411,8 @@ MailDaemonApplication::MessageReceived(BMessage* msg)
 					break;
 			}
 
-			BString string;
+			_UpdateNewMessagesNotification();
 
-			if (fNewMessages > 0) {
-				static BMessageFormat format(B_TRANSLATE(
-					"{0, plural, one{# new message.} other{# new messages.}}"));
-				format.Format(string, fNewMessages);
-			} else
-				string << B_TRANSLATE("No new messages.");
-
-			fNotification->SetTitle(string.String());
 			if (fNotifyMode != B_MAIL_SHOW_STATUS_WINDOW_NEVER)
 				fNotification->Send();
 			break;
@@ -826,8 +794,60 @@ MailDaemonApplication::_OutboundProtocol(int32 account)
 
 
 void
-MailDaemonApplication::_UpdateAutoCheck(bigtime_t interval)
+MailDaemonApplication::_InitNewMessagesCount()
 {
+	BVolume volume;
+	BVolumeRoster roster;
+
+	fNewMessages = 0;
+
+	while (roster.GetNextVolume(&volume) == B_OK) {
+		BQuery* query = new BQuery;
+
+		query->SetTarget(this);
+		query->SetVolume(&volume);
+		query->PushAttr(B_MAIL_ATTR_STATUS);
+		query->PushString("New");
+		query->PushOp(B_EQ);
+		query->PushAttr("BEOS:TYPE");
+		query->PushString("text/x-email");
+		query->PushOp(B_EQ);
+		query->PushAttr("BEOS:TYPE");
+		query->PushString("text/x-partial-email");
+		query->PushOp(B_EQ);
+		query->PushOp(B_OR);
+		query->PushOp(B_AND);
+		query->Fetch();
+
+		BEntry entry;
+		while (query->GetNextEntry(&entry) == B_OK)
+			fNewMessages++;
+
+		fQueries.AddItem(query);
+	}
+}
+
+
+void
+MailDaemonApplication::_UpdateNewMessagesNotification()
+{
+	BString title;
+	if (fNewMessages > 0) {
+		BMessageFormat format(B_TRANSLATE(
+			"{0, plural, one{One new message} other{# new messages}}"));
+
+		format.Format(title, fNewMessages);
+	} else
+		title = B_TRANSLATE("No new messages");
+
+	fNotification->SetTitle(title.String());
+}
+
+
+void
+MailDaemonApplication::_UpdateAutoCheckRunner()
+{
+	bigtime_t interval = fSettingsFile.AutoCheckInterval();
 	if (interval > 0) {
 		if (fAutoCheckRunner != NULL) {
 			fAutoCheckRunner->SetInterval(interval);

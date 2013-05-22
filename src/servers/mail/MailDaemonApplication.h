@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2013, Haiku, Inc. All rights reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
@@ -78,7 +78,9 @@ private:
 			BInboundMailProtocol* _InboundProtocol(int32 account);
 			BOutboundMailProtocol* _OutboundProtocol(int32 account);
 
-			void				_UpdateAutoCheck(bigtime_t interval);
+			void				_InitNewMessagesCount();
+			void				_UpdateNewMessagesNotification();
+			void				_UpdateAutoCheckRunner();
 
 			void				_AddMessage(send_mails_info& info,
 									const BEntry& entry, const BNode& node);

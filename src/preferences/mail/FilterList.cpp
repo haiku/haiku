@@ -35,7 +35,6 @@ FilterList::Reload()
 	std::set<BString> knownNames;
 
 	directory_which which[] = {B_USER_ADDONS_DIRECTORY,
-		B_COMMON_ADDONS_DIRECTORY,
 		B_SYSTEM_ADDONS_DIRECTORY};
 	for (size_t i = 0; i < sizeof(which) / sizeof(which[0]); i++) {
 		BPath path;
