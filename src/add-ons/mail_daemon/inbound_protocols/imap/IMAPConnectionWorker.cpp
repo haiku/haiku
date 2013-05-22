@@ -89,6 +89,10 @@ public:
 };
 
 
+/*!	All commands that inherit from this class will automatically maintain the
+	worker's fSyncPending member, and will thus prevent syncing more than once
+	concurrently.
+*/
 class SyncCommand : public WorkerCommand {
 };
 
@@ -613,8 +617,19 @@ IMAPConnectionWorker::_Connect()
 	if (fProtocol.IsConnected())
 		return B_OK;
 
-	status_t status = fProtocol.Connect(fSettings.ServerAddress(),
-		fSettings.Username(), fSettings.Password(), fSettings.UseSSL());
+	status_t status;
+	int tries = 6;
+	while (tries-- > 0) {
+		status = fProtocol.Connect(fSettings.ServerAddress(),
+			fSettings.Username(), fSettings.Password(), fSettings.UseSSL());
+		if (status == B_OK)
+			break;
+
+		// Wait for 10 seconds, and try again
+		snooze(10000000);
+	}
+	// TODO: if other workers are connected, but it fails for us, we need to
+	// remove this worker, and reduce the number of concurrent connections
 	if (status != B_OK)
 		return status;
 
