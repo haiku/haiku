@@ -110,7 +110,8 @@ protected:
 			typedef SinglyLinkedList<AttributeHandler> AttributeHandlerList;
 
 protected:
-			template<typename Header, uint32 kMagic, uint16 kVersion>
+			template<typename Header, uint32 kMagic, uint16 kVersion,
+				uint16 kMinorVersion>
 			status_t			Init(int fd, bool keepFD, Header& header,
 									uint32 flags);
 			status_t			InitHeapReader(uint32 compression,
@@ -182,6 +183,7 @@ private:
 			int					fFD;
 			bool				fOwnsFD;
 			uint16				fMinorFormatVersion;
+			uint16				fCurrentMinorFormatVersion;
 
 			PackageFileHeapReader* fRawHeapReader;
 			BAbstractBufferedDataReader* fHeapReader;
@@ -378,7 +380,7 @@ private:
 // #pragma mark - template and inline methods
 
 
-template<typename Header, uint32 kMagic, uint16 kVersion>
+template<typename Header, uint32 kMagic, uint16 kVersion, uint16 kMinorVersion>
 status_t
 ReaderImplBase::Init(int fd, bool keepFD, Header& header, uint32 flags)
 {
@@ -418,6 +420,7 @@ ReaderImplBase::Init(int fd, bool keepFD, Header& header, uint32 flags)
 	}
 
 	fMinorFormatVersion = B_BENDIAN_TO_HOST_INT16(header.minor_version);
+	fCurrentMinorFormatVersion = kMinorVersion;
 
 	// header size
 	uint64 heapOffset = B_BENDIAN_TO_HOST_INT16(header.header_size);

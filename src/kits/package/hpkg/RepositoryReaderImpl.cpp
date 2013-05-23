@@ -73,7 +73,7 @@ RepositoryReaderImpl::Init(int fd, bool keepFD)
 {
 	hpkg_repo_header header;
 	status_t error = inherited::Init<hpkg_repo_header, B_HPKG_REPO_MAGIC,
-		B_HPKG_REPO_VERSION>(fd, keepFD, header, 0);
+		B_HPKG_REPO_VERSION, B_HPKG_REPO_MINOR_VERSION>(fd, keepFD, header, 0);
 	if (error != B_OK)
 		return error;
 

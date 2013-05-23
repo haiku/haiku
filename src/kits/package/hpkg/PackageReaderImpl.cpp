@@ -335,8 +335,8 @@ status_t
 PackageReaderImpl::Init(int fd, bool keepFD, uint32 flags)
 {
 	hpkg_header header;
-	status_t error = inherited::Init<hpkg_header, B_HPKG_MAGIC, B_HPKG_VERSION>(
-		fd, keepFD, header, flags);
+	status_t error = inherited::Init<hpkg_header, B_HPKG_MAGIC, B_HPKG_VERSION,
+		B_HPKG_MINOR_VERSION>(fd, keepFD, header, flags);
 	if (error != B_OK)
 		return error;
 	fHeapSize = UncompressedHeapSize();

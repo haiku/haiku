@@ -33,6 +33,12 @@ namespace BPrivate {
 
 static const size_t kScratchBufferSize = 64 * 1024;
 
+static const uint16 kAttributeTypes[B_HPKG_ATTRIBUTE_ID_ENUM_COUNT] = {
+	#define B_DEFINE_HPKG_ATTRIBUTE(id, type, name, constant)	\
+		B_HPKG_ATTRIBUTE_TYPE_##type,
+	#include <package/hpkg/PackageAttributes.h>
+	#undef B_DEFINE_HPKG_ATTRIBUTE
+};
 
 // #pragma mark - AttributeHandlerContext
 
@@ -1035,18 +1041,26 @@ ReaderImplBase::_ReadAttribute(uint8& _id, AttributeValue& _value,
 			return B_BAD_DATA;
 		}
 
+		// get the ID
+		_id = attribute_tag_id(tag);
+		if (_id < B_HPKG_ATTRIBUTE_ID_ENUM_COUNT) {
+			if (type != kAttributeTypes[_id]) {
+				fErrorOutput->PrintError("Error: Invalid %s section: "
+					"unexpected type %d for attribute id %d (expected %d)!\n",
+					fCurrentSection->name, type, _id, kAttributeTypes[_id]);
+				return B_BAD_DATA;
+			}
+		} else if (fMinorFormatVersion <= fCurrentMinorFormatVersion) {
+			fErrorOutput->PrintError("Error: Invalid %s section: "
+				"attribute id %d not supported!\n", fCurrentSection->name, _id);
+			return B_BAD_DATA;
+		}
+
 		// get the value
 		error = ReadAttributeValue(type, attribute_tag_encoding(tag),
 			_value);
 		if (error != B_OK)
 			return error;
-
-		_id = attribute_tag_id(tag);
-		if (_id >= B_HPKG_ATTRIBUTE_ID_ENUM_COUNT) {
-			fErrorOutput->PrintError("Error: Invalid %s section: "
-				"attribute id %d not supported!\n", fCurrentSection->name, _id);
-			return B_BAD_DATA;
-		}
 	}
 
 	if (_hasChildren != NULL)
