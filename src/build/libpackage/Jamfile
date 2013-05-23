@@ -31,6 +31,7 @@ HPKG_SOURCES =
 	DataWriters.cpp
 	ErrorOutput.cpp
 	FDDataReader.cpp
+	GlobalSettingsFileInfo.cpp
 	HPKGDefs.cpp
 	PackageContentHandler.cpp
 	PackageData.cpp
@@ -50,6 +51,7 @@ HPKG_SOURCES =
 	RepositoryWriter.cpp
 	RepositoryWriterImpl.cpp
 	Strings.cpp
+	UserSettingsFileInfo.cpp
 	WriterImplBase.cpp
 
 	# V1 support

@@ -288,6 +288,28 @@ struct PackageContentListHandler : VersionPolicy::PackageContentHandler {
 				printf("\treplaces: %s\n", value.string);
 				break;
 
+			case B_PACKAGE_INFO_GLOBAL_SETTINGS_FILES:
+				printf("\tglobal settings file: %s",
+					value.globalSettingsFileInfo.path);
+				if (value.globalSettingsFileInfo.updateType
+						< B_SETTINGS_FILE_UPDATE_TYPE_ENUM_COUNT) {
+					printf(" %s\n",
+						BPackageInfo::kSettingsFileUpdateTypes[
+							value.globalSettingsFileInfo.updateType]);
+				} else
+					printf("\n");
+				break;
+
+			case B_PACKAGE_INFO_USER_SETTINGS_FILES:
+				printf("\tuser settings file: %s",
+					value.userSettingsFileInfo.path);
+				if (value.userSettingsFileInfo.templatePath != NULL) {
+					printf(" template %s\n",
+						value.userSettingsFileInfo.templatePath);
+				} else
+					printf("\n");
+				break;
+
 			case B_PACKAGE_INFO_INSTALL_PATH:
 				printf("\tinstall path: %s\n", value.string);
 				break;

@@ -105,6 +105,31 @@ ReaderImplBase::AttributeHandler::Delete(AttributeHandlerContext* context)
 }
 
 
+// #pragma mark - PackageInfoAttributeHandlerBase
+
+
+ReaderImplBase::PackageInfoAttributeHandlerBase
+	::PackageInfoAttributeHandlerBase(
+		BPackageInfoAttributeValue& packageInfoValue)
+	:
+	fPackageInfoValue(packageInfoValue)
+{
+}
+
+
+status_t
+ReaderImplBase::PackageInfoAttributeHandlerBase::Delete(
+	AttributeHandlerContext* context)
+{
+	status_t error = context->packageContentHandler->HandlePackageAttribute(
+		fPackageInfoValue);
+	fPackageInfoValue.Clear();
+
+	delete this;
+	return error;
+}
+
+
 // #pragma mark - PackageVersionAttributeHandler
 
 
@@ -112,7 +137,7 @@ ReaderImplBase::PackageVersionAttributeHandler::PackageVersionAttributeHandler(
 	BPackageInfoAttributeValue& packageInfoValue,
 	BPackageVersionData& versionData, bool notify)
 	:
-	fPackageInfoValue(packageInfoValue),
+	PackageInfoAttributeHandlerBase(packageInfoValue),
 	fPackageVersionData(versionData),
 	fNotify(notify)
 {
@@ -179,7 +204,7 @@ ReaderImplBase::PackageResolvableAttributeHandler
 	::PackageResolvableAttributeHandler(
 		BPackageInfoAttributeValue& packageInfoValue)
 	:
-	fPackageInfoValue(packageInfoValue)
+	PackageInfoAttributeHandlerBase(packageInfoValue)
 {
 }
 
@@ -230,19 +255,6 @@ ReaderImplBase::PackageResolvableAttributeHandler::HandleAttribute(
 }
 
 
-status_t
-ReaderImplBase::PackageResolvableAttributeHandler::Delete(
-	AttributeHandlerContext* context)
-{
-	status_t error = context->packageContentHandler->HandlePackageAttribute(
-		fPackageInfoValue);
-	fPackageInfoValue.Clear();
-
-	delete this;
-	return error;
-}
-
-
 // #pragma mark - PackageResolvableExpressionAttributeHandler
 
 
@@ -250,7 +262,7 @@ ReaderImplBase::PackageResolvableExpressionAttributeHandler
 	::PackageResolvableExpressionAttributeHandler(
 		BPackageInfoAttributeValue& packageInfoValue)
 	:
-	fPackageInfoValue(packageInfoValue)
+	PackageInfoAttributeHandlerBase(packageInfoValue)
 {
 }
 
@@ -303,18 +315,86 @@ ReaderImplBase::PackageResolvableExpressionAttributeHandler::HandleAttribute(
 }
 
 
-status_t
-ReaderImplBase::PackageResolvableExpressionAttributeHandler::Delete(
-	AttributeHandlerContext* context)
-{
-	status_t error = context->packageContentHandler->HandlePackageAttribute(
-		fPackageInfoValue);
-	fPackageInfoValue.Clear();
+// #pragma mark - GlobalSettingsFileInfoAttributeHandler
 
-	delete this;
-	return error;
+
+ReaderImplBase::GlobalSettingsFileInfoAttributeHandler
+	::GlobalSettingsFileInfoAttributeHandler(
+		BPackageInfoAttributeValue& packageInfoValue)
+	:
+	PackageInfoAttributeHandlerBase(packageInfoValue)
+{
 }
 
+
+status_t
+ReaderImplBase::GlobalSettingsFileInfoAttributeHandler::HandleAttribute(
+	AttributeHandlerContext* context, uint8 id, const AttributeValue& value,
+	AttributeHandler** _handler)
+{
+	switch (id) {
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_SETTINGS_FILE_UPDATE_TYPE:
+			if (value.unsignedInt >= B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT) {
+				context->errorOutput->PrintError(
+					"Error: Invalid package attribute section: invalid "
+					"global settings file update type %" B_PRIu64
+					" encountered\n", value.unsignedInt);
+				return B_BAD_DATA;
+			}
+			fPackageInfoValue.globalSettingsFileInfo.updateType
+				= (BSettingsFileUpdateType)value.unsignedInt;
+			break;
+
+		default:
+			if (context->ignoreUnknownAttributes)
+				break;
+
+			context->errorOutput->PrintError("Error: Invalid package "
+				"attribute section: unexpected package attribute id %d "
+				"encountered when parsing global settings file info\n",
+				id);
+			return B_BAD_DATA;
+	}
+
+	return B_OK;
+}
+
+
+// #pragma mark - UserSettingsFileInfoAttributeHandler
+
+
+ReaderImplBase::UserSettingsFileInfoAttributeHandler
+	::UserSettingsFileInfoAttributeHandler(
+		BPackageInfoAttributeValue& packageInfoValue)
+	:
+	PackageInfoAttributeHandlerBase(packageInfoValue)
+{
+}
+
+
+status_t
+ReaderImplBase::UserSettingsFileInfoAttributeHandler::HandleAttribute(
+	AttributeHandlerContext* context, uint8 id, const AttributeValue& value,
+	AttributeHandler** _handler)
+{
+	switch (id) {
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_SETTINGS_FILE_TEMPLATE:
+			fPackageInfoValue.userSettingsFileInfo.templatePath = value.string;
+			break;
+
+		default:
+			if (context->ignoreUnknownAttributes)
+				break;
+
+			context->errorOutput->PrintError("Error: Invalid package "
+				"attribute section: unexpected package attribute id %d "
+				"encountered when parsing user settings file info\n",
+				id);
+			return B_BAD_DATA;
+	}
+
+	return B_OK;
+}
 
 // #pragma mark - PackageAttributeHandler
 
@@ -453,6 +533,34 @@ ReaderImplBase::PackageAttributeHandler::HandleAttribute(
 
 		case B_HPKG_ATTRIBUTE_ID_PACKAGE_INSTALL_PATH:
 			fPackageInfoValue.SetTo(B_PACKAGE_INFO_INSTALL_PATH, value.string);
+			break;
+
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_GLOBAL_SETTINGS_FILE:
+			fPackageInfoValue.globalSettingsFileInfo.path = value.string;
+			fPackageInfoValue.globalSettingsFileInfo.updateType
+				= B_SETTINGS_FILE_UPDATE_TYPE_ENUM_COUNT;
+			fPackageInfoValue.attributeID
+				= B_PACKAGE_INFO_GLOBAL_SETTINGS_FILES;
+			if (_handler != NULL) {
+				*_handler
+					= new(std::nothrow) GlobalSettingsFileInfoAttributeHandler(
+						fPackageInfoValue);
+				if (*_handler == NULL)
+					return B_NO_MEMORY;
+			}
+			break;
+
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_SETTINGS_FILE:
+			fPackageInfoValue.globalSettingsFileInfo.path = value.string;
+			fPackageInfoValue.attributeID
+				= B_PACKAGE_INFO_USER_SETTINGS_FILES;
+			if (_handler != NULL) {
+				*_handler
+					= new(std::nothrow) UserSettingsFileInfoAttributeHandler(
+						fPackageInfoValue);
+				if (*_handler == NULL)
+					return B_NO_MEMORY;
+			}
 			break;
 
 		default:

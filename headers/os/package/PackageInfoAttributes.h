@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc.
+ * Copyright 2011-2013, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PACKAGE__PACKAGE_INFO_ATTRIBUTES_H_
@@ -41,6 +41,10 @@ enum BPackageInfoAttributeID {
 	B_PACKAGE_INFO_INSTALL_PATH, // package install path; only for package
 								// building
 	B_PACKAGE_INFO_BASE_PACKAGE, // name of the base package for this package
+	B_PACKAGE_INFO_GLOBAL_SETTINGS_FILES,
+								// list of global settings file infos
+	B_PACKAGE_INFO_USER_SETTINGS_FILES,
+								// list of user settings file infos
 	//
 	B_PACKAGE_INFO_ENUM_COUNT,
 };

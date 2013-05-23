@@ -11,12 +11,14 @@
 #include <String.h>
 #include <StringList.h>
 
+#include <package/GlobalSettingsFileInfo.h>
 #include <package/PackageArchitecture.h>
 #include <package/PackageFlags.h>
 #include <package/PackageInfoAttributes.h>
 #include <package/PackageResolvable.h>
 #include <package/PackageResolvableExpression.h>
 #include <package/PackageVersion.h>
+#include <package/UserSettingsFileInfo.h>
 
 
 class BEntry;
@@ -79,6 +81,11 @@ public:
 			const BStringList&	URLList() const;
 			const BStringList&	SourceURLList() const;
 
+			const BObjectList<BGlobalSettingsFileInfo>&
+									GlobalSettingsFileInfos() const;
+			const BObjectList<BUserSettingsFileInfo>&
+									UserSettingsFileInfos() const;
+
 			const BObjectList<BPackageResolvable>&	ProvidesList() const;
 			const BObjectList<BPackageResolvableExpression>&
 								RequiresList() const;
@@ -119,6 +126,14 @@ public:
 
 			void				ClearSourceURLList();
 			status_t			AddSourceURL(const BString& url);
+
+			void				ClearGlobalSettingsFileInfos();
+			status_t			AddGlobalSettingsFileInfo(
+									const BGlobalSettingsFileInfo& info);
+
+			void				ClearUserSettingsFileInfos();
+			status_t			AddUserSettingsFileInfo(
+									const BUserSettingsFileInfo& info);
 
 			void				ClearProvidesList();
 			status_t			AddProvides(const BPackageResolvable& provides);
@@ -163,6 +178,7 @@ public:
 public:
 	static	const char*	const	kElementNames[];
 	static	const char*	const	kArchitectureNames[];
+	static	const char* const	kSettingsFileUpdateTypes[];
 
 private:
 			class Parser;
@@ -174,6 +190,11 @@ private:
 			typedef BObjectList<BPackageResolvable> ResolvableList;
 			typedef BObjectList<BPackageResolvableExpression>
 				ResolvableExpressionList;
+
+			typedef BObjectList<BGlobalSettingsFileInfo>
+				GlobalSettingsFileInfoList;
+			typedef BObjectList<BUserSettingsFileInfo>
+				UserSettingsFileInfoList;
 
 private:
 			status_t			_ReadFromPackageFile(
@@ -189,6 +210,15 @@ private:
 									const char* field,
 									const ResolvableExpressionList&
 										expressions);
+	static	status_t			_AddGlobalSettingsFileInfos(BMessage* archive,
+									const char* field,
+									const GlobalSettingsFileInfoList&
+										infos);
+	static	status_t			_AddUserSettingsFileInfos(BMessage* archive,
+									const char* field,
+									const UserSettingsFileInfoList&
+										infos);
+
 	static	status_t			_ExtractVersion(BMessage* archive,
 									const char* field, int32 index,
 									BPackageVersion& _version);
@@ -200,6 +230,12 @@ private:
 	static	status_t			_ExtractResolvableExpressions(BMessage* archive,
 									const char* field,
 									ResolvableExpressionList& _expressions);
+	static	status_t			_ExtractGlobalSettingsFileInfos(
+									BMessage* archive, const char* field,
+									GlobalSettingsFileInfoList& _infos);
+	static	status_t			_ExtractUserSettingsFileInfos(
+									BMessage* archive, const char* field,
+									UserSettingsFileInfoList& _infos);
 
 private:
 			BString				fName;
@@ -219,6 +255,9 @@ private:
 			BStringList			fLicenseList;
 			BStringList			fURLList;
 			BStringList			fSourceURLList;
+
+			BObjectList<BGlobalSettingsFileInfo> fGlobalSettingsFileInfos;
+			BObjectList<BUserSettingsFileInfo> fUserSettingsFileInfos;
 
 			ResolvableList		fProvidesList;
 

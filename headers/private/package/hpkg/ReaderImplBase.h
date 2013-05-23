@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
@@ -97,9 +97,12 @@ protected:
 			class AttributeHandlerContext;
 			class AttributeHandler;
 			class IgnoreAttributeHandler;
+			class PackageInfoAttributeHandlerBase;
 			class PackageVersionAttributeHandler;
 			class PackageResolvableAttributeHandler;
 			class PackageResolvableExpressionAttributeHandler;
+			class GlobalSettingsFileInfoAttributeHandler;
+			class UserSettingsFileInfoAttributeHandler;
 			class PackageAttributeHandler;
 			class LowLevelAttributeHandler;
 
@@ -247,7 +250,22 @@ class ReaderImplBase::IgnoreAttributeHandler : public AttributeHandler {
 };
 
 
-class ReaderImplBase::PackageVersionAttributeHandler : public AttributeHandler {
+class ReaderImplBase::PackageInfoAttributeHandlerBase
+	: public AttributeHandler {
+public:
+								PackageInfoAttributeHandlerBase(
+									BPackageInfoAttributeValue&
+										packageInfoValue);
+
+	virtual	status_t			Delete(AttributeHandlerContext* context);
+
+protected:
+			BPackageInfoAttributeValue& fPackageInfoValue;
+};
+
+
+class ReaderImplBase::PackageVersionAttributeHandler
+	: public PackageInfoAttributeHandlerBase {
 public:
 								PackageVersionAttributeHandler(
 									BPackageInfoAttributeValue&
@@ -263,14 +281,13 @@ public:
 	virtual	status_t			Delete(AttributeHandlerContext* context);
 
 private:
-			BPackageInfoAttributeValue& fPackageInfoValue;
 			BPackageVersionData& fPackageVersionData;
 			bool				fNotify;
 };
 
 
 class ReaderImplBase::PackageResolvableAttributeHandler
-	: public AttributeHandler {
+	: public PackageInfoAttributeHandlerBase {
 public:
 								PackageResolvableAttributeHandler(
 									BPackageInfoAttributeValue&
@@ -280,16 +297,11 @@ public:
 									AttributeHandlerContext* context, uint8 id,
 									const AttributeValue& value,
 									AttributeHandler** _handler);
-
-	virtual	status_t			Delete(AttributeHandlerContext* context);
-
-private:
-			BPackageInfoAttributeValue& fPackageInfoValue;
 };
 
 
 class ReaderImplBase::PackageResolvableExpressionAttributeHandler
-	: public AttributeHandler {
+	: public PackageInfoAttributeHandlerBase {
 public:
 								PackageResolvableExpressionAttributeHandler(
 									BPackageInfoAttributeValue&
@@ -299,11 +311,34 @@ public:
 									AttributeHandlerContext* context, uint8 id,
 									const AttributeValue& value,
 									AttributeHandler** _handler);
+};
 
-	virtual	status_t			Delete(AttributeHandlerContext* context);
 
-private:
-			BPackageInfoAttributeValue& fPackageInfoValue;
+class ReaderImplBase::GlobalSettingsFileInfoAttributeHandler
+	: public PackageInfoAttributeHandlerBase {
+public:
+								GlobalSettingsFileInfoAttributeHandler(
+									BPackageInfoAttributeValue&
+										packageInfoValue);
+
+	virtual	status_t			HandleAttribute(
+									AttributeHandlerContext* context, uint8 id,
+									const AttributeValue& value,
+									AttributeHandler** _handler);
+};
+
+
+class ReaderImplBase::UserSettingsFileInfoAttributeHandler
+	: public PackageInfoAttributeHandlerBase {
+public:
+								UserSettingsFileInfoAttributeHandler(
+									BPackageInfoAttributeValue&
+										packageInfoValue);
+
+	virtual	status_t			HandleAttribute(
+									AttributeHandlerContext* context, uint8 id,
+									const AttributeValue& value,
+									AttributeHandler** _handler);
 };
 
 

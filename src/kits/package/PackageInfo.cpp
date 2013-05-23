@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <algorithm>
 #include <new>
 
 #include <File.h>
@@ -108,6 +109,10 @@ private:
 									BObjectList<BPackageResolvableExpression>*
 										value,
 									BString* _basePackage = NULL);
+			void				_ParseGlobalSettingsFileInfos(
+									GlobalSettingsFileInfoList* infos);
+			void				_ParseUserSettingsFileInfos(
+									UserSettingsFileInfoList* infos);
 
 			void				_Parse(BPackageInfo* packageInfo);
 
@@ -757,6 +762,119 @@ BPackageInfo::Parser::_ParseResolvableExprList(
 
 
 void
+BPackageInfo::Parser::_ParseGlobalSettingsFileInfos(
+	GlobalSettingsFileInfoList* infos)
+{
+	struct GlobalSettingsFileInfoParser : public ListElementParser {
+		Parser& parser;
+		GlobalSettingsFileInfoList* infos;
+
+		GlobalSettingsFileInfoParser(Parser& parser,
+			GlobalSettingsFileInfoList* infos)
+			:
+			parser(parser),
+			infos(infos)
+		{
+		}
+
+		virtual void operator()(const Token& token)
+		{
+			if (token.type != TOKEN_WORD && token.type != TOKEN_QUOTED_STRING) {
+				throw ParseError("expected string (a settings file path)",
+					token.pos);
+			}
+
+			BSettingsFileUpdateType updateType
+				= B_SETTINGS_FILE_UPDATE_TYPE_ENUM_COUNT;
+
+			Token nextToken = parser._NextToken();
+			if (nextToken.type == TOKEN_WORD) {
+				const char* const* end = kSettingsFileUpdateTypes
+					+ B_SETTINGS_FILE_UPDATE_TYPE_ENUM_COUNT;
+				const char* const* found = std::find(kSettingsFileUpdateTypes,
+					end, nextToken.text);
+				if (found == end) {
+					throw ParseError(BString("expected an update type"),
+						nextToken.pos);
+				}
+				updateType = (BSettingsFileUpdateType)(
+					found - kSettingsFileUpdateTypes);
+			} else if (nextToken.type == TOKEN_ITEM_SEPARATOR
+				|| nextToken.type == TOKEN_CLOSE_BRACE) {
+				parser._RewindTo(nextToken);
+			} else {
+				throw ParseError(
+					"expected 'included', semicolon, new line or '}'",
+					nextToken.pos);
+			}
+
+			if (!infos->AddItem(new BGlobalSettingsFileInfo(token.text,
+					updateType))) {
+				throw std::bad_alloc();
+			}
+		}
+	} resolvableExpressionParser(*this, infos);
+
+	_ParseList(resolvableExpressionParser, false);
+}
+
+
+void
+BPackageInfo::Parser::_ParseUserSettingsFileInfos(
+	UserSettingsFileInfoList* infos)
+{
+	struct UserSettingsFileInfoParser : public ListElementParser {
+		Parser& parser;
+		UserSettingsFileInfoList* infos;
+
+		UserSettingsFileInfoParser(Parser& parser,
+			UserSettingsFileInfoList* infos)
+			:
+			parser(parser),
+			infos(infos)
+		{
+		}
+
+		virtual void operator()(const Token& token)
+		{
+			if (token.type != TOKEN_WORD && token.type != TOKEN_QUOTED_STRING) {
+				throw ParseError("expected string (a settings file path)",
+					token.pos);
+			}
+
+			BString templatePath;
+
+			Token nextToken = parser._NextToken();
+			if (nextToken.type == TOKEN_WORD && nextToken.text == "template") {
+				nextToken = parser._NextToken();
+				if (nextToken.type != TOKEN_WORD
+					&& nextToken.type != TOKEN_QUOTED_STRING) {
+					throw ParseError(
+						"expected string (a settings template file path)",
+						nextToken.pos);
+				}
+				templatePath = nextToken.text;
+			} else if (nextToken.type == TOKEN_ITEM_SEPARATOR
+				|| nextToken.type == TOKEN_CLOSE_BRACE) {
+				parser._RewindTo(nextToken);
+			} else {
+				throw ParseError(
+					"expected 'template', semicolon, new line or '}'",
+					nextToken.pos);
+			}
+
+			if (!infos->AddItem(new BUserSettingsFileInfo(token.text,
+					templatePath))) {
+				throw std::bad_alloc();
+			}
+		}
+	} resolvableExpressionParser(*this, infos);
+
+	_ParseList(resolvableExpressionParser, false);
+}
+
+
+void
 BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 {
 	bool seen[B_PACKAGE_INFO_ENUM_COUNT];
@@ -855,6 +973,16 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 
 			case B_PACKAGE_INFO_SOURCE_URLS:
 				_ParseStringList(&packageInfo->fSourceURLList);
+				break;
+
+			case B_PACKAGE_INFO_GLOBAL_SETTINGS_FILES:
+				_ParseGlobalSettingsFileInfos(
+					&packageInfo->fGlobalSettingsFileInfos);
+				break;
+
+			case B_PACKAGE_INFO_USER_SETTINGS_FILES:
+				_ParseUserSettingsFileInfos(
+					&packageInfo->fUserSettingsFileInfos);
 				break;
 
 			case B_PACKAGE_INFO_PROVIDES:
@@ -987,6 +1115,9 @@ const char* const BPackageInfo::kElementNames[B_PACKAGE_INFO_ENUM_COUNT] = {
 	"source-urls",
 	"checksum",		// not being parsed, computed externally
 	NULL,			// install-path -- not settable via .PackageInfo
+	"base-package",
+	"global-settings-files",
+	"user-settings-files",
 };
 
 
@@ -996,6 +1127,14 @@ BPackageInfo::kArchitectureNames[B_PACKAGE_ARCHITECTURE_ENUM_COUNT] = {
 	"x86",
 	"x86_gcc2",
 	"source",
+};
+
+
+const char* const BPackageInfo::kSettingsFileUpdateTypes[
+		B_SETTINGS_FILE_UPDATE_TYPE_ENUM_COUNT] = {
+	"keep-old",
+	"manual",
+	"auto-merge",
 };
 
 
@@ -1119,26 +1258,46 @@ private:
 
 		int32 count = value.CountItems();
 		if (count == 1) {
-			_Write(value.ItemAt(0)->ToString());
-			if (!fBasePackage.IsEmpty()
-				&& value.ItemAt(0)->Name() == fBasePackage) {
-				_Write(" base");
-			}
+			_WriteListElement(value.ItemAt(0));
 		} else {
 			_Write("{\n", 2);
 
 			int32 count = value.CountItems();
 			for (int32 i = 0; i < count; i++) {
 				_Write('\t');
-				_Write(value.ItemAt(i)->ToString());
-				if (!fBasePackage.IsEmpty()
-					&& value.ItemAt(i)->Name() == fBasePackage) {
-					_Write(" base");
-				}
+				_WriteListElement(value.ItemAt(i));
 				_Write('\n');
 			}
 
 			_Write('}');
+		}
+	}
+
+	template<typename Value>
+	void _WriteListElement(const Value* value)
+	{
+		_Write(value->ToString());
+		if (!fBasePackage.IsEmpty()
+			&& value->Name() == fBasePackage) {
+			_Write(" base");
+		}
+	}
+
+	void _WriteListElement(const BGlobalSettingsFileInfo* value)
+	{
+		_WriteMaybeQuoted(value->Path());
+		if (value->IsIncluded()) {
+			_Write(' ');
+			_Write(kSettingsFileUpdateTypes[value->UpdateType()]);
+		}
+	}
+
+	void _WriteListElement(const BUserSettingsFileInfo* value)
+	{
+		_WriteMaybeQuoted(value->Path());
+		if (!value->TemplatePath().IsEmpty()) {
+			_Write(" template ");
+			_WriteMaybeQuoted(value->TemplatePath());
 		}
 	}
 
@@ -1342,6 +1501,8 @@ BPackageInfo::BPackageInfo()
 	fLicenseList(5),
 	fURLList(5),
 	fSourceURLList(5),
+	fGlobalSettingsFileInfos(5, true),
+	fUserSettingsFileInfos(5, true),
 	fProvidesList(20, true),
 	fRequiresList(20, true),
 	fSupplementsList(20, true),
@@ -1361,6 +1522,8 @@ BPackageInfo::BPackageInfo(BMessage* archive, status_t* _error)
 	fLicenseList(5),
 	fURLList(5),
 	fSourceURLList(5),
+	fGlobalSettingsFileInfos(5, true),
+	fUserSettingsFileInfos(5, true),
 	fProvidesList(20, true),
 	fRequiresList(20, true),
 	fSupplementsList(20, true),
@@ -1386,6 +1549,10 @@ BPackageInfo::BPackageInfo(BMessage* archive, status_t* _error)
 		&& (error = _ExtractStringList(archive, "urls", fURLList)) == B_OK
 		&& (error = _ExtractStringList(archive, "source-urls", fSourceURLList))
 			== B_OK
+		&& (error = _ExtractGlobalSettingsFileInfos(archive,
+			"global-settings-files", fGlobalSettingsFileInfos)) == B_OK
+		&& (error = _ExtractUserSettingsFileInfos(archive, "user-settings-files",
+			fUserSettingsFileInfos)) == B_OK
 		&& (error = _ExtractResolvables(archive, "provides", fProvidesList))
 			== B_OK
 		&& (error = _ExtractResolvableExpressions(archive, "requires",
@@ -1605,6 +1772,20 @@ BPackageInfo::SourceURLList() const
 }
 
 
+const BObjectList<BGlobalSettingsFileInfo>&
+BPackageInfo::GlobalSettingsFileInfos() const
+{
+	return fGlobalSettingsFileInfos;
+}
+
+
+const BObjectList<BUserSettingsFileInfo>&
+BPackageInfo::UserSettingsFileInfos() const
+{
+	return fUserSettingsFileInfos;
+}
+
+
 const BObjectList<BPackageResolvable>&
 BPackageInfo::ProvidesList() const
 {
@@ -1785,6 +1966,48 @@ BPackageInfo::ClearSourceURLList()
 }
 
 
+void
+BPackageInfo::ClearGlobalSettingsFileInfos()
+{
+	fGlobalSettingsFileInfos.MakeEmpty();
+}
+
+
+status_t
+BPackageInfo::AddGlobalSettingsFileInfo(const BGlobalSettingsFileInfo& info)
+{
+	BGlobalSettingsFileInfo* newInfo
+		= new (std::nothrow) BGlobalSettingsFileInfo(info);
+	if (newInfo == NULL || !fGlobalSettingsFileInfos.AddItem(newInfo)) {
+		delete newInfo;
+		return B_NO_MEMORY;
+	}
+
+	return B_OK;
+}
+
+
+void
+BPackageInfo::ClearUserSettingsFileInfos()
+{
+	fUserSettingsFileInfos.MakeEmpty();
+}
+
+
+status_t
+BPackageInfo::AddUserSettingsFileInfo(const BUserSettingsFileInfo& info)
+{
+	BUserSettingsFileInfo* newInfo
+		= new (std::nothrow) BUserSettingsFileInfo(info);
+	if (newInfo == NULL || !fUserSettingsFileInfos.AddItem(newInfo)) {
+		delete newInfo;
+		return B_NO_MEMORY;
+	}
+
+	return B_OK;
+}
+
+
 status_t
 BPackageInfo::AddSourceURL(const BString& url)
 {
@@ -1919,6 +2142,8 @@ BPackageInfo::Clear()
 	fLicenseList.MakeEmpty();
 	fURLList.MakeEmpty();
 	fSourceURLList.MakeEmpty();
+	fGlobalSettingsFileInfos.MakeEmpty();
+	fUserSettingsFileInfos.MakeEmpty();
 	fRequiresList.MakeEmpty();
 	fProvidesList.MakeEmpty();
 	fSupplementsList.MakeEmpty();
@@ -1950,6 +2175,10 @@ BPackageInfo::Archive(BMessage* archive, bool deep) const
 		|| (error = archive->AddStrings("urls", fURLList)) != B_OK
 		|| (error = archive->AddStrings("source-urls", fSourceURLList))
 			!= B_OK
+		|| (error = _AddGlobalSettingsFileInfos(archive,
+			"global-settings-files", fGlobalSettingsFileInfos)) != B_OK
+		|| (error = _AddUserSettingsFileInfos(archive,
+			"user-settings-files", fUserSettingsFileInfos)) != B_OK
 		|| (error = _AddResolvables(archive, "provides", fProvidesList)) != B_OK
 		|| (error = _AddResolvableExpressions(archive, "requires",
 			fRequiresList)) != B_OK
@@ -1993,6 +2222,8 @@ BPackageInfo::GetConfigString(BString& _string) const
 		.Write("licenses", fLicenseList)
 		.Write("urls", fURLList)
 		.Write("source-urls", fSourceURLList)
+		.Write("global-settings-files", fGlobalSettingsFileInfos)
+		.Write("user-settings-files", fUserSettingsFileInfos)
 		.Write("provides", fProvidesList)
 		.BeginRequires(fBasePackage)
 			.Write("requires", fRequiresList)
@@ -2188,6 +2419,60 @@ BPackageInfo::_AddResolvableExpressions(BMessage* archive, const char* field,
 
 
 /*static*/ status_t
+BPackageInfo::_AddGlobalSettingsFileInfos(BMessage* archive, const char* field,
+	const GlobalSettingsFileInfoList& infos)
+{
+	// construct the field names we need
+	FieldName pathField(field, ":path");
+	FieldName updateTypeField(field, ":version");
+
+	if (!pathField.IsValid() || !updateTypeField.IsValid())
+		return B_BAD_VALUE;
+
+	// add fields
+	int32 count = infos.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		const BGlobalSettingsFileInfo* info = infos.ItemAt(i);
+		status_t error;
+		if ((error = archive->AddString(pathField, info->Path())) != B_OK
+			|| (error = archive->AddInt32(updateTypeField, info->UpdateType()))
+				!= B_OK) {
+			return error;
+		}
+	}
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
+BPackageInfo::_AddUserSettingsFileInfos(BMessage* archive, const char* field,
+	const UserSettingsFileInfoList& infos)
+{
+	// construct the field names we need
+	FieldName pathField(field, ":path");
+	FieldName templatePathField(field, ":templatePath");
+
+	if (!pathField.IsValid() || !templatePathField.IsValid())
+		return B_BAD_VALUE;
+
+	// add fields
+	int32 count = infos.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		const BUserSettingsFileInfo* info = infos.ItemAt(i);
+		status_t error;
+		if ((error = archive->AddString(pathField, info->Path())) != B_OK
+			|| (error = archive->AddString(templatePathField,
+				info->TemplatePath())) != B_OK) {
+			return error;
+		}
+	}
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
 BPackageInfo::_ExtractVersion(BMessage* archive, const char* field, int32 index,
 	BPackageVersion& _version)
 {
@@ -2354,6 +2639,97 @@ BPackageInfo::_ExtractResolvableExpressions(BMessage* archive,
 				(BPackageResolvableOperator)operatorType, version);
 		if (expression == NULL || !_expressions.AddItem(expression)) {
 			delete expression;
+			return B_NO_MEMORY;
+		}
+	}
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
+BPackageInfo::_ExtractGlobalSettingsFileInfos(BMessage* archive,
+	const char* field, GlobalSettingsFileInfoList& _infos)
+{
+	// construct the field names we need
+	FieldName pathField(field, ":path");
+	FieldName updateTypeField(field, ":version");
+
+	if (!pathField.IsValid() || !updateTypeField.IsValid())
+		return B_BAD_VALUE;
+
+	// get the number of items
+	type_code type;
+	int32 count;
+	if (archive->GetInfo(pathField, &type, &count) != B_OK) {
+		// the field is missing
+		return B_OK;
+	}
+
+	// extract fields
+	for (int32 i = 0; i < count; i++) {
+		BString path;
+		status_t error = archive->FindString(pathField, i, &path);
+		if (error != B_OK)
+			return error;
+
+		int32 updateType;
+		error = archive->FindInt32(updateTypeField, i, &updateType);
+		if (error != B_OK)
+			return error;
+		if (updateType < 0
+			|| updateType > B_SETTINGS_FILE_UPDATE_TYPE_ENUM_COUNT) {
+			return B_BAD_DATA;
+		}
+
+		BGlobalSettingsFileInfo* info
+			= new(std::nothrow) BGlobalSettingsFileInfo(path,
+				(BSettingsFileUpdateType)updateType);
+		if (info == NULL || !_infos.AddItem(info)) {
+			delete info;
+			return B_NO_MEMORY;
+		}
+	}
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
+BPackageInfo::_ExtractUserSettingsFileInfos(BMessage* archive,
+	const char* field, UserSettingsFileInfoList& _infos)
+{
+	// construct the field names we need
+	FieldName pathField(field, ":path");
+	FieldName templatePathField(field, ":templatePath");
+
+	if (!pathField.IsValid() || !templatePathField.IsValid())
+		return B_BAD_VALUE;
+
+	// get the number of items
+	type_code type;
+	int32 count;
+	if (archive->GetInfo(pathField, &type, &count) != B_OK) {
+		// the field is missing
+		return B_OK;
+	}
+
+	// extract fields
+	for (int32 i = 0; i < count; i++) {
+		BString path;
+		status_t error = archive->FindString(pathField, i, &path);
+		if (error != B_OK)
+			return error;
+
+		BString templatePath;
+		error = archive->FindString(templatePathField, i, &templatePath);
+		if (error != B_OK)
+			return error;
+
+		BUserSettingsFileInfo* info
+			= new(std::nothrow) BUserSettingsFileInfo(path, templatePath);
+		if (info == NULL || !_infos.AddItem(info)) {
+			delete info;
 			return B_NO_MEMORY;
 		}
 	}

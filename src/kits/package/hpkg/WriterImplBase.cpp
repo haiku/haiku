@@ -435,6 +435,51 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 		attributeList.Add(replaces);
 	}
 
+	// global settings file info list
+	const BObjectList<BGlobalSettingsFileInfo>& globalSettingsFileInfos
+		= packageInfo.GlobalSettingsFileInfos();
+	for (int32 i = 0; i < globalSettingsFileInfos.CountItems(); ++i) {
+		BGlobalSettingsFileInfo* info = globalSettingsFileInfos.ItemAt(i);
+		PackageAttribute* attribute = new PackageAttribute(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_GLOBAL_SETTINGS_FILE,
+			B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+		attribute->string = fPackageStringCache.Get(info->Path());
+		attributeList.Add(attribute);
+
+		if (info->IsIncluded()) {
+			PackageAttribute* updateTypeAttribute = new PackageAttribute(
+				B_HPKG_ATTRIBUTE_ID_PACKAGE_SETTINGS_FILE_UPDATE_TYPE,
+				B_HPKG_ATTRIBUTE_TYPE_UINT,
+				B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
+			updateTypeAttribute->unsignedInt = info->UpdateType();
+			attribute->children.Add(updateTypeAttribute);
+		}
+	}
+
+	// user settings file info list
+	const BObjectList<BUserSettingsFileInfo>& userSettingsFileInfos
+		= packageInfo.UserSettingsFileInfos();
+	for (int32 i = 0; i < userSettingsFileInfos.CountItems(); ++i) {
+		BUserSettingsFileInfo* info = userSettingsFileInfos.ItemAt(i);
+		PackageAttribute* attribute = new PackageAttribute(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_SETTINGS_FILE,
+			B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+		attribute->string = fPackageStringCache.Get(info->Path());
+		attributeList.Add(attribute);
+
+		if (!info->TemplatePath().IsEmpty()) {
+			PackageAttribute* templatePathAttribute = new PackageAttribute(
+				B_HPKG_ATTRIBUTE_ID_PACKAGE_SETTINGS_FILE_TEMPLATE,
+				B_HPKG_ATTRIBUTE_TYPE_STRING,
+				B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+			templatePathAttribute->string
+				= fPackageStringCache.Get(info->TemplatePath());
+			attribute->children.Add(templatePathAttribute);
+		}
+	}
+
 	// checksum (optional, only exists in repositories)
 	if (packageInfo.Checksum().Length() > 0) {
 		PackageAttribute* checksum = new PackageAttribute(
