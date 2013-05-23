@@ -291,7 +291,7 @@ PackageFileHeapWriter::RemoveDataRanges(
 	if (rangeCount == 0)
 		return;
 
-	if (fOffsets.IsEmpty()) {
+	if (fUncompressedHeapSize == 0) {
 		fErrorOutput->PrintError("Can't remove ranges from empty heap\n");
 		throw status_t(B_BAD_VALUE);
 	}
