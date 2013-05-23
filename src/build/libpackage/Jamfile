@@ -92,6 +92,7 @@ BuildPlatformSharedLibrary libpackage_build.so
 	JobQueue.cpp
 	PackageInfo.cpp
 	PackageInfoContentHandler.cpp
+	PackageInfoParser.cpp
 	PackageInfoSet.cpp
 	PackageResolvable.cpp
 	PackageResolvableExpression.cpp
