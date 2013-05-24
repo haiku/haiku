@@ -43,20 +43,28 @@ BPackageInfo::Parser::Parse(const BString& packageInfoString,
 		if (fListener != NULL) {
 			// map error position to line and column
 			int line = 1;
-			int column;
+			int inLineOffset;
 			int32 offset = error.pos - packageInfoString.String();
 			int32 newlinePos = packageInfoString.FindLast('\n', offset - 1);
 			if (newlinePos < 0)
-				column = offset;
+				inLineOffset = offset;
 			else {
-				column = offset - newlinePos;
+				inLineOffset = offset - newlinePos - 1;
 				do {
 					line++;
 					newlinePos = packageInfoString.FindLast('\n',
 						newlinePos - 1);
 				} while (newlinePos >= 0);
 			}
-			fListener->OnError(error.message, line, column);
+
+			int column = 0;
+			for (int i = 0; i < inLineOffset; i++) {
+				column++;
+				if (error.pos[i - inLineOffset] == '\t')
+					column = (column + 3) / 4 * 4;
+			}
+
+			fListener->OnError(error.message, line, column + 1);
 		}
 		return B_BAD_DATA;
 	} catch (const std::bad_alloc& e) {
