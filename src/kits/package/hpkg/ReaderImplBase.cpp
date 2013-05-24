@@ -557,7 +557,7 @@ ReaderImplBase::PackageAttributeHandler::HandleAttribute(
 			break;
 
 		case B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_SETTINGS_FILE:
-			fPackageInfoValue.globalSettingsFileInfo.path = value.string;
+			fPackageInfoValue.userSettingsFileInfo.path = value.string;
 			fPackageInfoValue.attributeID
 				= B_PACKAGE_INFO_USER_SETTINGS_FILES;
 			if (_handler != NULL) {
