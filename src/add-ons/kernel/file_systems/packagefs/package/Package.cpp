@@ -716,7 +716,6 @@ struct Package::CachingPackageReader : public PackageReaderImpl {
 
 	~CachingPackageReader()
 	{
-		delete fCachedHeapReader;
 	}
 
 	virtual status_t CreateCachedHeapReader(
