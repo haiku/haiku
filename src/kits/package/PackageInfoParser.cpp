@@ -105,15 +105,20 @@ BPackageInfo::Parser::ParseVersion(const BString& versionString,
 BPackageInfo::Parser::Token
 BPackageInfo::Parser::_NextToken()
 {
-	// Eat any whitespace or comments. Also eat ';' -- they have the same
-	// function as newlines. We remember the last encountered ';' or '\n' and
-	// return it as a token afterwards.
+	// Eat any whitespace, comments, or escaped new lines. Also eat ';' -- they
+	// have the same function as newlines. We remember the last encountered ';'
+	// or '\n' and return it as a token afterwards.
 	const char* itemSeparatorPos = NULL;
 	bool inComment = false;
 	while ((inComment && *fPos != '\0') || isspace(*fPos) || *fPos == ';'
-		|| *fPos == '#') {
+		|| *fPos == '#' || *fPos == '\\') {
 		if (*fPos == '#') {
 			inComment = true;
+		} else if (!inComment && *fPos == '\\') {
+			if (fPos[1] != '\n')
+				break;
+			// ignore escaped line breaks
+			fPos++;
 		} else if (*fPos == '\n') {
 			itemSeparatorPos = fPos;
 			inComment = false;
