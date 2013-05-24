@@ -175,6 +175,37 @@ private:
 		}
 	}
 
+	void _WriteListElement(const BUser* value)
+	{
+		_WriteMaybeQuoted(value->Name());
+
+		if (!value->RealName().IsEmpty()) {
+			_Write(" real-name ");
+			_WriteMaybeQuoted(value->RealName());
+		}
+
+		if (!value->Home().IsEmpty()) {
+			_Write(" home ");
+			_WriteMaybeQuoted(value->Home());
+		}
+
+		if (!value->Shell().IsEmpty()) {
+			_Write(" shell ");
+			_WriteMaybeQuoted(value->Shell());
+		}
+
+		if (!value->Groups().IsEmpty()) {
+			_Write(" groups ");
+			BString groups = value->Groups().Join(" ");
+			if (groups.IsEmpty()) {
+				if (fError == B_OK)
+					fError = B_NO_MEMORY;
+				return;
+			}
+			_Write(groups);
+		}
+	}
+
 	static inline bool _IsValueEmpty(const char* value)
 	{
 		return value[0] == '\0';

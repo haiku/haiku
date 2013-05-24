@@ -163,6 +163,12 @@ private:
 		= B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MAJOR;
 
 private:
+			PackageAttribute*	_AddStringAttribute(BHPKGAttributeID id,
+									const BString& value,
+									DoublyLinkedList<PackageAttribute>& list);
+	inline	PackageAttribute*	_AddStringAttributeIfNotEmpty(
+									BHPKGAttributeID id, const BString& value,
+									DoublyLinkedList<PackageAttribute>& list);
 			void				_WritePackageAttributes(
 									const PackageAttributeList& attributes);
 
@@ -249,6 +255,16 @@ inline void
 WriterImplBase::SetFinished(bool finished)
 {
 	fFinished = finished;
+}
+
+
+inline WriterImplBase::PackageAttribute*
+WriterImplBase::_AddStringAttributeIfNotEmpty(BHPKGAttributeID id,
+	const BString& value, DoublyLinkedList<PackageAttribute>& list)
+{
+	if (value.IsEmpty())
+		return NULL;
+	return _AddStringAttribute(id, value, list);
 }
 
 

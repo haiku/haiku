@@ -1,5 +1,6 @@
 /*
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
+ * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -52,6 +53,8 @@ const char* const BPackageInfo::kElementNames[B_PACKAGE_INFO_ENUM_COUNT] = {
 	"base-package",
 	"global-settings-files",
 	"user-settings-files",
+	"users",
+	"groups"
 };
 
 
@@ -160,18 +163,20 @@ BPackageInfo::BPackageInfo()
 	BArchivable(),
 	fFlags(0),
 	fArchitecture(B_PACKAGE_ARCHITECTURE_ENUM_COUNT),
-	fCopyrightList(5),
-	fLicenseList(5),
-	fURLList(5),
-	fSourceURLList(5),
-	fGlobalSettingsFileInfos(5, true),
-	fUserSettingsFileInfos(5, true),
+	fCopyrightList(4),
+	fLicenseList(4),
+	fURLList(4),
+	fSourceURLList(4),
+	fGlobalSettingsFileInfos(4, true),
+	fUserSettingsFileInfos(4, true),
+	fUsers(4, true),
+	fGroups(4),
 	fProvidesList(20, true),
 	fRequiresList(20, true),
 	fSupplementsList(20, true),
-	fConflictsList(5, true),
-	fFreshensList(5, true),
-	fReplacesList(5)
+	fConflictsList(4, true),
+	fFreshensList(4, true),
+	fReplacesList(4)
 {
 }
 
@@ -181,18 +186,20 @@ BPackageInfo::BPackageInfo(BMessage* archive, status_t* _error)
 	BArchivable(archive),
 	fFlags(0),
 	fArchitecture(B_PACKAGE_ARCHITECTURE_ENUM_COUNT),
-	fCopyrightList(5),
-	fLicenseList(5),
-	fURLList(5),
-	fSourceURLList(5),
-	fGlobalSettingsFileInfos(5, true),
-	fUserSettingsFileInfos(5, true),
+	fCopyrightList(4),
+	fLicenseList(4),
+	fURLList(4),
+	fSourceURLList(4),
+	fGlobalSettingsFileInfos(4, true),
+	fUserSettingsFileInfos(4, true),
+	fUsers(4, true),
+	fGroups(4),
 	fProvidesList(20, true),
 	fRequiresList(20, true),
 	fSupplementsList(20, true),
-	fConflictsList(5, true),
-	fFreshensList(5, true),
-	fReplacesList(5)
+	fConflictsList(4, true),
+	fFreshensList(4, true),
+	fReplacesList(4)
 {
 	status_t error;
 	int32 architecture;
@@ -216,6 +223,8 @@ BPackageInfo::BPackageInfo(BMessage* archive, status_t* _error)
 			"global-settings-files", fGlobalSettingsFileInfos)) == B_OK
 		&& (error = _ExtractUserSettingsFileInfos(archive, "user-settings-files",
 			fUserSettingsFileInfos)) == B_OK
+		&& (error = _ExtractUsers(archive, "users", fUsers)) == B_OK
+		&& (error = _ExtractStringList(archive, "groups", fGroups)) == B_OK
 		&& (error = _ExtractResolvables(archive, "provides", fProvidesList))
 			== B_OK
 		&& (error = _ExtractResolvableExpressions(archive, "requires",
@@ -325,6 +334,50 @@ BPackageInfo::InitCheck() const
 		|| fCopyrightList.IsEmpty() || fLicenseList.IsEmpty()
 		|| fProvidesList.IsEmpty())
 		return B_NO_INIT;
+
+	// check global settings files
+	int32 globalSettingsFileCount = fGlobalSettingsFileInfos.CountItems();
+	for (int32 i = 0; i < globalSettingsFileCount; i++) {
+		const BGlobalSettingsFileInfo* info
+			= fGlobalSettingsFileInfos.ItemAt(i);
+		status_t error = info->InitCheck();
+		if (error != B_OK)
+			return error;
+	}
+
+	// check user settings files
+	int32 userSettingsFileCount = fUserSettingsFileInfos.CountItems();
+	for (int32 i = 0; i < userSettingsFileCount; i++) {
+		const BUserSettingsFileInfo* info = fUserSettingsFileInfos.ItemAt(i);
+		status_t error = info->InitCheck();
+		if (error != B_OK)
+			return error;
+	}
+
+	// check users
+	int32 userCount = fUsers.CountItems();
+	for (int32 i = 0; i < userCount; i++) {
+		const BUser* user = fUsers.ItemAt(i);
+		status_t error = user->InitCheck();
+		if (error != B_OK)
+			return B_NO_INIT;
+
+		// make sure the user's groups are specified as groups
+		const BStringList& userGroups = user->Groups();
+		int32 groupCount = userGroups.CountStrings();
+		for (int32 k = 0; k < groupCount; k++) {
+			const BString& group = userGroups.StringAt(k);
+			if (!fGroups.HasString(group))
+				return B_BAD_VALUE;
+		}
+	}
+
+	// check groups
+	int32 groupCount = fGroups.CountStrings();
+	for (int32 i = 0; i< groupCount; i++) {
+		if (!BUser::IsValidUserName(fGroups.StringAt(i)))
+			return B_BAD_VALUE;
+	}
 
 	return B_OK;
 }
@@ -446,6 +499,20 @@ const BObjectList<BUserSettingsFileInfo>&
 BPackageInfo::UserSettingsFileInfos() const
 {
 	return fUserSettingsFileInfos;
+}
+
+
+const BObjectList<BUser>&
+BPackageInfo::Users() const
+{
+	return fUsers;
+}
+
+
+const BStringList&
+BPackageInfo::Groups() const
+{
+	return fGroups;
 }
 
 
@@ -629,6 +696,13 @@ BPackageInfo::ClearSourceURLList()
 }
 
 
+status_t
+BPackageInfo::AddSourceURL(const BString& url)
+{
+	return fSourceURLList.Add(url) ? B_OK : B_NO_MEMORY;
+}
+
+
 void
 BPackageInfo::ClearGlobalSettingsFileInfos()
 {
@@ -671,10 +745,37 @@ BPackageInfo::AddUserSettingsFileInfo(const BUserSettingsFileInfo& info)
 }
 
 
-status_t
-BPackageInfo::AddSourceURL(const BString& url)
+void
+BPackageInfo::ClearUsers()
 {
-	return fSourceURLList.Add(url) ? B_OK : B_NO_MEMORY;
+	fUsers.MakeEmpty();
+}
+
+
+status_t
+BPackageInfo::AddUser(const BUser& user)
+{
+	BUser* newUser = new (std::nothrow) BUser(user);
+	if (newUser == NULL || !fUsers.AddItem(newUser)) {
+		delete newUser;
+		return B_NO_MEMORY;
+	}
+
+	return B_OK;
+}
+
+
+void
+BPackageInfo::ClearGroups()
+{
+	fGroups.MakeEmpty();
+}
+
+
+status_t
+BPackageInfo::AddGroup(const BString& group)
+{
+	return fGroups.Add(group) ? B_OK : B_NO_MEMORY;
 }
 
 
@@ -807,6 +908,8 @@ BPackageInfo::Clear()
 	fSourceURLList.MakeEmpty();
 	fGlobalSettingsFileInfos.MakeEmpty();
 	fUserSettingsFileInfos.MakeEmpty();
+	fUsers.MakeEmpty();
+	fGroups.MakeEmpty();
 	fRequiresList.MakeEmpty();
 	fProvidesList.MakeEmpty();
 	fSupplementsList.MakeEmpty();
@@ -842,6 +945,8 @@ BPackageInfo::Archive(BMessage* archive, bool deep) const
 			"global-settings-files", fGlobalSettingsFileInfos)) != B_OK
 		|| (error = _AddUserSettingsFileInfos(archive,
 			"user-settings-files", fUserSettingsFileInfos)) != B_OK
+		|| (error = _AddUsers(archive, "users", fUsers)) != B_OK
+		|| (error = archive->AddStrings("groups", fGroups)) != B_OK
 		|| (error = _AddResolvables(archive, "provides", fProvidesList)) != B_OK
 		|| (error = _AddResolvableExpressions(archive, "requires",
 			fRequiresList)) != B_OK
@@ -887,6 +992,8 @@ BPackageInfo::GetConfigString(BString& _string) const
 		.Write("source-urls", fSourceURLList)
 		.Write("global-settings-files", fGlobalSettingsFileInfos)
 		.Write("user-settings-files", fUserSettingsFileInfos)
+		.Write("users", fUsers)
+		.Write("groups", fGroups)
 		.Write("provides", fProvidesList)
 		.BeginRequires(fBasePackage)
 			.Write("requires", fRequiresList)
@@ -1127,6 +1234,44 @@ BPackageInfo::_AddUserSettingsFileInfos(BMessage* archive, const char* field,
 		if ((error = archive->AddString(pathField, info->Path())) != B_OK
 			|| (error = archive->AddString(templatePathField,
 				info->TemplatePath())) != B_OK) {
+			return error;
+		}
+	}
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
+BPackageInfo::_AddUsers(BMessage* archive, const char* field,
+	const UserList& users)
+{
+	// construct the field names we need
+	FieldName nameField(field, ":name");
+	FieldName realNameField(field, ":realName");
+	FieldName homeField(field, ":home");
+	FieldName shellField(field, ":shell");
+	FieldName groupsField(field, ":groups");
+
+	if (!nameField.IsValid() || !realNameField.IsValid() || !homeField.IsValid()
+		|| !shellField.IsValid() || !groupsField.IsValid())
+		return B_BAD_VALUE;
+
+	// add fields
+	int32 count = users.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		const BUser* user = users.ItemAt(i);
+		BString groups = user->Groups().Join(" ");
+		if (groups.IsEmpty() && !user->Groups().IsEmpty())
+			return B_NO_MEMORY;
+
+		status_t error;
+		if ((error = archive->AddString(nameField, user->Name())) != B_OK
+			|| (error = archive->AddString(realNameField, user->RealName()))
+				!= B_OK
+			|| (error = archive->AddString(homeField, user->Home())) != B_OK
+			|| (error = archive->AddString(shellField, user->Shell())) != B_OK
+			|| (error = archive->AddString(groupsField, groups)) != B_OK) {
 			return error;
 		}
 	}
@@ -1393,6 +1538,72 @@ BPackageInfo::_ExtractUserSettingsFileInfos(BMessage* archive,
 			= new(std::nothrow) BUserSettingsFileInfo(path, templatePath);
 		if (info == NULL || !_infos.AddItem(info)) {
 			delete info;
+			return B_NO_MEMORY;
+		}
+	}
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
+BPackageInfo::_ExtractUsers(BMessage* archive, const char* field,
+	UserList& _users)
+{
+	// construct the field names we need
+	FieldName nameField(field, ":name");
+	FieldName realNameField(field, ":realName");
+	FieldName homeField(field, ":home");
+	FieldName shellField(field, ":shell");
+	FieldName groupsField(field, ":groups");
+
+	if (!nameField.IsValid() || !realNameField.IsValid() || !homeField.IsValid()
+		|| !shellField.IsValid() || !groupsField.IsValid())
+		return B_BAD_VALUE;
+
+	// get the number of items
+	type_code type;
+	int32 count;
+	if (archive->GetInfo(nameField, &type, &count) != B_OK) {
+		// the field is missing
+		return B_OK;
+	}
+
+	// extract fields
+	for (int32 i = 0; i < count; i++) {
+		BString name;
+		status_t error = archive->FindString(nameField, i, &name);
+		if (error != B_OK)
+			return error;
+
+		BString realName;
+		error = archive->FindString(realNameField, i, &realName);
+		if (error != B_OK)
+			return error;
+
+		BString home;
+		error = archive->FindString(homeField, i, &home);
+		if (error != B_OK)
+			return error;
+
+		BString shell;
+		error = archive->FindString(shellField, i, &shell);
+		if (error != B_OK)
+			return error;
+
+		BString groupsString;
+		error = archive->FindString(groupsField, i, &groupsString);
+		if (error != B_OK)
+			return error;
+
+		BStringList groups;
+		if (!groupsString.Split(" ", false, groups))
+			return B_NO_MEMORY;
+
+		BUser* user = new(std::nothrow) BUser(name, realName, home, shell,
+			groups);
+		if (user == NULL || !_users.AddItem(user)) {
+			delete user;
 			return B_NO_MEMORY;
 		}
 	}

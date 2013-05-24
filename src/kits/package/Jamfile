@@ -97,6 +97,7 @@ SharedLibrary libpackage.so
 	RepositoryInfo.cpp
 	Request.cpp
 	TempfileManager.cpp
+	User.cpp
 	ValidateChecksumJob.cpp
 
 	$(HPKG_SOURCES)

@@ -310,6 +310,22 @@ struct PackageContentListHandler : VersionPolicy::PackageContentHandler {
 					printf("\n");
 				break;
 
+			case B_PACKAGE_INFO_USERS:
+				printf("\tuser: %s\n", value.user.name);
+				if (value.user.realName != NULL)
+					printf("\t\treal name: %s\n", value.user.realName);
+				if (value.user.home != NULL)
+					printf("\t\thome:      %s\n", value.user.home);
+				if (value.user.shell != NULL)
+					printf("\t\tshell:     %s\n", value.user.shell);
+				for (size_t i = 0; i < value.user.groupCount; i++)
+					printf("\t\tgroup:     %s\n", value.user.groups[i]);
+				break;
+
+			case B_PACKAGE_INFO_GROUPS:
+				printf("\tgroup: %s\n", value.string);
+				break;
+
 			case B_PACKAGE_INFO_INSTALL_PATH:
 				printf("\tinstall path: %s\n", value.string);
 				break;

@@ -18,6 +18,7 @@
 #include <package/PackageResolvable.h>
 #include <package/PackageResolvableExpression.h>
 #include <package/PackageVersion.h>
+#include <package/User.h>
 #include <package/UserSettingsFileInfo.h>
 
 
@@ -86,6 +87,9 @@ public:
 			const BObjectList<BUserSettingsFileInfo>&
 									UserSettingsFileInfos() const;
 
+			const BObjectList<BUser>& Users() const;
+			const BStringList&	Groups() const;
+
 			const BObjectList<BPackageResolvable>&	ProvidesList() const;
 			const BObjectList<BPackageResolvableExpression>&
 								RequiresList() const;
@@ -134,6 +138,12 @@ public:
 			void				ClearUserSettingsFileInfos();
 			status_t			AddUserSettingsFileInfo(
 									const BUserSettingsFileInfo& info);
+
+			void				ClearUsers();
+			status_t			AddUser(const BUser& user);
+
+			void				ClearGroups();
+			status_t			AddGroup(const BString& group);
 
 			void				ClearProvidesList();
 			status_t			AddProvides(const BPackageResolvable& provides);
@@ -196,6 +206,8 @@ private:
 			typedef BObjectList<BUserSettingsFileInfo>
 				UserSettingsFileInfoList;
 
+			typedef BObjectList<BUser> UserList;
+
 private:
 			status_t			_ReadFromPackageFile(
 									const PackageFileLocation& fileLocation);
@@ -218,6 +230,8 @@ private:
 									const char* field,
 									const UserSettingsFileInfoList&
 										infos);
+	static	status_t			_AddUsers(BMessage* archive, const char* field,
+									const UserList& users);
 
 	static	status_t			_ExtractVersion(BMessage* archive,
 									const char* field, int32 index,
@@ -236,6 +250,8 @@ private:
 	static	status_t			_ExtractUserSettingsFileInfos(
 									BMessage* archive, const char* field,
 									UserSettingsFileInfoList& _infos);
+	static	status_t			_ExtractUsers(BMessage* archive,
+									const char* field, UserList& _users);
 
 private:
 			BString				fName;
@@ -258,6 +274,9 @@ private:
 
 			BObjectList<BGlobalSettingsFileInfo> fGlobalSettingsFileInfos;
 			BObjectList<BUserSettingsFileInfo> fUserSettingsFileInfos;
+
+			UserList			fUsers;
+			BStringList			fGroups;
 
 			ResolvableList		fProvidesList;
 

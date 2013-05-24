@@ -13,6 +13,7 @@
 #include <ByteOrder.h>
 #include <SupportDefs.h>
 
+#include <Array.h>
 #include <util/SinglyLinkedList.h>
 
 #include <package/hpkg/ErrorOutput.h>
@@ -103,6 +104,7 @@ protected:
 			class PackageResolvableExpressionAttributeHandler;
 			class GlobalSettingsFileInfoAttributeHandler;
 			class UserSettingsFileInfoAttributeHandler;
+			class UserAttributeHandler;
 			class PackageAttributeHandler;
 			class LowLevelAttributeHandler;
 
@@ -341,6 +343,25 @@ public:
 									AttributeHandlerContext* context, uint8 id,
 									const AttributeValue& value,
 									AttributeHandler** _handler);
+};
+
+
+class ReaderImplBase::UserAttributeHandler
+	: public PackageInfoAttributeHandlerBase {
+public:
+								UserAttributeHandler(
+									BPackageInfoAttributeValue&
+										packageInfoValue);
+
+	virtual	status_t			HandleAttribute(
+									AttributeHandlerContext* context, uint8 id,
+									const AttributeValue& value,
+									AttributeHandler** _handler);
+
+	virtual	status_t			Delete(AttributeHandlerContext* context);
+
+private:
+			Array<const char*>	fGroups;
 };
 
 

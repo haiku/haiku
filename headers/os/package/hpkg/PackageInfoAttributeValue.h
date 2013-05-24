@@ -59,6 +59,16 @@ struct BUserSettingsFileInfoData {
 };
 
 
+struct BUserData {
+	const char*			name;
+	const char*			realName;
+	const char*			home;
+	const char*			shell;
+	const char* const*	groups;
+	size_t				groupCount;
+};
+
+
 struct BPackageInfoAttributeValue {
 			union {
 				uint64			unsignedInt;
@@ -68,6 +78,7 @@ struct BPackageInfoAttributeValue {
 				BPackageResolvableExpressionData resolvableExpression;
 				BGlobalSettingsFileInfoData globalSettingsFileInfo;
 				BUserSettingsFileInfoData userSettingsFileInfo;
+				BUserData		user;
 			};
 			BPackageInfoAttributeID	attributeID;
 

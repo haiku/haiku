@@ -480,6 +480,36 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 		}
 	}
 
+	// user list
+	const BObjectList<BUser>& users = packageInfo.Users();
+	for (int32 i = 0; i < users.CountItems(); ++i) {
+		const BUser* user = users.ItemAt(i);
+		PackageAttribute* attribute = _AddStringAttribute(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_USER, user->Name(), attributeList);
+
+		_AddStringAttributeIfNotEmpty(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_REAL_NAME, user->RealName(),
+			attribute->children);
+		_AddStringAttributeIfNotEmpty(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_HOME, user->Home(),
+			attribute->children);
+		_AddStringAttributeIfNotEmpty(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_SHELL, user->Shell(),
+			attribute->children);
+
+		for (int32 k = 0; k < user->Groups().CountStrings(); k++) {
+			_AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_GROUP,
+				user->Groups().StringAt(k), attribute->children);
+		}
+	}
+
+	// group list
+	const BStringList& groups = packageInfo.Groups();
+	for (int32 i = 0; i < groups.CountStrings(); i++) {
+		_AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_GROUP,
+			groups.StringAt(i), attributeList);
+	}
+
 	// checksum (optional, only exists in repositories)
 	if (packageInfo.Checksum().Length() > 0) {
 		PackageAttribute* checksum = new PackageAttribute(
@@ -737,6 +767,18 @@ WriterImplBase::RawWriteBuffer(const void* buffer, size_t size, off_t offset)
 			"RawWriteBuffer(%p, %lu) failed to write all data\n", buffer, size);
 		throw status_t(B_ERROR);
 	}
+}
+
+
+WriterImplBase::PackageAttribute*
+WriterImplBase::_AddStringAttribute(BHPKGAttributeID id, const BString& value,
+	DoublyLinkedList<PackageAttribute>& list)
+{
+	PackageAttribute* attribute = new PackageAttribute(id,
+		B_HPKG_ATTRIBUTE_TYPE_STRING, B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+	attribute->string = fPackageStringCache.Get(value);
+	list.Add(attribute);
+	return attribute;
 }
 
 

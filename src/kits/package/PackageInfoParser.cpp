@@ -704,6 +704,118 @@ BPackageInfo::Parser::_ParseUserSettingsFileInfos(
 
 
 void
+BPackageInfo::Parser::_ParseUsers(UserList* users)
+{
+	struct UserParser : public ListElementParser {
+		Parser& parser;
+		UserList* users;
+
+		UserParser(Parser& parser, UserList* users)
+			:
+			parser(parser),
+			users(users)
+		{
+		}
+
+		virtual void operator()(const Token& token)
+		{
+			if (token.type != TOKEN_WORD) {
+				throw ParseError("expected a user name",
+					token.pos);
+			}
+
+			BString realName;
+			BString home;
+			BString shell;
+			BStringList groups;
+
+			for (;;) {
+				Token nextToken = parser._NextToken();
+				if (nextToken.type != TOKEN_WORD) {
+					parser._RewindTo(nextToken);
+					break;
+				}
+
+				if (nextToken.text == "real-name") {
+					nextToken = parser._NextToken();
+					if (nextToken.type != TOKEN_WORD
+						&& nextToken.type != TOKEN_QUOTED_STRING) {
+						throw ParseError("expected string (a user real name)",
+							nextToken.pos);
+					}
+					realName = nextToken.text;
+				} else if (nextToken.text == "home") {
+					nextToken = parser._NextToken();
+					if (nextToken.type != TOKEN_WORD
+						&& nextToken.type != TOKEN_QUOTED_STRING) {
+						throw ParseError("expected string (a home path)",
+							nextToken.pos);
+					}
+					home = nextToken.text;
+				} else if (nextToken.text == "shell") {
+					nextToken = parser._NextToken();
+					if (nextToken.type != TOKEN_WORD
+						&& nextToken.type != TOKEN_QUOTED_STRING) {
+						throw ParseError("expected string (a shell path)",
+							nextToken.pos);
+					}
+					shell = nextToken.text;
+				} else if (nextToken.text == "groups") {
+					for (;;) {
+						nextToken = parser._NextToken();
+						if (nextToken.type == TOKEN_WORD) {
+							if (!groups.Add(nextToken.text))
+								throw std::bad_alloc();
+						} else if (nextToken.type == TOKEN_ITEM_SEPARATOR
+							|| nextToken.type == TOKEN_CLOSE_BRACE) {
+							parser._RewindTo(nextToken);
+							break;
+						} else {
+							throw ParseError("expected a group name",
+								nextToken.pos);
+						}
+					}
+					break;
+				} else {
+					throw ParseError(
+						"expected 'real-name', 'home', 'shell', or 'groups'",
+						nextToken.pos);
+				}
+			}
+
+			BString templatePath;
+
+			Token nextToken = parser._NextToken();
+			if (nextToken.type == TOKEN_WORD && nextToken.text == "template") {
+				nextToken = parser._NextToken();
+				if (nextToken.type != TOKEN_WORD
+					&& nextToken.type != TOKEN_QUOTED_STRING) {
+					throw ParseError(
+						"expected string (a settings template file path)",
+						nextToken.pos);
+				}
+				templatePath = nextToken.text;
+			} else if (nextToken.type == TOKEN_ITEM_SEPARATOR
+				|| nextToken.type == TOKEN_CLOSE_BRACE) {
+				parser._RewindTo(nextToken);
+			} else {
+				throw ParseError(
+					"expected 'template', semicolon, new line or '}'",
+					nextToken.pos);
+			}
+
+			if (!users->AddItem(new BUser(token.text, realName, home, shell,
+					groups))) {
+				throw std::bad_alloc();
+			}
+		}
+	} resolvableExpressionParser(*this, users);
+
+	_ParseList(resolvableExpressionParser, false);
+}
+
+
+void
 BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 {
 	bool seen[B_PACKAGE_INFO_ENUM_COUNT];
@@ -812,6 +924,14 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 			case B_PACKAGE_INFO_USER_SETTINGS_FILES:
 				_ParseUserSettingsFileInfos(
 					&packageInfo->fUserSettingsFileInfos);
+				break;
+
+			case B_PACKAGE_INFO_USERS:
+				_ParseUsers(&packageInfo->fUsers);
+				break;
+
+			case B_PACKAGE_INFO_GROUPS:
+				_ParseStringList(&packageInfo->fGroups);
 				break;
 
 			case B_PACKAGE_INFO_PROVIDES:

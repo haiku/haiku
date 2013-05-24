@@ -79,6 +79,7 @@ private:
 									GlobalSettingsFileInfoList* infos);
 			void				_ParseUserSettingsFileInfos(
 									UserSettingsFileInfoList* infos);
+			void				_ParseUsers(UserList* users);
 
 			void				_Parse(BPackageInfo* packageInfo);
 

@@ -402,6 +402,69 @@ ReaderImplBase::UserSettingsFileInfoAttributeHandler::HandleAttribute(
 	return B_OK;
 }
 
+
+// #pragma mark - UserAttributeHandler
+
+
+ReaderImplBase::UserAttributeHandler::UserAttributeHandler(
+		BPackageInfoAttributeValue& packageInfoValue)
+	:
+	PackageInfoAttributeHandlerBase(packageInfoValue),
+	fGroups()
+{
+}
+
+
+status_t
+ReaderImplBase::UserAttributeHandler::HandleAttribute(
+	AttributeHandlerContext* context, uint8 id, const AttributeValue& value,
+	AttributeHandler** _handler)
+{
+	switch (id) {
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_REAL_NAME:
+			fPackageInfoValue.user.realName = value.string;
+			break;
+
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_HOME:
+			fPackageInfoValue.user.home = value.string;
+			break;
+
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_SHELL:
+			fPackageInfoValue.user.shell = value.string;
+			break;
+
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_GROUP:
+			if (!fGroups.Add(value.string))
+				return B_NO_MEMORY;
+			break;
+
+		default:
+			if (context->ignoreUnknownAttributes)
+				break;
+
+			context->errorOutput->PrintError("Error: Invalid package "
+				"attribute section: unexpected package attribute id %d "
+				"encountered when parsing user settings file info\n",
+				id);
+			return B_BAD_DATA;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+ReaderImplBase::UserAttributeHandler::Delete(AttributeHandlerContext* context)
+{
+	if (!fGroups.IsEmpty()) {
+		fPackageInfoValue.user.groups = fGroups.Elements();
+		fPackageInfoValue.user.groupCount = fGroups.Count();
+	}
+
+	return PackageInfoAttributeHandlerBase::Delete(context);
+}
+
+
 // #pragma mark - PackageAttributeHandler
 
 
@@ -567,6 +630,21 @@ ReaderImplBase::PackageAttributeHandler::HandleAttribute(
 				if (*_handler == NULL)
 					return B_NO_MEMORY;
 			}
+			break;
+
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_USER:
+			fPackageInfoValue.user.name = value.string;
+			fPackageInfoValue.attributeID = B_PACKAGE_INFO_USERS;
+			if (_handler != NULL) {
+				*_handler = new(std::nothrow) UserAttributeHandler(
+					fPackageInfoValue);
+				if (*_handler == NULL)
+					return B_NO_MEMORY;
+			}
+			break;
+
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_GROUP:
+			fPackageInfoValue.SetTo(B_PACKAGE_INFO_GROUPS, value.string);
 			break;
 
 		default:

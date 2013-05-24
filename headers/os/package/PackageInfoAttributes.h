@@ -45,6 +45,10 @@ enum BPackageInfoAttributeID {
 								// list of global settings file infos
 	B_PACKAGE_INFO_USER_SETTINGS_FILES,
 								// list of user settings file infos
+	B_PACKAGE_INFO_USERS,
+								// list of (Unix) users defined/needed
+	B_PACKAGE_INFO_GROUPS,
+								// list of (Unix) groups defined/needed
 	//
 	B_PACKAGE_INFO_ENUM_COUNT,
 };
