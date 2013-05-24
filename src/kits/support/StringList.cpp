@@ -276,7 +276,7 @@ BStringList::IsEmpty() const
 
 
 BString
-BStringList::Join(const char* separator, int32 length)
+BStringList::Join(const char* separator, int32 length) const
 {
 	return _Join(separator,
 		length >= 0 ? strnlen(separator, length) : strlen(separator));
@@ -434,7 +434,7 @@ BStringList::_DecrementRefCounts() const
 
 
 BString
-BStringList::_Join(const char* separator, int32 length)
+BStringList::_Join(const char* separator, int32 length) const
 {
 	// handle simple cases (0 or 1 element)
 	int32 count = CountStrings();

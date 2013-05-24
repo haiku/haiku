@@ -53,7 +53,8 @@ public:
 			int32				CountStrings() const;
 			bool				IsEmpty() const;
 
-			BString				Join(const char* separator, int32 length = -1);
+			BString				Join(const char* separator, int32 length = -1)
+									const;
 
 	// Iteration
 			void				DoForEach(bool (*func)(const BString& string));
@@ -77,7 +78,8 @@ private:
 			void				_IncrementRefCounts() const;
 			void				_DecrementRefCounts() const;
 
-			BString				_Join(const char* separator, int32 length);
+			BString				_Join(const char* separator, int32 length)
+									const;
 
 private:
 			BList				fStrings;
