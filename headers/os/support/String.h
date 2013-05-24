@@ -11,6 +11,7 @@
 #include <string.h>
 
 
+class BStringList;
 class BStringRef;
 
 
@@ -65,6 +66,9 @@ public:
 								int32 charCount) const;
 			bool			CopyCharsInto(char* into, int32* intoLength,
 								int32 fromCharOffset, int32 charCount) const;
+
+			bool			Split(const char* separator, bool noEmptyStrings,
+								BStringList& _list) const;
 
 			// Appending
 			BString&		operator+=(const BString& string);

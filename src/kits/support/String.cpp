@@ -22,6 +22,7 @@
 #include <stdlib.h>
 
 #include <Debug.h>
+#include <StringList.h>
 
 #include <StringPrivate.h>
 #include <utf8_functions.h>
@@ -506,6 +507,42 @@ BString::CopyCharsInto(char* into, int32* intoLength, int32 fromCharOffset,
 	}
 
 	memcpy(into, fPrivateData + fromOffset, length);
+	return true;
+}
+
+
+bool
+BString::Split(const char* separator, bool noEmptyStrings,
+	BStringList& _list) const
+{
+	int32 separatorLength = strlen(separator);
+	int32 length = Length();
+	if (separatorLength == 0 || length == 0 || separatorLength > length) {
+		if (length == 0 && noEmptyStrings)
+			return true;
+		return _list.Add(*this);
+	}
+
+	int32 index = 0;
+	for (;;) {
+		int32 endIndex = index < length ? FindFirst(separator, index) : length;
+		if (endIndex < 0)
+			endIndex = length;
+
+		if (endIndex > index || !noEmptyStrings) {
+			BString toAppend(String() + index, endIndex - index);
+			if (toAppend.Length() != endIndex - index
+				|| _list.Add(toAppend)) {
+				return false;
+			}
+		}
+
+		if (endIndex == length)
+			break;
+
+		index = endIndex + 1;
+	}
+
 	return true;
 }
 
