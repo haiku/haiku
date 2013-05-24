@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <new>
 
+#include <ByteOrder.h>
 #include <package/hpkg/DataOutput.h>
 #include <package/hpkg/ErrorOutput.h>
 
@@ -62,7 +63,7 @@ PackageFileHeapAccessorBase::OffsetArray::InitChunksOffsets(
 
 	uint64 offset = (*this)[baseIndex];
 	for (size_t i = 0; i < chunkCount; i++) {
-		offset += (uint64)chunkSizes[i] + 1;
+		offset += (uint64)B_BENDIAN_TO_HOST_INT16(chunkSizes[i]) + 1;
 			// the stored value is chunkSize - 1
 		size_t index = baseIndex + i + 1;
 			// (baseIndex + i) is the index of the chunk whose size is stored in

@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <new>
 
+#include <ByteOrder.h>
 #include <List.h>
 #include <package/hpkg/ErrorOutput.h>
 #include <package/hpkg/HPKGDefs.h>
@@ -439,8 +440,8 @@ PackageFileHeapWriter::Finish()
 
 		for (ssize_t i = 0; i < toWrite; i++, offsetIndex++) {
 			// store chunkSize - 1, so it fits 16 bit (chunks cannot be empty)
-			buffer[i] = uint16(fOffsets[offsetIndex] - fOffsets[offsetIndex - 1]
-				- 1);
+			buffer[i] = B_HOST_TO_BENDIAN_INT16(
+				uint16(fOffsets[offsetIndex] - fOffsets[offsetIndex - 1] - 1));
 		}
 
 		error = _WriteDataUncompressed(buffer, toWrite * 2);
