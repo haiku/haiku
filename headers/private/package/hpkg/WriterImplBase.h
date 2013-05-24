@@ -169,6 +169,9 @@ private:
 	inline	PackageAttribute*	_AddStringAttributeIfNotEmpty(
 									BHPKGAttributeID id, const BString& value,
 									DoublyLinkedList<PackageAttribute>& list);
+			void				_AddStringAttributeList(BHPKGAttributeID id,
+									const BStringList& value,
+									DoublyLinkedList<PackageAttribute>& list);
 			void				_WritePackageAttributes(
 									const PackageAttributeList& attributes);
 

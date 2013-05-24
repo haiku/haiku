@@ -321,32 +321,20 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 	RegisterPackageVersion(attributeList, packageInfo.Version());
 
 	// copyright list
-	const BStringList& copyrightList = packageInfo.CopyrightList();
-	for (int i = 0; i < copyrightList.CountStrings(); ++i) {
-		_AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_COPYRIGHT,
-			copyrightList.StringAt(i), attributeList);
-	}
+	_AddStringAttributeList(B_HPKG_ATTRIBUTE_ID_PACKAGE_COPYRIGHT,
+			packageInfo.CopyrightList(), attributeList);
 
 	// license list
-	const BStringList& licenseList = packageInfo.LicenseList();
-	for (int i = 0; i < licenseList.CountStrings(); ++i) {
-		_AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_LICENSE,
-			licenseList.StringAt(i), attributeList);
-	}
+	_AddStringAttributeList(B_HPKG_ATTRIBUTE_ID_PACKAGE_LICENSE,
+		packageInfo.LicenseList(), attributeList);
 
 	// URL list
-	const BStringList& urlList = packageInfo.URLList();
-	for (int i = 0; i < urlList.CountStrings(); ++i) {
-		_AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_URL,
-			urlList.StringAt(i), attributeList);
-	}
+	_AddStringAttributeList(B_HPKG_ATTRIBUTE_ID_PACKAGE_URL,
+		packageInfo.URLList(), attributeList);
 
 	// source URL list
-	const BStringList& sourceURLList = packageInfo.SourceURLList();
-	for (int i = 0; i < sourceURLList.CountStrings(); ++i) {
-		_AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_SOURCE_URL,
-			sourceURLList.StringAt(i), attributeList);
-	}
+	_AddStringAttributeList(B_HPKG_ATTRIBUTE_ID_PACKAGE_SOURCE_URL,
+		packageInfo.SourceURLList(), attributeList);
 
 	// provides list
 	const BObjectList<BPackageResolvable>& providesList
@@ -388,11 +376,8 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 		packageInfo.FreshensList(), B_HPKG_ATTRIBUTE_ID_PACKAGE_FRESHENS);
 
 	// replaces list
-	const BStringList& replacesList = packageInfo.ReplacesList();
-	for (int i = 0; i < replacesList.CountStrings(); ++i) {
-		_AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_REPLACES,
-			replacesList.StringAt(i), attributeList);
-	}
+	_AddStringAttributeList(B_HPKG_ATTRIBUTE_ID_PACKAGE_REPLACES,
+		packageInfo.ReplacesList(), attributeList);
 
 	// global settings file info list
 	const BObjectList<BGlobalSettingsFileInfo>& globalSettingsFileInfos
@@ -451,18 +436,12 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 	}
 
 	// group list
-	const BStringList& groups = packageInfo.Groups();
-	for (int32 i = 0; i < groups.CountStrings(); i++) {
-		_AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_GROUP,
-			groups.StringAt(i), attributeList);
-	}
+	_AddStringAttributeList(B_HPKG_ATTRIBUTE_ID_PACKAGE_GROUP,
+		packageInfo.Groups(), attributeList);
 
 	// post install script list
-	const BStringList& postInstallScripts = packageInfo.PostInstallScripts();
-	for (int32 i = 0; i < postInstallScripts.CountStrings(); i++) {
-		_AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_POST_INSTALL_SCRIPT,
-			postInstallScripts.StringAt(i), attributeList);
-	}
+	_AddStringAttributeList(B_HPKG_ATTRIBUTE_ID_PACKAGE_POST_INSTALL_SCRIPT,
+		packageInfo.PostInstallScripts(), attributeList);
 
 	// checksum (optional, only exists in repositories)
 	_AddStringAttributeIfNotEmpty(B_HPKG_ATTRIBUTE_ID_PACKAGE_CHECKSUM,
@@ -694,6 +673,15 @@ WriterImplBase::_AddStringAttribute(BHPKGAttributeID id, const BString& value,
 	attribute->string = fPackageStringCache.Get(value);
 	list.Add(attribute);
 	return attribute;
+}
+
+
+void
+WriterImplBase::_AddStringAttributeList(BHPKGAttributeID id,
+	const BStringList& value, DoublyLinkedList<PackageAttribute>& list)
+{
+	for (int32 i = 0; i < value.CountStrings(); i++)
+		_AddStringAttribute(id, value.StringAt(i), list);
 }
 
 
