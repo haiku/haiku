@@ -647,6 +647,11 @@ ReaderImplBase::PackageAttributeHandler::HandleAttribute(
 			fPackageInfoValue.SetTo(B_PACKAGE_INFO_GROUPS, value.string);
 			break;
 
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_POST_INSTALL_SCRIPT:
+			fPackageInfoValue.SetTo(B_PACKAGE_INFO_POST_INSTALL_SCRIPTS,
+				value.string);
+			break;
+
 		default:
 			if (context->ignoreUnknownAttributes)
 				break;

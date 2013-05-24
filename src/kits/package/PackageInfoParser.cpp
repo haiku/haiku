@@ -934,6 +934,10 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 				_ParseStringList(&packageInfo->fGroups);
 				break;
 
+			case B_PACKAGE_INFO_POST_INSTALL_SCRIPTS:
+				_ParseStringList(&packageInfo->fPostInstallScripts);
+				break;
+
 			case B_PACKAGE_INFO_PROVIDES:
 				_ParseResolvableList(&packageInfo->fProvidesList);
 				break;

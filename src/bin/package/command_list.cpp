@@ -326,6 +326,10 @@ struct PackageContentListHandler : VersionPolicy::PackageContentHandler {
 				printf("\tgroup: %s\n", value.string);
 				break;
 
+			case B_PACKAGE_INFO_POST_INSTALL_SCRIPTS:
+				printf("\tpost install script: %s\n", value.string);
+				break;
+
 			case B_PACKAGE_INFO_INSTALL_PATH:
 				printf("\tinstall path: %s\n", value.string);
 				break;

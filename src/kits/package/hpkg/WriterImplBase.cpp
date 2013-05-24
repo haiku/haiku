@@ -457,6 +457,13 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 			groups.StringAt(i), attributeList);
 	}
 
+	// post install script list
+	const BStringList& postInstallScripts = packageInfo.PostInstallScripts();
+	for (int32 i = 0; i < postInstallScripts.CountStrings(); i++) {
+		_AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_POST_INSTALL_SCRIPT,
+			postInstallScripts.StringAt(i), attributeList);
+	}
+
 	// checksum (optional, only exists in repositories)
 	_AddStringAttributeIfNotEmpty(B_HPKG_ATTRIBUTE_ID_PACKAGE_CHECKSUM,
 		packageInfo.Checksum(), attributeList);

@@ -54,7 +54,8 @@ const char* const BPackageInfo::kElementNames[B_PACKAGE_INFO_ENUM_COUNT] = {
 	"global-settings-files",
 	"user-settings-files",
 	"users",
-	"groups"
+	"groups",
+	"post-install-scripts"
 };
 
 
@@ -171,6 +172,7 @@ BPackageInfo::BPackageInfo()
 	fUserSettingsFileInfos(4, true),
 	fUsers(4, true),
 	fGroups(4),
+	fPostInstallScripts(4),
 	fProvidesList(20, true),
 	fRequiresList(20, true),
 	fSupplementsList(20, true),
@@ -194,6 +196,7 @@ BPackageInfo::BPackageInfo(BMessage* archive, status_t* _error)
 	fUserSettingsFileInfos(4, true),
 	fUsers(4, true),
 	fGroups(4),
+	fPostInstallScripts(4),
 	fProvidesList(20, true),
 	fRequiresList(20, true),
 	fSupplementsList(20, true),
@@ -225,6 +228,8 @@ BPackageInfo::BPackageInfo(BMessage* archive, status_t* _error)
 			fUserSettingsFileInfos)) == B_OK
 		&& (error = _ExtractUsers(archive, "users", fUsers)) == B_OK
 		&& (error = _ExtractStringList(archive, "groups", fGroups)) == B_OK
+		&& (error = _ExtractStringList(archive, "post-install-scripts",
+			fPostInstallScripts)) == B_OK
 		&& (error = _ExtractResolvables(archive, "provides", fProvidesList))
 			== B_OK
 		&& (error = _ExtractResolvableExpressions(archive, "requires",
@@ -516,6 +521,13 @@ BPackageInfo::Groups() const
 }
 
 
+const BStringList&
+BPackageInfo::PostInstallScripts() const
+{
+	return fPostInstallScripts;
+}
+
+
 const BObjectList<BPackageResolvable>&
 BPackageInfo::ProvidesList() const
 {
@@ -780,6 +792,20 @@ BPackageInfo::AddGroup(const BString& group)
 
 
 void
+BPackageInfo::ClearPostInstallScripts()
+{
+	fPostInstallScripts.MakeEmpty();
+}
+
+
+status_t
+BPackageInfo::AddPostInstallScript(const BString& path)
+{
+	return fPostInstallScripts.Add(path) ? B_OK : B_NO_MEMORY;
+}
+
+
+void
 BPackageInfo::ClearProvidesList()
 {
 	fProvidesList.MakeEmpty();
@@ -910,6 +936,7 @@ BPackageInfo::Clear()
 	fUserSettingsFileInfos.MakeEmpty();
 	fUsers.MakeEmpty();
 	fGroups.MakeEmpty();
+	fPostInstallScripts.MakeEmpty();
 	fRequiresList.MakeEmpty();
 	fProvidesList.MakeEmpty();
 	fSupplementsList.MakeEmpty();
@@ -947,6 +974,8 @@ BPackageInfo::Archive(BMessage* archive, bool deep) const
 			"user-settings-files", fUserSettingsFileInfos)) != B_OK
 		|| (error = _AddUsers(archive, "users", fUsers)) != B_OK
 		|| (error = archive->AddStrings("groups", fGroups)) != B_OK
+		|| (error = archive->AddStrings("post-install-scripts",
+			fPostInstallScripts)) != B_OK
 		|| (error = _AddResolvables(archive, "provides", fProvidesList)) != B_OK
 		|| (error = _AddResolvableExpressions(archive, "requires",
 			fRequiresList)) != B_OK
@@ -994,6 +1023,7 @@ BPackageInfo::GetConfigString(BString& _string) const
 		.Write("user-settings-files", fUserSettingsFileInfos)
 		.Write("users", fUsers)
 		.Write("groups", fGroups)
+		.Write("post-install-scripts", fPostInstallScripts)
 		.Write("provides", fProvidesList)
 		.BeginRequires(fBasePackage)
 			.Write("requires", fRequiresList)

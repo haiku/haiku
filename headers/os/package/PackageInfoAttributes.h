@@ -49,6 +49,8 @@ enum BPackageInfoAttributeID {
 								// list of (Unix) users defined/needed
 	B_PACKAGE_INFO_GROUPS,
 								// list of (Unix) groups defined/needed
+	B_PACKAGE_INFO_POST_INSTALL_SCRIPTS,
+								// list of scripts to be executed post-install
 	//
 	B_PACKAGE_INFO_ENUM_COUNT,
 };

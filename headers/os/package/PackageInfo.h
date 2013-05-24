@@ -90,6 +90,8 @@ public:
 			const BObjectList<BUser>& Users() const;
 			const BStringList&	Groups() const;
 
+			const BStringList&	PostInstallScripts() const;
+
 			const BObjectList<BPackageResolvable>&	ProvidesList() const;
 			const BObjectList<BPackageResolvableExpression>&
 								RequiresList() const;
@@ -144,6 +146,9 @@ public:
 
 			void				ClearGroups();
 			status_t			AddGroup(const BString& group);
+
+			void				ClearPostInstallScripts();
+			status_t			AddPostInstallScript(const BString& path);
 
 			void				ClearProvidesList();
 			status_t			AddProvides(const BPackageResolvable& provides);
@@ -277,6 +282,8 @@ private:
 
 			UserList			fUsers;
 			BStringList			fGroups;
+
+			BStringList			fPostInstallScripts;
 
 			ResolvableList		fProvidesList;
 
