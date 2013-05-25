@@ -44,6 +44,9 @@ local openjpeg_files =
 
 ObjectCcFlags [ FGristFiles $(openjpeg_files:S=$(SUFOBJ)) ] : -w ;
 
+Includes [ FGristFiles icns_png.c ]
+	: $(HAIKU_LIBPNG_HEADERS_DEPENDENCY) ;
+
 local libicns_files = 
 	icns_debug.c
 	icns_element.c
