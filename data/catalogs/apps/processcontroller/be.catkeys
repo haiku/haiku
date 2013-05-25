@@ -1,5 +1,6 @@
-1	belarusian	x-vnd.Haiku-ProcessController	2886374724
+1	belarusian	x-vnd.Haiku-ProcessController	1848752768
 Memory usage	ProcessController		Ужыванне памяці
+Kill this team!	ProcessController		Знішчыць паток!
 Idle priority	ProcessController		Прыярытэт спакою
 Restart Deskbar	ProcessController		Перазапусціць Deskbar
 Custom priority	ProcessController		Нестандартны прыярытэт
@@ -7,6 +8,7 @@ This team is already gone…	ProcessController		Гэтая група ўжо н�
 Error saving file	ProcessController		Памылка пры захаванні файла
 Real-time priority	ProcessController		Прыярытэт рэальнага часу
 Your setting file could not be saved!\n(%s)	ProcessController		Немагчыма захаваць файл з наладкамі!\n(%s)
+What do you want to do with the team \"%s\"?	ProcessController		Што вы жадаеце зрабіць з патокам \"%s\"?
 This thread is already gone…	ProcessController		Гэты паток ўжо не існуе…
 Cancel	ProcessController		Адмена
 Display priority	ProcessController		Прыярытэт адлюстравання
@@ -36,6 +38,7 @@ Threads and CPU usage	ProcessController		Патокі і ўжыванне ЦП
 Urgent display priority	ProcessController		Прыярытэт неадкладнага адлюстравання
 OK	ProcessController		ОК
 Damned!	ProcessController		Чорт!
+Debug this team!	ProcessController		Адладжваць паток!
 Usage: %s [-deskbar]\n	ProcessController		Ужыванне: %s [-deskbar]\n
 ProcessController	System name		Працэсы і патокі
 Real-time display priority	ProcessController		Прыярытэт адлюстравання ў рэальным часе
