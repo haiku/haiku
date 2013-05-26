@@ -625,10 +625,9 @@ BMenuField::Alignment() const
 void
 BMenuField::SetDivider(float position)
 {
-	position = floorf(position + 0.5);
+	position = roundf(position);
 
 	float delta = fDivider - position;
-
 	if (delta == 0.0f)
 		return;
 
