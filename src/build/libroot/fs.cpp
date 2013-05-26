@@ -609,6 +609,7 @@ _kern_read_dir(int fd, struct dirent *buffer, size_t bufferSize,
 
 	// get the next entry
 	dirent *entry;
+	errno = 0;
 	if (dynamic_cast<AttrDirDescriptor*>(descriptor))
 		entry = fs_read_attr_dir(descriptor->dir);
 	else
