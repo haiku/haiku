@@ -231,7 +231,7 @@ AddFilesToHaikuImage system add-ons kernel busses scsi
 AddFilesToHaikuImage system add-ons kernel busses usb
 	: <usb>uhci <usb>ohci <usb>ehci ;
 AddFilesToHaikuImage system add-ons kernel busses virtio
-	: virtio_pci@x86 ;
+	: virtio_pci ;
 AddFilesToHaikuImage system add-ons kernel console : vga_text ;
 AddFilesToHaikuImage system add-ons kernel debugger
 	: <kdebug>demangle <kdebug>disasm@x86 <kdebug>hangman
