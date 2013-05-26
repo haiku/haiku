@@ -131,9 +131,6 @@ struct BMenuField::LayoutData {
 // #pragma mark -
 
 
-static float kVMargin = 2.0f;
-
-
 BMenuField::BMenuField(BRect frame, const char* name, const char* label,
 	BMenu* menu, uint32 resizingMode, uint32 flags)
 	:

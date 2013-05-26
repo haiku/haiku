@@ -22,10 +22,6 @@
 #include <Window.h>
 
 
-static const float kPopUpIndicatorWidth = 10.0f;
-static const float kMarginWidth = 3.0f;
-
-
 _BMCFilter_::_BMCFilter_(BMenuField* menuField, uint32 what)
 	:
 	BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, what),
@@ -178,30 +174,29 @@ _BMCMenuBar_::FrameResized(float width, float height)
 	float diff = width - fPreviousWidth;
 	fPreviousWidth = width;
 
-	if (Window()) {
+	if (Window() != NULL && diff != 0) {
+		BRect dirty(fMenuField->Bounds());
 		if (diff > 0) {
 			// clean up the dirty right border of
 			// the menu field when enlarging
-			BRect dirty(fMenuField->Bounds());
-			dirty.right = Frame().right + 2;
-			dirty.left = dirty.left - diff - 4;
+			dirty.right = Frame().right + kVMargin;
+			dirty.left = dirty.left - diff - kVMargin * 2;
 			fMenuField->Invalidate(dirty);
 
 			// clean up the arrow part
 			dirty = Bounds();
-			dirty.left = dirty.right - diff - 12;
+			dirty.left = dirty.right - diff - kPopUpIndicatorWidth;
 			Invalidate(dirty);
 		} else if (diff < 0) {
 			// clean up the dirty right line of
 			// the menu field when shrinking
-			BRect dirty(fMenuField->Bounds());
-			dirty.left = Frame().right - 2;
-			dirty.right = dirty.left - diff + 4;
+			dirty.left = Frame().right - kVMargin;
+			dirty.right = dirty.left - diff + kVMargin * 2;
 			fMenuField->Invalidate(dirty);
 
 			// clean up the arrow part
 			dirty = Bounds();
-			dirty.left = dirty.right - 12;
+			dirty.left = dirty.right - kPopUpIndicatorWidth;
 			Invalidate(dirty);
 		}
 	}
@@ -275,7 +270,7 @@ _BMCMenuBar_::MinSize()
 
 	if (fShowPopUpMarker) {
 		// account for popup indicator + a few pixels margin
-		size.width += kPopUpIndicatorWidth + kMarginWidth;
+		size.width += kPopUpIndicatorWidth;
 	}
 
 	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
@@ -322,8 +317,7 @@ _BMCMenuBar_::_Init(bool setMaxContentWidth)
 		left = right = be_control_look->DefaultLabelSpacing();
 
 	SetItemMargins(left, top,
-		right + fShowPopUpMarker ? kPopUpIndicatorWidth + kMarginWidth : 0,
-		bottom);
+		right + fShowPopUpMarker ? kPopUpIndicatorWidth : 0, bottom);
 
 	fPreviousWidth = Bounds().Width();
 
