@@ -139,17 +139,22 @@ _BMCMenuBar_::AttachedToWindow()
 void
 _BMCMenuBar_::Draw(BRect updateRect)
 {
-	// Set the width of the menu bar because the menu bar bounds may have
-	// been expanded by the selected menu item.
-	if (fFixedSize)
+	if (fFixedSize) {
+		// Set the width of the menu bar because the menu bar bounds may have
+		// been expanded by the selected menu item.
 		ResizeTo(fMenuField->_MenuBarWidth(), Bounds().Height());
-	else {
-		// For compatability with BeOS R5 set the height to the preferred height
-		// in auto-size mode ignoring the height of the menu field.
+	} else {
+		// For compatability with BeOS R5:
+		//  - Set to the minimum of the menu bar width set by the menu frame
+		//    and the selected menu item width.
+		//  - Set the height to the preferred height ignoring the height of the
+		//    menu field.
 		float height;
 		BMenuBar::GetPreferredSize(NULL, &height);
-		ResizeTo(std::min(Bounds().Width(), fMenuField->_MenuBarWidth()), height);
+		ResizeTo(std::min(Bounds().Width(), fMenuField->_MenuBarWidth()),
+			height);
 	}
+
 	BRect rect(Bounds());
 	rgb_color base = ui_color(B_MENU_BACKGROUND_COLOR);
 	uint32 flags = 0;
