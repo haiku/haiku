@@ -963,9 +963,11 @@ BMenuField::InitObject2()
 {
 	CALLED();
 
-	float height;
-	fMenuBar->GetPreferredSize(NULL, &height);
-	fMenuBar->ResizeTo(_MenuBarWidth(), height);
+	if (!fFixedSizeMB) {
+		float height;
+		fMenuBar->GetPreferredSize(NULL, &height);
+		fMenuBar->ResizeTo(_MenuBarWidth(), height);
+	}
 
 	TRACE("frame(%.1f, %.1f, %.1f, %.1f) (%.2f, %.2f)\n",
 		fMenuBar->Frame().left, fMenuBar->Frame().top,
