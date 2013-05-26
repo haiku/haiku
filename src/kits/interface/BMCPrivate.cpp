@@ -55,6 +55,9 @@ _BMCFilter_::Filter(BMessage* message, BHandler** handler)
 // #pragma mark -
 
 
+static const float kPopUpIndicatorWidth = 13.0f;
+
+
 _BMCMenuBar_::_BMCMenuBar_(BRect frame, bool fixedSize, BMenuField* menuField)
 	:
 	BMenuBar(frame, "_mc_mb_", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_ITEMS_IN_ROW,

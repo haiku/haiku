@@ -19,6 +19,7 @@
 #include <ControlLook.h>
 #include <LayoutUtils.h>
 #include <MenuBar.h>
+#include <MenuItem.h>
 #include <Message.h>
 #include <BMCPrivate.h>
 #include <Window.h>
@@ -397,8 +398,18 @@ BMenuField::AllAttached()
 
 	TRACE("width: %.2f, height: %.2f\n", Frame().Width(), Frame().Height());
 
-	ResizeTo(Bounds().Width(),
-		fMenuBar->Bounds().Height() + kVMargin + kVMargin);
+	float width = Bounds().Width();
+	if (!fFixedSizeMB && _MenuBarWidth() < kMinMenuBarWidth) {
+		// The menu bar is too narrow, resize it to fit the menu items
+		BMenuItem* item = fMenuBar->ItemAt(0);
+		if (item != NULL) {
+			float right;
+			fMenuBar->GetItemMargins(NULL, NULL, &right, NULL);
+			width = item->Frame().Width() + kVMargin + _MenuBarOffset() + right;
+		}
+	}
+
+	ResizeTo(width, fMenuBar->Bounds().Height() + kVMargin * 2);
 
 	TRACE("width: %.2f, height: %.2f\n", Frame().Width(), Frame().Height());
 }
