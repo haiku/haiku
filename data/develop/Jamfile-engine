@@ -329,7 +329,7 @@ if ( $(OSPLAT) = X86 )
 	switch $(TYPE)
 	{
 		case APP : LINKFLAGS += -Xlinker -soname=_APP_ ;
-		case SHARED : LINKFLAGS += -nostart -Xlinker -soname=$(NAME) ;
+		case SHARED : LINKFLAGS += -shared -Xlinker -soname=$(NAME) ;
 		case DRIVER : LINKFLAGS += -nostdlib /boot/develop/lib/x86/_KERNEL_ ;
 	}
 } 
