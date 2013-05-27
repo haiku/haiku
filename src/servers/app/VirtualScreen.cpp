@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2009, Haiku.
+ * Copyright 2005-2013, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -129,7 +129,11 @@ VirtualScreen::AddScreen(Screen* screen, ScreenConfigurations& configurations)
 		if (status != B_OK)
 			status = screen->SetBestMode(1024, 768, B_RGB32, 60.f);
 		if (status != B_OK)
-			screen->SetBestMode(800, 600, B_RGB32, 60.f, false);
+			status = screen->SetBestMode(800, 600, B_RGB32, 60.f, false);
+		if (status != B_OK) {
+			debug_printf("app_server: Failed to set mode: %s\n",
+				strerror(status));
+		}
 	}
 
 	// TODO: this works only for single screen configurations
