@@ -987,7 +987,7 @@ if [ IsOptionalHaikuImagePackageAdded Grep ] {
 				$(baseURL)/grep-2.14-x86-gcc4-2012-12-28.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/grep-2.14-2-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/grep-2.14-3-x86_gcc2.hpkg ;
 		}
 	} else if $(TARGET_ARCH) = x86_64 {
 		InstallOptionalHaikuImagePackage
