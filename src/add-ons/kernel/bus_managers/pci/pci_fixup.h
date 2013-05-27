@@ -8,7 +8,8 @@
 
 class PCI;
 
-void
-pci_fixup_device(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function);
+
+void pci_fixup_device(PCI *pci, uint8 domain, uint8 bus, uint8 device,
+	uint8 function);
 
 #endif

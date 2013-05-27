@@ -153,7 +153,7 @@ public:
 			status_t		SetSize(off_t size);
 
 			const char*		Name() const { return fName; }
-			size_t			Size() const { return fSize; }
+			off_t			Size() const { return fSize; }
 			type_code		Type() const { return fType; }
 			uint8*			Data() const { return fData; }
 
@@ -164,7 +164,7 @@ private:
 			char*			fName;
 			type_code		fType;
 			uint8*			fData;
-			size_t			fSize;
+			off_t			fSize;
 };
 
 class Inode {
@@ -473,7 +473,7 @@ open_attributes(uint32 cddbID, int deviceFD, int mode,
 
 	if (attrMode == kDiscIDAttributes) {
 		char id[64];
-		snprintf(id, sizeof(id), "/%08lx", cddbID);
+		snprintf(id, sizeof(id), "/%08" B_PRIx32, cddbID);
 		strlcat(path, id, B_PATH_NAME_LENGTH);
 	} else if (attrMode == kDeviceAttributes) {
 		uint32 length = strlen(path);
@@ -528,9 +528,12 @@ fill_stat_buffer(Volume* volume, Inode* inode, Attribute* attribute,
 	stat.st_uid = inode->UserID();
 	stat.st_gid = inode->GroupID();
 
-	stat.st_atime = time(NULL);
-	stat.st_mtime = stat.st_ctime = inode->ModificationTime();
-	stat.st_crtime = inode->CreationTime();
+	stat.st_atim.tv_sec = time(NULL);
+	stat.st_atim.tv_nsec = 0;
+	stat.st_mtim.tv_sec = stat.st_ctim.tv_sec = inode->ModificationTime();
+	stat.st_ctim.tv_nsec = stat.st_mtim.tv_nsec = 0;
+	stat.st_crtim.tv_sec = inode->CreationTime();
+	stat.st_crtim.tv_nsec = 0;
 }
 
 
@@ -690,14 +693,14 @@ Volume::Mount(const char* device)
 
 		if (text.titles[i] != NULL) {
 			if (text.artists[i] != NULL) {
-				snprintf(title, sizeof(title), "%02ld. %s - %s.wav", track,
-					text.artists[i], text.titles[i]);
+				snprintf(title, sizeof(title), "%02" B_PRId32 ". %s - %s.wav",
+					track, text.artists[i], text.titles[i]);
 			} else {
-				snprintf(title, sizeof(title), "%02ld. %s.wav", track,
-					text.titles[i]);
+				snprintf(title, sizeof(title), "%02" B_PRId32 ". %s.wav",
+					track, text.titles[i]);
 			}
 		} else
-			snprintf(title, sizeof(title), "Track %02ld.wav", track);
+			snprintf(title, sizeof(title), "Track %02" B_PRId32 ".wav", track);
 
 		// remove '/' and '\n' from title
 		for (int32 j = 0; title[j]; j++) {
@@ -722,7 +725,7 @@ Volume::Mount(const char* device)
 		inode->AddAttribute("Audio:Track", B_INT32_TYPE, (uint32)track);
 		inode->AddAttribute("Audio:Bitrate", B_STRING_TYPE, "1411 kbps");
 		inode->AddAttribute("Media:Length", B_INT64_TYPE,
-			inode->FrameCount() * 1000000LL / kFramesPerSecond);
+			inode->FrameCount() * 1000000L / kFramesPerSecond);
 		inode->AddAttribute("BEOS:TYPE", B_MIME_STRING_TYPE, "audio/x-wav");
 	}
 
@@ -1044,7 +1047,7 @@ Attribute::ReadAt(off_t offset, uint8* buffer, size_t* _length)
 		*_length = 0;
 		return B_OK;
 	}
-	if (offset + length > fSize)
+	if (offset + (off_t)length > fSize)
 		length = fSize - offset;
 
 	if (user_memcpy(buffer, fData + offset, length) < B_OK)
@@ -1710,13 +1713,13 @@ cdda_read(fs_volume* _volume, fs_vnode* _node, void* _cookie, off_t offset,
 	}
 
 	size_t length = *_length;
-	if (offset + length > maxSize)
+	if (offset + (off_t)length > maxSize)
 		length = maxSize - offset;
 
 	status_t status = B_OK;
 	size_t bytesRead = 0;
 
-	if (offset < sizeof(wav_header)) {
+	if (offset < (off_t)sizeof(wav_header)) {
 		// read fake WAV header
 		size_t size = sizeof(wav_header) - offset;
 		size = min_c(size, length);

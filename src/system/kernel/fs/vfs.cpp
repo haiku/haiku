@@ -3531,7 +3531,7 @@ common_file_io_vec_pages(struct vnode* vnode, void* cookie,
 	for (; fileVecIndex < fileVecCount; fileVecIndex++) {
 		const file_io_vec &fileVec = fileVecs[fileVecIndex];
 		off_t fileOffset = fileVec.offset;
-		off_t fileLeft = min_c(fileVec.length, bytesLeft);
+		off_t fileLeft = min_c(fileVec.length, (off_t)bytesLeft);
 
 		TRACE(("FILE VEC [%" B_PRIu32 "] length %" B_PRIdOFF "\n", fileVecIndex,
 			fileLeft));

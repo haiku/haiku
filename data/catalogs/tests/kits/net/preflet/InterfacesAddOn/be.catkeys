@@ -1,0 +1,33 @@
+1	belarusian	x-vnd.Haiku-InterfacesAddOn	160108912
+Interface	InterfaceWindow		Інтэрфейс
+Configure…	InterfacesListView		Канфігураваць…
+Static	IntefaceAddressView		Статычны
+None	InterfacesListView		Няма
+IP:	InterfacesListView	IPv4 address label	IP:
+Status:	IntefaceHardwareView		Стан:
+IPv6:	InterfacesListView	IPv6 address label	IPv6:
+Save	InterfaceWindow		Захаваць
+Link speed:	IntefaceHardwareView		Хуткасць злучэння:
+Renegotiate	InterfacesAddOn		Перазлучыць
+The method for obtaining an IP address	IntefaceAddressView		Метад атрыманя IP адрасу
+Your gateway	IntefaceAddressView		Ваш gateway
+Enable	InterfacesListView		Дазволіць
+Received:	IntefaceHardwareView		Атрымана:
+Revert	InterfaceWindow		Вярнуць
+connected	IntefaceHardwareView		злучаны
+Gateway:	IntefaceAddressView		Брама:
+Disable	InterfacesListView		Выключыць
+Sent:	IntefaceHardwareView		Адаслана:
+Disable	InterfacesAddOn		Выключыць
+Configure…	InterfacesAddOn		Канфігураваць…
+Renegotiate Address	InterfacesListView		Перазлучыць адрас
+DHCP	IntefaceAddressView		DHCP
+Mode:	IntefaceAddressView		Рэжым:
+Your netmask	IntefaceAddressView		Маска
+IP Address:	IntefaceAddressView		IP адрас:
+Off	IntefaceAddressView		Адключыць
+MAC address:	IntefaceHardwareView		MAC адрас:
+Netmask:	IntefaceAddressView		Маска:
+Your IP address	IntefaceAddressView		IP адрас
+%llu KBytes	IntefaceHardwareView		%llu КБайт
+disconnected	IntefaceHardwareView		адлучана

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-StyledEdit	3117187160
+1	ukrainian	x-vnd.Haiku-StyledEdit	3019034824
 StyledEdit	System name		Редактор тексту StyledEdit
 Paste	Menus		Вставити
 OK	LoadAlert		Гаразд
@@ -43,6 +43,7 @@ Don't save	QuitAlert		Не зберігати
 Align	Menus		Вирівняти
 Color	Menus		Колір
 Red	Menus		Червоний
+OK	QuitAlert		Гаразд
 Open…	Menus		Відкрити…
 Center	Menus		Центр
 Blue	Menus		Синій

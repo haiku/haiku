@@ -394,7 +394,7 @@ void
 MidiPlayerWindow::StartSynth()
 {
 	synth.Start();
-	synth.SetFileHook(_StopHook, (int32) this);
+	synth.SetFileHook(_StopHook, (int32)(addr_t)this);
 	playing = true;
 }
 
@@ -412,7 +412,7 @@ MidiPlayerWindow::StopSynth()
 void
 MidiPlayerWindow::_StopHook(int32 arg)
 {
-	((MidiPlayerWindow*)arg)->StopHook();
+	((MidiPlayerWindow*)(addr_t)arg)->StopHook();
 }
 
 

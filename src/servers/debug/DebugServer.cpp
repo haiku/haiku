@@ -799,7 +799,7 @@ TeamDebugHandler::_PrintStackTrace(thread_id thread)
 	if (error == B_OK) {
 		// create a symbol lookup context
 		debug_symbol_lookup_context *lookupContext = NULL;
-		error = debug_create_symbol_lookup_context(fTeam, &lookupContext);
+		error = debug_create_symbol_lookup_context(fTeam, -1, &lookupContext);
 		if (error != B_OK) {
 			debug_printf("debug_server: Failed to create symbol lookup "
 				"context: %s\n", strerror(error));

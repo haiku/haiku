@@ -895,8 +895,8 @@ NetServer::_ConfigureIPv6LinkLocal(const char* name)
 	const uint8* mac = link.LinkLevelAddress();
 
 	// Check for a few failure situations
-	static const char zeroMac[6] = {0, 0, 0, 0, 0, 0};
-	static const char fullMac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+	static const uint8 zeroMac[6] = {0, 0, 0, 0, 0, 0};
+	static const uint8 fullMac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 	if (memcmp(mac, zeroMac, 6) == 0
 		|| memcmp(mac, fullMac, 6) == 0) {
 		// Mac address is all 0 or all FF's

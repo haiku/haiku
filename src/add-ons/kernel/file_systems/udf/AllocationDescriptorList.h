@@ -101,7 +101,7 @@ status_t
 AllocationDescriptorList<Accessor>::FindExtent(off_t start,
 	long_address *extent, bool *isEmpty)
 {
-	TRACE(("AllocationDescriptorList<>::FindExtent: start: %Ld, "
+	TRACE(("AllocationDescriptorList<>::FindExtent: start: %" B_PRIdOFF ", "
 		"extent: %p, isEmpty: %p\n", start, extent, isEmpty));
 
 	off_t startBlock = start >> fVolume->BlockShift();
@@ -132,7 +132,8 @@ AllocationDescriptorList<Accessor>::FindExtent(off_t start,
 			}
 		} else {
 			TRACE_ERROR(("AllocationDescriptorList<>::FindExtent: "
-				"Descriptor #%ld found NULL\n", _DescriptorNumber()));
+				"Descriptor #%" B_PRId32 " found NULL\n",
+				_DescriptorNumber()));
 			status = B_ERROR;
 			break;
 		}

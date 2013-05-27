@@ -51,13 +51,13 @@ void load_settings()
 
 	gTraceOn = get_driver_boolean_parameter(handle, "trace", gTraceOn, true);
 	gTraceFlow = get_driver_boolean_parameter(handle, "trace_flow",
-						gTraceFlow, true);
+		gTraceFlow, true);
 	gTruncateLogFile = get_driver_boolean_parameter(handle,	"truncate_logfile",
-						gTruncateLogFile, true);
+		gTruncateLogFile, true);
 	gAddTimeStamp = get_driver_boolean_parameter(handle, "add_timestamp",
-						gAddTimeStamp, true);
+		gAddTimeStamp, true);
 	const char * logFilePath = get_driver_parameter(handle, "logfile",
-						NULL, "/var/log/"DRIVER_NAME".log");
+		NULL, "/var/log/"DRIVER_NAME".log");
 	if (logFilePath != NULL) {
 		gLogFilePath = strdup(logFilePath);
 	}
@@ -96,8 +96,8 @@ void usb_asix_trace(bool force, const char* func, const char *fmt, ...)
 		bigtime_t time = system_time();
 		uint32 msec = time / 1000;
 		uint32 sec  = msec / 1000;
-		sprintf(buf_ptr, "%02ld.%02ld.%03ld:",
-							sec / 60, sec % 60, msec % 1000);
+		sprintf(buf_ptr, "%02" B_PRId32 ".%02" B_PRId32 ".%03" B_PRId32 ":",
+			sec / 60, sec % 60, msec % 1000);
 		buf_ptr += strlen(buf_ptr);
 	}
 
@@ -123,4 +123,3 @@ void usb_asix_trace(bool force, const char* func, const char *fmt, ...)
 	}
 	mutex_unlock(&gLogLock);
 }
-

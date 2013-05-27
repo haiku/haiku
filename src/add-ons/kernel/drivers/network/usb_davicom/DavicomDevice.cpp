@@ -346,11 +346,12 @@ DavicomDevice::Write(const uint8 *buffer, size_t *numBytes)
 	}
 
 	struct _TXHeader {
-		uint	countLow	:8;
-		uint	countHigh	:8;
+		uint8	countLow;
+		uint8	countHigh;
 	} __attribute__((__packed__));
 
-	_TXHeader header = { length & 0xff, length >> 8 & 0xff };
+	_TXHeader header = { (uint8)(length & 0xff),
+		(uint8)((length >> 8) & 0xff) };
 
 	uint8 padding = 0;
 
@@ -821,7 +822,7 @@ DavicomDevice::_ModifyMulticastTable(bool join, ether_address_t *group)
 
 void
 DavicomDevice::_ReadCallback(void *cookie, int32 status, void *data,
-	uint32 actualLength)
+	size_t actualLength)
 {
 	TRACE_RX("ReadCB: %d bytes; status:%#010x\n", actualLength, status);
 	DavicomDevice *device = (DavicomDevice *)cookie;
@@ -834,7 +835,7 @@ DavicomDevice::_ReadCallback(void *cookie, int32 status, void *data,
 
 void
 DavicomDevice::_WriteCallback(void *cookie, int32 status, void *data,
-	uint32 actualLength)
+	size_t actualLength)
 {
 	TRACE_TX("WriteCB: %d bytes; status:%#010x\n", actualLength, status);
 	DavicomDevice *device = (DavicomDevice *)cookie;
@@ -847,7 +848,7 @@ DavicomDevice::_WriteCallback(void *cookie, int32 status, void *data,
 
 void
 DavicomDevice::_NotifyCallback(void *cookie, int32 status, void *data,
-	uint32 actualLength)
+	size_t actualLength)
 {
 	DavicomDevice *device = (DavicomDevice *)cookie;
 	atomic_add(&device->fInsideNotify, 1);
@@ -1117,7 +1118,7 @@ DavicomDevice::_WriteMII(uint8 reg, uint16 data)
 	}
 
 	// put the value to data register
-	uint8 values[] = { data & 0xff, ( data >> 8 ) & 0xff };
+	uint8 values[] = { (uint8)(data & 0xff), (uint8)((data >> 8) & 0xff) };
 	result = _WriteRegister(RegEPDRL, sizeof(uint16), values);
 	if (result != B_OK) {
 		TRACE_ALWAYS("Failed to put data %#x. Error:%#x\n", data, result);

@@ -247,7 +247,7 @@ handleFile(BEntry *entry, BNode *node)
 	}
 
 	// rewrite attrs and empty the list
-	while ((attr = static_cast<Attribute *>(list.RemoveItem(0L))) != NULL) {
+	while ((attr = static_cast<Attribute *>(list.RemoveItem((int32)0))) != NULL) {
 		// write attribute back to file
 		status = attr->WriteToFile(node);
 		if (status != B_OK) {
@@ -294,8 +294,8 @@ copyIndicesFromVolume(const char *path, BEntry &to)
 
 		if (fs_create_index(targetDevice, index->d_name, indexInfo.type, 0)
 				== -1 && errno != B_FILE_EXISTS && errno != B_BAD_VALUE) {
-			fprintf(stderr, "Could not create index '%s' (type = %lu): %s\n",
-				index->d_name, indexInfo.type, strerror(errno));
+			fprintf(stderr, "Could not create index '%s' (type = %" B_PRIu32
+				"): %s\n", index->d_name, indexInfo.type, strerror(errno));
 		} else
 			gAttrList.AddItem(strdup(index->d_name));
 	}

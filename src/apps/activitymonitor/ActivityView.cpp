@@ -600,10 +600,6 @@ ActivityView::~ActivityView()
 {
 	delete fOffscreen;
 	delete fSystemInfoHandler;
-
-	// replicant deleted, destroy the about window
-	if (fAboutWindow != NULL && fAboutWindow->Lock())
-		fAboutWindow->Quit();
 }
 
 
@@ -647,8 +643,6 @@ ActivityView::_Init(const BMessage* settings)
 	const char* name;
 	for (int32 i = 0; settings->FindString("source", i, &name) == B_OK; i++)
 		AddDataSource(DataSource::FindSource(name), settings);
-
-	fAboutWindow = NULL;
 }
 
 
@@ -1112,22 +1106,21 @@ ActivityView::MessageReceived(BMessage* message)
 
 	switch (message->what) {
 		case B_ABOUT_REQUESTED:
-			if (fAboutWindow == NULL) {
-				const char* authors[] = {
-					"Axel Dörfler",
-					NULL
-				};
+		{
+			BAboutWindow* window = new BAboutWindow(kAppName, kSignature);
 
-				fAboutWindow = new BAboutWindow(kAppName, kSignature);
-				fAboutWindow->AddCopyright(2008, "Haiku, Inc.");
-				fAboutWindow->AddAuthors(authors);
-				fAboutWindow->Show();
-			} else if (fAboutWindow->IsHidden())
-				fAboutWindow->Show();
-			else
-				fAboutWindow->Activate();
+			const char* authors[] = {
+				"Axel Dörfler",
+				NULL
+			};
+
+			window->AddCopyright(2008, "Haiku, Inc.");
+			window->AddAuthors(authors);
+
+			window->Show();
 
 			break;
+		}
 
 		case kMsgUpdateResolution:
 		{

@@ -38,11 +38,15 @@ All rights reserved.
 #include <Button.h>
 #include <Catalog.h>
 #include <CheckBox.h>
+#include <ControlLook.h>
 #include <Debug.h>
 #include <Directory.h>
 #include <FindDirectory.h>
 #include <File.h>
 #include <FilePanel.h>
+#include <GridLayoutBuilder.h>
+#include <InterfaceDefs.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -51,6 +55,9 @@ All rights reserved.
 #include <PopUpMenu.h>
 #include <Path.h>
 #include <Query.h>
+#include <SeparatorView.h>
+#include <Size.h>
+#include <SpaceLayoutItem.h>
 #include <TextControl.h>
 #include <TextView.h>
 #include <View.h>
@@ -72,7 +79,6 @@ All rights reserved.
 #include "FunctionObject.h"
 #include "IconMenuItem.h"
 #include "MimeTypes.h"
-#include "MiniMenuField.h"
 #include "Tracker.h"
 #include "Utilities.h"
 
@@ -80,9 +86,10 @@ All rights reserved.
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "FindPanel"
 
+
 const char* kAllMimeTypes = "mime/ALLTYPES";
 
-const BRect kInitialRect(100, 100, 530, 210);
+const BRect kInitialRect(0, 0, 0, 0);
 const int32 kInitialAttrModeWindowHeight = 140;
 const int32 kIncrementPerAttribute = 30;
 const float kMoreOptionsDelta = 20;
@@ -91,15 +98,39 @@ const uint32 kMoreOptionsMessage = 'mrop';
 const uint32 kNameModifiedMessage = 'nmmd';
 const uint32 kSwitchToQueryTemplate = 'swqt';
 const uint32 kRunSaveAsTemplatePanel = 'svtm';
+const uint32 kLatchChanged = 'ltch';
 
-const char* kDragNDropTypes [] = {
+const char* kDragNDropTypes[] = {
 	B_QUERY_MIMETYPE,
-	B_QUERY_TEMPLATE_MIMETYPE };
-static const char* kDragNDropActionSpecifiers [] = {
+	B_QUERY_TEMPLATE_MIMETYPE
+};
+static const char* kDragNDropActionSpecifiers[] = {
 	B_TRANSLATE_MARK("Create a Query"),
-	B_TRANSLATE_MARK("Create a Query template") };
+	B_TRANSLATE_MARK("Create a Query template")
+};
 
 const uint32 kAttachFile = 'attf';
+
+const int32 operators[] = {
+	B_CONTAINS,
+	B_EQ,
+	B_NE,
+	B_BEGINS_WITH,
+	B_ENDS_WITH,
+	B_GE,
+	B_LE
+};
+static const char* operatorLabels[] = {
+	B_TRANSLATE_MARK("contains"),
+	B_TRANSLATE_MARK("is"),
+	B_TRANSLATE_MARK("is not"),
+	B_TRANSLATE_MARK("starts with"),
+	B_TRANSLATE_MARK("ends with"),
+	B_TRANSLATE_MARK("greater than"),
+	B_TRANSLATE_MARK("less than"),
+	B_TRANSLATE_MARK("before"),
+	B_TRANSLATE_MARK("after")
+};
 
 
 namespace BPrivate {
@@ -133,6 +164,7 @@ class MostUsedNames {
 		int32		fCount;
 };
 
+
 MostUsedNames gMostUsedMimeTypes("MostUsedMimeTypes", "Tracker");
 
 
@@ -164,8 +196,9 @@ MoreOptionsStruct::QueryTemporary(const BNode* node)
 
 	if (ReadAttr(node, kAttrQueryMoreOptions, kAttrQueryMoreOptionsForeign,
 		B_RAW_TYPE, 0, &saveMoreOptions, sizeof(MoreOptionsStruct),
-		&MoreOptionsStruct::EndianSwap) == kReadAttrFailed)
+		&MoreOptionsStruct::EndianSwap) == kReadAttrFailed) {
 		return false;
+	}
 
 	return saveMoreOptions.temporary;
 }
@@ -177,13 +210,14 @@ MoreOptionsStruct::QueryTemporary(const BNode* node)
 FindWindow::FindWindow(const entry_ref* newRef, bool editIfTemplateOnly)
 	:
 	BWindow(kInitialRect, B_TRANSLATE("Find"), B_TITLED_WINDOW,
-		B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_CLOSE_ON_ESCAPE
+		| B_AUTO_UPDATE_SIZE_LIMITS),
 	fFile(TryOpening(newRef)),
 	fFromTemplate(false),
 	fEditTemplateOnly(false),
 	fSaveAsTemplatePanel(NULL)
 {
-	if (fFile) {
+	if (fFile != NULL) {
 		fRef = *newRef;
 		if (editIfTemplateOnly) {
 			char type[B_MIME_TYPE_LENGTH];
@@ -212,16 +246,13 @@ FindWindow::FindWindow(const entry_ref* newRef, bool editIfTemplateOnly)
 		}
 	}
 
-	if (fFile) {
-	 	BRect initialRect(FindPanel::InitialViewSize(fFile));
-		ResizeTo(initialRect.Width(), initialRect.Height());
-	}
-
 	fFromTemplate = IsQueryTemplate(fFile);
 
-	fBackground = new FindPanel(Bounds(), fFile, this, fFromTemplate,
+	fBackground = new FindPanel(fFile, this, fFromTemplate,
 		fEditTemplateOnly);
-	AddChild(fBackground);
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	GetLayout()->AddView(fBackground);
+	CenterOnScreen();
 }
 
 
@@ -279,12 +310,7 @@ FindWindow::SwitchToTemplate(const entry_ref* ref)
 		BFile templateFile(&entry, O_RDONLY);
 
 		ThrowOnInitCheckError(&templateFile);
-		DisableUpdates();
-			// turn off updates to reduce flicker while re-populating the
-			// window
 		fBackground->SwitchToTemplate(&templateFile);
-		EnableUpdates();
-
 	} catch (...) {
 	}
 }
@@ -389,8 +415,7 @@ FindWindow::SaveQueryAttributes(BNode* file, bool queryTemplate)
 
 status_t
 FindWindow::SaveQueryAsAttributes(BNode* file, BEntry* entry,
-	bool queryTemplate, const BMessage* oldAttributes,
-	const BPoint* oldLocation)
+	bool queryTemplate, const BMessage* oldAttributes, const BPoint* oldLocation)
 {
 	if (oldAttributes)
 		// revive old window settings
@@ -417,10 +442,10 @@ FindWindow::SaveQueryAsAttributes(BNode* file, BEntry* entry,
 
 	// write some useful info to help locate the volume to query
 	BMenuItem* item = fBackground->VolMenu()->FindMarked();
-	if (item) {
+	if (item != NULL) {
 		dev_t dev;
 		BMessage message;
-		int32 count = 0;
+		uint32 count = 0;
 
 		int32 itemCount = fBackground->VolMenu()->CountItems();
 		for (int32 index = 2; index < itemCount; index++) {
@@ -437,7 +462,7 @@ FindWindow::SaveQueryAsAttributes(BNode* file, BEntry* entry,
 			EmbedUniqueVolumeInfo(&message, &volume);
 		}
 
-		if (count) {
+		if (count > 0) {
 			// do we need to embed any volumes
 			ssize_t size = message.FlattenedSize();
 			BString buffer;
@@ -458,7 +483,7 @@ FindWindow::SaveQueryAsAttributes(BNode* file, BEntry* entry,
 		// be reopened and edited later
 
 	BView* focusedItem = CurrentFocus();
-	if (focusedItem) {
+	if (focusedItem != NULL) {
 		// text controls never get the focus, their internal text views do
 		BView* parent = focusedItem->Parent();
 		if (dynamic_cast<BTextControl*>(parent))
@@ -477,6 +502,7 @@ FindWindow::SaveQueryAsAttributes(BNode* file, BEntry* entry,
 				&selEnd, sizeof(selEnd));
 		}
 	}
+
 	return B_OK;
 }
 
@@ -500,10 +526,11 @@ FindWindow::Find()
 		TTracker* tracker = dynamic_cast<TTracker*>(be_app);
 		ASSERT(tracker);
 		for (int32 timeOut = 0; ; timeOut++) {
-			if (!tracker->EntryHasWindowOpen(&fRef))
+			if (!tracker->EntryHasWindowOpen(&fRef)) {
 				// window quit, we can post refs received to open a
 				// new copy
 				break;
+			}
 
 			// PRINT(("waiting for query window to quit, %d\n", timeOut));
 			if (timeOut == 5000) {
@@ -626,8 +653,7 @@ FindWindow::MessageReceived(BMessage* message)
 					fFile = TryOpening(&tmpRef);
 					if (fFile) {
 						fRef = tmpRef;
-						SaveQueryAsAttributes(fFile, &entry, queryTemplate,
-							0, 0);
+						SaveQueryAsAttributes(fFile, &entry, queryTemplate, 0, 0);
 							// try to save whatever state we aleady have
 							// to the new query so that if the user
 							// opens it before runing it from the find panel,
@@ -638,15 +664,16 @@ FindWindow::MessageReceived(BMessage* message)
 			break;
 
 		case kSwitchToQueryTemplate:
-			{
-				entry_ref ref;
-				if (message->FindRef("refs", &ref) == B_OK)
-					SwitchToTemplate(&ref);
-			}
+		{
+			entry_ref ref;
+			if (message->FindRef("refs", &ref) == B_OK)
+				SwitchToTemplate(&ref);
+
 			break;
+		}
 
 		case kRunSaveAsTemplatePanel:
-			if (fSaveAsTemplatePanel)
+			if (fSaveAsTemplatePanel != NULL)
 				fSaveAsTemplatePanel->Show();
 			else {
 				BMessenger panel(BackgroundView());
@@ -669,50 +696,32 @@ FindWindow::MessageReceived(BMessage* message)
 //	#pragma mark -
 
 
-FindPanel::FindPanel(BRect frame, BFile* node, FindWindow* parent,
-	bool , bool editTemplateOnly)
-	:	BView(frame, "MainView", B_FOLLOW_ALL, B_WILL_DRAW),
-		fMode(kByNameItem),
-		fDraggableIcon(NULL)
+FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate,
+	bool editTemplateOnly)
+	:
+	BView("MainView", B_WILL_DRAW),
+	fMode(kByNameItem),
+	fAttrGrid(NULL),
+	fDraggableIcon(NULL)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	uint32 initialMode = InitialMode(node);
 
-	BRect bounds(Bounds());
-	BRect boxBounds(bounds);
-
-	boxBounds.InsetBy(15, 30);
-	boxBounds.bottom -= 10;
-	AddChild(new BBox(boxBounds, "Box"));
-
-	BRect rect(boxBounds);
-	rect.top -= 25;
-	rect.right = rect.left + 20;
-	rect.bottom = rect.top + 20;
-
 	BMessenger self(this);
-	fRecentQueries = new BPopUpMenu("RecentQueries");
-	FindPanel::AddRecentQueries(fRecentQueries, true, &self,
-		kSwitchToQueryTemplate);
-
-	AddChild(new MiniMenuField(rect, "RecentQueries", fRecentQueries));
-
-	rect.left = rect.right + 15;
+	fRecentQueries = new BPopUpMenu(B_TRANSLATE("Recent queries"), false,
+		false);
+	AddRecentQueries(fRecentQueries, true, &self, kSwitchToQueryTemplate);
 
 	// add popup for mime types
 	fMimeTypeMenu = new BPopUpMenu("MimeTypeMenu");
 	fMimeTypeMenu->SetRadioMode(false);
 	AddMimeTypesToMenu();
 
-	rect.right = rect.left + 150;
-	fMimeTypeField = new BMenuField(rect, "MimeTypeMenu", "", fMimeTypeMenu);
+	fMimeTypeField = new BMenuField("MimeTypeMenu", "", fMimeTypeMenu);
 	fMimeTypeField->SetDivider(0.0f);
-	fMimeTypeField->MenuItem()->SetLabel(
-		B_TRANSLATE("All files and folders"));
-	AddChild(fMimeTypeField);
-
+	fMimeTypeField->MenuItem()->SetLabel(B_TRANSLATE("All files and folders"));
 	// add popup for search criteria
 	fSearchModeMenu = new BPopUpMenu("searchMode");
 	fSearchModeMenu->AddItem(new BMenuItem(B_TRANSLATE("by name"),
@@ -725,24 +734,17 @@ FindPanel::FindPanel(BRect frame, BFile* node, FindWindow* parent,
 	fSearchModeMenu->ItemAt(initialMode == kByNameItem ? 0 :
 		(initialMode == kByAttributeItem ? 1 : 2))->SetMarked(true);
 		// mark the appropriate mode
-	rect.left = rect.right + 10;
-	rect.right = rect.left + 100;
-	rect.bottom = rect.top + 15;
-	BMenuField* menuField = new BMenuField(rect, "", "", fSearchModeMenu);
-	menuField->SetDivider(0.0f);
-	AddChild(menuField);
+	BMenuField* searchModeField = new BMenuField("", "", fSearchModeMenu);
+	searchModeField->SetDivider(0.0f);
 
 	// add popup for volume list
-	rect.right = bounds.right - 15;
-	rect.left = rect.right - 100;
-	fVolMenu = new BPopUpMenu("", false, false);	// don't radioMode
-	menuField = new BMenuField(rect, "", B_TRANSLATE("On"), fVolMenu);
-	menuField->SetDivider(menuField->StringWidth(menuField->Label()) + 8);
-	AddChild(menuField);
+	fVolMenu = new BPopUpMenu("", false, false);
+	BMenuField* volumeField = new BMenuField("", B_TRANSLATE("On"), fVolMenu);
+	volumeField->SetDivider(volumeField->StringWidth(volumeField->Label()) + 8);
 	AddVolumes(fVolMenu);
 
 	if (!editTemplateOnly) {
-		BPoint draggableIconOrigin(15, bounds.bottom - 35);
+		BPoint draggableIconOrigin(0, 0);
 		BMessage dragNDropMessage(B_SIMPLE_DATA);
 		dragNDropMessage.AddInt32("be:actions", B_COPY_TARGET);
 		dragNDropMessage.AddString("be:types", B_FILE_MIME_TYPE);
@@ -754,88 +756,115 @@ FindPanel::FindPanel(BRect frame, BFile* node, FindWindow* parent,
 			B_TRANSLATE_NOCOLLECT(kDragNDropActionSpecifiers[1]));
 
 		BMessenger self(this);
-		fDraggableIcon = new DraggableQueryIcon(DraggableIcon::PreferredRect(
-			draggableIconOrigin, B_LARGE_ICON), "saveHere", &dragNDropMessage,
-			self, B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-		AddChild(fDraggableIcon);
+		BRect draggableRect = DraggableIcon::PreferredRect(draggableIconOrigin,
+			B_LARGE_ICON);
+		fDraggableIcon = new DraggableQueryIcon(draggableRect,
+			"saveHere", &dragNDropMessage, self, B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+		fDraggableIcon->SetExplicitMaxSize(
+			BSize(draggableRect.right - draggableRect.left,
+				draggableRect.bottom - draggableRect.top));
 	}
 
-	// add the more options collapsible pane
-	BRect paneInitialRect(bounds);
-	paneInitialRect.InsetBy(80, 5);
-	paneInitialRect.right = paneInitialRect.left + 255;
-	paneInitialRect.top = paneInitialRect.bottom - 30;
-	BRect paneExpandedRect(paneInitialRect);
-	paneExpandedRect.bottom += kMoreOptionsDelta;
-	fMoreOptionsPane = new DialogPane(paneInitialRect, paneExpandedRect, 0,
-		"moreOptions", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-	AddChild(fMoreOptionsPane);
-
-	fMoreOptionsPane->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	fMoreOptionsPane->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	// set up the contents of the more options pane
-	BRect expandedBounds(paneExpandedRect);
-	expandedBounds.OffsetTo(0, 0);
-	expandedBounds.InsetBy(5, 5);
-
-	rect = expandedBounds;
-	rect.right = rect.left + 200;
-	rect.bottom = rect.top + 20;
-	fQueryName = new BTextControl(rect, "queryName",
-		B_TRANSLATE("Query name:"), "", B_FOLLOW_NONE,
-		B_NAVIGABLE | B_NAVIGABLE_JUMP);
-	fQueryName->SetDivider(fQueryName->StringWidth(fQueryName->Label()) + 5);
-	fMoreOptionsPane->AddItem(fQueryName, 1);
+	fQueryName = new BTextControl("query name", B_TRANSLATE("Query name:"),
+		"", NULL, B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
 	FillCurrentQueryName(fQueryName, parent);
+	fSearchTrashCheck = new BCheckBox("searchTrash",
+		B_TRANSLATE("Include trash"), NULL);
+	fTemporaryCheck = new BCheckBox("temporary",
+		B_TRANSLATE("Temporary"), NULL);
+	fTemporaryCheck->SetValue(B_CONTROL_ON);
 
-	rect.top = rect.bottom + 6;
-	rect.bottom = rect.top + 16;
-	rect.right = rect.left + 100;
-	fSearchTrashCheck = new BCheckBox(rect, "searchTrash",
-		B_TRANSLATE("Include trash"), 0);
-	fSearchTrashCheck->ResizeToPreferred();
-	fMoreOptionsPane->AddItem(fSearchTrashCheck, 1);
+	BView* checkboxGroup = BLayoutBuilder::Group<>(B_HORIZONTAL)
+		.Add(fSearchTrashCheck)
+		.Add(fTemporaryCheck)
+		.View();
 
-	rect.OffsetBy(fSearchTrashCheck->Bounds().Width() + 8, 0);
-	fTemporaryCheck = new BCheckBox(rect, "temporary",
-		B_TRANSLATE("Temporary"), 0);
-	fMoreOptionsPane->AddItem(fTemporaryCheck, 1);
-	fTemporaryCheck->SetValue(1);
+	// add the more options collapsible pane
+	fMoreOptions = new BBox(B_NO_BORDER, BLayoutBuilder::Group<>()
+		.AddGrid(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
+			.Add(fQueryName->CreateLabelLayoutItem(), 0, 0)
+			.Add(fQueryName->CreateTextViewLayoutItem(), 1, 0)
+			.Add(BSpaceLayoutItem::CreateHorizontalStrut(0), 0, 1)
+			.Add(checkboxGroup, 1, 1)
+			.End()
+		.View());
 
-	BRect latchRect(paneInitialRect);
-	latchRect.left -= 20;
-	latchRect.right = latchRect.left + 10;
-	latchRect.top = paneInitialRect.top + paneInitialRect.Height() / 2 - 5;
+	fLatch = new PaneSwitch("optionsLatch", true, B_WILL_DRAW);
+	fLatch->SetLabels(B_TRANSLATE("Fewer options"), B_TRANSLATE("More options"));
+	fLatch->SetValue(0);
+	fLatch->SetMessage(new BMessage(kLatchChanged));
+	fLatch->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_CENTER));
+	fMoreOptions->Hide();
 
-	latchRect.bottom = latchRect.top + 12;
+	// add Search button
+	BButton* button;
+	if (editTemplateOnly) {
+		button = new BButton("save", B_TRANSLATE("Save"),
+			new BMessage(kSaveButton), B_FOLLOW_RIGHT + B_FOLLOW_BOTTOM);
+	} else {
+		button = new BButton("find", B_TRANSLATE("Search"),
+			new BMessage(kFindButton), B_FOLLOW_RIGHT + B_FOLLOW_BOTTOM);
+	}
+	button->MakeDefault(true);
 
-	fLatch = new PaneSwitch(latchRect, "moreOptionsLatch", true,
-		B_FOLLOW_BOTTOM | B_FOLLOW_LEFT);
-	AddChild(fLatch);
-	fMoreOptionsPane->SetSwitch(fLatch);
+	BView* icon = fDraggableIcon;
+	if (icon == NULL) {
+		icon = new BBox("no draggable icon", B_WILL_DRAW, B_NO_BORDER);
+		icon->SetExplicitMaxSize(BSize(0, 0));
+	}
+
+	BView* mimeTypeFieldSpacer = new BBox("MimeTypeMenuSpacer", B_WILL_DRAW,
+		B_NO_BORDER);
+	mimeTypeFieldSpacer->SetExplicitMaxSize(BSize(0, 0));
+
+	BBox* queryControls = new BBox("Box");
+	queryControls->SetBorder(B_NO_BORDER);
+
+	BBox* queryBox = new BBox("Outer Controls");
+	queryBox->SetLabel(new BMenuField("RecentQueries", NULL, fRecentQueries));
+
+	BGroupView* queryBoxView = new BGroupView(B_VERTICAL, B_USE_DEFAULT_SPACING);
+	queryBoxView->GroupLayout()->SetInsets(B_USE_DEFAULT_SPACING);
+	queryBox->AddChild(queryBoxView);
+
+	icon->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_BOTTOM));
+	button->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT, B_ALIGN_BOTTOM));
+
+	BLayoutBuilder::Group<>(queryBoxView, B_VERTICAL, B_USE_DEFAULT_SPACING)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
+			.Add(fMimeTypeField)
+			.Add(mimeTypeFieldSpacer)
+			.Add(searchModeField)
+			.Add(BSpaceLayoutItem::CreateHorizontalStrut(B_USE_DEFAULT_SPACING))
+			.Add(volumeField)
+			.End()
+		.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
+		.Add(queryControls);
+	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_DEFAULT_SPACING)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(queryBox)
+		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
+			.Add(icon)
+			.AddGroup(B_VERTICAL)
+				.AddGroup(B_HORIZONTAL)
+					.Add(fLatch)
+					.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
+					.End()
+				.Add(fMoreOptions)
+				.End()
+			.Add(button)
+			.End();
 
 	if (initialMode != kByAttributeItem)
 		AddByNameOrFormulaItems();
 	else
 		AddByAttributeItems(node);
 
-	// add Search button
-	rect = bounds;
-	rect.left = rect.right - 80;
-	rect.top = rect.bottom - 30;
-	rect.right = rect.left + 60;
-	rect.bottom = rect.top + 20;
-	BButton* button;
-	if (editTemplateOnly) {
-		button = new BButton(rect, "save", B_TRANSLATE("Save"),
-			new BMessage(kSaveButton), B_FOLLOW_RIGHT + B_FOLLOW_BOTTOM);
-	} else {
-		button = new BButton(rect, "find", B_TRANSLATE("Search"),
-			new BMessage(kFindButton), B_FOLLOW_RIGHT + B_FOLLOW_BOTTOM);
-	}
-	AddChild(button);
-	button->MakeDefault(true);
+	ResizeMenuField(fMimeTypeField);
+	ResizeMenuField(searchModeField);
+	ResizeMenuField(volumeField);
 }
 
 
@@ -850,7 +879,7 @@ FindPanel::AttachedToWindow()
 	BNode* node = dynamic_cast<FindWindow*>(Window())->QueryNode();
 	fSearchModeMenu->SetTargetForItems(this);
 	fQueryName->SetTarget(this);
-	fLatch->SetTarget(fMoreOptionsPane);
+	fLatch->SetTarget(this);
 	RestoreMimeTypeMenuSelection(node);
 		// preselect the mime we used the last time have to do it here
 		// because AddByAttributeItems will build different menus based
@@ -861,10 +890,10 @@ FindPanel::AttachedToWindow()
 		// try to pick a good focus if we restore to one already
 		BTextControl* textControl
 			= dynamic_cast<BTextControl*>(FindView("TextControl"));
-		if (!textControl) {
+		if (textControl == NULL) {
 			// pick the last text control in the attribute view
 			BString title("TextEntry");
-			title << (fAttrViewList.CountItems() - 1);
+			title << (fAttrGrid->CountRows() - 1);
 			textControl
 				= dynamic_cast<BTextControl*>(FindView(title.String()));
 		}
@@ -872,11 +901,11 @@ FindPanel::AttachedToWindow()
 			textControl->MakeFocus();
 	}
 
-	BButton* button = dynamic_cast<BButton*>(FindView("remove"));
+	BButton* button = dynamic_cast<BButton*>(FindView("remove button"));
 	if (button)
 		button->SetTarget(this);
 
-	button = dynamic_cast<BButton*>(FindView("add"));
+	button = dynamic_cast<BButton*>(FindView("add button"));
 	if (button)
 		button->SetTarget(this);
 
@@ -890,67 +919,61 @@ FindPanel::AttachedToWindow()
 	}
 	fMimeTypeMenu->SetTargetForItems(this);
 
-
 	if (fDraggableIcon)
 		fDraggableIcon->SetTarget(BMessenger(this));
 
 	fRecentQueries->SetTargetForItems(Window());
 }
 
-const float kAttrViewDelta = 30;
 
-BRect
-FindPanel::InitialViewSize(const BNode* node)
+void
+FindPanel::ResizeMenuField(BMenuField* menuField)
 {
-	if (!node || InitialMode(node) != (int32)kByAttributeItem)
-		return kInitialRect;
+	BSize size;
+	menuField->GetPreferredSize(&size.width, &size.height);
 
-	int32 numAttributes = InitialAttrCount(node);
-	if (numAttributes < 1)
-		numAttributes = 1;
+	BMenu* menu = menuField->Menu();
 
-	BRect result = kInitialRect;
-	result.bottom = result.top + kInitialAttrModeWindowHeight
-		+ (numAttributes - 1) * kIncrementPerAttribute;
+	float padding = 0.0f;
+	float width = 0.0f;
 
-	return result;
-}
-
-
-float
-FindPanel::ViewHeightForMode(uint32 mode, bool moreOptions)
-{
-	float result = moreOptions ? kMoreOptionsDelta : 0;
-	switch (mode) {
-		case kByFormulaItem:
-		case kByNameItem:
-			return 110 + result;
-
-		case kByAttributeItem:
-			return 110 + result + kAttrViewDelta;
-
+	BMenuItem* markedItem = menu->FindMarked();
+	if (markedItem != NULL) {
+		if (markedItem->Submenu() != NULL) {
+			BMenuItem* markedSubItem = markedItem->Submenu()->FindMarked();
+			if (markedSubItem != NULL && markedSubItem->Label() != NULL) {
+				float labelWidth
+					= menuField->StringWidth(markedSubItem->Label());
+				padding = size.width - labelWidth;
+			}
+		} else if (markedItem->Label() != NULL) {
+			float labelWidth = menuField->StringWidth(markedItem->Label());
+			padding = size.width - labelWidth;
+		}
 	}
-	TRESPASS();
-	return 0;
-}
 
+	for (int32 index = menu->CountItems(); index-- > 0; ) {
+		BMenuItem* item = menu->ItemAt(index);
+		if (item->Label() != NULL)
+			width = std::max(width, StringWidth(item->Label()));
 
-float
-FindPanel::BoxHeightForMode(uint32 mode, bool /*moreOptions*/)
-{
-	switch (mode) {
-		case kByFormulaItem:
-		case kByNameItem:
-			return 40;
+		BMenu* submenu = item->Submenu();
+		if (submenu != NULL) {
+			for (int32 subIndex = submenu->CountItems(); subIndex-- > 0; ) {
+				BMenuItem* subItem = submenu->ItemAt(subIndex);
+				if (subItem->Label() == NULL)
+					continue;
 
-		case kByAttributeItem:
-			return 40 + kAttrViewDelta;
-
+				width = std::max(width,
+					menuField->StringWidth(subItem->Label()));
+			}
+		}
 	}
-	TRESPASS();
-	return 0;
-}
 
+	float maxWidth = be_control_look->DefaultItemSpacing() * 20;
+	size.width = std::min(width + padding, maxWidth);
+	menuField->SetExplicitSize(size);
+}
 
 static void
 PopUpMenuSetTitle(BMenu* menu, const char* title)
@@ -960,7 +983,7 @@ PopUpMenuSetTitle(BMenu* menu, const char* title)
 
 	ASSERT(bar);
 	ASSERT(bar->ItemAt(0));
-	if (!bar || !bar->ItemAt(0))
+	if (bar == NULL || !bar->ItemAt(0))
 		return;
 
 	bar->ItemAt(0)->SetLabel(title);
@@ -1007,10 +1030,43 @@ FindPanel::ShowVolumeMenuLabel()
 
 
 void
+FindPanel::Draw(BRect)
+{
+	if (fAttrGrid == NULL)
+		return;
+
+	for (int32 index = 0; index < fAttrGrid->CountRows(); index++) {
+		BMenuField* menuField
+			= dynamic_cast<BMenuField*>(FindAttrView("MenuField", index));
+		if (menuField == NULL)
+			continue;
+
+		BLayoutItem* stringView = fAttrGrid->ItemAt(1, index);
+		BMenuItem* item = menuField->Menu()->FindMarked();
+		if (item == NULL || item->Submenu() == NULL
+			|| item->Submenu()->FindMarked() == NULL) {
+			continue;
+		}
+
+		if (stringView == NULL) {
+			stringView = fAttrGrid->AddView(new BStringView("",
+				item->Submenu()->FindMarked()->Label()), 1, index);
+			stringView->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
+				B_ALIGN_VERTICAL_UNSET));
+		} else {
+			dynamic_cast<BStringView*>(stringView->View())->SetText(
+				item->Submenu()->FindMarked()->Label());
+		}
+	}
+}
+
+
+void
 FindPanel::MessageReceived(BMessage* message)
 {
 	entry_ref dir;
 	const char* name;
+	BMenuItem* item;
 
 	switch (message->what) {
 		case kVolumeItem:
@@ -1065,15 +1121,21 @@ FindPanel::MessageReceived(BMessage* message)
 			break;
 
 		case kAddItem:
-			AddAttrView();
+			AddAttrRow();
 			break;
 
 		case kRemoveItem:
-			RemoveAttrView();
+			RemoveAttrRow();
 			break;
 
 		case kMIMETypeItem:
 		{
+			if (fMode == kByAttributeItem) {
+				// the attributes for this type may be different
+				RemoveAttrViewItems(false);
+				AddAttrRow();
+			}
+
 			BMenuItem* item;
 			if (message->FindPointer("source", (void**)&item) == B_OK) {
 				// don't add the "All files and folders" to the list
@@ -1083,23 +1145,6 @@ FindPanel::MessageReceived(BMessage* message)
 				SetCurrentMimeType(item);
 			}
 
-			// mime type switched
-			if (fMode != kByAttributeItem)
-				break;
-
-			// the attributes for this type may be different,
-			// rip out the existing ones
-			RemoveAttrViewItems();
-
-			Window()->ResizeTo(Window()->Frame().Width(),
-				ViewHeightForMode(kByAttributeItem, fLatch->Value() != 0));
-
-			BBox* box = dynamic_cast<BBox*>(FindView("Box"));
-			ASSERT(box);
-			box->ResizeTo(box->Bounds().Width(),
-				BoxHeightForMode(kByAttributeItem, fLatch->Value() != 0));
-
-			AddAttrView();
 			break;
 		}
 
@@ -1107,6 +1152,40 @@ FindPanel::MessageReceived(BMessage* message)
 			// the query name was edited, make the query permanent
 			fTemporaryCheck->SetValue(0);
 			break;
+
+		case kAttributeItem:
+			if (message->FindPointer("source", (void**)&item) != B_OK)
+				return;
+
+			item->Menu()->Superitem()->SetMarked(true);
+			Invalidate();
+			break;
+
+		case kAttributeItemMain:
+			// in case someone selected just an attribute without the
+			// comparator
+			if (message->FindPointer("source", (void**)&item) != B_OK)
+				return;
+
+			if (item->Submenu()->ItemAt(0) != NULL)
+				item->Submenu()->ItemAt(0)->SetMarked(true);
+
+			Invalidate();
+			break;
+
+		case kLatchChanged:
+		{
+			int32 value;
+			if (message->FindInt32("be:value", &value) != B_OK)
+				break;
+
+			if (value == 0 && !fMoreOptions->IsHidden(this))
+				fMoreOptions->Hide();
+			else if (value == 1 && fMoreOptions->IsHidden(this))
+				fMoreOptions->Show();
+
+			break;
+		}
 
 		case B_SAVE_REQUESTED:
 		{
@@ -1202,30 +1281,51 @@ FindPanel::SaveAsQueryOrTemplate(const entry_ref* dir, const char* name,
 }
 
 
+BView*
+FindPanel::FindAttrView(const char* name, int row) const
+{
+	for (int32 index = 0; index < fAttrGrid->CountColumns(); index++) {
+
+		BLayoutItem* item = fAttrGrid->ItemAt(index, row);
+		if (item == NULL)
+			continue;
+
+		BView* view = item->View();
+		if (view == NULL)
+			continue;
+
+		view = view->FindView(name);
+		if (view != NULL)
+			return view;
+
+	}
+
+	return NULL;
+}
+
 void
 FindPanel::BuildAttrQuery(BQuery* query, bool &dynamicDate) const
 {
 	dynamicDate = false;
 
 	// go through each attrview and add the attr and comparison info
-	for (int32 index = 0; index < fAttrViewList.CountItems(); index++) {
+	for (int32 index = 0; index < fAttrGrid->CountRows(); index++) {
 
-		TAttrView* view = fAttrViewList.ItemAt(index);
 		BString title;
 		title << "TextEntry" << index;
 
 		BTextControl* textControl = dynamic_cast<BTextControl*>
-			(view->FindView(title.String()));
-		if (!textControl)
+			(FindAttrView(title, index));
+		if (textControl == NULL)
 			return;
 
 		BMenuField* menuField
-			= dynamic_cast<BMenuField*>(view->FindView("MenuField"));
-		if (!menuField)
+			= dynamic_cast<BMenuField*>(FindAttrView("MenuField", index));
+		if (menuField == NULL)
 			return;
 
 		BMenuItem* item = menuField->Menu()->FindMarked();
-		if (!item)
+		if (item == NULL)
 			continue;
 
 		BMessage* message = item->Message();
@@ -1331,9 +1431,8 @@ FindPanel::BuildAttrQuery(BQuery* query, bool &dynamicDate) const
 
 		// add logic based on selection in Logic menufield
 		if (index > 0) {
-			TAttrView* prevView = fAttrViewList.ItemAt(index - 1);
 			menuField
-				= dynamic_cast<BMenuField*>(prevView->FindView("Logic"));
+				= dynamic_cast<BMenuField*>(FindAttrView("Logic", index - 1));
 			if (menuField) {
 				item = menuField->Menu()->FindMarked();
 				if (item) {
@@ -1404,10 +1503,9 @@ FindPanel::GetDefaultName(BString &result) const
 			BMenuItem* item = fMimeTypeMenu->FindMarked();
 			if (item != NULL)
 				result << item->Label() << ": ";
-
-			for (int32 i = 0; i < fAttrViewList.CountItems(); i++) {
-				fAttrViewList.ItemAt(i)->GetDefaultName(result);
-				if (i + 1 < fAttrViewList.CountItems())
+			for (int32 i = 0; i < fAttrGrid->CountRows(); i++) {
+				GetDefaultAttrName(result, i);
+				if (i + 1 < fAttrGrid->CountRows())
 					result << ", ";
 			}
 			break;
@@ -1454,9 +1552,6 @@ FindPanel::SwitchMode(uint32 mode)
 		// no work, bail
 		return;
 
-	BBox* box = dynamic_cast<BBox*>(FindView("Box"));
-	ASSERT(box);
-
 	uint32 oldMode = fMode;
 	BString buffer;
 
@@ -1477,16 +1572,6 @@ FindPanel::SwitchMode(uint32 mode)
 		case kByNameItem:
 		{
 			fMode = mode;
-			Window()->ResizeTo(Window()->Frame().Width(),
-				ViewHeightForMode(mode, fLatch->Value() != 0));
-			BRect bounds(Bounds());
-			bounds.InsetBy(15, 30);
-			bounds.bottom -= 10;
-			if (fLatch->Value())
-				bounds.bottom -= kMoreOptionsDelta;
-			box->ResizeTo(bounds.Width(), BoxHeightForMode(mode,
-				fLatch->Value() != 0));
-
 			RemoveByAttributeItems();
 			ShowOrHideMimeTypeMenu();
 			AddByNameOrFormulaItems();
@@ -1504,12 +1589,6 @@ FindPanel::SwitchMode(uint32 mode)
 		case kByAttributeItem:
 		{
 			fMode = mode;
-			box->ResizeTo(box->Bounds().Width(),
-				BoxHeightForMode(mode, fLatch->Value() != 0));
-
-			Window()->ResizeTo(Window()->Frame().Width(),
-				ViewHeightForMode(mode, fLatch->Value() != 0));
-
 			BTextControl* textControl
 				= dynamic_cast<BTextControl*>(FindView("TextControl"));
 			if (textControl) {
@@ -1518,7 +1597,7 @@ FindPanel::SwitchMode(uint32 mode)
 			}
 
 			ShowOrHideMimeTypeMenu();
-			AddAttrView();
+			AddAttrRow();
 			break;
 		}
 	}
@@ -1545,9 +1624,9 @@ FindPanel::CurrentMimeType(const char** type) const
 		}
 	}
 
-	if (type && item != NULL) {
+	if (type != NULL && item != NULL) {
 		BMessage* message = item->Message();
-		if (!message)
+		if (message == NULL)
 			return NULL;
 
 		if (message->FindString("mimetype", type) != B_OK)
@@ -1578,24 +1657,28 @@ FindPanel::SetCurrentMimeType(BMenuItem* item)
 
 		BMenuItem* search;
 		for (int32 i = 2; (search = MimeTypeMenu()->ItemAt(i)) != NULL; i++) {
-			if (item == search || !search->Label())
+			if (item == search || search->Label() == NULL)
 				continue;
-			if (!strcmp(item->Label(),search->Label())) {
+
+			if (strcmp(item->Label(), search->Label()) == 0) {
 				search->SetMarked(true);
 				break;
 			}
+
 			BMenu* submenu = search->Submenu();
-			if (submenu) {
-				for (int32 j = submenu->CountItems();j-- > 0;) {
-					BMenuItem* sub = submenu->ItemAt(j);
-					if (!strcmp(item->Label(),sub->Label())) {
-						sub->SetMarked(true);
-						break;
-					}
+			if (submenu == NULL)
+				continue;
+
+			for (int32 j = submenu->CountItems(); j-- > 0;) {
+				BMenuItem* sub = submenu->ItemAt(j);
+				if (strcmp(item->Label(), sub->Label()) == 0) {
+					sub->SetMarked(true);
+					break;
 				}
 			}
 		}
 	}
+
 	return B_OK;
 }
 
@@ -1625,14 +1708,14 @@ FindPanel::SetCurrentMimeType(const char* label)
 			for (int32 subIndex = submenu->CountItems(); subIndex-- > 0;) {
 				BMenuItem* subItem = submenu->ItemAt(subIndex);
 				if (subItem->Label() != NULL
-					&& !strcmp(label, subItem->Label())) {
+					&& strcmp(label, subItem->Label()) == 0) {
 					subItem->SetMarked(true);
 					found = true;
 				}
 			}
 		}
 
-		if (item->Label() != NULL && !strcmp(label, item->Label())) {
+		if (item->Label() != NULL && strcmp(label, item->Label()) == 0) {
 			item->SetMarked(true);
 			return B_OK;
 		}
@@ -1710,7 +1793,7 @@ FindPanel::AddMimeTypesToMenu()
 		const char* superType;
 		int32 index = 0;
 
-		while (types.FindString("super_types",index++,&superType) == B_OK) {
+		while (types.FindString("super_types", index++, &superType) == B_OK) {
 			BMenu* superMenu = new BMenu(superType);
 
 			BMessage* message = new BMessage(kMIMETypeItem);
@@ -1724,22 +1807,24 @@ FindPanel::AddMimeTypesToMenu()
 		}
 	}
 
-	if (tracker)
+	if (tracker != NULL) {
 		tracker->MimeTypes()->EachCommonType(&FindPanel::AddOneMimeTypeToMenu,
 			MimeTypeMenu());
+	}
 
 	// remove empty super type menus (and set target)
 
-	for (int32 index = MimeTypeMenu()->CountItems();index-- > 2;) {
+	for (int32 index = MimeTypeMenu()->CountItems(); index-- > 2;) {
 		BMenuItem* item = MimeTypeMenu()->ItemAt(index);
 		BMenu* submenu = item->Submenu();
-		if (submenu != NULL) {
-			if (submenu->CountItems() == 0) {
-				MimeTypeMenu()->RemoveItem(item);
-				delete item;
-			} else
-				submenu->SetTargetForItems(this);
-		}
+		if (submenu == NULL)
+			continue;
+
+		if (submenu->CountItems() == 0) {
+			MimeTypeMenu()->RemoveItem(item);
+			delete item;
+		} else
+			submenu->SetTargetForItems(this);
 	}
 
 	MimeTypeMenu()->SetTargetForItems(this);
@@ -1834,7 +1919,6 @@ FindPanel::AddRecentQueries(BMenu* menu, bool addSaveAsItem,
 	while (roster.GetNextVolume(&volume) == B_OK) {
 		if (volume.IsPersistent() && volume.KnowsQuery()
 			&& volume.KnowsAttr()) {
-
 			BQuery query;
 			query.SetVolume(&volume);
 			query.SetPredicate("_trk/recentQuery == 1");
@@ -1861,7 +1945,6 @@ FindPanel::AddRecentQueries(BMenu* menu, bool addSaveAsItem,
 
 					recentQueries.AddItem(new EntryWithDate(ref, changeTime));
 				}
-
 			}
 		}
 	}
@@ -1877,11 +1960,13 @@ FindPanel::AddRecentQueries(BMenu* menu, bool addSaveAsItem,
 	templates.EachElement(AddOneRecentItem, &params);
 
 	int32 count = recentQueries.CountItems();
-	// show only up to 10 recent queries
-	if (count > 10)
+	if (count > 10) {
+		// show only up to 10 recent queries
 		count = 10;
+	} else if (count < 0)
+		count = 0;
 
-	if (templates.CountItems() && count)
+	if (templates.CountItems() > 0 && count > 0)
 		menu->AddSeparatorItem();
 
 	for (int32 index = 0; index < count; index++)
@@ -1889,58 +1974,42 @@ FindPanel::AddRecentQueries(BMenu* menu, bool addSaveAsItem,
 
 	if (addSaveAsItem) {
 		// add a Save as template item
-		if (count || templates.CountItems())
+		if (count > 0 || templates.CountItems() > 0)
 			menu->AddSeparatorItem();
 
 		BMessage* message = new BMessage(kRunSaveAsTemplatePanel);
 		BMenuItem* item = new BMenuItem(
-			B_TRANSLATE("Save Query as template" B_UTF8_ELLIPSIS), message);
+			B_TRANSLATE("Save query as template" B_UTF8_ELLIPSIS), message);
 		menu->AddItem(item);
 	}
 }
 
 
 void
-FindPanel::AddOneAttributeItem(BBox* box, BRect rect)
-{
-	TAttrView* attrView = new TAttrView(rect, fAttrViewList.CountItems());
-	fAttrViewList.AddItem(attrView);
-
-	box->AddChild(attrView);
-	attrView->MakeTextViewFocus();
-}
-
-
-void
 FindPanel::SetUpAddRemoveButtons(BBox* box)
 {
-	BButton* button = Window() != NULL
-		? dynamic_cast<BButton*>(Window()->FindView("remove"))
-		: NULL;
-	if (button == NULL) {
-		BRect rect = box->Bounds();
-		rect.InsetBy(5, 10);
-		rect.top = rect.bottom - 20;
-		rect.right = rect.left + 22
-			+ be_plain_font->StringWidth(B_TRANSLATE("Add"));
-
-		button = new BButton(rect, "add", B_TRANSLATE("Add"),
-			new BMessage(kAddItem), B_FOLLOW_RIGHT + B_FOLLOW_BOTTOM);
-		button->SetTarget(this);
-		box->AddChild(button);
-
-		rect.OffsetBy(rect.Width() + 6, 0);
-		rect.right = rect.left + 22
-			+ be_plain_font->StringWidth(B_TRANSLATE("Remove"));
-		button = new BButton(rect, "remove", B_TRANSLATE("Remove"),
-			new BMessage(kRemoveItem), B_FOLLOW_RIGHT + B_FOLLOW_BOTTOM);
-
-		button->SetEnabled(false);
-		button->SetTarget(this);
-		box->AddChild(button);
+	BButton* removeButton = dynamic_cast<BButton*>(box->FindView("remove button"));
+	if (removeButton != NULL) {
+		removeButton->SetEnabled(fAttrGrid->CountRows() > 1);
+		return;
 	}
-	// enable remove button as needed
-	button->SetEnabled(fAttrViewList.CountItems() > 1);
+
+	removeButton = new BButton("remove button", B_TRANSLATE("Remove"),
+		new BMessage(kRemoveItem));
+	removeButton->SetEnabled(false);
+	removeButton->SetTarget(this);
+
+	BButton* addButton = new BButton("add button", B_TRANSLATE("Add"),
+		new BMessage(kAddItem));
+	addButton->SetTarget(this);
+
+	BGroupLayout* layout = dynamic_cast<BGroupLayout*>(box->GetLayout());
+	BLayoutBuilder::Group<>(layout)
+		.AddGroup(B_HORIZONTAL)
+			.AddGlue()
+			.Add(removeButton)
+			.Add(addButton)
+			.End();
 }
 
 
@@ -1953,81 +2022,99 @@ FindPanel::FillCurrentQueryName(BTextControl* queryName, FindWindow* window)
 
 
 void
-FindPanel::AddAttrView()
+FindPanel::AddAttrRow()
 {
 	BBox* box = dynamic_cast<BBox*>(FindView("Box"));
-	BRect bounds(Bounds());
+	BGridView* grid = dynamic_cast<BGridView*>(box->FindView("AttrFields"));
 
-	TAttrView* previous = fAttrViewList.LastItem();
+	if (grid == NULL) {
+		// reset layout
+		BLayoutBuilder::Group<>(box, B_VERTICAL);
 
-	if (previous)
-		Window()->ResizeBy(0, 30);
-
-	bounds = Bounds();
-	bounds.InsetBy(15, 30);
-	bounds.bottom -= 10 + (fLatch->Value() ? kAttrViewDelta : 0);
-
-	if (previous) {
-		box->ResizeTo(bounds.Width(), bounds.Height());
-		bounds = previous->Frame();
-		bounds.OffsetBy(0, 30);
-	} else {
-		bounds = box->Bounds();
-		bounds.InsetBy(5, 5);
-		bounds.bottom = bounds.top + 25;
+		grid = new BGridView("AttrFields");
+		box->AddChild(grid);
 	}
-	AddOneAttributeItem(box, bounds);
 
-		// add logic to previous attrview
-	if (previous)
-		previous->AddLogicMenu();
+	fAttrGrid = grid->GridLayout();
+
+	AddAttributeControls(fAttrGrid->CountRows());
+
+	// add logic to previous attrview
+	if (fAttrGrid->CountRows() > 1)
+		AddLogicMenu(fAttrGrid->CountRows() - 2);
 
 	SetUpAddRemoveButtons(box);
-
-	// populate mime popup
-	TAttrView* last = fAttrViewList.LastItem();
-	last->AddMimeTypeAttrs();
 }
 
 
 void
-FindPanel::RemoveAttrView()
+FindPanel::RemoveAttrRow()
 {
-	if (fAttrViewList.CountItems() < 2)
+	if (fAttrGrid->CountRows() < 2)
 		return;
 
-	BBox* box = dynamic_cast<BBox*>(FindView("Box"));
-	TAttrView* attrView = fAttrViewList.LastItem();
-	if (!box || !attrView)
+	BView* view;
+
+	int32 row = fAttrGrid->CountRows() - 1;
+	for (int32 col = fAttrGrid->CountColumns(); col > 0; col--) {
+		BLayoutItem* item = fAttrGrid->ItemAt(col - 1, row);
+		if (item == NULL)
+			continue;
+
+		view = item->View();
+		if (view == NULL)
+			continue;
+
+		view->RemoveSelf();
+		delete view;
+	}
+
+	BString string = "TextEntry";
+	string << (row - 1);
+	view = FindAttrView(string.String(), row - 1);
+	if (view != NULL)
+		view->MakeFocus();
+
+	if (fAttrGrid->CountRows() > 1) {
+		// remove the And/Or menu field of the previous row
+		BLayoutItem* item = fAttrGrid->ItemAt(3, row - 1);
+		if (item == NULL)
+			return;
+
+		view = item->View();
+		if (view == NULL)
+			return;
+
+		view->RemoveSelf();
+		delete view;
 		return;
+	}
 
-	Window()->ResizeBy(0, -30);
-	BRect bounds(Bounds());
-	bounds.InsetBy(15, 30);
-	bounds.bottom -= 10 + (fLatch->Value() ? kAttrViewDelta : 0);
-	box->ResizeTo(bounds.Width(), bounds.Height());
+	// only one row remains
 
-	fAttrViewList.RemoveItem(attrView);
-	attrView->RemoveSelf();
-	delete attrView;
-
-	attrView = fAttrViewList.LastItem();
-	attrView->RemoveLogicMenu();
-	attrView->MakeTextViewFocus();
-
-	if (fAttrViewList.CountItems() != 1)
-		return;
-
-	BButton* button = dynamic_cast<BButton*>(Window()->FindView("remove"));
-	if (button)
+	// disable the remove button
+	BButton* button = dynamic_cast<BButton*>(FindView("remove button"));
+	if (button != NULL)
 		button->SetEnabled(false);
+
+	// remove the And/Or menu field
+	BLayoutItem* item = fAttrGrid->RemoveItem(3);
+	if (item == NULL)
+		return;
+
+	view = item->View();
+	if (view == NULL)
+		return;
+
+	view->RemoveSelf();
+	delete view;
 }
 
 
 uint32
 FindPanel::InitialMode(const BNode* node)
 {
-	if (!node || node->InitCheck() != B_OK)
+	if (node == NULL || node->InitCheck() != B_OK)
 		return kByNameItem;
 
 	uint32 result;
@@ -2042,7 +2129,7 @@ FindPanel::InitialMode(const BNode* node)
 int32
 FindPanel::InitialAttrCount(const BNode* node)
 {
-	if (!node || node->InitCheck() != B_OK)
+	if (node == NULL || node->InitCheck() != B_OK)
 		return 1;
 
 	int32 result;
@@ -2107,12 +2194,12 @@ FindPanel::SaveWindowState(BNode* node, bool editTemplate)
 		case kByAttributeItem:
 		{
 			BMessage message;
-			int32 count = fAttrViewList.CountItems();
+			int32 count = fAttrGrid->CountRows();
 			node->WriteAttr(kAttrQueryInitialNumAttrs, B_INT32_TYPE, 0,
 				&count, sizeof(int32));
 
 			for (int32 index = 0; index < count; index++)
-				fAttrViewList.ItemAt(index)->SaveState(&message, index);
+				SaveAttrState(&message, index);
 
 			ssize_t size = message.FlattenedSize();
 			char* buffer = new char[size];
@@ -2143,25 +2230,12 @@ FindPanel::SaveWindowState(BNode* node, bool editTemplate)
 void
 FindPanel::SwitchToTemplate(const BNode* node)
 {
-	if (fLatch->Value()) {
-		// this is kind of a hack - the following code up to
-		// RestoreWindowState assumes the latch is closed
-		// Would be nicer if all the size of the window were set once
-		// and correctly - this is not easy thought because the latch
-		// controls the window size in relative increments
-		fLatch->SetValue(0);
-		fMoreOptionsPane->SetMode(0);
-	}
-
 	SwitchMode(InitialMode(node));
 		// update the menu to correspond to the mode
 	MarkNamedMenuItem(fSearchModeMenu, InitialMode(node), true);
 
- 	BRect initialRect(InitialViewSize(node));
-	Window()->ResizeTo(initialRect.Width(), initialRect.Height());
 	if (Mode() == (int32)kByAttributeItem) {
 		RemoveByAttributeItems();
-		ResizeAttributeBox(node);
 		AddByAttributeItems(node);
 	}
 
@@ -2172,8 +2246,10 @@ FindPanel::SwitchToTemplate(const BNode* node)
 void
 FindPanel::RestoreMimeTypeMenuSelection(const BNode* node)
 {
-	if (Mode() == (int32)kByFormulaItem || node == NULL || node->InitCheck() != B_OK)
+	if (Mode() == (int32)kByFormulaItem || node == NULL
+		|| node->InitCheck() != B_OK) {
 		return;
+	}
 
 	BString buffer;
 	if (node->ReadAttrString(kAttrQueryInitialMime, &buffer) == B_OK)
@@ -2185,7 +2261,7 @@ void
 FindPanel::RestoreWindowState(const BNode* node)
 {
 	fMode = InitialMode(node);
-	if (!node || node->InitCheck() != B_OK)
+	if (node == NULL || node->InitCheck() != B_OK)
 		return;
 
 	ShowOrHideMimeTypeMenu();
@@ -2195,7 +2271,7 @@ FindPanel::RestoreWindowState(const BNode* node)
 	bool storesMoreOptions = ReadAttr(node, kAttrQueryMoreOptions,
 		kAttrQueryMoreOptionsForeign, B_RAW_TYPE, 0, &saveMoreOptions,
 		sizeof(saveMoreOptions), &MoreOptionsStruct::EndianSwap)
-		!= kReadAttrFailed;
+			!= kReadAttrFailed;
 
 	if (storesMoreOptions) {
 		// need to sanitize to true or false here, could have picked
@@ -2205,7 +2281,10 @@ FindPanel::RestoreWindowState(const BNode* node)
 			(saveMoreOptions.showMoreOptions != 0);
 
 		fLatch->SetValue(saveMoreOptions.showMoreOptions);
-		fMoreOptionsPane->SetMode(saveMoreOptions.showMoreOptions);
+		if (saveMoreOptions.showMoreOptions == 1 && fMoreOptions->IsHidden())
+			fMoreOptions->Show();
+		else if (saveMoreOptions.showMoreOptions == 0 && !fMoreOptions->IsHidden())
+			fMoreOptions->Hide();
 
 		fSearchTrashCheck->SetValue(saveMoreOptions.searchTrash);
 		fTemporaryCheck->SetValue(saveMoreOptions.temporary);
@@ -2270,8 +2349,7 @@ FindPanel::RestoreWindowState(const BNode* node)
 				BMessage message;
 				if (message.Unflatten(buffer) == B_OK)
 					for (int32 index = 0; index < count; index++) {
-						fAttrViewList.ItemAt(index)->RestoreState(message,
-							index);
+						RestoreAttrState(message, index);
 					}
 			}
 			delete[] buffer;
@@ -2316,37 +2394,14 @@ FindPanel::RestoreWindowState(const BNode* node)
 
 
 void
-FindPanel::ResizeAttributeBox(const BNode* node)
-{
-	BBox* box = dynamic_cast<BBox*>(FindView("Box"));
-	BRect bounds(box->Bounds());
-	int32 count = InitialAttrCount(node);
-
-	bounds.bottom = count * 30 + 40;
-	box->ResizeTo(bounds.Width(), bounds.Height());
-}
-
-
-void
 FindPanel::AddByAttributeItems(const BNode* node)
 {
-	BBox* box = dynamic_cast<BBox*>(FindView("Box"));
-	ASSERT(box);
-	BRect bounds(box->Bounds());
-
 	int32 numAttributes = InitialAttrCount(node);
 	if (numAttributes < 1)
 		numAttributes = 1;
 
-	BRect rect(bounds);
-	rect.InsetBy(5, 5);
-	rect.bottom = rect.top + 25;
-
-	for (int32 index = 0; index < numAttributes; index ++) {
-		AddOneAttributeItem(box, rect);
-		rect.OffsetBy(0, 30);
-	}
-	SetUpAddRemoveButtons(box);
+	for (int32 index = 0; index < numAttributes; index ++)
+		AddAttrRow();
 }
 
 
@@ -2354,29 +2409,36 @@ void
 FindPanel::AddByNameOrFormulaItems()
 {
 	BBox* box = dynamic_cast<BBox*>(FindView("Box"));
+	// reset layout
+	BLayoutBuilder::Group<>(box, B_VERTICAL);
 
-	BRect bounds(box->Bounds());
-	bounds.InsetBy(10, 10);
-	BTextControl* textControl = new BTextControl(bounds, "TextControl",
+	BTextControl* textControl = new BTextControl("TextControl",
 		"", "", NULL);
 	textControl->SetDivider(0.0f);
+	box->SetBorder(B_NO_BORDER);
 	box->AddChild(textControl);
 	textControl->MakeFocus();
 }
 
 
 void
-FindPanel::RemoveAttrViewItems()
+FindPanel::RemoveAttrViewItems(bool removeGrid)
 {
-	for (;;) {
-		BView* view = FindView("AttrView");
-		if (view == NULL)
-			break;
-		view->RemoveSelf();
-		delete view;
+	if (fAttrGrid == NULL)
+		return;
+
+	BView* view = fAttrGrid->View();
+	for (int32 index = view->CountChildren(); index > 0; index--) {
+		BView* child = view->ChildAt(index - 1);
+		child->RemoveSelf();
+		delete child;
 	}
 
-	fAttrViewList.MakeEmpty();
+	if (removeGrid) {
+		view->RemoveSelf();
+		delete view;
+		fAttrGrid = NULL;
+	}
 }
 
 
@@ -2384,19 +2446,19 @@ void
 FindPanel::RemoveByAttributeItems()
 {
 	RemoveAttrViewItems();
-	BView* view = FindView("add");
+	BView* view = FindView("add button");
 	if (view) {
 		view->RemoveSelf();
 		delete view;
 	}
 
-	view = FindView("remove");
+	view = FindView("remove button");
 	if (view) {
 		view->RemoveSelf();
 		delete view;
 	}
 
-	view = dynamic_cast<BTextControl*>(FindView("TextControl"));
+	view = FindView("TextControl");
 	if (view) {
 		view->RemoveSelf();
 		delete view;
@@ -2407,25 +2469,26 @@ FindPanel::RemoveByAttributeItems()
 void
 FindPanel::ShowOrHideMimeTypeMenu()
 {
+	BView* menuFieldSpacer = FindView("MimeTypeMenuSpacer");
 	BMenuField* menuField
 		= dynamic_cast<BMenuField*>(FindView("MimeTypeMenu"));
-	if (Mode() == (int32)kByFormulaItem && !menuField->IsHidden())
+	if (Mode() == (int32)kByFormulaItem && !menuField->IsHidden(this)) {
+		BSize size = menuField->ExplicitMinSize();
 		menuField->Hide();
-	else if (menuField->IsHidden())
+		menuFieldSpacer->SetExplicitMinSize(size);
+		menuFieldSpacer->SetExplicitMaxSize(size);
+		if (menuFieldSpacer->IsHidden(this))
+			menuFieldSpacer->Show();
+	} else if (menuField->IsHidden(this)) {
+		menuFieldSpacer->Hide();
 		menuField->Show();
+	}
 }
 
 
-// #pragma mark -
-
-
-TAttrView::TAttrView(BRect frame, int32 index)
-	:
-	BView(frame, "AttrView", B_FOLLOW_NONE, B_WILL_DRAW)
+void
+FindPanel::AddAttributeControls(int32 gridRow)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
 	BPopUpMenu* menu = new BPopUpMenu("PopUp");
 
 	// add NAME attribute to popup
@@ -2438,27 +2501,14 @@ TAttrView::TAttrView(BRect frame, int32 index)
 	BMenuItem* item = new BMenuItem(submenu, message);
 	menu->AddItem(item);
 
-	const int32 operators[] = {
-		B_CONTAINS,
-		B_EQ,
-		B_NE,
-		B_BEGINS_WITH,
-		B_ENDS_WITH};
-	static const char* operatorLabels[] = {
-		B_TRANSLATE_MARK("contains"),
-		B_TRANSLATE_MARK("is"),
-		B_TRANSLATE_MARK("is not"),
-		B_TRANSLATE_MARK("starts with"),
-		B_TRANSLATE_MARK("ends with")};
-
 	for (int32 i = 0; i < 5; i++) {
 		message = new BMessage(kAttributeItem);
 		message->AddInt32("operator", operators[i]);
-		submenu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(
-			operatorLabels[i]), message));
+		submenu->AddItem(new BMenuItem(
+			B_TRANSLATE_NOCOLLECT(operatorLabels[i]), message));
 	}
 
-	// mark first item
+	// mark first items initially
 	menu->ItemAt(0)->SetMarked(true);
 	submenu->ItemAt(0)->SetMarked(true);
 
@@ -2474,15 +2524,18 @@ TAttrView::TAttrView(BRect frame, int32 index)
 
 	message = new BMessage(kAttributeItem);
 	message->AddInt32("operator", B_GE);
-	submenu->AddItem(new BMenuItem(B_TRANSLATE("greater than"), message));
+	submenu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(operatorLabels[5]),
+		message));
 
 	message = new BMessage(kAttributeItem);
 	message->AddInt32("operator", B_LE);
-	submenu->AddItem(new BMenuItem(B_TRANSLATE("less than"), message));
+	submenu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(operatorLabels[6]),
+		message));
 
 	message = new BMessage(kAttributeItem);
 	message->AddInt32("operator", B_EQ);
-	submenu->AddItem(new BMenuItem(B_TRANSLATE("is"), message));
+	submenu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(operatorLabels[1]),
+		message));
 
 	// add "modified" field
 	submenu = new BMenu(B_TRANSLATE("Modified"));
@@ -2496,62 +2549,46 @@ TAttrView::TAttrView(BRect frame, int32 index)
 
 	message = new BMessage(kAttributeItem);
 	message->AddInt32("operator", B_LE);
-	submenu->AddItem(new BMenuItem(B_TRANSLATE("before"), message));
+	submenu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(operatorLabels[7]),
+		message));
 
 	message = new BMessage(kAttributeItem);
 	message->AddInt32("operator", B_GE);
-	submenu->AddItem(new BMenuItem(B_TRANSLATE("after"), message));
+	submenu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(operatorLabels[8]),
+		message));
 
-	BRect bounds(Bounds());
-	bounds.right = bounds.left + 100;
-	bounds.bottom = bounds.top + 15;
-	fMenuField = new BMenuField(bounds, "MenuField", "", menu);
-	fMenuField->SetDivider(0.0f);
+	BMenuField* menuField = new BMenuField("MenuField", "", menu);
+	menuField->SetDivider(0.0f);
+	fAttrGrid->AddView(menuField, 0, gridRow);
 
-	// add text entry box
-	bounds = Bounds();
-	bounds.left += bounds.right - 180;
-	bounds.top += 2;
-	bounds.right -= 42;
+	BStringView* stringView = new BStringView("",
+		menu->FindMarked()->Submenu()->FindMarked()->Label());
+	BLayoutItem* layoutItem = fAttrGrid->AddView(stringView, 1, gridRow);
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
+		B_ALIGN_VERTICAL_UNSET));
+
 	BString title("TextEntry");
-	title << index;
-	fTextControl = new BTextControl(bounds, title.String(), "", "", NULL);
-	fTextControl->SetDivider(0.0f);
-	AddChild(fTextControl);
+	title << gridRow;
+	BTextControl* textControl = new BTextControl(title.String(), "", "", NULL);
+	textControl->SetDivider(0.0f);
+	fAttrGrid->AddView(textControl, 2, gridRow);
+	textControl->MakeFocus();
 
-	AddChild(fMenuField);
-		// add attributes from currently selected mimetype
-}
-
-
-TAttrView::~TAttrView()
-{
-}
-
-
-void
-TAttrView::AttachedToWindow()
-{
-	BMenu* menu = fMenuField->Menu();
 	// target everything
 	menu->SetTargetForItems(this);
-
 	for (int32 index = menu->CountItems() - 1; index >= 0; index--)
 		menu->SubmenuAt(index)->SetTargetForItems(this);
+
+	// populate mime popup
+	AddMimeTypeAttrs(menu);
 }
 
 
 void
-TAttrView::MakeTextViewFocus()
+FindPanel::RestoreAttrState(const BMessage &message, int32 index)
 {
-	fTextControl->MakeFocus();
-}
-
-
-void
-TAttrView::RestoreState(const BMessage &message, int32 index)
-{
-	BMenu* menu = fMenuField->Menu();
+	BMenu* menu = dynamic_cast<BMenuField*>(FindAttrView("MenuField", index))
+		->Menu();
 	// decode menu selections
 
 	AddMimeTypeAttrs(menu);
@@ -2568,27 +2605,32 @@ TAttrView::RestoreState(const BMessage &message, int32 index)
 	}
 
 	// decode attribute text
-	ASSERT(fTextControl);
+	BString bstring = "TextEntry";
+	bstring << index;
+	BTextControl* textControl
+		= dynamic_cast<BTextControl*>(FindAttrView(bstring.String(), index));
+	ASSERT(textControl);
 	const char* string;
 	if (message.FindString("attrViewText", index, &string) == B_OK)
-		fTextControl->TextView()->SetText(string);
+		textControl->TextView()->SetText(string);
 
 	int32 logicMenuSelectedIndex;
-	BMenuField* field = dynamic_cast<BMenuField*>(FindView("Logic"));
+	BMenuField* field = dynamic_cast<BMenuField*>(FindAttrView("Logic", index));
 	if (message.FindInt32("logicalRelation", index,
-		&logicMenuSelectedIndex) == B_OK) {
+			&logicMenuSelectedIndex) == B_OK) {
 		if (field)
 			field->Menu()->ItemAt(logicMenuSelectedIndex)->SetMarked(true);
 		else
-			AddLogicMenu(logicMenuSelectedIndex == 0);
+			AddLogicMenu(index, logicMenuSelectedIndex == 0);
 	}
 }
 
 
 void
-TAttrView::SaveState(BMessage* message, int32)
+FindPanel::SaveAttrState(BMessage* message, int32 index)
 {
-	BMenu* menu = fMenuField->Menu();
+	BMenu* menu = dynamic_cast<BMenuField*>(FindAttrView("MenuField", index))
+		->Menu();
 
 	// encode main attribute menu selection
 	BMenuItem* item = menu->FindMarked();
@@ -2607,11 +2649,15 @@ TAttrView::SaveState(BMessage* message, int32)
 	message->AddString("subMenuSelection", label);
 
 	// encode attribute text
-	ASSERT(fTextControl);
-	message->AddString("attrViewText", fTextControl->TextView()->Text());
+	BString string = "TextEntry";
+	string << index;
+	BTextControl* textControl
+		= dynamic_cast<BTextControl*>(FindAttrView(string.String(), index));
+	ASSERT(textControl);
+	message->AddString("attrViewText", textControl->TextView()->Text());
 
-	BMenuField* field = dynamic_cast<BMenuField*>(FindView("Logic"));
-	if (field) {
+	BMenuField* field = dynamic_cast<BMenuField*>(FindAttrView("Logic", index));
+	if (field != NULL) {
 		BMenuItem* item = field->Menu()->FindMarked();
 		ASSERT(item);
 		message->AddInt32("logicalRelation",
@@ -2619,8 +2665,9 @@ TAttrView::SaveState(BMessage* message, int32)
 	}
 }
 
+
 void
-TAttrView::AddLogicMenu(bool selectAnd)
+FindPanel::AddLogicMenu(int32 index, bool selectAnd)
 {
 	// add "AND/OR" menu
 	BPopUpMenu* menu = new BPopUpMenu("");
@@ -2640,20 +2687,19 @@ TAttrView::AddLogicMenu(bool selectAnd)
 
 	menu->SetTargetForItems(this);
 
-	BRect bounds(Bounds());
-	bounds.left = bounds.right - 40;
-	bounds.bottom = bounds.top + 15;
-	BMenuField* menufield = new BMenuField(bounds, "Logic", "", menu);
+	BMenuField* menufield = new BMenuField("Logic", "", menu, B_WILL_DRAW);
 	menufield->SetDivider(0.0f);
-	menufield->HidePopUpMarker();
-	AddChild(menufield);
+
+	ResizeMenuField(menufield);
+
+	fAttrGrid->AddView(menufield, 3, index);
 }
 
 
 void
-TAttrView::RemoveLogicMenu()
+FindPanel::RemoveLogicMenu(int32 index)
 {
-	BMenuField* menufield = dynamic_cast<BMenuField*>(FindView("Logic"));
+	BMenuField* menufield = dynamic_cast<BMenuField*>(FindAttrView("Logic", index));
 	if (menufield) {
 		menufield->RemoveSelf();
 		delete menufield;
@@ -2662,67 +2708,7 @@ TAttrView::RemoveLogicMenu()
 
 
 void
-TAttrView::Draw(BRect)
-{
-	BMenuItem* item = fMenuField->Menu()->FindMarked();
-	if (!item)
-		return;
-
-	if (item->Submenu()->FindMarked()) {
-		float width = StringWidth(item->Submenu()->FindMarked()->Label());
-		BRect bounds(fTextControl->Frame());
-
-		// draws the is/contains, etc. string
-		bounds.left -= (width + 10);
-		bounds.bottom -= 6;
-		DrawString(item->Submenu()->FindMarked()->Label(),
-			bounds.LeftBottom());
-	}
-}
-
-
-void
-TAttrView::MessageReceived(BMessage* message)
-{
-	BMenuItem* item;
-
-	switch (message->what) {
-		case kAttributeItem:
-			if (message->FindPointer("source", (void**)&item) != B_OK)
-				return;
-
-			item->Menu()->Superitem()->SetMarked(true);
-			Invalidate();
-			break;
-
-		case kAttributeItemMain:
-			// in case someone selected just and attribute without the
-			// comparator
-			if (message->FindPointer("source", (void**)&item) != B_OK)
-				return;
-
-			if (item->Submenu()->ItemAt(0))
-				item->Submenu()->ItemAt(0)->SetMarked(true);
-			Invalidate();
-			break;
-
-		default:
-			_inherited::MessageReceived(message);
-			break;
-	}
-}
-
-
-void
-TAttrView::AddMimeTypeAttrs()
-{
-	BMenu* menu = fMenuField->Menu();
-	AddMimeTypeAttrs(menu);
-}
-
-
-void
-TAttrView::AddAttributes(BMenu* menu, const BMimeType &mimeType)
+FindPanel::AddAttributes(BMenu* menu, const BMimeType &mimeType)
 {
 	// only add things to menu which have "user-visible" data
 	BMessage attributeMessage;
@@ -2767,29 +2753,25 @@ TAttrView::AddAttributes(BMenu* menu, const BMimeType &mimeType)
 			case B_STRING_TYPE:
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_CONTAINS);
-				submenu->AddItem(new BMenuItem(B_TRANSLATE("contains"),
-					message));
+				submenu->AddItem(new BMenuItem(operatorLabels[0], message));
 
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_EQ);
-				submenu->AddItem(new BMenuItem(B_TRANSLATE("is"), message));
+				submenu->AddItem(new BMenuItem(operatorLabels[1], message));
 
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_NE);
-				submenu->AddItem(new BMenuItem(B_TRANSLATE("is not"),
-					message));
+				submenu->AddItem(new BMenuItem(operatorLabels[2], message));
 				submenu->SetTargetForItems(this);
 
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_BEGINS_WITH);
-				submenu->AddItem(new BMenuItem(B_TRANSLATE("starts with"),
-					message));
+				submenu->AddItem(new BMenuItem(operatorLabels[3], message));
 				submenu->SetTargetForItems(this);
 
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_ENDS_WITH);
-				submenu->AddItem(new BMenuItem(B_TRANSLATE("ends with"),
-					message));
+				submenu->AddItem(new BMenuItem(operatorLabels[4], message));
 				break;
 
 			case B_BOOL_TYPE:
@@ -2806,27 +2788,25 @@ TAttrView::AddAttributes(BMenu* menu, const BMimeType &mimeType)
 			case B_DOUBLE_TYPE:
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_EQ);
-				submenu->AddItem(new BMenuItem(B_TRANSLATE("is"), message));
+				submenu->AddItem(new BMenuItem(operatorLabels[1], message));
 
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_GE);
-				submenu->AddItem(new BMenuItem(B_TRANSLATE("greater than"),
-					message));
+				submenu->AddItem(new BMenuItem(operatorLabels[5], message));
 
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_LE);
-				submenu->AddItem(new BMenuItem(B_TRANSLATE("less than"),
-					message));
+				submenu->AddItem(new BMenuItem(operatorLabels[6], message));
 				break;
 
 			case B_TIME_TYPE:
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_LE);
-				submenu->AddItem(new BMenuItem(B_TRANSLATE("before"), message));
+				submenu->AddItem(new BMenuItem(operatorLabels[7], message));
 
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_GE);
-				submenu->AddItem(new BMenuItem(B_TRANSLATE("after"), message));
+				submenu->AddItem(new BMenuItem(operatorLabels[8], message));
 				break;
 		}
 		submenu->SetTargetForItems(this);
@@ -2835,15 +2815,10 @@ TAttrView::AddAttributes(BMenu* menu, const BMimeType &mimeType)
 
 
 void
-TAttrView::AddMimeTypeAttrs(BMenu* menu)
+FindPanel::AddMimeTypeAttrs(BMenu* menu)
 {
-	FindPanel* mainView = dynamic_cast<FindPanel*>(Parent()->
-		Parent()->FindView("MainView"));
-	if (!mainView)
-		return;
-
 	const char* typeName;
-	if (mainView->CurrentMimeType(&typeName) == NULL)
+	if (CurrentMimeType(&typeName) == NULL)
 		return;
 
 	BMimeType mimeType(typeName);
@@ -2862,11 +2837,13 @@ TAttrView::AddMimeTypeAttrs(BMenu* menu)
 
 
 void
-TAttrView::GetDefaultName(BString &result) const
+FindPanel::GetDefaultAttrName(BString &result, int32 row) const
 {
 	BMenuItem* item = NULL;
-	if (fMenuField->Menu() != NULL)
-		item = fMenuField->Menu()->FindMarked();
+	BMenuField* menuField
+		= dynamic_cast<BMenuField*>(fAttrGrid->ItemAt(0, row)->View());
+	if (menuField->Menu() != NULL)
+		item = menuField->Menu()->FindMarked();
 	if (item != NULL)
 		result << item->Label();
 	else
@@ -2882,7 +2859,9 @@ TAttrView::GetDefaultName(BString &result) const
 	else
 		result << " = ";
 
-	result << fTextControl->Text();
+	BTextControl* textControl
+		= dynamic_cast<BTextControl*>(fAttrGrid->ItemAt(2, row)->View());
+	result << textControl->Text();
 }
 
 
@@ -3185,7 +3164,7 @@ MostUsedNames::~MostUsedNames()
 bool
 MostUsedNames::ObtainList(BList* list)
 {
-	if (!list)
+	if (list == NULL)
 		return false;
 
 	if (!fLoaded)
@@ -3240,9 +3219,8 @@ MostUsedNames::AddName(const char* name)
 
 	if (entry == NULL) {
 		for (int32 i = 0;
-				(entry = static_cast<list_entry*>(fList.ItemAt(i))) != NULL;
-				i++) {
-			if (!strcmp(entry->name, name))
+				(entry = static_cast<list_entry*>(fList.ItemAt(i))) != NULL; i++) {
+			if (strcmp(entry->name, name) == 0)
 				break;
 		}
 	}

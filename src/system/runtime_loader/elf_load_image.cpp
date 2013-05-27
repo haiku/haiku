@@ -505,7 +505,7 @@ load_image(char const* name, image_type type, const char* rpath,
 		goto err2;
 	}
 
-	status = map_image(fd, path, image, type == B_APP_IMAGE);
+	status = map_image(fd, path, image);
 	if (status < B_OK) {
 		FATAL("%s: Could not map image: %s\n", image->path, strerror(status));
 		status = B_ERROR;
@@ -535,6 +535,8 @@ load_image(char const* name, image_type type, const char* rpath,
 				sSearchPathSubDir = "gcc2";
 		#endif
 	}
+
+	set_abi_version(image->abi);
 
 	// init gcc version dependent image flags
 	// symbol resolution strategy

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtextencoding	3062073902
+1	hungarian	x-vnd.Haiku-libtextencoding	1525027211
 ISO Greek	textencodings		ISO görög
 ISO South European	textencodings		ISO dél-európai
 Chinese Big5	textencodings		Kínai Big5
@@ -7,6 +7,7 @@ ISO Arabic	textencodings		ISO arab
 ISO Latin 9	textencodings		ISO latin-9
 Japanese Shift JIS	textencodings		Japán Shift JIS
 DOS Cyrillic	textencodings		DOS cirill
+Windows Central European (CP 1250)	textencodings		Windows Közép-európai (CP 1250)
 Windows Cyrillic (CP 1251)	textencodings		Windows cirill (CP 1251)
 Japanese EUC	textencodings		Japán EUC
 Unicode	textencodings		Unicode

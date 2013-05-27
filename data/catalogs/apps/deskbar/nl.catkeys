@@ -1,6 +1,7 @@
-1	dutch; flemish	x-vnd.Be-TSKB	2987454543
+1	dutch; flemish	x-vnd.Be-TSKB	2632170999
 Power off	DeskbarMenu		Uitzetten
 Suspend	DeskbarMenu		Opschorten
+Applications	PreferencesWindow		Toepassingen
 Time preferences…	TimeView		Tijdsvoorkeuren…
 About Haiku	DeskbarMenu		Over Haiku
 Recent documents:	PreferencesWindow		Recente documenten:

@@ -8,6 +8,7 @@
 
 enum {
 	MSG_THREAD_RUN								= 'run_',
+	MSG_THREAD_SET_ADDRESS						= 'sead',
 	MSG_THREAD_STOP								= 'stop',
 	MSG_THREAD_STEP_OVER						= 'stov',
 	MSG_THREAD_STEP_INTO						= 'stin',
@@ -49,13 +50,17 @@ enum {
 	MSG_TEAM_DEBUGGER_QUIT						= 'dbqt',
 	MSG_SHOW_TEAMS_WINDOW						= 'stsw',
 	MSG_TEAMS_WINDOW_CLOSED						= 'tswc',
+	MSG_START_NEW_TEAM							= 'sttt',
 	MSG_DEBUG_THIS_TEAM							= 'dbtt',
 	MSG_SHOW_INSPECTOR_WINDOW					= 'sirw',
 	MSG_INSPECTOR_WINDOW_CLOSED					= 'irwc',
 	MSG_INSPECT_ADDRESS							= 'isad',
 	MSG_SHOW_TYPECAST_NODE_PROMPT				= 'stnp',
+	MSG_TYPECAST_TO_ARRAY						= 'stta',
 	MSG_TYPECAST_NODE							= 'tyno',
 	MSG_SHOW_WATCH_VARIABLE_PROMPT				= 'swvp',
+	MSG_SHOW_CONTAINER_RANGE_PROMPT				= 'scrp',
+	MSG_SET_CONTAINER_RANGE						= 'chcr',
 	MSG_GENERATE_DEBUG_REPORT					= 'gdrp'
 };
 

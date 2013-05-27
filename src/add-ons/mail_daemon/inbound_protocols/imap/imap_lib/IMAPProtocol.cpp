@@ -297,7 +297,7 @@ IMAPProtocol::SendCommand(const char* command, int32 commandID)
 		return B_NO_MEMORY;
 
 	static char cmd[256];
-	::sprintf(cmd, "A%.7ld %s"CRLF, commandID, command);
+	::sprintf(cmd, "A%.7" B_PRId32 " %s"CRLF, commandID, command);
 
 	TRACE("_SendCommand: %s\n", cmd);
 	int commandLength = strlen(cmd);
@@ -347,7 +347,7 @@ IMAPProtocol::HandleResponse(int32 commandID, bigtime_t timeout,
 		for (std::vector<int32>::iterator it = fOngoingCommands.begin();
 			it != fOngoingCommands.end(); it++) {
 			static char idString[8];
-			::sprintf(idString, "A%.7ld", *it);
+			::sprintf(idString, "A%.7" B_PRId32, *it);
 			if (line.FindFirst(idString) >= 0) {
 				if (*it == commandID) {
 					BString result = IMAPParser::ExtractElementAfter(line,

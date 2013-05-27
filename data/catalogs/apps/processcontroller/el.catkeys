@@ -1,10 +1,8 @@
-1	greek, modern (1453-)	x-vnd.Haiku-ProcessController	2887520383
+1	greek, modern (1453-)	x-vnd.Haiku-ProcessController	2886374724
 Memory usage	ProcessController		Χρήση μνήμης
-Do you really want to kill the team \"%s\"?	ProcessController		Θέλετε σίγουρα να τερματίσετε την ομάδα \"%s\";
 Idle priority	ProcessController		Ανενεργή προτεραιότητα
 Restart Deskbar	ProcessController		Επανεκκίνηση Deskbar
 Custom priority	ProcessController		Προσαρμοσμένη προτεραιότητα
-Debug thread	ProcessController		Αποσφαλμάτωση νήματος
 This team is already gone…	ProcessController		Αυτή η όμαδα έχει ήδη εξαφανιστεί
 Error saving file	ProcessController		Σφάλμα κατα την αποθήκευση του αρχείου
 Real-time priority	ProcessController		Προτεραιότητα πραγματικού χρόνου
@@ -42,7 +40,6 @@ Usage: %s [-deskbar]\n	ProcessController		Χρήση: %s [-deskbar]\n
 ProcessController	System name		ProcessController
 Real-time display priority	ProcessController		Προτεραιότητα εμφάνισης πραγματικού χρόνου
 Please confirm	ProcessController		Παρακαλώ επιβεβαιώστε
-Yes, kill this team!	ProcessController		Ναι, τερματισμός της ομάδας!
 System resources & caches…	ProcessController		Πόροι & λανθάνουσα μνήμη συστήματος...
 That's no Fun!	ProcessController		Αυτό δεν έχει πλάκα!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Μπορείτε να εκτελέσετε το ProcessController σε ένα παράθυρο ή να το εγκαταστήσετε στη Deskbar.

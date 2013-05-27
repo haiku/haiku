@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libbe	672385853
+1	slovak	x-vnd.Haiku-libbe	677628532
 gamma	AboutWindow		gama
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -7,7 +7,6 @@ About %app%	AboutMenuItem		O aplikácii %app%
 Cut	TextView		Vystrihnúť
 Version	AboutWindow		Verzia
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nemožno vytvoriť replikanta pre „%description“.\n%error
-About	AboutWindow		O aplikácii
 Copy	TextView		Kopírovať
 %3.2f KiB	StringForSize		%3.2f KiB
 %d bytes	StringForSize		%d bajtov

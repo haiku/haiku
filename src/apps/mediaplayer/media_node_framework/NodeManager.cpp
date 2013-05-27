@@ -118,8 +118,8 @@ NodeManager::SetPlayMode(int32 mode, bool continuePlaying)
 		status_t ret = fMediaRoster->SetRunModeNode(fVideoConnection.consumer,
 			runMode);
 		if (ret != B_OK) {
-			printf("NodeManager::SetPlayMode(%ld), setting run mode failed: "
-				"%s\n", mode, strerror(ret));
+			printf("NodeManager::SetPlayMode(%" B_PRId32 "), setting run mode "
+				"failed: %s\n", mode, strerror(ret));
 		}
 		fMediaRoster->Unlock();
 	}
@@ -393,12 +393,12 @@ NodeManager::_SetUpVideoNodes(color_space preferredVideoFormat,
 	format.type = B_MEDIA_RAW_VIDEO;
 	media_raw_video_format videoFormat = {
 		FramesPerSecond(), 1, 0,
-		fVideoBounds.IntegerWidth(),
+		(uint32)fVideoBounds.IntegerWidth(),
 		B_VIDEO_TOP_LEFT_RIGHT, 1, 1,
 		{
 			preferredVideoFormat,
-			fVideoBounds.IntegerWidth() + 1,
-			fVideoBounds.IntegerHeight() + 1,
+			(uint32)(fVideoBounds.IntegerWidth() + 1),
+			(uint32)(fVideoBounds.IntegerHeight() + 1),
 			0, 0, 0
 		}
 	};

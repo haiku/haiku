@@ -523,6 +523,7 @@ detect_cpu(int currentCPU)
 
 	// print some fun data
 	get_current_cpuid(&cpuid, 0);
+	uint32 maxBasicLeaf = cpuid.eax_0.max_eax;	
 
 	// build the vendor string
 	memset(vendorString, 0, sizeof(vendorString));
@@ -561,7 +562,8 @@ detect_cpu(int currentCPU)
 
 	// see if we can get the model name
 	get_current_cpuid(&cpuid, 0x80000000);
-	if (cpuid.eax_0.max_eax >= 0x80000004) {
+	uint32 maxExtendedLeaf = cpuid.eax_0.max_eax;
+	if (maxExtendedLeaf >= 0x80000004) {
 		// build the model string (need to swap ecx/edx data before copying)
 		unsigned int temp;
 		memset(cpu->arch.model_name, 0, sizeof(cpu->arch.model_name));
@@ -605,15 +607,19 @@ detect_cpu(int currentCPU)
 	get_current_cpuid(&cpuid, 1);
 	cpu->arch.feature[FEATURE_COMMON] = cpuid.eax_1.features; // edx
 	cpu->arch.feature[FEATURE_EXT] = cpuid.eax_1.extended_features; // ecx
-	if (cpu->arch.vendor == VENDOR_AMD || cpu->arch.vendor == VENDOR_INTEL) {
+
+	if (maxExtendedLeaf >= 0x80000001) {
 		get_current_cpuid(&cpuid, 0x80000001);
 		cpu->arch.feature[FEATURE_EXT_AMD] = cpuid.regs.edx; // edx
+		if (cpu->arch.vendor != VENDOR_AMD)
+			cpu->arch.feature[FEATURE_EXT_AMD] &= IA32_FEATURES_INTEL_EXT;
 	}
-	if (cpu->arch.vendor == VENDOR_INTEL)
-		cpu->arch.feature[FEATURE_EXT_AMD] &= IA32_FEATURES_INTEL_EXT;
-	get_current_cpuid(&cpuid, 6);
-	cpu->arch.feature[FEATURE_6_EAX] = cpuid.regs.eax;
-	cpu->arch.feature[FEATURE_6_ECX] = cpuid.regs.ecx;
+
+	if (maxBasicLeaf >= 6) {
+		get_current_cpuid(&cpuid, 6);
+		cpu->arch.feature[FEATURE_6_EAX] = cpuid.regs.eax;
+		cpu->arch.feature[FEATURE_6_ECX] = cpuid.regs.ecx;
+	}
 
 #if DUMP_FEATURE_STRING
 	dump_feature_string(currentCPU, cpu);

@@ -164,11 +164,16 @@ parse(BMessenger& the_application, int argc, char *argv[], int32 argapp)
 	} else {
 		if (the_reply.what == (uint32)B_MESSAGE_NOT_UNDERSTOOD || the_reply.what==(uint32)B_ERROR){	// I do it myself
 			if (the_reply.HasString("message")){
-				if (!silent)
-					printf("%s (error 0x%8lX)\n", the_reply.FindString("message"), the_reply.FindInt32("error"));
+				if (!silent) {
+					printf("%s (error 0x%8" B_PRIx32 ")\n",
+						the_reply.FindString("message"),
+						the_reply.FindInt32("error"));
+				}
 			} else {
-				if (!silent)
-					printf("error 0x%8lX\n", the_reply.FindInt32("error"));
+				if (!silent) {
+					printf("error 0x%8" B_PRIx32 "\n",
+						the_reply.FindInt32("error"));
+				}			
 			}
 			return 1;
 		} else {
@@ -187,7 +192,7 @@ parse(BMessenger& the_application, int argc, char *argv[], int32 argapp)
 						} else if(tc==B_INT32_TYPE){
 							int32 v;
 							the_reply.FindInt32("result", &v);
-							printf("%ld\n", v);
+							printf("%" B_PRId32 "\n", v);
 						} else if(tc==B_UINT8_TYPE){
 							uint8 v;
 							the_reply.FindInt8("result", (int8*)&v);
@@ -199,7 +204,7 @@ parse(BMessenger& the_application, int argc, char *argv[], int32 argapp)
 						} else if(tc==B_UINT32_TYPE){
 							uint32 v;
 							the_reply.FindInt32("result", (int32*)&v);
-							printf("%lu\n", v);
+							printf("%" B_PRIu32 "\n", v);
 						} else if(tc==B_STRING_TYPE){
 							const char* v;
 							the_reply.FindString("result", &v);
@@ -288,8 +293,8 @@ main(int argc, char *argv[])
 
 	be_roster->GetAppList(&team_list);
 
-	for (int32 i=0; i<team_list.CountItems(); i++){
-		teamid = (team_id)team_list.ItemAt(i);
+	for (int32 i = 0; i < team_list.CountItems(); i++){
+		teamid = (team_id)(addr_t)team_list.ItemAt(i);
 		be_roster->GetRunningAppInfo(teamid, &appinfo);
 		if (strcmp(appinfo.signature, argv[argapp])==0){
 			the_application=BMessenger(appinfo.signature);
@@ -479,7 +484,7 @@ Hey(BMessenger* target, char* argv[], int32* argx, int32 argc, BMessage* reply)
 						// if all goes well, rply contains all kinds of property infos
 						int32 j=0;
 						void *voidptr;
-						int32 sizefound;
+						ssize_t sizefound;
 						BPropertyInfo propinfo;
 						const value_info *vinfo;
 						int32 vinfo_index, vinfo_count;
@@ -958,8 +963,9 @@ void
 add_message_contents(BList *textlist, BMessage *msg, int32 level)
 {
 	int32 count;
-	int32 i, sizefound, j;
-	ulong typefound;
+	int32 i, j;
+	type_code typefound;
+	ssize_t sizefound;
 #ifdef HAIKU_TARGET_PLATFORM_DANO
 	const char *namefound;
 #else
@@ -1178,14 +1184,15 @@ format_data(int32 type, char *ptr, long size)
 		case B_INT64_TYPE:
 					str = new char[64];
 					i64 = *(int64*)ptr;
-					sprintf(str, "%Ld (0x%LX)", i64, i64);
+					sprintf(str, "%" B_PRId64 " (0x%" B_PRIx64 ")", i64, i64);
 					break;
 
 		case B_SIZE_T_TYPE:
 		case B_INT32_TYPE:
 					str = new char[64];
 					i32 = *(int32*)ptr;
-					sprintf(str, "%ld (0x%08lX)", i32, i32);
+					sprintf(str, "%" B_PRId32 " (0x%08" B_PRId32 ")", i32,
+						i32);
 					break;
 
 		case B_INT16_TYPE:
@@ -1204,13 +1211,15 @@ format_data(int32 type, char *ptr, long size)
 		case B_UINT64_TYPE:
 					str = new char[64];
 					ui64 = *(uint64*)ptr;
-					sprintf(str, "%Lu (0x%LX)", ui64, ui64);
+					sprintf(str, "%" B_PRIu64 " (0x%" B_PRIx64 ")", ui64,
+						ui64);
 					break;
 
 		case B_UINT32_TYPE:
 					str = new char[64];
 					ui32 = *(uint32*)ptr;
-					sprintf(str, "%lu (0x%08lX)", ui32, ui32);
+					sprintf(str, "%" B_PRIu32 " (0x%08" B_PRIx32 ")", ui32,
+						ui32);
 					break;
 
 		case B_UINT16_TYPE:
@@ -1394,7 +1403,8 @@ format_data(int32 type, char *ptr, long size)
 								strcat(str, vinfo[vinfo_index].name);
 								strcat(str, "   ");
 
-								sprintf(str+strlen(str), "0x%8lX (", vinfo[vinfo_index].value);
+								sprintf(str+strlen(str), "0x%8" B_PRIx32 " (",
+									vinfo[vinfo_index].value);
 								id_to_string(vinfo[vinfo_index].value, str+strlen(str));
 								strcat(str, ")");
 

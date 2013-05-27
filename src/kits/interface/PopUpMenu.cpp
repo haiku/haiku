@@ -20,9 +20,9 @@
 
 
 struct popup_menu_data {
-	BPopUpMenu *object;
-	BWindow *window;
-	BMenuItem *selected;
+	BPopUpMenu* object;
+	BWindow* window;
+	BMenuItem* selected;
 
 	BPoint where;
 	BRect rect;
@@ -36,9 +36,10 @@ struct popup_menu_data {
 };
 
 
-BPopUpMenu::BPopUpMenu(const char *title, bool radioMode, bool autoRename,
-		menu_layout layout)
-	: BMenu(title, layout),
+BPopUpMenu::BPopUpMenu(const char* title, bool radioMode, bool autoRename,
+	menu_layout layout)
+	:
+	BMenu(title, layout),
 	fUseWhere(false),
 	fAutoDestruct(false),
 	fTrackThread(-1)
@@ -51,8 +52,9 @@ BPopUpMenu::BPopUpMenu(const char *title, bool radioMode, bool autoRename,
 }
 
 
-BPopUpMenu::BPopUpMenu(BMessage *archive)
-	: BMenu(archive),
+BPopUpMenu::BPopUpMenu(BMessage* archive)
+	:
+	BMenu(archive),
 	fUseWhere(false),
 	fAutoDestruct(false),
 	fTrackThread(-1)
@@ -71,14 +73,14 @@ BPopUpMenu::~BPopUpMenu()
 
 
 status_t
-BPopUpMenu::Archive(BMessage *data, bool deep) const
+BPopUpMenu::Archive(BMessage* data, bool deep) const
 {
 	return BMenu::Archive(data, deep);
 }
 
 
-BArchivable *
-BPopUpMenu::Instantiate(BMessage *data)
+BArchivable*
+BPopUpMenu::Instantiate(BMessage* data)
 {
 	if (validate_instantiation(data, "BPopUpMenu"))
 		return new BPopUpMenu(data);
@@ -87,14 +89,14 @@ BPopUpMenu::Instantiate(BMessage *data)
 }
 
 
-BMenuItem *
+BMenuItem*
 BPopUpMenu::Go(BPoint where, bool deliversMessage, bool openAnyway, bool async)
 {
 	return _Go(where, deliversMessage, openAnyway, NULL, async);
 }
 
 
-BMenuItem *
+BMenuItem*
 BPopUpMenu::Go(BPoint where, bool deliversMessage, bool openAnyway,
 	BRect clickToOpen, bool async)
 {
@@ -103,9 +105,9 @@ BPopUpMenu::Go(BPoint where, bool deliversMessage, bool openAnyway,
 
 
 void
-BPopUpMenu::MessageReceived(BMessage *msg)
+BPopUpMenu::MessageReceived(BMessage* message)
 {
-	BMenu::MessageReceived(msg);
+	BMenu::MessageReceived(message);
 }
 
 
@@ -124,9 +126,9 @@ BPopUpMenu::MouseUp(BPoint point)
 
 
 void
-BPopUpMenu::MouseMoved(BPoint point, uint32 code, const BMessage *msg)
+BPopUpMenu::MouseMoved(BPoint point, uint32 code, const BMessage* message)
 {
-	BView::MouseMoved(point, code, msg);
+	BView::MouseMoved(point, code, message);
 }
 
 
@@ -158,16 +160,16 @@ BPopUpMenu::FrameResized(float newWidth, float newHeight)
 }
 
 
-BHandler *
-BPopUpMenu::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
-	int32 form, const char *property)
+BHandler*
+BPopUpMenu::ResolveSpecifier(BMessage* message, int32 index,
+	BMessage* specifier, int32 form, const char* property)
 {
-	return BMenu::ResolveSpecifier(msg, index, specifier, form, property);
+	return BMenu::ResolveSpecifier(message, index, specifier, form, property);
 }
 
 
 status_t
-BPopUpMenu::GetSupportedSuites(BMessage *data)
+BPopUpMenu::GetSupportedSuites(BMessage* data)
 {
 	return BMenu::GetSupportedSuites(data);
 }
@@ -204,7 +206,7 @@ BPopUpMenu::Perform(perform_code code, void* _data)
 			BPopUpMenu::GetHeightForWidth(data->width, &data->min, &data->max,
 				&data->preferred);
 			return B_OK;
-}
+		}
 		case PERFORM_CODE_SET_LAYOUT:
 		{
 			perform_data_set_layout* data = (perform_data_set_layout*)_data;
@@ -237,7 +239,7 @@ BPopUpMenu::ResizeToPreferred()
 
 
 void
-BPopUpMenu::GetPreferredSize(float *_width, float *_height)
+BPopUpMenu::GetPreferredSize(float* _width, float* _height)
 {
 	BMenu::GetPreferredSize(_width, _height);
 }
@@ -281,18 +283,25 @@ BPopUpMenu::AsyncAutoDestruct() const
 BPoint
 BPopUpMenu::ScreenLocation()
 {
+	// This case is when the BPopUpMenu is standalone
 	if (fUseWhere)
 		return fWhere;
 
-	BMenuItem *superItem = Superitem();
-	BMenu *superMenu = Supermenu();
-	BMenuItem *selectedItem = FindItem(superItem->Label());
+	// This case is when the BPopUpMenu is inside a BMenuField
+	BMenuItem* superItem = Superitem();
+	BMenu* superMenu = Supermenu();
+	BMenuItem* selectedItem = FindItem(superItem->Label());
 	BPoint point = superItem->Frame().LeftTop();
 
 	superMenu->ConvertToScreen(&point);
 
-	if (selectedItem != NULL)
+	if (selectedItem != NULL) {
+		while (selectedItem->Menu() != this
+			&& selectedItem->Menu()->Superitem() != NULL) {
+			selectedItem = selectedItem->Menu()->Superitem();
+		}
 		point.y -= selectedItem->Frame().top;
+	}
 
 	return point;
 }
@@ -306,18 +315,17 @@ void BPopUpMenu::_ReservedPopUpMenu2() {}
 void BPopUpMenu::_ReservedPopUpMenu3() {}
 
 
-BPopUpMenu &
-BPopUpMenu::operator=(const BPopUpMenu &)
+BPopUpMenu&
+BPopUpMenu::operator=(const BPopUpMenu& other)
 {
 	return *this;
 }
 
 
-BMenuItem *
+BMenuItem*
 BPopUpMenu::_Go(BPoint where, bool autoInvoke, bool startOpened,
-		BRect *_specialRect, bool async)
+	BRect* _specialRect, bool async)
 {
-
 	if (fTrackThread >= B_OK) {
 		// we already have an active menu, wait for it to go away before
 		// spawning another
@@ -325,8 +333,9 @@ BPopUpMenu::_Go(BPoint where, bool autoInvoke, bool startOpened,
 		while (wait_for_thread(fTrackThread, &unused) == B_INTERRUPTED)
 			;
 	}
-	popup_menu_data *data = new (std::nothrow) popup_menu_data;
-	if (!data)
+
+	popup_menu_data* data = new (std::nothrow) popup_menu_data;
+	if (data == NULL)
 		return NULL;
 
 	sem_id sem = create_sem(0, "window close lock");
@@ -336,14 +345,14 @@ BPopUpMenu::_Go(BPoint where, bool autoInvoke, bool startOpened,
 	}
 
 	// Get a pointer to the window from which Go() was called
-	BWindow *window = dynamic_cast<BWindow *>(BLooper::LooperForThread(find_thread(NULL)));
+	BWindow* window
+		= dynamic_cast<BWindow*>(BLooper::LooperForThread(find_thread(NULL)));
 	data->window = window;
 
 	// Asynchronous menu: we set the BWindow menu's semaphore
 	// and let BWindow block when needed
-	if (async && window != NULL) {
+	if (async && window != NULL)
 		_set_menu_sem_(window, sem);
-	}
 
 	data->object = this;
 	data->autoInvoke = autoInvoke;
@@ -357,7 +366,8 @@ BPopUpMenu::_Go(BPoint where, bool autoInvoke, bool startOpened,
 	data->lock = sem;
 
 	// Spawn the tracking thread
-	fTrackThread = spawn_thread(_thread_entry, "popup", B_DISPLAY_PRIORITY, data);
+	fTrackThread = spawn_thread(_thread_entry, "popup", B_DISPLAY_PRIORITY,
+		data);
 	if (fTrackThread < B_OK) {
 		// Something went wrong. Cleanup and return NULL
 		delete_sem(sem);
@@ -378,16 +388,17 @@ BPopUpMenu::_Go(BPoint where, bool autoInvoke, bool startOpened,
 
 /* static */
 int32
-BPopUpMenu::_thread_entry(void *arg)
+BPopUpMenu::_thread_entry(void* menuData)
 {
-	popup_menu_data *data = static_cast<popup_menu_data *>(arg);
-	BPopUpMenu *menu = data->object;
-	BRect *rect = NULL;
+	popup_menu_data* data = static_cast<popup_menu_data*>(menuData);
+	BPopUpMenu* menu = data->object;
+	BRect* rect = NULL;
 
 	if (data->useRect)
 		rect = &data->rect;
 
-	data->selected = menu->_StartTrack(data->where, data->autoInvoke, data->startOpened, rect);
+	data->selected = menu->_StartTrack(data->where, data->autoInvoke,
+		data->startOpened, rect);
 
 	// Reset the window menu semaphore
 	if (data->async && data->window)
@@ -408,28 +419,29 @@ BPopUpMenu::_thread_entry(void *arg)
 }
 
 
-BMenuItem *
-BPopUpMenu::_StartTrack(BPoint where, bool autoInvoke, bool startOpened, BRect *_specialRect)
+BMenuItem*
+BPopUpMenu::_StartTrack(BPoint where, bool autoInvoke, bool startOpened,
+	BRect* _specialRect)
 {
-	fWhere = where;
-
 	// I know, this doesn't look senseful, but don't be fooled,
 	// fUseWhere is used in ScreenLocation(), which is a virtual
 	// called by BMenu::Track()
+	fWhere = where;
 	fUseWhere = true;
 
-	// Determine when mouse-down-up will be taken as a 'press', rather than a 'click'
+	// Determine when mouse-down-up will be taken as a 'press',
+	// rather than a 'click'
 	bigtime_t clickMaxTime = 0;
 	get_click_speed(&clickMaxTime);
 	clickMaxTime += system_time();
-	
+
 	// Show the menu's window
 	Show();
 	snooze(50000);
-	BMenuItem *result = Track(startOpened, _specialRect);
+	BMenuItem* result = Track(startOpened, _specialRect);
 
 	// If it was a click, keep the menu open and tracking
-	if (system_time() <= clickMaxTime)	
+	if (system_time() <= clickMaxTime)
 		result = Track(true, _specialRect);
 	if (result != NULL && autoInvoke)
 		result->Invoke();
@@ -443,11 +455,11 @@ BPopUpMenu::_StartTrack(BPoint where, bool autoInvoke, bool startOpened, BRect *
 }
 
 
-BMenuItem *
-BPopUpMenu::_WaitMenu(void *_data)
+BMenuItem*
+BPopUpMenu::_WaitMenu(void* _data)
 {
-	popup_menu_data *data = (popup_menu_data *)_data;
-	BWindow *window = data->window;
+	popup_menu_data* data = static_cast<popup_menu_data*>(_data);
+	BWindow* window = data->window;
 	sem_id sem = data->lock;
 	if (window != NULL) {
 		while (acquire_sem_etc(sem, 1, B_TIMEOUT, 50000) != B_BAD_SEM_ID)
@@ -460,7 +472,7 @@ BPopUpMenu::_WaitMenu(void *_data)
 
 	fTrackThread = -1;
 
-	BMenuItem *selected = data->selected;
+	BMenuItem* selected = data->selected;
 		// data->selected is filled by the tracking thread
 
 	delete data;

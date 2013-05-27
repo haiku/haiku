@@ -9,6 +9,7 @@
  * Authors:
  *		Kian Duffy, myob@users.sourceforge.net
  *		Daniel Furrer, assimil8or@users.sourceforge.net
+ *		John Scipione, jscipione@gmail.com
  *		Siarzhuk Zharski, zharik@gmx.li
  */
 
@@ -38,6 +39,7 @@
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <PrintJob.h>
+#include <Rect.h>
 #include <Roster.h>
 #include <Screen.h>
 #include <ScrollBar.h>
@@ -729,9 +731,13 @@ TermWindow::MessageReceived(BMessage *message)
 			break;
 
 		case MENU_FIND_STRING:
-			if (!fFindPanel) {
+			if (fFindPanel == NULL) {
 				fFindPanel = new FindWindow(this, fFindString, fFindSelection,
 					fMatchWord, fMatchCase, fForwardSearch);
+
+				fFindPanel->CenterIn(Frame());
+				_MoveWindowInScreen(fFindPanel);
+				fFindPanel->Show();
 			} else
 				fFindPanel->Activate();
 			break;
@@ -885,7 +891,7 @@ TermWindow::MessageReceived(BMessage *message)
 				// done before ResizeTo to work around a Dano bug
 				// (not erasing the decor)
 				SetLook(B_NO_BORDER_WINDOW_LOOK);
-				ResizeTo(screen.Frame().Width()+1, screen.Frame().Height()+1);
+				ResizeTo(screen.Frame().Width() + 1, screen.Frame().Height() + 1);
 				MoveTo(screen.Frame().left, screen.Frame().top);
 				SetFlags(Flags() | (B_NOT_RESIZABLE | B_NOT_MOVABLE));
 				fFullScreen = true;
@@ -1844,10 +1850,8 @@ TermWindow::_OpenSetTabTitleDialog(int32 index)
 	// place the dialog window directly under the tab, but keep it on screen
 	BPoint location = fTabView->ConvertToScreen(
 		fTabView->TabFrame(index).LeftBottom() + BPoint(0, 1));
-	BRect frame(fSetTabTitleDialog->Frame().OffsetToCopy(location));
-	BSize screenSize(BScreen(fSetTabTitleDialog).Frame().Size());
-	fSetTabTitleDialog->MoveTo(
-		BLayoutUtils::MoveIntoFrame(frame, screenSize).LeftTop());
+	fSetTabTitleDialog->MoveTo(location);
+	_MoveWindowInScreen(fSetTabTitleDialog);
 
 	fSetTabTitleDialog->Go(title, userDefined, this);
 }
@@ -1867,10 +1871,7 @@ TermWindow::_OpenSetWindowTitleDialog()
 
 	// center the dialog in the window frame, but keep it on screen
 	fSetWindowTitleDialog->CenterIn(Frame());
-	BRect frame(fSetWindowTitleDialog->Frame());
-	BSize screenSize(BScreen(fSetWindowTitleDialog).Frame().Size());
-	fSetWindowTitleDialog->MoveTo(
-		BLayoutUtils::MoveIntoFrame(frame, screenSize).LeftTop());
+	_MoveWindowInScreen(fSetWindowTitleDialog);
 
 	fSetWindowTitleDialog->Go(fTitle.pattern, fTitle.patternUserDefined, this);
 }
@@ -1981,4 +1982,13 @@ TermWindow::_NewSessionIndex()
 		if (!used)
 			return id;
 	}
+}
+
+
+void
+TermWindow::_MoveWindowInScreen(BWindow* window)
+{
+	BRect frame = window->Frame();
+	BSize screenSize(BScreen(window).Frame().Size());
+	window->MoveTo(BLayoutUtils::MoveIntoFrame(frame, screenSize).LeftTop());
 }

@@ -497,8 +497,8 @@ PaneSwitch::Track(BPoint point, uint32)
 void
 PaneSwitch::DrawInState(PaneSwitch::State state)
 {
-	BRect rect(0, 0, 12, 12);
-	rect.OffsetBy(-1, -1);
+	BRect rect(0, 0, be_plain_font->Size(), be_plain_font->Size());
+	rect.OffsetBy(1, 1);
 
 	rgb_color arrowColor = state == kPressed ? kHighlightColor : kNormalColor;
 	int32 arrowDirection = BControlLook::B_RIGHT_ARROW;

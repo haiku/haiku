@@ -119,7 +119,6 @@ class WorkspacesView : public BView {
 
 		BView*	fParentWhichDrawsOnChildren;
 		BRect	fCurrentFrame;
-		BAboutWindow*   fAboutWindow;
 };
 
 class WorkspacesWindow : public BWindow {
@@ -342,8 +341,7 @@ WorkspacesView::WorkspacesView(BRect frame, bool showDragger=true)
 	BView(frame, kDeskbarItemName, B_FOLLOW_ALL,
 		kWorkspacesViewFlag | B_FRAME_EVENTS),
 	fParentWhichDrawsOnChildren(NULL),
-	fCurrentFrame(frame),
-	fAboutWindow(NULL)
+	fCurrentFrame(frame)
 {
 	if(showDragger) {
 		frame.OffsetTo(B_ORIGIN);
@@ -360,8 +358,7 @@ WorkspacesView::WorkspacesView(BMessage* archive)
 	:
 	BView(archive),
 	fParentWhichDrawsOnChildren(NULL),
-	fCurrentFrame(Frame()),
-	fAboutWindow(NULL)
+	fCurrentFrame(Frame())
 {
 	// Just in case we are instantiated from an older archive...
 	SetFlags(Flags() | B_FRAME_EVENTS);
@@ -374,8 +371,6 @@ WorkspacesView::WorkspacesView(BMessage* archive)
 
 WorkspacesView::~WorkspacesView()
 {
-	if (fAboutWindow != NULL && fAboutWindow->Lock())
-		fAboutWindow->Quit();
 }
 
 
@@ -405,34 +400,31 @@ WorkspacesView::Archive(BMessage* archive, bool deep) const
 void
 WorkspacesView::_AboutRequested()
 {
-	if (fAboutWindow == NULL) {
-		const char* authors[] = {
-			"Axel Dörfler",
-			"Oliver \"Madison\" Kohl",
-			"Matt Madia",
-			"François Revol",
-			NULL
-		};
+	BAboutWindow* window = new BAboutWindow(
+		B_TRANSLATE_SYSTEM_NAME("Workspaces"), kSignature);
 
-		const char* extraCopyrights[] = {
-			"2002 François Revol",
-			NULL
-		};
+	const char* authors[] = {
+		"Axel Dörfler",
+		"Oliver \"Madison\" Kohl",
+		"Matt Madia",
+		"François Revol",
+		NULL
+	};
 
-		const char* extraInfo = "Send windows behind using the Option key. "
-			"Move windows to front using the Control key.\n";
+	const char* extraCopyrights[] = {
+		"2002 François Revol",
+		NULL
+	};
 
-		fAboutWindow = new BAboutWindow(
-			B_TRANSLATE_SYSTEM_NAME("Workspaces"), kSignature);
-		fAboutWindow->AddCopyright(2002, "Haiku, Inc.",
+	const char* extraInfo = "Send windows behind using the Option key. "
+		"Move windows to front using the Control key.\n";
+
+	window->AddCopyright(2002, "Haiku, Inc.",
 			extraCopyrights);
-		fAboutWindow->AddAuthors(authors);
-		fAboutWindow->AddExtraInfo(extraInfo);
-		fAboutWindow->Show();
-	} else if (fAboutWindow->IsHidden())
-		fAboutWindow->Show();
-	else
-		fAboutWindow->Activate();
+	window->AddAuthors(authors);
+	window->AddExtraInfo(extraInfo);
+
+	window->Show();
 }
 
 

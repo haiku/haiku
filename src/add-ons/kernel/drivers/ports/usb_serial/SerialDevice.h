@@ -95,13 +95,13 @@ static	int32					_InputThread(void *data);
 
 static	void					_ReadCallbackFunction(void *cookie,
 									int32 status, void *data,
-									uint32 actualLength);
+									size_t actualLength);
 static	void					_WriteCallbackFunction(void *cookie,
 									int32 status, void *data,
-									uint32 actualLength);
+									size_t actualLength);
 static	void					_InterruptCallbackFunction(void *cookie,
 									int32 status, void *data,
-									uint32 actualLength);
+									size_t actualLength);
 
 		usb_device				fDevice;		// USB device handle
 		uint16					fVendorID;

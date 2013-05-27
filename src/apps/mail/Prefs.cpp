@@ -338,7 +338,7 @@ TPrefsWindow::MessageReceived(BMessage* msg)
 
 				fNewFont->SetSize(old_size);
 				if (revert) {
-					sprintf(label, "%ld", old_size);
+					sprintf(label, "%" B_PRId32, old_size);
 					item = fSizeMenu->FindItem(label);
 					if (item != NULL)
 						item->SetMarked(true);
@@ -759,7 +759,7 @@ TPrefsWindow::_BuildSizeMenu(BFont* font)
 	for (loop = 0; loop < sizeof(sizes) / sizeof(int32); loop++) {
 		msg = new BMessage(P_SIZE);
 		msg->AddInt32("size", sizes[loop]);
-		sprintf(label, "%ld", sizes[loop]);
+		sprintf(label, "%" B_PRId32, sizes[loop]);
 		menu->AddItem(item = new BMenuItem(label, msg));
 		if (sizes[loop] == (int32)size)
 			item->SetMarked(true);

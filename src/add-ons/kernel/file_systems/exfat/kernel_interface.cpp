@@ -179,7 +179,7 @@ static status_t
 exfat_get_vnode(fs_volume* _volume, ino_t id, fs_vnode* _node, int* _type,
 	uint32* _flags, bool reenter)
 {
-	TRACE("get_vnode %lu\n", id);
+	TRACE("get_vnode %" B_PRIdINO "\n", id);
 	Volume* volume = (Volume*)_volume->private_volume;
 
 	Inode* inode = new(std::nothrow) Inode(volume, id);
@@ -236,7 +236,7 @@ exfat_read_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 
 	while (true) {
 		file_io_vec fileVecs[8];
-		uint32 fileVecCount = 8;
+		size_t fileVecCount = 8;
 
 		status = file_map_translate(inode->Map(), pos, bytesLeft, fileVecs,
 			&fileVecCount, 0);
@@ -322,10 +322,10 @@ exfat_get_file_map(fs_volume* _volume, fs_vnode* _node, off_t offset,
 		offset += blockLength;
 		size -= blockLength;
 
-		if (size <= vecs[index - 1].length || offset >= inode->Size()) {
+		if ((off_t)size <= vecs[index - 1].length || offset >= inode->Size()) {
 			// We're done!
 			*_count = index;
-			TRACE("exfat_get_file_map for inode %lld\n", inode->ID());
+			TRACE("exfat_get_file_map for inode %" B_PRIdINO"\n", inode->ID());
 			return B_OK;
 		}
 	}
@@ -357,7 +357,7 @@ exfat_lookup(fs_volume* _volume, fs_vnode* _directory, const char* name,
 		return status;
 	}
 
-	TRACE("exfat_lookup: ID %d\n", *_vnodeID);
+	TRACE("exfat_lookup: ID %" B_PRIdINO "\n", *_vnodeID);
 	
 	return get_vnode(volume->FSVolume(), *_vnodeID, NULL);
 }
@@ -367,7 +367,7 @@ static status_t
 exfat_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 cmd,
 	void* buffer, size_t bufferLength)
 {
-	TRACE("ioctl: %lu\n", cmd);
+	TRACE("ioctl: %" B_PRIu32 "\n", cmd);
 
 	/*Volume* volume = (Volume*)_volume->private_volume;*/
 	return B_DEV_INVALID_IOCTL;
@@ -526,24 +526,40 @@ exfat_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 {
 	TRACE("exfat_read_dir\n");
 	DirectoryIterator* iterator = (DirectoryIterator*)_cookie;
-
-	size_t length = bufferSize;
-	ino_t id;
-	status_t status = iterator->GetNext(dirent->d_name, &length, &id);
-	if (status == B_ENTRY_NOT_FOUND) {
-		*_num = 0;
-		return B_OK;
-	} else if (status != B_OK)
-		return status;
-
 	Volume* volume = (Volume*)_volume->private_volume;
-	dirent->d_dev = volume->ID();
-	dirent->d_ino = id;
-	dirent->d_reclen = sizeof(struct dirent) + length;
-	*_num = 1;
+	
+	uint32 maxCount = *_num;
+	uint32 count = 0;
 
+	while (count < maxCount && bufferSize > sizeof(struct dirent)) {
+		ino_t id;
+		size_t length = bufferSize - sizeof(struct dirent) + 1;
+
+		status_t status = iterator->GetNext(dirent->d_name, &length, &id);
+		if (status == B_ENTRY_NOT_FOUND)
+			break;
+
+		if (status == B_BUFFER_OVERFLOW) {
+			// the remaining name buffer length was too small
+			if (count == 0)
+				return B_BUFFER_OVERFLOW;
+			break;
+		}
+
+		if (status != B_OK)
+			return status;
+
+		dirent->d_dev = volume->ID();
+		dirent->d_ino = id;
+		dirent->d_reclen = sizeof(struct dirent) + length;
+
+		bufferSize -= dirent->d_reclen;
+		dirent = (struct dirent*)((uint8*)dirent + dirent->d_reclen);
+		count++;
+	}
+
+	*_num = count;
 	TRACE("exfat_read_dir end\n");
-
 	return B_OK;
 }
 

@@ -15,6 +15,7 @@
 
 #include <syscall_utils.h>
 
+#include <libroot_private.h>
 #include <syscalls.h>
 #include <thread_defs.h>
 #include <tls.h>
@@ -158,6 +159,7 @@ pthread_create(pthread_t* _thread, const pthread_attr_t* attr,
 		return EAGAIN;
 	}
 
+	__set_stack_protection();
 	resume_thread(thread->id);
 	*_thread = thread;
 

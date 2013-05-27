@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -30,7 +31,10 @@ AbstractArrayValueNode::AbstractArrayValueNode(ValueNodeChild* nodeChild,
 	:
 	ValueNode(nodeChild),
 	fType(type),
-	fDimension(dimension)
+	fDimension(dimension),
+	fLowerBound(0),
+	fUpperBound(0),
+	fBoundsInitialized(false)
 {
 	fType->AcquireReference();
 }
@@ -76,18 +80,72 @@ AbstractArrayValueNode::CreateChildren()
 	if (!fChildren.IsEmpty())
 		return B_OK;
 
+	return CreateChildrenInRange(0, kMaxArrayElementCount - 1);
+}
+
+
+int32
+AbstractArrayValueNode::CountChildren() const
+{
+	return fChildren.CountItems();
+}
+
+
+ValueNodeChild*
+AbstractArrayValueNode::ChildAt(int32 index) const
+{
+	return fChildren.ItemAt(index);
+}
+
+
+bool
+AbstractArrayValueNode::IsRangedContainer() const
+{
+	return true;
+}
+
+
+void
+AbstractArrayValueNode::ClearChildren()
+{
+	fChildren.MakeEmpty();
+	fLowerBound = 0;
+	fUpperBound = 0;
+	if (fContainer != NULL)
+		fContainer->NotifyValueNodeChildrenDeleted(this);
+}
+
+
+status_t
+AbstractArrayValueNode::CreateChildrenInRange(int32 lowIndex,
+	int32 highIndex)
+{
+	// TODO: ensure that we don't already have children in the specified
+	// index range. These need to be skipped if so.
 	TRACE_LOCALS("TYPE_ARRAY\n");
 
 	int32 dimensionCount = fType->CountDimensions();
 	bool isFinalDimension = fDimension + 1 == dimensionCount;
+	status_t error = B_OK;
 
-	ArrayDimension* dimension = fType->DimensionAt(fDimension);
-	uint64 elementCount = dimension->CountElements();
-	if (elementCount == 0 || elementCount > kMaxArrayElementCount)
-		elementCount = kMaxArrayElementCount;
+	if (!fBoundsInitialized) {
+		int32 lowerBound, upperBound;
+		error = SupportedChildRange(lowerBound, upperBound);
+		if (error != B_OK)
+			return error;
+
+		fLowerBound = lowerBound;
+		fUpperBound = upperBound;
+		fBoundsInitialized = true;
+	} else {
+		if (lowIndex < fLowerBound)
+			fLowerBound = lowIndex;
+		if (highIndex > fUpperBound)
+			fUpperBound = highIndex;
+	}
 
 	// create children for the array elements
-	for (int32 i = 0; i < (int32)elementCount; i++) {
+	for (int32 i = lowIndex; i <= highIndex; i++) {
 		BString name(Name());
 		name << '[' << i << ']';
 		if (name.Length() <= Name().Length())
@@ -117,17 +175,27 @@ AbstractArrayValueNode::CreateChildren()
 }
 
 
-int32
-AbstractArrayValueNode::CountChildren() const
+status_t
+AbstractArrayValueNode::SupportedChildRange(int32& lowIndex,
+	int32& highIndex) const
 {
-	return fChildren.CountItems();
-}
+	if (!fBoundsInitialized) {
+		ArrayDimension* dimension = fType->DimensionAt(fDimension);
 
+		SubrangeType* dimensionType = dynamic_cast<SubrangeType*>(
+			dimension->GetType());
 
-ValueNodeChild*
-AbstractArrayValueNode::ChildAt(int32 index) const
-{
-	return fChildren.ItemAt(index);
+		if (dimensionType != NULL) {
+			lowIndex = dimensionType->LowerBound().ToInt32();
+			highIndex = dimensionType->UpperBound().ToInt32();
+		} else
+			return B_UNSUPPORTED;
+	} else {
+		lowIndex = fLowerBound;
+		highIndex = fUpperBound;
+	}
+
+	return B_OK;
 }
 
 

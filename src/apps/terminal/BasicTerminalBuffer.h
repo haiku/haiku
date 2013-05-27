@@ -107,6 +107,14 @@ public:
 			int32				LineLength(int32 index) const;
 			int32				GetLineColor(int32 index) const;
 
+			bool				PreviousLinePos(TermPos& pos) const;
+			bool				NextLinePos(TermPos& pos, bool normalize) const;
+									// normalize specifies that the returned
+									// position must be a valid position, i.e.
+									// actually point to a character (as opposed
+									// to just pointing to the position after a
+									// character).
+
 			bool				Find(const char* pattern, const TermPos& start,
 									bool forward, bool caseSensitive,
 									bool matchWord, TermPos& matchStart,
@@ -204,6 +212,11 @@ protected:
 									int32 endColumn) const;
 			bool				_PreviousChar(TermPos& pos, UTF8Char& c) const;
 			bool				_NextChar(TermPos& pos, UTF8Char& c) const;
+
+			bool				_PreviousLinePos(TerminalLine* lineBuffer,
+									TerminalLine*& line, TermPos& pos) const;
+			bool				_NormalizeLinePos(TerminalLine* lineBuffer,
+									TerminalLine*& line, TermPos& pos) const;
 
 protected:
 			// screen width/height

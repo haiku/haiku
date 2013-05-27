@@ -148,7 +148,7 @@ FilterHTMLTag(int32 &first, char **t, char *end)
 	// check for some common entities (in ISO-Latin-1)
 	if (first == '&') {
 		// filter out and convert decimal values
-		if (a[1] == '#' && sscanf(a + 2, "%ld;", &first) == 1) {
+		if (a[1] == '#' && sscanf(a + 2, "%" B_SCNd32 ";", &first) == 1) {
 			t[0] += strchr(a, ';') - a;
 			return false;
 		}
@@ -932,11 +932,11 @@ TTextView::UpdateFont(const BFont* newFont)
 	fFont = *newFont;
 
 	// update the text run array safely with new font
-	text_run_array *runArray = RunArray(0, LONG_MAX);
+	text_run_array *runArray = RunArray(0, INT32_MAX);
 	for (int i = 0; i < runArray->count; i++)
 		runArray->runs[i].font = *newFont;
 
-	SetRunArray(0, LONG_MAX, runArray);
+	SetRunArray(0, INT32_MAX, runArray);
 	FreeRunArray(runArray);
 }
 
@@ -1917,7 +1917,7 @@ TTextView::Open(hyper_text *enclosure)
 						strcpy(baseName, enclosure->name ? enclosure->name : "enclosure");
 						strcpy(name, baseName);
 						for (int32 index = 0; dir.Contains(name); index++)
-							sprintf(name, "%s_%ld", baseName, index);
+							sprintf(name, "%s_%" B_PRId32, baseName, index);
 
 						BEntry entry(path.Path());
 						entry_ref ref;

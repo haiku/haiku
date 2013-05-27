@@ -41,8 +41,8 @@ HTreeEntryIterator::HTreeEntryIterator(off_t offset, Inode* directory)
 		fCurrentEntry = fFirstEntry;
 	}
 
-	TRACE("HTreeEntryIterator::HTreeEntryIterator(): created %p, block %llu, "
-		"entry no. %lu, parent: %p\n", this, fBlockNum, (uint32)fCurrentEntry,
+	TRACE("HTreeEntryIterator::HTreeEntryIterator(): created %p, block %" B_PRIu64 ", "
+		"entry no. %u, parent: %p\n", this, fBlockNum, fCurrentEntry,
 		fParent);
 }
 
@@ -63,16 +63,16 @@ HTreeEntryIterator::HTreeEntryIterator(uint32 block, uint32 blockSize,
 	// fCurrentEntry is initialized to 1 to skip the fake directory entry
 	fInitStatus = B_OK;
 
-	TRACE("HTreeEntryIterator::HTreeEntryIterator(): created %p, block %lu, "
-		"parent: %p\n", this, block, fParent);
+	TRACE("HTreeEntryIterator::HTreeEntryIterator(): created %p, block %"
+		B_PRIu32 ", parent: %p\n", this, block, fParent);
 }
 
 
 status_t
 HTreeEntryIterator::Init()
 {
-	TRACE("HTreeEntryIterator::Init() first entry: %lu\n",
-		(uint32)fFirstEntry);
+	TRACE("HTreeEntryIterator::Init() first entry: %u\n",
+		fFirstEntry);
 	
 	if (fInitStatus != B_OK)
 		return fInitStatus;
@@ -99,15 +99,15 @@ HTreeEntryIterator::Init()
 	}
 
 	if (fLimit != fBlockSize / sizeof(HTreeEntry) - fFirstEntry) {
-		ERROR("HTreeEntryIterator::Init() bad fLimit %lu should be %lu "
-			"at block %llu\n", (uint32)fLimit, fBlockSize / sizeof(HTreeEntry)
-				- fFirstEntry, fBlockNum);
+		ERROR("HTreeEntryIterator::Init() bad fLimit %u should be %" B_PRIu32
+			" at block %" B_PRIu64 "\n", fLimit,
+			(uint32)(fBlockSize / sizeof(HTreeEntry) - fFirstEntry), fBlockNum);
 		fCount = fLimit = 0;
 		return B_ERROR;
 	}
 
-	TRACE("HTreeEntryIterator::Init() count %lu limit %lu\n",
-		(uint32)fCount, (uint32)fLimit);
+	TRACE("HTreeEntryIterator::Init() count %u limit %u\n",
+		fCount, fLimit);
 
 	return B_OK;
 }
@@ -149,8 +149,8 @@ HTreeEntryIterator::Lookup(uint32 hash, int indirections,
 	HTreeEntry* end = (HTreeEntry*)block + fCount + fFirstEntry - 1;
 	HTreeEntry* middle = start;
 	
-	TRACE("HTreeEntryIterator::Lookup() current entry: %lu\n",
-		(uint32)fCurrentEntry);
+	TRACE("HTreeEntryIterator::Lookup() current entry: %u\n",
+		fCurrentEntry);
 	TRACE("HTreeEntryIterator::Lookup() indirections: %d s:%p m:%p e:%p\n",
 		indirections, start, middle, end);
 
@@ -161,7 +161,8 @@ HTreeEntryIterator::Lookup(uint32 hash, int indirections,
 		TRACE("HTreeEntryIterator::Lookup() indirections: %d s:%p m:%p e:%p\n",
 			indirections, start, middle, end);
 
-		TRACE("HTreeEntryIterator::Lookup() %lx %lx\n", hash, middle->Hash());
+		TRACE("HTreeEntryIterator::Lookup() %" B_PRIx32 " %" B_PRIx32 "\n",
+			hash, middle->Hash());
 
 		if (hash >= middle->Hash())
 			start = middle + 1;
@@ -175,8 +176,8 @@ HTreeEntryIterator::Lookup(uint32 hash, int indirections,
 
 	if (indirections == 0) {
 		TRACE("HTreeEntryIterator::Lookup(): Creating an indexed directory "
-			"iterator starting at block: %lu, hash: 0x%lX\n", start->Block(), 
-			start->Hash());
+			"iterator starting at block: %" B_PRIu32 ", hash: 0x%" B_PRIx32
+			"\n", start->Block(), start->Hash());
 		*directoryIterator = new(std::nothrow)
 			DirectoryIterator(fDirectory, start->Block() * fBlockSize, this);
 
@@ -188,7 +189,8 @@ HTreeEntryIterator::Lookup(uint32 hash, int indirections,
 	}
 
 	TRACE("HTreeEntryIterator::Lookup(): Creating a HTree entry iterator "
-		"starting at block: %lu, hash: 0x%lX\n", start->Block(), start->Hash());
+		"starting at block: %" B_PRIu32 ", hash: 0x%" B_PRIx32 "\n",
+		start->Block(), start->Hash());
 	fsblock_t blockNum;
 	status_t status = fDirectory->FindBlock(start->Block() * fBlockSize,
 		blockNum);
@@ -215,8 +217,8 @@ status_t
 HTreeEntryIterator::GetNext(uint32& childBlock)
 {
 	fCurrentEntry++;
-	TRACE("HTreeEntryIterator::GetNext(): current entry: %lu count: %lu, "
-		"limit: %lu\n", (uint32)fCurrentEntry, (uint32)fCount, (uint32)fLimit);
+	TRACE("HTreeEntryIterator::GetNext(): current entry: %u count: %u, "
+		"limit: %u\n", fCurrentEntry, fCount, fLimit);
 	bool endOfBlock = fCurrentEntry >= (fCount + fFirstEntry);
 
 	if (endOfBlock) {
@@ -231,8 +233,8 @@ HTreeEntryIterator::GetNext(uint32& childBlock)
 		if (status != B_OK)
 			return status;
 		
-		TRACE("HTreeEntryIterator::GetNext(): moving to next block: %lu\n",
-			logicalBlock);
+		TRACE("HTreeEntryIterator::GetNext(): moving to next block: %" B_PRIx32
+			"\n", logicalBlock);
 		
 		status = fDirectory->FindBlock(logicalBlock * fBlockSize, fBlockNum);
 		if (status != B_OK)
@@ -257,7 +259,7 @@ HTreeEntryIterator::GetNext(uint32& childBlock)
 	if (!endOfBlock)
 		fHasCollision = (entry[fCurrentEntry].Hash() & 1) == 1;
 	
-	TRACE("HTreeEntryIterator::GetNext(): next block: %lu\n",
+	TRACE("HTreeEntryIterator::GetNext(): next block: %" B_PRIu32 "\n",
 		entry->Block());
 
 	childBlock = entry->Block();
@@ -269,8 +271,8 @@ HTreeEntryIterator::GetNext(uint32& childBlock)
 uint32
 HTreeEntryIterator::BlocksNeededForNewEntry()
 {
-	TRACE("HTreeEntryIterator::BlocksNeededForNewEntry(): block num: %llu, "
-		"volume: %p\n", fBlockNum, fVolume);
+	TRACE("HTreeEntryIterator::BlocksNeededForNewEntry(): block num: %"
+		B_PRIu64 ", volume: %p\n", fBlockNum, fVolume);
 	CachedBlock cached(fVolume);
 
 	const uint8* blockData = cached.SetTo(fBlockNum);
@@ -305,7 +307,8 @@ status_t
 HTreeEntryIterator::InsertEntry(Transaction& transaction, uint32 hash,
 	off_t blockNum, off_t newBlocksPos, bool hasCollision)
 {
-	TRACE("HTreeEntryIterator::InsertEntry(): block num: %llu\n", fBlockNum);
+	TRACE("HTreeEntryIterator::InsertEntry(): block num: %" B_PRIu64 "\n",
+		fBlockNum);
 	CachedBlock cached(fVolume);
 
 	uint8* blockData = cached.SetToWritable(transaction, fBlockNum);

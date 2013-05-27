@@ -77,9 +77,10 @@ AppManager::RegisterTeam(team_id team, const BMessenger& messenger)
 {
 	BAutolock lock(this);
 
-	TRACE("AppManager::RegisterTeam %ld\n", team);
+	TRACE("AppManager::RegisterTeam %" B_PRId32 "\n", team);
 	if (HasTeam(team)) {
-		ERROR("AppManager::RegisterTeam: team %ld already registered\n", team);
+		ERROR("AppManager::RegisterTeam: team %" B_PRId32 " already"
+			" registered\n", team);
 		return B_ERROR;
 	}
 
@@ -96,7 +97,7 @@ AppManager::RegisterTeam(team_id team, const BMessenger& messenger)
 status_t
 AppManager::UnregisterTeam(team_id team)
 {
-	TRACE("AppManager::UnregisterTeam %ld\n", team);
+	TRACE("AppManager::UnregisterTeam %" B_PRId32 "\n", team);
 
 	Lock();
 	bool isRemoved = fMap.erase(team) != 0;
@@ -146,8 +147,9 @@ AppManager::Dump()
 	for (; iterator != fMap.end(); iterator++) {
 		app_info info;
 		be_roster->GetRunningAppInfo(iterator->first, &info);
-		printf(" team %ld \"%s\", messenger %svalid\n", iterator->first,
-			info.ref.name, iterator->second.IsValid() ? "" : "NOT ");
+		printf(" team %" B_PRId32 " \"%s\", messenger %svalid\n",
+			iterator->first, info.ref.name,
+			iterator->second.IsValid() ? "" : "NOT ");
 	}
 
 	printf("AppManager: list end\n");
@@ -159,7 +161,7 @@ AppManager::_CleanupTeam(team_id team)
 {
 	ASSERT(!IsLocked());
 
-	TRACE("AppManager: cleaning up team %ld\n", team);
+	TRACE("AppManager: cleaning up team %" B_PRId32 "\n", team);
 
 	gNodeManager->CleanupTeam(team);
 	gBufferManager->CleanupTeam(team);

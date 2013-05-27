@@ -251,7 +251,7 @@ inline small_data *small_data::Next()
 
 inline bool small_data::IsLast(bfs_inode *inode)
 {
-	return (uint32)this > (uint32)inode + inode->inode_size - sizeof(small_data)
+	return (addr_t)this > (addr_t)inode + inode->inode_size - sizeof(small_data)
 		   || name_size == 0;
 }
 

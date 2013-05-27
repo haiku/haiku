@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -19,19 +20,10 @@ SpecificImageDebugInfo::~SpecificImageDebugInfo()
 
 /*static*/ status_t
 SpecificImageDebugInfo::GetFunctionsFromSymbols(
+	const BObjectList<SymbolInfo>& symbols,
 	BObjectList<FunctionDebugInfo>& functions, DebuggerInterface* interface,
 	const ImageInfo& imageInfo, SpecificImageDebugInfo* info)
 {
-	BObjectList<SymbolInfo> symbols(20, true);
-	status_t error = interface->GetSymbolInfos(imageInfo.TeamID(),
-		imageInfo.ImageID(), symbols);
-	if (error != B_OK)
-		return error;
-
-	// sort the symbols -- not necessary, but a courtesy to ImageDebugInfo which
-	// will peform better when inserting functions at the end of a list
-	symbols.SortItems(&_CompareSymbols);
-
 	// create the function infos
 	int32 functionsAdded = 0;
 	for (int32 i = 0; SymbolInfo* symbol = symbols.ItemAt(i); i++) {
@@ -55,12 +47,4 @@ SpecificImageDebugInfo::GetFunctionsFromSymbols(
 	}
 
 	return B_OK;
-}
-
-/*static*/ int
-SpecificImageDebugInfo::_CompareSymbols(const SymbolInfo* a,
-	const SymbolInfo* b)
-{
-	return a->Address() < b->Address()
-		? -1 : (a->Address() == b->Address() ? 0 : 1);
 }

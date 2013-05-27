@@ -364,7 +364,7 @@ MultiAudioNode::NodeRegistered()
 			input->destination.port = ControlPort();
 			input->destination.id = fInputs.CountItems();
 			input->node = Node();
-			sprintf(input->name, "output %ld", input->destination.id);
+			sprintf(input->name, "output %" B_PRId32, input->destination.id);
 
 			currentInput = new node_input(*input, fOutputPreferredFormat);
 			currentInput->fPreferredFormat.u.raw_audio.channel_count = 1;
@@ -414,7 +414,7 @@ MultiAudioNode::NodeRegistered()
 			output->source.port = ControlPort();
 			output->source.id = fOutputs.CountItems();
 			output->node = Node();
-			sprintf(output->name, "input %ld", output->source.id);
+			sprintf(output->name, "input %" B_PRId32, output->source.id);
 
 			currentOutput = new node_output(*output, fInputPreferredFormat);
 			currentOutput->fPreferredFormat.u.raw_audio.channel_count = 1;
@@ -1014,8 +1014,10 @@ MultiAudioNode::Disconnect(const media_source& what,
 		delete channel->fBufferGroup;
 		channel->fBufferGroup = NULL;
 	} else {
-		fprintf(stderr, "\tDisconnect() called with wrong source/destination (%ld/%ld), ours is (%ld/%ld)\n",
-			what.id, where.id, channel->fOutput.source.id, channel->fOutput.destination.id);
+		fprintf(stderr, "\tDisconnect() called with wrong source/destination ("
+			"%" B_PRId32 "/%" B_PRId32 "), ours is (%" B_PRId32 "/%" B_PRId32
+			")\n", what.id, where.id, channel->fOutput.source.id,
+			channel->fOutput.destination.id);
 	}
 }
 
@@ -1047,7 +1049,7 @@ MultiAudioNode::LateNoticeReceived(const media_source& what, bigtime_t howMuch,
 		fInternalLatency += howMuch;
 		SetEventLatency(fLatency + fInternalLatency);
 
-		fprintf(stderr, "\tincreasing latency to %Ld\n",
+		fprintf(stderr, "\tincreasing latency to %" B_PRIdBIGTIME"\n",
 			fLatency + fInternalLatency);
 	} else {
 		// The other run modes dictate various strategies for sacrificing data
@@ -1122,7 +1124,7 @@ MultiAudioNode::HandleEvent(const media_timed_event* event, bigtime_t lateness,
 			_HandleParameter(event, lateness, realTimeEvent);
 			break;
 		default:
-			fprintf(stderr,"  unknown event type: %li\n", event->type);
+			fprintf(stderr,"  unknown event type: %" B_PRId32 "\n", event->type);
 			break;
 	}
 }
@@ -1158,7 +1160,7 @@ MultiAudioNode::_HandleBuffer(const media_timed_event* event,
 		// lateness doesn't matter in offline mode or in recording mode
 		//mLateBuffers++;
 		NotifyLateProducer(channel->fInput.source, -howEarly, performanceTime);
-		fprintf(stderr,"	<- LATE BUFFER : %lli\n", howEarly);
+		fprintf(stderr,"	<- LATE BUFFER : %" B_PRIdBIGTIME "\n", howEarly);
 		buffer->Recycle();
 	} else {
 		//WriteBuffer(buffer, *channel);

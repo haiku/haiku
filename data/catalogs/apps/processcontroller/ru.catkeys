@@ -1,10 +1,8 @@
-1	russian	x-vnd.Haiku-ProcessController	2887520383
+1	russian	x-vnd.Haiku-ProcessController	2886374724
 Memory usage	ProcessController		Использование памяти
-Do you really want to kill the team \"%s\"?	ProcessController		Вы действительно хотите убить \"%s\"?
 Idle priority	ProcessController		Приоритет бездействия
 Restart Deskbar	ProcessController		Перезапустить Deskbar
 Custom priority	ProcessController		Заданный приоритет
-Debug thread	ProcessController		Отладить поток
 This team is already gone…	ProcessController		Этого приложения уже не существует…
 Error saving file	ProcessController		Ошибка при сохранении файла
 Real-time priority	ProcessController		Приоритет реального времени
@@ -42,7 +40,6 @@ Usage: %s [-deskbar]\n	ProcessController		Использование: %s [-deskb
 ProcessController	System name		Контроллер процессов
 Real-time display priority	ProcessController		Приоритет отображения реального времени
 Please confirm	ProcessController		Пожалуйста, подтвердите
-Yes, kill this team!	ProcessController		Да, убить это приложение!
 System resources & caches…	ProcessController		Системные ресурсы и кеш
 That's no Fun!	ProcessController		Это не смешно!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Вы можете запустить контроллер процессов в окне или установить его в Deskbar.

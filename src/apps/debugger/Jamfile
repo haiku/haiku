@@ -156,6 +156,7 @@ Application Debugger :
 	SymbolInfo.cpp
 	SystemInfo.cpp
 	Team.cpp
+	TeamInfo.cpp
 	TeamMemory.cpp
 	TeamMemoryBlock.cpp
 	TeamTypeInformation.cpp
@@ -226,6 +227,7 @@ Application Debugger :
 	MemoryView.cpp
 
 	# user_interface/gui/teams_window
+	StartTeamWindow.cpp
 	TeamsWindow.cpp
 	TeamsListView.cpp
 
@@ -265,6 +267,7 @@ Application Debugger :
 	ArchivingUtils.cpp
 	BitBuffer.cpp
 	IntegerFormatter.cpp
+	RangeList.cpp
 	StringUtils.cpp
 	Worker.cpp
 
@@ -327,7 +330,7 @@ Application Debugger :
 	libexpression_parser.a
 	libmapm.a
 	libedit.a
-	libtermcap.a
+	libncurses.a
 
 	$(TARGET_LIBSTDC++)
 	be tracker libbsd.so libdebug.so

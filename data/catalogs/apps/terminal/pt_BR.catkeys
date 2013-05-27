@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Terminal	328707356
+1	portuguese (brazil)	x-vnd.Haiku-Terminal	2967760334
 Not found.	Terminal TermWindow		Não localizado.
 Switch Terminals	Terminal TermWindow		Alternar Terminais
 Change directory	Terminal TermView		Mudar de pasta
@@ -79,6 +79,7 @@ Clear all	Terminal TermWindow		Limpar tudo
 Text encoding	Terminal TermWindow		Codificação de texto
 size	Terminal TermView		tamanho
 Close window	Terminal TermWindow		Fechar janela
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tO diretório atualmente em uso do processo ativo na\n\t\t\tguia atual. Opcionalmente o número máximo de componentes do caminho\n\t\t\tpode ser especificado. Por exemplo, '%2d' para ao menos dois componentes.\n\t%T\t-\tO nome do aplicativo Terminal para a localidade atual.\n\t%e\t-\tA codificação da guia atual. Não exibido para UTF-8.\n\t%i\t-\tO índice da janela.\n\t%p\t-\tO nome do processo ativo na guia atual.\n\t%t\t-\tO título da guia atual.\n\t%%\t-\tO caractere '%'.
 Save as default	Terminal TermWindow		Salvar como padrão
 Set tab title	Terminal TermWindow		Definir o título da guia
 Settings…	Terminal TermWindow		Configurações...

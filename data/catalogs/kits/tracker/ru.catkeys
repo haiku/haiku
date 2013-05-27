@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	4167158175
+1	russian	x-vnd.Haiku-libtracker	1762695842
 common	B_COMMON_DIRECTORY		Общие
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Большие значки
@@ -143,6 +143,7 @@ Add-ons	ContainerWindow		Дополнения
 Edit templates…	TemplatesMenu		Изменить шаблоны…
 Finish: %time - Over %finishtime left	StatusWindow		Окончание: %time - Осталось более %finishtime
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Объект с именем \"%name\" уже существует в этой папке. Заменить его ссылкой, которую вы создаёте?
+Fewer options	FindPanel		Меньше опций
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Извините, но на принимающем разделе недостаточно свободного места для копирования выделенных файлов.
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Невозможно открыть \"%document\" приложением \"%app\" (%error). 
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Извините, сохранение более одного файла недопустимо.
@@ -212,7 +213,6 @@ Resize to fit	VolumeWindow		Подогнать размер окна
 Could not find application \"%appname\"	OpenWithWindow		Невозможно найти приложение \"%appname\"
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Выбранный объект не может быть перемещён в корзину. Хотите ли вы вместо этого удалить его? (Эту операцию будет невозможно отменить)
 Invert	SelectionWindow		Инвертировать
-Save Query as template…	FindPanel		Сохранить запрос как шаблон…
 rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	переименуете
 Find	FindPanel		Найти
 Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Переместить
@@ -237,6 +237,7 @@ Temporary	FindPanel		Временный запрос
 Version	OpenWithWindow		Версия
 Default application	InfoWindow		приложении по умолчанию
 Preparing to copy items…	StatusWindow		Подготовка к копированию файлов…
+Save query as template…	FindPanel		Сохранить запрос как шаблон…
 Show folder location in title tab	SettingsView		Показывать путь папки в заголовке окна
 Proceed	FSUtils		Исправить
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Некоторые объекты с такими же именами, которые вы %verb, уже существуют в этой папке.\n \nЗаменить их теми, которые вы %verb или спрашивать для каждого объекта?
@@ -335,6 +336,7 @@ The specified name is already used as the name of a folder. Please choose anothe
 Clean up	ContainerWindow		Выстроить
 after	FindPanel		после
 Select…	QueryContainerWindow		Выделить…
+More options	FindPanel		Больше опций
 link	FSUtils	filename link	ссылка
 At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		Не удалось выполнить %func в find_directory(). \nПричина: %error
 The specified name is illegal. Please choose another name.	FilePanelPriv		Введённое имя недопустимо. Введите какое-нибудь другое.
@@ -446,6 +448,7 @@ contains	FindPanel		содержит
 Relation	OpenWithWindow		Возможности
 Open	FilePanelPriv		Открыть
 Mount	DeskWindow		Подключить
+Recent queries	FindPanel		Недавние запросы
 Mount	ContainerWindow		Подключить
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used занято -- %free свободно)
 Cancel	FSClipBoard		Отмена

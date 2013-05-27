@@ -48,14 +48,11 @@ public:
 			void				ReadConfiguration();
 
 private:
-			bool				_PrepareRequest(struct ifreq& request);
-
 			BString				fIP;
 			BString				fGateway;
 			BString				fNetmask;
 			BString				fName;
 			BString				fDomain;
-			int					fSocket;
 			bool				fAuto;
 			bool				fDisabled;
 			BObjectList<BString> fNameServers;

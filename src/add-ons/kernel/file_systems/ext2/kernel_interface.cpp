@@ -217,7 +217,7 @@ ext2_get_vnode(fs_volume* _volume, ino_t id, fs_vnode* _node, int* _type,
 	Volume* volume = (Volume*)_volume->private_volume;
 
 	if (id < 2 || id > volume->NumInodes()) {
-		ERROR("invalid inode id %lld requested!\n", id);
+		ERROR("invalid inode id %" B_PRIdINO " requested!\n", id);
 		return B_BAD_VALUE;
 	}
 
@@ -319,7 +319,7 @@ ext2_read_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 
 	while (true) {
 		file_io_vec fileVecs[8];
-		uint32 fileVecCount = 8;
+		size_t fileVecCount = 8;
 
 		status = file_map_translate(inode->Map(), pos, bytesLeft, fileVecs,
 			&fileVecCount, 0);
@@ -436,8 +436,8 @@ ext2_get_file_map(fs_volume* _volume, fs_vnode* _node, off_t offset,
 			return status;
 
 		if (block > volume->NumBlocks()) {
-			panic("ext2_get_file_map() found block %lld for offset %lld\n",
-				block, offset);
+			panic("ext2_get_file_map() found block %" B_PRIu64 " for offset %"
+				B_PRIdOFF "\n", block, offset);
 		}
 
 		off_t blockOffset = block << volume->BlockShift();
@@ -467,10 +467,10 @@ ext2_get_file_map(fs_volume* _volume, fs_vnode* _node, off_t offset,
 		offset += blockLength;
 		size -= blockLength;
 
-		if (size <= vecs[index - 1].length || offset >= inode->Size()) {
+		if ((off_t)size <= vecs[index - 1].length || offset >= inode->Size()) {
 			// We're done!
 			*_count = index;
-			TRACE("ext2_get_file_map for inode %lld\n", inode->ID());
+			TRACE("ext2_get_file_map for inode %" B_PRIdINO "\n", inode->ID());
 			return B_OK;
 		}
 	}
@@ -518,7 +518,7 @@ static status_t
 ext2_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 cmd,
 	void* buffer, size_t bufferLength)
 {
-	TRACE("ioctl: %lu\n", cmd);
+	TRACE("ioctl: %" B_PRIu32 "\n", cmd);
 
 	Volume* volume = (Volume*)_volume->private_volume;
 	switch (cmd) {
@@ -537,14 +537,15 @@ ext2_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 cmd,
 			uint32 group = 0;
 			uint32 length;
 
-			TRACE("ioctl: blocks per group: %lu, block size: %lu, "
-				"first block: %lu, start: %llu, group: %lu\n", blocksPerGroup,
+			TRACE("ioctl: blocks per group: %" B_PRIu32 ", block size: %"
+				B_PRIu32 ", first block: %" B_PRIu32 ", start: %" B_PRIu64
+				", group: %" B_PRIu32 "\n", blocksPerGroup,
 				blockSize, firstBlock, start, group);
 
 			while (volume->AllocateBlocks(transaction, 1, 2048, group, start,
 					length) == B_OK) {
-				TRACE("ioctl: Allocated blocks in group %lu: %llu-%llu\n", group,
-					start, start + length);
+				TRACE("ioctl: Allocated blocks in group %" B_PRIu32 ": %"
+					B_PRIu64 "-%" B_PRIu64 "\n", group, start, start + length);
 				off_t blockNum = start + group * blocksPerGroup - firstBlock;
 
 				for (uint32 i = 0; i < length; ++i) {
@@ -1072,8 +1073,8 @@ ext2_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 
 		status = inodeIterator.FindEntry("..");
 		if (status == B_ENTRY_NOT_FOUND) {
-			TRACE("Corrupt file sytem. Missing \"..\" in directory %ld\n",
-				(int32)inode->ID());
+			TRACE("Corrupt file system. Missing \"..\" in directory %"
+				B_PRIdINO "\n", inode->ID());
 			return B_BAD_DATA;
 		} else if (status != B_OK)
 			return status;
@@ -1266,7 +1267,7 @@ ext2_read_link(fs_volume *_volume, fs_vnode *_node, char *buffer,
 	if (!inode->IsSymLink())
 		return B_BAD_VALUE;
 
-	if (inode->Size() < *_bufferSize)
+	if (inode->Size() < (off_t)*_bufferSize)
 		*_bufferSize = inode->Size();
 
 	if (inode->Size() > EXT2_SHORT_SYMLINK_LENGTH)
@@ -1414,27 +1415,44 @@ ext2_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	struct dirent *dirent, size_t bufferSize, uint32 *_num)
 {
 	DirectoryIterator *iterator = (DirectoryIterator *)_cookie;
-
-	size_t length = bufferSize;
-	ino_t id;
-	status_t status = iterator->GetNext(dirent->d_name, &length, &id);
-	if (status == B_ENTRY_NOT_FOUND) {
-		*_num = 0;
-		return B_OK;
-	} else if (status != B_OK)
-		return status;
-
-	status = iterator->Next();
-	if (status != B_OK && status != B_ENTRY_NOT_FOUND)
-		return status;
-
 	Volume* volume = (Volume*)_volume->private_volume;
 
-	dirent->d_dev = volume->ID();
-	dirent->d_ino = id;
-	dirent->d_reclen = sizeof(struct dirent) + length;
+	uint32 maxCount = *_num;
+	uint32 count = 0;
 
-	*_num = 1;
+	while (count < maxCount && bufferSize > sizeof(struct dirent)) {
+
+		size_t length = bufferSize - sizeof(struct dirent) + 1;
+		ino_t id;
+
+		status_t status = iterator->GetNext(dirent->d_name, &length, &id);
+		if (status == B_ENTRY_NOT_FOUND)
+			break;
+
+		if (status == B_BUFFER_OVERFLOW) {
+			// the remaining name buffer length was too small
+			if (count == 0)
+				return B_BUFFER_OVERFLOW;
+			break;
+		}
+
+		if (status != B_OK)
+			return status;
+
+		status = iterator->Next();
+		if (status != B_OK && status != B_ENTRY_NOT_FOUND)
+			return status;
+		
+		dirent->d_dev = volume->ID();
+		dirent->d_ino = id;
+		dirent->d_reclen = sizeof(struct dirent) + length;
+
+		bufferSize -= dirent->d_reclen;
+		dirent = (struct dirent*)((uint8*)dirent + dirent->d_reclen);
+		count++;
+	}
+
+	*_num = count;
 	return B_OK;
 }
 

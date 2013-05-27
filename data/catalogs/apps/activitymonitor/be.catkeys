@@ -1,8 +1,9 @@
-1	belarusian	x-vnd.Haiku-ActivityMonitor	3704566709
+1	belarusian	x-vnd.Haiku-ActivityMonitor	1913625522
 P-faults	DataSource		Памылкі старонак памяці
 Media nodes	DataSource		Медыя узлы
 Threads	DataSource		Патокі
 MB	DataSource		МБ
+Always on top	ActivityWindow		Заўсёды наверсе
 Add graph	ActivityWindow		Дадаць графік
 Teams	DataSource		Групы
 Hide legend	ActivityView		Схаваць легенду

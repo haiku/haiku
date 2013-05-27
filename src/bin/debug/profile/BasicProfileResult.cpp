@@ -6,6 +6,9 @@
 
 #include "BasicProfileResult.h"
 
+#if __GNUC__ > 2
+#include <cxxabi.h>
+#endif
 #include <stdio.h>
 
 #include <algorithm>
@@ -210,10 +213,23 @@ BasicProfileResult::PrintResults(ImageProfileResultContainer* container)
 		for (int32 i = 0; i < hitSymbolCount; i++) {
 			const HitSymbol& hitSymbol = hitSymbols[i];
 			const Symbol* symbol = hitSymbol.symbol;
+#if __GNUC__ > 2
+			int status;
+			const char* symbolName = __cxxabiv1::__cxa_demangle(symbol->Name(),
+				NULL, NULL, &status);
+			if (symbolName == NULL)
+				symbolName = symbol->Name();
+#else
+			const char* symbolName = symbol->Name();
+#endif
 			fprintf(gOptions.output, "  %10lld  %10lld  %6.2f  %6ld  %s\n",
 				hitSymbol.hits, hitSymbol.hits * fInterval,
 				100.0 * hitSymbol.hits / totalTicks, hitSymbol.imageID,
-				symbol->Name());
+				symbolName);
+#if __GNUC__ > 2
+			if (status == 0)
+				free(const_cast<char*>(symbolName));
+#endif
 		}
 	} else
 		fprintf(gOptions.output, "  no functions were hit\n");

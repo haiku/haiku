@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -16,7 +16,6 @@
 #include <boot/stdio.h>
 #include <boot/vfs.h>
 #include <ddm_modules.h>
-#include <util/kernel_cpp.h>
 
 #include "RootFileSystem.h"
 
@@ -212,7 +211,7 @@ Partition::Type() const
 Partition *
 Partition::AddChild()
 {
-	Partition *child = new Partition(fFD);
+	Partition *child = new(nothrow) Partition(fFD);
 	TRACE(("%p Partition::AddChild %p\n", this, child));
 	if (child == NULL)
 		return NULL;
@@ -426,7 +425,7 @@ add_partitions_for(int fd, bool mountFileSystems, bool isBootDevice)
 	TRACE(("add_partitions_for(fd = %d, mountFS = %s)\n", fd,
 		mountFileSystems ? "yes" : "no"));
 
-	Partition *partition = new Partition(fd);
+	Partition *partition = new(nothrow) Partition(fd);
 
 	// set some magic/default values
 	partition->block_size = 512;

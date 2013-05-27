@@ -95,7 +95,7 @@ public:
 
 	virtual int32 CountColumns() const
 	{
-		return 3;
+		return 4;
 	}
 
 	virtual int32 CountRows() const
@@ -123,6 +123,14 @@ public:
 			case 2:
 				value.SetTo(thread->Name(), B_VARIANT_DONT_COPY_DATA);
 				return true;
+			case 3:
+			{
+				if (thread->State() != THREAD_STATE_RUNNING) {
+					value.SetTo(thread->StoppedReasonInfo(),
+						B_VARIANT_DONT_COPY_DATA);
+				}
+				return true;
+			}
 			default:
 				return false;
 		}
@@ -363,6 +371,8 @@ ThreadListView::_Init()
 		B_TRUNCATE_END, B_ALIGN_LEFT));
 	fThreadsTable->AddColumn(new StringTableColumn(2, "Name", 200, 40, 1000,
 		B_TRUNCATE_END, B_ALIGN_LEFT));
+	fThreadsTable->AddColumn(new StringTableColumn(3, "Stop Reason",
+		200, 40, 1000, B_TRUNCATE_END, B_ALIGN_LEFT));
 
 	fThreadsTable->SetSelectionMode(B_SINGLE_SELECTION_LIST);
 	fThreadsTable->AddTableListener(this);

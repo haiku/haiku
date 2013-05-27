@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Terminal	117590684
+1	dutch; flemish	x-vnd.Haiku-Terminal	3974501098
 Not found.	Terminal TermWindow		Niet gevonden.
 Switch Terminals	Terminal TermWindow		Wissel van Terminal
 Change directory	Terminal TermView		Directory veranderen
@@ -19,6 +19,7 @@ Font:	Terminal AppearancePrefView		Lettertype:
 Copy here	Terminal TermView		Hierheen kopiëren
 Really close?	Terminal TermWindow		Bent u zeker dat u wilt sluiten?
 Copy	Terminal TermWindow		Kopiëren
+Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 Window title:	Terminal TermWindow		Venstertitel:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Niet-herkende optie \"%s\"\n
 %app% settings	Terminal PrefWindow	window title	Instellingen voor %app%

@@ -176,7 +176,8 @@ Message::Draw(BView *view, int32 frame)
 	buffer.Lock();
 
 	// Set up the colors
-	rgb_color base_color = {rand() % 25, rand() % 25, rand() % 25};
+	rgb_color base_color = {(uint8)(rand() % 25), (uint8)(rand() % 25),
+		(uint8)(rand() % 25)};
 	offscreen.SetHighColor(base_color); 
 	offscreen.SetLowColor(tint_color(base_color, 0.815F));
 	offscreen.FillRect(offscreen.Bounds(), kCheckered);

@@ -143,7 +143,7 @@ MediaTrackAudioSupplier::Read(void* buffer, int64 pos, int64 frames)
 	pos += fOutOffset;
 	// Fill the frames after the end of the track with silence.
 	if (fCountFrames > 0 && pos + frames > fCountFrames) {
-		int64 size = max(0LL, fCountFrames - pos);
+		int64 size = max((int64)0, fCountFrames - pos);
 		ReadSilence(SkipFrames(buffer, size), frames - size);
 		frames = size;
 	}
@@ -276,10 +276,10 @@ MediaTrackAudioSupplier::_InitFromTrack()
 	// get the length of the track
 	fCountFrames = fMediaTrack->CountFrames();
 
-	TRACE("_InitFromTrack(): keyframes: %d, frame count: %lld\n",
-		fHasKeyFrames, fCountFrames);
-	printf("_InitFromTrack(): keyframes: %d, frame count: %lld\n",
-		fHasKeyFrames, fCountFrames);
+	TRACE("_InitFromTrack(): keyframes: %" B_PRId16 ", frame count: %" B_PRId64
+		"\n", fHasKeyFrames, fCountFrames);
+	printf("_InitFromTrack(): keyframes: %" B_PRId16 ", frame count: %"
+		B_PRId64 "\n", fHasKeyFrames, fCountFrames);
 }
 
 // _FramesPerBuffer
@@ -698,9 +698,9 @@ MediaTrackAudioSupplier::_SeekToKeyFrameBackward(int64& position)
 		if (error != B_OK) {
 			position = fMediaTrack->CurrentFrame();
 //			if (fReportSeekError) {
-				printf("  seek to key frame backward: %lld -> %lld (%lld) "
-					"- %s\n", wantedPosition, position,
-					fMediaTrack->CurrentFrame(), strerror(error));
+				printf("  seek to key frame backward: %" B_PRId64 " -> %"
+					B_PRId64 " (%" B_PRId64 ") - %s\n", wantedPosition,
+					position, fMediaTrack->CurrentFrame(), strerror(error));
 				fReportSeekError = false;
 //			}
 		} else {

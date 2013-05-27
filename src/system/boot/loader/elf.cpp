@@ -151,14 +151,14 @@ ELFLoader<Class>::Create(int fd, preloaded_image** _image)
 	ImageType* image = (ImageType*)kernel_args_malloc(sizeof(ImageType));
 	if (image == NULL)
 		return B_NO_MEMORY;
-
-	EhdrType& elfHeader = image->elf_header;
-
-	ssize_t length = read_pos(fd, 0, &elfHeader, sizeof(EhdrType));
+	
+	ssize_t length = read_pos(fd, 0, &image->elf_header, sizeof(EhdrType));
 	if (length < (ssize_t)sizeof(EhdrType)) {
 		kernel_args_free(image);
 		return B_BAD_TYPE;
 	}
+
+	const EhdrType& elfHeader = image->elf_header;
 
 	if (memcmp(elfHeader.e_ident, ELF_MAGIC, 4) != 0
 		|| elfHeader.e_ident[4] != Class::kIdentClass
@@ -186,7 +186,7 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 	void* mappedRegion = NULL;
 
 	ImageType* image = static_cast<ImageType*>(_image);
-	EhdrType& elfHeader = image->elf_header;
+	const EhdrType& elfHeader = image->elf_header;
 
 	ssize_t size = elfHeader.e_phnum * elfHeader.e_phentsize;
 	PhdrType* programHeaders = (PhdrType*)malloc(size);
@@ -445,7 +445,7 @@ template<typename Class>
 /*static*/ status_t
 ELFLoader<Class>::_LoadSymbolTable(int fd, ImageType* image)
 {
-	EhdrType& elfHeader = image->elf_header;
+	const EhdrType& elfHeader = image->elf_header;
 	SymType* symbolTable = NULL;
 	ShdrType* stringHeader = NULL;
 	uint32 numSymbols = 0;

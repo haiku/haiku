@@ -121,7 +121,7 @@ void
 JobSetupWindow::UpdateJobMessage()
 {
 	int32 from = 1;
-	int32 to = LONG_MAX;
+	int32 to = INT32_MAX;
 	if (fAll->Value() == B_CONTROL_OFF) {
 		from = atoi(fFrom->Text());
 		to = atoi(fTo->Text());

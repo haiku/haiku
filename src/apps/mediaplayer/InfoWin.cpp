@@ -293,7 +293,7 @@ InfoWin::ResizeToPreferred()
 void
 InfoWin::Update(uint32 which)
 {
-printf("InfoWin::Update(0x%08lx)\n", which);
+printf("InfoWin::Update(0x%08" B_PRIx32 ")\n", which);
 	fLabelsView->SetText("");
 	fContentsView->SetText("");
 	fLabelsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kBlue);

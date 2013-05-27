@@ -490,7 +490,7 @@ SVGExporter::_GetFill(const Style* style, char* string,
 	status_t ret = B_OK;
 	if (Gradient* gradient = style->Gradient()) {
 		ret = _ExportGradient(gradient, stream);
-		sprintf(string, "url(#gradient%ld)", fGradientCount++);
+		sprintf(string, "url(#gradient%" B_PRId32 ")", fGradientCount++);
 	} else {
 		sprintf(string, "#%.2x%.2x%.2x", style->Color().red,
 										 style->Color().green,

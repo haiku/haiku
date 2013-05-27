@@ -16,12 +16,14 @@ class BMenuField : public BView {
 public:
 								BMenuField(BRect frame, const char* name,
 									const char* label, BMenu* menu,
-									uint32 resize = B_FOLLOW_LEFT|B_FOLLOW_TOP,
+									uint32 resizingMode = B_FOLLOW_LEFT
+										| B_FOLLOW_TOP,
 									uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 								BMenuField(BRect frame, const char* name,
 									const char* label, BMenu* menu,
 									bool fixed_size,
-									uint32 resize = B_FOLLOW_LEFT|B_FOLLOW_TOP,
+									uint32 resizingMode = B_FOLLOW_LEFT
+										| B_FOLLOW_TOP,
 									uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 								BMenuField(const char* name,
 									const char* label, BMenu* menu,
@@ -35,14 +37,14 @@ public:
 	virtual	status_t			Archive(BMessage* archive,
 									bool deep = true) const;
 
-	virtual	void				Draw(BRect update);
+	virtual	void				Draw(BRect updateRect);
 	virtual	void				AttachedToWindow();
 	virtual	void				AllAttached();
 	virtual	void				MouseDown(BPoint where);
 	virtual	void				KeyDown(const char* bytes, int32 numBytes);
 	virtual	void				MakeFocus(bool state);
-	virtual void				MessageReceived(BMessage* message);
-	virtual void				WindowActivated(bool state);
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	void				WindowActivated(bool state);
 	virtual	void				MouseUp(BPoint where);
 	virtual	void				MouseMoved(BPoint where, uint32 transit,
 									const BMessage* dragMessage);
@@ -58,24 +60,24 @@ public:
 	virtual	void				SetLabel(const char* label);
 			const char*			Label() const;
 
-	virtual void				SetEnabled(bool on);
+	virtual	void				SetEnabled(bool on);
 			bool				IsEnabled() const;
 
 	virtual	void				SetAlignment(alignment label);
 			alignment			Alignment() const;
-	virtual	void				SetDivider(float dividing_line);
+	virtual	void				SetDivider(float position);
 			float				Divider() const;
 
 			void				ShowPopUpMarker();
 			void				HidePopUpMarker();
 
-	virtual BHandler*			ResolveSpecifier(BMessage* message,
+	virtual	BHandler*			ResolveSpecifier(BMessage* message,
 									int32 index, BMessage* specifier,
 									int32 form, const char* property);
-	virtual status_t			GetSupportedSuites(BMessage* data);
+	virtual	status_t			GetSupportedSuites(BMessage* data);
 
-	virtual void				ResizeToPreferred();
-	virtual void				GetPreferredSize(float* width, float* height);
+	virtual	void				ResizeToPreferred();
+	virtual	void				GetPreferredSize(float* width, float* height);
 
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
@@ -87,8 +89,8 @@ public:
 	virtual status_t			Perform(perform_code d, void* arg);
 
 protected:
-	virtual status_t			AllArchived(BMessage* into) const;
-	virtual status_t			AllUnarchived(const BMessage* from);
+	virtual	status_t			AllArchived(BMessage* into) const;
+	virtual	status_t			AllUnarchived(const BMessage* from);
 
 	virtual	void				LayoutInvalidated(bool descendants);
 	virtual	void				DoLayout();
@@ -121,7 +123,7 @@ private:
 
 			void				InitObject(const char* label);
 			void				InitObject2();
-			void				DrawLabel(BRect bounds, BRect update);
+			void				DrawLabel(BRect updateRect);
 	static	void				InitMenu(BMenu* menu);
 
 			int32				_MenuTask();

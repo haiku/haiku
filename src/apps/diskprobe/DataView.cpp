@@ -163,19 +163,19 @@ DataView::UpdateFromEditor(BMessage *message)
 	if (message != NULL
 		&& message->FindInt64("offset", &offset) == B_OK
 		&& message->FindInt64("size", &size) == B_OK) {
-		if (offset > fOffset + fDataSize
-			|| offset + size < fOffset) {
+		if (offset > fOffset + (off_t)fDataSize
+			|| offset + (off_t)size < fOffset) {
 			// the changes are not within our scope, so we can ignore them
 			return;
 		}
 
 		if (offset > fOffset)
 			start = offset - fOffset;
-		if (offset + size < fOffset + fDataSize)
+		if (offset + (off_t)size < fOffset + (off_t)fDataSize)
 			end = offset + size - fOffset;
 	}
 
-	if (fOffset + fDataSize > fFileSize)
+	if (fOffset + (off_t)fDataSize > fFileSize)
 		fSizeInView = fFileSize - fOffset;
 	else
 		fSizeInView = fDataSize;
@@ -356,8 +356,8 @@ DataView::ConvertLine(char *line, off_t offset, const uint8 *buffer, size_t size
 		return;
 	}
 
-	line += sprintf(line, fBase == kHexBase ? "%0*Lx:  " : "%0*Ld:  ",
-		(int)fPositionLength, offset);
+	line += sprintf(line, fBase == kHexBase ? "%0*" B_PRIxOFF":  " : "%0*"
+		B_PRIdOFF":  ", (int)fPositionLength, offset);
 
 	for (uint32 i = 0; i < kBlockSize; i++) {
 		if (i >= size) {

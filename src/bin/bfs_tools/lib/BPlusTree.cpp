@@ -250,14 +250,14 @@ BPlusTree::Validate(bool verbose)
 	while (true) {
 		if (!stack.Pop(&info)) {
 			if (verbose) {
-				printf("  %ld B+tree node(s) processed (%ld free node(s)).\n",
-					count, freeCount);
+				printf("  %" B_PRId32 " B+tree node(s) processed (%" B_PRId32
+					" free node(s)).\n", count, freeCount);
 			}
 			return B_OK;
 		}
 
 		if (!info.free && verbose && ++count % 10 == 0)
-			printf("  %ld%s1A\n", count, escape);
+			printf("  %" B_PRId32 "%s1A\n", count, escape);
 		else if (info.free)
 			freeCount++;
 
@@ -265,7 +265,9 @@ BPlusTree::Validate(bool verbose)
 		if ((node = fCache.Get(info.offset)) == NULL
 			|| !info.free && !CheckNode(node)) {
 			if (verbose) {
-				fprintf(stderr,"  B+Tree: Could not get data at position %Ld (referenced by node at %Ld)\n",info.offset,info.from);
+				fprintf(stderr,"  B+Tree: Could not get data at position %"
+					B_PRIdOFF " (referenced by node at %" B_PRIdOFF ")\n",
+					info.offset, info.from);
 				if ((node = fCache.Get(info.from)) != NULL)
 					dump_bplustree_node(node,fHeader);
 			}
@@ -350,7 +352,8 @@ status_t BPlusTree::Goto(int8 to)
 		else
 		{
 			if (node->all_key_length > fNodeSize
-				|| (uint32)node->Values() > (uint32)node + fNodeSize - 8 * node->all_key_count)
+				|| (addr_t)node->Values() > (addr_t)node + fNodeSize
+					- 8 * node->all_key_count)
 				return B_ERROR;
 			
 			pos = *node->Values();

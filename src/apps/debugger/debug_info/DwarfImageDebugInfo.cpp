@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -299,7 +299,8 @@ DwarfImageDebugInfo::Init()
 
 
 status_t
-DwarfImageDebugInfo::GetFunctions(BObjectList<FunctionDebugInfo>& functions)
+DwarfImageDebugInfo::GetFunctions(const BObjectList<SymbolInfo>& symbols,
+	BObjectList<FunctionDebugInfo>& functions)
 {
 	TRACE_IMAGES("DwarfImageDebugInfo::GetFunctions()\n");
 	TRACE_IMAGES("  %" B_PRId32 " compilation units\n",
@@ -413,9 +414,14 @@ DwarfImageDebugInfo::GetFunctions(BObjectList<FunctionDebugInfo>& functions)
 		return B_OK;
 
 	// if we had no compilation units, fall back to providing basic
-	// debug infos with DWARF-supported call frame unwinding
-	return SpecificImageDebugInfo::GetFunctionsFromSymbols(functions,
-		fDebuggerInterface, fImageInfo, this);
+	// debug infos with DWARF-supported call frame unwinding,
+	// if available.
+	if (fFile->HasFrameInformation()) {
+		return SpecificImageDebugInfo::GetFunctionsFromSymbols(symbols,
+			functions, fDebuggerInterface, fImageInfo, this);
+	}
+
+	return B_OK;
 }
 
 
@@ -1106,6 +1112,8 @@ DwarfImageDebugInfo::_CreateReturnValues(ReturnValueInfoList* returnValueInfos,
 		status_t result = B_OK;
 		ImageDebugInfo* imageInfo = image->GetImageDebugInfo();
 		FunctionInstance* targetFunction;
+		target_size_t addressSize = fDebuggerInterface->GetArchitecture()
+			->AddressSize();
 		if (subroutineAddress >= fPLTSectionStart
 			&& subroutineAddress < fPLTSectionEnd) {
 			// if the function in question is position-independent, the call
@@ -1118,8 +1126,6 @@ DwarfImageDebugInfo::_CreateReturnValues(ReturnValueInfoList* returnValueInfos,
 				return B_BAD_VALUE;
 			}
 
-			target_size_t addressSize = fDebuggerInterface->GetArchitecture()
-				->AddressSize();
 			ssize_t bytesRead = fDebuggerInterface->ReadMemory(
 				info.TargetAddress(), &subroutineAddress, addressSize);
 
@@ -1154,6 +1160,11 @@ DwarfImageDebugInfo::_CreateReturnValues(ReturnValueInfoList* returnValueInfos,
 						byteSize = fArchitecture->AddressSize();
 				} else
 					byteSize = returnType->ByteSize()->constant;
+
+				// if we were unable to determine a size for the type,
+				// simply default to the architecture's register width.
+				if (byteSize == 0)
+					byteSize = addressSize;
 
 				ValueLocation* location;
 				result = fArchitecture->GetReturnAddressLocation(frame,

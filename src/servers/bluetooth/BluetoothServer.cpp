@@ -344,7 +344,8 @@ BluetoothServer::HandleAcquireLocalDevice(BMessage* message, BMessage* reply)
 		for (int index = lastIndex + 1;
 			index < fLocalDevicesList.CountItems();	index++) {
 			lDeviceImpl= fLocalDevicesList.ItemAt(index);
-			printf("Requesting local device %ld\n", lDeviceImpl->GetID());
+			printf("Requesting local device %" B_PRId32 "\n",
+				lDeviceImpl->GetID());
 			if (lDeviceImpl != NULL && lDeviceImpl->Available()) {
 				Output::Instance()->Postf(BLACKBOARD_KIT,
 					"Device available: %lx\n", lDeviceImpl->GetID());
@@ -357,7 +358,8 @@ BluetoothServer::HandleAcquireLocalDevice(BMessage* message, BMessage* reply)
 		if (lDeviceImpl == NULL) {
 			for (int index = 0; index <= lastIndex ; index ++) {
 				lDeviceImpl = fLocalDevicesList.ItemAt(index);
-				printf("Requesting local device %ld\n", lDeviceImpl->GetID());
+				printf("Requesting local device %" B_PRId32 "\n",
+					lDeviceImpl->GetID());
 				if (lDeviceImpl != NULL && lDeviceImpl->Available()) {
 					Output::Instance()->Postf(BLACKBOARD_KIT,
 						"Device available: %lx\n", lDeviceImpl->GetID());
@@ -600,7 +602,7 @@ BluetoothServer::_InstallDeskbarIcon()
 
 	status_t res = deskbar.AddItem(&appInfo.ref);
 	if (res != B_OK) {
-		printf("Failed adding deskbar icon: %ld\n", res);
+		printf("Failed adding deskbar icon: %" B_PRId32 "\n", res);
 	}
 }
 
@@ -611,7 +613,7 @@ BluetoothServer::_RemoveDeskbarIcon()
 	BDeskbar deskbar;
 	status_t res = deskbar.RemoveItem(kDeskbarItemName);
 	if (res != B_OK) {
-		printf("Failed removing Deskbar icon: %ld: \n", res);
+		printf("Failed removing Deskbar icon: %" B_PRId32 ": \n", res);
 	}
 }
 

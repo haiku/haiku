@@ -1,7 +1,7 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2013, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "Volume.h"
@@ -9,7 +9,6 @@
 
 #include <boot/partitions.h>
 #include <boot/platform.h>
-#include <util/kernel_cpp.h>
 
 #include <string.h>
 #include <unistd.h>
@@ -87,7 +86,7 @@ Volume::~Volume()
 }
 
 
-status_t 
+status_t
 Volume::InitCheck()
 {
 	if (fRoot != NULL)

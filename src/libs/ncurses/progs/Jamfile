@@ -1,0 +1,32 @@
+SubDir HAIKU_TOP src libs ncurses progs ;
+
+SubDirCcFlags -O2 -DHAVE_CONFIG_H -D_XOPEN_SOURCE=500 -D_POSIX_C_SOURCE=199506L -DNDEBUG ;
+
+SubDirSysHdrs $(SUBDIR) ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) include ] ;
+
+BinCommand <ncurses>tput :
+	tput.c
+	: libncurses.a : ;
+
+BinCommand <ncurses>infocmp :
+	dump_entry.c
+	infocmp.c
+	: libncurses.a : ;
+
+BinCommand <ncurses>tset :
+	tset.c
+	: libncurses.a : ;
+
+BinCommand <ncurses>clear :
+	clear.c
+	: libncurses.a : ;
+
+BinCommand <ncurses>toe :
+	toe.c
+	: libncurses.a : ;
+
+BinCommand <ncurses>tic :
+	dump_entry.c
+	tic.c
+	: libncurses.a : ;

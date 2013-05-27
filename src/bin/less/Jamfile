@@ -6,14 +6,14 @@ TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 
 SubDirCcFlags -DBINDIR='\"/bin\"' -DSYSDIR='\"/etc\"' ;
 
-UseLibraryHeaders termcap ;
+UseLibraryHeaders ncurses ;
 SubDirSysHdrs $(SUBDIR) ;
 
 BinCommand less :
 	main.c screen.c brac.c ch.c charset.c cmdbuf.c command.c decode.c edit.c filename.c forwback.c
 	help.c ifile.c input.c jump.c line.c linenum.c lsystem.c mark.c optfunc.c option.c opttbl.c os.c
 	output.c position.c prompt.c search.c signal.c tags.c ttyin.c version.c  :
-	libtermcap.a : less.rdef ;
+	libncurses.a : less.rdef ;
 
 BinCommand lesskey : lesskey.c version.c : : less.rdef ;
 

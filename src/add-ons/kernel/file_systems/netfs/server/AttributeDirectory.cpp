@@ -329,7 +329,7 @@ AttributeDirectory::GetAttribute(const char* name) const
 			return attribute;
 	}
 
-	return false;
+	return NULL;
 }
 
 // GetFirstAttribute

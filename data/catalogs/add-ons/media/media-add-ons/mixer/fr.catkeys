@@ -1,7 +1,7 @@
 1	french	x-vnd.Haiku-mixer.media_addon	3450667169
 Input gain controls represent	AudioMixer		Les contrôles de gain d'entrée représentent
 Linear interpolation	AudioMixer		Interpolation linéaire
-Virtual output channels	AudioMixer		Canaux de sortie virtuelles
+Virtual output channels	AudioMixer		Canaux de la sortie virtuelle
 Refuse output format changes	AudioMixer		Refuser les changements de formats de sorties
 Output mapping	AudioMixer		Correspondances de sorties
 Allow input channel remapping	AudioMixer		Autoriser la réassignation des canaux d'entrées

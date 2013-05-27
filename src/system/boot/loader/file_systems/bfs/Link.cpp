@@ -1,15 +1,14 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2004-2013, Axel Dörfler, axeld@pinc-software.de.
+ * This file may be used under the terms of the MIT License.
+ */
 
 
 #include "Link.h"
 
-#include <util/kernel_cpp.h>
-
 
 namespace BFS {
+
 
 Link::Link(Volume &volume, block_run run)
 	: File(volume, run)
@@ -62,5 +61,6 @@ Link::Type() const
 {
 	return S_IFLNK;
 }
+
 
 }	// namespace BFS

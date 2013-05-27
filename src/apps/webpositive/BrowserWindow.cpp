@@ -40,6 +40,7 @@
 #include <CheckBox.h>
 #include <Clipboard.h>
 #include <ControlLook.h>
+#include <Debug.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>

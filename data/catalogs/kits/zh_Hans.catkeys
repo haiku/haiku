@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libbe	672385853
+1	english	x-vnd.Haiku-libbe	677628532
 gamma	AboutWindow		伽马
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -7,7 +7,6 @@ About %app%	AboutMenuItem		关于 %app%
 Cut	TextView		剪切
 Version	AboutWindow		版本
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		无法为 \"%description\" 创建克隆控件。\n%error
-About	AboutWindow		关于
 Copy	TextView		复制
 %3.2f KiB	StringForSize		%3.2f KiB
 %d bytes	StringForSize		%d bytes

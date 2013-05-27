@@ -1,7 +1,7 @@
 /*
 	ProcessController © 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org
-	Copyright (c) 2006-2012, Haiku, Inc. All rights reserved.
+	Copyright (c) 2006-2013, Haiku, Inc. All rights reserved.
 
 	This library is free software; you can redistribute it and/or
 	modify it under the terms of the GNU Lesser General Public
@@ -68,6 +68,9 @@ const char* kClassName = "ProcessController";
 const char* kFrameColorPref = "deskbar_frame_color";
 const char* kIdleColorPref = "deskbar_idle_color";
 const char* kActiveColorPref = "deskbar_active_color";
+
+static const char* const kDebuggerSignature
+	= "application/x-vnd.Haiku-Debugger";
 
 const rgb_color kKernelBlue = {20, 20, 231,	255};
 const rgb_color kIdleGreen = {110, 190,110,	255};
@@ -204,10 +207,6 @@ ProcessController::~ProcessController()
 
 	delete fMessageRunner;
 	gPCView = NULL;
-
-	// replicant deleted, destroy the about window
-	if (fAboutWindow != NULL && fAboutWindow->Lock())
-		fAboutWindow->Quit();
 }
 
 
@@ -221,7 +220,23 @@ ProcessController::Init()
 	memset(fCPUTimes, 0, sizeof(fCPUTimes));
 	memset(fPrevActive, 0, sizeof(fPrevActive));
 	fPrevTime = 0;
-	fAboutWindow = NULL;
+}
+
+
+void
+ProcessController::_HandleDebugRequest(team_id team, thread_id thread)
+{
+	char *argv[2];
+	char paramString[16];
+	char idString[16];
+	strlcpy(paramString, thread > 0 ? "--thread" : "--team", sizeof(paramString));
+	snprintf(idString, sizeof(idString), "%" B_PRId32, thread > 0 ? thread : team);
+	argv[0] = paramString;
+	argv[1] = idString;
+	status_t error = be_roster->Launch(kDebuggerSignature, 2, argv);
+	if (error != B_OK) {
+		// TODO: notify user
+	}
 }
 
 
@@ -272,14 +287,24 @@ ProcessController::MessageReceived(BMessage *message)
 				if (get_team_info(team, &infos.team_info) == B_OK) {
 					get_team_name_and_icon(infos);
 					snprintf(question, sizeof(question),
-					B_TRANSLATE("Do you really want to kill the team \"%s\"?"),
+					B_TRANSLATE("What do you want to do with the team \"%s\"?"),
 					infos.team_name);
 					alert = new BAlert(B_TRANSLATE("Please confirm"), question,
-					B_TRANSLATE("Cancel"), B_TRANSLATE("Yes, kill this team!"),
-					NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+					B_TRANSLATE("Cancel"), B_TRANSLATE("Debug this team!"),
+					B_TRANSLATE("Kill this team!"), B_WIDTH_AS_USUAL,
+					B_STOP_ALERT);
 					alert->SetShortcut(0, B_ESCAPE);
-					if (alert->Go())
-						kill_team(team);
+					int result = alert->Go();
+					switch (result) {
+						case 1:
+							_HandleDebugRequest(team, -1);
+							break;
+						case 2:
+							kill_team(team);
+							break;
+						default:
+							break;
+					}
 				} else {
 					alert = new BAlert(B_TRANSLATE("Info"),
 						B_TRANSLATE("This team is already gone"B_UTF8_ELLIPSIS),
@@ -322,17 +347,8 @@ ProcessController::MessageReceived(BMessage *message)
 					if (r == KILL)
 						kill_thread(thread);
 					#if DEBUG_THREADS
-					else if (r == 1) {
-						Tdebug_thead_param* param = new Tdebug_thead_param;
-						param->thread = thread;
-						if (thinfo.state == B_THREAD_WAITING)
-							param->sem = thinfo.sem;
-						else
-							param->sem = -1;
-						param->totalTime = thinfo.user_time+thinfo.kernel_time;
-						resume_thread(spawn_thread(thread_debug_thread,
-						B_TRANSLATE("Debug thread"), B_NORMAL_PRIORITY, param));
-					}
+					else if (r == 1)
+						_HandleDebugRequest(thinfo.team, thinfo.thread);
 					#endif
 				} else {
 					alert = new BAlert(B_TRANSLATE("Info"),
@@ -438,27 +454,24 @@ ProcessController::MessageReceived(BMessage *message)
 void
 ProcessController::AboutRequested()
 {
-	if (fAboutWindow == NULL) {
-		const char* extraCopyrights[] = {
-			"2004 beunited.org",
-			"1997-2001 Georges-Edouard Berenger",
-			NULL
-		};
+	BAboutWindow* window = new BAboutWindow(
+		B_TRANSLATE_SYSTEM_NAME("ProcessController"), kSignature);
 
-		const char* authors[] = {
-			"Georges-Edouard Berenger",
-			NULL
-		};
+	const char* extraCopyrights[] = {
+		"2004 beunited.org",
+		"1997-2001 Georges-Edouard Berenger",
+		NULL
+	};
 
-		fAboutWindow = new BAboutWindow(
-			B_TRANSLATE_SYSTEM_NAME("ProcessController"), kSignature);
-		fAboutWindow->AddCopyright(2007, "Haiku, Inc.", extraCopyrights);
-		fAboutWindow->AddAuthors(authors);
-		fAboutWindow->Show();
-	} else if (fAboutWindow->IsHidden())
-		fAboutWindow->Show();
-	else
-		fAboutWindow->Activate();
+	const char* authors[] = {
+		"Georges-Edouard Berenger",
+		NULL
+	};
+
+	window->AddCopyright(2007, "Haiku, Inc.", extraCopyrights);
+	window->AddAuthors(authors);
+
+	window->Show();
 }
 
 

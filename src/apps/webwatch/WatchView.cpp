@@ -97,7 +97,7 @@ void WatchView::Draw(BRect updateRect)
 	super::Draw(updateRect);
 
 	char string[5];
-	sprintf(string, "@%03ld", GetInternetTime());
+	sprintf(string, "@%03" B_PRId32, GetInternetTime());
 	
 	font_height height;         // center the text horizontally
 	GetFontHeight(&height);     // and vertically in the Deskbar

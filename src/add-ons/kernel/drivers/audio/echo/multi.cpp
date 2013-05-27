@@ -97,8 +97,8 @@ echo_channel_get_mix(void *card, MIXER_AUDIO_CHANNEL channel, int32 type, float 
 		} else {
 			values[0] = function[0].Data.iNominal == 4 ? 1.0 : 0.0;
 		}
-		PRINT(("echo_channel_get_mix iLevel: %ld, %d, %ld\n", function[0].Data.iLevel, 
-			channel.wChannel, channel.dwType));
+		PRINT(("echo_channel_get_mix iLevel: %" B_PRId32 ", %d, %" B_PRIu32
+			"\n", function[0].Data.iLevel, channel.wChannel, channel.dwType));
 	}
 
 }
@@ -134,8 +134,8 @@ echo_channel_set_mix(void *card, MIXER_AUDIO_CHANNEL channel, int32 type, float 
 	dev->pEG->ProcessMixerMultiFunction(multi_function, size);
 	
 	if (function[0].RtnStatus == ECHOSTATUS_OK) {
-		PRINT(("echo_channel_set_mix OK: %ld, %d, %ld\n", function[0].Data.iLevel, 
-			channel.wChannel, channel.dwType));
+		PRINT(("echo_channel_set_mix OK: %" B_PRId32 ", %d, %" B_PRIu32 "\n",
+			function[0].Data.iLevel, channel.wChannel, channel.dwType));
 	}
 
 }
@@ -242,7 +242,7 @@ echo_create_controls_list(multi_dev *multi)
 	}
 
 	multi->control_count = index;
-	PRINT(("multi->control_count %lu\n", multi->control_count));
+	PRINT(("multi->control_count %" B_PRIu32 "\n", multi->control_count));
 	return B_OK;
 }
 
@@ -256,7 +256,8 @@ echo_get_mix(echo_dev *card, multi_mix_value_info * mmvi)
 	for (i = 0; i < mmvi->item_count; i++) {
 		id = mmvi->values[i].id - MULTI_CONTROL_FIRSTID;
 		if (id < 0 || id >= card->multi.control_count) {
-			PRINT(("echo_get_mix : invalid control id requested : %li\n", id));
+			PRINT(("echo_get_mix : invalid control id requested : %" B_PRIu32
+				"\n", id));
 			continue;
 		}
 		control = &card->multi.controls[id];
@@ -297,7 +298,8 @@ echo_set_mix(echo_dev *card, multi_mix_value_info * mmvi)
 	for (i = 0; i < mmvi->item_count; i++) {
 		id = mmvi->values[i].id - MULTI_CONTROL_FIRSTID;
 		if (id < 0 || id >= card->multi.control_count) {
-			PRINT(("echo_set_mix : invalid control id requested : %li\n", id));
+			PRINT(("echo_set_mix : invalid control id requested : %" B_PRIu32
+				"\n", id));
 			continue;
 		}
 		control = &card->multi.controls[id];
@@ -307,7 +309,8 @@ echo_set_mix(echo_dev *card, multi_mix_value_info * mmvi)
 			if (i + 1 < mmvi->item_count) {
 				id = mmvi->values[i + 1].id - MULTI_CONTROL_FIRSTID;
 				if (id < 0 || id >= card->multi.control_count) {
-					PRINT(("echo_set_mix : invalid control id requested : %li\n", id));
+					PRINT(("echo_set_mix : invalid control id requested : %"
+						B_PRIu32 "\n", id));
 				} else {
 					control2 = &card->multi.controls[id];
 					if (control2->mix_control.master != control->mix_control.id)
@@ -995,21 +998,21 @@ echo_open(const char *name, uint32 flags, void** cookie)
 			value = strtoul (item, &end, 0);
 			if (*end == '\0') current_settings.sample_rate = value;
 		}
-		PRINT(("sample_rate %lu\n", current_settings.sample_rate));
+		PRINT(("sample_rate %" B_PRIu32 "\n", current_settings.sample_rate));
 		
 		item = get_driver_parameter (settings_handle, "buffer_frames", NULL, NULL);
 		if (item) {
 			value = strtoul (item, &end, 0);
 			if (*end == '\0') current_settings.buffer_frames = value;
 		}
-		PRINT(("buffer_frames %lu\n", current_settings.buffer_frames));
+		PRINT(("buffer_frames %" B_PRIu32 "\n", current_settings.buffer_frames));
 
 		item = get_driver_parameter (settings_handle, "buffer_count", NULL, NULL);
 		if (item) {
 			value = strtoul (item, &end, 0);
 			if (*end == '\0') current_settings.buffer_count = value;
 		}
-		PRINT(("buffer_count %lu\n", current_settings.buffer_count));
+		PRINT(("buffer_count %" B_PRId32 "\n", current_settings.buffer_count));
 		
 		unload_driver_settings (settings_handle);
 	}

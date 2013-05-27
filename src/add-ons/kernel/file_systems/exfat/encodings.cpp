@@ -98,14 +98,15 @@
 static status_t
 _lendian_unicode_to_utf8(
 	const char *src,
-	int32 *srcLen,
+	size_t *srcLen,
 	char *dst,
-	uint32 *dstLen)
+	size_t *dstLen)
 {
-	int32 srcLimit = *srcLen;
-	int32 dstLimit = *dstLen;
-	int32 srcCount = 0;
-	int32 dstCount = 0;
+	size_t srcLimit = *srcLen;
+	size_t dstLimit = *dstLen;
+	size_t srcCount = 0;
+	size_t dstCount = 0;
+	status_t status = B_ERROR;
 
 	for (srcCount = 0; srcCount < srcLimit; srcCount += 2) {
 		uint16  *UNICODE = (uint16 *)&src[srcCount];
@@ -119,33 +120,37 @@ _lendian_unicode_to_utf8(
 		u_lendian_to_utf8(UTF8, UNICODE);
 
 		utf8Len = UTF8 - utf8;
-		if ((dstCount + utf8Len) > dstLimit)
+		if ((dstCount + utf8Len) > dstLimit) {
+			status = B_BUFFER_OVERFLOW;
 			break;
+		}
 
 		for (j = 0; j < utf8Len; j++)
 			dst[dstCount + j] = utf8[j];
 		dstCount += utf8Len;
+		status = B_OK;
 	}
 
 	*srcLen = srcCount;
 	*dstLen = dstCount;
 	dst[dstCount] = '\0';
 	
-	return ((dstCount > 0) ? B_NO_ERROR : B_ERROR);
+	return status;
 }
 
 // utf8 to LENDIAN unicode
 static status_t
 _utf8_to_lendian_unicode(
 	const char	*src,
-	int32		*srcLen,
+	size_t		*srcLen,
 	char		*dst,
-	uint32		*dstLen)
+	size_t		*dstLen)
 {
-	int32 srcLimit = *srcLen;
-	int32 dstLimit = *dstLen - 1;
-	int32 srcCount = 0;
-	int32 dstCount = 0;
+	size_t srcLimit = *srcLen;
+	size_t dstLimit = *dstLen - 1;
+	size_t srcCount = 0;
+	size_t dstCount = 0;
+	status_t status = B_ERROR;
 
 	while ((srcCount < srcLimit) && (dstCount < dstLimit)) {
 		uint16	unicode;
@@ -157,31 +162,36 @@ _utf8_to_lendian_unicode(
 			break;
 
 		utf8_to_u_hostendian(UTF8, UNICODE, err_flag);
-		if(err_flag == 1)
+		if (err_flag == 1)
 			return EINVAL;
 
 		unicode = B_HOST_TO_LENDIAN_INT16(unicode);
+		if ((dstCount + 1) > dstLimit) {
+			status = B_BUFFER_OVERFLOW;
+			break;
+		}
 		dst[dstCount++] = unicode & 0xFF;
 		dst[dstCount++] = unicode >> 8;
 
 		srcCount += UTF8 - ((uchar *)(src + srcCount));
+		status = B_OK;	
 	}
 
 	*srcLen = srcCount;
 	*dstLen = dstCount;
 
-	return ((dstCount > 0) ? B_NO_ERROR : B_ERROR);
+	return status;
 }
 
 
 // takes a unicode name of unilen uchar's and converts to a utf8 name of at
 // most utf8len uint8's
-status_t unicode_to_utf8(const uchar *uni, uint32 unilen, uint8 *utf8,
-	uint32 *utf8len)
+status_t unicode_to_utf8(const uchar *uni, size_t unilen, uint8 *utf8,
+	size_t *utf8len)
 {
-	uint32 origlen = unilen;
+	//size_t origlen = unilen;
 	status_t result = _lendian_unicode_to_utf8((char *)uni,
-			(int32 *)&unilen, (char *)utf8, utf8len);
+			&unilen, (char *)utf8, utf8len);
 
 	/*if (unilen < origlen) {
 		panic("Name is too long (%lx < %lx)\n", unilen, origlen);
@@ -192,13 +202,13 @@ status_t unicode_to_utf8(const uchar *uni, uint32 unilen, uint8 *utf8,
 }
 
 
-status_t utf8_to_unicode(const char *utf8, uchar *uni, uint32 *unilen)
+status_t utf8_to_unicode(const char *utf8, uchar *uni, size_t *unilen)
 {
-	uint32 origlen = strlen(utf8) + 1;
-	uint32 utf8len = origlen;
+	size_t origlen = strlen(utf8) + 1;
+	size_t utf8len = origlen;
 
 	status_t result = _utf8_to_lendian_unicode(utf8,
-			(int32 *)&utf8len, (char *)uni, unilen);
+			&utf8len, (char *)uni, unilen);
 
 	/*if (origlen < utf8len) {
 		panic("Name is too long (%lx < %lx)\n", *unilen, origlen);

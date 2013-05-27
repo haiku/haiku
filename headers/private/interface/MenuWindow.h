@@ -40,6 +40,7 @@ public:
 			bool			HasScrollers() const;
 			bool			CheckForScrolling(const BPoint& cursor);
 			bool			TryScrollBy(const float& step);
+			bool			TryScrollTo(const float& where);
 
 private:
 			bool			_Scroll(const BPoint& cursor);

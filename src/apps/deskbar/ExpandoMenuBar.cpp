@@ -369,7 +369,7 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 
 			case B_INSIDE_VIEW:
 			{
-				BMenuItem* menuItem;
+				BMenuItem* menuItem = NULL;
 				TTeamMenuItem* item = TeamItemAtPoint(where, &menuItem);
 				TWindowMenuItem* windowMenuItem
 					= dynamic_cast<TWindowMenuItem*>(menuItem);

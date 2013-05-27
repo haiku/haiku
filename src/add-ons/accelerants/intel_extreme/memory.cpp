@@ -27,7 +27,7 @@
 
 
 void
-intel_free_memory(uint32 base)
+intel_free_memory(addr_t base)
 {
 	if (base == 0)
 		return;
@@ -42,7 +42,7 @@ intel_free_memory(uint32 base)
 
 
 status_t
-intel_allocate_memory(size_t size, uint32 flags, uint32 &base)
+intel_allocate_memory(size_t size, uint32 flags, addr_t &base)
 {
 	intel_allocate_graphics_memory allocMemory;
 	allocMemory.magic = INTEL_PRIVATE_DATA_MAGIC;

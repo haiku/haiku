@@ -1,10 +1,8 @@
-1	romanian	x-vnd.Haiku-ProcessController	2887520383
+1	romanian	x-vnd.Haiku-ProcessController	2886374724
 Memory usage	ProcessController		Utilizarea memoriei
-Do you really want to kill the team \"%s\"?	ProcessController		Doriți să terminați forțat echipa „%s”?
 Idle priority	ProcessController		Prioritate în așteptare
 Restart Deskbar	ProcessController		Repornește bara de desktop
 Custom priority	ProcessController		Prioritate personalizată
-Debug thread	ProcessController		Depanează firul de execuție
 This team is already gone…	ProcessController		Această echipă este plecată deja...
 Error saving file	ProcessController		Eroare la salvarea fișierului
 Real-time priority	ProcessController		Prioritate în timp real
@@ -42,7 +40,6 @@ Usage: %s [-deskbar]\n	ProcessController		Utilizare: %s [-deskbar]\n
 ProcessController	System name		ControlProcese
 Real-time display priority	ProcessController		Prioritate afișaj în timp real
 Please confirm	ProcessController		Confirmați
-Yes, kill this team!	ProcessController		Da, termină forțat această echipă!
 System resources & caches…	ProcessController		Resurse de sistem & cache-uri
 That's no Fun!	ProcessController		Nu e amuzant!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Puteți să rulați ControlerProces într-o fereastră sau să îl instalați pe bara de desktop.

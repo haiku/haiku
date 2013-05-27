@@ -559,8 +559,10 @@ Playlist::AppendPlaylistToPlaylist(const entry_ref& ref, Playlist* playlist)
 						= new (std::nothrow) FilePlaylistItem(refPath);
 					if (item == NULL || !playlist->AddItem(item))
 						delete item;
-				} else
-					printf("Error - %s: [%lx]\n", strerror(err), (int32) err);
+				} else {
+					printf("Error - %s: [%" B_PRIx32 "]\n", strerror(err),
+						err);
+				}
 			} else
 				printf("Error - No File Found in playlist\n");
 		}

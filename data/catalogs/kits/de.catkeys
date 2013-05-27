@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libbe	672385853
+1	german	x-vnd.Haiku-libbe	3504008668
 gamma	AboutWindow		Gamma
 beta	AboutWindow		Beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -7,7 +7,6 @@ About %app%	AboutMenuItem		Über %app%
 Cut	TextView		Ausschneiden
 Version	AboutWindow		Version
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Replikant für \"%description\" konnte nicht erstellt werden.\n%error
-About	AboutWindow		Über
 Copy	TextView		Kopieren
 %3.2f KiB	StringForSize		%3.2f KiB
 %d bytes	StringForSize		%d Bytes
@@ -15,9 +14,11 @@ alpha	AboutWindow		Alpha
 Error	PrintJob		Fehler
 No Pages to print!	PrintJob		Keine Seiten zu drucken!
 All Rights Reserved.	AboutWindow		Alle Rechte vorbehalten.
+About %app%	AboutWindow		Über %app%
 OK	Dragger		OK
 OK	PrintJob		OK
 Green:	ColorControl		Grün:
+Ok	AboutWindow		OK
 Version history:	AboutWindow		Historie:
 Remove replicant	Dragger		Replikant entfernen
 OK	ZombieReplicantView		OK

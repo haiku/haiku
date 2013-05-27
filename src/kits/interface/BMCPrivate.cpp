@@ -1,16 +1,17 @@
 /*
- * Copyright 2001-2009 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Marc Flerackers (mflerackers@androme.be)
- *		Stephan Aßmus <superstippi@gmx.de>
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		Marc Flerackers, mflerackers@androme.be
+ *		John Scipione, jcipione@gmail.com
  */
 
 
 #include <BMCPrivate.h>
 
-#include <stdio.h>
+#include <algorithm>
 
 #include <ControlLook.h>
 #include <LayoutUtils.h>
@@ -18,8 +19,11 @@
 #include <MenuItem.h>
 #include <Message.h>
 #include <MessageRunner.h>
-#include <Region.h>
 #include <Window.h>
+
+
+static const float kPopUpIndicatorWidth = 10.0f;
+static const float kMarginWidth = 3.0f;
 
 
 _BMCFilter_::_BMCFilter_(BMenuField* menuField, uint32 what)
@@ -68,11 +72,11 @@ _BMCMenuBar_::_BMCMenuBar_(BRect frame, bool fixedSize, BMenuField* menuField)
 }
 
 
-_BMCMenuBar_::_BMCMenuBar_(bool fixedSize, BMenuField* menuField)
+_BMCMenuBar_::_BMCMenuBar_(BMenuField* menuField)
 	:
-	BMenuBar("_mc_mb_", B_ITEMS_IN_ROW, !fixedSize),
+	BMenuBar("_mc_mb_", B_ITEMS_IN_ROW),
 	fMenuField(menuField),
-	fFixedSize(fixedSize),
+	fFixedSize(true),
 	fRunner(NULL),
 	fShowPopUpMarker(true)
 {
@@ -81,7 +85,8 @@ _BMCMenuBar_::_BMCMenuBar_(bool fixedSize, BMenuField* menuField)
 
 
 _BMCMenuBar_::_BMCMenuBar_(BMessage* data)
-	:	BMenuBar(data),
+	:
+	BMenuBar(data),
 	fMenuField(NULL),
 	fFixedSize(true),
 	fRunner(NULL),
@@ -134,119 +139,29 @@ _BMCMenuBar_::AttachedToWindow()
 void
 _BMCMenuBar_::Draw(BRect updateRect)
 {
-	if (be_control_look != NULL) {
-		BRect rect(Bounds());
-		rgb_color base = ui_color(B_MENU_BACKGROUND_COLOR);
-		uint32 flags = 0;
-		if (!IsEnabled())
-			flags |= BControlLook::B_DISABLED;
-		if (IsFocus())
-			flags |= BControlLook::B_FOCUSED;
-		be_control_look->DrawMenuFieldBackground(this, rect,
-			updateRect, base, fShowPopUpMarker, flags);
-
-		_DrawItems(updateRect);
-
-		return;
+	// Set the width of the menu bar because the menu bar bounds may have
+	// been expanded by the selected menu item.
+	if (fFixedSize)
+		ResizeTo(fMenuField->_MenuBarWidth(), Bounds().Height());
+	else {
+		// For compatability with BeOS R5 set the height to the preferred height
+		// in auto-size mode ignoring the height of the menu field.
+		float height;
+		BMenuBar::GetPreferredSize(NULL, &height);
+		ResizeTo(std::min(Bounds().Width(), fMenuField->_MenuBarWidth()), height);
 	}
+	BRect rect(Bounds());
+	rgb_color base = ui_color(B_MENU_BACKGROUND_COLOR);
+	uint32 flags = 0;
+	if (!IsEnabled())
+		flags |= BControlLook::B_DISABLED;
+	if (IsFocus())
+		flags |= BControlLook::B_FOCUSED;
 
-	if (!fShowPopUpMarker) {
-		BMenuBar::Draw(updateRect);
-		return;
-	}
+	be_control_look->DrawMenuFieldBackground(this, rect,
+		updateRect, base, fShowPopUpMarker, flags);
 
-	// draw the right side with the popup marker
-
-	// prevent the original BMenuBar's Draw from
-	// drawing in those parts
-	BRect bounds(Bounds());
-	bounds.right -= 10.0;
-	bounds.bottom -= 1.0;
-
-	BRegion clipping(bounds);
-	ConstrainClippingRegion(&clipping);
-
-	BMenuBar::Draw(updateRect);
-
-	// restore clipping
-	ConstrainClippingRegion(NULL);
-	bounds.right += 10.0;
-	bounds.bottom += 1.0;
-
-	// prepare some colors
-	rgb_color normalNoTint = LowColor();
-	rgb_color noTint = tint_color(normalNoTint, 0.74);
-	rgb_color darken4;
-	rgb_color normalDarken4;
-	rgb_color darken1;
-	rgb_color lighten1;
-	rgb_color lighten2;
-
-	if (IsEnabled()) {
-		darken4 = tint_color(noTint, B_DARKEN_4_TINT);
-		normalDarken4 = tint_color(normalNoTint, B_DARKEN_4_TINT);
-		darken1 = tint_color(noTint, B_DARKEN_1_TINT);
-		lighten1 = tint_color(noTint, B_LIGHTEN_1_TINT);
-		lighten2 = tint_color(noTint, B_LIGHTEN_2_TINT);
-	} else {
-		darken4 = tint_color(noTint, B_DARKEN_2_TINT);
-		normalDarken4 = tint_color(normalNoTint, B_DARKEN_2_TINT);
-		darken1 = tint_color(noTint, (B_NO_TINT + B_DARKEN_1_TINT) / 2.0);
-		lighten1 = tint_color(noTint, (B_NO_TINT + B_LIGHTEN_1_TINT) / 2.0);
-		lighten2 = tint_color(noTint, B_LIGHTEN_1_TINT);
-	}
-
-	BRect r(bounds);
-	r.left = r.right - 10.0;
-
-	BeginLineArray(6);
-		// bottom below item text, darker then BMenuBar
-		// would normaly draw it
-		AddLine(BPoint(bounds.left, r.bottom),
-				BPoint(r.left - 1.0, r.bottom), normalDarken4);
-
-		// bottom below popup marker
-		AddLine(BPoint(r.left, r.bottom),
-				BPoint(r.right, r.bottom), darken4);
-		// right of popup marker
-		AddLine(BPoint(r.right, r.bottom - 1),
-				BPoint(r.right, r.top), darken4);
-		// top above popup marker
-		AddLine(BPoint(r.left, r.top),
-				BPoint(r.right - 2, r.top), lighten2);
-
-		r.top += 1;
-		r.bottom -= 1;
-		r.right -= 1;
-
-		// bottom below popup marker
-		AddLine(BPoint(r.left, r.bottom),
-				BPoint(r.right, r.bottom), darken1);
-		// right of popup marker
-		AddLine(BPoint(r.right, r.bottom - 1),
-				BPoint(r.right, r.top), darken1);
-	EndLineArray();
-
-	r.bottom -= 1;
-	r.right -= 1;
-	SetHighColor(noTint);
-	FillRect(r);
-
-	// popup marker
-	BPoint center(roundf((r.left + r.right) / 2.0),
-				  roundf((r.top + r.bottom) / 2.0));
-	BPoint triangle[3];
-	triangle[0] = center + BPoint(-2.5, -0.5);
-	triangle[1] = center + BPoint(2.5, -0.5);
-	triangle[2] = center + BPoint(0.0, 2.0);
-
-	uint32 flags = Flags();
-	SetFlags(flags | B_SUBPIXEL_PRECISE);
-
-	SetHighColor(normalDarken4);
-	FillTriangle(triangle[0], triangle[1], triangle[2]);
-
-	SetFlags(flags);
+	_DrawItems(updateRect);
 }
 
 
@@ -271,7 +186,6 @@ _BMCMenuBar_::FrameResized(float width, float height)
 			dirty = Bounds();
 			dirty.left = dirty.right - diff - 12;
 			Invalidate(dirty);
-
 		} else if (diff < 0) {
 			// clean up the dirty right line of
 			// the menu field when shrinking
@@ -287,14 +201,6 @@ _BMCMenuBar_::FrameResized(float width, float height)
 		}
 	}
 
-	if (!fFixedSize && ResizingMode() == (B_FOLLOW_LEFT | B_FOLLOW_TOP)) {
-		// we have been shrinked or enlarged and need to take care
-		// of the size of the parent menu field as well
-		// NOTE: no worries about follow mode, we follow left and top
-		// in autosize mode
-		diff = Frame().right + 2 - fMenuField->Bounds().right;
-		fMenuField->ResizeBy(diff, 0.0);
-	}
 	BMenuBar::FrameResized(width, height);
 }
 
@@ -364,7 +270,7 @@ _BMCMenuBar_::MinSize()
 
 	if (fShowPopUpMarker) {
 		// account for popup indicator + a few pixels margin
-		size.width += 13.0;
+		size.width += kPopUpIndicatorWidth + kMarginWidth;
 	}
 
 	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
@@ -410,11 +316,12 @@ _BMCMenuBar_::_Init(bool setMaxContentWidth)
 	if (be_control_look != NULL)
 		left = right = be_control_look->DefaultLabelSpacing();
 
-	SetItemMargins(left, top, right + fShowPopUpMarker ? 10 : 0, bottom);
+	SetItemMargins(left, top,
+		right + fShowPopUpMarker ? kPopUpIndicatorWidth + kMarginWidth : 0,
+		bottom);
 
 	fPreviousWidth = Bounds().Width();
 
 	if (setMaxContentWidth)
 		SetMaxContentWidth(fPreviousWidth - (left + right));
 }
-

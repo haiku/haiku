@@ -68,7 +68,8 @@ dtt7592_set_frequency(i2c_bus *bus, uint32 frequency, dvb_bandwidth_t bandwidth)
 	if (divider > 0x7fff)
 		divider = 0x7fff;
 		
-	TRACE("dtt7592_set_frequency frequency %ld, divider 0x%lx (%ld)\n", frequency, divider, divider);
+	TRACE("dtt7592_set_frequency frequency %" B_PRId32 ", divider 0x%"
+		B_PRIx32 " (%" B_PRId32 ")\n", frequency, divider, divider);
 	
 	data[0] = divider >> 8;
 	data[1] = (uint8)divider;

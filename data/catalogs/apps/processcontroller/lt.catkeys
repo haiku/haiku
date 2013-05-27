@@ -1,10 +1,8 @@
-1	lithuanian	x-vnd.Haiku-ProcessController	2887520383
+1	lithuanian	x-vnd.Haiku-ProcessController	2886374724
 Memory usage	ProcessController		Atminties naudojimas
-Do you really want to kill the team \"%s\"?	ProcessController		Ar tikrai norite nutraukti užduoties „%s“ darbą?
 Idle priority	ProcessController		Nulinis prioritetas
 Restart Deskbar	ProcessController		Perleisti Užduočių juostą
 Custom priority	ProcessController		Parinktinis prioritetas
-Debug thread	ProcessController		Derinti giją
 This team is already gone…	ProcessController		Šios užduoties jau nebėra…
 Error saving file	ProcessController		Klaida įrašant failą
 Real-time priority	ProcessController		Tikralaikis prioritetas
@@ -42,7 +40,6 @@ Usage: %s [-deskbar]\n	ProcessController		Naudojimas: %s [-deskbar]\n
 ProcessController	System name		Procesų valdiklis
 Real-time display priority	ProcessController		Tikralaikio rodymo prioritetas
 Please confirm	ProcessController		Prašome patvirtinti
-Yes, kill this team!	ProcessController		Taip, nutraukti šios užduoties darbą!
 System resources & caches…	ProcessController		Sistemos ištekliai ir podėliai…
 That's no Fun!	ProcessController		Visai nejuokinga!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Šią programą galite paleisti atskirame lange arba patalpinti pranešimų srityje.

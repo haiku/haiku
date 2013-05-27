@@ -18,6 +18,7 @@ class StackFrame;
 class StackTrace;
 class Statement;
 class Team;
+class Thread;
 class UserBreakpoint;
 
 
@@ -32,9 +33,12 @@ public:
 	static	SourceView*			Create(Team* team, Listener* listener);
 									// throws
 
+	virtual	void				MessageReceived(BMessage* message);
+
 			void				UnsetListener();
 
-			void				SetStackTrace(StackTrace* stackTrace);
+			void				SetStackTrace(StackTrace* stackTrace,
+									Thread* thread);
 			void				SetStackFrame(StackFrame* stackFrame);
 			void				SetSourceCode(SourceCode* sourceCode);
 
@@ -59,11 +63,19 @@ private:
 			class MarkerView;
 			class TextView;
 
+			// for gcc2
+			friend class TextView;
+			friend class MarkerView;
+
 			struct FontInfo {
 				BFont		font;
 				font_height	fontHeight;
 				float		lineHeight;
 			};
+
+protected:
+			bool				GetStatementForLine(int32 line,
+									Statement*& _statement);
 
 private:
 			void				_Init();
@@ -72,6 +84,7 @@ private:
 
 private:
 			Team*				fTeam;
+			Thread*				fActiveThread;
 			StackTrace*			fStackTrace;
 			StackFrame*			fStackFrame;
 			SourceCode*			fSourceCode;
@@ -91,6 +104,8 @@ public:
 									target_addr_t address, bool enabled) = 0;
 	virtual	void				ClearBreakpointRequested(
 									target_addr_t address) = 0;
+	virtual void				ThreadActionRequested(Thread* thread,
+									uint32 action, target_addr_t address) = 0;
 };
 
 

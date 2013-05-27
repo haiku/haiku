@@ -66,7 +66,7 @@ LprTransport::LprTransport(BMessage *msg)
 		}
 		dir.WriteAttr(LPR_JOB_ID, B_INT32_TYPE, 0, &fJobId, sizeof(fJobId));
 
-		sprintf(fFile, "%s/%s@ipp.%ld", spool_path, fUser, fJobId);
+		sprintf(fFile, "%s/%s@ipp.%" B_PRId32, spool_path, fUser, fJobId);
 
 		fStream.open(fFile, ios::in | ios::out | ios::binary | ios::trunc);
 		if (fStream.good()) {

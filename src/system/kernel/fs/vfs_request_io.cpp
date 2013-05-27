@@ -167,7 +167,7 @@ do_iterative_fd_io_iterate(void* _cookie, io_request* request,
 	size_t subRequestCount = 0;
 	for (size_t i = 0; i < vecCount && subRequestCount < kMaxSubRequests; i++) {
 		off_t vecOffset = vecs[i].offset;
-		off_t vecLength = min_c(vecs[i].length, requestLength);
+		off_t vecLength = min_c(vecs[i].length, (off_t)requestLength);
 		TRACE_RIO("[%ld]    vec %lu offset: %lld, length: %lld\n",
 			find_thread(NULL), i, vecOffset, vecLength);
 

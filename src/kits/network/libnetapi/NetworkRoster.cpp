@@ -114,6 +114,8 @@ BNetworkRoster::AddInterface(const char* name)
 	if (socket < 0)
 		return errno;
 
+	FileDescriptorCloser closer(socket);
+
 	ifaliasreq request;
 	memset(&request, 0, sizeof(ifaliasreq));
 	strlcpy(request.ifra_name, name, IF_NAMESIZE);
@@ -138,6 +140,8 @@ BNetworkRoster::RemoveInterface(const char* name)
 	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
 	if (socket < 0)
 		return errno;
+
+	FileDescriptorCloser closer(socket);
 
 	ifreq request;
 	strlcpy(request.ifr_name, name, IF_NAMESIZE);

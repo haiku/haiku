@@ -6,7 +6,7 @@
 
 #define PAT_HOTSPOT 3,3
 
-extern const char gFlakeBits[NUM_PATTERNS][64];
+extern const uchar gFlakeBits[NUM_PATTERNS][64];
 
 
 #endif

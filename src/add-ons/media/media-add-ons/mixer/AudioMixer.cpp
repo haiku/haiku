@@ -321,7 +321,8 @@ void
 AudioMixer::HandleInputBuffer(BBuffer* buffer, bigtime_t lateness)
 {
 	if (lateness > kMaxJitter && lateness > fLastLateness) {
-		debug_printf("AudioMixer: Dequeued input buffer %Ld usec late\n", lateness);
+		debug_printf("AudioMixer: Dequeued input buffer %" B_PRIdBIGTIME
+			" usec late\n", lateness);
 		if (RunMode() == B_DROP_DATA || RunMode() == B_DECREASE_PRECISION
 			|| RunMode() == B_INCREASE_LATENCY) {
 			debug_printf("AudioMixer: sending notify\n");
@@ -380,8 +381,8 @@ AudioMixer::GetLatencyFor(const media_destination &for_whom,
 	*out_latency = EventLatency();
 	*out_timesource = TimeSource()->ID();
 
-	printf("AudioMixer::GetLatencyFor %Ld, timesource is %ld\n",
-		*out_latency, *out_timesource);
+	printf("AudioMixer::GetLatencyFor %" B_PRIdBIGTIME ", timesource is %"
+		B_PRId32 "\n", *out_latency, *out_timesource);
 
 	return B_OK;
 }
@@ -398,8 +399,8 @@ AudioMixer::Connected(const media_source &producer,
 	// BBufferProducer::PrepareToConnect() should have removed all wildcards.
 	if (out_input->format.u.raw_audio.frame_rate == 0) {
 		fprintf(stderr, "Audio Mixer Warning: "
-			"Producer (port %ld, id %ld) connected with frame_rate=0\n",
-			producer.port, producer.id);
+			"Producer (port %" B_PRId32 ", id %" B_PRId32 ") connected with "
+			"frame_rate=0\n", producer.port, producer.id);
 		MixerOutput *output = fCore->Output();
 		float frame_rate = output
 			? output->MediaOutput().format.u.raw_audio.frame_rate : 44100.0f;
@@ -422,8 +423,10 @@ AudioMixer::Connected(const media_source &producer,
 	// name, the name given the connection by the producer may still be an
 	// empty string.
 	// if the input has no name, assign one
-	if (strlen(out_input->name) == 0)
-		sprintf(out_input->name, "Input %ld", out_input->destination.id);
+	if (strlen(out_input->name) == 0) {
+		sprintf(out_input->name, "Input %" B_PRId32,
+			out_input->destination.id);
+	}
 
 	// add a new input to the mixer engine
 	MixerInput *input;
@@ -607,16 +610,19 @@ AudioMixer::FormatChangeRequested(const media_source &source,
 
 	media_node_id id;
 	FindLatencyFor(destination, &fDownstreamLatency, &id);
-	TRACE("AudioMixer: Downstream Latency is %Ld usecs\n", fDownstreamLatency);
+	TRACE("AudioMixer: Downstream Latency is %" B_PRIdBIGTIME " usecs\n",
+		fDownstreamLatency);
 
 	// SetDuration of one buffer
 	SetBufferDuration(buffer_duration(io_format->u.raw_audio));
-	TRACE("AudioMixer: buffer duration is %Ld usecs\n", BufferDuration());
+	TRACE("AudioMixer: buffer duration is %" B_PRIdBIGTIME " usecs\n",
+		BufferDuration());
 
 	// Our internal latency is at least the length of a full output buffer
 	fInternalLatency = BufferDuration()
-		+ max(4500LL, bigtime_t(0.5 * BufferDuration()));
-	TRACE("AudioMixer: Internal latency is %Ld usecs\n", fInternalLatency);
+		+ max((bigtime_t)4500, bigtime_t(0.5 * BufferDuration()));
+	TRACE("AudioMixer: Internal latency is %" B_PRIdBIGTIME " usecs\n",
+		fInternalLatency);
 
 	SetEventLatency(fDownstreamLatency + fInternalLatency);
 
@@ -1020,7 +1026,8 @@ AudioMixer::LateNoticeReceived(const media_source& what, bigtime_t howMuch,
 
 		fLastLateNotification = TimeSource()->Now() + howMuch;
 
-		debug_printf("AudioMixer: increasing internal latency to %Ld usec\n", fInternalLatency);
+		debug_printf("AudioMixer: increasing internal latency to %"
+			B_PRIdBIGTIME " usec\n", fInternalLatency);
 		SetEventLatency(fDownstreamLatency + fInternalLatency);
 
 		PublishEventLatencyChange();

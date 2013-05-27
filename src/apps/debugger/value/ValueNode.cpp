@@ -63,6 +63,41 @@ ValueNode::SetContainer(ValueNodeContainer* container)
 }
 
 
+bool
+ValueNode::IsRangedContainer() const
+{
+	return false;
+}
+
+
+bool
+ValueNode::IsContainerRangeFixed() const
+{
+	return false;
+}
+
+
+void
+ValueNode::ClearChildren()
+{
+	// do nothing
+}
+
+
+status_t
+ValueNode::CreateChildrenInRange(int32 lowIndex, int32 highIndex)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+ValueNode::SupportedChildRange(int32& lowIndex, int32& highIndex) const
+{
+	return B_NOT_SUPPORTED;
+}
+
+
 void
 ValueNode::SetLocationAndValue(ValueLocation* location, Value* value,
 	status_t resolutionState)

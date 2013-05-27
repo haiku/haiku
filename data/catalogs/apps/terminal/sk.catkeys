@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Terminal	766764238
+1	slovak	x-vnd.Haiku-Terminal	328707356
 Not found.	Terminal TermWindow		Nenájdené.
 Switch Terminals	Terminal TermWindow		Prepnúť terminály
 Change directory	Terminal TermView		Zmeniť adresár
@@ -21,6 +21,7 @@ Font:	Terminal AppearancePrefView		Písmo:
 Copy here	Terminal TermView		Skopírovať sem
 Really close?	Terminal TermWindow		Skutočne zatvoriť?
 Copy	Terminal TermWindow		Skopírovať
+Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminál
 Color scheme:	Terminal AppearancePrefView		Schéma farieb:
 Window title:	Terminal TermWindow		Titulok okna:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Nerozpoznaná voľba „%s“\n

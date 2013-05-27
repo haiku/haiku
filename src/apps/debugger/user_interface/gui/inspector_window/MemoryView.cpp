@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Rene Gollent, rene@gollent.com. All rights reserved.
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -26,7 +26,7 @@ enum {
 };
 
 
-MemoryView::MemoryView(::Team* team)
+MemoryView::MemoryView(::Team* team, Listener* listener)
 	:
 	BView("memoryView", B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE
 		| B_SUBPIXEL_PRECISE),
@@ -38,7 +38,8 @@ MemoryView::MemoryView(::Team* team)
 	fTextCharsPerLine(0),
 	fHexBlocksPerLine(0),
 	fHexMode(HexMode8BitInt),
-	fTextMode(TextModeASCII)
+	fTextMode(TextModeASCII),
+	fListener(listener)
 {
 	Architecture* architecture = team->GetArchitecture();
 	fTargetAddressSize = architecture->AddressSize() * 2;
@@ -56,9 +57,9 @@ MemoryView::~MemoryView()
 
 
 /*static */ MemoryView*
-MemoryView::Create(::Team* team)
+MemoryView::Create(::Team* team, Listener* listener)
 {
-	MemoryView* self = new MemoryView(team);
+	MemoryView* self = new MemoryView(team, listener);
 
 	try {
 		self->_Init();
@@ -82,6 +83,13 @@ MemoryView::SetTargetAddress(TeamMemoryBlock* block, target_addr_t address)
 	fTargetBlock->AcquireReference();
 	MakeFocus(true);
 	BMessenger(this).SendMessage(MSG_TARGET_ADDRESS_CHANGED);
+}
+
+
+void
+MemoryView::UnsetListener()
+{
+	fListener = NULL;
 }
 
 
@@ -329,6 +337,8 @@ MemoryView::MessageReceived(BMessage* message)
 			_RecalcScrollBars();
 			ScrollToSelection();
 			Invalidate();
+			if (fListener != NULL)
+				fListener->TargetAddressChanged(fTargetAddress);
 			break;
 		}
 		case MSG_SET_HEX_MODE:
@@ -545,4 +555,12 @@ MemoryView::_GetNextHexBlock(char* buffer, int32 bufferSize,
 			break;
 		}
 	}
+}
+
+
+//#pragma mark - Listener
+
+
+MemoryView::Listener::~Listener()
+{
 }

@@ -226,13 +226,13 @@ struct intel_allocate_graphics_memory {
 	uint32	size;
 	uint32	alignment;
 	uint32	flags;
-	uint32	buffer_base;
+	addr_t	buffer_base;
 };
 
 // free graphics memory
 struct intel_free_graphics_memory {
 	uint32 	magic;
-	uint32	buffer_base;
+	addr_t	buffer_base;
 };
 
 //----------------------------------------------------------

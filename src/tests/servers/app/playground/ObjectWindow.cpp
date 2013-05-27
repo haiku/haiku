@@ -92,8 +92,9 @@ class ObjectListView : public BListView {
 
 	virtual bool InitiateDrag(BPoint point, int32 itemIndex, bool wasSelected)
 			{
-				printf("InitiateDrag(BPoint(%.1f, %.1f), itemIndex: %ld, wasSelected: %d)\n",
-						point.x, point.y, itemIndex, wasSelected);
+				printf("InitiateDrag(BPoint(%.1f, %.1f), itemIndex: %" B_PRId32
+					", wasSelected: %d)\n", point.x, point.y, itemIndex,
+					wasSelected);
 				SwapItems(itemIndex, itemIndex + 1);
 				return true;
 			}

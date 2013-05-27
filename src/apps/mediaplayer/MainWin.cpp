@@ -1529,7 +1529,7 @@ MainWin::_CreateMenu()
 	fAttributesMenu->AddItem(fRatingMenu);
 	for (int32 i = 1; i <= 10; i++) {
 		char label[16];
-		snprintf(label, sizeof(label), "%ld", i);
+		snprintf(label, sizeof(label), "%" B_PRId32, i);
 		BMessage* setRatingMsg = new BMessage(M_SET_RATING);
 		setRatingMsg->AddInt32("rating", i);
 		fRatingMenu->AddItem(new BMenuItem(label, setRatingMsg));
@@ -1541,7 +1541,7 @@ void
 MainWin::_SetupVideoAspectItems(BMenu* menu)
 {
 	BMenuItem* item;
-	while ((item = menu->RemoveItem(0L)) != NULL)
+	while ((item = menu->RemoveItem((int32)0)) != NULL)
 		delete item;
 
 	int width;
@@ -2440,7 +2440,7 @@ MainWin::_UpdatePlaylistItemFile()
 				int32 bitrate = (int32)(format.u.encoded_audio.bit_rate
 					/ 1000);
 				char text[256];
-				snprintf(text, sizeof(text), "%ld kbit", bitrate);
+				snprintf(text, sizeof(text), "%" B_PRId32 " kbit", bitrate);
 				node.WriteAttr("Audio:Bitrate", B_STRING_TYPE, 0, text,
 					strlen(text) + 1);
 			}
@@ -2457,7 +2457,7 @@ MainWin::_UpdatePlaylistItemFile()
 				int32 bitrate = (int32)(format.u.encoded_video.avg_bit_rate
 					/ 1000);
 				char text[256];
-				snprintf(text, sizeof(text), "%ld kbit", bitrate);
+				snprintf(text, sizeof(text), "%" B_PRId32 " kbit", bitrate);
 				node.WriteAttr("Video:Bitrate", B_STRING_TYPE, 0, text,
 					strlen(text) + 1);
 			}

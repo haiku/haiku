@@ -64,18 +64,21 @@ CPUFrequencyView::CPUFrequencyView(BRect frame,
 	BBox *dynamicBox = new BBox(rect, "dynamicBox");
 	dynamicBox->SetLabel(B_TRANSLATE("Dynamic stepping"));
 	BGroupLayout* dynamicLayout = new BGroupLayout(B_VERTICAL);
-	dynamicLayout->SetInsets(10, dynamicBox->TopBorderOffset() * 2 + 10, 10,
-		10);
-	dynamicLayout->SetSpacing(10);
+	dynamicLayout->SetInsets(B_USE_DEFAULT_SPACING,
+		dynamicBox->TopBorderOffset() * 2 + 10,
+		B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
+	dynamicLayout->SetSpacing(B_USE_DEFAULT_SPACING);
 	dynamicBox->SetLayout(dynamicLayout);
 	mainLayout->AddView(dynamicBox);
 
 	fColorStepView = new ColorStepView(frame);
 	fColorStepView->SetFrequencys(fDriverInterface.GetCpuFrequencyStates());
 
-	fIntegrationTime = new BTextControl(BRect(0,0,Bounds().Width(),10),
+	fIntegrationTime = new BTextControl(BRect(0, 0, Bounds().Width(), 10),
 		"intergal", B_TRANSLATE("Integration time [ms]: "), "",
 		new BMessage(kIntegrationTimeChanged));
+	fIntegrationTime->SetDivider(Bounds().Width() * 3 / 4);
+	fIntegrationTime->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 
 	dynamicLayout->AddView(fColorStepView);
 	dynamicLayout->AddView(fIntegrationTime);
@@ -97,8 +100,8 @@ CPUFrequencyView::CPUFrequencyView(BRect frame,
 		new BMessage(kInstallIntoDeskbar));
 
 	statusLayout->AddView(fStatusView);
-	statusLayout->AddView(fInstallButton);
 	statusLayout->AddItem(BSpaceLayoutItem::CreateGlue());
+	statusLayout->AddView(fInstallButton);
 }
 
 

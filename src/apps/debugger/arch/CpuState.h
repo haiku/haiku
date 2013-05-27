@@ -21,13 +21,22 @@ class CpuState : public BReferenceable {
 public:
 	virtual						~CpuState();
 
+	virtual	status_t			Clone(CpuState*& _clone) const = 0;
+
+	virtual	status_t			UpdateDebugState(void* state, size_t size)
+									const = 0;
+
 	virtual	target_addr_t		InstructionPointer() const = 0;
+	virtual	void				SetInstructionPointer(
+									target_addr_t address) = 0;
+
 	virtual target_addr_t		StackFramePointer() const = 0;
 	virtual target_addr_t		StackPointer() const = 0;
 	virtual	bool				GetRegisterValue(const Register* reg,
 									BVariant& _value) const = 0;
 	virtual	bool				SetRegisterValue(const Register* reg,
 									const BVariant& value) = 0;
+
 };
 
 

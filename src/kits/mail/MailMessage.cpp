@@ -122,7 +122,7 @@ BEmailMessage::ReplyMessage(mail_reply_to_mode replyTo, bool accountFromMail,
 		BString cc;
 
 		for (int32 i = list.CountItems(); i-- > 0;) {
-			char *address = (char *)list.RemoveItem(0L);
+			char *address = (char *)list.RemoveItem((int32)0);
 
 			// add everything which is not the sender and not already in the list
 			if (sender.ICompare(address) && cc.FindFirst(address) < 0) {
@@ -731,7 +731,7 @@ BEmailMessage::RenderToRFC822(BPositionIO *file)
 
 	BString recipients;
 	for (int32 i = recipientList.CountItems(); i-- > 0;) {
-		char *address = (char *)recipientList.RemoveItem(0L);
+		char *address = (char *)recipientList.RemoveItem((int32)0);
 
 		recipients << '<' << address << '>';
 		if (i)

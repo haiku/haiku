@@ -12,8 +12,20 @@
 
 #include "Debug.h"
 #include "BPlusTree.h"
-#include "Inode.h"
 #include "Utility.h"
+
+#if !_BOOT_MODE
+#include "Inode.h"
+#else
+#include "Stream.h"
+
+// BFS::Stream from the bootloader has the same API as Inode.
+#define Inode BFS::Stream
+
+#define strerror(x)		"error message unavailable"
+
+namespace BFS {
+#endif
 
 
 /*!	Simple array used for the duplicate handling in the B+Tree. This is an
@@ -88,9 +100,10 @@ private:
 	int32					fSize;
 	const char*				fText;
 };
-#endif
+#endif // DEBUG
 
 
+#if !_BOOT_MODE
 class BitmapArray {
 public:
 								BitmapArray(size_t numBits);
@@ -243,6 +256,7 @@ CachedNode::UnsetUnchanged(Transaction& transaction)
 		fNode = NULL;
 	}
 }
+#endif // !_BOOT_MODE
 
 
 void
@@ -252,6 +266,7 @@ CachedNode::Unset()
 		return;
 
 	if (fNode != NULL) {
+#if !_BOOT_MODE
 		if (fWritable && fOffset == 0) {
 			// The B+tree header has been updated - we need to update the
 			// BPlusTrees copy of it, as well.
@@ -260,6 +275,8 @@ CachedNode::Unset()
 
 		block_cache_put(fTree->fStream->GetVolume()->BlockCache(),
 			fBlockNumber);
+#endif // !_BOOT_MODE
+
 		fNode = NULL;
 	}
 }
@@ -289,8 +306,9 @@ CachedNode::SetTo(off_t offset, const bplustree_node** _node, bool check)
 	// instead)
 	if (offset > fTree->fHeader.MaximumSize() - fTree->fNodeSize
 		|| offset <= 0
-		|| (offset % fTree->fNodeSize) != 0)
+		|| (offset % fTree->fNodeSize) != 0) {
 		RETURN_ERROR(B_BAD_VALUE);
+	}
 
 	if (InternalSetTo(NULL, offset) != NULL && check) {
 		// sanity checks (links, all_key_count)
@@ -307,6 +325,7 @@ CachedNode::SetTo(off_t offset, const bplustree_node** _node, bool check)
 }
 
 
+#if !_BOOT_MODE
 bplustree_node*
 CachedNode::SetToWritable(Transaction& transaction, off_t offset, bool check)
 {
@@ -345,11 +364,13 @@ CachedNode::MakeWritable(Transaction& transaction)
 		return NULL;
 
 	if (block_cache_make_writable(transaction.GetVolume()->BlockCache(),
-			fBlockNumber, transaction.ID()) == B_OK)
+			fBlockNumber, transaction.ID()) == B_OK) {
 		return fNode;
+	}
 
 	return NULL;
 }
+#endif // !_BOOT_MODE
 
 
 const bplustree_header*
@@ -367,6 +388,7 @@ CachedNode::SetToHeader()
 }
 
 
+#if !_BOOT_MODE
 bplustree_header*
 CachedNode::SetToWritableHeader(Transaction& transaction)
 {
@@ -391,6 +413,7 @@ CachedNode::SetToWritableHeader(Transaction& transaction)
 
 	return (bplustree_header*)fNode;
 }
+#endif // !_BOOT_MODE
 
 
 bplustree_node*
@@ -403,12 +426,18 @@ CachedNode::InternalSetTo(Transaction* transaction, off_t offset)
 	block_run run;
 	if (offset < fTree->fStream->Size()
 		&& fTree->fStream->FindBlockRun(offset, run, fileOffset) == B_OK) {
+
+#if !_BOOT_MODE
 		Volume* volume = fTree->fStream->GetVolume();
+#else
+		Volume* volume = &fTree->fStream->GetVolume();
+#endif
 
 		int32 blockOffset = (offset - fileOffset) / volume->BlockSize();
 		fBlockNumber = volume->ToBlock(run) + blockOffset;
-		uint8* block;
+		uint8* block = NULL;
 
+#if !_BOOT_MODE
 		if (transaction != NULL) {
 			block = (uint8*)block_cache_get_writable(volume->BlockCache(),
 				fBlockNumber, transaction->ID());
@@ -417,6 +446,20 @@ CachedNode::InternalSetTo(Transaction* transaction, off_t offset)
 			block = (uint8*)block_cache_get(volume->BlockCache(), fBlockNumber);
 			fWritable = false;
 		}
+#else // !_BOOT_MODE
+		if (fBlock == NULL) {
+			fBlock = (uint8*)malloc(volume->BlockSize());
+			if (fBlock == NULL)
+				return NULL;
+		}
+
+		if (read_pos(volume->Device(), fBlockNumber << volume->BlockShift(),
+				fBlock, volume->BlockSize()) == (ssize_t)volume->BlockSize()) {
+			block = fBlock;
+		}
+
+		fWritable = false;
+#endif // _BOOT_MODE
 
 		if (block != NULL) {
 			// The node is somewhere in that block...
@@ -430,6 +473,7 @@ CachedNode::InternalSetTo(Transaction* transaction, off_t offset)
 }
 
 
+#if !_BOOT_MODE
 status_t
 CachedNode::Free(Transaction& transaction, off_t offset)
 {
@@ -540,6 +584,7 @@ BPlusTree::BPlusTree(Transaction& transaction, Inode* stream, int32 nodeSize)
 	mutex_init(&fIteratorLock, "bfs b+tree iterator");
 	SetTo(transaction, stream);
 }
+#endif // !_BOOT_MODE
 
 
 BPlusTree::BPlusTree(Inode* stream)
@@ -547,7 +592,10 @@ BPlusTree::BPlusTree(Inode* stream)
 	fStream(NULL),
 	fInTransaction(false)
 {
+#if !_BOOT_MODE
 	mutex_init(&fIteratorLock, "bfs b+tree iterator");
+#endif
+
 	SetTo(stream);
 }
 
@@ -560,12 +608,15 @@ BPlusTree::BPlusTree()
 	fInTransaction(false),
 	fStatus(B_NO_INIT)
 {
+#if !_BOOT_MODE
 	mutex_init(&fIteratorLock, "bfs b+tree iterator");
+#endif
 }
 
 
 BPlusTree::~BPlusTree()
 {
+#if !_BOOT_MODE
 	// if there are any TreeIterators left, we need to stop them
 	// (can happen when the tree's inode gets deleted while
 	// traversing the tree - a TreeIterator doesn't lock the inode)
@@ -579,9 +630,11 @@ BPlusTree::~BPlusTree()
 	mutex_destroy(&fIteratorLock);
 
 	ASSERT(!fInTransaction);
+#endif // !_BOOT_MODE
 }
 
 
+#if !_BOOT_MODE
 /*! Create a new B+Tree on the specified stream */
 status_t
 BPlusTree::SetTo(Transaction& transaction, Inode* stream, int32 nodeSize)
@@ -629,6 +682,7 @@ BPlusTree::SetTo(Transaction& transaction, Inode* stream, int32 nodeSize)
 
 	return fStatus = B_OK;
 }
+#endif // !_BOOT_MODE
 
 
 status_t
@@ -701,6 +755,7 @@ BPlusTree::InitCheck()
 }
 
 
+#if !_BOOT_MODE
 status_t
 BPlusTree::Validate(bool repair, bool& _errorsFound)
 {
@@ -883,11 +938,13 @@ BPlusTree::ModeToKeyType(mode_t mode)
 			return BPLUSTREE_STRING_TYPE;
 	}
 }
+#endif // !_BOOT_MODE
 
 
 //	#pragma mark - TransactionListener implementation
 
 
+#if !_BOOT_MODE
 void
 BPlusTree::TransactionDone(bool success)
 {
@@ -944,6 +1001,7 @@ BPlusTree::_RemoveIterator(TreeIterator* iterator)
 	MutexLocker _(fIteratorLock);
 	fIterators.Remove(iterator);
 }
+#endif // !_BOOT_MODE
 
 
 int32
@@ -1006,7 +1064,9 @@ BPlusTree::_FindKey(const bplustree_node* node, const uint8* key,
 		if (searchKey + searchLength + sizeof(off_t) + sizeof(uint16)
 				> (uint8*)node + fNodeSize
 			|| searchLength > BPLUSTREE_MAX_KEY_LENGTH) {
+#if !_BOOT_MODE
 			fStream->GetVolume()->Panic();
+#endif
 			RETURN_ERROR(B_BAD_DATA);
 		}
 
@@ -1037,6 +1097,7 @@ BPlusTree::_FindKey(const bplustree_node* node, const uint8* key,
 }
 
 
+#if !_BOOT_MODE
 /*!	Prepares the stack to contain all nodes that were passed while
 	following the key, from the root node to the leaf node that could
 	or should contain that key.
@@ -2196,6 +2257,7 @@ BPlusTree::Replace(Transaction& transaction, const uint8* key, uint16 keyLength,
 	}
 	RETURN_ERROR(B_ERROR);
 }
+#endif // !_BOOT_MODE
 
 
 /*!	Searches the key in the tree, and stores the offset found in _value,
@@ -2220,7 +2282,9 @@ BPlusTree::Find(const uint8* key, uint16 keyLength, off_t* _value)
 	if (fAllowDuplicates)
 		RETURN_ERROR(B_BAD_TYPE);
 
+#if !_BOOT_MODE
 	ASSERT_READ_LOCKED_INODE(fStream);
+#endif
 
 	off_t nodeOffset = fHeader.RootNode();
 	CachedNode cached(this);
@@ -2259,6 +2323,7 @@ BPlusTree::Find(const uint8* key, uint16 keyLength, off_t* _value)
 }
 
 
+#if !_BOOT_MODE
 status_t
 BPlusTree::_ValidateChildren(TreeCheck& check, uint32 level, off_t offset,
 	const uint8* largestKey, uint16 largestKeyLength,
@@ -2482,6 +2547,7 @@ BPlusTree::_ValidateChild(TreeCheck& check, CachedNode& cached, uint32 level,
 
 	return _ValidateChildren(check, level + 1, offset, key, keyLength, node);
 }
+#endif // !_BOOT_MODE
 
 
 //	#pragma mark -
@@ -2492,14 +2558,18 @@ TreeIterator::TreeIterator(BPlusTree* tree)
 	fTree(tree),
 	fCurrentNodeOffset(BPLUSTREE_NULL)
 {
+#if !_BOOT_MODE
 	tree->_AddIterator(this);
+#endif
 }
 
 
 TreeIterator::~TreeIterator()
 {
+#if !_BOOT_MODE
 	if (fTree)
 		fTree->_RemoveIterator(this);
+#endif
 }
 
 
@@ -2509,8 +2579,10 @@ TreeIterator::Goto(int8 to)
 	if (fTree == NULL || fTree->fStream == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
+#if !_BOOT_MODE
 	// lock access to stream
 	InodeReadLocker locker(fTree->fStream);
+#endif
 
 	off_t nodeOffset = fTree->fHeader.RootNode();
 	CachedNode cached(fTree);
@@ -2578,8 +2650,10 @@ TreeIterator::Traverse(int8 direction, void* key, uint16* keyLength,
 	if (fCurrentNodeOffset == BPLUSTREE_FREE)
 		return B_ENTRY_NOT_FOUND;
 
+#if !_BOOT_MODE
 	// lock access to stream
 	InodeReadLocker locker(fTree->fStream);
+#endif
 
 	CachedNode cached(fTree);
 	const bplustree_node* node;
@@ -2641,7 +2715,7 @@ TreeIterator::Traverse(int8 direction, void* key, uint16* keyLength,
 				RETURN_ERROR(B_ERROR);
 
 			// reset current key
-			fCurrentKey = forward ? 0 : node->NumKeys();
+			fCurrentKey = forward ? 0 : node->NumKeys() - 1;
 		} else {
 			// there are no nodes left, so turn back to the last key
 			fCurrentNodeOffset = savedNodeOffset;
@@ -2659,19 +2733,26 @@ TreeIterator::Traverse(int8 direction, void* key, uint16* keyLength,
 	if (keyStart + length + sizeof(off_t) + sizeof(uint16)
 			> (uint8*)node + fTree->fNodeSize
 		|| length > BPLUSTREE_MAX_KEY_LENGTH) {
+#if !_BOOT_MODE
 		fTree->fStream->GetVolume()->Panic();
+#endif
 		RETURN_ERROR(B_BAD_DATA);
 	}
 
-	length = min_c(length, maxLength);
+	// include the termination for string types
+	bool needsTermination = fTree->fHeader.DataType() == BPLUSTREE_STRING_TYPE;
+	if (length + (needsTermination ? 1 : 0) > maxLength) {
+		// the buffer is too small, restore the last key and return an error
+		fCurrentNodeOffset = savedNodeOffset;
+		fCurrentKey = savedKey;
+		return B_BUFFER_OVERFLOW;
+	}
+
 	memcpy(key, keyStart, length);
 
-	if (fTree->fHeader.DataType() == BPLUSTREE_STRING_TYPE)	{
-		// terminate string type
-		if (length == maxLength)
-			length--;
+	if (needsTermination)
 		((char*)key)[length] = '\0';
-	}
+
 	*keyLength = length;
 
 	off_t offset = BFS_ENDIAN_TO_HOST_INT64(node->Values()[fCurrentKey]);
@@ -2722,8 +2803,10 @@ TreeIterator::Find(const uint8* key, uint16 keyLength)
 		|| key == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
+#if !_BOOT_MODE
 	// lock access to stream
 	InodeReadLocker locker(fTree->fStream);
+#endif
 
 	off_t nodeOffset = fTree->fHeader.RootNode();
 
@@ -2925,6 +3008,7 @@ bplustree_node::CheckIntegrity(uint32 nodeSize) const
 // #pragma mark -
 
 
+#if !_BOOT_MODE
 BitmapArray::BitmapArray(size_t numBits)
 {
 	fSize = (numBits + 7) / 8;
@@ -2972,6 +3056,7 @@ BitmapArray::Set(size_t index, bool set)
 		fCountSet--;
 	}
 }
+#endif // !_BOOT_MODE
 
 
 // #pragma mark -
@@ -3004,7 +3089,7 @@ duplicate_array::Insert(off_t value)
 	// binary search, if not, just iterate linearly to find
 	// the insertion point
 	int32 size = Count();
-	int32 i;
+	int32 i = 0;
 	if (size > 8 ) {
 		if (!_FindInternal(value, i) && ValueAt(i) <= value)
 			i++;
@@ -3127,3 +3212,7 @@ compareKeys(type_code type, const void* key1, int keyLength1,
 	return -1;
 }
 
+
+#if _BOOT_MODE
+} // namespace BFS
+#endif

@@ -673,8 +673,10 @@ X86VMTranslationMap64Bit::Protect(addr_t start, addr_t end, uint32 attributes,
 		newProtectionFlags = X86_64_PTE_USER;
 		if ((attributes & B_WRITE_AREA) != 0)
 			newProtectionFlags |= X86_64_PTE_WRITABLE;
-		if ((attributes & B_EXECUTE_AREA) == 0)
+		if ((attributes & B_EXECUTE_AREA) == 0
+			&& x86_check_feature(IA32_FEATURE_AMD_EXT_NX, FEATURE_EXT_AMD)) {
 			newProtectionFlags |= X86_64_PTE_NOT_EXECUTABLE;
+		}
 	} else if ((attributes & B_KERNEL_WRITE_AREA) != 0)
 		newProtectionFlags = X86_64_PTE_WRITABLE;
 

@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2010, Philippe Houdoin, phoudoin@haiku-os.org. All rights reserved.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -21,6 +22,11 @@
 #include <String.h>
 
 #include "TeamsListView.h"
+
+
+enum {
+	MSG_UPDATE_TEAMS_LIST = 'uptl'
+};
 
 
 // #pragma mark - BitmapStringField
@@ -204,17 +210,17 @@ TeamRow::TeamRow(team_id team)
 bool
 TeamRow::NeedsUpdate(team_info& info)
 {
-	// Check if we need to rebuilt the row's fields because the team critical 
+	// Check if we need to rebuilt the row's fields because the team critical
 	// info (basically, app image running under that team ID) has changed
-	
-	if (info.argc != fTeamInfo.argc 
+
+	if (info.argc != fTeamInfo.argc
 		|| strncmp(info.args, fTeamInfo.args, sizeof(fTeamInfo.args)) != 0) {
 		_SetTo(info);
 		return true;
 	}
-	
+
 	return false;
-}			
+}
 
 
 status_t
@@ -227,12 +233,12 @@ TeamRow::_SetTo(team_info& info)
 			len >= 0 && teamInfo.args[len] == ' '; len--) {
 		teamInfo.args[len] = 0;
 	}
-	
+
 	app_info appInfo;
 	status_t status = be_roster->GetRunningAppInfo(teamInfo.team, &appInfo);
 	if (status != B_OK) {
 		// Not an application known to be_roster
-		
+
 		if (teamInfo.team == B_SYSTEM_TEAM) {
 			// Get icon and name from kernel image
 			system_info	systemInfo;
@@ -243,7 +249,7 @@ TeamRow::_SetTo(team_info& info)
 			kernelPath.Append(systemInfo.kernel_name);
 
 			get_ref_for_path(kernelPath.Path(), &appInfo.ref);
-		
+
 		} else
 			BPrivate::get_app_ref(teamInfo.team, &appInfo.ref);
 	}
@@ -279,10 +285,11 @@ TeamRow::_SetTo(team_info& info)
 //	#pragma mark - TeamsListView
 
 
-TeamsListView::TeamsListView(BRect frame, const char* name)
+TeamsListView::TeamsListView(const char* name, team_id currentTeam)
 	:
-	Inherited(frame, name, B_FOLLOW_ALL, 0, B_NO_BORDER, true),
-	fUpdateRunner(NULL)
+	Inherited(name, 0),
+	fUpdateRunner(NULL),
+	fCurrentTeam(currentTeam)
 {
 	AddColumn(new TeamsColumn("Name", 400, 100, 600,
 		B_TRUNCATE_BEGINNING), kNameColumn);
@@ -295,9 +302,6 @@ TeamsListView::TeamsListView(BRect frame, const char* name)
 */
 	SetSortingEnabled(false);
 
-	team_info tmi;
-	get_team_info(B_CURRENT_TEAM, &tmi);
-	fThisTeam = tmi.team;
 /*
 #ifdef __HAIKU__
 	SetFlags(Flags() | B_SUBPIXEL_PRECISE);
@@ -322,7 +326,7 @@ TeamsListView::AttachedToWindow()
 
 	be_roster->StartWatching(this, B_REQUEST_LAUNCHED | B_REQUEST_QUIT);
 
-	BMessage msg(kMsgUpdateTeamsList);
+	BMessage msg(MSG_UPDATE_TEAMS_LIST);
 	fUpdateRunner = new BMessageRunner(this, &msg, 100000L);	// 10Hz
 }
 
@@ -345,7 +349,7 @@ void
 TeamsListView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case kMsgUpdateTeamsList:
+		case MSG_UPDATE_TEAMS_LIST:
 			_UpdateList();
 			break;
 
@@ -415,7 +419,7 @@ TeamsListView::_InitList()
 		}
 
 		if (tmi.team == B_SYSTEM_TEAM ||
-			tmi.team == fThisTeam) {
+			tmi.team == fCurrentTeam) {
 			// We don't support debugging kernel and... ourself!
 			row->SetEnabled(false);
 		}
@@ -445,7 +449,7 @@ TeamsListView::_UpdateList()
 
 		if (row != NULL && tmi.team == row->TeamID()
 			&& row->NeedsUpdate(tmi)) {
-			// The team image app could have change due after an exec*() call, 
+			// The team image app could have change due after an exec*() call,
 			UpdateRow(row);
 		} else if (row == NULL || tmi.team != row->TeamID()) {
 			// Team not found in previously known teams list: insert a new row

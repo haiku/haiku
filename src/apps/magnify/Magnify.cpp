@@ -873,8 +873,8 @@ TInfoView::Draw(BRect updateRect)
 		float h = Bounds().Height();
 		if (ch2Showing) {
 			MovePenTo(10, h-12);
-			sprintf(str, "2) x: %li y: %li   y: %i", (int32)pt2.x, (int32)pt2.y,
-				abs((int)(pt1.y - pt2.y)));
+			sprintf(str, "2) x: %" B_PRIi32 " y: %" B_PRIi32 "   y: %d",
+				(int32)pt2.x, (int32)pt2.y, abs((int)(pt1.y - pt2.y)));
 			invalRect.Set(10, h-12-fFontHeight, 10 + StringWidth(fCH2Str), h-10);
 			SetHighColor(ViewColor());
 			FillRect(invalRect);
@@ -886,8 +886,8 @@ TInfoView::Draw(BRect updateRect)
 
 		if (ch1Showing && ch2Showing) {
 			MovePenTo(10, h-10-fFontHeight-2);
-			sprintf(str, "1) x: %li  y: %li   x: %i", (int32)pt1.x, (int32)pt1.y,
-				abs((int)(pt1.x - pt2.x)));
+			sprintf(str, "1) x: %" B_PRIi32 "  y: %" B_PRIi32 "   x: %d",
+				(int32)pt1.x, (int32)pt1.y, abs((int)(pt1.x - pt2.x)));
 			invalRect.Set(10, h-10-2*fFontHeight-2, 10 + StringWidth(fCH1Str), h-10-fFontHeight);
 			SetHighColor(ViewColor());
 			FillRect(invalRect);
@@ -897,7 +897,7 @@ TInfoView::Draw(BRect updateRect)
 				DrawString(fCH1Str);
 		} else if (ch1Showing) {
 			MovePenTo(10, h-10);
-			sprintf(str, "x: %li  y: %li", (int32)pt1.x, (int32)pt1.y);
+			sprintf(str, "x: %" B_PRIi32 "  y: %" B_PRIi32, (int32)pt1.x, (int32)pt1.y);
 			invalRect.Set(10, h-10-fFontHeight, 10 + StringWidth(fCH1Str), h-8);
 			SetHighColor(ViewColor());
 			FillRect(invalRect);
@@ -1410,7 +1410,7 @@ void
 TMagnify::NudgeMouse(float x, float y)
 {
 	BPoint loc;
-	ulong button;
+	uint32 button;
 
 	GetMouse(&loc, &button);
 	ConvertToScreen(&loc);
@@ -1429,7 +1429,7 @@ TMagnify::WindowActivated(bool active)
 }
 
 
-long
+status_t
 TMagnify::MagnifyTask(void *arg)
 {
 	TMagnify* view = (TMagnify*)arg;
@@ -1456,7 +1456,7 @@ void
 TMagnify::Update(bool force)
 {
 	BPoint loc;
-	ulong button;
+	uint32 button;
 	static long counter = 0;
 
 	if (!fStickCoordinates) {
@@ -1697,11 +1697,14 @@ TMagnify::SaveBits(BFile* file, const BBitmap *bitmap, const char* name) const
 
 	char str[1024];
 	// stream out the width, height and ColorSpace
-	sprintf(str, "const int32 k%sWidth = %ld;\n", name, (int32)bitmap->Bounds().Width()+1);
+	sprintf(str, "const int32 k%sWidth = %" B_PRIi32 ";\n", name,
+		(int32)bitmap->Bounds().Width()+1);
 	file->Write(str, strlen(str));
-	sprintf(str, "const int32 k%sHeight = %ld;\n", name, (int32)bitmap->Bounds().Height()+1);
+	sprintf(str, "const int32 k%sHeight = %" B_PRIi32 ";\n", name,
+		(int32)bitmap->Bounds().Height()+1);
 	file->Write(str, strlen(str));
-	sprintf(str, "const color_space k%sColorSpace = %s;\n\n", name, kColorSpaceName);
+	sprintf(str, "const color_space k%sColorSpace = %s;\n\n", name,
+		kColorSpaceName);
 	file->Write(str, strlen(str));
 
 	// stream out the constant name for this array

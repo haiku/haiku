@@ -792,6 +792,7 @@ port_init(kernel_args *args)
 		"  <condition> - address of the port's read or write condition.\n", 0);
 
 	new(&sNotificationService) PortNotificationService();
+	sNotificationService.Register();
 	sPortsActive = true;
 	return B_OK;
 }

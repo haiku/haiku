@@ -609,10 +609,10 @@ KeyStrokeSequenceCommandActuator::KeyStrokeSequenceCommandActuator(int32 argc,
 
 			BString newStr = fSequence;
 			newStr.Truncate(nextStart);
-			fOverrides.AddItem((void*)unicodeVal);
-			fOverrideOffsets.AddItem((void*)newStr.Length());
-			fOverrideModifiers.AddItem((void*)customMods);
-			fOverrideKeyCodes.AddItem((void*)customKey);
+			fOverrides.AddItem((void*)(addr_t)unicodeVal);
+			fOverrideOffsets.AddItem((void*)(addr_t)newStr.Length());
+			fOverrideModifiers.AddItem((void*)(addr_t)customMods);
+			fOverrideKeyCodes.AddItem((void*)(addr_t)customKey);
 			newStr.Append(((unicodeVal > 0) && (unicodeVal < 127)) ?
 				((char)unicodeVal): ' ',1);
 			newStr.Append(&fSequence.String()[nextEnd + 2]);
@@ -636,22 +636,22 @@ KeyStrokeSequenceCommandActuator::KeyStrokeSequenceCommandActuator(
 	int32 temp;
 	for (int32 i = 0; from->FindInt32("ooffsets", i, &temp) == B_NO_ERROR;
 		i++) {
-		fOverrideOffsets.AddItem((void*)temp);
+		fOverrideOffsets.AddItem((void*)(addr_t)temp);
 
 		if (from->FindInt32("overrides", i, &temp) != B_NO_ERROR)
 			temp = ' ';
 
-		fOverrides.AddItem((void*)temp);
+		fOverrides.AddItem((void*)(addr_t)temp);
 
 		if (from->FindInt32("omods", i, &temp) != B_NO_ERROR)
 			temp = -1;
 
-		fOverrideModifiers.AddItem((void*)temp);
+		fOverrideModifiers.AddItem((void*)(addr_t)temp);
 
 		if (from->FindInt32("okeys", i, &temp) != B_NO_ERROR)
 			temp = 0;
 
-		fOverrideKeyCodes.AddItem((void*)temp);
+		fOverrideKeyCodes.AddItem((void*)(addr_t)temp);
 	}
 	_GenerateKeyCodes();
 }
@@ -682,9 +682,9 @@ KeyStrokeSequenceCommandActuator::_GenerateKeyCodes()
 		uint32 overrideKey= 0;
 		uint32 overrideMods = (uint32)-1;
 		for (int32 j = fOverrideOffsets.CountItems()-1; j >= 0; j--) {
-			if ((int32)fOverrideOffsets.ItemAt(j) == i) {
-				overrideKey= (uint32) fOverrideKeyCodes.ItemAt(j);
-				overrideMods = (uint32) fOverrideModifiers.ItemAt(j);
+			if ((int32)(addr_t)fOverrideOffsets.ItemAt(j) == i) {
+				overrideKey= (uint32)(addr_t) fOverrideKeyCodes.ItemAt(j);
+				overrideMods = (uint32)(addr_t) fOverrideModifiers.ItemAt(j);
 				break;
 			}
 		}
@@ -853,19 +853,23 @@ KeyStrokeSequenceCommandActuator::Archive(BMessage* into, bool deep) const
 	int32 numOverrides = fOverrideOffsets.CountItems();
 	status_t tmp = B_OK;
 	for (int32 i = 0; i < numOverrides; i++) {
-		ret = into->AddInt32("ooffsets", (int32)fOverrideOffsets.ItemAt(i));
+		ret = into->AddInt32("ooffsets",
+			(int32)(addr_t)fOverrideOffsets.ItemAt(i));
 		if (ret != B_NO_ERROR)
 			tmp = B_ERROR;
 
-		ret = into->AddInt32("overrides", (int32)fOverrides.ItemAt(i));
+		ret = into->AddInt32("overrides",
+			(int32)(addr_t)fOverrides.ItemAt(i));
 		if (ret != B_NO_ERROR)
 			tmp = B_ERROR;
 
-		ret = into->AddInt32("omods", (int32)fOverrideModifiers.ItemAt(i));
+		ret = into->AddInt32("omods",
+			(int32)(addr_t)fOverrideModifiers.ItemAt(i));
 		if (ret != B_NO_ERROR)
 			tmp = B_ERROR;
 
-		ret = into->AddInt32("okeys", (int32)fOverrideKeyCodes.ItemAt(i));
+		ret = into->AddInt32("okeys",
+			(int32)(addr_t)fOverrideKeyCodes.ItemAt(i));
 	}
 
 	if (tmp == B_ERROR)
@@ -895,9 +899,9 @@ KeyStrokeSequenceCommandActuator::KeyEvent(const BMessage* keyMsg,
 
 			int32 override = -1;
 			for (int32 j = fOverrideOffsets.CountItems()-1; j >= 0; j--) {
-				int32 offset = (int32) fOverrideOffsets.ItemAt(j);
+				int32 offset = (int32)(addr_t) fOverrideOffsets.ItemAt(j);
 				if (offset == i) {
-					override = (int32) fOverrides.ItemAt(j);
+					override = (int32)(addr_t) fOverrides.ItemAt(j);
 					break;
 				}
 			}

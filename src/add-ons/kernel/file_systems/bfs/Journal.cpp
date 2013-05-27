@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2013, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -853,7 +853,7 @@ Journal::_WriteTransactionToLog()
 
 	free(vecs);
 
-	LogEntry* logEntry = new LogEntry(this, fVolume->LogEnd(),
+	LogEntry* logEntry = new(std::nothrow) LogEntry(this, fVolume->LogEnd(),
 		runArrays.LogEntryLength());
 	if (logEntry == NULL) {
 		FATAL(("no memory to allocate log entries!"));

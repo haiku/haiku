@@ -31,7 +31,6 @@ static const float kMaximumWidthBasic		= 400.0f;
 static const float kMinimumHeightBasic		= 130.0f;
 static const float kMaximumHeightBasic		= 400.0f;
 
-class BAboutWindow;
 class BString;
 class BMenuItem;
 class BMessage;
@@ -161,9 +160,6 @@ class CalcView : public BView {
 
 			// calculator options.
 			CalcOptions*		fOptions;
-
-			// about window for replicant
-			BAboutWindow*		fAboutWindow;
 };
 
 #endif // _CALC_VIEW_H

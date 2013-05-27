@@ -223,7 +223,7 @@ FontManager::MessageReceived(BMessage* message)
 							if (fromDirectory == NULL) {
 								// there is a new directory to watch for us
 								_AddPath(entry);
-								FTRACE("new directory moved in");
+								FTRACE(("new directory moved in"));
 							} else {
 								// A directory from our watched directories has
 								// been renamed or moved within the watched
@@ -237,7 +237,7 @@ FontManager::MessageReceived(BMessage* message)
 										style->UpdatePath(directory->directory);
 									}
 								}
-								FTRACE("directory renamed");
+								FTRACE(("directory renamed"));
 							}
 						} else {
 							if (fromDirectory != NULL) {

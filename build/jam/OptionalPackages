@@ -97,6 +97,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	System-sounds			- a collection of system sounds
 #	TagLib					- id3 tag library
 #	Tar						- archiving utility
+#	TermInfo				- terminal capabilites database
 #	TimGMSoundFont			- a good quality General MIDI Sound Font
 #	TrackerNewTemplates		- template files for Tracker's New menu
 #	Transmission			- a fast, easy, and free BitTorrent Client
@@ -749,8 +750,8 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ] {
 
 		if $(HAIKU_GCC_VERSION[1]) = 4 || $(isHybridBuild) {
 			InstallOptionalHaikuImagePackage
-				gcc-4.6.3-r1a4-x86-gcc4-2012-11-01.zip
-				: $(baseURL)/gcc-4.6.3-r1a4-x86-gcc4-2012-11-01.zip ;
+				gcc-4.7.3-r1a4-x86-gcc4-2013-05-13.zip
+				: $(baseURL)/gcc-4.7.3-r1a4-x86-gcc4-2013-05-13.zip ;
 		}
 
 		if $(HAIKU_GCC_VERSION[1]) = 4 {
@@ -762,7 +763,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ] {
 			local libs = libstdc++.so libsupc++.so ;
 			for lib in $(libs) {
 				AddSymlinkToHaikuHybridImage
-					develop abi x86 gcc4 tools gcc-4.6.3-haiku-121101 lib
+					develop abi x86 gcc4 tools gcc-4.7.3-haiku-130513 lib
 					: /system/lib $(lib) : : true ;
 			}
 		}
@@ -961,7 +962,6 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ]
 
 	# third party libs headers
 	AddHeaderDirectoryToHaikuImage libs ncurses : 3rdparty ;
-	AddHeaderDirectoryToHaikuImage libs termcap : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs tiff : 3rdparty ;
 
 	CopyDirectoryToHaikuImage develop headers :
@@ -1299,7 +1299,7 @@ if [ IsOptionalHaikuImagePackageAdded ICU ] {
 		}
 	} else if $(TARGET_ARCH) = arm {
 		InstallOptionalHaikuImagePackage $(HAIKU_ICU_ARM_PACKAGE)
-			: $(baseURL)/(HAIKU_ICU_ARM_PACKAGE)
+			: $(baseURL)/$(HAIKU_ICU_ARM_PACKAGE)
 			: system lib ;
 	} else if $(TARGET_ARCH) = x86_64 {
 		InstallOptionalHaikuImagePackage $(HAIKU_ICU_X86_64_PACKAGE)
@@ -2062,6 +2062,13 @@ if [ IsOptionalHaikuImagePackageAdded Tar ] {
 	} else {
 		Echo "No optional package Tar available for $(TARGET_ARCH)" ;
 	}
+}
+
+
+# TermInfo
+if [ IsOptionalHaikuImagePackageAdded TermInfo ] {
+	InstallOptionalHaikuImagePackage terminfo-1.383-2013-05-21.zip
+		: $(baseURL)/terminfo-1.383-2013-05-21.zip ;
 }
 
 

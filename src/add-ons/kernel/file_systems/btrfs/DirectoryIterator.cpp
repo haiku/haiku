@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Jérôme Duval, korli@users.berlios.de.
+ * Copyright 2011-2013, Jérôme Duval, korli@users.berlios.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -52,14 +52,18 @@ status_t
 DirectoryIterator::GetNext(char* name, size_t* _nameLength, ino_t* _id)
 {
 	if (fOffset == 0) {
-		*_nameLength = 3;
-		strlcpy(name, "..", *_nameLength);
+		if (*_nameLength < 3)
+			return B_BUFFER_OVERFLOW;
+		*_nameLength = 2;
+		strlcpy(name, "..", *_nameLength + 1);
 		*_id = fInode->ID();
 		fOffset = 1;
 		return B_OK;
 	} else if (fOffset == 1) {
-		*_nameLength = 2;
-		strlcpy(name, ".", *_nameLength);
+		if (*_nameLength < 2)
+			return B_BUFFER_OVERFLOW;
+		*_nameLength = 1;
+		strlcpy(name, ".", *_nameLength + 1);
 		fOffset = 2;
 		if (fInode->ID() == BTRFS_OBJECT_ID_CHUNK_TREE) {
 			*_id = fInode->ID();
@@ -85,12 +89,19 @@ DirectoryIterator::GetNext(char* name, size_t* _nameLength, ino_t* _id)
 		entry = (btrfs_dir_entry *)((uint8*)entry + entry->Length());
 	}
 
+	size_t length = entry->NameLength();
+
 	TRACE("DirectoryIterator::GetNext() entries_length %ld name_length %d\n",
 		entries_length, entry->NameLength());
 
-	memcpy(name, entry + 1, entry->NameLength());
-	name[entry->NameLength()] = '\0';
-	*_nameLength = entry->NameLength();
+	if (length + 1 > *_nameLength) {
+		free(entries);
+		return B_BUFFER_OVERFLOW;
+	}
+
+	memcpy(name, entry + 1, length);
+	name[length] = '\0';
+	*_nameLength = length;
 	*_id = entry->InodeID();
 	free(entries);
 
@@ -121,8 +132,8 @@ DirectoryIterator::Lookup(const char* name, size_t nameLength, ino_t* _id)
 	status_t status = fInode->GetVolume()->FSTree()->FindExact(key,
 		(void**)&entries, &length);
 	if (status != B_OK) {
-		TRACE("DirectoryIterator::Lookup(): Couldn't find entry with hash %lu "
-			"\"%s\"\n", hash, name);
+		TRACE("DirectoryIterator::Lookup(): Couldn't find entry with hash %" B_PRIu32
+			" \"%s\"\n", hash, name);
 		return status;
 	}
 

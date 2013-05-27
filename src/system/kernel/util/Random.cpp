@@ -116,7 +116,7 @@ secure_random_value()
 	data[1] = system_time();
 	data[2] = find_thread(NULL);
 	data[3] = smp_get_current_cpu();
-	data[4] = smp_get_num_cpus();
+	data[4] = real_time_clock();
 	data[5] = sFastLast;
 	data[6] = sLast;
 	data[7] = sSecureLast;

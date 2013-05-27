@@ -40,10 +40,10 @@ typedef struct {
 	
 	area_id				dma_buf1_area;
 	void *				dma_buf1_virt;
-	void *				dma_buf1_phys;
+	phys_addr_t			dma_buf1_phys;
 	area_id				dma_buf2_area;
 	void *				dma_buf2_virt;
-	void *				dma_buf2_phys;
+	phys_addr_t			dma_buf2_phys;
 	
 	sem_id				capture_sem;
 	void *				capture_data;

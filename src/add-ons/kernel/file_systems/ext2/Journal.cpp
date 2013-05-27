@@ -268,7 +268,7 @@ Journal::Lock(Transaction* owner, bool separateSubTransactions)
 /*virtual*/ status_t
 Journal::Unlock(Transaction* owner, bool success)
 {
-	TRACE("Journal::Unlock(): Lock recursion: %ld\n",
+	TRACE("Journal::Unlock(): Lock recursion: %" B_PRId32 "\n",
 		recursive_lock_get_recursion(&fLock));
 	if (fSeparateSubTransactions
 		|| recursive_lock_get_recursion(&fLock) == 1) {
@@ -317,8 +317,8 @@ Journal::MapBlock(off_t logical, fsblock_t& physical)
 inline uint32
 Journal::FreeLogBlocks() const
 {
-	TRACE("Journal::FreeLogBlocks(): start: %lu, end: %lu, size: %lu\n",
-		fLogStart, fLogEnd, fLogSize);
+	TRACE("Journal::FreeLogBlocks(): start: %" B_PRIu32 ", end: %" B_PRIu32
+		", size: %" B_PRIu32 "\n", fLogStart, fLogEnd, fLogSize);
 	return fLogStart <= fLogEnd
 		? fLogSize - fLogEnd + fLogStart - 1
 		: fLogStart - fLogEnd;
@@ -381,7 +381,7 @@ Journal::_WritePartialTransactionToLog(JournalHeader* descriptorBlock,
 
 			if (escapedData == NULL) {
 				TRACE("Journal::_WritePartialTransactionToLog(): Allocating "
-					"space for escaped block (%lu)\n", fBlockSize);
+					"space for escaped block (%" B_PRIu32 ")\n", fBlockSize);
 				escapedData = new(std::nothrow) uint8[fBlockSize];
 				if (escapedData == NULL) {
 					TRACE("Journal::_WritePartialTransactionToLof(): Failed to "
@@ -411,7 +411,7 @@ Journal::_WritePartialTransactionToLog(JournalHeader* descriptorBlock,
 		off_t logOffset = physicalBlock * fBlockSize;
 
 		TRACE("Journal::_WritePartialTransactionToLog(): Writing from memory: "
-			"%p, to disk: %llu\n", finalData, logOffset);
+			"%p, to disk: %" B_PRIdOFF "\n", finalData, logOffset);
 		size_t written = write_pos(fJournalVolume->Device(), logOffset,
 			finalData, fBlockSize);
 		if (written != fBlockSize) {
@@ -420,7 +420,7 @@ Journal::_WritePartialTransactionToLog(JournalHeader* descriptorBlock,
 		}
 
 		TRACE("Journal::_WritePartialTransactionToLog(): Wrote a journal block "
-			"at: %lu\n", logBlock);
+			"at: %" B_PRIu32 "\n", logBlock);
 
 		blockCount++;
 		tag++;
@@ -442,8 +442,8 @@ Journal::_WritePartialTransactionToLog(JournalHeader* descriptorBlock,
 
 	off_t descriptorBlockOffset = physicalBlock * fBlockSize;
 
-	TRACE("Journal::_WritePartialTransactionToLog(): Writing to: %lld\n",
-		descriptorBlockOffset);
+	TRACE("Journal::_WritePartialTransactionToLog(): Writing to: %" B_PRIdOFF
+		"\n", descriptorBlockOffset);
 	size_t written = write_pos(fJournalVolume->Device(),
 		descriptorBlockOffset, descriptorBlock, fBlockSize);
 	if (written != fBlockSize) {
@@ -467,14 +467,15 @@ Journal::_WriteTransactionToLog()
 	TRACE("Journal::_WriteTransactionToLog(): Attempting to get transaction "
 		"size\n");
 	size_t size = _FullTransactionSize();
-	TRACE("Journal::_WriteTransactionToLog(): transaction size: %lu\n", size);
+	TRACE("Journal::_WriteTransactionToLog(): transaction size: %" B_PRIuSIZE
+		"\n", size);
 
 	if (size > fMaxTransactionSize) {
 		TRACE("Journal::_WriteTransactionToLog(): not enough free space "
 			"for the transaction. Attempting to free some space.\n");
 		size = _MainTransactionSize();
-		TRACE("Journal::_WriteTransactionToLog(): main transaction size: %lu\n",
-			size);
+		TRACE("Journal::_WriteTransactionToLog(): main transaction size: %"
+			B_PRIuSIZE "\n", size);
 
 		if(fHasSubTransaction && size < fMaxTransactionSize) {
 			TRACE("Journal::_WriteTransactionToLog(): transaction doesn't fit, "
@@ -482,22 +483,23 @@ Journal::_WriteTransactionToLog()
 			detached = true;
 		} else {
 			// Error: transaction can't fit in log
-			panic("transaction too large (size: %lu, max size: %lu, log size: "
-				"%lu)\n", size, fMaxTransactionSize, fLogSize);
+			panic("transaction too large (size: %" B_PRIuSIZE ", max size: %"
+				B_PRIu32 ", log size: %" B_PRIu32 ")\n", size,
+				fMaxTransactionSize, fLogSize);
 			return B_BUFFER_OVERFLOW;
 		}
 	}
 
-	TRACE("Journal::_WriteTransactionToLog(): free log blocks: %lu\n",
-		FreeLogBlocks());
+	TRACE("Journal::_WriteTransactionToLog(): free log blocks: %" B_PRIu32
+		"\n", FreeLogBlocks());
 	if (size > FreeLogBlocks()) {
 		TRACE("Journal::_WriteTransactionToLog(): Syncing block cache\n");
 		cache_sync_transaction(fFilesystemBlockCache, fTransactionID);
 
 		if (size > FreeLogBlocks()) {
 			panic("Transaction fits, but sync didn't result in enough"
-				"free space.\n\tGot %ld when at least %ld was expected.",
-				FreeLogBlocks(), size);
+				"free space.\n\tGot %" B_PRIu32 " when at least %" B_PRIuSIZE
+				" was expected.", FreeLogBlocks(), size);
 		}
 	}
 
@@ -510,7 +512,7 @@ Journal::_WriteTransactionToLog()
 
 	// Prepare Descriptor block
 	TRACE("Journal::_WriteTransactionToLog(): attempting to allocate space for "
-		"the descriptor block, block size %lu\n", fBlockSize);
+		"the descriptor block, block size %" B_PRIu32 "\n", fBlockSize);
 	JournalHeader* descriptorBlock =
 		(JournalHeader*)new(std::nothrow) uint8[fBlockSize];
 	if (descriptorBlock == NULL) {
@@ -524,7 +526,7 @@ Journal::_WriteTransactionToLog()
 
 	// Prepare Commit block
 	TRACE("Journal::_WriteTransactionToLog(): attempting to allocate space for "
-		"the commit block, block size %lu\n", fBlockSize);
+		"the commit block, block size %" B_PRIu32 "\n", fBlockSize);
 	JournalHeader* commitBlock =
 		(JournalHeader*)new(std::nothrow) uint8[fBlockSize];
 	if (descriptorBlock == NULL) {
@@ -588,7 +590,7 @@ Journal::_WriteTransactionToLog()
 		off_t logOffset = physicalBlock * fBlockSize;
 
 		TRACE("Journal::_WriteTransactionToLog(): Writting commit block to "
-			"%lld\n", logOffset);
+			"%" B_PRIdOFF "\n", logOffset);
 		off_t written = write_pos(fJournalVolume->Device(), logOffset,
 			commitBlock, fBlockSize);
 		if (written != fBlockSize) {
@@ -610,7 +612,8 @@ Journal::_WriteTransactionToLog()
 
 	off_t logOffset = physicalBlock * fBlockSize;
 
-	TRACE("Journal::_WriteTransactionToLog(): Writing to: %lld\n", logOffset);
+	TRACE("Journal::_WriteTransactionToLog(): Writing to: %" B_PRIdOFF "\n",
+		logOffset);
 	off_t written = write_pos(fJournalVolume->Device(), logOffset, commitBlock,
 		fBlockSize);
 	if (written != fBlockSize) {
@@ -644,8 +647,8 @@ Journal::_WriteTransactionToLog()
 		if (status == B_OK && _FullTransactionSize() > fLogSize) {
 			// If the transaction is too large after writing, there is no way to
 			// recover, so let this transaction fail.
-			ERROR("transaction too large (%ld blocks, log size %ld)!\n",
-				_FullTransactionSize(), fLogSize);
+			ERROR("transaction too large (%" B_PRIuSIZE " blocks, log size %"
+				B_PRIu32 ")!\n", _FullTransactionSize(), fLogSize);
 			return B_BUFFER_OVERFLOW;
 		}
 	} else {
@@ -679,7 +682,8 @@ Journal::_SaveSuperBlock()
 	superblock.SetFirstCommitID(fFirstCommitID);
 	superblock.SetLogStart(fLogStart);
 
-	TRACE("Journal::SaveSuperBlock(): Write to %lld\n", superblockPos);
+	TRACE("Journal::SaveSuperBlock(): Write to %" B_PRIdOFF "\n",
+		superblockPos);
 	size_t bytesWritten = write_pos(fJournalVolume->Device(), superblockPos,
 		&superblock, sizeof(superblock));
 
@@ -702,8 +706,8 @@ Journal::_LoadSuperBlock()
 	if (status != B_OK)
 		return status;
 
-	TRACE("Journal::_LoadSuperBlock(): superblock physical block: %llu\n",
-		superblockPos);
+	TRACE("Journal::_LoadSuperBlock(): superblock physical block: %" B_PRIu64
+		"\n", superblockPos);
 
 	JournalSuperBlock superblock;
 	size_t bytesRead = read_pos(fJournalVolume->Device(), superblockPos
@@ -715,8 +719,8 @@ Journal::_LoadSuperBlock()
 	}
 
 	if (!superblock.header.CheckMagic()) {
-		ERROR("Journal::_LoadSuperBlock(): Invalid superblock magic %lX\n",
-			superblock.header.Magic());
+		ERROR("Journal::_LoadSuperBlock(): Invalid superblock magic %" B_PRIx32
+			"\n", superblock.header.Magic());
 		return B_BAD_VALUE;
 	}
 
@@ -757,9 +761,10 @@ Journal::_LoadSuperBlock()
 		// TODO: Why is "superblock.MaxTransactionBlocks();" zero?
 	//fFirstCacheCommitID = fFirstCommitID - fTransactionID /*+ 1*/;
 
-	TRACE("Journal::_LoadSuperBlock(): block size: %lu, first commit id: %lu, "
-		"first log block: %lu, log start: %lu, log size: %lu, max transaction "
-		"size: %lu\n", fBlockSize, fFirstCommitID, fFirstLogBlock, fLogStart,
+	TRACE("Journal::_LoadSuperBlock(): block size: %" B_PRIu32 ", first commit"
+		" id: %" B_PRIu32 ", first log block: %" B_PRIu32 ", log start: %"
+		B_PRIu32 ", log size: %" B_PRIu32 ", max transaction size: %" B_PRIu32
+		"\n", fBlockSize, fFirstCommitID, fFirstLogBlock, fLogStart,
 		fLogSize, fMaxTransactionSize);
 
 	return B_OK;
@@ -795,7 +800,8 @@ Journal::_CountTags(JournalHeader* descriptorBlock)
 			tags += 2;	// Skip new UUID
 		}
 
-		TRACE("Journal::_CountTags(): Tag block: %lu\n", tags->BlockNumber());
+		TRACE("Journal::_CountTags(): Tag block: %" B_PRIu32 "\n",
+			tags->BlockNumber());
 
 		tags++; // Go to next tag
 		count++;
@@ -804,7 +810,7 @@ Journal::_CountTags(JournalHeader* descriptorBlock)
 	if ((tags->Flags() & JOURNAL_FLAG_LAST_TAG) != 0)
 		count++;
 
-	TRACE("Journal::_CountTags(): counted tags: %lu\n", count);
+	TRACE("Journal::_CountTags(): counted tags: %" B_PRIu32 "\n", count);
 
 	return count;
 }
@@ -858,11 +864,11 @@ Journal::_RecoverPassScan(uint32& lastCommitID)
 			uint32 tags = _CountTags(header);
 			nextBlock += tags;
 			TRACE("Journal recover pass scan: Found a descriptor block with "
-				"%lu tags\n", tags);
+				"%" B_PRIu32 " tags\n", tags);
 		} else if (blockType == JOURNAL_COMMIT_BLOCK) {
 			nextCommitID++;
 			TRACE("Journal recover pass scan: Found a commit block. Next "
-				"commit ID: %lu\n", nextCommitID);
+				"commit ID: %" B_PRIu32 "\n", nextCommitID);
 		} else if (blockType != JOURNAL_REVOKE_BLOCK) {
 			TRACE("Journal recover pass scan: Reached an unrecognized block, "
 				"assuming as log's end.\n");
@@ -881,8 +887,8 @@ Journal::_RecoverPassScan(uint32& lastCommitID)
 		header = (JournalHeader*)cached.SetTo(nextBlockPos);
 	}
 
-	TRACE("Journal Recovery pass scan: Last detected transaction ID: %lu\n",
-		nextCommitID);
+	TRACE("Journal Recovery pass scan: Last detected transaction ID: %"
+		B_PRIu32 "\n", nextCommitID);
 
 	lastCommitID = nextCommitID;
 	return B_OK;
@@ -946,7 +952,7 @@ Journal::_RecoverPassRevoke(uint32 lastCommitID)
 		return B_ERROR;
 	}
 
-	TRACE("Journal recovery pass revoke: Revoked blocks: %lu\n",
+	TRACE("Journal recovery pass revoke: Revoked blocks: %" B_PRIu32 "\n",
 		fRevokeManager->NumRevokes());
 
 	return B_OK;
@@ -1016,8 +1022,8 @@ Journal::_RecoverPassReplay(uint32 lastCommitID)
 							= B_HOST_TO_BENDIAN_INT32(JOURNAL_MAGIC);
 					}
 
-					TRACE("Journal::_RevoverPassReplay(): Write to %lu\n",
-						tag->BlockNumber() * fBlockSize);
+					TRACE("Journal::_RevoverPassReplay(): Write to %" B_PRIu32
+						"\n", tag->BlockNumber() * fBlockSize);
 					size_t written = write_pos(fFilesystemVolume->Device(),
 						tag->BlockNumber() * fBlockSize, data, fBlockSize);
 
@@ -1070,7 +1076,7 @@ Journal::_FlushLog(bool canWait, bool flushBlocks)
 	status_t status = canWait ? recursive_lock_lock(&fLock)
 		: recursive_lock_trylock(&fLock);
 
-	TRACE("Journal::_FlushLog(): Acquired fLock, recursion: %ld\n",
+	TRACE("Journal::_FlushLog(): Acquired fLock, recursion: %" B_PRId32 "\n",
 		recursive_lock_get_recursion(&fLock));
 	if (status != B_OK)
 		return status;
@@ -1131,7 +1137,7 @@ Journal::_WrapAroundLog(uint32 block)
 size_t
 Journal::_CurrentTransactionSize() const
 {
-	TRACE("Journal::_CurrentTransactionSize(): transaction %ld\n",
+	TRACE("Journal::_CurrentTransactionSize(): transaction %" B_PRIu32 "\n",
 		fTransactionID);
 
 	size_t count;
@@ -1140,12 +1146,12 @@ Journal::_CurrentTransactionSize() const
 		count = cache_blocks_in_sub_transaction(fFilesystemBlockCache,
 			fTransactionID);
 
-		TRACE("\tSub transaction size: %ld\n", count);
+		TRACE("\tSub transaction size: %" B_PRIuSIZE "\n", count);
 	} else {
 		count =  cache_blocks_in_transaction(fFilesystemBlockCache,
 			fTransactionID);
 
-		TRACE("\tTransaction size: %ld\n", count);
+		TRACE("\tTransaction size: %" B_PRIuSIZE "\n", count);
 	}
 
 	return count;
@@ -1155,13 +1161,14 @@ Journal::_CurrentTransactionSize() const
 size_t
 Journal::_FullTransactionSize() const
 {
-	TRACE("Journal::_FullTransactionSize(): transaction %ld\n", fTransactionID);
+	TRACE("Journal::_FullTransactionSize(): transaction %" B_PRIu32 "\n",
+		fTransactionID);
 	TRACE("\tFile sytem block cache: %p\n", fFilesystemBlockCache);
 
 	size_t count = cache_blocks_in_transaction(fFilesystemBlockCache,
 		 fTransactionID);
 
-	TRACE("\tFull transaction size: %ld\n", count);
+	TRACE("\tFull transaction size: %" B_PRIuSIZE "\n", count);
 
 	return count;
 }
@@ -1170,12 +1177,13 @@ Journal::_FullTransactionSize() const
 size_t
 Journal::_MainTransactionSize() const
 {
-	TRACE("Journal::_MainTransactionSize(): transaction %ld\n", fTransactionID);
+	TRACE("Journal::_MainTransactionSize(): transaction %" B_PRIu32 "\n",
+		fTransactionID);
 
 	size_t count =  cache_blocks_in_main_transaction(fFilesystemBlockCache,
 		fTransactionID);
 
-	TRACE("\tMain transaction size: %ld\n", count);
+	TRACE("\tMain transaction size: %" B_PRIuSIZE "\n", count);
 
 	return count;
 }
@@ -1186,13 +1194,13 @@ Journal::_TransactionDone(bool success)
 {
 	if (!success) {
 		if (fHasSubTransaction) {
-			TRACE("Journal::_TransactionDone(): transaction %ld failed, "
-				"aborting subtransaction\n", fTransactionID);
+			TRACE("Journal::_TransactionDone(): transaction %" B_PRIu32
+				" failed, aborting subtransaction\n", fTransactionID);
 			cache_abort_sub_transaction(fFilesystemBlockCache, fTransactionID);
 			// parent is unaffected
 		} else {
-			TRACE("Journal::_TransactionDone(): transaction %ld failed,"
-				" aborting\n", fTransactionID);
+			TRACE("Journal::_TransactionDone(): transaction %" B_PRIu32
+				" failed, aborting\n", fTransactionID);
 			cache_abort_transaction(fFilesystemBlockCache, fTransactionID);
 			fUnwrittenTransactions = 0;
 		}
@@ -1203,12 +1211,12 @@ Journal::_TransactionDone(bool success)
 
 	// If possible, delay flushing the transaction
 	uint32 size = _FullTransactionSize();
-	TRACE("Journal::_TransactionDone(): full transaction size: %lu, max "
-		"transaction size: %lu, free log blocks: %lu\n", size,
-		fMaxTransactionSize, FreeLogBlocks());
+	TRACE("Journal::_TransactionDone(): full transaction size: %" B_PRIu32
+		", max transaction size: %" B_PRIu32 ", free log blocks: %" B_PRIu32
+		"\n", size, fMaxTransactionSize, FreeLogBlocks());
 	if (fMaxTransactionSize > 0 && size < fMaxTransactionSize) {
 		TRACE("Journal::_TransactionDone(): delaying flush of transaction "
-			"%ld\n", fTransactionID);
+			"%" B_PRIu32 "\n", fTransactionID);
 
 		// Make sure the transaction fits in the log
 		if (size < FreeLogBlocks())
@@ -1228,8 +1236,8 @@ Journal::_TransactionWritten(int32 transactionID, int32 event, void* _logEntry)
 {
 	LogEntry* logEntry = (LogEntry*)_logEntry;
 
-	TRACE("Journal::_TransactionWritten(): Transaction %ld checkpointed\n",
-		transactionID);
+	TRACE("Journal::_TransactionWritten(): Transaction %" B_PRIu32
+		" checkpointed\n", transactionID);
 
 	Journal* journal = logEntry->GetJournal();
 
@@ -1243,12 +1251,12 @@ Journal::_TransactionWritten(int32 transactionID, int32 event, void* _logEntry)
 	TRACE("Journal::_TransactionWritten(): first log entry: %p\n",
 		journal->fLogEntries.First());
 	if (logEntry == journal->fLogEntries.First()) {
-		TRACE("Journal::_TransactionWritten(): Moving start of log to %lu\n",
-			logEntry->Start());
+		TRACE("Journal::_TransactionWritten(): Moving start of log to %"
+			B_PRIu32 "\n", logEntry->Start());
 		journal->fLogStart = logEntry->Start();
 		journal->fFirstCommitID = logEntry->CommitID();
-		TRACE("Journal::_TransactionWritten(): Setting commit ID to %lu\n",
-			logEntry->CommitID());
+		TRACE("Journal::_TransactionWritten(): Setting commit ID to %" B_PRIu32
+			"\n", logEntry->CommitID());
 
 		if (journal->_SaveSuperBlock() != B_OK)
 			panic("ext2: Failed to write journal superblock\n");

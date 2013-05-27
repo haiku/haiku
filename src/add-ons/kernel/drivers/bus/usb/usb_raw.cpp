@@ -49,7 +49,7 @@ static char **gDeviceNames = NULL;
 static status_t
 usb_raw_device_added(usb_device newDevice, void **cookie)
 {
-	TRACE((DRIVER_NAME": device_added(0x%08lx)\n", newDevice));
+	TRACE((DRIVER_NAME": device_added(0x%08" B_PRIx32 ")\n", newDevice));
 	raw_device *device = (raw_device *)malloc(sizeof(raw_device));
 
 	mutex_init(&device->lock, "usb_raw device lock");
@@ -66,7 +66,7 @@ usb_raw_device_added(usb_device newDevice, void **cookie)
 	if (gUSBModule->usb_ioctl('DNAM', deviceName, sizeof(deviceName)) >= B_OK) {
 		snprintf(device->name, sizeof(device->name), "bus/usb/%s", deviceName);
 	} else {
-		snprintf(device->name, sizeof(device->name), "bus/usb/%08lx",
+		snprintf(device->name, sizeof(device->name), "bus/usb/%08" B_PRIx32,
 			newDevice);
 	}
 
@@ -79,7 +79,7 @@ usb_raw_device_added(usb_device newDevice, void **cookie)
 	gDeviceCount++;
 	mutex_unlock(&gDeviceListLock);
 
-	TRACE((DRIVER_NAME": new device: 0x%08lx\n", (uint32)device));
+	TRACE((DRIVER_NAME": new device: 0x%p\n", device));
 	*cookie = (void *)device;
 	return B_OK;
 }
@@ -88,7 +88,7 @@ usb_raw_device_added(usb_device newDevice, void **cookie)
 static status_t
 usb_raw_device_removed(void *cookie)
 {
-	TRACE((DRIVER_NAME": device_removed(0x%08lx)\n", (uint32)cookie));
+	TRACE((DRIVER_NAME": device_removed(0x%p)\n", cookie));
 	raw_device *device = (raw_device *)cookie;
 
 	mutex_lock(&gDeviceListLock);
@@ -825,7 +825,8 @@ init_driver()
 	status_t result = get_module(B_USB_MODULE_NAME,
 		(module_info **)&gUSBModule);
 	if (result < B_OK) {
-		TRACE((DRIVER_NAME": getting module failed 0x%08lx\n", result));
+		TRACE((DRIVER_NAME": getting module failed 0x%08" B_PRIx32 "\n",
+			result));
 		mutex_destroy(&gDeviceListLock);
 		return result;
 	}

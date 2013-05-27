@@ -369,7 +369,7 @@ TSignatureWindow::Save()
 
 		fFile = new BFile();
 		while(true) {
-			sprintf(name, "signature_%ld", index++);
+			sprintf(name, "signature_%" B_PRId32, index++);
 			if ((result = dir.CreateFile(name, fFile, true)) == B_NO_ERROR)
 				break;
 			if (result != EEXIST)

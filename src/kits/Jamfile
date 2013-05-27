@@ -17,7 +17,7 @@ if $(RUN_WITHOUT_APP_SERVER) != 0 {
 	SubDirC++Flags $(defines) ;
 }
 
-UsePrivateHeaders app interface kernel locale shared ;
+UsePrivateHeaders app interface kernel locale print shared ;
 
 # Build our libbe.so
 
@@ -62,15 +62,9 @@ SharedLibrary libbe_test.so :
 	$(TARGET_LIBSTDC++)
 ;
 
-SEARCH on [ FGristFiles AboutMenuItem.cpp ] += [ FDirName $(HAIKU_TOP) src kits shared ] ;
-SEARCH on [ FGristFiles AboutWindow.cpp ] += [ FDirName $(HAIKU_TOP) src kits shared ] ;
-SEARCH on [ FGristFiles ColorControl.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
-SEARCH on [ FGristFiles StringForSize.cpp ] += [ FDirName $(HAIKU_TOP) src kits shared ] ;
-SEARCH on [ FGristFiles TextView.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
-SEARCH on [ FGristFiles Dragger.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
-SEARCH on [ FGristFiles Menu.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
-SEARCH on [ FGristFiles PrintJob.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
-SEARCH on [ FGristFiles ZombieReplicantView.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) interface ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) interface textview_support ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) shared ] ;
 
 DoCatalogs libbe.so
 	: x-vnd.Haiku-libbe

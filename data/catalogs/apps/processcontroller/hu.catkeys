@@ -1,14 +1,14 @@
-1	hungarian	x-vnd.Haiku-ProcessController	2887520383
+1	hungarian	x-vnd.Haiku-ProcessController	1848752768
 Memory usage	ProcessController		Memóriahasználat
-Do you really want to kill the team \"%s\"?	ProcessController		Biztosan le kívánja állítani: %s?
+Kill this team!	ProcessController		Szál leállítása!
 Idle priority	ProcessController		Üresjárat prioritás
 Restart Deskbar	ProcessController		Asztalsáv újraindítása
 Custom priority	ProcessController		Egyéni prioritás
-Debug thread	ProcessController		Szál hibakeresése
 This team is already gone…	ProcessController		Ez a csapat már eltűnt…
 Error saving file	ProcessController		Hiba történt a fájl mentése során
 Real-time priority	ProcessController		Valós idejű prioritás
 Your setting file could not be saved!\n(%s)	ProcessController		A beállításfájlt nem sikerült elmenteni!\n(%s)
+What do you want to do with the team \"%s\"?	ProcessController		Mit kíván tenni a szállal: %s?
 This thread is already gone…	ProcessController		Ez a szál már eltűnt…
 Cancel	ProcessController		Mégse
 Display priority	ProcessController		Kijelzési prioritás
@@ -38,11 +38,11 @@ Threads and CPU usage	ProcessController		Szálak és processzorhasználat
 Urgent display priority	ProcessController		Magas kijelzési prioritás
 OK	ProcessController		Rendben
 Damned!	ProcessController		Fenébe!
+Debug this team!	ProcessController		Szál hibakeresése!
 Usage: %s [-deskbar]\n	ProcessController		Használat: %s [-deskbar]\n
 ProcessController	System name		Folyamatkezelő
 Real-time display priority	ProcessController		Valós idejű kijelzési prioritás
 Please confirm	ProcessController		Jóváhagyás
-Yes, kill this team!	ProcessController		Igen, állítsa le a csapatot!
 System resources & caches…	ProcessController		Rendszer erőforrásai és gyorsítótárai…
 That's no Fun!	ProcessController		Ez nem vicces!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Futtathatja a Folyamatkezelőt egy ablakban, vagy feltelepítheti azt az Asztalsávra.

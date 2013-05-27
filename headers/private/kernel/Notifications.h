@@ -152,6 +152,9 @@ public:
 
 	virtual const char*			Name() { return fName; }
 
+			status_t			Register();
+			void				Unregister();
+
 protected:
 	virtual status_t			ToEventMask(const KMessage& eventSpecifier,
 									uint32& eventMask);

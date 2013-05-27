@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libbe	672385853
+1	russian	x-vnd.Haiku-libbe	3504008668
 gamma	AboutWindow		гамма
 beta	AboutWindow		бета
 %3.2f GiB	StringForSize		%3.2f ГБ
@@ -7,7 +7,6 @@ About %app%	AboutMenuItem		О программе…
 Cut	TextView		Вырезать
 Version	AboutWindow		Версия
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Невозможно удалить репликант \"%description\".\n%error
-About	AboutWindow		О программе
 Copy	TextView		Копировать
 %3.2f KiB	StringForSize		%3.2f КБ
 %d bytes	StringForSize		%d байт
@@ -15,9 +14,11 @@ alpha	AboutWindow		альфа
 Error	PrintJob		Ошибка
 No Pages to print!	PrintJob		Нет страниц для печати
 All Rights Reserved.	AboutWindow		Все права защищены.
+About %app%	AboutWindow		О программе…
 OK	Dragger		ОК
 OK	PrintJob		ОК
 Green:	ColorControl		Зеленый:
+Ok	AboutWindow		Ок
 Version history:	AboutWindow		История версий:
 Remove replicant	Dragger		Удалить репликант
 OK	ZombieReplicantView		ОК

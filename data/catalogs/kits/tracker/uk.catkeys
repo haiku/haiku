@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	3100363775
+1	ukrainian	x-vnd.Haiku-libtracker	571939486
 common	B_COMMON_DIRECTORY		common
 OK	WidgetAttributeText		Гаразд
 Icon view	VolumeWindow		У вигляді іконок
@@ -199,7 +199,6 @@ Resize to fit	VolumeWindow		Припасувати
 Could not find application \"%appname\"	OpenWithWindow		Невдалось знайти програму \"%appname\"
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Деякі з вибраних елементів не можуть бути переміщені Кошик . Ви хочете видалити їх все одно? ( Операція необоротна.)
 Invert	SelectionWindow		Інвертувати
-Save Query as template…	FindPanel		Зберегти запит як шаблон…
 rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	перейменуєте
 Find	FindPanel		Знайти
 Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Перемістити

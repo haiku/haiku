@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Rene Gollent, rene@gollent.com
+ * Copyright 2012-2013, Rene Gollent, rene@gollent.com
  * Distributed under the terms of the MIT License.
  */
 
@@ -165,7 +165,8 @@ BListValueNode::BListValueNode(ValueNodeChild* nodeChild,
 	fType(type),
 	fLoader(NULL),
 	fItemCountType(NULL),
-	fItemCount(0)
+	fItemCount(0),
+	fCountChildCreated(false)
 {
 	fType->AcquireReference();
 }
@@ -304,19 +305,67 @@ BListValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 status_t
 BListValueNode::CreateChildren()
 {
-	if (fChildrenCreated)
-		return B_OK;
+	return CreateChildrenInRange(0, kMaxArrayElementCount);
+}
 
+
+int32
+BListValueNode::CountChildren() const
+{
+	return fChildren.CountItems();
+}
+
+
+ValueNodeChild*
+BListValueNode::ChildAt(int32 index) const
+{
+	return fChildren.ItemAt(index);
+}
+
+
+bool
+BListValueNode::IsRangedContainer() const
+{
+	return true;
+}
+
+
+bool
+BListValueNode::IsContainerRangeFixed() const
+{
+	return true;
+}
+
+
+void
+BListValueNode::ClearChildren()
+{
+	fChildren.MakeEmpty();
+	fCountChildCreated = false;
+	if (fContainer != NULL)
+		fContainer->NotifyValueNodeChildrenDeleted(this);
+}
+
+
+status_t
+BListValueNode::CreateChildrenInRange(int32 lowIndex, int32 highIndex)
+{
 	if (fLocationResolutionState != B_OK)
 		return fLocationResolutionState;
 
-	if (fItemCountType != NULL) {
+	if (lowIndex < 0)
+		lowIndex = 0;
+	if (highIndex >= fItemCount)
+		highIndex = fItemCount - 1;
+
+	if (!fCountChildCreated && fItemCountType != NULL) {
 		BListItemCountNodeChild* countChild = new(std::nothrow)
 			BListItemCountNodeChild(fItemCountLocation, this, fItemCountType);
 
 		if (countChild == NULL)
 			return B_NO_MEMORY;
 
+		fCountChildCreated = true;
 		countChild->SetContainer(fContainer);
 		fChildren.AddItem(countChild);
 	}
@@ -343,7 +392,7 @@ BListValueNode::CreateChildren()
 			return result;
 	}
 
-	for (int32 i = 0; i < fItemCount && i < kMaxArrayElementCount; i++)
+	for (int32 i = lowIndex; i <= highIndex; i++)
 	{
 		BListElementNodeChild* child =
 			new(std::nothrow) BListElementNodeChild(this, i, type);
@@ -362,15 +411,12 @@ BListValueNode::CreateChildren()
 }
 
 
-int32
-BListValueNode::CountChildren() const
+status_t
+BListValueNode::SupportedChildRange(int32& lowIndex, int32& highIndex) const
 {
-	return fChildren.CountItems();
+	lowIndex = 0;
+	highIndex = fItemCount - 1;
+
+	return B_OK;
 }
 
-
-ValueNodeChild*
-BListValueNode::ChildAt(int32 index) const
-{
-	return fChildren.ItemAt(index);
-}

@@ -248,7 +248,7 @@ check_capabilities(agp_device_info &deviceInfo, uint32 &command)
 		agpStatus = fix_rate_support(agpStatus);
 	}
 
-	TRACE("device %u.%u.%u has AGP capabilities %lx\n", deviceInfo.info.bus,
+	TRACE("device %u.%u.%u has AGP capabilities %" B_PRIx32 "\n", deviceInfo.info.bus,
 		deviceInfo.info.device, deviceInfo.info.function, agpStatus);
 
 	// block non-supported AGP modes
@@ -482,8 +482,8 @@ Aperture::CreateMemory(size_t size, size_t alignment, uint32 flags)
 		return NULL;
 	}
 
-	TRACE("create memory %p, base %lx, size %lx, flags %lx\n", memory,
-		memory->base, memory->size, flags);
+	TRACE("create memory %p, base %" B_PRIxADDR ", size %" B_PRIxSIZE
+		", flags %" B_PRIx32 "\n", memory, memory->base, memory->size, flags);
 
 	memory->flags = flags;
 #if defined(__HAIKU__) && !defined(GART_TEST)
@@ -852,7 +852,7 @@ Aperture::_Insert(aperture_memory *memory, size_t size, size_t alignment,
 status_t
 get_nth_agp_info(uint32 index, agp_info *info)
 {
-	TRACE("get_nth_agp_info(index %lu)\n", index);
+	TRACE("get_nth_agp_info(index %" B_PRIu32 ")\n", index);
 
 	if (index >= sDeviceCount)
 		return B_BAD_VALUE;
@@ -888,7 +888,7 @@ release_agp(void)
 uint32
 set_agp_mode(uint32 command)
 {
-	TRACE("set_agp_mode(command %lx)\n", command);
+	TRACE("set_agp_mode(command %" B_PRIx32 ")\n", command);
 
 	if ((command & AGP_ENABLE) == 0) {
 		set_pci_mode();
@@ -912,7 +912,7 @@ set_agp_mode(uint32 command)
 	}
 
 	command = fix_rate_command(command);
-	TRACE("set AGP command %lx on all capable devices.\n", command);
+	TRACE("set AGP command %" B_PRIx32 " on all capable devices.\n", command);
 
 	// The order of programming differs for enabling/disabling AGP mode
 	// (see AGP specification)
@@ -1213,7 +1213,7 @@ agp_init(void)
 		sDeviceCount++;
 	}
 
-	TRACE("found %ld AGP devices\n", sDeviceCount);
+	TRACE("found %" B_PRId32 " AGP devices\n", sDeviceCount);
 
 	// Since there can be custom aperture modules (for memory management only),
 	// we always succeed if we could get the resources we need.

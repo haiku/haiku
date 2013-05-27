@@ -51,9 +51,26 @@ public:
 									{ return false; }
 			bool				ChildrenCreated() const
 									{ return fChildrenCreated; }
+
 	virtual	status_t			CreateChildren() = 0;
 	virtual	int32				CountChildren() const = 0;
 	virtual	ValueNodeChild*		ChildAt(int32 index) const = 0;
+
+	// optional virtual hooks for container type value nodes such as
+	// arrays that may contain a variable (and potentially quite large)
+	// number of children. The calls below should be implemented for such
+	// node types to allow the upper layers to be aware of this, and to be
+	// able to request that only a subset of children be created.
+	virtual	bool				IsRangedContainer() const;
+	virtual	bool				IsContainerRangeFixed() const;
+									// indicates that the user can't
+									// arbitrarily go outside of the
+									// specified/supported range.
+	virtual	void				ClearChildren();
+	virtual	status_t			CreateChildrenInRange(int32 lowIndex,
+									int32 highIndex);
+	virtual	status_t			SupportedChildRange(int32& lowIndex,
+									int32& highIndex) const;
 
 			status_t			LocationAndValueResolutionState() const
 									{ return fLocationResolutionState; }

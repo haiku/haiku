@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Terminal	3678865035
+1	lithuanian	x-vnd.Haiku-Terminal	3240808153
 Not found.	Terminal TermWindow		Nerasta.
 Switch Terminals	Terminal TermWindow		Pereiti į kitą terminalą
 Change directory	Terminal TermView		Keisti aplanką
@@ -21,6 +21,7 @@ Font:	Terminal AppearancePrefView		Šriftas:
 Copy here	Terminal TermView		Kopijuoti čia
 Really close?	Terminal TermWindow		Ar tikrai užverti?
 Copy	Terminal TermWindow		Kopijuoti
+Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminalas
 Color scheme:	Terminal AppearancePrefView		Spalvų schema:
 Window title:	Terminal TermWindow		Lango antraštė:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Nežinomas argumentas: „%s“\n

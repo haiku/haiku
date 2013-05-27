@@ -11,6 +11,7 @@
 
 #include <MenuField.h>
 
+#include <algorithm>
 #include <stdlib.h>
 #include <string.h>
 
@@ -134,9 +135,9 @@ static float kVMargin = 2.0f;
 
 
 BMenuField::BMenuField(BRect frame, const char* name, const char* label,
-		BMenu* menu, uint32 resize, uint32 flags)
+	BMenu* menu, uint32 resizingMode, uint32 flags)
 	:
-	BView(frame, name, resize, flags)
+	BView(frame, name, resizingMode, flags)
 {
 	CALLED();
 
@@ -152,9 +153,9 @@ BMenuField::BMenuField(BRect frame, const char* name, const char* label,
 
 
 BMenuField::BMenuField(BRect frame, const char* name, const char* label,
-		BMenu* menu, bool fixedSize, uint32 resize, uint32 flags)
+	BMenu* menu, bool fixedSize, uint32 resizingMode, uint32 flags)
 	:
-	BView(frame, name, resize, flags)
+	BView(frame, name, resizingMode, flags)
 {
 	InitObject(label);
 
@@ -168,7 +169,7 @@ BMenuField::BMenuField(BRect frame, const char* name, const char* label,
 
 
 BMenuField::BMenuField(const char* name, const char* label, BMenu* menu,
-		uint32 flags)
+	uint32 flags)
 	:
 	BView(name, flags | B_FRAME_EVENTS)
 {
@@ -353,54 +354,22 @@ BMenuField::AllUnarchived(const BMessage* from)
 
 
 void
-BMenuField::Draw(BRect update)
+BMenuField::Draw(BRect updateRect)
 {
-	BRect bounds(Bounds());
-	bool active = IsFocus() && Window()->IsActive();
+	DrawLabel(updateRect);
 
-	DrawLabel(bounds, update);
+	BRect rect(fMenuBar->Frame());
+	rect.InsetBy(-kVMargin, -kVMargin);
+	rgb_color base = fMenuBar->LowColor();
+	rgb_color background = LowColor();
+	uint32 flags = 0;
+	if (!fMenuBar->IsEnabled())
+		flags |= BControlLook::B_DISABLED;
+	if (IsFocus() && Window()->IsActive())
+		flags |= BControlLook::B_FOCUSED;
 
-	BRect frame(fMenuBar->Frame());
-
-	if (be_control_look != NULL) {
-		frame.InsetBy(-kVMargin, -kVMargin);
-		rgb_color base = fMenuBar->LowColor();
-		rgb_color background = LowColor();
-		uint32 flags = 0;
-		if (!fMenuBar->IsEnabled())
-			flags |= BControlLook::B_DISABLED;
-		if (active)
-			flags |= BControlLook::B_FOCUSED;
-		be_control_look->DrawMenuFieldFrame(this, frame, update, base,
-			background, flags);
-		return;
-	}
-
-	if (frame.InsetByCopy(-kVMargin, -kVMargin).Intersects(update)) {
-		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));
-		StrokeLine(BPoint(frame.left - 1.0f, frame.top - 1.0f),
-			BPoint(frame.left - 1.0f, frame.bottom - 1.0f));
-		StrokeLine(BPoint(frame.left - 1.0f, frame.top - 1.0f),
-			BPoint(frame.right - 1.0f, frame.top - 1.0f));
-
-		StrokeLine(BPoint(frame.left + 1.0f, frame.bottom + 1.0f),
-			BPoint(frame.right + 1.0f, frame.bottom + 1.0f));
-		StrokeLine(BPoint(frame.right + 1.0f, frame.top + 1.0f));
-
-		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_4_TINT));
-		StrokeLine(BPoint(frame.left - 1.0f, frame.bottom),
-			BPoint(frame.left - 1.0f, frame.bottom));
-		StrokeLine(BPoint(frame.right, frame.top - 1.0f),
-			BPoint(frame.right, frame.top - 1.0f));
-	}
-
-	if (active || fTransition) {
-		SetHighColor(active ? ui_color(B_KEYBOARD_NAVIGATION_COLOR) :
-			ViewColor());
-		StrokeRect(frame.InsetByCopy(-kVMargin, -kVMargin));
-
-		fTransition = false;
-	}
+	be_control_look->DrawMenuFieldFrame(this, rect, updateRect, base,
+		background, flags);
 }
 
 
@@ -452,7 +421,7 @@ BMenuField::MouseDown(BPoint where)
 	fMenuBar->StartMenuBar(-1, false, true, &bounds);
 
 	fMenuTaskID = spawn_thread((thread_func)_thread_entry,
-			 	"_m_task_", B_NORMAL_PRIORITY, this);
+		"_m_task_", B_NORMAL_PRIORITY, this);
 	if (fMenuTaskID >= 0)
 		resume_thread(fMenuTaskID);
 }
@@ -502,9 +471,9 @@ BMenuField::MakeFocus(bool state)
 
 
 void
-BMenuField::MessageReceived(BMessage* msg)
+BMenuField::MessageReceived(BMessage* message)
 {
-	BView::MessageReceived(msg);
+	BView::MessageReceived(message);
 }
 
 
@@ -654,18 +623,18 @@ BMenuField::Alignment() const
 
 
 void
-BMenuField::SetDivider(float divider)
+BMenuField::SetDivider(float position)
 {
-	divider = floorf(divider + 0.5);
+	position = floorf(position + 0.5);
 
-	float dx = fDivider - divider;
+	float delta = fDivider - position;
 
-	if (dx == 0.0f)
+	if (delta == 0.0f)
 		return;
 
-	fDivider = divider;
+	fDivider = position;
 
-	if (Flags() & B_SUPPORTS_LAYOUT) {
+	if ((Flags() & B_SUPPORTS_LAYOUT) != 0) {
 		// We should never get here, since layout support means, we also
 		// layout the divider, and don't use this method at all.
 		Relayout();
@@ -910,7 +879,7 @@ void
 BMenuField::DoLayout()
 {
 	// Bail out, if we shan't do layout.
-	if (!(Flags() & B_SUPPORTS_LAYOUT))
+	if ((Flags() & B_SUPPORTS_LAYOUT) == 0)
 		return;
 
 	CALLED();
@@ -984,7 +953,7 @@ BMenuField::InitObject(const char* label)
 	SetLabel(label);
 
 	if (label)
-		fDivider = (float)floor(Frame().Width() / 2.0f);
+		fDivider = floorf(Frame().Width() / 2.0f);
 	else
 		fDivider = 0;
 }
@@ -1009,42 +978,44 @@ BMenuField::InitObject2()
 
 
 void
-BMenuField::DrawLabel(BRect bounds, BRect update)
+BMenuField::DrawLabel(BRect updateRect)
 {
 	CALLED();
 
 	_ValidateLayoutData();
 	font_height& fh = fLayoutData->font_info;
 
-	if (Label()) {
-		SetLowColor(ViewColor());
+	const char* label = Label();
+	if (label == NULL)
+		return;
 
-		// horizontal alignment
-		float x;
-		switch (fAlign) {
-			case B_ALIGN_RIGHT:
-				x = fDivider - fLayoutData->label_width - 3.0;
-				break;
+	SetLowColor(ViewColor());
 
-			case B_ALIGN_CENTER:
-				x = fDivider - fLayoutData->label_width / 2.0;
-				break;
+	// horizontal alignment
+	float x;
+	switch (fAlign) {
+		case B_ALIGN_RIGHT:
+			x = fDivider - fLayoutData->label_width - 3.0;
+			break;
 
-			default:
-				x = 0.0;
-				break;
-		}
+		case B_ALIGN_CENTER:
+			x = fDivider - fLayoutData->label_width / 2.0;
+			break;
 
-		// vertical alignment
-		float y = Bounds().top
-			+ (Bounds().Height() + 1 - fh.ascent - fh.descent) / 2
-			+ fh.ascent;
-		y = floor(y + 0.5);
-
-		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			IsEnabled() ? B_DARKEN_MAX_TINT : B_DISABLED_LABEL_TINT));
-		DrawString(Label(), BPoint(x, y));
+		default:
+			x = 0.0;
+			break;
 	}
+
+	// vertical alignment
+	float y = Bounds().top
+		+ (Bounds().Height() + 1 - fh.ascent - fh.descent) / 2
+		+ fh.ascent;
+	y = floor(y + 0.5);
+
+	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		IsEnabled() ? B_DARKEN_MAX_TINT : B_DISABLED_LABEL_TINT));
+	DrawString(label, BPoint(x, y));
 }
 
 
@@ -1136,8 +1107,8 @@ BMenuField::_InitMenuBar(BMenu* menu, BRect frame, bool fixedSize)
 	fMenu = menu;
 	InitMenu(menu);
 
-	if ((Flags() & B_SUPPORTS_LAYOUT)) {
-		fMenuBar = new _BMCMenuBar_(fixedSize, this);
+	if ((Flags() & B_SUPPORTS_LAYOUT) != 0) {
+		fMenuBar = new _BMCMenuBar_(this);
 	} else {
 		frame.left = _MenuBarOffset();
 		frame.top = kVMargin;
@@ -1163,7 +1134,6 @@ BMenuField::_InitMenuBar(BMenu* menu, BRect frame, bool fixedSize)
 
 	AddChild(fMenuBar);
 	fMenuBar->AddItem(menu);
-
 	fMenuBar->SetFont(be_plain_font);
 }
 
@@ -1176,7 +1146,7 @@ BMenuField::_InitMenuBar(const BMessage* archive)
 		fFixedSizeMB = fixed;
 
 	fMenuBar = (BMenuBar*)FindView("_mc_mb_");
-	if (!fMenuBar) {
+	if (fMenuBar == NULL) {
 		_InitMenuBar(new BMenu(""), BRect(0, 0, 100, 15), fFixedSizeMB);
 		InitObject2();
 	} else {
@@ -1223,8 +1193,8 @@ BMenuField::_ValidateLayoutData()
 		divider = fLayoutData->label_width + 5;
 
 	// If we shan't do real layout, we let the current divider take influence.
-	if (!(Flags() & B_SUPPORTS_LAYOUT))
-		divider = max_c(divider, fDivider);
+	if ((Flags() & B_SUPPORTS_LAYOUT) == 0)
+		divider = std::max(divider, fDivider);
 
 	// get the minimal (== preferred) menu bar size
 	// TODO: BMenu::MinSize() is using the ResizeMode() to decide the
@@ -1257,7 +1227,7 @@ BMenuField::_ValidateLayoutData()
 float
 BMenuField::_MenuBarOffset() const
 {
-	return max_c(kVMargin, fDivider + kVMargin);
+	return std::max(fDivider + kVMargin, kVMargin);
 }
 
 

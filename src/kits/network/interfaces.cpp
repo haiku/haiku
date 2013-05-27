@@ -106,16 +106,27 @@ if_nameindex(void)
 	if (interfaceArray == NULL)
 		return NULL;
 
-	for (int i = 0; i < count; i++) {
-		interfaceArray[i].if_index = interfaces->ifr_index;
-		interfaceArray[i].if_name = strdup(interfaces->ifr_name);
+	int i = 0;
+	while (count > 0) {
+		// retrieve interface index
+		ifreq request;	
+		strlcpy(((struct ifreq&)request).ifr_name, interfaces->ifr_name, 
+			IF_NAMESIZE);
+
+		if (ioctl(socket.FD(), SIOCGIFINDEX, &request, 
+				sizeof(struct ifreq)) >= 0) {
+			interfaceArray[i].if_index = request.ifr_index;
+			interfaceArray[i].if_name = strdup(interfaces->ifr_name);
+			i++;
+		}
 
 		interfaces
 			= (ifreq*)((char*)interfaces + _SIZEOF_ADDR_IFREQ(interfaces[0]));
+		count--;
 	}
 
-	interfaceArray[count].if_index = 0;
-	interfaceArray[count].if_name = NULL;
+	interfaceArray[i].if_index = 0;
+	interfaceArray[i].if_name = NULL;
 
 	return interfaceArray;
 }

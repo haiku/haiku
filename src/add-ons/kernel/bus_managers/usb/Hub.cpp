@@ -221,8 +221,13 @@ Hub::Explore(change_item **changeList)
 
 				int32 retry = 2;
 				while (retry--) {
-					// wait some time for the device to power up
-					snooze(USB_DELAY_DEVICE_POWER_UP);
+					// wait for stable device power
+					result = _DebouncePort(i);
+					if (result != B_OK) {
+						TRACE_ERROR("debouncing port %" B_PRId32
+							" failed: %s\n", i, strerror(result));
+						break;
+					}
 
 					// reset the port, this will also enable it
 					result = ResetPort(i);
@@ -432,4 +437,39 @@ Hub::BuildDeviceName(char *string, uint32 *index, size_t bufferSize,
 	}
 
 	return B_OK;
+}
+
+
+status_t
+Hub::_DebouncePort(uint8 index)
+{
+	uint32 timeout = 0;
+	uint32 stableTime = 0;
+	while (timeout < USB_DEBOUNCE_TIMEOUT) {
+		snooze(USB_DEBOUNCE_CHECK_INTERVAL);
+		timeout += USB_DEBOUNCE_CHECK_INTERVAL;
+
+		status_t result = UpdatePortStatus(index);
+		if (result != B_OK)
+			return result;
+
+		if ((fPortStatus[index].change & PORT_STATUS_CONNECTION) == 0) {
+			stableTime += USB_DEBOUNCE_CHECK_INTERVAL;
+			if (stableTime >= USB_DEBOUNCE_STABLE_TIME)
+				return B_OK;
+			continue;
+		}
+
+		// clear the connection change and reset stable time
+		result = DefaultPipe()->SendRequest(USB_REQTYPE_CLASS
+			| USB_REQTYPE_OTHER_OUT, USB_REQUEST_CLEAR_FEATURE,
+			C_PORT_CONNECTION, index + 1, 0, NULL, 0, NULL);
+		if (result != B_OK)
+			return result;
+
+		TRACE("got connection change during debounce, resetting stable time\n");
+		stableTime = 0;
+	}
+
+	return B_TIMED_OUT;
 }

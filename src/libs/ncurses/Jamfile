@@ -1,3 +1,4 @@
 SubDir HAIKU_TOP src libs ncurses ;
 
 SubInclude HAIKU_TOP src libs ncurses ncurses ;
+SubInclude HAIKU_TOP src libs ncurses progs ;

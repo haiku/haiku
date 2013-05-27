@@ -216,7 +216,7 @@ get_type_string(char *buffer, size_t bufferSize, type_code type)
 	for (int32 i = 0; i < 4; i++) {
 		buffer[i] = type >> (24 - 8 * i);
 		if (buffer[i] < ' ' || buffer[i] == 0x7f) {
-			snprintf(buffer, bufferSize, "0x%04lx", type);
+			snprintf(buffer, bufferSize, "0x%04" B_PRIx32, type);
 			break;
 		} else if (i == 3)
 			buffer[4] = '\0';
@@ -705,7 +705,8 @@ HeaderView::UpdateIcon()
 void
 HeaderView::FormatValue(char *buffer, size_t bufferSize, off_t value)
 {
-	snprintf(buffer, bufferSize, fBase == kHexBase ? "0x%Lx" : "%Ld", value);
+	snprintf(buffer, bufferSize, fBase == kHexBase ? "0x%" B_PRIxOFF : "%"
+		B_PRIdOFF, value);
 }
 
 
@@ -1550,7 +1551,7 @@ ProbeView::AttachedToWindow()
 	const uint32 blockSizes[] = {512, 1024, 2048};
 	for (uint32 i = 0; i < sizeof(blockSizes) / sizeof(blockSizes[0]); i++) {
 		char buffer[32];
-		snprintf(buffer, sizeof(buffer), "%ld%s", blockSizes[i],
+		snprintf(buffer, sizeof(buffer), "%" B_PRId32 "%s", blockSizes[i],
 			fEditor.IsDevice() && fEditor.BlockSize() == blockSizes[i]
 			? B_TRANSLATE(" (native)") : "");
 		subMenu->AddItem(item = new BMenuItem(buffer,
@@ -1582,7 +1583,7 @@ ProbeView::AttachedToWindow()
 		fontSize = 0;
 	for (uint32 i = 0; i < sizeof(fontSizes) / sizeof(fontSizes[0]); i++) {
 		char buffer[16];
-		snprintf(buffer, sizeof(buffer), "%ld", fontSizes[i]);
+		snprintf(buffer, sizeof(buffer), "%" B_PRId32, fontSizes[i]);
 		subMenu->AddItem(item = new BMenuItem(buffer,
 			message = new BMessage(kMsgFontSize)));
 		message->AddFloat("font_size", fontSizes[i]);
@@ -1653,23 +1654,30 @@ ProbeView::_UpdateSelectionMenuItems(int64 start, int64 end)
 	// update menu items
 
 	char buffer[128];
-	if (fDataView->Base() == kHexBase)
-		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Native: 0x%0*Lx"), size * 2, position);
-	else
-		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Native: %Ld (0x%0*Lx)"), position, size * 2, position);
+	if (fDataView->Base() == kHexBase) {
+		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Native: 0x%0*Lx"),
+			size * 2, position);
+	} else {
+		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Native: %Ld (0x%0*Lx)"),
+			position, size * 2, position);
+	}
 
 	fNativeMenuItem->SetLabel(buffer);
-	fNativeMenuItem->SetEnabled(position >= 0 && (position * fEditor.BlockSize()) < fEditor.FileSize());
+	fNativeMenuItem->SetEnabled(position >= 0
+		&& (off_t)(position * fEditor.BlockSize()) < fEditor.FileSize());
 	fNativeMenuItem->Message()->ReplaceInt64("block", position);
 
 	position = B_SWAP_INT64(position) >> (8 * (8 - size));
-	if (fDataView->Base() == kHexBase)
-		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Swapped: 0x%0*Lx"), size * 2, position);
-	else
-		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Swapped: %Ld (0x%0*Lx)"), position, size * 2, position);
+	if (fDataView->Base() == kHexBase) {
+		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Swapped: 0x%0*Lx"),
+			size * 2, position);
+	} else {
+		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Swapped: %Ld (0x%0*Lx)"),
+			position, size * 2, position);
+	}
 
 	fSwappedMenuItem->SetLabel(buffer);
-	fSwappedMenuItem->SetEnabled(position >= 0 && (position * fEditor.BlockSize()) < fEditor.FileSize());
+	fSwappedMenuItem->SetEnabled(position >= 0 && (off_t)(position * fEditor.BlockSize()) < fEditor.FileSize());
 	fSwappedMenuItem->Message()->ReplaceInt64("block", position);
 }
 

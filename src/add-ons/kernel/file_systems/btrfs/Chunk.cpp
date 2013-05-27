@@ -35,13 +35,15 @@ Chunk::Chunk(struct btrfs_chunk* chunk, fsblock_t offset)
 	memcpy(fChunk, chunk, sizeof(struct btrfs_chunk)
 		+ chunk->StripeCount() * sizeof(struct btrfs_stripe));
 
-	TRACE("chunk[0] length %llu owner %llu stripe_length %llu type %llu "
-			"stripe_count %u sub_stripes %u sector_size %lu\n", chunk->Length(),
-			chunk->Owner(), chunk->StripeLength(), chunk->Type(),
-			chunk->StripeCount(), chunk->SubStripes(), chunk->SectorSize());
+	TRACE("chunk[0] length %" B_PRIu64 " owner %" B_PRIu64 " stripe_length %"
+		B_PRIu64 " type %" B_PRIu64 " stripe_count %u sub_stripes %u "
+		"sector_size %" B_PRIu32 "\n", chunk->Length(), chunk->Owner(), 
+		chunk->StripeLength(), chunk->Type(), chunk->StripeCount(), 
+		chunk->SubStripes(), chunk->SectorSize());
 	for(int32 i = 0; i < chunk->StripeCount(); i++) {
-		TRACE("chunk.stripe[%ld].physical %lld deviceid %lld\n", i,
-			chunk->stripes[i].Offset(), chunk->stripes[i].DeviceID());
+		TRACE("chunk.stripe[%" B_PRId32 "].physical %" B_PRId64 " deviceid %"
+			B_PRId64 "\n", i, chunk->stripes[i].Offset(),
+			chunk->stripes[i].DeviceID());
 	}
 }
 
@@ -66,8 +68,8 @@ Chunk::FindBlock(off_t logical, off_t &physical)
 	if (fChunk == NULL)
 		return B_NO_INIT;
 
-	if (logical < fChunkOffset
-		|| logical > (fChunkOffset + fChunk->Length()))
+	if (logical < (off_t)fChunkOffset
+		|| logical > (off_t)(fChunkOffset + fChunk->Length()))
 			return B_BAD_VALUE;
 	
 	// only one stripe

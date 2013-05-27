@@ -93,11 +93,12 @@ LocalDeviceHandler::ClearWantedEvent(BMessage* msg, uint16 event, uint16 opcode)
 	// for each Event
 	while (msg->FindInt16("eventExpected", eventIndex, &eventFound) == B_OK) {
 
-		printf("%s:Event expected %d@%ld...\n", __FUNCTION__, event, eventIndex);
+		printf("%s:Event expected %d@%" B_PRId32 "...\n", __FUNCTION__, event,
+			eventIndex);
 
 		if (eventFound == event) {
 
-			printf("%s:Event matches@%ld", __FUNCTION__, eventIndex);
+			printf("%s:Event matches@%" B_PRId32 "\n", __FUNCTION__, eventIndex);
 			// there is an opcode specified
 			if (opcode != 0) {
 

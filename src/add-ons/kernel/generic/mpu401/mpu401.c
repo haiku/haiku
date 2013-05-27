@@ -237,7 +237,7 @@ midi_close(void * cookie)
 	delete_sem(mpu_device->writesemaphore);
 
 	atomic_add(&mpu_device->count, -1);
-  	PRINT(("midi_close() done (count = %lu)\n", mpu_device->count));
+  	PRINT(("midi_close() done (count = %" B_PRId32 ")\n", mpu_device->count));
 
 	return B_OK;
 }

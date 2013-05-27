@@ -669,7 +669,7 @@ SerialDevice::_WriteToDevice()
 
 void
 SerialDevice::_ReadCallbackFunction(void *cookie, status_t status, void *data,
-	uint32 actualLength)
+	size_t actualLength)
 {
 	TRACE_FUNCALLS("read callback: cookie: 0x%08x status: 0x%08x data: 0x%08x "
 		"length: %lu\n", cookie, status, data, actualLength);
@@ -683,7 +683,7 @@ SerialDevice::_ReadCallbackFunction(void *cookie, status_t status, void *data,
 
 void
 SerialDevice::_WriteCallbackFunction(void *cookie, status_t status, void *data,
-	uint32 actualLength)
+	size_t actualLength)
 {
 	TRACE_FUNCALLS("write callback: cookie: 0x%08x status: 0x%08x data: 0x%08x "
 		"length: %lu\n", cookie, status, data, actualLength);
@@ -697,7 +697,7 @@ SerialDevice::_WriteCallbackFunction(void *cookie, status_t status, void *data,
 
 void
 SerialDevice::_InterruptCallbackFunction(void *cookie, status_t status,
-	void *data, uint32 actualLength)
+	void *data, size_t actualLength)
 {
 	TRACE_FUNCALLS("interrupt callback: cookie: 0x%08x status: 0x%08x data: "
 		"0x%08x len: %lu\n", cookie, status, data, actualLength);

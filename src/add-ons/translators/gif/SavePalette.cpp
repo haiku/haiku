@@ -244,7 +244,7 @@ SavePalette::SavePalette(BBitmap *bitmap, int32 maxSizeInBits)
 	  fSize(0),
 	  fSizeInBits(0),
 	  fMode(OPTIMAL_PALETTE),
-	  fTransparentMode(fTransparentMode),
+	  fTransparentMode(NO_TRANSPARENCY),
 	  fTransparentIndex(-1),
 	  fBackgroundIndex(0),
 	  fFatalError(pal == NULL)

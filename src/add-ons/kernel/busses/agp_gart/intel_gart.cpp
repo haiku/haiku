@@ -108,7 +108,7 @@ struct intel_info {
 	uint32		type;
 
 	uint32		*gtt_base;
-	addr_t		gtt_physical_base;
+	phys_addr_t	gtt_physical_base;
 	area_id		gtt_area;
 	size_t		gtt_entries;
 	size_t		gtt_stolen_entries;
@@ -117,7 +117,7 @@ struct intel_info {
 	area_id		registers_area;
 
 	addr_t		aperture_base;
-	addr_t		aperture_physical_base;
+	phys_addr_t	aperture_physical_base;
 	area_id		aperture_area;
 	size_t		aperture_size;
 	size_t		aperture_stolen_size;
@@ -385,7 +385,7 @@ intel_map(intel_info &info)
 
 	AreaKeeper mmioMapper;
 	info.registers_area = mmioMapper.Map("intel GMCH mmio",
-		(void*)info.display.u.h0.base_registers[mmioIndex],
+		info.display.u.h0.base_registers[mmioIndex],
 		info.display.u.h0.base_register_sizes[mmioIndex], B_ANY_KERNEL_ADDRESS,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&info.registers);
 	if (mmioMapper.InitCheck() < B_OK) {
@@ -439,12 +439,12 @@ intel_map(intel_info &info)
 	info.gtt_entries = gttSize / 4096;
 	info.gtt_stolen_entries = stolenSize / 4096;
 
-	TRACE("GTT base %lx, size %lu, entries %lu, stolen %lu\n",
+	TRACE("GTT base %" B_PRIxPHYSADDR ", size %lu, entries %lu, stolen %lu\n",
 		info.gtt_physical_base, gttSize, info.gtt_entries, stolenSize);
 
 	AreaKeeper gttMapper;
 	info.gtt_area = gttMapper.Map("intel GMCH gtt",
-		(void*)info.gtt_physical_base, gttSize, B_ANY_KERNEL_ADDRESS,
+		info.gtt_physical_base, gttSize, B_ANY_KERNEL_ADDRESS,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&info.gtt_base);
 	if (gttMapper.InitCheck() < B_OK) {
 		dprintf("intel_gart: could not map GTT!\n");
@@ -460,14 +460,16 @@ intel_map(intel_info &info)
 		"size %ld MB, GTT size %ld KB\n", (stolenSize + (1023 << 10)) >> 20,
 		info.aperture_size >> 20, gttSize >> 10);
 
-	dprintf("intel_gart: GTT base = 0x%lx\n", info.gtt_physical_base);
-	dprintf("intel_gart: MMIO base = 0x%lx\n",
+	dprintf("intel_gart: GTT base = 0x%" B_PRIxPHYSADDR "\n",
+		info.gtt_physical_base);
+	dprintf("intel_gart: MMIO base = 0x%" B_PRIx32 "\n",
 		info.display.u.h0.base_registers[mmioIndex]);
-	dprintf("intel_gart: GMR base = 0x%lx\n", info.aperture_physical_base);
+	dprintf("intel_gart: GMR base = 0x%" B_PRIxPHYSADDR "\n",
+		info.aperture_physical_base);
 
 	AreaKeeper apertureMapper;
 	info.aperture_area = apertureMapper.Map("intel graphics aperture",
-		(void*)info.aperture_physical_base, info.aperture_size,
+		info.aperture_physical_base, info.aperture_size,
 		B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
 		B_READ_AREA | B_WRITE_AREA, (void**)&info.aperture_base);
 	if (apertureMapper.InitCheck() < B_OK) {
@@ -475,7 +477,7 @@ intel_map(intel_info &info)
 		dprintf(DEVICE_NAME ": enabling write combined mode failed.\n");
 
 		info.aperture_area = apertureMapper.Map("intel graphics aperture",
-			(void*)info.aperture_physical_base, info.aperture_size,
+			info.aperture_physical_base, info.aperture_size,
 			B_ANY_KERNEL_BLOCK_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 			(void**)&info.aperture_base);
 	}

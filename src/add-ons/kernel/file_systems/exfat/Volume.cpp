@@ -218,7 +218,7 @@ LabelVisitor::LabelVisitor(Volume* volume)
 bool
 LabelVisitor::VisitLabel(struct exfat_entry* entry)
 {
-	dprintf("LabelVisitor::VisitLabel()\n");
+	TRACE("LabelVisitor::VisitLabel()\n");
 	char utfName[30];
 	size_t utfLength = 30;
 	unicode_to_utf8((const uchar*)entry->name_label.name,
@@ -318,7 +318,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	}
 	
 	fBlockSize = 1 << fSuperBlock.BlockShift();
-	TRACE("block size %ld\n", fBlockSize);
+	TRACE("block size %" B_PRIu32 "\n", fBlockSize);
 	fEntriesPerBlock = (fBlockSize / sizeof(struct exfat_entry));
 		
 	// check if the device size is large enough to hold the file system
@@ -348,7 +348,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		return status;
 	}
 
-	TRACE("Volume::Mount(): Found root node: %lld (%s)\n", fRootNode->ID(),
+	TRACE("Volume::Mount(): Found root node: %" B_PRIdINO " (%s)\n", fRootNode->ID(),
 		strerror(fRootNode->InitCheck()));
 
 	// all went fine
@@ -418,9 +418,12 @@ Volume::LoadSuperBlock()
 status_t
 Volume::ClusterToBlock(cluster_t cluster, fsblock_t &block)
 {
+	if (cluster < 2)
+		return B_BAD_VALUE;
 	block = ((cluster - 2) << SuperBlock().BlocksPerClusterShift())
 		+ SuperBlock().FirstDataBlock();
-	TRACE("Volume::ClusterToBlock() cluster %lu %u %lu: %llu, %lu\n", cluster, 
+	TRACE("Volume::ClusterToBlock() cluster %" B_PRIu32 " %u %" B_PRIu32 ": %"
+		B_PRIu64 ", %" B_PRIu32 "\n", cluster,
 		SuperBlock().BlocksPerClusterShift(), SuperBlock().FirstDataBlock(),
 		block, SuperBlock().FirstFatBlock());
 	return B_OK;
@@ -436,7 +439,8 @@ Volume::NextCluster(cluster_t _cluster)
 		+ _cluster / clusterPerBlock;
 	cluster_t *cluster = (cluster_t *)block.SetTo(blockNum);
 	cluster += _cluster % clusterPerBlock;
-	TRACE("Volume::NextCluster() cluster %lu next %lu\n", _cluster, *cluster);
+	TRACE("Volume::NextCluster() cluster %" B_PRIu32 " next %" B_PRIu32 "\n",
+		_cluster, *cluster);
 	return *cluster;
 }
 
@@ -463,8 +467,8 @@ Volume::GetIno(cluster_t cluster, uint32 offset, ino_t parent)
 	key.offset = offset;
 	struct node* node = fNodeTree.Lookup(key);
 	if (node != NULL) {
-		TRACE("Volume::GetIno() cached cluster %lu offset %lu ino %" B_PRIdINO
-			"\n", cluster, offset, node->ino);
+		TRACE("Volume::GetIno() cached cluster %" B_PRIu32 " offset %" B_PRIu32
+			" ino %" B_PRIdINO "\n", cluster, offset, node->ino);
 		return node->ino;
 	}
 	node = new struct node();
@@ -473,8 +477,8 @@ Volume::GetIno(cluster_t cluster, uint32 offset, ino_t parent)
 	node->parent = parent;
 	fNodeTree.Insert(node);
 	fInoTree.Insert(node);
-	TRACE("Volume::GetIno() new cluster %lu offset %lu ino %" B_PRIdINO "\n",
-		cluster, offset, node->ino);
+	TRACE("Volume::GetIno() new cluster %" B_PRIu32 " offset %" B_PRIu32 
+		" ino %" B_PRIdINO "\n", cluster, offset, node->ino);
 	return node->ino;
 }
 

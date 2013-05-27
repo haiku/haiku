@@ -425,7 +425,7 @@ PlaylistListView::Randomize()
 		int32 index = CurrentSelection(count);
 		if (index < 0)
 			break;
-		if (!indices.AddItem((void*)index))
+		if (!indices.AddItem((void*)(addr_t)index))
 			return;
 		count++;
 	}
@@ -435,7 +435,7 @@ PlaylistListView::Randomize()
 		// no selection, simply add all items
 		count = CountItems();
 		for (int32 i = 0; i < count; i++) {
-			if (!indices.AddItem((void*)i))
+			if (!indices.AddItem((void*)(addr_t)i))
 				return;
 		}
 	}
@@ -458,7 +458,7 @@ void
 PlaylistListView::RemoveToTrash(int32 index)
 {
 	BList indices;
-	indices.AddItem((void*)index);
+	indices.AddItem((void*)(addr_t)index);
 	RemoveItemList(indices, true);
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef BLIST_VALUE_NODE_H
@@ -36,6 +36,13 @@ public:
 	virtual int32					CountChildren() const;
 	virtual ValueNodeChild*			ChildAt(int32 index) const;
 
+	virtual	bool					IsRangedContainer() const;
+	virtual	bool					IsContainerRangeFixed() const;
+	virtual	void					ClearChildren();
+	virtual	status_t				CreateChildrenInRange(int32 lowIndex,
+										int32 highIndex);
+	virtual	status_t				SupportedChildRange(int32& lowIndex,
+										int32& highIndex) const;
 private:
 			class BListElementNodeChild;
 			class BListItemCountNodeChild;
@@ -55,6 +62,7 @@ private:
 			BVariant				fItemCountLocation;
 			Type*					fItemCountType;
 			int32					fItemCount;
+			bool					fCountChildCreated;
 };
 
 

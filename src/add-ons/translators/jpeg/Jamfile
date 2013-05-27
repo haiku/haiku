@@ -12,7 +12,8 @@ UseHeaders $(HAIKU_JPEG_HEADERS) : true ;
 
 AddResources JPEGTranslator : JPEGTranslator.rdef ;
 
-Includes [ FGristFiles be_jdatadst.cpp be_jerror.cpp ]
+Includes [ FGristFiles be_jdatadst.cpp be_jdatasrc.cpp
+	be_jerror.cpp JPEGTranslator.cpp ]
 	: $(HAIKU_JPEG_HEADERS_DEPENDENCY) ;
 
 Translator JPEGTranslator :

@@ -37,47 +37,49 @@
 
 
 area_id
-map_mem(void **virt, void *phy, size_t size, uint32 protection,
+map_mem(void **virt, phys_addr_t phy, size_t size, uint32 protection,
 	const char *name)
 {
 	uint32 offset;
-	void *phyadr;
+	phys_addr_t phyadr;
 	void *mapadr;
 	area_id area;
 
-	TRACE("mapping physical address %p with %ld bytes for %s\n", phy, size,
-		name);
+	TRACE("mapping physical address %" B_PRIxPHYSADDR " with %ld bytes for %s\n",
+		phy, size, name);
 
 	offset = (uint32)phy & (B_PAGE_SIZE - 1);
-	phyadr = (char *)phy - offset;
+	phyadr = phy - offset;
 	size = ROUNDUP(size + offset, B_PAGE_SIZE);
-	area = map_physical_memory(name, (addr_t)phyadr, size,
+	area = map_physical_memory(name, phyadr, size,
 		B_ANY_KERNEL_BLOCK_ADDRESS, protection, &mapadr);
 	if (area < B_OK) {
-		TRACE("mapping '%s' failed, error 0x%lx (%s)\n", name, area, strerror(area));
+		TRACE("mapping '%s' failed, error 0x%" B_PRIx32 " (%s)\n", name, area,
+			strerror(area));
 		return area;
 	}
 
 	*virt = (char *)mapadr + offset;
 
-	TRACE("physical = %p, virtual = %p, offset = %ld, phyadr = %p, mapadr = %p, size = %ld, area = 0x%08lx\n",
-		phy, *virt, offset, phyadr, mapadr, size, area);
+	TRACE("physical = %" B_PRIxPHYSADDR ", virtual = %p, offset = %" B_PRIu32
+		", phyadr = %" B_PRIxPHYSADDR ", mapadr = %p, size = %" B_PRIuSIZE
+		", area = 0x%08" B_PRIx32 "\n", phy, *virt, offset, phyadr, mapadr,
+		size, area);
 
 	return area;
 }
 
 
 area_id
-alloc_mem(void **virt, void **phy, size_t size, uint32 protection,
+alloc_mem(void **virt, phys_addr_t *phy, size_t size, uint32 protection,
 	const char *name)
 {
-// TODO: phy should be phys_addr_t*!
 	physical_entry pe;
 	void * virtadr;
 	area_id areaid;
 	status_t rv;
 
-	TRACE("allocating %ld bytes for %s\n", size, name);
+	TRACE("allocating %" B_PRIuSIZE " bytes for %s\n", size, name);
 
 	size = ROUNDUP(size, B_PAGE_SIZE);
 	areaid = create_area(name, &virtadr, B_ANY_KERNEL_ADDRESS, size,
@@ -97,7 +99,8 @@ alloc_mem(void **virt, void **phy, size_t size, uint32 protection,
 	if (virt)
 		*virt = virtadr;
 	if (phy)
-		*phy = (void*)(addr_t)pe.address;
-	TRACE("area = %ld, size = %ld, virt = %p, phy = %" B_PRIxPHYSADDR "\n", areaid, size, virtadr, pe.address);
+		*phy = pe.address;
+	TRACE("area = %" B_PRId32 ", size = %" B_PRIuSIZE ", virt = %p, phy = %"
+		B_PRIxPHYSADDR "\n", areaid, size, virtadr, pe.address);
 	return areaid;
 }

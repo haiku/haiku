@@ -236,8 +236,10 @@ void
 ReplaceChange::Apply(off_t bufferOffset, uint8 *buffer, size_t bufferSize)
 {
 	// is it in our range?
-	if (fOffset > bufferOffset + bufferSize || fOffset + fSize < bufferOffset)
+	if (fOffset > (bufferOffset + (off_t)bufferSize)
+		|| (fOffset + (off_t)fSize) < bufferOffset) {
 		return;
+	}
 
 	// don't change anything outside the supplied buffer
 	off_t offset = fOffset;
@@ -263,8 +265,10 @@ void
 ReplaceChange::Revert(off_t bufferOffset, uint8 *buffer, size_t bufferSize)
 {
 	// is it in our range?
-	if (fOffset - bufferOffset > bufferSize || fOffset + fSize < bufferOffset)
+	if (fOffset - bufferOffset > (off_t)bufferSize
+		|| fOffset + (off_t)fSize < bufferOffset) {
 		return;
+	}
 
 	// don't change anything outside the supplied buffer
 	off_t offset = fOffset;
@@ -307,8 +311,8 @@ ReplaceChange::Merge(DataChange *_change)
 
 	// are the changes adjacent?
 
-	if (change->fOffset + change->fSize != fOffset
-		&& fOffset + fSize != change->fOffset)
+	if (change->fOffset + (off_t)change->fSize != fOffset
+		&& fOffset + (off_t)fSize != change->fOffset)
 		return false;
 
 	// okay, we can try to merge the two changes
@@ -560,7 +564,7 @@ DataEditor::Replace(off_t offset, const uint8 *data, size_t length)
 
 	if (offset >= fSize)
 		return B_BAD_VALUE;
-	if (offset + length > fSize)
+	if (offset + (off_t)length > fSize)
 		length = fSize - offset;
 
 	if (fNeedsUpdate) {
@@ -705,7 +709,7 @@ DataEditor::Save()
 
 		// don't try to change the file size
 		size_t size = fRealViewSize;
-		if (fRealViewOffset + fRealViewSize > fSize)
+		if (fRealViewOffset + (off_t)fRealViewSize > (off_t)fSize)
 			size = fSize - fRealViewOffset;
 
 		ssize_t bytesWritten;
@@ -1125,7 +1129,7 @@ DataEditor::Find(off_t startPosition, const uint8 *data, size_t dataSize,
 		}
 
 		for (size_t i = firstByte; i < fRealViewSize; i++) {
-			if (position + i + dataSize > fSize)
+			if (position + (off_t)(i + dataSize) > (off_t)fSize)
 				break;
 
 			if (!compareFunc(fView + i, data, 1)) {

@@ -122,6 +122,10 @@ DebugReportGenerator::_GenerateReport(const entry_ref& outputPath)
 	if (result != B_OK)
 		return result;
 
+	result = _DumpRunningThreads(output);
+	if (result != B_OK)
+		return result;
+
 	result = _DumpLoadedImages(output);
 	if (result != B_OK)
 		return result;
@@ -131,10 +135,6 @@ DebugReportGenerator::_GenerateReport(const entry_ref& outputPath)
 		return result;
 
 	result = _DumpSemaphores(output);
-	if (result != B_OK)
-		return result;
-
-	result = _DumpRunningThreads(output);
 	if (result != B_OK)
 		return result;
 
@@ -248,22 +248,34 @@ DebugReportGenerator::_DumpLoadedImages(BString& _output)
 	AutoLocker< ::Team> locker(fTeam);
 
 	_output << "\nLoaded Images:\n";
+	BObjectList<Image> images;
 	BString data;
 	for (ImageList::ConstIterator it = fTeam->Images().GetIterator();
 		 Image* image = it.Next();) {
+		 images.AddItem(image);
+	}
+
+	images.SortItems(&_CompareImages);
+
+	Image* image = NULL;
+	data.SetToFormat("\tID\t\tText Base\tText End\tData Base\tData"
+		" End\tType\tName\n\t");
+	_output << data;
+	_output.Append('-', 80);
+	_output.Append("\n");
+	for (int32 i = 0; (image = images.ItemAt(i)) != NULL; i++) {
 		const ImageInfo& info = image->Info();
 		char buffer[32];
 		try {
 			target_addr_t textBase = info.TextBase();
 			target_addr_t dataBase = info.DataBase();
 
-			data.SetToFormat("\t%s (%" B_PRId32 ", %s) "
-				"Text: %#08" B_PRIx64 " - %#08" B_PRIx64 ", Data: %#08"
-				B_PRIx64 " - %#08" B_PRIx64 "\n", info.Name().String(),
-				info.ImageID(), UiUtils::ImageTypeToString(info.Type(),
-					buffer, sizeof(buffer)), textBase,
-				textBase + info.TextSize(), dataBase,
-				dataBase + info.DataSize());
+			data.SetToFormat("\t%" B_PRId32 "\t0x%08" B_PRIx64 "\t"
+				"0x%08" B_PRIx64 "\t0x%08" B_PRIx64 "\t0x%08" B_PRIx64 "\t"
+				"%-7s\t%s\n", info.ImageID(), textBase, textBase + info.TextSize(),
+				dataBase, dataBase + info.DataSize(),
+				UiUtils::ImageTypeToString(info.Type(), buffer,
+					sizeof(buffer)), info.Name().String());
 
 			_output << data;
 		} catch (...) {
@@ -283,28 +295,36 @@ DebugReportGenerator::_DumpAreas(BString& _output)
 	if (result != B_OK)
 		return result;
 
+	areas.SortItems(&_CompareAreas);
+
 	_output << "\nAreas:\n";
 	BString data;
+	data.SetToFormat("\tID\t\tBase\t\tEnd\t\t\tSize (KiB)\tProtection\tLocking\t\t\tName\n\t");
+	_output << data;
+	_output.Append('-', 80);
+	_output.Append("\n");
 	AreaInfo* info;
 	BString protectionBuffer;
 	char lockingBuffer[32];
 	for (int32 i = 0; (info = areas.ItemAt(i)) != NULL; i++) {
 		try {
-			data.SetToFormat("\t%s (%" B_PRId32 ") "
-				"Base: %#08" B_PRIx64 ", Size: %" B_PRId64
-				", RAM Size: %" B_PRId64 ",Locking: %s, Protection: %s\n",
-				info->Name().String(), info->AreaID(), info->BaseAddress(),
-				info->Size(), info->RamSize(),
-				UiUtils::AreaLockingFlagsToString(info->Lock(), lockingBuffer,
-					sizeof(lockingBuffer)),
+			data.SetToFormat("\t%" B_PRId32 "\t0x%08" B_PRIx64 "\t"
+				"0x%08" B_PRIx64 "\t%10" B_PRId64 "\t%-11s\t%-14s\t%s\n",
+				info->AreaID(), info->BaseAddress(), info->BaseAddress()
+					+ info->Size(), info->Size() / 1024,
 				UiUtils::AreaProtectionFlagsToString(info->Protection(),
-					protectionBuffer).String());
+					protectionBuffer).String(),
+				UiUtils::AreaLockingFlagsToString(info->Lock(), lockingBuffer,
+					sizeof(lockingBuffer)), info->Name().String());
 
 			_output << data;
 		} catch (...) {
 			return B_NO_MEMORY;
 		}
 	}
+
+	_output << "\nProtection Flags: r - read, w - write, x - execute, "
+		"s - stack, o - overcommit, c - cloneable, S - shared, k - kernel\n";
 
 	return B_OK;
 }
@@ -318,15 +338,20 @@ DebugReportGenerator::_DumpSemaphores(BString& _output)
 	if (result != B_OK)
 		return result;
 
+	semaphores.SortItems(&_CompareSemaphores);
+
 	_output << "\nSemaphores:\n";
 	BString data;
+	data.SetToFormat("\tID\t\tCount\tLast Holder\tName\n\t");
+	_output << data;
+	_output.Append('-', 60);
+	_output.Append("\n");
 	SemaphoreInfo* info;
 	for (int32 i = 0; (info = semaphores.ItemAt(i)) != NULL; i++) {
 		try {
-			data.SetToFormat("\t%s (%" B_PRId32 ") "
-				"Count: %" B_PRId32 ", Latest Holding Thread: %" B_PRId32 "\n",
-				info->Name().String(), info->SemID(), info->Count(),
-				info->LatestHolder());
+			data.SetToFormat("\t%" B_PRId32 "\t%5" B_PRId32 "\t%11" B_PRId32
+				"\t%s\n", info->SemID(), info->Count(),
+				info->LatestHolder(), info->Name().String());
 
 			_output << data;
 		} catch (...) {
@@ -346,24 +371,30 @@ DebugReportGenerator::_DumpRunningThreads(BString& _output)
 	_output << "\nActive Threads:\n";
 	BString data;
 	status_t result = B_OK;
+	BObjectList< ::Thread> threads;
+	::Thread* thread;
 	for (ThreadList::ConstIterator it = fTeam->Threads().GetIterator();
-		 ::Thread* thread = it.Next();) {
+		  (thread = it.Next());) {
+		 threads.AddItem(thread);
+	}
+
+	threads.SortItems(&_CompareThreads);
+	for (int32 i = 0; (thread = threads.ItemAt(i)) != NULL; i++) {
 		try {
-			data.SetToFormat("\t%s %s, id: %" B_PRId32", state: %s",
+			data.SetToFormat("\tthread %" B_PRId32 ": %s %s", thread->ID(),
 					thread->Name(), thread->IsMainThread()
-						? "(main)" : "", thread->ID(),
-					UiUtils::ThreadStateToString(thread->State(),
-							thread->StoppedReason()));
-
-			if (thread->State() == THREAD_STATE_STOPPED) {
-				const BString& stoppedInfo = thread->StoppedReasonInfo();
-				if (stoppedInfo.Length() != 0)
-					data << " (" << stoppedInfo << ")";
-			}
-
+						? "(main)" : "");
 			_output << data << "\n";
 
 			if (thread->State() == THREAD_STATE_STOPPED) {
+				data.SetToFormat("\t\tstate: %s",
+					UiUtils::ThreadStateToString(thread->State(),
+							thread->StoppedReason()));
+				const BString& stoppedInfo = thread->StoppedReasonInfo();
+				if (stoppedInfo.Length() != 0)
+					data << " (" << stoppedInfo << ")";
+				_output << data << "\n\n";
+
 				// we need to release our lock on the team here
 				// since we might need to block and wait
 				// on the stack trace.
@@ -553,4 +584,52 @@ DebugReportGenerator::_HandleMemoryBlockRetrieved(TeamMemoryBlock* block,
 
 	fCurrentBlock = block;
 	release_sem(fTeamDataSem);
+}
+
+
+/*static*/ int
+DebugReportGenerator::_CompareAreas(const AreaInfo* a, const AreaInfo* b)
+{
+	if (a->BaseAddress() < b->BaseAddress())
+		return -1;
+
+	return 1;
+}
+
+
+/*static*/ int
+DebugReportGenerator::_CompareImages(const Image* a, const Image* b)
+{
+	if (a->Info().TextBase() < b->Info().TextBase())
+		return -1;
+
+	return 1;
+}
+
+
+/*static*/ int
+DebugReportGenerator::_CompareSemaphores(const SemaphoreInfo* a,
+	const SemaphoreInfo* b)
+{
+	if (a->SemID() < b->SemID())
+		return -1;
+
+	return 1;
+}
+
+
+/*static*/ int
+DebugReportGenerator::_CompareThreads(const ::Thread* a,
+	const ::Thread* b)
+{
+	// sort stopped threads last, otherwise sort by thread ID
+	if (a->State() == b->State())
+		return a->ID() < b->ID() ? -1 : 1;
+
+	if (a->State() == THREAD_STATE_STOPPED && b->State()
+			!= THREAD_STATE_STOPPED) {
+		return 1;
+	}
+
+	return -1;
 }

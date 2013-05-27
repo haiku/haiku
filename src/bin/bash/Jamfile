@@ -88,7 +88,7 @@ BinCommand bash :
 	$(jobControlSources)
 
 	: libreadline.a <bash>libglob.a libbuiltins.a libtilde.a libsh.a
-	  libtermcap.a $(TARGET_SELECT_UNAME_ETC_LIB)
+	  libncurses.a $(TARGET_SELECT_UNAME_ETC_LIB)
 	: bash.rdef ;
 
 # trap.c includes signames.h

@@ -86,7 +86,7 @@ VideoConsumer::~VideoConsumer()
 
 
 BMediaAddOn*
-VideoConsumer::AddOn(long* cookie) const
+VideoConsumer::AddOn(int32* cookie) const
 {
 	FUNCTION("VideoConsumer::AddOn\n");
 	// do the right thing if we're ever used with an add-on
@@ -239,7 +239,7 @@ VideoConsumer::CreateBuffers(const media_format& format)
 			BBuffer* buffer = NULL;
 			if ((status = fBuffers->AddBuffer(info, &buffer)) != B_OK) {
 				ERROR("VideoConsumer::CreateBuffers - ERROR ADDING BUFFER "
-					"TO GROUP (%ld): %s\n", i, strerror(status));
+					"TO GROUP (%" B_PRId32 "): %s\n", i, strerror(status));
 				return status;
 			} else {
 				PROGRESS("VideoConsumer::CreateBuffers - SUCCESSFUL ADD "
@@ -248,8 +248,9 @@ VideoConsumer::CreateBuffers(const media_format& format)
 			fBufferMap[i] = buffer;
 		} else {
 			ERROR("VideoConsumer::CreateBuffers - ERROR CREATING VIDEO RING "
-				"BUFFER (Index %ld Width %ld Height %ld Colorspace %d: %s\n",
-				i, width, height, colorSpace, strerror(status));
+				"BUFFER (Index %" B_PRId32 " Width %" B_PRId32 " Height %"
+				B_PRId32 " Colorspace %d: %s\n", i, width, height, colorSpace,
+				strerror(status));
 			return status;
 		}	
 	}

@@ -78,8 +78,8 @@ PrinterDriver::PrintJob(BFile *spoolFile, BMessage *jobMsg)
 	printf("\n");
 
 	for (int32 page = 1; page <= pfh.page_count; ++page) {
-		printf("PrinterDriver::PrintPage(): Faking print of page %ld/ %ld\n",
-			page, pfh.page_count);
+		printf("PrinterDriver::PrintPage(): Faking print of page %" B_PRId32
+			"/ %" B_PRId32 "\n", page, pfh.page_count);
 	}
 
 	fJobFile->Seek(0, SEEK_SET);
@@ -87,9 +87,10 @@ PrinterDriver::PrintJob(BFile *spoolFile, BMessage *jobMsg)
 
 	status_t status = reader.InitCheck();
 	printf("\nPrintJobReader::InitCheck(): %s\n", status == B_OK ? "B_OK" : "B_ERROR");
-	printf("PrintJobReader::NumberOfPages(): %ld\n", reader.NumberOfPages());
-	printf("PrintJobReader::FirstPage(): %ld\n", reader.FirstPage());
-	printf("PrintJobReader::LastPage(): %ld\n", reader.LastPage());
+	printf("PrintJobReader::NumberOfPages(): %" B_PRId32 "\n",
+		reader.NumberOfPages());
+	printf("PrintJobReader::FirstPage(): %" B_PRId32 "\n", reader.FirstPage());
+	printf("PrintJobReader::LastPage(): %" B_PRId32 "\n", reader.LastPage());
 
 	BRect rect = reader.PaperRect();
 	printf("PrintJobReader::PaperRect(): BRect(l:%.1f, t:%.1f, r:%.1f, b:%.1f)\n",
@@ -101,7 +102,8 @@ PrinterDriver::PrintJob(BFile *spoolFile, BMessage *jobMsg)
 
 	int32 xdpi, ydpi;
 	reader.GetResolution(&xdpi, &ydpi);
-	printf("PrintJobReader::GetResolution(): xdpi:%ld, ydpi:%ld\n", xdpi, ydpi);
+	printf("PrintJobReader::GetResolution(): xdpi:%" B_PRId32 ", ydpi:%"
+		B_PRId32 "\n", xdpi, ydpi);
 	printf("PrintJobReader::GetScale(): %.1f\n", reader.GetScale());
 
 	fPrinting = false;
@@ -172,7 +174,7 @@ PrinterDriver::JobSetup(BMessage *jobMsg, const char *printerName)
 		jobMsg->AddInt32("first_page", 1);
 
 	if (!jobMsg->HasInt32("last_page"))
-		jobMsg->AddInt32("last_page", LONG_MAX);
+		jobMsg->AddInt32("last_page", INT32_MAX);
 
 	BlockingWindow* w = NewJobSetupWindow(jobMsg, printerName);
 	return w->Go();

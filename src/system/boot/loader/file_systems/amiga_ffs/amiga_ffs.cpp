@@ -1,14 +1,13 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2013, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "amiga_ffs.h"
 
 #include <boot/partitions.h>
 #include <boot/platform.h>
-#include <util/kernel_cpp.h>
 
 #include <string.h>
 #include <unistd.h>
@@ -31,7 +30,7 @@ class BCPLString {
 };
 
 
-int32 
+int32
 BCPLString::CopyTo(char *name, size_t size)
 {
 	int32 length = size - 1 > Length() ? Length() : size - 1;
@@ -56,7 +55,7 @@ BaseBlock::GetNameBackOffset(int32 offset, char *name, size_t size) const
 }
 
 
-status_t 
+status_t
 BaseBlock::ValidateCheckSum() const
 {
 	if (fData == NULL)
@@ -74,7 +73,7 @@ BaseBlock::ValidateCheckSum() const
 //	#pragma mark -
 
 
-char 
+char
 DirectoryBlock::ToUpperChar(int32 type, char c) const
 {
 	// Taken from Ralph Babel's "The Amiga Guru Book" (1993), section 15.3.4.3
@@ -87,11 +86,11 @@ DirectoryBlock::ToUpperChar(int32 type, char c) const
 }
 
 
-int32 
+int32
 DirectoryBlock::HashIndexFor(int32 type, const char *name) const
 {
 	int32 hash = strlen(name);
-	
+
 	while (name[0]) {
 		hash = (hash * 13 + ToUpperChar(type, name[0])) & 0x7ff;
 		name++;
@@ -101,7 +100,7 @@ DirectoryBlock::HashIndexFor(int32 type, const char *name) const
 }
 
 
-int32 
+int32
 DirectoryBlock::HashValueAt(int32 index) const
 {
 	return index >= HashSize() ? -1 : (int32)B_BENDIAN_TO_HOST_INT32(HashTable()[index]);
@@ -116,11 +115,11 @@ DirectoryBlock::FirstHashValue(int32 &index) const
 }
 
 
-int32 
+int32
 DirectoryBlock::NextHashValue(int32 &index) const
 {
 	index++;
-	
+
 	int32 value;
 	while ((value = HashValueAt(index)) == 0) {
 		if (++index >= HashSize())
@@ -152,14 +151,14 @@ HashIterator::~HashIterator()
 }
 
 
-status_t 
+status_t
 HashIterator::InitCheck()
 {
 	return fData != NULL ? B_OK : B_NO_MEMORY;
 }
 
 
-void 
+void
 HashIterator::Goto(int32 index)
 {
 	fCurrent = index;
@@ -197,7 +196,7 @@ HashIterator::GetNext(int32 &block)
 }
 
 
-void 
+void
 HashIterator::Rewind()
 {
 	fCurrent = 0;

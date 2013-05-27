@@ -23,12 +23,14 @@
 #include "ArchitectureX86.h"
 #include "ArchitectureX8664.h"
 #include "AreaInfo.h"
+#include "AutoDeleter.h"
 #include "CpuState.h"
 #include "DebugEvent.h"
 #include "ImageInfo.h"
 #include "SemaphoreInfo.h"
 #include "SymbolInfo.h"
 #include "SystemInfo.h"
+#include "TeamInfo.h"
 #include "ThreadInfo.h"
 
 
@@ -483,6 +485,19 @@ DebuggerInterface::GetSystemInfo(SystemInfo& info)
 
 
 status_t
+DebuggerInterface::GetTeamInfo(TeamInfo& info)
+{
+	team_info teamInfo;
+	status_t result = get_team_info(fTeamID, &teamInfo);
+	if (result != B_OK)
+		return result;
+
+	info.SetTo(fTeamID, teamInfo);
+	return B_OK;
+}
+
+
+status_t
 DebuggerInterface::GetThreadInfos(BObjectList<ThreadInfo>& infos)
 {
 	thread_info threadInfo;
@@ -564,9 +579,9 @@ DebuggerInterface::GetSymbolInfos(team_id team, image_id image,
 	BObjectList<SymbolInfo>& infos)
 {
 	// create a lookup context
-// TODO: It's too expensive to create a lookup context for each image!
 	debug_symbol_lookup_context* lookupContext;
-	status_t error = debug_create_symbol_lookup_context(team, &lookupContext);
+	status_t error = debug_create_symbol_lookup_context(team, image,
+		&lookupContext);
 	if (error != B_OK)
 		return error;
 
@@ -609,10 +624,9 @@ DebuggerInterface::GetSymbolInfo(team_id team, image_id image, const char* name,
 	int32 symbolType, SymbolInfo& info)
 {
 	// create a lookup context
-	// TODO: It's a bit expensive to create a lookup context just for one
-	// symbol!
 	debug_symbol_lookup_context* lookupContext;
-	status_t error = debug_create_symbol_lookup_context(team, &lookupContext);
+	status_t error = debug_create_symbol_lookup_context(team, image,
+		&lookupContext);
 	if (error != B_OK)
 		return error;
 
@@ -650,24 +664,37 @@ DebuggerInterface::GetThreadInfo(thread_id thread, ThreadInfo& info)
 status_t
 DebuggerInterface::GetCpuState(thread_id thread, CpuState*& _state)
 {
-	DebugContextGetter contextGetter(fDebugContextPool);
-
-	debug_nub_get_cpu_state message;
-	message.reply_port = contextGetter.Context()->reply_port;
-	message.thread = thread;
-
-	debug_nub_get_cpu_state_reply reply;
-
-	status_t error = send_debug_message(contextGetter.Context(),
-		B_DEBUG_MESSAGE_GET_CPU_STATE, &message, sizeof(message), &reply,
-		sizeof(reply));
+	debug_cpu_state debugState;
+	status_t error = _GetDebugCpuState(thread, debugState);
 	if (error != B_OK)
 		return error;
-	if (reply.error != B_OK)
-		return reply.error;
+	return fArchitecture->CreateCpuState(&debugState, sizeof(debug_cpu_state),
+		_state);
+}
 
-	return fArchitecture->CreateCpuState(&reply.cpu_state,
-		sizeof(debug_cpu_state), _state);
+
+status_t
+DebuggerInterface::SetCpuState(thread_id thread, const CpuState* state)
+{
+	debug_cpu_state debugState;
+	status_t error = _GetDebugCpuState(thread, debugState);
+	if (error != B_OK)
+		return error;
+
+	DebugContextGetter contextGetter(fDebugContextPool);
+
+	error = state->UpdateDebugState(&debugState, sizeof(debugState));
+	if (error != B_OK)
+		return error;
+
+	debug_nub_set_cpu_state message;
+	message.thread = thread;
+
+	memcpy(&message.cpu_state, &debugState, sizeof(debugState));
+
+	return send_debug_message(contextGetter.Context(),
+		B_DEBUG_MESSAGE_SET_CPU_STATE, &message, sizeof(message), NULL,
+		0);
 }
 
 
@@ -869,4 +896,29 @@ DebuggerInterface::_GetNextSystemWatchEvent(DebugEvent*& _event,
 		_event = event;
 
 	return error;
+}
+
+
+status_t
+DebuggerInterface::_GetDebugCpuState(thread_id thread, debug_cpu_state& _state)
+{
+	DebugContextGetter contextGetter(fDebugContextPool);
+
+	debug_nub_get_cpu_state message;
+	message.reply_port = contextGetter.Context()->reply_port;
+	message.thread = thread;
+
+	debug_nub_get_cpu_state_reply reply;
+
+	status_t error = send_debug_message(contextGetter.Context(),
+		B_DEBUG_MESSAGE_GET_CPU_STATE, &message, sizeof(message), &reply,
+		sizeof(reply));
+	if (error != B_OK)
+		return error;
+	if (reply.error != B_OK)
+		return reply.error;
+
+	memcpy(&_state, &reply.cpu_state, sizeof(debug_cpu_state));
+
+	return B_OK;
 }

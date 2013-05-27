@@ -7,6 +7,7 @@
 #include <pthread.h>
 #include <string.h>
 
+#include <OS.h>
 #include <image.h>
 
 #include <user_runtime.h>
@@ -30,6 +31,8 @@ char *__progname = NULL;
 int __libc_argc;
 char **__libc_argv;
 
+int __gABIVersion;
+
 char _single_threaded = true;
 	// determines if I/O locking needed; needed for BeOS compatibility
 
@@ -47,6 +50,7 @@ initialize_before(image_id imageID)
 {
 	char *programPath = __gRuntimeLoader->program_args->args[0];
 	__gCommPageAddress = __gRuntimeLoader->commpage_address;
+	__gABIVersion = __gRuntimeLoader->abi_version;
 
 	if (programPath) {
 		if ((__progname = strrchr(programPath, '/')) == NULL)
@@ -71,6 +75,7 @@ initialize_before(image_id imageID)
 	__init_env(__gRuntimeLoader->program_args);
 	__init_heap_post_env();
 	__init_pwd_backend();
+	__set_stack_protection();
 }
 
 

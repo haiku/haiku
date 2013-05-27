@@ -97,7 +97,7 @@ BBitmap* MenuPrivate::sMenuItemAlt;
 BBitmap* MenuPrivate::sMenuItemMenu;
 
 
-MenuPrivate::MenuPrivate(BMenu *menu)
+MenuPrivate::MenuPrivate(BMenu* menu)
 	:
 	fMenu(menu)
 {
@@ -147,22 +147,22 @@ MenuPrivate::Padding() const
 
 
 void
-MenuPrivate::GetItemMargins(float *left, float *top,
-					float *right, float *bottom) const
+MenuPrivate::GetItemMargins(float* left, float* top, float* right,
+	float* bottom) const
 {
 	fMenu->GetItemMargins(left, top, right, bottom);
 }
 
 
 int
-MenuPrivate::State(BMenuItem **item) const
+MenuPrivate::State(BMenuItem** item) const
 {
 	return fMenu->_State(item);
 }
 
 
 void
-MenuPrivate::Install(BWindow *window)
+MenuPrivate::Install(BWindow* window)
 {
 	fMenu->_Install(window);
 }
@@ -176,21 +176,21 @@ MenuPrivate::Uninstall()
 
 
 void
-MenuPrivate::SetSuper(BMenu *menu)
+MenuPrivate::SetSuper(BMenu* menu)
 {
 	fMenu->fSuper = menu;
 }
 
 
 void
-MenuPrivate::SetSuperItem(BMenuItem *item)
+MenuPrivate::SetSuperItem(BMenuItem* item)
 {
 	fMenu->fSuperitem = item;
 }
 
 
 void
-MenuPrivate::InvokeItem(BMenuItem *item, bool now)
+MenuPrivate::InvokeItem(BMenuItem* item, bool now)
 {
 	fMenu->_InvokeItem(item, now);
 }

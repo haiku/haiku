@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-StyledEdit	3117187160
+1	greek, modern (1453-)	x-vnd.Haiku-StyledEdit	3019034824
 StyledEdit	System name		StyledEdit
 Paste	Menus		Επικόλληση
 OK	LoadAlert		Εντάξει
@@ -43,6 +43,7 @@ Don't save	QuitAlert		Χωρίς αποθήκευση
 Align	Menus		Στοίχιση
 Color	Menus		Χρώμα
 Red	Menus		Κόκκινο
+OK	QuitAlert		Εντάξει
 Open…	Menus		Άνοιγμα...
 Center	Menus		Κέντρο
 Blue	Menus		Μπλέ

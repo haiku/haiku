@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	3375521561
+1	belarusian	x-vnd.Haiku-libtracker	1762695842
 common	B_COMMON_DIRECTORY		агульны
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Від іконак
@@ -74,6 +74,7 @@ Arrange by	ContainerWindow		Сартаваць па
 Mount server error	AutoMounterSettings		Памылка сервера мантавання
 Search	FindPanel		Пошук
 Preparing to empty Trash…	StatusWindow		Падрыхтоўка да ачысткі Сметніцы…
+You cannot put the selected item(s) into the trash.	FSUtils		Немагчыма змясціць абраны(я) элемент(ы) ў сметніцу.
 Disks	Model		Дыскі
 Create link	ContainerWindow		Стварыць спасылку
 develop	B_COMMON_DEVELOP_DIRECTORY		распрацоўка
@@ -142,6 +143,7 @@ Add-ons	ContainerWindow		Дапаўненні
 Edit templates…	TemplatesMenu		Правіць шаблоны…
 Finish: %time - Over %finishtime left	StatusWindow		Завяршэнне: %time - Засталося каля %finishtime
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Элемент \"%name\" у гэтым каталозе ўжо існуе. Ці жадаеце замяніць яго ствараемай спасылкай?
+Fewer options	FindPanel		Менш наладак
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Прабачце, не хапае месца на томе прызначэння для капіявання выбранага.
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Нельга адкрыць \"%document\" праграмай \"%app\" (%error). 
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Прабачце, захаванне больш чым аднаго элемента не дазволена.
@@ -211,7 +213,6 @@ Resize to fit	VolumeWindow		Расцягнуць
 Could not find application \"%appname\"	OpenWithWindow		Не ўдалося знайсці праграму \"%appname\"
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Выбраны элемент нельга адправіць у Сметніцу. Жадаеце выдаліць іх беззваротна?
 Invert	SelectionWindow		Інвертаваць
-Save Query as template…	FindPanel		Захаваць Запыт як шаблон…
 rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	перайменуеце
 Find	FindPanel		Знайсці
 Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Перасунуць
@@ -236,6 +237,7 @@ Temporary	FindPanel		Часовы
 Version	OpenWithWindow		Версія
 Default application	InfoWindow		Прадвызначаная праграма
 Preparing to copy items…	StatusWindow		Падрыхтоўка да капіявання…
+Save query as template…	FindPanel		Захаваць запыт як шаблон…
 Show folder location in title tab	SettingsView		Паказваць адрас каталога у імені ўкладкі
 Proceed	FSUtils		Далей
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Некаторыя элементы ужо існуюць у гэтым каталозе з тымі ж імёнамі, як і ў элементаў, якія вы %verb.\n \nЖадаеце замяніць іх тымі, што вы %verb, або вырашыць асобна для кожнага элемента?
@@ -334,6 +336,7 @@ The specified name is already used as the name of a folder. Please choose anothe
 Clean up	ContainerWindow		Прыбрацца
 after	FindPanel		пасля
 Select…	QueryContainerWindow		Выбраць…
+More options	FindPanel		Больш параметраў
 link	FSUtils	filename link	спасылка
 At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		У %func \nfind_directory() не ўдалося. \nПрычына: %error
 The specified name is illegal. Please choose another name.	FilePanelPriv		Пазначанае імя недапушчальна. Калі ласка, выберыце іншае.
@@ -445,6 +448,7 @@ contains	FindPanel		месціць
 Relation	OpenWithWindow		Адносіны
 Open	FilePanelPriv		Адкрыць
 Mount	DeskWindow		Змантаваць
+Recent queries	FindPanel		Папярэднія запыты
 Mount	ContainerWindow		Змантаваць
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used выкарыстана -- %free свабодна)
 Cancel	FSClipBoard		Адмена

@@ -487,7 +487,7 @@ translate_partition_access(devfs_partition* partition, off_t& offset,
 	ASSERT(offset >= 0);
 	ASSERT(offset < partition->info.size);
 
-	size = min_c(size, partition->info.size - offset);
+	size = (size_t)min_c((off_t)size, partition->info.size - offset);
 	offset += partition->info.offset;
 }
 

@@ -35,7 +35,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	setversion setvolume seq sha1sum shar shred shuf shutdown sleep sort
 	spamdbm split stat strace stty su sum sync sysinfo
 	tac tail tcpdump tcptester tee telnet telnetd test timeout top touch
-	tput tr traceroute translate trash true truncate tsort tty
+	<ncurses>tput tr traceroute translate trash true truncate tsort tty
 	uname unchop unexpand unmount uniq unlink unshar unzip unzipsfx
 	<bin>updatedb uptime urlwrapper useradd uudecode uuencode
 	vdir version vmstat
@@ -45,8 +45,8 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 ] ;
 
 SYSTEM_APPS = [ FFilterByBuildFeatures
-	AboutSystem ActivityMonitor BootManager@x86 CharacterMap
-	CodyCam DeskCalc Devices DiskProbe DiskUsage DriveSetup CDPlayer Debugger
+	AboutSystem ActivityMonitor BootManager@x86 CDPlayer CharacterMap
+	CodyCam Debugger DeskCalc Devices DiskProbe DiskUsage DriveSetup  
 	Expander GLInfo@x86 Icon-O-Matic Installer LaunchBox Magnify Mail
 	MediaConverter MediaPlayer MidiPlayer NetworkStatus PackageInstaller People
 	PoorMan PowerStatus ProcessController Screenshot ShowImage SoundRecorder
@@ -97,10 +97,13 @@ SYSTEM_NETWORK_DATALINK_PROTOCOLS = ethernet_frame <module>arp loopback_frame
 SYSTEM_NETWORK_PROTOCOLS = ipv4 tcp udp icmp unix icmp6 ipv6 ;
 
 SYSTEM_ADD_ONS_ACCELERANTS = [ FFilterByBuildFeatures
+	x86,x86_64 @{
+		vesa.accelerant
+	}@ # x86,x86_64
 	x86 @{
 		3dfx.accelerant ati.accelerant matrox.accelerant neomagic.accelerant
 		nvidia.accelerant intel_810.accelerant intel_extreme.accelerant
-		radeon.accelerant radeon_hd.accelerant s3.accelerant vesa.accelerant
+		radeon.accelerant radeon_hd.accelerant s3.accelerant 
 		#via.accelerant vmware.accelerant
 	}@ # x86
 ] ;
@@ -122,7 +125,7 @@ SYSTEM_ADD_ONS_MEDIA = [ FFilterByBuildFeatures
 	usb_webcam.media_addon
 	video_producer_demo.media_addon
 	video_window_demo.media_addon
-	firewire_dv.media_addon
+	firewire_dv.media_addon@x86
 	#legacy.media_addon
 	equalizer.media_addon
 	vst_host.media_addon
@@ -152,18 +155,21 @@ SYSTEM_ADD_ONS_SCREENSAVERS = [ FFilterByBuildFeatures
 SYSTEM_ADD_ONS_DRIVERS_AUDIO = auich auvia echo3g emuxki hda ice1712 sis7018 ;
 SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD = ; #cmedia usb_audio ;
 SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = [ FFilterByBuildFeatures
+	x86,x86_64 @{
+		vesa
+	}@ # x86,x86_64
 	x86 @{
 		ati 3dfx intel_810 intel_extreme matrox neomagic nvidia radeon radeon_hd
-		s3 vesa  #via vmware
+		s3 #via vmware
 	}@ # x86
 ] ;
 SYSTEM_ADD_ONS_DRIVERS_MIDI = emuxki ice1712 usb_midi ;
 SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
-	x86 @{
+	x86,x86_64 @{
 		3com atheros813x ar81xx attansic_l1 attansic_l2 broadcom440x
 		broadcom570x dec21xxx ipro100 ipro1000 jmicron2x0 marvell_yukon nforce
 		pcnet rtl8139 rtl81xx sis19x syskonnect via_rhine vt612x
-	}@ # x86
+	}@ # x86_64
 
 	etherpci pegasus sis900 usb_davicom usb_asix usb_ecm wb840
 
@@ -180,11 +186,12 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 ] ;
 SYSTEM_ADD_ONS_DRIVERS_POWER = [ FFilterByBuildFeatures acpi_button@x86 ] ;
 SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
-	ata@ata pci ps2@x86 isa@x86
-	ide@ide scsi config_manager agp_gart usb firewire acpi@x86
+	ata@ata pci ps2@x86,x86_64 isa@x86,x86_64
+	ide@ide scsi config_manager agp_gart@x86 usb firewire@x86 acpi@x86
+	virtio
 ] ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs btrfs cdda exfat ext2 fat iso9660 nfs nfs4
-	attribute_overlay write_overlay ntfs reiserfs udf googlefs ;
+	attribute_overlay write_overlay ntfs reiserfs@x86 udf googlefs ;
 
 # wifi firmware
 for driver in $(SYSTEM_ADD_ONS_DRIVERS_NET) {
@@ -223,6 +230,8 @@ AddFilesToHaikuImage system add-ons kernel busses scsi
 	: ahci ;
 AddFilesToHaikuImage system add-ons kernel busses usb
 	: <usb>uhci <usb>ohci <usb>ehci ;
+AddFilesToHaikuImage system add-ons kernel busses virtio
+	: virtio_pci ;
 AddFilesToHaikuImage system add-ons kernel console : vga_text ;
 AddFilesToHaikuImage system add-ons kernel debugger
 	: <kdebug>demangle <kdebug>disasm@x86 <kdebug>hangman
@@ -231,22 +240,22 @@ AddFilesToHaikuImage system add-ons kernel debugger
 AddFilesToHaikuImage system add-ons kernel file_systems
 	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToHaikuImage system add-ons kernel generic
-	: ata_adapter@ata bios@x86 dpc ide_adapter@ide
-		locked_pool mpu401 scsi_periph <module>tty cpuidle@x86 ;
+	: ata_adapter@ata bios@x86,x86_64 dpc ide_adapter@ide
+		locked_pool mpu401 scsi_periph <module>tty ;
 AddFilesToHaikuImage system add-ons kernel partitioning_systems
 	: amiga_rdb apple efi_gpt intel session ;
 AddFilesToHaikuImage system add-ons kernel interrupt_controllers
 	: openpic@ppc ;
 
-if $(TARGET_ARCH) = x86 {
+if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
 	AddFilesToHaikuImage system add-ons kernel cpu : generic_x86 ;
 }
 
 # drivers
 AddNewDriversToHaikuImage disk scsi	: scsi_cd scsi_disk ;
+AddNewDriversToHaikuImage disk virtual : virtio_block ;
 AddNewDriversToHaikuImage power : enhanced_speedstep@x86 ;
 AddNewDriversToHaikuImage power : acpi_battery@x86 ;
-AddNewDriversToHaikuImage power : x86_cpuidle@x86 ;
 #AddNewDriversToHaikuImage display : display_controls@x86 ;
 
 # legacy drivers
@@ -255,7 +264,7 @@ AddDriversToHaikuImage				: console dprintf null
 AddDriversToHaikuImage audio hmulti	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO) ;
 AddDriversToHaikuImage audio old	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD) ;
 AddDriversToHaikuImage midi			: $(SYSTEM_ADD_ONS_DRIVERS_MIDI) ;
-AddDriversToHaikuImage bus			: usb_raw fw_raw ;
+AddDriversToHaikuImage bus			: usb_raw fw_raw@x86 ;
 AddDriversToHaikuImage disk floppy	: pc_floppy@x86 ;
 AddDriversToHaikuImage disk usb		: usb_disk ;
 AddDriversToHaikuImage disk usb		: usb_floppy ;
@@ -302,22 +311,11 @@ if $(TARGET_ARCH) = x86 {
 	}
 }
 
-# libbe.so now includes what used to be in liblocale.so
-# TODO: Remove this once all optional packages have been rebuilt (i.e. after
-#       next release)!
-SYSTEM_LIBS_LIBBE_ALIASES = liblocale.so ;
-if $(TARGET_ARCH) = x86 {
-	local lib ;
-	for lib in $(SYSTEM_LIBS_LIBBE_ALIASES) {
-		AddSymlinkToHaikuHybridImage system lib : libbe.so : $(lib) : : true ;
-	}
-}
 
 SYSTEM_LIBS_ALIASES =
 	$(SYSTEM_LIBS_LIBNETWORK_ALIASES)
 	libnetapi.so
 	$(SYSTEM_LIBS_LIBGL_ALIASES)
-	$(SYSTEM_LIBS_LIBBE_ALIASES)
 ;
 
 OPTIONAL_LIBS_ALIASES =
@@ -613,6 +611,7 @@ AddBootModuleSymlinksToHaikuImage
 	ide_isa@x86
 	<usb>uhci <usb>ohci <usb>ehci
 	scsi_cd scsi_disk usb_disk
+	virtio virtio_pci virtio_block	
 	efi_gpt
 	intel
 	bfs

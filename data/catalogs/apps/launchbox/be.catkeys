@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-LaunchBox	3016105370
+1	belarusian	x-vnd.Haiku-LaunchBox	3692177981
 New	LaunchBox		Новы
 Set description…	LaunchBox		Прызначыць апісанне…
 Vertical layout	LaunchBox		Вертыкальная расстаноўка
@@ -6,6 +6,7 @@ OK	LaunchBox		ОК
 Pad 1	LaunchBox		Падложка 1
 last chance	LaunchBox		апошняя магчымасць
 Quit	LaunchBox		Выйсці
+Open containing folder	LaunchBox		Адкрыць папку, якая змяшчае аб'ект
 Clear button	LaunchBox		Ачысціць кнопку
 LaunchBox	System name		СтартПалічка
 Ignore double-click	LaunchBox		Ігнараваць падвойны клік

@@ -397,11 +397,12 @@ VMUserAddressSpace::_RandomizeAddress(addr_t start, addr_t end,
 	size_t alignment, bool initial)
 {
 	ASSERT((start & addr_t(alignment - 1)) == 0);
+	ASSERT(start <= end);
 
 	if (start == end)
 		return start;
 
-	addr_t range = end - start;
+	addr_t range = end - start + 1;
 	if (initial)
 		range = min_c(range, kMaxInitialRandomize);
 	else
@@ -538,9 +539,9 @@ VMUserAddressSpace::_InsertAreaSlot(addr_t start, addr_t size, addr_t end,
 
 	if (addressSpec == B_RANDOMIZED_BASE_ADDRESS) {
 		originalStart = start;
-		start = _RandomizeAddress(start, end - size, alignment, true);
+		start = _RandomizeAddress(start, end - size + 1, alignment, true);
 	}
-		
+
 	// walk up to the spot where we should start searching
 second_chance:
 	VMUserAreaList::Iterator it = fAreas.GetIterator();
@@ -568,10 +569,10 @@ second_chance:
 			if (last == NULL) {
 				// see if we can build it at the beginning of the virtual map
 				addr_t alignedBase = ROUNDUP(start, alignment);
-				addr_t nextBase = next == NULL ? end : min_c(next->Base(), end);
+				addr_t nextBase = next == NULL ? end : min_c(next->Base() - 1, end);
 				if (is_valid_spot(start, alignedBase, size, nextBase)) {
 
-					addr_t rangeEnd = min_c(nextBase - size, end);
+					addr_t rangeEnd = min_c(nextBase - size + 1, end);
 					if (is_randomized(addressSpec)) {
 						alignedBase = _RandomizeAddress(alignedBase, rangeEnd,
 							alignment);
@@ -587,14 +588,14 @@ second_chance:
 			}
 
 			// keep walking
-			while (next != NULL && next->Base() + size - 1 <= end) {
+			while (next != NULL && next->Base() + next->Size() - 1 <= end) {
 				addr_t alignedBase = ROUNDUP(last->Base() + last->Size(),
 					alignment);
-				addr_t nextBase = min_c(end, next->Base());
+				addr_t nextBase = min_c(end, next->Base() - 1);
 				if (is_valid_spot(last->Base() + (last->Size() - 1),
 						alignedBase, size, nextBase)) {
 
-					addr_t rangeEnd = min_c(nextBase - size, end);
+					addr_t rangeEnd = min_c(nextBase - size + 1, end);
 					if (is_randomized(addressSpec)) {
 						alignedBase = _RandomizeAddress(alignedBase,
 							rangeEnd, alignment);
@@ -614,11 +615,11 @@ second_chance:
 
 			addr_t alignedBase = ROUNDUP(last->Base() + last->Size(),
 				alignment);
-			if (is_valid_spot(last->Base() + (last->Size() - 1), alignedBase,
-					size, end)) {
+			if (next == NULL && is_valid_spot(last->Base() + (last->Size() - 1),
+					alignedBase, size, end)) {
 
 				if (is_randomized(addressSpec)) {
-					alignedBase = _RandomizeAddress(alignedBase, end - size,
+					alignedBase = _RandomizeAddress(alignedBase, end - size + 1,
 						alignment);
 				}
 
@@ -631,12 +632,13 @@ second_chance:
 
 				// we didn't find a free spot in the requested range, so we'll
 				// try again without any restrictions
-				start = USER_BASE_ANY;
-				if (!is_randomized(addressSpec))
+				if (!is_randomized(addressSpec)) {
+					start = USER_BASE_ANY;
 					addressSpec = B_ANY_ADDRESS;
-				else if (start == originalStart)
+				} else if (start == originalStart) {
+					start = USER_BASE_ANY;
 					addressSpec = B_RANDOMIZED_ANY_ADDRESS;
-				else {
+				} else {
 					start = originalStart;
 					addressSpec = B_RANDOMIZED_BASE_ADDRESS;
 				}
@@ -672,10 +674,11 @@ second_chance:
 					}
 
 					if ((next->protection & RESERVED_AVOID_BASE) == 0
-						&&  alignedBase == next->Base()
+						&& alignedBase == next->Base()
 						&& next->Size() >= size) {
 
-						addr_t rangeEnd = min_c(next->Size() - size, end);
+						addr_t rangeEnd = min_c(
+							next->Base() + next->Size() - size, end);
 						if (is_randomized(addressSpec)) {
 							alignedBase = _RandomizeAddress(next->Base(),
 								rangeEnd, alignment);

@@ -50,11 +50,10 @@ CLanguageFamily::ParseTypeExpression(const BString& expression,
 		modifierIndex = parsedName.FindFirst('&');
 	if (modifierIndex == -1)
 		modifierIndex = parsedName.FindFirst('[');
+	if (modifierIndex == -1)
+		modifierIndex = parsedName.Length();
 
-	if (modifierIndex >= 0)
-		parsedName.MoveInto(baseTypeName, 0, modifierIndex);
-	else
-		baseTypeName = parsedName;
+	parsedName.MoveInto(baseTypeName, 0, modifierIndex);
 
 	modifierIndex = parsedName.FindFirst('[');
 	if (modifierIndex >= 0) {

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	4167158175
+1	hungarian	x-vnd.Haiku-libtracker	1762695842
 common	B_COMMON_DIRECTORY		Közös
 OK	WidgetAttributeText		Rendben
 Icon view	VolumeWindow		Ikon nézet
@@ -143,6 +143,7 @@ Add-ons	ContainerWindow		Kiegészítők
 Edit templates…	TemplatesMenu		Sablonok szerkesztése…
 Finish: %time - Over %finishtime left	StatusWindow		Befejezés: %time - Több, mint %finishtime van hátra
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Már van ebben a mappában egy elem ezzel a névvel: %name. Szeretné felülírni a most elkészítendő szimbolikus hivatkozást?
+Fewer options	FindPanel		Kevesebb opció
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Sajnáljuk, de nincs elég hely a kiválasztott lemezen a másoláshoz.
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nem sikerült megnyitni a dokumentumot (%document) a programmal (%app).\n\t%error
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Sajnálom, de egyszerre csak egy elemet lehet elmenteni.
@@ -212,7 +213,6 @@ Resize to fit	VolumeWindow		Átméretezés hogy elférjen
 Could not find application \"%appname\"	OpenWithWindow		A program (%appname) nem található
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		A kiválasztott elemet nem lehet a Szemetesbe mozgatni. Szeretné inkább törölni? (Nem vonható vissza.)
 Invert	SelectionWindow		Megfordítás
-Save Query as template…	FindPanel		Keresés mentése sablonként…
 rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	átnevezi
 Find	FindPanel		Keresés
 Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Mozgatás
@@ -237,6 +237,7 @@ Temporary	FindPanel		Ideiglenes megőrzés
 Version	OpenWithWindow		Verzió
 Default application	InfoWindow		Alapértelmezett program
 Preparing to copy items…	StatusWindow		Felkészülés az elemek másolására…
+Save query as template…	FindPanel		Keresés mentése sablonként…
 Show folder location in title tab	SettingsView		Mappa helyének megjelenítése a fülön
 Proceed	FSUtils		Folytatás
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		A mappában már néhány elem neve megyegyezik azzal, amit Ön %verb akar.\n\nSzeretné lecserélni öket azokkal amiket ön szeretne most %verb, vagy minden elemnél kérdezzük meg?
@@ -335,6 +336,7 @@ The specified name is already used as the name of a folder. Please choose anothe
 Clean up	ContainerWindow		Rendrakás
 after	FindPanel		utána
 Select…	QueryContainerWindow		Kijelölés…
+More options	FindPanel		További opciók
 link	FSUtils	filename link	hivatkozás
 At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		Ennél: %func \nsikertelen volt a find_directory(). \nOka: %error
 The specified name is illegal. Please choose another name.	FilePanelPriv		A megadott név szabálytalan. Kérjük válasszon egy másik nevet.
@@ -446,6 +448,7 @@ contains	FindPanel		tartalmazza
 Relation	OpenWithWindow		Kapcsolat
 Open	FilePanelPriv		Megnyitás
 Mount	DeskWindow		Csatolás
+Recent queries	FindPanel		Előző keresések
 Mount	ContainerWindow		Csatolás
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used használt -- %free szabad)
 Cancel	FSClipBoard		Mégse

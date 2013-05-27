@@ -1,0 +1,15 @@
+1	polish	x-vnd.Haiku-InterfacesAddOn	34473294
+Interface	InterfaceWindow		Interfejs
+Configure…	InterfacesListView		Konfiguruj…
+Static	IntefaceAddressView		Statyczny
+IP:	InterfacesListView	IPv4 address label	IP:
+Link speed:	IntefaceHardwareView		Szybkość połączenia:
+The method for obtaining an IP address	IntefaceAddressView		Metoda uzyskania adresu IP
+Your gateway	IntefaceAddressView		Brama
+Received:	IntefaceHardwareView		Otrzymano:
+Sent:	IntefaceHardwareView		Wysłano:
+Configure…	InterfacesAddOn		Konfiguruj…
+Mode:	IntefaceAddressView		Tryb:
+Your netmask	IntefaceAddressView		Maska sieci
+IP Address:	IntefaceAddressView		Adres IP:
+disconnected	IntefaceHardwareView		odłączone

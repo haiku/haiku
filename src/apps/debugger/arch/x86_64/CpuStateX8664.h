@@ -1,7 +1,7 @@
 /*
  * Copyright 2012, Alex Smith, alex@alex-smith.me.uk.
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef CPU_STATE_X86_64_H
@@ -54,7 +54,14 @@ public:
 								CpuStateX8664(const x86_64_debug_cpu_state& state);
 	virtual						~CpuStateX8664();
 
+	virtual	status_t			Clone(CpuState*& _clone) const;
+
+	virtual	status_t			UpdateDebugState(void* state, size_t size)
+									const;
+
 	virtual	target_addr_t		InstructionPointer() const;
+	virtual void				SetInstructionPointer(target_addr_t address);
+
 	virtual	target_addr_t		StackFramePointer() const;
 	virtual	target_addr_t		StackPointer() const;
 	virtual	bool				GetRegisterValue(const Register* reg,

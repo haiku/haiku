@@ -65,7 +65,8 @@ DeviceInfo gSupportedDevices[] = {
 	{ { 0x1631, 0x6200 }, DeviceInfo::AX88172, "GoodWay USB2Ethernet" },
 	{ { 0x1737, 0x0039 }, DeviceInfo::AX88178, "LinkSys 1000" },
 	{ { 0x17ef, 0x7203 }, DeviceInfo::AX88772, "Lenovo U2L100P 10/100" },
-	{ { 0x2001, 0x1A00 }, DeviceInfo::AX88172, "D-Link DUB-E100" },
+	{ { 0x2001, 0x1a00 }, DeviceInfo::AX88172, "D-Link DUB-E100" },
+	{ { 0x2001, 0x1a02 }, DeviceInfo::AX88772B, "D-Link DUB-E100 rev.C1" },
 	{ { 0x2001, 0x3c05 }, DeviceInfo::AX88772, "D-Link DUB-E100 rev.B1" },
 	{ { 0x6189, 0x182d }, DeviceInfo::AX88172, "Sitecom LN-029" },
 };
@@ -107,7 +108,7 @@ lookup_and_create_device(usb_device device)
 				return new AX88178Device(device, gSupportedDevices[right]);
 			default:
 				TRACE_ALWAYS("Unknown device type:%#x ignored.\n",
-						static_cast<int>(gSupportedDevices[right].fType));
+					static_cast<int>(gSupportedDevices[right].fType));
 				break;
 		}
 	} else {
@@ -362,7 +363,8 @@ publish_devices()
 
 		gDeviceNames[deviceCount] = (char *)malloc(strlen(sDeviceBaseName) + 4);
 		if (gDeviceNames[deviceCount]) {
-			sprintf(gDeviceNames[deviceCount], "%s%ld", sDeviceBaseName, i);
+			sprintf(gDeviceNames[deviceCount], "%s%" B_PRId32, sDeviceBaseName,
+				i);
 			TRACE("publishing %s\n", gDeviceNames[deviceCount]);
 			deviceCount++;
 		} else
@@ -390,4 +392,3 @@ find_device(const char *name)
 
 	return &deviceHooks;
 }
-

@@ -77,7 +77,7 @@ struct pll_limits {
 static status_t
 get_i2c_signals(void* cookie, int* _clock, int* _data)
 {
-	uint32 ioRegister = (uint32)cookie;
+	uint32 ioRegister = (uint32)(addr_t)cookie;
 	uint32 value = read32(ioRegister);
 
 	*_clock = (value & I2C_CLOCK_VALUE_IN) != 0;
@@ -90,7 +90,7 @@ get_i2c_signals(void* cookie, int* _clock, int* _data)
 static status_t
 set_i2c_signals(void* cookie, int clock, int data)
 {
-	uint32 ioRegister = (uint32)cookie;
+	uint32 ioRegister = (uint32)(addr_t)cookie;
 	uint32 value;
 
 	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_83x)) {
@@ -488,16 +488,19 @@ sanitize_display_mode(display_mode& mode)
 
 	// TODO: verify constraints - these are more or less taken from the
 	// radeon driver!
-	const display_constraints constraints = {
+	display_constraints constraints = {
 		// resolution
 		320, 8192, 200, 4096,
 		// pixel clock
 		gInfo->shared_info->pll_info.min_frequency,
 		gInfo->shared_info->pll_info.max_frequency,
 		// horizontal
-		{olderCard ? 2 : 1, 0, 8160, 32, 8192, 0, 8192},
+		{1, 0, 8160, 32, 8192, 0, 8192},
 		{1, 1, 4092, 2, 63, 1, 4096}
 	};
+
+	if (olderCard)
+		constraints.horizontal_timing.resolution = 2;
 
 	return sanitize_display_mode(mode, constraints,
 		gInfo->has_edid ? &gInfo->edid_info : NULL);
@@ -563,7 +566,7 @@ status_t
 create_mode_list(void)
 {
 	i2c_bus bus;
-	bus.cookie = (void*)INTEL_I2C_IO_A;
+	bus.cookie = (void*)(addr_t)INTEL_I2C_IO_A;
 	bus.set_signals = &set_i2c_signals;
 	bus.get_signals = &get_i2c_signals;
 	ddc2_init_timing(&bus);
@@ -762,7 +765,7 @@ if (first) {
 
 	intel_free_memory(sharedInfo.frame_buffer);
 
-	uint32 base;
+	addr_t base;
 	if (intel_allocate_memory(bytesPerRow * target.virtual_height, 0,
 			base) < B_OK) {
 		// oh, how did that happen? Unfortunately, there is no really good way

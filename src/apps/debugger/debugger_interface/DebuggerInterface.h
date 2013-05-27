@@ -22,6 +22,7 @@ class ImageInfo;
 class SemaphoreInfo;
 class SymbolInfo;
 class SystemInfo;
+class TeamInfo;
 class ThreadInfo;
 
 namespace BPrivate {
@@ -56,6 +57,7 @@ public:
 	virtual status_t			UninstallWatchpoint(target_addr_t address);
 
 	virtual	status_t			GetSystemInfo(SystemInfo& info);
+	virtual	status_t			GetTeamInfo(TeamInfo& info);
 	virtual	status_t			GetThreadInfos(BObjectList<ThreadInfo>& infos);
 	virtual	status_t			GetImageInfos(BObjectList<ImageInfo>& infos);
 	virtual status_t			GetAreaInfos(BObjectList<AreaInfo>& infos);
@@ -72,6 +74,8 @@ public:
 	virtual	status_t			GetCpuState(thread_id thread,
 									CpuState*& _state);
 										// returns a reference to the caller
+	virtual	status_t			SetCpuState(thread_id thread,
+									const CpuState* state);
 
 	// TeamMemory
 	virtual	ssize_t				ReadMemory(target_addr_t address, void* buffer,
@@ -91,6 +95,9 @@ private:
 
 			status_t			_GetNextSystemWatchEvent(DebugEvent*& _event,
 									BPrivate::KMessage& message);
+
+			status_t			_GetDebugCpuState(thread_id thread,
+									debug_cpu_state& _state);
 
 private:
 			team_id				fTeamID;

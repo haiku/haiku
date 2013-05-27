@@ -1,10 +1,8 @@
-1	slovak	x-vnd.Haiku-ProcessController	2887520383
+1	slovak	x-vnd.Haiku-ProcessController	2886374724
 Memory usage	ProcessController		Využitie pamäte
-Do you really want to kill the team \"%s\"?	ProcessController		Skutočne chcete ukončiť tím „%s“?
 Idle priority	ProcessController		Priorita nečinný
 Restart Deskbar	ProcessController		Reštartovať Panel
 Custom priority	ProcessController		Vlastná priorita
-Debug thread	ProcessController		Ladiť vlákno
 This team is already gone…	ProcessController		Tento tím už je preč…
 Error saving file	ProcessController		Chyba pri ukladaní súboru
 Real-time priority	ProcessController		Priorita v reálnom čase
@@ -42,7 +40,6 @@ Usage: %s [-deskbar]\n	ProcessController		Použitie: %s [-deskbar]\n
 ProcessController	System name		Správca procesov
 Real-time display priority	ProcessController		Priorita zobrazenie v reálnom čase
 Please confirm	ProcessController		Prosím, potvrďte
-Yes, kill this team!	ProcessController		Áno, ukončiť tento tím!
 System resources & caches…	ProcessController		Zdroje a vyrovnávacia pamäť systému…
 That's no Fun!	ProcessController		To nie je sranda!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Správcu procesov môžete spúšťať v okne alebo ho nainštalovať do Panelu.

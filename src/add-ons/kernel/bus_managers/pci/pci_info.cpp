@@ -179,7 +179,7 @@ print_capabilities(const pci_info *info)
 static void
 print_info_basic(const pci_info *info, bool verbose)
 {
-	int domain;
+	uint8 domain;
 	uint8 bus;
 
 	__pci_resolve_virtual_bus(info->bus, &domain, &bus);

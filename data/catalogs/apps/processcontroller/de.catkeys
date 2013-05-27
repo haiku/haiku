@@ -1,14 +1,14 @@
-1	german	x-vnd.Haiku-ProcessController	2887520383
+1	german	x-vnd.Haiku-ProcessController	1848752768
 Memory usage	ProcessController		Speicherverbrauch
-Do you really want to kill the team \"%s\"?	ProcessController		Soll das Team \"%s\" wirklich beendet werden?
+Kill this team!	ProcessController		Dieses Team beenden!
 Idle priority	ProcessController		Leerlauf-Priorität
 Restart Deskbar	ProcessController		Deskbar neu starten
 Custom priority	ProcessController		Anwendungsspezifische Priorität
-Debug thread	ProcessController		Debug Thread
 This team is already gone…	ProcessController		Dieses Team existiert nicht mehr…
 Error saving file	ProcessController		Fehler beim Speichern der Datei
 Real-time priority	ProcessController		Echtzeit-Priorität
 Your setting file could not be saved!\n(%s)	ProcessController		Die Einstellungsdatei konnte nicht gespeichert werden.\n(%s)
+What do you want to do with the team \"%s\"?	ProcessController		Was soll mit dem Team \"%s\" geschehen?
 This thread is already gone…	ProcessController		Dieser Thread existiert nicht mehr…
 Cancel	ProcessController		Abbrechen
 Display priority	ProcessController		Anzeigen-Priorität
@@ -38,11 +38,11 @@ Threads and CPU usage	ProcessController		Threads und CPU-Last
 Urgent display priority	ProcessController		Hohe Anzeigen-Priorität
 OK	ProcessController		OK
 Damned!	ProcessController		Herrje!
+Debug this team!	ProcessController		Dieses Team debuggen!
 Usage: %s [-deskbar]\n	ProcessController		Gebrauch: %s [-deskbar]\n
 ProcessController	System name		Systemmanager
 Real-time display priority	ProcessController		Echtzeit-Anzeigen-Priorität
 Please confirm	ProcessController		Bitte bestätigen
-Yes, kill this team!	ProcessController		Ja, dieses Team beenden!
 System resources & caches…	ProcessController		Systemressourcen & Cache…
 That's no Fun!	ProcessController		Nicht lustig!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Der Systemmanager kann im Fenster ausgeführt oder in der Deskbar installiert werden.

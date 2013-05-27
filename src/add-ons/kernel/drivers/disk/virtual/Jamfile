@@ -3,3 +3,4 @@ SubDir HAIKU_TOP src add-ons kernel drivers disk virtual ;
 #SubInclude HAIKU_TOP src add-ons kernel drivers disk virtual fmap ;
 SubInclude HAIKU_TOP src add-ons kernel drivers disk virtual nbd ;
 SubInclude HAIKU_TOP src add-ons kernel drivers disk virtual remote_disk ;
+SubInclude HAIKU_TOP src add-ons kernel drivers disk virtual virtio_block ;

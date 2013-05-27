@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-ICOTranslator	1637901496
+1	romanian	x-vnd.Haiku-ICOTranslator	1211895126
 Cursor	ICOTranslator		Cursor
 Version %d.%d.%d, %s	ConfigView		Versiune %d.%d.%d, %s
 Windows %s %ld bit image	ICOTranslator		Imagine Windows %s %ld bit
@@ -10,3 +10,4 @@ pixels in either direction.	ConfigView		pixeli în ambele sensuri.
 Write 32 bit images on true color input	ConfigView		Scrie imagini de 32 biți la intrarea de culoare reală
 Icon	ICOTranslator		Pictogramă
 ICOTranslator Settings	ConfigView		Configurări TraducătorICO
+Windows icon translator	ConfigView		Traducător pictogramă Windows

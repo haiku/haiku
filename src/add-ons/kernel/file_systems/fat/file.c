@@ -180,7 +180,10 @@ dosfs_rstat(fs_volume *_vol, fs_vnode *_node, struct stat *st)
 	st->st_size = node->st_size;
 	st->st_blocks = (node->st_size + 511) / 512;
 	st->st_blksize = 0x10000; /* this value was chosen arbitrarily */
-	st->st_atime = st->st_mtime = st->st_ctime = st->st_crtime = node->st_time;
+	st->st_atim.tv_sec = st->st_mtim.tv_sec = st->st_ctim.tv_sec
+		= st->st_crtim.tv_sec = node->st_time;
+	st->st_atim.tv_nsec = st->st_mtim.tv_nsec = st->st_ctim.tv_nsec
+		= st->st_crtim.tv_nsec = 0;
 
 	UNLOCK_VOL(vol);
 

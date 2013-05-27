@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -40,6 +41,12 @@ public:
 	virtual	int32				CountChildren() const;
 	virtual	ValueNodeChild*		ChildAt(int32 index) const;
 
+	virtual	bool				IsRangedContainer() const;
+	virtual	void				ClearChildren();
+	virtual	status_t			CreateChildrenInRange(int32 lowIndex,
+									int32 highIndex);
+	virtual	status_t			SupportedChildRange(int32& lowIndex,
+									int32& highIndex) const;
 protected:
 			typedef BObjectList<AbstractArrayValueNodeChild> ChildList;
 
@@ -47,6 +54,9 @@ protected:
 			ArrayType*			fType;
 			ChildList			fChildren;
 			int32				fDimension;
+			int32				fLowerBound;
+			int32				fUpperBound;
+			bool				fBoundsInitialized;
 };
 
 

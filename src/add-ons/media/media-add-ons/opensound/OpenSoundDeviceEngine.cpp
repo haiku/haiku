@@ -540,7 +540,8 @@ status_t OpenSoundDeviceEngine::AcceptFormatFor(int fmt, media_format &format, b
 			return err;
 		}
 
-		PRINT(("%s:step1  fmt=0x%08x, raw.format=0x%08lx\n", __FUNCTION__, fmt, raw.format));
+		PRINT(("%s:step1  fmt=0x%08x, raw.format=0x%08" B_PRIx32 "\n",
+			__FUNCTION__, fmt, raw.format));
 		// if specified, try it
 		if (raw.format)
 			afmt = OpenSoundDevice::convert_media_format_to_oss_format(raw.format);
@@ -556,7 +557,8 @@ status_t OpenSoundDeviceEngine::AcceptFormatFor(int fmt, media_format &format, b
 		PRINT(("%s:step3 afmt=0x%08x\n", __FUNCTION__, afmt));
 		// convert back
 		raw.format = OpenSoundDevice::convert_oss_format_to_media_format(afmt);
-		PRINT(("%s:step4 afmt=0x%08x, raw.format=0x%08lx\n", __FUNCTION__, afmt, raw.format));
+		PRINT(("%s:step4 afmt=0x%08x, raw.format=0x%08" B_PRIx32 "\n",
+			__FUNCTION__, afmt, raw.format));
 		raw.valid_bits = OpenSoundDevice::convert_oss_format_to_valid_bits(afmt);
 
 		err = SetFormat(afmt);
@@ -634,7 +636,8 @@ status_t OpenSoundDeviceEngine::SpecializeFormatFor(int fmt, media_format &forma
 	if (format.type == B_MEDIA_RAW_AUDIO) {
 		media_multi_audio_format &raw = format.u.raw_audio;
 
-		PRINT(("%s:step1  fmt=0x%08x, raw.format=0x%08lx\n", __FUNCTION__, fmt, raw.format));
+		PRINT(("%s:step1  fmt=0x%08x, raw.format=0x%08" B_PRIx32 "\n",
+			__FUNCTION__, fmt, raw.format));
 		// select the best as default
 		if (!raw.format) {
 			afmt = OpenSoundDevice::select_oss_format(fmt);
@@ -651,7 +654,8 @@ status_t OpenSoundDeviceEngine::SpecializeFormatFor(int fmt, media_format &forma
 		}
 		// convert back
 		raw.format = OpenSoundDevice::convert_oss_format_to_media_format(afmt);
-		PRINT(("%s:step4 afmt=0x%08x, raw.format=0x%08lx\n", __FUNCTION__, afmt, raw.format));
+		PRINT(("%s:step4 afmt=0x%08x, raw.format=0x%08" B_PRIx32 "\n",
+			__FUNCTION__, afmt, raw.format));
 		if (!raw.valid_bits)
 			raw.valid_bits = OpenSoundDevice::convert_oss_format_to_valid_bits(afmt);
 		if (raw.valid_bits != OpenSoundDevice::convert_oss_format_to_valid_bits(afmt)) {

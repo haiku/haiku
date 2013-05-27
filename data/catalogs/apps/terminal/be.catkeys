@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Terminal	766764238
+1	belarusian	x-vnd.Haiku-Terminal	2967760334
 Not found.	Terminal TermWindow		Не знойдзена.
 Switch Terminals	Terminal TermWindow		Пераключыць Тэрміналы
 Change directory	Terminal TermView		Змяніць дырэкторыю
@@ -21,6 +21,7 @@ Font:	Terminal AppearancePrefView		Шрыфт:
 Copy here	Terminal TermView		Капіяваць сюды
 Really close?	Terminal TermWindow		Сапраўды закрыць?
 Copy	Terminal TermWindow		Капіяваць
+Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Тэрмінал
 Color scheme:	Terminal AppearancePrefView		Каляровая схема:
 Window title:	Terminal TermWindow		Імя вакна:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Невядомая опцыя \"%s\"\n
@@ -78,6 +79,7 @@ Clear all	Terminal TermWindow		Ачысціць усё
 Text encoding	Terminal TermWindow		Кадоўка тэксту
 size	Terminal TermView		памер
 Close window	Terminal TermWindow		Закрыць вакно
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tРабочы каталог актыўнага працэсу\n\t\t\tў цякучай укладцы.Дадаткова можна ўказаць макісмальную колькасць кампанентаў пуці.\n\t\t\t Напрыклад, '%2d' - не больша за два кампаненты.\n\t%T\t-\tІмя праграмы Тэрмінала ў актуальнай лакалі.\n\t%e\t-\tКадоўка актыўнай укладкі. Калі UTF-8 то не паказваецца.\n\t%i\t-\tІндэкс вакна.\n\t%p\t-\tІмя актыўнага працэсу ў цякучай укладцы.\n\t%t\t-\tІмя цякучай укладкі.\n\t%%\t-\tСімвал '%'.
 Save as default	Terminal TermWindow		Захаваць як прадвызначаныя
 Set tab title	Terminal TermWindow		Прызначыць імя ўкладкі
 Settings…	Terminal TermWindow		Наладкі…

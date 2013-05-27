@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -13,8 +13,6 @@
 #include <boot/platform.h>
 #include <boot/heap.h>
 #include <boot/stdio.h>
-
-#include <util/kernel_cpp.h>
 
 
 //#define TRACE_MAIN

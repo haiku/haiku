@@ -186,14 +186,14 @@ StyledTextImporter::Import(Icon* icon, BMessage* clipping)
 {
 	CALLED();
 	const char *text;
-	int32 textLength;
+	ssize_t textLength;
 
 	if (clipping == NULL)
 		return ENOENT;
 	if (clipping->FindData("text/plain",
 		B_MIME_TYPE, (const void **)&text, &textLength) == B_OK) {
 		text_run_array *runs = NULL;
-		int32 runsLength;
+		ssize_t runsLength;
 		if (clipping->FindData("application/x-vnd.Be-text_run_array",
 			B_MIME_TYPE, (const void **)&runs, &runsLength) < B_OK)
 			runs = NULL;

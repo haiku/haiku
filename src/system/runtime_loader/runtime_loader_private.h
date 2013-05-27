@@ -81,6 +81,7 @@ int resolve_symbol(image_t* rootImage, image_t* image, elf_sym* sym,
 status_t elf_verify_header(void* header, size_t length);
 void rldelf_init(void);
 void rldexport_init(void);
+void set_abi_version(int abi_version);
 status_t elf_reinit_after_fork(void);
 
 status_t heap_init(void);

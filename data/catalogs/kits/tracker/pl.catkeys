@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	2345639754
+1	polish	x-vnd.Haiku-libtracker	745004356
 common	B_COMMON_DIRECTORY		wspólny
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Widok ikon
@@ -210,7 +210,6 @@ Resize to fit	VolumeWindow		Zmień rozmiar by dopasować
 Could not find application \"%appname\"	OpenWithWindow		Nie można odnaleźć aplikacji \"%appname\"
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Zaznaczony plik nie może zostać przeniesiony do kosza. Czy chcesz go usunąć zamiast tego? (Ta operacja nie może zostać cofnięta)
 Invert	SelectionWindow		Odwróć
-Save Query as template…	FindPanel		Zapisz zapytanie jako szablon…
 rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	zmienisz nazwę
 Find	FindPanel		Znajdź
 Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Przenieś
@@ -235,6 +234,7 @@ Temporary	FindPanel		Tymczasowy
 Version	OpenWithWindow		Wersja
 Default application	InfoWindow		Domyślna aplikacja
 Preparing to copy items…	StatusWindow		Przygotowanie do kopiowania elementów…
+Save query as template…	FindPanel		Zapisz zapytanie jako szablon…
 Show folder location in title tab	SettingsView		Pokaż lokacje folderu na pasku
 Proceed	FSUtils		Kontynuuj
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Niektóre obiekty już istnieją w tym folderze o nazwach identycznych co te które probujesz %verb.\n \nCzy chcesz je zamienić z tymi które próbujesz %verb czy wolisz być pytany o każdy z nich?
@@ -333,6 +333,7 @@ The specified name is already used as the name of a folder. Please choose anothe
 Clean up	ContainerWindow		Wyczyść
 after	FindPanel		po
 Select…	QueryContainerWindow		Wybierz…
+More options	FindPanel		Więcej opcji
 link	FSUtils	filename link	Skrót
 At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		W %func \nfind_directory() nie powiódł się. \nPowód: %error
 The specified name is illegal. Please choose another name.	FilePanelPriv		Podana nazwa jest niedozwolona. Proszę wybrać inną nazwę.
@@ -444,6 +445,7 @@ contains	FindPanel		zawiera
 Relation	OpenWithWindow		Relacje
 Open	FilePanelPriv		Otwórz
 Mount	DeskWindow		Zamontuj
+Recent queries	FindPanel		Ostatnie zapytania
 Mount	ContainerWindow		Zamontuj
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used zajęte -- %free wolne)
 Cancel	FSClipBoard		Anuluj

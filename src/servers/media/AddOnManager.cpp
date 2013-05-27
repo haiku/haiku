@@ -117,7 +117,7 @@ AddOnManager::GetDecoderForFormat(xfer_entry_ref* _decoderRef,
 	BAutolock locker(fLock);
 
 	printf("AddOnManager::GetDecoderForFormat: searching decoder for encoding "
-		"%ld\n", format.Encoding());
+		"%" B_PRIu32 "\n", format.Encoding());
 
 	// Since the list of decoders is unsorted, we need to search for
 	// a decoder by add-on directory, in order to maintain the shadowing
@@ -175,7 +175,7 @@ AddOnManager::GetEncoder(xfer_entry_ref* _encoderRef, int32 id)
 		// check if the encoder matches the supplied format
 		if (info->internalID == (uint32)id) {
 			printf("AddOnManager::GetEncoderForFormat: found encoder %s for "
-				"id %ld\n", info->ref.name, id);
+				"id %" B_PRId32 "\n", info->ref.name, id);
 
 			*_encoderRef = info->ref;
 			return B_OK;
@@ -183,7 +183,7 @@ AddOnManager::GetEncoder(xfer_entry_ref* _encoderRef, int32 id)
 	}
 
 	printf("AddOnManager::GetEncoderForFormat: failed to find encoder for id "
-		"%ld\n", id);
+		"%" B_PRId32 "\n", id);
 
 	return B_ENTRY_NOT_FOUND;
 }
@@ -198,7 +198,7 @@ AddOnManager::GetWriter(xfer_entry_ref* _ref, uint32 internalID)
 	for (fWriterList.Rewind(); fWriterList.GetNext(&info);) {
 		if (info->internalID == internalID) {
 			printf("AddOnManager::GetWriter: found writer %s for "
-				"internal_id %lu\n", info->ref.name, internalID);
+				"internal_id %" B_PRId32 "\n", info->ref.name, internalID);
 
 			*_ref = info->ref;
 			return B_OK;
@@ -425,7 +425,7 @@ printf("removing writer '%s'\n", writerInfo->ref.name);
 	encoder_info* encoderInfo;
 	for (fEncoderList.Rewind(); fEncoderList.GetNext(&encoderInfo);) {
 		if (encoderInfo->ref == ref) {
-printf("removing encoder '%s', id %lu\n", encoderInfo->ref.name,
+printf("removing encoder '%s', id %" B_PRIu32 "\n", encoderInfo->ref.name,
 	encoderInfo->internalID);
 			fEncoderList.RemoveCurrent();
 			// Keep going, since we add multiple encoder infos per add-on.
@@ -600,7 +600,7 @@ AddOnManager::_FindDecoder(const media_format& format, const BPath& path,
 				continue;
 
 			printf("AddOnManager::GetDecoderForFormat: found decoder %s/%s "
-				"for encoding %ld\n", path.Path(), info->ref.name,
+				"for encoding %" B_PRIu32 "\n", path.Path(), info->ref.name,
 				decoderFormat->Encoding());
 
 			*_decoderRef = info->ref;

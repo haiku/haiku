@@ -1,9 +1,11 @@
-1	belarusian	x-vnd.Haiku-MediaConverter	2955071341
+1	belarusian	x-vnd.Haiku-MediaConverter	2722282283
 Video using parameters form settings	MediaConverter		Відэа карыстае параметры з наладак
 Video encoding:	MediaConverter		Кадаванне відэа:
+Error read audio frame %lld	MediaConverter		Памылка чытання фрэйма %lld
 No audio	Audio codecs list		Няма аўдыё
 Error	MediaConverter		Памылка
 Error loading a file	MediaConverter		Немагчыма адкрыць файл
+Error read video frame %lld	MediaConverter		Памылка чытання фрэйма %lld
 File Error	MediaConverter-FileInfo		Памылка файла
 Open…	Menu		Адкрыць…
 Start [ms]: 	MediaConverter		Пачатак [мсек]: 
@@ -22,6 +24,8 @@ Audio:	MediaConverter-FileInfo		Аўдыё:
 OK	MediaConverter-FileInfo		ОК
  seconds	MediaFileInfo		 секундаў
 Source files	MediaConverter		Зыходныя файлы
+Error writing video frame %lld	MediaConverter		Памылка запісу фрэйма %lld
+Error writing audio frame %lld	MediaConverter		Памылка запіса аўдыё фрэйма %lld
 Cancelling	MediaConverter		Адмена
 %d byte 	MediaFileInfo		%d байтаў 
 Error loading files	MediaConverter		Немагчыма загрузіць файлы

@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2010, Philippe Houdoin, phoudoin@haiku-os.org. All rights reserved.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -11,16 +12,25 @@
 #include <stdarg.h>
 
 #include <Application.h>
-#include <ListView.h>
-#include <ScrollView.h>
+#include <Button.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <LayoutBuilder.h>
+#include <ListView.h>
 #include <Path.h>
+#include <Screen.h>
+#include <ScrollView.h>
 
 #include "MessageCodes.h"
 #include "SettingsManager.h"
+#include "StartTeamWindow.h"
 #include "TeamsWindow.h"
 #include "TeamsListView.h"
+
+
+enum {
+	MSG_TEAM_SELECTION_CHANGED = 'tesc'
+};
 
 
 TeamsWindow::TeamsWindow(SettingsManager* settingsManager)
@@ -28,13 +38,20 @@ TeamsWindow::TeamsWindow(SettingsManager* settingsManager)
 	BWindow(BRect(100, 100, 500, 250), "Teams", B_DOCUMENT_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS),
 	fTeamsListView(NULL),
+	fStartTeamWindow(NULL),
+	fAttachTeamButton(NULL),
+	fCreateTeamButton(NULL),
 	fSettingsManager(settingsManager)
 {
+	team_info info;
+	get_team_info(B_CURRENT_TEAM, &info);
+	fCurrentTeam = info.team;
 }
 
 
 TeamsWindow::~TeamsWindow()
 {
+	BMessenger(fStartTeamWindow).SendMessage(B_QUIT_REQUESTED);
 }
 
 
@@ -55,17 +72,63 @@ TeamsWindow::Create(SettingsManager* settingsManager)
 
 
 void
+TeamsWindow::Zoom(BPoint, float, float)
+{
+	BSize preferredSize = fTeamsListView->PreferredSize();
+	ResizeBy(preferredSize.Width() - Bounds().Width(),
+		0.0);
+
+	// if the new size would extend us past the screen border,
+	// move sufficiently to the left to bring us back within the bounds
+	// + a bit of extra margin so we're not flush against the edge.
+	BScreen screen;
+	float offset = screen.Frame().right - Frame().right;
+	if (offset < 0)
+		MoveBy(offset - 5.0, 0.0);
+}
+
+
+void
 TeamsWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case kMsgDebugThisTeam:
+		case MSG_START_NEW_TEAM:
 		{
-			TeamRow* row = dynamic_cast<TeamRow*>(fTeamsListView->CurrentSelection());
+			BMessenger messenger(fStartTeamWindow);
+			if (!messenger.IsValid()) {
+				fStartTeamWindow = StartTeamWindow::Create();
+				if (fStartTeamWindow == NULL)
+					break;
+			}
+
+			fStartTeamWindow->Show();
+			break;
+		}
+
+		case MSG_DEBUG_THIS_TEAM:
+		{
+			TeamRow* row = dynamic_cast<TeamRow*>(
+				fTeamsListView->CurrentSelection());
 			if (row != NULL) {
 				BMessage message(MSG_DEBUG_THIS_TEAM);
 				message.AddInt32("team", row->TeamID());
 				be_app_messenger.SendMessage(&message);
 			}
+			break;
+		}
+
+		case MSG_TEAM_SELECTION_CHANGED:
+		{
+			TeamRow* row = dynamic_cast<TeamRow*>(
+				fTeamsListView->CurrentSelection());
+			bool enabled = false;
+			if (row != NULL) {
+				team_id id = row->TeamID();
+				if (id != fCurrentTeam && id != B_SYSTEM_TEAM)
+					enabled = true;
+			}
+
+			fAttachTeamButton->SetEnabled(enabled);
 			break;
 		}
 
@@ -101,17 +164,23 @@ TeamsWindow::_Init()
 		ResizeTo(frame.Width(), frame.Height());
 	}
 
-	// TODO: add button to start a team debugger
-	// TODO: add UI to setup arguments and environ, launch a program
-	//       and start his team debugger
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.Add(fTeamsListView = new TeamsListView("TeamsList", fCurrentTeam))
+		.SetInsets(1.0f, 1.0f, 1.0f, 1.0f)
+		.AddGroup(B_HORIZONTAL)
+			.SetInsets(B_USE_DEFAULT_SPACING)
+			.Add(fAttachTeamButton = new BButton("Attach", new BMessage(
+						MSG_DEBUG_THIS_TEAM)))
+			.Add(fCreateTeamButton = new BButton("Start new team"
+					B_UTF8_ELLIPSIS, new BMessage(MSG_START_NEW_TEAM)))
+			.End()
+		.End();
 
-	// Add a teams list view
-	frame = Bounds();
-	frame.InsetBy(-1, -1);
-	fTeamsListView = new TeamsListView(frame, "TeamsList");
-	fTeamsListView->SetInvocationMessage(new BMessage(kMsgDebugThisTeam));
+	fTeamsListView->SetInvocationMessage(new BMessage(MSG_DEBUG_THIS_TEAM));
+	fTeamsListView->SetSelectionMessage(new BMessage(
+			MSG_TEAM_SELECTION_CHANGED));
 
-	AddChild(fTeamsListView);
+	fAttachTeamButton->SetEnabled(false);
 }
 
 

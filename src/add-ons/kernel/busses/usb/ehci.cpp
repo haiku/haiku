@@ -802,7 +802,8 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 		uint16 pg = 0;
 		itd->buffer_phy[pg] = currentPhy & 0xfffff000;
 		uint32 offset = currentPhy & 0xfff;
-		TRACE("isochronous created itd, filling it with phy %lx\n", currentPhy);
+		TRACE("isochronous created itd, filling it with phy %" B_PRIxPHYSADDR
+			"\n", currentPhy);
 		for (int32 i = 0; i < 8 && dataLength > 0; i++) {
 			size_t length = min_c(dataLength, packetSize);
 			itd->token[i] = (EHCI_ITD_STATUS_ACTIVE << EHCI_ITD_STATUS_SHIFT)

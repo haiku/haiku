@@ -3,7 +3,7 @@
 #define TRAN 0xFF
 #define WHIT 0x3F
 
-const char gFlakeBits[NUM_PATTERNS][64] = {
+const uchar gFlakeBits[NUM_PATTERNS][64] = {
 {
 TRAN, TRAN, TRAN, TRAN, TRAN, TRAN, TRAN, TRAN, 
 TRAN, TRAN, WHIT, TRAN, WHIT, TRAN, TRAN, TRAN, 

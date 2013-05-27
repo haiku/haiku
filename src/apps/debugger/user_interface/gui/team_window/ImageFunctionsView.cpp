@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,8 +8,10 @@
 
 #include <stdio.h>
 
-#include <algorithm>
 #include <new>
+#include <set>
+
+#include <StringList.h>
 
 #include <AutoDeleter.h>
 
@@ -23,6 +25,132 @@
 #include "Tracing.h"
 
 
+// #pragma mark - SourcePathComponentNode
+
+
+class ImageFunctionsView::SourcePathComponentNode : public BReferenceable {
+public:
+	SourcePathComponentNode(SourcePathComponentNode* parent,
+		const BString& componentName, LocatableFile* sourceFile,
+		FunctionInstance* function)
+		:
+		fParent(parent),
+		fComponentName(componentName),
+		fSourceFile(sourceFile),
+		fFunction(function)
+	{
+		if (fSourceFile != NULL)
+			fSourceFile->AcquireReference();
+		if (fFunction != NULL)
+			fFunction->AcquireReference();
+	}
+
+	virtual ~SourcePathComponentNode()
+	{
+		for (int32 i = 0; i < fChildPathComponents.CountItems(); i++)
+			fChildPathComponents.ItemAt(i)->ReleaseReference();
+
+		if (fSourceFile != NULL)
+			fSourceFile->ReleaseReference();
+
+		if (fFunction != NULL)
+			fFunction->ReleaseReference();
+	}
+
+	const BString& ComponentName() const
+	{
+		return fComponentName;
+	}
+
+	LocatableFile* SourceFile() const
+	{
+		return fSourceFile;
+	}
+
+	FunctionInstance* Function() const
+	{
+		return fFunction;
+	}
+
+	int32 CountChildren() const
+	{
+		return fChildPathComponents.CountItems();
+	}
+
+	SourcePathComponentNode* ChildAt(int32 index)
+	{
+		return fChildPathComponents.ItemAt(index);
+	}
+
+	SourcePathComponentNode* FindChildByName(const BString& name) const
+	{
+		return fChildPathComponents.BinarySearchByKey(name,
+			&CompareByComponentName);
+	}
+
+	int32 FindChildIndexByName(const BString& name) const
+	{
+		return fChildPathComponents.BinarySearchIndexByKey(name,
+			&CompareByComponentName);
+	}
+
+	bool AddChild(SourcePathComponentNode* child)
+	{
+		if (!fChildPathComponents.BinaryInsert(child,
+				&CompareComponents)) {
+			return false;
+		}
+
+		child->AcquireReference();
+
+		return true;
+	}
+
+	bool RemoveChild(SourcePathComponentNode* child)
+	{
+		if (!fChildPathComponents.RemoveItem(child))
+			return false;
+
+		child->ReleaseReference();
+
+		return true;
+	}
+
+	bool RemoveAllChildren()
+	{
+		for (int32 i = 0; i < fChildPathComponents.CountItems(); i++)
+			RemoveChild(fChildPathComponents.ItemAt(i));
+
+		return true;
+	}
+
+private:
+	friend class ImageFunctionsView::FunctionsTableModel;
+
+	static int CompareByComponentName(const BString* name, const
+		SourcePathComponentNode* node)
+	{
+		return name->Compare(node->ComponentName());
+	}
+
+	static int CompareComponents(const SourcePathComponentNode* a,
+		const SourcePathComponentNode* b)
+	{
+		return a->ComponentName().Compare(b->ComponentName());
+	}
+
+private:
+	typedef BObjectList<SourcePathComponentNode> ChildPathComponentList;
+
+private:
+	SourcePathComponentNode* fParent;
+	BString					fComponentName;
+	LocatableFile*			fSourceFile;
+	FunctionInstance*		fFunction;
+	ChildPathComponentList	fChildPathComponents;
+};
+
+
 // #pragma mark - FunctionsTableModel
 
 
@@ -31,10 +159,7 @@ public:
 	FunctionsTableModel()
 		:
 		fImageDebugInfo(NULL),
-		fFunctions(NULL),
-		fFunctionCount(0),
-		fSourceFileIndices(NULL),
-		fSourceFileCount(0)
+		fSourcelessNode(NULL)
 	{
 	}
 
@@ -46,84 +171,75 @@ public:
 	void SetImageDebugInfo(ImageDebugInfo* imageDebugInfo)
 	{
 		// unset old functions
-		if (fSourceFileIndices != NULL) {
-			NotifyNodesRemoved(TreeTablePath(), 0, fSourceFileCount);
+		int32 count = fChildPathComponents.CountItems();
+		if (fImageDebugInfo != NULL) {
+			for (int32 i = 0; i < count; i++)
+				fChildPathComponents.ItemAt(i)->ReleaseReference();
 
-			delete[] fFunctions;
-			fFunctions = NULL;
-			fFunctionCount = 0;
-
-			delete[] fSourceFileIndices;
-			fSourceFileIndices = NULL;
-			fSourceFileCount = 0;
+			fChildPathComponents.MakeEmpty();
+			fSourcelessNode = NULL;
 		}
 
 		fImageDebugInfo = imageDebugInfo;
 
 		// set new functions
-		if (fImageDebugInfo == NULL || fImageDebugInfo->CountFunctions() == 0)
+		if (fImageDebugInfo == NULL || fImageDebugInfo->CountFunctions()
+				== 0) {
+			NotifyNodesRemoved(TreeTablePath(), 0, count);
 			return;
+		}
 
-		// create an array with the functions
+		std::set<target_addr_t> functionAddresses;
+
+		SourcePathComponentNode* sourcelessNode = new(std::nothrow)
+			SourcePathComponentNode(NULL, "<no source file>", NULL, NULL);
+		BReference<SourcePathComponentNode> sourceNodeRef(
+			sourcelessNode, true);
+
+		LocatableFile* currentFile = NULL;
+		BStringList pathComponents;
 		int32 functionCount = fImageDebugInfo->CountFunctions();
-		FunctionInstance** functions
-			= new(std::nothrow) FunctionInstance*[functionCount];
-		if (functions == NULL)
-			return;
-		ArrayDeleter<FunctionInstance*> functionsDeleter(functions);
-
-		for (int32 i = 0; i < functionCount; i++)
-			functions[i] = fImageDebugInfo->FunctionAt(i);
-
-		// sort them
-		std::sort(functions, functions + functionCount, &_FunctionLess);
-
-		// eliminate duplicate function instances
-		if (functionCount > 0) {
-			Function* previousFunction = functions[0]->GetFunction();
-			int32 removed = 0;
-			for (int32 i = 1; i < functionCount; i++) {
-				if (functions[i]->GetFunction() == previousFunction) {
-					removed++;
-				} else {
-					functions[i - removed] = functions[i];
-					previousFunction = functions[i]->GetFunction();
+		for (int32 i = 0; i < functionCount; i++) {
+			FunctionInstance* instance = fImageDebugInfo->FunctionAt(i);
+			target_addr_t address = instance->Address();
+			if (functionAddresses.find(address) != functionAddresses.end())
+				continue;
+			else {
+				try {
+					functionAddresses.insert(address);
+				} catch (...) {
+					return;
 				}
 			}
 
-			functionCount -= removed;
-				// The array might now be too large, but we can live with that.
+			LocatableFile* sourceFile = instance->SourceFile();
+			if (sourceFile == NULL) {
+				if (!_AddFunctionNode(sourcelessNode, instance, NULL))
+					return;
+				continue;
+			}
+
+			if (sourceFile != currentFile) {
+				currentFile = sourceFile;
+				if (!_GetSourcePathComponents(currentFile,
+						pathComponents)) {
+					return;
+				}
+			}
+
+			if (!_AddFunctionByPath(pathComponents, instance, currentFile))
+				return;
 		}
 
-		// count the different source files
-		int32 sourceFileCount = 1;
-		for (int32 i = 1; i < functionCount; i++) {
-			if (_CompareSourceFileNames(functions[i - 1]->SourceFile(),
-					functions[i]->SourceFile()) != 0) {
-				sourceFileCount++;
+		if (sourcelessNode->CountChildren() != 0) {
+			if (fChildPathComponents.BinaryInsert(sourcelessNode,
+					&SourcePathComponentNode::CompareComponents)) {
+				fSourcelessNode = sourcelessNode;
+				sourceNodeRef.Detach();
 			}
 		}
 
-		// allocate and init the indices for the source files
-		fSourceFileIndices = new(std::nothrow) int32[sourceFileCount];
-		if (fSourceFileIndices == NULL)
-			return;
-		fSourceFileCount = sourceFileCount;
-
-		fSourceFileIndices[0] = 0;
-
-		int32 sourceFileIndex = 1;
-		for (int32 i = 1; i < functionCount; i++) {
-			if (_CompareSourceFileNames(functions[i - 1]->SourceFile(),
-					functions[i]->SourceFile()) != 0) {
-				fSourceFileIndices[sourceFileIndex++] = i;
-			}
-		}
-
-		fFunctions = functionsDeleter.Detach();
-		fFunctionCount = functionCount;
-
-		NotifyNodesAdded(TreeTablePath(), 0, fSourceFileCount);
+		NotifyTableModelReset();
 	}
 
 	virtual int32 CountColumns() const
@@ -139,34 +255,17 @@ public:
 	virtual int32 CountChildren(void* parent) const
 	{
 		if (parent == this)
-			return fSourceFileCount;
+			return fChildPathComponents.CountItems();
 
-		if (parent >= fSourceFileIndices
-			&& parent < fSourceFileIndices + fSourceFileCount) {
-			int32 sourceIndex = (int32*)parent - fSourceFileIndices;
-			return _CountSourceFileFunctions(sourceIndex);
-		}
-
-		return 0;
+		return ((SourcePathComponentNode*)parent)->CountChildren();
 	}
 
 	virtual void* ChildAt(void* parent, int32 index) const
 	{
-		if (parent == this) {
-			return index >= 0 && index < fSourceFileCount
-				? fSourceFileIndices + index : NULL;
-		}
+		if (parent == this)
+			return fChildPathComponents.ItemAt(index);
 
-		if (parent >= fSourceFileIndices
-			&& parent < fSourceFileIndices + fSourceFileCount) {
-			int32 sourceIndex = (int32*)parent - fSourceFileIndices;
-			int32 count = _CountSourceFileFunctions(sourceIndex);
-			int32 firstFunctionIndex = fSourceFileIndices[sourceIndex];
-			return index >= 0 && index < count
-				? fFunctions[firstFunctionIndex + index] : NULL;
-		}
-
-		return NULL;
+		return ((SourcePathComponentNode*)parent)->ChildAt(index);
 	}
 
 	virtual bool GetValueAt(void* object, int32 columnIndex, BVariant& value)
@@ -177,124 +276,175 @@ public:
 		if (object == this)
 			return false;
 
-		if (object >= fSourceFileIndices
-			&& object < fSourceFileIndices + fSourceFileCount) {
-			int32 index = *(int32*)object;
-			if (LocatableFile* file = fFunctions[index]->SourceFile()) {
-				BString path;
-				file->GetPath(path);
-				value.SetTo(path);
-			} else
-				value.SetTo("<no source file>", B_VARIANT_DONT_COPY_DATA);
+		SourcePathComponentNode* node = (SourcePathComponentNode*)object;
 
-			return true;
-		}
+		value.SetTo(node->ComponentName(), B_VARIANT_DONT_COPY_DATA);
 
-		FunctionInstance* function = (FunctionInstance*)object;
-		value.SetTo(function->PrettyName(), B_VARIANT_DONT_COPY_DATA);
 		return true;
 	}
 
 	bool GetFunctionPath(FunctionInstance* function, TreeTablePath& _path)
 	{
-		int32 index = -1;
-		for (int32 i = 0; i < fFunctionCount; i++) {
-			if (fFunctions[i] == function) {
-				index = i;
-				break;
+		if (function == NULL)
+			return false;
+
+		LocatableFile* sourceFile = function->SourceFile();
+		SourcePathComponentNode* node = NULL;
+		int32 childIndex = -1;
+		if (sourceFile == NULL) {
+			node = fSourcelessNode;
+			_path.AddComponent(fChildPathComponents.IndexOf(node));
+		} else {
+			BStringList pathComponents;
+			if (!_GetSourcePathComponents(sourceFile, pathComponents))
+				return false;
+
+			for (int32 i = 0; i < pathComponents.CountStrings(); i++) {
+				BString component = pathComponents.StringAt(i);
+
+				if (node == NULL) {
+					childIndex = fChildPathComponents.BinarySearchIndexByKey(
+						component,
+						&SourcePathComponentNode::CompareByComponentName);
+					node = fChildPathComponents.ItemAt(childIndex);
+				} else {
+					childIndex = node->FindChildIndexByName(component);
+					node = node->ChildAt(childIndex);
+				}
+
+				if (childIndex < 0)
+					return false;
+
+				_path.AddComponent(childIndex);
 			}
 		}
 
-		if (index < 0)
+		if (node == NULL)
 			return false;
 
-		int32 sourceIndex = fSourceFileCount - 1;
-		while (fSourceFileIndices[sourceIndex] > index)
-			sourceIndex--;
+		childIndex = node->FindChildIndexByName(function->PrettyName());
+		if (childIndex < 0)
+			return false;
 
-		_path.Clear();
-		return _path.AddComponent(sourceIndex)
-			&& _path.AddComponent(index - fSourceFileIndices[sourceIndex]);
+		_path.AddComponent(childIndex);
+		return true;
 	}
 
 	bool GetObjectForPath(const TreeTablePath& path,
 		LocatableFile*& _sourceFile, FunctionInstance*& _function)
 	{
-		int32 componentCount = path.CountComponents();
-		if (componentCount == 0 || componentCount > 2)
+		SourcePathComponentNode* node = fChildPathComponents.ItemAt(
+			path.ComponentAt(0));
+
+		if (node == NULL)
 			return false;
 
-		int32 sourceIndex = path.ComponentAt(0);
-		if (sourceIndex < 0 || sourceIndex >= fSourceFileCount)
+		for (int32 i = 1; i < path.CountComponents(); i++)
+			node = node->ChildAt(path.ComponentAt(i));
+
+		if (node != NULL) {
+			_sourceFile = node->SourceFile();
+			_function = node->Function();
+			return true;
+		}
+
+		return false;
+	}
+
+private:
+	bool _GetSourcePathComponents(LocatableFile* currentFile,
+		BStringList& pathComponents)
+	{
+		BString sourcePath;
+		currentFile->GetPath(sourcePath);
+		if (sourcePath.IsEmpty())
 			return false;
 
-		_sourceFile = fFunctions[fSourceFileIndices[sourceIndex]]->SourceFile();
+		pathComponents.MakeEmpty();
 
-		_function = NULL;
+		int32 startIndex = 0;
+		if (sourcePath[0] == '/')
+			startIndex = 1;
 
-		if (componentCount == 2) {
-			int32 index = path.ComponentAt(1);
-			if (index >= 0 && index < _CountSourceFileFunctions(sourceIndex))
-				_function = fFunctions[fSourceFileIndices[sourceIndex] + index];
+		while (startIndex < sourcePath.Length()) {
+			int32 searchIndex = sourcePath.FindFirst('/', startIndex);
+			BString data;
+			if (searchIndex < 0)
+				searchIndex = sourcePath.Length();
+
+			sourcePath.CopyInto(data, startIndex, searchIndex - startIndex);
+			if (!pathComponents.Add(data))
+				return false;
+
+			startIndex = searchIndex + 1;
 		}
 
 		return true;
 	}
 
-	int32 CountSourceFiles() const
+	bool _AddFunctionByPath(const BStringList& pathComponents,
+		FunctionInstance* function, LocatableFile* file)
 	{
-		return fSourceFileCount;
+		SourcePathComponentNode* parentNode = NULL;
+		SourcePathComponentNode* currentNode = NULL;
+		for (int32 i = 0; i < pathComponents.CountStrings(); i++) {
+			const BString pathComponent = pathComponents.StringAt(i);
+			if (parentNode == NULL) {
+				currentNode = fChildPathComponents.BinarySearchByKey(
+					pathComponent,
+					SourcePathComponentNode::CompareByComponentName);
+			} else
+				currentNode = parentNode->FindChildByName(pathComponent);
+
+			if (currentNode == NULL) {
+				currentNode = new(std::nothrow) SourcePathComponentNode(
+					parentNode,	pathComponent, NULL, NULL);
+				if (currentNode == NULL)
+					return false;
+				BReference<SourcePathComponentNode> nodeReference(currentNode,
+					true);
+				if (parentNode != NULL) {
+					if (!parentNode->AddChild(currentNode))
+						return false;
+				} else {
+					if (!fChildPathComponents.BinaryInsert(currentNode,
+						&SourcePathComponentNode::CompareComponents)) {
+						return false;
+					}
+
+					nodeReference.Detach();
+				}
+			}
+			parentNode = currentNode;
+		}
+
+		return _AddFunctionNode(currentNode, function, file);
+	}
+
+	bool _AddFunctionNode(SourcePathComponentNode* parent,
+		FunctionInstance* function, LocatableFile* file)
+	{
+		SourcePathComponentNode* functionNode = new(std::nothrow)
+			SourcePathComponentNode(parent, function->PrettyName(), file,
+				function);
+
+		if (functionNode == NULL)
+			return B_NO_MEMORY;
+
+		BReference<SourcePathComponentNode> nodeReference(functionNode, true);
+		if (!parent->AddChild(functionNode))
+			return false;
+
+		return true;
 	}
 
 private:
-	int32 _CountSourceFileFunctions(int32 sourceIndex) const
-	{
-		if (sourceIndex < 0 || sourceIndex >= fSourceFileCount)
-			return 0;
-
-		int32 nextFunctionIndex = sourceIndex + 1 < fSourceFileCount
-			? fSourceFileIndices[sourceIndex + 1] : fFunctionCount;
-		return nextFunctionIndex - fSourceFileIndices[sourceIndex];
-	}
-
-	static int _CompareSourceFileNames(LocatableFile* a, LocatableFile* b)
-	{
-		if (a == b)
-			return 0;
-
-		if (a == NULL)
-			return 1;
-		if (b == NULL)
-			return -1;
-
-		BString pathA;
-		a->GetPath(pathA);
-
-		BString pathB;
-		b->GetPath(pathB);
-
-		return pathA.Compare(pathB);
-	}
-
-	static bool _FunctionLess(const FunctionInstance* a,
-		const FunctionInstance* b)
-	{
-		// compare source file name first
-		int compared = _CompareSourceFileNames(a->SourceFile(),
-			b->SourceFile());
-		if (compared != 0)
-			return compared < 0;
-
-		// source file names are equal -- compare the function names
-		return strcasecmp(a->PrettyName(), b->PrettyName()) < 0;
-	}
+	typedef BObjectList<SourcePathComponentNode> ChildPathComponentList;
 
 private:
-	ImageDebugInfo*		fImageDebugInfo;
-	FunctionInstance**	fFunctions;
-	int32				fFunctionCount;
-	int32*				fSourceFileIndices;
-	int32				fSourceFileCount;
+	ImageDebugInfo*			fImageDebugInfo;
+	ChildPathComponentList	fChildPathComponents;
+	SourcePathComponentNode* fSourcelessNode;
 };
 
 
@@ -364,7 +514,7 @@ ImageFunctionsView::SetImageDebugInfo(ImageDebugInfo* imageDebugInfo)
 
 	// If there's only one source file (i.e. "no source file"), expand the item.
 	if (fImageDebugInfo != NULL
-		&& fFunctionsTableModel->CountSourceFiles() == 1) {
+		&& fFunctionsTableModel->CountChildren(fFunctionsTableModel) == 1) {
 		TreeTablePath path;
 		path.AddComponent(0);
 		fFunctionsTable->SetNodeExpanded(path, true, false);
@@ -388,6 +538,7 @@ ImageFunctionsView::SetFunction(FunctionInstance* function)
 		fFunctionsTable->SetNodeExpanded(path, true, true);
 		fFunctionsTable->SelectNode(path, false);
 		fFunctionsTable->ScrollToNode(path);
+		fFunctionsTable->ResizeAllColumnsToPreferred();
 	} else
 		fFunctionsTable->DeselectAllNodes();
 }
@@ -444,7 +595,7 @@ ImageFunctionsView::_Init()
 
 	// columns
 	fFunctionsTable->AddColumn(new StringTableColumn(0, "File/Function", 300,
-		100, 1000, B_TRUNCATE_END, B_ALIGN_LEFT));
+		100, 1000, B_TRUNCATE_BEGINNING, B_ALIGN_LEFT));
 
 	fFunctionsTableModel = new FunctionsTableModel();
 	fFunctionsTable->SetTreeTableModel(fFunctionsTableModel);

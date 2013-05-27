@@ -37,7 +37,8 @@ enum {
 	STEP_NONE,
 	STEP_OVER,
 	STEP_INTO,
-	STEP_OUT
+	STEP_OUT,
+	STEP_UNTIL
 };
 
 
@@ -124,7 +125,7 @@ ThreadHandler::HandleBreakpointHit(BreakpointHitEvent* event)
 	// check whether this is a temporary breakpoint we're waiting for
 	if (fBreakpointAddress != 0 && instructionPointer == fBreakpointAddress
 		&& fStepMode != STEP_NONE) {
-		if (_HandleBreakpointHitStep(cpuState))
+		if (fStepMode != STEP_UNTIL && _HandleBreakpointHitStep(cpuState))
 			return true;
 	} else {
 		// Might be a user breakpoint, but could as well be a temporary
@@ -199,7 +200,7 @@ ThreadHandler::HandleExceptionOccurred(ExceptionOccurredEvent* event)
 
 
 void
-ThreadHandler::HandleThreadAction(uint32 action)
+ThreadHandler::HandleThreadAction(uint32 action, target_addr_t address)
 {
 	AutoLocker<Team> locker(fThread->GetTeam());
 
@@ -219,6 +220,11 @@ ThreadHandler::HandleThreadAction(uint32 action)
 	BReference<CpuState> cpuStateReference(cpuState);
 	BReference<StackTrace> stackTraceReference(stackTrace);
 
+	if (action == MSG_THREAD_SET_ADDRESS) {
+		_HandleSetAddress(cpuState, address);
+		return;
+	}
+
 	// When continuing the thread update thread state before actually issuing
 	// the command, since we need to unlock.
 	if (action != MSG_THREAD_STOP) {
@@ -230,7 +236,9 @@ ThreadHandler::HandleThreadAction(uint32 action)
 
 	switch (action) {
 		case MSG_THREAD_RUN:
-			fStepMode = STEP_NONE;
+			fStepMode = address != 0 ? STEP_UNTIL : STEP_NONE;
+			if (address != 0)
+				_InstallTemporaryBreakpoint(address);
 			_RunThread(0);
 			return;
 		case MSG_THREAD_STOP:
@@ -269,6 +277,7 @@ ThreadHandler::HandleThreadAction(uint32 action)
 
 	TRACE_CONTROL("  ip: %#" B_PRIx64 "\n", frame->InstructionPointer());
 
+	target_addr_t frameIP = frame->GetCpuState()->InstructionPointer();
 	// When the thread is in a syscall, do the same for all step kinds: Stop it
 	// when it returns by means of a breakpoint.
 	if (frame->Type() == STACK_FRAME_TYPE_SYSCALL) {
@@ -284,15 +293,14 @@ ThreadHandler::HandleThreadAction(uint32 action)
 // The second issue is that the temporary breakpoint is probably not necessary
 // anymore, since single-stepping over "syscall" instructions should just work
 // as expected.
-		status_t error = _InstallTemporaryBreakpoint(
-			frame->GetCpuState()->InstructionPointer());
+		status_t error = _InstallTemporaryBreakpoint(frameIP);
 		if (error != B_OK) {
 			_StepFallback();
 			return;
 		}
 
 		fStepMode = STEP_OUT;
-		_RunThread(frame->GetCpuState()->InstructionPointer());
+		_RunThread(frameIP);
 		return;
 	}
 
@@ -303,9 +311,10 @@ ThreadHandler::HandleThreadAction(uint32 action)
 			_StepFallback();
 			return;
 		}
+		fPreviousInstructionPointer = frameIP;
 		fPreviousFrameAddress = frame->FrameAddress();
 		fStepMode = STEP_OUT;
-		_RunThread(frame->GetCpuState()->InstructionPointer());
+		_RunThread(frameIP);
 		return;
 	}
 
@@ -324,7 +333,7 @@ ThreadHandler::HandleThreadAction(uint32 action)
 	if (action == MSG_THREAD_STEP_INTO) {
 		// step into
 		fStepMode = STEP_INTO;
-		_SingleStepThread(frame->GetCpuState()->InstructionPointer());
+		_SingleStepThread(frameIP);
 	} else {
 		fPreviousFrameAddress = frame->FrameAddress();
 		// step over
@@ -403,6 +412,26 @@ ThreadHandler::_HandleThreadStopped(CpuState* cpuState, uint32 stoppedReason,
 
 	_SetThreadState(THREAD_STATE_STOPPED, cpuState, stoppedReason,
 		stoppedReasonInfo);
+
+	return true;
+}
+
+
+bool
+ThreadHandler::_HandleSetAddress(CpuState* state, target_addr_t address)
+{
+	CpuState* newState = NULL;
+	if (state->Clone(newState) != B_OK)
+		return false;
+	BReference<CpuState> stateReference(newState, true);
+
+	newState->SetInstructionPointer(address);
+	if (fDebuggerInterface->SetCpuState(fThread->ID(), newState) != B_OK)
+		return false;
+
+	AutoLocker<Team> locker(fThread->GetTeam());
+	fThread->SetStackTrace(NULL);
+	fThread->SetCpuState(newState);
 
 	return true;
 }
@@ -648,7 +677,7 @@ ThreadHandler::_HandleBreakpointHitStep(CpuState* cpuState)
 				" - step out adding return value\n", cpuState
 					->StackFramePointer(), fPreviousFrameAddress);
 			ReturnValueInfo* info = new(std::nothrow) ReturnValueInfo(
-				cpuState->InstructionPointer(), cpuState);
+				fPreviousInstructionPointer, cpuState);
 			if (info == NULL)
 				return false;
 			BReference<ReturnValueInfo> infoReference(info, true);
@@ -730,8 +759,8 @@ ThreadHandler::_HandleSingleStepStep(CpuState* cpuState)
 						TRACE_CONTROL("ThreadHandler::_HandleSingleStepStep() "
 							" - adding return value for STEP_OVER\n");
 						ReturnValueInfo* info = new(std::nothrow)
-							ReturnValueInfo(cpuState->InstructionPointer(),
-								cpuState);
+							ReturnValueInfo(fStepStatement
+								->CoveringAddressRange().Start(), cpuState);
 						if (info == NULL)
 							return false;
 						BReference<ReturnValueInfo> infoReference(info, true);

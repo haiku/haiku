@@ -700,7 +700,7 @@ ASIXDevice::ModifyMulticastTable(bool join, ether_address_t* group)
 
 void
 ASIXDevice::_ReadCallback(void *cookie, int32 status, void *data,
-	uint32 actualLength)
+	size_t actualLength)
 {
 	TRACE_FLOW("ReadCB: %d bytes; status:%#010x\n", actualLength, status);
 	ASIXDevice *device = (ASIXDevice *)cookie;
@@ -712,7 +712,7 @@ ASIXDevice::_ReadCallback(void *cookie, int32 status, void *data,
 
 void
 ASIXDevice::_WriteCallback(void *cookie, int32 status, void *data,
-	uint32 actualLength)
+	size_t actualLength)
 {
 	TRACE_FLOW("WriteCB: %d bytes; status:%#010x\n", actualLength, status);
 	ASIXDevice *device = (ASIXDevice *)cookie;
@@ -724,7 +724,7 @@ ASIXDevice::_WriteCallback(void *cookie, int32 status, void *data,
 
 void
 ASIXDevice::_NotifyCallback(void *cookie, int32 status, void *data,
-	uint32 actualLength)
+	size_t actualLength)
 {
 	ASIXDevice *device = (ASIXDevice *)cookie;
 	atomic_add(&device->fInsideNotify, 1);

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Terminal	4173005440
+1	greek, modern (1453-)	x-vnd.Haiku-Terminal	3734948558
 Not found.	Terminal TermWindow		Δε βρέθηκε.
 Switch Terminals	Terminal TermWindow		Εναλλαγή Τερματικών
 Change directory	Terminal TermView		Αλλαγή καταλόγου
@@ -19,6 +19,7 @@ Font:	Terminal AppearancePrefView		Γραμματοσειρά:
 Copy here	Terminal TermView		Αντιγραφή εδώ
 Really close?	Terminal TermWindow		Να κλείσει σίγουρα;
 Copy	Terminal TermWindow		Αντιγραφή
+Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 Window title:	Terminal TermWindow		Τίτλος παραθύρου:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Μη αναγνωρισμένη επιλογή \"%s\"\n
 %app% settings	Terminal PrefWindow	window title	Ρυθμίσεις %app%

@@ -52,8 +52,9 @@ SubTitlesSRT::SubTitlesSRT(BFile* file, const char* name)
 				int32 sequenceNumber = atoi(line.String());
 				if (sequenceNumber != lastSequenceNumber + 1) {
 					fprintf(stderr, "Warning: Wrong sequence number in SRT "
-						"file: %ld, expected: %ld, line %ld\n", sequenceNumber,
-						lastSequenceNumber + 1, currentLine);
+						"file: %" B_PRId32 ", expected: %" B_PRId32 ", line %"
+						B_PRId32 "\n", sequenceNumber, lastSequenceNumber + 1,
+						currentLine);
 				}
 				state = EXPECT_TIME_CODE;
 				lastSequenceNumber = sequenceNumber;
@@ -65,14 +66,14 @@ SubTitlesSRT::SubTitlesSRT(BFile* file, const char* name)
 				line.Trim();
 				int32 separatorPos = line.FindFirst(" --> ");
 				if (separatorPos < 0) {
-					fprintf(stderr, "Error: Time code expected on line %ld, "
-						"got '%s'\n", currentLine, line.String());
+					fprintf(stderr, "Error: Time code expected on line %"
+						B_PRId32 ", got '%s'\n", currentLine, line.String());
 					return;
 				}
 				BString timeCode(line.String(), separatorPos);
 				if (separatorPos != 12) {
-					fprintf(stderr, "Warning: Time code broken on line %ld "
-						"(%s)?\n", currentLine, timeCode.String());
+					fprintf(stderr, "Warning: Time code broken on line %"
+						B_PRId32 " (%s)?\n", currentLine, timeCode.String());
 				}
 				int hours;
 				int minutes;
@@ -81,7 +82,7 @@ SubTitlesSRT::SubTitlesSRT(BFile* file, const char* name)
 				if (sscanf(timeCode.String(), "%d:%d:%d,%d", &hours, &minutes,
 					&seconds, &milliSeconds) != 4) {
 					fprintf(stderr, "Error: Failed to parse start time on "
-						"line %ld\n", currentLine);
+						"line %" B_PRId32 "\n", currentLine);
 					return;
 				}
 				subTitle.startTime = (bigtime_t)hours * 60 * 60 * 1000000LL
@@ -94,7 +95,7 @@ SubTitlesSRT::SubTitlesSRT(BFile* file, const char* name)
 				if (sscanf(timeCode.String(), "%d:%d:%d,%d", &hours, &minutes,
 					&seconds, &milliSeconds) != 4) {
 					fprintf(stderr, "Error: Failed to parse end time on "
-						"line %ld\n", currentLine);
+						"line %" B_PRId32 "\n", currentLine);
 					return;
 				}
 				bigtime_t endTime = (bigtime_t)hours * 60 * 60 * 1000000LL

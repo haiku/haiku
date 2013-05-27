@@ -274,7 +274,7 @@ apm_shutdown(void)
 status_t
 apm_init(kernel_args *args)
 {
-	apm_info &info = args->platform_args.apm;
+	const apm_info &info = args->platform_args.apm;
 
 	TRACE(("apm_init()\n"));
 
@@ -338,11 +338,14 @@ apm_init(kernel_args *args)
 	if ((info.data_segment_base << 4) < 0xe0000) {
 		// use the BIOS data segment as data segment for APM
 
-		if (info.data_segment_length == 0)
-			info.data_segment_length = B_PAGE_SIZE - info.data_segment_base;
+		if (info.data_segment_length == 0) {
+			args->platform_args.apm.data_segment_length = B_PAGE_SIZE 
+				- info.data_segment_base;
+		}
 
 		set_segment_descriptor(&gGDT[APM_DATA_SEGMENT >> 3],
-			(addr_t)gDmaAddress + (info.data_segment_base << 4), info.data_segment_length,
+			(addr_t)gDmaAddress + (info.data_segment_base << 4),
+			info.data_segment_length,
 			DT_DATA_WRITEABLE, DPL_KERNEL);
 	} else {
 		// use the BIOS area as data segment

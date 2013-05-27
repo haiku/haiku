@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TREE_TABLE_H
@@ -61,6 +61,7 @@ public:
 	virtual	void				TableNodesChanged(TreeTableModel* model,
 									const TreeTablePath& path, int32 childIndex,
 									int32 count);
+	virtual	void				TableModelReset(TreeTableModel* model);
 };
 
 
@@ -93,6 +94,7 @@ protected:
 									int32 childIndex, int32 count);
 			void				NotifyNodesChanged(const TreeTablePath& path,
 									int32 childIndex, int32 count);
+			void				NotifyTableModelReset();
 
 protected:
 			ListenerList		fListeners;
@@ -217,6 +219,7 @@ private:
 	virtual	void				TableNodesChanged(TreeTableModel* model,
 									const TreeTablePath& path, int32 childIndex,
 									int32 count);
+	virtual	void				TableModelReset(TreeTableModel* model);
 
 private:
 			class Column;

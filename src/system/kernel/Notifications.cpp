@@ -156,13 +156,11 @@ DefaultNotificationService::DefaultNotificationService(const char* name)
 	fName(name)
 {
 	recursive_lock_init(&fLock, name);
-	NotificationManager::Manager().RegisterService(*this);
 }
 
 
 DefaultNotificationService::~DefaultNotificationService()
 {
-	NotificationManager::Manager().UnregisterService(*this);
 	recursive_lock_destroy(&fLock);
 }
 
@@ -250,6 +248,20 @@ DefaultNotificationService::RemoveListener(const KMessage* eventSpecifier,
 	}
 
 	return B_ENTRY_NOT_FOUND;
+}
+
+
+status_t
+DefaultNotificationService::Register()
+{
+	return NotificationManager::Manager().RegisterService(*this);
+}
+
+
+void
+DefaultNotificationService::Unregister()
+{
+	NotificationManager::Manager().UnregisterService(*this);
 }
 
 

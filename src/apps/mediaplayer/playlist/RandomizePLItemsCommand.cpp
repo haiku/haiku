@@ -48,7 +48,7 @@ RandomizePLItemsCommand::RandomizePLItemsCommand(Playlist* playlist,
 	BList indexSet;
 	for (int32 i = 0; i < fCount; i++) {
 		fItems[i] = fPlaylist->ItemAt(fListIndices[i]);
-		if (fItems[i] == NULL || !indexSet.AddItem((void*)i)) {
+		if (fItems[i] == NULL || !indexSet.AddItem((void*)(addr_t)i)) {
 			// indicate a bad object state
 			delete[] fItems;
 			fItems = NULL;
@@ -59,7 +59,7 @@ RandomizePLItemsCommand::RandomizePLItemsCommand(Playlist* playlist,
 	// remove the indices from the set in random order
 	for (int32 i = 0; i < fCount; i++) {
 		int32 randomSetIndex = rand() % indexSet.CountItems();
-		fRandomInternalIndices[i] = (int32)indexSet.RemoveItem(randomSetIndex);
+		fRandomInternalIndices[i] = (int32)(addr_t)indexSet.RemoveItem(randomSetIndex);
 	}
 }
 

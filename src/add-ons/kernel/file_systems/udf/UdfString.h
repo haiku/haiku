@@ -61,7 +61,8 @@ UdfString::UdfString(const array<char, length> &dString)
 	: fCs0String(NULL)
 	, fUtf8String(NULL)
 {
-	TRACE(("UdfString::UdfString: dString.length(): %ld", dString.length()));
+	TRACE(("UdfString::UdfString: dString.length(): %" B_PRIu32,
+		dString.length()));
 	SetTo(dString);
 }
 

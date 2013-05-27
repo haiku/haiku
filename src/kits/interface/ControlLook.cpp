@@ -2944,7 +2944,7 @@ BControlLook::_EdgeLightColor(const rgb_color& base, float contrast,
 
 	if ((flags & B_BLEND_FRAME) != 0) {
 		uint8 alpha = uint8(20 * contrast);
-		uint32 white = uint8(255 * brightness);
+		uint8 white = uint8(255 * brightness);
 
 		edgeLightColor = (rgb_color){ white, white, white, alpha };
 	} else {

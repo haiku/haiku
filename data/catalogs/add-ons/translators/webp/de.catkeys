@@ -1,5 +1,6 @@
-1	german	x-vnd.Haiku-WebPTranslator	2427600890
+1	german	x-vnd.Haiku-WebPTranslator	3197103165
 Compression method:	ConfigView		Komprimierungsart:
+WebP image translator	ConfigView		WebP-Bild-Translator
 Based on libwebp v0.1,	ConfigView		Basiert auf libwebp v0.1
 Preset	ConfigView		Voreinstellung
 WebP images	WebPTranslator		WebP-Bilder

@@ -63,6 +63,12 @@ TableModelListener::TableRowsChanged(TableModel* model, int32 rowIndex,
 }
 
 
+void
+TableModelListener::TableModelReset(TableModel* model)
+{
+}
+
+
 // #pragma mark - TableModel
 
 
@@ -114,6 +120,17 @@ TableModel::NotifyRowsChanged(int32 rowIndex, int32 count)
 	for (int32 i = listenerCount - 1; i >= 0; i--) {
 		TableModelListener* listener = fListeners.ItemAt(i);
 		listener->TableRowsChanged(this, rowIndex, count);
+	}
+}
+
+
+void
+TableModel::NotifyTableModelReset()
+{
+	int32 listenerCount = fListeners.CountItems();
+	for (int32 i = listenerCount - 1; i >= 0; i--) {
+		TableModelListener* listener = fListeners.ItemAt(i);
+		listener->TableModelReset(this);
 	}
 }
 
@@ -616,6 +633,12 @@ Table::TableRowsAdded(TableModel* model, int32 rowIndex, int32 count)
 void
 Table::TableRowsRemoved(TableModel* model, int32 rowIndex, int32 count)
 {
+	if (rowIndex == 0 && count == fRows.CountItems()) {
+		fRows.MakeEmpty();
+		Clear();
+		return;
+	}
+
 	for (int32 i = rowIndex + count - 1; i >= rowIndex; i--) {
 		if (BRow* row = fRows.RemoveItemAt(i)) {
 			RemoveRow(row);
@@ -636,6 +659,14 @@ Table::TableRowsChanged(TableModel* model, int32 rowIndex, int32 count)
 		if (BRow* row = fRows.ItemAt(i))
 			UpdateRow(row);
 	}
+}
+
+
+void
+Table::TableModelReset(TableModel* model)
+{
+	Clear();
+	TableRowsAdded(model, 0, model->CountRows());
 }
 
 

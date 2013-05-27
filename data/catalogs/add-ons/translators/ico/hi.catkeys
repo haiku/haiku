@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-ICOTranslator	1637901496
+1	hindi	x-vnd.Haiku-ICOTranslator	1211895126
 Cursor	ICOTranslator		कर्सर 
 Version %d.%d.%d, %s	ConfigView		संस्करण %d.%d.%d, %s
 Windows %s %ld bit image	ICOTranslator		विंडोज़ %s %ld बिट चित्र
@@ -10,3 +10,4 @@ pixels in either direction.	ConfigView		पिक्सेल्स कोई �
 Write 32 bit images on true color input	ConfigView		32 बिट चित्र सही कलर इनपुट में लिखे 
 Icon	ICOTranslator		आइकन
 ICOTranslator Settings	ConfigView		आईसीऔ संवादक सेत्तिंग्स
+Windows icon translator	ConfigView		विंडोज़ आइकन संवादक

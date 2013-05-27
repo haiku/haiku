@@ -95,7 +95,8 @@ interface_attach(void **cookie, const pci_info *info)
 
 	// adjust PCI latency timer
 	val = gPci->read_pci_config(device->pci_info->bus, device->pci_info->device, device->pci_info->function, PCI_latency, 1);
-	TRACE("PCI latency is %02lx, changing to %02x\n", val, PCI_LATENCY);
+	TRACE("PCI latency is %02" B_PRIx32 ", changing to %02x\n", val,
+		PCI_LATENCY);
 	gPci->write_pci_config(device->pci_info->bus, device->pci_info->device, device->pci_info->function, PCI_latency, 1, PCI_LATENCY);
 
 	// get IRQ
@@ -113,8 +114,9 @@ interface_attach(void **cookie, const pci_info *info)
 		dprintf("cx23882: Error, no memory space assigned\n");
 		goto err;
 	}
-	TRACE("hardware register address %p\n", (void *) val);
-	device->regs_area = map_mem(&device->regs, (void *)val, 16777216 /* 16 MB */, 0, "cx23882 registers");
+	TRACE("hardware register address 0x%" B_PRIx32 "\n", val);
+	device->regs_area = map_mem(&device->regs, (addr_t)val,
+		16777216 /* 16 MB */, 0, "cx23882 registers");
 	if (device->regs_area < B_OK) {
 		dprintf("cx23882: Error, can't map hardware registers\n");
 		goto err;

@@ -815,15 +815,15 @@ ConfigWindow::_SetToGeneralSettings(BMailSettings *settings)
 	int timeIndex = 0;
 	if (interval >= 60) {
 		timeIndex = 1;
-		sprintf(text, "%ld", interval / (60));
+		sprintf(text, "%" B_PRIdTIME, interval / (60));
 	}
 	if (interval >= (60*60)) {
 		timeIndex = 2;
-		sprintf(text, "%ld", interval / (60*60));
+		sprintf(text, "%" B_PRIdTIME, interval / (60*60));
 	}
 	if (interval >= (60*60*24)) {
 		timeIndex = 3;
-		sprintf(text, "%ld", interval / (60*60*24));
+		sprintf(text, "%" B_PRIdTIME, interval / (60*60*24));
 	}
 	fIntervalControl->SetText(text);
 

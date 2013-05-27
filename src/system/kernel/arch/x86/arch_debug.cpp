@@ -1252,7 +1252,7 @@ arch_get_debug_variable(const char* variableName, uint64* value)
 
 struct gdb_register {
 	int32 type;
-	int64 value;
+	uint64 value;
 };
 
 

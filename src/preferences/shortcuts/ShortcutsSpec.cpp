@@ -488,7 +488,7 @@ ShortcutsSpec::GetCellText(int whichColumn) const
 				if (temp == NULL)
 					temp = "";
 			} else if (fKey > 0xFF) {
-				sprintf(fScratch, "#%lx", fKey);
+				sprintf(fScratch, "#%" B_PRIx32, fKey);
 				return fScratch;
 			}
 			break;

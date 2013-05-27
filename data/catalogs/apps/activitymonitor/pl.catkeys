@@ -1,8 +1,9 @@
-1	polish	x-vnd.Haiku-ActivityMonitor	3704566709
+1	polish	x-vnd.Haiku-ActivityMonitor	1913625522
 P-faults	DataSource		P-błędy
 Media nodes	DataSource		Węzły multimedialne
 Threads	DataSource		Wątki
 MB	DataSource		MB
+Always on top	ActivityWindow		Zawsze na wierzchu
 Add graph	ActivityWindow		Dodaj wykres
 Teams	DataSource		Zespoły
 Hide legend	ActivityView		Ukryj legendę

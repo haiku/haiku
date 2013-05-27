@@ -592,7 +592,7 @@ radeon_hd_init(radeon_info &info)
 	// *** Map Memory mapped IO
 	AreaKeeper mmioMapper;
 	info.registers_area = mmioMapper.Map("radeon hd mmio",
-		(void*)info.pci->u.h0.base_registers[PCI_BAR_MMIO],
+		info.pci->u.h0.base_registers[PCI_BAR_MMIO],
 		info.pci->u.h0.base_register_sizes[PCI_BAR_MMIO],
 		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 		(void**)&info.registers);
@@ -665,7 +665,7 @@ radeon_hd_init(radeon_info &info)
 	// *** Framebuffer mapping
 	AreaKeeper frambufferMapper;
 	info.framebuffer_area = frambufferMapper.Map("radeon hd frame buffer",
-		(void*)info.pci->u.h0.base_registers[PCI_BAR_FB],
+		info.pci->u.h0.base_registers[PCI_BAR_FB],
 		info.shared_info->frame_buffer_size * 1024,
 		B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 		(void**)&info.shared_info->frame_buffer);

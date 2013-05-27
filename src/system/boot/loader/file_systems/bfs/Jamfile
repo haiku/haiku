@@ -19,3 +19,6 @@ BootStaticLibrary boot_bfs :
 	BPlusTree.cpp
 	: -fno-pic
 	;
+
+SEARCH on [ FGristFiles BPlusTree.cpp ]
+    = [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems bfs ] ;

@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2009, Rene Gollent, rene@gollent.com.
+ * Copyright 2009-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -14,18 +14,24 @@
 #include <stdio.h>
 
 #include <Clipboard.h>
+#include <Entry.h>
 #include <LayoutUtils.h>
 #include <Looper.h>
+#include <MenuItem.h>
 #include <Message.h>
 #include <MessageRunner.h>
+#include <Path.h>
 #include <Polygon.h>
+#include <PopUpMenu.h>
 #include <Region.h>
 #include <ScrollBar.h>
 #include <ScrollView.h>
+#include <ToolTip.h>
 
 #include <AutoLocker.h>
 #include <ObjectList.h>
 
+#include "AutoDeleter.h"
 #include "Breakpoint.h"
 #include "DisassembledCode.h"
 #include "Function.h"
@@ -44,6 +50,17 @@ static const float kMinViewHeight = 80.0f;
 static const int32 kSpacesPerTab = 4;
 	// TODO: Should be settable!
 static const bigtime_t kScrollTimer = 10000LL;
+
+static const char* kClearBreakpointMessage = "Click to clear breakpoint at "
+	"line %" B_PRId32 ".";
+static const char* kDisableBreakpointMessage = "Click to disable breakpoint at "
+	"line %" B_PRId32 ".";
+static const char* kEnableBreakpointMessage = "Click to enable breakpoint at "
+	"line %" B_PRId32 ".";
+
+static const uint32 MSG_OPEN_SOURCE_FILE = 'mosf';
+
+static const char* kTrackerSignature = "application/x-vnd.Be-TRAK";
 
 
 class SourceView::BaseView : public BView {
@@ -157,6 +174,8 @@ public:
 
 	virtual	void				MouseDown(BPoint where);
 
+protected:
+	virtual bool				GetToolTipAt(BPoint point, BToolTip** _tip);
 
 private:
 			Team*				fTeam;
@@ -300,6 +319,19 @@ private:
 			void				_ScrollByPages(int32 pageCount);
 			void				_ScrollToTop();
 			void				_ScrollToBottom();
+
+			bool				_AddGeneralActions(BPopUpMenu* menu,
+									int32 line);
+			bool				_AddFlowControlActions(BPopUpMenu* menu,
+									int32 line);
+
+			bool				_AddGeneralActionItem(BPopUpMenu* menu,
+									const char* text, BMessage* message) const;
+										// takes ownership of message
+										// regardless of outcome
+			bool				_AddFlowControlActionItem(BPopUpMenu* menu,
+									const char* text, uint32 what,
+									target_addr_t address) const;
 
 private:
 
@@ -908,18 +940,11 @@ SourceView::MarkerView::MouseDown(BPoint where)
 		return;
 
 	int32 line = LineAtOffset(where.y);
-	if (line < 0)
-		return;
 
-	AutoLocker<Team> locker(fTeam);
 	Statement* statement;
-	if (fTeam->GetStatementAtSourceLocation(fSourceCode,
-			SourceLocation(line), statement) != B_OK) {
+	if (!fSourceView->GetStatementForLine(line, statement))
 		return;
-	}
 	BReference<Statement> statementReference(statement, true);
-	if (statement->StartSourceLocation().Line() != line)
-		return;
 
 	int32 modifiers;
 	if (Looper()->CurrentMessage()->FindInt32("modifiers", &modifiers) != B_OK)
@@ -941,6 +966,57 @@ SourceView::MarkerView::MouseDown(BPoint where)
 		else
 			fListener->SetBreakpointRequested(address, true);
 	}
+}
+
+
+bool
+SourceView::MarkerView::GetToolTipAt(BPoint point, BToolTip** _tip)
+{
+	if (fSourceCode == NULL)
+		return false;
+
+	int32 line = LineAtOffset(point.y);
+	if (line < 0)
+		return false;
+
+	AutoLocker<Team> locker(fTeam);
+	Statement* statement;
+	if (fTeam->GetStatementAtSourceLocation(fSourceCode,
+			SourceLocation(line), statement) != B_OK) {
+		return false;
+	}
+	BReference<Statement> statementReference(statement, true);
+	if (statement->StartSourceLocation().Line() != line)
+		return false;
+
+	SourceView::MarkerManager::BreakpointMarker* marker =
+		fMarkerManager->BreakpointMarkerAtLine(line);
+
+	BString text;
+	if (marker == NULL) {
+		text.SetToFormat(kEnableBreakpointMessage, line);
+	} else if ((modifiers() & B_SHIFT_KEY) != 0) {
+		if (!marker->IsEnabled())
+			text.SetToFormat(kClearBreakpointMessage, line);
+		else
+			text.SetToFormat(kDisableBreakpointMessage, line);
+	} else {
+		if (marker->IsEnabled())
+			text.SetToFormat(kClearBreakpointMessage, line);
+		else
+			text.SetToFormat(kEnableBreakpointMessage, line);
+	}
+
+	if (text.Length() > 0) {
+		BTextToolTip* tip = new(std::nothrow) BTextToolTip(text);
+		if (tip == NULL)
+			return false;
+
+		*_tip = tip;
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -1132,7 +1208,15 @@ SourceView::TextView::MessageReceived(BMessage* message)
 void
 SourceView::TextView::MouseDown(BPoint where)
 {
-	if (fSourceCode != NULL) {
+	if (fSourceCode == NULL)
+		return;
+
+	int32 buttons;
+	if (Looper()->CurrentMessage()->FindInt32("buttons", &buttons) != B_OK)
+		buttons = B_PRIMARY_MOUSE_BUTTON;
+
+
+	if (buttons == B_PRIMARY_MOUSE_BUTTON) {
 		if (!IsFocus())
 			MakeFocus(true);
 		fTrackState = kTracking;
@@ -1172,6 +1256,39 @@ SourceView::TextView::MouseDown(BPoint where)
 			Invalidate();
 			SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 		}
+	} else if (buttons == B_SECONDARY_MOUSE_BUTTON) {
+		int32 line = LineAtOffset(where.y);
+		if (line < 0)
+			return;
+
+		::Team* team = fSourceView->fTeam;
+		AutoLocker<Team> locker(team);
+		::Thread* activeThread = fSourceView->fActiveThread;
+
+		if (activeThread == NULL)
+			return;
+		else if (activeThread->State() != THREAD_STATE_STOPPED)
+			return;
+
+		BPopUpMenu* menu = new(std::nothrow) BPopUpMenu("");
+		if (menu == NULL)
+			return;
+		ObjectDeleter<BPopUpMenu> menuDeleter(menu);
+
+		if (!_AddGeneralActions(menu, line))
+			return;
+
+		if (!_AddFlowControlActions(menu, line))
+			return;
+
+		menuDeleter.Detach();
+
+		BPoint screenWhere(where);
+		ConvertToScreen(&screenWhere);
+		menu->SetTargetForItems(fSourceView);
+		BRect mouseRect(screenWhere, screenWhere);
+		mouseRect.InsetBy(-4.0, -4.0);
+		menu->Go(screenWhere, true, false, mouseRect, true);
 	}
 }
 
@@ -1627,6 +1744,92 @@ SourceView::TextView::_ScrollToBottom(void)
 }
 
 
+bool
+SourceView::TextView::_AddGeneralActions(BPopUpMenu* menu, int32 line)
+{
+	BMessage* message = new(std::nothrow) BMessage(MSG_OPEN_SOURCE_FILE);
+	if (message == NULL)
+		return false;
+	message->AddInt32("line", line);
+
+	if (!_AddGeneralActionItem(menu, "Open source file", message))
+		return false;
+
+	return true;
+}
+
+
+bool
+SourceView::TextView::_AddFlowControlActions(BPopUpMenu* menu, int32 line)
+{
+	Statement* statement;
+	if (!fSourceView->GetStatementForLine(line, statement))
+		return true;
+
+	BReference<Statement> statementReference(statement, true);
+	target_addr_t address = statement->CoveringAddressRange().Start();
+
+	if (menu->CountItems() > 0)
+		menu->AddSeparatorItem();
+
+	if (!_AddFlowControlActionItem(menu, "Run to cursor", MSG_THREAD_RUN,
+		address)) {
+		return false;
+	}
+
+	if (!_AddFlowControlActionItem(menu, "Set next statement",
+			MSG_THREAD_SET_ADDRESS, address)) {
+		return false;
+	}
+
+	return true;
+}
+
+
+bool
+SourceView::TextView::_AddGeneralActionItem(BPopUpMenu* menu, const char* text,
+	BMessage* message) const
+{
+	ObjectDeleter<BMessage> messageDeleter(message);
+
+	BMenuItem* item = new(std::nothrow) BMenuItem(text, message);
+	if (item == NULL)
+		return false;
+	ObjectDeleter<BMenuItem> itemDeleter(item);
+	messageDeleter.Detach();
+
+	if (!menu->AddItem(item))
+		return false;
+
+	itemDeleter.Detach();
+	return true;
+}
+
+
+bool
+SourceView::TextView::_AddFlowControlActionItem(BPopUpMenu* menu,
+	const char* text, uint32 what, target_addr_t address) const
+{
+	BMessage* message = new(std::nothrow) BMessage(what);
+	if (message == NULL)
+		return false;
+	ObjectDeleter<BMessage> messageDeleter(message);
+
+	message->AddUInt64("address", address);
+	BMenuItem* item = new(std::nothrow) BMenuItem(text, message);
+	if (item == NULL)
+		return false;
+	ObjectDeleter<BMenuItem> itemDeleter(item);
+	messageDeleter.Detach();
+
+	if (!menu->AddItem(item))
+		return false;
+
+	itemDeleter.Detach();
+	return true;
+}
+
+
 // #pragma mark - SourceView
 
 
@@ -1634,6 +1837,7 @@ SourceView::SourceView(Team* team, Listener* listener)
 	:
 	BView("source view", 0),
 	fTeam(team),
+	fActiveThread(NULL),
 	fStackTrace(NULL),
 	fStackFrame(NULL),
 	fSourceCode(NULL),
@@ -1652,7 +1856,7 @@ SourceView::SourceView(Team* team, Listener* listener)
 SourceView::~SourceView()
 {
 	SetStackFrame(NULL);
-	SetStackTrace(NULL);
+	SetStackTrace(NULL, NULL);
 	SetSourceCode(NULL);
 }
 
@@ -1674,6 +1878,63 @@ SourceView::Create(Team* team, Listener* listener)
 
 
 void
+SourceView::MessageReceived(BMessage* message)
+{
+	switch(message->what) {
+		case MSG_THREAD_RUN:
+		case MSG_THREAD_SET_ADDRESS:
+		{
+			target_addr_t address;
+			if (message->FindUInt64("address", &address) != B_OK)
+				break;
+			fListener->ThreadActionRequested(fActiveThread, message->what,
+				address);
+			break;
+		}
+
+		case MSG_OPEN_SOURCE_FILE:
+		{
+			int32 line;
+			if (message->FindInt32("line", &line) != B_OK)
+				break;
+			// be:line is 1-based.
+			++line;
+			if (fSourceCode == NULL)
+				break;
+			LocatableFile* file = fSourceCode->GetSourceFile();
+			if (file == NULL)
+				break;
+
+			BString sourcePath;
+			file->GetLocatedPath(sourcePath);
+			if (sourcePath.IsEmpty())
+				break;
+
+			BPath path(sourcePath);
+			entry_ref ref;
+			if (path.InitCheck() != B_OK)
+				break;
+
+			if (get_ref_for_path(path.Path(), &ref) != B_OK)
+				break;
+
+			BMessage trackerMessage(B_REFS_RECEIVED);
+			trackerMessage.AddRef("refs", &ref);
+			trackerMessage.AddInt32("be:line", line);
+
+			BMessenger messenger(kTrackerSignature);
+			messenger.SendMessage(&trackerMessage);
+			break;
+		}
+
+		default:
+			BView::MessageReceived(message);
+			break;
+	}
+}
+
+
+void
 SourceView::UnsetListener()
 {
 	fListener = NULL;
@@ -1681,12 +1942,20 @@ SourceView::UnsetListener()
 
 
 void
-SourceView::SetStackTrace(StackTrace* stackTrace)
+SourceView::SetStackTrace(StackTrace* stackTrace, Thread* activeThread)
 {
 	TRACE_GUI("SourceView::SetStackTrace(%p)\n", stackTrace);
 
 	if (stackTrace == fStackTrace)
 		return;
+
+	if (fActiveThread != NULL)
+		fActiveThread->ReleaseReference();
+
+	fActiveThread = activeThread;
+
+	if (fActiveThread != NULL)
+		fActiveThread->AcquireReference();
 
 	if (fStackTrace != NULL) {
 		fMarkerManager->SetStackTrace(NULL);
@@ -1885,6 +2154,29 @@ SourceView::DoLayout()
 	fTextView->ResizeTo(size.width - markerWidth - 1, size.height);
 
 	_UpdateScrollBars();
+}
+
+
+bool
+SourceView::GetStatementForLine(int32 line, Statement*& _statement)
+{
+	if (line < 0)
+		return false;
+
+	AutoLocker<Team> locker(fTeam);
+	Statement* statement;
+	if (fTeam->GetStatementAtSourceLocation(fSourceCode,	SourceLocation(line),
+		statement) != B_OK) {
+		return false;
+	}
+	BReference<Statement> statementReference(statement, true);
+	if (statement->StartSourceLocation().Line() != line)
+		return false;
+
+	_statement = statement;
+	statementReference.Detach();
+
+	return true;
 }
 
 

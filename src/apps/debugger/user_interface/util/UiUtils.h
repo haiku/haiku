@@ -14,6 +14,7 @@
 
 class BString;
 class BVariant;
+class RangeList;
 class StackFrame;
 class Team;
 class TeamMemoryBlock;
@@ -50,6 +51,12 @@ public:
 									TeamMemoryBlock* block,
 									target_addr_t address, int32 itemSize,
 									int32 displayWidth, int32 count);
+
+	static	status_t			ParseRangeExpression(
+									const BString& rangeString,
+									int32 lowerBound, int32 upperBound,
+									bool fixedRange,
+									RangeList& _output);
 };
 
 

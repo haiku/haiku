@@ -28,7 +28,7 @@ BitmapBlock::BitmapBlock(Volume* volume, uint32 numBits)
 	fNumBits(numBits),
 	fMaxIndex(fNumBits >> 5)
 {
-	TRACE("BitmapBlock::BitmapBlock(): num bits: %lu\n", fNumBits);
+	TRACE("BitmapBlock::BitmapBlock(): num bits: %" B_PRIu32 "\n", fNumBits);
 }
 
 
@@ -95,7 +95,8 @@ BitmapBlock::_Check(uint32 start, uint32 length, bool marked)
 		uint32 bits = B_LENDIAN_TO_HOST_INT32(data[index]);
 
 		if ((bits & mask) != (marked ? mask : 0)) {
-			TRACE("BitmapBlock::_Check(): start %lx mask %lx\n", bits, mask);
+			TRACE("BitmapBlock::_Check(): start %" B_PRIx32 " mask %" B_PRIx32
+				"\n", bits, mask);
 			return false;
 		}
 
@@ -105,8 +106,8 @@ BitmapBlock::_Check(uint32 start, uint32 length, bool marked)
 
 	for (; iterations > 0; --iterations) {
 		if (data[index++] != (marked ? 0xFFFFFFFF : 0)) {
-			TRACE("BitmapBlock::_Check(): iterations %lu bits: %lX\n", iterations,
-				data[index - 1]);
+			TRACE("BitmapBlock::_Check(): iterations %" B_PRIu32 " bits: %"
+				B_PRIx32 "\n", iterations, data[index - 1]);
 			return false;
 		}
 	}
@@ -116,8 +117,9 @@ BitmapBlock::_Check(uint32 start, uint32 length, bool marked)
 
 		uint32 bits = B_LENDIAN_TO_HOST_INT32(data[index]);
 		if ((bits & mask) != (marked ? mask : 0)) {
-			TRACE("BitmapBlock::_Check(): remainingBits %ld remaining %lX mask %lX\n",
-				remainingBits, bits, mask);
+			TRACE("BitmapBlock::_Check(): remainingBits %" B_PRIu32
+				" remaining %" B_PRIx32 " mask %" B_PRIx32 "\n", remainingBits,
+				bits, mask);
 			return false;
 		}
 	}
@@ -129,8 +131,8 @@ BitmapBlock::_Check(uint32 start, uint32 length, bool marked)
 bool
 BitmapBlock::_Update(uint32 start, uint32 length, bool mark, bool force)
 {
-	TRACE("BitmapBlock::_Update(%lu, %lu, %c, %c)\n", start, length,
-		unmark ? 't' : 'f', force ? 't' : 'f');
+	TRACE("BitmapBlock::_Update(%" B_PRIu32 ", %" B_PRIu32 ", %c, %c)\n",
+		start, length, mark ? 't' : 'f', force ? 't' : 'f');
 
 	if (fData == NULL || start + length > fNumBits)
 		return false;
@@ -139,23 +141,24 @@ BitmapBlock::_Update(uint32 start, uint32 length, bool mark, bool force)
 	uint32 startBit = start & 0x1F;
 	uint32 remainingBits = (length + startBit) & 0x1F;
 
-	TRACE("BitmapBlock::_Update(): start index: %lu, start bit: %lu, remaining "
-		"bits: %lu)\n", startIndex, startBit, remainingBits);
+	TRACE("BitmapBlock::_Update(): start index: %" B_PRIu32 ", start bit: %"
+		B_PRIu32 ", remaining bits: %" B_PRIu32 ")\n", startIndex, startBit,
+		remainingBits);
 	uint32 iterations;
        
 	if (length < 32) {
 		if (startBit + length < 32) {
 			uint32 bits = B_LENDIAN_TO_HOST_INT32(fData[startIndex]);
-			TRACE("BitmapBlock::_Update(): bits: %lx\n", bits);
+			TRACE("BitmapBlock::_Update(): bits: %" B_PRIx32 "\n", bits);
 
 			uint32 mask = (1 << (startBit + length)) - 1;
 			mask &= ~((1 << startBit) - 1);
 		       
-			TRACE("BitmapBlock::_Update(): mask: %lx\n", mask);
+			TRACE("BitmapBlock::_Update(): mask: %" B_PRIx32 "\n", mask);
 
 			if ((bits & mask) != (mark ? 0 : mask)) {
-				ERROR("BitmapBlock::_Update() Marking failed bits %lx "
-					"startBit %ld\n", bits, startBit);
+				ERROR("BitmapBlock::_Update() Marking failed bits %" B_PRIx32
+					" startBit %" B_PRIu32 "\n", bits, startBit);
 				return false;
 			}
 		       
@@ -164,7 +167,8 @@ BitmapBlock::_Update(uint32 start, uint32 length, bool mark, bool force)
 			else
 			    bits &= ~mask;
 		       
-			TRACE("BitmapBlock::_Update(): updated bits: %lx\n", bits);
+			TRACE("BitmapBlock::_Update(): updated bits: %" B_PRIx32 "\n",
+				bits);
 			fData[startIndex] = B_HOST_TO_LENDIAN_INT32(bits);
 		       
 			return true;
@@ -173,14 +177,15 @@ BitmapBlock::_Update(uint32 start, uint32 length, bool mark, bool force)
 	} else
 		iterations = (length - 32 + startBit) >> 5;
 
-	TRACE("BitmapBlock::_Update(): iterations: %lu\n", iterations);
+	TRACE("BitmapBlock::_Update(): iterations: %" B_PRIu32 "\n", iterations);
 	uint32 index = startIndex;
 	
 	if (startBit != 0) {
 		uint32 mask = ~((1 << startBit) - 1);
 		uint32 bits = B_LENDIAN_TO_HOST_INT32(fData[index]);
 
-		TRACE("BitmapBlock::_Update(): mask: %lx, bits: %lx\n", mask, bits);
+		TRACE("BitmapBlock::_Update(): mask: %" B_PRIx32 ", bits: %" B_PRIx32
+			"\n", mask, bits);
 
 		if (!force && (bits & mask) != (mark ? 0 : mask))
 			return false;
@@ -191,7 +196,7 @@ BitmapBlock::_Update(uint32 start, uint32 length, bool mark, bool force)
 			bits &= ~mask;
 		fData[index] = B_HOST_TO_LENDIAN_INT32(bits);
 
-		TRACE("BitmapBlock::_Update(): updated bits: %lx\n", bits);
+		TRACE("BitmapBlock::_Update(): updated bits: %" B_PRIx32 "\n", bits);
 		index += 1;
 	} else
 		iterations++;
@@ -199,7 +204,8 @@ BitmapBlock::_Update(uint32 start, uint32 length, bool mark, bool force)
 	for (; iterations > 0; --iterations) {
 		if (!force && fData[index] != (mark ? 0 : 0xFFFFFFFF)) {
 			ERROR("BitmapBlock::_Update() Marking failed "
-				"index %ld, iterations %ld\n", index, iterations);
+				"index %" B_PRIu32 ", iterations %" B_PRId32 "\n", index,
+				iterations);
 			return false;
 		}
 		fData[index++] = (mark ? 0xFFFFFFFF : 0);
@@ -211,7 +217,8 @@ BitmapBlock::_Update(uint32 start, uint32 length, bool mark, bool force)
 		uint32 mask = (1 << remainingBits) - 1;
 		uint32 bits = B_LENDIAN_TO_HOST_INT32(fData[index]);
 
-		TRACE("BitmapBlock::_Update(): mask: %lx, bits: %lx\n", mask, bits);
+		TRACE("BitmapBlock::_Update(): mask: %" B_PRIx32 ", bits: %" B_PRIx32
+			"\n", mask, bits);
 
 		if (!force && (bits & mask) != (mark ? 0 : mask)) {
 			ERROR("BitmapBlock::_Update() Marking failed remaining\n");
@@ -224,7 +231,7 @@ BitmapBlock::_Update(uint32 start, uint32 length, bool mark, bool force)
 			bits &= ~mask;
 		fData[index] = B_HOST_TO_LENDIAN_INT32(bits);
 
-		TRACE("BitmapBlock::_Update(): updated bits: %lx\n", bits);
+		TRACE("BitmapBlock::_Update(): updated bits: %" B_PRIx32 "\n", bits);
 	}
 
 	return true;
@@ -234,7 +241,7 @@ BitmapBlock::_Update(uint32 start, uint32 length, bool mark, bool force)
 void
 BitmapBlock::_FindNext(uint32& pos, bool marked)
 {
-	TRACE("BitmapBlock::_FindNext(): pos: %lu\n", pos);
+	TRACE("BitmapBlock::_FindNext(): pos: %" B_PRIu32 "\n", pos);
 
 	const uint32* data = fData == NULL ? fReadOnlyData : fData;
 	if (data == NULL)
@@ -252,8 +259,9 @@ BitmapBlock::_FindNext(uint32& pos, bool marked)
 	uint32 mask = ~((1 << bit) - 1);
 	uint32 bits = B_LENDIAN_TO_HOST_INT32(data[index]);
 
-	TRACE("BitmapBlock::_FindNext(): index: %lu, bit: %lu, mask: %lX, "
-		"bits: %lX\n", index, bit, mask, bits);
+	TRACE("BitmapBlock::_FindNext(): index: %" B_PRIu32 ", bit: %" B_PRIu32
+		", mask: %" B_PRIx32 ", bits: %" B_PRIx32 "\n", index, bit, mask,
+		bits);
 
 	bits &= mask;
 	if (bits == (marked ? 0 : mask) && index < fMaxIndex) {
@@ -271,7 +279,7 @@ BitmapBlock::_FindNext(uint32& pos, bool marked)
 		if (maxBit == 0) {
 			// Not found
 			TRACE("BitmapBlock::_FindNext(): reached end of block, "
-				"num bits: %lu\n", fNumBits);
+				"num bits: %" B_PRIu32 "\n", fNumBits);
 			pos = fNumBits;
 			return;
 		}
@@ -279,7 +287,7 @@ BitmapBlock::_FindNext(uint32& pos, bool marked)
 		mask &= (1 << maxBit) - 1;
 		if ((bits & mask) == (marked ? 0 : mask)) {
 			TRACE("BitmapBlock::_FindNext(): reached end of block, "
-				"num bits: %lu\n", fNumBits);
+				"num bits: %" B_PRIu32 "\n", fNumBits);
 			pos = fNumBits;
 			return;
 		}
@@ -291,19 +299,19 @@ BitmapBlock::_FindNext(uint32& pos, bool marked)
 		// Find the marked bit
 		if ((bits >> bit & 1) != (marked ? 0U : 1U)) {
 			pos = index << 5 | bit;
-			TRACE("BitmapBlock::_FindNext(): found bit: %lu\n", pos);
+			TRACE("BitmapBlock::_FindNext(): found bit: %" B_PRIu32 "\n", pos);
 			return;
 		}
 	}
 
-	panic("Couldn't find bit inside an uint32 (%lx)\n", bits);
+	panic("Couldn't find bit inside an uint32 (%" B_PRIx32 ")\n", bits);
 }
 
 
 void
 BitmapBlock::FindPreviousMarked(uint32& pos)
 {
-	TRACE("BitmapBlock::FindPreviousMarked(%lu)\n", pos);
+	TRACE("BitmapBlock::FindPreviousMarked(%" B_PRIu32 ")\n", pos);
 	const uint32* data = fData == NULL ? fReadOnlyData : fData;
 	if (data == NULL)
 		return;
@@ -321,8 +329,8 @@ BitmapBlock::FindPreviousMarked(uint32& pos)
 	uint32 bits = B_LENDIAN_TO_HOST_INT32(data[index]);
 	bits = bits & mask;
 
-	TRACE("BitmapBlock::FindPreviousMarked(): index: %lu bit: %lu bits: %lx\n",
-		index, bit, bits);
+	TRACE("BitmapBlock::FindPreviousMarked(): index: %" B_PRIu32 " bit: %"
+		B_PRIu32 " bits: %" B_PRIx32 "\n", index, bit, bits);
 
 	if (bits == 0) {
 		// Find an block of 32 bits that has a marked bit
@@ -340,8 +348,8 @@ BitmapBlock::FindPreviousMarked(uint32& pos)
 		bit = 31;
 	}
 
-	TRACE("BitmapBlock::FindPreviousMarked(): index: %lu bit: %lu bits: %lx\n",
-		index, bit, bits);
+	TRACE("BitmapBlock::FindPreviousMarked(): index: %" B_PRIu32 " bit: %"
+		B_PRIu32 " bits: %" B_PRIx32 "\n", index, bit, bits);
 
 	for (; bit >= 0; --bit) {
 		// Find the marked bit
@@ -368,9 +376,10 @@ BitmapBlock::FindLargestUnmarkedRange(uint32& start, uint32& length)
 	uint32 index = 0;
 	uint32 bits = B_LENDIAN_TO_HOST_INT32(data[0]);
 
-	TRACE("BitmapBlock::FindLargestUnmarkedRange(): word span: %lu, last "
-		"index: %lu, start index: %lu, index: %lu, bits: %lX, start: %lu, "
-		"length: %lu\n", wordSpan, fMaxIndex, startIndex, index, bits, start,
+	TRACE("BitmapBlock::FindLargestUnmarkedRange(): word span: %" B_PRIu32
+		", last index: %" B_PRIu32 ", start index: %" B_PRIu32 ", index: %"
+		B_PRIu32 ", bits: %" B_PRIx32 ", start: %" B_PRIu32 ", length: %"
+		B_PRIu32 "\n", wordSpan, fMaxIndex, startIndex, index, bits, start,
 		length);
 
 	if (wordSpan == 0) {
@@ -390,7 +399,8 @@ BitmapBlock::FindLargestUnmarkedRange(uint32& start, uint32& length)
 					start = startPos;
 					length = newLength;
 					TRACE("BitmapBlock::FindLargestUnmarkedRange(): Found "
-						"larger length %lu starting at %lu\n", length, start);
+						"larger length %" B_PRIu32 " starting at %" B_PRIu32
+						"\n", length, start);
 				} 
 
 				startPos = endPos;
@@ -442,8 +452,9 @@ BitmapBlock::FindLargestUnmarkedRange(uint32& start, uint32& length)
 					wordSpan = length >> 5;
 					
 					TRACE("BitmapBlock::FindLargestUnmarkedRange(): Found "
-						"larger length %lu starting at %lu; word span: "
-						"%lu\n", length, start, wordSpan);
+						"larger length %" B_PRIu32 " starting at %" B_PRIu32
+						"; word span: %" B_PRIu32 "\n", length, start,
+						wordSpan);
 				}
 			}
 
@@ -458,15 +469,16 @@ BitmapBlock::FindLargestUnmarkedRange(uint32& start, uint32& length)
 		uint32 newStart = (startIndex + 1) << 5;
 		
 		TRACE("BitmapBlock::FindLargestUnmarkedRange(): Possibly found a "
-			"larger range. index: %lu, start index: %lu, word span: %lu, "
-			"new length: %lu, new start: %lu\n", index, startIndex, wordSpan,
+			"larger range. index: %" B_PRIu32 ", start index: %" B_PRIu32
+			", word span: %" B_PRIu32 ", new length: %" B_PRIu32
+			", new start: %" B_PRIu32 "\n", index, startIndex, wordSpan,
 			newLength, newStart);
 
 		if (newStart != 0) {
 			uint32 startBits = B_LENDIAN_TO_HOST_INT32(data[startIndex]);
 			
-			TRACE("BitmapBlock::FindLargestUnmarkedRange(): start bits: %lu\n",
-				startBits);
+			TRACE("BitmapBlock::FindLargestUnmarkedRange(): start bits: %"
+				B_PRIu32 "\n", startBits);
 
 			for (int32 bit = 31; bit >= 0; --bit) {
 				if ((startBits >> bit & 1) != 0)
@@ -477,7 +489,8 @@ BitmapBlock::FindLargestUnmarkedRange(uint32& start, uint32& length)
 			}
 			
 			TRACE("BitmapBlock::FindLargestUnmarkedRange(): updated new start "
-				"to %lu and new length to %lu\n", newStart, newLength);
+				"to %" B_PRIu32 " and new length to %" B_PRIu32 "\n", newStart,
+				newLength);
 		}
 
 		for (int32 bit = 0; bit < 32; ++bit) {
@@ -488,13 +501,14 @@ BitmapBlock::FindLargestUnmarkedRange(uint32& start, uint32& length)
 		}
 		
 		TRACE("BitmapBlock::FindLargestUnmarkedRange(): updated new length to "
-			"%lu\n", newLength);
+			"%" B_PRIu32 "\n", newLength);
 
 		if (newLength > length) {
 			start = newStart;
 			length = newLength;
 			TRACE("BitmapBlock::FindLargestUnmarkedRange(): Found "
-				"largest length %lu starting at %lu\n", length, start);
+				"largest length %" B_PRIu32 " starting at %" B_PRIu32 "\n",
+				length, start);
 		}
 	}
 }

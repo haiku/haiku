@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	2830900562
+1	romanian	x-vnd.Haiku-libtracker	302476273
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Vizualizare pictogramă
 Add-ons	FilePanelPriv		Module
@@ -165,7 +165,6 @@ You cannot create a link to the root directory.	FSUtils		Nu puteți crea o legă
 Resize to fit	VolumeWindow		Redimensionează pentru a potrivi
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Elementul selectat nu poate fi mutat la gunoi. Doriți să îl ștergeți în schimb? (Această operație nu poate fi inversată.)
 Invert	SelectionWindow		Inversează
-Save Query as template…	FindPanel		Salvează interogare ca șablon...
 Find	FindPanel		Găsește
 Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Mută
 Get info	ContainerWindow		Obține info

@@ -22,7 +22,6 @@ $PRODUCES kill.c
 
 $BUILTIN kill
 $FUNCTION kill_builtin
-$DEPENDS_ON HAVE_KILL_BUILTIN
 $SHORT_DOC kill [-s sigspec | -n signum | -sigspec] pid | jobspec ... or kill -l [sigspec]
 Send a signal to a job.
 
@@ -55,6 +54,8 @@ $END
 #  include <unistd.h>
 #endif
 
+#include <OS.h>
+
 #include "../bashansi.h"
 #include "../bashintl.h"
 
@@ -77,6 +78,46 @@ static void kill_error __P((pid_t, int));
 #else
 #  define CONTINUE_OR_FAIL goto continue_killing
 #endif /* CONTINUE_AFTER_KILL_ERROR */
+
+
+int kill_by_name(int signum, const char *name)
+{
+	team_info teamInfo;
+	uint32    cookie = 0;
+	int       status = EXECUTION_SUCCESS;
+	int       found = 0;
+
+	while (get_next_team_info(&cookie, &teamInfo) >= B_OK) {
+		char *token, *args;
+
+		args = teamInfo.args;
+		token = strchr(args, ' ');
+		if (token) {
+			/* remove process argument */
+			*token = 0;
+		}
+
+		/* skip the path if any */
+		token = basename(args);
+
+		if (!strncmp(name, token, strlen(token))) {
+			found = 1;
+			/* name matched */
+			if (kill((pid_t)teamInfo.team, signum) != 0) {
+				kill_error (teamInfo.team, errno);
+				status = EXECUTION_FAILURE;
+			}
+		}
+	}
+
+	if (!found)
+		builtin_error (_("(%s) - %s"), name, strerror(ESRCH));
+
+	return status;
+}
+
+
+
 
 /* Here is the kill builtin.  We only have it so that people can type
    kill -KILL %1?  No, if you fill up the process table this way you
@@ -177,20 +218,27 @@ kill_builtin (list)
 	word++;
 
       /* Use the entire argument in case of minus sign presence. */
-      if (*word && legal_number (list->word->word, &pid_value) && (pid_value == (pid_t)pid_value))
-	{
-	  pid = (pid_t) pid_value;
+      if (*word)
+      {
+      	if (legal_number (list->word->word, &pid_value)
+      		&& (pid_value == (pid_t)pid_value))
+		{
+		  pid = (pid_t) pid_value;
 
-	  if (kill_pid (pid, sig, pid < -1) < 0)
-	    {
-	      if (errno == EINVAL)
-		sh_invalidsig (sigspec);
-	      else
-		kill_error (pid, errno);
-	      CONTINUE_OR_FAIL;
-	    }
-	  else
-	    any_succeeded++;
+		  if (kill_pid (pid, sig, pid < -1) < 0)
+		    {
+		      if (errno == EINVAL)
+			sh_invalidsig (sigspec);
+		      else
+			kill_error (pid, errno);
+		      CONTINUE_OR_FAIL;
+		    }
+		  else
+		    any_succeeded++;
+		} else {
+			errno = kill_by_name(sig, word);
+	    	CONTINUE_OR_FAIL;
+		}
 	}
 #if defined (JOB_CONTROL)
       else if (*list->word->word && *list->word->word != '%')

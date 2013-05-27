@@ -15,8 +15,10 @@
 
 class entry_ref;
 class Architecture;
+class AreaInfo;
 class BString;
 class DebuggerInterface;
+class SemaphoreInfo;
 class StackFrame;
 class Team;
 class Thread;
@@ -77,6 +79,13 @@ private:
 			void				_HandleMemoryBlockRetrieved(
 									TeamMemoryBlock* block, status_t result);
 
+	static	int					_CompareAreas(const AreaInfo* a,
+									const AreaInfo* b);
+	static	int					_CompareImages(const Image* a, const Image* b);
+	static	int					_CompareSemaphores(const SemaphoreInfo* a,
+									const SemaphoreInfo* b);
+	static	int					_CompareThreads(const ::Thread* a,
+									const ::Thread* b);
 private:
 			::Team*				fTeam;
 			Architecture*		fArchitecture;

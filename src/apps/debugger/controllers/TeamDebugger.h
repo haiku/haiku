@@ -60,7 +60,7 @@ private:
 									ValueNodeContainer* container,
 									ValueNode* valueNode);
 	virtual	void				ThreadActionRequested(thread_id threadID,
-									uint32 action);
+									uint32 action, target_addr_t address);
 	virtual	void				SetBreakpointRequested(target_addr_t address,
 									bool enabled);
 	virtual	void				SetBreakpointEnabledRequested(
@@ -116,6 +116,8 @@ private:
 
 			void				_HandleDebuggerMessage(DebugEvent* event);
 
+			bool				_HandleTeamDeleted(
+									TeamDeletedEvent* event);
 			bool				_HandleThreadCreated(
 									ThreadCreatedEvent* event);
 			bool				_HandleThreadRenamed(

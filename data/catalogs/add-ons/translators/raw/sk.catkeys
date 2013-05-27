@@ -1,8 +1,9 @@
-1	slovak	x-vnd.Haiku-RAWTranslator	2229230003
+1	slovak	x-vnd.Haiku-RAWTranslator	2975919330
 RAWTranslator Settings	ConfigView		Nastavenia Prekladača RAW
 Version %d.%d.%d, %s	ConfigView		Verzia %d.%d.%d, %s
 RAW image translator	RAWTranslator		Prekladač obrázkov RAW
 RAW Settings	RAWTranslator main		Nastavenia RAW
 RAW images	RAWTranslator		Obrázky RAW
+RAW image translator	ConfigView		Prekladač obrázkov RAW
 %s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	%s obrázok RAW
 Based on Dave Coffin's dcraw 8.63	ConfigView		Založené na dcraw 8.63 od Dava Coffina

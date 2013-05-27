@@ -1,12 +1,13 @@
 /*
- * Copyright 2001-2011, Haiku Inc. All rights reserved.
+ * Copyright 2001-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
- *		Marc Flerackers (mflerackers@androme.be)
- *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
- *		Rene Gollent (anevilyak@gmail.com)
- *		Stephan Aßmus <superstippi@gmx.de>
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		Stefano Ceccherini, stefano.ceccherini@gmail.com
+ *		Marc Flerackers, mflerackers@androme.be
+ *		Rene Gollent, anevilyak@gmail.com
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -733,7 +734,7 @@ BMenu::AddItem(BMenuItem* item, BRect frame)
 			"be called if the menu layout is B_ITEMS_IN_MATRIX");
 	}
 
-	if (!item)
+	if (item == NULL)
 		return false;
 
 	item->fBounds = frame;
@@ -758,7 +759,7 @@ bool
 BMenu::AddItem(BMenu* submenu)
 {
 	BMenuItem* item = new (nothrow) BMenuItem(submenu);
-	if (!item)
+	if (item == NULL)
 		return false;
 
 	if (!AddItem(item, CountItems())) {
@@ -780,7 +781,7 @@ BMenu::AddItem(BMenu* submenu, int32 index)
 	}
 
 	BMenuItem* item = new (nothrow) BMenuItem(submenu);
-	if (!item)
+	if (item == NULL)
 		return false;
 
 	if (!AddItem(item, index)) {
@@ -802,7 +803,7 @@ BMenu::AddItem(BMenu* submenu, BRect frame)
 	}
 
 	BMenuItem* item = new (nothrow) BMenuItem(submenu);
-	if (!item)
+	if (item == NULL)
 		return false;
 
 	if (!AddItem(item, frame)) {
@@ -2848,7 +2849,8 @@ BMenu::_UpdateWindowViewSize(const bool &move)
 		return;
 
 	bool scroll = false;
-	const BPoint screenLocation = move ? ScreenLocation() : window->Frame().LeftTop();
+	const BPoint screenLocation = move ? ScreenLocation()
+		: window->Frame().LeftTop();
 	BRect frame = _CalcFrame(screenLocation, &scroll);
 	ResizeTo(frame.Width(), frame.Height());
 
@@ -2870,7 +2872,24 @@ BMenu::_UpdateWindowViewSize(const bool &move)
 					screen.Frame().bottom - frame.top);
 			}
 
-			window->AttachScrollers();
+			if (fLayout == B_ITEMS_IN_COLUMN) {
+				// we currently only support scrolling for B_ITEMS_IN_COLUMN
+				window->AttachScrollers();
+
+				BMenuItem* selectedItem = FindMarked();
+				if (selectedItem != NULL) {
+					// scroll to the selected item
+					if (Supermenu() == NULL) {
+						window->TryScrollTo(selectedItem->Frame().top);
+					} else {
+						BPoint point = selectedItem->Frame().LeftTop();
+						BPoint superPoint = Superitem()->Frame().LeftTop();
+						Supermenu()->ConvertToScreen(&superPoint);
+						ConvertToScreen(&point);
+						window->TryScrollTo(point.y - superPoint.y);
+					}
+				}
+			}
 		}
 	} else {
 		_CacheFontInfo();
@@ -3007,4 +3026,3 @@ B_IF_GCC_2(InvalidateLayout__5BMenub,_ZN5BMenu16InvalidateLayoutEb)(
 {
 	menu->InvalidateLayout();
 }
-

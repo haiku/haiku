@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-WebPositive	233049275
+1	belarusian	x-vnd.Haiku-WebPositive	3577331897
 Show home button	Settings Window		Паказваць кнопку "Дадому"
 Username:	Authentication Panel		Карыстальнік:
 Copy URL to clipboard	Download Window		Скапіяваць спасылку
@@ -16,6 +16,7 @@ Start page:	Settings Window		Пачатковая старонка:
 History	WebPositive Window		Гісторыя
 Error opening downloads folder	Download Window		Немагчыма адчыніць папку запампованых файлаў
 Paste	WebPositive Window		Уставіць
+Proxy username:	Settings Window		Імя карыстальніка проксі:
 Settings	Settings Window		Наладкі
 %seconds seconds left	Download Window		Засталося %seconds секунд
 Confirmation	WebPositive Window		Пацверджанне
@@ -41,6 +42,7 @@ Quit	WebPositive Window		Выйсці
 Full screen	WebPositive Window		Поўнаэкранны рэжым
 Open download error	Download Window		Немагчыма адкрыць спампаваны файл
 Standard font:	Settings Window		Звычайны шрыфт:
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Знайсці папярэдні выпадак таго што шукаеце
 Restart	Download Window		Перазапусціць
 Proxy server	Settings Window		Проксі-сервер
 Open containing folder	Download Window		Адкрыць паку з гэтым файлам
@@ -58,6 +60,7 @@ Cut	WebPositive Window		Выразаць
 Bookmark this page	WebPositive Window		Дадаць гэтую старонку ў закладкі
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Памылка падчас апрацоўкі папкі закладак.\n\nПамылка: %error
 Open downloads folder	Download Window		Адкрыць папку спамповак
+Proxy password:	Settings Window		Пароль проксі:
 Number of days to keep links in History menu:	Settings Window		Выдаляць спасылкі з гісторыі пасля [дзён]:
 Hide	Download Window		Схаваць
 Reset size	WebPositive Window		Вярнуць памер
@@ -67,6 +70,7 @@ There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive 
 Over 1 day left	Download Window		Засталося болей 1 дня
 Downloads	WebPositive Window		Спампоўкі
 Requesting %url	WebPositive Window		Запыт да %url
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Знайсці наступны выпадак таго, што шукаеце
 Apply	Settings Window		Ужыць
 Bookmark info	WebPositive Window		Інфа пра закладку
 Size:	Font Selection view		Памер:
@@ -80,6 +84,7 @@ Open blank page	Settings Window		Адчыніць пустую старонку
 New tabs:	Settings Window		Новыя ўкаладкі:
 Cancel	WebPositive Window		Скасаваць
 Open all	WebPositive Window		Адчыніць усе
+Proxy server requires authentication	Settings Window		Проксі сервер патрабуе ідэнтыфікацыі
 Clear	URL Bar		Ачысьціць
 Cut	URL Bar		Выразаць
 Clear	WebPositive Window		Ачысьціць

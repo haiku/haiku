@@ -1,11 +1,14 @@
-1	belarusian	x-vnd.Haiku-DriveSetup	644135944
+1	belarusian	x-vnd.Haiku-DriveSetup	3775412465
 DriveSetup	System name		Рэдыктар дыскаў
+Cancel	AbstractParametersPanel		Адмяніць
 Delete	MainWindow		Выдаліць
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Сапрўды жадаеце запісаць змены на дыск?\n\nУсе данные на абраным падзеле будуць беззваротна згублены!
 Rescan	MainWindow		Перасканіраваць
 OK	MainWindow		ОК
 Could not aquire partitioning information.	MainWindow		Не ўдалося атрымаць інфармацыю аб падзелах.
 There's no space on the partition where a child partition could be created.	MainWindow		Няма мечца на падзеле для стварэння даччынага падзела.
+Initialize	InitializeParametersPanel		Ініцыялізіраваць
+OK	AbstractParametersPanel		Добра
 <empty>	PartitionList		<пуста>
 Unable to find the selected partition by ID.	MainWindow		Не ўдалося знайсці абраны падзел па ID.
 Select a partition from the list below.	DiskView		Абярыце падзел са спісу нішэй.
@@ -15,6 +18,7 @@ The selected disk is read-only.	MainWindow		Абраны дыск толькі �
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Вы упэўнены, што жадаеце фарматаваць падзел \"%s\"? Дадатковае пацвержанне спатрэбіцца і непасрэдна перад запісам на дыск.
 Could not mount partition %s.	MainWindow		Не ўдалося змантаваць падзел %s.
 The partition %s has been successfully formatted.\n	MainWindow		Падзел %s паспяхова фарматаваны.\n
+Change parameters	MainWindow		Змяніць параметры
 The partition %s is already unmounted.	MainWindow		Падзел %s ужо змантаваны.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Не ўдалося выдаліць падзел. Змены не былі запісаны на дыск.
 Could not delete the selected partition.	MainWindow		Немагчыма выдаліць абраны падзел.
@@ -33,38 +37,53 @@ Write changes	MainWindow		Запісаць змены
 There was an error preparing the disk for modifications.	MainWindow		Адбылася памылка пры падрыхтоўцы дыску да мадыфікацый.
 The partition %s is already mounted.	MainWindow		Падзел %s ужо змантаваны.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Вы упэўнены, што жадаеце фарматаваць падзел? Дадатковае пацвержанне спатрэбіцца і непасрэдна перад запісам на дыск.
+Partition name:	ChangeParametersPanel		Імя падзела:
+Change	ChangeParametersPanel		Змяніць
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Сапраўды жадаеце запісаць змены на дыск?\n\nУсе данные на абраным падзеле %s будуць беззваротна згублены!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Сапрўды жадаеце выдаліць абраны падзел?\n\nУсе данные на абраным падзеле будуць беззваротна згублены!
 Create…	MainWindow		Стварыць…
 Disk system \"%s\"\" not found!	MainWindow		Дыскавая сістэма \"%s\"\" не знойдзена!
 The disk has been successfully initialized.\n	MainWindow		Дыск быў паспяхова ініцыялізаваны.\n
 Could not unmount partition %s.	MainWindow		Не ўдалося змантаваць падзел %s.
+Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Не ўдалося зманіць параметры падзела. Змены не былі запісаныя на дыск.
 Failed to format the partition %s!\n	MainWindow		Не ўдалося фарматаваць падзел %s!\n
 Mount	MainWindow		Змантаваць
+Partition type	PartitionList		Тып падзела
 Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Вы упэўнены, што жадаеце фарматаваць ўвесь дыск? (у большасці выпадкаў на дыску ствараюць сыстэму падзелаў) Дадатковае пацвержанне спатрэбіцца і непасрэдна перад запісам на дыск.
+The panel experienced a problem!	MainWindow		З панэллю ёсьць пэўная праблема!
+Change parameters…	MainWindow		Змяніць параметры…
 Device	PartitionList		Прылада
 Disk	MainWindow		Дыск
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Вы упэўнены, што жадаеце ініцыялізаваць абраны дыск? Усе дадзеныя з яго будуць страчаны. Дадатковае пацвержанне спатрэбіцца і непасрэдна перад запісам на дыск.\n
+Partition size	CreateParametersPanel		Памер падзела
 Device	DiskView		Прылада
 Active	PartitionList		Актыўны
 Volume name	PartitionList		Імя тому
 Continue	MainWindow		Працягнуць
 Cannot delete the selected partition.	MainWindow		Немагчыма выдаліць абраны падзел.
 Mount all	MainWindow		Зманатаваць усё
+End: %s	Support		Канец: %s
+The panel could not return successfully.	MainWindow		Панэль не можа вярнуцца карэктна.
 Cancel	MainWindow		Адмяніць
 Delete partition	MainWindow		Выдаліць падзел
+Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Вы ўпэўнены, што жадаеце зманіць параметры абранага падзел?\n\nГэты падзел можа стаць нераспазнаваным для іншых аперацыйных сістэм!
 Eject	MainWindow		Выцягнуць
 Partition	MainWindow		Падзел
+Validation of the given parameters failed.	MainWindow		Не удалася праверка дадзеных параметраў стварэння падзелу.
+Create	CreateParametersPanel		Стварыць
 File system	PartitionList		Файлавая сістэма
 Validation of the given creation parameters failed.	MainWindow		Не удалася праверка дадзеных параметраў стварэння падзелу.
+Partition type:	ChangeParametersPanel		Тып падзела:
 Size	PartitionList		Памер
 Wipe (not implemented)	MainWindow		Вынішчыць усе дадзеныя (пакуль не працуе)
 Validation of the given initialization parameters failed.	MainWindow		Не удалася праверка дадзеных параметраў ініцыялізацыі падзелу.
 The selected partition does not contain a partitioning system.	MainWindow		Абраны падзел не мае сістымы дзялення.
+Offset: %s	Support		Зрух: %s
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Сапрўды жадаеце запісаць змены на дыск?\n\nУсе данные на абраным падзеле %s будуць беззваротна згублены!
 The partition %s is currently mounted.	MainWindow		Падзел %s зараз змантаваны.
 Surface test (not implemented)	MainWindow		Тэст паверхні (не ажыццявіма)
 Format	MainWindow		Фарматаваць
+Could not change the parameters of the selected partition.	MainWindow		Немагчыма змяніць параметры абранага падзела.
 Parameters	PartitionList		Параметры
 Creation of the partition has failed.	MainWindow		Не удалося стварыць падзел.
 The currently selected partition is not empty.	MainWindow		Абраны зараз падзел не пусты.

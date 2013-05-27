@@ -22,7 +22,7 @@
  * the IDE driver for the AHCI controller for some reason).
  */
 static void
-jmicron_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device,
+jmicron_fixup_ahci(PCI *pci, uint8 domain, uint8 bus, uint8 device,
 	uint8 function, uint16 deviceId)
 {
 	// We only care about function 0.
@@ -80,8 +80,8 @@ jmicron_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device,
 
 
 static void
-intel_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function,
-	uint16 deviceId)
+intel_fixup_ahci(PCI *pci, uint8 domain, uint8 bus, uint8 device,
+	uint8 function, uint16 deviceId)
 {
 	// TODO(bga): disabled until the PCI manager can assign new resources.
 	return;
@@ -156,7 +156,8 @@ intel_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function,
 
 
 static void
-ati_fixup_ixp(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function, uint16 deviceId)
+ati_fixup_ixp(PCI *pci, uint8 domain, uint8 bus, uint8 device, uint8 function,
+	uint16 deviceId)
 {
 #if defined(__INTEL__) || defined(__x86_64__)
 	/* ATI Technologies Inc, IXP chipset:
@@ -187,7 +188,8 @@ ati_fixup_ixp(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function, uin
 
 
 void
-pci_fixup_device(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function)
+pci_fixup_device(PCI *pci, uint8 domain, uint8 bus, uint8 device,
+	uint8 function)
 {
 	uint16 vendorId = pci->ReadConfig(domain, bus, device, function,
 		PCI_vendor_id, 2);

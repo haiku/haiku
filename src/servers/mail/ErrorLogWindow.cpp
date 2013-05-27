@@ -208,7 +208,7 @@ Error::GetPreferredSize(float *width, float *height)
 	BTextView *view = static_cast<BTextView *>(FindView("error_display"));
 
 	*width = view->Frame().Width() + 20;
-	*height = view->TextHeight(0, LONG_MAX) + 3;
+	*height = view->TextHeight(0, INT32_MAX) + 3;
 }
 
 

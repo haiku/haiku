@@ -1,7 +1,8 @@
-1	french	x-vnd.Haiku-hmulti_audio.media_addon	1510080944
+1	french	x-vnd.Haiku-hmulti_audio.media_addon	451057402
 Master	MultiAudio		Général
 SPDIF	MultiAudio		SPDIF
 Gain	MultiAudio		Gain
+Output 3D center	MultiAudio		Sortie 3D centrale
 Extended Setup	MultiAudio		Réglages étendus
 CD	MultiAudio		CD
 Tone control	MultiAudio		Tonalité
@@ -19,6 +20,7 @@ General	MultiAudio		Général
 Input & Output	MultiAudio		Entrée & Sortie
 Enhanced Setup	MultiAudio		Réglages fins
 Stereo mix	MultiAudio		Mélangeur stéréo
+Output 3D depth	MultiAudio		Profondeur de la sortie 3D
 Volume	MultiAudio		Volume
 Output	MultiAudio		Sortie
 Video	MultiAudio		Vidéo

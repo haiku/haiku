@@ -348,7 +348,7 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 				fAccountMenu->AddItem(
 					item = new BMenuItem(B_TRANSLATE("<none>"), NULL));
 				item->SetEnabled(false);
-				fAccountID = ~0UL;
+				fAccountID = ~(int32)0;
 			}
 			// default account is invalid, set to marked
 			// TODO: do this differently, no casting and knowledge
@@ -1093,7 +1093,7 @@ QPopupMenu::AddPersonItem(const entry_ref *ref, ino_t node, BString &name,
 
 	if (!parentMenu->AddItem(newItem, index + 1)) {
 		fprintf (stderr, "QPopupMenu::AddPersonItem: Unable to add menu "
-			"item \"%s\" at index %ld.\n", sortKey.String(), index + 1);
+			"item \"%s\" at index %" B_PRId32 ".\n", sortKey.String(), index + 1);
 		delete newItem;
 	}
 }

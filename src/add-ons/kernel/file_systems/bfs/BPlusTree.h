@@ -7,8 +7,21 @@
 
 
 #include "bfs.h"
-#include "Journal.h"
 
+#include "Utility.h"
+
+#if !_BOOT_MODE
+#include "Journal.h"
+class Inode;
+#else
+#define Inode BFS::Stream
+
+namespace BFS {
+
+class Stream;
+class Transaction;
+class TransactionListener {};
+#endif // _BOOT_MODE
 
 //	#pragma mark - on-disk structures
 
@@ -132,18 +145,21 @@ enum bplustree_traversing {
 
 //	#pragma mark - in-memory structures
 
-template<class T> class Stack;
+
 class BPlusTree;
-class TreeIterator;
-class CachedNode;
-class Inode;
 struct TreeCheck;
+class TreeIterator;
+
+
+#if !_BOOT_MODE
+template<class T> class Stack;
 
 // needed for searching (utilizing a stack)
 struct node_and_key {
 	off_t	nodeOffset;
 	uint16	keyIndex;
 };
+#endif // !_BOOT_MODE
 
 
 class CachedNode {
@@ -153,6 +169,9 @@ public:
 		fTree(tree),
 		fNode(NULL)
 	{
+#if _BOOT_MODE
+		fBlock = NULL;
+#endif
 	}
 
 	CachedNode(BPlusTree* tree, off_t offset, bool check = true)
@@ -160,30 +179,40 @@ public:
 		fTree(tree),
 		fNode(NULL)
 	{
+#if _BOOT_MODE
+		fBlock = NULL;
+#endif
 		SetTo(offset, check);
 	}
 
 	~CachedNode()
 	{
 		Unset();
+#if _BOOT_MODE
+		free(fBlock);
+#endif
 	}
 
 			const bplustree_node* SetTo(off_t offset, bool check = true);
 			status_t			SetTo(off_t offset,
 									const bplustree_node** _node,
 									bool check = true);
+
+			const bplustree_header* SetToHeader();
+			void				Unset();
+
+#if !_BOOT_MODE
 			bplustree_node*		SetToWritable(Transaction& transaction,
 									off_t offset, bool check = true);
 			bplustree_node*		MakeWritable(Transaction& transaction);
-			const bplustree_header* SetToHeader();
 			bplustree_header*	SetToWritableHeader(Transaction& transaction);
 
 			void				UnsetUnchanged(Transaction& transaction);
-			void				Unset();
 
 			status_t			Free(Transaction& transaction, off_t offset);
 			status_t			Allocate(Transaction& transaction,
 									bplustree_node** _node, off_t* _offset);
+#endif // !_BOOT_MODE
 
 			bool				IsWritable() const { return fWritable; }
 			bplustree_node*		Node() const { return fNode; }
@@ -197,20 +226,27 @@ protected:
 			off_t				fOffset;
 			off_t				fBlockNumber;
 			bool				fWritable;
+#if _BOOT_MODE
+			uint8*				fBlock;
+#endif
 };
 
 
 class BPlusTree : public TransactionListener {
 public:
+#if !_BOOT_MODE
 								BPlusTree(Transaction& transaction,
 									Inode* stream,
 									int32 nodeSize = BPLUSTREE_NODE_SIZE);
+#endif
 								BPlusTree(Inode* stream);
 								BPlusTree();
 								~BPlusTree();
 
+#if !_BOOT_MODE
 			status_t			SetTo(Transaction& transaction, Inode* stream,
 									int32 nodeSize = BPLUSTREE_NODE_SIZE);
+#endif
 			status_t			SetTo(Inode* stream);
 			status_t			SetStream(Inode* stream);
 
@@ -219,6 +255,7 @@ public:
 			size_t				NodeSize() const { return fNodeSize; }
 			Inode*				Stream() const { return fStream; }
 
+#if !_BOOT_MODE
 			status_t			Validate(bool repair, bool& _errorsFound);
 			status_t			MakeEmpty();
 
@@ -249,15 +286,19 @@ public:
 			status_t			Replace(Transaction& transaction,
 									const uint8* key, uint16 keyLength,
 									off_t value);
+#endif // !_BOOT_MODE
+
 			status_t			Find(const uint8* key, uint16 keyLength,
 									off_t* value);
 
+#if !_BOOT_MODE
 	static	int32				TypeCodeToKeyType(type_code code);
 	static	int32				ModeToKeyType(mode_t mode);
 
 protected:
 	virtual void				TransactionDone(bool success);
 	virtual void				RemovedFromTransaction();
+#endif // !_BOOT_MODE
 
 private:
 								BPlusTree(const BPlusTree& other);
@@ -269,6 +310,7 @@ private:
 			status_t			_FindKey(const bplustree_node* node,
 									const uint8* key, uint16 keyLength,
 									uint16* index = NULL, off_t* next = NULL);
+#if !_BOOT_MODE
 			status_t			_SeekDown(Stack<node_and_key>& stack,
 									const uint8* key, uint16 keyLength);
 
@@ -310,6 +352,7 @@ private:
 									off_t offset, off_t lastOffset,
 									off_t nextOffset, const uint8* key,
 									uint16 keyLength);
+#endif // !_BOOT_MODE
 
 private:
 			friend class TreeIterator;
@@ -322,8 +365,11 @@ private:
 			bool				fAllowDuplicates;
 			bool				fInTransaction;
 			status_t			fStatus;
+
+#if !_BOOT_MODE
 			mutex				fIteratorLock;
 			SinglyLinkedList<TreeIterator> fIterators;
+#endif
 };
 
 
@@ -385,6 +431,7 @@ private:
 //	(most of them may not be needed)
 
 
+#if !_BOOT_MODE
 inline status_t
 BPlusTree::Remove(Transaction& transaction, const char* key, off_t value)
 {
@@ -455,6 +502,7 @@ BPlusTree::Insert(Transaction& transaction, double key, off_t value)
 		return B_BAD_TYPE;
 	return Insert(transaction, (uint8*)&key, sizeof(key), value);
 }
+#endif // !_BOOT_MODE
 
 
 //	#pragma mark - TreeIterator inline functions
@@ -605,5 +653,11 @@ bplustree_node::MaxFragments(uint32 nodeSize)
 	return nodeSize / ((NUM_FRAGMENT_VALUES + 1) * sizeof(off_t));
 }
 
+
+#if _BOOT_MODE
+} // namespace BFS
+
+#undef Inode
+#endif
 
 #endif	// B_PLUS_TREE_H

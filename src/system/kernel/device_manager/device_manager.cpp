@@ -1552,6 +1552,7 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 				switch (subType) {
 					case PCI_scsi:
 						_AddPath(*stack, "busses", "scsi");
+						_AddPath(*stack, "busses", "virtio");
 						break;
 					case PCI_ide:
 						_AddPath(*stack, "busses", "ata");
@@ -1583,6 +1584,7 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 				break;
 			case PCI_network:
 				_AddPath(*stack, "drivers", "net");
+				_AddPath(*stack, "busses", "virtio");
 				break;
 			case PCI_display:
 				_AddPath(*stack, "drivers", "graphics");

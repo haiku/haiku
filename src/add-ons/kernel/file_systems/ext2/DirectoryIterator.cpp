@@ -56,8 +56,8 @@ DirectoryIterator::DirectoryIterator(Inode* directory, off_t start,
 	fStartLogicalBlock(fLogicalBlock),
 	fStartDisplacement(fDisplacement)
 {
-	TRACE("DirectoryIterator::DirectoryIterator() %lld: num blocks: %lu\n",
-		fDirectory->ID(), fNumBlocks);
+	TRACE("DirectoryIterator::DirectoryIterator() %" B_PRIdINO ": num blocks: "
+		"%" B_PRIu32 "\n", fDirectory->ID(), fNumBlocks);
 	fIndexing = parent != NULL;
 	fInitStatus = fDirectory->FindBlock(start, fPhysicalBlock);
 	fStartPhysicalBlock = fPhysicalBlock;
@@ -83,7 +83,7 @@ DirectoryIterator::InitCheck()
 status_t
 DirectoryIterator::Get(char* name, size_t* _nameLength, ino_t* _id)
 {
-	TRACE("DirectoryIterator::Get() ID %lld\n", fDirectory->ID());
+	TRACE("DirectoryIterator::Get() ID %" B_PRIdINO "\n", fDirectory->ID());
 	if (_Offset() >= fDirectory->Size()) {
 		TRACE("DirectoryIterator::Get() out of entries\n");
 		return B_ENTRY_NOT_FOUND;
@@ -94,7 +94,8 @@ DirectoryIterator::Get(char* name, size_t* _nameLength, ino_t* _id)
 	if (block == NULL)
 		return B_IO_ERROR;
 
-	TRACE("DirectoryIterator::Get(): Displacement: %lu\n", fDisplacement);
+	TRACE("DirectoryIterator::Get(): Displacement: %" B_PRIu32 "\n",
+		fDisplacement);
 	const ext2_dir_entry* entry = (const ext2_dir_entry*)&block[fDisplacement];
 
 	if (entry->Length() == 0 || entry->InodeID() == 0)
@@ -103,13 +104,14 @@ DirectoryIterator::Get(char* name, size_t* _nameLength, ino_t* _id)
 	if (entry->NameLength() != 0) {
 		size_t length = entry->NameLength();
 
-		TRACE("block %lu, displacement %lu: entry ino %lu, length %u, "
-			"name length %lu, type %u\n", fLogicalBlock, fDisplacement,
-			entry->InodeID(), entry->Length(), length, entry->FileType());
+		TRACE("block %" B_PRIu32 ", displacement %" B_PRIu32 ": entry ino %"
+			B_PRIu32 ", length %u, name length %" B_PRIuSIZE ", type %u\n",
+			fLogicalBlock, fDisplacement, entry->InodeID(), entry->Length(),
+			length,	entry->FileType());
 
 		if (*_nameLength > 0) {
-			if (*_nameLength < length)
-				length = *_nameLength - 1;
+			if (length + 1 > *_nameLength)
+				return B_BUFFER_OVERFLOW;
 
 			memcpy(name, entry->name, length);
 			name[length] = '\0';
@@ -141,7 +143,8 @@ DirectoryIterator::GetNext(char* name, size_t* _nameLength, ino_t* _id)
 status_t
 DirectoryIterator::Next()
 {
-	TRACE("DirectoryIterator::Next() fDirectory->ID() %lld\n", fDirectory->ID());
+	TRACE("DirectoryIterator::Next() fDirectory->ID() %" B_PRIdINO "\n",
+		fDirectory->ID());
 
 	if (_Offset() >= fDirectory->Size()) {
 		TRACE("DirectoryIterator::Next() out of entries\n");
@@ -161,8 +164,9 @@ DirectoryIterator::Next()
 	entry = (ext2_dir_entry*)(block + fDisplacement);
 
 	do {
-		TRACE("Checking entry at block %llu, displacement %lu entry inodeid %ld\n", fPhysicalBlock,
-			fDisplacement, entry->InodeID());
+		TRACE("Checking entry at block %" B_PRIu64 ", displacement %" B_PRIu32
+			" entry inodeid %" B_PRIu32 "\n", fPhysicalBlock, fDisplacement,
+			entry->InodeID());
 
 		if (entry->Length() != 0) {
 			if (!entry->IsValid()) {
@@ -183,7 +187,7 @@ DirectoryIterator::Next()
 			if (status != B_OK)
 				return status;
 						
-			if (_Offset() + ext2_dir_entry::MinimumSize()
+			if ((off_t)(_Offset() + ext2_dir_entry::MinimumSize())
 					>= fDirectory->Size()) {
 				TRACE("DirectoryIterator::Next() end of directory file\n");
 				return B_ENTRY_NOT_FOUND;
@@ -203,7 +207,8 @@ DirectoryIterator::Next()
 
 		entry = (ext2_dir_entry*)(block + fDisplacement);
 
-		TRACE("DirectoryIterator::Next() skipping entry %d %ld\n", entry->Length(), entry->InodeID());
+		TRACE("DirectoryIterator::Next() skipping entry %d %" B_PRIu32 "\n",
+			entry->Length(), entry->InodeID());
 	} while (entry->Length() == 0 || entry->InodeID() == 0);
 
 	TRACE("DirectoryIterator::Next() entry->Length() %d entry->name %*s\n",
@@ -228,7 +233,8 @@ void
 DirectoryIterator::Restart()
 {
 	TRACE("DirectoryIterator::Restart(): (logical, physical, displacement): "
-		"current: (%lu, %llu, %lu), start: (%lu, %llu, %lu)\n", fLogicalBlock,
+		"current: (%" B_PRIu32 ", %" B_PRIu64 ", %" B_PRIu32 "), start: (%"
+		B_PRIu32 ", %" B_PRIu64 ", %" B_PRIu32 ")\n", fLogicalBlock,
 		fPhysicalBlock, fDisplacement, fStartLogicalBlock, fStartPhysicalBlock,
 		fStartDisplacement);
 	fLogicalBlock = fStartLogicalBlock;
@@ -365,7 +371,8 @@ DirectoryIterator::RemoveEntry(Transaction& transaction)
 		return B_OK;
 	}
 
-	TRACE("DirectoryIterator::RemoveEntry() fDisplacement %ld\n", fDisplacement);
+	TRACE("DirectoryIterator::RemoveEntry() fDisplacement %" B_PRIu32 "\n",
+		fDisplacement);
 
 	if (fPreviousDisplacement == fDisplacement) {
 		char buffer[EXT2_NAME_LENGTH + 1];
@@ -471,8 +478,9 @@ DirectoryIterator::_AddEntry(Transaction& transaction, const char* name,
 	uint8 nameLength, ino_t id, uint8 type, uint16 newLength, uint16 pos,
 	bool hasPrevious)
 {
-	TRACE("DirectoryIterator::_AddEntry(%s, %d, %llu, %d, %d, %d, %c)\n",
-		name, nameLength, id, type, newLength, pos, hasPrevious ? 't' : 'f');
+	TRACE("DirectoryIterator::_AddEntry(%s, %d, %" B_PRIdINO ", %d, %d, %d, "
+		"%c)\n", name, nameLength, id, type, newLength, pos,
+		hasPrevious ? 't' : 'f');
 	CachedBlock cached(fVolume);
 
 	uint8* block = cached.SetToWritable(transaction, fPhysicalBlock);
@@ -507,8 +515,8 @@ DirectoryIterator::_SplitIndexedBlock(Transaction& transaction,
 	uint32 newBlocksPos, bool firstSplit)
 {
 	// Block is full, split required
-	TRACE("DirectoryIterator::_SplitIndexedBlock(.., %s, %u, %llu, %lu, %c)\n",
-		name, nameLength, id, newBlocksPos,
+	TRACE("DirectoryIterator::_SplitIndexedBlock(.., %s, %u, %" B_PRIdINO ", %"
+		B_PRIu32 ", %c)\n", name, nameLength, id, newBlocksPos,
 		firstSplit ? 't' : 'f');
 
 	// Allocate a buffer for the entries in the block
@@ -598,14 +606,14 @@ DirectoryIterator::_SplitIndexedBlock(Transaction& transaction,
 
 		TRACE("DirectoryIterator::_SplitIndexedBlock(): pos: %p, name "
 			"length: %u, entry length: %u\n", entry.position,
-			(unsigned int)dirEntry->name_length,
-			(unsigned int)dirEntry->Length());
+			dirEntry->name_length,
+			dirEntry->Length());
 
 		char cbuffer[256];
 		memcpy(cbuffer, dirEntry->name, dirEntry->name_length);
 		cbuffer[dirEntry->name_length] = '\0';
 		entry.hash = htree.Hash(dirEntry->name, dirEntry->name_length);
-		TRACE("DirectoryIterator::_SplitIndexedBlock(): %s -> %lu\n",
+		TRACE("DirectoryIterator::_SplitIndexedBlock(): %s -> %" B_PRIu32 "\n",
 			cbuffer, entry.hash);
 
 		status = entrySet.Insert(entry);
@@ -630,7 +638,7 @@ DirectoryIterator::_SplitIndexedBlock(Transaction& transaction,
 
 	entry.position = (uint8*)&newEntry;
 	entry.hash = htree.Hash(name, nameLength);
-	TRACE("DirectoryIterator::_SplitIndexedBlock(): %s -> %lu\n",
+	TRACE("DirectoryIterator::_SplitIndexedBlock(): %s -> %" B_PRIu32 "\n",
 		name, entry.hash);
 
 	entrySet.Insert(entry);
@@ -639,8 +647,8 @@ DirectoryIterator::_SplitIndexedBlock(Transaction& transaction,
 	VectorSet<HashedEntry>::Iterator iterator = entrySet.Begin();
 	int32 median = entrySet.Count() / 2;
 	displacement = 0;
-	TRACE("DirectoryIterator::_SplitIndexedBlock(): Count: %ld, median: %ld\n",
-		entrySet.Count(), median);
+	TRACE("DirectoryIterator::_SplitIndexedBlock(): Count: %" B_PRId32
+		", median: %" B_PRId32 "\n", entrySet.Count(), median);
 
 	uint32 previousHash = (*iterator).hash;
 

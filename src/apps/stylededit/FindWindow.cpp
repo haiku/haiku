@@ -25,6 +25,7 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "FindandReplaceWindow"
 
+
 FindWindow::FindWindow(BRect frame, BHandler* _handler, BString* searchString,
 	bool caseState, bool wrapState, bool backState)
 	: BWindow(frame, "FindWindow", B_MODAL_WINDOW,
@@ -125,5 +126,3 @@ FindWindow::_SendMessage()
 
 	PostMessage(B_QUIT_REQUESTED);
 }
-
-

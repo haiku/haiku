@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-DiskUsage	2447717116
+1	dutch; flemish	x-vnd.Haiku-DiskUsage	797331250
 Scanning %refName%	Scanner		%refName% scannen
 Size	Info Window		Grootte
 Rescan	Pie View		Opnieuw scannen
@@ -9,6 +9,7 @@ no supporting apps	Pie View		geen ondersteunende programma's
 Path	Info Window		Pad
 Scan	Status View		Scannen
 9999.99 GB	Status View		9999.99 GB
+Rescan	Status View		Opnieuw scannen
 file unavailable	Status View		bestand niet beschikbaar
 DiskUsage	System name		DiskUsage
  in %d files	Info Window		in %d bestanden

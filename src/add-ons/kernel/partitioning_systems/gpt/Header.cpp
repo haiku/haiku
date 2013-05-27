@@ -336,7 +336,7 @@ Header::_PrintGUID(const guid_t &id)
 {
 	static char guid[48];
 	snprintf(guid, sizeof(guid),
-		"%08lx-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+		"%08" B_PRIx32 "-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
 		B_LENDIAN_TO_HOST_INT32(id.data1), B_LENDIAN_TO_HOST_INT16(id.data2),
 		B_LENDIAN_TO_HOST_INT16(id.data3), id.data4[0], id.data4[1],
 		id.data4[2], id.data4[3], id.data4[4], id.data4[5], id.data4[6],
@@ -350,17 +350,17 @@ Header::_Dump(const efi_table_header& header)
 {
 	dprintf("EFI header: %.8s\n", header.header);
 	dprintf("EFI revision: %" B_PRIx32 "\n", header.Revision());
-	dprintf("header size: %ld\n", header.HeaderSize());
-	dprintf("header CRC: %ld\n", header.HeaderCRC());
-	dprintf("absolute block: %Ld\n", header.AbsoluteBlock());
-	dprintf("alternate block: %Ld\n", header.AlternateBlock());
-	dprintf("first usable block: %Ld\n", header.FirstUsableBlock());
-	dprintf("last usable block: %Ld\n", header.LastUsableBlock());
+	dprintf("header size: %" B_PRId32 "\n", header.HeaderSize());
+	dprintf("header CRC: %" B_PRId32 "\n", header.HeaderCRC());
+	dprintf("absolute block: %" B_PRIu64 "\n", header.AbsoluteBlock());
+	dprintf("alternate block: %" B_PRIu64 "\n", header.AlternateBlock());
+	dprintf("first usable block: %" B_PRIu64 "\n", header.FirstUsableBlock());
+	dprintf("last usable block: %" B_PRIu64 "\n", header.LastUsableBlock());
 	dprintf("disk GUID: %s\n", _PrintGUID(header.disk_guid));
-	dprintf("entries block: %Ld\n", header.EntriesBlock());
-	dprintf("entry size:  %ld\n", header.EntrySize());
-	dprintf("entry count: %ld\n", header.EntryCount());
-	dprintf("entries CRC: %ld\n", header.EntriesCRC());
+	dprintf("entries block: %" B_PRIu64 "\n", header.EntriesBlock());
+	dprintf("entry size:  %" B_PRIu32 "\n", header.EntrySize());
+	dprintf("entry count: %" B_PRIu32 "\n", header.EntryCount());
+	dprintf("entries CRC: %" B_PRIu32 "\n", header.EntriesCRC());
 }
 
 
@@ -373,14 +373,14 @@ Header::_DumpPartitions()
 		if (entry.partition_type == kEmptyGUID)
 			continue;
 
-		dprintf("[%3ld] partition type: %s\n", i,
+		dprintf("[%3" B_PRIu32 "] partition type: %s\n", i,
 			_PrintGUID(entry.partition_type));
 		dprintf("      unique id: %s\n", _PrintGUID(entry.unique_guid));
-		dprintf("      start block: %Ld\n", entry.StartBlock());
-		dprintf("      end block: %Ld\n", entry.EndBlock());
+		dprintf("      start block: %" B_PRIu64 "\n", entry.StartBlock());
+		dprintf("      end block: %" B_PRIu64 "\n", entry.EndBlock());
 		dprintf("      size: %g MB\n", (entry.EndBlock() - entry.StartBlock())
 			* 512 / 1024.0 / 1024.0);
-		dprintf("      attributes: %Lx\n", entry.Attributes());
+		dprintf("      attributes: %" B_PRIx64 "\n", entry.Attributes());
 
 		char name[64];
 		to_utf8(entry.name, EFI_PARTITION_NAME_LENGTH, name, sizeof(name));

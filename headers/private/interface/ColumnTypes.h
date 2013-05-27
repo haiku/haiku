@@ -60,10 +60,11 @@ class BStringField : public BField
 				void				SetString			(const char* string);
 				const char*			String				() const;
 				void				SetClippedString	(const char* string);
+				bool				HasClippedString	() const;
 				const char*			ClippedString		();
 				void				SetWidth			(float);
 				float				Width				();
-	
+
 	private:
 		float				fWidth;
 		BString				fString;
@@ -109,7 +110,7 @@ class BDateField : public BField
 		time_t				Seconds				();
 		time_t				UnixTime			();
 
-	private:	
+	private:
 		struct tm			fTime;
 		time_t				fUnixTime;
 		time_t				fSeconds;
@@ -235,7 +236,7 @@ class BBitmapColumn : public BTitledColumn
 		virtual int			CompareFields		(BField* field1, BField* field2);
 		virtual	bool		AcceptsField        (const BField* field) const;
 };
-	
+
 
 //=====================================================================
 // Column to display BIntegerField objects as a graph.

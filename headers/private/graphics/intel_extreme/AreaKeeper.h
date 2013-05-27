@@ -22,8 +22,9 @@ class AreaKeeper {
 
 		area_id Create(const char *name, void **_virtualAddress, uint32 spec,
 			size_t size, uint32 lock, uint32 protection);
-		area_id Map(const char *name, void *physicalAddress, size_t numBytes,
-			uint32 spec, uint32 protection, void **_virtualAddress);
+		area_id Map(const char *name, phys_addr_t physicalAddress,
+			size_t numBytes, uint32 spec, uint32 protection,
+			void **_virtualAddress);
 
 		status_t InitCheck() { return fArea < B_OK ? (status_t)fArea : B_OK; }
 		void Detach();
@@ -57,10 +58,10 @@ AreaKeeper::Create(const char *name, void **_virtualAddress, uint32 spec,
 
 
 area_id
-AreaKeeper::Map(const char *name, void *physicalAddress, size_t numBytes,
+AreaKeeper::Map(const char *name, phys_addr_t physicalAddress, size_t numBytes,
 	uint32 spec, uint32 protection, void **_virtualAddress)
 {
-	fArea = map_physical_memory(name, (addr_t)physicalAddress, numBytes, spec,
+	fArea = map_physical_memory(name, physicalAddress, numBytes, spec,
 		protection, _virtualAddress);
 	return fArea;
 }

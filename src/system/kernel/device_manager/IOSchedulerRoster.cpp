@@ -78,10 +78,12 @@ IOSchedulerRoster::IOSchedulerRoster()
 	fNotificationService("I/O")
 {
 	mutex_init(&fLock, "IOSchedulerRoster");
+	fNotificationService.Register();
 }
 
 
 IOSchedulerRoster::~IOSchedulerRoster()
 {
 	mutex_destroy(&fLock);
+	fNotificationService.Unregister();
 }

@@ -1,10 +1,8 @@
-1	english	x-vnd.Haiku-ProcessController	2887520383
+1	english	x-vnd.Haiku-ProcessController	2886374724
 Memory usage	ProcessController		内存使用
-Do you really want to kill the team \"%s\"?	ProcessController		您确定要杀死该组 \"%s\"?
 Idle priority	ProcessController		空闲优先级
 Restart Deskbar	ProcessController		重启桌面栏
 Custom priority	ProcessController		自定义优先级
-Debug thread	ProcessController		调试线程
 This team is already gone…	ProcessController		该组已经结束...
 Error saving file	ProcessController		保存文件错误
 Real-time priority	ProcessController		实时优先级
@@ -42,7 +40,6 @@ Usage: %s [-deskbar]\n	ProcessController		用法: %s [-deskbar]\n
 ProcessController	System name		进程控制器
 Real-time display priority	ProcessController		实时显示优先级
 Please confirm	ProcessController		请确认
-Yes, kill this team!	ProcessController		是的，杀死该组！
 System resources & caches…	ProcessController		系统资源与缓存...
 That's no Fun!	ProcessController		不好玩的！
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		您可以在窗口中运行进程控制器或者将其安装到桌面栏。

@@ -315,7 +315,8 @@ ColorField::SetModeAndValue(selected_color_mode mode, float fixed_value)
 		R *= 255.0; G *= 255.0; B *= 255.0;
 	}
 	
-	rgb_color color = { round(R), round(G), round(B), 255 };
+	rgb_color color = { (uint8)round(R), (uint8)round(G), (uint8)round(B),
+		255 };
 
 	fBgBitmap[0]->Unlock();
 

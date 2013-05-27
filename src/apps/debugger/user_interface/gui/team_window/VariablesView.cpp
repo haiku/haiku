@@ -32,6 +32,7 @@
 #include "FunctionInstance.h"
 #include "GuiSettingsUtils.h"
 #include "MessageCodes.h"
+#include "RangeList.h"
 #include "Register.h"
 #include "SettingsMenu.h"
 #include "SourceLanguage.h"
@@ -46,6 +47,7 @@
 #include "TypeComponentPath.h"
 #include "TypeHandlerRoster.h"
 #include "TypeLookupConstraints.h"
+#include "UiUtils.h"
 #include "Value.h"
 #include "ValueHandler.h"
 #include "ValueHandlerRoster.h"
@@ -173,6 +175,9 @@ public:
 
 	Type* GetType() const
 	{
+		if (fCastedType != NULL)
+			return fCastedType;
+
 		return fNodeChild->GetType();
 	}
 
@@ -926,18 +931,19 @@ VariablesView::VariableTableModel::SetStackFrame(Thread* thread,
 
 	fNodeManager->SetStackFrame(thread, stackFrame);
 
+	int32 count = fNodes.CountItems();
 	fNodeTable.Clear(true);
 
 	if (!fNodes.IsEmpty()) {
-		int32 count = fNodes.CountItems();
 		for (int32 i = 0; i < count; i++)
 			fNodes.ItemAt(i)->ReleaseReference();
 		fNodes.MakeEmpty();
-		NotifyNodesRemoved(TreeTablePath(), 0, count);
 	}
 
-	if (stackFrame == NULL)
+	if (stackFrame == NULL) {
+		NotifyNodesRemoved(TreeTablePath(), 0, count);
 		return;
+	}
 
 	ValueNodeContainer* container = fNodeManager->GetContainer();
 	AutoLocker<ValueNodeContainer> containerLocker(container);
@@ -950,6 +956,8 @@ VariablesView::VariableTableModel::SetStackFrame(Thread* thread,
 		// so those won't invoke our callback hook. Add them directly here.
 		ValueNodeChildrenCreated(child->Node());
 	}
+
+	NotifyTableModelReset();
 }
 
 
@@ -996,11 +1004,9 @@ VariablesView::VariableTableModel::ValueNodeChildrenCreated(
 				child->IsInternal(), childCount == 1);
 		}
 
-		if (valueNode->ChildCreationNeedsValue()) {
-			ModelNode* childNode = fNodeTable.Lookup(child);
-			if (childNode != NULL)
-				fContainerListener->ModelNodeValueRequested(childNode);
-		}
+		ModelNode* childNode = fNodeTable.Lookup(child);
+		if (childNode != NULL)
+			fContainerListener->ModelNodeValueRequested(childNode);
 	}
 
 	if (valueNode->ChildCreationNeedsValue())
@@ -1035,8 +1041,12 @@ VariablesView::VariableTableModel::ValueNodeChildrenDeleted(ValueNode* node)
 		fNodeTable.Remove(hiddenChild);
 	}
 
-	for (int32 i = 0; i < modelNode->CountChildren(); i++) {
+	for (int32 i = modelNode->CountChildren() - 1; i >= 0 ; i--) {
 		BReference<ModelNode> childNode = modelNode->ChildAt(i);
+		// recursively remove the current node's child hierarchy.
+		if (childNode->CountChildren() != 0)
+			ValueNodeChildrenDeleted(childNode->NodeChild()->Node());
+
 		TreeTablePath treePath;
 		if (GetTreePath(childNode, treePath)) {
 			int32 index = treePath.RemoveLastComponent();
@@ -1103,7 +1113,7 @@ VariablesView::VariableTableModel::ValueNodeValueChanged(ValueNode* valueNode)
 int32
 VariablesView::VariableTableModel::CountColumns() const
 {
-	return 2;
+	return 3;
 }
 
 
@@ -1191,6 +1201,15 @@ VariablesView::VariableTableModel::GetValueAt(void* object, int32 columnIndex,
 
 			_value.SetTo(node, VALUE_NODE_TYPE);
 			return true;
+		case 2:
+		{
+			Type* type = node->GetType();
+			if (type == NULL)
+				return false;
+
+			_value.SetTo(type->Name(), B_VARIANT_DONT_COPY_DATA);
+			return true;
+		}
 		default:
 			return false;
 	}
@@ -1248,31 +1267,48 @@ VariablesView::VariableTableModel::GetToolTipForTablePath(
 	if (node->NodeChild()->LocationResolutionState() != B_OK)
 		return false;
 
-	ValueLocation* location = node->NodeChild()->Location();
 	BString tipData;
-	for (int32 i = 0; i < location->CountPieces(); i++) {
-		ValuePieceLocation piece = location->PieceAt(i);
-		BString pieceData;
-		switch (piece.type) {
-			case VALUE_PIECE_LOCATION_MEMORY:
-				pieceData.SetToFormat("(%" B_PRId32 "): Address: %#" B_PRIx64
-					", Size: %" B_PRId64 " bytes", i, piece.address, piece.size);
-				break;
-			case VALUE_PIECE_LOCATION_REGISTER:
-			{
-				Architecture* architecture = fThread->GetTeam()->GetArchitecture();
-				pieceData.SetToFormat("(%" B_PRId32 "): Register (%s)",
-					i, architecture->Registers()[piece.reg].Name());
+	switch (columnIndex) {
+		case 0:
+		{
+			ValueLocation* location = node->NodeChild()->Location();
+			for (int32 i = 0; i < location->CountPieces(); i++) {
+				ValuePieceLocation piece = location->PieceAt(i);
+				BString pieceData;
+				switch (piece.type) {
+					case VALUE_PIECE_LOCATION_MEMORY:
+						pieceData.SetToFormat("(%" B_PRId32 "): Address: %#"
+							B_PRIx64 ", Size: %" B_PRId64 " bytes", i,
+							piece.address, piece.size);
+						break;
+					case VALUE_PIECE_LOCATION_REGISTER:
+					{
+						Architecture* architecture = fThread->GetTeam()
+							->GetArchitecture();
+						pieceData.SetToFormat("(%" B_PRId32 "): Register (%s)",
+							i, architecture->Registers()[piece.reg].Name());
+						break;
+					}
+					default:
+						break;
+				}
 
-				break;
+				tipData	+= pieceData;
+				if (i < location->CountPieces() - 1)
+					tipData += "\n";
 			}
-			default:
-				break;
+			break;
 		}
+		case 1:
+		{
+			Value* value = node->GetValue();
+			if (value != NULL)
+				value->ToString(tipData);
 
-		tipData	+= pieceData;
-		if (i < location->CountPieces() - 1)
-			tipData += "\n";
+			break;
+		}
+		default:
+			break;
 	}
 
 	if (tipData.IsEmpty())
@@ -1500,7 +1536,8 @@ VariablesView::MessageReceived(BMessage* message)
 			promptMessage->AddPointer("node", fVariableTable
 				->SelectionModel()->NodeAt(0));
 			PromptWindow* promptWindow = new(std::nothrow) PromptWindow(
-				"Specify Type", "Type: ", BMessenger(this), promptMessage);
+				"Specify Type", "Type: ", NULL, BMessenger(this),
+				promptMessage);
 			if (promptWindow == NULL)
 				return;
 
@@ -1543,14 +1580,133 @@ VariablesView::MessageReceived(BMessage* message)
 				break;
 			}
 
+			BReference<Type> typeRef(type, true);
 			ValueNode* valueNode = NULL;
 			if (TypeHandlerRoster::Default()->CreateValueNode(
-				node->NodeChild(), type, valueNode) != B_OK) {
+					node->NodeChild(), type, valueNode) != B_OK) {
 				break;
 			}
 
+			typeRef.Detach();
 			node->NodeChild()->SetNode(valueNode);
 			node->SetCastedType(type);
+			fVariableTableModel->NotifyNodeChanged(node);
+			break;
+		}
+		case MSG_TYPECAST_TO_ARRAY:
+		{
+			ModelNode* node = NULL;
+			if (message->FindPointer("node", reinterpret_cast<void **>(&node))
+				!= B_OK) {
+				break;
+			}
+
+			Type* baseType = dynamic_cast<AddressType*>(node->NodeChild()
+					->Node()->GetType())->BaseType();
+			ArrayType* arrayType = NULL;
+			if (baseType->CreateDerivedArrayType(0, kMaxArrayElementCount,
+				false, arrayType) != B_OK) {
+				break;
+			}
+
+			AddressType* addressType = NULL;
+			BReference<Type> typeRef(arrayType, true);
+			if (arrayType->CreateDerivedAddressType(DERIVED_TYPE_POINTER,
+					addressType) != B_OK) {
+				break;
+			}
+
+			typeRef.Detach();
+			typeRef.SetTo(addressType, true);
+			ValueNode* valueNode = NULL;
+			if (TypeHandlerRoster::Default()->CreateValueNode(
+					node->NodeChild(), addressType, valueNode) != B_OK) {
+				break;
+			}
+
+			typeRef.Detach();
+			node->NodeChild()->SetNode(valueNode);
+			node->SetCastedType(addressType);
+			fVariableTableModel->NotifyNodeChanged(node);
+			break;
+		}
+		case MSG_SHOW_CONTAINER_RANGE_PROMPT:
+		{
+			ModelNode* node = (ModelNode*)fVariableTable
+				->SelectionModel()->NodeAt(0);
+			int32 lowerBound, upperBound;
+			ValueNode* valueNode = node->NodeChild()->Node();
+			if (!valueNode->IsRangedContainer()) {
+				valueNode = node->ChildAt(0)->NodeChild()->Node();
+				if (!valueNode->IsRangedContainer())
+					break;
+			}
+
+			bool fixedRange = valueNode->IsContainerRangeFixed();
+			if (valueNode->SupportedChildRange(lowerBound, upperBound)
+				!= B_OK) {
+				break;
+			}
+
+			BMessage* promptMessage = new(std::nothrow) BMessage(
+				MSG_SET_CONTAINER_RANGE);
+			if (promptMessage == NULL)
+				break;
+
+			ObjectDeleter<BMessage> messageDeleter(promptMessage);
+			promptMessage->AddPointer("node", node);
+			promptMessage->AddBool("fixedRange", fixedRange);
+			BString infoText;
+			if (fixedRange) {
+				infoText.SetToFormat("Allowed range: %" B_PRId32
+					"-%" B_PRId32 ".", lowerBound, upperBound);
+			} else {
+				infoText.SetToFormat("Current range: %" B_PRId32
+					"-%" B_PRId32 ".", lowerBound, upperBound);
+			}
+
+			PromptWindow* promptWindow = new(std::nothrow) PromptWindow(
+				"Set Range", "Range: ", infoText.String(), BMessenger(this),
+				promptMessage);
+			if (promptWindow == NULL)
+				return;
+
+			messageDeleter.Detach();
+			promptWindow->CenterOnScreen();
+			promptWindow->Show();
+			break;
+		}
+		case MSG_SET_CONTAINER_RANGE:
+		{
+			ModelNode* node = (ModelNode*)fVariableTable
+				->SelectionModel()->NodeAt(0);
+			int32 lowerBound, upperBound;
+			ValueNode* valueNode = node->NodeChild()->Node();
+			if (!valueNode->IsRangedContainer())
+				valueNode = node->ChildAt(0)->NodeChild()->Node();
+			if (valueNode->SupportedChildRange(lowerBound, upperBound) != B_OK)
+				break;
+
+			bool fixedRange = message->FindBool("fixedRange");
+
+			BString rangeExpression = message->FindString("text");
+			if (rangeExpression.Length() == 0)
+				break;
+
+			RangeList ranges;
+			status_t result = UiUtils::ParseRangeExpression(
+				rangeExpression, lowerBound, upperBound, fixedRange, ranges);
+			if (result != B_OK)
+				break;
+
+			valueNode->ClearChildren();
+			for (int32 i = 0; i < ranges.CountRanges(); i++) {
+				const Range* range = ranges.RangeAt(i);
+				result = valueNode->CreateChildrenInRange(
+					range->lowerBound, range->upperBound);
+				if (result != B_OK)
+					break;
+			}
 			break;
 		}
 		case MSG_SHOW_WATCH_VARIABLE_PROMPT:
@@ -1805,6 +1961,8 @@ VariablesView::_Init()
 		B_TRUNCATE_END, B_ALIGN_LEFT));
 	fVariableTable->AddColumn(new VariableValueColumn(1, "Value", 80, 40, 1000,
 		B_TRUNCATE_END, B_ALIGN_RIGHT));
+	fVariableTable->AddColumn(new StringTableColumn(2, "Type", 80, 40, 1000,
+		B_TRUNCATE_END, B_ALIGN_LEFT));
 
 	fVariableTableModel = new VariableTableModel;
 	if (fVariableTableModel->Init() != B_OK)
@@ -1838,9 +1996,23 @@ VariablesView::_RequestNodeValue(ModelNode* node)
 
 	// get the value node and check whether its value has not yet been resolved
 	ValueNode* valueNode = nodeChild->Node();
-	if (valueNode == NULL
-		|| valueNode->LocationAndValueResolutionState()
-			!= VALUE_NODE_UNRESOLVED) {
+	if (valueNode == NULL) {
+		ModelNode* parent = node->Parent();
+		if (parent != NULL) {
+			TreeTablePath path;
+			if (!fVariableTableModel->GetTreePath(parent, path))
+				return;
+
+			// if the parent node was already expanded when the child was
+			// added, we may not yet have added a value node.
+			// Notify the table model that this needs to be done.
+			if (fVariableTable->IsNodeExpanded(path))
+				fVariableTableModel->NodeExpanded(parent);
+		}
+	}
+
+	if (valueNode == NULL || valueNode->LocationAndValueResolutionState()
+		!= VALUE_NODE_UNRESOLVED) {
 		return;
 	}
 
@@ -1858,19 +2030,31 @@ VariablesView::_GetContextActionsForNode(ModelNode* node,
 	ContextActionList* actions)
 {
 	ValueLocation* location = node->NodeChild()->Location();
-
-	// if the location's stored somewhere other than in memory,
-	// then we won't be able to inspect it this way.
-	if (location->PieceAt(0).type != VALUE_PIECE_LOCATION_MEMORY)
-		return B_OK;
-
+	status_t result = B_OK;
 	BMessage* message = NULL;
-	status_t result = _AddContextAction("Inspect", MSG_SHOW_INSPECTOR_WINDOW,
-		actions, message);
-	if (result != B_OK)
-		return result;
 
-	message->AddUInt64("address", location->PieceAt(0).address);
+	// only show the Inspect option if the value is in fact located
+	// in memory.
+	if (location->PieceAt(0).type == VALUE_PIECE_LOCATION_MEMORY) {
+		result = _AddContextAction("Inspect", MSG_SHOW_INSPECTOR_WINDOW,
+			actions, message);
+		if (result != B_OK)
+			return result;
+		message->AddUInt64("address", location->PieceAt(0).address);
+	}
+
+	ValueNode* valueNode = node->NodeChild()->Node();
+
+	if (valueNode != NULL) {
+		AddressType* type = dynamic_cast<AddressType*>(valueNode->GetType());
+		if (type != NULL && type->BaseType() != NULL) {
+			result = _AddContextAction("Cast to array", MSG_TYPECAST_TO_ARRAY,
+				actions, message);
+			if (result != B_OK)
+				return result;
+			message->AddPointer("node", node);
+		}
+	}
 
 	result = _AddContextAction("Cast as" B_UTF8_ELLIPSIS,
 		MSG_SHOW_TYPECAST_NODE_PROMPT, actions, message);
@@ -1879,6 +2063,23 @@ VariablesView::_GetContextActionsForNode(ModelNode* node,
 
 	result = _AddContextAction("Watch" B_UTF8_ELLIPSIS,
 		MSG_SHOW_WATCH_VARIABLE_PROMPT, actions, message);
+	if (result != B_OK)
+		return result;
+
+	if (valueNode == NULL)
+		return B_OK;
+
+	if (!valueNode->IsRangedContainer()) {
+		if (node->CountChildren() == 1 && node->ChildAt(0)->IsHidden()) {
+			valueNode = node->ChildAt(0)->NodeChild()->Node();
+			if (valueNode == NULL || !valueNode->IsRangedContainer())
+				return B_OK;
+		} else
+			return B_OK;
+	}
+
+	result = _AddContextAction("Set visible range" B_UTF8_ELLIPSIS,
+		MSG_SHOW_CONTAINER_RANGE_PROMPT, actions, message);
 	if (result != B_OK)
 		return result;
 

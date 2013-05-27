@@ -166,9 +166,9 @@ topological_sort(image_t* image, uint32 slot, image_t** initList,
 */
 static void
 get_image_region_load_address(image_t* image, uint32 index, long lastDelta,
-	bool fixed, addr_t& loadAddress, uint32& addressSpecifier)
+	addr_t& loadAddress, uint32& addressSpecifier)
 {
-	if (image->dynamic_ptr != 0 && !fixed) {
+	if (image->dynamic_ptr != 0) {
 		// relocatable image... we can afford to place wherever
 		if (index == 0) {
 			// but only the first segment gets a free ride
@@ -283,7 +283,7 @@ put_image(image_t* image)
 
 
 status_t
-map_image(int fd, char const* path, image_t* image, bool fixed)
+map_image(int fd, char const* path, image_t* image)
 {
 	// cut the file name from the path as base name for the created areas
 	const char* baseName = strrchr(path, '/');
@@ -301,16 +301,10 @@ map_image(int fd, char const* path, image_t* image, bool fixed)
 	uint32 addressSpecifier = B_RANDOMIZED_ANY_ADDRESS;
 
 	for (uint32 i = 0; i < image->num_regions; i++) {
-		// for BeOS compatibility: if we load an old BeOS executable, we
-		// have to relocate it, if possible - we recognize it because the
-		// vmstart is set to 0 (hopefully always)
-		if (fixed && image->regions[i].vmstart == 0)
-			fixed = false;
-
 		uint32 regionAddressSpecifier;
 		get_image_region_load_address(image, i,
 			i > 0 ? loadAddress - image->regions[i - 1].vmstart : 0,
-			fixed, loadAddress, regionAddressSpecifier);
+			loadAddress, regionAddressSpecifier);
 		if (i == 0) {
 			reservedAddress = loadAddress;
 			addressSpecifier = regionAddressSpecifier;
@@ -342,7 +336,7 @@ map_image(int fd, char const* path, image_t* image, bool fixed)
 			baseName, i, (image->regions[i].flags & RFLAG_RW) ? "rw" : "ro");
 
 		get_image_region_load_address(image, i,
-			i > 0 ? image->regions[i - 1].delta : 0, fixed, loadAddress,
+			i > 0 ? image->regions[i - 1].delta : 0, loadAddress,
 			addressSpecifier);
 
 		// If the image position is arbitrary, we must let it point to the start
@@ -423,8 +417,10 @@ unmap_image(image_t* image)
 
 
 /*!	This function will change the protection of all read-only segments to really
-	be read-only.
+	be read-only (and executable).
 	The areas have to be read/write first, so that they can be relocated.
+	If at least one image is in compatibility mode then we allow execution of
+	all areas.
 */
 void
 remap_images()
@@ -432,14 +428,22 @@ remap_images()
 	for (image_t* image = sLoadedImages.head; image != NULL;
 			image = image->next) {
 		for (uint32 i = 0; i < image->num_regions; i++) {
-			if ((image->regions[i].flags & RFLAG_RW) == 0
-				&& (image->regions[i].flags & RFLAG_REMAPPED) == 0) {
-				// we only need to do this once, so we remember those we've already mapped
-				if (_kern_set_area_protection(image->regions[i].id,
-						B_READ_AREA | B_EXECUTE_AREA) == B_OK) {
-					image->regions[i].flags |= RFLAG_REMAPPED;
-				}
+			// we only need to do this once, so we remember those we've already
+			// mapped
+			if ((image->regions[i].flags & RFLAG_REMAPPED) != 0)
+				continue;
+
+			status_t result = B_OK;
+			if ((image->regions[i].flags & RFLAG_RW) == 0) {
+				result = _kern_set_area_protection(image->regions[i].id,
+						B_READ_AREA | B_EXECUTE_AREA);
+			} else if (image->abi < B_HAIKU_ABI_GCC_2_HAIKU) {
+				result = _kern_set_area_protection(image->regions[i].id,
+						B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA);
 			}
+
+			if (result == B_OK)
+				image->regions[i].flags |= RFLAG_REMAPPED;
 		}
 	}
 }

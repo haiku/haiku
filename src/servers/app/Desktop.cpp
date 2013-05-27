@@ -1903,12 +1903,15 @@ Desktop::SetFocusWindow(Window* nextFocus)
 		return;
 	}
 
-	uint32 list = fCurrentWorkspace;
-	if (!fSettings->NormalMouse())
-		list = kFocusList;
+	uint32 listIndex = fCurrentWorkspace;
+	WindowList* list = &_Windows(fCurrentWorkspace);
+	if (!fSettings->NormalMouse()) {
+		listIndex = kFocusList;
+		list = &fFocusList;
+	}
 
 	if (nextFocus == NULL || hasModal || hasWindowScreen) {
-		nextFocus = _Windows(list).LastWindow();
+		nextFocus = list->LastWindow();
 
 		if (fSettings->NormalMouse()) {
 			// If the last window having focus is a window that cannot make it
@@ -1923,7 +1926,7 @@ Desktop::SetFocusWindow(Window* nextFocus)
 
 	// make sure no window is chosen that doesn't want focus or cannot have it
 	while (nextFocus != NULL && !_WindowCanHaveFocus(nextFocus)) {
-		nextFocus = nextFocus->PreviousWindow(list);
+		nextFocus = nextFocus->PreviousWindow(listIndex);
 	}
 
 	if (fFocus == nextFocus) {
@@ -2701,6 +2704,7 @@ Desktop::WindowForClientLooperPort(port_id port)
 WindowList&
 Desktop::_Windows(int32 index)
 {
+	ASSERT(index >= 0 && index < kMaxWorkspaces);
 	return fWorkspaces[index].Windows();
 }
 

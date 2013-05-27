@@ -195,7 +195,7 @@ ECMDevice::Read(uint8 *buffer, size_t *numBytes)
 	}
 
 	if (fStatusRead != B_OK && fStatusRead != B_CANCELED && !fRemoved) {
-		TRACE_ALWAYS("device status error 0x%08lx\n", fStatusRead);
+		TRACE_ALWAYS("device status error 0x%08" B_PRIx32 "\n", fStatusRead);
 		result = gUSBModule->clear_feature(fReadEndpoint,
 			USB_FEATURE_ENDPOINT_HALT);
 		if (result != B_OK) {
@@ -232,7 +232,7 @@ ECMDevice::Write(const uint8 *buffer, size_t *numBytes)
 	}
 
 	if (fStatusWrite != B_OK && fStatusWrite != B_CANCELED && !fRemoved) {
-		TRACE_ALWAYS("device status error 0x%08lx\n", fStatusWrite);
+		TRACE_ALWAYS("device status error 0x%08" B_PRIx32 "\n", fStatusWrite);
 		result = gUSBModule->clear_feature(fWriteEndpoint,
 			USB_FEATURE_ENDPOINT_HALT);
 		if (result != B_OK) {
@@ -279,7 +279,7 @@ ECMDevice::Control(uint32 op, void *buffer, size_t length)
 #endif
 
 		default:
-			TRACE_ALWAYS("unsupported ioctl %lu\n", op);
+			TRACE_ALWAYS("unsupported ioctl %" B_PRIu32 "\n", op);
 	}
 
 	return B_DEV_INVALID_IOCTL;
@@ -506,7 +506,7 @@ ECMDevice::_ReadMACAddress(usb_device device, uint8 *buffer)
 
 void
 ECMDevice::_ReadCallback(void *cookie, int32 status, void *data,
-	uint32 actualLength)
+	size_t actualLength)
 {
 	ECMDevice *device = (ECMDevice *)cookie;
 	device->fActualLengthRead = actualLength;
@@ -517,7 +517,7 @@ ECMDevice::_ReadCallback(void *cookie, int32 status, void *data,
 
 void
 ECMDevice::_WriteCallback(void *cookie, int32 status, void *data,
-	uint32 actualLength)
+	size_t actualLength)
 {
 	ECMDevice *device = (ECMDevice *)cookie;
 	device->fActualLengthWrite = actualLength;
@@ -528,7 +528,7 @@ ECMDevice::_WriteCallback(void *cookie, int32 status, void *data,
 
 void
 ECMDevice::_NotifyCallback(void *cookie, int32 status, void *data,
-	uint32 actualLength)
+	size_t actualLength)
 {
 	ECMDevice *device = (ECMDevice *)cookie;
 	atomic_add(&device->fInsideNotify, 1);
@@ -580,7 +580,7 @@ ECMDevice::_NotifyCallback(void *cookie, int32 status, void *data,
 	}
 
 	if (status != B_OK) {
-		TRACE_ALWAYS("device status error 0x%08lx\n", status);
+		TRACE_ALWAYS("device status error 0x%08" B_PRIx32 "\n", status);
 		if (gUSBModule->clear_feature(device->fNotifyEndpoint,
 			USB_FEATURE_ENDPOINT_HALT) != B_OK)
 			TRACE_ALWAYS("failed to clear halt state in notify hook\n");

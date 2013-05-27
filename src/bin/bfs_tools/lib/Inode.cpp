@@ -276,17 +276,18 @@ Inode::SetName(const char *name)
 	int32 oldLength = nameData == NULL ? 0 : nameData->data_size;
 	int32 newLength = strlen(name) + (nameData == NULL ? sizeof(small_data) + 5 : 0);
 
-	if (int32(data) + newLength - oldLength >= (int32)(fInode + fDisk->BlockSize()))
+	if ((addr_t)data + newLength - oldLength >= (addr_t)(fInode
+			+ fDisk->BlockSize()))
 		return B_NO_MEMORY;
 
 	if (nameData == NULL) {
 		memmove(newLength + (uint8 *)fInode->small_data_start,
 			fInode->small_data_start,
-			int32(data) - int32(fInode->small_data_start));
+			(addr_t)data - (addr_t)fInode->small_data_start);
 		nameData = fInode->small_data_start;
 	} else {
 		memmove(newLength + (uint8 *)nameData, nameData,
-			int32(data) - int32(fInode->small_data_start));
+			(addr_t)data - (addr_t)fInode->small_data_start);
 	}
 
 	memset(nameData, 0, sizeof(small_data) + 5 + strlen(name));
@@ -766,7 +767,7 @@ DataStream::ReadAt(off_t pos, void *buffer, size_t size)
 
 	//printf("DataStream::ReadAt(pos = %Ld,buffer = %p,size = %ld);\n",pos,buffer,size);
 	// truncate size to read
-	if (pos + size > fInode->data.size) {
+	if (pos + (off_t)size > fInode->data.size) {
 		if (pos > fInode->data.size)	// reading outside the file
 			return B_ERROR;
 
@@ -782,14 +783,14 @@ DataStream::ReadAt(off_t pos, void *buffer, size_t size)
 		if (status < B_OK)
 			return status;
 
-		ssize_t bytes = min_c(size, fRunBlockEnd - pos);
+		ssize_t bytes = min_c((off_t)size, fRunBlockEnd - pos);
 
 		//printf("### read %ld bytes from %Ld\n### --\n",bytes,fDisk->ToOffset(fRun) + pos - fRunFileOffset);
 		bytes = fDisk->ReadAt(fDisk->ToOffset(fRun) + pos - fRunFileOffset,
 			buffer, bytes);
 		if (bytes <= 0) {
 			if (bytes == 0) {
-				printf("could not read bytes at: %ld,%d\n",
+				printf("could not read bytes at: %" B_PRId32 ",%d\n",
 					fRun.allocation_group, fRun.start);
 			}
 			return bytes < 0 ? bytes : B_BAD_DATA;
@@ -813,7 +814,7 @@ DataStream::WriteAt(off_t pos, const void *buffer, size_t size)
 	NodeGetter _(this);
 
 	// FIXME: truncate size -> should enlargen the file
-	if (pos + size > fInode->data.size) {
+	if (pos + (off_t)size > fInode->data.size) {
 		if (pos > fInode->data.size)	// writing outside the file
 			return B_ERROR;
 
@@ -829,7 +830,7 @@ DataStream::WriteAt(off_t pos, const void *buffer, size_t size)
 		if (status < B_OK)
 			return status;
 
-		ssize_t bytes = min_c(size,fRunBlockEnd - pos);
+		ssize_t bytes = min_c((off_t)size, fRunBlockEnd - pos);
 
 		//printf("### write %ld bytes to %Ld\n### --\n",bytes,fDisk->ToOffset(fRun) + pos - fRunFileOffset);
 		bytes = fDisk->WriteAt(fDisk->ToOffset(fRun) + pos - fRunFileOffset,buffer,bytes);
@@ -959,8 +960,8 @@ File::CopyTo(const char *root, bool fullPath, Inode::Source *source)
 			<< (int32)BlockRun().start;
 		path.Append(sub.String());
 	}
-	printf("%ld,%d -> %s\n", BlockRun().allocation_group, BlockRun().start,
-		path.Path());
+	printf("%" B_PRId32 ",%d -> %s\n", BlockRun().allocation_group,
+		BlockRun().start, path.Path());
 
 	BFile file;
 	status = file.SetTo(path.Path(),

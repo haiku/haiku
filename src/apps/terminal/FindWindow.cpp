@@ -1,8 +1,11 @@
 /*
- * Copyright 2007-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2013 Haiku, Inc. All rights reserved.
  * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
  * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai.
  * All rights reserved. Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
  */
 
 #include "FindWindow.h"
@@ -18,6 +21,7 @@
 #include <GroupLayoutBuilder.h>
 #include <Locale.h>
 #include <RadioButton.h>
+#include <SpaceLayoutItem.h>
 #include <String.h>
 #include <TextControl.h>
 
@@ -26,11 +30,13 @@ const uint32 MSG_FIND_HIDE = 'Fhid';
 const uint32 TOGGLE_FIND_CONTROL = 'MTFG';
 const BRect kWindowFrame(10, 30, 250, 200);
 
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Terminal FindWindow"
 
+
 FindWindow::FindWindow(BMessenger messenger, const BString& str,
-		bool findSelection, bool matchWord, bool matchCase, bool forwardSearch)
+	bool findSelection, bool matchWord, bool matchCase, bool forwardSearch)
 	:
 	BWindow(kWindowFrame, B_TRANSLATE("Find"), B_FLOATING_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_CLOSE_ON_ESCAPE
@@ -39,26 +45,31 @@ FindWindow::FindWindow(BMessenger messenger, const BString& str,
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	BBox *separator = new BBox("separator");
+	BBox* separator = new BBox("separator");
 	separator->SetExplicitMinSize(BSize(250.0, B_SIZE_UNSET));
 	separator->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1.0));
 
 	BRadioButton* useSelection = NULL;
 	const float spacing = be_control_look->DefaultItemSpacing();
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 5.0)
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, B_USE_SMALL_SPACING)
 		.SetInsets(spacing, spacing, spacing, spacing)
-		.Add(BGridLayoutBuilder()
+		.Add(BGridLayoutBuilder(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
 			.Add(fTextRadio = new BRadioButton(B_TRANSLATE("Use text:"),
 				new BMessage(TOGGLE_FIND_CONTROL)), 0, 0)
 			.Add(fFindLabel = new BTextControl(NULL, NULL, NULL), 1, 0)
 			.Add(useSelection = new BRadioButton(B_TRANSLATE("Use selection"),
 				new BMessage(TOGGLE_FIND_CONTROL)), 0, 1))
+		.Add(BSpaceLayoutItem::CreateVerticalStrut(spacing / 4))
 		.Add(separator)
+		.Add(BSpaceLayoutItem::CreateVerticalStrut(spacing / 4))
 		.Add(fForwardSearchBox = new BCheckBox(B_TRANSLATE("Search forward")))
 		.Add(fMatchCaseBox = new BCheckBox(B_TRANSLATE("Match case")))
 		.Add(fMatchWordBox = new BCheckBox(B_TRANSLATE("Match word")))
-		.Add(fFindButton = new BButton(B_TRANSLATE("Find"),
+		.AddGroup(B_HORIZONTAL)
+			.AddGlue()
+			.Add(fFindButton = new BButton(B_TRANSLATE("Find"),
 				new BMessage(MSG_FIND)))
+			.End()
 		.TopView());
 
 	fFindLabel->SetDivider(0.0);
@@ -87,8 +98,6 @@ FindWindow::FindWindow(BMessenger messenger, const BString& str,
 	fFindButton->MakeDefault(true);
 
 	AddShortcut((uint32)'W', B_COMMAND_KEY, new BMessage(MSG_FIND_HIDE));
-
-	Show();
 }
 
 

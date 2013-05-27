@@ -22,9 +22,9 @@ DirectoryIterator::GetNextEntry(char *name, uint32 *length, ino_t *id)
 	if (!id || !name || !length)
 		return B_BAD_VALUE;
 
-	TRACE(("DirectoryIterator::GetNextEntry: name = %p, length = %ld, "
-		"id = %p, position = %Ld, parent length = %Ld\n", name, *length, id,
-		fPosition, Parent()->Length()));
+	TRACE(("DirectoryIterator::GetNextEntry: name = %p, length = %" B_PRIu32
+		", id = %p, position = %" B_PRIdOFF ", parent length = %" B_PRIu64
+		"\n", name, *length, id, fPosition, Parent()->Length()));
 
 	status_t status = B_OK;
 	if (fAtBeginning) {
@@ -62,7 +62,8 @@ DirectoryIterator::GetNextEntry(char *name, uint32 *length, ino_t *id)
 			} else {
 				UdfString string(entry->id(), entry->id_length());
 				TRACE(("DirectoryIterator::GetNextEntry: UfdString id == `%s', "
-				"length = %lu\n", string.Utf8(), string.Utf8Length()));
+					"length = %" B_PRIu32 "\n", string.Utf8(),
+					string.Utf8Length()));
 				DUMP(entry->icb());
 				sprintf(name, "%s", string.Utf8());
 				*length = string.Utf8Length();
@@ -111,9 +112,9 @@ Icb::Icb(Volume *volume, long_address address)
 	fFileCache(NULL),
 	fFileMap(NULL)
 {
-	TRACE(("Icb::Icb: volume = %p, address(block = %ld, partition = %d, "
-		"length = %ld)\n", volume, address.block(), address.partition(),
-		address.length()));
+	TRACE(("Icb::Icb: volume = %p, address(block = %" B_PRIu32 ", partition = "
+		"%d, length = %" B_PRIu32 ")\n", volume, address.block(),
+		address.partition(), address.length()));
 
 	if (volume == NULL)
 		fInitStatus = B_BAD_VALUE;
@@ -142,7 +143,8 @@ Icb::Icb(Volume *volume, long_address address)
 	}
 
 	fInitStatus = status;
-	TRACE(("Icb::Icb: status = 0x%lx, `%s'\n", status, strerror(status)));
+	TRACE(("Icb::Icb: status = 0x%" B_PRIx32 ", `%s'\n", status,
+		strerror(status)));
 }
 
 
@@ -222,7 +224,7 @@ Icb::FindBlock(uint32 logicalBlock, off_t &block, bool &recorded)
 		return B_ERROR;
 	}
 
-	DEBUG_INIT_ETC("Icb", ("pos: %lld", pos));
+	DEBUG_INIT_ETC("Icb", ("pos: %" B_PRIdOFF, pos));
 
 	status_t status = B_OK;
 	long_address extent;
@@ -237,8 +239,9 @@ Icb::FindBlock(uint32 logicalBlock, off_t &block, bool &recorded)
 				ShortDescriptorAccessor(fPartition));
 			status = list.FindExtent(pos, &extent, &isEmpty);
 			if (status != B_OK) {
-				TRACE_ERROR(("Icb::FindBlock: error finding extent for offset %Ld. "
-					"status = 0x%lx `%s'\n", pos, status, strerror(status)));
+				TRACE_ERROR(("Icb::FindBlock: error finding extent for offset "
+					"%" B_PRIdOFF ". status = 0x%" B_PRIx32 " `%s'\n", pos, status,
+					strerror(status)));
 			}
 			break;
 		}
@@ -249,8 +252,9 @@ Icb::FindBlock(uint32 logicalBlock, off_t &block, bool &recorded)
 			AllocationDescriptorList<LongDescriptorAccessor> list(this);
 			status = list.FindExtent(pos, &extent, &isEmpty);
 			if (status != B_OK) {
-				TRACE_ERROR(("Icb::FindBlock: error finding extent for offset %Ld. "
-					"status = 0x%lx `%s'\n", pos, status, strerror(status)));
+				TRACE_ERROR(("Icb::FindBlock: error finding extent for offset "
+					"%" B_PRIdOFF ". status = 0x%" B_PRIx32 " `%s'\n", pos,
+					status, strerror(status)));
 			}
 			break;
 		}
@@ -281,7 +285,7 @@ Icb::FindBlock(uint32 logicalBlock, off_t &block, bool &recorded)
 	if (status == B_OK) {
 		block = extent.block();
 		recorded = extent.type() == EXTENT_TYPE_RECORDED;
-		TRACE(("Icb::FindBlock: block %lld\n", block));
+		TRACE(("Icb::FindBlock: block %" B_PRIdOFF "\n", block));
 	}
 	return status;
 }
@@ -290,7 +294,7 @@ Icb::FindBlock(uint32 logicalBlock, off_t &block, bool &recorded)
 status_t
 Icb::Read(off_t pos, void *buffer, size_t *length, uint32 *block)
 {
-	TRACE(("Icb::Read: pos = %Ld, buffer = %p, length = (%p)->%ld\n",
+	TRACE(("Icb::Read: pos = %" B_PRIdOFF ", buffer = %p, length = (%p)->%ld\n",
 		pos, buffer, length, (length ? *length : 0)));
 
 	if (!buffer || !length || pos < 0)
@@ -356,8 +360,8 @@ template <class DescriptorList>
 status_t
 Icb::_Read(DescriptorList &list, off_t pos, void *_buffer, size_t *length, uint32 *block)
 {
-	TRACE(("Icb::_Read(): list = %p, pos = %Ld, buffer = %p, length = %ld\n",
-		&list, pos, _buffer, (length ? *length : 0)));
+	TRACE(("Icb::_Read(): list = %p, pos = %" B_PRIdOFF ", buffer = %p, "
+		"length = %ld\n", &list, pos, _buffer, (length ? *length : 0)));
 
 	uint64 bytesLeftInFile = uint64(pos) > Length() ? 0 : Length() - pos;
 	size_t bytesLeft = (*length >= bytesLeftInFile) ? bytesLeftInFile : *length;
@@ -370,19 +374,22 @@ Icb::_Read(DescriptorList &list, off_t pos, void *_buffer, size_t *length, uint3
 
 	while (bytesLeft > 0) {
 
-		TRACE(("Icb::_Read(): pos: %Ld, bytesLeft: %ld\n", pos, bytesLeft));
+		TRACE(("Icb::_Read(): pos: %" B_PRIdOFF ", bytesLeft: %ld\n", pos,
+			bytesLeft));
 		long_address extent;
 		bool isEmpty = false;
 		status = list.FindExtent(pos, &extent, &isEmpty);
 		if (status != B_OK) {
-			TRACE_ERROR(("Icb::_Read: error finding extent for offset %Ld. "
-				"status = 0x%lx `%s'\n", pos, status, strerror(status)));
+			TRACE_ERROR(("Icb::_Read: error finding extent for offset %"
+				B_PRIdOFF ". status = 0x%" B_PRIx32 " `%s'\n", pos, status,
+				strerror(status)));
 			break;
 		}
 
-		TRACE(("Icb::_Read(): found extent for offset %Ld: (block: %ld, "
-			"partition: %d, length: %ld, type: %d)\n", pos, extent.block(),
-			extent.partition(), extent.length(), extent.type()));
+		TRACE(("Icb::_Read(): found extent for offset %" B_PRIdOFF ": (block: "
+			"%" B_PRIu32 ", partition: %d, length: %" B_PRIu32 ", type: %d)\n",
+			pos, extent.block(), extent.partition(), extent.length(),
+			extent.type()));
 
 		switch (extent.type()) {
 			case EXTENT_TYPE_RECORDED:
@@ -421,8 +428,8 @@ Icb::_Read(DescriptorList &list, off_t pos, void *_buffer, size_t *length, uint3
 		if (extent.length() < readLength)
 			readLength = extent.length();
 
-		TRACE(("Icb::_Read: reading block. offset = %Ld, length: %ld\n",
-			blockOffset, readLength));
+		TRACE(("Icb::_Read: reading block. offset = %" B_PRIdOFF
+			", length: %ld\n", blockOffset, readLength));
 
 		if (isEmpty) {
 			TRACE(("Icb::_Read: reading %ld empty bytes as zeros\n",
@@ -436,8 +443,8 @@ Icb::_Read(DescriptorList &list, off_t pos, void *_buffer, size_t *length, uint3
 				break;
 			}
 
-			TRACE(("Icb::_Read: %ld bytes from disk block %Ld using "
-				"block_cache_get_etc()\n", readLength, diskBlock));
+			TRACE(("Icb::_Read: %ld bytes from disk block %" B_PRIdOFF " using"
+				" block_cache_get_etc()\n", readLength, diskBlock));
 			uint8 *data = (uint8*)block_cache_get_etc(volume->BlockCache(),
 				diskBlock, 0, readLength);
 			if (data == NULL)
@@ -530,7 +537,7 @@ Icb::_GetFileMap(DescriptorList &list, off_t offset, size_t size,
 		size -= length;
 		index++;
 
-		if (index >= max || size <= vecs[index - 1].length
+		if (index >= max || (off_t)size <= vecs[index - 1].length
 			|| offset >= (off_t)Length()) {
 			*count = index;
 			return index >= max ? B_BUFFER_OVERFLOW : B_OK;

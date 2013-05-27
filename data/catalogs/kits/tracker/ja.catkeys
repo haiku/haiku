@@ -1,4 +1,5 @@
-1	japanese	x-vnd.Haiku-libtracker	251834432
+1	japanese	x-vnd.Haiku-libtracker	1188087477
+common	B_COMMON_DIRECTORY		一般
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		アイコン表示
 Add-ons	FilePanelPriv		アドオン
@@ -123,6 +124,7 @@ Create %s clipping	PoseView		%s クリップを作成
 Set new link target	InfoWindow		リンク先を変更
 If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		システムフォルダーおよびその中身を%ifYouDoActionした場合、%osName が起動しなくなります!\n\n本当に続けますか?\n\nそれでもシステムフォルダーまたはその中身の%toDoActionを実行するなら、Shift キーを押しながら \"%toConfirmAction\" をクリックしてください。
 Save as Query template:	FindPanel		クエリ雛型として保存する：
+preferences	B_PREFERENCES_DIRECTORY		設定
 Cancel	FSUtils		中止
 move	FSUtils	As in 'to move this folder...' (en) Um diesen Ordner zu verschieben...' (de)	移動
 Edit name	ContainerWindow		名前の編集
@@ -139,6 +141,7 @@ Add-ons	ContainerWindow		アドオン
 Edit templates…	TemplatesMenu		テンプレートを編集…
 Finish: %time - Over %finishtime left	StatusWindow		終了: %time - 残り %finishtime 以上
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		このフォルダーにすでに \"%name\" という項目があります。作成しようとしているシンボリックリンクと置き換えますか?
+Fewer options	FindPanel		検索オプションを隠す
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		コピー先ディスクの空き容量が不足しています。コピーができません。
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		アプリケーション \"%app\" を使って \"%document\" を開けませんでした (%error)。
 Sorry, saving more than one item is not allowed.	FilePanelPriv		2 項目以上は保存できません。
@@ -208,7 +211,6 @@ Resize to fit	VolumeWindow		最適な表示サイズに変更
 Could not find application \"%appname\"	OpenWithWindow		アプリケーション \"%appname\" が見つかりませんでした
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		選択した項目をごみ箱に移動できません。完全に削除しても良いでしょうか？元は戻せませんので、ご注意ください。
 Invert	SelectionWindow		反転
-Save Query as template…	FindPanel		クエリテンプレートとして保存…
 rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	名前の変更
 Find	FindPanel		検索
 Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	移動
@@ -233,6 +235,7 @@ Temporary	FindPanel		一時的なクエリ
 Version	OpenWithWindow		バージョン
 Default application	InfoWindow		デフォルトアプリケーション
 Preparing to copy items…	StatusWindow		コピーの準備をしています…
+Save query as template…	FindPanel		クエリテンプレートとして保存…
 Show folder location in title tab	SettingsView		タイトルタブにフォルダー位置を表示
 Proceed	FSUtils		続行
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		%verbしようとしているものと同じ名前の項目がすでにフォルダーの中に存在します。\n \n%verbして置き換えますか？それとも、一つずつ確認しますか？
@@ -330,6 +333,7 @@ The specified name is already used as the name of a folder. Please choose anothe
 Clean up	ContainerWindow		アイコンの整列
 after	FindPanel		以降
 Select…	QueryContainerWindow		選択…
+More options	FindPanel		検索オプションを表示
 link	FSUtils	filename link	リンク
 At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		%func にて\nfind_directory() が失敗。\nエラー: %error
 The specified name is illegal. Please choose another name.	FilePanelPriv		指定された名前は利用できない文字を含んでいます。他の名前を指定してください。
@@ -441,6 +445,7 @@ contains	FindPanel		含む
 Relation	OpenWithWindow		関連
 Open	FilePanelPriv		開く
 Mount	DeskWindow		マウント
+Recent queries	FindPanel		最近のクエリー
 Mount	ContainerWindow		マウント
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used 使用中 -- %free 使用可能)
 Cancel	FSClipBoard		中止

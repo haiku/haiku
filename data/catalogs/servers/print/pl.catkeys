@@ -1,4 +1,4 @@
-1	polish	x-vnd.Be-PSRV	1761631281
+1	polish	x-vnd.Be-PSRV	123334776
 Undefined	ConfigWindow		Nieokreślone
 Return the number of available transports	PrintServerApp Scripting		Zwróć liczbę dostępnych transportów
 Return the number of available printers	PrintServerApp Scripting		Zwróć liczbę dostępnych drukarek
@@ -9,10 +9,11 @@ Retrieve a specific printer	PrintServerApp Scripting		Odzyskaj konkretną drukar
 Page %1 to %2	ConfigWindow		Strony %1 do %2
 Get name of the printer add-on used for this printer	Printer Scripting		Pokaż nazwę dodatku dla tej drukarki
 Page setup:	ConfigWindow		Ustawienia strony:
+B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
 OK	ConfigWindow		OK
 Cancel	ConfigWindow		Anuluj
-Printer server	ConfigWindow		Serwer drukujący
-Page %1 to %2, %3 copies	ConfigWindow		Strony %1 to %2, %3 kopie
+Printer server	ConfigWindow		Serwer druku
+Page %1 to %2, %3 copies	ConfigWindow		Strony %1 do %2, %3 kopie
 A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Drukarka o tej nazwie już istnieje, ale sterownik nie może zostać zlokalizowany. Zastąpić?
 Yes	PrintServerApp		Tak
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Rejestr

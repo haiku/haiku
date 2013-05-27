@@ -1,0 +1,10 @@
+SubDir HAIKU_TOP src add-ons kernel bus_managers virtio ;
+
+UsePrivateHeaders virtio ;
+UsePrivateKernelHeaders ;
+
+KernelAddon virtio :
+	VirtioDevice.cpp
+	VirtioModule.cpp
+	VirtioQueue.cpp
+	;
