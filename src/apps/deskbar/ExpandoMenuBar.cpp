@@ -89,6 +89,7 @@ TExpandoMenuBar::TExpandoMenuBar(BRect frame, const char* name,
 	fExpandNewTeams(static_cast<TBarApp*>(be_app)->Settings()->expandNewTeams),
 	fDeskbarMenuWidth(kMinMenuItemWidth),
 	fPreviousDragTargetItem(NULL),
+	fLastMousedOverItem(NULL),
 	fLastClickedItem(NULL),
 	fClickedExpander(false)
 {
