@@ -713,14 +713,8 @@ TExpandoMenuBar::RemoveTeam(team_id team, bool partial)
 		if (TTeamMenuItem* item = dynamic_cast<TTeamMenuItem*>(ItemAt(i))) {
 			if (item->Teams()->HasItem((void*)(addr_t)team)) {
 				item->Teams()->RemoveItem(team);
-
 				if (partial)
 					return;
-
-#ifdef DOUBLECLICKBRINGSTOFRONT
-				if (fLastClickedItem == i)
-					fLastClickedItem = -1;
-#endif
 
 				BAutolock locker(sMonLocker);
 					// make the update thread wait

@@ -45,8 +45,6 @@ All rights reserved.
 #include <Locker.h>
 
 
-//#define DOUBLECLICKBRINGSTOFRONT
-
 enum drag_and_drop_selection {
 	kNoSelection,
 	kDeskbarMenuSelection,
