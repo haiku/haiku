@@ -45,11 +45,6 @@ All rights reserved.
 #include <Locker.h>
 
 
-class BBitmap;
-class TBarView;
-class TBarMenuTitle;
-class TTeamMenuItem;
-
 //#define DOUBLECLICKBRINGSTOFRONT
 
 enum drag_and_drop_selection {
@@ -58,6 +53,13 @@ enum drag_and_drop_selection {
 	kAppMenuSelection,
 	kAnyMenuSelection
 };
+
+
+class BBitmap;
+class TBarView;
+class TBarMenuTitle;
+class TTeamMenuItem;
+
 
 class TExpandoMenuBar : public BMenuBar {
 public:

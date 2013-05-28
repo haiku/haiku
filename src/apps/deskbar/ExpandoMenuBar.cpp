@@ -396,6 +396,7 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 						SetToolTip(windowMenuItem->FullTitle());
 					} else
 						SetToolTip((const char*)NULL);
+
 					break;
 				}
 
@@ -406,12 +407,10 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 					break;
 				}
 
-				// new item, set the tooltip to the item name
 				SetToolTip(item->Name());
-
-				// save the current menuitem for the next MouseMoved() call
+					// new item, set the tooltip to the item name
 				fLastMousedOverItem = menuItem;
-
+					// save the current menuitem for the next MouseMoved() call
 				break;
 			}
 
@@ -422,8 +421,8 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 			{
 				TTeamMenuItem* lastItem
 					= dynamic_cast<TTeamMenuItem*>(fLastClickedItem);
-				if (fVertical && fShowTeamExpander && fClickedExpander
-					&& lastItem != NULL) {
+				if (lastItem != NULL && fVertical && fShowTeamExpander
+					&& fClickedExpander) {
 					// Started expander animation, then exited view,
 					// since we can't track outside mouse movements
 					// redraw the original expander arrow
