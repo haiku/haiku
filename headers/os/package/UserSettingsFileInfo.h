@@ -12,9 +12,17 @@
 namespace BPackageKit {
 
 
+namespace BHPKG {
+	struct BUserSettingsFileInfoData;
+}
+
+
 class BUserSettingsFileInfo {
 public:
 								BUserSettingsFileInfo();
+								BUserSettingsFileInfo(
+									const BHPKG::BUserSettingsFileInfoData&
+										infoData);
 								BUserSettingsFileInfo(const BString& path,
 									const BString& templatePath = BString());
 								~BUserSettingsFileInfo();

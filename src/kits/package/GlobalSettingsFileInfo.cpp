@@ -6,6 +6,8 @@
 
 #include <package/GlobalSettingsFileInfo.h>
 
+#include <package/hpkg/PackageInfoAttributeValue.h>
+
 
 namespace BPackageKit {
 
@@ -14,6 +16,15 @@ BGlobalSettingsFileInfo::BGlobalSettingsFileInfo()
 	:
 	fPath(),
 	fUpdateType(B_SETTINGS_FILE_UPDATE_TYPE_ENUM_COUNT)
+{
+}
+
+
+BGlobalSettingsFileInfo::BGlobalSettingsFileInfo(
+	const BHPKG::BGlobalSettingsFileInfoData& infoData)
+	:
+	fPath(infoData.path),
+	fUpdateType(infoData.updateType)
 {
 }
 

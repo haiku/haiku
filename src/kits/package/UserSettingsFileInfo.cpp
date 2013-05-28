@@ -6,6 +6,8 @@
 
 #include <package/UserSettingsFileInfo.h>
 
+#include <package/hpkg/PackageInfoAttributeValue.h>
+
 
 namespace BPackageKit {
 
@@ -14,6 +16,15 @@ BUserSettingsFileInfo::BUserSettingsFileInfo()
 	:
 	fPath(),
 	fTemplatePath()
+{
+}
+
+
+BUserSettingsFileInfo::BUserSettingsFileInfo(
+	const BHPKG::BUserSettingsFileInfoData& infoData)
+	:
+	fPath(infoData.path),
+	fTemplatePath(infoData.templatePath)
 {
 }
 

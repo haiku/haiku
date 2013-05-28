@@ -13,9 +13,17 @@
 namespace BPackageKit {
 
 
+namespace BHPKG {
+	struct BGlobalSettingsFileInfoData;
+}
+
+
 class BGlobalSettingsFileInfo {
 public:
 								BGlobalSettingsFileInfo();
+								BGlobalSettingsFileInfo(
+									const BHPKG::BGlobalSettingsFileInfoData&
+										infoData);
 								BGlobalSettingsFileInfo(const BString& path,
 									BSettingsFileUpdateType updateType);
 								~BGlobalSettingsFileInfo();

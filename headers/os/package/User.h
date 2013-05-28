@@ -13,9 +13,15 @@
 namespace BPackageKit {
 
 
+namespace BHPKG {
+	struct BUserData;
+}
+
+
 class BUser {
 public:
 								BUser();
+								BUser(const BHPKG::BUserData& userData);
 								BUser(const BString& name,
 									const BString& realName,
 									const BString& home, const BString& shell,

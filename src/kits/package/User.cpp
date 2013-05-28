@@ -8,6 +8,8 @@
 
 #include <ctype.h>
 
+#include <package/hpkg/PackageInfoAttributeValue.h>
+
 
 namespace BPackageKit {
 
@@ -20,6 +22,19 @@ BUser::BUser()
 	fShell(),
 	fGroups()
 {
+}
+
+
+BUser::BUser(const BHPKG::BUserData& userData)
+	:
+	fName(userData.name),
+	fRealName(userData.realName),
+	fHome(userData.home),
+	fShell(userData.shell),
+	fGroups()
+{
+	for (size_t i =	0; i < userData.groupCount; i++)
+		fGroups.Add(userData.groups[i]);
 }
 
 
