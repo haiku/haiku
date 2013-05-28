@@ -1290,8 +1290,15 @@ TeamWindow::_HandleThreadStateChanged(thread_id threadID)
 	}
 
 	// Switch to the threads tab view when the thread has stopped.
-	if (thread->State() == THREAD_STATE_STOPPED)
+	if (thread->State() == THREAD_STATE_STOPPED) {
 		fTabView->Select(MAIN_TAB_INDEX_THREADS);
+
+		// if we hit a breakpoint or exception, raise the window to the
+		// foreground, since if this occurs while e.g. debugging a GUI
+		// app, it might not be immediately obvious that such an event
+		// occurred as the app may simply appear to hang.
+		Activate();
+	}
 
 	_UpdateRunButtons();
 }
