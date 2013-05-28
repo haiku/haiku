@@ -20,7 +20,6 @@ provides {
 	coreutils = 8.4 compat >= 0
 	diffutils = 2.8.1 compat >= 0
 	findutils = 4.2.33 compat >= 0
-	zlib = 1.2.5 compat >= 1
 	cmd:arp
 	cmd:awk
 	cmd:base64
@@ -187,8 +186,8 @@ provides {
 	lib:libjpeg = 8.0
 	lib:libpng = 1.4.4 compat >= 1
 	lib:libtiff = 3.9.4 compat >= 3
-	lib:libz = 1.2.5 compat >= 1
 }
 
 requires {
+	lib:libz
 }
