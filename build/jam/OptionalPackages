@@ -1339,21 +1339,21 @@ if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
 	if $(TARGET_ARCH) = x86 {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				KeymapSwitcher-1.2.7-x86-gcc4-2013-01-08.zip
-				: $(baseURL)/KeymapSwitcher-1.2.7-x86-gcc4-2013-01-08.zip
+				KeymapSwitcher-1.2.7-x86-gcc4-2013-05-27.zip
+				: $(baseURL)/KeymapSwitcher-1.2.7-x86-gcc4-2013-05-27.zip
 				: : : false ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				KeymapSwitcher-1.2.7-x86-gcc2-2013-01-08.zip
-				: $(baseURL)/KeymapSwitcher-1.2.7-x86-gcc2-2013-01-08.zip
+				KeymapSwitcher-1.2.7-x86-gcc2-2013-05-27.zip
+				: $(baseURL)/KeymapSwitcher-1.2.7-x86-gcc2-2013-05-27.zip
 				: : : false ;
 		}
 		AddSymlinkToHaikuImage home config settings deskbar Preferences
 			: /boot/common/bin/KeymapSwitcher ;
 	} else if $(TARGET_ARCH) = x86_64 {
 		InstallOptionalHaikuImagePackage
-			KeymapSwitcher-1.2.7-x86_64-2013-01-08.zip
-			: $(baseURL)/KeymapSwitcher-1.2.7-x86_64-2013-01-08.zip
+			KeymapSwitcher-1.2.7-x86_64-2013-05-27.zip
+			: $(baseURL)/KeymapSwitcher-1.2.7-x86_64-2013-05-27.zip
 			: : true ;
 		AddSymlinkToHaikuImage home config settings deskbar Preferences
 			: /boot/common/bin/KeymapSwitcher ;
