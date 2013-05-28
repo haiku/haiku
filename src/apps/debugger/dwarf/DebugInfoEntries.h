@@ -1641,6 +1641,50 @@ private:
 };
 
 
+class DIECallSite : public DIEDeclaredBase {
+public:
+								DIECallSite();
+
+	virtual	uint16				Tag() const;
+
+	virtual	const char*			Name() const;
+
+	virtual	status_t			AddAttribute_name(uint16 attributeName,
+									const AttributeValue& value);
+
+			const DebugInfoEntryList& Children() const
+										{ return fChildren; }
+
+	virtual	status_t			AddChild(DebugInfoEntry* child);
+
+private:
+			const char*			fName;
+			DebugInfoEntryList	fChildren;
+};
+
+
+class DIECallSiteParameter : public DIEDeclaredBase {
+public:
+								DIECallSiteParameter();
+
+	virtual	uint16				Tag() const;
+
+	virtual	const char*			Name() const;
+
+	virtual	status_t			AddAttribute_name(uint16 attributeName,
+									const AttributeValue& value);
+
+			const DebugInfoEntryList& Children() const
+										{ return fChildren; }
+
+	virtual	status_t			AddChild(DebugInfoEntry* child);
+
+private:
+			const char*			fName;
+			DebugInfoEntryList	fChildren;
+};
+
+
 // #pragma mark - DebugInfoEntryFactory
 
 
