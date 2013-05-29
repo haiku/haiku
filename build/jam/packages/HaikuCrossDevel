@@ -30,6 +30,7 @@ AddFilesToPackage $(developCrossLibDirTokens) : kernel.so : _KERNEL_ ;
 # libraries
 AddLibrariesToPackage $(developCrossLibDirTokens) : 
 	<revisioned>libroot.so 
+	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
 ;
 
 # static libraries
@@ -47,10 +48,10 @@ for headerDir in config glibc os posix {
 }
 
 # BSD and GNU compatibility headers
-#for headerDib in bsd gnu {
-#	CopyDirectoryToPackage $(developCrossHeadersDirTokens)
-#		: [ FDirName $(HAIKU_TOP) headers compatibility $(headerDir) ] ;
-#}
+for headerDir in bsd gnu {
+	CopyDirectoryToPackage $(developCrossHeadersDirTokens)
+		: [ FDirName $(HAIKU_TOP) headers compatibility $(headerDir) ] ;
+}
 
 # cpp headers
 if $(HAIKU_GCC_VERSION[1]) = 2 {
