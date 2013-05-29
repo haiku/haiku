@@ -1840,6 +1840,7 @@ DIESubprogram::DIESubprogram()
 	fAddressClass(0),
 	fPrototyped(false),
 	fInline(DW_INL_not_inlined),
+	fMain(false),
 	fArtificial(false),
 	fCallingConvention(DW_CC_normal)
 {
@@ -1892,6 +1893,9 @@ DIESubprogram::AddChild(DebugInfoEntry* child)
 			return B_OK;
 		case DW_TAG_template_value_parameter:
 			fTemplateValueParameters.Add(child);
+			return B_OK;
+		case DW_TAG_GNU_call_site:
+			fCallSites.Add(child);
 			return B_OK;
 		default:
 			return DIEDeclaredNamedBase::AddChild(child);
@@ -2014,6 +2018,15 @@ DIESubprogram::AddAttribute_calling_convention(uint16 attributeName,
 	const AttributeValue& value)
 {
 	fCallingConvention = value.constant;
+	return B_OK;
+}
+
+
+status_t
+DIESubprogram::AddAttribute_main_subprogram(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fMain = true;
 	return B_OK;
 }
 
