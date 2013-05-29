@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -1253,7 +1253,17 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 			case DW_FORM_ref_udata:
 				value = dataReader.ReadUnsignedLEB128(0);
 				break;
+			case DW_FORM_exprloc:
+				value = dataReader.ReadUnsignedLEB128(0);
+				break;
+			case DW_FORM_flag_present:
+				attributeValue.SetToFlag(dataReader.Read<uint8>(0) != 0);
+				break;
+			case DW_FORM_ref_sig8:
+				value = dataReader.Read<uint64>(0);
+				break;
 			case DW_FORM_indirect:
+			case DW_FORM_sec_offset:
 			default:
 				WARNING("Unsupported attribute form: %" B_PRIu32 "\n",
 					attributeForm);
@@ -1321,6 +1331,10 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 			case ATTRIBUTE_CLASS_FLAG:
 			case ATTRIBUTE_CLASS_STRING:
 				// already set
+				break;
+			case ATTRIBUTE_CLASS_EXPRESSION:
+				// TODO: implement
+				dataReader.Skip(value);
 				break;
 		}
 
