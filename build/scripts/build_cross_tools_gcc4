@@ -103,8 +103,9 @@ objDir=$haikuOutputDir/cross-tools-build
 binutilsObjDir=$objDir/binutils
 gccObjDir=$objDir/gcc
 stdcxxObjDir=$objDir/stdcxx
-tmpIncludeDir=$objDir/sysincludes
-tmpLibDir=$objDir/syslibs
+sysrootDir=$objDir/sysroot
+tmpIncludeDir=$sysrootDir/boot/system/develop/headers
+tmpLibDir=$sysrootDir/boot/system/develop/lib
 
 rm -rf $installDir $objDir
 
@@ -135,7 +136,9 @@ export LC_ALL=POSIX
 cd $binutilsObjDir
 CFLAGS="-O2" CXXFLAGS="-O2" $binutilsSourceDir/configure \
 	--prefix=$installDir --target=$haikuMachine --disable-nls \
-	--disable-shared --disable-werror $binutilsConfigureArgs || exit 1
+	--disable-shared --disable-werror \
+	--with-sysroot=$sysrootDir \
+	$binutilsConfigureArgs || exit 1
 $MAKE $additionalMakeArgs || exit 1
 $MAKE $additionalMakeArgs install || exit 1
 
@@ -194,7 +197,7 @@ cd $gccObjDir
 CFLAGS="-O2" CXXFLAGS="-O2" $gccSourceDir/configure --prefix=$installDir \
 	--target=$haikuMachine --disable-nls --disable-shared --with-system-zlib \
 	--enable-languages=c,c++ --enable-lto --enable-frame-pointer \
-	--with-headers=$tmpIncludeDir --with-libs=$tmpLibDir \
+	--with-sysroot=$sysrootDir \
 	$gccConfigureArgs || exit 1
 
 # make gcc
