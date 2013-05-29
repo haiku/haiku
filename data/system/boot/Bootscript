@@ -193,7 +193,7 @@ fi
 
 # Check for fresh install and run post install scripts.
 freshInstallIndicator=/boot/common/settings/fresh_install
-postInstallDir=boot/post_install
+postInstallDir=boot/post-install
 if [ -e $freshInstallIndicator ]; then
 	# wait a moment for things to calm down a bit
 	sleep 3

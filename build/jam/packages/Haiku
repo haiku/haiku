@@ -179,7 +179,7 @@ local postInstallFiles = add_catalog_entry_attributes.sh
 postInstallFiles = $(postInstallFiles:G=post-install) ;
 SEARCH on $(postInstallFiles)
 	= [ FDirName $(HAIKU_TOP) data common boot post_install ] ;
-AddFilesToPackage boot post_install : $(postInstallFiles) ;
+AddFilesToPackage boot post-install : $(postInstallFiles) ;
 
 # Gutenprint data files
 CopyDirectoryToPackage data

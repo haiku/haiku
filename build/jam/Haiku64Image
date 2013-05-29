@@ -373,7 +373,7 @@ SEARCH on $(postInstallFiles)
 	= [ FDirName $(HAIKU_TOP) data common boot post_install ] ;
 SEARCH on <post-install>fresh_install
 	= [ FDirName $(HAIKU_TOP) data common settings ] ;
-AddFilesToHaikuImage common boot post_install : $(postInstallFiles) ;
+AddFilesToHaikuImage common boot post-install : $(postInstallFiles) ;
 AddFilesToHaikuImage common settings : <post-install>fresh_install ;
 
 # boot loader
