@@ -218,7 +218,9 @@ TeamDebugger::TeamDebugger(Listener* listener, UserInterface* userInterface,
 	fDebugEventListener(-1),
 	fUserInterface(userInterface),
 	fTerminating(false),
-	fKillTeamOnQuit(false)
+	fKillTeamOnQuit(false),
+	fCommandLineArgc(0),
+	fCommandLineArgv(NULL)
 {
 	fUserInterface->AcquireReference();
 }
@@ -293,12 +295,20 @@ TeamDebugger::~TeamDebugger()
 	delete fTeam;
 	delete fFileManager;
 
+	for (int i = 0; i < fCommandLineArgc; i++) {
+		if (fCommandLineArgv[i] != NULL)
+			free(const_cast<char*>(fCommandLineArgv[i]));
+	}
+
+	delete [] fCommandLineArgv;
+
 	fListener->TeamDebuggerQuit(this);
 }
 
 
 status_t
-TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
+TeamDebugger::Init(team_id teamID, thread_id threadID, int argc,
+	const char* const* argv, bool stopInMain)
 {
 	bool targetIsLocal = true;
 		// TODO: Support non-local targets!
@@ -308,12 +318,16 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 
 	fTeamID = teamID;
 
+	status_t error = _HandleSetArguments(argc, argv);
+	if (error != B_OK)
+		return error;
+
 	// create debugger interface
 	fDebuggerInterface = new(std::nothrow) DebuggerInterface(fTeamID);
 	if (fDebuggerInterface == NULL)
 		return B_NO_MEMORY;
 
-	status_t error = fDebuggerInterface->Init();
+	error = fDebuggerInterface->Init();
 	if (error != B_OK)
 		return error;
 
@@ -716,6 +730,25 @@ TeamDebugger::MessageReceived(BMessage* message)
 			_LoadSettings();
 			Activate();
 			break;
+
+		case MSG_TEAM_RESTART_REQUESTED:
+		{
+			if (fCommandLineArgc == 0)
+				break;
+
+			BString argumentString;
+			for (int i = 0; i < fCommandLineArgc; i++) {
+				if (i > 0)
+					argumentString.Append(" ");
+				argumentString.Append(fCommandLineArgv[i]);
+			}
+
+			BMessage startMessage(MSG_START_NEW_TEAM);
+			startMessage.AddString("path", fCommandLineArgv[0]);
+			startMessage.AddString("arguments", argumentString);
+
+			break;
+		}
 
 		default:
 			BLooper::MessageReceived(message);
@@ -1240,11 +1273,19 @@ bool
 TeamDebugger::_HandleTeamDeleted(TeamDeletedEvent* event)
 {
 	char message[64];
-	snprintf(message, sizeof(message), "Team %" B_PRId32 " has terminated.",
+	snprintf(message, sizeof(message), "Team %" B_PRId32 " has terminated. ",
 		event->Team());
-	fUserInterface->SynchronouslyAskUser("Quit Debugger", message, "Quit",
-		NULL, NULL);
-	PostMessage(B_QUIT_REQUESTED);
+
+	int32 result = fUserInterface->SynchronouslyAskUser("Team terminated",
+		message, "Do nothing", "Quit", fCommandLineArgc != 0
+			? "Restart team" : NULL);
+
+	if (result == 1)
+		PostMessage(B_QUIT_REQUESTED);
+	else if (result == 2) {
+		_SaveSettings();
+		fListener->TeamDebuggerRestartRequested(this);
+	}
 
 	return true;
 }
@@ -1655,6 +1696,26 @@ TeamDebugger::_HandleInspectAddress(target_addr_t address,
 	} else
 		memoryBlock->NotifyDataRetrieved();
 
+}
+
+
+status_t
+TeamDebugger::_HandleSetArguments(int argc, const char* const* argv)
+{
+	fCommandLineArgc = argc;
+	fCommandLineArgv = new(std::nothrow) const char*[argc];
+	if (fCommandLineArgv == NULL)
+		return B_NO_MEMORY;
+
+	memset(const_cast<char **>(fCommandLineArgv), 0, sizeof(char*) * argc);
+
+	for (int i = 0; i < argc; i++) {
+		fCommandLineArgv[i] = strdup(argv[i]);
+		if (fCommandLineArgv[i] == NULL)
+			return B_NO_MEMORY;
+	}
+
+	return B_OK;
 }
 
 
