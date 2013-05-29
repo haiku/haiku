@@ -117,7 +117,7 @@ do_fetch(int argc, char** argv)
 		}
 
 		virtual	bool FetchData(uint32 fetchFlags, BDataIO& stream,
-			size_t length)
+			size_t& length)
 		{
 			fBuffer.SetSize(0);
 
@@ -176,7 +176,7 @@ do_flags(int argc, char** argv)
 		to = atoul(argv[1]);
 
 	IMAP::MessageEntryList entries;
-	IMAP::FetchMessageEntriesCommand command(entries, from, to);
+	IMAP::FetchMessageEntriesCommand command(entries, from, to, true);
 	status_t status = sProtocol.ProcessCommand(command);
 	if (status != B_OK) {
 		error("flags", status);

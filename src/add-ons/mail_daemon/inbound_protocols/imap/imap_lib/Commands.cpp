@@ -279,11 +279,12 @@ CapabilityHandler::HandleUntagged(Response& response)
 
 
 FetchMessageEntriesCommand::FetchMessageEntriesCommand(
-	MessageEntryList& entries, uint32 from, uint32 to)
+	MessageEntryList& entries, uint32 from, uint32 to, bool uids)
 	:
 	fEntries(entries),
 	fFrom(from),
-	fTo(to)
+	fTo(to),
+	fUIDs(uids)
 {
 }
 
@@ -291,8 +292,11 @@ FetchMessageEntriesCommand::FetchMessageEntriesCommand(
 BString
 FetchMessageEntriesCommand::CommandString()
 {
-	BString command = "UID FETCH ";
-	command << fFrom << ":" << fTo << " (FLAGS RFC822.SIZE)";
+	BString command = fUIDs ? "UID FETCH " : "FETCH ";
+	command << fFrom << ":" << fTo << " (FLAGS RFC822.SIZE";
+	if (!fUIDs)
+		command << " UID";
+	command << ")";
 
 	return command;
 }

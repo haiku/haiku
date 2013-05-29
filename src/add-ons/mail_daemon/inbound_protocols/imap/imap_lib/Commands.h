@@ -126,7 +126,7 @@ class FetchMessageEntriesCommand : public Command, public Handler {
 public:
 								FetchMessageEntriesCommand(
 									MessageEntryList& entries, uint32 from,
-									uint32 to);
+									uint32 to, bool uids);
 
 			BString				CommandString();
 	virtual	bool				HandleUntagged(Response& response);
@@ -135,6 +135,7 @@ private:
 			MessageEntryList&	fEntries;
 			uint32				fFrom;
 			uint32				fTo;
+			bool				fUIDs;
 };
 
 

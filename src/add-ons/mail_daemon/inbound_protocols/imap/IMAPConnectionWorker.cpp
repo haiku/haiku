@@ -343,7 +343,7 @@ public:
 			printf("IMAP: get entries from %lu to %lu\n", from, to);
 			// TODO: we don't really need the flags at this point at all
 			IMAP::MessageEntryList	entries;
-			IMAP::FetchMessageEntriesCommand fetch(entries, from, to);
+			IMAP::FetchMessageEntriesCommand fetch(entries, from, to, true);
 			status = protocol.ProcessCommand(fetch);
 			if (status != B_OK)
 				return status;
