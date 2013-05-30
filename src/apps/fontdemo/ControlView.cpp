@@ -71,14 +71,14 @@ ControlView::AttachedToWindow()
 
 	fTextControl = new BTextControl(rect, "TextInput", B_TRANSLATE("Text:"),
 		B_TRANSLATE("Haiku, Inc."), NULL);
-	fTextControl->SetDivider(29.0);
+	fTextControl->SetDivider(36.0);
 	fTextControl->SetModificationMessage(new BMessage(TEXT_CHANGED_MSG));
 	AddChild(fTextControl);
 
 	rect.OffsetBy(0.0, 27.0);
 	_AddFontMenu(rect);
 
-	rect.OffsetBy(0.0, 29.0);
+	rect.OffsetBy(0.0, 36.0);
 	fFontsizeSlider = new BSlider(rect, "Fontsize", B_TRANSLATE("Size: 50"),
 		NULL, 4, 360);
 	fFontsizeSlider->SetModificationMessage(new BMessage(FONTSIZE_MSG));
@@ -122,59 +122,15 @@ ControlView::AttachedToWindow()
 	fAliasingCheckBox->SetValue(B_CONTROL_ON);
 	AddChild(fAliasingCheckBox);
 
-	rect.OffsetBy(0.0, offsetX);
-	fDrawingModeMenu = new BMenu("drawingmodemenu");
+	rect.OffsetBy(0.0, 30.0f);
+	_AddDrawingModeMenu(rect);
 
-	BMessage* drawingMsg = NULL;
-	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
-	drawingMsg->AddInt32("_mode", B_OP_COPY);
-	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_COPY", drawingMsg));
-	fDrawingModeMenu->ItemAt(0)->SetMarked(true);
-	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
-	drawingMsg->AddInt32("_mode", B_OP_OVER);
-	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_OVER", drawingMsg));
-	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
-	drawingMsg->AddInt32("_mode", B_OP_ERASE);
-	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_ERASE", drawingMsg));
-	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
-	drawingMsg->AddInt32("_mode", B_OP_INVERT);
-	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_INVERT", drawingMsg));
-	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
-	drawingMsg->AddInt32("_mode", B_OP_ADD);
-	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_ADD", drawingMsg));
-	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
-	drawingMsg->AddInt32("_mode", B_OP_SUBTRACT);
-	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_SUBTRACT", drawingMsg));
-	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
-	drawingMsg->AddInt32("_mode", B_OP_BLEND);
-	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_BLEND", drawingMsg));
-	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
-	drawingMsg->AddInt32("_mode", B_OP_MIN);
-	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_MIN", drawingMsg));
-	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
-	drawingMsg->AddInt32("_mode", B_OP_MAX);
-	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_MAX", drawingMsg));
-	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
-	drawingMsg->AddInt32("_mode", B_OP_SELECT);
-	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_SELECT", drawingMsg));
-	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
-	drawingMsg->AddInt32("_mode", B_OP_ALPHA);
-	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_ALPHA", drawingMsg));
-
-	fDrawingModeMenu->SetLabelFromMarked(true);
-
-	BMenuField *drawingModeMenuField = new BMenuField(rect, "FontMenuField",
-		B_TRANSLATE("Drawing mode:"), fDrawingModeMenu, true);
-	drawingModeMenuField->SetDivider(5+StringWidth(
-		B_TRANSLATE("Drawing mode:")));
-	AddChild(drawingModeMenuField);
-
-	rect.OffsetBy(0.0, 22);
+	rect.OffsetBy(0.0, 30.0f);
 	fBoundingboxesCheckBox = new BCheckBox(rect, "BoundingBoxes",
 		B_TRANSLATE("Bounding boxes"), new BMessage(BOUNDING_BOX_MSG));
 	AddChild(fBoundingboxesCheckBox);
 
-	rect.OffsetBy(0.0, 22.0);
+	rect.OffsetBy(0.0, 30.0f);
 	fCyclingFontButton = new BButton(rect, "Cyclefonts",
 		B_TRANSLATE("Cycle fonts"), new BMessage(CYCLING_FONTS_MSG));
 	AddChild(fCyclingFontButton);
@@ -472,10 +428,64 @@ ControlView::_AddFontMenu(BRect rect)
 
 	_UpdateFontmenus(true);
 
+	rect.bottom += 4;
 	fFontMenuField = new BMenuField(rect, "FontMenuField",
 		B_TRANSLATE("Font:"), fFontFamilyMenu, true);
-	fFontMenuField->SetDivider(30.0);
+	fFontMenuField->SetDivider(
+		fFontMenuField->StringWidth(B_TRANSLATE("Font:")) + 5);
 	AddChild(fFontMenuField);
+}
+
+
+void
+ControlView::_AddDrawingModeMenu(BRect rect)
+{
+	fDrawingModeMenu = new BMenu("drawingmodemenu");
+
+	BMessage* drawingMsg = NULL;
+	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
+	drawingMsg->AddInt32("_mode", B_OP_COPY);
+	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_COPY", drawingMsg));
+	fDrawingModeMenu->ItemAt(0)->SetMarked(true);
+	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
+	drawingMsg->AddInt32("_mode", B_OP_OVER);
+	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_OVER", drawingMsg));
+	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
+	drawingMsg->AddInt32("_mode", B_OP_ERASE);
+	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_ERASE", drawingMsg));
+	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
+	drawingMsg->AddInt32("_mode", B_OP_INVERT);
+	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_INVERT", drawingMsg));
+	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
+	drawingMsg->AddInt32("_mode", B_OP_ADD);
+	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_ADD", drawingMsg));
+	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
+	drawingMsg->AddInt32("_mode", B_OP_SUBTRACT);
+	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_SUBTRACT", drawingMsg));
+	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
+	drawingMsg->AddInt32("_mode", B_OP_BLEND);
+	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_BLEND", drawingMsg));
+	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
+	drawingMsg->AddInt32("_mode", B_OP_MIN);
+	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_MIN", drawingMsg));
+	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
+	drawingMsg->AddInt32("_mode", B_OP_MAX);
+	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_MAX", drawingMsg));
+	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
+	drawingMsg->AddInt32("_mode", B_OP_SELECT);
+	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_SELECT", drawingMsg));
+	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
+	drawingMsg->AddInt32("_mode", B_OP_ALPHA);
+	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_ALPHA", drawingMsg));
+
+	fDrawingModeMenu->SetLabelFromMarked(true);
+
+	rect.bottom += 4;
+	BMenuField* drawingModeMenuField = new BMenuField(rect, "FontMenuField",
+		B_TRANSLATE("Drawing mode:"), fDrawingModeMenu, true);
+	drawingModeMenuField->SetDivider(
+		fDrawingModeMenu->StringWidth(B_TRANSLATE("Drawing mode:") + 5));
+	AddChild(drawingModeMenuField);
 }
 
 
