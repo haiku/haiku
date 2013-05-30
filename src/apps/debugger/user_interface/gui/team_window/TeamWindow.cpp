@@ -787,9 +787,9 @@ TeamWindow::_Init()
 				.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
 					.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
 						.Add(fRunButton = new BButton("Run"))
-						.Add(fStepOverButton = new BButton("Step Over"))
-						.Add(fStepIntoButton = new BButton("Step Into"))
-						.Add(fStepOutButton = new BButton("Step Out"))
+						.Add(fStepOverButton = new BButton("Step over"))
+						.Add(fStepIntoButton = new BButton("Step into"))
+						.Add(fStepOutButton = new BButton("Step out"))
 						.AddGlue()
 					.End()
 					.Add(fSourcePathView = new BStringView(
@@ -872,16 +872,16 @@ TeamWindow::_Init()
 	item = new BMenuItem("Copy", new BMessage(B_COPY), 'C');
 	menu->AddItem(item);
 	item->SetTarget(this);
-	item = new BMenuItem("Select All", new BMessage(B_SELECT_ALL), 'A');
+	item = new BMenuItem("Select all", new BMessage(B_SELECT_ALL), 'A');
 	menu->AddItem(item);
 	item->SetTarget(this);
 	menu = new BMenu("Tools");
 	fMenuBar->AddItem(menu);
-	item = new BMenuItem("Save Debug Report",
+	item = new BMenuItem("Save debug report",
 		new BMessage(MSG_CHOOSE_DEBUG_REPORT_LOCATION));
 	menu->AddItem(item);
 	item->SetTarget(this);
-	item = new BMenuItem("Inspect Memory",
+	item = new BMenuItem("Inspect memory",
 		new BMessage(MSG_SHOW_INSPECTOR_WINDOW), 'I');
 	menu->AddItem(item);
 	item->SetTarget(this);
