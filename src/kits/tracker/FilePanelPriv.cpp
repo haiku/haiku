@@ -675,6 +675,8 @@ TFilePanel::Init(const BMessage*)
 	fDirMenuField = new BMenuField(rect, "DirMenuField", "", fDirMenu);
 	fDirMenuField->MenuBar()->SetFont(be_plain_font);
 	fDirMenuField->SetDivider(0);
+	fDirMenuField->MenuBar()->SetMaxContentWidth(rect.Width() - 26.0f);
+		// Make room for the icon
 
 	fDirMenuField->MenuBar()->RemoveItem((int32)0);
 	fDirMenu->SetMenuBar(fDirMenuField->MenuBar());
