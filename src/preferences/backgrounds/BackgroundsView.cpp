@@ -1,10 +1,11 @@
 /*
- * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2013 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Jerome Duval (jerome.duval@free.fr)
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Jerome Duval, jerome.duval@free.fr
+ *		John Scipione, jscipione@gmail.com
  *		Jonas Sundström, jonas@kirilla.se
  */
 
@@ -22,7 +23,6 @@
 #include <FindDirectory.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
-#include <MenuField.h>
 #include <Messenger.h>
 #include <MimeType.h>
 #include <Point.h>
@@ -162,9 +162,8 @@ BackgroundsView::BackgroundsView()
 	fImageMenu->AddItem(new BMenuItem(B_TRANSLATE("Other" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgOtherImage)));
 
-	BMenuField* imageMenuField = new BMenuField(NULL, fImageMenu);
-	imageMenuField->SetAlignment(B_ALIGN_RIGHT);
-	imageMenuField->ResizeToPreferred();
+	fImageMenuField = new BMenuField(NULL, fImageMenu);
+	fImageMenuField->SetAlignment(B_ALIGN_RIGHT);
 
 	fPlacementMenu = new BPopUpMenu(B_TRANSLATE("pick one"));
 	fPlacementMenu->AddItem(new BMenuItem(B_TRANSLATE("Manual"),
@@ -176,8 +175,8 @@ BackgroundsView::BackgroundsView()
 	fPlacementMenu->AddItem(new BMenuItem(B_TRANSLATE("Tile"),
 		new BMessage(kMsgTilePlacement)));
 
-	BMenuField* placementMenuField = new BMenuField(NULL, fPlacementMenu);
-	placementMenuField->SetAlignment(B_ALIGN_RIGHT);
+	fPlacementMenuField = new BMenuField(NULL, fPlacementMenu);
+	fPlacementMenuField->SetAlignment(B_ALIGN_RIGHT);
 
 	fIconLabelOutline = new BCheckBox(B_TRANSLATE("Icon label outline"),
 		new BMessage(kMsgIconLabelOutline));
@@ -197,18 +196,18 @@ BackgroundsView::BackgroundsView()
 		B_ALIGN_NO_VERTICAL));
 
 	view = BLayoutBuilder::Group<>()
-		.AddGroup(B_VERTICAL, 10)
-			.AddGroup(B_VERTICAL, 10)
-				.AddGrid(10, 10)
+		.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING)
+			.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING)
+				.AddGrid(B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING)
 					.Add(imageStringView, 0, 0)
+					.Add(fImageMenuField, 1, 0)
 					.Add(placementStringView, 0, 1)
-					.Add(imageMenuField, 1, 0)
-					.Add(placementMenuField, 1, 1)
+					.Add(fPlacementMenuField, 1, 1)
+					.Add(fIconLabelOutline, 1, 2)
 					.End()
-				.Add(fIconLabelOutline)
 				.End()
 			.Add(fPicker)
-			.SetInsets(10, 10, 10, 10)
+			.SetInsets(B_USE_DEFAULT_SPACING)
 			.End()
 		.View();
 
@@ -316,13 +315,10 @@ BackgroundsView::MessageReceived(BMessage* msg)
 		}
 
 		case kMsgManualPlacement:
-			_UpdatePreview();
-			_UpdateButtons();
-			break;
-
 		case kMsgTilePlacement:
 		case kMsgScalePlacement:
 		case kMsgCenterPlacement:
+			fPlacementMenuField->ResizeToPreferred();
 			_UpdatePreview();
 			_UpdateButtons();
 			break;
@@ -388,6 +384,8 @@ BackgroundsView::MessageReceived(BMessage* msg)
 		case kMsgNoImage:
 			fLastImageIndex = ((BGImageMenuItem*)fImageMenu->FindMarked())
 				->ImageIndex();
+			fImageMenuField->ResizeToPreferred();
+			fPlacementMenuField->ResizeToPreferred();
 			_UpdatePreview();
 			_UpdateButtons();
 			break;
@@ -826,6 +824,19 @@ BackgroundsView::_LoadSettings()
 	fWorkspaceMenu->SetTargetForItems(this);
 
 	PRINT(("Settings Loaded\n"));
+}
+
+
+void
+BackgroundsView::WindowActivated(bool active)
+{
+	static bool firstRun = true;
+
+	if (firstRun) {
+		firstRun = false;
+		fImageMenuField->ResizeToPreferred();
+		fPlacementMenuField->ResizeToPreferred();
+	}
 }
 
 
