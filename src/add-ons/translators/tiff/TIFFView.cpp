@@ -120,7 +120,7 @@ TIFFView::TIFFView(const char* name, uint32 flags,
 	// TODO ? - strip encoding is not implemented in libTIFF for this compression
 	//	add_menu_item(menu, COMPRESSION_JP2000, "JPEG2000", currentCompression);
 
-	fCompressionMF = new BMenuField(B_TRANSLATE("Use Compression:"), menu);
+	fCompressionMF = new BMenuField(B_TRANSLATE("Use compression:"), menu);
 
 	// Build the layout
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 7)
