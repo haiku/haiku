@@ -539,6 +539,17 @@ BMenuField::FrameResized(float newWidth, float newHeight)
 {
 	BView::FrameResized(newWidth, newHeight);
 
+	if (fFixedSizeMB) {
+		// we have let the menubar resize itself, but
+		// in fixed size mode, the menubar is supposed to
+		// be at the right end of the view always. Since
+		// the menu bar is in follow left/right mode then,
+		// resizing ourselfs might have caused the menubar
+		// to be outside now
+		fMenuBar->ResizeTo(_MenuBarWidth(), fMenuBar->Frame().Height());
+		fMenuBar->SetMaxContentWidth(_MenuBarWidth());
+	}
+
 	if (newHeight != fLayoutData->previous_height && Label()) {
 		// The height changed, which means the label has to move and we
 		// probably also invalidate a part of the borders around the menu bar.
@@ -654,8 +665,10 @@ BMenuField::SetDivider(float position)
 
 		fMenuBar->MoveTo(_MenuBarOffset(), kVMargin);
 
-		if (fFixedSizeMB)
+		if (fFixedSizeMB) {
 			fMenuBar->ResizeTo(_MenuBarWidth(), dirty.Height());
+			fMenuBar->SetMaxContentWidth(_MenuBarWidth());
+		}
 
 		dirty = dirty | fMenuBar->Frame();
 		dirty.InsetBy(-kVMargin, -kVMargin);
@@ -722,15 +735,7 @@ BMenuField::ResizeToPreferred()
 
 	BView::ResizeToPreferred();
 
-	if (fFixedSizeMB) {
-		// we have let the menubar resize itself, but
-		// in fixed size mode, the menubar is supposed to
-		// be at the right end of the view always. Since
-		// the menu bar is in follow left/right mode then,
-		// resizing ourselfs might have caused the menubar
-		// to be outside now
-		fMenuBar->ResizeTo(_MenuBarWidth(), fMenuBar->Frame().Height());
-	}
+	Invalidate();
 }
 
 

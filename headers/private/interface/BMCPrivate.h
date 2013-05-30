@@ -51,6 +51,7 @@ public:
 	virtual	void				FrameResized(float width, float height);
 	virtual	void				MessageReceived(BMessage* msg);
 	virtual	void				MakeFocus(bool focused = true);
+	virtual	void				SetMaxContentWidth(float width);
 
 			void				TogglePopUpMarker(bool show)
 									{ fShowPopUpMarker = show; }
