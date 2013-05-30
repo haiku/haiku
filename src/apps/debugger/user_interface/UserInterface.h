@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef USER_INTERFACE_H
@@ -120,6 +121,8 @@ public:
 									TeamMemoryBlock::Listener* listener) = 0;
 
 	virtual void				DebugReportRequested(entry_ref* path) = 0;
+
+	virtual	void				TeamRestartRequested() = 0;
 
 	virtual	bool				UserInterfaceQuitRequested(
 									QuitOption quitOption

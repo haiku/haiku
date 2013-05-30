@@ -90,6 +90,8 @@ private:
 
 	virtual void				DebugReportRequested(entry_ref* targetPath);
 
+	virtual	void				TeamRestartRequested();
+
 	virtual	bool				UserInterfaceQuitRequested(
 									QuitOption quitOption);
 

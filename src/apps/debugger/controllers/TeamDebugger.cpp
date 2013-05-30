@@ -736,17 +736,7 @@ TeamDebugger::MessageReceived(BMessage* message)
 			if (fCommandLineArgc == 0)
 				break;
 
-			BString argumentString;
-			for (int i = 0; i < fCommandLineArgc; i++) {
-				if (i > 0)
-					argumentString.Append(" ");
-				argumentString.Append(fCommandLineArgv[i]);
-			}
-
-			BMessage startMessage(MSG_START_NEW_TEAM);
-			startMessage.AddString("path", fCommandLineArgv[0]);
-			startMessage.AddString("arguments", argumentString);
-
+			fListener->TeamDebuggerRestartRequested(this);
 			break;
 		}
 
@@ -958,6 +948,13 @@ TeamDebugger::DebugReportRequested(entry_ref* targetPath)
 	BMessage message(MSG_GENERATE_DEBUG_REPORT);
 	message.AddRef("target", targetPath);
 	PostMessage(&message);
+}
+
+
+void
+TeamDebugger::TeamRestartRequested()
+{
+	PostMessage(MSG_TEAM_RESTART_REQUESTED);
 }
 
 
