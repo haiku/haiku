@@ -17,8 +17,6 @@
 
 
 static const float kVMargin = 2.0f;
-static const float kMinMenuBarWidth = 20.0f;
-	// found by experimenting on BeOS R5
 
 
 class BMessageRunner;

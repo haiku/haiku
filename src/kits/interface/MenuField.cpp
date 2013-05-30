@@ -132,6 +132,10 @@ struct BMenuField::LayoutData {
 // #pragma mark -
 
 
+static const float kMinMenuBarWidth = 20.0f;
+	// found by experimenting on BeOS R5
+
+
 BMenuField::BMenuField(BRect frame, const char* name, const char* label,
 	BMenu* menu, uint32 resizingMode, uint32 flags)
 	:
