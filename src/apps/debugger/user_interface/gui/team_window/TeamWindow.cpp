@@ -220,6 +220,11 @@ void
 TeamWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case MSG_TEAM_RESTART_REQUESTED:
+		{
+			fListener->TeamRestartRequested();
+			break;
+		}
 		case MSG_CHOOSE_DEBUG_REPORT_LOCATION:
 		{
 			try {
@@ -854,7 +859,11 @@ TeamWindow::_Init()
 	// add menus and menu items
 	BMenu* menu = new BMenu("Team");
 	fMenuBar->AddItem(menu);
-	BMenuItem* item = new BMenuItem("Close", new BMessage(B_QUIT_REQUESTED),
+	BMenuItem* item = new BMenuItem("Restart", new BMessage(
+		MSG_TEAM_RESTART_REQUESTED), 'R', B_SHIFT_KEY);
+	menu->AddItem(item);
+	item->SetTarget(this);
+	item = new BMenuItem("Close", new BMessage(B_QUIT_REQUESTED),
 		'W');
 	menu->AddItem(item);
 	item->SetTarget(this);
