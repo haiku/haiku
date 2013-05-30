@@ -150,8 +150,8 @@ BackgroundsView::BackgroundsView()
 		B_TRANSLATE("Other folder" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgOtherFolder)));
 
-	BMenuField* workspaceMenuField = new BMenuField(BRect(0, 0, 130, 18),
-		"workspaceMenuField", NULL, fWorkspaceMenu, true);
+	BMenuField* workspaceMenuField = new BMenuField("workspaceMenuField",
+		NULL, fWorkspaceMenu);
 	workspaceMenuField->ResizeToPreferred();
 	rightbox->SetLabel(workspaceMenuField);
 
