@@ -156,8 +156,6 @@ void
 TIFFView::AllAttached()
 {
 	fCompressionMF->Menu()->SetTargetForItems(this);
-	fCompressionMF->SetDivider(
-		fCompressionMF->StringWidth(fCompressionMF->Label()) + 3);
 	fCompressionMF->ResizeToPreferred();
 }
 
