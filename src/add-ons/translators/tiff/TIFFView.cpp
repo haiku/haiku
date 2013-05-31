@@ -128,7 +128,10 @@ TIFFView::TIFFView(const char* name, uint32 flags,
 		.Add(fTitle)
 		.Add(fDetail)
 		.AddGlue()
-		.Add(fCompressionMF)
+		.AddGroup(B_HORIZONTAL)
+			.Add(fCompressionMF)
+			.AddGlue()
+			.End()
 		.AddGlue()
 		.Add(fLibTIFF[0])
 		.Add(fLibTIFF[1])
@@ -156,7 +159,6 @@ void
 TIFFView::AllAttached()
 {
 	fCompressionMF->Menu()->SetTargetForItems(this);
-	fCompressionMF->ResizeToPreferred();
 }
 
 
