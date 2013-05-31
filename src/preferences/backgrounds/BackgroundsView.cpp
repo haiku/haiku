@@ -164,7 +164,8 @@ BackgroundsView::BackgroundsView()
 	fImageMenu->AddItem(new BMenuItem(B_TRANSLATE("Other" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgOtherImage)));
 
-	BMenuField* imageMenuField = new BMenuField(NULL, fImageMenu);
+	BMenuField* imageMenuField = new BMenuField("image",
+		B_TRANSLATE("Image:"), fImageMenu);
 	imageMenuField->SetAlignment(B_ALIGN_RIGHT);
 	imageMenuField->ResizeToPreferred();
 
@@ -178,7 +179,8 @@ BackgroundsView::BackgroundsView()
 	fPlacementMenu->AddItem(new BMenuItem(B_TRANSLATE("Tile"),
 		new BMessage(kMsgTilePlacement)));
 
-	BMenuField* placementMenuField = new BMenuField(NULL, fPlacementMenu);
+	BMenuField* placementMenuField = new BMenuField("placement",
+		B_TRANSLATE("Placement:"), fPlacementMenu);
 	placementMenuField->SetAlignment(B_ALIGN_RIGHT);
 
 	fIconLabelOutline = new BCheckBox(B_TRANSLATE("Icon label outline"),
@@ -188,33 +190,17 @@ BackgroundsView::BackgroundsView()
 	fPicker = new BColorControl(BPoint(0, 0), B_CELLS_32x8, 7.0, "Picker",
 		new BMessage(kMsgUpdateColor));
 
-	BStringView* imageStringView =
-		new BStringView(NULL, B_TRANSLATE("Image:"));
-	BStringView* placementStringView =
-		new BStringView(NULL, B_TRANSLATE("Placement:"));
-
-	imageStringView->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
-		B_ALIGN_NO_VERTICAL));
-	placementStringView->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
-		B_ALIGN_NO_VERTICAL));
-
-	view = BLayoutBuilder::Group<>()
-		.AddGroup(B_VERTICAL, 10)
-			.AddGroup(B_VERTICAL, 10)
-				.AddGrid(10, 10)
-					.Add(imageStringView, 0, 0)
-					.Add(placementStringView, 0, 1)
-					.Add(imageMenuField, 1, 0)
-					.Add(placementMenuField, 1, 1)
-					.End()
-				.Add(fIconLabelOutline)
-				.End()
-			.Add(fPicker)
-			.SetInsets(10, 10, 10, 10)
+	rightbox->AddChild(BLayoutBuilder::Group<>(B_VERTICAL, B_USE_DEFAULT_SPACING)
+		.AddGrid(B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING)
+			.Add(imageMenuField->CreateLabelLayoutItem(), 0, 0)
+			.Add(imageMenuField->CreateMenuBarLayoutItem(), 1, 0)
+			.Add(placementMenuField->CreateLabelLayoutItem(), 0, 1)
+			.Add(placementMenuField->CreateMenuBarLayoutItem(), 1, 1)
+			.Add(fIconLabelOutline, 1, 2)
 			.End()
-		.View();
-
-	rightbox->AddChild(view);
+		.Add(fPicker)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.View());
 
 	fRevert = new BButton(B_TRANSLATE("Revert"),
 		new BMessage(kMsgRevertSettings));
