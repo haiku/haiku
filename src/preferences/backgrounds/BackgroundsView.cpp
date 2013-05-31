@@ -103,7 +103,7 @@ BackgroundsView::BackgroundsView()
 		}
 	}
 
-	BView* view = BLayoutBuilder::Group<>()
+	previewBox->AddChild(BLayoutBuilder::Group<>()
 		.AddGlue()
 		.AddGroup(B_VERTICAL, be_control_look->DefaultItemSpacing() * 2)
 			.AddGroup(B_HORIZONTAL, 0)
@@ -129,9 +129,7 @@ BackgroundsView::BackgroundsView()
 			.SetInsets(B_USE_DEFAULT_SPACING)
 			.End()
 		.AddGlue()
-		.View();
-
-	previewBox->AddChild(view);
+		.View());
 
 	BBox* rightbox = new BBox("rightbox");
 
@@ -211,7 +209,7 @@ BackgroundsView::BackgroundsView()
 	fApply->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
 		B_ALIGN_NO_VERTICAL));
 
-	view = BLayoutBuilder::Group<>()
+	AddChild(BLayoutBuilder::Group<>()
 		.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING)
 			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 				.Add(previewBox)
@@ -223,9 +221,7 @@ BackgroundsView::BackgroundsView()
 				.End()
 			.SetInsets(B_USE_DEFAULT_SPACING)
 			.End()
-		.View();
-
-	AddChild(view);
+		.View());
 
 	fApply->MakeDefault(true);
 }
