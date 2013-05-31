@@ -130,7 +130,10 @@ SGIView::SGIView(const char* name, uint32 flags, TranslatorSettings* settings)
 		.SetInsets(padding)
 		.Add(titleView)
 		.Add(detailView)
-		.Add(fCompressionMF)
+		.AddGroup(B_HORIZONTAL)
+			.Add(fCompressionMF)
+			.AddGlue()
+			.End()
 		.Add(infoView)
 		.AddGlue();
 
@@ -170,7 +173,6 @@ SGIView::MessageReceived(BMessage* message)
 				fSettings->SetGetInt32(SGI_SETTING_COMPRESSION, &value);
 				fSettings->SaveSettings();
 			}
-			fCompressionMF->ResizeToPreferred();
 			break;
 		}
 		default:
