@@ -736,6 +736,7 @@ TeamDebugger::MessageReceived(BMessage* message)
 			if (fCommandLineArgc == 0)
 				break;
 
+			_SaveSettings();
 			fListener->TeamDebuggerRestartRequested(this);
 			break;
 		}
@@ -1270,6 +1271,8 @@ bool
 TeamDebugger::_HandleTeamDeleted(TeamDeletedEvent* event)
 {
 	char message[64];
+	fDebuggerInterface->Close(false);
+
 	snprintf(message, sizeof(message), "Team %" B_PRId32 " has terminated. ",
 		event->Team());
 
