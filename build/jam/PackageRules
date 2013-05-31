@@ -334,14 +334,16 @@ rule BuildHaikuPackage package : packageInfo
 	# create the other scripts
 	local makeDirsScript = <$(grist)>haiku.package-make-dirs ;
 	local copyFilesScript = <$(grist)>haiku.package-copy-files ;
+	local extractFilesScript = <$(grist)>haiku.package-extract-files ;
 
 	MakeLocate $(makeDirsScript) $(copyFilesScript) : $(scriptDir) ;
 
 	CreateContainerMakeDirectoriesScript $(package) : $(makeDirsScript) ;
 	CreateContainerCopyFilesScript $(package) : $(copyFilesScript) ;
+	CreateContainerExtractFilesScript $(package) : $(extractFilesScript) ;
 
 	local scripts = $(initVariablesScript) $(makeDirsScript)
-		$(copyFilesScript) ;
+		$(copyFilesScript) $(extractFilesScript) ;
 
 	# call the build actions
 	local mainScript = build_haiku_package ;

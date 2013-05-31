@@ -56,6 +56,51 @@ rm=$rmAttrs
 mkindex=mkindex
 
 
+extractFile()
+{
+	# extractFile <archive> <directory> <extractedSubDir> <stripDebugSymbols>
+	archiveFile=$1
+	targetExtractedDir=$2
+	extractedSubDir=$3
+	# Ignore stripDebugSymbols. It's not relevant here, since executables and
+	# libraries shouldn't come from zip files or other archives anymore.
+
+	extractDir=$tmpDir/extract
+	$rmAttrs -rf "$extractDir"
+	mkdir -p "$extractDir"
+
+	case "$archiveFile" in
+		*.zip)
+			echo "Extracting $archiveFile ..."
+			$unzip -q -d "$extractDir" "$archiveFile"
+			;;
+		*.tgz|*.tar.gz)
+			echo "Extracting $archiveFile ..."
+			tar -C "$extractDir" -xf "$archiveFile"
+			;;
+		*.hpkg)
+			echo "Extracting $archiveFile ..."
+			if [ -n "$extractedSubDir" ]; then
+				$package extract -C "$extractDir" "$archiveFile" \
+					"$extractedSubDir"
+			else
+				$package extract -C "$extractDir" "$archiveFile"
+			fi
+			;;
+		*)
+			echo "Unhandled archive extension in build_haiku_image" \
+				"extractFile()"
+			exit 1
+			;;
+	esac
+
+	$cp -r "${sPrefix}$extractDir/$extractedSubDir/." \
+		"${tPrefix}$targetExtractedDir"
+
+	$rmAttrs -rf "$extractDir"
+}
+
+
 # execute the scripts preparing the package contents
 while [ $# -gt 0 ]; do
 	. $1
