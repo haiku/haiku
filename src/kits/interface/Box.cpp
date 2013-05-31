@@ -158,7 +158,12 @@ BBox::Border() const
 float
 BBox::TopBorderOffset()
 {
-	return fLabelHeight / 2;
+	_ValidateLayoutData();
+
+	if (fLabel != NULL || fLabelView != NULL)
+		return fLayoutData->label_box.Height() / 2;
+
+	return 0;
 }
 
 
@@ -441,18 +446,6 @@ BBox::MakeFocus(bool focused)
 }
 
 
-void
-BBox::SetFont(const BFont* font, uint32 mask)
-{
-	BView::SetFont(font, mask);
-
-	// recalculate the label height based on the new font
-	font_height fontHeight;
-	GetFontHeight(&fontHeight);
-	fLabelHeight = ceilf(fontHeight.ascent + fontHeight.descent) + 1;
-}
-
-
 status_t
 BBox::GetSupportedSuites(BMessage* message)
 {
@@ -642,11 +635,6 @@ BBox::_InitObject(BMessage* archive)
 
 	if (flags != 0)
 		SetFont(&font, flags);
-	else {
-		font_height fontHeight;
-		GetFontHeight(&fontHeight);
-		fLabelHeight = ceilf(fontHeight.ascent + fontHeight.descent) + 1;
-	}
 
 	if (archive != NULL) {
 		const char* string;
@@ -813,9 +801,8 @@ BBox::_ValidateLayoutData()
 		return;
 
 	// compute the label box, width and height
-	bool hasLabel = true;
-	float labelHeight = 0;
-		// height of the label (pixel count)
+	bool label = true;
+	float labelHeight = 0;	// height of the label (pixel count)
 	if (fLabel) {
 		// leave 6 pixels of the frame, and have a gap of 4 pixels between
 		// the frame and the text on either side
@@ -823,15 +810,14 @@ BBox::_ValidateLayoutData()
 		GetFontHeight(&fontHeight);
 		fLayoutData->label_box.Set(6.0f, 0, 14.0f + StringWidth(fLabel),
 			ceilf(fontHeight.ascent));
-		labelHeight = fLabelHeight;
+		labelHeight = ceilf(fontHeight.ascent + fontHeight.descent) + 1;
 	} else if (fLabelView) {
 		// the label view is placed at (0, 10) at its preferred size
 		BSize size = fLabelView->PreferredSize();
 		fLayoutData->label_box.Set(10, 0, 10 + size.width, size.height);
 		labelHeight = size.height + 1;
 	} else {
-		labelHeight = fLabelHeight;
-		hasLabel = false;
+		label = false;
 	}
 
 	// border
@@ -848,8 +834,8 @@ BBox::_ValidateLayoutData()
 			break;
 	}
 
-	// Grow the top inset by the label height
-	if (labelHeight > fLayoutData->insets.top)
+	// if there's a label, the top inset will be dictated by the label
+	if (label && labelHeight > fLayoutData->insets.top)
 		fLayoutData->insets.top = labelHeight;
 
 	// total number of pixel the border adds
@@ -857,8 +843,11 @@ BBox::_ValidateLayoutData()
 	float addHeight = fLayoutData->insets.top + fLayoutData->insets.bottom;
 
 	// compute the minimal width induced by the label
-	float minWidth = !hasLabel ? addWidth - 1
-		: fLayoutData->label_box.right + fLayoutData->insets.right;
+	float minWidth;
+	if (label)
+		minWidth = fLayoutData->label_box.right + fLayoutData->insets.right;
+	else
+		minWidth = addWidth - 1;
 
 	// finally consider the child constraints, if we shall support layout
 	BView* child = _Child();
