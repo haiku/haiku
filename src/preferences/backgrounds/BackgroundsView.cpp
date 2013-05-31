@@ -167,7 +167,6 @@ BackgroundsView::BackgroundsView()
 	BMenuField* imageMenuField = new BMenuField("image",
 		B_TRANSLATE("Image:"), fImageMenu);
 	imageMenuField->SetAlignment(B_ALIGN_RIGHT);
-	imageMenuField->ResizeToPreferred();
 
 	fPlacementMenu = new BPopUpMenu(B_TRANSLATE("pick one"));
 	fPlacementMenu->AddItem(new BMenuItem(B_TRANSLATE("Manual"),
