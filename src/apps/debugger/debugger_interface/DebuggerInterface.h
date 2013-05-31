@@ -38,6 +38,9 @@ public:
 			status_t			Init();
 			void				Close(bool killTeam);
 
+			bool				Connected() const
+									{ return fNubPort >= 0; }
+
 			Architecture*		GetArchitecture() const
 									{ return fArchitecture; }
 

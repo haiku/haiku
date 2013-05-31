@@ -316,6 +316,9 @@ DebuggerInterface::Close(bool killTeam)
 
 	if (fDebuggerPort >= 0)
 		delete_port(fDebuggerPort);
+
+	fNubPort = -1;
+	fDebuggerPort = -1;
 }
 
 
