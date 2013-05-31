@@ -505,18 +505,17 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 		new BMessage(BUTTON_REVERT_MSG));
 	fRevertButton->SetEnabled(false);
 
-	BLayoutBuilder::Group<>(this, B_VERTICAL, 10.0)
-		.SetInsets(10, 10, 10, 10)
-		.AddGroup(B_HORIZONTAL, 10.0)
-			.AddGroup(B_VERTICAL)
-				.AddStrut(floor(controlsBox->TopBorderOffset() / 16) - 1)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_DEFAULT_SPACING)
+		.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING)
+			.AddGroup(B_HORIZONTAL)
 				.Add(screenBox)
-			.End()
-			.Add(controlsBox)
-		.End()
-		.AddGroup(B_HORIZONTAL, 10.0)
-			.Add(fRevertButton)
-			.AddGlue();
+				.Add(controlsBox)
+				.End()
+			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
+				.Add(fRevertButton)
+				.AddGlue()
+				.End()
+			.SetInsets(B_USE_DEFAULT_SPACING);
 
 	_UpdateControls();
 	_UpdateMonitor();
