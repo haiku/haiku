@@ -234,8 +234,7 @@ BackgroundsView::BackgroundsView()
 				.Add(fRevert)
 				.Add(fApply)
 				.End()
-			.SetInsets(B_USE_DEFAULT_SPACING, 0, B_USE_DEFAULT_SPACING,
-				B_USE_DEFAULT_SPACING)
+			.SetInsets(B_USE_DEFAULT_SPACING)
 			.End()
 		.View();
 

@@ -122,7 +122,8 @@ FontSelectionView::FontSelectionView(const char* name,
 	fPreviewBox = new BBox("preview box", B_WILL_DRAW | B_FRAME_EVENTS);
 	fPreviewBox->AddChild(BGroupLayoutBuilder(B_HORIZONTAL)
 		.Add(fPreviewText)
-		.SetInsets(B_USE_SMALL_SPACING, 0, B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
+		.SetInsets(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING,
+			B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
 		.TopView()
 	);
 }
