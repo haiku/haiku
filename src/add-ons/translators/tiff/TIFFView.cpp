@@ -120,8 +120,7 @@ TIFFView::TIFFView(const char* name, uint32 flags,
 	// TODO ? - strip encoding is not implemented in libTIFF for this compression
 	//	add_menu_item(menu, COMPRESSION_JP2000, "JPEG2000", currentCompression);
 
-	fCompressionMF = new BMenuField("compression",
-		B_TRANSLATE("Use compression:"), menu);
+	fCompressionMF = new BMenuField(B_TRANSLATE("Use compression:"), menu);
 
 	// Build the layout
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 7)
@@ -159,6 +158,7 @@ TIFFView::AllAttached()
 	fCompressionMF->Menu()->SetTargetForItems(this);
 	fCompressionMF->SetDivider(
 		fCompressionMF->StringWidth(fCompressionMF->Label()) + 3);
+	fCompressionMF->ResizeToPreferred();
 }
 
 
@@ -172,22 +172,9 @@ TIFFView::MessageReceived(BMessage* message)
 				fSettings->SetGetInt32(TIFF_SETTING_COMPRESSION, &value);
 				fSettings->SaveSettings();
 			}
-			fCompressionMF->ResizeToPreferred();
 			break;
 		}
 		default:
 			BView::MessageReceived(message);
-	}
-}
-
-
-void
-TIFFView::WindowActivated(bool active)
-{
-	static bool firstRun = true;
-
-	if (firstRun) {
-		firstRun = false;
-		fCompressionMF->ResizeToPreferred();
 	}
 }
