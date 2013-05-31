@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -24,6 +24,25 @@ UnpackingDirectory::UnpackingDirectory(ino_t id)
 
 UnpackingDirectory::~UnpackingDirectory()
 {
+}
+
+
+status_t
+UnpackingDirectory::VFSInit(dev_t deviceID)
+{
+	status_t error = NodeInitVFS(deviceID, fID, fPackageDirectories.Head());
+	if (error == B_OK)
+		Directory::VFSInit(deviceID);
+
+	return error;
+}
+
+
+void
+UnpackingDirectory::VFSUninit()
+{
+	NodeUninitVFS(fPackageDirectories.Head(), fFlags);
+	Directory::VFSUninit();
 }
 
 
@@ -80,7 +99,7 @@ UnpackingDirectory::GetNode()
 
 
 status_t
-UnpackingDirectory::AddPackageNode(PackageNode* packageNode)
+UnpackingDirectory::AddPackageNode(PackageNode* packageNode, dev_t deviceID)
 {
 	if (!S_ISDIR(packageNode->Mode()))
 		return B_BAD_VALUE;
@@ -92,9 +111,10 @@ UnpackingDirectory::AddPackageNode(PackageNode* packageNode)
 	bool isNewest = other == NULL
 		|| packageDirectory->ModifiedTime() > other->ModifiedTime();
 
-	if (isNewest)
+	if (isNewest) {
 		fPackageDirectories.Insert(other, packageDirectory);
-	else
+		NodeReinitVFS(deviceID, fID, packageDirectory, other, fFlags);
+	} else
 		fPackageDirectories.Add(packageDirectory);
 
 	return B_OK;
@@ -102,7 +122,7 @@ UnpackingDirectory::AddPackageNode(PackageNode* packageNode)
 
 
 void
-UnpackingDirectory::RemovePackageNode(PackageNode* packageNode)
+UnpackingDirectory::RemovePackageNode(PackageNode* packageNode, dev_t deviceID)
 {
 	bool isNewest = packageNode == fPackageDirectories.Head();
 	fPackageDirectories.Remove(dynamic_cast<PackageDirectory*>(packageNode));
@@ -121,6 +141,7 @@ UnpackingDirectory::RemovePackageNode(PackageNode* packageNode)
 
 		fPackageDirectories.Remove(newestNode);
 		fPackageDirectories.Insert(fPackageDirectories.Head(), newestNode);
+		NodeReinitVFS(deviceID, fID, newestNode, packageNode, fFlags);
 	}
 }
 
@@ -164,6 +185,9 @@ UnpackingDirectory::PrepareForRemoval()
 status_t
 UnpackingDirectory::OpenAttributeDirectory(AttributeDirectoryCookie*& _cookie)
 {
+	if (HasVFSInitError())
+		return B_ERROR;
+
 	return UnpackingAttributeDirectoryCookie::Open(fPackageDirectories.Head(),
 		_cookie);
 }
@@ -173,6 +197,9 @@ status_t
 UnpackingDirectory::OpenAttribute(const StringKey& name, int openMode,
 	AttributeCookie*& _cookie)
 {
+	if (HasVFSInitError())
+		return B_ERROR;
+
 	return UnpackingAttributeCookie::Open(fPackageDirectories.Head(), name,
 		openMode, _cookie);
 }

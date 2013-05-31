@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef NODE_H
@@ -27,10 +27,11 @@ class Directory;
 class PackageNode;
 
 
-// node flags
+// internal node flags
 enum {
-	NODE_FLAG_KNOWN_TO_VFS	= 0x01
-		// internal flag
+	NODE_FLAG_KNOWN_TO_VFS		= 0x01,
+	NODE_FLAG_VFS_INIT_ERROR	= 0x02,
+		// used by subclasses
 };
 
 
@@ -61,6 +62,7 @@ public:
 	virtual	void				VFSUninit();
 									// base class version must be called
 	inline	bool				IsKnownToVFS() const;
+	inline	bool				HasVFSInitError() const;
 
 			void				SetID(ino_t id);
 			void				SetParent(Directory* parent);
@@ -130,6 +132,13 @@ bool
 Node::IsKnownToVFS() const
 {
 	return (fFlags & NODE_FLAG_KNOWN_TO_VFS) != 0;
+}
+
+
+bool
+Node::HasVFSInitError() const
+{
+	return (fFlags & NODE_FLAG_VFS_INIT_ERROR) != 0;
 }
 
 

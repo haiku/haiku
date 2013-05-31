@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -44,6 +44,11 @@ PackageNode::Init(PackageDirectory* parent, const String& name)
 status_t
 PackageNode::VFSInit(dev_t deviceID, ino_t nodeID)
 {
+	// open the package
+	int fd = fPackage->Open();
+	if (fd < 0)
+		RETURN_ERROR(fd);
+
 	fPackage->AcquireReference();
 	return B_OK;
 }
@@ -52,6 +57,7 @@ PackageNode::VFSInit(dev_t deviceID, ino_t nodeID)
 void
 PackageNode::VFSUninit()
 {
+	fPackage->Close();
 	fPackage->ReleaseReference();
 }
 

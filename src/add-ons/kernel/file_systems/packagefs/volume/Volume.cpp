@@ -1192,7 +1192,7 @@ Volume::_AddPackageNode(Directory* directory, PackageNode* packageNode,
 		newNode = true;
 	}
 
-	status_t error = unpackingNode->AddPackageNode(packageNode);
+	status_t error = unpackingNode->AddPackageNode(packageNode, ID());
 	if (error != B_OK) {
 		// Remove the node, if created before. If the node was created to
 		// replace the previous node, send out notifications instead.
@@ -1274,7 +1274,7 @@ Volume::_RemovePackageNode(Directory* directory, PackageNode* packageNode,
 		// with a completely new one and let the old one die. This is necessary
 		// to avoid surprises for clients that have opened/mapped the node.
 		if (S_ISDIR(packageNode->Mode())) {
-			unpackingNode->RemovePackageNode(packageNode);
+			unpackingNode->RemovePackageNode(packageNode, ID());
 			_NotifyNodeChanged(node, kAllStatFields,
 				OldUnpackingNodeAttributes(headPackageNode));
 		} else {
@@ -1284,7 +1284,7 @@ Volume::_RemovePackageNode(Directory* directory, PackageNode* packageNode,
 				fNextNodeID++, newUnpackingNode);
 			if (error == B_OK) {
 				// remove the package node
-				newUnpackingNode->RemovePackageNode(packageNode);
+				newUnpackingNode->RemovePackageNode(packageNode, ID());
 
 				// remove the old node
 				_NotifyNodeRemoved(node);
@@ -1311,7 +1311,7 @@ Volume::_RemovePackageNode(Directory* directory, PackageNode* packageNode,
 	} else {
 		// The package node to remove is not the head of the node. This change
 		// doesn't have any visible effect.
-		unpackingNode->RemovePackageNode(packageNode);
+		unpackingNode->RemovePackageNode(packageNode, ID());
 	}
 
 	if (!notify)

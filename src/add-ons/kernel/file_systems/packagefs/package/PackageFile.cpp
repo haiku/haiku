@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -150,7 +150,8 @@ PackageFile::VFSInit(dev_t deviceID, ino_t nodeID)
 	MethodDeleter<PackageNode> baseClassUninit(this,
 		&PackageNode::NonVirtualVFSUninit);
 
-	// open the package
+	// open the package -- that's already done by PackageNode::VFSInit(), so it
+	// shouldn't fail here. We only need to do it again, since we need the FD.
 	int fd = fPackage->Open();
 	if (fd < 0)
 		RETURN_ERROR(fd);
@@ -168,7 +169,6 @@ PackageFile::VFSInit(dev_t deviceID, ino_t nodeID)
 		return error;
 	}
 
-	packageCloser.Detach();
 	baseClassUninit.Detach();
 	return B_OK;
 }
@@ -178,7 +178,6 @@ void
 PackageFile::VFSUninit()
 {
 	if (fDataAccessor != NULL) {
-		fPackage->Close();
 		delete fDataAccessor;
 		fDataAccessor = NULL;
 	}

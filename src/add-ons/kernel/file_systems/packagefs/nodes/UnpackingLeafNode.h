@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef LEAF_NODE_H
@@ -27,8 +27,10 @@ public:
 
 	virtual	Node*				GetNode();
 
-	virtual	status_t			AddPackageNode(PackageNode* packageNode);
-	virtual	void				RemovePackageNode(PackageNode* packageNode);
+	virtual	status_t			AddPackageNode(PackageNode* packageNode,
+									dev_t deviceID);
+	virtual	void				RemovePackageNode(PackageNode* packageNode,
+									dev_t deviceID);
 
 	virtual	PackageNode*		GetPackageNode();
 	virtual	bool				IsOnlyPackageNode(PackageNode* node) const;

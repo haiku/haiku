@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef UNPACKING_DIRECTORY_H
@@ -16,6 +16,9 @@ public:
 								UnpackingDirectory(ino_t id);
 	virtual						~UnpackingDirectory();
 
+	virtual	status_t			VFSInit(dev_t deviceID);
+	virtual	void				VFSUninit();
+
 	virtual	mode_t				Mode() const;
 	virtual	uid_t				UserID() const;
 	virtual	gid_t				GroupID() const;
@@ -24,8 +27,10 @@ public:
 
 	virtual	Node*				GetNode();
 
-	virtual	status_t			AddPackageNode(PackageNode* packageNode);
-	virtual	void				RemovePackageNode(PackageNode* packageNode);
+	virtual	status_t			AddPackageNode(PackageNode* packageNode,
+									dev_t deviceID);
+	virtual	void				RemovePackageNode(PackageNode* packageNode,
+									dev_t deviceID);
 
 	virtual	PackageNode*		GetPackageNode();
 	virtual	bool				IsOnlyPackageNode(PackageNode* node) const;

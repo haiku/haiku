@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -34,10 +34,7 @@ UnpackingLeafNode::~UnpackingLeafNode()
 status_t
 UnpackingLeafNode::VFSInit(dev_t deviceID)
 {
-	status_t error = B_OK;
-	if (PackageLeafNode* packageNode = _ActivePackageNode())
-		error = packageNode->VFSInit(deviceID, fID);
-
+	status_t error = NodeInitVFS(deviceID, fID, _ActivePackageNode());
 	if (error == B_OK)
 		Node::VFSInit(deviceID);
 
@@ -48,9 +45,7 @@ UnpackingLeafNode::VFSInit(dev_t deviceID)
 void
 UnpackingLeafNode::VFSUninit()
 {
-	if (PackageLeafNode* packageNode = _ActivePackageNode())
-		packageNode->VFSUninit();
-
+	NodeUninitVFS(_ActivePackageNode(), fFlags);
 	Node::VFSUninit();
 }
 
@@ -110,7 +105,7 @@ UnpackingLeafNode::GetNode()
 
 
 status_t
-UnpackingLeafNode::AddPackageNode(PackageNode* packageNode)
+UnpackingLeafNode::AddPackageNode(PackageNode* packageNode, dev_t deviceID)
 {
 	ASSERT(fFinalPackageNode == NULL);
 
@@ -126,6 +121,7 @@ UnpackingLeafNode::AddPackageNode(PackageNode* packageNode)
 
 	if (isNewest) {
 		fPackageNodes.Add(packageLeafNode);
+		NodeReinitVFS(deviceID, fID, packageLeafNode, headNode, fFlags);
 	} else {
 		// add after the head
 		fPackageNodes.RemoveHead();
@@ -138,7 +134,7 @@ UnpackingLeafNode::AddPackageNode(PackageNode* packageNode)
 
 
 void
-UnpackingLeafNode::RemovePackageNode(PackageNode* packageNode)
+UnpackingLeafNode::RemovePackageNode(PackageNode* packageNode, dev_t deviceID)
 {
 	ASSERT(fFinalPackageNode == NULL);
 
@@ -160,6 +156,7 @@ UnpackingLeafNode::RemovePackageNode(PackageNode* packageNode)
 		// re-add the newest node to the head
 		fPackageNodes.Remove(newestNode);
 		fPackageNodes.Add(newestNode);
+		NodeReinitVFS(deviceID, fID, newestNode, packageNode, fFlags);
 	}
 }
 
@@ -238,6 +235,9 @@ UnpackingLeafNode::CloneTransferPackageNodes(ino_t id, UnpackingNode*& _newNode)
 status_t
 UnpackingLeafNode::Read(off_t offset, void* buffer, size_t* bufferSize)
 {
+	if (HasVFSInitError())
+		return B_ERROR;
+
 	if (PackageLeafNode* packageNode = _ActivePackageNode())
 		return packageNode->Read(offset, buffer, bufferSize);
 	return B_ERROR;
@@ -247,6 +247,9 @@ UnpackingLeafNode::Read(off_t offset, void* buffer, size_t* bufferSize)
 status_t
 UnpackingLeafNode::Read(io_request* request)
 {
+	if (HasVFSInitError())
+		return B_ERROR;
+
 	if (PackageLeafNode* packageNode = _ActivePackageNode())
 		return packageNode->Read(request);
 	return EBADF;
@@ -256,6 +259,9 @@ UnpackingLeafNode::Read(io_request* request)
 status_t
 UnpackingLeafNode::ReadSymlink(void* buffer, size_t* bufferSize)
 {
+	if (HasVFSInitError())
+		return B_ERROR;
+
 	PackageLeafNode* packageNode = _ActivePackageNode();
 	if (packageNode == NULL)
 		return B_BAD_VALUE;
@@ -277,6 +283,9 @@ UnpackingLeafNode::ReadSymlink(void* buffer, size_t* bufferSize)
 status_t
 UnpackingLeafNode::OpenAttributeDirectory(AttributeDirectoryCookie*& _cookie)
 {
+	if (HasVFSInitError())
+		return B_ERROR;
+
 	return UnpackingAttributeDirectoryCookie::Open(_ActivePackageNode(),
 		_cookie);
 }
@@ -286,6 +295,9 @@ status_t
 UnpackingLeafNode::OpenAttribute(const StringKey& name, int openMode,
 	AttributeCookie*& _cookie)
 {
+	if (HasVFSInitError())
+		return B_ERROR;
+
 	return UnpackingAttributeCookie::Open(_ActivePackageNode(), name, openMode,
 		_cookie);
 }
