@@ -84,7 +84,8 @@ BColorControl::_InitData(color_control_layout layout, float size,
 		//		so we take the main_screen colorspace at startup
 	fColumns = layout;
 	fRows = 256 / fColumns;
-	fCellSize = ceil(max_c(kMinCellSize, size));
+
+	_SetCellSize(size);
 
 	fSelectedPaletteColorIndex = -1;
 	fPreviousSelectedPaletteColorIndex = -1;
@@ -611,6 +612,13 @@ BColorControl::_RampFrame(uint8 rampIndex) const
 }
 
 
+void
+BColorControl::_SetCellSize(float size)
+{
+	fCellSize = ceilf(max_c(kMinCellSize, size));
+}
+
+
 BRect
 BColorControl::_PaletteSelectorFrame(uint8 colorIndex) const
 {
@@ -635,9 +643,9 @@ BColorControl::_InitOffscreen()
 
 
 void
-BColorControl::SetCellSize(float cellSide)
+BColorControl::SetCellSize(float size)
 {
-	fCellSize = ceil(max_c(kMinCellSize, cellSide));
+	_SetCellSize(size);
 	_LayoutView();
 	ResizeToPreferred();
 }

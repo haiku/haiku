@@ -102,7 +102,8 @@ private:
 									uint8 shade) const;
 			BRect				_PaletteSelectorFrame(uint8 colorIndex) const;
 			BRect				_RampFrame(uint8 rampIndex) const;
-		
+			void				_SetCellSize(float size);
+
 	private:
 			BRect				fPaletteFrame;
 			int16				fSelectedPaletteColorIndex;
