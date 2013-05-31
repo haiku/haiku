@@ -63,6 +63,7 @@ class BBox : public BView {
 		virtual	void		ResizeToPreferred();
 		virtual	void		GetPreferredSize(float* _width, float* _height);
 		virtual	void		MakeFocus(bool focused = true);
+		virtual	void		SetFont(const BFont* font, uint32 mask = B_FONT_ALL);
 		virtual	status_t	GetSupportedSuites(BMessage* message);
 
 		virtual	status_t	Perform(perform_code d, void* arg);
@@ -96,6 +97,7 @@ class BBox : public BView {
 		border_style		fStyle;
 		BView*				fLabelView;
 		LayoutData*			fLayoutData;
+		float				fLabelHeight;
 };
 
 #endif	// _BOX_H
