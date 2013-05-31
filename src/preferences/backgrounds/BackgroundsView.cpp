@@ -1,11 +1,12 @@
 /*
- * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2013 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Jerome Duval (jerome.duval@free.fr)
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Jerome Duval, jerome.duval@free.fr
  *		Jonas Sundström, jonas@kirilla.se
+ *		John Scipione, jscipione@gmail.com
  */
 
 
