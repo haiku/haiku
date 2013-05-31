@@ -494,8 +494,13 @@ BreakpointManager::_UpdateBreakpointInstallation(Breakpoint* breakpoint)
 
 	if (shouldBeInstalled) {
 		// install
-		status_t error = fDebuggerInterface->InstallBreakpoint(
-			breakpoint->Address());
+		status_t error = B_OK;
+		// if we're not actually connected to a team, silently
+		// allow setting the breakpoint so it's saved to settings
+		// for when we do connect/have the team in the debugger.
+		if (fDebuggerInterface->Connected())
+			fDebuggerInterface->InstallBreakpoint(breakpoint->Address());
+
 		if (error != B_OK)
 			return error;
 
