@@ -38,6 +38,8 @@ eval "$addBuildCompatibilityLibDir"
 
 
 # make a clean contents dir
+packageName=`basename "$packagePath"`
+echo "$packageName: Removing and re-creating package contents dir ..."
 contentsDir="$tmpDir/contents"
 $rmAttrs -rf "$contentsDir"
 mkdir -p "$contentsDir"
@@ -71,15 +73,12 @@ extractFile()
 
 	case "$archiveFile" in
 		*.zip)
-			echo "Extracting $archiveFile ..."
 			$unzip -q -d "$extractDir" "$archiveFile"
 			;;
 		*.tgz|*.tar.gz)
-			echo "Extracting $archiveFile ..."
 			tar -C "$extractDir" -xf "$archiveFile"
 			;;
 		*.hpkg)
-			echo "Extracting $archiveFile ..."
 			if [ -n "$extractedSubDir" ]; then
 				$package extract -C "$extractDir" "$archiveFile" \
 					"$extractedSubDir"
@@ -102,6 +101,7 @@ extractFile()
 
 
 # execute the scripts preparing the package contents
+echo "$packageName: Collecting package contents ..."
 while [ $# -gt 0 ]; do
 	. $1
 	shift
@@ -109,15 +109,18 @@ done
 
 
 # mimeset the whole package content
+echo "$packageName: mimeset'ing package contents ..."
 $mimeset --mimedb "$mimeDB" "$contentsDir"
 
 
 # create the package
 if [ ! $updateOnly ]; then
+	echo "$packageName: Creating the package ..."
 	rm -f "$packagePath"
 	$package create -q "-$compressionLevel" -i "$packageInfoPath" \
 		-C "$contentsDir" "$packagePath"
 else
+	echo "$packageName: Updating the package ..."
 	$package add -q -f "-$compressionLevel" -i "$packageInfoPath" \
 		-C "$contentsDir" "$packagePath" .
 fi
