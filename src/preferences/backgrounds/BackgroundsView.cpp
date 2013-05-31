@@ -17,6 +17,7 @@
 
 #include <Bitmap.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Cursor.h>
 #include <Debug.h>
 #include <File.h>
@@ -72,8 +73,8 @@ BackgroundsView::BackgroundsView()
 {
 	SetBorder(B_NO_BORDER);
 
-	fPreviewBox = new BBox("preview");
-	fPreviewBox->SetLabel(B_TRANSLATE("Preview"));
+	BBox* previewBox = new BBox("preview");
+	previewBox->SetLabel(B_TRANSLATE("Preview"));
 
 	fPreview = new Preview();
 
@@ -103,7 +104,7 @@ BackgroundsView::BackgroundsView()
 
 	BView* view = BLayoutBuilder::Group<>()
 		.AddGlue()
-		.AddGroup(B_VERTICAL, 20)
+		.AddGroup(B_VERTICAL, be_control_look->DefaultItemSpacing() * 2)
 			.AddGroup(B_HORIZONTAL, 0)
 				.AddGlue()
 				.AddGrid(0, 0, 1)
@@ -119,17 +120,17 @@ BackgroundsView::BackgroundsView()
 					.End()
 				.AddGlue()
 				.End()
-			.AddGroup(B_HORIZONTAL, 10)
+			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 				.Add(fXPlacementText)
 				.Add(fYPlacementText)
 				.End()
 			.AddGlue()
-			.SetInsets(10, 10, 10, 10)
+			.SetInsets(B_USE_DEFAULT_SPACING)
 			.End()
 		.AddGlue()
 		.View();
 
-	fPreviewBox->AddChild(view);
+	previewBox->AddChild(view);
 
 	BBox* rightbox = new BBox("rightbox");
 
@@ -224,16 +225,17 @@ BackgroundsView::BackgroundsView()
 		B_ALIGN_NO_VERTICAL));
 
 	view = BLayoutBuilder::Group<>()
-		.AddGroup(B_VERTICAL, 10)
-			.AddGroup(B_HORIZONTAL, 10)
-				.Add(fPreviewBox)
+		.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING)
+			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
+				.Add(previewBox)
 				.Add(rightbox)
 				.End()
-			.AddGroup(B_HORIZONTAL, 0)
+			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 				.Add(fRevert)
 				.Add(fApply)
 				.End()
-			.SetInsets(10, 10, 10, 10)
+			.SetInsets(B_USE_DEFAULT_SPACING, 0, B_USE_DEFAULT_SPACING,
+				B_USE_DEFAULT_SPACING)
 			.End()
 		.View();
 

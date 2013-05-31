@@ -154,7 +154,6 @@ protected:
 			BTextControl*		fXPlacementText;
 			BTextControl*		fYPlacementText;
 			Preview*			fPreview;
-			BBox*				fPreviewBox;
 			BFilePanel*			fFolderPanel;
 			ImageFilePanel*		fPanel;
 
