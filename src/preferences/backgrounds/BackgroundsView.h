@@ -1,10 +1,9 @@
 /*
- * Copyright 2002-2013 Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Jerome Duval, jerome.duval@free.fr
- *		John Scipione, jscipione@gmail.com
+ *		Jerome Duval (jerome.duval@free.fr)
  */
 #ifndef BACKGROUNDS_VIEW_H
 #define BACKGROUNDS_VIEW_H
@@ -19,7 +18,6 @@
 #include <Entry.h>
 #include <FilePanel.h>
 #include <Menu.h>
-#include <MenuField.h>
 #include <MenuItem.h>
 #include <Message.h>
 #include <Picture.h>
@@ -112,7 +110,6 @@ public:
 			void				RefsReceived(BMessage* msg);
 
 			void				SaveSettings();
-			void				WindowActivated(bool active);
 			void				WorkspaceActivated(uint32 oldWorkspaces,
 									bool active);
 			int32				AddImage(BPath path);
@@ -145,12 +142,10 @@ protected:
 			BColorControl*		fPicker;
 			BButton*			fApply;
 			BButton*			fRevert;
-			BMenu*				fWorkspaceMenu;
-			BMenu*				fPlacementMenu;
-			BMenuField*			fPlacementMenuField;
-			BMenu*				fImageMenu;
-			BMenuField*			fImageMenuField;
 			BCheckBox*			fIconLabelOutline;
+			BMenu*				fPlacementMenu;
+			BMenu*				fImageMenu;
+			BMenu*				fWorkspaceMenu;
 			BTextControl*		fXPlacementText;
 			BTextControl*		fYPlacementText;
 			Preview*			fPreview;
