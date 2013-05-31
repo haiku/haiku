@@ -50,7 +50,6 @@ public:
 
 	virtual	void				AllAttached();
 	virtual	void				MessageReceived(BMessage* message);
-	virtual	void				WindowActivated(bool active);
 
 	enum {
 		MSG_COMPRESSION_CHANGED	= 'cmch',

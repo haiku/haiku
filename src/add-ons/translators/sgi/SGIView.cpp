@@ -95,7 +95,7 @@ SGIView::SGIView(const char* name, uint32 flags, TranslatorSettings* settings)
 
 	//add_menu_item(menu, SGI_COMP_ARLE, "Agressive RLE", currentCompression);
 
-	fCompressionMF = new BMenuField("compression",
+	fCompressionMF = new BMenuField("compression", 
 		B_TRANSLATE("Use compression:"), menu);
 
 	BAlignment labelAlignment(B_ALIGN_LEFT, B_ALIGN_NO_VERTICAL);
@@ -157,8 +157,6 @@ void
 SGIView::AllAttached()
 {
 	fCompressionMF->Menu()->SetTargetForItems(this);
-	fCompressionMF->SetDivider(
-		fCompressionMF->StringWidth(fCompressionMF->Label()) + 3);
 }
 
 
@@ -177,17 +175,5 @@ SGIView::MessageReceived(BMessage* message)
 		}
 		default:
 			BView::MessageReceived(message);
-	}
-}
-
-
-void
-SGIView::WindowActivated(bool active)
-{
-	static bool firstRun = true;
-
-	if (firstRun) {
-		firstRun = false;
-		fCompressionMF->ResizeToPreferred();
 	}
 }
