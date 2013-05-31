@@ -506,16 +506,18 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 	fRevertButton->SetEnabled(false);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_DEFAULT_SPACING)
-		.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING)
-			.AddGroup(B_HORIZONTAL)
+		.AddGroup(B_HORIZONTAL)
+			.AddGroup(B_VERTICAL, 0)
+				.AddStrut(floorf(controlsBox->TopBorderOffset()) - 1)
 				.Add(screenBox)
-				.Add(controlsBox)
 				.End()
-			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
-				.Add(fRevertButton)
-				.AddGlue()
-				.End()
-			.SetInsets(B_USE_DEFAULT_SPACING);
+			.Add(controlsBox)
+			.End()
+		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
+			.Add(fRevertButton)
+			.AddGlue()
+			.End()
+		.SetInsets(B_USE_DEFAULT_SPACING);
 
 	_UpdateControls();
 	_UpdateMonitor();
