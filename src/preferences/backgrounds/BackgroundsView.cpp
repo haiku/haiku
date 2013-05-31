@@ -318,10 +318,6 @@ BackgroundsView::MessageReceived(BMessage* msg)
 		}
 
 		case kMsgManualPlacement:
-			_UpdatePreview();
-			_UpdateButtons();
-			break;
-
 		case kMsgTilePlacement:
 		case kMsgScalePlacement:
 		case kMsgCenterPlacement:
