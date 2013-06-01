@@ -708,6 +708,7 @@ Equation<QueryPolicy>::Match(Entry* entry, Node* node,
 	// get a pointer to the attribute in question
 	union value<QueryPolicy> value;
 	uint8* buffer = (uint8*)&value;
+	const size_t bufferSize = sizeof(value);
 
 	// first, check if we are matching for a live query and use that value
 	if (attributeName != NULL && !strcmp(fAttribute, attributeName)) {
@@ -737,6 +738,7 @@ Equation<QueryPolicy>::Match(Entry* entry, Node* node,
 		type = B_INT32_TYPE;
 	} else {
 		// then for attributes
+		size = bufferSize;
 		if (QueryPolicy::NodeGetAttribute(node, fAttribute, buffer, &size,
 				&type) != B_OK) {
 			return MatchEmptyString();
