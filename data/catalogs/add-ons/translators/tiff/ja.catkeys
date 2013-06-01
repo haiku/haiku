@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-TIFFTranslator	237855326
+1	japanese	x-vnd.Haiku-TIFFTranslator	1624888114
 LZW	TIFFView		LZW
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: couldn't set directory\n
 TIFF image	TIFFTranslator		TIFF イメージ
@@ -13,4 +13,3 @@ TIFF Settings	TIFFMain		TIFF 設定
 identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: invalid document index\n
 ZIP (Deflate)	TIFFView		ZIP (Deflate)
 Version %d.%d.%d %s	TIFFView		バージョン %d.%d.%d %s
-Use Compression:	TIFFView		圧縮方法：

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-InterfacesAddOn	34473294
+1	polish	x-vnd.Haiku-InterfacesAddOn	603078848
 Interface	InterfaceWindow		Interfejs
 Configure…	InterfacesListView		Konfiguruj…
 Static	IntefaceAddressView		Statyczny
@@ -7,6 +7,7 @@ Link speed:	IntefaceHardwareView		Szybkość połączenia:
 The method for obtaining an IP address	IntefaceAddressView		Metoda uzyskania adresu IP
 Your gateway	IntefaceAddressView		Brama
 Received:	IntefaceHardwareView		Otrzymano:
+connected	IntefaceHardwareView		połączono
 Sent:	IntefaceHardwareView		Wysłano:
 Configure…	InterfacesAddOn		Konfiguruj…
 Mode:	IntefaceAddressView		Tryb:
