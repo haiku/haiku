@@ -141,7 +141,6 @@ CopyEngine::CopyFile(const BEntry& _source, const BEntry& _destination,
 	SemaphoreLocker lock(cancelSemaphore);
 	if (cancelSemaphore >= 0 && !lock.IsLocked()) {
 		// We are supposed to quit
-printf("CopyFile - cancled\n");
 		return B_CANCELED;
 	}
 
@@ -555,10 +554,6 @@ CopyEngine::_ShouldClobberFolder(const char* name, const struct stat& statInfo,
 			printf("clobbering '%s'.\n", name);
 			return true;
 		}
-//		if (strcmp("develop", name) == 0) {
-//			printf("clobbering '%s'.\n", name);
-//			return true;
-//		}
 	}
 	return false;
 }
@@ -621,5 +616,3 @@ CopyEngine::_WriteThread()
 			megaBytes / seconds);
 	}
 }
-
-
