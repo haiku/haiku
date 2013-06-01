@@ -5,8 +5,7 @@
  * Copyright 2003, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
-#define FUNCTION(x) .global x; .type x,@function; x
-#define LOCAL_FUNCTION(x) .type x,@function; x
+#include <asm_defs.h>
 
 /*	General exception handling concept:
 
