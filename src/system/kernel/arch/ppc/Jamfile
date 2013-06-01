@@ -14,6 +14,7 @@ KernelMergeObject kernel_arch_ppc.o :
 	arch_debug.cpp
 	arch_elf.cpp
 	arch_exceptions.S
+	arch_exceptions_44x.S
 	arch_int.cpp
 	arch_mmu.cpp
 	arch_platform.cpp
