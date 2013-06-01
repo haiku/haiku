@@ -184,7 +184,7 @@ BackgroundsView::BackgroundsView()
 		new BMessage(kMsgIconLabelOutline));
 	fIconLabelOutline->SetValue(B_CONTROL_OFF);
 
-	fPicker = new BColorControl(BPoint(0, 0), B_CELLS_32x8, 7.0, "Picker",
+	fPicker = new BColorControl(BPoint(0, 0), B_CELLS_32x8, 8.0, "Picker",
 		new BMessage(kMsgUpdateColor));
 
 	rightbox->AddChild(BLayoutBuilder::Group<>(B_VERTICAL, B_USE_DEFAULT_SPACING)
