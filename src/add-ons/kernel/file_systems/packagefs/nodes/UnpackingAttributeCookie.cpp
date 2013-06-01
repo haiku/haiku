@@ -128,8 +128,14 @@ UnpackingAttributeCookie::ReadAttribute(PackageNode* packageNode,
 		return read_package_data(data, &dataReader, offset, buffer, bufferSize);
 	}
 
-	// data not inline -- let the package create a data reader for us
+	// data not inline -- open the package and let it create a data reader for
+	// us
 	Package* package = packageNode->GetPackage();
+	int fd = package->Open();
+	if (fd < 0)
+		RETURN_ERROR(fd);
+	PackageCloser packageCloser(package);
+
 	BAbstractBufferedDataReader* reader;
 	status_t error = package->CreateDataReader(data, reader);
 	if (error != B_OK)
