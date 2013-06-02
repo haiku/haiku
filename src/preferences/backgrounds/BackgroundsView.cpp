@@ -209,18 +209,16 @@ BackgroundsView::BackgroundsView()
 	fApply->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
 		B_ALIGN_NO_VERTICAL));
 
-	AddChild(BLayoutBuilder::Group<>()
-		.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING)
-			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
-				.Add(previewBox)
-				.Add(rightbox)
-				.End()
-			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
-				.Add(fRevert)
-				.Add(fApply)
-				.End()
-			.SetInsets(B_USE_DEFAULT_SPACING)
+	AddChild(BLayoutBuilder::Group<>(B_VERTICAL)
+		.AddGroup(B_HORIZONTAL)
+			.Add(previewBox)
+			.Add(rightbox)
 			.End()
+		.AddGroup(B_HORIZONTAL)
+			.Add(fRevert)
+			.Add(fApply)
+			.End()
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.View());
 
 	fApply->MakeDefault(true);
