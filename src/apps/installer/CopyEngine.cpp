@@ -507,11 +507,6 @@ CopyEngine::_ShouldCopyEntry(const BEntry& entry, const char* name,
 	const struct stat& statInfo, int32 level) const
 {
 	if (level == 1 && S_ISDIR(statInfo.st_mode)) {
-		if (strcmp(kVarDirectoryPath, name) == 0) {
-			// old location of /boot/var
-			printf("ignoring '%s'.\n", name);
-			return false;
-		}
 		if (strcmp(kPackagesDirectoryPath, name) == 0) {
 			printf("ignoring '%s'.\n", name);
 			return false;

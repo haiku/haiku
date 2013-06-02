@@ -8,7 +8,6 @@
 
 extern const char* const kPackagesDirectoryPath;
 extern const char* const kSourcesDirectoryPath;
-extern const char* const kVarDirectoryPath;
 extern const char* const kSwapFilePath;
 
 
