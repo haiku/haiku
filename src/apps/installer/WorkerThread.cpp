@@ -86,6 +86,9 @@ private:
 class WorkerThread::EntryFilter : public CopyEngine::EntryFilter {
 public:
 	EntryFilter(const char* sourceDirectory)
+		:
+		fIgnorePaths(),
+		fSourceDevice(-1)
 	{
 		try {
 			fIgnorePaths.insert(kPackagesDirectoryPath);
@@ -93,10 +96,18 @@ public:
 			fIgnorePaths.insert("rr_moved");
 			fIgnorePaths.insert("boot.catalog");
 			fIgnorePaths.insert("haiku-boot-floppy.image");
-			fIgnorePaths.insert(kSwapFilePath);
+			fIgnorePaths.insert("common/var/swap");
+			fIgnorePaths.insert("common/var/shared_memory");
+
+			fPackageFSRootPaths.insert("system");
+			fPackageFSRootPaths.insert("common");
+			fPackageFSRootPaths.insert("home/config");
 		} catch (std::bad_alloc&) {
 		}
 
+		struct stat st;
+		if (stat(sourceDirectory, &st) == 0)
+			fSourceDevice = st.st_dev;
 	}
 
 	virtual bool ShouldCopyEntry(const BEntry& entry, const char* path,
@@ -106,6 +117,15 @@ public:
 			printf("ignoring '%s'.\n", path);
 			return false;
 		}
+
+		if (statInfo.st_dev != fSourceDevice) {
+			// Allow that only for the root of the packagefs mounts, since
+			// those contain directories that shine through from the
+			// underlying volume.
+			if (fPackageFSRootPaths.find(path) == fPackageFSRootPaths.end())
+				return false;
+		}
+
 		return true;
 	}
 
@@ -123,6 +143,8 @@ public:
 
 private:
 	std::set<std::string>	fIgnorePaths;
+	std::set<std::string>	fPackageFSRootPaths;
+	dev_t					fSourceDevice;
 };
 
 

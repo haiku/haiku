@@ -9,4 +9,3 @@
 
 const char* const kPackagesDirectoryPath = "_packages_";
 const char* const kSourcesDirectoryPath = "_sources_";
-const char* const kSwapFilePath = "common/var/swap";

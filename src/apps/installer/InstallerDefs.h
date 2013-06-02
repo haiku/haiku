@@ -16,7 +16,6 @@ static const uint32 MSG_WRITE_BOOT_SECTOR = 'iWBS';
 
 extern const char* const kPackagesDirectoryPath;
 extern const char* const kSourcesDirectoryPath;
-extern const char* const kSwapFilePath;
 
 
 #endif	// INSTALLER_DEFS_H
