@@ -19,7 +19,6 @@
 #include <String.h>
 #include <SymLink.h>
 
-#include "InstallerDefs.h"
 #include "SemaphoreLocker.h"
 #include "ProgressReporter.h"
 
@@ -27,7 +26,18 @@
 using std::nothrow;
 
 
-CopyEngine::CopyEngine(ProgressReporter* reporter)
+// #pragma mark - EntryFilter
+
+
+CopyEngine::EntryFilter::~EntryFilter()
+{
+}
+
+
+// #pragma mark - CopyEngine
+
+
+CopyEngine::CopyEngine(ProgressReporter* reporter, EntryFilter* entryFilter)
 	:
 	fBufferQueue(),
 	fWriterThread(-1),
@@ -48,7 +58,8 @@ CopyEngine::CopyEngine(ProgressReporter* reporter)
 	fCurrentTargetFolder(NULL),
 	fCurrentItem(NULL),
 
-	fProgressReporter(reporter)
+	fProgressReporter(reporter),
+	fEntryFilter(entryFilter)
 {
 	fWriterThread = spawn_thread(_WriteThreadEntry, "buffer writer",
 		B_NORMAL_PRIORITY, this);
@@ -97,19 +108,6 @@ CopyEngine::ResetTargets(const char* source)
 
 	fCurrentTargetFolder = NULL;
 	fCurrentItem = NULL;
-
-	// init BEntry pointing to /var
-	// There is no other way to retrieve the path to the var folder
-	// on the source volume. Using find_directory() with
-	// B_COMMON_VAR_DIRECTORY will only ever get the var folder on the
-	// current /boot volume regardless of the volume of "source", which
-	// makes sense, since passing a volume is meant to folders that are
-	// volume specific, like "trash".
-	BPath path(source);
-	if (path.Append(kSwapFilePath) == B_OK)
-		fSwapFileEntry.SetTo(path.Path());
-	else
-		fSwapFileEntry.Unset();
 }
 
 
@@ -244,8 +242,10 @@ CopyEngine::_CollectCopyInfo(const char* _source, int32& level,
 		if (ret < B_OK)
 			return ret;
 
-		if (!_ShouldCopyEntry(entry, name, statInfo, level))
+		if (fEntryFilter != NULL
+			&& !fEntryFilter->ShouldCopyEntry(entry, name, statInfo, level)) {
 			continue;
+		}
 
 		if (S_ISDIR(statInfo.st_mode)) {
 			// handle recursive directory copy
@@ -315,8 +315,10 @@ CopyEngine::_CopyFolder(const char* _source, const char* _destination,
 		struct stat statInfo;
 		entry.GetStat(&statInfo);
 
-		if (!_ShouldCopyEntry(entry, name, statInfo, level))
+		if (fEntryFilter != NULL
+			&& !fEntryFilter->ShouldCopyEntry(entry, name, statInfo, level)) {
 			continue;
+		}
 
 		fItemsCopied++;
 		fCurrentItem = name;
@@ -331,9 +333,11 @@ CopyEngine::_CopyFolder(const char* _source, const char* _destination,
 			if (copy.Exists()) {
 				ret = B_OK;
 				if (copy.IsDirectory()) {
-					if (_ShouldClobberFolder(name, statInfo, level))
+					if (fEntryFilter
+						&& fEntryFilter->ShouldClobberFolder(entry, name,
+							statInfo, level)) {
 						ret = _RemoveFolder(copy);
-					else {
+					} else {
 						// Do not overwrite attributes on folders that exist.
 						// This should work better when the install target
 						// already contains a Haiku installation.
@@ -499,57 +503,6 @@ CopyEngine::_UpdateProgress()
 
 	fProgressReporter->ItemsWritten(items, bytes, fCurrentItem,
 		fCurrentTargetFolder);
-}
-
-
-bool
-CopyEngine::_ShouldCopyEntry(const BEntry& entry, const char* name,
-	const struct stat& statInfo, int32 level) const
-{
-	if (level == 1 && S_ISDIR(statInfo.st_mode)) {
-		if (strcmp(kPackagesDirectoryPath, name) == 0) {
-			printf("ignoring '%s'.\n", name);
-			return false;
-		}
-		if (strcmp(kSourcesDirectoryPath, name) == 0) {
-			printf("ignoring '%s'.\n", name);
-			return false;
-		}
-		if (strcmp("rr_moved", name) == 0) {
-			printf("ignoring '%s'.\n", name);
-			return false;
-		}
-	}
-	if (level == 1 && S_ISREG(statInfo.st_mode)) {
-		if (strcmp("boot.catalog", name) == 0) {
-			printf("ignoring '%s'.\n", name);
-			return false;
-		}
-		if (strcmp("haiku-boot-floppy.image", name) == 0) {
-			printf("ignoring '%s'.\n", name);
-			return false;
-		}
-	}
-	if (fSwapFileEntry == entry) {
-		// current location of var
-		printf("ignoring swap file\n");
-		return false;
-	}
-	return true;
-}
-
-
-bool
-CopyEngine::_ShouldClobberFolder(const char* name, const struct stat& statInfo,
-	int32 level) const
-{
-	if (level == 1 && S_ISDIR(statInfo.st_mode)) {
-		if (strcmp("system", name) == 0) {
-			printf("clobbering '%s'.\n", name);
-			return true;
-		}
-	}
-	return false;
 }
 
 

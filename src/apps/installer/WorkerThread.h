@@ -55,6 +55,10 @@ private:
 
 			void				_SetStatusMessage(const char* status);
 
+private:
+			class EntryFilter;
+
+private:
 			InstallerWindow*	fWindow;
 			BDiskDeviceRoster	fDDRoster;
 			BList*				fPackages;

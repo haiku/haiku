@@ -81,6 +81,81 @@ private:
 // #pragma mark - WorkerThread
 
 
+class WorkerThread::EntryFilter : public CopyEngine::EntryFilter {
+public:
+	EntryFilter(const char* sourceDirectory)
+	{
+		// init BEntry pointing to /var
+		// There is no other way to retrieve the path to the var folder
+		// on the source volume. Using find_directory() with
+		// B_COMMON_VAR_DIRECTORY will only ever get the var folder on the
+		// current /boot volume regardless of the volume of "source", which
+		// makes sense, since passing a volume is meant to folders that are
+		// volume specific, like "trash".
+		BPath path(sourceDirectory);
+		if (path.Append(kSwapFilePath) == B_OK)
+			fSwapFileEntry.SetTo(path.Path());
+		else
+			fSwapFileEntry.Unset();
+	}
+
+	virtual bool ShouldCopyEntry(const BEntry& entry, const char* name,
+		const struct stat& statInfo, int32 level) const
+	{
+		if (level == 1 && S_ISDIR(statInfo.st_mode)) {
+			if (strcmp(kPackagesDirectoryPath, name) == 0) {
+				printf("ignoring '%s'.\n", name);
+				return false;
+			}
+			if (strcmp(kSourcesDirectoryPath, name) == 0) {
+				printf("ignoring '%s'.\n", name);
+				return false;
+			}
+			if (strcmp("rr_moved", name) == 0) {
+				printf("ignoring '%s'.\n", name);
+				return false;
+			}
+		}
+		if (level == 1 && S_ISREG(statInfo.st_mode)) {
+			if (strcmp("boot.catalog", name) == 0) {
+				printf("ignoring '%s'.\n", name);
+				return false;
+			}
+			if (strcmp("haiku-boot-floppy.image", name) == 0) {
+				printf("ignoring '%s'.\n", name);
+				return false;
+			}
+		}
+		if (fSwapFileEntry == entry) {
+			// current location of var
+			printf("ignoring swap file\n");
+			return false;
+		}
+		return true;
+	}
+
+	virtual bool ShouldClobberFolder(const BEntry& entry, const char* name,
+		const struct stat& statInfo, int32 level) const
+	{
+		if (level == 1 && S_ISDIR(statInfo.st_mode)) {
+			if (strcmp("system", name) == 0) {
+				printf("clobbering '%s'.\n", name);
+				return true;
+			}
+		}
+		return false;
+	}
+
+private:
+	// TODO: Should be made into a list of BEntris to be ignored, perhaps.
+	// settable by method...
+	BEntry fSwapFileEntry;
+};
+
+
+// #pragma mark - WorkerThread
+
+
 WorkerThread::WorkerThread(InstallerWindow *window)
 	:
 	BLooper("copy_engine"),
@@ -266,11 +341,6 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 	const char* mountError = B_TRANSLATE("The disk can't be mounted. Please "
 		"choose a different disk.");
 
-	BMessenger messenger(fWindow);
-	ProgressReporter reporter(messenger, new BMessage(MSG_STATUS_MESSAGE));
-	CopyEngine engine(&reporter);
-	BList unzipEngines;
-
 	PartitionMenuItem* targetItem = (PartitionMenuItem*)targetMenu->FindMarked();
 	PartitionMenuItem* srcItem = (PartitionMenuItem*)srcMenu->FindMarked();
 	if (!srcItem || !targetItem) {
@@ -401,6 +471,13 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 
 	// Begin actual installation
 
+	{
+	BMessenger messenger(fWindow);
+	ProgressReporter reporter(messenger, new BMessage(MSG_STATUS_MESSAGE));
+	EntryFilter entryFilter(srcDirectory.Path());
+	CopyEngine engine(&reporter, &entryFilter);
+	BList unzipEngines;
+
 	_LaunchInitScript(targetDirectory);
 
 	// Create the default indices which should always be present on a proper
@@ -480,6 +557,8 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 	BMessenger(fWindow).SendMessage(MSG_INSTALL_FINISHED);
 
 	return;
+	}
+
 error:
 	BMessage statusMessage(MSG_RESET);
 	if (err == B_CANCELED)

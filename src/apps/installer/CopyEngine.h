@@ -20,7 +20,11 @@ class ProgressReporter;
 
 class CopyEngine {
 public:
-								CopyEngine(ProgressReporter* reporter);
+			class EntryFilter;
+
+public:
+								CopyEngine(ProgressReporter* reporter,
+									EntryFilter* entryFilter);
 	virtual						~CopyEngine();
 
 			void				ResetTargets(const char* source);
@@ -41,15 +45,6 @@ private:
 			status_t			_CopyFolder(const char* source,
 									const char* destination,
 									int32& level, sem_id cancelSemaphore);
-
-			bool				_ShouldCopyEntry(const BEntry& entry,
-									const char* name,
-									const struct stat& statInfo,
-									int32 level) const;
-
-			bool				_ShouldClobberFolder(const char* name,
-									const struct stat& statInfo,
-									int32 level) const;
 
 			status_t			_RemoveFolder(BEntry& entry);
 
@@ -107,10 +102,22 @@ private:
 			const char*			fCurrentItem;
 
 			ProgressReporter*	fProgressReporter;
+			EntryFilter*		fEntryFilter;
+};
 
-	// TODO: Should be made into a list of BEntris to be ignored, perhaps.
-	// settable by method...
-			BEntry				fSwapFileEntry;
+
+class CopyEngine::EntryFilter {
+public:
+	virtual						~EntryFilter();
+
+	virtual	bool				ShouldCopyEntry(const BEntry& entry,
+									const char* name,
+									const struct stat& statInfo,
+									int32 level) const = 0;
+	virtual	bool				ShouldClobberFolder(const BEntry& entry,
+									const char* name,
+									const struct stat& statInfo,
+									int32 level) const = 0;
 };
 
 
