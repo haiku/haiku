@@ -11,7 +11,10 @@
 #include <new>
 #include <set>
 
+#include <LayoutBuilder.h>
+#include <MessageRunner.h>
 #include <StringList.h>
+#include <TextControl.h>
 
 #include <AutoDeleter.h>
 
@@ -23,6 +26,15 @@
 #include "ImageDebugInfo.h"
 #include "LocatableFile.h"
 #include "Tracing.h"
+
+
+static const uint32 MSG_FUNCTION_FILTER_CHANGED = 'mffc';
+static const uint32 MSG_FUNCTION_TYPING_TIMEOUT	= 'mftt';
+
+static const uint32 kKeypressTimeout = 250000;
+
+// from ColumnTypes.cpp
+static const float kTextMargin = 8.0;
 
 
 // #pragma mark - SourcePathComponentNode
@@ -151,6 +163,65 @@ private:
 };
 
 
+// #pragma mark - HighlightingTableColumn
+
+
+class ImageFunctionsView::HighlightingTableColumn : public StringTableColumn {
+public:
+	HighlightingTableColumn(int32 modelIndex, const char* title, float width,
+		float minWidth, float maxWidth, uint32 truncate,
+		alignment align = B_ALIGN_LEFT)
+		:
+		StringTableColumn(modelIndex, title, width, minWidth, maxWidth,
+			truncate, align),
+		fFilter(),
+		fFilterWidth(0.0)
+	{
+	}
+
+	void SetFilter(const BString& filter)
+	{
+		fFilter = filter;
+		fFilterWidth = 0.0;
+	}
+
+	virtual void DrawValue(const BVariant& value, BRect rect,
+		BView* targetView)
+	{
+		StringTableColumn::DrawValue(value, rect, targetView);
+
+		if (!fFilter.IsEmpty()) {
+			if (fFilterWidth == 0.0)
+				fFilterWidth = targetView->StringWidth(fFilter);
+
+			// TODO: handle this case as well
+			if (fField.HasClippedString())
+				return;
+
+			const char* fieldString = fField.String();
+			const char* filterMatch = strstr(fieldString, fFilter.String());
+			if (filterMatch == NULL)
+				return;
+
+			targetView->PushState();
+			BRect fillRect(rect);
+			fillRect.left += kTextMargin + targetView->StringWidth(
+				fieldString, filterMatch - fieldString);
+			fillRect.right = fillRect.left + fFilterWidth;
+			targetView->SetLowColor(255, 255, 0, 255);
+			targetView->SetDrawingMode(B_OP_MIN);
+			targetView->FillRect(fillRect, B_SOLID_LOW);
+			targetView->PopState();
+		}
+	}
+
+
+private:
+	BString fFilter;
+	float	fFilterWidth;
+};
+
+
 // #pragma mark - FunctionsTableModel
 
 
@@ -198,6 +269,7 @@ public:
 
 		LocatableFile* currentFile = NULL;
 		BStringList pathComponents;
+		bool applyFilter = !fCurrentFilter.IsEmpty();
 		int32 functionCount = fImageDebugInfo->CountFunctions();
 		for (int32 i = 0; i < functionCount; i++) {
 			FunctionInstance* instance = fImageDebugInfo->FunctionAt(i);
@@ -213,6 +285,13 @@ public:
 			}
 
 			LocatableFile* sourceFile = instance->SourceFile();
+			BString sourcePath;
+			if (sourceFile != NULL)
+				sourceFile->GetPath(sourcePath);
+
+			if (applyFilter && !_FilterFunction(instance, sourcePath))
+				continue;
+
 			if (sourceFile == NULL) {
 				if (!_AddFunctionNode(sourcelessNode, instance, NULL))
 					return;
@@ -221,9 +300,14 @@ public:
 
 			if (sourceFile != currentFile) {
 				currentFile = sourceFile;
-				if (!_GetSourcePathComponents(currentFile,
+				pathComponents.MakeEmpty();
+				if (applyFilter) {
+					pathComponents.Add(sourcePath);
+				} else {
+					if (!_GetSourcePathComponents(currentFile,
 						pathComponents)) {
-					return;
+						return;
+					}
 				}
 			}
 
@@ -351,6 +435,13 @@ public:
 		return false;
 	}
 
+	void SetFilter(const char* filter)
+	{
+		fCurrentFilter = filter;
+
+		SetImageDebugInfo(fImageDebugInfo);
+	}
+
 private:
 	bool _GetSourcePathComponents(LocatableFile* currentFile,
 		BStringList& pathComponents)
@@ -359,8 +450,6 @@ private:
 		currentFile->GetPath(sourcePath);
 		if (sourcePath.IsEmpty())
 			return false;
-
-		pathComponents.MakeEmpty();
 
 		int32 startIndex = 0;
 		if (sourcePath[0] == '/')
@@ -438,6 +527,15 @@ private:
 		return true;
 	}
 
+	bool _FilterFunction(FunctionInstance* instance, const BString& sourcePath)
+	{
+		if (instance->PrettyName().IFindFirst(fCurrentFilter) >= 0)
+			return true;
+
+		return sourcePath.IFindFirst(fCurrentFilter) >= 0;
+	}
+
+
 private:
 	typedef BObjectList<SourcePathComponentNode> ChildPathComponentList;
 
@@ -445,6 +543,7 @@ private:
 	ImageDebugInfo*			fImageDebugInfo;
 	ChildPathComponentList	fChildPathComponents;
 	SourcePathComponentNode* fSourcelessNode;
+	BString					fCurrentFilter;
 };
 
 
@@ -455,9 +554,12 @@ ImageFunctionsView::ImageFunctionsView(Listener* listener)
 	:
 	BGroupView(B_VERTICAL),
 	fImageDebugInfo(NULL),
+	fFilterField(NULL),
 	fFunctionsTable(NULL),
 	fFunctionsTableModel(NULL),
-	fListener(listener)
+	fListener(listener),
+	fHighlightingColumn(NULL),
+	fLastFilterKeypress(0)
 {
 	SetName("Functions");
 }
@@ -545,6 +647,45 @@ ImageFunctionsView::SetFunction(FunctionInstance* function)
 
 
 void
+ImageFunctionsView::AttachedToWindow()
+{
+	BView::AttachedToWindow();
+
+	fFilterField->SetTarget(this);
+}
+
+
+void
+ImageFunctionsView::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case MSG_FUNCTION_FILTER_CHANGED:
+		{
+			fLastFilterKeypress = system_time();
+			BMessage keypressMessage(MSG_FUNCTION_TYPING_TIMEOUT);
+			BMessageRunner::StartSending(BMessenger(this), &keypressMessage,
+				kKeypressTimeout, 1);
+			break;
+		}
+
+		case MSG_FUNCTION_TYPING_TIMEOUT:
+		{
+			if (system_time() - fLastFilterKeypress >= kKeypressTimeout) {
+				fFunctionsTableModel->SetFilter(fFilterField->Text());
+				fHighlightingColumn->SetFilter(fFilterField->Text());
+				_ExpandFilteredNodes();
+			}
+			break;
+		}
+
+		default:
+			BView::MessageReceived(message);
+			break;
+	}
+}
+
+
+void
 ImageFunctionsView::LoadSettings(const BMessage& settings)
 {
 	BMessage tableSettings;
@@ -591,17 +732,40 @@ ImageFunctionsView::_Init()
 {
 	fFunctionsTable = new TreeTable("functions", 0, B_FANCY_BORDER);
 	AddChild(fFunctionsTable->ToView());
+	AddChild(fFilterField = new BTextControl("filtertext", "Filter:",
+			NULL, NULL));
+
+	fFilterField->SetModificationMessage(new BMessage(
+			MSG_FUNCTION_FILTER_CHANGED));
 	fFunctionsTable->SetSortingEnabled(false);
 
 	// columns
-	fFunctionsTable->AddColumn(new StringTableColumn(0, "File/Function", 300,
-		100, 1000, B_TRUNCATE_BEGINNING, B_ALIGN_LEFT));
+	fFunctionsTable->AddColumn(fHighlightingColumn
+		= new HighlightingTableColumn(0, "File/Function", 300, 100, 1000,
+			B_TRUNCATE_BEGINNING, B_ALIGN_LEFT));
 
 	fFunctionsTableModel = new FunctionsTableModel();
 	fFunctionsTable->SetTreeTableModel(fFunctionsTableModel);
 
 	fFunctionsTable->SetSelectionMode(B_SINGLE_SELECTION_LIST);
 	fFunctionsTable->AddTreeTableListener(this);
+}
+
+
+void
+ImageFunctionsView::_ExpandFilteredNodes()
+{
+	if (fFilterField->TextView()->TextLength() == 0)
+		return;
+
+	for (int32 i = 0; i < fFunctionsTableModel->CountChildren(
+		fFunctionsTableModel); i++) {
+		TreeTablePath path;
+		path.AddComponent(i);
+		fFunctionsTable->SetNodeExpanded(path, true, true);
+	}
+
+	fFunctionsTable->ResizeAllColumnsToPreferred();
 }
 
 
