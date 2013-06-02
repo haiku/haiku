@@ -3070,9 +3070,9 @@ OutlineView::Clear()
 	DeselectAll();
 		// Make sure selection list doesn't point to deleted rows!
 	RecursiveDeleteRows(&fRows, false);
-	Invalidate();
 	fItemsHeight = 0.0;
 	FixScrollBar(true);
+	Invalidate();
 }
 
 
@@ -4378,7 +4378,7 @@ OutlineView::FixScrollBar(bool scrollToFit)
 				vScrollBar->SetRange(0.0, maxScrollBarValue);
 				vScrollBar->SetSteps(20.0, fVisibleRect.Height());
 			}
-		} else if (vScrollBar->Value() == 0.0)
+		} else if (vScrollBar->Value() == 0.0 || fItemsHeight == 0.0)
 			vScrollBar->SetRange(0.0, 0.0);		// disable scroll bar.
 	}
 }
