@@ -42,8 +42,9 @@ private:
 			void				_LaunchInitScript(BPath& path);
 			void				_LaunchFinishScript(BPath& path);
 
-			void				_PerformInstall(BMenu* srcMenu,
+			status_t			_PerformInstall(BMenu* srcMenu,
 									BMenu* dstMenu);
+			status_t			_InstallationError(status_t error);
 			status_t			_MirrorIndices(const BPath& srcDirectory,
 									const BPath& targetDirectory) const;
 			status_t			_CreateDefaultIndices(

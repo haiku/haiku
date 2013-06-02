@@ -322,7 +322,7 @@ WorkerThread::_LaunchFinishScript(BPath &path)
 }
 
 
-void
+status_t
 WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 {
 	CALLED();
@@ -345,7 +345,7 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 	PartitionMenuItem* srcItem = (PartitionMenuItem*)srcMenu->FindMarked();
 	if (!srcItem || !targetItem) {
 		ERR("bad menu items\n");
-		goto error;
+		return _InstallationError(err);
 	}
 
 	// check if target is initialized
@@ -356,35 +356,35 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 			if ((err = partition->Mount()) < B_OK) {
 				_SetStatusMessage(mountError);
 				ERR("BPartition::Mount");
-				goto error;
+				return _InstallationError(err);
 			}
 		}
 		if ((err = partition->GetVolume(&targetVolume)) != B_OK) {
 			ERR("BPartition::GetVolume");
-			goto error;
+			return _InstallationError(err);
 		}
 		if ((err = partition->GetMountPoint(&targetDirectory)) != B_OK) {
 			ERR("BPartition::GetMountPoint");
-			goto error;
+			return _InstallationError(err);
 		}
 	} else if (fDDRoster.GetDeviceWithID(targetItem->ID(), &device) == B_OK) {
 		if (!device.IsMounted()) {
 			if ((err = device.Mount()) < B_OK) {
 				_SetStatusMessage(mountError);
 				ERR("BDiskDevice::Mount");
-				goto error;
+				return _InstallationError(err);
 			}
 		}
 		if ((err = device.GetVolume(&targetVolume)) != B_OK) {
 			ERR("BDiskDevice::GetVolume");
-			goto error;
+			return _InstallationError(err);
 		}
 		if ((err = device.GetMountPoint(&targetDirectory)) != B_OK) {
 			ERR("BDiskDevice::GetMountPoint");
-			goto error;
+			return _InstallationError(err);
 		}
 	} else
-		goto error; // shouldn't happen
+		return _InstallationError(err);  // shouldn't happen
 
 	// check if target has enough space
 	if (fSpaceRequired > 0 && targetVolume.FreeBytes() < fSpaceRequired) {
@@ -395,27 +395,27 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 			B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		alert->SetShortcut(1, B_ESCAPE);
 		if (alert->Go() != 0)
-				goto error;
+			return _InstallationError(err);
 	}
 
 	if (fDDRoster.GetPartitionWithID(srcItem->ID(), &device, &partition) == B_OK) {
 		if ((err = partition->GetMountPoint(&srcDirectory)) != B_OK) {
 			ERR("BPartition::GetMountPoint");
-			goto error;
+			return _InstallationError(err);
 		}
 	} else if (fDDRoster.GetDeviceWithID(srcItem->ID(), &device) == B_OK) {
 		if ((err = device.GetMountPoint(&srcDirectory)) != B_OK) {
 			ERR("BDiskDevice::GetMountPoint");
-			goto error;
+			return _InstallationError(err);
 		}
 	} else
-		goto error; // shouldn't happen
+		return _InstallationError(err); // shouldn't happen
 
 	// check not installing on itself
 	if (strcmp(srcDirectory.Path(), targetDirectory.Path()) == 0) {
 		_SetStatusMessage(B_TRANSLATE("You can't install the contents of a "
 			"disk onto itself. Please choose a different disk."));
-		goto error;
+		return _InstallationError(err);
 	}
 
 	// check not installing on boot volume
@@ -427,7 +427,7 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 		alert->SetShortcut(1, B_ESCAPE);
 		if (alert->Go() != 0) {
 			_SetStatusMessage("Installation stopped.");
-			goto error;
+			return _InstallationError(err);
 		}
 	}
 
@@ -464,14 +464,12 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 		if (alert->Go() != 0) {
 		// TODO: Would be cool to offer the option here to clean additional
 		// folders at the user's choice (like /boot/common and /boot/develop).
-			err = B_CANCELED;
-			goto error;
+			return _InstallationError(B_CANCELED);
 		}
 	}
 
 	// Begin actual installation
 
-	{
 	BMessenger messenger(fWindow);
 	ProgressReporter reporter(messenger, new BMessage(MSG_STATUS_MESSAGE));
 	EntryFilter entryFilter(srcDirectory.Path());
@@ -486,18 +484,18 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 	// want problems fixed along the way...
 	err = _CreateDefaultIndices(targetDirectory);
 	if (err != B_OK)
-		goto error;
+		return _InstallationError(err);
 	// Mirror all the indices which are present on the source volume onto
 	// the target volume.
 	err = _MirrorIndices(srcDirectory, targetDirectory);
 	if (err != B_OK)
-		goto error;
+		return _InstallationError(err);
 
 	// Let the engine collect information for the progress bar later on
 	engine.ResetTargets(srcDirectory.Path());
 	err = engine.CollectTargets(srcDirectory.Path(), fCancelSemaphore);
 	if (err != B_OK)
-		goto error;
+		return _InstallationError(err);
 
 	// Collect selected packages also
 	if (fPackages) {
@@ -508,7 +506,7 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 			BPath packageDir(pkgRootDir.Path(), p->Folder());
 			err = engine.CollectTargets(packageDir.Path(), fCancelSemaphore);
 			if (err != B_OK)
-				goto error;
+				return _InstallationError(err);
 		}
 	}
 
@@ -516,7 +514,7 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 	err = _ProcessZipPackages(srcDirectory.Path(), targetDirectory.Path(),
 		&reporter, unzipEngines);
 	if (err != B_OK)
-		goto error;
+		return _InstallationError(err);
 
 	reporter.StartTimer();
 
@@ -524,7 +522,7 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 	err = engine.CopyFolder(srcDirectory.Path(), targetDirectory.Path(),
 		fCancelSemaphore);
 	if (err != B_OK)
-		goto error;
+		return _InstallationError(err);
 
 	// copy selected packages
 	if (fPackages) {
@@ -536,7 +534,7 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 			err = engine.CopyFolder(packageDir.Path(), targetDirectory.Path(),
 				fCancelSemaphore);
 			if (err != B_OK)
-				goto error;
+				return _InstallationError(err);
 		}
 	}
 
@@ -550,23 +548,26 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 		delete engine;
 	}
 	if (err != B_OK)
-		goto error;
+		return _InstallationError(err);
 
 	_LaunchFinishScript(targetDirectory);
 
 	BMessenger(fWindow).SendMessage(MSG_INSTALL_FINISHED);
+	return B_OK;
+}
 
-	return;
-	}
 
-error:
+status_t
+WorkerThread::_InstallationError(status_t error)
+{
 	BMessage statusMessage(MSG_RESET);
-	if (err == B_CANCELED)
+	if (error == B_CANCELED)
 		_SetStatusMessage(B_TRANSLATE("Installation canceled."));
 	else
-		statusMessage.AddInt32("error", err);
+		statusMessage.AddInt32("error", error);
 	ERR("_PerformInstall failed");
 	BMessenger(fWindow).SendMessage(&statusMessage);
+	return error;
 }
 
 
