@@ -15,12 +15,11 @@
 
 class BList;
 class BMenu;
-class InstallerWindow;
 class ProgressReporter;
 
 class WorkerThread : public BLooper {
 public:
-								WorkerThread(InstallerWindow* window);
+								WorkerThread(const BMessenger& owner);
 
 	virtual	void				MessageReceived(BMessage* message);
 
@@ -35,15 +34,16 @@ public:
 			void				SetLock(sem_id cancelSemaphore)
 									{ fCancelSemaphore = cancelSemaphore; }
 
-			void				StartInstall();
+			void				StartInstall(partition_id sourcePartitionID,
+									partition_id targetPartitionID);
 			void				WriteBootSector(BMenu* dstMenu);
 
 private:
 			void				_LaunchInitScript(BPath& path);
 			void				_LaunchFinishScript(BPath& path);
 
-			status_t			_PerformInstall(BMenu* srcMenu,
-									BMenu* dstMenu);
+			status_t			_PerformInstall(partition_id sourcePartitionID,
+									partition_id targetPartitionID);
 			status_t			_InstallationError(status_t error);
 			status_t			_MirrorIndices(const BPath& srcDirectory,
 									const BPath& targetDirectory) const;
@@ -60,7 +60,7 @@ private:
 			class EntryFilter;
 
 private:
-			InstallerWindow*	fWindow;
+			BMessenger			fOwner;
 			BDiskDeviceRoster	fDDRoster;
 			BList*				fPackages;
 			off_t				fSpaceRequired;

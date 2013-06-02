@@ -19,8 +19,9 @@
 #include <ScrollBar.h>
 #include <String.h>
 #include <View.h>
+#include <Window.h>
 
-#include "InstallerWindow.h"
+#include "InstallerDefs.h"
 #include "StringForSize.h"
 
 

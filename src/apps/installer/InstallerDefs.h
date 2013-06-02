@@ -6,6 +6,14 @@
 #define INSTALLER_DEFS_H
 
 
+#include <SupportDefs.h>
+
+
+static const uint32 MSG_STATUS_MESSAGE = 'iSTM';
+static const uint32 MSG_INSTALL_FINISHED = 'iIFN';
+static const uint32 MSG_RESET = 'iRSI';
+static const uint32 MSG_WRITE_BOOT_SECTOR = 'iWBS';
+
 extern const char* const kPackagesDirectoryPath;
 extern const char* const kSourcesDirectoryPath;
 extern const char* const kSwapFilePath;

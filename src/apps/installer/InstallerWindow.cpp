@@ -370,6 +370,14 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			switch (fInstallStatus) {
 				case kReadyForInstall:
 				{
+					// get source and target
+					PartitionMenuItem* targetItem
+						= (PartitionMenuItem*)fDestMenu->FindMarked();
+					PartitionMenuItem* srcItem
+						= (PartitionMenuItem*)fSrcMenu->FindMarked();
+					if (srcItem == NULL || targetItem == NULL)
+						break;
+
 					_SetCopyEngineCancelSemaphore(create_sem(1,
 						"copy engine cancel"));
 
@@ -380,7 +388,8 @@ InstallerWindow::MessageReceived(BMessage *msg)
 					fWorkerThread->SetPackagesList(list);
 					fWorkerThread->SetSpaceRequired(size);
 					fInstallStatus = kInstalling;
-					fWorkerThread->StartInstall();
+					fWorkerThread->StartInstall(srcItem->ID(),
+						targetItem->ID());
 					fBeginButton->SetLabel(B_TRANSLATE("Stop"));
 					_DisableInterface(true);
 

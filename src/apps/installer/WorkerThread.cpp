@@ -29,7 +29,6 @@
 #include "AutoLocker.h"
 #include "CopyEngine.h"
 #include "InstallerDefs.h"
-#include "InstallerWindow.h"
 #include "PackageViews.h"
 #include "PartitionMenuItem.h"
 #include "ProgressReporter.h"
@@ -156,10 +155,10 @@ private:
 // #pragma mark - WorkerThread
 
 
-WorkerThread::WorkerThread(InstallerWindow *window)
+WorkerThread::WorkerThread(const BMessenger& owner)
 	:
 	BLooper("copy_engine"),
-	fWindow(window),
+	fOwner(owner),
 	fPackages(NULL),
 	fSpaceRequired(0),
 	fCancelSemaphore(-1)
@@ -175,7 +174,8 @@ WorkerThread::MessageReceived(BMessage* message)
 
 	switch (message->what) {
 		case MSG_START_INSTALLING:
-			_PerformInstall(fWindow->GetSourceMenu(), fWindow->GetTargetMenu());
+			_PerformInstall(message->GetInt32("source", -1),
+				message->GetInt32("target", -1));
 			break;
 
 		case MSG_WRITE_BOOT_SECTOR:
@@ -262,10 +262,15 @@ WorkerThread::SetPackagesList(BList *list)
 
 
 void
-WorkerThread::StartInstall()
+WorkerThread::StartInstall(partition_id sourcePartitionID,
+	partition_id targetPartitionID)
 {
 	// Executed in window thread.
-	PostMessage(MSG_START_INSTALLING, this);
+	BMessage message(MSG_START_INSTALLING);
+	message.AddInt32("source", sourcePartitionID);
+	message.AddInt32("target", targetPartitionID);
+
+	PostMessage(&message, this);
 }
 
 
@@ -323,7 +328,8 @@ WorkerThread::_LaunchFinishScript(BPath &path)
 
 
 status_t
-WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
+WorkerThread::_PerformInstall(partition_id sourcePartitionID,
+	partition_id targetPartitionID)
 {
 	CALLED();
 
@@ -341,16 +347,14 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 	const char* mountError = B_TRANSLATE("The disk can't be mounted. Please "
 		"choose a different disk.");
 
-	PartitionMenuItem* targetItem = (PartitionMenuItem*)targetMenu->FindMarked();
-	PartitionMenuItem* srcItem = (PartitionMenuItem*)srcMenu->FindMarked();
-	if (!srcItem || !targetItem) {
-		ERR("bad menu items\n");
+	if (sourcePartitionID < 0 || targetPartitionID < 0) {
+		ERR("bad source or target partition ID\n");
 		return _InstallationError(err);
 	}
 
 	// check if target is initialized
 	// ask if init or mount as is
-	if (fDDRoster.GetPartitionWithID(targetItem->ID(), &device,
+	if (fDDRoster.GetPartitionWithID(targetPartitionID, &device,
 			&partition) == B_OK) {
 		if (!partition->IsMounted()) {
 			if ((err = partition->Mount()) < B_OK) {
@@ -367,7 +371,7 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 			ERR("BPartition::GetMountPoint");
 			return _InstallationError(err);
 		}
-	} else if (fDDRoster.GetDeviceWithID(targetItem->ID(), &device) == B_OK) {
+	} else if (fDDRoster.GetDeviceWithID(targetPartitionID, &device) == B_OK) {
 		if (!device.IsMounted()) {
 			if ((err = device.Mount()) < B_OK) {
 				_SetStatusMessage(mountError);
@@ -398,12 +402,13 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 			return _InstallationError(err);
 	}
 
-	if (fDDRoster.GetPartitionWithID(srcItem->ID(), &device, &partition) == B_OK) {
+	if (fDDRoster.GetPartitionWithID(sourcePartitionID, &device, &partition)
+			== B_OK) {
 		if ((err = partition->GetMountPoint(&srcDirectory)) != B_OK) {
 			ERR("BPartition::GetMountPoint");
 			return _InstallationError(err);
 		}
-	} else if (fDDRoster.GetDeviceWithID(srcItem->ID(), &device) == B_OK) {
+	} else if (fDDRoster.GetDeviceWithID(sourcePartitionID, &device) == B_OK) {
 		if ((err = device.GetMountPoint(&srcDirectory)) != B_OK) {
 			ERR("BDiskDevice::GetMountPoint");
 			return _InstallationError(err);
@@ -470,8 +475,7 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 
 	// Begin actual installation
 
-	BMessenger messenger(fWindow);
-	ProgressReporter reporter(messenger, new BMessage(MSG_STATUS_MESSAGE));
+	ProgressReporter reporter(fOwner, new BMessage(MSG_STATUS_MESSAGE));
 	EntryFilter entryFilter(srcDirectory.Path());
 	CopyEngine engine(&reporter, &entryFilter);
 	BList unzipEngines;
@@ -552,7 +556,7 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 
 	_LaunchFinishScript(targetDirectory);
 
-	BMessenger(fWindow).SendMessage(MSG_INSTALL_FINISHED);
+	fOwner.SendMessage(MSG_INSTALL_FINISHED);
 	return B_OK;
 }
 
@@ -566,7 +570,7 @@ WorkerThread::_InstallationError(status_t error)
 	else
 		statusMessage.AddInt32("error", error);
 	ERR("_PerformInstall failed");
-	BMessenger(fWindow).SendMessage(&statusMessage);
+	fOwner.SendMessage(&statusMessage);
 	return error;
 }
 
@@ -707,7 +711,7 @@ WorkerThread::_SetStatusMessage(const char *status)
 {
 	BMessage msg(MSG_STATUS_MESSAGE);
 	msg.AddString("status", status);
-	BMessenger(fWindow).SendMessage(&msg);
+	fOwner.SendMessage(&msg);
 }
 
 
