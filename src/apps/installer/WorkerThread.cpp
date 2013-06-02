@@ -98,30 +98,30 @@ public:
 			fSwapFileEntry.Unset();
 	}
 
-	virtual bool ShouldCopyEntry(const BEntry& entry, const char* name,
+	virtual bool ShouldCopyEntry(const BEntry& entry, const char* path,
 		const struct stat& statInfo, int32 level) const
 	{
 		if (level == 1 && S_ISDIR(statInfo.st_mode)) {
-			if (strcmp(kPackagesDirectoryPath, name) == 0) {
-				printf("ignoring '%s'.\n", name);
+			if (strcmp(kPackagesDirectoryPath, path) == 0) {
+				printf("ignoring '%s'.\n", path);
 				return false;
 			}
-			if (strcmp(kSourcesDirectoryPath, name) == 0) {
-				printf("ignoring '%s'.\n", name);
+			if (strcmp(kSourcesDirectoryPath, path) == 0) {
+				printf("ignoring '%s'.\n", path);
 				return false;
 			}
-			if (strcmp("rr_moved", name) == 0) {
-				printf("ignoring '%s'.\n", name);
+			if (strcmp("rr_moved", path) == 0) {
+				printf("ignoring '%s'.\n", path);
 				return false;
 			}
 		}
 		if (level == 1 && S_ISREG(statInfo.st_mode)) {
-			if (strcmp("boot.catalog", name) == 0) {
-				printf("ignoring '%s'.\n", name);
+			if (strcmp("boot.catalog", path) == 0) {
+				printf("ignoring '%s'.\n", path);
 				return false;
 			}
-			if (strcmp("haiku-boot-floppy.image", name) == 0) {
-				printf("ignoring '%s'.\n", name);
+			if (strcmp("haiku-boot-floppy.image", path) == 0) {
+				printf("ignoring '%s'.\n", path);
 				return false;
 			}
 		}
@@ -133,12 +133,12 @@ public:
 		return true;
 	}
 
-	virtual bool ShouldClobberFolder(const BEntry& entry, const char* name,
+	virtual bool ShouldClobberFolder(const BEntry& entry, const char* path,
 		const struct stat& statInfo, int32 level) const
 	{
 		if (level == 1 && S_ISDIR(statInfo.st_mode)) {
-			if (strcmp("system", name) == 0) {
-				printf("clobbering '%s'.\n", name);
+			if (strcmp("system", path) == 0) {
+				printf("clobbering '%s'.\n", path);
 				return true;
 			}
 		}

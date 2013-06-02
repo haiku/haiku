@@ -16,7 +16,6 @@
 #include <fs_attr.h>
 #include <NodeInfo.h>
 #include <Path.h>
-#include <String.h>
 #include <SymLink.h>
 
 #include "SemaphoreLocker.h"
@@ -42,6 +41,8 @@ CopyEngine::CopyEngine(ProgressReporter* reporter, EntryFilter* entryFilter)
 	fBufferQueue(),
 	fWriterThread(-1),
 	fQuitting(false),
+
+	fAbsoluteSourcePath(),
 
 	fBytesRead(0),
 	fLastBytesRead(0),
@@ -93,6 +94,8 @@ CopyEngine::ResetTargets(const char* source)
 {
 	// TODO: One could subtract the bytes/items which were added to the
 	// ProgressReporter before resetting them...
+
+	fAbsoluteSourcePath = source;
 
 	fBytesRead = 0;
 	fLastBytesRead = 0;
@@ -237,13 +240,14 @@ CopyEngine::_CollectCopyInfo(const char* _source, int32& level,
 		struct stat statInfo;
 		entry.GetStat(&statInfo);
 
-		char name[B_FILE_NAME_LENGTH];
-		status_t ret = entry.GetName(name);
+		BPath sourceEntryPath;
+		status_t ret = entry.GetPath(&sourceEntryPath);
 		if (ret < B_OK)
 			return ret;
 
 		if (fEntryFilter != NULL
-			&& !fEntryFilter->ShouldCopyEntry(entry, name, statInfo, level)) {
+			&& !fEntryFilter->ShouldCopyEntry(entry,
+				_RelativeEntryPath(sourceEntryPath.Path()), statInfo, level)) {
 			continue;
 		}
 
@@ -307,16 +311,20 @@ CopyEngine::_CopyFolder(const char* _source, const char* _destination,
 			return B_CANCELED;
 		}
 
-		char name[B_FILE_NAME_LENGTH];
-		status_t ret = entry.GetName(name);
-		if (ret < B_OK)
+		const char* name = entry.Name();
+		BPath sourceEntryPath;
+		status_t ret = entry.GetPath(&sourceEntryPath);
+		if (ret != B_OK)
 			return ret;
+		const char* relativeSourceEntryPath
+			= _RelativeEntryPath(sourceEntryPath.Path());
 
 		struct stat statInfo;
 		entry.GetStat(&statInfo);
 
 		if (fEntryFilter != NULL
-			&& !fEntryFilter->ShouldCopyEntry(entry, name, statInfo, level)) {
+			&& !fEntryFilter->ShouldCopyEntry(entry, relativeSourceEntryPath,
+				statInfo, level)) {
 			continue;
 		}
 
@@ -334,8 +342,8 @@ CopyEngine::_CopyFolder(const char* _source, const char* _destination,
 				ret = B_OK;
 				if (copy.IsDirectory()) {
 					if (fEntryFilter
-						&& fEntryFilter->ShouldClobberFolder(entry, name,
-							statInfo, level)) {
+						&& fEntryFilter->ShouldClobberFolder(entry,
+							relativeSourceEntryPath, statInfo, level)) {
 						ret = _RemoveFolder(copy);
 					} else {
 						// Do not overwrite attributes on folders that exist.
@@ -353,11 +361,6 @@ CopyEngine::_CopyFolder(const char* _source, const char* _destination,
 				}
 			}
 
-			BPath srcFolder;
-			ret = entry.GetPath(&srcFolder);
-			if (ret < B_OK)
-				return ret;
-
 			BPath dstFolder;
 			ret = copy.GetPath(&dstFolder);
 			if (ret < B_OK)
@@ -366,7 +369,7 @@ CopyEngine::_CopyFolder(const char* _source, const char* _destination,
 			if (cancelSemaphore >= 0)
 				lock.Unlock();
 
-			ret = _CopyFolder(srcFolder.Path(), dstFolder.Path(), level,
+			ret = _CopyFolder(sourceEntryPath.Path(), dstFolder.Path(), level,
 				cancelSemaphore);
 			if (ret < B_OK)
 				return ret;
@@ -480,6 +483,20 @@ CopyEngine::_RemoveFolder(BEntry& entry)
 		}
 	}
 	return entry.Remove();
+}
+
+
+const char*
+CopyEngine::_RelativeEntryPath(const char* absoluteSourcePath) const
+{
+	if (strncmp(absoluteSourcePath, fAbsoluteSourcePath,
+			fAbsoluteSourcePath.Length()) != 0) {
+		return absoluteSourcePath;
+	}
+
+	const char* relativePath
+		= absoluteSourcePath + fAbsoluteSourcePath.Length();
+	return relativePath[0] == '/' ? relativePath + 1 : relativePath;
 }
 
 

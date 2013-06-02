@@ -11,6 +11,7 @@
 #include <Entry.h>
 #include <File.h>
 #include <Messenger.h>
+#include <String.h>
 
 #include "BlockingQueue.h"
 
@@ -48,6 +49,9 @@ private:
 
 			status_t			_RemoveFolder(BEntry& entry);
 
+			const char*			_RelativeEntryPath(
+									const char* absoluteSourcePath) const;
+
 			void				_UpdateProgress();
 
 	static	int32				_WriteThreadEntry(void* cookie);
@@ -81,10 +85,13 @@ private:
 				bool			deleteFile;
 			};
 
+private:
 	BlockingQueue<Buffer>		fBufferQueue;
 
 			thread_id			fWriterThread;
 	volatile bool				fQuitting;
+
+			BString				fAbsoluteSourcePath;
 
 			off_t				fBytesRead;
 			off_t				fLastBytesRead;
@@ -111,11 +118,11 @@ public:
 	virtual						~EntryFilter();
 
 	virtual	bool				ShouldCopyEntry(const BEntry& entry,
-									const char* name,
+									const char* path,
 									const struct stat& statInfo,
 									int32 level) const = 0;
 	virtual	bool				ShouldClobberFolder(const BEntry& entry,
-									const char* name,
+									const char* path,
 									const struct stat& statInfo,
 									int32 level) const = 0;
 };
