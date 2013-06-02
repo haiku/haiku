@@ -19,8 +19,7 @@
 #include <String.h>
 #include <SymLink.h>
 
-#include "InstallerWindow.h"
-	// TODO: For PACKAGES_DIRECTORY and VAR_DIRECTORY, not so nice...
+#include "InstallerDefs.h"
 #include "SemaphoreLocker.h"
 #include "ProgressReporter.h"
 
@@ -107,7 +106,7 @@ CopyEngine::ResetTargets(const char* source)
 	// makes sense, since passing a volume is meant to folders that are
 	// volume specific, like "trash".
 	BPath path(source);
-	if (path.Append("common/var/swap") == B_OK)
+	if (path.Append(kSwapFilePath) == B_OK)
 		fSwapFileEntry.SetTo(path.Path());
 	else
 		fSwapFileEntry.Unset();
@@ -508,16 +507,16 @@ CopyEngine::_ShouldCopyEntry(const BEntry& entry, const char* name,
 	const struct stat& statInfo, int32 level) const
 {
 	if (level == 1 && S_ISDIR(statInfo.st_mode)) {
-		if (strcmp(VAR_DIRECTORY, name) == 0) {
+		if (strcmp(kVarDirectoryPath, name) == 0) {
 			// old location of /boot/var
 			printf("ignoring '%s'.\n", name);
 			return false;
 		}
-		if (strcmp(PACKAGES_DIRECTORY, name) == 0) {
+		if (strcmp(kPackagesDirectoryPath, name) == 0) {
 			printf("ignoring '%s'.\n", name);
 			return false;
 		}
-		if (strcmp(SOURCES_DIRECTORY, name) == 0) {
+		if (strcmp(kSourcesDirectoryPath, name) == 0) {
 			printf("ignoring '%s'.\n", name);
 			return false;
 		}

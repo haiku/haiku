@@ -6,6 +6,7 @@ SubDirHdrs [ FDirName $(HAIKU_TOP) src kits tracker ] ;
 Application Installer :
 	CopyEngine.cpp
 	InstallerApp.cpp
+	InstallerDefs.cpp
 	InstallerWindow.cpp
 	PackageViews.cpp
 	PartitionMenuItem.cpp
@@ -26,4 +27,3 @@ DoCatalogs Installer :
 	ProgressReporter.cpp
 	WorkerThread.cpp
 ;
-

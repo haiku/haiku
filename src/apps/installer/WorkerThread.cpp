@@ -28,6 +28,7 @@
 
 #include "AutoLocker.h"
 #include "CopyEngine.h"
+#include "InstallerDefs.h"
 #include "InstallerWindow.h"
 #include "PackageViews.h"
 #include "PartitionMenuItem.h"
@@ -423,7 +424,7 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 
 	// Collect selected packages also
 	if (fPackages) {
-		BPath pkgRootDir(srcDirectory.Path(), PACKAGES_DIRECTORY);
+		BPath pkgRootDir(srcDirectory.Path(), kPackagesDirectoryPath);
 		int32 count = fPackages->CountItems();
 		for (int32 i = 0; i < count; i++) {
 			Package *p = static_cast<Package*>(fPackages->ItemAt(i));
@@ -450,7 +451,7 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 
 	// copy selected packages
 	if (fPackages) {
-		BPath pkgRootDir(srcDirectory.Path(), PACKAGES_DIRECTORY);
+		BPath pkgRootDir(srcDirectory.Path(), kPackagesDirectoryPath);
 		int32 count = fPackages->CountItems();
 		for (int32 i = 0; i < count; i++) {
 			Package *p = static_cast<Package*>(fPackages->ItemAt(i));
@@ -586,7 +587,7 @@ WorkerThread::_ProcessZipPackages(const char* sourcePath,
 	// TODO: Put those in the optional packages list view
 	// TODO: Implement mechanism to handle dependencies between these
 	// packages. (Selecting one will auto-select others.)
-	BPath pkgRootDir(sourcePath, PACKAGES_DIRECTORY);
+	BPath pkgRootDir(sourcePath, kPackagesDirectoryPath);
 	BDirectory directory(pkgRootDir.Path());
 	BEntry entry;
 	while (directory.GetNextEntry(&entry) == B_OK) {

@@ -40,6 +40,7 @@
 #include "tracker_private.h"
 
 #include "DialogPane.h"
+#include "InstallerDefs.h"
 #include "PackageViews.h"
 #include "PartitionMenuItem.h"
 #include "WorkerThread.h"
@@ -838,7 +839,7 @@ InstallerWindow::_PublishPackages()
 	} else
 		return; // shouldn't happen
 
-	directory.Append(PACKAGES_DIRECTORY);
+	directory.Append(kPackagesDirectoryPath);
 	BDirectory dir(directory.Path());
 	if (dir.InitCheck() != B_OK)
 		return;
