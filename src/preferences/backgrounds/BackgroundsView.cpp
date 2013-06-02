@@ -29,7 +29,6 @@
 #include <MimeType.h>
 #include <Point.h>
 #include <PopUpMenu.h>
-#include <SpaceLayoutItem.h>
 
 #include <be_apps/Tracker/Background.h>
 
@@ -212,12 +211,7 @@ BackgroundsView::BackgroundsView()
 
 	AddChild(BLayoutBuilder::Group<>(B_VERTICAL)
 		.AddGroup(B_HORIZONTAL)
-			.AddGroup(B_VERTICAL, 0)
-				.Add(BSpaceLayoutItem::CreateVerticalStrut(
-					ceilf(rightbox->TopBorderOffset() / 2
-						- previewBox->TopBorderOffset() / 2) + 1))
-				.Add(previewBox)
-				.End()
+			.Add(previewBox)
 			.Add(rightbox)
 			.End()
 		.AddGroup(B_HORIZONTAL)
