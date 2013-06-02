@@ -9,6 +9,9 @@
 #include <errno.h>
 #include <stdio.h>
 
+#include <set>
+#include <string>
+
 #include <Alert.h>
 #include <Autolock.h>
 #include <Catalog.h>
@@ -84,50 +87,23 @@ class WorkerThread::EntryFilter : public CopyEngine::EntryFilter {
 public:
 	EntryFilter(const char* sourceDirectory)
 	{
-		// init BEntry pointing to /var
-		// There is no other way to retrieve the path to the var folder
-		// on the source volume. Using find_directory() with
-		// B_COMMON_VAR_DIRECTORY will only ever get the var folder on the
-		// current /boot volume regardless of the volume of "source", which
-		// makes sense, since passing a volume is meant to folders that are
-		// volume specific, like "trash".
-		BPath path(sourceDirectory);
-		if (path.Append(kSwapFilePath) == B_OK)
-			fSwapFileEntry.SetTo(path.Path());
-		else
-			fSwapFileEntry.Unset();
+		try {
+			fIgnorePaths.insert(kPackagesDirectoryPath);
+			fIgnorePaths.insert(kSourcesDirectoryPath);
+			fIgnorePaths.insert("rr_moved");
+			fIgnorePaths.insert("boot.catalog");
+			fIgnorePaths.insert("haiku-boot-floppy.image");
+			fIgnorePaths.insert(kSwapFilePath);
+		} catch (std::bad_alloc&) {
+		}
+
 	}
 
 	virtual bool ShouldCopyEntry(const BEntry& entry, const char* path,
 		const struct stat& statInfo, int32 level) const
 	{
-		if (level == 1 && S_ISDIR(statInfo.st_mode)) {
-			if (strcmp(kPackagesDirectoryPath, path) == 0) {
-				printf("ignoring '%s'.\n", path);
-				return false;
-			}
-			if (strcmp(kSourcesDirectoryPath, path) == 0) {
-				printf("ignoring '%s'.\n", path);
-				return false;
-			}
-			if (strcmp("rr_moved", path) == 0) {
-				printf("ignoring '%s'.\n", path);
-				return false;
-			}
-		}
-		if (level == 1 && S_ISREG(statInfo.st_mode)) {
-			if (strcmp("boot.catalog", path) == 0) {
-				printf("ignoring '%s'.\n", path);
-				return false;
-			}
-			if (strcmp("haiku-boot-floppy.image", path) == 0) {
-				printf("ignoring '%s'.\n", path);
-				return false;
-			}
-		}
-		if (fSwapFileEntry == entry) {
-			// current location of var
-			printf("ignoring swap file\n");
+		if (fIgnorePaths.find(path) != fIgnorePaths.end()) {
+			printf("ignoring '%s'.\n", path);
 			return false;
 		}
 		return true;
@@ -146,9 +122,7 @@ public:
 	}
 
 private:
-	// TODO: Should be made into a list of BEntris to be ignored, perhaps.
-	// settable by method...
-	BEntry fSwapFileEntry;
+	std::set<std::string>	fIgnorePaths;
 };
 
 
