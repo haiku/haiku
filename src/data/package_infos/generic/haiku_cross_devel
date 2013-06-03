@@ -1,10 +1,10 @@
-name			haiku_devel
+name			haiku_cross_devel
 version			R1~alpha4_pm-1
-architecture	x86_gcc2
-summary			"The Haiku base system development files"
+architecture	HAIKU_PACKAGING_ARCH
+summary			"The Haiku base system files for cross development"
 
 description		"The package contains all files associated with the base system
-needed for development, like static libraries, glue code, library symlinks,
+needed for cross development, like static libraries, glue code, library symlinks,
 header files, etc."
 
 packager		"The Haiku build system"
@@ -14,7 +14,7 @@ copyrights		"2001-2011 Haiku, Inc. et al"
 licenses		"MIT"
 
 provides {
-	haiku_devel = R1~alpha4_pm-1
+	haiku_cross_devel = R1~alpha4_pm-1
 }
 
 requires {

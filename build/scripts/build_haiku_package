@@ -9,6 +9,8 @@ set -o errexit
 # tmpDir
 # compressionLevel
 # updateOnly
+# cc
+# packagingArch
 #
 # addattr
 # copyattr
@@ -111,6 +113,16 @@ done
 # mimeset the whole package content
 echo "$packageName: mimeset'ing package contents ..."
 $mimeset --mimedb "$mimeDB" "$contentsDir"
+
+
+# create the package-info from a generic package-info if needed
+if [ $(basename $(dirname $packageInfoPath)) = 'generic' ]; then
+	echo "$packageName: Creating real package info from generic one ..."
+	genericPackageInfoPath=$packageInfoPath
+	packageInfoPath=$tmpDir/.PackageInfo
+	cat "$genericPackageInfoPath" \
+		| $cc -E -DHAIKU_PACKAGING_ARCH=$packagingArch - > "$packageInfoPath"
+fi
 
 
 # create the package

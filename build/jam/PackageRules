@@ -298,7 +298,11 @@ rule BuildHaikuPackage package : packageInfo
 
 	# locate the package and package info
 	MakeLocate $(package) : $(HAIKU_PACKAGES_DIR) ;
-	SEARCH on $(packageInfo) += $(HAIKU_PACKAGE_INFOS_DIR) ;
+	SEARCH on $(packageInfo) +=
+		[ FDirName $(HAIKU_PACKAGE_INFOS_DIR) $(HAIKU_PACKAGING_ARCH) ]
+		[ FDirName $(HAIKU_PACKAGE_INFOS_DIR) any ]
+		[ FDirName $(HAIKU_PACKAGE_INFOS_DIR) generic ] 
+	;
 	LocalDepends $(package) : $(packageInfo) ;
 
 	# prepare the script that initializes the shell variables
@@ -316,6 +320,8 @@ rule BuildHaikuPackage package : packageInfo
 		: [ on $(package) return $(HAIKU_PACKAGE_COMPRESSION_LEVEL) ] ;
 	AddVariableToScript $(script) : updateOnly
 		: [ on $(package) return $(HAIKU_CONTAINER_UPDATE_ONLY) ] ;
+	AddVariableToScript $(script) : cc : $(TARGET_CC) ;
+	AddVariableToScript $(script) : packagingArch : $(HAIKU_PACKAGING_ARCH) ;
 	AddTargetVariableToScript $(script) : <build>addattr ;
 	AddTargetVariableToScript $(script) : <build>copyattr ;
 	AddTargetVariableToScript $(script) : <mimedb>mime_db : mimeDB ;
