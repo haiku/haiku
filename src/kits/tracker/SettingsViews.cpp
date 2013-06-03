@@ -32,25 +32,28 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-#include <Alert.h>
 
-#include "Commands.h"
-#include "DeskWindow.h"
-#include "Model.h"
 #include "SettingsViews.h"
-#include "Tracker.h"
-#include "WidgetAttributeText.h"
 
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <CheckBox.h>
+#include <ColorControl.h>
 #include <ControlLook.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuField.h>
-#include <ColorControl.h>
 #include <NodeMonitor.h>
+#include <Point.h>
+#include <RadioButton.h>
 #include <StringView.h>
+
+#include "Commands.h"
+#include "DeskWindow.h"
+#include "Model.h"
+#include "Tracker.h"
+#include "WidgetAttributeText.h"
 
 
 static const uint32 kSpaceBarSwitchColor = 'SBsc';

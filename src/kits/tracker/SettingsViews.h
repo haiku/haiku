@@ -35,19 +35,19 @@ All rights reserved.
 #define _SETTINGS_VIEWS
 
 
-#include <CheckBox.h>
 #include <GroupView.h>
-#include <RadioButton.h>
-#include <TextControl.h>
-#include <ColorControl.h>
 
 #include "TrackerSettings.h"
 
 
 const uint32 kSettingsContentsModified = 'Scmo';
 
+
 class BButton;
+class BCheckBox;
+class BColorControl;
 class BMenuField;
+class BRadioButton;
 class BStringView;
 
 
