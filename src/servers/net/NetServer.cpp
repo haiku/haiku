@@ -539,7 +539,11 @@ NetServer::_ConfigureInterface(BMessage& message)
 	}
 
 	// Set up IPv6 Link Local address (based on MAC, if not loopback)
-	_ConfigureIPv6LinkLocal(name);
+
+	// TODO: our IPv6 stack is still fairly fragile. We need more v6 work
+	// (including IPv6 address scope flags before we start attaching link
+	// local addresses by default.
+	//_ConfigureIPv6LinkLocal(name);
 
 	BMessage addressMessage;
 	for (int32 index = 0; message.FindMessage("address", index,
