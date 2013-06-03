@@ -103,6 +103,7 @@ private:
 			BRect				_PaletteSelectorFrame(uint8 colorIndex) const;
 			BRect				_RampFrame(uint8 rampIndex) const;
 			void				_SetCellSize(float size);
+			float				_TextRectOffset();
 
 	private:
 			BRect				fPaletteFrame;

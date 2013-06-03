@@ -36,11 +36,13 @@ using BPrivate::gSystemCatalog;
 #define B_TRANSLATION_CONTEXT "ColorControl"
 
 static const uint32 kMsgColorEntered = 'ccol';
-static const uint32 kMinCellSize = 6;
+static const float kMinCellSize = 6.0f;
 static const float kSelectorPenSize = 2.0f;
 static const float kSelectorSize = 4.0f;
 static const float kSelectorHSpacing = 2.0f;
 static const float kTextFieldsHSpacing = 6.0f;
+static const float kDefaultFontSize = 12.0f;
+static const float kBevelSpacing = 2.0f;
 
 
 BColorControl::BColorControl(BPoint leftTop, color_control_layout layout,
@@ -108,14 +110,20 @@ BColorControl::_InitData(color_control_layout layout, float size,
 
 		SetValue(value);
 	} else {
-		BRect rect(0.0f, 0.0f, 70.0f, 15.0f);
+		BRect textRect(0.0f, 0.0f, 0.0f, 0.0f);
 		float labelWidth = std::max(StringWidth(red),
-			std::max(StringWidth(green), StringWidth(blue))) + 5;
-		rect.right = labelWidth + StringWidth("999") + 20;
+			std::max(StringWidth(green), StringWidth(blue)))
+				+ kTextFieldsHSpacing;
+		textRect.right = labelWidth + StringWidth("999999");
+			// enough room for 3 digits plus 3 digits of padding
+		font_height fontHeight;
+		GetFontHeight(&fontHeight);
+		float labelHeight = fontHeight.ascent + fontHeight.descent;
+		textRect.bottom = labelHeight;
 
 		// red
 
-		fRedText = new BTextControl(rect, "_red", red, "0",
+		fRedText = new BTextControl(textRect, "_red", red, "0",
 			new BMessage(kMsgColorEntered), B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			B_WILL_DRAW | B_NAVIGABLE);
 		fRedText->SetDivider(labelWidth);
@@ -126,12 +134,10 @@ BColorControl::_InitData(color_control_layout layout, float size,
 			fRedText->TextView()->AllowChar(i);
 		fRedText->TextView()->SetMaxBytes(3);
 
-		float offset = fRedText->Bounds().Height() + 2.0f;
-
 		// green
 
-		rect.OffsetBy(0, offset);
-		fGreenText = new BTextControl(rect, "_green", green, "0",
+		textRect.OffsetBy(0, _TextRectOffset());
+		fGreenText = new BTextControl(textRect, "_green", green, "0",
 			new BMessage(kMsgColorEntered), B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			B_WILL_DRAW | B_NAVIGABLE);
 		fGreenText->SetDivider(labelWidth);
@@ -144,8 +150,8 @@ BColorControl::_InitData(color_control_layout layout, float size,
 
 		// blue
 
-		rect.OffsetBy(0, offset);
-		fBlueText = new BTextControl(rect, "_blue", blue, "0",
+		textRect.OffsetBy(0, _TextRectOffset());
+		fBlueText = new BTextControl(textRect, "_blue", blue, "0",
 			new BMessage(kMsgColorEntered), B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			B_WILL_DRAW | B_NAVIGABLE);
 		fBlueText->SetDivider(labelWidth);
@@ -165,7 +171,7 @@ BColorControl::_InitData(color_control_layout layout, float size,
 
 	if (useOffscreen) {
 		BRect bounds = fPaletteFrame;
-		bounds.InsetBy(-2.0f, -2.0f);
+		bounds.InsetBy(-kBevelSpacing, -kBevelSpacing);
 
 		fBitmap = new BBitmap(bounds, B_RGB32, true, false);
 		fOffscreenView = new BView(bounds, "off_view", 0, 0);
@@ -183,30 +189,24 @@ BColorControl::_InitData(color_control_layout layout, float size,
 void
 BColorControl::_LayoutView()
 {
-	if (fPaletteMode) {
-		fPaletteFrame.Set(2.0f, 2.0f,
-			float(fColumns) * fCellSize + 2.0,
-			float(fRows) * fCellSize + 2.0);
-	} else {
-		fPaletteFrame.Set(2.0f, 2.0f,
-			float(fColumns) * fCellSize + 2.0,
-			float(fRows) * fCellSize + 2.0 - 1.0);
-			// 1 pixel adjust so that the inner space
-			// has exactly rows * cellsize pixels in height
+	fPaletteFrame.Set(0, 0, fColumns * fCellSize, fRows * fCellSize);
+	fPaletteFrame.OffsetBy(kBevelSpacing, kBevelSpacing);
+	if (!fPaletteMode) {
+		// Reduce the inner space by 1 pixel so that the frame
+		// is exactly rows * cellsize pixels in height
+		fPaletteFrame.bottom -= 1;
 	}
 
-	BRect rect = fPaletteFrame.InsetByCopy(-2.0, -2.0);
-		// bevel
+	BRect rect = fPaletteFrame.InsetByCopy(-kBevelSpacing, -kBevelSpacing);
+		// frame not including bevel
 
-	if (rect.Height() < fBlueText->Frame().bottom) {
-		// adjust the height to fit
+	if (rect.Height() < fBlueText->Frame().bottom)
 		rect.bottom = fBlueText->Frame().bottom;
-	}
 
-	float offset = floor(rect.bottom / 4);
+	float offset = floorf(rect.bottom / 4);
 	float y = offset;
-	if (offset < fRedText->Bounds().Height() + 2) {
-		offset = fRedText->Bounds().Height() + 2;
+	if (offset < _TextRectOffset()) {
+		offset = _TextRectOffset();
 		y = 0;
 	}
 
@@ -417,7 +417,7 @@ BColorControl::Draw(BRect updateRect)
 void
 BColorControl::_DrawColorArea(BView* target, BRect updateRect)
 {
-	BRect bevelRect = fPaletteFrame.InsetByCopy(-2.0, -2.0);
+	BRect bevelRect = fPaletteFrame.InsetByCopy(-kBevelSpacing, -kBevelSpacing);
 	bool enabled = IsEnabled();
 
 	rgb_color noTint = ui_color(B_PANEL_BACKGROUND_COLOR);
@@ -615,7 +615,18 @@ BColorControl::_RampFrame(uint8 rampIndex) const
 void
 BColorControl::_SetCellSize(float size)
 {
-	fCellSize = ceilf(max_c(kMinCellSize, size));
+	BFont font;
+	GetFont(&font);
+	fCellSize = std::max(kMinCellSize,
+		ceilf(size * font.Size() / kDefaultFontSize));
+}
+
+
+float
+BColorControl::_TextRectOffset()
+{
+	return std::max(fRedText->Bounds().Height(),
+		ceilf(_PaletteFrame().Height() / 3));
 }
 
 
@@ -635,7 +646,7 @@ BColorControl::_InitOffscreen()
 {
 	if (fBitmap->Lock()) {
 		_DrawColorArea(fOffscreenView,
-			fPaletteFrame.InsetByCopy(-2.0f, -2.0f));
+			fPaletteFrame.InsetByCopy(-kBevelSpacing, -kBevelSpacing));
 		fOffscreenView->Sync();
 		fBitmap->Unlock();
 	}
@@ -841,7 +852,7 @@ BColorControl::DetachedFromWindow()
 void
 BColorControl::GetPreferredSize(float* _width, float* _height)
 {
-	BRect rect = fPaletteFrame.InsetByCopy(-2.0, -2.0);
+	BRect rect = fPaletteFrame.InsetByCopy(-kBevelSpacing, -kBevelSpacing);
 		// bevel
 
 	if (rect.Height() < fBlueText->Frame().bottom) {
