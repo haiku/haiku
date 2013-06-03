@@ -57,8 +57,6 @@ All rights reserved.
 
 
 static const uint32 kSpaceBarSwitchColor = 'SBsc';
-static const float kItemExtraSpacing = 2.0f;
-static const float kIndentSpacing = 12.0f;
 
 //TODO: defaults should be set in one place only (TrackerSettings.cpp) while
 //		being accessible from here.
@@ -734,15 +732,17 @@ SpaceBarSettingsView::SpaceBarSettingsView()
 
 	fColorPicker = new BMenuField("menu", NULL, menu);
 
-	fColorControl = new BColorControl(BPoint(8,
-			fColorPicker->Bounds().Height() + 8 + kItemExtraSpacing),
+	fColorControl = new BColorControl(BPoint(0, 0),
 		B_CELLS_16x16, 1, "SpaceColorControl",
 		new BMessage(kSpaceBarColorChanged));
 	fColorControl->SetValue(TrackerSettings().UsedSpaceColor());
 
 	BBox* box = new BBox("box");
 	box->SetLabel(fColorPicker);
-	box->AddChild(fColorControl);
+	box->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL)
+		.Add(fColorControl)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.View());
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.Add(fSpaceBarShowCheckBox)
