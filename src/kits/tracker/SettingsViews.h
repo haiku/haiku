@@ -69,6 +69,7 @@ class SettingsView : public BGroupView {
 		typedef BGroupView _inherited;
 };
 
+
 class DesktopSettingsView : public SettingsView {
 	public:
 		DesktopSettingsView();
@@ -100,6 +101,7 @@ class DesktopSettingsView : public SettingsView {
 
 		typedef SettingsView _inherited;
 };
+
 
 class WindowsSettingsView : public SettingsView {
 	public:
@@ -133,6 +135,7 @@ class WindowsSettingsView : public SettingsView {
 
 		typedef SettingsView _inherited;
 };
+
 
 class SpaceBarSettingsView : public SettingsView {
 	public:

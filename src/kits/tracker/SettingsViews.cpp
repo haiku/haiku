@@ -65,11 +65,11 @@ static const float kIndentSpacing = 12.0f;
 //		What about adding DefaultValue(), IsDefault() etc... methods to
 //		xxxValueSetting ?
 static const uint8 kSpaceBarAlpha = 192;
-static const rgb_color kDefaultUsedSpaceColor = {0, 203, 0, kSpaceBarAlpha};
+static const rgb_color kDefaultUsedSpaceColor = { 0, 203, 0, kSpaceBarAlpha };
 static const rgb_color kDefaultFreeSpaceColor
-	= {255, 255, 255, kSpaceBarAlpha};
+	= { 255, 255, 255, kSpaceBarAlpha };
 static const rgb_color kDefaultWarningSpaceColor
-	= {203, 0, 0, kSpaceBarAlpha};
+	= { 203, 0, 0, kSpaceBarAlpha };
 
 
 static void
