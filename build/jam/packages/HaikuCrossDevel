@@ -4,16 +4,12 @@
 # The main use of this package is to provide HaikuPorter with a development
 # environment for a cross-build Haiku platform.
 
-local haikuCrossDevelPackage = haiku_cross_devel.hpkg ;
+# first create the actual cross development package
+
+local haikuCrossDevelPackage = haiku_cross_devel_$(HAIKU_PACKAGING_ARCH).hpkg ;
 HaikuPackage $(haikuCrossDevelPackage) ;
 
-local arch ;
-if $(HAIKU_GCC_VERSION[1]) = 2 {
-	arch = x86_gcc2 ;
-} else {
-	arch = $(TARGET_ARCH) ;
-}
-local developCrossLibDirTokens = develop cross lib $(arch) ;
+local developCrossLibDirTokens = develop lib $(HAIKU_PACKAGING_ARCH) ;
 
 # glue code
 AddFilesToPackage $(developCrossLibDirTokens) :
@@ -40,7 +36,7 @@ AddFilesToPackage $(developCrossLibDirTokens) : liblocalestub.a ;
 AddFilesToPackage $(developCrossLibDirTokens) : libposix_error_mapper.a ;
 
 # headers
-local developCrossHeadersDirTokens = develop cross headers $(arch) ;
+local developCrossHeadersDirTokens = develop headers $(HAIKU_PACKAGING_ARCH) ;
 local headerDir ;
 for headerDir in config glibc os posix {
 	CopyDirectoryToPackage $(developCrossHeadersDirTokens)
@@ -61,3 +57,18 @@ if $(HAIKU_GCC_VERSION[1]) = 2 {
 }
 
 BuildHaikuPackage $(haikuCrossDevelPackage) : haiku_cross_devel ;
+
+# Now create a wrapper package which just contains the actual cross development 
+# package. This wrapper package can safely be installed into the system 
+# hierarchy of the target system, from where haikuporter will fetch it when
+# needed.
+
+local haikuCrossDevelWrapperPackage 
+	= haiku_cross_devel_wrapper_$(HAIKU_PACKAGING_ARCH).hpkg ;
+HaikuPackage $(haikuCrossDevelWrapperPackage) ;
+
+# add the wrapped package
+local developCrossDirTokens = develop cross ;
+AddFilesToPackage $(developCrossDirTokens) : $(haikuCrossDevelPackage) ;
+
+BuildHaikuPackage $(haikuCrossDevelWrapperPackage) : haiku_cross_devel_wrapper ;
