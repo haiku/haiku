@@ -257,11 +257,14 @@ CDDBServer::Read(QueryResponseData* diskData, ReadResponseData* readResponse)
 				trackData->trackNumber = track;
 
 				int32 pos = line.FindFirst(" / " );
-				if (pos != B_ERROR) {
-					// We have track specific artist information.
+				if (pos != B_ERROR && diskData->artist.ICompare("Various") == 0) {
+					// Disk is set to have a compilation artist and
+					// we have track specific artist information.
 					BString artist;
 					line.MoveInto(artist, 0, pos);
+						// Move artist information from line to artist.
 					line.Remove(0, 3);
+						// Remove " / " from line.
 					trackData->artist = artist;
 				} else {
 					trackData->artist = diskData->artist;
