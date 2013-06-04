@@ -349,10 +349,10 @@ find_directory(directory_which which, dev_t device, bool createIt,
 
 		/* Global directories */
 		case B_APPS_DIRECTORY:
-			templatePath = "apps";
+			templatePath = COMMON "/apps";
 			break;
 		case B_PREFERENCES_DIRECTORY:
-			templatePath = "preferences";
+			templatePath = COMMON "/preferences";
 			break;
 		case B_UTILITIES_DIRECTORY:
 			templatePath = "utilities";
