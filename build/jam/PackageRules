@@ -259,7 +259,7 @@ actions together LinkInstallZip
 rule FHaikuPackageGrist package
 {
 	local grist = [ Match "<(.*)>" : $(package:G) ] ;
-	return hpkg_$(grist:E="")_$(package:G=) ;
+	return hpkg_$(grist:E="")-$(package:G=) ;
 }
 
 
