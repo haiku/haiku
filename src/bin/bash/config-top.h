@@ -56,9 +56,9 @@
 #define DEFAULT_PATH_VALUE \
   ".:/boot/home/config/non-packaged/bin:/boot/home/config/bin" \
   ":/boot/common/non-packaged/bin:/boot/common/bin" \
-  ":/bin:/boot/apps:/boot/preferences" \
+  ":/bin:/boot/common/apps:/boot/common/preferences" \
   ":/boot/system/apps" \
-  ":/boot/system/preferences" 
+  ":/boot/system/preferences"
 #endif
 
 /* The value for PATH when invoking `command -p'.  This is only used when
@@ -66,7 +66,7 @@
 #ifndef STANDARD_UTILS_PATH
 #define STANDARD_UTILS_PATH \
   ":/boot/common/non-packaged/bin:/boot/common/bin" \
-  ":/bin:/boot/apps:/boot/preferences" \
+  ":/bin:/boot/common/apps:/boot/common/preferences" \
   ":/boot/system/apps" \
   ":/boot/system/preferences" 
 #endif

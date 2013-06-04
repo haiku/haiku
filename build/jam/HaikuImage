@@ -204,8 +204,6 @@ AddPackageFilesToHaikuImage system : haiku.hpkg ;
 AddPackageFilesToHaikuImage system : haiku_loader.hpkg ;
 
 
-AddSymlinkToHaikuImage . : /boot/common/apps ;
-AddSymlinkToHaikuImage . : /boot/common/preferences ;
 AddSymlinkToHaikuImage home Desktop : /boot/home : Home ;
 
 # Mailbox folders and symlink

@@ -178,7 +178,7 @@ if [ IsOptionalHaikuImagePackageAdded ArmyKnife ] {
 		InstallOptionalHaikuImagePackage
 			$(baseURL)/armyknife-63-r1a4-x86-gcc2-2012-08-30.zip ;
 		AddSymlinkToHaikuImage home config settings deskbar menu Applications
-			: /boot/apps/ArmyKnife/ArmyKnife ;
+			: /boot/common/apps/ArmyKnife/ArmyKnife ;
 	}
 }
 
@@ -210,7 +210,7 @@ if [ IsOptionalHaikuImagePackageAdded BeAE ] {
 				$(baseURL)/beae-22-r1a4-x86-gcc2-2012-08-27.zip ;
 		}
 		AddSymlinkToHaikuImage home config settings deskbar menu Applications
-			: /boot/apps/BeAE/BeAE ;
+			: /boot/common/apps/BeAE/BeAE ;
 	}
 }
 
@@ -228,7 +228,7 @@ if [ IsOptionalHaikuImagePackageAdded Beam ] {
 				$(baseURL)/beam-1.2alpha-r1a4-x86-gcc2-2012-08-29.zip ;
 		}
 		AddSymlinkToHaikuImage home config settings deskbar menu Applications
-			: /boot/apps/Beam/Beam ;
+			: /boot/common/apps/Beam/Beam ;
 	}
 }
 
@@ -291,7 +291,7 @@ if [ IsOptionalHaikuImagePackageAdded BePDF ] {
 				$(hpkgBaseURL)/bepdf-1.1.1~beta5_130428-1-x86_gcc2.hpkg ;
 		}
 		AddSymlinkToHaikuImage home config settings deskbar menu Applications
-			: /boot/apps/BePDF/BePDF ;
+			: /boot/common/apps/BePDF/BePDF ;
 	}
 }
 
@@ -309,7 +309,7 @@ if [ IsOptionalHaikuImagePackageAdded BeZillaBrowser ] {
 				$(hpkgBaseURL)/bezillabrowser-2.0.0.22pre_2010_05_02-1-x86_gcc2.hpkg ;
  		}
  		AddSymlinkToHaikuImage home config settings deskbar menu Applications
-			: /boot/apps/BeZillaBrowser/BeZillaBrowser ;
+			: /boot/common/apps/BeZillaBrowser/BeZillaBrowser ;
 	}
 }
 
@@ -351,7 +351,7 @@ if [ IsOptionalHaikuImagePackageAdded BurnItNow ] {
 				$(baseURL)/burnitnow-39-r1a4-x86-gcc2-2012-08-27.zip ;
 		}
 		AddSymlinkToHaikuImage home config settings deskbar menu Applications
-			: /boot/apps/BurnItNow/BurnItNow ;
+			: /boot/common/apps/BurnItNow/BurnItNow ;
 	}
 }
 
@@ -403,7 +403,7 @@ if [ IsOptionalHaikuImagePackageAdded Caya ] {
 				$(baseURL)/caya-gpl-protocols-36-r1a4-x86-gcc4-2012-10-01.zip
 				: : cdPackage ;
 			AddSymlinkToHaikuImage home config be Applications
-				: /boot/apps/Caya/Caya ;
+				: /boot/common/apps/Caya/Caya ;
 		} else {
 			Echo "No optional package Caya available for $(TARGET_ARCH)-gcc2" ;
 		}
@@ -474,7 +474,7 @@ if [ IsOptionalHaikuImagePackageAdded Clockwerk ] {
 				$(baseURL)/Clockwerk-0.0.2-x86-gcc2-2012-03-04.zip ;
 		}
 		AddSymlinkToHaikuImage home config settings deskbar menu Applications
-			: /boot/apps/Clockwerk/Clockwerk ;
+			: /boot/common/apps/Clockwerk/Clockwerk ;
 	}
 }
 
@@ -523,7 +523,7 @@ if [ IsOptionalHaikuImagePackageAdded Colors! ] {
 				$(baseURL)/Colors\!-2.1-r1a4-x86-gcc2-2012-08-30.zip ;
 		}
 		AddSymlinkToHaikuImage home config settings deskbar menu Applications
-			: /boot/apps/Colors\!/Colors\! ;
+			: /boot/common/apps/Colors\!/Colors\! ;
 	}
 }
 
@@ -868,7 +868,7 @@ if [ IsOptionalHaikuImagePackageAdded friss ] {
 				$(baseURL)/friss-33-r1a4-x86-gcc2-2012-11-06.zip ;
 		}
 #		AddSymlinkToHaikuImage home config settings deskbar menu Desktop\ applets
-#			: /boot/apps/FRiSS/FRiSS ;
+#			: /boot/common/apps/FRiSS/FRiSS ;
 	}
 }
 
@@ -1389,7 +1389,7 @@ if [ IsOptionalHaikuImagePackageAdded NetSurf ] {
 		InstallOptionalHaikuImagePackage
 			$(baseURL)/netsurf-2.7-r1a3-x86-gcc2-2011-06-04.zip ;
 		AddSymlinkToHaikuImage home config settings deskbar menu Applications
-			: /boot/apps/NetSurf/NetSurf ;
+			: /boot/common/apps/NetSurf/NetSurf ;
 	}
 }
 
@@ -1502,9 +1502,9 @@ if [ IsOptionalHaikuImagePackageAdded Paladin ] {
 		}
 
 		AddSymlinkToHaikuImage home config settings deskbar menu Applications
-			: /boot/apps/Paladin/Paladin ;
+			: /boot/common/apps/Paladin/Paladin ;
 		AddSymlinkToHaikuImage common bin
-			: /boot/apps/Paladin/Paladin ;
+			: /boot/common/apps/Paladin/Paladin ;
 	}
 }
 
@@ -1541,7 +1541,7 @@ if [ IsOptionalHaikuImagePackageAdded Pe ] {
 				$(hpkgBaseURL)/pe-2.4.3_hg602-3-x86_gcc2.hpkg ;
 		}
 		AddSymlinkToHaikuImage home config settings deskbar menu Applications
-			: /boot/apps/Pe/Pe ;
+			: /boot/common/apps/Pe/Pe ;
 	}
 }
 
@@ -1577,7 +1577,7 @@ if [ IsOptionalHaikuImagePackageAdded Puri ] {
 		InstallOptionalHaikuImagePackage
 			$(baseURL)/puri-0.3.9.1-x86-gcc4-2012-11-01.zip ;
 		AddSymlinkToHaikuImage home config settings deskbar menu Applications
-			: /boot/apps/Puri/Puri ;
+			: /boot/common/apps/Puri/Puri ;
 	}
 }
 
@@ -1889,7 +1889,7 @@ if [ IsOptionalHaikuImagePackageAdded Vision ] {
 				$(hpkgBaseURL)/vision-908-3-x86_gcc2.hpkg ;
 		}
 		AddSymlinkToHaikuImage home config settings deskbar menu Applications
-			: /boot/apps/Vision/Vision ;
+			: /boot/common/apps/Vision/Vision ;
 	}
 }
 
@@ -1920,7 +1920,7 @@ if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
 		AddFilesToHaikuHybridImage apps : WebPositive ;
 		AddSymlinkToHaikuHybridImage
 			home config settings deskbar menu Applications
-			: /boot/apps/WebPositive ;
+			: /boot/common/apps/WebPositive ;
 	}
 }
 

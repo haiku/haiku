@@ -8,7 +8,7 @@ This tiny Deskbar replicant is a window autoraiser. It will bring to front whate
 
 
 Installation:
-- put the AutoRaise folder where you want (I suggest /boot/apps),
+- put the AutoRaise folder where you want (I suggest /boot/common/apps),
 - you can delete the src/ folder if you aren't interested in the sources,
 - double-click on either the 'Put me in Deskbar', or 'Put me in Deskbar (persistant)', the later will keep it in between boots.
 

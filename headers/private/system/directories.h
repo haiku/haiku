@@ -13,8 +13,8 @@
 #define kGlobalTempDirectory 			"/tmp"
 #define kGlobalVarDirectory 			"/var"
 
-#define kAppsDirectory 					"/boot/apps"
-#define kPreferencesDirectory 			"/boot/preferences"
+#define kAppsDirectory 					"/boot/common/apps"
+#define kPreferencesDirectory 			"/boot/common/preferences"
 
 #define kAppLocalAddonsDirectory 		"%A/add-ons"
 #define kAppLocalLibDirectory 			"%A/lib"

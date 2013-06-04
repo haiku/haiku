@@ -29,11 +29,11 @@ export BE_HOST_CPU
 
 if [ "$SAFEMODE" != "yes" ]
 then
-	export PATH=.:$HOME/config/non-packaged/bin:$HOME/config/bin:/boot/common/non-packaged/bin:/boot/common/bin:/bin:/boot/apps:/boot/preferences:/boot/system/apps:/boot/system/preferences
+	export PATH=.:$HOME/config/non-packaged/bin:$HOME/config/bin:/boot/common/non-packaged/bin:/boot/common/bin:/bin:/boot/common/apps:/boot/common/preferences:/boot/system/apps:/boot/system/preferences
 	export LIBRARY_PATH="%A/lib:$HOME/config/non-packaged/lib:$HOME/config/lib:/boot/common/non-packaged/lib:/boot/common/lib:/boot/system/lib"
 	export ADDON_PATH="%A/add-ons:$HOME/config/non-packaged/add-ons:$HOME/config/add-ons:/boot/common/non-packaged/add-ons:/boot/common/add-ons:/boot/system/add-ons"
 else
-	export PATH=.:/bin:/boot/apps:/boot/system/apps:/boot/system/preferences
+	export PATH=.:/bin:/boot/common/apps:/boot/system/apps:/boot/system/preferences
 	export LIBRARY_PATH="%A/lib:/boot/system/lib"
 	export ADDON_PATH="%A/add-ons:/boot/system/add-ons"
 fi

@@ -1309,7 +1309,7 @@ copydir(char *fromPath,char *toPath)
 static int
 do_copytest(int argc, char **argv)
 {
-    char *fromPath = "/boot/apps/internet/mozilla";
+    char *fromPath = "/boot/common/apps/internet/mozilla";
 
 	if (argc > 2) {
 		printf("usage: copytest <path>");
