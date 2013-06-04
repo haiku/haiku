@@ -33,6 +33,7 @@ WriteMailCatalogEntryAttribute()
 }
 
 
+# TODO: Several of the directories are read-only, so this doesn't work.
 WriteTrackerCatalogEntryAttribute \
 	"$(finddir B_APPS_DIRECTORY)" B_APPS_DIRECTORY
 
@@ -54,8 +55,6 @@ WriteTrackerCatalogEntryAttribute \
 WriteTrackerCatalogEntryAttribute \
 	"$(finddir B_USER_SETTINGS_DIRECTORY)/Tracker/Tracker New Templates" \
 	"B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates"
-
-WriteTrackerCatalogEntryAttribute "/boot/optional" "/boot/optional"
 
 WriteTrackerCatalogEntryAttribute \
 	"$(finddir B_PREFERENCES_DIRECTORY)" B_PREFERENCES_DIRECTORY
