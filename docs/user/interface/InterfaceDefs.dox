@@ -1,13 +1,13 @@
 /*
- * Copyright 2011 Haiku, Inc. All rights reserved.
+ * Copyright 2011-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/interface/InterfaceDefs.h	rev 43230
- *		src/kits/interface/InterfaceDefs.cpp	rev 43230
+ *		headers/os/interface/InterfaceDefs.h	hrev45737
+ *		src/kits/interface/InterfaceDefs.cpp	hrev45737
  */
 
 
@@ -104,6 +104,85 @@
 
 	Set the width of each button to accomidate the width of the button's
 	label.
+*/
+
+
+// Line join and cap modes
+
+
+/*!
+	\enum join_mode
+
+	PostScript-style line join modes used by BView::SetLineMode()
+*/
+
+
+/*!
+	\var join_mode B_ROUND_JOIN
+
+	Round join mode.
+*/
+
+
+/*!
+	\var join_mode B_MITER_JOIN
+
+	Miter join mode.
+*/
+
+
+/*!
+	\var join_mode B_BEVEL_JOIN
+
+	Bevel join mode.
+*/
+
+
+/*!
+	\var join_mode B_BUTT_JOIN
+
+	Butt join mode.
+*/
+
+/*!
+	\var join_mode B_SQUARE_JOIN
+
+	Square join mode.
+*/
+
+
+/*!
+	\enum cap_mode
+
+	PostScript-style line cap modes used by BView::SetLineMode()
+*/
+
+
+/*!
+	\var cap_mode B_ROUND_CAP
+
+	Round cap mode.
+*/
+
+
+/*!
+	\var cap_mode B_BUTT_CAP
+
+	Butt cap mode.
+*/
+
+
+/*!
+	\var cap_mode B_SQUARE_CAP
+
+	Square cap mode.
+*/
+
+
+/*!
+	\var B_DEFAULT_MITER_LIMIT
+
+	Default miter limit used to calculate the angle cut off for miter joins.
 */
 
 

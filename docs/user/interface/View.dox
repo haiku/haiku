@@ -1,13 +1,13 @@
 /*
- * Copyright 2011 Haiku, Inc. All rights reserved.
+ * Copyright 2011-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/interface/View.h	 rev 42794
- *		src/kits/interface/View.cpp	 rev 42794
+ *		headers/os/interface/View.h	 hrev45737
+ *		src/kits/interface/View.cpp	 hrev45737
  */
 
 
@@ -16,6 +16,447 @@
 	\ingroup interface
 	\ingroup libbe
 	\brief BView class definition and support data structures.
+*/
+
+
+// mouse buttons
+
+
+/*!
+	\var B_PRIMARY_MOUSE_BUTTON
+
+	Primary mouse button mask parameter.
+*/
+
+
+/*!
+	\var B_SECONDARY_MOUSE_BUTTON
+
+	Secondary mouse button mask parameter.
+*/
+
+
+/*!
+	\var B_TERTIARY_MOUSE_BUTTON
+
+	Tertiary mouse button mask parameter.
+*/
+
+
+// mouse transit
+
+
+/*!
+	\var B_ENTERED_VIEW
+
+	Mouse transit entered view.
+*/
+
+
+/*!
+	\var B_INSIDE_VIEW
+
+	Mouse transit inside view.
+*/
+
+
+/*!
+	\var B_EXITED_VIEW
+
+	Mouse transit exited view.
+*/
+
+
+/*!
+	\var B_OUTSIDE_VIEW
+
+	Mouse transit outside view.
+*/
+
+
+// event mask
+
+
+/*!
+	\var B_POINTER_EVENTS
+
+	Mouse pointer events mask parameter.
+*/
+
+
+/*!
+	\var B_KEYBOARD_EVENTS
+
+	Keyboard events mask parameter.
+*/
+
+
+// event mask options
+
+
+/*!
+	\var B_LOCK_WINDOW_FOCUS
+
+	Prevents the attached window from losing its focused state while the mouse is
+	held down.
+*/
+
+
+/*!
+	\var B_SUSPEND_VIEW_FOCUS
+
+	Events normally sent to the focus view are suppressed.
+*/
+
+
+/*!
+	\var B_NO_POINTER_HISTORY
+
+	Send only the most recent MouseMoved() event to the view.
+
+	\note New in Haiku: unless this flag is specified, both BWindow and
+	      BView::GetMouse() will filter out older mouse moved messages.
+*/
+
+
+/*!
+	\var B_FULL_POINTER_HISTORY
+
+	Send all MouseMoved() events to the view.
+*/
+
+
+// event tracking
+
+
+/*!
+	\var B_TRACK_WHOLE_RECT
+
+	The whole rectangle moves with the cursor.
+*/
+
+
+/*!
+	\var B_TRACK_RECT_CORNER
+
+	The left top corner is fixed while the right and bottom edges move with the
+	cursor.
+*/
+
+
+// set font mask
+
+
+/*!
+	\var B_FONT_FAMILY_AND_STYLE
+
+	Font family and style mask parameter.
+*/
+
+
+/*!
+	\var B_FONT_SIZE
+
+	Font size mask parameter.
+*/
+
+
+/*!
+	\var B_FONT_SHEAR
+
+	Font shear mask parameter.
+*/
+
+
+/*!
+	\var B_FONT_ROTATION
+
+	Font rotation mask parameter.
+*/
+
+
+/*!
+	\var B_FONT_SPACING
+
+	Font spacing mask parameter.
+*/
+
+
+/*!
+	\var B_FONT_ENCODING
+
+	Font encoding mask parameter.
+*/
+
+
+/*!
+	\var B_FONT_FACE
+
+	Font face mask parameter.
+*/
+
+
+/*!
+	\var B_FONT_FLAGS
+
+	Font flags mask parameter.
+*/
+
+
+/*!
+	\var B_FONT_FALSE_BOLD_WIDTH
+
+	Font false bold width mask parameter.
+*/
+
+
+/*!
+	\var B_FONT_ALL
+
+	Font all properties mask parameter.
+*/
+
+
+// view flags
+
+
+/*!
+	\var B_FULL_UPDATE_ON_RESIZE
+
+	Redraw the entire view on resize.
+*/
+
+
+/*!
+	\var _B_RESERVED1_
+
+	Reserved for future use.
+*/
+
+
+/*!
+	\var B_WILL_DRAW
+
+	Indicates that the view will do it's own drawing.
+*/
+
+
+/*!
+	\var B_PULSE_NEEDED
+
+	Indicates that the view accepts Pulse() messages.
+*/
+
+
+/*!
+	\var B_NAVIGABLE_JUMP
+
+	Indicates this is the default keyboard navigation view.
+*/
+
+/*!
+	\var B_FRAME_EVENTS
+
+	View responds to frame move and resize events.
+*/
+
+
+/*!
+	\var B_NAVIGABLE
+
+	The view is able to receive focus for keyboard navigation.
+*/
+
+
+/*!
+	\var B_SUBPIXEL_PRECISE
+
+	The view draws with sub-pixel precision.
+*/
+
+
+/*!
+	\var B_DRAW_ON_CHILDREN
+
+	Indicates that the view responds to the DrawAfterChildren() hook method.
+*/
+
+
+/*!
+	\var B_INPUT_METHOD_AWARE
+
+	??
+*/
+
+
+/*!
+	\var _B_RESERVED7_
+
+	Reserved for future use.
+*/
+
+
+/*!
+	\var B_SUPPORTS_LAYOUT
+
+	The view supports the layout APIs, i.e. it doesn't require an explicit frame
+	rectangle to be specified.
+*/
+
+
+/*!
+	\var B_INVALIDATE_AFTER_LAYOUT
+
+	Indicates that the view should be redraw after being added to a layout.
+*/
+
+
+// resize mask variables, internal variables but are in a public header.
+
+
+/*!
+	\var _RESIZE_MASK_
+
+	Resize mask. Do not use.
+*/
+
+
+/*!
+	\var _VIEW_TOP_
+
+	View top mask variable. Do not use.
+*/
+
+
+/*!
+	\var _VIEW_LEFT_
+
+	View left mask variable. Do not use.
+*/
+
+
+/*!
+	\var _VIEW_BOTTOM_
+
+	View bottom mask variable. Do not use.
+*/
+
+
+/*!
+	\var _VIEW_RIGHT_
+
+	View right mask variable. Do not use.
+*/
+
+
+/*!
+	\var _VIEW_CENTER_
+
+	View center mask variable. Do not use.
+*/
+
+
+/*!
+	\fn inline uint32 _rule_(uint32 r1, uint32 r2, uint32 r3, uint32 r4)
+	\brief Internal function, do not use.
+*/
+
+
+// resize mask
+
+
+/*!
+	\var B_FOLLOW_NONE
+
+	Follow none resize mask parameter. Equivalent to <tt>B_FOLLOW_LEFT
+	| B_FOLLOW_TOP</tt>. The view maintains its position in its parent's
+	coordinate system but not in the screen coordinate system.
+*/
+
+
+/*!
+	\var B_FOLLOW_ALL_SIDES
+
+	Follow all sides resize mask parameter. Equivalent to <tt>B_FOLLOW_LEFT_RIGHT |
+	B_FOLLOW_TOP_BOTTOM</tt>. The view will be resized with its parent view both
+	horizontally and vertically.
+*/
+
+
+/*!
+	\var B_FOLLOW_ALL
+
+	Equivalent to \c B_FOLLOW_ALL_SIDES.
+*/
+
+
+// horizontal resize mask
+
+
+/*!
+	\var B_FOLLOW_LEFT
+
+	The margin between the left side of the view and the left side of the parent
+	remains constant.
+*/
+
+
+/*!
+	\var B_FOLLOW_RIGHT
+
+	The margin between the right side of the view and the right side of the parent
+	remains constant.
+*/
+
+
+/*!
+	\var B_FOLLOW_LEFT_RIGHT
+
+	The margin between the left and right sides of the view and the left and right
+	sides of the parent both remain constant.
+*/
+
+
+/*!
+	\var B_FOLLOW_H_CENTER
+
+	The view maintains a constant relationship to the horizontal center of the
+	parent view.
+*/
+
+
+// vertical resize mask
+
+
+/*!
+	\var B_FOLLOW_TOP
+
+	The margin between the top of the view and the top of the parent remains
+	constant.
+*/
+
+
+/*!
+	\var B_FOLLOW_BOTTOM
+
+	The margin between the bottom of the view and the bottom of the parent remains
+	constant.
+*/
+
+
+/*!
+	\var B_FOLLOW_TOP_BOTTOM
+
+	The margin between the top and bottom sides of the view and the top and bottom
+	sides of the parent both remain constant.
+*/
+
+
+/*!
+	\var B_FOLLOW_V_CENTER
+
+	The view maintains a constant relationship to the vertical center of the
+	parent view.
 */
 
 
@@ -28,9 +469,107 @@
 
 
 /*!
+	\fn BView::BView(const char* name, uint32 flags, BLayout* layout)
+	\brief Layout constructor.
+
+	\param name The name of the view.
+	\param flags The view flags.
+	\param layout A \a layout to set the view to.
+*/
+
+
+/*!
+	\fn BView::BView(BRect frame, const char* name, uint32 resizingMode,
+		uint32 flags)
+	\brief Standard constructor.
+
+	\param frame The \a frame rectangle of the view.
+	\param name The name of the view.
+	\param resizingMode The resizing mode flags.
+	\param flags The view flags.
+*/
+
+
+/*!
+	\fn BView::BView(BMessage* archive)
+	\brief Archive constructor.
+
+	\param archive The data message to construct the view from.
+*/
+
+
+/*!
+	\fn BView::~BView()
+	\brief Destructor method.
+
+	Deletes the view and all children freeing any memory used.
+*/
+
+
+/*!
+	\name Archiving
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BArchivable* BView::Instantiate(BMessage* data)
+	\brief Creates a new BView object from the \a data message.
+
+	\returns A newly created BView object or \c NULL if the message doesn't
+		contain an archived BView object.
+*/
+
+
+/*!
+	\fn status_t BView::Archive(BMessage* data, bool deep) const
+	\brief Archives the object into the \a data message.
+
+	\param data A pointer to the BMessage object to archive the object into.
+	\param deep Whether or not to archive child views as well.
+
+	\return A status code, \c B_OK if everything went well or an error code
+	        otherwise.
+	\retval B_OK The object was archived successfully.
+	\retval B_NO_MEMORY Ran out of memory while archiving the object.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Hook Methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BView::AllUnarchived(const BMessage* from)
+	\brief Hook method called when all views have been unarchived.
+
+	The default implementation does nothing.
+*/
+
+
+/*!
+	\fn status_t BView::AllArchived(BMessage* into) const
+	\brief Hook method called when all views have been archived.
+
+	The default implementation does nothing.
+*/
+
+
+/*!
 	\fn void BView::AttachedToWindow()
 	\brief Hook method that is called when the object is attached to a
 		window.
+
+	The default implementation does nothing.
 */
 
 
@@ -38,6 +577,8 @@
 	\fn void BView::AllAttached()
 	\brief Similar to AttachedToWindow() but this method is triggered after
 		all child views have already been attached to a window.
+
+	The default implementation does nothing.
 */
 
 
@@ -45,13 +586,19 @@
 	\fn void BView::DetachedFromWindow()
 	\brief Hook method that is called when the object is detached from a
 		window.
+
+	The default implementation does nothing.
 */
+
 
 /*!
 	\fn void BView::AllDetached()
 	\brief Similar to AttachedToWindow() but this method is triggered after
 		all child views have already been detached from a window.
+
+	The default implementation does nothing.
 */
+
 
 /*!
 	\fn void BView::Draw(BRect updateRect)
@@ -59,11 +606,13 @@
 
 	Derived classes should override this method to draw their view.
 
-	\note This is an hook method called by the Interface Kit, you don't
-	have to call it yourself. If you need to forcefully redraw the view
-	consider calling Invalidate() instead.
+	\remark This is an hook method called by the Interface Kit, you don't have to
+	        call it yourself. If you need to forcefully redraw the view consider
+	        calling Invalidate() instead.
 
 	\param updateRect The rectangular area to be drawn.
+
+	The default implementation does nothing.
 */
 
 
@@ -73,6 +622,8 @@
 		already been drawn.
 
 	\param r The rectangular area to be drawn.
+
+	The default implementation does nothing.
 */
 
 
@@ -82,6 +633,8 @@
 
 	\param newPosition The point of the top left corner of the frame
 		that the view has been moved to.
+
+	The default implementation does nothing.
 */
 
 
@@ -91,6 +644,476 @@
 
 	\param newWidth The new \a width of the view.
 	\param newHeight The new \a height of the view.
+
+	The default implementation does nothing.
+*/
+
+
+/*!
+	\fn void BView::KeyDown(const char* bytes, int32 numBytes)
+	\brief Hook method that is called when a keyboard key is pressed.
+
+	\param bytes The bytes of the key combination pressed.
+	\param numBytes The number of bytes in \a bytes.
+
+	The default implementation sets keyboard navigation focus.
+*/
+
+
+/*!
+	\fn void BView::KeyUp(const char* bytes, int32 numBytes)
+	\brief Hook method that is called when a keyboard key is released.
+
+	\param bytes The bytes of the key combination pressed.
+	\param numBytes The number of bytes in \a bytes.
+
+	The default implementation does nothing.
+*/
+
+
+/*!
+	\fn void BView::MessageReceived(BMessage* msg)
+	\brief Handle \a message received by the associated looper.
+
+	\param msg The message received by the associated looper.
+
+	\see BHandler::MessageReceived()
+*/
+
+
+/*!
+	\fn void BView::MouseDown(BPoint where)
+	\brief Hook method that is called when a mouse button is pressed.
+
+	\param where The point on the screen where to mouse pointer is when
+		the mouse button is pressed.
+
+	The default implementation does nothing.
+*/
+
+
+/*!
+	\fn void BView::MouseUp(BPoint where)
+	\brief Hook method that is called when a mouse button is released.
+
+	\param where The point on the screen where to mouse pointer is when
+		the mouse button is released.
+
+	The default implementation does nothing.
+*/
+
+
+/*!
+	\fn void BView::MouseMoved(BPoint where, uint32 code,
+		const BMessage* a_message)
+	\brief Hook method that is called when the mouse is moved.
+
+	The default implementation does nothing.
+*/
+
+
+/*!
+	\fn void BView::Pulse()
+	\brief Hook method that gets called when the view receives a \c B_PULSE
+	       message.
+
+	An action is performed each time the App Server calls the Pulse() method. 
+	The pulse rate is set by SetPulseRate(). You can implement Pulse() to do
+	anything you want. The default version does nothing. The pulse granularity
+	is no better than once per 100,000 microseconds.
+
+	The default implementation does nothing.
+
+	\sa SetPulseRate()
+*/
+
+
+/*!
+	\fn void BView::TargetedByScrollView(BScrollView* scrollView)
+	\brief Hook method called when the view becomes the target of
+	       \a scrollView.
+
+	The default implementation does nothing.
+
+	\param scrollView The BScrollView object that has targeted the view.
+*/
+
+
+/*!
+	\fn void BView::WindowActivated(bool state)
+	\brief Hook method called when the attached window becomes activated or
+	       deactivated.
+
+	The default implementation does nothing.
+
+	\param state \c true if the window becomes activated, \c false if the
+		window becomes deactivated.
+*/
+
+
+//! @}
+
+
+/*!
+	\fn BRect BView::Bounds() const
+	\brief Returns the view frame rectangle in the view's coordinate system.
+
+	\return The bounding rectangle of the view.
+*/
+
+
+/*!
+	\fn BRect BView::Frame() const
+	\brief Returns the frame rectangle of the view in the parent's coordinate system.
+
+	\returns The view's frame rectangle.
+*/
+
+
+/*!
+	\name Coordinate Conversion Methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BView::ConvertToParent(BPoint* pt) const
+	\brief Convert \a pt to the parent's coordinate system in place.
+
+	\param pt A pointer to a BPoint object to convert.
+*/
+
+
+/*!
+	\fn BPoint BView::ConvertToParent(BPoint pt) const
+	\brief Returns \a pt converted to the parent's coordinate system.
+
+	\param pt A BPoint object to convert.
+
+	\return A new BPoint object in the parent's coordinate system.
+*/
+
+
+/*!
+	\fn void BView::ConvertFromParent(BPoint* pt) const
+	\brief Convert \a pt from the parent's coordinate system to the
+		   view's coordinate system in place.
+
+	\param pt A pointer to a BPoint object to convert.
+*/
+
+
+/*!
+	\fn BPoint BView::ConvertFromParent(BPoint pt) const
+	\brief Returns \a pt converted from the parent's coordinate system to the
+		   view's coordinate system.
+
+	\param pt A BPoint object to convert.
+
+	\return A new BPoint object in the view's coordinate system.
+*/
+
+
+/*!
+	\fn void BView::ConvertToParent(BRect* r) const
+	\brief Convert \a r to the parent's coordinate system in place.
+
+	\param r A pointer to a BRect object to convert.
+*/
+
+
+/*!
+	\fn BRect BView::ConvertToParent(BRect r) const
+	\brief Returns \a r converted to the parent's coordinate system.
+
+	\param r A BRect object to convert.
+
+	\return A new BRect object in the parent's coordinate system.
+*/
+
+
+/*!
+	\fn void BView::ConvertFromParent(BRect* r) const
+	\brief Convert \a r from the parent's coordinate system to the
+		   view's coordinate system in place.
+
+	\param r A pointer to a BRect object to convert.
+*/
+
+
+/*!
+	\fn BRect BView::ConvertFromParent(BRect r) const
+	\brief Returns \a r converted from the parent's coordinate system to the
+		   view's coordinate system.
+
+	\param r A BRect object to convert.
+
+	\return A new BRect object in the view's coordinate system.
+*/
+
+
+/*!
+	\fn void BView::ConvertToScreen(BPoint* pt) const
+	\brief Convert \a pt to the screen's coordinate system in place.
+
+	\param pt A pointer to a BPoint object to convert.
+*/
+
+
+/*!
+	\fn BPoint BView::ConvertToScreen(BPoint pt) const
+	\brief Returns \a pt converted to the screen's coordinate system.
+
+	\param pt A BPoint object to convert.
+
+	\return A new BPoint object in the screen's coordinate system.
+*/
+
+
+/*!
+	\fn void BView::ConvertFromScreen(BPoint* pt) const
+	\brief Convert \a pt from the screen's coordinate system to the
+		   view's coordinate system in place.
+
+	\param pt A pointer to a BPoint object to convert.
+*/
+
+
+/*!
+	\fn BPoint BView::ConvertFromScreen(BPoint pt) const
+	\brief Returns \a pt converted from the screen's coordinate system to the
+		   view's coordinate system.
+
+	\param pt A BPoint object to convert.
+
+	\return A new BPoint object in the view's coordinate system.
+*/
+
+
+/*!
+	\fn void BView::ConvertToScreen(BRect* r) const
+	\brief Convert \a r to the screen's coordinate system in place.
+
+	\param r A pointer to a BRect object to convert.
+*/
+
+
+/*!
+	\fn BRect BView::ConvertToScreen(BRect r) const
+	\brief Returns \a r converted to the screen's coordinate system.
+
+	\param r A BRect object to convert.
+
+	\return A new BRect object in the screen's coordinate system.
+*/
+
+
+/*!
+	\fn void BView::ConvertFromScreen(BRect* r) const
+	\brief Convert \a r from the screen's coordinate system to the
+		   view's coordinate system in place.
+
+	\param r A pointer to a BRect object to convert.
+*/
+
+
+/*!
+	\fn BRect BView::ConvertFromScreen(BRect r) const
+	\brief Returns \a r converted from the screen's coordinate system to the
+		   view's coordinate system.
+
+	\param r A BRect object to convert.
+
+	\return A new BRect object in the view's coordinate system.
+*/
+
+
+//! @}
+
+
+/*!
+	\fn uint32 BView::Flags() const
+	\brief Return the view flags set in the constructor or by SetFlags().
+
+	\return The view flags as a uint32 mask.
+*/
+
+
+/*!
+	\fn void BView::SetFlags(uint32 flags)
+	\brief Sets the view flags to the \a flags mask.
+
+	\param flags The view flags to set as a uint32 mask.
+*/
+
+
+//! @}
+
+
+/*!
+	\fn void BView::Hide()
+	\brief Hides the view without removing it from the view hierarchy.
+
+	Calls to Hide() and Show() are cumulative. A visible view becomes hidden
+	once the number of Hide() calls exceeds the number of Show() calls.
+
+	\see BWindow::Hide()
+	\see IsHidden()
+*/
+
+
+/*!
+	\fn void BView::Show()
+	\brief Shows the view making it visible.
+
+	Calls to Hide() and Show() are cumulative. A hidden view becomes visible
+	again once the number of Show() calls matches the number of Hide() calls.
+
+	\see BWindow::Show()
+	\see IsHidden()
+*/
+
+
+/*!
+	\fn bool BView::IsFocus() const
+	\brief Returns whether or not the view is the window's current focus view.
+
+	The focus view changes as the user moves from one view to another either
+	by pushing the tab key or by clicking a new view with the mouse. The change
+	can be made programmatically via the MakeFocus() method.
+
+	\returns \c true if the view is the current focus view, \c false otherwise.
+
+	\see MakeFocus()
+	\see BWindow::CurrentFocus()
+*/
+
+
+/*!
+	\fn bool BView::IsHidden(const BView* lookingFrom) const
+	\brief Returns whether or not the view is hidden from the perspective of
+	       \a lookingFrom.
+
+	A view is considered hidden if it, any of it's parent views, or the window
+	it is attached to has had the Hide() method called on it. This method
+	allows you to determine the hidden status of a view from a different point
+	on the view hierarchy.
+
+	\param lookingFrom The view used as a base when determining the hidden
+	       status of the BView object.
+
+	\return \c true if the view was hidden via the Hide() method, \c false
+	        otherwise.
+*/
+
+
+/*!
+	\fn bool BView::IsHidden() const
+	\brief Returns whether or not the view is hidden.
+
+	A view can be hidden either by calling Hide() on the view, calling Hide()
+	on a parent view or calling Hide() on the window that the view is attached
+	to. When a BWindow or BView is hidden, all its descendants are also hidden.
+
+	This method only returns whether the view or an ancestor view has had the
+	Hide() method called on it, it doesn't consider if the view is obscured
+	by another view or is off-screen. A BView is not hidden by default.
+
+	\return \c true if the view was hidden via the Hide() method, \c false
+	        otherwise.
+*/
+
+
+/*!
+	\fn bool BView::IsPrinting() const
+	\brief Returns whether or not the BView object is drawing to a printer.
+
+	This method should only be called from the Draw() or DrawAfterChildren()
+	methods. If called from any other method this method returns \c false.
+
+	The view may choose different fonts, images, or colors when drawing to a
+	printer vs. when drawing to the screen.
+
+	\return Returns \c true if drawing to a printer, \c false otherwise.
+*/
+
+
+/*!
+	\fn BPoint BView::LeftTop() const
+	\brief Returns the left top corner point.
+
+	\return The left top corner of the view as a BPoint object.
+*/
+
+
+/*!
+	\name Resizing mode methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BView::SetResizingMode(uint32 mode)
+	\brief Sets the resizing mode of the view according to the \a mode mask.
+
+	The resizing mode is first set in the BView constructor.
+
+	\see SetFlags()
+*/
+
+
+/*!
+	\fn uint32 BView::ResizingMode() const
+	\brief Returns the resizing mode flags mask set in the constructor or by
+	       SetResizingMode().
+
+	\returns the current resizing mode flags as a uint32 mask.
+*/
+
+
+//! @}
+
+
+/*!
+	\fn void BView::SetViewCursor(const BCursor* cursor, bool sync)
+	\brief Assigns \a cursor to the view.
+
+	This cursor will be displayed when the mouse is positioned inside the view.
+
+	\param cursor The BCursor object to assign to the view.
+	\param sync If \c true App Server is synchronized immediately forcing the
+	       change to occur. If \c false, the change will be put in the queue and
+	       will take effect when the pending requests are processed. 
+*/
+
+
+/*!
+	\fn void BView::Flush() const
+	\brief Flushes the attached window's connection to App Server.
+
+	If the view isn't attached to a window, Flush() does nothing.
+*/
+
+
+/*!
+	\fn void BView::Sync() const
+	\brief Synchronizes the attached window's connection to App Server.
+
+	\warning If the view isn't attached to a window, Sync() might crash the
+	         application.
+*/
+
+
+/*!
+	\fn BWindow* BView::Window() const
+	\brief Returns the window the view is attached to.
+
+	\return The window the view is attached to or \c NULL if the view isn't
+	attached to a window.
 */
 
 
@@ -102,8 +1125,8 @@
 	Derived classes should override this method to set the preferred
 	size of object.
 
-	\note Either the \a _width or \a _height parameter may be set to \c NULL
-		if you only want to get the other one.
+	\remark Either the \a _width or \a _height parameter may be set to \c NULL
+		    if you only want to get the other one.
 
 	\param[out] _width Pointer to a \c float to store the width of the view.
 	\param[out] _height Pointer to a \c float to store the height of the view.
@@ -112,82 +1135,2054 @@
 
 /*!
 	\fn void BView::ResizeToPreferred()
-	\brief Resize the view to its preferred size.
+	\brief Resizes the view to its preferred size keeping the left top corner
+	       constant.
 */
 
 
 /*!
-	\fn void BView::KeyDown(const char* bytes, int32 numBytes)
-	\brief Hook method that is called when a keyboard key is pressed.
+	\name Input Related Methods
+*/
 
-	\param bytes The bytes of the key combination pressed.
-	\param numBytes The number of bytes in \a bytes.
+
+//! @{
+
+
+/*!
+	\fn void BView::BeginRectTracking(BRect startRect, uint32 style)
+	\brief Displays an outline rectangle on the view and initiates tracking.
+
+	This method is typically called from the MouseDown() while EndRectTracking()
+	is typically called from the MouseUp method().
+
+	\param startRect The initial frame in the view's coordinate system.
+	\param style This parameter is set to one of the following:
+	- \c B_TRACK_WHOLE_RECT The position of the rect changes with the cursor while
+	     its size remains the same.
+	- \c B_TRACK_RECT_CORNER The left top corner is fixed while the right and
+	     bottom edges move with the cursor.
 */
 
 
 /*!
-	\fn void BView::KeyUp(const char* bytes, int32 numBytes)
-	\brief Hook method that is called when a keyboard key is released.
+	\fn void BView::EndRectTracking()
+	\brief Ends tracking removing the outline rectangle from the view.
 
-	\param bytes The bytes of the key combination pressed.
-	\param numBytes The number of bytes in \a bytes.
+	BeginRectTracking() is typically called from the MouseDown() while this method
+	is typically called from the MouseUp() method.
 */
 
 
 /*!
-	\fn void BView::MouseDown(BPoint where)
-	\brief Hook method that is called when a mouse button is pressed.
+	\fn void BView::DragMessage(BMessage* message, BRect dragRect,
+		BHandler* replyTo)
+	\brief Initiates a drag-and-drop session.
 
-	\param where The point on the screen where to mouse pointer is when
-		the mouse button is pressed.
+	This method only works if the BView objects are attached to a window.
+
+	\param message Contains data to be dragged and dropped on the destination
+	       view. The caller retains responsibility for this object.
+	\param dragRect An outline rectangle used in place of a bitmap image set in
+	       the view's coordinate system.
+	\param replyTo The target set to handle the message sent in reply to the
+	       dragged message. If \c NULL the reply is instead directed to the BView
+		   object that initiated the drag-and-drop session.
 */
 
 
 /*!
-	\fn void BView::MouseUp(BPoint where)
-	\brief Hook method that is called when a mouse button is released.
+	\fn void BView::DragMessage(BMessage* message, BBitmap* image,
+		BPoint offset, BHandler* replyTo)
+	\brief Initiates a drag-and-drop session of an \a image.
 
-	\param where The point on the screen where to mouse pointer is when
-		the mouse button is released.
+	This method only works if the BView objects are attached to a window.
+
+	\param message Contains data to be dragged and dropped on the destination
+	       view. The caller retains responsibility for this object.
+	\param image Bitmap image dragged by the user. The memory used by the bitmap
+	       is freed automatically when the message is dropped.
+	\param offset The offset to the hotspot within the image in the bitmap's
+	       coordinate system.
+	\param replyTo The target set to handle the message sent in reply to the
+	       dragged message. If \c NULL the reply is instead directed to the BView
+		   object that initiated the drag-and-drop session.
 */
 
 
 /*!
-	\fn void BView::MouseMoved(BPoint where, uint32 code,
-		const BMessage* a_message)
-	\brief Hook method that is called when the mouse is moved.
+	\fn void BView::DragMessage(BMessage* message, BBitmap* image,
+		drawing_mode dragMode, BPoint offset, BHandler* replyTo)
+	\brief Initiates a drag-and-drop session of an \a image with drawing_mode
+	       set by \a dragMode.
+
+	This method only works if the BView objects are attached to a window.
+
+	\param message Contains data to be dragged and dropped on the destination
+	       view. The caller retains responsibility for this object.
+	\param image Bitmap image dragged by the user. The memory used by the bitmap
+	       is freed automatically when the message is dropped.
+	\param dragMode Sets the drawing_mode used to draw the dragged image. Set to
+	       \c B_OP_ALPHA to drag-and-drop partially transparent images.
+	\param offset The offset to the hotspot within the image in the bitmap's
+	       coordinate system.
+	\param replyTo The target set to handle the message sent in reply to the
+	       dragged message. If \c NULL the reply is instead directed to the BView
+		   object that initiated the drag-and-drop session.
 */
 
 
 /*!
-	\fn void BView::Pulse()
-	\brief Hook method that gets invoked when the view receives a
-		\c B_PULSE message.
+	\fn void BView::GetMouse(BPoint* _location, uint32* _buttons,
+		bool checkMessageQueue)
+	\brief Fills out the cursor location and the current state of the mouse
+	       buttons.
 
-	An action is performed each time the App Server calls the Pulse() method. 
-	The pulse rate is set by SetPulseRate(). You can implement Pulse() to do
-	anything you want. The default version does nothing. The pulse granularity
-	is no better than once per 100,000 microseconds.
+	The cursor doesn't have to be located within the view for this method to work,
+	however, the view must be attached to a window. Don't use this method to track
+	the mouse in your derived view, implement MouseMoved() instead.
 
-	\sa SetPulseRate()
-*/
-
-
-/*!
-	\fn void BView::WindowActivated(bool state)
-	\brief Hook method that is called when the attached window becomes
-		activated or deactivated.
-
-	\param state \c true if the window becomes activated, \c false if the
-		window becomes deactivated.
+	\param[out] _location Filled out with the cursor location in the view's
+	            coordinate system.
+	\param[out] _buttons Filled out with a mask of the following values:
+	            - \c B_PRIMARY_MOUSE_BUTTON
+	            - \c B_SECONDARY_MOUSE_BUTTON
+	            - \c B_TERTIARY_MOUSE_BUTTON
+	\param checkMessageQueue If \c true pull from any pending MouseMoved() or
+	       MouseUp() events in the message queue top down before filling out the
+		   current mouse cursor state.
 */
 
 
 /*!
 	\fn void BView::MakeFocus(bool focusState)
-	\brief Gives or removes focus from the control.
+	\brief Makes the view the current focus view of the window or gives up
+	       being the focus view of the window.
+
+	The focus view handles selections and KeyDown events when the the attached
+	window is active. There can be only one focus view at a time per window.
+
+	When called with \a focusState set to \c true this method first calls
+	MakeFocus() on the previously focused view with \a focusState set to
+	\c false.
+
+	The focus doesn't automatically change when MouseDown is called so calling
+	MakeFocus() is the only way to make a view the focus view of a window.
+	Classes derived from BView that can display the current selection, or that
+	can accept pasted data should call MakeFocus() in their MouseDown() method
+	to update the focus view of the window on click.
+
+	If the view isn't attached to a window this method has no effect.
 
 	\param focusState \a true to set focus, \a false to remove it.
+*/
+
+
+/*!
+	\fn BScrollBar* BView::ScrollBar(orientation posture) const
+	\brief Returns the BScrollBar object that has the BView set as its target.
+
+	\param posture Either \c B_VERTICAL to get the vertical scroll bar or
+	       \c B_HORIZONTAL to get the horizontal scroll bar.
+
+	\returns the Scrollbar object requested or \c NULL if none found.
+
+	\see BScrollBar::SetTarget()
+*/
+
+
+/*!
+	\fn void BView::ScrollBy(float deltaX, float deltaY)
+	\brief Scroll the view by \a deltaX horizontally and \a deltaY vertically.
+
+	\param deltaX The amount to scroll horizontally.
+	\param deltaY The amount to scroll vertically.
+*/
+
+
+/*!
+	\fn void BView::ScrollTo(BPoint where)
+	\brief Scroll the view to the point specified by \a where.
+
+	\param where The location to scroll the view to.
+*/
+
+
+/*!
+	\fn status_t BView::SetEventMask(uint32 mask, uint32 options)
+	\brief Sets whether or not the view can accept mouse and keyboard
+	       events when not in focus.
+
+	If \a mask includes \c B_POINTER_EVENTS then the view will receive mouse
+	events even when the mouse isn't over the view and if it includes
+	\c B_KEYBOARD_EVENTS the view will receive keyboard events even if it
+	isn't in focus.
+
+	The \a options mask options are as follows:
+	- \c B_NO_POINTER_HISTORY Tells App Server to only send the most recent
+	     MouseMoved() event to the view sacrificing some granularity.
+    - \c B_FULL_POINTER_HISTORY Tells App Server to send all MouseMoved()
+	     events to the view.
+
+	\param mask The \a mask of \c B_POINTER_EVENTS and \c B_KEYBOARD_EVENTS
+	       to set.
+	\param options Sets other event-handling options.
+
+	\return \c B_OK if everything went fine or an error code, usually
+	        \c B_ERROR if something went wrong.
+*/
+
+
+/*!
+	\fn uint32 BView::EventMask()
+	\brief Returns the current event mask.
+
+	\return The current event mask as a uint32.
+*/
+
+
+/*!
+	\fn status_t BView::SetMouseEventMask(uint32 mask, uint32 options)
+	\brief Sets whether or not the view can accept mouse and keyboard
+	       events when not in focus from within MouseDown() until the
+	       following MouseUp() event.
+
+	The \a options mask options are as follows:
+	- \c B_NO_POINTER_HISTORY Tells App Server to send only the most recent
+	     MouseMoved() event to the view sacrificing mouse movement granularity.
+    - \c B_FULL_POINTER_HISTORY Tells App Server to send all MouseMoved()
+	     events to the view.
+	- \c B_SUSPEND_VIEW_FOCUS Events normally sent to the focus view are
+	     suppressed. While the mouse is held down, the keyboard is ignored.
+	     The view receiving the MouseDown() messages doesn't have to be the
+	     focus view to suppress focused messages.
+	- \c B_LOCK_WINDOW_FOCUS Prevents the attached window from losing its
+	     focused state while the mouse is held down, even if the mouse leaves
+	     the bounds of the window.
+
+	\param mask The \a mask of \c B_POINTER_EVENTS and \c B_KEYBOARD_EVENTS
+	       to set.
+	\param options Sets other event-handling options.
+
+	\return \c B_OK if everything went fine or an error code, usually
+	        \c B_ERROR if something went wrong.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Graphics State Methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BView::PushState()
+	\brief Saves the drawing state to the stack.
+
+	The drawing state contains the following elements:
+	- local and global origins
+	- local and global scales
+	- local and global clipping regions
+	- the current drawing mode
+	- pen size and location
+	- the font context
+	- foreground and background color
+	- line cap and join modes
+	- miter limit
+	- stipple pattern
+
+	A new state context is created after PushState() is called with a local scale
+	at 0, a local origin at (0, 0), and no clipping region.
+*/
+
+
+/*!
+	\fn void BView::PopState()
+	\brief Restores the drawing state from the stack.
+*/
+
+
+/*!
+	\fn void BView::SetOrigin(BPoint pt)
+	\brief Sets the origin in the view's coordinate system.
+
+	\param pt The point to set the origin to.
+*/
+
+
+/*!
+	\fn void BView::SetOrigin(float x, float y)
+	\brief Sets the origin in the view's coordinate system.
+
+	\param x The x-coordinate to set the origin to.
+	\param y The y-coordinate to set the origin to.
+*/
+
+
+/*!
+	\fn BPoint BView::Origin() const
+	\brief Returns the origin point in the view's coordinate system.
+
+	\return The local origin point in the view's coordinate system.
+*/
+
+
+/*!
+	\fn void BView::SetScale(float scale) const
+	\brief Sets the scale of the coordinate system the view uses for drawing.
+
+	The default scale is 1.0. A \a scale value lower than 1.0 reduces the size of
+	the drawing coordinate system, a \a scale value greater than 1.0 magnifies
+	the coordinate system; for example, a \a scale value of 0.5 cuts the drawing
+	drawing area in half moving the drawing closer to the origin while a \a scale
+	value of 2.0 doubles the drawing area and moving it away from the origin.
+
+	Updating the \a scale of view won't update previously drawn elements.
+
+	SetScale() calls are not commutative unless you call them across different
+	drawing states as the following:
+
+\code
+	view->SetScale(2);
+	view->SetScale(2);
+	// view's scale is 2
+
+	view2->SetScale(2);
+	view2->PushState();
+	view2->SetScale(2);
+	// view2's scale is 4
+\endcode
+
+	/param scale The scale factor to set.
+*/
+
+
+/*!
+	\fn float BView::Scale() const
+	\brief Return the current drawing scale.
+
+	\return The current drawing scale.
+*/
+
+
+/*!
+	\fn void BView::SetLineMode(cap_mode lineCap, join_mode lineJoin,
+		float miterLimit)
+	\brief Set line mode to use PostScript-style line cap and join modes.
+
+	\a lineCap determines the shape of the endpoints of stroked paths while
+	\a lineJoin determines the shape of the corners where two lines meet.
+
+	The default miter limit is 10.0 which gives an angle of 11.478341°.
+
+	\param lineCap One of the following:
+	- \c B_ROUND_CAP A semicircle with diameter of line width is drawn at the
+	     endpoint.
+	- \c B_BUTT_CAP A straight edge is drawn without extending beyond the endpoint.
+	- \c B_SQUARE_CAP A straight edge is drawn extending past the endpoint by half
+	     the line width.
+	\param lineJoin One of the following:
+	- \c B_ROUND_JOIN Same as \c B_ROUND_CAP but for a join.
+	- \c B_MITER_JOIN The lines are extended until they meet. If angle that they
+	     meet at is greater than the 2*arcsin(1/\a miterLimit) than a bevel join
+		 is used instead.
+	- \c B_BEVEL_JOIN The area between the caps is filled with a triangle.
+	- \c B_BUTT_JOIN Same as \c B_BUTT_CAP but for a join.
+	- \c B_SQUARE_JOIN Same as \c B_SQUARE_CAP but for a join.
+	\param miterLimit Sets the cut off angle before a miter join becomes a bevel
+	       join calculated by 2*arcsin(1/\a miterLimit).
+*/
+
+
+/*!
+	\fn join_mode BView::LineJoinMode() const
+	\brief Returns the current line join mode.
+
+	\return The current line join mode set to the view.
+*/
+
+
+/*!
+	\fn cap_mode BView::LineCapMode() const
+	\brief Returns the current line cap mode.
+
+	\return The current line cap mode set to the view.
+*/
+
+
+/*!
+	\fn float BView::LineMiterLimit() const
+	\brief Returns the miter limit used for \c B_MITER_JOIN join mode.
+
+	\return The current miter limit set to the view.
+*/
+
+
+/*!
+	\fn void BView::SetDrawingMode(drawing_mode mode)
+	\brief Sets the drawing mode of the view.
+
+	The default drawing mode is \c B_OP_COPY.
+
+	\param mode Set to one of the following:
+	- \c B_OP_COPY
+	- \c B_OP_OVER
+	- \c B_OP_ERASE
+	- \c B_OP_INVERT
+	- \c B_OP_SELECT
+	- \c B_OP_ALPHA
+	- \c B_OP_MIN
+	- \c B_OP_MAX
+	- \c B_OP_ADD
+	- \c B_OP_SUBTRACT
+	- \c B_OP_BLEND
+*/
+
+
+/*!
+	\fn drawing_mode BView::DrawingMode() const
+	\brief Return the current drawing_mode.
+
+	\return The current drawing_mode.
+*/
+
+
+/*!
+	\fn void BView::SetBlendingMode(source_alpha srcAlpha,
+		alpha_function alphaFunc)
+	\brief Set the blending mode which controls how transparency is used.
+
+	\param srcAlpha Set to one of the following:
+	- \c B_CONSTANT_ALPHA Use the high color's alpha channel.
+	- \c B_PIXEL_ALPHA Use the alpha value of each pixel when drawing a bitmap.
+	\param alphaFunc Set to one of the following:
+	- \c B_ALPHA_OVERLAY Used for drawing a image with transparency over an opaque
+	     background.
+	- \c B_ALPHA_COMPOSITE Used to composite two or more transparent images
+	     together offscreen to produce a new image drawn using
+		 \c B_ALPHA_OVERLAY mode.
+*/
+
+
+/*!
+	\fn void BView::GetBlendingMode(source_alpha* srcAlpha,
+		alpha_function* alphaFunc) const
+	\brief Fill out \a srcAlpha and \a alphaFunc with the alpha mode and
+	       alpha function of the view.
+
+	\param[out] srcAlpha The alpha mode to fill out.
+	\param[out] alphaFunc The alpha function to fill out.
+*/
+
+
+/*!
+	\fn void BView::MovePenTo(BPoint point)
+	\brief Move the pen to \a point in the view's coordinate system.
+
+	\param point the location to move the pen to.
+*/
+
+
+/*!
+	\fn void BView::MovePenTo(float x, float y)
+	\brief Move the pen to the point specified by \a x and \a y in the view's
+	       coordinate system.
+
+	\param x The horizontal coordinate to move the pen to.
+	\param y The vertical coordinate to move the pen to.
+*/
+
+
+/*!
+	\fn void BView::MovePenBy(float x, float y)
+	\brief Move the pen by \a x pixels horizontally and \a y pixels vertically.
+
+	\param x The number of pixels to move the pen horizontally.
+	\param y The number of pixels to move the pen vertically.
+*/
+
+
+/*!
+	\fn BPoint BView::PenLocation() const
+	\brief Return the current pen location as a BPoint object.
+
+	\return The current pen location in the view's coordinate system.
+*/
+
+
+/*!
+	\fn void BView::SetPenSize(float size)
+	\brief Set the pen size to \a size.
+
+	\param size The pen size to set.
+*/
+
+
+/*!
+	\fn float BView::PenSize() const
+	\brief Return the current pen size.
+
+	\return The current pen size as a float.
+*/
+
+
+/*!
+
+	\fn void BView::SetHighColor(rgb_color color)
+	\brief Set the high color of the view.
+
+	\param color The color to set.
+*/
+
+
+/*!
+	\fn rgb_color BView::HighColor() const
+	\brief Return the current high color.
+
+	\return The current high color as an rgb_color struct.
+*/
+
+
+/*!
+	\fn void BView::SetLowColor(rgb_color color)
+	\brief Set the low color of the view.
+
+	\param color The color to set.
+*/
+
+
+/*!
+	\fn rgb_color BView::LowColor() const
+	\brief Return the current low color.
+
+	\return The current low color as an rgb_color struct.
+*/
+
+
+/*!
+	\fn void BView::SetViewColor(rgb_color color)
+	\brief Set the view color of the view.
+
+	\param color The color to set.
+*/
+
+
+/*!
+	\fn rgb_color BView::ViewColor() const
+	\brief Return the current view color.
+
+	\return The current view color as an rgb_color struct.
+*/
+
+
+/*!
+	\fn void BView::ForceFontAliasing(bool enable)
+	\brief Turn anti-aliasing on and off when printing.
+
+	Typically want to turn font anti-aliasing off when printing by passing
+	\c true to this method and then turn it on again by passing in \c false.
+
+	This method does not affect characters drawn to the screen.
+
+	\param enable If \c true turn off anti-aliasing, if \c false turn on
+	       anti-aliasing.
+*/
+
+
+/*!
+	\fn void BView::SetFont(const BFont* font, uint32 mask)
+	\brief Set the font of the view.
+
+	By passing \c B_FONT_ALL to the \a mask parameter as is the default all font
+	properties from \a font are set on the view.
+
+	\param font A pointer to a BFont object to set.
+	\param mask A mask of the following values to determine what font properties to set:
+	- \c B_FONT_FAMILY_AND_STYLE
+	- \c B_FONT_SPACING
+	- \c B_FONT_SIZE
+	- \c B_FONT_ENCODING
+	- \c B_FONT_SHEAR
+	- \c B_FONT_FACE
+	- \c B_FONT_ROTATION
+	- \c B_FONT_FLAGS
+*/
+
+
+/*!
+	\fn void BView::GetFont(BFont* font) const
+	\brief Fill out \a font with the font set to the view.
+
+	\param[out] font The BFont object to fill out.
+*/
+
+
+/*!
+	\fn void BView::GetFontHeight(font_height* height) const
+	\brief Fill out the font_height struct with the view font.
+
+	\param[out] height The font_height struct to fill out.
+*/
+
+
+/*!
+	\fn void BView::SetFontSize(float size)
+	\brief Set the size of the view's font to \a size.
+
+	\param size The font size to set to the view in points.
+*/
+
+
+/*!
+	\fn float BView::StringWidth(const char* string) const
+	\brief Return the width of \a string set in the font of the view.
+
+	\param string The \a string to get the width of.
+
+	\return The width of the string in the view's font as a float.
+*/
+
+
+/*!
+	\fn float BView::StringWidth(const char* string, int32 length) const
+	\brief Return the width of \a string set in the font of the view up to
+	       \a length characters.
+
+	\param string The \a string to get the width of.
+	\param length The maximum number of characters in \a string to consider.
+
+	\return The width of the string in the view's font as a float.
+*/
+
+
+/*!
+	\fn void BView::GetStringWidths(char* stringArray[], int32 lengthArray[],
+		int32 numStrings, float widthArray[]) const
+	\brief Fill out widths of the strings in \a stringArray set in the font
+	       of the view into \a widthArray.
+
+	\param stringArray The array of strings to get the lengths of.
+	\param lengthArray The number of characters of the strings in \a stringArray
+	       to consider.
+	\param numStrings The number of strings in \a stringArray.
+	\param widthArray The array to store the widths of the strings in
+	       \a stringArray.
+*/
+
+
+/*!
+	\fn void BView::TruncateString(BString* string, uint32 mode, float width) const
+	\brief Truncate \a string with truncation mode \a mode so that it is no wider
+	       than \a width set in the view's font.
+
+	When the string is truncated the missing characters are replaced by a
+	horizontal ellipses.
+
+	\param string The string to truncate in place.
+	\param mode The truncation mode to use, one of the following:
+	- \c B_TRUNCATE_BEGINNING Truncate from the beginning of the string.
+	- \c B_TRUNCATE_MIDDLE Truncate from the middle of the string.
+	- \c B_TRUNCATE_END Truncate from the end of the string.
+	- \c B_TRUNCATE_SMART Truncate from anywhere based on the string content.
+	     Not currently implemented.
+	\param width The maximum width to truncate the string to.
+*/
+
+
+/*!
+	\fn void BView::ClipToPicture(BPicture* picture, BPoint where, bool sync)
+	\brief Intersects the current clipping region of the view with the pixels
+	       of \a picture.
+
+	BPicture instances are resolution independent, \a picture is effectively
+	drawn at the view's resolution and the bitmap produced is used to modify the
+	clipping region.
+
+	The pixels that are at least partially opaque are the ones drawn by
+	\a picture.
+
+	\param picture The BPicture object to intersect with.
+	\param where Offset in the view's coordinate system.
+	\param sync If \c false, this method will execute asynchronously.
+*/
+
+
+/*!
+	\fn void BView::ClipToInversePicture(BPicture* picture, BPoint where,
+		bool sync)
+	\brief Intersects the current clipping region of the view with the pixels
+	       outside of \a picture.
+
+	\param picture The BPicture object to intersect with.
+	\param where Offset in the view's coordinate system.
+	\param sync If \c false, this method will execute asynchronously.
+
+	\see ClipToPicture()
+*/
+
+
+/*!
+	\fn void BView::GetClippingRegion(BRegion* region) const
+	\brief Fill out \a region with the view's clipping region.
+
+	\param[out] region The BRegion object to fill out.
+*/
+
+
+/*!
+	\fn void BView::ConstrainClippingRegion(BRegion* region)
+	\brief Set the clipping region the \a region restricting the area that the
+	       view can draw in.
+
+	The Application Server keeps track of the clipping region for each view
+	attached to a window so that the view can't draw outside of it,
+	consequently this method works only for view that are attached to a window.
+
+	The default clipping region contains the visible area of the view. By passing
+	a region to this method the clipping area is further restricted. Passing in
+	\c NULL resets the clipping region back to the default.
+
+	Calls to ConstrainClippingRegion() are not cumulative, each time this
+	method is called it replaces the old clipping region.
+
+	\param region The region to set the clipping region to or \c NULL
+	       to reset to default.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Drawing Related Methods
+
+	The view must be attached to the window for these methods to work unless
+	otherwise stated. Notes on specific methods are provided below:
+
+	DrawBitmap()
+
+	If the the image is bigger than the destination rectangle, it is scaled to fit.
+
+	The asynchronous versions pass the image to Application Server and return
+	immediately.
+
+	This can be more efficient in some cases for example to draw several bitmaps
+	at once and then call Sync() to tell Application Server to wait for them all
+	to finish drawing rather than waiting for each one to draw.
+
+	DrawPicture()
+
+	The asynchronous versions pass the picture to Application Server and return
+	immediately.
+
+	This can be more efficient in some cases for example to draw several pictures
+	at once and then call Sync() to tell Application Server to wait for them all
+	to finish drawing rather than waiting for each one to draw.
+
+	DrawPicture() doesn't alter the graphics state of the view nor do changes to
+	the graphics state of the view alter the BPicture object. What the picture
+	will look like depends on the graphics parameters that were in effect when the
+	picture was recorded.
+
+	DrawString()
+
+	The \a string is drawn in the view's current font and is modified by
+	the other parameters of the font such as it's direction (left-to-right or
+	right-to-left), rotation, spacing, shear, etc. The \a string is always drawn
+	left to right even if it's text direction is set to right-to-left mode.
+
+	Drawing a string is fastest in \c B_OP_COPY mode and anti-aliasing can
+	produce undesirable effects when a string is draw in other modes, especially
+	if the string is drawn in the same location repeatedly.
+
+	DrawString() doesn't erase before drawing.
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BView::DrawBitmapAsync(const BBitmap* bitmap, BRect bitmapRect,
+		BRect viewRect, uint32 options)
+	\brief Draws \a bitmap on the view within \a viewRect asynchronously.
+
+	\param bitmap The bitmap to draw onto the view.
+	\param bitmapRect The portion of the bitmap to draw in the bitmap's
+	       coordinate system.
+	\param viewRect The area in the view's coordinate system to draw the
+	       bitmap in.
+	\param options ??
+*/
+
+
+/*!
+	\fn void BView::DrawBitmapAsync(const BBitmap* bitmap, BRect bitmapRect,
+		BRect viewRect)
+	\brief Draws \a bitmap on the view within \a viewRect asynchronously.
+
+	\param bitmap The bitmap to draw onto the view.
+	\param bitmapRect The portion of the bitmap to draw in the bitmap's
+	       coordinate system.
+	\param viewRect The area in the view's coordinate system to draw the
+	       bitmap in.
+*/
+
+
+/*!
+	\fn void BView::DrawBitmapAsync(const BBitmap* bitmap, BRect viewRect)
+	\brief Draws \a bitmap on the view within \a viewRect asynchronously.
+
+	\param bitmap The bitmap to draw onto the view.
+	\param viewRect The area in the view's coordinate system to draw the
+	       bitmap in.
+*/
+
+
+/*!
+	\fn void BView::DrawBitmapAsync(const BBitmap* bitmap, BPoint where)
+	\brief Draws \a bitmap on the view offset by \a where asynchronously.
+
+	\param bitmap The bitmap to draw onto the view.
+	\param where The location to draw the bitmap in the view's coordinate system.
+*/
+
+
+/*!
+	\fn void BView::DrawBitmapAsync(const BBitmap* bitmap)
+	\brief Draws \a bitmap on the view asynchronously.
+
+	\param bitmap The bitmap to draw onto the view.
+*/
+
+
+/*!
+	\fn void BView::DrawBitmap(const BBitmap* bitmap, BRect bitmapRect,
+		BRect viewRect, uint32 options)
+	\brief brief Draws \a bitmap on the view within \a viewRect.
+
+	\param bitmap The bitmap to draw onto the view.
+	\param bitmapRect The portion of the bitmap to draw in the bitmap's
+	       coordinate system.
+	\param viewRect The area in the view's coordinate system to draw the
+	       bitmap in.
+	\param options ??
+*/
+
+
+/*!
+	\fn void BView::DrawBitmap(const BBitmap* bitmap, BRect bitmapRect,
+		BRect viewRect)
+	\brief Draws \a bitmap on the view within \a viewRect.
+
+	\param bitmap The bitmap to draw onto the view.
+	\param bitmapRect The portion of the bitmap to draw in the bitmap's
+	       coordinate system.
+	\param viewRect The area in the view's coordinate system to draw the
+	       bitmap in.
+*/
+
+
+/*!
+	\fn void BView::DrawBitmap(const BBitmap* bitmap, BRect viewRect)
+	\brief Draws \a bitmap on the view within \a viewRect.
+
+	\param bitmap The bitmap to draw onto the view.
+	\param viewRect The area in the view's coordinate system to draw the
+	       bitmap in.
+*/
+
+
+/*!
+	\fn void BView::DrawBitmap(const BBitmap* bitmap, BPoint where)
+	\brief Draws \a bitmap on the view offset by \a where.
+
+	\param bitmap The bitmap to draw onto the view.
+	\param where The location to draw the bitmap in the view's coordinate system.
+*/
+
+
+/*!
+	\fn void BView::DrawBitmap(const BBitmap* bitmap)
+	\brief Draws \a bitmap on the view.
+
+	\param bitmap The bitmap to draw onto the view.
+*/
+
+
+/*!
+	\fn void BView::DrawChar(char c)
+	\brief Draws character \a c onto to the view at the current pen position.
+
+	The character is drawn in the view's current font.
+
+	\param c The character to draw.
+*/
+
+
+/*!
+	\fn void BView::DrawChar(char c, BPoint location)
+	\brief Draws character \a c at the specified \a location in the view.
+
+	The character is drawn in the view's current font.
+
+	\param c The character to draw.
+	\param location The location in the view to draw the character.
+*/
+
+
+/*!
+	\fn void BView::DrawString(const char* string, escapement_delta* delta)
+	\brief Draw \a string onto the view at the current pen position.
+
+	\param string The string to draw.
+	\param delta Adds additional width to each character according to the
+	       following fields:
+	- nonspace(float) The amount of width to add to characters with visible
+	  glyphs.
+	- space(float) The amount of width to add to characters with escapements
+	  but don't have visible glyphs.
+*/
+
+
+/*!
+	\fn void BView::DrawString(const char* string, BPoint location,
+		escapement_delta* delta)
+	\brief Draw \a string onto the view at the specified \a location in the view.
+
+	\param string The string to draw.
+	\param location The location in the view to draw the string.
+	\param delta Adds additional width to each character according to the
+	       following fields:
+	- nonspace(float) The amount of width to add to characters with visible
+	  glyphs.
+	- space(float) The amount of width to add to characters with escapements
+	  but don't have visible glyphs.
+*/
+
+
+/*!
+	\fn void BView::DrawString(const char* string, int32 length,
+		escapement_delta* delta)
+	\brief Draw \a string up to \a length characters onto the view at the current
+	       pen position.
+
+	\param string The string to draw.
+	\param length The maximum number of characters in \a string to draw.
+	\param delta Adds additional width to each character according to the
+	       following fields:
+	- nonspace(float) The amount of width to add to characters with visible
+	  glyphs.
+	- space(float) The amount of width to add to characters with escapements
+	  but don't have visible glyphs.
+*/
+
+
+/*!
+	\fn void BView::DrawString(const char* string, int32 length, BPoint location,
+		escapement_delta* delta)
+	\brief Draw \a string up to \a length characters onto the view at the
+	       specified \a location in the view.
+
+	\param string The string to draw.
+	\param length The maximum number of characters in \a string to draw.
+	\param location The location in the view to draw the string.
+	\param delta Adds additional width to each character according to the
+	       following fields:
+	- nonspace(float) The amount of width to add to characters with visible
+	  glyphs.
+	- space(float) The amount of width to add to characters with escapements
+	  but don't have visible glyphs.
+*/
+
+
+/*!
+	\fn void BView::DrawString(const char* string, const BPoint* locations,
+		int32 locationCount)
+	\brief Draw \a string \a locationCount times at the specified \a locations.
+
+	\param string The string to draw.
+	\param locations A pointer to an array of BPoint objects to draw the string.
+	\param locationCount The number of elements in \a locations.
+*/
+
+
+/*!
+	\fn void BView::DrawString(const char* string, int32 length,
+		const BPoint* locations, int32 locationCount)
+	\brief Draw \a string up to \a length characters \a locationCount times at the
+	       specified \a locations.
+
+	\param string The string to draw.
+	\param length The maximum number of characters in \a string to draw.
+	\param locations A pointer to an array of BPoint objects to draw the string.
+	\param locationCount The number of elements in \a locations.
+*/
+
+
+/*!
+	\fn void BView::StrokeEllipse(BPoint center, float xRadius, float yRadius,
+		pattern p)
+	\brief Stroke the outline of an ellipse starting at \a center with a
+	       horizontal radius of \a xRadius and a vertical radius of \a yRadius.
+
+	\param center The center point.
+	\param xRadius The horizontal radius.
+	\param yRadius The vertical radius.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::StrokeEllipse(BRect rect, pattern p)
+	\brief Stroke the outline of an ellipse inscribed within \a rect.
+
+	\param rect The area within which to inscribe the shape.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::FillEllipse(BPoint center, float xRadius, float yRadius,
+		pattern p)
+	\brief Fill an ellipse starting at \a center with a horizontal radius
+	       of \a xRadius and a vertical radius of \a yRadius.
+
+	\param center The center point.
+	\param xRadius The horizontal radius.
+	\param yRadius The vertical radius.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::FillEllipse(BRect rect, pattern p)
+	\brief Fill an ellipse inscribed within \a rect.
+
+	\param rect The area within which to inscribe the shape.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::FillEllipse(BPoint center, float xRadius, float yRadius,
+		const BGradient& gradient)
+	\brief Fill an ellipse with the specified \a gradient pattern starting at
+	       \a center with a horizontal radius of \a xRadius and a vertical radius
+		   of \a yRadius.
+
+	\param center The center point.
+	\param xRadius The horizontal radius.
+	\param yRadius The vertical radius.
+	\param gradient The gradient pattern to fill the ellipse with.
+*/
+
+
+/*!
+	\fn void BView::FillEllipse(BRect rect, const BGradient& gradient)
+	\brief Fill an ellipse with the specified \a gradient pattern inscribed within
+	       \a rect.
+
+	\param rect The area within which to inscribe the shape.
+	\param gradient The gradient pattern to fill the ellipse with.
+*/
+
+
+/*!
+	\fn void BView::StrokeArc(BPoint center, float xRadius, float yRadius,
+		float startAngle, float arcAngle, pattern p)
+	\brief Stroke the outline of an arc starting at \a center with a
+	       horizontal radius of \a xRadius and a vertical radius of \a yRadius
+	       starting at \a startAngle and drawing \a arcAngle degrees.
+
+	\param center The center point.
+	\param xRadius The horizontal radius.
+	\param yRadius The vertical radius.
+	\param startAngle The angle to begin drawing at.
+	\param arcAngle The number of degrees of the arc to draw.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::StrokeArc(BRect rect, float startAngle, float arcAngle,
+		pattern p)
+	\brief Stroke the outline of an arc inscribed within \a rect starting at
+	       \a startAngle and drawing \a arcAngle degrees.
+
+	\param rect The area within which to inscribe the shape.
+	\param startAngle The angle to begin drawing at.
+	\param arcAngle The number of degrees of the arc to draw.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::FillArc(BPoint center, float xRadius, float yRadius,
+		float startAngle, float arcAngle, pattern p)
+	\brief Fill an arc starting at \a center with a horizontal radius of
+	       \a xRadius and a vertical radius of \a yRadius starting at
+	       \a startAngle and drawing \a arcAngle degrees.
+
+	\param center The center point.
+	\param xRadius The horizontal radius.
+	\param yRadius The vertical radius.
+	\param startAngle The angle to begin drawing at.
+	\param arcAngle The number of degrees of the arc to draw.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::FillArc(BPoint center, float xRadius, float yRadius,
+		float startAngle, float arcAngle, const BGradient& gradient)
+	\brief Fill an arc with the specified \a gradient pattern starting at
+	       \a center with a horizontal radius of \a xRadius and a vertical
+		   radius of \a yRadius starting at \a startAngle and drawing
+		   \a arcAngle degrees.
+
+	\param center The center point.
+	\param xRadius The horizontal radius.
+	\param yRadius The vertical radius.
+	\param startAngle The angle to begin drawing at.
+	\param arcAngle The number of degrees of the arc to draw.
+	\param gradient The gradient pattern to fill the arc with.
+*/
+
+
+/*!
+	\fn void BView::FillArc(BRect rect, float startAngle, float arcAngle,
+		pattern p)
+	\brief Fill an arc inscribed within \a rect starting at startAngle and
+	       drawing \a arcAngle degrees.
+
+	\param rect The area within which to inscribe the shape.
+	\param startAngle The angle to begin drawing at.
+	\param arcAngle The number of degrees of the arc to draw.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::FillArc(BRect rect, float startAngle, float arcAngle,
+		const BGradient& gradient)
+	\brief Fill an arc with the specified \a gradient pattern inscribed within
+	       \a rect starting at startAngle and drawing \a arcAngle degrees.
+
+	\param rect The area within which to inscribe the shape.
+	\param startAngle The angle to begin drawing at.
+	\param arcAngle The number of degrees of the arc to draw.
+	\param gradient The gradient pattern to fill the arc with.
+*/
+
+
+/*!
+	\fn void BView::StrokeBezier(BPoint* controlPoints, pattern p)
+	\brief Stroke a bezier curve.
+
+	\param controlPoints The list of points that form the bezier curve.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::FillBezier(BPoint* controlPoints, ::pattern pattern)
+	\brief Fill a bezier curve.
+
+	\param controlPoints The list of points that form the bezier curve.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::FillBezier(BPoint* controlPoints, const BGradient& gradient)
+
+	\brief Fill a bezier curve.
+
+	\param controlPoints The list of points that form the bezier curve.
+	\param gradient The gradient pattern to fill the bezier curve with.
+*/
+
+
+/*!
+	\fn void BView::StrokePolygon(const BPolygon* polygon, bool closed, pattern p)
+	\brief Stroke a polygon shape.
+
+	\param polygon The polygon shape to stroke.
+	\param closed Whether or not the last line of the polygon should intersect
+	       with the initial point.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::StrokePolygon(const BPoint* pointArray, int32 numPoints,
+		bool closed, pattern p)
+	\brief Stroke a polygon shape made up of points specified by \a pointArray.
+
+	\param pointArray An array of points that specify the vertices of the polygon.
+	\param numPoints The number of points in \a pointArray.
+	\param closed Whether or not the last line of the polygon should intersect
+	       with the initial point.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::StrokePolygon(const BPoint* ptArray, int32 numPoints,
+		BRect bounds, bool closed, pattern p)
+	\brief Stroke a polygon shape made up of points specified by \a pointArray
+	       inscribed by \a bounds.
+
+	\param ptArray An array of points that specify the vertices of the polygon.
+	\param numPoints The number of points in \a ptArray.
+	\param bounds The smallest rectangle that encloses the points in \a ptArray.
+	\param closed Whether or not the last line of the polygon should intersect
+	       with the initial point.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::FillPolygon(const BPolygon* polygon, pattern p)
+	\brief Fill a polygon shape.
+
+	\param polygon The polygon shape to fill.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::FillPolygon(const BPolygon* polygon,
+		const BGradient& gradient)
+	\brief Fill a polygon shape with the specified \a gradient pattern.
+
+	\param polygon The polygon shape to fill.
+	\param gradient The gradient pattern to fill the polygon with.
+*/
+
+
+/*!
+	\fn void BView::FillPolygon(const BPoint* ptArray, int32 numPts, pattern p)
+	\brief Fill a polygon shape made up of points specified by \a ptArray.
+
+	\param ptArray An array of points that specify the vertices of the polygon.
+	\param numPts The number of points in \a pointArray.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::FillPolygon(const BPoint* ptArray, int32 numPts,
+		const BGradient& gradient)
+	\brief Fill a polygon shape made up of points specified by \a ptArray with the
+	       specified \a gradient pattern.
+
+	\param ptArray An array of points that specify the vertices of the polygon.
+	\param numPts The number of points in \a pointArray.
+	\param gradient The gradient pattern to fill the polygon with.
+*/
+
+
+/*!
+	\fn void BView::FillPolygon(const BPoint* ptArray, int32 numPts,
+		BRect bounds, pattern p)
+	\brief Fill a polygon shape made up of points specified by \a pointArray
+	       inscribed by \a bounds.
+
+	\param ptArray An array of points that specify the vertices of the polygon.
+	\param numPts The number of points in \a ptArray.
+	\param bounds The smallest rectangle that encloses the points in \a ptArray.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::FillPolygon(const BPoint* ptArray, int32 numPts, BRect bounds,
+		const BGradient& gradient)
+	\brief Fill a polygon shape made up of points specified by \a pointArray
+	       inscribed by \a bounds with the specified \a gradient pattern.
+
+	\param ptArray An array of points that specify the vertices of the polygon.
+	\param numPts The number of points in \a ptArray.
+	\param bounds The smallest rectangle that encloses the points in \a ptArray.
+	\param gradient The gradient pattern to fill the polygon with.
+*/
+
+
+/*!
+	\fn void BView::StrokeRect(BRect rect, pattern p)
+	\brief Stroke the rectangle specified by \a rect.
+
+	\param rect The rectangular area to stroke.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::FillRect(BRect rect, pattern p)
+	\brief Fill the rectangle specified by \a rect.
+
+	\param rect The rectangular area to fill.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::FillRect(BRect rect, const BGradient& gradient)
+	\brief Fill the rectangle specified by \a rect with the specified \a gradient
+	       pattern.
+
+	\param rect The rectangular area to fill.
+	\param gradient The gradient pattern to fill the rectangle with.
+*/
+
+
+/*!
+	\fn void BView::StrokeRoundRect(BRect rect, float xRadius, float yRadius,
+		pattern p)
+	\brief Stroke the rounded rectangle with horizontal radius \a xRadius and
+	       vertical radius \a yRadius.
+
+	\param rect The rectangular area to stroke the round rect within.
+	\param xRadius The horizontal radius.
+	\param yRadius The vertical radius.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::FillRoundRect(BRect rect, float xRadius, float yRadius,
+		pattern p)
+	\brief Fill the rounded rectangle with horizontal radius \a xRadius and
+	       vertical radius \a yRadius.
+
+	\param rect The rectangular area to fill the round rect within.
+	\param xRadius The horizontal radius.
+	\param yRadius The vertical radius.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::FillRoundRect(BRect rect, float xRadius, float yRadius,
+		const BGradient& gradient)
+	\brief Fill the rounded rectangle with horizontal radius \a xRadius and
+	       vertical radius \a yRadius with the specified \a gradient pattern.
+
+	\param rect The rectangular area to fill the round rect within.
+	\param xRadius The horizontal radius.
+	\param yRadius The vertical radius.
+	\param gradient The gradient pattern to fill the round rect with.
+*/
+
+
+/*!
+	\fn void BView::FillRegion(BRegion* region, pattern p)
+	\brief Fill \a region.
+
+	\param region The \a region to fill.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::FillRegion(BRegion* region, const BGradient& gradient)
+	\brief Fill \a region with the specified \a gradient pattern.
+
+	\param region The \a region to fill.
+	\param gradient The gradient pattern to fill the \a region with.
+*/
+
+
+/*!
+	\fn void BView::StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
+		BRect bounds, pattern p)
+	\brief Stroke the triangle specified by points \a pt1, \a pt2, and \a pt3 and
+	       enclosed by \a bounds.
+
+	\param pt1 The first point of the triangle.
+	\param pt2 The second point of the triangle.
+	\param pt3 The third point of the triangle.
+	\param bounds The rectangular area that encloses the triangle.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3, pattern p)
+	\brief Stroke the triangle specified by points \a pt1, \a pt2, and \a pt3.
+
+	\param pt1 The first point of the triangle.
+	\param pt2 The second point of the triangle.
+	\param pt3 The third point of the triangle.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3, pattern p)
+	\brief Fill the triangle specified by points \a pt1, \a pt2, and \a pt3.
+
+	\param pt1 The first point of the triangle.
+	\param pt2 The second point of the triangle.
+	\param pt3 The third point of the triangle.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
+		const BGradient& gradient)
+	\brief Fill the triangle specified by points \a pt1, \a pt2, and \a pt3
+	       with the specified \a gradient pattern.
+
+	\param pt1 The first point of the triangle.
+	\param pt2 The second point of the triangle.
+	\param pt3 The third point of the triangle.
+	\param gradient The gradient pattern to fill the triangle with.
+*/
+
+
+/*!
+	\fn void BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
+		BRect bounds, pattern p)
+	\brief Fill the triangle specified by points \a pt1, \a pt2, and \a pt3 and
+	       enclosed by \a bounds.
+
+	\param pt1 The first point of the triangle.
+	\param pt2 The second point of the triangle.
+	\param pt3 The third point of the triangle.
+	\param bounds The rectangular area that encloses the triangle.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
+		BRect bounds, const BGradient& gradient)
+	\brief Fill the triangle specified by points \a pt1, \a pt2, and \a pt3 and
+	       enclosed by \a bounds with the specified \a gradient pattern.
+
+	\param pt1 The first point of the triangle.
+	\param pt2 The second point of the triangle.
+	\param pt3 The third point of the triangle.
+	\param bounds The rectangular area that encloses the triangle.
+	\param gradient The gradient pattern to fill the triangle with.
+*/
+
+
+/*!
+	\fn void BView::StrokeLine(BPoint toPt, pattern p)
+	\brief Stroke a line from the current pen location to the point \a toPt.
+
+	\param toPt The end point of the line.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::StrokeLine(BPoint pt0, BPoint pt1, pattern p)
+	\brief Stroke a line from point \a pt0 to point \a pt1.
+
+	\param pt0 The start point of the line.
+	\param pt1 The end point of the line.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::StrokeShape(BShape* shape, pattern p)
+	\brief Stroke \a shape.
+
+	\param shape The \a shape to stroke.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::FillShape(BShape* shape, pattern p)
+	\brief Fill \a shape.
+
+	\param shape The \a shape to fill.
+	\param p One of the following:
+	- \c B_SOLID_HIGH
+	- \c B_SOLID_LOW
+	- \c B_MIXED_COLORS
+*/
+
+
+/*!
+	\fn void BView::FillShape(BShape* shape, const BGradient& gradient)
+	\brief Fill \a shape with the specified \a gradient pattern.
+
+	\param shape The \a shape to fill.
+	\param gradient The gradient pattern to fill the \a shape with.
+*/
+
+
+/*!
+	\fn void BView::BeginLineArray(int32 count)
+	\brief Begin a line array of up to \a count lines.
+
+	This is a more efficient way of drawing a large number of lines than calling
+	StrokeLine() repeatedly. First call BeginLineArray() to begin drawing lines,
+	then call AddLine() for each line you wish to draw, and finally call
+	EndLineArray() to finish the line array and draw the lines.
+
+	These methods don't move the current pen location or change the high or low
+	colors of the view. \a count should be close to the number of lines you wish
+	to draw and should be below 256 to draw efficiently.
+
+	\param count The maximum number of lines in the line array to draw.
+
+	\see StrokeLine()
+*/
+
+
+/*!
+	\fn void BView::AddLine(BPoint pt0, BPoint pt1, rgb_color col)
+	\brief Add a line to the line array from point \a pt0 to point \a pt1.
+
+	\param pt0 The start point of the line.
+	\param pt1 The end point of the line.
+	\param col The line color.
+*/
+
+
+/*!
+	\fn void BView::EndLineArray()
+	\brief End the line array drawing the lines.
+*/
+
+
+/*!
+	\fn void BView::SetDiskMode(char* filename, long offset)
+	\brief Unimplemented.
+*/
+
+
+/*!
+	\fn void BView::BeginPicture(BPicture* picture)
+	\brief Begins sending drawing instructions to \a picture.
+
+	The \a BPicture object is cleared and any successive drawing instructions sent
+	to the view are redirected to \a picture until EndPicture() is called. To
+	append drawing instructions to a BPicture object without clearing it first
+	call AppendToPicture() instead.
+
+	The view doesn't display anything to the screen while it's recording to \a
+	picture. Use the DrawPicture() method to render the \a picture.
+
+	Only drawing instructions performed directly on the view, not it's child views
+	are send to the BPicture object and BPicture captures only primitive graphics
+	operations. The view must be attached to a window for the drawing instruction
+	to be recorded. Drawing instructions are recorded even if the view is hidden or
+	resides outside the clipping region or the window is off-screen.
+
+	\param picture The BPicture object to record drawing instructions to.
+*/
+
+
+/*!
+	\fn void BView::AppendToPicture(BPicture* picture)
+	\brief Appends drawing instructions to \a picture without clearing it first.
+
+	\param picture The BPicture object to record drawing instructions to.
+*/
+
+
+/*!
+	\fn BPicture* BView::EndPicture()
+	\brief Ends the drawing instruction recording session and returns the
+	       BPicture object passed to BeginPicture() or AppendToPicture().
+
+	\return The BPicture object passed to BeginPicture() or AppendToPicture().
+*/
+
+
+/*!
+	\fn void BView::SetViewBitmap(const BBitmap* bitmap, BRect srcRect,
+		BRect dstRect, uint32 followFlags, uint32 options)
+	\brief Sets the background \a bitmap of the view.
+
+	All drawing to the view occurs over \a bitmap. Any visible regions not
+	covered by \a bitmap are filled with the current background color.
+
+	Once \a bitmap has been passed in and this method returns the caller may
+	safely delete the object.
+
+	\param bitmap The background bitmap to set to the view.
+	\param srcRect Specifies the area of \a bitmap to use.
+	\param dstRect Specifies the area of the view to set \a bitmap to.
+	\param followFlags Specifies the as the view is resized. See the BView
+	       constructor for more details.
+	\param options Specifies additional view options. The only option currently
+	       available is \c B_TILE_BITMAP which tiles the bitmap across the view.
+*/
+
+
+/*!
+	\fn void BView::SetViewBitmap(const BBitmap* bitmap, uint32 followFlags,
+		uint32 options)
+	\brief Sets the background \a bitmap of the view.
+
+	All drawing to the view occurs over \a bitmap. Any visible regions not
+	covered by \a bitmap are filled with the current background color.
+
+	Once \a bitmap has been passed in and this method returns the caller may
+	safely delete the object.
+
+	\param bitmap The background bitmap to set to the view.
+	\param followFlags Specifies the as the view is resized. See the BView
+	       constructor for more details.
+	\param options Specifies additional view options. The only option currently
+	       available is \c B_TILE_BITMAP which tiles the bitmap across the view.
+*/
+
+
+/*!
+	\fn void BView::ClearViewBitmap()
+	\brief Clears the background bitmap of the view if it has one.
+*/
+
+
+/*!
+	\fn status_t BView::SetViewOverlay(const BBitmap* overlay, BRect srcRect,
+		BRect dstRect, rgb_color* colorKey, uint32 followFlags, uint32 options)
+	\brief Sets the \a overlay bitmap of the view.
+
+	\a colorKey specifies which color pixels in \a overlay are treated as transparent
+	allowing the pixels of the view to show through.
+
+	Once \a overlay has been passed in and this method returns the caller may
+	safely delete the object.
+
+	\param overlay The overlay bitmap to set to the view.
+	\param srcRect Specifies the area of \a overlay to use.
+	\param dstRect Specifies the area of the view to set \a overlay to.
+	\param colorKey The color in \a overlay to treat as transparent.
+	\param followFlags Specifies the as the view is resized. See the BView
+	       constructor for more details.
+	\param options Specifies additional view options. The only option currently
+	       available is \c B_TILE_BITMAP which tiles the bitmap across the view.
+*/
+
+
+/*!
+	\fn status_t BView::SetViewOverlay(const BBitmap* overlay,
+		rgb_color* colorKey, uint32 followFlags, uint32 options)
+	\brief Sets the \a overlay bitmap of the view.
+
+	\a colorKey specifies which color pixels in \a overlay are treated as transparent
+	allowing the pixels of the view to show through.
+
+	Once \a overlay has been passed in and this method returns the caller may
+	safely delete the object.
+
+	\param overlay The overlay bitmap to set to the view.
+	\param colorKey The color in \a overlay to treat as transparent.
+	\param followFlags Specifies the as the view is resized. See the BView
+	       constructor for more details.
+	\param options Specifies additional view options. The only option currently
+	       available is \c B_TILE_BITMAP which tiles the bitmap across the view.
+*/
+
+
+/*!
+	\fn void BView::ClearViewOverlay()
+	\brief Clears the overlay bitmap of the view if it has one.
+*/
+
+
+/*!
+	\fn void BView::CopyBits(BRect src, BRect dst)
+	\brief Copy the bits from the \a src rectangle to the \a dst rectangle in the
+	       view's coordinate system.
+
+	If the rectangles are of different sizes than \a src is scaled to fit. \a src
+	is clipped if a part of \a dst lies outside of the visible region of the view.
+	Only the visible portions of \a src are copied.
+
+	The view must be attached to a window for this method to work.
+
+	\param src The source rectangle to copy bits from.
+	\param dst The destination rectangle to copy bits to.
+*/
+
+
+/*!
+	\fn void BView::DrawPicture(const BPicture* picture)
+	\brief Draws the \a picture at the view's current pen position.
+
+	\param picture The BPicture object to draw.
+*/
+
+
+/*!
+	\fn void BView::DrawPicture(const BPicture* picture, BPoint where)
+	\brief Draws the \a picture at the location in the view specified by \a where.
+
+	\param picture The BPicture object to draw.
+	\param where The point on the view to draw \a picture.
+*/
+
+
+/*!
+	\fn void BView::DrawPicture(const char* filename, long offset, BPoint where)
+	\brief Draws the \a picture from the file specified by \a filename offset by
+	       \a offset bytes at the location in the view specified by \a where.
+
+	\param filename The filename of the file containing the picture to draw.
+	\param where The point on the view to draw the picture.
+	\param offset The number of bytes to offset in the file to find the picture.
+*/
+
+
+/*!
+	\fn void BView::DrawPictureAsync(const BPicture* picture)
+	\brief Draws the \a picture at the view's current pen position.
+
+	\param picture The BPicture object to draw.
+*/
+
+
+/*!
+	\fn void BView::DrawPictureAsync(const BPicture* picture, BPoint where)
+	\brief Draws the \a picture at the location in the view specified by \a where.
+
+	\param picture The BPicture object to draw.
+	\param where The point on the view to draw \a picture.
+*/
+
+
+/*!
+	\fn void BView::DrawPictureAsync(const char* filename, long offset, BPoint where)
+	\brief Draws the \a picture from the file specified by \a filename offset by
+	       \a offset bytes at the location in the view specified by \a where.
+
+	\param filename The filename of the file containing the picture to draw.
+	\param where The point on the view to draw the picture.
+	\param offset The number of bytes to offset in the file to find the picture.
+*/
+
+
+/*!
+	\fn void BView::Invalidate(BRect invalRect)
+	\brief Sends a message to App Server to redraw the portion of the view
+	       specified by \a invalRect.
+
+	\param invalRect The rectangular area of the view to redraw.
+*/
+
+
+/*!
+	\fn void BView::Invalidate(const BRegion* region)
+	\brief Sends a message to App Server to redraw the portion of the view
+	       specified by \a region.
+
+	\param region The region of the view to redraw.
+*/
+
+
+/*!
+	\fn void BView::Invalidate()
+	\brief Sends a message to App Server to redraw the view.
+*/
+
+
+/*!
+	\fn void BView::InvertRect(BRect rect)
+	\brief Inverts the colors within \a rect.
+
+	This method is often used to draw a highlighted selection in a view.
+
+	\param rect The rectangular area in the view to invert the colors of.
+*/
+
+
+//! @}
+
+
+/*!
+	\name View Hierarchy Methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BView::AddChild(BView* child, BView* before)
+	\brief Adds \a child to the view hierarchy immediately before \a before.
+
+	A view may only have one parent at a time so \a child must not have already
+	been added to the view hierarchy. if \a before \c NULL then \a child is added
+	to the end of the tree. If the view is attached to a window \a child and all
+	of its descendent views also become attached to the window invoking an
+	AttachedToWindow() method on each view.
+
+	\param child The child view to add.
+	\param before The sibling view to add \a child before.
+*/
+
+
+/*!
+	\fn bool BView::AddChild(BLayoutItem* child)
+	\brief Add the \a child layout item to the view hierarchy.
+
+	\param child The child layout item to add.
+	\return Whether or not \a child was added to the view layout hierarchy.
+*/
+
+
+/*!
+	\fn bool BView::RemoveChild(BView* child)
+	\brief Removes \a child from the view hierarchy.
+
+	\param child The child view to remove.
+	\return Whether or not \a child was removed from the view hierarchy.
+*/
+
+
+/*!
+	\fn int32 BView::CountChildren() const
+	\brief Returns the number of child views that this view has.
+
+	\return The number of child views.
+*/
+
+
+/*!
+	\fn BView* BView::ChildAt(int32 index) const
+	\brief Returns a pointer to the child view found at \a index.
+
+	\param index The index of the child view to return a pointer of.
+
+	\return A pointer to the child view at \a index or \c NULL if not found.
+*/
+
+
+/*!
+	\fn BView* BView::NextSibling() const
+	\brief Returns a pointer to the next sibling view.
+
+	\return A pointer to the next sibling view or \a NULL if not found.
+*/
+
+
+/*!
+	\fn BView* BView::PreviousSibling() const
+	\brief Returns a pointer to the previous sibling view.
+
+	\return A pointer to the previous sibling view or \a NULL if not found.
+*/
+
+
+/*!
+	\fn bool BView::RemoveSelf()
+	\brief Removes the view and all child views from the view hierarchy.
+
+	\returns Whether or not the view was removed from the view hierarchy.
+*/
+
+
+/*!
+	\fn BView* BView::Parent() const
+	\brief Returns a pointer to the view's parent.
+
+	\return A pointer to the parent view or \c NULL if not attached.
+*/
+
+
+/*!
+	\fn BView* BView::FindView(const char* name) const
+	\brief Returns the view in the view hierarchy with the specified \a name.
+
+	\return The view in the view hierarchy with the specified \a name or \c NULL
+	        if not found.
+*/
+
+
+//! @}
+
+
+/*!
+	\name View Frame Alteration Methods
+
+	As a view's frame rectangle must be aligned to pixel values all parameters are
+	rounded to the nearest integer. If the view isn't attached these methods alter the
+	frame rectangle without triggering FrameMoved(), FrameResized() or Invalidate().
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BView::MoveBy(float deltaX, float deltaY)
+	\brief Moves the view \a deltaX pixels horizontally and \a deltaY pixels
+	       vertically in the parent view's coordinate system.
+
+	\param deltaX The number of pixels to move the view horizontally.
+	\param deltaY The number of pixels to move the view vertically.
+*/
+
+
+/*!
+	\fn void BView::MoveTo(BPoint where)
+	\brief Move the view to the location specified by \a where in the parent
+	       view's coordinate system.
+
+	\param where The location to move the view to.
+*/
+
+
+/*!
+	\fn void BView::MoveTo(float x, float y)
+	\brief Move the view to the coordinates specified by \a x in the horizontal
+	       dimension and \a y in the vertical dimension in the parent view's
+	       coordinate system.
+
+	\param x The horizontal coordinate to move the view to.
+	\param y The vertical coordinate to move the view to.
+*/
+
+
+/*!
+	\fn void BView::ResizeBy(float deltaWidth, float deltaHeight)
+	\brief Resize the view by \a deltaWidth horizontally and \a deltaHeight
+	       vertically without moving the top left corner of the view.
+
+	\param deltaWidth The number of pixels to resize the view by horizontally.
+	\param deltaHeight The number of pixels to resize the view by vertically.
+*/
+
+
+/*!
+	\fn void BView::ResizeTo(float width, float height)
+	\brief Resize the view to the specified \a width and \a height.
+
+	\param width The width to resize the view to.
+	\param height The height to resize the view to.
+*/
+
+
+/*!
+	\fn void BView::ResizeTo(BSize size)
+	\brief Resize the view to the dimension specified by \a size.
+
+	\param size The \a size to resize the view to.
+*/
+
+
+//! @}
+
+
+/*!
+	\fn status_t BView::GetSupportedSuites(BMessage* data)
+	\brief Reports the suites of messages and specifiers understood by the view.
+
+	\param data The message to use to report the suite of messages and specifiers.
+
+	\see BHandler::GetSupportedSuites()
+*/
+
+
+/*!
+	\fn BHandler* BView::ResolveSpecifier(BMessage* msg, int32 index,
+		BMessage* specifier, int32 what, const char* property)
+	\brief Determine the proper handler for a scripting message.
+
+	\see BHandler::ResolveSpecifier()
 */
 
 
@@ -216,6 +3211,14 @@
 
 	\sa BHandler::Perform()
 */
+
+
+/*!
+	\name Layout Methods
+*/
+
+
+//! @{
 
 
 /*!
@@ -283,7 +3286,7 @@
 
 /*!
 	\fn void BView::SetLayout(BLayout* layout)
-	\brief Set the \a layout of the view.
+	\brief Sets the \a layout of the view.
 
 	\param layout The \a layout to set.
 */
@@ -297,3 +3300,4 @@
 */
 
 
+//! @}
