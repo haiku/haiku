@@ -6,8 +6,9 @@
 
 # first create the actual cross development package
 
-local haikuCrossDevelPackage = haiku_cross_devel_$(HAIKU_PACKAGING_ARCH).hpkg ;
-HaikuPackage $(haikuCrossDevelPackage) ;
+local haikuCrossDevelSysrootPackage 
+	= haiku_cross_devel_sysroot_$(HAIKU_PACKAGING_ARCH).hpkg ;
+HaikuPackage $(haikuCrossDevelSysrootPackage) ;
 
 local developCrossLibDirTokens = develop lib ;
 
@@ -56,19 +57,19 @@ if $(HAIKU_GCC_VERSION[1]) = 2 {
 		: [ FDirName $(HAIKU_TOP) headers cpp ] : 2.95.3 ;
 }
 
-BuildHaikuPackage $(haikuCrossDevelPackage) : haiku_cross_devel ;
+BuildHaikuPackage $(haikuCrossDevelSysrootPackage) : haiku_cross_devel_sysroot ;
 
 # Now create a wrapper package which just contains the actual cross development 
 # package. This wrapper package can safely be installed into the system 
 # hierarchy of the target system, from where haikuporter will fetch it when
 # needed.
 
-local haikuCrossDevelWrapperPackage 
-	= haiku_cross_devel_wrapper_$(HAIKU_PACKAGING_ARCH).hpkg ;
-HaikuPackage $(haikuCrossDevelWrapperPackage) ;
+local haikuCrossDevelPackage 
+	= haiku_cross_devel_$(HAIKU_PACKAGING_ARCH).hpkg ;
+HaikuPackage $(haikuCrossDevelPackage) ;
 
 # add the wrapped package
 local developCrossDirTokens = develop cross ;
-AddFilesToPackage $(developCrossDirTokens) : $(haikuCrossDevelPackage) ;
+AddFilesToPackage $(developCrossDirTokens) : $(haikuCrossDevelSysrootPackage) ;
 
-BuildHaikuPackage $(haikuCrossDevelWrapperPackage) : haiku_cross_devel_wrapper ;
+BuildHaikuPackage $(haikuCrossDevelPackage) : haiku_cross_devel ;
