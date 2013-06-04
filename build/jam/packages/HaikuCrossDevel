@@ -9,7 +9,7 @@
 local haikuCrossDevelPackage = haiku_cross_devel_$(HAIKU_PACKAGING_ARCH).hpkg ;
 HaikuPackage $(haikuCrossDevelPackage) ;
 
-local developCrossLibDirTokens = develop lib $(HAIKU_PACKAGING_ARCH) ;
+local developCrossLibDirTokens = develop lib ;
 
 # glue code
 AddFilesToPackage $(developCrossLibDirTokens) :
@@ -36,7 +36,7 @@ AddFilesToPackage $(developCrossLibDirTokens) : liblocalestub.a ;
 AddFilesToPackage $(developCrossLibDirTokens) : libposix_error_mapper.a ;
 
 # headers
-local developCrossHeadersDirTokens = develop headers $(HAIKU_PACKAGING_ARCH) ;
+local developCrossHeadersDirTokens = develop headers ;
 local headerDir ;
 for headerDir in config glibc os posix {
 	CopyDirectoryToPackage $(developCrossHeadersDirTokens)
