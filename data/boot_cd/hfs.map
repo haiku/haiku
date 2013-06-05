@@ -2,9 +2,9 @@
 # from treating everything like a text file (ugly!)
 #
 # EXTN                   XLate   CREATOR TYPE    Comment
-.b                       Raw     'UNIX'  'tbxi'  "Macintosh Toolbox ROM file"
-.chrp                    Raw     'chrp'  'tbxi'  "Macintosh CHRP script"
-.elf                     Raw     'UNIX'  'boot'  "Bootstrap"
+.chrp                    -       'chrp'  'tbxi'  "Macintosh Toolbox ROM file"
+.elf                     Raw     'UNIX'  'boot'  "ELF Binary"
+.xcf                     Raw     'UNIX'  'boot'  "XCOFF Binary"
 .htm                     Ascii   'MOSS'  'TEXT'  "HTML File"
 .html                    Ascii   'MOSS'  'TEXT'  "HTML File"
 .txt                     Ascii   'ttxt'  'TEXT'  "Text File"

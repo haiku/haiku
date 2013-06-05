@@ -1480,21 +1480,20 @@ actions BuildCDBootPPCImage1 bind MAPS
 	mkdir -p $(HAIKU_OUTPUT_DIR)/cd/boot
 	# CHRP Boot script
 	cp $(>[3]) $(HAIKU_OUTPUT_DIR)/cd/ppc/bootinfo.txt
-	# Haiku Bootloaders (Old World Mac + PReP partition)
-	cp $(>[2]) $(HAIKU_OUTPUT_DIR)/cd/ofwboot.xcf
-	# Haiku Bootloader (New World)
-	cp $(>[1]) $(HAIKU_OUTPUT_DIR)/cd/ofwboot.elf
-	cp $(>[1]) $(HAIKU_OUTPUT_DIR)/cd/boot/bootloader.b
+	cp $(>[3]) $(HAIKU_OUTPUT_DIR)/cd/boot/boot.chrp
+	# Haiku Bootloaders
+	cp $(>[2]) $(HAIKU_OUTPUT_DIR)/cd/boot/haikuloader.xcf
+	cp $(>[1]) $(HAIKU_OUTPUT_DIR)/cd/boot/haikuloader.elf
 	# Extras (readme files, etc)
 	cp $(>[4]) $(HAIKU_OUTPUT_DIR)/cd/
 
 	mkisofs -v -hfs -part -map $(MAPS) -no-desktop -hfs-volid bootimg \
 		-V bootimg -hfs-bless $(HAIKU_OUTPUT_DIR)/cd/boot -prep-boot \
-		ofwboot.xcf -r -o $(<) $(HAIKU_OUTPUT_DIR)/cd \
+		boot/haikuloader.xcf -r -o $(<) $(HAIKU_OUTPUT_DIR)/cd \
 	|| \
 	genisoimage -v -hfs -part -map $(MAPS) -no-desktop -hfs-volid bootimg \
 		-V bootimg -hfs-bless $(HAIKU_OUTPUT_DIR)/cd/boot -prep-boot \
-		ofwboot.xcf -r -o $(<) $(HAIKU_OUTPUT_DIR)/cd
+		boot/haikuloader.xcf -r -o $(<) $(HAIKU_OUTPUT_DIR)/cd
 	$(RM) -R $(HAIKU_OUTPUT_DIR)/cd
 }
 

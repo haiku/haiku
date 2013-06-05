@@ -1,8 +1,16 @@
-<chrp-boot> <description>Haiku</description>
-<os-name>Haiku</os-name> 
-<boot-script>boot &device;:\\bootloader.b</boot-script>
+<chrp-boot>
+<compatible>
+MacRISC
+</compatible>
+<description>
+Haiku for PowerPC
+</description>
+<boot-script>
+boot cd:,\\haikuloader.elf
+</boot-script>
 <icon size=64,64 color-space=3,3,2>
-<bitmap> FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+<bitmap>
+FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
@@ -166,4 +174,7 @@ FF FF FF FF FF FF FF FF 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-00 00 00 00 00 00 </bitmap> </icon> </chrp-boot>
+00 00 00 00 00 00
+</bitmap>
+</icon>
+</chrp-boot>
