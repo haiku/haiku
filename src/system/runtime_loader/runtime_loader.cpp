@@ -90,7 +90,7 @@ search_path_for_type(image_type type)
 
 static int
 try_open_executable(const char *dir, int dirLength, const char *name,
-	const char *programPath, const char *compatibilitySubDir, char *path,
+	const char *programPath, const char *abiSpecificSubDir, char *path,
 	size_t pathLength)
 {
 	size_t nameLength = strlen(name);
@@ -123,11 +123,12 @@ try_open_executable(const char *dir, int dirLength, const char *name,
 			pathLength -= bytesCopied;
 			dir += 2;
 			dirLength -= 2;
-		} else if (compatibilitySubDir != NULL) {
+		} else if (abiSpecificSubDir != NULL) {
 			// We're looking for a library or an add-on and the executable has
-			// not been compiled with a compiler compatible with the one the
-			// OS has been built with. Thus we only look in specific subdirs.
-			subDirLen = strlen(compatibilitySubDir) + 1;
+			// not been compiled with a compiler using the same ABI as the one
+			// the OS has been built with. Thus we only look in subdirs
+			// specific to that ABI.
+			subDirLen = strlen(abiSpecificSubDir) + 1;
 		}
 
 		if (dirLength + 1 + subDirLen + nameLength >= pathLength)
@@ -136,7 +137,7 @@ try_open_executable(const char *dir, int dirLength, const char *name,
 		memcpy(buffer, dir, dirLength);
 		buffer[dirLength] = '/';
 		if (subDirLen > 0) {
-			memcpy(buffer + dirLength + 1, compatibilitySubDir, subDirLen - 1);
+			memcpy(buffer + dirLength + 1, abiSpecificSubDir, subDirLen - 1);
 			buffer[dirLength + subDirLen] = '/';
 		}
 		strcpy(buffer + dirLength + 1 + subDirLen, name);
@@ -180,7 +181,7 @@ try_open_executable(const char *dir, int dirLength, const char *name,
 
 static int
 search_executable_in_path_list(const char *name, const char *pathList,
-	int pathListLen, const char *programPath, const char *compatibilitySubDir,
+	int pathListLen, const char *programPath, const char *abiSpecificSubDir,
 	char *pathBuffer, size_t pathBufferLength)
 {
 	const char *pathListEnd = pathList + pathListLen;
@@ -198,7 +199,7 @@ search_executable_in_path_list(const char *name, const char *pathList,
 			pathEnd++;
 
 		fd = try_open_executable(pathList, pathEnd - pathList, name,
-			programPath, compatibilitySubDir, pathBuffer, pathBufferLength);
+			programPath, abiSpecificSubDir, pathBuffer, pathBufferLength);
 		if (fd >= 0) {
 			// see if it's a dir
 			struct stat stat;
@@ -221,7 +222,7 @@ search_executable_in_path_list(const char *name, const char *pathList,
 
 int
 open_executable(char *name, image_type type, const char *rpath,
-	const char *programPath, const char *compatibilitySubDir)
+	const char *programPath, const char *abiSpecificSubDir)
 {
 	char buffer[PATH_MAX];
 	int fd = B_ENTRY_NOT_FOUND;
@@ -273,7 +274,7 @@ open_executable(char *name, image_type type, const char *rpath,
 	if (fd < 0) {
 		if (const char *paths = search_path_for_type(type)) {
 			fd = search_executable_in_path_list(name, paths, strlen(paths),
-				programPath, compatibilitySubDir, buffer, sizeof(buffer));
+				programPath, abiSpecificSubDir, buffer, sizeof(buffer));
 		}
 	}
 
