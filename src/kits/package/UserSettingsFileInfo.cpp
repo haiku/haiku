@@ -24,7 +24,8 @@ BUserSettingsFileInfo::BUserSettingsFileInfo(
 	const BHPKG::BUserSettingsFileInfoData& infoData)
 	:
 	fPath(infoData.path),
-	fTemplatePath(infoData.templatePath)
+	fTemplatePath(infoData.templatePath),
+	fIsDirectory(infoData.isDirectory)
 {
 }
 
@@ -33,7 +34,18 @@ BUserSettingsFileInfo::BUserSettingsFileInfo(const BString& path,
 	const BString& templatePath)
 	:
 	fPath(path),
-	fTemplatePath(templatePath)
+	fTemplatePath(templatePath),
+	fIsDirectory(false)
+{
+}
+
+
+BUserSettingsFileInfo::BUserSettingsFileInfo(const BString& path,
+	bool isDirectory)
+	:
+	fPath(path),
+	fTemplatePath(),
+	fIsDirectory(isDirectory)
 {
 }
 
@@ -64,11 +76,28 @@ BUserSettingsFileInfo::TemplatePath() const
 }
 
 
+bool
+BUserSettingsFileInfo::IsDirectory() const
+{
+	return fIsDirectory;
+}
+
+
 void
 BUserSettingsFileInfo::SetTo(const BString& path, const BString& templatePath)
 {
 	fPath = path;
 	fTemplatePath = templatePath;
+	fIsDirectory = false;
+}
+
+
+void
+BUserSettingsFileInfo::SetTo(const BString& path, bool isDirectory)
+{
+	fPath = path;
+	fTemplatePath.Truncate(0);
+	fIsDirectory = isDirectory;
 }
 
 

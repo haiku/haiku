@@ -51,7 +51,7 @@ const char* const BPackageInfo::kElementNames[B_PACKAGE_INFO_ENUM_COUNT] = {
 	"checksum",		// not being parsed, computed externally
 	NULL,			// install-path -- not settable via .PackageInfo
 	"base-package",
-	"global-settings-files",
+	"global-writable-files",
 	"user-settings-files",
 	"users",
 	"groups",
@@ -68,8 +68,8 @@ BPackageInfo::kArchitectureNames[B_PACKAGE_ARCHITECTURE_ENUM_COUNT] = {
 };
 
 
-const char* const BPackageInfo::kSettingsFileUpdateTypes[
-		B_SETTINGS_FILE_UPDATE_TYPE_ENUM_COUNT] = {
+const char* const BPackageInfo::kWritableFileUpdateTypes[
+		B_WRITABLE_FILE_UPDATE_TYPE_ENUM_COUNT] = {
 	"keep-old",
 	"manual",
 	"auto-merge",
@@ -168,7 +168,7 @@ BPackageInfo::BPackageInfo()
 	fLicenseList(4),
 	fURLList(4),
 	fSourceURLList(4),
-	fGlobalSettingsFileInfos(4, true),
+	fGlobalWritableFileInfos(4, true),
 	fUserSettingsFileInfos(4, true),
 	fUsers(4, true),
 	fGroups(4),
@@ -192,7 +192,7 @@ BPackageInfo::BPackageInfo(BMessage* archive, status_t* _error)
 	fLicenseList(4),
 	fURLList(4),
 	fSourceURLList(4),
-	fGlobalSettingsFileInfos(4, true),
+	fGlobalWritableFileInfos(4, true),
 	fUserSettingsFileInfos(4, true),
 	fUsers(4, true),
 	fGroups(4),
@@ -222,8 +222,8 @@ BPackageInfo::BPackageInfo(BMessage* archive, status_t* _error)
 		&& (error = _ExtractStringList(archive, "urls", fURLList)) == B_OK
 		&& (error = _ExtractStringList(archive, "source-urls", fSourceURLList))
 			== B_OK
-		&& (error = _ExtractGlobalSettingsFileInfos(archive,
-			"global-settings-files", fGlobalSettingsFileInfos)) == B_OK
+		&& (error = _ExtractGlobalWritableFileInfos(archive,
+			"global-writable-files", fGlobalWritableFileInfos)) == B_OK
 		&& (error = _ExtractUserSettingsFileInfos(archive, "user-settings-files",
 			fUserSettingsFileInfos)) == B_OK
 		&& (error = _ExtractUsers(archive, "users", fUsers)) == B_OK
@@ -340,11 +340,11 @@ BPackageInfo::InitCheck() const
 		|| fProvidesList.IsEmpty())
 		return B_NO_INIT;
 
-	// check global settings files
-	int32 globalSettingsFileCount = fGlobalSettingsFileInfos.CountItems();
-	for (int32 i = 0; i < globalSettingsFileCount; i++) {
-		const BGlobalSettingsFileInfo* info
-			= fGlobalSettingsFileInfos.ItemAt(i);
+	// check global writable files
+	int32 globalWritableFileCount = fGlobalWritableFileInfos.CountItems();
+	for (int32 i = 0; i < globalWritableFileCount; i++) {
+		const BGlobalWritableFileInfo* info
+			= fGlobalWritableFileInfos.ItemAt(i);
 		status_t error = info->InitCheck();
 		if (error != B_OK)
 			return error;
@@ -493,10 +493,10 @@ BPackageInfo::SourceURLList() const
 }
 
 
-const BObjectList<BGlobalSettingsFileInfo>&
-BPackageInfo::GlobalSettingsFileInfos() const
+const BObjectList<BGlobalWritableFileInfo>&
+BPackageInfo::GlobalWritableFileInfos() const
 {
-	return fGlobalSettingsFileInfos;
+	return fGlobalWritableFileInfos;
 }
 
 
@@ -716,18 +716,18 @@ BPackageInfo::AddSourceURL(const BString& url)
 
 
 void
-BPackageInfo::ClearGlobalSettingsFileInfos()
+BPackageInfo::ClearGlobalWritableFileInfos()
 {
-	fGlobalSettingsFileInfos.MakeEmpty();
+	fGlobalWritableFileInfos.MakeEmpty();
 }
 
 
 status_t
-BPackageInfo::AddGlobalSettingsFileInfo(const BGlobalSettingsFileInfo& info)
+BPackageInfo::AddGlobalWritableFileInfo(const BGlobalWritableFileInfo& info)
 {
-	BGlobalSettingsFileInfo* newInfo
-		= new (std::nothrow) BGlobalSettingsFileInfo(info);
-	if (newInfo == NULL || !fGlobalSettingsFileInfos.AddItem(newInfo)) {
+	BGlobalWritableFileInfo* newInfo
+		= new (std::nothrow) BGlobalWritableFileInfo(info);
+	if (newInfo == NULL || !fGlobalWritableFileInfos.AddItem(newInfo)) {
 		delete newInfo;
 		return B_NO_MEMORY;
 	}
@@ -932,7 +932,7 @@ BPackageInfo::Clear()
 	fLicenseList.MakeEmpty();
 	fURLList.MakeEmpty();
 	fSourceURLList.MakeEmpty();
-	fGlobalSettingsFileInfos.MakeEmpty();
+	fGlobalWritableFileInfos.MakeEmpty();
 	fUserSettingsFileInfos.MakeEmpty();
 	fUsers.MakeEmpty();
 	fGroups.MakeEmpty();
@@ -968,8 +968,8 @@ BPackageInfo::Archive(BMessage* archive, bool deep) const
 		|| (error = archive->AddStrings("urls", fURLList)) != B_OK
 		|| (error = archive->AddStrings("source-urls", fSourceURLList))
 			!= B_OK
-		|| (error = _AddGlobalSettingsFileInfos(archive,
-			"global-settings-files", fGlobalSettingsFileInfos)) != B_OK
+		|| (error = _AddGlobalWritableFileInfos(archive,
+			"global-writable-files", fGlobalWritableFileInfos)) != B_OK
 		|| (error = _AddUserSettingsFileInfos(archive,
 			"user-settings-files", fUserSettingsFileInfos)) != B_OK
 		|| (error = _AddUsers(archive, "users", fUsers)) != B_OK
@@ -1019,7 +1019,7 @@ BPackageInfo::GetConfigString(BString& _string) const
 		.Write("licenses", fLicenseList)
 		.Write("urls", fURLList)
 		.Write("source-urls", fSourceURLList)
-		.Write("global-settings-files", fGlobalSettingsFileInfos)
+		.Write("global-writable-files", fGlobalWritableFileInfos)
 		.Write("user-settings-files", fUserSettingsFileInfos)
 		.Write("users", fUsers)
 		.Write("groups", fGroups)
@@ -1219,24 +1219,29 @@ BPackageInfo::_AddResolvableExpressions(BMessage* archive, const char* field,
 
 
 /*static*/ status_t
-BPackageInfo::_AddGlobalSettingsFileInfos(BMessage* archive, const char* field,
-	const GlobalSettingsFileInfoList& infos)
+BPackageInfo::_AddGlobalWritableFileInfos(BMessage* archive, const char* field,
+	const GlobalWritableFileInfoList& infos)
 {
 	// construct the field names we need
 	FieldName pathField(field, ":path");
-	FieldName updateTypeField(field, ":version");
+	FieldName updateTypeField(field, ":updateType");
+	FieldName isDirectoryField(field, ":isDirectory");
 
-	if (!pathField.IsValid() || !updateTypeField.IsValid())
+	if (!pathField.IsValid() || !updateTypeField.IsValid()
+		|| !isDirectoryField.IsValid()) {
 		return B_BAD_VALUE;
+	}
 
 	// add fields
 	int32 count = infos.CountItems();
 	for (int32 i = 0; i < count; i++) {
-		const BGlobalSettingsFileInfo* info = infos.ItemAt(i);
+		const BGlobalWritableFileInfo* info = infos.ItemAt(i);
 		status_t error;
 		if ((error = archive->AddString(pathField, info->Path())) != B_OK
 			|| (error = archive->AddInt32(updateTypeField, info->UpdateType()))
-				!= B_OK) {
+				!= B_OK
+			|| (error = archive->AddBool(isDirectoryField,
+				info->IsDirectory())) != B_OK) {
 			return error;
 		}
 	}
@@ -1252,9 +1257,12 @@ BPackageInfo::_AddUserSettingsFileInfos(BMessage* archive, const char* field,
 	// construct the field names we need
 	FieldName pathField(field, ":path");
 	FieldName templatePathField(field, ":templatePath");
+	FieldName isDirectoryField(field, ":isDirectory");
 
-	if (!pathField.IsValid() || !templatePathField.IsValid())
+	if (!pathField.IsValid() || !templatePathField.IsValid()
+		|| !isDirectoryField.IsValid()) {
 		return B_BAD_VALUE;
+	}
 
 	// add fields
 	int32 count = infos.CountItems();
@@ -1263,7 +1271,9 @@ BPackageInfo::_AddUserSettingsFileInfos(BMessage* archive, const char* field,
 		status_t error;
 		if ((error = archive->AddString(pathField, info->Path())) != B_OK
 			|| (error = archive->AddString(templatePathField,
-				info->TemplatePath())) != B_OK) {
+				info->TemplatePath())) != B_OK
+			|| (error = archive->AddBool(isDirectoryField,
+				info->IsDirectory())) != B_OK) {
 			return error;
 		}
 	}
@@ -1486,15 +1496,18 @@ BPackageInfo::_ExtractResolvableExpressions(BMessage* archive,
 
 
 /*static*/ status_t
-BPackageInfo::_ExtractGlobalSettingsFileInfos(BMessage* archive,
-	const char* field, GlobalSettingsFileInfoList& _infos)
+BPackageInfo::_ExtractGlobalWritableFileInfos(BMessage* archive,
+	const char* field, GlobalWritableFileInfoList& _infos)
 {
 	// construct the field names we need
 	FieldName pathField(field, ":path");
-	FieldName updateTypeField(field, ":version");
+	FieldName updateTypeField(field, ":updateType");
+	FieldName isDirectoryField(field, ":isDirectory");
 
-	if (!pathField.IsValid() || !updateTypeField.IsValid())
+	if (!pathField.IsValid() || !updateTypeField.IsValid()
+		|| !isDirectoryField.IsValid()) {
 		return B_BAD_VALUE;
+	}
 
 	// get the number of items
 	type_code type;
@@ -1516,13 +1529,18 @@ BPackageInfo::_ExtractGlobalSettingsFileInfos(BMessage* archive,
 		if (error != B_OK)
 			return error;
 		if (updateType < 0
-			|| updateType > B_SETTINGS_FILE_UPDATE_TYPE_ENUM_COUNT) {
+			|| updateType > B_WRITABLE_FILE_UPDATE_TYPE_ENUM_COUNT) {
 			return B_BAD_DATA;
 		}
 
-		BGlobalSettingsFileInfo* info
-			= new(std::nothrow) BGlobalSettingsFileInfo(path,
-				(BSettingsFileUpdateType)updateType);
+		bool isDirectory;
+		error = archive->FindBool(isDirectoryField, i, &isDirectory);
+		if (error != B_OK)
+			return error;
+
+		BGlobalWritableFileInfo* info
+			= new(std::nothrow) BGlobalWritableFileInfo(path,
+				(BWritableFileUpdateType)updateType, isDirectory);
 		if (info == NULL || !_infos.AddItem(info)) {
 			delete info;
 			return B_NO_MEMORY;
@@ -1540,9 +1558,12 @@ BPackageInfo::_ExtractUserSettingsFileInfos(BMessage* archive,
 	// construct the field names we need
 	FieldName pathField(field, ":path");
 	FieldName templatePathField(field, ":templatePath");
+	FieldName isDirectoryField(field, ":isDirectory");
 
-	if (!pathField.IsValid() || !templatePathField.IsValid())
+	if (!pathField.IsValid() || !templatePathField.IsValid()
+		|| !isDirectoryField.IsValid()) {
 		return B_BAD_VALUE;
+	}
 
 	// get the number of items
 	type_code type;
@@ -1564,8 +1585,14 @@ BPackageInfo::_ExtractUserSettingsFileInfos(BMessage* archive,
 		if (error != B_OK)
 			return error;
 
-		BUserSettingsFileInfo* info
-			= new(std::nothrow) BUserSettingsFileInfo(path, templatePath);
+		bool isDirectory;
+		error = archive->FindBool(isDirectoryField, i, &isDirectory);
+		if (error != B_OK)
+			return error;
+
+		BUserSettingsFileInfo* info = isDirectory
+			? new(std::nothrow) BUserSettingsFileInfo(path, true)
+			: new(std::nothrow) BUserSettingsFileInfo(path, templatePath);
 		if (info == NULL || !_infos.AddItem(info)) {
 			delete info;
 			return B_NO_MEMORY;

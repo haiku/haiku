@@ -143,9 +143,9 @@ BPackageInfoContentHandler::HandlePackageAttribute(
 			fPackageInfo.SetBasePackage(value.string);
 			break;
 
-		case B_PACKAGE_INFO_GLOBAL_SETTINGS_FILES:
-			fPackageInfo.AddGlobalSettingsFileInfo(
-				value.globalSettingsFileInfo);
+		case B_PACKAGE_INFO_GLOBAL_WRITABLE_FILES:
+			fPackageInfo.AddGlobalWritableFileInfo(
+				value.globalWritableFileInfo);
 			break;
 
 		case B_PACKAGE_INFO_USER_SETTINGS_FILES:

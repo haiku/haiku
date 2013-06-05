@@ -75,8 +75,8 @@ private:
 									BObjectList<BPackageResolvableExpression>*
 										value,
 									BString* _basePackage = NULL);
-			void				_ParseGlobalSettingsFileInfos(
-									GlobalSettingsFileInfoList* infos);
+			void				_ParseGlobalWritableFileInfos(
+									GlobalWritableFileInfoList* infos);
 			void				_ParseUserSettingsFileInfos(
 									UserSettingsFileInfoList* infos);
 			void				_ParseUsers(UserList* users);

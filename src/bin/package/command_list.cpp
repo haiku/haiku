@@ -288,14 +288,16 @@ struct PackageContentListHandler : VersionPolicy::PackageContentHandler {
 				printf("\treplaces: %s\n", value.string);
 				break;
 
-			case B_PACKAGE_INFO_GLOBAL_SETTINGS_FILES:
-				printf("\tglobal settings file: %s",
-					value.globalSettingsFileInfo.path);
-				if (value.globalSettingsFileInfo.updateType
-						< B_SETTINGS_FILE_UPDATE_TYPE_ENUM_COUNT) {
+			case B_PACKAGE_INFO_GLOBAL_WRITABLE_FILES:
+				printf("\tglobal writable file: %s",
+					value.globalWritableFileInfo.path);
+				if (value.globalWritableFileInfo.isDirectory)
+					printf( " directory");
+				if (value.globalWritableFileInfo.updateType
+						< B_WRITABLE_FILE_UPDATE_TYPE_ENUM_COUNT) {
 					printf(" %s\n",
-						BPackageInfo::kSettingsFileUpdateTypes[
-							value.globalSettingsFileInfo.updateType]);
+						BPackageInfo::kWritableFileUpdateTypes[
+							value.globalWritableFileInfo.updateType]);
 				} else
 					printf("\n");
 				break;
@@ -303,7 +305,9 @@ struct PackageContentListHandler : VersionPolicy::PackageContentHandler {
 			case B_PACKAGE_INFO_USER_SETTINGS_FILES:
 				printf("\tuser settings file: %s",
 					value.userSettingsFileInfo.path);
-				if (value.userSettingsFileInfo.templatePath != NULL) {
+				if (value.globalWritableFileInfo.isDirectory) {
+					printf( " directory\n");
+				} else if (value.userSettingsFileInfo.templatePath != NULL) {
 					printf(" template %s\n",
 						value.userSettingsFileInfo.templatePath);
 				} else

@@ -157,19 +157,25 @@ private:
 		}
 	}
 
-	void _WriteListElement(const BGlobalSettingsFileInfo* value)
+	void _WriteListElement(const BGlobalWritableFileInfo* value)
 	{
 		_WriteMaybeQuoted(value->Path());
+		if (value->IsDirectory()) {
+			_Write(' ');
+			_Write("directory");
+		}
 		if (value->IsIncluded()) {
 			_Write(' ');
-			_Write(kSettingsFileUpdateTypes[value->UpdateType()]);
+			_Write(kWritableFileUpdateTypes[value->UpdateType()]);
 		}
 	}
 
 	void _WriteListElement(const BUserSettingsFileInfo* value)
 	{
 		_WriteMaybeQuoted(value->Path());
-		if (!value->TemplatePath().IsEmpty()) {
+		if (value->IsDirectory()) {
+			_Write(" directory");
+		} else if (!value->TemplatePath().IsEmpty()) {
 			_Write(" template ");
 			_WriteMaybeQuoted(value->TemplatePath());
 		}

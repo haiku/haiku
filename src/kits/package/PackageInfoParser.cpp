@@ -604,15 +604,15 @@ BPackageInfo::Parser::_ParseResolvableExprList(
 
 
 void
-BPackageInfo::Parser::_ParseGlobalSettingsFileInfos(
-	GlobalSettingsFileInfoList* infos)
+BPackageInfo::Parser::_ParseGlobalWritableFileInfos(
+	GlobalWritableFileInfoList* infos)
 {
-	struct GlobalSettingsFileInfoParser : public ListElementParser {
+	struct GlobalWritableFileInfoParser : public ListElementParser {
 		Parser& parser;
-		GlobalSettingsFileInfoList* infos;
+		GlobalWritableFileInfoList* infos;
 
-		GlobalSettingsFileInfoParser(Parser& parser,
-			GlobalSettingsFileInfoList* infos)
+		GlobalWritableFileInfoParser(Parser& parser,
+			GlobalWritableFileInfoList* infos)
 			:
 			parser(parser),
 			infos(infos)
@@ -626,21 +626,27 @@ BPackageInfo::Parser::_ParseGlobalSettingsFileInfos(
 					token.pos);
 			}
 
-			BSettingsFileUpdateType updateType
-				= B_SETTINGS_FILE_UPDATE_TYPE_ENUM_COUNT;
+			BWritableFileUpdateType updateType
+				= B_WRITABLE_FILE_UPDATE_TYPE_ENUM_COUNT;
+			bool isDirectory = false;
 
 			Token nextToken = parser._NextToken();
+			if (nextToken.type == TOKEN_WORD && nextToken.text == "directory") {
+				isDirectory = true;
+				nextToken = parser._NextToken();
+			}
+
 			if (nextToken.type == TOKEN_WORD) {
-				const char* const* end = kSettingsFileUpdateTypes
-					+ B_SETTINGS_FILE_UPDATE_TYPE_ENUM_COUNT;
-				const char* const* found = std::find(kSettingsFileUpdateTypes,
+				const char* const* end = kWritableFileUpdateTypes
+					+ B_WRITABLE_FILE_UPDATE_TYPE_ENUM_COUNT;
+				const char* const* found = std::find(kWritableFileUpdateTypes,
 					end, nextToken.text);
 				if (found == end) {
 					throw ParseError(BString("expected an update type"),
 						nextToken.pos);
 				}
-				updateType = (BSettingsFileUpdateType)(
-					found - kSettingsFileUpdateTypes);
+				updateType = (BWritableFileUpdateType)(
+					found - kWritableFileUpdateTypes);
 			} else if (nextToken.type == TOKEN_ITEM_SEPARATOR
 				|| nextToken.type == TOKEN_CLOSE_BRACE) {
 				parser._RewindTo(nextToken);
@@ -650,8 +656,8 @@ BPackageInfo::Parser::_ParseGlobalSettingsFileInfos(
 					nextToken.pos);
 			}
 
-			if (!infos->AddItem(new BGlobalSettingsFileInfo(token.text,
-					updateType))) {
+			if (!infos->AddItem(new BGlobalWritableFileInfo(token.text,
+					updateType, isDirectory))) {
 				throw std::bad_alloc();
 			}
 		}
@@ -685,9 +691,13 @@ BPackageInfo::Parser::_ParseUserSettingsFileInfos(
 			}
 
 			BString templatePath;
+			bool isDirectory = false;
 
 			Token nextToken = parser._NextToken();
-			if (nextToken.type == TOKEN_WORD && nextToken.text == "template") {
+			if (nextToken.type == TOKEN_WORD && nextToken.text == "directory") {
+				isDirectory = true;
+			} else if (nextToken.type == TOKEN_WORD
+				&& nextToken.text == "template") {
 				nextToken = parser._NextToken();
 				if (nextToken.type != TOKEN_WORD
 					&& nextToken.type != TOKEN_QUOTED_STRING) {
@@ -705,8 +715,10 @@ BPackageInfo::Parser::_ParseUserSettingsFileInfos(
 					nextToken.pos);
 			}
 
-			if (!infos->AddItem(new BUserSettingsFileInfo(token.text,
-					templatePath))) {
+			if (isDirectory
+				? !infos->AddItem(new BUserSettingsFileInfo(token.text, true))
+				: !infos->AddItem(new BUserSettingsFileInfo(token.text,
+						templatePath))) {
 				throw std::bad_alloc();
 			}
 		}
@@ -929,9 +941,9 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 				_ParseStringList(&packageInfo->fSourceURLList);
 				break;
 
-			case B_PACKAGE_INFO_GLOBAL_SETTINGS_FILES:
-				_ParseGlobalSettingsFileInfos(
-					&packageInfo->fGlobalSettingsFileInfos);
+			case B_PACKAGE_INFO_GLOBAL_WRITABLE_FILES:
+				_ParseGlobalWritableFileInfos(
+					&packageInfo->fGlobalWritableFileInfos);
 				break;
 
 			case B_PACKAGE_INFO_USER_SETTINGS_FILES:

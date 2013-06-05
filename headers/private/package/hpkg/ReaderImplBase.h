@@ -102,7 +102,7 @@ protected:
 			class PackageVersionAttributeHandler;
 			class PackageResolvableAttributeHandler;
 			class PackageResolvableExpressionAttributeHandler;
-			class GlobalSettingsFileInfoAttributeHandler;
+			class GlobalWritableFileInfoAttributeHandler;
 			class UserSettingsFileInfoAttributeHandler;
 			class UserAttributeHandler;
 			class PackageAttributeHandler;
@@ -318,10 +318,10 @@ public:
 };
 
 
-class ReaderImplBase::GlobalSettingsFileInfoAttributeHandler
+class ReaderImplBase::GlobalWritableFileInfoAttributeHandler
 	: public PackageInfoAttributeHandlerBase {
 public:
-								GlobalSettingsFileInfoAttributeHandler(
+								GlobalWritableFileInfoAttributeHandler(
 									BPackageInfoAttributeValue&
 										packageInfoValue);
 

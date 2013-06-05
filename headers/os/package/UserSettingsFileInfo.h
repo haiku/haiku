@@ -25,19 +25,25 @@ public:
 										infoData);
 								BUserSettingsFileInfo(const BString& path,
 									const BString& templatePath = BString());
+								BUserSettingsFileInfo(const BString& path,
+									bool isDirectory);
 								~BUserSettingsFileInfo();
 
 			status_t			InitCheck() const;
 
 			const BString&		Path() const;
 			const BString&		TemplatePath() const;
+			bool				IsDirectory() const;
 
 			void				SetTo(const BString& path,
 									const BString& templatePath = BString());
+			void				SetTo(const BString& path,
+									bool isDirectory);
 
 private:
 			BString				fPath;
 			BString				fTemplatePath;
+			bool				fIsDirectory;
 };
 
 

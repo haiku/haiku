@@ -379,18 +379,27 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 	_AddStringAttributeList(B_HPKG_ATTRIBUTE_ID_PACKAGE_REPLACES,
 		packageInfo.ReplacesList(), attributeList);
 
-	// global settings file info list
-	const BObjectList<BGlobalSettingsFileInfo>& globalSettingsFileInfos
-		= packageInfo.GlobalSettingsFileInfos();
-	for (int32 i = 0; i < globalSettingsFileInfos.CountItems(); ++i) {
-		BGlobalSettingsFileInfo* info = globalSettingsFileInfos.ItemAt(i);
+	// global writable file info list
+	const BObjectList<BGlobalWritableFileInfo>& globalWritableFileInfos
+		= packageInfo.GlobalWritableFileInfos();
+	for (int32 i = 0; i < globalWritableFileInfos.CountItems(); ++i) {
+		BGlobalWritableFileInfo* info = globalWritableFileInfos.ItemAt(i);
 		PackageAttribute* attribute = _AddStringAttribute(
-			B_HPKG_ATTRIBUTE_ID_PACKAGE_GLOBAL_SETTINGS_FILE, info->Path(),
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_GLOBAL_WRITABLE_FILE, info->Path(),
 			attributeList);
+
+		if (info->IsDirectory()) {
+			PackageAttribute* isDirectoryAttribute = new PackageAttribute(
+				B_HPKG_ATTRIBUTE_ID_PACKAGE_IS_WRITABLE_DIRECTORY,
+				B_HPKG_ATTRIBUTE_TYPE_UINT,
+				B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
+			isDirectoryAttribute->unsignedInt = 1;
+			attribute->children.Add(isDirectoryAttribute);
+		}
 
 		if (info->IsIncluded()) {
 			PackageAttribute* updateTypeAttribute = new PackageAttribute(
-				B_HPKG_ATTRIBUTE_ID_PACKAGE_SETTINGS_FILE_UPDATE_TYPE,
+				B_HPKG_ATTRIBUTE_ID_PACKAGE_WRITABLE_FILE_UPDATE_TYPE,
 				B_HPKG_ATTRIBUTE_TYPE_UINT,
 				B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
 			updateTypeAttribute->unsignedInt = info->UpdateType();
@@ -407,9 +416,18 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 			B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_SETTINGS_FILE, info->Path(),
 			attributeList);
 
-		_AddStringAttributeIfNotEmpty(
-			B_HPKG_ATTRIBUTE_ID_PACKAGE_SETTINGS_FILE_TEMPLATE,
-			info->TemplatePath(), attribute->children);
+		if (info->IsDirectory()) {
+			PackageAttribute* isDirectoryAttribute = new PackageAttribute(
+				B_HPKG_ATTRIBUTE_ID_PACKAGE_IS_WRITABLE_DIRECTORY,
+				B_HPKG_ATTRIBUTE_TYPE_UINT,
+				B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
+			isDirectoryAttribute->unsignedInt = 1;
+			attribute->children.Add(isDirectoryAttribute);
+		} else {
+			_AddStringAttributeIfNotEmpty(
+				B_HPKG_ATTRIBUTE_ID_PACKAGE_SETTINGS_FILE_TEMPLATE,
+				info->TemplatePath(), attribute->children);
+		}
 	}
 
 	// user list

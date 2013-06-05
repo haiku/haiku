@@ -11,7 +11,7 @@
 #include <String.h>
 #include <StringList.h>
 
-#include <package/GlobalSettingsFileInfo.h>
+#include <package/GlobalWritableFileInfo.h>
 #include <package/PackageArchitecture.h>
 #include <package/PackageFlags.h>
 #include <package/PackageInfoAttributes.h>
@@ -82,8 +82,8 @@ public:
 			const BStringList&	URLList() const;
 			const BStringList&	SourceURLList() const;
 
-			const BObjectList<BGlobalSettingsFileInfo>&
-									GlobalSettingsFileInfos() const;
+			const BObjectList<BGlobalWritableFileInfo>&
+									GlobalWritableFileInfos() const;
 			const BObjectList<BUserSettingsFileInfo>&
 									UserSettingsFileInfos() const;
 
@@ -133,9 +133,9 @@ public:
 			void				ClearSourceURLList();
 			status_t			AddSourceURL(const BString& url);
 
-			void				ClearGlobalSettingsFileInfos();
-			status_t			AddGlobalSettingsFileInfo(
-									const BGlobalSettingsFileInfo& info);
+			void				ClearGlobalWritableFileInfos();
+			status_t			AddGlobalWritableFileInfo(
+									const BGlobalWritableFileInfo& info);
 
 			void				ClearUserSettingsFileInfos();
 			status_t			AddUserSettingsFileInfo(
@@ -193,7 +193,7 @@ public:
 public:
 	static	const char*	const	kElementNames[];
 	static	const char*	const	kArchitectureNames[];
-	static	const char* const	kSettingsFileUpdateTypes[];
+	static	const char* const	kWritableFileUpdateTypes[];
 
 private:
 			class Parser;
@@ -206,8 +206,8 @@ private:
 			typedef BObjectList<BPackageResolvableExpression>
 				ResolvableExpressionList;
 
-			typedef BObjectList<BGlobalSettingsFileInfo>
-				GlobalSettingsFileInfoList;
+			typedef BObjectList<BGlobalWritableFileInfo>
+				GlobalWritableFileInfoList;
 			typedef BObjectList<BUserSettingsFileInfo>
 				UserSettingsFileInfoList;
 
@@ -227,9 +227,9 @@ private:
 									const char* field,
 									const ResolvableExpressionList&
 										expressions);
-	static	status_t			_AddGlobalSettingsFileInfos(BMessage* archive,
+	static	status_t			_AddGlobalWritableFileInfos(BMessage* archive,
 									const char* field,
-									const GlobalSettingsFileInfoList&
+									const GlobalWritableFileInfoList&
 										infos);
 	static	status_t			_AddUserSettingsFileInfos(BMessage* archive,
 									const char* field,
@@ -249,9 +249,9 @@ private:
 	static	status_t			_ExtractResolvableExpressions(BMessage* archive,
 									const char* field,
 									ResolvableExpressionList& _expressions);
-	static	status_t			_ExtractGlobalSettingsFileInfos(
+	static	status_t			_ExtractGlobalWritableFileInfos(
 									BMessage* archive, const char* field,
-									GlobalSettingsFileInfoList& _infos);
+									GlobalWritableFileInfoList& _infos);
 	static	status_t			_ExtractUserSettingsFileInfos(
 									BMessage* archive, const char* field,
 									UserSettingsFileInfoList& _infos);
@@ -277,7 +277,7 @@ private:
 			BStringList			fURLList;
 			BStringList			fSourceURLList;
 
-			BObjectList<BGlobalSettingsFileInfo> fGlobalSettingsFileInfos;
+			BObjectList<BGlobalWritableFileInfo> fGlobalWritableFileInfos;
 			BObjectList<BUserSettingsFileInfo> fUserSettingsFileInfos;
 
 			UserList			fUsers;

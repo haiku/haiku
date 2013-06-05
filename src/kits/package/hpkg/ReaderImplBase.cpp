@@ -321,11 +321,11 @@ ReaderImplBase::PackageResolvableExpressionAttributeHandler::HandleAttribute(
 }
 
 
-// #pragma mark - GlobalSettingsFileInfoAttributeHandler
+// #pragma mark - GlobalWritableFileInfoAttributeHandler
 
 
-ReaderImplBase::GlobalSettingsFileInfoAttributeHandler
-	::GlobalSettingsFileInfoAttributeHandler(
+ReaderImplBase::GlobalWritableFileInfoAttributeHandler
+	::GlobalWritableFileInfoAttributeHandler(
 		BPackageInfoAttributeValue& packageInfoValue)
 	:
 	PackageInfoAttributeHandlerBase(packageInfoValue)
@@ -334,21 +334,21 @@ ReaderImplBase::GlobalSettingsFileInfoAttributeHandler
 
 
 status_t
-ReaderImplBase::GlobalSettingsFileInfoAttributeHandler::HandleAttribute(
+ReaderImplBase::GlobalWritableFileInfoAttributeHandler::HandleAttribute(
 	AttributeHandlerContext* context, uint8 id, const AttributeValue& value,
 	AttributeHandler** _handler)
 {
 	switch (id) {
-		case B_HPKG_ATTRIBUTE_ID_PACKAGE_SETTINGS_FILE_UPDATE_TYPE:
-			if (value.unsignedInt >= B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT) {
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_WRITABLE_FILE_UPDATE_TYPE:
+			if (value.unsignedInt >= B_WRITABLE_FILE_UPDATE_TYPE_ENUM_COUNT) {
 				context->errorOutput->PrintError(
 					"Error: Invalid package attribute section: invalid "
 					"global settings file update type %" B_PRIu64
 					" encountered\n", value.unsignedInt);
 				return B_BAD_DATA;
 			}
-			fPackageInfoValue.globalSettingsFileInfo.updateType
-				= (BSettingsFileUpdateType)value.unsignedInt;
+			fPackageInfoValue.globalWritableFileInfo.updateType
+				= (BWritableFileUpdateType)value.unsignedInt;
 			break;
 
 		default:
@@ -604,15 +604,15 @@ ReaderImplBase::PackageAttributeHandler::HandleAttribute(
 			fPackageInfoValue.SetTo(B_PACKAGE_INFO_INSTALL_PATH, value.string);
 			break;
 
-		case B_HPKG_ATTRIBUTE_ID_PACKAGE_GLOBAL_SETTINGS_FILE:
-			fPackageInfoValue.globalSettingsFileInfo.path = value.string;
-			fPackageInfoValue.globalSettingsFileInfo.updateType
-				= B_SETTINGS_FILE_UPDATE_TYPE_ENUM_COUNT;
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_GLOBAL_WRITABLE_FILE:
+			fPackageInfoValue.globalWritableFileInfo.path = value.string;
+			fPackageInfoValue.globalWritableFileInfo.updateType
+				= B_WRITABLE_FILE_UPDATE_TYPE_ENUM_COUNT;
 			fPackageInfoValue.attributeID
-				= B_PACKAGE_INFO_GLOBAL_SETTINGS_FILES;
+				= B_PACKAGE_INFO_GLOBAL_WRITABLE_FILES;
 			if (_handler != NULL) {
 				*_handler
-					= new(std::nothrow) GlobalSettingsFileInfoAttributeHandler(
+					= new(std::nothrow) GlobalWritableFileInfoAttributeHandler(
 						fPackageInfoValue);
 				if (*_handler == NULL)
 					return B_NO_MEMORY;

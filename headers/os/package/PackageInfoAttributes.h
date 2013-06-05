@@ -41,8 +41,8 @@ enum BPackageInfoAttributeID {
 	B_PACKAGE_INFO_INSTALL_PATH, // package install path; only for package
 								// building
 	B_PACKAGE_INFO_BASE_PACKAGE, // name of the base package for this package
-	B_PACKAGE_INFO_GLOBAL_SETTINGS_FILES,
-								// list of global settings file infos
+	B_PACKAGE_INFO_GLOBAL_WRITABLE_FILES,
+								// list of global writable file infos
 	B_PACKAGE_INFO_USER_SETTINGS_FILES,
 								// list of user settings file infos
 	B_PACKAGE_INFO_USERS,

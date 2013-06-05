@@ -13,7 +13,7 @@
 #include <package/PackageArchitecture.h>
 #include <package/PackageInfoAttributes.h>
 #include <package/PackageResolvableOperator.h>
-#include <package/SettingsFileUpdateType.h>
+#include <package/WritableFileUpdateType.h>
 
 
 namespace BPackageKit {
@@ -47,15 +47,17 @@ struct BPackageResolvableExpressionData {
 };
 
 
-struct BGlobalSettingsFileInfoData {
+struct BGlobalWritableFileInfoData {
 	const char*				path;
-	BSettingsFileUpdateType	updateType;
+	BWritableFileUpdateType	updateType;
+	bool					isDirectory;
 };
 
 
 struct BUserSettingsFileInfoData {
 	const char*	path;
 	const char*	templatePath;
+	bool		isDirectory;
 };
 
 
@@ -76,7 +78,7 @@ struct BPackageInfoAttributeValue {
 				BPackageVersionData version;
 				BPackageResolvableData resolvable;
 				BPackageResolvableExpressionData resolvableExpression;
-				BGlobalSettingsFileInfoData globalSettingsFileInfo;
+				BGlobalWritableFileInfoData globalWritableFileInfo;
 				BUserSettingsFileInfoData userSettingsFileInfo;
 				BUserData		user;
 			};
