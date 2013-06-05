@@ -17,7 +17,7 @@ local coffloader = boot_loader_openfirmware_coff ;
 # OpenFirmware / Mac boot support files:
 
 # CHRP script
-local chrpboot = ofboot.b ;
+local chrpscript = ofboot.chrp ;
 
 # HFS creator and application type mapping for mkisofs
 local hfsmaps = hfs.map ;
@@ -25,11 +25,11 @@ local hfsmaps = hfs.map ;
 # extra files to put on the boot iso
 local extras = README.html ;
 
-SEARCH on $(chrpboot) $(hfsmaps) $(extras) = [ FDirName $(HAIKU_TOP) data boot_cd ] ;
+SEARCH on $(chrpscript) $(hfsmaps) $(extras) = [ FDirName $(HAIKU_TOP) data boot_cd ] ;
 
 
 
-BuildCDBootPPCImage $(HAIKU_CD_BOOT_PPC_IMAGE) : $(hfsmaps) : $(elfloader) : $(coffloader) : $(chrpboot) : $(extras) ;
+BuildCDBootPPCImage $(HAIKU_CD_BOOT_PPC_IMAGE) : $(hfsmaps) : $(elfloader) : $(coffloader) : $(chrpscript) : $(extras) ;
 
 
 NotFile haiku-boot-cd-ppc ;
