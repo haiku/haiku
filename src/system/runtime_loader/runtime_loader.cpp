@@ -274,13 +274,6 @@ open_executable(char *name, image_type type, const char *rpath,
 		if (const char *paths = search_path_for_type(type)) {
 			fd = search_executable_in_path_list(name, paths, strlen(paths),
 				programPath, compatibilitySubDir, buffer, sizeof(buffer));
-
-			// If not found and a compatibility sub directory has been
-			// specified, look again in the standard search paths.
-			if (fd == B_ENTRY_NOT_FOUND && compatibilitySubDir != NULL) {
-				fd = search_executable_in_path_list(name, paths, strlen(paths),
-					programPath, NULL, buffer, sizeof(buffer));
-			}
 		}
 	}
 
