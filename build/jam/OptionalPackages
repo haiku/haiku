@@ -2218,11 +2218,11 @@ if [ IsOptionalHaikuImagePackageAdded Vision ] {
 		Echo "No optional package Vision available for $(TARGET_ARCH)" ;
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
-			InstallOptionalHaikuImagePackage vision-0.9.7-x86-gcc4-2013-06-04.zip
+			InstallOptionalHaikuImagePackage vision-0.9.7-x86-gcc4-2013-06-04-2.zip
 				: $(baseURL)/vision-0.9.7-x86-gcc4-2013-06-04.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				vision-0.9.7-x86-gcc2-2013-06-04.zip
+				vision-0.9.7-x86-gcc2-2013-06-04-2.zip
 				: $(baseURL)/vision-0.9.7-x86-gcc2-2013-06-04.zip ;
 		}
 		AddSymlinkToHaikuImage home config settings deskbar Applications
