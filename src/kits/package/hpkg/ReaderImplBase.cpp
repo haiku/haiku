@@ -351,6 +351,11 @@ ReaderImplBase::GlobalWritableFileInfoAttributeHandler::HandleAttribute(
 				= (BWritableFileUpdateType)value.unsignedInt;
 			break;
 
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_IS_WRITABLE_DIRECTORY:
+			fPackageInfoValue.globalWritableFileInfo.isDirectory
+				= value.unsignedInt != 0;
+			break;
+
 		default:
 			if (context->ignoreUnknownAttributes)
 				break;
@@ -386,6 +391,11 @@ ReaderImplBase::UserSettingsFileInfoAttributeHandler::HandleAttribute(
 	switch (id) {
 		case B_HPKG_ATTRIBUTE_ID_PACKAGE_SETTINGS_FILE_TEMPLATE:
 			fPackageInfoValue.userSettingsFileInfo.templatePath = value.string;
+			break;
+
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_IS_WRITABLE_DIRECTORY:
+			fPackageInfoValue.userSettingsFileInfo.isDirectory
+				= value.unsignedInt != 0;
 			break;
 
 		default:
