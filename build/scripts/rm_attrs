@@ -9,7 +9,7 @@ rmAttrs=$1
 shift
 
 if [ -f $rmAttrs ]; then
-	$rmAttrs $@
+	$rmAttrs "$@"
 else
-	rm $@
+	rm "$@"
 fi
