@@ -17,6 +17,7 @@
 #include <TextControl.h>
 
 #include <AutoDeleter.h>
+#include <RegExp.h>
 
 #include "table/TableColumns.h"
 
@@ -50,7 +51,7 @@ public:
 		fComponentName(componentName),
 		fSourceFile(sourceFile),
 		fFunction(function),
-		fFilterMatchIndex(-1)
+		fFilterMatch()
 	{
 		if (fSourceFile != NULL)
 			fSourceFile->AcquireReference();
@@ -137,14 +138,14 @@ public:
 		return true;
 	}
 
-	int32 FilterMatchIndex() const
+	const RegExp::MatchResult& FilterMatch() const
 	{
-		return fFilterMatchIndex;
+		return fFilterMatch;
 	}
 
-	void SetFilterMatchIndex(int32 index)
+	void SetFilterMatch(const RegExp::MatchResult& match)
 	{
-		fFilterMatchIndex = index;
+		fFilterMatch = match;
 	}
 
 private:
@@ -171,7 +172,7 @@ private:
 	LocatableFile*			fSourceFile;
 	FunctionInstance*		fFunction;
 	ChildPathComponentList	fChildPathComponents;
-	int32					fFilterMatchIndex;
+	RegExp::MatchResult		fFilterMatch;
 };
 
 
@@ -186,15 +187,13 @@ public:
 		:
 		StringTableColumn(modelIndex, title, width, minWidth, maxWidth,
 			truncate, align),
-		fFilter(),
-		fFilterWidth(0.0)
+		fHasFilter(false)
 	{
 	}
 
-	void SetFilter(const BString& filter)
+	void SetHasFilter(bool hasFilter)
 	{
-		fFilter = filter;
-		fFilterWidth = 0.0;
+		fHasFilter = hasFilter;
 	}
 
 	virtual void DrawValue(const BVariant& value, BRect rect,
@@ -202,10 +201,7 @@ public:
 	{
 		StringTableColumn::DrawValue(value, rect, targetView);
 
-		if (!fFilter.IsEmpty()) {
-			if (fFilterWidth == 0.0)
-				fFilterWidth = targetView->StringWidth(fFilter);
-
+		if (fHasFilter) {
 			// TODO: handle this case as well
 			if (fField.HasClippedString())
 				return;
@@ -213,15 +209,18 @@ public:
 			const SourcePathComponentNode* node
 				= (const SourcePathComponentNode*)value.ToPointer();
 
-			int32 matchIndex = node->FilterMatchIndex();
-			if (matchIndex < 0)
+			const RegExp::MatchResult& match = node->FilterMatch();
+			if (!match.HasMatched())
 				return;
 
 			targetView->PushState();
 			BRect fillRect(rect);
 			fillRect.left += kTextMargin + targetView->StringWidth(
-				fField.String(), matchIndex);
-			fillRect.right = fillRect.left + fFilterWidth;
+				fField.String(), match.StartOffset());
+			float filterWidth = targetView->StringWidth(fField.String()
+					+ match.StartOffset(), match.EndOffset()
+					- match.StartOffset());
+			fillRect.right = fillRect.left + filterWidth;
 			targetView->SetLowColor(255, 255, 0, 255);
 			targetView->SetDrawingMode(B_OP_MIN);
 			targetView->FillRect(fillRect, B_SOLID_LOW);
@@ -241,8 +240,7 @@ public:
 
 
 private:
-	BString fFilter;
-	float	fFilterWidth;
+	bool fHasFilter;
 };
 
 
@@ -293,7 +291,8 @@ public:
 
 		LocatableFile* currentFile = NULL;
 		BStringList pathComponents;
-		bool applyFilter = !fCurrentFilter.IsEmpty();
+		bool applyFilter = !fFilterString.IsEmpty()
+			&& fCurrentFilter.IsValid();
 		int32 functionCount = fImageDebugInfo->CountFunctions();
 		for (int32 i = 0; i < functionCount; i++) {
 			FunctionInstance* instance = fImageDebugInfo->FunctionAt(i);
@@ -313,16 +312,16 @@ public:
 			if (sourceFile != NULL)
 				sourceFile->GetPath(sourcePath);
 
-			int32 pathMatchIndex = -1;
-			int32 functionMatchIndex = -1;
+			RegExp::MatchResult pathMatch;
+			RegExp::MatchResult functionMatch;
 			if (applyFilter && !_FilterFunction(instance, sourcePath,
-					pathMatchIndex, functionMatchIndex)) {
+					pathMatch, functionMatch)) {
 				continue;
 			}
 
 			if (sourceFile == NULL) {
 				if (!_AddFunctionNode(sourcelessNode, instance, NULL,
-						functionMatchIndex)) {
+						functionMatch)) {
 					return;
 				}
 				continue;
@@ -342,7 +341,7 @@ public:
 			}
 
 			if (!_AddFunctionByPath(pathComponents, instance, currentFile,
-					pathMatchIndex, functionMatchIndex)) {
+					pathMatch, functionMatch)) {
 				return;
 			}
 		}
@@ -469,9 +468,12 @@ public:
 
 	void SetFilter(const char* filter)
 	{
-		fCurrentFilter = filter;
-
-		SetImageDebugInfo(fImageDebugInfo);
+		fFilterString = filter;
+		if (fFilterString.IsEmpty()
+			|| fCurrentFilter.SetPattern(filter, RegExp::PATTERN_TYPE_WILDCARD,
+				false)) {
+			SetImageDebugInfo(fImageDebugInfo);
+		}
 	}
 
 private:
@@ -504,8 +506,8 @@ private:
 	}
 
 	bool _AddFunctionByPath(const BStringList& pathComponents,
-		FunctionInstance* function, LocatableFile* file, int32 pathMatchIndex,
-		int32 functionMatchIndex)
+		FunctionInstance* function, LocatableFile* file,
+		RegExp::MatchResult& pathMatch, RegExp::MatchResult& functionMatch)
 	{
 		SourcePathComponentNode* parentNode = NULL;
 		SourcePathComponentNode* currentNode = NULL;
@@ -525,7 +527,7 @@ private:
 					return false;
 
 				if (pathComponents.CountStrings() == 1)
-					currentNode->SetFilterMatchIndex(pathMatchIndex);
+					currentNode->SetFilterMatch(pathMatch);
 
 				BReference<SourcePathComponentNode> nodeReference(currentNode,
 					true);
@@ -545,11 +547,12 @@ private:
 		}
 
 		return _AddFunctionNode(currentNode, function, file,
-			functionMatchIndex);
+			functionMatch);
 	}
 
 	bool _AddFunctionNode(SourcePathComponentNode* parent,
-		FunctionInstance* function, LocatableFile* file, int32 matchIndex)
+		FunctionInstance* function, LocatableFile* file,
+		RegExp::MatchResult& match)
 	{
 		SourcePathComponentNode* functionNode = new(std::nothrow)
 			SourcePathComponentNode(parent, function->PrettyName(), file,
@@ -558,7 +561,7 @@ private:
 		if (functionNode == NULL)
 			return B_NO_MEMORY;
 
-		functionNode->SetFilterMatchIndex(matchIndex);
+		functionNode->SetFilterMatch(match);
 
 		BReference<SourcePathComponentNode> nodeReference(functionNode, true);
 		if (!parent->AddChild(functionNode))
@@ -568,12 +571,12 @@ private:
 	}
 
 	bool _FilterFunction(FunctionInstance* instance, const BString& sourcePath,
-		int32& pathMatchIndex, int32& functionMatchIndex)
+		RegExp::MatchResult& pathMatch, RegExp::MatchResult& functionMatch)
 	{
-		functionMatchIndex = instance->PrettyName().IFindFirst(fCurrentFilter);
-		pathMatchIndex = sourcePath.IFindFirst(fCurrentFilter);
+		functionMatch = fCurrentFilter.Match(instance->PrettyName());
+		pathMatch = fCurrentFilter.Match(sourcePath.String());
 
-		return functionMatchIndex >= 0 || pathMatchIndex >= 0;
+		return functionMatch.HasMatched() || pathMatch.HasMatched();
 	}
 
 
@@ -584,7 +587,8 @@ private:
 	ImageDebugInfo*			fImageDebugInfo;
 	ChildPathComponentList	fChildPathComponents;
 	SourcePathComponentNode* fSourcelessNode;
-	BString					fCurrentFilter;
+	BString					fFilterString;
+	RegExp					fCurrentFilter;
 };
 
 
@@ -713,7 +717,8 @@ ImageFunctionsView::MessageReceived(BMessage* message)
 		{
 			if (system_time() - fLastFilterKeypress >= kKeypressTimeout) {
 				fFunctionsTableModel->SetFilter(fFilterField->Text());
-				fHighlightingColumn->SetFilter(fFilterField->Text());
+				fHighlightingColumn->SetHasFilter(
+					fFilterField->TextView()->TextLength() > 0);
 				_ExpandFilteredNodes();
 			}
 			break;
