@@ -51,7 +51,8 @@ public:
 		fComponentName(componentName),
 		fSourceFile(sourceFile),
 		fFunction(function),
-		fFilterMatch()
+		fFilterMatch(),
+		fHasMatchingChild(false)
 	{
 		if (fSourceFile != NULL)
 			fSourceFile->AcquireReference();
@@ -148,6 +149,16 @@ public:
 		fFilterMatch = match;
 	}
 
+	bool HasMatchingChild() const
+	{
+		return fHasMatchingChild;
+	}
+
+	void SetHasMatchingChild()
+	{
+		fHasMatchingChild = true;
+	}
+
 private:
 	friend class ImageFunctionsView::FunctionsTableModel;
 
@@ -173,6 +184,7 @@ private:
 	FunctionInstance*		fFunction;
 	ChildPathComponentList	fChildPathComponents;
 	RegExp::MatchResult		fFilterMatch;
+	bool					fHasMatchingChild;
 };
 
 
@@ -398,6 +410,16 @@ public:
 		return true;
 	}
 
+	bool HasMatchingChildAt(void* parent, int32 index) const
+	{
+		SourcePathComponentNode* node
+			= (SourcePathComponentNode*)ChildAt(parent, index);
+		if (node != NULL)
+			return node->HasMatchingChild();
+
+		return false;
+	}
+
 	bool GetFunctionPath(FunctionInstance* function, TreeTablePath& _path)
 	{
 		if (function == NULL)
@@ -543,7 +565,12 @@ private:
 					nodeReference.Detach();
 				}
 			}
+
+			if (functionMatch.HasMatched())
+				currentNode->SetHasMatchingChild();
+
 			parentNode = currentNode;
+
 		}
 
 		return _AddFunctionNode(currentNode, function, file,
@@ -806,9 +833,15 @@ ImageFunctionsView::_ExpandFilteredNodes()
 
 	for (int32 i = 0; i < fFunctionsTableModel->CountChildren(
 		fFunctionsTableModel); i++) {
-		TreeTablePath path;
-		path.AddComponent(i);
-		fFunctionsTable->SetNodeExpanded(path, true, true);
+		// only expand nodes if the match actually hit a function,
+		// and not just the containing path.
+		if (fFunctionsTableModel->CountChildren(fFunctionsTableModel) == 1
+			|| fFunctionsTableModel->HasMatchingChildAt(fFunctionsTableModel,
+				i)) {
+			TreeTablePath path;
+			path.AddComponent(i);
+			fFunctionsTable->SetNodeExpanded(path, true, true);
+		}
 	}
 
 	fFunctionsTable->ResizeAllColumnsToPreferred();
