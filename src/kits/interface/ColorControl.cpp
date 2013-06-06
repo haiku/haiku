@@ -170,9 +170,7 @@ BColorControl::_InitData(color_control_layout layout, float size,
 	_LayoutView();
 
 	if (useOffscreen) {
-		BRect bounds = fPaletteFrame;
-		bounds.InsetBy(-kBevelSpacing, -kBevelSpacing);
-
+		BRect bounds = _PaletteFrame();
 		fBitmap = new BBitmap(bounds, B_RGB32, true, false);
 		fOffscreenView = new BView(bounds, "off_view", 0, 0);
 
@@ -417,8 +415,7 @@ BColorControl::Draw(BRect updateRect)
 void
 BColorControl::_DrawColorArea(BView* target, BRect updateRect)
 {
-	BRect rect = fPaletteFrame.InsetByCopy(-kBevelSpacing, -kBevelSpacing);
-		// frame including bevel
+	BRect rect = _PaletteFrame();
 	bool enabled = IsEnabled();
 
 	rgb_color noTint = ui_color(B_PANEL_BACKGROUND_COLOR);
@@ -602,6 +599,13 @@ BColorControl::_SelectorPosition(const BRect& rampRect, uint8 shade) const
 
 
 BRect
+BColorControl::_PaletteFrame() const
+{
+	return fPaletteFrame.InsetByCopy(-kBevelSpacing, -kBevelSpacing);
+}
+
+
+BRect
 BColorControl::_RampFrame(uint8 rampIndex) const
 {
 	float rampHeight = float(fRows) * fCellSize / 4.0f;
@@ -646,8 +650,7 @@ void
 BColorControl::_InitOffscreen()
 {
 	if (fBitmap->Lock()) {
-		_DrawColorArea(fOffscreenView,
-			fPaletteFrame.InsetByCopy(-kBevelSpacing, -kBevelSpacing));
+		_DrawColorArea(fOffscreenView, _PaletteFrame());
 		fOffscreenView->Sync();
 		fBitmap->Unlock();
 	}
@@ -853,8 +856,7 @@ BColorControl::DetachedFromWindow()
 void
 BColorControl::GetPreferredSize(float* _width, float* _height)
 {
-	BRect rect = fPaletteFrame.InsetByCopy(-kBevelSpacing, -kBevelSpacing);
-		// bevel
+	BRect rect = _PaletteFrame();
 
 	if (rect.Height() < fBlueText->Frame().bottom) {
 		// adjust the height to fit

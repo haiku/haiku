@@ -100,6 +100,7 @@ private:
 									BRect updateRect);
 			BPoint				_SelectorPosition(const BRect& rampRect,
 									uint8 shade) const;
+			BRect				_PaletteFrame() const;
 			BRect				_PaletteSelectorFrame(uint8 colorIndex) const;
 			BRect				_RampFrame(uint8 rampIndex) const;
 			void				_SetCellSize(float size);
