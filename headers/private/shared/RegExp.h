@@ -22,7 +22,8 @@ public:
 								RegExp();
 								RegExp(const char* pattern,
 									PatternType patternType
-										= PATTERN_TYPE_REGULAR_EXPRESSION);
+										= PATTERN_TYPE_REGULAR_EXPRESSION,
+									bool caseSensitive = true);
 								RegExp(const RegExp& other);
 								~RegExp();
 
@@ -31,7 +32,8 @@ public:
 
 			bool				SetPattern(const char* pattern,
 									PatternType patternType
-										= PATTERN_TYPE_REGULAR_EXPRESSION);
+										= PATTERN_TYPE_REGULAR_EXPRESSION,
+									bool caseSensitive = true);
 
 			MatchResult			Match(const char* string) const;
 

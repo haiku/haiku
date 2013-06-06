@@ -20,7 +20,7 @@
 
 
 struct RegExp::Data : public BReferenceable {
-	Data(const char* pattern, PatternType patternType)
+	Data(const char* pattern, PatternType patternType, bool caseSensitive)
 		:
 		BReferenceable()
 	{
@@ -115,7 +115,11 @@ struct RegExp::Data : public BReferenceable {
 			pattern = patternString.String();
 		}
 
-		fError = regcomp(&fCompiledExpression, pattern, REG_EXTENDED);
+		int flags = REG_EXTENDED;
+		if (!caseSensitive)
+			flags |= REG_ICASE;
+
+		fError = regcomp(&fCompiledExpression, pattern, flags);
 	}
 
 	~Data()
@@ -218,11 +222,12 @@ RegExp::RegExp()
 }
 
 
-RegExp::RegExp(const char* pattern, PatternType patternType)
+RegExp::RegExp(const char* pattern, PatternType patternType,
+	bool caseSensitive)
 	:
 	fData(NULL)
 {
-	SetPattern(pattern, patternType);
+	SetPattern(pattern, patternType, caseSensitive);
 }
 
 
@@ -243,20 +248,23 @@ RegExp::~RegExp()
 
 
 bool
-RegExp::SetPattern(const char* pattern, PatternType patternType)
+RegExp::SetPattern(const char* pattern, PatternType patternType,
+	bool caseSensitive)
 {
 	if (fData != NULL) {
 		fData->ReleaseReference();
 		fData = NULL;
 	}
 
-	fData = new Data(pattern, patternType);
-	if (!fData->IsValid()) {
-		delete fData;
-		fData = NULL;
+	Data* newData = new(std::nothrow) Data(pattern, patternType, caseSensitive);
+	if (newData == NULL)
 		return false;
-	}
 
+	BReference<Data> dataReference(newData, true);
+	if (!newData->IsValid())
+		return false;
+
+	fData = dataReference.Detach();
 	return true;
 }
 
