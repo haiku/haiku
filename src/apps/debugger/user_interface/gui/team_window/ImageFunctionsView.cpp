@@ -49,7 +49,8 @@ public:
 		fParent(parent),
 		fComponentName(componentName),
 		fSourceFile(sourceFile),
-		fFunction(function)
+		fFunction(function),
+		fFilterMatchIndex(-1)
 	{
 		if (fSourceFile != NULL)
 			fSourceFile->AcquireReference();
@@ -136,6 +137,16 @@ public:
 		return true;
 	}
 
+	int32 FilterMatchIndex() const
+	{
+		return fFilterMatchIndex;
+	}
+
+	void SetFilterMatchIndex(int32 index)
+	{
+		fFilterMatchIndex = index;
+	}
+
 private:
 	friend class ImageFunctionsView::FunctionsTableModel;
 
@@ -160,6 +171,7 @@ private:
 	LocatableFile*			fSourceFile;
 	FunctionInstance*		fFunction;
 	ChildPathComponentList	fChildPathComponents;
+	int32					fFilterMatchIndex;
 };
 
 
@@ -198,21 +210,33 @@ public:
 			if (fField.HasClippedString())
 				return;
 
-			const char* fieldString = fField.String();
-			const char* filterMatch = strstr(fieldString, fFilter.String());
-			if (filterMatch == NULL)
+			const SourcePathComponentNode* node
+				= (const SourcePathComponentNode*)value.ToPointer();
+
+			int32 matchIndex = node->FilterMatchIndex();
+			if (matchIndex < 0)
 				return;
 
 			targetView->PushState();
 			BRect fillRect(rect);
 			fillRect.left += kTextMargin + targetView->StringWidth(
-				fieldString, filterMatch - fieldString);
+				fField.String(), matchIndex);
 			fillRect.right = fillRect.left + fFilterWidth;
 			targetView->SetLowColor(255, 255, 0, 255);
 			targetView->SetDrawingMode(B_OP_MIN);
 			targetView->FillRect(fillRect, B_SOLID_LOW);
 			targetView->PopState();
 		}
+	}
+
+	virtual	BField*	PrepareField(const BVariant& value) const
+	{
+		const SourcePathComponentNode* node
+			= (const SourcePathComponentNode*)value.ToPointer();
+
+		BVariant tempValue(node->ComponentName(), B_VARIANT_DONT_COPY_DATA);
+		return StringTableColumn::PrepareField(tempValue);
+
 	}
 
 
@@ -289,12 +313,18 @@ public:
 			if (sourceFile != NULL)
 				sourceFile->GetPath(sourcePath);
 
-			if (applyFilter && !_FilterFunction(instance, sourcePath))
+			int32 pathMatchIndex = -1;
+			int32 functionMatchIndex = -1;
+			if (applyFilter && !_FilterFunction(instance, sourcePath,
+					pathMatchIndex, functionMatchIndex)) {
 				continue;
+			}
 
 			if (sourceFile == NULL) {
-				if (!_AddFunctionNode(sourcelessNode, instance, NULL))
+				if (!_AddFunctionNode(sourcelessNode, instance, NULL,
+						functionMatchIndex)) {
 					return;
+				}
 				continue;
 			}
 
@@ -311,8 +341,10 @@ public:
 				}
 			}
 
-			if (!_AddFunctionByPath(pathComponents, instance, currentFile))
+			if (!_AddFunctionByPath(pathComponents, instance, currentFile,
+					pathMatchIndex, functionMatchIndex)) {
 				return;
+			}
 		}
 
 		if (sourcelessNode->CountChildren() != 0) {
@@ -362,7 +394,7 @@ public:
 
 		SourcePathComponentNode* node = (SourcePathComponentNode*)object;
 
-		value.SetTo(node->ComponentName(), B_VARIANT_DONT_COPY_DATA);
+		value.SetTo(node);
 
 		return true;
 	}
@@ -472,7 +504,8 @@ private:
 	}
 
 	bool _AddFunctionByPath(const BStringList& pathComponents,
-		FunctionInstance* function, LocatableFile* file)
+		FunctionInstance* function, LocatableFile* file, int32 pathMatchIndex,
+		int32 functionMatchIndex)
 	{
 		SourcePathComponentNode* parentNode = NULL;
 		SourcePathComponentNode* currentNode = NULL;
@@ -490,6 +523,10 @@ private:
 					parentNode,	pathComponent, NULL, NULL);
 				if (currentNode == NULL)
 					return false;
+
+				if (pathComponents.CountStrings() == 1)
+					currentNode->SetFilterMatchIndex(pathMatchIndex);
+
 				BReference<SourcePathComponentNode> nodeReference(currentNode,
 					true);
 				if (parentNode != NULL) {
@@ -507,11 +544,12 @@ private:
 			parentNode = currentNode;
 		}
 
-		return _AddFunctionNode(currentNode, function, file);
+		return _AddFunctionNode(currentNode, function, file,
+			functionMatchIndex);
 	}
 
 	bool _AddFunctionNode(SourcePathComponentNode* parent,
-		FunctionInstance* function, LocatableFile* file)
+		FunctionInstance* function, LocatableFile* file, int32 matchIndex)
 	{
 		SourcePathComponentNode* functionNode = new(std::nothrow)
 			SourcePathComponentNode(parent, function->PrettyName(), file,
@@ -520,6 +558,8 @@ private:
 		if (functionNode == NULL)
 			return B_NO_MEMORY;
 
+		functionNode->SetFilterMatchIndex(matchIndex);
+
 		BReference<SourcePathComponentNode> nodeReference(functionNode, true);
 		if (!parent->AddChild(functionNode))
 			return false;
@@ -527,12 +567,13 @@ private:
 		return true;
 	}
 
-	bool _FilterFunction(FunctionInstance* instance, const BString& sourcePath)
+	bool _FilterFunction(FunctionInstance* instance, const BString& sourcePath,
+		int32& pathMatchIndex, int32& functionMatchIndex)
 	{
-		if (instance->PrettyName().IFindFirst(fCurrentFilter) >= 0)
-			return true;
+		functionMatchIndex = instance->PrettyName().IFindFirst(fCurrentFilter);
+		pathMatchIndex = sourcePath.IFindFirst(fCurrentFilter);
 
-		return sourcePath.IFindFirst(fCurrentFilter) >= 0;
+		return functionMatchIndex >= 0 || pathMatchIndex >= 0;
 	}
 
 
