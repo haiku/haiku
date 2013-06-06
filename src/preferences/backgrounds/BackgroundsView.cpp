@@ -196,6 +196,7 @@ BackgroundsView::BackgroundsView()
 			.Add(placementMenuField->CreateMenuBarLayoutItem(), 1, 1)
 			.Add(fIconLabelOutline, 1, 2)
 			.End()
+		.AddGlue()
 		.Add(fPicker)
 		.SetInsets(B_USE_DEFAULT_SPACING)
 		.View());
