@@ -43,6 +43,7 @@ static const float kSelectorHSpacing = 2.0f;
 static const float kTextFieldsHSpacing = 6.0f;
 static const float kDefaultFontSize = 12.0f;
 static const float kBevelSpacing = 2.0f;
+static const uint32 kRampCount = 4;
 
 
 BColorControl::BColorControl(BPoint leftTop, color_control_layout layout,
@@ -608,7 +609,7 @@ BColorControl::_PaletteFrame() const
 BRect
 BColorControl::_RampFrame(uint8 rampIndex) const
 {
-	float rampHeight = float(fRows) * fCellSize / 4.0f;
+	float rampHeight = (float)(fRows * fCellSize / kRampCount);
 
 	return BRect(fPaletteFrame.left,
 		fPaletteFrame.top + float(rampIndex) * rampHeight,
