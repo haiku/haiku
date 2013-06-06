@@ -198,7 +198,7 @@ BColorControl::_LayoutView()
 	}
 
 	BRect rect = fPaletteFrame.InsetByCopy(-kBevelSpacing, -kBevelSpacing);
-		// frame not including bevel
+		// frame including bevel
 
 	if (rect.Height() < fBlueText->Frame().bottom)
 		rect.bottom = fBlueText->Frame().bottom;
@@ -417,7 +417,8 @@ BColorControl::Draw(BRect updateRect)
 void
 BColorControl::_DrawColorArea(BView* target, BRect updateRect)
 {
-	BRect bevelRect = fPaletteFrame.InsetByCopy(-kBevelSpacing, -kBevelSpacing);
+	BRect rect = fPaletteFrame.InsetByCopy(-kBevelSpacing, -kBevelSpacing);
+		// frame including bevel
 	bool enabled = IsEnabled();
 
 	rgb_color noTint = ui_color(B_PANEL_BACKGROUND_COLOR);
@@ -428,8 +429,8 @@ BColorControl::_DrawColorArea(BView* target, BRect updateRect)
 		if (!enabled)
 			flags |= BControlLook::B_DISABLED;
 
-		be_control_look->DrawTextControlBorder(target, bevelRect, updateRect,
-			noTint, flags);
+		be_control_look->DrawTextControlBorder(target, rect, updateRect, noTint,
+			flags);
 	} else {
 		rgb_color lighten1 = tint_color(noTint, B_LIGHTEN_1_TINT);
 		rgb_color lightenmax = tint_color(noTint, B_LIGHTEN_MAX_TINT);
@@ -442,19 +443,19 @@ BColorControl::_DrawColorArea(BView* target, BRect updateRect)
 		else
 			target->SetHighColor(noTint);
 
-		target->StrokeLine(bevelRect.LeftBottom(), bevelRect.LeftTop());
-		target->StrokeLine(bevelRect.LeftTop(), bevelRect.RightTop());
+		target->StrokeLine(rect.LeftBottom(), rect.LeftTop());
+		target->StrokeLine(rect.LeftTop(), rect.RightTop());
 		if (enabled)
 			target->SetHighColor(lightenmax);
 		else
 			target->SetHighColor(lighten1);
 
-		target->StrokeLine(BPoint(bevelRect.left + 1.0f, bevelRect.bottom),
-			bevelRect.RightBottom());
-		target->StrokeLine(bevelRect.RightBottom(),
-			BPoint(bevelRect.right, bevelRect.top + 1.0f));
+		target->StrokeLine(BPoint(rect.left + 1.0f, rect.bottom),
+			rect.RightBottom());
+		target->StrokeLine(rect.RightBottom(),
+			BPoint(rect.right, rect.top + 1.0f));
 
-		bevelRect.InsetBy(1.0f, 1.0f);
+		rect.InsetBy(1.0f, 1.0f);
 
 		// second bevel
 		if (enabled)
@@ -462,13 +463,13 @@ BColorControl::_DrawColorArea(BView* target, BRect updateRect)
 		else
 			target->SetHighColor(darken2);
 
-		target->StrokeLine(bevelRect.LeftBottom(), bevelRect.LeftTop());
-		target->StrokeLine(bevelRect.LeftTop(), bevelRect.RightTop());
+		target->StrokeLine(rect.LeftBottom(), rect.LeftTop());
+		target->StrokeLine(rect.LeftTop(), rect.RightTop());
 		target->SetHighColor(noTint);
-		target->StrokeLine(BPoint(bevelRect.left + 1.0f, bevelRect.bottom),
-			bevelRect.RightBottom());
-		target->StrokeLine(bevelRect.RightBottom(),
-			BPoint(bevelRect.right, bevelRect.top + 1.0f));
+		target->StrokeLine(BPoint(rect.left + 1.0f, rect.bottom),
+			rect.RightBottom());
+		target->StrokeLine(rect.RightBottom(),
+			BPoint(rect.right, rect.top + 1.0f));
 	}
 
 	if (fPaletteMode) {
@@ -485,12 +486,12 @@ BColorControl::_DrawColorArea(BView* target, BRect updateRect)
 		else
 			target->SetHighColor(noTint);
 
-		for (int xi = 0; xi < fColumns+1; xi++) {
+		for (int xi = 0; xi < fColumns + 1; xi++) {
 			float x = fPaletteFrame.left + float(xi) * fCellSize;
 			target->StrokeLine(BPoint(x, fPaletteFrame.top),
 				BPoint(x, fPaletteFrame.bottom));
 		}
-		for (int yi = 0; yi < fRows+1; yi++) {
+		for (int yi = 0; yi < fRows + 1; yi++) {
 			float y = fPaletteFrame.top + float(yi) * fCellSize;
 			target->StrokeLine(BPoint(fPaletteFrame.left, y),
 				BPoint(fPaletteFrame.right, y));
