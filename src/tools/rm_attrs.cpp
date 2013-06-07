@@ -14,7 +14,8 @@
 
 
 // exported by the generic attribute support in libroot_build.so
-extern "C" bool __get_attribute_dir_path(const struct stat* st, char* buffer);
+extern "C" bool __get_attribute_dir_path(const struct stat* st,
+	const char* path, char* buffer);
 
 
 class Path {
@@ -143,7 +144,8 @@ remove_entry(Path& path, bool recursive, bool force, bool removeAttributes)
 	// remove the file's attributes
 	if (removeAttributes) {
 		Path attrDirPath;
-		if (__get_attribute_dir_path(&st, attrDirPath.Buffer())) {
+		if (__get_attribute_dir_path(&st, path.GetPath(),
+				attrDirPath.Buffer())) {
 			attrDirPath.BufferChanged();
 			remove_entry(attrDirPath, true, true, false);
 		}

@@ -18,10 +18,29 @@
 #include "fs_descriptors.h"
 
 
+// Include the interface to the host platform attributes support, if it shall be
+// used to tag files with unique IDs to identify their attribute directory.
+#if HAIKU_HOST_USE_XATTR_REF
+#	if defined(HAIKU_HOST_PLATFORM_LINUX)
+#		include "fs_attr_xattr.h"
+#	elif defined(HAIKU_HOST_PLATFORM_FREEBSD)
+#		include "fs_attr_extattr.h"
+#	elif defined(HAIKU_HOST_PLATFORM_DARWIN)
+#		include "fs_attr_bsdxattr.h"
+#	else
+#		error No attribute support for this host platform!
+#	endif
+#endif
+
+
 using namespace std;
 using namespace BPrivate;
 
 static const char *sAttributeDirBasePath = HAIKU_BUILD_ATTRIBUTES_DIR;
+
+#if HAIKU_HOST_USE_XATTR_REF
+static const char* const kIDAttributeName = "id";
+#endif
 
 
 // init_attribute_dir_base_dir
@@ -107,28 +126,172 @@ deescape_attr_name(const char *name)
 	return deescapedName;
 }
 
-// get_attribute_dir_path
+
+#if HAIKU_HOST_USE_XATTR_REF
+
+
+static status_t
+make_unique_node_id(string& _id)
+{
+	// open random device
+	int fd = open("/dev/urandom", O_RDONLY);
+	if (fd < 0) {
+		fd = open("/dev/random", O_RDONLY);
+		if (fd < 0)
+			return B_NOT_SUPPORTED;
+	}
+
+	// read bytes
+	uint8 buffer[16];
+	ssize_t bytesRead = read(fd, buffer, sizeof(buffer));
+	status_t error = B_OK;
+	if (bytesRead < 0)
+		error = errno;
+	close(fd);
+
+	if (error != B_OK)
+		return error;
+
+	if (bytesRead != (ssize_t)sizeof(buffer))
+		error = B_ERROR;
+
+	// convert to hex string
+	static const char* const kHexChars = "0123456789abcdef";
+	_id.clear();
+	for (size_t i = 0; i < sizeof(buffer); i++) {
+		_id += kHexChars[buffer[i] >> 4];
+		_id += kHexChars[buffer[i] & 0xf];
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+get_id_attribute(const char *path, int fd, string& _id)
+{
+	// list_attributes() and remove_attribute() are unused here -- prevent the
+	// warning
+	(void)list_attributes;
+	(void)remove_attribute;
+
+	string attributeName(kAttributeNamespace);
+	attributeName += kIDAttributeName;
+
+	char buffer[64];
+	ssize_t bytesRead = get_attribute(fd, path, attributeName.c_str(), buffer,
+		sizeof(buffer));
+	if (bytesRead < 0) {
+		// On Linux only priviledged users are allowed to set attributes on
+		// symlinks. So, if this is a symlink, we don't even try and instead
+		// construct a symlink specific node ID.
+		status_t error = errno;
+		struct stat st;
+		if (path == NULL || lstat(path, &st) < 0 || !S_ISLNK(st.st_mode))
+			return error;
+
+		char buffer[32];
+		snprintf(buffer, sizeof(buffer), "symlink-%" B_PRIdINO, st.st_ino);
+		_id = buffer;
+		return B_OK;
+	}
+
+	_id = string(buffer, bytesRead);
+	return B_OK;
+}
+
+
+static status_t
+set_id_attribute(const char *path, int fd, const char* id)
+{
+	string attributeName(kAttributeNamespace);
+	attributeName += kIDAttributeName;
+
+	if (set_attribute(fd, path, attributeName.c_str(), id, strlen(id)) < 0)
+		return errno;
+	return B_OK;
+}
+
+
 static string
-get_attribute_dir_path(NodeRef ref)
+get_attribute_dir_path(NodeRef ref, const char *path, int fd)
+{
+	string id;
+	status_t error = get_id_attribute(path, fd, id);
+	if (error != B_OK)
+		id = "_no_attributes_";
+
+	string attrDirPath(sAttributeDirBasePath);
+	attrDirPath += '/';
+	attrDirPath += id;
+	return attrDirPath;
+}
+
+
+static status_t
+get_attribute_dir_path_needed(NodeRef ref, const char *path, int fd,
+	string& _attrDirPath)
+{
+	string id;
+	status_t error = get_id_attribute(path, fd, id);
+	if (error != B_OK) {
+		error = make_unique_node_id(id);
+		if (error != B_OK)
+			return error;
+
+		error = set_id_attribute(path, fd, id.c_str());
+		if (error != B_OK)
+			return error;
+	}
+
+	_attrDirPath = sAttributeDirBasePath;
+	_attrDirPath += '/';
+	_attrDirPath += id;
+	return B_OK;
+}
+
+
+#else
+
+
+static string
+get_attribute_dir_path(NodeRef ref, const char *path, int fd)
 {
 	string attrDirPath(sAttributeDirBasePath);
 	char buffer[32];
-	sprintf(buffer, "/%lld", (int64)ref.node);
+	sprintf(buffer, "/%" B_PRIdINO, ref.node);
 	attrDirPath += buffer;
 	return attrDirPath;
 }
+
+
+static status_t
+get_attribute_dir_path_needed(NodeRef ref, const char *path, int fd,
+	string& _attrDirPath)
+{
+	_attrDirPath = get_attribute_dir_path(ref, path, fd);
+	return B_OK;
+}
+
+
+#endif
+
 
 // ensure_attribute_dir_exists
 static status_t
 ensure_attribute_dir_exists(NodeRef ref, const char *path, int fd)
 {
-	// init the base directory here
+	// init the base directory and get the attribute directory path
 	status_t error = init_attribute_dir_base_dir();
 	if (error != B_OK)
 		return error;
 
+	string attrDirPath;
+	error = get_attribute_dir_path_needed(ref, path, fd, attrDirPath);
+	if (error != B_OK)
+		return error;
+
 	// stat the dir
-	string attrDirPath(get_attribute_dir_path(ref));
 	struct stat st;
 	if (lstat(attrDirPath.c_str(), &st) == 0) {
 		if (!S_ISDIR(st.st_mode)) {
@@ -161,7 +324,7 @@ open_attr_dir(NodeRef ref, const char *path, int fd)
 	}
 
 	// open it
-	string dirPath(get_attribute_dir_path(ref));
+	string dirPath(get_attribute_dir_path(ref, path, fd));
 	return opendir(dirPath.c_str());
 }
 
@@ -181,7 +344,7 @@ get_attribute_path(NodeRef ref, const char *path, int fd,
 	}
 
 	// construct the attribute path
-	attrPath = get_attribute_dir_path(ref) + '/';
+	attrPath = get_attribute_dir_path(ref, path, fd) + '/';
 	string attrName(escape_attr_name(attribute));
 	typePath = attrPath + "t" + attrName;
 	attrPath += attrName;
@@ -407,8 +570,17 @@ fs_write_attr(int fd, const char *attribute, uint32 type, off_t pos,
 	// open the attribute
 	int attrFD = fs_fopen_attr(fd, attribute, type,
 		O_WRONLY | O_CREAT | O_TRUNC);
-	if (attrFD < 0)
+	if (attrFD < 0) {
+		// Setting user attributes on symlinks is not allowed (xattr). So, if
+		// this is a symlink and we're only supposed to write a "BEOS:TYPE"
+		// attribute we silently pretend to have succeeded.
+		struct stat st;
+		if (strcmp(attribute, "BEOS:TYPE") == 0 && fstat(fd, &st) == 0
+			&& S_ISLNK(st.st_mode)) {
+			return readBytes;
+		}
 		return attrFD;
+	}
 
 	// read
 	ssize_t bytesWritten = write_pos(attrFD, pos, buffer, readBytes);
@@ -601,12 +773,13 @@ _kern_remove_attr(int fd, const char *name)
 
 
 // __get_attribute_dir_path
-extern "C" bool __get_attribute_dir_path(const struct stat* st, char* buffer);
+extern "C" bool __get_attribute_dir_path(const struct stat* st,
+	const char* path, char* buffer);
 bool
-__get_attribute_dir_path(const struct stat* st, char* buffer)
+__get_attribute_dir_path(const struct stat* st, const char* path, char* buffer)
 {
 	NodeRef ref(*st);
-	string path = get_attribute_dir_path(ref);
-	strcpy(buffer, path.c_str());
+	string dirPath = get_attribute_dir_path(ref, path, -1);
+	strcpy(buffer, dirPath.c_str());
 	return true;
 }

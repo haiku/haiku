@@ -66,10 +66,15 @@ options:
   --use-gcc-graphite          Build with GCC Graphite engine for loop
                               optimizations. Only for gcc 4.
   --use-32bit                 Use -m32 flag on 64bit host gcc compiler.
-  --use-xattr                 Use Linux xattr support for BeOS attribute
-                              emulation. Warning: Make sure your file system
-                              supports sufficient attribute sizes (4 KB per
-                              file for all attributes won't suffice).
+  --use-xattr                 Use Linux xattr respectively *BSD extattr support
+                              for BeOS attribute emulation. Warning: Make sure
+                              your file system supports sufficient attribute
+                              sizes (4 KB per file for all attributes won't
+                              suffice).
+  --use-xattr-ref             Use the generic BeOS attribute emulation, but use
+                              Linux xattr respectively *BSD extattr support to
+                              make it more robust (i.e. attribute mix-ups become
+                              less likely).
 
 environment variables:
   HAIKU_AR                    The static library archiver. Defaults to "ar".
@@ -343,6 +348,7 @@ HAIKU_USE_GCC_PIPE=0
 HAIKU_USE_GCC_GRAPHITE=0
 HAIKU_HOST_USE_32BIT=0
 HAIKU_HOST_USE_XATTR=0
+HAIKU_HOST_USE_XATTR_REF=0
 HOST_GCC_LD=`gcc -print-prog-name=ld`
 HOST_GCC_OBJCOPY=`gcc -print-prog-name=objcopy`
 SFDISK_BINARY=sfdisk
@@ -448,6 +454,7 @@ while [ $# -gt 0 ] ; do
 		--use-gcc-graphite)	HAIKU_USE_GCC_GRAPHITE=1; shift 1;;
 		--use-32bit)	HAIKU_HOST_USE_32BIT=1; shift 1;;
 		--use-xattr)	HAIKU_HOST_USE_XATTR=1; shift 1;;
+		--use-xattr-ref)	HAIKU_HOST_USE_XATTR_REF=1; shift 1;;
 		*)				echo Invalid argument: \`$1\'; exit 1;;
 	esac
 done
@@ -565,6 +572,7 @@ HAIKU_USE_GCC_PIPE					?= "${HAIKU_USE_GCC_PIPE}" ;
 HAIKU_USE_GCC_GRAPHITE				?= "${HAIKU_USE_GCC_GRAPHITE}" ;
 HAIKU_HOST_USE_32BIT				?= "${HAIKU_HOST_USE_32BIT}" ;
 HAIKU_HOST_USE_XATTR				?= "${HAIKU_HOST_USE_XATTR}" ;
+HAIKU_HOST_USE_XATTR_REF			?= "${HAIKU_HOST_USE_XATTR_REF}" ;
 
 HAIKU_GCC_RAW_VERSION		?= ${HAIKU_GCC_RAW_VERSION} ;
 HAIKU_GCC_MACHINE			?= ${HAIKU_GCC_MACHINE} ;

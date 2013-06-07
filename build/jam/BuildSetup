@@ -914,6 +914,11 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 				tools rm_attrs ] -f ;
 			# assumes that rm_attrs is built with debugging disabled
 		HOST_RM_ATTRS_TARGET = <build>rm_attrs ;
+
+		# If specified, use xattr support to tag files with unique IDs.
+		if $(HAIKU_HOST_USE_XATTR_REF) = 1 {
+			HOST_DEFINES += HAIKU_HOST_USE_XATTR_REF ;
+		}
 	}
 }
 
