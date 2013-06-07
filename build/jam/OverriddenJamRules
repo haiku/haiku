@@ -535,7 +535,8 @@ rule MainFromObjects
 }
 
 # Override Jam 2.5rc3 MakeLocate and MkDir to deal more intelligently
-# with grist set on the supplied directory name.
+# with grist set on the supplied directory name. Also do nothing for already
+# located files.
 rule MakeLocate
 {
 	local dir = $(2[1]) ;
@@ -545,9 +546,16 @@ rule MakeLocate
 		if ! $(dir:G) {
 			dir = $(dir:G=dir) ;
 		}
-	    LOCATE on $(1) += $(dir:G=) ;	# don't relocate once located
-	    Depends $(1) : $(dir) ;
-	    MkDir $(dir) ;
+
+		local target ;
+		for target in $(1) {
+			# don't relocate once located
+		    LOCATE on $(target) += $(dir:G=) ;
+			if [ on $(target) return $(LOCATE) ] = $(dir:G=) {
+			    Depends $(target) : $(dir) ;
+		    	MkDir $(dir) ;
+			}
+		}
 	}
 }
 
