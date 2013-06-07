@@ -411,6 +411,18 @@ BPrivate::get_path(int fd, const char *name, string &path)
 		if (!descriptor)
 			return B_FILE_ERROR;
 
+		// Handle symlink descriptors here explicitly, so this function can be
+		// used more flexibly.
+		if (SymlinkDescriptor* symlinkDescriptor
+				= dynamic_cast<SymlinkDescriptor*>(descriptor)) {
+			path = symlinkDescriptor->path;
+			if (name == NULL)
+				return B_OK;
+			path += '/';
+			path += name;
+			return B_OK;
+		}
+
 		// get node ref for the descriptor
 		NodeRef ref;
 		status_t error = descriptor->GetNodeRef(ref);
