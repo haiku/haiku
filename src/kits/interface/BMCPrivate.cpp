@@ -67,7 +67,7 @@ _BMCMenuBar_::_BMCMenuBar_(BRect frame, bool fixedSize, BMenuField* menuField)
 	fRunner(NULL),
 	fShowPopUpMarker(true)
 {
-	_Init(fixedSize);
+	_Init();
 }
 
 
@@ -79,7 +79,7 @@ _BMCMenuBar_::_BMCMenuBar_(BMenuField* menuField)
 	fRunner(NULL),
 	fShowPopUpMarker(true)
 {
-	_Init(true);
+	_Init();
 }
 
 
@@ -303,7 +303,7 @@ _BMCMenuBar_::MaxSize()
 
 
 void
-_BMCMenuBar_::_Init(bool setMaxContentWidth)
+_BMCMenuBar_::_Init()
 {
 	SetFlags(Flags() | B_FRAME_EVENTS);
 	SetBorder(B_BORDER_CONTENTS);
@@ -334,7 +334,4 @@ _BMCMenuBar_::_Init(bool setMaxContentWidth)
 		right + fShowPopUpMarker ? kPopUpIndicatorWidth : 0, bottom);
 
 	fPreviousWidth = Bounds().Width();
-
-	if (setMaxContentWidth)
-		SetMaxContentWidth(fPreviousWidth);
 }

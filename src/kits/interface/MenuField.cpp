@@ -547,7 +547,6 @@ BMenuField::FrameResized(float newWidth, float newHeight)
 		// resizing ourselfs might have caused the menubar
 		// to be outside now
 		fMenuBar->ResizeTo(_MenuBarWidth(), fMenuBar->Frame().Height());
-		fMenuBar->SetMaxContentWidth(_MenuBarWidth());
 	}
 
 	if (newHeight != fLayoutData->previous_height && Label()) {
@@ -665,10 +664,8 @@ BMenuField::SetDivider(float position)
 
 		fMenuBar->MoveTo(_MenuBarOffset(), kVMargin);
 
-		if (fFixedSizeMB) {
+		if (fFixedSizeMB)
 			fMenuBar->ResizeTo(_MenuBarWidth(), dirty.Height());
-			fMenuBar->SetMaxContentWidth(_MenuBarWidth());
-		}
 
 		dirty = dirty | fMenuBar->Frame();
 		dirty.InsetBy(-kVMargin, -kVMargin);

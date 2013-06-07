@@ -64,7 +64,7 @@ public:
 private:
 								_BMCMenuBar_&operator=(const _BMCMenuBar_&);
 
-			void				_Init(bool setMaxContentWidth);
+			void				_Init();
 
 			BMenuField*			fMenuField;
 			bool				fFixedSize;	
