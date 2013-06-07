@@ -71,10 +71,13 @@ AddHeaderDirectoryToPackage compatibility gnu : gnu ;
 AddHeaderDirectoryToPackage libs termcap : 3rdparty ;
 AddHeaderDirectoryToPackage libs tiff : 3rdparty ;
 
-CopyDirectoryToPackage develop headers :
-	[ FDirName $(HAIKU_FREETYPE_DIR) develop headers 3rdparty ] ;
-CopyDirectoryToPackage develop headers : $(HAIKU_JPEG_HEADERS) : 3rdparty ;
-CopyDirectoryToPackage develop headers : $(HAIKU_LIBPNG_HEADERS) : 3rdparty ;
+CopyDirectoryToPackage develop headers 3rdparty
+	: $(HAIKU_FREETYPE_HEADERS_DEPENDENCY)
+	: freetype2 : : isTarget ;
+CopyDirectoryToPackage develop headers : $(HAIKU_JPEG_HEADERS_DEPENDENCY)
+	: 3rdparty : : isTarget ;
+CopyDirectoryToPackage develop headers : $(HAIKU_LIBPNG_HEADERS_DEPENDENCY)
+	: 3rdparty : : isTarget ;
 
 # cpp headers
 if $(HAIKU_GCC_VERSION[1]) = 2 {
@@ -85,10 +88,13 @@ if $(HAIKU_GCC_VERSION[1]) = 2 {
 
 # OpenGL headers
 if $(TARGET_ARCH) = x86 {
+	local mesaGlHeaders = [ FDirName $(HAIKU_MESA_HEADERS) GL ] ;
+	mesaGlHeaders = $(mesaGlHeaders:G=$(HAIKU_MESA_HEADERS_DEPENDENCY:G)) ;
+	Depends $(mesaGlHeaders) : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
 	CopyDirectoryToPackage $(developDirTokens) headers os opengl
-		: [ FDirName $(HAIKU_MESA_HEADERS) GL ] ;
+		: $(mesaGlHeaders) : : : isTarget ;
 	CopyDirectoryToPackage $(developDirTokens) headers os opengl
-		: [ FDirName $(HAIKU_GLU_HEADERS) GL ] ;
+		: $(HAIKU_GLU_HEADERS_DEPENDENCY) : : : isTarget ;
 }
 
 BuildHaikuPackage $(haikuDevelPackage) : haiku_devel ;
