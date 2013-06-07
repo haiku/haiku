@@ -196,16 +196,17 @@ BColorControl::_LayoutView()
 		fPaletteFrame.bottom -= 1;
 	}
 
-	BRect rect = fPaletteFrame.InsetByCopy(-kBevelSpacing, -kBevelSpacing);
-		// frame including bevel
-
-	float offset = floorf(rect.bottom / 4);
-	float y = offset;
-	if (offset < _TextRectOffset()) {
-		offset = _TextRectOffset();
-		y = 0;
+	float rampHeight = (float)(fRows * fCellSize / kRampCount);
+	float offset = _TextRectOffset();
+	float y = 0;
+	if (rampHeight > fRedText->Frame().Height()) {
+		// there is enough room to fit kRampCount labels,
+		// shift text controls down by one ramp
+		offset = rampHeight;
+		y = floorf(offset + (offset - fRedText->Frame().Height()) / 2);
 	}
 
+	BRect rect = _PaletteFrame();
 	fRedText->MoveTo(rect.right + kTextFieldsHSpacing, y);
 
 	y += offset;
