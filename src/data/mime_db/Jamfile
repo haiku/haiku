@@ -27,11 +27,11 @@ rule BuildMimeDB superTypes
 				# Note: The subtype name may contain '.'s. Hence we cannot use
 				# ":S=.rsrc".
 			compiledSubType = $(compiledSubType:G=mimedb-sub-$(superType:B)) ;
-			ResComp $(compiledSubType) : $(subType) ;
 			MakeLocate $(compiledSubType)
 				: [ FDirName $(COMMON_PLATFORM_LOCATE_TARGET) $(superType:B) ] ;
-				# need to relocate to avoid clashes between equally named
-				# subtypes of different supertypes
+				# Need to locate explicitly to avoid clashes between equally
+				# named subtypes of different supertypes.
+			ResComp $(compiledSubType) : $(subType) ;
 			compiledSubTypes += $(compiledSubType) ;
 		}
 
@@ -86,7 +86,7 @@ superTypeFiles = $(superTypeFiles:BSG=mimedb) ;
 SEARCH on $(superTypeFiles) = $(SUBDIR) ;
 
 # for each supertype glob the subtype source files
-local superType ;
+local superTypeFile ;
 for superTypeFile in $(superTypeFiles) {
 	local superTypeDirectory = [ FDirName $(SUBDIR) $(superTypeFile:B) ] ;
 	local subTypeFiles = [ Glob $(superTypeDirectory) : * ] ;
@@ -95,7 +95,7 @@ for superTypeFile in $(superTypeFiles) {
 	local subType ;
 	for subType in $(subTypeFiles:BS) {
 		if $(subType) != "." && $(subType) != ".." {
-			subType = $(subType:G=mimedb-sub) ;
+			subType = $(subType:G=mimedb-sub-$(superTypeFile:B)) ;
 			SEARCH on $(subType) = $(superTypeDirectory) ;
 			subTypes += $(subType) ;
 		}
