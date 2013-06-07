@@ -168,7 +168,7 @@ BColorControl::_InitData(color_control_layout layout, float size,
 		AddChild(fBlueText);
 	}
 
-	_LayoutView();
+	ResizeToPreferred();
 
 	if (useOffscreen) {
 		BRect bounds = _PaletteFrame();
@@ -199,9 +199,6 @@ BColorControl::_LayoutView()
 	BRect rect = fPaletteFrame.InsetByCopy(-kBevelSpacing, -kBevelSpacing);
 		// frame including bevel
 
-	if (rect.Height() < fBlueText->Frame().bottom)
-		rect.bottom = fBlueText->Frame().bottom;
-
 	float offset = floorf(rect.bottom / 4);
 	float y = offset;
 	if (offset < _TextRectOffset()) {
@@ -216,9 +213,6 @@ BColorControl::_LayoutView()
 
 	y += offset;
 	fBlueText->MoveTo(rect.right + kTextFieldsHSpacing, y);
-
-	ResizeTo(rect.Width() + kTextFieldsHSpacing + fRedText->Bounds().Width(),
-		rect.Height());
 }
 
 
@@ -662,7 +656,6 @@ void
 BColorControl::SetCellSize(float size)
 {
 	_SetCellSize(size);
-	_LayoutView();
 	ResizeToPreferred();
 }
 
@@ -699,8 +692,6 @@ BColorControl::SetLayout(color_control_layout layout)
 			fRows = 4;
 			break;
 	}
-
-	_LayoutView();
 
 	ResizeToPreferred();
 	Invalidate();
@@ -877,9 +868,8 @@ BColorControl::GetPreferredSize(float* _width, float* _height)
 void
 BColorControl::ResizeToPreferred()
 {
-	BControl::ResizeToPreferred();
-
 	_LayoutView();
+	BControl::ResizeToPreferred();
 }
 
 
