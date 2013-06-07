@@ -32,6 +32,12 @@ BootStaticLibrary boot_zlib :
 	;
 
 
+Includes [ FGristFiles tarfs.cpp ] : [ BuildFeatureAttribute zlib : sources ] ;
+	# Strictly speaking it should be "headers", but the sources contain the
+	# headers as well and we have already added the sources directory to the
+	# header search path for the subdirectory. Should building boot_zlib be
+	# moved to its own directory, this should better be changes as well.
+
 BootStaticLibrary boot_tarfs :
 	tarfs.cpp
 	: -fno-pic
