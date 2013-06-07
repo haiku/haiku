@@ -33,6 +33,7 @@ StaticLibrary libshared.a :
 	ShakeTrackingFilter.cpp
 	StringForRate.cpp
 	StringForSize.cpp
+	Uuid.cpp
 	Variant.cpp
 ;
 
