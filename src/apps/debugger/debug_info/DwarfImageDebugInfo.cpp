@@ -705,7 +705,8 @@ DwarfImageDebugInfo::GetStatement(FunctionDebugInfo* _function,
 		= dynamic_cast<DwarfFunctionDebugInfo*>(_function);
 	if (function == NULL) {
 		TRACE_LINES("  -> no dwarf function\n");
-		return B_BAD_VALUE;
+		// fall back to assembly
+		return fArchitecture->GetStatement(function, address, _statement);
 	}
 
 	AutoLocker<BLocker> locker(fLock);
