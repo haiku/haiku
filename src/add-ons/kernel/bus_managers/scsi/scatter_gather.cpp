@@ -37,7 +37,6 @@ fill_temp_sg(scsi_ccb *ccb)
 	};
 	size_t num_entries;
 	size_t mapped_len;
-	uint32 cur_idx;
 	physical_entry *temp_sg = (physical_entry *)ccb->sg_list;
 
 	res = get_iovec_memory_map(&vec, 1, 0, ccb->data_length, temp_sg, max_sg_blocks,
@@ -54,10 +53,10 @@ fill_temp_sg(scsi_ccb *ccb)
 	if (dma_boundary != ~(uint32)0 || ccb->data_length > max_sg_block_size) {
 		// S/G list may not be controller-compatible:
 		// we have to split offending entries
-		SHOW_FLOW(3, "Checking violation of dma boundary 0x%x and entry size 0x%x",
-			(int)dma_boundary, (int)max_sg_block_size);
+		SHOW_FLOW(3, "Checking violation of dma boundary 0x%" B_PRIx32
+			" and entry size 0x%" B_PRIx32, dma_boundary, max_sg_block_size);
 
-		for (cur_idx = 0; cur_idx < num_entries; ++cur_idx) {
+		for (uint32 cur_idx = 0; cur_idx < num_entries; ++cur_idx) {
 			addr_t max_len;
 
 			// calculate space upto next dma boundary crossing
@@ -66,10 +65,10 @@ fill_temp_sg(scsi_ccb *ccb)
 			// restrict size per sg item
 			max_len = std::min(max_len, (addr_t)max_sg_block_size);
 
-			SHOW_FLOW(4, "addr=%#" B_PRIxPHYSADDR ", size=%x, max_len=%x, "
-				"idx=%d, num=%d", temp_sg[cur_idx].address,
-				(int)temp_sg[cur_idx].size, (int)max_len, (int)cur_idx,
-				(int)num_entries);
+			SHOW_FLOW(4, "addr=%#" B_PRIxPHYSADDR ", size=%" B_PRIxPHYSADDR
+				", max_len=%" B_PRIxADDR ", idx=%" B_PRId32 ", num=%"
+				B_PRIuSIZE, temp_sg[cur_idx].address, temp_sg[cur_idx].size,
+				max_len, cur_idx, num_entries);
 
 			if (max_len < temp_sg[cur_idx].size) {
 				// split sg block
@@ -153,8 +152,8 @@ cleanup_tmp_sg(scsi_ccb *ccb)
 {
 	status_t res;
 
-	SHOW_FLOW(3, "ccb=%p, data=%p, data_length=%d",
-		ccb, ccb->data, (int)ccb->data_length);
+	SHOW_FLOW(3, "ccb=%p, data=%p, data_length=%" B_PRId32,
+		ccb, ccb->data, ccb->data_length);
 
 	res = unlock_memory(ccb->data, ccb->data_length, B_DMA_IO
 		|  ((ccb->flags & SCSI_DIR_MASK) == SCSI_DIR_IN ? B_READ_DEVICE : 0));

@@ -167,7 +167,6 @@ scsi_start_mode_sense_6(scsi_ccb *request)
 {
 	scsi_cmd_mode_sense_6 *cmd = (scsi_cmd_mode_sense_6 *)request->orig_cdb;
 	scsi_cmd_mode_sense_10 *cdb = (scsi_cmd_mode_sense_10 *)request->cdb;
-	size_t allocationLength;
 
 	SHOW_FLOW0(3, "patching MODE SENSE(6) to MODE SENSE(10)");
 
@@ -180,11 +179,11 @@ scsi_start_mode_sense_6(scsi_ccb *request)
 	cdb->page_code = cmd->page_code;
 	cdb->page_control = cmd->page_control;
 
-	allocationLength = cmd->allocation_length
+	size_t allocationLength = cmd->allocation_length
 		- sizeof(scsi_cmd_mode_sense_6) + sizeof(scsi_cmd_mode_sense_10);
 	cdb->allocation_length = B_HOST_TO_BENDIAN_INT16(allocationLength);
 
-	SHOW_FLOW(3, "allocation_length=%ld", allocationLength);
+	SHOW_FLOW(3, "allocation_length=%" B_PRIuSIZE, allocationLength);
 
 	cdb->control = cmd->control;
 
