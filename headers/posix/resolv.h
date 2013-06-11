@@ -56,12 +56,14 @@
 #ifndef _RESOLV_H_
 #define	_RESOLV_H_
 
+#include <arpa/nameser.h>
+#include <netinet/in.h>
+#include <netinet6/in6.h>
+#include <stdio.h>
 #include <sys/param.h>
 #include <sys/types.h>
 #include <sys/cdefs.h>
 #include <sys/socket.h>
-#include <stdio.h>
-#include <arpa/nameser.h>
 
 /*
  * Revision information.  This is the release date in YYYYMMDD format.
