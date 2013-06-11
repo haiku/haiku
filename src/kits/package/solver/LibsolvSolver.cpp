@@ -518,12 +518,11 @@ LibsolvSolver::GetResult(BSolverResult& _result)
 
 	for (int i = 0; i < transaction->steps.count; i++) {
 		Id solvableId = transaction->steps.elements[i];
-		Solvable* solvable = pool_id2solvable(fPool, solvableId);
 		switch (transaction_type(transaction, solvableId,
 				SOLVER_TRANSACTION_RPM_ONLY)) {
 			case SOLVER_TRANSACTION_ERASE:
 			{
-				BSolverPackage* package = _GetPackage(solvable);
+				BSolverPackage* package = _GetPackage(solvableId);
 				if (package == NULL)
 					return B_ERROR;
 
@@ -551,7 +550,7 @@ LibsolvSolver::GetResult(BSolverResult& _result)
 				if (!foundPackage)
 					continue;
 
-				BSolverPackage* package = _GetPackage(solvable);
+				BSolverPackage* package = _GetPackage(solvableId);
 				if (package == NULL)
 					return B_ERROR;
 
@@ -719,11 +718,10 @@ LibsolvSolver::_AddRepositories()
 			BSolverPackage* package = repository->PackageAt(k);
 			Id solvableId = repo_add_haiku_package_info(repo, package->Info(),
 				REPO_REUSE_REPODATA | REPO_NO_INTERNALIZE);
-			Solvable* solvable = pool_id2solvable(fPool, solvableId);
 
 			try {
-				fSolvablePackages[solvable] = package;
-				fPackageSolvables[package] = solvable;
+				fSolvablePackages[solvableId] = package;
+				fPackageSolvables[package] = solvableId;
 			} catch (std::bad_alloc&) {
 				return B_NO_MEMORY;
 			}
@@ -759,26 +757,18 @@ LibsolvSolver::_GetRepositoryInfo(BSolverRepository* repository) const
 
 
 BSolverPackage*
-LibsolvSolver::_GetPackage(Solvable* solvable) const
+LibsolvSolver::_GetPackage(Id solvableId) const
 {
-	SolvableMap::const_iterator it = fSolvablePackages.find(solvable);
+	SolvableMap::const_iterator it = fSolvablePackages.find(solvableId);
 	return it != fSolvablePackages.end() ? it->second : NULL;
 }
 
 
-BSolverPackage*
-LibsolvSolver::_GetPackage(Id solvableId) const
-{
-	Solvable* solvable = pool_id2solvable(fPool, solvableId);
-	return solvable != NULL ? _GetPackage(solvable) : NULL;
-}
-
-
-Solvable*
+Id
 LibsolvSolver::_GetSolvable(BSolverPackage* package) const
 {
 	PackageMap::const_iterator it = fPackageSolvables.find(package);
-	return it != fPackageSolvables.end() ? it->second : NULL;
+	return it != fPackageSolvables.end() ? it->second : 0;
 }
 
 
@@ -797,14 +787,13 @@ LibsolvSolver::_AddSpecifiedPackages(
 			case BSolverPackageSpecifier::B_PACKAGE:
 			{
 				BSolverPackage* package = specifier.Package();
-				Solvable* solvable;
+				Id solvableId;
 				if (package == NULL
-					|| (solvable = _GetSolvable(package)) == NULL) {
+					|| (solvableId = _GetSolvable(package)) == 0) {
 					return B_BAD_VALUE;
 				}
 
-				queue_push2(fJobs, SOLVER_SOLVABLE,
-					solvable - fPool->solvables);
+				queue_push2(fJobs, SOLVER_SOLVABLE, solvableId);
 				break;
 			}
 			
@@ -1034,11 +1023,11 @@ LibsolvSolver::_AddSolutionElement(Solution* solution, Id sourceId, Id targetId)
 					&& fPool->solvables[what].repo
 						== fInstalledRepository->SolvRepo()) {
 					return _AddSolutionElement(solution, Element::B_DONT_KEEP,
-						fPool->solvables + what, NULL, NULL);
+						what, 0, NULL);
 				}
 
 				return _AddSolutionElement(solution,
-					Element::B_DONT_INSTALL, NULL, NULL,
+					Element::B_DONT_INSTALL, 0, 0,
 					solver_select2str(fPool, select, what));
 
 			case SOLVER_ERASE:
@@ -1048,33 +1037,32 @@ LibsolvSolver::_AddSolutionElement(Solution* solution, Id sourceId, Id targetId)
 						|| fPool->solvables[what].repo
 							!= fInstalledRepository->SolvRepo())) {
 					return _AddSolutionElement(solution,
-						Element::B_DONT_FORBID_INSTALLATION,
-						fPool->solvables + what, NULL, NULL);
+						Element::B_DONT_FORBID_INSTALLATION, what, 0, NULL);
 				}
 
 				Element::BType type = select == SOLVER_SOLVABLE_PROVIDES
 					? Element::B_DONT_DEINSTALL_ALL : Element::B_DONT_DEINSTALL;
-				return _AddSolutionElement(solution, type, NULL, NULL,
+				return _AddSolutionElement(solution, type, 0, 0,
 					solver_select2str(fPool, select, what));
 			}
 
 			case SOLVER_UPDATE:
 				return _AddSolutionElement(solution,
-					Element::B_DONT_INSTALL_MOST_RECENT, NULL, NULL,
+					Element::B_DONT_INSTALL_MOST_RECENT, 0, 0,
 					solver_select2str(fPool, select, what));
 
 			case SOLVER_LOCK:
-				return _AddSolutionElement(solution, Element::B_DONT_LOCK, NULL,
-					NULL, solver_select2str(fPool, select, what));
+				return _AddSolutionElement(solution, Element::B_DONT_LOCK, 0, 0,
+					solver_select2str(fPool, select, what));
 
 			default:
-				return _AddSolutionElement(solution, Element::B_UNSPECIFIED,
-					NULL, NULL, NULL);
+				return _AddSolutionElement(solution, Element::B_UNSPECIFIED, 0,
+					0, NULL);
 		}
 	}
 
 	Solvable* target = targetId != 0 ? fPool->solvables + targetId : NULL;
-	bool targetInstalled = target && fInstalledRepository
+	bool targetInstalled = target != NULL && fInstalledRepository
 		&& target->repo == fInstalledRepository->SolvRepo();
 
 	if (sourceId == SOLVER_SOLUTION_INFARCH) {
@@ -1082,61 +1070,61 @@ LibsolvSolver::_AddSolutionElement(Solution* solution, Id sourceId, Id targetId)
 			targetInstalled
 				? Element::B_KEEP_INFERIOR_ARCHITECTURE
 				: Element::B_INSTALL_INFERIOR_ARCHITECTURE,
-			target, NULL, NULL);
+			targetId, 0, NULL);
 	}
 
 	if (sourceId == SOLVER_SOLUTION_DISTUPGRADE) {
 		return _AddSolutionElement(solution,
 			targetInstalled
 				? Element::B_KEEP_EXCLUDED : Element::B_INSTALL_EXCLUDED,
-			target, NULL, NULL);
+			targetId, 0, NULL);
 	}
 
 	if (sourceId == SOLVER_SOLUTION_BEST) {
 		return _AddSolutionElement(solution,
 			targetInstalled ? Element::B_KEEP_OLD : Element::B_INSTALL_OLD,
-			target, NULL, NULL);
+			targetId, 0, NULL);
 	}
 
 	// replace source with target
 	Solvable* source = fPool->solvables + sourceId;
 	if (target == NULL) {
 		return _AddSolutionElement(solution, Element::B_ALLOW_DEINSTALLATION,
-			source, NULL, NULL);
+			sourceId, 0, NULL);
 	}
 
 	int illegalMask = policy_is_illegal(fSolver, source, target, 0);
 	if ((illegalMask & POLICY_ILLEGAL_DOWNGRADE) != 0) {
 		status_t error = _AddSolutionElement(solution,
-			Element::B_ALLOW_DOWNGRADE, source, target, NULL);
+			Element::B_ALLOW_DOWNGRADE, sourceId, targetId, NULL);
 		if (error != B_OK)
 			return error;
 	}
 
 	if ((illegalMask & POLICY_ILLEGAL_NAMECHANGE) != 0) {
 		status_t error = _AddSolutionElement(solution,
-			Element::B_ALLOW_NAME_CHANGE, source, target, NULL);
+			Element::B_ALLOW_NAME_CHANGE, sourceId, targetId, NULL);
 		if (error != B_OK)
 			return error;
 	}
 
 	if ((illegalMask & POLICY_ILLEGAL_ARCHCHANGE) != 0) {
 		status_t error = _AddSolutionElement(solution,
-			Element::B_ALLOW_ARCHITECTURE_CHANGE, source, target, NULL);
+			Element::B_ALLOW_ARCHITECTURE_CHANGE, sourceId, targetId, NULL);
 		if (error != B_OK)
 			return error;
 	}
 
 	if ((illegalMask & POLICY_ILLEGAL_VENDORCHANGE) != 0) {
 		status_t error = _AddSolutionElement(solution,
-			Element::B_ALLOW_VENDOR_CHANGE, source, target, NULL);
+			Element::B_ALLOW_VENDOR_CHANGE, sourceId, targetId, NULL);
 		if (error != B_OK)
 			return error;
 	}
 
 	if (illegalMask == 0) {
 		return _AddSolutionElement(solution, Element::B_ALLOW_REPLACEMENT,
-			source, target, NULL);
+			sourceId, targetId, NULL);
 	}
 
 	return B_OK;
@@ -1145,19 +1133,19 @@ LibsolvSolver::_AddSolutionElement(Solution* solution, Id sourceId, Id targetId)
 
 status_t
 LibsolvSolver::_AddSolutionElement(Solution* solution,
-	BSolverProblemSolutionElement::BType type, Solvable* sourceSolvable,
-	Solvable* targetSolvable, const char* selectionString)
+	BSolverProblemSolutionElement::BType type, Id sourceSolvableId,
+	Id targetSolvableId, const char* selectionString)
 {
 	BSolverPackage* sourcePackage = NULL;
-	if (sourceSolvable != NULL) {
-		sourcePackage = _GetPackage(sourceSolvable);
+	if (sourceSolvableId != 0) {
+		sourcePackage = _GetPackage(sourceSolvableId);
 		if (sourcePackage == NULL)
 			return B_ERROR;
 	}
 
 	BSolverPackage* targetPackage = NULL;
-	if (targetSolvable != NULL) {
-		targetPackage = _GetPackage(targetSolvable);
+	if (targetSolvableId != 0) {
+		targetPackage = _GetPackage(targetSolvableId);
 		if (targetPackage == NULL)
 			return B_ERROR;
 	}

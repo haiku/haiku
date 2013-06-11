@@ -72,8 +72,8 @@ private:
 
 			typedef BObjectList<RepositoryInfo> RepositoryInfoList;
 			typedef BObjectList<Problem> ProblemList;
-			typedef std::map<Solvable*, BSolverPackage*> SolvableMap;
-			typedef std::map<BSolverPackage*, Solvable*> PackageMap;
+			typedef std::map<Id, BSolverPackage*> SolvableMap;
+			typedef std::map<BSolverPackage*, Id> PackageMap;
 
 private:
 			status_t			_InitPool();
@@ -88,9 +88,8 @@ private:
 			status_t			_AddRepositories();
 			RepositoryInfo*		_GetRepositoryInfo(
 									BSolverRepository* repository) const;
-			BSolverPackage*		_GetPackage(Solvable* solvable) const;
 			BSolverPackage*		_GetPackage(Id solvableId) const;
-			Solvable*			_GetSolvable(BSolverPackage* package) const;
+			Id					_GetSolvable(BSolverPackage* package) const;
 
 			status_t			_AddSpecifiedPackages(
 									const BSolverPackageSpecifierList& packages,
@@ -103,8 +102,7 @@ private:
 									Id sourceId, Id targetId);
 			status_t			_AddSolutionElement(Solution* solution,
 									BSolverProblemSolutionElement::BType type,
-									Solvable* sourceSolvable,
-									Solvable* targetSolvable,
+									Id sourceSolvableId, Id targetSolvableId,
 									const char* selectionString);
 			status_t			_GetResolvableExpression(Id id,
 									BPackageResolvableExpression& _expression)
