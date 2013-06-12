@@ -87,6 +87,8 @@ CallbackServer::LocalID()
 	PeerAddress address;
 
 	ASSERT(fListener != NULL);
+
+	memset(&address, 0, sizeof(address));
 	fListener->GetLocalAddress(&address);
 	return address;
 }
