@@ -61,7 +61,6 @@ private:
 			uint32			fLeaseTime;
 
 			uint64			fClientId;
-			bool			fClientIdInit;
 			time_t			fClientIdLastUse;
 			mutex			fClientIdLock;
 
