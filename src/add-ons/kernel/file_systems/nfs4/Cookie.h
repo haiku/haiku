@@ -66,7 +66,7 @@ struct Cookie {
 
 			sem_id			fSnoozeCancel;
 
-							Cookie();
+							Cookie(FileSystem* fileSystem);
 	virtual					~Cookie();
 
 			status_t		RegisterRequest(RPC::Request* req);
@@ -77,6 +77,8 @@ struct Cookie {
 struct OpenStateCookie : public Cookie {
 			OpenState*		fOpenState;
 			uint32			fMode;
+
+							OpenStateCookie(FileSystem* fileSystem);
 };
 
 struct OpenFileCookie : public OpenStateCookie {
@@ -85,7 +87,7 @@ struct OpenFileCookie : public OpenStateCookie {
 			void			AddLock(LockInfo* lock);
 			void			RemoveLock(LockInfo* lock, LockInfo* prev);
 
-							OpenFileCookie();
+							OpenFileCookie(FileSystem* fileSystem);
 };
 
 struct OpenDirCookie : public Cookie {
@@ -96,10 +98,13 @@ struct OpenDirCookie : public Cookie {
 
 			bool						fAttrDir;
 
+										OpenDirCookie(FileSystem* fileSystem);
 										~OpenDirCookie();
 };
 
-struct OpenAttrCookie : public OpenStateCookie { };
+struct OpenAttrCookie : public OpenStateCookie {
+							OpenAttrCookie(FileSystem* fileSystem);
+};
 
 
 #endif	// COOKIE_H

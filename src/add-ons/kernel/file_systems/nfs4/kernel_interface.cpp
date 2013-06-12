@@ -752,7 +752,9 @@ static status_t
 nfs4_create(fs_volume* volume, fs_vnode* dir, const char* name, int openMode,
 	int perms, void** _cookie, ino_t* _newVnodeID)
 {
-	OpenFileCookie* cookie = new OpenFileCookie;
+	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
+
+	OpenFileCookie* cookie = new OpenFileCookie(fs);
 	if (cookie == NULL)
 		return B_NO_MEMORY;
 	*_cookie = cookie;
@@ -766,7 +768,6 @@ nfs4_create(fs_volume* volume, fs_vnode* dir, const char* name, int openMode,
 	if (inode == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
 	MutexLocker createLocker(fs->CreateFileLock());
 
 	OpenDelegationData data;
@@ -826,7 +827,8 @@ nfs4_open(fs_volume* volume, fs_vnode* vnode, int openMode, void** _cookie)
 		return B_OK;
 	}
 
-	OpenFileCookie* cookie = new OpenFileCookie;
+	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
+	OpenFileCookie* cookie = new OpenFileCookie(fs);
 	if (cookie == NULL)
 		return B_NO_MEMORY;
 	*_cookie = cookie;
@@ -1003,7 +1005,8 @@ nfs4_remove_dir(fs_volume* volume, fs_vnode* parent, const char* name)
 static status_t
 nfs4_open_dir(fs_volume* volume, fs_vnode* vnode, void** _cookie)
 {
-	OpenDirCookie* cookie = new(std::nothrow) OpenDirCookie;
+	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
+	OpenDirCookie* cookie = new(std::nothrow) OpenDirCookie(fs);
 	if (cookie == NULL)
 		return B_NO_MEMORY;
 	*_cookie = cookie;
@@ -1087,7 +1090,8 @@ nfs4_rewind_dir(fs_volume* volume, fs_vnode* vnode, void* _cookie)
 static status_t
 nfs4_open_attr_dir(fs_volume* volume, fs_vnode* vnode, void** _cookie)
 {
-	OpenDirCookie* cookie = new(std::nothrow) OpenDirCookie;
+	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
+	OpenDirCookie* cookie = new(std::nothrow) OpenDirCookie(fs);
 	if (cookie == NULL)
 		return B_NO_MEMORY;
 	*_cookie = cookie;
@@ -1148,7 +1152,8 @@ nfs4_create_attr(fs_volume* volume, fs_vnode* vnode, const char* name,
 	if (inode == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	OpenAttrCookie* cookie = new OpenAttrCookie;
+	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
+	OpenAttrCookie* cookie = new OpenAttrCookie(fs);
 	if (cookie == NULL)
 		return B_NO_MEMORY;
 	*_cookie = cookie;
@@ -1172,7 +1177,8 @@ nfs4_open_attr(fs_volume* volume, fs_vnode* vnode, const char* name,
 	if (inode == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	OpenAttrCookie* cookie = new OpenAttrCookie;
+	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
+	OpenAttrCookie* cookie = new OpenAttrCookie(fs);
 	if (cookie == NULL)
 		return B_NO_MEMORY;
 	*_cookie = cookie;
