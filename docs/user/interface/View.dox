@@ -264,7 +264,8 @@
 /*!
 	\var B_NAVIGABLE
 
-	The view is able to receive focus for keyboard navigation.
+	The view is able to receive focus for keyboard navigation. Typically focus is
+	indicated by drawing a blue rectangle around the view.
 */
 
 
@@ -285,7 +286,8 @@
 /*!
 	\var B_INPUT_METHOD_AWARE
 
-	??
+	Allows the view to use input method add-ons to gain access to the input
+	methods needed for Japanese and other languages.
 */
 
 
@@ -368,8 +370,8 @@
 /*!
 	\var B_FOLLOW_NONE
 
-	Follow none resize mask parameter. Equivalent to <tt>B_FOLLOW_LEFT
-	| B_FOLLOW_TOP</tt>. The view maintains its position in its parent's
+	Follow none resize mask parameter. Equivalent to \c B_FOLLOW_LEFT
+	| \c B_FOLLOW_TOP. The view maintains its position in its parent's
 	coordinate system but not in the screen coordinate system.
 */
 
@@ -377,8 +379,8 @@
 /*!
 	\var B_FOLLOW_ALL_SIDES
 
-	Follow all sides resize mask parameter. Equivalent to <tt>B_FOLLOW_LEFT_RIGHT |
-	B_FOLLOW_TOP_BOTTOM</tt>. The view will be resized with its parent view both
+	Follow all sides resize mask parameter. Equivalent to \c B_FOLLOW_LEFT_RIGHT |
+	\c B_FOLLOW_TOP_BOTTOM. The view will be resized with its parent view both
 	horizontally and vertically.
 */
 
@@ -396,7 +398,7 @@
 /*!
 	\var B_FOLLOW_LEFT
 
-	The margin between the left side of the view and the left side of the parent
+	The margin between the left side of the view and the left side of its parent
 	remains constant.
 */
 
@@ -404,7 +406,7 @@
 /*!
 	\var B_FOLLOW_RIGHT
 
-	The margin between the right side of the view and the right side of the parent
+	The margin between the right side of the view and the right side of its parent
 	remains constant.
 */
 
@@ -413,14 +415,14 @@
 	\var B_FOLLOW_LEFT_RIGHT
 
 	The margin between the left and right sides of the view and the left and right
-	sides of the parent both remain constant.
+	sides of its parent both remain constant.
 */
 
 
 /*!
 	\var B_FOLLOW_H_CENTER
 
-	The view maintains a constant relationship to the horizontal center of the
+	The view maintains a constant relationship to the horizontal center of its
 	parent view.
 */
 
@@ -431,7 +433,7 @@
 /*!
 	\var B_FOLLOW_TOP
 
-	The margin between the top of the view and the top of the parent remains
+	The margin between the top of the view and the top of its parent remains
 	constant.
 */
 
@@ -439,7 +441,7 @@
 /*!
 	\var B_FOLLOW_BOTTOM
 
-	The margin between the bottom of the view and the bottom of the parent remains
+	The margin between the bottom of the view and the bottom of its parent remains
 	constant.
 */
 
@@ -448,14 +450,14 @@
 	\var B_FOLLOW_TOP_BOTTOM
 
 	The margin between the top and bottom sides of the view and the top and bottom
-	sides of the parent both remain constant.
+	sides of its parent both remain constant.
 */
 
 
 /*!
 	\var B_FOLLOW_V_CENTER
 
-	The view maintains a constant relationship to the vertical center of the
+	The view maintains a constant relationship to the vertical center of its
 	parent view.
 */
 
@@ -472,8 +474,26 @@
 	\fn BView::BView(const char* name, uint32 flags, BLayout* layout)
 	\brief Layout constructor.
 
-	\param name The name of the view.
-	\param flags The view flags.
+	To be used as part of a BLayout. You may use the Layout Methods found below
+	to set the size and alignment constraints of the view.
+
+	\c B_SUPPORTS_LAYOUT is automatically set to the view. The view flags can be
+	set after the view has been constructed by calling the SetFlags() methods.
+
+	\param name The name of the view, can be \c NULL.
+	\param flags The view flags, a mask of one or more of the following:
+	       - \c B_FULL_UPDATE_ON_RESIZE Redraw the entire view on resize.
+	       - \c B_WILL_DRAW Indicates that the view will do it's own drawing.
+	       - \c B_PULSE_NEEDED The view accepts Pulse() messages.
+	       - \c B_NAVIGABLE_JUMP Default for keyboard navigation.
+	       - \c B_FRAME_EVENTS Responds to move and resize events.
+	       - \c B_NAVIGABLE Able to receive keyboard navigation focus.
+	       - \c B_SUBPIXEL_PRECISE Draws with sub-pixel precision.
+	       - \c B_DRAW_ON_CHILDREN Responds to DrawAfterChildren().
+	       - \c B_INPUT_METHOD_AWARE Allows access input method add-ons.
+	       - \c B_SUPPORTS_LAYOUT Supports the layout APIs, i.e. it doesn't
+	            use a frame rectangle.
+	       - \c B_INVALIDATE_AFTER_LAYOUT Is redraw after added to a layout.
 	\param layout A \a layout to set the view to.
 */
 
@@ -483,10 +503,61 @@
 		uint32 flags)
 	\brief Standard constructor.
 
+	A newly constructed BView object has no parent, you must assign it one by
+	passing it into the AddChild() method of another view or window. Once the
+	view or a parent view has been attached to a window the view becomes part of
+	that window's view hierarchy.
+
+	When the BView object is added as a child the \a frame values are interpreted
+	in the parent's coordinate system. The frame rectangle should be specified in
+	integral values to align on pixel boundaries, decimal values will be rounded.
+
+	The resizing mode flags and view flags can be set after the view has been
+	constructed by calling the SetResizingMode() and SetFlags() methods.
+
 	\param frame The \a frame rectangle of the view.
-	\param name The name of the view.
-	\param resizingMode The resizing mode flags.
-	\param flags The view flags.
+	\param name The name of the view, can be \c NULL.
+	\param resizingMode Defines the view's behavior of the when its parent is
+	       resized.
+	       \n\n It combines one of the following horizontal resizing constants:
+	       \li \c B_FOLLOW_TOP The margin between the top of the view and the top
+	           of its parent remains constant.
+	       \li \c B_FOLLOW_BOTTOM The margin between the bottom of the view and
+	           the bottom of its parent remains constant.
+	       \li \c B_FOLLOW_TOP_BOTTOM The margin between the top and bottom sides
+	           of the view and the top and bottom sides of the parent both remain
+	           constant.
+	       \li \c B_FOLLOW_V_CENTER Maintains a constant relationship to the
+	           vertical center of the parent view.
+
+	       with one of the following vertical resizing constants:
+	       \li \c B_FOLLOW_LEFT The margin between the left side of the view and
+	           the left side of its parent remains constant.
+	       \li \c B_FOLLOW_RIGHT The margin between the right side of the view and
+	            the right side of the parent remains constant.
+	       \li \c B_FOLLOW_LEFT_RIGHT The margin between the left and right sides
+	           of the view and the left and right sides of its parent both remain
+	           constant.
+	       \li \c B_FOLLOW_H_CENTER The view maintains a constant relationship to
+	            the horizontal center of the parent view.
+
+	       or use one of the following combined horizontal/vertical constants:
+	       \li \c B_FOLLOW_NONE Equivalent to \c B_FOLLOW_LEFT | \c B_FOLLOW_TOP.
+	       \li \c B_FOLLOW_ALL_SIDES Equivalent to
+	            \c B_FOLLOW_LEFT_RIGHT | \c B_FOLLOW_TOP_BOTTOM.
+	\param flags The view flags, a mask of one or more of the following:
+	       - \c B_FULL_UPDATE_ON_RESIZE Redraw the entire view on resize.
+	       - \c B_WILL_DRAW Indicates that the view will do it's own drawing.
+	       - \c B_PULSE_NEEDED The view accepts Pulse() messages.
+	       - \c B_NAVIGABLE_JUMP Default for keyboard navigation.
+	       - \c B_FRAME_EVENTS Responds to move and resize events.
+	       - \c B_NAVIGABLE Able to receive keyboard navigation focus.
+	       - \c B_SUBPIXEL_PRECISE Draws with sub-pixel precision.
+	       - \c B_DRAW_ON_CHILDREN Responds to DrawAfterChildren().
+	       - \c B_INPUT_METHOD_AWARE Allows access input method add-ons.
+	       - \c B_SUPPORTS_LAYOUT Supports the layout APIs, i.e. it doesn't
+	            use a frame rectangle.
+	       - \c B_INVALIDATE_AFTER_LAYOUT Is redraw after added to a layout.
 */
 
 
@@ -494,7 +565,7 @@
 	\fn BView::BView(BMessage* archive)
 	\brief Archive constructor.
 
-	\param archive The data message to construct the view from.
+	\param archive The data \a archive message to construct the view from.
 */
 
 
@@ -1049,14 +1120,6 @@
 
 
 /*!
-	\name Resizing mode methods
-*/
-
-
-//! @{
-
-
-/*!
 	\fn void BView::SetResizingMode(uint32 mode)
 	\brief Sets the resizing mode of the view according to the \a mode mask.
 
@@ -1073,9 +1136,6 @@
 
 	\returns the current resizing mode flags as a uint32 mask.
 */
-
-
-//! @}
 
 
 /*!
