@@ -83,9 +83,9 @@ enum {
 	_NL_LANGINFO_LAST
 };
 
-// According to the POSIX base specs v7, the above need to be available as
-// symbolic constants, so we define them individually to their respective
-// enumeration name.
+/* According to the POSIX base specs v7, the above need to be available as
+   symbolic constants, so we define them individually to their respective
+   enumeration name. */
 #define CODESET CODESET
 #define D_T_FMT D_T_FMT
 #define D_FMT D_FMT
