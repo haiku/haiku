@@ -1,6 +1,6 @@
 <chrp-boot>
 <compatible>
-MacRISC
+MacRISC MacRISC3 MacRISC4
 </compatible>
 <description>
 Haiku for PowerPC
