@@ -4,6 +4,8 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders interface ;
 UsePrivateSystemHeaders ;
+UseBuildFeatureHeaders glu ;
+UseBuildFeatureHeaders mesa ;
 
 local sources =
 	GLView.cpp
@@ -18,19 +20,18 @@ if $(TARGET_PLATFORM) != haiku {
 		# We need our public GL headers also when not compiling for Haiku.
 }
 
-SubDirSysHdrs $(HAIKU_GLU_HEADERS) ;
-SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
-Includes [ FGristFiles $(sources) ] : $(HAIKU_GLU_HEADERS_DEPENDENCY) ;
-Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+Includes [ FGristFiles $(sources) ] : [ BuildFeatureAttribute glu : headers ] ;
+Includes [ FGristFiles $(sources) ] : [ BuildFeatureAttribute mesa : headers ] ;
 
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) include ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa main ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi glapi ] ;
+UseHeaders [ BuildFeatureAttribute mesa : headers : path ] ;
+local privateHeaders = [ BuildFeatureAttribute mesa : privateHeaders : path ] ;
+UseHeaders [ FDirName $(privateHeaders) mesa ] ;
+UseHeaders [ FDirName $(privateHeaders) mesa main ] ;
+UseHeaders [ FDirName $(privateHeaders) mapi ] ;
+UseHeaders [ FDirName $(privateHeaders) mapi glapi ] ;
 
 # For older versions of Mesa
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa glapi ] ;
+UseHeaders [ FDirName $(privateHeaders) mesa glapi ] ;
 
 LINKFLAGS on libGL.so = [ on libGL.so return $(LINKFLAGS) ]
 	-Xlinker --whole-archive -Xlinker --no-undefined ;
@@ -43,10 +44,10 @@ if $(HAIKU_GCC_VERSION[1]) < 3 {
 
 SharedLibrary libGL.so : $(sources) :
 	# GLU
-	$(HAIKU_GLU_LIBS)
+	[ BuildFeatureAttribute glu : library ]
 
 	# GLAPI Dispatch code (from Mesa buildpackage)
-	$(HAIKU_GLAPI_LIB)
+	[ BuildFeatureAttribute mesa : glapiLibrary ]
 
 	# External libraries:
 	game			# BWindowScreen needed by BGLScreen stub class

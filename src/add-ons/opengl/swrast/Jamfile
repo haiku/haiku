@@ -14,21 +14,22 @@ SubDirC++Flags [ FDefines $(defines) ] ;
 local sources = MesaSoftwareRenderer.cpp ;
 
 UsePrivateHeaders interface ;
-SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
-Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+UseBuildFeatureHeaders mesa ;
+Includes [ FGristFiles $(sources) ] : [ BuildFeatureAttribute mesa : headers ] ;
 
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) include ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa main ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi glapi ] ;
+UseHeaders [ BuildFeatureAttribute mesa : headers : path ] ;
+local privateHeaders = [ BuildFeatureAttribute mesa : privateHeaders : path ] ;
+UseHeaders [ FDirName $(privateHeaders) mesa ] ;
+UseHeaders [ FDirName $(privateHeaders) mesa main ] ;
+UseHeaders [ FDirName $(privateHeaders) mapi ] ;
+UseHeaders [ FDirName $(privateHeaders) mapi glapi ] ;
 
 AddResources Software\ Rasterizer : MesaSoftwareRenderer.rdef ;
 
 Addon Software\ Rasterizer :
 	MesaSoftwareRenderer.cpp
 	:
-	$(HAIKU_MESA_LIB)
-	$(HAIKU_GLSL_LIB)
+	[ BuildFeatureAttribute mesa : mesaLibrary ]
+	[ BuildFeatureAttribute mesa : glslLibrary ]
 	libGL.so be $(TARGET_LIBSUPC++)
 ;

@@ -1,5 +1,5 @@
 SubDir HAIKU_TOP src add-ons opengl swpipe ;
-SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
+UseBuildFeatureHeaders mesa ;
 
 UsePrivateHeaders interface ;
 
@@ -10,13 +10,14 @@ local sources =
 	GalliumFramebuffer.cpp
 	bitmap_wrapper.cpp ;
 
-Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+Includes [ FGristFiles $(sources) ] : [ BuildFeatureAttribute mesa : headers ] ;
 
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src gallium auxiliary ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src gallium drivers ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src gallium include ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa ] ;
+local privateHeaders = [ BuildFeatureAttribute mesa : privateHeaders : path ] ;
+UseHeaders [ FDirName $(privateHeaders) gallium auxiliary ] ;
+UseHeaders [ FDirName $(privateHeaders) gallium drivers ] ;
+UseHeaders [ FDirName $(privateHeaders) gallium include ] ;
+UseHeaders [ FDirName $(privateHeaders) mapi ] ;
+UseHeaders [ FDirName $(privateHeaders) mesa ] ;
 
 AddResources Software\ Renderer : SoftwareRenderer.rdef ;
 
@@ -36,11 +37,11 @@ Addon Software\ Renderer :
 	$(sources)
 	:
 	libGL.so
-	$(HAIKU_GALLIUM_SOFTPIPE_LIB)
-	$(HAIKU_GALLIUM_LLVMPIPE_LIB)
-	$(HAIKU_MESA_LIB)
-	$(HAIKU_GLSL_LIB)
-	$(HAIKU_GALLIUM_LIB)
+	[ BuildFeatureAttribute mesa : galliumSoftpipeLibrary ]
+	[ BuildFeatureAttribute mesa : galliumLlvmpipeLibrary ]
+	[ BuildFeatureAttribute mesa : mesaLibrary ]
+	[ BuildFeatureAttribute mesa : glslLibrary ]
+	[ BuildFeatureAttribute mesa : galliumLibrary ]
 	$(HAIKU_LLVM_LIBS)
 	be translation stdc++ $(TARGET_LIBSUPC++)
 ;

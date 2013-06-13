@@ -1,5 +1,5 @@
 SubDir HAIKU_TOP src apps 3dmov ;
-SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
+UseBuildFeatureHeaders mesa ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
@@ -19,7 +19,7 @@ local sources =
 	GLUtility.cpp
     ;
 
-Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+Includes [ FGristFiles $(sources) ] : [ BuildFeatureAttribute mesa : headers ] ;
 
 Application 3DMov :
 	$(sources)

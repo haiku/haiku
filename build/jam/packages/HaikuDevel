@@ -22,7 +22,7 @@ AddFilesToPackage lib : $(developmentLibs) ;
 
 # library symlinks
 local lib ;
-for lib in $(SYSTEM_LIBS) $(SYSTEM_LIBS_LIBGL_ALIASES) $(developmentLibs) {
+for lib in $(SYSTEM_LIBS) $(developmentLibs) {
 	AddSymlinkToPackage $(developDirTokens) lib : /system/lib $(lib:BS) ;
 	local abiVersion = [ on $(lib) return $(HAIKU_LIB_ABI_VERSION) ] ;
 	if $(abiVersion) {
@@ -88,13 +88,13 @@ if $(HAIKU_GCC_VERSION[1]) = 2 {
 
 # OpenGL headers
 if $(TARGET_ARCH) = x86 {
-	local mesaGlHeaders = [ FDirName $(HAIKU_MESA_HEADERS) GL ] ;
-	mesaGlHeaders = $(mesaGlHeaders:G=$(HAIKU_MESA_HEADERS_DEPENDENCY:G)) ;
-	Depends $(mesaGlHeaders) : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+	local mesaGlHeaders
+		= [ FDirName [ BuildFeatureAttribute mesa : headers : path ] GL ] ;
+	local mesaGlHeadersDependency = [ BuildFeatureAttribute mesa : headers ] ;
+	mesaGlHeaders = $(mesaGlHeaders:G=$(mesaGlHeadersDependency:G)) ;
+	Depends $(mesaGlHeaders) : $(mesaGlHeadersDependency) ;
 	CopyDirectoryToPackage $(developDirTokens) headers os opengl
 		: $(mesaGlHeaders) : : : isTarget ;
-	CopyDirectoryToPackage $(developDirTokens) headers os opengl
-		: $(HAIKU_GLU_HEADERS_DEPENDENCY) : : : isTarget ;
 }
 
 BuildHaikuPackage $(haikuDevelPackage) : haiku_devel ;

@@ -97,20 +97,9 @@ if $(HAIKU_GCC_VERSION[1]) = 2 {
 }
 
 
-# libGL.so has GLU (like BeOS) built-in
-SYSTEM_LIBS_LIBGL_ALIASES = libGLU.so ;
-
-if $(TARGET_ARCH) = x86 {
-	local lib ;
-	for lib in $(SYSTEM_LIBS_LIBGL_ALIASES) {
-		AddSymlinkToPackage lib : libGL.so : $(lib) ;
-	}
-}
-
 SYSTEM_LIBS_ALIASES =
 	$(SYSTEM_LIBS_LIBNETWORK_ALIASES)
 	libnetapi.so
-	$(SYSTEM_LIBS_LIBGL_ALIASES)
 ;
 
 OPTIONAL_LIBS_ALIASES =

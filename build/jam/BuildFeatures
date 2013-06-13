@@ -264,21 +264,24 @@ if $(TARGET_ARCH) = x86 {
 # GLU (GL Utilities)
 if $(TARGET_ARCH) = x86 {
 	if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		HAIKU_GLU_FILE = glu-9.0-x86-gcc4-2012-11-13.zip ;
+		# TODO:...
+		HAIKU_GLU_PACKAGE = glu-9.0-x86-gcc4-2012-11-13.zip ;
 	} else {
-		HAIKU_GLU_FILE = glu-9.0-x86-gcc2-2012-11-13.zip ;
+		HAIKU_GLU_PACKAGE = glu-9.0.0-1-x86_gcc2.hpkg ;
+		HAIKU_GLU_DEVEL_PACKAGE = glu_devel-9.0.0-1-x86_gcc2.hpkg ;
 	}
 
-	local zipFile = [ DownloadFile $(HAIKU_GLU_FILE)
-		: $(baseURL)/lib/$(HAIKU_GLU_FILE) ] ;
+	HAIKU_GLU_URL = $(hpkgBaseURL)/$(HAIKU_GLU_PACKAGE) ;
+	HAIKU_GLU_DEVEL_URL = $(hpkgBaseURL)/$(HAIKU_GLU_DEVEL_PACKAGE) ;
 
-	HAIKU_GLU_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
-		$(HAIKU_GLU_FILE:B) ] ;
-	HAIKU_GLU_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_GLU_DIR)
-		: develop/headers/os/opengl/GL : $(zipFile) : extracted-glu-headers ] ;
-	HAIKU_GLU_LIBS = [ ExtractArchive $(HAIKU_GLU_DIR)
-		: system/lib/libGLU.a : $(zipFile) : extracted-glu ] ;
-	HAIKU_GLU_HEADERS = [ FDirName $(HAIKU_GLU_DIR) develop headers os opengl ] ;
+	ExtractBuildFeatureArchives glu :
+		file: base $(HAIKU_GLU_URL)
+			runtime: lib
+		file: devel $(HAIKU_GLU_DEVEL_URL)
+			depends: base
+			library: develop/lib/libGLU.so
+			headers: develop/headers
+		;
 
 	EnableBuildFeatures glu ;
 } else {
@@ -290,64 +293,37 @@ if $(TARGET_ARCH) = x86 {
 if $(TARGET_ARCH) = x86 {
 	local zipFile ;
 	if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		HAIKU_MESA_FILE = mesa-9.1.1-x86-gcc4-2013-04-27.zip ;
+		# TODO:...
+		HAIKU_MESA_PACKAGE = mesa-9.1.1-x86-gcc4-2013-04-27.zip ;
 	} else {
-		HAIKU_MESA_FILE = mesa-7.8.2-x86-gcc2-2013-04-28.zip ;
+		HAIKU_MESA_PACKAGE = mesa-7.8.2-3-x86_gcc2.hpkg ;
+		HAIKU_MESA_DEVEL_PACKAGE = mesa_devel-7.8.2-3-x86_gcc2.hpkg ;
 	}
 
-	zipFile = [ DownloadFile $(HAIKU_MESA_FILE)
-		: $(baseURL)/$(HAIKU_MESA_FILE) ] ;
+	HAIKU_MESA_URL = $(hpkgBaseURL)/$(HAIKU_MESA_PACKAGE) ;
+	HAIKU_MESA_DEVEL_URL = $(hpkgBaseURL)/$(HAIKU_MESA_DEVEL_PACKAGE) ;
 
-	HAIKU_MESA_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
-		$(HAIKU_MESA_FILE:B) ] ;
+	ExtractBuildFeatureArchives mesa : [ FFilterByBuildFeatures
+		file: devel $(HAIKU_MESA_DEVEL_URL)
+			mesaLibrary: develop/lib/libmesa.a
+			glapiLibrary: develop/lib/libglapi.a
+			headers: develop/headers
+			privateHeaders: develop/headers/mesa_private
 
-	HAIKU_MESA_HEADERS = [ FDirName $(HAIKU_MESA_DIR) include ] ;
-	HAIKU_MESA_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_MESA_DIR)
-		: include/ : $(zipFile) : extracted-mesa ] ;
+			!gcc2 @{
+				glslLibrary: develop/lib/libglsl.a
+				galliumLibrary: develop/lib/libgallium.a
+				llvm @{
+					galliumLlvmpipeLibrary: develop/lib/libllvmpipe.a
+				}@
+				!llvm @{
+					galliumSoftpipeLibrary: develop/lib/libsoftpipe.a
+				}@
+			}@ # !gcc2
+		] ;
 
-	# Base Mesa libraries
-	HAIKU_MESA_LIB = [ ExtractArchive $(HAIKU_MESA_DIR)
-		:
-		lib.haiku/libmesa.a
-		: $(zipFile)
-		: extracted-mesa ] ;
-	HAIKU_GLAPI_LIB = [ ExtractArchive $(HAIKU_MESA_DIR)
-		:
-		lib.haiku/libglapi.a
-		: $(zipFile)
-		: extracted-mesa ] ;
-
-	Depends $(HAIKU_MESA_HEADERS_DEPENDENCY) : $(HAIKU_GLU_HEADERS_DEPENDENCY) ;
-	Depends $(HAIKU_GLAPI_LIBS) : $(HAIKU_GLU_LIBS) ;
-
-	# Extended Mesa libraries for newer versions
-	if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		HAIKU_GLSL_LIB = [ ExtractArchive $(HAIKU_MESA_DIR)
-			:
-			lib.haiku/libglsl.a
-			: $(zipFile)
-			: extracted-mesa ] ;
-		HAIKU_GALLIUM_LIB = [ ExtractArchive $(HAIKU_MESA_DIR)
-			:
-			lib.haiku/libgallium.a
-			: $(zipFile)
-			: extracted-mesa ] ;
-
-		if FIsBuildFeatureEnabled(llvm) {
-			HAIKU_GALLIUM_LLVMPIPE_LIB = [ ExtractArchive $(HAIKU_MESA_DIR)
-				:
-				lib.haiku/libllvmpipe.a
-				: $(zipFile)
-				: extracted-mesa ] ;
-			Depends $(HAIKU_GALLIUM_LLVMPIPE_LIB) : $(HAIKU_LLVM_LIBS) ;
-		} else {
-			HAIKU_GALLIUM_SOFTPIPE_LIB = [ ExtractArchive $(HAIKU_MESA_DIR)
-				:
-				lib.haiku/libsoftpipe.a
-				: $(zipFile)
-				: extracted-mesa ] ;
-		}
-	}
+	Depends [ BuildFeatureAttribute mesa : galliumLlvmpipeLibrary ]
+		: $(HAIKU_LLVM_LIBS) ;
 
 	EnableBuildFeatures mesa ;
 } else {

@@ -49,6 +49,8 @@
 #	GetTextLibintl			- GetText's libintl
 #	Git						- the distributed version control system
 #	GitDoc					- documentation for the distributed version control system
+#	GLU						- OpenGL Utilities
+#	GLU-devel				- GLU development files
 #	GPerf					- the perfect hash function generator.
 #	Grep					- program to search for strings inside a file
 #	Groff					- text formatter used for man pages
@@ -959,6 +961,30 @@ if [ IsOptionalHaikuImagePackageAdded GitDoc ] {
 }
 
 
+# GLU
+if [ IsOptionalHaikuImagePackageAdded GLU ] {
+	if $(TARGET_ARCH) = x86 {
+		InstallOptionalHaikuImagePackage
+			$(hpkgBaseURL)/$(HAIKU_GLU_URL)
+			: system ;
+	} else {
+		Echo "No optional package GLU available for $(TARGET_ARCH)" ;
+	}
+}
+
+
+# GLU-devel
+if [ IsOptionalHaikuImagePackageAdded GLU-devel ] {
+	if $(TARGET_ARCH) = x86 {
+		InstallOptionalHaikuImagePackage
+			$(hpkgBaseURL)/$(HAIKU_GLU_DEVEL_PACKAGE)
+			: system ;
+	} else {
+		Echo "No optional package GLU-devel available for $(TARGET_ARCH)" ;
+	}
+}
+
+
 # GPerf
 if [ IsOptionalHaikuImagePackageAdded GPerf ] {
 	if $(TARGET_ARCH) = x86 {
@@ -1290,6 +1316,16 @@ if [ IsOptionalHaikuImagePackageAdded Mercurial ] {
 			: : cdPackage ;
 	} else {
 		Echo "No optional package Mercurial available for $(TARGET_ARCH)" ;
+	}
+}
+
+
+# Mesa
+if [ IsOptionalHaikuImagePackageAdded Mesa ] {
+	if $(TARGET_ARCH) = x86 {
+		InstallOptionalHaikuImagePackage $(HAIKU_MESA_URL) : system ;
+	} else {
+		Echo "No optional package Mesa available for $(TARGET_ARCH)" ;
 	}
 }
 

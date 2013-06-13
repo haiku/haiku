@@ -28,19 +28,20 @@ if $(TARGET_PLATFORM) != haiku {
 local sources = MesaSoftwareRenderer.cpp ;
 
 UsePrivateHeaders interface ;
-SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
-Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+UseBuildFeatureHeaders mesa ;
+Includes [ FGristFiles $(sources) ] : [ BuildFeatureAttribute mesa : headers ] ;
 
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) include ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa main ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi glapi ] ;
+UseHeaders [ BuildFeatureAttribute mesa : headers : path ] ;
+local privateHeaders = [ BuildFeatureAttribute mesa : privateHeaders : path ] ;
+UseHeaders [ FDirName $(privateHeaders) mesa ] ;
+UseHeaders [ FDirName $(privateHeaders) mesa main ] ;
+UseHeaders [ FDirName $(privateHeaders) mapi ] ;
+UseHeaders [ FDirName $(privateHeaders) mapi glapi ] ;
 
 # For older versions of Mesa
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa glapi ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa tnl ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa x86 ] ;
+UseHeaders [ FDirName $(privateHeaders) mesa glapi ] ;
+UseHeaders [ FDirName $(privateHeaders) mesa tnl ] ;
+UseHeaders [ FDirName $(privateHeaders) mesa x86 ] ;
 
 
 AddResources Legacy\ Software\ Rasterizer : MesaSoftwareRenderer.rdef ;
@@ -48,6 +49,6 @@ AddResources Legacy\ Software\ Rasterizer : MesaSoftwareRenderer.rdef ;
 Addon Legacy\ Software\ Rasterizer :
 	$(sources)
 	:
-	$(HAIKU_MESA_LIB)
+	[ BuildFeatureAttribute mesa : mesaLibrary ]
 	libGL.so be $(TARGET_LIBSUPC++)
 ;

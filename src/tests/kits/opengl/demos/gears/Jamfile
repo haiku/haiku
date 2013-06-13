@@ -1,5 +1,5 @@
 SubDir HAIKU_TOP src tests kits opengl demos gears ;
-SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
+UseBuildFeatureHeaders mesa ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
@@ -15,7 +15,7 @@ local sources =
 	gears.c
 ;
 
-Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+Includes [ FGristFiles $(sources) ] : [ BuildFeatureAttribute mesa : headers ] ;
 
 
 SimpleTest GLGears :

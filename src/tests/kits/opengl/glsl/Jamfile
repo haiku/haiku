@@ -1,5 +1,5 @@
 SubDir HAIKU_TOP src tests kits opengl glsl ;
-SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
+UseBuildFeatureHeaders mesa ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
@@ -14,7 +14,8 @@ local shadersources =
 	shaderutil.c
 ;
 
-Includes [ FGristFiles $(shadersources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+Includes [ FGristFiles $(shadersources) ]
+	: [ BuildFeatureAttribute mesa : headers ] ;
 
 StaticLibrary libshaderutil.a :
 	$(shadersources)
