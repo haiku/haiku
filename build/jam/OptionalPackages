@@ -2228,15 +2228,11 @@ if [ IsOptionalHaikuImagePackageAdded Yasm ] {
 
 # Zlib
 if [ IsOptionalHaikuImagePackageAdded Zlib ] {
-	InstallOptionalHaikuImagePackage
-		$(hpkgBaseURL)/$(HAIKU_ZLIB_FILE)
-		: system ;
+	InstallOptionalHaikuImagePackage $(HAIKU_ZLIB_URL) : system ;
 }
 
 
 # Zlib-devel
 if [ IsOptionalHaikuImagePackageAdded Zlib-devel ] {
-	InstallOptionalHaikuImagePackage
-		$(hpkgBaseURL)/$(HAIKU_ZLIB_DEVEL_FILE)
-		: system ;
+	InstallOptionalHaikuImagePackage $(HAIKU_ZLIB_DEVEL_URL) : system ;
 }

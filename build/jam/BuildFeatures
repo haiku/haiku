@@ -581,30 +581,33 @@ if $(TARGET_ARCH) in arm ppc x86 x86_64 {
 
 
 # zlib
-local zlibBaseURL = $(hpkgBaseURL) ;
 if $(TARGET_ARCH) in arm ppc x86 x86_64 {
 	if $(TARGET_ARCH) = arm {
-		HAIKU_ZLIB_FILE = zlib-1.2.7-arm-2012-11-21.zip ;
+		HAIKU_ZLIB_PACKAGE = zlib-1.2.7-arm-2012-11-21.zip ;
 	} else if $(TARGET_ARCH) = ppc {
-		HAIKU_ZLIB_FILE = zlib-1.2.7-ppc-gcc4-2012-10-30.zip ;
+		HAIKU_ZLIB_PACKAGE = zlib-1.2.7-ppc-gcc4-2012-10-30.zip ;
 	} else if $(TARGET_ARCH) = x86_64 {
-		HAIKU_ZLIB_FILE = zlib-1.2.7-x86_64-2012-11-18.zip ;
+		HAIKU_ZLIB_PACKAGE = zlib-1.2.7-x86_64-2012-11-18.zip ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		HAIKU_ZLIB_FILE = zlib-1.2.7-x86-gcc4-2012-10-30.zip ;
+		HAIKU_ZLIB_PACKAGE = zlib-1.2.7-x86-gcc4-2012-10-30.zip ;
 	} else {
-		HAIKU_ZLIB_FILE = zlib-1.2.8-2-x86_gcc2.hpkg ;
-		HAIKU_ZLIB_DEVEL_FILE = zlib_devel-1.2.8-2-x86_gcc2.hpkg ;
+		HAIKU_ZLIB_PACKAGE = zlib-1.2.8-2-x86_gcc2.hpkg ;
+		HAIKU_ZLIB_DEVEL_PACKAGE = zlib_devel-1.2.8-2-x86_gcc2.hpkg ;
 	}
-	HAIKU_ZLIB_SOURCE_FILE = zlib_source-1.2.8-2-source.hpkg ;
+	HAIKU_ZLIB_SOURCE_PACKAGE = zlib_source-1.2.8-2-source.hpkg ;
+
+ 	HAIKU_ZLIB_URL = $(hpkgBaseURL)/$(HAIKU_ZLIB_PACKAGE) ;
+ 	HAIKU_ZLIB_DEVEL_URL = $(hpkgBaseURL)/$(HAIKU_ZLIB_DEVEL_PACKAGE) ;
+ 	HAIKU_ZLIB_SOURCE_URL = $(hpkgBaseURL)/$(HAIKU_ZLIB_SOURCE_PACKAGE) ;
 
 	ExtractBuildFeatureArchives zlib :
-		file: base $(zlibBaseURL)/$(HAIKU_ZLIB_FILE)
+		file: base $(HAIKU_ZLIB_URL)
 			runtime: lib
-		file: devel $(zlibBaseURL)/$(HAIKU_ZLIB_DEVEL_FILE)
+		file: devel $(HAIKU_ZLIB_DEVEL_URL)
 			depends: base
 			library: develop/lib/libz.so
 			headers: develop/headers
-		file: source $(zlibBaseURL)/$(HAIKU_ZLIB_SOURCE_FILE)
+		file: source $(HAIKU_ZLIB_SOURCE_URL)
 			sources: develop/sources/zlib-1.2.8-2/source
 		;
 
