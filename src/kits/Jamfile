@@ -41,7 +41,7 @@ SharedLibrary libbe.so : :
 	libagg.a
 
 	libroot.so	# make sure it links against our libroot.so
-	$(TARGET_LIBSTDC++) $(HAIKU_ICU_LIBS)
+	$(TARGET_LIBSTDC++) [ BuildFeatureAttribute icu : libraries ]
 ;
 
 # Build libbe_test.so

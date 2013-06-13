@@ -61,83 +61,42 @@ if $(HAIKU_BUILD_FEATURE_SSL) {
 # ICU
 
 # Note ICU isn't actually optional, but is still an external package
-HAIKU_ICU_GCC_2_PACKAGE = icu-4.8.1.1-2-x86_gcc2.hpkg ;
-HAIKU_ICU_GCC_4_PACKAGE = icu-4.8.1.1-r1a4-x86-gcc4-2012-08-29.zip ;
-	# TODO: Make hpkg!
-HAIKU_ICU_PPC_PACKAGE = icu-4.8.1-ppc-2011-08-20.zip ;
-HAIKU_ICU_ARM_PACKAGE = icu-4.8.1.1-arm-2012-11-21.zip ;
-HAIKU_ICU_X86_64_PACKAGE = icu-4.8.1.1-x86_64-2012-07-30.zip ;
-
 if $(TARGET_ARCH) in arm ppc x86 x86_64 {
-	local icu_package ;
 	if $(TARGET_ARCH) = ppc {
-		icu_package = $(HAIKU_ICU_PPC_PACKAGE) ;
+		HAIKU_ICU_PACKAGE = icu-4.8.1-ppc-2011-08-20.zip ;
 		HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1-ppc-2011-12-19.zip ;
 	} else if $(TARGET_ARCH) = arm {
-		icu_package = $(HAIKU_ICU_ARM_PACKAGE) ;
+		HAIKU_ICU_PACKAGE = icu-4.8.1.1-arm-2012-11-21.zip ;
 		HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1.1-arm-2012-11-21.zip ;
 	} else if $(TARGET_ARCH) = x86_64 {
-		icu_package = $(HAIKU_ICU_X86_64_PACKAGE) ;
+		HAIKU_ICU_PACKAGE = icu-4.8.1.1-x86_64-2012-07-30.zip ;
 		HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1.1-x86_64-2012-07-30.zip ;
 	} else if $(HAIKU_GCC_VERSION[1]) = 2 {
-		icu_package = $(HAIKU_ICU_GCC_2_PACKAGE) ;
-		HAIKU_ICU_DEVEL_PACKAGE = icu_devel-4.8.1.1-2-x86_gcc2.hpkg ;
+		HAIKU_ICU_PACKAGE = icu-4.8.1.1-3-x86_gcc2.hpkg ;
+		HAIKU_ICU_DEVEL_PACKAGE = icu_devel-4.8.1.1-3-x86_gcc2.hpkg ;
 	} else {
-		icu_package = $(HAIKU_ICU_GCC_4_PACKAGE) ;
+		HAIKU_ICU_PACKAGE = icu-4.8.1.1-r1a4-x86-gcc4-2012-08-29.zip ;
 		HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1.1-x86-gcc4-2011-12-20.zip ;
 	}
-	local packageFile = [ DownloadFile $(icu_package)
-		: $(hpkgBaseURL)/$(icu_package) ] ;
 
-	# zip file and output directory
-	HAIKU_ICU_PACKAGE_FILE = $(packageFile) ;
-	HAIKU_ICU_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
-		$(icu_package:B) ] ;
+	HAIKU_ICU_URL = $(hpkgBaseURL)/$(HAIKU_ICU_PACKAGE) ;
+	HAIKU_ICU_DEVEL_URL = $(hpkgBaseURL)/$(HAIKU_ICU_DEVEL_PACKAGE) ;
 
-	# extract libraries
-	if $(TARGET_ARCH) = ppc {
-		HAIKU_ICU_LIBS = [ ExtractArchive $(HAIKU_ICU_DIR)
-			:
-			libicudata.so.48.1
-			libicui18n.so.48.1
-			libicuio.so.48.1
-			libicule.so.48.1
-			libiculx.so.48.1
-			libicutu.so.48.1
-			libicuuc.so.48.1
-			: $(packageFile)
-			: extracted-icu
-		] ;
-	} else {
-		HAIKU_ICU_LIBS = [ ExtractArchive $(HAIKU_ICU_DIR)
-			:
-			develop/lib/libicudata.so.48.1.1
-			develop/lib/libicui18n.so.48.1.1
-			develop/lib/libicuio.so.48.1.1
-			develop/lib/libicule.so.48.1.1
-			develop/lib/libiculx.so.48.1.1
-			develop/lib/libicutu.so.48.1.1
-			develop/lib/libicuuc.so.48.1.1
-			: $(packageFile)
-			: extracted-icu
-		] ;
-	}
-
-	# zip file and output directory
-	HAIKU_ICU_DEVEL_ZIP_FILE = [ DownloadFile $(HAIKU_ICU_DEVEL_PACKAGE)
-			: $(hpkgBaseURL)/$(HAIKU_ICU_DEVEL_PACKAGE) ] ;
-	HAIKU_ICU_DEVEL_DIR = $(HAIKU_ICU_DIR) ;
-
-	# extract headers
-	HAIKU_ICU_HEADERS_DEPENDENCY = [ ExtractArchive
-		$(HAIKU_ICU_DEVEL_DIR:G=icu_devel)
-			# We need a grist here, so it's a different target than the one for the
-			# main package, even though it's the same directory.
-		: develop/headers : $(HAIKU_ICU_DEVEL_ZIP_FILE)
-		: extracted-icu-devel ] ;
-
-	HAIKU_ICU_HEADERS
-		= [ FDirName $(HAIKU_ICU_DEVEL_DIR) develop headers ] ;
+	ExtractBuildFeatureArchives icu :
+		file: base $(HAIKU_ICU_URL)
+			runtime: lib
+		file: devel $(HAIKU_ICU_DEVEL_URL)
+			depends: base
+			libraries:
+				develop/lib/libicudata.so
+				develop/lib/libicui18n.so
+				develop/lib/libicuio.so
+				develop/lib/libicule.so
+				develop/lib/libiculx.so
+				develop/lib/libicutu.so
+				develop/lib/libicuuc.so
+			headers: develop/headers
+		;
 
 	EnableBuildFeatures icu ;
 } else  {
