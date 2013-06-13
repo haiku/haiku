@@ -60,6 +60,9 @@ NFS4Object::HandleErrors(uint32& attempt, uint32 nfs4Error, RPC::Server* server,
 
 		// resource is locked, we need to wait
 		case NFS4ERR_DENIED:
+			if (cookie == NULL)
+				return false;
+
 			if (sequence != NULL)
 				fFileSystem->OpenOwnerSequenceUnlock(*sequence);
 
