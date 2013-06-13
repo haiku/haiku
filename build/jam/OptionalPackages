@@ -67,6 +67,8 @@
 #	LibIconv				- text encoding conversion library
 #	LibLayout				- GCC2 package needed by some BeOS apps to compile
 #	Libmng					- mng support library
+#	Libpng					- Portable Network Graphics library
+#	Libpng-devel			- Libpng development files
 #	LibSolv					- package dependency solver library
 #	LibXML2					- the XML support library
 #	LibXSLT					- xslt library and utility
@@ -1245,6 +1247,26 @@ if [ IsOptionalHaikuImagePackageAdded Libmng ] {
 	} else {
 		InstallOptionalHaikuImagePackage
 			$(baseURL)/lib/libmng-1.0.10-r1a4-x86-gcc2-2012-08-28.zip ;
+	}
+}
+
+
+# Libpng
+if [ IsOptionalHaikuImagePackageAdded Libpng ] {
+	if $(TARGET_ARCH) in arm ppc x86 x86_64 {
+		InstallOptionalHaikuImagePackage $(HAIKU_LIBPNG_URL) : system ;
+	} else {
+		Echo "No optional package Libpng available for $(TARGET_ARCH)" ;
+	}
+}
+
+
+# Libpng-devel
+if [ IsOptionalHaikuImagePackageAdded Libpng-devel ] {
+	if $(TARGET_ARCH) in arm ppc x86 x86_64 {
+		InstallOptionalHaikuImagePackage $(HAIKU_LIBPNG_DEVEL_URL) : system ;
+	} else {
+		Echo "No optional package Libpng-devel available for $(TARGET_ARCH)" ;
 	}
 }
 

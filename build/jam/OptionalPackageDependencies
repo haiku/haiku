@@ -11,8 +11,10 @@ OptionalPackageDependencies Caya : Expat ;
 OptionalPackageDependencies CDRecord : GetTextLibintl LibIconv ;
 OptionalPackageDependencies Curl : OpenSSL ;
 OptionalPackageDependencies DevelopmentBase : CDRecord DevelopmentMin Yasm ;
-OptionalPackageDependencies Development
-	: DevelopmentBase FFMpeg-devel FreeType-devel GLU-devel Perl Zlib-devel ;
+OptionalPackageDependencies Development :
+	DevelopmentBase FFMpeg-devel FreeType-devel GLU-devel Libpng-devel Perl
+	Zlib-devel
+	;
 OptionalPackageDependencies DevelopmentPowerPC : DevelopmentMin ;
 OptionalPackageDependencies GetText : GetTextLibintl ;
 OptionalPackageDependencies GetTextLibintl : LibIconv ;
@@ -46,4 +48,4 @@ OptionalPackageDependencies XZ-Utils : Tar ;
 OptionalPackageDependencies Zlib-devel : Zlib ;
 
 OptionalPackageDependencies MandatoryPackages
-	: Bzip Ctags FFMpeg FreeType GLU Grep ICU LibSolv Mesa Sed Tar Zlib ;
+	: Bzip Ctags FFMpeg FreeType GLU Grep ICU Libpng LibSolv Mesa Sed Tar Zlib ;
