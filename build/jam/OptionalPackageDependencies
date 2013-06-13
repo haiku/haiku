@@ -12,7 +12,7 @@ OptionalPackageDependencies CDRecord : GetTextLibintl LibIconv ;
 OptionalPackageDependencies Curl : OpenSSL ;
 OptionalPackageDependencies DevelopmentBase : CDRecord DevelopmentMin Yasm ;
 OptionalPackageDependencies Development
-	: DevelopmentBase GLU-devel Perl Zlib-devel ;
+	: DevelopmentBase FFMpeg-devel GLU-devel Perl Zlib-devel ;
 OptionalPackageDependencies DevelopmentPowerPC : DevelopmentMin ;
 OptionalPackageDependencies GetText : GetTextLibintl ;
 OptionalPackageDependencies GetTextLibintl : LibIconv ;
@@ -46,4 +46,4 @@ OptionalPackageDependencies XZ-Utils : Tar ;
 OptionalPackageDependencies Zlib-devel : Zlib ;
 
 OptionalPackageDependencies MandatoryPackages
-	: Bzip Ctags GLU Grep ICU LibSolv Mesa Sed Tar Zlib ;
+	: Bzip Ctags FFMpeg GLU Grep ICU LibSolv Mesa Sed Tar Zlib ;

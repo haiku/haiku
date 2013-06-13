@@ -2,10 +2,11 @@ SubDir HAIKU_TOP src add-ons media media-add-ons dvb ;
 
 UsePrivateHeaders drivers ;
 
-UseHeaders [ FDirName $(HAIKU_FFMPEG_HEADERS) ] ;
-UseHeaders [ FDirName $(HAIKU_FFMPEG_HEADERS) libavcodec ] ;
-UseHeaders [ FDirName $(HAIKU_FFMPEG_HEADERS) libavformat ] ;
-UseHeaders [ FDirName $(HAIKU_FFMPEG_HEADERS) libavutil ] ;
+local ffmpegHeaders = [ BuildFeatureAttribute ffmpeg : headers : path ] ;
+UseHeaders $(ffmpegHeaders) ;
+UseHeaders [ FDirName $(ffmpegHeaders) libavcodec ] ;
+UseHeaders [ FDirName $(ffmpegHeaders) libavformat ] ;
+UseHeaders [ FDirName $(ffmpegHeaders) libavutil ] ;
 
 
 Addon dvb.media_addon :
@@ -21,5 +22,5 @@ Addon dvb.media_addon :
 	: be media $(TARGET_LIBSUPC++)
 ;
 
-Includes [ FGristFiles MediaFormat.cpp ] : $(HAIKU_FFMPEG_HEADERS_DEPENDENCY) ;
-
+Includes [ FGristFiles MediaFormat.cpp ]
+	: [ BuildFeatureAttribute ffmpeg : headers ] ;
