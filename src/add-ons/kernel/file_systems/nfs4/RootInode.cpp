@@ -110,6 +110,8 @@ RootInode::_UpdateInfo(bool force)
 
 		if (ioSize == LONGLONG_MAX)
 			ioSize = 32768;
+		if (ioSize == 0)
+			ioSize = 4096;
 		fInfoCache.io_size = ioSize;
 		fInfoCache.block_size = ioSize;
 		fIOSize = ioSize;
