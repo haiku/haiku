@@ -506,7 +506,8 @@
 	\struct escapement_delta
 	\ingroup interface
 	\ingroup libbe
-	\brief The amount of horizontal space surrounding a character.
+	\brief A struct that allows you to specify extra horizontal space to surround
+		each character with.
 
 	Escapements need to be multiplied by the font size to get the correct
 	value for the font.
@@ -518,15 +519,15 @@
 /*!
 	\var escapement_delta::nonspace
 
-	The amount of space surrounding a character with a visible glyph.
+	The amount of horizontal space to surround a visible glyph character with.
 */
 
 
 /*!
 	\var escapement_delta::space
 
-	The amount of space surrounding a whitespace character, for example
-	\c B_TAB and \c B_SPACE.
+	The amount of horizontal space to surround a whitespace character with, for
+	example \c B_TAB or \c B_SPACE.
 */
 
 
@@ -1253,14 +1254,14 @@
 	\fn void BFont::GetEscapements(const char charArray[], int32 numChars,
 		escapement_delta *delta, float escapementArray[]) const
 	\brief Determines the escapements for each char in \a charArray and writes
-		the result in \a escapementArray with consideration to the provided
-		escapement \a delta.
+		the result in \a escapementArray with consideration to the horizontal
+		space provided by the escapement \a delta.
 
 	The escapement_delta structure contains the following values:
-	- \c nonspace The amount of space surrounding a character with a visible
-		glyph.
-	- \c space The amount of space surrounding a whitespace character, for
-		example \c B_TAB and \c B_SPACE.
+	- \c nonspace The amount of horizontal space to surround a visible glyph
+		character with.
+	- \c space The amount of horizontal space to surround a whitespace character
+		with, for example \c B_TAB or \c B_SPACE.
 
 	\param charArray The source character array.
 	\param numChars The number of characters to consider in \a charArray.
@@ -1274,13 +1275,14 @@
 		escapement_delta *delta, BPoint escapementArray[]) const
 	\brief Determines the escapements for each char in \a charArray and writes
 		the result in \a escapementArray as an array of BPoint objects
-		with consideration to the provided escapement \a delta.
+		with consideration to the horizontal space provided by the escapement
+		\a delta.
 
 	The escapement_delta structure contains the following values:
-	- \c nonspace The amount of space surrounding a character with a visible
-		glyph.
-	- \c space The amount of space surrounding a whitespace character, for
-		example \c B_TAB and \c B_SPACE.
+	- \c nonspace The amount of horizontal space to surround a visible glyph
+		character with.
+	- \c space The amount of horizontal space to surround a whitespace character
+		with, for example \c B_TAB or \c B_SPACE.
 
 	\param charArray The source character array.
 	\param numChars The number of characters to consider in \a charArray.
@@ -1296,14 +1298,14 @@
 		BPoint offsetArray[]) const
 	\brief Determines the escapements for each char in \a charArray and writes
 		the result in \a escapementArray as an array of BPoint objects
-		with consideration to the provided escapement \a delta
-		and writes offsets to \a offsetArray.
+		with consideration to the horizontal space provided by the escapement
+		\a delta and writes the offsets to \a offsetArray.
 
 	The escapement_delta structure contains the following values:
-	- \c nonspace The amount of space surrounding a character with a visible
-		glyph.
-	- \c space The amount of space surrounding a whitespace character, for
-		example \c B_TAB and \c B_SPACE.
+	- \c nonspace The amount of horizontal space to surround a visible glyph
+		character with.
+	- \c space The amount of horizontal space to surround a whitespace character
+		with, for example \c B_TAB or \c B_SPACE.
 
 	\param charArray The source character array.
 	\param numChars The number of characters to consider in \a charArray.
@@ -1370,9 +1372,9 @@
 	\fn void BFont::GetBoundingBoxesAsString(const char charArray[],
 		int32 numChars, font_metric_mode mode, escapement_delta *delta,
 		BRect boundingBoxArray[]) const
-	\brief Writes an array of BRect objects to \a boundingBoxArray
-		representing the bounding rectangles of each character in
-		\a charArray with consideration to the provided escapement
+	\brief Writes an array of BRect objects to \a boundingBoxArray representing
+		the bounding rectangles of each character in \a charArray with
+		consideration to the horizontal space provided by the escapement
 		\a delta.
 
 	Each BRect object corresponds to the glyph of one character.
@@ -1381,15 +1383,15 @@
 	- \c B_SCREEN_METRIC The bounding boxes should use the screen metric.
 	- \c B_PRINTING_METRIC The bounding boxes should use the print metric.
 
-	Escapement deltas are applied as part of the bounding box calculations.
-	This lets you specify a character spacing is looser or tighter than
-	normal.
+	The provided escapement \a delta is applied as part of the bounding box
+	calculations. This lets you specify a character spacing is looser or
+	tighter than normal.
 
 	The escapement_delta structure contains the following values:
-	- \c nonspace The amount of space surrounding a character with a visible
-		glyph.
-	- \c space The amount of space surrounding a whitespace character, for
-		example \c B_TAB and \c B_SPACE.
+	- \c nonspace The amount of horizontal space to surround a visible glyph
+		character with.
+	- \c space The amount of horizontal space to surround a whitespace character
+		with, for example \c B_TAB or \c B_SPACE.
 
 	\param charArray The source character array.
 	\param numChars The number of characters to consider in \a charArray.
@@ -1403,10 +1405,10 @@
 	\fn void BFont::GetBoundingBoxesForStrings(const char *stringArray[],
 		int32 numStrings, font_metric_mode mode, escapement_delta deltas[],
 		BRect boundingBoxArray[]) const
-	\brief Writes an array of BRect objects to \a boundingBoxArray
-		representing the bounding rectangles of each string in
-		\a stringArray with consideration to the provided escapement
-		\a delta.
+	\brief Writes an array of BRect objects to \a boundingBoxArray representing
+		the bounding rectangles of each string in \a stringArray with
+		consideration to the horizontal space provided by the escapement
+		\a deltas.
 
 	Each BRect object corresponds to the bounding box of the entire string.
 
@@ -1414,15 +1416,15 @@
 	- \c B_SCREEN_METRIC The bounding boxes should use the screen metric.
 	- \c B_PRINTING_METRIC The bounding boxes should use the print metric.
 
-	Escapement deltas are applied as part of the bounding box calculations.
-	This lets you specify a character spacing is looser or tighter than
-	normal.
+	The provided escapement \a deltas are applied as part of the bounding box
+	calculations. This lets you specify a character spacing is looser or tighter
+	than normal.
 
-	The escapement_delta structures should contain the following values:
-	- \c nonspace The amount of space surrounding a character with a visible
-		glyph.
-	- \c space The amount of space surrounding a whitespace character, for
-		example \c B_TAB and \c B_SPACE.
+	The escapement_delta structure contains the following values:
+	- \c nonspace The amount of horizontal space to surround a visible glyph
+		character with.
+	- \c space The amount of horizontal space to surround a whitespace character
+		with, for example \c B_TAB or \c B_SPACE.
 
 	\param stringArray The source string array.
 	\param numStrings The number of strings to consider in \a stringArray.
