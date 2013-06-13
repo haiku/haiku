@@ -623,32 +623,27 @@ if $(TARGET_ARCH) != x86 {
 	Echo "Libsolv not available for $(TARGET_ARCH)." ;
 } else if $(HAIKU_GCC_VERSION[1]) = 2 {
 	HAIKU_LIBSOLV_PACKAGE
-		= libsolv-0.3.0_haiku_2013_05_30-1-x86_gcc2.hpkg ;
+		= libsolv-0.3.0_haiku_2013_05_30-2-x86_gcc2.hpkg ;
+	HAIKU_LIBSOLV_DEVEL_PACKAGE
+		= libsolv_devel-0.3.0_haiku_2013_05_30-2-x86_gcc2.hpkg ;
 } else {
 	Echo "Libsolv not available for gcc4." ;
 }
 
 if $(HAIKU_LIBSOLV_PACKAGE) {
-	# download package
-	HAIKU_LIBSOLV_PACKAGE_FILE = [ DownloadFile $(HAIKU_LIBSOLV_PACKAGE)
-			: $(hpkgBaseURL)/$(HAIKU_LIBSOLV_PACKAGE) ] ;
-	HAIKU_LIBSOLV_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
-		$(HAIKU_LIBSOLV_PACKAGE:B) ] ;
+ 	HAIKU_LIBSOLV_URL = $(hpkgBaseURL)/$(HAIKU_LIBSOLV_PACKAGE) ;
+ 	HAIKU_LIBSOLV_DEVEL_URL = $(hpkgBaseURL)/$(HAIKU_LIBSOLV_DEVEL_PACKAGE) ;
 
-	# extract headers and libraries
-	HAIKU_LIBSOLV_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_LIBSOLV_DIR)
-		: develop/headers/ : $(HAIKU_LIBSOLV_PACKAGE_FILE) : extracted-libsolv
-	] ;
+	ExtractBuildFeatureArchives libsolv :
+		file: base $(HAIKU_LIBSOLV_URL)
+			runtime: lib
+		file: devel $(HAIKU_LIBSOLV_DEVEL_URL)
+			depends: base
+			libraries: develop/lib/libsolv.so develop/lib/libsolvext.so
+			headers: develop/headers
+		;
 
-	HAIKU_LIBSOLV_LIBS = [ ExtractArchive $(HAIKU_LIBSOLV_DIR)
-		:
-		develop/lib/libsolv.so
-		develop/lib/libsolvext.so
-		: $(HAIKU_LIBSOLV_PACKAGE_FILE)
-		: extracted-libsolv
-	] ;
-
-	HAIKU_LIBSOLV_HEADERS = [ FDirName $(HAIKU_LIBSOLV_DIR) develop/headers ] ;
+	EnableBuildFeatures libsolv ;
 }
 
 

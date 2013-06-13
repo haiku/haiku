@@ -1295,11 +1295,11 @@ if [ IsOptionalHaikuImagePackageAdded Libpng-devel ] {
 
 # LibSolv
 if [ IsOptionalHaikuImagePackageAdded LibSolv ] {
-	if ! $(HAIKU_LIBSOLV_PACKAGE) {
+	if ! $(HAIKU_LIBSOLV_URL) {
 		Echo "No optional package LibSolv available for $(TARGET_ARCH)" ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			$(hpkgBaseURL)/$(HAIKU_LIBSOLV_PACKAGE)
+			$(HAIKU_LIBSOLV_URL)
 			: system ;
 	}
 }

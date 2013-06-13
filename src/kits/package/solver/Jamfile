@@ -2,8 +2,10 @@ SubDir HAIKU_TOP src kits package solver ;
 
 # add-on implementing a libsolv based BSolver
 
-SubDirSysHdrs $(HAIKU_LIBSOLV_HEADERS) ;
-SubDirHdrs $(HAIKU_LIBSOLV_HEADERS)/solv ;
+UseBuildFeatureHeaders libsolv ;
+
+local libsolvHeaders = [ BuildFeatureAttribute libsolv : headers : path ] ;
+UseHeaders [ FDirName $(libsolvHeaders) solv ] ;
 
 UsePrivateHeaders shared ;
 
@@ -12,9 +14,11 @@ SharedLibrary libpackage-add-on-libsolv.so
 	:
 	LibsolvSolver.cpp
 	:
-	package $(HAIKU_LIBSOLV_LIBS) be $(TARGET_LIBSTDC++)
+	package
+	[ BuildFeatureAttribute libsolv : libraries ]
+	be $(TARGET_LIBSTDC++)
 ;
 
 
 Includes [ FGristFiles LibsolvSolver.cpp ]
-	: $(HAIKU_LIBSOLV_HEADERS_DEPENDENCY) ;
+	: [ BuildFeatureAttribute libsolv : headers ] ;
