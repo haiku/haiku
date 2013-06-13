@@ -810,11 +810,10 @@ if $(TARGET_ARCH) in arm ppc x86 x86_64 {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		HAIKU_ZLIB_FILE = zlib-1.2.7-x86-gcc4-2012-10-30.zip ;
 	} else {
-		HAIKU_ZLIB_FILE = zlib-1.2.8-1-x86_gcc2.hpkg ;
-		HAIKU_ZLIB_DEVEL_FILE = zlib_devel-1.2.8-1-x86_gcc2.hpkg ;
+		HAIKU_ZLIB_FILE = zlib-1.2.8-2-x86_gcc2.hpkg ;
+		HAIKU_ZLIB_DEVEL_FILE = zlib_devel-1.2.8-2-x86_gcc2.hpkg ;
 	}
-	HAIKU_ZLIB_SOURCE_FILE = zlib_source-1.2.8-1-x86_gcc2.hpkg ;
-		# TODO: Wrong architecture! Should be "any".
+	HAIKU_ZLIB_SOURCE_FILE = zlib_source-1.2.8-2-source.hpkg ;
 
 	ExtractBuildFeatureArchives zlib :
 		file: base $(zlibBaseURL)/$(HAIKU_ZLIB_FILE)
@@ -824,8 +823,7 @@ if $(TARGET_ARCH) in arm ppc x86 x86_64 {
 			library: develop/lib/libz.so
 			headers: develop/headers
 		file: source $(zlibBaseURL)/$(HAIKU_ZLIB_SOURCE_FILE)
-			sources: source/zlib-1.2.8
-		;
+			sources: develop/sources/zlib-1.2.8-2/source
 
 	EnableBuildFeatures zlib ;
 } else {
