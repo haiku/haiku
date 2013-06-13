@@ -835,7 +835,7 @@ if [ IsOptionalHaikuImagePackageAdded Expat ] {
 				: : cdPackage ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/expat-2.0.1-5-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/expat-2.0.1-6-x86_gcc2.hpkg ;
 		}
 	} else if $(TARGET_ARCH) = x86_64 {
 		InstallOptionalHaikuImagePackage
