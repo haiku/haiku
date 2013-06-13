@@ -550,44 +550,31 @@ if $(TARGET_ARCH) in arm ppc x86 x86_64 {
 local jpegBaseURL = $(baseURL)/lib ;
 if $(TARGET_ARCH) in arm ppc x86 x86_64 {
 	if $(TARGET_ARCH) = arm {
-		HAIKU_JPEG_FILE = jpeg-8d-arm-2012-11-21.zip ;
+		HAIKU_JPEG_PACKAGE = jpeg-8d-arm-2012-11-21.zip ;
 	} else if $(TARGET_ARCH) = ppc {
-		HAIKU_JPEG_FILE = jpeg-8d-ppc-gcc4-2012-08-27.zip ;
+		HAIKU_JPEG_PACKAGE = jpeg-8d-ppc-gcc4-2012-08-27.zip ;
 	} else if $(TARGET_ARCH) = x86_64 {
-		HAIKU_JPEG_FILE = jpeg-8d-x86_64-2012-11-18.zip ;
+		HAIKU_JPEG_PACKAGE = jpeg-8d-x86_64-2012-11-18.zip ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		HAIKU_JPEG_FILE = jpeg-8d-x86-gcc4-2012-08-23.zip ;
+		HAIKU_JPEG_PACKAGE = jpeg-8d-x86-gcc4-2012-08-23.zip ;
 	} else {
-		HAIKU_JPEG_FILE = jpeg-8d-x86-gcc2-2012-08-23.zip ;
+		HAIKU_JPEG_PACKAGE = jpeg-9-2-x86_gcc2.hpkg ;
+		HAIKU_JPEG_DEVEL_PACKAGE = jpeg_devel-9-2-x86_gcc2.hpkg ;
 	}
 
-	local jpegZipFile = [ DownloadFile $(HAIKU_JPEG_FILE)
-		: $(jpegBaseURL)/$(HAIKU_JPEG_FILE) ] ;
+ 	HAIKU_JPEG_URL = $(hpkgBaseURL)/$(HAIKU_JPEG_PACKAGE) ;
+ 	HAIKU_JPEG_DEVEL_URL = $(hpkgBaseURL)/$(HAIKU_JPEG_DEVEL_PACKAGE) ;
 
-	HAIKU_JPEG_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
-		$(HAIKU_JPEG_FILE:B) ] ;
+	ExtractBuildFeatureArchives jpeg :
+		file: base $(HAIKU_JPEG_URL)
+			runtime: lib
+		file: devel $(HAIKU_JPEG_DEVEL_URL)
+			depends: base
+			library: develop/lib/libjpeg.so
+			headers: develop/headers
+		;
 
-	HAIKU_JPEG_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_JPEG_DIR)
-		: common/include : $(jpegZipFile)
-		: extracted-jpeg ] ;
-
-	HAIKU_JPEG_LIB = [ ExtractArchive $(HAIKU_JPEG_DIR)
-		:
-		common/lib/libjpeg.so
-		: $(jpegZipFile)
-		: extracted-jpeg ] ;
-	HAIKU_JPEG_CURRENT_LIB = [ ExtractArchive $(HAIKU_JPEG_DIR)
-		:
-		common/lib/libjpeg.so.8.4.0
-		: $(jpegZipFile)
-		: extracted-jpeg ] ;
-	Depends $(HAIKU_JPEG_LIB) $(HAIKU_JPEG_CURRENT_LIB) : $(HAIKU_JPEG_HEADERS_DEPENDENCY) ;
-
-	HAIKU_JPEG_CURRENT_LINK = libjpeg.so.8 ;
-
-	HAIKU_JPEG_HEADERS = [ FDirName $(HAIKU_JPEG_DIR) common include ] ;
-
-	EnableBuildFeatures libjpeg ;
+	EnableBuildFeatures jpeg ;
 } else {
 	Echo "jpeg support not available on $(TARGET_ARCH)" ;
 }

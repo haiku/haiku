@@ -71,8 +71,6 @@ AddHeaderDirectoryToPackage compatibility gnu : gnu ;
 AddHeaderDirectoryToPackage libs termcap : 3rdparty ;
 AddHeaderDirectoryToPackage libs tiff : 3rdparty ;
 
-CopyDirectoryToPackage develop headers : $(HAIKU_JPEG_HEADERS_DEPENDENCY)
-	: 3rdparty : : isTarget ;
 # cpp headers
 if $(HAIKU_GCC_VERSION[1]) = 2 {
 	# GCC 2 only -- for GCC 4 they come with the DevelopmentBase package

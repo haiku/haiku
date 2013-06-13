@@ -60,6 +60,8 @@
 #	Groff					- text formatter used for man pages
 #	HGrep					- header grep tool
 #	ICU-devel				- the headers and lib-links for ICU (for development)
+#	Jpeg					- JPEG image compression library and tools
+#	Jpeg-devel				- the Jpeg development files
 #	KeymapSwitcher			- Easy to use keymap switcher
 #	LGrep					- Library Grep tool
 #	LibEdit					- A BSD licensed replacement for GNU readline
@@ -1128,6 +1130,26 @@ if [ IsOptionalHaikuImagePackageAdded ICU-devel ] {
 	InstallOptionalHaikuImagePackage
 		$(hpkgBaseURL)/$(HAIKU_ICU_DEVEL_PACKAGE)
 		: system ;
+}
+
+
+# Jpeg
+if [ IsOptionalHaikuImagePackageAdded Jpeg ] {
+	if $(TARGET_ARCH) in arm ppc x86 x86_64 {
+		InstallOptionalHaikuImagePackage $(HAIKU_JPEG_URL) : system ;
+	} else {
+		Echo "No optional package Jpeg available for $(TARGET_ARCH)" ;
+	}
+}
+
+
+# Jpeg-devel
+if [ IsOptionalHaikuImagePackageAdded Jpeg-devel ] {
+	if $(TARGET_ARCH) in arm ppc x86 x86_64 {
+		InstallOptionalHaikuImagePackage $(HAIKU_JPEG_DEVEL_URL) : system ;
+	} else {
+		Echo "No optional package Jpeg-devel available for $(TARGET_ARCH)" ;
+	}
 }
 
 

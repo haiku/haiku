@@ -102,19 +102,6 @@ SYSTEM_LIBS_ALIASES =
 	libnetapi.so
 ;
 
-OPTIONAL_LIBS_ALIASES =
-	libjpeg.so
-	libz.so
-;
-
-# TODO: Remove the following symlinks when the libraries have been packaged
-# properly!
-# libjpeg.so links to the current libjpeg
-AddSymlinkToPackage lib : $(HAIKU_JPEG_CURRENT_LIB:BS)
-	: $(HAIKU_JPEG_CURRENT_LINK) : : true ;
-AddSymlinkToPackage lib : $(HAIKU_JPEG_CURRENT_LINK)
-	: libjpeg.so : : true ;
-
 # TODO: Remove when the packages have been rebuilt!
 AddSymlinkToPackage lib : libbe.so : liblocale.so ;
 

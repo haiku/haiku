@@ -76,7 +76,6 @@ SYSTEM_LIBS = [ FFilterByBuildFeatures
 	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
 ] ;
 PRIVATE_SYSTEM_LIBS = [ FFilterByBuildFeatures
-	$(HAIKU_JPEG_CURRENT_LIB)
 	libalm.so
 	libfluidsynth.so
 	libilmimf.so
