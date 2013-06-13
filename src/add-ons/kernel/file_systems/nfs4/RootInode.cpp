@@ -205,10 +205,12 @@ RootInode::GetLocations(AttrValue** attrv)
 		result = reply.GetAttr(attrv, &count);
 		if (result != B_OK)
 			return result;
-		if (count < 1)
+		if (count < 1) {
+			delete *attrv;
 			return B_ERROR;
-		return B_OK;
+		}
 
+		return B_OK;
 	} while (true);
 
 	return B_OK;
