@@ -467,6 +467,87 @@
 	\ingroup interface
 	\ingroup libbe
 	\brief View base class.
+
+	A BView is a rectangular area within a window that responds to mouse clicks
+	and key presses, and acts as a surface for you to draw on.
+
+	Most Interface Kit classes, with the notable exception of BWindow inherit from
+	BView. Some of the time you might use a BView object as is, but most of the
+	time you subclass BView to do something unique.
+
+	To create a subclass of BView you generally override one or more of BView's
+	hook methods to respond to user events such as MouseDown() or FrameMoved().
+	By default a BView does nothing in it's hook methods unless otherwise stated,
+	it's up to you to define what happens. To override the look of a BView you
+	should override the Draw() or DrawAfterChildren() methods. See the section on
+	Hook Methods below for more details.
+
+	When a BView object is first created it has no parent or child views. How you
+	add a view to the view hierarchy depends on if you want to use a standard
+	view with a defined frame rectangle or to use the Layout APIs to position and
+	size your view instead.
+
+	If you create a standard view you need to add it to a window or another view
+	using the AddChild() method, if you create a layout view you need to add your
+	view to a layout using BLayout::AddView() or by adding it to a layout builder.
+
+	Views are not very interesting until they, or one of their parents, are
+	attached to a window as many of BView's methods depend on a connection to the
+	App Server to do their work. In order to prevent multiple views from altering
+	the window simultaneously though locking is required. To perform an action
+	while the window is locked you issue the following code:
+
+\code
+if (Window()->LockLooper()) {
+	...
+	Window()->UnlockLooper()
+}
+\endcode
+
+	Whenever App Server calls a hook method it automatically locks the BWindow for
+	you.
+
+	Only one view attached to a window is able to receive keyboard events at a
+	time. The view that is able to receive keyboard events such as KeyDown() is
+	called the "focus view". MakeFocus() gives or removes focus from a view.
+	Call IsFocus() to determine whether or not the view is the window's current
+	focus view.
+
+	When a view has focus an indicator should be drawn to inform the user. Typically
+	the view is surrounded by a blue rectangle to indicate that it is the window's
+	focus view. The color can be queried using the keyboard_navigation_color()
+	function in InterfaceDefs.h
+
+	Each view has it's own coordinate system with the origin point (0.0, 0.0)
+	located at the top left corner. You can convert a BPoint or BRect to or from
+	the view's coordinate system to the coordinate system of it's parent, or
+	of the screen's coordinate system. See the section on Coordinate Conversion
+	Methods for more details.
+
+	The Application Server clips a BView to the region where it's permitted to
+	draw which is never larger than the view's bound rectangle. A view can never
+	draw outside its bounds nor can it draw outside of the bounds rectangle of any
+	parent view.
+
+	You may limit the clipping region further by passing a BRegion object to
+	ConstrainClippingRegion(). You can obtain the current clipping region by
+	calling GetClippingRegion().
+
+	Each view has a ViewColor() that fills the frame rectangle before the
+	view does any drawing of its own. The default view color is white, you may
+	change the view color by calling SetViewColor(). A commonly used view color
+	is \c B_PANEL_BACKGROUND_COLOR which is a grey color used as the view color
+	of many Interface Kit classes. If you set the view color to
+	\c B_TRANSPARENT_COLOR then the Application Server won't erase the clipping
+	region of the view before updating, this should only be used if the view
+	erases itself by drawing on every pixel in the clipping region.
+
+	If you want to set the view color of a view to be the same as its parent you
+	need to set it within the AttachedToWindow() method of the view like so:
+
+\code
+SetViewColor(Parent()->ViewColor());
+\endcode
 */
 
 
