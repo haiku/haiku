@@ -824,6 +824,7 @@ if $(TARGET_ARCH) in arm ppc x86 x86_64 {
 			headers: develop/headers
 		file: source $(zlibBaseURL)/$(HAIKU_ZLIB_SOURCE_FILE)
 			sources: develop/sources/zlib-1.2.8-2/source
+		;
 
 	EnableBuildFeatures zlib ;
 } else {
