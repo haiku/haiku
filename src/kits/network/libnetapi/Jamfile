@@ -8,13 +8,14 @@ UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
 
 local sslSources ;
 local md5Sources ;
-if $(HAIKU_BUILD_FEATURE_OPENSSL_ENABLED) {
+if [ FIsBuildFeatureEnabled openssl ] {
 	SubDirC++Flags -DOPENSSL_ENABLED ;
-	SubDirSysHdrs $(HAIKU_OPENSSL_HEADERS) ;
+	UseBuildFeatureHeaders openssl ;
 	sslSources = SSL.cpp ;
 	md5Sources = ;
-	Includes [ FGristFiles $(sslSources) SecureSocket.cpp HttpAuthentication.cpp ]
-		: $(HAIKU_OPENSSL_HEADERS_DEPENDENCY) ;
+	Includes [ FGristFiles $(sslSources) SecureSocket.cpp
+			HttpAuthentication.cpp ]
+		: [ BuildFeatureAttribute openssl : headers ] ;
 		# Dependency needed to trigger downloading/unzipping the package before
 		# compiling the files.
 	SetupFeatureObjectsDir ssl ;
@@ -71,6 +72,7 @@ SharedLibrary libbnetapi.so :
 	UrlSynchronousRequest.cpp
 
 	:
-	be $(TARGET_NETWORK_LIBS) $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) $(HAIKU_OPENSSL_LIBS)
+	be $(TARGET_NETWORK_LIBS) $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
+	[ BuildFeatureAttribute openssl : libraries ]
 	libshared.a
 ;

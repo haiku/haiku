@@ -36,10 +36,11 @@ local sources =
 
 
 # use OpenSSL, if enabled
-if $(HAIKU_BUILD_FEATURE_OPENSSL_ENABLED) {
+if [ FIsBuildFeatureEnabled openssl ] {
 	SubDirC++Flags -DUSE_SSL ;
-	SubDirSysHdrs $(HAIKU_OPENSSL_HEADERS) ;
-	Includes [ FGristFiles $(sources) ] : $(HAIKU_OPENSSL_HEADERS_DEPENDENCY) ;
+	UseBuildFeatureHeaders openssl ;
+	Includes [ FGristFiles $(sources) ]
+		: [ BuildFeatureAttribute openssl : headers ] ;
 		# Dependency needed to trigger downloading/unzipping the package before
 		# compiling the files.
 	SetupFeatureObjectsDir ssl ;
@@ -56,7 +57,7 @@ SharedLibrary libmail.so :
 	$(TARGET_LIBSTDC++)
 	$(TARGET_NETWORK_LIBS)
 	$(TARGET_SELECT_UNAME_ETC_LIB)
-	$(HAIKU_OPENSSL_LIBS)
+	[ BuildFeatureAttribute openssl : libraries ]
 	$(HAIKU_LOCALE_LIBS)
 ;
 

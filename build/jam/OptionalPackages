@@ -1478,6 +1478,9 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSH ] {
 if [ IsOptionalHaikuImagePackageAdded OpenSSL ] {
 	if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
 		InstallOptionalHaikuImagePackage $(HAIKU_OPENSSL_URL) ;
+		if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ] {
+			InstallOptionalHaikuImagePackage $(HAIKU_OPENSSL_DEVEL_URL) ;
+		}
 	} else {
 		Echo "No optional package OpenSSL available for $(TARGET_ARCH)" ;
 	}
