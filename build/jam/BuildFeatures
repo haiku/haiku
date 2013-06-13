@@ -389,46 +389,31 @@ if $(TARGET_ARCH) = x86 {
 
 # Freetype
 local freetypeBaseURL = $(baseURL)/lib ;
-if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 || $(TARGET_ARCH) = arm {
+if $(TARGET_ARCH) in arm ppc x86 x86_64 {
 	if $(TARGET_ARCH) = arm {
-		HAIKU_FREETYPE_FILE = freetype-2.4.9-arm-2012-11-21.zip ;
+		HAIKU_FREETYPE_PACKAGE = freetype-2.4.9-arm-2012-11-21.zip ;
 	} else if $(TARGET_ARCH) = ppc {
-		HAIKU_FREETYPE_FILE = freetype-2.4.9-ppc-gcc4-2012-06-26.zip ;
+		HAIKU_FREETYPE_PACKAGE = freetype-2.4.9-ppc-gcc4-2012-06-26.zip ;
 	} else if $(TARGET_ARCH) = x86_64 {
-		HAIKU_FREETYPE_FILE = freetype-2.4.9-x86_64-2012-08-04.zip ;
+		HAIKU_FREETYPE_PACKAGE = freetype-2.4.9-x86_64-2012-08-04.zip ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		HAIKU_FREETYPE_FILE = freetype-2.4.9-r1a4-x86-gcc4-2012-09-02.zip ;
+		HAIKU_FREETYPE_PACKAGE = freetype-2.4.9-r1a4-x86-gcc4-2012-09-02.zip ;
 	} else {
-		HAIKU_FREETYPE_FILE = freetype-2.4.9-r1a4-x86-gcc2-2012-08-28.zip ;
+		HAIKU_FREETYPE_PACKAGE = freetype-2.4.9-1-x86_gcc2.hpkg ;
+		HAIKU_FREETYPE_DEVEL_PACKAGE = freetype_devel-2.4.9-1-x86_gcc2.hpkg ;
 	}
 
-	local freetypeZipFile = [ DownloadFile $(HAIKU_FREETYPE_FILE)
-		: $(freetypeBaseURL)/$(HAIKU_FREETYPE_FILE) ] ;
+	HAIKU_FREETYPE_URL = $(hpkgBaseURL)/$(HAIKU_FREETYPE_PACKAGE) ;
+	HAIKU_FREETYPE_DEVEL_URL = $(hpkgBaseURL)/$(HAIKU_FREETYPE_DEVEL_PACKAGE) ;
 
-	HAIKU_FREETYPE_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
-		$(HAIKU_FREETYPE_FILE:B) ] ;
-
-	HAIKU_FREETYPE_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_FREETYPE_DIR)
-		: develop/headers/3rdparty/freetype2 : $(freetypeZipFile)
-		: extracted-freetype ] ;
-
-	HAIKU_FREETYPE_LIB = [ ExtractArchive $(HAIKU_FREETYPE_DIR)
-		:
-		common/lib/libfreetype.so
-		: $(freetypeZipFile)
-		: extracted-freetype ] ;
-	HAIKU_FREETYPE_CURRENT_LIB = [ ExtractArchive $(HAIKU_FREETYPE_DIR)
-		:
-		common/lib/libfreetype.so.6.8.1
-		: $(freetypeZipFile)
-		: extracted-freetype ] ;
-	Depends $(HAIKU_FREETYPE_LIB) $(HAIKU_FREETYPE_CURRENT_LIB) : $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
-
-	HAIKU_FREETYPE_CURRENT_LINK = libfreetype.so.6 ;
-
-	HAIKU_FREETYPE_HEADERS = [ FDirName $(HAIKU_FREETYPE_DIR) develop
-		headers 3rdparty ] [ FDirName $(HAIKU_FREETYPE_DIR) develop
-		headers 3rdparty freetype2 ] ;
+	ExtractBuildFeatureArchives freetype :
+		file: base $(HAIKU_FREETYPE_URL)
+			runtime: lib
+		file: devel $(HAIKU_FREETYPE_DEVEL_URL)
+			depends: base
+			library: develop/lib/libfreetype.so
+			headers: develop/headers develop/headers/freetype2
+		;
 
 	EnableBuildFeatures freetype ;
 } else {

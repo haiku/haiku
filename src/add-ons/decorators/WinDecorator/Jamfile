@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons decorators WinDecorator ;
 
-UseHeaders $(HAIKU_FREETYPE_HEADERS) : true ;
+UseBuildFeatureHeaders freetype ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
@@ -10,9 +10,8 @@ UsePrivateHeaders kernel ;
 
 AddResources WinDecorator : resources.rdef ;
 
-#TODO: See #8716, hrev44313 for ft2build.h: No such file or directory
-#Includes [ FGristFiles WinDecorator.cpp ]
-#	: $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
+Includes [ FGristFiles WinDecorator.cpp ]
+	: [ BuildFeatureAttribute freetype : headers ] ;
 
 Addon WinDecorator :
 	WinDecorator.cpp

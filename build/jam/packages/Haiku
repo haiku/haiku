@@ -103,7 +103,6 @@ SYSTEM_LIBS_ALIASES =
 ;
 
 OPTIONAL_LIBS_ALIASES =
-	libfreetype.so
 	libjpeg.so
 	libpng.so
 	libz.so
@@ -111,12 +110,6 @@ OPTIONAL_LIBS_ALIASES =
 
 # TODO: Remove the following symlinks when the libraries have been packaged
 # properly!
-# libfreetype.so links to the current freetype lib
-AddSymlinkToPackage lib : $(HAIKU_FREETYPE_CURRENT_LIB:BS)
-	: $(HAIKU_FREETYPE_CURRENT_LINK) : : true ;
-AddSymlinkToPackage lib : $(HAIKU_FREETYPE_CURRENT_LINK)
-	: libfreetype.so : : true ;
-
 # libpng.so links to the current libpng
 AddSymlinkToPackage lib : $(HAIKU_LIBPNG_CURRENT_LIB:BS)
 	: $(HAIKU_LIBPNG_CURRENT_LINK) : : true ;

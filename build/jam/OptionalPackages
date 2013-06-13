@@ -46,6 +46,8 @@
 #	Fastdep					- fast dependency generator for C/C++ files
 #	FFMpeg					- audio/video library
 #	FFMpeg-devel			- FFMpeg development files
+#	FreeType				- A Free, High-Quality, and Portable Font Engine
+#	FreeType-devel			- FreeType development files
 #	friss					- RSS/ATOM/... feeds reader
 #	GetText					- a framework to help produce multi-lingual messages.
 #	GetTextLibintl			- GetText's libintl
@@ -884,6 +886,26 @@ if [ IsOptionalHaikuImagePackageAdded FFMpeg-devel ] {
 		}
 	} else {
 		Echo "No optional package FFMpeg-devel available for $(TARGET_ARCH)" ;
+	}
+}
+
+
+# FreeType
+if [ IsOptionalHaikuImagePackageAdded FreeType ] {
+	if $(TARGET_ARCH) in arm ppc x86 x86_64 {
+		InstallOptionalHaikuImagePackage $(HAIKU_FREETYPE_URL) : system ;
+	} else {
+		Echo "No optional package FreeType available for $(TARGET_ARCH)" ;
+	}
+}
+
+
+# FreeType-devel
+if [ IsOptionalHaikuImagePackageAdded FreeType-devel ] {
+	if $(TARGET_ARCH) in arm ppc x86 x86_64 {
+		InstallOptionalHaikuImagePackage $(HAIKU_FREETYPE_DEVEL_URL) : system ;
+	} else {
+		Echo "No optional package FreeType-devel available for $(TARGET_ARCH)" ;
 	}
 }
 
