@@ -35,6 +35,7 @@ static const float kMaximumHeightBasic		= 400.0f;
 class BString;
 class BMenuItem;
 class BMessage;
+class BMessageRunner;
 class BPopUpMenu;
 class CalcOptions;
 class CalcOptionsWindow;
@@ -97,6 +98,7 @@ class CalcView : public BView {
 			void				SetKeypadMode(uint8 mode);
 
  private:
+	static	status_t			_EvaluateThread(void* data);
 			void				_Init(BMessage* settings);
 			status_t			_LoadSettings(BMessage* archive);
 			void				_ParseCalcDesc(const char* keypadDescription);
@@ -118,6 +120,8 @@ class CalcView : public BView {
 
 			void				_FetchAppIcon(BBitmap* into);
 			bool				_IsEmbedded();
+
+			void				_SetEnabled(bool enable);
 
 			// grid dimensions
 			int16				fColumns;
@@ -161,6 +165,11 @@ class CalcView : public BView {
 
 			// calculator options.
 			CalcOptions*		fOptions;
+
+			thread_id			fEvaluateThread;
+			BMessageRunner*		fEvaluateMessageRunner;
+			sem_id				fEvaluateSemaphore;
+			bool				fEnabled;
 };
 
 #endif // _CALC_VIEW_H

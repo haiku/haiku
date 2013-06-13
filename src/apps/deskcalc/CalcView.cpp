@@ -50,6 +50,10 @@
 #define B_TRANSLATION_CONTEXT "CalcView"
 
 
+static const int32 kMsgCalculating = 'calc';
+static const int32 kMsgAnimateDots = 'dots';
+static const int32 kMsgDoneEvaluating = 'done';
+
 //const uint8 K_COLOR_OFFSET				= 32;
 const float kFontScaleY						= 0.4f;
 const float kFontScaleX						= 0.4f;
@@ -57,6 +61,8 @@ const float kExpressionFontScaleY			= 0.6f;
 const float kDisplayScaleY					= 0.2f;
 
 static const bigtime_t kFlashOnOffInterval	= 100000;
+static const bigtime_t kCalculatingInterval	= 1000000;
+static const bigtime_t kAnimationInterval	= 333333;
 
 static const float kMinimumWidthCompact		= 130.0f;
 static const float kMaximumWidthCompact		= 400.0f;
@@ -139,7 +145,11 @@ CalcView::CalcView(BRect frame, rgb_color rgbBaseColor, BMessage* settings)
 	fPopUpMenu(NULL),
 	fAutoNumlockItem(NULL),
 	fAudioFeedbackItem(NULL),
-	fOptions(new CalcOptions())
+	fOptions(new CalcOptions()),
+	fEvaluateThread(-1),
+	fEvaluateMessageRunner(NULL),
+	fEvaluateSemaphore(B_BAD_SEM_ID),
+	fEnabled(true)
 {
 	// tell the app server not to erase our b/g
 	SetViewColor(B_TRANSPARENT_32_BIT);
@@ -172,7 +182,11 @@ CalcView::CalcView(BMessage* archive)
 	fPopUpMenu(NULL),
 	fAutoNumlockItem(NULL),
 	fAudioFeedbackItem(NULL),
-	fOptions(new CalcOptions())
+	fOptions(new CalcOptions()),
+	fEvaluateThread(-1),
+	fEvaluateMessageRunner(NULL),
+	fEvaluateSemaphore(B_BAD_SEM_ID),
+	fEnabled(true)
 {
 	// Do not restore the follow mode, in shelfs, we never follow.
 	SetResizingMode(B_FOLLOW_NONE);
@@ -186,6 +200,8 @@ CalcView::~CalcView()
 	delete fKeypad;
 	delete fOptions;
 	free(fKeypadDescription);
+	delete fEvaluateMessageRunner;
+	delete_sem(fEvaluateSemaphore);
 }
 
 
@@ -300,6 +316,80 @@ CalcView::MessageReceived(BMessage* message)
 				if (message->FindInt32("key", &key) == B_OK)
 					_FlashKey(key, 0);
 
+				break;
+			}
+
+			case kMsgAnimateDots:
+			{
+				int32 end = fExpressionTextView->TextLength();
+				int32 start = end - 3;
+				if (fEnabled || strcmp(fExpressionTextView->Text() + start, "...") != 0) {
+					// stop the message runner
+					delete fEvaluateMessageRunner;
+					fEvaluateMessageRunner = NULL;
+					break;
+				}
+
+				uint8 dot = 0;
+				if (message->FindUInt8("dot", &dot) == B_OK) {
+					rgb_color fontColor = fExpressionTextView->HighColor();
+					rgb_color backColor = fExpressionTextView->LowColor();
+					fExpressionTextView->SetStylable(true);
+					fExpressionTextView->SetFontAndColor(start, end, NULL, 0, &backColor);
+					fExpressionTextView->SetFontAndColor(start + dot - 1, start + dot, NULL,
+						0, &fontColor);
+					fExpressionTextView->SetStylable(false);
+				}
+
+				dot++;
+				if (dot == 4)
+					dot = 1;
+
+				delete fEvaluateMessageRunner;
+				BMessage animate(kMsgAnimateDots);
+				animate.AddUInt8("dot", dot);
+				fEvaluateMessageRunner = new (std::nothrow) BMessageRunner(
+					BMessenger(this), &animate, kAnimationInterval, 1);
+				break;
+			}
+
+			case kMsgCalculating:
+			{
+				// calculation has taken more than 3 seconds
+				if (fEnabled) {
+					// stop the message runner
+					delete fEvaluateMessageRunner;
+					fEvaluateMessageRunner = NULL;
+					break;
+				}
+
+				BString calculating;
+				calculating << B_TRANSLATE("Calculating") << "...";
+				fExpressionTextView->SetText(calculating.String());
+
+				delete fEvaluateMessageRunner;
+				BMessage animate(kMsgAnimateDots);
+				animate.AddUInt8("dot", 1U);
+				fEvaluateMessageRunner = new (std::nothrow) BMessageRunner(
+					BMessenger(this), &animate, kAnimationInterval, 1);
+				break;
+			}
+
+			case kMsgDoneEvaluating:
+			{
+				_SetEnabled(true);
+				rgb_color fontColor = fExpressionTextView->HighColor();
+				fExpressionTextView->SetFontAndColor(NULL, 0, &fontColor);
+
+				const char* result;
+				if (message->FindString("error", &result) == B_OK)
+					fExpressionTextView->SetText(result);
+				else if (message->FindString("value", &result) == B_OK)
+					fExpressionTextView->SetValue(result);
+
+				// stop the message runner
+				delete fEvaluateMessageRunner;
+				fEvaluateMessageRunner = NULL;
 				break;
 			}
 
@@ -591,7 +681,8 @@ CalcView::FrameResized(float width, float height)
 		? fHeight : fHeight * kDisplayScaleY;
 	BFont font(be_bold_font);
 	font.SetSize(sizeDisp * kExpressionFontScaleY);
-	fExpressionTextView->SetFontAndColor(&font, B_FONT_ALL);
+	rgb_color fontColor = fExpressionTextView->HighColor();
+	fExpressionTextView->SetFontAndColor(&font, B_FONT_ALL, &fontColor);
 
 	expressionRect.OffsetTo(B_ORIGIN);
 	float inset = (expressionRect.Height() - fExpressionTextView->LineHeight(0)) / 2;
@@ -736,31 +827,39 @@ CalcView::SaveSettings(BMessage* archive) const
 void
 CalcView::Evaluate()
 {
-	BString expression = fExpressionTextView->Text();
-
-	if (expression.Length() == 0) {
+	if (fExpressionTextView->TextLength() == 0) {
 		beep();
 		return;
 	}
 
-	_AudioFeedback(false);
-
-	// evaluate expression
-	BString value;
-
-	try {
-		ExpressionParser parser;
-		parser.SetDegreeMode(fOptions->degree_mode);
-		value = parser.Evaluate(expression.String());
-	} catch (ParseException e) {
-		BString error(e.message.String());
-		error << " at " << (e.position + 1);
-		fExpressionTextView->SetText(error.String());
+	fEvaluateThread = spawn_thread(_EvaluateThread, "Evaluate Thread",
+		B_LOW_PRIORITY, this);
+	if (fEvaluateThread < B_OK) {
+		// failed to create evaluate thread, error out
+		fExpressionTextView->SetText(strerror(fEvaluateThread));
 		return;
 	}
 
-	// render new result to display
-	fExpressionTextView->SetValue(value.String());
+	_AudioFeedback(false);
+	_SetEnabled(false);
+		// Disable input while we evaluate
+
+	status_t threadStatus = resume_thread(fEvaluateThread);
+	if (threadStatus != B_OK) {
+		// evaluate thread failed to start, error out
+		fExpressionTextView->SetText(strerror(threadStatus));
+		_SetEnabled(true);
+		return;
+	}
+
+	if (fEvaluateMessageRunner == NULL) {
+		BMessage message(kMsgCalculating);
+		fEvaluateMessageRunner = new (std::nothrow) BMessageRunner(
+			BMessenger(this), &message, kCalculatingInterval, 1);
+		status_t runnerStatus = fEvaluateMessageRunner->InitCheck();
+		if (runnerStatus != B_OK)
+			printf("Evaluate Message Runner: %s\n", strerror(runnerStatus));
+	}
 }
 
 
@@ -895,6 +994,41 @@ CalcView::SetKeypadMode(uint8 mode)
 // #pragma mark -
 
 
+/*static*/ status_t
+CalcView::_EvaluateThread(void* data)
+{
+	CalcView* calcView = reinterpret_cast<CalcView*>(data);
+	if (calcView == NULL)
+		return B_BAD_TYPE;
+
+	BMessenger messenger(calcView);
+	if (!messenger.IsValid())
+		return B_BAD_VALUE;
+
+	BString result;
+	status_t status = acquire_sem(calcView->fEvaluateSemaphore);
+	if (status == B_OK) {
+		ExpressionParser parser;
+		parser.SetDegreeMode(calcView->fOptions->degree_mode);
+		BString expression(calcView->fExpressionTextView->Text());
+		try {
+			result = parser.Evaluate(expression.String());
+		} catch (ParseException e) {
+			result << e.message.String() << " at " << (e.position + 1);
+			status = B_ERROR;
+		}
+		release_sem(calcView->fEvaluateSemaphore);
+	} else
+		result = strerror(status);
+
+	BMessage message(kMsgDoneEvaluating);
+	message.AddString(status == B_OK ? "value" : "error", result.String());
+	messenger.SendMessage(&message);
+
+	return status;
+}
+
+
 void
 CalcView::_Init(BMessage* settings)
 {
@@ -907,6 +1041,8 @@ CalcView::_Init(BMessage* settings)
 
 	// fetch the calc icon for compact view
 	_FetchAppIcon(fCalcIcon);
+
+	fEvaluateSemaphore = create_sem(1, "Evaluate Semaphore");
 }
 
 
@@ -1023,6 +1159,9 @@ CalcView::_ParseCalcDesc(const char* keypadDescription)
 void
 CalcView::_PressKey(int key)
 {
+	if (!fEnabled)
+		return;
+
 	assert(key < (fRows * fColumns));
 	assert(key >= 0);
 
@@ -1293,4 +1432,13 @@ bool
 CalcView::_IsEmbedded()
 {
 	return Parent() != NULL && (Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0;
+}
+
+
+void
+CalcView::_SetEnabled(bool enable)
+{
+	fEnabled = enable;
+	fExpressionTextView->MakeSelectable(enable);
+	fExpressionTextView->MakeEditable(enable);
 }
