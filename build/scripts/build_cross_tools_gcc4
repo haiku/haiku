@@ -244,8 +244,7 @@ fi
 
 # remove the system headers from the installation dir
 # Only the ones from the source tree should be used.
-sysIncludeDir=$installDir/$haikuMachine/sys-include
-rm -rf $sysIncludeDir/os $sysIncludeDir/posix
+rm -rf $installDir/$haikuMachine/sys-include
 
 # remove the objects dir
 rm -rf $objDir
