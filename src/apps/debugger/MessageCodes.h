@@ -52,6 +52,8 @@ enum {
 	MSG_TEAM_RESTART_REQUESTED					= 'trrq',
 	MSG_SHOW_TEAMS_WINDOW						= 'stsw',
 	MSG_TEAMS_WINDOW_CLOSED						= 'tswc',
+	MSG_SHOW_EXCEPTION_CONFIG_WINDOW			= 'secw',
+	MSG_EXCEPTION_CONFIG_WINDOW_CLOSED			= 'ecwc',
 	MSG_START_NEW_TEAM							= 'sttt',
 	MSG_DEBUG_THIS_TEAM							= 'dbtt',
 	MSG_SHOW_INSPECTOR_WINDOW					= 'sirw',
