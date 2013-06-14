@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -31,6 +31,7 @@
 #include "Breakpoint.h"
 #include "CpuState.h"
 #include "DisassembledCode.h"
+#include "ExceptionConfigWindow.h"
 #include "FileSourceCode.h"
 #include "GuiSettingsUtils.h"
 #include "GuiTeamUiSettings.h"
@@ -115,6 +116,7 @@ TeamWindow::TeamWindow(::Team* team, UserInterfaceListener* listener)
 	fStepOverButton(NULL),
 	fStepIntoButton(NULL),
 	fStepOutButton(NULL),
+	fExceptionConfigWindow(NULL),
 	fInspectorWindow(NULL),
 	fFilePanel(NULL)
 {
@@ -300,6 +302,27 @@ TeamWindow::MessageReceived(BMessage* message)
 			fInspectorWindow = NULL;
 			break;
 
+		}
+		case MSG_SHOW_EXCEPTION_CONFIG_WINDOW:
+		{
+			if (fExceptionConfigWindow) {
+				fExceptionConfigWindow->Activate(true);
+			} else {
+				try {
+					fExceptionConfigWindow = ExceptionConfigWindow::Create(
+						fTeam, fListener, this);
+					if (fExceptionConfigWindow != NULL)
+						fExceptionConfigWindow->Show();
+	           	} catch (...) {
+	           		// TODO: notify user
+	           	}
+			}
+			break;
+		}
+		case MSG_EXCEPTION_CONFIG_WINDOW_CLOSED:
+		{
+			fExceptionConfigWindow = NULL;
+			break;
 		}
 		case MSG_SHOW_WATCH_VARIABLE_PROMPT:
 		{

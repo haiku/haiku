@@ -29,6 +29,7 @@ class BMenuBar;
 class BSplitView;
 class BStringView;
 class BTabView;
+class ExceptionConfigWindow;
 class Image;
 class InspectorWindow;
 class RegistersView;
@@ -195,6 +196,7 @@ private:
 			BSplitView*			fSourceSplitView;
 			BSplitView*			fImageSplitView;
 			BSplitView*			fThreadSplitView;
+			ExceptionConfigWindow* fExceptionConfigWindow;
 			InspectorWindow*	fInspectorWindow;
 			GuiTeamUiSettings	fUiSettings;
 			BFilePanel*			fFilePanel;
