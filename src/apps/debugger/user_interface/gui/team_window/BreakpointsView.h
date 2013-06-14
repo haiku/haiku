@@ -54,6 +54,7 @@ private:
 			Team*				fTeam;
 			BreakpointListView*	fListView;
 			BreakpointProxyList	fSelectedBreakpoints;
+			BButton*			fConfigureExceptionsButton;
 			BButton*			fToggleBreakpointButton;
 			BButton*			fRemoveBreakpointButton;
 			Listener*			fListener;
