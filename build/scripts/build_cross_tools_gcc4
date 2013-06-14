@@ -50,6 +50,12 @@ arm-*)
 	;;
 esac
 
+if [ `uname -o` = 'Haiku' ]; then
+	# force cross-build if building on Haiku:
+	buildhostMachine=${haikuMachine}_buildhost
+	buildHostSpec="--build=$buildhostMachine --host=$buildhostMachine"
+fi
+
 if [ ! -d $haikuSourceDir ]; then
 	echo "No such directory: \"$haikuSourceDir\"" >&2
 	exit 1
@@ -135,10 +141,11 @@ export LC_ALL=POSIX
 # build binutils
 cd $binutilsObjDir
 CFLAGS="-O2" CXXFLAGS="-O2" $binutilsSourceDir/configure \
-	--prefix=$installDir --target=$haikuMachine --disable-nls \
-	--disable-shared --disable-werror \
+	--prefix=$installDir $buildHostSpec --target=$haikuMachine \
+	--disable-nls --disable-shared --disable-werror \
 	--with-sysroot=$sysrootDir \
-	$binutilsConfigureArgs || exit 1
+	$binutilsConfigureArgs \
+	|| exit 1
 $MAKE $additionalMakeArgs || exit 1
 $MAKE $additionalMakeArgs install || exit 1
 
@@ -194,11 +201,13 @@ copy_headers $haikuSourceDir/headers/posix $tmpIncludeDir/posix
 
 # configure gcc
 cd $gccObjDir
-CFLAGS="-O2" CXXFLAGS="-O2" $gccSourceDir/configure --prefix=$installDir \
-	--target=$haikuMachine --disable-nls --disable-shared --with-system-zlib \
+CFLAGS="-O2" CXXFLAGS="-O2" $gccSourceDir/configure \
+	--prefix=$installDir $buildHostSpec --target=$haikuMachine \
+	--disable-nls --disable-shared --with-system-zlib \
 	--enable-languages=c,c++ --enable-lto --enable-frame-pointer \
 	--with-sysroot=$sysrootDir \
-	$gccConfigureArgs || exit 1
+	$gccConfigureArgs \
+	|| exit 1
 
 # make gcc
 $MAKE $additionalMakeArgs || {
