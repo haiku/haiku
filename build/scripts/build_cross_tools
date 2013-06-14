@@ -189,8 +189,7 @@ rm -f $installDir/lib/gcc-lib/i586-pc-haiku/$haikuRequiredLegacyGCCVersion/inclu
 
 # remove the system headers from the installation dir
 # Only the ones from the source tree should be used.
-sysIncludeDir=$installDir/i586-pc-haiku/sys-include
-rm -rf $sysIncludeDir/be $sysIncludeDir/posix
+rm -rf $installDir/i586-pc-haiku/sys-include
 
 # remove the objects dir
 rm -rf $objDir
