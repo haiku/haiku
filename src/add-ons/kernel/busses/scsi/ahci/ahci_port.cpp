@@ -171,7 +171,7 @@ AHCIPort::Uninit()
 	// disable FIS receive
 	fRegs->cmd &= ~PORT_CMD_FER;
 
-	// wait for receive completition, up to 500ms
+	// wait for receive completion, up to 500ms
 	if (wait_until_clear(&fRegs->cmd, PORT_CMD_FR, 500000) < B_OK) {
 		TRACE("AHCIPort::Uninit port %d error FIS rx still running\n", fIndex);
 	}
@@ -179,7 +179,7 @@ AHCIPort::Uninit()
 	// stop DMA engine
 	fRegs->cmd &= ~PORT_CMD_ST;
 
-	// wait for DMA completition
+	// wait for DMA completion
 	if (wait_until_clear(&fRegs->cmd, PORT_CMD_CR, 500000) < B_OK) {
 		TRACE("AHCIPort::Uninit port %d error DMA engine still running\n",
 			fIndex);
@@ -565,9 +565,9 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 	sreq.set_data(&ataData, sizeof(ataData));
 	sreq.set_ata_cmd(fIsATAPI ? 0xa1 : 0xec); // Identify (Packet) Device
 	ExecuteSataRequest(&sreq);
-	sreq.wait_for_completition();
+	sreq.wait_for_completion();
 
-	if (sreq.completition_status() & ATA_ERR) {
+	if (sreq.completion_status() & ATA_ERR) {
 		TRACE("identify device failed\n");
 		request->subsys_status = SCSI_REQ_CMP_ERR;
 		gSCSI->finished(request, 1);
