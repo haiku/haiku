@@ -8,6 +8,11 @@
 #include <CheckBox.h>
 #include <LayoutBuilder.h>
 
+#include <AutoLocker.h>
+
+#include "FunctionInstance.h"
+#include "Image.h"
+#include "ImageDebugInfo.h"
 #include "MessageCodes.h"
 #include "UserInterface.h"
 #include "Team.h"
@@ -59,6 +64,37 @@ ExceptionConfigWindow::Create(::Team* team,
 }
 
 void
+ExceptionConfigWindow::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case MSG_STOP_ON_THROWN_EXCEPTION_CHANGED:
+		{
+			_UpdateThrownBreakpoints(fExceptionThrown->Value()
+				== B_CONTROL_ON);
+			break;
+		}
+
+		case MSG_STOP_ON_CAUGHT_EXCEPTION_CHANGED:
+		{
+			break;
+		}
+		default:
+			BWindow::MessageReceived(message);
+			break;
+	}
+
+}
+
+
+void
+ExceptionConfigWindow::Show()
+{
+	CenterOnScreen();
+	BWindow::Show();
+}
+
+
+void
 ExceptionConfigWindow::_Init()
 {
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
@@ -84,29 +120,30 @@ ExceptionConfigWindow::_Init()
 	fCloseButton->SetTarget(this);
 }
 
-void
-ExceptionConfigWindow::Show()
-{
-	CenterOnScreen();
-	BWindow::Show();
-}
 
 void
-ExceptionConfigWindow::MessageReceived(BMessage* message)
+ExceptionConfigWindow::_UpdateThrownBreakpoints(bool enable)
 {
-	switch (message->what) {
-		case MSG_STOP_ON_THROWN_EXCEPTION_CHANGED:
-		{
-			break;
-		}
+	AutoLocker< ::Team> teamLocker(fTeam);
 
-		case MSG_STOP_ON_CAUGHT_EXCEPTION_CHANGED:
-		{
-			break;
+	for (ImageList::ConstIterator it = fTeam->Images().GetIterator();
+		it.HasNext();) {
+		Image* image = it.Next();
+
+		ImageDebugInfo* info = image->GetImageDebugInfo();
+		if (info != NULL) {
+			FunctionInstance* instance = info->FunctionByName(
+				"__cxa_allocate_exception");
+			if (instance == NULL)
+				instance = info->FunctionByName("__throw(void)");
+
+			if (instance != NULL) {
+				target_addr_t address = instance->Address();
+				if (enable)
+					fListener->SetBreakpointRequested(address, true);
+				else
+					fListener->ClearBreakpointRequested(address);
+			}
 		}
-		default:
-			BWindow::MessageReceived(message);
-			break;
 	}
-
 }

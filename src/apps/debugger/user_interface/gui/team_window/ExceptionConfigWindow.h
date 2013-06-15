@@ -35,6 +35,7 @@ public:
 
 private:
 			void	 			_Init();
+			void				_UpdateThrownBreakpoints(bool enable);
 
 
 private:
