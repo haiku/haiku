@@ -118,6 +118,24 @@ ExceptionConfigWindow::_Init()
 	fExceptionCaught->SetEnabled(false);
 
 	fCloseButton->SetTarget(this);
+
+
+	// check if the exception breakpoints are already installed
+	AutoLocker< ::Team> teamLocker(fTeam);
+	for (ImageList::ConstIterator it = fTeam->Images().GetIterator();
+		it.HasNext();) {
+		Image* image = it.Next();
+
+		ImageDebugInfo* info = image->GetImageDebugInfo();
+		target_addr_t address;
+		if (_FindExceptionFunction(info, address) != B_OK)
+			continue;
+
+		if (fTeam->BreakpointAtAddress(address) != NULL) {
+			fExceptionThrown->SetValue(B_CONTROL_ON);
+			break;
+		}
+	}
 }
 
 
@@ -125,25 +143,38 @@ void
 ExceptionConfigWindow::_UpdateThrownBreakpoints(bool enable)
 {
 	AutoLocker< ::Team> teamLocker(fTeam);
-
 	for (ImageList::ConstIterator it = fTeam->Images().GetIterator();
 		it.HasNext();) {
 		Image* image = it.Next();
 
 		ImageDebugInfo* info = image->GetImageDebugInfo();
-		if (info != NULL) {
-			FunctionInstance* instance = info->FunctionByName(
-				"__cxa_allocate_exception");
-			if (instance == NULL)
-				instance = info->FunctionByName("__throw(void)");
+		target_addr_t address;
+		if (_FindExceptionFunction(info, address) != B_OK)
+			continue;
 
-			if (instance != NULL) {
-				target_addr_t address = instance->Address();
-				if (enable)
-					fListener->SetBreakpointRequested(address, true);
-				else
-					fListener->ClearBreakpointRequested(address);
-			}
+		if (enable)
+			fListener->SetBreakpointRequested(address, true, true);
+		else
+			fListener->ClearBreakpointRequested(address);
+	}
+}
+
+
+status_t
+ExceptionConfigWindow::_FindExceptionFunction(ImageDebugInfo* info,
+	target_addr_t& _foundAddress) const
+{
+	if (info != NULL) {
+		FunctionInstance* instance = info->FunctionByName(
+			"__cxa_allocate_exception");
+		if (instance == NULL)
+			instance = info->FunctionByName("__throw(void)");
+
+		if (instance != NULL) {
+			_foundAddress = instance->Address();
+			return B_OK;
 		}
 	}
+
+	return B_NAME_NOT_FOUND;
 }

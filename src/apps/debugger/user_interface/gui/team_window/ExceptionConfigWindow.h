@@ -8,9 +8,12 @@
 
 #include <Window.h>
 
+#include "types/Types.h"
+
 
 class BButton;
 class BCheckBox;
+class ImageDebugInfo;
 class Team;
 class UserInterfaceListener;
 
@@ -36,6 +39,8 @@ public:
 private:
 			void	 			_Init();
 			void				_UpdateThrownBreakpoints(bool enable);
+			status_t			_FindExceptionFunction(ImageDebugInfo* info,
+									target_addr_t& _foundAddress) const;
 
 
 private:
