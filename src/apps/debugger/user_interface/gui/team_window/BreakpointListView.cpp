@@ -380,6 +380,9 @@ BreakpointListView::UnsetListener()
 void
 BreakpointListView::UserBreakpointChanged(UserBreakpoint* breakpoint)
 {
+	if (breakpoint->IsHidden())
+		return;
+
 	BreakpointProxy proxy(breakpoint, NULL);
 	fBreakpointsTableModel->UpdateBreakpoint(&proxy);
 }

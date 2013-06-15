@@ -686,6 +686,8 @@ SourceView::MarkerManager::_UpdateBreakpointMarkers()
 
 		for (int32 i = 0; UserBreakpoint* breakpoint = breakpoints.ItemAt(i);
 				i++) {
+			if (breakpoint->IsHidden())
+				continue;
 			UserBreakpointInstance* breakpointInstance
 				= breakpoint->InstanceAt(0);
 			FunctionInstance* functionInstance;
