@@ -649,13 +649,13 @@ if [ IsOptionalHaikuImagePackageAdded Development ] {
 				: : cdPackage ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/autoconf-2.69-3-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/autoconf-2.69-4-x86_gcc2.hpkg ;
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/automake-1.13.1-3-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/automake-1.13.1-4-x86_gcc2.hpkg ;
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/libtool-2.4-7-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/libtool-2.4-8-x86_gcc2.hpkg ;
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/texinfo-4.13a-6-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/texinfo-4.13a-7-x86_gcc2.hpkg ;
 		}
 	} else if $(TARGET_ARCH) = x86_64 {
 		AddSymlinkToHaikuImage home config settings deskbar menu Applications
@@ -682,9 +682,9 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ] {
 		# gcc and binutils
 		if $(HAIKU_GCC_VERSION[1]) = 2 {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/binutils-2.17_130421-1-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/binutils-2.17_130421-2-x86_gcc2.hpkg ;
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/gcc-2.95.3_130425-1-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/gcc-2.95.3_130425-2-x86_gcc2.hpkg ;
 		}
 
 		if $(HAIKU_GCC_VERSION[1]) = 4 {
@@ -708,17 +708,17 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ] {
 				$(baseURL)/make-3.82-r1a4-x86-gcc4-2012-08-28.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/bison-2.4.3-4-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/bison-2.4.3-5-x86_gcc2.hpkg ;
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/m4-1.4.16-4-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/m4-1.4.16-5-x86_gcc2.hpkg ;
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/flex-2.5.35-5-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/flex-2.5.35-6-x86_gcc2.hpkg ;
 			InstallOptionalHaikuImagePackage
 				$(hpkgBaseURL)/jam-2.5_121012-2-x86_gcc2.hpkg ;
 			InstallOptionalHaikuImagePackage
 				$(hpkgBaseURL)/mkdepend-1.7-2-x86_gcc2.hpkg ;
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/make-3.82-4-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/make-3.82-5-x86_gcc2.hpkg ;
 		}
 	} else if $(TARGET_ARCH) = x86_64 {
 		# gcc and binutils
@@ -1091,7 +1091,7 @@ if [ IsOptionalHaikuImagePackageAdded Grep ] {
 				$(baseURL)/grep-2.14-x86-gcc4-2012-12-28.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/grep-2.14-3-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/grep-2.14-4-x86_gcc2.hpkg ;
 		}
 	} else if $(TARGET_ARCH) = x86_64 {
 		InstallOptionalHaikuImagePackage
@@ -1696,7 +1696,7 @@ if [ IsOptionalHaikuImagePackageAdded Perl ] {
 				: : cdPackage ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/perl-5.10.1-4-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/perl-5.10.1-5-x86_gcc2.hpkg ;
 		}
 	} else if $(TARGET_ARCH) = x86_64 {
 		InstallOptionalHaikuImagePackage
@@ -1799,7 +1799,7 @@ if [ IsOptionalHaikuImagePackageAdded Sed ] {
 				$(baseURL)/sed-4.2.1-r1a4-x86-gcc4-2012-08-31.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/sed-4.2.1-4-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/sed-4.2.1-5-x86_gcc2.hpkg ;
 		}
 	} else if $(TARGET_ARCH) = x86_64 {
 		InstallOptionalHaikuImagePackage
