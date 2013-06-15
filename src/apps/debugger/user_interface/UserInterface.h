@@ -95,7 +95,7 @@ public:
 									target_addr_t address = 0) = 0;
 
 	virtual	void				SetBreakpointRequested(target_addr_t address,
-									bool enabled) = 0;
+									bool enabled, bool hidden = false) = 0;
 	virtual	void				SetBreakpointEnabledRequested(
 									UserBreakpoint* breakpoint,
 									bool enabled) = 0;

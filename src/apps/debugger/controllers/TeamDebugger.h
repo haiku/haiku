@@ -70,7 +70,7 @@ private:
 	virtual	void				ThreadActionRequested(thread_id threadID,
 									uint32 action, target_addr_t address);
 	virtual	void				SetBreakpointRequested(target_addr_t address,
-									bool enabled);
+									bool enabled, bool hidden = false);
 	virtual	void				SetBreakpointEnabledRequested(
 									UserBreakpoint* breakpoint,
 									bool enabled);
@@ -145,7 +145,7 @@ private:
 			void				_HandleImageFileChanged(image_id imageID);
 
 			void				_HandleSetUserBreakpoint(target_addr_t address,
-									bool enabled);
+									bool enabled, bool hidden);
 			void				_HandleSetUserBreakpoint(
 									UserBreakpoint* breakpoint, bool enabled);
 			void				_HandleClearUserBreakpoint(

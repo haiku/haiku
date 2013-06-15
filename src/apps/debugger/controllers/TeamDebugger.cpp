@@ -582,10 +582,14 @@ TeamDebugger::MessageReceived(BMessage* message)
 				if (message->FindBool("enabled", &enabled) != B_OK)
 					enabled = true;
 
+				bool hidden;
+				if (message->FindBool("hidden", &hidden) != B_OK)
+					hidden = false;
+
 				if (breakpoint != NULL)
 					_HandleSetUserBreakpoint(breakpoint, enabled);
 				else
-					_HandleSetUserBreakpoint(address, enabled);
+					_HandleSetUserBreakpoint(address, enabled, hidden);
 			} else {
 				if (breakpoint != NULL)
 					_HandleClearUserBreakpoint(breakpoint);
@@ -840,11 +844,13 @@ TeamDebugger::ThreadActionRequested(thread_id threadID,
 
 
 void
-TeamDebugger::SetBreakpointRequested(target_addr_t address, bool enabled)
+TeamDebugger::SetBreakpointRequested(target_addr_t address, bool enabled,
+	bool hidden)
 {
 	BMessage message(MSG_SET_BREAKPOINT);
 	message.AddUInt64("address", (uint64)address);
 	message.AddBool("enabled", enabled);
+	message.AddBool("hidden", hidden);
 	PostMessage(&message);
 }
 
@@ -1431,10 +1437,11 @@ TeamDebugger::_HandleImageFileChanged(image_id imageID)
 
 
 void
-TeamDebugger::_HandleSetUserBreakpoint(target_addr_t address, bool enabled)
+TeamDebugger::_HandleSetUserBreakpoint(target_addr_t address, bool enabled,
+	bool hidden)
 {
 	TRACE_CONTROL("TeamDebugger::_HandleSetUserBreakpoint(%#" B_PRIx64
-		", %d)\n", address, enabled);
+		", %d, %d)\n", address, enabled, hidden);
 
 	// check whether there already is a breakpoint
 	AutoLocker< ::Team> locker(fTeam);
@@ -1505,6 +1512,8 @@ TeamDebugger::_HandleSetUserBreakpoint(target_addr_t address, bool enabled)
 		if (userBreakpoint == NULL)
 			return;
 		userBreakpointReference.SetTo(userBreakpoint, true);
+
+		userBreakpoint->SetHidden(hidden);
 
 		TRACE_CONTROL("  created user breakpoint: %p\n", userBreakpoint);
 
@@ -1794,6 +1803,8 @@ TeamDebugger::_LoadSettings()
 		if (breakpoint == NULL)
 			return;
 		BReference<UserBreakpoint> breakpointReference(breakpoint, true);
+
+		breakpoint->SetHidden(breakpointSetting->IsHidden());
 
 		// install it
 		fBreakpointManager->InstallUserBreakpoint(breakpoint,
