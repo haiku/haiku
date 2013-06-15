@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2013, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Alexander von Gluck <kallisti5@unixzen.com>
  */
 
 
@@ -48,11 +49,7 @@ struct address_family {
 	int			family;
 	const char*	name;
 	const char*	identifiers[4];
-	preferred_output_format	preferred_format;
-	bool		(*parse_address)(const char* string, sockaddr* _address);
-	bool		(*prefix_length_to_mask)(uint8 prefixLength, sockaddr* mask);
-	uint8		(*mask_to_prefix_length)(sockaddr* mask);
-	const char*	(*address_to_string)(sockaddr* address);
+	uint32		maxLength;
 };
 
 
@@ -61,15 +58,15 @@ static const address_family kFamilies[] = {
 		AF_INET,
 		"inet",
 		{"AF_INET", "inet", "ipv4", NULL},
-		PREFER_OUTPUT_MASK,
+		15,
 	},
 	{
 		AF_INET6,
 		"inet6",
 		{"AF_INET6", "inet6", "ipv6", NULL},
-		PREFER_OUTPUT_PREFIX_LENGTH,
+		39,
 	},
-	{ -1, NULL, {NULL}, PREFER_OUTPUT_MASK, NULL, NULL, NULL, NULL }
+	{ -1, NULL, {NULL} }
 };
 
 
@@ -204,20 +201,16 @@ list_routes(int socket, const char *interfaceName, route_entry &route)
 
 			if (family != NULL) {
 				BNetworkAddress destination(*route.destination);
-				BNetworkAddress mask;
-				if (route.mask != NULL)
-					mask.SetTo(*route.mask);
 
-				// TODO: is the %15s format OK for IPv6?
 				printf("%15s", destination.ToString().String());
-				switch (family->preferred_format) {
-					case PREFER_OUTPUT_MASK:
-						printf(" mask %-15s ", mask.ToString().String());
-						break;
-					case PREFER_OUTPUT_PREFIX_LENGTH:
-						printf("/%zd ", mask.PrefixLength());
-						break;
-				}
+
+				if (route.mask != NULL) {
+					BNetworkAddress mask;
+					mask.SetTo(*route.mask);
+					printf("/%zd\t", mask.PrefixLength());
+				} else
+					printf("   \t");
+
 				if ((route.flags & RTF_GATEWAY) != 0) {
 					BNetworkAddress gateway;
 					if (route.gateway != NULL)
@@ -334,22 +327,17 @@ get_route(int socket, route_entry &route)
 	}
 
 	if (family != NULL) {
-		printf("%s", family->address_to_string(request.destination));
-		switch (family->preferred_format) {
-			case PREFER_OUTPUT_MASK:
-				printf(" mask %s ",
-					family->address_to_string(request.mask));
-				break;
-			case PREFER_OUTPUT_PREFIX_LENGTH:
-				printf("/%u ",
-					family->mask_to_prefix_length(request.mask));
-				break;
-		}
+		BNetworkAddress destination(*request.destination);
+		BNetworkAddress mask(*request.mask);
+		printf("%s", destination.ToString().String());
+		printf("/%zd ", mask.PrefixLength());
 
+		BNetworkAddress gateway(*request.gateway);
 		if (request.flags & RTF_GATEWAY)
-			printf("gateway %s ", family->address_to_string(request.gateway));
+			printf("gateway %s ", gateway.ToString().String());
 
-		printf("source %s\n", family->address_to_string(request.source));
+		BNetworkAddress source(*request.source);
+		printf("source %s\n", source.ToString().String());
 	} else {
 		printf("unknown family ");
 	}
