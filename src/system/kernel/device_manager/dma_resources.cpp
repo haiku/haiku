@@ -92,6 +92,8 @@ DMABuffer::Dump() const
 
 
 DMAResource::DMAResource()
+	: 
+	fScratchVecs(NULL)
 {
 	mutex_init(&fLock, "dma resource");
 }
