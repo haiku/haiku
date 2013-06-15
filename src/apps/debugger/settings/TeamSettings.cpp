@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -61,7 +62,7 @@ TeamSettings::SetTo(Team* team)
 			return B_NO_MEMORY;
 
 		status_t error = breakpointSetting->SetTo(breakpoint->Location(),
-			breakpoint->IsEnabled());
+			breakpoint->IsEnabled(), breakpoint->IsHidden());
 		if (error == B_OK && !fBreakpoints.AddItem(breakpointSetting))
 			error = B_NO_MEMORY;
 		if (error != B_OK) {

@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -20,7 +21,8 @@ BreakpointSetting::BreakpointSetting()
 	fSourceFile(),
 	fSourceLocation(),
 	fRelativeAddress(0),
-	fEnabled(false)
+	fEnabled(false),
+	fHidden(false)
 {
 }
 
@@ -31,7 +33,8 @@ BreakpointSetting::BreakpointSetting(const BreakpointSetting& other)
 	fSourceFile(other.fSourceFile),
 	fSourceLocation(other.fSourceLocation),
 	fRelativeAddress(other.fRelativeAddress),
-	fEnabled(other.fEnabled)
+	fEnabled(other.fEnabled),
+	fHidden(other.fHidden)
 {
 	if (fFunctionID != NULL)
 		fFunctionID->AcquireReference();
@@ -45,7 +48,8 @@ BreakpointSetting::~BreakpointSetting()
 
 
 status_t
-BreakpointSetting::SetTo(const UserBreakpointLocation& location, bool enabled)
+BreakpointSetting::SetTo(const UserBreakpointLocation& location, bool enabled,
+	bool hidden)
 {
 	_Unset();
 
@@ -59,6 +63,7 @@ BreakpointSetting::SetTo(const UserBreakpointLocation& location, bool enabled)
 	fSourceLocation = location.GetSourceLocation();
 	fRelativeAddress = location.RelativeAddress();
 	fEnabled = enabled;
+	fHidden = hidden;
 
 	return B_OK;
 }
@@ -92,6 +97,9 @@ BreakpointSetting::SetTo(const BMessage& archive)
 	if (archive.FindBool("enabled", &fEnabled) != B_OK)
 		fEnabled = false;
 
+	if (archive.FindBool("hidden", &fHidden) != B_OK)
+		fHidden = false;
+
 	return B_OK;
 }
 
@@ -113,7 +121,8 @@ BreakpointSetting::WriteTo(BMessage& archive) const
 			!= B_OK
 		|| (error = archive.AddUInt64("relativeAddress", fRelativeAddress))
 			!= B_OK
-		|| (error = archive.AddBool("enabled", fEnabled)) != B_OK) {
+		|| (error = archive.AddBool("enabled", fEnabled)) != B_OK
+		|| (error = archive.AddBool("hidden", fHidden)) != B_OK) {
 		return error;
 	}
 
@@ -137,6 +146,7 @@ BreakpointSetting::operator=(const BreakpointSetting& other)
 	fSourceLocation = other.fSourceLocation;
 	fRelativeAddress = other.fRelativeAddress;
 	fEnabled = other.fEnabled;
+	fHidden = other.fHidden;
 
 	return *this;
 }
