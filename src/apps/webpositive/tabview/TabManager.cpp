@@ -847,7 +847,7 @@ void
 TabManager::SelectTab(const BView* containedView)
 {
 	int32 tabIndex = TabForView(containedView);
-	if (tabIndex > 0)
+	if (tabIndex >= 0)
 		SelectTab(tabIndex);
 }
 
