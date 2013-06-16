@@ -35,6 +35,7 @@
 #include <Bitmap.h>
 #include <Button.h>
 #include <CardLayout.h>
+#include <Catalog.h>
 #include <ControlLook.h>
 #include <GroupView.h>
 #include <MenuBar.h>
@@ -42,6 +43,10 @@
 #include <Window.h>
 
 #include "TabView.h"
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Tab Manager"
 
 
 static const float kLeftTabInset = 4;
@@ -468,8 +473,10 @@ TabContainerView::_MouseMoved(BPoint where, uint32 _transit,
 		fLastMouseEventTab = tab;
 		if (fLastMouseEventTab)
 			fLastMouseEventTab->MouseMoved(where, B_ENTERED_VIEW, dragMessage);
-		else
-			fController->SetToolTip("Double-click or middle-click to open new tab.");
+		else {
+			fController->SetToolTip(
+				B_TRANSLATE("Double-click or middle-click to open new tab."));
+		}
 	}
 }
 
