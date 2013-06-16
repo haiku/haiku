@@ -44,7 +44,7 @@ struct address_family {
 	int			family;
 	const char*	name;
 	const char*	identifiers[4];
-	uint32		maxAddressLength;
+	int		maxAddressLength;
 };
 
 static const address_family kFamilies[] = {
@@ -189,7 +189,12 @@ list_routes(int socket, const char *interfaceName, route_entry &route)
 		}
 	}
 
+	int addressLength = family->maxAddressLength;
+
 	printf("%s routing table:\n", family->name);
+
+	printf("%*s     %*s Flags  Interface\n", addressLength, "Destination",
+		addressLength, "Next Hop");
 
 	while (interface < end) {
 		route_entry& route = interface->ifr_route;
@@ -200,53 +205,49 @@ list_routes(int socket, const char *interfaceName, route_entry &route)
 
 			if (family != NULL) {
 				BNetworkAddress destination(*route.destination);
-				printf("%15s", destination.ToString().String());
+				printf("%*s", addressLength, destination.ToString().String());
 
 				if (route.mask != NULL) {
 					BNetworkAddress mask;
 					mask.SetTo(*route.mask);
-					printf("/%zd\t", mask.PrefixLength());
+					printf("/%-3zd ", mask.PrefixLength());
 				} else
-					printf("   \t");
+					printf("     ");
 
 				if ((route.flags & RTF_GATEWAY) != 0) {
 					BNetworkAddress gateway;
 					if (route.gateway != NULL)
 						gateway.SetTo(*route.gateway);
-					printf("gateway %-15s ", gateway.ToString().String());
-				}
+					printf("%*s ", addressLength, gateway.ToString().String());
+				} else
+					printf("%*s ", family->maxAddressLength, "-");
 			} else
 				printf("unknown family ");
-
-			printf("%s", interface->ifr_name);
 
 			if (route.flags != 0) {
 				const struct {
 					int			value;
 					const char	*name;
 				} kFlags[] = {
-					{RTF_DEFAULT, "default"},
-					{RTF_REJECT, "reject"},
-					{RTF_HOST, "host"},
-					{RTF_LOCAL, "local"},
-					{RTF_DYNAMIC, "dynamic"},
-					{RTF_MODIFIED, "modified"},
+					{RTF_DEFAULT, "D"},
+					{RTF_REJECT, "R"},
+					{RTF_HOST, "H"},
+					{RTF_LOCAL, "L"},
+					{RTF_DYNAMIC, "D"},
+					{RTF_MODIFIED, "M"},
 				};
-				bool first = true;
-
 				for (uint32 i = 0; i < sizeof(kFlags) / sizeof(kFlags[0]);
-						i++) {
+					i++) {
 					if ((route.flags & kFlags[i].value) != 0) {
-						if (first) {
-							printf(", ");
-							first = false;
-						} else
-							putchar(' ');
 						printf(kFlags[i].name);
-					}
+					} else
+						putchar('-');
 				}
-			}
+				printf(" ");
+			} else
+				printf("------ ");
 
+			printf("%s", interface->ifr_name);
 			putchar('\n');
 		}
 
