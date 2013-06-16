@@ -40,29 +40,23 @@ enum modes {
 	RTM_FLUSH,
 };
 
-enum preferred_output_format {
-	PREFER_OUTPUT_MASK,
-	PREFER_OUTPUT_PREFIX_LENGTH,
-};
-
 struct address_family {
 	int			family;
 	const char*	name;
 	const char*	identifiers[4];
-	uint32		maxLength;
+	uint32		maxAddressLength;
 };
-
 
 static const address_family kFamilies[] = {
 	{
 		AF_INET,
-		"inet",
+		"IPv4",
 		{"AF_INET", "inet", "ipv4", NULL},
 		15,
 	},
 	{
 		AF_INET6,
-		"inet6",
+		"IPv6",
 		{"AF_INET6", "inet6", "ipv6", NULL},
 		39,
 	},
@@ -184,24 +178,28 @@ list_routes(int socket, const char *interfaceName, route_entry &route)
 	ifreq *interface = (ifreq*)buffer;
 	ifreq *end = (ifreq*)((uint8*)buffer + size);
 
+	// find family (we use the family of the first address as this is
+	// called on a socket for a single family)
+	const address_family *family = NULL;
+	for (int32 i = 0; kFamilies[i].family >= 0; i++) {
+		if (interface->ifr_route.destination->sa_family
+			== kFamilies[i].family) {
+			family = &kFamilies[i];
+			break;
+		}
+	}
+
+	printf("%s routing table:\n", family->name);
+
 	while (interface < end) {
 		route_entry& route = interface->ifr_route;
 
 		// apply filters
 		if (interfaceName == NULL
 			|| !strcmp(interfaceName, interface->ifr_name)) {
-			// find family
-			const address_family *family = NULL;
-			for (int32 i = 0; kFamilies[i].family >= 0; i++) {
-				if (route.destination->sa_family == kFamilies[i].family) {
-					family = &kFamilies[i];
-					break;
-				}
-			}
 
 			if (family != NULL) {
 				BNetworkAddress destination(*route.destination);
-
 				printf("%15s", destination.ToString().String());
 
 				if (route.mask != NULL) {
@@ -264,6 +262,7 @@ list_routes(int socket, const char *interfaceName, route_entry &route)
 			+ sizeof(route_entry) + addressSize);
 	}
 
+	putchar('\n');
 	free(buffer);
 }
 
