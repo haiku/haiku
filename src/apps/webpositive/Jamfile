@@ -26,11 +26,8 @@ local sources =
 	# support
 	BaseURL.cpp
 	BitmapButton.cpp
-	DateTime.cpp
 	FontSelectionView.cpp
-	IconButton.cpp
 	SettingsMessage.cpp
-	StringForSize.cpp
 
 	# tabview
 	TabContainerView.cpp
@@ -46,7 +43,6 @@ local sources =
 	DownloadWindow.cpp
 	SettingsKeys.cpp
 	SettingsWindow.cpp
-	svn_revision.cpp
 	URLInputGroup.cpp
 ;
 
@@ -54,12 +50,11 @@ Includes [ FGristFiles $(sources) ] : $(HAIKU_WEBKIT_HEADERS_DEPENDENCY) ;
 	# Dependency needed to trigger downloading/unzipping the package before
 	# compiling the files.
 
-# SVN revision
-#local svnRevisionFile = [ FGristFiles svn_revision ] ;
-#MakeLocate $(svnRevisionFile) : $(LOCATE_TARGET) ;
-#CreateSVNRevisionFile $(svnRevisionFile) ;
+# private OS headers
+UseLibraryHeaders icon ;
+UsePrivateHeaders shared tracker ;
+SubDirHdrs $(HAIKU_TOP) src kits tracker ;
 
-UsePrivateHeaders shared ;
 
 Application WebPositive :
 	$(sources)

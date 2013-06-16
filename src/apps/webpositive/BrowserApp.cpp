@@ -47,7 +47,6 @@
 #include "DownloadWindow.h"
 #include "SettingsMessage.h"
 #include "SettingsWindow.h"
-#include "svn_revision.h"
 #include "NetworkCookieJar.h"
 #include "WebKitInfo.h"
 #include "WebPage.h"
