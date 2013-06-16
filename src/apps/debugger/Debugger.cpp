@@ -613,7 +613,7 @@ Debugger::_StartNewTeam(const char* path, const char* args)
 		return B_BAD_VALUE;
 
 	BString data;
-	data.SetToFormat("%s %s", path, args);
+	data.SetToFormat("\"%s\" %s", path, args);
 	if (data.Length() == 0)
 		return B_NO_MEMORY;
 
