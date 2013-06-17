@@ -715,7 +715,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ] {
 			InstallOptionalHaikuImagePackage
 				$(hpkgBaseURL)/jam-2.5_2012_10_12-1-x86_gcc2.hpkg ;
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/mkdepend-1.7-2-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/mkdepend-1.7-3-x86_gcc2.hpkg ;
 			InstallOptionalHaikuImagePackage
 				$(hpkgBaseURL)/make-3.82-5-x86_gcc2.hpkg ;
 		}
@@ -1391,7 +1391,7 @@ if [ IsOptionalHaikuImagePackageAdded Mercurial ] {
 				: : cdPackage ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/mercurial-2.2.2-2-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/mercurial-2.2.2-3-x86_gcc2.hpkg ;
 		}
 	} else if $(TARGET_ARCH) = x86_64 {
 		InstallOptionalHaikuImagePackage
