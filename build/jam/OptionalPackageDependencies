@@ -18,8 +18,7 @@ OptionalPackageDependencies Development :
 OptionalPackageDependencies DevelopmentPowerPC : DevelopmentMin ;
 OptionalPackageDependencies GetText : GetTextLibintl ;
 OptionalPackageDependencies GetTextLibintl : LibIconv ;
-OptionalPackageDependencies Git : Expat Curl OpenSSL LibIconv ;
-OptionalPackageDependencies GitDoc : Man Git ;
+OptionalPackageDependencies Git : Expat Curl LibIconv Man OpenSSL Perl Python ;
 OptionalPackageDependencies ICU-devel : DevelopmentBase ;
 OptionalPackageDependencies LibEdit : NCurses ;
 OptionalPackageDependencies LibLayout : DevelopmentBase ;

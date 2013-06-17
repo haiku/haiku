@@ -399,8 +399,8 @@ if $(TARGET_ARCH) in arm ppc x86 x86_64 {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		HAIKU_FREETYPE_PACKAGE = freetype-2.4.9-r1a4-x86-gcc4-2012-09-02.zip ;
 	} else {
-		HAIKU_FREETYPE_PACKAGE = freetype-2.4.9-1-x86_gcc2.hpkg ;
-		HAIKU_FREETYPE_DEVEL_PACKAGE = freetype_devel-2.4.9-1-x86_gcc2.hpkg ;
+		HAIKU_FREETYPE_PACKAGE = freetype-2.4.9-2-x86_gcc2.hpkg ;
+		HAIKU_FREETYPE_DEVEL_PACKAGE = freetype_devel-2.4.9-2-x86_gcc2.hpkg ;
 	}
 
 	HAIKU_FREETYPE_URL = $(hpkgBaseURL)/$(HAIKU_FREETYPE_PACKAGE) ;
@@ -623,9 +623,9 @@ if $(TARGET_ARCH) != x86 {
 	Echo "Libsolv not available for $(TARGET_ARCH)." ;
 } else if $(HAIKU_GCC_VERSION[1]) = 2 {
 	HAIKU_LIBSOLV_PACKAGE
-		= libsolv-0.3.0_haiku_2013_05_30-2-x86_gcc2.hpkg ;
+		= libsolv-0.3.0_haiku_2013_06_16-1-x86_gcc2.hpkg ;
 	HAIKU_LIBSOLV_DEVEL_PACKAGE
-		= libsolv_devel-0.3.0_haiku_2013_05_30-2-x86_gcc2.hpkg ;
+		= libsolv_devel-0.3.0_haiku_2013_06_16-1-x86_gcc2.hpkg ;
 } else {
 	Echo "Libsolv not available for gcc4." ;
 }

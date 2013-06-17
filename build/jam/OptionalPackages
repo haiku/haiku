@@ -52,7 +52,6 @@
 #	GetText					- a framework to help produce multi-lingual messages.
 #	GetTextLibintl			- GetText's libintl
 #	Git						- the distributed version control system
-#	GitDoc					- documentation for the distributed version control system
 #	GLU						- OpenGL Utilities
 #	GLU-devel				- GLU development files
 #	GPerf					- the perfect hash function generator.
@@ -376,7 +375,7 @@ if [ IsOptionalHaikuImagePackageAdded Bzip ] {
 				: : cdPackage ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/bzip2-1.0.6-2-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/bzip2-1.0.6-3-x86_gcc2.hpkg ;
 		}
 	} else if $(TARGET_ARCH) = x86_64 {
 		InstallOptionalHaikuImagePackage
@@ -396,7 +395,7 @@ if [ IsOptionalHaikuImagePackageAdded CARootCertificates ] {
 			: common data ssl ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			$(hpkgBaseURL)/ca_root_certificates-121229-1-any.hpkg ;
+			$(hpkgBaseURL)/ca_root_certificates-2012_12_29-1-any.hpkg ;
 	}
 }
 
@@ -448,7 +447,7 @@ if [ IsOptionalHaikuImagePackageAdded CDRecord ] {
 				$(baseURL)/cdrtools-3.01a07-r1a4-x86-gcc4-2012-08-30.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/cdrtools-3.01~a07-2-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/cdrtools-3.01~a07-3-x86_gcc2.hpkg ;
 		}
 	} else if $(TARGET_ARCH) = x86_64 {
 		InstallOptionalHaikuImagePackage
@@ -515,7 +514,7 @@ if [ IsOptionalHaikuImagePackageAdded CMake ] {
 				: : cdPackage ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/cmake-2.8.5-4-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/cmake-2.8.5-5-x86_gcc2.hpkg ;
 		}
 	}
 }
@@ -548,7 +547,7 @@ if [ IsOptionalHaikuImagePackageAdded Ctags ] {
 				: : cdPackage ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/ctags-5.8-2-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/ctags-5.8-3-x86_gcc2.hpkg ;
 		}
 	} else if $(TARGET_ARCH) = x86_64 {
 		InstallOptionalHaikuImagePackage
@@ -568,7 +567,7 @@ if [ IsOptionalHaikuImagePackageAdded Curl ] {
 				$(baseURL)/curl-7.26.0-r1a4-x86-gcc4-2012-08-29.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/curl-7.26.0-3-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/curl-7.26.0-4-x86_gcc2.hpkg ;
 		}
 	} else if $(TARGET_ARCH) = x86_64 {
 		InstallOptionalHaikuImagePackage
@@ -588,7 +587,7 @@ if [ IsOptionalHaikuImagePackageAdded CVS ] {
 				: : cdPackage ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/cvs-1.12.13.1-4-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/cvs-1.12.13.1-5-x86_gcc2.hpkg ;
 		}
 	} else if $(TARGET_ARCH) = x86_64 {
 		InstallOptionalHaikuImagePackage
@@ -813,7 +812,7 @@ if [ IsOptionalHaikuImagePackageAdded Doxygen ] {
 				: : cdPackage ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/doxygen-1.6.3-2-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/doxygen-1.6.3-3-x86_gcc2.hpkg ;
 		}
 	}
 }
@@ -983,7 +982,17 @@ if [ IsOptionalHaikuImagePackageAdded Git ] {
 				: : cdPackage ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/git-1.7.5-1-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/git-1.7.10.2-2-x86_gcc2.hpkg ;
+			InstallOptionalHaikuImagePackage
+				$(hpkgBaseURL)/git_arch-1.7.10.2-2-x86_gcc2.hpkg ;
+			InstallOptionalHaikuImagePackage
+				$(hpkgBaseURL)/git_cvs-1.7.10.2-2-x86_gcc2.hpkg ;
+			InstallOptionalHaikuImagePackage
+				$(hpkgBaseURL)/git_daemon-1.7.10.2-2-x86_gcc2.hpkg ;
+			InstallOptionalHaikuImagePackage
+				$(hpkgBaseURL)/git_email-1.7.10.2-2-x86_gcc2.hpkg ;
+			InstallOptionalHaikuImagePackage
+				$(hpkgBaseURL)/git_svn-1.7.10.2-2-x86_gcc2.hpkg ;
 		}
 	} else if $(TARGET_ARCH) = x86_64 {
 		InstallOptionalHaikuImagePackage
@@ -991,28 +1000,6 @@ if [ IsOptionalHaikuImagePackageAdded Git ] {
 			: : cdPackage ;
 	} else {
 		Echo "No optional package Git available for $(TARGET_ARCH)" ;
-	}
-}
-
-
-# GitDoc
-if [ IsOptionalHaikuImagePackageAdded GitDoc ] {
-	if $(TARGET_ARCH) = x86 {
-		if $(HAIKU_GCC_VERSION[1]) >= 4 {
-			InstallOptionalHaikuImagePackage
-				$(baseURL)/gitdoc-1.7.10.2-r1a4-x86-gcc4-2012-09-03.zip
-				: : cdPackage ;
-		} else {
-			InstallOptionalHaikuImagePackage
-				$(baseURL)/gitdoc-1.7.10.2-r1a4-x86-gcc2-2012-08-28.zip
-				: : cdPackage ;
-		}
-	} else if $(TARGET_ARCH) = x86_64 {
-		InstallOptionalHaikuImagePackage
-			$(baseURL)/gitdoc-1.8.0-x86_64-2012-12-18.zip
-			: : cdPackage ;
-	} else {
-		Echo "No optional package GitDoc available for $(TARGET_ARCH)" ;
 	}
 }
 
@@ -1063,26 +1050,6 @@ if [ IsOptionalHaikuImagePackageAdded GPerf ] {
 }
 
 
-# Groff
-if [ IsOptionalHaikuImagePackageAdded Groff ] {
-	if $(TARGET_ARCH) = x86 {
-		if $(HAIKU_GCC_VERSION[1]) >= 4 {
-			InstallOptionalHaikuImagePackage
-				$(baseURL)/groff-1.20.1-r1a4-x86-gcc4-2012-08-30.zip
-				: : cdPackage ;
-		} else {
-			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/groff-1.20.1-1-x86_gcc2.hpkg ;
-		}
-	} else if $(TARGET_ARCH) = x86_64 {
-		InstallOptionalHaikuImagePackage
-			$(baseURL)/groff-1.20.1-x86_64-2012-12-08.zip
-			: : cdPackage ;
-	} else {
-		Echo "No optional package Groff available for $(TARGET_ARCH)" ;
-	}
-}
-
 # Grep
 if [ IsOptionalHaikuImagePackageAdded Grep ] {
 	if $(TARGET_ARCH) = x86 {
@@ -1099,6 +1066,26 @@ if [ IsOptionalHaikuImagePackageAdded Grep ] {
 			: : cdPackage ;
 	} else {
 		Echo "No optional package Grep available for $(TARGET_ARCH)" ;
+	}
+}
+
+# Groff
+if [ IsOptionalHaikuImagePackageAdded Groff ] {
+	if $(TARGET_ARCH) = x86 {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			InstallOptionalHaikuImagePackage
+				$(baseURL)/groff-1.20.1-r1a4-x86-gcc4-2012-08-30.zip
+				: : cdPackage ;
+		} else {
+			InstallOptionalHaikuImagePackage
+				$(hpkgBaseURL)/groff-1.20.1-2-x86_gcc2.hpkg ;
+		}
+	} else if $(TARGET_ARCH) = x86_64 {
+		InstallOptionalHaikuImagePackage
+			$(baseURL)/groff-1.20.1-x86_64-2012-12-08.zip
+			: : cdPackage ;
+	} else {
+		Echo "No optional package Groff available for $(TARGET_ARCH)" ;
 	}
 }
 
@@ -1384,7 +1371,7 @@ if [ IsOptionalHaikuImagePackageAdded Man ] {
 			$(baseURL)/man-1.6g-r1a4-x86-gcc4-2012-08-30.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			$(hpkgBaseURL)/man-1.6g-1-x86_gcc2.hpkg ;
+			$(hpkgBaseURL)/man-1.6g-2-x86_gcc2.hpkg ;
 	}
 }
 
@@ -1434,7 +1421,7 @@ if [ IsOptionalHaikuImagePackageAdded Nano ] {
 				$(baseURL)/nano-2.2.6-r1a4-x86-gcc4-2012-08-30.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/nano-2.2.6-2-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/nano-2.2.6-3-x86_gcc2.hpkg ;
 		}
 	} else if $(TARGET_ARCH) = x86_64 {
 		InstallOptionalHaikuImagePackage
@@ -1753,7 +1740,7 @@ if [ IsOptionalHaikuImagePackageAdded Readline ] {
 			Echo "No optional package Readline available for gcc 4" ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/readline-6.2-2-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/readline-6.2-3-x86_gcc2.hpkg;
 		}
 	}
 }
@@ -1818,7 +1805,7 @@ if [ IsOptionalHaikuImagePackageAdded SQLite ] {
 				$(baseURL)/sqlite-3.7.13-r1a4-x86-gcc4-2012-08-30.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/sqlite-3.7.13-2-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/sqlite-3.7.13-3-x86_gcc2.hpkg ;
 		}
 	} else if $(TARGET_ARCH) = x86_64 {
 		InstallOptionalHaikuImagePackage
