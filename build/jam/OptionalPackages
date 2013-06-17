@@ -1149,7 +1149,7 @@ if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
 				: : !stripDebugSymbols ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/keymapswitcher-1.2.7.9-2-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/keymapswitcher-1.2.7.10-1-x86_gcc2.hpkg ;
 		}
 		AddSymlinkToHaikuImage home config settings deskbar menu Preferences
 			: /boot/common/bin/KeymapSwitcher ;
@@ -1185,7 +1185,7 @@ if [ IsOptionalHaikuImagePackageAdded LibEdit ] {
 			Echo "No optional package LibEdit available for gcc 4" ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/libedit-20120601_3.0-2-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/libedit-2012_06_01_3.0-1-x86_gcc2.hpkg ;
 		}
 	}
 }
@@ -1300,7 +1300,7 @@ if [ IsOptionalHaikuImagePackageAdded LibXML2 ] {
 				$(baseURL)/libxml2-2.8.0-r1a4-x86-gcc4-2012-08-28.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/libxml2-2.8.0-2-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/libxml2-2.8.0-3-x86_gcc2.hpkg ;
 		}
 	} else if $(TARGET_ARCH) = x86_64 {
 		InstallOptionalHaikuImagePackage
@@ -1645,7 +1645,7 @@ if [ IsOptionalHaikuImagePackageAdded PCRE ] {
 				$(baseURL)/libpcre-8.21-r1a4-x86-gcc4-2012-09-03.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/libpcre-8.21-4-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/libpcre-8.21-5-x86_gcc2.hpkg ;
 		}
 	} else if $(TARGET_ARCH) = x86_64 {
 		InstallOptionalHaikuImagePackage
