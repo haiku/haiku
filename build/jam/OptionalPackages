@@ -1740,7 +1740,7 @@ if [ IsOptionalHaikuImagePackageAdded Readline ] {
 			Echo "No optional package Readline available for gcc 4" ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/readline-6.2-3-x86_gcc2.hpkg;
+				$(hpkgBaseURL)/readline-6.2-3-x86_gcc2.hpkg ;
 		}
 	}
 }
@@ -2187,7 +2187,7 @@ if [ IsOptionalHaikuImagePackageAdded XZ-Utils ] {
 #		AddExpanderRuleToHaikuImage "application/x-xz" : .xz
 #			: "echo \\0045s | sed 's/.xz\\\$//g'"
 #			: "xz -df \\0045s"
-		;
+#		;
 	} else {
 		Echo "No optional package XZ-Utils available for $(TARGET_ARCH)" ;
 	}
