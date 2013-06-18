@@ -1566,7 +1566,7 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSH ] {
 				$(baseURL)/openssh-6.0p1-r1a4-x86-gcc4-2012-09-29.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				$(hpkgBaseURL)/openssh-6.0p1-4-x86_gcc2.hpkg ;
+				$(hpkgBaseURL)/openssh-6.0p1-5-x86_gcc2.hpkg ;
 		}
 
 		AddUserToHaikuImage sshd : 1001 : 100 : /var/empty : /bin/true
