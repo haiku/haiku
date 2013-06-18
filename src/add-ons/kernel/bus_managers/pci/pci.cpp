@@ -1185,11 +1185,15 @@ PCI::_GetBarInfo(PCIDev *dev, uint8 offset, uint32 *_address, uint32 *_size,
 	WriteConfig(dev->domain, dev->bus, dev->device, dev->function, offset, 4,
 		oldValue);
 
-	*_address = oldValue & PCI_address_memory_32_mask;
+	uint32 mask = PCI_address_memory_32_mask;
+	if ((oldValue & PCI_address_space) == PCI_address_space)
+		mask = PCI_address_io_mask;
+
+	*_address = oldValue & mask;
 	if (_size != NULL)
-		*_size = _BarSize(newValue, PCI_address_memory_32_mask);
+		*_size = _BarSize(newValue, mask);
 	if (_flags != NULL)
-		*_flags = newValue & 0xf;
+		*_flags = newValue & ~mask;
 }
 
 
