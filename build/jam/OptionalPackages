@@ -2131,7 +2131,7 @@ if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
 		Echo "No optional package WonderBrush available for gcc4" ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			$(hpkgBaseURL)/wonderbrush-2.1.2-2-x86_gcc2.hpkg ;
+			$(hpkgBaseURL)/wonderbrush-2.1.2-3-x86_gcc2.hpkg ;
 		AddSymlinkToHaikuImage home config settings deskbar menu Applications
 			: /boot/common/apps/WonderBrush/WonderBrush ;
 	}
