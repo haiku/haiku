@@ -206,6 +206,8 @@ struct SourceView::MarkerManager::InstructionPointerMarker : Marker {
 
 	virtual	void				Draw(BView* view, BRect rect);
 
+			bool				IsCurrentIP() const { return fIsCurrentIP; }
+
 private:
 			void				_DrawArrow(BView* view, BPoint tip, BSize size,
 									BSize base, const rgb_color& color,
@@ -1095,6 +1097,7 @@ SourceView::TextView::Draw(BRect updateRect)
 	SetHighColor(fTextColor);
 	SetFont(&fFontInfo->font);
 	SourceView::MarkerManager::Marker* marker;
+	SourceView::MarkerManager::InstructionPointerMarker* ipMarker;
 	int32 markerIndex = 0;
 	for (int32 i = minLine; i <= maxLine; i++) {
 		SetLowColor(ViewColor());
@@ -1109,9 +1112,16 @@ SourceView::TextView::Draw(BRect updateRect)
 			 	continue;
 			 } else if (marker->Line() == (uint32)i) {
 			 	++markerIndex;
-			 	if (dynamic_cast<SourceView::MarkerManager
-			 		::InstructionPointerMarker*>(marker) != NULL)
-			 		SetLowColor(96, 216, 216, 255);
+			 	 ipMarker = dynamic_cast<SourceView::MarkerManager
+			 	 	::InstructionPointerMarker*>(marker);
+			 	if (ipMarker != NULL) {
+			 		rgb_color ipColor = {96, 216, 216, 255 };
+			 		if (!ipMarker->IsCurrentIP())
+			 			ipColor = tint_color(ipColor, B_LIGHTEN_2_TINT);
+
+			 		SetLowColor(ipColor);
+
+			 	}
 			 	else
 					SetLowColor(255, 255, 0, 255);
 				FillRect(BRect(kLeftTextMargin, y, Bounds().right,
