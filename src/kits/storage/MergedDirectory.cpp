@@ -170,7 +170,7 @@ BMergedDirectory::GetNextDirents(struct dirent* direntBuffer, size_t bufferSize,
 		}
 	}
 
-	return B_ENTRY_NOT_FOUND;
+	return 0;
 }
 
 
