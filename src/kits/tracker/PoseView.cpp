@@ -1349,7 +1349,7 @@ BPoseView::AddPosesTask(void* castToParams)
 			if (count <= 0 && modelChunkIndex == -1)
 				break;
 
-			if (count) {
+			if (count > 0) {
 				ASSERT(count == 1);
 
 				if ((!hideDotFiles && (!strcmp(eptr->d_name, ".")
@@ -1393,7 +1393,7 @@ BPoseView::AddPosesTask(void* castToParams)
 				throw failToLock();
 			}
 
-			if (count) {
+			if (count > 0) {
 				// try to watch the model, no matter what
 
 				if (result != B_OK) {
@@ -1421,7 +1421,7 @@ BPoseView::AddPosesTask(void* castToParams)
 
 			bigtime_t now = system_time();
 
-			if (!count || modelChunkIndex >= kMaxAddPosesChunk - 1
+			if (count <= 0 || modelChunkIndex >= kMaxAddPosesChunk - 1
 				|| now > nextChunkTime) {
 				// keep getting models until we get <kMaxAddPosesChunk> of them
 				// or until 300000 runs out
@@ -1446,7 +1446,7 @@ BPoseView::AddPosesTask(void* castToParams)
 				snooze(500);	// be nice
 			}
 
-			if (!count)
+			if (count <= 0)
 				break;
 		}
 
