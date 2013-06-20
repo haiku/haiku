@@ -5174,13 +5174,12 @@ BPoseView::FSNotification(const BMessage* message)
 				}
 
 				const char* name;
-				if (message->FindString("name", &name) != B_OK)
-					break;
+				if (message->FindString("name", &name) != B_OK) {
 #if DEBUG
-				else
 					SERIAL_PRINT(("no name in entry creation message\n"));
-					break;
 #endif
+					break;
+				}
 				if (count) {
 					// basically, let's say we have a broken link :
 					// ./a_link -> ./some_folder/another_folder/a_target
