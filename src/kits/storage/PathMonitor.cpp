@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2007-2013, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,7 +10,12 @@
 
 #include <PathMonitor.h>
 
-#include <ObjectList.h>
+#include <pthread.h>
+#include <stdio.h>
+
+#include <map>
+#include <new>
+#include <set>
 
 #include <Autolock.h>
 #include <Directory.h>
@@ -21,10 +26,8 @@
 #include <Path.h>
 #include <String.h>
 
-#include <map>
-#include <new>
-#include <set>
-#include <stdio.h>
+#include <ObjectList.h>
+
 
 #undef TRACE
 //#define TRACE_PATH_MONITOR
@@ -34,9 +37,11 @@
 #	define TRACE(x...) ;
 #endif
 
+
 using namespace BPrivate;
 using namespace std;
 using std::nothrow; // TODO: Remove this line if the above line is enough.
+
 
 // TODO: Use optimizations where stuff is already known to avoid iterating
 // the watched directory and files set too often.
