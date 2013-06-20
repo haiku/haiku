@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Ingo Weinhold, ingo_weinhold@gmx.de
+ * Copyright 2011-2013, Ingo Weinhold, ingo_weinhold@gmx.de
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  *
  * Distributed under the terms of the MIT License.
@@ -55,8 +55,13 @@ BStringList::~BStringList()
 
 
 bool
-BStringList::Add(const BString& string, int32 index)
+BStringList::Add(const BString& _string, int32 index)
 {
+	BString string(_string);
+		// makes sure the string is shareable
+	if (string.Length() != _string.Length())
+		return false;
+
 	char* privateData = BString::Private(string).Data();
 	if (!fStrings.AddItem(privateData, index))
 		return false;
@@ -67,8 +72,13 @@ BStringList::Add(const BString& string, int32 index)
 
 
 bool
-BStringList::Add(const BString& string)
+BStringList::Add(const BString& _string)
 {
+	BString string(_string);
+		// makes sure the string is shareable
+	if (string.Length() != _string.Length())
+		return false;
+
 	char* privateData = BString::Private(string).Data();
 	if (!fStrings.AddItem(privateData))
 		return false;
