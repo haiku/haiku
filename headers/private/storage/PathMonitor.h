@@ -33,8 +33,8 @@ private:
 								BPathMonitor();
 								~BPathMonitor();
 
-	static	status_t			_InitLockerIfNeeded();
-	static	status_t			_InitLooperIfNeeded();
+	static	status_t			_InitIfNeeded();
+	static	void				_Init();
 };
 
 }	// namespace BPrivate

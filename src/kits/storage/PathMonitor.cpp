@@ -143,6 +143,7 @@ class PathHandler : public BHandler {
 };
 
 
+static pthread_once_t sInitOnce = PTHREAD_ONCE_INIT;
 static WatcherMap sWatchers;
 static BLocker* sLocker = NULL;
 static BLooper* sLooper = NULL;
@@ -975,50 +976,32 @@ BPathMonitor::~BPathMonitor()
 
 
 /*static*/ status_t
-BPathMonitor::_InitLockerIfNeeded()
+BPathMonitor::_InitIfNeeded()
 {
-	static vint32 lock = 0;
-
-	if (sLocker != NULL)
-		return B_OK;
-
-	while (sLocker == NULL) {
-		if (atomic_add(&lock, 1) == 0) {
-			sLocker = new (nothrow) BLocker("path monitor");
-			TRACE("Create PathMonitor locker\n");
-			if (sLocker == NULL)
-				return B_NO_MEMORY;
-		}
-		snooze(5000);
-	}
-
-	return B_OK;
+	pthread_once(&sInitOnce, &BPathMonitor::_Init);
+	return sLooper != NULL ? B_OK : B_NO_MEMORY;
 }
 
 
-/*static*/ status_t
-BPathMonitor::_InitLooperIfNeeded()
+/*static*/ void
+BPathMonitor::_Init()
 {
-	static vint32 lock = 0;
+	sLocker = new (nothrow) BLocker("path monitor");
+	TRACE("Create PathMonitor locker\n");
+	if (sLocker == NULL)
+		return;
 
-	if (sLooper != NULL)
-		return B_OK;
-
-	while (sLooper == NULL) {
-		if (atomic_add(&lock, 1) == 0) {
-			// first thread initializes the global looper
-			sLooper = new (nothrow) BLooper("PathMonitor looper");
-			TRACE("Start PathMonitor looper\n");
-			if (sLooper == NULL)
-				return B_NO_MEMORY;
-			thread_id thread = sLooper->Run();
-			if (thread < B_OK)
-				return (status_t)thread;
-		}
-		snooze(5000);
+	BLooper* looper = new (nothrow) BLooper("PathMonitor looper");
+	TRACE("Start PathMonitor looper\n");
+	if (looper == NULL)
+		return;
+	thread_id thread = looper->Run();
+	if (thread < 0) {
+		delete looper;
+		return;
 	}
 
-	return sLooper->Thread() >= 0 ? B_OK : B_ERROR;
+	sLooper = looper;
 }
 
 
@@ -1027,13 +1010,8 @@ BPathMonitor::StartWatching(const char* path, uint32 flags, BMessenger target)
 {
 	TRACE("StartWatching(%s)\n", path);
 
-	status_t status = _InitLockerIfNeeded();
+	status_t status = _InitIfNeeded();
 	if (status != B_OK)
-		return status;
-
-	// use the global looper for receiving node monitor notifications
-	status = _InitLooperIfNeeded();
-	if (status < B_OK)
 		return status;
 
 	BAutolock _(sLocker);
