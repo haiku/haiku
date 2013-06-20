@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2007-2013, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PATH_MONITOR_H
@@ -18,9 +18,14 @@
 
 #define B_PATH_MONITOR		'_PMN'
 
+
 namespace BPrivate {
 
+
 class BPathMonitor {
+public:
+			class BWatchingInterface;
+
 public:
 	static	status_t			StartWatching(const char* path, uint32 flags,
 									BMessenger target);
@@ -28,6 +33,10 @@ public:
 	static	status_t			StopWatching(const char* path,
 									BMessenger target);
 	static	status_t			StopWatching(BMessenger target);
+
+	static	void				SetWatchingInterface(
+									BWatchingInterface* watchingInterface);
+									// pass NULL to reset to default
 
 private:
 								BPathMonitor();
@@ -37,6 +46,27 @@ private:
 	static	void				_Init();
 };
 
+
+/*!	Base class just delegates to the respective C functions.
+ */
+class BPathMonitor::BWatchingInterface {
+public:
+								BWatchingInterface();
+	virtual						~BWatchingInterface();
+
+	virtual	status_t			WatchNode(const node_ref* node, uint32 flags,
+									const BMessenger& target);
+	virtual	status_t			WatchNode(const node_ref* node, uint32 flags,
+                    				const BHandler* handler,
+							  		const BLooper* looper = NULL);
+
+	virtual	status_t			StopWatching(const BMessenger& target);
+	virtual	status_t			StopWatching(const BHandler* handler,
+									const BLooper* looper = NULL);
+};
+
+
 }	// namespace BPrivate
+
 
 #endif	// _PATH_MONITOR_H

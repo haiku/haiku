@@ -147,6 +147,8 @@ static pthread_once_t sInitOnce = PTHREAD_ONCE_INIT;
 static WatcherMap sWatchers;
 static BLocker* sLocker = NULL;
 static BLooper* sLooper = NULL;
+static BPathMonitor::BWatchingInterface* sDefaultWatchingInterface = NULL;
+static BPathMonitor::BWatchingInterface* sWatchingInterface = NULL;
 
 
 static status_t
@@ -248,7 +250,7 @@ void
 PathHandler::Quit()
 {
 	if (sLooper->Lock()) {
-		stop_watching(this);
+		sWatchingInterface->StopWatching(this);
 		sLooper->RemoveHandler(this);
 		sLooper->Unlock();
 	}
@@ -706,7 +708,7 @@ PathHandler::_AddDirectory(BEntry& entry, bool notify)
 	else
 		flags = B_WATCH_DIRECTORY;
 
-	status = watch_node(&directory.node, flags, this);
+	status = sWatchingInterface->WatchNode(&directory.node, flags, this);
 	if (status != B_OK)
 		return status;
 
@@ -765,7 +767,7 @@ PathHandler::_RemoveDirectory(const node_ref& nodeRef, ino_t directoryNode)
 	if (iterator == fDirectories.end())
 		return B_ENTRY_NOT_FOUND;
 
-	watch_node(&directory.node, B_STOP_WATCHING, this);
+	sWatchingInterface->WatchNode(&directory.node, B_STOP_WATCHING, this);
 
 	node_ref directoryRef;
 	directoryRef.device = nodeRef.device;
@@ -852,7 +854,8 @@ PathHandler::_AddFile(BEntry& entry, bool notify)
 	if (_HasFile(nodeRef))
 		return B_OK;
 
-	status = watch_node(&nodeRef, (fFlags & WATCH_NODE_FLAG_MASK), this);
+	status = sWatchingInterface->WatchNode(&nodeRef,
+		(fFlags & WATCH_NODE_FLAG_MASK), this);
 	if (status != B_OK)
 		return status;
 
@@ -893,7 +896,7 @@ PathHandler::_RemoveFile(const node_ref& nodeRef)
 	if (iterator == fFiles.end())
 		return B_ENTRY_NOT_FOUND;
 
-	watch_node(&nodeRef, B_STOP_WATCHING, this);
+	sWatchingInterface->WatchNode(&nodeRef, B_STOP_WATCHING, this);
 	fFiles.erase(iterator);
 	return B_OK;
 }
@@ -990,6 +993,13 @@ BPathMonitor::_Init()
 	TRACE("Create PathMonitor locker\n");
 	if (sLocker == NULL)
 		return;
+
+	sDefaultWatchingInterface = new(std::nothrow) BWatchingInterface;
+	if (sDefaultWatchingInterface == NULL)
+		return;
+
+	if (sWatchingInterface == NULL)
+		SetWatchingInterface(sDefaultWatchingInterface);
 
 	BLooper* looper = new (nothrow) BLooper("PathMonitor looper");
 	TRACE("Start PathMonitor looper\n");
@@ -1105,5 +1115,58 @@ BPathMonitor::StopWatching(BMessenger target)
 
 	return B_OK;
 }
+
+
+/*static*/ void
+BPathMonitor::SetWatchingInterface(BWatchingInterface* watchingInterface)
+{
+	sWatchingInterface = watchingInterface != NULL
+		? watchingInterface : sDefaultWatchingInterface;
+}
+
+
+// #pragma mark - BWatchingInterface
+
+
+BPathMonitor::BWatchingInterface::BWatchingInterface()
+{
+}
+
+
+BPathMonitor::BWatchingInterface::~BWatchingInterface()
+{
+}
+
+
+status_t
+BPathMonitor::BWatchingInterface::WatchNode(const node_ref* node, uint32 flags,
+	const BMessenger& target)
+{
+	return watch_node(node, flags, target);
+}
+
+
+status_t
+BPathMonitor::BWatchingInterface::WatchNode(const node_ref* node, uint32 flags,
+	const BHandler* handler, const BLooper* looper)
+{
+	return watch_node(node, flags, handler, looper);
+}
+
+
+status_t
+BPathMonitor::BWatchingInterface::StopWatching(const BMessenger& target)
+{
+	return stop_watching(target);
+}
+
+
+status_t
+BPathMonitor::BWatchingInterface::StopWatching(const BHandler* handler,
+	const BLooper* looper)
+{
+	return stop_watching(handler, looper);
+}
+
 
 }	// namespace BPrivate
