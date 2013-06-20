@@ -32,7 +32,6 @@ NFS4Object::HandleErrors(uint32& attempt, uint32 nfs4Error, RPC::Server* server,
 {
 	// No request send by the client should cause any of the following errors.
 	ASSERT(nfs4Error != NFS4ERR_CLID_INUSE);
-	ASSERT(nfs4Error != NFS4ERR_NOFILEHANDLE);
 	ASSERT(nfs4Error != NFS4ERR_BAD_STATEID);
 	ASSERT(nfs4Error != NFS4ERR_RESTOREFH);
 	ASSERT(nfs4Error != NFS4ERR_LOCKS_HELD);
