@@ -264,8 +264,11 @@ TeamWindow::MessageReceived(BMessage* message)
 			BString data;
 			data.SetToFormat("Debug report successfully saved to '%s'",
 				message->FindString("path"));
-			BAlert *alert = new BAlert("Report saved", data.String(),
-				"OK");
+			BAlert *alert = new(std::nothrow) BAlert("Report saved",
+				data.String(), "Close");
+			if (alert == NULL)
+				break;
+
 			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 			break;
