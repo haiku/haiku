@@ -1121,8 +1121,7 @@ SourceView::TextView::Draw(BRect updateRect)
 
 			 		SetLowColor(ipColor);
 
-			 	}
-			 	else
+			 	} else
 					SetLowColor(255, 255, 0, 255);
 				FillRect(BRect(kLeftTextMargin, y, Bounds().right,
 					y + fFontInfo->lineHeight), B_SOLID_LOW);
