@@ -349,7 +349,9 @@ TeamWindow::MessageReceived(BMessage* message)
 		case B_REFS_RECEIVED:
 		{
 			entry_ref locatedPath;
-			message->FindRef("refs", &locatedPath);
+			if (message->FindRef("refs", &locatedPath) != B_OK)
+				break;
+
 			_HandleResolveMissingSourceFile(locatedPath);
 			break;
 		}
@@ -1438,11 +1440,30 @@ TeamWindow::_HandleResolveMissingSourceFile(entry_ref& locatedPath)
 			->SourceFile();
 		if (sourceFile != NULL) {
 			BString sourcePath;
-			BString targetPath;
 			sourceFile->GetPath(sourcePath);
-			BPath path(&locatedPath);
-			targetPath = path.Path();
-			fListener->SourceEntryLocateRequested(sourcePath, targetPath);
+			BPath sourceFilePath(sourcePath);
+			BPath targetFilePath(&locatedPath);
+			if (sourceFilePath.InitCheck() != B_OK
+				|| targetFilePath.InitCheck() != B_OK) {
+				return;
+			}
+
+			if (strcmp(sourceFilePath.Leaf(), targetFilePath.Leaf()) != 0) {
+				BString message;
+				message.SetToFormat("The names of source file '%s' and located"
+					" file '%s' differ. Use file anyway?",
+					sourceFilePath.Leaf(), targetFilePath.Leaf());
+				BAlert* alert = new(std::nothrow) BAlert(
+					"Source path mismatch", message.String(), "Cancel", "Use");
+				if (alert == NULL)
+					return;
+
+				int32 choice = alert->Go();
+				if (choice <= 0)
+					return;
+			}
+			fListener->SourceEntryLocateRequested(sourcePath,
+				targetFilePath.Path());
 			fListener->FunctionSourceCodeRequested(fActiveFunction);
 		}
 	}
