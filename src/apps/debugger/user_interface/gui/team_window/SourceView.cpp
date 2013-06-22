@@ -59,6 +59,7 @@ static const char* kEnableBreakpointMessage = "Click to enable breakpoint at "
 	"line %" B_PRId32 ".";
 
 static const uint32 MSG_OPEN_SOURCE_FILE = 'mosf';
+static const uint32 MSG_SWITCH_DISASSEMBLY_STATE = 'msds';
 
 static const char* kTrackerSignature = "application/x-vnd.Be-TRAK";
 
@@ -1758,13 +1759,51 @@ SourceView::TextView::_ScrollToBottom(void)
 bool
 SourceView::TextView::_AddGeneralActions(BPopUpMenu* menu, int32 line)
 {
-	BMessage* message = new(std::nothrow) BMessage(MSG_OPEN_SOURCE_FILE);
+	if (fSourceCode == NULL)
+		return true;
+
+	BMessage* message = NULL;
+	if (fSourceCode->GetSourceFile() != NULL) {
+		message = new(std::nothrow) BMessage(MSG_OPEN_SOURCE_FILE);
+		if (message == NULL)
+			return false;
+		message->AddInt32("line", line);
+
+		if (!_AddGeneralActionItem(menu, "Open source file", message))
+			return false;
+	}
+
+	if (fSourceView->fStackFrame == NULL)
+		return true;
+
+	FunctionInstance* instance = fSourceView->fStackFrame->Function();
+	if (instance == NULL)
+		return true;
+
+	FileSourceCode* code = instance->GetFunction()->GetSourceCode();
+
+	// if we only have disassembly, this option doesn't apply.
+	if (code == NULL)
+		return true;
+
+	// verify that we do in fact know the source file of the function,
+	// since we can't switch to it if it wasn't found and hasn't been
+	// located.
+	BString sourcePath;
+	code->GetSourceFile()->GetLocatedPath(sourcePath);
+	if (sourcePath.IsEmpty())
+		return true;
+
+	message = new(std::nothrow) BMessage(
+		MSG_SWITCH_DISASSEMBLY_STATE);
 	if (message == NULL)
 		return false;
-	message->AddInt32("line", line);
 
-	if (!_AddGeneralActionItem(menu, "Open source file", message))
+	if (!_AddGeneralActionItem(menu, dynamic_cast<DisassembledCode*>(
+			fSourceCode) != NULL ? "Show source" : "Show disassembly",
+			message)) {
 		return false;
+	}
 
 	return true;
 }
@@ -1935,6 +1974,40 @@ SourceView::MessageReceived(BMessage* message)
 
 			BMessenger messenger(kTrackerSignature);
 			messenger.SendMessage(&trackerMessage);
+			break;
+		}
+
+		case MSG_SWITCH_DISASSEMBLY_STATE:
+		{
+			if (fStackFrame == NULL)
+				break;
+
+			FunctionInstance* instance = fStackFrame->Function();
+			if (instance == NULL)
+					break;
+
+			SourceCode* code = NULL;
+			if (dynamic_cast<FileSourceCode*>(fSourceCode) != NULL) {
+				if (instance->SourceCodeState()
+					== FUNCTION_SOURCE_NOT_LOADED) {
+					fListener->FunctionSourceCodeRequested(instance, true);
+					break;
+				}
+
+				code = instance->GetSourceCode();
+			} else {
+				Function* function = instance->GetFunction();
+				if (function->SourceCodeState()
+					== FUNCTION_SOURCE_NOT_LOADED) {
+					fListener->FunctionSourceCodeRequested(instance, false);
+					break;
+				}
+
+				code = function->GetSourceCode();
+			}
+
+			if (code != NULL)
+				SetSourceCode(code);
 			break;
 		}
 

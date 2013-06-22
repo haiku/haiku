@@ -363,7 +363,9 @@ TeamWindow::MessageReceived(BMessage* message)
 			if (fActiveFunction != NULL
 				&& fActiveFunction->GetFunctionDebugInfo()
 					->SourceFile() != NULL && fActiveSourceCode != NULL
-				&& fActiveSourceCode->GetSourceFile() == NULL) {
+				&& fActiveSourceCode->GetSourceFile() == NULL
+				&& fActiveFunction->GetFunction()->SourceCodeState()
+					!= FUNCTION_SOURCE_NOT_LOADED) {
 				try {
 					if (fFilePanel == NULL) {
 						fFilePanel = new BFilePanel(B_OPEN_PANEL,
@@ -691,6 +693,14 @@ TeamWindow::ThreadActionRequested(::Thread* thread, uint32 action,
 	target_addr_t address)
 {
 	fListener->ThreadActionRequested(thread->ID(), action, address);
+}
+
+
+void
+TeamWindow::FunctionSourceCodeRequested(FunctionInstance* function,
+	bool forceDisassembly)
+{
+	fListener->FunctionSourceCodeRequested(function, forceDisassembly);
 }
 
 
@@ -1248,15 +1258,17 @@ TeamWindow::_UpdateSourcePathState()
 		if (sourceFile != NULL && !sourceFile->GetLocatedPath(sourceText))
 			sourceFile->GetPath(sourceText);
 
-		if (fActiveSourceCode->GetSourceFile() == NULL && sourceFile != NULL) {
+		if (fActiveFunction->GetFunction()->SourceCodeState()
+			!= FUNCTION_SOURCE_NOT_LOADED
+			&& fActiveSourceCode->GetSourceFile() == NULL
+			&& sourceFile != NULL) {
 			sourceText.Prepend("Click to locate source file '");
 			sourceText += "'";
 			truncatedText = sourceText;
 			fSourcePathView->TruncateString(&truncatedText, B_TRUNCATE_MIDDLE,
 				fSourcePathView->Bounds().Width());
-		} else if (sourceFile != NULL) {
+		} else if (sourceFile != NULL)
 			sourceText.Prepend("File: ");
-		}
 	}
 
 	if (!truncatedText.IsEmpty() && truncatedText != sourceText) {
@@ -1408,8 +1420,11 @@ TeamWindow::_HandleSourceCodeChanged()
 	// get a reference to the source code
 	AutoLocker< ::Team> locker(fTeam);
 
-	SourceCode* sourceCode = fActiveFunction->GetFunction()->GetSourceCode();
-	if (sourceCode == NULL)
+	SourceCode* sourceCode = NULL;
+	if (fActiveFunction->GetFunction()->SourceCodeState()
+		== FUNCTION_SOURCE_LOADED) {
+		sourceCode = fActiveFunction->GetFunction()->GetSourceCode();
+	} else
 		sourceCode = fActiveFunction->GetSourceCode();
 
 	BReference<SourceCode> sourceCodeReference(sourceCode);

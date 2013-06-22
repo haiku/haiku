@@ -110,6 +110,9 @@ private:
 									target_addr_t address);
 	virtual	void				ThreadActionRequested(::Thread* thread,
 									uint32 action, target_addr_t address);
+	virtual	void				FunctionSourceCodeRequested(
+									FunctionInstance* function,
+									bool forceDisassembly);
 
 
 	// VariablesView::Listener

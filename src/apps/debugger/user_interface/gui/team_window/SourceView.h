@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef SOURCE_VIEW_H
@@ -13,6 +14,7 @@
 
 
 class Breakpoint;
+class FunctionInstance;
 class SourceCode;
 class StackFrame;
 class StackTrace;
@@ -106,6 +108,9 @@ public:
 									target_addr_t address) = 0;
 	virtual void				ThreadActionRequested(Thread* thread,
 									uint32 action, target_addr_t address) = 0;
+	virtual	void				FunctionSourceCodeRequested(
+									FunctionInstance* function,
+									bool forceDisassembly) = 0;
 };
 
 
