@@ -126,7 +126,8 @@ class PathHandler : public BHandler {
 		status_t _RemoveDirectory(const node_ref& nodeRef, ino_t directoryNode);
 		status_t _RemoveDirectory(BEntry& entry, ino_t directoryNode);
 
-		bool _HasFile(const node_ref& nodeRef) const;
+		bool _HasFile(const node_ref& nodeRef, const entry_ref** _ref = NULL)
+			const;
 		status_t _AddFile(BEntry& entry, bool notify = false);
 		status_t _RemoveFile(const node_ref& nodeRef);
 		status_t _RemoveFile(BEntry& entry);
@@ -635,11 +636,7 @@ PathHandler::_NotifyTarget(BMessage* message, const node_ref& nodeRef) const
 
 	TRACE("_NotifyTarget(): node ref %ld.%Ld\n", nodeRef.device, nodeRef.node);
 
-	WatchedDirectory directory;
-	directory.node = nodeRef;
-
-	DirectorySet::const_iterator iterator = fDirectories.find(directory);
-	if (iterator != fDirectories.end()) {
+	if (_HasDirectory(nodeRef)) {
 		if (_WatchFilesOnly()) {
 			// stat or attr notification for a directory
 			return;
@@ -655,13 +652,10 @@ PathHandler::_NotifyTarget(BMessage* message, const node_ref& nodeRef) const
 			// this is bound to be a notification for a file
 			return;
 		}
-		FileEntry setEntry;
-		setEntry.ref.device = nodeRef.device;
-		setEntry.node = nodeRef.node;
-			// name does not need to be set, since it's not used for comparing
-		FileSet::const_iterator i = fFiles.find(setEntry);
-		if (i != fFiles.end()) {
-			BPath path(&(i->ref));
+
+		const entry_ref* entryRef;
+		if (_HasFile(nodeRef, &entryRef)) {
+			BPath path(entryRef);
 			update.AddString("path", path.Path());
 		}
 	}
@@ -815,14 +809,20 @@ PathHandler::_RemoveDirectory(BEntry& entry, ino_t directoryNode)
 
 
 bool
-PathHandler::_HasFile(const node_ref& nodeRef) const
+PathHandler::_HasFile(const node_ref& nodeRef,
+	const entry_ref** _ref /*= NULL*/) const
 {
 	FileEntry setEntry;
 	setEntry.ref.device = nodeRef.device;
 	setEntry.node = nodeRef.node;
 		// name does not need to be set, since it's not used for comparing
 	FileSet::const_iterator iterator = fFiles.find(setEntry);
-	return iterator != fFiles.end();
+	if (iterator == fFiles.end())
+		return false;
+
+	if (_ref != NULL)
+		*_ref = &iterator->ref;
+	return true;
 }
 
 
