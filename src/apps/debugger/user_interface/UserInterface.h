@@ -82,7 +82,8 @@ public:
 	virtual						~UserInterfaceListener();
 
 	virtual	void				FunctionSourceCodeRequested(
-									FunctionInstance* function) = 0;
+									FunctionInstance* function,
+									bool forceDisassembly = false) = 0;
 	virtual void				SourceEntryLocateRequested(
 									const char* sourcePath,
 									const char* locatedPath) = 0;

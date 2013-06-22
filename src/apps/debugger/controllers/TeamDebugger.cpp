@@ -762,22 +762,27 @@ TeamDebugger::SourceEntryLocateRequested(const char* sourcePath,
 
 
 void
-TeamDebugger::FunctionSourceCodeRequested(FunctionInstance* functionInstance)
+TeamDebugger::FunctionSourceCodeRequested(FunctionInstance* functionInstance,
+	bool forceDisassembly)
 {
 	Function* function = functionInstance->GetFunction();
 
 	// mark loading
 	AutoLocker< ::Team> locker(fTeam);
 
-	if (functionInstance->SourceCodeState() != FUNCTION_SOURCE_NOT_LOADED)
+	if (forceDisassembly && functionInstance->SourceCodeState()
+			!= FUNCTION_SOURCE_NOT_LOADED) {
 		return;
-	if (function->SourceCodeState() == FUNCTION_SOURCE_LOADED)
+	} else if (!forceDisassembly && function->SourceCodeState()
+			== FUNCTION_SOURCE_LOADED) {
 		return;
+	}
 
 	functionInstance->SetSourceCode(NULL, FUNCTION_SOURCE_LOADING);
 
 	bool loadForFunction = false;
-	if (function->SourceCodeState() == FUNCTION_SOURCE_NOT_LOADED) {
+	if (!forceDisassembly && function->SourceCodeState()
+			== FUNCTION_SOURCE_NOT_LOADED) {
 		loadForFunction = true;
 		function->SetSourceCode(NULL, FUNCTION_SOURCE_LOADING);
 	}

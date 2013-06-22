@@ -59,7 +59,8 @@ public:
 private:
 	// UserInterfaceListener
 	virtual	void				FunctionSourceCodeRequested(
-									FunctionInstance* function);
+									FunctionInstance* function,
+									bool forceDisassembly = false);
 	virtual void				SourceEntryLocateRequested(
 									const char* sourcePath,
 									const char* locatedPath);
