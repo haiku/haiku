@@ -1467,7 +1467,7 @@ PCI::_RefreshDeviceInfo(PCIBus *bus)
 
 status_t
 PCI::ReadConfig(uint8 domain, uint8 bus, uint8 device, uint8 function,
-	uint8 offset, uint8 size, uint32 *value)
+	uint16 offset, uint8 size, uint32 *value)
 {
 	domain_data *info = _GetDomainData(domain);
 	if (!info)
@@ -1490,7 +1490,7 @@ PCI::ReadConfig(uint8 domain, uint8 bus, uint8 device, uint8 function,
 
 uint32
 PCI::ReadConfig(uint8 domain, uint8 bus, uint8 device, uint8 function,
-	uint8 offset, uint8 size)
+	uint16 offset, uint8 size)
 {
 	uint32 value;
 	if (ReadConfig(domain, bus, device, function, offset, size, &value)
@@ -1502,7 +1502,7 @@ PCI::ReadConfig(uint8 domain, uint8 bus, uint8 device, uint8 function,
 
 
 uint32
-PCI::ReadConfig(PCIDev *device, uint8 offset, uint8 size)
+PCI::ReadConfig(PCIDev *device, uint16 offset, uint8 size)
 {
 	uint32 value;
 	if (ReadConfig(device->domain, device->bus, device->device,
@@ -1515,7 +1515,7 @@ PCI::ReadConfig(PCIDev *device, uint8 offset, uint8 size)
 
 status_t
 PCI::WriteConfig(uint8 domain, uint8 bus, uint8 device, uint8 function,
-	uint8 offset, uint8 size, uint32 value)
+	uint16 offset, uint8 size, uint32 value)
 {
 	domain_data *info = _GetDomainData(domain);
 	if (!info)
@@ -1537,7 +1537,7 @@ PCI::WriteConfig(uint8 domain, uint8 bus, uint8 device, uint8 function,
 
 
 status_t
-PCI::WriteConfig(PCIDev *device, uint8 offset, uint8 size, uint32 value)
+PCI::WriteConfig(PCIDev *device, uint16 offset, uint8 size, uint32 value)
 {
 	return WriteConfig(device->domain, device->bus, device->device,
 		device->function, offset, size, value);

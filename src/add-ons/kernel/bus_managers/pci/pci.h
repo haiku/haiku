@@ -77,17 +77,17 @@ public:
 			status_t		GetNthInfo(long index, pci_info *outInfo);
 
 			status_t		ReadConfig(uint8 domain, uint8 bus, uint8 device,
-								uint8 function, uint8 offset, uint8 size,
+								uint8 function, uint16 offset, uint8 size,
 								uint32 *value);
 			uint32			ReadConfig(uint8 domain, uint8 bus, uint8 device,
-								uint8 function, uint8 offset, uint8 size);
-			uint32			ReadConfig(PCIDev *device, uint8 offset,
+								uint8 function, uint16 offset, uint8 size);
+			uint32			ReadConfig(PCIDev *device, uint16 offset,
 								uint8 size);
 
 			status_t		WriteConfig(uint8 domain, uint8 bus, uint8 device,
-								uint8 function, uint8 offset, uint8 size,
+								uint8 function, uint16 offset, uint8 size,
 								uint32 value);
-			status_t		WriteConfig(PCIDev *device, uint8 offset,
+			status_t		WriteConfig(PCIDev *device, uint16 offset,
 								uint8 size, uint32 value);
 
 			status_t		FindCapability(uint8 domain, uint8 bus,
