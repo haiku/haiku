@@ -46,7 +46,10 @@ extern "C" {
 
 void *		pci_ram_address(const void *physical_address_in_system_memory);
 
-status_t 	pci_find_capability(uchar bus, uchar device, uchar function, uchar cap_id, uchar *offset);
+status_t 	pci_find_capability(uint8 bus, uint8 device, uint8 function,
+	uint8 cap_id, uint8 *offset = NULL);
+status_t 	pci_find_extended_capability(uint8 bus, uint8 device, uint8 function, 
+	uint16 cap_id, uint16 *offset = NULL);
 
 status_t	pci_reserve_device(uchar virtualBus, uchar device, uchar function,
 			const char *driverName, void *nodeCookie);

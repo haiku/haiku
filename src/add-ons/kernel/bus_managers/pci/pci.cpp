@@ -75,8 +75,8 @@ pci_write_config(uint8 virtualBus, uint8 device, uint8 function, uint8 offset,
 
 
 status_t
-pci_find_capability(uchar virtualBus, uchar device, uchar function,
-	uchar capID, uchar *offset)
+pci_find_capability(uint8 virtualBus, uint8 device, uint8 function,
+	uint8 capID, uint8 *offset)
 {
 	uint8 bus;
 	uint8 domain;
@@ -84,6 +84,20 @@ pci_find_capability(uchar virtualBus, uchar device, uchar function,
 		return B_ERROR;
 
 	return gPCI->FindCapability(domain, bus, device, function, capID, offset);
+}
+
+
+status_t
+pci_find_extended_capability(uint8 virtualBus, uint8 device, uint8 function,
+	uint16 capID, uint16 *offset)
+{
+	uint8 bus;
+	uint8 domain;
+	if (gPCI->ResolveVirtualBus(virtualBus, &domain, &bus) != B_OK)
+		return B_ERROR;
+
+	return gPCI->FindExtendedCapability(domain, bus, device, function, capID,
+		offset);
 }
 
 
@@ -1548,14 +1562,10 @@ status_t
 PCI::FindCapability(uint8 domain, uint8 bus, uint8 device, uint8 function,
 	uint8 capID, uint8 *offset)
 {
-	if (offset == NULL) {
-		TRACE_CAP("PCI: FindCapability() ERROR %u:%u:%u capability %#02x offset NULL pointer\n", bus, device, function, capID);
-		return B_BAD_VALUE;
-	}
-
 	uint16 status = ReadConfig(domain, bus, device, function, PCI_status, 2);
 	if (!(status & PCI_status_capabilities)) {
-		TRACE_CAP("PCI: find_pci_capability ERROR %u:%u:%u capability %#02x not supported\n", bus, device, function, capID);
+		FLOW("PCI: find_pci_capability ERROR %u:%u:%u capability %#02x "
+			"not supported\n", bus, device, function, capID);
 		return B_ERROR;
 	}
 
@@ -1566,27 +1576,29 @@ PCI::FindCapability(uint8 domain, uint8 bus, uint8 device, uint8 function,
 	switch (headerType & PCI_header_type_mask) {
 		case PCI_header_type_generic:
 		case PCI_header_type_PCI_to_PCI_bridge:
-			capPointer = ReadConfig(domain, bus, device, function,
-				PCI_capabilities_ptr, 1);
+			capPointer = PCI_capabilities_ptr;
 			break;
 		case PCI_header_type_cardbus:
-			capPointer = ReadConfig(domain, bus, device, function,
-				PCI_capabilities_ptr_2, 1);
+			capPointer = PCI_capabilities_ptr_2;
 			break;
 		default:
-			TRACE_CAP("PCI: find_pci_capability ERROR %u:%u:%u capability %#02x unknown header type\n", bus, device, function, capID);
+			TRACE_CAP("PCI: find_pci_capability ERROR %u:%u:%u capability "
+				"%#02x unknown header type\n", bus, device, function, capID);
 			return B_ERROR;
 	}
 
+	capPointer = ReadConfig(domain, bus, device, function, capPointer, 1);
 	capPointer &= ~3;
 	if (capPointer == 0) {
-		TRACE_CAP("PCI: find_pci_capability ERROR %u:%u:%u capability %#02x empty list\n", bus, device, function, capID);
+		TRACE_CAP("PCI: find_pci_capability ERROR %u:%u:%u capability %#02x "
+			"empty list\n", bus, device, function, capID);
 		return B_NAME_NOT_FOUND;
 	}
 
 	for (int i = 0; i < 48; i++) {
 		if (ReadConfig(domain, bus, device, function, capPointer, 1) == capID) {
-			*offset = capPointer;
+			if (offset != NULL)			
+				*offset = capPointer;
 			return B_OK;
 		}
 
@@ -1607,6 +1619,51 @@ status_t
 PCI::FindCapability(PCIDev *device, uint8 capID, uint8 *offset)
 {
 	return FindCapability(device->domain, device->bus, device->device,
+		device->function, capID, offset);
+}
+
+
+status_t
+PCI::FindExtendedCapability(uint8 domain, uint8 bus, uint8 device,
+	uint8 function, uint16 capID, uint16 *offset)
+{
+	if (FindCapability(domain, bus, device, function, PCI_cap_id_pcie)
+		!= B_OK) {
+		FLOW("PCI:FindExtendedCapability ERROR %u:%u:%u capability %#02x "
+			"not supported\n", bus, device, function, capID);
+		return B_ERROR;
+	}
+	uint16 capPointer = PCI_extended_capability;
+	uint32 capability = ReadConfig(domain, bus, device, function,
+		capPointer, 4);
+
+	if (capability == 0 || capability == 0xffffffff)
+			return B_NAME_NOT_FOUND;
+
+	for (int i = 0; i < 48; i++) {
+		if (PCI_extcap_id(capability) == capID) {
+			if (offset != NULL)
+				*offset = capPointer;
+			return B_OK;
+		}
+
+		capPointer = PCI_extcap_next_ptr(capability) & ~3;
+		if (capPointer < PCI_extended_capability)
+			return B_NAME_NOT_FOUND;
+		capability = ReadConfig(domain, bus, device, function,
+			capPointer, 4);
+	}
+
+	TRACE_CAP("PCI:FindExtendedCapability ERROR %u:%u:%u capability %#04x "
+		"circular list\n", bus, device, function, capID);
+	return B_ERROR;
+}
+
+
+status_t
+PCI::FindExtendedCapability(PCIDev *device, uint16 capID, uint16 *offset)
+{
+	return FindExtendedCapability(device->domain, device->bus, device->device,
 		device->function, capID, offset);
 }
 
