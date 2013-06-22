@@ -62,7 +62,7 @@ public:
 			bool				IsTextSelected() const;
 
 private:
-			BFile*				fFile;
+			const entry_ref*		fRef;
 			time_t				fLastModificationTime;
 			BPopUpMenu*			fGroups;
 			typedef BObjectList<AttributeTextControl> AttributeList;
