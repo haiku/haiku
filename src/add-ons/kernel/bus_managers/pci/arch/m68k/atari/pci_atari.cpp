@@ -82,9 +82,9 @@ static int		m68k_atari_enable_config(struct m68k_atari_fake_host_bridge *bridge,
 					uint8 bus, uint8 slot, uint8 function, uint8 offset);
 
 static status_t	m68k_atari_read_pci_config(void *cookie, uint8 bus, uint8 device,
-					uint8 function, uint8 offset, uint8 size, uint32 *value);
+					uint8 function, uint16 offset, uint8 size, uint32 *value);
 static status_t	m68k_atari_write_pci_config(void *cookie, uint8 bus,
-					uint8 device, uint8 function, uint8 offset, uint8 size,
+					uint8 device, uint8 function, uint16 offset, uint8 size,
 					uint32 value);
 static status_t	m68k_atari_get_max_bus_devices(void *cookie, int32 *count);
 static status_t	m68k_atari_read_pci_irq(void *cookie, uint8 bus, uint8 device,
@@ -103,7 +103,7 @@ static pci_controller sM68kAtariPCIController = {
 
 static status_t
 m68k_atari_read_pci_config(void *cookie, uint8 bus, uint8 device, uint8 function,
-	uint8 offset, uint8 size, uint32 *value)
+	uint16 offset, uint8 size, uint32 *value)
 {
 	struct fake_pci_device *devices = (struct fake_pci_device *)cookie;
 	struct fake_pci_device *dev;
@@ -183,7 +183,7 @@ m68k_atari_read_pci_config(void *cookie, uint8 bus, uint8 device, uint8 function
 
 static status_t
 m68k_atari_write_pci_config(void *cookie, uint8 bus, uint8 device,
-	uint8 function, uint8 offset, uint8 size, uint32 value)
+	uint8 function, uint16 offset, uint8 size, uint32 value)
 {
 #if 0
 	if (m68k_atari_enable_config(bridge, bus, device, function, offset)) {

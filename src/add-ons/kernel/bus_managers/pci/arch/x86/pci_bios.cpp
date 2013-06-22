@@ -17,7 +17,7 @@ pci_bios_init(void)
 
 status_t
 pci_bios_read_config(void *cookie, uint8 bus, uint8 device, uint8 function,
-	uint8 offset, uint8 size, uint32 *value)
+	uint16 offset, uint8 size, uint32 *value)
 {
 	return B_ERROR;
 }
@@ -25,7 +25,7 @@ pci_bios_read_config(void *cookie, uint8 bus, uint8 device, uint8 function,
 
 status_t
 pci_bios_write_config(void *cookie, uint8 bus, uint8 device, uint8 function,
-	uint8 offset, uint8 size, uint32 value)
+	uint16 offset, uint8 size, uint32 value)
 {
 	return B_ERROR;
 }
