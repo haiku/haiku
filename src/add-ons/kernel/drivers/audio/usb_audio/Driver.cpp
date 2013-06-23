@@ -1,47 +1,35 @@
 /*
  *	Driver for USB Audio Device Class devices.
- *	Copyright (c) 2009,10,12 S.Zharski <imker@gmx.li>
+ *	Copyright (c) 2009-13 S.Zharski <imker@gmx.li>
  *	Distributed under the terms of the MIT license.
  *
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <lock.h> // for mutex
-
 #include "Driver.h"
-#include "Settings.h"
+
+#include <AutoLock.h>
+
 #include "Device.h"
-#include "USB_audio_spec.h"
+#include "Settings.h"
 
 
+static const char* sDeviceBaseName = "audio/hmulti/USB Audio/";
+
+usb_module_info* gUSBModule = NULL;
+
+Device* gDevices[MAX_DEVICES];
+char* gDeviceNames[MAX_DEVICES + 1];
+
+mutex gDriverLock;
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
 
-static const char *sDeviceBaseName = "audio/hmulti/USB Audio/";
-Device *gDevices[MAX_DEVICES];
-char *gDeviceNames[MAX_DEVICES + 1];
-
-usb_module_info *gUSBModule = NULL;
-
-
-mutex gDriverLock;
-// auto - release helper class
-class DriverSmartLock {
-public:
-	DriverSmartLock()	{ mutex_lock(&gDriverLock);		}
-	~DriverSmartLock()	{ mutex_unlock(&gDriverLock);	}
-};
-
-
 status_t
-usb_audio_device_added(usb_device device, void **cookie)
+usb_audio_device_added(usb_device device, void** cookie)
 {
 	*cookie = NULL;
 
-	DriverSmartLock driverLock; // released on exit
+	MutexLocker driverLock;
 
 	// check if this is a replug of an existing device first
 	for (int32 i = 0; i < MAX_DEVICES; i++) {
@@ -57,10 +45,9 @@ usb_audio_device_added(usb_device device, void **cookie)
 	}
 
 	// no such device yet, create a new one
-	Device *audioDevice = new Device(device);
-	if (audioDevice == 0) {
+	Device* audioDevice = new Device(device);
+	if (audioDevice == 0)
 		return ENODEV;
-	}
 
 	status_t status = audioDevice->InitCheck();
 	if (status < B_OK) {
@@ -94,11 +81,11 @@ usb_audio_device_added(usb_device device, void **cookie)
 
 
 status_t
-usb_audio_device_removed(void *cookie)
+usb_audio_device_removed(void* cookie)
 {
-	DriverSmartLock driverLock; // released on exit
+	MutexLocker driverLock;
 
-	Device *device = (Device *)cookie;
+	Device* device = (Device*)cookie;
 	for (int32 i = 0; i < MAX_DEVICES; i++) {
 		if (gDevices[i] == device) {
 			if (device->IsOpen()) {
@@ -128,7 +115,7 @@ status_t
 init_driver()
 {
 	status_t status = get_module(B_USB_MODULE_NAME,
-		(module_info **)&gUSBModule);
+		(module_info**)&gUSBModule);
 	if (status < B_OK)
 		return status;
 
@@ -148,7 +135,7 @@ init_driver()
 	};
 
 	static usb_support_descriptor supportedDevices[] = {
-		{UAS_AUDIO, 0, 0, 0, 0 }
+		{ UAS_AUDIO, 0, 0, 0, 0 }
 	};
 
 	gUSBModule->register_driver(DRIVER_NAME, supportedDevices, 0, NULL);
@@ -183,9 +170,9 @@ uninit_driver()
 
 
 static status_t
-usb_audio_open(const char *name, uint32 flags, void **cookie)
+usb_audio_open(const char* name, uint32 flags, void** cookie)
 {
-	DriverSmartLock driverLock; // released on exit
+	MutexLocker driverLock;
 
 	*cookie = NULL;
 	status_t status = ENODEV;
@@ -200,44 +187,44 @@ usb_audio_open(const char *name, uint32 flags, void **cookie)
 
 
 static status_t
-usb_audio_read(void *cookie, off_t position, void *buffer, size_t *numBytes)
+usb_audio_read(void* cookie, off_t position, void* buffer, size_t* numBytes)
 {
-	Device *device = (Device *)cookie;
-	return device->Read((uint8 *)buffer, numBytes);
+	Device* device = (Device*)cookie;
+	return device->Read((uint8*)buffer, numBytes);
 }
 
 
 static status_t
-usb_audio_write(void *cookie, off_t position, const void *buffer,
-	size_t *numBytes)
+usb_audio_write(void* cookie, off_t position, const void* buffer,
+	size_t* numBytes)
 {
-	Device *device = (Device *)cookie;
-	return device->Write((const uint8 *)buffer, numBytes);
+	Device* device = (Device*)cookie;
+	return device->Write((const uint8*)buffer, numBytes);
 }
 
 
 static status_t
-usb_audio_control(void *cookie, uint32 op, void *buffer, size_t length)
+usb_audio_control(void* cookie, uint32 op, void* buffer, size_t length)
 {
-	Device *device = (Device *)cookie;
+	Device* device = (Device*)cookie;
 	return device->Control(op, buffer, length);
 }
 
 
 static status_t
-usb_audio_close(void *cookie)
+usb_audio_close(void* cookie)
 {
-	Device *device = (Device *)cookie;
+	Device* device = (Device*)cookie;
 	return device->Close();
 }
 
 
 static status_t
-usb_audio_free(void *cookie)
+usb_audio_free(void* cookie)
 {
-	Device *device = (Device *)cookie;
+	Device* device = (Device*)cookie;
 
-	DriverSmartLock driverLock; // released on exit
+	MutexLocker driverLock;
 
 	status_t status = device->Free();
 	for (int32 i = 0; i < MAX_DEVICES; i++) {
@@ -255,7 +242,7 @@ usb_audio_free(void *cookie)
 }
 
 
-const char **
+const char**
 publish_devices()
 {
 	for (int32 i = 0; gDeviceNames[i]; i++) {
@@ -263,14 +250,14 @@ publish_devices()
 		gDeviceNames[i] = NULL;
 	}
 
-	DriverSmartLock driverLock; // released on exit
+	MutexLocker driverLock;
 
 	int32 deviceCount = 0;
 	for (int32 i = 0; i < MAX_DEVICES; i++) {
 		if (gDevices[i] == NULL)
 			continue;
 
-		gDeviceNames[deviceCount] = (char *)malloc(strlen(sDeviceBaseName) + 4);
+		gDeviceNames[deviceCount] = (char*)malloc(strlen(sDeviceBaseName) + 4);
 		if (gDeviceNames[deviceCount]) {
 			sprintf(gDeviceNames[deviceCount], "%s%ld", sDeviceBaseName, i);
 			TRACE("publishing %s\n", gDeviceNames[deviceCount]);
@@ -280,12 +267,12 @@ publish_devices()
 	}
 
 	gDeviceNames[deviceCount] = NULL;
-	return (const char **)&gDeviceNames[0];
+	return (const char**)&gDeviceNames[0];
 }
 
 
-device_hooks *
-find_device(const char *name)
+device_hooks*
+find_device(const char* name)
 {
 	static device_hooks deviceHooks = {
 		usb_audio_open,
@@ -294,8 +281,8 @@ find_device(const char *name)
 		usb_audio_control,
 		usb_audio_read,
 		usb_audio_write,
-		NULL,				/* select */
-		NULL				/* deselect */
+		NULL,				// select
+		NULL				// deselect
 	};
 
 	return &deviceHooks;

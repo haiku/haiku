@@ -1,22 +1,28 @@
 /*
  *	Driver for USB Audio Device Class devices.
- *	Copyright (c) 2009,10,12 S.Zharski <imker@gmx.li>
+ *	Copyright (c) 2009-13 S.Zharski <imker@gmx.li>
  *	Distributed under the terms of the MIT license.
  *
  */
 
-#include <lock.h> // for mutex
-#include <stdlib.h> // for file operation
-#include <string.h> // for file operation
-#include <stdio.h> // for file operation
 
 #include "Settings.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <driver_settings.h>
+#include <lock.h>
+
+#include "Driver.h"
+
 
 bool gTraceOn = false;
 bool gTruncateLogFile = false;
 bool gAddTimeStamp = true;
 bool gTraceFlow = false;
-static char *gLogFilePath = NULL;
+static char* gLogFilePath = NULL;
 mutex gLogLock;
 
 static
@@ -36,7 +42,7 @@ void create_log()
 
 void load_settings()
 {
-	void *handle = load_driver_settings(DRIVER_NAME);
+	void* handle = load_driver_settings(DRIVER_NAME);
 	if (handle == 0)
 		return;
 
@@ -47,11 +53,10 @@ void load_settings()
 						gTruncateLogFile, true);
 	gAddTimeStamp = get_driver_boolean_parameter(handle, "add_timestamp",
 						gAddTimeStamp, true);
-	const char * logFilePath = get_driver_parameter(handle, "logfile",
+	const char* logFilePath = get_driver_parameter(handle, "logfile",
 						NULL, "/var/log/"DRIVER_NAME".log");
-	if (logFilePath != NULL) {
+	if (logFilePath != NULL)
 		gLogFilePath = strdup(logFilePath);
-	}
 
 	unload_driver_settings(handle);
 
@@ -68,16 +73,15 @@ void release_settings()
 }
 
 
-void usb_audio_trace(bool force, const char* func, const char *fmt, ...)
+void usb_audio_trace(bool force, const char* func, const char* fmt, ...)
 {
-	if (!(force || gTraceOn)) {
+	if (!(force || gTraceOn))
 		return;
-	}
 
 	va_list arg_list;
-	static const char *prefix = DRIVER_NAME":";
+	static const char* prefix = DRIVER_NAME":";
 	static char buffer[1024];
-	char *buf_ptr = buffer;
+	char* buf_ptr = buffer;
 	if (gLogFilePath == NULL) {
 		strlcpy(buffer, prefix, sizeof(buffer));
 		buf_ptr += strlen(prefix);

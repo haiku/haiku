@@ -1,36 +1,36 @@
 /*
  *	Driver for USB Audio Device Class devices.
- *	Copyright (c) 2009,10,12 S.Zharski <imker@gmx.li>
+ *	Copyright (c) 2009-13 S.Zharski <imker@gmx.li>
  *	Distributed under the terms of the MIT license.
  *
  */
 
 
 #include "Stream.h"
+
+
 #include "Device.h"
 #include "Driver.h"
 #include "Settings.h"
 
 
-Stream::Stream(Device *device, size_t interface, usb_interface_list *List
-										/*, bool isInput, uint32 HWChannel*/)
-			:
-			AudioStreamingInterface(&device->AudioControl(), interface, List),
-			fDevice(device),
-			fStatus(B_NO_INIT),
-			fStreamEndpoint(0),
-			fIsRunning(false),
-			fArea(-1),
-			fAreaSize(0),
-			fDescriptors(NULL),
-			fDescriptorsCount(0),
-			fCurrentBuffer(0),
-			fStartingFrame(0),
-			fSamplesCount(0),
-			fPacketSize(0),
-			fProcessedBuffers(0)
+Stream::Stream(Device* device, size_t interface, usb_interface_list* List)
+	:
+	AudioStreamingInterface(&device->AudioControl(), interface, List),
+	fDevice(device),
+	fStatus(B_NO_INIT),
+	fStreamEndpoint(0),
+	fIsRunning(false),
+	fArea(-1),
+	fAreaSize(0),
+	fDescriptors(NULL),
+	fDescriptorsCount(0),
+	fCurrentBuffer(0),
+	fStartingFrame(0),
+	fSamplesCount(0),
+	fPacketSize(0),
+	fProcessedBuffers(0)
 {
-	memset(&fFormat, 0, sizeof(_multi_format));
 }
 
 
@@ -58,7 +58,7 @@ Stream::_ChooseAlternate()
 
 		if (fAlternates[i]->Format()->fFormatType != UAF_FORMAT_TYPE_I) {
 			TRACE("Ignore alternate %d - format type %#02x is not supported.\n",
-									i, fAlternates[i]->Format()->fFormatType);
+				i, fAlternates[i]->Format()->fFormatType);
 			continue;
 		}
 
@@ -71,16 +71,16 @@ Stream::_ChooseAlternate()
 				break;
 			default:
 				TRACE("Ignore alternate %d - format %#04x is not supported.\n",
-									i, fAlternates[i]->Interface()->fFormatTag);
+					i, fAlternates[i]->Interface()->fFormatTag);
 			continue;
 		}
 
 		TypeIFormatDescriptor* format
-				= static_cast<TypeIFormatDescriptor*>(fAlternates[i]->Format());
+			= static_cast<TypeIFormatDescriptor*>(fAlternates[i]->Format());
 
 		if (format->fNumChannels > 2) {
 			TRACE("Ignore alternate %d - channel count %d "
-					"is not supported.\n", i, format->fNumChannels);
+				"is not supported.\n", i, format->fNumChannels);
 			continue;
 		}
 
@@ -88,7 +88,7 @@ Stream::_ChooseAlternate()
 			switch(format->fBitResolution) {
 				default:
 				TRACE("Ignore alternate %d - bit resolution %d "
-						"is not supported.\n", i, format->fBitResolution);
+					"is not supported.\n", i, format->fBitResolution);
 					continue;
 				case 8: case 16: case 18: case 20: case 24: case 32:
 					break;
@@ -107,10 +107,11 @@ Stream::_ChooseAlternate()
 		return B_NO_INIT;
 	}
 
-	const ASEndpointDescriptor* endpoint = fAlternates[
-												fActiveAlternate]->Endpoint();
+	const ASEndpointDescriptor* endpoint
+		= fAlternates[fActiveAlternate]->Endpoint();
 	fIsInput = (endpoint->fEndpointAddress & USB_ENDPOINT_ADDR_DIR_IN)
-													== USB_ENDPOINT_ADDR_DIR_IN;
+		== USB_ENDPOINT_ADDR_DIR_IN;
+
 	TRACE("Alternate %d EP:%x selected for %s!\n",
 		fActiveAlternate, endpoint->fEndpointAddress,
 		fIsInput ? "recording" : "playback");
@@ -158,8 +159,8 @@ Stream::_SetupBuffers()
 			B_READ_AREA | B_WRITE_AREA);
 		
 		if (fArea < 0) {
-			TRACE_ALWAYS("Error of creating %#x - bytes size buffer area:%#010x\n",
-													fAreaSize, fArea);
+			TRACE_ALWAYS("Error of creating %#x - "
+				"bytes size buffer area:%#010x\n", fAreaSize, fArea);
 			fStatus = fArea;
 			return fStatus;
 		}
@@ -197,7 +198,7 @@ Stream::_SetupBuffers()
 
 status_t
 Stream::OnSetConfiguration(usb_device device,
-								const usb_configuration_info *config)
+		const usb_configuration_info* config)
 {
 	if (config == NULL) {
 		TRACE_ALWAYS("NULL configuration. Not set.\n");
@@ -205,7 +206,7 @@ Stream::OnSetConfiguration(usb_device device,
 	}
 
 	usb_interface_info* interface
-					= &config->interface[fInterface].alt[fActiveAlternate];
+		= &config->interface[fInterface].alt[fActiveAlternate];
 	if (interface == NULL) {
 		TRACE_ALWAYS("NULL interface. Not set.\n");
 		return B_ERROR;
@@ -220,29 +221,13 @@ Stream::OnSetConfiguration(usb_device device,
 		if (address == interface->endpoint[i].descr->endpoint_address) {
 			fStreamEndpoint = interface->endpoint[i].handle;
 			TRACE("%s Stream Endpoint [address %#04x] handle is: %#010x.\n",
-					fIsInput ? "Input" : "Output", address, fStreamEndpoint);
-/*			
-			size_t actualLength = 0;
-			uint32 speed = 48000;
-			uint8 data[3];
-			data[0]	= 0xFF & speed;
-			data[1]	= (uint8) 0xFF & speed >> 8;
-			data[2]	= (uint8) 0xFF & speed >> 16;
-	
-			status_t status = gUSBModule->send_request(device,
-					USB_REQTYPE_CLASS | USB_REQTYPE_ENDPOINT_OUT,
-					UAS_SET_CUR, UAS_SAMPLING_FREQ_CONTROL << 8,
-					address, 3, data, &actualLength);
-			
-			TRACE_ALWAYS("set_speed for ep %#x %d: %x\n",
-					address, actualLength, status);
-*/			
+				fIsInput ? "Input" : "Output", address, fStreamEndpoint);
 			return B_OK;
 		}
 	}
 
 	TRACE("%s Stream Endpoint [address %#04x] was not found.\n",
-			fIsInput ? "Input" : "Output", address);
+		fIsInput ? "Input" : "Output", address);
 	return B_ERROR;
 }
 
@@ -278,9 +263,8 @@ Stream::Stop()
 status_t
 Stream::_QueueNextTransfer(size_t queuedBuffer, bool start)
 {
-	TypeIFormatDescriptor* format
-		= static_cast<TypeIFormatDescriptor*>(fAlternates[
-												fActiveAlternate]->Format());
+	TypeIFormatDescriptor* format = static_cast<TypeIFormatDescriptor*>(
+		fAlternates[fActiveAlternate]->Format());
 
 	size_t bufferSize = format->fNumChannels * format->fSubframeSize;
 	bufferSize *= fSamplesCount / kSamplesBufferCount;
@@ -290,34 +274,14 @@ Stream::_QueueNextTransfer(size_t queuedBuffer, bool start)
 	size_t packetsCount = fDescriptorsCount / kSamplesBufferCount;
 
 	TRACE("buffers:%#010x[%#x]\ndescrs:%#010x[%#x]\n",
-			buffers + bufferSize * queuedBuffer, bufferSize,
-			fDescriptors + queuedBuffer * packetsCount, packetsCount);
-#if 0
-{	
-	static int16 sin[24] = { 0, 4277, 8481, 12540, 16384, 19948, 23170, 25996,
-	   	28378, 30273, 31651, 32487, 32767, 32487, 31651, 30273, 28378, 25996,
-	   	23170, 19948, 16384, 12540, 8481, 4277 };
-	static uint16 sample = 0;
-	static bool sign = true;
-			
-			uint16* b = (uint16*)(buffers + bufferSize * queuedBuffer);
-			size_t length = bufferSize;
-			for (size_t u = 0; u < length / 2; u += 2) {
-				b[u] = b[u + 1] = sign ? sin[sample] : -sin[sample];
-				sample ++;
-				if (sample == 24) {
-					sample = 0;
-					sign = !sign;
-				}
-			}
-}
-#endif
+		buffers + bufferSize * queuedBuffer, bufferSize,
+		fDescriptors + queuedBuffer * packetsCount, packetsCount);
 
 	status_t status = gUSBModule->queue_isochronous(fStreamEndpoint,
-			buffers + bufferSize * queuedBuffer, bufferSize,
-			fDescriptors + queuedBuffer * packetsCount, packetsCount,
-			&fStartingFrame, start ? USB_ISO_ASAP : 0,
-			Stream::_TransferCallback, this);
+		buffers + bufferSize * queuedBuffer, bufferSize,
+		fDescriptors + queuedBuffer * packetsCount, packetsCount,
+		&fStartingFrame, start ? USB_ISO_ASAP : 0,
+		Stream::_TransferCallback, this);
 
 	TRACE("frame:%#010x\n", fStartingFrame);
 	return status; // B_OK;
@@ -325,16 +289,16 @@ Stream::_QueueNextTransfer(size_t queuedBuffer, bool start)
 
 
 void
-Stream::_TransferCallback(void *cookie, int32 status, void *data,
+Stream::_TransferCallback(void* cookie, int32 status, void* data,
 	uint32 actualLength)
 {
 	if (status == B_CANCELED) {
 		TRACE_ALWAYS("Cancelled: c:%p st:%#010x, data:%#010x, len:%d\n",
-			   cookie, status, data, actualLength);
+		   cookie, status, data, actualLength);
 		return;
 	}
 
-	Stream *stream = (Stream *)cookie;
+	Stream* stream = (Stream*)cookie;
 	
 	stream->fCurrentBuffer = (stream->fCurrentBuffer + 1) % kSamplesBufferCount;
 
@@ -342,9 +306,8 @@ Stream::_TransferCallback(void *cookie, int32 status, void *data,
 
 	/*status_t result =*/ stream->_QueueNextTransfer(stream->fCurrentBuffer, false);
 
-	if (atomic_add(&stream->fProcessedBuffers, 1) > (int32)kSamplesBufferCount) {
+	if (atomic_add(&stream->fProcessedBuffers, 1) > (int32)kSamplesBufferCount)
 		TRACE_ALWAYS("Processed buffers overflow:%d\n", stream->fProcessedBuffers);
-	}
 
 	release_sem_etc(stream->fDevice->fBuffersReadySem, 1, B_DO_NOT_RESCHEDULE);
 
@@ -359,21 +322,19 @@ Stream::_DumpDescriptors()
 	//size_t packetsCount = fDescriptorsCount / kSamplesBufferCount;
 	size_t from = /*fCurrentBuffer > 0 ? packetsCount :*/ 0 ;
 	size_t to   = /*fCurrentBuffer > 0 ?*/ fDescriptorsCount /*: packetsCount*/ ;
-	for (size_t i = from; i < to; i++) {
+	for (size_t i = from; i < to; i++)
 		TRACE("%d:req_len:%d; act_len:%d; stat:%#010x\n", i,
 			fDescriptors[i].request_length,	fDescriptors[i].actual_length,
 			fDescriptors[i].status);
-	}
 }
 
 
 status_t
-Stream::GetEnabledChannels(uint32& offset, multi_channel_enable *Enable)
+Stream::GetEnabledChannels(uint32& offset, multi_channel_enable* Enable)
 {
 	AudioChannelCluster* cluster = ChannelCluster();
-	if (cluster == 0) {
+	if (cluster == 0)
 		return B_ERROR;
-	}
 
 	for (size_t i = 0; i < cluster->ChannelsCount(); i++) {
 		B_SET_CHANNEL(Enable->enable_bits, offset++, true);
@@ -385,24 +346,22 @@ Stream::GetEnabledChannels(uint32& offset, multi_channel_enable *Enable)
 
 
 status_t
-Stream::SetEnabledChannels(uint32& offset, multi_channel_enable *Enable)
+Stream::SetEnabledChannels(uint32& offset, multi_channel_enable* Enable)
 {
 	AudioChannelCluster* cluster = ChannelCluster();
-	if (cluster == 0) {
+	if (cluster == 0)
 		return B_ERROR;
-	}
 
-	for (size_t i = 0; i < cluster->ChannelsCount(); i++) {
+	for (size_t i = 0; i < cluster->ChannelsCount(); i++)
 		TRACE("%s channel %d.\n", (B_TEST_CHANNEL(Enable->enable_bits, offset++)
-						? "Enable" : "Disable"), offset + 1);
-	}
+			? "Enable" : "Disable"), offset + 1);
 
 	return B_OK;
 }
 
 
 status_t
-Stream::GetGlobalFormat(multi_format_info *Format)
+Stream::GetGlobalFormat(multi_format_info* Format)
 {
 	_multi_format* format = fIsInput ? &Format->input : &Format->output;
 	format->cvsr = fAlternates[fActiveAlternate]->GetSamplingRate();
@@ -416,12 +375,12 @@ Stream::GetGlobalFormat(multi_format_info *Format)
 
 
 status_t
-Stream::SetGlobalFormat(multi_format_info *Format)
+Stream::SetGlobalFormat(multi_format_info* Format)
 {
 	_multi_format* format = fIsInput ? &Format->input : &Format->output;
 	AudioStreamAlternate* alternate = fAlternates[fActiveAlternate];
 	if (format->rate == alternate->GetSamplingRateId(0)
-		&& format->format == alternate->GetFormatId()) {
+			&& format->format == alternate->GetFormatId()) {
 		TRACE("No changes required\n");
 		return B_OK;
 	}
@@ -453,13 +412,13 @@ Stream::SetGlobalFormat(multi_format_info *Format)
 	uint8 address = fAlternates[fActiveAlternate]->Endpoint()->fEndpointAddress;
 
 	status = gUSBModule->send_request(fDevice->fDevice,
-			USB_REQTYPE_CLASS | USB_REQTYPE_ENDPOINT_OUT,
-			UAS_SET_CUR, UAS_SAMPLING_FREQ_CONTROL << 8,
-			address, 3, data, &actualLength);
+		USB_REQTYPE_CLASS | USB_REQTYPE_ENDPOINT_OUT,
+		UAS_SET_CUR, UAS_SAMPLING_FREQ_CONTROL << 8,
+		address, 3, data, &actualLength);
 	
 	TRACE_ALWAYS("set_speed %02x%02x%02x for ep %#x %d: %x\n",
-			data[0], data[1], data[2], 
-			address, actualLength, status);
+		data[0], data[1], data[2], 
+		address, actualLength, status);
 	return status;
 }
 
@@ -494,9 +453,8 @@ Stream::GetBuffers(multi_buffer_list* List)
 			List->return_playback_buffer_size, List->return_playback_buffers);
 	}
 
-	TypeIFormatDescriptor* format
-		= static_cast<TypeIFormatDescriptor*>(
-						fAlternates[fActiveAlternate]->Format());
+	TypeIFormatDescriptor* format = static_cast<TypeIFormatDescriptor*>(
+		fAlternates[fActiveAlternate]->Format());
 //	const ASEndpointDescriptor* endpoint
 //					= fAlternates[fActiveAlternate]->Endpoint();
 
@@ -505,18 +463,17 @@ Stream::GetBuffers(multi_buffer_list* List)
 		TRACE("%s buffer #%d:\n", fIsInput ? "input" : "output", buffer + 1);
 
 		for (size_t channel = startChannel;
-					channel < format->fNumChannels; channel++)
-		{
+				channel < format->fNumChannels; channel++) {
 			// init stride to the same for all buffers
 			uint32 stride = format->fSubframeSize * format->fNumChannels;
 			Buffers[buffer][channel].stride = stride;
 
 			// init to buffers area begin
 			Buffers[buffer][channel].base
-									= (char*)(fDescriptors + fDescriptorsCount);
+				= (char*)(fDescriptors + fDescriptorsCount);
 			// shift for whole buffer if required
 			size_t bufferSize = fPacketSize/*endpoint->fMaxPacketSize*/
-									* (fDescriptorsCount / kSamplesBufferCount);
+				* (fDescriptorsCount / kSamplesBufferCount);
 			Buffers[buffer][channel].base += buffer * bufferSize;
 			// shift for channel if required
 			Buffers[buffer][channel].base += channel * format->fSubframeSize;
@@ -528,11 +485,12 @@ Stream::GetBuffers(multi_buffer_list* List)
 
 	if (fIsInput) {
 		List->return_record_channels += format->fNumChannels;
-		TRACE("return_record_channels:%#010x\n", List->return_record_channels);
+		TRACE("return_record_channels:%#010x\n",
+			List->return_record_channels);
 	} else {
 		List->return_playback_channels += format->fNumChannels;
 		TRACE("return_playback_channels:%#010x\n",
-												List->return_playback_channels);
+			List->return_playback_channels);
 	}
 
 	return B_OK;
@@ -562,19 +520,4 @@ Stream::ExchangeBuffer(multi_buffer_info* Info)
 
 	return true;
 }
-
-
-/*
-ASInterfaceDescriptor*
-Stream::ASInterface()
-{
-	return fAlternates[fActiveAlternate]->Interface();
-}
-
-
-_ASFormatDescriptor*
-Stream::ASFormat()
-{
-	return fAlternates[fActiveAlternate]->Format();
-}*/
 

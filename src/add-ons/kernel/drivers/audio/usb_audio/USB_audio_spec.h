@@ -7,9 +7,10 @@
  *  And the USB Device Class Definition for Audio Formats Release 1.0
  *  (March 18, 1998)
  */
-
 #ifndef __USB_AUDIO_SPEC_H__
 #define __USB_AUDIO_SPEC_H__
+
+#include <SupportDefs.h>
 
 #ifdef __cplusplus
 extern "C" {

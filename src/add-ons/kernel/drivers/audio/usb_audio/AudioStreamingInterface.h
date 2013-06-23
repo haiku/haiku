@@ -1,6 +1,6 @@
 /*
  *	Driver for USB Audio Device Class devices.
- *	Copyright (c) 2009,10,12 S.Zharski <imker@gmx.li>
+ *	Copyright (c) 2009-13 S.Zharski <imker@gmx.li>
  *	Distributed under the terms of the MIT license.
  *
  */
@@ -8,31 +8,27 @@
 #define _AUDIO_STREAMING_INTERFACE_H_
 
 
-#include "Driver.h"
-#include "AudioControlInterface.h"
-
 #include <util/VectorMap.h>
+#include <USB3.h>
+
+#include "AudioControlInterface.h"
 #include "USB_audio_spec.h"
 
 
-//
-// Audio Streaming Interface information entities
-//
-//
-class ASInterfaceDescriptor /*: public _AudioFunctionEntity*/ {
+class ASInterfaceDescriptor {
 public:
-							ASInterfaceDescriptor(/*Device* device, size_t interface,*/
+							ASInterfaceDescriptor(
 								usb_as_interface_descriptor_r1*	Descriptor);
 							~ASInterfaceDescriptor();
 
 // protected:
-		uint8				fTerminalLink;
-		uint8				fDelay;
-		uint16				fFormatTag;
+			uint8			fTerminalLink;
+			uint8			fDelay;
+			uint16			fFormatTag;
 };
 
 
-class ASEndpointDescriptor /*: public _AudioFunctionEntity*/ {
+class ASEndpointDescriptor {
 public:
 							ASEndpointDescriptor(
 								usb_endpoint_descriptor* Endpoint,
@@ -40,63 +36,63 @@ public:
 							~ASEndpointDescriptor();
 
 // protected:
-		uint8				fCSAttributes;
-		uint8				fLockDelayUnits;
-		uint16				fLockDelay;
-		uint16				fMaxPacketSize;
-		uint8				fEndpointAddress;
-		uint8				fEndpointAttributes;
+			uint8			fCSAttributes;
+			uint8			fLockDelayUnits;
+			uint16			fLockDelay;
+			uint16			fMaxPacketSize;
+			uint8			fEndpointAddress;
+			uint8			fEndpointAttributes;
 };
 
 
-class _ASFormatDescriptor /*: public _AudioFunctionEntity*/ {
+class _ASFormatDescriptor {
 public:
 							_ASFormatDescriptor(
-									usb_type_I_format_descriptor* Descriptor);
-		virtual				~_ASFormatDescriptor();
+								usb_type_I_format_descriptor* Descriptor);
+	virtual					~_ASFormatDescriptor();
 
 // protected:
-		uint8				fFormatType;
-		uint32				GetSamFreq(uint8* freq);
+			uint8			fFormatType;
+			uint32			GetSamFreq(uint8* freq);
 };
 
 
 class TypeIFormatDescriptor : public _ASFormatDescriptor {
 public:
-							TypeIFormatDescriptor(/*Device* device, size_t interface,*/ 
+							TypeIFormatDescriptor(
 								usb_type_I_format_descriptor* Descriptor);
-		virtual				~TypeIFormatDescriptor();
+	virtual					~TypeIFormatDescriptor();
 
-		status_t			Init(usb_type_I_format_descriptor* Descriptor);
+			status_t		Init(usb_type_I_format_descriptor* Descriptor);
 
 // protected:
-		uint8				fNumChannels;
-		uint8				fSubframeSize;
-		uint8				fBitResolution;
-		uint8				fSampleFrequencyType;
-		Vector<uint32>		fSampleFrequencies;
+			uint8			fNumChannels;
+			uint8			fSubframeSize;
+			uint8			fBitResolution;
+			uint8			fSampleFrequencyType;
+			Vector<uint32>	fSampleFrequencies;
 };
 
 
 class TypeIIFormatDescriptor : public _ASFormatDescriptor {
 public:
-							TypeIIFormatDescriptor(/*Device* device, size_t interface,*/ 
+							TypeIIFormatDescriptor(
 								usb_type_II_format_descriptor* Descriptor);
-		virtual				~TypeIIFormatDescriptor();
+	virtual					~TypeIIFormatDescriptor();
 
 // protected:
-		uint16				fMaxBitRate;
-		uint16				fSamplesPerFrame;
-		uint8				fSampleFrequencyType;
-		Vector<uint32>		fSampleFrequencies;
+			uint16			fMaxBitRate;
+			uint16			fSamplesPerFrame;
+			uint8			fSampleFrequencyType;
+			Vector<uint32>	fSampleFrequencies;
 };
 
 
 class TypeIIIFormatDescriptor : public TypeIFormatDescriptor {
 public:
-							TypeIIIFormatDescriptor(/*Device* device, size_t interface, */
+							TypeIIIFormatDescriptor(
 								usb_type_III_format_descriptor* Descriptor);
-		virtual				~TypeIIIFormatDescriptor();
+	virtual					~TypeIIIFormatDescriptor();
 
 // protected:
 };
@@ -104,63 +100,59 @@ public:
 
 class AudioStreamAlternate {
 public:
-						AudioStreamAlternate(size_t alternate,
+									AudioStreamAlternate(size_t alternate,
 										ASInterfaceDescriptor* interface,
 										ASEndpointDescriptor* endpoint,
 										_ASFormatDescriptor* format);
-						~AudioStreamAlternate();
+									~AudioStreamAlternate();
 
-		ASInterfaceDescriptor*	Interface()	{ return fInterface; }
-		ASEndpointDescriptor*	Endpoint()	{ return fEndpoint;	 }
-		_ASFormatDescriptor*	Format()	{ return fFormat;	 }
+			ASInterfaceDescriptor*	Interface()	{ return fInterface; }
+			ASEndpointDescriptor*	Endpoint()	{ return fEndpoint;	 }
+			_ASFormatDescriptor*	Format()	{ return fFormat;	 }
 
-		status_t				SetSamplingRate(uint32 newRate);
-		status_t				SetSamplingRateById(uint32 newId);
-		uint32					GetSamplingRate() { return fSamplingRate; }
-		uint32					GetSamplingRateId(uint32 rate);
-		uint32					GetSamplingRateIds();
-		uint32					GetFormatId();
-		status_t				SetFormatId(uint32 newFormatId);
-		uint32					SamplingRateFromId(uint32 id);
+			status_t				SetSamplingRate(uint32 newRate);
+			status_t				SetSamplingRateById(uint32 newId);
+			uint32					GetSamplingRate() { return fSamplingRate; }
+			uint32					GetSamplingRateId(uint32 rate);
+			uint32					GetSamplingRateIds();
+			uint32					GetFormatId();
+			status_t				SetFormatId(uint32 newFormatId);
+			uint32					SamplingRateFromId(uint32 id);
 
 protected:
 
-		size_t					fAlternate;
-		ASInterfaceDescriptor*	fInterface;
-		ASEndpointDescriptor*	fEndpoint;
-		_ASFormatDescriptor*	fFormat;
-		uint32					fSamplingRate;
+			size_t					fAlternate;
+			ASInterfaceDescriptor*	fInterface;
+			ASEndpointDescriptor*	fEndpoint;
+			_ASFormatDescriptor*	fFormat;
+			uint32					fSamplingRate;
 };
-
-
-typedef	Vector<AudioStreamAlternate*>			StreamAlternatesVector;
-typedef	Vector<AudioStreamAlternate*>::Iterator	StreamAlternatesIterator;
 
 
 class AudioStreamingInterface {
 public:
-						AudioStreamingInterface(
-								AudioControlInterface*	controlInterface,
-								size_t interface, usb_interface_list *List);
-						~AudioStreamingInterface();
+								AudioStreamingInterface(
+									AudioControlInterface*	controlInterface,
+									size_t interface, usb_interface_list* List);
+								~AudioStreamingInterface();
 
-	//	status_t		InitCheck() { return fStatus; }
-		uint8			TerminalLink();
-		bool			IsInput() { return fIsInput; }
+	//		status_t			InitCheck() { return fStatus; }
+			uint8				TerminalLink();
+			bool				IsInput() { return fIsInput; }
 
-		AudioChannelCluster* ChannelCluster();
+			AudioChannelCluster* ChannelCluster();
 
-		void GetFormatsAndRates(multi_description *Description);
-
+			void				GetFormatsAndRates(
+									multi_description* Description);
 protected:
-		size_t				fInterface;
-		AudioControlInterface*	fControlInterface;
+			size_t				fInterface;
+			AudioControlInterface*	fControlInterface;
 
-	//	status_t			fStatus;
-		bool			fIsInput;
+	//		status_t			fStatus;
+			bool				fIsInput;
 		// alternates of the streams
-		StreamAlternatesVector	fAlternates;
-		size_t				fActiveAlternate;
+			Vector<AudioStreamAlternate*>	fAlternates;
+			size_t				fActiveAlternate;
 };
 
 
