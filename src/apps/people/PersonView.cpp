@@ -292,11 +292,9 @@ PersonView::IsSaved() const
 void
 PersonView::Save()
 {
-	BFile* file = new(std::nothrow) BFile(fRef, B_READ_WRITE);
-	if (file == NULL || file->InitCheck() != B_NO_ERROR) {
-		delete file;
+	BFile file(fRef, B_READ_WRITE);
+	if (file.InitCheck() != B_NO_ERROR)
 		return;
-	}
 
 	fSaving = true;
 
@@ -304,7 +302,7 @@ PersonView::Save()
 	for (int32 i = 0; i < count; i++) {
 		AttributeTextControl* control = fControls.ItemAt(i);
 		const char* value = control->Text();
-		file->WriteAttr(control->Attribute().String(), B_STRING_TYPE, 0,
+		file.WriteAttr(control->Attribute().String(), B_STRING_TYPE, 0,
 			value, strlen(value) + 1);
 		control->Update();
 	}
@@ -312,8 +310,8 @@ PersonView::Save()
 	// Write the picture, if any, in the person file content
 	if (fPictureView) {
 		// Trim any previous content
-		file->Seek(0, SEEK_SET);
-		file->SetSize(0);
+		file.Seek(0, SEEK_SET);
+		file.SetSize(0);
 
 		BBitmap* picture = fPictureView->Bitmap();
 		if (picture) {
@@ -323,7 +321,7 @@ PersonView::Save()
 			stream.DetachBitmap(&picture);
 
 			BTranslatorRoster* roster = BTranslatorRoster::Default();
-			roster->Translate(&stream, NULL, NULL, file,
+			roster->Translate(&stream, NULL, NULL, &file,
 				fPictureView->SuggestedType(), B_TRANSLATOR_BITMAP,
 				fPictureView->SuggestedMIMEType());
 
@@ -332,10 +330,9 @@ PersonView::Save()
 		fPictureView->Update();
 	}
 
-	file->GetModificationTime(&fLastModificationTime);
+	file.GetModificationTime(&fLastModificationTime);
 
 	fSaving = false;
-	delete file;
 }
 
 
