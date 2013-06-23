@@ -1116,11 +1116,10 @@ SourceView::TextView::Draw(BRect updateRect)
 			 	 ipMarker = dynamic_cast<SourceView::MarkerManager
 			 	 	::InstructionPointerMarker*>(marker);
 			 	if (ipMarker != NULL) {
-			 		rgb_color ipColor = {96, 216, 216, 255 };
-			 		if (!ipMarker->IsCurrentIP())
-			 			ipColor = tint_color(ipColor, B_LIGHTEN_2_TINT);
-
-			 		SetLowColor(ipColor);
+			 		if (ipMarker->IsCurrentIP())
+			 			SetLowColor(96, 216, 216, 255);
+			 		else
+			 			SetLowColor(216, 216, 216, 255);
 
 			 	} else
 					SetLowColor(255, 255, 0, 255);
