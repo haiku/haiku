@@ -334,7 +334,7 @@ PathHandler::_WatchFilesOnly() const
 bool
 PathHandler::_WatchFoldersOnly() const
 {
-	return (fFlags & B_WATCH_FOLDERS_ONLY) != 0;
+	return (fFlags & B_WATCH_DIRECTORIES_ONLY) != 0;
 }
 
 
