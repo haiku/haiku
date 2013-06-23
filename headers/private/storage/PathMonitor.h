@@ -28,11 +28,11 @@ public:
 
 public:
 	static	status_t			StartWatching(const char* path, uint32 flags,
-									BMessenger target);
+									const BMessenger& target);
 
 	static	status_t			StopWatching(const char* path,
-									BMessenger target);
-	static	status_t			StopWatching(BMessenger target);
+									const BMessenger& target);
+	static	status_t			StopWatching(const BMessenger& target);
 
 	static	void				SetWatchingInterface(
 									BWatchingInterface* watchingInterface);

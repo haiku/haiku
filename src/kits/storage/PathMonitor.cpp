@@ -1016,7 +1016,8 @@ BPathMonitor::_Init()
 
 
 /*static*/ status_t
-BPathMonitor::StartWatching(const char* path, uint32 flags, BMessenger target)
+BPathMonitor::StartWatching(const char* path, uint32 flags,
+	const BMessenger& target)
 {
 	TRACE("StartWatching(%s)\n", path);
 
@@ -1056,7 +1057,7 @@ BPathMonitor::StartWatching(const char* path, uint32 flags, BMessenger target)
 
 
 /*static*/ status_t
-BPathMonitor::StopWatching(const char* path, BMessenger target)
+BPathMonitor::StopWatching(const char* path, const BMessenger& target)
 {
 	if (sLocker == NULL)
 		return B_NO_INIT;
@@ -1090,7 +1091,7 @@ BPathMonitor::StopWatching(const char* path, BMessenger target)
 
 
 /*static*/ status_t
-BPathMonitor::StopWatching(BMessenger target)
+BPathMonitor::StopWatching(const BMessenger& target)
 {
 	if (sLocker == NULL)
 		return B_NO_INIT;
