@@ -18,8 +18,7 @@ class Team;
 class UserInterfaceListener;
 
 
-class ExceptionConfigWindow : public BWindow
-{
+class ExceptionConfigWindow : public BWindow {
 public:
 								ExceptionConfigWindow(::Team* team,
 									UserInterfaceListener* listener,
