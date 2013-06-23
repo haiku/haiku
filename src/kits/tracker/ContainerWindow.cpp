@@ -2761,9 +2761,10 @@ BContainerWindow::AddFileContextMenus(BMenu* menu)
 		menu->AddItem(new BMenuItem(TrackerSettings().DontMoveFilesToTrash()
 			? B_TRANSLATE("Delete")	: B_TRANSLATE("Move to Trash"),
 			new BMessage(kMoveToTrash), 'T'));
-
-		// add separator for copy to/move to items (navigation items)
-		menu->AddSeparatorItem();
+		if (!IsPrintersDir()) {
+			// add separator for copy to/move to items (navigation items)
+			menu->AddSeparatorItem();
+		}
 	} else {
 		menu->AddItem(new BMenuItem(B_TRANSLATE("Delete"),
 			new BMessage(kDelete), 0));
