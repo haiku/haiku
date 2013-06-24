@@ -194,7 +194,7 @@ list_routes(int socket, const char *interfaceName, route_entry &route)
 	printf("%s routing table:\n", family->name);
 
 	printf("%*s     %*s Flags  Interface\n", addressLength, "Destination",
-		addressLength, "Next Hop");
+		addressLength, "Gateway");
 
 	while (interface < end) {
 		route_entry& route = interface->ifr_route;
