@@ -14,7 +14,7 @@
 #define B_WATCH_RECURSIVELY			0x0200
 #define	B_WATCH_DIRECTORIES_ONLY	0x0400
 // NOTE: B_WATCH_RECURSIVELY usually implies to watch for file changes as well,
-// if that is not desired, add B_WATCH_FOLDERS_ONLY to the flags.
+// if that is not desired, add B_WATCH_DIRECTORIES_ONLY to the flags.
 
 #define B_PATH_MONITOR		'_PMN'
 
