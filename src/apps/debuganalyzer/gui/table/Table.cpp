@@ -640,8 +640,10 @@ Table::TableRowsRemoved(TableModel* model, int32 rowIndex, int32 count)
 	}
 
 	for (int32 i = rowIndex + count - 1; i >= rowIndex; i--) {
-		if (BRow* row = fRows.RemoveItemAt(i))
+		if (BRow* row = fRows.RemoveItemAt(i)) {
 			RemoveRow(row);
+			delete row;
+		}
 	}
 
 	// re-index the subsequent rows
