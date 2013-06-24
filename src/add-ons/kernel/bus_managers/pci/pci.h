@@ -186,9 +186,9 @@ void		pci_uninit(void);
 long		pci_get_nth_pci_info(long index, pci_info *outInfo);
 
 uint32		pci_read_config(uint8 virtualBus, uint8 device, uint8 function,
-				uint8 offset, uint8 size);
+				uint16 offset, uint8 size);
 void		pci_write_config(uint8 virtualBus, uint8 device, uint8 function,
-				uint8 offset, uint8 size, uint32 value);
+				uint16 offset, uint8 size, uint32 value);
 
 void		__pci_resolve_virtual_bus(uint8 virtualBus, uint8 *domain, uint8 *bus);
 

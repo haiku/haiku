@@ -26,6 +26,7 @@
 #endif
 
 const char *get_capability_name(uint8 cap_id);
+const char *get_extended_capability_name(uint16 cap_id);
 
 
 static void
@@ -177,6 +178,45 @@ print_capabilities(const pci_info *info)
 
 
 static void
+print_extended_capabilities(const pci_info *info)
+{
+	if (pci_find_capability(info->bus, info->device, info->function,
+			PCI_cap_id_pcie, NULL) != B_OK)
+		return;
+
+	uint16 capPointer = PCI_extended_capability;
+	uint32 capability = pci_read_config(info->bus, info->device,
+		info->function, capPointer, 4);
+	TRACE(("PCI:   Extended capabilities: "));
+	if (capability == 0 || capability == 0xffffffff) {
+		TRACE(("(empty list)\n"));
+		return;
+	}
+
+	for (int i = 0; i < 48; i++) {
+		if (i) {
+			TRACE((", "));
+		}
+		const char *name = get_extended_capability_name(
+			PCI_extcap_id(capability));
+		if (name) {
+			TRACE(("%s", name));
+		} else {
+			TRACE(("0x%04" B_PRIx32, PCI_extcap_id(capability)));
+		}
+
+		capPointer = PCI_extcap_next_ptr(capability) & ~3;
+		if (capPointer < PCI_extended_capability)
+			break;
+		capability = pci_read_config(info->bus, info->device, info->function,
+			capPointer, 4);
+	}
+
+	TRACE(("\n"));
+}
+
+
+static void
 print_info_basic(const pci_info *info, bool verbose)
 {
 	uint8 domain;
@@ -236,6 +276,7 @@ print_info_basic(const pci_info *info, bool verbose)
 	}
 
 	print_capabilities(info);
+	print_extended_capabilities(info);
 }
 
 
@@ -293,6 +334,74 @@ get_capability_name(uint8 cap_id)
 			return "SATA";
 		case PCI_cap_id_pciaf:
 			return "AdvancedFeatures";
+		default:
+			return NULL;
+	}
+}
+
+
+const char *
+get_extended_capability_name(uint16 cap_id)
+{
+	switch (cap_id) {
+		case PCI_extcap_id_aer:
+			return "Advanced Error Reporting";
+		case PCI_extcap_id_vc:
+			return "Virtual Channel";
+		case PCI_extcap_id_serial:
+			return "Serial Number";
+		case PCI_extcap_id_power_budget:
+			return "Power Budgeting";
+		case PCI_extcap_id_rcl_decl:
+			return "Root Complex Link Declaration";
+		case PCI_extcap_id_rcil_ctl:
+			return "Root Complex Internal Link Control";
+		case PCI_extcap_id_rcec_assoc:
+			return "Root Complex Event Collector Association";
+		case PCI_extcap_id_mfvc:
+			return "MultiFunction Virtual Channel";
+		case PCI_extcap_id_vc2:
+			return "Virtual Channel 2";
+		case PCI_extcap_id_rcrb_header:
+			return "RCRB Header";
+		case PCI_extcap_id_vendor:
+			return "Vendor Unique";
+		case PCI_extcap_id_acs:
+			return "Access Control Services";
+		case PCI_extcap_id_ari:
+			return "Alternative Routing Id Interpretation";
+		case PCI_extcap_id_ats:
+			return "Address Translation Services";
+		case PCI_extcap_id_srio_virtual:
+			return "Single Root I/O Virtualization";
+		case PCI_extcap_id_mrio_virtual:
+			return "Multiple Root I/O Virtual";
+		case PCI_extcap_id_multicast:
+			return "Multicast";
+		case PCI_extcap_id_page_request:
+			return "Page Request";
+		case PCI_extcap_id_amd:
+			return "AMD Reserved";
+		case PCI_extcap_id_resizable_bar:
+			return "Resizable Bar";
+		case PCI_extcap_id_dyn_power_alloc:
+			return "Dynamic Power Allocation";
+		case PCI_extcap_id_tph_requester:
+			return "TPH Requester";
+		case PCI_extcap_id_latency_tolerance:
+			return "Latency Tolerance Reporting";
+		case PCI_extcap_id_2ndpcie:
+			return "Secondary PCIe";
+		case PCI_extcap_id_pmux:
+			return "Protocol Multiplexing";
+		case PCI_extcap_id_pasid:
+			return "Process Address Space Id";
+		case PCI_extcap_id_ln_requester:
+			return "LN Requester";
+		case PCI_extcap_id_dpc:
+			return "Downstream Porto Containment";
+		case PCI_extcap_id_l1pm:
+			return "L1 Power Management Substates";
 		default:
 			return NULL;
 	}

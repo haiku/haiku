@@ -29,11 +29,11 @@ typedef struct pci_root_module_info {
 
 	// read PCI config space
 	uint32 (*read_pci_config)(uint8 bus, uint8 device, uint8 function,
-				uint8 offset, uint8 size);
+				uint16 offset, uint8 size);
 
 	// write PCI config space
 	void (*write_pci_config)(uint8 bus, uint8 device, uint8 function,
-				uint8 offset, uint8 size, uint32 value);
+				uint16 offset, uint8 size, uint32 value);
 } pci_root_module_info;
 
 extern pci_root_module_info gPCIRootModule;

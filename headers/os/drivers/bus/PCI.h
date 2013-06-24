@@ -27,13 +27,15 @@ typedef struct pci_device_module_info {
 
 	void	*(*ram_address)(pci_device *device, const void *physicalAddress);
 
-	uint32	(*read_pci_config)(pci_device *device, uint8 offset,
+	uint32	(*read_pci_config)(pci_device *device, uint16 offset,
 				uint8 size);
-	void	(*write_pci_config)(pci_device *device, uint8 offset,
+	void	(*write_pci_config)(pci_device *device, uint16 offset,
 				uint8 size, uint32 value);
 	status_t (*find_pci_capability)(pci_device *device, uint8 capID,
 				uint8 *offset);
 	void 	(*get_pci_info)(pci_device *device, struct pci_info *info);
+	status_t (*find_pci_extended_capability)(pci_device *device, uint16 capID,
+				uint16 *offset);
 } pci_device_module_info;
 
 

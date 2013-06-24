@@ -131,18 +131,18 @@ struct pci_module_info {
 						pci_info 	*info	/* caller-supplied buffer for info */
 					);
 	uint32			(*read_pci_config) (
-						uchar	bus,		/* bus number */
-						uchar	device,		/* device # on bus */
-						uchar	function,	/* function # in device */
-						uchar	offset,		/* offset in configuration space */
-						uchar	size		/* # bytes to read (1, 2 or 4) */
+						uint8	bus,		/* bus number */
+						uint8	device,		/* device # on bus */
+						uint8	function,	/* function # in device */
+						uint16	offset,		/* offset in configuration space */
+						uint8	size		/* # bytes to read (1, 2 or 4) */
 					);
 	void			(*write_pci_config) (
-						uchar	bus,		/* bus number */
-						uchar	device,		/* device # on bus */
-						uchar	function,	/* function # in device */
-						uchar	offset,		/* offset in configuration space */
-						uchar	size,		/* # bytes to write (1, 2 or 4) */
+						uint8	bus,		/* bus number */
+						uint8	device,		/* device # on bus */
+						uint8	function,	/* function # in device */
+						uint16	offset,		/* offset in configuration space */
+						uint8	size,		/* # bytes to write (1, 2 or 4) */
 						uint32	value		/* value to write */
 					);
 
@@ -174,6 +174,14 @@ struct pci_module_info {
 						uchar device,
 						uchar function,
 						uchar newInterruptLineValue);
+
+	status_t		(*find_pci_extended_capability) (
+						uint8	bus,
+						uint8	device,
+						uint8	function,
+						uint16	cap_id,
+						uint16	*offset
+					);
 };
 
 #define	B_PCI_MODULE_NAME		"bus_managers/pci/v1"
