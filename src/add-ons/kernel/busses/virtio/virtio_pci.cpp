@@ -252,7 +252,6 @@ init_bus(device_node* node, void** bus_cookie)
 
 	pci_device_module_info* pci;
 	pci_device* device;
-		
 	{
 		device_node* parent = gDeviceManager->get_parent_node(node);
 		device_node* pciParent = gDeviceManager->get_parent_node(parent);
@@ -276,6 +275,7 @@ init_bus(device_node* node, void** bus_cookie)
 	bus->irq = pciInfo.u.h0.interrupt_line;
 	if (bus->irq == 0 || bus->irq == 0xff) {
 		ERROR("PCI IRQ not assigned\n");
+		delete bus;
 		return B_ERROR;
 	}
 
@@ -288,7 +288,7 @@ init_bus(device_node* node, void** bus_cookie)
 	set_status(bus, VIRTIO_CONFIG_STATUS_RESET);
 	set_status(bus, VIRTIO_CONFIG_STATUS_ACK);
 
-	TRACE("init_bus() %p node %p pci %p device %p\n", bus, node, 
+	TRACE("init_bus() %p node %p pci %p device %p\n", bus, node,
 		bus->pci, bus->device);
 
 	*bus_cookie = bus;
