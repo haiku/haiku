@@ -40,11 +40,17 @@ enum modes {
 	RTM_FLUSH,
 };
 
+enum preferredPrefixFormat {
+	PREFIX_PREFER_NETMASK = 0,
+	PREFIX_PREFER_CIDR,
+};
+
 struct address_family {
 	int			family;
 	const char*	name;
 	const char*	identifiers[4];
-	int		maxAddressLength;
+	int			maxAddressLength;
+	int			preferredPrefixFormat;
 };
 
 static const address_family kFamilies[] = {
@@ -53,14 +59,16 @@ static const address_family kFamilies[] = {
 		"IPv4",
 		{"AF_INET", "inet", "ipv4", NULL},
 		15,
+		PREFIX_PREFER_NETMASK,
 	},
 	{
 		AF_INET6,
 		"IPv6",
 		{"AF_INET6", "inet6", "ipv6", NULL},
 		39,
+		PREFIX_PREFER_CIDR,
 	},
-	{ -1, NULL, {NULL} }
+	{ -1, NULL, {NULL}, -1, -1 }
 };
 
 
@@ -193,8 +201,13 @@ list_routes(int socket, const char *interfaceName, route_entry &route)
 
 	printf("%s routing table:\n", family->name);
 
-	printf("%*s     %*s Flags  Interface\n", addressLength, "Destination",
-		addressLength, "Gateway");
+	if (family->preferredPrefixFormat == PREFIX_PREFER_NETMASK) {
+		printf("%*s %*s %*s Flags  Interface\n", addressLength, "Destination",
+			addressLength, "Netmask", addressLength, "Gateway");
+	} else {
+		printf("%*s     %*s Flags  Interface\n", addressLength, "Destination",
+			addressLength, "Gateway");
+	}
 
 	while (interface < end) {
 		route_entry& route = interface->ifr_route;
@@ -206,13 +219,23 @@ list_routes(int socket, const char *interfaceName, route_entry &route)
 			if (family != NULL) {
 				BNetworkAddress destination(*route.destination);
 				printf("%*s", addressLength, destination.ToString().String());
-
 				if (route.mask != NULL) {
 					BNetworkAddress mask;
 					mask.SetTo(*route.mask);
-					printf("/%-3zd ", mask.PrefixLength());
-				} else
-					printf("     ");
+					if (family->preferredPrefixFormat
+						== PREFIX_PREFER_NETMASK) {
+						printf(" %*s ", addressLength,
+							mask.ToString().String());
+					} else {
+						printf("/%-3zd ", mask.PrefixLength());
+					}
+				} else {
+					if (family->preferredPrefixFormat
+						== PREFIX_PREFER_NETMASK) {
+						printf(" %*s ", addressLength, "-");
+					} else
+						printf("     ");
+				}
 
 				if ((route.flags & RTF_GATEWAY) != 0) {
 					BNetworkAddress gateway;
