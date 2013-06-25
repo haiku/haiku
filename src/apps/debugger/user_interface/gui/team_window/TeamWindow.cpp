@@ -1459,18 +1459,20 @@ TeamWindow::_HandleResolveMissingSourceFile(entry_ref& locatedPath)
 		if (sourceFile != NULL) {
 			BString sourcePath;
 			sourceFile->GetPath(sourcePath);
-			BPath sourceFilePath(sourcePath);
-			BPath targetFilePath(&locatedPath);
-			if (sourceFilePath.InitCheck() != B_OK
-				|| targetFilePath.InitCheck() != B_OK) {
-				return;
-			}
+			BString sourceFileName(sourcePath);
+			int32 index = sourcePath.FindLast('/');
+			if (index >= 0)
+				sourceFileName.Remove(0, index + 1);
 
-			if (strcmp(sourceFilePath.Leaf(), targetFilePath.Leaf()) != 0) {
+			BPath targetFilePath(&locatedPath);
+			if (targetFilePath.InitCheck() != B_OK)
+				return;
+
+			if (strcmp(sourceFileName.String(), targetFilePath.Leaf()) != 0) {
 				BString message;
 				message.SetToFormat("The names of source file '%s' and located"
 					" file '%s' differ. Use file anyway?",
-					sourceFilePath.Leaf(), targetFilePath.Leaf());
+					sourceFileName.String(), targetFilePath.Leaf());
 				BAlert* alert = new(std::nothrow) BAlert(
 					"Source path mismatch", message.String(), "Cancel", "Use");
 				if (alert == NULL)
