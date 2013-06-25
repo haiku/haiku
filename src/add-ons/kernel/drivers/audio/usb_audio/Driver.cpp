@@ -8,6 +8,7 @@
 #include "Driver.h"
 
 #include <AutoLock.h>
+#include <usb/USB_audio.h>
 
 #include "Device.h"
 #include "Settings.h"
@@ -135,7 +136,7 @@ init_driver()
 	};
 
 	static usb_support_descriptor supportedDevices[] = {
-		{ UAS_AUDIO, 0, 0, 0, 0 }
+		{ USB_AUDIO_INTERFACE_AUDIO_CLASS, 0, 0, 0, 0 }
 	};
 
 	gUSBModule->register_driver(DRIVER_NAME, supportedDevices, 0, NULL);

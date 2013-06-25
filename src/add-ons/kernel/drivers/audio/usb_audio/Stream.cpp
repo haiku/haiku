@@ -8,6 +8,7 @@
 
 #include "Stream.h"
 
+#include <usb/USB_audio.h>
 
 #include "Device.h"
 #include "Driver.h"
@@ -57,18 +58,19 @@ Stream::_ChooseAlternate()
 			continue;
 		}
 
-		if (fAlternates[i]->Format()->fFormatType != UAF_FORMAT_TYPE_I) {
+		if (fAlternates[i]->Format()->fFormatType
+				!= USB_AUDIO_FORMAT_TYPE_I) {
 			TRACE("Ignore alternate %d - format type %#02x is not supported.\n",
 				i, fAlternates[i]->Format()->fFormatType);
 			continue;
 		}
 
 		switch (fAlternates[i]->Interface()->fFormatTag) {
-			case UAF_PCM:
-			case UAF_PCM8:
-			case UAF_IEEE_FLOAT:
-		//	case UAF_ALAW:
-		//	case UAF_MULAW:
+			case USB_AUDIO_FORMAT_PCM:
+			case USB_AUDIO_FORMAT_PCM8:
+			case USB_AUDIO_FORMAT_IEEE_FLOAT:
+		//	case USB_AUDIO_FORMAT_ALAW:
+		//	case USB_AUDIO_FORMAT_MULAW:
 				break;
 			default:
 				TRACE("Ignore alternate %d - format %#04x is not supported.\n",
@@ -85,7 +87,7 @@ Stream::_ChooseAlternate()
 			continue;
 		}
 
-		if (fAlternates[i]->Interface()->fFormatTag == UAF_PCM) {
+		if (fAlternates[i]->Interface()->fFormatTag == USB_AUDIO_FORMAT_PCM) {
 			switch(format->fBitResolution) {
 				default:
 				TRACE("Ignore alternate %d - bit resolution %d "
@@ -330,7 +332,6 @@ Stream::_TransferCallback(void* cookie, int32 status, void* data,
 
 	release_sem_etc(stream->fDevice->fBuffersReadySem, 1, B_DO_NOT_RESCHEDULE);
 
-	// TRACE_ALWAYS("st:%#010x, len:%d -> %#010x\n", status, actualLength, result);
 	TRACE("st:%#010x, data:%#010x, len:%d\n", status, data, actualLength);
 	
 	atomic_add(&stream->fInsideNotify, -1);
@@ -426,19 +427,19 @@ Stream::SetGlobalFormat(multi_format_info* Format)
 	// set endpoint speed	
 	uint32 samplingRate = fAlternates[fActiveAlternate]->GetSamplingRate();
 	size_t actualLength = 0;
-	uint8 data[3];
-	data[0]	= 0xFF & samplingRate;
+	usb_audio_sampling_freq freq = _ASFormatDescriptor::GetSamFreq(samplingRate);
+/*	data[0]	= 0xFF & samplingRate;
 	data[1]	= 0xFF & samplingRate >> 8;
-	data[2]	= 0xFF & samplingRate >> 16;
+	data[2]	= 0xFF & samplingRate >> 16; */
 	uint8 address = fAlternates[fActiveAlternate]->Endpoint()->fEndpointAddress;
 
 	status = gUSBModule->send_request(fDevice->fDevice,
 		USB_REQTYPE_CLASS | USB_REQTYPE_ENDPOINT_OUT,
-		UAS_SET_CUR, UAS_SAMPLING_FREQ_CONTROL << 8,
-		address, 3, data, &actualLength);
+		USB_AUDIO_SET_CUR, USB_AUDIO_SAMPLING_FREQ_CONTROL << 8,
+		address, sizeof(freq), &freq, &actualLength);
 	
 	TRACE_ALWAYS("set_speed %02x%02x%02x for ep %#x %d: %x\n",
-		data[0], data[1], data[2], 
+		freq.bytes[0], freq.bytes[1], freq.bytes[2],
 		address, actualLength, status);
 	return status;
 }

@@ -8,6 +8,8 @@
 
 #include "Device.h"
 
+#include <usb/USB_audio.h>
+
 #include "Driver.h"
 #include "Settings.h"
 
@@ -572,14 +574,14 @@ Device::_SetupEndpoints()
 
 	for (size_t i = 0; i < config->interface_count; i++) {
 		usb_interface_info* Interface = config->interface[i].active;
-		if (Interface->descr->interface_class != UAS_AUDIO)
+		if (Interface->descr->interface_class != USB_AUDIO_INTERFACE_AUDIO_CLASS)
 			continue;
 
 		switch (Interface->descr->interface_subclass) {
-			case UAS_AUDIOCONTROL:
+			case USB_AUDIO_INTERFACE_AUDIOCONTROL_SUBCLASS:
 				fAudioControl.Init(i, Interface);
 				break;
-			case UAS_AUDIOSTREAMING:
+			case USB_AUDIO_INTERFACE_AUDIOSTREAMING_SUBCLASS:
 				{
 					Stream* stream = new Stream(this, i, &config->interface[i]);
 					if (B_OK == stream->Init()) {

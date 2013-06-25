@@ -1,6 +1,6 @@
 /*
  *	Driver for USB Audio Device Class devices.
- *	Copyright (c) 2009,10,12 S.Zharski <imker@gmx.li>
+ *	Copyright (c) 2009-13 S.Zharski <imker@gmx.li>
  *	Distributed under the tems of the MIT license.
  *
  */
@@ -8,8 +8,8 @@
 
 #include "AudioStreamingInterface.h"
 
+#include <usb/USB_audio.h>
 
-#include "audio.h"
 #include "Driver.h"
 #include "Settings.h"
 
@@ -42,15 +42,16 @@ static struct RatePair {
 //
 //
 ASInterfaceDescriptor::ASInterfaceDescriptor(
-		usb_as_interface_descriptor_r1* Descriptor)
+		usb_audio_streaming_interface_descriptor* Descriptor)
 	:
 	fTerminalLink(0),
 	fDelay(0),
 	fFormatTag(0)
 {
+// TODO: what aboput rev 2???????	
 	fTerminalLink = Descriptor->terminal_link;
-	fDelay = Descriptor->delay;
-	fFormatTag = Descriptor->format_tag;
+	fDelay = Descriptor->r1.delay;
+	fFormatTag = Descriptor->r1.format_tag;
 
 	TRACE("fTerminalLink:%d\n", fTerminalLink);
 	TRACE("fDelay:%d\n", fDelay);
@@ -66,7 +67,7 @@ ASInterfaceDescriptor::~ASInterfaceDescriptor()
 
 
 ASEndpointDescriptor::ASEndpointDescriptor(usb_endpoint_descriptor* Endpoint,
-		usb_as_cs_endpoint_descriptor* Descriptor)
+		usb_audio_streaming_endpoint_descriptor* Descriptor)
 	:
 	fCSAttributes(0),
 	fLockDelayUnits(0),
@@ -75,9 +76,6 @@ ASEndpointDescriptor::ASEndpointDescriptor(usb_endpoint_descriptor* Endpoint,
 	fEndpointAddress(0),
 	fEndpointAttributes(0)
 {
-//	usb_audiocontrol_header_descriptor* Header
-//		= (usb_audiocontrol_header_descriptor*)Interface->generic[i];
-
 	fCSAttributes = Descriptor->attributes;
 	fLockDelayUnits = Descriptor->lock_delay_units;
 	fLockDelay = Descriptor->lock_delay;
@@ -102,9 +100,9 @@ ASEndpointDescriptor::~ASEndpointDescriptor()
 
 
 _ASFormatDescriptor::_ASFormatDescriptor(
-		usb_type_I_format_descriptor* Descriptor)
+		usb_audio_format_descriptor* Descriptor)
 	:
-	fFormatType(UAF_FORMAT_TYPE_UNDEFINED)
+	fFormatType(USB_AUDIO_FORMAT_TYPE_UNDEFINED)
 {
 	fFormatType = Descriptor->format_type;
 }
@@ -116,14 +114,29 @@ _ASFormatDescriptor::~_ASFormatDescriptor()
 
 
 uint32
-_ASFormatDescriptor::GetSamFreq(uint8* freq)
+_ASFormatDescriptor::GetSamFreq(const usb_audio_sampling_freq& freq)
 {
-	return freq[0] | freq[1] << 8 | freq[2] << 16;
+	return freq.bytes[0] | freq.bytes[1] << 8 | freq.bytes[2] << 16;
+}
+
+// TODO: beautify!!!
+usb_audio_sampling_freq
+_ASFormatDescriptor::GetSamFreq(uint32 samplingRate)
+{
+	usb_audio_sampling_freq freq;
+	for (size_t i = 0; i < 3; i++)
+		freq.bytes[i] = 0xFF & samplingRate >> 8 * i;
+
+//	return freq.bytes[0] | freq.bytes[1] << 8 | freq.bytes[2] << 16;
+/*	data[0]	= 0xFF & samplingRate;
+	data[1]	= 0xFF & samplingRate >> 8;
+	data[2]	= 0xFF & samplingRate >> 16; */
+	return freq;
 }
 
 
 TypeIFormatDescriptor::TypeIFormatDescriptor(
-		usb_type_I_format_descriptor* Descriptor)
+		usb_audio_format_descriptor* Descriptor)
 	:
 	_ASFormatDescriptor(Descriptor),
 	fNumChannels(0),
@@ -141,22 +154,22 @@ TypeIFormatDescriptor::~TypeIFormatDescriptor()
 
 
 status_t
-TypeIFormatDescriptor::Init(usb_type_I_format_descriptor* Descriptor)
+TypeIFormatDescriptor::Init(usb_audio_format_descriptor* Descriptor)
 {
-	fNumChannels = Descriptor->nr_channels;
-	fSubframeSize = Descriptor->subframe_size;
-	fBitResolution = Descriptor->bit_resolution;
-	fSampleFrequencyType = Descriptor->sam_freq_type;
+	fNumChannels = Descriptor->typeI.nr_channels;
+	fSubframeSize = Descriptor->typeI.subframe_size;
+	fBitResolution = Descriptor->typeI.bit_resolution;
+	fSampleFrequencyType = Descriptor->typeI.sam_freq_type;
 
 	if (fSampleFrequencyType == 0) {
 		fSampleFrequencies.PushBack(
-			GetSamFreq(Descriptor->sf.cont.lower_sam_freq));
+			GetSamFreq(Descriptor->typeI.sam_freqs[0]));
 		fSampleFrequencies.PushBack(
-			GetSamFreq(Descriptor->sf.cont.upper_sam_freq));
+			GetSamFreq(Descriptor->typeI.sam_freqs[1]));
 	} else
 		for (size_t i = 0; i < fSampleFrequencyType; i++)
 			fSampleFrequencies.PushBack(
-				GetSamFreq(Descriptor->sf.discr.sam_freq[i]));
+				GetSamFreq(Descriptor->typeI.sam_freqs[i]));
 
 	TRACE("fNumChannels:%d\n", fNumChannels);
 	TRACE("fSubframeSize:%d\n", fSubframeSize);
@@ -171,9 +184,9 @@ TypeIFormatDescriptor::Init(usb_type_I_format_descriptor* Descriptor)
 
 
 TypeIIFormatDescriptor::TypeIIFormatDescriptor(
-		usb_type_II_format_descriptor* Descriptor)
+		usb_audio_format_descriptor* Descriptor)
 	:
-	_ASFormatDescriptor((usb_type_I_format_descriptor*)Descriptor),
+	_ASFormatDescriptor(Descriptor),
 	fMaxBitRate(0),
 	fSamplesPerFrame(0),
 	fSampleFrequencyType(0),
@@ -188,9 +201,9 @@ TypeIIFormatDescriptor::~TypeIIFormatDescriptor()
 
 
 TypeIIIFormatDescriptor::TypeIIIFormatDescriptor(
-		usb_type_III_format_descriptor* Descriptor)
+		usb_audio_format_descriptor* Descriptor)
 	:
-	TypeIFormatDescriptor((usb_type_I_format_descriptor*)Descriptor)
+	TypeIFormatDescriptor(Descriptor)
 {
 }
 
@@ -326,9 +339,13 @@ AudioStreamAlternate::GetFormatId()
 
 	uint32 formats = 0;
 	switch (Interface()->fFormatTag) {
-		case UAF_PCM8: formats = B_FMT_8BIT_U; break;
-		case UAF_IEEE_FLOAT: formats = B_FMT_FLOAT; break;
-		case UAF_PCM:
+		case USB_AUDIO_FORMAT_PCM8:
+			formats = B_FMT_8BIT_U;
+			break;
+		case USB_AUDIO_FORMAT_IEEE_FLOAT:
+			formats = B_FMT_FLOAT;
+			break;
+		case USB_AUDIO_FORMAT_PCM:
 			switch(format->fBitResolution) {
 				case 8: formats = B_FMT_8BIT_S; break;
 				case 16: formats = B_FMT_16BIT; break;
@@ -404,19 +421,19 @@ AudioStreamingInterface::AudioStreamingInterface(
 			usb_audiocontrol_header_descriptor* Header
 				= (usb_audiocontrol_header_descriptor*)Interface->generic[i];
 
-			if (Header->descriptor_type == AC_CS_INTERFACE) {
+			if (Header->descriptor_type == USB_AUDIO_CS_INTERFACE) {
 				switch(Header->descriptor_subtype) {
-					case UAS_AS_GENERAL:
+					case USB_AUDIO_AS_GENERAL:
 						if (ASInterface == 0)
 							ASInterface = new ASInterfaceDescriptor(
-								(usb_as_interface_descriptor_r1*) Header);
+								(usb_audio_streaming_interface_descriptor*)Header);
 						else
 							TRACE_ALWAYS("Duplicate AStream interface ignored.\n");
 						break;
-					case UAS_FORMAT_TYPE:
+					case USB_AUDIO_AS_FORMAT_TYPE:
 						if (ASFormat == 0)
 							ASFormat = new TypeIFormatDescriptor(
-								(usb_type_I_format_descriptor*) Header);
+								(usb_audio_format_descriptor*) Header);
 						else
 							TRACE_ALWAYS("Duplicate AStream format ignored.\n");
 						break;
@@ -428,12 +445,12 @@ AudioStreamingInterface::AudioStreamingInterface(
 				continue;
 			}
 
-			if (Header->descriptor_type == AC_CS_ENDPOINT) {
+			if (Header->descriptor_type == USB_AUDIO_CS_ENDPOINT) {
 				if (ASEndpoint == 0) {
 					usb_endpoint_descriptor* Endpoint
 						= Interface->endpoint[0].descr;
 					ASEndpoint = new ASEndpointDescriptor(Endpoint,
-						(usb_as_cs_endpoint_descriptor*)Header);
+						(usb_audio_streaming_endpoint_descriptor*)Header);
 				} else
 					TRACE_ALWAYS("Duplicate AStream endpoint ignored.\n");
 				continue;

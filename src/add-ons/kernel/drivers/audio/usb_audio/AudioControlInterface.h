@@ -8,11 +8,10 @@
 #define _AUDIO_CONTROL_INTERFACE_H_
 
 
-#include "USB_audio_spec.h"
-#include <hmulti_audio.h>
-
-#include <util/VectorMap.h>
 #include <USB3.h>
+#include <hmulti_audio.h>
+#include <usb/USB_audio.h>
+#include <util/VectorMap.h>
 
 
 class Device;
