@@ -221,15 +221,10 @@ InspectorWindow::MessageReceived(BMessage* message)
 
 			if (addressValid) {
 				fCurrentAddress = address;
-				if (fCurrentBlock != NULL
-					&& !fCurrentBlock->Contains(address)) {
-					fCurrentBlock->ReleaseReference();
-					fCurrentBlock = NULL;
-				}
-
-				if (fCurrentBlock == NULL)
+				if (fCurrentBlock == NULL
+					|| !fCurrentBlock->Contains(address)) {
 					fListener->InspectRequested(address, this);
-				else
+				} else
 					fMemoryView->SetTargetAddress(fCurrentBlock, address);
 			}
 			break;
@@ -266,6 +261,9 @@ InspectorWindow::MessageReceived(BMessage* message)
 			}
 
 			if (result == B_OK) {
+				if (fCurrentBlock != NULL)
+					fCurrentBlock->ReleaseReference();
+
 				fCurrentBlock = block;
 				fMemoryView->SetTargetAddress(block, fCurrentAddress);
 				fPreviousBlockButton->SetEnabled(true);
