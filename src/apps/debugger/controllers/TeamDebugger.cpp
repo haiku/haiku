@@ -1690,11 +1690,11 @@ TeamDebugger::_HandleInspectAddress(target_addr_t address,
 		return;
 	}
 
-	if (!memoryBlock->HasListener(listener))
-		memoryBlock->AddListener(listener);
-
 	if (!memoryBlock->IsValid()) {
 		AutoLocker< ::Team> teamLocker(fTeam);
+
+		if (!memoryBlock->HasListener(listener))
+			memoryBlock->AddListener(listener);
 
 		TeamMemory* memory = fTeam->GetTeamMemory();
 		// schedule the job
@@ -1703,7 +1703,10 @@ TeamDebugger::_HandleInspectAddress(target_addr_t address,
 			new(std::nothrow) RetrieveMemoryBlockJob(fTeam, memory,
 				memoryBlock),
 			this)) != B_OK) {
+
+			memoryBlock->NotifyDataRetrieved(result);
 			memoryBlock->ReleaseReference();
+
 			_NotifyUser("Inspect Address", "Failed to retrieve memory data: %s",
 				strerror(result));
 		}

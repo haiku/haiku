@@ -41,6 +41,8 @@ public:
 
 	// TeamMemoryBlock::Listener
 	virtual void				MemoryBlockRetrieved(TeamMemoryBlock* block);
+	virtual void				MemoryBlockRetrievalFailed(
+									TeamMemoryBlock* block, status_t result);
 
 	// MemoryView::Listener
 	virtual	void				TargetAddressChanged(target_addr_t address);
