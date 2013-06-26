@@ -674,7 +674,6 @@ void
 CalcView::ResizeTo(float width, float height)
 {
 	BView::ResizeTo(width, height);
-	FrameResized(width, height);
 }
 
 
