@@ -48,7 +48,7 @@ print_pci2pci_bridge_info(const pci_info *info, bool verbose)
 	uint32 memory_base = ((uint32)info->u.h1.memory_base & 0xfff0) << 16;
 	uint32 memory_limit = (((uint32)info->u.h1.memory_limit & 0xfff0) << 16)
 		+ 0xfffff;
-	TRACE(("PCI:   memory window %04" B_PRIx32 "-%04" B_PRIx32 "\n",
+	TRACE(("PCI:   memory window %08" B_PRIx32 "-%08" B_PRIx32 "\n",
 		memory_base, memory_limit));
 	uint64 prefetchable_memory_base =
 		((uint32)info->u.h1.prefetchable_memory_base & 0xfff0) << 16;
