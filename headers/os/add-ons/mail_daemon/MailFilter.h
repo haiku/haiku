@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2013, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _MAIL_FILTER_H
@@ -21,16 +21,14 @@ public:
 	virtual						~BMailFilter();
 
 	// Message hooks if filter is installed to an inbound protocol
-	virtual	void				HeaderFetched(const entry_ref& ref,
-									BFile* file);
-	virtual	void				BodyFetched(const entry_ref& ref, BFile* file);
+	virtual	BMailFilterAction	HeaderFetched(entry_ref& ref, BFile& file);
+	virtual	void				BodyFetched(const entry_ref& ref, BFile& file);
 	virtual void				MailboxSynchronized(status_t status);
 
 	// Message hooks if filter is installed to an outbound protocol
 	virtual	void				MessageReadyToSend(const entry_ref& ref,
-									BFile* file);
-	virtual	void				MessageSent(const entry_ref& ref,
-									BFile* file);
+									BFile& file);
+	virtual	void				MessageSent(const entry_ref& ref, BFile& file);
 
 protected:
 			BMailProtocol&		fMailProtocol;

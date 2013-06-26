@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2004-2013, Haiku, Inc. All rights reserved.
  * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -56,50 +56,55 @@ RuleFilter::RuleFilter(BMailProtocol& protocol,
 }
 
 
-void
-RuleFilter::HeaderFetched(const entry_ref& ref, BFile* file)
+BMailFilterAction
+RuleFilter::HeaderFetched(entry_ref& ref, BFile& file)
 {
 	// That field doesn't exist? NO match
 	if (fAttribute == "")
-		return;
+		return B_NO_MAIL_ACTION;
 
 	attr_info info;
-	if (file->GetAttrInfo("Subject", &info) != B_OK
+	if (file.GetAttrInfo("Subject", &info) != B_OK
 		|| info.type != B_STRING_TYPE)
-		return;
+		return B_NO_MAIL_ACTION;
 
 	char* buffer = new char[info.size];
-	if (file->ReadAttr(fAttribute, B_STRING_TYPE, 0, buffer, info.size) < 0) {
+	if (file.ReadAttr(fAttribute, B_STRING_TYPE, 0, buffer, info.size) < 0) {
 		delete[] buffer;
-		return;
+		return B_NO_MAIL_ACTION;
 	}
+
 	BString data = buffer;
 	delete[] buffer;
 
 	if (!fMatcher.Match(data)) {
 		// We're not supposed to do anything
-		return;
+		return B_NO_MAIL_ACTION;
 	}
 
 	switch (fAction) {
 		case ACTION_MOVE_TO:
 		{
 			BDirectory dir(fMoveTarget);
-			// TODO: move is currently broken!
-//			fMailProtocol.Looper()->TriggerFileMove(ref, dir);
-			break;
+			node_ref nodeRef;
+			status_t status = dir.GetNodeRef(&nodeRef);
+			if (status != B_OK)
+				return status;
+
+			ref.device = nodeRef.device;
+			ref.directory = nodeRef.node;
+			return B_MOVE_MAIL_ACTION;
 		}
+
 		case ACTION_DELETE_MESSAGE:
-			// TODO trash!?
-//			fMailProtocol.Looper()->TriggerFileDeletion(ref);
-			break;
+			return B_DELETE_MAIL_ACTION;
 
 		case ACTION_SET_FLAGS_TO:
-			file->WriteAttrString("MAIL:filter_flags", &fSetFlags);
+			file.WriteAttrString("MAIL:filter_flags", &fSetFlags);
 			break;
 
 		case ACTION_REPLY_WITH:
-			file->WriteAttr("MAIL:reply_with", B_INT32_TYPE, 0, &fReplyAccount,
+			file.WriteAttr("MAIL:reply_with", B_INT32_TYPE, 0, &fReplyAccount,
 				sizeof(int32));
 			break;
 		case ACTION_SET_AS_READ:
@@ -113,7 +118,7 @@ RuleFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 			fprintf(stderr,"Unknown do_what: 0x%04x!\n", fAction);
 	}
 
-	return;
+	return B_NO_MAIL_ACTION;
 }
 
 

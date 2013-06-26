@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2011-2013, Haiku, Inc. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
  *
@@ -97,10 +97,10 @@ HaikuMailFormatFilter::DescriptiveName() const
 }
 
 
-void
-HaikuMailFormatFilter::HeaderFetched(const entry_ref& ref, BFile* file)
+BMailFilterAction
+HaikuMailFormatFilter::HeaderFetched(entry_ref& ref, BFile& file)
 {
-	file->Seek(0, SEEK_SET);
+	file.Seek(0, SEEK_SET);
 
 	BMessage attributes;
 	// TODO: attributes.AddInt32(B_MAIL_ATTR_CONTENT, length);
@@ -109,9 +109,17 @@ HaikuMailFormatFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 
 	BString header;
 	off_t size;
-	if (file->GetSize(&size) == B_OK) {
+	if (file.GetSize(&size) == B_OK) {
 		char* buffer = header.LockBuffer(size);
-		file->Read(buffer, size);
+		if (buffer == NULL)
+			return B_NO_MEMORY;
+
+		ssize_t bytesRead = file.Read(buffer, size);
+		if (bytesRead < 0)
+			return bytesRead;
+		if (bytesRead != size)
+			return B_IO_ERROR;
+
 		header.UnlockBuffer(size);
 	}
 
@@ -151,9 +159,6 @@ HaikuMailFormatFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 	if (name.Length() <= 0)
 		name = "No Subject";
 	attributes.AddString(B_MAIL_ATTR_THREAD, name);
-	// Avoid hidden files, starting with a dot.
-	if (name[0] == '.')
-		name.Prepend ("_");
 
 	// Convert the date into a year-month-day fixed digit width format, so that
 	// sorting by file name will give all the messages with the same subject in
@@ -174,11 +179,11 @@ HaikuMailFormatFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 		timeFields.tm_hour, timeFields.tm_min, timeFields.tm_sec);
 	name << " " << numericDateString;
 
-	BString worker = attributes.FindString(B_MAIL_ATTR_FROM);
-	extract_address_name(worker);
-	name << " " << worker;
+	BString workerName = attributes.FindString(B_MAIL_ATTR_FROM);
+	extract_address_name(workerName);
+	name << " " << workerName;
 
-	name.Truncate(222);	// reserve space for the uniquer
+	name.Truncate(222);	// reserve space for the unique number
 
 	// Get rid of annoying characters which are hard to use in the shell.
 	name.ReplaceAll('/', '_');
@@ -187,49 +192,36 @@ HaikuMailFormatFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 	name.ReplaceAll('!', '_');
 	name.ReplaceAll('<', '_');
 	name.ReplaceAll('>', '_');
-	// Remove multiple spaces.
-	while (name.FindFirst("  ") >= 0)
-		name.Replace("  ", " ", 1024);
+	_RemoveExtraWhitespace(name);
+	_RemoveLeadingDots(name);
+		// Avoid files starting with a dot.
 
-	worker = name;
-	int32 identicalNumber = 1;
-	status_t status = _SetFileName(ref, worker);
-	while (status == B_FILE_EXISTS) {
-		identicalNumber++;
+	file << attributes;
 
-		worker = name;
-		worker << "_" << identicalNumber;
-		status = _SetFileName(ref, worker);
-	}
-	if (status < B_OK) {
-		printf("FolderFilter::ProcessMailMessage: could not rename mail (%s)! "
-			"(should be: %s)\n",strerror(status), worker.String());
-	} else {
-		entry_ref to(ref.device, ref.directory, worker);
-		fMailProtocol.FileRenamed(ref, to);
-	}
-
-	(*file) << attributes;
-
-	BNodeInfo info(file);
+	// TODO: find a way to not set that twice for each complete mail
+	BNodeInfo info(&file);
 	info.SetType(B_PARTIAL_MAIL_TYPE);
+
+	ref.set_name(name.String());
+
+	return B_MOVE_MAIL_ACTION;
 }
 
 
 void
-HaikuMailFormatFilter::BodyFetched(const entry_ref& ref, BFile* file)
+HaikuMailFormatFilter::BodyFetched(const entry_ref& ref, BFile& file)
 {
-	BNodeInfo info(file);
+	BNodeInfo info(&file);
 	info.SetType(B_MAIL_TYPE);
 }
 
 
 void
-HaikuMailFormatFilter::MessageSent(const entry_ref& ref, BFile* file)
+HaikuMailFormatFilter::MessageSent(const entry_ref& ref, BFile& file)
 {
 	mail_flags flags = B_MAIL_SENT;
-	file->WriteAttr(B_MAIL_ATTR_FLAGS, B_INT32_TYPE, 0, &flags, sizeof(int32));
-	file->WriteAttr(B_MAIL_ATTR_STATUS, B_STRING_TYPE, 0, "Sent", 5);
+	file.WriteAttr(B_MAIL_ATTR_FLAGS, B_INT32_TYPE, 0, &flags, sizeof(int32));
+	file.WriteAttr(B_MAIL_ATTR_STATUS, B_STRING_TYPE, 0, "Sent", 5);
 
 	if (!fOutboundDirectory.IsEmpty()) {
 		create_directory(fOutboundDirectory, 755);
@@ -243,11 +235,39 @@ HaikuMailFormatFilter::MessageSent(const entry_ref& ref, BFile* file)
 }
 
 
-status_t
-HaikuMailFormatFilter::_SetFileName(const entry_ref& ref, const BString& name)
+void
+HaikuMailFormatFilter::_RemoveExtraWhitespace(BString& name)
 {
-	BEntry entry(&ref);
-	return entry.Rename(name);
+	int spaces = 0;
+	for (int i = 0; i <= name.Length();) {
+		if (i < name.Length() && isspace(name.ByteAt(i))) {
+			spaces++;
+			i++;
+		} else if (spaces > 0) {
+			int remove = spaces - 1;
+			// Also remove leading and trailing spaces
+			if (i == remove + 1 || i == name.Length())
+				remove++;
+			else
+				name[i - spaces] = ' ';
+			name.Remove(i - remove, remove);
+			i -= remove;
+			spaces = 0;
+		} else
+			i++;
+	}
+}
+
+
+void
+HaikuMailFormatFilter::_RemoveLeadingDots(BString& name)
+{
+	int dots = 0;
+	while (dots < name.Length() && name.ByteAt(dots) == '.')
+		dots++;
+
+	if (dots > 0)
+		name.Remove(0, dots);
 }
 
 

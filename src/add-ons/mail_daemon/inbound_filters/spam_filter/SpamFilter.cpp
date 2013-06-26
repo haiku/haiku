@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2002-2013, Haiku, Inc. All rights reserved.
  * Copyright 2002 Alexander G. M. Smith.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
@@ -66,15 +66,16 @@ SpamFilter::~SpamFilter()
 }
 
 
-void
-SpamFilter::HeaderFetched(const entry_ref& ref, BFile* file)
+BMailFilterAction
+SpamFilter::HeaderFetched(entry_ref& ref, BFile& file)
 {
 	_CheckForSpam(file);
+	return B_NO_MAIL_ACTION;
 }
 
 
 void
-SpamFilter::BodyFetched(const entry_ref& ref, BFile* file)
+SpamFilter::BodyFetched(const entry_ref& ref, BFile& file)
 {
 	if (fHeaderOnly)
 		return;
@@ -84,7 +85,7 @@ SpamFilter::BodyFetched(const entry_ref& ref, BFile* file)
 	// untrain the partial part before training on the complete message, but we
 	// don't know how big it was, so instead just ignore the message.
 	attr_info attributeInfo;
-	if (file->GetAttrInfo ("MAIL:classification", &attributeInfo) == B_OK)
+	if (file.GetAttrInfo ("MAIL:classification", &attributeInfo) == B_OK)
 		return;
 
 	_CheckForSpam(file);
@@ -92,22 +93,22 @@ SpamFilter::BodyFetched(const entry_ref& ref, BFile* file)
 
 
 status_t
-SpamFilter::_CheckForSpam(BFile* file)
+SpamFilter::_CheckForSpam(BFile& file)
 {
 	// Get a connection to the spam database server.  Launch if needed, should
 	// only need it once, unless another e-mail thread shuts down the server
 	// inbetween messages.  This code used to be in InitCheck, but apparently
 	// that isn't called.
 	printf("Checking for Spam Server.\n");
-	if (fLaunchAttemptCount == 0 || !fMessengerToServer.IsValid ()) {
+	if (fLaunchAttemptCount == 0 || !fMessengerToServer.IsValid()) {
 		if (_GetTokenizeMode() != B_OK)
 			return B_ERROR;
 	}
 
 	off_t dataSize;
-	file->GetSize(&dataSize);
+	file.GetSize(&dataSize);
 	char* stringBuffer = new char[dataSize + 1];
-	file->Read(stringBuffer, dataSize);
+	file.Read(stringBuffer, dataSize);
 	stringBuffer[dataSize] = 0; // Add an end of string NUL, just in case.
 
 	float spamRatio;
@@ -118,7 +119,7 @@ SpamFilter::_CheckForSpam(BFile* file)
 	// training example (don't train if it is uncertain).
 	if (fAutoTraining && (spamRatio >= fSpamCutoffRatio
 		|| spamRatio < fGenuineCutoffRatio)) {
-			_TrainServer(stringBuffer, dataSize, spamRatio);
+		_TrainServer(stringBuffer, dataSize, spamRatio);
 	}
 
 	delete[] stringBuffer;
@@ -127,12 +128,12 @@ SpamFilter::_CheckForSpam(BFile* file)
 	const char *classificationString;
 	classificationString = spamRatio >= fSpamCutoffRatio ? "Spam"
 		: spamRatio < fGenuineCutoffRatio ? "Genuine" : "Uncertain";
-	file->WriteAttr("MAIL:classification", B_STRING_TYPE, 0 /* offset */,
+	file.WriteAttr("MAIL:classification", B_STRING_TYPE, 0 /* offset */,
 		classificationString, strlen(classificationString) + 1);
 
 	// Store the spam ratio in an attribute called MAIL:ratio_spam,
 	// attached to the eventual output file.
-	file->WriteAttr("MAIL:ratio_spam", B_FLOAT_TYPE, 0 /* offset */, &spamRatio,
+	file.WriteAttr("MAIL:ratio_spam", B_FLOAT_TYPE, 0 /* offset */, &spamRatio,
 		sizeof(spamRatio));
 
 	// Also add it to the subject, if requested.
@@ -280,16 +281,16 @@ SpamFilter::_TrainServer(const char* stringBuffer, off_t dataSize,
 
 
 status_t
-SpamFilter::_AddSpamToSubject(BNode* file, float spamRatio)
+SpamFilter::_AddSpamToSubject(BNode& file, float spamRatio)
 {
 	attr_info info;
-	if (file->GetAttrInfo("Subject", &info) != B_OK)
+	if (file.GetAttrInfo("Subject", &info) != B_OK)
 		return B_ERROR;
 	if (info.type != B_STRING_TYPE)
 		return B_ERROR;
 
 	char* buffer = new char[info.size];
-	if (file->ReadAttr("Subject", B_STRING_TYPE, 0, buffer, info.size) < 0) {
+	if (file.ReadAttr("Subject", B_STRING_TYPE, 0, buffer, info.size) < 0) {
 		delete[] buffer;
 		return B_ERROR;
 	}
@@ -302,7 +303,7 @@ SpamFilter::_AddSpamToSubject(BNode* file, float spamRatio)
 	newSubjectString << buffer;
 	delete[] buffer;
 
-	if (file->WriteAttr("Subject", B_STRING_TYPE, 0, newSubjectString.String(),
+	if (file.WriteAttr("Subject", B_STRING_TYPE, 0, newSubjectString.String(),
 		newSubjectString.Length()) < 0)
 		return B_ERROR;
 

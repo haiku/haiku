@@ -218,8 +218,8 @@ POP3Protocol::SyncMessages()
 				printf("POP3: Failed to download body %s\n ", uid);
 				break;
 			}
-			NotifyHeaderFetched(ref, &file);
-			NotifyBodyFetched(ref, &file);
+			ProcessHeaderFetched(ref, file);
+			NotifyBodyFetched(ref, file);
 
 			if (!leaveOnServer)
 				Delete(toRetrieve);
@@ -230,7 +230,7 @@ POP3Protocol::SyncMessages()
 				printf("POP3: Failed to download header %s\n ", uid);
 				break;
 			}
-			NotifyHeaderFetched(ref, &file);
+			ProcessHeaderFetched(ref, file);
 		}
 		ReportProgress(1, 0);
 
@@ -302,7 +302,7 @@ POP3Protocol::FetchBody(const entry_ref& ref)
 		return status;
 	}
 
-	NotifyBodyFetched(ref, &file);
+	NotifyBodyFetched(ref, file);
 
 	if (!leaveOnServer)
 		Delete(toRetrieve);

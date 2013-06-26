@@ -43,6 +43,13 @@ public:
 };
 
 
+typedef status_t BMailFilterAction;
+
+#define B_NO_MAIL_ACTION		0
+#define B_MOVE_MAIL_ACTION		1
+#define B_DELETE_MAIL_ACTION	2
+
+
 class BMailProtocol : public BLooper {
 public:
 								BMailProtocol(
@@ -68,10 +75,6 @@ public:
 									BDirectory& dir);
 	virtual	status_t			DeleteMessage(const entry_ref& ref);
 
-	virtual	void				FileRenamed(const entry_ref& from,
-									const entry_ref& to);
-	virtual	void				FileDeleted(const node_ref& node);
-
 			// Convenience methods that call the BMailNotifier
 			void				ShowError(const char* error);
 			void				ShowMessage(const char* message);
@@ -88,17 +91,17 @@ protected:
 			void				ReportProgress(uint32 items, uint64 bytes,
 									const char* message = NULL);
 			void				ResetProgress(const char* message = NULL);
+			void				NotifyNewMessagesToFetch(int32 nMessages);
 
 			// Filter notifications
-			void				NotifyNewMessagesToFetch(int32 nMessages);
-			void				NotifyHeaderFetched(const entry_ref& ref,
-									BFile* mail);
+			BMailFilterAction	ProcessHeaderFetched(entry_ref& ref,
+									BFile& mail);
 			void				NotifyBodyFetched(const entry_ref& ref,
-									BFile* mail);
+									BFile& mail);
 			void				NotifyMessageReadyToSend(const entry_ref& ref,
-									BFile* mail);
+									BFile& mail);
 			void				NotifyMessageSent(const entry_ref& ref,
-									BFile* mail);
+									BFile& mail);
 
 			void				LoadFilters(
 									const BMailProtocolSettings& settings);

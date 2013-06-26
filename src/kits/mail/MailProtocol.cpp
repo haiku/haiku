@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2011-2013, Haiku, Inc. All rights reserved.
  * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
  */
 
@@ -41,12 +41,6 @@ using namespace BPrivate;
 
 const uint32 kMsgDeleteMessage = '&DeM';
 const uint32 kMsgAppendMessage = '&ApM';
-
-const uint32 kMsgMoveFile = '&MoF';
-const uint32 kMsgDeleteFile = '&DeF';
-const uint32 kMsgFileRenamed = '&FiR';
-const uint32 kMsgFileDeleted = '&FDe';
-const uint32 kMsgInit = '&Ini';
 
 const uint32 kMsgSendMessage = '&SeM';
 
@@ -138,48 +132,7 @@ BMailProtocol::RemoveFilter(BMailFilter* filter)
 void
 BMailProtocol::MessageReceived(BMessage* message)
 {
-	switch (message->what) {
-		case kMsgMoveFile:
-		{
-			entry_ref file;
-			message->FindRef("file", &file);
-			entry_ref dir;
-			message->FindRef("directory", &dir);
-			BDirectory directory(&dir);
-			MoveMessage(file, directory);
-			break;
-		}
-
-		case kMsgDeleteFile:
-		{
-			entry_ref file;
-			message->FindRef("file", &file);
-			DeleteMessage(file);
-			break;
-		}
-
-		case kMsgFileRenamed:
-		{
-			entry_ref from;
-			message->FindRef("from", &from);
-			entry_ref to;
-			message->FindRef("to", &to);
-			FileRenamed(from, to);
-			break;
-		}
-
-		case kMsgFileDeleted:
-		{
-			node_ref node;
-			message->FindInt32("device",&node.device);
-			message->FindInt64("node", &node.node);
-			FileDeleted(node);
-			break;
-		}
-
-		default:
-			BLooper::MessageReceived(message);
-	}
+	BLooper::MessageReceived(message);
 }
 
 
@@ -196,18 +149,6 @@ BMailProtocol::DeleteMessage(const entry_ref& ref)
 {
 	BEntry entry(&ref);
 	return entry.Remove();
-}
-
-
-void
-BMailProtocol::FileRenamed(const entry_ref& from, const entry_ref& to)
-{
-}
-
-
-void
-BMailProtocol::FileDeleted(const node_ref& node)
-{
 }
 
 
@@ -268,16 +209,65 @@ BMailProtocol::NotifyNewMessagesToFetch(int32 count)
 }
 
 
-void
-BMailProtocol::NotifyHeaderFetched(const entry_ref& ref, BFile* data)
+BMailFilterAction
+BMailProtocol::ProcessHeaderFetched(entry_ref& ref, BFile& data)
 {
-	for (int i = 0; i < fFilterList.CountItems(); i++)
-		fFilterList.ItemAt(i)->HeaderFetched(ref, data);
+	entry_ref outRef = ref;
+
+	for (int i = 0; i < fFilterList.CountItems(); i++) {
+		BMailFilterAction action = fFilterList.ItemAt(i)->HeaderFetched(outRef,
+			data);
+		if (action == B_DELETE_MAIL_ACTION) {
+			// We have to delete the message
+			BEntry entry(&ref);
+			status_t status = entry.Remove();
+			if (status != B_OK) {
+				fprintf(stderr, "BMailProtocol::NotifyHeaderFetched(): could "
+					"not delete mail: %s\n", strerror(status));
+			}
+			return B_DELETE_MAIL_ACTION;
+		}
+	}
+
+	if (ref == outRef)
+		return B_NO_MAIL_ACTION;
+
+	// We have to rename the file
+	node_ref newParentRef;
+	newParentRef.device = outRef.device;
+	newParentRef.node = outRef.directory;
+
+	BDirectory newParent(&newParentRef);
+	status_t status = newParent.InitCheck();
+	BString workerName;
+	if (status == B_OK) {
+		int32 uniqueNumber = 1;
+		do {
+			workerName = outRef.name;
+			if (uniqueNumber > 1)
+				workerName << "_" << ++uniqueNumber;
+
+			// TODO: support copying to another device!
+			BEntry entry(&ref);
+			status = entry.Rename(workerName);
+		} while (status == B_FILE_EXISTS);
+	}
+
+	if (status != B_OK) {
+		fprintf(stderr, "BMailProtocol::NotifyHeaderFetched(): could not "
+			"rename mail (%s)! (should be: %s)\n", strerror(status),
+			workerName.String());
+	}
+
+	ref = outRef;
+	ref.set_name(workerName.String());
+
+	return B_MOVE_MAIL_ACTION;
 }
 
 
 void
-BMailProtocol::NotifyBodyFetched(const entry_ref& ref, BFile* data)
+BMailProtocol::NotifyBodyFetched(const entry_ref& ref, BFile& data)
 {
 	for (int i = 0; i < fFilterList.CountItems(); i++)
 		fFilterList.ItemAt(i)->BodyFetched(ref, data);
@@ -285,7 +275,7 @@ BMailProtocol::NotifyBodyFetched(const entry_ref& ref, BFile* data)
 
 
 void
-BMailProtocol::NotifyMessageReadyToSend(const entry_ref& ref, BFile* data)
+BMailProtocol::NotifyMessageReadyToSend(const entry_ref& ref, BFile& data)
 {
 	for (int i = 0; i < fFilterList.CountItems(); i++)
 		fFilterList.ItemAt(i)->MessageReadyToSend(ref, data);
@@ -293,7 +283,7 @@ BMailProtocol::NotifyMessageReadyToSend(const entry_ref& ref, BFile* data)
 
 
 void
-BMailProtocol::NotifyMessageSent(const entry_ref& ref, BFile* data)
+BMailProtocol::NotifyMessageSent(const entry_ref& ref, BFile& data)
 {
 	for (int i = 0; i < fFilterList.CountItems(); i++)
 		fFilterList.ItemAt(i)->MessageSent(ref, data);

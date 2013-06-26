@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2011, Haiku, Inc. All rights reserved.
+ * Copyright 2002-2013, Haiku, Inc. All rights reserved.
  * Copyright 2002 Alexander G. M. Smith.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
@@ -18,12 +18,11 @@ public:
 									const BMailAddOnSettings& settings);
 	virtual						~SpamFilter();
 
-	virtual	void				HeaderFetched(const entry_ref& ref,
-									BFile* file);
-	virtual	void				BodyFetched(const entry_ref& ref, BFile* file);
+	virtual	BMailFilterAction	HeaderFetched(entry_ref& ref, BFile& file);
+	virtual	void				BodyFetched(const entry_ref& ref, BFile& file);
 
 private:
-			status_t			_CheckForSpam(BFile* file);
+			status_t			_CheckForSpam(BFile& file);
 			//! If the server is not running start it
 			status_t			_CheckForSpamServer();
 			status_t			_GetTokenizeMode();
@@ -31,7 +30,7 @@ private:
 									float& ratio);
 			status_t			_TrainServer(const char* data, off_t dataSize,
 									float spamRatio);
-			status_t			_AddSpamToSubject(BNode* file, float spamRatio);
+			status_t			_AddSpamToSubject(BNode& file, float spamRatio);
 
 private:
 			bool				fAddSpamToSubject;

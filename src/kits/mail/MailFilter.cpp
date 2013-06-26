@@ -1,5 +1,6 @@
 /*
- * Copyright 2011-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2011-2013, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
 
 
@@ -20,14 +21,15 @@ BMailFilter::~BMailFilter()
 }
 
 
-void
-BMailFilter::HeaderFetched(const entry_ref& ref, BFile* file)
+BMailFilterAction
+BMailFilter::HeaderFetched(entry_ref& ref, BFile& file)
 {
+	return B_NO_MAIL_ACTION;
 }
 
 
 void
-BMailFilter::BodyFetched(const entry_ref& ref, BFile* file)
+BMailFilter::BodyFetched(const entry_ref& ref, BFile& file)
 {
 }
 
@@ -39,12 +41,12 @@ BMailFilter::MailboxSynchronized(status_t status)
 
 
 void
-BMailFilter::MessageReadyToSend(const entry_ref& ref, BFile* file)
+BMailFilter::MessageReadyToSend(const entry_ref& ref, BFile& file)
 {
 }
 
 
 void
-BMailFilter::MessageSent(const entry_ref& ref, BFile* file)
+BMailFilter::MessageSent(const entry_ref& ref, BFile& file)
 {
 }

@@ -231,8 +231,6 @@ IMAPFolder::MessageStored(entry_ref& ref, BFile& file, uint32 fetchFlags,
 	if ((fetchFlags & IMAP::kFetchFlags) != 0)
 		_WriteFlags(file, flags);
 
-	// TODO: the call below may move/rename the file - this prevents downloading
-	// the body to the correct file!
 	fProtocol.MessageStored(*this, ref, file, fetchFlags);
 	file.Unset();
 

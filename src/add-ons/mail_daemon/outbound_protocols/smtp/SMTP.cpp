@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2013, Haiku, Inc. All rights reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  *
@@ -546,11 +546,11 @@ SMTPProtocol::_SendMessage(const entry_ref& ref)
 		return B_ERROR;
 	}
 
-	NotifyMessageReadyToSend(ref, &file);
+	NotifyMessageReadyToSend(ref, file);
 	status = Send(to, from, &file);
 	if (status != B_OK)
 		return status;
-	NotifyMessageSent(ref, &file);
+	NotifyMessageSent(ref, file);
 
 	off_t size = 0;
 	file.GetSize(&size);

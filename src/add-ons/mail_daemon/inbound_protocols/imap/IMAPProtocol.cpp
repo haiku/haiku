@@ -126,10 +126,13 @@ void
 IMAPProtocol::MessageStored(IMAPFolder& folder, entry_ref& ref, BFile& stream,
 	uint32 fetchFlags)
 {
-	if ((fetchFlags & IMAP::kFetchHeader) != 0)
-		NotifyHeaderFetched(ref, &stream);
+	if ((fetchFlags & IMAP::kFetchHeader) != 0) {
+		BMailFilterAction action = ProcessHeaderFetched(ref, stream);
+		if (action < B_OK || action == B_DELETE_MAIL_ACTION)
+			return;
+	}
 	if ((fetchFlags & IMAP::kFetchBody) != 0)
-		NotifyBodyFetched(ref, &stream);
+		NotifyBodyFetched(ref, stream);
 }
 
 

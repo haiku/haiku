@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2004-2013, Haiku, Inc. All rights reserved.
  * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -21,8 +21,7 @@ public:
 								RuleFilter(BMailProtocol& protocol,
 									const BMailAddOnSettings& settings);
 
-	virtual	void				HeaderFetched(const entry_ref& ref,
-									BFile* file);
+	virtual	BMailFilterAction	HeaderFetched(entry_ref& ref, BFile& file);
 
 private:
 			BString				fAttribute;
