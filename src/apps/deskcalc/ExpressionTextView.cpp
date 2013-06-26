@@ -286,8 +286,8 @@ ExpressionTextView::SetValue(BString value)
 			}
 			if (digit == 10) {
 				// carry over, shift the result
-				if (value[firstDigit+1] == '.') {
-					value[firstDigit+1] = '0';
+				if (value[firstDigit + 1] == '.') {
+					value[firstDigit + 1] = '0';
 					value[firstDigit] = '.';
 				}
 				value.Insert('1', 1, firstDigit);
