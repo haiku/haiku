@@ -33,7 +33,7 @@ public:
 									const BMailAddOnSettings& settings);
 
 	virtual	void				MessageReadyToSend(const entry_ref& ref,
-									BFile* file);
+									BFile& file);
 };
 
 
@@ -46,7 +46,7 @@ FortuneFilter::FortuneFilter(BMailProtocol& protocol,
 
 
 void
-FortuneFilter::MessageReadyToSend(const entry_ref& ref, BFile* file)
+FortuneFilter::MessageReadyToSend(const entry_ref& ref, BFile& file)
 {
 	// What we want to do here is to change the message body. To do that we use the
 	// framework we already have by creating a new BEmailMessage based on the
@@ -87,8 +87,8 @@ FortuneFilter::MessageReadyToSend(const entry_ref& ref, BFile* file)
 	BTextMailComponent* body = mailMessage.Body();
 	body->AppendText(fortuneText);
 
-	file->SetSize(0);
-	mailMessage.RenderToRFC822(file);
+	file.SetSize(0);
+	mailMessage.RenderToRFC822(&file);
 }
 
 

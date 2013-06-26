@@ -547,8 +547,10 @@ BEmailMessage::CountComponents() const
 void
 BEmailMessage::Attach(entry_ref* ref, bool includeAttributes)
 {
-	AddComponent(includeAttributes
-		? new BAttributedMailAttachment(ref) : new BSimpleMailAttachment(ref));
+	if (includeAttributes)
+		AddComponent(new BAttributedMailAttachment(ref));
+	else
+		AddComponent(new BSimpleMailAttachment(ref));
 }
 
 

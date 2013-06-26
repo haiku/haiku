@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2009-2013, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2006, Ryan Leavengood, leavengood@gmail.com. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -12,6 +12,7 @@
 #include <Message.h>
 #include <Node.h>
 #include <String.h>
+
 
 extern "C" void
 process_refs(entry_ref dir, BMessage* message, void* /*reserved*/)
@@ -30,16 +31,16 @@ process_refs(entry_ref dir, BMessage* message, void* /*reserved*/)
 			// if we're marking it via the add-on, we haven't really read it
 			// so use B_SEEN instead of B_READ
 			read_flags read = B_SEEN;
-			
+
 			// Update the MAIL:read status to match
 			// Check both B_SEEN and B_READ
 			// (so we don't overwrite B_READ with B_SEEN)
-			if (read_read_attr(node, previousRead) != B_OK ||
-				(previousRead != B_SEEN && previousRead != B_READ)) {
+			if (read_read_attr(node, previousRead) != B_OK
+				|| (previousRead != B_SEEN && previousRead != B_READ)) {
 				int32 account;
 				if (node.ReadAttr(B_MAIL_ATTR_ACCOUNT_ID, B_INT32_TYPE,
-					0LL, &account, sizeof(account)) == sizeof(account))
-					BMailDaemon::MarkAsRead(account, ref, read);
+						0LL, &account, sizeof(account)) == sizeof(account))
+					BMailDaemon().MarkAsRead(account, ref, read);
 				else
 					write_read_attr(node, read);
 			}
@@ -55,4 +56,3 @@ process_refs(entry_ref dir, BMessage* message, void* /*reserved*/)
 		}
 	}
 }
-

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2009-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -99,7 +99,7 @@ process_refs(entry_ref dir, BMessage* message, void* /*reserved*/)
 			&& (type == B_MAIL_TYPE || type == B_PARTIAL_MAIL_TYPE)) {
 			BString previousStatus;
 			read_flags previousRead;
-			
+
 			// Update the MAIL:read flag
 			if (status == "New") {
 				if (read_read_attr(node, previousRead) != B_OK ||
@@ -115,8 +115,8 @@ process_refs(entry_ref dir, BMessage* message, void* /*reserved*/)
 					(previousRead != B_SEEN && previousRead != B_READ)) {
 					int32 account;
 					if (node.ReadAttr(B_MAIL_ATTR_ACCOUNT_ID, B_INT32_TYPE,
-						0LL, &account, sizeof(account)) == sizeof(account))
-						BMailDaemon::MarkAsRead(account, ref, B_SEEN);
+							0LL, &account, sizeof(account)) == sizeof(account))
+						BMailDaemon().MarkAsRead(account, ref, B_SEEN);
 					else
 						write_read_attr(node, B_SEEN);
 				}

@@ -55,6 +55,6 @@ SEARCH on [ FGristFiles Commands.cpp Protocol.cpp Response.cpp ]
 DoCatalogs IMAP :
 	x-vnd.Haiku-IMAP
 	:
-	imap_config.cpp
-	IMAPFolderConfig.cpp
+	ConfigView.cpp
+	FolderConfigWindow.cpp
 ;
