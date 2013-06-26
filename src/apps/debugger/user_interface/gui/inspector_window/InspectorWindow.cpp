@@ -256,7 +256,7 @@ InspectorWindow::MessageReceived(BMessage* message)
 			}
 
 			{
-				AutoLocker< ::Team>(fTeam);
+				AutoLocker< ::Team> teamLocker(fTeam);
 				block->RemoveListener(this);
 			}
 
