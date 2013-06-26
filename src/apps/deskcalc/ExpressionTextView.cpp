@@ -244,10 +244,15 @@ ExpressionTextView::SetValue(BString value)
 			}
 		}
 
-		// add the exponent
-		offset = value.CountChars() - 1;
-		if (exponent != 0)
+		if (exponent != 0) {
+			value.Truncate(40);
+				// truncate to a reasonable precision
+				// while ensuring result will be rounded
+			offset = value.CountChars() - 1;
 			value << "E" << exponent;
+				// add the exponent
+		} else
+			offset = value.CountChars() - 1;
 
 		// reduce the number of digits until the string fits or can not be
 		// made any shorter
