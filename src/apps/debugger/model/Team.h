@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TEAM_H
@@ -32,6 +33,8 @@ enum {
 
 	TEAM_EVENT_IMAGE_DEBUG_INFO_CHANGED,
 
+	TEAM_EVENT_CONSOLE_OUTPUT_RECEIVED,
+
 	TEAM_EVENT_BREAKPOINT_ADDED,
 	TEAM_EVENT_BREAKPOINT_REMOVED,
 	TEAM_EVENT_USER_BREAKPOINT_CHANGED,
@@ -41,6 +44,7 @@ enum {
 	TEAM_EVENT_WATCHPOINT_CHANGED,
 
 	TEAM_EVENT_DEBUG_REPORT_CHANGED
+
 };
 
 
@@ -63,6 +67,7 @@ class Team {
 public:
 			class Event;
 			class BreakpointEvent;
+			class ConsoleOutputEvent;
 			class DebugReportEvent;
 			class ImageEvent;
 			class ThreadEvent;
@@ -178,6 +183,10 @@ public:
 			// service methods for Image
 			void				NotifyImageDebugInfoChanged(Image* image);
 
+			// service methods for console output
+			void				NotifyConsoleOutputReceived(
+									int32 fd, const BString& output);
+
 			// breakpoint related service methods
 			void				NotifyUserBreakpointChanged(
 									UserBreakpoint* breakpoint);
@@ -268,6 +277,20 @@ protected:
 };
 
 
+class Team::ConsoleOutputEvent : public Event {
+public:
+								ConsoleOutputEvent(uint32 type, Team* team,
+									int32 fd, const BString& output);
+
+			int32				Descriptor() const	{ return fDescriptor; }
+			const BString&		Output() const		{ return fOutput; }
+
+protected:
+			int32				fDescriptor;
+			BString				fOutput;
+};
+
+
 class Team::DebugReportEvent : public Event {
 public:
 								DebugReportEvent(uint32 type, Team* team,
@@ -322,6 +345,9 @@ public:
 
 	virtual	void				ImageDebugInfoChanged(
 									const Team::ImageEvent& event);
+
+	virtual	void				ConsoleOutputReceived(
+									const Team::ConsoleOutputEvent& event);
 
 	virtual	void				BreakpointAdded(
 									const Team::BreakpointEvent& event);

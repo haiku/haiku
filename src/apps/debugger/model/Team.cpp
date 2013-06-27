@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -614,6 +615,18 @@ Team::NotifyImageDebugInfoChanged(Image* image)
 
 
 void
+Team::NotifyConsoleOutputReceived(int32 fd, const BString& output)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->ConsoleOutputReceived(
+			ConsoleOutputEvent(TEAM_EVENT_CONSOLE_OUTPUT_RECEIVED, this,
+				fd, output));
+	}
+}
+
+
+void
 Team::NotifyUserBreakpointChanged(UserBreakpoint* breakpoint)
 {
 	for (ListenerList::Iterator it = fListeners.GetIterator();
@@ -731,6 +744,19 @@ Team::BreakpointEvent::BreakpointEvent(uint32 type, Team* team,
 }
 
 
+// #pragma mark - ConsoleOutputEvent
+
+
+Team::ConsoleOutputEvent::ConsoleOutputEvent(uint32 type, Team* team,
+	int32 fd, const BString& output)
+	:
+	Event(type, team),
+	fDescriptor(fd),
+	fOutput(output)
+{
+}
+
+
 // #pragma mark - DebugReportEvent
 
 
@@ -819,6 +845,12 @@ Team::Listener::ThreadStackTraceChanged(const Team::ThreadEvent& event)
 
 void
 Team::Listener::ImageDebugInfoChanged(const Team::ImageEvent& event)
+{
+}
+
+
+void
+Team::Listener::ConsoleOutputReceived(const Team::ConsoleOutputEvent& event)
 {
 }
 
