@@ -217,9 +217,8 @@ AddOnManager::StartMonitoringDevice(DeviceAddOn* addOn, const char* device)
 	bool newPath;
 	status_t status = _AddDevicePath(addOn, path.String(), newPath);
 	if (status == B_OK && newPath) {
-		status = BPathMonitor::StartWatching(path.String(), B_ENTRY_CREATED
-			| B_ENTRY_REMOVED | B_ENTRY_MOVED | B_WATCH_FILES_ONLY
-			| B_WATCH_RECURSIVELY, this);
+		status = BPathMonitor::StartWatching(path.String(),
+			B_WATCH_FILES_ONLY | B_WATCH_RECURSIVELY, this);
 		if (status != B_OK) {
 			bool lastPath;
 			_RemoveDevicePath(addOn, path.String(), lastPath);
