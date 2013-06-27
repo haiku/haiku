@@ -982,6 +982,7 @@ NodeMonitorService::RemoveUserListeners(struct io_context *context,
 			// to remove its successor (which is saved in "removeListener")
 
 		_RemoveListener(removeListener);
+		context->num_monitors--;
 		count++;
 	}
 
