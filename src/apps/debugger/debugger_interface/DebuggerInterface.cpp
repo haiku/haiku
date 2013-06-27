@@ -351,8 +351,10 @@ DebuggerInterface::GetNextDebugEvent(DebugEvent*& _event)
 
 			if (ignore) {
 				if (message.origin.thread >= 0 && message.origin.nub_port >= 0)
-					continue_thread(message.origin.nub_port,
+					error = continue_thread(message.origin.nub_port,
 						message.origin.thread);
+					if (error != B_OK)
+						return error;
 				continue;
 			}
 
@@ -373,16 +375,14 @@ DebuggerInterface::GetNextDebugEvent(DebugEvent*& _event)
 status_t
 DebuggerInterface::SetTeamDebuggingFlags(uint32 flags)
 {
-	set_team_debugging_flags(fNubPort, flags);
-	return B_OK;
+	return set_team_debugging_flags(fNubPort, flags);
 }
 
 
 status_t
 DebuggerInterface::ContinueThread(thread_id thread)
 {
-	continue_thread(fNubPort, thread);
-	return B_OK;
+	return continue_thread(fNubPort, thread);
 }
 
 
