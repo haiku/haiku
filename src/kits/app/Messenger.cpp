@@ -504,6 +504,13 @@ BMessenger::Team() const
 }
 
 
+uint32
+BMessenger::HashValue() const
+{
+	return fPort * 19 + fHandlerToken;
+}
+
+
 //	#pragma mark - Private or reserved
 
 
