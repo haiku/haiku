@@ -26,6 +26,7 @@ public:
 			status_t		Start();
 			status_t		Stop();
 			bool			IsRunning() { return fIsRunning; }
+			void			OnRemove();
 
 			status_t		GetBuffers(multi_buffer_list* List);
 
@@ -57,6 +58,7 @@ protected:
 			size_t			fSamplesCount;
 			size_t			fPacketSize;
 			int32			fProcessedBuffers;
+			int32			fInsideNotify;
 
 private:
 			status_t		_ChooseAlternate();

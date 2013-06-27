@@ -29,7 +29,8 @@ Stream::Stream(Device* device, size_t interface, usb_interface_list* List)
 	fStartingFrame(0),
 	fSamplesCount(0),
 	fPacketSize(0),
-	fProcessedBuffers(0)
+	fProcessedBuffers(0),
+	fInsideNotify(0)
 {
 }
 
@@ -126,6 +127,20 @@ Stream::Init()
 	fStatus = _ChooseAlternate();
 	//if (fStatus != B_OK)
 	return fStatus;
+}
+
+
+void
+Stream::OnRemove()
+{
+	// the transfer callback schedule traffic - so we must ensure that we are
+	// not inside the callback anymore before returning, as we would otherwise
+	// violate the promise not to use any of the pipes after returning from the
+	// removed callback
+	while (atomic_add(&fInsideNotify, 0) != 0)
+		snooze(100);
+
+	gUSBModule->cancel_queued_transfers(fStreamEndpoint);
 }
 
 
@@ -252,6 +267,9 @@ status_t
 Stream::Stop()
 {
 	if (fIsRunning) {
+		// wait until possible notification handling finished...
+		while (atomic_add(&fInsideNotify, 0) != 0)
+			snooze(100);
 		gUSBModule->cancel_queued_transfers(fStreamEndpoint);
 		fIsRunning = false;
 	}
@@ -292,13 +310,14 @@ void
 Stream::_TransferCallback(void* cookie, int32 status, void* data,
 	uint32 actualLength)
 {
-	if (status == B_CANCELED) {
+	Stream* stream = (Stream*)cookie;
+	atomic_add(&stream->fInsideNotify, 1);
+	if (status == B_CANCELED || stream->fDevice->fRemoved) {
+		atomic_add(&stream->fInsideNotify, -1);
 		TRACE_ALWAYS("Cancelled: c:%p st:%#010x, data:%#010x, len:%d\n",
 		   cookie, status, data, actualLength);
 		return;
 	}
-
-	Stream* stream = (Stream*)cookie;
 	
 	stream->fCurrentBuffer = (stream->fCurrentBuffer + 1) % kSamplesBufferCount;
 
@@ -313,6 +332,8 @@ Stream::_TransferCallback(void* cookie, int32 status, void* data,
 
 	// TRACE_ALWAYS("st:%#010x, len:%d -> %#010x\n", status, actualLength, result);
 	TRACE("st:%#010x, data:%#010x, len:%d\n", status, data, actualLength);
+	
+	atomic_add(&stream->fInsideNotify, -1);
 }
 
 

@@ -17,7 +17,6 @@ Device::Device(usb_device device)
 	fStatus(B_ERROR),
 	fOpen(false),
 	fRemoved(false),
-//	fInsideNotify(0),
 	fDevice(device),
 	fNonBlocking(false),
 	fAudioControl(this),
@@ -92,13 +91,6 @@ Device::Close()
 
 	for (int i = 0; i < fStreams.Count(); i++)
 		fStreams[i]->Stop();
-
-	// wait until possible notification handling finished...
-//	while (atomic_add(&fInsideNotify, 0) != 0)
-//		snooze(100);
-//	gUSBModule->cancel_queued_transfers(fControlEndpoint);
-//	gUSBModule->cancel_queued_transfers(fInStreamEndpoint);
-//	gUSBModule->cancel_queued_transfers(fOutStreamEndpoint);
 
 	fOpen = false;
 
@@ -220,19 +212,8 @@ Device::Removed()
 {
 	fRemoved = true;
 
-	// the notify hook is different from the read and write hooks as it does
-	// itself schedule traffic (while the other hooks only release a semaphore
-	// to notify another thread which in turn safly checks for the removed
-	// case) - so we must ensure that we are not inside the notify hook anymore
-	// before returning, as we would otherwise violate the promise not to use
-	// any of the pipes after returning from the removed hook
-// TODO?????? 
-//	while (atomic_add(&fInsideNotify, 0) != 0)
-//		snooze(100);
-
-//	gUSBModule->cancel_queued_transfers(fControlEndpoint);
-//	gUSBModule->cancel_queued_transfers(fInStreamEndpoint);
-//	gUSBModule->cancel_queued_transfers(fOutStreamEndpoint);
+	for (int i = 0; i < fStreams.Count(); i++)
+		fStreams[i]->OnRemove();
 }
 
 
@@ -644,34 +625,4 @@ Device::StopDevice()
 	TRACE_RET(result);
 	return result;
 }
-
-
-/*void
-Device::_NotifyCallback(void* cookie, int32 status, void* data,
-	uint32 actualLength)
-{
-	Device* device = (Device*)cookie;
-	atomic_add(&device->fInsideNotify, 1);
-	if (status == B_CANCELED || device->fRemoved) {
-		atomic_add(&device->fInsideNotify, -1);
-		return;
-	}
-
-/ *	if (status != B_OK) {
-		TRACE_ALWAYS("Device status error:%#010x\n", status);
-		status_t result = gUSBModule->clear_feature(device->fControLeNDPOint,
-													USB_FEATURE_ENDPOINT_HALT);
-		if (result != B_OK)
-			TRACE_ALWAYS("Error during clearing of HALT state:%#010x.\n", result);
-	}
-* /
-	// parse data in overriden class
-//	device->OnNotify(actualLength);
-
-	// schedule next notification buffer
-//	gUSBModule->queue_interrupt(device->fNotifyEndpoint, device->fNotifyBuffer,
-//		device->fNotifyBufferLength, _NotifyCallback, device);
-	atomic_add(&device->fInsideNotify, -1);
-}
-*/
 

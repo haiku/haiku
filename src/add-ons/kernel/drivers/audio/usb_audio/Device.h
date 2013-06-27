@@ -57,7 +57,6 @@ private:
 			status_t		fStatus;
 			bool			fOpen;
 			bool			fRemoved;
-//			int32			fInsideNotify; // TODO: move to Stream!
 			usb_device		fDevice;
 			uint16			fUSBVersion;
 			uint16			fVendorID;
