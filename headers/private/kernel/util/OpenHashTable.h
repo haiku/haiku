@@ -126,6 +126,11 @@ public:
 		return fTableSize;
 	}
 
+	bool IsEmpty() const
+	{
+		return fItemCount == 0;
+	}
+
 	size_t CountElements() const
 	{
 		return fItemCount;
