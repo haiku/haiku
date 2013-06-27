@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src kits storage ;
 
 SetSubDirSupportedPlatforms haiku libbe_test ;
 
-UsePrivateHeaders app libroot shared storage ;
+UsePrivateHeaders app kernel libroot shared storage ;
 UsePrivateSystemHeaders ;
 
 # for libbe_test
