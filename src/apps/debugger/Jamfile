@@ -4,6 +4,10 @@ CCFLAGS +=  -Werror ;
 C++FLAGS += -Werror ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
+
+# for syscall_numbers.h
+UseHeaders [ FDirName $(HAIKU_COMMON_DEBUG_OBJECT_DIR) system kernel ] ;
+
 UsePrivateHeaders app debug interface kernel shared libroot ;
 UsePrivateSystemHeaders ;
 
@@ -57,6 +61,11 @@ SourceHdrs
 	DwarfTypes.cpp
 	: [ FDirName $(SUBDIR) dwarf ]
 ;
+
+# since syscall_numbers.h is generated on the fly, we need to explicitly
+# let Jam know about the dependency.
+Includes [ FGristFiles TeamDebugger.cpp ]
+	: <syscalls>syscall_numbers.h ;
 
 Application Debugger :
 	Debugger.cpp

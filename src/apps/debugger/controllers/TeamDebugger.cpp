@@ -18,6 +18,7 @@
 #include <AutoLocker.h>
 
 #include "debug_utils.h"
+#include "syscall_numbers.h"
 
 #include "BreakpointManager.h"
 #include "BreakpointSetting.h"
@@ -1261,8 +1262,16 @@ TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 			handled = _HandleImageDeleted(imageEvent);
 			break;
 		}
-		case B_DEBUGGER_MESSAGE_PRE_SYSCALL:
 		case B_DEBUGGER_MESSAGE_POST_SYSCALL:
+		{
+			PostSyscallEvent* postSyscallEvent
+				= dynamic_cast<PostSyscallEvent*>(event);
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_POST_SYSCALL: syscall: %"
+				B_PRIu32 "\n", postSyscallEvent->GetSyscallInfo().Syscall());
+			handled = _HandlePostSyscall(postSyscallEvent);
+			break;
+		}
+		case B_DEBUGGER_MESSAGE_PRE_SYSCALL:
 		case B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED:
 		case B_DEBUGGER_MESSAGE_PROFILER_UPDATE:
 		case B_DEBUGGER_MESSAGE_HANDED_OVER:
@@ -1397,6 +1406,37 @@ TeamDebugger::_HandleImageDeleted(ImageDeletedEvent* event)
 
 	// remove breakpoints in the image
 	fBreakpointManager->RemoveImageBreakpoints(imageHandler->GetImage());
+
+	return false;
+}
+
+
+bool
+TeamDebugger::_HandlePostSyscall(PostSyscallEvent* event)
+{
+	const SyscallInfo& info = event->GetSyscallInfo();
+	const uint32* args = info.Arguments();
+
+	switch (info.Syscall()) {
+		case SYSCALL_WRITE:
+		{
+			int32 fd = (int32)args[0];
+			if (fd == 1 || fd == 2) {
+				BString data;
+				ssize_t result = fDebuggerInterface->ReadMemoryString(
+					(target_addr_t)args[3], (size_t)args[4], data);
+				if (result >= 0)
+					fTeam->NotifyConsoleOutputReceived(fd, data);
+			}
+			break;
+		}
+		case SYSCALL_WRITEV:
+		{
+			// TODO: handle
+		}
+		default:
+			break;
+	}
 
 	return false;
 }

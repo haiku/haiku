@@ -141,6 +141,8 @@ private:
 									ImageCreatedEvent* event);
 			bool				_HandleImageDeleted(
 									ImageDeletedEvent* event);
+			bool				_HandlePostSyscall(
+									PostSyscallEvent* event);
 
 			void				_HandleImageDebugInfoChanged(image_id imageID);
 			void				_HandleImageFileChanged(image_id imageID);
