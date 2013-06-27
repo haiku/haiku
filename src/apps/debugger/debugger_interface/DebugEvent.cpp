@@ -215,6 +215,18 @@ ImageDeletedEvent::ImageDeletedEvent(team_id team, thread_id thread,
 }
 
 
+// #pragma mark - PostSyscallEvent
+
+
+PostSyscallEvent::PostSyscallEvent(team_id team, thread_id thread,
+	const SyscallInfo& info)
+	:
+	DebugEvent(B_DEBUGGER_MESSAGE_POST_SYSCALL, team, thread),
+	fInfo(info)
+{
+}
+
+
 // #pragma mark - HandedOverEvent
 
 

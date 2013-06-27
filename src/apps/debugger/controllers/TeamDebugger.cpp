@@ -441,7 +441,8 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, int argc,
 
 	// set team debugging flags
 	fDebuggerInterface->SetTeamDebuggingFlags(
-		B_TEAM_DEBUG_THREADS | B_TEAM_DEBUG_IMAGES);
+		B_TEAM_DEBUG_THREADS | B_TEAM_DEBUG_IMAGES
+			| B_TEAM_DEBUG_POST_SYSCALL);
 
 	// get the initial state of the team
 	AutoLocker< ::Team> teamLocker(fTeam);
