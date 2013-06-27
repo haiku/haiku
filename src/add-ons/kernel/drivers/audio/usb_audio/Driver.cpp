@@ -40,7 +40,7 @@ usb_audio_device_added(usb_device device, void** cookie)
 		if (gDevices[i]->CompareAndReattach(device) != B_OK)
 			continue;
 
-		TRACE("The device is plugged back. Use entry at %ld.\n", i);
+		TRACE(INF, "The device is plugged back. Use entry at %ld.\n", i);
 		*cookie = gDevices[i];
 		return B_OK;
 	}
@@ -69,12 +69,12 @@ usb_audio_device_added(usb_device device, void** cookie)
 		gDevices[i] = audioDevice;
 		*cookie = audioDevice;
 
-		TRACE("New device is added at %ld.\n", i);
+		TRACE(INF, "New device is added at %ld.\n", i);
 		return B_OK;
 	}
 
 	// no space for the device
-	TRACE_ALWAYS("Error: no more device entries availble.\n");
+	TRACE(ERR, "Error: no more device entries availble.\n");
 
 	delete audioDevice;
 	return B_ERROR;
@@ -95,7 +95,7 @@ usb_audio_device_removed(void* cookie)
 			} else {
 				gDevices[i] = NULL;
 				delete device;
-				TRACE("Device at %ld deleted.\n", i);
+				TRACE(INF, "Device at %ld deleted.\n", i);
 			}
 			break;
 		}
@@ -122,7 +122,7 @@ init_driver()
 
 	load_settings();
 
-	TRACE_ALWAYS("%s\n", kVersion);
+	TRACE(ERR, "%s\n", kVersion); // TODO: always???
 
 	for (int32 i = 0; i < MAX_DEVICES; i++)
 		gDevices[i] = NULL;
@@ -234,7 +234,7 @@ usb_audio_free(void* cookie)
 			// removed hook has not deleted the object
 			gDevices[i] = NULL;
 			delete device;
-			TRACE("Device at %ld deleted.\n", i);
+			TRACE(INF, "Device at %ld deleted.\n", i);
 			break;
 		}
 	}
@@ -261,10 +261,10 @@ publish_devices()
 		gDeviceNames[deviceCount] = (char*)malloc(strlen(sDeviceBaseName) + 4);
 		if (gDeviceNames[deviceCount]) {
 			sprintf(gDeviceNames[deviceCount], "%s%ld", sDeviceBaseName, i);
-			TRACE("publishing %s\n", gDeviceNames[deviceCount]);
+			TRACE(INF, "publishing %s\n", gDeviceNames[deviceCount]);
 			deviceCount++;
 		} else
-			TRACE_ALWAYS("Error: out of memory during allocating device name.\n");
+			TRACE(ERR, "Error: out of memory during allocating device name.\n");
 	}
 
 	gDeviceNames[deviceCount] = NULL;

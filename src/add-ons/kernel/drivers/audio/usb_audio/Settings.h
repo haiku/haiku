@@ -7,24 +7,35 @@
 #ifndef _USB_AUDIO_SETTINGS_H_
 #define _USB_AUDIO_SETTINGS_H_
 
+#include <SupportDefs.h>
+
+enum {
+	ERR = 0x00000001,
+	INF = 0x00000002,
+	MIX = 0x00000004,
+	API = 0x00000080,
+	DTA = 0x00000010,
+	ISO = 0x00000020,
+	UAC = 0x00000040
+};
 
 void load_settings();
 void release_settings();
 
-void usb_audio_trace(bool force, const char* func, const char* fmt, ...);
+void usb_audio_trace(uint32 bits, const char* func, const char* fmt, ...);
 
 #ifdef TRACE
 #undef TRACE
 #endif
 
-#define TRACE(x...)			usb_audio_trace(false,	__func__, x)
-#define TRACE_ALWAYS(x...)	usb_audio_trace(true,	__func__, x)
+#define TRACE(__mask__, x...) usb_audio_trace(__mask__, __func__, x)
+//#define TRACE(mask, x...)	usb_audio_trace(true,	__func__, x)
 
-extern bool gTraceFlow;
-#define TRACE_FLOW(x...)	usb_audio_trace(gTraceFlow, NULL, x)
+//extern bool gTraceFlow;
+//#define TRACE_FLOW(x...)	usb_audio_trace(gTraceFlow, NULL, x)
 
-#define TRACE_RET(result)	usb_audio_trace(false, __func__, \
-									"Returns:%#010x\n", result);
+//#define TRACE_RET(result)	usb_audio_trace(false, __func__, 
+//									"Returns:%#010x\n", result);
 
 #endif // _USB_AUDIO_SETTINGS_H_
 

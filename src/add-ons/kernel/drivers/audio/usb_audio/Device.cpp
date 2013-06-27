@@ -28,7 +28,7 @@ Device::Device(usb_device device)
 		= gUSBModule->get_device_descriptor(device);
 
 	if (deviceDescriptor == NULL) {
-		TRACE_ALWAYS("Error of getting USB device descriptor.\n");
+		TRACE(ERR, "Error of getting USB device descriptor.\n");
 		return;
 	}
 
@@ -38,7 +38,7 @@ Device::Device(usb_device device)
 
 	fBuffersReadySem = create_sem(0, DRIVER_NAME "_buffers_ready");
 	if (fBuffersReadySem < B_OK) {
-		TRACE_ALWAYS("Error of creating ready "
+		TRACE(ERR, "Error of creating ready "
 			"buffers semaphore:%#010x\n", fBuffersReadySem);
 		return;
 	}
@@ -131,15 +131,15 @@ Device::Control(uint32 op, void* buffer, size_t length)
 			return _MultiGetDescription((multi_description*)buffer);
 
 		case B_MULTI_GET_EVENT_INFO:
-			TRACE(("B_MULTI_GET_EVENT_INFO\n"));
+			TRACE(ERR, "B_MULTI_GET_EVENT_INFO n/i\n");
 			return B_ERROR;
 
 		case B_MULTI_SET_EVENT_INFO:
-			TRACE(("B_MULTI_SET_EVENT_INFO\n"));
+			TRACE(ERR, "B_MULTI_SET_EVENT_INFO n/i\n");
 			return B_ERROR;
 
 		case B_MULTI_GET_EVENT:
-			TRACE(("B_MULTI_GET_EVENT\n"));
+			TRACE(ERR, "B_MULTI_GET_EVENT n/i\n");
 			return B_ERROR;
 
 		case B_MULTI_GET_ENABLED_CHANNELS:
@@ -155,11 +155,11 @@ Device::Control(uint32 op, void* buffer, size_t length)
 			return _MultiSetGlobalFormat((multi_format_info*)buffer);
 
 		case B_MULTI_GET_CHANNEL_FORMATS:
-			TRACE(("B_MULTI_GET_CHANNEL_FORMATS\n"));
+			TRACE(ERR, "B_MULTI_GET_CHANNEL_FORMATS n/i\n");
 			return B_ERROR;
 
 		case B_MULTI_SET_CHANNEL_FORMATS:
-			TRACE(("B_MULTI_SET_CHANNEL_FORMATS\n"));
+			TRACE(ERR, "B_MULTI_SET_CHANNEL_FORMATS n/i\n");
 			return B_ERROR;
 
 		case B_MULTI_GET_MIX:
@@ -169,14 +169,14 @@ Device::Control(uint32 op, void* buffer, size_t length)
 			return _MultiSetMix((multi_mix_value_info*)buffer);
 
 		case B_MULTI_LIST_MIX_CHANNELS:
-			TRACE(("B_MULTI_LIST_MIX_CHANNELS\n"));
+			TRACE(ERR, "B_MULTI_LIST_MIX_CHANNELS n/i\n");
 			return B_ERROR;
 
 		case B_MULTI_LIST_MIX_CONTROLS:
 			return _MultiListMixControls((multi_mix_control_info*)buffer);
 
 		case B_MULTI_LIST_MIX_CONNECTIONS:
-			TRACE(("B_MULTI_LIST_MIX_CONNECTIONS\n"));
+			TRACE(ERR, "B_MULTI_LIST_MIX_CONNECTIONS n/i\n");
 			return B_ERROR;
 
 		case B_MULTI_GET_BUFFERS:
@@ -185,12 +185,12 @@ Device::Control(uint32 op, void* buffer, size_t length)
 
 		case B_MULTI_SET_BUFFERS:
 			// Set what buffers to use, if the driver supports soft buffers.
-			TRACE(("B_MULTI_SET_BUFFERS\n"));
+			TRACE(ERR, "B_MULTI_SET_BUFFERS n/i\n");
 			return B_ERROR; /* we do not support soft buffers */
 
 		case B_MULTI_SET_START_TIME:
 			// When to actually start
-			TRACE(("B_MULTI_SET_START_TIME\n"));
+			TRACE(ERR, "B_MULTI_SET_START_TIME n/i\n");
 			return B_ERROR;
 
 		case B_MULTI_BUFFER_EXCHANGE:
@@ -202,7 +202,7 @@ Device::Control(uint32 op, void* buffer, size_t length)
 			return _MultiBufferForceStop();
 
 		default:
-			TRACE_ALWAYS("Unhandled IOCTL catched: %#010x\n", op);
+			TRACE(ERR, "Unhandled IOCTL catched: %#010x\n", op);
 	}
 
 	return B_DEV_INVALID_IOCTL;
@@ -233,7 +233,7 @@ Device::CompareAndReattach(usb_device device)
 		= gUSBModule->get_device_descriptor(device);
 
 	if (deviceDescriptor == NULL) {
-		TRACE_ALWAYS("Error of getting USB device descriptor.\n");
+		TRACE(ERR, "Error of getting USB device descriptor.\n");
 		return B_ERROR;
 	}
 
@@ -347,37 +347,40 @@ void
 Device::TraceMultiDescription(multi_description* Description,
 		Vector<multi_channel_info>& Channels)
 {
-	TRACE("interface_version:%d\n", Description->interface_version);
-	TRACE("interface_minimum:%d\n", Description->interface_minimum);
-	TRACE("friendly_name:%s\n", Description->friendly_name);
-	TRACE("vendor_info:%s\n", Description->vendor_info);
-	TRACE("output_channel_count:%d\n", Description->output_channel_count);
-	TRACE("input_channel_count:%d\n", Description->input_channel_count);
-	TRACE("output_bus_channel_count:%d\n", Description->output_bus_channel_count);
-	TRACE("input_bus_channel_count:%d\n", Description->input_bus_channel_count);
-	TRACE("aux_bus_channel_count:%d\n", Description->aux_bus_channel_count);
-	TRACE("output_rates:%#08x\n", Description->output_rates);
-	TRACE("input_rates:%#08x\n", Description->input_rates);
-	TRACE("min_cvsr_rate:%f\n", Description->min_cvsr_rate);
-	TRACE("max_cvsr_rate:%f\n", Description->max_cvsr_rate);
-	TRACE("output_formats:%#08x\n", Description->output_formats);
-	TRACE("input_formats:%#08x\n", Description->input_formats);
-	TRACE("lock_sources:%d\n", Description->lock_sources);
-	TRACE("timecode_sources:%d\n", Description->timecode_sources);
-	TRACE("interface_flags:%#08x\n", Description->interface_flags);
-	TRACE("start_latency:%d\n", Description->start_latency);
-	TRACE("control_panel:%s\n", Description->control_panel);
+	TRACE(API, "interface_version:%d\n", Description->interface_version);
+	TRACE(API, "interface_minimum:%d\n", Description->interface_minimum);
+	TRACE(API, "friendly_name:%s\n", Description->friendly_name);
+	TRACE(API, "vendor_info:%s\n", Description->vendor_info);
+	TRACE(API, "output_channel_count:%d\n", Description->output_channel_count);
+	TRACE(API, "input_channel_count:%d\n", Description->input_channel_count);
+	TRACE(API, "output_bus_channel_count:%d\n",
+		Description->output_bus_channel_count);
+	TRACE(API, "input_bus_channel_count:%d\n",
+		Description->input_bus_channel_count);
+	TRACE(API, "aux_bus_channel_count:%d\n", Description->aux_bus_channel_count);
+	TRACE(API, "output_rates:%#08x\n", Description->output_rates);
+	TRACE(API, "input_rates:%#08x\n", Description->input_rates);
+	TRACE(API, "min_cvsr_rate:%f\n", Description->min_cvsr_rate);
+	TRACE(API, "max_cvsr_rate:%f\n", Description->max_cvsr_rate);
+	TRACE(API, "output_formats:%#08x\n", Description->output_formats);
+	TRACE(API, "input_formats:%#08x\n", Description->input_formats);
+	TRACE(API, "lock_sources:%d\n", Description->lock_sources);
+	TRACE(API, "timecode_sources:%d\n", Description->timecode_sources);
+	TRACE(API, "interface_flags:%#08x\n", Description->interface_flags);
+	TRACE(API, "start_latency:%d\n", Description->start_latency);
+	TRACE(API, "control_panel:%s\n", Description->control_panel);
 
 	// multi_channel_info* Channels = Description->channels;
 	// for (int i = 0; i < Description->request_channel_count; i++) {
 	for (int i = 0; i < Channels.Count(); i++) {
-		TRACE(" channel_id:%d\n", Channels[i].channel_id);
-		TRACE("  kind:%#02x\n", Channels[i].kind);
-		TRACE("  designations:%#08x\n", Channels[i].designations);
-		TRACE("  connectors:%#08x\n", Channels[i].connectors);
+		TRACE(API, " channel_id:%d\n", Channels[i].channel_id);
+		TRACE(API, "  kind:%#02x\n", Channels[i].kind);
+		TRACE(API, "  designations:%#08x\n", Channels[i].designations);
+		TRACE(API, "  connectors:%#08x\n", Channels[i].connectors);
 	}
 
-	TRACE("request_channel_count:%d\n\n", Description->request_channel_count);
+	TRACE(API, "request_channel_count:%d\n\n",
+		Description->request_channel_count);
 }
 
 
@@ -430,9 +433,9 @@ Device::_MultiSetGlobalFormat(multi_format_info* Format)
 {
 	status_t status = B_OK;
 
-	TRACE("output_latency:%lld\n", Format->output_latency);
-	TRACE("input_latency:%lld\n",  Format->input_latency);
-	TRACE("timecode_kind:%#08x\n", Format->timecode_kind);
+	TRACE(API, "output_latency:%lld\n", Format->output_latency);
+	TRACE(API, "input_latency:%lld\n",  Format->input_latency);
+	TRACE(API, "timecode_kind:%#08x\n", Format->timecode_kind);
 
 	// uint32 offset = 0;
 	for (int i = 0; i < fStreams.Count() && status == B_OK; i++)
@@ -447,7 +450,7 @@ Device::_MultiGetBuffers(multi_buffer_list* List)
 {
 	status_t status = B_OK;
 
-	TRACE("info_size:%d\n"
+	TRACE(API, "info_size:%d\n"
 	"request_playback_buffers:%d\n"
 	"request_playback_channels:%d\n"
 	"request_playback_buffer_size:%d\n"
@@ -490,7 +493,7 @@ Device::_MultiBufferExchange(multi_buffer_info* multiInfo)
 		status = acquire_sem_etc(fBuffersReadySem, 1,
 							B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, 50000);
 		if (status == B_TIMED_OUT) {
-			TRACE_ALWAYS("Timeout during buffers exchange.\n");
+			TRACE(ERR, "Timeout during buffers exchange.\n");
 			break;
 		}
 
@@ -540,17 +543,17 @@ Device::_MultiListMixControls(multi_mix_control_info* Info)
 void
 Device::TraceListMixControls(multi_mix_control_info* Info)
 {
-	TRACE("control_count:%d\n.", Info->control_count);
+	TRACE(MIX, "control_count:%d\n.", Info->control_count);
 
 	int32 i = 0;
 	while (Info->controls[i].id > 0) {
 		multi_mix_control &c = Info->controls[i];
-		TRACE("id:%#08x\n",		c.id);
-		TRACE("flags:%#08x\n",	c.flags);
-		TRACE("master:%#08x\n", c.master);
-		TRACE("parent:%#08x\n", c.parent);
-		TRACE("string:%d\n",	c.string);
-		TRACE("name:%s\n",		c.name);
+		TRACE(MIX, "id:%#08x\n",		c.id);
+		TRACE(MIX, "flags:%#08x\n",	c.flags);
+		TRACE(MIX, "master:%#08x\n", c.master);
+		TRACE(MIX, "parent:%#08x\n", c.parent);
+		TRACE(MIX, "string:%d\n",	c.string);
+		TRACE(MIX, "name:%s\n",		c.name);
 		i++;
 	}
 }
@@ -563,12 +566,12 @@ Device::_SetupEndpoints()
 		= gUSBModule->get_nth_configuration(fDevice, 0);
 
 	if (config == NULL) {
-		TRACE_ALWAYS("Error of getting USB device configuration.\n");
+		TRACE(ERR, "Error of getting USB device configuration.\n");
 		return B_ERROR;
 	}
 
 	if (config->interface_count <= 0) {
-		TRACE_ALWAYS("Error:no interfaces found in USB device configuration\n");
+		TRACE(ERR, "Error:no interfaces found in USB device configuration\n");
 		return B_ERROR;
 	}
 
@@ -596,14 +599,14 @@ Device::_SetupEndpoints()
 				}
 				break;
 			default:
-				TRACE_ALWAYS("Ignore interface of unsupported subclass %#x.\n",
+				TRACE(ERR, "Ignore interface of unsupported subclass %#x.\n",
 					Interface->descr->interface_subclass);
 				break;
 		}
 	}
 
 	if (fAudioControl.InitCheck() == B_OK && fStreams.Count() > 0) {
-		TRACE("Found device %#06x:%#06x\n", fVendorID, fProductID);
+		TRACE(INF, "Found device %#06x:%#06x\n", fVendorID, fProductID);
 		gUSBModule->set_configuration(fDevice, config);
 
 		for (int i = 0; i < fStreams.Count(); i++)
@@ -622,9 +625,9 @@ Device::StopDevice()
 	status_t result = B_OK;
 
 	if (result != B_OK)
-		TRACE_ALWAYS("Error of writing %#04x RX Control:%#010x\n", 0, result);
+		TRACE(ERR, "Error of writing %#04x RX Control:%#010x\n", 0, result);
 
-	TRACE_RET(result);
+	//TRACE_RET(result);
 	return result;
 }
 

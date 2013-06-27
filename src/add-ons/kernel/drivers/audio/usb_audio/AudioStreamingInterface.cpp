@@ -53,9 +53,9 @@ ASInterfaceDescriptor::ASInterfaceDescriptor(
 	fDelay = Descriptor->r1.delay;
 	fFormatTag = Descriptor->r1.format_tag;
 
-	TRACE("fTerminalLink:%d\n", fTerminalLink);
-	TRACE("fDelay:%d\n", fDelay);
-	TRACE("fFormatTag:%#06x\n", fFormatTag);
+	TRACE(UAC, "fTerminalLink:%d\n", fTerminalLink);
+	TRACE(UAC, "fDelay:%d\n", fDelay);
+	TRACE(UAC, "fFormatTag:%#06x\n", fFormatTag);
 
 	// fStatus = B_OK;
 }
@@ -85,12 +85,12 @@ ASEndpointDescriptor::ASEndpointDescriptor(usb_endpoint_descriptor* Endpoint,
 	fEndpointAddress = Endpoint->endpoint_address;
 	fMaxPacketSize = Endpoint->max_packet_size;
 
-	TRACE("fCSAttributes:%d\n", fCSAttributes);
-	TRACE("fLockDelayUnits:%d\n", fLockDelayUnits);
-	TRACE("fLockDelay:%d\n", fLockDelay);
-	TRACE("fMaxPacketSize:%d\n", fMaxPacketSize);
-	TRACE("fEndpointAddress:%#02x\n", fEndpointAddress);
-	TRACE("fEndpointAttributes:%d\n", fEndpointAttributes);
+	TRACE(UAC, "fCSAttributes:%d\n", fCSAttributes);
+	TRACE(UAC, "fLockDelayUnits:%d\n", fLockDelayUnits);
+	TRACE(UAC, "fLockDelay:%d\n", fLockDelay);
+	TRACE(UAC, "fMaxPacketSize:%d\n", fMaxPacketSize);
+	TRACE(UAC, "fEndpointAddress:%#02x\n", fEndpointAddress);
+	TRACE(UAC, "fEndpointAttributes:%d\n", fEndpointAttributes);
 }
 
 
@@ -171,13 +171,13 @@ TypeIFormatDescriptor::Init(usb_audio_format_descriptor* Descriptor)
 			fSampleFrequencies.PushBack(
 				GetSamFreq(Descriptor->typeI.sam_freqs[i]));
 
-	TRACE("fNumChannels:%d\n", fNumChannels);
-	TRACE("fSubframeSize:%d\n", fSubframeSize);
-	TRACE("fBitResolution:%d\n", fBitResolution);
-	TRACE("fSampleFrequencyType:%d\n", fSampleFrequencyType);
+	TRACE(UAC, "fNumChannels:%d\n", fNumChannels);
+	TRACE(UAC, "fSubframeSize:%d\n", fSubframeSize);
+	TRACE(UAC, "fBitResolution:%d\n", fBitResolution);
+	TRACE(UAC, "fSampleFrequencyType:%d\n", fSampleFrequencyType);
 
 	for (int32 i = 0; i < fSampleFrequencies.Count(); i++)
-		TRACE("Frequency #%d: %d\n", i, fSampleFrequencies[i]);
+		TRACE(UAC, "Frequency #%d: %d\n", i, fSampleFrequencies[i]);
 
 	return B_OK;
 }
@@ -241,7 +241,7 @@ AudioStreamAlternate::SetSamplingRate(uint32 newRate)
 		= static_cast<TypeIFormatDescriptor*>(Format());
 
 	if (format == NULL) {
-		TRACE_ALWAYS("Format not set for active alternate\n");
+		TRACE(ERR, "Format not set for active alternate\n");
 		return B_NO_INIT;
 	}
 	
@@ -260,7 +260,7 @@ AudioStreamAlternate::SetSamplingRate(uint32 newRate)
 			uint32 min = min_c(frequencies[0], frequencies[1]);
 			uint32 max = max_c(frequencies[0], frequencies[1]);
 			if (newRate < min || newRate > max) {
-				TRACE_ALWAYS("Rate %d outside of %d - %d ignored.\n",
+				TRACE(ERR, "Rate %d outside of %d - %d ignored.\n",
 					newRate, min, max);
 				return B_BAD_INDEX;
 			}
@@ -271,7 +271,7 @@ AudioStreamAlternate::SetSamplingRate(uint32 newRate)
 					fSamplingRate = newRate;
 					return B_OK;
 				}
-				TRACE_ALWAYS("Rate %d not found - ignore it.\n", newRate);
+				TRACE(ERR, "Rate %d not found - ignore it.\n", newRate);
 				return B_BAD_INDEX;
 		}
 	}
@@ -290,7 +290,7 @@ AudioStreamAlternate::GetSamplingRateId(uint32 rate)
 		if (ratesMap[i].rate == rate)
 			return ratesMap[i].rateId;
 
-	TRACE_ALWAYS("Ignore unsupported sample rate %d.\n", rate);
+	TRACE(ERR, "Ignore unsupported sample rate %d.\n", rate);
 	return 0;
 }
 
@@ -302,7 +302,7 @@ AudioStreamAlternate::GetSamplingRateIds()
 		= static_cast<TypeIFormatDescriptor*>(Format());
 
 	if (format == NULL) {
-		TRACE_ALWAYS("Format not set for active alternate\n");
+		TRACE(ERR, "Format not set for active alternate\n");
 		return 0;
 	}
 	
@@ -332,7 +332,7 @@ AudioStreamAlternate::GetFormatId()
 		= static_cast<TypeIFormatDescriptor*>(Format());
 
 	if (format == NULL || Interface() == NULL) {
-		TRACE_ALWAYS("Ignore alternate due format "
+		TRACE(ERR, "Ignore alternate due format "
 			"%#08x or interface %#08x null.\n", format, Interface());
 		return 0;
 	}
@@ -354,14 +354,14 @@ AudioStreamAlternate::GetFormatId()
 				case 24: formats = B_FMT_24BIT; break;
 				case 32: formats = B_FMT_32BIT; break;
 				default:
-					TRACE_ALWAYS("Ignore unsupported "
+					TRACE(ERR, "Ignore unsupported "
 						"bit resolution %d for alternate.\n",
 						format->fBitResolution);
 					break;
 			}
 			break;
 		default:
-			TRACE_ALWAYS("Ignore unsupported "
+			TRACE(ERR, "Ignore unsupported "
 				"format bit resolution %d for alternate.\n",
 				Interface()->fFormatTag);
 			break;
@@ -378,7 +378,7 @@ AudioStreamAlternate::SamplingRateFromId(uint32 id)
 		if (ratesMap[i].rateId == id)
 			return ratesMap[i].rate;
 
-	TRACE_ALWAYS("Unknown sample rate id: %d.\n", id);
+	TRACE(ERR, "Unknown sample rate id: %d.\n", id);
 	return 0;
 }
 
@@ -406,7 +406,7 @@ AudioStreamingInterface::AudioStreamingInterface(
 	fIsInput(false),
 	fActiveAlternate(0)
 {
-	TRACE_ALWAYS("if[%d]:alt_count:%d\n", interface, List->alt_count);
+	TRACE(ERR, "if[%d]:alt_count:%d\n", interface, List->alt_count);
 
 	for (size_t alt = 0; alt < List->alt_count; alt++) {
 		ASInterfaceDescriptor*	ASInterface	= NULL;
@@ -415,7 +415,7 @@ AudioStreamingInterface::AudioStreamingInterface(
 
 		usb_interface_info* Interface = &List->alt[alt];
 
-		TRACE_ALWAYS("if[%d]:alt[%d]:descrs_count:%d\n",
+		TRACE(ERR, "if[%d]:alt[%d]:descrs_count:%d\n",
 			interface, alt, Interface->generic_count);
 		for (size_t i = 0; i < Interface->generic_count; i++) {
 			usb_audiocontrol_header_descriptor* Header
@@ -428,17 +428,17 @@ AudioStreamingInterface::AudioStreamingInterface(
 							ASInterface = new ASInterfaceDescriptor(
 								(usb_audio_streaming_interface_descriptor*)Header);
 						else
-							TRACE_ALWAYS("Duplicate AStream interface ignored.\n");
+							TRACE(ERR, "Duplicate AStream interface ignored.\n");
 						break;
 					case USB_AUDIO_AS_FORMAT_TYPE:
 						if (ASFormat == 0)
 							ASFormat = new TypeIFormatDescriptor(
 								(usb_audio_format_descriptor*) Header);
 						else
-							TRACE_ALWAYS("Duplicate AStream format ignored.\n");
+							TRACE(ERR, "Duplicate AStream format ignored.\n");
 						break;
 					default:
-						TRACE_ALWAYS("Ignore AStream descr subtype %#04x\n",
+						TRACE(ERR, "Ignore AStream descr subtype %#04x\n",
 							Header->descriptor_subtype);
 						break;
 				}
@@ -452,11 +452,11 @@ AudioStreamingInterface::AudioStreamingInterface(
 					ASEndpoint = new ASEndpointDescriptor(Endpoint,
 						(usb_audio_streaming_endpoint_descriptor*)Header);
 				} else
-					TRACE_ALWAYS("Duplicate AStream endpoint ignored.\n");
+					TRACE(ERR, "Duplicate AStream endpoint ignored.\n");
 				continue;
 			}
 
-			TRACE_ALWAYS("Ignore Audio Stream of "
+			TRACE(ERR, "Ignore Audio Stream of "
 				"unknown descriptor type %#04x.\n",	Header->descriptor_type);
 		}
 
@@ -491,7 +491,7 @@ AudioStreamingInterface::ChannelCluster()
 {
 	_AudioControl* control = fControlInterface->Find(TerminalLink());
 	if (control == 0) {
-		TRACE_ALWAYS("Control was not found for terminal id:%d.\n",
+		TRACE(ERR, "Control was not found for terminal id:%d.\n",
 			TerminalLink());
 		return NULL;
 	}
