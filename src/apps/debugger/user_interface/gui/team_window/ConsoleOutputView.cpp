@@ -74,8 +74,19 @@ ConsoleOutputView::ConsoleOutputReceived(int32 fd, const BString& output)
 	run.runs[0].color.blue = 0;
 	run.runs[0].color.alpha = 255;
 
+	bool autoScroll = false;
+	BScrollBar* scroller = fConsoleOutput->ScrollBar(B_VERTICAL);
+	float min, max;
+	scroller->GetRange(&min, &max);
+	if (min == max || scroller->Value() == max)
+		autoScroll = true;
+
 	fConsoleOutput->Insert(fConsoleOutput->TextLength(), output.String(),
 		output.Length(), &run);
+	if (autoScroll) {
+		scroller->GetRange(&min, &max);
+		fConsoleOutput->ScrollTo(0.0, max);
+	}
 }
 
 
