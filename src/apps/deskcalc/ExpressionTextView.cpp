@@ -136,8 +136,13 @@ ExpressionTextView::SetTextRect(BRect rect)
 	InputTextView::SetTextRect(rect);
 
 	int32 count = fPreviousExpressions.CountItems();
-	if (fHistoryPos == count && fCurrentValue.CountChars() > 0)
+	if (fHistoryPos == count && fCurrentValue.CountChars() > 0) {
+		int32 start;
+		int32 finish;
+		GetSelection(&start, &finish);
 		SetValue(fCurrentValue.String());
+		Select(start, finish);
+	}
 }
 
 
