@@ -117,8 +117,7 @@ CalcView::Instantiate(BMessage* archive)
 
 CalcView::CalcView(BRect frame, rgb_color rgbBaseColor, BMessage* settings)
 	:
-	BView(frame, "DeskCalc", B_FOLLOW_ALL_SIDES,
-		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
+	BView(frame, "DeskCalc", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS),
 	fColumns(5),
 	fRows(4),
 
@@ -847,14 +846,19 @@ CalcView::SetKeypadMode(uint8 mode)
 
 			if (width < kMinimumWidthScientific)
 				width = kMinimumWidthScientific;
-			if (width > kMaximumWidthScientific)
+			else if (width > kMaximumWidthScientific)
 				width = kMaximumWidthScientific;
 
 			if (height < kMinimumHeightScientific)
 				height = kMinimumHeightScientific;
-			if (height > kMaximumHeightScientific)
+			else if (height > kMaximumHeightScientific)
 				height = kMaximumHeightScientific;
-			ResizeTo(width, height);
+
+			if (width != fWidth || height != fHeight)
+				ResizeTo(width, height);
+			else
+				Invalidate();
+
 			break;
 		}
 
@@ -871,14 +875,18 @@ CalcView::SetKeypadMode(uint8 mode)
 
 			if (width < kMinimumWidthBasic)
 				width = kMinimumWidthBasic;
-			if (width > kMaximumWidthBasic)
+			else if (width > kMaximumWidthBasic)
 				width = kMaximumWidthBasic;
 
 			if (height < kMinimumHeightBasic)
 				height = kMinimumHeightBasic;
-			if (height > kMaximumHeightBasic)
+			else if (height > kMaximumHeightBasic)
 				height = kMaximumHeightBasic;
-			ResizeTo(width, height);
+
+			if (width != fWidth || height != fHeight)
+				ResizeTo(width, height);
+			else
+				Invalidate();
 		}
 	}
 }
