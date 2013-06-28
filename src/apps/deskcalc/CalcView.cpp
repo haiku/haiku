@@ -858,7 +858,8 @@ CalcView::SetKeypadMode(uint8 mode)
 			break;
 		}
 
-		default: // KEYPAD_MODE_BASIC is the default
+		case KEYPAD_MODE_BASIC:
+		default:
 		{
 			free(fKeypadDescription);
 			fKeypadDescription = strdup(kKeypadDescriptionBasic);
