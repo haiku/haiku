@@ -45,8 +45,10 @@
 #include "CalcOptions.h"
 #include "ExpressionTextView.h"
 
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "CalcView"
+
 
 //const uint8 K_COLOR_OFFSET				= 32;
 const float kFontScaleY						= 0.4f;
@@ -87,10 +89,12 @@ const char *kKeypadDescriptionScientific =
     "1     2     3     +     -    \n"
     "0     .     BS    =     C    \n";
 
+
 enum {
 	FLAGS_FLASH_KEY							= 1 << 0,
 	FLAGS_MOUSE_DOWN						= 1 << 1
 };
+
 
 struct CalcView::CalcKey {
 	char		label[8];
@@ -684,27 +688,27 @@ CalcView::FrameResized(float width, float height)
 	fHeight = height;
 
 	// layout expression text view
-	BRect frame = _ExpressionRect();
+	BRect expressionRect = _ExpressionRect();
 	if (fOptions->keypad_mode == KEYPAD_MODE_COMPACT) {
-		frame.InsetBy(2, 2);
-		frame.right -= ceilf(fCalcIcon->Bounds().Width() * 1.5);
+		expressionRect.InsetBy(2, 2);
+		expressionRect.right -= ceilf(fCalcIcon->Bounds().Width() * 1.5);
 	} else
-		frame.InsetBy(4, 4);
+		expressionRect.InsetBy(4, 4);
 
-	fExpressionTextView->MoveTo(frame.LeftTop());
-	fExpressionTextView->ResizeTo(frame.Width(), frame.Height());
+	fExpressionTextView->MoveTo(expressionRect.LeftTop());
+	fExpressionTextView->ResizeTo(expressionRect.Width(), expressionRect.Height());
 
 	// configure expression text view font size and color
 	float sizeDisp = fOptions->keypad_mode == KEYPAD_MODE_COMPACT
-					 ? fHeight : fHeight * kDisplayScaleY;
+		? fHeight : fHeight * kDisplayScaleY;
 	BFont font(be_bold_font);
 	font.SetSize(sizeDisp * kExpressionFontScaleY);
 	fExpressionTextView->SetFontAndColor(&font, B_FONT_ALL);
 
-	frame.OffsetTo(B_ORIGIN);
-	float inset = (frame.Height() - fExpressionTextView->LineHeight(0)) / 2;
-	frame.InsetBy(0, inset);
-	fExpressionTextView->SetTextRect(frame);
+	expressionRect.OffsetTo(B_ORIGIN);
+	float inset = (expressionRect.Height() - fExpressionTextView->LineHeight(0)) / 2;
+	expressionRect.InsetBy(0, inset);
+	fExpressionTextView->SetTextRect(expressionRect);
 	Invalidate();
 }
 
@@ -929,12 +933,12 @@ CalcView::SetKeypadMode(uint8 mode)
 		{
 			if (window->Bounds() == Frame()) {
 				window->SetSizeLimits(kMinimumWidthCompact,
-									  kMaximumWidthCompact,
-									  kMinimumHeightCompact,
-									  kMaximumHeightCompact);
+					kMaximumWidthCompact, kMinimumHeightCompact,
+					kMaximumHeightCompact);
 				window->ResizeTo(width, height * kDisplayScaleY);
 			} else
 				ResizeTo(width, height * kDisplayScaleY);
+
 			break;
 		}
 
@@ -946,13 +950,14 @@ CalcView::SetKeypadMode(uint8 mode)
 			_ParseCalcDesc(fKeypadDescription);
 
 			window->SetSizeLimits(kMinimumWidthScientific,
-								  kMaximumWidthScientific,
-								  kMinimumHeightScientific,
-								  kMaximumHeightScientific);
+				kMaximumWidthScientific, kMinimumHeightScientific,
+				kMaximumHeightScientific);
+
 			if (width < kMinimumWidthScientific)
 				width = kMinimumWidthScientific;
 			if (width > kMaximumWidthScientific)
 				width = kMaximumWidthScientific;
+
 			if (height < kMinimumHeightScientific)
 				height = kMinimumHeightScientific;
 			if (height > kMaximumHeightScientific)
@@ -969,11 +974,13 @@ CalcView::SetKeypadMode(uint8 mode)
 			_ParseCalcDesc(fKeypadDescription);
 
 			window->SetSizeLimits(kMinimumWidthBasic, kMaximumWidthBasic,
-								  kMinimumHeightBasic, kMaximumHeightBasic);
+				kMinimumHeightBasic, kMaximumHeightBasic);
+
 			if (width < kMinimumWidthBasic)
 				width = kMinimumWidthBasic;
 			if (width > kMaximumWidthBasic)
 				width = kMaximumWidthBasic;
+
 			if (height < kMinimumHeightBasic)
 				height = kMinimumHeightBasic;
 			if (height > kMaximumHeightBasic)

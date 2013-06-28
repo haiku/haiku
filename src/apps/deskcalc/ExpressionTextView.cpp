@@ -401,7 +401,7 @@ ExpressionTextView::PreviousExpression()
 	}
 
 	BString* item = (BString*)fPreviousExpressions.ItemAt(fHistoryPos);
-	if (item)
+	if (item != NULL)
 		SetExpression(item->String());
 }
 

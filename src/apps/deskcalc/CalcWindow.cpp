@@ -42,7 +42,7 @@ CalcWindow::CalcWindow(BRect frame, BMessage* settings)
 
 	// Size Limits are defined in CalcView.h
 	SetSizeLimits(kMinimumWidthBasic, kMaximumWidthBasic,
-				  kMinimumHeightBasic, kMaximumHeightBasic);
+		kMinimumHeightBasic, kMaximumHeightBasic);
 
 	frame.OffsetTo(B_ORIGIN);
 	fCalcView = new CalcView(frame, baseColor, settings);
