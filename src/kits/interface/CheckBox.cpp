@@ -366,7 +366,7 @@ BCheckBox::MouseDown(BPoint point)
 			Invalidate();
 			Window()->UpdateIfNeeded();
 		}
-	}	
+	}
 }
 
 
@@ -452,7 +452,7 @@ BSize
 BCheckBox::MaxSize()
 {
 	return BLayoutUtils::ComposeSize(ExplicitMaxSize(),
-		BSize(B_SIZE_UNLIMITED, _ValidatePreferredSize().height));
+		_ValidatePreferredSize());
 }
 
 
@@ -631,6 +631,6 @@ B_IF_GCC_2(InvalidateLayout__9BCheckBoxb, _ZN9BCheckBox16InvalidateLayoutEb)(
 	perform_data_layout_invalidated data;
 	data.descendants = descendants;
 
-	box->Perform(PERFORM_CODE_LAYOUT_INVALIDATED, &data);	
+	box->Perform(PERFORM_CODE_LAYOUT_INVALIDATED, &data);
 }
 
