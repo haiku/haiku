@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TEAM_WINDOW_H
@@ -29,6 +29,7 @@ class BMenuBar;
 class BSplitView;
 class BStringView;
 class BTabView;
+class ConsoleOutputView;
 class ExceptionConfigWindow;
 class Image;
 class InspectorWindow;
@@ -129,6 +130,8 @@ private:
 									const Team::ThreadEvent& event);
 	virtual	void				ImageDebugInfoChanged(
 									const Team::ImageEvent& event);
+	virtual	void				ConsoleOutputReceived(
+									const Team::ConsoleOutputEvent& event);
 	virtual	void				UserBreakpointChanged(
 									const Team::UserBreakpointEvent& event);
 	virtual	void				WatchpointChanged(
@@ -195,10 +198,12 @@ private:
 			BButton*			fStepOutButton;
 			BMenuBar*			fMenuBar;
 			BStringView*		fSourcePathView;
+			ConsoleOutputView*	fConsoleOutputView;
 			BSplitView*			fFunctionSplitView;
 			BSplitView*			fSourceSplitView;
 			BSplitView*			fImageSplitView;
 			BSplitView*			fThreadSplitView;
+			BSplitView*			fConsoleSplitView;
 			ExceptionConfigWindow* fExceptionConfigWindow;
 			InspectorWindow*	fInspectorWindow;
 			GuiTeamUiSettings	fUiSettings;

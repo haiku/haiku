@@ -29,6 +29,7 @@
 #include <AutoLocker.h>
 
 #include "Breakpoint.h"
+#include "ConsoleOutputView.h"
 #include "CpuState.h"
 #include "DisassembledCode.h"
 #include "ExceptionConfigWindow.h"
@@ -116,6 +117,14 @@ TeamWindow::TeamWindow(::Team* team, UserInterfaceListener* listener)
 	fStepOverButton(NULL),
 	fStepIntoButton(NULL),
 	fStepOutButton(NULL),
+	fMenuBar(NULL),
+	fSourcePathView(NULL),
+	fConsoleOutputView(NULL),
+	fFunctionSplitView(NULL),
+	fSourceSplitView(NULL),
+	fImageSplitView(NULL),
+	fThreadSplitView(NULL),
+	fConsoleSplitView(NULL),
 	fExceptionConfigWindow(NULL),
 	fInspectorWindow(NULL),
 	fFilePanel(NULL)
@@ -429,6 +438,18 @@ TeamWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case MSG_CONSOLE_OUTPUT_RECEIVED:
+		{
+			int32 fd;
+			BString output;
+			if (message->FindInt32("fd", &fd) != B_OK
+					|| message->FindString("output", &output) != B_OK) {
+				break;
+			}
+			fConsoleOutputView->ConsoleOutputReceived(fd, output);
+			break;
+		}
+
 		case MSG_USER_BREAKPOINT_CHANGED:
 		{
 			UserBreakpoint* breakpoint;
@@ -505,6 +526,9 @@ TeamWindow::LoadSettings(const GuiTeamUiSettings* settings)
 	if (teamWindowSettings.FindMessage("threadSplit", &archive) == B_OK)
 		GuiSettingsUtils::UnarchiveSplitView(archive, fThreadSplitView);
 
+	if (teamWindowSettings.FindMessage("consoleSplit", &archive) == B_OK)
+		GuiSettingsUtils::UnarchiveSplitView(archive, fConsoleSplitView);
+
 	if (teamWindowSettings.FindMessage("imageListView", &archive) == B_OK)
 		fImageListView->LoadSettings(archive);
 
@@ -525,6 +549,9 @@ TeamWindow::LoadSettings(const GuiTeamUiSettings* settings)
 
 	if (teamWindowSettings.FindMessage("breakpointsView", &archive) == B_OK)
 		fBreakpointsView->LoadSettings(archive);
+
+	if (teamWindowSettings.FindMessage("consoleOutputView", &archive) == B_OK)
+		fConsoleOutputView->LoadSettings(archive);
 
 	fUiSettings = *settings;
 
@@ -570,6 +597,11 @@ TeamWindow::SaveSettings(GuiTeamUiSettings* settings)
 	if (teamWindowSettings.AddMessage("threadSplit", &archive))
 		return B_NO_MEMORY;
 
+	if (GuiSettingsUtils::ArchiveSplitView(archive, fConsoleSplitView) != B_OK)
+		return B_NO_MEMORY;
+	if (teamWindowSettings.AddMessage("consoleSplit", &archive))
+		return B_NO_MEMORY;
+
 	if (fImageListView->SaveSettings(archive) != B_OK)
 		return B_NO_MEMORY;
 	if (teamWindowSettings.AddMessage("imageListView", &archive))
@@ -603,6 +635,11 @@ TeamWindow::SaveSettings(GuiTeamUiSettings* settings)
 	if (fBreakpointsView->SaveSettings(archive) != B_OK)
 		return B_NO_MEMORY;
 	if (teamWindowSettings.AddMessage("breakpointsView", &archive))
+		return B_NO_MEMORY;
+
+	if (fConsoleOutputView->SaveSettings(archive) != B_OK)
+		return B_NO_MEMORY;
+	if (teamWindowSettings.AddMessage("consoleOutputView", &archive))
 		return B_NO_MEMORY;
 
 	if (!settings->AddSettings("teamWindow", teamWindowSettings))
@@ -764,6 +801,16 @@ TeamWindow::ImageDebugInfoChanged(const Team::ImageEvent& event)
 
 
 void
+TeamWindow::ConsoleOutputReceived(const Team::ConsoleOutputEvent& event)
+{
+	BMessage message(MSG_CONSOLE_OUTPUT_RECEIVED);
+	message.AddInt32("fd", event.Descriptor());
+	message.AddString("output", event.Output());
+	PostMessage(&message);
+}
+
+
+void
 TeamWindow::UserBreakpointChanged(const Team::UserBreakpointEvent& event)
 {
 	BMessage message(MSG_USER_BREAKPOINT_CHANGED);
@@ -837,6 +884,11 @@ TeamWindow::_Init()
 						NULL, 0, true, true), splitSpacing)
 				.End()
 				.Add(fLocalsTabView = new BTabView("locals view"))
+			.End()
+			.AddSplit(B_VERTICAL, splitSpacing)
+				.GetSplitView(&fConsoleSplitView)
+				.SetInsets(0.0)
+				.Add(fConsoleOutputView = ConsoleOutputView::Create())
 			.End()
 		.End();
 

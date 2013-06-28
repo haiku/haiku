@@ -244,6 +244,7 @@ Application Debugger :
 	# user_interface/gui/team_window
 	BreakpointListView.cpp
 	BreakpointsView.cpp
+	ConsoleOutputView.cpp
 	ExceptionConfigWindow.cpp
 	ImageFunctionsView.cpp
 	ImageListView.cpp
