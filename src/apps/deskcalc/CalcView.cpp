@@ -362,47 +362,11 @@ CalcView::Draw(BRect updateRect)
 			expressionRect.InsetBy(1, 1);
 		}
 
-		if (be_control_look != NULL) {
-			uint32 flags = 0;
-			if (!drawBackground)
-				flags |= BControlLook::B_BLEND_FRAME;
-			be_control_look->DrawTextControlBorder(this, expressionRect,
-				updateRect, fBaseColor, flags);
-		} else {
-			BeginLineArray(8);
-
-			rgb_color lightShadow = tint_color(fBaseColor, B_DARKEN_1_TINT);
-			rgb_color darkShadow = tint_color(fBaseColor, B_DARKEN_3_TINT);
-
-			AddLine(BPoint(expressionRect.left, expressionRect.bottom),
-					BPoint(expressionRect.left, expressionRect.top),
-					lightShadow);
-			AddLine(BPoint(expressionRect.left + 1, expressionRect.top),
-					BPoint(expressionRect.right, expressionRect.top),
-					lightShadow);
-			AddLine(BPoint(expressionRect.right, expressionRect.top + 1),
-					BPoint(expressionRect.right, expressionRect.bottom),
-					fLightColor);
-			AddLine(BPoint(expressionRect.left + 1, expressionRect.bottom),
-					BPoint(expressionRect.right - 1, expressionRect.bottom),
-					fLightColor);
-
-			expressionRect.InsetBy(1, 1);
-			AddLine(BPoint(expressionRect.left, expressionRect.bottom),
-					BPoint(expressionRect.left, expressionRect.top),
-					darkShadow);
-			AddLine(BPoint(expressionRect.left + 1, expressionRect.top),
-					BPoint(expressionRect.right, expressionRect.top),
-					darkShadow);
-			AddLine(BPoint(expressionRect.right, expressionRect.top + 1),
-					BPoint(expressionRect.right, expressionRect.bottom),
-					fBaseColor);
-			AddLine(BPoint(expressionRect.left + 1, expressionRect.bottom),
-					BPoint(expressionRect.right - 1, expressionRect.bottom),
-					fBaseColor);
-
-			EndLineArray();
-		}
+		uint32 flags = 0;
+		if (!drawBackground)
+			flags |= BControlLook::B_BLEND_FRAME;
+		be_control_look->DrawTextControlBorder(this, expressionRect,
+			updateRect, fBaseColor, flags);
 	}
 
 	if (fOptions->keypad_mode == KEYPAD_MODE_COMPACT)
@@ -426,101 +390,38 @@ CalcView::Draw(BRect updateRect)
 
 	SetFontSize(min_c(sizeRow * kFontScaleY, sizeCol * kFontScaleX));
 
-	if (be_control_look != NULL) {
-		CalcKey* key = fKeypad;
-		for (int row = 0; row < fRows; row++) {
-			for (int col = 0; col < fColumns; col++) {
-				BRect frame;
-				frame.left = keypadRect.left + col * sizeCol;
-				frame.right = keypadRect.left + (col + 1) * sizeCol - 1;
-				frame.top = sizeDisp + row * sizeRow;
-				frame.bottom = sizeDisp + (row + 1) * sizeRow - 1;
-
-				if (drawBackground) {
-					SetHighColor(fBaseColor);
-					StrokeRect(frame);
-				}
-				frame.InsetBy(1, 1);
-
-				uint32 flags = 0;
-				if (!drawBackground)
-					flags |= BControlLook::B_BLEND_FRAME;
-				if (key->flags != 0)
-					flags |= BControlLook::B_ACTIVATED;
-				flags |= BControlLook::B_IGNORE_OUTLINE;
-
-				be_control_look->DrawButtonFrame(this, frame, updateRect,
-					fBaseColor, fBaseColor, flags);
-
-				be_control_look->DrawButtonBackground(this, frame, updateRect,
-					fBaseColor, flags);
-
-				be_control_look->DrawLabel(this, key->label, frame, updateRect,
-					fBaseColor, flags, BAlignment(B_ALIGN_HORIZONTAL_CENTER,
-						B_ALIGN_VERTICAL_CENTER));
-
-				key++;
-			}
-		}
-		return;
-	}
-
-	// TODO: support pressed keys
-
-	// paint keypad b/g
-	SetHighColor(fBaseColor);
-	FillRect(updateRect & keypadRect);
-
-	// render key main grid
-	BeginLineArray(((fColumns + fRows) << 1) + 1);
-
-	// render cols
-	AddLine(BPoint(0.0, sizeDisp),
-			BPoint(0.0, fHeight),
-			fLightColor);
-	for (int col = 1; col < fColumns; col++) {
-		AddLine(BPoint(col * sizeCol - 1.0, sizeDisp),
-				BPoint(col * sizeCol - 1.0, fHeight),
-				fDarkColor);
-		AddLine(BPoint(col * sizeCol, sizeDisp),
-				BPoint(col * sizeCol, fHeight),
-				fLightColor);
-	}
-	AddLine(BPoint(fColumns * sizeCol, sizeDisp),
-			BPoint(fColumns * sizeCol, fHeight),
-			fDarkColor);
-
-	// render rows
-	for (int row = 0; row < fRows; row++) {
-		AddLine(BPoint(0.0, sizeDisp + row * sizeRow - 1.0),
-				BPoint(fWidth, sizeDisp + row * sizeRow - 1.0),
-				fDarkColor);
-		AddLine(BPoint(0.0, sizeDisp + row * sizeRow),
-				BPoint(fWidth, sizeDisp + row * sizeRow),
-				fLightColor);
-	}
-	AddLine(BPoint(0.0, sizeDisp + fRows * sizeRow),
-			BPoint(fWidth, sizeDisp + fRows * sizeRow),
-			fDarkColor);
-
-	// main grid complete
-	EndLineArray();
-
-	// render key symbols
-	float halfSizeCol = sizeCol * 0.5f;
-	SetHighColor(fButtonTextColor);
-	SetLowColor(fBaseColor);
-	SetDrawingMode(B_OP_COPY);
-
-	float baselineOffset = ((fHeight - sizeDisp) / (float)fRows)
-							* (1.0 - kFontScaleY) * 0.5;
 	CalcKey* key = fKeypad;
 	for (int row = 0; row < fRows; row++) {
 		for (int col = 0; col < fColumns; col++) {
-			float halfSymbolWidth = StringWidth(key->label) * 0.5f;
-			DrawString(key->label,
-				BPoint(col * sizeCol + halfSizeCol - halfSymbolWidth,
-				sizeDisp + (row + 1) * sizeRow - baselineOffset));
+			BRect frame;
+			frame.left = keypadRect.left + col * sizeCol;
+			frame.right = keypadRect.left + (col + 1) * sizeCol - 1;
+			frame.top = sizeDisp + row * sizeRow;
+			frame.bottom = sizeDisp + (row + 1) * sizeRow - 1;
+
+			if (drawBackground) {
+				SetHighColor(fBaseColor);
+				StrokeRect(frame);
+			}
+			frame.InsetBy(1, 1);
+
+			uint32 flags = 0;
+			if (!drawBackground)
+				flags |= BControlLook::B_BLEND_FRAME;
+			if (key->flags != 0)
+				flags |= BControlLook::B_ACTIVATED;
+			flags |= BControlLook::B_IGNORE_OUTLINE;
+
+			be_control_look->DrawButtonFrame(this, frame, updateRect,
+				fBaseColor, fBaseColor, flags);
+
+			be_control_look->DrawButtonBackground(this, frame, updateRect,
+				fBaseColor, flags);
+
+			be_control_look->DrawLabel(this, key->label, frame, updateRect,
+				fBaseColor, flags, BAlignment(B_ALIGN_HORIZONTAL_CENTER,
+					B_ALIGN_VERTICAL_CENTER));
+
 			key++;
 		}
 	}
