@@ -20,6 +20,7 @@
 #include "debug_utils.h"
 #include "syscall_numbers.h"
 
+#include "Architecture.h"
 #include "BreakpointManager.h"
 #include "BreakpointSetting.h"
 #include "CpuState.h"
@@ -1415,16 +1416,37 @@ bool
 TeamDebugger::_HandlePostSyscall(PostSyscallEvent* event)
 {
 	const SyscallInfo& info = event->GetSyscallInfo();
-	const uint32* args = info.Arguments();
 
 	switch (info.Syscall()) {
 		case SYSCALL_WRITE:
 		{
-			int32 fd = (int32)args[0];
+			int32 fd;
+			target_addr_t address;
+			size_t size;
+			// TODO: decoding the syscall arguments should probably be
+			// factored out into an Architecture method of its own, since
+			// there's no guarantee the target architecture has the same
+			// endianness as the host. This could re-use the syscall
+			// argument parser that strace uses, though that would need to
+			// be adapted to handle the aforementioned endian differences.
+			// This works for x86{-64} for now though.
+			if (fTeam->GetArchitecture()->AddressSize() == 4) {
+				const uint32* args = (const uint32*)info.Arguments();
+				fd = args[0];
+				address = args[3];
+				size = args[4];
+			} else {
+				const uint64* args = (const uint64*)info.Arguments();
+				fd = args[0];
+				address = args[2];
+				size = args[3];
+			}
+
 			if (fd == 1 || fd == 2) {
 				BString data;
+
 				ssize_t result = fDebuggerInterface->ReadMemoryString(
-					(target_addr_t)args[3], (size_t)args[4], data);
+					address, size, data);
 				if (result >= 0)
 					fTeam->NotifyConsoleOutputReceived(fd, data);
 			}
