@@ -315,12 +315,7 @@ CalcView::MessageReceived(BMessage* message)
 void
 CalcView::Draw(BRect updateRect)
 {
-	bool drawBackground = true;
-	if (Parent() && (Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0) {
-		// CalcView is embedded somewhere, most likely the Tracker Desktop
-		// shelf.
-		drawBackground = false;
-	}
+	bool drawBackground = !_IsEmbedded();
 
 	SetHighColor(fBaseColor);
 	BRect expressionRect(_ExpressionRect());
@@ -809,11 +804,14 @@ CalcView::SetDegreeMode(bool degrees)
 void
 CalcView::SetKeypadMode(uint8 mode)
 {
-	if (fOptions->keypad_mode == mode)
+	if (_IsEmbedded())
 		return;
 
 	BWindow* window = Window();
 	if (window == NULL)
+		return;
+
+	if (fOptions->keypad_mode == mode)
 		return;
 
 	fOptions->keypad_mode = mode;
@@ -1277,4 +1275,13 @@ CalcView::_FetchAppIcon(BBitmap* into)
 	}
 	if (status != B_OK)
 		memset(into->Bits(), 0, into->BitsLength());
+}
+
+
+// Returns whether or not CalcView is embedded somewhere, most likely
+// the Desktop
+bool
+CalcView::_IsEmbedded()
+{
+	return Parent() != NULL && (Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0;
 }

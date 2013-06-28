@@ -117,6 +117,7 @@ class CalcView : public BView {
 			void				_MarkKeypadItems(uint8 mode);
 
 			void				_FetchAppIcon(BBitmap* into);
+			bool				_IsEmbedded();
 
 			// grid dimensions
 			int16				fColumns;
