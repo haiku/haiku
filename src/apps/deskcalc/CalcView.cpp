@@ -576,13 +576,6 @@ CalcView::MakeFocus(bool focused)
 
 
 void
-CalcView::ResizeTo(float width, float height)
-{
-	BView::ResizeTo(width, height);
-}
-
-
-void
 CalcView::FrameResized(float width, float height)
 {
 	fWidth = width;

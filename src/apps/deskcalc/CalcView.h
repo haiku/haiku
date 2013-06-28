@@ -60,7 +60,6 @@ class CalcView : public BView {
 	virtual	void				MouseUp(BPoint point);
 	virtual	void				KeyDown(const char* bytes, int32 numBytes);
 	virtual	void				MakeFocus(bool focused = true);
-	virtual	void				ResizeTo(float width, float height);
 	virtual	void				FrameResized(float width, float height);
 
 			// Archive this view.
