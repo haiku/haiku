@@ -13,241 +13,6 @@
 #include "Driver.h"
 #include "Settings.h"
 
-/*
-enum TerminalTypes {
-	// USB Terminal Types
-	UndefinedUSB_IO		= 0x100,
-	StreamingUSB_IO		= 0x101,
-	VendorUSB_IO		= 0x1ff,
-	// Input Terminal Types
-	Undefined_In		= 0x200,
-	Microphone_In		= 0x201,
-	DesktopMic_In		= 0x202,
-	PersonalMic_In		= 0x203,
-	OmniMic_In			= 0x204,
-	MicsArray_In		= 0x205,
-	ProcMicsArray_In	= 0x206,
-	// Output Terminal Types
-	Undefined_Out		= 0x300,
-	Speaker_Out			= 0x301,
-	HeadPhones_Out		= 0x302,
-	HMDAudio_Out		= 0x303,
-	DesktopSpeaker		= 0x304,
-	RoomSpeaker			= 0x305,
-	CommSpeaker			= 0x306,
-	LFESpeaker			= 0x307,
-	// Bi-directional Terminal Types
-	Undefined_IO		= 0x400,
-	Handset_IO			= 0x401,
-	Headset_IO			= 0x402,
-	SpeakerPhone_IO		= 0x403,
-	SpeakerPhoneES_IO	= 0x404,
-	SpeakerPhoneEC_IO	= 0x405,
-	// Telephony Terminal Types
-	UndefTelephony_IO	= 0x500,
-	PhoneLine_IO		= 0x501,
-	Telephone_IO		= 0x502,
-	DownLinePhone_IO	= 0x503,
-	// External Terminal Types
-	UndefinedExt_IO		= 0x600,
-	AnalogConnector_IO	= 0x601,
-	DAInterface_IO		= 0x602,
-	LineConnector_IO	= 0x603,
-	LegacyConnector_IO	= 0x604,
-	SPDIFInterface_IO	= 0x605,
-	DA1394Stream_IO		= 0x606,
-	DV1394StreamSound_IO= 0x607,
-	ADATLightpipe_IO	= 0x608,
-	TDIF_IO				= 0x609,
-	MADI_IO				= 0x60a,
-	// Embedded Terminal Types
-	UndefEmbedded_IO	= 0x700,
-	LCNoiseSource_Out	= 0x701,
-	EqualizationNoise_Out	= 0x702,
-	CDPlayer_In			= 0x703,
-	DAT_IO				= 0x704,
-	DCC_IO				= 0x705,
-	MiniDisk_IO			= 0x706,
-	AnalogTape_IO		= 0x707,
-	Phonograph_In		= 0x708,
-	VCRAudio_In			= 0x709,
-	VideoDiscAudio_In	= 0x70a,
-	DVDAudio_In			= 0x70b,
-	TVTunerAudio_In		= 0x70c,
-	SatReceiverAudio_In	= 0x70d,
-	CableTunerAudio_In	= 0x70e,
-	DSSAudio_In			= 0x70f,
-	Radio_Receiver_In	= 0x710,
-	RadioTransmitter_In	= 0x711,
-	MultiTrackRecorder_IO	= 0x712,
-	Synthesizer_IO		= 0x713,
-	Piano_IO			= 0x714,
-	Guitar_IO			= 0x715,
-	Drums_IO			= 0x716,
-	Instrument_IO		= 0x717
-}; */
-
-
-const char*
-GetTerminalDescription(uint16 TerminalType)
-{
-	static struct _pair {
-		uint16 type;
-		const char* description;
-	} termInfoPairs[] = {
-		// USB Terminal Types
-		{ USB_AUDIO_UNDEFINED_USB_IO,		"USB I/O" },
-		{ USB_AUDIO_STREAMING_USB_IO,		"USB Streaming I/O" },
-		{ USB_AUDIO_VENDOR_USB_IO,			"Vendor USB I/O" },
-		// Input Terminal Types
-		{ USB_AUDIO_UNDEFINED_IN,			"Undefined Input" },
-		{ USB_AUDIO_MICROPHONE_IN,			"Microphone" },
-		{ USB_AUDIO_DESKTOPMIC_IN,			"Desktop Microphone" },
-		{ USB_AUDIO_PERSONALMIC_IN,			"Personal Microphone" },
-		{ USB_AUDIO_OMNI_MIC_IN,			"Omni-directional Mic" },
-		{ USB_AUDIO_MICS_ARRAY_IN,			"Microphone Array" },
-		{ USB_AUDIO_PROC_MICS_ARRAY_IN,		"Processing Mic Array" },
-		// Output Terminal Types
-		{ USB_AUDIO_UNDEFINED_OUT,			"Undefined Output" },
-		{ USB_AUDIO_SPEAKER_OUT,			"Speaker" },
-		{ USB_AUDIO_HEAD_PHONES_OUT,		"Headphones" },
-		{ USB_AUDIO_HMD_AUDIO_OUT,			"Head Mounted Disp.Audio" },
-		{ USB_AUDIO_DESKTOP_SPEAKER,		"Desktop Speaker" },
-		{ USB_AUDIO_ROOM_SPEAKER,			"Room Speaker" },
-		{ USB_AUDIO_COMM_SPEAKER,			"Communication Speaker" },
-		{ USB_AUDIO_LFE_SPEAKER,			"LFE Speaker" },
-		// Bi-directional Terminal Types
-		{ USB_AUDIO_UNDEFINED_IO,			"Undefined I/O" },
-		{ USB_AUDIO_HANDSET_IO,				"Handset" },
-		{ USB_AUDIO_HEADSET_IO,				"Headset" },
-		{ USB_AUDIO_SPEAKER_PHONE_IO,		"Speakerphone" },
-		{ USB_AUDIO_SPEAKER_PHONEES_IO,		"Echo-supp Speakerphone" },
-		{ USB_AUDIO_SPEAKER_PHONEEC_IO,		"Echo-cancel Speakerphone" },
-		// Telephony Terminal Types
-		{ USB_AUDIO_UNDEF_TELEPHONY_IO,		"Undefined Telephony" },
-		{ USB_AUDIO_PHONE_LINE_IO,			"Phone Line" },
-		{ USB_AUDIO_TELEPHONE_IO,			"Telephone" },
-		{ USB_AUDIO_DOWNLINE_PHONE_IO,		"Down Line Phone" },
-		// External Terminal Types
-		{ USB_AUDIO_UNDEFINEDEXT_IO,		"Undefined External I/O" },
-		{ USB_AUDIO_ANALOG_CONNECTOR_IO,	"Analog Connector" },
-		{ USB_AUDIO_DAINTERFACE_IO,			"Digital Audio Interface" },
-		{ USB_AUDIO_LINE_CONNECTOR_IO,		"Line Connector" },
-		{ USB_AUDIO_LEGACY_CONNECTOR_IO,	"LegacyAudioConnector" },
-		{ USB_AUDIO_SPDIF_INTERFACE_IO,		"S/PDIF Interface" },
-		{ USB_AUDIO_DA1394_STREAM_IO,		"1394 DA Stream" },
-		{ USB_AUDIO_DV1394_STREAMSOUND_IO,	"1394 DV Stream Soundtrack" },
-		{ USB_AUDIO_ADAT_LIGHTPIPE_IO,		"Alesis DAT Stream" },
-		{ USB_AUDIO_TDIF_IO,				"Tascam Digital Interface" },
-		{ USB_AUDIO_MADI_IO,				"AES Multi-channel interface" },
-		// Embedded Terminal Types
-		{ USB_AUDIO_UNDEF_EMBEDDED_IO,		"Undefined Embedded I/O" },
-		{ USB_AUDIO_LC_NOISE_SOURCE_OUT,	"Level Calibration Noise Source" },
-		{ USB_AUDIO_EQUALIZATION_NOISE_OUT,	"Equalization Noise" },
-		{ USB_AUDIO_CDPLAYER_IN,			"CD Player" },
-		{ USB_AUDIO_DAT_IO,					"DAT" },
-		{ USB_AUDIO_DCC_IO,					"DCC" },
-		{ USB_AUDIO_MINI_DISK_IO,			"Mini Disk" },
-		{ USB_AUDIO_ANALOG_TAPE_IO,			"Analog Tape" },
-		{ USB_AUDIO_PHONOGRAPH_IN,			"Phonograph" },
-		{ USB_AUDIO_VCR_AUDIO_IN,			"VCR Audio" },
-		{ USB_AUDIO_VIDEO_DISC_AUDIO_IN,	"Video Disc Audio" },
-		{ USB_AUDIO_DVD_AUDIO_IN,			"DVD Audio" },
-		{ USB_AUDIO_TV_TUNER_AUDIO_IN,		"TV Tuner Audio" },
-		{ USB_AUDIO_SAT_RECEIVER_AUDIO_IN,	"Satellite Receiver Audio" },
-		{ USB_AUDIO_CABLE_TUNER_AUDIO_IN,	"Cable Tuner Audio" },
-		{ USB_AUDIO_DSS_AUDIO_IN,			"DSS Audio" },
-		{ USB_AUDIO_RADIO_RECEIVER_IN,		"Radio Receiver" },
-		{ USB_AUDIO_RADIO_TRANSMITTER_IN,	"Radio Transmitter" },
-		{ USB_AUDIO_MULTI_TRACK_RECORDER_IO,"Multi-track Recorder" },
-		{ USB_AUDIO_SYNTHESIZER_IO,			"Synthesizer" },
-		{ USB_AUDIO_PIANO_IO,				"Piano" },
-		{ USB_AUDIO_GUITAR_IO,				"Guitar" },
-		{ USB_AUDIO_DRUMS_IO,				"Percussion Instrument" },
-		{ USB_AUDIO_INSTRUMENT_IO,			"Musical Instrument" }
-	};
-
-	for (size_t i = 0; _countof(termInfoPairs); i++)
-		if (termInfoPairs[i].type == TerminalType)
-			return termInfoPairs[i].description;
-/*
-	switch(TerminalType) {
-		// USB Terminal Types
-		case UndefinedUSB_IO:		return "USB I/O";
-		case StreamingUSB_IO:		return "USB Streaming I/O";
-		case VendorUSB_IO:			return "Vendor USB I/O";
-		// Input Terminal Types
-		case Undefined_In:			return "Undefined Input";
-		case Microphone_In:			return "Microphone";
-		case DesktopMic_In:			return "Desktop Microphone";
-		case PersonalMic_In:		return "Personal Microphone";
-		case OmniMic_In:			return "Omni-directional Mic";
-		case MicsArray_In:			return "Microphone Array";
-		case ProcMicsArray_In:		return "Processing Mic Array";
-		// Output Terminal Types
-		case Undefined_Out:			return "Undefined Output";
-		case Speaker_Out:			return "Speaker";
-		case HeadPhones_Out:		return "Headphones";
-		case HMDAudio_Out:			return "Head Mounted Disp.Audio";
-		case DesktopSpeaker:		return "Desktop Speaker";
-		case RoomSpeaker:			return "Room Speaker";
-		case CommSpeaker:			return "Communication Speaker";
-		case LFESpeaker:			return "LFE Speaker";
-		// Bi-directional Terminal Types
-		case Undefined_IO:			return "Undefined I/O";
-		case Handset_IO:			return "Handset";
-		case Headset_IO:			return "Headset";
-		case SpeakerPhone_IO:		return "Speakerphone";
-		case SpeakerPhoneES_IO:		return "Echo-supp Speakerphone";
-		case SpeakerPhoneEC_IO:		return "Echo-cancel Speakerphone";
-		// Telephony Terminal Types
-		case UndefTelephony_IO:		return "Undefined Telephony";
-		case PhoneLine_IO:			return "Phone Line";
-		case Telephone_IO:			return "Telephone";
-		case DownLinePhone_IO:		return "Down Line Phone";
-		// External Terminal Types
-		case UndefinedExt_IO:		return "Undefined External I/O";
-		case AnalogConnector_IO:	return "Analog Connector";
-		case DAInterface_IO:		return "Digital Audio Interface";
-		case LineConnector_IO:		return "Line Connector";
-		case LegacyConnector_IO:	return "LegacyAudioConnector";
-		case SPDIFInterface_IO:		return "S/PDIF Interface";
-		case DA1394Stream_IO:		return "1394 DA Stream";
-		case DV1394StreamSound_IO:	return "1394 DV Stream Soundtrack";
-		case ADATLightpipe_IO:		return "Alesis DAT Stream";
-		case TDIF_IO:				return "Tascam Digital Interface";
-		case MADI_IO:				return "AES Multi-channel interface";
-		// Embedded Terminal Types
-		case UndefEmbedded_IO:		return "Undefined Embedded I/O";
-		case LCNoiseSource_Out:		return "Level Calibration Noise Source";
-		case EqualizationNoise_Out:	return "Equalization Noise";
-		case CDPlayer_In:			return "CD Player";
-		case DAT_IO:				return "DAT";
-		case DCC_IO:				return "DCC";
-		case MiniDisk_IO:			return "Mini Disk";
-		case AnalogTape_IO:			return "Analog Tape";
-		case Phonograph_In:			return "Phonograph";
-		case VCRAudio_In:			return "VCR Audio";
-		case VideoDiscAudio_In:		return "Video Disc Audio";
-		case DVDAudio_In:			return "DVD Audio";
-		case TVTunerAudio_In:		return "TV Tuner Audio";
-		case SatReceiverAudio_In:	return "Satellite Receiver Audio";
-		case CableTunerAudio_In:	return "Cable Tuner Audio";
-		case DSSAudio_In:			return "DSS Audio";
-		case Radio_Receiver_In:		return "Radio Receiver";
-		case RadioTransmitter_In:	return "Radio Transmitter";
-		case MultiTrackRecorder_IO:	return "Multi-track Recorder";
-		case Synthesizer_IO:		return "Synthesizer";
-		case Piano_IO:				return "Piano";
-		case Guitar_IO:				return "Guitar";
-		case Drums_IO:				return "Percussion Instrument";
-		case Instrument_IO:			return "Musical Instrument";
-	} */
-
-	TRACE(ERR, "Unknown Terminal Type: %#06x", TerminalType);
-	return "Unknown";
-}
-
 
 // control id is encoded in following way
 //	CS	CN	ID	IF where:
@@ -333,7 +98,7 @@ _Terminal::~_Terminal()
 const char*
 _Terminal::Name()
 {
-	return GetTerminalDescription(fTerminalType);
+	return _GetTerminalDescription(fTerminalType);
 }
 
 
@@ -341,6 +106,94 @@ bool
 _Terminal::IsUSBIO()
 {
 	return (fTerminalType & 0xff00) == USB_AUDIO_UNDEFINED_USB_IO;
+}
+
+
+const char*
+_Terminal::_GetTerminalDescription(uint16 TerminalType)
+{
+	static struct _pair {
+		uint16 type;
+		const char* description;
+	} termInfoPairs[] = {
+		// USB Terminal Types
+		{ USB_AUDIO_UNDEFINED_USB_IO,		"USB I/O" },
+		{ USB_AUDIO_STREAMING_USB_IO,		"USB Streaming I/O" },
+		{ USB_AUDIO_VENDOR_USB_IO,			"Vendor USB I/O" },
+		// Input Terminal Types
+		{ USB_AUDIO_UNDEFINED_IN,			"Undefined Input" },
+		{ USB_AUDIO_MICROPHONE_IN,			"Microphone" },
+		{ USB_AUDIO_DESKTOPMIC_IN,			"Desktop Microphone" },
+		{ USB_AUDIO_PERSONALMIC_IN,			"Personal Microphone" },
+		{ USB_AUDIO_OMNI_MIC_IN,			"Omni-directional Mic" },
+		{ USB_AUDIO_MICS_ARRAY_IN,			"Microphone Array" },
+		{ USB_AUDIO_PROC_MICS_ARRAY_IN,		"Processing Mic Array" },
+		// Output Terminal Types
+		{ USB_AUDIO_UNDEFINED_OUT,			"Undefined Output" },
+		{ USB_AUDIO_SPEAKER_OUT,			"Speaker" },
+		{ USB_AUDIO_HEAD_PHONES_OUT,		"Headphones" },
+		{ USB_AUDIO_HMD_AUDIO_OUT,			"Head Mounted Disp.Audio" },
+		{ USB_AUDIO_DESKTOP_SPEAKER,		"Desktop Speaker" },
+		{ USB_AUDIO_ROOM_SPEAKER,			"Room Speaker" },
+		{ USB_AUDIO_COMM_SPEAKER,			"Communication Speaker" },
+		{ USB_AUDIO_LFE_SPEAKER,			"LFE Speaker" },
+		// Bi-directional Terminal Types
+		{ USB_AUDIO_UNDEFINED_IO,			"Undefined I/O" },
+		{ USB_AUDIO_HANDSET_IO,				"Handset" },
+		{ USB_AUDIO_HEADSET_IO,				"Headset" },
+		{ USB_AUDIO_SPEAKER_PHONE_IO,		"Speakerphone" },
+		{ USB_AUDIO_SPEAKER_PHONEES_IO,		"Echo-supp Speakerphone" },
+		{ USB_AUDIO_SPEAKER_PHONEEC_IO,		"Echo-cancel Speakerphone" },
+		// Telephony Terminal Types
+		{ USB_AUDIO_UNDEF_TELEPHONY_IO,		"Undefined Telephony" },
+		{ USB_AUDIO_PHONE_LINE_IO,			"Phone Line" },
+		{ USB_AUDIO_TELEPHONE_IO,			"Telephone" },
+		{ USB_AUDIO_DOWNLINE_PHONE_IO,		"Down Line Phone" },
+		// External Terminal Types
+		{ USB_AUDIO_UNDEFINEDEXT_IO,		"Undefined External I/O" },
+		{ USB_AUDIO_ANALOG_CONNECTOR_IO,	"Analog Connector" },
+		{ USB_AUDIO_DAINTERFACE_IO,			"Digital Audio Interface" },
+		{ USB_AUDIO_LINE_CONNECTOR_IO,		"Line Connector" },
+		{ USB_AUDIO_LEGACY_CONNECTOR_IO,	"LegacyAudioConnector" },
+		{ USB_AUDIO_SPDIF_INTERFACE_IO,		"S/PDIF Interface" },
+		{ USB_AUDIO_DA1394_STREAM_IO,		"1394 DA Stream" },
+		{ USB_AUDIO_DV1394_STREAMSOUND_IO,	"1394 DV Stream Soundtrack" },
+		{ USB_AUDIO_ADAT_LIGHTPIPE_IO,		"Alesis DAT Stream" },
+		{ USB_AUDIO_TDIF_IO,				"Tascam Digital Interface" },
+		{ USB_AUDIO_MADI_IO,				"AES Multi-channel interface" },
+		// Embedded Terminal Types
+		{ USB_AUDIO_UNDEF_EMBEDDED_IO,		"Undefined Embedded I/O" },
+		{ USB_AUDIO_LC_NOISE_SOURCE_OUT,	"Level Calibration Noise Source" },
+		{ USB_AUDIO_EQUALIZATION_NOISE_OUT,	"Equalization Noise" },
+		{ USB_AUDIO_CDPLAYER_IN,			"CD Player" },
+		{ USB_AUDIO_DAT_IO,					"DAT" },
+		{ USB_AUDIO_DCC_IO,					"DCC" },
+		{ USB_AUDIO_MINI_DISK_IO,			"Mini Disk" },
+		{ USB_AUDIO_ANALOG_TAPE_IO,			"Analog Tape" },
+		{ USB_AUDIO_PHONOGRAPH_IN,			"Phonograph" },
+		{ USB_AUDIO_VCR_AUDIO_IN,			"VCR Audio" },
+		{ USB_AUDIO_VIDEO_DISC_AUDIO_IN,	"Video Disc Audio" },
+		{ USB_AUDIO_DVD_AUDIO_IN,			"DVD Audio" },
+		{ USB_AUDIO_TV_TUNER_AUDIO_IN,		"TV Tuner Audio" },
+		{ USB_AUDIO_SAT_RECEIVER_AUDIO_IN,	"Satellite Receiver Audio" },
+		{ USB_AUDIO_CABLE_TUNER_AUDIO_IN,	"Cable Tuner Audio" },
+		{ USB_AUDIO_DSS_AUDIO_IN,			"DSS Audio" },
+		{ USB_AUDIO_RADIO_RECEIVER_IN,		"Radio Receiver" },
+		{ USB_AUDIO_RADIO_TRANSMITTER_IN,	"Radio Transmitter" },
+		{ USB_AUDIO_MULTI_TRACK_RECORDER_IO,"Multi-track Recorder" },
+		{ USB_AUDIO_SYNTHESIZER_IO,			"Synthesizer" },
+		{ USB_AUDIO_PIANO_IO,				"Piano" },
+		{ USB_AUDIO_GUITAR_IO,				"Guitar" },
+		{ USB_AUDIO_DRUMS_IO,				"Percussion Instrument" },
+		{ USB_AUDIO_INSTRUMENT_IO,			"Musical Instrument" }
+	};
+
+	for (size_t i = 0; _countof(termInfoPairs); i++)
+		if (termInfoPairs[i].type == TerminalType)
+			return termInfoPairs[i].description;
+
+	TRACE(ERR, "Unknown Terminal Type: %#06x", TerminalType);
+	return "Unknown";
 }
 
 
@@ -357,7 +210,7 @@ InputTerminal::InputTerminal(AudioControlInterface*	interface,
 
 	TRACE(UAC, "Input Terminal ID:%d >>>\n", fID);
 	TRACE(UAC, "Terminal type:%s (%#06x)\n",
-		GetTerminalDescription(fTerminalType), fTerminalType);
+		_GetTerminalDescription(fTerminalType), fTerminalType);
 	TRACE(UAC, "Assoc.terminal:%d\n",	fAssociatedTerminal);
 
 	if (fInterface->SpecReleaseNumber() < 0x200) {
@@ -406,7 +259,7 @@ OutputTerminal::OutputTerminal(AudioControlInterface*	interface,
 
 	TRACE(UAC, "Output Terminal ID:%d >>>\n",	fID);
 	TRACE(UAC, "Terminal type:%s (%#06x)\n",
-		GetTerminalDescription(fTerminalType), fTerminalType);
+		_GetTerminalDescription(fTerminalType), fTerminalType);
 	TRACE(UAC, "Assoc.terminal:%d\n",		fAssociatedTerminal);
 	TRACE(UAC, "Source ID:%d\n",				fSourceID);
 
@@ -722,9 +575,9 @@ EffectUnit::EffectUnit(AudioControlInterface*	interface,
 	:
 	_AudioControl(interface, Header)
 {
-	usb_audio_input_terminal_descriptor* D
+	usb_audio_input_terminal_descriptor* descriptor
 		= (usb_audio_input_terminal_descriptor*) Header;
-	TRACE(UAC, "Effect Unit:%d >>>\n",	D->terminal_id);
+	TRACE(UAC, "Effect Unit:%d >>>\n", descriptor->terminal_id);
 }
 
 
@@ -1214,7 +1067,7 @@ AudioControlInterface::GetBusChannelsDescription(
 		addedChannels += channels;
 	}
 
-	// output channels should follow too
+	// input channels should follow too
 	for (AudioControlsIterator I = fInputTerminals.Begin();
 			I != fInputTerminals.End(); I++) {
 		_AudioControl* control = I->Value();
@@ -1229,7 +1082,7 @@ AudioControlInterface::GetBusChannelsDescription(
 		}
 
 		uint32 channels = GetTerminalChannels(Channels,
-											cluster, B_MULTI_INPUT_BUS);
+			cluster, B_MULTI_INPUT_BUS);
 
 		Description->input_bus_channel_count += channels;
 		addedChannels += channels;

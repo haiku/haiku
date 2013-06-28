@@ -116,6 +116,9 @@ Stream::_ChooseAlternate()
 	fIsInput = (endpoint->fEndpointAddress & USB_ENDPOINT_ADDR_DIR_IN)
 		== USB_ENDPOINT_ADDR_DIR_IN;
 
+//	if (fIsInput)
+//		fCurrentBuffer = -1;
+
 	TRACE(INF, "Alternate %d EP:%x selected for %s!\n",
 		fActiveAlternate, endpoint->fEndpointAddress,
 		fIsInput ? "recording" : "playback");
@@ -255,11 +258,11 @@ Stream::Start()
 {
 	status_t result = B_BUSY;
 	if (!fIsRunning) {
-		if (!fIsInput) { // TODO: recording
+		//if (!fIsInput) { // TODO: recording
 			for (size_t i = 0; i < kSamplesBufferCount; i++)
 				result = _QueueNextTransfer(i, true);
-		} else
-			result = B_OK;
+		//} else
+		//	result = B_OK;
 		fIsRunning = result == B_OK;
 	}
 	return result;
@@ -524,11 +527,11 @@ Stream::GetBuffers(multi_buffer_list* List)
 bool
 Stream::ExchangeBuffer(multi_buffer_info* Info)
 {
-	if (fProcessedBuffers <= 0) {
+	if (fProcessedBuffers <= 0) //{
 		// looks like somebody else has processed buffers but this stream
-		release_sem_etc(fDevice->fBuffersReadySem, 1, B_DO_NOT_RESCHEDULE);
+//		release_sem_etc(fDevice->fBuffersReadySem, 1, B_DO_NOT_RESCHEDULE);
 		return false;
-	}
+//	}
 
 	if (fIsInput) {
 		Info->recorded_real_time = system_time();// TODO fRealTime;

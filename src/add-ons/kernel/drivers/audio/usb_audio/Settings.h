@@ -13,7 +13,7 @@ enum {
 	ERR = 0x00000001,
 	INF = 0x00000002,
 	MIX = 0x00000004,
-	API = 0x00000080,
+	API = 0x00000008,
 	DTA = 0x00000010,
 	ISO = 0x00000020,
 	UAC = 0x00000040
@@ -24,18 +24,17 @@ void release_settings();
 
 void usb_audio_trace(uint32 bits, const char* func, const char* fmt, ...);
 
+#define TRACE_USB_AUDIO
+
 #ifdef TRACE
 #undef TRACE
 #endif
 
+#ifdef TRACE_USB_AUDIO
 #define TRACE(__mask__, x...) usb_audio_trace(__mask__, __func__, x)
-//#define TRACE(mask, x...)	usb_audio_trace(true,	__func__, x)
-
-//extern bool gTraceFlow;
-//#define TRACE_FLOW(x...)	usb_audio_trace(gTraceFlow, NULL, x)
-
-//#define TRACE_RET(result)	usb_audio_trace(false, __func__, 
-//									"Returns:%#010x\n", result);
+#else
+#define TRACE(__mask__, x...) // nothing
+#endif
 
 #endif // _USB_AUDIO_SETTINGS_H_
 

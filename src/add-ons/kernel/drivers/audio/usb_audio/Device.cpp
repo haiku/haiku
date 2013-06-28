@@ -312,14 +312,15 @@ Device::_MultiGetDescription(multi_description* multiDescription)
 	for (int i = 0; i < fStreams.Count(); i++) {
 		uint8 id = fStreams[i]->TerminalLink();
 		_AudioControl* control = fAudioControl.Find(id);
-		// if (control->SubType() == IDSOutputTerminal) {
+		 //if (control->SubType() == USB_AUDIO_AC_OUTPUT_TERMINAL) {
+		// if (control->SubType() == USB_AUDIO_AC_INPUT_TERMINAL) {
 		//	USBTerminals.PushFront(control);
 		//	fStreams[i]->GetFormatsAndRates(Description);
 		// } else
 		// if (control->SubType() == IDSInputTerminal) {
 			USBTerminals.PushBack(control);
 			fStreams[i]->GetFormatsAndRates(&Description);
-		// }
+		//}
 	}
 
 	Vector<multi_channel_info> Channels;
@@ -335,7 +336,7 @@ Device::_MultiGetDescription(multi_description* multiDescription)
 		return B_BAD_ADDRESS;
 
 	if (user_memcpy(multiDescription->channels,
-			&Channels[0], min_c(Channels.Count(),
+			&Channels[0], sizeof(multi_channel_info) * min_c(Channels.Count(),
 			Description.request_channel_count)) != B_OK)
 		return B_BAD_ADDRESS;
 
@@ -472,6 +473,33 @@ Device::_MultiGetBuffers(multi_buffer_list* List)
 	for (int i = 0; i < fStreams.Count() && status == B_OK; i++)
 		status = fStreams[i]->GetBuffers(List);
 
+	TRACE(API, "flags:%#x\n"
+	"return_playback_buffers:%d\n"
+	"return_playback_channels:%d\n"
+	"return_playback_buffer_size:%d\n"
+	"return_record_buffers:%d\n"
+	"return_record_channels:%d\n"
+	"return_record_buffer_size:%d\n",
+		List->flags,
+		List->return_playback_buffers,
+		List->return_playback_channels,
+		List->return_playback_buffer_size,
+		List->return_record_buffers,
+		List->return_record_channels,
+		List->return_record_buffer_size);
+
+	TRACE(API, "playback buffers\n");
+	for (int32_t b = 0; b <  List->return_playback_buffers; b++)
+		for (int32 c = 0; c < List->return_playback_channels; c++)
+			TRACE(API, "%d:%d %08x:%d\n", b, c, List->playback_buffers[b][c].base,
+				List->playback_buffers[b][c].stride);
+
+	TRACE(API, "record buffers:\n");
+	for (int32_t b = 0; b <  List->return_record_buffers; b++)
+		for (int32 c = 0; c < List->return_record_channels; c++)
+			TRACE(API, "%d:%d %08x:%d\n", b, c, List->record_buffers[b][c].base,
+				List->record_buffers[b][c].stride);
+
 	return B_OK;
 }
 
@@ -487,18 +515,23 @@ Device::_MultiBufferExchange(multi_buffer_info* multiInfo)
 		if (!fStreams[i]->IsRunning())
 			fStreams[i]->Start();
 
-	status_t status = B_ERROR;
-	bool anyBufferProcessed = false;
-	for (int i = 0; i < fStreams.Count() && !anyBufferProcessed; i++) {
-		status = acquire_sem_etc(fBuffersReadySem, 1,
-							B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, 50000);
-		if (status == B_TIMED_OUT) {
-			TRACE(ERR, "Timeout during buffers exchange.\n");
+	status_t status = acquire_sem_etc(fBuffersReadySem, 1,
+		B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, 50000);
+	if (status == B_TIMED_OUT) {
+		TRACE(ERR, "Timeout during buffers exchange.\n");
+		return status;
+	}
+
+	status = B_ERROR;
+	for (int i = 0; i < fStreams.Count(); i++)
+		if (fStreams[i]->ExchangeBuffer(&Info)) {
+			status = B_OK;
 			break;
 		}
 
-		anyBufferProcessed = fStreams[i]->ExchangeBuffer(&Info);
-		status = anyBufferProcessed ? B_OK : B_ERROR;
+	if (status != B_OK) {
+		TRACE(ERR, "Error processing buffers:%08x.\n", status);
+		return status;
 	}
 
 	if (user_memcpy(multiInfo, &Info, sizeof(multi_buffer_info)) != B_OK)

@@ -87,6 +87,7 @@ public:
 			uint16			TerminalType() { return fTerminalType; }
 			bool			IsUSBIO();
 	virtual	const char*		Name();
+	static	const char*		_GetTerminalDescription(uint16 TerminalType);
 
 protected:
 			uint16			fTerminalType;

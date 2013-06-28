@@ -177,7 +177,7 @@ usb_audio_open(const char* name, uint32 flags, void** cookie)
 
 	*cookie = NULL;
 	status_t status = ENODEV;
-	int32 index = strtol(name + strlen(sDeviceBaseName), NULL, 10);
+	int32 index = strtol(name + strlen(sDeviceBaseName), NULL, 10) - 1;
 	if (index >= 0 && index < MAX_DEVICES && gDevices[index]) {
 		status = gDevices[index]->Open(flags);
 		*cookie = gDevices[index];
@@ -260,7 +260,7 @@ publish_devices()
 
 		gDeviceNames[deviceCount] = (char*)malloc(strlen(sDeviceBaseName) + 4);
 		if (gDeviceNames[deviceCount]) {
-			sprintf(gDeviceNames[deviceCount], "%s%ld", sDeviceBaseName, i);
+			sprintf(gDeviceNames[deviceCount], "%s%ld", sDeviceBaseName, i + 1);
 			TRACE(INF, "publishing %s\n", gDeviceNames[deviceCount]);
 			deviceCount++;
 		} else

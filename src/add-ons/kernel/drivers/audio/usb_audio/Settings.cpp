@@ -18,11 +18,9 @@
 #include "Driver.h"
 
 
-//bool gTraceOn = false;
 uint32 gTraceMask = ERR;
 bool gTruncateLogFile = false;
 bool gAddTimeStamp = true;
-//bool gTraceFlow = false;
 static char* gLogFilePath = NULL;
 mutex gLogLock;
 
@@ -47,10 +45,7 @@ void load_settings()
 	if (handle == 0)
 		return;
 
-	//gTraceOn = get_driver_boolean_parameter(handle, "trace", gTraceOn, true);
 	gTraceMask = strtoul(get_driver_parameter(handle, "trace", "1", "0"), 0, 0);
-	//gTraceFlow = get_driver_boolean_parameter(handle, "trace_flow",
-	//					gTraceFlow, true);
 	gTruncateLogFile = get_driver_boolean_parameter(handle,	"truncate_logfile",
 						gTruncateLogFile, true);
 	gAddTimeStamp = get_driver_boolean_parameter(handle, "add_timestamp",
@@ -77,7 +72,6 @@ void release_settings()
 
 void usb_audio_trace(uint32 bits, const char* func, const char* fmt, ...)
 {
-	//if (!(force || gTraceOn))
 	if ((gTraceMask & bits) == 0)
 		return;
 
