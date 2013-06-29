@@ -144,3 +144,21 @@ PoseList::FindAllPoses(const node_ref* node) const
 	}
 	return result;
 }
+
+
+BPose*
+PoseList::FindPoseByFileName(const char* name, int32* _index) const
+{
+	int32 count = CountItems();
+	for (int32 index = 0; index < count; index++) {
+		BPose* pose = ItemAt(index);
+		ASSERT(pose->TargetModel());
+		if (strcmp(pose->TargetModel()->EntryRef()->name, name) == 0) {
+			if (_index)
+				*_index = index;
+
+			return pose;
+		}
+	}
+	return NULL;
+}

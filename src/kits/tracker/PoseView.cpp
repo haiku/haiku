@@ -72,6 +72,7 @@ All rights reserved.
 #include <Window.h>
 
 #include <ObjectListPrivate.h>
+#include <PathMonitor.h>
 
 #include "Attributes.h"
 #include "AttributeStream.h"
@@ -1107,6 +1108,7 @@ BPoseView::InitDirentIterator(const entry_ref* ref)
 		return NULL;
 
 	ASSERT(!sourceModel.IsQuery());
+	ASSERT(!sourceModel.IsVirtualDirectory());
 	ASSERT(sourceModel.Node());
 
 	BDirectory* directory = dynamic_cast<BDirectory*>(sourceModel.Node());
@@ -2153,6 +2155,7 @@ BPoseView::MessageReceived(BMessage* message)
 			break;
 
 		case B_NODE_MONITOR:
+		case B_PATH_MONITOR:
 		case B_QUERY_UPDATE:
 			if (!FSNotification(message))
 				pendingNodeMonitorCache.Add(message);
@@ -4920,6 +4923,10 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 		okToMove = alert->Go() == 1;
 	}
 
+	// TODO: Handle correctly!
+	if (srcWindow->TargetModel()->IsVirtualDirectory())
+		okToMove = false;
+
 	if (okToMove) {
 		PoseList* selectionList = srcWindow->PoseView()->SelectionList();
 		BList* pointList = destWindow->PoseView()->GetDropPointList(clickPt, loc, selectionList,
@@ -5166,6 +5173,7 @@ BPoseView::FSNotification(const BMessage* message)
 				TrackerSettings settings;
 				if (dirNode != *TargetModel()->NodeRef()
 					&& !TargetModel()->IsQuery()
+					&& !TargetModel()->IsVirtualDirectory()
 					&& !TargetModel()->IsRoot()
 					&& (!settings.ShowDisksIcon() || !IsDesktopView())) {
 					if (count == 0)
@@ -5446,7 +5454,8 @@ BPoseView::EntryMoved(const BMessage* message)
 		TargetModel()->UpdateEntryRef(&dirNode, name);
 		assert_cast<BContainerWindow*>(Window())->UpdateTitle();
 	}
-	if (oldDir == dirNode.node || TargetModel()->IsQuery()) {
+	if (oldDir == dirNode.node || TargetModel()->IsQuery()
+		|| TargetModel()->IsVirtualDirectory()) {
 
 		// rename or move of entry in this directory (or query)
 
@@ -8329,11 +8338,9 @@ BPoseView::OpenParent()
 		return;
 
 	BEntry entry(TargetModel()->EntryRef());
-	BDirectory parent;
 	entry_ref ref;
 
-	if (entry.GetParent(&parent) != B_OK
-		|| parent.GetEntry(&entry) != B_OK
+	if (FSGetParentVirtualDirectoryAware(entry, entry) != B_OK
 		|| entry.GetRef(&ref) != B_OK)
 		return;
 

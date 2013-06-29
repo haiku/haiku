@@ -74,7 +74,7 @@ const uint32 B_ENTRY_SPECIFIER = 'sref';
 
 
 
-class TTracker : public BApplication {
+class TTracker : public BApplication  {
 	public:
 		TTracker();
 		virtual ~TTracker();
@@ -164,6 +164,9 @@ class TTracker : public BApplication {
 		bool SetProperty(BMessage*, BMessage*, int32, const char*, BMessage*);
 
 	private:
+		class WatchingInterface;
+
+	private:
 		// callbacks for ChildParentSoon calls
 		bool CloseParentWaitingForChild(const entry_ref* child,
 				const node_ref* parent);
@@ -221,6 +224,7 @@ class TTracker : public BApplication {
 		BTrashWatcher*			fTrashWatcher;
 		TaskLoop*				fTaskLoop;
 		int32 					fNodeMonitorCount;
+		WatchingInterface*		fWatchingInterface;
 
 		TrackerSettingsWindow*	fSettingsWindow;
 

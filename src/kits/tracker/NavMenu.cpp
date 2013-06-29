@@ -64,6 +64,7 @@ their respective holders. All rights reserved.
 #include "QueryPoseView.h"
 #include "Thread.h"
 #include "Tracker.h"
+#include "VirtualDirectoryEntryList.h"
 
 
 namespace BPrivate {
@@ -420,6 +421,8 @@ BNavMenu::StartBuildingItemList()
 
 	if (startModel.IsQuery())
 		fContainer = new QueryEntryListCollection(&startModel);
+	else if (startModel.IsVirtualDirectory())
+		fContainer = new VirtualDirectoryEntryList(&startModel);
 	else if (startModel.IsDesktop()) {
 		fIteratingDesktop = true;
 		fContainer = DesktopPoseView::InitDesktopDirentIterator(

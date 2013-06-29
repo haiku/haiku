@@ -238,6 +238,10 @@ status_t FSRecursiveCreateFolder(const char* path);
 void FSMakeOriginalName(BString &name, const BDirectory* destDir,
 	const char* suffix = 0);
 
+status_t FSGetParentVirtualDirectoryAware(const BEntry& entry, entry_ref& _ref);
+status_t FSGetParentVirtualDirectoryAware(const BEntry& entry, BEntry& _entry);
+status_t FSGetParentVirtualDirectoryAware(const BEntry& entry, BNode& _node);
+
 status_t TrackerLaunch(const entry_ref* app, bool async);
 status_t TrackerLaunch(const BMessage* refs, bool async,
 	bool okToRunOpenWith = true);

@@ -86,6 +86,10 @@ SharedLibrary libtracker.so :
 	TrashWatcher.cpp
 	Utilities.cpp
 	ViewState.cpp
+	VirtualDirectoryEntryList.cpp
+	VirtualDirectoryManager.cpp
+	VirtualDirectoryPoseView.cpp
+	VirtualDirectoryWindow.cpp
 	VolumeWindow.cpp
 	WidgetAttributeText.cpp
 

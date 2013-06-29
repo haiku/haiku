@@ -59,6 +59,8 @@ All rights reserved.
 #include <Volume.h>
 #include <VolumeRoster.h>
 
+#include <PathMonitor.h>
+
 #include "Attributes.h"
 #include "AutoLock.h"
 #include "AutoMounterSettings.h"
@@ -86,6 +88,7 @@ All rights reserved.
 #include "TaskLoop.h"
 #include "Thread.h"
 #include "Utilities.h"
+#include "VirtualDirectoryWindow.h"
 #include "VolumeWindow.h"
 
 // prototypes for some private kernel calls that will some day be public
@@ -209,7 +212,26 @@ GetVolumeFlags(Model* model)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - WatchingInterface
+
+
+class TTracker::WatchingInterface : public BPathMonitor::BWatchingInterface {
+public:
+	virtual status_t WatchNode(const node_ref* node, uint32 flags,
+		const BMessenger& target)
+	{
+		return TTracker::WatchNode(node, flags, target);
+	}
+
+	virtual status_t WatchNode(const node_ref* node, uint32 flags,
+		const BHandler* handler, const BLooper* looper = NULL)
+	{
+		return TTracker::WatchNode(node, flags, BMessenger(handler, looper));
+	}
+};
+
+
+//	#pragma mark - TTracker
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -217,8 +239,11 @@ GetVolumeFlags(Model* model)
 
 TTracker::TTracker()
 	:	BApplication(kTrackerSignature),
+	fWatchingInterface(new WatchingInterface),
 	fSettingsWindow(NULL)
 {
+	BPathMonitor::SetWatchingInterface(fWatchingInterface);
+
 	// set the cwd to /boot/home, anything that's launched
 	// from Tracker will automatically inherit this
 	BPath homePath;
@@ -261,6 +286,9 @@ TTracker::~TTracker()
 {
 	gLaunchLooper->Lock();
 	gLaunchLooper->Quit();
+
+	BPathMonitor::SetWatchingInterface(NULL);
+	delete fWatchingInterface;
 }
 
 
@@ -961,6 +989,9 @@ TTracker::OpenContainerWindow(Model* model, BMessage* originalRefsList,
 	} else if (model->IsQuery()) {
 		// window will adopt the model
 		window = new BQueryContainerWindow(&fWindowList, openFlags);
+	} else if (model->IsVirtualDirectory()) {
+		// window will adopt the model
+		window = new VirtualDirectoryWindow(&fWindowList, openFlags);
 	} else
 		// window will adopt the model
 		window = new BContainerWindow(&fWindowList, openFlags);

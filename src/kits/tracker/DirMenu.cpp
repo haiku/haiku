@@ -115,10 +115,9 @@ BDirMenu::Populate(const BEntry* startEntry, BWindow* originatingWindow,
 				// if we're at the root directory skip "mnt" and
 				// go straight to "/"
 				parent.SetTo("/");
+				parent.GetEntry(&entry);
 			} else
-				entry.GetParent(&parent);
-
-			parent.GetEntry(&entry);
+				FSGetParentVirtualDirectoryAware(entry, entry);
 		}
 
 		BDirectory desktopDir;
@@ -135,9 +134,7 @@ BDirMenu::Populate(const BEntry* startEntry, BWindow* originatingWindow,
 				kAttrPoseInfoForeign, B_RAW_TYPE, 0, &info, sizeof(PoseInfo),
 				&PoseInfo::EndianSwap);
 
-			BDirectory parent;
-			entry.GetParent(&parent);
-
+			BEntry parentEntry;
 			bool hitRoot = false;
 
 			BDirectory dir(&entry);
@@ -146,8 +143,9 @@ BDirMenu::Populate(const BEntry* startEntry, BWindow* originatingWindow,
 				// if we're at the root directory skip "mnt" and
 				// go straight to "/"
 				hitRoot = true;
-				parent.SetTo("/");
-			}
+				parentEntry.SetTo("/");
+			} else
+				FSGetParentVirtualDirectoryAware(entry, parentEntry);
 
 			if (showDesktop) {
 				BEntry root("/");
@@ -174,7 +172,9 @@ BDirMenu::Populate(const BEntry* startEntry, BWindow* originatingWindow,
 				break;
 			}
 
-			parent.GetEntry(&entry);
+			entry = parentEntry;
+			if (entry.InitCheck() != B_OK)
+				break;
 		}
 
 		// select last item in menu

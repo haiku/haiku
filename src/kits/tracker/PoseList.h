@@ -67,6 +67,8 @@ public:
 		// same as FindPose, node can be a target of the actual
 		// pose if the pose is a symlink
 	PoseList* FindAllPoses(const node_ref* node) const;
+
+	BPose* FindPoseByFileName(const char* name, int32* _index = NULL) const;
 };
 
 // iteration glue, add permutations as needed
