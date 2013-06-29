@@ -315,6 +315,49 @@ AddFilesToPackage add-ons disk_systems
 CopyDirectoryToPackage data : <mimedb>mime_db : : : isTarget ;
 
 
+# Deskbar menu symlinks
+
+# "Applications" links
+DESKBAR_APPLICATIONS = ActivityMonitor CharacterMap CodyCam CDPlayer DeskCalc
+	Devices DiskProbe DriveSetup DiskUsage Expander Icon-O-Matic Installer
+	Magnify	Mail MediaConverter MediaPlayer MidiPlayer People PoorMan
+	Screenshot SoundRecorder StyledEdit Terminal TV
+;
+local linkTarget ;
+for linkTarget in $(DESKBAR_APPLICATIONS) {
+	AddSymlinkToPackage data deskbar menu Applications
+		: ../../../../apps/$(linkTarget) : $(linkTarget) ;
+}
+
+# "Desktop applets" links
+DESKBAR_DESKTOP_APPLETS = LaunchBox NetworkStatus PowerStatus ProcessController
+	Workspaces
+;
+for linkTarget in $(DESKBAR_DESKTOP_APPLETS) {
+	AddSymlinkToPackage data deskbar menu Desktop\ applets
+		: ../../../../apps/$(linkTarget) : $(linkTarget) ;
+}
+
+# "Preferences" links
+AddDirectoryToPackage data deskbar menu Preferences ;
+DESKBAR_PREFERENCES = $(SYSTEM_PREFERENCES:B) ;
+for linkTarget in $(DESKBAR_PREFERENCES) {
+	AddSymlinkToPackage data deskbar menu Preferences
+		: ../../../../preferences/$(linkTarget)
+		: $(linkTarget) ;
+}
+
+# "Demo" links
+AddDirectoryToPackage data deskbar menu Demos ;
+for linkTarget in $(SYSTEM_DEMOS) {
+	AddSymlinkToPackage data deskbar menu Demos
+		: ../../../../demos/$(linkTarget) : $(linkTarget) ;
+}
+
+# Deskbar menu entries file
+AddFilesToPackage data deskbar : <deskbar>menu_entries ;
+
+
 # optional
 # TODO: We should probably build another package (including the data files
 # above) that can be installed, if desired.

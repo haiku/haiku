@@ -54,6 +54,7 @@ All rights reserved.
 #include "BarApp.h"
 #include "BarMenuBar.h"
 #include "BarView.h"
+#include "DeskbarUtils.h"
 #include "DeskbarMenu.h"
 #include "PublicCommands.h"
 #include "StatusView.h"
@@ -115,27 +116,20 @@ TBarWindow::MenusBeginning()
 {
 	BPath path;
 	entry_ref ref;
+	BEntry entry;
 
-	find_directory (B_USER_DESKBAR_DIRECTORY, &path);
-	get_ref_for_path(path.Path(), &ref);
-
-	BEntry entry(&ref, true);
-	if (entry.InitCheck() == B_OK && entry.IsDirectory()) {
-		//	need the entry_ref to the actual item
-		entry.GetRef(&ref);
-		//	set the nav directory to the deskbar folder
+	if (GetDeskbarSettingsDirectory(path) == B_OK
+		&& path.Append(kDeskbarMenuEntriesFileName) == B_OK
+		&& entry.SetTo(path.Path(), true) == B_OK
+		&& entry.Exists()
+		&& entry.GetRef(&ref) == B_OK) {
 		sDeskbarMenu->SetNavDir(&ref);
-	} else if (!entry.Exists()) {
-		//	the deskbar folder does not exist
-		//	create one now
-		BDirectory dir;
-		if (entry.GetParent(&dir) == B_OK) {
-			BDirectory deskbarDir;
-			dir.CreateDirectory("deskbar", &deskbarDir);
-			if (deskbarDir.GetEntry(&entry) == B_OK
-				&& entry.GetRef(&ref) == B_OK)
-				sDeskbarMenu->SetNavDir(&ref);
-		}
+	} else if (GetDeskbarDataDirectory(path) == B_OK
+		&& path.Append(kDeskbarMenuEntriesFileName) == B_OK
+		&& entry.SetTo(path.Path(), true) == B_OK
+		&& entry.Exists()
+		&& entry.GetRef(&ref) == B_OK) {
+		sDeskbarMenu->SetNavDir(&ref);
 	} else {
 		//	this really should never happen
 		TRESPASS();

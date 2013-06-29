@@ -300,8 +300,6 @@ if [ IsOptionalHaikuImagePackageAdded BePDF ] {
 			InstallOptionalHaikuImagePackage
 				$(hpkgBaseURL)/bepdf-1.1.1~beta5_2013_04_28-1-x86_gcc2.hpkg ;
 		}
-		AddSymlinkToHaikuImage home config settings deskbar menu Applications
-			: /boot/common/apps/BePDF/BePDF ;
 	}
 }
 
@@ -318,8 +316,6 @@ if [ IsOptionalHaikuImagePackageAdded BeZillaBrowser ] {
 			InstallOptionalHaikuImagePackage
 				$(hpkgBaseURL)/bezillabrowser-2.0.0.22pre_2010_05_02-1-x86_gcc2.hpkg ;
  		}
- 		AddSymlinkToHaikuImage home config settings deskbar menu Applications
-			: /boot/common/apps/BeZillaBrowser/BeZillaBrowser ;
 	}
 }
 
@@ -630,8 +626,6 @@ if [ IsOptionalHaikuImagePackageAdded DemoPackage_Video ] {
 # Development
 if [ IsOptionalHaikuImagePackageAdded Development ] {
 	if $(TARGET_ARCH) = x86 {
-		AddSymlinkToHaikuImage home config settings deskbar menu Applications
-			: /boot/system/apps/Debugger : Debugger ;
 		# autotools
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
@@ -1151,8 +1145,6 @@ if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
 			InstallOptionalHaikuImagePackage
 				$(hpkgBaseURL)/keymapswitcher-1.2.7.10-1-x86_gcc2.hpkg ;
 		}
-		AddSymlinkToHaikuImage home config settings deskbar menu Preferences
-			: /boot/common/bin/KeymapSwitcher ;
 	} else if $(TARGET_ARCH) = x86_64 {
 		InstallOptionalHaikuImagePackage
 			$(baseURL)/KeymapSwitcher-1.2.7-x86_64-2013-01-08.zip
@@ -1668,8 +1660,6 @@ if [ IsOptionalHaikuImagePackageAdded Pe ] {
 			InstallOptionalHaikuImagePackage
 				$(hpkgBaseURL)/pe-2.4.3_hg602-4-x86_gcc2.hpkg ;
 		}
-		AddSymlinkToHaikuImage home config settings deskbar menu Applications
-			: /boot/common/apps/Pe/Pe ;
 	}
 }
 
@@ -2016,8 +2006,6 @@ if [ IsOptionalHaikuImagePackageAdded Vision ] {
 			InstallOptionalHaikuImagePackage
 				$(hpkgBaseURL)/vision-0.9.7.r944-1-x86_gcc2.hpkg ;
 		}
-		AddSymlinkToHaikuImage home config settings deskbar menu Applications
-			: /boot/common/apps/Vision/Vision ;
 	}
 }
 
@@ -2132,8 +2120,6 @@ if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
 	} else {
 		InstallOptionalHaikuImagePackage
 			$(hpkgBaseURL)/wonderbrush-2.1.2-3-x86_gcc2.hpkg ;
-		AddSymlinkToHaikuImage home config settings deskbar menu Applications
-			: /boot/common/apps/WonderBrush/WonderBrush ;
 	}
 }
 

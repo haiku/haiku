@@ -1,0 +1,7 @@
+directory /boot/home/config/settings/deskbar/menu
+directory /boot/home/config/non-packaged/data/deskbar/menu
+directory /boot/home/config/data/deskbar/menu
+directory /boot/common/non-packaged/data/deskbar/menu
+directory /boot/common/data/deskbar/menu
+directory /boot/system/data/deskbar/menu
+

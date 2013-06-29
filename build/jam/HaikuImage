@@ -211,45 +211,6 @@ AddDirectoryToHaikuImage home mail out ;
 # global settings when a package is installed in ~/config
 AddDirectoryToHaikuImage home config settings global ;
 
-# Deskbar Application links
-AddDirectoryToHaikuImage home config settings deskbar menu Applications ;
-DESKBAR_APPLICATIONS = ActivityMonitor CharacterMap CodyCam CDPlayer DeskCalc
-	Devices DiskProbe DriveSetup DiskUsage Expander Icon-O-Matic Installer
-	Magnify	Mail MediaConverter MediaPlayer MidiPlayer People PoorMan
-	Screenshot SoundRecorder StyledEdit Terminal TV
-;
-local linkTarget ;
-for linkTarget in $(DESKBAR_APPLICATIONS) {
-	AddSymlinkToHaikuImage home config settings deskbar menu Applications
-		: /boot/system/apps/$(linkTarget) : $(linkTarget) ;
-}
-
-# Deskbar Desktop applets links
-AddDirectoryToHaikuImage home config settings deskbar menu Desktop\ applets ;
-DESKBAR_DESKTOP_APPLETS = LaunchBox NetworkStatus PowerStatus ProcessController
-	Workspaces
-;
-for linkTarget in $(DESKBAR_DESKTOP_APPLETS) {
-	AddSymlinkToHaikuImage home config settings deskbar menu Desktop\ applets
-		: /boot/system/apps/$(linkTarget) : $(linkTarget) ;
-}
-
-# Deskbar Preferences links
-AddDirectoryToHaikuImage home config settings deskbar menu Preferences ;
-DESKBAR_PREFERENCES = $(SYSTEM_PREFERENCES:B) ;
-for linkTarget in $(DESKBAR_PREFERENCES) {
-	AddSymlinkToHaikuImage home config settings deskbar menu Preferences
-		: /boot/system/preferences/$(linkTarget)
-		: $(linkTarget) ;
-}
-
-# Deskbar Demo links
-AddDirectoryToHaikuImage home config settings deskbar menu Demos ;
-for linkTarget in $(SYSTEM_DEMOS) {
-	AddSymlinkToHaikuImage home config settings deskbar menu Demos
-		: /boot/system/demos/$(linkTarget) : $(linkTarget) ;
-}
-
 
 # scripts and data files
 local userBootScripts = UserBootscript UserSetupEnvironment.sample ;

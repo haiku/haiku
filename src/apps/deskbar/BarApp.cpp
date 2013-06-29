@@ -266,13 +266,13 @@ TBarApp::InitSettings()
 	clock.showTimeZone = false;
 
 	BPath dirPath;
-	const char* settingsFileName = "Deskbar_settings";
-	const char* clockSettingsFileName = "Deskbar_clock_settings";
+	const char* settingsFileName = "settings";
+	const char* clockSettingsFileName = "clock_settings";
 
 	find_directory(B_USER_DESKBAR_DIRECTORY, &dirPath, true);
 		// just make it
 
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &dirPath, true) == B_OK) {
+	if (GetDeskbarSettingsDirectory(dirPath, true) == B_OK) {
 		BPath filePath = dirPath;
 		filePath.Append(settingsFileName);
 		fSettingsFile = new BFile(filePath.Path(), O_RDWR);

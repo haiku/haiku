@@ -89,4 +89,8 @@ if $(TARGET_ARCH) = x86 {
 		: $(mesaGlHeaders) : : : isTarget ;
 }
 
+# Deskbar menu symlinks
+AddSymlinkToPackage data deskbar menu Applications
+	: ../../../../apps/Debugger : Debugger ;
+
 BuildHaikuPackage $(haikuDevelPackage) : haiku_devel ;
