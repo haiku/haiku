@@ -4758,15 +4758,6 @@ BView::IsLayoutValid() const
 }
 
 
-/*!	\brief Service call for BView derived classes reenabling
-	InvalidateLayout() notifications.
-
-	BLayout & BView will avoid calling InvalidateLayout on views that have
-	already been invalidated, but if the view caches internal layout information
-	which it updates in methods other than DoLayout(), it has to invoke this
-	method, when it has done so, since otherwise the information might become
-	obsolete without the layout noticing.
-*/
 void
 BView::ResetLayoutInvalidation()
 {

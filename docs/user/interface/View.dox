@@ -824,6 +824,18 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
+	\fn void BView::LayoutInvalidated(bool descendants)
+	\brief Hook method that is called when the layout is invalidated.
+
+	\note This method was not available in BeOS R5.
+
+	\param descendants Whether or not child views have also been invalidated.
+
+	The default implementation does nothing.
+*/
+
+
+/*!
 	\fn void BView::MessageReceived(BMessage* message)
 	\brief Handle \a message received by the associated looper.
 
@@ -1445,6 +1457,23 @@ SetViewColor(Parent()->ViewColor());
 	\brief Scroll the view to the point specified by \a where.
 
 	\param where The location to scroll the view to.
+*/
+
+
+/*!
+	\fn void BView::ScrollWithMouseWheelDelta(BScrollBar* scrollBar,
+		float delta)
+	\brief Handle the scroll wheel changing over scrollbars.
+
+	\note This method was not available in BeOS R5.
+
+	- Extract the scrollbar change based on the mouse wheel \a delta into a
+	  protected method of BView.
+	- The method is called from the MessageReceived() method of BScrollBar.
+
+	With this change it is now a bit easier to scroll horizontally around the
+	system by putting the mouse cursor over a horizontal scrollbar and using
+	the wheel.
 */
 
 
@@ -3401,6 +3430,8 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\name Layout Methods
+
+	\note These methods were not available in BeOS R5.
 */
 
 
@@ -3483,6 +3514,135 @@ SetViewColor(Parent()->ViewColor());
 	\brief Get the layout of the view.
 
 	\returns The layout of the view.
+*/
+
+
+/*!
+	\fn void BView::InvalidateLayout(bool descendants)
+	\brief Invalidate layout.
+
+	\param descendants Also invalidate its children views.
+*/
+
+
+/*!
+	\fn void BView::EnableLayoutInvalidation()
+	\brief Enable layout invalidation.
+*/
+
+
+/*!
+	\fn void BView::DisableLayoutInvalidation()
+	\brief Disable layout invalidation.
+*/
+
+
+/*!
+	\fn bool BView::IsLayoutInvalidationDisabled()
+	\brief Returns whether or not layout invalidation is disabled.
+
+	\return \c true of layout invalidation is disabled, \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BView::IsLayoutValid() const
+	\brief Returns whether or not the layout is valid.
+
+	\brief Returns \c true if the layout is valid, \c false otherwise.
+*/
+
+
+/*!
+	\fn void BView::ResetLayoutInvalidation()
+	\brief Service call for BView derived classes re-enabling
+	       InvalidateLayout() notifications.
+
+	BLayout and  BView will avoid calling InvalidateLayout on views that have
+	already been invalidated, but if the view caches internal layout information
+	which it updates in methods other than DoLayout(), it has to invoke this
+	method, when it has done so, since otherwise the information might become
+	obsolete without the layout noticing.
+*/
+
+
+/*!
+	\fn void BView::Layout(bool force)
+	\brief Layout the view.
+
+	\param force If \c true layout even if valid.
+*/
+
+
+/*!
+	\fn void BView::Relayout()
+	\brief Relayout the view.
+*/
+
+
+/*!
+	\fn void BView::DoLayout()
+	\brief Layout view within the layout context.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Tool Tip Methods
+
+	\note These methods were not available in BeOS R5.
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BView::SetToolTip(const char* text)
+	\brief Set the tool tip of the view to \a text.
+
+	\param text The \a text to set the view to or \c NULL or blank to unset.
+*/
+
+
+/*!
+	\fn void BView::SetToolTip(BToolTip* tip)
+	\brief Set the tool tip of the view to the \a tip object.
+
+	\param tip The tool tip object to set the view to or \c NULL to unset.
+*/
+
+
+/*!
+	\fn BToolTip* BView::ToolTip() const
+	\brief Return the tool tip set to the view or \c NULL if not set.
+
+	\return The BToolTip object set to the view.
+*/
+
+
+/*!
+	\fn void BView::ShowToolTip(BToolTip* tip)
+	\brief Show the tool tip at the current mouse position.
+
+	\param tip The BToolTip object to show.
+*/
+
+
+/*!
+	\fn void BView::HideToolTip()
+	\brief Hide the view's tool tip.
+*/
+
+
+/*!
+	\fn bool BView::GetToolTipAt(BPoint point, BToolTip** _tip)
+	\brief Point \a _tip with the view's tool tip.
+
+	\param point Currently unused.
+	\param _tip A pointer to a pointer to a BToolTip object to set.
 */
 
 
