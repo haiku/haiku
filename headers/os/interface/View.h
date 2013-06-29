@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_VIEW_H
@@ -196,22 +196,22 @@ public:
 			BView*				Parent() const;
 			BRect				Bounds() const;
 			BRect				Frame() const;
-			void				ConvertToScreen(BPoint* pt) const;
-			BPoint				ConvertToScreen(BPoint pt) const;
-			void				ConvertFromScreen(BPoint* pt) const;
-			BPoint				ConvertFromScreen(BPoint pt) const;
-			void				ConvertToScreen(BRect* r) const;
-			BRect				ConvertToScreen(BRect r) const;
-			void				ConvertFromScreen(BRect* r) const;
-			BRect				ConvertFromScreen(BRect r) const;
-			void				ConvertToParent(BPoint* pt) const;
-			BPoint				ConvertToParent(BPoint pt) const;
-			void				ConvertFromParent(BPoint* pt) const;
-			BPoint				ConvertFromParent(BPoint pt) const;
-			void				ConvertToParent(BRect* r) const;
-			BRect				ConvertToParent(BRect r) const;
-			void				ConvertFromParent(BRect* r) const;
-			BRect				ConvertFromParent(BRect r) const;
+			void				ConvertToScreen(BPoint* point) const;
+			BPoint				ConvertToScreen(BPoint point) const;
+			void				ConvertFromScreen(BPoint* point) const;
+			BPoint				ConvertFromScreen(BPoint point) const;
+			void				ConvertToScreen(BRect* rect) const;
+			BRect				ConvertToScreen(BRect rect) const;
+			void				ConvertFromScreen(BRect* rect) const;
+			BRect				ConvertFromScreen(BRect rect) const;
+			void				ConvertToParent(BPoint* point) const;
+			BPoint				ConvertToParent(BPoint point) const;
+			void				ConvertFromParent(BPoint* point) const;
+			BPoint				ConvertFromParent(BPoint point) const;
+			void				ConvertToParent(BRect* rect) const;
+			BRect				ConvertToParent(BRect rect) const;
+			void				ConvertFromParent(BRect* rect) const;
+			BRect				ConvertFromParent(BRect rect) const;
 			BPoint				LeftTop() const;
 
 			void				GetClippingRegion(BRegion* region) const;
@@ -235,9 +235,9 @@ public:
 			void				SetViewCursor(const BCursor* cursor,
 									bool sync = true);
 
-	virtual	void				SetViewColor(rgb_color c);
-			void				SetViewColor(uchar r, uchar g, uchar b,
-									uchar a = 255);
+	virtual	void				SetViewColor(rgb_color color);
+			void				SetViewColor(uchar red, uchar green, uchar blue,
+									uchar alpha = 255);
 			rgb_color			ViewColor() const;
 
 			void				SetViewBitmap(const BBitmap* bitmap,
@@ -264,14 +264,14 @@ public:
 									uint32 options = 0);
 			void				ClearViewOverlay();
 
-	virtual	void				SetHighColor(rgb_color a_color);
-			void				SetHighColor(uchar r, uchar g, uchar b,
-									uchar a = 255);
+	virtual	void				SetHighColor(rgb_color color);
+			void				SetHighColor(uchar red, uchar green, uchar blue,
+									uchar alpha = 255);
 			rgb_color			HighColor() const;
 
-	virtual	void				SetLowColor(rgb_color a_color);
-			void				SetLowColor(uchar r, uchar g, uchar b,
-									uchar a = 255);
+	virtual	void				SetLowColor(rgb_color color);
+			void				SetLowColor(uchar red, uchar green, uchar blue,
+									uchar alpha = 255);
 			rgb_color			LowColor() const;
 
 			void				SetLineMode(cap_mode lineCap,
@@ -292,110 +292,125 @@ public:
 			void				MovePenTo(float x, float y);
 			void				MovePenBy(float x, float y);
 			BPoint				PenLocation() const;
-			void				StrokeLine(BPoint toPt,
-									pattern p = B_SOLID_HIGH);
-			void				StrokeLine(BPoint a, BPoint b,
-									pattern p = B_SOLID_HIGH);
+			void				StrokeLine(BPoint toPoint,
+									::pattern pattern = B_SOLID_HIGH);
+			void				StrokeLine(BPoint start, BPoint end,
+									::pattern pattern = B_SOLID_HIGH);
 			void				BeginLineArray(int32 count);
-			void				AddLine(BPoint a, BPoint b, rgb_color color);
+			void				AddLine(BPoint start, BPoint end,
+									rgb_color color);
 			void				EndLineArray();
 
 			void				StrokePolygon(const BPolygon* polygon,
 									bool closed = true,
-									pattern p = B_SOLID_HIGH);
-			void				StrokePolygon(const BPoint* ptArray,
-									int32 numPts, bool closed = true,
-									pattern p = B_SOLID_HIGH);
-			void				StrokePolygon(const BPoint* ptArray,
-									int32 numPts, BRect bounds,
+									::pattern pattern = B_SOLID_HIGH);
+			void				StrokePolygon(const BPoint* pointArray,
+									int32 numPoints, bool closed = true,
+									::pattern pattern = B_SOLID_HIGH);
+			void				StrokePolygon(const BPoint* pointArray,
+									int32 numPoints, BRect bounds,
 									bool closed = true,
-									pattern p = B_SOLID_HIGH);
+									::pattern pattern = B_SOLID_HIGH);
 			void				FillPolygon(const BPolygon* polygon,
-									pattern p = B_SOLID_HIGH);
-			void				FillPolygon(const BPoint* ptArray,
-									int32 numPts, pattern p = B_SOLID_HIGH);
-			void				FillPolygon(const BPoint* ptArray,
-									int32 numPts, BRect bounds,
-									pattern p = B_SOLID_HIGH);
+									::pattern pattern = B_SOLID_HIGH);
+			void				FillPolygon(const BPoint* pointArray,
+									int32 numPoints,
+									::pattern pattern = B_SOLID_HIGH);
+			void				FillPolygon(const BPoint* pointArray,
+									int32 numPoints, BRect bounds,
+									::pattern pattern = B_SOLID_HIGH);
 			void				FillPolygon(const BPolygon* polygon,
 									const BGradient& gradient);
-			void				FillPolygon(const BPoint* ptArray,
-									int32 numPts, const BGradient& gradient);
-			void				FillPolygon(const BPoint* ptArray,
-									int32 numPts, BRect bounds,
+			void				FillPolygon(const BPoint* pointArray,
+									int32 numPoints, const BGradient& gradient);
+			void				FillPolygon(const BPoint* pointArray,
+									int32 numPoints, BRect bounds,
 									const BGradient& gradient);
 
-			void				StrokeTriangle(BPoint pt1, BPoint pt2,
-									BPoint pt3, BRect bounds,
-									pattern p = B_SOLID_HIGH);
-			void				StrokeTriangle(BPoint pt1, BPoint pt2,
-									BPoint pt3, pattern p = B_SOLID_HIGH);
-			void				FillTriangle(BPoint pt1, BPoint pt2,
-									BPoint pt3, pattern p = B_SOLID_HIGH);
-			void				FillTriangle(BPoint pt1, BPoint pt2,
-									BPoint pt3, BRect bounds,
-									pattern p = B_SOLID_HIGH);
-			void				FillTriangle(BPoint pt1, BPoint pt2,
-									BPoint pt3, const BGradient& gradient);
-			void				FillTriangle(BPoint pt1, BPoint pt2,
-									BPoint pt3, BRect bounds,
+			void				StrokeTriangle(BPoint point1, BPoint point2,
+									BPoint point3, BRect bounds,
+									::pattern pattern = B_SOLID_HIGH);
+			void				StrokeTriangle(BPoint point1, BPoint point2,
+									BPoint point3,
+									::pattern pattern = B_SOLID_HIGH);
+			void				FillTriangle(BPoint point1, BPoint point2,
+									BPoint point3,
+									::pattern pattern = B_SOLID_HIGH);
+			void				FillTriangle(BPoint point1, BPoint point2,
+									BPoint point3, BRect bounds,
+									::pattern pattern = B_SOLID_HIGH);
+			void				FillTriangle(BPoint point1, BPoint point2,
+									BPoint point3, const BGradient& gradient);
+			void				FillTriangle(BPoint point1, BPoint point2,
+									BPoint point3, BRect bounds,
 									const BGradient& gradient);
 
-			void				StrokeRect(BRect r, pattern p = B_SOLID_HIGH);
-			void				FillRect(BRect r, pattern p = B_SOLID_HIGH);
-			void				FillRect(BRect r, const BGradient& gradient);
-			void				FillRegion(BRegion* region,
-									pattern p = B_SOLID_HIGH);
-			void				FillRegion(BRegion* region,
+			void				StrokeRect(BRect rect,
+									::pattern pattern = B_SOLID_HIGH);
+			void				FillRect(BRect rect,
+									::pattern pattern = B_SOLID_HIGH);
+			void				FillRect(BRect rect, const BGradient& gradient);
+			void				FillRegion(BRegion* rectegion,
+									::pattern pattern = B_SOLID_HIGH);
+			void				FillRegion(BRegion* rectegion,
 								   const BGradient& gradient);
-			void				InvertRect(BRect r);
+			void				InvertRect(BRect rect);
 
-			void				StrokeRoundRect(BRect r, float xRadius,
-									float yRadius, pattern p = B_SOLID_HIGH);
-			void				FillRoundRect(BRect r, float xRadius,
-									float yRadius, pattern p = B_SOLID_HIGH);
-			void				FillRoundRect(BRect r, float xRadius,
+			void				StrokeRoundRect(BRect rect, float xRadius,
+									float yRadius,
+									::pattern pattern = B_SOLID_HIGH);
+			void				FillRoundRect(BRect rect, float xRadius,
+									float yRadius,
+									::pattern pattern = B_SOLID_HIGH);
+			void				FillRoundRect(BRect rect, float xRadius,
 									float yRadius, const BGradient& gradient);
 
 			void				StrokeEllipse(BPoint center, float xRadius,
-									float yRadius, pattern p = B_SOLID_HIGH);
-			void				StrokeEllipse(BRect r,
-									pattern p = B_SOLID_HIGH);
+									float yRadius,
+									::pattern pattern = B_SOLID_HIGH);
+			void				StrokeEllipse(BRect rect,
+									::pattern pattern = B_SOLID_HIGH);
 			void				FillEllipse(BPoint center, float xRadius,
-									float yRadius, pattern p = B_SOLID_HIGH);
-			void				FillEllipse(BRect r, pattern p = B_SOLID_HIGH);
+									float yRadius,
+									::pattern pattern = B_SOLID_HIGH);
+			void				FillEllipse(BRect rect,
+									::pattern pattern = B_SOLID_HIGH);
 			void				FillEllipse(BPoint center, float xRadius,
 									float yRadius, const BGradient& gradient);
-			void				FillEllipse(BRect r,
+			void				FillEllipse(BRect rect,
 									const BGradient& gradient);
 
 			void				StrokeArc(BPoint center, float xRadius,
 									float yRadius, float startAngle,
-									float arcAngle, pattern p = B_SOLID_HIGH);
-			void				StrokeArc(BRect r, float startAngle,
-									float arcAngle, pattern p = B_SOLID_HIGH);
+									float arcAngle,
+									::pattern pattern = B_SOLID_HIGH);
+			void				StrokeArc(BRect rect, float startAngle,
+									float arcAngle,
+									::pattern pattern = B_SOLID_HIGH);
 			void				FillArc(BPoint center, float xRadius,
 									float yRadius, float startAngle,
-									float arcAngle, pattern p = B_SOLID_HIGH);
-			void				FillArc(BRect r, float startAngle,
-									float arcAngle, pattern p = B_SOLID_HIGH);
+									float arcAngle,
+									::pattern pattern = B_SOLID_HIGH);
+			void				FillArc(BRect rect, float startAngle,
+									float arcAngle,
+									::pattern pattern = B_SOLID_HIGH);
 			void				FillArc(BPoint center, float xRadius,
 									float yRadius, float startAngle,
 									float arcAngle, const BGradient& gradient);
-			void				FillArc(BRect r, float startAngle,
+			void				FillArc(BRect rect, float startAngle,
 									float arcAngle, const BGradient& gradient);
 
 			void				StrokeBezier(BPoint* controlPoints,
-									pattern p = B_SOLID_HIGH);
+									::pattern pattern = B_SOLID_HIGH);
 			void				FillBezier(BPoint* controlPoints,
-									pattern p = B_SOLID_HIGH);
+									::pattern pattern = B_SOLID_HIGH);
 			void				FillBezier(BPoint* controlPoints,
 								   const BGradient& gradient);
 
 			void				StrokeShape(BShape* shape,
-									pattern p = B_SOLID_HIGH);
+									::pattern pattern = B_SOLID_HIGH);
 			void				FillShape(BShape* shape,
-									pattern p = B_SOLID_HIGH);
+									::pattern pattern = B_SOLID_HIGH);
 			void				FillShape(BShape* shape,
 									const BGradient& gradient);
 
@@ -442,7 +457,7 @@ public:
 									const BPoint* locations,
 									int32 locationCount);
 
-	virtual void            	SetFont(const BFont* font,
+	virtual	void            	SetFont(const BFont* font,
 									uint32 mask = B_FONT_ALL);
 
 			void            	GetFont(BFont* font) const;
@@ -508,22 +523,22 @@ public:
 			void				Flush() const;
 			void				Sync() const;
 
-	virtual	void				GetPreferredSize(float* width, float* height);
+	virtual	void				GetPreferredSize(float* _width, float* _height);
 	virtual	void				ResizeToPreferred();
 
 			BScrollBar*			ScrollBar(orientation posture) const;
 
-	virtual BHandler*			ResolveSpecifier(BMessage* msg, int32 index,
+	virtual	BHandler*			ResolveSpecifier(BMessage* message, int32 index,
 									BMessage* specifier, int32 form,
 									const char* property);
-	virtual status_t			GetSupportedSuites(BMessage* data);
+	virtual	status_t			GetSupportedSuites(BMessage* data);
 
 			bool				IsPrinting() const;
 			void				SetScale(float scale) const;
 			float				Scale() const;
 									// new for Haiku
 
-	virtual status_t			Perform(perform_code code, void* data);
+	virtual	status_t			Perform(perform_code code, void* data);
 
 	virtual	void				DrawAfterChildren(BRect r);
 
@@ -581,7 +596,7 @@ public:
 			void				HideToolTip();
 
 protected:
-	virtual bool				GetToolTipAt(BPoint point, BToolTip** _tip);
+	virtual	bool				GetToolTipAt(BPoint point, BToolTip** _tip);
 
 	virtual	void				LayoutChanged();
 
@@ -720,37 +735,37 @@ BView::ScrollTo(float x, float y)
 
 
 inline void
-BView::SetViewColor(uchar r, uchar g, uchar b, uchar a)
+BView::SetViewColor(uchar red, uchar green, uchar blue, uchar alpha)
 {
 	rgb_color color;
-	color.red = r;
-	color.green = g;
-	color.blue = b;
-	color.alpha = a;
+	color.red = red;
+	color.green = green;
+	color.blue = blue;
+	color.alpha = alpha;
 	SetViewColor(color);
 }
 
 
 inline void
-BView::SetHighColor(uchar r, uchar g, uchar b, uchar a)
+BView::SetHighColor(uchar red, uchar green, uchar blue, uchar alpha)
 {
 	rgb_color color;
-	color.red = r;
-	color.green = g;
-	color.blue = b;
-	color.alpha = a;
+	color.red = red;
+	color.green = green;
+	color.blue = blue;
+	color.alpha = alpha;
 	SetHighColor(color);
 }
 
 
 inline void
-BView::SetLowColor(uchar r, uchar g, uchar b, uchar a)
+BView::SetLowColor(uchar red, uchar green, uchar blue, uchar alpha)
 {
 	rgb_color color;
-	color.red = r;
-	color.green = g;
-	color.blue = b;
-	color.alpha = a;
+	color.red = red;
+	color.green = green;
+	color.blue = blue;
+	color.alpha = alpha;
 	SetLowColor(color);
 }
 
