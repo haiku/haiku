@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -12,6 +12,8 @@
 #include <new>
 
 #include <ControlLook.h>
+#include <MessageRunner.h>
+#include <Window.h>
 
 #include "table/TableColumns.h"
 
@@ -21,6 +23,11 @@
 #include "StackTrace.h"
 #include "TargetAddressTableColumn.h"
 #include "UiUtils.h"
+
+
+enum {
+	MSG_CLEAR_STACK_TRACE 	= 'clst'
+};
 
 
 // #pragma mark - FramesTableModel
@@ -107,6 +114,7 @@ StackTraceView::StackTraceView(Listener* listener)
 	fStackTrace(NULL),
 	fFramesTable(NULL),
 	fFramesTableModel(NULL),
+	fTraceUpdateRunner(NULL),
 	fListener(listener)
 {
 	SetName("Stack Trace");
@@ -149,16 +157,23 @@ StackTraceView::SetStackTrace(StackTrace* stackTrace)
 {
 	if (stackTrace == fStackTrace)
 		return;
-
-	if (fStackTrace != NULL)
-		fStackTrace->ReleaseReference();
-
-	fStackTrace = stackTrace;
-
-	if (fStackTrace != NULL)
-		fStackTrace->AcquireReference();
-
-	fFramesTableModel->SetStackTrace(fStackTrace);
+	else if (stackTrace == NULL) {
+		if (fTraceUpdateRunner == NULL) {
+			BMessage message(MSG_CLEAR_STACK_TRACE);
+			message.AddPointer("currentTrace", fStackTrace);
+			fTraceUpdateRunner = new(std::nothrow) BMessageRunner(this,
+				message, 250000, 1);
+			if (fTraceUpdateRunner != NULL
+				&& fTraceUpdateRunner->InitCheck() != B_OK) {
+				delete fTraceUpdateRunner;
+				fTraceUpdateRunner = NULL;
+			}
+		}
+	} else {
+		delete fTraceUpdateRunner;
+		fTraceUpdateRunner = NULL;
+		_SetStackTrace(stackTrace);
+	}
 }
 
 
@@ -205,6 +220,29 @@ StackTraceView::SaveSettings(BMessage& settings)
 
 
 void
+StackTraceView::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case MSG_CLEAR_STACK_TRACE:
+		{
+			StackTrace* currentStackTrace;
+			if (message->FindPointer("currentTrace",
+					reinterpret_cast<void**>(&currentStackTrace))
+					== B_OK && currentStackTrace == fStackTrace) {
+				_SetStackTrace(NULL);
+			}
+			break;
+		}
+		default:
+		{
+			BGroupView::MessageReceived(message);
+			break;
+		}
+	}
+}
+
+
+void
 StackTraceView::TableSelectionChanged(Table* table)
 {
 	if (fListener == NULL)
@@ -240,6 +278,21 @@ StackTraceView::_Init()
 
 	fFramesTable->SetSelectionMode(B_SINGLE_SELECTION_LIST);
 	fFramesTable->AddTableListener(this);
+}
+
+
+void
+StackTraceView::_SetStackTrace(StackTrace* stackTrace)
+{
+	if (fStackTrace != NULL)
+		fStackTrace->ReleaseReference();
+
+	fStackTrace = stackTrace;
+
+	if (fStackTrace != NULL)
+		fStackTrace->AcquireReference();
+
+	fFramesTableModel->SetStackTrace(fStackTrace);
 }
 
 
