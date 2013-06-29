@@ -149,18 +149,22 @@ actions SetVersion1
 	$(2[1]) "$(1)" -system $(HAIKU_BUILD_VERSION) -short "$(HAIKU_BUILD_DESCRIPTION)" ;
 }
 
-rule SetType
+rule SetType target : type
 {
-	# SetType <target>
+	# SetType <target> [ : <type> ]
+	# Sets the MIME type on the target. If none is given, the executable MIME
+	# type is used.
 
-	Depends $(1) : <build>settype ;
-	SetType1 $(1) : <build>settype ;
+	TARGET_MIME_TYPE on $(target) = $(type:E=$(TARGET_EXECUTABLE_MIME_TYPE)) ;
+
+	Depends $(target) : <build>settype ;
+	SetType1 $(target) : <build>settype ;
 }
 
 actions SetType1
 {
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-	$(2[1]) -t $(TARGET_EXECUTABLE_MIME_TYPE) "$(1)" ;
+	$(2[1]) -t $(TARGET_MIME_TYPE) "$(1)" ;
 }
 
 rule MimeSet target
