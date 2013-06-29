@@ -16,6 +16,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) sniffer ] ;
 MergeObject <libbe>storage_kit.o :
 	AppFileInfo.cpp
 	Directory.cpp
+	DriverSettings.cpp
 	Entry.cpp
 	EntryList.cpp
 	File.cpp
