@@ -191,7 +191,7 @@ list_routes(int socket, const char *interfaceName, route_entry &route)
 	const address_family *family = NULL;
 	for (int32 i = 0; kFamilies[i].family >= 0; i++) {
 		if (interface->ifr_route.destination->sa_family
-			== kFamilies[i].family) {
+				== kFamilies[i].family) {
 			family = &kFamilies[i];
 			break;
 		}
@@ -223,7 +223,7 @@ list_routes(int socket, const char *interfaceName, route_entry &route)
 					BNetworkAddress mask;
 					mask.SetTo(*route.mask);
 					if (family->preferredPrefixFormat
-						== PREFIX_PREFER_NETMASK) {
+							== PREFIX_PREFER_NETMASK) {
 						printf(" %*s ", addressLength,
 							mask.ToString().String());
 					} else {
@@ -231,7 +231,7 @@ list_routes(int socket, const char *interfaceName, route_entry &route)
 					}
 				} else {
 					if (family->preferredPrefixFormat
-						== PREFIX_PREFER_NETMASK) {
+							== PREFIX_PREFER_NETMASK) {
 						printf(" %*s ", addressLength, "-");
 					} else
 						printf("     ");
