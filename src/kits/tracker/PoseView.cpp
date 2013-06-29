@@ -5596,6 +5596,7 @@ BPoseView::AttributeChanged(const BMessage* message)
 	message->FindString("attr", &attrName);
 
 	if (TargetModel() != NULL && *TargetModel()->NodeRef() == itemNode
+		&& TargetModel()->IsNodeOpen()
 		&& TargetModel()->AttrChanged(attrName)) {
 		// the icon of our target has changed, update drag icon
 		// TODO: make this simpler (ie. store the icon with the window)
