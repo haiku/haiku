@@ -157,23 +157,21 @@ StackTraceView::SetStackTrace(StackTrace* stackTrace)
 {
 	if (stackTrace == fStackTrace)
 		return;
-	else if (stackTrace == NULL) {
-		if (fTraceUpdateRunner == NULL) {
-			BMessage message(MSG_CLEAR_STACK_TRACE);
-			message.AddPointer("currentTrace", fStackTrace);
-			fTraceUpdateRunner = new(std::nothrow) BMessageRunner(this,
-				message, 250000, 1);
-			if (fTraceUpdateRunner != NULL
-				&& fTraceUpdateRunner->InitCheck() != B_OK) {
-				delete fTraceUpdateRunner;
-				fTraceUpdateRunner = NULL;
-			}
+
+	if (stackTrace == NULL) {
+		if (fTraceUpdateRunner != NULL)
+			return;
+
+		BMessage message(MSG_CLEAR_STACK_TRACE);
+		fTraceUpdateRunner = new(std::nothrow) BMessageRunner(this,
+			message, 250000, 1);
+		if (fTraceUpdateRunner != NULL
+			&& fTraceUpdateRunner->InitCheck() == B_OK) {
+			return;
 		}
-	} else {
-		delete fTraceUpdateRunner;
-		fTraceUpdateRunner = NULL;
-		_SetStackTrace(stackTrace);
 	}
+
+	_SetStackTrace(stackTrace);
 }
 
 
@@ -225,12 +223,8 @@ StackTraceView::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case MSG_CLEAR_STACK_TRACE:
 		{
-			StackTrace* currentStackTrace;
-			if (message->FindPointer("currentTrace",
-					reinterpret_cast<void**>(&currentStackTrace))
-					== B_OK && currentStackTrace == fStackTrace) {
+			if (fTraceUpdateRunner != NULL)
 				_SetStackTrace(NULL);
-			}
 			break;
 		}
 		default:
@@ -247,6 +241,14 @@ StackTraceView::TableSelectionChanged(Table* table)
 {
 	if (fListener == NULL)
 		return;
+
+	if (fTraceUpdateRunner != NULL) {
+		// in this instance, ignore the selection change, since the
+		// stack trace for which a selection change was requested will
+		// momentarily be invalid. This case is quite unlikely to be hit
+		// anyways.
+		return;
+	}
 
 	StackFrame* frame
 		= fFramesTableModel->FrameAt(table->SelectionModel()->RowAt(0));
@@ -284,6 +286,9 @@ StackTraceView::_Init()
 void
 StackTraceView::_SetStackTrace(StackTrace* stackTrace)
 {
+	delete fTraceUpdateRunner;
+	fTraceUpdateRunner = NULL;
+
 	if (fStackTrace != NULL)
 		fStackTrace->ReleaseReference();
 
