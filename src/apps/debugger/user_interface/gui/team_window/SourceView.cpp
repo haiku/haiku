@@ -1045,7 +1045,7 @@ SourceView::TextView::TextView(SourceView* sourceView, MarkerManager* manager,
 	fScrollRunner(NULL),
 	fMarkerManager(manager)
 {
-	SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
+	SetViewColor(B_TRANSPARENT_COLOR);
 	fTextColor = ui_color(B_DOCUMENT_TEXT_COLOR);
 	SetFlags(Flags() | B_NAVIGABLE);
 }
@@ -1085,8 +1085,11 @@ SourceView::TextView::MaxSize()
 void
 SourceView::TextView::Draw(BRect updateRect)
 {
-	if (fSourceCode == NULL)
+	if (fSourceCode == NULL) {
+		SetLowColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
+		FillRect(updateRect, B_SOLID_LOW);
 		return;
+	}
 
 	// get the lines intersecting with the update rect
 	int32 minLine, maxLine;
@@ -1101,11 +1104,13 @@ SourceView::TextView::Draw(BRect updateRect)
 	SourceView::MarkerManager::InstructionPointerMarker* ipMarker;
 	int32 markerIndex = 0;
 	for (int32 i = minLine; i <= maxLine; i++) {
-		SetLowColor(ViewColor());
+		SetLowColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
 		float y = i * fFontInfo->lineHeight;
 		BString lineString;
 		_FormatLine(fSourceCode->LineAt(i), lineString);
 
+		FillRect(BRect(0.0, y, kLeftTextMargin, y + fFontInfo->lineHeight),
+			B_SOLID_LOW);
 		for (int32 j = markerIndex; j < markers.CountItems(); j++) {
 			marker = markers.ItemAt(j);
 			 if (marker->Line() < (uint32)i) {
@@ -1123,13 +1128,13 @@ SourceView::TextView::Draw(BRect updateRect)
 
 			 	} else
 					SetLowColor(255, 255, 0, 255);
-				FillRect(BRect(kLeftTextMargin, y, Bounds().right,
-					y + fFontInfo->lineHeight), B_SOLID_LOW);
 				break;
 			 } else
 			 	break;
 		}
 
+		FillRect(BRect(kLeftTextMargin, y, Bounds().right,
+			y + fFontInfo->lineHeight), B_SOLID_LOW);
 		DrawString(lineString,
 			BPoint(kLeftTextMargin, y + fFontInfo->fontHeight.ascent));
 	}
@@ -2053,13 +2058,13 @@ SourceView::SetStackTrace(StackTrace* stackTrace, Thread* activeThread)
 
 	fMarkerManager->SetStackTrace(fStackTrace);
 	fMarkerView->SetStackTrace(fStackTrace);
-	fTextView->Invalidate();
 }
 
 
 void
 SourceView::SetStackFrame(StackFrame* stackFrame)
 {
+	TRACE_GUI("SourceView::SetStackFrame(%p)\n", stackFrame);
 	if (stackFrame == fStackFrame)
 		return;
 
