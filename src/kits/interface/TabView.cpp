@@ -569,7 +569,8 @@ BTabView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
 
-	Select(fSelection);
+	if (fSelection < 0)
+		Select(0);
 }
 
 
