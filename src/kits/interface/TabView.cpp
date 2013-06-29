@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2013, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,6 +7,7 @@
  *		Jérôme Duval (korli@users.berlios.de)
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Artur Wyszynski
+ *		Rene Gollent (rene@gollent.com)
  */
 
 
@@ -746,6 +747,9 @@ BTabView::Pulse()
 void
 BTabView::Select(int32 index)
 {
+	if (index == Selection())
+		return;
+
 	if (index < 0 || index >= CountTabs())
 		index = Selection();
 
@@ -1351,7 +1355,7 @@ BTabView::_InitObject(bool layouted, button_width width)
 	fTabList = new BList;
 
 	fTabWidthSetting = width;
-	fSelection = 0;
+	fSelection = -1;
 	fFocus = -1;
 	fTabOffset = 0.0f;
 	fBorderStyle = B_FANCY_BORDER;
