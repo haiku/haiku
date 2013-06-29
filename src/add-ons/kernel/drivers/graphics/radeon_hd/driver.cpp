@@ -124,7 +124,7 @@ const struct supported_device {
 	{0x9513, 2, 0, RADEON_RV670, CHIP_STD, "Radeon HD 3850 X2"},
 	{0x9515, 2, 0, RADEON_RV670, CHIP_STD, "Radeon HD 3850"},
 	{0x9501, 2, 0, RADEON_RV670, CHIP_STD, "Radeon HD 3870"},
-	{0x950F, 2, 0, RADEON_RV670, CHIP_STD, "Radeon HD 3870 X2"},
+	{0x950F, 2, 0, RADEON_RV670, CHIP_STD | CHIP_X2, "Radeon HD 3870 X2"},
 	{0x9710, 3, 0, RADEON_RV620, CHIP_IGP, "Radeon HD 4200"},
 	{0x9715, 3, 0, RADEON_RV620, CHIP_IGP, "Radeon HD 4250"},
 	{0x9712, 3, 0, RADEON_RV620, CHIP_IGP, "Radeon HD 4270"},
@@ -153,15 +153,15 @@ const struct supported_device {
 	{0x944e, 3, 1, RADEON_RV770, CHIP_STD, "Radeon HD 4810"},
 	{0x944c, 3, 1, RADEON_RV770, CHIP_STD, "Radeon HD 4830"},
 	{0x9442, 3, 1, RADEON_RV770, CHIP_STD, "Radeon HD 4850"},
-	{0x9443, 3, 1, RADEON_RV770, CHIP_STD, "Radeon HD 4850 X2"},
+	{0x9443, 3, 1, RADEON_RV770, CHIP_STD | CHIP_X2, "Radeon HD 4850 X2"},
 	{0x94a1, 3, 1, RADEON_RV770, CHIP_IGP, "Radeon HD 4860"},
 	{0x9440, 3, 1, RADEON_RV770, CHIP_STD, "Radeon HD 4870"},
-	{0x9441, 3, 1, RADEON_RV770, CHIP_STD, "Radeon HD 4870 X2"},
+	{0x9441, 3, 1, RADEON_RV770, CHIP_STD | CHIP_X2, "Radeon HD 4870 X2"},
 	{0x9460, 3, 1, RADEON_RV770, CHIP_STD, "Radeon HD 4890"},
 
 	// From here on AMD no longer used numeric identifiers
 
-	// Marketing Names: Radeon HD 54xx ~ HD 63xx
+	// Marketing Names: Radeon HD 5450 - HD 6320
 	// Introduced: 2009
 	// Codename: Evergreen
 	// Process: 40 nm
@@ -186,7 +186,8 @@ const struct supported_device {
 	{0x6899, 4, 0, RADEON_CYPRESS, CHIP_STD, "Radeon HD 5850"},
 	{0x6898, 4, 0, RADEON_CYPRESS, CHIP_STD, "Radeon HD 5870"},
 	//  Hemlock
-	{0x689c, 4, 0, RADEON_HEMLOCK, CHIP_STD, "Radeon HD 5900"},
+	{0x689c, 4, 0, RADEON_HEMLOCK, CHIP_STD | CHIP_X2, "Radeon HD 5900 X2"},
+	{0x689d, 4, 0, RADEON_HEMLOCK, CHIP_STD | CHIP_X2, "Radeon HD 5900 X2"},
 	// Fusion APUS
 	//  Palm
 	{0x9804, 4, 1, RADEON_PALM, CHIP_APU, "Radeon HD 6250"},
@@ -209,7 +210,7 @@ const struct supported_device {
 	{0x9644, 4, 1, RADEON_SUMO2, CHIP_APU, "Radeon HD 6410D"},
 	{0x9645, 4, 1, RADEON_SUMO2, CHIP_APU, "Radeon HD SUMO2 M"},
 
-	// Radeon HD 64xx - HD 69xx
+	// Radeon HD 6450 - HD 7670
 	// Introduced: 2010
 	// Codename: Nothern Islands
 	// Process: 40 nm
@@ -244,6 +245,7 @@ const struct supported_device {
 	{0x6750, 5, 0, RADEON_TURKS, CHIP_STD, "Radeon HD 6500"},
 	{0x6758, 5, 0, RADEON_TURKS, CHIP_STD, "Radeon HD 6670"},
 	{0x6759, 5, 0, RADEON_TURKS, CHIP_STD, "Radeon HD 6570/7570"},
+	{0x6850, 6, 0, RADEON_TURKS, CHIP_MOBILE, "Radeon HD 7570"},
 	//  Barts
 	{0x673e, 5, 0, RADEON_BARTS, CHIP_STD, "Radeon HD 6790"},
 	{0x6739, 5, 0, RADEON_BARTS, CHIP_STD, "Radeon HD 6850"},
@@ -266,12 +268,10 @@ const struct supported_device {
 	//  Antilles (Top, Dual GPU)
 	{0x671d, 5, 0, RADEON_ANTILLES, CHIP_STD, "Radeon HD 6990"},
 
-	// Marketing Names: Radeon HD 74xx - HD 79xx
+	// Marketing Names: Radeon HD 7750 - HD 79xx
 	// Introduced: Late 2011
 	// Codename: Southern Islands
 	// Process: 28 nm
-	//  Lombok?
-	{0x6850, 6, 0, RADEON_LOMBOK, CHIP_MOBILE, "Radeon HD 7570"},
 	//  Cape Verde (TODO: Need to find friendly names)
 	{0x6820, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD Verde"},
 	{0x6821, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD Verde"},
@@ -292,6 +292,13 @@ const struct supported_device {
 	{0x683b, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD Verde"},
 	{0x683f, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD 7750"},
 	{0x683d, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD 7770"},
+	//  Bonaire (TODO: Need to find friendly names)
+	{0x6649, 6, 0, RADEON_BONAIRE, CHIP_STD, "Radeon HD Bonaire"},
+	{0x6650, 6, 0, RADEON_BONAIRE, CHIP_STD, "Radeon HD Bonaire"}, 
+	{0x6651, 6, 0, RADEON_BONAIRE, CHIP_STD, "Radeon HD Bonaire"}, 
+	{0x6658, 6, 0, RADEON_BONAIRE, CHIP_STD, "Radeon HD Bonaire"}, 
+	{0x665c, 6, 0, RADEON_BONAIRE, CHIP_STD, "Radeon HD 7790"},
+	{0x665d, 6, 0, RADEON_BONAIRE, CHIP_STD, "Radeon HD Bonaire"},
 	//  Pitcairn (TODO: Need to find friendly names)
 	{0x6800, 6, 0, RADEON_PITCAIRN, CHIP_MOBILE, "Radeon HD 7970"},
 	{0x6801, 6, 0, RADEON_PITCAIRN, CHIP_STD, "Radeon HD Pitcairn"},
@@ -312,8 +319,25 @@ const struct supported_device {
 	{0x679f, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD Tahiti"},
 	{0x679a, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD 7950"},
 	{0x6798, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD 7970"},
-	//  New Zealand (Top, Dual GPU)
-	{0x6799, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD 7990"}
+	{0x6799, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD 7990"},
+
+	// Marketing Names: Radeon HD 83xx - HD 89xx
+	// Introduced: Late 2013
+	// Codename: Sea Islands
+	// Process: 28 nm
+	//  Oland   DCE 6,4
+	//  Hainan  NO DCE?
+	//  Curacao ????
+
+	// Marketing Names: Radeon HD 9xxx - HD 9xxx 
+	// Introduced: 2014?
+	// Codename: Volcanic Islands
+	// Process: 20 nm
+
+	// Marketing Names: Radeon HD 9xxx - HD 9xxx 
+	// Introduced: 2015?
+	// Codename: Pirate Islands
+	// Process: ?? nm
 };
 
 
