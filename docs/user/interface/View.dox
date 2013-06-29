@@ -6,8 +6,8 @@
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/interface/View.h	 hrev45737
- *		src/kits/interface/View.cpp	 hrev45737
+ *		headers/os/interface/View.h	 hrev45799
+ *		src/kits/interface/View.cpp	 hrev45799
  */
 
 
@@ -824,10 +824,10 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\fn void BView::MessageReceived(BMessage* msg)
+	\fn void BView::MessageReceived(BMessage* message)
 	\brief Handle \a message received by the associated looper.
 
-	\param msg The message received by the associated looper.
+	\param message The \a message received by the associated looper.
 
 	\see BHandler::MessageReceived()
 */
@@ -931,152 +931,152 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\fn void BView::ConvertToParent(BPoint* pt) const
-	\brief Convert \a pt to the parent's coordinate system in place.
+	\fn void BView::ConvertToParent(BPoint* point) const
+	\brief Convert \a point to the parent's coordinate system in place.
 
-	\param pt A pointer to a BPoint object to convert.
+	\param point A pointer to a BPoint object to convert.
 */
 
 
 /*!
-	\fn BPoint BView::ConvertToParent(BPoint pt) const
-	\brief Returns \a pt converted to the parent's coordinate system.
+	\fn BPoint BView::ConvertToParent(BPoint point) const
+	\brief Returns \a point converted to the parent's coordinate system.
 
-	\param pt A BPoint object to convert.
+	\param point A BPoint object to convert.
 
 	\return A new BPoint object in the parent's coordinate system.
 */
 
 
 /*!
-	\fn void BView::ConvertFromParent(BPoint* pt) const
-	\brief Convert \a pt from the parent's coordinate system to the
+	\fn void BView::ConvertFromParent(BPoint* point) const
+	\brief Convert \a point from the parent's coordinate system to the
 		   view's coordinate system in place.
 
-	\param pt A pointer to a BPoint object to convert.
+	\param point A pointer to a BPoint object to convert.
 */
 
 
 /*!
-	\fn BPoint BView::ConvertFromParent(BPoint pt) const
-	\brief Returns \a pt converted from the parent's coordinate system to the
-		   view's coordinate system.
+	\fn BPoint BView::ConvertFromParent(BPoint point) const
+	\brief Returns \a point converted from the parent's coordinate system to
+	       the view's coordinate system.
 
-	\param pt A BPoint object to convert.
+	\param point A BPoint object to convert.
 
 	\return A new BPoint object in the view's coordinate system.
 */
 
 
 /*!
-	\fn void BView::ConvertToParent(BRect* r) const
-	\brief Convert \a r to the parent's coordinate system in place.
+	\fn void BView::ConvertToParent(BRect* rect) const
+	\brief Convert \a rect to the parent's coordinate system in place.
 
-	\param r A pointer to a BRect object to convert.
+	\param rect A pointer to a BRect object to convert.
 */
 
 
 /*!
-	\fn BRect BView::ConvertToParent(BRect r) const
-	\brief Returns \a r converted to the parent's coordinate system.
+	\fn BRect BView::ConvertToParent(BRect rect) const
+	\brief Returns \a rect converted to the parent's coordinate system.
 
-	\param r A BRect object to convert.
+	\param rect A BRect object to convert.
 
 	\return A new BRect object in the parent's coordinate system.
 */
 
 
 /*!
-	\fn void BView::ConvertFromParent(BRect* r) const
-	\brief Convert \a r from the parent's coordinate system to the
+	\fn void BView::ConvertFromParent(BRect* rect) const
+	\brief Convert \a rect from the parent's coordinate system to the
 		   view's coordinate system in place.
 
-	\param r A pointer to a BRect object to convert.
+	\param rect A pointer to a BRect object to convert.
 */
 
 
 /*!
-	\fn BRect BView::ConvertFromParent(BRect r) const
-	\brief Returns \a r converted from the parent's coordinate system to the
+	\fn BRect BView::ConvertFromParent(BRect rect) const
+	\brief Returns \a rect converted from the parent's coordinate system to the
 		   view's coordinate system.
 
-	\param r A BRect object to convert.
+	\param rect A BRect object to convert.
 
 	\return A new BRect object in the view's coordinate system.
 */
 
 
 /*!
-	\fn void BView::ConvertToScreen(BPoint* pt) const
-	\brief Convert \a pt to the screen's coordinate system in place.
+	\fn void BView::ConvertToScreen(BPoint* point) const
+	\brief Convert \a point to the screen's coordinate system in place.
 
-	\param pt A pointer to a BPoint object to convert.
+	\param point A pointer to a BPoint object to convert.
 */
 
 
 /*!
-	\fn BPoint BView::ConvertToScreen(BPoint pt) const
-	\brief Returns \a pt converted to the screen's coordinate system.
+	\fn BPoint BView::ConvertToScreen(BPoint point) const
+	\brief Returns \a point converted to the screen's coordinate system.
 
-	\param pt A BPoint object to convert.
+	\param point A BPoint object to convert.
 
 	\return A new BPoint object in the screen's coordinate system.
 */
 
 
 /*!
-	\fn void BView::ConvertFromScreen(BPoint* pt) const
-	\brief Convert \a pt from the screen's coordinate system to the
+	\fn void BView::ConvertFromScreen(BPoint* point) const
+	\brief Convert \a point from the screen's coordinate system to the
 		   view's coordinate system in place.
 
-	\param pt A pointer to a BPoint object to convert.
+	\param point A pointer to a BPoint object to convert.
 */
 
 
 /*!
-	\fn BPoint BView::ConvertFromScreen(BPoint pt) const
-	\brief Returns \a pt converted from the screen's coordinate system to the
-		   view's coordinate system.
+	\fn BPoint BView::ConvertFromScreen(BPoint point) const
+	\brief Returns \a point converted from the screen's coordinate system to
+	       the view's coordinate system.
 
-	\param pt A BPoint object to convert.
+	\param point A BPoint object to convert.
 
 	\return A new BPoint object in the view's coordinate system.
 */
 
 
 /*!
-	\fn void BView::ConvertToScreen(BRect* r) const
-	\brief Convert \a r to the screen's coordinate system in place.
+	\fn void BView::ConvertToScreen(BRect* rect) const
+	\brief Convert \a rect to the screen's coordinate system in place.
 
-	\param r A pointer to a BRect object to convert.
+	\param rect A pointer to a BRect object to convert.
 */
 
 
 /*!
-	\fn BRect BView::ConvertToScreen(BRect r) const
-	\brief Returns \a r converted to the screen's coordinate system.
+	\fn BRect BView::ConvertToScreen(BRect rect) const
+	\brief Returns \a rect converted to the screen's coordinate system.
 
-	\param r A BRect object to convert.
+	\param rect A BRect object to convert.
 
 	\return A new BRect object in the screen's coordinate system.
 */
 
 
 /*!
-	\fn void BView::ConvertFromScreen(BRect* r) const
-	\brief Convert \a r from the screen's coordinate system to the
+	\fn void BView::ConvertFromScreen(BRect* rect) const
+	\brief Convert \a rect from the screen's coordinate system to the
 		   view's coordinate system in place.
 
-	\param r A pointer to a BRect object to convert.
+	\param rect A pointer to a BRect object to convert.
 */
 
 
 /*!
-	\fn BRect BView::ConvertFromScreen(BRect r) const
-	\brief Returns \a r converted from the screen's coordinate system to the
+	\fn BRect BView::ConvertFromScreen(BRect rect) const
+	\brief Returns \a rect converted from the screen's coordinate system to the
 		   view's coordinate system.
 
-	\param r A BRect object to convert.
+	\param rect A BRect object to convert.
 
 	\return A new BRect object in the view's coordinate system.
 */
@@ -1298,8 +1298,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param startRect The initial frame in the view's coordinate system.
 	\param style This parameter is set to one of the following:
-	- \c B_TRACK_WHOLE_RECT The position of the rect changes with the cursor while
-	     its size remains the same.
+	- \c B_TRACK_WHOLE_RECT The position of the rect changes with the cursor
+	     while its size remains the same.
 	- \c B_TRACK_RECT_CORNER The left top corner is fixed while the right and
 	     bottom edges move with the cursor.
 */
@@ -1309,8 +1309,8 @@ SetViewColor(Parent()->ViewColor());
 	\fn void BView::EndRectTracking()
 	\brief Ends tracking removing the outline rectangle from the view.
 
-	BeginRectTracking() is typically called from the MouseDown() while this method
-	is typically called from the MouseUp() method.
+	BeginRectTracking() is typically called from the MouseDown() while this
+	method is typically called from the MouseUp() method.
 */
 
 
@@ -1326,8 +1326,8 @@ SetViewColor(Parent()->ViewColor());
 	\param dragRect An outline rectangle used in place of a bitmap image set in
 	       the view's coordinate system.
 	\param replyTo The target set to handle the message sent in reply to the
-	       dragged message. If \c NULL the reply is instead directed to the BView
-		   object that initiated the drag-and-drop session.
+	       dragged message. If \c NULL the reply is instead directed to the
+	       BView object that initiated the drag-and-drop session.
 */
 
 
@@ -1345,8 +1345,8 @@ SetViewColor(Parent()->ViewColor());
 	\param offset The offset to the hotspot within the image in the bitmap's
 	       coordinate system.
 	\param replyTo The target set to handle the message sent in reply to the
-	       dragged message. If \c NULL the reply is instead directed to the BView
-		   object that initiated the drag-and-drop session.
+	       dragged message. If \c NULL the reply is instead directed to the
+	       BView object that initiated the drag-and-drop session.
 */
 
 
@@ -1367,8 +1367,8 @@ SetViewColor(Parent()->ViewColor());
 	\param offset The offset to the hotspot within the image in the bitmap's
 	       coordinate system.
 	\param replyTo The target set to handle the message sent in reply to the
-	       dragged message. If \c NULL the reply is instead directed to the BView
-		   object that initiated the drag-and-drop session.
+	       dragged message. If \c NULL the reply is instead directed to the
+	       BView object that initiated the drag-and-drop session.
 */
 
 
@@ -1389,8 +1389,8 @@ SetViewColor(Parent()->ViewColor());
 	            - \c B_SECONDARY_MOUSE_BUTTON
 	            - \c B_TERTIARY_MOUSE_BUTTON
 	\param checkMessageQueue If \c true pull from any pending MouseMoved() or
-	       MouseUp() events in the message queue top down before filling out the
-		   current mouse cursor state.
+	       MouseUp() events in the message queue top down before filling out
+	       the current mouse cursor state.
 */
 
 
@@ -1772,11 +1772,22 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-
 	\fn void BView::SetHighColor(rgb_color color)
 	\brief Set the high color of the view.
 
 	\param color The color to set.
+*/
+
+
+/*!
+	\fn void BView::SetHighColor(uchar red, uchar green, uchar blue,
+		uchar alpha)
+	\brief Set the high color of the view.
+
+	\param red The \a red component of the high color.
+	\param green The \a green component of the high color.
+	\param blue The \a blue component of the high color.
+	\param alpha The \a alpha component of the high color.
 */
 
 
@@ -1797,6 +1808,17 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
+	\fn void BView::SetLowColor(uchar red, uchar green, uchar blue, uchar alpha)
+	\brief Set the low color of the view.
+
+	\param red The \a red component of the low color.
+	\param green The \a green component of the low color.
+	\param blue The \a blue component of the low color.
+	\param alpha The \a alpha component of the low color.
+*/
+
+
+/*!
 	\fn rgb_color BView::LowColor() const
 	\brief Return the current low color.
 
@@ -1809,6 +1831,18 @@ SetViewColor(Parent()->ViewColor());
 	\brief Set the view color of the view.
 
 	\param color The color to set.
+*/
+
+
+/*!
+	\fn void BView::SetViewColor(uchar red, uchar green, uchar blue,
+		uchar alpha)
+	\brief Set the view color of the view.
+
+	\param red The \a red component of the view color.
+	\param green The \a green component of the view color.
+	\param blue The \a blue component of the view color.
+	\param alpha The \a alpha component of the view color.
 */
 
 
@@ -2267,14 +2301,14 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::StrokeEllipse(BPoint center, float xRadius, float yRadius,
-		pattern p)
+		::pattern pattern)
 	\brief Stroke the outline of an ellipse starting at \a center with a
 	       horizontal radius of \a xRadius and a vertical radius of \a yRadius.
 
 	\param center The center point.
 	\param xRadius The horizontal radius.
 	\param yRadius The vertical radius.
-	\param p One of the following:
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2282,11 +2316,11 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\fn void BView::StrokeEllipse(BRect rect, pattern p)
+	\fn void BView::StrokeEllipse(BRect rect, ::pattern pattern)
 	\brief Stroke the outline of an ellipse inscribed within \a rect.
 
 	\param rect The area within which to inscribe the shape.
-	\param p One of the following:
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2295,14 +2329,14 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::FillEllipse(BPoint center, float xRadius, float yRadius,
-		pattern p)
+		::pattern pattern)
 	\brief Fill an ellipse starting at \a center with a horizontal radius
 	       of \a xRadius and a vertical radius of \a yRadius.
 
 	\param center The center point.
 	\param xRadius The horizontal radius.
 	\param yRadius The vertical radius.
-	\param p One of the following:
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2310,11 +2344,11 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\fn void BView::FillEllipse(BRect rect, pattern p)
+	\fn void BView::FillEllipse(BRect rect, ::pattern pattern)
 	\brief Fill an ellipse inscribed within \a rect.
 
 	\param rect The area within which to inscribe the shape.
-	\param p One of the following:
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2347,7 +2381,7 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::StrokeArc(BPoint center, float xRadius, float yRadius,
-		float startAngle, float arcAngle, pattern p)
+		float startAngle, float arcAngle, ::pattern pattern)
 	\brief Stroke the outline of an arc starting at \a center with a
 	       horizontal radius of \a xRadius and a vertical radius of \a yRadius
 	       starting at \a startAngle and drawing \a arcAngle degrees.
@@ -2357,7 +2391,7 @@ SetViewColor(Parent()->ViewColor());
 	\param yRadius The vertical radius.
 	\param startAngle The angle to begin drawing at.
 	\param arcAngle The number of degrees of the arc to draw.
-	\param p One of the following:
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2366,14 +2400,14 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::StrokeArc(BRect rect, float startAngle, float arcAngle,
-		pattern p)
+		::pattern pattern)
 	\brief Stroke the outline of an arc inscribed within \a rect starting at
 	       \a startAngle and drawing \a arcAngle degrees.
 
 	\param rect The area within which to inscribe the shape.
 	\param startAngle The angle to begin drawing at.
 	\param arcAngle The number of degrees of the arc to draw.
-	\param p One of the following:
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2382,7 +2416,7 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::FillArc(BPoint center, float xRadius, float yRadius,
-		float startAngle, float arcAngle, pattern p)
+		float startAngle, float arcAngle, ::pattern pattern)
 	\brief Fill an arc starting at \a center with a horizontal radius of
 	       \a xRadius and a vertical radius of \a yRadius starting at
 	       \a startAngle and drawing \a arcAngle degrees.
@@ -2392,7 +2426,7 @@ SetViewColor(Parent()->ViewColor());
 	\param yRadius The vertical radius.
 	\param startAngle The angle to begin drawing at.
 	\param arcAngle The number of degrees of the arc to draw.
-	\param p One of the following:
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2418,14 +2452,14 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::FillArc(BRect rect, float startAngle, float arcAngle,
-		pattern p)
+		::pattern pattern)
 	\brief Fill an arc inscribed within \a rect starting at startAngle and
 	       drawing \a arcAngle degrees.
 
 	\param rect The area within which to inscribe the shape.
 	\param startAngle The angle to begin drawing at.
 	\param arcAngle The number of degrees of the arc to draw.
-	\param p One of the following:
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2446,11 +2480,11 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\fn void BView::StrokeBezier(BPoint* controlPoints, pattern p)
+	\fn void BView::StrokeBezier(BPoint* controlPoints, ::pattern pattern)
 	\brief Stroke a bezier curve.
 
 	\param controlPoints The list of points that form the bezier curve.
-	\param p One of the following:
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2462,7 +2496,7 @@ SetViewColor(Parent()->ViewColor());
 	\brief Fill a bezier curve.
 
 	\param controlPoints The list of points that form the bezier curve.
-	\param p One of the following:
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2480,13 +2514,13 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\fn void BView::StrokePolygon(const BPolygon* polygon, bool closed, pattern p)
+	\fn void BView::StrokePolygon(const BPolygon* polygon, bool closed, ::pattern pattern)
 	\brief Stroke a polygon shape.
 
 	\param polygon The polygon shape to stroke.
 	\param closed Whether or not the last line of the polygon should intersect
 	       with the initial point.
-	\param p One of the following:
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2495,14 +2529,14 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::StrokePolygon(const BPoint* pointArray, int32 numPoints,
-		bool closed, pattern p)
+		bool closed, ::pattern pattern)
 	\brief Stroke a polygon shape made up of points specified by \a pointArray.
 
 	\param pointArray An array of points that specify the vertices of the polygon.
 	\param numPoints The number of points in \a pointArray.
 	\param closed Whether or not the last line of the polygon should intersect
 	       with the initial point.
-	\param p One of the following:
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2510,17 +2544,17 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\fn void BView::StrokePolygon(const BPoint* ptArray, int32 numPoints,
-		BRect bounds, bool closed, pattern p)
+	\fn void BView::StrokePolygon(const BPoint* pointArray, int32 numPoints,
+		BRect bounds, bool closed, ::pattern pattern)
 	\brief Stroke a polygon shape made up of points specified by \a pointArray
 	       inscribed by \a bounds.
 
-	\param ptArray An array of points that specify the vertices of the polygon.
-	\param numPoints The number of points in \a ptArray.
-	\param bounds The smallest rectangle that encloses the points in \a ptArray.
+	\param pointArray An array of points that specify the vertices of the polygon.
+	\param numPoints The number of points in \a pointArray.
+	\param bounds The smallest rectangle that encloses the points in \a pointArray.
 	\param closed Whether or not the last line of the polygon should intersect
 	       with the initial point.
-	\param p One of the following:
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2528,11 +2562,11 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\fn void BView::FillPolygon(const BPolygon* polygon, pattern p)
+	\fn void BView::FillPolygon(const BPolygon* polygon, ::pattern pattern)
 	\brief Fill a polygon shape.
 
 	\param polygon The polygon shape to fill.
-	\param p One of the following:
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2550,12 +2584,13 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\fn void BView::FillPolygon(const BPoint* ptArray, int32 numPts, pattern p)
-	\brief Fill a polygon shape made up of points specified by \a ptArray.
+	\fn void BView::FillPolygon(const BPoint* pointArray, int32 numPoints,
+		::pattern pattern)
+	\brief Fill a polygon shape made up of points specified by \a pointArray.
 
-	\param ptArray An array of points that specify the vertices of the polygon.
-	\param numPts The number of points in \a pointArray.
-	\param p One of the following:
+	\param pointArray An array of points that specify the vertices of the polygon.
+	\param numPoints The number of points in \a pointArray.
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2563,27 +2598,30 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\fn void BView::FillPolygon(const BPoint* ptArray, int32 numPts,
+	\fn void BView::FillPolygon(const BPoint* pointArray, int32 numPoints,
 		const BGradient& gradient)
-	\brief Fill a polygon shape made up of points specified by \a ptArray with the
-	       specified \a gradient pattern.
+	\brief Fill a polygon shape made up of points specified by \a pointArray
+	       with the specified \a gradient pattern.
 
-	\param ptArray An array of points that specify the vertices of the polygon.
-	\param numPts The number of points in \a pointArray.
+	\param pointArray An array of points that specify the vertices of the
+	       polygon.
+	\param numPoints The number of points in \a pointArray.
 	\param gradient The gradient pattern to fill the polygon with.
 */
 
 
 /*!
-	\fn void BView::FillPolygon(const BPoint* ptArray, int32 numPts,
-		BRect bounds, pattern p)
+	\fn void BView::FillPolygon(const BPoint* pointArray, int32 numPoints,
+		BRect bounds, ::pattern pattern)
 	\brief Fill a polygon shape made up of points specified by \a pointArray
 	       inscribed by \a bounds.
 
-	\param ptArray An array of points that specify the vertices of the polygon.
-	\param numPts The number of points in \a ptArray.
-	\param bounds The smallest rectangle that encloses the points in \a ptArray.
-	\param p One of the following:
+	\param pointArray An array of points that specify the vertices of the
+	       polygon.
+	\param numPoints The number of points in \a pointArray.
+	\param bounds The smallest rectangle that encloses the points in
+	       \a pointArray.
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2591,24 +2629,26 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\fn void BView::FillPolygon(const BPoint* ptArray, int32 numPts, BRect bounds,
-		const BGradient& gradient)
+	\fn void BView::FillPolygon(const BPoint* pointArray, int32 numPoints,
+		BRect bounds, const BGradient& gradient)
 	\brief Fill a polygon shape made up of points specified by \a pointArray
 	       inscribed by \a bounds with the specified \a gradient pattern.
 
-	\param ptArray An array of points that specify the vertices of the polygon.
-	\param numPts The number of points in \a ptArray.
-	\param bounds The smallest rectangle that encloses the points in \a ptArray.
+	\param pointArray An array of points that specify the vertices of the
+	       polygon.
+	\param numPoints The number of points in \a pointArray.
+	\param bounds The smallest rectangle that encloses the points in
+	       \a pointArray.
 	\param gradient The gradient pattern to fill the polygon with.
 */
 
 
 /*!
-	\fn void BView::StrokeRect(BRect rect, pattern p)
+	\fn void BView::StrokeRect(BRect rect, ::pattern pattern)
 	\brief Stroke the rectangle specified by \a rect.
 
 	\param rect The rectangular area to stroke.
-	\param p One of the following:
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2616,11 +2656,11 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\fn void BView::FillRect(BRect rect, pattern p)
+	\fn void BView::FillRect(BRect rect, ::pattern pattern)
 	\brief Fill the rectangle specified by \a rect.
 
 	\param rect The rectangular area to fill.
-	\param p One of the following:
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2629,8 +2669,8 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::FillRect(BRect rect, const BGradient& gradient)
-	\brief Fill the rectangle specified by \a rect with the specified \a gradient
-	       pattern.
+	\brief Fill the rectangle specified by \a rect with the specified
+	       \a gradient pattern.
 
 	\param rect The rectangular area to fill.
 	\param gradient The gradient pattern to fill the rectangle with.
@@ -2639,14 +2679,14 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::StrokeRoundRect(BRect rect, float xRadius, float yRadius,
-		pattern p)
+		::pattern pattern)
 	\brief Stroke the rounded rectangle with horizontal radius \a xRadius and
 	       vertical radius \a yRadius.
 
 	\param rect The rectangular area to stroke the round rect within.
 	\param xRadius The horizontal radius.
 	\param yRadius The vertical radius.
-	\param p One of the following:
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2655,14 +2695,14 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::FillRoundRect(BRect rect, float xRadius, float yRadius,
-		pattern p)
+		::pattern pattern)
 	\brief Fill the rounded rectangle with horizontal radius \a xRadius and
 	       vertical radius \a yRadius.
 
 	\param rect The rectangular area to fill the round rect within.
 	\param xRadius The horizontal radius.
 	\param yRadius The vertical radius.
-	\param p One of the following:
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2683,11 +2723,11 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\fn void BView::FillRegion(BRegion* region, pattern p)
+	\fn void BView::FillRegion(BRegion* region, ::pattern pattern)
 	\brief Fill \a region.
 
 	\param region The \a region to fill.
-	\param p One of the following:
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2704,16 +2744,16 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\fn void BView::StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
-		BRect bounds, pattern p)
-	\brief Stroke the triangle specified by points \a pt1, \a pt2, and \a pt3 and
-	       enclosed by \a bounds.
+	\fn void BView::StrokeTriangle(BPoint point1, BPoint point2, BPoint point3,
+		BRect bounds, ::pattern pattern)
+	\brief Stroke the triangle specified by points \a point1, \a point2, and
+	       \a point3 and enclosed by \a bounds.
 
-	\param pt1 The first point of the triangle.
-	\param pt2 The second point of the triangle.
-	\param pt3 The third point of the triangle.
+	\param point1 The first point of the triangle.
+	\param point2 The second point of the triangle.
+	\param point3 The third point of the triangle.
 	\param bounds The rectangular area that encloses the triangle.
-	\param p One of the following:
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2721,13 +2761,15 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\fn void BView::StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3, pattern p)
-	\brief Stroke the triangle specified by points \a pt1, \a pt2, and \a pt3.
+	\fn void BView::StrokeTriangle(BPoint point1, BPoint point2, BPoint point3,
+		::pattern pattern)
+	\brief Stroke the triangle specified by points \a point1, \a point2,
+	       and \a point3.
 
-	\param pt1 The first point of the triangle.
-	\param pt2 The second point of the triangle.
-	\param pt3 The third point of the triangle.
-	\param p One of the following:
+	\param point1 The first point of the triangle.
+	\param point2 The second point of the triangle.
+	\param point3 The third point of the triangle.
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2735,13 +2777,15 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\fn void BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3, pattern p)
-	\brief Fill the triangle specified by points \a pt1, \a pt2, and \a pt3.
+	\fn void BView::FillTriangle(BPoint point1, BPoint point2, BPoint point3,
+		::pattern pattern)
+	\brief Fill the triangle specified by points \a point1, \a point2,
+	       and \a point3.
 
-	\param pt1 The first point of the triangle.
-	\param pt2 The second point of the triangle.
-	\param pt3 The third point of the triangle.
-	\param p One of the following:
+	\param point1 The first point of the triangle.
+	\param point2 The second point of the triangle.
+	\param point3 The third point of the triangle.
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2749,29 +2793,29 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\fn void BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
+	\fn void BView::FillTriangle(BPoint point1, BPoint point2, BPoint point3,
 		const BGradient& gradient)
-	\brief Fill the triangle specified by points \a pt1, \a pt2, and \a pt3
-	       with the specified \a gradient pattern.
+	\brief Fill the triangle specified by points \a point1, \a point2,
+	       and \a point3 with the specified \a gradient pattern.
 
-	\param pt1 The first point of the triangle.
-	\param pt2 The second point of the triangle.
-	\param pt3 The third point of the triangle.
+	\param point1 The first point of the triangle.
+	\param point2 The second point of the triangle.
+	\param point3 The third point of the triangle.
 	\param gradient The gradient pattern to fill the triangle with.
 */
 
 
 /*!
-	\fn void BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
-		BRect bounds, pattern p)
-	\brief Fill the triangle specified by points \a pt1, \a pt2, and \a pt3 and
-	       enclosed by \a bounds.
+	\fn void BView::FillTriangle(BPoint point1, BPoint point2, BPoint point3,
+		BRect bounds, ::pattern pattern)
+	\brief Fill the triangle specified by points \a point1, \a point2,
+	       and \a point3 and enclosed by \a bounds.
 
-	\param pt1 The first point of the triangle.
-	\param pt2 The second point of the triangle.
-	\param pt3 The third point of the triangle.
+	\param point1 The first point of the triangle.
+	\param point2 The second point of the triangle.
+	\param point3 The third point of the triangle.
 	\param bounds The rectangular area that encloses the triangle.
-	\param p One of the following:
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2779,25 +2823,26 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\fn void BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
+	\fn void BView::FillTriangle(BPoint point1, BPoint point2, BPoint point3,
 		BRect bounds, const BGradient& gradient)
-	\brief Fill the triangle specified by points \a pt1, \a pt2, and \a pt3 and
-	       enclosed by \a bounds with the specified \a gradient pattern.
+	\brief Fill the triangle specified by points \a point1, \a point2,
+	       and \a point3 and enclosed by \a bounds with the specified
+	       \a gradient pattern.
 
-	\param pt1 The first point of the triangle.
-	\param pt2 The second point of the triangle.
-	\param pt3 The third point of the triangle.
+	\param point1 The first point of the triangle.
+	\param point2 The second point of the triangle.
+	\param point3 The third point of the triangle.
 	\param bounds The rectangular area that encloses the triangle.
 	\param gradient The gradient pattern to fill the triangle with.
 */
 
 
 /*!
-	\fn void BView::StrokeLine(BPoint toPt, pattern p)
-	\brief Stroke a line from the current pen location to the point \a toPt.
+	\fn void BView::StrokeLine(BPoint toPoint, ::pattern pattern)
+	\brief Stroke a line from the current pen location to the point \a toPoint.
 
-	\param toPt The end point of the line.
-	\param p One of the following:
+	\param toPoint The end point of the line.
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2805,12 +2850,12 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\fn void BView::StrokeLine(BPoint pt0, BPoint pt1, pattern p)
-	\brief Stroke a line from point \a pt0 to point \a pt1.
+	\fn void BView::StrokeLine(BPoint start, BPoint end, ::pattern pattern)
+	\brief Stroke a line from point \a start to point \a end.
 
-	\param pt0 The start point of the line.
-	\param pt1 The end point of the line.
-	\param p One of the following:
+	\param start The start point of the line.
+	\param end The end point of the line.
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2818,11 +2863,11 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\fn void BView::StrokeShape(BShape* shape, pattern p)
+	\fn void BView::StrokeShape(BShape* shape, ::pattern pattern)
 	\brief Stroke \a shape.
 
 	\param shape The \a shape to stroke.
-	\param p One of the following:
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2830,11 +2875,11 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\fn void BView::FillShape(BShape* shape, pattern p)
+	\fn void BView::FillShape(BShape* shape, ::pattern pattern)
 	\brief Fill \a shape.
 
 	\param shape The \a shape to fill.
-	\param p One of the following:
+	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
@@ -2870,12 +2915,12 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\fn void BView::AddLine(BPoint pt0, BPoint pt1, rgb_color col)
+	\fn void BView::AddLine(BPoint start, BPoint end, rgb_color color);
 	\brief Add a line to the line array from point \a pt0 to point \a pt1.
 
-	\param pt0 The start point of the line.
-	\param pt1 The end point of the line.
-	\param col The line color.
+	\param start The \a start point of the line.
+	\param end The \a end point of the line.
+	\param color The line \a color.
 */
 
 
@@ -3319,7 +3364,7 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\fn BHandler* BView::ResolveSpecifier(BMessage* msg, int32 index,
+	\fn BHandler* BView::ResolveSpecifier(BMessage* message, int32 index,
 		BMessage* specifier, int32 what, const char* property)
 	\brief Determine the proper handler for a scripting message.
 
