@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-WebPositive	3577331897
+1	belarusian	x-vnd.Haiku-WebPositive	1786411139
 Show home button	Settings Window		Паказваць кнопку "Дадому"
 Username:	Authentication Panel		Карыстальнік:
 Copy URL to clipboard	Download Window		Скапіяваць спасылку
@@ -16,6 +16,7 @@ Start page:	Settings Window		Пачатковая старонка:
 History	WebPositive Window		Гісторыя
 Error opening downloads folder	Download Window		Немагчыма адчыніць папку запампованых файлаў
 Paste	WebPositive Window		Уставіць
+Double-click or middle-click to open new tab.	Tab Manager		Скарыстайце сярэдню кнопку ці падвойны клік каб адкрыць новы таб.
 Proxy username:	Settings Window		Імя карыстальніка проксі:
 Settings	Settings Window		Наладкі
 %seconds seconds left	Download Window		Засталося %seconds секунд
