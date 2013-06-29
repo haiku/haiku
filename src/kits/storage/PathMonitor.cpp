@@ -604,7 +604,8 @@ private:
 									bool isDirectory, int32 opcode) const;
 			void				_NotifyEntryMoved(const entry_ref& fromEntryRef,
 									const entry_ref& toEntryRef,
-									const node_ref& nodeRef, const char* path,
+									const node_ref& nodeRef,
+							 		const char* fromPath, const char* path,
 									bool isDirectory, bool wasAdded,
 									bool wasRemoved) const;
 			void				_NotifyTarget(BMessage& message,
@@ -1210,14 +1211,21 @@ PathHandler::_EntryMoved(BMessage* message)
 							B_ENTRY_CREATED);
 					}
 				} else {
+					BString fromPath;
+					if (fromDirectoryNode != NULL) {
+						fromPath = make_path(_NodePath(fromDirectoryNode),
+							fromEntryRef.name);
+					}
+
 					BString path;
 					if (toDirectoryNode != NULL) {
 						path = make_path(_NodePath(toDirectoryNode),
 							toEntryRef.name);
 					}
+
 					_NotifyEntryMoved(fromEntryRef, toEntryRef, nodeRef,
-						path, isDirectory, fromDirectoryNode == NULL,
-					   toDirectoryNode == NULL);
+						fromPath, path, isDirectory, fromDirectoryNode == NULL,
+						toDirectoryNode == NULL);
 				}
 
 				if (removedEntry != NULL)
@@ -1263,12 +1271,16 @@ PathHandler::_EntryMoved(BMessage* message)
 
 		if (fromAncestor == fBaseAncestor || toAncestor == fBaseAncestor) {
 			if ((fFlags & B_WATCH_DIRECTORY) != 0) {
+				BString fromPath;
+				if (fromAncestor == fBaseAncestor)
+					fromPath = make_path(fPath, fromEntryRef.name);
+
 				BString path;
 				if (toAncestor == fBaseAncestor)
 					path = make_path(fPath, toEntryRef.name);
 
 				_NotifyEntryMoved(fromEntryRef, toEntryRef, nodeRef,
-					path, isDirectory, fromAncestor == NULL,
+					fromPath, path, isDirectory, fromAncestor == NULL,
 					toAncestor == NULL);
 			}
 			return;
@@ -1321,7 +1333,9 @@ PathHandler::_EntryMoved(BMessage* message)
 		}
 
 		if (!notifyFilesRecursively) {
-			_NotifyEntryMoved(fromEntryRef, toEntryRef, nodeRef, fPath,
+			_NotifyEntryMoved(fromEntryRef, toEntryRef, nodeRef,
+				fromIsBase ? fPath.String() : NULL,
+				toIsBase ? fPath.String() : NULL,
 				isDirectory, toIsBase, fromIsBase);
 		}
 		return;
@@ -1867,8 +1881,8 @@ PathHandler::_NotifyEntryCreatedOrRemoved(const entry_ref& entryRef,
 
 void
 PathHandler::_NotifyEntryMoved(const entry_ref& fromEntryRef,
-	const entry_ref& toEntryRef, const node_ref& nodeRef, const char* path,
-	bool isDirectory, bool wasAdded, bool wasRemoved) const
+	const entry_ref& toEntryRef, const node_ref& nodeRef, const char* fromPath,
+	const char* path, bool isDirectory, bool wasAdded, bool wasRemoved) const
 {
 	if ((isDirectory && _WatchFilesOnly())
 		|| (!isDirectory && _WatchDirectoriesOnly())) {
@@ -1895,6 +1909,9 @@ PathHandler::_NotifyEntryMoved(const entry_ref& fromEntryRef,
 		message.AddBool("added", true);
 	if (wasRemoved)
 		message.AddBool("removed", true);
+
+	if (fromPath != NULL && fromPath[0] != '\0')
+		message.AddString("from path", fromPath);
 
 	_NotifyTarget(message, path);
 }
