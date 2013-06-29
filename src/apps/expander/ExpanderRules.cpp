@@ -6,14 +6,18 @@
 
 #include "ExpanderRules.h"
 
-#include <FindDirectory.h>
 #include <stdlib.h>
-#include <Path.h>
-#include <NodeInfo.h>
 #include <stdio.h>
 #include <unistd.h>
 
+#include <FindDirectory.h>
+#include <NodeInfo.h>
+#include <Path.h>
+
 #include <compat/sys/stat.h>
+
+
+// #pragma mark - ExpanderRule
 
 
 ExpanderRule::ExpanderRule(BString mimetype, BString filenameExtension,
@@ -38,25 +42,39 @@ ExpanderRule::ExpanderRule(const char* mimetype, const char* filenameExtension,
 }
 
 
+// #pragma mark - ExpanderRules
+
+
 ExpanderRules::ExpanderRules()
 {
-	fList.AddItem(new ExpanderRule("", 								".tar.gz", 	"tar -ztvf %s", 				"tar -zxf %s"));
-	fList.AddItem(new ExpanderRule("", 								".tar.bz2", "tar -jtvf %s",					"tar -jxf %s"));
-	fList.AddItem(new ExpanderRule("", 								".tar.Z", 	"tar -Ztvf %s", 				"tar -Zxf %s"));
-	fList.AddItem(new ExpanderRule("", 								".tgz", 	"tar -ztvf %s", 				"tar -zxf %s"));
-	fList.AddItem(new ExpanderRule("application/x-tar", 			".tar", 	"tar -tvf %s", 					"tar -xf %s"));
-	fList.AddItem(new ExpanderRule("application/x-gzip",			".gz", 		"echo %s | sed 's/.gz$//g'", 	"gunzip -c %s > `echo %s | sed 's/.gz$//g'`"));
-	fList.AddItem(new ExpanderRule("application/x-bzip2",			".bz2", 	"echo %s | sed 's/.bz2$//g'", 	"bunzip2 -k %s"));
-	fList.AddItem(new ExpanderRule("application/zip", 				".zip", 	"unzip -l %s", 					"unzip -o %s"));
-	fList.AddItem(new ExpanderRule("application/x-zip-compressed", 	".zip", 	"unzip -l %s", 					"unzip -o %s"));
-	fList.AddItem(new ExpanderRule("application/x-rar",				".rar", 	"unrar v %s", 					"unrar x -y %s"));
+	fList.AddItem(new ExpanderRule("", ".tar.gz",
+		"tar -ztvf %s", "tar -zxf %s"));
+	fList.AddItem(new ExpanderRule("", ".tar.bz2",
+		"tar -jtvf %s", "tar -jxf %s"));
+	fList.AddItem(new ExpanderRule("", ".tar.Z",
+		"tar -Ztvf %s", "tar -Zxf %s"));
+	fList.AddItem(new ExpanderRule("", ".tgz",
+		"tar -ztvf %s", "tar -zxf %s"));
+	fList.AddItem(new ExpanderRule("application/x-tar", ".tar",
+		"tar -tvf %s", "tar -xf %s"));
+	fList.AddItem(new ExpanderRule("application/x-gzip", ".gz",
+		"echo %s | sed 's/.gz$//g'",
+		"gunzip -c %s > `echo %s | sed 's/.gz$//g'`"));
+	fList.AddItem(new ExpanderRule("application/x-bzip2", ".bz2",
+		"echo %s | sed 's/.bz2$//g'", "bunzip2 -k %s"));
+	fList.AddItem(new ExpanderRule("application/zip", ".zip",
+		"unzip -l %s", "unzip -o %s"));
+	fList.AddItem(new ExpanderRule("application/x-zip-compressed", ".zip",
+		"unzip -l %s", "unzip -o %s"));
+	fList.AddItem(new ExpanderRule("application/x-rar", ".rar",
+		"unrar v %s", "unrar x -y %s"));
 
 	BFile file;
-	if (Open(&file) != B_OK)
+	if (_Open(&file) != B_OK)
 		return;
 
 	int fd = file.Dup();
-	FILE * f = fdopen(fd, "r");
+	FILE* f = fdopen(fd, "r");
 
 	char buffer[1024];
 	BString strings[4];
@@ -66,14 +84,16 @@ ExpanderRules::ExpanderRules()
 		while (buffer[i] != '#' && buffer[i] != '\n' && j < 4) {
 			if ((j == 0 || j > 1) && buffer[i] == '"') {
 				if (firstQuote >= 0) {
-					strings[j++].SetTo(&buffer[firstQuote+1], i - firstQuote - 1);
+					strings[j++].SetTo(&buffer[firstQuote+1],
+						i - firstQuote - 1);
 					firstQuote = -1;
 				} else
 					firstQuote = i;
 			} else if (j == 1 && (buffer[i] == ' ' || buffer[i] == '\t')) {
 				if (firstQuote >= 0) {
 					if (firstQuote + 1 != i) {
-						strings[j++].SetTo(&buffer[firstQuote+1], i - firstQuote - 1);
+						strings[j++].SetTo(&buffer[firstQuote+1],
+							i - firstQuote - 1);
 						firstQuote = -1;
 					} else
 						firstQuote = i;
@@ -83,7 +103,8 @@ ExpanderRules::ExpanderRules()
 			i++;
 		}
 		if (j == 4) {
-			fList.AddItem(new ExpanderRule(strings[0], strings[1], strings[2], strings[3]));
+			fList.AddItem(new ExpanderRule(strings[0], strings[1], strings[2],
+				strings[3]));
 		}
 	}
 	fclose(f);
@@ -93,14 +114,14 @@ ExpanderRules::ExpanderRules()
 
 ExpanderRules::~ExpanderRules()
 {
-	void *item;
+	void* item;
 	while ((item = fList.RemoveItem((int32)0)))
 		delete (ExpanderRule*)item;
 }
 
 
 status_t
-ExpanderRules::Open(BFile *file)
+ExpanderRules::_Open(BFile* file)
 {
 	directory_which which[] = {
 		B_USER_DATA_DIRECTORY,
@@ -121,13 +142,13 @@ ExpanderRules::Open(BFile *file)
 }
 
 
-ExpanderRule *
-ExpanderRules::MatchingRule(BString &fileName, const char *filetype)
+ExpanderRule*
+ExpanderRules::MatchingRule(BString& fileName, const char* filetype)
 {
 	int32 count = fList.CountItems();
 	int32 length = fileName.Length();
 	for (int32 i = 0; i < count; i++) {
-		ExpanderRule *rule = (ExpanderRule *)fList.ItemAt(i);
+		ExpanderRule* rule = (ExpanderRule*)fList.ItemAt(i);
 		if (rule->MimeType().IsValid() && rule->MimeType() == filetype)
 			return rule;
 		int32 extPosition = fileName.FindLast(rule->FilenameExtension());
@@ -139,8 +160,8 @@ ExpanderRules::MatchingRule(BString &fileName, const char *filetype)
 }
 
 
-ExpanderRule *
-ExpanderRules::MatchingRule(const entry_ref *ref)
+ExpanderRule*
+ExpanderRules::MatchingRule(const entry_ref* ref)
 {
 	BEntry entry(ref, true);
 	BNode node(&entry);
@@ -152,7 +173,10 @@ ExpanderRules::MatchingRule(const entry_ref *ref)
 }
 
 
-RuleRefFilter::RuleRefFilter(ExpanderRules &rules)
+// #pragma mark - RuleRefFilter
+
+
+RuleRefFilter::RuleRefFilter(ExpanderRules& rules)
 	: BRefFilter(),
 	fRules(rules)
 {
@@ -160,8 +184,8 @@ RuleRefFilter::RuleRefFilter(ExpanderRules &rules)
 
 
 bool
-RuleRefFilter::Filter(const entry_ref *ref, BNode* node, struct stat_beos *st,
-	const char *filetype)
+RuleRefFilter::Filter(const entry_ref* ref, BNode* node, struct stat_beos* st,
+	const char* filetype)
 {
 	if (node->IsDirectory() || node->IsSymLink())
 		return true;
