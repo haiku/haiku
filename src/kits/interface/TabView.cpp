@@ -430,7 +430,7 @@ BTabView::BTabView(BMessage *archive)
 	}
 
 	if (archive->FindInt32("_sel", &fSelection) != B_OK)
-		fSelection = 0;
+		fSelection = -1;
 
 	if (archive->FindInt32("_border_style", (int32*)&fBorderStyle) != B_OK)
 		fBorderStyle = B_FANCY_BORDER;
@@ -1243,13 +1243,10 @@ BTabView::RemoveTab(int32 index)
 	if (fContainerView->GetLayout())
 		fContainerView->GetLayout()->RemoveItem(index);
 
-	if (index <= fSelection && fSelection != 0)
-		fSelection--;
-
 	if (CountTabs() == 0)
 		fFocus = -1;
-	else
-		Select(fSelection);
+	else if (index <= fSelection)
+		Select(fSelection - 1);
 
 	if (fFocus == CountTabs() - 1 || CountTabs() == 0)
 		SetFocusTab(fFocus, false);
