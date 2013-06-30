@@ -1098,43 +1098,6 @@ rule AddGroupToHaikuImage group : gid : members
 	AddEntryToHaikuImageUserGroupFile <haiku-image>group : $(entry) ;
 }
 
-rule AddEntryToHaikuImageExpanderRuleFile file : entry
-{
-	local allEntries
-		= [ on $(file) return $(HAIKU_IMAGE_EXPANDER_RULES_ENTRIES) ] ;
-
-	if $(allEntries) {
-		allEntries = $(allEntries)!$(entry) ;
-	} else {
-		allEntries = $(entry) ;
-
-		Always $(file) ;
-		MakeLocate $(file) : $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) ;
-		BuildHaikuImageExpanderRules $(file) ;
-		AddFilesToHaikuImage common data : $(file) ;
-	}
-
-	HAIKU_IMAGE_EXPANDER_RULES_ENTRIES on $(file) = $(allEntries) ;
-}
-
-actions BuildHaikuImageExpanderRules
-{
-	echo -e "$(HAIKU_IMAGE_EXPANDER_RULES_ENTRIES)" | tr '!' '\n' > $(1)
-}
-
-rule AddExpanderRuleToHaikuImage mimetype : extension : list : extract
-{
-	#AddExpanderRuleToHaikuImage <mimetype> : <extension> : <list> : <extract>
-
-	if ! $(mimetype) || ! $(extension) || ! $(list) || ! $(extract) {
-		Exit "Invalid expander rule specification passed to AddExpanderRule." ;
-	}
-
-	local entry
-		= "\\\"$(mimetype)\\\"\\\t$(extension)\\\t\\\"$(list)\\\"\\\t\\\"$(extract)\\\"" ;
-	AddEntryToHaikuImageExpanderRuleFile <haiku-image>expander.rules
-		: $(entry) ;
-}
 
 rule AddOptionalPackageDescriptionToHaikuImage file : searchPath
 {

@@ -32,6 +32,10 @@
 #include <Message.h>
 #include <File.h>
 
+
+class BPath;
+
+
 static const uint32 kMsgExpanderSettings = 'Exst';
 
 class ExpanderSettings {
@@ -41,6 +45,8 @@ class ExpanderSettings {
 
 		const BMessage &Message() const { return fMessage; }
 		void UpdateFrom(BMessage *message);
+
+		static status_t GetSettingsDirectoryPath(BPath& _path);
 
 	private:
 		status_t Open(BFile *file, int32 mode);

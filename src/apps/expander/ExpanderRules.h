@@ -16,13 +16,10 @@
 
 class ExpanderRule {
 public:
-								ExpanderRule(BString mimetype,
-									BString filenameExtension,
-					 				BString listingCmd, BString expandCmd);
 								ExpanderRule(const char* mimetype,
-									const char* filenameExtension,
-									const char* listingCmd,
-									const char* expandCmd);
+									const BString& filenameExtension,
+									const BString& listingCmd,
+									const BString& expandCmd);
 
 			const BMimeType&	MimeType() const
 									{ return fMimeType; }
@@ -51,7 +48,13 @@ public:
 			ExpanderRule*		MatchingRule(const entry_ref* ref);
 
 private:
-			status_t			_Open(BFile* file);
+			void				_LoadRulesFiles();
+			void				_LoadRulesFile(const char* path);
+
+			bool				_AddRule(const char* mimetype,
+									const BString& filenameExtension,
+									const BString& listingCmd,
+									const BString& expandCmd);
 
 private:
 			BList				fList;
