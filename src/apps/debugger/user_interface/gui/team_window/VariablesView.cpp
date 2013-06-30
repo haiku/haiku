@@ -940,10 +940,10 @@ VariablesView::VariableTableModel::SetStackFrame(Thread* thread,
 		fNodes.MakeEmpty();
 	}
 
-	if (stackFrame == NULL) {
-		NotifyNodesRemoved(TreeTablePath(), 0, count);
+	NotifyNodesRemoved(TreeTablePath(), 0, count);
+
+	if (stackFrame == NULL)
 		return;
-	}
 
 	ValueNodeContainer* container = fNodeManager->GetContainer();
 	AutoLocker<ValueNodeContainer> containerLocker(container);
@@ -956,8 +956,6 @@ VariablesView::VariableTableModel::SetStackFrame(Thread* thread,
 		// so those won't invoke our callback hook. Add them directly here.
 		ValueNodeChildrenCreated(child->Node());
 	}
-
-	NotifyTableModelReset();
 }
 
 
