@@ -30,16 +30,18 @@ TOffscreenView::TOffscreenView(BRect frame, const char *name, short mRadius,
 	  fHoursRadius(hRadius),
 	  fMinutesRadius(mRadius),
 	  fFace(face),
-	  fShowSeconds(show)
+	  fShowSeconds(show),
+	  fInner(NULL),
+	  fCenter(NULL)
 {
+	for (short i = 0; i <= 8; i++)
+		fClockFace[i] = NULL;
+
 	status_t error;
 	BResources rsrcs;
 	error = rsrcs.SetToImage(&&dummy_label);
 dummy_label:
 	if (error == B_OK) {
-		for (short i = 0; i <= 8; i++)
-			fClockFace[i] = NULL;
-
 		size_t len;
 		void *picH;
 		BRect theRect(0, 0, 82, 82);
@@ -114,7 +116,7 @@ TOffscreenView::DrawX()
 	ASSERT(Window());
 
 	if (Window()->Lock()) {
-		if (fClockFace != NULL)
+		if (fClockFace[fFace] != NULL)
 			DrawBitmap(fClockFace[fFace], BPoint(0, 0));
 
 		//
