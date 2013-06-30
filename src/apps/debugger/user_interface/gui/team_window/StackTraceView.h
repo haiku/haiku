@@ -11,7 +11,6 @@
 #include "Team.h"
 
 
-class BMessageRunner;
 class StackFrame;
 
 
@@ -34,7 +33,7 @@ public:
 			void				LoadSettings(const BMessage& settings);
 			status_t			SaveSettings(BMessage& settings);
 
-	virtual	void				MessageReceived(BMessage* message);
+			void				SetStackTraceClearPending();
 
 private:
 			class FramesTableModel;
@@ -45,13 +44,11 @@ private:
 
 			void				_Init();
 
-			void				_SetStackTrace(StackTrace* stackTrace);
-
 private:
 			StackTrace*			fStackTrace;
 			Table*				fFramesTable;
 			FramesTableModel*	fFramesTableModel;
-			BMessageRunner*		fTraceUpdateRunner;
+			bool				fTraceClearPending;
 			Listener*			fListener;
 };
 

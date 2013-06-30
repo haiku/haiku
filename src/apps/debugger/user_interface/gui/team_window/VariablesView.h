@@ -47,6 +47,8 @@ public:
 			void				LoadSettings(const BMessage& settings);
 			status_t			SaveSettings(BMessage& settings);
 
+			void				SetStackFrameClearPending();
+
 private:
 	// TreeTableListener
 	virtual	void				TreeTableNodeExpandedChanged(TreeTable* table,
@@ -94,6 +96,7 @@ private:
 			VariablesViewState*	fPreviousViewState;
 			VariablesViewStateHistory* fViewStateHistory;
 			TableCellContextMenuTracker* fTableCellContextMenuTracker;
+			bool				fFrameClearPending;
 			Listener*			fListener;
 };
 

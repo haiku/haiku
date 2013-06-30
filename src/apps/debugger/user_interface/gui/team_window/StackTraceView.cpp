@@ -12,7 +12,6 @@
 #include <new>
 
 #include <ControlLook.h>
-#include <MessageRunner.h>
 #include <Window.h>
 
 #include "table/TableColumns.h"
@@ -23,11 +22,6 @@
 #include "StackTrace.h"
 #include "TargetAddressTableColumn.h"
 #include "UiUtils.h"
-
-
-enum {
-	MSG_CLEAR_STACK_TRACE 	= 'clst'
-};
 
 
 // #pragma mark - FramesTableModel
@@ -114,7 +108,7 @@ StackTraceView::StackTraceView(Listener* listener)
 	fStackTrace(NULL),
 	fFramesTable(NULL),
 	fFramesTableModel(NULL),
-	fTraceUpdateRunner(NULL),
+	fTraceClearPending(false),
 	fListener(listener)
 {
 	SetName("Stack Trace");
@@ -155,23 +149,19 @@ StackTraceView::UnsetListener()
 void
 StackTraceView::SetStackTrace(StackTrace* stackTrace)
 {
+	fTraceClearPending = false;
 	if (stackTrace == fStackTrace)
 		return;
 
-	if (stackTrace == NULL) {
-		if (fTraceUpdateRunner != NULL)
-			return;
+	if (fStackTrace != NULL)
+		fStackTrace->ReleaseReference();
 
-		BMessage message(MSG_CLEAR_STACK_TRACE);
-		fTraceUpdateRunner = new(std::nothrow) BMessageRunner(this,
-			message, 250000, 1);
-		if (fTraceUpdateRunner != NULL
-			&& fTraceUpdateRunner->InitCheck() == B_OK) {
-			return;
-		}
-	}
+	fStackTrace = stackTrace;
 
-	_SetStackTrace(stackTrace);
+	if (fStackTrace != NULL)
+		fStackTrace->AcquireReference();
+
+	fFramesTableModel->SetStackTrace(fStackTrace);
 }
 
 
@@ -218,37 +208,17 @@ StackTraceView::SaveSettings(BMessage& settings)
 
 
 void
-StackTraceView::MessageReceived(BMessage* message)
+StackTraceView::SetStackTraceClearPending()
 {
-	switch (message->what) {
-		case MSG_CLEAR_STACK_TRACE:
-		{
-			if (fTraceUpdateRunner != NULL)
-				_SetStackTrace(NULL);
-			break;
-		}
-		default:
-		{
-			BGroupView::MessageReceived(message);
-			break;
-		}
-	}
+	fTraceClearPending = true;
 }
 
 
 void
 StackTraceView::TableSelectionChanged(Table* table)
 {
-	if (fListener == NULL)
+	if (fListener == NULL || fTraceClearPending)
 		return;
-
-	if (fTraceUpdateRunner != NULL) {
-		// in this instance, ignore the selection change, since the
-		// stack trace for which a selection change was requested will
-		// momentarily be invalid. This case is quite unlikely to be hit
-		// anyways.
-		return;
-	}
 
 	StackFrame* frame
 		= fFramesTableModel->FrameAt(table->SelectionModel()->RowAt(0));
@@ -280,24 +250,6 @@ StackTraceView::_Init()
 
 	fFramesTable->SetSelectionMode(B_SINGLE_SELECTION_LIST);
 	fFramesTable->AddTableListener(this);
-}
-
-
-void
-StackTraceView::_SetStackTrace(StackTrace* stackTrace)
-{
-	delete fTraceUpdateRunner;
-	fTraceUpdateRunner = NULL;
-
-	if (fStackTrace != NULL)
-		fStackTrace->ReleaseReference();
-
-	fStackTrace = stackTrace;
-
-	if (fStackTrace != NULL)
-		fStackTrace->AcquireReference();
-
-	fFramesTableModel->SetStackTrace(fStackTrace);
 }
 
 

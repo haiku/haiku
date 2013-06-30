@@ -1428,6 +1428,7 @@ VariablesView::VariablesView(Listener* listener)
 	fPreviousViewState(NULL),
 	fViewStateHistory(NULL),
 	fTableCellContextMenuTracker(NULL),
+	fFrameClearPending(false),
 	fListener(listener)
 {
 	SetName("Variables");
@@ -1471,6 +1472,8 @@ VariablesView::Create(Listener* listener)
 void
 VariablesView::SetStackFrame(Thread* thread, StackFrame* stackFrame)
 {
+	fFrameClearPending = false;
+
 	if (thread == fThread && stackFrame == fStackFrame)
 		return;
 
@@ -1859,12 +1862,20 @@ VariablesView::SaveSettings(BMessage& settings)
 }
 
 
+void
+VariablesView::SetStackFrameClearPending()
+{
+	fFrameClearPending = true;
+}
 
 
 void
 VariablesView::TreeTableNodeExpandedChanged(TreeTable* table,
 	const TreeTablePath& path, bool expanded)
 {
+	if (fFrameClearPending)
+		return;
+
 	if (expanded) {
 		ModelNode* node = (ModelNode*)fVariableTableModel->NodeForPath(path);
 		if (node == NULL)
@@ -1899,6 +1910,9 @@ VariablesView::TreeTableCellMouseDown(TreeTable* table,
 	uint32 buttons)
 {
 	if ((buttons & B_SECONDARY_MOUSE_BUTTON) == 0)
+		return;
+
+	if (fFrameClearPending)
 		return;
 
 	_FinishContextMenu(true);

@@ -26,6 +26,7 @@
 class BButton;
 class BFilePanel;
 class BMenuBar;
+class BMessageRunner;
 class BSplitView;
 class BStringView;
 class BTabView;
@@ -182,6 +183,7 @@ private:
 			SourceCode*			fActiveSourceCode;
 			ActiveSourceObject	fActiveSourceObject;
 			UserInterfaceListener* fListener;
+			BMessageRunner*		fTraceUpdateRunner;
 			BTabView*			fTabView;
 			BTabView*			fLocalsTabView;
 			ThreadListView*		fThreadListView;

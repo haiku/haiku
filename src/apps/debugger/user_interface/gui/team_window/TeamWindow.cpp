@@ -19,6 +19,7 @@
 #include <MenuItem.h>
 #include <Message.h>
 #include <MessageFilter.h>
+#include <MessageRunner.h>
 #include <Path.h>
 #include <StringView.h>
 #include <TabView.h>
@@ -61,7 +62,8 @@ enum {
 enum {
 	MSG_CHOOSE_DEBUG_REPORT_LOCATION = 'ccrl',
 	MSG_DEBUG_REPORT_SAVED = 'drsa',
-	MSG_LOCATE_SOURCE_IF_NEEDED = 'lsin'
+	MSG_LOCATE_SOURCE_IF_NEEDED = 'lsin',
+	MSG_CLEAR_STACK_TRACE 	= 'clst'
 };
 
 
@@ -103,6 +105,7 @@ TeamWindow::TeamWindow(::Team* team, UserInterfaceListener* listener)
 	fActiveSourceCode(NULL),
 	fActiveSourceObject(ACTIVE_SOURCE_NONE),
 	fListener(listener),
+	fTraceUpdateRunner(NULL),
 	fTabView(NULL),
 	fLocalsTabView(NULL),
 	fThreadListView(NULL),
@@ -185,7 +188,7 @@ TeamWindow::DispatchMessage(BMessage* message, BHandler* handler)
 	// Handle function key shortcuts for stepping
 	switch (message->what) {
 		case B_KEY_DOWN:
-			if (fActiveThread != NULL) {
+			if (fActiveThread != NULL && fTraceUpdateRunner == NULL) {
 				int32 key;
 				uint32 modifiers;
 				if (message->FindInt32("key", &key) == B_OK
@@ -393,12 +396,20 @@ TeamWindow::MessageReceived(BMessage* message)
 		case MSG_THREAD_STEP_OVER:
 		case MSG_THREAD_STEP_INTO:
 		case MSG_THREAD_STEP_OUT:
-			if (fActiveThread != NULL) {
+			if (fActiveThread != NULL && fTraceUpdateRunner == NULL) {
 				fListener->ThreadActionRequested(fActiveThread->ID(),
 					message->what);
 			}
 			break;
 
+		case MSG_CLEAR_STACK_TRACE:
+		{
+			if (fTraceUpdateRunner != NULL) {
+				_SetActiveStackTrace(NULL);
+				_UpdateRunButtons();
+			}
+			break;
+		}
 		case MSG_THREAD_STATE_CHANGED:
 		{
 			int32 threadID;
@@ -729,7 +740,8 @@ void
 TeamWindow::ThreadActionRequested(::Thread* thread, uint32 action,
 	target_addr_t address)
 {
-	fListener->ThreadActionRequested(thread->ID(), action, address);
+	if (fTraceUpdateRunner == NULL)
+		fListener->ThreadActionRequested(thread->ID(), action, address);
 }
 
 
@@ -1049,6 +1061,9 @@ TeamWindow::_SetActiveImage(Image* image)
 void
 TeamWindow::_SetActiveStackTrace(StackTrace* stackTrace)
 {
+	delete fTraceUpdateRunner;
+	fTraceUpdateRunner = NULL;
+
 	if (stackTrace == fActiveStackTrace)
 		return;
 
@@ -1065,6 +1080,8 @@ TeamWindow::_SetActiveStackTrace(StackTrace* stackTrace)
 
 	if (fActiveStackTrace != NULL)
 		_SetActiveStackFrame(fActiveStackTrace->FrameAt(0));
+	else
+		_SetActiveStackFrame(NULL);
 }
 
 
@@ -1278,12 +1295,14 @@ TeamWindow::_UpdateRunButtons()
 			fStepOutButton->SetEnabled(false);
 			break;
 		case THREAD_STATE_RUNNING:
-			fRunButton->SetLabel("Debug");
-			fRunButton->SetMessage(new BMessage(MSG_THREAD_STOP));
-			fRunButton->SetEnabled(true);
-			fStepOverButton->SetEnabled(false);
-			fStepIntoButton->SetEnabled(false);
-			fStepOutButton->SetEnabled(false);
+			if (fTraceUpdateRunner == NULL) {
+				fRunButton->SetLabel("Debug");
+				fRunButton->SetMessage(new BMessage(MSG_THREAD_STOP));
+				fRunButton->SetEnabled(true);
+				fStepOverButton->SetEnabled(false);
+				fStepIntoButton->SetEnabled(false);
+				fStepOutButton->SetEnabled(false);
+			}
 			break;
 		case THREAD_STATE_STOPPED:
 			fRunButton->SetLabel("Run");
@@ -1431,6 +1450,21 @@ TeamWindow::_HandleStackTraceChanged(thread_id threadID)
 		// hold a reference until the register view has one
 
 	locker.Unlock();
+
+	if (stackTrace == NULL) {
+		if (fTraceUpdateRunner != NULL)
+			return;
+
+		BMessage message(MSG_CLEAR_STACK_TRACE);
+		fTraceUpdateRunner = new(std::nothrow) BMessageRunner(this,
+			message, 250000, 1);
+		if (fTraceUpdateRunner != NULL
+			&& fTraceUpdateRunner->InitCheck() == B_OK) {
+			fStackTraceView->SetStackTraceClearPending();
+			fVariablesView->SetStackFrameClearPending();
+			return;
+		}
+	}
 
 	_SetActiveStackTrace(stackTrace);
 }
