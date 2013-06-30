@@ -940,6 +940,13 @@ SourceView::MarkerView::Draw(BRect updateRect)
 		SetHighColor(fBreakpointOptionMarker);
 		FillEllipse(BPoint(width - 8, y), 2, 2);
 	}
+
+	float y = (maxLine + 1) * fFontInfo->lineHeight;
+	if (y < updateRect.bottom) {
+		FillRect(BRect(0.0, y, Bounds().right, updateRect.bottom),
+			B_SOLID_LOW);
+	}
+
 }
 
 
@@ -1108,9 +1115,10 @@ SourceView::TextView::Draw(BRect updateRect)
 	SourceView::MarkerManager::Marker* marker;
 	SourceView::MarkerManager::InstructionPointerMarker* ipMarker;
 	int32 markerIndex = 0;
+	float y;
 	for (int32 i = minLine; i <= maxLine; i++) {
 		SetLowColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
-		float y = i * fFontInfo->lineHeight;
+		y = i * fFontInfo->lineHeight;
 		BString lineString;
 		_FormatLine(fSourceCode->LineAt(i), lineString);
 
@@ -1139,9 +1147,15 @@ SourceView::TextView::Draw(BRect updateRect)
 		}
 
 		FillRect(BRect(kLeftTextMargin, y, Bounds().right,
-			y + fFontInfo->lineHeight), B_SOLID_LOW);
+			y + fFontInfo->lineHeight - 1), B_SOLID_LOW);
 		DrawString(lineString,
 			BPoint(kLeftTextMargin, y + fFontInfo->fontHeight.ascent));
+	}
+
+	y = (maxLine + 1) * fFontInfo->lineHeight;
+	if (y < updateRect.bottom) {
+		FillRect(BRect(0.0, y, Bounds().right, updateRect.bottom),
+			B_SOLID_LOW);
 	}
 
 	if (fSelectionStart.line != -1 && fSelectionEnd.line != -1) {
