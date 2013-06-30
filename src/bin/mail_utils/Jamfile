@@ -13,24 +13,15 @@ StdBinCommands
 	: be
 	: mail2mbox.rdef
 	;
-Package haiku-maildaemon-cvs :
-	mail2mbox :
-	boot home config bin ;
 
 StdBinCommands
 	mbox2mail.cpp
 	: be libmail.so
 	: mbox2mail.rdef
 	;
-Package haiku-maildaemon-cvs :
-	mbox2mail :
-	boot home config bin ;
 
 StdBinCommands
 	spamdbm.cpp
 	: be tracker $(TARGET_LIBSTDC++) libmail.so
 	: spamdbm.rdef
 	;
-Package haiku-maildaemon-cvs :
-	spamdbm : 
-	boot home config bin ;

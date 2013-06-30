@@ -36,8 +36,4 @@ Addon radeon.accelerant :
 	: libaccelerantscommon.a libradeon.a be
 ;
 
-Package haiku-radeon-cvs :
-	radeon.accelerant : 
-	boot home config add-ons accelerants ;
-
 Depends radeon.accelerant : radeon ;

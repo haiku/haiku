@@ -39,7 +39,3 @@ LinkAgainst ipcp : libkernelppp.a ;
 HaikuInstall install-networking
 	: /boot/home/config/add-ons/kernel/obos_network/ppp
 	: ipcp ;
-
-Package haiku-networkingkit-cvs :
-	ipcp :
-	boot home config add-ons kernel obos_network ppp ;

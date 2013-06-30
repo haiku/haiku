@@ -1,3 +1,20 @@
+rule Copy
+{
+	if $(2) {
+		SEARCH on $(2) += $(SEARCH_SOURCE) ;
+		Depends $(1) : <build>copyattr $(2) ;
+		Copy1 $(1) : <build>copyattr $(2) ;
+	}
+}
+
+
+actions Copy1
+{
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	"$(2[1])" -d "$(2[2-])" "$(1)"
+}
+
+
 rule SymLink
 {
 	# SymLink <target> : <source> : <makeDefaultDependencies> ;

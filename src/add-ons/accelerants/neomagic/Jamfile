@@ -21,10 +21,6 @@ Addon neomagic.accelerant :
 	: libneomagic_engine.a
 ;
 
-Package haiku-neomagic-cvs :
-	neomagic.accelerant :
-	boot home config add-ons accelerants ;
-
 Depends neomagic.accelerant : neomagic ;
 
 SubInclude HAIKU_TOP src add-ons accelerants neomagic engine ;

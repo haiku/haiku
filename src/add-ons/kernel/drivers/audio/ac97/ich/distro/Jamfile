@@ -1,4 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel drivers audio ac97 ich distro ;
-
-Package haiku-ich-ac97-cvs :
-	README.html install.sh uninstall.sh ;

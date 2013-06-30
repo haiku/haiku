@@ -7,9 +7,3 @@ SubDirCcFlags -DBUILD_LOADABLE ;
 KernelAddon 53c8xx :
 	53c8xx.c
 ;
-
-Package haiku-53c8xx-cvs
-	:
-	53c8xx
-	:
-	boot home config add-ons kernel busses scsi ;

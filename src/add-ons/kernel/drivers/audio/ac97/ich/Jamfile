@@ -26,10 +26,3 @@ KernelAddon ich_ac97 :
 #	:
 #	-fno-pic -D_KERNEL_MODE
 #	;
-
-Package haiku-ich-ac97-cvs :
-	ich_ac97 :
-	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-ich-ac97-cvs : audio multi ich_ac97 ;
-
-SubInclude HAIKU_TOP src add-ons kernel drivers audio ac97 ich distro ;

@@ -22,8 +22,3 @@ DoCatalogs BMPTranslator :
 	BMPTranslator.cpp
 	BMPView.cpp
 ;
-
-Package haiku-translationkit-cvs :
-	BMPTranslator :
-	boot home config add-ons Translators ;
-

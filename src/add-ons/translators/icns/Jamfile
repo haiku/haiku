@@ -88,8 +88,3 @@ DoCatalogs ICNSTranslator :
 	ICNSTranslator.h
 	ICNSTranslator.cpp
 ;
-
-Package haiku-translationkit-cvs :
-	ICNSTranslator :
-	boot home config add-ons Translators ;
-

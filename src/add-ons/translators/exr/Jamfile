@@ -28,9 +28,5 @@ DoCatalogs EXRTranslator :
 	main.cpp
 ;
 
-Package haiku-translationkit-cvs :
-	EXRTranslator :
-	boot home config add-ons Translators ;
-
 SubInclude HAIKU_TOP src add-ons translators exr openexr ;
 

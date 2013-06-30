@@ -33,8 +33,3 @@ HaikuInstall install-userland-networking
 	: traceroute
 	: installed-userland-networking
 ;
-
-Package haiku-networkingkit-cvs :
-	traceroute :
-#	boot home config bin ;
-	boot home Desktop haiku-networkingkit ;

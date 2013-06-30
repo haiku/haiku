@@ -24,10 +24,6 @@ SEARCH on [ FGristFiles
 		ScreenSaver.cpp
 	] = [ FDirName $(HAIKU_TOP) src kits screensaver ] ;
 
-Package haiku-screensaverkit-cvs :
-	screen_blanker :
-	boot home config bin ;
-
 DoCatalogs screen_blanker :
 	x-vnd.Haiku.screenblanker
 	:

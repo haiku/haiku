@@ -22,10 +22,6 @@ Addon nvidia.accelerant :
 	: libnvidia_engine.a libaccelerantscommon.a
 ;
 
-Package haiku-nvidia-cvs :
-	nvidia.accelerant : 
-	boot home config add-ons accelerants ;
-
 Depends nvidia.accelerant : nvidia ;
 
 SubInclude HAIKU_TOP src add-ons accelerants nvidia engine ;

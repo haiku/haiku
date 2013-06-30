@@ -28,8 +28,3 @@ DoCatalogs TIFFTranslator :
 	TIFFTranslator.cpp
 	TIFFView.cpp
 ;
-
-Package haiku-translationkit-cvs :
-	TIFFTranslator :
-	boot home config add-ons Translators ;
-

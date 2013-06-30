@@ -28,9 +28,3 @@ DoCatalogs GIFTranslator :
 	GIFTranslator.cpp
 	GIFView.cpp
 ;
-
-
-Package haiku-translationkit-cvs :
-	GIFTranslator :
-	boot home config add-ons Translators ;
-

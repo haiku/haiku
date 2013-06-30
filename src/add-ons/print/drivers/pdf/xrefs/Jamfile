@@ -1,9 +1,0 @@
-SubDir HAIKU_TOP src add-ons print drivers pdf xrefs ;
-
-Package haiku-pdf_writer-cvs :
-	English Deutsch :
-	boot home config settings PDF\ Writer xrefs ;	
-
-Package haiku-printingkit-cvs :
-	English Deutsch :
-	boot home config settings PDF\ Writer xrefs ;	

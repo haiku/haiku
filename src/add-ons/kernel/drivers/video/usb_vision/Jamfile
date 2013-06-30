@@ -11,14 +11,3 @@ KernelAddon usb_vision :
 	usb_vision.c
 	tracing.c
 ;
-
-# driver goes in dev/video
-
-Package haiku-usb_vision-cvs
-	:
-	usb_vision
-	:
-	boot home config add-ons kernel drivers bin ;
-
-Package haiku-usb_vision-cvs : <usb_vision!driver>usb_vision.settings.sample
-        : boot home config settings kernel drivers sample ;

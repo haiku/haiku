@@ -18,10 +18,6 @@ Addon mixer.media_addon :
 	: be media $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 ;
 
-Package haiku-mixer-cvs
-	: mixer.media_addon
-	: boot home config add-ons media ;
-
 DoCatalogs mixer.media_addon
 	:
 	x-vnd.Haiku-mixer.media_addon

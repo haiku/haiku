@@ -10,7 +10,3 @@ Addon Print\ To\ File :
 	FileSelector.cpp
 	: be tracker $(TARGET_LIBSUPC++)
 ;
-
-Package haiku-printingkit-cvs :
-	Print\ To\ File :
-	boot home config add-ons Print transport ;

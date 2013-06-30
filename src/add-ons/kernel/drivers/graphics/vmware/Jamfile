@@ -14,8 +14,3 @@ KernelAddon vmware :
 if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 	LinkAgainst vmware : $(TARGET_HAIKU_COMPATIBILITY_LIBS) ;
 }
-
-Package haiku-vmware-video-svn :
-	vmware : 
-	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-vmware-video-svn : graphics vmware ;

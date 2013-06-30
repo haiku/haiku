@@ -25,12 +25,3 @@ KernelAddon usb_scsi :
 #	tracing.c
 #	tracing_daemon.c
 #;
-
-Package haiku-usb_scsi-cvs
-	:
-	usb_scsi
-	:
-	boot home config add-ons kernel busses scsi ;
-
-Package haiku-usb_scsi-cvs : <usb_scsi!driver>usb_scsi.settings.sample
-        : boot home config settings kernel drivers sample ;

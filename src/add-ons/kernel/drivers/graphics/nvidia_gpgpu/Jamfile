@@ -8,14 +8,3 @@ UsePrivateHeaders [ FDirName graphics nvidia_gpgpu ] ;
 KernelAddon nvidia_gpgpu :
 	driver.c
 ;
-
-Package haiku-nvidia_gpgpu-cvs :
-	README.html UPDATE.html ;
-Package haiku-nvidia_gpgpu-cvs :
-	nvidia_gpgpu : 
-	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-nvidia_gpgpu-cvs : graphics nvidia_gpgpu ;
-Package haiku-nvidia_gpgpu-cvs :
-	nvidia_gpgpu.settings :
-	boot home config settings kernel drivers ;
-

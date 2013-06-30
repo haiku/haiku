@@ -26,9 +26,3 @@ DoCatalogs RAWTranslator :
 	ConfigView.cpp
 	main.cpp
 ;
-
-Package haiku-translationkit-cvs :
-	RAWTranslator
-	:
-	boot home config add-ons Translators
-	;

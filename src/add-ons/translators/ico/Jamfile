@@ -24,8 +24,3 @@ DoCatalogs ICOTranslator :
 	ConfigView.cpp
 	ICOTranslator.cpp
 ;
-
-Package haiku-translationkit-cvs :
-	ICOTranslator
-	: boot home config add-ons Translators
-	;

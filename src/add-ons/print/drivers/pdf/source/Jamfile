@@ -50,11 +50,3 @@ Addon PDF\ Writer :
 	libprintutils.a 
 	$(TARGET_LIBSUPC++)
 ;
-
-Package haiku-pdf_writer-cvs :
-	PDF\ Writer :
-	boot home config add-ons Print ;
-
-Package haiku-printingkit-cvs :
-	PDF\ Writer :
-	boot home config add-ons Print ;

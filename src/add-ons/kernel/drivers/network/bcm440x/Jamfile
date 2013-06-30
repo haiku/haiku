@@ -13,10 +13,6 @@ KernelAddon bcm440x :
 	mempool.c
 	;
 
-Package haiku-networkingkit-cvs :
-	bcm440x :
-	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-networkingkit-cvs : net bcm440x ;
 
 # Installation
 

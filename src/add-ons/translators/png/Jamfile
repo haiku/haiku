@@ -35,8 +35,3 @@ DoCatalogs PNGTranslator :
 	PNGTranslator.cpp
 	PNGView.cpp
 ;
-
-Package haiku-translationkit-cvs :
-	PNGTranslator :
-	boot home config add-ons Translators ;
-

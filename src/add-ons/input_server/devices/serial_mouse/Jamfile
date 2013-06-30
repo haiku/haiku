@@ -8,7 +8,3 @@ Addon <input>serial_mouse :
 	MouseInputDevice.cpp 
 	SerialMouse.cpp
 	: be device input_server ;
-
-Package haiku-inputkit-cvs :
-        <input>serial_mouse :
-        boot home config add-ons input_server devices ;

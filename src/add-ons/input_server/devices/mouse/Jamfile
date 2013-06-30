@@ -7,7 +7,3 @@ UsePrivateHeaders input shared ;
 Addon <input>mouse :
 	MouseInputDevice.cpp
 	: be input_server $(TARGET_LIBSUPC++) ;
-
-Package haiku-inputkit-cvs :
-        <input>mouse :
-        boot home config add-ons input_server devices ;

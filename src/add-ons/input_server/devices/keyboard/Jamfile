@@ -16,10 +16,6 @@ Addon <input>keyboard :
 
 	: input_server be libshared.a $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++) ;
 
-Package haiku-inputkit-cvs :
-	<input>keyboard :
-	boot home config add-ons input_server devices ;
-
 DoCatalogs <input>keyboard :
 	x-vnd.Haiku-KeyboardInputServerDevice
 	:

@@ -37,7 +37,3 @@ KernelAddon stack :
 # Installation
 HaikuInstall install-networking : /boot/home/config/add-ons/kernel/haiku_network
 	: stack ;
-
-Package haiku-networkingkit-cvs :
-	haiku :
-	boot home config add-ons kernel haiku_network ;

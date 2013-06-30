@@ -11,8 +11,3 @@ KernelAddon hda :
 	hda_controller.cpp
 	hda_codec.cpp
 ;
-
-Package haiku-hda-cvs :
-	hda :
-	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-hda-cvs : audio multi hda ;

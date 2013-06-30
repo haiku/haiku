@@ -34,8 +34,3 @@ HaikuInstall install-userland-networking
 	: ftp
 	: installed-userland-networking
 ;
-
-Package haiku-networkingkit-cvs :
-	ftp :
-#	boot home config bin ;
-	boot home Desktop haiku-networkingkit ;

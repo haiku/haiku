@@ -21,10 +21,6 @@ Addon skel.accelerant :
 	: libskeleton_engine.a
 ;
 
-Package haiku-skeleton-cvs :
-	skel.accelerant : 
-	boot home config add-ons accelerants ;
-
 Depends skel.accelerant : skel.driver ;
 
 SubInclude HAIKU_TOP src add-ons accelerants skeleton engine ;

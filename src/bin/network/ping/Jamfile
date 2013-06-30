@@ -22,9 +22,3 @@ HaikuInstall install-userland-networking
 	: ping
 	: installed-userland-networking
 ;
-
-Package haiku-networkingkit-cvs :
-	ping :
-#	boot home config bin ;
-	boot home Desktop haiku-networkingkit ;
-

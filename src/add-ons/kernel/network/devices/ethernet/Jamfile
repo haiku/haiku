@@ -20,7 +20,3 @@ KernelAddon ethernet :
 # Installation
 HaikuInstall install-networking : /boot/home/config/add-ons/kernel/haiku_network/devices
 	: ethernet ;
-
-Package haiku-networkingkit-cvs :
-	haiku :
-	boot home config add-ons kernel haiku_network protocols ;

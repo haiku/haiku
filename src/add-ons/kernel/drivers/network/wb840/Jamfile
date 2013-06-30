@@ -13,23 +13,6 @@ KernelAddon wb840 :
 	wb840.c
 	;
 
-Package haiku-wb840-cvs :
-	wb840 : 
-	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-wb840-cvs : net wb840 ;
-# Package haiku-wb840-cvs :
-#	wb840.settings :
-#	boot home config settings kernel drivers sample ;
-
-Package haiku-networkingkit-cvs :
-	wb840 :
-	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-networkingkit-cvs : net wb840 ;
-#Package haiku-networkingkit-cvs :
-#	wb840.settings :
-#	boot home config settings kernel drivers sample ;
-
-
 
 rule Installwb840
 {

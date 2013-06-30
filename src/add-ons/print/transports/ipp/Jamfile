@@ -25,7 +25,3 @@ ObjectReferences
 	<src!add-ons!print!transports!shared>SocketStream.o
 	<src!add-ons!print!transports!shared>DbgMsg.o
 ;
-
-Package haiku-printingkit-cvs :
-	IPP :
-	boot home config add-ons Print transport ;

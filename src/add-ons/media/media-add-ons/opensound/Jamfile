@@ -16,8 +16,3 @@ Addon opensound.media_addon :
 	OpenSoundNode.cpp
 	: be media $(TARGET_LIBSUPC++)
 ;
-
-Package haiku-opensound-cvs
-	: opensound.media_addon
-	: boot home config add-ons media ;
-

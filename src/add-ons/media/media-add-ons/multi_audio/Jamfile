@@ -20,10 +20,6 @@ Addon hmulti_audio.media_addon :
 	: be media $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 ;
 
-Package haiku-multi_audio-cvs
-	: hmulti_audio.media_addon
-	: boot home config add-ons media ;
-
 DoCatalogs hmulti_audio.media_addon
 	:
 	x-vnd.Haiku-hmulti_audio.media_addon

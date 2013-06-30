@@ -20,10 +20,6 @@ Addon nvidia_gpgpu.accelerant :
 	: libnvidia_gpgpu_engine.a
 ;
 
-Package haiku-nvidia_gpgpu-cvs :
-	nvidia_gpgpu.accelerant : 
-	boot home config add-ons accelerants ;
-
 Depends nvidia_gpgpu.accelerant : nvidia_gpgpu ;
 
 SubInclude HAIKU_TOP src add-ons accelerants nvidia_gpgpu engine ;

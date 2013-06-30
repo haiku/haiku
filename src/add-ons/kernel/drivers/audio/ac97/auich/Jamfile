@@ -14,11 +14,3 @@ KernelAddon auich :
 	multi.c
 	util.c
 ;
-
-Package haiku-auich-cvs
-	:
-	auich
-	:
-	boot home config add-ons kernel drivers bin ;
-
-PackageDriverSymLink haiku-auich-cvs : audio hmulti auich ;

@@ -24,8 +24,3 @@ BinCommand pppconfig :
 HaikuInstall install-networking
 	: [ FDirName $(HAIKU_TEST_DIR) kits net ]
 	: pppconfig ;
-
-Package haiku-networkingkit-cvs :
-	pppconfig :
-#	boot home config bin ;
-	boot home Desktop haiku-networkingkit ;

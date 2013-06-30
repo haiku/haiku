@@ -21,8 +21,3 @@ DoCatalogs TGATranslator :
 	TGATranslator.cpp
 	TGAView.cpp
 ;
-
-Package haiku-translationkit-cvs :
-	TGATranslator :
-	boot home config add-ons Translators ;
-

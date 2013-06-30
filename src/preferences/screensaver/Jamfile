@@ -27,10 +27,6 @@ SEARCH on [ FGristFiles
 		ScreenSaver.cpp
 	] = [ FDirName $(HAIKU_TOP) src kits screensaver ] ;
 
-Package haiku-screensaverkit-cvs :
-	ScreenSaver :
-	boot home Desktop haiku-screensaverkit ;
-
 DoCatalogs ScreenSaver :
 	x-vnd.Haiku-ScreenSaver
 	:

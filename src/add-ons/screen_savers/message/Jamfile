@@ -13,11 +13,6 @@ ScreenSaver Message :
 	Message.cpp : 
 	be libscreensaver.so $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++) ;
 
-Package haiku-screensaverkit-cvs :
-	Message :
-	boot home config add-ons Screen\ Savers
-;
-
 DoCatalogs Message :
 	x-vnd.Haiku-MessageScreensaver
 	:

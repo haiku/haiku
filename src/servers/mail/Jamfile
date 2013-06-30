@@ -23,13 +23,6 @@ Server mail_daemon :
 		$(TARGET_NETWORK_LIBS)
 ;
 
-Package haiku-maildaemon-cvs :
-	mail_daemon :
-	boot beos system servers ;
-
-Packages haiku-maildaemon-cvs :
-	README LICENSE HISTORY install.sh ;
-
 DoCatalogs mail_daemon :
 	x-vnd.Be-POST
 	:

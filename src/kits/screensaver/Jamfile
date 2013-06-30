@@ -15,10 +15,3 @@ SharedLibrary libscreensaver.so :
 	:
 	be game $(TARGET_LIBSUPC++)
 ;
-
-Package haiku-screensaverkit-cvs :
-	libscreensaver.so :
-	boot home config lib ;
-
-Packages haiku-screensaverkit-cvs :
-	README ;

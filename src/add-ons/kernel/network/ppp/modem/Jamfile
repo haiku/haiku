@@ -34,7 +34,3 @@ LinkAgainst modem : libkernelppp.a ;
 HaikuInstall install-networking
 	: /boot/home/config/add-ons/kernel/obos_network/ppp
 	: modem ;
-
-Package haiku-networkingkit-cvs :
-	modem :
-	boot home config add-ons kernel obos_network ppp ;

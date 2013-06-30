@@ -71,15 +71,3 @@ SEARCH on [ FGristFiles
 		multi.cpp
 		util.c
 	] = [ FDirName $(HAIKU_TOP) src add-ons kernel drivers audio echo ] ;
-
-Package haiku-echoindigo-cvs
-	:
-	echoindigo
-	:
-	boot home config add-ons kernel drivers bin ;
-
-PackageDriverSymLink haiku-echoindigo-cvs : audio hmulti echoindigo ;
-
-Package haiku-echoindigo-cvs : <echo!driver>echo.settings
-	: boot home config settings kernel drivers ;
-

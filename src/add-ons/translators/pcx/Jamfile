@@ -23,8 +23,3 @@ DoCatalogs PCXTranslator :
 	ConfigView.cpp
 	PCXTranslator.cpp
 ;
-
-Package haiku-translationkit-cvs :
-	PCXTranslator
-	: boot home config add-ons Translators
-	;

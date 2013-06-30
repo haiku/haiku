@@ -19,7 +19,3 @@ KernelAddon loopback :
 # Installation
 HaikuInstall install-networking : /boot/home/config/add-ons/kernel/haiku_network/devices
 	: loopback ;
-
-Package haiku-networkingkit-cvs :
-	haiku :
-	boot home config add-ons kernel haiku_network protocols ;

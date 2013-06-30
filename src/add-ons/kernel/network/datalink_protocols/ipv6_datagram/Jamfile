@@ -21,7 +21,3 @@ KernelAddon ipv6_datagram :
 # Installation
 HaikuInstall install-networking : /boot/home/config/add-ons/kernel/haiku_network/datalink_protocols
 	: ipv6_datagram ;
-
-Package haiku-networkingkit-cvs :
-	haiku :
-	boot home config add-ons kernel haiku_network datalink_protocols ;

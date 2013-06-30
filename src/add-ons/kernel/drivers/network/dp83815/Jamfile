@@ -10,16 +10,6 @@ KernelAddon dp83815 :
 	util.c
 	;
 
-Package haiku-dp83815-cvs :
-	dp83815 : 
-	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-dp83815-cvs : net dp83815 ;
-
-# Package haiku-dp83815-cvs :
-#	dp83815.settings :
-#	boot home config settings kernel drivers sample ;
-
-
 
 rule Installdp83815
 {
@@ -43,14 +33,3 @@ HaikuInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/dri
 	<installed>dp83815 : 
 	installed-symlink 
 ;
-
-Package haiku-networkingkit-cvs :
-	dp83815 :
-	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-networkingkit-cvs : net dp83815 ;
-
-# Package haiku-networkingkit-cvs :
-#	dp83815.settings :
-#	boot home config settings kernel drivers sample ;
-
-

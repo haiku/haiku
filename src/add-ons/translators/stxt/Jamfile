@@ -26,8 +26,4 @@ DoCatalogs STXTTranslator :
 	STXTTranslator.cpp
 	STXTView.cpp
 ;
-	
-#Package haiku-translationkit-cvs :
-#	STXTTranslator :
-#	boot home config add-ons Translators ;
 

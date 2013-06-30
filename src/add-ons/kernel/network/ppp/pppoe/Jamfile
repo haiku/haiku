@@ -34,7 +34,3 @@ LinkAgainst pppoe : libkernelppp.a ;
 HaikuInstall install-networking
 	: /boot/home/config/add-ons/kernel/obos_network/ppp
 	: pppoe ;
-
-Package haiku-networkingkit-cvs :
-	pppoe :
-	boot home config add-ons kernel obos_network ppp ;

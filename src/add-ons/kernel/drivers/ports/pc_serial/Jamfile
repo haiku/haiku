@@ -17,13 +17,3 @@ KernelAddon pc_serial :
 ;
 
 #AddResources pc_serial : pc_serial.rdef ;
-
-
-#Package haiku-pc_serial-cvs
-#	:
-#	pc_serial
-#	:
-#	boot home config add-ons kernel drivers bin ;
-#
-#Package haiku-pc_serial-cvs : <pc_serial!driver>pc_serial.settings.sample
-#        : boot home config settings kernel drivers sample ;

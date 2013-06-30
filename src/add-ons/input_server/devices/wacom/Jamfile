@@ -11,7 +11,3 @@ Addon <input>wacom :
 	PointingDeviceFactory.cpp
 	TabletDevice.cpp
 	: be input_server $(TARGET_LIBSUPC++) ;
-
-Package haiku-inputkit-cvs :
-        <input>tablet :
-        boot home config add-ons input_server devices ;

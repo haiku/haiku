@@ -41,8 +41,3 @@ DoCatalogs WonderBrushTranslator :
 	WonderBrushTranslator.cpp
 	WonderBrushView.cpp
 ;
-
-Package haiku-translationkit-cvs :
-	WonderBrushTranslator :
-	boot home config add-ons Translators ;
-

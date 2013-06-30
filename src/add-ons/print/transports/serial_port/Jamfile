@@ -11,8 +11,3 @@ Addon Serial\ Port :
 	PrintTransportAddOn.cpp
 	: be $(TARGET_LIBSUPC++)
 ;
-
-Package haiku-printingkit-cvs :
-	Serial\ Port :
-	boot home config add-ons Print transport ;
-

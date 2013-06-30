@@ -18,8 +18,3 @@ Addon intel_extreme.accelerant :
 #	overlay_3d_i965.cpp
 	: be libaccelerantscommon.a
 ;
-
-Package haiku-intel_extreme-cvs :
-	intel_extreme.accelerant :
-	boot home config add-ons accelerants ;
-

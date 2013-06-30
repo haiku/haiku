@@ -38,11 +38,6 @@ Addon POP3
 		$(TARGET_NETWORK_LIBS)
 ;
 
-Package haiku-maildaemon-cvs :
-	POP3 :
-	boot home config add-ons mail_daemon inbound_protocols
-;
-
 DoCatalogs POP3 :
 	x-vnd.Haiku-POP3
 	:

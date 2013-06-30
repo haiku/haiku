@@ -8,14 +8,6 @@ KernelAddon ipw2100 :
 	kernel_cpp.c
 	;
 
-Package haiku-ipw2100-cvs :
-	ipw2100 :
-	boot home config add-ons kernel drivers bin ;
-Package haiku-ipw2100-cvs :
-	ipw2100.settings :
-	boot home config settings kernel drivers sample ;
-PackageDriverSymLink haiku-ipw2100-cvs : net ipw2100 ;
-
 # Note: Due to licensing restrictions, we can only distribute the archive.
 # The end-user must extract and install it themselves.
 HAIKU_WIFI_FIRMWARE_PACKAGE on ipw2100 = "" ;

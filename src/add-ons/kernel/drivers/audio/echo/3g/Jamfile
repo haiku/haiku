@@ -73,16 +73,3 @@ SEARCH on [ FGristFiles
 		multi.cpp
 		util.c
 	] = [ FDirName $(HAIKU_TOP) src add-ons kernel drivers audio echo ] ;
-
-Package haiku-echo3g-cvs
-	:
-	echo3g
-	:
-	boot home config add-ons kernel drivers bin ;
-
-PackageDriverSymLink haiku-echo3g-cvs : audio hmulti echo3g ;
-PackageDriverSymLink haiku-echo3g-cvs : midi echo3g ;
-
-Package haiku-echo3g-cvs : <echo!driver>echo.settings
-	: boot home config settings kernel drivers ;
-

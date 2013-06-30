@@ -7,9 +7,3 @@ SubDirCcFlags -DBUILD_LOADABLE ;
 KernelAddon buslogic :
 	buslogic.c
 ;
-
-Package haiku-buslogic-cvs
-	:
-	buslogic
-	:
-	boot home config add-ons kernel busses scsi ;
