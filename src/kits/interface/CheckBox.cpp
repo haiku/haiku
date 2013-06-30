@@ -452,7 +452,7 @@ BSize
 BCheckBox::MaxSize()
 {
 	return BLayoutUtils::ComposeSize(ExplicitMaxSize(),
-		BSize(B_SIZE_UNLIMITED, _ValidatePreferredSize().height));
+		_ValidatePreferredSize());
 }
 
 
@@ -461,6 +461,14 @@ BCheckBox::PreferredSize()
 {
 	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(),
 		_ValidatePreferredSize());
+}
+
+
+BAlignment
+BCheckBox::LayoutAlignment()
+{
+	return BLayoutUtils::ComposeAlignment(ExplicitAlignment(),
+		BAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_UNSET));
 }
 
 
