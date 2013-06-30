@@ -184,6 +184,7 @@ private:
 			MarkerManager*		fMarkerManager;
 			StackTrace*			fStackTrace;
 			StackFrame*			fStackFrame;
+			rgb_color			fBackgroundColor;
 			rgb_color			fBreakpointOptionMarker;
 };
 
@@ -837,9 +838,9 @@ SourceView::MarkerView::MarkerView(SourceView* sourceView, Team* team,
 	fStackFrame(NULL)
 {
 	rgb_color background = ui_color(B_PANEL_BACKGROUND_COLOR);
-	fBreakpointOptionMarker = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-		B_DARKEN_1_TINT);
-	SetViewColor(tint_color(background, B_LIGHTEN_2_TINT));
+	fBreakpointOptionMarker = tint_color(background, B_DARKEN_1_TINT);
+	fBackgroundColor = tint_color(background, B_LIGHTEN_2_TINT);
+	SetViewColor(B_TRANSPARENT_COLOR);
 }
 
 
@@ -892,8 +893,11 @@ SourceView::MarkerView::MaxSize()
 void
 SourceView::MarkerView::Draw(BRect updateRect)
 {
-	if (fSourceCode == NULL)
+	SetLowColor(fBackgroundColor);
+	if (fSourceCode == NULL) {
+		FillRect(updateRect, B_SOLID_LOW);
 		return;
+	}
 
 	// get the lines intersecting with the update rect
 	int32 minLine, maxLine;
@@ -914,6 +918,7 @@ SourceView::MarkerView::Draw(BRect updateRect)
 		bool drawBreakpointOptionMarker = true;
 
 		SourceView::MarkerManager::Marker* marker;
+		FillRect(LineRect(line), B_SOLID_LOW);
 		while ((marker = markers.ItemAt(markerIndex)) != NULL
 				&& marker->Line() == (uint32)line) {
 			marker->Draw(this, LineRect(line));
