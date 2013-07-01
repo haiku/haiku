@@ -60,6 +60,8 @@ ExpanderRules::ExpanderRules()
 	_AddRule("application/x-zip-compressed", ".zip", "unzip -l %s",
 		"unzip -o %s");
 	_AddRule("application/x-rar", ".rar", "unrar v %s", "unrar x -y %s");
+	_AddRule("application/x-vnd.haiku-package", ".hpkg", "package list %s",
+		"package extract %s");
 }
 
 
