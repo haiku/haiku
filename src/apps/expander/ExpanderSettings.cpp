@@ -29,6 +29,7 @@
 #include "ExpanderSettings.h"
 
 #include <ByteOrder.h>
+#include <Directory.h>
 #include <Screen.h>
 #include <FindDirectory.h>
 #include <Entry.h>
@@ -196,6 +197,13 @@ ExpanderSettings::Open(BFile *file, int32 mode)
 	status_t error = GetSettingsDirectoryPath(path);
 	if (error != B_OK)
 		return error;
+
+	// create the directory, if file creation is requested
+	if ((mode & B_CREATE_FILE) != 0) {
+		error = create_directory(path.Path(), 0755);
+		if (error != B_OK)
+			return error;
+	}
 
 	error = path.Append("settings");
 	if (error != B_OK)
