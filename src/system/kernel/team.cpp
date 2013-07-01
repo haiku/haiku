@@ -1707,7 +1707,9 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
  	InterruptsSpinLocker teamsLocker(sTeamHashLock);
 
 	sTeamHash.Insert(team);
-	sUsedTeams++;
+	bool teamLimitReached = sUsedTeams >= sMaxTeams;
+	if (!teamLimitReached)
+		sUsedTeams++;
 
 	teamsLocker.Unlock();
 
@@ -1726,6 +1728,11 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 
 	// check the executable's set-user/group-id permission
 	update_set_id_user_and_group(team, path);
+
+	if (teamLimitReached) {
+		status = B_NO_MORE_TEAMS;
+		goto err1;
+	}
 
 	status = create_team_arg(&teamArgs, path, flatArgs, flatArgsSize, argCount,
 		envCount, (mode_t)-1, errorPort, errorToken);
@@ -1834,6 +1841,8 @@ err1:
 
 	teamsLocker.Lock();
 	sTeamHash.Remove(team);
+	if (!teamLimitReached)
+		sUsedTeams--;
 	teamsLocker.Unlock();
 
 	sNotificationService.Notify(TEAM_REMOVED, team);
@@ -2038,7 +2047,9 @@ fork_team(void)
 	InterruptsSpinLocker teamsLocker(sTeamHashLock);
 
 	sTeamHash.Insert(team);
-	sUsedTeams++;
+	bool teamLimitReached = sUsedTeams >= sMaxTeams;
+	if (!teamLimitReached)
+		sUsedTeams++;
 
 	teamsLocker.Unlock();
 
@@ -2054,6 +2065,11 @@ fork_team(void)
 	// inherit some team debug flags
 	team->debug_info.flags |= atomic_get(&parentTeam->debug_info.flags)
 		& B_TEAM_DEBUG_INHERITED_FLAGS;
+
+	if (teamLimitReached) {
+		status = B_NO_MORE_TEAMS;
+		goto err1;
+	}
 
 	forkArgs = (arch_fork_arg*)malloc(sizeof(arch_fork_arg));
 	if (forkArgs == NULL) {
@@ -2185,6 +2201,8 @@ err1:
 
 	teamsLocker.Lock();
 	sTeamHash.Remove(team);
+	if (!teamLimitReached)
+		sUsedTeams--;
 	teamsLocker.Unlock();
 
 	sNotificationService.Notify(TEAM_REMOVED, team);
