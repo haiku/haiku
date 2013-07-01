@@ -114,8 +114,14 @@ DatabaseLocation::OpenOrCreateType(const char* type, BNode& _node,
 		return error;
 
 	// write the type attribute
-	error = _node.WriteAttr(kTypeAttr, B_STRING_TYPE, 0, type,
-		strlen(type) + 1);
+	size_t toWrite = strlen(type) + 1;
+	ssize_t bytesWritten = _node.WriteAttr(kTypeAttr, B_STRING_TYPE, 0, type,
+		toWrite);
+	if (bytesWritten < 0)
+		error = bytesWritten;
+	else if ((size_t)bytesWritten != toWrite)
+		error = B_FILE_ERROR;
+
 	if (error != B_OK) {
 		_node.Unset();
 		return error;
