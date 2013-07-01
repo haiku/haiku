@@ -452,7 +452,7 @@ BSize
 BCheckBox::MaxSize()
 {
 	return BLayoutUtils::ComposeSize(ExplicitMaxSize(),
-		_ValidatePreferredSize());
+		BSize(B_SIZE_UNLIMITED, _ValidatePreferredSize().height));
 }
 
 
