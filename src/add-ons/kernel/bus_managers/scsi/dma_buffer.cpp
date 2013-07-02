@@ -313,8 +313,8 @@ dump_sg_table(const physical_entry *sg_list,
 	SHOW_FLOW(1, "count=%" B_PRIu32, sg_list_count);
 
 	for (cur_idx = sg_list_count; cur_idx >= 1; --cur_idx, ++sg_list) {
-		SHOW_FLOW(1, "addr=%" B_PRIxPHYSADDR ", size=%" B_PRIuPHYSADDR, sg_list->address,
-			sg_list->size);
+		SHOW_FLOW(1, "addr=%" B_PRIxPHYSADDR ", size=%" B_PRIuPHYSADDR,
+			sg_list->address, sg_list->size);
 	}
 }
 
