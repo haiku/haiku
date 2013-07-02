@@ -134,6 +134,7 @@ VirtioQueue::VirtioQueue(VirtioDevice* device, uint16 queueNumber,
 VirtioQueue::~VirtioQueue()
 {
 	delete_area(fArea);
+	delete[] fDescriptors;
 }
 
 
