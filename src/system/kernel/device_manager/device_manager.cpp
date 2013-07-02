@@ -1619,6 +1619,7 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 						_AddPath(*stack, "busses");
 					}
 					_AddPath(*stack, "drivers", sGenericContextPath);
+					_AddPath(*stack, "busses/scsi");					
 				}
 				break;
 		}

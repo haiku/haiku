@@ -227,7 +227,7 @@ if $(HAIKU_ATA_STACK) = 1 {
 }
 
 AddFilesToHaikuImage system add-ons kernel busses scsi
-	: ahci ;
+	: ahci virtio_scsi ;
 AddFilesToHaikuImage system add-ons kernel busses usb
 	: <usb>uhci <usb>ohci <usb>ehci ;
 AddFilesToHaikuImage system add-ons kernel busses virtio
@@ -611,7 +611,7 @@ AddBootModuleSymlinksToHaikuImage
 	ide_isa@x86
 	<usb>uhci <usb>ohci <usb>ehci
 	scsi_cd scsi_disk usb_disk
-	virtio virtio_pci virtio_block	
+	virtio virtio_pci virtio_block virtio_scsi
 	efi_gpt
 	intel
 	bfs
