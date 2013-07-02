@@ -101,6 +101,7 @@ DMAResource::DMAResource()
 
 DMAResource::~DMAResource()
 {
+	mutex_lock(&fLock);
 	mutex_destroy(&fLock);
 	free(fScratchVecs);
 
