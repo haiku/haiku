@@ -310,11 +310,11 @@ dump_sg_table(const physical_entry *sg_list,
 {
 	uint32 cur_idx;
 
-	SHOW_FLOW(1, "count=%d", (int)sg_list_count);
+	SHOW_FLOW(1, "count=%" B_PRIu32, sg_list_count);
 
 	for (cur_idx = sg_list_count; cur_idx >= 1; --cur_idx, ++sg_list) {
-		SHOW_FLOW(1, "addr=%" B_PRIxPHYSADDR ", size=%d", sg_list->address,
-			(int)sg_list->size);
+		SHOW_FLOW(1, "addr=%" B_PRIxPHYSADDR ", size=%" B_PRIuPHYSADDR, sg_list->address,
+			sg_list->size);
 	}
 }
 
@@ -403,7 +403,7 @@ scsi_get_dma_buffer(scsi_ccb *request)
 	request->sg_list = buffer->sg_list;
 	request->sg_count = buffer->sg_count;
 
-	SHOW_INFO(1, "bytes: %d", (int)request->data_length);
+	SHOW_INFO(1, "bytes: %" B_PRIu32, request->data_length);
 	SHOW_INFO0(3, "we can start now");
 
 	request->buffered = true;
@@ -433,9 +433,9 @@ scsi_release_dma_buffer(scsi_ccb *request)
 	scsi_device_info *device = request->device;
 	dma_buffer *buffer = request->dma_buffer;
 
-	SHOW_FLOW(1, "Buffering finished, %x, %x",
+	SHOW_FLOW(1, "Buffering finished, %x, %" B_PRIx32,
 		request->subsys_status & SCSI_SUBSYS_STATUS_MASK,
-		(int)(request->flags & SCSI_DIR_MASK));
+		(request->flags & SCSI_DIR_MASK));
 
 	// copy data from buffer if required and if operation succeeded
 	if ((request->subsys_status & SCSI_SUBSYS_STATUS_MASK) == SCSI_REQ_CMP
