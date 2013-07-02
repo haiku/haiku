@@ -270,12 +270,13 @@ detect_displays()
 			edid1_info* edid = &gDisplay[displayIndex]->edidData;
 			gDisplay[displayIndex]->attached
 				= ddc2_dp_read_edid1(id, edid);
-				
+
 			if (gDisplay[displayIndex]->attached) {
 				TRACE("%s: connector(%" B_PRIu32 "): Found DisplayPort EDID!\n",
 					__func__);
 			}
 		}
+
 		// TODO: Handle external DP brides - ??
 		#if 0
 		if (gConnector[id]->encoderExternal.isDPBridge == true) {
@@ -289,16 +290,6 @@ detect_displays()
 			// TODO: DDC Router switching for DisplayPort (and others?)
 		}
 		#endif
-		if (gConnector[id]->type == VIDEO_CONNECTOR_LVDS) {
-			// If plain (non-DP) laptop LVDS, read mode info from AtomBIOS
-			//TRACE("%s: non-DP laptop LVDS detected\n", __func__);
-			gDisplay[displayIndex]->attached = connector_read_mode_lvds(id,
-				&gDisplay[displayIndex]->preferredMode);
-			if (gDisplay[displayIndex]->attached) {
-				TRACE("%s: connector(%" B_PRIu32 "): found LVDS preferred "
-					"mode\n", __func__, id);
-			}
-		}
 
 		// If no display found yet, try more standard detection methods
 		if (gDisplay[displayIndex]->attached == false) {
@@ -340,6 +331,17 @@ detect_displays()
 
 					// Else... everything aligns as it should and attached = 1
 				}
+			}
+		}
+
+		// If we haven't found EDID yet and LVDS, check LVDS_Info table
+		if (gDisplay[displayIndex]->attached == false
+			&& gConnector[id]->type == VIDEO_CONNECTOR_LVDS) {
+			gDisplay[displayIndex]->attached = connector_read_mode_lvds(id,
+				&gDisplay[displayIndex]->preferredMode);
+			if (gDisplay[displayIndex]->attached) {
+				TRACE("%s: connector(%" B_PRIu32 "): using AtomBIOS LVDS_Info "
+					"preferred mode\n", __func__, id);
 			}
 		}
 
