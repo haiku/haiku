@@ -119,7 +119,11 @@ HAIKU_CONFIG_HEADERS = [ FDirName $(HAIKU_TOP) build user_config_headers ]
 # haiku target platform settings
 
 # analyze GCC version
-HAIKU_GCC_VERSION = [ FAnalyzeGCCVersion HAIKU_GCC_RAW_VERSION ] ;
+if $(HAIKU_HOST_BUILD_ONLY) = 1 {
+	HAIKU_GCC_VERSION = 0 0 0 ;
+} else {
+	HAIKU_GCC_VERSION = [ FAnalyzeGCCVersion HAIKU_GCC_RAW_VERSION ] ;
+}
 
 # enable GCC -pipe option, if requested
 if $(HAIKU_USE_GCC_PIPE) = 1 {

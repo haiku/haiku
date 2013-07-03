@@ -41,6 +41,9 @@ options:
                               default -- any other distro (default value).
   --enable-multiuser          Enable experimental multiuser support.
   --help                      Prints out this help.
+  --host-only                 Configure for building tools for the build host
+                              only. Haiku cannot be built when configured like
+                              this.
   --include-gpl-addons        Include GPL licensed add-ons.
   --include-patented-code     Enable code that is known to implemented patented
                               ideas and techniques. If this option is not
@@ -349,6 +352,7 @@ HAIKU_USE_GCC_GRAPHITE=0
 HAIKU_HOST_USE_32BIT=0
 HAIKU_HOST_USE_XATTR=0
 HAIKU_HOST_USE_XATTR_REF=0
+HAIKU_HOST_BUILD_ONLY=0
 HOST_GCC_LD=`gcc -print-prog-name=ld`
 HOST_GCC_OBJCOPY=`gcc -print-prog-name=objcopy`
 SFDISK_BINARY=sfdisk
@@ -444,6 +448,7 @@ while [ $# -gt 0 ] ; do
 			;;
 		--enable-multiuser)	HAIKU_ENABLE_MULTIUSER=1; shift 1;;
 		--help | -h)	usage; exit 0;;
+		--host-only)	HAIKU_HOST_BUILD_ONLY=1; shift 1;;
 		--include-gpl-addons)	HAIKU_INCLUDE_GPL_ADDONS=1; shift 1;;
 		--include-patented-code)	HAIKU_INCLUDE_PATENTED_CODE=1; shift 1;;
 		--include-sources)	HAIKU_INCLUDE_SOURCES=1; shift 1;;
@@ -511,46 +516,58 @@ fi
 # create output directory
 mkdir -p "$buildOutputDir" || exit 1
 
-# build cross tools from sources
-if [ -n "$buildCrossTools" ]; then
-	export HAIKU_USE_GCC_GRAPHITE
-	"$buildCrossToolsScript" $buildCrossToolsMachine "$sourceDir" \
-		"$buildCrossTools" "$outputDir" $buildCrossToolsJobs || exit 1
-	crossToolsPrefix="$outputDir/cross-tools/bin/${HAIKU_GCC_MACHINE}-"
-fi
+if [ "$HAIKU_HOST_BUILD_ONLY" = 1 ]; then
+	invalidCommand=$sourceDir/build/scripts/host_build_only
+	HAIKU_AR=$invalidCommand
+	HAIKU_CC=$invalidCommand
+	HAIKU_LD=$invalidCommand
+	HAIKU_OBJCOPY=$invalidCommand
+	HAIKU_RANLIB=$invalidCommand
+	HAIKU_ELFEDIT=$invalidCommand
+	HAIKU_YASM=$invalidCommand
+	HAIKU_STRIP=$invalidCommand
+else
+	# build cross tools from sources
+	if [ -n "$buildCrossTools" ]; then
+		export HAIKU_USE_GCC_GRAPHITE
+		"$buildCrossToolsScript" $buildCrossToolsMachine "$sourceDir" \
+			"$buildCrossTools" "$outputDir" $buildCrossToolsJobs || exit 1
+		crossToolsPrefix="$outputDir/cross-tools/bin/${HAIKU_GCC_MACHINE}-"
+	fi
 
-# cross tools
-if [ -n "$crossToolsPrefix" ]; then
-	get_build_tool_path AR ar
-	get_build_tool_path CC gcc
-	get_build_tool_path LD ld
-	get_build_tool_path OBJCOPY objcopy
-	get_build_tool_path RANLIB ranlib
-	get_build_tool_path STRIP strip
-fi
+	# cross tools
+	if [ -n "$crossToolsPrefix" ]; then
+		get_build_tool_path AR ar
+		get_build_tool_path CC gcc
+		get_build_tool_path LD ld
+		get_build_tool_path OBJCOPY objcopy
+		get_build_tool_path RANLIB ranlib
+		get_build_tool_path STRIP strip
+	fi
 
-# prepare gcc settings
-standard_gcc_settings
+	# prepare gcc settings
+	standard_gcc_settings
 
-# cross tools for gcc4 builds
-if [ -n "$crossToolsPrefix" ]; then
-	case $HAIKU_GCC_RAW_VERSION in
-		4.*)
-			get_build_tool_path ELFEDIT elfedit
-		;;
+	# cross tools for gcc4 builds
+	if [ -n "$crossToolsPrefix" ]; then
+		case $HAIKU_GCC_RAW_VERSION in
+			4.*)
+				get_build_tool_path ELFEDIT elfedit
+			;;
+		esac
+	fi
+
+	# check whether the Haiku compiler really targets Haiku or BeOS
+	case "$HAIKU_GCC_MACHINE" in
+		*-*-haiku)	;;
+		*-*-beos)	;;
+		*) echo The compiler specified as Haiku target compiler is not a valid \
+				Haiku cross-compiler. Please see ReadMe.cross-compile. >&2
+		echo compiler: $HAIKU_CC
+		echo compiler is configured for target: $HAIKU_GCC_MACHINE
+		exit 1 ;;
 	esac
 fi
-
-# check whether the Haiku compiler really targets Haiku or BeOS
-case "$HAIKU_GCC_MACHINE" in
-	*-*-haiku)	;;
-	*-*-beos)	;;
-	*) echo The compiler specified as Haiku target compiler is not a valid \
-			Haiku cross-compiler. Please see ReadMe.cross-compile. >&2
-	   echo compiler: $HAIKU_CC
-	   echo compiler is configured for target: $HAIKU_GCC_MACHINE
-	   exit 1 ;;
-esac
 
 # Generate BuildConfig
 cat << EOF > "$buildConfigFile"
@@ -573,6 +590,7 @@ HAIKU_USE_GCC_GRAPHITE				?= "${HAIKU_USE_GCC_GRAPHITE}" ;
 HAIKU_HOST_USE_32BIT				?= "${HAIKU_HOST_USE_32BIT}" ;
 HAIKU_HOST_USE_XATTR				?= "${HAIKU_HOST_USE_XATTR}" ;
 HAIKU_HOST_USE_XATTR_REF			?= "${HAIKU_HOST_USE_XATTR_REF}" ;
+HAIKU_HOST_BUILD_ONLY				?= "${HAIKU_HOST_BUILD_ONLY}" ;
 
 HAIKU_GCC_RAW_VERSION		?= ${HAIKU_GCC_RAW_VERSION} ;
 HAIKU_GCC_MACHINE			?= ${HAIKU_GCC_MACHINE} ;
