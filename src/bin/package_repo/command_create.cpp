@@ -68,7 +68,7 @@ public:
 			return;
 
 		printf("----- Repository Info Section --------------------\n");
-		printf("repository info size:    %10lu (uncompressed)\n",
+		printf("repository info size:    %10" B_PRIu32 " (uncompressed)\n",
 			uncompressedSize);
 	}
 
@@ -79,8 +79,8 @@ public:
 			return;
 
 		printf("----- Package Attribute Section -------------------\n");
-		printf("string count:            %10lu\n", stringCount);
-		printf("package attributes size: %10lu (uncompressed)\n",
+		printf("string count:            %10" B_PRIu32 "\n", stringCount);
+		printf("package attributes size: %10" B_PRIu32 " (uncompressed)\n",
 			uncompressedSize);
 	}
 
@@ -93,13 +93,15 @@ public:
 
 		printf("----- Package Repository Info -----\n");
 		if (fVerbose)
-			printf("embedded license count   %10lu\n", licenseCount);
-		printf("package count            %10lu\n", packageCount);
+			printf("embedded license count   %10" B_PRIu32 "\n", licenseCount);
+		printf("package count            %10" B_PRIu32 "\n", packageCount);
 		printf("-----------------------------------\n");
-		printf("header size:             %10lu\n", headerSize);
-		printf("repository header size:  %10lu\n", repositoryInfoSize);
-		printf("package attributes size: %10lu\n", packageAttributesSize);
-		printf("total size:              %10llu\n", totalSize);
+		printf("header size:             %10" B_PRIu32 "\n", headerSize);
+		printf("repository header size:  %10" B_PRIu32 "\n",
+			repositoryInfoSize);
+		printf("package attributes size: %10" B_PRIu32 "\n",
+			packageAttributesSize);
+		printf("total size:              %10" B_PRIu64 "\n", totalSize);
 		printf("-----------------------------------\n");
 	}
 
