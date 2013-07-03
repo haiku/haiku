@@ -21,7 +21,8 @@ public:
 								RuleFilter(BMailProtocol& protocol,
 									const BMailAddOnSettings& settings);
 
-	virtual	BMailFilterAction	HeaderFetched(entry_ref& ref, BFile& file);
+	virtual	BMailFilterAction	HeaderFetched(entry_ref& ref, BFile& file,
+									BMessage& attributes);
 
 private:
 			BString				fAttribute;

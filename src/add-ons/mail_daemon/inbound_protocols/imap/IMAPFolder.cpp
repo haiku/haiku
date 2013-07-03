@@ -231,7 +231,14 @@ IMAPFolder::MessageStored(entry_ref& ref, BFile& file, uint32 fetchFlags,
 	if ((fetchFlags & IMAP::kFetchFlags) != 0)
 		_WriteFlags(file, flags);
 
-	fProtocol.MessageStored(*this, ref, file, fetchFlags);
+	// TODO: add some utility function for this in libmail.so
+	BMessage attributes;
+	if ((flags & IMAP::kAnswered) != 0)
+		attributes.AddString(B_MAIL_ATTR_STATUS, "Answered");
+	else if ((flags & IMAP::kSeen) != 0)
+		attributes.AddString(B_MAIL_ATTR_STATUS, "Read");
+
+	fProtocol.MessageStored(*this, ref, file, fetchFlags, attributes);
 	file.Unset();
 
 	fRefMap.insert(std::make_pair(uid, ref));
@@ -282,7 +289,8 @@ IMAPFolder::StoreBody(uint32 uid, BDataIO& stream, size_t& length,
 void
 IMAPFolder::BodyStored(entry_ref& ref, BFile& file, uint32 uid)
 {
-	fProtocol.MessageStored(*this, ref, file, IMAP::kFetchBody);
+	BMessage attributes;
+	fProtocol.MessageStored(*this, ref, file, IMAP::kFetchBody, attributes);
 	file.Unset();
 }
 

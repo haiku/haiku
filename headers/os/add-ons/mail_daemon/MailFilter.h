@@ -21,8 +21,10 @@ public:
 	virtual						~BMailFilter();
 
 	// Message hooks if filter is installed to an inbound protocol
-	virtual	BMailFilterAction	HeaderFetched(entry_ref& ref, BFile& file);
-	virtual	void				BodyFetched(const entry_ref& ref, BFile& file);
+	virtual	BMailFilterAction	HeaderFetched(entry_ref& ref, BFile& file,
+									BMessage& attributes);
+	virtual	void				BodyFetched(const entry_ref& ref, BFile& file,
+									BMessage& attributes);
 	virtual void				MailboxSynchronized(status_t status);
 
 	// Message hooks if filter is installed to an outbound protocol

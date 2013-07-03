@@ -36,7 +36,7 @@ public:
 
 			void				MessageStored(IMAPFolder& folder,
 									entry_ref& ref, BFile& stream,
-									uint32 fetchFlags);
+									uint32 fetchFlags, BMessage& attributes);
 
 	virtual	status_t			SyncMessages();
 	virtual status_t			FetchBody(const entry_ref& ref);

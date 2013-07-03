@@ -203,13 +203,10 @@ POP3Protocol::SyncMessages()
 			break;
 		}
 		BMailMessageIO mailIO(this, &file, toRetrieve);
+		BMessage attributes;
 
 		entry_ref ref;
 		entry.GetRef(&ref);
-
-		// the ref becomes invalid after renaming the file thus we already
-		// write the status here
-		MarkMessageAsRead(ref, B_UNREAD);
 
 		int32 size = MessageSize(toRetrieve);
 		if (fFetchBodyLimit < 0 || size <= fFetchBodyLimit) {
@@ -218,8 +215,7 @@ POP3Protocol::SyncMessages()
 				printf("POP3: Failed to download body %s\n ", uid);
 				break;
 			}
-			ProcessHeaderFetched(ref, file);
-			NotifyBodyFetched(ref, file);
+			ProcessMessageFetched(ref, file, attributes);
 
 			if (!leaveOnServer)
 				Delete(toRetrieve);
@@ -230,7 +226,7 @@ POP3Protocol::SyncMessages()
 				printf("POP3: Failed to download header %s\n ", uid);
 				break;
 			}
-			ProcessHeaderFetched(ref, file);
+			ProcessHeaderFetched(ref, file, attributes);
 		}
 		ReportProgress(1, 0);
 
@@ -302,7 +298,8 @@ POP3Protocol::FetchBody(const entry_ref& ref)
 		return status;
 	}
 
-	NotifyBodyFetched(ref, file);
+	BMessage attributes;
+	NotifyBodyFetched(ref, file, attributes);
 
 	if (!leaveOnServer)
 		Delete(toRetrieve);

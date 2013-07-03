@@ -18,8 +18,10 @@ public:
 									const BMailAddOnSettings& settings);
 	virtual						~SpamFilter();
 
-	virtual	BMailFilterAction	HeaderFetched(entry_ref& ref, BFile& file);
-	virtual	void				BodyFetched(const entry_ref& ref, BFile& file);
+	virtual	BMailFilterAction	HeaderFetched(entry_ref& ref, BFile& file,
+									BMessage& attributes);
+	virtual	void				BodyFetched(const entry_ref& ref, BFile& file,
+									BMessage& attributes);
 
 private:
 			status_t			_CheckForSpam(BFile& file);

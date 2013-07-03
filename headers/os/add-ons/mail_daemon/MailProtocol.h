@@ -95,9 +95,11 @@ protected:
 
 			// Filter notifications
 			BMailFilterAction	ProcessHeaderFetched(entry_ref& ref,
-									BFile& mail);
+									BFile& mail, BMessage& attributes);
 			void				NotifyBodyFetched(const entry_ref& ref,
-									BFile& mail);
+									BFile& mail, BMessage& attributes);
+			BMailFilterAction	ProcessMessageFetched(entry_ref& ref,
+									BFile& mail, BMessage& attributes);
 			void				NotifyMessageReadyToSend(const entry_ref& ref,
 									BFile& mail);
 			void				NotifyMessageSent(const entry_ref& ref,
@@ -108,6 +110,10 @@ protected:
 
 private:
 			BMailFilter*		_LoadFilter(const BMailAddOnSettings& settings);
+			BMailFilterAction	_ProcessHeaderFetched(entry_ref& ref,
+									BFile& mail, BMessage& attributes);
+			void				_NotifyBodyFetched(const entry_ref& ref,
+									BFile& mail, BMessage& attributes);
 
 protected:
 			const BMailAccountSettings fAccountSettings;

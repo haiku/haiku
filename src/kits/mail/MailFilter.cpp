@@ -22,14 +22,15 @@ BMailFilter::~BMailFilter()
 
 
 BMailFilterAction
-BMailFilter::HeaderFetched(entry_ref& ref, BFile& file)
+BMailFilter::HeaderFetched(entry_ref& ref, BFile& file, BMessage& attributes)
 {
 	return B_NO_MAIL_ACTION;
 }
 
 
 void
-BMailFilter::BodyFetched(const entry_ref& ref, BFile& file)
+BMailFilter::BodyFetched(const entry_ref& ref, BFile& file,
+	BMessage& attributes)
 {
 }
 

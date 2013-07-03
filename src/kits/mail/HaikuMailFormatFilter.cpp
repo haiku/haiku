@@ -16,7 +16,6 @@
 #include <NodeInfo.h>
 
 #include <mail_util.h>
-#include <NodeMessage.h>
 
 
 struct mail_header_field {
@@ -98,11 +97,11 @@ HaikuMailFormatFilter::DescriptiveName() const
 
 
 BMailFilterAction
-HaikuMailFormatFilter::HeaderFetched(entry_ref& ref, BFile& file)
+HaikuMailFormatFilter::HeaderFetched(entry_ref& ref, BFile& file,
+	BMessage& attributes)
 {
 	file.Seek(0, SEEK_SET);
 
-	BMessage attributes;
 	// TODO: attributes.AddInt32(B_MAIL_ATTR_CONTENT, length);
 	attributes.AddInt32(B_MAIL_ATTR_ACCOUNT_ID, fAccountID);
 	attributes.AddString(B_MAIL_ATTR_ACCOUNT, fAccountName);
@@ -196,11 +195,10 @@ HaikuMailFormatFilter::HeaderFetched(entry_ref& ref, BFile& file)
 	_RemoveLeadingDots(name);
 		// Avoid files starting with a dot.
 
-	file << attributes;
+	if (!attributes.HasString(B_MAIL_ATTR_STATUS))
+		attributes.AddString(B_MAIL_ATTR_STATUS, "New");
 
-	// TODO: find a way to not set that twice for each complete mail
-	BNodeInfo info(&file);
-	info.SetType(B_PARTIAL_MAIL_TYPE);
+	_SetType(attributes, B_PARTIAL_MAIL_TYPE);
 
 	ref.set_name(name.String());
 
@@ -209,10 +207,10 @@ HaikuMailFormatFilter::HeaderFetched(entry_ref& ref, BFile& file)
 
 
 void
-HaikuMailFormatFilter::BodyFetched(const entry_ref& ref, BFile& file)
+HaikuMailFormatFilter::BodyFetched(const entry_ref& ref, BFile& file,
+	BMessage& attributes)
 {
-	BNodeInfo info(&file);
-	info.SetType(B_MAIL_TYPE);
+	_SetType(attributes, B_MAIL_TYPE);
 }
 
 
@@ -306,4 +304,12 @@ HaikuMailFormatFilter::_ExtractName(const BString& from)
 		name.Truncate(name.Length() - 1, true);
 	name.Trim();
 	return name;
+}
+
+
+status_t
+HaikuMailFormatFilter::_SetType(BMessage& attributes, const char* mimeType)
+{
+	return attributes.SetData("BEOS:TYPE", B_MIME_STRING_TYPE, mimeType,
+		strlen(mimeType) + 1, false);
 }

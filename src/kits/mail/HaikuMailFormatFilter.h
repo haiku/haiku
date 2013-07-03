@@ -18,8 +18,10 @@ public:
 
 	virtual BString				DescriptiveName() const;
 
-			BMailFilterAction	HeaderFetched(entry_ref& ref, BFile& file);
-			void				BodyFetched(const entry_ref& ref, BFile& file);
+			BMailFilterAction	HeaderFetched(entry_ref& ref, BFile& file,
+									BMessage& attributes);
+			void				BodyFetched(const entry_ref& ref, BFile& file,
+									BMessage& attributes);
 
 			void				MessageSent(const entry_ref& ref, BFile& file);
 
@@ -27,6 +29,8 @@ private:
 			void				_RemoveExtraWhitespace(BString& name);
 			void				_RemoveLeadingDots(BString& name);
 			BString				_ExtractName(const BString& from);
+			status_t			_SetType(BMessage& attributes,
+									const char* mimeType);
 
 private:
 			int32				fAccountID;

@@ -3194,20 +3194,21 @@ BMessage::GetString(const char* name, int32 index,
 status_t
 BMessage::SetString(const char* name, const BString& value)
 {
-	return SetData(name, B_STRING_TYPE, value.String(), value.Length() + 1);
+	return SetData(name, B_STRING_TYPE, value.String(), value.Length() + 1,
+		false);
 }
 
 
 status_t
 BMessage::SetString(const char* name, const char* value)
 {
-	return SetData(name, B_STRING_TYPE, value, strlen(value) + 1);
+	return SetData(name, B_STRING_TYPE, value, strlen(value) + 1, false);
 }
 
 
 status_t
 BMessage::SetData(const char* name, type_code type, const void* data,
-	ssize_t numBytes)
+	ssize_t numBytes, bool fixedSize, int count)
 {
 	if (numBytes <= 0 || data == NULL)
 		return B_BAD_VALUE;
@@ -3215,5 +3216,5 @@ BMessage::SetData(const char* name, type_code type, const void* data,
 	if (ReplaceData(name, type, data, numBytes) == B_OK)
 		return B_OK;
 
-	return AddData(name, type, data, numBytes);
+	return AddData(name, type, data, numBytes, fixedSize, count);
 }

@@ -67,7 +67,7 @@ SpamFilter::~SpamFilter()
 
 
 BMailFilterAction
-SpamFilter::HeaderFetched(entry_ref& ref, BFile& file)
+SpamFilter::HeaderFetched(entry_ref& ref, BFile& file, BMessage& attributes)
 {
 	_CheckForSpam(file);
 	return B_NO_MAIL_ACTION;
@@ -75,7 +75,7 @@ SpamFilter::HeaderFetched(entry_ref& ref, BFile& file)
 
 
 void
-SpamFilter::BodyFetched(const entry_ref& ref, BFile& file)
+SpamFilter::BodyFetched(const entry_ref& ref, BFile& file, BMessage& attributes)
 {
 	if (fHeaderOnly)
 		return;
@@ -85,7 +85,7 @@ SpamFilter::BodyFetched(const entry_ref& ref, BFile& file)
 	// untrain the partial part before training on the complete message, but we
 	// don't know how big it was, so instead just ignore the message.
 	attr_info attributeInfo;
-	if (file.GetAttrInfo ("MAIL:classification", &attributeInfo) == B_OK)
+	if (file.GetAttrInfo("MAIL:classification", &attributeInfo) == B_OK)
 		return;
 
 	_CheckForSpam(file);

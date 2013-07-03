@@ -57,7 +57,7 @@ RuleFilter::RuleFilter(BMailProtocol& protocol,
 
 
 BMailFilterAction
-RuleFilter::HeaderFetched(entry_ref& ref, BFile& file)
+RuleFilter::HeaderFetched(entry_ref& ref, BFile& file, BMessage& attributes)
 {
 	// That field doesn't exist? NO match
 	if (fAttribute == "")
@@ -68,16 +68,8 @@ RuleFilter::HeaderFetched(entry_ref& ref, BFile& file)
 		|| info.type != B_STRING_TYPE)
 		return B_NO_MAIL_ACTION;
 
-	char* buffer = new char[info.size];
-	if (file.ReadAttr(fAttribute, B_STRING_TYPE, 0, buffer, info.size) < 0) {
-		delete[] buffer;
-		return B_NO_MAIL_ACTION;
-	}
-
-	BString data = buffer;
-	delete[] buffer;
-
-	if (!fMatcher.Match(data)) {
+	BString data = attributes.GetString(fAttribute.String(), NULL);
+	if (data.IsEmpty() || !fMatcher.Match(data)) {
 		// We're not supposed to do anything
 		return B_NO_MAIL_ACTION;
 	}

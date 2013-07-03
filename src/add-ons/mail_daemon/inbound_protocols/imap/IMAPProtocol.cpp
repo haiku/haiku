@@ -124,15 +124,16 @@ IMAPProtocol::WorkerQuit(IMAPConnectionWorker* worker)
 
 void
 IMAPProtocol::MessageStored(IMAPFolder& folder, entry_ref& ref, BFile& stream,
-	uint32 fetchFlags)
+	uint32 fetchFlags, BMessage& attributes)
 {
-	if ((fetchFlags & IMAP::kFetchHeader) != 0) {
-		BMailFilterAction action = ProcessHeaderFetched(ref, stream);
-		if (action < B_OK || action == B_DELETE_MAIL_ACTION)
-			return;
+	if ((fetchFlags & (IMAP::kFetchHeader | IMAP::kFetchBody))
+			== IMAP::kFetchHeader | IMAP::kFetchBody) {
+		ProcessMessageFetched(ref, stream, attributes);
+	} else if ((fetchFlags & IMAP::kFetchHeader) != 0) {
+		ProcessHeaderFetched(ref, stream, attributes);
+	} else if ((fetchFlags & IMAP::kFetchBody) != 0) {
+		NotifyBodyFetched(ref, stream, attributes);
 	}
-	if ((fetchFlags & IMAP::kFetchBody) != 0)
-		NotifyBodyFetched(ref, stream);
 }
 
 

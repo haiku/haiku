@@ -32,6 +32,7 @@
 
 #include <mail_util.h>
 #include <MailPrivate.h>
+#include <NodeMessage.h>
 
 #include "HaikuMailFormatFilter.h"
 
@@ -210,83 +211,53 @@ BMailProtocol::NotifyNewMessagesToFetch(int32 count)
 
 
 BMailFilterAction
-BMailProtocol::ProcessHeaderFetched(entry_ref& ref, BFile& data)
+BMailProtocol::ProcessHeaderFetched(entry_ref& ref, BFile& file,
+	BMessage& attributes)
 {
-	entry_ref outRef = ref;
+	BMailFilterAction action = _ProcessHeaderFetched(ref, file, attributes);
+	if (action >= B_OK && action != B_DELETE_MAIL_ACTION)
+		file << attributes;
 
-	for (int i = 0; i < fFilterList.CountItems(); i++) {
-		BMailFilterAction action = fFilterList.ItemAt(i)->HeaderFetched(outRef,
-			data);
-		if (action == B_DELETE_MAIL_ACTION) {
-			// We have to delete the message
-			BEntry entry(&ref);
-			status_t status = entry.Remove();
-			if (status != B_OK) {
-				fprintf(stderr, "BMailProtocol::NotifyHeaderFetched(): could "
-					"not delete mail: %s\n", strerror(status));
-			}
-			return B_DELETE_MAIL_ACTION;
-		}
-	}
-
-	if (ref == outRef)
-		return B_NO_MAIL_ACTION;
-
-	// We have to rename the file
-	node_ref newParentRef;
-	newParentRef.device = outRef.device;
-	newParentRef.node = outRef.directory;
-
-	BDirectory newParent(&newParentRef);
-	status_t status = newParent.InitCheck();
-	BString workerName;
-	if (status == B_OK) {
-		int32 uniqueNumber = 1;
-		do {
-			workerName = outRef.name;
-			if (uniqueNumber > 1)
-				workerName << "_" << ++uniqueNumber;
-
-			// TODO: support copying to another device!
-			BEntry entry(&ref);
-			status = entry.Rename(workerName);
-		} while (status == B_FILE_EXISTS);
-	}
-
-	if (status != B_OK) {
-		fprintf(stderr, "BMailProtocol::NotifyHeaderFetched(): could not "
-			"rename mail (%s)! (should be: %s)\n", strerror(status),
-			workerName.String());
-	}
-
-	ref = outRef;
-	ref.set_name(workerName.String());
-
-	return B_MOVE_MAIL_ACTION;
+	return action;
 }
 
 
 void
-BMailProtocol::NotifyBodyFetched(const entry_ref& ref, BFile& data)
+BMailProtocol::NotifyBodyFetched(const entry_ref& ref, BFile& file,
+	BMessage& attributes)
 {
-	for (int i = 0; i < fFilterList.CountItems(); i++)
-		fFilterList.ItemAt(i)->BodyFetched(ref, data);
+	_NotifyBodyFetched(ref, file, attributes);
+	file << attributes;
+}
+
+
+BMailFilterAction
+BMailProtocol::ProcessMessageFetched(entry_ref& ref, BFile& file,
+	BMessage& attributes)
+{
+	BMailFilterAction action = _ProcessHeaderFetched(ref, file, attributes);
+	if (action >= B_OK && action != B_DELETE_MAIL_ACTION) {
+		_NotifyBodyFetched(ref, file, attributes);
+		file << attributes;
+	}
+
+	return action;
 }
 
 
 void
-BMailProtocol::NotifyMessageReadyToSend(const entry_ref& ref, BFile& data)
+BMailProtocol::NotifyMessageReadyToSend(const entry_ref& ref, BFile& file)
 {
 	for (int i = 0; i < fFilterList.CountItems(); i++)
-		fFilterList.ItemAt(i)->MessageReadyToSend(ref, data);
+		fFilterList.ItemAt(i)->MessageReadyToSend(ref, file);
 }
 
 
 void
-BMailProtocol::NotifyMessageSent(const entry_ref& ref, BFile& data)
+BMailProtocol::NotifyMessageSent(const entry_ref& ref, BFile& file)
 {
 	for (int i = 0; i < fFilterList.CountItems(); i++)
-		fFilterList.ItemAt(i)->MessageSent(ref, data);
+		fFilterList.ItemAt(i)->MessageSent(ref, file);
 }
 
 
@@ -328,6 +299,75 @@ BMailProtocol::_LoadFilter(const BMailAddOnSettings& settings)
 
 	fFilterImages[ref] = image;
 	return instantiateFilter(*this, settings);
+}
+
+
+BMailFilterAction
+BMailProtocol::_ProcessHeaderFetched(entry_ref& ref, BFile& file,
+	BMessage& attributes)
+{
+	entry_ref outRef = ref;
+
+	for (int i = 0; i < fFilterList.CountItems(); i++) {
+		BMailFilterAction action = fFilterList.ItemAt(i)->HeaderFetched(outRef,
+			file, attributes);
+		if (action == B_DELETE_MAIL_ACTION) {
+			// We have to delete the message
+			BEntry entry(&ref);
+			status_t status = entry.Remove();
+			if (status != B_OK) {
+				fprintf(stderr, "BMailProtocol::NotifyHeaderFetched(): could "
+					"not delete mail: %s\n", strerror(status));
+			}
+			return B_DELETE_MAIL_ACTION;
+		}
+	}
+
+	if (ref == outRef)
+		return B_NO_MAIL_ACTION;
+
+	// We have to rename the file
+	node_ref newParentRef;
+	newParentRef.device = outRef.device;
+	newParentRef.node = outRef.directory;
+
+	BDirectory newParent(&newParentRef);
+	status_t status = newParent.InitCheck();
+	BString workerName;
+	if (status == B_OK) {
+		int32 uniqueNumber = 1;
+		do {
+			workerName = outRef.name;
+			if (uniqueNumber > 1)
+				workerName << "_" << uniqueNumber;
+
+			// TODO: support copying to another device!
+			BEntry entry(&ref);
+			status = entry.Rename(workerName);
+
+			uniqueNumber++;
+		} while (status == B_FILE_EXISTS);
+	}
+
+	if (status != B_OK) {
+		fprintf(stderr, "BMailProtocol::NotifyHeaderFetched(): could not "
+			"rename mail (%s)! (should be: %s)\n", strerror(status),
+			workerName.String());
+	}
+
+	ref = outRef;
+	ref.set_name(workerName.String());
+
+	return B_MOVE_MAIL_ACTION;
+}
+
+
+void
+BMailProtocol::_NotifyBodyFetched(const entry_ref& ref, BFile& file,
+	BMessage& attributes)
+{
+	for (int i = 0; i < fFilterList.CountItems(); i++)
+		fFilterList.ItemAt(i)->BodyFetched(ref, file, attributes);
 }
 
 

@@ -489,7 +489,8 @@ public:
 			status_t			SetRect(const char* name, const BRect& value);
 			status_t			SetSize(const char* name, const BSize& value);
 			status_t			SetData(const char* name, type_code type,
-									const void* data, ssize_t numBytes);
+									const void* data, ssize_t numBytes,
+									bool fixedSize = true, int count = 1);
 
 	class Private;
 	struct message_header;
