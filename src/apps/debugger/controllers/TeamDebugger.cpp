@@ -1270,6 +1270,18 @@ TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 			TRACE_EVENTS("B_DEBUGGER_MESSAGE_POST_SYSCALL: syscall: %"
 				B_PRIu32 "\n", postSyscallEvent->GetSyscallInfo().Syscall());
 			handled = _HandlePostSyscall(postSyscallEvent);
+
+			// if a thread was blocked in a syscall when we requested to
+			// stop it for debugging, then that request will interrupt
+			// said call, and the post syscall event will be all we get
+			// in response. Consequently, we need to treat this case as
+			// equivalent to having received a thread debugged event.
+			AutoLocker< ::Team> teamLocker(fTeam);
+			::Thread* thread = fTeam->ThreadByID(event->Thread());
+			if (handler != NULL && thread != NULL
+				&& thread->StopRequestPending()) {
+				handled = handler->HandleThreadDebugged(NULL);
+			}
 			break;
 		}
 		case B_DEBUGGER_MESSAGE_PRE_SYSCALL:
