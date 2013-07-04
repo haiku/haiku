@@ -13,6 +13,7 @@
 #include <dirent.h>
 
 #include <Entry.h>
+#include <package/RepositoryCache.h>
 #include <Path.h>
 
 #include <AutoDeleter.h>
@@ -44,6 +45,20 @@ RepositoryBuilder::RepositoryBuilder(BSolverRepository& repository,
 	status_t error = fRepository.SetTo(config);
 	if (error != B_OK)
 		DIE(error, "failed to init %s repository", fErrorName.String());
+}
+
+
+RepositoryBuilder::RepositoryBuilder(BSolverRepository& repository,
+	const BRepositoryCache& cache, const BString& errorName)
+	:
+	fRepository(repository),
+	fErrorName(errorName.IsEmpty() ? cache.Info().Name() : errorName),
+	fPackagePaths(NULL)
+{
+	status_t error = fRepository.SetTo(cache);
+	if (error != B_OK)
+		DIE(error, "failed to init %s repository", fErrorName.String());
+	fErrorName = fRepository.Name();
 }
 
 

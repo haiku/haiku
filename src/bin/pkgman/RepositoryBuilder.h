@@ -33,6 +33,9 @@ public:
 									const BString& errorName = BString());
 								RepositoryBuilder(BSolverRepository& repository,
 									const BRepositoryConfig& config);
+								RepositoryBuilder(BSolverRepository& repository,
+									const BRepositoryCache& cache,
+									const BString& errorName = BString());
 
 			RepositoryBuilder&	SetPackagePathMap(PackagePathMap* packagePaths);
 
