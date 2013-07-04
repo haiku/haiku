@@ -252,6 +252,37 @@ find_dir_entry(const char *path, NodeRef ref, string &name, bool skipDot)
 	return error;
 }
 
+
+static bool
+guess_normalized_dir_path(string path, NodeRef ref, string& _normalizedPath)
+{
+	// We assume the CWD is normalized and hope that the directory is an
+	// ancestor of it. We just chop off path components until we find a match or
+	// hit root.
+	char cwd[B_PATH_NAME_LENGTH];
+	if (getcwd(cwd, sizeof(cwd)) == NULL)
+		return false;
+
+	while (cwd[0] == '/') {
+		struct stat st;
+		if (stat(cwd, &st) == 0) {
+			if (st.st_dev == ref.device && st.st_ino == ref.node) {
+				_normalizedPath = cwd;
+				return true;
+			}
+		}
+
+		*strrchr(cwd, '/') = '\0';
+	}
+
+	// TODO: If path is absolute, we could also try to work with that, though
+	// the other way around -- trying prefixes until we hit a "." or ".."
+	// component.
+
+	return false;
+}
+
+
 // normalize_dir_path
 static status_t
 normalize_dir_path(string path, NodeRef ref, string &normalizedPath)
@@ -274,8 +305,19 @@ normalize_dir_path(string path, NodeRef ref, string &normalizedPath)
 	// find the entry
 	string name;
 	status_t error = find_dir_entry(path.c_str(), ref, name, true)				;
-	if (error != B_OK)
+	if (error != B_OK) {
+		if (error != B_ENTRY_NOT_FOUND) {
+			// We couldn't open the directory. This might be because we don't
+			// have read permission. We're OK with not fully normalizing the
+			// path and try to guess the path in this case. Note: We don't check
+			// error for B_PERMISSION_DENIED, since opendir() may clobber the
+			// actual kernel error code with something not helpful.
+			if (guess_normalized_dir_path(path, ref, normalizedPath))
+				return B_OK;
+		}
+
 		return error;
+	}
 
 	// recurse to get the parent dir path, if found
 	error = normalize_dir_path(path, parentRef, normalizedPath);
