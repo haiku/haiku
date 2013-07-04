@@ -38,6 +38,7 @@ struct BBox::LayoutData {
 	BSize	min;
 	BSize	max;
 	BSize	preferred;
+	BAlignment alignment;
 	bool	valid;			// validity the other fields
 };
 
@@ -540,6 +541,17 @@ BBox::PreferredSize()
 }
 
 
+BAlignment
+BBox::LayoutAlignment()
+{
+	_ValidateLayoutData();
+
+	BAlignment alignment = (GetLayout() ? GetLayout()->Alignment()
+			: fLayoutData->alignment);
+	return BLayoutUtils::ComposeAlignment(ExplicitAlignment(), alignment);
+}
+
+
 void
 BBox::LayoutInvalidated(bool descendants)
 {
@@ -849,6 +861,8 @@ BBox::_ValidateLayoutData()
 	else
 		minWidth = addWidth - 1;
 
+	BAlignment alignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER);
+
 	// finally consider the child constraints, if we shall support layout
 	BView* child = _Child();
 	if (child && (Flags() & B_SUPPORTS_LAYOUT)) {
@@ -870,10 +884,19 @@ BBox::_ValidateLayoutData()
 		fLayoutData->min = min;
 		fLayoutData->max = max;
 		fLayoutData->preferred = preferred;
+
+		BAlignment childAlignment = child->LayoutAlignment();
+		if (childAlignment.horizontal == B_ALIGN_USE_FULL_WIDTH)
+			alignment.horizontal = B_ALIGN_USE_FULL_WIDTH;
+		if (childAlignment.vertical == B_ALIGN_USE_FULL_HEIGHT)
+			alignment.vertical = B_ALIGN_USE_FULL_HEIGHT;
+
+		fLayoutData->alignment = alignment;
 	} else {
 		fLayoutData->min.Set(minWidth, addHeight - 1);
 		fLayoutData->max.Set(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED);
 		fLayoutData->preferred = fLayoutData->min;
+		fLayoutData->alignment = alignment;
 	}
 
 	fLayoutData->valid = true;

@@ -70,6 +70,7 @@ class BBox : public BView {
 		virtual	BSize		MinSize();
 		virtual	BSize		MaxSize();
 		virtual	BSize		PreferredSize();
+		virtual	BAlignment	LayoutAlignment();
 
 	protected:
 		virtual	void		LayoutInvalidated(bool descendants = false);
