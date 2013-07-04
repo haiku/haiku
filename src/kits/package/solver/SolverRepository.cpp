@@ -247,7 +247,7 @@ BSolverRepository::PackageAt(int32 index) const
 
 status_t
 BSolverRepository::AddPackage(const BPackageInfo& info,
-	BSolverPackage** _package = NULL)
+	BSolverPackage** _package)
 {
 	BSolverPackage* package = new(std::nothrow) BSolverPackage(this, info);
 	if (package == NULL || !fPackages.AddItem(package)) {
