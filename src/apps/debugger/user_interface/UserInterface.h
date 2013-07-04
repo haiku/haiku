@@ -106,6 +106,8 @@ public:
 									UserBreakpoint* breakpoint) = 0;
 									// TODO: Consolidate those!
 
+	virtual	void				SetStopOnImageLoadRequested(bool enabled) = 0;
+
 	virtual	void				SetWatchpointRequested(target_addr_t address,
 									uint32 type, int32 length,
 									bool enabled) = 0;

@@ -15,6 +15,7 @@
 #include <Entry.h>
 #include <Message.h>
 
+#include <AutoDeleter.h>
 #include <AutoLocker.h>
 
 #include "debug_utils.h"
@@ -222,7 +223,8 @@ TeamDebugger::TeamDebugger(Listener* listener, UserInterface* userInterface,
 	fTerminating(false),
 	fKillTeamOnQuit(false),
 	fCommandLineArgc(0),
-	fCommandLineArgv(NULL)
+	fCommandLineArgv(NULL),
+	fStopOnImageLoad(false)
 {
 	fUserInterface->AcquireReference();
 }
@@ -603,6 +605,16 @@ TeamDebugger::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case MSG_STOP_ON_IMAGE_LOAD:
+		{
+			bool enabled;
+			if (message->FindBool("enabled", &enabled) != B_OK)
+				break;
+
+			fStopOnImageLoad = enabled;
+			break;
+		}
+
 		case MSG_SET_WATCHPOINT:
 		case MSG_CLEAR_WATCHPOINT:
 		{
@@ -882,6 +894,15 @@ TeamDebugger::ClearBreakpointRequested(target_addr_t address)
 {
 	BMessage message(MSG_CLEAR_BREAKPOINT);
 	message.AddUInt64("address", (uint64)address);
+	PostMessage(&message);
+}
+
+
+void
+TeamDebugger::SetStopOnImageLoadRequested(bool enabled)
+{
+	BMessage message(MSG_STOP_ON_IMAGE_LOAD);
+	message.AddBool("enabled", enabled);
 	PostMessage(&message);
 }
 
@@ -1502,9 +1523,16 @@ TeamDebugger::_HandleImageDebugInfoChanged(image_id imageID)
 		ImageInfoPendingThread* thread =  fImageInfoPendingThreads
 			->Lookup(imageID);
 		if (thread != NULL) {
-			fDebuggerInterface->ContinueThread(thread->ThreadID());
 			fImageInfoPendingThreads->Remove(thread);
-			delete thread;
+			ObjectDeleter<ImageInfoPendingThread> threadDeleter(thread);
+			if (fStopOnImageLoad) {
+				ThreadHandler* handler = _GetThreadHandler(thread->ThreadID());
+				BReference<ThreadHandler> handlerReference(handler);
+
+				if (handler != NULL && handler->HandleThreadDebugged(NULL))
+					return;
+			}
+			fDebuggerInterface->ContinueThread(thread->ThreadID());
 		}
 	}
 }

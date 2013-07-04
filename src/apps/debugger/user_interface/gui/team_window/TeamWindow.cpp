@@ -60,10 +60,10 @@ enum {
 
 
 enum {
-	MSG_CHOOSE_DEBUG_REPORT_LOCATION = 'ccrl',
-	MSG_DEBUG_REPORT_SAVED = 'drsa',
-	MSG_LOCATE_SOURCE_IF_NEEDED = 'lsin',
-	MSG_CLEAR_STACK_TRACE 	= 'clst'
+	MSG_CHOOSE_DEBUG_REPORT_LOCATION	= 'ccrl',
+	MSG_DEBUG_REPORT_SAVED				= 'drsa',
+	MSG_LOCATE_SOURCE_IF_NEEDED			= 'lsin',
+	MSG_CLEAR_STACK_TRACE				= 'clst'
 };
 
 
@@ -234,6 +234,16 @@ void
 TeamWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case MSG_STOP_ON_IMAGE_LOAD:
+		{
+			BMenuItem* item;
+			if (message->FindPointer("source", (void **)&item) != B_OK)
+				break;
+			bool enable = !item->IsMarked();
+			fListener->SetStopOnImageLoadRequested(enable);
+			item->SetMarked(enable);
+			break;
+		}
 		case MSG_TEAM_RESTART_REQUESTED:
 		{
 			fListener->TeamRestartRequested();
@@ -965,6 +975,10 @@ TeamWindow::_Init()
 		MSG_TEAM_RESTART_REQUESTED), 'R', B_SHIFT_KEY);
 	menu->AddItem(item);
 	item->SetTarget(this);
+	item = new BMenuItem("Stop on image load", new BMessage(
+		MSG_STOP_ON_IMAGE_LOAD));
+	item->SetTarget(this);
+	menu->AddItem(item);
 	item = new BMenuItem("Close", new BMessage(B_QUIT_REQUESTED),
 		'W');
 	menu->AddItem(item);

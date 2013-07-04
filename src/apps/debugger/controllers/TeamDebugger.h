@@ -78,6 +78,7 @@ private:
 	virtual	void				ClearBreakpointRequested(target_addr_t address);
 	virtual	void				ClearBreakpointRequested(
 									UserBreakpoint* breakpoint);
+	virtual	void				SetStopOnImageLoadRequested(bool enabled);
 	virtual	void				SetWatchpointRequested(target_addr_t address,
 									uint32 type, int32 length, bool enabled);
 	virtual	void				SetWatchpointEnabledRequested(
@@ -206,6 +207,7 @@ private:
 			TeamSettings		fTeamSettings;
 			int					fCommandLineArgc;
 			const char**		fCommandLineArgv;
+			bool				fStopOnImageLoad;
 };
 
 

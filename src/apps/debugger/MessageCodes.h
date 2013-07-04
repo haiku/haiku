@@ -22,6 +22,7 @@ enum {
 	MSG_CLEAR_WATCHPOINT						= 'cwpt',
 	MSG_ENABLE_WATCHPOINT						= 'ewpt',
 	MSG_DISABLE_WATCHPOINT						= 'dwpt',
+	MSG_STOP_ON_IMAGE_LOAD						= 'tsil',
 
 	MSG_THREAD_STATE_CHANGED					= 'tsch',
 	MSG_THREAD_CPU_STATE_CHANGED				= 'tcsc',
