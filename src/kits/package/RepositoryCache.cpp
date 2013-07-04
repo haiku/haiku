@@ -22,6 +22,7 @@
 #include <package/hpkg/PackageInfoAttributeValue.h>
 #include <package/hpkg/RepositoryContentHandler.h>
 #include <package/hpkg/RepositoryReader.h>
+#include <package/hpkg/StandardErrorOutput.h>
 #include <package/PackageInfo.h>
 #include <package/RepositoryInfo.h>
 
@@ -181,17 +182,6 @@ private:
 };
 
 
-// #pragma mark - StandardErrorOutput
-
-
-class BRepositoryCache::StandardErrorOutput : public BErrorOutput {
-	virtual	void PrintErrorVarArgs(const char* format, va_list args)
-	{
-		vfprintf(stderr, format, args);
-	}
-};
-
-
 // #pragma mark - BRepositoryCache
 
 
@@ -252,7 +242,7 @@ BRepositoryCache::SetTo(const BEntry& entry)
 		return result;
 
 	// read repository cache
-	StandardErrorOutput errorOutput;
+	BStandardErrorOutput errorOutput;
 	BRepositoryReader repositoryReader(&errorOutput);
 	if ((result = repositoryReader.Init(repositoryCachePath.Path())) != B_OK)
 		return result;
