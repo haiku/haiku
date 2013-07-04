@@ -67,6 +67,10 @@ public:
 	static	const char*	const	kLicenseTextField;
 
 private:
+			status_t			_SetTo(const BMessage* data);
+			status_t			_SetTo(const BEntry& entry);
+
+private:
 			status_t			fInitStatus;
 
 			BString				fName;
