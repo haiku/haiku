@@ -1432,6 +1432,9 @@ TeamDebugger::_HandlePostSyscall(PostSyscallEvent* event)
 	switch (info.Syscall()) {
 		case SYSCALL_WRITE:
 		{
+			if ((ssize_t)info.ReturnValue() <= 0)
+				break;
+
 			int32 fd;
 			target_addr_t address;
 			size_t size;
