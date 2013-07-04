@@ -376,14 +376,15 @@ RepositoryWriterImpl::_RegisterCurrentPackageInfo()
 	// used by the repository
 	BPackageArchitecture expectedArchitecture = fRepositoryInfo->Architecture();
 	if (fPackageInfo.Architecture() != expectedArchitecture
-		&& fPackageInfo.Architecture() != B_PACKAGE_ARCHITECTURE_ANY) {
+		&& fPackageInfo.Architecture() != B_PACKAGE_ARCHITECTURE_ANY
+		&& fPackageInfo.Architecture() != B_PACKAGE_ARCHITECTURE_SOURCE) {
 		fListener->PrintError(
 			"package '%s' has non-matching architecture '%s' "
-			"(expected '%s' or '%s')!\n", fPackageInfo.Name().String(),
+			"(expected '%s', '%s', or '%s')!\n", fPackageInfo.Name().String(),
 			BPackageInfo::kArchitectureNames[fPackageInfo.Architecture()],
 			BPackageInfo::kArchitectureNames[expectedArchitecture],
-			BPackageInfo::kArchitectureNames[B_PACKAGE_ARCHITECTURE_ANY]
-		);
+			BPackageInfo::kArchitectureNames[B_PACKAGE_ARCHITECTURE_ANY],
+			BPackageInfo::kArchitectureNames[B_PACKAGE_ARCHITECTURE_SOURCE]);
 		return B_BAD_DATA;
 	}
 
