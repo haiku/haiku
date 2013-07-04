@@ -44,7 +44,10 @@ extern uint64 gLongKernelEntry;
 static inline uint64
 fix_address(uint64 address)
 {
-	return address - KERNEL_LOAD_BASE + KERNEL_LOAD_BASE_64_BIT;
+	if(address >= KERNEL_LOAD_BASE)
+		return address - KERNEL_LOAD_BASE + KERNEL_LOAD_BASE_64_BIT;
+	else
+		return address;
 }
 
 
@@ -339,9 +342,8 @@ long_start_kernel()
 	long_gdt_init();
 	long_idt_init();
 	long_mmu_init();
-	convert_kernel_args();
-
 	debug_cleanup();
+	convert_kernel_args();
 
 	// Save the kernel entry point address.
 	gLongKernelEntry = image->elf_header.e_entry;
