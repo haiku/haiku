@@ -606,7 +606,8 @@ status_t
 PackageWriterImpl::_Init(const char* fileName,
 	const BPackageWriterParameters& parameters)
 {
-	status_t result = inherited::Init(fileName, parameters);
+	status_t result = inherited::Init(fileName, sizeof(hpkg_header),
+		parameters);
 	if (result != B_OK)
 		return result;
 

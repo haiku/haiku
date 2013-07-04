@@ -243,7 +243,7 @@ WriterImplBase::~WriterImplBase()
 
 
 status_t
-WriterImplBase::Init(const char* fileName,
+WriterImplBase::Init(const char* fileName, size_t headerSize,
 	const BPackageWriterParameters& parameters)
 {
 	fParameters = parameters;
@@ -266,8 +266,8 @@ WriterImplBase::Init(const char* fileName,
 	fFileName = fileName;
 
 	// create heap writer
-	fHeapWriter = new PackageFileHeapWriter(fErrorOutput, FD(),
-		sizeof(hpkg_header), fParameters.CompressionLevel());
+	fHeapWriter = new PackageFileHeapWriter(fErrorOutput, FD(), headerSize,
+		fParameters.CompressionLevel());
 	fHeapWriter->Init();
 	fDataWriter = fHeapWriter->DataWriter();
 

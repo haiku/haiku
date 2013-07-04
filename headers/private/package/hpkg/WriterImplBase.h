@@ -100,7 +100,7 @@ protected:
 			typedef DoublyLinkedList<PackageAttribute> PackageAttributeList;
 
 protected:
-			status_t			Init(const char* fileName,
+			status_t			Init(const char* fileName, size_t headerSize,
 									const BPackageWriterParameters& parameters);
 
 			void				RegisterPackageInfo(
