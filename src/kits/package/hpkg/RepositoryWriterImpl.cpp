@@ -311,13 +311,15 @@ RepositoryWriterImpl::_AddPackage(const BEntry& packageEntry)
 
 	BPath packagePath;
 	if ((result = packageEntry.GetPath(&packagePath)) != B_OK) {
-		fListener->PrintError("can't get path for entry!\n");
+		fListener->PrintError("can't get path for entry '%s'!\n",
+			packageEntry.Name());
 		return result;
 	}
 
 	BPackageReader packageReader(fListener);
 	if ((result = packageReader.Init(packagePath.Path())) != B_OK) {
-		fListener->PrintError("can't create package reader!\n");
+		fListener->PrintError("can't create package reader for '%s'!\n",
+			packagePath.Path());
 		return result;
 	}
 
@@ -333,7 +335,8 @@ RepositoryWriterImpl::_AddPackage(const BEntry& packageEntry)
 	GeneralFileChecksumAccessor checksumAccessor(packageEntry);
 	BString checksum;
 	if ((result = checksumAccessor.GetChecksum(checksum)) != B_OK) {
-		fListener->PrintError("can't compute checksum!\n");
+		fListener->PrintError("can't compute checksum of file '%s'!\n",
+			packagePath.Path());
 		return result;
 	}
 	fPackageInfo.SetChecksum(checksum);
