@@ -169,6 +169,31 @@ BSolverRepository::SetTo(const BRepositoryConfig& config)
 }
 
 
+status_t
+BSolverRepository::SetTo(const BRepositoryCache& cache)
+{
+	Unset();
+
+	const BRepositoryInfo& info = cache.Info();
+	if (info.InitCheck() != B_OK)
+		return B_BAD_VALUE;
+
+	fName = info.Name();
+	fPriority = info.Priority();
+
+	BRepositoryCache::Iterator it = cache.GetIterator();
+	while (const BPackageInfo* packageInfo = it.Next()) {
+		status_t error = AddPackage(*packageInfo);
+		if (error != B_OK) {
+			Unset();
+			return error;
+		}
+	}
+
+	return B_OK;
+}
+
+
 void
 BSolverRepository::Unset()
 {

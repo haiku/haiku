@@ -16,6 +16,7 @@ namespace BPackageKit {
 
 
 class BPackageInfo;
+class BRepositoryCache;
 class BRepositoryConfig;
 class BSolverPackage;
 
@@ -42,6 +43,7 @@ public:
 			status_t			SetTo(BPackageInstallationLocation location);
 			status_t			SetTo(BAllInstallationLocations);
 			status_t			SetTo(const BRepositoryConfig& config);
+			status_t			SetTo(const BRepositoryCache& cache);
 			void				Unset();
 
 			status_t			InitCheck();
