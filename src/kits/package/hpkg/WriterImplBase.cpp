@@ -280,23 +280,23 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 	const BPackageInfo& packageInfo)
 {
 	// name
-	_AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_NAME, packageInfo.Name(),
+	AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_NAME, packageInfo.Name(),
 		attributeList);
 
 	// summary
-	_AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_SUMMARY,
+	AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_SUMMARY,
 		packageInfo.Summary(), attributeList);
 
 	// description
-	_AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_DESCRIPTION,
+	AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_DESCRIPTION,
 		packageInfo.Description(), attributeList);
 
 	// vendor
-	_AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_VENDOR,
+	AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_VENDOR,
 		packageInfo.Vendor(), attributeList);
 
 	// packager
-	_AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_PACKAGER,
+	AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_PACKAGER,
 		packageInfo.Packager(), attributeList);
 
 	// base package (optional)
@@ -345,7 +345,7 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 		bool hasCompatibleVersion
 			= resolvable->CompatibleVersion().InitCheck() == B_OK;
 
-		PackageAttribute* provides = _AddStringAttribute(
+		PackageAttribute* provides = AddStringAttribute(
 			B_HPKG_ATTRIBUTE_ID_PACKAGE_PROVIDES, resolvable->Name(),
 			attributeList);
 
@@ -384,7 +384,7 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 		= packageInfo.GlobalWritableFileInfos();
 	for (int32 i = 0; i < globalWritableFileInfos.CountItems(); ++i) {
 		BGlobalWritableFileInfo* info = globalWritableFileInfos.ItemAt(i);
-		PackageAttribute* attribute = _AddStringAttribute(
+		PackageAttribute* attribute = AddStringAttribute(
 			B_HPKG_ATTRIBUTE_ID_PACKAGE_GLOBAL_WRITABLE_FILE, info->Path(),
 			attributeList);
 
@@ -412,7 +412,7 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 		= packageInfo.UserSettingsFileInfos();
 	for (int32 i = 0; i < userSettingsFileInfos.CountItems(); ++i) {
 		BUserSettingsFileInfo* info = userSettingsFileInfos.ItemAt(i);
-		PackageAttribute* attribute = _AddStringAttribute(
+		PackageAttribute* attribute = AddStringAttribute(
 			B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_SETTINGS_FILE, info->Path(),
 			attributeList);
 
@@ -434,7 +434,7 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 	const BObjectList<BUser>& users = packageInfo.Users();
 	for (int32 i = 0; i < users.CountItems(); ++i) {
 		const BUser* user = users.ItemAt(i);
-		PackageAttribute* attribute = _AddStringAttribute(
+		PackageAttribute* attribute = AddStringAttribute(
 			B_HPKG_ATTRIBUTE_ID_PACKAGE_USER, user->Name(), attributeList);
 
 		_AddStringAttributeIfNotEmpty(
@@ -448,7 +448,7 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 			attribute->children);
 
 		for (int32 k = 0; k < user->Groups().CountStrings(); k++) {
-			_AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_GROUP,
+			AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_GROUP,
 				user->Groups().StringAt(k), attribute->children);
 		}
 	}
@@ -475,11 +475,11 @@ void
 WriterImplBase::RegisterPackageVersion(PackageAttributeList& attributeList,
 	const BPackageVersion& version, BHPKGAttributeID attributeID)
 {
-	PackageAttribute* versionMajor = _AddStringAttribute(attributeID,
+	PackageAttribute* versionMajor = AddStringAttribute(attributeID,
 		version.Major(), attributeList);
 
 	if (!version.Minor().IsEmpty()) {
-		_AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MINOR,
+		AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MINOR,
 			version.Minor(), versionMajor->children);
 		_AddStringAttributeIfNotEmpty(
 			B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MICRO, version.Micro(),
@@ -507,7 +507,7 @@ WriterImplBase::RegisterPackageResolvableExpressionList(
 {
 	for (int i = 0; i < expressionList.CountItems(); ++i) {
 		BPackageResolvableExpression* resolvableExpr = expressionList.ItemAt(i);
-		PackageAttribute* name = _AddStringAttribute((BHPKGAttributeID)id,
+		PackageAttribute* name = AddStringAttribute((BHPKGAttributeID)id,
 			resolvableExpr->Name(), attributeList);
 
 		if (resolvableExpr->Version().InitCheck() == B_OK) {
@@ -520,6 +520,18 @@ WriterImplBase::RegisterPackageResolvableExpressionList(
 			RegisterPackageVersion(name->children, resolvableExpr->Version());
 		}
 	}
+}
+
+
+WriterImplBase::PackageAttribute*
+WriterImplBase::AddStringAttribute(BHPKGAttributeID id, const BString& value,
+	DoublyLinkedList<PackageAttribute>& list)
+{
+	PackageAttribute* attribute = new PackageAttribute(id,
+		B_HPKG_ATTRIBUTE_TYPE_STRING, B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+	attribute->string = fPackageStringCache.Get(value);
+	list.Add(attribute);
+	return attribute;
 }
 
 
@@ -682,24 +694,12 @@ WriterImplBase::RawWriteBuffer(const void* buffer, size_t size, off_t offset)
 }
 
 
-WriterImplBase::PackageAttribute*
-WriterImplBase::_AddStringAttribute(BHPKGAttributeID id, const BString& value,
-	DoublyLinkedList<PackageAttribute>& list)
-{
-	PackageAttribute* attribute = new PackageAttribute(id,
-		B_HPKG_ATTRIBUTE_TYPE_STRING, B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-	attribute->string = fPackageStringCache.Get(value);
-	list.Add(attribute);
-	return attribute;
-}
-
-
 void
 WriterImplBase::_AddStringAttributeList(BHPKGAttributeID id,
 	const BStringList& value, DoublyLinkedList<PackageAttribute>& list)
 {
 	for (int32 i = 0; i < value.CountStrings(); i++)
-		_AddStringAttribute(id, value.StringAt(i), list);
+		AddStringAttribute(id, value.StringAt(i), list);
 }
 
 

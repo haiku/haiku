@@ -37,6 +37,7 @@ HPKG_SOURCES =
 	PackageWriterImpl.cpp
 	PoolBuffer.cpp
 	ReaderImplBase.cpp
+	RepositoryContentHandler.cpp
 	RepositoryReader.cpp
 	RepositoryReaderImpl.cpp
 	RepositoryWriter.cpp

@@ -40,6 +40,127 @@ static const size_t kMaxRepositoryInfoSize		= 1 * 1024 * 1024;
 static const size_t kMaxPackageAttributesSize	= 64 * 1024 * 1024;
 
 
+// #pragma mark - PackagesAttributeHandler
+
+
+class RepositoryReaderImpl::PackagesAttributeHandler
+	: public AttributeHandler {
+public:
+	PackagesAttributeHandler(BRepositoryContentHandler* contentHandler)
+		:
+		fContentHandler(contentHandler),
+		fPackageName(NULL)
+	{
+	}
+
+	virtual status_t HandleAttribute(AttributeHandlerContext* context, uint8 id,
+		const AttributeValue& value, AttributeHandler** _handler)
+	{
+		switch (id) {
+			case B_HPKG_ATTRIBUTE_ID_PACKAGE:
+			{
+				status_t error = _NotifyPackageDone();
+				if (error != B_OK)
+					return error;
+
+				if (_handler != NULL) {
+					if (fContentHandler != NULL) {
+						error = fContentHandler->HandlePackage(value.string);
+						if (error != B_OK)
+							return error;
+					}
+
+					*_handler = new(std::nothrow) PackageAttributeHandler;
+					if (*_handler == NULL)
+						return B_NO_MEMORY;
+
+					fPackageName = value.string;
+				}
+				break;
+			}
+
+			default:
+				if (context->ignoreUnknownAttributes)
+					break;
+
+				context->errorOutput->PrintError(
+					"Error: Invalid package attribute section: unexpected "
+					"top level attribute id %d encountered\n", id);
+				return B_BAD_DATA;
+		}
+
+		return B_OK;
+	}
+
+	virtual status_t Delete(AttributeHandlerContext* context)
+	{
+		return _NotifyPackageDone();
+	}
+
+private:
+	status_t _NotifyPackageDone()
+	{
+		if (fPackageName == NULL || fContentHandler == NULL)
+			return B_OK;
+
+		status_t error = fContentHandler->HandlePackageDone(fPackageName);
+		fPackageName = NULL;
+		return error;
+	}
+
+private:
+	BRepositoryContentHandler*	fContentHandler;
+	const char*					fPackageName;
+};
+
+
+// #pragma mark - PackageContentHandlerAdapter
+
+
+class RepositoryReaderImpl::PackageContentHandlerAdapter
+	: public BPackageContentHandler {
+public:
+	PackageContentHandlerAdapter(BRepositoryContentHandler* contentHandler)
+		:
+		fContentHandler(contentHandler)
+	{
+	}
+
+	virtual status_t HandleEntry(BPackageEntry* entry)
+	{
+		return B_OK;
+	}
+
+	virtual status_t HandleEntryAttribute(BPackageEntry* entry,
+		BPackageEntryAttribute* attribute)
+	{
+		return B_OK;
+	}
+
+	virtual status_t HandleEntryDone(BPackageEntry* entry)
+	{
+		return B_OK;
+	}
+
+	virtual status_t HandlePackageAttribute(
+		const BPackageInfoAttributeValue& value)
+	{
+		return fContentHandler->HandlePackageAttribute(value);
+	}
+
+	virtual void HandleErrorOccurred()
+	{
+		return fContentHandler->HandleErrorOccurred();
+	}
+
+private:
+	BRepositoryContentHandler*	fContentHandler;
+};
+
+
+// #pragma mark - RepositoryReaderImpl
+
+
 RepositoryReaderImpl::RepositoryReaderImpl(BErrorOutput* errorOutput)
 	:
 	inherited("repository", errorOutput)
@@ -140,10 +261,12 @@ RepositoryReaderImpl::ParseContent(BRepositoryContentHandler* contentHandler)
 {
 	status_t result = contentHandler->HandleRepositoryInfo(fRepositoryInfo);
 	if (result == B_OK) {
-		AttributeHandlerContext context(ErrorOutput(), contentHandler,
+		PackageContentHandlerAdapter contentHandlerAdapter(contentHandler);
+		AttributeHandlerContext context(ErrorOutput(),
+			contentHandler != NULL ? &contentHandlerAdapter : NULL,
 			B_HPKG_SECTION_PACKAGE_ATTRIBUTES,
 			MinorFormatVersion() > B_HPKG_REPO_MINOR_VERSION);
-		PackageAttributeHandler rootAttributeHandler;
+		PackagesAttributeHandler rootAttributeHandler(contentHandler);
 		result = ParsePackageAttributesSection(&context, &rootAttributeHandler);
 	}
 	return result;

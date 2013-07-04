@@ -117,6 +117,10 @@ protected:
 										BPackageResolvableExpression>& list,
 									uint8 id);
 
+			PackageAttribute*	AddStringAttribute(BHPKGAttributeID id,
+									const BString& value,
+									DoublyLinkedList<PackageAttribute>& list);
+
 			int32				WriteCachedStrings(const StringCache& cache,
 									uint32 minUsageCount);
 
@@ -163,9 +167,6 @@ private:
 		= B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MAJOR;
 
 private:
-			PackageAttribute*	_AddStringAttribute(BHPKGAttributeID id,
-									const BString& value,
-									DoublyLinkedList<PackageAttribute>& list);
 	inline	PackageAttribute*	_AddStringAttributeIfNotEmpty(
 									BHPKGAttributeID id, const BString& value,
 									DoublyLinkedList<PackageAttribute>& list);
@@ -267,7 +268,7 @@ WriterImplBase::_AddStringAttributeIfNotEmpty(BHPKGAttributeID id,
 {
 	if (value.IsEmpty())
 		return NULL;
-	return _AddStringAttribute(id, value, list);
+	return AddStringAttribute(id, value, list);
 }
 
 

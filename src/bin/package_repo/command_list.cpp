@@ -32,18 +32,7 @@ struct RepositoryContentListHandler : BRepositoryContentHandler {
 	{
 	}
 
-	virtual status_t HandleEntry(BPackageEntry* entry)
-	{
-		return B_OK;
-	}
-
-	virtual status_t HandleEntryAttribute(BPackageEntry* entry,
-		BPackageEntryAttribute* attribute)
-	{
-		return B_OK;
-	}
-
-	virtual status_t HandleEntryDone(BPackageEntry* entry)
+	virtual status_t HandlePackage(const char* packageName)
 	{
 		return B_OK;
 	}
@@ -201,6 +190,11 @@ struct RepositoryContentListHandler : BRepositoryContentHandler {
 				return B_BAD_DATA;
 		}
 
+		return B_OK;
+	}
+
+	virtual status_t HandlePackageDone(const char* packageName)
+	{
 		return B_OK;
 	}
 

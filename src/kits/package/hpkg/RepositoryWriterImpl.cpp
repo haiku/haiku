@@ -395,7 +395,9 @@ RepositoryWriterImpl::_RegisterCurrentPackageInfo()
 	if ((result = fPackageNames->Add(fPackageInfo.Name())) != B_OK)
 		return result;
 
-	RegisterPackageInfo(PackageAttributes(), fPackageInfo);
+	PackageAttribute* packageAttribute = AddStringAttribute(
+		B_HPKG_ATTRIBUTE_ID_PACKAGE, fPackageInfo.Name(), PackageAttributes());
+	RegisterPackageInfo(packageAttribute->children, fPackageInfo);
 	fPackageCount++;
 	fListener->OnPackageAdded(fPackageInfo);
 

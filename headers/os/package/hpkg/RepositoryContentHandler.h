@@ -8,7 +8,7 @@
 
 #include <SupportDefs.h>
 
-#include <package/hpkg/PackageContentHandler.h>
+#include <package/hpkg/HPKGDefs.h>
 
 
 namespace BPackageKit {
@@ -20,10 +20,24 @@ class BRepositoryInfo;
 namespace BHPKG {
 
 
-class BRepositoryContentHandler : public BPackageContentHandler {
+class BPackageInfoAttributeValue;
+
+
+class BRepositoryContentHandler {
 public:
+	virtual						~BRepositoryContentHandler();
+
 	virtual	status_t			HandleRepositoryInfo(
 									const BRepositoryInfo& info) = 0;
+
+	virtual	status_t			HandlePackage(const char* packageName) = 0;
+	virtual	status_t			HandlePackageAttribute(
+									const BPackageInfoAttributeValue& value)
+									= 0;
+	virtual	status_t			HandlePackageDone(const char* packageName) = 0;
+
+	virtual	void				HandleErrorOccurred() = 0;
+
 };
 
 

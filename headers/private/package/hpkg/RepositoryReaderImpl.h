@@ -38,7 +38,8 @@ public:
 									BRepositoryContentHandler* contentHandler);
 
 private:
-			struct RootAttributeHandler;
+			class PackagesAttributeHandler;
+			class PackageContentHandlerAdapter;
 
 private:
 			BRepositoryInfo		fRepositoryInfo;
