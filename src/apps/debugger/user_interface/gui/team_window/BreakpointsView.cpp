@@ -171,13 +171,13 @@ BreakpointsView::_Init()
 			.Add(fToggleBreakpointButton = new BButton("Toggle"))
 		.End();
 
-	fConfigureExceptionsButton->SetMessage(new BMessage(
-		MSG_SHOW_EXCEPTION_CONFIG_WINDOW));
+	fConfigureExceptionsButton->SetMessage(
+		new BMessage(MSG_SHOW_EXCEPTION_CONFIG_WINDOW));
 	fToggleBreakpointButton->SetMessage(new BMessage(MSG_ENABLE_BREAKPOINT));
 	fRemoveBreakpointButton->SetMessage(new BMessage(MSG_CLEAR_BREAKPOINT));
 	fStopOnImageLoadCheckBox->SetMessage(new BMessage(MSG_STOP_ON_IMAGE_LOAD));
-	fStopOnImageLoadCheckBox->SetExplicitAlignment(BAlignment(
-			B_ALIGN_HORIZONTAL_UNSET, B_ALIGN_VERTICAL_CENTER));
+	fStopOnImageLoadCheckBox->SetExplicitAlignment(
+		BAlignment(B_ALIGN_HORIZONTAL_UNSET, B_ALIGN_VERTICAL_CENTER));
 
 	_UpdateButtons();
 }
