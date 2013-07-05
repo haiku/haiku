@@ -291,14 +291,36 @@ detect_displays()
 		}
 		#endif
 
+		if (gConnector[id]->type == VIDEO_CONNECTOR_LVDS) {
+			display_mode preferredMode;
+			bool lvdsInfoFound = connector_read_mode_lvds(id,
+				&preferredMode);
+			TRACE("%s: connector(%" B_PRIu32 "): bit-banging LVDS for EDID.\n",
+				__func__, id);
+
+			gDisplay[displayIndex]->attached = connector_read_edid(id,
+				&gDisplay[displayIndex]->edidData);
+
+			if (!gDisplay[displayIndex]->attached && lvdsInfoFound) {
+				// If we didn't find ddc edid data, fallback to lvdsInfo
+				// We have to call connector_read_mode_lvds first to
+				// collect SS data for the lvds connector
+				TRACE("%s: connector(%" B_PRIu32 "): using AtomBIOS LVDS_Info "
+					"preferred mode\n", __func__, id);
+				gDisplay[displayIndex]->attached = true;
+				memcpy(&gDisplay[displayIndex]->preferredMode,
+					&preferredMode, sizeof(display_mode));
+			}
+		}
+
 		// If no display found yet, try more standard detection methods
 		if (gDisplay[displayIndex]->attached == false) {
 			TRACE("%s: connector(%" B_PRIu32 "): bit-banging ddc for EDID.\n",
 				__func__, id);
 
-			// Lets try bit-banging edid from connector
-			gDisplay[displayIndex]->attached
-				= connector_read_edid(id, &gDisplay[displayIndex]->edidData);
+			// Bit-bang edid from connector
+			gDisplay[displayIndex]->attached = connector_read_edid(id,
+				&gDisplay[displayIndex]->edidData);
 
 			// Found EDID data?
 			if (gDisplay[displayIndex]->attached) {
@@ -331,17 +353,6 @@ detect_displays()
 
 					// Else... everything aligns as it should and attached = 1
 				}
-			}
-		}
-
-		// If we haven't found EDID yet and LVDS, check LVDS_Info table
-		if (gDisplay[displayIndex]->attached == false
-			&& gConnector[id]->type == VIDEO_CONNECTOR_LVDS) {
-			gDisplay[displayIndex]->attached = connector_read_mode_lvds(id,
-				&gDisplay[displayIndex]->preferredMode);
-			if (gDisplay[displayIndex]->attached) {
-				TRACE("%s: connector(%" B_PRIu32 "): using AtomBIOS LVDS_Info "
-					"preferred mode\n", __func__, id);
 			}
 		}
 
