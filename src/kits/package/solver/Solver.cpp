@@ -9,16 +9,15 @@
 
 #include <package/solver/Solver.h>
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-#	include <dlfcn.h>
-#	include <pthread.h>
-#endif
-
 
 typedef BPackageKit::BSolver* CreateSolverFunction();
 
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+#if defined(HAIKU_TARGET_PLATFORM_HAIKU) || __GNUC__ == 2
+
+
+#include <dlfcn.h>
+#include <pthread.h>
 
 
 static CreateSolverFunction* sCreateSolver = NULL;
@@ -29,7 +28,11 @@ static pthread_once_t sLoadLibsolvSolverAddOnInitOnce = PTHREAD_ONCE_INIT;
 static void
 load_libsolv_solver_add_on()
 {
+#if defined(HAIKU_TARGET_PLATFORM_HAIKU) || __GNUC__ == 2
 	void* imageHandle = dlopen("libpackage-add-on-libsolv.so", 0);
+#else
+	void* imageHandle = dlopen("libpackage-add-on-libsolv_build.so", 0);
+#endif
 	if (imageHandle == NULL)
 		return;
 
