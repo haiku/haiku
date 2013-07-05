@@ -69,6 +69,11 @@ struct RepositoryContentListHandler : BRepositoryContentHandler {
 					printf("\tpackager: %s\n", value.string);
 				break;
 
+			case B_PACKAGE_INFO_BASE_PACKAGE:
+				if (fVerbose)
+					printf("\tbase package: %s\n", value.string);
+				break;
+
 			case B_PACKAGE_INFO_FLAGS:
 				if (value.unsignedInt == 0 || !fVerbose)
 					break;
@@ -181,6 +186,68 @@ struct RepositoryContentListHandler : BRepositoryContentHandler {
 
 			case B_PACKAGE_INFO_CHECKSUM:
 				printf("\tchecksum: %s\n", value.string);
+				break;
+
+			case B_PACKAGE_INFO_GLOBAL_WRITABLE_FILES:
+				if (!fVerbose)
+					break;
+				printf("\tglobal writable file: %s",
+					value.globalWritableFileInfo.path);
+				if (value.globalWritableFileInfo.isDirectory)
+					printf( " directory");
+				if (value.globalWritableFileInfo.updateType
+						< B_WRITABLE_FILE_UPDATE_TYPE_ENUM_COUNT) {
+					printf(" %s\n",
+						BPackageInfo::kWritableFileUpdateTypes[
+							value.globalWritableFileInfo.updateType]);
+				} else
+					printf("\n");
+				break;
+
+			case B_PACKAGE_INFO_USER_SETTINGS_FILES:
+				if (!fVerbose)
+					break;
+				printf("\tuser settings file: %s",
+					value.userSettingsFileInfo.path);
+				if (value.globalWritableFileInfo.isDirectory) {
+					printf( " directory\n");
+				} else if (value.userSettingsFileInfo.templatePath != NULL) {
+					printf(" template %s\n",
+						value.userSettingsFileInfo.templatePath);
+				} else
+					printf("\n");
+				break;
+
+			case B_PACKAGE_INFO_USERS:
+				if (!fVerbose)
+					break;
+				printf("\tuser: %s\n", value.user.name);
+				if (value.user.realName != NULL)
+					printf("\t\treal name: %s\n", value.user.realName);
+				if (value.user.home != NULL)
+					printf("\t\thome:      %s\n", value.user.home);
+				if (value.user.shell != NULL)
+					printf("\t\tshell:     %s\n", value.user.shell);
+				for (size_t i = 0; i < value.user.groupCount; i++)
+					printf("\t\tgroup:     %s\n", value.user.groups[i]);
+				break;
+
+			case B_PACKAGE_INFO_GROUPS:
+				if (!fVerbose)
+					break;
+				printf("\tgroup: %s\n", value.string);
+				break;
+
+			case B_PACKAGE_INFO_POST_INSTALL_SCRIPTS:
+				if (!fVerbose)
+					break;
+				printf("\tpost install script: %s\n", value.string);
+				break;
+
+			case B_PACKAGE_INFO_INSTALL_PATH:
+				if (!fVerbose)
+					break;
+				printf("\tinstall path: %s\n", value.string);
 				break;
 
 			default:
