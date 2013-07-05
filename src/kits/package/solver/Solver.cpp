@@ -68,7 +68,7 @@ BSolver::~BSolver()
 /*static*/ status_t
 BSolver::Create(BSolver*& _solver)
 {
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+#if defined(HAIKU_TARGET_PLATFORM_HAIKU) || __GNUC__ == 2
 	pthread_once(&sLoadLibsolvSolverAddOnInitOnce, &load_libsolv_solver_add_on);
 #endif
 	if (sCreateSolver == NULL)
