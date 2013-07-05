@@ -177,7 +177,7 @@ BreakpointsView::_Init()
 	fRemoveBreakpointButton->SetMessage(new BMessage(MSG_CLEAR_BREAKPOINT));
 	fStopOnImageLoadCheckBox->SetMessage(new BMessage(MSG_STOP_ON_IMAGE_LOAD));
 	fStopOnImageLoadCheckBox->SetExplicitAlignment(BAlignment(
-		B_ALIGN_HORIZONTAL_UNSET, B_ALIGN_VERTICAL_CENTER));
+			B_ALIGN_HORIZONTAL_UNSET, B_ALIGN_VERTICAL_CENTER));
 
 	_UpdateButtons();
 }
