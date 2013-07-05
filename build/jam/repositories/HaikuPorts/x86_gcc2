@@ -15,7 +15,7 @@ PackageRepository HaikuPorts
 	automake-1.13.1-4
 	bepdf-1.1.1~beta5_2013_04_28-1
 #	bezillabrowser-2.0.0.22pre_2010_05_02-1
-	binutils-2.17_130421-2
+	binutils-2.17_2013_04_21-1
 	bison-2.4.3-5
 	bzip2-1.0.6-3
 	cdrtools-3.01~a07-3
@@ -30,7 +30,7 @@ PackageRepository HaikuPorts
 	flex-2.5.35-6
 	freetype-2.4.9-2
 	freetype_devel-2.4.9-2
-	gcc-2.95.3_130425-2
+	gcc-2.95.3_2013_05_04-1
 	gettext-0.18.1.1-4
 	gettext_libintl-0.18.1.1-4
 	git-1.7.10.2-2
@@ -103,7 +103,7 @@ PackageRepository HaikuPorts
 	apr
 	autoconf
 	automake
-#	bepdf
+	bepdf
 	binutils
 	bison
 	bzip2
