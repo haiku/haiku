@@ -93,7 +93,8 @@ actions GenerateLibsolvVersionHeader
 }
 
 local versionHeaderIn = solvversion.h.in ;
-SEARCH on $(versionHeaderIn) = $(libsolvSourceDirectory) ;
+LOCATE on $(versionHeaderIn) = $(libsolvSourceDirectory) ;
+Depends $(versionHeaderIn) : [ BuildFeatureAttribute libsolv : sources ] ;
 
 local versionHeader = [ FGristFiles solvversion.h ] ;
 MakeLocate $(versionHeader) : $(LOCATE_SOURCE) ;
