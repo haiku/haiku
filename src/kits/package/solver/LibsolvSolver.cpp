@@ -38,11 +38,27 @@
 // abort()s. Obviously that isn't good behavior for a library.
 
 
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+
+
 BSolver*
 BPackageKit::create_solver()
 {
 	return new(std::nothrow) LibsolvSolver;
 }
+
+
+#else
+
+
+extern "C" BSolver*
+__create_libsolv_solver()
+{
+	return new(std::nothrow) LibsolvSolver;
+}
+
+
+#endif
 
 
 struct LibsolvSolver::SolvQueue : Queue {
@@ -583,17 +599,21 @@ LibsolvSolver::_InitPool()
 	// x86 gcc2.
 	{
 		const char* arch;
-		#ifdef __HAIKU_ARCH_X86
-			#if (B_HAIKU_ABI & B_HAIKU_ABI_MAJOR) == B_HAIKU_ABI_GCC_2
-				arch = "x86_gcc2";
+		#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+			#ifdef __HAIKU_ARCH_X86
+				#if (B_HAIKU_ABI & B_HAIKU_ABI_MAJOR) == B_HAIKU_ABI_GCC_2
+					arch = "x86_gcc2";
+				#else
+					arch = "x86";
+				#endif
 			#else
-				arch = "x86";
+				struct utsname info;
+				if (uname(&info) != 0)
+					return errno;
+				arch = info.machine;
 			#endif
 		#else
-			struct utsname info;
-			if (uname(&info) != 0)
-				return errno;
-			arch = info.machine;
+			arch = HAIKU_PACKAGING_ARCH;
 		#endif
 
 		pool_setarchpolicy(fPool, arch);

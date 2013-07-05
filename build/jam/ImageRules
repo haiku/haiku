@@ -947,6 +947,7 @@ rule AddPackageFilesToHaikuImage location : packages
 	HAIKU_PACKAGES_IN_IMAGE on $(HAIKU_IMAGE_CONTAINER_NAME)
 		= [ on $(HAIKU_IMAGE_CONTAINER_NAME) return $(HAIKU_PACKAGES_IN_IMAGE) ]
 			$(packages) ;
+	HAIKU_PACKAGE_INSTALLATION_LOCATION on $(packages) = $(location) ;
 	AddFilesToHaikuImage $(location) packages : $(packages) ;
 }
 
@@ -996,6 +997,43 @@ rule OptionalPackageDependencies package : dependencies
 		AddOptionalHaikuImagePackages $(dependencies) ;
 	}
 }
+
+
+rule AddHaikuImagePackages packages : installationLocation
+{
+	# AddHaikuImagePackages <packages> [ : <installationLocation> ] ;
+	 # Adds the given package <packages>s to the image. <installationLocation>
+	 # is either "system" or "common" (the default) and specifies where the
+	 # packages shall be installed.
+
+	local package ;
+	for package in $(packages) {
+		if ! [ on $(package) return $(HAIKU_PACKAGE_ADDED) ] {
+			if ! [ IsPackageAvailable $(package) ] {
+				Echo "AddHaikuImagePackages: package" $(package)
+					"not available!" ;
+				continue ;
+			}
+
+			HAIKU_PACKAGE_ADDED on $(package) = 1 ;
+			HAIKU_ADDED_PACKAGES += $(package) ;
+
+			InstallOptionalHaikuImagePackage [ PackageURL $(package) ]
+				: $(installationLocation) ;
+		}
+	}
+}
+
+
+rule IsHaikuImagePackageAdded package
+{
+	if [ on $(package) return $(HAIKU_PACKAGE_ADDED) ] {
+		return 1 ;
+	}
+
+	return ;
+}
+
 
 rule InstallSourceArchive file : url
 {

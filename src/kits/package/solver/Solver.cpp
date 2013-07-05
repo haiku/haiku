@@ -9,14 +9,18 @@
 
 #include <package/solver/Solver.h>
 
-#include <dlfcn.h>
-#include <pthread.h>
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+#	include <dlfcn.h>
+#	include <pthread.h>
+#endif
 
 
-namespace BPackageKit {
+typedef BPackageKit::BSolver* CreateSolverFunction();
 
 
-typedef BSolver* CreateSolverFunction();
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+
+
 static CreateSolverFunction* sCreateSolver = NULL;
 
 static pthread_once_t sLoadLibsolvSolverAddOnInitOnce = PTHREAD_ONCE_INIT;
@@ -34,6 +38,19 @@ load_libsolv_solver_add_on()
 		dlclose(imageHandle);
 }
 
+#else
+
+
+static BPackageKit::BSolver* __create_libsolv_solver()
+	__attribute__((weakref("__create_libsolv_solver")));
+static CreateSolverFunction* sCreateSolver = &__create_libsolv_solver;
+
+
+#endif
+
+
+namespace BPackageKit {
+
 
 BSolver::BSolver()
 {
@@ -48,7 +65,9 @@ BSolver::~BSolver()
 /*static*/ status_t
 BSolver::Create(BSolver*& _solver)
 {
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	pthread_once(&sLoadLibsolvSolverAddOnInitOnce, &load_libsolv_solver_add_on);
+#endif
 	if (sCreateSolver == NULL)
 		return B_NOT_SUPPORTED;
 

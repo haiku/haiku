@@ -6,13 +6,16 @@ set -o errexit
 # outputDir
 # tmpDir
 # addBuildCompatibilityLibDir
-# packages - a list of the hpkg packages copied/updated
+# systemPackages, commonPackages - lists of the hpkg packages copied/updated
+#   (in "system" and "common" respectively)
+# downloadDir
 # The following are only for image types:
 # installDir
 # isImage
 # imagePath
 # imageSize
 # imageLabel
+# resolvePackageDependencies
 # updateOnly
 # dontClearImage
 # isVMwareImage
@@ -20,6 +23,7 @@ set -o errexit
 #
 # addattr
 # copyattr
+# getPackageDependencies
 # package
 # rc
 # rmAttrs
@@ -226,6 +230,17 @@ extractFile()
 }
 
 
+downloadFile()
+{
+	url=$1
+	path=$2
+
+	if [ ! -f "$path" ]; then
+		wget -O "$path" "$url"
+	fi
+}
+
+
 mkdir -p $tmpDir
 copyrightsFile=$tmpDir/copyrights
 $rmAttrs -f $copyrightsFile
@@ -287,8 +302,48 @@ while [ $# -gt 0 ]; do
 done
 
 
+# resolve package dependencies
+if [ -n "$resolvePackageDependencies" ]; then
+	echo "Resolving package dependencies ..."
+
+	repoFiles=
+	for repository in $repositories; do
+		eval 'repositoryPackageList=$repositoryPackageList_'$repository
+		eval 'repositoryUrl=$repositoryUrl_'$repository
+		packageListHash=`sha256sum $repositoryPackageList \
+			| sed -r 's,([^[:space:]]*).*,\1,'`
+		repoFileName=repo-$packageListHash
+		repoFileUrl="$repositoryUrl/repos/$repoFileName"
+		repoFilePath="$downloadDir/$repoFileName"
+		downloadFile $repoFileUrl $repoFilePath
+		repoFiles="$repoFiles $repoFilePath"
+	done
+
+	# additional packages for system
+	packageUrls=`$getPackageDependencies $repoFiles -- $systemPackages`
+	for packageUrl in $packageUrls; do
+		packageFileName=`basename $packageUrl`
+		packageFilePath="$downloadDir/$packageFileName"
+		downloadFile $packageUrl "$packageFilePath"
+		$cp "${sPrefix}$packageFilePath" "${tPrefix}system/packages"
+		systemPackages="$systemPackages $packageFilePath"
+	done
+
+	# additional packages for common
+	packageUrls=`$getPackageDependencies $repoFiles -- $systemPackages \
+		$commonPackages`
+	for packageUrl in $packageUrls; do
+		packageFileName=`basename $packageUrl`
+		packageFilePath="$downloadDir/$packageFileName"
+		downloadFile $packageUrl "$packageFilePath"
+		$cp "${sPrefix}$packageFilePath" "${tPrefix}common/packages"
+		commonPackages="$commonPackages $packageFilePath"
+	done
+fi
+
+
 # install default settings for packages
-for packageFile in $packages; do
+for packageFile in $systemPackages $commonPackages; do
 	if $package list -p $packageFile | egrep '^settings/' > /dev/null; then
 		extractFile $packageFile common/settings settings
 	fi

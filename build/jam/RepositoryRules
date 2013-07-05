@@ -1,0 +1,113 @@
+rule PackageFamily packageBaseName
+{
+	return $(packageBaseName:G=package-family) ;
+}
+
+
+rule AddRepositoryPackage repository : architecture : baseName : version
+{
+	local package = $(baseName)-$(version) ;
+	package = $(package:E=$(baseName):G=package-in-$(repository:G=)) ;
+	HAIKU_PACKAGE_REPOSITORY on $(package) = $(repository) ;
+	HAIKU_PACKAGE_ARCHITECTURE on $(package) = $(architecture) ;
+	HAIKU_PACKAGE_FILE_NAME on $(package) = $(package:G=)-$(architecture).hpkg ;
+
+	if ! $(baseName) in $(HAIKU_AVAILABLE_PACKAGES) {
+		HAIKU_AVAILABLE_PACKAGES += $(baseName) ;
+	}
+
+	local packageFamily = [ PackageFamily $(baseName) ] ;
+	HAIKU_PACKAGE_VERSIONS on $(packageFamily) += $(package) ;
+	HAIKU_REPOSITORY_PACKAGES on $(repository) += $(package) ;
+}
+
+
+rule AddRepositoryPackages repository : architecture : packages : sourcePackages
+{
+	local package ;
+	for package in $(packages) {
+		local splitName = [ Match "([^-]*)-(.*)" : $(package) ] ;
+		local baseName = $(splitName[1]:E=$(package)) ;
+		local version = $(splitName[2]) ;
+		AddRepositoryPackage $(repository) : $(architecture) : $(baseName)
+			: $(version) ;
+		if $(baseName) in $(sourcePackages) {
+			AddRepositoryPackage $(repository) : source : $(baseName)_source
+				: $(version) ;
+		}
+	}
+}
+
+
+rule PackageRepository repository : architecture : url : anyPackages : packages
+	: sourcePackages
+{
+	repository = $(repository:G=repository) ;
+
+	if $(architecture) != $(HAIKU_PACKAGING_ARCH) {
+		return ;
+	}
+
+	HAIKU_REPOSITORIES += $(repository) ;
+	HAIKU_REPOSITORY_URL on $(repository) = $(url) ;
+
+	AddRepositoryPackages $(repository) : any : $(anyPackages)
+		: $(sourcePackages) ;
+	AddRepositoryPackages $(repository) : $(architecture) : $(packages)
+		: $(sourcePackages) ;
+}
+
+
+rule GeneratedRepositoryPackageList target : repository
+{
+	repository = $(repository:G=repository) ;
+
+	# construct a list of file names
+	local fileNames ;
+	local package ;
+	for package in [ on $(repository) return $(HAIKU_REPOSITORY_PACKAGES) ] {
+		fileNames += [ on $(package) return $(HAIKU_PACKAGE_FILE_NAME) ] ;
+	}
+
+	HAIKU_REPOSITORY_PACKAGE_FILE_NAMES on $(target) = $(fileNames) ;
+	GeneratedRepositoryPackageList1 $(target) ;
+}
+
+
+actions GeneratedRepositoryPackageList1
+{
+	(for file in $(HAIKU_REPOSITORY_PACKAGE_FILE_NAMES) ; do
+		echo $file
+	done) | sort -u > $(1)
+}
+
+
+rule IsPackageAvailable package
+{
+	if $(package) in $(HAIKU_AVAILABLE_PACKAGES) {
+		return 1 ;
+	}
+
+	return ;
+}
+
+
+rule PackageURL packageName
+{
+	if ! [ IsPackageAvailable $(packageName) ] {
+		Exit "PackageURL: package" $(packageName) "not available!" ;
+		return ;
+	}
+
+	# TODO: We should support explicitly specified versions (or partial/minimum
+	# versions like gcc-2 or gcc-4).
+
+	local packageFamily = [ PackageFamily $(packageName) ] ;
+	local package
+		= [ on $(packageFamily) return $(HAIKU_PACKAGE_VERSIONS[1]) ] ;
+	local fileName = [ on $(package) return $(HAIKU_PACKAGE_FILE_NAME) ] ;
+	local repository = [ on $(package) return $(HAIKU_PACKAGE_REPOSITORY) ] ;
+	local baseUrl = [ on $(repository) return $(HAIKU_REPOSITORY_URL) ] ;
+
+	return $(baseUrl)/$(fileName) ;
+}

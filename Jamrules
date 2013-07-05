@@ -51,8 +51,22 @@ include [ FDirName $(HAIKU_BUILD_RULES_DIR) MainBuildRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) MiscRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) OverriddenJamRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) PackageRules ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) RepositoryRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) TestsRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) BuildSetup ] ;
+
+# Include the repositories for this architecture.
+local repositoriesDirectory
+	= [ FDirName $(HAIKU_BUILD_RULES_DIR) repositories ] ;
+local repository ;
+for repository in HaikuPorts {
+	local repositoryDirectory
+		= [ FDirName $(repositoriesDirectory) $(repository) ] ;
+	local file = [ Glob $(repositoryDirectory) : $(HAIKU_PACKAGING_ARCH) ] ;
+	if $(file) {
+		include $(file) ;
+	}
+}
 
 # Declare no-op user-overridable build rules.
 rule UserBuildConfigRulePostBuildTargets	{ }

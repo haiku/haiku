@@ -1120,6 +1120,10 @@ if $(HOST_PLATFORM_IS_64_BIT) {
 	HOST_DEFINES += HAIKU_HOST_PLATFORM_64_BIT ;
 }
 
+# define Haiku packaging architecture macro for host build
+HOST_DEFINES += HAIKU_PACKAGING_ARCH=\\\"$(HAIKU_PACKAGING_ARCH)\\\" ;
+
+
 #pragma mark -
 
 # In case we build for a BeOS compatible platform, but not for Haiku, we

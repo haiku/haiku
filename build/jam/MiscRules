@@ -695,7 +695,7 @@ rule ExtractBuildFeatureArchives feature : list
 		}
 
 		local package = $(list[2]) ;
-		local url = $(list[3]) ;
+		local url = [ PackageURL $(list[3]) ] ;
 		local fileName = $(url:BS) ;
 		list = $(list[4-]) ;
 

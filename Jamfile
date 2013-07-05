@@ -3,27 +3,21 @@ SubDir HAIKU_TOP ;
 NotFile doc_files ;
 Depends files : doc_files ;
 
-# Add optional packages given via HAIKU_ADD_OPTIONAL_PACKAGES.
-if $(HAIKU_ADD_OPTIONAL_PACKAGES) {
-	AddOptionalHaikuImagePackages
-		[ FSplitString $(HAIKU_ADD_OPTIONAL_PACKAGES) : / ] ;
-}
-
 # Prepare the optional build features before parsing the Jamfile tree.
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) BuildFeatures ] ;
 
 # Include packages that are required by all images.
-AddOptionalHaikuImagePackages MandatoryPackages ;
+AddHaikuImagePackages
+	bzip2 ctags ffmpeg freetype glu grep icu jpeg libpng libsolv mesa sed tar
+	zlib
+	:
+	system
+	;
 
 # If enabled, make sure that OpenSSL is added to the image.
 if $(HAIKU_BUILD_FEATURE_OPENSSL_ENABLED) {
-	AddOptionalHaikuImagePackages OpenSSL ;
+	AddHaikuImagePackages openssl ;
 }
-
-AddOptionalHaikuImagePackages ICU ;
-
-# Evaluate optional package dependencies
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalPackageDependencies ] ;
 
 # Optionally we allow not to include the "src" subdirectory.
 if $(HAIKU_DONT_INCLUDE_SRC) {

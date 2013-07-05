@@ -18,34 +18,17 @@ local hpkgBaseURL = http://haiku-files.org/files/hpkg ;
 
 # SSL
 
-# Automatically enable the SSL feature, when the optional OpenSSL optional
-# package is enabled.
-if [ IsOptionalHaikuImagePackageAdded OpenSSL ] {
+# Automatically enable the SSL feature, when the OpenSSL package is enabled.
+if [ IsHaikuImagePackageAdded openssl ] {
 	HAIKU_BUILD_FEATURE_SSL = 1 ;
 }
 
 if $(HAIKU_BUILD_FEATURE_SSL) {
-	if $(TARGET_ARCH) in x86 x86_64 {
-		if $(HAIKU_GCC_VERSION[1]) >= 4 {
-			if $(TARGET_ARCH) = x86_64 {
-				HAIKU_OPENSSL_PACKAGE = openssl-1.0.0j-x86_64-2012-12-18.zip ;
-			} else {
-				HAIKU_OPENSSL_PACKAGE
-					= openssl-1.0.0j-r1a4-x86-gcc4-2012-08-29.zip ;
-			}
-		} else {
-			HAIKU_OPENSSL_PACKAGE = openssl-1.0.0j-2-x86_gcc2.hpkg ;
-			HAIKU_OPENSSL_DEVEL_PACKAGE = openssl_devel-1.0.0j-2-x86_gcc2.hpkg ;
-		}
-
-		HAIKU_OPENSSL_URL = $(hpkgBaseURL)/$(HAIKU_OPENSSL_PACKAGE) ;
-		HAIKU_OPENSSL_DEVEL_URL
-			= $(hpkgBaseURL)/$(HAIKU_OPENSSL_DEVEL_PACKAGE) ;
-
+	if [ IsPackageAvailable openssl_devel ] {
 		ExtractBuildFeatureArchives openssl :
-			file: base $(HAIKU_OPENSSL_URL)
+			file: base openssl
 				runtime: lib
-			file: devel $(HAIKU_OPENSSL_DEVEL_URL)
+			file: devel openssl_devel
 				depends: base
 				libraries: develop/lib/libcrypto.so develop/lib/libssl.so
 				headers: develop/headers
@@ -61,31 +44,11 @@ if $(HAIKU_BUILD_FEATURE_SSL) {
 # ICU
 
 # Note ICU isn't actually optional, but is still an external package
-if $(TARGET_ARCH) in arm ppc x86 x86_64 {
-	if $(TARGET_ARCH) = ppc {
-		HAIKU_ICU_PACKAGE = icu-4.8.1-ppc-2011-08-20.zip ;
-		HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1-ppc-2011-12-19.zip ;
-	} else if $(TARGET_ARCH) = arm {
-		HAIKU_ICU_PACKAGE = icu-4.8.1.1-arm-2012-11-21.zip ;
-		HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1.1-arm-2012-11-21.zip ;
-	} else if $(TARGET_ARCH) = x86_64 {
-		HAIKU_ICU_PACKAGE = icu-4.8.1.1-x86_64-2012-07-30.zip ;
-		HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1.1-x86_64-2012-07-30.zip ;
-	} else if $(HAIKU_GCC_VERSION[1]) = 2 {
-		HAIKU_ICU_PACKAGE = icu-4.8.1.1-3-x86_gcc2.hpkg ;
-		HAIKU_ICU_DEVEL_PACKAGE = icu_devel-4.8.1.1-3-x86_gcc2.hpkg ;
-	} else {
-		HAIKU_ICU_PACKAGE = icu-4.8.1.1-r1a4-x86-gcc4-2012-08-29.zip ;
-		HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1.1-x86-gcc4-2011-12-20.zip ;
-	}
-
-	HAIKU_ICU_URL = $(hpkgBaseURL)/$(HAIKU_ICU_PACKAGE) ;
-	HAIKU_ICU_DEVEL_URL = $(hpkgBaseURL)/$(HAIKU_ICU_DEVEL_PACKAGE) ;
-
+if [ IsPackageAvailable icu_devel ] {
 	ExtractBuildFeatureArchives icu :
-		file: base $(HAIKU_ICU_URL)
+		file: base icu
 			runtime: lib
-		file: devel $(HAIKU_ICU_DEVEL_URL)
+		file: devel icu_devel
 			depends: base
 			libraries:
 				develop/lib/libicudata.so
@@ -106,9 +69,12 @@ if $(TARGET_ARCH) in arm ppc x86 x86_64 {
 
 # CLucene
 
-# Automatically install the CLucene feature, when the optional CLucene optional
-# package is enabled.
-if [ IsOptionalHaikuImagePackageAdded CLucene ] {
+# TODO: Update to packages!
+if ! 1 {
+
+# Automatically install the CLucene feature, when the CLucene package is
+# enabled.
+if [ IsHaikuImagePackageAdded clucene ] {
 	HAIKU_BUILD_FEATURE_CLUCENE = 1 ;
 }
 
@@ -148,6 +114,11 @@ if $(HAIKU_BUILD_FEATURE_CLUCENE) {
 	}
 }
 
+} # ! 1
+
+
+# TODO: Update to packages!
+if ! 1 {
 
 # LLVM
 if $(TARGET_ARCH) = x86 {
@@ -260,24 +231,15 @@ if $(TARGET_ARCH) = x86 {
 	Echo "LLVM not yet available on $(TARGET_ARCH)" ;
 }
 
+} # ! 1
+
 
 # GLU (GL Utilities)
-if $(TARGET_ARCH) = x86 {
-	if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		# TODO:...
-		HAIKU_GLU_PACKAGE = glu-9.0-x86-gcc4-2012-11-13.zip ;
-	} else {
-		HAIKU_GLU_PACKAGE = glu-9.0.0-1-x86_gcc2.hpkg ;
-		HAIKU_GLU_DEVEL_PACKAGE = glu_devel-9.0.0-1-x86_gcc2.hpkg ;
-	}
-
-	HAIKU_GLU_URL = $(hpkgBaseURL)/$(HAIKU_GLU_PACKAGE) ;
-	HAIKU_GLU_DEVEL_URL = $(hpkgBaseURL)/$(HAIKU_GLU_DEVEL_PACKAGE) ;
-
+if [ IsPackageAvailable glu_devel ] {
 	ExtractBuildFeatureArchives glu :
-		file: base $(HAIKU_GLU_URL)
+		file: base glu
 			runtime: lib
-		file: devel $(HAIKU_GLU_DEVEL_URL)
+		file: devel glu_devel
 			depends: base
 			library: develop/lib/libGLU.so
 			headers: develop/headers
@@ -290,21 +252,9 @@ if $(TARGET_ARCH) = x86 {
 
 
 # Mesa
-if $(TARGET_ARCH) = x86 {
-	local zipFile ;
-	if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		# TODO:...
-		HAIKU_MESA_PACKAGE = mesa-9.1.1-x86-gcc4-2013-04-27.zip ;
-	} else {
-		HAIKU_MESA_PACKAGE = mesa-7.8.2-3-x86_gcc2.hpkg ;
-		HAIKU_MESA_DEVEL_PACKAGE = mesa_devel-7.8.2-3-x86_gcc2.hpkg ;
-	}
-
-	HAIKU_MESA_URL = $(hpkgBaseURL)/$(HAIKU_MESA_PACKAGE) ;
-	HAIKU_MESA_DEVEL_URL = $(hpkgBaseURL)/$(HAIKU_MESA_DEVEL_PACKAGE) ;
-
+if [ IsPackageAvailable mesa_devel ] {
 	ExtractBuildFeatureArchives mesa : [ FFilterByBuildFeatures
-		file: devel $(HAIKU_MESA_DEVEL_URL)
+		file: devel mesa_devel
 			mesaLibrary: develop/lib/libmesa.a
 			glapiLibrary: develop/lib/libglapi.a
 			headers: develop/headers
@@ -332,31 +282,7 @@ if $(TARGET_ARCH) = x86 {
 
 
 # FFmpeg
-local ffmpegBaseURL = $(baseURL)/lib ;
-if $(TARGET_ARCH) = x86 {
-	if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		# TODO:...
-		HAIKU_FFMPEG_PACKAGE = ffmpeg-0.10.2-r1a4-x86-gcc4-2012-09-02.zip ;
-		HAIKU_SPEEX_PACKAGE = speex-1.2rc1-r1a4-x86-gcc4-2012-09-02.zip ;
-		HAIKU_LIBTHEORA_PACKAGE = libtheora-1.1.1-r1a4-x86-gcc4-2012-09-02.zip ;
-		HAIKU_LIBVORBIS_PACKAGE = libvorbis-1.3.2-r1a4-x86-gcc4-2012-09-02.zip ;
-		HAIKU_LIBOGG_PACKAGE = libogg-1.3.0-r1a4-x86-gcc4-2012-09-02.zip ;
-		HAIKU_LIBVPX_PACKAGE = libvpx-1.0.0-r1a4-x86-gcc4-2012-09-02.zip ;
-	} else {
-		HAIKU_FFMPEG_PACKAGE = ffmpeg-0.10.2-2-x86_gcc2.hpkg ;
-		HAIKU_FFMPEG_DEVEL_PACKAGE = ffmpeg_devel-0.10.2-2-x86_gcc2.hpkg ;
-		HAIKU_SPEEX_PACKAGE = speex-1.2~rc1-1-x86_gcc2.hpkg ;
-		HAIKU_SPEEX_DEVEL_PACKAGE = speex_devel-1.2~rc1-1-x86_gcc2.hpkg ;
-		HAIKU_LIBTHEORA_PACKAGE = libtheora-1.1.1-1-x86_gcc2.hpkg ;
-		HAIKU_LIBTHEORA_DEVEL_PACKAGE = libtheora_devel-1.1.1-1-x86_gcc2.hpkg ;
-		HAIKU_LIBVORBIS_PACKAGE = libvorbis-1.3.2-1-x86_gcc2.hpkg ;
-		HAIKU_LIBVORBIS_DEVEL_PACKAGE = libvorbis_devel-1.3.2-1-x86_gcc2.hpkg ;
-		HAIKU_LIBOGG_PACKAGE = libogg-1.3.0-1-x86_gcc2.hpkg ;
-		HAIKU_LIBOGG_DEVEL_PACKAGE = libogg_devel-1.3.0-1-x86_gcc2.hpkg ;
-		HAIKU_LIBVPX_PACKAGE = libvpx-1.0.0-1-x86_gcc2.hpkg ;
-		HAIKU_LIBVPX_DEVEL_PACKAGE = libvpx_devel-1.0.0-1-x86_gcc2.hpkg ;
-	}
-
+if [ IsPackageAvailable ffmpeg_devel ] {
 	local ffmpegLibs = libavformat.so libavcodec.so libavdevice.so
 		libavfilter.so libswscale.so libavutil.so ;
 	local speexLibs = libspeex.so ;
@@ -367,14 +293,10 @@ if $(TARGET_ARCH) = x86 {
 
 	local feature ;
 	for feature in ffmpeg speex libtheora libvorbis libogg libvpx {
-		HAIKU_$(feature:U)_URL = $(hpkgBaseURL)/$(HAIKU_$(feature:U)_PACKAGE) ;
-		HAIKU_$(feature:U)_DEVEL_URL
-			= $(hpkgBaseURL)/$(HAIKU_$(feature:U)_DEVEL_PACKAGE) ;
-
 		ExtractBuildFeatureArchives $(feature) :
-			file: base $(HAIKU_$(feature:U)_URL)
+			file: base $(feature)
 				runtime: lib
-			file: devel $(HAIKU_$(feature:U)_DEVEL_URL)
+			file: devel $(feature)_devel
 				depends: base
 				libraries: develop/lib/$($(feature)Libs)
 				headers: develop/headers
@@ -388,28 +310,11 @@ if $(TARGET_ARCH) = x86 {
 
 
 # Freetype
-local freetypeBaseURL = $(baseURL)/lib ;
-if $(TARGET_ARCH) in arm ppc x86 x86_64 {
-	if $(TARGET_ARCH) = arm {
-		HAIKU_FREETYPE_PACKAGE = freetype-2.4.9-arm-2012-11-21.zip ;
-	} else if $(TARGET_ARCH) = ppc {
-		HAIKU_FREETYPE_PACKAGE = freetype-2.4.9-ppc-gcc4-2012-06-26.zip ;
-	} else if $(TARGET_ARCH) = x86_64 {
-		HAIKU_FREETYPE_PACKAGE = freetype-2.4.9-x86_64-2012-08-04.zip ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		HAIKU_FREETYPE_PACKAGE = freetype-2.4.9-r1a4-x86-gcc4-2012-09-02.zip ;
-	} else {
-		HAIKU_FREETYPE_PACKAGE = freetype-2.4.9-2-x86_gcc2.hpkg ;
-		HAIKU_FREETYPE_DEVEL_PACKAGE = freetype_devel-2.4.9-2-x86_gcc2.hpkg ;
-	}
-
-	HAIKU_FREETYPE_URL = $(hpkgBaseURL)/$(HAIKU_FREETYPE_PACKAGE) ;
-	HAIKU_FREETYPE_DEVEL_URL = $(hpkgBaseURL)/$(HAIKU_FREETYPE_DEVEL_PACKAGE) ;
-
+if [ IsPackageAvailable freetype_devel ] {
 	ExtractBuildFeatureArchives freetype :
-		file: base $(HAIKU_FREETYPE_URL)
+		file: base freetype
 			runtime: lib
-		file: devel $(HAIKU_FREETYPE_DEVEL_URL)
+		file: devel freetype_devel
 			depends: base
 			library: develop/lib/libfreetype.so
 			headers: develop/headers develop/headers/freetype2
@@ -423,9 +328,12 @@ if $(TARGET_ARCH) in arm ppc x86 x86_64 {
 
 # TagLib
 
+# TODO: Update to packages!
+if ! 1 {
+
 # Automatically install the TagLib feature, when the optional TagLib optional
 # package is enabled.
-if [ IsOptionalHaikuImagePackageAdded TagLib ] {
+if [ IsHaikuImagePackageAdded taglib ] {
 	HAIKU_BUILD_FEATURE_TAGLIB = 1 ;
 }
 
@@ -465,8 +373,14 @@ if $(HAIKU_BUILD_FEATURE_TAGLIB) {
 	}
 }
 
+} # ! 1
+
 
 # WebKit
+
+# TODO: Update to packages!
+if ! 1 {
+
 # Automatically install the WebKit feature, when the optional WebPositive
 # optional package is enabled.
 if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
@@ -513,29 +427,15 @@ if $(HAIKU_BUILD_FEATURE_WEBKIT) {
 	}
 }
 
+} # ! 1
+
+
 # libpng
-local libpngBaseURL = $(baseURL)/lib ;
-if $(TARGET_ARCH) in arm ppc x86 x86_64 {
-	if $(TARGET_ARCH) = arm {
-		HAIKU_LIBPNG_PACKAGE = libpng-1.5.12-arm-2012-11-21.zip ;
-	} else if $(TARGET_ARCH) = ppc {
-		HAIKU_LIBPNG_PACKAGE = libpng-1.5.12-ppc-gcc4-2012-08-27.zip ;
-	} else if $(TARGET_ARCH) = x86_64 {
-		HAIKU_LIBPNG_PACKAGE = libpng-1.5.12-x86_64-2012-11-18.zip ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		HAIKU_LIBPNG_PACKAGE = libpng-1.5.12-x86-gcc4-2012-08-23.zip ;
-	} else {
-		HAIKU_LIBPNG_PACKAGE = libpng-1.5.12-2-x86_gcc2.hpkg ;
-		HAIKU_LIBPNG_DEVEL_PACKAGE = libpng_devel-1.5.12-2-x86_gcc2.hpkg ;
-	}
-
- 	HAIKU_LIBPNG_URL = $(hpkgBaseURL)/$(HAIKU_LIBPNG_PACKAGE) ;
- 	HAIKU_LIBPNG_DEVEL_URL = $(hpkgBaseURL)/$(HAIKU_LIBPNG_DEVEL_PACKAGE) ;
-
+if [ IsPackageAvailable libpng_devel ] {
 	ExtractBuildFeatureArchives libpng :
-		file: base $(HAIKU_LIBPNG_URL)
+		file: base libpng
 			runtime: lib
-		file: devel $(HAIKU_LIBPNG_DEVEL_URL)
+		file: devel libpng_devel
 			depends: base
 			library: develop/lib/libpng.so
 			headers: develop/headers
@@ -546,29 +446,13 @@ if $(TARGET_ARCH) in arm ppc x86 x86_64 {
 	Echo "libpng support not available on $(TARGET_ARCH)" ;
 }
 
+
 # jpeg
-local jpegBaseURL = $(baseURL)/lib ;
-if $(TARGET_ARCH) in arm ppc x86 x86_64 {
-	if $(TARGET_ARCH) = arm {
-		HAIKU_JPEG_PACKAGE = jpeg-8d-arm-2012-11-21.zip ;
-	} else if $(TARGET_ARCH) = ppc {
-		HAIKU_JPEG_PACKAGE = jpeg-8d-ppc-gcc4-2012-08-27.zip ;
-	} else if $(TARGET_ARCH) = x86_64 {
-		HAIKU_JPEG_PACKAGE = jpeg-8d-x86_64-2012-11-18.zip ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		HAIKU_JPEG_PACKAGE = jpeg-8d-x86-gcc4-2012-08-23.zip ;
-	} else {
-		HAIKU_JPEG_PACKAGE = jpeg-9-2-x86_gcc2.hpkg ;
-		HAIKU_JPEG_DEVEL_PACKAGE = jpeg_devel-9-2-x86_gcc2.hpkg ;
-	}
-
- 	HAIKU_JPEG_URL = $(hpkgBaseURL)/$(HAIKU_JPEG_PACKAGE) ;
- 	HAIKU_JPEG_DEVEL_URL = $(hpkgBaseURL)/$(HAIKU_JPEG_DEVEL_PACKAGE) ;
-
+if [ IsPackageAvailable jpeg_devel ] {
 	ExtractBuildFeatureArchives jpeg :
-		file: base $(HAIKU_JPEG_URL)
+		file: base jpeg
 			runtime: lib
-		file: devel $(HAIKU_JPEG_DEVEL_URL)
+		file: devel jpeg_devel
 			depends: base
 			library: develop/lib/libjpeg.so
 			headers: develop/headers
@@ -581,33 +465,15 @@ if $(TARGET_ARCH) in arm ppc x86 x86_64 {
 
 
 # zlib
-if $(TARGET_ARCH) in arm ppc x86 x86_64 {
-	if $(TARGET_ARCH) = arm {
-		HAIKU_ZLIB_PACKAGE = zlib-1.2.7-arm-2012-11-21.zip ;
-	} else if $(TARGET_ARCH) = ppc {
-		HAIKU_ZLIB_PACKAGE = zlib-1.2.7-ppc-gcc4-2012-10-30.zip ;
-	} else if $(TARGET_ARCH) = x86_64 {
-		HAIKU_ZLIB_PACKAGE = zlib-1.2.7-x86_64-2012-11-18.zip ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		HAIKU_ZLIB_PACKAGE = zlib-1.2.7-x86-gcc4-2012-10-30.zip ;
-	} else {
-		HAIKU_ZLIB_PACKAGE = zlib-1.2.8-2-x86_gcc2.hpkg ;
-		HAIKU_ZLIB_DEVEL_PACKAGE = zlib_devel-1.2.8-2-x86_gcc2.hpkg ;
-	}
-	HAIKU_ZLIB_SOURCE_PACKAGE = zlib_source-1.2.8-2-source.hpkg ;
-
- 	HAIKU_ZLIB_URL = $(hpkgBaseURL)/$(HAIKU_ZLIB_PACKAGE) ;
- 	HAIKU_ZLIB_DEVEL_URL = $(hpkgBaseURL)/$(HAIKU_ZLIB_DEVEL_PACKAGE) ;
- 	HAIKU_ZLIB_SOURCE_URL = $(hpkgBaseURL)/$(HAIKU_ZLIB_SOURCE_PACKAGE) ;
-
+if [ IsPackageAvailable zlib_devel ] {
 	ExtractBuildFeatureArchives zlib :
-		file: base $(HAIKU_ZLIB_URL)
+		file: base zlib
 			runtime: lib
-		file: devel $(HAIKU_ZLIB_DEVEL_URL)
+		file: devel zlib_devel
 			depends: base
 			library: develop/lib/libz.so
 			headers: develop/headers
-		file: source $(HAIKU_ZLIB_SOURCE_URL)
+		file: source zlib_source
 			sources: develop/sources/zlib-1.2.8-2/source
 		;
 
@@ -617,33 +483,22 @@ if $(TARGET_ARCH) in arm ppc x86 x86_64 {
 }
 
 
-# LibSolv
-
-if $(TARGET_ARCH) != x86 {
-	Echo "Libsolv not available for $(TARGET_ARCH)." ;
-} else if $(HAIKU_GCC_VERSION[1]) = 2 {
-	HAIKU_LIBSOLV_PACKAGE
-		= libsolv-0.3.0_haiku_2013_06_16-1-x86_gcc2.hpkg ;
-	HAIKU_LIBSOLV_DEVEL_PACKAGE
-		= libsolv_devel-0.3.0_haiku_2013_06_16-1-x86_gcc2.hpkg ;
-} else {
-	Echo "Libsolv not available for gcc4." ;
-}
-
-if $(HAIKU_LIBSOLV_PACKAGE) {
- 	HAIKU_LIBSOLV_URL = $(hpkgBaseURL)/$(HAIKU_LIBSOLV_PACKAGE) ;
- 	HAIKU_LIBSOLV_DEVEL_URL = $(hpkgBaseURL)/$(HAIKU_LIBSOLV_DEVEL_PACKAGE) ;
-
+# libsolv
+if [ IsPackageAvailable libsolv_devel ] {
 	ExtractBuildFeatureArchives libsolv :
-		file: base $(HAIKU_LIBSOLV_URL)
+		file: base libsolv
 			runtime: lib
-		file: devel $(HAIKU_LIBSOLV_DEVEL_URL)
+		file: devel libsolv_devel
 			depends: base
 			libraries: develop/lib/libsolv.so develop/lib/libsolvext.so
 			headers: develop/headers
+		file: source libsolv_source
+			sources: develop/sources/libsolv-0.3.0_haiku_2013_06_16-1/source
 		;
 
 	EnableBuildFeatures libsolv ;
+} else {
+	Echo "libsolv package not available for $(TARGET_ARCH)" ;
 }
 
 
