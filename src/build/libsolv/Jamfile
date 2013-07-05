@@ -6,16 +6,6 @@ local libsolvSourceDirectory = [ FDirName $(libsolvSourceBaseDirectory) src ] ;
 local libsolvextSourceDirectory
 	= [ FDirName $(libsolvSourceBaseDirectory) ext ] ;
 
-UseHeaders $(libsolvSourceDirectory) ;
-
-local libsolvSources = [ FGristFiles
-	bitmap.c poolarch.c poolvendor.c poolid.c strpool.c dirpool.c
-	solver.c solverdebug.c repo_solv.c repo_write.c evr.c pool.c
-	queue.c repo.c repodata.c repopage.c util.c policy.c solvable.c
-	transaction.c rules.c problems.c
-	chksum.c md5.c sha1.c sha2.c solvversion.c selection.c
-	] ;
-
 local libsolvMajor = 0 ;
 local libsolvMinor = 3 ;
 local libsolvPatch = 0 ;
@@ -45,6 +35,16 @@ SubDirCcFlags -Wno-sign-compare -Wno-missing-prototypes ;
 
 # libsolv
 
+UseHeaders $(libsolvSourceDirectory) ;
+
+local libsolvSources = [ FGristFiles
+	bitmap.c poolarch.c poolvendor.c poolid.c strpool.c dirpool.c
+	solver.c solverdebug.c repo_solv.c repo_write.c evr.c pool.c
+	queue.c repo.c repodata.c repopage.c util.c policy.c solvable.c
+	transaction.c rules.c problems.c
+	chksum.c md5.c sha1.c sha2.c solvversion.c selection.c
+	] ;
+
 LOCATE on $(libsolvSources) = $(libsolvSourceDirectory) ;
 Depends $(libsolvSources) : [ BuildFeatureAttribute libsolv : sources ] ;
 
@@ -55,15 +55,14 @@ BuildPlatformSharedLibrary libsolv_build.so
 	$(libsolvSources)
 	;
 
-UseHeaders $(libsolvSourceDirectory) ;
+# libsolvext
+
+UseHeaders $(libsolvextSourceDirectory) ;
 
 local libsolvextSources = [ FGristFiles
 	solv_xfopen.c testcase.c
 	repo_haiku.cpp
 	] ;
-
-
-# libsolvext
 
 LOCATE on $(libsolvextSources) = $(libsolvextSourceDirectory) ;
 Depends $(libsolvextSources) : [ BuildFeatureAttribute libsolv : sources ] ;
