@@ -10,6 +10,7 @@
 #include <new>
 
 #include <Button.h>
+#include <CheckBox.h>
 #include <LayoutBuilder.h>
 
 #include <AutoLocker.h>
@@ -31,6 +32,7 @@ BreakpointsView::BreakpointsView(Team* team, Listener* listener)
 	fConfigureExceptionsButton(NULL),
 	fToggleBreakpointButton(NULL),
 	fRemoveBreakpointButton(NULL),
+	fStopOnImageLoadCheckBox(NULL),
 	fListener(listener)
 {
 	SetName("Breakpoints");
@@ -95,6 +97,12 @@ BreakpointsView::MessageReceived(BMessage* message)
 			_HandleBreakpointAction(message->what);
 			break;
 
+		case MSG_STOP_ON_IMAGE_LOAD:
+		{
+			fListener->SetStopOnImageLoadRequested(
+				fStopOnImageLoadCheckBox->Value() == B_CONTROL_ON);
+			break;
+		}
 		default:
 			BGroupView::MessageReceived(message);
 			break;
@@ -108,6 +116,7 @@ BreakpointsView::AttachedToWindow()
 	fConfigureExceptionsButton->SetTarget(Window());
 	fToggleBreakpointButton->SetTarget(this);
 	fRemoveBreakpointButton->SetTarget(this);
+	fStopOnImageLoadCheckBox->SetTarget(this);
 }
 
 
@@ -153,6 +162,9 @@ BreakpointsView::_Init()
 		.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
 			.SetInsets(B_USE_SMALL_SPACING)
 			.AddGlue()
+			.Add(fStopOnImageLoadCheckBox = new BCheckBox(
+				"Stop on image load"))
+			.AddStrut(5)
 			.Add(fConfigureExceptionsButton = new BButton(
 				"Configure exceptions" B_UTF8_ELLIPSIS))
 			.Add(fRemoveBreakpointButton = new BButton("Remove"))
@@ -163,6 +175,9 @@ BreakpointsView::_Init()
 		MSG_SHOW_EXCEPTION_CONFIG_WINDOW));
 	fToggleBreakpointButton->SetMessage(new BMessage(MSG_ENABLE_BREAKPOINT));
 	fRemoveBreakpointButton->SetMessage(new BMessage(MSG_CLEAR_BREAKPOINT));
+	fStopOnImageLoadCheckBox->SetMessage(new BMessage(MSG_STOP_ON_IMAGE_LOAD));
+	fStopOnImageLoadCheckBox->SetExplicitAlignment(BAlignment(
+		B_ALIGN_HORIZONTAL_UNSET, B_ALIGN_VERTICAL_CENTER));
 
 	_UpdateButtons();
 }

@@ -104,6 +104,8 @@ private:
 	virtual	void				ClearWatchpointRequested(
 									Watchpoint* watchpoint);
 
+	virtual	void				SetStopOnImageLoadRequested(bool enabled);
+
 
 	// SourceView::Listener
 	virtual	void				SetBreakpointRequested(target_addr_t address,

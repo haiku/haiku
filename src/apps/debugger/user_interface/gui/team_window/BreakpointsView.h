@@ -12,6 +12,7 @@
 
 
 class BButton;
+class BCheckBox;
 
 
 class BreakpointsView : public BGroupView,
@@ -57,6 +58,7 @@ private:
 			BButton*			fConfigureExceptionsButton;
 			BButton*			fToggleBreakpointButton;
 			BButton*			fRemoveBreakpointButton;
+			BCheckBox*			fStopOnImageLoadCheckBox;
 			Listener*			fListener;
 };
 
@@ -79,6 +81,8 @@ public:
 									bool enabled) = 0;
 	virtual	void				ClearWatchpointRequested(
 									Watchpoint* watchpoint) = 0;
+
+	virtual	void				SetStopOnImageLoadRequested(bool enabled) = 0;
 };
 
 
