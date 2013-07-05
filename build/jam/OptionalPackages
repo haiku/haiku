@@ -99,7 +99,7 @@ if [ IsOptionalHaikuImagePackageAdded Development ] {
 
 	# devel packages for mandatory packages
 	AddHaikuImagePackages ffmpeg_devel freetype_devel glu_devel jpeg_devel
-		libpng_devel zlib_devel ;
+		libpng_devel zlib_devel : system ;
 }
 
 
