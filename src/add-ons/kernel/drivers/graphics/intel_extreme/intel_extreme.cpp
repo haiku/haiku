@@ -340,16 +340,19 @@ intel_extreme_init(intel_info &info)
 
 	// setup overlay registers
 
-	if (intel_allocate_memory(info, B_PAGE_SIZE, 0,
-			intel_uses_physical_overlay(*info.shared_info)
+	status_t status = intel_allocate_memory(info, B_PAGE_SIZE, 0,
+		intel_uses_physical_overlay(*info.shared_info)
 				? B_APERTURE_NEED_PHYSICAL : 0,
-			(addr_t*)&info.overlay_registers,
-			&info.shared_info->physical_overlay_registers) == B_OK) {
+		(addr_t*)&info.overlay_registers, 
+		&info.shared_info->physical_overlay_registers);
+	if (status == B_OK) {
 		info.shared_info->overlay_offset = (addr_t)info.overlay_registers
 			- info.aperture_base;
+		init_overlay_registers(info.overlay_registers);
+	} else {
+		ERROR("error: could not allocate overlay memory! %s\n",
+			strerror(status));
 	}
-
-	init_overlay_registers(info.overlay_registers);
 
 	// Allocate hardware status page and the cursor memory
 
