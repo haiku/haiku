@@ -10,6 +10,7 @@
 #include "LibsolvSolver.h"
 
 #include <errno.h>
+#include <sys/utsname.h>
 
 #include <new>
 
