@@ -78,7 +78,7 @@ actions GeneratedRepositoryPackageList1
 {
 	(for file in $(HAIKU_REPOSITORY_PACKAGE_FILE_NAMES) ; do
 		echo $file
-	done) | sort -u > $(1)
+	done) | LC_ALL=C sort -u > $(1)
 }
 
 
