@@ -36,7 +36,7 @@ local baseSourceURL = http://haiku-files.org/files/sources ;
 
 # BeBook
 if [ IsOptionalHaikuImagePackageAdded BeBook ] {
-	AddHaikuImagePackages be_book ;
+	AddHaikuImagePackages be_book : system ;
 	AddSymlinkToHaikuImage home Desktop
 		: /boot/system/documentation/BeBook/index.html
 		: BeBook ;
