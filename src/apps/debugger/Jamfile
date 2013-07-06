@@ -242,10 +242,10 @@ Application Debugger :
 	TeamsListView.cpp
 
 	# user_interface/gui/team_window
+	BreakConditionConfigWindow.cpp
 	BreakpointListView.cpp
 	BreakpointsView.cpp
 	ConsoleOutputView.cpp
-	ExceptionConfigWindow.cpp
 	ImageFunctionsView.cpp
 	ImageListView.cpp
 	RegistersView.cpp

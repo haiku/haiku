@@ -31,7 +31,7 @@ class BSplitView;
 class BStringView;
 class BTabView;
 class ConsoleOutputView;
-class ExceptionConfigWindow;
+class BreakConditionConfigWindow;
 class Image;
 class InspectorWindow;
 class RegistersView;
@@ -103,8 +103,6 @@ private:
 									bool enabled);
 	virtual	void				ClearWatchpointRequested(
 									Watchpoint* watchpoint);
-
-	virtual	void				SetStopOnImageLoadRequested(bool enabled);
 
 
 	// SourceView::Listener
@@ -208,7 +206,7 @@ private:
 			BSplitView*			fImageSplitView;
 			BSplitView*			fThreadSplitView;
 			BSplitView*			fConsoleSplitView;
-			ExceptionConfigWindow* fExceptionConfigWindow;
+			BreakConditionConfigWindow* fBreakConditionConfigWindow;
 			InspectorWindow*	fInspectorWindow;
 			GuiTeamUiSettings	fUiSettings;
 			BFilePanel*			fFilePanel;

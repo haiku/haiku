@@ -2,8 +2,8 @@
  * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
-#ifndef EXCEPTION_CONFIG_WINDOW_H
-#define EXCEPTION_CONFIG_WINDOW_H
+#ifndef BREAK_CONDITION_CONFIG_WINDOW_H
+#define BREAK_CONDITION_CONFIG_WINDOW_H
 
 
 #include <Window.h>
@@ -18,15 +18,15 @@ class Team;
 class UserInterfaceListener;
 
 
-class ExceptionConfigWindow : public BWindow {
+class BreakConditionConfigWindow : public BWindow {
 public:
-								ExceptionConfigWindow(::Team* team,
+								BreakConditionConfigWindow(::Team* team,
 									UserInterfaceListener* listener,
 									BHandler* target);
 
-								~ExceptionConfigWindow();
+								~BreakConditionConfigWindow();
 
-	static	ExceptionConfigWindow* Create(::Team* team,
+	static	BreakConditionConfigWindow* Create(::Team* team,
 									UserInterfaceListener* listener,
 									BHandler* target);
 									// throws
@@ -52,4 +52,4 @@ private:
 };
 
 
-#endif // EXCEPTION_CONFIG_WINDOW_H
+#endif // BREAK_CONDITION_CONFIG_WINDOW_H

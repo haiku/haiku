@@ -33,7 +33,7 @@
 #include "ConsoleOutputView.h"
 #include "CpuState.h"
 #include "DisassembledCode.h"
-#include "ExceptionConfigWindow.h"
+#include "BreakConditionConfigWindow.h"
 #include "FileSourceCode.h"
 #include "GuiSettingsUtils.h"
 #include "GuiTeamUiSettings.h"
@@ -128,7 +128,7 @@ TeamWindow::TeamWindow(::Team* team, UserInterfaceListener* listener)
 	fImageSplitView(NULL),
 	fThreadSplitView(NULL),
 	fConsoleSplitView(NULL),
-	fExceptionConfigWindow(NULL),
+	fBreakConditionConfigWindow(NULL),
 	fInspectorWindow(NULL),
 	fFilePanel(NULL)
 {
@@ -318,25 +318,26 @@ TeamWindow::MessageReceived(BMessage* message)
 			break;
 
 		}
-		case MSG_SHOW_EXCEPTION_CONFIG_WINDOW:
+		case MSG_SHOW_BREAK_CONDITION_CONFIG_WINDOW:
 		{
-			if (fExceptionConfigWindow) {
-				fExceptionConfigWindow->Activate(true);
+			if (fBreakConditionConfigWindow) {
+				fBreakConditionConfigWindow->Activate(true);
 			} else {
 				try {
-					fExceptionConfigWindow = ExceptionConfigWindow::Create(
+					fBreakConditionConfigWindow
+						= BreakConditionConfigWindow::Create(
 						fTeam, fListener, this);
-					if (fExceptionConfigWindow != NULL)
-						fExceptionConfigWindow->Show();
+					if (fBreakConditionConfigWindow != NULL)
+						fBreakConditionConfigWindow->Show();
 	           	} catch (...) {
 	           		// TODO: notify user
 	           	}
 			}
 			break;
 		}
-		case MSG_EXCEPTION_CONFIG_WINDOW_CLOSED:
+		case MSG_BREAK_CONDITION_CONFIG_WINDOW_CLOSED:
 		{
-			fExceptionConfigWindow = NULL;
+			fBreakConditionConfigWindow = NULL;
 			break;
 		}
 		case MSG_SHOW_WATCH_VARIABLE_PROMPT:
@@ -765,13 +766,6 @@ void
 TeamWindow::ClearWatchpointRequested(Watchpoint* watchpoint)
 {
 	fListener->ClearWatchpointRequested(watchpoint);
-}
-
-
-void
-TeamWindow::SetStopOnImageLoadRequested(bool enabled)
-{
-	fListener->SetStopOnImageLoadRequested(enabled);
 }
 
 

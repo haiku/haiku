@@ -2,7 +2,7 @@
  * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
-#include "ExceptionConfigWindow.h"
+#include "BreakConditionConfigWindow.h"
 
 #include <Button.h>
 #include <CheckBox.h>
@@ -24,10 +24,10 @@ enum {
 };
 
 
-ExceptionConfigWindow::ExceptionConfigWindow(::Team* team,
+BreakConditionConfigWindow::BreakConditionConfigWindow(::Team* team,
 	UserInterfaceListener* listener, BHandler* target)
 	:
-	BWindow(BRect(), "Configure Exceptions", B_FLOATING_WINDOW,
+	BWindow(BRect(), "Configure break conditions", B_FLOATING_WINDOW,
 		B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
 	fTeam(team),
 	fListener(listener),
@@ -39,18 +39,18 @@ ExceptionConfigWindow::ExceptionConfigWindow(::Team* team,
 }
 
 
-ExceptionConfigWindow::~ExceptionConfigWindow()
+BreakConditionConfigWindow::~BreakConditionConfigWindow()
 {
-	BMessenger(fTarget).SendMessage(MSG_EXCEPTION_CONFIG_WINDOW_CLOSED);
+	BMessenger(fTarget).SendMessage(MSG_BREAK_CONDITION_CONFIG_WINDOW_CLOSED);
 }
 
 
-ExceptionConfigWindow*
-ExceptionConfigWindow::Create(::Team* team,
+BreakConditionConfigWindow*
+BreakConditionConfigWindow::Create(::Team* team,
 	UserInterfaceListener* listener, BHandler* target)
 {
-	ExceptionConfigWindow* self = new ExceptionConfigWindow(team, listener,
-		target);
+	BreakConditionConfigWindow* self = new BreakConditionConfigWindow(
+		team, listener, target);
 
 	try {
 		self->_Init();
@@ -64,7 +64,7 @@ ExceptionConfigWindow::Create(::Team* team,
 }
 
 void
-ExceptionConfigWindow::MessageReceived(BMessage* message)
+BreakConditionConfigWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MSG_STOP_ON_THROWN_EXCEPTION_CHANGED:
@@ -87,7 +87,7 @@ ExceptionConfigWindow::MessageReceived(BMessage* message)
 
 
 void
-ExceptionConfigWindow::Show()
+BreakConditionConfigWindow::Show()
 {
 	CenterOnScreen();
 	BWindow::Show();
@@ -95,7 +95,7 @@ ExceptionConfigWindow::Show()
 
 
 void
-ExceptionConfigWindow::_Init()
+BreakConditionConfigWindow::_Init()
 {
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.SetInsets(B_USE_DEFAULT_SPACING)
@@ -140,7 +140,7 @@ ExceptionConfigWindow::_Init()
 
 
 void
-ExceptionConfigWindow::_UpdateThrownBreakpoints(bool enable)
+BreakConditionConfigWindow::_UpdateThrownBreakpoints(bool enable)
 {
 	AutoLocker< ::Team> teamLocker(fTeam);
 	for (ImageList::ConstIterator it = fTeam->Images().GetIterator();
@@ -161,7 +161,7 @@ ExceptionConfigWindow::_UpdateThrownBreakpoints(bool enable)
 
 
 status_t
-ExceptionConfigWindow::_FindExceptionFunction(ImageDebugInfo* info,
+BreakConditionConfigWindow::_FindExceptionFunction(ImageDebugInfo* info,
 	target_addr_t& _foundAddress) const
 {
 	if (info != NULL) {
