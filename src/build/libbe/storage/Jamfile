@@ -11,6 +11,7 @@ USES_BE_API on <libbe_build>storage_kit.o = true ;
 BuildPlatformMergeObjectPIC <libbe_build>storage_kit.o :
 	AppFileInfo.cpp
 	Directory.cpp
+	DriverSettings.cpp
 	Entry.cpp
 	EntryList.cpp
 	File.cpp
