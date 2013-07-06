@@ -827,6 +827,13 @@ Volume::InitPackages(Listener* listener)
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
+	// create the admin directory, if it doesn't exist yet
+	BDirectory packagesDirectory;
+	if (packagesDirectory.SetTo(&fPackagesDirectoryRef) == B_OK) {
+		if (!BEntry(&packagesDirectory, kAdminDirectoryName).Exists())
+			packagesDirectory.CreateDirectory(kAdminDirectoryName, NULL);
+	}
+
 	return B_OK;
 }
 
