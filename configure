@@ -357,6 +357,16 @@ HOST_GCC_LD=`gcc -print-prog-name=ld`
 HOST_GCC_OBJCOPY=`gcc -print-prog-name=objcopy`
 SFDISK_BINARY=sfdisk
 HOST_SFDISK=$SFDISK_BINARY
+HOST_SHA256=
+
+if [ sha256sum < /dev/null 2>&1 > /dev/null ]; then
+	HOST_SHA256=sha256sum
+elif [ sha256 < /dev/null 2>&1 > /dev/null ]; then
+	HOST_SHA256="sha256 -q"
+else
+	echo "Error: Neither sha256sum nor sha256 seem to be available!" >&2
+	exit 1
+fi
 
 haikuRequiredLegacyGCCVersion="2.95.3-haiku-2013_05_04"
 export haikuRequiredLegacyGCCVersion
@@ -631,6 +641,7 @@ HOST_GCC_MACHINE			?= ${HOST_GCC_MACHINE} ;
 HOST_LD						?= ${HOST_GCC_LD} ;
 HOST_OBJCOPY				?= ${HOST_GCC_OBJCOPY} ;
 HOST_SFDISK					?= ${HOST_SFDISK} ;
+HOST_SHA256					?= ${HOST_SHA256} ;
 
 EOF
 
