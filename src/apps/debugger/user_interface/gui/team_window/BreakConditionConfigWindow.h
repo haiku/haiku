@@ -13,6 +13,9 @@
 
 class BButton;
 class BCheckBox;
+class BListView;
+class BMenuField;
+class BTextControl;
 class ImageDebugInfo;
 class Team;
 class UserInterfaceListener;
@@ -47,6 +50,12 @@ private:
 			UserInterfaceListener* fListener;
 			BCheckBox*			fExceptionThrown;
 			BCheckBox*			fExceptionCaught;
+			BCheckBox*			fStopOnImageLoad;
+			BMenuField*			fStopImageConstraints;
+			BListView*			fStopImageNames;
+			BTextControl*		fStopImageNameInput;
+			BButton*			fAddImageNameButton;
+			BButton*			fRemoveImageNameButton;
 			BButton*			fCloseButton;
 			BHandler*			fTarget;
 };
