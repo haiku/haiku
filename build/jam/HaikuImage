@@ -308,6 +308,14 @@ CopyDirectoryToHaikuImage home config settings Media
 	: [ FDirName $(HAIKU_TOP) data settings media dvb ]
 	: dvb : -x Jamfile ;
 
+# repository config files
+local repository ;
+for repository in $(HAIKU_REPOSITORIES) {
+	AddFilesToHaikuImage common settings package-repositories
+		: [ on $(repository) return $(HAIKU_REPOSITORY_CONFIG_FILE) ]
+		: $(repository:G=) ;
+}
+
 
 #pragma mark - Optional Packages
 
