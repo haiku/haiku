@@ -88,6 +88,7 @@ SubInclude HAIKU_TOP src tools addattr ;
 SubInclude HAIKU_TOP src tools anyboot ;
 SubInclude HAIKU_TOP src tools bfs_shell ;
 SubInclude HAIKU_TOP src tools cppunit ;
+SubInclude HAIKU_TOP src tools create_repository_config ;
 SubInclude HAIKU_TOP src tools docbook ;
 SubInclude HAIKU_TOP src tools elfsymbolpatcher ;
 SubInclude HAIKU_TOP src tools fixup_amiga_boot_checksum ;

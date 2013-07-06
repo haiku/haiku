@@ -1,0 +1,11 @@
+SubDir HAIKU_TOP src tools create_repository_config ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin pkgman ] ;
+
+USES_BE_API on <build>create_repository_config = true ;
+
+BuildPlatformMain <build>create_repository_config :
+	create_repository_config.cpp
+	:
+	libpackage_build.so $(HOST_LIBBE) $(HOST_LIBSTDC++)
+	;
