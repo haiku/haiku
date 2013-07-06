@@ -359,9 +359,9 @@ SFDISK_BINARY=sfdisk
 HOST_SFDISK=$SFDISK_BINARY
 HOST_SHA256=
 
-if [ sha256sum < /dev/null 2>&1 > /dev/null ]; then
+if sha256sum < /dev/null > /dev/null 2>&1; then
 	HOST_SHA256=sha256sum
-elif [ sha256 < /dev/null 2>&1 > /dev/null ]; then
+elif sha256 < /dev/null > /dev/null 2>&1; then
 	HOST_SHA256="sha256 -q"
 else
 	echo "Error: Neither sha256sum nor sha256 seem to be available!" >&2
