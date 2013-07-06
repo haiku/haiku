@@ -393,20 +393,35 @@ actions DataFileToSourceFile1
 	$(2[1]) $(DATA_VARIABLE) $(SIZE_VARIABLE) $(2[2]) $(1)
 }
 
-rule DownloadLocatedFile target : url
+rule DownloadLocatedFile target : url : source
 {
+	# DownloadLocatedFile <target> : <url> [ : <source> ] ;
+	#
+	# <source> is an optional target that <target> will be made dependent on.
+	# Its resolved path can be used in <url> via '$source'.
+
 	URL on $(target) = $(url) ;
 
-	DownloadLocatedFile1 $(target) ;
+	if $(source) {
+		Depends $(target) : $(source) ;
+	}
+
+	DownloadLocatedFile1 $(target) : $(source) ;
 }
 
 actions DownloadLocatedFile1
 {
-	wget -O "$(1)" $(URL)
+	source="$(2)"
+	wget --no-use-server-timestamps -O "$(1)" $(URL)
 }
 
-rule DownloadFile file : url
+rule DownloadFile file : url : source
 {
+	# DownloadFile <file> : <url> [ : <source> ] ;
+	#
+	# <source> is an optional target that the target will be made dependent on.
+	# Its resolved path can be used in <url> via '$source'.
+
 	file = $(file:G=download) ;
 
 	# Request the download only once.
@@ -417,7 +432,7 @@ rule DownloadFile file : url
 	HAIKU_FILE_DOWNLOAD on $(file) = 1 ;
 
 	MakeLocate $(file) : $(HAIKU_DOWNLOAD_DIR) ;
-	DownloadLocatedFile $(file) : $(url) ;
+	DownloadLocatedFile $(file) : $(url) : $(source) ;
 
 	return $(file) ;
 }
