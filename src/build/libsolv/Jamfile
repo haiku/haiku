@@ -28,6 +28,11 @@ switch $(HOST_PLATFORM) {
 		DEFINES += HAVE_STRCHRNUL HAVE_QSORT_R HAVE_FOPENCOOKIE ;
 	case haiku_host :
 		DEFINES += HAVE_FOPENCOOKIE ;
+	case freebsd :
+		DEFINES += HAVE_FUNOPEN ;
+	case * :
+		Exit $(SUBDIR)/Jamfile: "Please add a case for your platform"
+			"($(HOST_PLATFORM))!" ;
 }
 
 SubDirCcFlags -Wno-sign-compare -Wno-missing-prototypes ;
