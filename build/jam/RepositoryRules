@@ -39,8 +39,8 @@ rule AddRepositoryPackages repository : architecture : packages : sourcePackages
 }
 
 
-rule PackageRepository repository : architecture : repositoryUrl : packagesUrl
-	: anyPackages : packages : sourcePackages
+rule PackageRepository repository : architecture : repositoryUrl : anyPackages
+	: packages : sourcePackages
 {
 	repository = $(repository:G=repository) ;
 
@@ -50,7 +50,6 @@ rule PackageRepository repository : architecture : repositoryUrl : packagesUrl
 
 	HAIKU_REPOSITORIES += $(repository) ;
 	HAIKU_REPOSITORY_URL on $(repository) = $(repositoryUrl) ;
-	HAIKU_REPOSITORY_PACKAGES_URL on $(repository) = $(packagesUrl) ;
 	HAIKU_REPOSITORY_DEFINITION_FILE on $(repository)
 		= $(HAIKU_REPOSITORY_JAMFILE) ;
 
@@ -95,6 +94,8 @@ rule PackageRepository repository : architecture : repositoryUrl : packagesUrl
 
 	HAIKU_REPOSITORY_CACHE_FILE on $(repository) = $(repositoryFile) ;
 	HAIKU_REPOSITORY_CONFIG_FILE on $(repository) = $(repositoryConfig) ;
+	HAIKU_REPOSITORY_PACKAGES_CHECKSUM_FILE on $(repository)
+		= $(packagesChecksumFile) ;
 }
 
 
@@ -156,10 +157,10 @@ rule IsPackageAvailable package
 }
 
 
-rule PackageURL packageName
+rule DownloadPackage packageName
 {
 	if ! [ IsPackageAvailable $(packageName) ] {
-		Exit "PackageURL: package" $(packageName) "not available!" ;
+		Exit "DownloadPackage: package" $(packageName) "not available!" ;
 		return ;
 	}
 
@@ -171,8 +172,16 @@ rule PackageURL packageName
 		= [ on $(packageFamily) return $(HAIKU_PACKAGE_VERSIONS[1]) ] ;
 	local fileName = [ on $(package) return $(HAIKU_PACKAGE_FILE_NAME) ] ;
 	local repository = [ on $(package) return $(HAIKU_PACKAGE_REPOSITORY) ] ;
-	local baseUrl
-		= [ on $(repository) return $(HAIKU_REPOSITORY_PACKAGES_URL) ] ;
+	local baseUrl = [ on $(repository) return $(HAIKU_REPOSITORY_URL) ] ;
+	local packagesChecksumFile
+		= [ on $(repository)
+			return $(HAIKU_REPOSITORY_PACKAGES_CHECKSUM_FILE) ] ;
 
-	return $(baseUrl)/$(fileName) ;
+	local downloadedFile = [ DownloadFile $(fileName)
+		: "$(baseUrl)/`cat $source`/packages/$(fileName)"
+		: $(packagesChecksumFile) ] ;
+	NoUpdate $(downloadedFile) ;
+		# Don't download the file again when something in the repository
+		# changes. It is (supposed to be) still the same file.
+	return $(downloadedFile) ;
 }

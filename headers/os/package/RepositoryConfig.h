@@ -33,6 +33,8 @@ public:
 
 			const BEntry&		Entry() const;
 
+			BString				PackagesURL() const;
+
 			void				SetName(const BString& name);
 			void				SetBaseURL(const BString& url);
 			void				SetPriority(uint8 priority);

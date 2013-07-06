@@ -143,7 +143,7 @@ main(int argc, const char* const* argv)
 					const BRepositoryInfo& info
 						= repositoryInfos[package->Repository()];
 					BString url = info.OriginalBaseURL();
-					url << '/' << package->Info().CanonicalFileName();
+					url << "/packages/" << package->Info().CanonicalFileName();
 					printf("%s\n", url.String());
 				}
 				break;

@@ -160,6 +160,15 @@ BRepositoryConfig::Entry() const
 }
 
 
+BString
+BRepositoryConfig::PackagesURL() const
+{
+	if (fBaseURL.IsEmpty())
+		return BString();
+	return BString().SetToFormat("%s/packages", fBaseURL.String());
+}
+
+
 void
 BRepositoryConfig::SetName(const BString& name)
 {

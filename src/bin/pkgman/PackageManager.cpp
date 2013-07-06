@@ -398,7 +398,7 @@ PackageManager::_ApplyPackageChanges()
 		// get package URL and target entry
 		Repository* repository
 			= static_cast<Repository*>(package->Repository());
-		BString url = repository->Config().BaseURL();
+		BString url = repository->Config().PackagesURL();
 		BString fileName(package->Info().CanonicalFileName());
 		if (fileName.IsEmpty())
 			DIE(B_NO_MEMORY, "failed to allocate file name");

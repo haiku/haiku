@@ -695,11 +695,9 @@ rule ExtractBuildFeatureArchives feature : list
 		}
 
 		local package = $(list[2]) ;
-		local url = [ PackageURL $(list[3]) ] ;
-		local fileName = $(url:BS) ;
+		local file = [ DownloadPackage $(list[3]) ] ;
+		local fileName = $(file:BS) ;
 		list = $(list[4-]) ;
-
-		local file = [ DownloadFile $(fileName) : $(url) ] ;
 
 		local directory = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
 			$(fileName:B) ] ;
