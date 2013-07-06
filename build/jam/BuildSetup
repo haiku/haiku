@@ -1240,11 +1240,16 @@ HAIKU_APP_TEST_DIR		?= [ FDirName $(HAIKU_TEST_DIR) apps ] ;
 HAIKU_APP_TEST_LIB_DIR 	?= [ FDirName $(HAIKU_APP_TEST_DIR) lib ] ;
 HAIKU_TMP_DIR			?= [ FDirName $(HAIKU_OUTPUT_DIR) tmp ] ;
 
-HAIKU_PACKAGES_DIR			= [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR)
-								packages ] ;
-HAIKU_PACKAGES_BUILD_DIR	= [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR)
-								packages_build ] ;
-HAIKU_PACKAGE_INFOS_DIR		= [ FDirName $(HAIKU_TOP) src data package_infos ] ;
+HAIKU_PACKAGING_BASE_DIR		= [ FDirName $(TARGET_OBJECT_BASE_DIR)
+									$(HAIKU_PACKAGING_ARCH) packaging ] ;
+HAIKU_PACKAGES_DIR				= [ FDirName $(HAIKU_PACKAGING_BASE_DIR)
+									packages ] ;
+HAIKU_PACKAGES_BUILD_DIR		= [ FDirName $(HAIKU_PACKAGING_BASE_DIR)
+									packages_build ] ;
+HAIKU_PACKAGE_REPOSITORIES_DIR	= [ FDirName $(HAIKU_PACKAGING_BASE_DIR)
+									repositories ] ;
+HAIKU_PACKAGE_INFOS_DIR			= [ FDirName $(HAIKU_TOP) src data
+									package_infos ] ;
 
 TARGET_TEST_DIR				?= [ FDirName $(HAIKU_TEST_DIR)
 									$(TARGET_PLATFORM) ] ;

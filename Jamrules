@@ -64,6 +64,7 @@ for repository in HaikuPorts {
 		= [ FDirName $(repositoriesDirectory) $(repository) ] ;
 	local file = [ Glob $(repositoryDirectory) : $(HAIKU_PACKAGING_ARCH) ] ;
 	if $(file) {
+		HAIKU_REPOSITORY_JAMFILE = $(file) ;
 		include $(file) ;
 	}
 }

@@ -39,8 +39,8 @@ rule AddRepositoryPackages repository : architecture : packages : sourcePackages
 }
 
 
-rule PackageRepository repository : architecture : url : anyPackages : packages
-	: sourcePackages
+rule PackageRepository repository : architecture : repositoryUrl : packagesUrl
+	: anyPackages : packages : sourcePackages
 {
 	repository = $(repository:G=repository) ;
 
@@ -49,12 +49,52 @@ rule PackageRepository repository : architecture : url : anyPackages : packages
 	}
 
 	HAIKU_REPOSITORIES += $(repository) ;
-	HAIKU_REPOSITORY_URL on $(repository) = $(url) ;
+	HAIKU_REPOSITORY_URL on $(repository) = $(repositoryUrl) ;
+	HAIKU_REPOSITORY_PACKAGES_URL on $(repository) = $(packagesUrl) ;
+	HAIKU_REPOSITORY_DEFINITION_FILE on $(repository)
+		= $(HAIKU_REPOSITORY_JAMFILE) ;
 
 	AddRepositoryPackages $(repository) : any : $(anyPackages)
 		: $(sourcePackages) ;
 	AddRepositoryPackages $(repository) : $(architecture) : $(packages)
 		: $(sourcePackages) ;
+
+	# build package list file
+	local packageListFile = $(repository:G=repository-package-list)-packages ;
+	MakeLocate $(packageListFile) : $(HAIKU_PACKAGE_REPOSITORIES_DIR) ;
+	GeneratedRepositoryPackageList $(packageListFile) : $(repository) ;
+
+	# build package list checksum file
+	local packagesChecksumFile
+		= $(repository:G=repository-package-checksum)-checksum ;
+	MakeLocate $(packagesChecksumFile) : $(HAIKU_PACKAGE_REPOSITORIES_DIR) ;
+	Depends $(packagesChecksumFile) : $(packageListFile) ;
+	ChecksumFileSHA256 $(packagesChecksumFile) : $(packageListFile) ;
+
+	# download repository info file
+	local repositoryInfo = $(repository:G=repository-info)-info ;
+	MakeLocate $(repositoryInfo) : $(HAIKU_PACKAGE_REPOSITORIES_DIR) ;
+	local repoUrl = [ on $(repository) return $(HAIKU_REPOSITORY_URL) ] ;
+	DownloadLocatedFile $(repositoryInfo)
+		: "$(repoUrl)/`cat $source`/repo.info"
+		: $(packagesChecksumFile) ;
+
+	# download repository file
+	local repositoryFile = $(repository:G=repository-cache) ;
+	MakeLocate $(repositoryFile) : $(HAIKU_PACKAGE_REPOSITORIES_DIR) ;
+	local repoUrl = [ on $(repository) return $(HAIKU_REPOSITORY_URL) ] ;
+	DownloadLocatedFile $(repositoryFile)
+		: "$(repoUrl)/`cat $source`/repo"
+		: $(packagesChecksumFile) ;
+
+	# build repository config file
+	local repositoryConfig = $(repository:G=repository-config)-config ;
+	MakeLocate $(repositoryConfig) : $(HAIKU_PACKAGE_REPOSITORIES_DIR) ;
+	RepositoryConfig $(repositoryConfig) : $(repositoryInfo)
+		: $(packagesChecksumFile) : $(repository) ;
+
+	HAIKU_REPOSITORY_CACHE_FILE on $(repository) = $(repositoryFile) ;
+	HAIKU_REPOSITORY_CONFIG_FILE on $(repository) = $(repositoryConfig) ;
 }
 
 
@@ -69,6 +109,10 @@ rule GeneratedRepositoryPackageList target : repository
 		fileNames += [ on $(package) return $(HAIKU_PACKAGE_FILE_NAME) ] ;
 	}
 
+	local definitionFile
+		= [ on $(repository) return $(HAIKU_REPOSITORY_DEFINITION_FILE) ] ;
+	Depends $(target) : $(definitionFile) ;
+
 	HAIKU_REPOSITORY_PACKAGE_FILE_NAMES on $(target) = $(fileNames) ;
 	GeneratedRepositoryPackageList1 $(target) ;
 }
@@ -79,6 +123,26 @@ actions GeneratedRepositoryPackageList1
 	(for file in $(HAIKU_REPOSITORY_PACKAGE_FILE_NAMES) ; do
 		echo $file
 	done) | LC_ALL=C sort -u > $(1)
+}
+
+
+rule RepositoryConfig repoConfig : repoInfo : packagesChecksumFile : repository
+{
+	repository = $(repository:G=repository) ;
+
+	HAIKU_REPOSITORY_URL on $(repoConfig)
+		= [ on $(repository) return $(HAIKU_REPOSITORY_URL) ] ;
+	Depends $(repoConfig)
+		: <build>create_repository_config $(repoInfo) $(packagesChecksumFile) ;
+	RepositoryConfig1 $(repoConfig)
+		: <build>create_repository_config $(repoInfo) $(packagesChecksumFile) ;
+}
+
+
+actions RepositoryConfig1
+{
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	$(2[1]) $(HAIKU_REPOSITORY_URL)/`cat $(2[3])` $(2[2]) $(1)
 }
 
 
@@ -107,7 +171,8 @@ rule PackageURL packageName
 		= [ on $(packageFamily) return $(HAIKU_PACKAGE_VERSIONS[1]) ] ;
 	local fileName = [ on $(package) return $(HAIKU_PACKAGE_FILE_NAME) ] ;
 	local repository = [ on $(package) return $(HAIKU_PACKAGE_REPOSITORY) ] ;
-	local baseUrl = [ on $(repository) return $(HAIKU_REPOSITORY_URL) ] ;
+	local baseUrl
+		= [ on $(repository) return $(HAIKU_REPOSITORY_PACKAGES_URL) ] ;
 
 	return $(baseUrl)/$(fileName) ;
 }

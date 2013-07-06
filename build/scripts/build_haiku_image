@@ -8,6 +8,7 @@ set -o errexit
 # addBuildCompatibilityLibDir
 # systemPackages, commonPackages - lists of the hpkg packages copied/updated
 #   (in "system" and "common" respectively)
+# repositories - all repository files
 # downloadDir
 # The following are only for image types:
 # installDir
@@ -306,21 +307,8 @@ done
 if [ -n "$resolvePackageDependencies" ]; then
 	echo "Resolving package dependencies ..."
 
-	repoFiles=
-	for repository in $repositories; do
-		eval 'repositoryPackageList=$repositoryPackageList_'$repository
-		eval 'repositoryUrl=$repositoryUrl_'$repository
-		packageListHash=`sha256sum $repositoryPackageList \
-			| sed -r 's,([^[:space:]]*).*,\1,'`
-		repoFileName=repo-$packageListHash
-		repoFileUrl="$repositoryUrl/repos/$repoFileName"
-		repoFilePath="$downloadDir/$repoFileName"
-		downloadFile $repoFileUrl $repoFilePath
-		repoFiles="$repoFiles $repoFilePath"
-	done
-
 	# additional packages for system
-	packageUrls=`$getPackageDependencies $repoFiles -- $systemPackages`
+	packageUrls=`$getPackageDependencies $repositories -- $systemPackages`
 	for packageUrl in $packageUrls; do
 		packageFileName=`basename $packageUrl`
 		packageFilePath="$downloadDir/$packageFileName"
@@ -330,7 +318,7 @@ if [ -n "$resolvePackageDependencies" ]; then
 	done
 
 	# additional packages for common
-	packageUrls=`$getPackageDependencies $repoFiles -- $systemPackages \
+	packageUrls=`$getPackageDependencies $repositories -- $systemPackages \
 		$commonPackages`
 	for packageUrl in $packageUrls; do
 		packageFileName=`basename $packageUrl`

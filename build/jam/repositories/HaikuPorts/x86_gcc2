@@ -1,5 +1,6 @@
 PackageRepository HaikuPorts
 	: x86_gcc2
+	: http://haiku-files.org/files/repo
 	: http://haiku-files.org/files/hpkg
 	:
 	# architecture "any" packages

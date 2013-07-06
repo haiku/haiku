@@ -463,20 +463,13 @@ AddTargetVariableToScript $(script) : $(commonPackages) : commonPackages ;
 
 # Generate the repository package lists and add variables for the repositories.
 local repository ;
+local repositoryFiles ;
 for repository in $(HAIKU_REPOSITORIES) {
-	local packageListFile = $(repository:G=repository-package-list) ;
-	MakeLocate $(packageListFile)
-		: [ FDirName $(TARGET_OBJECT_BASE_DIR) $(HAIKU_PACKAGING_ARCH) ] ;
-	Always $(packageListFile) ;
-	GeneratedRepositoryPackageList $(packageListFile) : $(repository) ;
-
-	AddTargetVariableToScript $(script) : $(packageListFile)
-		: repositoryPackageList_$(repository:G=) ;
-	AddVariableToScript $(script) : repositoryUrl_$(repository:G=)
-		: [ on $(repository) return $(HAIKU_REPOSITORY_URL) ] ;
+	repositoryFiles
+		+= [ on $(repository) return $(HAIKU_REPOSITORY_CACHE_FILE) ] ;
 }
 
-AddVariableToScript $(script) : repositories : $(HAIKU_REPOSITORIES:G=) ;
+AddTargetVariableToScript $(script) : $(repositoryFiles) : repositories ;
 
 # create the other scripts
 HAIKU_IMAGE_MAKE_DIRS_SCRIPT = <HaikuImage>haiku.image-make-dirs ;
