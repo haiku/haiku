@@ -245,7 +245,7 @@ BPackageInfo::BPackageInfo(BMessage* archive, status_t* _error)
 		&& (error = archive->FindString("checksum", &fChecksum)) == B_OK
 		&& (error = archive->FindString("install-path", &fInstallPath)) == B_OK) {
 		if (architecture >= 0
-			|| architecture <= B_PACKAGE_ARCHITECTURE_ENUM_COUNT) {
+			&& architecture <= B_PACKAGE_ARCHITECTURE_ENUM_COUNT) {
 			fArchitecture = (BPackageArchitecture)architecture;
 		} else
 			error = B_BAD_DATA;
