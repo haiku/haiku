@@ -1654,7 +1654,7 @@ BPackageInfo::_ExtractUsers(BMessage* archive, const char* field,
 			return error;
 
 		BStringList groups;
-		if (!groupsString.Split(" ", false, groups))
+		if (!groupsString.IsEmpty() && !groupsString.Split(" ", false, groups))
 			return B_NO_MEMORY;
 
 		BUser* user = new(std::nothrow) BUser(name, realName, home, shell,
