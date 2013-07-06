@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src build libpackage ;
 
-UsePrivateBuildHeaders kernel package shared ;
+UsePrivateBuildHeaders kernel package shared storage ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;

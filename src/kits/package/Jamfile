@@ -4,7 +4,9 @@ UseBuildFeatureHeaders zlib ;
 
 UsePrivateHeaders
 	kernel
-	shared ;
+	shared
+	storage
+	;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg v1 ] ;
