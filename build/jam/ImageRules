@@ -1145,32 +1145,6 @@ rule AddGroupToHaikuImage group : gid : members
 }
 
 
-rule AddOptionalPackageDescriptionToHaikuImage file : searchPath
-{
-	if $(searchPath) {
-		SEARCH on $(file) = [ FDirName $(searchPath) ] ;
-	}
-
-	HAIKU_IMAGE_OPTIONAL_PACKAGE_DESCRIPTIONS += $(file) ;
-}
-
-rule AddLicenseToHaikuImage file : name : searchPath
-{
-	if $(searchPath) {
-		SEARCH on $(file) = [ FDirName $(searchPath) ] ;
-	}
-
-	if $(name) && $(file:BS) = $(name) {
-		name = ;
-	}
-
-	local systemDirTokens
-		= [ on $(container) return $(HAIKU_CONTAINER_SYSTEM_DIR_TOKENS) ] ;
-
-	AddFilesToHaikuImage $(systemDirTokens) data licenses : $(file) : $(name) ;
-}
-
-
 rule AddLibrariesToHaikuImage directory : libs
 {
 	# AddLibraryToHaikuImage <directory> : <libs>

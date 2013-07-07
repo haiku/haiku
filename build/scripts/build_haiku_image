@@ -20,7 +20,6 @@ set -o errexit
 # updateOnly
 # dontClearImage
 # isVMwareImage
-# optionalPackageDescriptions
 #
 # addattr
 # copyattr
@@ -245,9 +244,6 @@ downloadFile()
 mkdir -p $tmpDir
 copyrightsFile=$tmpDir/copyrights
 $rmAttrs -f $copyrightsFile
-if [ "$optionalPackageDescriptions" ]; then
-	cp "$optionalPackageDescriptions" $copyrightsFile
-fi
 
 if [ $isCD ]; then
 	# setup output dir
