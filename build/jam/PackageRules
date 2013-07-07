@@ -29,23 +29,50 @@ rule HaikuPackage package
 }
 
 
+rule PreprocessPackageInfo source : directory
+{
+	source = $(source:G=package-info-source) ;
+	SEARCH on $(source) +=
+		[ FDirName $(HAIKU_PACKAGE_INFOS_DIR) $(HAIKU_PACKAGING_ARCH) ]
+		[ FDirName $(HAIKU_PACKAGE_INFOS_DIR) any ]
+		[ FDirName $(HAIKU_PACKAGE_INFOS_DIR) generic ] 
+	;
+
+	local target = $(source:BSG=package-info)-package-info ;
+	local defines = HAIKU_PACKAGING_ARCH=$(HAIKU_PACKAGING_ARCH) ;
+	if $(HAIKU_BOOTSTRAP_BUILD) {
+		defines += HAIKU_BOOTSTRAP_BUILD ;
+		target = $(target)-bootstrap ;
+	}
+
+	MakeLocate $(target) : $(directory) ;
+	Depends $(target) : $(source) ;
+
+	CCDEFS on $(target) = [ FDefines $(defines) ] ;
+
+	PreprocessPackageInfo1 $(target) : $(source) ;
+
+	return $(target) ;
+}
+
+
+actions PreprocessPackageInfo1
+{
+	$(HOST_CC) -E -w $(CCDEFS) - -o $(1) < $(2)
+}
+
+
 rule BuildHaikuPackage package : packageInfo
 {
-	packageInfo = $(packageInfo:G=package-info) ;
-
 	local grist = [ FHaikuPackageGrist $(package) ] ;
 
 	local tempDir = [ FDirName $(HAIKU_PACKAGES_BUILD_DIR) $(grist) ] ;
 	local scriptDir = [ FDirName $(tempDir) scripts ] ;
 
-	# locate the package and package info
+	#  build the package info and locate the package
+	packageInfo = [ PreprocessPackageInfo $(packageInfo) : $(tempDir) ] ;
 	MakeLocate $(package) : $(HAIKU_PACKAGES_DIR) ;
-	SEARCH on $(packageInfo) +=
-		[ FDirName $(HAIKU_PACKAGE_INFOS_DIR) $(HAIKU_PACKAGING_ARCH) ]
-		[ FDirName $(HAIKU_PACKAGE_INFOS_DIR) any ]
-		[ FDirName $(HAIKU_PACKAGE_INFOS_DIR) generic ] 
-	;
-	LocalDepends $(package) : $(packageInfo) ;
+	Depends $(package) : $(packageInfo) ;
 
 	# prepare the script that initializes the shell variables
 	local initVariablesScript = <$(grist)>haiku.package-init-vars ;
@@ -63,7 +90,6 @@ rule BuildHaikuPackage package : packageInfo
 	AddVariableToScript $(script) : updateOnly
 		: [ on $(package) return $(HAIKU_CONTAINER_UPDATE_ONLY) ] ;
 	AddVariableToScript $(script) : cc : $(TARGET_CC) ;
-	AddVariableToScript $(script) : packagingArch : $(HAIKU_PACKAGING_ARCH) ;
 	AddTargetVariableToScript $(script) : <build>addattr ;
 	AddTargetVariableToScript $(script) : <build>copyattr ;
 	AddTargetVariableToScript $(script) : <mimedb>mime_db : mimeDB ;
