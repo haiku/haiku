@@ -1,14 +1,20 @@
 # The packages we build. Each is defined in its own file in the packages/
 # subdirectory.
 local packages =
-	Haiku
 	HaikuCrossDevel
 	HaikuDevel
 	HaikuLoader
 	HaikuUserguide
 	HaikuWelcome
 	MakefileEngine
-;
+	;
+
+if $(HAIKU_BOOTSTRAP_BUILD) {
+	packages += HaikuBootstrap ;
+} else {
+	packages += Haiku ;
+}
+
 
 packages = $(packages:G=package-rules) ;
 SEARCH on $(packages) = [ FDirName $(HAIKU_BUILD_RULES_DIR) packages ] ;

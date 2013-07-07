@@ -7,12 +7,20 @@ Depends files : doc_files ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) BuildFeatures ] ;
 
 # Include packages that are required by all images.
-AddHaikuImagePackages
-	bzip2 ctags ffmpeg freetype glu grep icu jpeg libpng libsolv mesa sed tar
-	zlib
-	:
-	system
-	;
+if $(HAIKU_BOOTSTRAP_BUILD) {
+	AddHaikuImagePackages
+		bzip2 freetype glu grep icu libsolv mesa sed tar zlib
+		:
+		system
+		;
+} else {
+	AddHaikuImagePackages
+		bzip2 ctags ffmpeg freetype glu grep icu jpeg libpng libsolv mesa sed
+		tar zlib
+		:
+		system
+		;
+}
 
 # If enabled, make sure that OpenSSL is added to the image.
 if $(HAIKU_BUILD_FEATURE_OPENSSL_ENABLED) {
@@ -42,7 +50,11 @@ SubDir HAIKU_TOP ;
 UserBuildConfigRulePostBuildTargets	;
 
 # specify the Haiku image and network boot archive contents
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) images HaikuImage ] ;
+if $(HAIKU_BOOTSTRAP_BUILD) {
+	include [ FDirName $(HAIKU_BUILD_RULES_DIR) images HaikuImageBootstrap ] ;
+} else {
+	include [ FDirName $(HAIKU_BUILD_RULES_DIR) images HaikuImage ] ;
+}
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) images NetBootArchive ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) images FloppyBootImage ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) images CDBootImage ] ;
