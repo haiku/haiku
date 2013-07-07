@@ -98,9 +98,10 @@ ThreadHandler::SetBreakpointAndRun(target_addr_t address)
 
 
 bool
-ThreadHandler::HandleThreadDebugged(ThreadDebuggedEvent* event)
+ThreadHandler::HandleThreadDebugged(ThreadDebuggedEvent* event,
+	const BString& stoppedReason)
 {
-	return _HandleThreadStopped(NULL, THREAD_STOPPED_DEBUGGED);
+	return _HandleThreadStopped(NULL, THREAD_STOPPED_DEBUGGED, stoppedReason);
 }
 
 
