@@ -1576,21 +1576,25 @@ TeamDebugger::_HandleImageDebugInfoChanged(image_id imageID)
 				BReference<ThreadHandler> handlerReference(handler);
 
 				bool stop = true;
+				const BString& imageName = image->Name();
+				// only match on the image filename itself
+				const char* rawImageName = imageName.String()
+					+ imageName.FindLast('/') + 1;
 				if (fTeam->StopImageNameListEnabled()) {
 					const BStringList& nameList = fTeam->StopImageNames();
-					const BString& imageName = image->Name();
-					// only match on the image filename itself
-					const char* rawImageName = imageName.String()
-						+ imageName.FindLast('/') + 1;
 					stop = nameList.HasString(rawImageName);
 				}
 
-				locker.Unlock();
+				if (stop && handler != NULL) {
+					BString stopReason;
+					stopReason.SetToFormat("Image '%s' loaded.",
+						rawImageName);
+					locker.Unlock();
 
-				if (stop && handler != NULL
-					&& handler->HandleThreadDebugged(NULL)) {
-					return;
-				}
+					if (handler->HandleThreadDebugged(NULL, stopReason))
+						return;
+				} else
+					locker.Unlock();
 			} else
 				locker.Unlock();
 
