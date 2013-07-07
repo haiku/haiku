@@ -187,8 +187,10 @@ provides {
 
 requires {
 	lib:libfreetype
+#ifndef HAIKU_BOOTSTRAP_BUILD
 	lib:libjpeg
 	lib:libpng
+#endif
 	lib:libsolv
 	lib:libsolvext
 	lib:libz
