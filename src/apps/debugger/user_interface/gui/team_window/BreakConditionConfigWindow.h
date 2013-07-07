@@ -8,6 +8,8 @@
 
 #include <Window.h>
 
+#include "Team.h"
+
 #include "types/Types.h"
 
 
@@ -17,11 +19,10 @@ class BListView;
 class BMenuField;
 class BTextControl;
 class ImageDebugInfo;
-class Team;
 class UserInterfaceListener;
 
 
-class BreakConditionConfigWindow : public BWindow {
+class BreakConditionConfigWindow : public BWindow, private Team::Listener {
 public:
 								BreakConditionConfigWindow(::Team* team,
 									UserInterfaceListener* listener,
@@ -38,11 +39,26 @@ public:
 
 	virtual	void				Show();
 
+	// Team::Listener
+	virtual	void				StopOnImageLoadSettingsChanged(
+									const Team::ImageLoadEvent& event);
+	virtual	void				StopOnImageLoadNameAdded(
+									const Team::ImageLoadNameEvent& event);
+	virtual	void				StopOnImageLoadNameRemoved(
+									const Team::ImageLoadNameEvent& event);
+
+
 private:
 			void	 			_Init();
 			void				_UpdateThrownBreakpoints(bool enable);
 			status_t			_FindExceptionFunction(ImageDebugInfo* info,
 									target_addr_t& _foundAddress) const;
+
+			void				_UpdateExceptionState();
+			void				_UpdateStopImageState();
+			void				_UpdateStopImageButtons();
+									// must be called with team lock held
+
 
 
 private:
@@ -56,6 +72,7 @@ private:
 			BTextControl*		fStopImageNameInput;
 			BButton*			fAddImageNameButton;
 			BButton*			fRemoveImageNameButton;
+			bool				fUseCustomImages;
 			BButton*			fCloseButton;
 			BHandler*			fTarget;
 };
