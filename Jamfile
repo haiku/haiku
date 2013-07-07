@@ -42,13 +42,13 @@ SubDir HAIKU_TOP ;
 UserBuildConfigRulePostBuildTargets	;
 
 # specify the Haiku image and network boot archive contents
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) HaikuImage ] ;
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) NetBootArchive ] ;
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) FloppyBootImage ] ;
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) CDBootImage ] ;
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) CDBootPPCImage ] ;
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) HaikuCD ] ;
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) AnybootImage ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) images HaikuImage ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) images NetBootArchive ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) images FloppyBootImage ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) images CDBootImage ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) images CDBootPPCImage ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) images HaikuCD ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) images AnybootImage ] ;
 
 # Check whether all requested optional packages do actually exist.
 local package ;
