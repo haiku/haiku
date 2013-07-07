@@ -70,6 +70,7 @@ private:
 									ValueNode* valueNode);
 	virtual	void				ThreadActionRequested(thread_id threadID,
 									uint32 action, target_addr_t address);
+
 	virtual	void				SetBreakpointRequested(target_addr_t address,
 									bool enabled, bool hidden = false);
 	virtual	void				SetBreakpointEnabledRequested(
@@ -78,7 +79,14 @@ private:
 	virtual	void				ClearBreakpointRequested(target_addr_t address);
 	virtual	void				ClearBreakpointRequested(
 									UserBreakpoint* breakpoint);
-	virtual	void				SetStopOnImageLoadRequested(bool enabled);
+
+	virtual	void				SetStopOnImageLoadRequested(bool enabled,
+									bool useImageNames);
+	virtual	void				AddStopImageNameRequested(
+									const char* name);
+	virtual	void				RemoveStopImageNameRequested(
+									const char* name);
+
 	virtual	void				SetWatchpointRequested(target_addr_t address,
 									uint32 type, int32 length, bool enabled);
 	virtual	void				SetWatchpointEnabledRequested(
@@ -207,7 +215,6 @@ private:
 			TeamSettings		fTeamSettings;
 			int					fCommandLineArgc;
 			const char**		fCommandLineArgv;
-			bool				fStopOnImageLoad;
 };
 
 

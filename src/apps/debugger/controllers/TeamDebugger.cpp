@@ -14,6 +14,7 @@
 
 #include <Entry.h>
 #include <Message.h>
+#include <StringList.h>
 
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
@@ -223,8 +224,7 @@ TeamDebugger::TeamDebugger(Listener* listener, UserInterface* userInterface,
 	fTerminating(false),
 	fKillTeamOnQuit(false),
 	fCommandLineArgc(0),
-	fCommandLineArgv(NULL),
-	fStopOnImageLoad(false)
+	fCommandLineArgv(NULL)
 {
 	fUserInterface->AcquireReference();
 }
@@ -608,11 +608,37 @@ TeamDebugger::MessageReceived(BMessage* message)
 		case MSG_STOP_ON_IMAGE_LOAD:
 		{
 			bool enabled;
+			bool useNames;
 			if (message->FindBool("enabled", &enabled) != B_OK)
 				break;
 
-			fStopOnImageLoad = enabled;
+			if (message->FindBool("useNames", &useNames) != B_OK)
+				break;
+
+			AutoLocker< ::Team> teamLocker(fTeam);
+			fTeam->SetStopOnImageLoad(enabled, useNames);
 			break;
+		}
+
+		case MSG_ADD_STOP_IMAGE_NAME:
+		{
+			BString imageName;
+			if (message->FindString("name", &imageName) != B_OK)
+				break;
+
+			AutoLocker< ::Team> teamLocker(fTeam);
+			fTeam->AddStopImageName(imageName);
+			break;
+		}
+
+		case MSG_REMOVE_STOP_IMAGE_NAME:
+		{
+			BString imageName;
+			if (message->FindString("name", &imageName) != B_OK)
+				break;
+
+			AutoLocker< ::Team> teamLocker(fTeam);
+			fTeam->RemoveStopImageName(imageName);
 		}
 
 		case MSG_SET_WATCHPOINT:
@@ -899,10 +925,29 @@ TeamDebugger::ClearBreakpointRequested(target_addr_t address)
 
 
 void
-TeamDebugger::SetStopOnImageLoadRequested(bool enabled)
+TeamDebugger::SetStopOnImageLoadRequested(bool enabled, bool useImageNames)
 {
 	BMessage message(MSG_STOP_ON_IMAGE_LOAD);
 	message.AddBool("enabled", enabled);
+	message.AddBool("useNames", useImageNames);
+	PostMessage(&message);
+}
+
+
+void
+TeamDebugger::AddStopImageNameRequested(const char* name)
+{
+	BMessage message(MSG_ADD_STOP_IMAGE_NAME);
+	message.AddString("name", name);
+	PostMessage(&message);
+}
+
+
+void
+TeamDebugger::RemoveStopImageNameRequested(const char* name)
+{
+	BMessage message(MSG_REMOVE_STOP_IMAGE_NAME);
+	message.AddString("name", name);
 	PostMessage(&message);
 }
 
@@ -1525,13 +1570,30 @@ TeamDebugger::_HandleImageDebugInfoChanged(image_id imageID)
 		if (thread != NULL) {
 			fImageInfoPendingThreads->Remove(thread);
 			ObjectDeleter<ImageInfoPendingThread> threadDeleter(thread);
-			if (fStopOnImageLoad) {
+			locker.Lock();
+			if (fTeam->StopOnImageLoad()) {
 				ThreadHandler* handler = _GetThreadHandler(thread->ThreadID());
 				BReference<ThreadHandler> handlerReference(handler);
 
-				if (handler != NULL && handler->HandleThreadDebugged(NULL))
+				bool stop = true;
+				if (fTeam->StopImageNameListEnabled()) {
+					const BStringList& nameList = fTeam->StopImageNames();
+					const BString& imageName = image->Name();
+					// only match on the image filename itself
+					const char* rawImageName = imageName.String()
+						+ imageName.FindLast('/') + 1;
+					stop = nameList.HasString(rawImageName);
+				}
+
+				locker.Unlock();
+
+				if (stop && handler != NULL
+					&& handler->HandleThreadDebugged(NULL)) {
 					return;
-			}
+				}
+			} else
+				locker.Unlock();
+
 			fDebuggerInterface->ContinueThread(thread->ThreadID());
 		}
 	}
