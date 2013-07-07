@@ -445,4 +445,4 @@ CopyDirectoryToHaikuImage system documentation
 	: diskusage : -x .svn ;
 
 
-include HaikuImageCommon ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) images HaikuImageCommon ] ;

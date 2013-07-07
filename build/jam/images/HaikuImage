@@ -317,4 +317,4 @@ for repository in $(HAIKU_REPOSITORIES) {
 }
 
 
-include HaikuImageCommon ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) images HaikuImageCommon ] ;
