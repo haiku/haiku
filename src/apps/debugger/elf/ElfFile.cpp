@@ -345,7 +345,7 @@ ElfFile::_LoadFile(const char* fileName)
 bool
 ElfFile::_CheckRange(off_t offset, off_t size) const
 {
-	return offset < fFileSize && offset + size < fFileSize;
+	return offset < fFileSize && offset + size <= fFileSize;
 }
 
 
