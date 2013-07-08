@@ -147,7 +147,7 @@ public:
 										= B_ALIGN_HORIZONTAL_UNSET,
 									int32 columnCount = 1, int32 rowCount = 1);
 
-	inline	GroupBuilder		AddGroup(enum orientation orientation,
+	inline	GroupBuilder		AddGroup(orientation orientation,
 									float spacing, int32 column, int32 row,
 									int32 columnCount = 1, int32 rowCount = 1);
 	inline	GroupBuilder		AddGroup(BGroupView* groupView,	int32 column,
@@ -168,7 +168,7 @@ public:
 									int32 column, int32 row,
 									int32 columnCount = 1, int32 rowCount = 1);
 
-	inline	SplitBuilder		AddSplit(enum orientation orientation,
+	inline	SplitBuilder		AddSplit(orientation orientation,
 									float spacing, int32 column, int32 row,
 									int32 columnCount = 1, int32 rowCount = 1);
 	inline	SplitBuilder		AddSplit(BSplitView* splitView, int32 column,
@@ -197,8 +197,7 @@ public:
 	typedef Split<ThisBuilder>		SplitBuilder;
 
 public:
-	inline						Split(enum orientation orientation
-										= B_HORIZONTAL,
+	inline						Split(orientation orientation = B_HORIZONTAL,
 									float spacing = 0.0f);
 	inline						Split(BSplitView* view);
 
@@ -211,7 +210,7 @@ public:
 	inline	ThisBuilder&		Add(BLayoutItem* item);
 	inline	ThisBuilder&		Add(BLayoutItem* item, float weight);
 
-	inline	GroupBuilder		AddGroup(enum orientation orientation,
+	inline	GroupBuilder		AddGroup(orientation orientation,
 									float spacing = 0.0f, float weight = 1.0f);
 	inline	GroupBuilder		AddGroup(BGroupView* groupView,
 									float weight = 1.0f);
@@ -226,7 +225,7 @@ public:
 	inline	GridBuilder			AddGrid(BGridLayout* gridLayout,
 									float weight = 1.0f);
 
-	inline	SplitBuilder		AddSplit(enum orientation orientation,
+	inline	SplitBuilder		AddSplit(orientation orientation,
 									float spacing = 0.0f, float weight = 1.0f);
 	inline	SplitBuilder		AddSplit(BSplitView* splitView,
 									float weight = 1.0f);

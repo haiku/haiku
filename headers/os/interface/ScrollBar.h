@@ -26,7 +26,7 @@ public:
 									orientation direction);
 								BScrollBar(const char* name, BView* target,
 									float min, float max,
-									enum orientation orientation);
+									orientation orientation);
 								BScrollBar(BMessage* archive);
 	virtual						~BScrollBar();
 	static	BArchivable*		Instantiate(BMessage* archive);
@@ -48,7 +48,7 @@ public:
 			void				SetTarget(BView *target);
 			void				SetTarget(const char* targetName);
 			BView*				Target() const;
-			void				SetOrientation(enum orientation orientation);
+			void				SetOrientation(orientation orientation);
 			orientation			Orientation() const;
 
 			// TODO: Make this a virtual method, it should be one,

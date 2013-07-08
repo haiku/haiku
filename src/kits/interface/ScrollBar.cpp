@@ -595,7 +595,7 @@ BScrollBar::Target() const
 
 
 void
-BScrollBar::SetOrientation(enum orientation orientation)
+BScrollBar::SetOrientation(orientation orientation)
 {
 	if (fOrientation == orientation)
 		return;

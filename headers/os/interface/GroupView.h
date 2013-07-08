@@ -13,10 +13,10 @@
 class BGroupView : public BView {
 public:
 								BGroupView(
-									enum orientation orientation = B_HORIZONTAL,
+									orientation orientation = B_HORIZONTAL,
 									float spacing = B_USE_DEFAULT_SPACING);
 								BGroupView(const char* name,
-									enum orientation orientation = B_HORIZONTAL,
+									orientation orientation = B_HORIZONTAL,
 									float spacing = B_USE_DEFAULT_SPACING);
 								BGroupView(BMessage* from);
 	virtual						~BGroupView();

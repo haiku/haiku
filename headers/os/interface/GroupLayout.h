@@ -9,7 +9,7 @@
 
 class BGroupLayout : public BTwoDimensionalLayout {
 public:
-								BGroupLayout(enum orientation orientation,
+								BGroupLayout(orientation orientation,
 									float spacing = B_USE_DEFAULT_SPACING);
 								BGroupLayout(BMessage* from);
 	virtual						~BGroupLayout();
@@ -18,7 +18,7 @@ public:
 			void				SetSpacing(float spacing);
 
 			orientation			Orientation() const;
-			void				SetOrientation(enum orientation orientation);
+			void				SetOrientation(orientation orientation);
 	
 			float				ItemWeight(int32 index) const;
 			void				SetItemWeight(int32 index, float weight);
@@ -51,12 +51,12 @@ protected:
 	virtual	bool				ItemAdded(BLayoutItem* item, int32 atIndex);
 	virtual	void				ItemRemoved(BLayoutItem* item, int32 fromIndex);
 
-	virtual	void				PrepareItems(enum orientation orientation);
+	virtual	void				PrepareItems(orientation orientation);
 	
 	virtual	int32				InternalCountColumns();
 	virtual	int32				InternalCountRows();
 	virtual	void				GetColumnRowConstraints(
-									enum orientation orientation,
+									orientation orientation,
 									int32 index,
 									ColumnRowConstraints* constraints);
 	virtual	void				GetItemDimensions(BLayoutItem* item,

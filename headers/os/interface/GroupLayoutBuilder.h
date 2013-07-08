@@ -12,7 +12,7 @@
 class BGroupLayoutBuilder {
 public:
 								BGroupLayoutBuilder(
-									enum orientation orientation = B_HORIZONTAL,
+									orientation orientation = B_HORIZONTAL,
 									float spacing = B_USE_DEFAULT_SPACING);
 								BGroupLayoutBuilder(BGroupLayout* layout);
 								BGroupLayoutBuilder(BGroupView* view);
@@ -28,7 +28,7 @@ public:
 			BGroupLayoutBuilder& Add(BLayoutItem* item);
 			BGroupLayoutBuilder& Add(BLayoutItem* item, float weight);
 
-			BGroupLayoutBuilder& AddGroup(enum orientation orientation,
+			BGroupLayoutBuilder& AddGroup(orientation orientation,
 									float spacing = B_USE_DEFAULT_SPACING,
 									float weight = 1.0f);
 			BGroupLayoutBuilder& End();

@@ -80,7 +80,7 @@ protected:
 	virtual	int32				InternalCountColumns();
 	virtual	int32				InternalCountRows();
 	virtual	void				GetColumnRowConstraints(
-									enum orientation orientation,
+									orientation orientation,
 									int32 index,
 									ColumnRowConstraints* constraints);
 	virtual	void				GetItemDimensions(BLayoutItem* item,

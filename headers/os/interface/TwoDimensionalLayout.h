@@ -25,7 +25,7 @@ public:
 									float* bottom) const;
 
 			void				AlignLayoutWith(BTwoDimensionalLayout* other,
-									enum orientation orientation);
+									orientation orientation);
 
 	virtual	BSize				BaseMinSize();
 	virtual	BSize				BaseMaxSize();
@@ -72,14 +72,14 @@ protected:
 									float* preferredHeight);
 			BSize				SubtractInsets(BSize size);
 
-	virtual	void				PrepareItems(enum orientation orientation);
+	virtual	void				PrepareItems(orientation orientation);
 	virtual	bool				HasMultiColumnItems();
 	virtual	bool				HasMultiRowItems();
 
 	virtual	int32				InternalCountColumns() = 0;
 	virtual	int32				InternalCountRows() = 0;
 	virtual	void				GetColumnRowConstraints(
-									enum orientation orientation,
+									orientation orientation,
 									int32 index,
 									ColumnRowConstraints* constraints) = 0;
 	virtual	void				GetItemDimensions(BLayoutItem* item,
