@@ -1,10 +1,14 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
 #include "CpuStateX86.h"
+
+#include <new>
+
+#include <string.h>
 
 #include "Register.h"
 
@@ -47,11 +51,65 @@ CpuStateX86::~CpuStateX86()
 }
 
 
+status_t
+CpuStateX86::Clone(CpuState*& _clone) const
+{
+	CpuStateX86* newState = new(std::nothrow) CpuStateX86();
+	if (newState == NULL)
+		return B_NO_MEMORY;
+
+
+	memcpy(newState->fIntRegisters, fIntRegisters, sizeof(fIntRegisters));
+	newState->fSetRegisters = fSetRegisters;
+	newState->fInterruptVector = fInterruptVector;
+
+	_clone = newState;
+
+	return B_OK;
+}
+
+
+status_t
+CpuStateX86::UpdateDebugState(void* state, size_t size) const
+{
+	if (size != sizeof(x86_debug_cpu_state))
+		return B_BAD_VALUE;
+
+	x86_debug_cpu_state* x86State = (x86_debug_cpu_state*)state;
+
+	x86State->eip = InstructionPointer();
+	x86State->user_esp = StackPointer();
+	x86State->ebp = StackFramePointer();
+	x86State->eax = IntRegisterValue(X86_REGISTER_EAX);
+	x86State->ebx = IntRegisterValue(X86_REGISTER_EBX);
+	x86State->ecx = IntRegisterValue(X86_REGISTER_ECX);
+	x86State->edx = IntRegisterValue(X86_REGISTER_EDX);
+	x86State->esi = IntRegisterValue(X86_REGISTER_ESI);
+	x86State->edi = IntRegisterValue(X86_REGISTER_EDI);
+	x86State->cs = IntRegisterValue(X86_REGISTER_CS);
+	x86State->ds = IntRegisterValue(X86_REGISTER_DS);
+	x86State->es = IntRegisterValue(X86_REGISTER_ES);
+	x86State->fs = IntRegisterValue(X86_REGISTER_FS);
+	x86State->gs = IntRegisterValue(X86_REGISTER_GS);
+	x86State->user_ss = IntRegisterValue(X86_REGISTER_SS);
+	x86State->vector = fInterruptVector;
+
+	return B_OK;
+}
+
+
 target_addr_t
 CpuStateX86::InstructionPointer() const
 {
 	return IsRegisterSet(X86_REGISTER_EIP)
 		? IntRegisterValue(X86_REGISTER_EIP) : 0;
+}
+
+
+void
+CpuStateX86::SetInstructionPointer(target_addr_t address)
+{
+	SetIntRegister(X86_REGISTER_EIP, (uint32)address);
 }
 
 

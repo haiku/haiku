@@ -108,7 +108,7 @@ struct intel_info {
 	uint32		type;
 
 	uint32		*gtt_base;
-	addr_t		gtt_physical_base;
+	phys_addr_t	gtt_physical_base;
 	area_id		gtt_area;
 	size_t		gtt_entries;
 	size_t		gtt_stolen_entries;
@@ -117,7 +117,7 @@ struct intel_info {
 	area_id		registers_area;
 
 	addr_t		aperture_base;
-	addr_t		aperture_physical_base;
+	phys_addr_t	aperture_physical_base;
 	area_id		aperture_area;
 	size_t		aperture_size;
 	size_t		aperture_stolen_size;
@@ -439,7 +439,7 @@ intel_map(intel_info &info)
 	info.gtt_entries = gttSize / 4096;
 	info.gtt_stolen_entries = stolenSize / 4096;
 
-	TRACE("GTT base %lx, size %lu, entries %lu, stolen %lu\n",
+	TRACE("GTT base %" B_PRIxPHYSADDR ", size %lu, entries %lu, stolen %lu\n",
 		info.gtt_physical_base, gttSize, info.gtt_entries, stolenSize);
 
 	AreaKeeper gttMapper;
@@ -460,10 +460,12 @@ intel_map(intel_info &info)
 		"size %ld MB, GTT size %ld KB\n", (stolenSize + (1023 << 10)) >> 20,
 		info.aperture_size >> 20, gttSize >> 10);
 
-	dprintf("intel_gart: GTT base = 0x%lx\n", info.gtt_physical_base);
-	dprintf("intel_gart: MMIO base = 0x%lx\n",
+	dprintf("intel_gart: GTT base = 0x%" B_PRIxPHYSADDR "\n",
+		info.gtt_physical_base);
+	dprintf("intel_gart: MMIO base = 0x%" B_PRIx32 "\n",
 		info.display.u.h0.base_registers[mmioIndex]);
-	dprintf("intel_gart: GMR base = 0x%lx\n", info.aperture_physical_base);
+	dprintf("intel_gart: GMR base = 0x%" B_PRIxPHYSADDR "\n",
+		info.aperture_physical_base);
 
 	AreaKeeper apertureMapper;
 	info.aperture_area = apertureMapper.Map("intel graphics aperture",
@@ -606,8 +608,6 @@ intel_init()
 	if (get_module(B_PCI_MODULE_NAME, (module_info**)&sPCI) != B_OK)
 		return B_ERROR;
 
-	bool found = false;
-
 	for (uint32 index = 0; sPCI->get_nth_pci_info(index, &sInfo.bridge) == B_OK;
 			index++) {
 		if (sInfo.bridge.vendor_id != VENDOR_ID_INTEL
@@ -619,20 +619,16 @@ intel_init()
 				/ sizeof(kSupportedDevices[0]); i++) {
 			if (sInfo.bridge.device_id == kSupportedDevices[i].bridge_id) {
 				sInfo.type = kSupportedDevices[i].type;
-				found = has_display_device(sInfo.display,
-					kSupportedDevices[i].display_id);
+				if (has_display_device(sInfo.display,
+						kSupportedDevices[i].display_id)) {
+					TRACE("found intel bridge\n");
+					return B_OK;
+				}
 			}
 		}
-
-		if (found)
-			break;
 	}
 
-	if (!found)
-		return ENODEV;
-
-	TRACE("found intel bridge\n");
-	return B_OK;
+	return ENODEV;
 }
 
 

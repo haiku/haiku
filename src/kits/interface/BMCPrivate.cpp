@@ -11,6 +11,8 @@
 
 #include <BMCPrivate.h>
 
+#include <algorithm>
+
 #include <ControlLook.h>
 #include <LayoutUtils.h>
 #include <MenuField.h>
@@ -18,10 +20,6 @@
 #include <Message.h>
 #include <MessageRunner.h>
 #include <Window.h>
-
-
-static const float kPopUpIndicatorWidth = 10.0f;
-static const float kMarginWidth = 3.0f;
 
 
 _BMCFilter_::_BMCFilter_(BMenuField* menuField, uint32 what)
@@ -57,6 +55,9 @@ _BMCFilter_::Filter(BMessage* message, BHandler** handler)
 // #pragma mark -
 
 
+static const float kPopUpIndicatorWidth = 13.0f;
+
+
 _BMCMenuBar_::_BMCMenuBar_(BRect frame, bool fixedSize, BMenuField* menuField)
 	:
 	BMenuBar(frame, "_mc_mb_", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_ITEMS_IN_ROW,
@@ -66,7 +67,7 @@ _BMCMenuBar_::_BMCMenuBar_(BRect frame, bool fixedSize, BMenuField* menuField)
 	fRunner(NULL),
 	fShowPopUpMarker(true)
 {
-	_Init(true);
+	_Init();
 }
 
 
@@ -78,7 +79,7 @@ _BMCMenuBar_::_BMCMenuBar_(BMenuField* menuField)
 	fRunner(NULL),
 	fShowPopUpMarker(true)
 {
-	_Init(false);
+	_Init();
 }
 
 
@@ -137,11 +138,22 @@ _BMCMenuBar_::AttachedToWindow()
 void
 _BMCMenuBar_::Draw(BRect updateRect)
 {
-	if (fFixedSize || Bounds().Width() > fMenuField->_MenuBarWidth()) {
-		// Set the width of the menu bar because the menu bar bounds have
+	if (fFixedSize) {
+		// Set the width of the menu bar because the menu bar bounds may have
 		// been expanded by the selected menu item.
 		ResizeTo(fMenuField->_MenuBarWidth(), Bounds().Height());
+	} else {
+		// For compatability with BeOS R5:
+		//  - Set to the minimum of the menu bar width set by the menu frame
+		//    and the selected menu item width.
+		//  - Set the height to the preferred height ignoring the height of the
+		//    menu field.
+		float height;
+		BMenuBar::GetPreferredSize(NULL, &height);
+		ResizeTo(std::min(Bounds().Width(), fMenuField->_MenuBarWidth()),
+			height);
 	}
+
 	BRect rect(Bounds());
 	rgb_color base = ui_color(B_MENU_BACKGROUND_COLOR);
 	uint32 flags = 0;
@@ -165,30 +177,29 @@ _BMCMenuBar_::FrameResized(float width, float height)
 	float diff = width - fPreviousWidth;
 	fPreviousWidth = width;
 
-	if (Window()) {
+	if (Window() != NULL && diff != 0) {
+		BRect dirty(fMenuField->Bounds());
 		if (diff > 0) {
 			// clean up the dirty right border of
 			// the menu field when enlarging
-			BRect dirty(fMenuField->Bounds());
-			dirty.right = Frame().right + 2;
-			dirty.left = dirty.left - diff - 4;
+			dirty.right = Frame().right + kVMargin;
+			dirty.left = dirty.left - diff - kVMargin * 2;
 			fMenuField->Invalidate(dirty);
 
 			// clean up the arrow part
 			dirty = Bounds();
-			dirty.left = dirty.right - diff - 12;
+			dirty.left = dirty.right - diff - kPopUpIndicatorWidth;
 			Invalidate(dirty);
 		} else if (diff < 0) {
 			// clean up the dirty right line of
 			// the menu field when shrinking
-			BRect dirty(fMenuField->Bounds());
-			dirty.left = Frame().right - 2;
-			dirty.right = dirty.left - diff + 4;
+			dirty.left = Frame().right - kVMargin;
+			dirty.right = dirty.left - diff + kVMargin * 2;
 			fMenuField->Invalidate(dirty);
 
 			// clean up the arrow part
 			dirty = Bounds();
-			dirty.left = dirty.right - 12;
+			dirty.left = dirty.right - kPopUpIndicatorWidth;
 			Invalidate(dirty);
 		}
 	}
@@ -254,6 +265,17 @@ _BMCMenuBar_::MakeFocus(bool focused)
 }
 
 
+void
+_BMCMenuBar_::SetMaxContentWidth(float width)
+{
+	float left;
+	float right;
+	GetItemMargins(&left, NULL, &right, NULL);
+
+	BMenuBar::SetMaxContentWidth(width - (left + right));
+}
+
+
 BSize
 _BMCMenuBar_::MinSize()
 {
@@ -262,7 +284,7 @@ _BMCMenuBar_::MinSize()
 
 	if (fShowPopUpMarker) {
 		// account for popup indicator + a few pixels margin
-		size.width += kPopUpIndicatorWidth + kMarginWidth;
+		size.width += kPopUpIndicatorWidth;
 	}
 
 	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
@@ -281,7 +303,7 @@ _BMCMenuBar_::MaxSize()
 
 
 void
-_BMCMenuBar_::_Init(bool setMaxContentWidth)
+_BMCMenuBar_::_Init()
 {
 	SetFlags(Flags() | B_FRAME_EVENTS);
 	SetBorder(B_BORDER_CONTENTS);
@@ -309,11 +331,7 @@ _BMCMenuBar_::_Init(bool setMaxContentWidth)
 		left = right = be_control_look->DefaultLabelSpacing();
 
 	SetItemMargins(left, top,
-		right + fShowPopUpMarker ? kPopUpIndicatorWidth + kMarginWidth : 0,
-		bottom);
+		right + fShowPopUpMarker ? kPopUpIndicatorWidth : 0, bottom);
 
 	fPreviousWidth = Bounds().Width();
-
-	if (setMaxContentWidth)
-		SetMaxContentWidth(fPreviousWidth - (left + right));
 }

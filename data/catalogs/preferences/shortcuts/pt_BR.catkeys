@@ -1,5 +1,5 @@
 1	portuguese (brazil)	x-vnd.Haiku-Shortcuts	341885426
-Error, NULL state description?\n	ShortcutsSpec		Erro, descrição de estado em branco?\n
+Error, NULL state description?\n	ShortcutsSpec		Erro, descrição de estado nulo?\n
 MoveMouse	ShortcutsSpec		Mover o Mouse
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		O Atalhos não pode salvar sua combinação de teclas

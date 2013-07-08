@@ -1840,6 +1840,7 @@ DIESubprogram::DIESubprogram()
 	fAddressClass(0),
 	fPrototyped(false),
 	fInline(DW_INL_not_inlined),
+	fMain(false),
 	fArtificial(false),
 	fCallingConvention(DW_CC_normal)
 {
@@ -1892,6 +1893,9 @@ DIESubprogram::AddChild(DebugInfoEntry* child)
 			return B_OK;
 		case DW_TAG_template_value_parameter:
 			fTemplateValueParameters.Add(child);
+			return B_OK;
+		case DW_TAG_GNU_call_site:
+			fCallSites.Add(child);
 			return B_OK;
 		default:
 			return DIEDeclaredNamedBase::AddChild(child);
@@ -2014,6 +2018,15 @@ DIESubprogram::AddAttribute_calling_convention(uint16 attributeName,
 	const AttributeValue& value)
 {
 	fCallingConvention = value.constant;
+	return B_OK;
+}
+
+
+status_t
+DIESubprogram::AddAttribute_main_subprogram(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fMain = true;
 	return B_OK;
 }
 
@@ -2604,6 +2617,91 @@ DIETemplateValueParameterPack::AddChild(DebugInfoEntry* child)
 }
 
 
+// #pragma mark - DIECallSite
+
+
+DIECallSite::DIECallSite()
+	:
+	fName(NULL)
+{
+}
+
+
+uint16
+DIECallSite::Tag() const
+{
+	return DW_TAG_GNU_call_site;
+}
+
+
+const char*
+DIECallSite::Name() const
+{
+	return fName;
+}
+
+
+status_t
+DIECallSite::AddAttribute_name(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fName = value.string;
+	return B_OK;
+}
+
+
+status_t
+DIECallSite::AddChild(DebugInfoEntry* child)
+{
+	if (child->Tag() == DW_TAG_GNU_call_site_parameter) {
+		fChildren.Add(child);
+		return B_OK;
+	}
+
+	return DIEDeclaredBase::AddChild(child);
+}
+
+
+// #pragma mark - DIECallSiteParameter
+
+
+DIECallSiteParameter::DIECallSiteParameter()
+	:
+	fName(NULL)
+{
+}
+
+
+uint16
+DIECallSiteParameter::Tag() const
+{
+	return DW_TAG_GNU_call_site_parameter;
+}
+
+
+const char*
+DIECallSiteParameter::Name() const
+{
+	return fName;
+}
+
+
+status_t
+DIECallSiteParameter::AddAttribute_name(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fName = value.string;
+	return B_OK;
+}
+
+
+status_t
+DIECallSiteParameter::AddChild(DebugInfoEntry* child)
+{
+	return DIEDeclaredBase::AddChild(child);
+}
+
+
 // #pragma mark - DebugInfoEntryFactory
 
 
@@ -2794,6 +2892,12 @@ DebugInfoEntryFactory::CreateDebugInfoEntry(uint16 tag, DebugInfoEntry*& _entry)
 			break;
 		case DW_TAG_GNU_formal_parameter_pack:
 			entry = new(std::nothrow) DIETemplateValueParameterPack;
+			break;
+		case DW_TAG_GNU_call_site:
+			entry = new(std::nothrow) DIECallSite;
+			break;
+		case DW_TAG_GNU_call_site_parameter:
+			entry = new(std::nothrow) DIECallSiteParameter;
 			break;
 		default:
 			return B_ENTRY_NOT_FOUND;

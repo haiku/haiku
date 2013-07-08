@@ -86,6 +86,7 @@ public:
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
 	virtual	BSize				PreferredSize();
+	virtual	BAlignment			LayoutAlignment();
 
 			BLayoutItem*		CreateLabelLayoutItem();
 			BLayoutItem*		CreateTextViewLayoutItem();

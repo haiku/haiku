@@ -1,0 +1,33 @@
+1	russian	x-vnd.Haiku-InterfacesAddOn	160108912
+Interface	InterfaceWindow		Интерфейс
+Configure…	InterfacesListView		Настроить…
+Static	IntefaceAddressView		Статический
+None	InterfacesListView		Отсутствует
+IP:	InterfacesListView	IPv4 address label	IP:
+Status:	IntefaceHardwareView		Статус:
+IPv6:	InterfacesListView	IPv6 address label	IPv6:
+Save	InterfaceWindow		Сохранить
+Link speed:	IntefaceHardwareView		Скорость соединения:
+Renegotiate	InterfacesAddOn		Переполучить
+The method for obtaining an IP address	IntefaceAddressView		Метод получения IP адреса
+Your gateway	IntefaceAddressView		Ваш шлюз
+Enable	InterfacesListView		Включить
+Received:	IntefaceHardwareView		Получено:
+Revert	InterfaceWindow		Вернуть
+connected	IntefaceHardwareView		подключён
+Gateway:	IntefaceAddressView		Шлюз:
+Disable	InterfacesListView		Отключить
+Sent:	IntefaceHardwareView		Отправлено:
+Disable	InterfacesAddOn		Отключить
+Configure…	InterfacesAddOn		Настроить…
+Renegotiate Address	InterfacesListView		Переполучить адрес
+DHCP	IntefaceAddressView		DHCP
+Mode:	IntefaceAddressView		Режим:
+Your netmask	IntefaceAddressView		Маска подсети
+IP Address:	IntefaceAddressView		IP-адрес:
+Off	IntefaceAddressView		Выключить
+MAC address:	IntefaceHardwareView		MAC-адрес:
+Netmask:	IntefaceAddressView		Маска подсети:
+Your IP address	IntefaceAddressView		IP-адрес:
+%llu KBytes	IntefaceHardwareView		%llu КБайт
+disconnected	IntefaceHardwareView		отключён

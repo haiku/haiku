@@ -28,39 +28,40 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
-
 #ifndef TIFFVIEW_H
 #define TIFFVIEW_H
+
 
 #include <View.h>
 #include <MenuField.h>
 #include <StringView.h>
 #include "TranslatorSettings.h"
 
+
 class TIFFView : public BView {
 public:
-	TIFFView(const char *name, uint32 flags, TranslatorSettings *settings);
-		// sets up the view
-		
-	~TIFFView();
-		// releases the TIFFTranslator settings
+								TIFFView(const char* name, uint32 flags, TranslatorSettings* settings);
+									// sets up the view
 
-	virtual void AllAttached();
-	virtual void MessageReceived(BMessage *message);
+								~TIFFView();
+									// releases the TIFFTranslator settings
+
+	virtual	void				AllAttached();
+	virtual	void				MessageReceived(BMessage* message);
 
 	enum {
 		MSG_COMPRESSION_CHANGED	= 'cmch',
 	};
 
 private:
-	BStringView*			fTitle;
-	BStringView*			fDetail;
-	BStringView*			fLibTIFF[5];
-	BMenuField*				fCompressionMF;
+			BStringView*		fTitle;
+			BStringView*		fDetail;
+			BStringView*		fLibTIFF[5];
+			BMenuField*			fCompressionMF;
 
-	TranslatorSettings *fSettings;
-		// the actual settings for the translator,
-		// shared with the translator
+			TranslatorSettings*	fSettings;
+				// the actual settings for the translator, shared with the translator
 };
+
 
 #endif // #ifndef TIFFVIEW_H

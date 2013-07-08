@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-WebPositive	3577331897
+1	hungarian	x-vnd.Haiku-WebPositive	1786411139
 Show home button	Settings Window		Kezdőlap-gomb megjelenítése
 Username:	Authentication Panel		Felhasználónév:
 Copy URL to clipboard	Download Window		Cím másolása a vágólapra
@@ -16,6 +16,7 @@ Start page:	Settings Window		Kezdőlap:
 History	WebPositive Window		Előzmény
 Error opening downloads folder	Download Window		Hiba történt a letöltések mappa megnyitásakor
 Paste	WebPositive Window		Beillesztés
+Double-click or middle-click to open new tab.	Tab Manager		Új fül dupla kattintással vagy az egér középső gombjával.
 Proxy username:	Settings Window		Felhasználónév a proxyhoz:
 Settings	Settings Window		Beállítások
 %seconds seconds left	Download Window		%seconds másodperc van hátra

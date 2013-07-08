@@ -1,11 +1,15 @@
 /*
  * Copyright 2012, Alex Smith, alex@alex-smith.me.uk.
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
 #include "CpuStateX8664.h"
+
+#include <new>
+
+#include <string.h>
 
 #include "Register.h"
 
@@ -52,11 +56,71 @@ CpuStateX8664::~CpuStateX8664()
 }
 
 
+status_t
+CpuStateX8664::Clone(CpuState*& _clone) const
+{
+	CpuStateX8664* newState = new(std::nothrow) CpuStateX8664();
+	if (newState == NULL)
+		return B_NO_MEMORY;
+
+
+	memcpy(newState->fIntRegisters, fIntRegisters, sizeof(fIntRegisters));
+	newState->fSetRegisters = fSetRegisters;
+
+	_clone = newState;
+
+	return B_OK;
+}
+
+
+status_t
+CpuStateX8664::UpdateDebugState(void* state, size_t size) const
+{
+	if (size != sizeof(x86_64_debug_cpu_state))
+		return B_BAD_VALUE;
+
+	x86_64_debug_cpu_state* x64State = (x86_64_debug_cpu_state*)state;
+
+	x64State->rip = InstructionPointer();
+	x64State->rsp = StackPointer();
+	x64State->rbp = StackFramePointer();
+	x64State->rax = IntRegisterValue(X86_64_REGISTER_RAX);
+	x64State->rbx = IntRegisterValue(X86_64_REGISTER_RBX);
+	x64State->rcx = IntRegisterValue(X86_64_REGISTER_RCX);
+	x64State->rdx = IntRegisterValue(X86_64_REGISTER_RDX);
+	x64State->rsi = IntRegisterValue(X86_64_REGISTER_RSI);
+	x64State->rdi = IntRegisterValue(X86_64_REGISTER_RDI);
+	x64State->r8 = IntRegisterValue(X86_64_REGISTER_R8);
+	x64State->r9 = IntRegisterValue(X86_64_REGISTER_R9);
+	x64State->r10 = IntRegisterValue(X86_64_REGISTER_R10);
+	x64State->r11 = IntRegisterValue(X86_64_REGISTER_R11);
+	x64State->r12 = IntRegisterValue(X86_64_REGISTER_R12);
+	x64State->r13 = IntRegisterValue(X86_64_REGISTER_R13);
+	x64State->r14 = IntRegisterValue(X86_64_REGISTER_R14);
+	x64State->r15 = IntRegisterValue(X86_64_REGISTER_R15);
+	x64State->cs = IntRegisterValue(X86_64_REGISTER_CS);
+	x64State->ds = IntRegisterValue(X86_64_REGISTER_DS);
+	x64State->es = IntRegisterValue(X86_64_REGISTER_ES);
+	x64State->fs = IntRegisterValue(X86_64_REGISTER_FS);
+	x64State->gs = IntRegisterValue(X86_64_REGISTER_GS);
+	x64State->ss = IntRegisterValue(X86_64_REGISTER_SS);
+
+	return B_OK;
+}
+
+
 target_addr_t
 CpuStateX8664::InstructionPointer() const
 {
 	return IsRegisterSet(X86_64_REGISTER_RIP)
 		? IntRegisterValue(X86_64_REGISTER_RIP) : 0;
+}
+
+
+void
+CpuStateX8664::SetInstructionPointer(target_addr_t address)
+{
+	SetIntRegister(X86_64_REGISTER_RIP, address);
 }
 
 

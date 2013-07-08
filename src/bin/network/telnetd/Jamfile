@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src bin network telnetd ;
 
-UseLibraryHeaders termcap ;
+UseLibraryHeaders ncurses ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs libtelnet ] : false ;
@@ -19,5 +19,5 @@ BinCommand telnetd :
 	telnetd.c
 	termstat.c
 	utility.c
-	: libtermcap.a libtelnet.a libutil.a libbsd.so $(TARGET_NETWORK_LIBS)
+	: libncurses.a libtelnet.a libutil.a libbsd.so $(TARGET_NETWORK_LIBS)
 ;

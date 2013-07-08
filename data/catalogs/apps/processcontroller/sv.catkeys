@@ -1,10 +1,8 @@
-1	swedish	x-vnd.Haiku-ProcessController	2887520383
+1	swedish	x-vnd.Haiku-ProcessController	2886374724
 Memory usage	ProcessController		Minnesanvändning
-Do you really want to kill the team \"%s\"?	ProcessController		Vill du verkligen avsluta processen "%s"?
 Idle priority	ProcessController		Overksam prioritet
 Restart Deskbar	ProcessController		Starta om Deskbar
 Custom priority	ProcessController		Annan prioritet
-Debug thread	ProcessController		Felsök tråd
 This team is already gone…	ProcessController		Processen är redan avslutad...
 Error saving file	ProcessController		Fel vid sparning av fil
 Real-time priority	ProcessController		Realtidsprioritet
@@ -42,7 +40,6 @@ Usage: %s [-deskbar]\n	ProcessController		Hantering: %s [-deskbar]\n
 ProcessController	System name		ProcessKontroll
 Real-time display priority	ProcessController		Realtidsvisningprioritet
 Please confirm	ProcessController		Vänligen bekräfta
-Yes, kill this team!	ProcessController		Ja, avsluta den här processen!
 System resources & caches…	ProcessController		Systemresurser & filsystemscache…
 That's no Fun!	ProcessController		Det var inte roligt!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Du kan köra ProcessKontroll i ett fönster eller installera den i Deskbar.

@@ -1,5 +1,10 @@
-1	polish	x-vnd.Haiku-Playground	1190349404
+1	polish	x-vnd.Haiku-Playground	3331526596
 Line	Playground		Linia
+Fill	Playground		Wypełnienie
+Over	Playground		Ponad
+Quit	Playground		Zakończ
+Rect	Playground		Prostokąt
+Select	Playground		Wybierz
 Click and drag to draw an object	Playground		Kliknij i przeciągnij, żeby narysować obiekt
 Controls	Playground		Sterowanie
 Round rect	Playground		Zaokrąglony prostokąt

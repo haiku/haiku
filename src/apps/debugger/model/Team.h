@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TEAM_H
@@ -7,6 +8,7 @@
 
 
 #include <Locker.h>
+#include <StringList.h>
 
 #include <ObjectList.h>
 
@@ -32,6 +34,12 @@ enum {
 
 	TEAM_EVENT_IMAGE_DEBUG_INFO_CHANGED,
 
+	TEAM_EVENT_IMAGE_LOAD_SETTINGS_CHANGED,
+	TEAM_EVENT_IMAGE_LOAD_NAME_ADDED,
+	TEAM_EVENT_IMAGE_LOAD_NAME_REMOVED,
+
+	TEAM_EVENT_CONSOLE_OUTPUT_RECEIVED,
+
 	TEAM_EVENT_BREAKPOINT_ADDED,
 	TEAM_EVENT_BREAKPOINT_REMOVED,
 	TEAM_EVENT_USER_BREAKPOINT_CHANGED,
@@ -41,11 +49,13 @@ enum {
 	TEAM_EVENT_WATCHPOINT_CHANGED,
 
 	TEAM_EVENT_DEBUG_REPORT_CHANGED
+
 };
 
 
 class Architecture;
 class Breakpoint;
+class BStringList;
 class Function;
 class FunctionID;
 class FunctionInstance;
@@ -63,8 +73,11 @@ class Team {
 public:
 			class Event;
 			class BreakpointEvent;
+			class ConsoleOutputEvent;
 			class DebugReportEvent;
 			class ImageEvent;
+			class ImageLoadEvent;
+			class ImageLoadNameEvent;
 			class ThreadEvent;
 			class UserBreakpointEvent;
 			class WatchpointEvent;
@@ -111,6 +124,17 @@ public:
 			Image*				ImageByID(image_id imageID) const;
 			Image*				ImageByAddress(target_addr_t address) const;
 			const ImageList&	Images() const;
+
+			bool				AddStopImageName(const BString& name);
+			void				RemoveStopImageName(const BString& name);
+			const BStringList&	StopImageNames() const;
+
+			void				SetStopOnImageLoad(bool enabled,
+									bool useImageNameList);
+			bool				StopOnImageLoad() const
+									{ return fStopOnImageLoad; }
+			bool				StopImageNameListEnabled() const
+									{ return fStopImageNameListEnabled; }
 
 			bool				AddBreakpoint(Breakpoint* breakpoint);
 									// takes over reference (also on error)
@@ -178,6 +202,17 @@ public:
 			// service methods for Image
 			void				NotifyImageDebugInfoChanged(Image* image);
 
+			// service methods for Image load settings
+			void				NotifyStopOnImageLoadChanged(bool enabled,
+									bool useImageNameList);
+			void				NotifyStopImageNameAdded(const BString& name);
+			void				NotifyStopImageNameRemoved(
+									const BString& name);
+
+			// service methods for console output
+			void				NotifyConsoleOutputReceived(
+									int32 fd, const BString& output);
+
 			// breakpoint related service methods
 			void				NotifyUserBreakpointChanged(
 									UserBreakpoint* breakpoint);
@@ -214,6 +249,9 @@ private:
 			BString				fName;
 			ThreadList			fThreads;
 			ImageList			fImages;
+			bool				fStopOnImageLoad;
+			bool				fStopImageNameListEnabled;
+			BStringList			fStopImageNames;
 			BreakpointList		fBreakpoints;
 			WatchpointList		fWatchpoints;
 			UserBreakpointList	fUserBreakpoints;
@@ -256,6 +294,35 @@ protected:
 };
 
 
+class Team::ImageLoadEvent : public Event {
+public:
+								ImageLoadEvent(uint32 type, Team* team,
+									bool stopOnImageLoad,
+									bool stopImageNameListEnabled);
+
+			bool				StopOnImageLoad() const
+									{ return fStopOnImageLoad; }
+			bool				StopImageNameListEnabled() const
+									{ return fStopImageNameListEnabled; }
+
+private:
+			bool				fStopOnImageLoad;
+			bool				fStopImageNameListEnabled;
+};
+
+
+class Team::ImageLoadNameEvent : public Event {
+public:
+								ImageLoadNameEvent(uint32 type, Team* team,
+									const BString& name);
+
+			const BString&		ImageName() const { return fImageName; }
+
+private:
+			BString				fImageName;
+};
+
+
 class Team::BreakpointEvent : public Event {
 public:
 								BreakpointEvent(uint32 type, Team* team,
@@ -265,6 +332,20 @@ public:
 
 protected:
 			Breakpoint*			fBreakpoint;
+};
+
+
+class Team::ConsoleOutputEvent : public Event {
+public:
+								ConsoleOutputEvent(uint32 type, Team* team,
+									int32 fd, const BString& output);
+
+			int32				Descriptor() const	{ return fDescriptor; }
+			const BString&		Output() const		{ return fOutput; }
+
+protected:
+			int32				fDescriptor;
+			BString				fOutput;
 };
 
 
@@ -322,6 +403,16 @@ public:
 
 	virtual	void				ImageDebugInfoChanged(
 									const Team::ImageEvent& event);
+
+	virtual	void				StopOnImageLoadSettingsChanged(
+									const Team::ImageLoadEvent& event);
+	virtual	void				StopOnImageLoadNameAdded(
+									const Team::ImageLoadNameEvent& event);
+	virtual	void				StopOnImageLoadNameRemoved(
+									const Team::ImageLoadNameEvent& event);
+
+	virtual	void				ConsoleOutputReceived(
+									const Team::ConsoleOutputEvent& event);
 
 	virtual	void				BreakpointAdded(
 									const Team::BreakpointEvent& event);

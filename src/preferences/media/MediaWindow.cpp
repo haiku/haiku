@@ -363,6 +363,7 @@ MediaWindow::_InitWindow()
 	fContentLayout = new BCardLayout();
 	new BView("content view", 0, fContentLayout);
 	fContentLayout->Owner()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fContentLayout->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	fAudioView = new AudioSettingsView();
 	fContentLayout->AddView(fAudioView);

@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -156,6 +156,12 @@ TreeTableModelListener::TableNodesChanged(TreeTableModel* model,
 }
 
 
+void
+TreeTableModelListener::TableModelReset(TreeTableModel* model)
+{
+}
+
+
 // #pragma mark - TreeTableModel
 
 
@@ -226,6 +232,16 @@ TreeTableModel::NotifyNodesChanged(const TreeTablePath& path, int32 childIndex,
 	}
 }
 
+
+void
+TreeTableModel::NotifyTableModelReset()
+{
+	int32 listenerCount = fListeners.CountItems();
+	for (int32 i = listenerCount - 1; i >= 0; i--) {
+		TreeTableModelListener* listener = fListeners.ItemAt(i);
+		listener->TableModelReset(this);
+	}
+}
 
 // #pragma mark - TreeTableToolTipProvider
 
@@ -966,6 +982,15 @@ TreeTable::TableNodesChanged(TreeTableModel* model, const TreeTablePath& path,
 
 
 void
+TreeTable::TableModelReset(TreeTableModel* model)
+{
+	_RemoveChildRows(fRootNode, 0, fRootNode->CountChildren());
+	_AddChildRows(fRootNode, 0, fModel->CountChildren(
+		fModel->Root()), fModel->CountColumns());
+}
+
+
+void
 TreeTable::ExpandOrCollapse(BRow* _row, bool expand)
 {
 	TreeTableRow* row = dynamic_cast<TreeTableRow*>(_row);
@@ -1038,6 +1063,14 @@ void
 TreeTable::_RemoveChildRows(TreeTableNode* parentNode, int32 childIndex,
 	int32 count)
 {
+	// check if the removal request would in effect remove all
+	// existing nodes.
+	if (parentNode == fRootNode && childIndex == 0
+		&& count == parentNode->CountChildren()) {
+		Clear();
+		return;
+	}
+
 	for (int32 i = childIndex + count - 1; i >= childIndex; i--) {
 		if (TreeTableNode* child = parentNode->RemoveChild(i)) {
 			int32 childCount = child->CountChildren();

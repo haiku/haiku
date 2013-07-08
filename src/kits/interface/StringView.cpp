@@ -19,10 +19,30 @@
 
 #include <LayoutUtils.h>
 #include <Message.h>
+#include <PropertyInfo.h>
 #include <View.h>
 #include <Window.h>
 
 #include <binary_compatibility/Interface.h>
+
+
+static property_info sPropertyList[] = {
+	{
+		"Text",
+		{ B_GET_PROPERTY, B_SET_PROPERTY },
+		{ B_DIRECT_SPECIFIER },
+		NULL, 0,
+		{ B_STRING_TYPE }
+	},
+	{
+		"Alignment",
+		{ B_GET_PROPERTY, B_SET_PROPERTY },
+		{ B_DIRECT_SPECIFIER },
+		NULL, 0,
+		{ B_INT32_TYPE }
+	},
+	{}
+};
 
 
 BStringView::BStringView(BRect frame, const char* name, const char* text,
@@ -261,6 +281,51 @@ BStringView::Draw(BRect updateRect)
 void
 BStringView::MessageReceived(BMessage* message)
 {
+	if (message->what == B_GET_PROPERTY || message->what == B_SET_PROPERTY) {
+		int32 index;
+		BMessage specifier;
+		int32 form;
+		const char* property;
+		if (message->GetCurrentSpecifier(&index, &specifier, &form, &property)
+				!= B_OK) {
+			BView::MessageReceived(message);
+			return;
+		}
+
+		BMessage reply(B_REPLY);
+		bool handled = false;
+		if (strcmp(property, "Text") == 0) {
+			if (message->what == B_GET_PROPERTY) {
+				reply.AddString("result", fText);
+				handled = true;
+			} else {
+				const char* text;
+				if (message->FindString("data", &text) == B_OK) {
+					SetText(text);
+					reply.AddInt32("error", B_OK);
+					handled = true;
+				}
+			}
+		} else if (strcmp(property, "Alignment") == 0) {
+			if (message->what == B_GET_PROPERTY) {
+				reply.AddInt32("result", (int32)fAlign);
+				handled = true;
+			} else {
+				int32 align;
+				if (message->FindInt32("data", &align) == B_OK) {
+					SetAlignment((alignment)align);
+					reply.AddInt32("error", B_OK);
+					handled = true;
+				}
+			}
+		}
+
+		if (handled) {
+			message->SendReply(&reply);
+			return;
+		}
+	}
+
 	BView::MessageReceived(message);
 }
 
@@ -331,17 +396,33 @@ BStringView::Alignment() const
 
 
 BHandler*
-BStringView::ResolveSpecifier(BMessage* msg, int32 index,
+BStringView::ResolveSpecifier(BMessage* message, int32 index,
 	BMessage* specifier, int32 form, const char* property)
 {
-	return NULL;
+	BPropertyInfo propInfo(sPropertyList);
+	if (propInfo.FindMatch(message, 0, specifier, form, property) >= B_OK)
+		return this;
+
+	return BView::ResolveSpecifier(message, index, specifier, form, property);
 }
 
 
 status_t
-BStringView::GetSupportedSuites(BMessage* message)
+BStringView::GetSupportedSuites(BMessage* data)
 {
-	return BView::GetSupportedSuites(message);
+	if (data == NULL)
+		return B_BAD_VALUE;
+
+	status_t status = data->AddString("suites", "suite/vnd.Be-string-view");
+	if (status != B_OK)
+		return status;
+
+	BPropertyInfo propertyInfo(sPropertyList);
+	status = data->AddFlat("messages", &propertyInfo);
+	if (status != B_OK)
+		return status;
+
+	return BView::GetSupportedSuites(data);
 }
 
 

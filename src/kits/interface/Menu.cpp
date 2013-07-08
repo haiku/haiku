@@ -2085,7 +2085,8 @@ BMenu::_LayoutItems(int32 index)
 {
 	_CalcTriggers();
 
-	float width, height;
+	float width;
+	float height;
 	_ComputeLayout(index, fResizeToFit, true, &width, &height);
 
 	if (fResizeToFit)
@@ -2128,8 +2129,7 @@ BMenu::_ComputeLayout(int32 index, bool bestFit, bool moveItems,
 				overrideFrame = &parentFrame;
 			}
 
-			_ComputeColumnLayout(index, bestFit, moveItems, overrideFrame,
-					frame);
+			_ComputeColumnLayout(index, bestFit, moveItems, overrideFrame, frame);
 			break;
 		}
 		case B_ITEMS_IN_ROW:
@@ -2147,9 +2147,11 @@ BMenu::_ComputeLayout(int32 index, bool bestFit, bool moveItems,
 	// change width depending on resize mode
 	BSize size;
 	if ((ResizingMode() & B_FOLLOW_LEFT_RIGHT) == B_FOLLOW_LEFT_RIGHT) {
-		if (Parent())
+		if (dynamic_cast<_BMCMenuBar_*>(this) != NULL)
+			size.width = Bounds().Width() - fPad.right;
+		else if (Parent() != NULL)
 			size.width = Parent()->Frame().Width() + 1;
-		else if (Window())
+		else if (Window() != NULL)
 			size.width = Window()->Frame().Width() + 1;
 		else
 			size.width = Bounds().Width();

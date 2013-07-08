@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef ATTRIBUTE_TABLES_H
@@ -24,7 +25,8 @@ enum {
 	ATTRIBUTE_CLASS_MACPTR			= 7,
 	ATTRIBUTE_CLASS_RANGELISTPTR	= 8,
 	ATTRIBUTE_CLASS_REFERENCE		= 9,
-	ATTRIBUTE_CLASS_STRING			= 10
+	ATTRIBUTE_CLASS_STRING			= 10,
+	ATTRIBUTE_CLASS_EXPRESSION		= 11
 };
 
 

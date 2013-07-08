@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku, Inc. All Rights Reserved.
+ * Copyright 2005-2013 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _COLOR_CONTROL_H
@@ -7,8 +7,6 @@
 
 
 #include <Control.h>
-
-class BBitmap;
 
 
 enum color_control_layout {
@@ -19,6 +17,8 @@ enum color_control_layout {
 	B_CELLS_64x4	= 64,
 };
 
+
+class BBitmap;
 class BTextControl;
 
 
@@ -93,15 +93,19 @@ private:
 			void				_LayoutView();
 			void				_InitOffscreen();
 			void				_DrawColorArea(BView* target, BRect update);
-			void				_DrawSelectors(BView* target);		
-			void				_ColorRamp(BRect rect, BView* target,
-									rgb_color baseColor, rgb_color compColor, 
-									int16 flag, bool focused, BRect update);
+			void				_DrawSelectors(BView* target);
+			void				_DrawColorRamp(BRect rect, BView* target,
+									rgb_color baseColor, rgb_color compColor,
+									int16 flag, bool focused,
+									BRect updateRect);
 			BPoint				_SelectorPosition(const BRect& rampRect,
 									uint8 shade) const;
-			BRect				_PaletteSelectorFrame(uint8 colorIndex) const;		
+			BRect				_PaletteFrame() const;
+			BRect				_PaletteSelectorFrame(uint8 colorIndex) const;
 			BRect				_RampFrame(uint8 rampIndex) const;
-		
+			void				_SetCellSize(float size);
+			float				_TextRectOffset();
+
 	private:
 			BRect				fPaletteFrame;
 			int16				fSelectedPaletteColorIndex;

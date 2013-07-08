@@ -1,14 +1,14 @@
-1	belarusian	x-vnd.Haiku-ProcessController	2887520383
+1	belarusian	x-vnd.Haiku-ProcessController	1848752768
 Memory usage	ProcessController		Ужыванне памяці
-Do you really want to kill the team \"%s\"?	ProcessController		Сапраўды жадаеце знішчыць групу \"%s\"?
+Kill this team!	ProcessController		Знішчыць паток!
 Idle priority	ProcessController		Прыярытэт спакою
 Restart Deskbar	ProcessController		Перазапусціць Deskbar
 Custom priority	ProcessController		Нестандартны прыярытэт
-Debug thread	ProcessController		Адладжваць паток
 This team is already gone…	ProcessController		Гэтая група ўжо не існуе…
 Error saving file	ProcessController		Памылка пры захаванні файла
 Real-time priority	ProcessController		Прыярытэт рэальнага часу
 Your setting file could not be saved!\n(%s)	ProcessController		Немагчыма захаваць файл з наладкамі!\n(%s)
+What do you want to do with the team \"%s\"?	ProcessController		Што вы жадаеце зрабіць з патокам \"%s\"?
 This thread is already gone…	ProcessController		Гэты паток ўжо не існуе…
 Cancel	ProcessController		Адмена
 Display priority	ProcessController		Прыярытэт адлюстравання
@@ -38,11 +38,11 @@ Threads and CPU usage	ProcessController		Патокі і ўжыванне ЦП
 Urgent display priority	ProcessController		Прыярытэт неадкладнага адлюстравання
 OK	ProcessController		ОК
 Damned!	ProcessController		Чорт!
+Debug this team!	ProcessController		Адладжваць паток!
 Usage: %s [-deskbar]\n	ProcessController		Ужыванне: %s [-deskbar]\n
 ProcessController	System name		Працэсы і патокі
 Real-time display priority	ProcessController		Прыярытэт адлюстравання ў рэальным часе
 Please confirm	ProcessController		Калі ласка падцвердзіце
-Yes, kill this team!	ProcessController		Так, знішчыць гэтую групу!
 System resources & caches…	ProcessController		Сістэмныя рэсурсы & кэш…
 That's no Fun!	ProcessController		Гэта непрыкольна!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Вы можаце запускаць ProcessController у вакне або ўсталяваць яго ў Deskbar.

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-TIFFTranslator	237855326
+1	finnish	x-vnd.Haiku-TIFFTranslator	1624888114
 LZW	TIFFView		LZW
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: ei voitu asettaa hakemistoa\n
 TIFF image	TIFFTranslator		TIFF-kuva
@@ -13,4 +13,3 @@ TIFF Settings	TIFFMain		TIFF-asetukset
 identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: virheellinen asiakirjahakemisto\n
 ZIP (Deflate)	TIFFView		ZIP (Kutista)
 Version %d.%d.%d %s	TIFFView		Versio %d.%d.%d %s
-Use Compression:	TIFFView		Käyttäjätiivistys:

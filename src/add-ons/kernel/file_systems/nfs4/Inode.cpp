@@ -749,7 +749,7 @@ Inode::AcquireLock(OpenFileCookie* cookie, const struct flock* lock,
 	if (owner == NULL)
 		return B_NO_MEMORY;
 
-	LockInfo* linfo = new LockInfo(owner);
+	LockInfo* linfo = new(std::nothrow) LockInfo(owner);
 	if (linfo == NULL)
 		return B_NO_MEMORY;
 	locker.Unlock();

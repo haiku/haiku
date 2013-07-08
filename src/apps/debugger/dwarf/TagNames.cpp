@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -75,11 +76,18 @@ static const tag_name_info kTagNameInfos[] = {
 	ENTRY(imported_unit),
 	ENTRY(condition),
 	ENTRY(shared_type),
+	ENTRY(type_unit),
+	ENTRY(rvalue_reference_type),
+	ENTRY(template_alias),
+	ENTRY(GNU_template_parameter_pack),
+	ENTRY(GNU_formal_parameter_pack),
+	ENTRY(GNU_call_site),
+	ENTRY(GNU_call_site_parameter),
 	{}
 };
 
 
-static const uint32 kTagNameInfoCount = DW_TAG_shared_type + 1;
+static const uint32 kTagNameInfoCount = DW_TAG_template_alias + 5;
 static const char* sTagNames[kTagNameInfoCount];
 
 static struct InitTagNames {
@@ -87,7 +95,12 @@ static struct InitTagNames {
 	{
 		for (uint32 i = 0; kTagNameInfos[i].name != NULL; i++) {
 			const tag_name_info& info = kTagNameInfos[i];
-			sTagNames[info.tag] = info.name;
+			if (info.tag <= DW_TAG_template_alias)
+				sTagNames[info.tag] = info.name;
+			else {
+				sTagNames[DW_TAG_template_alias + 1 + (info.tag
+						- DW_TAG_GNU_template_parameter_pack)] = info.name;
+			}
 		}
 	}
 } sInitTagNames;
@@ -96,5 +109,13 @@ static struct InitTagNames {
 const char*
 get_entry_tag_name(uint16 tag)
 {
-	return tag < kTagNameInfoCount ? sTagNames[tag] : NULL;
+	if (tag <= DW_TAG_template_alias)
+		return sTagNames[tag];
+	else if (tag >= DW_TAG_GNU_template_parameter_pack
+		&& tag <= DW_TAG_GNU_call_site_parameter) {
+		return sTagNames[DW_TAG_template_alias + 1 + (tag
+				- DW_TAG_GNU_template_parameter_pack)];
+	}
+
+	return NULL;
 }

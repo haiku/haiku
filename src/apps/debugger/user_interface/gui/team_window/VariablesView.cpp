@@ -175,6 +175,9 @@ public:
 
 	Type* GetType() const
 	{
+		if (fCastedType != NULL)
+			return fCastedType;
+
 		return fNodeChild->GetType();
 	}
 
@@ -928,15 +931,16 @@ VariablesView::VariableTableModel::SetStackFrame(Thread* thread,
 
 	fNodeManager->SetStackFrame(thread, stackFrame);
 
+	int32 count = fNodes.CountItems();
 	fNodeTable.Clear(true);
 
 	if (!fNodes.IsEmpty()) {
-		int32 count = fNodes.CountItems();
 		for (int32 i = 0; i < count; i++)
 			fNodes.ItemAt(i)->ReleaseReference();
 		fNodes.MakeEmpty();
-		NotifyNodesRemoved(TreeTablePath(), 0, count);
 	}
+
+	NotifyNodesRemoved(TreeTablePath(), 0, count);
 
 	if (stackFrame == NULL)
 		return;
@@ -1107,7 +1111,7 @@ VariablesView::VariableTableModel::ValueNodeValueChanged(ValueNode* valueNode)
 int32
 VariablesView::VariableTableModel::CountColumns() const
 {
-	return 2;
+	return 3;
 }
 
 
@@ -1195,6 +1199,15 @@ VariablesView::VariableTableModel::GetValueAt(void* object, int32 columnIndex,
 
 			_value.SetTo(node, VALUE_NODE_TYPE);
 			return true;
+		case 2:
+		{
+			Type* type = node->GetType();
+			if (type == NULL)
+				return false;
+
+			_value.SetTo(type->Name(), B_VARIANT_DONT_COPY_DATA);
+			return true;
+		}
 		default:
 			return false;
 	}
@@ -1415,6 +1428,7 @@ VariablesView::VariablesView(Listener* listener)
 	fPreviousViewState(NULL),
 	fViewStateHistory(NULL),
 	fTableCellContextMenuTracker(NULL),
+	fFrameClearPending(false),
 	fListener(listener)
 {
 	SetName("Variables");
@@ -1458,6 +1472,8 @@ VariablesView::Create(Listener* listener)
 void
 VariablesView::SetStackFrame(Thread* thread, StackFrame* stackFrame)
 {
+	fFrameClearPending = false;
+
 	if (thread == fThread && stackFrame == fStackFrame)
 		return;
 
@@ -1565,14 +1581,54 @@ VariablesView::MessageReceived(BMessage* message)
 				break;
 			}
 
+			BReference<Type> typeRef(type, true);
 			ValueNode* valueNode = NULL;
 			if (TypeHandlerRoster::Default()->CreateValueNode(
-				node->NodeChild(), type, valueNode) != B_OK) {
+					node->NodeChild(), type, valueNode) != B_OK) {
 				break;
 			}
 
+			typeRef.Detach();
 			node->NodeChild()->SetNode(valueNode);
 			node->SetCastedType(type);
+			fVariableTableModel->NotifyNodeChanged(node);
+			break;
+		}
+		case MSG_TYPECAST_TO_ARRAY:
+		{
+			ModelNode* node = NULL;
+			if (message->FindPointer("node", reinterpret_cast<void **>(&node))
+				!= B_OK) {
+				break;
+			}
+
+			Type* baseType = dynamic_cast<AddressType*>(node->NodeChild()
+					->Node()->GetType())->BaseType();
+			ArrayType* arrayType = NULL;
+			if (baseType->CreateDerivedArrayType(0, kMaxArrayElementCount,
+				false, arrayType) != B_OK) {
+				break;
+			}
+
+			AddressType* addressType = NULL;
+			BReference<Type> typeRef(arrayType, true);
+			if (arrayType->CreateDerivedAddressType(DERIVED_TYPE_POINTER,
+					addressType) != B_OK) {
+				break;
+			}
+
+			typeRef.Detach();
+			typeRef.SetTo(addressType, true);
+			ValueNode* valueNode = NULL;
+			if (TypeHandlerRoster::Default()->CreateValueNode(
+					node->NodeChild(), addressType, valueNode) != B_OK) {
+				break;
+			}
+
+			typeRef.Detach();
+			node->NodeChild()->SetNode(valueNode);
+			node->SetCastedType(addressType);
+			fVariableTableModel->NotifyNodeChanged(node);
 			break;
 		}
 		case MSG_SHOW_CONTAINER_RANGE_PROMPT:
@@ -1581,8 +1637,17 @@ VariablesView::MessageReceived(BMessage* message)
 				->SelectionModel()->NodeAt(0);
 			int32 lowerBound, upperBound;
 			ValueNode* valueNode = node->NodeChild()->Node();
-			if (valueNode->SupportedChildRange(lowerBound, upperBound) != B_OK)
+			if (!valueNode->IsRangedContainer()) {
+				valueNode = node->ChildAt(0)->NodeChild()->Node();
+				if (!valueNode->IsRangedContainer())
+					break;
+			}
+
+			bool fixedRange = valueNode->IsContainerRangeFixed();
+			if (valueNode->SupportedChildRange(lowerBound, upperBound)
+				!= B_OK) {
 				break;
+			}
 
 			BMessage* promptMessage = new(std::nothrow) BMessage(
 				MSG_SET_CONTAINER_RANGE);
@@ -1591,9 +1656,16 @@ VariablesView::MessageReceived(BMessage* message)
 
 			ObjectDeleter<BMessage> messageDeleter(promptMessage);
 			promptMessage->AddPointer("node", node);
+			promptMessage->AddBool("fixedRange", fixedRange);
 			BString infoText;
-			infoText.SetToFormat("Allowed range: %" B_PRId32
-				"-%" B_PRId32 ".", lowerBound, upperBound);
+			if (fixedRange) {
+				infoText.SetToFormat("Allowed range: %" B_PRId32
+					"-%" B_PRId32 ".", lowerBound, upperBound);
+			} else {
+				infoText.SetToFormat("Current range: %" B_PRId32
+					"-%" B_PRId32 ".", lowerBound, upperBound);
+			}
+
 			PromptWindow* promptWindow = new(std::nothrow) PromptWindow(
 				"Set Range", "Range: ", infoText.String(), BMessenger(this),
 				promptMessage);
@@ -1611,8 +1683,12 @@ VariablesView::MessageReceived(BMessage* message)
 				->SelectionModel()->NodeAt(0);
 			int32 lowerBound, upperBound;
 			ValueNode* valueNode = node->NodeChild()->Node();
+			if (!valueNode->IsRangedContainer())
+				valueNode = node->ChildAt(0)->NodeChild()->Node();
 			if (valueNode->SupportedChildRange(lowerBound, upperBound) != B_OK)
 				break;
+
+			bool fixedRange = message->FindBool("fixedRange");
 
 			BString rangeExpression = message->FindString("text");
 			if (rangeExpression.Length() == 0)
@@ -1620,7 +1696,7 @@ VariablesView::MessageReceived(BMessage* message)
 
 			RangeList ranges;
 			status_t result = UiUtils::ParseRangeExpression(
-				rangeExpression, lowerBound, upperBound, ranges);
+				rangeExpression, lowerBound, upperBound, fixedRange, ranges);
 			if (result != B_OK)
 				break;
 
@@ -1786,12 +1862,20 @@ VariablesView::SaveSettings(BMessage& settings)
 }
 
 
+void
+VariablesView::SetStackFrameClearPending()
+{
+	fFrameClearPending = true;
+}
 
 
 void
 VariablesView::TreeTableNodeExpandedChanged(TreeTable* table,
 	const TreeTablePath& path, bool expanded)
 {
+	if (fFrameClearPending)
+		return;
+
 	if (expanded) {
 		ModelNode* node = (ModelNode*)fVariableTableModel->NodeForPath(path);
 		if (node == NULL)
@@ -1826,6 +1910,9 @@ VariablesView::TreeTableCellMouseDown(TreeTable* table,
 	uint32 buttons)
 {
 	if ((buttons & B_SECONDARY_MOUSE_BUTTON) == 0)
+		return;
+
+	if (fFrameClearPending)
 		return;
 
 	_FinishContextMenu(true);
@@ -1886,6 +1973,8 @@ VariablesView::_Init()
 		B_TRUNCATE_END, B_ALIGN_LEFT));
 	fVariableTable->AddColumn(new VariableValueColumn(1, "Value", 80, 40, 1000,
 		B_TRUNCATE_END, B_ALIGN_RIGHT));
+	fVariableTable->AddColumn(new StringTableColumn(2, "Type", 80, 40, 1000,
+		B_TRUNCATE_END, B_ALIGN_LEFT));
 
 	fVariableTableModel = new VariableTableModel;
 	if (fVariableTableModel->Init() != B_OK)
@@ -1966,6 +2055,18 @@ VariablesView::_GetContextActionsForNode(ModelNode* node,
 		message->AddUInt64("address", location->PieceAt(0).address);
 	}
 
+	ValueNode* valueNode = node->NodeChild()->Node();
+
+	if (valueNode != NULL) {
+		AddressType* type = dynamic_cast<AddressType*>(valueNode->GetType());
+		if (type != NULL && type->BaseType() != NULL) {
+			result = _AddContextAction("Cast to array", MSG_TYPECAST_TO_ARRAY,
+				actions, message);
+			if (result != B_OK)
+				return result;
+			message->AddPointer("node", node);
+		}
+	}
 
 	result = _AddContextAction("Cast as" B_UTF8_ELLIPSIS,
 		MSG_SHOW_TYPECAST_NODE_PROMPT, actions, message);
@@ -1977,13 +2078,22 @@ VariablesView::_GetContextActionsForNode(ModelNode* node,
 	if (result != B_OK)
 		return result;
 
-	ValueNode* valueNode = node->NodeChild()->Node();
-	if (valueNode != NULL && valueNode->IsRangedContainer()) {
-		result = _AddContextAction("Set visible range" B_UTF8_ELLIPSIS,
-			MSG_SHOW_CONTAINER_RANGE_PROMPT, actions, message);
-		if (result != B_OK)
-			return result;
+	if (valueNode == NULL)
+		return B_OK;
+
+	if (!valueNode->IsRangedContainer()) {
+		if (node->CountChildren() == 1 && node->ChildAt(0)->IsHidden()) {
+			valueNode = node->ChildAt(0)->NodeChild()->Node();
+			if (valueNode == NULL || !valueNode->IsRangedContainer())
+				return B_OK;
+		} else
+			return B_OK;
 	}
+
+	result = _AddContextAction("Set visible range" B_UTF8_ELLIPSIS,
+		MSG_SHOW_CONTAINER_RANGE_PROMPT, actions, message);
+	if (result != B_OK)
+		return result;
 
 	return B_OK;
 }

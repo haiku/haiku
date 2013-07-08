@@ -1,14 +1,14 @@
-1	russian	x-vnd.Haiku-ProcessController	2887520383
+1	russian	x-vnd.Haiku-ProcessController	1848752768
 Memory usage	ProcessController		Использование памяти
-Do you really want to kill the team \"%s\"?	ProcessController		Вы действительно хотите убить \"%s\"?
+Kill this team!	ProcessController		Убить этот поток!
 Idle priority	ProcessController		Приоритет бездействия
 Restart Deskbar	ProcessController		Перезапустить Deskbar
 Custom priority	ProcessController		Заданный приоритет
-Debug thread	ProcessController		Отладить поток
 This team is already gone…	ProcessController		Этого приложения уже не существует…
 Error saving file	ProcessController		Ошибка при сохранении файла
 Real-time priority	ProcessController		Приоритет реального времени
 Your setting file could not be saved!\n(%s)	ProcessController		Невозможно сохранить настройки!\n(%s)
+What do you want to do with the team \"%s\"?	ProcessController		Что вы хотите сделать с потоком \"%s\"?
 This thread is already gone…	ProcessController		Этого потока уже не существует…
 Cancel	ProcessController		Отмена
 Display priority	ProcessController		Приоритет отображения
@@ -38,11 +38,11 @@ Threads and CPU usage	ProcessController		Потоки и загрузка ЦПУ
 Urgent display priority	ProcessController		Срочный приоритет отображения
 OK	ProcessController		ОК
 Damned!	ProcessController		Проклятье!
+Debug this team!	ProcessController		Отладить этот поток!
 Usage: %s [-deskbar]\n	ProcessController		Использование: %s [-deskbar]\n
 ProcessController	System name		Контроллер процессов
 Real-time display priority	ProcessController		Приоритет отображения реального времени
 Please confirm	ProcessController		Пожалуйста, подтвердите
-Yes, kill this team!	ProcessController		Да, убить это приложение!
 System resources & caches…	ProcessController		Системные ресурсы и кеш
 That's no Fun!	ProcessController		Это не смешно!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Вы можете запустить контроллер процессов в окне или установить его в Deskbar.

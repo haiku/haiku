@@ -1,5 +1,6 @@
 /*
  * Copyright 2005-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -144,7 +145,8 @@ struct Team {
 		int32 teamDebugFlags = (traceTeam ? B_TEAM_DEBUG_POST_SYSCALL : 0)
 			| (traceChildTeams ? B_TEAM_DEBUG_TEAM_CREATION : 0)
 			| (traceSignal ? B_TEAM_DEBUG_SIGNALS : 0);
-		set_team_debugging_flags(fNubPort, teamDebugFlags);
+		if (set_team_debugging_flags(fNubPort, teamDebugFlags) != B_OK)
+			exit(1);
 
 		return fMemoryReader.Init(fNubPort);
 	}
@@ -568,7 +570,10 @@ main(int argc, const char *const *argv)
 				| (traceChildThreads
 					? B_THREAD_DEBUG_SYSCALL_TRACE_CHILD_THREADS : 0);
 		}
-		set_thread_debugging_flags(nubPort, threadID, threadDebugFlags);
+		if (set_thread_debugging_flags(nubPort, threadID, threadDebugFlags)
+				!= B_OK) {
+			exit(1);
+		}
 
 		// resume the target thread to be sure, it's running
 		resume_thread(threadID);
@@ -672,8 +677,12 @@ main(int argc, const char *const *argv)
 
 		// tell the thread to continue (only when there is a thread and the
 		// message was synchronous)
-		if (message.origin.thread >= 0 && message.origin.nub_port >= 0)
-			continue_thread(message.origin.nub_port, message.origin.thread);
+		if (message.origin.thread >= 0 && message.origin.nub_port >= 0) {
+			if (continue_thread(message.origin.nub_port,
+					message.origin.thread) != B_OK) {
+				exit(1);
+			}
+		}
 	}
 
 	if (outputFile != NULL && outputFile != stdout)

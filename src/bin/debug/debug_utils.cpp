@@ -1,5 +1,6 @@
 /*
  * Copyright 2005-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -116,52 +117,52 @@ load_program(const char* const* args, int32 argCount, bool traceLoading)
 
 
 // set_team_debugging_flags
-void
+status_t
 set_team_debugging_flags(port_id nubPort, int32 flags)
 {
 	debug_nub_set_team_flags message;
 	message.flags = flags;
 
-	while (true) {
-		status_t error = write_port(nubPort, B_DEBUG_MESSAGE_SET_TEAM_FLAGS,
+	status_t error = B_OK;
+	do {
+		error = write_port(nubPort, B_DEBUG_MESSAGE_SET_TEAM_FLAGS,
 			&message, sizeof(message));
-		if (error == B_OK)
-			return;
+	} while (error == B_INTERRUPTED);
 
-		if (error != B_INTERRUPTED) {
-			fprintf(stderr, "%s: Failed to set team debug flags: %s\n",
-				kCommandName, strerror(error));
-			exit(1);
-		}
+	if (error != B_OK) {
+		fprintf(stderr, "%s: Failed to set team debug flags: %s\n",
+			kCommandName, strerror(error));
 	}
+
+	return error;
 }
 
 
 // set_thread_debugging_flags
-void
+status_t
 set_thread_debugging_flags(port_id nubPort, thread_id thread, int32 flags)
 {
 	debug_nub_set_thread_flags message;
 	message.thread = thread;
 	message.flags = flags;
 
-	while (true) {
-		status_t error = write_port(nubPort, B_DEBUG_MESSAGE_SET_THREAD_FLAGS,
+	status_t error = B_OK;
+	do {
+		error = write_port(nubPort, B_DEBUG_MESSAGE_SET_THREAD_FLAGS,
 			&message, sizeof(message));
-		if (error == B_OK)
-			return;
+	} while (error == B_INTERRUPTED);
 
-		if (error != B_INTERRUPTED) {
-			fprintf(stderr, "%s: Failed to set thread debug flags: %s\n",
-				kCommandName, strerror(error));
-			exit(1);
-		}
+	if (error != B_OK) {
+		fprintf(stderr, "%s: Failed to set thread debug flags: %s\n",
+			kCommandName, strerror(error));
 	}
+
+	return error;
 }
 
 
 // continue_thread
-void
+status_t
 continue_thread(port_id nubPort, thread_id thread)
 {
 	debug_nub_continue_thread message;
@@ -169,16 +170,17 @@ continue_thread(port_id nubPort, thread_id thread)
 	message.handle_event = B_THREAD_DEBUG_HANDLE_EVENT;
 	message.single_step = false;
 
-	while (true) {
-		status_t error = write_port(nubPort, B_DEBUG_MESSAGE_CONTINUE_THREAD,
-			&message, sizeof(message));
-		if (error == B_OK)
-			return;
+	status_t error = B_OK;
 
-		if (error != B_INTERRUPTED) {
-			fprintf(stderr, "%s: Failed to run thread %" B_PRId32 ": %s\n",
-				kCommandName, thread, strerror(error));
-			exit(1);
-		}
+	do {
+		error = write_port(nubPort, B_DEBUG_MESSAGE_CONTINUE_THREAD,
+			&message, sizeof(message));
+	} while (error == B_INTERRUPTED);
+
+	if (error != B_OK) {
+		fprintf(stderr, "%s: Failed to run thread %" B_PRId32 ": %s\n",
+			kCommandName, thread, strerror(error));
 	}
+
+	return error;
 }

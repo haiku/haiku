@@ -14,11 +14,15 @@
 
 #include <Entry.h>
 #include <Message.h>
+#include <StringList.h>
 
+#include <AutoDeleter.h>
 #include <AutoLocker.h>
 
 #include "debug_utils.h"
+#include "syscall_numbers.h"
 
+#include "Architecture.h"
 #include "BreakpointManager.h"
 #include "BreakpointSetting.h"
 #include "CpuState.h"
@@ -218,7 +222,9 @@ TeamDebugger::TeamDebugger(Listener* listener, UserInterface* userInterface,
 	fDebugEventListener(-1),
 	fUserInterface(userInterface),
 	fTerminating(false),
-	fKillTeamOnQuit(false)
+	fKillTeamOnQuit(false),
+	fCommandLineArgc(0),
+	fCommandLineArgv(NULL)
 {
 	fUserInterface->AcquireReference();
 }
@@ -293,12 +299,20 @@ TeamDebugger::~TeamDebugger()
 	delete fTeam;
 	delete fFileManager;
 
+	for (int i = 0; i < fCommandLineArgc; i++) {
+		if (fCommandLineArgv[i] != NULL)
+			free(const_cast<char*>(fCommandLineArgv[i]));
+	}
+
+	delete [] fCommandLineArgv;
+
 	fListener->TeamDebuggerQuit(this);
 }
 
 
 status_t
-TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
+TeamDebugger::Init(team_id teamID, thread_id threadID, int argc,
+	const char* const* argv, bool stopInMain)
 {
 	bool targetIsLocal = true;
 		// TODO: Support non-local targets!
@@ -308,12 +322,16 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 
 	fTeamID = teamID;
 
+	status_t error = _HandleSetArguments(argc, argv);
+	if (error != B_OK)
+		return error;
+
 	// create debugger interface
 	fDebuggerInterface = new(std::nothrow) DebuggerInterface(fTeamID);
 	if (fDebuggerInterface == NULL)
 		return B_NO_MEMORY;
 
-	status_t error = fDebuggerInterface->Init();
+	error = fDebuggerInterface->Init();
 	if (error != B_OK)
 		return error;
 
@@ -427,7 +445,8 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 
 	// set team debugging flags
 	fDebuggerInterface->SetTeamDebuggingFlags(
-		B_TEAM_DEBUG_THREADS | B_TEAM_DEBUG_IMAGES);
+		B_TEAM_DEBUG_THREADS | B_TEAM_DEBUG_IMAGES
+			| B_TEAM_DEBUG_POST_SYSCALL);
 
 	// get the initial state of the team
 	AutoLocker< ::Team> teamLocker(fTeam);
@@ -530,17 +549,22 @@ TeamDebugger::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MSG_THREAD_RUN:
+		case MSG_THREAD_SET_ADDRESS:
 		case MSG_THREAD_STOP:
 		case MSG_THREAD_STEP_OVER:
 		case MSG_THREAD_STEP_INTO:
 		case MSG_THREAD_STEP_OUT:
 		{
 			int32 threadID;
+			target_addr_t address;
 			if (message->FindInt32("thread", &threadID) != B_OK)
 				break;
 
+			if (message->FindUInt64("address", &address) != B_OK)
+				address = 0;
+
 			if (ThreadHandler* handler = _GetThreadHandler(threadID)) {
-				handler->HandleThreadAction(message->what);
+				handler->HandleThreadAction(message->what, address);
 				handler->ReleaseReference();
 			}
 			break;
@@ -563,10 +587,14 @@ TeamDebugger::MessageReceived(BMessage* message)
 				if (message->FindBool("enabled", &enabled) != B_OK)
 					enabled = true;
 
+				bool hidden;
+				if (message->FindBool("hidden", &hidden) != B_OK)
+					hidden = false;
+
 				if (breakpoint != NULL)
 					_HandleSetUserBreakpoint(breakpoint, enabled);
 				else
-					_HandleSetUserBreakpoint(address, enabled);
+					_HandleSetUserBreakpoint(address, enabled, hidden);
 			} else {
 				if (breakpoint != NULL)
 					_HandleClearUserBreakpoint(breakpoint);
@@ -575,6 +603,42 @@ TeamDebugger::MessageReceived(BMessage* message)
 			}
 
 			break;
+		}
+
+		case MSG_STOP_ON_IMAGE_LOAD:
+		{
+			bool enabled;
+			bool useNames;
+			if (message->FindBool("enabled", &enabled) != B_OK)
+				break;
+
+			if (message->FindBool("useNames", &useNames) != B_OK)
+				break;
+
+			AutoLocker< ::Team> teamLocker(fTeam);
+			fTeam->SetStopOnImageLoad(enabled, useNames);
+			break;
+		}
+
+		case MSG_ADD_STOP_IMAGE_NAME:
+		{
+			BString imageName;
+			if (message->FindString("name", &imageName) != B_OK)
+				break;
+
+			AutoLocker< ::Team> teamLocker(fTeam);
+			fTeam->AddStopImageName(imageName);
+			break;
+		}
+
+		case MSG_REMOVE_STOP_IMAGE_NAME:
+		{
+			BString imageName;
+			if (message->FindString("name", &imageName) != B_OK)
+				break;
+
+			AutoLocker< ::Team> teamLocker(fTeam);
+			fTeam->RemoveStopImageName(imageName);
 		}
 
 		case MSG_SET_WATCHPOINT:
@@ -712,6 +776,16 @@ TeamDebugger::MessageReceived(BMessage* message)
 			Activate();
 			break;
 
+		case MSG_TEAM_RESTART_REQUESTED:
+		{
+			if (fCommandLineArgc == 0)
+				break;
+
+			_SaveSettings();
+			fListener->TeamDebuggerRestartRequested(this);
+			break;
+		}
+
 		default:
 			BLooper::MessageReceived(message);
 			break;
@@ -729,22 +803,27 @@ TeamDebugger::SourceEntryLocateRequested(const char* sourcePath,
 
 
 void
-TeamDebugger::FunctionSourceCodeRequested(FunctionInstance* functionInstance)
+TeamDebugger::FunctionSourceCodeRequested(FunctionInstance* functionInstance,
+	bool forceDisassembly)
 {
 	Function* function = functionInstance->GetFunction();
 
 	// mark loading
 	AutoLocker< ::Team> locker(fTeam);
 
-	if (functionInstance->SourceCodeState() != FUNCTION_SOURCE_NOT_LOADED)
+	if (forceDisassembly && functionInstance->SourceCodeState()
+			!= FUNCTION_SOURCE_NOT_LOADED) {
 		return;
-	if (function->SourceCodeState() == FUNCTION_SOURCE_LOADED)
+	} else if (!forceDisassembly && function->SourceCodeState()
+			== FUNCTION_SOURCE_LOADED) {
 		return;
+	}
 
 	functionInstance->SetSourceCode(NULL, FUNCTION_SOURCE_LOADING);
 
 	bool loadForFunction = false;
-	if (function->SourceCodeState() == FUNCTION_SOURCE_NOT_LOADED) {
+	if (!forceDisassembly && function->SourceCodeState()
+			== FUNCTION_SOURCE_NOT_LOADED) {
 		loadForFunction = true;
 		function->SetSourceCode(NULL, FUNCTION_SOURCE_LOADING);
 	}
@@ -801,20 +880,23 @@ TeamDebugger::ValueNodeValueRequested(CpuState* cpuState,
 
 void
 TeamDebugger::ThreadActionRequested(thread_id threadID,
-	uint32 action)
+	uint32 action, target_addr_t address)
 {
 	BMessage message(action);
 	message.AddInt32("thread", threadID);
+	message.AddUInt64("address", address);
 	PostMessage(&message);
 }
 
 
 void
-TeamDebugger::SetBreakpointRequested(target_addr_t address, bool enabled)
+TeamDebugger::SetBreakpointRequested(target_addr_t address, bool enabled,
+	bool hidden)
 {
 	BMessage message(MSG_SET_BREAKPOINT);
 	message.AddUInt64("address", (uint64)address);
 	message.AddBool("enabled", enabled);
+	message.AddBool("hidden", hidden);
 	PostMessage(&message);
 }
 
@@ -838,6 +920,34 @@ TeamDebugger::ClearBreakpointRequested(target_addr_t address)
 {
 	BMessage message(MSG_CLEAR_BREAKPOINT);
 	message.AddUInt64("address", (uint64)address);
+	PostMessage(&message);
+}
+
+
+void
+TeamDebugger::SetStopOnImageLoadRequested(bool enabled, bool useImageNames)
+{
+	BMessage message(MSG_STOP_ON_IMAGE_LOAD);
+	message.AddBool("enabled", enabled);
+	message.AddBool("useNames", useImageNames);
+	PostMessage(&message);
+}
+
+
+void
+TeamDebugger::AddStopImageNameRequested(const char* name)
+{
+	BMessage message(MSG_ADD_STOP_IMAGE_NAME);
+	message.AddString("name", name);
+	PostMessage(&message);
+}
+
+
+void
+TeamDebugger::RemoveStopImageNameRequested(const char* name)
+{
+	BMessage message(MSG_REMOVE_STOP_IMAGE_NAME);
+	message.AddString("name", name);
 	PostMessage(&message);
 }
 
@@ -919,6 +1029,13 @@ TeamDebugger::DebugReportRequested(entry_ref* targetPath)
 	BMessage message(MSG_GENERATE_DEBUG_REPORT);
 	message.AddRef("target", targetPath);
 	PostMessage(&message);
+}
+
+
+void
+TeamDebugger::TeamRestartRequested()
+{
+	PostMessage(MSG_TEAM_RESTART_REQUESTED);
 }
 
 
@@ -1212,8 +1329,28 @@ TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 			handled = _HandleImageDeleted(imageEvent);
 			break;
 		}
-		case B_DEBUGGER_MESSAGE_PRE_SYSCALL:
 		case B_DEBUGGER_MESSAGE_POST_SYSCALL:
+		{
+			PostSyscallEvent* postSyscallEvent
+				= dynamic_cast<PostSyscallEvent*>(event);
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_POST_SYSCALL: syscall: %"
+				B_PRIu32 "\n", postSyscallEvent->GetSyscallInfo().Syscall());
+			handled = _HandlePostSyscall(postSyscallEvent);
+
+			// if a thread was blocked in a syscall when we requested to
+			// stop it for debugging, then that request will interrupt
+			// said call, and the post syscall event will be all we get
+			// in response. Consequently, we need to treat this case as
+			// equivalent to having received a thread debugged event.
+			AutoLocker< ::Team> teamLocker(fTeam);
+			::Thread* thread = fTeam->ThreadByID(event->Thread());
+			if (handler != NULL && thread != NULL
+				&& thread->StopRequestPending()) {
+				handled = handler->HandleThreadDebugged(NULL);
+			}
+			break;
+		}
+		case B_DEBUGGER_MESSAGE_PRE_SYSCALL:
 		case B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED:
 		case B_DEBUGGER_MESSAGE_PROFILER_UPDATE:
 		case B_DEBUGGER_MESSAGE_HANDED_OVER:
@@ -1234,11 +1371,21 @@ bool
 TeamDebugger::_HandleTeamDeleted(TeamDeletedEvent* event)
 {
 	char message[64];
-	snprintf(message, sizeof(message), "Team %" B_PRId32 " has terminated.",
+	fDebuggerInterface->Close(false);
+
+	snprintf(message, sizeof(message), "Team %" B_PRId32 " has terminated. ",
 		event->Team());
-	fUserInterface->SynchronouslyAskUser("Quit Debugger", message, "Quit",
-		NULL, NULL);
-	PostMessage(B_QUIT_REQUESTED);
+
+	int32 result = fUserInterface->SynchronouslyAskUser("Team terminated",
+		message, "Do nothing", "Quit", fCommandLineArgc != 0
+			? "Restart team" : NULL);
+
+	if (result == 1)
+		PostMessage(B_QUIT_REQUESTED);
+	else if (result == 2) {
+		_SaveSettings();
+		fListener->TeamDebuggerRestartRequested(this);
+	}
 
 	return true;
 }
@@ -1343,6 +1490,61 @@ TeamDebugger::_HandleImageDeleted(ImageDeletedEvent* event)
 }
 
 
+bool
+TeamDebugger::_HandlePostSyscall(PostSyscallEvent* event)
+{
+	const SyscallInfo& info = event->GetSyscallInfo();
+
+	switch (info.Syscall()) {
+		case SYSCALL_WRITE:
+		{
+			if ((ssize_t)info.ReturnValue() <= 0)
+				break;
+
+			int32 fd;
+			target_addr_t address;
+			size_t size;
+			// TODO: decoding the syscall arguments should probably be
+			// factored out into an Architecture method of its own, since
+			// there's no guarantee the target architecture has the same
+			// endianness as the host. This could re-use the syscall
+			// argument parser that strace uses, though that would need to
+			// be adapted to handle the aforementioned endian differences.
+			// This works for x86{-64} for now though.
+			if (fTeam->GetArchitecture()->AddressSize() == 4) {
+				const uint32* args = (const uint32*)info.Arguments();
+				fd = args[0];
+				address = args[3];
+				size = args[4];
+			} else {
+				const uint64* args = (const uint64*)info.Arguments();
+				fd = args[0];
+				address = args[2];
+				size = args[3];
+			}
+
+			if (fd == 1 || fd == 2) {
+				BString data;
+
+				ssize_t result = fDebuggerInterface->ReadMemoryString(
+					address, size, data);
+				if (result >= 0)
+					fTeam->NotifyConsoleOutputReceived(fd, data);
+			}
+			break;
+		}
+		case SYSCALL_WRITEV:
+		{
+			// TODO: handle
+		}
+		default:
+			break;
+	}
+
+	return false;
+}
+
+
 void
 TeamDebugger::_HandleImageDebugInfoChanged(image_id imageID)
 {
@@ -1366,9 +1568,37 @@ TeamDebugger::_HandleImageDebugInfoChanged(image_id imageID)
 		ImageInfoPendingThread* thread =  fImageInfoPendingThreads
 			->Lookup(imageID);
 		if (thread != NULL) {
-			fDebuggerInterface->ContinueThread(thread->ThreadID());
 			fImageInfoPendingThreads->Remove(thread);
-			delete thread;
+			ObjectDeleter<ImageInfoPendingThread> threadDeleter(thread);
+			locker.Lock();
+			if (fTeam->StopOnImageLoad()) {
+				ThreadHandler* handler = _GetThreadHandler(thread->ThreadID());
+				BReference<ThreadHandler> handlerReference(handler);
+
+				bool stop = true;
+				const BString& imageName = image->Name();
+				// only match on the image filename itself
+				const char* rawImageName = imageName.String()
+					+ imageName.FindLast('/') + 1;
+				if (fTeam->StopImageNameListEnabled()) {
+					const BStringList& nameList = fTeam->StopImageNames();
+					stop = nameList.HasString(rawImageName);
+				}
+
+				if (stop && handler != NULL) {
+					BString stopReason;
+					stopReason.SetToFormat("Image '%s' loaded.",
+						rawImageName);
+					locker.Unlock();
+
+					if (handler->HandleThreadDebugged(NULL, stopReason))
+						return;
+				} else
+					locker.Unlock();
+			} else
+				locker.Unlock();
+
+			fDebuggerInterface->ContinueThread(thread->ThreadID());
 		}
 	}
 }
@@ -1384,10 +1614,11 @@ TeamDebugger::_HandleImageFileChanged(image_id imageID)
 
 
 void
-TeamDebugger::_HandleSetUserBreakpoint(target_addr_t address, bool enabled)
+TeamDebugger::_HandleSetUserBreakpoint(target_addr_t address, bool enabled,
+	bool hidden)
 {
 	TRACE_CONTROL("TeamDebugger::_HandleSetUserBreakpoint(%#" B_PRIx64
-		", %d)\n", address, enabled);
+		", %d, %d)\n", address, enabled, hidden);
 
 	// check whether there already is a breakpoint
 	AutoLocker< ::Team> locker(fTeam);
@@ -1458,6 +1689,8 @@ TeamDebugger::_HandleSetUserBreakpoint(target_addr_t address, bool enabled)
 		if (userBreakpoint == NULL)
 			return;
 		userBreakpointReference.SetTo(userBreakpoint, true);
+
+		userBreakpoint->SetHidden(hidden);
 
 		TRACE_CONTROL("  created user breakpoint: %p\n", userBreakpoint);
 
@@ -1629,11 +1862,11 @@ TeamDebugger::_HandleInspectAddress(target_addr_t address,
 		return;
 	}
 
-	if (!memoryBlock->HasListener(listener))
-		memoryBlock->AddListener(listener);
-
 	if (!memoryBlock->IsValid()) {
 		AutoLocker< ::Team> teamLocker(fTeam);
+
+		if (!memoryBlock->HasListener(listener))
+			memoryBlock->AddListener(listener);
 
 		TeamMemory* memory = fTeam->GetTeamMemory();
 		// schedule the job
@@ -1642,13 +1875,36 @@ TeamDebugger::_HandleInspectAddress(target_addr_t address,
 			new(std::nothrow) RetrieveMemoryBlockJob(fTeam, memory,
 				memoryBlock),
 			this)) != B_OK) {
+
+			memoryBlock->NotifyDataRetrieved(result);
 			memoryBlock->ReleaseReference();
+
 			_NotifyUser("Inspect Address", "Failed to retrieve memory data: %s",
 				strerror(result));
 		}
 	} else
 		memoryBlock->NotifyDataRetrieved();
 
+}
+
+
+status_t
+TeamDebugger::_HandleSetArguments(int argc, const char* const* argv)
+{
+	fCommandLineArgc = argc;
+	fCommandLineArgv = new(std::nothrow) const char*[argc];
+	if (fCommandLineArgv == NULL)
+		return B_NO_MEMORY;
+
+	memset(const_cast<char **>(fCommandLineArgv), 0, sizeof(char*) * argc);
+
+	for (int i = 0; i < argc; i++) {
+		fCommandLineArgv[i] = strdup(argv[i]);
+		if (fCommandLineArgv[i] == NULL)
+			return B_NO_MEMORY;
+	}
+
+	return B_OK;
 }
 
 
@@ -1727,6 +1983,8 @@ TeamDebugger::_LoadSettings()
 		if (breakpoint == NULL)
 			return;
 		BReference<UserBreakpoint> breakpointReference(breakpoint, true);
+
+		breakpoint->SetHidden(breakpointSetting->IsHidden());
 
 		// install it
 		fBreakpointManager->InstallUserBreakpoint(breakpoint,

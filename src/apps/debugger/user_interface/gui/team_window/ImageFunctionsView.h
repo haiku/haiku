@@ -12,6 +12,7 @@
 #include "Team.h"
 
 
+class BTextControl;
 class FunctionInstance;
 
 
@@ -31,12 +32,15 @@ public:
 			void				SetImageDebugInfo(
 									ImageDebugInfo* imageDebugInfo);
 			void				SetFunction(FunctionInstance* function);
+	virtual	void				AttachedToWindow();
+	virtual	void				MessageReceived(BMessage* message);
 
 			void				LoadSettings(const BMessage& settings);
 			status_t			SaveSettings(BMessage& settings);
 
 private:
 			class FunctionsTableModel;
+			class HighlightingTableColumn;
 			class SourcePathComponentNode;
 
 private:
@@ -45,11 +49,16 @@ private:
 
 			void				_Init();
 
+			void				_ExpandFilteredNodes();
+
 private:
 			ImageDebugInfo*		fImageDebugInfo;
+			BTextControl*		fFilterField;
 			TreeTable*			fFunctionsTable;
 			FunctionsTableModel* fFunctionsTableModel;
 			Listener*			fListener;
+			HighlightingTableColumn* fHighlightingColumn;
+			bigtime_t			fLastFilterKeypress;
 };
 
 

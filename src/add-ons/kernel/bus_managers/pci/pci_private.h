@@ -29,11 +29,11 @@ typedef struct pci_root_module_info {
 
 	// read PCI config space
 	uint32 (*read_pci_config)(uint8 bus, uint8 device, uint8 function,
-				uint8 offset, uint8 size);
+				uint16 offset, uint8 size);
 
 	// write PCI config space
 	void (*write_pci_config)(uint8 bus, uint8 device, uint8 function,
-				uint8 offset, uint8 size, uint32 value);
+				uint16 offset, uint8 size, uint32 value);
 } pci_root_module_info;
 
 extern pci_root_module_info gPCIRootModule;
@@ -46,7 +46,10 @@ extern "C" {
 
 void *		pci_ram_address(const void *physical_address_in_system_memory);
 
-status_t 	pci_find_capability(uchar bus, uchar device, uchar function, uchar cap_id, uchar *offset);
+status_t 	pci_find_capability(uint8 bus, uint8 device, uint8 function,
+	uint8 cap_id, uint8 *offset);
+status_t 	pci_find_extended_capability(uint8 bus, uint8 device, uint8 function, 
+	uint16 cap_id, uint16 *offset);
 
 status_t	pci_reserve_device(uchar virtualBus, uchar device, uchar function,
 			const char *driverName, void *nodeCookie);

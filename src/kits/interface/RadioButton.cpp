@@ -566,9 +566,16 @@ BRadioButton::MaxSize()
 	GetPreferredSize(&width, &height);
 
 	return BLayoutUtils::ComposeSize(ExplicitMaxSize(),
-		BSize(B_SIZE_UNLIMITED, height));
+		BSize(width, height));
 }
 
+
+BAlignment
+BRadioButton::LayoutAlignment()
+{
+	return BLayoutUtils::ComposeAlignment(ExplicitAlignment(),
+		BAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_UNSET));
+}
 
 
 

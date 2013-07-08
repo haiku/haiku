@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-WebPositive	3577331897
+1	german	x-vnd.Haiku-WebPositive	1786411139
 Show home button	Settings Window		Home-Symbol anzeigen
 Username:	Authentication Panel		Benutzername:
 Copy URL to clipboard	Download Window		Adresse kopieren
@@ -16,6 +16,7 @@ Start page:	Settings Window		Startseite:
 History	WebPositive Window		Verlauf
 Error opening downloads folder	Download Window		Fehler beim Öffnen des Download-Ordners
 Paste	WebPositive Window		Einfügen
+Double-click or middle-click to open new tab.	Tab Manager		Doppel- oder Mittelklick, um neuen Reiter zu öffnen.
 Proxy username:	Settings Window		Proxy-Nutzername:
 Settings	Settings Window		Einstellungen
 %seconds seconds left	Download Window		Noch %seconds Sekunden

@@ -52,6 +52,7 @@ ClockView::ClockView(const char* name)
 		new BMessage(kShowTimeZone));
 
 	BView* view = BLayoutBuilder::Group<>(B_VERTICAL, 0)
+		.SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET))
 		.Add(fShowSeconds)
 		.Add(fShowDayOfWeek)
 		.Add(fShowTimeZone)

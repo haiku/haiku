@@ -118,6 +118,8 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		fPeriodicFrameListArea(-1),
 		fPeriodicFrameList(NULL),
 		fInterruptEntries(NULL),
+		fItdEntries(NULL),
+		fSitdEntries(NULL),
 		fAsyncQueueHead(NULL),
 		fAsyncAdvanceSem(-1),
 		fFirstTransfer(NULL),

@@ -37,6 +37,7 @@ public:
 	virtual ValueNodeChild*			ChildAt(int32 index) const;
 
 	virtual	bool					IsRangedContainer() const;
+	virtual	bool					IsContainerRangeFixed() const;
 	virtual	void					ClearChildren();
 	virtual	status_t				CreateChildrenInRange(int32 lowIndex,
 										int32 highIndex);

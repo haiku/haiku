@@ -57,7 +57,12 @@ struct rld_export gRuntimeLoader = {
 
 	elf_reinit_after_fork,
 	NULL, // call_atexit_hooks_for_range
-	terminate_program
+	terminate_program,
+
+	// the following values will be set later
+	NULL,	// program_args
+	NULL,	// commpage_address
+	0		// ABI version
 };
 
 
@@ -66,4 +71,17 @@ rldexport_init(void)
 {
 	gRuntimeLoader.program_args = gProgramArgs;
 	gRuntimeLoader.commpage_address = __gCommPageAddress;
+}
+
+
+/*!	Is called for all images, and sets the minimum ABI version found to the
+	gRuntimeLoader.abi_version field.
+*/
+void
+set_abi_version(int abi_version)
+{
+	if (gRuntimeLoader.abi_version == 0
+		|| gRuntimeLoader.abi_version > abi_version) {
+		gRuntimeLoader.abi_version = abi_version;
+	}
 }

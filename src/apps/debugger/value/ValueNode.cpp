@@ -70,6 +70,13 @@ ValueNode::IsRangedContainer() const
 }
 
 
+bool
+ValueNode::IsContainerRangeFixed() const
+{
+	return false;
+}
+
+
 void
 ValueNode::ClearChildren()
 {

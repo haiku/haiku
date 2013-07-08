@@ -77,24 +77,29 @@ public:
 			status_t		GetNthInfo(long index, pci_info *outInfo);
 
 			status_t		ReadConfig(uint8 domain, uint8 bus, uint8 device,
-								uint8 function, uint8 offset, uint8 size,
+								uint8 function, uint16 offset, uint8 size,
 								uint32 *value);
 			uint32			ReadConfig(uint8 domain, uint8 bus, uint8 device,
-								uint8 function, uint8 offset, uint8 size);
-			uint32			ReadConfig(PCIDev *device, uint8 offset,
+								uint8 function, uint16 offset, uint8 size);
+			uint32			ReadConfig(PCIDev *device, uint16 offset,
 								uint8 size);
 
 			status_t		WriteConfig(uint8 domain, uint8 bus, uint8 device,
-								uint8 function, uint8 offset, uint8 size,
+								uint8 function, uint16 offset, uint8 size,
 								uint32 value);
-			status_t		WriteConfig(PCIDev *device, uint8 offset,
+			status_t		WriteConfig(PCIDev *device, uint16 offset,
 								uint8 size, uint32 value);
 
 			status_t		FindCapability(uint8 domain, uint8 bus,
 								uint8 device, uint8 function, uint8 capID,
-								uint8 *offset);
+								uint8 *offset = NULL);
 			status_t		FindCapability(PCIDev *device, uint8 capID,
-								uint8 *offset);
+								uint8 *offset = NULL);
+			status_t		FindExtendedCapability(uint8 domain, uint8 bus,
+								uint8 device, uint8 function, uint16 capID,
+								uint16 *offset = NULL);
+			status_t		FindExtendedCapability(PCIDev *device,
+								uint16 capID, uint16 *offset = NULL);
 
 			status_t		ResolveVirtualBus(uint8 virtualBus, uint8 *domain,
 								uint8 *bus);
@@ -134,9 +139,9 @@ private:
 			void			_RefreshDeviceInfo(PCIBus *bus);
 
 			uint32			_BarSize(uint32 bits, uint32 mask);
-			void			_GetBarInfo(PCIDev *dev, uint8 offset,
+			size_t			_GetBarInfo(PCIDev *dev, uint8 offset,
 								uint32 *address, uint32 *size = 0,
-								uint8 *flags = 0);
+								uint8 *flags = 0, uint32 *highAddress = 0);
 			void			_GetRomBarInfo(PCIDev *dev, uint8 offset,
 								uint32 *address, uint32 *size = 0,
 								uint8 *flags = 0);
@@ -181,9 +186,9 @@ void		pci_uninit(void);
 long		pci_get_nth_pci_info(long index, pci_info *outInfo);
 
 uint32		pci_read_config(uint8 virtualBus, uint8 device, uint8 function,
-				uint8 offset, uint8 size);
+				uint16 offset, uint8 size);
 void		pci_write_config(uint8 virtualBus, uint8 device, uint8 function,
-				uint8 offset, uint8 size, uint32 value);
+				uint16 offset, uint8 size, uint32 value);
 
 void		__pci_resolve_virtual_bus(uint8 virtualBus, uint8 *domain, uint8 *bus);
 

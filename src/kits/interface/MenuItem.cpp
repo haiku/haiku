@@ -406,7 +406,9 @@ BMenuItem::DrawContent()
 	GetContentSize(&labelWidth, &labelHeight);
 
 	const BRect& padding = menuPrivate.Padding();
-	float frameWidth = fSuper->Frame().Width() - padding.left - padding.right;
+	float maxContentWidth = fSuper->MaxContentWidth();
+	float frameWidth = maxContentWidth > 0 ? maxContentWidth
+		: fSuper->Frame().Width() - padding.left - padding.right;
 
 	if (roundf(frameWidth) >= roundf(labelWidth))
 		fSuper->DrawString(fLabel);

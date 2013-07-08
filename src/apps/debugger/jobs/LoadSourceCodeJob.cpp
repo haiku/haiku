@@ -82,6 +82,18 @@ LoadSourceCodeJob::Do()
 	locker.Lock();
 	if (error == B_OK) {
 		if (fFunctionInstance->SourceCodeState() == FUNCTION_SOURCE_LOADING) {
+			// various parts of the debugger expect functions to have only
+			// one of source or disassembly available. As such, if the current
+			// function had source code previously active, unset it when
+			// explicitly asked for disassembly. This needs to be done first
+			// since Function will clear the disassembled code states of all
+			// its child instances.
+			if (function->SourceCodeState() == FUNCTION_SOURCE_LOADED) {
+				FileSourceCode* sourceCode = function->GetSourceCode();
+				function->SetSourceCode(sourceCode,
+					FUNCTION_SOURCE_NOT_LOADED);
+			}
+
 			fFunctionInstance->SetSourceCode(sourceCode,
 				FUNCTION_SOURCE_LOADED);
 			sourceCode->ReleaseReference();

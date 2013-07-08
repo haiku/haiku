@@ -110,6 +110,8 @@ RootInode::_UpdateInfo(bool force)
 
 		if (ioSize == LONGLONG_MAX)
 			ioSize = 32768;
+		if (ioSize == 0)
+			ioSize = 4096;
 		fInfoCache.io_size = ioSize;
 		fInfoCache.block_size = ioSize;
 		fIOSize = ioSize;
@@ -203,10 +205,12 @@ RootInode::GetLocations(AttrValue** attrv)
 		result = reply.GetAttr(attrv, &count);
 		if (result != B_OK)
 			return result;
-		if (count < 1)
+		if (count < 1) {
+			delete *attrv;
 			return B_ERROR;
-		return B_OK;
+		}
 
+		return B_OK;
 	} while (true);
 
 	return B_OK;

@@ -301,7 +301,6 @@ DwarfTypeFactory::CreateType(DIEType* typeEntry, DwarfType*& _type)
 	// try the type cache first
 	BString name;
 	DwarfUtils::GetFullyQualifiedDIEName(typeEntry, name);
-// TODO: The DIE may not have a name (e.g. pointer and reference types don't).
 
 	TypeLookupConstraints constraints(
 		dwarf_tag_to_type_kind(typeEntry->Tag()));

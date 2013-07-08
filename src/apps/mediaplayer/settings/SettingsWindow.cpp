@@ -48,7 +48,7 @@ SettingsWindow::SettingsWindow(BRect frame)
  			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	const float kSpacing = be_control_look->DefaultItemSpacing();
-	
+
 	BBox* settingsBox = new BBox(B_PLAIN_BORDER, NULL);
 	BGroupLayout* settingsLayout = new BGroupLayout(B_VERTICAL, kSpacing / 2);
 	settingsBox->SetLayout(settingsLayout);
@@ -135,13 +135,18 @@ SettingsWindow::SettingsWindow(BRect frame)
 	okButton->MakeDefault(true);
 
 	// Build the layout
+	BGroupLayout* volumeGroup;
+	BGroupLayout* startGroup;
+	BGroupLayout* playGroup;
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.AddGroup(settingsLayout)
 			.SetInsets(kSpacing, kSpacing, kSpacing * 2, 0)
 			.Add(playModeLabel)
 			.AddGroup(B_HORIZONTAL, 0)
-				.AddStrut(kSpacing)
+				.GetLayout(&playGroup)
+				.AddStrut(10)
 				.AddGroup(B_VERTICAL, 0)
+					.GetLayout(&startGroup)
 					.Add(fAutostartCB)
 					.AddGrid(kSpacing, 0)
 						.Add(BSpaceLayoutItem::CreateHorizontalStrut(kSpacing), 0, 0)
@@ -172,6 +177,7 @@ SettingsWindow::SettingsWindow(BRect frame)
 			.AddGroup(B_HORIZONTAL, 0)
 				.AddStrut(10)
 				.AddGroup(B_VERTICAL, 0)
+					.GetLayout(&volumeGroup)
 					.Add(fFullVolumeBGMoviesRB)
 					.Add(fHalfVolumeBGMoviesRB)
 					.Add(fMutedVolumeBGMoviesRB)
@@ -185,6 +191,10 @@ SettingsWindow::SettingsWindow(BRect frame)
 			.AddGlue()
 			.Add(cancelButton)
 			.Add(okButton);
+
+	startGroup->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	playGroup->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	volumeGroup->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 }
 
 

@@ -965,6 +965,8 @@ status_t
 UdpEndpoint::Close()
 {
 	TRACE_EP("Close()");
+	fSocket->error = EBADF;
+	WakeAll();
 	return B_OK;
 }
 

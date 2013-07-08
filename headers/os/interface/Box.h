@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2005-2013 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _BOX_H
@@ -11,7 +11,7 @@
 
 class BBox : public BView {
 	public:
-							BBox(BRect frame, const char *name = NULL,
+							BBox(BRect frame, const char* name = NULL,
 								uint32 resizingMode = B_FOLLOW_LEFT
 									| B_FOLLOW_TOP,
 								uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS
@@ -47,8 +47,8 @@ class BBox : public BView {
 		virtual	void		DetachedFromWindow();
 		virtual	void		AllAttached();
 		virtual	void		AllDetached();
-		virtual void		FrameResized(float width, float height);
-		virtual void		MessageReceived(BMessage* message);
+		virtual	void		FrameResized(float width, float height);
+		virtual	void		MessageReceived(BMessage* message);
 		virtual	void		MouseDown(BPoint point);
 		virtual	void		MouseUp(BPoint point);
 		virtual	void		WindowActivated(bool active);
@@ -56,20 +56,21 @@ class BBox : public BView {
 								const BMessage* dragMessage);
 		virtual	void		FrameMoved(BPoint newLocation);
 
-		virtual BHandler*	ResolveSpecifier(BMessage* message,
+		virtual	BHandler*	ResolveSpecifier(BMessage* message,
 								int32 index, BMessage* specifier,
 								int32 what, const char* property);
 
-		virtual void		ResizeToPreferred();
-		virtual void		GetPreferredSize(float* _width, float* _height);
-		virtual void		MakeFocus(bool focused = true);
-		virtual status_t	GetSupportedSuites(BMessage* message);
+		virtual	void		ResizeToPreferred();
+		virtual	void		GetPreferredSize(float* _width, float* _height);
+		virtual	void		MakeFocus(bool focused = true);
+		virtual	status_t	GetSupportedSuites(BMessage* message);
 
-		virtual status_t	Perform(perform_code d, void* arg);
+		virtual	status_t	Perform(perform_code d, void* arg);
 
 		virtual	BSize		MinSize();
 		virtual	BSize		MaxSize();
 		virtual	BSize		PreferredSize();
+		virtual	BAlignment	LayoutAlignment();
 
 	protected:
 		virtual	void		LayoutInvalidated(bool descendants = false);

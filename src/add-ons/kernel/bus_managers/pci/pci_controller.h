@@ -13,12 +13,12 @@ typedef struct pci_controller
 	// read PCI config space
 	status_t	(*read_pci_config)(void *cookie, 
 				uint8 bus, uint8 device, uint8 function,
-				uint8 offset, uint8 size, uint32 *value);
+				uint16 offset, uint8 size, uint32 *value);
 
 	// write PCI config space
 	status_t	(*write_pci_config)(void *cookie, 
 				uint8 bus, uint8 device, uint8 function,
-				uint8 offset, uint8 size, uint32 value);
+				uint16 offset, uint8 size, uint32 value);
 				
 	status_t	(*get_max_bus_devices)(void *cookie, int32 *count);
 	

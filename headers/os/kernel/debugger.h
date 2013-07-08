@@ -487,7 +487,7 @@ typedef struct {
 typedef struct {
 	debug_origin	origin;
 	uint32			syscall;		// the syscall number
-	uint32			args[16];		// syscall arguments
+	uint8			args[128];		// syscall arguments
 } debug_pre_syscall;
 
 // B_DEBUGGER_MESSAGE_POST_SYSCALL
@@ -498,7 +498,7 @@ typedef struct {
 	bigtime_t		end_time;		// time of syscall completion
 	uint64			return_value;	// the syscall's return value
 	uint32			syscall;		// the syscall number
-	uint32			args[16];		// syscall arguments
+	uint8			args[128];		// syscall arguments
 } debug_post_syscall;
 
 // B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED

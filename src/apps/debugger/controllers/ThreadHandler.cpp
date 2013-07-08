@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -37,7 +37,8 @@ enum {
 	STEP_NONE,
 	STEP_OVER,
 	STEP_INTO,
-	STEP_OUT
+	STEP_OUT,
+	STEP_UNTIL
 };
 
 
@@ -97,9 +98,10 @@ ThreadHandler::SetBreakpointAndRun(target_addr_t address)
 
 
 bool
-ThreadHandler::HandleThreadDebugged(ThreadDebuggedEvent* event)
+ThreadHandler::HandleThreadDebugged(ThreadDebuggedEvent* event,
+	const BString& stoppedReason)
 {
-	return _HandleThreadStopped(NULL, THREAD_STOPPED_DEBUGGED);
+	return _HandleThreadStopped(NULL, THREAD_STOPPED_DEBUGGED, stoppedReason);
 }
 
 
@@ -124,7 +126,7 @@ ThreadHandler::HandleBreakpointHit(BreakpointHitEvent* event)
 	// check whether this is a temporary breakpoint we're waiting for
 	if (fBreakpointAddress != 0 && instructionPointer == fBreakpointAddress
 		&& fStepMode != STEP_NONE) {
-		if (_HandleBreakpointHitStep(cpuState))
+		if (fStepMode != STEP_UNTIL && _HandleBreakpointHitStep(cpuState))
 			return true;
 	} else {
 		// Might be a user breakpoint, but could as well be a temporary
@@ -199,7 +201,7 @@ ThreadHandler::HandleExceptionOccurred(ExceptionOccurredEvent* event)
 
 
 void
-ThreadHandler::HandleThreadAction(uint32 action)
+ThreadHandler::HandleThreadAction(uint32 action, target_addr_t address)
 {
 	AutoLocker<Team> locker(fThread->GetTeam());
 
@@ -219,6 +221,11 @@ ThreadHandler::HandleThreadAction(uint32 action)
 	BReference<CpuState> cpuStateReference(cpuState);
 	BReference<StackTrace> stackTraceReference(stackTrace);
 
+	if (action == MSG_THREAD_SET_ADDRESS) {
+		_HandleSetAddress(cpuState, address);
+		return;
+	}
+
 	// When continuing the thread update thread state before actually issuing
 	// the command, since we need to unlock.
 	if (action != MSG_THREAD_STOP) {
@@ -230,12 +237,15 @@ ThreadHandler::HandleThreadAction(uint32 action)
 
 	switch (action) {
 		case MSG_THREAD_RUN:
-			fStepMode = STEP_NONE;
+			fStepMode = address != 0 ? STEP_UNTIL : STEP_NONE;
+			if (address != 0)
+				_InstallTemporaryBreakpoint(address);
 			_RunThread(0);
 			return;
 		case MSG_THREAD_STOP:
 			fStepMode = STEP_NONE;
-			fDebuggerInterface->StopThread(ThreadID());
+			if (fDebuggerInterface->StopThread(ThreadID()) == B_OK)
+				fThread->SetStopRequestPending();
 			return;
 		case MSG_THREAD_STEP_OVER:
 		case MSG_THREAD_STEP_INTO:
@@ -404,6 +414,26 @@ ThreadHandler::_HandleThreadStopped(CpuState* cpuState, uint32 stoppedReason,
 
 	_SetThreadState(THREAD_STATE_STOPPED, cpuState, stoppedReason,
 		stoppedReasonInfo);
+
+	return true;
+}
+
+
+bool
+ThreadHandler::_HandleSetAddress(CpuState* state, target_addr_t address)
+{
+	CpuState* newState = NULL;
+	if (state->Clone(newState) != B_OK)
+		return false;
+	BReference<CpuState> stateReference(newState, true);
+
+	newState->SetInstructionPointer(address);
+	if (fDebuggerInterface->SetCpuState(fThread->ID(), newState) != B_OK)
+		return false;
+
+	AutoLocker<Team> locker(fThread->GetTeam());
+	fThread->SetStackTrace(NULL);
+	fThread->SetCpuState(newState);
 
 	return true;
 }

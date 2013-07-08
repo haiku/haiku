@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2013, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Alexander von Gluck <kallisti5@unixzen.com>
  */
 
 
@@ -39,37 +40,35 @@ enum modes {
 	RTM_FLUSH,
 };
 
-enum preferred_output_format {
-	PREFER_OUTPUT_MASK,
-	PREFER_OUTPUT_PREFIX_LENGTH,
+enum preferredPrefixFormat {
+	PREFIX_PREFER_NETMASK = 0,
+	PREFIX_PREFER_CIDR,
 };
 
 struct address_family {
 	int			family;
 	const char*	name;
 	const char*	identifiers[4];
-	preferred_output_format	preferred_format;
-	bool		(*parse_address)(const char* string, sockaddr* _address);
-	bool		(*prefix_length_to_mask)(uint8 prefixLength, sockaddr* mask);
-	uint8		(*mask_to_prefix_length)(sockaddr* mask);
-	const char*	(*address_to_string)(sockaddr* address);
+	int			maxAddressLength;
+	int			preferredPrefixFormat;
 };
-
 
 static const address_family kFamilies[] = {
 	{
 		AF_INET,
-		"inet",
+		"IPv4",
 		{"AF_INET", "inet", "ipv4", NULL},
-		PREFER_OUTPUT_MASK,
+		15,
+		PREFIX_PREFER_NETMASK,
 	},
 	{
 		AF_INET6,
-		"inet6",
+		"IPv6",
 		{"AF_INET6", "inet6", "ipv6", NULL},
-		PREFER_OUTPUT_PREFIX_LENGTH,
+		39,
+		PREFIX_PREFER_CIDR,
 	},
-	{ -1, NULL, {NULL}, PREFER_OUTPUT_MASK, NULL, NULL, NULL, NULL }
+	{ -1, NULL, {NULL}, -1, -1 }
 };
 
 
@@ -187,75 +186,91 @@ list_routes(int socket, const char *interfaceName, route_entry &route)
 	ifreq *interface = (ifreq*)buffer;
 	ifreq *end = (ifreq*)((uint8*)buffer + size);
 
+	// find family (we use the family of the first address as this is
+	// called on a socket for a single family)
+	const address_family *family = NULL;
+	for (int32 i = 0; kFamilies[i].family >= 0; i++) {
+		if (interface->ifr_route.destination->sa_family
+				== kFamilies[i].family) {
+			family = &kFamilies[i];
+			break;
+		}
+	}
+
+	int addressLength = family->maxAddressLength;
+
+	printf("%s routing table:\n", family->name);
+
+	if (family->preferredPrefixFormat == PREFIX_PREFER_NETMASK) {
+		printf("%*s %*s %*s Flags  Interface\n", addressLength, "Destination",
+			addressLength, "Netmask", addressLength, "Gateway");
+	} else {
+		printf("%*s     %*s Flags  Interface\n", addressLength, "Destination",
+			addressLength, "Gateway");
+	}
+
 	while (interface < end) {
 		route_entry& route = interface->ifr_route;
 
 		// apply filters
 		if (interfaceName == NULL
 			|| !strcmp(interfaceName, interface->ifr_name)) {
-			// find family
-			const address_family *family = NULL;
-			for (int32 i = 0; kFamilies[i].family >= 0; i++) {
-				if (route.destination->sa_family == kFamilies[i].family) {
-					family = &kFamilies[i];
-					break;
-				}
-			}
 
 			if (family != NULL) {
 				BNetworkAddress destination(*route.destination);
-				BNetworkAddress mask;
-				if (route.mask != NULL)
+				printf("%*s", addressLength, destination.ToString().String());
+				if (route.mask != NULL) {
+					BNetworkAddress mask;
 					mask.SetTo(*route.mask);
-
-				// TODO: is the %15s format OK for IPv6?
-				printf("%15s", destination.ToString().String());
-				switch (family->preferred_format) {
-					case PREFER_OUTPUT_MASK:
-						printf(" mask %-15s ", mask.ToString().String());
-						break;
-					case PREFER_OUTPUT_PREFIX_LENGTH:
-						printf("/%zd ", mask.PrefixLength());
-						break;
+					if (family->preferredPrefixFormat
+							== PREFIX_PREFER_NETMASK) {
+						printf(" %*s ", addressLength,
+							mask.ToString().String());
+					} else {
+						printf("/%-3zd ", mask.PrefixLength());
+					}
+				} else {
+					if (family->preferredPrefixFormat
+							== PREFIX_PREFER_NETMASK) {
+						printf(" %*s ", addressLength, "-");
+					} else
+						printf("     ");
 				}
+
 				if ((route.flags & RTF_GATEWAY) != 0) {
 					BNetworkAddress gateway;
 					if (route.gateway != NULL)
 						gateway.SetTo(*route.gateway);
-					printf("gateway %-15s ", gateway.ToString().String());
-				}
+					printf("%*s ", addressLength, gateway.ToString().String());
+				} else
+					printf("%*s ", family->maxAddressLength, "-");
 			} else
 				printf("unknown family ");
-
-			printf("%s", interface->ifr_name);
 
 			if (route.flags != 0) {
 				const struct {
 					int			value;
 					const char	*name;
 				} kFlags[] = {
-					{RTF_DEFAULT, "default"},
-					{RTF_REJECT, "reject"},
-					{RTF_HOST, "host"},
-					{RTF_LOCAL, "local"},
-					{RTF_DYNAMIC, "dynamic"},
-					{RTF_MODIFIED, "modified"},
+					{RTF_DEFAULT, "D"},
+					{RTF_REJECT, "R"},
+					{RTF_HOST, "H"},
+					{RTF_LOCAL, "L"},
+					{RTF_DYNAMIC, "D"},
+					{RTF_MODIFIED, "M"},
 				};
-				bool first = true;
-
 				for (uint32 i = 0; i < sizeof(kFlags) / sizeof(kFlags[0]);
-						i++) {
+					i++) {
 					if ((route.flags & kFlags[i].value) != 0) {
-						if (first) {
-							printf(", ");
-							first = false;
-						} else
-							putchar(' ');
 						printf(kFlags[i].name);
-					}
+					} else
+						putchar('-');
 				}
-			}
+				printf(" ");
+			} else
+				printf("------ ");
 
+			printf("%s", interface->ifr_name);
 			putchar('\n');
 		}
 
@@ -271,6 +286,7 @@ list_routes(int socket, const char *interfaceName, route_entry &route)
 			+ sizeof(route_entry) + addressSize);
 	}
 
+	putchar('\n');
 	free(buffer);
 }
 
@@ -334,22 +350,17 @@ get_route(int socket, route_entry &route)
 	}
 
 	if (family != NULL) {
-		printf("%s", family->address_to_string(request.destination));
-		switch (family->preferred_format) {
-			case PREFER_OUTPUT_MASK:
-				printf(" mask %s ",
-					family->address_to_string(request.mask));
-				break;
-			case PREFER_OUTPUT_PREFIX_LENGTH:
-				printf("/%u ",
-					family->mask_to_prefix_length(request.mask));
-				break;
-		}
+		BNetworkAddress destination(*request.destination);
+		BNetworkAddress mask(*request.mask);
+		printf("%s", destination.ToString().String());
+		printf("/%zd ", mask.PrefixLength());
 
+		BNetworkAddress gateway(*request.gateway);
 		if (request.flags & RTF_GATEWAY)
-			printf("gateway %s ", family->address_to_string(request.gateway));
+			printf("gateway %s ", gateway.ToString().String());
 
-		printf("source %s\n", family->address_to_string(request.source));
+		BNetworkAddress source(*request.source);
+		printf("source %s\n", source.ToString().String());
 	} else {
 		printf("unknown family ");
 	}

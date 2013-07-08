@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DEBUG_INFO_ENTRY_H
@@ -162,6 +163,20 @@ public:
 	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(elemental)
 	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(pure)
 	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(recursive)
+	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(signature)
+	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(main_subprogram)
+	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(data_bit_offset)
+	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(const_expr)
+	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(enum_class)
+	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(linkage_name)
+	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(call_site_value)
+	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(call_site_data_value)
+	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(call_site_target)
+	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(call_site_target_clobbered)
+	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(tail_call)
+	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(all_tail_call_sites)
+	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(all_call_sites)
+	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(all_source_call_sites)
 
 protected:
 	virtual	DeclarationLocation* GetDeclarationLocation();

@@ -1048,8 +1048,19 @@ TermParse::EscParse()
 						uchar params[512];
 						// fill the buffer until BEL, ST or something else.
 						bool isParsed = false;
+						int32 skipCount = 0; // take care about UTF-8 characters
 						for (uint i = 0; !isParsed && i < sizeof(params); i++) {
 							params[i] = _NextParseChar();
+
+							if (skipCount > 0) {
+								skipCount--;
+								continue;
+							}
+
+							skipCount = UTF8Char::ByteCount(params[i]) - 1;
+							if (skipCount > 0)
+								continue;
+
 							switch (params[i]) {
 								// BEL
 								case 0x07:
@@ -1073,6 +1084,9 @@ TermParse::EscParse()
 							}
 							params[i] = '\0';
 						}
+
+						// watchdog for the 'end of buffer' case
+						params[sizeof(params) - 1] = '\0';
 
 						if (isParsed)
 							_ProcessOperatingSystemControls(params);

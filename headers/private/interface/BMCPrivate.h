@@ -16,6 +16,9 @@
 #include <MessageFilter.h>
 
 
+static const float kVMargin = 2.0f;
+
+
 class BMessageRunner;
 
 
@@ -48,6 +51,7 @@ public:
 	virtual	void				FrameResized(float width, float height);
 	virtual	void				MessageReceived(BMessage* msg);
 	virtual	void				MakeFocus(bool focused = true);
+	virtual	void				SetMaxContentWidth(float width);
 
 			void				TogglePopUpMarker(bool show)
 									{ fShowPopUpMarker = show; }
@@ -60,7 +64,7 @@ public:
 private:
 								_BMCMenuBar_&operator=(const _BMCMenuBar_&);
 
-			void				_Init(bool setMaxContentWidth);
+			void				_Init();
 
 			BMenuField*			fMenuField;
 			bool				fFixedSize;	

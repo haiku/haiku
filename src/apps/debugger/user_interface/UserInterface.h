@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef USER_INTERFACE_H
@@ -81,7 +82,8 @@ public:
 	virtual						~UserInterfaceListener();
 
 	virtual	void				FunctionSourceCodeRequested(
-									FunctionInstance* function) = 0;
+									FunctionInstance* function,
+									bool forceDisassembly = false) = 0;
 	virtual void				SourceEntryLocateRequested(
 									const char* sourcePath,
 									const char* locatedPath) = 0;
@@ -90,10 +92,11 @@ public:
 									ValueNodeContainer* container,
 									ValueNode* valueNode) = 0;
 	virtual	void				ThreadActionRequested(thread_id threadID,
-									uint32 action) = 0;
+									uint32 action,
+									target_addr_t address = 0) = 0;
 
 	virtual	void				SetBreakpointRequested(target_addr_t address,
-									bool enabled) = 0;
+									bool enabled, bool hidden = false) = 0;
 	virtual	void				SetBreakpointEnabledRequested(
 									UserBreakpoint* breakpoint,
 									bool enabled) = 0;
@@ -102,6 +105,13 @@ public:
 	virtual	void				ClearBreakpointRequested(
 									UserBreakpoint* breakpoint) = 0;
 									// TODO: Consolidate those!
+
+	virtual	void				SetStopOnImageLoadRequested(bool enabled,
+									bool useImageNames) = 0;
+	virtual	void				AddStopImageNameRequested(
+									const char* name) = 0;
+	virtual	void				RemoveStopImageNameRequested(
+									const char* name) = 0;
 
 	virtual	void				SetWatchpointRequested(target_addr_t address,
 									uint32 type, int32 length,
@@ -119,6 +129,8 @@ public:
 									TeamMemoryBlock::Listener* listener) = 0;
 
 	virtual void				DebugReportRequested(entry_ref* path) = 0;
+
+	virtual	void				TeamRestartRequested() = 0;
 
 	virtual	bool				UserInterfaceQuitRequested(
 									QuitOption quitOption

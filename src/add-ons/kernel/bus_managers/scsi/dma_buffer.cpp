@@ -83,8 +83,8 @@ is_sg_list_dma_safe(scsi_ccb *request)
 
 		// verify entry size
 		if (sg_list->size > max_sg_block_size) {
-			SHOW_FLOW(0, "S/G-entry is too long (%d/%d bytes)",
-				(int)sg_list->size, (int)max_sg_block_size);
+			SHOW_FLOW(0, "S/G-entry is too long (%" B_PRIuPHYSADDR "/%" B_PRIu32
+				" bytes)", sg_list->size, max_sg_block_size);
 			return false;
 		}
 	}
@@ -103,7 +103,7 @@ scsi_copy_dma_buffer(scsi_ccb *request, uint32 size, bool to_buffer)
 	uint32 num_vecs = buffer->sg_count_orig;
 	uchar *buffer_data = buffer->address;
 
-	SHOW_FLOW(1, "to_buffer=%d, %d bytes", to_buffer, (int)size);
+	SHOW_FLOW(1, "to_buffer=%d, %" B_PRIu32 " bytes", to_buffer, size);
 
 	// survive even if controller returned invalid data size
 	size = min_c(size, request->data_length);
@@ -154,10 +154,8 @@ scsi_free_dma_buffer(dma_buffer *buffer)
 static bool
 scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 {
-	size_t sg_list_size, sg_list_entries;
-
 	// free old buffer first
-	scsi_free_dma_buffer( buffer );
+	scsi_free_dma_buffer(buffer);
 
 	// just in case alignment is ridiculously huge
 	size = (size + dma_params->alignment) & ~dma_params->alignment;
@@ -171,14 +169,14 @@ scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 		uint32 boundary = dma_params->dma_boundary;
 
 		// alright - a contiguous buffer is required to keep S/G table short
-		SHOW_INFO(1, "need to setup contiguous DMA buffer of size %d",
-			(int)size);
+		SHOW_INFO(1, "need to setup contiguous DMA buffer of size %" B_PRIu32,
+			size);
 
 		// verify that we don't get problems with dma boundary
 		if (boundary != ~(uint32)0) {
 			if (size > boundary + 1) {
-				SHOW_ERROR(2, "data is longer then maximum DMA transfer len (%d/%d bytes)",
-					(int)size, (int)boundary + 1);
+				SHOW_ERROR(2, "data is longer then maximum DMA transfer len (%"
+					 B_PRId32 "/%" B_PRId32 " bytes)", size, boundary + 1);
 				return false;
 			}
 		}
@@ -199,8 +197,8 @@ scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 			(void**)&buffer->address);
 
 		if (buffer->area < 0) {
-			SHOW_ERROR(2, "Cannot create contignous DMA buffer of %d bytes",
-				(int)size);
+			SHOW_ERROR(2, "Cannot create contignous DMA buffer of %" B_PRIu32
+				" bytes", size);
 			return false;
 		}
 
@@ -212,8 +210,8 @@ scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 			B_32_BIT_FULL_LOCK, 0);
 				// TODO: Use B_FULL_LOCK, if possible!
 		if (buffer->area < 0) {
-			SHOW_ERROR(2, "Cannot create DMA buffer of %d bytes",
-				(int)size);
+			SHOW_ERROR(2, "Cannot create DMA buffer of %" B_PRIu32 " bytes",
+				size);
 			return false;
 		}
 
@@ -222,7 +220,7 @@ scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 
 	// create S/G list
 	// worst case is one entry per page, and size is page-aligned
-	sg_list_size = buffer->size / B_PAGE_SIZE * sizeof( physical_entry );
+	size_t sg_list_size = buffer->size / B_PAGE_SIZE * sizeof( physical_entry );
 	// create_area has page-granularity
 	sg_list_size = (sg_list_size + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 
@@ -231,15 +229,15 @@ scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 		B_32_BIT_FULL_LOCK, 0);
 			// TODO: Use B_FULL_LOCK, if possible!
 	if (buffer->sg_list_area < 0) {
-		SHOW_ERROR( 2, "Cannot craete DMA buffer S/G list of %d bytes",
-			(int)sg_list_size );
+		SHOW_ERROR( 2, "Cannot create DMA buffer S/G list of %" B_PRIuSIZE
+			" bytes", sg_list_size );
 
 		delete_area(buffer->area);
 		buffer->area = 0;
 		return false;
 	}
 
-	sg_list_entries = sg_list_size / sizeof( physical_entry );
+	size_t sg_list_entries = sg_list_size / sizeof(physical_entry);
 
 	{
 		size_t mapped_len;
@@ -255,8 +253,9 @@ scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 			&mapped_len );
 
 		if( res != B_OK || mapped_len != buffer->size ) {
-			SHOW_ERROR(0, "Error creating S/G list for DMA buffer (%s; wanted %d, got %d bytes)",
-				strerror(res), (int)mapped_len, (int)buffer->size);
+			SHOW_ERROR(0, "Error creating S/G list for DMA buffer (%s; wanted "
+				"%" B_PRIuSIZE ", got %" B_PRIuSIZE " bytes)", strerror(res),
+				mapped_len, buffer->size);
 		}
 	}
 
@@ -278,7 +277,7 @@ scsi_free_dma_buffer_sg_orig(dma_buffer *buffer)
 /** allocate S/G list to original data */
 
 static bool
-scsi_alloc_dma_buffer_sg_orig(dma_buffer *buffer, int size)
+scsi_alloc_dma_buffer_sg_orig(dma_buffer *buffer, size_t size)
 {
 	// free old list first
 	scsi_free_dma_buffer_sg_orig(buffer);
@@ -290,15 +289,15 @@ scsi_alloc_dma_buffer_sg_orig(dma_buffer *buffer, int size)
 		B_ANY_KERNEL_ADDRESS, size,
 		B_NO_LOCK, 0);
 	if (buffer->sg_orig < 0) {
-		SHOW_ERROR(2, "Cannot S/G list buffer to original data of %d bytes",
-			(int)size);
+		SHOW_ERROR(2, "Cannot S/G list buffer to original data of %" B_PRIuSIZE
+			" bytes", size);
 		return false;
 	}
 
 	buffer->sg_count_max_orig = size / sizeof(physical_entry);
 
-	SHOW_INFO(3, "Got up to %d S/G entries to original data",
-		(int)buffer->sg_count_max_orig);
+	SHOW_INFO(3, "Got up to %" B_PRIuSIZE " S/G entries to original data",
+		buffer->sg_count_max_orig);
 
 	return true;
 }
@@ -311,11 +310,11 @@ dump_sg_table(const physical_entry *sg_list,
 {
 	uint32 cur_idx;
 
-	SHOW_FLOW(1, "count=%d", (int)sg_list_count);
+	SHOW_FLOW(1, "count=%" B_PRIu32, sg_list_count);
 
 	for (cur_idx = sg_list_count; cur_idx >= 1; --cur_idx, ++sg_list) {
-		SHOW_FLOW(1, "addr=%" B_PRIxPHYSADDR ", size=%d", sg_list->address,
-			(int)sg_list->size);
+		SHOW_FLOW(1, "addr=%" B_PRIxPHYSADDR ", size=%" B_PRIuPHYSADDR,
+			sg_list->address, sg_list->size);
 	}
 }
 
@@ -404,7 +403,7 @@ scsi_get_dma_buffer(scsi_ccb *request)
 	request->sg_list = buffer->sg_list;
 	request->sg_count = buffer->sg_count;
 
-	SHOW_INFO(1, "bytes: %d", (int)request->data_length);
+	SHOW_INFO(1, "bytes: %" B_PRIu32, request->data_length);
 	SHOW_INFO0(3, "we can start now");
 
 	request->buffered = true;
@@ -434,9 +433,9 @@ scsi_release_dma_buffer(scsi_ccb *request)
 	scsi_device_info *device = request->device;
 	dma_buffer *buffer = request->dma_buffer;
 
-	SHOW_FLOW(1, "Buffering finished, %x, %x",
+	SHOW_FLOW(1, "Buffering finished, %x, %" B_PRIx32,
 		request->subsys_status & SCSI_SUBSYS_STATUS_MASK,
-		(int)(request->flags & SCSI_DIR_MASK));
+		(request->flags & SCSI_DIR_MASK));
 
 	// copy data from buffer if required and if operation succeeded
 	if ((request->subsys_status & SCSI_SUBSYS_STATUS_MASK) == SCSI_REQ_CMP

@@ -4,3 +4,4 @@ SubInclude HAIKU_TOP src add-ons kernel busses scsi ahci ;
 SubInclude HAIKU_TOP src add-ons kernel busses scsi 53c8xx ;
 SubInclude HAIKU_TOP src add-ons kernel busses scsi buslogic ;
 SubInclude HAIKU_TOP src add-ons kernel busses scsi usb ;
+SubInclude HAIKU_TOP src add-ons kernel busses scsi virtio ;

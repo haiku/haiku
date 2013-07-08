@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2013, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,6 +7,7 @@
  *		Jérôme Duval (korli@users.berlios.de)
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Artur Wyszynski
+ *		Rene Gollent (rene@gollent.com)
  */
 
 
@@ -429,7 +430,7 @@ BTabView::BTabView(BMessage *archive)
 	}
 
 	if (archive->FindInt32("_sel", &fSelection) != B_OK)
-		fSelection = 0;
+		fSelection = -1;
 
 	if (archive->FindInt32("_border_style", (int32*)&fBorderStyle) != B_OK)
 		fBorderStyle = B_FANCY_BORDER;
@@ -568,7 +569,8 @@ BTabView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
 
-	Select(fSelection);
+	if (fSelection < 0)
+		Select(0);
 }
 
 
@@ -746,6 +748,9 @@ BTabView::Pulse()
 void
 BTabView::Select(int32 index)
 {
+	if (index == Selection())
+		return;
+
 	if (index < 0 || index >= CountTabs())
 		index = Selection();
 
@@ -1238,13 +1243,10 @@ BTabView::RemoveTab(int32 index)
 	if (fContainerView->GetLayout())
 		fContainerView->GetLayout()->RemoveItem(index);
 
-	if (index <= fSelection && fSelection != 0)
-		fSelection--;
-
 	if (CountTabs() == 0)
 		fFocus = -1;
-	else
-		Select(fSelection);
+	else if (index <= fSelection)
+		Select(fSelection - 1);
 
 	if (fFocus == CountTabs() - 1 || CountTabs() == 0)
 		SetFocusTab(fFocus, false);
@@ -1351,7 +1353,7 @@ BTabView::_InitObject(bool layouted, button_width width)
 	fTabList = new BList;
 
 	fTabWidthSetting = width;
-	fSelection = 0;
+	fSelection = -1;
 	fFocus = -1;
 	fTabOffset = 0.0f;
 	fBorderStyle = B_FANCY_BORDER;

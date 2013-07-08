@@ -79,7 +79,7 @@ dump_indirect_stream(Disk &disk, bfs_inode *node, bool showOffsets)
 		if (runs[i].IsZero())
 			return;
 
-		printf("  indirect[%02" B_PRId32 "]              = ", i);
+		printf("  indirect[%04" B_PRId32 "]            = ", i);
 
 		char buffer[256];
 		if (showOffsets)
@@ -90,6 +90,68 @@ dump_indirect_stream(Disk &disk, bfs_inode *node, bool showOffsets)
 		dump_block_run("", runs[i], buffer);
 
 		offset += runs[i].length * disk.BlockSize();
+	}
+}
+
+
+void
+dump_double_indirect_stream(Disk& disk, bfs_inode* node, bool showOffsets)
+{
+	if (node->data.max_double_indirect_range == 0)
+		return;
+
+	int32 bytes = node->data.double_indirect.length * disk.BlockSize();
+	int32 count = bytes / sizeof(block_run);
+	block_run runs[count];
+
+	off_t offset = node->data.max_indirect_range;
+
+	ssize_t bytesRead = disk.ReadAt(disk.ToOffset(node->data.double_indirect),
+		(uint8*)runs, bytes);
+	if (bytesRead < bytes) {
+		fprintf(stderr, "couldn't read double indirect runs: %s\n",
+			strerror(bytesRead));
+		return;
+	}
+
+	puts("double indirect stream:");
+
+	for (int32 i = 0; i < count; i++) {
+		if (runs[i].IsZero())
+			return;
+
+		printf("  double_indirect[%02" B_PRId32 "]       = ", i);
+
+		dump_block_run("", runs[i], "");
+
+		int32 indirectBytes = runs[i].length * disk.BlockSize();
+		int32 indirectCount = indirectBytes / sizeof(block_run);
+		block_run indirectRuns[indirectCount];
+
+		bytesRead = disk.ReadAt(disk.ToOffset(runs[i]), (uint8*)indirectRuns,
+			indirectBytes);
+		if (bytesRead < indirectBytes) {
+			fprintf(stderr, "couldn't read double indirect runs: %s\n",
+				strerror(bytesRead));
+			continue;
+		}
+
+		for (int32 j = 0; j < indirectCount; j++) {
+			if (indirectRuns[j].IsZero())
+				break;
+
+			printf("                     [%04" B_PRId32 "] = ", j);
+
+			char buffer[256];
+			if (showOffsets)
+				snprintf(buffer, sizeof(buffer), " %16" B_PRIdOFF, offset);
+			else
+				buffer[0] = '\0';
+
+			dump_block_run("", indirectRuns[j], buffer);
+
+			offset += indirectRuns[j].length * disk.BlockSize();
+		}
 	}
 }
 
@@ -235,6 +297,7 @@ main(int argc, char **argv)
 	}
 
 	char buffer[disk.BlockSize()];
+	bfs_inode* bfsInode = (bfs_inode*)buffer;
 	block_run run;
 	Inode *inode = NULL;
 
@@ -253,7 +316,7 @@ main(int argc, char **argv)
 			return -1;
 		}
 
-		inode = Inode::Factory(&disk, (bfs_inode *)buffer, false);
+		inode = Inode::Factory(&disk, bfsInode, false);
 		if (inode == NULL || inode->InitCheck() < B_OK) {
 			fprintf(stderr,"Not a valid inode!\n");
 			delete inode;
@@ -264,13 +327,14 @@ main(int argc, char **argv)
 	if (dumpInode) {
 		printf("Inode at block %" B_PRIdOFF ":\n------------------------------"
 			"-----------\n", disk.ToBlock(run));
-		dump_inode(inode, (bfs_inode *)buffer, showOffsets);
-		dump_indirect_stream(disk, (bfs_inode *)buffer, showOffsets);
+		dump_inode(inode, bfsInode, showOffsets);
+		dump_indirect_stream(disk, bfsInode, showOffsets);
+		dump_double_indirect_stream(disk, bfsInode, showOffsets);
 		dump_small_data(inode);
 		putchar('\n');
 	}
 
-	if (dumpBTree && inode) {
+	if (dumpBTree && inode != NULL) {
 		printf("B+Tree at block %" B_PRIdOFF ":\n-----------------------------"
 			"------------\n", disk.ToBlock(run));
 		if (inode->IsDirectory() || inode->IsAttributeDirectory()) {
@@ -280,7 +344,7 @@ main(int argc, char **argv)
 			fprintf(stderr, "Inode is not a directory!\n");
 	}
 
-	if (validateBTree && inode) {
+	if (validateBTree && inode != NULL) {
 		printf("Validating B+Tree at block %" B_PRIdOFF ":\n------------------"
 			"-----------------------\n", disk.ToBlock(run));
 		if (inode->IsDirectory() || inode->IsAttributeDirectory()) {

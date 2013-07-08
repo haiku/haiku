@@ -602,7 +602,7 @@ CalcView::MouseUp(BPoint point)
 void
 CalcView::KeyDown(const char* bytes, int32 numBytes)
 {
- 	// if single byte character...
+	// if single byte character...
 	if (numBytes == 1) {
 
 		//printf("Key pressed: %c\n", bytes[0]);
@@ -674,7 +674,6 @@ void
 CalcView::ResizeTo(float width, float height)
 {
 	BView::ResizeTo(width, height);
-	FrameResized(width, height);
 }
 
 

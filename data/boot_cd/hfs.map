@@ -1,7 +1,14 @@
 # This mapping is needed to successfully boot and to keep macos
 # from treating everything like a text file (ugly!)
 #
-# EXTN	XLate	CREATOR	TYPE	Comment
-.b	Raw	'UNIX'	'tbxi'	"bootstrap"
-boot_loader_openfirmware	Raw	'UNIX'	'boot'	"bootstrap"
-*	Raw	'UNIX'	'UNIX'	"unix"
+# EXTN                   XLate   CREATOR TYPE    Comment
+.chrp                    -       'chrp'  'tbxi'  "Macintosh Toolbox ROM file"
+.elf                     Raw     'UNIX'  'boot'  "ELF Binary"
+.xcf                     Raw     'UNIX'  'boot'  "XCOFF Binary"
+.htm                     Ascii   'MOSS'  'TEXT'  "HTML File"
+.html                    Ascii   'MOSS'  'TEXT'  "HTML File"
+.txt                     Ascii   'ttxt'  'TEXT'  "Text File"
+.hqx                     Ascii   'BnHq'  'TEXT'  "BinHex file"
+.sea                     Raw     'aust'  'APPL'  "Self Expanding Archive"
+.sit                     Raw     'SIT!'  'SITD'  "Stuffit Expander file"
+*                        Raw     'UNIX'  'UNIX'  "Unix"

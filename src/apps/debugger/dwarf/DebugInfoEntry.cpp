@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -299,6 +300,20 @@ DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(endianity)
 DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(elemental)
 DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(pure)
 DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(recursive)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(signature)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(main_subprogram)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(data_bit_offset)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(const_expr)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(enum_class)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(linkage_name)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(call_site_value)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(call_site_data_value)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(call_site_target)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(call_site_target_clobbered)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(tail_call)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(all_tail_call_sites)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(all_call_sites)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(all_source_call_sites)
 
 
 DeclarationLocation*

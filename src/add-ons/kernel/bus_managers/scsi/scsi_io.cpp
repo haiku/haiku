@@ -277,9 +277,9 @@ scsi_request_finished(scsi_ccb *request, uint num_requests)
 		&& request->device_status == SCSI_STATUS_CHECK_CONDITION;
 
 	if (request->subsys_status != SCSI_REQ_CMP) {
-		SHOW_FLOW(3, "subsys=%x, device=%x, flags=%x, manual_auto_sense=%d",
-			request->subsys_status, request->device_status, (int)request->flags,
-			device->manual_autosense);
+		SHOW_FLOW(3, "subsys=%x, device=%x, flags=%" B_PRIx32
+			", manual_auto_sense=%d", request->subsys_status,
+			request->device_status, request->flags, device->manual_autosense);
 	}
 
 	if (do_autosense) {
@@ -397,8 +397,10 @@ scsi_async_io(scsi_ccb *request)
 	//snooze( 1000000 );
 
 	// do some sanity tests first
-	if (request->state != SCSI_STATE_FINISHED)
-		panic("Passed ccb to scsi_action that isn't ready (state = %d)\n", request->state);
+	if (request->state != SCSI_STATE_FINISHED) {
+		panic("Passed ccb to scsi_action that isn't ready (state = %d)\n",
+			request->state);
+	}
 
 	if (request->cdb_length < func_group_len[request->cdb[0] >> 5]) {
 		SHOW_ERROR(3, "invalid command len (%d instead of %d)",
@@ -418,8 +420,8 @@ scsi_async_io(scsi_ccb *request)
 
 	if ((request->flags & SCSI_DIR_MASK) != SCSI_DIR_NONE
 		&& request->sg_list == NULL && request->data_length > 0) {
-		SHOW_ERROR( 3, "Asynchronous SCSI I/O requires S/G list (data is %d bytes)",
-			(int)request->data_length );
+		SHOW_ERROR( 3, "Asynchronous SCSI I/O requires S/G list (data is %"
+			B_PRIu32 " bytes)", request->data_length );
 		request->subsys_status = SCSI_DATA_RUN_ERR;
 		goto err;
 	}

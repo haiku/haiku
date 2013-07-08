@@ -18,6 +18,8 @@ struct real_time_data;
 extern "C" {
 #endif
 
+extern int __gABIVersion;
+
 extern char _single_threaded;
 	/* This determines if a process runs single threaded or not */
 
@@ -31,7 +33,7 @@ status_t __flatten_process_args(const char* const* args, int32 argCount,
 			size_t* _flatSize);
 void _call_atexit_hooks_for_range(addr_t start, addr_t size);
 void __init_env(const struct user_space_program_args *args);
-void __init_heap(void);
+status_t __init_heap(void);
 void __init_heap_post_env(void);
 
 void __init_time(addr_t commPageTable);
@@ -41,6 +43,8 @@ bigtime_t __get_system_time_offset();
 void __init_pwd_backend(void);
 void __reinit_pwd_backend_after_fork(void);
 void* __arch_get_caller(void);
+
+void __set_stack_protection(void);
 
 
 #ifdef __cplusplus

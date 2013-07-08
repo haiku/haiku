@@ -185,6 +185,8 @@ private:
 			SessionID			_NewSessionID();
 			int32				_NewSessionIndex();
 
+			void				_MoveWindowInScreen(BWindow* window);
+
 private:
 			TerminalRoster		fTerminalRoster;
 

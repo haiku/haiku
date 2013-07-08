@@ -32,10 +32,11 @@
 
 // Card chipset flags
 #define CHIP_STD		(1 << 0) // Standard chipset
-#define CHIP_IGP		(1 << 1) // IGP chipset
-#define CHIP_MOBILE		(1 << 2) // Mobile chipset
-#define CHIP_DISCREET	(1 << 3) // Discreet chipset
-#define CHIP_APU		(1 << 4) // APU chipset
+#define CHIP_X2			(1 << 1) // Dual cpu
+#define CHIP_IGP		(1 << 2) // IGP chipset
+#define CHIP_MOBILE		(1 << 3) // Mobile chipset
+#define CHIP_DISCREET	(1 << 4) // Discreet chipset
+#define CHIP_APU		(1 << 5) // APU chipset
 
 #define DEVICE_NAME				"radeon_hd"
 #define RADEON_ACCELERANT_NAME	"radeon_hd.accelerant"
@@ -86,16 +87,18 @@ enum radeon_chipset {
 	RADEON_PALM,		//Fusion APU (NI), Radeon HD 6000
 	RADEON_SUMO,
 	RADEON_SUMO2,
-	RADEON_CAICOS,		//Nothern Islands, Radeon HD 6000
+	RADEON_CAICOS,		//Nothern Islands, Radeon HD 6000 / Low end 7000
 	RADEON_TURKS,
 	RADEON_BARTS,
 	RADEON_CAYMAN,
 	RADEON_ANTILLES,
-	RADEON_LOMBOK,		//Southern Islands, Radeon HD 7000
-	RADEON_CAPEVERDE,
+	RADEON_CAPEVERDE,	//Southern Islands, Radeon HD 7000 aka ARUBA
+	RADEON_BONAIRE,
 	RADEON_PITCAIRN,
 	RADEON_TAHITI,
-	RADEON_NEWZEALAND
+	RADEON_OLAND,		//Sea Islands, Radeon HD 8000
+	RADEON_HAINAN,		// NO DCE?
+	RADEON_CURACAO,
 };
 
 

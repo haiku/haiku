@@ -1225,12 +1225,15 @@ public:
 										{ return fTemplateTypeParameters; }
 			const DebugInfoEntryList TemplateValueParameters() const
 										{ return fTemplateValueParameters; }
+			const DebugInfoEntryList CallSites() const
+										{ return fCallSites; }
 
 			bool				IsPrototyped() const	{ return fPrototyped; }
 			uint8				Inline() const			{ return fInline; }
 			bool				IsArtificial() const	{ return fArtificial; }
 			uint8				CallingConvention() const
 										{ return fCallingConvention; }
+			bool				IsMain() const			{ return fMain; }
 
 			DIEType*			ReturnType() const		{ return fReturnType; }
 
@@ -1264,6 +1267,10 @@ public:
 	virtual status_t			AddAttribute_calling_convention(
 									uint16 attributeName,
 									const AttributeValue& value);
+	virtual	status_t			AddAttribute_main_subprogram(
+									uint16 attributeName,
+									const AttributeValue& value);
+
 
 protected:
 			DebugInfoEntryList	fParameters;
@@ -1271,6 +1278,7 @@ protected:
 			DebugInfoEntryList	fBlocks;
 			DebugInfoEntryList	fTemplateTypeParameters;
 			DebugInfoEntryList	fTemplateValueParameters;
+			DebugInfoEntryList	fCallSites;
 			target_addr_t		fLowPC;
 			target_addr_t		fHighPC;
 			off_t				fAddressRangesOffset;
@@ -1281,6 +1289,7 @@ protected:
 			uint8				fAddressClass;
 			bool				fPrototyped;
 			uint8				fInline;
+			bool				fMain;
 			bool				fArtificial;
 			uint8				fCallingConvention;
 
@@ -1622,6 +1631,50 @@ private:
 class DIETemplateValueParameterPack : public DIEDeclaredBase {
 public:
 								DIETemplateValueParameterPack();
+
+	virtual	uint16				Tag() const;
+
+	virtual	const char*			Name() const;
+
+	virtual	status_t			AddAttribute_name(uint16 attributeName,
+									const AttributeValue& value);
+
+			const DebugInfoEntryList& Children() const
+										{ return fChildren; }
+
+	virtual	status_t			AddChild(DebugInfoEntry* child);
+
+private:
+			const char*			fName;
+			DebugInfoEntryList	fChildren;
+};
+
+
+class DIECallSite : public DIEDeclaredBase {
+public:
+								DIECallSite();
+
+	virtual	uint16				Tag() const;
+
+	virtual	const char*			Name() const;
+
+	virtual	status_t			AddAttribute_name(uint16 attributeName,
+									const AttributeValue& value);
+
+			const DebugInfoEntryList& Children() const
+										{ return fChildren; }
+
+	virtual	status_t			AddChild(DebugInfoEntry* child);
+
+private:
+			const char*			fName;
+			DebugInfoEntryList	fChildren;
+};
+
+
+class DIECallSiteParameter : public DIEDeclaredBase {
+public:
+								DIECallSiteParameter();
 
 	virtual	uint16				Tag() const;
 

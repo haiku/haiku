@@ -1,15 +1,23 @@
-1	polish	x-vnd.Haiku-InterfacesAddOn	34473294
+1	polish	x-vnd.Haiku-InterfacesAddOn	3798202204
 Interface	InterfaceWindow		Interfejs
 Configure…	InterfacesListView		Konfiguruj…
 Static	IntefaceAddressView		Statyczny
 IP:	InterfacesListView	IPv4 address label	IP:
+IPv6:	InterfacesListView	IPv6 address label	IPv6:
 Link speed:	IntefaceHardwareView		Szybkość połączenia:
+Renegotiate	InterfacesAddOn		Negocjuj ponownie
 The method for obtaining an IP address	IntefaceAddressView		Metoda uzyskania adresu IP
 Your gateway	IntefaceAddressView		Brama
 Received:	IntefaceHardwareView		Otrzymano:
+connected	IntefaceHardwareView		połączono
+Gateway:	IntefaceAddressView		Brama:
 Sent:	IntefaceHardwareView		Wysłano:
 Configure…	InterfacesAddOn		Konfiguruj…
+Renegotiate Address	InterfacesListView		Ponownie negocjuj adres
+DHCP	IntefaceAddressView		DHCP
 Mode:	IntefaceAddressView		Tryb:
-Your netmask	IntefaceAddressView		Maska sieci
+Your netmask	IntefaceAddressView		Maska twojej sieci
 IP Address:	IntefaceAddressView		Adres IP:
+Your IP address	IntefaceAddressView		Twój adres IP
+%llu KBytes	IntefaceHardwareView		%llu kilobajtów
 disconnected	IntefaceHardwareView		odłączone

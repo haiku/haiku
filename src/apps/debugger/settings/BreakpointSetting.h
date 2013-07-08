@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef BREAKPOINT_SETTING_H
@@ -27,7 +28,7 @@ public:
 								~BreakpointSetting();
 
 			status_t			SetTo(const UserBreakpointLocation& location,
-									bool enabled);
+									bool enabled, bool hidden);
 			status_t			SetTo(const BMessage& archive);
 			status_t			WriteTo(BMessage& archive) const;
 
@@ -39,6 +40,7 @@ public:
 									{ return fRelativeAddress; }
 
 			bool				IsEnabled() const	{ return fEnabled; }
+			bool				IsHidden() const	{ return fHidden; }
 
 			BreakpointSetting&	operator=(const BreakpointSetting& other);
 
@@ -51,6 +53,7 @@ private:
 			SourceLocation		fSourceLocation;
 			target_addr_t		fRelativeAddress;
 			bool				fEnabled;
+			bool				fHidden;
 };
 
 

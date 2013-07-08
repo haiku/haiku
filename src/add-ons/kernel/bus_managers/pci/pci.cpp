@@ -43,7 +43,7 @@ pci_get_nth_pci_info(long index, pci_info *outInfo)
 
 
 uint32
-pci_read_config(uint8 virtualBus, uint8 device, uint8 function, uint8 offset,
+pci_read_config(uint8 virtualBus, uint8 device, uint8 function, uint16 offset,
 	uint8 size)
 {
 	uint8 bus;
@@ -62,7 +62,7 @@ pci_read_config(uint8 virtualBus, uint8 device, uint8 function, uint8 offset,
 
 
 void
-pci_write_config(uint8 virtualBus, uint8 device, uint8 function, uint8 offset,
+pci_write_config(uint8 virtualBus, uint8 device, uint8 function, uint16 offset,
 	uint8 size, uint32 value)
 {
 	uint8 bus;
@@ -75,8 +75,8 @@ pci_write_config(uint8 virtualBus, uint8 device, uint8 function, uint8 offset,
 
 
 status_t
-pci_find_capability(uchar virtualBus, uchar device, uchar function,
-	uchar capID, uchar *offset)
+pci_find_capability(uint8 virtualBus, uint8 device, uint8 function,
+	uint8 capID, uint8 *offset)
 {
 	uint8 bus;
 	uint8 domain;
@@ -84,6 +84,20 @@ pci_find_capability(uchar virtualBus, uchar device, uchar function,
 		return B_ERROR;
 
 	return gPCI->FindCapability(domain, bus, device, function, capID, offset);
+}
+
+
+status_t
+pci_find_extended_capability(uint8 virtualBus, uint8 device, uint8 function,
+	uint16 capID, uint16 *offset)
+{
+	uint8 bus;
+	uint8 domain;
+	if (gPCI->ResolveVirtualBus(virtualBus, &domain, &bus) != B_OK)
+		return B_ERROR;
+
+	return gPCI->FindExtendedCapability(domain, bus, device, function, capID,
+		offset);
 }
 
 
@@ -1138,6 +1152,7 @@ PCI::_CreateDevice(PCIBus *parent, uint8 device, uint8 function)
 	newDev->bus = parent->bus;
 	newDev->device = device;
 	newDev->function = function;
+	memset(&newDev->info, 0, sizeof(newDev->info));
 
 	_ReadBasicInfo(newDev);
 
@@ -1172,9 +1187,9 @@ PCI::_BarSize(uint32 bits, uint32 mask)
 }
 
 
-void
+size_t
 PCI::_GetBarInfo(PCIDev *dev, uint8 offset, uint32 *_address, uint32 *_size,
-	uint8 *_flags)
+	uint8 *_flags, uint32 *_highAddress)
 {
 	uint32 oldValue = ReadConfig(dev->domain, dev->bus, dev->device, dev->function,
 		offset, 4);
@@ -1185,11 +1200,21 @@ PCI::_GetBarInfo(PCIDev *dev, uint8 offset, uint32 *_address, uint32 *_size,
 	WriteConfig(dev->domain, dev->bus, dev->device, dev->function, offset, 4,
 		oldValue);
 
-	*_address = oldValue & PCI_address_memory_32_mask;
+	uint32 mask = PCI_address_memory_32_mask;
+	bool is64bit = (oldValue & PCI_address_type_64) != 0;
+	if ((oldValue & PCI_address_space) == PCI_address_space)
+		mask = PCI_address_io_mask;
+	else if (is64bit && _highAddress != NULL) {
+		*_highAddress = ReadConfig(dev->domain, dev->bus, dev->device,
+			dev->function, offset + 4, 4);
+	}
+
+	*_address = oldValue & mask;
 	if (_size != NULL)
-		*_size = _BarSize(newValue, PCI_address_memory_32_mask);
+		*_size = _BarSize(newValue, mask);
 	if (_flags != NULL)
-		*_flags = newValue & 0xf;
+		*_flags = oldValue & ~mask;
+	return is64bit ? 2 : 1;
 }
 
 
@@ -1270,11 +1295,15 @@ PCI::_ReadHeaderInfo(PCIDev *dev)
 			// get BAR size infos
 			_GetRomBarInfo(dev, PCI_rom_base, &dev->info.u.h0.rom_base_pci,
 				&dev->info.u.h0.rom_size);
-			for (int i = 0; i < 6; i++) {
-				_GetBarInfo(dev, PCI_base_registers + 4*i,
+			for (int i = 0; i < 6;) {
+				size_t barSize = _GetBarInfo(dev, PCI_base_registers + 4 * i,
 					&dev->info.u.h0.base_registers_pci[i],
 					&dev->info.u.h0.base_register_sizes[i],
-					&dev->info.u.h0.base_register_flags[i]);
+					&dev->info.u.h0.base_register_flags[i],
+					i < 5 ? &dev->info.u.h0.base_registers_pci[i + 1] : NULL);
+				dev->info.u.h0.base_registers[i] = (addr_t)pci_ram_address(
+					(void *)(addr_t)dev->info.u.h0.base_registers_pci[i]);
+				i += barSize;
 			}
 
 			// restore PCI device address decoding
@@ -1283,10 +1312,6 @@ PCI::_ReadHeaderInfo(PCIDev *dev)
 
 			dev->info.u.h0.rom_base = (addr_t)pci_ram_address(
 				(void *)(addr_t)dev->info.u.h0.rom_base_pci);
-			for (int i = 0; i < 6; i++) {
-				dev->info.u.h0.base_registers[i] = (addr_t)pci_ram_address(
-					(void *)(addr_t)dev->info.u.h0.base_registers_pci[i]);
-			}
 
 			dev->info.u.h0.cardbus_cis = ReadConfig(dev->domain, dev->bus,
 				dev->device, dev->function, PCI_cardbus_cis, 4);
@@ -1316,11 +1341,15 @@ PCI::_ReadHeaderInfo(PCIDev *dev)
 
 			_GetRomBarInfo(dev, PCI_bridge_rom_base,
 				&dev->info.u.h1.rom_base_pci);
-			for (int i = 0; i < 2; i++) {
-				_GetBarInfo(dev, PCI_base_registers + 4*i,
+			for (int i = 0; i < 2;) {
+				size_t barSize = _GetBarInfo(dev, PCI_base_registers + 4 * i,
 					&dev->info.u.h1.base_registers_pci[i],
 					&dev->info.u.h1.base_register_sizes[i],
-					&dev->info.u.h1.base_register_flags[i]);
+					&dev->info.u.h1.base_register_flags[i],
+					i < 5 ? &dev->info.u.h1.base_registers_pci[i + 1] : NULL);
+				dev->info.u.h1.base_registers[i] = (addr_t)pci_ram_address(
+					(void *)(addr_t)dev->info.u.h1.base_registers_pci[i]);
+				i += barSize;
 			}
 
 			// restore PCI device address decoding
@@ -1329,10 +1358,6 @@ PCI::_ReadHeaderInfo(PCIDev *dev)
 
 			dev->info.u.h1.rom_base = (addr_t)pci_ram_address(
 				(void *)(addr_t)dev->info.u.h1.rom_base_pci);
-			for (int i = 0; i < 2; i++) {
-				dev->info.u.h1.base_registers[i] = (addr_t)pci_ram_address(
-					(void *)(addr_t)dev->info.u.h1.base_registers_pci[i]);
-			}
 
 			dev->info.u.h1.primary_bus = ReadConfig(dev->domain, dev->bus,
 				dev->device, dev->function, PCI_primary_bus, 1);
@@ -1456,7 +1481,7 @@ PCI::_RefreshDeviceInfo(PCIBus *bus)
 
 status_t
 PCI::ReadConfig(uint8 domain, uint8 bus, uint8 device, uint8 function,
-	uint8 offset, uint8 size, uint32 *value)
+	uint16 offset, uint8 size, uint32 *value)
 {
 	domain_data *info = _GetDomainData(domain);
 	if (!info)
@@ -1479,7 +1504,7 @@ PCI::ReadConfig(uint8 domain, uint8 bus, uint8 device, uint8 function,
 
 uint32
 PCI::ReadConfig(uint8 domain, uint8 bus, uint8 device, uint8 function,
-	uint8 offset, uint8 size)
+	uint16 offset, uint8 size)
 {
 	uint32 value;
 	if (ReadConfig(domain, bus, device, function, offset, size, &value)
@@ -1491,7 +1516,7 @@ PCI::ReadConfig(uint8 domain, uint8 bus, uint8 device, uint8 function,
 
 
 uint32
-PCI::ReadConfig(PCIDev *device, uint8 offset, uint8 size)
+PCI::ReadConfig(PCIDev *device, uint16 offset, uint8 size)
 {
 	uint32 value;
 	if (ReadConfig(device->domain, device->bus, device->device,
@@ -1504,7 +1529,7 @@ PCI::ReadConfig(PCIDev *device, uint8 offset, uint8 size)
 
 status_t
 PCI::WriteConfig(uint8 domain, uint8 bus, uint8 device, uint8 function,
-	uint8 offset, uint8 size, uint32 value)
+	uint16 offset, uint8 size, uint32 value)
 {
 	domain_data *info = _GetDomainData(domain);
 	if (!info)
@@ -1526,7 +1551,7 @@ PCI::WriteConfig(uint8 domain, uint8 bus, uint8 device, uint8 function,
 
 
 status_t
-PCI::WriteConfig(PCIDev *device, uint8 offset, uint8 size, uint32 value)
+PCI::WriteConfig(PCIDev *device, uint16 offset, uint8 size, uint32 value)
 {
 	return WriteConfig(device->domain, device->bus, device->device,
 		device->function, offset, size, value);
@@ -1537,14 +1562,10 @@ status_t
 PCI::FindCapability(uint8 domain, uint8 bus, uint8 device, uint8 function,
 	uint8 capID, uint8 *offset)
 {
-	if (offset == NULL) {
-		TRACE_CAP("PCI: FindCapability() ERROR %u:%u:%u capability %#02x offset NULL pointer\n", bus, device, function, capID);
-		return B_BAD_VALUE;
-	}
-
 	uint16 status = ReadConfig(domain, bus, device, function, PCI_status, 2);
 	if (!(status & PCI_status_capabilities)) {
-		TRACE_CAP("PCI: find_pci_capability ERROR %u:%u:%u capability %#02x not supported\n", bus, device, function, capID);
+		FLOW("PCI: find_pci_capability ERROR %u:%u:%u capability %#02x "
+			"not supported\n", bus, device, function, capID);
 		return B_ERROR;
 	}
 
@@ -1555,27 +1576,29 @@ PCI::FindCapability(uint8 domain, uint8 bus, uint8 device, uint8 function,
 	switch (headerType & PCI_header_type_mask) {
 		case PCI_header_type_generic:
 		case PCI_header_type_PCI_to_PCI_bridge:
-			capPointer = ReadConfig(domain, bus, device, function,
-				PCI_capabilities_ptr, 1);
+			capPointer = PCI_capabilities_ptr;
 			break;
 		case PCI_header_type_cardbus:
-			capPointer = ReadConfig(domain, bus, device, function,
-				PCI_capabilities_ptr_2, 1);
+			capPointer = PCI_capabilities_ptr_2;
 			break;
 		default:
-			TRACE_CAP("PCI: find_pci_capability ERROR %u:%u:%u capability %#02x unknown header type\n", bus, device, function, capID);
+			TRACE_CAP("PCI: find_pci_capability ERROR %u:%u:%u capability "
+				"%#02x unknown header type\n", bus, device, function, capID);
 			return B_ERROR;
 	}
 
+	capPointer = ReadConfig(domain, bus, device, function, capPointer, 1);
 	capPointer &= ~3;
 	if (capPointer == 0) {
-		TRACE_CAP("PCI: find_pci_capability ERROR %u:%u:%u capability %#02x empty list\n", bus, device, function, capID);
+		TRACE_CAP("PCI: find_pci_capability ERROR %u:%u:%u capability %#02x "
+			"empty list\n", bus, device, function, capID);
 		return B_NAME_NOT_FOUND;
 	}
 
 	for (int i = 0; i < 48; i++) {
 		if (ReadConfig(domain, bus, device, function, capPointer, 1) == capID) {
-			*offset = capPointer;
+			if (offset != NULL)			
+				*offset = capPointer;
 			return B_OK;
 		}
 
@@ -1596,6 +1619,51 @@ status_t
 PCI::FindCapability(PCIDev *device, uint8 capID, uint8 *offset)
 {
 	return FindCapability(device->domain, device->bus, device->device,
+		device->function, capID, offset);
+}
+
+
+status_t
+PCI::FindExtendedCapability(uint8 domain, uint8 bus, uint8 device,
+	uint8 function, uint16 capID, uint16 *offset)
+{
+	if (FindCapability(domain, bus, device, function, PCI_cap_id_pcie)
+		!= B_OK) {
+		FLOW("PCI:FindExtendedCapability ERROR %u:%u:%u capability %#02x "
+			"not supported\n", bus, device, function, capID);
+		return B_ERROR;
+	}
+	uint16 capPointer = PCI_extended_capability;
+	uint32 capability = ReadConfig(domain, bus, device, function,
+		capPointer, 4);
+
+	if (capability == 0 || capability == 0xffffffff)
+			return B_NAME_NOT_FOUND;
+
+	for (int i = 0; i < 48; i++) {
+		if (PCI_extcap_id(capability) == capID) {
+			if (offset != NULL)
+				*offset = capPointer;
+			return B_OK;
+		}
+
+		capPointer = PCI_extcap_next_ptr(capability) & ~3;
+		if (capPointer < PCI_extended_capability)
+			return B_NAME_NOT_FOUND;
+		capability = ReadConfig(domain, bus, device, function,
+			capPointer, 4);
+	}
+
+	TRACE_CAP("PCI:FindExtendedCapability ERROR %u:%u:%u capability %#04x "
+		"circular list\n", bus, device, function, capID);
+	return B_ERROR;
+}
+
+
+status_t
+PCI::FindExtendedCapability(PCIDev *device, uint16 capID, uint16 *offset)
+{
+	return FindExtendedCapability(device->domain, device->bus, device->device,
 		device->function, capID, offset);
 }
 

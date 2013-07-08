@@ -28,6 +28,7 @@ StaticLibrary libshared.a :
 	NaturalCompare.cpp
 	PromptWindow.cpp
 	QueryFile.cpp
+	RegExp.cpp
 	RWLockManager.cpp
 	SHA256.cpp
 	ShakeTrackingFilter.cpp

@@ -61,7 +61,7 @@ public:
 	virtual	status_t			Perform(perform_code d, void* argument);
 
 	virtual	BSize				MaxSize();
-
+	virtual	BAlignment			LayoutAlignment();
 
 private:
 	friend	status_t			_init_interface_kit_();

@@ -54,6 +54,9 @@ protected:
 			ArrayType*			fType;
 			ChildList			fChildren;
 			int32				fDimension;
+			int32				fLowerBound;
+			int32				fUpperBound;
+			bool				fBoundsInitialized;
 };
 
 

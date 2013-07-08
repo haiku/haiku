@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -40,6 +40,67 @@ DwarfUtils::GetDIEName(const DebugInfoEntry* entry, BString& _name)
 
 
 /*static*/ void
+DwarfUtils::GetDIETypeName(const DebugInfoEntry* entry, BString& _name)
+{
+	const DIEType* type = dynamic_cast<const DIEType*>(entry);
+	if (type == NULL)
+		return;
+
+	const DIEModifiedType* modifiedType = dynamic_cast<const DIEModifiedType*>(
+		type);
+	BString typeName;
+	BString modifier;
+
+	if (modifiedType != NULL) {
+		const DIEType* baseType = type;
+		while ((modifiedType = dynamic_cast<const DIEModifiedType*>(
+			baseType)) != NULL) {
+			switch (modifiedType->Tag()) {
+				case DW_TAG_pointer_type:
+					modifier.Prepend("*");
+					break;
+				case DW_TAG_reference_type:
+					modifier.Prepend("&");
+					break;
+				case DW_TAG_const_type:
+					modifier.Prepend(" const ");
+					break;
+				default:
+					break;
+			}
+
+			baseType = modifiedType->GetType();
+		}
+		type = baseType;
+	}
+
+	// if the parameter has no type associated,
+	// then it's the unspecified type.
+	if (type == NULL)
+		typeName = "void";
+	else
+		GetFullyQualifiedDIEName(type, typeName);
+
+	if (modifier.Length() > 0) {
+		if (modifier[modifier.Length() - 1] == ' ')
+			modifier.Truncate(modifier.Length() - 1);
+
+		// if the modifier has a leading const, treat it
+		// as the degenerate case and prepend it to the
+		// type name since that's the more typically used
+		// representation in source
+		if (modifier[0] == ' ') {
+			typeName.Prepend("const ");
+			modifier.Remove(0, 7);
+		}
+		typeName += modifier;
+	}
+
+	_name = typeName;
+}
+
+
+/*static*/ void
 DwarfUtils::GetFullDIEName(const DebugInfoEntry* entry, BString& _name)
 {
 	BString generatedName;
@@ -62,9 +123,13 @@ DwarfUtils::GetFullDIEName(const DebugInfoEntry* entry, BString& _name)
 		}
 	}
 
-	// we found no name for this entry whatsoever, abort.
-	if (name == NULL)
+	if (name == NULL) {
+		if (dynamic_cast<const DIEModifiedType*>(entry) != NULL)
+			GetDIETypeName(entry, _name);
+
+		// we found no name for this entry whatsoever, abort.
 		return;
+	}
 
 	generatedName = name;
 
@@ -98,51 +163,7 @@ DwarfUtils::GetFullDIEName(const DebugInfoEntry* entry, BString& _name)
 			BString paramName;
 			BString modifier;
 			DIEType* type = parameter->GetType();
-			if (DIEModifiedType* modifiedType = dynamic_cast<DIEModifiedType*>(
-				type)) {
-				DIEType* baseType = type;
-				while ((modifiedType = dynamic_cast<DIEModifiedType*>(
-					baseType)) != NULL) {
-					switch (modifiedType->Tag()) {
-						case DW_TAG_pointer_type:
-							modifier.Prepend("*");
-							break;
-						case DW_TAG_reference_type:
-							modifier.Prepend("&");
-							break;
-						case DW_TAG_const_type:
-							modifier.Prepend(" const ");
-							break;
-						default:
-							break;
-					}
-
-					baseType = modifiedType->GetType();
-				}
-				type = baseType;
-			}
-
-			// if the parameter has no type associated,
-			// then it's the unspecified type.
-			if (type == NULL)
-				paramName = "void";
-			else
-				GetFullyQualifiedDIEName(type, paramName);
-
-			if (modifier.Length() > 0) {
-				if (modifier[modifier.Length() - 1] == ' ')
-					modifier.Truncate(modifier.Length() - 1);
-
-				// if the modifier has a leading const, treat it
-				// as the degenerate case and prepend it to the
-				// type name since that's the more typically used
-				// representation in source
-				if (modifier[0] == ' ') {
-					paramName.Prepend("const ");
-					modifier.Remove(0, 7);
-				}
-				paramName += modifier;
-			}
+			GetDIETypeName(type, paramName);
 
 			if (firstParameter)
 				firstParameter = false;
@@ -158,7 +179,6 @@ DwarfUtils::GetFullDIEName(const DebugInfoEntry* entry, BString& _name)
 			generatedName += "void";
 		generatedName += ")";
 	}
-
 	_name = generatedName;
 }
 

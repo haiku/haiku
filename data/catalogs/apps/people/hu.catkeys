@@ -13,7 +13,7 @@ New person	People		Új névjegy
 Select all	People		Mind kijelölése
 File	People		Fájl
 Unnamed person	People		Névtelen személy
-Could not create %s.	People		%s létrehozása sikertelen
+Could not create %s.	People		%s létrehozása sikertelen.
 Country	People		Ország
 Close	People		Bezárás
 Group	People		Csoport
@@ -41,7 +41,7 @@ Address	People		Cím
 URL	People		URL
 Sorry	People		Sajnálom
 Zip	People		Irányítószám
-Contact information for a person.	Long mimetype description		Elérhetőség információk
+Contact information for a person.	Long mimetype description		Elérhetőség információk.
 Fax	People		Fax
 Contact name	People		Kapcsolat neve
 Cut	People		Kivágás

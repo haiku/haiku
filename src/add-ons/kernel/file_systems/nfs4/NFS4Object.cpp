@@ -17,9 +17,9 @@
 static inline bigtime_t
 RetryDelay(uint32 attempt, uint32 leaseTime = 0)
 {
-	attempt = min_c(attempt, sizeof(bigtime_t) * 8);
+	attempt = min_c(attempt, 10);
 
-	bigtime_t delay = (1 << (attempt - 1)) * 100000;
+	bigtime_t delay = (bigtime_t(1) << (attempt - 1)) * 100000;
 	if (leaseTime != 0)
 		delay = min_c(delay, sSecToBigTime(leaseTime));
 	return delay;
@@ -32,7 +32,6 @@ NFS4Object::HandleErrors(uint32& attempt, uint32 nfs4Error, RPC::Server* server,
 {
 	// No request send by the client should cause any of the following errors.
 	ASSERT(nfs4Error != NFS4ERR_CLID_INUSE);
-	ASSERT(nfs4Error != NFS4ERR_NOFILEHANDLE);
 	ASSERT(nfs4Error != NFS4ERR_BAD_STATEID);
 	ASSERT(nfs4Error != NFS4ERR_RESTOREFH);
 	ASSERT(nfs4Error != NFS4ERR_LOCKS_HELD);
@@ -60,6 +59,9 @@ NFS4Object::HandleErrors(uint32& attempt, uint32 nfs4Error, RPC::Server* server,
 
 		// resource is locked, we need to wait
 		case NFS4ERR_DENIED:
+			if (cookie == NULL)
+				return false;
+
 			if (sequence != NULL)
 				fFileSystem->OpenOwnerSequenceUnlock(*sequence);
 

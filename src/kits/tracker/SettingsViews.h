@@ -35,19 +35,19 @@ All rights reserved.
 #define _SETTINGS_VIEWS
 
 
-#include <CheckBox.h>
 #include <GroupView.h>
-#include <RadioButton.h>
-#include <TextControl.h>
-#include <ColorControl.h>
 
 #include "TrackerSettings.h"
 
 
 const uint32 kSettingsContentsModified = 'Scmo';
 
+
 class BButton;
+class BCheckBox;
+class BColorControl;
 class BMenuField;
+class BRadioButton;
 class BStringView;
 
 
@@ -68,6 +68,7 @@ class SettingsView : public BGroupView {
 	protected:
 		typedef BGroupView _inherited;
 };
+
 
 class DesktopSettingsView : public SettingsView {
 	public:
@@ -101,6 +102,7 @@ class DesktopSettingsView : public SettingsView {
 		typedef SettingsView _inherited;
 };
 
+
 class WindowsSettingsView : public SettingsView {
 	public:
 		WindowsSettingsView();
@@ -133,6 +135,7 @@ class WindowsSettingsView : public SettingsView {
 
 		typedef SettingsView _inherited;
 };
+
 
 class SpaceBarSettingsView : public SettingsView {
 	public:

@@ -131,18 +131,18 @@ struct pci_module_info {
 						pci_info 	*info	/* caller-supplied buffer for info */
 					);
 	uint32			(*read_pci_config) (
-						uchar	bus,		/* bus number */
-						uchar	device,		/* device # on bus */
-						uchar	function,	/* function # in device */
-						uchar	offset,		/* offset in configuration space */
-						uchar	size		/* # bytes to read (1, 2 or 4) */
+						uint8	bus,		/* bus number */
+						uint8	device,		/* device # on bus */
+						uint8	function,	/* function # in device */
+						uint16	offset,		/* offset in configuration space */
+						uint8	size		/* # bytes to read (1, 2 or 4) */
 					);
 	void			(*write_pci_config) (
-						uchar	bus,		/* bus number */
-						uchar	device,		/* device # on bus */
-						uchar	function,	/* function # in device */
-						uchar	offset,		/* offset in configuration space */
-						uchar	size,		/* # bytes to write (1, 2 or 4) */
+						uint8	bus,		/* bus number */
+						uint8	device,		/* device # on bus */
+						uint8	function,	/* function # in device */
+						uint16	offset,		/* offset in configuration space */
+						uint8	size,		/* # bytes to write (1, 2 or 4) */
 						uint32	value		/* value to write */
 					);
 
@@ -174,6 +174,14 @@ struct pci_module_info {
 						uchar device,
 						uchar function,
 						uchar newInterruptLineValue);
+
+	status_t		(*find_pci_extended_capability) (
+						uint8	bus,
+						uint8	device,
+						uint8	function,
+						uint16	cap_id,
+						uint16	*offset
+					);
 };
 
 #define	B_PCI_MODULE_NAME		"bus_managers/pci/v1"
@@ -196,6 +204,7 @@ struct pci_module_info {
 #define PCI_header_type			0x0e		/* (1 byte) header type */
 #define PCI_bist				0x0f		/* (1 byte) built-in self-test */
 
+#define PCI_extended_capability 0x100		/* (4 bytes) extended capability */
 
 
 /* ---
@@ -689,6 +698,41 @@ struct pci_module_info {
 #define PCI_cap_id_msix		0x11	/* MSI-X */
 #define PCI_cap_id_sata		0x12	/* Serial ATA Capability */
 #define PCI_cap_id_pciaf	0x13	/* PCI Advanced Features */
+
+/** PCI Extended Capabilities */
+#define PCI_extcap_id(x)		(x & 0x0000ffff)
+#define PCI_extcap_version(x)	((x & 0x000f0000) >> 16)
+#define PCI_extcap_next_ptr(x)	((x & 0xfff00000) >> 20)
+
+#define PCI_extcap_id_aer			0x0001	/* Advanced Error Reporting */
+#define PCI_extcap_id_vc			0x0002	/* Virtual Channel */
+#define PCI_extcap_id_serial		0x0003	/* Serial Number */
+#define PCI_extcap_id_power_budget	0x0004	/* Power Budgeting */
+#define PCI_extcap_id_rcl_decl		0x0005	/* Root Complex Link Declaration */
+#define PCI_extcap_id_rcil_ctl		0x0006	/* Root Complex Internal Link Control */
+#define PCI_extcap_id_rcec_assoc	0x0007	/* Root Complex Event Collector Association */
+#define PCI_extcap_id_mfvc			0x0008	/* MultiFunction Virtual Channel */
+#define PCI_extcap_id_vc2			0x0009	/* Virtual Channel 2 */
+#define PCI_extcap_id_rcrb_header	0x000a	/* RCRB Header */
+#define PCI_extcap_id_vendor		0x000b	/* Vendor Unique */
+#define PCI_extcap_id_acs			0x000d	/* Access Control Services */
+#define PCI_extcap_id_ari			0x000e	/* Alternative Routing Id Interpretation */
+#define PCI_extcap_id_ats			0x000f	/* Address Translation Services */
+#define PCI_extcap_id_srio_virtual	0x0010	/* Single Root I/O Virtualization */
+#define PCI_extcap_id_mrio_virtual	0x0011	/* Multiple Root I/O Virtual */
+#define PCI_extcap_id_multicast		0x0012	/* Multicast */
+#define PCI_extcap_id_page_request	0x0013	/* Page Request */
+#define PCI_extcap_id_amd			0x0014	/* AMD Reserved */
+#define PCI_extcap_id_resizable_bar	0x0015	/* Resizable Bar */
+#define PCI_extcap_id_dyn_power_alloc	0x0016	/* Dynamic Power Allocation */
+#define PCI_extcap_id_tph_requester	0x0017	/* TPH Requester */
+#define PCI_extcap_id_latency_tolerance	0x0018	/* Latency Tolerance Reporting */
+#define PCI_extcap_id_2ndpcie		0x0019	/* Secondary PCIe */
+#define PCI_extcap_id_pmux			0x001a	/* Protocol Multiplexing */
+#define PCI_extcap_id_pasid			0x001b	/* Process Address Space Id */
+#define PCI_extcap_id_ln_requester	0x001c	/* LN Requester */
+#define PCI_extcap_id_dpc			0x001d	/* Downstream Porto Containment */
+#define PCI_extcap_id_l1pm			0x001e	/* L1 Power Management Substates */
 
 /** Power Management Control Status Register settings */
 #define PCI_pm_mask             0x03

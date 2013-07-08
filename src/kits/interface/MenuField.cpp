@@ -19,6 +19,7 @@
 #include <ControlLook.h>
 #include <LayoutUtils.h>
 #include <MenuBar.h>
+#include <MenuItem.h>
 #include <Message.h>
 #include <BMCPrivate.h>
 #include <Window.h>
@@ -131,7 +132,8 @@ struct BMenuField::LayoutData {
 // #pragma mark -
 
 
-static float kVMargin = 2.0f;
+static const float kMinMenuBarWidth = 20.0f;
+	// found by experimenting on BeOS R5
 
 
 BMenuField::BMenuField(BRect frame, const char* name, const char* label,
@@ -400,8 +402,18 @@ BMenuField::AllAttached()
 
 	TRACE("width: %.2f, height: %.2f\n", Frame().Width(), Frame().Height());
 
-	ResizeTo(Bounds().Width(),
-		fMenuBar->Bounds().Height() + kVMargin + kVMargin);
+	float width = Bounds().Width();
+	if (!fFixedSizeMB && _MenuBarWidth() < kMinMenuBarWidth) {
+		// The menu bar is too narrow, resize it to fit the menu items
+		BMenuItem* item = fMenuBar->ItemAt(0);
+		if (item != NULL) {
+			float right;
+			fMenuBar->GetItemMargins(NULL, NULL, &right, NULL);
+			width = item->Frame().Width() + kVMargin + _MenuBarOffset() + right;
+		}
+	}
+
+	ResizeTo(width, fMenuBar->Bounds().Height() + kVMargin * 2);
 
 	TRACE("width: %.2f, height: %.2f\n", Frame().Width(), Frame().Height());
 }
@@ -527,6 +539,16 @@ BMenuField::FrameResized(float newWidth, float newHeight)
 {
 	BView::FrameResized(newWidth, newHeight);
 
+	if (fFixedSizeMB) {
+		// we have let the menubar resize itself, but
+		// in fixed size mode, the menubar is supposed to
+		// be at the right end of the view always. Since
+		// the menu bar is in follow left/right mode then,
+		// resizing ourselfs might have caused the menubar
+		// to be outside now
+		fMenuBar->ResizeTo(_MenuBarWidth(), fMenuBar->Frame().Height());
+	}
+
 	if (newHeight != fLayoutData->previous_height && Label()) {
 		// The height changed, which means the label has to move and we
 		// probably also invalidate a part of the borders around the menu bar.
@@ -625,10 +647,9 @@ BMenuField::Alignment() const
 void
 BMenuField::SetDivider(float position)
 {
-	position = floorf(position + 0.5);
+	position = roundf(position);
 
 	float delta = fDivider - position;
-
 	if (delta == 0.0f)
 		return;
 
@@ -711,15 +732,7 @@ BMenuField::ResizeToPreferred()
 
 	BView::ResizeToPreferred();
 
-	if (fFixedSizeMB) {
-		// we have let the menubar resize itself, but
-		// in fixed size mode, the menubar is supposed to
-		// be at the right end of the view always. Since
-		// the menu bar is in follow left/right mode then,
-		// resizing ourselfs might have caused the menubar
-		// to be outside now
-		fMenuBar->ResizeTo(_MenuBarWidth(), fMenuBar->Frame().Height());
-	}
+	Invalidate();
 }
 
 
@@ -964,9 +977,11 @@ BMenuField::InitObject2()
 {
 	CALLED();
 
-	float height;
-	fMenuBar->GetPreferredSize(NULL, &height);
-	fMenuBar->ResizeTo(_MenuBarWidth(), height);
+	if (!fFixedSizeMB) {
+		float height;
+		fMenuBar->GetPreferredSize(NULL, &height);
+		fMenuBar->ResizeTo(_MenuBarWidth(), height);
+	}
 
 	TRACE("frame(%.1f, %.1f, %.1f, %.1f) (%.2f, %.2f)\n",
 		fMenuBar->Frame().left, fMenuBar->Frame().top,

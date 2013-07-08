@@ -462,19 +462,19 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 	}
 
 	// Back, Forward, Stop & Home buttons
-	fBackButton = new IconButton("Back", 0, NULL, new BMessage(GO_BACK));
+	fBackButton = new BIconButton("Back", NULL, new BMessage(GO_BACK));
 	fBackButton->SetIcon(201);
 	fBackButton->TrimIcon();
 
-	fForwardButton = new IconButton("Forward", 0, NULL, new BMessage(GO_FORWARD));
+	fForwardButton = new BIconButton("Forward", NULL, new BMessage(GO_FORWARD));
 	fForwardButton->SetIcon(202);
 	fForwardButton->TrimIcon();
 
-	fStopButton = new IconButton("Stop", 0, NULL, new BMessage(STOP));
+	fStopButton = new BIconButton("Stop", NULL, new BMessage(STOP));
 	fStopButton->SetIcon(204);
 	fStopButton->TrimIcon();
 
-	fHomeButton = new IconButton("Home", 0, NULL, new BMessage(HOME));
+	fHomeButton = new BIconButton("Home", NULL, new BMessage(HOME));
 	fHomeButton->SetIcon(206);
 	fHomeButton->TrimIcon();
 	if (!fAppSettings->GetValue(kSettingsKeyShowHomeButton, true))

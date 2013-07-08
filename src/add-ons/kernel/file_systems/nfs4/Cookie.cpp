@@ -67,8 +67,9 @@ LockInfo::operator==(const LockInfo& lock) const
 }
 
 
-Cookie::Cookie()
+Cookie::Cookie(FileSystem* fileSystem)
 	:
+	fFileSystem(fileSystem),
 	fRequests(NULL),
 	fSnoozeCancel(create_sem(1, NULL))
 {
@@ -144,8 +145,16 @@ Cookie::CancelAll()
 }
 
 
-OpenFileCookie::OpenFileCookie()
+OpenStateCookie::OpenStateCookie(FileSystem* fileSystem)
 	:
+	Cookie(fileSystem)
+{
+}
+
+
+OpenFileCookie::OpenFileCookie(FileSystem* fileSystem)
+	:
+	OpenStateCookie(fileSystem),
 	fLocks(NULL)
 {
 }
@@ -173,9 +182,23 @@ OpenFileCookie::RemoveLock(LockInfo* lock, LockInfo* prev)
 }
 
 
+OpenDirCookie::OpenDirCookie(FileSystem* fileSystem)
+	:
+	Cookie(fileSystem)
+{
+}
+
+
 OpenDirCookie::~OpenDirCookie()
 {
 	if (fSnapshot != NULL)
 		fSnapshot->ReleaseReference();
+}
+
+
+OpenAttrCookie::OpenAttrCookie(FileSystem* fileSystem)
+	:
+	OpenStateCookie(fileSystem)
+{
 }
 

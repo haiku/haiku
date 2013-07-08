@@ -179,7 +179,7 @@ register_sim(device_node *parent)
 			{ SCSI_DESCRIPTION_CONTROLLER_NAME, B_STRING_TYPE,
 				{ string: AHCI_DEVICE_MODULE_NAME }},
 			{ B_DMA_MAX_TRANSFER_BLOCKS, B_UINT32_TYPE, { ui32: 255 }},
-			{ AHCI_ID_ITEM, B_UINT32_TYPE, { ui32: id }},
+			{ AHCI_ID_ITEM, B_UINT32_TYPE, { ui32: (uint32)id }},
 //			{ PNP_MANAGER_ID_GENERATOR, B_STRING_TYPE,
 //				{ string: AHCI_ID_GENERATOR }},
 //			{ PNP_MANAGER_AUTO_ID, B_UINT32_TYPE, { ui32: id }},

@@ -37,7 +37,7 @@ The directory named '%s' already exits in the given path.\nReplace the directory
 The package you requested has been successfully installed on your system.	PackageView		A kért csomag sikeresen fel lett telepítve a rendszerre.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Hiba! Érvénytelen útvonal: %s.\n
 Installation type:	PackageView		Telepítés típusa:
-Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Hiba (%s)! Nem nyitható meg: %s\n
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Hiba (%s)! Nem nyitható meg:  \"%s\".\n
 Finishing installation	PackageInstall		Telepítés befejezése
 Installing package	PackageStatus		Csomag telepítése
 Ask again	PackageView		Kérdezze újból

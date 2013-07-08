@@ -80,12 +80,15 @@ struct grackle_host_bridge {
 
 static status_t
 grackle_read_pci_config(void *cookie, uint8 bus, uint8 device, uint8 function,
-	uint8 offset, uint8 size, uint32 *value)
+	uint16 offset, uint8 size, uint32 *value)
 {
 	grackle_host_bridge *bridge = (grackle_host_bridge*)cookie;
 	TRACE("grackle_read_pci_config(bus=%u, dev=%u, func=%u, offset=%u, "
 		"size=%u)\n", (int)bus, (int)device, (int)function, (int)offset,
 		(int)size);
+
+	if (offset > 0xff)
+		return B_BAD_VALUE;
 
 	out32rb(bridge->address_registers, (1 << 31)
 		| (bus << 16) | ((device & 0x1f) << 11) | ((function & 0x7) << 8)
@@ -115,12 +118,15 @@ grackle_read_pci_config(void *cookie, uint8 bus, uint8 device, uint8 function,
 
 static status_t
 grackle_write_pci_config(void *cookie, uint8 bus, uint8 device, uint8 function,
-	uint8 offset, uint8 size, uint32 value)
+	uint16 offset, uint8 size, uint32 value)
 {
 	grackle_host_bridge *bridge = (grackle_host_bridge*)cookie;
 	TRACE("grackle_write_pci_config(bus=%u, dev=%u, func=%u, offset=%u, "
 		"size=%u, value=%lu)\n", (int)bus, (int)device, (int)function,
 		(int)offset, (int)size, value);
+
+	if (offset > 0xff)
+		return B_BAD_VALUE;
 
 	out32rb(bridge->address_registers, (1 << 31)
 		| (bus << 16) | ((device & 0x1f) << 11) | ((function & 0x7) << 8)

@@ -74,6 +74,23 @@ _thread_do_exit_work(void)
 }
 
 
+void
+__set_stack_protection(void)
+{
+	if (__gABIVersion < B_HAIKU_ABI_GCC_2_HAIKU) {
+		area_info info;
+		ssize_t cookie = 0;
+
+		while (get_next_area_info(B_CURRENT_TEAM, &cookie, &info) == B_OK) {
+			if ((info.protection & B_STACK_AREA) != 0) {
+				_kern_set_area_protection(info.area,
+					B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA | B_STACK_AREA);
+			}
+		}
+	}
+}
+
+
 // #pragma mark -
 
 
@@ -99,8 +116,11 @@ spawn_thread(thread_func entry, const char *name, int32 priority, void *data)
 	id = _kern_spawn_thread(&attributes);
 	if (id < 0)
 		free(thread);
-	else
+	else {
 		thread->id = id;
+		__set_stack_protection();
+	}
+
 	return id;
 }
 

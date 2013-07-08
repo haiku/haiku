@@ -1825,7 +1825,7 @@ StyledEditWindow::_ShowStatistics()
 	size_t length = fTextView->TextLength();
 
 	for (size_t i = 0; i < length; i++)	{
-		if (BUnicodeChar::IsSpace(fTextView->Text()[i])) {
+		if (BUnicodeChar::IsWhitespace(fTextView->Text()[i])) {
 			inWord = false;
 		} else if (!inWord)	{
 			words++;

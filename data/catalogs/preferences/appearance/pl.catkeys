@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Appearance	556979190
+1	polish	x-vnd.Haiku-Appearance	1475577782
 Plain font:	Font view		Zwykła czcionka:
 Control highlight	Colors tab		Podkreślenie kontrolki
 Control border	Colors tab		Obramowanie kontrolki
@@ -32,7 +32,9 @@ Document text	Colors tab		Tekst dokumentu
 Navigation pulse	Colors tab		Puls nawigacji
 Selected menu item text	Colors tab		Tekst zaznaczonego elementu menu
 Menu background	Colors tab		Tło menu
+List background	Colors tab		Tło listy
 OK	DecorSettingsView		OK
+Control mark	Colors tab		Znak sterujący
 Size:	Font Selection view		Rozmiar:
 Selected list item background	Colors tab		Tło zaznaczonego elementu listy
 Panel background	Colors tab		Tło panelu
@@ -40,6 +42,7 @@ Menu font:	Font view		Czcionka menu:
 Colors	APRWindow		Kolory
 Control background	Colors tab		Tło kontrolki
 Inactive window tab	Colors tab		Nieaktywna zakładka okna
+List item text	Colors tab		Tekst elementu listy
 Appearance	System name		Wygląd
 Fixed font:	Font view		Czcionka o stałej szerokości:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Koń i żółw grali w kości z piękną ćmą u źródła.

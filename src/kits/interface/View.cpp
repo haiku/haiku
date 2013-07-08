@@ -1,12 +1,12 @@
 /*
- * Copyright 2001-2012, Haiku.
+ * Copyright 2001-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Adrian Oanca <adioanca@cotty.iren.ro>
+ *		Stephan Aßmus, superstippi@gmx.de
  *		Axel Dörfler, axeld@pinc-software.de
- *		Stephan Aßmus <superstippi@gmx.de>
- *		Ingo Weinhold <ingo_weinhold@gmx.de>
+ *		Adrian Oanca, adioanca@cotty.iren.ro
+ *		Ingo Weinhold. ingo_weinhold@gmx.de
  */
 
 
@@ -834,11 +834,11 @@ BView::ConvertFromParent(BRect rect) const
 
 
 void
-BView::_ConvertToScreen(BPoint* pt, bool checkLock) const
+BView::_ConvertToScreen(BPoint* point, bool checkLock) const
 {
 	if (!fParent) {
 		if (fOwner)
-			fOwner->ConvertToScreen(pt);
+			fOwner->ConvertToScreen(point);
 
 		return;
 	}
@@ -846,33 +846,33 @@ BView::_ConvertToScreen(BPoint* pt, bool checkLock) const
 	if (checkLock)
 		_CheckOwnerLock();
 
-	_ConvertToParent(pt, false);
-	fParent->_ConvertToScreen(pt, false);
+	_ConvertToParent(point, false);
+	fParent->_ConvertToScreen(point, false);
 }
 
 
 void
-BView::ConvertToScreen(BPoint* pt) const
+BView::ConvertToScreen(BPoint* point) const
 {
-	_ConvertToScreen(pt, true);
+	_ConvertToScreen(point, true);
 }
 
 
 BPoint
-BView::ConvertToScreen(BPoint pt) const
+BView::ConvertToScreen(BPoint point) const
 {
-	ConvertToScreen(&pt);
+	ConvertToScreen(&point);
 
-	return pt;
+	return point;
 }
 
 
 void
-BView::_ConvertFromScreen(BPoint* pt, bool checkLock) const
+BView::_ConvertFromScreen(BPoint* point, bool checkLock) const
 {
 	if (!fParent) {
 		if (fOwner)
-			fOwner->ConvertFromScreen(pt);
+			fOwner->ConvertFromScreen(point);
 
 		return;
 	}
@@ -880,24 +880,24 @@ BView::_ConvertFromScreen(BPoint* pt, bool checkLock) const
 	if (checkLock)
 		_CheckOwnerLock();
 
-	_ConvertFromParent(pt, false);
-	fParent->_ConvertFromScreen(pt, false);
+	_ConvertFromParent(point, false);
+	fParent->_ConvertFromScreen(point, false);
 }
 
 
 void
-BView::ConvertFromScreen(BPoint* pt) const
+BView::ConvertFromScreen(BPoint* point) const
 {
-	_ConvertFromScreen(pt, true);
+	_ConvertFromScreen(point, true);
 }
 
 
 BPoint
-BView::ConvertFromScreen(BPoint pt) const
+BView::ConvertFromScreen(BPoint point) const
 {
-	ConvertFromScreen(&pt);
+	ConvertFromScreen(&point);
 
-	return pt;
+	return point;
 }
 
 
@@ -2739,7 +2739,7 @@ BView::FillEllipse(BPoint center, float xRadius, float yRadius,
 	const BGradient& gradient)
 {
 	FillEllipse(BRect(center.x - xRadius, center.y - yRadius,
-					  center.x + xRadius, center.y + yRadius), gradient);
+		center.x + xRadius, center.y + yRadius), gradient);
 }
 
 
@@ -2919,7 +2919,7 @@ BView::FillBezier(BPoint* controlPoints, const BGradient& gradient)
 void
 BView::StrokePolygon(const BPolygon* polygon, bool closed, ::pattern pattern)
 {
-	if (!polygon)
+	if (polygon == NULL)
 		return;
 
 	StrokePolygon(polygon->fPoints, polygon->fCount, polygon->Frame(), closed,
@@ -2939,10 +2939,10 @@ BView::StrokePolygon(const BPoint* pointArray, int32 numPoints, bool closed,
 
 
 void
-BView::StrokePolygon(const BPoint* ptArray, int32 numPoints, BRect bounds,
+BView::StrokePolygon(const BPoint* pointArray, int32 numPoints, BRect bounds,
 	bool closed, ::pattern pattern)
 {
-	if (!ptArray
+	if (pointArray == NULL
 		|| numPoints <= 1
 		|| fOwner == NULL)
 		return;
@@ -2950,7 +2950,7 @@ BView::StrokePolygon(const BPoint* ptArray, int32 numPoints, BRect bounds,
 	_CheckLockAndSwitchCurrent();
 	_UpdatePattern(pattern);
 
-	BPolygon polygon(ptArray, numPoints);
+	BPolygon polygon(pointArray, numPoints);
 	polygon.MapTo(polygon.Frame(), bounds);
 
 	if (fOwner->fLink->StartMessage(AS_STROKE_POLYGON,
@@ -3021,50 +3021,50 @@ BView::FillPolygon(const BPolygon* polygon, const BGradient& gradient)
 
 
 void
-BView::FillPolygon(const BPoint* ptArray, int32 numPts, ::pattern pattern)
+BView::FillPolygon(const BPoint* pointArray, int32 numPoints, ::pattern pattern)
 {
-	if (!ptArray)
+	if (pointArray == NULL)
 		return;
 
-	BPolygon polygon(ptArray, numPts);
+	BPolygon polygon(pointArray, numPoints);
 	FillPolygon(&polygon, pattern);
 }
 
 
 void
-BView::FillPolygon(const BPoint* ptArray, int32 numPts,
+BView::FillPolygon(const BPoint* pointArray, int32 numPoints,
 	const BGradient& gradient)
 {
-	if (!ptArray)
+	if (pointArray == NULL)
 		return;
 
-	BPolygon polygon(ptArray, numPts);
+	BPolygon polygon(pointArray, numPoints);
 	FillPolygon(&polygon, gradient);
 }
 
 
 void
-BView::FillPolygon(const BPoint* ptArray, int32 numPts, BRect bounds,
-	pattern p)
+BView::FillPolygon(const BPoint* pointArray, int32 numPoints, BRect bounds,
+	::pattern pattern)
 {
-	if (!ptArray)
+	if (pointArray == NULL)
 		return;
 
-	BPolygon polygon(ptArray, numPts);
+	BPolygon polygon(pointArray, numPoints);
 
 	polygon.MapTo(polygon.Frame(), bounds);
-	FillPolygon(&polygon, p);
+	FillPolygon(&polygon, pattern);
 }
 
 
 void
-BView::FillPolygon(const BPoint* ptArray, int32 numPts, BRect bounds,
+BView::FillPolygon(const BPoint* pointArray, int32 numPoints, BRect bounds,
 	const BGradient& gradient)
 {
-	if (!ptArray)
+	if (pointArray == NULL)
 		return;
 
-	BPolygon polygon(ptArray, numPts);
+	BPolygon polygon(pointArray, numPoints);
 
 	polygon.MapTo(polygon.Frame(), bounds);
 	FillPolygon(&polygon, gradient);
@@ -3221,7 +3221,7 @@ BView::FillRegion(BRegion* region, const BGradient& gradient)
 
 
 void
-BView::StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3, BRect bounds,
+BView::StrokeTriangle(BPoint point1, BPoint point2, BPoint point3, BRect bounds,
 	::pattern pattern)
 {
 	if (fOwner == NULL)
@@ -3232,9 +3232,9 @@ BView::StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3, BRect bounds,
 	_UpdatePattern(pattern);
 
 	fOwner->fLink->StartMessage(AS_STROKE_TRIANGLE);
-	fOwner->fLink->Attach<BPoint>(pt1);
-	fOwner->fLink->Attach<BPoint>(pt2);
-	fOwner->fLink->Attach<BPoint>(pt3);
+	fOwner->fLink->Attach<BPoint>(point1);
+	fOwner->fLink->Attach<BPoint>(point2);
+	fOwner->fLink->Attach<BPoint>(point3);
 	fOwner->fLink->Attach<BRect>(bounds);
 
 	_FlushIfNotInTransaction();
@@ -3242,125 +3242,127 @@ BView::StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3, BRect bounds,
 
 
 void
-BView::StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3, pattern p)
+BView::StrokeTriangle(BPoint point1, BPoint point2, BPoint point3,
+	::pattern pattern)
 {
 	if (fOwner) {
 		// we construct the smallest rectangle that contains the 3 points
 		// for the 1st point
-		BRect bounds(pt1, pt1);
+		BRect bounds(point1, point1);
 
 		// for the 2nd point
-		if (pt2.x < bounds.left)
-			bounds.left = pt2.x;
+		if (point2.x < bounds.left)
+			bounds.left = point2.x;
 
-		if (pt2.y < bounds.top)
-			bounds.top = pt2.y;
+		if (point2.y < bounds.top)
+			bounds.top = point2.y;
 
-		if (pt2.x > bounds.right)
-			bounds.right = pt2.x;
+		if (point2.x > bounds.right)
+			bounds.right = point2.x;
 
-		if (pt2.y > bounds.bottom)
-			bounds.bottom = pt2.y;
+		if (point2.y > bounds.bottom)
+			bounds.bottom = point2.y;
 
 		// for the 3rd point
-		if (pt3.x < bounds.left)
-			bounds.left = pt3.x;
+		if (point3.x < bounds.left)
+			bounds.left = point3.x;
 
-		if (pt3.y < bounds.top)
-			bounds.top = pt3.y;
+		if (point3.y < bounds.top)
+			bounds.top = point3.y;
 
-		if (pt3.x > bounds.right)
-			bounds.right = pt3.x;
+		if (point3.x > bounds.right)
+			bounds.right = point3.x;
 
-		if (pt3.y > bounds.bottom)
-			bounds.bottom = pt3.y;
+		if (point3.y > bounds.bottom)
+			bounds.bottom = point3.y;
 
-		StrokeTriangle(pt1, pt2, pt3, bounds, p);
+		StrokeTriangle(point1, point2, point3, bounds, pattern);
 	}
 }
 
 
 void
-BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3, pattern p)
+BView::FillTriangle(BPoint point1, BPoint point2, BPoint point3,
+	::pattern pattern)
 {
 	if (fOwner) {
 		// we construct the smallest rectangle that contains the 3 points
 		// for the 1st point
-		BRect bounds(pt1, pt1);
+		BRect bounds(point1, point1);
 
 		// for the 2nd point
-		if (pt2.x < bounds.left)
-			bounds.left = pt2.x;
+		if (point2.x < bounds.left)
+			bounds.left = point2.x;
 
-		if (pt2.y < bounds.top)
-			bounds.top = pt2.y;
+		if (point2.y < bounds.top)
+			bounds.top = point2.y;
 
-		if (pt2.x > bounds.right)
-			bounds.right = pt2.x;
+		if (point2.x > bounds.right)
+			bounds.right = point2.x;
 
-		if (pt2.y > bounds.bottom)
-			bounds.bottom = pt2.y;
+		if (point2.y > bounds.bottom)
+			bounds.bottom = point2.y;
 
 		// for the 3rd point
-		if (pt3.x < bounds.left)
-			bounds.left = pt3.x;
+		if (point3.x < bounds.left)
+			bounds.left = point3.x;
 
-		if (pt3.y < bounds.top)
-			bounds.top = pt3.y;
+		if (point3.y < bounds.top)
+			bounds.top = point3.y;
 
-		if (pt3.x > bounds.right)
-			bounds.right = pt3.x;
+		if (point3.x > bounds.right)
+			bounds.right = point3.x;
 
-		if (pt3.y > bounds.bottom)
-			bounds.bottom = pt3.y;
+		if (point3.y > bounds.bottom)
+			bounds.bottom = point3.y;
 
-		FillTriangle(pt1, pt2, pt3, bounds, p);
+		FillTriangle(point1, point2, point3, bounds, pattern);
 	}
 }
 
 
 void
-BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
+BView::FillTriangle(BPoint point1, BPoint point2, BPoint point3,
 	const BGradient& gradient)
 {
 	if (fOwner) {
 		// we construct the smallest rectangle that contains the 3 points
 		// for the 1st point
-		BRect bounds(pt1, pt1);
+		BRect bounds(point1, point1);
 
 		// for the 2nd point
-		if (pt2.x < bounds.left)
-			bounds.left = pt2.x;
+		if (point2.x < bounds.left)
+			bounds.left = point2.x;
 
-		if (pt2.y < bounds.top)
-			bounds.top = pt2.y;
+		if (point2.y < bounds.top)
+			bounds.top = point2.y;
 
-		if (pt2.x > bounds.right)
-			bounds.right = pt2.x;
+		if (point2.x > bounds.right)
+			bounds.right = point2.x;
 
-		if (pt2.y > bounds.bottom)
-			bounds.bottom = pt2.y;
+		if (point2.y > bounds.bottom)
+			bounds.bottom = point2.y;
 
 		// for the 3rd point
-		if (pt3.x < bounds.left)
-			bounds.left = pt3.x;
+		if (point3.x < bounds.left)
+			bounds.left = point3.x;
 
-		if (pt3.y < bounds.top)
-			bounds.top = pt3.y;
+		if (point3.y < bounds.top)
+			bounds.top = point3.y;
 
-		if (pt3.x > bounds.right)
-			bounds.right = pt3.x;
+		if (point3.x > bounds.right)
+			bounds.right = point3.x;
 
-		if (pt3.y > bounds.bottom)
-			bounds.bottom = pt3.y;
+		if (point3.y > bounds.bottom)
+			bounds.bottom = point3.y;
 
-		FillTriangle(pt1, pt2, pt3, bounds, gradient);
+		FillTriangle(point1, point2, point3, bounds, gradient);
 	}
 }
 
 
 void
-BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
+BView::FillTriangle(BPoint point1, BPoint point2, BPoint point3,
 	BRect bounds, ::pattern pattern)
 {
 	if (fOwner == NULL)
@@ -3370,9 +3372,9 @@ BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
 	_UpdatePattern(pattern);
 
 	fOwner->fLink->StartMessage(AS_FILL_TRIANGLE);
-	fOwner->fLink->Attach<BPoint>(pt1);
-	fOwner->fLink->Attach<BPoint>(pt2);
-	fOwner->fLink->Attach<BPoint>(pt3);
+	fOwner->fLink->Attach<BPoint>(point1);
+	fOwner->fLink->Attach<BPoint>(point2);
+	fOwner->fLink->Attach<BPoint>(point3);
 	fOwner->fLink->Attach<BRect>(bounds);
 
 	_FlushIfNotInTransaction();
@@ -3380,17 +3382,17 @@ BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
 
 
 void
-BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
-	BRect bounds, const BGradient& gradient)
+BView::FillTriangle(BPoint point1, BPoint point2, BPoint point3, BRect bounds,
+	const BGradient& gradient)
 {
 	if (fOwner == NULL)
 		return;
 
 	_CheckLockAndSwitchCurrent();
 	fOwner->fLink->StartMessage(AS_FILL_TRIANGLE_GRADIENT);
-	fOwner->fLink->Attach<BPoint>(pt1);
-	fOwner->fLink->Attach<BPoint>(pt2);
-	fOwner->fLink->Attach<BPoint>(pt3);
+	fOwner->fLink->Attach<BPoint>(point1);
+	fOwner->fLink->Attach<BPoint>(point2);
+	fOwner->fLink->Attach<BPoint>(point3);
 	fOwner->fLink->Attach<BRect>(bounds);
 	fOwner->fLink->AttachGradient(gradient);
 
@@ -3399,14 +3401,14 @@ BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
 
 
 void
-BView::StrokeLine(BPoint toPt, pattern p)
+BView::StrokeLine(BPoint toPoint, ::pattern pattern)
 {
-	StrokeLine(PenLocation(), toPt, p);
+	StrokeLine(PenLocation(), toPoint, pattern);
 }
 
 
 void
-BView::StrokeLine(BPoint pt0, BPoint pt1, ::pattern pattern)
+BView::StrokeLine(BPoint start, BPoint end, ::pattern pattern)
 {
 	if (fOwner == NULL)
 		return;
@@ -3415,8 +3417,8 @@ BView::StrokeLine(BPoint pt0, BPoint pt1, ::pattern pattern)
 	_UpdatePattern(pattern);
 
 	ViewStrokeLineInfo info;
-	info.startPoint = pt0;
-	info.endPoint = pt1;
+	info.startPoint = start;
+	info.endPoint = end;
 
 	fOwner->fLink->StartMessage(AS_STROKE_LINE);
 	fOwner->fLink->Attach<ViewStrokeLineInfo>(info);
@@ -3531,7 +3533,7 @@ BView::BeginLineArray(int32 count)
 
 
 void
-BView::AddLine(BPoint pt0, BPoint pt1, rgb_color col)
+BView::AddLine(BPoint start, BPoint end, rgb_color color)
 {
 	if (fOwner == NULL)
 		return;
@@ -3543,9 +3545,9 @@ BView::AddLine(BPoint pt0, BPoint pt1, rgb_color col)
 
 	const uint32 &arrayCount = fCommArray->count;
 	if (arrayCount < fCommArray->maxCount) {
-		fCommArray->array[arrayCount].startPoint = pt0;
-		fCommArray->array[arrayCount].endPoint = pt1;
-		fCommArray->array[arrayCount].color = col;
+		fCommArray->array[arrayCount].startPoint = start;
+		fCommArray->array[arrayCount].endPoint = end;
+		fCommArray->array[arrayCount].color = color;
 
 		fCommArray->count++;
 	}
@@ -3977,6 +3979,7 @@ BView::RemoveChild(BView* child)
 	return child->RemoveSelf();
 }
 
+
 int32
 BView::CountChildren() const
 {
@@ -4205,18 +4208,19 @@ BView::GetSupportedSuites(BMessage* data)
 
 
 BHandler*
-BView::ResolveSpecifier(BMessage* msg, int32 index, BMessage* specifier,
-	int32 what,	const char* property)
+BView::ResolveSpecifier(BMessage* message, int32 index, BMessage* specifier,
+	int32 what, const char* property)
 {
-	if (msg->what == B_WINDOW_MOVE_BY
-		|| msg->what == B_WINDOW_MOVE_TO)
+	if (message->what == B_WINDOW_MOVE_BY
+		|| message->what == B_WINDOW_MOVE_TO) {
 		return this;
+	}
 
 	BPropertyInfo propertyInfo(sViewPropInfo);
 	status_t err = B_BAD_SCRIPT_SYNTAX;
 	BMessage replyMsg(B_REPLY);
 
-	switch (propertyInfo.FindMatch(msg, index, specifier, what, property)) {
+	switch (propertyInfo.FindMatch(message, index, specifier, what, property)) {
 		case 0:
 		case 1:
 		case 3:
@@ -4224,7 +4228,7 @@ BView::ResolveSpecifier(BMessage* msg, int32 index, BMessage* specifier,
 
 		case 2:
 			if (fShelf) {
-				msg->PopSpecifier();
+				message->PopSpecifier();
 				return fShelf;
 			}
 
@@ -4269,7 +4273,7 @@ BView::ResolveSpecifier(BMessage* msg, int32 index, BMessage* specifier,
 			}
 
 			if (child != NULL) {
-				msg->PopSpecifier();
+				message->PopSpecifier();
 				return child;
 			}
 
@@ -4282,7 +4286,7 @@ BView::ResolveSpecifier(BMessage* msg, int32 index, BMessage* specifier,
 		}
 
 		default:
-			return BHandler::ResolveSpecifier(msg, index, specifier, what,
+			return BHandler::ResolveSpecifier(message, index, specifier, what,
 				property);
 	}
 
@@ -4296,16 +4300,16 @@ BView::ResolveSpecifier(BMessage* msg, int32 index, BMessage* specifier,
 	}
 
 	replyMsg.AddInt32("error", err);
-	msg->SendReply(&replyMsg);
+	message->SendReply(&replyMsg);
 	return NULL;
 }
 
 
 void
-BView::MessageReceived(BMessage* msg)
+BView::MessageReceived(BMessage* message)
 {
-	if (!msg->HasSpecifiers()) {
-		switch (msg->what) {
+	if (!message->HasSpecifiers()) {
+		switch (message->what) {
 			case B_VIEW_RESIZED:
 				// By the time the message arrives, the bounds may have
 				// changed already, that's why we don't use the values
@@ -4320,14 +4324,14 @@ BView::MessageReceived(BMessage* msg)
 			case B_MOUSE_IDLE:
 			{
 				BPoint where;
-				if (msg->FindPoint("be:view_where", &where) != B_OK)
+				if (message->FindPoint("be:view_where", &where) != B_OK)
 					break;
 
 				BToolTip* tip;
 				if (GetToolTipAt(where, &tip))
 					ShowToolTip(tip);
 				else
-					BHandler::MessageReceived(msg);
+					BHandler::MessageReceived(message);
 				break;
 			}
 
@@ -4337,15 +4341,15 @@ BView::MessageReceived(BMessage* msg)
 				BScrollBar* vertical = ScrollBar(B_VERTICAL);
 				if (horizontal == NULL && vertical == NULL) {
 					// Pass the message to the next handler
-					BHandler::MessageReceived(msg);
+					BHandler::MessageReceived(message);
 					break;
 				}
 
 				float deltaX = 0.0f, deltaY = 0.0f;
 				if (horizontal != NULL)
-					msg->FindFloat("be:wheel_delta_x", &deltaX);
+					message->FindFloat("be:wheel_delta_x", &deltaX);
 				if (vertical != NULL)
-					msg->FindFloat("be:wheel_delta_y", &deltaY);
+					message->FindFloat("be:wheel_delta_y", &deltaY);
 
 				if (deltaX == 0.0f && deltaY == 0.0f)
 					break;
@@ -4361,7 +4365,7 @@ BView::MessageReceived(BMessage* msg)
 			}
 
 			default:
-				BHandler::MessageReceived(msg);
+				BHandler::MessageReceived(message);
 				break;
 		}
 
@@ -4377,17 +4381,20 @@ BView::MessageReceived(BMessage* msg)
 	int32 what;
 	const char* property;
 
-	if (msg->GetCurrentSpecifier(&index, &specifier, &what, &property) != B_OK)
-		return BHandler::MessageReceived(msg);
+	if (message->GetCurrentSpecifier(&index, &specifier, &what, &property)
+			!= B_OK) {
+		return BHandler::MessageReceived(message);
+	}
 
 	BPropertyInfo propertyInfo(sViewPropInfo);
-	switch (propertyInfo.FindMatch(msg, index, &specifier, what, property)) {
+	switch (propertyInfo.FindMatch(message, index, &specifier, what,
+			property)) {
 		case 0:
-			if (msg->what == B_GET_PROPERTY) {
+			if (message->what == B_GET_PROPERTY) {
 				err = replyMsg.AddRect("result", Frame());
-			} else if (msg->what == B_SET_PROPERTY) {
+			} else if (message->what == B_SET_PROPERTY) {
 				BRect newFrame;
-				err = msg->FindRect("data", &newFrame);
+				err = message->FindRect("data", &newFrame);
 				if (err == B_OK) {
 					MoveTo(newFrame.LeftTop());
 					ResizeTo(newFrame.Width(), newFrame.Height());
@@ -4395,11 +4402,11 @@ BView::MessageReceived(BMessage* msg)
 			}
 			break;
 		case 1:
-			if (msg->what == B_GET_PROPERTY) {
+			if (message->what == B_GET_PROPERTY) {
 				err = replyMsg.AddBool("result", IsHidden());
-			} else if (msg->what == B_SET_PROPERTY) {
+			} else if (message->what == B_SET_PROPERTY) {
 				bool newHiddenState;
-				err = msg->FindBool("data", &newHiddenState);
+				err = message->FindBool("data", &newHiddenState);
 				if (err == B_OK) {
 					if (newHiddenState == true)
 						Hide();
@@ -4412,7 +4419,7 @@ BView::MessageReceived(BMessage* msg)
 			err = replyMsg.AddInt32("result", CountChildren());
 			break;
 		default:
-			return BHandler::MessageReceived(msg);
+			return BHandler::MessageReceived(message);
 	}
 
 	if (err != B_OK) {
@@ -4426,7 +4433,7 @@ BView::MessageReceived(BMessage* msg)
 		replyMsg.AddInt32("error", err);
 	}
 
-	msg->SendReply(&replyMsg);
+	message->SendReply(&replyMsg);
 }
 
 
@@ -4751,15 +4758,6 @@ BView::IsLayoutValid() const
 }
 
 
-/*!	\brief Service call for BView derived classes reenabling
-	InvalidateLayout() notifications.
-
-	BLayout & BView will avoid calling InvalidateLayout on views that have
-	already been invalidated, but if the view caches internal layout information
-	which it updates in methods other than DoLayout(), it has to invoke this
-	method, when it has done so, since otherwise the information might become
-	obsolete without the layout noticing.
-*/
 void
 BView::ResetLayoutInvalidation()
 {

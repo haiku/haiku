@@ -21,31 +21,32 @@
 
 static const int32 kMaxDecimalPlaces = 32;
 
-enum {
-	TOKEN_IDENTIFIER			= 0,
 
+enum {
+	TOKEN_NONE					= 0,
+	TOKEN_IDENTIFIER,
 	TOKEN_CONSTANT,
 
-	TOKEN_PLUS,
-	TOKEN_MINUS,
+	TOKEN_END_OF_LINE			= '\n',
 
-	TOKEN_STAR,
-	TOKEN_SLASH,
-	TOKEN_MODULO,
+	TOKEN_PLUS					= '+',
+	TOKEN_MINUS					= '-',
 
-	TOKEN_POWER,
-	TOKEN_FACTORIAL,
+	TOKEN_STAR					= '*',
+	TOKEN_SLASH					= '/',
+	TOKEN_MODULO				= '%',
 
-	TOKEN_OPENING_BRACKET,
-	TOKEN_CLOSING_BRACKET,
+	TOKEN_POWER					= '^',
+	TOKEN_FACTORIAL				= '!',
 
-	TOKEN_AND,
-	TOKEN_OR,
-	TOKEN_NOT,
+	TOKEN_OPENING_BRACKET		= '(',
+	TOKEN_CLOSING_BRACKET		= ')',
 
-	TOKEN_NONE,
-	TOKEN_END_OF_LINE
+	TOKEN_AND					= '&',
+	TOKEN_OR					= '|',
+	TOKEN_NOT					= '~'
 };
+
 
 struct ExpressionParser::Token {
 	Token()
@@ -218,50 +219,25 @@ class ExpressionParser::Tokenizer {
 			int32 type = TOKEN_NONE;
 
 			switch (*fCurrentChar) {
-				case '+':
-					type = TOKEN_PLUS;
+				case TOKEN_PLUS:
+				case TOKEN_MINUS:
+				case TOKEN_STAR:
+				case TOKEN_SLASH:
+				case TOKEN_MODULO:
+				case TOKEN_POWER:
+				case TOKEN_FACTORIAL:
+				case TOKEN_OPENING_BRACKET:
+				case TOKEN_CLOSING_BRACKET:
+				case TOKEN_AND:
+				case TOKEN_OR:
+				case TOKEN_NOT:
+				case TOKEN_END_OF_LINE:
+					type = *fCurrentChar;
 					break;
-				case '-':
-					type = TOKEN_MINUS;
-					break;
-				case '*':
-					type = TOKEN_STAR;
-					break;
-				case '/':
+
 				case '\\':
 				case ':':
-					type = TOKEN_SLASH;
-					break;
-
-				case '%':
-					type = TOKEN_MODULO;
-					break;
-				case '^':
-					type = TOKEN_POWER;
-					break;
-				case '!':
-					type = TOKEN_FACTORIAL;
-					break;
-
-				case '(':
-					type = TOKEN_OPENING_BRACKET;
-					break;
-				case ')':
-					type = TOKEN_CLOSING_BRACKET;
-					break;
-
-				case '&':
-					type = TOKEN_AND;
-					break;
-				case '|':
-					type = TOKEN_OR;
-					break;
-				case '~':
-					type = TOKEN_NOT;
-					break;
-
-				case '\n':
-					type = TOKEN_END_OF_LINE;
+				type = TOKEN_SLASH;
 					break;
 
 				case 'x':
@@ -755,9 +731,40 @@ ExpressionParser::_EatToken(int32 type)
 {
 	Token token = fTokenizer->NextToken();
 	if (token.type != type) {
-		BString temp("expected '");
-		temp << (char)type << "' got '" << token.string << "'";
+		BString expected;
+		switch (type) {
+			case TOKEN_IDENTIFIER:
+				expected = "an identifier";
+				break;
+
+			case TOKEN_CONSTANT:
+				expected = "a constant";
+				break;
+
+			case TOKEN_PLUS:
+			case TOKEN_MINUS:
+			case TOKEN_STAR:
+			case TOKEN_MODULO:
+			case TOKEN_POWER:
+			case TOKEN_FACTORIAL:
+			case TOKEN_OPENING_BRACKET:
+			case TOKEN_CLOSING_BRACKET:
+			case TOKEN_AND:
+			case TOKEN_OR:
+			case TOKEN_NOT:
+				expected << "'" << (char)type << "'";
+				break;
+
+			case TOKEN_SLASH:
+				expected = "'/', '\\', or ':'";
+				break;
+
+			case TOKEN_END_OF_LINE:
+				expected = "'\\n'";
+				break;
+		}
+		BString temp;
+		temp << "Expected " << expected.String() << " got '" << token.string << "'";
 		throw ParseException(temp.String(), token.position);
 	}
 }
-

@@ -74,9 +74,9 @@ static int		uninorth_enable_config(struct uninorth_host_bridge *bridge,
 					uint8 bus, uint8 slot, uint8 function, uint8 offset);
 
 static status_t	uninorth_read_pci_config(void *cookie, uint8 bus, uint8 device,
-					uint8 function, uint8 offset, uint8 size, uint32 *value);
+					uint8 function, uint16 offset, uint8 size, uint32 *value);
 static status_t	uninorth_write_pci_config(void *cookie, uint8 bus,
-					uint8 device, uint8 function, uint8 offset, uint8 size,
+					uint8 device, uint8 function, uint16 offset, uint8 size,
 					uint32 value);
 static status_t	uninorth_get_max_bus_devices(void *cookie, int32 *count);
 static status_t	uninorth_read_pci_irq(void *cookie, uint8 bus, uint8 device,
@@ -95,9 +95,12 @@ static pci_controller sUniNorthPCIController = {
 
 static status_t
 uninorth_read_pci_config(void *cookie, uint8 bus, uint8 device, uint8 function,
-	uint8 offset, uint8 size, uint32 *value)
+	uint16 offset, uint8 size, uint32 *value)
 {
 	uninorth_host_bridge *bridge = (uninorth_host_bridge*)cookie;
+
+	if (offset > 0xff)
+		return B_BAD_VALUE;
 
 	addr_t caoff = bridge->data_registers + (offset & 0x07);
 
@@ -124,9 +127,12 @@ uninorth_read_pci_config(void *cookie, uint8 bus, uint8 device, uint8 function,
 
 
 static status_t uninorth_write_pci_config(void *cookie, uint8 bus, uint8 device,
-	uint8 function, uint8 offset, uint8 size, uint32 value)
+	uint8 function, uint16 offset, uint8 size, uint32 value)
 {
 	uninorth_host_bridge *bridge = (uninorth_host_bridge*)cookie;
+
+	if (offset > 0xff)
+		return B_BAD_VALUE;
 
 	addr_t caoff = bridge->data_registers + (offset & 0x07);
 

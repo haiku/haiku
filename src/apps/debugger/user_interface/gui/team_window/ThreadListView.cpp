@@ -371,7 +371,7 @@ ThreadListView::_Init()
 		B_TRUNCATE_END, B_ALIGN_LEFT));
 	fThreadsTable->AddColumn(new StringTableColumn(2, "Name", 200, 40, 1000,
 		B_TRUNCATE_END, B_ALIGN_LEFT));
-	fThreadsTable->AddColumn(new StringTableColumn(3, "Stop Reason",
+	fThreadsTable->AddColumn(new StringTableColumn(3, "Stop reason",
 		200, 40, 1000, B_TRUNCATE_END, B_ALIGN_LEFT));
 
 	fThreadsTable->SetSelectionMode(B_SINGLE_SELECTION_LIST);

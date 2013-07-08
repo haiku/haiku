@@ -21,7 +21,6 @@
 #include <getopt.h>
 #include <sys/types.h>
 #include <signal.h>
-#include <libgen.h>
 
 #if HAVE_SYS_WAIT_H
 # include <sys/wait.h>
@@ -37,7 +36,6 @@
 #include "error.h"
 #include "sig2str.h"
 #include "operand2sig.h"
-#include "OS.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "kill"
@@ -87,7 +85,7 @@ usage (int status)
   else
     {
       printf (_("\
-Usage: %s [-s SIGNAL | -SIGNAL] <PID | PROCESS> ...\n\
+Usage: %s [-s SIGNAL | -SIGNAL] PID...\n\
   or:  %s -l [SIGNAL]...\n\
   or:  %s -t [SIGNAL]...\n\
 "),
@@ -111,8 +109,6 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 SIGNAL may be a signal name like `HUP', or a signal number like `1',\n\
 or the exit status of a process terminated by a signal.\n\
 PID is an integer; if negative it identifies a process group.\n\
-PROCESS is name of the process to be killed. The signal will be sent \n\
-to all of the processes matching the given PROCESS name.\n\
 "), stdout);
       printf (USAGE_BUILTIN_WARNING, PROGRAM_NAME);
       emit_ancillary_info ();
@@ -200,115 +196,38 @@ list_signals (bool table, char *const *argv)
 
   return status;
 }
-
-
-/*
- * Checks if passed string is a valid number
- *
- * Returns:
- *	true:	on valid number
- *		The converted number is returned in NUM if it is not NULL
- *
- *	false:  on invalid number
- *
- */
-bool is_number(const char *str, intmax_t *_number)
-{
-	char     *end;
-	intmax_t number;
-
-	if (!str)
-		return 0;
-
-	errno = 0;
-	number = strtoimax(str, &end, 10);
-	if (errno == ERANGE || str == end) {
-		/* not a valid number */
-		return false;
-	}
-
-	/* skip all whitespace if there are any */
-	while (*end == ' ' || *end == '\t')
-		end++;
-
-	if (*end == '\0') {
-		if (_number)
-			*_number = number;
-		return true;
-	}
-	return false;
-}
-
-
-/*
- * kill the processes if they match given name
- *
- * Returns EXIT_SUCCESS signal was successfully sent to all matched processes,
- * otherwise EXIT_FAILURE is returned.
- */
-int kill_by_name(int signum, const char *name)
-{
-	team_info teamInfo;
-	uint32    cookie = 0;
-	int       status = EXIT_SUCCESS;
-	int       found = 0;
-
-	while (get_next_team_info(&cookie, &teamInfo) >= B_OK) {
-		char *token, *args;
-
-		args = teamInfo.args;
-		token = strchr(args, ' ');
-		if (token) {
-			/* remove process argument */
-			*token = 0;
-		}
-
-		/* skip the path if any */
-		token = basename(args);
-
-		if (!strncmp(name, token, strlen(token))) {
-			found = 1;
-			/* name matched */
-			if (kill((pid_t)teamInfo.team, signum) != 0) {
-				error (0, errno, "%s", name);
-				status = EXIT_FAILURE;
-			}
-		}
-	}
-
-	if (!found)
-		error (0, ESRCH, "%s", name);
-
-	return status;
-}
-
-
+
 /* Send signal SIGNUM to all the processes or process groups specified
    by ARGV.  Return a suitable exit status.  */
 
 static int
 send_signals (int signum, char *const *argv)
 {
-	int status = EXIT_SUCCESS;
-	char const *arg = *argv;
-	pid_t pid;
+  int status = EXIT_SUCCESS;
+  char const *arg = *argv;
 
-	do {
-		bool  is_pid = is_number(arg, (intmax_t *) &pid);
-		if (is_pid) {
-			if (kill(pid, signum) != 0) {
-				error (0, errno, "%s", arg);
-				status = EXIT_FAILURE;
-			}
-		} else if (kill_by_name(signum, arg) != EXIT_SUCCESS)
-			status = EXIT_FAILURE;
+  do
+    {
+      char *endp;
+      intmax_t n = (errno = 0, strtoimax (arg, &endp, 10));
+      pid_t pid = n;
 
-	} while ((arg = *++argv));
+      if (errno == ERANGE || pid != n || arg == endp || *endp)
+        {
+          error (0, 0, _("%s: invalid process id"), arg);
+          status = EXIT_FAILURE;
+        }
+      else if (kill (pid, signum) != 0)
+        {
+          error (0, errno, "%s", arg);
+          status = EXIT_FAILURE;
+        }
+    }
+  while ((arg = *++argv));
 
-	return status;
+  return status;
 }
-
-
+
 int
 main (int argc, char **argv)
 {

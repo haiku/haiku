@@ -1,12 +1,11 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "Team.h"
-
-#include <stdio.h>
 
 #include <new>
 
@@ -78,7 +77,9 @@ Team::Team(team_id teamID, TeamMemory* teamMemory, Architecture* architecture,
 	fTeamMemory(teamMemory),
 	fTypeInformation(typeInformation),
 	fArchitecture(architecture),
-	fDebugInfo(debugInfo)
+	fDebugInfo(debugInfo),
+	fStopOnImageLoad(false),
+	fStopImageNameListEnabled(false)
 {
 	fDebugInfo->AcquireReference();
 }
@@ -270,6 +271,43 @@ const ImageList&
 Team::Images() const
 {
 	return fImages;
+}
+
+
+bool
+Team::AddStopImageName(const BString& name)
+{
+	if (!fStopImageNames.Add(name))
+		return false;
+
+	fStopImageNames.Sort();
+
+	NotifyStopImageNameAdded(name);
+	return true;
+}
+
+
+void
+Team::RemoveStopImageName(const BString& name)
+{
+	fStopImageNames.Remove(name);
+	NotifyStopImageNameRemoved(name);
+}
+
+
+void
+Team::SetStopOnImageLoad(bool enabled, bool useImageNameList)
+{
+	fStopOnImageLoad = enabled;
+	fStopImageNameListEnabled = useImageNameList;
+	NotifyStopOnImageLoadChanged(enabled, useImageNameList);
+}
+
+
+const BStringList&
+Team::StopImageNames() const
+{
+	return fStopImageNames;
 }
 
 
@@ -614,6 +652,53 @@ Team::NotifyImageDebugInfoChanged(Image* image)
 
 
 void
+Team::NotifyStopOnImageLoadChanged(bool enabled, bool useImageNameList)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->StopOnImageLoadSettingsChanged(
+			ImageLoadEvent(TEAM_EVENT_IMAGE_LOAD_SETTINGS_CHANGED, this,
+				enabled, useImageNameList));
+	}
+}
+
+
+void
+Team::NotifyStopImageNameAdded(const BString& name)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->StopOnImageLoadNameAdded(
+			ImageLoadNameEvent(TEAM_EVENT_IMAGE_LOAD_NAME_ADDED, this, name));
+	}
+}
+
+
+void
+Team::NotifyStopImageNameRemoved(const BString& name)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->StopOnImageLoadNameRemoved(
+			ImageLoadNameEvent(TEAM_EVENT_IMAGE_LOAD_NAME_REMOVED, this,
+				name));
+	}
+}
+
+
+void
+Team::NotifyConsoleOutputReceived(int32 fd, const BString& output)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->ConsoleOutputReceived(
+			ConsoleOutputEvent(TEAM_EVENT_CONSOLE_OUTPUT_RECEIVED, this,
+				fd, output));
+	}
+}
+
+
+void
 Team::NotifyUserBreakpointChanged(UserBreakpoint* breakpoint)
 {
 	for (ListenerList::Iterator it = fListeners.GetIterator();
@@ -719,6 +804,31 @@ Team::ImageEvent::ImageEvent(uint32 type, Image* image)
 }
 
 
+// #pragma mark - ImageLoadEvent
+
+
+Team::ImageLoadEvent::ImageLoadEvent(uint32 type, Team* team,
+	bool stopOnImageLoad, bool stopImageNameListEnabled)
+	:
+	Event(type, team),
+	fStopOnImageLoad(stopOnImageLoad),
+	fStopImageNameListEnabled(stopImageNameListEnabled)
+{
+}
+
+
+// #pragma mark - ImageLoadNameEvent
+
+
+Team::ImageLoadNameEvent::ImageLoadNameEvent(uint32 type, Team* team,
+	const BString& name)
+	:
+	Event(type, team),
+	fImageName(name)
+{
+}
+
+
 // #pragma mark - BreakpointEvent
 
 
@@ -727,6 +837,19 @@ Team::BreakpointEvent::BreakpointEvent(uint32 type, Team* team,
 	:
 	Event(type, team),
 	fBreakpoint(breakpoint)
+{
+}
+
+
+// #pragma mark - ConsoleOutputEvent
+
+
+Team::ConsoleOutputEvent::ConsoleOutputEvent(uint32 type, Team* team,
+	int32 fd, const BString& output)
+	:
+	Event(type, team),
+	fDescriptor(fd),
+	fOutput(output)
 {
 }
 
@@ -819,6 +942,32 @@ Team::Listener::ThreadStackTraceChanged(const Team::ThreadEvent& event)
 
 void
 Team::Listener::ImageDebugInfoChanged(const Team::ImageEvent& event)
+{
+}
+
+
+void
+Team::Listener::StopOnImageLoadSettingsChanged(
+	const Team::ImageLoadEvent& event)
+{
+}
+
+
+void
+Team::Listener::StopOnImageLoadNameAdded(const Team::ImageLoadNameEvent& event)
+{
+}
+
+
+void
+Team::Listener::StopOnImageLoadNameRemoved(
+	const Team::ImageLoadNameEvent& event)
+{
+}
+
+
+void
+Team::Listener::ConsoleOutputReceived(const Team::ConsoleOutputEvent& event)
 {
 }
 
