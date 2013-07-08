@@ -528,10 +528,12 @@ topLayout->AddItem(nestedLayoutWithView);
 
 
 /*!
-	\fn void BLayout::LayoutInvalidated() = 0
+	\fn void BLayout::LayoutInvalidated(bool children)
 
 	Hook method called when this layout becomes invalid. This is a good place
 	to clear any caches your object might hold.
+
+	\param children Whether or not child layouts have also been invalidated.
 */
 
 
