@@ -292,7 +292,7 @@ const struct supported_device {
 	{0x683b, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD Verde"},
 	{0x683f, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD 7750"},
 	{0x683d, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD 7770"},
-	//  Bonaire (TODO: Need to find friendly names)
+	//  Bonaire (7xxx rebranded HD 8xxx)
 	{0x6649, 6, 0, RADEON_BONAIRE, CHIP_STD, "Radeon HD Bonaire"},
 	{0x6650, 6, 0, RADEON_BONAIRE, CHIP_STD, "Radeon HD Bonaire"}, 
 	{0x6651, 6, 0, RADEON_BONAIRE, CHIP_STD, "Radeon HD Bonaire"}, 
@@ -320,14 +320,14 @@ const struct supported_device {
 	{0x679a, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD 7950"},
 	{0x6798, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD 7970"},
 	{0x6799, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD 7990"},
+	//  Oland   DCE 6,4 (7xxx rebranded HD 8xxx)
 
 	// Marketing Names: Radeon HD 83xx - HD 89xx
 	// Introduced: Late 2013
 	// Codename: Sea Islands
 	// Process: 28 nm
-	//  Oland   DCE 6,4
-	//  Hainan  NO DCE?
-	//  Curacao ????
+	//  Hainan  NODCE. No display hardware, OpenCL 3D engine.
+	//  Curacao DCE 8.0
 
 	// Marketing Names: Radeon HD 9xxx - HD 9xxx 
 	// Introduced: 2014?
