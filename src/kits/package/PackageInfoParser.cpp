@@ -443,19 +443,19 @@ BPackageInfo::Parser::_ParseFlags()
 
 		virtual void operator()(const Token& token)
 		{
-		if (token.type != TOKEN_WORD)
-			throw ParseError("expected word (a flag)", token.pos);
+			if (token.type != TOKEN_WORD)
+				throw ParseError("expected word (a flag)", token.pos);
 
-		if (token.text.ICompare("approve_license") == 0)
-			flags |= B_PACKAGE_FLAG_APPROVE_LICENSE;
-		else if (token.text.ICompare("system_package") == 0)
-			flags |= B_PACKAGE_FLAG_SYSTEM_PACKAGE;
-		else {
+			if (token.text.ICompare("approve_license") == 0)
+				flags |= B_PACKAGE_FLAG_APPROVE_LICENSE;
+			else if (token.text.ICompare("system_package") == 0)
+				flags |= B_PACKAGE_FLAG_SYSTEM_PACKAGE;
+			else {
 				throw ParseError(
 					"expected 'approve_license' or 'system_package'",
-				token.pos);
+					token.pos);
+			}
 		}
-	}
 	} flagParser;
 
 	_ParseList(flagParser, true);
