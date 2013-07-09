@@ -10,6 +10,7 @@
 #include <stdint.h>
 
 #include <algorithm>
+#include <string>
 
 
 namespace BPackageKit {
@@ -84,7 +85,7 @@ BPackageInfo::Parser::ParseVersion(const BString& versionString,
 	fPos = versionString.String();
 
 	try {
-		Token token(TOKEN_WORD, fPos, versionString.Length());
+		Token token(TOKEN_STRING, fPos, versionString.Length());
 		_ParseVersionValue(token, &_version, revisionIsOptional);
 	} catch (const ParseError& error) {
 		if (fListener != NULL) {
@@ -175,38 +176,76 @@ BPackageInfo::Parser::_NextToken()
 			}
 			return Token(TOKEN_OPERATOR_GREATER, tokenPos, 1);
 
-		case '"':
-		case '\'':
-		{
-			char quoteChar = *fPos;
-			fPos++;
-			const char* start = fPos;
-			// anything until the next quote is part of the value
-			bool lastWasEscape = false;
-			while ((*fPos != quoteChar || lastWasEscape) && *fPos != '\0') {
-				if (lastWasEscape)
-					lastWasEscape = false;
-				else if (*fPos == '\\')
-					lastWasEscape = true;
-				fPos++;
-			}
-			if (*fPos != quoteChar)
-				throw ParseError("unterminated quoted-string", tokenPos);
-			const char* end = fPos++;
-			return Token(TOKEN_QUOTED_STRING, start, end - start);
-		}
-
 		default:
 		{
-			const char* start = fPos;
-			while (isalnum(*fPos) || *fPos == '.' || *fPos == '-'
-				|| *fPos == '_' || *fPos == ':' || *fPos == '+'
-				|| *fPos == '~') {
-				fPos++;
+			std::string string;
+			char quoteChar = '\0';
+
+			for (; *fPos != '\0'; fPos++) {
+				char c = *fPos;
+				if (quoteChar != '\0') {
+					// within a quoted string segment
+					if (c == quoteChar) {
+						quoteChar = '\0';
+						continue;
+					}
+
+					if (c == '\\') {
+						// next char is escaped
+						c = *++fPos;
+						if (c == '\0') {
+							throw ParseError("unterminated quoted-string",
+								tokenPos);
+						}
+
+						if (c == 'n')
+							c = '\n';
+						else if (c == 't')
+							c = '\t';
+					}
+
+					string += c;
+				} else {
+					// unquoted string segment
+					switch (c) {
+						case '"':
+						case '\'':
+							// quoted string start
+							quoteChar = c;
+							continue;
+
+						case '{':
+						case '}':
+						case '<':
+						case '=':
+						case '!':
+						case '>':
+							// a separator character -- this ends the string
+							break;
+
+						case '\\':
+							// next char is escaped
+							c = *++fPos;
+							if (c == '\0') {
+								throw ParseError("'\\' at end of string",
+									tokenPos);
+							}
+							string += c;
+							continue;
+
+						default:
+							if (isspace(c))
+								break;
+							string += c;
+							continue;
+					}
+
+					break;
+				}
 			}
-			if (fPos == start)
-				break;
-			return Token(TOKEN_WORD, start, fPos - start);
+
+			return Token(TOKEN_STRING, tokenPos, fPos - tokenPos,
+				string.c_str());
 		}
 	}
 
@@ -226,8 +265,8 @@ void
 BPackageInfo::Parser::_ParseStringValue(BString* value, const char** _tokenPos)
 {
 	Token string = _NextToken();
-	if (string.type != TOKEN_QUOTED_STRING && string.type != TOKEN_WORD)
-		throw ParseError("expected quoted-string or word", string.pos);
+	if (string.type != TOKEN_STRING)
+		throw ParseError("expected string", string.pos);
 
 	*value = string.text;
 	if (_tokenPos != NULL)
@@ -239,7 +278,7 @@ void
 BPackageInfo::Parser::_ParseArchitectureValue(BPackageArchitecture* value)
 {
 	Token arch = _NextToken();
-	if (arch.type == TOKEN_WORD) {
+	if (arch.type == TOKEN_STRING) {
 		for (int i = 0; i < B_PACKAGE_ARCHITECTURE_ENUM_COUNT; ++i) {
 			if (arch.text.ICompare(BPackageInfo::kArchitectureNames[i]) == 0) {
 				*value = (BPackageArchitecture)i;
@@ -272,8 +311,8 @@ BPackageInfo::Parser::_ParseVersionValue(BPackageVersion* value,
 BPackageInfo::Parser::_ParseVersionValue(Token& word, BPackageVersion* value,
 	bool revisionIsOptional)
 {
-	if (word.type != TOKEN_WORD)
-		throw ParseError("expected word (a version)", word.pos);
+	if (word.type != TOKEN_STRING)
+		throw ParseError("expected string (a version)", word.pos);
 
 	// get the revision number
 	uint32 revision = 0;
@@ -388,33 +427,33 @@ BPackageInfo::Parser::_ParseList(ListElementParser& elementParser,
 
 void
 BPackageInfo::Parser::_ParseStringList(BStringList* value,
-	bool allowQuotedStrings, bool convertToLowerCase)
+	bool requireResolvableName, bool convertToLowerCase)
 {
 	struct StringParser : public ListElementParser {
 		BStringList* value;
-		bool allowQuotedStrings;
+		bool requireResolvableName;
 		bool convertToLowerCase;
 
-		StringParser(BStringList* value, bool allowQuotedStrings,
+		StringParser(BStringList* value, bool requireResolvableName,
 			bool convertToLowerCase)
 			:
 			value(value),
-			allowQuotedStrings(allowQuotedStrings),
+			requireResolvableName(requireResolvableName),
 			convertToLowerCase(convertToLowerCase)
 		{
 		}
 
 		virtual void operator()(const Token& token)
 		{
-			if (allowQuotedStrings) {
-				if (token.type != TOKEN_QUOTED_STRING
-					&& token.type != TOKEN_WORD) {
-					throw ParseError("expected quoted-string or word",
-						token.pos);
+			if (token.type != TOKEN_STRING)
+				throw ParseError("expected string", token.pos);
+
+			if (requireResolvableName) {
+				int32 errorPos;
+				if (!_IsValidResolvableName(token.text, &errorPos)) {
+					throw ParseError("invalid character in resolvable name",
+						token.pos + errorPos);
 				}
-			} else {
-				if (token.type != TOKEN_WORD)
-					throw ParseError("expected word", token.pos);
 			}
 
 			BString element(token.text);
@@ -423,7 +462,7 @@ BPackageInfo::Parser::_ParseStringList(BStringList* value,
 
 			value->Add(element);
 		}
-	} stringParser(value, allowQuotedStrings, convertToLowerCase);
+	} stringParser(value, requireResolvableName, convertToLowerCase);
 
 	_ParseList(stringParser, true);
 }
@@ -443,7 +482,7 @@ BPackageInfo::Parser::_ParseFlags()
 
 		virtual void operator()(const Token& token)
 		{
-			if (token.type != TOKEN_WORD)
+			if (token.type != TOKEN_STRING)
 				throw ParseError("expected word (a flag)", token.pos);
 
 			if (token.text.ICompare("approve_license") == 0)
@@ -482,7 +521,7 @@ BPackageInfo::Parser::_ParseResolvableList(
 
 		virtual void operator()(const Token& token)
 		{
-			if (token.type != TOKEN_WORD) {
+			if (token.type != TOKEN_STRING) {
 				throw ParseError("expected word (a resolvable name)",
 					token.pos);
 			}
@@ -507,7 +546,7 @@ BPackageInfo::Parser::_ParseResolvableList(
 			// parse compatible version
 			BPackageVersion compatibleVersion;
 			Token compatible = parser._NextToken();
-			if (compatible.type == TOKEN_WORD
+			if (compatible.type == TOKEN_STRING
 				&& (compatible.text == "compat"
 					|| compatible.text == "compatible")) {
 				op = parser._NextToken();
@@ -548,7 +587,7 @@ BPackageInfo::Parser::_ParseResolvableExprList(
 
 		virtual void operator()(const Token& token)
 		{
-			if (token.type != TOKEN_WORD) {
+			if (token.type != TOKEN_STRING) {
 				throw ParseError("expected word (a resolvable name)",
 					token.pos);
 			}
@@ -571,7 +610,7 @@ BPackageInfo::Parser::_ParseResolvableExprList(
 
 				if (basePackage != NULL) {
 					Token base = parser._NextToken();
-					if (base.type == TOKEN_WORD && base.text == "base") {
+					if (base.type == TOKEN_STRING && base.text == "base") {
 						if (!basePackage->IsEmpty()) {
 						throw ParseError(
 							"multiple packages marked as base package",
@@ -621,8 +660,8 @@ BPackageInfo::Parser::_ParseGlobalWritableFileInfos(
 
 		virtual void operator()(const Token& token)
 		{
-			if (token.type != TOKEN_WORD && token.type != TOKEN_QUOTED_STRING) {
-				throw ParseError("expected string (a settings file path)",
+			if (token.type != TOKEN_STRING) {
+				throw ParseError("expected string (a file path)",
 					token.pos);
 			}
 
@@ -631,12 +670,13 @@ BPackageInfo::Parser::_ParseGlobalWritableFileInfos(
 			bool isDirectory = false;
 
 			Token nextToken = parser._NextToken();
-			if (nextToken.type == TOKEN_WORD && nextToken.text == "directory") {
+			if (nextToken.type == TOKEN_STRING
+				&& nextToken.text == "directory") {
 				isDirectory = true;
 				nextToken = parser._NextToken();
 			}
 
-			if (nextToken.type == TOKEN_WORD) {
+			if (nextToken.type == TOKEN_STRING) {
 				const char* const* end = kWritableFileUpdateTypes
 					+ B_WRITABLE_FILE_UPDATE_TYPE_ENUM_COUNT;
 				const char* const* found = std::find(kWritableFileUpdateTypes,
@@ -685,7 +725,7 @@ BPackageInfo::Parser::_ParseUserSettingsFileInfos(
 
 		virtual void operator()(const Token& token)
 		{
-			if (token.type != TOKEN_WORD && token.type != TOKEN_QUOTED_STRING) {
+			if (token.type != TOKEN_STRING) {
 				throw ParseError("expected string (a settings file path)",
 					token.pos);
 			}
@@ -694,13 +734,13 @@ BPackageInfo::Parser::_ParseUserSettingsFileInfos(
 			bool isDirectory = false;
 
 			Token nextToken = parser._NextToken();
-			if (nextToken.type == TOKEN_WORD && nextToken.text == "directory") {
+			if (nextToken.type == TOKEN_STRING
+				&& nextToken.text == "directory") {
 				isDirectory = true;
-			} else if (nextToken.type == TOKEN_WORD
+			} else if (nextToken.type == TOKEN_STRING
 				&& nextToken.text == "template") {
 				nextToken = parser._NextToken();
-				if (nextToken.type != TOKEN_WORD
-					&& nextToken.type != TOKEN_QUOTED_STRING) {
+				if (nextToken.type != TOKEN_STRING) {
 					throw ParseError(
 						"expected string (a settings template file path)",
 						nextToken.pos);
@@ -744,9 +784,9 @@ BPackageInfo::Parser::_ParseUsers(UserList* users)
 
 		virtual void operator()(const Token& token)
 		{
-			if (token.type != TOKEN_WORD) {
-				throw ParseError("expected a user name",
-					token.pos);
+			if (token.type != TOKEN_STRING
+				|| !BUser::IsValidUserName(token.text)) {
+				throw ParseError("expected a user name", token.pos);
 			}
 
 			BString realName;
@@ -756,31 +796,28 @@ BPackageInfo::Parser::_ParseUsers(UserList* users)
 
 			for (;;) {
 				Token nextToken = parser._NextToken();
-				if (nextToken.type != TOKEN_WORD) {
+				if (nextToken.type != TOKEN_STRING) {
 					parser._RewindTo(nextToken);
 					break;
 				}
 
 				if (nextToken.text == "real-name") {
 					nextToken = parser._NextToken();
-					if (nextToken.type != TOKEN_WORD
-						&& nextToken.type != TOKEN_QUOTED_STRING) {
+					if (nextToken.type != TOKEN_STRING) {
 						throw ParseError("expected string (a user real name)",
 							nextToken.pos);
 					}
 					realName = nextToken.text;
 				} else if (nextToken.text == "home") {
 					nextToken = parser._NextToken();
-					if (nextToken.type != TOKEN_WORD
-						&& nextToken.type != TOKEN_QUOTED_STRING) {
+					if (nextToken.type != TOKEN_STRING) {
 						throw ParseError("expected string (a home path)",
 							nextToken.pos);
 					}
 					home = nextToken.text;
 				} else if (nextToken.text == "shell") {
 					nextToken = parser._NextToken();
-					if (nextToken.type != TOKEN_WORD
-						&& nextToken.type != TOKEN_QUOTED_STRING) {
+					if (nextToken.type != TOKEN_STRING) {
 						throw ParseError("expected string (a shell path)",
 							nextToken.pos);
 					}
@@ -788,7 +825,8 @@ BPackageInfo::Parser::_ParseUsers(UserList* users)
 				} else if (nextToken.text == "groups") {
 					for (;;) {
 						nextToken = parser._NextToken();
-						if (nextToken.type == TOKEN_WORD) {
+						if (nextToken.type == TOKEN_STRING
+							&& BUser::IsValidUserName(nextToken.text)) {
 							if (!groups.Add(nextToken.text))
 								throw std::bad_alloc();
 						} else if (nextToken.type == TOKEN_ITEM_SEPARATOR
@@ -811,10 +849,10 @@ BPackageInfo::Parser::_ParseUsers(UserList* users)
 			BString templatePath;
 
 			Token nextToken = parser._NextToken();
-			if (nextToken.type == TOKEN_WORD && nextToken.text == "template") {
+			if (nextToken.type == TOKEN_STRING
+				&& nextToken.text == "template") {
 				nextToken = parser._NextToken();
-				if (nextToken.type != TOKEN_WORD
-					&& nextToken.type != TOKEN_QUOTED_STRING) {
+				if (nextToken.type != TOKEN_STRING) {
 					throw ParseError(
 						"expected string (a settings template file path)",
 						nextToken.pos);
@@ -853,8 +891,8 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 		if (t.type == TOKEN_ITEM_SEPARATOR)
 			continue;
 
-		if (t.type != TOKEN_WORD)
-			throw ParseError("expected word (a variable name)", t.pos);
+		if (t.type != TOKEN_STRING)
+			throw ParseError("expected string (a variable name)", t.pos);
 
 		BPackageInfoAttributeID attribute = B_PACKAGE_INFO_ENUM_COUNT;
 		for (int i = 0; i < B_PACKAGE_INFO_ENUM_COUNT; i++) {
@@ -986,7 +1024,7 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 				break;
 
 			case B_PACKAGE_INFO_REPLACES:
-				_ParseStringList(&packageInfo->fReplacesList, false, true);
+				_ParseStringList(&packageInfo->fReplacesList, true);
 				break;
 
 			case B_PACKAGE_INFO_FLAGS:

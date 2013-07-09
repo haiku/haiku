@@ -34,8 +34,7 @@ private:
 	friend	struct ListElementParser;
 
 			enum TokenType {
-				TOKEN_WORD,
-				TOKEN_QUOTED_STRING,
+				TOKEN_STRING,
 				TOKEN_OPERATOR_ASSIGN,
 				TOKEN_OPERATOR_LESS,
 				TOKEN_OPERATOR_LESS_EQUAL,
@@ -67,7 +66,7 @@ private:
 			void				_ParseList(ListElementParser& elementParser,
 									bool allowSingleNonListElement);
 			void				_ParseStringList(BStringList* value,
-									bool allowQuotedStrings = true,
+									bool requireResolvableName = false,
 									bool convertToLowerCase = false);
 			void				_ParseResolvableList(
 									BObjectList<BPackageResolvable>* value);
@@ -118,38 +117,16 @@ struct BPackageInfo::Parser::Token {
 	BString		text;
 	const char*	pos;
 
-	Token(TokenType _type, const char* _pos, int length = 0)
-		: type(_type), pos(_pos)
+	Token(TokenType _type, const char* _pos, int length = 0,
+		const char* text = NULL)
+		:
+		type(_type),
+		pos(_pos)
 	{
-		if (length != 0) {
-			text.SetTo(pos, length);
-
-			if (type == TOKEN_QUOTED_STRING) {
-				// unescape value of quoted string
-				char* value = text.LockBuffer(length);
-				if (value == NULL)
-					return;
-				int index = 0;
-				int newIndex = 0;
-				bool lastWasEscape = false;
-				while (char c = value[index++]) {
-					if (lastWasEscape) {
-						lastWasEscape = false;
-						// map \n to newline and \t to tab
-						if (c == 'n')
-							c = '\n';
-						else if (c == 't')
-							c = '\t';
-					} else if (c == '\\') {
-						lastWasEscape = true;
-						continue;
-					}
-					value[newIndex++] = c;
-				}
-				value[newIndex] = '\0';
-				text.UnlockBuffer(newIndex);
-			}
-		}
+		if (text != NULL)
+			this->text = text;
+		else if (length != 0)
+			this->text.SetTo(pos, length);
 	}
 
 	operator bool() const
