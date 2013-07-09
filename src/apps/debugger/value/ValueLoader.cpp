@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -178,8 +179,10 @@ ValueLoader::LoadValue(ValueLocation* location, type_code valueType,
 				if (registerValue.Size() < bytesToRead)
 					return B_ENTRY_NOT_FOUND;
 
-				if (!bigEndian)
+				if (!bigEndian) {
 					registerValue.SwapEndianess();
+					bitOffset = registerValue.Size() * 8 - bitOffset - bitSize;
+				}
 				valueBuffer.AddBits(registerValue.Bytes(), bitSize, bitOffset);
 				break;
 			}
