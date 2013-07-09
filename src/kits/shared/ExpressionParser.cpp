@@ -197,7 +197,6 @@ class ExpressionParser::Tokenizer {
 			fCurrentToken = Token(begin, length, _CurrentPos() - length,
 				TOKEN_CONSTANT);
 			fCurrentToken.value = temp.String();
-
 		} else if (isalpha(*fCurrentChar) && *fCurrentChar != 'x') {
 			const char* begin = fCurrentChar;
 			while (*fCurrentChar != 0 && (isalpha(*fCurrentChar)
@@ -207,14 +206,10 @@ class ExpressionParser::Tokenizer {
 			int32 length = fCurrentChar - begin;
 			fCurrentToken = Token(begin, length, _CurrentPos() - length,
 				TOKEN_IDENTIFIER);
-
-		} else if ((unsigned char)fCurrentChar[0] == 0xCF
-			&& (unsigned char)fCurrentChar[1] == 0x80) {
-			// UTF-8 small greek letter PI
+		} else if (strncmp(fCurrentChar, "π", 2) == 0) {
 			fCurrentToken = Token(fCurrentChar, 2, _CurrentPos() - 1,
 				TOKEN_IDENTIFIER);
 			fCurrentChar += 2;
-
 		} else {
 			int32 type = TOKEN_NONE;
 
@@ -567,14 +562,10 @@ ExpressionParser::_InitArguments(MAPM values[], int32 argumentCount)
 MAPM
 ExpressionParser::_ParseFunction(const Token& token)
 {
-	if (strcmp("e", token.string.String()) == 0)
+	if (token.string == "e")
 		return _ParseFactorial(MAPM(MM_E));
-	else if (strcasecmp("pi", token.string.String()) == 0
-		|| ((unsigned char)token.string.String()[0] == 0xCF
-			&& (unsigned char)token.string.String()[1] == 0x80)) {
-		// UTF-8 small greek letter PI
+	else if (token.string.ICompare("pi") == 0 || token.string == "π")
 		return _ParseFactorial(MAPM(MM_PI));
-	}
 
 	// hard coded cases for different count of arguments
 	// supports functions with 3 arguments at most
