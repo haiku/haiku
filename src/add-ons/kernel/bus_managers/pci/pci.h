@@ -100,7 +100,12 @@ public:
 								uint16 *offset = NULL);
 			status_t		FindExtendedCapability(PCIDev *device,
 								uint16 capID, uint16 *offset = NULL);
-
+			status_t		FindHTCapability(uint8 domain, uint8 bus,
+								uint8 device, uint8 function, uint16 capID,
+								uint8 *offset);
+			status_t		FindHTCapability(PCIDev *device,
+								uint16 capID, uint8 *offset = NULL);
+			
 			status_t		ResolveVirtualBus(uint8 virtualBus, uint8 *domain,
 								uint8 *bus);
 
