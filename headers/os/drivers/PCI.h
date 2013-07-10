@@ -355,6 +355,8 @@ struct pci_module_info {
 #define PCI_fddi			0x02			/* FDDI controller */
 #define PCI_atm				0x03			/* ATM controller */
 #define PCI_isdn            0x04            /* ISDN controller */
+#define PCI_worldfip		0x05            /* WorldFip controller */
+#define PCI_picmg			0x06            /* PICMG controller */
 #define PCI_network_other	0x80			/* other network controller */
 
 
@@ -415,6 +417,8 @@ struct pci_module_info {
 #define PCI_parallel					0x01	/* parallel port */
 #define PCI_multiport_serial            0x02    /* multiport serial controller */
 #define PCI_modem                       0x03    /* modem */
+#define PCI_gpib						0x04    /* GPIB controller */
+#define PCI_smart_card					0x05	/* Smard Card controller */
 #define PCI_simple_communications_other	0x80	/* other communications device */
 
 /* ---
@@ -449,6 +453,8 @@ struct pci_module_info {
 #define PCI_timer					0x02	/* timers */
 #define PCI_rtc						0x03	/* real time clock */
 #define PCI_generic_hot_plug        0x04    /* generic PCI hot-plug controller */
+#define PCI_sd_host					0x05	/* SD Host controller */
+#define PCI_iommu					0x06	/* IOMMU */
 #define PCI_system_peripheral_other	0x80	/* other generic system peripheral */
 
 /* ---
@@ -809,7 +815,8 @@ struct pci_module_info {
 #define PCI_ht_msi_address_low		0x04
 #define PCI_ht_msi_address_high		0x08
 
-#define PCI_ht_command_cap_mask		0xf800
+#define PCI_ht_command_cap_mask_3_bits	0xe000
+#define PCI_ht_command_cap_mask_5_bits	0xf800
 #define PCI_ht_command_cap_slave	0x0000
 #define PCI_ht_command_cap_host		0x2000
 #define PCI_ht_command_cap_switch	0x4000

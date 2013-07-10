@@ -1685,9 +1685,9 @@ PCI::FindHTCapability(uint8 domain, uint8 bus, uint8 device,
 		return B_NAME_NOT_FOUND;
 	}
 	
-	uint16 mask = PCI_ht_command_cap_mask;
+	uint16 mask = PCI_ht_command_cap_mask_5_bits;
 	if (capID == PCI_ht_command_cap_slave || capID == PCI_ht_command_cap_host)
-		mask = 0xe000;
+		mask = PCI_ht_command_cap_mask_3_bits;
 	for (int i = 0; i < 48; i++) {
 		capPointer &= ~3;
 		if (capPointer == 0)
