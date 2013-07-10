@@ -686,13 +686,13 @@ dump_cpus(system_info *info)
 static void
 dump_mem(system_info *info)
 {
-	printf("%10" B_PRIu32 " bytes free      (used/max %10" B_PRIu32 " / %10"
-		B_PRIu32 ")\n",
-		B_PAGE_SIZE * (uint32)(info->max_pages - info->used_pages),
-		B_PAGE_SIZE * (uint32)info->used_pages,
-		B_PAGE_SIZE * (uint32)info->max_pages);
-	printf("                           (cached   %10" B_PRIu32 ")\n",
-		B_PAGE_SIZE * (uint32)info->cached_pages);
+	printf("%10" B_PRIu64 " bytes free      (used/max %10" B_PRIu64 " / %10"
+		B_PRIu64 ")\n",
+		B_PAGE_SIZE * (uint64)(info->max_pages - info->used_pages),
+		B_PAGE_SIZE * (uint64)info->used_pages,
+		B_PAGE_SIZE * (uint64)info->max_pages);
+	printf("                           (cached   %10" B_PRIu64 ")\n",
+		B_PAGE_SIZE * (uint64)info->cached_pages);
 }
 
 
