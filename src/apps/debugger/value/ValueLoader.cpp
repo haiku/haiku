@@ -122,6 +122,11 @@ ValueLoader::LoadValue(ValueLocation* location, type_code valueType,
 		uint32 bytesToRead = piece.size;
 		uint32 bitSize = piece.bitSize;
 		uint8 bitOffset = piece.bitOffset;
+			// TODO: the offset's ordinal position and direction aren't
+			// specified by DWARF, and simply follow the target language.
+			// To handle non C/C++ languages properly, the corresponding
+			// SourceLanguage will need to be passed in and extended to
+			// return the relevant information.
 
 		switch (piece.type) {
 			case VALUE_PIECE_LOCATION_INVALID:
