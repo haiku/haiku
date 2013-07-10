@@ -324,6 +324,7 @@ struct pci_module_info {
 #define PCI_ata				0x05			/* ATA controller with ADMA interface */
 #define PCI_sata			0x06			/* Serial ATA controller */
 #define PCI_sas				0x07			/* Serial Attached SCSI controller */
+#define PCI_nvm				0x08			/* NVM Express controller */
 #define PCI_mass_storage_other 0x80			/* other mass storage controller */
 
 /* ---
@@ -335,6 +336,15 @@ struct pci_module_info {
 #define PCI_sata_other			0x00	/* vendor specific interface */
 #define PCI_sata_ahci			0x01	/* AHCI interface */
 
+/* ---
+	values of the class_api field for
+		class_base	= 0x01 (mass storage)
+		class_sub	= 0x08 (NVM Express controller)
+--- */
+
+#define PCI_nvm_other			0x00	/* vendor specific interface */
+#define PCI_nvm_hci				0x01	/* NVMHCI interface 1.0 */
+#define PCI_nvm_hci_enterprise	0x02	/* NVMHCI enterprise */
 
 /* ---
 	values for the class_sub field for class_base = 0x02 (network)
