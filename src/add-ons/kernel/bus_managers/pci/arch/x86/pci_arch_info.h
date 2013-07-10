@@ -10,6 +10,7 @@
 typedef struct pci_arch_info {
 	msi_info	msi;
 	msix_info	msix;
+	ht_mapping_info	ht_mapping;
 } pci_arch_info;
 
 

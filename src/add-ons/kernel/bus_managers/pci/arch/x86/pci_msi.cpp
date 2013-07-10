@@ -15,6 +15,60 @@
 extern PCI *gPCI;
 
 
+static void
+pci_ht_msi_map(PCIDev *device, uint64 address)
+{
+	ht_mapping_info *info = &device->arch_info.ht_mapping;
+	if (!info->ht_mapping_capable)
+		return;
+
+	bool enabled = (info->control_value & PCI_ht_command_msi_enable) != 0;
+	if ((address != 0) != enabled) {
+		if (enabled) {
+			info->control_value &= ~PCI_ht_command_msi_enable;
+		} else {
+			if ((address >> 20) != (info->address_value >> 20))
+				return;
+			dprintf("ht msi mapping enabled\n");
+			info->control_value |= PCI_ht_command_msi_enable;
+		}
+		gPCI->WriteConfig(device, info->capability_offset + PCI_ht_command,
+			info->control_value, 2); 
+	}
+}
+
+
+void
+pci_read_ht_mapping_info(PCIDev *device)
+{
+	if (!msi_supported())
+		return;
+
+	ht_mapping_info *info = &device->arch_info.ht_mapping;
+	info->ht_mapping_capable = false;
+
+	uint8 offset = 0;
+	if (gPCI->FindHTCapability(device, PCI_ht_command_cap_msi_mapping,
+		&offset) == B_OK) {
+		info->control_value = gPCI->ReadConfig(device, offset + PCI_ht_command,
+			2);
+		info->capability_offset = offset;
+		info->ht_mapping_capable = true;
+		if ((info->control_value & PCI_ht_command_msi_fixed) != 0)
+			info->address_value = MSI_ADDRESS_BASE;
+		else {
+			info->address_value = gPCI->ReadConfig(device, offset
+				+ PCI_ht_msi_address_high, 4);
+			info->address_value <<= 32;
+			info->address_value |= gPCI->ReadConfig(device, offset
+				+ PCI_ht_msi_address_low, 4);
+		}
+		dprintf("found an ht msi mapping at %#" B_PRIx64 "\n",
+			info->address_value);
+	}
+}
+
+
 uint8
 pci_get_msi_count(uint8 virtualBus, uint8 _device, uint8 function)
 {
@@ -164,6 +218,9 @@ pci_enable_msi(uint8 virtualBus, uint8 _device, uint8 function)
 	gPCI->WriteConfig(device, info->capability_offset + PCI_msi_control, 2,
 		info->control_value);
 
+	// enable HT msi mapping (if applicable)
+	pci_ht_msi_map(device, info->address_value);
+
 	dprintf("msi enabled: 0x%04" B_PRIx32 "\n",
 		gPCI->ReadConfig(device, info->capability_offset + PCI_msi_control, 2));
 	return B_OK;
@@ -192,6 +249,9 @@ pci_disable_msi(uint8 virtualBus, uint8 _device, uint8 function)
 
 	if (info->configured_count == 0)
 		return B_NO_INIT;
+
+	// disable HT msi mapping (if applicable)
+	pci_ht_msi_map(device, 0);
 
 	// disable msi generation
 	info->control_value &= ~PCI_msi_control_enable;
@@ -423,6 +483,9 @@ pci_enable_msix(uint8 virtualBus, uint8 _device, uint8 function)
 	gPCI->WriteConfig(device, info->capability_offset + PCI_msix_control, 2,
 		info->control_value);
 
+	// enable HT msi mapping (if applicable)
+	pci_ht_msi_map(device, info->address_value);
+
 	dprintf("msi-x enabled: 0x%04" B_PRIx32 "\n",
 		gPCI->ReadConfig(device, info->capability_offset + PCI_msix_control, 2));
 	return B_OK;
@@ -451,6 +514,9 @@ pci_disable_msix(uint8 virtualBus, uint8 _device, uint8 function)
 
 	if (info->configured_count == 0)
 		return B_NO_INIT;
+
+	// disable HT msi mapping (if applicable)
+	pci_ht_msi_map(device, 0);
 
 	// disable msi-x generation
 	info->control_value &= ~PCI_msix_control_enable;

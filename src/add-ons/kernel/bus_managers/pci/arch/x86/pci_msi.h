@@ -10,9 +10,12 @@
 #include <SupportDefs.h>
 
 
+// Message Signaled Interrupts
+
+
 class PCIDev;
 
-// Message Signaled Interrupts
+// MSI
 typedef struct msi_info {
 	bool	msi_capable;
 	uint8	capability_offset;
@@ -34,7 +37,7 @@ status_t	pci_disable_msi(uint8 virtualBus, uint8 device, uint8 function);
 void		pci_read_msi_info(PCIDev *device);
 
 
-// Message Signaled Interrupts
+// MSI-X
 typedef struct msix_info {
 	bool	msix_capable;
 	uint8	capability_offset;
@@ -62,5 +65,17 @@ status_t	pci_unconfigure_msix(uint8 virtualBus, uint8 device, uint8 function);
 status_t	pci_enable_msix(uint8 virtualBus, uint8 _device, uint8 function);
 status_t	pci_disable_msix(uint8 virtualBus, uint8 _device, uint8 function);
 void		pci_read_msix_info(PCIDev *device);
+
+// HyperTransport MSI mapping
+typedef struct ht_mapping_info {
+	bool	ht_mapping_capable;
+	uint8	capability_offset;
+	uint16	control_value;
+	uint64	address_value;
+} ht_mapping_info;
+
+
+void		pci_read_ht_mapping_info(PCIDev *device);
+
 
 #endif // _PCI_x86_MSI_H
