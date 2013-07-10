@@ -30,7 +30,8 @@ enum {
 	MSG_SET_STOP_FOR_CUSTOM_IMAGES			= 'sfci',
 	MSG_IMAGE_NAME_SELECTION_CHANGED		= 'insc',
 	MSG_ADD_IMAGE_NAME						= 'anin',
-	MSG_REMOVE_IMAGE_NAME					= 'arin'
+	MSG_REMOVE_IMAGE_NAME					= 'arin',
+	MSG_IMAGE_NAME_INPUT_CHANGED			= 'inic'
 };
 
 
@@ -43,13 +44,6 @@ static int SortStringItems(const void* a, const void* b)
 }
 
 
-static bool UpdateItemState(BListItem* item, void* enabled)
-{
-	item->SetEnabled((bool)enabled);
-	return false;
-}
-
-
 BreakConditionConfigWindow::BreakConditionConfigWindow(::Team* team,
 	UserInterfaceListener* listener, BHandler* target)
 	:
@@ -57,6 +51,8 @@ BreakConditionConfigWindow::BreakConditionConfigWindow(::Team* team,
 		B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
 	fTeam(team),
 	fListener(listener),
+	fExceptionSettingsBox(NULL),
+	fImageSettingsBox(NULL),
 	fExceptionThrown(NULL),
 	fExceptionCaught(NULL),
 	fStopOnImageLoad(NULL),
@@ -65,6 +61,8 @@ BreakConditionConfigWindow::BreakConditionConfigWindow(::Team* team,
 	fStopImageNameInput(NULL),
 	fAddImageNameButton(NULL),
 	fRemoveImageNameButton(NULL),
+	fCustomImageGroup(NULL),
+	fStopOnLoadEnabled(false),
 	fUseCustomImages(false),
 	fCloseButton(NULL),
 	fTarget(target)
@@ -116,19 +114,17 @@ BreakConditionConfigWindow::MessageReceived(BMessage* message)
 
 		case MSG_SET_STOP_FOR_ALL_IMAGES:
 		{
-			fUseCustomImages = false;
 			fListener->SetStopOnImageLoadRequested(
 				fStopOnImageLoad->Value() == B_CONTROL_ON,
-				fUseCustomImages);
+				false);
 			break;
 		}
 
 		case MSG_SET_STOP_FOR_CUSTOM_IMAGES:
 		{
-			fUseCustomImages = true;
 			fListener->SetStopOnImageLoadRequested(
 				fStopOnImageLoad->Value() == B_CONTROL_ON,
-				fUseCustomImages);
+				true);
 			break;
 		}
 
@@ -142,6 +138,14 @@ BreakConditionConfigWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case MSG_IMAGE_NAME_INPUT_CHANGED:
+		{
+			BString imageName(fStopImageNameInput->Text());
+			imageName.Trim();
+			fAddImageNameButton->SetEnabled(!imageName.IsEmpty());
+			break;
+		}
+
 		case MSG_STOP_ON_IMAGE_LOAD:
 		{
 			fListener->SetStopOnImageLoadRequested(
@@ -152,13 +156,14 @@ BreakConditionConfigWindow::MessageReceived(BMessage* message)
 
 		case MSG_STOP_IMAGE_SETTINGS_CHANGED:
 		{
-			_UpdateStopImageButtons();
+			_UpdateStopImageState();
 			break;
 		}
 
 		case MSG_ADD_IMAGE_NAME:
 		{
 			BString imageName(fStopImageNameInput->Text());
+			imageName.Trim();
 			AutoLocker< ::Team> teamLocker(fTeam);
 			if (fTeam->StopImageNames().HasString(imageName))
 				break;
@@ -268,18 +273,16 @@ BreakConditionConfigWindow::StopOnImageLoadNameRemoved(
 void
 BreakConditionConfigWindow::_Init()
 {
-	BBox* exceptionSettingsBox = new BBox("exceptionBox");
-	exceptionSettingsBox->SetLabel("Exceptions");
-	exceptionSettingsBox->AddChild(BLayoutBuilder::Group<>()
-		.AddGroup(B_VERTICAL)
-			.SetInsets(B_USE_DEFAULT_SPACING)
-			.Add(fExceptionThrown = new BCheckBox("exceptionThrown",
-				"Stop when an exception is thrown",
-				new BMessage(MSG_STOP_ON_THROWN_EXCEPTION_CHANGED)))
-			.Add(fExceptionCaught = new BCheckBox("exceptionCaught",
-				"Stop when an exception is caught",
-				new BMessage(MSG_STOP_ON_CAUGHT_EXCEPTION_CHANGED)))
-		.End()
+	fExceptionSettingsBox = new BBox("exceptionBox");
+	fExceptionSettingsBox->SetLabel("Exceptions");
+	fExceptionSettingsBox->AddChild(BLayoutBuilder::Group<>(B_VERTICAL,
+			B_USE_DEFAULT_SPACING)
+		.Add(fExceptionThrown = new BCheckBox("exceptionThrown",
+			"Stop when an exception is thrown",
+			new BMessage(MSG_STOP_ON_THROWN_EXCEPTION_CHANGED)))
+		.Add(fExceptionCaught = new BCheckBox("exceptionCaught",
+			"Stop when an exception is caught",
+			new BMessage(MSG_STOP_ON_CAUGHT_EXCEPTION_CHANGED)))
 		.View());
 
 	fExceptionThrown->SetTarget(this);
@@ -289,8 +292,8 @@ BreakConditionConfigWindow::_Init()
 	fExceptionCaught->SetEnabled(false);
 
 
-	BBox* imageSettingsBox = new BBox("imageBox");
-	imageSettingsBox->SetLabel("Images");
+	fImageSettingsBox = new BBox("imageBox");
+	fImageSettingsBox->SetLabel("Images");
 	BMenu* stopImageMenu = new BMenu("stopImageTypesMenu");
 
 	stopImageMenu->AddItem(new BMenuItem("All",
@@ -303,26 +306,28 @@ BreakConditionConfigWindow::_Init()
 	fStopImageNames->SetSelectionMessage(
 		new BMessage(MSG_IMAGE_NAME_SELECTION_CHANGED));
 
-	imageSettingsBox->AddChild(BLayoutBuilder::Group<>()
-		.AddGroup(B_VERTICAL)
-			.SetInsets(B_USE_DEFAULT_SPACING)
-			.Add(fStopOnImageLoad = new BCheckBox("stopOnImage",
-				"Stop when an image is loaded",
-				new BMessage(MSG_STOP_ON_IMAGE_LOAD)))
-			.Add(fStopImageConstraints = new BMenuField(
-				"stopTypes", "Types:", stopImageMenu))
-			.Add(new BScrollView("stopImageScroll", fStopImageNames,
-				0, false, true))
-			.Add(fStopImageNameInput = new BTextControl("stopImageName",
-				"Image:", NULL,	NULL))
-			.AddGroup(B_HORIZONTAL)
-				.AddGlue()
-				.Add(fAddImageNameButton = new BButton("Add",
-					new BMessage(MSG_ADD_IMAGE_NAME)))
-				.Add(fRemoveImageNameButton = new BButton("Remove",
-					new BMessage(MSG_REMOVE_IMAGE_NAME)))
-			.End()
-		.End()
+	fCustomImageGroup = new BGroupView();
+	BLayoutBuilder::Group<>(fCustomImageGroup, B_VERTICAL, 0.0)
+		.Add(new BScrollView("stopImageScroll", fStopImageNames,
+			0, false, true))
+		.Add(fStopImageNameInput = new BTextControl("stopImageName",
+			"Image:", NULL,	NULL))
+		.AddGroup(B_HORIZONTAL)
+			.AddGlue()
+			.Add(fAddImageNameButton = new BButton("Add",
+				new BMessage(MSG_ADD_IMAGE_NAME)))
+			.Add(fRemoveImageNameButton = new BButton("Remove",
+				new BMessage(MSG_REMOVE_IMAGE_NAME)))
+		.End();
+
+	fImageSettingsBox->AddChild(BLayoutBuilder::Group<>(B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(fStopOnImageLoad = new BCheckBox("stopOnImage",
+			"Stop when an image is loaded",
+			new BMessage(MSG_STOP_ON_IMAGE_LOAD)))
+		.Add(fStopImageConstraints = new BMenuField(
+			"stopTypes", "Types:", stopImageMenu))
+		.Add(fCustomImageGroup)
 		.View());
 
 	font_height fontHeight;
@@ -333,8 +338,8 @@ BreakConditionConfigWindow::_Init()
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.SetInsets(B_USE_DEFAULT_SPACING)
-		.Add(exceptionSettingsBox)
-		.Add(imageSettingsBox)
+		.Add(fExceptionSettingsBox)
+		.Add(fImageSettingsBox)
 		.AddGroup(B_HORIZONTAL)
 			.AddGlue()
 			.Add(fCloseButton = new BButton("Close", new BMessage(
@@ -343,8 +348,14 @@ BreakConditionConfigWindow::_Init()
 
 
 	fCloseButton->SetTarget(this);
+	fAddImageNameButton->SetEnabled(false);
+	fRemoveImageNameButton->SetEnabled(false);
 	stopImageMenu->SetTargetForItems(this);
 	stopImageMenu->SetLabelFromMarked(true);
+	fStopImageNameInput->SetModificationMessage(
+		new BMessage(MSG_IMAGE_NAME_INPUT_CHANGED));
+
+	fCustomImageGroup->Hide();
 
 	AutoLocker< ::Team> teamLocker(fTeam);
 	_UpdateStopImageState();
@@ -418,9 +429,15 @@ BreakConditionConfigWindow::_UpdateExceptionState()
 void
 BreakConditionConfigWindow::_UpdateStopImageState()
 {
+	bool previousStop = fStopOnLoadEnabled;
+	bool previousCustomImages = fUseCustomImages;
+
+	fStopOnLoadEnabled = fTeam->StopOnImageLoad();
+	fStopOnImageLoad->SetValue(
+		fStopOnLoadEnabled ? B_CONTROL_ON : B_CONTROL_OFF);
 	fUseCustomImages = fTeam->StopImageNameListEnabled();
-	fStopImageConstraints->Menu()->ItemAt(0)->SetMarked(!fUseCustomImages);
-	fStopImageConstraints->Menu()->ItemAt(1)->SetMarked(fUseCustomImages);
+	fStopImageConstraints->Menu()
+		->ItemAt(fUseCustomImages ? 1 : 0)->SetMarked(true);
 
 	fStopImageNames->MakeEmpty();
 	const BStringList& imageNames = fTeam->StopImageNames();
@@ -436,20 +453,17 @@ BreakConditionConfigWindow::_UpdateStopImageState()
 		itemDeleter.Detach();
 	}
 
-	_UpdateStopImageButtons();
+	_UpdateStopImageButtons(previousStop, previousCustomImages);
 }
 
 
 void
-BreakConditionConfigWindow::_UpdateStopImageButtons()
+BreakConditionConfigWindow::_UpdateStopImageButtons(bool previousStop,
+	bool previousCustomImages)
 {
-	bool stopOnImageLoad = fTeam->StopOnImageLoad();
-	fStopOnImageLoad->SetValue(stopOnImageLoad ? B_CONTROL_ON : B_CONTROL_OFF);
-	bool enabled = stopOnImageLoad && fUseCustomImages;
-	fStopImageConstraints->SetEnabled(stopOnImageLoad);
-	fAddImageNameButton->SetEnabled(enabled);
-	fRemoveImageNameButton->SetEnabled(enabled
-		&& fStopImageNames->CurrentSelection() >= 0);
-	fStopImageNames->DoForEach(UpdateItemState, (void*)enabled);
-	fStopImageNameInput->TextView()->MakeEditable(enabled);
+	fStopImageConstraints->SetEnabled(fStopOnLoadEnabled);
+	if (!previousCustomImages && fUseCustomImages)
+		fCustomImageGroup->Show();
+	else if (previousCustomImages && !fUseCustomImages)
+		fCustomImageGroup->Hide();
 }
