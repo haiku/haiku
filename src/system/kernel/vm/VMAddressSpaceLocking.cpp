@@ -511,7 +511,7 @@ MultiAddressSpaceLocker::AddAreaCacheAndLock(area_id areaID,
 		VMArea* firstArea = cache->areas;
 		for (VMArea* current = firstArea; current;
 				current = current->cache_next) {
-			error = AddArea(current->id,
+			error = AddArea(current,
 				current == area ? writeLockThisOne : writeLockOthers);
 			if (error != B_OK) {
 				vm_area_put_locked_cache(cache);
@@ -569,5 +569,3 @@ MultiAddressSpaceLocker::AddAreaCacheAndLock(area_id areaID,
 			memcpy(fItems, originalItems, fCount * sizeof(lock_item));
 	}
 }
-
-
