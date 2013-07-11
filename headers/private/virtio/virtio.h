@@ -84,7 +84,7 @@ typedef struct {
 	
 	uint16	(*get_queue_ring_size)(void* cookie, uint16 queue);
 	status_t (*setup_queue)(void* cookie, uint16 queue, phys_addr_t phy);
-	status_t (*setup_interrupt)(void* cookie);
+	status_t (*setup_interrupt)(void* cookie, uint16 queueCount);
 	void	(*notify_queue)(void* cookie, uint16 queue);
 } virtio_sim_interface;
 

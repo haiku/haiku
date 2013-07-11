@@ -177,7 +177,7 @@ VirtioDevice::SetupInterrupt(virtio_intr_func configHandler,
 {
 	fConfigHandler = configHandler;
 	fConfigCookie = configCookie;
-	status_t status = fController->setup_interrupt(fCookie);
+	status_t status = fController->setup_interrupt(fCookie, fQueueCount);
 	if (status != B_OK)
 		return status;
 
