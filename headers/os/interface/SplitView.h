@@ -13,8 +13,7 @@ class BSplitLayout;
 class BSplitView : public BView {
 public:
 								BSplitView(
-									enum orientation orientation
-										= B_HORIZONTAL,
+									orientation orientation = B_HORIZONTAL,
 									float spacing = B_USE_DEFAULT_SPACING);
 								BSplitView(BMessage* from);
 	virtual						~BSplitView();
@@ -30,7 +29,7 @@ public:
 			void				SetSpacing(float spacing);
 
 			orientation			Orientation() const;
-			void				SetOrientation(enum orientation orientation);
+			void				SetOrientation(orientation orientation);
 
 			float				SplitterSize() const;
 			void				SetSplitterSize(float size);
@@ -86,7 +85,7 @@ protected:
 
 	virtual	void				DrawSplitter(BRect frame,
 									const BRect& updateRect,
-									enum orientation orientation,
+									orientation orientation,
 									bool pressed);
 
 private:
@@ -109,7 +108,7 @@ private:
 
 	static	void				_DrawDefaultSplitter(BView* view, BRect frame,
 									const BRect& updateRect,
-									enum orientation orientation,
+									orientation orientation,
 									bool pressed);
 
 private:

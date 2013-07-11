@@ -13,6 +13,7 @@
 #include "types/Types.h"
 
 
+class BBox;
 class BButton;
 class BCheckBox;
 class BListView;
@@ -56,7 +57,8 @@ private:
 
 			void				_UpdateExceptionState();
 			void				_UpdateStopImageState();
-			void				_UpdateStopImageButtons();
+			void				_UpdateStopImageButtons(bool previousStop,
+									bool previousCustomImages);
 									// must be called with team lock held
 
 
@@ -64,6 +66,8 @@ private:
 private:
 			::Team*				fTeam;
 			UserInterfaceListener* fListener;
+			BBox*				fExceptionSettingsBox;
+			BBox*				fImageSettingsBox;
 			BCheckBox*			fExceptionThrown;
 			BCheckBox*			fExceptionCaught;
 			BCheckBox*			fStopOnImageLoad;
@@ -72,6 +76,8 @@ private:
 			BTextControl*		fStopImageNameInput;
 			BButton*			fAddImageNameButton;
 			BButton*			fRemoveImageNameButton;
+			BView*				fCustomImageGroup;
+			bool				fStopOnLoadEnabled;
 			bool				fUseCustomImages;
 			BButton*			fCloseButton;
 			BHandler*			fTarget;

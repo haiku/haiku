@@ -33,7 +33,7 @@ struct BGroupLayout::ItemLayoutData {
 };
 
 
-BGroupLayout::BGroupLayout(enum orientation orientation, float spacing)
+BGroupLayout::BGroupLayout(orientation orientation, float spacing)
 	:
 	BTwoDimensionalLayout(),
 	fOrientation(orientation)
@@ -85,7 +85,7 @@ BGroupLayout::Orientation() const
 
 
 void
-BGroupLayout::SetOrientation(enum orientation orientation)
+BGroupLayout::SetOrientation(orientation orientation)
 {
 	if (orientation != fOrientation) {
 		fOrientation = orientation;
@@ -262,7 +262,7 @@ BGroupLayout::ItemRemoved(BLayoutItem* item, int32 fromIndex)
 
 
 void
-BGroupLayout::PrepareItems(enum orientation orientation)
+BGroupLayout::PrepareItems(orientation orientation)
 {
 	// filter the visible items
 	fVisibleItems.MakeEmpty();
@@ -290,7 +290,7 @@ BGroupLayout::InternalCountRows()
 
 
 void
-BGroupLayout::GetColumnRowConstraints(enum orientation orientation, int32 index,
+BGroupLayout::GetColumnRowConstraints(orientation orientation, int32 index,
 	ColumnRowConstraints* constraints)
 {
 	if (index >= 0 && index < fVisibleItems.CountItems()) {

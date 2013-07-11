@@ -127,8 +127,8 @@ private:
 			uint32				fMagic3;
 };
 
-static TracingMetaData sDummyTracingMetaData;
-static TracingMetaData* sTracingMetaData = &sDummyTracingMetaData;
+static TracingMetaData sFallbackTracingMetaData;
+static TracingMetaData* sTracingMetaData = &sFallbackTracingMetaData;
 static bool sTracingDataRecovered = false;
 
 
@@ -525,7 +525,15 @@ TracingMetaData::_CreateMetaDataArea(bool findPrevious, area_id& _area,
 		delete_area(area);
 	}
 
-	return B_ENTRY_NOT_FOUND;
+	if (findPrevious)
+		return B_ENTRY_NOT_FOUND;
+
+	// We could allocate any of the standard locations. Instead of failing
+	// entirely, we use the static meta data. The tracing buffer won't be
+	// reattachable in the next session, but at least we can use it in this
+	// session.
+	_metaData = &sFallbackTracingMetaData;
+	return B_OK;
 }
 
 
@@ -1786,7 +1794,8 @@ tracing_init(void)
 #if	ENABLE_TRACING
 	status_t result = TracingMetaData::Create(sTracingMetaData);
 	if (result != B_OK) {
-		sTracingMetaData = &sDummyTracingMetaData;
+		memset(&sFallbackTracingMetaData, 0, sizeof(sFallbackTracingMetaData));
+		sTracingMetaData = &sFallbackTracingMetaData;
 		return result;
 	}
 

@@ -398,7 +398,8 @@
 	       set in the BTextView with the font and color formats set by \a runs.
 
 	\param text The text to set.
-	\param runs The text styling to set, can be \c NULL.
+	\param runs Set the font and color formats of the new text if provided. Only
+	       applies if the BTextView permits multiple character formats.
 */
 
 
@@ -413,8 +414,9 @@
 	to 0 to clear the text from the BTextView.
 
 	\param text The text to set.
-	\param length The number of bytes of text to set.
-	\param runs The text styling to use, can be \c NULL.
+	\param length The maximum number of bytes of \a text to use.
+	\param runs Set the font and color formats of the new text if provided. Only
+	       applies if the BTextView permits multiple character formats.
 */
 
 
@@ -428,7 +430,8 @@
 	\param file The file to set the text from.
 	\param offset The position in the file to start reading text.
 	\param length The number of bytes of text to read from the file.
-	\param runs The text styling to use, can be \c NULL.
+	\param runs Set the font and color formats of the new text if provided. Only
+	       applies if the BTextView permits multiple character formats.
 */
 
 
@@ -488,25 +491,6 @@
 	\param runs The text styling to use, can be \c NULL.
 */
 
-
-//! @{
-
-
-/*!
-	\fn void BTextView::SetText(const char* text, const text_run_array* runs)
-*/
-
-
-/*!
-	\fn void BTextView::SetText(const char* text, int32 length,
-		const text_run_array* runs)
-*/
-
-
-/*!
-	\fn void BTextView::SetText(BFile* file, int32 offset, int32 length,
-		const text_run_array* runs)
-*/
 
 //! @}
 

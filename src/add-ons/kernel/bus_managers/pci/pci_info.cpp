@@ -310,8 +310,8 @@ get_capability_name(uint8 cap_id)
 			return "CompactPCIHotSwap";
 		case PCI_cap_id_pcix:
 			return "PCI-X";
-		case PCI_cap_id_ldt:
-			return "ldt";
+		case PCI_cap_id_ht:
+			return "HyperTransport";
 		case PCI_cap_id_vendspec:
 			return "vendspec";
 		case PCI_cap_id_debugport:

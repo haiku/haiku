@@ -14,7 +14,7 @@ using std::nothrow;
 
 
 // constructor
-BGroupLayoutBuilder::BGroupLayoutBuilder(enum orientation orientation,
+BGroupLayoutBuilder::BGroupLayoutBuilder(orientation orientation,
 	float spacing)
 	: fRootLayout((new BGroupView(orientation, spacing))->GroupLayout())
 {
@@ -118,8 +118,8 @@ BGroupLayoutBuilder::Add(BLayoutItem* item, float weight)
 
 // AddGroup
 BGroupLayoutBuilder&
-BGroupLayoutBuilder::AddGroup(enum orientation orientation,
-	float spacing, float weight)
+BGroupLayoutBuilder::AddGroup(orientation orientation, float spacing,
+	float weight)
 {
 	if (BGroupLayout* layout = TopLayout()) {
 		BGroupView* group = new(nothrow) BGroupView(orientation, spacing);

@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -121,6 +122,11 @@ ValueLoader::LoadValue(ValueLocation* location, type_code valueType,
 		uint32 bytesToRead = piece.size;
 		uint32 bitSize = piece.bitSize;
 		uint8 bitOffset = piece.bitOffset;
+			// TODO: the offset's ordinal position and direction aren't
+			// specified by DWARF, and simply follow the target language.
+			// To handle non C/C++ languages properly, the corresponding
+			// SourceLanguage will need to be passed in and extended to
+			// return the relevant information.
 
 		switch (piece.type) {
 			case VALUE_PIECE_LOCATION_INVALID:
@@ -178,8 +184,10 @@ ValueLoader::LoadValue(ValueLocation* location, type_code valueType,
 				if (registerValue.Size() < bytesToRead)
 					return B_ENTRY_NOT_FOUND;
 
-				if (!bigEndian)
+				if (!bigEndian) {
 					registerValue.SwapEndianess();
+					bitOffset = registerValue.Size() * 8 - bitOffset - bitSize;
+				}
 				valueBuffer.AddBits(registerValue.Bytes(), bitSize, bitOffset);
 				break;
 			}

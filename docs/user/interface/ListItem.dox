@@ -67,7 +67,7 @@
 
 
 /*!
-	\fn void DrawItem(BView* owner, BRect frame, bool complete)
+	\fn void BListItem::DrawItem(BView* owner, BRect frame, bool complete)
 	\brief Hook method called when the item is drawn.
 
 	\param owner The view that the list item is a child of.

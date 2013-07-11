@@ -12,7 +12,7 @@ using std::nothrow;
 
 
 // constructor
-BSplitLayoutBuilder::BSplitLayoutBuilder(enum orientation orientation,
+BSplitLayoutBuilder::BSplitLayoutBuilder(orientation orientation,
 		float spacing)
 	: fView(new BSplitView(orientation, spacing))
 {

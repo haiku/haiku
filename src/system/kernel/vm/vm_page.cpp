@@ -3887,7 +3887,7 @@ vm_page_allocate_page_run(uint32 flags, page_num_t length,
 			dprintf("vm_page_allocate_page_run(): Failed to allocate run of "
 				"length %" B_PRIuPHYSADDR " (%" B_PRIuPHYSADDR " %"
 				B_PRIuPHYSADDR ") in second iteration (align: %" B_PRIuPHYSADDR
-				" boundary: %" B_PRIuPHYSADDR ") !", length, requestedStart,
+				" boundary: %" B_PRIuPHYSADDR ")!\n", length, requestedStart,
 				end, restrictions->alignment, restrictions->boundary);
 
 			freeClearQueueLocker.Unlock();

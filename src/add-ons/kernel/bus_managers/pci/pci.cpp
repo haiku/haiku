@@ -1668,6 +1668,60 @@ PCI::FindExtendedCapability(PCIDev *device, uint16 capID, uint16 *offset)
 }
 
 
+status_t
+PCI::FindHTCapability(uint8 domain, uint8 bus, uint8 device,
+	uint8 function, uint16 capID, uint8 *offset)
+{
+	uint8 capPointer;
+	// consider the passed offset as the current ht capability block pointer
+	// when it's non zero
+	if (offset != NULL && *offset != 0) {
+		capPointer = ReadConfig(domain, bus, device, function, *offset + 1,
+			1);
+	} else if (FindCapability(domain, bus, device, function, PCI_cap_id_ht,
+		&capPointer) != B_OK) {
+		FLOW("PCI:FindHTCapability ERROR %u:%u:%u capability %#02x "
+			"not supported\n", bus, device, function, capID);
+		return B_NAME_NOT_FOUND;
+	}
+	
+	uint16 mask = PCI_ht_command_cap_mask_5_bits;
+	if (capID == PCI_ht_command_cap_slave || capID == PCI_ht_command_cap_host)
+		mask = PCI_ht_command_cap_mask_3_bits;
+	for (int i = 0; i < 48; i++) {
+		capPointer &= ~3;
+		if (capPointer == 0)
+			return B_NAME_NOT_FOUND;
+
+		uint8 capability = ReadConfig(domain, bus, device, function,
+			capPointer, 1);
+		if (capability == PCI_cap_id_ht) {
+			if ((ReadConfig(domain, bus, device, function,
+					capPointer + PCI_ht_command, 2) & mask) == capID) {
+				if (offset != NULL)
+					*offset = capPointer;
+				return B_OK;
+			}
+		}
+
+		capPointer = ReadConfig(domain, bus, device, function, capPointer + 1,
+			1);
+	}
+
+	TRACE_CAP("PCI:FindHTCapability ERROR %u:%u:%u capability %#04x "
+		"circular list\n", bus, device, function, capID);
+	return B_ERROR;
+}
+
+
+status_t
+PCI::FindHTCapability(PCIDev *device, uint16 capID, uint8 *offset)
+{
+	return FindHTCapability(device->domain, device->bus, device->device,
+		device->function, capID, offset);
+}
+
+
 PCIDev *
 PCI::FindDevice(uint8 domain, uint8 bus, uint8 device, uint8 function)
 {

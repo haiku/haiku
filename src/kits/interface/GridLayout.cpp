@@ -665,7 +665,7 @@ BGridLayout::InternalCountRows()
 
 
 void
-BGridLayout::GetColumnRowConstraints(enum orientation orientation, int32 index,
+BGridLayout::GetColumnRowConstraints(orientation orientation, int32 index,
 	ColumnRowConstraints* constraints)
 {
 	if (orientation == B_HORIZONTAL) {

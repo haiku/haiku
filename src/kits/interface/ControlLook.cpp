@@ -143,7 +143,7 @@ BControlLook::DrawButtonFrame(BView* view, BRect& rect,
 void
 BControlLook::DrawButtonBackground(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
-	uint32 borders, enum orientation orientation)
+	uint32 borders, orientation orientation)
 {
 	_DrawButtonBackground(view, rect, updateRect, 0.0f, 0.0f, 0.0f, 0.0f,
 		base, flags, borders, orientation);
@@ -153,7 +153,7 @@ BControlLook::DrawButtonBackground(BView* view, BRect& rect,
 void
 BControlLook::DrawButtonBackground(BView* view, BRect& rect,
 	const BRect& updateRect, float radius, const rgb_color& base, uint32 flags,
-	uint32 borders, enum orientation orientation)
+	uint32 borders, orientation orientation)
 {
 	_DrawButtonBackground(view, rect, updateRect, radius, radius, radius,
 		radius, base, flags, borders, orientation);
@@ -164,7 +164,7 @@ void
 BControlLook::DrawButtonBackground(BView* view, BRect& rect,
 	const BRect& updateRect, float leftTopRadius, float rightTopRadius,
 	float leftBottomRadius, float rightBottomRadius, const rgb_color& base,
-	uint32 flags, uint32 borders, enum orientation orientation)
+	uint32 flags, uint32 borders, orientation orientation)
 {
 	_DrawButtonBackground(view, rect, updateRect, leftTopRadius,
 		rightTopRadius, leftBottomRadius, rightBottomRadius, base, flags,
@@ -553,7 +553,7 @@ BControlLook::DrawRadioButton(BView* view, BRect& rect, const BRect& updateRect,
 void
 BControlLook::DrawScrollBarBackground(BView* view, BRect& rect1, BRect& rect2,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
-	enum orientation orientation)
+	orientation orientation)
 {
 	DrawScrollBarBackground(view, rect1, updateRect, base, flags, orientation);
 	DrawScrollBarBackground(view, rect2, updateRect, base, flags, orientation);
@@ -563,7 +563,7 @@ BControlLook::DrawScrollBarBackground(BView* view, BRect& rect1, BRect& rect2,
 void
 BControlLook::DrawScrollBarBackground(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
-	enum orientation orientation)
+	orientation orientation)
 {
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
@@ -818,7 +818,7 @@ BControlLook::SliderBarColor(const rgb_color& base)
 void
 BControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 	const rgb_color& base, rgb_color leftFillColor, rgb_color rightFillColor,
-	float sliderScale, uint32 flags, enum orientation orientation)
+	float sliderScale, uint32 flags, orientation orientation)
 {
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
@@ -875,7 +875,7 @@ BControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 void
 BControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 	const rgb_color& base, rgb_color fillColor, uint32 flags,
-	enum orientation orientation)
+	orientation orientation)
 {
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
@@ -1021,7 +1021,7 @@ BControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 
 void
 BControlLook::DrawSliderThumb(BView* view, BRect& rect, const BRect& updateRect,
-	const rgb_color& base, uint32 flags, enum orientation orientation)
+	const rgb_color& base, uint32 flags, orientation orientation)
 {
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
@@ -1106,7 +1106,7 @@ BControlLook::DrawSliderThumb(BView* view, BRect& rect, const BRect& updateRect,
 void
 BControlLook::DrawSliderTriangle(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
-	enum orientation orientation)
+	orientation orientation)
 {
 	DrawSliderTriangle(view, rect, updateRect, base, base, flags, orientation);
 }
@@ -1115,7 +1115,7 @@ BControlLook::DrawSliderTriangle(BView* view, BRect& rect,
 void
 BControlLook::DrawSliderTriangle(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, const rgb_color& fill,
-	uint32 flags, enum orientation orientation)
+	uint32 flags, orientation orientation)
 {
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
@@ -1234,7 +1234,7 @@ BControlLook::DrawSliderTriangle(BView* view, BRect& rect,
 void
 BControlLook::DrawSliderHashMarks(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, int32 count,
-	hash_mark_location location, uint32 flags, enum orientation orientation)
+	hash_mark_location location, uint32 flags, orientation orientation)
 {
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
@@ -1482,7 +1482,7 @@ BControlLook::DrawInactiveTab(BView* view, BRect& rect, const BRect& updateRect,
 
 void
 BControlLook::DrawSplitter(BView* view, BRect& rect, const BRect& updateRect,
-	const rgb_color& base, enum orientation orientation, uint32 flags,
+	const rgb_color& base, orientation orientation, uint32 flags,
 	uint32 borders)
 {
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
@@ -2180,7 +2180,7 @@ void
 BControlLook::_DrawButtonBackground(BView* view, BRect& rect,
 	const BRect& updateRect, float leftTopRadius, float rightTopRadius,
 	float leftBottomRadius, float rightBottomRadius, const rgb_color& base,
-	uint32 flags, uint32 borders, enum orientation orientation)
+	uint32 flags, uint32 borders, orientation orientation)
 {
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
@@ -2886,7 +2886,7 @@ BControlLook::_DrawRoundBarCorner(BView* view, BRect& rect,
 	const rgb_color& frameLightColor, const rgb_color& frameShadowColor,
 	const rgb_color& fillLightColor, const rgb_color& fillShadowColor,
 	float leftInset, float topInset, float rightInset, float bottomInset,
-	enum orientation orientation)
+	orientation orientation)
 {
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
@@ -3102,7 +3102,7 @@ BControlLook::_BevelShadowColor(const rgb_color& base, uint32 flags)
 void
 BControlLook::_FillGradient(BView* view, const BRect& rect,
 	const rgb_color& base, float topTint, float bottomTint,
-	enum orientation orientation)
+	orientation orientation)
 {
 	BGradientLinear gradient;
 	_MakeGradient(gradient, rect, base, topTint, bottomTint, orientation);
@@ -3113,7 +3113,7 @@ BControlLook::_FillGradient(BView* view, const BRect& rect,
 void
 BControlLook::_FillGlossyGradient(BView* view, const BRect& rect,
 	const rgb_color& base, float topTint, float middle1Tint,
-	float middle2Tint, float bottomTint, enum orientation orientation)
+	float middle2Tint, float bottomTint, orientation orientation)
 {
 	BGradientLinear gradient;
 	_MakeGlossyGradient(gradient, rect, base, topTint, middle1Tint,
@@ -3125,7 +3125,7 @@ BControlLook::_FillGlossyGradient(BView* view, const BRect& rect,
 void
 BControlLook::_MakeGradient(BGradientLinear& gradient, const BRect& rect,
 	const rgb_color& base, float topTint, float bottomTint,
-	enum orientation orientation) const
+	orientation orientation) const
 {
 	gradient.AddColor(tint_color(base, topTint), 0);
 	gradient.AddColor(tint_color(base, bottomTint), 255);
@@ -3141,7 +3141,7 @@ void
 BControlLook::_MakeGlossyGradient(BGradientLinear& gradient, const BRect& rect,
 	const rgb_color& base, float topTint, float middle1Tint,
 	float middle2Tint, float bottomTint,
-	enum orientation orientation) const
+	orientation orientation) const
 {
 	gradient.AddColor(tint_color(base, topTint), 0);
 	gradient.AddColor(tint_color(base, middle1Tint), 132);
@@ -3157,7 +3157,7 @@ BControlLook::_MakeGlossyGradient(BGradientLinear& gradient, const BRect& rect,
 
 void
 BControlLook::_MakeButtonGradient(BGradientLinear& gradient, BRect& rect,
-	const rgb_color& base, uint32 flags, enum orientation orientation) const
+	const rgb_color& base, uint32 flags, orientation orientation) const
 {
 	float topTint = 0.49;
 	float middleTint1 = 0.62;

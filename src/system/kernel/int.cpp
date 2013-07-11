@@ -457,7 +457,7 @@ reserve_io_interrupt_vectors(long count, long startVector)
 }
 
 
-/*!	Allocate \a count contigous interrupt vectors. The vectors are allocated
+/*!	Allocate \a count contiguous interrupt vectors. The vectors are allocated
 	as available so that they do not overlap with any other reserved vector.
 	The first vector to be used is returned in \a startVector on success.
 */

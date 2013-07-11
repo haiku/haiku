@@ -251,6 +251,8 @@ private:
 			void				_HandleInputMethodLocationRequest();
 			void				_CancelInputMethod();
 
+			void				_UpdateModifiers();
+
 			void				_NextState(State* state);
 
 private:

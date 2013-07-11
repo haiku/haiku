@@ -52,10 +52,10 @@
 
 
 /*!
-	\fn BGroupLayout::BGroupLayout(enum orientation orientation, float spacing)
+	\fn BGroupLayout::BGroupLayout(orientation orientation, float spacing)
 	\brief Creates a new BGroupLayout.
 
-	\param orientation The #orientation of this BGroupLayout.
+	\param orientation The orientation of this BGroupLayout.
 	\param spacing The spacing between BLayoutItems in this BGroupLayout.
 */
 
@@ -95,7 +95,7 @@
 
 
 /*!
-	\fn void BGroupLayout::SetOrientation(enum orientation orientation)
+	\fn void BGroupLayout::SetOrientation(orientation orientation)
 	\brief Set the #orientation of this BGroupLayout.
 	\param orientation The new #orientation of this BGroupLayout.
 */

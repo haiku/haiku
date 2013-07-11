@@ -268,17 +268,6 @@
 
 
 /*!
-	\fn void BListView::KeyUp(const char* bytes, int32 numBytes)
-	\brief Hook method that is called when a keyboard key is released.
-
-	\param bytes The \a bytes representing the keys released.
-	\param numBytes The size of \a bytes.
-
-	\see BView::KeyUp()
-*/
-
-
-/*!
 	\fn void BListView::MouseDown(BPoint point)
 	\brief Hook method that is called when a mouse button is pushed down while
 	       the cursor is contained in the view.
@@ -475,7 +464,7 @@
 
 /*!
 	\fn bool BListView::AddList(BList* list)
-	\fn Add a \a list of list items to the end of the list view.
+	\brief Add a \a list of list items to the end of the list view.
 
 	\param list The \a list of list items to add.
 
@@ -698,7 +687,7 @@
 
 
 /*!
-	\fn void BListView::DoForEach(bool (*func)(BListItem*))
+	\fn void BListView::DoForEach(bool (*func)(BListItem* item))
 	\brief Calls the specified function on each item in the list.
 
 	The \a func is called on the items in order starting with the item at index 0
@@ -712,7 +701,8 @@
 
 
 /*!
-	\fn void BListView::DoForEach(bool (*func)(BListItem*, void*), void* arg)
+	\fn void BListView::DoForEach(bool (*func)(BListItem* item, void* arg),
+		void* arg)
 	\brief Calls the specified function on each item in the list.
 
 	The \a func is called on the items in order starting with the item at index 0
@@ -723,6 +713,7 @@
 	as the second argument.
 
 	\param func The function to call on each item.
+	\param arg The second argument of the function.
 */
 
 
