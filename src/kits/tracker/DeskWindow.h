@@ -75,24 +75,20 @@ protected:
 	virtual BPoseView* NewPoseView(Model*, BRect, uint32);
 
 	virtual void WorkspaceActivated(int32, bool);
-	virtual	void MenusBeginning();
 	virtual void MessageReceived(BMessage*);
 
 private:
+	void InitAddonsList(bool);
+	void ApplyShortcutPreferences(bool);
+
 	BShelf* fDeskShelf;
 		// shelf for replicant support
 	BPopUpMenu* fTrashContextMenu;
 
 	BRect fOldFrame;
 
-	// in the desktop window addon shortcuts have to be added by AddShortcut
-	// and we don't always get the MenusBeginning call to check for new
-	// addons/update the shortcuts -- instead we need to node monitor the
-	// addon directory and keep a dirty flag that triggers shortcut
-	// reinstallation
-	bool fShouldUpdateAddonShortcuts;
-	std::set<uint32> fCurrentAddonShortcuts;
-		// keeps track of which shortcuts are installed for Tracker addons
+	node_ref* fNodeRef;
+	char* fShortcutsSettings;
 
 	typedef BContainerWindow _inherited;
 };
