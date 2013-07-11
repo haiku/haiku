@@ -3,9 +3,9 @@ SubDir HAIKU_TOP src add-ons tracker filetype ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 # TODO: does not seem to work:
-AddResources FileType-F : FileType.rdef ;
+AddResources FileType : FileType.rdef ;
 
-Addon FileType-F :
+Addon FileType :
 	FileType.cpp
 
 	: be tracker

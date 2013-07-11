@@ -5,14 +5,14 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders mail ;
 
 AddResources Mark\ as… : MarkAs.rdef ;
-AddResources Mark\ as\ Read-R : MarkAsRead.rdef ;
+AddResources Mark\ as\ Read : MarkAsRead.rdef ;
 
 Addon Mark\ as… :
 	MarkAs.cpp
 	: be tracker $(TARGET_LIBSUPC++) libmail.so
 ;
 
-Addon Mark\ as\ Read-R :
+Addon Mark\ as\ Read :
 	MarkAsRead.cpp
 	: be tracker $(TARGET_LIBSUPC++) libmail.so
 ;
