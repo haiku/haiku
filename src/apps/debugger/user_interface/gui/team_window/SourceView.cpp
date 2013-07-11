@@ -902,43 +902,42 @@ SourceView::MarkerView::Draw(BRect updateRect)
 	// get the lines intersecting with the update rect
 	int32 minLine, maxLine;
 	GetLineRange(updateRect, minLine, maxLine);
-	if (minLine > maxLine)
-		return;
+	if (minLine <= maxLine) {
+		// get the markers in that range
+		SourceView::MarkerManager::MarkerList markers;
+		fMarkerManager->GetMarkers(minLine, maxLine, markers);
 
-	// get the markers in that range
-	SourceView::MarkerManager::MarkerList markers;
-	fMarkerManager->GetMarkers(minLine, maxLine, markers);
+		float width = Bounds().Width();
 
-	float width = Bounds().Width();
+		AutoLocker<SourceCode> sourceLocker(fSourceCode);
 
-	AutoLocker<SourceCode> sourceLocker(fSourceCode);
+		int32 markerIndex = 0;
+		for (int32 line = minLine; line <= maxLine; line++) {
+			bool drawBreakpointOptionMarker = true;
 
-	int32 markerIndex = 0;
-	for (int32 line = minLine; line <= maxLine; line++) {
-		bool drawBreakpointOptionMarker = true;
+			SourceView::MarkerManager::Marker* marker;
+			FillRect(LineRect(line), B_SOLID_LOW);
+			while ((marker = markers.ItemAt(markerIndex)) != NULL
+					&& marker->Line() == (uint32)line) {
+				marker->Draw(this, LineRect(line));
+				drawBreakpointOptionMarker = false;
+				markerIndex++;
+			}
 
-		SourceView::MarkerManager::Marker* marker;
-		FillRect(LineRect(line), B_SOLID_LOW);
-		while ((marker = markers.ItemAt(markerIndex)) != NULL
-				&& marker->Line() == (uint32)line) {
-			marker->Draw(this, LineRect(line));
-			drawBreakpointOptionMarker = false;
-			markerIndex++;
+			if (!drawBreakpointOptionMarker)
+				continue;
+
+			SourceLocation statementStart, statementEnd;
+			if (!fSourceCode->GetStatementLocationRange(SourceLocation(line),
+					statementStart, statementEnd)
+				|| statementStart.Line() != line) {
+				continue;
+			}
+
+			float y = ((float)line + 0.5f) * fFontInfo->lineHeight;
+			SetHighColor(fBreakpointOptionMarker);
+			FillEllipse(BPoint(width - 8, y), 2, 2);
 		}
-
-		if (!drawBreakpointOptionMarker)
-			continue;
-
-		SourceLocation statementStart, statementEnd;
-		if (!fSourceCode->GetStatementLocationRange(SourceLocation(line),
-				statementStart, statementEnd)
-			|| statementStart.Line() != line) {
-			continue;
-		}
-
-		float y = ((float)line + 0.5f) * fFontInfo->lineHeight;
-		SetHighColor(fBreakpointOptionMarker);
-		FillEllipse(BPoint(width - 8, y), 2, 2);
 	}
 
 	float y = (maxLine + 1) * fFontInfo->lineHeight;
@@ -1154,6 +1153,7 @@ SourceView::TextView::Draw(BRect updateRect)
 
 	y = (maxLine + 1) * fFontInfo->lineHeight;
 	if (y < updateRect.bottom) {
+		SetLowColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
 		FillRect(BRect(0.0, y, Bounds().right, updateRect.bottom),
 			B_SOLID_LOW);
 	}
