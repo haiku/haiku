@@ -430,14 +430,14 @@ void
 BreakConditionConfigWindow::_UpdateStopImageState()
 {
 	bool previousStop = fStopOnLoadEnabled;
-	bool previousCustomImages = fUseCustomImages;
+	bool previousCustomImages = fUseCustomImages && fStopOnLoadEnabled;
 
 	fStopOnLoadEnabled = fTeam->StopOnImageLoad();
 	fStopOnImageLoad->SetValue(
 		fStopOnLoadEnabled ? B_CONTROL_ON : B_CONTROL_OFF);
 	fUseCustomImages = fTeam->StopImageNameListEnabled();
 	fStopImageConstraints->Menu()
-		->ItemAt(fUseCustomImages ? 1 : 0)->SetMarked(true);
+		->ItemAt(fTeam->StopImageNameListEnabled() ? 1 : 0)->SetMarked(true);
 
 	fStopImageNames->MakeEmpty();
 	const BStringList& imageNames = fTeam->StopImageNames();
@@ -462,8 +462,9 @@ BreakConditionConfigWindow::_UpdateStopImageButtons(bool previousStop,
 	bool previousCustomImages)
 {
 	fStopImageConstraints->SetEnabled(fStopOnLoadEnabled);
-	if (!previousCustomImages && fUseCustomImages)
+	bool showCustomGroup = fUseCustomImages && fStopOnLoadEnabled;
+	if (!previousCustomImages && showCustomGroup)
 		fCustomImageGroup->Show();
-	else if (previousCustomImages && !fUseCustomImages)
+	else if (previousCustomImages && !showCustomGroup)
 		fCustomImageGroup->Hide();
 }
