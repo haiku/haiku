@@ -648,14 +648,14 @@ AddFilesToHaikuImage system add-ons media : $(SYSTEM_ADD_ONS_MEDIA) ;
 AddFilesToHaikuImage system add-ons media plugins
 	: $(SYSTEM_ADD_ONS_MEDIA_PLUGINS) ;
 AddFilesToHaikuImage system add-ons Tracker
-	: FileType-F Mark\ as… Mark\ as\ Read-R Open\ Target\ Folder-O
-	Open\ Terminal-T ZipOMatic-Z ;
+	: FileType Mark\ as… Mark\ as\ Read Open\ Target\ Folder
+	Open\ Terminal ZipOMatic ;
 AddSymlinkToHaikuImage system add-ons Tracker
-	: /boot/system/preferences/Backgrounds : Background-B ;
+	: /boot/system/preferences/Backgrounds : Background ;
 AddSymlinkToHaikuImage system add-ons Tracker
-	: /boot/system/apps/TextSearch : TextSearch-G ;
+	: /boot/system/apps/TextSearch : TextSearch ;
 AddSymlinkToHaikuImage system add-ons Tracker
-	: /boot/system/apps/DiskUsage : DiskUsage-I ;
+	: /boot/system/apps/DiskUsage : DiskUsage ;
 AddFilesToHaikuImage system add-ons input_server devices
 	: <input>keyboard <input>mouse <input>tablet <input>wacom ;
 AddFilesToHaikuImage system add-ons input_server filters
