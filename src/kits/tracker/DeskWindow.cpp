@@ -395,9 +395,7 @@ BDeskWindow::Quit()
 		fNavigationItem = 0;
 	}
 
-	while (fAddonsList->CountItems())
-		fAddonsList->RemoveItem(0);
-
+	fAddonsList->MakeEmpty(true);
 	delete fAddonsList;
 
 	delete fTrashContextMenu;
