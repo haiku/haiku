@@ -170,4 +170,9 @@ PackageRepository HaikuPorts
 	wpa_supplicant
 	yasm
 	zlib
+	:
+	# debuginfo packages
+	grep
+	sed
+	tar
 	;
