@@ -230,9 +230,9 @@ KeyCommandMap::MessageReceived(BMessage* msg)
 				dev_t device;
 				ino_t node;
 				if (msg->FindInt32("device", &device) != B_OK
-					&& msg->FindInt64("node", &node) != B_OK
-					&& device != fNodeRef.device
-					&& node != fNodeRef.node)
+					|| msg->FindInt64("node", &node) != B_OK
+					|| device != fNodeRef.device
+					|| node != fNodeRef.node)
 					break;
 			}
 		}
@@ -240,12 +240,9 @@ KeyCommandMap::MessageReceived(BMessage* msg)
 		{
 			BMessage fileMsg;
 			BFile file(fFileName, B_READ_ONLY);
+			BList* newList = new BList;
+			BList* oldList = NULL;
 			if (file.InitCheck() == B_OK && fileMsg.Unflatten(&file) == B_OK) {
-				BList* newList = new BList;
-
-				// whatever this is set to will be deleted below.
-				// defaults to no deletion
-				BList* oldList = NULL;
 
 				file.GetNodeRef(&fNodeRef);
 				int i = 0;
@@ -261,7 +258,7 @@ KeyCommandMap::MessageReceived(BMessage* msg)
 						
 						// Leave handling of add-ons shortcuts to Tracker
 						BString command;
-						if (actMsg.FindString("largv", &command) == B_OK) {
+						if (msg.FindString("command", &command) == B_OK) {
 							BPath path;
 							if (find_directory(B_SYSTEM_ADDONS_DIRECTORY, &path) == B_OK) {
 								path.Append("Tracker/");
@@ -295,18 +292,20 @@ KeyCommandMap::MessageReceived(BMessage* msg)
 							delete archive;
 					}
 				}
-
-				if (fSyncSpecs.Lock()) {
-					// swap in the new list
-					oldList = fSpecs;
-					fSpecs = newList;
-					fSyncSpecs.Unlock();
-				} else {
-					// wtf? This shouldn't happen...
-					oldList = newList; // but clean up if it does
-				}
-				_DeleteHKSList(oldList);
+			} else {
+				fNodeRef.device = -1;
+				fNodeRef.node = -1;
 			}
+			if (fSyncSpecs.Lock()) {
+				// swap in the new list
+				oldList = fSpecs;
+				fSpecs = newList;
+				fSyncSpecs.Unlock();
+			} else {
+				// wtf? This shouldn't happen...
+				oldList = newList; // but clean up if it does
+			}
+			_DeleteHKSList(oldList);
 		}
 		break;
 	}
@@ -320,7 +319,7 @@ KeyCommandMap::_DeleteHKSList(BList* l)
 	if (l != NULL) {
 		int num = l->CountItems();
 		for (int i = 0; i < num; i++)
-			delete ((hks*) l->ItemAt(0));
+			delete ((hks*) l->ItemAt(i));
 		delete l;
 	}
 }
