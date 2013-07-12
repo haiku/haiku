@@ -23,6 +23,7 @@ rule AddRepositoryPackage repository : architecture : baseName : version
 
 
 rule AddRepositoryPackages repository : architecture : packages : sourcePackages
+	: debugInfoPackages
 {
 	local package ;
 	for package in $(packages) {
@@ -35,12 +36,16 @@ rule AddRepositoryPackages repository : architecture : packages : sourcePackages
 			AddRepositoryPackage $(repository) : source : $(baseName)_source
 				: $(version) ;
 		}
+		if $(baseName) in $(debugInfoPackages) {
+			AddRepositoryPackage $(repository) : $(architecture)
+				: $(baseName)_debuginfo : $(version) ;
+		}
 	}
 }
 
 
 rule PackageRepository repository : architecture : repositoryUrl : anyPackages
-	: packages : sourcePackages
+	: packages : sourcePackages : debugInfoPackages
 {
 	repository = $(repository:G=repository) ;
 
@@ -54,9 +59,9 @@ rule PackageRepository repository : architecture : repositoryUrl : anyPackages
 		= $(HAIKU_REPOSITORY_JAMFILE) ;
 
 	AddRepositoryPackages $(repository) : any : $(anyPackages)
-		: $(sourcePackages) ;
+		: $(sourcePackages) : $(debugInfoPackages) ;
 	AddRepositoryPackages $(repository) : $(architecture) : $(packages)
-		: $(sourcePackages) ;
+		: $(sourcePackages) : $(debugInfoPackages) ;
 
 	# build package list file
 	local packageListFile = $(repository:G=repository-package-list)-packages ;
