@@ -110,4 +110,4 @@ resource mini_icon array {
 
 #endif // HAIKU_TARGET_PLATFORM_HAIKU
 
-resource(100, "default_shortcut") "F";
+resource(100, "BEOS:default_shortcut") "F";

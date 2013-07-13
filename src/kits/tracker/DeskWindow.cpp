@@ -68,7 +68,7 @@ const char* kShelfPath = "tracker_shelf";
 	// replicant support
 
 const char* kShortcutsSettings = "shortcuts_settings";
-const char* kDefaultShortcut = "default_shortcut";
+const char* kDefaultShortcut = "BEOS:default_shortcut";
 const uint32 kDefaultModifiers = B_OPTION_KEY | B_COMMAND_KEY;
 
 static struct AddonShortcut*
