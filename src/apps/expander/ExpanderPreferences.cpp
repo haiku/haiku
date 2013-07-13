@@ -140,6 +140,9 @@ ExpanderPreferences::ExpanderPreferences(BMessage* settings)
 			.SetInsets(kSpacing, kSpacing, kSpacing, kSpacing)
 		.End();
 
+	fDestText->SetExplicitAlignment(
+		BAlignment(B_ALIGN_HORIZONTAL_UNSET, B_ALIGN_VERTICAL_CENTER));
+
 	CenterOnScreen();
 
 	_ReadSettings();
