@@ -26,6 +26,7 @@
 #include <package/PackageInfo.h>
 
 #include "package.h"
+#include "PackageInfoPrinter.h"
 
 
 using namespace BPackageKit;
@@ -81,6 +82,7 @@ template<typename VersionPolicy>
 struct PackageContentListHandler : VersionPolicy::PackageContentHandler {
 	PackageContentListHandler(bool listAttributes)
 		:
+		fPrinter(),
 		fLevel(0),
 		fListAttribute(listAttributes)
 	{
@@ -167,182 +169,13 @@ struct PackageContentListHandler : VersionPolicy::PackageContentHandler {
 	virtual status_t HandlePackageAttribute(
 		const BPackageInfoAttributeValue& value)
 	{
-		switch (value.attributeID) {
-			case B_PACKAGE_INFO_NAME:
-				printf("package-attributes:\n");
-				printf("\tname: %s\n", value.string);
-				break;
+		if (value.attributeID == B_PACKAGE_INFO_NAME)
+			printf("package-attributes:\n");
 
-			case B_PACKAGE_INFO_SUMMARY:
-				printf("\tsummary: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_DESCRIPTION:
-				printf("\tdescription: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_VENDOR:
-				printf("\tvendor: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_PACKAGER:
-				printf("\tpackager: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_BASE_PACKAGE:
-				printf("\tbase package: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_FLAGS:
-				if (value.unsignedInt == 0)
-					break;
-				printf("\tflags:\n");
-				if ((value.unsignedInt & B_PACKAGE_FLAG_APPROVE_LICENSE) != 0)
-					printf("\t\tapprove_license\n");
-				if ((value.unsignedInt & B_PACKAGE_FLAG_SYSTEM_PACKAGE) != 0)
-					printf("\t\tsystem_package\n");
-				break;
-
-			case B_PACKAGE_INFO_ARCHITECTURE:
-				printf("\tarchitecture: %s\n",
-					BPackageInfo::kArchitectureNames[value.unsignedInt]);
-				break;
-
-			case B_PACKAGE_INFO_VERSION:
-				printf("\tversion: ");
-				_PrintPackageVersion(value.version);
-				printf("\n");
-				break;
-
-			case B_PACKAGE_INFO_COPYRIGHTS:
-				printf("\tcopyright: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_LICENSES:
-				printf("\tlicense: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_URLS:
-				printf("\tURL: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_SOURCE_URLS:
-				printf("\tsource URL: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_PROVIDES:
-				printf("\tprovides: %s", value.resolvable.name);
-				if (value.resolvable.haveVersion) {
-					printf(" = ");
-					_PrintPackageVersion(value.resolvable.version);
-				}
-				if (value.resolvable.haveCompatibleVersion) {
-					printf(" (compatible >= ");
-					_PrintPackageVersion(value.resolvable.compatibleVersion);
-					printf(")");
-				}
-				printf("\n");
-				break;
-
-			case B_PACKAGE_INFO_REQUIRES:
-				printf("\trequires: %s", value.resolvableExpression.name);
-				if (value.resolvableExpression.haveOpAndVersion) {
-					printf(" %s ", BPackageResolvableExpression::kOperatorNames[
-							value.resolvableExpression.op]);
-					_PrintPackageVersion(value.resolvableExpression.version);
-				}
-				printf("\n");
-				break;
-
-			case B_PACKAGE_INFO_SUPPLEMENTS:
-				printf("\tsupplements: %s", value.resolvableExpression.name);
-				if (value.resolvableExpression.haveOpAndVersion) {
-					printf(" %s ", BPackageResolvableExpression::kOperatorNames[
-							value.resolvableExpression.op]);
-					_PrintPackageVersion(value.resolvableExpression.version);
-				}
-				printf("\n");
-				break;
-
-			case B_PACKAGE_INFO_CONFLICTS:
-				printf("\tconflicts: %s", value.resolvableExpression.name);
-				if (value.resolvableExpression.haveOpAndVersion) {
-					printf(" %s ", BPackageResolvableExpression::kOperatorNames[
-							value.resolvableExpression.op]);
-					_PrintPackageVersion(value.resolvableExpression.version);
-				}
-				printf("\n");
-				break;
-
-			case B_PACKAGE_INFO_FRESHENS:
-				printf("\tfreshens: %s", value.resolvableExpression.name);
-				if (value.resolvableExpression.haveOpAndVersion) {
-					printf(" %s ", BPackageResolvableExpression::kOperatorNames[
-							value.resolvableExpression.op]);
-					_PrintPackageVersion(value.resolvableExpression.version);
-				}
-				printf("\n");
-				break;
-
-			case B_PACKAGE_INFO_REPLACES:
-				printf("\treplaces: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_GLOBAL_WRITABLE_FILES:
-				printf("\tglobal writable file: %s",
-					value.globalWritableFileInfo.path);
-				if (value.globalWritableFileInfo.isDirectory)
-					printf( " directory");
-				if (value.globalWritableFileInfo.updateType
-						< B_WRITABLE_FILE_UPDATE_TYPE_ENUM_COUNT) {
-					printf(" %s\n",
-						BPackageInfo::kWritableFileUpdateTypes[
-							value.globalWritableFileInfo.updateType]);
-				} else
-					printf("\n");
-				break;
-
-			case B_PACKAGE_INFO_USER_SETTINGS_FILES:
-				printf("\tuser settings file: %s",
-					value.userSettingsFileInfo.path);
-				if (value.globalWritableFileInfo.isDirectory) {
-					printf( " directory\n");
-				} else if (value.userSettingsFileInfo.templatePath != NULL) {
-					printf(" template %s\n",
-						value.userSettingsFileInfo.templatePath);
-				} else
-					printf("\n");
-				break;
-
-			case B_PACKAGE_INFO_USERS:
-				printf("\tuser: %s\n", value.user.name);
-				if (value.user.realName != NULL)
-					printf("\t\treal name: %s\n", value.user.realName);
-				if (value.user.home != NULL)
-					printf("\t\thome:      %s\n", value.user.home);
-				if (value.user.shell != NULL)
-					printf("\t\tshell:     %s\n", value.user.shell);
-				for (size_t i = 0; i < value.user.groupCount; i++)
-					printf("\t\tgroup:     %s\n", value.user.groups[i]);
-				break;
-
-			case B_PACKAGE_INFO_GROUPS:
-				printf("\tgroup: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_POST_INSTALL_SCRIPTS:
-				printf("\tpost install script: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_INSTALL_PATH:
-				printf("\tinstall path: %s\n", value.string);
-				break;
-
-			default:
-				printf(
-					"*** Invalid package attribute section: unexpected "
-					"package attribute id %d encountered\n", value.attributeID);
-				return B_BAD_DATA;
+		if (!fPrinter.PrintAttribute(value)) {
+			printf("*** Invalid package attribute section: unexpected "
+				"package attribute id %d encountered\n", value.attributeID);
+			return B_BAD_DATA;
 		}
 
 		return B_OK;
@@ -373,8 +206,9 @@ private:
 	}
 
 private:
-	int		fLevel;
-	bool	fListAttribute;
+	PackageInfoPrinter	fPrinter;
+	int					fLevel;
+	bool				fListAttribute;
 };
 
 
