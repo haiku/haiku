@@ -167,6 +167,7 @@ LoadAddOnDir(directory_which dirName, BDeskWindow* window,
 					item->key = shortcut[0];
 				AddOneShortcut(model, item->key, kDefaultModifiers, window);
 				item->defaultKey = item->key;
+				item->modifiers = kDefaultModifiers;
 				list->AddItem(item);
 			}
 			free(name);
@@ -309,14 +310,10 @@ BDeskWindow::ApplyShortcutPreferences(bool update)
 		while (fileMsg.FindMessage("spec", i++, &message) == B_OK) {
 	
 			int32 key;
-			BMessage actMsg;
-			
-			if (message.FindInt32("key", &key) == B_OK
-				&& message.FindMessage("act", &actMsg) == B_OK) {
-
+			if (message.FindInt32("key", &key) == B_OK) {
 				// only handle shortcuts referring add-ons
 				BString command;
-				if (actMsg.FindString("largv", &command) != B_OK)
+				if (message.FindString("command", &command) != B_OK)
 					continue;
 				BPath path;
 				bool isInAddons = false;
@@ -347,8 +344,9 @@ BDeskWindow::ApplyShortcutPreferences(bool update)
 				const char* shortcut = GetKeyName(key);
 				if (strlen(shortcut) != 1)
 					continue;
-			
-				uint32 modifiers = 0;
+
+				uint32 modifiers = B_COMMAND_KEY;
+					// it's required by interface kit to at least have B_COMMAND_KEY
 				int32 value;
 				if (message.FindInt32("mcidx", 0, &value) == B_OK)
 					modifiers |= (value != 0 ? B_SHIFT_KEY : 0);
@@ -356,14 +354,8 @@ BDeskWindow::ApplyShortcutPreferences(bool update)
 				if (message.FindInt32("mcidx", 1, &value) == B_OK)
 					modifiers |= (value != 0 ? B_CONTROL_KEY : 0);
 
-				if (message.FindInt32("mcidx", 2, &value) == B_OK)
-					modifiers |= (value != 0 ? B_COMMAND_KEY : 0);
-
 				if (message.FindInt32("mcidx", 3, &value) == B_OK)
 					modifiers |= (value != 0 ? B_OPTION_KEY : 0);
-
-				if (modifiers == 0)
-					modifiers = kDefaultModifiers;
 
 				Model model(&entry);
 				AddonShortcut* item = fAddonsList->EachElement(FindElement,
