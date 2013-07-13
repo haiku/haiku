@@ -26,6 +26,7 @@
 #include <PopUpMenu.h>
 #include <Roster.h>
 #include <String.h>
+#include <StringForSize.h>
 #include <Volume.h>
 
 #include <tracker_private.h>
@@ -456,7 +457,7 @@ PieView::_DrawDirectory(BRect b, FileInfo* info, float parentSpan,
 
 			// Show total volume capacity.
 			char label[B_PATH_NAME_LENGTH];
-			size_to_string(volCapacity, label, sizeof(label));
+			string_for_size(volCapacity, label, sizeof(label));
 			SetHighColor(kPieBGColor);
 			SetDrawingMode(B_OP_OVER);
 			DrawString(label, BPoint(cx - StringWidth(label) / 2.0,
