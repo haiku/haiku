@@ -140,7 +140,7 @@ EditableCatalog::WriteToResource(const entry_ref& appOrAddOnRef)
 
 void EditableCatalog::MakeEmpty()
 {
-	if (fCatalogData == NULL)
+	if (fCatalogData != NULL)
 		fCatalogData->MakeEmpty();
 }
 
