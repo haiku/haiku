@@ -65,6 +65,7 @@ BPackageInfo::kArchitectureNames[B_PACKAGE_ARCHITECTURE_ENUM_COUNT] = {
 	"x86",
 	"x86_gcc2",
 	"source",
+	"x86_64",
 };
 
 
