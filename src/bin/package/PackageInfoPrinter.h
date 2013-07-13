@@ -21,6 +21,89 @@ using BPackageKit::BHPKG::BUserSettingsFileInfoData;
 
 class PackageInfoPrinter {
 public:
+	void PrintPackageInfo(const BPackageInfo& info)
+	{
+		PrintName(info.Name());
+		PrintSummary(info.Summary());
+		PrintDescription(info.Description());
+		PrintVendor(info.Vendor());
+		PrintPackager(info.Packager());
+
+		if (!info.BasePackage().IsEmpty())
+			PrintBasePackage(info.BasePackage());
+
+		PrintFlags(info.Flags());
+		PrintArchitecture((uint32)info.Architecture());
+		PrintVersion(info.Version());
+
+		int32 count = info.CopyrightList().CountStrings();
+		for (int32 i = 0; i < count; i++)
+			PrintCopyright(info.CopyrightList().StringAt(i));
+
+		count = info.LicenseList().CountStrings();
+		for (int32 i = 0; i < count; i++)
+			PrintLicense(info.LicenseList().StringAt(i));
+
+		count = info.URLList().CountStrings();
+		for (int32 i = 0; i < count; i++)
+			PrintUrl(info.URLList().StringAt(i));
+
+		count = info.SourceURLList().CountStrings();
+		for (int32 i = 0; i < count; i++)
+			PrintSourceUrl(info.SourceURLList().StringAt(i));
+
+		count = info.ProvidesList().CountItems();
+		for (int32 i = 0; i < count; i++)
+			PrintProvides(*info.ProvidesList().ItemAt(i));
+
+		count = info.RequiresList().CountItems();
+		for (int32 i = 0; i < count; i++)
+			PrintRequires(*info.RequiresList().ItemAt(i));
+
+		count = info.SupplementsList().CountItems();
+		for (int32 i = 0; i < count; i++)
+			PrintSupplements(*info.SupplementsList().ItemAt(i));
+
+		count = info.ConflictsList().CountItems();
+		for (int32 i = 0; i < count; i++)
+			PrintConflicts(*info.ConflictsList().ItemAt(i));
+
+		count = info.FreshensList().CountItems();
+		for (int32 i = 0; i < count; i++)
+			PrintFreshens(*info.FreshensList().ItemAt(i));
+
+		count = info.ReplacesList().CountStrings();
+		for (int32 i = 0; i < count; i++)
+			PrintReplaces(info.ReplacesList().StringAt(i));
+
+		count = info.GlobalWritableFileInfos().CountItems();
+		for (int32 i = 0; i < count; i++)
+			PrintGlobalWritableFile(*info.GlobalWritableFileInfos().ItemAt(i));
+
+		count = info.UserSettingsFileInfos().CountItems();
+		for (int32 i = 0; i < count; i++)
+			PrintUserSettingsFile(*info.UserSettingsFileInfos().ItemAt(i));
+
+		count = info.Users().CountItems();
+		for (int32 i = 0; i < count; i++)
+			PrintUser(*info.Users().ItemAt(i));
+
+		count = info.Groups().CountStrings();
+		for (int32 i = 0; i < count; i++)
+			PrintGroup(info.Groups().StringAt(i));
+
+		count = info.PostInstallScripts().CountStrings();
+		for (int32 i = 0; i < count; i++)
+			PrintPostInstallScript(info.PostInstallScripts().StringAt(i));
+
+		count = info.PostInstallScripts().CountStrings();
+		for (int32 i = 0; i < count; i++)
+			PrintPostInstallScript(info.PostInstallScripts().StringAt(i));
+
+		if (!info.InstallPath().IsEmpty())
+			PrintInstallPath(info.InstallPath());
+	}
+
 	bool PrintAttribute(const BPackageInfoAttributeValue& value)
 	{
 		switch (value.attributeID) {
@@ -181,11 +264,9 @@ public:
 				: "<invalid>");
 	}
 
-	void PrintVersion(const BPackageVersionData& version) const
+	void PrintVersion(const BPackageVersion& version) const
 	{
-		printf("\tversion: ");
-		_PrintPackageVersion(version);
-		printf("\n");
+		printf("\tversion: %s\n", version.ToString().String());
 	}
 
 	void PrintCopyright(const char* copyright) const
@@ -208,38 +289,36 @@ public:
 		printf("\tsource URL: %s\n", sourceUrl);
 	}
 
-	void PrintProvides(const BPackageResolvableData& provides) const
+	void PrintProvides(const BPackageResolvable& provides) const
 	{
-		printf("\tprovides: %s", provides.name);
-		if (provides.haveVersion) {
-			printf(" = ");
-			_PrintPackageVersion(provides.version);
-		}
-		if (provides.haveCompatibleVersion) {
-			printf(" (compatible >= ");
-			_PrintPackageVersion(provides.compatibleVersion);
-			printf(")");
+		printf("\tprovides: %s", provides.Name().String());
+		if (provides.Version().InitCheck() == B_OK)
+			printf(" = %s", provides.Version().ToString().String());
+
+		if (provides.CompatibleVersion().InitCheck() == B_OK) {
+			printf(" (compatible >= %s)",
+				provides.CompatibleVersion().ToString().String());
 		}
 		printf("\n");
 	}
 
-	void PrintRequires(const BPackageResolvableExpressionData& requires) const
+	void PrintRequires(const BPackageResolvableExpression& requires) const
 	{
 		_PrintResolvableExpression("requires", requires);
 	}
 
-	void PrintSupplements(const BPackageResolvableExpressionData& supplements)
+	void PrintSupplements(const BPackageResolvableExpression& supplements)
 		const
 	{
 		_PrintResolvableExpression("supplements", supplements);
 	}
 
-	void PrintConflicts(const BPackageResolvableExpressionData& conflicts) const
+	void PrintConflicts(const BPackageResolvableExpression& conflicts) const
 	{
 		_PrintResolvableExpression("conflicts", conflicts);
 	}
 
-	void PrintFreshens(const BPackageResolvableExpressionData& freshens) const
+	void PrintFreshens(const BPackageResolvableExpression& freshens) const
 	{
 		_PrintResolvableExpression("freshens", freshens);
 	}
@@ -249,40 +328,42 @@ public:
 		printf("\treplaces: %s\n", replaces);
 	}
 
-	void PrintGlobalWritableFile(const BGlobalWritableFileInfoData& info) const
+	void PrintGlobalWritableFile(const BGlobalWritableFileInfo& info) const
 	{
-		printf("\tglobal writable file: %s", info.path);
-		if (info.isDirectory)
+		printf("\tglobal writable file: %s", info.Path().String());
+		if (info.IsDirectory())
 			printf( " directory");
-		if (info.updateType < B_WRITABLE_FILE_UPDATE_TYPE_ENUM_COUNT) {
+		if (info.UpdateType() < B_WRITABLE_FILE_UPDATE_TYPE_ENUM_COUNT) {
 			printf(" %s\n",
-				BPackageInfo::kWritableFileUpdateTypes[info.updateType]);
+				BPackageInfo::kWritableFileUpdateTypes[info.UpdateType()]);
 		} else
 			printf("\n");
 	}
 
-	void PrintUserSettingsFile(const BUserSettingsFileInfoData& info) const
+	void PrintUserSettingsFile(const BUserSettingsFileInfo& info) const
 	{
-		printf("\tuser settings file: %s", info.path);
-		if (info.isDirectory)
+		printf("\tuser settings file: %s", info.Path().String());
+		if (info.IsDirectory())
 			printf( " directory\n");
-		else if (info.templatePath != NULL)
-			printf(" template %s\n", info.templatePath);
+		else if (!info.TemplatePath().IsEmpty())
+			printf(" template %s\n", info.TemplatePath().String());
 		else
 			printf("\n");
 	}
 
-	void PrintUser(const BUserData& user) const
+	void PrintUser(const BUser& user) const
 	{
-		printf("\tuser: %s\n", user.name);
-		if (user.realName != NULL)
-			printf("\t\treal name: %s\n", user.realName);
-		if (user.home != NULL)
-			printf("\t\thome:      %s\n", user.home);
-		if (user.shell != NULL)
-			printf("\t\tshell:     %s\n", user.shell);
-		for (size_t i = 0; i < user.groupCount; i++)
-			printf("\t\tgroup:     %s\n", user.groups[i]);
+		printf("\tuser: %s\n", user.Name().String());
+		if (!user.RealName().IsEmpty())
+			printf("\t\treal name: %s\n", user.RealName().String());
+		if (!user.Home().IsEmpty())
+			printf("\t\thome:      %s\n", user.Home().String());
+		if (!user.Shell().IsEmpty())
+			printf("\t\tshell:     %s\n", user.Shell().String());
+
+		int32 groupCount = user.Groups().CountStrings();
+		for (int32 i = 0; i < groupCount; i++)
+			printf("\t\tgroup:     %s\n", user.Groups().StringAt(i).String());
 	}
 
 	void PrintGroup(const char* group) const
@@ -301,24 +382,10 @@ public:
 	}
 
 private:
-	static void _PrintPackageVersion(const BPackageVersionData& version)
-	{
-		printf("%s", BPackageVersion(version).ToString().String());
-	}
-
 	void _PrintResolvableExpression(const char* fieldName,
-		const BPackageResolvableExpressionData& expression) const
+		const BPackageResolvableExpression& expression) const
 	{
-		printf("\t%s: %s", fieldName, expression.name);
-		if (expression.haveOpAndVersion) {
-			printf(" %s ",
-				expression.op < B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT
-					? BPackageResolvableExpression::kOperatorNames[
-						expression.op]
-					: "<invalid operator>");
-			_PrintPackageVersion(expression.version);
-		}
-		printf("\n");
+		printf("\t%s: %s\n", fieldName, expression.ToString().String());
 	}
 };
 

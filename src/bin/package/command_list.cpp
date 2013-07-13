@@ -12,6 +12,7 @@
 #include <string.h>
 #include <time.h>
 
+#include <Entry.h>
 #include <package/hpkg/PackageContentHandler.h>
 #include <package/hpkg/PackageEntry.h>
 #include <package/hpkg/PackageEntryAttribute.h>
@@ -356,6 +357,31 @@ command_list(int argc, const char* const* argv)
 		print_usage_and_exit(true);
 
 	const char* packageFileName = argv[optind++];
+
+	// If the file doesn't look like a package file, try to load it as a
+	// package info file.
+	if (!BString(packageFileName).EndsWith(".hpkg")) {
+		struct ErrorListener : BPackageInfo::ParseErrorListener {
+			virtual void OnError(const BString& msg, int line, int col)
+			{
+				fprintf(stderr, "%s:%d:%d: %s\n", fPath, line, col,
+					msg.String());
+			}
+
+			const char*	fPath;
+		} errorListener;
+		errorListener.fPath = packageFileName;
+
+		BPackageInfo info;
+		if (info.ReadFromConfigFile(BEntry(packageFileName), &errorListener)
+				!= B_OK) {
+			return 1;
+		}
+
+		printf("package-attributes:\n");
+		PackageInfoPrinter().PrintPackageInfo(info);
+		return 0;
+	}
 
 	BHPKG::BStandardErrorOutput errorOutput;
 
