@@ -78,18 +78,29 @@ struct VersionPolicyV2 {
 };
 
 
+enum ListMode {
+	LIST_ALL,
+	LIST_PATHS_ONLY,
+	LIST_META_INFO_ONLY
+};
+
+
 template<typename VersionPolicy>
 struct PackageContentListHandler : VersionPolicy::PackageContentHandler {
-	PackageContentListHandler(bool listAttributes)
+	PackageContentListHandler(bool listEntries, bool listAttributes)
 		:
 		fPrinter(),
 		fLevel(0),
-		fListAttribute(listAttributes)
+		fListEntries(listEntries),
+		fListAttribute(listEntries && listAttributes)
 	{
 	}
 
 	virtual status_t HandleEntry(typename VersionPolicy::PackageEntry* entry)
 	{
+		if (!fListEntries)
+			return B_OK;
+
 		fLevel++;
 
 		int indentation = (fLevel - 1) * 2;
@@ -162,6 +173,9 @@ struct PackageContentListHandler : VersionPolicy::PackageContentHandler {
 	virtual status_t HandleEntryDone(
 		typename VersionPolicy::PackageEntry* entry)
 	{
+		if (!fListEntries)
+			return B_OK;
+
 		fLevel--;
 		return B_OK;
 	}
@@ -208,6 +222,7 @@ private:
 private:
 	PackageInfoPrinter	fPrinter;
 	int					fLevel;
+	bool				fListEntries;
 	bool				fListAttribute;
 };
 
@@ -258,7 +273,7 @@ private:
 
 template<typename VersionPolicy>
 static void
-do_list(const char* packageFileName, bool listAttributes, bool filePathsOnly,
+do_list(const char* packageFileName, bool listAttributes, ListMode listMode,
 	bool ignoreVersionError)
 {
 	// open package
@@ -272,13 +287,23 @@ do_list(const char* packageFileName, bool listAttributes, bool filePathsOnly,
 	}
 
 	// list
-	if (filePathsOnly) {
-		PackageContentListPathsHandler<VersionPolicy> handler;
-		error = packageReader.ParseContent(&handler);
-	} else {
-		PackageContentListHandler<VersionPolicy> handler(listAttributes);
-		error = packageReader.ParseContent(&handler);
+	switch (listMode) {
+		case LIST_PATHS_ONLY:
+		{
+			PackageContentListPathsHandler<VersionPolicy> handler;
+			error = packageReader.ParseContent(&handler);
+			break;
+		}
+
+		case LIST_ALL:
+		case LIST_META_INFO_ONLY:
+		{
+			PackageContentListHandler<VersionPolicy> handler(
+				listMode != LIST_META_INFO_ONLY, listAttributes);
+			error = packageReader.ParseContent(&handler);
+		}
 	}
+
 	if (error != B_OK)
 		exit(1);
 
@@ -289,8 +314,8 @@ do_list(const char* packageFileName, bool listAttributes, bool filePathsOnly,
 int
 command_list(int argc, const char* const* argv)
 {
+	ListMode listMode = LIST_ALL;
 	bool listAttributes = false;
-	bool filePathsOnly = false;
 
 	while (true) {
 		static struct option sLongOptions[] = {
@@ -299,7 +324,7 @@ command_list(int argc, const char* const* argv)
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "+hap", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "+ahip", sLongOptions, NULL);
 		if (c == -1)
 			break;
 
@@ -308,12 +333,16 @@ command_list(int argc, const char* const* argv)
 				listAttributes = true;
 				break;
 
+			case 'i':
+				listMode = LIST_META_INFO_ONLY;
+				break;
+
 			case 'h':
 				print_usage_and_exit(false);
 				break;
 
 			case 'p':
-				filePathsOnly = true;
+				listMode = LIST_PATHS_ONLY;
 				break;
 
 			default:
@@ -331,10 +360,8 @@ command_list(int argc, const char* const* argv)
 	BHPKG::BStandardErrorOutput errorOutput;
 
 	// current package file format version
-	do_list<VersionPolicyV2>(packageFileName, listAttributes, filePathsOnly,
-		true);
-	do_list<VersionPolicyV1>(packageFileName, listAttributes, filePathsOnly,
-		false);
+	do_list<VersionPolicyV2>(packageFileName, listAttributes, listMode, true);
+	do_list<VersionPolicyV1>(packageFileName, listAttributes, listMode, false);
 
 	return 0;
 }

@@ -80,6 +80,7 @@ static const char* kUsage =
 	"    Lists the contents of package file <package>.\n"
 	"\n"
 	"    -a         - Also list the file attributes.\n"
+	"    -i         - Only print the meta information, not the files.\n"
 	"    -p         - Only print a list of file paths.\n"
 	"\n"
 	"Common Options:\n"
