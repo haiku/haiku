@@ -63,6 +63,13 @@ BasicFunctionDebugInfo::PrettyName() const
 }
 
 
+bool
+BasicFunctionDebugInfo::IsMain() const
+{
+	return false;
+}
+
+
 LocatableFile*
 BasicFunctionDebugInfo::SourceFile() const
 {

@@ -267,7 +267,8 @@ TeamDebugInfo::TeamDebugInfo(DebuggerInterface* debuggerInterface,
 	fSpecificInfos(10, true),
 	fFunctions(NULL),
 	fSourceFiles(NULL),
-	fTypeCache(NULL)
+	fTypeCache(NULL),
+	fMainFunction(NULL)
 {
 	fDebuggerInterface->AcquireReference();
 }
@@ -451,6 +452,12 @@ TeamDebugInfo::LoadImageDebugInfo(const ImageInfo& imageInfo,
 	status_t error = imageDebugInfo->FinishInit(fDebuggerInterface);
 	if (error != B_OK)
 		return error;
+
+	if (fMainFunction == NULL) {
+		FunctionInstance* instance = imageDebugInfo->MainFunction();
+		if (instance != NULL)
+			fMainFunction = instance;
+	}
 
 	_imageDebugInfo = imageDebugInfoReference.Detach();
 	return B_OK;
