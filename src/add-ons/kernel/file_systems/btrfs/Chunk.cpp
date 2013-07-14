@@ -30,8 +30,11 @@ Chunk::Chunk(struct btrfs_chunk* chunk, fsblock_t offset)
 	fChunkOffset = offset;
 	fChunk = (struct btrfs_chunk*)malloc(sizeof(struct btrfs_chunk)
 		+ chunk->StripeCount() * sizeof(struct btrfs_stripe));
-	if (fChunk == NULL)
+	if (fChunk == NULL) {
 		fInitStatus = B_NO_MEMORY;
+		return;
+	}
+
 	memcpy(fChunk, chunk, sizeof(struct btrfs_chunk)
 		+ chunk->StripeCount() * sizeof(struct btrfs_stripe));
 
