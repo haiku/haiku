@@ -787,7 +787,7 @@ BGridLayout::_ResizeGrid(int32 columnCount, int32 rowCount)
 
 	// delete the old, respectively on error the partially created grid
 	for (int32 i = 0; i < columnCount; i++)
-		delete grid[i];
+		delete[] grid[i];
 	delete[] grid;
 
 	return success;
