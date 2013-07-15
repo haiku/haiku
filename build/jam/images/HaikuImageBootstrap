@@ -35,7 +35,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	setversion setvolume seq sha1sum sha256sum shar shred shuf shutdown sleep
 	sort split stat strace stty su sum sync sysinfo
 	tac tail tcpdump tcptester tee telnet telnetd test timeout top touch
-	tput tr traceroute trash true truncate tsort tty
+	tr traceroute trash true truncate tsort tty
 	uname unchop unexpand unmount uniq unlink unshar unzip unzipsfx
 	<bin>updatedb uptime urlwrapper useradd uudecode uuencode
 	vdir version vmstat
@@ -46,7 +46,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 
 SYSTEM_APPS = [ FFilterByBuildFeatures
 	AboutSystem ActivityMonitor BootManager@x86 CharacterMap
-	DeskCalc Devices DiskProbe DiskUsage DriveSetup Debugger
+	DeskCalc Debugger Devices DiskProbe DiskUsage DriveSetup
 	Expander Installer LaunchBox
 	NetworkStatus PackageInstaller
 	PowerStatus ProcessController ShowImage
@@ -146,6 +146,7 @@ SYSTEM_ADD_ONS_DRIVERS_POWER = [ FFilterByBuildFeatures acpi_button@x86 ] ;
 SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
 	ata@ata pci ps2@x86,x86_64 isa@x86,x86_64
 	ide@ide scsi config_manager agp_gart@x86 usb firewire@x86 acpi@x86
+	virtio
 ] ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs bindfs btrfs exfat ext2 fat iso9660
 	attribute_overlay write_overlay ntfs packagefs reiserfs@x86 udf ;

@@ -33,8 +33,9 @@ if $(HAIKU_ATA_STACK) = 1 {
 		: generic_ide_pci it8211 legacy_sata silicon_image_3112 ide_isa@x86 ;
 }
 
-AddFilesToPackage add-ons kernel busses scsi : ahci ;
+AddFilesToPackage add-ons kernel busses scsi : ahci virtio_scsi ;
 AddFilesToPackage add-ons kernel busses usb : <usb>uhci <usb>ohci <usb>ehci ;
+AddFilesToPackage add-ons kernel busses virtio : virtio_pci ;
 AddFilesToPackage add-ons kernel console : vga_text ;
 AddFilesToPackage add-ons kernel debugger
 	: <kdebug>demangle <kdebug>disasm@x86 <kdebug>hangman
@@ -54,6 +55,7 @@ if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
 
 # drivers
 AddNewDriversToPackage disk scsi	: scsi_cd scsi_disk ;
+AddNewDriversToPackage disk virtual : virtio_block ;
 AddNewDriversToPackage power		: enhanced_speedstep@x86 ;
 AddNewDriversToPackage power		: acpi_battery@x86 ;
 #AddNewDriversToPackage display		: display_controls@x86 ;
@@ -216,6 +218,7 @@ AddBootModuleSymlinksToPackage
 	ide_isa@x86
 	<usb>uhci <usb>ohci <usb>ehci
 	scsi_cd scsi_disk usb_disk
+	virtio virtio_pci virtio_block virtio_scsi
 	efi_gpt
 	intel
 	bfs packagefs
