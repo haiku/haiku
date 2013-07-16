@@ -184,6 +184,11 @@ make install-gcc-cross || {
 # equivalent.
 rm -f $installDir/lib/gcc-lib/i586-pc-haiku/$haikuRequiredLegacyGCCVersion/include/math.h
 
+# Symlink the built-in C++ headers path to the sys-include directory. This is
+# not actually needed for cross compiling Haiku itself, but simplifies using the
+# cross compiler for building the bootstrap packages.
+(cd $installDir/include; ln -s ../i586-pc-haiku/sys-include/c++/2.95.3 g++)
+
 
 # cleanup
 
