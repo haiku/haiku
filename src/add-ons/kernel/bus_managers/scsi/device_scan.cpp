@@ -223,8 +223,20 @@ scsi_scan_lun(scsi_bus_info *bus, uchar target_id, uchar target_lun)
 	// solution 2: device drivers must scan devices before first use
 	// disadvantage: it takes time and driver must perform a task that
 	//   the bus_manager should really take care of
-	scsi_register_device(bus, target_id, target_lun, &new_inquiry_data);
-
+	res = scsi_register_device(bus, target_id, target_lun, &new_inquiry_data);
+	if (res == B_NAME_IN_USE) {
+		SHOW_FLOW0(3, "name in use");			
+		if (scsi_force_get_device(bus, target_id, target_lun, &device) != B_OK)
+			return B_OK;
+		// the device was already registered, let's tell our child to rescan it
+		device_node *childNode = NULL;
+		const device_attr attrs[] = { { NULL } };
+		if (pnp->get_next_child_node(bus->node, attrs, &childNode) == B_OK) {
+			pnp->rescan_node(childNode);
+			pnp->put_node(childNode);
+		}
+		scsi_put_forced_device(device);
+	}
 	return B_OK;
 
 err3:
