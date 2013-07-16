@@ -35,6 +35,7 @@
 #define VIRTIO_SCSI_F_HOTPLUG	0x0002	/* Host should enable hot plug/unplug
 					 * of new LUNs and targets.
 					 */
+#define VIRTIO_SCSI_F_CHANGE	0x0004	/* Host can change the config */
 
 #define VIRTIO_SCSI_CDB_SIZE	32
 #define VIRTIO_SCSI_SENSE_SIZE	96
@@ -138,6 +139,7 @@ struct virtio_scsi_config {
 #define VIRTIO_SCSI_T_NO_EVENT                 0
 #define VIRTIO_SCSI_T_TRANSPORT_RESET          1
 #define VIRTIO_SCSI_T_ASYNC_NOTIFY             2
+#define VIRTIO_SCSI_T_PARAM_CHANGE             3
 
 /* Reasons of transport reset event */
 #define VIRTIO_SCSI_EVT_RESET_HARD             0
