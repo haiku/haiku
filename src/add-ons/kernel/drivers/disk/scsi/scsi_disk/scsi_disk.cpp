@@ -595,6 +595,19 @@ das_register_child_devices(void* _cookie)
 }
 
 
+static status_t
+das_rescan_child_devices(void* _cookie)
+{
+	das_driver_info* info = (das_driver_info*)_cookie;
+	uint64 capacity = info->capacity;
+	update_capacity(info);
+	if (info->capacity != capacity)
+		sSCSIPeripheral->media_changed(info->scsi_periph_device);
+	return B_OK;
+}
+
+
+
 module_dependency module_dependencies[] = {
 	{SCSI_PERIPH_MODULE_NAME, (module_info**)&sSCSIPeripheral},
 	{B_DEVICE_MANAGER_MODULE_NAME, (module_info**)&sDeviceManager},
@@ -636,7 +649,7 @@ struct driver_module_info sSCSIDiskDriver = {
 	das_init_driver,
 	das_uninit_driver,
 	das_register_child_devices,
-	NULL,	// rescan
+	das_rescan_child_devices,	
 	NULL,	// removed
 };
 
