@@ -164,7 +164,7 @@ virtio_block_callback(void* cookie)
 {
 	virtio_block_driver_info* info = (virtio_block_driver_info*)cookie;
 
-	release_sem(info->sem_cb);
+	release_sem_etc(info->sem_cb, 1, B_DO_NOT_RESCHEDULE);
 }
 
 
