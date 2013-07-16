@@ -1257,7 +1257,7 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 				value = dataReader.ReadUnsignedLEB128(0);
 				break;
 			case DW_FORM_flag_present:
-				attributeValue.SetToFlag(dataReader.Read<uint8>(0) != 0);
+				attributeValue.SetToFlag(true);
 				break;
 			case DW_FORM_ref_sig8:
 				value = dataReader.Read<uint64>(0);
