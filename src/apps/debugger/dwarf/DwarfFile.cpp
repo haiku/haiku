@@ -1262,8 +1262,12 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 			case DW_FORM_ref_sig8:
 				value = dataReader.Read<uint64>(0);
 				break;
-			case DW_FORM_indirect:
 			case DW_FORM_sec_offset:
+				value = fCurrentCompilationUnit->IsDwarf64()
+					? dataReader.Read<uint64>(0)
+					: (uint64)dataReader.Read<uint32>(0);
+				break;
+			case DW_FORM_indirect:
 			default:
 				WARNING("Unsupported attribute form: %" B_PRIu32 "\n",
 					attributeForm);
