@@ -53,6 +53,13 @@ BaseUnit::AddDebugInfoEntry(DebugInfoEntry* entry, off_t offset)
 }
 
 
+bool
+BaseUnit::ContainsAbsoluteOffset(off_t offset) const
+{
+	return fHeaderOffset <= offset && fHeaderOffset + fTotalSize > offset;
+}
+
+
 void
 BaseUnit::SetSourceLanguage(const SourceLanguageInfo* language)
 {

@@ -45,6 +45,8 @@ public:
 			off_t				AbbreviationOffset() const
 									{ return fAbbreviationOffset; }
 
+			bool				ContainsAbsoluteOffset(off_t offset) const;
+
 			uint8				AddressSize() const	{ return fAddressSize; }
 			bool				IsDwarf64() const	{ return fIsDwarf64; }
 
