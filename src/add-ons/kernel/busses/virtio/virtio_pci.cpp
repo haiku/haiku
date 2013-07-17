@@ -575,16 +575,18 @@ supports_device(device_node* parent)
 		|| gDeviceManager->get_attr_uint16(parent, B_DEVICE_VENDOR_ID,
 				&vendorID, false) < B_OK
 		|| gDeviceManager->get_attr_uint16(parent, B_DEVICE_ID, &deviceID,
-				false) < B_OK)
+				false) < B_OK) {
 		return -1;
+	}
 
 	if (strcmp(bus, "pci") != 0)
 		return 0.0f;
 
 	if (vendorID == VIRTIO_PCI_VENDORID) {
 		if (deviceID < VIRTIO_PCI_DEVICEID_MIN
-			|| deviceID > VIRTIO_PCI_DEVICEID_MAX)
+			|| deviceID > VIRTIO_PCI_DEVICEID_MAX) {
 			return 0.0f;
+		}
 
 		pci_device_module_info* pci;
 		pci_device* device;
