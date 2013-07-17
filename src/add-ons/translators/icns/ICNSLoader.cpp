@@ -72,7 +72,7 @@ ICNSLoader::ICNSLoader(BPositionIO *stream)
 		&fIconFamily);
 	
 	if (status != 0) {
-		delete icnsDataBuffer;		
+		delete[] icnsDataBuffer;
 		return;
 	}
 
@@ -98,9 +98,9 @@ ICNSLoader::ICNSLoader(BPositionIO *stream)
 			
 	fFormatList.SortItems(compareTypes);
 	
-	delete icnsDataBuffer;
+	delete[] icnsDataBuffer;
 
-	fLoaded = true;	
+	fLoaded = true;
 }
 
 
@@ -177,7 +177,7 @@ ICNSLoader::GetIcon(BPositionIO *target, int index)
 		}
 		target->Write(rowBuff, iconImage.imageWidth * sizeof(uint32));
 	}				
-	delete rowBuff;	
+	delete[] rowBuff;	
 	icns_free_image(&iconImage);
 	
 	return B_OK;
