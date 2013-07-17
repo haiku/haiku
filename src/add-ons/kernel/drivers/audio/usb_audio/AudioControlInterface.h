@@ -122,6 +122,8 @@ public:
 							MixerUnit(AudioControlInterface* interface,
 								usb_audiocontrol_header_descriptor* Header);
 	virtual					~MixerUnit();
+	
+	virtual	const char*		Name() { return "Mixer"; }
 
 protected:
 			Vector<uint8>	fInputPins;
@@ -138,6 +140,7 @@ public:
 
 	virtual	AudioChannelCluster*
 							OutCluster();
+	virtual	const char*		Name() { return "Selector"; }
 
 // protected:
 			Vector<uint8>	fInputPins;
@@ -167,6 +170,7 @@ public:
 								usb_audiocontrol_header_descriptor* Header);
 	virtual					~EffectUnit();
 
+	virtual	const char*		Name() { return "Effect"; }
 protected:
 /*			uint16			fProcessType;
 			Vector<uint8>	fInputPins;
@@ -181,6 +185,8 @@ public:
 								usb_audiocontrol_header_descriptor* Header);
 	virtual					~ProcessingUnit();
 
+	virtual	const char*		Name() { return "Processing"; }
+
 protected:
 			uint16			fProcessType;
 			Vector<uint8>	fInputPins;
@@ -194,6 +200,8 @@ public:
 							ExtensionUnit(AudioControlInterface* interface,
 								usb_audiocontrol_header_descriptor* Header);
 	virtual					~ExtensionUnit();
+
+	virtual	const char*		Name() { return "Extension"; }
 
 protected:
 			uint16			fExtensionCode;
