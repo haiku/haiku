@@ -600,18 +600,21 @@ DwarfExpressionEvaluator::_Evaluate(ValuePieceLocation* _piece)
 
 			case DW_OP_call2:
 				TRACE_EXPR("  DW_OP_call2\n");
-				_Call(fDataReader.Read<uint16>(0), true);
+				_Call(fDataReader.Read<uint16>(0), dwarf_reference_type_local);
 				break;
 			case DW_OP_call4:
 				TRACE_EXPR("  DW_OP_call4\n");
-				_Call(fDataReader.Read<uint32>(0), true);
+				_Call(fDataReader.Read<uint32>(0), dwarf_reference_type_local);
 				break;
 			case DW_OP_call_ref:
 				TRACE_EXPR("  DW_OP_call_ref\n");
-				if (fContext->AddressSize() == 4)
-					_Call(fDataReader.Read<uint32>(0), false);
-				else
-					_Call(fDataReader.Read<uint64>(0), false);
+				if (fContext->AddressSize() == 4) {
+					_Call(fDataReader.Read<uint32>(0),
+						dwarf_reference_type_global);
+				} else {
+					_Call(fDataReader.Read<uint64>(0),
+						dwarf_reference_type_global);
+				}
 				break;
 
 			case DW_OP_piece:
@@ -746,7 +749,7 @@ DwarfExpressionEvaluator::_PushRegister(uint32 reg, target_addr_t offset)
 
 
 void
-DwarfExpressionEvaluator::_Call(uint64 offset, bool local)
+DwarfExpressionEvaluator::_Call(uint64 offset, uint8 refType)
 {
 	if (fDataReader.HasOverflow())
 		throw EvaluationException("unexpected end of expression");
@@ -754,7 +757,7 @@ DwarfExpressionEvaluator::_Call(uint64 offset, bool local)
 	// get the expression to "call"
 	const void* block;
 	off_t size;
-	if (fContext->GetCallTarget(offset, local, block, size) != B_OK)
+	if (fContext->GetCallTarget(offset, refType, block, size) != B_OK)
 		throw EvaluationException("failed to get call target");
 
 	// no expression is OK, then this is just a no-op

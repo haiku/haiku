@@ -507,4 +507,11 @@ enum {
 };
 
 
+enum dwarf_reference_type {
+	dwarf_reference_type_local = 0,
+	dwarf_reference_type_global,
+	dwarf_reference_type_signature
+};
+
+
 #endif	// DWARF_H
