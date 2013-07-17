@@ -43,7 +43,7 @@ BString *get_message()
 			bytesRead = fread(buf, 1, 512, file);
 			result->Append(buf, bytesRead);
 		}
-		fclose(file);
+		pclose(file);
 	}
 
 	// Just in case
