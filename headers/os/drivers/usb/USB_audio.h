@@ -335,6 +335,16 @@ enum { // Terminal Control Selectors
 	USB_AUDIO_COPY_PROTECT_CONTROL = 0x01
 };
 
+// R2: A.17.5 Mixer Unit Control Selectors
+enum {
+	USB_AUDIO_MU_CONTROL_UNDEFINED		= 0x00,
+	USB_AUDIO_MIXER_CONTROL				= 0x01,
+	USB_AUDIO_CLUSTER_CONTROL			= 0x02,
+	USB_AUDIO_UNDERFLOW_CONTROL			= 0x03,
+	USB_AUDIO_OVERFLOW_CONTROL			= 0x04,
+	USB_AUDIO_LATENCY_CONTROL			= 0x05
+};
+
 /* A.10.2 Feature Unit Control Selectors */
 enum {
 	USB_AUDIO_AC_FU_CONTROL_UNDEFINED	= 0x00,

@@ -29,6 +29,8 @@ public:
 
 			uint8			ChannelsCount()		{ return fOutChannelsNumber; }
 			uint32			ChannelsConfig()	{ return fChannelsConfig;	 }
+			
+			bool			HasChannel(uint32 location);
 
 protected:
 			uint8			fOutChannelsNumber;
@@ -102,6 +104,8 @@ public:
 							InputTerminal(AudioControlInterface* interface,
 								usb_audiocontrol_header_descriptor* Header);
 	virtual					~InputTerminal();
+	
+	virtual	const char*		Name();
 
 protected:
 };
@@ -112,6 +116,8 @@ public:
 							OutputTerminal(AudioControlInterface* interface,
 								usb_audiocontrol_header_descriptor* Header);
 	virtual					~OutputTerminal();
+
+	virtual	const char*		Name();
 
 protected:
 };
@@ -124,11 +130,13 @@ public:
 	virtual					~MixerUnit();
 	
 	virtual	const char*		Name() { return "Mixer"; }
+			bool			HasProgrammableControls();
+			bool			IsControlProgrammable(int inChannel, int outChannel);
 
-protected:
+//protected:
 			Vector<uint8>	fInputPins;
-			Vector<uint8>	fProgrammableControls;
-			uint8			fControlsBitmap;
+			Vector<uint8>	fControlsBitmap;
+			uint8			fBmControlsR2;
 };
 
 
@@ -253,6 +261,12 @@ protected:
 
 class AudioControlInterface {
 public:
+			enum {
+				kLeftChannel = 0,
+				kRightChannel = 1,
+				kChannels = 18
+			};
+
 							AudioControlInterface(Device* device);
 							~AudioControlInterface();
 
@@ -302,7 +316,19 @@ protected:
 			void			_ListSelectorUnitControl(int32& index,
 								int32 parentGroup, multi_mix_control_info* Info,
 								_AudioControl* control);
-			void			_InitGainLimits(multi_mix_control& Control);
+			void			_ListMixControlsForMixerUnit(int32& index,
+								multi_mix_control_info* Info,
+								_AudioControl* control);
+			void			_ListMixerUnitControls(int32& index,
+								multi_mix_control_info* Info,
+								Vector<multi_mix_control>& controls);
+			size_t			_CollectMixerUnitControls(
+								const uint32 controlIds[kChannels][kChannels],
+								size_t inLeft, size_t outLeft,
+								size_t inRight, size_t outRight,
+								const char* inputName, const char* name,
+								Vector<multi_mix_control>& Controls);
+			bool			_InitGainLimits(multi_mix_control& Control);
 
 			size_t			fInterface;
 			status_t		fStatus;
