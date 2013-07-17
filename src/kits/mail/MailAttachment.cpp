@@ -578,7 +578,7 @@ void
 BAttributedMailAttachment::SaveToDisk(BEntry *entry)
 {
 	BString path = "/tmp/";
-	char name[255] = "";
+	char name[B_FILE_NAME_LENGTH + 1] = "";
 	_data->FileName(name);
 	path << name;
 
