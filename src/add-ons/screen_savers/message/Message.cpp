@@ -146,13 +146,14 @@ Message::StartSaver(BView *view, bool preview)
 	// Get font families
 	int numFamilies = count_font_families();
 	for (int32 i = 0; i < numFamilies; i++) {
-		font_family *family = new font_family[1];
+		font_family* family = new font_family[1];
 		uint32 flags;
-		if (get_font_family(i, family, &flags) == B_OK) {
+		if (get_font_family(i, family, &flags) == B_OK
+			&& (flags & B_IS_FIXED) == 0) {
 			// Do not add fixed fonts
-			if (!(flags & B_IS_FIXED))
-				fFontFamilies.AddItem(family);
-		}
+			fFontFamilies.AddItem(family);
+		} else
+			delete[] family;
 	}
 
 	// Seed the random number generator
