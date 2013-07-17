@@ -583,9 +583,8 @@ supports_device(device_node* parent)
 
 	if (vendorID == VIRTIO_PCI_VENDORID) {
 		if (deviceID < VIRTIO_PCI_DEVICEID_MIN
-			&& deviceID > VIRTIO_PCI_DEVICEID_MAX) {
+			|| deviceID > VIRTIO_PCI_DEVICEID_MAX)
 			return 0.0f;
-		}
 
 		pci_device_module_info* pci;
 		pci_device* device;
