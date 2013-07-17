@@ -1378,6 +1378,7 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 				attributeValue.SetToString(dataReader.ReadString());
 				break;
 			case DW_FORM_block:
+			case DW_FORM_exprloc:
 				blockLength = dataReader.ReadUnsignedLEB128(0);
 				break;
 			case DW_FORM_block1:
@@ -1434,9 +1435,6 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 				value = dataReader.Read<uint64>(0);
 				break;
 			case DW_FORM_ref_udata:
-				value = dataReader.ReadUnsignedLEB128(0);
-				break;
-			case DW_FORM_exprloc:
 				value = dataReader.ReadUnsignedLEB128(0);
 				break;
 			case DW_FORM_flag_present:
@@ -1522,11 +1520,6 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 			case ATTRIBUTE_CLASS_FLAG:
 			case ATTRIBUTE_CLASS_STRING:
 				// already set
-				break;
-			case ATTRIBUTE_CLASS_EXPRESSION:
-				WARNING("Skipping unhandled attribute class expression.\n");
-				// TODO: implement
-				dataReader.Skip(value);
 				break;
 		}
 
