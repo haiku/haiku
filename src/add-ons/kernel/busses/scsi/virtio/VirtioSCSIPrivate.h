@@ -60,8 +60,9 @@ public:
 									void* buffer, size_t length);
 			
 private:
-	static	void				RequestCallback(void *cookie);
-			void				_Interrupt();
+	static	void				_RequestCallback(void* driverCookie,
+									void *cookie);
+			void				_RequestInterrupt();
 
 			device_node*		fNode;
 			scsi_bus 			fBus;

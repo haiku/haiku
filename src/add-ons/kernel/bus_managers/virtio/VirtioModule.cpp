@@ -96,11 +96,11 @@ virtio_alloc_queues(virtio_device cookie, size_t count, virtio_queue *queues)
 
 status_t
 virtio_setup_interrupt(virtio_device cookie, virtio_intr_func config_handler,
-	void* configCookie)
+	void *driverCookie)
 {
 	CALLED();
 	VirtioDevice *device = (VirtioDevice *)cookie;
-	return device->SetupInterrupt(config_handler, configCookie); 
+	return device->SetupInterrupt(config_handler, driverCookie); 
 }
 
 

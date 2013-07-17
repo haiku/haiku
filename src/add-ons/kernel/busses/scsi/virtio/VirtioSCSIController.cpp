@@ -84,7 +84,7 @@ VirtioSCSIController::VirtioSCSIController(device_node *node)
 	fEventVirtioQueue = virtioQueues[1];
 	fRequestVirtioQueue = virtioQueues[2];
 	
-	fStatus = fVirtio->setup_interrupt(fVirtioDevice, NULL, NULL);
+	fStatus = fVirtio->setup_interrupt(fVirtioDevice, NULL, this);
 	if (fStatus != B_OK) {
 		ERROR("interrupt setup failed (%s)\n", strerror(fStatus));
 		return;
@@ -206,7 +206,7 @@ VirtioSCSIController::ExecuteRequest(scsi_ccb *ccb)
 	}
 
 	fVirtio->queue_request_v(fRequestVirtioQueue, entries,
-		outCount, inCount, VirtioSCSIController::RequestCallback, this);
+		outCount, inCount, VirtioSCSIController::_RequestCallback, NULL);
 
 	result = fInterruptConditionEntry.Wait(B_RELATIVE_TIMEOUT,
 		fRequest->Timeout());
@@ -247,16 +247,16 @@ VirtioSCSIController::Control(uint8 targetID, uint32 op, void *buffer,
 
 
 void
-VirtioSCSIController::RequestCallback(void* cookie)
+VirtioSCSIController::_RequestCallback(void* driverCookie, void* cookie)
 {
 	CALLED();
-	VirtioSCSIController* controller = (VirtioSCSIController*)cookie;
-	controller->_Interrupt();
+	VirtioSCSIController* controller = (VirtioSCSIController*)driverCookie;
+	controller->_RequestInterrupt();
 }
 
 
 void
-VirtioSCSIController::_Interrupt()
+VirtioSCSIController::_RequestInterrupt()
 {
 	SpinLocker locker(fInterruptLock);
 	fInterruptCondition.NotifyAll();

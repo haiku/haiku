@@ -50,7 +50,8 @@ alloc_mem(void **virt, phys_addr_t *phy, size_t size, uint32 protection,
 
 class TransferDescriptor {
 public:
-								TransferDescriptor(uint16 size, 
+								TransferDescriptor(VirtioQueue* queue,
+									uint16 size, 
 									virtio_callback_func callback,
 									void *callbackCookie);
 								~TransferDescriptor();
@@ -58,6 +59,7 @@ public:
 			void				Callback();
 			uint16				Size() { return fDescriptorCount; }
 private:
+			VirtioQueue*		fQueue;
 			void*				fCookie;
 			virtio_callback_func fCallback;
 			struct vring_desc* 	fIndirect;
@@ -67,9 +69,10 @@ private:
 };
 
 
-TransferDescriptor::TransferDescriptor(uint16 size, 
+TransferDescriptor::TransferDescriptor(VirtioQueue* queue, uint16 size, 
 	virtio_callback_func callback, void *callbackCookie)
-	: fCookie(callbackCookie),
+	: fQueue(queue),
+	fCookie(callbackCookie),
 	fCallback(callback),
 	fDescriptorCount(size)
 {
@@ -85,7 +88,7 @@ void
 TransferDescriptor::Callback()
 {
 	if (fCallback != NULL)
-		fCallback(fCookie);
+		fCallback(fQueue->Device()->DriverCookie(), fCookie);
 }
 
 
@@ -226,8 +229,8 @@ VirtioQueue::QueueRequest(const physical_entry* vector, size_t readVectorCount,
 		return B_BUSY;
 
 	uint16 insertIndex = fRingHeadIndex;
-	fDescriptors[insertIndex] = new(std::nothrow) TransferDescriptor(count,
-		callback, callbackCookie);
+	fDescriptors[insertIndex] = new(std::nothrow) TransferDescriptor(this,
+		count, callback, callbackCookie);
 	if (fDescriptors[insertIndex] == NULL)
 		return B_NO_MEMORY;
 	

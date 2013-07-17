@@ -160,7 +160,7 @@ log2(uint32 x)
 
 
 static void
-virtio_block_callback(void* cookie)
+virtio_block_callback(void* driverCookie, void* cookie)
 {
 	virtio_block_driver_info* info = (virtio_block_driver_info*)cookie;
 

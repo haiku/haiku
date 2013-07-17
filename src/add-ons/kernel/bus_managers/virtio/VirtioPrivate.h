@@ -23,7 +23,8 @@
 #else
 #	define TRACE(x...)		
 #endif
-#define ERROR(x...)			dprintf("\33[33mvirtio:\33[0m " x)
+#define TRACE_ALWAYS(x...)	dprintf("\33[33mvirtio:\33[0m " x)
+#define ERROR(x...)			TRACE_ALWAYS(x)
 #define CALLED() 			TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
 
@@ -56,10 +57,12 @@ public:
 			status_t			AllocateQueues(size_t count,
 									virtio_queue *queues);
 			status_t			SetupInterrupt(virtio_intr_func config_handler,
-									void* configCookie);
+									void *driverCookie);
 
-			uint16				Alignment() { return fAlignment; }
-			uint32				Features() { return fFeatures; }
+			uint16				Alignment() const { return fAlignment; }
+			uint32				Features() const { return fFeatures; }
+
+			void*				DriverCookie() { return fDriverCookie; }
 
 			status_t			SetupQueue(uint16 queueNumber,
 									phys_addr_t physAddr);
@@ -85,7 +88,7 @@ private:
 			uint16				fAlignment;
 
 			virtio_intr_func	fConfigHandler;
-			void* 				fConfigCookie;
+			void* 				fDriverCookie;
 };
 
 
@@ -102,8 +105,10 @@ public:
 			void				NotifyHost();
 			status_t			Interrupt();
 
-			bool				IsFull() { return fRingFree == 0; }
-			bool				IsEmpty() { return fRingFree == fRingSize; }
+			bool				IsFull() const { return fRingFree == 0; }
+			bool				IsEmpty() const { return fRingFree == fRingSize; }
+
+			VirtioDevice*		Device() { return fDevice; }
 
 			status_t			QueueRequest(const physical_entry* vector,
 									size_t readVectorCount,

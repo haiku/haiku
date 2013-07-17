@@ -58,7 +58,10 @@ VirtioDevice::VirtioDevice(device_node *node)
 	fCookie(NULL),
 	fStatus(B_NO_INIT),
 	fQueues(NULL),
-	fFeatures(0)
+	fFeatures(0),
+	fAlignment(0),
+	fConfigHandler(NULL),
+	fDriverCookie(NULL)
 {
 	device_node *parent = gDeviceManager->get_parent_node(node);
 	fStatus = gDeviceManager->get_driver(parent,
@@ -172,11 +175,10 @@ err:
 
 
 status_t
-VirtioDevice::SetupInterrupt(virtio_intr_func configHandler,
-	void* configCookie)
+VirtioDevice::SetupInterrupt(virtio_intr_func configHandler, void *driverCookie)
 {
 	fConfigHandler = configHandler;
-	fConfigCookie = configCookie;
+	fDriverCookie = driverCookie;
 	status_t status = fController->setup_interrupt(fCookie, fQueueCount);
 	if (status != B_OK)
 		return status;
@@ -228,7 +230,7 @@ status_t
 VirtioDevice::ConfigInterrupt()
 {
 	if (fConfigHandler != NULL)
-		fConfigHandler(fConfigCookie);
+		fConfigHandler(fDriverCookie);
 	return B_OK;
 }
 

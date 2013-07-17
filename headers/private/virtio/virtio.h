@@ -53,7 +53,7 @@ typedef void* virtio_device;
 // queue cookie, issued by virtio bus manager
 typedef void* virtio_queue;
 // callback function for requests
-typedef void (*virtio_callback_func)(void *cookie);
+typedef void (*virtio_callback_func)(void* driverCookie, void *cookie);
 // callback function for interrupts
 typedef void (*virtio_intr_func)(void *cookie);
 
@@ -105,7 +105,7 @@ typedef struct {
 		virtio_queue *queues);
 
 	status_t (*setup_interrupt)(virtio_device cookie,
-		virtio_intr_func config_handler, void* configCookie);
+		virtio_intr_func config_handler, void* driverCookie);
 
 	status_t (*queue_request)(virtio_queue queue,
 		const physical_entry *readEntry,
