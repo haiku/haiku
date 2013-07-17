@@ -490,6 +490,13 @@ DwarfFile::~DwarfFile()
 		delete fAlternateElfFile;
 	}
 
+	TypeUnitTableEntry* entry = fTypeUnits.Clear(true);
+	while (entry != NULL) {
+		TypeUnitTableEntry* nextEntry = entry->next;
+		delete entry;
+		entry = nextEntry;
+	}
+
 	free(fName);
 	free(fAlternateName);
 }
