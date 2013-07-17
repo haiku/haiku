@@ -177,6 +177,8 @@ private:
 									BString& _infoPath) const;
 
 			TypeUnitTableEntry*	_GetTypeUnit(uint64 signature) const;
+			CompilationUnit*	_GetContainingCompilationUnit(
+									off_t refAddr) const;
 
 private:
 			friend class 		DwarfFile::ExpressionEvaluationContext;

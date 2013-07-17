@@ -2576,7 +2576,14 @@ DwarfFile::_ResolveReference(BaseUnit* unit, uint64 offset,
 			break;
 		case dwarf_reference_type_global:
 		{
-			WARNING("DwarfFile: Unhandled global reference\n");
+			CompilationUnit* unit = _GetContainingCompilationUnit(offset);
+			if (unit == NULL)
+				break;
+
+			offset -= unit->HeaderOffset();
+			DebugInfoEntry* entry = unit->EntryForOffset(offset);
+			if (entry != NULL)
+				return entry;
 			break;
 		}
 		case dwarf_reference_type_signature:
@@ -2782,3 +2789,24 @@ DwarfFile::_GetTypeUnit(uint64 signature) const
 	return fTypeUnits.Lookup(signature);
 }
 
+
+CompilationUnit*
+DwarfFile::_GetContainingCompilationUnit(off_t refAddr) const
+{
+	if (fCompilationUnits.IsEmpty())
+		return NULL;
+
+	// binary search
+	int lower = 0;
+	int upper = fCompilationUnits.CountItems() - 1;
+	while (lower < upper) {
+		int mid = (lower + upper + 1) / 2;
+		if (fCompilationUnits.ItemAt(mid)->HeaderOffset() > refAddr)
+			upper = mid - 1;
+		else
+			lower = mid;
+	}
+
+	CompilationUnit* unit = fCompilationUnits.ItemAt(lower);
+	return unit->ContainsAbsoluteOffset(refAddr) ? unit : NULL;
+}
