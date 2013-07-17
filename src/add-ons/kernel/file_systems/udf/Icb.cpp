@@ -116,8 +116,10 @@ Icb::Icb(Volume *volume, long_address address)
 		"%d, length = %" B_PRIu32 ")\n", volume, address.block(),
 		address.partition(), address.length()));
 
-	if (volume == NULL)
+	if (volume == NULL) {
 		fInitStatus = B_BAD_VALUE;
+		return;
+	}
 
 	off_t block;
 	status_t status = fVolume->MapBlock(address, &block);
