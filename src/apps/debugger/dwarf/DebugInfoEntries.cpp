@@ -2527,6 +2527,42 @@ DIESharedType::AddAttribute_decl_column(uint16 attributeName,
 }
 
 
+// #pragma mark - DIETypeUnit
+
+
+DIETypeUnit::DIETypeUnit()
+	:
+	fLanguage(0)
+{
+}
+
+
+uint16
+DIETypeUnit::Tag() const
+{
+	return DW_TAG_type_unit;
+}
+
+
+status_t
+DIETypeUnit::AddChild(DebugInfoEntry* child)
+{
+	if (child->IsType())
+		fType = dynamic_cast<DIEType*>(child);
+
+	return B_OK;
+}
+
+
+status_t
+DIETypeUnit::AddAttribute_language(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fLanguage = value.constant;
+	return B_OK;
+}
+
+
 // #pragma mark - DIETemplateTypeParameterPack
 
 
@@ -2886,6 +2922,9 @@ DebugInfoEntryFactory::CreateDebugInfoEntry(uint16 tag, DebugInfoEntry*& _entry)
 			break;
 		case DW_TAG_shared_type:
 			entry = new(std::nothrow) DIESharedType;
+			break;
+		case DW_TAG_type_unit:
+			entry = new(std::nothrow) DIETypeUnit;
 			break;
 		case DW_TAG_GNU_template_parameter_pack:
 			entry = new(std::nothrow) DIETemplateTypeParameterPack;
