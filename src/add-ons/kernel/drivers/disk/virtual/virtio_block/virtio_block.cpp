@@ -58,6 +58,7 @@ typedef struct {
 	uint32 					features;
 	uint64					capacity;
 	uint32					block_size;
+	status_t				media_status;
 
 	sem_id 	sem_cb;
 } virtio_block_driver_info;
@@ -156,6 +157,29 @@ log2(uint32 x)
 	}
 
 	return y;
+}
+
+
+static void
+virtio_block_config_callback(void* driverCookie)
+{
+	virtio_block_driver_info* info = (virtio_block_driver_info*)driverCookie;
+
+	status_t status = info->virtio->read_device_config(info->virtio_device, 0,
+		&info->config, sizeof(struct virtio_blk_config));
+	if (status != B_OK)
+		return;
+
+	uint32 block_size = 512;
+	if ((info->features & VIRTIO_BLK_F_BLK_SIZE) != 0)
+		block_size = info->config.blk_size;
+	uint64 capacity = info->config.capacity * 512 / block_size;
+
+	if (block_size != info->block_size || capacity != info->capacity) {
+		virtio_block_set_capacity(info, capacity, block_size);
+		info->media_status = B_DEV_MEDIA_CHANGED;
+	}
+
 }
 
 
@@ -268,7 +292,8 @@ virtio_block_init_device(void* _info, void** _cookie)
 		ERROR("queue allocation failed (%s)\n", strerror(status));
 		return status;
 	}
-	status = info->virtio->setup_interrupt(info->virtio_device, NULL, NULL);
+	status = info->virtio->setup_interrupt(info->virtio_device,
+		virtio_block_config_callback, info);
 
 	*_cookie = info;
 	return status;
@@ -398,6 +423,15 @@ virtio_block_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 	TRACE("ioctl(op = %ld)\n", op);
 
 	switch (op) {
+		case B_GET_MEDIA_STATUS:
+		{
+			*(status_t *)buffer = info->media_status;
+			info->media_status = B_OK;
+			TRACE("B_GET_MEDIA_STATUS: 0x%08lx\n", *(status_t *)buffer);
+			return B_OK;
+			break;
+		}
+
 		case B_GET_DEVICE_SIZE:
 		{
 			size_t size = info->capacity * info->block_size;
@@ -555,6 +589,7 @@ virtio_block_init_driver(device_node *node, void **cookie)
 
 	memset(info, 0, sizeof(*info));
 
+	info->media_status = B_OK;
 	info->dma_resource = new(std::nothrow) DMAResource;
 	if (info->dma_resource == NULL) {
 		free(info);
@@ -659,4 +694,3 @@ module_info* modules[] = {
 	(module_info*)&sVirtioBlockDevice,
 	NULL
 };
-
