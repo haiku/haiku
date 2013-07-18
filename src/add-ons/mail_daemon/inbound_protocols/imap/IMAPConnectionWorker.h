@@ -62,6 +62,8 @@ private:
 			IMAPMailbox*		_MailboxFor(IMAPFolder& folder);
 			IMAPFolder*			_Selected() const { return fSelectedBox; }
 			void				_SyncCommandDone();
+			uint32				_MessagesExist() const
+									{ return fMessagesExist; }
 
 			status_t			_Connect();
 			void				_Disconnect();
@@ -85,6 +87,7 @@ private:
 			IMAPFolder*			fIdleBox;
 			IMAPFolder*			fSelectedBox;
 			MailboxMap			fMailboxes;
+			uint32				fMessagesExist;
 
 			BLocker				fLocker;
 			thread_id			fThread;

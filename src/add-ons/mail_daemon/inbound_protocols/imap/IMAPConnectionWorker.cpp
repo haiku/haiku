@@ -15,6 +15,9 @@
 #include "IMAPProtocol.h"
 
 
+using IMAP::MessageUIDList;
+
+
 static const uint32 kMaxFetchEntries = 500;
 static const uint32 kMaxDirectDownloadSize = 4096;
 
@@ -59,9 +62,14 @@ public:
 		return fWorker._MailboxFor(folder);
 	}
 
-	int32 BodyFetchLimit()
+	int32 BodyFetchLimit() const
 	{
 		return fWorker.fSettings.BodyFetchLimit();
+	}
+
+	uint32 MessagesExist() const
+	{
+		return fWorker._MessagesExist();
 	}
 
 	status_t EnqueueCommand(WorkerCommand* command)
@@ -151,13 +159,15 @@ public:
 		fUID = *fEntries.begin();
 		fEntries.erase(fEntries.begin());
 
-		// TODO: check nextUID if we get one
 		status_t status = WorkerPrivate(worker).SelectMailbox(fFolder);
 		if (status != B_OK)
 			return status;
 
 		printf("IMAP: fetch body for %lu\n", fUID);
-		// TODO: combine smaller messages together for faster retrieval
+		// Since RFC3501 does not specify whether the FETCH response may
+		// alter the order of the message data items we request, we cannot
+		// request more than a single UID at a time, or else we may not be
+		// able to assign the data to the correct message beforehand.
 		IMAP::FetchCommand fetch(fUID, fUID, IMAP::kFetchBody);
 		fetch.SetListener(this);
 
@@ -195,12 +205,11 @@ private:
 class FetchHeadersCommand : public SyncCommand, public IMAP::FetchListener {
 public:
 	FetchHeadersCommand(IMAPFolder& folder, IMAPMailbox& mailbox,
-		uint32 from, uint32 to, int32 bodyFetchLimit)
+		MessageUIDList& uids, int32 bodyFetchLimit)
 		:
 		fFolder(folder),
 		fMailbox(mailbox),
-		fFrom(from),
-		fTo(to),
+		fUIDs(uids),
 		fBodyFetchLimit(bodyFetchLimit)
 	{
 	}
@@ -209,27 +218,19 @@ public:
 	{
 		IMAP::Protocol& protocol = WorkerPrivate(worker).Protocol();
 
-		// TODO: check nextUID if we get one
 		status_t status = WorkerPrivate(worker).SelectMailbox(fFolder);
 		if (status != B_OK)
 			return status;
 
-		// TODO: this does not scale that well. Over time, the holes in the
-		// UIDs might become really large
-		uint32 to = fTo;
-		if (to - fFrom >= kMaxFetchEntries)
-			to = fFrom + kMaxFetchEntries - 1;
+		printf("IMAP: fetch %" B_PRIuSIZE "u headers\n", fUIDs.size());
 
-		printf("IMAP: fetch headers from %lu to %lu\n", fFrom, to);
-		IMAP::FetchCommand fetch(fFrom, to,
+		IMAP::FetchCommand fetch(fUIDs, kMaxFetchEntries,
 			IMAP::kFetchHeader | IMAP::kFetchFlags);
 		fetch.SetListener(this);
 
 		status = protocol.ProcessCommand(fetch);
 		if (status != B_OK)
 			return status;
-
-		fFrom = to + 1;
 
 		if (IsDone() && !fFetchBodies.empty()) {
 			// Enqueue command to fetch the message bodies
@@ -242,7 +243,7 @@ public:
 
 	virtual bool IsDone() const
 	{
-		return fFrom >= fTo;
+		return fUIDs.empty();
 	}
 
 	virtual bool FetchData(uint32 fetchFlags, BDataIO& stream, size_t& length)
@@ -266,10 +267,9 @@ public:
 private:
 	IMAPFolder&				fFolder;
 	IMAPMailbox&			fMailbox;
-	uint32					fFrom;
-	uint32					fTo;
+	MessageUIDList			fUIDs;
+	MessageUIDList			fFetchBodies;
 	uint32					fBodyFetchLimit;
-	std::vector<uint32>		fFetchBodies;
 	entry_ref				fRef;
 	BFile					fFile;
 	status_t				fFetchStatus;
@@ -318,14 +318,14 @@ public:
 
 			fMailbox = WorkerPrivate(worker).MailboxFor(*fFolder);
 
-			status_t status = WorkerPrivate(worker).SelectMailbox(*fFolder,
-				fNextUID);
+			status_t status = WorkerPrivate(worker).SelectMailbox(*fFolder);
 			if (status != B_OK)
 				return status;
 
-			fState = FETCH_ENTRIES;
-			fFirstUID = fLastUID = fFolder->LastUID() + 1;
-			fMailboxEntries = 0;
+			fLastIndex = WorkerPrivate(worker).MessagesExist();
+			fFirstIndex = fMailbox->CountMessages() + 1;
+			if (fLastIndex > 0)
+				fState = FETCH_ENTRIES;
 		}
 
 		if (fState == FETCH_ENTRIES) {
@@ -333,44 +333,49 @@ public:
 			if (status != B_OK)
 				return status;
 
-			// TODO: this does not scale that well. Over time, the holes in the
-			// UIDs might become really large
-			uint32 from = fLastUID;
-			uint32 to = fNextUID;
-			if (to - from >= kMaxFetchEntries)
-				to = from + kMaxFetchEntries - 1;
+			uint32 to = fLastIndex;
+			uint32 from = fFirstIndex + kMaxFetchEntries < to
+				? fLastIndex - kMaxFetchEntries : fFirstIndex;
 
 			printf("IMAP: get entries from %lu to %lu\n", from, to);
-			// TODO: we don't really need the flags at this point at all
-			IMAP::MessageEntryList	entries;
-			IMAP::FetchMessageEntriesCommand fetch(entries, from, to, true);
+
+			IMAP::MessageEntryList entries;
+			IMAP::FetchMessageEntriesCommand fetch(entries, from, to, false);
 			status = protocol.ProcessCommand(fetch);
 			if (status != B_OK)
 				return status;
 
+			std::vector<uint32> uidsToFetch;
+
 			// Determine how much we need to download
 			// TODO: also retrieve the header size, and only take the body
-			// size into account if it's below the limit
+			// size into account if it's below the limit -- that does not
+			// seem to be possible, though
 			for (size_t i = 0; i < entries.size(); i++) {
 				printf("%10lu %8lu bytes, flags: %#lx\n", entries[i].uid,
 					entries[i].size, entries[i].flags);
-				fMailbox->AddMessageEntry(entries[i].uid, entries[i].flags,
-					entries[i].size);
-				fTotalBytes += entries[i].size;
+				fMailbox->AddMessageEntry(from + i, entries[i].uid,
+					entries[i].flags, entries[i].size);
+
+				if (entries[i].uid > fFolder->LastUID()) {
+					fTotalBytes += entries[i].size;
+					fUIDsToFetch.push_back(entries[i].uid);
+				}
 			}
-			fTotalEntries += entries.size();
-			fMailboxEntries += entries.size();
 
-			fLastUID = to + 1;
+			fTotalEntries += fUIDsToFetch.size();
+			fLastIndex = from - 1;
 
-			if (to == fNextUID) {
-				if (fMailboxEntries > 0) {
+			if (from == 1) {
+				if (fUIDsToFetch.size() > 0) {
 					// Add pending command to fetch the message headers
 					WorkerCommand* command = new FetchHeadersCommand(*fFolder,
-						*fMailbox, fFirstUID, fNextUID,
+						*fMailbox, fUIDsToFetch,
 						WorkerPrivate(worker).BodyFetchLimit());
 					if (!fFetchCommands.AddItem(command))
 						delete command;
+
+					fUIDsToFetch.clear();
 				}
 				fState = SELECT;
 			}
@@ -397,13 +402,12 @@ private:
 	State					fState;
 	IMAPFolder*				fFolder;
 	IMAPMailbox*			fMailbox;
-	uint32					fFirstUID;
-	uint32					fLastUID;
-	uint32					fNextUID;
-	uint32					fMailboxEntries;
+	uint32					fFirstIndex;
+	uint32					fLastIndex;
 	uint64					fTotalEntries;
 	uint64					fTotalBytes;
 	WorkerCommandList		fFetchCommands;
+	MessageUIDList			fUIDsToFetch;
 };
 
 
@@ -416,7 +420,7 @@ struct CommandDelete
 };
 
 
-/*!	An auto deleter similar to ObjectDeleter that called SyncCommandDone()
+/*!	An auto deleter similar to ObjectDeleter that calls SyncCommandDone()
 	for all SyncCommands.
 */
 struct CommandDeleter : BPrivate::AutoDeleter<WorkerCommand, CommandDelete>
@@ -454,6 +458,9 @@ IMAPConnectionWorker::IMAPConnectionWorker(IMAPProtocol& owner,
 {
 	fExistsHandler.SetListener(this);
 	fProtocol.AddHandler(fExistsHandler);
+
+	fExpungeHandler.SetListener(this);
+	fProtocol.AddHandler(fExpungeHandler);
 }
 
 
@@ -568,9 +575,14 @@ IMAPConnectionWorker::EnqueueRetrieveMail(entry_ref& ref)
 
 
 void
-IMAPConnectionWorker::MessageExistsReceived(uint32 index)
+IMAPConnectionWorker::MessageExistsReceived(uint32 count)
 {
-	printf("Message exists: %ld\n", index);
+	printf("Message exists: %lu\n", count);
+	fMessagesExist = count;
+
+	// TODO: We might want to trigger another check even during sync
+	// (but only one), if this isn't the result of a SELECT
+	EnqueueCheckMailboxes();
 }
 
 
@@ -578,6 +590,14 @@ void
 IMAPConnectionWorker::MessageExpungeReceived(uint32 index)
 {
 	printf("Message expunge: %ld\n", index);
+	if (fSelectedBox == NULL)
+		return;
+
+	IMAPMailbox* mailbox = _MailboxFor(*fSelectedBox);
+	if (mailbox != NULL) {
+		mailbox->RemoveMessageEntry(index);
+		// TODO: remove message from folder
+	}
 }
 
 

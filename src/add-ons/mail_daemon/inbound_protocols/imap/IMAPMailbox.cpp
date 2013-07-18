@@ -25,10 +25,37 @@ IMAPMailbox::~IMAPMailbox()
 
 
 void
-IMAPMailbox::AddMessageEntry(uint32 uid, uint32 flags, uint32 size)
+IMAPMailbox::AddMessageEntry(uint32 index, uint32 uid, uint32 flags,
+	uint32 size)
 {
 	fMessageEntries.insert(
 		std::make_pair(uid, MessageFlagsAndSize(flags, size)));
+
+	fUIDs.reserve(index + 1);
+	fUIDs[index] = uid;
+}
+
+
+void
+IMAPMailbox::RemoveMessageEntry(uint32 index)
+{
+	if (index >= fUIDs.size())
+		return;
+
+	uint32 uid = fUIDs[index];
+	fMessageEntries.erase(uid);
+
+	fUIDs.erase(fUIDs.begin() + index);
+}
+
+
+uint32
+IMAPMailbox::UIDForIndex(uint32 index) const
+{
+	if (index >= fUIDs.size())
+		return 0;
+
+	return fUIDs[index];
 }
 
 

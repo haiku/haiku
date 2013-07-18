@@ -6,6 +6,7 @@
 #define IMAP_MAILBOX_H
 
 
+#include "Commands.h"
 #include "IMAPFolder.h"
 
 
@@ -22,10 +23,14 @@ public:
 
 			const BString&		MailboxName() const { return fMailboxName; }
 
-			void				AddMessageEntry(uint32 uid, uint32 flags,
-									uint32 size);
+			void				AddMessageEntry(uint32 index, uint32 uid,
+									uint32 flags, uint32 size);
+			void				RemoveMessageEntry(uint32 index);
+
+			uint32				UIDForIndex(uint32 index) const;
 			uint32				MessageFlags(uint32 uid) const;
 			uint32				MessageSize(uint32 uid) const;
+			uint32				CountMessages() const { return fUIDs.size(); }
 
 	// FolderListener interface
 	virtual	uint32				MessageAdded(const MessageToken& fromToken,
@@ -53,6 +58,7 @@ protected:
 			IMAP::Protocol&		fProtocol;
 			BString				fMailboxName;
 			MessageEntryMap		fMessageEntries;
+			IMAP::MessageUIDList fUIDs;
 };
 
 

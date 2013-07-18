@@ -33,6 +33,8 @@ struct MessageEntry {
 };
 typedef std::vector<MessageEntry> MessageEntryList;
 
+typedef std::vector<uint32> MessageUIDList;
+
 enum MessageFlags {
 	kSeen				= 0x01,
 	kAnswered			= 0x02,
@@ -161,6 +163,8 @@ class FetchCommand : public Command, public Handler,
 public:
 								FetchCommand(uint32 from, uint32 to,
 									uint32 fetchFlags);
+								FetchCommand(MessageUIDList& uids,
+									size_t max, uint32 fetchFlags);
 
 			void				SetListener(FetchListener* listener);
 			FetchListener*		Listener() const { return fListener; }
@@ -172,8 +176,7 @@ public:
 									size_t& length);
 
 private:
-			uint32				fFrom;
-			uint32				fTo;
+			BString				fSequence;
 			uint32				fFlags;
 			FetchListener*		fListener;
 };
@@ -213,7 +216,7 @@ private:
 
 class ExistsListener {
 public:
-	virtual	void				MessageExistsReceived(uint32 index) = 0;
+	virtual	void				MessageExistsReceived(uint32 count) = 0;
 };
 
 

@@ -24,6 +24,10 @@
 using namespace BPrivate;
 
 
+/*!	Maximum size of commands to the server (soft limit) */
+const size_t kMaxCommandLength = 2048;
+
+
 static void
 PutFlag(BString& string, const char* flag)
 {
@@ -293,7 +297,11 @@ BString
 FetchMessageEntriesCommand::CommandString()
 {
 	BString command = fUIDs ? "UID FETCH " : "FETCH ";
-	command << fFrom << ":" << fTo << " (FLAGS RFC822.SIZE";
+	command << fFrom;
+	if (fFrom != fTo)
+		command << ":" << fTo;
+
+	command << " (FLAGS RFC822.SIZE";
 	if (!fUIDs)
 		command << " UID";
 	command << ")";
@@ -336,10 +344,47 @@ FetchMessageEntriesCommand::HandleUntagged(Response& response)
 
 FetchCommand::FetchCommand(uint32 from, uint32 to, uint32 flags)
 	:
-	fFrom(from),
-	fTo(to),
 	fFlags(flags)
 {
+	fSequence << from;
+	if (from != to)
+		fSequence << ":" << to;
+}
+
+
+/*!	Builds the sequence from the passed in UID list, and takes \a max entries
+	at maximum. If the sequence gets too large, it might fetch less entries
+	than specified. The fetched UIDs will be removed from the \uids list.
+*/
+FetchCommand::FetchCommand(MessageUIDList& uids, size_t max, uint32 flags)
+	:
+	fFlags(flags)
+{
+	// Build sequence string
+	max = std::min(max, uids.size());
+
+	size_t index = 0;
+	while (index < max && (size_t)fSequence.Length() < kMaxCommandLength) {
+		// Get start of range
+		uint32 first = uids[index++];
+		uint32 last = first;
+		if (!fSequence.IsEmpty())
+			fSequence += ",";
+		fSequence << first;
+
+		for (; index < max; index++) {
+			uint32 uid = uids[index];
+			if (uid != last + 1)
+				break;
+
+			last = uid;
+		}
+
+		if (last != first)
+			fSequence << ":" << last;
+	}
+
+	uids.erase(uids.begin(), uids.begin() + index);
 }
 
 
@@ -354,9 +399,7 @@ BString
 FetchCommand::CommandString()
 {
 	BString command = "UID FETCH ";
-	command << fFrom;
-	if (fFrom != fTo)
-		command << ":" << fTo;
+	command += fSequence;
 
 	command += " (UID ";
 	if ((fFlags & kFetchFlags) != 0)
@@ -525,10 +568,10 @@ ExistsHandler::HandleUntagged(Response& response)
 	if (!response.EqualsAt(1, "EXISTS") || !response.IsNumberAt(0))
 		return false;
 
-	int32 index = response.NumberAt(0);
+	uint32 count = response.NumberAt(0);
 
 	if (fListener != NULL)
-		fListener->MessageExistsReceived(index);
+		fListener->MessageExistsReceived(count);
 
 	return true;
 }
@@ -570,7 +613,7 @@ ExpungeHandler::HandleUntagged(Response& response)
 	if (!response.EqualsAt(1, "EXPUNGE") || !response.IsNumberAt(0))
 		return false;
 
-	int32 index = response.NumberAt(0);
+	uint32 index = response.NumberAt(0);
 
 	if (fListener != NULL)
 		fListener->MessageExpungeReceived(index);
