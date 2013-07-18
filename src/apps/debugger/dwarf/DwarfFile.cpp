@@ -1007,9 +1007,21 @@ DwarfFile::_ParseTypesSection()
 			break;
 		}
 
+		dataReader.SetAddressSize(addressSize);
+
+		uint64 signature = dataReader.Read<uint64>(0);
+
+		off_t typeOffset = dwarf64
+			? dataReader.Read<uint64>(0)
+			: dataReader.Read<uint32>(0);
+
+		off_t unitContentOffset = dataReader.Offset();
+
 		TRACE_DIE("DWARF%d type unit: version %d, length: %" B_PRIu64
-			", abbrevOffset: %" B_PRIdOFF ", address size: %d\n",
-			dwarf64 ? 64 : 32, version, unitLength, abbrevOffset, addressSize);
+			", abbrevOffset: %" B_PRIdOFF ", address size: %d, "
+			"signature: %#" B_PRIx64 ", type offset: %" B_PRIu64 "\n",
+			dwarf64 ? 64 : 32, version, unitLength, abbrevOffset, addressSize,
+			signature, typeOffset);
 
 		if (version > 4) {
 			WARNING("\"%s\": Unsupported type unit version: %d\n",
@@ -1022,15 +1034,6 @@ DwarfFile::_ParseTypesSection()
 				addressSize);
 			break;
 		}
-		dataReader.SetAddressSize(addressSize);
-
-		uint64 signature = dataReader.Read<uint64>(0);
-
-		off_t typeOffset = dwarf64
-			? dataReader.Read<uint64>(0)
-			: dataReader.Read<uint32>(0);
-
-		off_t unitContentOffset = dataReader.Offset();
 
 		// create a type unit object
 		TypeUnit* unit = new(std::nothrow) TypeUnit(
