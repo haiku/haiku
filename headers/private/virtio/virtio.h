@@ -81,7 +81,7 @@ typedef struct {
 		size_t bufferSize);
 	status_t (*write_device_config)(void* cookie, uint8 offset,
 		const void* buffer, size_t bufferSize);
-	
+
 	uint16	(*get_queue_ring_size)(void* cookie, uint16 queue);
 	status_t (*setup_queue)(void* cookie, uint16 queue, phys_addr_t phy);
 	status_t (*setup_interrupt)(void* cookie, uint16 queueCount);
@@ -95,7 +95,7 @@ typedef struct {
 
 	status_t (*negociate_features)(virtio_device cookie, uint32 supported,
 		uint32* negociated, const char* (*get_feature_name)(uint32));
-	
+
 	status_t (*read_device_config)(virtio_device cookie, uint8 offset,
 		void* buffer, size_t bufferSize);
 	status_t (*write_device_config)(virtio_device cookie, uint8 offset,
