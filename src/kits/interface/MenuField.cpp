@@ -788,8 +788,9 @@ BMenuField::PreferredSize()
 BLayoutItem*
 BMenuField::CreateLabelLayoutItem()
 {
-	if (!fLayoutData->label_layout_item)
+	if (fLayoutData->label_layout_item == NULL)
 		fLayoutData->label_layout_item = new LabelLayoutItem(this);
+
 	return fLayoutData->label_layout_item;
 }
 
@@ -797,7 +798,7 @@ BMenuField::CreateLabelLayoutItem()
 BLayoutItem*
 BMenuField::CreateMenuBarLayoutItem()
 {
-	if (!fLayoutData->menu_bar_layout_item) {
+	if (fLayoutData->menu_bar_layout_item == NULL) {
 		// align the menu bar in the full available space
 		fMenuBar->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
 			B_ALIGN_VERTICAL_UNSET));
