@@ -60,7 +60,7 @@ public:
 			uchar				TerminateRequest(scsi_ccb* request);
 			status_t			Control(uint8 targetID, uint32 op,
 									void* buffer, size_t length);
-			
+
 private:
 	static	void				_RequestCallback(void* driverCookie,
 									void *cookie);
@@ -141,7 +141,7 @@ private:
 			bool				fHasLock;
 
 			uint8				fStatus;
-			
+
 			bigtime_t			fTimeout;
 			size_t				fBytesLeft;
 			bool				fIsWrite;

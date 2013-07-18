@@ -201,7 +201,7 @@ do_io(void* cookie, IOOperation* operation)
 		1 + (operation->IsWrite() ? operation->VecCount() : 0 ),
 		1 + (operation->IsWrite() ? 0 : operation->VecCount()),
 		virtio_block_callback, info);
-		
+
 	acquire_sem(info->sem_cb);
 
 	switch (*ack) {
@@ -258,7 +258,7 @@ virtio_block_init_device(void* _info, void** _cookie)
 	uint64 capacity = info->config.capacity * 512 / block_size;
 
 	virtio_block_set_capacity(info, capacity, block_size);
-	
+
 	TRACE("virtio_block: capacity: %" B_PRIu64 ", block_size %" B_PRIu32 "\n",
 		info->capacity, info->block_size);
 
@@ -269,7 +269,7 @@ virtio_block_init_device(void* _info, void** _cookie)
 		return status;
 	}
 	status = info->virtio->setup_interrupt(info->virtio_device, NULL, NULL);
-	
+
 	*_cookie = info;
 	return status;
 }
@@ -298,7 +298,7 @@ virtio_block_open(void* _info, const char* path, int openMode, void** _cookie)
 		return B_NO_MEMORY;
 
 	handle->info = info;
-	
+
 	*_cookie = handle;
 	return B_OK;
 }
@@ -319,7 +319,7 @@ virtio_block_free(void* cookie)
 {
 	CALLED();
 	virtio_block_handle* handle = (virtio_block_handle*)cookie;
-	
+
 	free(handle);
 	return B_OK;
 }
@@ -476,7 +476,7 @@ virtio_block_set_capacity(virtio_block_driver_info* info, uint64 capacity,
 			restrictions.max_segment_size = info->config.size_max;
 		if ((info->features & VIRTIO_BLK_F_SEG_MAX) != 0)
 			restrictions.max_segment_count = info->config.seg_max;
-		
+
 		// TODO: we need to replace the DMAResource in our IOScheduler
 		status_t status = info->dma_resource->Init(restrictions, blockSize,
 			1024, 32);

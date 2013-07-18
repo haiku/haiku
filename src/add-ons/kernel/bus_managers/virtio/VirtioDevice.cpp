@@ -118,12 +118,12 @@ VirtioDevice::NegociateFeatures(uint32 supported, uint32* negociated,
 		/*| VIRTIO_FEATURE_RING_INDIRECT_DESC*/ | VIRTIO_FEATURE_RING_EVENT_IDX);
 
 	*negociated = fFeatures;
-	
+
 	DumpFeatures("negociated features", fFeatures, get_feature_name);
 
 	return fController->write_guest_features(fCookie, fFeatures);
 }
-	
+
 
 status_t
 VirtioDevice::ReadDeviceConfig(uint8 offset, void* buffer, size_t bufferSize)
@@ -183,7 +183,7 @@ VirtioDevice::SetupInterrupt(virtio_intr_func configHandler, void *driverCookie)
 	if (status != B_OK)
 		return status;
 
-	// ready to go	
+	// ready to go
 	fController->set_status(fCookie, VIRTIO_CONFIG_STATUS_DRIVER_OK);
 
 	for (size_t index = 0; index < fQueueCount; index++)
@@ -196,7 +196,7 @@ status_t
 VirtioDevice::SetupQueue(uint16 queueNumber, phys_addr_t physAddr)
 {
 	return fController->setup_queue(fCookie, queueNumber, physAddr);
-}			
+}
 
 
 void
@@ -214,14 +214,14 @@ VirtioDevice::QueueInterrupt(uint16 queueNumber)
 			return B_BAD_VALUE;
 		return fQueues[queueNumber]->Interrupt();
 	}
-	
+
 	status_t status = B_OK;
 	for (uint16 i = 0; i < fQueueCount; i++) {
 		status = fQueues[i]->Interrupt();
 		if (status != B_OK)
 			break;
 	}
-	
+
 	return status;
 }
 

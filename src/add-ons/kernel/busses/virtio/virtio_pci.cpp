@@ -68,7 +68,7 @@ int32
 virtio_pci_interrupt(void *data)
 {
 	virtio_pci_sim_info* bus = (virtio_pci_sim_info*)data;
-	uint8 isr = bus->pci->read_io_8(bus->device, 
+	uint8 isr = bus->pci->read_io_8(bus->device,
 		bus->base_addr + VIRTIO_PCI_ISR);
 	if (isr == 0)
 		return B_UNHANDLED_INTERRUPT;
@@ -129,7 +129,7 @@ virtio_pci_setup_msix_interrupts(virtio_pci_sim_info* bus)
 			ERROR("msix queue vector incorrect\n");
 			return B_BAD_VALUE;
 		}
-	
+
 		if (bus->irq_type == VIRTIO_IRQ_MSI_X)
 			irq++;
 	}
@@ -156,7 +156,7 @@ read_host_features(void* cookie, uint32 *features)
 	TRACE("read_host_features() %p node %p pci %p device %p\n", bus,
 		bus->node, bus->pci, bus->device);
 
-	*features = bus->pci->read_io_32(bus->device, 
+	*features = bus->pci->read_io_32(bus->device,
 		bus->base_addr + VIRTIO_PCI_HOST_FEATURES);
 	return B_OK;
 }
@@ -206,17 +206,17 @@ read_device_config(void* cookie, uint8 _offset, void* _buffer,
 		uint8 size = 4;
 		if (bufferSize == 1) {
 			size = 1;
-			*buffer = bus->pci->read_io_8(bus->device, 
+			*buffer = bus->pci->read_io_8(bus->device,
 			offset);
 		} else if (bufferSize <= 3) {
 			size = 2;
-			*(uint16*)buffer = bus->pci->read_io_16(bus->device, 
+			*(uint16*)buffer = bus->pci->read_io_16(bus->device,
 			offset);
 		} else {
-			*(uint32*)buffer = bus->pci->read_io_32(bus->device, 
+			*(uint32*)buffer = bus->pci->read_io_32(bus->device,
 				offset);
 		}
-		buffer += size; 
+		buffer += size;
 		bufferSize -= size;
 		offset += size;
 	}
@@ -238,17 +238,17 @@ write_device_config(void* cookie, uint8 _offset, const void* _buffer,
 		uint8 size = 4;
 		if (bufferSize == 1) {
 			size = 1;
-			bus->pci->write_pci_config(bus->device, 
+			bus->pci->write_pci_config(bus->device,
 			offset, size, *buffer);
 		} else if (bufferSize <= 3) {
 			size = 2;
-			bus->pci->write_pci_config(bus->device, 
+			bus->pci->write_pci_config(bus->device,
 			offset, size, *(const uint16*)buffer);
 		} else {
-			bus->pci->write_pci_config(bus->device, 
+			bus->pci->write_pci_config(bus->device,
 				offset, size, *(const uint32*)buffer);
 		}
-		buffer += size; 
+		buffer += size;
 		bufferSize -= size;
 		offset += size;
 	}
@@ -275,13 +275,13 @@ setup_queue(void* cookie, uint16 queue, phys_addr_t phy)
 	virtio_pci_sim_info* bus = (virtio_pci_sim_info*)cookie;
 	bus->pci->write_io_16(bus->device, bus->base_addr + VIRTIO_PCI_QUEUE_SEL,
 		queue);
-	bus->pci->write_io_32(bus->device, bus->base_addr + VIRTIO_PCI_QUEUE_PFN, 
+	bus->pci->write_io_32(bus->device, bus->base_addr + VIRTIO_PCI_QUEUE_PFN,
 		(uint32)phy >> VIRTIO_PCI_QUEUE_ADDR_SHIFT);
 	return B_OK;
 }
 
 
-status_t 
+status_t
 setup_interrupt(void* cookie, uint16 queueCount)
 {
 	CALLED();
@@ -327,7 +327,7 @@ setup_interrupt(void* cookie, uint16 queueCount)
 			}
 		} else if (sPCIx86Module->get_msi_count(
 			pciInfo->bus, pciInfo->device, pciInfo->function) >= 1) {
-			// try MSI 
+			// try MSI
 			uint8 vector;
 			if (sPCIx86Module->configure_msi(pciInfo->bus, pciInfo->device,
 					pciInfo->function, 1, &vector) == B_OK
@@ -514,13 +514,13 @@ register_child_devices(void* cookie)
 	pci_device* device;
 	gDeviceManager->get_driver(parent, (driver_module_info**)&pci,
 		(void**)&device);
-	
+
 	uint16 pciSubDeviceId = pci->read_pci_config(device, PCI_subsystem_id,
 		2);
 
 	char prettyName[25];
 	sprintf(prettyName, "Virtio Device %" B_PRIu16, pciSubDeviceId);
-	
+
 	device_attr attrs[] = {
 		// properties of this controller for virtio bus manager
 		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE,

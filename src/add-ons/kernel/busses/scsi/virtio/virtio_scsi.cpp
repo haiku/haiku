@@ -198,7 +198,7 @@ virtio_scsi_register_device(device_node *parent)
 
 	gDeviceManager->get_driver(parent, (driver_module_info **)&virtio,
 		(void **)&virtioDevice);
-	
+
 	status_t status = virtio->read_device_config(virtioDevice, 0, &config,
 		sizeof(struct virtio_scsi_config));
 	if (status != B_OK)
@@ -221,7 +221,7 @@ virtio_scsi_register_device(device_node *parent)
 			{ ui32: config.seg_max }},
 		{ NULL }
 	};
-	
+
 	return gDeviceManager->register_node(parent, VIRTIO_SCSI_DEVICE_MODULE_NAME,
 		attrs, NULL, NULL);
 }

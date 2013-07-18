@@ -51,7 +51,7 @@ alloc_mem(void **virt, phys_addr_t *phy, size_t size, uint32 protection,
 class TransferDescriptor {
 public:
 								TransferDescriptor(VirtioQueue* queue,
-									uint16 size, 
+									uint16 size,
 									virtio_callback_func callback,
 									void *callbackCookie);
 								~TransferDescriptor();
@@ -69,7 +69,7 @@ private:
 };
 
 
-TransferDescriptor::TransferDescriptor(VirtioQueue* queue, uint16 size, 
+TransferDescriptor::TransferDescriptor(VirtioQueue* queue, uint16 size,
 	virtio_callback_func callback, void *callbackCookie)
 	: fQueue(queue),
 	fCookie(callbackCookie),
@@ -127,7 +127,7 @@ VirtioQueue::VirtioQueue(VirtioDevice* device, uint16 queueNumber,
 	for (uint16 i = 0; i < fRingSize - 1; i++)
 		fRing.desc[i].next = i + 1;
 	fRing.desc[fRingSize - 1].next = UINT16_MAX;
-	
+
 	DisableInterrupt();
 
 	device->SetupQueue(fQueueNumber, physAddr);
@@ -172,7 +172,7 @@ VirtioQueue::Interrupt()
 
 	while (fRingUsedIndex != fRing.used->idx)
 		Finish();
-	
+
 	EnableInterrupt();
 	return B_OK;
 }
@@ -199,7 +199,7 @@ VirtioQueue::Finish()
 		index = fRing.desc[index].next;
 		size--;
 	}
-	
+
 	if (size > 0)
 		panic("VirtioQueue::Finish() descriptors left %d\n", size);
 
@@ -221,7 +221,7 @@ VirtioQueue::QueueRequest(const physical_entry* vector, size_t readVectorCount,
 	if (count < 1)
 		return B_BAD_VALUE;
 	if ((fDevice->Features() & VIRTIO_FEATURE_RING_INDIRECT_DESC) != 0) {
-		return QueueRequestIndirect(vector, readVectorCount, 
+		return QueueRequestIndirect(vector, readVectorCount,
 			writtenVectorCount, callback, callbackCookie);
 	}
 
@@ -233,7 +233,7 @@ VirtioQueue::QueueRequest(const physical_entry* vector, size_t readVectorCount,
 		count, callback, callbackCookie);
 	if (fDescriptors[insertIndex] == NULL)
 		return B_NO_MEMORY;
-	
+
 	// enqueue
 	uint16 index = QueueVector(insertIndex, fRing.desc, vector,
 		readVectorCount, writtenVectorCount);
@@ -244,7 +244,7 @@ VirtioQueue::QueueRequest(const physical_entry* vector, size_t readVectorCount,
 	UpdateAvailable(insertIndex);
 
 	NotifyHost();
-	
+
 	return B_OK;
 }
 

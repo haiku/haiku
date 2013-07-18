@@ -21,7 +21,7 @@
 #ifdef VIRTIO_TRACE
 #	define TRACE(x...)		dprintf("\33[33mvirtio:\33[0m " x)
 #else
-#	define TRACE(x...)		
+#	define TRACE(x...)
 #endif
 #define TRACE_ALWAYS(x...)	dprintf("\33[33mvirtio:\33[0m " x)
 #define ERROR(x...)			TRACE_ALWAYS(x)
@@ -48,7 +48,7 @@ public:
 			status_t 			NegociateFeatures(uint32 supported,
 									uint32* negociated,
 									const char* (*get_feature_name)(uint32));
-	
+
 			status_t			ReadDeviceConfig(uint8 offset, void* buffer,
 									size_t bufferSize);
 			status_t			WriteDeviceConfig(uint8 offset,
@@ -75,7 +75,7 @@ private:
 			void				DumpFeatures(const char* title,
 									uint32 features,
 									const char* (*get_feature_name)(uint32));
-			
+
 
 			device_node *		fNode;
 			uint32				fID;
@@ -123,7 +123,7 @@ public:
 									void *callbackCookie);
 			void				EnableInterrupt();
 			void				DisableInterrupt();
-			
+
 private:
 			void				UpdateAvailable(uint16 index);
 			uint16				QueueVector(uint16 insertIndex,

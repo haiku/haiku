@@ -42,7 +42,7 @@ VirtioSCSIController::VirtioSCSIController(device_node *node)
 
 	if (gSCSI->alloc_dpc(&fEventDPC) != B_OK)
 		return;
-	
+
 	// get the Virtio device from our parent's parent
 	device_node *parent = gDeviceManager->get_parent_node(node);
 	device_node *virtioParent = gDeviceManager->get_parent_node(parent);
@@ -90,14 +90,14 @@ VirtioSCSIController::VirtioSCSIController(device_node *node)
 
 	for (uint32 i = 0; i < VIRTIO_SCSI_NUM_EVENTS; i++)
 		_SubmitEvent(i);
-	
+
 	fStatus = fVirtio->setup_interrupt(fVirtioDevice, NULL, this);
 	if (fStatus != B_OK) {
 		ERROR("interrupt setup failed (%s)\n", strerror(fStatus));
 		return;
 	}
 
-	
+
 }
 
 
@@ -149,7 +149,7 @@ VirtioSCSIController::GetRestrictions(uint8 targetID, bool *isATAPI,
 	bool *noAutoSense, uint32 *maxBlocks)
 {
 	*isATAPI = false;
-	*noAutoSense = true;	
+	*noAutoSense = true;
 	*maxBlocks = fConfig.cmd_per_lun;
 }
 
@@ -219,7 +219,7 @@ VirtioSCSIController::ExecuteRequest(scsi_ccb *ccb)
 
 	result = fInterruptConditionEntry.Wait(B_RELATIVE_TIMEOUT,
 		fRequest->Timeout());
-	
+
 	{
 		InterruptsSpinLocker locker(fInterruptLock);
 		fExpectsInterrupt = false;
@@ -233,7 +233,7 @@ VirtioSCSIController::ExecuteRequest(scsi_ccb *ccb)
 
 
 uchar
-VirtioSCSIController::AbortRequest(scsi_ccb *request)			
+VirtioSCSIController::AbortRequest(scsi_ccb *request)
 {
 	return SCSI_REQ_CMP;
 }
@@ -250,7 +250,7 @@ status_t
 VirtioSCSIController::Control(uint8 targetID, uint32 op, void *buffer,
 	size_t length)
 {
-	CALLED();	
+	CALLED();
 	return B_DEV_INVALID_IOCTL;
 }
 
@@ -293,7 +293,7 @@ VirtioSCSIController::_EventInterrupt(struct virtio_scsi_event* event)
 	} else switch (event->event) {
 		case VIRTIO_SCSI_T_TRANSPORT_RESET:
 			ERROR("transport reset\n");
-			break;		
+			break;
 		case VIRTIO_SCSI_T_ASYNC_NOTIFY:
 			ERROR("async notify\n");
 			break;
