@@ -916,14 +916,15 @@ BMenuField::DoLayout()
 
 	// divider
 	float divider = 0;
-	if (fLayoutData->label_layout_item && fLayoutData->menu_bar_layout_item) {
-		// We have layout items. They define the divider location.
+	if (fLayoutData->label_layout_item != NULL
+		&& fLayoutData->menu_bar_layout_item != NULL
+		&& fLayoutData->label_layout_item->Frame().IsValid()
+		&& fLayoutData->menu_bar_layout_item->Frame().IsValid()) {
+		// We have valid layout items, they define the divider location.
 		divider = fLayoutData->menu_bar_layout_item->Frame().left
 			- fLayoutData->label_layout_item->Frame().left;
-	} else {
-		if (fLayoutData->label_width > 0)
-			divider = fLayoutData->label_width + 5;
-	}
+	} else if (fLayoutData->label_width > 0)
+		divider = fLayoutData->label_width + 5;
 
 	// menu bar
 	BRect dirty(fMenuBar->Frame());
@@ -1093,25 +1094,31 @@ BMenuField::_UpdateFrame()
 {
 	CALLED();
 
-	if (fLayoutData->label_layout_item && fLayoutData->menu_bar_layout_item) {
-		BRect labelFrame = fLayoutData->label_layout_item->Frame();
-		BRect menuFrame = fLayoutData->menu_bar_layout_item->Frame();
-
-		// update divider
-		fDivider = menuFrame.left - labelFrame.left;
-
-		// update our frame
-		MoveTo(labelFrame.left, labelFrame.top);
-		BSize oldSize = Bounds().Size();
-		ResizeTo(menuFrame.left + menuFrame.Width() - labelFrame.left,
-			menuFrame.top + menuFrame.Height() - labelFrame.top);
-		BSize newSize = Bounds().Size();
-
-		// If the size changes, ResizeTo() will trigger a relayout, otherwise
-		// we need to do that explicitly.
-		if (newSize != oldSize)
-			Relayout();
+	if (fLayoutData->label_layout_item == NULL
+		|| fLayoutData->menu_bar_layout_item == NULL) {
+		return;
 	}
+
+	BRect labelFrame = fLayoutData->label_layout_item->Frame();
+	BRect menuFrame = fLayoutData->menu_bar_layout_item->Frame();
+
+	if (!labelFrame.IsValid() || !menuFrame.IsValid())
+		return;
+
+	// update divider
+	fDivider = menuFrame.left - labelFrame.left;
+
+	// update our frame
+	MoveTo(labelFrame.left, labelFrame.top);
+	BSize oldSize = Bounds().Size();
+	ResizeTo(menuFrame.left + menuFrame.Width() - labelFrame.left,
+		menuFrame.top + menuFrame.Height() - labelFrame.top);
+	BSize newSize = Bounds().Size();
+
+	// If the size changes, ResizeTo() will trigger a relayout, otherwise
+	// we need to do that explicitly.
+	if (newSize != oldSize)
+		Relayout();
 }
 
 
