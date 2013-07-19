@@ -1431,7 +1431,12 @@ status_t
 DIEPointerToMemberType::AddAttribute_containing_type(uint16 attributeName,
 	const AttributeValue& value)
 {
-	fContainingType = dynamic_cast<DIECompoundType*>(value.reference);
+	DebugInfoEntry* type = value.reference;
+	DIEModifiedType* modifiedType;
+	while ((modifiedType = dynamic_cast<DIEModifiedType*>(type)) != NULL)
+		type = modifiedType->GetType();
+
+	fContainingType = dynamic_cast<DIECompoundType*>(type);
 	return fContainingType != NULL ? B_OK : B_BAD_DATA;
 }
 
