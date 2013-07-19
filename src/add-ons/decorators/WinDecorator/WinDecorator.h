@@ -6,46 +6,57 @@
 #define _WINDOWS_DECORATOR_H_
 
 
+#include "Decorator.h"
 #include "DecorManager.h"
-#include "RGBColor.h"
 
+
+struct rgb_color;
+
+
+class BRect;
 
 class WinDecorAddOn : public DecorAddOn {
 public:
 								WinDecorAddOn(image_id id, const char* name);
 
-
 protected:
 	virtual Decorator*			_AllocateDecorator(DesktopSettings& settings,
-									BRect rect, window_look look, uint32 flags);
+									BRect rect);
 };
 
 
 class WinDecorator: public Decorator {
 public:
-								WinDecorator(DesktopSettings& settings,
-									BRect frame, window_look wlook,
-									uint32 wflags);
+								WinDecorator(DesktopSettings& settings, BRect frame);
 								~WinDecorator(void);
 
-			void				Draw(BRect r);
-			void				Draw();
+	virtual	void				Draw(BRect updateRect);
+	virtual	void				Draw();
 
-	virtual	Region				RegionAt(BPoint where) const;
+	virtual	Region				RegionAt(BPoint where, int32& tab) const;
 
 protected:
+	virtual	void				DrawButtons(Decorator::Tab* tab,
+									const BRect& invalid);
+
 			void				_DoLayout();
 
-			void				_DrawFrame(BRect r);
-			void				_DrawTab(BRect r);
+	virtual	Decorator::Tab*		_AllocateNewTab();
+			WinDecorator::Tab*	_TabAt(int32 index) const;
 
-			void				_DrawClose(BRect r);
-			void				_DrawTitle(BRect r);
-			void				_DrawZoom(BRect r);
-			void				_DrawMinimize(BRect r);
+	virtual	void				_DrawFrame(BRect rect);
+	virtual	void				_DrawTab(Decorator::Tab* tab, BRect rect);
+	virtual	void				_DrawTitle(Decorator::Tab* tab, BRect rect);
 
-			void				_SetTitle(const char* string,
-	 								BRegion* updateRegion = NULL);
+	virtual	void				_DrawMinimize(Decorator::Tab* tab, bool direct,
+									BRect rect);
+	virtual	void				_DrawZoom(Decorator::Tab* tab, bool direct,
+									BRect rect);
+	virtual	void				_DrawClose(Decorator::Tab* tab, bool direct,
+									BRect rect);
+
+	virtual	void				_SetTitle(Decorator::Tab* tab, const char* string,
+									BRegion* updateRegion = NULL);
 
 			void				_FontsChanged(DesktopSettings& settings,
 									BRegion* updateRegion);
@@ -55,11 +66,19 @@ protected:
 			void				_SetFlags(uint32 flags,
 									BRegion* updateRegion = NULL);
 
-			void				_MoveBy(BPoint pt);
-			void				_ResizeBy(BPoint pt, BRegion* dirty);
+			void				_MoveBy(BPoint offset);
+			void				_ResizeBy(BPoint offset, BRegion* dirty);
+
+	virtual	bool				_AddTab(DesktopSettings& settings,
+									int32 index = -1,
+									BRegion* updateRegion = NULL);
+	virtual	bool				_RemoveTab(int32 index,
+									BRegion* updateRegion = NULL);
+	virtual	bool				_MoveTab(int32 from, int32 to, bool isMoving,
+									BRegion* updateRegion = NULL);
 
 			void				_GetFootprint(BRegion *region);
-			void				_SetFocus(void);
+	virtual	void				_SetFocus(Decorator::Tab* tab);
 
 private:
 			void				_UpdateFont(DesktopSettings& settings);
