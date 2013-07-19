@@ -255,7 +255,7 @@ PackageInfo::Parse()
 			uint8 *compressed = new uint8[length];
 			if (fPackageFile->Read(compressed, length)
 					!= static_cast<int64>(length)) {
-				delete compressed;
+				delete[] compressed;
 				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 
@@ -263,14 +263,14 @@ PackageInfo::Parse()
 			status_t ret = inflate_data(compressed, length, disclaimer,
 				original);
 			disclaimer[original] = 0;
-			delete compressed;
+			delete[] compressed;
 			if (ret != B_OK) {
-				delete disclaimer;
+				delete[] disclaimer;
 				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 
 			fDisclaimer = (char *)disclaimer;
-			delete disclaimer;
+			delete[] disclaimer;
 
 			continue;
 		} else if (!memcmp(buffer, splashScreenMarker, 7)) {
@@ -291,7 +291,7 @@ PackageInfo::Parse()
 			uint8 *compressed = new uint8[length];
 			if (fPackageFile->Read(compressed, length)
 					!= static_cast<int64>(length)) {
-				delete compressed;
+				delete[] compressed;
 				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 
@@ -299,7 +299,7 @@ PackageInfo::Parse()
 			status_t ret = inflate_data(compressed, length,
 				static_cast<uint8 *>(const_cast<void *>(fImage.Buffer())),
 				original);
-			delete compressed;
+			delete[] compressed;
 			if (ret != B_OK) {
 				RETURN_AND_SET_STATUS(B_ERROR);
 			}
@@ -370,7 +370,7 @@ PackageInfo::Parse()
 					fPackageFile->Read(name, length);
 					name[length] = 0;
 					group.name = name;
-					delete name;
+					delete[] name;
 				} else if (!memcmp(buffer, "GrpD", 5)) {
 					if (!groupStarted) {
 						RETURN_AND_SET_STATUS(B_ERROR);
@@ -385,7 +385,7 @@ PackageInfo::Parse()
 					fPackageFile->Read(desc, length);
 					desc[length] = 0;
 					group.description = desc;
-					delete desc;
+					delete[] desc;
 				} else if (!memcmp(buffer, "GrHt", 5)) {
 					if (!groupStarted) {
 						RETURN_AND_SET_STATUS(B_ERROR);
@@ -465,7 +465,7 @@ PackageInfo::Parse()
 					}
 					fDescription.Remove(0, i);
 
-					delete description;
+					delete[] description;
 					parser_debug("Description text reached\n");
 
 					// After this, there's a known size sequence of bytes, which
@@ -494,7 +494,7 @@ PackageInfo::Parse()
 					fPackageFile->Read(name, length);
 					name[length] = 0;
 					fName = name;
-					delete name;
+					delete[] name;
 				} else if (!memcmp(buffer, versionMarker, 7)) {
 					parser_debug("Package version reached\n");
 					fPackageFile->Read(&length, 4);
@@ -505,7 +505,7 @@ PackageInfo::Parse()
 					fPackageFile->Read(version, length);
 					version[length] = 0;
 					fVersion = version;
-					delete version;
+					delete[] version;
 				} else if (!memcmp(buffer, devMarker, 7)) {
 					parser_debug("Package developer reached\n");
 					fPackageFile->Read(&length, 4);
@@ -516,7 +516,7 @@ PackageInfo::Parse()
 					fPackageFile->Read(dev, length);
 					dev[length] = 0;
 					fDeveloper = dev;
-					delete dev;
+					delete[] dev;
 				} else if (!memcmp(buffer, shortDescMarker, 7)) {
 					parser_debug("Package short description reached\n");
 					fPackageFile->Read(&length, 4);
@@ -527,7 +527,7 @@ PackageInfo::Parse()
 					fPackageFile->Read(desc, length);
 					desc[length] = 0;
 					fShortDesc = desc;
-					delete desc;
+					delete[] desc;
 				} else if (!memcmp(buffer, helpMarker, 7)) {
 					// The help text is a stored in deflated state, preceded by a 64 bit
 					// compressed size, 64 bit inflated size and a 32 bit integer
@@ -564,7 +564,7 @@ PackageInfo::Parse()
 					fPackageFile->Read(ti, length);
 					ti[length] = 0;
 					parser_debug("DQTi - %s\n", ti);
-					delete ti;
+					delete[] ti;
 				} else if (!memcmp(buffer, "DQSz", 5)) {
 					parser_debug("DQSz\n");
 					uint64 size;
@@ -588,7 +588,7 @@ PackageInfo::Parse()
 					fPackageFile->Read(signature, length);
 					signature[length] = 0;
 					parser_debug("DQMi - %s\n", signature);
-					delete signature;
+					delete[] signature;
 				} else if (!memcmp(buffer, "PaNa", 5)) {
 					parser_debug("PaNa\n");
 					fPackageFile->Read(&length, 4);
@@ -602,7 +602,7 @@ PackageInfo::Parse()
 					if (length > 0 && pathname[length - 1] == '/')
 						path->Remove(length - 1, 1);
 					userPaths.AddItem(path);
-					delete pathname;
+					delete[] pathname;
 				} else if (!memcmp(buffer, padding, 7)) {
 					parser_debug("Padding!\n");
 					continue;
@@ -675,7 +675,7 @@ PackageInfo::Parse()
 			name[length] = 0;
 
 			nameString = name;
-			delete name;
+			delete[] name;
 		} else if (!memcmp(buffer, "Grps", 5)) {
 			if (element == P_NONE) {
 				RETURN_AND_SET_STATUS(B_ERROR);
@@ -763,7 +763,7 @@ PackageInfo::Parse()
 			parser_debug("Mime: %s\n", mime);
 
 			mimeString = mime;
-			delete mime;
+			delete[] mime;
 		} else if (!memcmp(buffer, "CmpS", 5)) {
 			if (element == P_NONE) {
 				RETURN_AND_SET_STATUS(B_ERROR);
@@ -821,7 +821,7 @@ PackageInfo::Parse()
 			parser_debug("Signature: %s\n", signature);
 
 			signatureString = signature;
-			delete signature;
+			delete[] signature;
 		} else if (!memcmp(buffer, "Link", 5)) {
 			if (element != P_LINK) {
 				RETURN_AND_SET_STATUS(B_ERROR);
@@ -837,7 +837,7 @@ PackageInfo::Parse()
 			parser_debug("Link: %s\n", link);
 
 			linkString = link;
-			delete link;
+			delete[] link;
 		} else if (!memcmp(buffer, padding, 7)) {
 			PackageItem *item = NULL;
 
