@@ -10,12 +10,12 @@ UsePrivateHeaders app shared interface graphics ;
 UseLibraryHeaders agg ;
 UsePrivateHeaders kernel ;
 
-AddResources ClassicBe : resources.rdef ;
+AddResources BeDecorator : resources.rdef ;
 
 Includes [ FGristFiles BeDecorator.cpp ]
 	: [ BuildFeatureAttribute freetype : headers ] ;
 
-Addon ClassicBe :
+Addon BeDecorator :
 	BeDecorator.cpp
 	: be <nogrist>app_server $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
 	: resources.rdef
