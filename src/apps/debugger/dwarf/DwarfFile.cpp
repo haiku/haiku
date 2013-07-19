@@ -575,16 +575,16 @@ DwarfFile::FinishLoading()
 		return fFinishError;
 
 	status_t error;
-	for (int32 i = 0; CompilationUnit* unit = fCompilationUnits.ItemAt(i);
-			i++) {
-		error = _FinishUnit(unit);
+	for (TypeUnitTable::Iterator it = fTypeUnits.GetIterator();
+		TypeUnitTableEntry* entry = it.Next();) {
+		error = _FinishUnit(entry->unit);
 		if (error != B_OK)
 			return fFinishError = error;
 	}
 
-	for (TypeUnitTable::Iterator it = fTypeUnits.GetIterator();
-		TypeUnitTableEntry* entry = it.Next();) {
-		error = _FinishUnit(entry->unit);
+	for (int32 i = 0; CompilationUnit* unit = fCompilationUnits.ItemAt(i);
+			i++) {
+		error = _FinishUnit(unit);
 		if (error != B_OK)
 			return fFinishError = error;
 	}
