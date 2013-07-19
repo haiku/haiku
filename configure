@@ -183,6 +183,22 @@ standard_gcc_settings()
 		# Note: We filter out eabi.o. It's present in gcc's libgcc for PPC and
 		# neither needed nor wanted.
 
+	# determine architecture from machine triple
+	case $HAIKU_GCC_MACHINE in
+		arm-*)		HAIKU_CPU=arm;;
+		i?86-*)		HAIKU_CPU=x86;;
+		m68k-*)		HAIKU_CPU=m68k;;
+		mipsel-*)	HAIKU_CPU=mipsel;;
+		powerpc-*)	HAIKU_CPU=ppc;;
+		x86_64-*)	HAIKU_CPU=x86_64;;
+		*)
+			echo "Unsupported gcc target machine: $HAIKU_GCC_MACHINE" >&2
+			exit 1
+			;;
+	esac
+
+	HAIKU_PACKAGING_ARCH=$HAIKU_CPU
+
 	case $HAIKU_GCC_RAW_VERSION in
 		4.*)
 			# for gcc 4 we use the libstdc++ and libsupc++ that come with the
@@ -246,7 +262,7 @@ standard_gcc_settings()
 			else
 				HAIKU_SHARED_LIBSUPCXX=`$readlink $HAIKU_SHARED_LIBSUPCXX`
 			fi
-		;;
+			;;
 		2.9*)
 			# check for correct (most up-to-date) legacy compiler and complain
 			# if an older one is installed
@@ -258,7 +274,8 @@ standard_gcc_settings()
 
 			HAIKU_KERNEL_LIBGCC=$HAIKU_GCC_LIBGCC
 			HAIKU_KERNEL_LIBSUPCXX=
-		;;
+			HAIKU_PACKAGING_ARCH=x86_gcc2
+			;;
 	esac
 
 	case $HAIKU_GCC_MACHINE in
@@ -266,11 +283,11 @@ standard_gcc_settings()
 			# Boot loader is 32-bit, need the 32-bit libs.
 			HAIKU_BOOT_LIBGCC=`$HAIKU_CC -m32 -print-libgcc-file-name`
 			HAIKU_BOOT_LIBSUPCXX=`$HAIKU_CC -m32 -print-file-name=libsupc++.a`
-		;;
+			;;
 		*)
 			HAIKU_BOOT_LIBGCC=$HAIKU_GCC_LIBGCC
 			HAIKU_BOOT_LIBSUPCXX=$HAIKU_STATIC_LIBSUPCXX
-		;;
+			;;
 	esac
 }
 
@@ -322,7 +339,6 @@ configureArgs="$@"
 #
 platform=`uname`
 platformMachine=`uname  -m`
-targetArch=x86
 crossToolsPrefix=
 buildCrossTools=
 buildCrossToolsScript="$sourceDir/build/scripts/build_cross_tools"
@@ -332,6 +348,8 @@ buildCrossToolsJobs=
 # exported (BuildSetup) default parameter values
 #
 HAIKU_GCC_RAW_VERSION=
+HAIKU_CPU=x86
+HAIKU_PACKAGING_ARCH=x86_gcc2
 HAIKU_GCC_MACHINE=i586-pc-haiku
 HAIKU_STATIC_LIBSTDCXX=
 HAIKU_SHARED_LIBSTDCXX=
@@ -427,11 +445,11 @@ while [ $# -gt 0 ] ; do
 			buildCrossToolsScript="${buildCrossToolsScript}_gcc4"
 			case "$2" in
 				x86)	HAIKU_GCC_MACHINE=i586-pc-haiku;;
-				x86_64)	HAIKU_GCC_MACHINE=x86_64-unknown-haiku; targetArch=x86_64;;
-				ppc)	HAIKU_GCC_MACHINE=powerpc-apple-haiku; targetArch=ppc;;
-				m68k)	HAIKU_GCC_MACHINE=m68k-unknown-haiku; targetArch=m68k;;
-				arm)	HAIKU_GCC_MACHINE=arm-unknown-haiku; targetArch=arm;;
-				mipsel)	HAIKU_GCC_MACHINE=mipsel-unknown-haiku; targetArch=mips;;
+				x86_64)	HAIKU_GCC_MACHINE=x86_64-unknown-haiku;;
+				ppc)	HAIKU_GCC_MACHINE=powerpc-apple-haiku;;
+				m68k)	HAIKU_GCC_MACHINE=m68k-unknown-haiku;;
+				arm)	HAIKU_GCC_MACHINE=arm-unknown-haiku;;
+				mipsel)	HAIKU_GCC_MACHINE=mipsel-unknown-haiku;
 				*)		echo "Unsupported target architecture: $2"
 						exit 1;;
 			esac
@@ -607,6 +625,9 @@ HAIKU_GCC_MACHINE			?= ${HAIKU_GCC_MACHINE} ;
 HAIKU_GCC_LIB_DIR			?= ${HAIKU_GCC_LIB_DIR} ;
 HAIKU_GCC_HEADERS_DIR		?= ${HAIKU_GCC_HEADERS_DIR} ;
 HAIKU_GCC_LIBGCC			?= ${HAIKU_GCC_LIBGCC} ;
+
+HAIKU_CPU					?= ${HAIKU_CPU} ;
+HAIKU_PACKAGING_ARCH		?= ${HAIKU_PACKAGING_ARCH} ;
 
 HAIKU_STATIC_LIBSTDC++		?= ${HAIKU_STATIC_LIBSTDCXX} ;
 HAIKU_SHARED_LIBSTDC++		?= ${HAIKU_SHARED_LIBSTDCXX} ;
