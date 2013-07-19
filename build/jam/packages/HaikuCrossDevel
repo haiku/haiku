@@ -25,8 +25,9 @@ AddFilesToPackage $(developCrossLibDirTokens) :
 AddFilesToPackage $(developCrossLibDirTokens) : kernel.so : _KERNEL_ ;
 
 # libraries
-AddLibrariesToPackage $(developCrossLibDirTokens) : 
-	<revisioned>libroot.so 
+AddLibrariesToPackage $(developCrossLibDirTokens) :
+	libbsd.so
+	<revisioned>libroot.so
 	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
 ;
 
