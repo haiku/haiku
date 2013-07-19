@@ -1788,12 +1788,12 @@ if [ IsOptionalHaikuImagePackageAdded Paladin ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				paladin-1.3-r1a4-x86-gcc4-2012-08-30.zip
-				: $(baseURL)/paladin-1.3-r1a4-x86-gcc4-2012-08-30.zip ;
+				paladin-1.3-x86-gcc4-2013-07-19.zip
+				: $(baseURL)/paladin-1.3-x86-gcc4-2013-07-19.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				paladin-1.3-r1a3-x86-gcc2-2011-05-18.zip
-				: $(baseURL)/paladin-1.3-r1a3-x86-gcc2-2011-05-18.zip ;
+				paladin-1.3-x86-gcc2-2013-07-19.zip
+				: $(baseURL)/paladin-1.3-x86-gcc2-2013-07-19.zip ;
 		}
 
 		AddSymlinkToHaikuImage home config settings deskbar Applications
