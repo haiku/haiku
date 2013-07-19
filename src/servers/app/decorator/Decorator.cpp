@@ -294,7 +294,8 @@ Decorator::TabRect(Decorator::Tab* tab) const
 	Note that this does not update the button's look - it just updates the
 	internal button value
 
-	\param is_down Whether the button is down or not
+	\param tab The tab index
+	\param pressed Whether the button is down or not
 */
 void
 Decorator::SetClose(int32 tab, bool pressed)
@@ -308,6 +309,7 @@ Decorator::SetClose(int32 tab, bool pressed)
 		DrawClose(tab);
 	}
 }
+
 
 /*!	\brief Sets the minimize button's value.
 
@@ -619,17 +621,17 @@ Decorator::GetSettings(BMessage* settings) const
 }
 
 
-/*!	\brief Updates the decorator's look in the area \a rect
+/*!	\brief Updates the decorator in the rectangular area \a updateRect.
 
 	The default version updates all areas which intersect the frame and tab.
 
-	\param rect The area to update.
+	\param updateRect The rectangular area to update.
 */
 void
-Decorator::Draw(BRect rect)
+Decorator::Draw(BRect updateRect)
 {
-	_DrawFrame(rect & fFrame);
-	_DrawTabs(rect & fTitleBarRect);
+	_DrawFrame(updateRect & fFrame);
+	_DrawTabs(updateRect & fTitleBarRect);
 }
 
 
@@ -746,7 +748,6 @@ void
 Decorator::_DrawFrame(BRect rect)
 {
 }
-
 
 
 void

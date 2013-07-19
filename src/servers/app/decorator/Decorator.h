@@ -155,7 +155,7 @@ public:
 								BRegion* updateRegion = NULL);
 	virtual	bool			GetSettings(BMessage* settings) const;
 
-	virtual	void			Draw(BRect rect);
+	virtual	void			Draw(BRect updateRect);
 	virtual	void			Draw();
 	virtual	void			DrawClose(int32 tab);
 	virtual	void			DrawMinimize(int32 tab);

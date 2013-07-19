@@ -721,8 +721,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
 						BPoint(r.right - i, r.top + i), colors[i * 2]);
 				}
-				if (fTitleBarRect.IsValid()
-					&& fTopTab->look != kLeftTitledWindowLook) {
+				if (fTitleBarRect.IsValid() && fTopTab->look != kLeftTitledWindowLook) {
 					// grey along the bottom of the tab
 					// (overwrites "white" from frame)
 					fDrawingEngine->StrokeLine(
@@ -1436,7 +1435,7 @@ DefaultDecorator::_GetFootprint(BRegion *region)
 	// This function calculates the decorator's footprint in coordinates
 	// relative to the view. This is most often used to set a Window
 	// object's visible region.
-	if (!region)
+	if (region == NULL)
 		return;
 
 	region->MakeEmpty();

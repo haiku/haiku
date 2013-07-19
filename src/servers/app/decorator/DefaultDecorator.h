@@ -141,7 +141,7 @@ protected:
 	virtual	bool				_SetSettings(const BMessage& settings,
 									BRegion* updateRegion = NULL);
 
-	virtual bool				_AddTab(DesktopSettings& settings,
+	virtual	bool				_AddTab(DesktopSettings& settings,
 									int32 index = -1,
 									BRegion* updateRegion = NULL);
 	virtual	bool				_RemoveTab(int32 index,
