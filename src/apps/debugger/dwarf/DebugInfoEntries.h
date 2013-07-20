@@ -1614,16 +1614,11 @@ public:
 
 			uint16				Language() const	{ return fLanguage; }
 
-	virtual	status_t			AddChild(DebugInfoEntry* child);
-
 	virtual	status_t			AddAttribute_language(uint16 attributeName,
 									const AttributeValue& value);
-	inline	DIEType*			GetType() const { return fType; }
-
 
 private:
 			uint16				fLanguage;
-			DIEType*			fType;
 };
 
 

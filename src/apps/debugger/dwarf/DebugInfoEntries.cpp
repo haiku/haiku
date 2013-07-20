@@ -2550,16 +2550,6 @@ DIETypeUnit::Tag() const
 
 
 status_t
-DIETypeUnit::AddChild(DebugInfoEntry* child)
-{
-	if (child->IsType())
-		fType = dynamic_cast<DIEType*>(child);
-
-	return B_OK;
-}
-
-
-status_t
 DIETypeUnit::AddAttribute_language(uint16 attributeName,
 	const AttributeValue& value)
 {

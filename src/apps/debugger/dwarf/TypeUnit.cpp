@@ -16,6 +16,7 @@ TypeUnit::TypeUnit(off_t headerOffset, off_t contentOffset,
 	BaseUnit(headerOffset, contentOffset, totalSize, abbreviationOffset,
 		addressSize, isDwarf64),
 	fUnitEntry(NULL),
+	fTypeEntry(NULL),
 	fSignature(signature),
 	fTypeOffset(typeOffset)
 {
@@ -37,10 +38,14 @@ TypeUnit::SetUnitEntry(DIETypeUnit* entry)
 DebugInfoEntry*
 TypeUnit::TypeEntry() const
 {
-	if (fUnitEntry != NULL)
-		return fUnitEntry->GetType();
+	return fTypeEntry;
+}
 
-	return NULL;
+
+void
+TypeUnit::SetTypeEntry(DebugInfoEntry* entry)
+{
+	fTypeEntry = entry;
 }
 
 

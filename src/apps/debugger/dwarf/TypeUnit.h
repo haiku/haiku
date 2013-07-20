@@ -36,11 +36,13 @@ public:
 			void				SetUnitEntry(DIETypeUnit* entry);
 
 			DebugInfoEntry*		TypeEntry() const;
+			void				SetTypeEntry(DebugInfoEntry* entry);
 
 	virtual	dwarf_unit_kind		Kind() const;
 
 private:
 			DIETypeUnit*		fUnitEntry;
+			DebugInfoEntry*		fTypeEntry;
 			uint64				fSignature;
 			off_t				fTypeOffset;
 };

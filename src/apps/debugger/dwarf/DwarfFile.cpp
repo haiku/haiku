@@ -1142,6 +1142,13 @@ DwarfFile::_ParseTypeUnit(TypeUnit* unit)
 	}
 
 	unit->SetUnitEntry(unitEntry);
+	DebugInfoEntry* typeEntry = unit->EntryForOffset(unit->TypeOffset());
+	if (typeEntry == NULL) {
+		WARNING("No type found for type unit %p at specified offset %"
+			B_PRId64 ".\n", unit, unit->TypeOffset());
+		return B_BAD_DATA;
+	}
+	unit->SetTypeEntry(typeEntry);
 
 	TRACE_DIE_ONLY(
 		TRACE_DIE("remaining bytes in unit: %" B_PRIdOFF "\n",
@@ -2591,6 +2598,7 @@ DwarfFile::_ResolveReference(BaseUnit* unit, uint64 offset,
 		}
 		case dwarf_reference_type_signature:
 		{
+			TRACE_DIE("Resolving signature %#" B_PRIx64 "\n", offset);
 			TypeUnitTableEntry* entry = fTypeUnits.Lookup(offset);
 			if (entry != NULL && entry->unit != NULL)
 				return entry->unit->TypeEntry();
