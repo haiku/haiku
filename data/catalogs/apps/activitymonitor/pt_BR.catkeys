@@ -1,8 +1,7 @@
-1	portuguese (brazil)	x-vnd.Haiku-ActivityMonitor	1913625522
+1	portuguese (brazil)	x-vnd.Haiku-ActivityMonitor	2739021859
 P-faults	DataSource		P-falhas
 Media nodes	DataSource		Nós de mídia
 Threads	DataSource		Processos
-MB	DataSource		Mb
 Always on top	ActivityWindow		Sempre visível
 Add graph	ActivityWindow		Adicionar grafo
 Teams	DataSource		Equipes
@@ -28,7 +27,6 @@ TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		Sair
 Block cache memory	DataSource		Bloquear memória em cache
 Remove graph	ActivityView		Remover grafo
-%.1f MB	DataSource		%.1f MB
 %lld sec.	SettingsWindow		%lld seg.
 %lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		Utilização da CPU
@@ -44,6 +42,5 @@ File	ActivityWindow		Arquivo
 usage	DataSource		uso
 Additional items	ActivityView		Itens adicionais
 Network receive	DataSource		Recebimento de rede
-%.1f KB/s	DataSource		%.1f Kb/s
 Memory	DataSource		Memória
 RX	DataSource	Shorter version for Receiving.	RX

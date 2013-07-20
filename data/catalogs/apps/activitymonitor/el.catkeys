@@ -1,8 +1,7 @@
-1	greek, modern (1453-)	x-vnd.Haiku-ActivityMonitor	3704566709
+1	greek, modern (1453-)	x-vnd.Haiku-ActivityMonitor	234995750
 P-faults	DataSource		P-σφάλματα
 Media nodes	DataSource		Κόμβοι πολυμέσων
 Threads	DataSource		Θέματα
-MB	DataSource		ΜΒ
 Add graph	ActivityWindow		Προσθήκη γραφήματος
 Teams	DataSource		Ομάδες
 Hide legend	ActivityView		Απόκρυψη υπομνήματος
@@ -27,7 +26,6 @@ TX	DataSource	Shorter version for Sending	ΑΠ
 Quit	ActivityWindow		Έξοδος
 Block cache memory	DataSource		Αποκλεισμός λανθάνουσας μνήμης
 Remove graph	ActivityView		Αφαίρεση γραφήματος
-%.1f MB	DataSource		%.1f MB
 %lld sec.	SettingsWindow		%lld δευτ.
 %lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		Χρήση ΚΜΕ
@@ -43,6 +41,5 @@ File	ActivityWindow		Αρχείο
 usage	DataSource		χρήση
 Additional items	ActivityView		Επιπλέον αντικείμενα
 Network receive	DataSource		Λήψεις δικτύου
-%.1f KB/s	DataSource		%.1f KB/s
 Memory	DataSource		Μνήμη
 RX	DataSource	Shorter version for Receiving.	ΛΗ

@@ -1,8 +1,7 @@
-1	romanian	x-vnd.Haiku-ActivityMonitor	3704566709
+1	romanian	x-vnd.Haiku-ActivityMonitor	234995750
 P-faults	DataSource		Defecțiuni de tip P
 Media nodes	DataSource		Noduri media
 Threads	DataSource		Fire de execuție
-MB	DataSource		MiB
 Add graph	ActivityWindow		Adaugă grafic
 Teams	DataSource		Echipe
 Hide legend	ActivityView		Ascunde legenda
@@ -27,7 +26,6 @@ TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		Părăsește
 Block cache memory	DataSource		Blochează memoria tampon
 Remove graph	ActivityView		Elimină grafic
-%.1f MB	DataSource		%.1f MiB
 %lld sec.	SettingsWindow		%lld sec.
 %lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		Utilizare procesor
@@ -43,6 +41,5 @@ File	ActivityWindow		Fișier
 usage	DataSource		utilizare
 Additional items	ActivityView		Elemente adiționale
 Network receive	DataSource		Recepție rețea
-%.1f KB/s	DataSource		%.1f KiB/s
 Memory	DataSource		Memorie
 RX	DataSource	Shorter version for Receiving.	RX

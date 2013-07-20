@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	1638733886
+1	finnish	x-vnd.Haiku-libtracker	1762695842
 common	B_COMMON_DIRECTORY		yhteinen
 OK	WidgetAttributeText		Valmis
 Icon view	VolumeWindow		Kuvakenäkymä
@@ -143,6 +143,7 @@ Add-ons	ContainerWindow		Lisäosat
 Edit templates…	TemplatesMenu		Muokkaa mallinteita...
 Finish: %time - Over %finishtime left	StatusWindow		Loppuu: %time - Yli %finistime jäljellä
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Kohde nimeltä ”%name” on jo olemassa tässä kansiossa. Haluaisitko korvata sen symbolisella linkillä, jota olet luomassa?
+Fewer options	FindPanel		Vähemmän valitsimia
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Kohdetaltiolla ei ole tarpeeksi tilaa valinnan kopioimiseksi.
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Asiakirjan ”%document” avaaminen sovelluksella ”%app” epäonnistui (%error). 
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Useamman kuin yhden kohteen tallentaminen ei ole sallittua.
@@ -236,6 +237,7 @@ Temporary	FindPanel		Tilapäinen
 Version	OpenWithWindow		Versio
 Default application	InfoWindow		Oletussovellus
 Preparing to copy items…	StatusWindow		Valmistaudutaan kopioimaan kohteita...
+Save query as template…	FindPanel		Tallenna kysely mallinteena...
 Show folder location in title tab	SettingsView		Näytä kansion sijainti otsikkovälilehdessä
 Proceed	FSUtils		Jatketaan
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Tässä kansiossa on jo joitakin kohteita, joilla on samat nimet kuin kohteilla, joille haluat suorittaa toiminnon ”%verb”.\n \nHaluaisitko korvata ne niillä kohteilla, jotka joille haluat suorittaa toiminnon ”%verb” vai haluatko kysymyskehotteen jokaiselle?
@@ -334,6 +336,7 @@ The specified name is already used as the name of a folder. Please choose anothe
 Clean up	ContainerWindow		Tyhjennä
 after	FindPanel		jälkeen
 Select…	QueryContainerWindow		Valitse...
+More options	FindPanel		Lisää valitsimia
 link	FSUtils	filename link	linkki
 At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		Funktio %func kohteessa\nfind_directory() epäonnistui. \nSyy: %error
 The specified name is illegal. Please choose another name.	FilePanelPriv		Määritelty nimi on virheellinen. Valitse toinen nimi.
@@ -445,6 +448,7 @@ contains	FindPanel		sisältää
 Relation	OpenWithWindow		Suhde
 Open	FilePanelPriv		Avaa
 Mount	DeskWindow		Liitä
+Recent queries	FindPanel		Äskettäiset kyselyt
 Mount	ContainerWindow		Liitä
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used käytetty -- %free vapaana)
 Cancel	FSClipBoard		Peru

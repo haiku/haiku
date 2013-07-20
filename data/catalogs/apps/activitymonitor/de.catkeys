@@ -1,8 +1,7 @@
-1	german	x-vnd.Haiku-ActivityMonitor	1913625522
+1	german	x-vnd.Haiku-ActivityMonitor	2739021859
 P-faults	DataSource		Seitenfehler
 Media nodes	DataSource		Media-Nodes
 Threads	DataSource		Threads
-MB	DataSource		MiB
 Always on top	ActivityWindow		Immer im Vordergrund
 Add graph	ActivityWindow		Graphen hinzufügen
 Teams	DataSource		Teams
@@ -28,7 +27,6 @@ TX	DataSource	Shorter version for Sending	Senden
 Quit	ActivityWindow		Beenden
 Block cache memory	DataSource		Block-Cache-Speicher
 Remove graph	ActivityView		Graph entfernen
-%.1f MB	DataSource		%.1f MiB
 %lld sec.	SettingsWindow		%lld Sek.
 %lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		CPU-Auslastung
@@ -44,6 +42,5 @@ File	ActivityWindow		Datei
 usage	DataSource		Last
 Additional items	ActivityView		Zusätzliche Elemente
 Network receive	DataSource		Netzwerk empfangen
-%.1f KB/s	DataSource		%.1f KiB/s
 Memory	DataSource		Speicher
 RX	DataSource	Shorter version for Receiving.	Empfangen

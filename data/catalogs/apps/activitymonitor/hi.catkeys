@@ -1,8 +1,7 @@
-1	hindi	x-vnd.Haiku-ActivityMonitor	3548050559
+1	hindi	x-vnd.Haiku-ActivityMonitor	2276879962
 P-faults	DataSource		पी-गलतियाँ
 Media nodes	DataSource		मीडिया नोडस
 Threads	DataSource		थ्रेअड्स
-MB	DataSource		एमबी
 Add graph	ActivityWindow		गराफ जोड़े
 Teams	DataSource		टीम्स
 Hide legend	ActivityView		लेजेनद को छुपाएँ

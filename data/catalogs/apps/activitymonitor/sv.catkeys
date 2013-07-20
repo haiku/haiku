@@ -1,8 +1,7 @@
-1	swedish	x-vnd.Haiku-ActivityMonitor	1913625522
+1	swedish	x-vnd.Haiku-ActivityMonitor	2739021859
 P-faults	DataSource		P-fel
 Media nodes	DataSource		Medianoder
 Threads	DataSource		Trådar
-MB	DataSource		MB
 Always on top	ActivityWindow		Alltid överst
 Add graph	ActivityWindow		Lägg till graf
 Teams	DataSource		Processer
@@ -28,7 +27,6 @@ TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		Avsluta
 Block cache memory	DataSource		Blockcacheminne
 Remove graph	ActivityView		Ta bort graf
-%.1f MB	DataSource		%.1f MB
 %lld sec.	SettingsWindow		%lld sek.
 %lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		CPU användning
@@ -44,6 +42,5 @@ File	ActivityWindow		Arkiv
 usage	DataSource		användning
 Additional items	ActivityView		Ytterligare mätvärden
 Network receive	DataSource		Nätverksmotagning
-%.1f KB/s	DataSource		%.1f KB/s
 Memory	DataSource		Minne
 RX	DataSource	Shorter version for Receiving.	RX

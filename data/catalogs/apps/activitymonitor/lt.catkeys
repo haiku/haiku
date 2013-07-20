@@ -1,7 +1,6 @@
-1	lithuanian	x-vnd.Haiku-ActivityMonitor	3130452266
+1	lithuanian	x-vnd.Haiku-ActivityMonitor	3955848603
 P-faults	DataSource		Psl. klaidos
 Threads	DataSource		Gijos
-MB	DataSource		MB
 Add graph	ActivityWindow		Pridėti grafiką
 Teams	DataSource		Procesų grupės
 Hide legend	ActivityView		Nerodyti legendos
@@ -26,7 +25,6 @@ TX	DataSource	Shorter version for Sending	Išs.
 Quit	ActivityWindow		Baigti darbą
 Block cache memory	DataSource		Blokinio podėlio atmintis
 Remove graph	ActivityView		Pašalinti grafiką
-%.1f MB	DataSource		%.1f MB
 %lld sec.	SettingsWindow		%lld sek.
 %lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		Centrinio procesoriaus apkrova
@@ -42,6 +40,5 @@ File	ActivityWindow		Failas
 usage	DataSource		apkrova
 Additional items	ActivityView		Papildomi elementai
 Network receive	DataSource		Atsiunčiami duomenys
-%.1f KB/s	DataSource		%.1f KB/s
 Memory	DataSource		Atmintis
 RX	DataSource	Shorter version for Receiving.	Ats.

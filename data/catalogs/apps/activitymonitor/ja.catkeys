@@ -1,8 +1,7 @@
-1	japanese	x-vnd.Haiku-ActivityMonitor	1913625522
+1	japanese	x-vnd.Haiku-ActivityMonitor	2739021859
 P-faults	DataSource		ページフォルト
 Media nodes	DataSource		メディアノード数
 Threads	DataSource		スレッド数
-MB	DataSource		MB
 Always on top	ActivityWindow		常に前面に
 Add graph	ActivityWindow		グラフの追加
 Teams	DataSource		チーム数
@@ -28,7 +27,6 @@ TX	DataSource	Shorter version for Sending	送信
 Quit	ActivityWindow		終了
 Block cache memory	DataSource		ブロックキャッシュメモリ
 Remove graph	ActivityView		グラフの削除
-%.1f MB	DataSource		%.1f MB
 %lld sec.	SettingsWindow		%lld 秒
 %lld ms	SettingsWindow		%lld マイクロ秒
 CPU usage	DataSource		CPU 使用率
@@ -44,6 +42,5 @@ File	ActivityWindow		ファイル
 usage	DataSource		使用量
 Additional items	ActivityView		追加項目
 Network receive	DataSource		ネットワーク受信バイト数
-%.1f KB/s	DataSource		%.1f KB/s
 Memory	DataSource		メモリ
 RX	DataSource	Shorter version for Receiving.	受信

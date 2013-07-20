@@ -1,8 +1,7 @@
-1	slovak	x-vnd.Haiku-ActivityMonitor	3704566709
+1	slovak	x-vnd.Haiku-ActivityMonitor	234995750
 P-faults	DataSource		P-fault
 Media nodes	DataSource		Mediálne uzly
 Threads	DataSource		Vlákna
-MB	DataSource		MB
 Add graph	ActivityWindow		Pridať graf
 Teams	DataSource		Tímy
 Hide legend	ActivityView		Skryť legendu
@@ -27,7 +26,6 @@ TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		Ukončiť
 Block cache memory	DataSource		Bloková vyrovnávacia pamäť
 Remove graph	ActivityView		Odstrániť graf
-%.1f MB	DataSource		%.1f MB
 %lld sec.	SettingsWindow		%lld sek.
 %lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		Využitie CPU
@@ -43,6 +41,5 @@ File	ActivityWindow		Súbor
 usage	DataSource		využitie
 Additional items	ActivityView		Ďalšie položky
 Network receive	DataSource		Sieť - prijaté
-%.1f KB/s	DataSource		%.1f KB/s
 Memory	DataSource		Pamäť
 RX	DataSource	Shorter version for Receiving.	RX

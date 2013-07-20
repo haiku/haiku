@@ -1,8 +1,7 @@
-1	polish	x-vnd.Haiku-ActivityMonitor	1913625522
+1	polish	x-vnd.Haiku-ActivityMonitor	2739021859
 P-faults	DataSource		P-błędy
 Media nodes	DataSource		Węzły multimedialne
 Threads	DataSource		Wątki
-MB	DataSource		MB
 Always on top	ActivityWindow		Zawsze na wierzchu
 Add graph	ActivityWindow		Dodaj wykres
 Teams	DataSource		Zespoły
@@ -28,7 +27,6 @@ TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		Wyjdź
 Block cache memory	DataSource		Pamięć bloku cache
 Remove graph	ActivityView		Usuń wykres
-%.1f MB	DataSource		%.1f MB
 %lld sec.	SettingsWindow		%lld sek.
 %lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		Użycie CPU
@@ -44,6 +42,5 @@ File	ActivityWindow		Plik
 usage	DataSource		zużycie
 Additional items	ActivityView		Dodatki
 Network receive	DataSource		Odebrano
-%.1f KB/s	DataSource		%.1f KB/s
 Memory	DataSource		Pamięć
 RX	DataSource	Shorter version for Receiving.	RX
