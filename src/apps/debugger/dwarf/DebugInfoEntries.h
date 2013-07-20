@@ -1606,19 +1606,11 @@ private:
 };
 
 
-class DIETypeUnit : public DebugInfoEntry {
+class DIETypeUnit : public DIECompileUnitBase {
 public:
 								DIETypeUnit();
 
 	virtual	uint16				Tag() const;
-
-			uint16				Language() const	{ return fLanguage; }
-
-	virtual	status_t			AddAttribute_language(uint16 attributeName,
-									const AttributeValue& value);
-
-private:
-			uint16				fLanguage;
 };
 
 

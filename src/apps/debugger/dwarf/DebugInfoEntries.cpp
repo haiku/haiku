@@ -2536,8 +2536,6 @@ DIESharedType::AddAttribute_decl_column(uint16 attributeName,
 
 
 DIETypeUnit::DIETypeUnit()
-	:
-	fLanguage(0)
 {
 }
 
@@ -2546,15 +2544,6 @@ uint16
 DIETypeUnit::Tag() const
 {
 	return DW_TAG_type_unit;
-}
-
-
-status_t
-DIETypeUnit::AddAttribute_language(uint16 attributeName,
-	const AttributeValue& value)
-{
-	fLanguage = value.constant;
-	return B_OK;
 }
 
 
