@@ -241,14 +241,15 @@ BPrintJob::BeginJob()
 		return;
 
 	path.Append(printer);
-	free(printer);
 
 	char mangledName[B_FILE_NAME_LENGTH];
 	_GetMangledName(mangledName, B_FILE_NAME_LENGTH);
 
 	path.Append(mangledName);
-	if (path.InitCheck() != B_OK)
+	if (path.InitCheck() != B_OK) {
+		free(printer);
 		return;
+	}
 
 	// TODO: fSpoolFileName should store the name only (not path which can be
 	// 1024 bytes long)
@@ -256,6 +257,7 @@ BPrintJob::BeginJob()
 	fSpoolFile = new BFile(fSpoolFileName, B_READ_WRITE | B_CREATE_FILE);
 
 	if (fSpoolFile->InitCheck() != B_OK) {
+		free(printer);
 		CancelJob();
 		return;
 	}
@@ -269,6 +271,7 @@ BPrintJob::BeginJob()
 
 	if (fSpoolFile->Write(&fSpoolFileHeader, sizeof(print_file_header))
 			!= sizeof(print_file_header)) {
+		free(printer);
 		CancelJob();
 		return;
 	}
@@ -277,6 +280,7 @@ BPrintJob::BeginJob()
 	if (!fSetupMessage->HasString(PSRV_FIELD_CURRENT_PRINTER))
 		fSetupMessage->AddString(PSRV_FIELD_CURRENT_PRINTER, printer);
 
+	free(printer);
 	_AddSetupSpec();
 	_NewPage();
 
