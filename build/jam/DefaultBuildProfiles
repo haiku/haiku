@@ -118,12 +118,14 @@ rule DefineDefaultBuildProfiles
 				bison
 				flex
 				gcc
+				haikuporter
 #				jam
 				libtool
 				m4
 				make
 #				mkdepend
 #				perl
+				python
 #				texinfo
 				;
 

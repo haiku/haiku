@@ -2,6 +2,7 @@ BootstrapPackageRepository HaikuPortsCross
 	: x86_gcc2
 	:
 	# architecture "any" packages
+	haikuporter-0-1
 	:
 	# repository architecture packages (stage 1)
 	autoconf_bootstrap-2.69-1
