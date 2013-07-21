@@ -474,7 +474,7 @@ if [ IsPackageAvailable zlib_devel ] {
 			library: develop/lib/libz.so
 			headers: develop/headers
 		file: source zlib_source
-			sources: develop/sources/zlib-1.2.8-2/source
+			sources: develop/sources/%portRevisionedName%/source
 		;
 
 	EnableBuildFeatures zlib ;
@@ -493,7 +493,7 @@ if [ IsPackageAvailable libsolv_devel ] {
 			libraries: develop/lib/libsolv.so develop/lib/libsolvext.so
 			headers: develop/headers
 		file: source libsolv_source
-			sources: develop/sources/libsolv-0.3.0_haiku_2013_06_16-1/source
+			sources: develop/sources/%portRevisionedName%/source
 		;
 
 	EnableBuildFeatures libsolv ;
