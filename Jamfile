@@ -9,7 +9,7 @@ include [ FDirName $(HAIKU_BUILD_RULES_DIR) BuildFeatures ] ;
 # Include packages that are required by all images.
 if $(HAIKU_BOOTSTRAP_BUILD) {
 	AddHaikuImagePackages
-		bzip2 freetype glu grep icu libsolv mesa sed tar zlib
+		freetype grep icu libsolv sed zlib
 		:
 		system
 		;

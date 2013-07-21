@@ -68,7 +68,9 @@ AddHeaderDirectoryToPackage compatibility bsd : bsd ;
 AddHeaderDirectoryToPackage compatibility gnu : gnu ;
 
 # third party libs headers
-AddHeaderDirectoryToPackage libs tiff : 3rdparty ;
+if ! $(HAIKU_BOOTSTRAP_BUILD) {
+	AddHeaderDirectoryToPackage libs tiff : 3rdparty ;
+}
 
 # cpp headers
 if $(HAIKU_GCC_VERSION[1]) = 2 {
@@ -78,7 +80,7 @@ if $(HAIKU_GCC_VERSION[1]) = 2 {
 }
 
 # OpenGL headers
-if $(TARGET_ARCH) = x86 {
+if $(TARGET_ARCH) = x86 && ! $(HAIKU_BOOTSTRAP_BUILD) {
 	local mesaGlHeaders
 		= [ FDirName [ BuildFeatureAttribute mesa : headers : path ] GL ] ;
 	local mesaGlHeadersDependency = [ BuildFeatureAttribute mesa : headers ] ;

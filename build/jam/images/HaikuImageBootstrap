@@ -62,13 +62,13 @@ SYSTEM_DEMOS = ;
 SYSTEM_LIBS = [ FFilterByBuildFeatures
 	libbe.so libbsd.so libbnetapi.so
 	libdebug.so libdevice.so
-	libgame.so libGL.so@x86 libglut.so@x86
+	libgame.so
 	libgnu.so libmail.so libmedia.so libmidi.so libmidi2.so
 	libnetwork.so
 	libpackage.so
 	<revisioned>libroot.so
 	libscreensaver.so
-	libtextencoding.so libtiff.so libtracker.so libtranslation.so
+	libtextencoding.so libtracker.so libtranslation.so
 	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
 ] ;
 PRIVATE_SYSTEM_LIBS = [ FFilterByBuildFeatures
