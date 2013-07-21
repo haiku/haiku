@@ -109,6 +109,9 @@ public:
 									const ValuePieceLocation& piece);
 								ValueLocation(const ValueLocation& other);
 
+			bool				SetToByteOffset(const ValueLocation& other,
+									uint64 byteffset, uint64 Size);
+
 			bool				SetTo(const ValueLocation& other,
 									uint64 bitOffset, uint64 bitSize);
 

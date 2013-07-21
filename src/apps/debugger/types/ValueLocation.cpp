@@ -75,6 +75,21 @@ ValueLocation::ValueLocation(const ValueLocation& other)
 
 
 bool
+ValueLocation::SetToByteOffset(const ValueLocation& other, uint64 byteOffset,
+	uint64 byteSize)
+{
+	Clear();
+
+	fBigEndian = other.fBigEndian;
+	ValuePieceLocation piece = other.PieceAt(0);
+	piece.SetToMemory(piece.address + byteOffset);
+	piece.SetSize(byteSize);
+
+	return AddPiece(piece);
+}
+
+
+bool
 ValueLocation::SetTo(const ValueLocation& other, uint64 bitOffset,
 	uint64 bitSize)
 {
