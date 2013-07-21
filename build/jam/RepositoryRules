@@ -247,13 +247,18 @@ rule BootstrapRepositoryFetchPackage repository : package : fileName
 		return $(HAIKU_REPOSITORY_HAIKU_CROSS_DEVEL_PACKAGE) ] ;
 
 	local packageFile = <cross-built>$(fileName) ;
+	if [ on $(packageFile) return $(HAIKU_REPOSITORY_BUILD_DIRECTORY) ] {
+		# rule already called for this package
+		return $(packageFile) ;
+	}
+
+	HAIKU_REPOSITORY_BUILD_DIRECTORY on $(packageFile) = $(outputDir) ;
+
 	MakeLocate $(packageFile) : [ FDirName $(outputDir) packages ] ;
 	NoUpdate $(packageFile) ;
 		# Don't rebuild the file. Since the haiku cross devel package is
 		# a dependency and is updated always, this package would otherwise be
 		# rebuilt always as well.
-
-	HAIKU_REPOSITORY_BUILD_DIRECTORY on $(packageFile) = $(outputDir) ;
 
 	Depends $(packageFile) : $(haikuCrossDevelPackage) $(configFile) ;
 	BootstrapRepositoryFetchPackage1 $(packageFile)
@@ -332,19 +337,20 @@ rule BootstrapPackageRepository repository : architecture
 		: BootstrapRepositoryFetchPackage ;
 
 	# register repository with stage 1 packages
-	local packageTargets = [ PackageRepository $(repository) : $(architecture)
-		: $(anyPackages) : $(packagesStage1)  : $(sourcePackages)
-		: $(debugInfoPackages) ] ;
-	if ! $(packageTargets) {
+	local stage1PackageTargets = [ PackageRepository $(repository)
+		: $(architecture) : $(anyPackages) : $(packagesStage1)
+		: $(sourcePackages) : $(debugInfoPackages) ] ;
+	if ! $(stage1PackageTargets) {
 		return ;
 	}
-	HAIKU_REPOSITORY_HAIKU_CROSS_DEVEL_PACKAGE on $(packageTargets)
+	HAIKU_REPOSITORY_HAIKU_CROSS_DEVEL_PACKAGE on $(stage1PackageTargets)
 		= haiku_cross_devel_sysroot_stage1_$(HAIKU_PACKAGING_ARCH).hpkg ;
 
 	# add stage 2 packages
-	packageTargets = [ AddRepositoryPackages $(repository) : $(architecture)
-		: $(packagesStage2) : $(sourcePackages) : $(debugInfoPackages) ] ;
-	HAIKU_REPOSITORY_HAIKU_CROSS_DEVEL_PACKAGE on $(packageTargets)
+	local stage2PackageTargets = [ AddRepositoryPackages $(repository)
+		: $(architecture) : $(packagesStage2) : $(sourcePackages)
+		: $(debugInfoPackages) ] ;
+	HAIKU_REPOSITORY_HAIKU_CROSS_DEVEL_PACKAGE on $(stage2PackageTargets)
 		= haiku_cross_devel_sysroot_$(HAIKU_PACKAGING_ARCH).hpkg ;
 
 	# prepare the config file for the HaikuPorts cross build
@@ -361,6 +367,20 @@ rule BootstrapPackageRepository repository : architecture
 
 	HAIKU_REPOSITORY_BUILD_CONFIG_FILE on $(repository) = $(configFile) ;
 	HAIKU_REPOSITORY_BUILD_DIRECTORY on $(repository) = $(outputDir) ;
+
+	# Serialize all package file targets. We need to do this, since
+	# haikuporter uses a common directory for building the ports, so building
+	# two ports concurrently isn't possible.
+	local previousPackageFile ;
+	local package ;
+	for package in $(stage1PackageTargets) $(stage2PackageTargets) {
+		local fileName = [ on $(package) return $(HAIKU_PACKAGE_FILE_NAME) ] ;
+		local packageFile = [ BootstrapRepositoryFetchPackage $(repository)
+			: $(package) : $(fileName) ] ;
+		Depends $(packageFile) : $(previousPackageFile) ;
+
+		previousPackageFile = $(packageFile) ;
+	}
 }
 
 
