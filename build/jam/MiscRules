@@ -661,22 +661,117 @@ rule BuildFeatureAttribute feature : attribute : flags
 }
 
 
+rule ExtractBuildFeatureArchivesExpandValue value : fileName
+{
+	if ! $(value) {
+		return $(value) ;
+	}
+
+	# split the value
+	local splitValue ;
+	while $(value) {
+		local components = [ Match "([^%]*)(%[^%]*%)(.*)" : $(value) ] ;
+		if ! $(components) {
+			splitValue += $(value) ;
+			break ;
+		}
+
+		if $(components[1]) {
+			splitValue += $(components[1]) ;
+		}
+		splitValue += $(components[2]) ;
+		value = $(components[3]) ;
+	}
+
+	# reassemble the value, performing the substitutions
+	local %packageName% ;
+	local %portName% ;
+	local %packageFullVersion% ;
+	value = "" ;
+	while $(splitValue) {
+		local component = $(splitValue[1]) ;
+		splitValue = $(splitValue[2-]) ;
+		switch $(component) {
+			case %packageRevisionedName% :
+				splitValue = %packageName% "-" %packageFullVersion%
+					$(splitValue) ;
+
+			case %portRevisionedName% :
+				splitValue = %portName% "-" %packageFullVersion% $(splitValue) ;
+
+			case %*% :
+				if ! x$(%packageName%) {
+					# extract package name and version from file name
+					local splitName
+						= [ Match "([^-]*)-(.*).hpkg" : $(fileName) ] ;
+					if $(splitName) {
+						%packageName% = $(splitName[1]) ;
+						%packageFullVersion%
+							= [ Match "([^-]*-[^-]*)-.*" : $(splitName[2]) ] ;
+						if ! $(packageFullVersion%) {
+							packageFullVersion% = $(splitName[2]) ;
+						}
+					} else {
+						%packageName% = [ Match "(.*).hpkg" : $(fileName) ] ;
+						if ! $(%packageName%) {
+							%packageName% = $(fileName) ;
+						}
+						%packageFullVersion% = "" ;
+					}
+
+					# get the port name from the package name
+					splitName = [ Match "(.*)_([^_]*)" : $(%packageName%) ] ;
+					local knownPackageSuffixes = devel doc source debuginfo ;
+					if $(splitName[2])
+						&& $(splitName[2]) in $(knownPackageSuffixes) {
+						%portName% = $(splitName[1]) ;
+					} else {
+						%portName% = $(%packageName%) ;
+					}
+				}
+
+				value = "$(value)$($(component):E=)" ;
+
+			case * :
+				value = "$(value)$(component)" ;
+		}
+	}
+
+	return $(value) ;
+}
+
+
 rule ExtractBuildFeatureArchives feature : list
 {
 	# ExtractBuildFeatureArchives <feature> : <list> ;
 	# Downloads and extracts one or more archives for build feature <feature>
 	# and sets attributes for the build feature to extracted entries. The syntax
 	# for <list> is:
-	# "file:" <packageName> <url>
+	# "file:" <packageAlias> <packageName>
 	#    <attribute>: <value> ...
 	#    ...
-	# "file:" <packageName2> <url2>
+	# "file:" <packageAlias2> <packageName2>
 	# ...
 	#
-	# <packageName> specifies a short name for the archive (e.g. "base" for the
-	# base package, "devel" for the development package, etc.), <url> the URL
-	# from which to download the file. <attribute> and be any name and <value>
-	# any relative path in the extraction directory.
+	# <packageAlias> specifies a short name for the archive (e.g. "base" for the
+	# base package, "devel" for the development package, etc.), <packageName>
+	# the unversioned name of the package (e.g. "libsolv_devel").
+	# <attribute> can be any name and <value> any relative path in the
+	# extraction directory. The following placeholders in <value> will be
+	# replaced with the respective value:
+	# * %packageName% is replaced with the name of the package as extracted from
+	#   the package file name (may differ from the specified package name e.g.
+	#   for bootstrap packages).
+	# * %portName% is replaced with the name of the port the package belongs to.
+	#   That is %packageName% with any well-known package type suffix ("_devel",
+	#   "_source", etc.) removed.
+	# * %packageFullVersion% is replaced with the the full version string of the
+	#   package (i.e. including the revision) as extracted frmo the package file
+	#   name.
+	# * %packageRevisionedName% is replaced with what
+	#   %packageName%-%packageFullVersion% would be replaced.
+	# * %portRevisionedName% is replaced with what
+	#   %portName%-%packageFullVersion% would be replaced.
 	#
 	# The attribute with the name "depends" will be handled specially. Its
 	# <value> specifies the name of a package the current package depends on
@@ -685,7 +780,7 @@ rule ExtractBuildFeatureArchives feature : list
 	# the package it depends on. The "depends" attribute must precede any other
 	# attribute for the package.
 	#
-	# The rule also sets the build feature attribute "<packageName>:directory"
+	# The rule also sets the build feature attribute "<packageAlias>:directory"
 	# to the extraction directory for each package.
 
 	while $(list) {
@@ -725,7 +820,8 @@ rule ExtractBuildFeatureArchives feature : list
 					}
 					case * :
 					{
-						values += $(list[1]) ;
+						values += [ ExtractBuildFeatureArchivesExpandValue
+							$(list[1]) : $(fileName) ] ;
 						list = $(list[2-]) ;
 					}
 				}
