@@ -650,7 +650,8 @@ ArchitectureX86::GetReturnAddressLocation(StackFrame* frame,
 			return B_NO_MEMORY;
 	} else {
 		ValuePieceLocation piece;
-		piece.SetToMemory(frame->GetCpuState()->StackPointer());
+		CpuStateX86* state = dynamic_cast<CpuStateX86*>(frame->GetCpuState());
+		piece.SetToMemory(state->IntRegisterValue(X86_REGISTER_EAX));
 		piece.SetSize(valueSize);
 		if (!location->AddPiece(piece))
 			return B_NO_MEMORY;
