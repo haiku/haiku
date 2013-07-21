@@ -12,6 +12,16 @@ usage()
 
 Usage: $0 <options>
 options:
+  --bootstrap <haikuporter> <HaikuPorts cross repo> <HaikuPorts repo>
+                              Prepare for a bootstrap build. No pre-built
+                              packages will be used, instead they will be built
+                              from the sources (in several phases).
+                              <haikuporter> is the path to the haikuporter tool
+                              suitable for the host platform.
+                              <HaikuPorts cross repo> is the path to a checked
+                              out HaikuPorts cross-compilation repository.
+                              <HaikuPorts repo> is the path to a checked out
+                              HaikuPorts repository.
   --build-cross-tools <build tools dir>
                               Assume cross compilation. <build tools dir>
                               defines the location of the build tools sources.
@@ -132,6 +142,19 @@ assertparams()
 	if [ $3 -le $2 ]; then
 		echo $0: \`$1\': Not enough parameters.
 		exit 1
+	fi
+}
+
+# absolute_path
+#
+# returns the absolute path of a given path.
+#
+absolute_path()
+{
+	if [[ "$1" == /* ]]; then
+		echo "$1"
+	else
+		echo "`pwd`/$1"
 	fi
 }
 
@@ -376,6 +399,9 @@ HOST_GCC_OBJCOPY=`gcc -print-prog-name=objcopy`
 SFDISK_BINARY=sfdisk
 HOST_SFDISK=$SFDISK_BINARY
 HOST_SHA256=
+HOST_HAIKU_PORTER=
+HAIKU_PORTS=
+HAIKU_PORTS_CROSS=
 
 if sha256sum < /dev/null > /dev/null 2>&1; then
 	HOST_SHA256=sha256sum
@@ -438,6 +464,13 @@ fi
 #
 while [ $# -gt 0 ] ; do
 	case "$1" in
+		--bootstrap)
+			assertparams "$1" 3 $#
+			HOST_HAIKU_PORTER="`absolute_path $2`"
+			HAIKU_PORTS_CROSS="`absolute_path $3`"
+			HAIKU_PORTS="`absolute_path $4`"
+			shift 4
+			;;
 		--build-cross-tools) assertparam "$1" $#; buildCrossTools=$2; shift 2;;
 		--build-cross-tools-gcc4)
 			assertparams "$1" 2 $#
@@ -449,7 +482,7 @@ while [ $# -gt 0 ] ; do
 				ppc)	HAIKU_GCC_MACHINE=powerpc-apple-haiku;;
 				m68k)	HAIKU_GCC_MACHINE=m68k-unknown-haiku;;
 				arm)	HAIKU_GCC_MACHINE=arm-unknown-haiku;;
-				mipsel)	HAIKU_GCC_MACHINE=mipsel-unknown-haiku;
+				mipsel)	HAIKU_GCC_MACHINE=mipsel-unknown-haiku;;
 				*)		echo "Unsupported target architecture: $2"
 						exit 1;;
 			esac
@@ -663,6 +696,10 @@ HOST_LD						?= ${HOST_GCC_LD} ;
 HOST_OBJCOPY				?= ${HOST_GCC_OBJCOPY} ;
 HOST_SFDISK					?= ${HOST_SFDISK} ;
 HOST_SHA256					?= ${HOST_SHA256} ;
+
+HOST_HAIKU_PORTER			?= ${HOST_HAIKU_PORTER} ;
+HAIKU_PORTS					?= ${HAIKU_PORTS} ;
+HAIKU_PORTS_CROSS			?= ${HAIKU_PORTS_CROSS} ;
 
 EOF
 

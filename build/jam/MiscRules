@@ -790,7 +790,7 @@ rule ExtractBuildFeatureArchives feature : list
 		}
 
 		local package = $(list[2]) ;
-		local file = [ DownloadPackage $(list[3]) ] ;
+		local file = [ FetchPackage $(list[3]) ] ;
 		local fileName = $(file:BS) ;
 		list = $(list[4-]) ;
 

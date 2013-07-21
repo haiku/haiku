@@ -1,4 +1,4 @@
-PackageRepository HaikuPorts
+RemotePackageRepository HaikuPorts
 	: x86_gcc2
 	: http://haiku-files.org/files/repo
 	:

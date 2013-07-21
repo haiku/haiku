@@ -59,8 +59,13 @@ include [ FDirName $(HAIKU_BUILD_RULES_DIR) DefaultBuildProfiles ] ;
 # Include the repositories for this architecture.
 local repositoriesDirectory
 	= [ FDirName $(HAIKU_BUILD_RULES_DIR) repositories ] ;
+local repositories = HaikuPorts ;
+if $(HAIKU_BOOTSTRAP_BUILD) {
+	repositories = HaikuPortsCross ;
+}
+
 local repository ;
-for repository in HaikuPorts {
+for repository in $(repositories) {
 	local repositoryDirectory
 		= [ FDirName $(repositoriesDirectory) $(repository) ] ;
 	local file = [ Glob $(repositoryDirectory) : $(HAIKU_PACKAGING_ARCH) ] ;

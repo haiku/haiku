@@ -94,7 +94,8 @@ if $(HOST_RM_ATTRS_TARGET) {
 # always want to do that in non-update mode, but also in update mode when all
 # packages are updated.
 local resolvePackageDependencies ;
-if ! [ IsUpdateHaikuImageOnly ] || $(HAIKU_UPDATE_ALL_PACKAGES) {
+if ( ! [ IsUpdateHaikuImageOnly ] || $(HAIKU_UPDATE_ALL_PACKAGES) )
+	&& ! $(HAIKU_BOOTSTRAP_BUILD) {
 	resolvePackageDependencies = 1 ;
 }
 AddVariableToScript $(script) : resolvePackageDependencies

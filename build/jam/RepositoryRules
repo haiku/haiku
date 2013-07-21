@@ -1,6 +1,29 @@
+#pragma mark - Private
+
+
 rule PackageFamily packageBaseName
 {
 	return $(packageBaseName:G=package-family) ;
+}
+
+
+rule SetRepositoryMethod repository : methodName : method
+{
+	HAIKU_REPOSITORY_METHOD_$(methodName) on $(repository) = $(method) ;
+}
+
+rule InvokeRepositoryMethod repository : methodName : arg1 : arg2 : arg3 : arg4
+	: arg5 : arg6 : arg7
+{
+	local method
+		= [ on $(repository) return $(HAIKU_REPOSITORY_METHOD_$(methodName)) ] ;
+	if ! $(method) {
+		Exit "Method" $(methodName) " not defined for repository"
+			$(repository) ;
+	}
+
+	return [ $(method) $(repository) : $(arg1) : $(arg2) : $(arg3) : $(arg4)
+		: $(arg5) : $(arg6) : $(arg7) ] ;
 }
 
 
@@ -12,56 +35,104 @@ rule AddRepositoryPackage repository : architecture : baseName : version
 	HAIKU_PACKAGE_ARCHITECTURE on $(package) = $(architecture) ;
 	HAIKU_PACKAGE_FILE_NAME on $(package) = $(package:G=)-$(architecture).hpkg ;
 
+	local packageFamily = [ InvokeRepositoryMethod $(repository) : PackageFamily
+		: $(baseName) ] ;
+	baseName = $(packageFamily:G=) ;
+
 	if ! $(baseName) in $(HAIKU_AVAILABLE_PACKAGES) {
 		HAIKU_AVAILABLE_PACKAGES += $(baseName) ;
 	}
 
-	local packageFamily = [ PackageFamily $(baseName) ] ;
 	HAIKU_PACKAGE_VERSIONS on $(packageFamily) += $(package) ;
 	HAIKU_REPOSITORY_PACKAGES on $(repository) += $(package) ;
+
+	return $(package) ;
 }
 
 
 rule AddRepositoryPackages repository : architecture : packages : sourcePackages
 	: debugInfoPackages
 {
+	local packageTargets ;
 	local package ;
 	for package in $(packages) {
 		local splitName = [ Match "([^-]*)-(.*)" : $(package) ] ;
 		local baseName = $(splitName[1]:E=$(package)) ;
 		local version = $(splitName[2]) ;
-		AddRepositoryPackage $(repository) : $(architecture) : $(baseName)
-			: $(version) ;
+		packageTargets += [ AddRepositoryPackage $(repository) : $(architecture)
+			: $(baseName) : $(version) ] ;
 		if $(baseName) in $(sourcePackages) {
 			AddRepositoryPackage $(repository) : source : $(baseName)_source
 				: $(version) ;
 		}
 		if $(baseName) in $(debugInfoPackages) {
-			AddRepositoryPackage $(repository) : $(architecture)
-				: $(baseName)_debuginfo : $(version) ;
+			packageTargets += [ AddRepositoryPackage $(repository)
+				: $(architecture) : $(baseName)_debuginfo : $(version) ] ;
 		}
 	}
+
+	return $(packageTargets) ;
 }
 
 
-rule PackageRepository repository : architecture : repositoryUrl : anyPackages
-	: packages : sourcePackages : debugInfoPackages
+rule PackageRepository repository : architecture : anyPackages : packages
+	: sourcePackages : debugInfoPackages
 {
-	repository = $(repository:G=repository) ;
-
 	if $(architecture) != $(HAIKU_PACKAGING_ARCH) {
 		return ;
 	}
 
 	HAIKU_REPOSITORIES += $(repository) ;
-	HAIKU_REPOSITORY_URL on $(repository) = $(repositoryUrl) ;
 	HAIKU_REPOSITORY_DEFINITION_FILE on $(repository)
 		= $(HAIKU_REPOSITORY_JAMFILE) ;
 
-	AddRepositoryPackages $(repository) : any : $(anyPackages)
-		: $(sourcePackages) : $(debugInfoPackages) ;
-	AddRepositoryPackages $(repository) : $(architecture) : $(packages)
-		: $(sourcePackages) : $(debugInfoPackages) ;
+	return [ AddRepositoryPackages $(repository) : any : $(anyPackages)
+			: $(sourcePackages) : $(debugInfoPackages) ]
+		[ AddRepositoryPackages $(repository) : $(architecture) : $(packages)
+			: $(sourcePackages) : $(debugInfoPackages) ] ;
+}
+
+
+#pragma mark - Remote Repository
+
+
+rule RemoteRepositoryPackageFamily repository : packageBaseName
+{
+	return [ PackageFamily $(packageBaseName) ] ;
+}
+
+
+rule RemoteRepositoryFetchPackage repository : package : fileName
+{
+	local baseUrl = [ on $(repository) return $(HAIKU_REPOSITORY_URL) ] ;
+	local packagesChecksumFile
+		= [ on $(repository)
+			return $(HAIKU_REPOSITORY_PACKAGES_CHECKSUM_FILE) ] ;
+
+	local downloadedFile = [ DownloadFile $(fileName)
+		: "$(baseUrl)/`cat $source`/packages/$(fileName)"
+		: $(packagesChecksumFile) ] ;
+	NoUpdate $(downloadedFile) ;
+		# Don't download the file again when something in the repository
+		# changes. It is (supposed to be) still the same file.
+	return $(downloadedFile) ;
+}
+
+
+rule RemotePackageRepository repository : architecture : repositoryUrl
+	: anyPackages : packages : sourcePackages : debugInfoPackages
+{
+	repository = $(repository:G=repository) ;
+
+	SetRepositoryMethod $(repository) : PackageFamily
+		: RemoteRepositoryPackageFamily ;
+	SetRepositoryMethod $(repository) : FetchPackage
+		: RemoteRepositoryFetchPackage ;
+
+	HAIKU_REPOSITORY_URL on $(repository) = $(repositoryUrl) ;
+
+	PackageRepository $(repository) : $(architecture) : $(anyPackages)
+		: $(packages) : $(sourcePackages) : $(debugInfoPackages) ;
 
 	# build package list file
 	local packageListFile = $(repository:G=repository-package-list)-packages ;
@@ -152,6 +223,150 @@ actions RepositoryConfig1
 }
 
 
+#pragma mark - Bootstrap Repository
+
+
+rule BootstrapRepositoryPackageFamily repository : packageBaseName
+{
+	local splitBaseName = [ Match "(.*)_bootstrap(.*)" : $(packageBaseName) ] ;
+	if $(splitBaseName) {
+		packageBaseName = $(splitBaseName[1])$(splitBaseName[2]) ;
+	}
+
+	return [ PackageFamily $(packageBaseName) ] ;
+}
+
+
+rule BootstrapRepositoryFetchPackage repository : package : fileName
+{
+	local outputDir
+		= [ on $(repository) return $(HAIKU_REPOSITORY_BUILD_DIRECTORY) ] ;
+	local configFile
+		= [ on $(repository) return $(HAIKU_REPOSITORY_BUILD_CONFIG_FILE) ] ;
+	local haikuCrossDevelPackage = [ on $(package)
+		return $(HAIKU_REPOSITORY_HAIKU_CROSS_DEVEL_PACKAGE) ] ;
+
+	local packageFile = <cross-built>$(fileName) ;
+	MakeLocate $(packageFile) : [ FDirName $(outputDir) packages ] ;
+	NoUpdate $(packageFile) ;
+		# Don't rebuild the file. Since the haiku cross devel package is
+		# a dependency and is updated always, this package would otherwise be
+		# rebuilt always as well.
+
+	HAIKU_REPOSITORY_BUILD_DIRECTORY on $(packageFile) = $(outputDir) ;
+
+	Depends $(packageFile) : $(haikuCrossDevelPackage) $(configFile) ;
+	BootstrapRepositoryFetchPackage1 $(packageFile)
+		: $(haikuCrossDevelPackage) ;
+
+	return $(packageFile) ;
+}
+
+
+actions BootstrapRepositoryFetchPackage1
+{
+	# don't rebuild existing package
+	package="$(1)"
+	if [ -e "$package" ]; then
+		exit 0
+	fi
+
+	# make Haiku cross devel package path absolute
+	haikuCrossDevelPackage="$(2)"
+	if [[ "$haikuCrossDevelPackage" != /* ]]; then
+		haikuCrossDevelPackage="`pwd`/$haikuCrossDevelPackage"
+	fi
+
+	# determine the portName
+	portName=`basename "$package" | sed 's@-.*@@'`
+	case $portName in
+		*_devel|*_doc|*_source|*_debuginfo)
+			portName=`echo $portName | sed 's@_[^_]*$@@'`
+			;;
+	esac
+
+	cd $(HAIKU_REPOSITORY_BUILD_DIRECTORY)
+
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	$(HOST_HAIKU_PORTER) --cross-devel-package "$haikuCrossDevelPackage" \
+		$portName
+}
+
+
+actions BuildBootstrapRepositoryConfig
+{
+cat > $(1) << EOF
+PACKAGER="The Haiku build system <build-system@haiku-os.org>"
+TREE_PATH="$(HAIKU_PORTS_CROSS)"
+TARGET_ARCHITECTURE="$(HAIKU_PACKAGING_ARCH)"
+
+DOWNLOAD_IN_PORT_DIRECTORY="yes"
+PACKAGE_COMMAND="$(2[1])"
+MIMESET_COMMAND="$(2[2])"
+SYSTEM_MIME_DB="$(2[3])"
+LICENSES_DIRECTORY="$(HAIKU_TOP)/data/system/data/licenses"
+OUTPUT_DIRECTORY="$(HAIKU_REPOSITORY_BUILD_DIRECTORY)"
+EOF
+
+	# If we have cross tools, add the cross tools directory.
+	gcc=$(HAIKU_CC)
+	if [[ "$gcc" = /* ]]; then
+		if [ `basename $gcc` = $(HAIKU_GCC_MACHINE)-gcc ]; then
+			dir=`dirname $gcc`
+			dir=`dirname $dir`
+			echo CROSS_TOOLS="$dir" >> $(1)
+		fi
+	fi
+}
+
+
+rule BootstrapPackageRepository repository : architecture
+	: anyPackages : packagesStage1 : packagesStage2 : sourcePackages
+	: debugInfoPackages
+{
+	repository = $(repository:G=repository) ;
+
+	SetRepositoryMethod $(repository) : PackageFamily
+		: BootstrapRepositoryPackageFamily ;
+	SetRepositoryMethod $(repository) : FetchPackage
+		: BootstrapRepositoryFetchPackage ;
+
+	# register repository with stage 1 packages
+	local packageTargets = [ PackageRepository $(repository) : $(architecture)
+		: $(anyPackages) : $(packagesStage1)  : $(sourcePackages)
+		: $(debugInfoPackages) ] ;
+	if ! $(packageTargets) {
+		return ;
+	}
+	HAIKU_REPOSITORY_HAIKU_CROSS_DEVEL_PACKAGE on $(packageTargets)
+		= haiku_cross_devel_sysroot_stage1_$(HAIKU_PACKAGING_ARCH).hpkg ;
+
+	# add stage 2 packages
+	packageTargets = [ AddRepositoryPackages $(repository) : $(architecture)
+		: $(packagesStage2) : $(sourcePackages) : $(debugInfoPackages) ] ;
+	HAIKU_REPOSITORY_HAIKU_CROSS_DEVEL_PACKAGE on $(packageTargets)
+		= haiku_cross_devel_sysroot_$(HAIKU_PACKAGING_ARCH).hpkg ;
+
+	# prepare the config file for the HaikuPorts cross build
+	local outputDir = [ FDirName $(HAIKU_PACKAGE_REPOSITORIES_DIR)
+		$(repository:G=)-build ] ;
+	local configFile = haikuports.conf ;
+	configFile = $(configFile:G=repository-config-$(repository:G=)) ;
+	MakeLocate $(configFile) : $(outputDir) ;
+	NoUpdate $(configFile) ;
+	Depends $(configFile) : <build>package <build>mimeset <mimedb>mime_db ;
+	HAIKU_REPOSITORY_BUILD_DIRECTORY on $(configFile) = $(outputDir) ;
+	BuildBootstrapRepositoryConfig $(configFile)
+		: <build>package <build>mimeset <mimedb>mime_db ;
+
+	HAIKU_REPOSITORY_BUILD_CONFIG_FILE on $(repository) = $(configFile) ;
+	HAIKU_REPOSITORY_BUILD_DIRECTORY on $(repository) = $(outputDir) ;
+}
+
+
+#pragma mark - Public
+
+
 rule IsPackageAvailable package
 {
 	if $(package) in $(HAIKU_AVAILABLE_PACKAGES) {
@@ -162,7 +377,7 @@ rule IsPackageAvailable package
 }
 
 
-rule DownloadPackage packageName
+rule FetchPackage packageName
 {
 	if ! [ IsPackageAvailable $(packageName) ] {
 		Exit "DownloadPackage: package" $(packageName) "not available!" ;
@@ -177,16 +392,7 @@ rule DownloadPackage packageName
 		= [ on $(packageFamily) return $(HAIKU_PACKAGE_VERSIONS[1]) ] ;
 	local fileName = [ on $(package) return $(HAIKU_PACKAGE_FILE_NAME) ] ;
 	local repository = [ on $(package) return $(HAIKU_PACKAGE_REPOSITORY) ] ;
-	local baseUrl = [ on $(repository) return $(HAIKU_REPOSITORY_URL) ] ;
-	local packagesChecksumFile
-		= [ on $(repository)
-			return $(HAIKU_REPOSITORY_PACKAGES_CHECKSUM_FILE) ] ;
 
-	local downloadedFile = [ DownloadFile $(fileName)
-		: "$(baseUrl)/`cat $source`/packages/$(fileName)"
-		: $(packagesChecksumFile) ] ;
-	NoUpdate $(downloadedFile) ;
-		# Don't download the file again when something in the repository
-		# changes. It is (supposed to be) still the same file.
-	return $(downloadedFile) ;
+	return [ InvokeRepositoryMethod $(repository) : FetchPackage : $(package)
+		: $(fileName) ] ;
 }

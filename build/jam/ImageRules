@@ -1021,7 +1021,7 @@ rule AddHaikuImagePackages packages : installationLocation
 			HAIKU_ADDED_PACKAGES += $(package) ;
 
 			# download the package file and add it to the image
-			local file = [ DownloadPackage $(package) ] ;
+			local file = [ FetchPackage $(package) ] ;
 
 			if $(HAIKU_UPDATE_ALL_PACKAGES) {
 				HAIKU_INCLUDE_IN_IMAGE on $(file) = 1 ;
