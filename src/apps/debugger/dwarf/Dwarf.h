@@ -306,6 +306,8 @@ enum {
 	DW_OP_form_tls_address		= 0x9b,
 	DW_OP_call_frame_cfa		= 0x9c,
 	DW_OP_bit_piece				= 0x9d,
+	DW_OP_implicit_value		= 0x9e,
+	DW_OP_stack_value			= 0x9f,
 	DW_OP_lo_user				= 0xe0,
 	DW_OP_hi_user				= 0xff
 };

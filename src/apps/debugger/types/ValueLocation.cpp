@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -257,6 +258,11 @@ ValueLocation::Dump() const
 				break;
 			case VALUE_PIECE_LOCATION_REGISTER:
 				printf("  register %" B_PRIu32, piece.reg);
+				break;
+			case VALUE_PIECE_LOCATION_IMPLICIT:
+				printf("  implicit value: ");
+				for (uint32 j = 0; j < piece.size; j++)
+					printf("%x ", ((char *)piece.value)[j]);
 				break;
 		}
 

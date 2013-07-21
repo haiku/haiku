@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -631,6 +632,36 @@ DwarfExpressionEvaluator::_Evaluate(ValuePieceLocation* _piece)
 				TRACE_EXPR("  DW_OP_nop\n");
 				break;
 
+			case DW_OP_implicit_value:
+			{
+				TRACE_EXPR("  DW_OP_implicit_value\n");
+				if (_piece == NULL) {
+					throw EvaluationException(
+						"DW_OP_implicit_value in non-location expression");
+				}
+				uint32 length = fDataReader.ReadUnsignedLEB128(0);
+				if (length == 0)
+					return B_BAD_DATA;
+
+				if (fDataReader.BytesRemaining() < length)
+					return B_BAD_DATA;
+
+				_piece->SetToValue(fDataReader.Data(), length);
+				return B_OK;
+			}
+			case DW_OP_stack_value:
+			{
+				TRACE_EXPR("  DW_OP_stack_value\n");
+				if (_piece == NULL) {
+					throw EvaluationException(
+						"DW_OP_stack_value in non-location expression");
+				}
+				if (fStackSize == 0)
+					return B_BAD_DATA;
+				target_addr_t value = _Pop();
+				_piece->SetToValue(&value, sizeof(target_addr_t));
+				return B_OK;
+			}
 			default:
 				if (opcode >= DW_OP_lit0 && opcode <= DW_OP_lit31) {
 					TRACE_EXPR("  DW_OP_lit%u\n", opcode - DW_OP_lit0);
