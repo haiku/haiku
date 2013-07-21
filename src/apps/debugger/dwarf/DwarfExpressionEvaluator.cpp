@@ -646,7 +646,9 @@ DwarfExpressionEvaluator::_Evaluate(ValuePieceLocation* _piece)
 				if (fDataReader.BytesRemaining() < length)
 					return B_BAD_DATA;
 
-				_piece->SetToValue(fDataReader.Data(), length);
+				if (!_piece->SetToValue(fDataReader.Data(), length))
+					return B_NO_MEMORY;
+
 				return B_OK;
 			}
 			case DW_OP_stack_value:
@@ -659,7 +661,9 @@ DwarfExpressionEvaluator::_Evaluate(ValuePieceLocation* _piece)
 				if (fStackSize == 0)
 					return B_BAD_DATA;
 				target_addr_t value = _Pop();
-				_piece->SetToValue(&value, sizeof(target_addr_t));
+				if (!_piece->SetToValue(&value, sizeof(target_addr_t)))
+					return B_NO_MEMORY;
+
 				return B_OK;
 			}
 			default:
