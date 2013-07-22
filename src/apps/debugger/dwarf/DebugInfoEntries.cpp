@@ -28,7 +28,8 @@ DIECompileUnitBase::DIECompileUnitBase()
 	fBaseTypesUnit(NULL),
 	fLanguage(0),
 	fIdentifierCase(0),
-	fUseUTF8(true)
+	fUseUTF8(true),
+	fContainsMainSubprogram(false)
 {
 }
 
@@ -186,6 +187,15 @@ DIECompileUnitBase::AddAttribute_ranges(uint16 attributeName,
 	const AttributeValue& value)
 {
 	fAddressRangesOffset = value.pointer;
+	return B_OK;
+}
+
+
+status_t
+DIECompileUnitBase::AddAttribute_main_subprogram(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fContainsMainSubprogram = true;
 	return B_OK;
 }
 
@@ -1069,6 +1079,14 @@ DIEMember::AddAttribute_bit_offset(uint16 attributeName,
 }
 
 
+status_t
+DIEMember::AddAttribute_data_bit_offset(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetDynamicAttributeValue(fDataBitOffset, value);
+}
+
+
 // #pragma mark - DIEPointerType
 
 
@@ -1642,6 +1660,14 @@ DIEBaseType::AddAttribute_bit_offset(uint16 attributeName,
 	const AttributeValue& value)
 {
 	return SetDynamicAttributeValue(fBitOffset, value);
+}
+
+
+status_t
+DIEBaseType::AddAttribute_data_bit_offset(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetDynamicAttributeValue(fDataBitOffset, value);
 }
 
 
