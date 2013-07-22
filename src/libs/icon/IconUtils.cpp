@@ -646,9 +646,9 @@ BIconUtils::ConvertFromCMAP8(const uint8* src, uint32 width, uint32 height,
 
 	// check for downscaling or integer multiple scaling
 	if (dstWidth < width || dstHeight < height
-		|| dstWidth == 2 * width && dstHeight == 2 * height
-		|| dstWidth == 3 * width && dstHeight == 3 * height
-		|| dstWidth == 4 * width && dstHeight == 4 * height) {
+		|| (dstWidth == 2 * width && dstHeight == 2 * height)
+		|| (dstWidth == 3 * width && dstHeight == 3 * height)
+		|| (dstWidth == 4 * width && dstHeight == 4 * height)) {
 		BBitmap* converted = new BBitmap(BRect(0, 0, width - 1, height - 1),
 			result->ColorSpace());
 		converted->ImportBits(src, height * srcBPR, srcBPR, 0, B_CMAP8);
