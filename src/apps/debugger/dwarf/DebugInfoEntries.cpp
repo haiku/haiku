@@ -2573,6 +2573,39 @@ DIETypeUnit::Tag() const
 }
 
 
+// #pragma mark - DIETemplateTemplateParameter
+
+
+DIETemplateTemplateParameter::DIETemplateTemplateParameter()
+	:
+	fName(NULL)
+{
+}
+
+
+uint16
+DIETemplateTemplateParameter::Tag() const
+{
+	return DW_TAG_GNU_template_template_param;
+}
+
+
+const char*
+DIETemplateTemplateParameter::Name() const
+{
+	return fName;
+}
+
+
+status_t
+DIETemplateTemplateParameter::AddAttribute_name(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fName = value.string;
+	return B_OK;
+}
+
+
 // #pragma mark - DIETemplateTypeParameterPack
 
 
@@ -2935,6 +2968,9 @@ DebugInfoEntryFactory::CreateDebugInfoEntry(uint16 tag, DebugInfoEntry*& _entry)
 			break;
 		case DW_TAG_type_unit:
 			entry = new(std::nothrow) DIETypeUnit;
+			break;
+		case DW_TAG_GNU_template_template_param:
+			entry = new(std::nothrow) DIETemplateTemplateParameter;
 			break;
 		case DW_TAG_GNU_template_parameter_pack:
 			entry = new(std::nothrow) DIETemplateTypeParameterPack;

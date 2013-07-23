@@ -1633,6 +1633,22 @@ public:
 };
 
 
+class DIETemplateTemplateParameter : public DIEDeclaredBase {
+public:
+								DIETemplateTemplateParameter();
+
+	virtual	uint16				Tag() const;
+
+	virtual	const char*			Name() const;
+
+	virtual	status_t			AddAttribute_name(uint16 attributeName,
+									const AttributeValue& value);
+
+private:
+			const char*			fName;
+};
+
+
 class DIETemplateTypeParameterPack : public DIEDeclaredBase {
 public:
 								DIETemplateTypeParameterPack();

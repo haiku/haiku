@@ -69,6 +69,8 @@ enum {
 	DW_TAG_rvalue_reference_type	= 0x42,
 	DW_TAG_template_alias			= 0x43,
 	DW_TAG_lo_user					= 0x4080,
+	DW_TAG_GNU_template_template_param
+									= 0x4106,
 	DW_TAG_GNU_template_parameter_pack
 									= 0x4107,
 	DW_TAG_GNU_formal_parameter_pack
