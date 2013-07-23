@@ -275,8 +275,8 @@ BreakConditionConfigWindow::_Init()
 {
 	fExceptionSettingsBox = new BBox("exceptionBox");
 	fExceptionSettingsBox->SetLabel("Exceptions");
-	fExceptionSettingsBox->AddChild(BLayoutBuilder::Group<>(B_VERTICAL,
-			B_USE_DEFAULT_SPACING)
+	fExceptionSettingsBox->AddChild(BLayoutBuilder::Group<>(B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(fExceptionThrown = new BCheckBox("exceptionThrown",
 			"Stop when an exception is thrown",
 			new BMessage(MSG_STOP_ON_THROWN_EXCEPTION_CHANGED)))
