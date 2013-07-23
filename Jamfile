@@ -7,13 +7,7 @@ Depends files : doc_files ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) BuildFeatures ] ;
 
 # Include packages that are required by all images.
-if $(HAIKU_BOOTSTRAP_BUILD) {
-	AddHaikuImagePackages
-		freetype grep icu libsolv sed zlib
-		:
-		system
-		;
-} else {
+if ! $(HAIKU_BOOTSTRAP_BUILD) {
 	AddHaikuImagePackages
 		bzip2 ctags ffmpeg freetype glu grep icu jpeg libpng libsolv mesa sed
 		tar zlib

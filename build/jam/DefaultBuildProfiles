@@ -105,7 +105,15 @@ rule DefineDefaultBuildProfiles
 			HAIKU_IMAGE_SIZE = 1000 ;
 
 			AddHaikuImagePackages
+				freetype
 				freetype_devel
+				grep
+				icu
+				libsolv
+				ncurses
+				ncurses_devel
+				sed
+				zlib
 				zlib_devel
 				:
 				system
@@ -121,8 +129,10 @@ rule DefineDefaultBuildProfiles
 				haikuporter
 #				jam
 				libtool
+				libtool_libltdl
 				m4
 				make
+#				makeinfo
 #				mkdepend
 #				perl
 				python
