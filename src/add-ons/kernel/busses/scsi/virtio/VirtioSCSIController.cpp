@@ -21,6 +21,8 @@ get_feature_name(uint32 feature)
 			return "in out";
 		case VIRTIO_SCSI_F_HOTPLUG:
 			return "hotplug";
+		case VIRTIO_SCSI_F_CHANGE:
+			return "change";
 	}
 	return NULL;
 }
@@ -348,4 +350,3 @@ VirtioSCSIController::_RescanChildBus(void *cookie)
 	TRACE("rescan done %p\n", childNode);
 	gDeviceManager->put_node(childNode);
 }
-
