@@ -145,6 +145,8 @@ private:
 			size_t 				fAreaSize;
 			area_id				fArea;
 
+			uint16				fIndirectMaxSize;
+
 			TransferDescriptor**	fDescriptors;
 };
 

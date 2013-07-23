@@ -51,36 +51,69 @@ alloc_mem(void **virt, phys_addr_t *phy, size_t size, uint32 protection,
 class TransferDescriptor {
 public:
 								TransferDescriptor(VirtioQueue* queue,
-									uint16 size,
-									virtio_callback_func callback,
-									void *callbackCookie);
+									uint16 indirectMaxSize);
 								~TransferDescriptor();
+
+			status_t			InitCheck() { return fStatus; }
 
 			void				Callback();
 			uint16				Size() { return fDescriptorCount; }
+			void				SetTo(uint16 size,
+									virtio_callback_func callback,
+									void *callbackCookie);
+			void				Unset();
+			struct vring_desc*	Indirect() { return fIndirect; }
+			phys_addr_t			PhysAddr() { return fPhysAddr; }
 private:
+			status_t			fStatus;
 			VirtioQueue*		fQueue;
 			void*				fCookie;
 			virtio_callback_func fCallback;
+
 			struct vring_desc* 	fIndirect;
 			size_t 				fAreaSize;
 			area_id				fArea;
+			phys_addr_t 		fPhysAddr;
 			uint16				fDescriptorCount;
 };
 
 
-TransferDescriptor::TransferDescriptor(VirtioQueue* queue, uint16 size,
-	virtio_callback_func callback, void *callbackCookie)
+TransferDescriptor::TransferDescriptor(VirtioQueue* queue, uint16 indirectMaxSize)
 	: fQueue(queue),
-	fCookie(callbackCookie),
-	fCallback(callback),
-	fDescriptorCount(size)
+	fCookie(NULL),
+	fCallback(NULL),
+	fIndirect(NULL),
+	fAreaSize(0),
+	fArea(-1),
+	fDescriptorCount(0)
 {
+	fStatus = B_OK;
+	struct vring_desc* virtAddr;
+	phys_addr_t physAddr;
+
+	if (indirectMaxSize > 0) {
+		fAreaSize = indirectMaxSize * sizeof(struct vring_desc);
+		fArea = alloc_mem((void **)&virtAddr, &physAddr, fAreaSize, 0,
+			"virtqueue");
+		if (fArea < B_OK) {
+			fStatus = fArea;
+			return;
+		}
+		memset(virtAddr, 0, fAreaSize);
+		fIndirect = virtAddr;
+		fPhysAddr = physAddr;
+
+		for (uint16 i = 0; i < indirectMaxSize - 1; i++)
+			fIndirect[i].next = i + 1;
+		fIndirect[indirectMaxSize - 1].next = UINT16_MAX;
+	}
 }
 
 
 TransferDescriptor::~TransferDescriptor()
 {
+	if (fArea > B_OK)
+		delete_area(fArea);
 }
 
 
@@ -89,6 +122,25 @@ TransferDescriptor::Callback()
 {
 	if (fCallback != NULL)
 		fCallback(fQueue->Device()->DriverCookie(), fCookie);
+}
+
+
+void
+TransferDescriptor::SetTo(uint16 size, virtio_callback_func callback,
+	void *callbackCookie)
+{
+	fCookie = callbackCookie;
+	fCallback = callback;
+	fDescriptorCount = size;
+}
+
+
+void
+TransferDescriptor::Unset()
+{
+	fCookie = NULL;
+	fCallback = NULL;
+	fDescriptorCount = 0;
 }
 
 
@@ -104,7 +156,8 @@ VirtioQueue::VirtioQueue(VirtioDevice* device, uint16 queueNumber,
 	fRingFree(ringSize),
 	fRingHeadIndex(0),
 	fRingUsedIndex(0),
-	fStatus(B_OK)
+	fStatus(B_OK),
+	fIndirectMaxSize(0)
 {
 	fDescriptors = new(std::nothrow) TransferDescriptor*[fRingSize];
 	if (fDescriptors == NULL) {
@@ -128,6 +181,17 @@ VirtioQueue::VirtioQueue(VirtioDevice* device, uint16 queueNumber,
 		fRing.desc[i].next = i + 1;
 	fRing.desc[fRingSize - 1].next = UINT16_MAX;
 
+	if ((fDevice->Features() & VIRTIO_FEATURE_RING_INDIRECT_DESC) != 0)
+		fIndirectMaxSize = 128;
+
+	for (uint16 i = 0; i < fRingSize; i++) {
+		fDescriptors[i] = new TransferDescriptor(this, fIndirectMaxSize);
+		if (fDescriptors[i] == NULL || fDescriptors[i]->InitCheck() != B_OK) {
+			fStatus = B_NO_MEMORY;
+			return;
+		}
+	}
+
 	DisableInterrupt();
 
 	device->SetupQueue(fQueueNumber, physAddr);
@@ -137,6 +201,9 @@ VirtioQueue::VirtioQueue(VirtioDevice* device, uint16 queueNumber,
 VirtioQueue::~VirtioQueue()
 {
 	delete_area(fArea);
+	for (uint16 i = 0; i < fRingSize; i++) {
+		delete fDescriptors[i];
+	}
 	delete[] fDescriptors;
 }
 
@@ -191,6 +258,7 @@ VirtioQueue::Finish()
 
 	fDescriptors[descriptorIndex]->Callback();
 	uint16 size = fDescriptors[descriptorIndex]->Size();
+	fDescriptors[descriptorIndex]->Unset();
 	fRingFree += size;
 	size--;
 
@@ -202,8 +270,6 @@ VirtioQueue::Finish()
 
 	if (size > 0)
 		panic("VirtioQueue::Finish() descriptors left %d\n", size);
-
-	// TODO TransferDescriptors are leaked, can't delete in interrupt handler.
 
 	fRing.desc[index].next = fRingHeadIndex;
 	fRingHeadIndex = descriptorIndex;
@@ -229,10 +295,8 @@ VirtioQueue::QueueRequest(const physical_entry* vector, size_t readVectorCount,
 		return B_BUSY;
 
 	uint16 insertIndex = fRingHeadIndex;
-	fDescriptors[insertIndex] = new(std::nothrow) TransferDescriptor(this,
-		count, callback, callbackCookie);
-	if (fDescriptors[insertIndex] == NULL)
-		return B_NO_MEMORY;
+	fDescriptors[insertIndex]->SetTo(count, callback,
+		callbackCookie);
 
 	// enqueue
 	uint16 index = QueueVector(insertIndex, fRing.desc, vector,
@@ -254,7 +318,29 @@ VirtioQueue::QueueRequestIndirect(const physical_entry* vector,
 	size_t readVectorCount,	size_t writtenVectorCount,
 	virtio_callback_func callback, void *callbackCookie)
 {
-	// TODO
+	CALLED();
+	size_t count = readVectorCount + writtenVectorCount;
+	if (count > fRingFree || count > fIndirectMaxSize)
+		return B_BUSY;
+
+	uint16 insertIndex = fRingHeadIndex;
+	fDescriptors[insertIndex]->SetTo(1, callback,
+		callbackCookie);
+
+	// enqueue
+	uint16 index = QueueVector(0, fDescriptors[insertIndex]->Indirect(),
+		vector, readVectorCount, writtenVectorCount);
+
+	fRing.desc[insertIndex].addr = fDescriptors[insertIndex]->PhysAddr();
+	fRing.desc[insertIndex].len = index * sizeof(struct vring_desc);
+	fRing.desc[insertIndex].flags = VRING_DESC_F_INDIRECT;
+	fRingHeadIndex = fRing.desc[insertIndex].next;
+	fRingFree--;
+
+	UpdateAvailable(insertIndex);
+
+	NotifyHost();
+
 	return B_OK;
 }
 

@@ -115,7 +115,7 @@ VirtioDevice::NegociateFeatures(uint32 supported, uint32* negociated,
 
 	// filter our own features
 	fFeatures &= (VIRTIO_FEATURE_TRANSPORT_MASK
-		/*| VIRTIO_FEATURE_RING_INDIRECT_DESC*/ | VIRTIO_FEATURE_RING_EVENT_IDX);
+		| VIRTIO_FEATURE_RING_INDIRECT_DESC | VIRTIO_FEATURE_RING_EVENT_IDX);
 
 	*negociated = fFeatures;
 
@@ -254,4 +254,3 @@ VirtioDevice::DumpFeatures(const char* title, uint32 features,
 	}
 	TRACE("%s: %s\n", title, features_string);
 }
-
