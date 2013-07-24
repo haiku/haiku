@@ -103,7 +103,7 @@ SYSTEM_ADD_ONS_ACCELERANTS = [ FFilterByBuildFeatures
 		#via.accelerant vmware.accelerant
 	}@ # x86
 ] ;
-SYSTEM_ADD_ONS_TRANSLATORS = ;
+SYSTEM_ADD_ONS_TRANSLATORS = STXTTranslator ;
 SYSTEM_ADD_ONS_LOCALE_CATALOGS = <catalog-addon>plaintext ;
 SYSTEM_ADD_ONS_MEDIA = ;
 SYSTEM_ADD_ONS_MEDIA_PLUGINS =  ;
