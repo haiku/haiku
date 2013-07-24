@@ -527,16 +527,6 @@ done
 
 # detect the build platform
 case "${platform}" in
-	BeOS)	revision=`uname -r`
-			case "$revision" in
-				6.*)	HOST_PLATFORM=dano ;;
-				5.1)	HOST_PLATFORM=dano ;;
-				5.0.4)	HOST_PLATFORM=bone ;;
-				5.0*)	HOST_PLATFORM=r5 ;;
-				*)		echo Unknown BeOS version: $revision
-						exit 1 ;;
-			esac
-			;;
 	Darwin)	HOST_PLATFORM=darwin ;;
 	FreeBSD)	HOST_PLATFORM=freebsd
 				SFDISK_BINARY=sfdisk-linux
@@ -618,10 +608,9 @@ else
 		esac
 	fi
 
-	# check whether the Haiku compiler really targets Haiku or BeOS
+	# check whether the Haiku compiler really targets Haiku
 	case "$HAIKU_GCC_MACHINE" in
 		*-*-haiku)	;;
-		*-*-beos)	;;
 		*) echo The compiler specified as Haiku target compiler is not a valid \
 				Haiku cross-compiler. Please see ReadMe.cross-compile. >&2
 		echo compiler: $HAIKU_CC
