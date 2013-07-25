@@ -44,6 +44,9 @@ public:
 
 private:
 			status_t			_Negotiate(dhcp_state state);
+			status_t			_GotMessage(dhcp_state& state,
+									dhcp_message* message);
+			status_t			_StateTransition(int socket, dhcp_state& state);
 			void				_ParseOptions(dhcp_message& message,
 									BMessage& address,
 									BMessage& resolverConfiguration);
@@ -52,10 +55,10 @@ private:
 			status_t			_SendMessage(int socket, dhcp_message& message,
 									const BNetworkAddress& address) const;
 			dhcp_state			_CurrentState() const;
-			void				_ResetTimeout(int socket, time_t& timeout,
-									uint32& tries);
-			bool				_TimeoutShift(int socket, time_t& timeout,
-									uint32& tries);
+			void				_ResetTimeout(int socket, dhcp_state& state,
+									time_t& timeout, uint32& tries);
+			bool				_TimeoutShift(int socket, dhcp_state& state,
+									time_t& timeout, uint32& tries);
 			void				_RestartLease(bigtime_t lease);
 
 	static	BString				_AddressToString(const uint8* data);
@@ -71,6 +74,7 @@ private:
 			in_addr_t			fAssignedAddress;
 			BNetworkAddress		fServer;
 			bigtime_t			fStartTime;
+			bigtime_t			fRequestTime;
 			bigtime_t			fRenewalTime;
 			bigtime_t			fRebindingTime;
 			bigtime_t			fLeaseTime;
