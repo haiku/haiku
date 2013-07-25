@@ -185,6 +185,14 @@ struct Entry {
 	static status_t Create(Entry* parent, const char* name, bool implicit,
 		Entry*& _entry)
 	{
+		if (parent != NULL) {
+			Entry* entryInParent = parent->FindChild(name);
+			if (entryInParent != NULL) {
+				_entry = entryInParent;
+				return B_OK;
+			}
+		}
+
 		char* clonedName = strdup(name);
 		if (clonedName == NULL)
 			return B_NO_MEMORY;
@@ -804,7 +812,6 @@ do_extract(const char* packageFileName, const char* changeToDirectory,
 					entryName);
 				exit(1);
 			}
-
 			if (handler.AddFilterEntry(entryName) != B_OK)
 				exit(1);
 		}
@@ -836,6 +843,7 @@ do_extract(const char* packageFileName, const char* changeToDirectory,
 	// check whether all explicitly specified entries have been extracted
 	if (explicitEntryCount > 0) {
 		for (int i = 0; i < explicitEntryCount; i++) {
+			printf("check...en:%s\n", explicitEntries[i]);
 			if (Entry* entry = handler.FindFilterEntry(explicitEntries[i])) {
 				if (!entry->Seen()) {
 					fprintf(stderr, "Warning: Entry \"%s\" not found.\n",
@@ -893,7 +901,6 @@ command_extract(int argc, const char* const* argv)
 	const char* packageFileName = argv[optind++];
 	const char* const* explicitEntries = argv + optind;
 	int explicitEntryCount = argc - optind;
-
 	do_extract<VersionPolicyV2>(packageFileName, changeToDirectory,
 		packageInfoFileName, explicitEntries, explicitEntryCount, true);
 	do_extract<VersionPolicyV1>(packageFileName, changeToDirectory,
