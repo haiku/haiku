@@ -83,23 +83,6 @@ HAIKU_DEFAULT_ANYBOOT_LABEL ?= Haiku ;
 ProcessCommandLineArguments ;
 
 
-# include libgccObjects
-{
-	local libgccObjects = [ GLOB $(HAIKU_BUILD_OUTPUT_DIR) : libgccObjects ] ;
-
-	if ! $(libgccObjects) {
-		ECHO "No `libgccObjects' found in"
-			"$(HAIKU_BUILD_OUTPUT_DIR)!" ;
-		EXIT "Please run ./configure in the source tree's root directory"
-			"again!" ;
-	}
-
-	LOCATE on libgccObjects = $(HAIKU_BUILD_OUTPUT_DIR) ;
-
-	include libgccObjects ;
-}
-
-
 # supported debug levels
 HAIKU_DEBUG_LEVELS = 0 1 2 3 4 5 ;
 

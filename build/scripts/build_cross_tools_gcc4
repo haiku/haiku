@@ -1,18 +1,18 @@
 #!/bin/sh
 #
-# parameters <machine> <haiku sourcedir> <buildtools dir> <haiku output dir>
+# parameters <machine> <haiku sourcedir> <buildtools dir> <isntall dir>
 
 # get and check the parameters
 if [ $# -lt 4 ]; then
 	echo Usage: $0 '<machine> <haiku sourcedir> <buildtools dir>' \
-		'<haiku output dir>' >&2
+		'<install dir>' >&2
 	exit 1
 fi
 
 haikuMachine=$1
 haikuSourceDir=$2
 buildToolsDir=$3
-haikuOutputDir=$4
+installDir=$4
 shift 4
 additionalMakeArgs=$*
 
@@ -68,7 +68,7 @@ fi
 
 
 # create the output dir
-mkdir -p $haikuOutputDir || exit 1
+mkdir -p $installDir || exit 1
 
 
 # get absolute paths
@@ -82,8 +82,9 @@ cd $buildToolsDir
 buildToolsDir=$(pwd)
 cd $currentDir
 
-cd $haikuOutputDir
-haikuOutputDir=$(pwd)
+cd $installDir
+installDir=$(pwd)
+cd $currentDir
 
 binutilsSourceDir=$buildToolsDir/binutils
 gccSourceDir=$buildToolsDir/gcc
@@ -104,8 +105,7 @@ fi
 find $binutilsSourceDir $gccSourceDir -name \*.info -print0 | xargs -0 touch
 
 # create the object and installation directories for the cross compilation tools
-installDir=$haikuOutputDir/cross-tools
-objDir=$haikuOutputDir/cross-tools-build
+objDir=${installDir}-build
 binutilsObjDir=$objDir/binutils
 gccObjDir=$objDir/gcc
 stdcxxObjDir=$objDir/stdcxx

@@ -22,19 +22,22 @@ options:
                               out HaikuPorts cross-compilation repository.
                               <HaikuPorts repo> is the path to a checked out
                               HaikuPorts repository.
-  --build-cross-tools <build tools dir>
+  --build-cross-tools <arch> [ <build tools dir> ]
                               Assume cross compilation. <build tools dir>
                               defines the location of the build tools sources.
                               They will be compiled and placed in the output
                               directory under "cross-tools". The HAIKU_* tools
                               variables will be set accordingly.
-  --build-cross-tools-gcc4 <arch> <build tools dir>
-                              Like "--build-cross-tools" just that gcc 4 will
-                              be used for cross-compilation. Note, that the
-                              resulting Haiku installation built with gcc 4
-                              will not be binary compatible with BeOS R5.
                               <arch> specifies the target architecture, either
-                              "x86", "x86_64", "ppc", "m68k", "arm" or "mipsel".
+                              "x86_gcc2", "x86", "x86_64", "ppc", "m68k", "arm",
+                              or "mipsel".
+                              This option and --cross-tools-prefix can be
+                              specified multiple times. The first cross tools
+                              specify the primary tools, the subsequent ones the
+                              secondary tools (for "hybrid" images).
+                              For the first --build-cross-tools the
+                              <build tools dir> argument must be specified and
+                              for the subsequent ones it must be omitted.
   --cross-tools-prefix <prefix>
                               Assume cross compilation. <prefix> should be a
                               path to the directory where the cross
@@ -90,23 +93,32 @@ options:
                               less likely).
 
 environment variables:
-  HAIKU_AR                    The static library archiver. Defaults to "ar".
-  HAIKU_CC                    The compiler. Defaults to "gcc".
-  HAIKU_LD                    The linker. Defaults to "ld".
-  HAIKU_OBJCOPY               The objcopy to be used. Defaults to "objcopy".
-  HAIKU_RANLIB                The static library indexer. Defaults to "ranlib".
+  HAIKU_AR_x86_gcc2           The static library archiver for x86_gcc2.
+                              Defaults to "ar".
+  HAIKU_CC_x86_gcc2           The x86_gcc2 compiler. Defaults to "gcc".
+  HAIKU_LD_x86_gcc2           The x86_gcc2 linker. Defaults to "ld".
+  HAIKU_OBJCOPY_x86_gcc2      The x86_gcc2 objcopy to be used. Defaults to
+                              "objcopy".
+  HAIKU_RANLIB_x86_gcc2       The static library indexer for x86_gcc2. Defaults
+                              to "ranlib".
+  HAIKU_STRIP_x86_gcc2        The x86_gcc2 strip command. Defaults to "strip".
   HAIKU_YASM                  The yasm assembler (x86 only).
-  HAIKU_STRIP                 The strip command. Defaults to "strip".
-  HAIKU_CPPFLAGS              The preprocessor flags. Defaults to "".
-  HAIKU_CCFLAGS               The C flags. Defaults to "".
-  HAIKU_CXXFLAGS              The C++ flags. Defaults to "".
-  HAIKU_LDFLAGS               The linker flags. Defaults to "".
-  HAIKU_ARFLAGS               The flags passed to HAIKU_AR for archiving.
-                              Defaults to "cru".
-  HAIKU_UNARFLAGS             The flags passed to HAIKU_AR for unarchiving.
-                              Defaults to "x".
+  HAIKU_CPPFLAGS_<arch>       The preprocessor flags for target architecture
+                              <arch>. Defaults to "".
+  HAIKU_CCFLAGS_<arch>        The C flags for target architecture <arch>.
+                              Defaults to "".
+  HAIKU_CXXFLAGS_<arch>       The C++ flags for target architecture <arch>.
+                              Defaults to "".
+  HAIKU_LDFLAGS_<arch>        The linker flags for target architecture <arch>.
+                              Defaults to "".
+  HAIKU_ARFLAGS_<arch>        The flags passed to HAIKU_AR for target
+                              architecture <arch> for archiving. Defaults to
+                              "cru".
+  HAIKU_UNARFLAGS_<arch>      The flags passed to HAIKU_AR for target
+                              architecture <arch> for unarchiving. Defaults to
+                              "x".
 
-Non-standard output directories:
+Non-default output directories:
   By default all objects, build configuration, and other related files are
   stored in /path/to/haiku_source/generated.  To store objects in a non-default
   location, run "../../relative/path/to/haiku_source/configure <options>" from
@@ -173,6 +185,8 @@ real_path()
 #
 standard_gcc_settings()
 {
+	local gcc=$1
+
 	if which greadlink > /dev/null 2>&1; then
 		readlink="greadlink -e"
 	elif which realpath > /dev/null 2>&1; then
@@ -184,77 +198,67 @@ standard_gcc_settings()
 	fi
 
 	# PLATFORM_LINKLIBS
-	gcclib=`$HAIKU_CC -print-libgcc-file-name`
-	gccdir=`dirname ${gcclib}`
+	local gcclib=`$gcc -print-libgcc-file-name`
+	local gccdir=`dirname ${gcclib}`
 
-	HAIKU_GCC_RAW_VERSION=`$HAIKU_CC -dumpversion`
-	HAIKU_GCC_MACHINE=`$HAIKU_CC -dumpmachine`
-	if [ "$HAIKU_USE_GCC_GRAPHITE" != 0 ]; then
-		UNUSED=`echo "int main() {}" | $HAIKU_CC -xc -c -floop-block - 2>&1`
-		if [ $? != 0 ]; then
-			echo "GCC Graphite loop optimizations cannot be used"
-			HAIKU_USE_GCC_GRAPHITE=0
-		fi
-	fi
+	local gccRawVersion=`$gcc -dumpversion`
+	local gccMachine=`$gcc -dumpmachine`
 
-	HAIKU_GCC_LIB_DIR=${gccdir}
-	HAIKU_GCC_LIBGCC=${gccdir}/libgcc.a
-	HAIKU_GCC_GLUE_CODE="crtbegin.o crtend.o"
-	HAIKU_GCC_HEADERS_DIR="${gccdir}/include
-		${gccdir}/include-fixed"
-	HAIKU_GCC_LIBGCC_OBJECTS=`$HAIKU_AR t ${HAIKU_GCC_LIBGCC} | grep -v eabi.o`
-		# Note: We filter out eabi.o. It's present in gcc's libgcc for PPC and
-		# neither needed nor wanted.
+	local libgcc=${gccdir}/libgcc.a
 
 	# determine architecture from machine triple
-	case $HAIKU_GCC_MACHINE in
-		arm-*)		HAIKU_CPU=arm;;
-		i?86-*)		HAIKU_CPU=x86;;
-		m68k-*)		HAIKU_CPU=m68k;;
-		mipsel-*)	HAIKU_CPU=mipsel;;
-		powerpc-*)	HAIKU_CPU=ppc;;
-		x86_64-*)	HAIKU_CPU=x86_64;;
+	case $gccMachine in
+		arm-*)		targetCpu=arm;;
+		i?86-*)		targetCpu=x86;;
+		m68k-*)		targetCpu=m68k;;
+		mipsel-*)	targetCpu=mipsel;;
+		powerpc-*)	targetCpu=ppc;;
+		x86_64-*)	targetCpu=x86_64;;
 		*)
-			echo "Unsupported gcc target machine: $HAIKU_GCC_MACHINE" >&2
+			echo "Unsupported gcc target machine: $gccMachine" >&2
 			exit 1
 			;;
 	esac
 
-	HAIKU_PACKAGING_ARCH=$HAIKU_CPU
+	local targetArch=$targetCpu
+	local staticLibStdCxx
+	local sharedLibStdCxx
+	local staticLibSupCxx
+	local sharedLibSupCxx
+	local kernelLibgcc
+	local cxxHeaders
 
-	case $HAIKU_GCC_RAW_VERSION in
+	case $gccRawVersion in
 		4.*)
 			# for gcc 4 we use the libstdc++ and libsupc++ that come with the
 			# compiler
-			HAIKU_STATIC_LIBSTDCXX=`$HAIKU_CC -print-file-name=libstdc++.a`
-			HAIKU_SHARED_LIBSTDCXX=`$HAIKU_CC -print-file-name=libstdc++.so`
-			HAIKU_STATIC_LIBSUPCXX=`$HAIKU_CC -print-file-name=libsupc++.a`
-			HAIKU_SHARED_LIBSUPCXX=`$HAIKU_CC -print-file-name=libsupc++.so`
+			staticLibStdCxx=`$gcc -print-file-name=libstdc++.a`
+			sharedLibStdCxx=`$gcc -print-file-name=libstdc++.so`
+			staticLibSupCxx=`$gcc -print-file-name=libsupc++.a`
+			sharedLibSupCxx=`$gcc -print-file-name=libsupc++.so`
 
 			# If the architecture has separate runtime libraries for the
 			# kernel, use them.
-			HAIKU_KERNEL_LIBGCC=`$HAIKU_CC -print-file-name=libgcc-kernel.a`
-			if [ $HAIKU_KERNEL_LIBGCC = libgcc-kernel.a ]; then
-				HAIKU_KERNEL_LIBGCC=$HAIKU_GCC_LIBGCC
+			kernelLibgcc=`$gcc -print-file-name=libgcc-kernel.a`
+			if [ $kernelLibgcc = libgcc-kernel.a ]; then
+				kernelLibgcc=$libgcc
 			fi
-			HAIKU_KERNEL_LIBSUPCXX=`$HAIKU_CC -print-file-name=libsupc++-kernel.a`
-			if [ $HAIKU_KERNEL_LIBSUPCXX = libsupc++-kernel.a ]; then
-				HAIKU_KERNEL_LIBSUPCXX=$HAIKU_STATIC_LIBSUPCXX
-			fi
-
-			local headers
-			if [ -d $gccdir/../../../../$HAIKU_GCC_MACHINE/include/c++/$HAIKU_GCC_RAW_VERSION ]; then
-				headers=$gccdir/../../../../$HAIKU_GCC_MACHINE/include/c++/$HAIKU_GCC_RAW_VERSION
-			else
-				headers=$gccdir/../../../../include/c++/$HAIKU_GCC_RAW_VERSION
+			kernelLibSupCxx=`$gcc -print-file-name=libsupc++-kernel.a`
+			if [ $kernelLibSupCxx = libsupc++-kernel.a ]; then
+				kernelLibSupCxx=$staticLibSupCxx
 			fi
 
-			HAIKU_CXX_HEADERS_DIR=$headers
-			for d in $HAIKU_GCC_MACHINE backward ext; do
+			local headersBase=$gccdir/../../../..
+			local headers=$headersBase/$gccMachine/include/c++/$gccRawVersion
+			if [ ! -d $headers ]; then
+				headers=$headersBase/include/c++/$gccRawVersion
+			fi
+
+			cxxHeaders=$headers
+			for d in $gccMachine backward ext; do
 				# Note: We need the line break, otherwise the line might become
 				# too long for jam (512 bytes max).
-				HAIKU_CXX_HEADERS_DIR="$HAIKU_CXX_HEADERS_DIR
-					$headers/$d"
+				cxxHeaders="$cxxHeaders $headers/$d"
 			done
 
 			# Unset the HAIKU_{SHARED,STATIC}_LIB{STD,SUP}CXX variables, if the
@@ -262,56 +266,113 @@ standard_gcc_settings()
 			# symlinks to avoid problems when copying the libraries to the
 			# image.
 
-			if [ $HAIKU_STATIC_LIBSTDCXX = libstdc++.a ]; then
-				HAIKU_STATIC_LIBSTDCXX=
+			if [ $staticLibStdCxx = libstdc++.a ]; then
+				staticLibStdCxx=
 			else
-				HAIKU_STATIC_LIBSTDCXX=`$readlink $HAIKU_STATIC_LIBSTDCXX`
+				staticLibStdCxx=`$readlink $staticLibStdCxx`
 			fi
 
-			if [ $HAIKU_SHARED_LIBSTDCXX = libstdc++.so ]; then
-				HAIKU_SHARED_LIBSTDCXX=
+			if [ $sharedLibStdCxx = libstdc++.so ]; then
+				sharedLibStdCxx=
 			else
-				HAIKU_SHARED_LIBSTDCXX=`$readlink $HAIKU_SHARED_LIBSTDCXX`
+				sharedLibStdCxx=`$readlink $sharedLibStdCxx`
 			fi
 
-			if [ $HAIKU_STATIC_LIBSUPCXX = libsupc++.a ]; then
-				HAIKU_STATIC_LIBSUPCXX=
+			if [ $staticLibSupCxx = libsupc++.a ]; then
+				staticLibSupCxx=
 			else
-				HAIKU_STATIC_LIBSUPCXX=`$readlink $HAIKU_STATIC_LIBSUPCXX`
+				staticLibSupCxx=`$readlink $staticLibSupCxx`
 			fi
 
-			if [ $HAIKU_SHARED_LIBSUPCXX = libsupc++.so ]; then
-				HAIKU_SHARED_LIBSUPCXX=
+			if [ $sharedLibSupCxx = libsupc++.so ]; then
+				sharedLibSupCxx=
 			else
-				HAIKU_SHARED_LIBSUPCXX=`$readlink $HAIKU_SHARED_LIBSUPCXX`
+				sharedLibSupCxx=`$readlink $sharedLibSupCxx`
 			fi
 			;;
 		2.9*)
 			# check for correct (most up-to-date) legacy compiler and complain
 			# if an older one is installed
-			if [ $HAIKU_GCC_RAW_VERSION != $haikuRequiredLegacyGCCVersion ]; then
+			if [ $gccRawVersion != $haikuRequiredLegacyGCCVersion ]; then
 				echo "GCC version $haikuRequiredLegacyGCCVersion is required!";
 				echo "Please download it from www.haiku-os.org...";
 				exit 1;
 			fi
 
-			HAIKU_KERNEL_LIBGCC=$HAIKU_GCC_LIBGCC
-			HAIKU_KERNEL_LIBSUPCXX=
-			HAIKU_PACKAGING_ARCH=x86_gcc2
+			kernelLibgcc=$libgcc
+			kernelLibSupCxx=
+			targetArch=x86_gcc2
 			;;
 	esac
 
-	case $HAIKU_GCC_MACHINE in
+	local bootLibgcc
+	local bootLibSupCxx
+	case $gccMachine in
 		x86_64-*)
 			# Boot loader is 32-bit, need the 32-bit libs.
-			HAIKU_BOOT_LIBGCC=`$HAIKU_CC -m32 -print-libgcc-file-name`
-			HAIKU_BOOT_LIBSUPCXX=`$HAIKU_CC -m32 -print-file-name=libsupc++.a`
+			bootLibgcc=`$gcc -m32 -print-libgcc-file-name`
+			bootLibSupCxx=`$gcc -m32 -print-file-name=libsupc++.a`
 			;;
 		*)
-			HAIKU_BOOT_LIBGCC=$HAIKU_GCC_LIBGCC
-			HAIKU_BOOT_LIBSUPCXX=$HAIKU_STATIC_LIBSUPCXX
+			bootLibgcc=$libgcc
+			bootLibSupCxx=$staticLibSupCxx
 			;;
 	esac
+
+	# determine whether graphite loop optimization should/can be used
+	local useGraphite=`get_variable HAIKU_USE_GCC_GRAPHITE_$targetCpu`
+	if [ -z "$useGraphite" ]; then
+		useGraphite=$useGccGraphiteDefault
+	fi
+
+	if [ "$useGraphite" != 0 ]; then
+		UNUSED=`echo "int main() {}" | $gcc -xc -c -floop-block - 2>&1`
+		if [ $? != 0 ]; then
+			echo "GCC Graphite loop optimizations cannot be used on $targetArch"
+			useGraphite=0
+		fi
+	fi
+
+	set_variable HAIKU_CPU_$targetArch $targetCpu
+
+	get_build_tool_path CC_$targetArch "$gcc"
+	set_variable HAIKU_GCC_RAW_VERSION_$targetArch $gccRawVersion
+	set_variable HAIKU_GCC_MACHINE_$targetArch $gccMachine
+	set_variable HAIKU_GCC_LIB_DIR_$targetArch $gccdir
+	set_variable HAIKU_GCC_LIBGCC_$targetArch $libgcc
+	set_variable HAIKU_GCC_GLUE_CODE_$targetArch "crtbegin.o crtend.o"
+	set_variable HAIKU_GCC_HEADERS_DIR_$targetArch \
+		"${gccdir}/include ${gccdir}/include-fixed"
+	set_variable HAIKU_STATIC_LIBSTDCXX_$targetArch "$staticLibStdCxx"
+	set_variable HAIKU_SHARED_LIBSTDCXX_$targetArch "$sharedLibStdCxx"
+	set_variable HAIKU_STATIC_LIBSUPCXX_$targetArch "$staticLibSupCxx"
+	set_variable HAIKU_SHARED_LIBSUPCXX_$targetArch "$sharedLibSupCxx"
+	set_variable HAIKU_KERNEL_LIBSUPCXX_$targetArch "$kernelLibSupCxx"
+	set_variable HAIKU_BOOT_LIBSUPCXX_$targetArch "$bootLibSupCxx"
+	set_variable HAIKU_KERNEL_LIBGCC_$targetArch $kernelLibgcc
+	set_variable HAIKU_CXX_HEADERS_DIR_$targetArch "$cxxHeaders"
+	set_variable HAIKU_BOOT_LIBGCC_$targetArch $bootLibgcc
+	set_variable HAIKU_USE_GCC_GRAPHITE_$targetArch $useGraphite
+
+	standard_gcc_settings_targetArch=$targetArch
+}
+
+# set_variable
+#
+# Set the value of a variable.
+#
+set_variable()
+{
+	eval "$1=\"$2\""
+}
+
+# get_variable
+#
+# Echo the value of a variable.
+#
+get_variable()
+{
+	eval "echo \${$1}"
 }
 
 # set_default_value
@@ -330,8 +391,7 @@ set_default_value()
 get_build_tool_path()
 {
 	local var="HAIKU_$1"
-	local tool=$2
-	local path="${crossToolsPrefix}$tool"
+	local path=$2
 
 	if [ -f "$path" ]; then
 		# get absolute path
@@ -362,23 +422,15 @@ configureArgs="$@"
 #
 platform=`uname`
 platformMachine=`uname  -m`
-crossToolsPrefix=
+targetArchs=
 buildCrossTools=
 buildCrossToolsScript="$sourceDir/build/scripts/build_cross_tools"
-buildCrossToolsMachine=
 buildCrossToolsJobs=
+useGccGraphiteDefault=0
+unknownArchIndex=1
 
 # exported (BuildSetup) default parameter values
 #
-HAIKU_GCC_RAW_VERSION=
-HAIKU_CPU=x86
-HAIKU_PACKAGING_ARCH=x86_gcc2
-HAIKU_GCC_MACHINE=i586-pc-haiku
-HAIKU_STATIC_LIBSTDCXX=
-HAIKU_SHARED_LIBSTDCXX=
-HAIKU_STATIC_LIBSUPCXX=
-HAIKU_SHARED_LIBSUPCXX=
-HAIKU_CXX_HEADERS_DIR=
 HOST_GCC_RAW_VERSION=`gcc -dumpversion`
 HOST_GCC_MACHINE=`gcc -dumpmachine`
 HAIKU_INCLUDE_GPL_ADDONS=0
@@ -389,7 +441,6 @@ HAIKU_ENABLE_MULTIUSER=0
 HAIKU_DISTRO_COMPATIBILITY=default
 TARGET_PLATFORM=haiku
 HAIKU_USE_GCC_PIPE=0
-HAIKU_USE_GCC_GRAPHITE=0
 HAIKU_HOST_USE_32BIT=0
 HAIKU_HOST_USE_XATTR=0
 HAIKU_HOST_USE_XATTR_REF=0
@@ -403,6 +454,10 @@ HOST_HAIKU_PORTER=
 HAIKU_PORTS=
 HAIKU_PORTS_CROSS=
 
+HAIKU_PACKAGING_ARCHS=
+
+set_default_value HAIKU_YASM		yasm
+
 if sha256sum < /dev/null > /dev/null 2>&1; then
 	HOST_SHA256=sha256sum
 elif sha256 < /dev/null > /dev/null 2>&1; then
@@ -415,21 +470,6 @@ fi
 haikuRequiredLegacyGCCVersion="2.95.3-haiku-2013_07_15"
 export haikuRequiredLegacyGCCVersion
 	# version of legacy gcc required to build haiku
-
-set_default_value HAIKU_AR			ar
-set_default_value HAIKU_CC			gcc
-set_default_value HAIKU_LD			ld
-set_default_value HAIKU_OBJCOPY		objcopy
-set_default_value HAIKU_RANLIB		ranlib
-set_default_value HAIKU_ELFEDIT		elfedit
-set_default_value HAIKU_YASM		yasm
-set_default_value HAIKU_STRIP		strip
-set_default_value HAIKU_CPPFLAGS	""
-set_default_value HAIKU_CCFLAGS		""
-set_default_value HAIKU_CXXFLAGS	""
-set_default_value HAIKU_LDFLAGS		""
-set_default_value HAIKU_ARFLAGS		cru
-set_default_value HAIKU_UNARFLAGS	x
 
 # determine output directory
 if [ "$currentDir" = "$sourceDir" ]; then
@@ -471,27 +511,41 @@ while [ $# -gt 0 ] ; do
 			HAIKU_PORTS="`absolute_path $4`"
 			shift 4
 			;;
-		--build-cross-tools) assertparam "$1" $#; buildCrossTools=$2; shift 2;;
-		--build-cross-tools-gcc4)
-			assertparams "$1" 2 $#
-			buildCrossTools=$3
-			buildCrossToolsScript="${buildCrossToolsScript}_gcc4"
-			case "$2" in
-				x86)	HAIKU_GCC_MACHINE=i586-pc-haiku;;
-				x86_64)	HAIKU_GCC_MACHINE=x86_64-unknown-haiku;;
-				ppc)	HAIKU_GCC_MACHINE=powerpc-apple-haiku;;
-				m68k)	HAIKU_GCC_MACHINE=m68k-unknown-haiku;;
-				arm)	HAIKU_GCC_MACHINE=arm-unknown-haiku;;
-				mipsel)	HAIKU_GCC_MACHINE=mipsel-unknown-haiku;;
-				*)		echo "Unsupported target architecture: $2"
-						exit 1;;
+		--build-cross-tools)
+			if [ -z "$buildCrossTools" ]; then
+				assertparams "$1" 2 $#
+				targetArch=$2
+				buildCrossTools=$3
+				shift 3
+			else
+				assertparam "$1" $#
+				targetArch=$2
+				shift 2
+			fi
+			case "$targetArch" in
+				x86_gcc2)	targetMachine=i586-pc-haiku;;
+				x86)		targetMachine=i586-pc-haiku;;
+				x86_64)		targetMachine=x86_64-unknown-haiku;;
+				ppc)		targetMachine=powerpc-apple-haiku;;
+				m68k)		targetMachine=m68k-unknown-haiku;;
+				arm)		targetMachine=arm-unknown-haiku;;
+				mipsel)		targetMachine=mipsel-unknown-haiku;;
+				*)
+					echo "Unsupported target architecture: $2" >&2
+					exit 1
+					;;
 			esac
-			buildCrossToolsMachine=$HAIKU_GCC_MACHINE
-			shift 3
+			set_variable buildCrossToolsMachine_$targetArch $targetMachine
+			targetArchs="$targetArchs $targetArch"
+			HAIKU_PACKAGING_ARCHS=
 			;;
 		--cross-tools-prefix)
 			assertparam "$1" $#
-			crossToolsPrefix=$2
+			targetArch=unknown${unknownArchIndex}
+			set_variable crossToolsPrefix_$targetArch "$2"
+			targetArchs="$targetArchs $targetArch"
+			HAIKU_PACKAGING_ARCHS=
+			unknownArchIndex=$[$unknownArchIndex + 1]
 			shift 2
 			;;
 		--distro-compatibility)
@@ -517,7 +571,7 @@ while [ $# -gt 0 ] ; do
         -j*)				buildCrossToolsJobs="$1"; shift 1;;
 		--target=*)     TARGET_PLATFORM=`echo $1 | cut -d'=' -f2-`; shift 1;;
 		--use-gcc-pipe)	HAIKU_USE_GCC_PIPE=1; shift 1;;
-		--use-gcc-graphite)	HAIKU_USE_GCC_GRAPHITE=1; shift 1;;
+		--use-gcc-graphite)	useGccGraphiteDefault=1; shift 1;;
 		--use-32bit)	HAIKU_HOST_USE_32BIT=1; shift 1;;
 		--use-xattr)	HAIKU_HOST_USE_XATTR=1; shift 1;;
 		--use-xattr-ref)	HAIKU_HOST_USE_XATTR_REF=1; shift 1;;
@@ -578,45 +632,101 @@ if [ "$HAIKU_HOST_BUILD_ONLY" = 1 ]; then
 	HAIKU_YASM=$invalidCommand
 	HAIKU_STRIP=$invalidCommand
 else
-	# build cross tools from sources
-	if [ -n "$buildCrossTools" ]; then
-		export HAIKU_USE_GCC_GRAPHITE
-		"$buildCrossToolsScript" $buildCrossToolsMachine "$sourceDir" \
-			"$buildCrossTools" "$outputDir" $buildCrossToolsJobs || exit 1
-		crossToolsPrefix="$outputDir/cross-tools/bin/${HAIKU_GCC_MACHINE}-"
+	if [ -n "$HAIKU_PACKAGING_ARCHS" ]; then
+		targetArchs="$HAIKU_PACKAGING_ARCHS"
+	fi
+	HAIKU_PACKAGING_ARCHS=
+
+	if [ -z "$targetArchs" ]; then
+		targetArch=x86_gcc2
+		targetArchs=$targetArch
+		set_default_value HAIKU_AR_$targetArch			ar
+		set_default_value HAIKU_CC_$targetArch			gcc
+		set_default_value HAIKU_LD_$targetArch			ld
+		set_default_value HAIKU_OBJCOPY_$targetArch		objcopy
+		set_default_value HAIKU_RANLIB_$targetArch		ranlib
+		set_default_value HAIKU_ELFEDIT_$targetArch		elfedit
+		set_default_value HAIKU_STRIP_$targetArch		strip
 	fi
 
-	# cross tools
-	if [ -n "$crossToolsPrefix" ]; then
-		get_build_tool_path AR ar
-		get_build_tool_path CC gcc
-		get_build_tool_path LD ld
-		get_build_tool_path OBJCOPY objcopy
-		get_build_tool_path RANLIB ranlib
-		get_build_tool_path STRIP strip
-	fi
+	for targetArch in $targetArchs; do
+		# Note: targetArch is "unknown<n>" at this point, if a cross-tools
+		# prefix was specified. The standard_gcc_settings call below will get
+		# the actual architecture.
 
-	# prepare gcc settings
-	standard_gcc_settings
+		crossToolsPrefix=`get_variable crossToolsPrefix_$targetArch`
 
-	# cross tools for gcc4 builds
-	if [ -n "$crossToolsPrefix" ]; then
-		case $HAIKU_GCC_RAW_VERSION in
-			4.*)
-				get_build_tool_path ELFEDIT elfedit
-			;;
+		# build cross tools from sources
+		if [ -n "$buildCrossTools" -a -z "$crossToolsPrefix" ]; then
+			crossToolsDir="$outputDir/cross-tools-$targetArch"
+			targetMachine=`get_variable buildCrossToolsMachine_$targetArch`
+			script="$buildCrossToolsScript"
+			if [ $targetArch != x86_gcc2 ]; then
+				script="${script}_gcc4 $targetMachine"
+			fi
+			HAIKU_USE_GCC_GRAPHITE=`get_variable \
+				HAIKU_USE_GCC_GRAPHITE_$targetArch` \
+			$script "$sourceDir" "$buildCrossTools" "$crossToolsDir" \
+				$buildCrossToolsJobs || exit 1
+			crossToolsPrefix="$crossToolsDir/bin/${targetMachine}-"
+		fi
+
+		# prepare gcc settings and get the actual target architecture
+		gcc="${crossToolsPrefix}gcc"
+		if [ -z "${crossToolsPrefix}" ]; then
+			gcc=`get_variable HAIKU_CC_$targetArch`
+		fi
+		standard_gcc_settings "$gcc"
+		targetArch=$standard_gcc_settings_targetArch
+
+		# set default values for flags
+		set_default_value HAIKU_CPPFLAGS_$targetArch	""
+		set_default_value HAIKU_CCFLAGS_$targetArch		""
+		set_default_value HAIKU_CXXFLAGS_$targetArch	""
+		set_default_value HAIKU_LDFLAGS_$targetArch		""
+		set_default_value HAIKU_ARFLAGS_$targetArch		cru
+		set_default_value HAIKU_UNARFLAGS_$targetArch	x
+
+		# Override the cross tools variables, if the tools were built or a
+		# prefix was specified.
+		if [ -n "$crossToolsPrefix" ]; then
+			get_build_tool_path AR_$targetArch ${crossToolsPrefix}ar
+			get_build_tool_path LD_$targetArch ${crossToolsPrefix}ld
+			get_build_tool_path OBJCOPY_$targetArch ${crossToolsPrefix}objcopy
+			get_build_tool_path RANLIB_$targetArch ${crossToolsPrefix}ranlib
+			get_build_tool_path STRIP_$targetArch ${crossToolsPrefix}strip
+
+			case `get_variable HAIKU_GCC_RAW_VERSION_$targetArch` in
+				4.*)
+					get_build_tool_path ELFEDIT_$targetArch \
+						${crossToolsPrefix}elfedit
+				;;
+			esac
+		fi
+
+		# Get the libgcc objects. We couldn't do that in standard_gcc_settings,
+		# since we need "ar", which may be set later.
+		ar=`get_variable HAIKU_AR_$targetArch`
+		libgcc=`get_variable HAIKU_GCC_LIBGCC_$targetArch`
+		set_variable HAIKU_GCC_LIBGCC_OBJECTS_$targetArch \
+			"`$ar t $libgcc | grep -v eabi.o`"
+			# Note: We filter out eabi.o. It's present in gcc's libgcc for PPC
+			# and neither needed nor wanted.
+
+		# check whether the Haiku compiler really targets Haiku
+		targetMachine=`get_variable HAIKU_GCC_MACHINE_$targetArch`
+		case "$targetMachine" in
+			*-*-haiku)	;;
+			*)
+				echo The compiler specified as Haiku target compiler is not a \
+				valid Haiku cross-compiler. Please see ReadMe.cross-compile. >&2
+				echo compiler: $HAIKU_CC
+				echo compiler is configured for target: $targetMachine
+				exit 1 ;;
 		esac
-	fi
 
-	# check whether the Haiku compiler really targets Haiku
-	case "$HAIKU_GCC_MACHINE" in
-		*-*-haiku)	;;
-		*) echo The compiler specified as Haiku target compiler is not a valid \
-				Haiku cross-compiler. Please see ReadMe.cross-compile. >&2
-		echo compiler: $HAIKU_CC
-		echo compiler is configured for target: $HAIKU_GCC_MACHINE
-		exit 1 ;;
-	esac
+		HAIKU_PACKAGING_ARCHS="$HAIKU_PACKAGING_ARCHS $targetArch"
+	done
 fi
 
 # Generate BuildConfig
@@ -636,48 +746,16 @@ HAIKU_INCLUDE_3RDPARTY				?= "${HAIKU_INCLUDE_3RDPARTY}" ;
 HAIKU_ENABLE_MULTIUSER				?= "${HAIKU_ENABLE_MULTIUSER}" ;
 HAIKU_DISTRO_COMPATIBILITY			?= "${HAIKU_DISTRO_COMPATIBILITY}" ;
 HAIKU_USE_GCC_PIPE					?= "${HAIKU_USE_GCC_PIPE}" ;
-HAIKU_USE_GCC_GRAPHITE				?= "${HAIKU_USE_GCC_GRAPHITE}" ;
 HAIKU_HOST_USE_32BIT				?= "${HAIKU_HOST_USE_32BIT}" ;
 HAIKU_HOST_USE_XATTR				?= "${HAIKU_HOST_USE_XATTR}" ;
 HAIKU_HOST_USE_XATTR_REF			?= "${HAIKU_HOST_USE_XATTR_REF}" ;
 HAIKU_HOST_BUILD_ONLY				?= "${HAIKU_HOST_BUILD_ONLY}" ;
 
-HAIKU_GCC_RAW_VERSION		?= ${HAIKU_GCC_RAW_VERSION} ;
-HAIKU_GCC_MACHINE			?= ${HAIKU_GCC_MACHINE} ;
-HAIKU_GCC_LIB_DIR			?= ${HAIKU_GCC_LIB_DIR} ;
-HAIKU_GCC_HEADERS_DIR		?= ${HAIKU_GCC_HEADERS_DIR} ;
-HAIKU_GCC_LIBGCC			?= ${HAIKU_GCC_LIBGCC} ;
-
-HAIKU_CPU					?= ${HAIKU_CPU} ;
-HAIKU_PACKAGING_ARCH		?= ${HAIKU_PACKAGING_ARCH} ;
-
-HAIKU_STATIC_LIBSTDC++		?= ${HAIKU_STATIC_LIBSTDCXX} ;
-HAIKU_SHARED_LIBSTDC++		?= ${HAIKU_SHARED_LIBSTDCXX} ;
-HAIKU_STATIC_LIBSUPC++		?= ${HAIKU_STATIC_LIBSUPCXX} ;
-HAIKU_SHARED_LIBSUPC++		?= ${HAIKU_SHARED_LIBSUPCXX} ;
-HAIKU_C++_HEADERS_DIR		?= ${HAIKU_CXX_HEADERS_DIR} ;
-
-HAIKU_KERNEL_LIBGCC			?= ${HAIKU_KERNEL_LIBGCC} ;
-HAIKU_KERNEL_LIBSUPC++		?= ${HAIKU_KERNEL_LIBSUPCXX} ;
-HAIKU_BOOT_LIBGCC			?= ${HAIKU_BOOT_LIBGCC} ;
-HAIKU_BOOT_LIBSUPC++		?= ${HAIKU_BOOT_LIBSUPCXX} ;
+HAIKU_PACKAGING_ARCHS		?= ${HAIKU_PACKAGING_ARCHS} ;
 
 HAIKU_BUILD_ATTRIBUTES_DIR	?= ${HAIKU_BUILD_ATTRIBUTES_DIR} ;
 
-HAIKU_AR					?= ${HAIKU_AR} ;
-HAIKU_CC					?= ${HAIKU_CC} ;
-HAIKU_LD					?= ${HAIKU_LD} ;
-HAIKU_OBJCOPY				?= ${HAIKU_OBJCOPY} ;
-HAIKU_RANLIB				?= ${HAIKU_RANLIB} ;
-HAIKU_ELFEDIT				?= ${HAIKU_ELFEDIT} ;
 HAIKU_YASM					?= ${HAIKU_YASM} ;
-HAIKU_STRIP					?= ${HAIKU_STRIP} ;
-HAIKU_CPPFLAGS				?= ${HAIKU_CPPFLAGS} ;
-HAIKU_CCFLAGS				?= ${HAIKU_CCFLAGS} ;
-HAIKU_C++FLAGS				?= ${HAIKU_CXXFLAGS} ;
-HAIKU_LDFLAGS				?= ${HAIKU_LDFLAGS} ;
-HAIKU_ARFLAGS				?= ${HAIKU_ARFLAGS} ;
-HAIKU_UNARFLAGS				?= ${HAIKU_UNARFLAGS} ;
 
 HOST_GCC_RAW_VERSION		?= ${HOST_GCC_RAW_VERSION} ;
 HOST_GCC_MACHINE			?= ${HOST_GCC_MACHINE} ;
@@ -692,14 +770,60 @@ HAIKU_PORTS_CROSS			?= ${HAIKU_PORTS_CROSS} ;
 
 EOF
 
-# Libgcc.a objects
+for targetArch in $HAIKU_PACKAGING_ARCHS; do
+	variables="
+		HAIKU_GCC_RAW_VERSION		HAIKU_GCC_RAW_VERSION
+		HAIKU_GCC_MACHINE			HAIKU_GCC_MACHINE
+		HAIKU_GCC_LIB_DIR			HAIKU_GCC_LIB_DIR
+		HAIKU_GCC_LIBGCC			HAIKU_GCC_LIBGCC
+		HAIKU_CPU					HAIKU_CPU
+		HAIKU_STATIC_LIBSTDC++		HAIKU_STATIC_LIBSTDCXX
+		HAIKU_SHARED_LIBSTDC++		HAIKU_SHARED_LIBSTDCXX
+		HAIKU_STATIC_LIBSUPC++		HAIKU_STATIC_LIBSUPCXX
+		HAIKU_SHARED_LIBSUPC++		HAIKU_SHARED_LIBSUPCXX
+		HAIKU_KERNEL_LIBGCC			HAIKU_KERNEL_LIBGCC
+		HAIKU_KERNEL_LIBSUPC++		HAIKU_KERNEL_LIBSUPCXX
+		HAIKU_BOOT_LIBGCC			HAIKU_BOOT_LIBGCC
+		HAIKU_BOOT_LIBSUPC++		HAIKU_BOOT_LIBSUPCXX
+		HAIKU_AR					HAIKU_AR
+		HAIKU_CC					HAIKU_CC
+		HAIKU_LD					HAIKU_LD
+		HAIKU_OBJCOPY				HAIKU_OBJCOPY
+		HAIKU_RANLIB				HAIKU_RANLIB
+		HAIKU_ELFEDIT				HAIKU_ELFEDIT
+		HAIKU_STRIP					HAIKU_STRIP
+		HAIKU_CPPFLAGS				HAIKU_CPPFLAGS
+		HAIKU_CCFLAGS				HAIKU_CCFLAGS
+		HAIKU_C++FLAGS				HAIKU_CXXFLAGS
+		HAIKU_LDFLAGS				HAIKU_LDFLAGS
+		HAIKU_ARFLAGS				HAIKU_ARFLAGS
+		HAIKU_UNARFLAGS				HAIKU_UNARFLAGS
+		HAIKU_USE_GCC_GRAPHITE		HAIKU_USE_GCC_GRAPHITE
+		"
+	set -- $variables
+	while [ $# -ge 2 ]; do
+		value=`get_variable ${2}_$targetArch`
+		echo "${1}_${targetArch} ?= $value ;" >> "$buildConfigFile"
+		shift 2
+	done
 
-cat << EOF > "$buildOutputDir/libgccObjects"
-# libgcc.a objects to be linked against libroot.so
-# Note: This file has been automatically generated by configure.
+	# For variables that may have long values, distribute them over multiple
+	# lines so that jam doesn't hit the maximum line length.
+	variables="
+		HAIKU_GCC_HEADERS_DIR		HAIKU_GCC_HEADERS_DIR
+		HAIKU_C++_HEADERS_DIR		HAIKU_CXX_HEADERS_DIR
+		HAIKU_GCC_LIBGCC_OBJECTS	HAIKU_GCC_LIBGCC_OBJECTS
+		"
+	set -- $variables
+	while [ $# -ge 2 ]; do
+		echo "${1}_${targetArch} ?= " >> "$buildConfigFile"
+		get_variable ${2}_$targetArch | xargs -n 1 echo "   " \
+			>> "$buildConfigFile"
+		echo "    ;" >> "$buildConfigFile"
+		shift 2
+	done
+done
 
-HAIKU_GCC_LIBGCC_OBJECTS	?= ${HAIKU_GCC_LIBGCC_OBJECTS} ;
-EOF
 
 # Generate a boot strap Jamfile in the output directory.
 

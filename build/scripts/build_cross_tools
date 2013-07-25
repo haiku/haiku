@@ -1,19 +1,19 @@
 #!/bin/sh
 
-# Parameters <haiku sourcedir> <buildtools dir> <haiku output dir>
+# Parameters <haiku sourcedir> <buildtools dir> <install dir>
 # Influential environmental variable:
 # * haikuRequiredLegacyGCCVersion: The required version of the gcc. Will be
 #   checked against the version in the buildtools directory.
 
 # get and check the parameters
 if [ $# -lt 3 ]; then
-	echo Usage: $0 '<haiku sourcedir> <buildtools dir> <haiku output dir>' >&2
+	echo Usage: $0 '<haiku sourcedir> <buildtools dir> <install dir>' >&2
 	exit 1
 fi
 
 haikuSourceDir=$1
 buildToolsDir=$2/legacy
-haikuOutputDir=$3
+installDir=$3
 shift 3
 additionalMakeArgs=$*
 	# Note: The gcc 2 build has trouble with -jN N > 1, hence we only use the
@@ -62,7 +62,7 @@ fi
 
 
 # create the output dir
-mkdir -p $haikuOutputDir || exit 1
+mkdir -p $installDir || exit 1
 
 
 # get absolute paths
@@ -76,13 +76,13 @@ cd $buildToolsDir
 buildToolsDir=`pwd`
 cd $currentDir
 
-cd $haikuOutputDir
-haikuOutputDir=`pwd`
+cd $installDir
+installDir=`pwd`
+cd $currentDir
 
 
 # create the object and installation directories for the cross compilation tools
-installDir=$haikuOutputDir/cross-tools
-objDir=$haikuOutputDir/cross-tools-build
+objDir=${installDir}-build
 binutilsObjDir=$objDir/binutils
 gccObjDir=$objDir/gcc
 tmpIncludeDir=$objDir/sysincludes
