@@ -1,0 +1,1629 @@
+/*
+ * Copyright 2011-2013 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/Window.h	 hrev45799
+ *		src/kits/interface/Window.cpp	 hrev45799
+ */
+
+
+/*!
+	\file Window.h
+	\ingroup interface
+	\ingroup libbe
+	\brief BWindow class definition and support data structures.
+*/
+
+
+// window_type
+
+
+/*!
+	\enum window_type
+	\ingroup interface
+
+	Combined window look and feel constants. Define both the appearance and
+	behavior of a window.
+*/
+
+
+/*!
+	\var window_type B_UNTYPED_WINDOW
+
+	A window of unknown or undefined type.
+*/
+
+
+/*!
+	\var window_type B_TITLED_WINDOW
+
+	\c B_TITLED_WINDOW_LOOK and \c B_NORMAL_WINDOW_FEEL.
+*/
+
+
+/*!
+	\var window_type B_MODAL_WINDOW
+
+	\c B_MODAL_WINDOW_LOOK and \c B_MODAL_APP_WINDOW_FEEL.
+*/
+
+
+/*!
+	\var window_type B_DOCUMENT_WINDOW
+
+	\c B_DOCUMENT_WINDOW_LOOK and \c B_NORMAL_WINDOW_FEEL.
+*/
+
+
+/*!
+	\var window_type B_BORDERED_WINDOW
+
+	\c B_BORDERED_WINDOW_LOOK and \c B_NORMAL_WINDOW_FEEL.
+*/
+
+
+/*!
+	\var window_type B_FLOATING_WINDOW
+
+	\c B_FLOATING_WINDOW_LOOK and \c B_FLOATING_APP_WINDOW_FEEL.
+*/
+
+
+// window_look
+
+
+/*!
+	\enum window_look
+	\ingroup interface
+
+	Window look constants, define window appearance.
+*/
+
+
+/*!
+	\var window_look B_BORDERED_WINDOW_LOOK
+
+	No title bar, thin border, no resize control.
+*/
+
+
+/*!
+	\var window_look B_NO_BORDER_WINDOW_LOOK
+
+	A borderless rectangle with no provisions to move or close the window.
+*/
+
+
+/*!
+	\var window_look B_TITLED_WINDOW_LOOK
+
+	Like \c B_DOCUMENT_WINDOW_LOOK, but with a resize corner instead of a resize
+	thumb.
+*/
+
+
+/*!
+	\var window_look B_DOCUMENT_WINDOW_LOOK
+
+	Large title bar, thick border, draggable resize corner thumb.
+*/
+
+
+/*!
+	\var window_look B_MODAL_WINDOW_LOOK
+
+	For modal dialogs: no title bar, thick border, resize corner depending on the
+	\c B_NOT_RESIZABLE flag.
+*/
+
+
+/*!
+	\var window_look B_FLOATING_WINDOW_LOOK
+
+	For floating sub windows: small title bar, thin border, resize corner.
+*/
+
+
+// window_feel
+
+
+/*!
+	\enum window_feel
+	\ingroup interface
+
+	Window feel constants, define window behavior.
+*/
+
+
+/*!
+	\var window_feel B_NORMAL_WINDOW_FEEL
+
+	Behaves like a normal, non-modal, non-floating window.
+*/
+
+
+/*!
+	\var window_feel B_MODAL_SUBSET_WINDOW_FEEL
+
+	Blocks all windows in its subset when displayed. Visible only if a window in
+	its subset is visible.
+*/
+
+
+/*!
+	\var window_feel B_MODAL_APP_WINDOW_FEEL
+
+	Blocks all windows in its app when displayed. Visible only if a window in its
+	app is visible.
+*/
+
+
+/*!
+	\var window_feel B_MODAL_ALL_WINDOW_FEEL
+
+	Blocks all windows across the entire system when displayed. Always visible
+	in all workspaces.
+*/
+
+
+/*!
+	\var window_feel B_FLOATING_SUBSET_WINDOW_FEEL
+
+	Floats above all windows in its subset when displayed. Visible only if a
+	window in its subset is the frontmost window.
+*/
+
+
+/*!
+	\var window_feel B_FLOATING_APP_WINDOW_FEEL
+
+	Floats above all windows in its app when displayed. Visible only if a
+	window in its app is the frontmost window.
+*/
+
+
+/*!
+	\var window_feel B_FLOATING_ALL_WINDOW_FEEL
+
+	Floats above all windows across the entire system when displayed. Always
+	visible in all workspaces.
+*/
+
+
+// window_alignment
+
+
+/*!
+	\enum window_alignment
+	\ingroup interface
+
+	Define window alignment.
+*/
+
+
+/*!
+	\var window_alignment B_BYTE_ALIGNMENT
+
+	Aligns window in terms of frame buffer offsets. Affects only horizontal
+	origin and width, can't align right and bottom edges in this mode.
+*/
+
+
+/*!
+	\var window_alignment B_PIXEL_ALIGNMENT
+
+	Aligns window in pixel coordinates.
+*/
+
+
+// window flags
+
+
+/*!
+	\var B_NOT_MOVABLE
+
+	Window cannot be moved by the user.
+*/
+
+
+/*!
+	\var B_NOT_CLOSABLE
+
+	Window cannot be closed by the user, no close button is displayed.
+*/
+
+
+/*!
+	\var B_NOT_ZOOMABLE
+
+	Window cannot be zoomed by the user, no zoom button is displayed.
+*/
+
+
+/*!
+	\var B_NOT_MINIMIZABLE
+
+	Window cannot be minimized by the user.
+*/
+
+
+/*!
+	\var B_NOT_RESIZABLE
+
+	Window cannot be resized by the user.
+*/
+
+
+/*!
+	\var B_NOT_H_RESIZABLE
+
+	Window cannot be resized horizontally by the user.
+*/
+
+
+/*!
+	\var B_NOT_V_RESIZABLE
+
+	Window cannot be resized vertically by the user.
+*/
+
+
+/*!
+	\var B_AVOID_FRONT
+
+	Window cannot be brought to front.
+*/
+
+
+/*!
+	\var B_AVOID_FOCUS
+
+	Window cannot receive keyboard focus.
+*/
+
+
+/*!
+	\var B_WILL_ACCEPT_FIRST_CLICK
+
+	The first click will not just bring the window to front, it will also be
+	processed by the window.
+*/
+
+
+/*!
+	\var B_OUTLINE_RESIZE
+
+	Window draws only it's outline as it's resized and doesn't draw its
+	contents.
+*/
+
+
+/*!
+	\var B_NO_WORKSPACE_ACTIVATION
+
+	Causes the current workspace to stay active even if the window is activated on
+	another workspace.
+*/
+
+
+/*!
+	\var B_NOT_ANCHORED_ON_ACTIVATE
+
+	Causes the window to move to the current workspace when activated if it already
+	exists on another workspace.
+*/
+
+
+/*!
+	\var B_QUIT_ON_WINDOW_CLOSE
+
+	Quit the application when the window closes.
+
+	\note This flag existed but didn't function in BeOS R5.
+*/
+
+
+/*!
+	\var B_SAME_POSITION_IN_ALL_WORKSPACES
+
+	Window maintains its position across workspaces.
+
+	\note This flag did not exist in BeOS R5.
+*/
+
+
+/*!
+	\var B_AUTO_UPDATE_SIZE_LIMITS
+
+	Automatically adjust the window size according to the layout constraints.
+
+	\note This flag did not exist in BeOS R5.
+*/
+
+
+/*!
+	\var B_CLOSE_ON_ESCAPE
+
+	Close the window when the user pushes the Escape key.
+
+	\note This flag did not exist in BeOS R5.
+*/
+
+
+/*!
+	\var B_NO_SERVER_SIDE_WINDOW_MODIFIERS
+
+	??
+
+	\note This flag did not exist in BeOS R5.
+*/
+
+
+// workspace constants
+
+
+/*!
+	\def B_CURRENT_WORKSPACE
+
+	Applies to current workspace only.
+*/
+
+
+/*!
+	\def B_ALL_WORKSPACES
+
+	Applies to all workspaces.
+*/
+
+
+/*!
+	\class BWindow
+	\ingroup interface
+	\ingroup libbe
+	\brief Window base class.
+
+	A BWindow is an on-screen window which contains views and is the target of
+	keyboard and mouse events. A BWindow instance is nearly always subclassed.
+
+	BWindow draws by talking to App Server. If you want draw directly into the
+	graphics card by-passing App Server, you need to use a BDirectWindow or
+	BWindowScreen.
+
+	Despite the fact that BWindow inherits from BLooper, you should not invoke
+	Run() on a BWindow, instead, call Show() to get the message loop started and
+	show the window on screen. Once you've called Show() you may remove a window
+	from the screen without interrupting the message loop by calling Hide(). Other
+	message loop details such as locking and quitting are detailed in the BLooper
+	class.
+*/
+
+
+/*!
+	\fn BWindow::BWindow(BRect frame, const char* title, window_type type,
+		uint32 flags, uint32 workspace)
+	\brief Creates a new BWindow object.
+
+	\param frame The inner \a frame rectangle in the screen coordinate system.
+	\param title The window \a title and thread title as "w>title".
+	\param type window_type flag, one of the following:
+	       - \c B_UNTYPED_WINDOW
+	       - \c B_TITLED_WINDOW
+	       - \c B_MODAL_WINDOW
+	       - \c B_DOCUMENT_WINDOW
+	       - \c B_BORDERED_WINDOW
+	       - \c B_FLOATING_WINDOW
+	\param flags Mask that defines window attributes:
+	       - \c B_NOT_MOVABLE cannot be moved by the user
+	       - \c B_NOT_CLOSABLE cannot be closed by the user, no close button
+	            displayed
+	       - \c B_NOT_ZOOMABLE cannot be zoomed by the user, no zoom button
+	            displayed
+	       - \c B_NOT_MINIMIZABLE cannot be minimized by the user
+	       - \c B_NOT_RESIZABLE cannot be resized by the user
+	       - \c B_NOT_H_RESIZABLE cannot be resized horizontally by the user
+	       - \c B_NOT_V_RESIZABLE  cannot be resized vertically by the user
+	       - \c B_AVOID_FRONT cannot be brought to front by the user
+	       - \c B_AVOID_FOCUS cannot receive keyboard focus
+	       - \c B_WILL_ACCEPT_FIRST_CLICK The first click is processed by the
+	            window.
+	       - \c B_OUTLINE_RESIZE draws only it's outline as it's resized and
+	            doesn't draw its contents.
+	       - \c B_NO_WORKSPACE_ACTIVATION Causes the current workspace to stay
+	            active when activated on another workspace.
+	       - \c B_NOT_ANCHORED_ON_ACTIVATE Causes the window to move to the current
+	            workspace when activated if it already exists on another workspace.
+	       - \c B_QUIT_ON_WINDOW_CLOSE Quit the application when the window closes.
+	       - \c B_SAME_POSITION_IN_ALL_WORKSPACES Window maintains its position
+	            across workspaces.
+	       - \c B_AUTO_UPDATE_SIZE_LIMITS Automatically adjust the size according
+	            to layout constraints.
+	       - \c B_CLOSE_ON_ESCAPE Close when the user pushes the Escape key.
+	       - \c B_NO_SERVER_SIDE_WINDOW_MODIFIERS ??
+	\param workspace Mask that indicates which of the 32 potential workspace(s)
+	       the window should be displayed in or \c B_CURRENT_WORKSPACE or
+	       \c B_ALL_WORKSPACES constants.
+*/
+
+
+/*!
+	\fn BWindow::BWindow(BRect frame, const char* title, window_look look,
+		window_feel feel, uint32 flags, uint32 workspace)
+	\brief Creates a new BWindow object with the specified \a look and \a feel.
+
+	\param frame The inner \a frame rectangle in the screen coordinate system.
+	\param title The window \a title and thread title as "w>title".
+	\param look The window_look flags, one of the following:
+	       - \c B_BORDERED_WINDOW_LOOK No title bar, thin border, no resize
+	         control.
+	       - \c B_NO_BORDER_WINDOW_LOOK A borderless rectangle with no provisions
+	         to move or close the window.
+	       - \c B_TITLED_WINDOW_LOOK Like \c B_DOCUMENT_WINDOW_LOOK, but with a
+	         resize corner instead of a resize thumb.
+	       - \c B_DOCUMENT_WINDOW_LOOK Large title bar, thick border, draggable
+	         resize corner thumb.
+	       - \c B_MODAL_WINDOW_LOOK For modal dialogs: no title bar, thick border,
+	         resize corner depending on the \c B_NOT_RESIZABLE flag.
+	       - \c B_FLOATING_WINDOW_LOOK For floating sub windows: small title bar,
+	         thin border, resize corner.
+	\param feel The window_feel flags, one of the following:
+	       - \c B_NORMAL_WINDOW_FEEL Behaves like a normal, non-modal,
+	         non-floating window.
+	       - \c B_MODAL_SUBSET_WINDOW_FEEL Blocks all windows in its subset when
+	         displayed. Visible only if a window in its subset is visible.
+	       - \c B_MODAL_APP_WINDOW_FEEL Blocks all windows in its app when
+	         displayed. Visible only if a window in its app is visible.
+	       - \c B_MODAL_ALL_WINDOW_FEEL Blocks all windows across the entire
+	         system when displayed. Always visible in all workspaces.
+	       - \c B_FLOATING_SUBSET_WINDOW_FEEL Floats above all windows in its
+	         subset when displayed. Visible only if a window in its subset is the
+	         frontmost window.
+	       - \c  B_FLOATING_APP_WINDOW_FEEL Floats above all windows in its app
+	         when displayed. Visible only if a window in its app is the frontmost
+	         window.
+	       - \c  B_FLOATING_ALL_WINDOW_FEEL Floats above all windows across the
+	         entire system when displayed. Always visible in all workspaces.
+	\param flags Mask that defines window attributes:
+	       - \c B_NOT_MOVABLE cannot be moved by the user
+	       - \c B_NOT_CLOSABLE cannot be closed by the user, no close button
+	            displayed
+	       - \c B_NOT_ZOOMABLE cannot be zoomed by the user, no zoom button
+	            displayed
+	       - \c B_NOT_MINIMIZABLE cannot be minimized by the user
+	       - \c B_NOT_RESIZABLE cannot be resized by the user
+	       - \c B_NOT_H_RESIZABLE cannot be resized horizontally by the user
+	       - \c B_NOT_V_RESIZABLE  cannot be resized vertically by the user
+	       - \c B_AVOID_FRONT cannot be brought to front by the user
+	       - \c B_AVOID_FOCUS cannot receive keyboard focus
+	       - \c B_WILL_ACCEPT_FIRST_CLICK The first click is processed by the
+	            window.
+	       - \c B_OUTLINE_RESIZE draws only it's outline as it's resized and
+	            doesn't draw its contents.
+	       - \c B_NO_WORKSPACE_ACTIVATION Causes the current workspace to stay
+	            active when activated on another workspace.
+	       - \c B_NOT_ANCHORED_ON_ACTIVATE Causes the window to move to the current
+	            workspace when activated if it already exists on another workspace.
+	       - \c B_QUIT_ON_WINDOW_CLOSE Quit the application when the window closes.
+	       - \c B_SAME_POSITION_IN_ALL_WORKSPACES Window maintains its position
+	            across workspaces.
+	       - \c B_AUTO_UPDATE_SIZE_LIMITS Automatically adjust the size according
+	            to layout constraints.
+	       - \c B_CLOSE_ON_ESCAPE Close when the user pushes the Escape key.
+	       - \c B_NO_SERVER_SIDE_WINDOW_MODIFIERS ??
+	\param workspace Mask that indicates which of the 32 potential workspace(s)
+	       the window should be displayed in or \c B_CURRENT_WORKSPACE or
+	       \c B_ALL_WORKSPACES constants.
+*/
+
+
+/*!
+	\fn BWindow::BWindow(BMessage* data)
+	\brief Archive constructor.
+
+	\param data A pointer to the BMessage object to build the object from.
+*/
+
+
+/*!
+	\fn BWindow::BWindow(BRect frame, int32 bitmapToken)
+	\brief Offscreen bitmap constructor.
+
+	\param frame The inner \a frame rectangle in the screen coordinate system.
+	\param bitmapToken Token to pass into App Server for offscreen window bitmap.
+*/
+
+
+/*!
+	\fn BWindow::~BWindow()
+	\brief Destroys the BWindow object and all attached views.
+*/
+
+
+/*!
+	\fn BArchivable* BWindow::Instantiate(BMessage* data)
+	\brief Creates a new BWindow object from the \a data message.
+
+	\param data A pointer to the BMessage object to build the object from.
+
+	\returns A newly created BWindow object or \c NULL if the message doesn't
+		contain an archived BWindow.
+*/
+
+
+/*!
+	\fn status_t BWindow::Archive(BMessage* data, bool deep) const
+	\brief Archives the object into the \a data message.
+
+	\param data A pointer to the BMessage object to archive the object into.
+	\param deep Whether or not to archive child views as well.
+
+	\return A status code, \c B_OK if the object was archived or an error code
+	        otherwise.
+*/
+
+
+/*!
+	\fn void BWindow::Quit()
+	\brief Deletes the window and all child views, destroys the window thread,
+	       removes the window's connection to the Application Server, and deletes
+	       the object.
+
+	Use this method to destroy a window rather than using the delete operator.
+
+	This method works much like the BLooper::Quit(), it doesn't return when
+	called from the BWindow's thread and it returns after all messages have been
+	processed when called from another thread and the BWindow and its thread has
+	been destroyed.
+
+	\warning The window must first be locked before calling Quit().
+
+	\see BLooper::Quit()
+*/
+
+
+/*!
+	\fn void BWindow::AddChild(BView* child, BView* before)
+	\brief Adds \a child to the view hierarchy immediately before \a before.
+
+	A view may only have one parent at a time so \a child must not have already
+	been added to the view hierarchy. If \a before is \c NULL then \a child is
+	added to the end of the view hierarchy.
+
+	The AttachedToWindow() method is invoked on \a child and all of its
+	descendent views.
+
+	\param child The child view to add.
+	\param before The sibling view to add \a child before.
+*/
+
+
+/*!
+	\fn void BWindow::AddChild(BLayoutItem* child)
+	\brief Add the \a child layout item to the view hierarchy.
+
+	\note This method was not available in BeOS R5.
+
+	\param child The child layout item to add.
+*/
+
+
+/*!
+	\fn bool BWindow::RemoveChild(BView* child)
+	\brief Removes \a child from the view hierarchy.
+
+	\param child The child view to remove.
+
+	\return Whether or not \a child was removed from the view hierarchy.
+*/
+
+
+/*!
+	\fn int32 BWindow::CountChildren() const
+	\brief Returns the number of child views that the window has.
+
+	\return The number of child views as an int32.
+*/
+
+
+/*!
+	\fn BView* BWindow::ChildAt(int32 index) const
+	\brief Returns a pointer to the child view found at \a index.
+
+	\param index The index of the child view to return a pointer of.
+
+	\return A pointer to the child view at \a index or \c NULL if not found.
+*/
+
+
+/*!
+	\fn void BWindow::Minimize(bool minimize)
+	\brief Minimizes or un-minimizes the window based on \a minimize.
+
+	Unlike Hide() an Show(), Minimize() dims and un-dims the entry for the window
+	in Deskbar's window list rather than removing it. Also Minimize() calls are not
+	cumulative like Hide() and Show(); one \c false call will undo multiple \c true
+	calls.
+
+	Minimize() also acts as a hook method that is invoked when the user double-
+	clicks on the title tab of the window or selects the window from the DeskBar
+	window list. The \a minimize parameter is \c true if the window is about to be
+	hidden and \c false if it is about to be shown.
+
+	If you override Minimize() and you want to inherit BWindow's behavior, you
+	must call BWindow::Minimize().
+*/
+
+
+/*!
+	\fn status_t BWindow::SendBehind(const BWindow* window)
+	\brief Moves the BWindow object behind \a window.
+
+	\param window A pointer to the window to move behind.
+
+	\returns \c B_OK on success or \c B_ERROR on failure.
+*/
+
+
+/*!
+	\fn void BWindow::Flush() const
+	\brief Flushes the window's connection to App Server causing any pending
+	messages to be processed then returns immediately.
+*/
+
+
+/*!
+	\fn void BWindow::Sync() const
+	\brief Synchronizes the attached window's connection to App Server causing any
+	pending messages to be processed and then waits for the App Server to respond.
+*/
+
+
+/*!
+	\fn void BWindow::DisableUpdates()
+	\brief Suppresses drawing within the window.
+
+	If you want the results of several drawing operations to appear in the window
+	all at once you disable updates, draw, and then re-enable updates.
+*/
+
+
+/*!
+	\fn void BWindow::EnableUpdates()
+	\brief Re-enable drawing within the window.
+
+	If you want the results of several drawing operations to appear in the window
+	all at once you disable updates, draw, and then re-enable updates.
+*/
+
+
+/*!
+	\fn void BWindow::BeginViewTransaction()
+	\brief Stall updates to App Server allowing you to batch drawing commands to
+	       limit flickering.
+
+	Unlike DisableUpdates() the messages are sent but are not processed.
+
+	\note This method was not available in BeOS R5.
+*/
+
+
+/*!
+	\fn void BWindow::EndViewTransaction()
+	\brief Ends a view transaction allowing update to go to App Server again.
+
+	\note This method was not available in BeOS R5.
+*/
+
+
+/*!
+	\fn bool BWindow::InViewTransaction() const
+	\brief Returns whether or not the window is currently in a view transaction.
+
+	\note This method was not available in BeOS R5.
+
+	\returns \c true if the window is currently in a view transaction,
+	         \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BWindow::IsFront() const
+	\brief Returns whether or not the window is the frontmost on screen.
+
+	\returns \c true if window is the frontmost on screen, \c false otherwise.
+*/
+
+
+/*!
+	\fn void BWindow::MessageReceived(BMessage* message)
+	\brief Handle \a message received by the associated looper.
+
+	\param message The \a message received by the looper.
+
+	\see BHandler::MessageReceived()
+*/
+
+
+/*!
+	\fn void BWindow::DispatchMessage(BMessage* message, BHandler* target)
+	\brief Window's central message-processing method.
+
+	This method called automatically as messages arrive in the queue, you should
+	never call DispatchMessage() yourself.
+
+	\warning Don't override this method in your BWindow subclass. Override
+	MessageReceived() instead to alter the window's message dispatching
+	mechanism.
+
+	\see BLooper::DispatchMessage()
+*/
+
+
+/*!
+	\fn void BWindow::FrameMoved(BPoint newPosition)
+	\brief Hook method that gets called when the window is moved.
+
+	The default implementation does nothing.
+
+	\param newPosition The point of the top left corner of the frame
+		rectangle that the window has been moved to.
+*/
+
+
+/*!
+	\fn void BWindow::FrameResized(float newWidth, float newHeight)
+	\brief Hook method that gets called when the window is resized.
+
+	The default implementation does nothing.
+
+	\param newWidth The new \a width of the window.
+	\param newHeight The new \a height of the window.
+*/
+
+
+/*!
+	\fn void BWindow::WorkspacesChanged(uint32 oldWorkspaces,
+		uint32 newWorkspaces)
+	\brief Hook method that gets called when the number of workspaces changes.
+
+	The default implementation does nothing.
+
+	\param oldWorkspaces The old number of workspaces.
+	\param newWorkspaces The new number of workspaces.
+*/
+
+
+/*!
+	\fn void BWindow::WorkspaceActivated(int32 workspace, bool state)
+	\brief Hook method that gets called when the active workspace changes.
+
+	The default implementation does nothing.
+
+	\param workspace The \a workspace number that was activated/deactivated.
+	\param state \c true if activated, \c false if deactivated.
+*/
+
+
+/*!
+	\fn void BWindow::MenusBeginning()
+	\brief Hook method that gets called just before a menu owned by the window is
+	       shown.
+
+	The default implementation does nothing.
+
+	\note This method is not invoked by a message, there is no
+	      \c B_MENUS_BEGINNING flag.
+*/
+
+
+/*!
+	\fn void BWindow::MenusEnded()
+	\brief Hook method that gets called just before a menu owned by the window is
+	       hidden.
+
+	The default implementation does nothing.
+
+	\note This method is not invoked by a message, there is no
+	      \c B_MENUS_ENDED flag.
+*/
+
+
+/*!
+	\fn void BWindow::SetSizeLimits(float minWidth, float maxWidth,
+		float minHeight, float maxHeight)
+	\brief Set size limits on the window.
+
+	The user won't be able to resize the window beyond the limits set by this
+	method. SetSizeLimits() constrains the user, not the programmer, you may
+	still resize the window outside of the size limits set by this method by
+	calling ResizeBy() or ResizeTo().
+
+	\param minWidth The minimum width of the window to set.
+	\param maxWidth The maximum width of the window to set.
+	\param minHeight The minimum height of the window to set.
+	\param maxHeight The maximum height of the window to set.
+*/
+
+
+/*!
+	\fn void BWindow::GetSizeLimits(float* _minWidth, float* _maxWidth,
+		float* _minHeight, float* _maxHeight)
+	\brief Fills out the size limits set on the window.
+
+	\param _minWidth The minimum width of the window.
+	\param _maxWidth The maximum width of the window.
+	\param _minHeight The minimum height of the window.
+	\param _maxHeight The maximum height of the window.
+*
+
+
+/*!
+	\fn void BWindow::UpdateSizeLimits()
+	\brief Updates the window's size limits from the minimum and maximum sizes
+	       of its top view.
+
+	This method does nothing unless the \c B_AUTO_UPDATE_SIZE_LIMITS window flag
+	is set.
+
+	The method is called automatically after a layout invalidation. Since it is
+	invoked asynchronously, calling this method manually is necessary, if it is
+	desired to adjust the limits (and as a possible side effect the window size)
+	earlier, e.g. before the first call to the Show() method.)
+*/
+
+
+/*!
+	\fn status_t BWindow::SetDecoratorSettings(const BMessage& settings)
+	\brief Set the window decorator settings according to \a settings.
+
+	\param settings The decorator \a settings message to set.
+
+	\returns \c B_OK if the decorator settings were set successfully or an error
+	         code otherwise.
+*/
+
+
+/*!
+	\fn status_t BWindow::GetDecoratorSettings(BMessage* settings) const
+	\brief Fill out the window's decorator settings into \a settings.
+
+	\param settings A pointer to a BMessage object to fill out.
+
+	\returns \c B_OK if the decorator settings were filled out successfully
+	         or an error code otherwise.
+*/
+
+
+/*!
+	\fn void BWindow::SetZoomLimits(float maxWidth, float maxHeight)
+	\brief Sets the maximum size that the window will zoom to when Zoom() is
+	       called.
+
+	The window will zoom to the minimum of the screen size, the maximum values
+	set by SetSizeLimits(), and the maximum values set by this method.
+
+	/see Zoom()
+*/
+
+
+/*!
+	\fn void BWindow::Zoom(BPoint origin, float width, float height)
+	\brief Move window to \a origin, then resize to \a width and \a height.
+
+	You may call Zoom() even if the window has the \c B_NOT_ZOOMABLE flag set.
+	This method may move and resize the window resulting in both the FrameMoved()
+	and FrameResized() hook methods to be called.
+
+	\param origin The point that the window was moved to.
+	\param width The new width of the window.
+	\param height The new height of the window.
+*/
+
+
+/*!
+	\fn void BWindow::Zoom()
+	\brief Resize the window to the minimum of the screen size, the maximum values
+	       set by SetSizeLimits(), and the maximum values set by SetZoomLimits().
+
+	You may call Zoom() even if the window has the \c B_NOT_ZOOMABLE flag set.
+	This method may move and resize the window resulting in both the FrameMoved()
+	and FrameResized() hook methods to be called. This is the method called when
+	the user clicks a window's zoom button.
+*/
+
+
+/*!
+	\fn void BWindow::ScreenChanged(BRect screenSize, color_space depth)
+	\brief Hook method that is called when the screen that the window is located
+	       on changes size or location or the color space of the screen changes.
+
+	The default implementation does nothing.
+
+	\param screenSize The new screen size in the screen's coordinate system.
+	\param depth The new color space of the screen.
+*/
+
+
+/*!
+	\fn void BWindow::SetPulseRate(bigtime_t rate)
+	\brief Sets how often \c B_PULSE messages are posted to the window.
+
+	All BViews attached to a window share the same pulse rate.
+
+	\a rate should not be set to less than 100,000 microseconds, differences less
+	than 50,000 microseconds may not be noticeable.
+
+	Setting the \a rate to 0 disables pulsing for all views attache to the window.
+
+	\param rate The pulse rate to set.
+*/
+
+
+/*!
+	\fn bigtime_t BWindow::PulseRate() const
+	\brief Returns the pulse rate of the window.
+
+	\c B_PULSE messages are sent by default every 500,000 microseconds provided
+	that no other messages are pending.
+
+	\returns The pulse rate of the window as a bigtime_t.
+*/
+
+
+/*!
+	\fn void BWindow::AddShortcut(uint32 key, uint32 modifiers, BMenuItem* item)
+	\brief Creates a keyboard shortcut that activates \a item.
+
+	\note This method was not available in BeOS R5.
+
+	\param key The modifier key to set.
+	\param modifiers Additional modifiers on top of \a B_COMMAND_KEY.
+	\param item The menu \a item to activate.
+*/
+
+
+/*!
+	\fn void BWindow::AddShortcut(uint32 key, uint32 modifiers, BMessage* message)
+	\brief Creates a keyboard shortcut that sends a \a message to the window.
+
+	\param key The modifier key to set.
+	\param modifiers Additional modifiers on top of \a B_COMMAND_KEY.
+	\param message The \a message to send when the shortcut is activated.
+*/
+
+
+/*!
+	\fn void BWindow::AddShortcut(uint32 key, uint32 modifiers, BMessage* message,
+		BHandler* target)
+	\brief Creates a keyboard shortcut that sends a \a message to the specified
+	       \a target.
+
+	\param key The modifier key to set.
+	\param modifiers Additional modifiers on top of \a B_COMMAND_KEY.
+	\param message The \a message to send when the shortcut is activated.
+	\param target The handler to send the message to.
+*/
+
+
+/*!
+	\fn bool BWindow::HasShortcut(uint32 key, uint32 modifiers)
+	\brief Returns whether or not the specified shortcut is set on the window.
+
+	\param key The modifier key to check.
+	\param modifiers Additional modifiers on top of \a B_COMMAND_KEY to check.
+
+	\returns \c true if the window has the specified shortcut, \c false otherwise.
+*/
+
+
+/*!
+	\fn void BWindow::RemoveShortcut(uint32 key, uint32 modifiers)
+	\brief Removes the specified shortcut from the window.
+
+	\param key The modifier key.
+	\param modifiers Additional modifiers on top of \a B_COMMAND_KEY.
+*/
+
+
+/*!
+	\fn BButton* BWindow::DefaultButton() const
+	\brief Returns a pointer to the default button set on the window.
+
+	\return A pointer to the window's default button or \c NULL if it doesn't
+	        have one.
+*/
+
+
+/*!
+	\fn void BWindow::SetDefaultButton(BButton* button)
+	\brief Set the default button of the window to \a button.
+
+	The default button has a grey outline and is activated by the user pushing
+	the Enter key. The user can activate the default button even if another view
+	is currently set to be the focus view of the window.
+
+	A window may only have one default button at a time, to remove the current
+	default without setting another button you may pass in \c NULL.
+
+	\param button A pointer to the button to set as the default or \c NULL to
+	       unset.
+*/
+
+
+/*!
+	\fn bool BWindow::NeedsUpdate() const
+	\brief Returns whether or not any of the attached views need to be updated.
+
+	\return \c true if an attached view needs to be updated, \c false otherwise.
+*/
+
+
+/*!
+	\fn void BWindow::UpdateIfNeeded()
+	\brief Invokes Draw() immediately on each child view that needs updating.
+
+	This method is synchronous, it waits for each child view to update before
+	returning. This method is ignored unless it is called from within the message
+	loop of the thread that the BWindow is running in.
+
+	You may call this method as part of a hook function such as MouseMoved() or
+	KeyDown() to force invalid views to be immediately redrawn without having to
+	wait for the hook function to finish.
+*/
+
+
+/*!
+	\fn BView* BWindow::FindView(const char* viewName) const
+	\brief Returns the attached view with the specified \a viewName.
+
+	\param viewName The name of the attached view to look for.
+
+	\return A pointer to the BView object or \c NULL if no view is found.
+*/
+
+
+/*!
+	\fn BView* BWindow::FindView(BPoint point) const
+	\brief Returns a pointer to the attached view located at the specified
+	       \a point.
+
+	\param point The \a point to get the view at in the window's coordinate
+	       system.
+
+	\return A pointer to the BView object or \c NULL if no view is found.
+*/
+
+
+/*!
+	\fn BView* BWindow::CurrentFocus() const
+	\brief Returns a pointer to the current focus view of the window.
+
+	\return A pointer to the current focus view of the window or \c NULL if
+	        not found.
+*/
+
+
+/*!
+	\fn void BWindow::Activate(bool active)
+	\brief Activates or deactivates the window based on \a active.
+
+	The title tab of the active window is drawn more brightly, the window is made
+	frontmost, and it becomes the target of keyboard events. Calling Show()
+	automatically activates the window calling the WindowActivated() hook method.
+
+	\param active \c true to activate the window, \c false to deactivate the
+	       window.
+*/
+
+
+/*!
+	\fn void BWindow::WindowActivated(bool state)
+	\brief Hook method that gets called when the window becomes activated or
+	       deactivated.
+
+	The default implementation does nothing.
+
+	\param state \c true if the window has become activated, \c false if the
+	       window has become deactivated.
+*/
+
+
+/*!
+	\fn void BWindow::ConvertToScreen(BPoint* point) const
+	\brief Convert \a point to the screen's coordinate system in place.
+
+	\param point A pointer to a BPoint object to convert.
+*/
+
+
+/*!
+	\fn BPoint BWindow::ConvertToScreen(BPoint point) const
+	\brief Returns \a point converted to the screen's coordinate system.
+
+	\param point A BPoint object to convert.
+
+	\return A new BPoint object in the screen's coordinate system.
+*/
+
+
+/*!
+	\fn void BWindow::ConvertFromScreen(BPoint* point) const
+	\brief Convert \a point from the screen's coordinate system to the
+		   window's coordinate system in place.
+
+	\param point A pointer to a BPoint object to convert.
+*/
+
+
+/*!
+	\fn BPoint BWindow::ConvertFromScreen(BPoint point) const
+	\brief Returns \a point converted from the screen's coordinate system to
+	       the window's coordinate system.
+
+	\param point A BPoint object to convert.
+
+	\return A new BPoint object in the window's coordinate system.
+*/
+
+
+/*!
+	\fn void BWindow::ConvertToScreen(BRect* rect) const
+	\brief Convert \a rect to the screen's coordinate system in place.
+
+	\param rect A pointer to a BRect object to convert.
+*/
+
+
+/*!
+	\fn BRect BWindow::ConvertToScreen(BRect rect) const
+	\brief Returns \a rect converted to the screen's coordinate system.
+
+	\param rect A BRect object to convert.
+
+	\return A new BRect object in the screen's coordinate system.
+*/
+
+
+/*!
+	\fn void BWindow::ConvertFromScreen(BRect* rect) const
+	\brief Convert \a rect from the screen's coordinate system to the
+		   window's coordinate system in place.
+
+	\param rect A pointer to a BRect object to convert.
+*/
+
+
+/*!
+	\fn BRect BWindow::ConvertFromScreen(BRect rect) const
+	\brief Returns \a rect converted from the screen's coordinate system to the
+		   window's coordinate system.
+
+	\param rect A BRect object to convert.
+
+	\return A new BRect object in the window's coordinate system.
+*/
+
+
+/*!
+	\fn bool BWindow::IsMinimized() const
+	\brief Returns whether or not the window is minimized.
+
+	\return \c true if the window is minimized, \c false otherwise.
+*/
+
+
+/*!
+	\fn BRect BWindow::Bounds() const
+	\brief Returns the bounding rectangle of the window.
+
+	\return The bounding rectangle of the window as a BRect in the window's
+	        coordinate system.
+*/
+
+
+/*!
+	\fn BRect BWindow::Frame() const
+	\brief Returns the frame rectangle of the window.
+
+	\return The bounding rectangle of the window as a BRect in the screen
+	        coordinate system.
+*/
+
+
+/*!
+	\fn BRect BWindow::DecoratorFrame() const
+	\brief Returns the frame rectangle of the window decorator.
+
+	\note This method was not available in BeOS R5.
+
+	\return The bounding rectangle of the window decorator as a BRect in the
+	        screen coordinate system.
+*/
+
+
+/*!
+	\fn BSize BWindow::Size() const
+	\brief Returns the size of the window.
+
+	\note This method was not available in BeOS R5.
+
+	\return The size of the window as a BSize in the screen coordinate system.
+*/
+
+
+/*!
+	\fn const char* BWindow::Title() const
+	\brief Returns the window title as set by the constructor or SetTitle().
+
+	\return A pointer to the window title.
+*/
+
+
+/*!
+	\fn void BWindow::SetTitle(const char* title)
+	\brief Sets the window title to \a title.
+
+	Also renames the window thread to "w>title" where "title" is the passed in
+	title string.
+*/
+
+
+/*!
+	\fn bool BWindow::IsActive() const
+	\brief Returns whether or not the window is active.
+
+	\return \c true if the window is active, \c false otherwise.
+*/
+
+
+/*!
+	\fn void BWindow::SetKeyMenuBar(BMenuBar* bar)
+	\brief Set the specified menu \a bar as the key menu bar for the window.
+
+	The key menu bar is the one located at the top of the window at the root of
+	the menu hierarchy that the user can navigate with the keyboard.
+
+	\param bar A pointer to the menu \a bar to set as as the key menu \a bar for
+	       the window.
+*/
+
+
+/*!
+	\fn BMenuBar* BWindow::KeyMenuBar() const
+	\brief Returns a pointer to the key menu bar set to the window.
+
+	If the window contains only one menu bar it is automatically considered to be
+	the key menu bar for the window. If more than one menu bar is attached to the
+	window then the last one added to the window's view hierarchy is considered
+	to be the key menu bar for the window.
+
+	To explicitly set a menu bar as the key menu bar call SetKeyMenuBar().
+
+	\return A pointer to the key menu bar or \c NULL is not is set.
+*/
+
+
+/*!
+	\fn bool BWindow::IsModal() const
+	\brief Returns whether or not the window is modal.
+
+	\return \c true if the window is modal, \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BWindow::IsFloating() const
+	\brief Returns whether or not the window is floating.
+
+	\return \c true if the window is floating, \c false otherwise.
+*/
+
+
+/*!
+	\fn status_t BWindow::AddToSubset(BWindow* window)
+	\brief Adds \a window to be in the subset of the BWindow.
+
+	\return A status code.
+	\retval B_OK \a window was added as a subset of the BWindow.
+	\retval B_BAD_VALUE \c window is not \c B_NORMAL_WINDOW_FEEL or the BWindow
+	        object's feel is not set to \c B_MODAL_SUBSET_WINDOW_FEEL or
+			\c B_FLOATING_SUBSET_WINDOW_FEEL.
+	\retval B_ERROR Could not lock the BWindow object.
+*/
+
+
+/*!
+	\fn status_t BWindow::RemoveFromSubset(BWindow* window)
+	\brief Remove \a window from the subset of the BWindow.
+
+	\return A status code.
+	\retval B_OK \a window was removed from the subset of the BWindow.
+	\retval B_BAD_VALUE \c window is not \c B_NORMAL_WINDOW_FEEL or the BWindow
+	        object's feel is not set to \c B_MODAL_SUBSET_WINDOW_FEEL or
+			\c B_FLOATING_SUBSET_WINDOW_FEEL.
+	\retval B_ERROR Could not lock the BWindow object.
+*/
+
+
+/*!
+	\fn status_t BWindow::SetType(window_type type)
+	\brief Changes the window type set in the constructor to \a type.
+
+	\return \c B_OK on success or an error code on failure.
+*/
+
+
+/*!
+	\fn window_type BWindow::Type() const
+	\brief Returns the current window type flag.
+
+	\return The currently set window type flag.
+*/
+
+
+/*!
+	\fn status_t BWindow::SetLook(window_look look)
+	\brief Changes the window look set in the constructor to \a look.
+
+	\return \c B_OK on success or an error code on failure.
+*/
+
+
+/*!
+	\fn window_look BWindow::Look() const
+	\brief Returns the current window look flag.
+
+	\return The currently set window look flag.
+*/
+
+
+/*!
+	\fn status_t BWindow::SetFeel(window_feel feel)
+	\brief Changes the window feel set in the constructor to \a feel.
+
+	\return \c B_OK on success or an error code on failure.
+*/
+
+
+/*!
+	\fn window_feel BWindow::Feel() const
+	\brief Returns the current window feel flag.
+
+	\return The currently set window feel flag.
+*/
+
+
+/*!
+	\fn status_t BWindow::SetFlags(uint32 flags)
+	\brief Changes the window flags set in the constructor to \a flags.
+
+	\return \c B_OK on success or an error code on failure.
+*/
+
+
+/*!
+	\fn uint32 BWindow::Flags() const
+	\brief Returns the current window flags.
+
+	\return The currently set window flags.
+*/
+
+
+/*!
+	\fn status_t BWindow::SetWindowAlignment(window_alignment mode,
+	int32 h, int32 hOffset, int32 width, int32 widthOffset,
+	int32 v, int32 vOffset, int32 height, int32 heightOffset)
+*/
+
+
+/*!
+	\fn status_t BWindow::GetWindowAlignment(window_alignment* mode,
+	int32* h, int32* hOffset, int32* width, int32* widthOffset,
+	int32* v, int32* vOffset, int32* height, int32* heightOffset) const
+*/
+
+
+/*!
+	\fn uint32 BWindow::Workspaces() const
+	\brief Returns the set of workspaces where the window can be displayed.
+*/
+
+
+/*!
+	\fn void BWindow::SetWorkspaces(uint32 workspaces)
+	\brief Sets the set of workspaces where the window can be displayed.
+
+	\param workspaces
+	- \c B_CURRENT_WORKSPACE to place the window in the currently displayed
+	     workspace removing it from all others.
+	- \c B_ALL_WORKSPACES to make the window show up in all workspaces.
+*/
+
+
+/*!
+	\fn BView* BWindow::LastMouseMovedView() const
+	\brief Returns a pointer to the attached view that most recently received
+	       a \c B_MOUSE_MOVED message.
+
+	\return A pointer the BView object that most recently received a
+	        \c B_MOUSE_MOVED message or \c NULL if not found.
+*/
+
+
+/*!
+	\fn void BWindow::MoveBy(float dx, float dy)
+	\brief Move the window by \a dx pixels horizontally and \a dy pixels
+	       vertically.
+
+	\a dx and \a dy must be integral units.
+
+	\param dx The number of pixels to move the window vertically.
+	\param dy The number of pixels to move the window horizontally.
+*/
+
+
+/*!
+	\fn void BWindow::MoveTo(BPoint point)
+	\brief Move the window to \a point.
+
+	\param point the location to move the window in the screen's coordinate
+	       system.
+*/
+
+
+/*!
+	\fn void BWindow::MoveTo(float x, float y)
+	\brief Move the window to the specified \a x and \a y coordinates.
+
+	\a x and \a y must be integral units.
+
+	\param x The horizontal coordinate to move the window to in the screen's
+	       coordinate system.
+	\param y The vertical coordinate to move the window to in the screen's
+	       coordinate system.
+*/
+
+
+/*!
+	\fn void BWindow::ResizeBy(float dx, float dy)
+	\brief Resize the window by \a dx pixels horizontally and \a dy pixels vertically.
+
+	\a dx and \a dy must be integral units.
+
+	\brief dx The number of pixels to resize the window horizontally.
+	\brief dy The number of pixels to resize the window vertically.
+*/
+
+
+/*!
+	\fn void BWindow::ResizeTo(float width, float height)
+	\brief Resize the window to the specified \a width and \a height.
+
+	\a width and \a height must be integral units.
+
+	\param width The width to resize the window to.
+	\param height The height to resize the window to.
+*/
+
+
+/*!
+	\fn void BWindow::CenterIn(const BRect& rect)
+	\brief Center the window in \a rect.
+
+	\param rect The rectangle to center the window in.
+*/
+
+
+/*!
+	\fn void BWindow::CenterOnScreen()
+	\brief Centers the window on the screen the window is currently on.
+*/
+
+
+/*!
+	\fn void BWindow::CenterOnScreen(screen_id id)
+	\brief Centers the window on the screen with the passed in \a id.
+*/
+
+
+/*!
+	\fn void BWindow::Show()
+	\brief Shows the window on screen, places it frontmost on the screen, adds
+	       the window to Deskbar's window list, and makes it the active window.
+
+	If this is the first time Show() has been called on the window the message loop
+	is started and it is unlocked.
+
+	Calls to Hide() and Show() are cumulative.
+*/
+
+
+/*!
+	\fn void BWindow::Hide()
+	\brief Removes the window from the screen, removes it from Deskbar's window
+	       list, and passes active status to another window.
+
+	Calls to Hide() and Show() are cumulative.
+*/
+
+
+/*!
+	\fn bool BWindow::IsHidden() const
+	\brief Returns whether or not the window is hidden.
+
+	Windows are hidden by default, you must call Show() to show the window starting
+	the message loop going.
+*/
+
+
+/*!
+	\fn bool BWindow::QuitRequested()
+	\brief Hook method that gets called when the window receives a
+	       \a B_QUIT_REQUESTED message.
+
+	\see Quit()
+	\see BLooper::QuitRequested()
+*/
+
+
+/*!
+	\fn thread_id BWindow::Run()
+	\brief Spawns the message loop thread and starts the window running.
+
+	\see BLooper::Run()
+*/
+
+
+/*!
+	\fn void BWindow::SetLayout(BLayout* layout)
+	\brief Sets the \a layout of the window.
+
+	\param layout The \a layout to set.
+*/
+
+
+/*!
+	\fn BLayout* BWindow::GetLayout() const
+	\brief Get the layout of the window.
+
+	\returns The layout of the window.
+*/
+
+
+/*!
+	\fn void BWindow::InvalidateLayout(bool descendants)
+	\brief Invalidate layout.
+
+	\param descendants Also invalidate its children windows.
+*/
+
+
+/*!
+	\fn void BWindow::Layout(bool force)
+	\brief Update the size limits and do the layout of the topmost view attached
+	       to the window.
+
+	\param force If \c true, layout even if valid.
+*/
+
+
+/*!
+	\fn status_t BWindow::GetSupportedSuites(BMessage* data)
+	\brief Reports the suites of messages and specifiers understood by the window.
+
+	\param data The message to use to report the suite of messages and specifiers.
+
+	\see BHandler::GetSupportedSuites()
+*/
+
+
+/*!
+	\fn BHandler* BView::ResolveSpecifier(BMessage* message, int32 index,
+		BMessage* specifier, int32 what, const char* property)
+	\brief Determine the proper handler for a scripting message.
+
+	\see BHandler::ResolveSpecifier()
+*/
