@@ -843,7 +843,6 @@ do_extract(const char* packageFileName, const char* changeToDirectory,
 	// check whether all explicitly specified entries have been extracted
 	if (explicitEntryCount > 0) {
 		for (int i = 0; i < explicitEntryCount; i++) {
-			printf("check...en:%s\n", explicitEntries[i]);
 			if (Entry* entry = handler.FindFilterEntry(explicitEntries[i])) {
 				if (!entry->Seen()) {
 					fprintf(stderr, "Warning: Entry \"%s\" not found.\n",
