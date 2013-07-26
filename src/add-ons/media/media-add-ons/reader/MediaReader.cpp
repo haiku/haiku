@@ -514,7 +514,7 @@ void MediaReader::Connect(
 			end = TimeSource()->RealTime();
 		}
 		bytesRead = buffer->SizeUsed();
-		delete data;
+		delete[] data;
 		if (buffer != 0) {
 			buffer->Recycle();
 		}
