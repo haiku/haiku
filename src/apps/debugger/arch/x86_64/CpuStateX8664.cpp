@@ -23,7 +23,8 @@ CpuStateX8664::CpuStateX8664()
 
 CpuStateX8664::CpuStateX8664(const x86_64_debug_cpu_state& state)
 	:
-	fSetRegisters()
+	fSetRegisters(),
+	fInterruptVector(0)
 {
 	SetIntRegister(X86_64_REGISTER_RIP, state.rip);
 	SetIntRegister(X86_64_REGISTER_RSP, state.rsp);
@@ -48,6 +49,8 @@ CpuStateX8664::CpuStateX8664(const x86_64_debug_cpu_state& state)
 	SetIntRegister(X86_64_REGISTER_FS, state.fs);
 	SetIntRegister(X86_64_REGISTER_GS, state.gs);
 	SetIntRegister(X86_64_REGISTER_SS, state.ss);
+
+	fInterruptVector = state.vector;
 }
 
 
