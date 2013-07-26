@@ -83,6 +83,8 @@ private:
 									const char* name, uint32 valueType,
 									register_type type, bool calleePreserved);
 
+			bool				_HasFunctionPrologue(
+									FunctionDebugInfo* function) const;
 private:
 			Array<Register>		fRegisters;
 			SourceLanguage*		fAssemblyLanguage;
