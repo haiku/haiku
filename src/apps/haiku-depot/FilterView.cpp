@@ -34,11 +34,34 @@ FilterView::FilterView()
 {
 	// Contruct category popup
 	BPopUpMenu* categoryMenu = new BPopUpMenu(B_TRANSLATE("Category"));
+	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("All packages"), NULL));
+	categoryMenu->AddItem(new BSeparatorItem());
+	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Audio"), NULL));
+	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Games"), NULL));
+	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Graphics"), NULL));
+	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Development"), NULL));
+	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Miscellaneous"), NULL));
+	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Shell"), NULL));
+	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Video"), NULL));
+	categoryMenu->AddItem(new BSeparatorItem());
+	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Installed packages"),
+		NULL));
+	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Uninstalled packages"),
+		NULL));
+	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("User selected packages"),
+		NULL));
+	categoryMenu->AddItem(new BSeparatorItem());
+	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Downloading"), NULL));
+	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Update available"), NULL));
+	categoryMenu->ItemAt(0)->SetMarked(true);
+
 	fCategoryField = new BMenuField("category", B_TRANSLATE("Category:"),
 		categoryMenu);
 
 	// Construct repository popup
 	BPopUpMenu* repositoryMenu = new BPopUpMenu(B_TRANSLATE("Depot"));
+	repositoryMenu->AddItem(new BMenuItem(B_TRANSLATE("All depots"), NULL));
+	repositoryMenu->ItemAt(0)->SetMarked(true);
 	fRepositoryField = new BMenuField("repository", B_TRANSLATE("Depot:"),
 		repositoryMenu);
 
