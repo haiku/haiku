@@ -1,13 +1,17 @@
 SubDir HAIKU_TOP src apps haiku-depot ;
 
-UsePrivateHeaders shared ;
+UsePrivateHeaders interface shared ;
 
 Application HaikuDepot :
 	App.cpp
+	FilterView.cpp
 	main.cpp
 	MainWindow.cpp
+	PackageActionsView.cpp
+	PackageListView.cpp
 	support.cpp
-	: be translation libshared.a $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: be translation libcolumnlistview.a libshared.a $(TARGET_LIBSUPC++)
+		$(HAIKU_LOCALE_LIBS)
 	: HaikuDepot.rdef
 ;
 
@@ -15,5 +19,8 @@ DoCatalogs HaikuDepot :
 	x-vnd.Haiku-HaikuDepot
 	:
 	App.cpp
+	FilterView.cpp
 	MainWindow.cpp
+	PackageActionsView.cpp
+	PackageListView.cpp
 ;

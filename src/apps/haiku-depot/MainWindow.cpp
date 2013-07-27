@@ -12,14 +12,20 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <LayoutBuilder.h>
-#include <Menu.h>
+#include <MenuBar.h>
 #include <MenuItem.h>
 #include <Messenger.h>
 #include <ScrollView.h>
 #include <TabView.h>
 
+#include "FilterView.h"
+#include "PackageActionsView.h"
+#include "PackageListView.h"
+
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "MainWindow"
+
 
 MainWindow::MainWindow(BRect frame)
 	:
@@ -27,6 +33,35 @@ MainWindow::MainWindow(BRect frame)
 		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
+	BMenuBar* mainMenu = new BMenuBar(B_TRANSLATE("Main Menu"));
+	BMenu* menu = new BMenu(B_TRANSLATE("Package"));
+	mainMenu->AddItem(menu);
+	
+	FilterView* filterView = new FilterView();
+	
+	PackageListView* packageListView = new PackageListView();
+
+	PackageActionsView* packageActionsView = new PackageActionsView();
+	
+	BSplitView* splitView = new BSplitView(B_VERTICAL, B_USE_SMALL_SPACING);
+	
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
+		.Add(mainMenu)
+		.Add(filterView)
+		.AddGroup(B_VERTICAL)
+			.AddSplit(splitView)
+				.AddGroup(B_VERTICAL)
+					.Add(packageListView)
+					.Add(packageActionsView)
+					.End()
+				.Add(new BGroupView)
+			.End()
+			.SetInsets(B_USE_DEFAULT_SPACING, 0.0f, B_USE_DEFAULT_SPACING,
+				B_USE_DEFAULT_SPACING)
+		.End()
+	;
+
+	splitView->SetCollapsible(0, false);
 }
 
 
