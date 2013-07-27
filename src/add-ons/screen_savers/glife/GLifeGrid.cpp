@@ -53,7 +53,7 @@ GLifeGrid::GLifeGrid(int32 iWidth, int32 iHeight)
 //  GLifeGrid Class Destructor Definition
 GLifeGrid::~GLifeGrid(void)
 {
-	delete m_pbGrid;
+	delete[] m_pbGrid;
 }
 
 
@@ -75,7 +75,7 @@ GLifeGrid::Generation(void)
 	}
 	
 	// Swap grids
-	delete m_pbGrid;
+	delete[] m_pbGrid;
 	m_pbGrid = pbTemp;
 }
 
