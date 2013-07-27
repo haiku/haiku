@@ -111,10 +111,10 @@ DisassemblerX8664::GetNextInstruction(BString& line, target_addr_t& _address,
 	if (size < 1)
 		return B_ENTRY_NOT_FOUND;
 
-	uint64 address = ud_insn_off(fUdisData);
+	target_addr_t address = ud_insn_off(fUdisData);
 
 	char buffer[256];
-	snprintf(buffer, sizeof(buffer), "0x%08" B_PRIx64 ": %16.16s  %s", address,
+	snprintf(buffer, sizeof(buffer), "0x%016" B_PRIx64 ": %16.16s  %s", address,
 		ud_insn_hex(fUdisData), ud_insn_asm(fUdisData));
 			// TODO: Resolve symbols!
 
@@ -159,7 +159,7 @@ DisassemblerX8664::GetNextInstructionInfo(InstructionInfo& _info,
 	if (size < 1)
 		return B_ENTRY_NOT_FOUND;
 
-	uint32 address = (uint32)ud_insn_off(fUdisData);
+	target_addr_t address = ud_insn_off(fUdisData);
 
 	instruction_type type = INSTRUCTION_TYPE_OTHER;
 	target_addr_t targetAddress = 0;
@@ -172,7 +172,7 @@ DisassemblerX8664::GetNextInstructionInfo(InstructionInfo& _info,
 		targetAddress = GetInstructionTargetAddress(state);
 
 	char buffer[256];
-	snprintf(buffer, sizeof(buffer), "0x%08" B_PRIx32 ": %16.16s  %s", address,
+	snprintf(buffer, sizeof(buffer), "0x%016" B_PRIx64 ": %16.16s  %s", address,
 		ud_insn_hex(fUdisData), ud_insn_asm(fUdisData));
 			// TODO: Resolve symbols!
 
