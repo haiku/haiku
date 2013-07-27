@@ -1,7 +1,8 @@
-1	portuguese (brazil)	x-vnd.Haiku-libmail	161731481
+1	portuguese (brazil)	x-vnd.Haiku-libmail	4037525365
 Partially download messages larger than	ProtocolConfigView		Baixar parcialmente mensagens maiores que
 Password:	ProtocolConfigView		Senha:
 Remove mail from server when deleted	ProtocolConfigView		Remover correio do servidor quando excluído
+KiB	ProtocolConfigView		KB
 Mail server:	ProtocolConfigView		Servidor de correio:
 Select…	MailKit		Selecionar…
 Connection type:	ProtocolConfigView		Tipo de conexão:

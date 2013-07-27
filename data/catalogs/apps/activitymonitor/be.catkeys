@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-ActivityMonitor	2739021859
+1	belarusian	x-vnd.Haiku-ActivityMonitor	1211510241
 P-faults	DataSource		Памылкі старонак памяці
 Media nodes	DataSource		Медыя узлы
 Threads	DataSource		Патокі
@@ -6,6 +6,7 @@ Always on top	ActivityWindow		Заўсёды наверсе
 Add graph	ActivityWindow		Дадаць графік
 Teams	DataSource		Групы
 Hide legend	ActivityView		Схаваць легенду
+MiB	DataSource		МіБ
 Network send	DataSource		Адпраўка па сетцы
 CPU usage (combined)	DataSource		Выкарыстанне ЦП (камбінавана)
 CPU	DataSource		ЦП
@@ -26,12 +27,14 @@ Update time interval:	SettingsWindow		Інтэрвал часу абнаўлен
 TX	DataSource	Shorter version for Sending	Адпр.
 Quit	ActivityWindow		Выйсці
 Block cache memory	DataSource		Памяць блокавага кэшу
+%.1f KiB/s	DataSource		%.1f КБ/сек
 Remove graph	ActivityView		Выдаліць графік
 %lld sec.	SettingsWindow		%lld сек.
 %lld ms	SettingsWindow		%lld м.сек
 CPU usage	DataSource		Выкарыстанне ЦП
 Raw clipboard	DataSource		Агульны буфер
 Sems	DataSource		Семафоры
+%.1f MiB	DataSource		%.1f МБ
 ActivityMonitor	System name		МаніторАктыўнасці
 Running applications	DataSource		Запушчаныя праграмы
 Semaphores	DataSource		Семафоры

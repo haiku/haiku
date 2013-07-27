@@ -44,7 +44,7 @@ Moving: 	StatusWindow		Áthelyezés:
 before	FindPanel		előtte
 Error emptying Trash	FSUtils		Hiba történt a Szemetes ürítése közben.
 On	FindPanel		Hol:
-MiB	WidgetAttributeText		MB
+MiB	WidgetAttributeText		MiB
 greater than	FindPanel		nagyobb, mint
 Delete	PoseView		Törlés
 Select all	ContainerWindow		Mind kijelölése
@@ -131,7 +131,7 @@ Cancel	FSUtils		Mégse
 move	FSUtils	As in 'to move this folder...' (en) Um diesen Ordner zu verschieben...' (de)	átmozgassa
 Edit name	ContainerWindow		Név szerkesztése
 Show volumes on Desktop	SettingsView		Lemezek megjelenítése az Asztalon
-KiB	WidgetAttributeText		KB
+KiB	WidgetAttributeText		KiB
 Error %error loading Add-On %name.	ContainerWindow		Hiba történt a bővítmény (%name) betöltése közben: %error.
 Defaults	TrackerSettingsWindow		Eredeti
 %num items	CountView		%num elem
@@ -253,7 +253,7 @@ Paste	ContainerWindow		Beillesztés
 optional	/boot/optional		Választható
 Modified:	InfoWindow		Módosítva:
 Error moving \"%name\".	FSUtils		Hiba történt a fájl (%name) mozgatása közben.
-TiB	WidgetAttributeText		TB
+TiB	WidgetAttributeText		TiB
 40 x 40	ContainerWindow		40 x 40
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		A megadott mappában már létezik egy ilyen nevű fájl: %name. Szeretné felülírni?
 Cancel	ContainerWindow		Mégse
@@ -286,7 +286,7 @@ Creating links: 	StatusWindow		Hivatkozások készítése:
 Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	Átnevezés
 Paused: click to resume or stop	StatusWindow		Szüneteltetve: kattintson a folytatásra vagy leállításra
 Preferred for %type	OpenWithWindow		Előnyben részesítve ehhez: %type
-GiB	WidgetAttributeText		GB
+GiB	WidgetAttributeText		GiB
 There was an error deleting \"%name\":\n\t%error	FSUtils		Hiba történt a törlés közben: %name\n\t%error
 Paste	FilePanelPriv		Beillesztés
 Copy more	ContainerWindow		Több másolása
