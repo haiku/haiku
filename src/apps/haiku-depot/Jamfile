@@ -1,0 +1,19 @@
+SubDir HAIKU_TOP src apps haiku-depot ;
+
+UsePrivateHeaders shared ;
+
+Application HaikuDepot :
+	App.cpp
+	main.cpp
+	MainWindow.cpp
+	support.cpp
+	: be translation libshared.a $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: HaikuDepot.rdef
+;
+
+DoCatalogs HaikuDepot :
+	x-vnd.Haiku-HaikuDepot
+	:
+	App.cpp
+	MainWindow.cpp
+;
