@@ -20,6 +20,7 @@
 
 #include "FilterView.h"
 #include "PackageActionsView.h"
+#include "PackageInfoView.h"
 #include "PackageListView.h"
 
 
@@ -42,6 +43,8 @@ MainWindow::MainWindow(BRect frame)
 	PackageListView* packageListView = new PackageListView();
 
 	PackageActionsView* packageActionsView = new PackageActionsView();
+
+	PackageInfoView* packageInfoView = new PackageInfoView();
 	
 	BSplitView* splitView = new BSplitView(B_VERTICAL, B_USE_SMALL_SPACING);
 	
@@ -50,12 +53,10 @@ MainWindow::MainWindow(BRect frame)
 		.Add(filterView)
 		.AddGroup(B_VERTICAL)
 			.AddSplit(splitView)
-				.AddGroup(B_VERTICAL)
-					.Add(packageListView)
-					.Add(packageActionsView)
-					.End()
-				.Add(new BGroupView)
+				.Add(packageListView)
+				.Add(packageInfoView)
 			.End()
+			.Add(packageActionsView)
 			.SetInsets(B_USE_DEFAULT_SPACING, 0.0f, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING)
 		.End()
