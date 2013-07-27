@@ -33,7 +33,7 @@ FilterView::FilterView()
 	BGroupView("filter view")
 {
 	// Contruct category popup
-	BPopUpMenu* categoryMenu = new BPopUpMenu(B_TRANSLATE("Category"));
+	BPopUpMenu* categoryMenu = new BPopUpMenu(B_TRANSLATE("Show"));
 	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("All packages"), NULL));
 	categoryMenu->AddItem(new BSeparatorItem());
 	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Audio"), NULL));
@@ -55,7 +55,7 @@ FilterView::FilterView()
 	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Update available"), NULL));
 	categoryMenu->ItemAt(0)->SetMarked(true);
 
-	fCategoryField = new BMenuField("category", B_TRANSLATE("Category:"),
+	fShowField = new BMenuField("category", B_TRANSLATE("Show:"),
 		categoryMenu);
 
 	// Construct repository popup
@@ -83,7 +83,7 @@ FilterView::FilterView()
 	
 	// Build layout
 	BLayoutBuilder::Group<>(this)
-		.Add(fCategoryField, 0.0f)
+		.Add(fShowField, 0.0f)
 		.Add(fRepositoryField, 0.0f)
 		.AddGlue(0.5f)
 		.Add(fSearchTermsText, 1.0f)
@@ -101,7 +101,7 @@ FilterView::~FilterView()
 void
 FilterView::AttachedToWindow()
 {
-	fCategoryField->Menu()->SetTargetForItems(this);
+	fShowField->Menu()->SetTargetForItems(this);
 	fRepositoryField->Menu()->SetTargetForItems(this);
 	fSearchTermsText->SetTarget(this);
 }

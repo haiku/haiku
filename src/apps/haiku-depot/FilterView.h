@@ -21,7 +21,7 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 
 private:
-			BMenuField*			fCategoryField;
+			BMenuField*			fShowField;
 			BMenuField*			fRepositoryField;
 			BTextControl*		fSearchTermsText;
 };
