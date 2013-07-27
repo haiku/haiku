@@ -118,6 +118,11 @@ struct devfs_cookie {
 	void*				device_cookie;
 };
 
+struct synchronous_io_cookie {
+	BaseDevice*		device;
+	void*			cookie;
+};
+
 // directory iteration states
 enum {
 	ITERATION_STATE_DOT		= 0,
@@ -764,6 +769,22 @@ get_device_name(struct devfs_vnode* vnode, char* buffer, size_t size)
 
 		offset = start;
 	}
+}
+
+
+static status_t
+device_read(void* _cookie, off_t offset, void* buffer, size_t* length)
+{
+	synchronous_io_cookie* cookie = (synchronous_io_cookie*)_cookie;
+	return cookie->device->Read(cookie->cookie, offset, buffer, length);
+}
+
+
+static status_t
+device_write(void* _cookie, off_t offset, void* buffer, size_t* length)
+{
+	synchronous_io_cookie* cookie = (synchronous_io_cookie*)_cookie;
+	return cookie->device->Write(cookie->cookie, offset, buffer, length);
 }
 
 
@@ -1761,14 +1782,36 @@ devfs_io(fs_volume* volume, fs_vnode* _vnode, void* _cookie,
 	devfs_vnode* vnode = (devfs_vnode*)_vnode->private_node;
 	devfs_cookie* cookie = (devfs_cookie*)_cookie;
 
+	bool isWrite = request->IsWrite();
+
 	if (!S_ISCHR(vnode->stream.type)
-		|| !vnode->stream.u.dev.device->HasIO()
+		|| (((isWrite && !vnode->stream.u.dev.device->HasWrite())
+				|| (!isWrite && !vnode->stream.u.dev.device->HasRead()))
+			&& !vnode->stream.u.dev.device->HasIO())
 		|| cookie == NULL) {
 		request->SetStatusAndNotify(B_NOT_ALLOWED);
 		return B_NOT_ALLOWED;
 	}
 
-	return vnode->stream.u.dev.device->IO(cookie->device_cookie, request);
+	if (vnode->stream.u.dev.partition != NULL) {
+		if (request->Offset() + (off_t)request->Length()
+				> vnode->stream.u.dev.partition->info.size) {
+			request->SetStatusAndNotify(B_BAD_VALUE);
+			return B_BAD_VALUE;
+		}
+		translate_partition_access(vnode->stream.u.dev.partition, request);
+	}
+
+	if (vnode->stream.u.dev.device->HasIO())
+		return vnode->stream.u.dev.device->IO(cookie->device_cookie, request);
+
+	synchronous_io_cookie synchronousCookie = {
+		vnode->stream.u.dev.device,
+		cookie->device_cookie
+	};
+
+	return vfs_synchronous_io(request,
+		request->IsWrite() ? &device_write : &device_read, &synchronousCookie);
 }
 
 
@@ -1855,22 +1898,6 @@ devfs_write_stat(fs_volume* _volume, fs_vnode* _vnode, const struct stat* stat,
 
 	notify_stat_changed(fs->id, vnode->id, statMask);
 	return B_OK;
-}
-
-
-bool devfs_supports_operation(fs_volume* _volume, fs_vnode* _vnode,
-	BVnodeOperation operation)
-{
-	struct devfs_vnode* vnode = (struct devfs_vnode*)_vnode->private_node;
-
-	switch (operation) {
-		case B_VNODE_OPERATION_IO:
-			return S_ISCHR(vnode->stream.type)
-				&& vnode->stream.u.dev.device->HasIO();
-
-		default:
-			return false;
-	}
 }
 
 
@@ -1968,36 +1995,8 @@ fs_vnode_ops kVnodeOps = {
 	&devfs_read_dir,
 	&devfs_rewind_dir,
 
-	/* attribute directory */
-	NULL,	// open_attr_dir()
-	NULL,	// close_attr_dir()
-	NULL,	// free_attr_dir_cookie()
-	NULL,	// read_attr_dir()
-	NULL,	// rewind_attr_dir()
-
-	/* attribute */
-	NULL,	// create_attr()
-	NULL,	// open_attr()
-	NULL,	// close_attr()
-	NULL,	// free_attr_cookie()
-	NULL,	// read_attr()
-	NULL,	// write_attr()
-	NULL,	// read_attr_stat()
-	NULL,	// write_attr_stat()
-	NULL,	// rename_attr()
-	NULL,	// remove_attr()
-
-	/* support for node and FS layers */
-	NULL,	// create_special_node()
-	NULL,	// get_super_vnode()
-
-	/* lock operations */
-	NULL,	// test_lock()
-	NULL,	// acquire_lock()
-	NULL,	// release_lock()
-
-	/* supported vnode operations info */
-	&devfs_supports_operation,
+	// attributes operations are not supported
+	NULL,
 };
 
 }	// namespace

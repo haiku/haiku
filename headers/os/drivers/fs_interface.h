@@ -45,11 +45,6 @@ struct file_io_vec {
 #define B_VNODE_DONT_CREATE_SPECIAL_SUB_NODE	0x02
 
 
-enum BVnodeOperation {
-	B_VNODE_OPERATION_IO	= 0
-};
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -255,10 +250,6 @@ struct fs_vnode_ops {
 				const struct flock* lock, bool wait);
 	status_t (*release_lock)(fs_volume* volume, fs_vnode* vnode, void* cookie,
 				const struct flock* lock);
-
-	/* supported vnode operations info */
-	bool (*supports_operation)(fs_volume* volume, fs_vnode* vnode,
-				enum BVnodeOperation operation);
 };
 
 struct file_system_module_info {

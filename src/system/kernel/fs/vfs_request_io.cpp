@@ -133,17 +133,6 @@ private:
 };
 
 
-static bool
-is_vnode_io_operation_supported(struct vnode* vnode)
-{
-	if (!HAS_FS_CALL(vnode, io))
-		return false;
-	if (!HAS_FS_CALL(vnode, supports_operation))
-		return true;
-	return FS_CALL(vnode, supports_operation, B_VNODE_OPERATION_IO);
-}
-
-
 static status_t
 do_iterative_fd_io_iterate(void* _cookie, io_request* request,
 	bool* _partialTransfer)
@@ -371,7 +360,7 @@ status_t
 vfs_vnode_io(struct vnode* vnode, void* cookie, io_request* request)
 {
 	status_t result = B_ERROR;
-	if (!is_vnode_io_operation_supported(vnode)
+	if (!HAS_FS_CALL(vnode, io)
 		|| (result = FS_CALL(vnode, io, cookie, request)) == B_UNSUPPORTED) {
 		// no io() call -- fall back to synchronous I/O
 		VnodeIO io(request->IsWrite(), vnode, cookie);
@@ -481,7 +470,7 @@ do_iterative_fd_io(int fd, io_request* request, iterative_io_get_vecs getVecs,
 
 	CObjectDeleter<file_descriptor> descriptorPutter(descriptor, put_fd);
 
-	if (!is_vnode_io_operation_supported(vnode)) {
+	if (!HAS_FS_CALL(vnode, io)) {
 		// no io() call -- fall back to synchronous I/O
 		return do_synchronous_iterative_vnode_io(vnode, descriptor->cookie,
 			request, getVecs, finished, cookie);

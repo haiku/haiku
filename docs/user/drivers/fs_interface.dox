@@ -92,16 +92,6 @@
 */
 
 
-/*!
-	\enum BVnodeOperation
-	Enumeration type for specifying vnode operations.
-*/
-
-/*!
-	\var BVnodeOperation B_VNODE_OPERATION_IO
-	Refers to the fs_vnode_ops::io operation.
-*/
-
 ///// file_system_module_info /////
 
 
@@ -1708,31 +1698,6 @@
 	\brief TODO: Document!
 */
 
-/* TODO: test_lock(), acquire_lock(), release_lock() */
-
-/*!
-	\fn bool (*fs_vnode_ops::supports_operation)(fs_volume* volume,
-			fs_vnode* vnode, BVnodeOperation operation)
-	\brief Returns whether the specified vnode operation is supported for the
-		specified vnode.
-
-	For most vnode operations the FS can simply indicate that it doesn't support
-	it by setting the respective attribute in the fs_vnode_ops structure to
-	\c NULL. For certain nodes the support of an operation may change over the
-	life time of the node. While in most cases the implementation of the
-	operation can then simply return an error (\c B_NOT_SUPPORTED), for some
-	operations, however, the VFS has to know beforehand whether to call it at
-	all or resort to a different handling. It calls this hook only for
-	operations that aren't set to \c NULL in the fs_vnode_ops structure. If this
-	hook is not present, the VFS behaves as if it was present always returned
-	\c true.
-
-	\param volume The volume object.
-	\param vnode The node object.
-	\param operation The enum value identifying the operation.
-	\return \c true, if the specified operation is currently supported, \c false
-		otherwise.
-*/
 
 //! @}
 
