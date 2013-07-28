@@ -96,4 +96,31 @@ private:
 typedef List<PackageInfo, false> PackageInfoList;
 
 
+class DepotInfo {
+public:
+								DepotInfo();
+								DepotInfo(const BString& title);
+								DepotInfo(const DepotInfo& other);
+
+			DepotInfo&			operator=(const DepotInfo& other);
+			bool				operator==(const DepotInfo& other) const;
+			bool				operator!=(const DepotInfo& other) const;
+
+			const BString&		Title() const
+									{ return fTitle; }
+
+			const PackageInfoList& PackageList() const
+									{ return fPackages; }
+
+			bool				AddPackage(const PackageInfo& package);
+
+private:
+			BString				fTitle;
+			PackageInfoList		fPackages;
+};
+
+
+typedef List<DepotInfo, false> DepotInfoList;
+
+
 #endif // PACKAGE_INFO_H

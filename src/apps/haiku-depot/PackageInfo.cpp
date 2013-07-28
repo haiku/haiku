@@ -189,3 +189,61 @@ PackageInfo::AddUserRating(const UserRating& rating)
 {
 	return fUserRatings.Add(rating);
 }
+
+
+// #pragma mark -
+
+
+DepotInfo::DepotInfo()
+	:
+	fTitle(),
+	fPackages()
+{
+}
+
+
+DepotInfo::DepotInfo(const BString& title)
+	:
+	fTitle(title),
+	fPackages()
+{
+}
+
+
+DepotInfo::DepotInfo(const DepotInfo& other)
+	:
+	fTitle(other.fTitle),
+	fPackages(other.fPackages)
+{
+}
+
+
+DepotInfo&
+DepotInfo::operator=(const DepotInfo& other)
+{
+	fTitle = other.fTitle;
+	fPackages = other.fPackages;
+	return *this;
+}
+
+
+bool
+DepotInfo::operator==(const DepotInfo& other) const
+{
+	return fTitle == other.fTitle
+		&& fPackages == other.fPackages;
+}
+
+
+bool
+DepotInfo::operator!=(const DepotInfo& other) const
+{
+	return !(*this == other);
+}
+
+
+bool
+DepotInfo::AddPackage(const PackageInfo& package)
+{
+	return fPackages.Add(package);
+}
