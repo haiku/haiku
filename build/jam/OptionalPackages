@@ -1828,9 +1828,7 @@ if [ IsOptionalHaikuImagePackageAdded PCRE ] {
 
 # Pe text editor
 if [ IsOptionalHaikuImagePackageAdded Pe ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package Pe available for $(TARGET_ARCH)" ;
-	} else {
+	if $(TARGET_ARCH) = x86 {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
 				pe-2.4.3-600-x86-gcc4-2011-12-18.zip
@@ -1844,6 +1842,16 @@ if [ IsOptionalHaikuImagePackageAdded Pe ] {
 			: /boot/apps/Pe/Pe ;
 		AddSymlinkToHaikuImage common bin
 			: /boot/apps/Pe/lpe ;
+	} else if $(TARGET_ARCH) = x86_64 {
+		InstallOptionalHaikuImagePackage
+			pe-2.4.3-hg-x86_64-2013-07-28.zip
+			: $(baseURL)/pe-2.4.3-hg-x86_64-2013-07-28.zip ;
+		AddSymlinkToHaikuImage home config settings deskbar Applications
+			: /boot/apps/Pe/Pe ;
+		AddSymlinkToHaikuImage common bin
+			: /boot/apps/Pe/lpe ;
+	} else {
+		Echo "No optional package Pe available for $(TARGET_ARCH)" ;
 	}
 }
 
