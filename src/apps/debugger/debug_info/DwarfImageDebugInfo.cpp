@@ -1097,14 +1097,15 @@ DwarfImageDebugInfo::_CreateReturnValues(ReturnValueInfoList* returnValueInfos,
 	Image* image, StackFrame* frame, DwarfStackFrameDebugInfo& factory)
 {
 	for (int32 i = 0; i < returnValueInfos->CountItems(); i++) {
+		Image* targetImage = image;
 		ReturnValueInfo* valueInfo = returnValueInfos->ItemAt(i);
 		target_addr_t subroutineAddress = valueInfo->SubroutineAddress();
 		CpuState* subroutineState = valueInfo->State();
-		if (!image->ContainsAddress(subroutineAddress)) {
+		if (!targetImage->ContainsAddress(subroutineAddress)) {
 			// our current image doesn't contain the target function,
 			// locate the one which does.
-			image = image->GetTeam()->ImageByAddress(subroutineAddress);
-			if (image == NULL) {
+			targetImage = image->GetTeam()->ImageByAddress(subroutineAddress);
+			if (targetImage == NULL) {
 				// nothing we can do, try the next entry (if any)
 				continue;
 			}
