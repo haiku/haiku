@@ -1112,27 +1112,15 @@ DwarfImageDebugInfo::_CreateReturnValues(ReturnValueInfoList* returnValueInfos,
 		}
 
 		status_t result = B_OK;
-		ImageDebugInfo* imageInfo = image->GetImageDebugInfo();
+		ImageDebugInfo* imageInfo = targetImage->GetImageDebugInfo();
+
 		FunctionInstance* targetFunction;
-		target_size_t addressSize = fDebuggerInterface->GetArchitecture()
-			->AddressSize();
-		if (subroutineAddress >= fPLTSectionStart
-			&& subroutineAddress < fPLTSectionEnd) {
-			// if the function in question is position-independent, the call
-			// will actually have taken us to its corresponding PLT slot.
-			// in such a case, look at the disassembled jump to determine
-			// where to find the actual function address.
-			InstructionInfo info;
-			if (fDebuggerInterface->GetArchitecture()->GetInstructionInfo(
-				subroutineAddress, info, subroutineState) != B_OK) {
-				return B_BAD_VALUE;
-			}
-
-			ssize_t bytesRead = fDebuggerInterface->ReadMemory(
-				info.TargetAddress(), &subroutineAddress, addressSize);
-
-			if (bytesRead != (ssize_t)addressSize)
-				return B_BAD_VALUE;
+		if (imageInfo->GetAddressSectionType(subroutineAddress)
+				== ADDRESS_SECTION_TYPE_PLT) {
+			result = fArchitecture->ResolvePICFunctionAddress(
+				subroutineAddress, subroutineState, subroutineAddress);
+			if (result != B_OK)
+				continue;
 		}
 
 		targetFunction = imageInfo->FunctionAtAddress(subroutineAddress);
@@ -1166,7 +1154,7 @@ DwarfImageDebugInfo::_CreateReturnValues(ReturnValueInfoList* returnValueInfos,
 				// if we were unable to determine a size for the type,
 				// simply default to the architecture's register width.
 				if (byteSize == 0)
-					byteSize = addressSize;
+					byteSize = fArchitecture->AddressSize();
 
 				ValueLocation* location;
 				result = fArchitecture->GetReturnAddressLocation(frame,

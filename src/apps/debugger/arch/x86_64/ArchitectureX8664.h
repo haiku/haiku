@@ -61,6 +61,10 @@ public:
 									Statement*& _statement);
 	virtual	status_t			GetInstructionInfo(target_addr_t address,
 									InstructionInfo& _info, CpuState* state);
+	virtual	status_t			ResolvePICFunctionAddress(target_addr_t
+									instructionAddress,
+									CpuState* state,
+									target_addr_t& _targetAddress);
 
 	virtual	status_t			GetWatchpointDebugCapabilities(
 									int32& _maxRegisterCount,

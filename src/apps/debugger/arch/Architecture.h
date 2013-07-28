@@ -106,6 +106,10 @@ public:
 	virtual	status_t			GetInstructionInfo(target_addr_t address,
 									InstructionInfo& _info,
 									CpuState* state) = 0;
+	virtual	status_t			ResolvePICFunctionAddress(target_addr_t
+									instructionAddress,
+									CpuState* state,
+									target_addr_t& _targetAddress) = 0;
 
 			status_t			CreateStackTrace(Team* team,
 									ImageDebugInfoProvider* imageInfoProvider,

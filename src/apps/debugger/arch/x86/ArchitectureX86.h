@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef ARCHITECTURE_X86_H
@@ -60,6 +60,10 @@ public:
 									Statement*& _statement);
 	virtual	status_t			GetInstructionInfo(target_addr_t address,
 									InstructionInfo& _info, CpuState* state);
+	virtual	status_t			ResolvePICFunctionAddress(
+									target_addr_t instructionAddress,
+									CpuState* state,
+									target_addr_t& _targetAddress);
 
 	virtual	status_t			GetWatchpointDebugCapabilities(
 									int32& _maxRegisterCount,
