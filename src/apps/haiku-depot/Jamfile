@@ -8,6 +8,7 @@ Application HaikuDepot :
 	main.cpp
 	MainWindow.cpp
 	PackageActionsView.cpp
+	PackageInfo.cpp
 	PackageInfoView.cpp
 	PackageListView.cpp
 	support.cpp
