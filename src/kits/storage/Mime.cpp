@@ -311,10 +311,11 @@ get_named_icon(const char* name, BBitmap* icon, icon_size which)
 	size_t size;
 	type_code type;
 	status_t status = get_named_icon(name, &data, &size, &type);
-	if (status == B_OK)
+	if (status == B_OK) {
 		status = BIconUtils::GetVectorIcon(data, size, icon);
+		delete[] data;
+	}
 
-	delete[] data;
 	return status;
 }
 
