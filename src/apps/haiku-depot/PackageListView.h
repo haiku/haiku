@@ -12,64 +12,7 @@
 #include "PackageInfo.h"
 
 
-// A field type displaying both a bitmap and a string so that the
-// tree display looks nicer (both text and bitmap are indented)
-// TODO: Code-duplication with DriveSetup PartitionList.h
-class BBitmapStringField : public BStringField {
-	typedef BStringField Inherited;
-public:
-								BBitmapStringField(BBitmap* bitmap,
-									const char* string);
-	virtual						~BBitmapStringField();
-
-			void				SetBitmap(BBitmap* bitmap);
-			const BBitmap*		Bitmap() const
-									{ return fBitmap; }
-
-private:
-			BBitmap*			fBitmap;
-};
-
-
-// BColumn for PackageListView which knows how to render
-// a BBitmapStringField
-// TODO: Code-duplication with DriveSetup PartitionList.h
-class PackageColumn : public BTitledColumn {
-	typedef BTitledColumn Inherited;
-public:
-								PackageColumn(const char* title,
-									float width, float minWidth,
-									float maxWidth, uint32 truncateMode,
-									alignment align = B_ALIGN_LEFT);
-
-	virtual	void				DrawField(BField* field, BRect rect,
-									BView* parent);
-	virtual float				GetPreferredWidth(BField* field,
-									BView* parent) const;
-
-	virtual	bool				AcceptsField(const BField* field) const;
-
-	static	void				InitTextMargin(BView* parent);
-
-private:
-			uint32				fTruncateMode;
-	static	float				sTextMargin;
-};
-
-
-// BRow for the PartitionListView
-class PackageRow : public BRow {
-	typedef BRow Inherited;
-public:
-								PackageRow(const PackageInfo& package);
-
-			const PackageInfo&	Package() const
-									{ return fPackage; }
-
-private:
-			PackageInfo			fPackage;
-};
-
+class PackageRow;
 
 class PackageListView : public BColumnListView {
 public:
