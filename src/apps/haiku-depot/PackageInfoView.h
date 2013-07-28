@@ -5,10 +5,16 @@
 #ifndef PACKAGE_INFO_VIEW_H
 #define PACKAGE_INFO_VIEW_H
 
-#include <TabView.h>
+#include <GroupView.h>
+
+#include "PackageInfo.h"
 
 
-class PackageInfoView : public BTabView {
+class TitleView;
+class PagesView;
+
+
+class PackageInfoView : public BGroupView {
 public:
 								PackageInfoView();
 	virtual						~PackageInfoView();
@@ -16,10 +22,12 @@ public:
 	virtual void				AttachedToWindow();
 	virtual	void				MessageReceived(BMessage* message);
 
+			void				SetPackage(const PackageInfo& package);
+			void				Clear();
+
 private:
-			BView*				fDescriptionView;
-			BView*				fRatingAndCommentsView;
-			BView*				fChangeLogView;
+			TitleView*			fTitleView;
+			PagesView*			fPagesView;
 };
 
 #endif // PACKAGE_INFO_VIEW_H
