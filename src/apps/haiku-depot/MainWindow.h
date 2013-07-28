@@ -7,6 +7,14 @@
 
 #include <Window.h>
 
+#include "Model.h"
+
+
+class BSplitView;
+class FilterView;
+class PackageActionsView;
+class PackageInfoView;
+class PackageListView;
 
 enum {
 	MSG_MAIN_WINDOW_CLOSED		= 'mwcl',
@@ -23,6 +31,16 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 
 private:
+			void				_BuildMenu(BMenuBar* menuBar);
+
+private:
+			FilterView*			fFilterView;
+			PackageActionsView*	fPackageActionsView;
+			PackageInfoView*	fPackageInfoView;
+			PackageListView*	fPackageListView;
+			BSplitView*			fSplitView;
+
+			Model				fModel;
 };
 
 #endif // MAIN_WINDOW_H

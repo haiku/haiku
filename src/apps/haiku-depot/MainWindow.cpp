@@ -34,35 +34,31 @@ MainWindow::MainWindow(BRect frame)
 		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	BMenuBar* mainMenu = new BMenuBar(B_TRANSLATE("Main Menu"));
-	BMenu* menu = new BMenu(B_TRANSLATE("Package"));
-	mainMenu->AddItem(menu);
+	BMenuBar* menuBar = new BMenuBar(B_TRANSLATE("Main Menu"));
+	_BuildMenu(menuBar);
 	
-	FilterView* filterView = new FilterView();
+	fFilterView = new FilterView();
+	fPackageListView = new PackageListView();
+	fPackageActionsView = new PackageActionsView();
+	fPackageInfoView = new PackageInfoView();
 	
-	PackageListView* packageListView = new PackageListView();
-
-	PackageActionsView* packageActionsView = new PackageActionsView();
-
-	PackageInfoView* packageInfoView = new PackageInfoView();
-	
-	BSplitView* splitView = new BSplitView(B_VERTICAL, B_USE_SMALL_SPACING);
+	fSplitView = new BSplitView(B_VERTICAL, B_USE_SMALL_SPACING);
 	
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
-		.Add(mainMenu)
-		.Add(filterView)
+		.Add(menuBar)
+		.Add(fFilterView)
 		.AddGroup(B_VERTICAL)
-			.AddSplit(splitView)
-				.Add(packageListView)
-				.Add(packageInfoView)
+			.AddSplit(fSplitView)
+				.Add(fPackageListView)
+				.Add(fPackageInfoView)
 			.End()
-			.Add(packageActionsView)
+			.Add(fPackageActionsView)
 			.SetInsets(B_USE_DEFAULT_SPACING, 0.0f, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING)
 		.End()
 	;
 
-	splitView->SetCollapsible(0, false);
+	fSplitView->SetCollapsible(0, false);
 }
 
 
@@ -93,4 +89,13 @@ MainWindow::MessageReceived(BMessage* message)
 			BWindow::MessageReceived(message);
 			break;
 	}
+}
+
+
+void
+MainWindow::_BuildMenu(BMenuBar* menuBar)
+{
+	BMenu* menu = new BMenu(B_TRANSLATE("Package"));
+	menuBar->AddItem(menu);
+
 }
