@@ -14,6 +14,11 @@
 
 class PackageRow;
 
+enum {
+	MSG_PACKAGE_SELECTED		= 'pkgs',
+};
+
+
 class PackageListView : public BColumnListView {
 public:
 								PackageListView();
@@ -21,6 +26,8 @@ public:
 
 	virtual void				AttachedToWindow();
 	virtual	void				MessageReceived(BMessage* message);
+
+	virtual void				SelectionChanged();
 
 			void				AddPackage(const PackageInfo& package);
 			

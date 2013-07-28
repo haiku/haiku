@@ -88,6 +88,19 @@ MainWindow::MessageReceived(BMessage* message)
 		case B_SIMPLE_DATA:
 		case B_REFS_RECEIVED:
 			break;
+
+		case MSG_PACKAGE_SELECTED:
+		{
+			int32 index;
+			if (message->FindInt32("index", &index) == B_OK
+				&& index >= 0 && index < fVisiblePackages.CountItems()) {
+				_AdoptPackage(fVisiblePackages.ItemAtFast(index));
+			} else {
+				_ClearPackage();
+			}
+			break;
+		}
+		
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -107,12 +120,26 @@ MainWindow::_BuildMenu(BMenuBar* menuBar)
 void
 MainWindow::_AdoptModel()
 {
-	PackageInfoList packages = fModel.CreatePackageList();
+	fVisiblePackages = fModel.CreatePackageList();
 	
 	fPackageListView->Clear();
-	for (int32 i = 0; i < packages.CountItems(); i++) {
-		fPackageListView->AddPackage(packages.ItemAtFast(i));
+	for (int32 i = 0; i < fVisiblePackages.CountItems(); i++) {
+		fPackageListView->AddPackage(fVisiblePackages.ItemAtFast(i));
 	}
+}
+
+
+void
+MainWindow::_AdoptPackage(const PackageInfo& package)
+{
+	fPackageInfoView->SetPackage(package);
+}
+
+
+void
+MainWindow::_ClearPackage()
+{
+	fPackageInfoView->Clear();
 }
 
 

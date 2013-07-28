@@ -33,6 +33,9 @@ public:
 private:
 			void				_BuildMenu(BMenuBar* menuBar);
 			void				_AdoptModel();
+			
+			void				_AdoptPackage(const PackageInfo& package);
+			void				_ClearPackage();
 
 			void				_InitDummyModel();
 
@@ -44,6 +47,7 @@ private:
 			BSplitView*			fSplitView;
 
 			Model				fModel;
+			PackageInfoList		fVisiblePackages;
 };
 
 #endif // MAIN_WINDOW_H

@@ -23,7 +23,7 @@ class TitleView : public BView {
 public:
 	TitleView()
 		:
-		BView("title view", B_WILL_DRAW),
+		BView("title view", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
 		fIcon(NULL),
 		fTitle()
 	{
@@ -46,6 +46,8 @@ public:
 	{
 		BPoint offset(B_ORIGIN);
 		BRect bounds(Bounds());
+		
+		FillRect(updateRect, B_SOLID_LOW);
 		
 		if (fIcon != NULL) {
 			// TODO: ...
@@ -81,6 +83,7 @@ public:
 		// TODO: Fetch icon
 		fTitle = package.Title();
 		InvalidateLayout();
+		Invalidate();
 	}
 
 	void Clear()
@@ -88,6 +91,11 @@ public:
 		delete fIcon;
 		fIcon = NULL;
 		fTitle = "";
+
+		if (Parent() != NULL) {
+			InvalidateLayout();
+			Invalidate();
+		}
 	}
 
 private:

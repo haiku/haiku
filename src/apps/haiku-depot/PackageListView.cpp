@@ -9,6 +9,7 @@
 #include <stdio.h>
 
 #include <Catalog.h>
+#include <Window.h>
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -288,6 +289,8 @@ PackageListView::PackageListView()
 		B_TRUNCATE_END), kSizeColumn);
 	AddColumn(new PackageColumn(B_TRANSLATE("Status"), 100, 50, 500,
 		B_TRUNCATE_END), kStatusColumn);
+
+	SetSortingEnabled(true);
 }
 
 
@@ -311,6 +314,23 @@ PackageListView::MessageReceived(BMessage* message)
 			BColumnListView::MessageReceived(message);
 			break;
 	}
+}
+
+
+void
+PackageListView::SelectionChanged()
+{
+	BColumnListView::SelectionChanged();
+	
+	BMessage message(MSG_PACKAGE_SELECTED);
+	
+	BRow* selected = CurrentSelection();
+	int32 index = -1;
+	if (selected != NULL)
+		index = IndexOf(selected);
+	message.AddInt32("index", index);
+	
+	Window()->PostMessage(&message);
 }
 
 
