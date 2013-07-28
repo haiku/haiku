@@ -209,19 +209,41 @@ DisassemblerX8664::GetInstructionTargetAddress(CpuState* state) const
 			targetAddress += x64State->IntRegisterValue(
 				RegisterNumberFromUdisIndex(fUdisData->operand[0].index))
 				* fUdisData->operand[0].scale;
+			off_t offset = 0;
+			switch (fUdisData->operand[0].offset) {
+				case 8:
+					offset = fUdisData->operand[0].lval.sbyte;
+					break;
+				case 16:
+					offset = fUdisData->operand[0].lval.sword;
+					break;
+				case 32:
+					offset = fUdisData->operand[0].lval.sdword;
+					break;
+				case 64:
+					offset = fUdisData->operand[0].lval.sqword;
+					break;
+			}
+			targetAddress += offset;
 		}
 		break;
 		case UD_OP_JIMM:
 		{
-			targetAddress = ud_insn_off(fUdisData)
-				+ fUdisData->operand[0].lval.sdword + ud_insn_len(fUdisData);
+			targetAddress = ud_insn_off(fUdisData) + ud_insn_len(fUdisData);
+			if (fUdisData->operand[0].size == 32)
+				targetAddress += fUdisData->operand[0].lval.sdword;
+			else
+				targetAddress += fUdisData->operand[0].lval.sqword;
 		}
 		break;
 
 		case UD_OP_IMM:
 		case UD_OP_CONST:
 		{
-			targetAddress = fUdisData->operand[0].lval.udword;
+			if (fUdisData->operand[0].size == 32)
+				targetAddress = fUdisData->operand[0].lval.udword;
+			else if (fUdisData->operand[0].size == 64)
+				targetAddress = fUdisData->operand[0].lval.uqword;
 		}
 		break;
 
