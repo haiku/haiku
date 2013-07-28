@@ -7,8 +7,6 @@
 
 
 #include <Application.h>
-#include <List.h>
-#include <Size.h>
 
 
 class MainWindow;
