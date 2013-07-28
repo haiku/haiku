@@ -605,7 +605,6 @@ ArchitectureX86::ResolvePICFunctionAddress(target_addr_t instructionAddress,
 	// will actually have taken us to its corresponding PLT slot.
 	// in such a case, look at the disassembled jump to determine
 	// where to find the actual function address.
-	state->SetInstructionPointer(instructionAddress);
 	InstructionInfo info;
 	if (GetInstructionInfo(instructionAddress, info, state) != B_OK) {
 		return B_BAD_VALUE;

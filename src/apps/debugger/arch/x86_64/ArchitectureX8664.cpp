@@ -625,6 +625,7 @@ status_t
 ArchitectureX8664::ResolvePICFunctionAddress(target_addr_t instructionAddress,
 	CpuState* state, target_addr_t& _targetAddress)
 {
+	target_addr_t previousIP = state->InstructionPointer();
 	// if the function in question is position-independent, the call
 	// will actually have taken us to its corresponding PLT slot.
 	// in such a case, look at the disassembled jump to determine
@@ -638,8 +639,10 @@ ArchitectureX8664::ResolvePICFunctionAddress(target_addr_t instructionAddress,
 	// after this instruction (where it would be during actual
 	// execution), and recalculate the target address of the jump
 	state->SetInstructionPointer(info.Address() + info.Size());
-	if (GetInstructionInfo(info.Address(), info, state) != B_OK)
-		return B_BAD_VALUE;
+	status_t result = GetInstructionInfo(info.Address(), info, state);
+	state->SetInstructionPointer(previousIP);
+	if (result != B_OK)
+		return result;
 
 	target_addr_t subroutineAddress;
 	ssize_t bytesRead = fTeamMemory->ReadMemory(info.TargetAddress(),
@@ -650,8 +653,6 @@ ArchitectureX8664::ResolvePICFunctionAddress(target_addr_t instructionAddress,
 
 	_targetAddress = subroutineAddress;
 	return B_OK;
-
-	return B_BAD_VALUE;
 }
 
 
