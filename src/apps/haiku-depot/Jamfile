@@ -7,6 +7,7 @@ Application HaikuDepot :
 	FilterView.cpp
 	main.cpp
 	MainWindow.cpp
+	Model.cpp
 	PackageActionsView.cpp
 	PackageInfo.cpp
 	PackageInfoView.cpp
