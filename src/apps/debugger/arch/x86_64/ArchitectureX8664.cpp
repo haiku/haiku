@@ -24,6 +24,7 @@
 #include "StackFrame.h"
 #include "Statement.h"
 #include "TeamMemory.h"
+#include "ValueLocation.h"
 #include "X86AssemblyLanguage.h"
 
 #include "disasm/DisassemblerX8664.h"
@@ -639,8 +640,37 @@ ArchitectureX8664::GetWatchpointDebugCapabilities(int32& _maxRegisterCount,
 
 status_t
 ArchitectureX8664::GetReturnAddressLocation(StackFrame* frame,
-	target_size_t valueSize, ValueLocation*& _location) {
-	return B_NOT_SUPPORTED;
+	target_size_t valueSize, ValueLocation*& _location)
+{
+	// for the calling conventions currently in use on Haiku,
+	// the x86-64 rules for how values are returned are as follows:
+	//
+	// - 64 bit or smaller values are returned in RAX.
+	// - > 64 bit values are returned on the stack.
+	ValueLocation* location = new(std::nothrow) ValueLocation(
+		IsBigEndian());
+	if (location == NULL)
+		return B_NO_MEMORY;
+	BReference<ValueLocation> locationReference(location,
+		true);
+
+	if (valueSize <= 8) {
+		ValuePieceLocation piece;
+		piece.SetSize(valueSize);
+		piece.SetToRegister(X86_64_REGISTER_RAX);
+		if (!location->AddPiece(piece))
+			return B_NO_MEMORY;
+	} else {
+		ValuePieceLocation piece;
+		CpuStateX8664* state = dynamic_cast<CpuStateX8664*>(frame->GetCpuState());
+		piece.SetToMemory(state->IntRegisterValue(X86_64_REGISTER_RAX));
+		piece.SetSize(valueSize);
+		if (!location->AddPiece(piece))
+			return B_NO_MEMORY;
+	}
+
+	_location = locationReference.Detach();
+	return B_OK;
 }
 
 
