@@ -39,8 +39,8 @@ MainWindow::MainWindow(BRect frame)
 	
 	fFilterView = new FilterView();
 	fPackageListView = new PackageListView();
-	fPackageActionsView = new PackageActionsView();
 	fPackageInfoView = new PackageInfoView();
+	fPackageActionsView = new PackageActionsView();
 	
 	fSplitView = new BSplitView(B_VERTICAL, B_USE_SMALL_SPACING);
 	
@@ -59,6 +59,9 @@ MainWindow::MainWindow(BRect frame)
 	;
 
 	fSplitView->SetCollapsible(0, false);
+
+	_InitDummyModel();
+	_AdoptModel();
 }
 
 
@@ -98,4 +101,66 @@ MainWindow::_BuildMenu(BMenuBar* menuBar)
 	BMenu* menu = new BMenu(B_TRANSLATE("Package"));
 	menuBar->AddItem(menu);
 
+}
+
+
+void
+MainWindow::_AdoptModel()
+{
+	PackageInfoList packages = fModel.CreatePackageList();
+	
+	fPackageListView->Clear();
+	for (int32 i = 0; i < packages.CountItems(); i++) {
+		fPackageListView->AddPackage(packages.ItemAtFast(i));
+	}
+}
+
+
+void
+MainWindow::_InitDummyModel()
+{
+	// TODO: The Model could be filled from another thread by 
+	// sending messages which contain collected package information.
+	// The Model could be cached on disk.
+	
+	DepotInfo depot(B_TRANSLATE("Default"));
+
+	PackageInfo wonderbrush(
+		"WonderBrush",
+		"2.1.2",
+		"A vector based graphics editor.",
+		"2.1.2 - Initial Haiku release.");
+	wonderbrush.AddUserRating(
+		UserRating(UserInfo("humdinger"), 4.5f,
+		"Awesome!", "en", "2.1.2")
+	);
+	wonderbrush.AddUserRating(
+		UserRating(UserInfo("bonefish"), 5.0f,
+		"The best!", "en", "2.1.2")
+	);
+	depot.AddPackage(wonderbrush);
+
+	PackageInfo paladin(
+		"Paladin",
+		"1.2.0",
+		"A C/C++ IDE based on Pe.",
+		"");
+	paladin.AddUserRating(
+		UserRating(UserInfo("stippi"), 3.5f,
+		"Could be more integrated from the sounds of it.",
+		"en", "1.2.0")
+	);
+	paladin.AddUserRating(
+		UserRating(UserInfo("mmadia"), 5.0f,
+		"It rocks! Give a try",
+		"en", "1.1.0")
+	);
+	paladin.AddUserRating(
+		UserRating(UserInfo("bonefish"), 2.0f,
+		"It just needs to use my jam-rewrite 'ham' and it will be great.",
+		"en", "1.1.0")
+	);
+	depot.AddPackage(paladin);
+
+	fModel.AddDepot(depot);
 }

@@ -171,11 +171,11 @@ PackageColumn::InitTextMargin(BView* parent)
 }
 
 
-// #pragma mark - PackageListView
+// #pragma mark - PackageRow
 
 
 enum {
-	kNameColumn,
+	kTitleColumn,
 	kRatingColumn,
 	kDescriptionColumn,
 	kSizeColumn,
@@ -183,12 +183,44 @@ enum {
 };
 
 
+PackageRow::PackageRow(const PackageInfo& package)
+	:
+	Inherited(),
+	fPackage(package)
+{
+	// Package icon
+
+	BBitmap* icon = NULL;
+	// TODO: Fetch package icon
+
+	SetField(new BBitmapStringField(icon, package.Title()), kTitleColumn);
+
+	// Rating
+	// TODO: Method to compute and cache rating
+	SetField(new BStringField("n/a"), kRatingColumn);
+
+	// Description
+	SetField(new BStringField(package.Description()), kDescriptionColumn);
+
+	// Size
+	// TODO: Store package size
+	SetField(new BStringField("0 KiB"), kSizeColumn);
+
+	// Status
+	// TODO: Fetch info about installed/deactivated/unintalled/...
+	SetField(new BStringField("n/a"), kStatusColumn);
+}
+
+
+// #pragma mark - PackageListView
+
+
 PackageListView::PackageListView()
 	:
 	BColumnListView("package list view", 0, B_FANCY_BORDER, true)
 {
 	AddColumn(new PackageColumn(B_TRANSLATE("Name"), 150, 50, 500,
-		B_TRUNCATE_MIDDLE), kNameColumn);
+		B_TRUNCATE_MIDDLE), kTitleColumn);
 	AddColumn(new PackageColumn(B_TRANSLATE("Rating"), 100, 50, 500,
 		B_TRUNCATE_MIDDLE), kRatingColumn);
 	AddColumn(new PackageColumn(B_TRANSLATE("Description"), 130, 50, 500,
@@ -221,3 +253,43 @@ PackageListView::MessageReceived(BMessage* message)
 			break;
 	}
 }
+
+
+void
+PackageListView::AddPackage(const PackageInfo& package)
+{
+	PackageRow* packageRow = _FindRow(package);
+
+	// forget about it if this package is already in the listview
+	if (packageRow != NULL)
+		return;
+
+	// create the row for this package
+	packageRow = new PackageRow(package);
+
+	// add the row, parent may be NULL (add at top level)
+	AddRow(packageRow);
+
+	// make sure the row is initially expanded
+	ExpandOrCollapse(packageRow, true);
+}
+
+
+PackageRow*
+PackageListView::_FindRow(const PackageInfo& package, PackageRow* parent)
+{
+	for (int32 i = CountRows(parent) - 1; i >= 0; i--) {
+		PackageRow* row = dynamic_cast<PackageRow*>(RowAt(i, parent));
+		if (row != NULL && row->Package() == package)
+			return row;
+		if (CountRows(row) > 0) {
+			// recurse into child rows
+			row = _FindRow(package, row);
+			if (row != NULL)
+				return row;
+		}
+	}
+
+	return NULL;
+}
+

@@ -60,19 +60,22 @@ UserInfo::operator!=(const UserInfo& other) const
 UserRating::UserRating()
 	:
 	fUserInfo(),
-	fComment(),
 	fRating(0.0f),
+	fComment(),
+	fLanguage(),
 	fPackageVersion()
 {
 }
 
 
-UserRating::UserRating(const UserInfo& userInfo, const BString& comment,
-		float rating, const BString& packageVersion)
+UserRating::UserRating(const UserInfo& userInfo, float rating,
+		const BString& comment, const BString& language,
+		const BString& packageVersion)
 	:
 	fUserInfo(userInfo),
-	fComment(comment),
 	fRating(rating),
+	fComment(comment),
+	fLanguage(language),
 	fPackageVersion(packageVersion)
 	
 {
@@ -82,8 +85,9 @@ UserRating::UserRating(const UserInfo& userInfo, const BString& comment,
 UserRating::UserRating(const UserRating& other)
 	:
 	fUserInfo(other.fUserInfo),
-	fComment(other.fComment),
 	fRating(other.fRating),
+	fComment(other.fComment),
+	fLanguage(other.fLanguage),
 	fPackageVersion(other.fPackageVersion)
 {
 }
@@ -93,8 +97,9 @@ UserRating&
 UserRating::operator=(const UserRating& other)
 {
 	fUserInfo = other.fUserInfo;
-	fComment = other.fComment;
 	fRating = other.fRating;
+	fComment = other.fComment;
+	fLanguage = other.fLanguage;
 	fPackageVersion = other.fPackageVersion;
 	return *this;
 }
@@ -104,8 +109,9 @@ bool
 UserRating::operator==(const UserRating& other) const
 {
 	return fUserInfo == other.fUserInfo
-		&& fComment == other.fComment
 		&& fRating == other.fRating
+		&& fComment == other.fComment
+		&& fLanguage == other.fLanguage
 		&& fPackageVersion == other.fPackageVersion;
 }
 

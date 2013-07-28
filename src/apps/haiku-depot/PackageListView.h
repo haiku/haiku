@@ -9,6 +9,8 @@
 #include <ColumnListView.h>
 #include <ColumnTypes.h>
 
+#include "PackageInfo.h"
+
 
 // A field type displaying both a bitmap and a string so that the
 // tree display looks nicer (both text and bitmap are indented)
@@ -55,6 +57,20 @@ private:
 };
 
 
+// BRow for the PartitionListView
+class PackageRow : public BRow {
+	typedef BRow Inherited;
+public:
+								PackageRow(const PackageInfo& package);
+
+			const PackageInfo&	Package() const
+									{ return fPackage; }
+
+private:
+			PackageInfo			fPackage;
+};
+
+
 class PackageListView : public BColumnListView {
 public:
 								PackageListView();
@@ -62,6 +78,12 @@ public:
 
 	virtual void				AttachedToWindow();
 	virtual	void				MessageReceived(BMessage* message);
+
+			void				AddPackage(const PackageInfo& package);
+			
+private:
+			PackageRow*			_FindRow(const PackageInfo& package,
+									PackageRow* parent = NULL);
 };
 
 #endif // PACKAGE_LIST_VIEW_H

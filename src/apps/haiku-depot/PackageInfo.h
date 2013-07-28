@@ -32,7 +32,9 @@ class UserRating {
 public:
 								UserRating();
 								UserRating(const UserInfo& userInfo,
-									const BString& comment, float rating,
+									float rating,
+									const BString& comment,
+									const BString& language,
 									const BString& packageVersion);
 								UserRating(const UserRating& other);
 
@@ -51,8 +53,9 @@ public:
 
 private:
 			UserInfo			fUserInfo;
-			BString				fComment;
 			float				fRating;
+			BString				fComment;
+			BString				fLanguage;
 			BString				fPackageVersion;
 };
 

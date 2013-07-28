@@ -32,12 +32,15 @@ public:
 
 private:
 			void				_BuildMenu(BMenuBar* menuBar);
+			void				_AdoptModel();
+
+			void				_InitDummyModel();
 
 private:
 			FilterView*			fFilterView;
-			PackageActionsView*	fPackageActionsView;
-			PackageInfoView*	fPackageInfoView;
 			PackageListView*	fPackageListView;
+			PackageInfoView*	fPackageInfoView;
+			PackageActionsView*	fPackageActionsView;
 			BSplitView*			fSplitView;
 
 			Model				fModel;
