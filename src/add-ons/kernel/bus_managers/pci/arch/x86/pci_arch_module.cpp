@@ -45,7 +45,5 @@ pci_x86_module_info gPCIArchModule = {
 	&pci_disable_msi,
 	&pci_get_msix_count,
 	&pci_configure_msix,
-	&pci_unconfigure_msix,
-	&pci_enable_msix,
-	&pci_disable_msix
+	&pci_enable_msix
 };

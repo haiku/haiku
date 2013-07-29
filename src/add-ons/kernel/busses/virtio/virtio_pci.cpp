@@ -466,10 +466,7 @@ uninit_bus(void* bus_cookie)
 	if (bus->irq_type != VIRTIO_IRQ_LEGACY) {
 		if (bus->irq_type == VIRTIO_IRQ_MSI) {
 			remove_io_interrupt_handler(bus->irq, virtio_pci_interrupt, bus);
-			sPCIx86Module->disable_msi(bus->info.bus,
-				bus->info.device, bus->info.function);
-			sPCIx86Module->unconfigure_msi(bus->info.bus,
-				bus->info.device, bus->info.function);
+
 		} else {
 			int32 irq = bus->irq + 1;
 			for (uint16 queue = 0; queue < bus->queue_count; queue++, irq++) {
@@ -478,11 +475,11 @@ uninit_bus(void* bus_cookie)
 			}
 			remove_io_interrupt_handler(bus->irq, virtio_pci_config_interrupt,
 					bus);
-			sPCIx86Module->disable_msix(bus->info.bus,
-				bus->info.device, bus->info.function);
-			sPCIx86Module->unconfigure_msix(bus->info.bus,
-				bus->info.device, bus->info.function);
 		}
+		sPCIx86Module->disable_msi(bus->info.bus,
+			bus->info.device, bus->info.function);
+		sPCIx86Module->unconfigure_msi(bus->info.bus,
+			bus->info.device, bus->info.function);
 	} else
 		remove_io_interrupt_handler(bus->irq, virtio_pci_interrupt, bus);
 	if (sPCIx86Module != NULL) {
@@ -668,4 +665,3 @@ module_info* modules[] = {
 	(module_info* )&gVirtioPCIDeviceModule,
 	NULL
 };
-

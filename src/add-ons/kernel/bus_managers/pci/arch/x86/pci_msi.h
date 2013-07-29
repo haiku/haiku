@@ -61,9 +61,7 @@ typedef struct msix_info {
 uint8		pci_get_msix_count(uint8 virtualBus, uint8 _device, uint8 function);
 status_t	pci_configure_msix(uint8 virtualBus, uint8 _device, uint8 function,
 				uint8 count, uint8 *startVector);
-status_t	pci_unconfigure_msix(uint8 virtualBus, uint8 device, uint8 function);
 status_t	pci_enable_msix(uint8 virtualBus, uint8 _device, uint8 function);
-status_t	pci_disable_msix(uint8 virtualBus, uint8 _device, uint8 function);
 void		pci_read_msix_info(PCIDev *device);
 
 // HyperTransport MSI mapping
