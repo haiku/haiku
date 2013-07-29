@@ -294,6 +294,10 @@ SpiderSaver::_DrawInto(BView *view)
 				view->SetHighColor(2, 1, 1, 255);
 				break;
 		}
+
+		if (fQueues[i] == NULL)
+			continue;
+
 		if (Polygon* p = fQueues[i]->Head()) {
 			view->SetDrawingMode(B_OP_ADD);
 			_DrawPolygon(p, view);
