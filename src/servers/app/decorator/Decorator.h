@@ -197,9 +197,8 @@ protected:
 
 	virtual void			_FontsChanged(DesktopSettings& settings,
 								BRegion* updateRegion = NULL);
-	virtual void			_SetLook(Decorator::Tab* tab,
-								DesktopSettings& settings, window_look look,
-								BRegion* updateRegion = NULL);
+	virtual void			_SetLook(Decorator::Tab* tab, DesktopSettings& settings,
+								window_look look, BRegion* updateRegion = NULL);
 	virtual void			_SetFlags(Decorator::Tab* tab, uint32 flags,
 								BRegion* updateRegion = NULL);
 

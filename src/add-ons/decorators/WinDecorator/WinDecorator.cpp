@@ -431,9 +431,11 @@ WinDecorator::_FontsChanged(DesktopSettings& settings,
 
 
 void
-WinDecorator::_SetLook(DesktopSettings& settings, window_look look,
-	BRegion* updateRegion)
+WinDecorator::_SetLook(Decorator::Tab* tab, DesktopSettings& settings,
+	window_look look, BRegion* updateRegion)
 {
+	tab->look = look;
+
 	// TODO we could be much smarter about the update region
 
 	// get previous extent
@@ -452,8 +454,10 @@ WinDecorator::_SetLook(DesktopSettings& settings, window_look look,
 
 
 void
-WinDecorator::_SetFlags(uint32 flags, BRegion* updateRegion)
+WinDecorator::_SetFlags(Decorator::Tab* tab, uint32 flags, BRegion* updateRegion)
 {
+	tab->flags = flags;
+
 	// TODO we could be much smarter about the update region
 
 	// get previous extent

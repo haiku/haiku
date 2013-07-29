@@ -60,10 +60,9 @@ protected:
 
 			void				_FontsChanged(DesktopSettings& settings,
 									BRegion* updateRegion);
-			void				_SetLook(DesktopSettings& settings,
-									window_look look,
-									BRegion* updateRegion = NULL);
-			void				_SetFlags(uint32 flags,
+			void				_SetLook(Decorator::Tab* tab, DesktopSettings& settings,
+									window_look look, BRegion* updateRegion = NULL);
+			void				_SetFlags(Decorator::Tab* tab, uint32 flags,
 									BRegion* updateRegion = NULL);
 
 			void				_MoveBy(BPoint offset);
