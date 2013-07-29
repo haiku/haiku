@@ -52,18 +52,6 @@ WonderBrushView::WonderBrushView(const BRect &frame, const char *name,
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ViewColor());
 
-	// figure out where the text ends
-	font_height fh;
-	be_bold_font->GetHeight(&fh);
-	float xbold, ybold;
-	xbold = fh.descent + 1;
-	ybold = fh.ascent + fh.descent * 2 + fh.leading;
-
-	font_height plainh;
-	be_plain_font->GetHeight(&plainh);
-	float yplain;
-	yplain = plainh.ascent + plainh.descent * 2 + plainh.leading;
-
 	ResizeToPreferred();
 }
 
