@@ -295,9 +295,7 @@ if [ IsOptionalHaikuImagePackageAdded BeOSCompatibility ] {
 
 # BePDF
 if [ IsOptionalHaikuImagePackageAdded BePDF ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package BePDF available for $(TARGET_ARCH)" ;
-	} else {
+	if $(TARGET_ARCH) = x86 {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
 				bepdf-1.1.1b4-x86-gcc4-2012-08-11.zip
@@ -309,6 +307,14 @@ if [ IsOptionalHaikuImagePackageAdded BePDF ] {
 		}
 		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/BePDF/BePDF ;
+	} else if $(TARGET_ARCH) = x86_64 {
+		InstallOptionalHaikuImagePackage
+			bepdf-1.1.1b4-x86_64-2013-07-28.zip
+			: $(baseURL)/bepdf-1.1.1b4-x86_64-2013-07-28.zip ;
+		AddSymlinkToHaikuImage home config settings deskbar Applications
+			: /boot/apps/BePDF/BePDF ;
+	} else {
+		Echo "No optional package BePDF available for $(TARGET_ARCH)" ;
 	}
 }
 
@@ -1429,14 +1435,19 @@ if [ IsOptionalHaikuImagePackageAdded LibIconv ] {
 
 # LibLayout library
 if [ IsOptionalHaikuImagePackageAdded LibLayout ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package LibLayout available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage liblayout-1.4.1-r1a4-x86-gcc4-2012-08-30.zip
-			: $(baseURL)/liblayout-1.4.1-r1a4-x86-gcc4-2012-08-30.zip ;
+	if $(TARGET_ARCH) = x86 {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			InstallOptionalHaikuImagePackage liblayout-1.4.1-r1a4-x86-gcc4-2012-08-30.zip
+				: $(baseURL)/liblayout-1.4.1-r1a4-x86-gcc4-2012-08-30.zip ;
+		} else {
+			InstallOptionalHaikuImagePackage liblayout-1.4.0-gcc2-2009-03-08.zip
+				: $(baseURL)/liblayout-1.4.0-gcc2-2009-03-08.zip ;
+		}
+	} else if $(TARGET_ARCH) = x86_64 {
+			InstallOptionalHaikuImagePackage liblayout-1.4.1-x86_64-2013-07-28.zip
+				: $(baseURL)/liblayout-1.4.1-x86_64-2013-07-28.zip ;
 	} else {
-		InstallOptionalHaikuImagePackage liblayout-1.4.0-gcc2-2009-03-08.zip
-			: $(baseURL)/liblayout-1.4.0-gcc2-2009-03-08.zip ;
+		Echo "No optional package LibLayout available for $(TARGET_ARCH)" ;
 	}
 }
 
