@@ -128,25 +128,23 @@ BeDecorator::BeDecorator(DesktopSettings& settings, BRect rect)
 	fTabOffset(0),
 	fWasDoubleClick(false)
 {
-	_UpdateFont(settings);
-	//SetLook(settings, look);
-
 	fFrameColors = new RGBColor[6];
 	fFrameColors[0].SetColor(152, 152, 152);
 	fFrameColors[1].SetColor(255, 255, 255);
-	fFrameColors[2].SetColor(216, 216, 216);
+	fFrameColors[2].SetColor(ui_color(B_MENU_BACKGROUND_COLOR));
 	fFrameColors[3].SetColor(136, 136, 136);
 	fFrameColors[4].SetColor(152, 152, 152);
 	fFrameColors[5].SetColor(96, 96, 96);
 
-	fTabList.AddItem(_AllocateNewTab());
+	fTabColor.SetColor(ui_color(B_WINDOW_TAB_COLOR));
+	fTextColor.SetColor(ui_color(B_WINDOW_TEXT_COLOR));
 
-	// Set appropriate colors based on the current focus value. In this case,
-	// each decorator defaults to not having the focus.
-	_SetFocus(_TabAt(0));
+	fButtonHighColor.SetColor(tint_color(fTabColor.GetColor32(),
+		B_LIGHTEN_2_TINT));
+	fButtonLowColor.SetColor(tint_color(fTabColor.GetColor32(),
+		B_DARKEN_2_TINT));
 
-	// Do initial decorator setup
-	_DoLayout();
+	//_UpdateFont(settings);
 
 	// TODO: If the decorator was created with a frame too small, it should
 	// resize itself!
@@ -214,9 +212,11 @@ BeDecorator::Draw(BRect updateRect)
 	STRACE(("BeDecorator::Draw(BRect updateRect): "));
 	updateRect.PrintToStream();
 
+	// We need to draw a few things: the tab, the resize knob, the borders,
+	// and the buttons
 	fDrawingEngine->SetDrawState(&fDrawState);
 
-	_DrawFrame(updateRect & fFrame);
+	_DrawFrame(updateRect);
 	_DrawTabs(updateRect & fTitleBarRect);
 }
 
@@ -228,7 +228,7 @@ BeDecorator::Draw()
 	// things
 	fDrawingEngine->SetDrawState(&fDrawState);
 
-	_DrawFrame(fFrame);
+	_DrawFrame(BRect(fTopBorder.LeftTop(), fBottomBorder.RightBottom()));
 	_DrawTabs(fTitleBarRect);
 }
 
@@ -837,9 +837,15 @@ BeDecorator::_DrawTab(Decorator::Tab* tab, BRect invalid)
 
 
 void
-BeDecorator::_DrawTitle(Decorator::Tab* tab, BRect r)
+BeDecorator::_DrawTitle(Decorator::Tab* _tab, BRect r)
 {
 	STRACE(("_DrawTitle(%f, %f, %f, %f)\n", r.left, r.top, r.right, r.bottom));
+
+	BeDecorator::Tab* tab = static_cast<BeDecorator::Tab*>(_tab);
+
+	const BRect& tabRect = tab->tabRect;
+	const BRect& closeRect = tab->closeRect;
+	const BRect& zoomRect = tab->zoomRect;
 
 	fDrawingEngine->SetDrawingMode(B_OP_OVER);
 	fDrawingEngine->SetHighColor(fTextColor);
@@ -852,20 +858,22 @@ BeDecorator::_DrawTitle(Decorator::Tab* tab, BRect r)
 
 	BPoint titlePos;
 	if (fTopTab->look != kLeftTitledWindowLook) {
-		titlePos.x = tab->closeRect.IsValid() ? tab->closeRect.right + fTextOffset
-			: tab->tabRect.left + fTextOffset;
-		titlePos.y = floorf(((tab->tabRect.top + 2.0) + tab->tabRect.bottom
+		titlePos.x = closeRect.IsValid() ? closeRect.right + tab->textOffset
+			: tabRect.left + tab->textOffset;
+		titlePos.y = floorf(((tabRect.top + 2.0) + tabRect.bottom
 			+ fontHeight.ascent + fontHeight.descent) / 2.0
 			- fontHeight.descent + 0.5);
 	} else {
-		titlePos.x = floorf(((tab->tabRect.left + 2.0) + tab->tabRect.right
+		titlePos.x = floorf(((tabRect.left + 2.0) + tabRect.right
 			+ fontHeight.ascent + fontHeight.descent) / 2.0
 			- fontHeight.descent + 0.5);
-		titlePos.y = tab->zoomRect.IsValid() ? tab->zoomRect.top - fTextOffset
-			: tab->tabRect.bottom - fTextOffset;
+		titlePos.y = zoomRect.IsValid() ? zoomRect.top - tab->textOffset
+			: tabRect.bottom - tab->textOffset;
 	}
 
-	fDrawingEngine->DrawString(fTruncatedTitle.String(), fTruncatedTitleLength,
+	fDrawingEngine->SetFont(fDrawState.Font());
+
+	fDrawingEngine->DrawString(tab->truncatedTitle.String(), tab->truncatedTitleLength,
 		titlePos);
 
 	fDrawingEngine->SetDrawingMode(B_OP_COPY);

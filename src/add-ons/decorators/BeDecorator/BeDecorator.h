@@ -189,12 +189,9 @@ private:
 
 			uint32				fTabOffset;
 			float				fTabLocation;
-			float				fTextOffset;
 
 			float				fMinTabSize;
 			float				fMaxTabSize;
-			BString				fTruncatedTitle;
-			int32				fTruncatedTitleLength;
 
 			bool				fWasDoubleClick;
 };

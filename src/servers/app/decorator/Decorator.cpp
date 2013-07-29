@@ -433,6 +433,7 @@ Decorator::IsFocus(int32 tab) const
 	Decorator::Tab* decoratorTab = fTabList.ItemAt(tab);
 	if (decoratorTab == NULL)
 		return false;
+
 	return decoratorTab->isFocused;
 };
 

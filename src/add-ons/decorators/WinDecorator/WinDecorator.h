@@ -103,7 +103,6 @@ private:
 			int32				fTruncatedTitleLength;
 
 			bool slidetab;
-			int textoffset;
 };
 
 

@@ -48,8 +48,6 @@ WinDecorator::WinDecorator(DesktopSettings& settings, BRect rect)
 	:
 	Decorator(settings, rect)
 {
-	_UpdateFont(settings);
-
 	// common colors to both focus and non focus state
 	frame_highcol = (rgb_color){ 255, 255, 255, 255 };
 	frame_midcol = (rgb_color){ 216, 216, 216, 255 };
@@ -62,18 +60,11 @@ WinDecorator::WinDecorator(DesktopSettings& settings, BRect rect)
 	fNonFocusTabColor = settings.UIColor(B_WINDOW_INACTIVE_TAB_COLOR);
 	fNonFocusTextColor = settings.UIColor(B_WINDOW_INACTIVE_TEXT_COLOR);
 
-	fTabList.AddItem(_AllocateNewTab());
+	//_UpdateFont(settings);
 
-	// Set appropriate colors based on the current focus value. In this case,
-	// each decorator defaults to not having the focus.
-	_SetFocus(_TabAt(0));
-
-	// Do initial decorator setup
-	_DoLayout();
-
-	textoffset = 5;
-
-	STRACE(("WinDecorator()\n"));
+	STRACE(("WinDecorator:\n"));
+	STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",
+		rect.left, rect.top, rect.right, rect.bottom));
 }
 
 
@@ -98,17 +89,20 @@ WinDecorator::Draw(BRect updateRect)
 	STRACE(("WinDecorator::Draw(BRect updateRect): "));
 	updateRect.PrintToStream();
 
+	// We need to draw a few things: the tab, the resize knob, the borders,
+	// and the buttons
 	fDrawingEngine->SetDrawState(&fDrawState);
 
-	_DrawFrame(updateRect & fFrame);
-	_DrawTabs(updateRect & fTitleBarRect);
+	_DrawFrame(fFrame & updateRect);
+	_DrawTabs(fTitleBarRect & updateRect);
 }
 
 
 void
 WinDecorator::Draw()
 {
-	STRACE(("WinDecorator::Draw()\n"));
+	// Easy way to draw everything - no worries about drawing only certain
+	// things
 	fDrawingEngine->SetDrawState(&fDrawState);
 
 	_DrawFrame(fFrame);
@@ -301,26 +295,28 @@ void
 WinDecorator::_DrawTitle(Decorator::Tab* tab, BRect rect)
 {
 	const BRect& tabRect = tab->tabRect;
-	const BRect& closeRect = tab->closeRect;
+	const BRect& minimizeRect = tab->minimizeRect;
 	const BRect& zoomRect = tab->zoomRect;
+	const BRect& closeRect = tab->closeRect;
 
 	//fDrawingEngine->SetDrawingMode(B_OP_OVER);
 	fDrawingEngine->SetHighColor(textcol);
-	fDrawingEngine->SetLowColor(IsFocus(_TabAt(0))
+	fDrawingEngine->SetLowColor(IsFocus(tab)
 		? fFocusTabColor : fNonFocusTabColor);
 
-	fTruncatedTitle = Title(_TabAt(0));
+	fTruncatedTitle = Title(tab);
 	fDrawState.Font().TruncateString(&fTruncatedTitle, B_TRUNCATE_END,
-		((zoomRect.IsValid() ? zoomRect.left :
+		((minimizeRect.IsValid() ? minimizeRect.left :
+			zoomRect.IsValid() ? zoomRect.left :
 			closeRect.IsValid() ? closeRect.left : tabRect.right) - 5)
-		- (tabRect.left + textoffset));
+		- (tabRect.left + 5));
 	fTruncatedTitleLength = fTruncatedTitle.Length();
 	fDrawingEngine->SetFont(fDrawState.Font());
 
 	fDrawingEngine->DrawString(fTruncatedTitle, fTruncatedTitleLength,
-		BPoint(tabRect.left + textoffset,closeRect.bottom - 1));
+		BPoint(tabRect.left + 5, closeRect.bottom - 1));
 
-	//fDrawingEngine->SetDrawingMode(B_OP_COPY);
+	fDrawingEngine->SetDrawingMode(B_OP_COPY);
 }
 
 
@@ -480,7 +476,7 @@ WinDecorator::_SetFocus(Decorator::Tab* tab)
 	// SetFocus() performs necessary duties for color swapping and
 	// other things when a window is deactivated or activated.
 
-	if (IsFocus(_TabAt(0))) {
+	if (IsFocus(tab)) {
 //		tab_highcol.SetColor(100, 100, 255);
 //		tab_lowcol.SetColor(40, 0, 255);
 		tab_highcol = fFocusTabColor;
