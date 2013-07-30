@@ -17,6 +17,7 @@
 
 struct pci_info;
 struct pci_module_info;
+struct pci_x86_module_info;
 struct xhci_td;
 struct xhci_device;
 struct xhci_endpoint;
@@ -194,6 +195,7 @@ private:
 	inline	void				WriteDoorReg32(uint32 reg, uint32 value);
 
 	static	pci_module_info *	sPCIModule;
+	static	pci_x86_module_info *sPCIx86Module;
 
 			uint8 *				fCapabilityRegisters;
 			uint32				fCapabilityLength;
@@ -205,6 +207,8 @@ private:
 			area_id				fRegisterArea;
 			pci_info *			fPCIInfo;
 			Stack *				fStack;
+			uint8				fIRQ;
+			bool				fUseMSI;
 
 			area_id				fErstArea;
 			xhci_erst_element *	fErst;
