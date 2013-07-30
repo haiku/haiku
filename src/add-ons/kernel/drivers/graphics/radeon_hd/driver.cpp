@@ -246,6 +246,7 @@ const struct supported_device {
 	{0x6758, 5, 0, RADEON_TURKS, CHIP_STD, "Radeon HD 6670"},
 	{0x6759, 5, 0, RADEON_TURKS, CHIP_STD, "Radeon HD 6570/7570"},
 	{0x6850, 6, 0, RADEON_TURKS, CHIP_MOBILE, "Radeon HD 7570"},
+	{0x6840, 6, 0, RADEON_TURKS, CHIP_MOBILE, "Radeon HD 7670"},
 	//  Barts
 	{0x673e, 5, 0, RADEON_BARTS, CHIP_STD, "Radeon HD 6790"},
 	{0x6739, 5, 0, RADEON_BARTS, CHIP_STD, "Radeon HD 6850"},
@@ -314,6 +315,7 @@ const struct supported_device {
 	{0x6798, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD 7970"},
 	{0x6799, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD 7990"},
 	//  Aruba   DCE 6.1 Trinity / Richland
+	{0x9990, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 7920"},
 	//  Oland   DCE 6,4
 	//  Hainan  NODCE. No display hardware, OpenCL 3D engine.
 
