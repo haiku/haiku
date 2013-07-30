@@ -1,11 +1,12 @@
 /*
- * Copyright 2001-2010, Haiku.
+ * Copyright 2001-2013, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		DarkWyrm <bpmagic@columbus.rr.com>
- *		Stephan Aßmus <superstippi@gmx.de>
- *		Clemens Zeidler <haiku@clemens-zeidler.de>
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		DarkWyrm, bpmagic@columbus.rr.com
+ *		John Scipione, jscipione@gmail.com
+ *		Clemens Zeidler, haiku@clemens-zeidler.de
  */
 #ifndef DEFAULT_DECORATOR_H
 #define DEFAULT_DECORATOR_H

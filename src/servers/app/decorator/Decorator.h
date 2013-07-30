@@ -1,12 +1,13 @@
 /*
- * Copyright 2001-2011, Haiku.
+ * Copyright 2001-2013 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		DarkWyrm <bpmagic@columbus.rr.com>
- *		Stephan Aßmus <superstippi@gmx.de>
- *		Clemens Zeidler <haiku@clemens-zeidler.de>
- *		Ingo Weinhold <ingo_weinhold@gmx.de>
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		DarkWyrm, bpmagic@columbus.rr.com
+ *		John Scipione, jscipione@gmail.com
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
+ *		Clemens Zeidler, haiku@clemens-zeidler.de
  */
 #ifndef DECORATOR_H
 #define DECORATOR_H

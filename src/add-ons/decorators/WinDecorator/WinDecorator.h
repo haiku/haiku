@@ -1,6 +1,10 @@
 /*
- * Copyright 2009-2010, Haiku.
+ * Copyright 2009-2013 Haiku, Inc.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adrien Destugues, pulkomandy@gmail.com
+ *		John Scipione, jscipione@gmail.com
  */
 #ifndef _WINDOWS_DECORATOR_H_
 #define _WINDOWS_DECORATOR_H_
