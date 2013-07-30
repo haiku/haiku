@@ -76,7 +76,9 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		fProcessingPipe(NULL),
 		fRootHub(NULL),
 		fRootHubAddress(0),
-		fPortCount(0)
+		fPortCount(0),
+		fIRQ(0),
+		fUseMSI(false)
 {
 	if (!fInitOK) {
 		TRACE_ERROR("bus manager failed to init\n");
@@ -323,7 +325,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	resume_thread(fFinishThread);
 
 	// Find the right interrupt vector, using MSIs if available.
-	uint8 interruptVector = fPCIInfo->u.h0.interrupt_line;
+	fIRQ = fPCIInfo->u.h0.interrupt_line;
 	if (sPCIx86Module != NULL && sPCIx86Module->get_msi_count(fPCIInfo->bus,
 			fPCIInfo->device, fPCIInfo->function) >= 1) {
 		uint8 msiVector = 0;
@@ -332,14 +334,14 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 			&& sPCIx86Module->enable_msi(fPCIInfo->bus, fPCIInfo->device,
 				fPCIInfo->function) == B_OK) {
 			TRACE_ALWAYS("using message signaled interrupts\n");
-			interruptVector = msiVector;
+			fIRQ = msiVector;
+			fUseMSI = true;
 		}
 	}
 
 	// Install the interrupt handler
 	TRACE("installing interrupt handler\n");
-	install_io_interrupt_handler(interruptVector, _InterruptHandler,
-		(void *)this, 0);
+	install_io_interrupt_handler(fIRQ, _InterruptHandler, (void *)this, 0);
 
 	// Enable interesting interrupts now that the handler is in place
 	_WriteReg(OHCI_INTERRUPT_ENABLE, OHCI_NORMAL_INTERRUPTS
@@ -356,6 +358,8 @@ OHCI::~OHCI()
 	fStopFinishThread = true;
 	delete_sem(fFinishTransfersSem);
 	wait_for_thread(fFinishThread, &result);
+
+	remove_io_interrupt_handler(fIRQ, _InterruptHandler, (void *)this);
 
 	_LockEndpoints();
 	mutex_destroy(&fEndpointLock);
@@ -377,7 +381,17 @@ OHCI::~OHCI()
 	delete [] fInterruptEndpoints;
 	delete fRootHub;
 
+	if (fUseMSI && sPCIx86Module != NULL) {
+		sPCIx86Module->disable_msi(fPCIInfo->bus,
+			fPCIInfo->device, fPCIInfo->function);
+		sPCIx86Module->unconfigure_msi(fPCIInfo->bus,
+			fPCIInfo->device, fPCIInfo->function);
+	}
 	put_module(B_PCI_MODULE_NAME);
+	if (sPCIx86Module != NULL) {
+		sPCIx86Module = NULL;
+		put_module(B_PCI_X86_MODULE_NAME);
+	}
 }
 
 

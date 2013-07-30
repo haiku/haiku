@@ -174,6 +174,9 @@ static	pci_x86_module_info *		sPCIx86Module;
 
 		// Port management
 		uint8						fPortCount;
+
+		uint8						fIRQ;
+		bool						fUseMSI;
 };
 
 
