@@ -8,8 +8,8 @@
  *		John Scipione, jscipione@gmail.com
  *		Clemens Zeidler, haiku@clemens-zeidler.de
  */
-#ifndef DEFAULT_DECORATOR_H
-#define DEFAULT_DECORATOR_H
+#ifndef BE_DECORATOR_H
+#define BE_DECORATOR_H
 
 
 #include <Region.h>
@@ -198,4 +198,4 @@ private:
 };
 
 
-#endif	// DEFAULT_DECORATOR_H
+#endif	// BE_DECORATOR_H
