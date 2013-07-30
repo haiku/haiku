@@ -156,6 +156,9 @@ MainWindow::_InitDummyModel()
 		"WonderBrush",
 		"2.1.2",
 		"A vector based graphics editor.",
+		"WonderBrush is YellowBites' software for doing graphics design "
+		"on Haiku. It combines many great under-the-hood features with "
+		"powerful tools and an efficient and intuitive interface.",
 		"2.1.2 - Initial Haiku release.");
 	wonderbrush.AddUserRating(
 		UserRating(UserInfo("humdinger"), 4.5f,
@@ -171,6 +174,10 @@ MainWindow::_InitDummyModel()
 		"Paladin",
 		"1.2.0",
 		"A C/C++ IDE based on Pe.",
+		"If you like BeIDE, you'll like Paladin even better. "
+		"The interface is streamlined, it has some features sorely "
+		"missing from BeIDE, like running a project in the Terminal, "
+		"and has a bundled text editor based upon Pe.",
 		"");
 	paladin.AddUserRating(
 		UserRating(UserInfo("stippi"), 3.5f,

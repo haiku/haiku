@@ -155,6 +155,7 @@ public:
 		
 		fDescriptionView = new BTextView("description view");
 		fDescriptionView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		fDescriptionView->MakeEditable(false);
 		
 		BLayoutBuilder::Group<>(fLayout)
 			.Add(fDescriptionView)
@@ -172,7 +173,7 @@ public:
 
 	void SetPackage(const PackageInfo& package)
 	{
-		fDescriptionView->SetText(package.Description());
+		fDescriptionView->SetText(package.FullDescription());
 	}
 
 	void Clear()

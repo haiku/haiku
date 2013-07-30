@@ -130,7 +130,8 @@ PackageInfo::PackageInfo()
 	:
 	fTitle(),
 	fVersion(),
-	fDescription(),
+	fShortDescription(),
+	fFullDescription(),
 	fChangelog(),
 	fUserRatings()
 {
@@ -138,11 +139,13 @@ PackageInfo::PackageInfo()
 
 
 PackageInfo::PackageInfo(const BString& title, const BString& version,
-		const BString& description, const BString& changelog)
+		const BString& shortDescription, const BString& fullDescription,
+		const BString& changelog)
 	:
 	fTitle(title),
 	fVersion(version),
-	fDescription(description),
+	fShortDescription(shortDescription),
+	fFullDescription(fullDescription),
 	fChangelog(changelog),
 	fUserRatings()
 {
@@ -153,7 +156,8 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 	:
 	fTitle(other.fTitle),
 	fVersion(other.fVersion),
-	fDescription(other.fDescription),
+	fShortDescription(other.fShortDescription),
+	fFullDescription(other.fFullDescription),
 	fChangelog(other.fChangelog),
 	fUserRatings(other.fUserRatings)
 {
@@ -165,7 +169,8 @@ PackageInfo::operator=(const PackageInfo& other)
 {
 	fTitle = other.fTitle;
 	fVersion = other.fVersion;
-	fDescription = other.fDescription;
+	fShortDescription = other.fShortDescription;
+	fFullDescription = other.fFullDescription;
 	fChangelog = other.fChangelog;
 	fUserRatings = other.fUserRatings;
 	return *this;
@@ -177,7 +182,8 @@ PackageInfo::operator==(const PackageInfo& other) const
 {
 	return fTitle == other.fTitle
 		&& fVersion == other.fVersion
-		&& fDescription == other.fDescription
+		&& fShortDescription == other.fShortDescription
+		&& fFullDescription == other.fFullDescription
 		&& fChangelog == other.fChangelog
 		&& fUserRatings == other.fUserRatings;
 }

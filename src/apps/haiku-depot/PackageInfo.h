@@ -46,6 +46,8 @@ public:
 									{ return fUserInfo; }
 			const BString&		Comment() const
 									{ return fComment; }
+			const BString&		Language() const
+									{ return fLanguage; }
 			const float			Rating() const
 									{ return fRating; }
 			const BString&		PackageVersion() const
@@ -68,7 +70,8 @@ public:
 								PackageInfo();
 								PackageInfo(const BString& title,
 									const BString& version,
-									const BString& description,
+									const BString& shortDescription,
+									const BString& fullDescription,
 									const BString& changelog);
 								PackageInfo(const PackageInfo& other);
 
@@ -80,8 +83,10 @@ public:
 									{ return fTitle; }
 			const BString&		Version() const
 									{ return fVersion; }
-			const BString&		Description() const
-									{ return fDescription; }
+			const BString&		ShortDescription() const
+									{ return fShortDescription; }
+			const BString&		FullDescription() const
+									{ return fFullDescription; }
 			const BString&		Changelog() const
 									{ return fChangelog; }
 
@@ -90,7 +95,8 @@ public:
 private:
 			BString				fTitle;
 			BString				fVersion;
-			BString				fDescription;
+			BString				fShortDescription;
+			BString				fFullDescription;
 			BString				fChangelog;
 			UserRatingList		fUserRatings;
 };
