@@ -260,7 +260,7 @@ PackageRow::PackageRow(const PackageInfo& package)
 	SetField(new BStringField("n/a"), kRatingColumn);
 
 	// Description
-	SetField(new BStringField(package.Description()), kDescriptionColumn);
+	SetField(new BStringField(package.ShortDescription()), kDescriptionColumn);
 
 	// Size
 	// TODO: Store package size
@@ -279,15 +279,15 @@ PackageListView::PackageListView()
 	:
 	BColumnListView("package list view", 0, B_FANCY_BORDER, true)
 {
-	AddColumn(new PackageColumn(B_TRANSLATE("Name"), 150, 50, 500,
+	AddColumn(new PackageColumn(B_TRANSLATE("Name"), 150, 50, 300,
 		B_TRUNCATE_MIDDLE), kTitleColumn);
-	AddColumn(new PackageColumn(B_TRANSLATE("Rating"), 100, 50, 500,
+	AddColumn(new PackageColumn(B_TRANSLATE("Rating"), 80, 50, 100,
 		B_TRUNCATE_MIDDLE), kRatingColumn);
-	AddColumn(new PackageColumn(B_TRANSLATE("Description"), 130, 50, 500,
+	AddColumn(new PackageColumn(B_TRANSLATE("Description"), 300, 80, 1000,
 		B_TRUNCATE_MIDDLE), kDescriptionColumn);
-	AddColumn(new PackageColumn(B_TRANSLATE("Size"), 100, 50, 500,
+	AddColumn(new PackageColumn(B_TRANSLATE("Size"), 60, 50, 100,
 		B_TRUNCATE_END), kSizeColumn);
-	AddColumn(new PackageColumn(B_TRANSLATE("Status"), 100, 50, 500,
+	AddColumn(new PackageColumn(B_TRANSLATE("Status"), 60, 60, 100,
 		B_TRUNCATE_END), kStatusColumn);
 
 	SetSortingEnabled(true);
