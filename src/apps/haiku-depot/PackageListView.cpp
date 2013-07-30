@@ -22,16 +22,16 @@
 class BBitmapStringField : public BStringField {
 	typedef BStringField Inherited;
 public:
-								BBitmapStringField(BBitmap* bitmap,
+								BBitmapStringField(const BBitmap* bitmap,
 									const char* string);
 	virtual						~BBitmapStringField();
 
-			void				SetBitmap(BBitmap* bitmap);
+			void				SetBitmap(const BBitmap* bitmap);
 			const BBitmap*		Bitmap() const
 									{ return fBitmap; }
 
 private:
-			BBitmap*			fBitmap;
+			const BBitmap*		fBitmap;
 };
 
 
@@ -79,7 +79,8 @@ private:
 
 
 // TODO: Code-duplication with DriveSetup PartitionList.cpp
-BBitmapStringField::BBitmapStringField(BBitmap* bitmap, const char* string)
+BBitmapStringField::BBitmapStringField(const BBitmap* bitmap,
+		const char* string)
 	:
 	Inherited(string),
 	fBitmap(bitmap)
@@ -89,14 +90,12 @@ BBitmapStringField::BBitmapStringField(BBitmap* bitmap, const char* string)
 
 BBitmapStringField::~BBitmapStringField()
 {
-	delete fBitmap;
 }
 
 
 void
-BBitmapStringField::SetBitmap(BBitmap* bitmap)
+BBitmapStringField::SetBitmap(const BBitmap* bitmap)
 {
-	delete fBitmap;
 	fBitmap = bitmap;
 	// TODO: cause a redraw?
 }
@@ -248,11 +247,11 @@ PackageRow::PackageRow(const PackageInfo& package)
 	Inherited(),
 	fPackage(package)
 {
-	// Package icon
-
-	BBitmap* icon = NULL;
-	// TODO: Fetch package icon
-
+	// Package icon and title
+	// NOTE: The icon BBitmap is referenced by the fPackage member.
+	const BBitmap* icon = NULL;
+	if (package.Icon().Get() != NULL)
+		icon = package.Icon()->Bitmap();
 	SetField(new BBitmapStringField(icon, package.Title()), kTitleColumn);
 
 	// Rating

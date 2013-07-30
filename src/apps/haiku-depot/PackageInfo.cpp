@@ -7,26 +7,55 @@
 
 #include <stdio.h>
 
+#include <Bitmap.h>
+
+
+// #pragma mark - SharedBitmap
+
+
+SharedBitmap::SharedBitmap(BBitmap* bitmap)
+	:
+	fBitmap(bitmap)
+{
+}
+
+
+SharedBitmap::~SharedBitmap()
+{
+	delete fBitmap;
+}
+
 
 // #pragma mark - UserInfo
 
 
 UserInfo::UserInfo()
 	:
+	fAvatar(),
 	fNickName()
 {
 }
 
 
-UserInfo::UserInfo(const BString& fNickName)
+UserInfo::UserInfo(const BString& nickName)
 	:
-	fNickName(fNickName)
+	fAvatar(),
+	fNickName(nickName)
+{
+}
+
+
+UserInfo::UserInfo(const BitmapRef& avatar, const BString& nickName)
+	:
+	fAvatar(avatar),
+	fNickName(nickName)
 {
 }
 
 
 UserInfo::UserInfo(const UserInfo& other)
 	:
+	fAvatar(other.fAvatar),
 	fNickName(other.fNickName)
 {
 }
@@ -35,6 +64,7 @@ UserInfo::UserInfo(const UserInfo& other)
 UserInfo&
 UserInfo::operator=(const UserInfo& other)
 {
+	fAvatar = other.fAvatar;
 	fNickName = other.fNickName;
 	return *this;
 }
@@ -43,7 +73,8 @@ UserInfo::operator=(const UserInfo& other)
 bool
 UserInfo::operator==(const UserInfo& other) const
 {
-	return fNickName == other.fNickName;
+	return fAvatar == other.fAvatar
+		&& fNickName == other.fNickName;
 }
 
 
@@ -128,6 +159,7 @@ UserRating::operator!=(const UserRating& other) const
 
 PackageInfo::PackageInfo()
 	:
+	fIcon(),
 	fTitle(),
 	fVersion(),
 	fShortDescription(),
@@ -138,10 +170,11 @@ PackageInfo::PackageInfo()
 }
 
 
-PackageInfo::PackageInfo(const BString& title, const BString& version,
-		const BString& shortDescription, const BString& fullDescription,
-		const BString& changelog)
+PackageInfo::PackageInfo(const BitmapRef& icon, const BString& title,
+		const BString& version, const BString& shortDescription,
+		const BString& fullDescription, const BString& changelog)
 	:
+	fIcon(icon),
 	fTitle(title),
 	fVersion(version),
 	fShortDescription(shortDescription),
@@ -154,6 +187,7 @@ PackageInfo::PackageInfo(const BString& title, const BString& version,
 
 PackageInfo::PackageInfo(const PackageInfo& other)
 	:
+	fIcon(other.fIcon),
 	fTitle(other.fTitle),
 	fVersion(other.fVersion),
 	fShortDescription(other.fShortDescription),
@@ -167,6 +201,7 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 PackageInfo&
 PackageInfo::operator=(const PackageInfo& other)
 {
+	fIcon = other.fIcon;
 	fTitle = other.fTitle;
 	fVersion = other.fVersion;
 	fShortDescription = other.fShortDescription;
@@ -180,7 +215,8 @@ PackageInfo::operator=(const PackageInfo& other)
 bool
 PackageInfo::operator==(const PackageInfo& other) const
 {
-	return fTitle == other.fTitle
+	return fIcon == other.fIcon
+		&& fTitle == other.fTitle
 		&& fVersion == other.fVersion
 		&& fShortDescription == other.fShortDescription
 		&& fFullDescription == other.fFullDescription

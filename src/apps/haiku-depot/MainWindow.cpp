@@ -153,6 +153,7 @@ MainWindow::_InitDummyModel()
 	DepotInfo depot(B_TRANSLATE("Default"));
 
 	PackageInfo wonderbrush(
+		BitmapRef(),
 		"WonderBrush",
 		"2.1.2",
 		"A vector based graphics editor.",
@@ -171,6 +172,7 @@ MainWindow::_InitDummyModel()
 	depot.AddPackage(wonderbrush);
 
 	PackageInfo paladin(
+		BitmapRef(),
 		"Paladin",
 		"1.2.0",
 		"A C/C++ IDE based on Pe.",

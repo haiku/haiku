@@ -6,24 +6,50 @@
 #define PACKAGE_INFO_H
 
 
+#include <Referenceable.h>
 #include <String.h>
 
 #include "List.h"
+
+
+class BBitmap;
+
+
+class SharedBitmap : public BReferenceable {
+public:
+								SharedBitmap(BBitmap* bitmap);
+								~SharedBitmap();
+
+			const BBitmap*		Bitmap() const
+									{ return fBitmap; }
+
+private:
+			BBitmap*			fBitmap;
+};
+
+
+typedef BReference<SharedBitmap> BitmapRef;
 
 
 class UserInfo {
 public:
 								UserInfo();
 								UserInfo(const BString& nickName);
+								UserInfo(const BitmapRef& avatar,
+									const BString& nickName);
 								UserInfo(const UserInfo& other);
 
 			UserInfo&			operator=(const UserInfo& other);
 			bool				operator==(const UserInfo& other) const;
 			bool				operator!=(const UserInfo& other) const;
 
-			const BString&		NickName() const;
+			const BitmapRef&	Avatar() const
+									{ return fAvatar; }
+			const BString&		NickName() const
+									{ return fNickName; }
 
 private:
+			BitmapRef		fAvatar;
 			BString				fNickName;
 };
 
@@ -68,7 +94,8 @@ typedef List<UserRating, false> UserRatingList;
 class PackageInfo {
 public:
 								PackageInfo();
-								PackageInfo(const BString& title,
+								PackageInfo(const BitmapRef& icon,
+									const BString& title,
 									const BString& version,
 									const BString& shortDescription,
 									const BString& fullDescription,
@@ -79,6 +106,8 @@ public:
 			bool				operator==(const PackageInfo& other) const;
 			bool				operator!=(const PackageInfo& other) const;
 
+			const BitmapRef&	Icon() const
+									{ return fIcon; }
 			const BString&		Title() const
 									{ return fTitle; }
 			const BString&		Version() const
@@ -93,6 +122,7 @@ public:
 			bool				AddUserRating(const UserRating& rating);
 
 private:
+			BitmapRef			fIcon;
 			BString				fTitle;
 			BString				fVersion;
 			BString				fShortDescription;
