@@ -166,17 +166,17 @@ DefaultDecorator::GetSettings(BMessage* settings) const
 
 
 void
-DefaultDecorator::Draw(BRect update)
+DefaultDecorator::Draw(BRect updateRect)
 {
 	STRACE(("DefaultDecorator: Draw(%.1f,%.1f,%.1f,%.1f)\n",
-		update.left, update.top, update.right, update.bottom));
+		updateRect.left, updateRect.top, updateRect.right, updateRect.bottom));
 
 	// We need to draw a few things: the tab, the resize knob, the borders,
 	// and the buttons
 	fDrawingEngine->SetDrawState(&fDrawState);
 
-	_DrawFrame(update);
-	_DrawTabs(update);
+	_DrawFrame(updateRect);
+	_DrawTabs(updateRect);
 }
 
 
