@@ -52,6 +52,7 @@ private:
 	int						fPortCount;
 	uint32					fPortImplementedMask;
 	uint8					fIRQ;
+	bool					fUseMSI;
 	AHCIPort *				fPort[32];
 
 // --- Instance check workaround begin
