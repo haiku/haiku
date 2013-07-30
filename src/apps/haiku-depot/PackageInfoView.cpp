@@ -10,31 +10,108 @@
 
 #include <Bitmap.h>
 #include <Button.h>
+#include <CardLayout.h>
 #include <Catalog.h>
 #include <LayoutBuilder.h>
 #include <Message.h>
+#include <StringView.h>
 
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "PackageInfoView"
 
 
-class TitleView : public BView {
+class BitmapView : public BView {
 public:
-	TitleView()
+	BitmapView(const char* name)
 		:
-		BView("title view", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
-		fIcon(NULL),
-		fTitle()
+		BView(name, B_WILL_DRAW),
+		fBitmap(NULL)
 	{
 		SetViewColor(B_TRANSPARENT_COLOR);
 		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetDrawingMode(B_OP_OVER);
+	}
+	
+	virtual ~BitmapView()
+	{
+		delete fBitmap;
+	}
+
+	virtual void Draw(BRect updateRect)
+	{
+		BRect bounds(Bounds());
+		FillRect(updateRect, B_SOLID_LOW);
 		
+		if (fBitmap == NULL)
+			return;
+
+		DrawBitmap(fBitmap, fBitmap->Bounds(), bounds);
+	}
+
+	virtual BSize MinSize()
+	{
+		BSize size(0.0f, 0.0f);
+		
+		if (fBitmap != NULL) {
+			BRect bounds = fBitmap->Bounds();
+			size.width = bounds.Width();
+			size.height = bounds.Height();
+		}
+		
+		return size;
+	}
+
+	virtual BSize MaxSize()
+	{
+		return MinSize();
+	}
+	
+	void SetBitmap(BBitmap* bitmap)
+	{
+		if (bitmap == fBitmap)
+			return;
+
+		BSize size = MinSize();
+
+		delete fBitmap;
+		fBitmap = bitmap;
+		
+		BSize newSize = MinSize();
+		if (size != newSize)
+			InvalidateLayout();
+		
+		Invalidate();
+	}
+
+private:
+	BBitmap*	fBitmap;
+};
+
+
+// #pragma mark - TitleView
+
+
+class TitleView : public BGroupView {
+public:
+	TitleView()
+		:
+		BGroupView("title view", B_HORIZONTAL)
+	{
+		fIconView = new BitmapView("package icon view");
+		fTitleView = new BStringView("package title view", "");
+
 		// Title font
 		BFont font;
 		GetFont(&font);
 		font.SetSize(font.Size() * 2.0f);
-		SetFont(&font);
+		fTitleView->SetFont(&font);
+	
+		BLayoutBuilder::Group<>(this)
+			.Add(fIconView)
+			.Add(fTitleView)
+			.AddGlue()
+		;
 	}
 	
 	virtual ~TitleView()
@@ -42,76 +119,93 @@ public:
 		Clear();
 	}
 
-	virtual void Draw(BRect updateRect)
-	{
-		BPoint offset(B_ORIGIN);
-		BRect bounds(Bounds());
-		
-		FillRect(updateRect, B_SOLID_LOW);
-		
-		if (fIcon != NULL) {
-			// TODO: ...
-		}
-		
-		if (fTitle.Length() > 0) {
-			// TODO: Truncate title
-			font_height fontHeight;
-			GetFontHeight(&fontHeight);
-
-			offset.y = ceilf((bounds.Height() + fontHeight.ascent) / 2.0f);
-			DrawString(fTitle.String(), offset);
-		}
-	}
-
-	virtual BSize MinSize()
-	{
-		BSize size(0.0f, 0.0f);
-		
-		if (fTitle.Length() > 0) {
-			font_height fontHeight;
-			GetFontHeight(&fontHeight);
-
-			size.width = StringWidth(fTitle.String());
-			size.height = ceilf(fontHeight.ascent + fontHeight.descent);
-		}
-		
-		return size;
-	}
-	
 	void SetPackage(const PackageInfo& package)
 	{
 		// TODO: Fetch icon
-		fTitle = package.Title();
+		fTitleView->SetText(package.Title());
 		InvalidateLayout();
 		Invalidate();
 	}
 
 	void Clear()
 	{
-		delete fIcon;
-		fIcon = NULL;
-		fTitle = "";
-
-		if (Parent() != NULL) {
-			InvalidateLayout();
-			Invalidate();
-		}
+		fTitleView->SetText("");
 	}
 
 private:
-	BBitmap*	fIcon;
-	BString		fTitle;
+	BitmapView*		fIconView;
+	BStringView*	fTitleView;
 };
+
+
+// #pragma mark - AboutView
+
+
+class AboutView : public BView {
+public:
+	AboutView()
+		:
+		BView("about view", B_WILL_DRAW),
+		fLayout(new BGroupLayout(B_VERTICAL))
+	{
+		SetViewColor(B_TRANSPARENT_COLOR);
+		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		
+		SetLayout(fLayout);
+		
+		fDescriptionView = new BTextView("description view");
+		fDescriptionView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		
+		BLayoutBuilder::Group<>(fLayout)
+			.Add(fDescriptionView)
+		;
+	}
+	
+	virtual ~AboutView()
+	{
+		Clear();
+	}
+
+	virtual void Draw(BRect updateRect)
+	{
+	}
+
+	void SetPackage(const PackageInfo& package)
+	{
+		fDescriptionView->SetText(package.Description());
+	}
+
+	void Clear()
+	{
+		fDescriptionView->SetText("");
+	}
+
+private:
+	BGroupLayout*	fLayout;
+	BTextView*		fDescriptionView;
+	
+};
+
+
+// #pragma mark - PagesView
 
 
 class PagesView : public BView {
 public:
 	PagesView()
 		:
-		BView("pages view", B_WILL_DRAW)
+		BView("pages view", B_WILL_DRAW),
+		fLayout(new BCardLayout())
 	{
 		SetViewColor(B_TRANSPARENT_COLOR);
 		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetLayout(fLayout);
+		
+		fAboutView = new AboutView();
+		
+		fLayout->AddView(fAboutView);
+		
+		fLayout->SetVisibleItem(0L);
 	}
 	
 	virtual ~PagesView()
@@ -125,14 +219,22 @@ public:
 
 	void SetPackage(const PackageInfo& package)
 	{
+		fAboutView->SetPackage(package);
 	}
 
 	void Clear()
 	{
+		fAboutView->Clear();
 	}
 
 private:
+	BCardLayout*	fLayout;
+	
+	AboutView*		fAboutView;
 };
+
+
+// #pragma mark - PackageInfoView
 
 
 PackageInfoView::PackageInfoView()
@@ -143,7 +245,7 @@ PackageInfoView::PackageInfoView()
 	fPagesView = new PagesView();
 
 	BLayoutBuilder::Group<>(this)
-		.Add(fTitleView)
+		.Add(fTitleView, 0.0f)
 		.Add(fPagesView)
 	;
 }
