@@ -29,6 +29,14 @@
 
 static const float kResizeKnobSize = 18.0;
 
+
+static const rgb_color kFrameColors[4] = {
+	{ 152, 152, 152, 255 },
+	{ 240, 240, 240, 255 },
+	{ 152, 152, 152, 255 },
+	{ 108, 108, 108, 255 }
+};
+
 static const rgb_color kHighlightFrameColors[6] = {
 	{ 52, 52, 52, 255 },
 	{ 140, 140, 140, 255 },

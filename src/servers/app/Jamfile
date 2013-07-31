@@ -17,6 +17,7 @@ local decorator_src =
 	DefaultDecorator.cpp
 	DefaultWindowBehaviour.cpp
 	MagneticBorder.cpp
+	TabDecorator.cpp
 	WindowBehaviour.cpp
 	;
 

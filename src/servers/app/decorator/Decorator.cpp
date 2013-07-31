@@ -47,10 +47,8 @@ Decorator::Tab::Tab()
 	Does general initialization of internal data members and creates a colorset
 	object.
 
-	\param rect Size of client area
-	\param wlook style of window look. See Window.h
-	\param wfeel style of window feel. See Window.h
-	\param wflags various window flags. See Window.h
+	\param settings DesktopSettings pointer.
+	\param rect Size of client area.
 */
 Decorator::Decorator(DesktopSettings& settings, BRect rect)
 	:
@@ -70,8 +68,7 @@ Decorator::Decorator(DesktopSettings& settings, BRect rect)
 }
 
 
-/*!
-	\brief Destructor
+/*!	\brief Destructor
 
 	Frees the color set and the title string
 */
@@ -677,6 +674,7 @@ Decorator::DrawClose(int32 tab)
 	Decorator::Tab* decoratorTab = fTabList.ItemAt(tab);
 	if (decoratorTab == NULL)
 		return;
+
 	_DrawClose(decoratorTab, true, decoratorTab->closeRect);
 }
 
@@ -688,6 +686,7 @@ Decorator::DrawMinimize(int32 tab)
 	Decorator::Tab* decoratorTab = fTabList.ItemAt(tab);
 	if (decoratorTab == NULL)
 		return;
+
 	_DrawTab(decoratorTab, decoratorTab->minimizeRect);
 }
 
