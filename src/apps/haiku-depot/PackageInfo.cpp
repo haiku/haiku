@@ -41,6 +41,9 @@ SharedBitmap::SharedBitmap(int32 resourceID)
 const BBitmap*
 SharedBitmap::Bitmap(Size which)
 {
+	if (fResourceID == -1)
+		return fBitmap[0];
+	
 	int32 index = 0;
 	int32 size = 16;
 
