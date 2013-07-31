@@ -35,7 +35,6 @@ public:
 	
 	virtual ~BitmapView()
 	{
-		delete fBitmap;
 	}
 
 	virtual void Draw(BRect updateRect)
@@ -67,14 +66,13 @@ public:
 		return MinSize();
 	}
 	
-	void SetBitmap(BBitmap* bitmap)
+	void SetBitmap(const BBitmap* bitmap)
 	{
 		if (bitmap == fBitmap)
 			return;
 
 		BSize size = MinSize();
 
-		delete fBitmap;
 		fBitmap = bitmap;
 		
 		BSize newSize = MinSize();
@@ -85,7 +83,7 @@ public:
 	}
 
 private:
-	BBitmap*	fBitmap;
+	const BBitmap*	fBitmap;
 };
 
 
@@ -121,8 +119,13 @@ public:
 
 	void SetPackage(const PackageInfo& package)
 	{
-		// TODO: Fetch icon
+		if (package.Icon().Get() != NULL)
+			fIconView->SetBitmap(package.Icon()->Bitmap(SharedBitmap::SIZE_32));
+		else
+			fIconView->SetBitmap(NULL);
+
 		fTitleView->SetText(package.Title());
+
 		InvalidateLayout();
 		Invalidate();
 	}
@@ -277,14 +280,16 @@ PackageInfoView::MessageReceived(BMessage* message)
 void
 PackageInfoView::SetPackage(const PackageInfo& package)
 {
-	fTitleView->SetPackage(package);
-	fPagesView->SetPackage(package);
+	fPackageInfo = package;
+	fTitleView->SetPackage(fPackageInfo);
+	fPagesView->SetPackage(fPackageInfo);
 }
 
 
 void
 PackageInfoView::Clear()
 {
+	fPackageInfo = PackageInfo();
 	fTitleView->Clear();
 	fPagesView->Clear();
 }

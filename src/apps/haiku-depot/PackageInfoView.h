@@ -28,6 +28,7 @@ public:
 private:
 			TitleView*			fTitleView;
 			PagesView*			fPagesView;
+			PackageInfo			fPackageInfo;
 };
 
 #endif // PACKAGE_INFO_VIEW_H

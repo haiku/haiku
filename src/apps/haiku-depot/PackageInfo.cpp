@@ -7,7 +7,12 @@
 
 #include <stdio.h>
 
+#include <Application.h>
 #include <Bitmap.h>
+#include <IconUtils.h>
+#include <Resources.h>
+
+#include "support.h"
 
 
 // #pragma mark - SharedBitmap
@@ -15,14 +20,87 @@
 
 SharedBitmap::SharedBitmap(BBitmap* bitmap)
 	:
-	fBitmap(bitmap)
+	fResourceID(-1)
 {
+	fBitmap[0] = bitmap;
+	fBitmap[1] = NULL;
+	fBitmap[2] = NULL;
+}
+
+
+SharedBitmap::SharedBitmap(int32 resourceID)
+	:
+	fResourceID(resourceID)
+{
+	fBitmap[0] = NULL;
+	fBitmap[1] = NULL;
+	fBitmap[2] = NULL;
+}
+
+
+const BBitmap*
+SharedBitmap::Bitmap(Size which)
+{
+	int32 index = 0;
+	int32 size = 16;
+
+	switch (which) {
+		default:
+		case SIZE_16:
+			break;
+
+		case SIZE_32:
+			index = 1;
+			size = 32;
+			break;
+		case SIZE_64:
+			index = 2;
+			size = 64;
+			break;
+	}
+	
+	if (fBitmap[index] == NULL)
+		fBitmap[index] = _CreateBitmap(size);
+	
+	return fBitmap[index];
+}
+
+
+BBitmap*
+SharedBitmap::_CreateBitmap(int32 size) const
+{
+	BResources resources;
+	status_t status = get_app_resources(resources);
+	if (status != B_OK)
+		return NULL;
+
+	size_t dataSize;
+	const void* data = resources.LoadResource(B_VECTOR_ICON_TYPE, fResourceID,
+		&dataSize);
+	if (data == NULL)
+		return NULL;
+
+	BBitmap* bitmap = new BBitmap(BRect(0, 0, size - 1, size - 1), 0, B_RGBA32);
+	status = bitmap->InitCheck();
+	if (status == B_OK) {
+		status = BIconUtils::GetVectorIcon(
+			reinterpret_cast<const uint8*>(data), dataSize, bitmap);
+	};
+
+	if (status != B_OK) {
+		delete bitmap;
+		bitmap = NULL;
+	}
+	
+	return bitmap;
 }
 
 
 SharedBitmap::~SharedBitmap()
 {
-	delete fBitmap;
+	delete fBitmap[0];
+	delete fBitmap[1];
+	delete fBitmap[2];
 }
 
 

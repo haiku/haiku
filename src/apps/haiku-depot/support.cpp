@@ -9,10 +9,13 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <Application.h>
 #include <Directory.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <Path.h>
+#include <Resources.h>
+#include <Roster.h>
 #include <Screen.h>
 
 
@@ -128,5 +131,17 @@ make_sure_frame_is_on_screen(BRect& frame, float borderWidth,
 
 	delete screen;
 	return true;
+}
+
+
+status_t
+get_app_resources(BResources& resources)
+{
+	app_info info;
+	status_t status = be_app->GetAppInfo(&info);
+	if (status != B_OK)
+		return status;
+
+	return resources.SetTo(&info.ref);
 }
 

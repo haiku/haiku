@@ -10,6 +10,7 @@
 
 
 class BMessage;
+class BResources;
 class BWindow;
 
 
@@ -21,6 +22,8 @@ status_t save_settings(BMessage* message, const char* fileName,
 
 bool make_sure_frame_is_on_screen(BRect& frame, float borderWidth = 5.0f,
 	float tabHeight = 20.0f, BWindow* window = NULL);
+
+status_t get_app_resources(BResources& resources);
 
 
 #endif // SUPPORT_H

@@ -17,14 +17,24 @@ class BBitmap;
 
 class SharedBitmap : public BReferenceable {
 public:
+		enum Size {
+			SIZE_16 = 0,
+			SIZE_32 = 1,
+			SIZE_64 = 2
+		};
+
 								SharedBitmap(BBitmap* bitmap);
+								SharedBitmap(int32 resourceID);
 								~SharedBitmap();
 
-			const BBitmap*		Bitmap() const
-									{ return fBitmap; }
+			const BBitmap*		Bitmap(Size which);
 
 private:
-			BBitmap*			fBitmap;
+			BBitmap*			_CreateBitmap(int32 size) const;
+
+private:
+			int32				fResourceID;
+			BBitmap*			fBitmap[3];
 };
 
 
@@ -49,7 +59,7 @@ public:
 									{ return fNickName; }
 
 private:
-			BitmapRef		fAvatar;
+			BitmapRef			fAvatar;
 			BString				fNickName;
 };
 

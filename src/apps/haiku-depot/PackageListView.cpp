@@ -251,7 +251,7 @@ PackageRow::PackageRow(const PackageInfo& package)
 	// NOTE: The icon BBitmap is referenced by the fPackage member.
 	const BBitmap* icon = NULL;
 	if (package.Icon().Get() != NULL)
-		icon = package.Icon()->Bitmap();
+		icon = package.Icon()->Bitmap(SharedBitmap::SIZE_16);
 	SetField(new BBitmapStringField(icon, package.Title()), kTitleColumn);
 
 	// Rating
