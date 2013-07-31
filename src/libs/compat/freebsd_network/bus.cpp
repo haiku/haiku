@@ -382,14 +382,14 @@ bus_setup_intr(device_t dev, struct resource *res, int flags,
 		// this is an msi, enable it
 		pci_info *info
 			= &((struct root_device_softc *)dev->root->softc)->pci_info;
-		if (&((struct root_device_softc *)dev->root->softc)->is_msi) {
+		if (((struct root_device_softc *)dev->root->softc)->is_msi) {
 			if (gPCIx86->enable_msi(info->bus, info->device,
 					info->function) != B_OK) {
 				device_printf(dev, "enabling msi failed\n");
 				bus_teardown_intr(dev, res, intr);
 				return ENODEV;
 			}
-		} else if (&((struct root_device_softc *)dev->root->softc)->is_msix) {
+		} else if (((struct root_device_softc *)dev->root->softc)->is_msix) {
 			if (gPCIx86->enable_msix(info->bus, info->device,
 					info->function) != B_OK) {
 				device_printf(dev, "enabling msix failed\n");
