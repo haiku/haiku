@@ -25,15 +25,18 @@ public:
 
 								SharedBitmap(BBitmap* bitmap);
 								SharedBitmap(int32 resourceID);
+								SharedBitmap(const char* mimeType);
 								~SharedBitmap();
 
 			const BBitmap*		Bitmap(Size which);
 
 private:
-			BBitmap*			_CreateBitmap(int32 size) const;
+			BBitmap*			_CreateBitmapFromResource(int32 size) const;
+			BBitmap*			_CreateBitmapFromMimeType(int32 size) const;
 
 private:
 			int32				fResourceID;
+			BString				fMimeType;
 			BBitmap*			fBitmap[3];
 };
 
@@ -109,6 +112,8 @@ public:
 									const BString& version,
 									const BString& shortDescription,
 									const BString& fullDescription,
+									const BString& publisherEmail,
+									const BString& publisherWebsite,
 									const BString& changelog);
 								PackageInfo(const PackageInfo& other);
 
@@ -126,6 +131,10 @@ public:
 									{ return fShortDescription; }
 			const BString&		FullDescription() const
 									{ return fFullDescription; }
+			const BString&		PublisherEmail() const
+									{ return fPublisherEmail; }
+			const BString&		PublisherWebsite() const
+									{ return fPublisherWebsite; }
 			const BString&		Changelog() const
 									{ return fChangelog; }
 
@@ -137,6 +146,8 @@ private:
 			BString				fVersion;
 			BString				fShortDescription;
 			BString				fFullDescription;
+			BString				fPublisherEmail;
+			BString				fPublisherWebsite;
 			BString				fChangelog;
 			UserRatingList		fUserRatings;
 };

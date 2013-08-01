@@ -10,6 +10,7 @@
 #include <Application.h>
 #include <Bitmap.h>
 #include <IconUtils.h>
+#include <MimeType.h>
 #include <Resources.h>
 
 #include "support.h"
@@ -20,7 +21,8 @@
 
 SharedBitmap::SharedBitmap(BBitmap* bitmap)
 	:
-	fResourceID(-1)
+	fResourceID(-1),
+	fMimeType()
 {
 	fBitmap[0] = bitmap;
 	fBitmap[1] = NULL;
@@ -30,11 +32,31 @@ SharedBitmap::SharedBitmap(BBitmap* bitmap)
 
 SharedBitmap::SharedBitmap(int32 resourceID)
 	:
-	fResourceID(resourceID)
+	fResourceID(resourceID),
+	fMimeType()
 {
 	fBitmap[0] = NULL;
 	fBitmap[1] = NULL;
 	fBitmap[2] = NULL;
+}
+
+
+SharedBitmap::SharedBitmap(const char* mimeType)
+	:
+	fResourceID(-1),
+	fMimeType(mimeType)
+{
+	fBitmap[0] = NULL;
+	fBitmap[1] = NULL;
+	fBitmap[2] = NULL;
+}
+
+
+SharedBitmap::~SharedBitmap()
+{
+	delete fBitmap[0];
+	delete fBitmap[1];
+	delete fBitmap[2];
 }
 
 
@@ -62,15 +84,19 @@ SharedBitmap::Bitmap(Size which)
 			break;
 	}
 	
-	if (fBitmap[index] == NULL)
-		fBitmap[index] = _CreateBitmap(size);
+	if (fBitmap[index] == NULL) {
+		if (fResourceID >= 0)
+			fBitmap[index] = _CreateBitmapFromResource(size);
+		else if (fMimeType.Length() > 0)
+			fBitmap[index] = _CreateBitmapFromMimeType(size);
+	}
 	
 	return fBitmap[index];
 }
 
 
 BBitmap*
-SharedBitmap::_CreateBitmap(int32 size) const
+SharedBitmap::_CreateBitmapFromResource(int32 size) const
 {
 	BResources resources;
 	status_t status = get_app_resources(resources);
@@ -99,11 +125,25 @@ SharedBitmap::_CreateBitmap(int32 size) const
 }
 
 
-SharedBitmap::~SharedBitmap()
+BBitmap*
+SharedBitmap::_CreateBitmapFromMimeType(int32 size) const
 {
-	delete fBitmap[0];
-	delete fBitmap[1];
-	delete fBitmap[2];
+	BMimeType mimeType(fMimeType.String());
+	status_t status = mimeType.InitCheck();
+	if (status != B_OK)
+		return NULL;
+
+	BBitmap* bitmap = new BBitmap(BRect(0, 0, size - 1, size - 1), 0, B_RGBA32);
+	status = bitmap->InitCheck();
+	if (status == B_OK)
+		status = mimeType.GetIcon(bitmap, B_LARGE_ICON);
+
+	if (status != B_OK) {
+		delete bitmap;
+		bitmap = NULL;
+	}
+	
+	return bitmap;
 }
 
 
@@ -245,6 +285,8 @@ PackageInfo::PackageInfo()
 	fVersion(),
 	fShortDescription(),
 	fFullDescription(),
+	fPublisherEmail(),
+	fPublisherWebsite(),
 	fChangelog(),
 	fUserRatings()
 {
@@ -253,13 +295,16 @@ PackageInfo::PackageInfo()
 
 PackageInfo::PackageInfo(const BitmapRef& icon, const BString& title,
 		const BString& version, const BString& shortDescription,
-		const BString& fullDescription, const BString& changelog)
+		const BString& fullDescription, const BString& publisherEmail,
+		const BString& publisherWebsite, const BString& changelog)
 	:
 	fIcon(icon),
 	fTitle(title),
 	fVersion(version),
 	fShortDescription(shortDescription),
 	fFullDescription(fullDescription),
+	fPublisherEmail(publisherEmail),
+	fPublisherWebsite(publisherWebsite),
 	fChangelog(changelog),
 	fUserRatings()
 {
@@ -273,6 +318,8 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 	fVersion(other.fVersion),
 	fShortDescription(other.fShortDescription),
 	fFullDescription(other.fFullDescription),
+	fPublisherEmail(other.fPublisherEmail),
+	fPublisherWebsite(other.fPublisherWebsite),
 	fChangelog(other.fChangelog),
 	fUserRatings(other.fUserRatings)
 {
@@ -287,6 +334,8 @@ PackageInfo::operator=(const PackageInfo& other)
 	fVersion = other.fVersion;
 	fShortDescription = other.fShortDescription;
 	fFullDescription = other.fFullDescription;
+	fPublisherEmail = other.fPublisherEmail;
+	fPublisherWebsite = other.fPublisherWebsite;
 	fChangelog = other.fChangelog;
 	fUserRatings = other.fUserRatings;
 	return *this;
@@ -301,6 +350,8 @@ PackageInfo::operator==(const PackageInfo& other) const
 		&& fVersion == other.fVersion
 		&& fShortDescription == other.fShortDescription
 		&& fFullDescription == other.fFullDescription
+		&& fPublisherEmail == other.fPublisherEmail
+		&& fPublisherWebsite == other.fPublisherWebsite
 		&& fChangelog == other.fChangelog
 		&& fUserRatings == other.fUserRatings;
 }
