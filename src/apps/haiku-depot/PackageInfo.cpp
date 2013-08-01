@@ -275,6 +275,68 @@ UserRating::operator!=(const UserRating& other) const
 }
 
 
+// #pragma mark - PublisherInfo
+
+
+PublisherInfo::PublisherInfo()
+	:
+	fLogo(),
+	fName(),
+	fEmail(),
+	fWebsite()
+{
+}
+
+
+PublisherInfo::PublisherInfo(const BitmapRef& logo, const BString& name,
+		const BString& email, const BString& website)
+	:
+	fLogo(logo),
+	fName(name),
+	fEmail(email),
+	fWebsite(website)
+{
+}
+
+
+PublisherInfo::PublisherInfo(const PublisherInfo& other)
+	:
+	fLogo(other.fLogo),
+	fName(other.fName),
+	fEmail(other.fEmail),
+	fWebsite(other.fWebsite)
+{
+}
+
+
+PublisherInfo&
+PublisherInfo::operator=(const PublisherInfo& other)
+{
+	fLogo = other.fLogo;
+	fName = other.fName;
+	fEmail = other.fEmail;
+	fWebsite = other.fWebsite;
+	return *this;
+}
+
+
+bool
+PublisherInfo::operator==(const PublisherInfo& other) const
+{
+	return fLogo == other.fLogo
+		&& fName == other.fName
+		&& fEmail == other.fEmail
+		&& fWebsite == other.fWebsite;
+}
+
+
+bool
+PublisherInfo::operator!=(const PublisherInfo& other) const
+{
+	return !(*this == other);
+}
+
+
 // #pragma mark - PackageInfo
 
 
@@ -283,10 +345,9 @@ PackageInfo::PackageInfo()
 	fIcon(),
 	fTitle(),
 	fVersion(),
+	fPublisher(),
 	fShortDescription(),
 	fFullDescription(),
-	fPublisherEmail(),
-	fPublisherWebsite(),
 	fChangelog(),
 	fUserRatings()
 {
@@ -294,17 +355,16 @@ PackageInfo::PackageInfo()
 
 
 PackageInfo::PackageInfo(const BitmapRef& icon, const BString& title,
-		const BString& version, const BString& shortDescription,
-		const BString& fullDescription, const BString& publisherEmail,
-		const BString& publisherWebsite, const BString& changelog)
+		const BString& version, const PublisherInfo& publisher,
+		const BString& shortDescription, const BString& fullDescription,
+		const BString& changelog)
 	:
 	fIcon(icon),
 	fTitle(title),
 	fVersion(version),
+	fPublisher(publisher),
 	fShortDescription(shortDescription),
 	fFullDescription(fullDescription),
-	fPublisherEmail(publisherEmail),
-	fPublisherWebsite(publisherWebsite),
 	fChangelog(changelog),
 	fUserRatings()
 {
@@ -316,10 +376,9 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 	fIcon(other.fIcon),
 	fTitle(other.fTitle),
 	fVersion(other.fVersion),
+	fPublisher(other.fPublisher),
 	fShortDescription(other.fShortDescription),
 	fFullDescription(other.fFullDescription),
-	fPublisherEmail(other.fPublisherEmail),
-	fPublisherWebsite(other.fPublisherWebsite),
 	fChangelog(other.fChangelog),
 	fUserRatings(other.fUserRatings)
 {
@@ -332,10 +391,9 @@ PackageInfo::operator=(const PackageInfo& other)
 	fIcon = other.fIcon;
 	fTitle = other.fTitle;
 	fVersion = other.fVersion;
+	fPublisher = other.fPublisher;
 	fShortDescription = other.fShortDescription;
 	fFullDescription = other.fFullDescription;
-	fPublisherEmail = other.fPublisherEmail;
-	fPublisherWebsite = other.fPublisherWebsite;
 	fChangelog = other.fChangelog;
 	fUserRatings = other.fUserRatings;
 	return *this;
@@ -348,10 +406,9 @@ PackageInfo::operator==(const PackageInfo& other) const
 	return fIcon == other.fIcon
 		&& fTitle == other.fTitle
 		&& fVersion == other.fVersion
+		&& fPublisher == other.fPublisher
 		&& fShortDescription == other.fShortDescription
 		&& fFullDescription == other.fFullDescription
-		&& fPublisherEmail == other.fPublisherEmail
-		&& fPublisherWebsite == other.fPublisherWebsite
 		&& fChangelog == other.fChangelog
 		&& fUserRatings == other.fUserRatings;
 }

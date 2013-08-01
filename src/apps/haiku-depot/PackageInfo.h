@@ -104,16 +104,45 @@ private:
 typedef List<UserRating, false> UserRatingList;
 
 
+class PublisherInfo {
+public:
+								PublisherInfo();
+								PublisherInfo(const BitmapRef& logo,
+									const BString& name,
+									const BString& email,
+									const BString& website);
+								PublisherInfo(const PublisherInfo& other);
+
+			PublisherInfo&		operator=(const PublisherInfo& other);
+			bool				operator==(const PublisherInfo& other) const;
+			bool				operator!=(const PublisherInfo& other) const;
+
+			const BitmapRef&	Logo() const
+									{ return fLogo; }
+			const BString&		Name() const
+									{ return fName; }
+			const BString&		Email() const
+									{ return fEmail; }
+			const BString&		Website() const
+									{ return fWebsite; }
+
+private:
+			BitmapRef			fLogo;
+			BString				fName;
+			BString				fEmail;
+			BString				fWebsite;
+};
+
+
 class PackageInfo {
 public:
 								PackageInfo();
 								PackageInfo(const BitmapRef& icon,
 									const BString& title,
 									const BString& version,
+									const PublisherInfo& publisher,
 									const BString& shortDescription,
 									const BString& fullDescription,
-									const BString& publisherEmail,
-									const BString& publisherWebsite,
 									const BString& changelog);
 								PackageInfo(const PackageInfo& other);
 
@@ -131,10 +160,8 @@ public:
 									{ return fShortDescription; }
 			const BString&		FullDescription() const
 									{ return fFullDescription; }
-			const BString&		PublisherEmail() const
-									{ return fPublisherEmail; }
-			const BString&		PublisherWebsite() const
-									{ return fPublisherWebsite; }
+			const PublisherInfo& Publisher() const
+									{ return fPublisher; }
 			const BString&		Changelog() const
 									{ return fChangelog; }
 
@@ -144,10 +171,9 @@ private:
 			BitmapRef			fIcon;
 			BString				fTitle;
 			BString				fVersion;
+			PublisherInfo		fPublisher;
 			BString				fShortDescription;
 			BString				fFullDescription;
-			BString				fPublisherEmail;
-			BString				fPublisherWebsite;
 			BString				fChangelog;
 			UserRatingList		fUserRatings;
 };

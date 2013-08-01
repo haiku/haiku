@@ -203,9 +203,9 @@ public:
 	{
 		fDescriptionView->SetText(package.FullDescription());
 		fEmailIconView->SetBitmap(fEmailIcon.Bitmap(SharedBitmap::SIZE_16));
-		fEmailLinkView->SetText(package.PublisherEmail());
+		fEmailLinkView->SetText(package.Publisher().Email());
 		fWebsiteIconView->SetBitmap(fWebsiteIcon.Bitmap(SharedBitmap::SIZE_16));
-		fWebsiteLinkView->SetText(package.PublisherWebsite());
+		fWebsiteLinkView->SetText(package.Publisher().Website());
 	}
 
 	void Clear()
