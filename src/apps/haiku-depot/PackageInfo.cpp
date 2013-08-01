@@ -63,7 +63,7 @@ SharedBitmap::~SharedBitmap()
 const BBitmap*
 SharedBitmap::Bitmap(Size which)
 {
-	if (fResourceID == -1)
+	if (fResourceID == -1 && fMimeType.Length() == 0)
 		return fBitmap[0];
 	
 	int32 index = 0;
@@ -136,7 +136,7 @@ SharedBitmap::_CreateBitmapFromMimeType(int32 size) const
 	BBitmap* bitmap = new BBitmap(BRect(0, 0, size - 1, size - 1), 0, B_RGBA32);
 	status = bitmap->InitCheck();
 	if (status == B_OK)
-		status = mimeType.GetIcon(bitmap, B_LARGE_ICON);
+		status = mimeType.GetIcon(bitmap, B_MINI_ICON);
 
 	if (status != B_OK) {
 		delete bitmap;
