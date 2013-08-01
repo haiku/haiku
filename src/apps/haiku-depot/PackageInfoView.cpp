@@ -99,16 +99,30 @@ public:
 	{
 		fIconView = new BitmapView("package icon view");
 		fTitleView = new BStringView("package title view", "");
+		fPublisherView = new BStringView("package publisher view", "");
 
 		// Title font
 		BFont font;
 		GetFont(&font);
-		font.SetSize(font.Size() * 2.0f);
+		font_family family;
+		font_style style;
+		font.SetSize(ceilf(font.Size() * 1.5f));
+		font.GetFamilyAndStyle(&family, &style);
+		font.SetFamilyAndStyle(family, "Bold");
 		fTitleView->SetFont(&font);
+
+		// Publisher font
+		GetFont(&font);
+		font.SetSize(std::max(9.0f, floorf(font.Size() * 0.9f)));
+		font.SetFamilyAndStyle(family, "Italic");
+		fPublisherView->SetFont(&font);
 	
 		BLayoutBuilder::Group<>(this)
 			.Add(fIconView)
-			.Add(fTitleView)
+			.AddGroup(B_VERTICAL, 0.0f)
+				.Add(fTitleView)
+				.Add(fPublisherView)
+			.End()
 			.AddGlue()
 		;
 	}
@@ -126,6 +140,10 @@ public:
 			fIconView->SetBitmap(NULL);
 
 		fTitleView->SetText(package.Title());
+		
+		BString publisher = B_TRANSLATE("by %Publisher%");
+		publisher.ReplaceAll("%Publisher%", package.Publisher().Name());
+		fPublisherView->SetText(publisher);
 
 		InvalidateLayout();
 		Invalidate();
@@ -134,11 +152,13 @@ public:
 	void Clear()
 	{
 		fTitleView->SetText("");
+		fPublisherView->SetText("");
 	}
 
 private:
 	BitmapView*		fIconView;
 	BStringView*	fTitleView;
+	BStringView*	fPublisherView;
 };
 
 
@@ -180,7 +200,7 @@ public:
 			.Add(fDescriptionView)
 			.AddGroup(B_HORIZONTAL)
 				.AddGlue()
-				.AddGrid(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
+				.AddGrid(B_USE_HALF_ITEM_SPACING, B_USE_HALF_ITEM_SPACING)
 					.Add(fEmailIconView, 0, 0)
 					.Add(fEmailLinkView, 1, 0)
 					.Add(fWebsiteIconView, 0, 1)
