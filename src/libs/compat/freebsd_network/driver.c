@@ -61,7 +61,7 @@ init_root_device(driver_t *driver, device_t *_root, device_t *_child)
 		return B_NO_MEMORY;
 	}
 
-	bzero(root, sizeof(struct root_device_softc));
+	bzero(root->softc, sizeof(struct root_device_softc));
 	root->driver = &sRootDriver;
 	root->root = root;
 
@@ -273,4 +273,3 @@ _fbsd_uninit_drivers(driver_t *drivers[])
 
 	return B_OK;
 }
-
