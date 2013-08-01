@@ -7283,11 +7283,11 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 
 			break;
 		}
+		MemoryDeleter layerFSNameDeleter(layerFSName);
 
 		volume = (fs_volume*)malloc(sizeof(fs_volume));
 		if (volume == NULL) {
 			status = B_NO_MEMORY;
-			free(layerFSName);
 			goto err1;
 		}
 
@@ -7304,7 +7304,6 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 		volume->file_system_name = get_file_system_name(layerFSName);
 		if (volume->file_system_name == NULL) {
 			status = B_NO_MEMORY;
-			free(layerFSName);
 			free(volume);
 			goto err1;
 		}
@@ -7312,7 +7311,6 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 		volume->file_system = get_file_system(layerFSName);
 		if (volume->file_system == NULL) {
 			status = B_DEVICE_NOT_FOUND;
-			free(layerFSName);
 			free(volume->file_system_name);
 			free(volume);
 			goto err1;
