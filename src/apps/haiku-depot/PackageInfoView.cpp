@@ -12,6 +12,7 @@
 #include <Button.h>
 #include <CardLayout.h>
 #include <Catalog.h>
+#include <Font.h>
 #include <LayoutBuilder.h>
 #include <Message.h>
 #include <StringView.h>
@@ -149,10 +150,11 @@ public:
 	AboutView()
 		:
 		BView("about view", B_WILL_DRAW),
-		fLayout(new BGroupLayout(B_VERTICAL))
+		fLayout(new BGroupLayout(B_VERTICAL)),
+		fEmailIcon("text/x-email"),
+		fWebsiteIcon("text/html")
 	{
-		SetViewColor(B_TRANSPARENT_COLOR);
-		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		
 		SetLayout(fLayout);
 		
@@ -160,8 +162,31 @@ public:
 		fDescriptionView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		fDescriptionView->MakeEditable(false);
 		
+		BFont smallFont;
+		GetFont(&smallFont);
+		smallFont.SetSize(std::max(9.0f, ceilf(smallFont.Size() * 0.85f)));
+		
+		fEmailIconView = new BitmapView("email icon view");
+		fEmailLinkView = new BStringView("email link view", "");
+		fEmailLinkView->SetFont(&smallFont);
+		fEmailLinkView->SetHighColor(60, 60, 60);
+
+		fWebsiteIconView = new BitmapView("website icon view");
+		fWebsiteLinkView = new BStringView("website link view", "");
+		fWebsiteLinkView->SetFont(&smallFont);
+		fWebsiteLinkView->SetHighColor(60, 60, 60);
+		
 		BLayoutBuilder::Group<>(fLayout)
 			.Add(fDescriptionView)
+			.AddGroup(B_HORIZONTAL)
+				.AddGlue()
+				.AddGrid(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
+					.Add(fEmailIconView, 0, 0)
+					.Add(fEmailLinkView, 1, 0)
+					.Add(fWebsiteIconView, 0, 1)
+					.Add(fWebsiteLinkView, 1, 1)
+				.End()
+			.End()
 		;
 	}
 	
@@ -177,17 +202,32 @@ public:
 	void SetPackage(const PackageInfo& package)
 	{
 		fDescriptionView->SetText(package.FullDescription());
+		fEmailIconView->SetBitmap(fEmailIcon.Bitmap(SharedBitmap::SIZE_16));
+		fEmailLinkView->SetText(package.PublisherEmail());
+		fWebsiteIconView->SetBitmap(fWebsiteIcon.Bitmap(SharedBitmap::SIZE_16));
+		fWebsiteLinkView->SetText(package.PublisherWebsite());
 	}
 
 	void Clear()
 	{
 		fDescriptionView->SetText("");
+		fEmailIconView->SetBitmap(NULL);
+		fEmailLinkView->SetText("");
+		fWebsiteIconView->SetBitmap(NULL);
+		fWebsiteLinkView->SetText("");
 	}
 
 private:
 	BGroupLayout*	fLayout;
 	BTextView*		fDescriptionView;
-	
+
+	SharedBitmap	fEmailIcon;
+	BitmapView*		fEmailIconView;
+	BStringView*	fEmailLinkView;
+
+	SharedBitmap	fWebsiteIcon;
+	BitmapView*		fWebsiteIconView;
+	BStringView*	fWebsiteLinkView;
 };
 
 
