@@ -1,10 +1,17 @@
 SubDir HAIKU_TOP src system libroot posix string arch arm ;
 
-UsePrivateSystemHeaders ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup arm ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
+		UsePrivateSystemHeaders ;
 
-MergeObject posix_string_arch_$(TARGET_ARCH).o :
-	arch_string.S
-	memset.c
-;
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
+
+		MergeObject <$(architecture)>posix_string_arch_$(TARGET_ARCH).o :
+			arch_string.S
+			memset.c
+			;
+	}
+}

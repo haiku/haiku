@@ -7,7 +7,7 @@ AddResources Message : SimpleClock.rdef ;
 ScreenSaver SimpleClock :
 	SimpleClock.cpp
 
-	: be libscreensaver.so $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	: be libscreensaver.so localestub $(TARGET_LIBSUPC++)
 ;
 
 DoCatalogs SimpleClock :

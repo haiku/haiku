@@ -1,9 +1,11 @@
 SubDir HAIKU_TOP src libs stdc++ ;
 
-if $(HAIKU_GCC_VERSION[1]) = 2 || $(isHybridBuild) {
-	SubInclude HAIKU_TOP src libs stdc++ legacy ;
-}
+if $(TARGET_PLATFORM) = haiku {
+	if x86_gcc2 in $(TARGET_PACKAGING_ARCHS) {
+		HaikuSubInclude legacy ;
+	}
 
-if $(HAIKU_GCC_VERSION[1]) = 4 || $(isHybridBuild) {
-	SubInclude HAIKU_TOP src libs stdc++ current ;
+	if $(TARGET_PACKAGING_ARCHS) != x86_gcc2 {
+		HaikuSubInclude current ;
+	}
 }

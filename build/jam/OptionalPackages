@@ -48,7 +48,7 @@ if [ IsOptionalHaikuImagePackageAdded BeOSCompatibility ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package BeOSCompatibility available for"
 			"$(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	} else if $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) >= 4 {
 		Echo "No optional package BeOSCompatibility available for gcc4" ;
 	} else {
 		Echo "Warning: Adding BeOS compatibility symlinks. This will go away."
@@ -83,9 +83,9 @@ if [ IsOptionalHaikuImagePackageAdded Bluetooth ] {
 # 	AddSymlinkToHaikuImage home config settings deskbar menu Preferences
 # 		: /boot/system/preferences/Bluetooth ;
 # 	if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ]
-# 		&& $(HAIKU_GCC_VERSION[1]) in 2 4 {
+# 		&& $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) in 2 4 {
 # 		local arch = $(TARGET_ARCH) ;
-# 		local abi = gcc$(HAIKU_GCC_VERSION[1]) ;
+# 		local abi = gcc$(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) ;
 # 		AddSymlinkToHaikuImage system develop lib
 # 			: /system/lib libbluetooth.so ;
 # 	}
@@ -201,7 +201,7 @@ if [ IsOptionalHaikuImagePackageAdded NetFS ] {
 if [ IsOptionalHaikuImagePackageAdded UserlandFS ] {
 # TODO: Make this an actual package!
 # 	local arch = $(TARGET_ARCH) ;
-# 	local abi = gcc$(HAIKU_GCC_VERSION[1]) ;
+# 	local abi = gcc$(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) ;
 # 
 # 	# kernel module
 # 	AddFilesToHaikuImage system add-ons kernel file_systems
@@ -220,9 +220,9 @@ if [ IsOptionalHaikuImagePackageAdded UserlandFS ] {
 # 
 # 	# development goodies
 # 	if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] {
-# 		if ! ( $(HAIKU_GCC_VERSION[1]) in 2 4 ) {
+# 		if ! ( $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) in 2 4 ) {
 # 			Exit "Optional package UserlandFS: Unsupported GCC version:"
-# 				$(HAIKU_GCC_VERSION[1]) ;
+# 				$(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) ;
 # 		}
 # 
 # 		# library symlinks
@@ -255,9 +255,9 @@ if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
 # TODO: Make this an actual package!
 # 	if $(TARGET_ARCH) != x86  && $(TARGET_ARCH) != x86_64 {
 # 		Echo "No optional package WebPositive available for $(TARGET_ARCH)" ;
-# 	} else if $(HAIKU_GCC_VERSION[1]) < 4 {
+# 	} else if $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) < 4 {
 # 		Echo "No optional package WebPositive available for gcc2" ;
-# 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+# 	} else if $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) >= 4 {
 # 		# TODO: Either we build a separate package for WebPositive or we
 # 		# incorporate it in haiku.hpkg.
 # 		AddFilesToHaikuHybridImage apps : WebPositive ;

@@ -11,7 +11,7 @@ Addon <disk_system>ntfs :
 	NTFSAddOn.cpp
 	InitializeParameterEditor.cpp
 
-	: be $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++) libshared.a
+	: be localestub $(TARGET_LIBSUPC++) libshared.a
 ;
 
 DoCatalogs <disk_system>ntfs :

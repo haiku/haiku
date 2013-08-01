@@ -15,7 +15,7 @@ Addon mixer.media_addon :
 	MixerSettings.cpp
 	MixerUtils.cpp
 	Resampler.cpp
-	: be media $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: be media $(TARGET_LIBSUPC++) localestub
 ;
 
 DoCatalogs mixer.media_addon

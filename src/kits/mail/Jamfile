@@ -58,7 +58,7 @@ SharedLibrary libmail.so :
 	$(TARGET_NETWORK_LIBS)
 	$(TARGET_SELECT_UNAME_ETC_LIB)
 	[ BuildFeatureAttribute openssl : libraries ]
-	$(HAIKU_LOCALE_LIBS)
+	localestub
 ;
 
 

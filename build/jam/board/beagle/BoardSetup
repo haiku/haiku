@@ -64,7 +64,7 @@ HAIKU_BOARD_SDIMAGE_FILES =
 
 HAIKU_KERNEL_CCFLAGS += -mcpu=cortex-a8 -mfpu=vfp -mfloat-abi=soft ;
 HAIKU_KERNEL_C++FLAGS += -mcpu=cortex-a8 -mfpu=vfp -mfloat-abi=soft ;
-HAIKU_CCFLAGS += -mcpu=cortex-a8 -mfpu=vfp -mfloat-abi=soft ;
-HAIKU_C++FLAGS += -mcpu=cortex-a8 -mfpu=vfp -mfloat-abi=soft ;
-
-
+HAIKU_CCFLAGS_$(HAIKU_PACKAGING_ARCH)
+	+= -mcpu=cortex-a8 -mfpu=vfp -mfloat-abi=soft ;
+HAIKU_C++FLAGS_$(HAIKU_PACKAGING_ARCH)
+	+= -mcpu=cortex-a8 -mfpu=vfp -mfloat-abi=soft ;

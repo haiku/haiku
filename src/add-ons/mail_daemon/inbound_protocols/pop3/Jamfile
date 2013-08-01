@@ -33,7 +33,7 @@ AddResources POP3 : POP3.rdef ;
 
 Addon POP3
 	: $(sources)
-	: be libbnetapi.so libmail.so $(HAIKU_LOCALE_LIBS)
+	: be libbnetapi.so libmail.so localestub
 		[ BuildFeatureAttribute openssl : libraries ] $(TARGET_LIBSUPC++)
 		$(TARGET_NETWORK_LIBS)
 ;

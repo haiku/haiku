@@ -6,7 +6,7 @@ AddSubDirSupportedPlatforms libbe_test ;
 Application Mandelbrot :
 	Mandelbrot.cpp
 	tsb.cpp
-	: be $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: be $(TARGET_LIBSUPC++) localestub
 	: Mandelbrot.rdef
 	;
 

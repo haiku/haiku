@@ -72,7 +72,7 @@ Translator JPEG2000Translator :
 	$(jasper_files)
 
 	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
-	$(HAIKU_LOCALE_LIBS)
+	localestub
 	: true
 ;
 

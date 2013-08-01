@@ -1,3 +1,0 @@
-SubDir HAIKU_TOP src system glue arch ;
-
-SubInclude HAIKU_TOP src system glue arch $(TARGET_ARCH) ;

@@ -7,7 +7,7 @@ Preference Backgrounds :
 	Backgrounds.cpp
 	BackgroundsView.cpp
 	ImageFilePanel.cpp
-	: be tracker translation $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: be tracker translation $(TARGET_LIBSUPC++) localestub
 	: Backgrounds.rdef
 	;
 

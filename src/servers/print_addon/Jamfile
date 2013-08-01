@@ -14,6 +14,6 @@ LinkAgainst print_addon_server :
 	be 
 	root
 	libprintutils.a
-	$(HAIKU_LOCALE_LIBS)
+	localestub
 	$(TARGET_LIBSUPC++)
 ;

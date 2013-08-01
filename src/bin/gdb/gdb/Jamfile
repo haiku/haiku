@@ -17,8 +17,9 @@ SubDirCcFlags -DHAVE_CONFIG_H -DLOCALEDIR=\\\"/etc/locale\\\"
 	-DMI_OUT=1 -DTUI=1 ;
 
 # filter warnings we don't want here
-TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
-	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
+TARGET_WARNING_CCFLAGS_$(TARGET_PACKAGING_ARCH)
+	= [ FFilter $(TARGET_WARNING_CCFLAGS_$(TARGET_PACKAGING_ARCH))
+		: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) cli ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) mi ] ;
@@ -287,7 +288,6 @@ BinCommand gdb : gdb.c :
 
 	libncurses.a
 
-	libroot.so
 	libdebug.so
 	libnetwork.so
 ;

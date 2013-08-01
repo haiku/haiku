@@ -11,7 +11,7 @@ Translator SGITranslator :
 	SGIMain.cpp
 	SGITranslator.cpp
 	SGIView.cpp
-	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++) localestub
 	: true
 ;
 

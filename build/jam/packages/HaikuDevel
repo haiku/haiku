@@ -1,3 +1,6 @@
+local architecture = $(HAIKU_PACKAGING_ARCHS[1]) ;
+
+
 local haikuDevelPackage = haiku_devel.hpkg ;
 HaikuPackage $(haikuDevelPackage) ;
 
@@ -6,12 +9,12 @@ local developDirTokens = develop ;
 
 # glue code
 AddFilesToPackage $(developDirTokens) lib :
-	<src!system!glue!arch!$(arch)>crti.o
-	<src!system!glue!arch!$(arch)>crtn.o
-	<src!system!glue>init_term_dyn.o
-	<src!system!glue>start_dyn.o
-	<src!system!glue>haiku_version_glue.o
-;
+	<src!system!glue!arch!$(arch)!$(architecture)>crti.o
+	<src!system!glue!arch!$(arch)!$(architecture)>crtn.o
+	<src!system!glue!$(architecture)>init_term_dyn.o
+	<src!system!glue!$(architecture)>start_dyn.o
+	<src!system!glue!$(architecture)>haiku_version_glue.o
+	;
 
 # kernel
 AddFilesToPackage $(developDirTokens) lib : kernel.so : _KERNEL_ ;
@@ -33,7 +36,7 @@ for lib in $(SYSTEM_LIBS) $(developmentLibs) {
 }
 
 # static libraries
-AddFilesToPackage $(developDirTokens) lib : liblocalestub.a ;
+AddFilesToPackage $(developDirTokens) lib : <$(architecture)>liblocalestub.a ;
 
 # the POSIX error code mapper library
 AddFilesToPackage $(developDirTokens) lib : libposix_error_mapper.a ;
@@ -73,7 +76,7 @@ if ! $(HAIKU_BOOTSTRAP_BUILD) {
 }
 
 # cpp headers
-if $(HAIKU_GCC_VERSION[1]) = 2 {
+if $(HAIKU_GCC_VERSION_$(architecture)[1]) = 2 {
 	# GCC 2 only -- for GCC 4 they come with the DevelopmentBase package
 	CopyDirectoryToPackage $(developDirTokens) headers c++
 		: [ FDirName $(HAIKU_TOP) headers cpp ] : 2.95.3 ;

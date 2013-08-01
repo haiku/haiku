@@ -19,7 +19,7 @@ Application PackageInstaller :
 	PackageTextViewer.cpp
 	PackageImageViewer.cpp
 	InstalledPackageInfo.cpp
-	: be $(HAIKU_LOCALE_LIBS) tracker translation
+	: be localestub tracker translation
 		[ BuildFeatureAttribute zlib : library ]
 		$(TARGET_LIBSUPC++)
 	: PackageInstaller.rdef

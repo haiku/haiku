@@ -4,7 +4,7 @@ UseBuildFeatureHeaders mesa ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 # For GCC2
-if $(HAIKU_GCC_VERSION[1]) < 3 {
+if $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) < 3 {
 	SubDirC++Flags --no-warnings ;
 }
 
@@ -23,7 +23,7 @@ Includes [ FGristFiles $(sources) ] : [ BuildFeatureAttribute mesa : headers ] ;
 
 Application 3DMov :
 	$(sources)
-	: be GL game $(HAIKU_LOCALE_LIBS) media translation $(TARGET_LIBSUPC++)
+	: be GL game localestub media translation $(TARGET_LIBSUPC++)
 	: 3dmov.rdef
 ;
 

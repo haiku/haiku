@@ -5,7 +5,7 @@ Preference NetworkSetup :
 	NetworkSetupWindow.cpp
 	NetworkSetupProfile.cpp
 	NetworkSetupAddOn.cpp
-	: be root $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
+	: be root $(TARGET_LIBSTDC++) localestub
 	: NetworkSetup.rdef
 ;
 

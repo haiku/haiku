@@ -13,7 +13,7 @@ local sources =
 Preference Locale
 	: $(sources)
 	: be $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) libshared.a
-		$(HAIKU_LOCALE_LIBS)
+		localestub
 	: Locale.rdef
 ;
 

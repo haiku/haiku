@@ -203,7 +203,8 @@ rule UnarchiveObjects
 
 actions UnarchiveObjects
 {
-	( cd $(1[1]:D) && $(TARGET_AR) $(TARGET_UNARFLAGS) "$(2)" $(1:BS) )
+	( cd $(1[1]:D) && $(TARGET_AR_$(TARGET_PACKAGING_ARCH)) \
+		$(TARGET_UNARFLAGS_$(TARGET_PACKAGING_ARCH)) "$(2)" $(1:BS) )
 }
 
 

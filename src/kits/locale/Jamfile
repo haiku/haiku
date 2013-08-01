@@ -4,7 +4,6 @@ AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders locale shared ;
 UsePublicHeaders locale storage ;
-UseBuildFeatureHeaders icu ;
 
 local sources =
 	cat.cpp
@@ -49,15 +48,24 @@ local sources =
 	# NumberFormatParameters.cpp
 	;
 
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-Includes [ FGristFiles $(sources) ] : [ BuildFeatureAttribute icu : headers ] ;
-	# Dependency needed to trigger downloading/unzipping the package before
-	# compiling the files.
+		UseBuildFeatureHeaders icu ;
 
-MergeObject <libbe>locale_kit.o :
-	$(sources)
-	;
+		Includes [ FGristFiles $(sources) ]
+			: [ BuildFeatureAttribute icu : headers ] ;
+			# Dependency needed to trigger downloading/unzipping the package
+			# before compiling the files.
 
-StaticLibrary liblocalestub.a
-	: CatalogStub.cpp
-	;
+		MergeObject <libbe!$(architecture)>locale_kit.o :
+			$(sources)
+			;
+
+		StaticLibrary <$(architecture)>liblocalestub.a
+			: CatalogStub.cpp
+			;
+	}
+}

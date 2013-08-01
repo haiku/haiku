@@ -1,3 +1,6 @@
+local architecture = $(HAIKU_PACKAGING_ARCHS[1]) ;
+
+
 local haikuPackage = haiku.hpkg ;
 HaikuPackage $(haikuPackage) ;
 
@@ -89,7 +92,7 @@ AddLibrariesToPackage lib : $(SYSTEM_LIBS) $(PRIVATE_SYSTEM_LIBS) ;
 # libnetwork.so replaces quite a few libraries
 SYSTEM_LIBS_LIBNETWORK_ALIASES = libsocket.so libbind.so libnet.so ;
 
-if $(HAIKU_GCC_VERSION[1]) = 2 {
+if $(HAIKU_GCC_VERSION_$(architecture)[1]) = 2 {
 	local lib ;
 	for lib in $(SYSTEM_LIBS_LIBNETWORK_ALIASES) {
 		AddSymlinkToPackage lib : libnetwork.so : $(lib) ;

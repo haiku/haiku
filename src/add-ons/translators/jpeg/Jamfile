@@ -24,7 +24,7 @@ Translator JPEGTranslator :
 	JPEGTranslator.cpp
 	: be translation libtranslatorsutils.a
 	[ BuildFeatureAttribute jpeg : library ]
-	$(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
+	$(TARGET_LIBSTDC++) localestub
 	: true
 ;
 

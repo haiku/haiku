@@ -1,10 +1,18 @@
 SubDir HAIKU_TOP src system libroot posix crypt ;
 
-# filter warnings we don't want here
-TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
-	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-MergeObject posix_crypt.o :
-	crypt.c
-	crypt_util.c
-;
+		# filter warnings we don't want here
+		TARGET_WARNING_CCFLAGS_$(architecture)
+			= [ FFilter $(TARGET_WARNING_CCFLAGS_$(architecture))
+				: -Wall -Wmissing-prototypes -Wsign-compare ] ;
+
+		MergeObject <$(architecture)>posix_crypt.o :
+			crypt.c
+			crypt_util.c
+			;
+	}
+}

@@ -3,20 +3,22 @@ SubDir HAIKU_TOP src bin bash ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 # split the canonical target string
-local cpuName = [ Match "([^-]*)-.*" : $(HAIKU_GCC_MACHINE) ] ;
-local vendorName = [ Match "[^-]*-([^-]*)" : $(HAIKU_GCC_MACHINE) ] ;
-local osName = [ Match "[^-]*-[^-]*-([^-]*)" : $(HAIKU_GCC_MACHINE) ] ;
+local gccMachine = $(HAIKU_GCC_MACHINE_$(TARGET_PACKAGING_ARCH)) ;
+local cpuName = [ Match "([^-]*)-.*" : $(gccMachine) ] ;
+local vendorName = [ Match "[^-]*-([^-]*)" : $(gccMachine) ] ;
+local osName = [ Match "[^-]*-[^-]*-([^-]*)" : $(gccMachine) ] ;
 
 SubDirCcFlags -DHAVE_CONFIG_H -DPROGRAM='\"bash\"' -DSHELL -DLOCALEDIR='\"/boot/common/share/locale\"' -DPACKAGE='\"bash\"' ;
-SubDirCcFlags -DCONF_MACHTYPE='\"$(HAIKU_GCC_MACHINE)\"' ;
+SubDirCcFlags -DCONF_MACHTYPE='\"$(gccMachine)\"' ;
 SubDirCcFlags -DCONF_HOSTTYPE='\"$(cpuName)\"' ;
 SubDirCcFlags -DCONF_VENDOR='\"$(vendorName)\"' ;
 #SubDirCcFlags -DCONF_OSTYPE='\"$(osName)\"' ;
 SubDirCcFlags -DCONF_OSTYPE='\"beos\"' ;
 
 # filter warnings we don't want here
-TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
-	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
+TARGET_WARNING_CCFLAGS_$(TARGET_PACKAGING_ARCH)
+	= [ FFilter $(TARGET_WARNING_CCFLAGS_$(TARGET_PACKAGING_ARCH))
+		: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
 SubDirSysHdrs [ FDirName $(SUBDIR) include ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) lib ] ;

@@ -17,7 +17,7 @@ Application SoundRecorder :
 	UpDownButton.cpp
 	VUView.cpp
 	VolumeSlider.cpp
-	: be $(HAIKU_LOCALE_LIBS) media tracker $(TARGET_LIBSTDC++)
+	: be localestub media tracker $(TARGET_LIBSTDC++)
 	: SoundRecorder.rdef
 ;
 

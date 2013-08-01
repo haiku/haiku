@@ -55,4 +55,5 @@ BinCommand strace : $(straceSources)
 ;
 
 # We need to specify the dependency on the generated syscalls file explicitly.
-Includes $(straceSyscallsSource) : <syscalls>strace_syscalls.h ;
+Includes $(straceSyscallsSource)
+	: <syscalls!$(TARGET_PACKAGING_ARCH)>strace_syscalls.h ;

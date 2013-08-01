@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src system runtime_loader ;
 
+local architecture = $(TARGET_PACKAGING_ARCH) ;
+
 UsePrivateHeaders libroot runtime_loader shared ;
 UsePrivateHeaders kernel ;
 	# for <util/KMessage.h>
@@ -24,37 +26,37 @@ StaticLibrary libruntime_loader.a :
 	kernel_cpp.cpp
 	KMessage.cpp
 	:
-	<src!system!libroot!os>mutex.o
-	<src!system!libroot!os>recursive_lock.o
-	<src!system!libroot!os>syscalls.o
-	<src!system!libroot!os>sem.o
+	<src!system!libroot!os!$(architecture)>mutex.o
+	<src!system!libroot!os!$(architecture)>recursive_lock.o
+	<src!system!libroot!os!$(architecture)>syscalls.o
+	<src!system!libroot!os!$(architecture)>sem.o
 
-	<src!system!libroot!posix>errno.o
-  	<src!system!libroot!posix>fcntl.o
+	<src!system!libroot!posix!$(architecture)>errno.o
+  	<src!system!libroot!posix!$(architecture)>fcntl.o
 
-	<src!system!libroot!posix!locale>ctype.o
-	<src!system!libroot!posix!locale>LocaleData.o
+	<src!system!libroot!posix!locale!$(architecture)>ctype.o
+	<src!system!libroot!posix!locale!$(architecture)>LocaleData.o
 
-	<src!system!libroot!posix!string>memchr.o
-	<src!system!libroot!posix!string>memcmp.o
-	<src!system!libroot!posix!string>memmove.o
-	<src!system!libroot!posix!string>strcasecmp.o
-	<src!system!libroot!posix!string>strcat.o
-	<src!system!libroot!posix!string>strchr.o
-	<src!system!libroot!posix!string>strcmp.o
-	<src!system!libroot!posix!string>strcpy.o
-	<src!system!libroot!posix!string>strcspn.o
-	<src!system!libroot!posix!string>strdup.o
-	<src!system!libroot!posix!string>strerror.o
-	<src!system!libroot!posix!string>strlcat.o
-	<src!system!libroot!posix!string>strlcpy.o
+	<src!system!libroot!posix!string!$(architecture)>memchr.o
+	<src!system!libroot!posix!string!$(architecture)>memcmp.o
+	<src!system!libroot!posix!string!$(architecture)>memmove.o
+	<src!system!libroot!posix!string!$(architecture)>strcasecmp.o
+	<src!system!libroot!posix!string!$(architecture)>strcat.o
+	<src!system!libroot!posix!string!$(architecture)>strchr.o
+	<src!system!libroot!posix!string!$(architecture)>strcmp.o
+	<src!system!libroot!posix!string!$(architecture)>strcpy.o
+	<src!system!libroot!posix!string!$(architecture)>strcspn.o
+	<src!system!libroot!posix!string!$(architecture)>strdup.o
+	<src!system!libroot!posix!string!$(architecture)>strerror.o
+	<src!system!libroot!posix!string!$(architecture)>strlcat.o
+	<src!system!libroot!posix!string!$(architecture)>strlcpy.o
 	<src!system!kernel!lib>strlen.o
-	<src!system!libroot!posix!string>strncmp.o
-	<src!system!libroot!posix!string>strnlen.o
-	<src!system!libroot!posix!string>strpbrk.o
-	<src!system!libroot!posix!string>strrchr.o
-	<src!system!libroot!posix!string>strspn.o
-	<src!system!libroot!posix!string>strstr.o
+	<src!system!libroot!posix!string!$(architecture)>strncmp.o
+	<src!system!libroot!posix!string!$(architecture)>strnlen.o
+	<src!system!libroot!posix!string!$(architecture)>strpbrk.o
+	<src!system!libroot!posix!string!$(architecture)>strrchr.o
+	<src!system!libroot!posix!string!$(architecture)>strspn.o
+	<src!system!libroot!posix!string!$(architecture)>strstr.o
 
 	[ FGristFiles kernel_vsprintf.o ]
 ;
@@ -88,8 +90,8 @@ Ld runtime_loader :
 	[ FGristFiles $(sources:S=$(SUFOBJ)) ]
 	libruntime_loader.a
 	libruntime_loader_$(TARGET_ARCH).a
-	$(TARGET_STATIC_LIBSUPC++)
-	$(TARGET_GCC_LIBGCC)
+	$(HAIKU_STATIC_LIBSUPC++_$(TARGET_PACKAGING_ARCH))
+	$(HAIKU_GCC_LIBGCC_$(TARGET_PACKAGING_ARCH))
 	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/runtime_loader.ld
 	: --no-undefined -shared -soname=runtime_loader
 ;

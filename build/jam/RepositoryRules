@@ -78,7 +78,7 @@ rule AddRepositoryPackages repository : architecture : packages : sourcePackages
 rule PackageRepository repository : architecture : anyPackages : packages
 	: sourcePackages : debugInfoPackages
 {
-	if $(architecture) != $(HAIKU_PACKAGING_ARCH) {
+	if $(architecture) != $(HAIKU_PACKAGING_ARCHS[1]) {
 		return ;
 	}
 
@@ -136,19 +136,20 @@ rule RemotePackageRepository repository : architecture : repositoryUrl
 
 	# build package list file
 	local packageListFile = $(repository:G=repository-package-list)-packages ;
-	MakeLocate $(packageListFile) : $(HAIKU_PACKAGE_REPOSITORIES_DIR) ;
+	local repositoriesDir = $(HAIKU_PACKAGE_REPOSITORIES_DIR_$(architecture)) ;
+	MakeLocate $(packageListFile) : $(repositoriesDir) ;
 	GeneratedRepositoryPackageList $(packageListFile) : $(repository) ;
 
 	# build package list checksum file
 	local packagesChecksumFile
 		= $(repository:G=repository-package-checksum)-checksum ;
-	MakeLocate $(packagesChecksumFile) : $(HAIKU_PACKAGE_REPOSITORIES_DIR) ;
+	MakeLocate $(packagesChecksumFile) : $(repositoriesDir) ;
 	Depends $(packagesChecksumFile) : $(packageListFile) ;
 	ChecksumFileSHA256 $(packagesChecksumFile) : $(packageListFile) ;
 
 	# download repository info file
 	local repositoryInfo = $(repository:G=repository-info)-info ;
-	MakeLocate $(repositoryInfo) : $(HAIKU_PACKAGE_REPOSITORIES_DIR) ;
+	MakeLocate $(repositoryInfo) : $(repositoriesDir) ;
 	local repoUrl = [ on $(repository) return $(HAIKU_REPOSITORY_URL) ] ;
 	DownloadLocatedFile $(repositoryInfo)
 		: "$(repoUrl)/`cat $source`/repo.info"
@@ -156,7 +157,7 @@ rule RemotePackageRepository repository : architecture : repositoryUrl
 
 	# download repository file
 	local repositoryFile = $(repository:G=repository-cache) ;
-	MakeLocate $(repositoryFile) : $(HAIKU_PACKAGE_REPOSITORIES_DIR) ;
+	MakeLocate $(repositoryFile) : $(repositoriesDir) ;
 	local repoUrl = [ on $(repository) return $(HAIKU_REPOSITORY_URL) ] ;
 	DownloadLocatedFile $(repositoryFile)
 		: "$(repoUrl)/`cat $source`/repo"
@@ -164,7 +165,7 @@ rule RemotePackageRepository repository : architecture : repositoryUrl
 
 	# build repository config file
 	local repositoryConfig = $(repository:G=repository-config)-config ;
-	MakeLocate $(repositoryConfig) : $(HAIKU_PACKAGE_REPOSITORIES_DIR) ;
+	MakeLocate $(repositoryConfig) : $(repositoriesDir) ;
 	RepositoryConfig $(repositoryConfig) : $(repositoryInfo)
 		: $(packagesChecksumFile) : $(repository) ;
 
@@ -314,9 +315,10 @@ OUTPUT_DIRECTORY="$(HAIKU_REPOSITORY_BUILD_DIRECTORY)"
 EOF
 
 	# If we have cross tools, add the cross tools directory.
-	gcc=$(HAIKU_CC)
+	gcc=$(HAIKU_CC_$(HAIKU_PACKAGING_ARCH))
 	if [[ "$gcc" = /* ]]; then
-		if [ `basename $gcc` = $(HAIKU_GCC_MACHINE)-gcc ]; then
+		if [ `basename $gcc` = \
+				$(HAIKU_GCC_MACHINE_$(HAIKU_PACKAGING_ARCH))-gcc ]; then
 			dir=`dirname $gcc`
 			dir=`dirname $dir`
 			echo CROSS_TOOLS="$dir" >> $(1)
@@ -344,17 +346,18 @@ rule BootstrapPackageRepository repository : architecture
 		return ;
 	}
 	HAIKU_REPOSITORY_HAIKU_CROSS_DEVEL_PACKAGE on $(stage1PackageTargets)
-		= haiku_cross_devel_sysroot_stage1_$(HAIKU_PACKAGING_ARCH).hpkg ;
+		= haiku_cross_devel_sysroot_stage1_$(architecture).hpkg ;
 
 	# add stage 2 packages
 	local stage2PackageTargets = [ AddRepositoryPackages $(repository)
 		: $(architecture) : $(packagesStage2) : $(sourcePackages)
 		: $(debugInfoPackages) ] ;
 	HAIKU_REPOSITORY_HAIKU_CROSS_DEVEL_PACKAGE on $(stage2PackageTargets)
-		= haiku_cross_devel_sysroot_$(HAIKU_PACKAGING_ARCH).hpkg ;
+		= haiku_cross_devel_sysroot_$(architecture).hpkg ;
 
 	# prepare the config file for the HaikuPorts cross build
-	local outputDir = [ FDirName $(HAIKU_PACKAGE_REPOSITORIES_DIR)
+	local outputDir = [ FDirName
+		$(HAIKU_PACKAGE_REPOSITORIES_DIR_$(architecture))
 		$(repository:G=)-build ] ;
 	local configFile = haikuports.conf ;
 	configFile = $(configFile:G=repository-config-$(repository:G=)) ;
@@ -362,6 +365,7 @@ rule BootstrapPackageRepository repository : architecture
 	NoUpdate $(configFile) ;
 	Depends $(configFile) : <build>package <build>mimeset <mimedb>mime_db ;
 	HAIKU_REPOSITORY_BUILD_DIRECTORY on $(configFile) = $(outputDir) ;
+	HAIKU_PACKAGING_ARCH on $(configFile) = $(architecture) ;
 	BuildBootstrapRepositoryConfig $(configFile)
 		: <build>package <build>mimeset <mimedb>mime_db ;
 

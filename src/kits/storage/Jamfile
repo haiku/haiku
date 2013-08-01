@@ -3,89 +3,97 @@ SubDir HAIKU_TOP src kits storage ;
 SetSubDirSupportedPlatforms haiku libbe_test ;
 
 UsePrivateHeaders app kernel libroot shared storage ;
-UsePrivateSystemHeaders ;
 
 # for libbe_test
 UsePublicHeaders [ FDirName add-ons registrar ] ;
 
-SEARCH_SOURCE += [ FDirName $(SUBDIR) disk_device ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) disk_device jobs ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) mime ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) sniffer ] ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-MergeObject <libbe>storage_kit.o :
-	AppFileInfo.cpp
-	Directory.cpp
-	DriverSettings.cpp
-	Entry.cpp
-	EntryList.cpp
-	File.cpp
-	FileDescriptorIO.cpp
-	FileIO.cpp
-	FindDirectory.cpp
-	MergedDirectory.cpp
-	Mime.cpp
-	MimeType.cpp
-	Node.cpp
-	NodeInfo.cpp
-	NodeMonitor.cpp
-	OffsetFile.cpp
-	Path.cpp
-	PathMonitor.cpp
-	Query.cpp
-	QueryPredicate.cpp
-	ResourceFile.cpp
-	ResourceItem.cpp
-	Resources.cpp
-	ResourcesContainer.cpp
-	ResourceStrings.cpp
-	Statable.cpp
-	SymLink.cpp
-	Volume.cpp
-	VolumeRoster.cpp
-	storage_support.cpp
+		UsePrivateSystemHeaders ;
 
-	# sniffer
-	CharStream.cpp
-	Err.cpp
-	DisjList.cpp
-	Pattern.cpp
-	PatternList.cpp
-	Parser.cpp
-	Range.cpp
-	RPattern.cpp
-	RPatternList.cpp
-	Rule.cpp
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) disk_device ] ;
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) disk_device jobs ] ;
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) mime ] ;
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) sniffer ] ;
 
-	# disk device API
-	DiskDevice.cpp
-	DiskDeviceJob.cpp
-	DiskDeviceJobGenerator.cpp
-	DiskDeviceJobQueue.cpp
-	DiskDeviceList.cpp
-	DiskDevicePrivate.cpp
-	DiskDeviceRoster.cpp
-	DiskDeviceTypes.cpp
-	DiskDeviceVisitor.cpp
-	DiskSystem.cpp
-	DiskSystemAddOn.cpp
-	DiskSystemAddOnManager.cpp
-	MutablePartition.cpp
-	Partition.cpp
-	PartitionDelegate.cpp
-	PartitioningInfo.cpp
-	PartitionParameterEditor.cpp
-	PartitionReference.cpp
+		MergeObject <libbe!$(architecture)>storage_kit.o :
+			AppFileInfo.cpp
+			Directory.cpp
+			DriverSettings.cpp
+			Entry.cpp
+			EntryList.cpp
+			File.cpp
+			FileDescriptorIO.cpp
+			FileIO.cpp
+			FindDirectory.cpp
+			MergedDirectory.cpp
+			Mime.cpp
+			MimeType.cpp
+			Node.cpp
+			NodeInfo.cpp
+			NodeMonitor.cpp
+			OffsetFile.cpp
+			Path.cpp
+			PathMonitor.cpp
+			Query.cpp
+			QueryPredicate.cpp
+			ResourceFile.cpp
+			ResourceItem.cpp
+			Resources.cpp
+			ResourcesContainer.cpp
+			ResourceStrings.cpp
+			Statable.cpp
+			SymLink.cpp
+			Volume.cpp
+			VolumeRoster.cpp
+			storage_support.cpp
 
-	CreateChildJob.cpp
-	DeleteChildJob.cpp
-	DefragmentJob.cpp
-	InitializeJob.cpp
-	MoveJob.cpp
-	RepairJob.cpp
-	ResizeJob.cpp
-	SetStringJob.cpp
-	UninitializeJob.cpp
-;
+			# sniffer
+			CharStream.cpp
+			Err.cpp
+			DisjList.cpp
+			Pattern.cpp
+			PatternList.cpp
+			Parser.cpp
+			Range.cpp
+			RPattern.cpp
+			RPatternList.cpp
+			Rule.cpp
+
+			# disk device API
+			DiskDevice.cpp
+			DiskDeviceJob.cpp
+			DiskDeviceJobGenerator.cpp
+			DiskDeviceJobQueue.cpp
+			DiskDeviceList.cpp
+			DiskDevicePrivate.cpp
+			DiskDeviceRoster.cpp
+			DiskDeviceTypes.cpp
+			DiskDeviceVisitor.cpp
+			DiskSystem.cpp
+			DiskSystemAddOn.cpp
+			DiskSystemAddOnManager.cpp
+			MutablePartition.cpp
+			Partition.cpp
+			PartitionDelegate.cpp
+			PartitioningInfo.cpp
+			PartitionParameterEditor.cpp
+			PartitionReference.cpp
+
+			CreateChildJob.cpp
+			DeleteChildJob.cpp
+			DefragmentJob.cpp
+			InitializeJob.cpp
+			MoveJob.cpp
+			RepairJob.cpp
+			ResizeJob.cpp
+			SetStringJob.cpp
+			UninitializeJob.cpp
+			;
+	}
+}
 
 HaikuSubInclude mime ;

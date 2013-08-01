@@ -20,7 +20,7 @@ Exit You must NOT copy UserBuildConfig.ReadMe directly but use parts of it! ;
 #	CCFLAGS C++FLAGS DEBUG DEFINES HDRS LINKFLAGS OPTIM OPTIMIZE SYSHDRS
 #	WARNINGS
 #	HOST_WARNING_CCFLAGS HOST_WARNING_C++FLAGS
-#	TARGET_WARNING_CCFLAGS TARGET_WARNING_C++FLAGS
+#	TARGET_WARNING_CCFLAGS_<packageArch> TARGET_WARNING_C++FLAGS_<packageArch>
 #	PLATFORM SUPPORTED_PLATFORMS
 #
 # The following examples would work analogously for any of these variables.

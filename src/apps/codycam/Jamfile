@@ -13,7 +13,7 @@ Application CodyCam :
 	Settings.cpp
 	SettingsHandler.cpp
 	VideoConsumer.cpp
-	: be $(HAIKU_LOCALE_LIBS) media translation $(TARGET_NETAPI_LIB)
+	: be localestub media translation $(TARGET_NETAPI_LIB)
 		$(TARGET_LIBSTDC++)
 	: CodyCam.rdef
 ;

@@ -9,21 +9,21 @@ rule AddSharedObjectGlueCode
 	on $(1) {
 		platform = $(PLATFORM) ;
 		if $(platform) = haiku {
-			local stdLibs = libroot.so ;
-			local beginGlue ;
-			local endGlue ;
-			if $(2) = true {
-				beginGlue += $(HAIKU_EXECUTABLE_BEGIN_GLUE_CODE) ;
-				endGlue += $(HAIKU_EXECUTABLE_END_GLUE_CODE) ;
-			} else {
-				beginGlue += $(HAIKU_LIBRARY_BEGIN_GLUE_CODE) ;
-				endGlue += $(HAIKU_LIBRARY_END_GLUE_CODE) ;
+			local stdLibs = [ MultiArchDefaultGristFiles libroot.so ] ;
+			local type = EXECUTABLE ;
+			if $(2) != true {
+				type = LIBRARY ;
 
 				# special case for libroot: don't link it against itself
 				if $(DONT_LINK_AGAINST_LIBROOT) {
 					stdLibs = ;
 				}
 			}
+
+			local beginGlue
+				= $(HAIKU_$(type)_BEGIN_GLUE_CODE_$(TARGET_PACKAGING_ARCH)) ;
+			local endGlue
+				= $(HAIKU_$(type)_END_GLUE_CODE_$(TARGET_PACKAGING_ARCH)) ;
 
 			LINK_BEGIN_GLUE on $(1) = $(beginGlue) ;
 			LINK_END_GLUE on $(1) = $(endGlue) ;
@@ -199,9 +199,9 @@ rule Ld
 			LINK on $(target) = $(HOST_LD) ;
 			LINKFLAGS on $(target) = $(HOST_LDFLAGS) $(LINKFLAGS) $(linkerFlags) ;
 		} else {
-			LINK on $(target) = $(TARGET_LD) ;
-			LINKFLAGS on $(target) = $(TARGET_LDFLAGS) $(LINKFLAGS)
-				$(linkerFlags) ;
+			LINK on $(target) = $(TARGET_LD_$(TARGET_PACKAGING_ARCH)) ;
+			LINKFLAGS on $(target) = $(TARGET_LDFLAGS_$(TARGET_PACKAGING_ARCH))
+				$(LINKFLAGS) $(linkerFlags) ;
 		}
 
 		NEEDLIBS on $(target) = $(NEEDLIBS) ;
@@ -265,8 +265,9 @@ rule CreateAsmStructOffsetsHeader header : source
 			}
 
 		} else {
-			sysHeaders += $(TARGET_HDRS) ;
-			defines += $(TARGET_DEFINES) ;
+			sysHeaders += $(TARGET_HDRS_$(TARGET_PACKAGING_ARCH)) ;
+			defines += $(TARGET_DEFINES_$(TARGET_PACKAGING_ARCH))
+				$(TARGET_DEFINES) ;
 		}
 
 		# optimization flags
@@ -299,18 +300,22 @@ rule CreateAsmStructOffsetsHeader header : source
 		} else {
 			# warning flags
 			if $(WARNINGS) != 0 {
-				flags += $(TARGET_WARNING_C++FLAGS) ;
+				flags += $(TARGET_WARNING_C++FLAGS_$(TARGET_PACKAGING_ARCH)) ;
 			}
 
 			# debug and other flags
-			flags += $(TARGET_C++FLAGS) $(TARGET_DEBUG_$(DEBUG)_C++FLAGS)
+			flags += $(TARGET_C++FLAGS_$(TARGET_PACKAGING_ARCH))
+				$(TARGET_DEBUG_$(DEBUG)_C++FLAGS_$(TARGET_PACKAGING_ARCH))
 				$(SUBDIRC++FLAGS) $(C++FLAGS) ;
 
-			C++ on $(header) = $(TARGET_C++) ;
+			C++ on $(header) = $(TARGET_C++_$(TARGET_PACKAGING_ARCH)) ;
 
-			includesSeparator = $(TARGET_INCLUDES_SEPARATOR) ;
-			localIncludesOption = $(TARGET_LOCAL_INCLUDES_OPTION) ;
-			systemIncludesOption = $(TARGET_SYSTEM_INCLUDES_OPTION) ;
+			includesSeparator
+				= $(TARGET_INCLUDES_SEPARATOR_$(TARGET_PACKAGING_ARCH)) ;
+			localIncludesOption
+				= $(TARGET_LOCAL_INCLUDES_OPTION_$(TARGET_PACKAGING_ARCH)) ;
+			systemIncludesOption
+				= $(TARGET_SYSTEM_INCLUDES_OPTION_$(TARGET_PACKAGING_ARCH)) ;
 		}
 	}
 
@@ -318,6 +323,7 @@ rule CreateAsmStructOffsetsHeader header : source
 	# for non-PODs. Since we're using the same compiler for the whole kernel and
 	# don't do virtual inheritence, that works well enough.
 	flags += -Wno-invalid-offsetof ;
+		# TODO: Rather get rid of the respective offsetof() instances.
 
 	# locate object, search for source, and set on target variables
 
@@ -366,8 +372,9 @@ rule MergeObjectFromObjects
 			LINK on $(1) = $(HOST_LD) ;
 			LINKFLAGS on $(target) = $(HOST_LDFLAGS) ;
 		} else {
-			LINK on $(1) = $(TARGET_LD) ;
-			LINKFLAGS on $(target) = $(TARGET_LDFLAGS) ;
+			LINK on $(1) = $(TARGET_LD_$(TARGET_PACKAGING_ARCH)) ;
+			LINKFLAGS on $(target)
+				= $(TARGET_LDFLAGS_$(TARGET_PACKAGING_ARCH)) ;
 		}
 	}
 
@@ -469,12 +476,12 @@ rule LinkAgainst
 
 	on $(target) {
 		# map libraries, if desired and target platform is Haiku
-		if $(PLATFORM) != host && $(mapLibs) = true
-				&& $(TARGET_LIBRARY_NAME_MAP) {
+		local map = $(TARGET_LIBRARY_NAME_MAP_$(TARGET_PACKAGING_ARCH)) ;
+		if $(PLATFORM) != host && $(mapLibs) = true && $(map) {
 			local mappedLibs ;
 
 			for i in $(libs) {
-				local mapped = $($(TARGET_LIBRARY_NAME_MAP)_$(i)) ;
+				local mapped = $($(map)_$(i)) ;
 				mapped ?= $(i) ;
 				mappedLibs += $(mapped) ;
 			}

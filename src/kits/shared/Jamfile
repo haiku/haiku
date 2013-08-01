@@ -5,7 +5,8 @@ AddSubDirSupportedPlatforms libbe_test ;
 
 UseLibraryHeaders agg ;
 UsePrivateHeaders shared locale ;
-UseHeaders [ FDirName $(HAIKU_COMMON_DEBUG_OBJECT_DIR) servers input ] ;
+UseHeaders [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH))
+	servers input ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src kits ] ;
 
 # for RWLockManager only

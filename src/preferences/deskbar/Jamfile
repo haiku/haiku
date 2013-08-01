@@ -6,7 +6,7 @@ Preference <preference>Deskbar
 	:
 	DeskbarPreferences.cpp
 	:
-	be $(HAIKU_LOCALE_LIBS)
+	be localestub
 	:
 	DeskbarPreferences.rdef
 ;

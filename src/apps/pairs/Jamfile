@@ -6,7 +6,7 @@ Application Pairs :
 	PairsView.cpp
 	PairsTopButton.cpp
 
-	: be $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSTDC++)
+	: be localestub $(TARGET_LIBSTDC++)
 	: Pairs.rdef
 ;
 

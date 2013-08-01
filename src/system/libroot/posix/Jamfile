@@ -1,39 +1,50 @@
 SubDir HAIKU_TOP src system libroot posix ;
 
 UsePrivateHeaders app shared [ FDirName syslog_daemon ] ;
-UsePrivateSystemHeaders ;
 UsePrivateHeaders kernel ;
 	# For util/KMessage.h
 UsePrivateHeaders libroot runtime_loader shared ;
 
-if $(HAIKU_MULTIUSER_QUERY) = 1 {
-	PWD_BACKEND = pwd_query.c ;
-} else {
-	PWD_BACKEND = pwd.cpp grp.cpp shadow.cpp user_group_common.cpp ;
-}
-MergeObject posix_main.o :
- 	assert.c
- 	dlfcn.c
- 	dirent.c
- 	errno.c
-	fcntl.cpp
- 	fnmatch.c
-    fts.c
-    ftw.c
- 	glob.c
- 	inttypes.c
-	libgen.cpp
-    nftw.c
- 	poll.c
- 	$(PWD_BACKEND)
- 	scheduler.cpp
-	semaphore.cpp
- 	syslog.cpp
- 	termios.c
- 	utime.c
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-SubInclude HAIKU_TOP src system libroot posix arch $(TARGET_ARCH) ;
+		UsePrivateSystemHeaders ;
+
+		if $(HAIKU_MULTIUSER_QUERY) = 1 {
+			PWD_BACKEND = pwd_query.c ;
+		} else {
+			PWD_BACKEND = pwd.cpp grp.cpp shadow.cpp user_group_common.cpp ;
+		}
+		MergeObject <$(architecture)>posix_main.o :
+			assert.c
+			dlfcn.c
+			dirent.c
+			errno.c
+			fcntl.cpp
+			fnmatch.c
+			fts.c
+			ftw.c
+			glob.c
+			inttypes.c
+			libgen.cpp
+			nftw.c
+			poll.c
+			$(PWD_BACKEND)
+			scheduler.cpp
+			semaphore.cpp
+			syslog.cpp
+			termios.c
+			utime.c
+			;
+	}
+}
+
+local arch ;
+for arch in $(TARGET_ARCHS) {
+	HaikuSubInclude arch $(arch) ;
+}
 
 SubInclude HAIKU_TOP src system libroot posix crypt ;
 SubInclude HAIKU_TOP src system libroot posix locale ;

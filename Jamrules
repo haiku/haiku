@@ -29,42 +29,8 @@ if ! $(buildConfig) {
 LOCATE on BuildConfig = $(HAIKU_BUILD_OUTPUT_DIR) ;
 include BuildConfig ;
 
-# Set simplified variables for primary architecture.
+# set HAIKU_PACKAGING_ARCH, the primary packaging architecture
 HAIKU_PACKAGING_ARCH = $(HAIKU_PACKAGING_ARCHS[1]) ;
-local variable ;
-for variable in
-	HAIKU_GCC_RAW_VERSION
-	HAIKU_GCC_MACHINE
-	HAIKU_GCC_LIB_DIR
-	HAIKU_GCC_HEADERS_DIR
-	HAIKU_GCC_LIBGCC
-	HAIKU_GCC_LIBGCC_OBJECTS
-	HAIKU_CPU
-	HAIKU_STATIC_LIBSTDC++
-	HAIKU_SHARED_LIBSTDC++
-	HAIKU_STATIC_LIBSUPC++
-	HAIKU_SHARED_LIBSUPC++
-	HAIKU_C++_HEADERS_DIR
-	HAIKU_KERNEL_LIBGCC
-	HAIKU_KERNEL_LIBSUPC++
-	HAIKU_BOOT_LIBGCC
-	HAIKU_BOOT_LIBSUPC++
-	HAIKU_AR
-	HAIKU_CC
-	HAIKU_LD
-	HAIKU_OBJCOPY
-	HAIKU_RANLIB
-	HAIKU_ELFEDIT
-	HAIKU_STRIP
-	HAIKU_CPPFLAGS
-	HAIKU_CCFLAGS
-	HAIKU_C++FLAGS
-	HAIKU_LDFLAGS
-	HAIKU_ARFLAGS
-	HAIKU_UNARFLAGS
-	HAIKU_USE_GCC_GRAPHITE {
-	$(variable) = $($(variable)_$(HAIKU_PACKAGING_ARCH)) ;
-}
 
 # The build setup and rules are neatly organized in several files. Include
 # them now. Start with the side-effect-less rules, since they are the most
@@ -73,6 +39,7 @@ for variable in
 # optional user-defined UserBuildConfig is included thereafter.
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) HelperRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) MathRules ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) ArchitectureRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) BeOSRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) LocaleRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) CommandLineArguments ] ;

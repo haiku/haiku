@@ -51,7 +51,7 @@ Server registrar
 	libstorage_kit_mime.a
 	be
 	$(TARGET_LIBSTDC++)
-	$(HAIKU_LOCALE_LIBS)
+	localestub
 	:
 	registrar.rdef
 ;

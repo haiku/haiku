@@ -1,11 +1,15 @@
 SubDir HAIKU_TOP src system libroot posix glibc ;
 
-SubInclude HAIKU_TOP src system libroot posix glibc arch ;
+local arch ;
+for arch in $(TARGET_ARCHS) {
+	HaikuSubInclude arch $(arch) ;
+}
+
 SubInclude HAIKU_TOP src system libroot posix glibc ctype ;
 SubInclude HAIKU_TOP src system libroot posix glibc extensions ;
 SubInclude HAIKU_TOP src system libroot posix glibc iconv ;
-SubInclude HAIKU_TOP src system libroot posix glibc locale ;
 SubInclude HAIKU_TOP src system libroot posix glibc libio ;
+SubInclude HAIKU_TOP src system libroot posix glibc locale ;
 SubInclude HAIKU_TOP src system libroot posix glibc misc ;
 SubInclude HAIKU_TOP src system libroot posix glibc regex ;
 SubInclude HAIKU_TOP src system libroot posix glibc stdio-common ;

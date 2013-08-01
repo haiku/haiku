@@ -1,33 +1,41 @@
 SubDir HAIKU_TOP src system libroot posix signal ;
 
-UsePrivateSystemHeaders ;
 UsePrivateHeaders libroot shared ;
 
-MergeObject posix_signal.o :
-	kill.c
-	killpg.cpp
-	psiginfo.cpp
-	psignal.cpp
-	raise.c
-	send_signal.c
-	set_signal_mask.cpp
-	set_signal_stack.c
-	sigaction.cpp
-	sigaltstack.c
-	sighold.cpp
-	sigignore.cpp
-	siginterrupt.cpp
-	signal.cpp
-	signal_limits.cpp
-	sigpause.cpp
-	sigpending.cpp
-	sigqueue.cpp
-	sigrelse.cpp
-	sigset.cpp
-	sigset_accessors.cpp
-	sigsuspend.cpp
-	sigtimedwait.cpp
-	sigwait.cpp
-	sigwaitinfo.cpp
-	strsignal.cpp
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		UsePrivateSystemHeaders ;
+
+		MergeObject <$(architecture)>posix_signal.o :
+			kill.c
+			killpg.cpp
+			psiginfo.cpp
+			psignal.cpp
+			raise.c
+			send_signal.c
+			set_signal_mask.cpp
+			set_signal_stack.c
+			sigaction.cpp
+			sigaltstack.c
+			sighold.cpp
+			sigignore.cpp
+			siginterrupt.cpp
+			signal.cpp
+			signal_limits.cpp
+			sigpause.cpp
+			sigpending.cpp
+			sigqueue.cpp
+			sigrelse.cpp
+			sigset.cpp
+			sigset_accessors.cpp
+			sigsuspend.cpp
+			sigtimedwait.cpp
+			sigwait.cpp
+			sigwaitinfo.cpp
+			strsignal.cpp
+			;
+	}
+}

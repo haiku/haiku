@@ -14,5 +14,6 @@ KernelStaticLibrary broadcom440x_mii.a
 	;
 
 ObjectHdrs [ FGristFiles bmtphy$(SUFOBJ) ]
-	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) libs compat freebsd_network ] ;
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)) libs
+		compat freebsd_network ] ;
 Includes [ FGristFiles bmtphy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;

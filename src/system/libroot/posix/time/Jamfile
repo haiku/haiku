@@ -9,26 +9,34 @@ UsePrivateHeaders
 	[ FDirName libroot locale ]
 	[ FDirName libroot time ]
 	shared
-;
-UsePrivateSystemHeaders ;
+	;
 
-MergeObject posix_time.o :
-	asctime.cpp
-	clock.cpp
-	clock_support.cpp
-	ctime.c
-	difftime.c
-	localtime_fading_out.c
-	localtime.cpp
-	nanosleep.c
-	stime.c
-	strftime.c
-	strptime.c
-	timelocal.cpp
-	time.c
-	timer_support.cpp
-	wcsftime.c
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		UsePrivateSystemHeaders ;
+
+		MergeObject <$(architecture)>posix_time.o :
+			asctime.cpp
+			clock.cpp
+			clock_support.cpp
+			ctime.c
+			difftime.c
+			localtime_fading_out.c
+			localtime.cpp
+			nanosleep.c
+			stime.c
+			strftime.c
+			strptime.c
+			timelocal.cpp
+			time.c
+			timer_support.cpp
+			wcsftime.c
+			;
+	}
+}
 
 # Explanations of flags:
 #

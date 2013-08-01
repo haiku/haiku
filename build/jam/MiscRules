@@ -10,15 +10,21 @@ rule SetupObjectsDir
 	if $(relPath) = . {
 		relPath = ;
 	}
-	COMMON_PLATFORM_LOCATE_TARGET =
-		[ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) $(relPath) ] ;
+
+	COMMON_PLATFORM_LOCATE_TARGET
+		= [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) $(relPath) ] ;
+	HOST_COMMON_ARCH_LOCATE_TARGET
+		= [ FDirName $(HOST_COMMON_ARCH_OBJECT_DIR) $(relPath) ] ;
+	TARGET_COMMON_ARCH_LOCATE_TARGET
+		= [ FDirName $(TARGET_COMMON_ARCH_OBJECT_DIR) $(relPath) ] ;
 
 	local var ;
-	for var in COMMON_ARCH COMMON_DEBUG DEBUG_$(HAIKU_DEBUG_LEVELS) {
+	for var in COMMON_DEBUG DEBUG_$(HAIKU_DEBUG_LEVELS) {
 		HOST_$(var)_LOCATE_TARGET
 			= [ FDirName $(HOST_$(var)_OBJECT_DIR) $(relPath) ] ;
 		TARGET_$(var)_LOCATE_TARGET
-			= [ FDirName $(TARGET_$(var)_OBJECT_DIR) $(relPath) ] ;
+			= [ FDirName $(TARGET_$(var)_OBJECT_DIR_$(TARGET_PACKAGING_ARCH))
+				$(relPath) ] ;
 	}
 
 	LOCATE_TARGET = $(COMMON_PLATFORM_LOCATE_TARGET) ;
@@ -71,58 +77,62 @@ rule SubIncludeGPL
 # pragma mark - MakeLocate variants
 
 
-rule MakeLocateCommonPlatform
+rule MakeLocateCommonPlatform files : subdir
 {
 	# The file is shared between all target platforms.
-	MakeLocate $(1) : $(COMMON_PLATFORM_LOCATE_TARGET) ;
+	MakeLocate $(files)
+		: [ FDirName $(COMMON_PLATFORM_LOCATE_TARGET) $(subdir) ] ;
 }
 
-rule MakeLocatePlatform
+rule MakeLocatePlatform files : subdir
 {
 	# The file is specific for the target platform, but
 	# architecture independent. Usually the right rule for generated
 	# sources, though sometimes sources can be architecture specific.
-	local files = $(1) ;
 	local file ;
 	for file in $(files) {
+		local directory ;
 		if [ on $(file) return $(PLATFORM) ] = host {
-			MakeLocate $(file) : $(HOST_COMMON_ARCH_LOCATE_TARGET) ;
+			directory = $(HOST_COMMON_ARCH_LOCATE_TARGET) ;
 		} else {
-			MakeLocate $(file) : $(TARGET_COMMON_ARCH_LOCATE_TARGET) ;
+			directory = $(TARGET_COMMON_ARCH_LOCATE_TARGET) ;
 		}
+		MakeLocate $(file) : [ FDirName $(directory) $(subdir) ] ;
 	}
 }
 
-rule MakeLocateArch
+rule MakeLocateArch files : subdir
 {
 	# The file is platform+architecture specific, but is debug
 	# level independent. This is usually the right rule for generated
 	# architecture specific data or source files.
-	local files = $(1) ;
 	local file ;
 	for file in $(files) {
+		local directory ;
 		if [ on $(file) return $(PLATFORM) ] = host {
-			MakeLocate $(file) : $(HOST_COMMON_DEBUG_LOCATE_TARGET) ;
+			directory = $(HOST_COMMON_DEBUG_LOCATE_TARGET) ;
 		} else {
-			MakeLocate $(file) : $(TARGET_COMMON_DEBUG_LOCATE_TARGET) ;
+			directory = $(TARGET_COMMON_DEBUG_LOCATE_TARGET) ;
 		}
+		MakeLocate $(file) : [ FDirName $(directory) $(subdir) ] ;
 	}
 }
 
-rule MakeLocateDebug
+rule MakeLocateDebug files : subdir
 {
 	# The file is platform+architecture+debug level specific.
 	# That's what should be used for compiled code.
-	local files = $(1) ;
 	local file ;
 	for file in $(files) {
+		local directory ;
 		on $(file) {
 			if $(PLATFORM) = host {
-				MakeLocate $(file) : $(HOST_DEBUG_$(DEBUG)_LOCATE_TARGET) ;
+				directory = $(HOST_DEBUG_$(DEBUG)_LOCATE_TARGET) ;
 			} else {
-				MakeLocate $(file) : $(TARGET_DEBUG_$(DEBUG)_LOCATE_TARGET) ;
+				directory = $(TARGET_DEBUG_$(DEBUG)_LOCATE_TARGET) ;
 			}
 		}
+		MakeLocate $(file) : [ FDirName $(directory) $(subdir) ] ;
 	}
 }
 

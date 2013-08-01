@@ -19,47 +19,54 @@ if $(RUN_WITHOUT_APP_SERVER) != 0 {
 
 UseLibraryHeaders icon ;
 UsePrivateHeaders shared app interface kernel locale notification ;
-UsePrivateSystemHeaders ;
 
 SetSubDirSupportedPlatforms haiku libbe_test ;
 
-MergeObject <libbe>app_kit.o :
-	AppDefs.cpp
-	Application.cpp
-	AppMisc.cpp
-	AppServerLink.cpp
-	Cursor.cpp
-	Clipboard.cpp
-	DesktopLink.cpp
-	DirectMessageTarget.cpp
-	Handler.cpp
-	InitTerminateLibBe.cpp
-	Invoker.cpp
-	LinkReceiver.cpp
-	LinkSender.cpp
-	Looper.cpp
-	LooperList.cpp
-	Message.cpp
-	MessageAdapter.cpp
-	MessageFilter.cpp
-	MessageQueue.cpp
-	MessageRunner.cpp
-	Messenger.cpp
-	MessageUtils.cpp
-	Notification.cpp
-	PropertyInfo.cpp
-	PortLink.cpp
-	RegistrarDefs.cpp
-	Roster.cpp
-	RosterPrivate.cpp
-	Server.cpp
-	ServerLink.cpp
-	ServerMemoryAllocator.cpp
-	TokenSpace.cpp
-	TypeConstants.cpp
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-	# KeyStore implementation
-	Key.cpp
-	KeyStore.cpp
-;
+		UsePrivateSystemHeaders ;
 
+		MergeObject <libbe!$(architecture)>app_kit.o :
+			AppDefs.cpp
+			Application.cpp
+			AppMisc.cpp
+			AppServerLink.cpp
+			Cursor.cpp
+			Clipboard.cpp
+			DesktopLink.cpp
+			DirectMessageTarget.cpp
+			Handler.cpp
+			InitTerminateLibBe.cpp
+			Invoker.cpp
+			LinkReceiver.cpp
+			LinkSender.cpp
+			Looper.cpp
+			LooperList.cpp
+			Message.cpp
+			MessageAdapter.cpp
+			MessageFilter.cpp
+			MessageQueue.cpp
+			MessageRunner.cpp
+			Messenger.cpp
+			MessageUtils.cpp
+			Notification.cpp
+			PropertyInfo.cpp
+			PortLink.cpp
+			RegistrarDefs.cpp
+			Roster.cpp
+			RosterPrivate.cpp
+			Server.cpp
+			ServerLink.cpp
+			ServerMemoryAllocator.cpp
+			TokenSpace.cpp
+			TypeConstants.cpp
+
+			# KeyStore implementation
+			Key.cpp
+			KeyStore.cpp
+			;
+	}
+}

@@ -4,8 +4,9 @@ SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) gnulib lib ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 # filter warnings we don't want here
-TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
-	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
+TARGET_WARNING_CCFLAGS_$(TARGET_PACKAGING_ARCH)
+	= [ FFilter $(TARGET_WARNING_CCFLAGS_$(TARGET_PACKAGING_ARCH))
+		: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
 # set some additional defines
 {

@@ -15,7 +15,7 @@ Preference Media :
 	MediaListItem.cpp
 	MediaViews.cpp
 	MediaWindow.cpp
-	: media be $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	: media be localestub $(TARGET_LIBSUPC++)
 	: media.rdef
 	;
 

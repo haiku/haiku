@@ -232,9 +232,11 @@ rule ResComp
 			cc = $(HOST_CC) ;
 			localIncludesOption = $(HOST_LOCAL_INCLUDES_OPTION) ;
 		} else {
-			defines += $(TARGET_DEFINES) ;
-			cc = $(TARGET_CC) ;
-			localIncludesOption = $(TARGET_LOCAL_INCLUDES_OPTION) ;
+			defines += $(TARGET_DEFINES_$(TARGET_PACKAGING_ARCH))
+				$(TARGET_DEFINES) ;
+			cc = $(TARGET_CC_$(TARGET_PACKAGING_ARCH)) ;
+			localIncludesOption
+				= $(TARGET_LOCAL_INCLUDES_OPTION_$(TARGET_PACKAGING_ARCH)) ;
 		}
 	}
 

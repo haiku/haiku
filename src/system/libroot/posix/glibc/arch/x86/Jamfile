@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src system libroot posix glibc arch x86 ;
 
-SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch $(TARGET_ARCH) ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch x86 ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch generic ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc libio ;
@@ -98,94 +98,103 @@ local genericSources =
 	w_sinh.c w_sinhf.c w_sinhl.c
 	w_sqrt.c w_sqrtf.c w_sqrtl.c
 	w_tgamma.c w_tgammaf.c w_tgammal.c
-;
+	;
 
-MergeObject posix_gnu_arch_$(TARGET_ARCH)_other.o :
-	add_n.S
-	addmul_1.S
-	fegetround.c
-	fesetround.c
-	fraiseexcpt.c
-	ldbl2mpn.c
-	mpa.c mpatan.c mpatan2.c mptan.c
-	
-	mplog.c
-	mul_1.S
-	lshift.S rshift.S
-	sub_n.S
-	submul_1.S
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup x86 x86_gcc2 ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		MergeObject <$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_other.o :
+			add_n.S
+			addmul_1.S
+			fegetround.c
+			fesetround.c
+			fraiseexcpt.c
+			ldbl2mpn.c
+			mpa.c mpatan.c mpatan2.c mptan.c
+
+			mplog.c
+			mul_1.S
+			lshift.S rshift.S
+			sub_n.S
+			submul_1.S
+			;
 
 
-MergeObject posix_gnu_arch_$(TARGET_ARCH)_e.o :
-	e_acos.S e_acosf.S e_acosl.c
-	e_acosh.S e_acoshf.S e_acoshl.S
-	e_asin.S e_asinf.S
-	e_atan2.S e_atan2f.S e_atan2l.c
-	e_atanh.S e_atanhf.S e_atanhl.S
-	e_exp.S e_expf.S e_expl.c
-	e_exp2.S e_exp2f.S e_exp2l.S
-	e_exp10.S e_exp10f.S e_exp10l.S
-	e_fmod.S e_fmodf.S e_fmodl.c
-	e_hypot.S e_hypotf.S
-	e_log.S e_logf.S e_logl.S
-	e_log2.S e_log2f.S e_log2l.S
-	e_log10.S e_log10f.S e_log10l.S
-	e_pow.S e_powf.S e_powl.S
-	e_remainder.S e_remainderf.S e_remainderl.S
-	e_scalb.S e_scalbf.S e_scalbl.S
-	e_sqrt.S e_sqrtf.S e_sqrtl.c
-;
+		MergeObject <$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_e.o :
+			e_acos.S e_acosf.S e_acosl.c
+			e_acosh.S e_acoshf.S e_acoshl.S
+			e_asin.S e_asinf.S
+			e_atan2.S e_atan2f.S e_atan2l.c
+			e_atanh.S e_atanhf.S e_atanhl.S
+			e_exp.S e_expf.S e_expl.c
+			e_exp2.S e_exp2f.S e_exp2l.S
+			e_exp10.S e_exp10f.S e_exp10l.S
+			e_fmod.S e_fmodf.S e_fmodl.c
+			e_hypot.S e_hypotf.S
+			e_log.S e_logf.S e_logl.S
+			e_log2.S e_log2f.S e_log2l.S
+			e_log10.S e_log10f.S e_log10l.S
+			e_pow.S e_powf.S e_powl.S
+			e_remainder.S e_remainderf.S e_remainderl.S
+			e_scalb.S e_scalbf.S e_scalbl.S
+			e_sqrt.S e_sqrtf.S e_sqrtl.c
+			;
 
-MergeObject posix_gnu_arch_$(TARGET_ARCH)_s.o :
-	s_asinh.S s_asinhf.S s_asinhl.S
-	s_atan.S s_atanf.S s_atanl.c
-	s_cbrt.S s_cbrtf.S s_cbrtl.S
-	s_ceil.S s_ceilf.S s_ceill.S
-	s_cexp.S s_cexpf.S s_cexpl.S
-	s_copysign.S s_copysignf.S s_copysignl.S
-	s_cos.S s_cosf.S s_cosl.S
-	s_expm1.S s_expm1f.S s_expm1l.S
-	s_fdim.S s_fdimf.S s_fdiml.S
-	s_fabs.S s_fabsf.S s_fabsl.S
-	s_finite.S s_finitef.S s_finitel.S
-	s_floor.S s_floorf.S s_floorl.S
-	s_fma.S s_fmaf.S s_fmal.S
-	s_fmax.S s_fmaxf.S s_fmaxl.S
-	s_fmin.S s_fminf.S s_fminl.S
-	s_fpclassifyl.c
-	s_frexp.S s_frexpf.S s_frexpl.S
-	s_ilogb.S s_ilogbf.S
-	s_isinfl.c
-	s_isnanl.c
-	s_llrint.S s_llrintf.S s_llrintl.S
-	s_log1p.S s_log1pf.S s_log1pl.S
-	s_logb.S s_logbf.S s_logbl.c
-	s_lrint.S s_lrintf.S s_lrintl.S
-	s_nearbyint.S s_nearbyintf.S s_nearbyintl.S
-	s_nextafterl.c
-	s_nexttoward.c s_nexttowardf.c
-	s_remquo.S s_remquof.S s_remquol.S
-	s_rint.S s_rintf.S s_rintl.c
-	s_scalbln.c s_scalblnf.c s_scalblnl.c
-	s_scalbn.S s_scalbnf.S s_scalbnl.S
-	s_significand.S s_significandf.S
-	s_sin.S s_sinf.S s_sinl.S
-	s_sincos.S s_sincosf.S s_sincosl.S
-	s_tan.S s_tanf.S s_tanl.S
-	s_trunc.S s_truncf.S s_truncl.S
-;
+		MergeObject <$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_s.o :
+			s_asinh.S s_asinhf.S s_asinhl.S
+			s_atan.S s_atanf.S s_atanl.c
+			s_cbrt.S s_cbrtf.S s_cbrtl.S
+			s_ceil.S s_ceilf.S s_ceill.S
+			s_cexp.S s_cexpf.S s_cexpl.S
+			s_copysign.S s_copysignf.S s_copysignl.S
+			s_cos.S s_cosf.S s_cosl.S
+			s_expm1.S s_expm1f.S s_expm1l.S
+			s_fdim.S s_fdimf.S s_fdiml.S
+			s_fabs.S s_fabsf.S s_fabsl.S
+			s_finite.S s_finitef.S s_finitel.S
+			s_floor.S s_floorf.S s_floorl.S
+			s_fma.S s_fmaf.S s_fmal.S
+			s_fmax.S s_fmaxf.S s_fmaxl.S
+			s_fmin.S s_fminf.S s_fminl.S
+			s_fpclassifyl.c
+			s_frexp.S s_frexpf.S s_frexpl.S
+			s_ilogb.S s_ilogbf.S
+			s_isinfl.c
+			s_isnanl.c
+			s_llrint.S s_llrintf.S s_llrintl.S
+			s_log1p.S s_log1pf.S s_log1pl.S
+			s_logb.S s_logbf.S s_logbl.c
+			s_lrint.S s_lrintf.S s_lrintl.S
+			s_nearbyint.S s_nearbyintf.S s_nearbyintl.S
+			s_nextafterl.c
+			s_nexttoward.c s_nexttowardf.c
+			s_remquo.S s_remquof.S s_remquol.S
+			s_rint.S s_rintf.S s_rintl.c
+			s_scalbln.c s_scalblnf.c s_scalblnl.c
+			s_scalbn.S s_scalbnf.S s_scalbnl.S
+			s_significand.S s_significandf.S
+			s_sin.S s_sinf.S s_sinl.S
+			s_sincos.S s_sincosf.S s_sincosl.S
+			s_tan.S s_tanf.S s_tanl.S
+			s_trunc.S s_truncf.S s_truncl.S
+			;
 
-MergeObject posix_gnu_arch_$(TARGET_ARCH)_generic.o :
-	$(genericSources)
-;
+		MergeObject <$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_generic.o :
+			$(genericSources)
+			;
 
-MergeObjectFromObjects posix_gnu_arch_$(TARGET_ARCH).o : :
-	posix_gnu_arch_$(TARGET_ARCH)_e.o
-	posix_gnu_arch_$(TARGET_ARCH)_generic.o
-	posix_gnu_arch_$(TARGET_ARCH)_other.o
-	posix_gnu_arch_$(TARGET_ARCH)_s.o
-;
+		MergeObjectFromObjects <$(architecture)>posix_gnu_arch_$(TARGET_ARCH).o
+			: :
+			<$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_e.o
+			<$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_generic.o
+			<$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_other.o
+			<$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_s.o
+			;
 
-SEARCH on [ FGristFiles $(genericSources) ]
-	= [ FDirName $(HAIKU_TOP) src system libroot posix glibc arch generic ] ;
+		SEARCH on [ FGristFiles $(genericSources) ]
+			= [ FDirName $(HAIKU_TOP) src system libroot posix glibc arch
+				generic ] ;
+	}
+}

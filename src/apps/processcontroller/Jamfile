@@ -21,7 +21,7 @@ Application ProcessController :
 	ThreadBarMenu.cpp
 	ThreadBarMenuItem.cpp
 	Utilities.cpp
-	: be libshared.a $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: be libshared.a $(TARGET_LIBSUPC++) localestub
 	: ProcessController.rdef
 ;
 

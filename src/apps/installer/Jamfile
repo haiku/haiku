@@ -14,7 +14,7 @@ Application Installer :
 	UnzipEngine.cpp
 	WorkerThread.cpp
 	: be tracker translation libshared.a $(TARGET_LIBSTDC++) 
-		$(HAIKU_LOCALE_LIBS)
+		localestub
 	: Installer.rdef
 ;
 

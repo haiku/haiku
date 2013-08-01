@@ -4,10 +4,13 @@
 # for an optional package.
 
 
-# Add the target architecture as a build feature.
-EnableBuildFeatures $(HAIKU_ARCH) ;
+local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-if $(HAIKU_GCC_VERSION[1]) = 2 {
+
+# Add the target architecture as a build feature.
+EnableBuildFeatures $(TARGET_ARCH_$(architecture)) ;
+
+if $(TARGET_GCC_VERSION_$(architecture)[1]) = 2 {
 	EnableBuildFeatures gcc2 ;
 }
 
@@ -122,7 +125,7 @@ if ! 1 {
 
 # LLVM
 if $(TARGET_ARCH) = x86 {
-	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	if $(TARGET_GCC_VERSION_$(architecture)[1]) >= 4 {
 		HAIKU_LLVM_FILE = llvm-3.2-x86-gcc4-2012-12-21.zip ;
 		local zipFile = [ DownloadFile $(HAIKU_LLVM_FILE)
 			: $(baseURL)/$(HAIKU_LLVM_FILE) ] ;
@@ -395,11 +398,13 @@ if $(TARGET_ARCH) = x86 {
 if $(HAIKU_BUILD_FEATURE_WEBKIT) {
 	if $(TARGET_ARCH) != x86 && $(TARGET_ARCH) != x86_64 {
 		Echo "WebKit support not available on $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) < 4 {
+	} else if $(TARGET_GCC_VERSION_$(architecture)[1]) < 4 {
 		if ! $(isHybridBuild) {
-			Echo "WebKit support not available on gcc $(HAIKU_GCC_VERSION[1])" ;
+			Echo "WebKit support not available on gcc"
+				"$(TARGET_GCC_VERSION_$(architecture)[1])" ;
 		} else {
-			Echo "WebKit to be utilized by gcc4 inside $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR)" ;
+			Echo "WebKit to be utilized by gcc4 inside"
+				"$(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR)" ;
 		}
 	} else {
 		local zipFile = [ DownloadFile $(HAIKU_WEBKIT_FILE)

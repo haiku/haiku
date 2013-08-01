@@ -29,7 +29,7 @@ Translator WonderBrushTranslator :
 	: be translation
 	[ BuildFeatureAttribute zlib : library ]
 	libtranslatorsutils.a
-	$(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	$(TARGET_LIBSUPC++) localestub
 	: true
 ;
 

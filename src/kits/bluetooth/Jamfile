@@ -24,7 +24,7 @@ SharedLibrary libbluetooth.so :
 	#UI
 	PincodeWindow.cpp
 	ConnectionIncoming.cpp
-	: be $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSTDC++)
+	: be localestub $(TARGET_LIBSTDC++)
 ;
 
 DoCatalogs libbluetooth.so :

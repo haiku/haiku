@@ -8,7 +8,7 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 AddResources PNGTranslator : PNGTranslator.rdef ;
 
-if $(HAIKU_GCC_VERSION[1]) = 2 {
+if $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) = 2 {
 	SubDirCcFlags -DPNG_NO_PEDANTIC_WARNINGS ;
 }
 
@@ -24,7 +24,7 @@ Translator PNGTranslator :
 		[ BuildFeatureAttribute libpng : library ]
 		[ BuildFeatureAttribute zlib : library ]
 		$(TARGET_LIBSUPC++) libtranslatorsutils.a
-		$(HAIKU_LOCALE_LIBS)
+		localestub
 	: true
 ;
 

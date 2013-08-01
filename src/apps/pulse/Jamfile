@@ -23,7 +23,7 @@ Application Pulse :
 	PulseView.cpp
 	PulseWindow.cpp
 
-	: be $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	: be localestub $(TARGET_LIBSUPC++)
 	: Pulse.rdef
 ;
 

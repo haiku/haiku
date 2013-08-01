@@ -60,7 +60,7 @@ Application WebPositive :
 	$(sources)
 	:
 	$(HAIKU_WEBKIT_LIBS)
-	$(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
+	$(TARGET_LIBSTDC++) localestub
 	be libshared.a network tracker translation
 	:
 	WebPositive.rdef

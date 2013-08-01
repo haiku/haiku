@@ -2,52 +2,59 @@ SubDir HAIKU_TOP src system libroot posix glibc stdio-common ;
 
 SubDirCcFlags -D_GNU_SOURCE -DUSE_IN_LIBIO ;
 
-SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc libio ;
-SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch
-	$(TARGET_ARCH) ;
-SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch generic ;
-SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
-SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc stdio-common ;
-SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;
-SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-UsePrivateHeaders libroot ;
+		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc libio ;
+		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch
+			$(TARGET_ARCH) ;
+		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch
+			generic ;
+		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
+		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc stdio-common ;
+		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;
+		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 
+		UsePrivateHeaders libroot ;
 
-MergeObject posix_gnu_stdio.o : #_common.o :
-	_itoa.c
-	_itowa.c
-	asprintf.c
-#	dprintf.c
-	fprintf.c
-	fscanf.c
-	getline.c
-	getw.c
-	itoa-digits.c
-	itoa-udigits.c
-	itowa-digits.c
-	perror.c
-	printf-prs.c
-	printf.c
-	printf_fp.c
-	printf_fphex.c
-	printf_size.c
-	putw.c
-	reg-printf.c
-	scanf.c
-	snprintf.c
-	sprintf.c
-	sscanf.c
-	tempnam.c
-	tempname.c
-	tmpfile.c
-	tmpnam.c
-	tmpnam_r.c
-	vfprintf.c
-#	vfprintf_stub.c
-#	vfscanf_stub.c
-	vfscanf.c
-	vfwprintf.c
-	vfwscanf.c
-	vprintf.c
-;
+		MergeObject <$(architecture)>posix_gnu_stdio.o :
+			_itoa.c
+			_itowa.c
+			asprintf.c
+#			dprintf.c
+			fprintf.c
+			fscanf.c
+			getline.c
+			getw.c
+			itoa-digits.c
+			itoa-udigits.c
+			itowa-digits.c
+			perror.c
+			printf-prs.c
+			printf.c
+			printf_fp.c
+			printf_fphex.c
+			printf_size.c
+			putw.c
+			reg-printf.c
+			scanf.c
+			snprintf.c
+			sprintf.c
+			sscanf.c
+			tempnam.c
+			tempname.c
+			tmpfile.c
+			tmpnam.c
+			tmpnam_r.c
+			vfprintf.c
+#			vfprintf_stub.c
+#			vfscanf_stub.c
+			vfscanf.c
+			vfwprintf.c
+			vfwscanf.c
+			vprintf.c
+			;
+	}
+}

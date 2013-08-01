@@ -3,24 +3,26 @@ SubDir HAIKU_TOP src kits storage mime ;
 SetSubDirSupportedPlatforms haiku libbe_test ;
 
 UsePrivateHeaders app shared storage ;
-#UsePrivateHeaders app libroot shared storage ;
-#UsePrivateSystemHeaders ;
 
-# for libbe_test
-#UsePublicHeaders [ FDirName add-ons registrar ] ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-StaticLibrary libstorage_kit_mime.a :
-	AppMetaMimeCreator.cpp
-	AssociatedTypes.cpp
-	Database.cpp
-	DatabaseDirectory.cpp
-	DatabaseLocation.cpp
-	database_support.cpp
-	InstalledTypes.cpp
-	MimeEntryProcessor.cpp
-	MimeInfoUpdater.cpp
-	MimeSniffer.cpp
-	SnifferRules.cpp
-	Supertype.cpp
-	SupportingApps.cpp
-;
+		StaticLibrary [ MultiArchDefaultGristFiles libstorage_kit_mime.a ] :
+			AppMetaMimeCreator.cpp
+			AssociatedTypes.cpp
+			Database.cpp
+			DatabaseDirectory.cpp
+			DatabaseLocation.cpp
+			database_support.cpp
+			InstalledTypes.cpp
+			MimeEntryProcessor.cpp
+			MimeInfoUpdater.cpp
+			MimeSniffer.cpp
+			SnifferRules.cpp
+			Supertype.cpp
+			SupportingApps.cpp
+			;
+	}
+}

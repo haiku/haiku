@@ -19,7 +19,7 @@ Preference Screen :
 	ScreenSettings.cpp
 	ScreenWindow.cpp
 	Utility.cpp
-	: be $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS) libaccelerantscommon.a
+	: be $(TARGET_LIBSUPC++) localestub libaccelerantscommon.a
 	: Screen.rdef
 	;
 

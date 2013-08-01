@@ -23,7 +23,7 @@ Addon <disk_system>intel :
 	# kernel sources
 	PartitionMap.cpp
 
-	: be libshared.a $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	: be libshared.a localestub $(TARGET_LIBSUPC++)
 ;
 
 DoCatalogs <disk_system>intel :

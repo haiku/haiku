@@ -16,5 +16,6 @@ KernelAddon broadcom570x :
 	;
 
 ObjectHdrs [ FGristFiles if_bge$(SUFOBJ) ]
-	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) libs compat freebsd_network ] ;
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)) libs
+		compat freebsd_network ] ;
 Includes [ FGristFiles if_bge.c ] : <src!libs!compat!freebsd_network>miidevs.h ;

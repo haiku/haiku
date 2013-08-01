@@ -21,7 +21,7 @@ Includes [ FGristFiles $(sources) ] :
 Application GLTeapot :
 	$(sources)
 	:
-	be GL game $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	be GL game localestub $(TARGET_LIBSUPC++)
 	[ BuildFeatureAttribute glu : library ]
 	: GLTeapot.rdef
 ;

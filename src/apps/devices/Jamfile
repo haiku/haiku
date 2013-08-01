@@ -97,7 +97,7 @@ Application Devices :
 	PropertyList.cpp
 	PropertyListPlain.cpp
 	: be libcolumnlistview.a tracker $(TARGET_LIBSUPC++)
-		$(TARGET_LIBSTDC++)	$(HAIKU_LOCALE_LIBS) 
+		$(TARGET_LIBSTDC++)	localestub 
 	: Devices.rdef
 ;
 

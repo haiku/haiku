@@ -267,19 +267,19 @@ rule FAnalyzeGCCVersion
 	return $(version) ;
 }
 
-rule SetIncludePropertiesVariables
+rule SetIncludePropertiesVariables prefix : suffix
 {
-	# SetIncludePropertiesVariables <varPrefix> ;
+	# SetIncludePropertiesVariables <prefix> : <suffix> ;
 	#
-	local prefix = $(1) ;
-	if $($(prefix)_GCC_VERSION[1]) < 4 {
-		$(prefix)_INCLUDES_SEPARATOR = -I- ;
-		$(prefix)_LOCAL_INCLUDES_OPTION = -I ;
-		$(prefix)_SYSTEM_INCLUDES_OPTION = -I ;
+	suffix = $(suffix:E=) ;
+	if $($(prefix)_GCC_VERSION$(suffix)[1]) < 4 {
+		$(prefix)_INCLUDES_SEPARATOR$(suffix) = -I- ;
+		$(prefix)_LOCAL_INCLUDES_OPTION$(suffix) = -I ;
+		$(prefix)_SYSTEM_INCLUDES_OPTION$(suffix) = -I ;
 	} else {
-		$(prefix)_INCLUDES_SEPARATOR = ;
-		$(prefix)_LOCAL_INCLUDES_OPTION = "-iquote " ;
-		$(prefix)_SYSTEM_INCLUDES_OPTION = "-I " ;
+		$(prefix)_INCLUDES_SEPARATOR$(suffix) = ;
+		$(prefix)_LOCAL_INCLUDES_OPTION$(suffix) = "-iquote " ;
+		$(prefix)_SYSTEM_INCLUDES_OPTION$(suffix) = "-I " ;
 	}
 }
 

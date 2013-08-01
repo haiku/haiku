@@ -16,7 +16,7 @@ Translator EXRTranslator :
 	EXRTranslator.cpp
 	IStreamWrapper.cpp
 	: be translation libilmimf.so $(TARGET_LIBSTDC++) libtranslatorsutils.a 
-	$(HAIKU_LOCALE_LIBS)
+	localestub
 	: true
 ;
 

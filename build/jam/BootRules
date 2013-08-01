@@ -24,8 +24,9 @@ rule SetupBoot
         ASFLAGS on $(object) = $(TARGET_BOOT_CCFLAGS) ;
 
 		# override warning flags
-		TARGET_WARNING_CCFLAGS on $(object) = $(TARGET_KERNEL_WARNING_CCFLAGS) ;
-		TARGET_WARNING_C++FLAGS on $(object)
+		TARGET_WARNING_CCFLAGS_$(TARGET_PACKAGING_ARCH) on $(object)
+			= $(TARGET_KERNEL_WARNING_CCFLAGS) ;
+		TARGET_WARNING_C++FLAGS_$(TARGET_PACKAGING_ARCH) on $(object)
 			= $(TARGET_KERNEL_WARNING_C++FLAGS) ;
 	}
 }
@@ -40,7 +41,7 @@ rule BootLd
 {
 	# BootLd <name> : <objs> : <linkerscript> : <args> ;
 
-	LINK on $(1) = $(TARGET_LD) ;
+	LINK on $(1) = $(TARGET_LD_$(TARGET_PACKAGING_ARCH)) ;
 
 	LINKFLAGS on $(1) = $(4) ;
 	if $(3) { LINKFLAGS on $(1) += --script=$(3) ; }
@@ -125,5 +126,5 @@ actions BootStaticLibraryObjects
 	# Force recreation of the archive to avoid build errors caused by
 	# stale dependencies after renaming or deleting object files.
 	$(RM) "$(1)"
-	$(HAIKU_AR) -r "$(1)" "$(2)" ;
+	$(HAIKU_AR_$(TARGET_PACKAGING_ARCH)) -r "$(1)" "$(2)" ;
 }

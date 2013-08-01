@@ -30,7 +30,7 @@ Preference E-mail
 	$(sources)
 	:
 	be libmail.so $(HAIKU_NETWORK_LIBS) $(TARGET_NETAPI_LIB) $(TARGET_LIBSTDC++)
-	$(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	$(TARGET_LIBSUPC++) localestub
 ;
 
 DoCatalogs E-mail

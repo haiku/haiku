@@ -8,7 +8,7 @@ Preference VirtualMemory :
 	Settings.cpp
 	$(DRIVER_SETTINGS)
 
-	: be libshared.a $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
+	: be libshared.a $(TARGET_LIBSTDC++) localestub
 	: VirtualMemory.rdef
 ;
 

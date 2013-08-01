@@ -6,7 +6,7 @@ Preference Fonts :
 	FontView.cpp
 	main.cpp
 	MainWindow.cpp
-	: be $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: be $(TARGET_LIBSUPC++) localestub
 	: Fonts.rdef
 	;
 

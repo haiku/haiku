@@ -31,7 +31,7 @@ Addon Interfaces :
 	libbnetapi.so
 	$(TARGET_LIBSUPC++)
 	$(TARGET_LIBSTDC++)
-	$(HAIKU_LOCALE_LIBS)
+	localestub
 	libicon.a libagg.a
 ;
 

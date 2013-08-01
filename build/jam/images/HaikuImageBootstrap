@@ -69,7 +69,8 @@ SYSTEM_LIBS = [ FFilterByBuildFeatures
 	<revisioned>libroot.so
 	libscreensaver.so
 	libtextencoding.so libtracker.so libtranslation.so
-	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
+	$(HAIKU_SHARED_LIBSTDC++_$(HAIKU_PACKAGING_ARCH))
+	$(HAIKU_SHARED_LIBSUPC++_$(HAIKU_PACKAGING_ARCH))
 ] ;
 PRIVATE_SYSTEM_LIBS = [ FFilterByBuildFeatures
 	libalm.so

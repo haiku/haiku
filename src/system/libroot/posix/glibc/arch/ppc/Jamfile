@@ -1,7 +1,6 @@
 SubDir HAIKU_TOP src system libroot posix glibc arch ppc ;
 
-SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch
-	$(TARGET_ARCH) ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch ppc ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch generic ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc stdlib ;
@@ -119,38 +118,47 @@ local genericSources =
 	w_scalb.c w_scalbf.c # w_scalbl.c
 	w_sinh.c w_sinhf.c # w_sinhl.c
 	w_tgamma.c w_tgammaf.c # w_tgammal.c
-;
+	;
 
-MergeObject posix_gnu_arch_$(TARGET_ARCH)_generic.o :
-	$(genericSources)
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ppc ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-MergeObject posix_gnu_arch_$(TARGET_ARCH)_other.o :
-	add_n.S
-	addmul_1.S
-	feholdexcpt.c fraiseexcpt.c fesetenv.c fesetround.c ftestexcept.c
-	ldbl2mpn.c
-	lshift.S rshift.S
-	mul_1.S
-	sub_n.S
-	submul_1.S
+		MergeObject <$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_generic.o :
+			$(genericSources)
+			;
 
-	e_sqrt.c e_sqrtf.c # e_sqrtl.c
-	s_copysign.S s_copysignf.S # s_copysignl.S
-	s_fabs.S s_fabsf.S # s_fabsl.S
-	s_fdim.c s_fdimf.c # s_fdiml.S
-	s_fmax.S s_fmaxf.S # s_fmaxl.S
-	s_fmin.S s_fminf.S # s_fminl.S
-	s_isnan.c s_isnanf.S
-	s_rint.c s_rintf.c # s_rintl.c
-	t_sqrt.c
-	w_sqrt.c w_sqrtf.c # w_sqrtl.c
-;
-	
-MergeObjectFromObjects posix_gnu_arch_$(TARGET_ARCH).o : :
-	posix_gnu_arch_$(TARGET_ARCH)_generic.o
-	posix_gnu_arch_$(TARGET_ARCH)_other.o
-;
+		MergeObject <$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_other.o :
+			add_n.S
+			addmul_1.S
+			feholdexcpt.c fraiseexcpt.c fesetenv.c fesetround.c ftestexcept.c
+			ldbl2mpn.c
+			lshift.S rshift.S
+			mul_1.S
+			sub_n.S
+			submul_1.S
 
-SEARCH on [ FGristFiles $(genericSources) ]
-	= [ FDirName $(HAIKU_TOP) src system libroot posix glibc arch generic ] ;
+			e_sqrt.c e_sqrtf.c # e_sqrtl.c
+			s_copysign.S s_copysignf.S # s_copysignl.S
+			s_fabs.S s_fabsf.S # s_fabsl.S
+			s_fdim.c s_fdimf.c # s_fdiml.S
+			s_fmax.S s_fmaxf.S # s_fmaxl.S
+			s_fmin.S s_fminf.S # s_fminl.S
+			s_isnan.c s_isnanf.S
+			s_rint.c s_rintf.c # s_rintl.c
+			t_sqrt.c
+			w_sqrt.c w_sqrtf.c # w_sqrtl.c
+			;
+
+		MergeObjectFromObjects <$(architecture)>posix_gnu_arch_$(TARGET_ARCH).o
+			: :
+			<$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_generic.o
+			<$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_other.o
+			;
+
+		SEARCH on [ FGristFiles $(genericSources) ]
+			= [ FDirName $(HAIKU_TOP) src system libroot posix glibc arch
+				generic ] ;
+	}
+}

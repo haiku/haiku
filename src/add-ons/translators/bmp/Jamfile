@@ -11,7 +11,7 @@ Translator BMPTranslator :
 	BMPTranslator.cpp
 	BMPView.cpp
 	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
-	$(HAIKU_LOCALE_LIBS)
+	localestub
 	: true
 ;
 

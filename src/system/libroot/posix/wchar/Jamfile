@@ -5,52 +5,59 @@ UsePrivateHeaders
 	[ FDirName libroot locale ]
 ;
 
-MergeObject posix_wchar.o :
-	btowc.c
-	mblen.c
-	mbrlen.c
-	mbrtowc.cpp
-	mbsinit.c
-	mbsrtowcs.cpp
-	mbstowcs.c
-	mbtowc.c
-	wcpcpy.c
-	wcpncpy.c
-	wcrtomb.cpp
-	wcscasecmp.c
-	wcscat.c
-	wcschr.c
-	wcschrnul.c
-	wcscmp.c
-	wcscoll.cpp
-	wcscpy.c
-	wcscspn.c
-	wcsdup.c
-#	wcsftime.cpp
-	wcslcat.c
-	wcslcpy.c
-	wcslen.c
-	wcsncasecmp.c
-	wcsncat.c
-	wcsncmp.c
-	wcsncpy.c
-	wcsnlen.c
-	wcspbrk.c
-	wcsrchr.c
-	wcsrtombs.cpp
-	wcsspn.c
-	wcsstr.c
-	wcstok.c
-	wcstombs.c
-	wcswidth.c
-	wcsxfrm.cpp
-	wctob.c
-	wctomb.c
-	wcwidth.c
-	wmemchr.c
-	wmemcmp.c
-	wmemcpy.c
-	wmemmove.c
-	wmempcpy.c
-	wmemset.c
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		MergeObject <$(architecture)>posix_wchar.o :
+			btowc.c
+			mblen.c
+			mbrlen.c
+			mbrtowc.cpp
+			mbsinit.c
+			mbsrtowcs.cpp
+			mbstowcs.c
+			mbtowc.c
+			wcpcpy.c
+			wcpncpy.c
+			wcrtomb.cpp
+			wcscasecmp.c
+			wcscat.c
+			wcschr.c
+			wcschrnul.c
+			wcscmp.c
+			wcscoll.cpp
+			wcscpy.c
+			wcscspn.c
+			wcsdup.c
+#			wcsftime.cpp
+			wcslcat.c
+			wcslcpy.c
+			wcslen.c
+			wcsncasecmp.c
+			wcsncat.c
+			wcsncmp.c
+			wcsncpy.c
+			wcsnlen.c
+			wcspbrk.c
+			wcsrchr.c
+			wcsrtombs.cpp
+			wcsspn.c
+			wcsstr.c
+			wcstok.c
+			wcstombs.c
+			wcswidth.c
+			wcsxfrm.cpp
+			wctob.c
+			wctomb.c
+			wcwidth.c
+			wmemchr.c
+			wmemcmp.c
+			wmemcpy.c
+			wmemmove.c
+			wmempcpy.c
+			wmemset.c
+			;
+	}
+}

@@ -30,7 +30,7 @@ AddResources SMTP : SMTP.rdef ;
 Addon SMTP
 	: $(sources)
 	: be libmail.so $(TARGET_NETWORK_LIBS) $(TARGET_LIBSTDC++)
-		$(HAIKU_LOCALE_LIBS) [ BuildFeatureAttribute openssl : libraries ]
+		localestub [ BuildFeatureAttribute openssl : libraries ]
 ;
 
 DoCatalogs SMTP :

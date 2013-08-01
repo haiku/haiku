@@ -34,6 +34,5 @@ HAIKU_KERNEL_PIC_CCFLAGS += -mcpu=440fp -mtune=440fp ;
 HAIKU_KERNEL_PIC_C++FLAGS += -mcpu=440fp -mtune=440fp ;
 HAIKU_KERNEL_CCFLAGS += -mcpu=440fp -mtune=440fp ;
 HAIKU_KERNEL_C++FLAGS += -mcpu=440fp -mtune=440fp ;
-HAIKU_CCFLAGS += -mcpu=440fp -mtune=440fp ;
-HAIKU_C++FLAGS += -mcpu=440fp -mtune=440fp ;
-
+HAIKU_CCFLAGS_$(HAIKU_PACKAGING_ARCH) += -mcpu=440fp -mtune=440fp ;
+HAIKU_C++FLAGS_$(HAIKU_PACKAGING_ARCH) += -mcpu=440fp -mtune=440fp ;

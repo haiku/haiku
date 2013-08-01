@@ -18,6 +18,7 @@ KernelAddon dec21xxx :
 	;
 
 ObjectHdrs [ FGristFiles dcphy$(SUFOBJ)	pnphy$(SUFOBJ) ]
-	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) libs compat freebsd_network ] ;
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)) libs
+		compat freebsd_network ] ;
 Includes [ FGristFiles dcphy.c pnphy.c ]
 	: <src!libs!compat!freebsd_network>miidevs.h ;

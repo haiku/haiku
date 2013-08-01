@@ -25,7 +25,7 @@ AddResources GLife : GLife.rdef ;
 
 ScreenSaver GLife :
 	$(sources) : 
-	be screensaver GL $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	be screensaver GL localestub $(TARGET_LIBSUPC++)
 	[ BuildFeatureAttribute glu : library ]
 ;
 

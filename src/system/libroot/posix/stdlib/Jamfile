@@ -2,30 +2,38 @@ SubDir HAIKU_TOP src system libroot posix stdlib ;
 
 UsePrivateHeaders drivers libroot runtime_loader shared ;
 UsePrivateHeaders kernel ;	# for <util/*>
-UsePrivateSystemHeaders ;
 
-MergeObject posix_stdlib.o :
-	abs.c
-	atfork.c
-	atof.c
-	atoi.c
-	bsearch.c
-	div.c
-	env.cpp
-	exit.cpp
-	getsubopt.cpp
-	heapsort.c
-	merge.c
-	mktemp.c
-	pty.cpp
-	qsort.c
-	radixsort.c
-	rand.c
-	random.c
-	realpath.cpp
-	strfmon.c
-	strtol.c
-	strtoll.c
-	strtoul.c
-	strtoull.c
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		UsePrivateSystemHeaders ;
+
+		MergeObject <$(architecture)>posix_stdlib.o :
+			abs.c
+			atfork.c
+			atof.c
+			atoi.c
+			bsearch.c
+			div.c
+			env.cpp
+			exit.cpp
+			getsubopt.cpp
+			heapsort.c
+			merge.c
+			mktemp.c
+			pty.cpp
+			qsort.c
+			radixsort.c
+			rand.c
+			random.c
+			realpath.cpp
+			strfmon.c
+			strtol.c
+			strtoll.c
+			strtoul.c
+			strtoull.c
+			;
+	}
+}

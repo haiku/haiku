@@ -25,7 +25,7 @@ Preference FileTypes :
 
 	PreferredAppMenu.cpp
 	StringView.cpp
-	: be tracker $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: be tracker $(TARGET_LIBSUPC++) localestub
 	: FileTypes.rdef FileTypes.icons.rdef
 	;
 

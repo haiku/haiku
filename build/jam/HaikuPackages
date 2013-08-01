@@ -1,7 +1,6 @@
 # The packages we build. Each is defined in its own file in the packages/
 # subdirectory.
 local packages =
-	HaikuCrossDevel
 	HaikuDevel
 	HaikuLoader
 	HaikuUserguide
@@ -15,11 +14,26 @@ if $(HAIKU_BOOTSTRAP_BUILD) {
 	packages += Haiku ;
 }
 
+local archDependentPackages =
+	HaikuCrossDevel
+	;
+
 
 packages = $(packages:G=package-rules) ;
-SEARCH on $(packages) = [ FDirName $(HAIKU_BUILD_RULES_DIR) packages ] ;
+archDependentPackages = $(archDependentPackages:G=package-rules) ;
+SEARCH on $(packages) $(archDependentPackages)
+	= [ FDirName $(HAIKU_BUILD_RULES_DIR) packages ] ;
 
 local package ;
 for package in $(packages) {
 	include $(package) ;
+}
+
+for package in $(archDependentPackages) {
+	local architectureObject ;
+	for architectureObject in [ MultiArchSubDirSetup ] {
+		on $(architectureObject) {
+			include $(package) ;
+		}
+	}
 }

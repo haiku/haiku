@@ -17,7 +17,7 @@ Translator TIFFTranslator :
 	TIFFView.cpp
 
 	: be libtiff.so translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
-	$(HAIKU_LOCALE_LIBS)
+	localestub
 	: true
 ;
 

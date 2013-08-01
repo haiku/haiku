@@ -77,7 +77,7 @@ Translator ICNSTranslator :
 
 	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
 	[ BuildFeatureAttribute libpng : library ]
-	$(HAIKU_LOCALE_LIBS)
+	localestub
 	: true
 ;
 

@@ -13,6 +13,7 @@ KernelStaticLibrary rtl8139_mii.a :
 	rlphy.c
 ;
 
-ObjectHdrs [ FGristFiles rlphy$(SUFOBJ) ] : [ FDirName
-		$(TARGET_COMMON_DEBUG_OBJECT_DIR) libs compat freebsd_network ] ;
+ObjectHdrs [ FGristFiles rlphy$(SUFOBJ) ]
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)) libs
+		compat freebsd_network ] ;
 Includes [ FGristFiles rlphy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;

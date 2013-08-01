@@ -1,9 +1,17 @@
 SubDir HAIKU_TOP src system libroot posix malloc_debug ;
 
-UsePrivateSystemHeaders ;
 UsePrivateHeaders libroot shared ;
 
-MergeObject posix_malloc_debug.o :
-	#guarded_heap.cpp
-	heap.cpp
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		UsePrivateSystemHeaders ;
+
+		MergeObject <$(architecture)>posix_malloc_debug.o :
+			#guarded_heap.cpp
+			heap.cpp
+			;
+	}
+}

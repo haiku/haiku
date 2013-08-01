@@ -53,6 +53,7 @@ BuildPlatformMain <build>mkindex : mkindex.cpp : $(HOST_LIBBE) ;
 
 BuildPlatformMain <build>rm_attrs_tmp : rm_attrs.cpp
 	: $(HOST_LIBSUPC++) $(HOST_LIBSTDC++) ;
+PLATFORM on <build>rm_attrs = host ;
 MakeLocateDebug <build>rm_attrs ;
 File <build>rm_attrs : <build>rm_attrs_tmp ;
 MODE on <build>rm_attrs = 755 ;

@@ -1,27 +1,35 @@
 SubDir HAIKU_TOP src system libroot posix glibc locale ;
 
-SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch
-	$(TARGET_ARCH) ;
-SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch generic ;
-SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
-SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;
-SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
-
 SubDirCcFlags -D_GNU_SOURCE -DUSE_IN_LIBIO -DLOCALEDIR=\'\"/share/locale\"\' ;
 
-MergeObject posix_gnu_locale.o :
-	C-collate.c
-	C-ctype.c
-	C-messages.c
-	C-monetary.c
-	C-numeric.c
-	C-time.c
-	C_name.c
-	coll-lookup.c
-	lc-collate.c
-	lc-ctype.c
-	lc-messages.c
-	lc-monetary.c
-	lc-numeric.c
-	xlocale.c
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch
+			$(TARGET_ARCH) ;
+		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch
+			generic ;
+		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
+		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;
+		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
+
+		MergeObject <$(architecture)>posix_gnu_locale.o :
+			C-collate.c
+			C-ctype.c
+			C-messages.c
+			C-monetary.c
+			C-numeric.c
+			C-time.c
+			C_name.c
+			coll-lookup.c
+			lc-collate.c
+			lc-ctype.c
+			lc-messages.c
+			lc-monetary.c
+			lc-numeric.c
+			xlocale.c
+			;
+	}
+}

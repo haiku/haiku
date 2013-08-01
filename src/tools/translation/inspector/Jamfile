@@ -21,5 +21,5 @@ DoCatalogs Inspector :
 ;
 
 LinkAgainst Inspector :
-	be tracker translation $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS) ;
+	be tracker translation $(TARGET_LIBSUPC++) localestub ;
 

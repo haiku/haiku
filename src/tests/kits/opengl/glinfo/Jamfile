@@ -25,7 +25,7 @@ Preference GLInfo :
 	$(sources)
 	:
 	be GL libglut.so 
-	translation libcolumnlistview.a $(HAIKU_LOCALE_LIBS)
+	translation libcolumnlistview.a localestub
 	$(TARGET_LIBSUPC++)
 	[ BuildFeatureAttribute glu : library ]
 	:

@@ -6,7 +6,7 @@ Application FontDemo :
 	ControlView.cpp
 	FontDemo.cpp
 	FontDemoView.cpp
-	: be $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	: be localestub $(TARGET_LIBSUPC++)
 	: FontDemo.rdef
 	;
 

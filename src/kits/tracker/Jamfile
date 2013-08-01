@@ -93,7 +93,7 @@ SharedLibrary libtracker.so :
 	VolumeWindow.cpp
 	WidgetAttributeText.cpp
 
-	: be translation $(vector_icon_libs) $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS) libshared.a
+	: be translation $(vector_icon_libs) $(TARGET_LIBSTDC++) localestub libshared.a
 	;
 
 DoCatalogs libtracker.so :

@@ -12,7 +12,7 @@ Application Expander :
 	DirectoryFilePanel.cpp
 	ExpanderRules.cpp
 	PasswordAlert.cpp
-	: be tracker $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	: be tracker localestub $(TARGET_LIBSUPC++)
 	: Expander.rdef
 ;
 

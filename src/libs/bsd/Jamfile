@@ -4,19 +4,24 @@ SetSubDirSupportedPlatforms $(HAIKU_BONE_COMPATIBLE_PLATFORMS) ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 
-SharedLibrary libbsd.so :
-	daemon.c
-	err.c
-	fgetln.c
-	getpass.c
-	issetugid.c
-	progname.c
-	pty.cpp
-	signal.c
-	string.cpp
-	stringlist.c
-	unvis.c
-	usershell.c
-	vis.c
-	wait.c
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		SharedLibrary [ MultiArchDefaultGristFiles libbsd.so ] :
+			daemon.c
+			err.c
+			fgetln.c
+			getpass.c
+			issetugid.c
+			progname.c
+			pty.cpp
+			signal.c
+			string.cpp
+			stringlist.c
+			unvis.c
+			usershell.c
+			vis.c
+			wait.c
+			;
+	}
+}

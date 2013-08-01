@@ -13,7 +13,7 @@ Preference Keymap :
 	KeymapWindow.cpp
 	ModifierKeysWindow.cpp
 
-	: be tracker $(HAIKU_LOCALE_LIBS) libshared.a $(TARGET_LIBSTDC++)
+	: be tracker localestub libshared.a $(TARGET_LIBSTDC++)
 	: Keymap.rdef
 ;
 

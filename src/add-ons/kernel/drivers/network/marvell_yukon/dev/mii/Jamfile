@@ -16,5 +16,6 @@ KernelStaticLibrary marvell_yukon_mii.a
 	;
 
 ObjectHdrs [ FGristFiles e1000phy$(SUFOBJ) ]
-        : [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) libs compat freebsd_network ] ;
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)) libs
+		compat freebsd_network ] ;
 Includes [ FGristFiles e1000phy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;

@@ -13,7 +13,7 @@ SharedLibrary libtextencoding.so :
 	CharacterSetRoster.cpp
 	character_sets.cpp
 	utf8_conversions.cpp
-	: be libiconv.a $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS) ;
+	: be libiconv.a $(TARGET_LIBSUPC++) localestub ;
 
 DoCatalogs libtextencoding.so :
 	x-vnd.Haiku-libtextencoding

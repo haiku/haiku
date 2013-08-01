@@ -54,7 +54,7 @@ Translator HPGSTranslator :
 	: be translation libtextencoding.so
 		[ BuildFeatureAttribute libpng : library ]
 		[ BuildFeatureAttribute zlib : library ]
-		libtranslatorsutils.a $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+		libtranslatorsutils.a $(TARGET_LIBSUPC++) localestub
 	: true
 ;
 

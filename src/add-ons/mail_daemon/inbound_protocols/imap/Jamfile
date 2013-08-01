@@ -42,7 +42,7 @@ Addon IMAP
 	:
 	$(sources)
 	:
-	be libmail.so $(HAIKU_LOCALE_LIBS) $(TARGET_NETWORK_LIBS) libalm.so
+	be libmail.so localestub $(TARGET_NETWORK_LIBS) libalm.so
 		libshared.a $(TARGET_LIBSUPC++) $(TARGET_LIBSTDC++)
 ;
 

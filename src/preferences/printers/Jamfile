@@ -17,7 +17,7 @@ Preference Printers :
 	translation
 	libprintutils.a
 	$(TARGET_LIBSUPC++)
-	$(HAIKU_LOCALE_LIBS)
+	localestub
 	:
 	Printers.rdef
 	;

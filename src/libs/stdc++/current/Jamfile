@@ -10,14 +10,27 @@ rule CreateSharedC++LibraryFromArchive sharedLib : staticLib
 }
 
 
-# create libstdc++.so from the libstdc++.a built with the compiler
-if $(HAIKU_BUILD_SHARED_LIBSTDC++) {
-	CreateSharedC++LibraryFromArchive $(HAIKU_SHARED_LIBSTDC++)
-		: $(HAIKU_STATIC_LIBSTDC++) ;
-}
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-# create libsupc++.so from the libsupc++.a build with the compiler
-if $(HAIKU_BUILD_SHARED_LIBSUPC++) {
-	CreateSharedC++LibraryFromArchive $(HAIKU_SHARED_LIBSUPC++)
-		: $(HAIKU_STATIC_LIBSUPC++) ;
+		if $(TARGET_GCC_VERSION_$(architecture)[1]) = 2 {
+			continue ;
+		}
+
+		# create libstdc++.so from the libstdc++.a built with the compiler
+		if $(HAIKU_BUILD_SHARED_LIBSTDC++_$(architecture)) {
+			CreateSharedC++LibraryFromArchive
+				$(HAIKU_SHARED_LIBSTDC++_$(architecture))
+				: $(HAIKU_STATIC_LIBSTDC++_$(architecture)) ;
+		}
+
+		# create libsupc++.so from the libsupc++.a build with the compiler
+		if $(HAIKU_BUILD_SHARED_LIBSUPC++_$(architecture)) {
+			CreateSharedC++LibraryFromArchive
+				$(HAIKU_SHARED_LIBSUPC++_$(architecture))
+				: $(HAIKU_STATIC_LIBSUPC++_$(architecture)) ;
+		}
+	}
 }

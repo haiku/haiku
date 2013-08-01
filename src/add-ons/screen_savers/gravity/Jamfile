@@ -3,7 +3,7 @@ UseBuildFeatureHeaders glu ;
 UseBuildFeatureHeaders mesa ;
 
 # For GCC2
-if $(HAIKU_GCC_VERSION[1]) < 3 {
+if $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) < 3 {
     SubDirC++Flags --no-warnings ;
 }
 
@@ -28,7 +28,7 @@ Includes [ FGristFiles $(sources) ] :
 ScreenSaver Gravity :
 	$(sources)
 	:
-	be screensaver GL $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSTDC++)
+	be screensaver GL localestub $(TARGET_LIBSTDC++)
 	[ BuildFeatureAttribute glu : library ]
 ;
 

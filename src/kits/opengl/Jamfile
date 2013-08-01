@@ -37,7 +37,7 @@ LINKFLAGS on libGL.so = [ on libGL.so return $(LINKFLAGS) ]
 	-Xlinker --whole-archive -Xlinker --no-undefined ;
 
 # For GCC2
-if $(HAIKU_GCC_VERSION[1]) < 3 {
+if $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) < 3 {
 	SubDirC++Flags --no-warnings ;
 }
 
