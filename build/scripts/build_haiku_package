@@ -61,12 +61,10 @@ mkindex=mkindex
 
 extractFile()
 {
-	# extractFile <archive> <directory> <extractedSubDir> <stripDebugSymbols>
+	# extractFile <archive> <directory> <extractedSubDir>
 	archiveFile=$1
 	targetExtractedDir=$2
 	extractedSubDir=$3
-	# Ignore stripDebugSymbols. It's not relevant here, since executables and
-	# libraries shouldn't come from zip files or other archives anymore.
 
 	extractDir=$tmpDir/extract
 	$rmAttrs -rf "$extractDir"

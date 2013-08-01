@@ -83,7 +83,6 @@ AddTargetVariableToScript $(script) : <build>get_package_dependencies
 	: getPackageDependencies ;
 AddTargetVariableToScript $(script) : <build>unzip ;
 AddTargetVariableToScript $(script) : <build>vmdkimage ;
-AddVariableToScript $(script) : stripCommand : $(HAIKU_STRIP) ;
 if $(HOST_RM_ATTRS_TARGET) {
 	AddTargetVariableToScript $(script) : $(HOST_RM_ATTRS_TARGET) : rmAttrs ;
 } else {

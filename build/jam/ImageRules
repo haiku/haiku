@@ -412,7 +412,7 @@ rule ExtractArchiveToContainer container : directoryTokens : archiveFile
 	# ExtractArchiveToContainer <container> : <directory> : <archiveFile>
 	#	: [ <flags> ] : <extractedSubDir> ;
 	#
-	# Supported flags: alwaysUpdate, stripDebugSymbols
+	# Supported flags: alwaysUpdate
 
 	# If the container shall only be updated, we extract only, if explicitely
 	# requested.
@@ -423,14 +423,9 @@ rule ExtractArchiveToContainer container : directoryTokens : archiveFile
 
 	local directory = [ AddDirectoryToContainer $(container)
 		: $(directoryTokens) ] ;
-	local stripDebugSymbols ;
-	if stripDebugSymbols in $(flags) {
-		stripDebugSymbols = 1 ;
-	}
 
 	ARCHIVE_FILES_TO_INSTALL on $(directory) += $(archiveFile) ;
 	ARCHIVE_SUBDIR_TO_INSTALL_FROM on $(archiveFile) = $(extractedSubDir) ;
-	ARCHIVE_FILES_TO_STRIP on $(archiveFile) = $(stripDebugSymbols) ;
 }
 
 rule AddDriversToContainer container : relativeDirectoryTokens : targets
@@ -799,11 +794,6 @@ rule CreateContainerExtractFilesScript container : script
 			ARCHIVE_SUBDIR_TO_INSTALL_FROM on $(dummyTarget) =
 				$(extractedSubDir:E=.) ;
 
-			local stripDebugSymbols = [ on $(archiveFile)
-				return $(ARCHIVE_FILES_TO_STRIP) ] ;
-			STRIP_DEBUG_SYMBOLS_FROM_ARCHIVE on $(dummyTarget) =
-				$(stripDebugSymbols) ;
-
 			Depends $(dummyTarget) : $(initScript) $(archiveFile)
 				$(serializationDependency) ;
 			Depends $(script) : $(dummyTarget) ;
@@ -819,8 +809,7 @@ rule CreateContainerExtractFilesScript container : script
 actions AddExtractFileToContainerExtractFilesScript
 {
 	echo extractFile "\"$(2[2])\"" "\"$(TARGET_DIR)\"" \
-		"\"$(ARCHIVE_SUBDIR_TO_INSTALL_FROM)\"" \
-		"\"$(STRIP_DEBUG_SYMBOLS_FROM_ARCHIVE)\"" >> $(2[1])
+		"\"$(ARCHIVE_SUBDIR_TO_INSTALL_FROM)\"" >> $(2[1])
 }
 
 
@@ -1068,7 +1057,7 @@ rule InstallOptionalHaikuImagePackage url : dirTokens : flags
 	#   directory relative to the image's root directory where the content of
 	#   the archive will be extracted to.
 	#
-	# Supported flags: cdPackage, stripDebugSymbols/!stripDebugSymbols
+	# Supported flags: cdPackage
 
 	local package = $(url:BS) ;
 
@@ -1087,11 +1076,6 @@ rule InstallOptionalHaikuImagePackage url : dirTokens : flags
 		# copy onto image
 		AddFilesToHaikuImage _packages_ : $(archiveFile) ;
 	} else {
-		if $(HAIKU_STRIP_DEBUG_FROM_OPTIONAL_PACKAGES) = 1
-			&& ! stripDebugSymbols in $(flags)
-			&& ! !stripDebugSymbols in $(flags) {
-			flags += stripDebugSymbols ;
-		}
 		# extract onto image
 		ExtractArchiveToHaikuImage $(dirTokens) : $(archiveFile) : $(flags) ;
 	}
