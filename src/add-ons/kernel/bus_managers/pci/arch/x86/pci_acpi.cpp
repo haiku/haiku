@@ -117,8 +117,11 @@ acpi_check_rsdt(acpi_rsdp* rsdp)
 		rsdtArea = map_physical_memory("rsdt acpi",
 			rsdp->rsdt_address, sizeof(acpi_descriptor_header),
 			B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA, (void **)&rsdt);
-		if (rsdt != NULL
-			&& strncmp(rsdt->signature, ACPI_RSDT_SIGNATURE, 4) != 0) {
+		if (rsdt == NULL) {
+			TRACE(("acpi: couldn't map rsdt header\n"));
+			return B_ERROR;
+		}
+		if (strncmp(rsdt->signature, ACPI_RSDT_SIGNATURE, 4) != 0) {
 			delete_area(rsdtArea);
 			rsdt = NULL;
 			TRACE(("acpi: invalid root system description table\n"));
