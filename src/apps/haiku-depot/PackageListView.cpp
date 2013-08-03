@@ -244,7 +244,7 @@ enum {
 
 PackageRow::PackageRow(const PackageInfo& package)
 	:
-	Inherited(),
+	Inherited(ceilf(be_plain_font->Size() * 1.8f)),
 	fPackage(package)
 {
 	// Package icon and title
