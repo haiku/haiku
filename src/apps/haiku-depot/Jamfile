@@ -12,6 +12,7 @@ Application HaikuDepot :
 	PackageInfo.cpp
 	PackageInfoView.cpp
 	PackageListView.cpp
+	PackageManager.cpp
 	support.cpp
 	: be translation libcolumnlistview.a libshared.a $(TARGET_LIBSUPC++)
 		$(HAIKU_LOCALE_LIBS)
@@ -27,4 +28,5 @@ DoCatalogs HaikuDepot :
 	PackageActionsView.cpp
 	PackageInfoView.cpp
 	PackageListView.cpp
+	PackageManager.cpp
 ;
