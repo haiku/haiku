@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libbe	677628532
+1	japanese	x-vnd.Haiku-libbe	3504008668
 gamma	AboutWindow		γ
 beta	AboutWindow		β
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -14,9 +14,11 @@ alpha	AboutWindow		α
 Error	PrintJob		エラー
 No Pages to print!	PrintJob		印刷するページがありません。
 All Rights Reserved.	AboutWindow		All Rights Reserved.
+About %app%	AboutWindow		%app% について
 OK	Dragger		OK
 OK	PrintJob		OK
 Green:	ColorControl		緑：
+Ok	AboutWindow		Ok
 Version history:	AboutWindow		改訂履歴:
 Remove replicant	Dragger		レプリカントを削除
 OK	ZombieReplicantView		OK
