@@ -59,6 +59,7 @@ MainWindow::MainWindow(BRect frame)
 	;
 
 	fSplitView->SetCollapsible(0, false);
+	fSplitView->SetCollapsible(1, false);
 
 	_InitDummyModel();
 	_AdoptModel();
