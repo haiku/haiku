@@ -8,7 +8,6 @@ Application HaikuDepot :
 	main.cpp
 	MainWindow.cpp
 	Model.cpp
-	PackageActionsView.cpp
 	PackageInfo.cpp
 	PackageInfoView.cpp
 	PackageListView.cpp
@@ -25,7 +24,6 @@ DoCatalogs HaikuDepot :
 	App.cpp
 	FilterView.cpp
 	MainWindow.cpp
-	PackageActionsView.cpp
 	PackageInfoView.cpp
 	PackageListView.cpp
 	PackageManager.cpp

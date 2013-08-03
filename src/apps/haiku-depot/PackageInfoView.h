@@ -11,12 +11,14 @@
 
 
 class TitleView;
+class PackageActionView;
+class PackageManager;
 class PagesView;
 
 
 class PackageInfoView : public BGroupView {
 public:
-								PackageInfoView();
+								PackageInfoView(PackageManager* packageManager);
 	virtual						~PackageInfoView();
 
 	virtual void				AttachedToWindow();
@@ -27,8 +29,8 @@ public:
 
 private:
 			TitleView*			fTitleView;
+			PackageActionView*	fPackageActionView;
 			PagesView*			fPagesView;
-			PackageInfo			fPackageInfo;
 };
 
 #endif // PACKAGE_INFO_VIEW_H

@@ -24,7 +24,10 @@ public:
 	// Package Kit supports this stuff already.
 	virtual status_t			Perform() = 0;
 
-protected:
+			const PackageInfo&	Package() const
+									{ return fPackage; }
+
+private:
 			PackageInfo			fPackage;
 };
 

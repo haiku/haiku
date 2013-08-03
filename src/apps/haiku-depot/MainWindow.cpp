@@ -19,7 +19,6 @@
 #include <TabView.h>
 
 #include "FilterView.h"
-#include "PackageActionsView.h"
 #include "PackageInfoView.h"
 #include "PackageListView.h"
 
@@ -39,22 +38,21 @@ MainWindow::MainWindow(BRect frame)
 	
 	fFilterView = new FilterView();
 	fPackageListView = new PackageListView();
-	fPackageInfoView = new PackageInfoView();
-	fPackageActionsView = new PackageActionsView();
+	fPackageInfoView = new PackageInfoView(&fPackageManager);
 	
 	fSplitView = new BSplitView(B_VERTICAL, B_USE_SMALL_SPACING);
 	
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
 		.Add(menuBar)
 		.Add(fFilterView)
-		.AddGroup(B_VERTICAL)
-			.AddSplit(fSplitView)
+		.AddSplit(fSplitView)
+			.AddGroup(B_VERTICAL)
 				.Add(fPackageListView)
-				.Add(fPackageInfoView)
+				.SetInsets(
+					B_USE_DEFAULT_SPACING, 0.0f,
+					B_USE_DEFAULT_SPACING, 0.0f)
 			.End()
-			.Add(fPackageActionsView)
-			.SetInsets(B_USE_DEFAULT_SPACING, 0.0f, B_USE_DEFAULT_SPACING,
-				B_USE_DEFAULT_SPACING)
+			.Add(fPackageInfoView)
 		.End()
 	;
 

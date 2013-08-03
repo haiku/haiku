@@ -8,6 +8,7 @@
 #include <Window.h>
 
 #include "Model.h"
+#include "PackageManager.h"
 
 
 class BSplitView;
@@ -43,11 +44,12 @@ private:
 			FilterView*			fFilterView;
 			PackageListView*	fPackageListView;
 			PackageInfoView*	fPackageInfoView;
-			PackageActionsView*	fPackageActionsView;
 			BSplitView*			fSplitView;
 
 			Model				fModel;
 			PackageInfoList		fVisiblePackages;
+
+			PackageManager		fPackageManager;
 };
 
 #endif // MAIN_WINDOW_H

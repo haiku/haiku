@@ -15,9 +15,11 @@
 #include <Font.h>
 #include <LayoutBuilder.h>
 #include <Message.h>
-#include <RadioButton.h>
+#include <TabView.h>
 #include <SpaceLayoutItem.h>
 #include <StringView.h>
+
+#include "PackageManager.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -25,6 +27,7 @@
 
 
 static const rgb_color kLightBlack = (rgb_color){ 60, 60, 60, 255 };
+static const float kContentTint = (B_NO_TINT + B_LIGHTEN_1_TINT) / 2.0f;
 
 
 class BitmapView : public BView {
@@ -41,6 +44,13 @@ public:
 	
 	virtual ~BitmapView()
 	{
+	}
+
+	virtual void AttachedToWindow()
+	{
+		BView* parent = Parent();
+		if (parent != NULL)
+			SetLowColor(parent->ViewColor());
 	}
 
 	virtual void Draw(BRect updateRect)
@@ -180,9 +190,7 @@ private:
 
 
 enum {
-	MSG_SHOW_ABOUT_PAGE			= 'shap',
-	MSG_SHOW_RATINGS_PAGE		= 'shrp',
-	MSG_SHOW_CHANGELOG_PAGE		= 'shcp',
+	MSG_PACKAGE_ACTION			= 'pkga',
 };
 
 
@@ -232,22 +240,11 @@ public:
 		fVoteInfo->SetFont(&font);
 		fVoteInfo->SetHighColor(kLightBlack);
 
-		fAboutPageButton = new BRadioButton("about page button",
-			B_TRANSLATE("About"), new BMessage(MSG_SHOW_ABOUT_PAGE));
-		fAboutPageButton->SetValue(B_CONTROL_ON);
-
-		fRatingsPageButton = new BRadioButton("ratings page button",
-			B_TRANSLATE("Ratings"), new BMessage(MSG_SHOW_RATINGS_PAGE));
-
-		fChangelogPageButton = new BRadioButton("changelog page button",
-			B_TRANSLATE("Changelog"), new BMessage(MSG_SHOW_CHANGELOG_PAGE));
-
 		BLayoutBuilder::Group<>(this)
 			.Add(fIconView)
 			.AddGroup(B_VERTICAL, 1.0f)
 				.Add(fTitleView)
 				.Add(fPublisherView)
-//				.SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET))
 			.End()
 			.AddGlue(0.2f)
 			.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
@@ -256,9 +253,6 @@ public:
 				.Add(fVoteInfo)
 			.End()
 			.AddGlue(3.0f)
-			.Add(fAboutPageButton)
-			.Add(fRatingsPageButton)
-			.Add(fChangelogPageButton)
 		;
 	
 		Clear();
@@ -266,13 +260,6 @@ public:
 	
 	virtual ~TitleView()
 	{
-	}
-
-	void SetTarget(BHandler* handler)
-	{
-		fAboutPageButton->SetTarget(handler);
-		fRatingsPageButton->SetTarget(handler);
-		fChangelogPageButton->SetTarget(handler);
 	}
 
 	void SetPackage(const PackageInfo& package)
@@ -304,33 +291,18 @@ public:
 
 		fVoteInfo->SetText(voteInfo);
 
-		if (fAboutPageButton->IsHidden(fAboutPageButton))
-			fAboutPageButton->Show();
-		if (fRatingsPageButton->IsHidden(fRatingsPageButton))
-			fRatingsPageButton->Show();
-		if (fChangelogPageButton->IsHidden(fChangelogPageButton))
-			fChangelogPageButton->Show();
-
-		fAboutPageButton->SetValue(B_CONTROL_ON);
-
 		InvalidateLayout();
 		Invalidate();
 	}
 
 	void Clear()
 	{
+		fIconView->SetBitmap(NULL);
 		fTitleView->SetText("");
 		fPublisherView->SetText("");
 		fRatingView->SetRating(-1.0f);
 		fAvgRating->SetText("");
 		fVoteInfo->SetText("");
-		
-		if (!fAboutPageButton->IsHidden(fAboutPageButton))
-			fAboutPageButton->Hide();
-		if (!fRatingsPageButton->IsHidden(fRatingsPageButton))
-			fRatingsPageButton->Hide();
-		if (!fChangelogPageButton->IsHidden(fChangelogPageButton))
-			fChangelogPageButton->Hide();
 	}
 
 private:
@@ -342,10 +314,94 @@ private:
 	RatingView*		fRatingView;
 	BStringView*	fAvgRating;
 	BStringView*	fVoteInfo;
+};
 
-	BRadioButton*	fAboutPageButton;
-	BRadioButton*	fRatingsPageButton;
-	BRadioButton*	fChangelogPageButton;
+
+// #pragma mark - PackageActionView
+
+
+class PackageActionView : public BView {
+public:
+	PackageActionView(PackageManager* packageManager)
+		:
+		BView("about view", B_WILL_DRAW),
+		fPackageManager(packageManager),
+		fLayout(new BGroupLayout(B_HORIZONTAL))
+	{
+		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		
+		SetLayout(fLayout);
+	}
+	
+	virtual ~PackageActionView()
+	{
+		Clear();
+	}
+	
+	virtual void MessageReceived(BMessage* message)
+	{
+		switch (message->what) {
+			case MSG_PACKAGE_ACTION:
+			{
+				int32 index;
+				if (message->FindInt32("index", &index) == B_OK) {
+					const PackageActionRef& action
+						= fPackageActions.ItemAt(index);
+					if (action.Get() != NULL) {
+						status_t result = action->Perform();
+						if (result != B_OK) {
+							fprintf(stderr, "Package action failed: %s '%s'\n",
+								action->Label(),
+								action->Package().Title().String());
+						}
+					}
+				}
+				break;
+			}
+			
+			default:
+				BView::MessageReceived(message);
+				break;
+		}
+	}
+
+	void SetPackage(const PackageInfo& package)
+	{
+		Clear();
+
+		fPackageActions = fPackageManager->GetPackageActions(package);
+		
+		// Add Buttons in reverse action order
+		for (int32 i = fPackageActions.CountItems() - 1; i >= 0; i--) {
+			const PackageActionRef& action = fPackageActions.ItemAtFast(i);
+			
+			BMessage* message = new BMessage(MSG_PACKAGE_ACTION);
+			message->AddInt32("index", i);
+			
+			BButton* button = new BButton(action->Label(), message);
+			fLayout->AddView(button);
+			button->SetTarget(this);
+			
+			fButtons.AddItem(button);
+		}
+	}
+
+	void Clear()
+	{
+		for (int32 i = fButtons.CountItems() - 1; i >= 0; i--) {
+			BButton* button = (BButton*)fButtons.ItemAtFast(i);
+			button->RemoveSelf();
+			delete button;
+		}
+		fButtons.MakeEmpty();
+	}
+
+private:
+	PackageManager*		fPackageManager;
+	
+	BGroupLayout*		fLayout;
+	PackageActionList	fPackageActions;
+	BList				fButtons;
 };
 
 
@@ -356,18 +412,20 @@ class AboutView : public BView {
 public:
 	AboutView()
 		:
-		BView("about view", B_WILL_DRAW),
+		BView("about view", 0),
 		fLayout(new BGroupLayout(B_HORIZONTAL)),
 		fEmailIcon("text/x-email"),
 		fWebsiteIcon("text/html")
 	{
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+			kContentTint));
 		
 		SetLayout(fLayout);
 		
 		fDescriptionView = new BTextView("description view");
-		fDescriptionView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		fDescriptionView->SetViewColor(ViewColor());
 		fDescriptionView->MakeEditable(false);
+		fDescriptionView->SetInsets(0.0f, be_plain_font->Size(), 0.0f, 0.0f);
 		
 		BFont smallFont;
 		GetFont(&smallFont);
@@ -384,6 +442,7 @@ public:
 		fWebsiteLinkView->SetHighColor(kLightBlack);
 		
 		BLayoutBuilder::Group<>(fLayout)
+			.Add(BSpaceLayoutItem::CreateHorizontalStrut(32.0f))
 			.Add(fDescriptionView, 1.0f)
 			.AddGroup(B_VERTICAL, 0.0f)
 				.AddGlue()
@@ -394,20 +453,18 @@ public:
 						.Add(fEmailLinkView, 1, 0)
 						.Add(fWebsiteIconView, 0, 1)
 						.Add(fWebsiteLinkView, 1, 1)
+						.SetInsets(B_USE_DEFAULT_SPACING)
 					.End()
 				.End()
 			.End()
 			.SetExplicitMaxSize(BSize(B_SIZE_UNSET, B_SIZE_UNLIMITED))
+			.SetInsets(B_USE_DEFAULT_SPACING, 0.0f, 0.0f, 0.0f)
 		;
 	}
 	
 	virtual ~AboutView()
 	{
 		Clear();
-	}
-
-	virtual void Draw(BRect updateRect)
-	{
 	}
 
 	void SetPackage(const PackageInfo& package)
@@ -449,29 +506,29 @@ class UserRatingsView : public BView {
 public:
 	UserRatingsView()
 		:
-		BView("package ratings view", B_WILL_DRAW),
+		BView("package ratings view", 0),
 		fLayout(new BGroupLayout(B_HORIZONTAL))
 	{
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+			kContentTint));
 		
 		SetLayout(fLayout);
 		
 		fTextView = new BTextView("ratings view");
-		fTextView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		fTextView->SetViewColor(ViewColor());
 		fTextView->MakeEditable(false);
+		fTextView->SetInsets(0.0f, be_plain_font->Size(), 0.0f, 0.0f);
 		
 		BLayoutBuilder::Group<>(fLayout)
+			.Add(BSpaceLayoutItem::CreateHorizontalStrut(32.0f))
 			.Add(fTextView, 1.0f)
+			.SetInsets(B_USE_DEFAULT_SPACING, 0.0f, 0.0f, 0.0f)
 		;
 	}
 	
 	virtual ~UserRatingsView()
 	{
 		Clear();
-	}
-
-	virtual void Draw(BRect updateRect)
-	{
 	}
 
 	void SetPackage(const PackageInfo& package)
@@ -521,16 +578,20 @@ public:
 		BView("package changelog view", B_WILL_DRAW),
 		fLayout(new BGroupLayout(B_HORIZONTAL))
 	{
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+			kContentTint));
 		
 		SetLayout(fLayout);
 		
 		fTextView = new BTextView("changelog view");
-		fTextView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		fTextView->SetViewColor(ViewColor());
 		fTextView->MakeEditable(false);
+		fTextView->SetInsets(0.0f, be_plain_font->Size(), 0.0f, 0.0f);
 		
 		BLayoutBuilder::Group<>(fLayout)
+			.Add(BSpaceLayoutItem::CreateHorizontalStrut(32.0f))
 			.Add(fTextView, 1.0f)
+			.SetInsets(B_USE_DEFAULT_SPACING, 0.0f, 0.0f, 0.0f)
 		;
 	}
 	
@@ -562,26 +623,28 @@ private:
 // #pragma mark - PagesView
 
 
-class PagesView : public BView {
+class PagesView : public BTabView {
 public:
 	PagesView()
 		:
-		BView("pages view", 0),
+		BTabView("pages view", B_WIDTH_FROM_WIDEST),
 		fLayout(new BCardLayout())
 	{
-		SetViewColor(B_TRANSPARENT_COLOR);
-		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-		SetLayout(fLayout);
+		SetBorder(B_NO_BORDER);
 		
 		fAboutView = new AboutView();
 		fUserRatingsView = new UserRatingsView();
 		fChangelogView = new ChangelogView();
+
+		AddTab(fAboutView);
+		AddTab(fUserRatingsView);
+		AddTab(fChangelogView);
 		
-		fLayout->AddView(fAboutView);
-		fLayout->AddView(fUserRatingsView);
-		fLayout->AddView(fChangelogView);
-		
-		fLayout->SetVisibleItem(0L);
+		TabAt(0)->SetLabel(B_TRANSLATE("About"));
+		TabAt(1)->SetLabel(B_TRANSLATE("Ratings"));
+		TabAt(2)->SetLabel(B_TRANSLATE("Changelog"));
+
+		Select(0);
 	}
 	
 	virtual ~PagesView()
@@ -589,28 +652,9 @@ public:
 		Clear();
 	}
 
-	virtual void MessageReceived(BMessage* message)
-	{
-		switch (message->what) {
-			case MSG_SHOW_ABOUT_PAGE:
-				fLayout->SetVisibleItem(0L);
-				break;
-			case MSG_SHOW_RATINGS_PAGE:
-				fLayout->SetVisibleItem(1L);
-				break;
-			case MSG_SHOW_CHANGELOG_PAGE:
-				fLayout->SetVisibleItem(2L);
-				break;
-
-			default:
-				BView::MessageReceived(message);
-				break;
-		}
-	}
-
 	void SetPackage(const PackageInfo& package)
 	{
-		fLayout->SetVisibleItem(0L);
+		Select(0);
 		fAboutView->SetPackage(package);
 		fUserRatingsView->SetPackage(package);
 		fChangelogView->SetPackage(package);
@@ -635,20 +679,26 @@ private:
 // #pragma mark - PackageInfoView
 
 
-PackageInfoView::PackageInfoView()
+PackageInfoView::PackageInfoView(PackageManager* packageManager)
 	:
 	BGroupView("package info view", B_VERTICAL)
 {
 	fTitleView = new TitleView();
+	fPackageActionView = new PackageActionView(packageManager);
 	fPagesView = new PagesView();
 
 	BLayoutBuilder::Group<>(this)
-		.Add(fTitleView, 0.0f)
-		.AddGroup(B_HORIZONTAL)
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(32.0f))
-			.Add(fPagesView)
+		.AddGroup(B_HORIZONTAL, 0.0f)
+			.Add(fTitleView)
+			.Add(fPackageActionView)
+			.SetInsets(
+				B_USE_DEFAULT_SPACING, 0.0f,
+				B_USE_DEFAULT_SPACING, 0.0f)
 		.End()
+		.Add(fPagesView)
 	;
+
+	Clear();
 }
 
 
@@ -660,7 +710,6 @@ PackageInfoView::~PackageInfoView()
 void
 PackageInfoView::AttachedToWindow()
 {
-	fTitleView->SetTarget(fPagesView);
 }
 
 
@@ -678,17 +727,23 @@ PackageInfoView::MessageReceived(BMessage* message)
 void
 PackageInfoView::SetPackage(const PackageInfo& package)
 {
-	fPackageInfo = package;
-	fTitleView->SetPackage(fPackageInfo);
-	fPagesView->SetPackage(fPackageInfo);
+	fTitleView->SetPackage(package);
+	fPackageActionView->SetPackage(package);
+	fPagesView->SetPackage(package);
+	
+	if (fPagesView->IsHidden(fPagesView))
+		fPagesView->Show();
 }
 
 
 void
 PackageInfoView::Clear()
 {
-	fPackageInfo = PackageInfo();
 	fTitleView->Clear();
+	fPackageActionView->Clear();
 	fPagesView->Clear();
+
+	if (!fPagesView->IsHidden(fPagesView))
+		fPagesView->Hide();
 }
 
