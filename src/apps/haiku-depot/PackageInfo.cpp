@@ -428,6 +428,48 @@ PackageInfo::AddUserRating(const UserRating& rating)
 }
 
 
+RatingSummary
+PackageInfo::CalculateRatingSummary() const
+{
+	RatingSummary summary;
+	summary.ratingCount = fUserRatings.CountItems();
+	summary.averageRating = 0.0f;
+	int starRatingCount = sizeof(summary.ratingCountByStar) / sizeof(int);
+	for (int i = 0; i < starRatingCount; i++)
+		summary.ratingCountByStar[i] = 0;
+	
+	if (summary.ratingCount <= 0)
+		return summary;
+		
+	float ratingSum = 0.0f;
+
+	for (int i = 0; i < summary.ratingCount; i++) {
+		float rating = fUserRatings.ItemAtFast(i).Rating();
+
+		if (rating < 0.0f)
+			rating = 0.0f;
+		else if (rating > 5.0f)
+			rating = 5.0f;
+		
+		ratingSum += rating;
+
+		if (rating <= 1.0f)
+			summary.ratingCountByStar[0]++;
+		else if (rating <= 2.0f)
+			summary.ratingCountByStar[1]++;
+		else if (rating <= 3.0f)
+			summary.ratingCountByStar[2]++;
+		else if (rating <= 4.0f)
+			summary.ratingCountByStar[3]++;
+		else if (rating <= 5.0f)
+			summary.ratingCountByStar[4]++;
+	}
+
+	summary.averageRating = ratingSum / summary.ratingCount;
+	return summary;
+}
+
+
 // #pragma mark -
 
 

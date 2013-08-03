@@ -104,6 +104,15 @@ private:
 typedef List<UserRating, false> UserRatingList;
 
 
+class RatingSummary {
+public:
+			float				averageRating;
+			int					ratingCount;
+
+			int					ratingCountByStar[5];
+};
+
+
 class PublisherInfo {
 public:
 								PublisherInfo();
@@ -166,6 +175,11 @@ public:
 									{ return fChangelog; }
 
 			bool				AddUserRating(const UserRating& rating);
+
+			const UserRatingList& UserRatings() const
+									{ return fUserRatings; }
+
+			RatingSummary		CalculateRatingSummary() const;
 
 private:
 			BitmapRef			fIcon;
