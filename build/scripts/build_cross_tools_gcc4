@@ -109,7 +109,7 @@ objDir=${installDir}-build
 binutilsObjDir=$objDir/binutils
 gccObjDir=$objDir/gcc
 stdcxxObjDir=$objDir/stdcxx
-sysrootDir=$objDir/sysroot
+sysrootDir=$installDir/sysroot
 tmpIncludeDir=$sysrootDir/boot/system/develop/headers
 tmpLibDir=$sysrootDir/boot/system/develop/lib
 
@@ -248,6 +248,9 @@ fi
 # remove the system headers from the installation dir
 # Only the ones from the source tree should be used.
 rm -rf $installDir/$haikuMachine/sys-include
+
+# remove the sysroot dir
+rm -rf $sysrootDir
 
 # remove the objects dir
 rm -rf $objDir
