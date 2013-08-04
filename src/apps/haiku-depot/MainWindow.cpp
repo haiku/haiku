@@ -30,7 +30,7 @@
 MainWindow::MainWindow(BRect frame)
 	:
 	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("HaikuDepot"),
-		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	BMenuBar* menuBar = new BMenuBar(B_TRANSLATE("Main Menu"));
@@ -40,7 +40,7 @@ MainWindow::MainWindow(BRect frame)
 	fPackageListView = new PackageListView();
 	fPackageInfoView = new PackageInfoView(&fPackageManager);
 	
-	fSplitView = new BSplitView(B_VERTICAL, B_USE_SMALL_SPACING);
+	fSplitView = new BSplitView(B_VERTICAL, 5.0f);
 	
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
 		.Add(menuBar)

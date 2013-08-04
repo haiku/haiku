@@ -17,6 +17,7 @@
 #include <LayoutUtils.h>
 #include <Message.h>
 #include <TabView.h>
+#include <ScrollView.h>
 #include <SpaceLayoutItem.h>
 #include <StringView.h>
 
@@ -108,6 +109,41 @@ public:
 
 private:
 	const BBitmap*	fBitmap;
+};
+
+
+//! Layouts the scrollbar so it looks nice with no border and the document
+// window look.
+class CustomScrollView : public BScrollView {
+public:
+	CustomScrollView(const char* name, BView* target)
+		:
+		BScrollView(name, target, 0, false, true, B_NO_BORDER)
+	{
+	}
+
+	virtual void DoLayout()
+	{
+		BRect innerFrame = Bounds();
+		innerFrame.right -= B_V_SCROLL_BAR_WIDTH + 1;
+		
+		BView* target = Target();
+		if (target != NULL) {
+			Target()->MoveTo(innerFrame.left, innerFrame.top);
+			Target()->ResizeTo(innerFrame.Width(), innerFrame.Height());
+		}
+		
+		BScrollBar* scrollBar = ScrollBar(B_VERTICAL);
+		if (scrollBar != NULL) {
+			BRect rect = innerFrame;
+			rect.left = rect.right + 1;
+			rect.right = rect.left + B_V_SCROLL_BAR_WIDTH;
+			rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
+	
+			scrollBar->MoveTo(rect.left, rect.top);
+			scrollBar->ResizeTo(rect.Width(), rect.Height());
+		}
+	}
 };
 
 
@@ -421,19 +457,20 @@ public:
 	AboutView()
 		:
 		BView("about view", 0),
-		fLayout(new BGroupLayout(B_HORIZONTAL)),
 		fEmailIcon("text/x-email"),
 		fWebsiteIcon("text/html")
 	{
 		SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 			kContentTint));
 		
-		SetLayout(fLayout);
-		
 		fDescriptionView = new BTextView("description view");
 		fDescriptionView->SetViewColor(ViewColor());
 		fDescriptionView->MakeEditable(false);
-		fDescriptionView->SetInsets(0.0f, be_plain_font->Size(), 0.0f, 0.0f);
+		const float textInset = be_plain_font->Size();
+		fDescriptionView->SetInsets(textInset, textInset, textInset, 0.0f);
+		
+		BScrollView* scrollView = new CustomScrollView(
+			"description scroll view", fDescriptionView);
 		
 		BFont smallFont;
 		GetFont(&smallFont);
@@ -449,9 +486,8 @@ public:
 		fWebsiteLinkView->SetFont(&smallFont);
 		fWebsiteLinkView->SetHighColor(kLightBlack);
 		
-		BLayoutBuilder::Group<>(fLayout)
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(32.0f))
-			.Add(fDescriptionView, 1.0f)
+		BLayoutBuilder::Group<>(this, B_HORIZONTAL, 0.0f)
+//			.Add(BSpaceLayoutItem::CreateHorizontalStrut(32.0f))
 			.AddGroup(B_VERTICAL, 0.0f)
 				.AddGlue()
 				.AddGroup(B_HORIZONTAL)
@@ -465,9 +501,13 @@ public:
 					.End()
 				.End()
 			.End()
+			.Add(scrollView, 1.0f)
+
 			.SetExplicitMaxSize(BSize(B_SIZE_UNSET, B_SIZE_UNLIMITED))
-			.SetInsets(B_USE_DEFAULT_SPACING, 0.0f, 0.0f, 0.0f)
+			.SetInsets(B_USE_DEFAULT_SPACING, -1.0f, -1.0f, -1.0f)
 		;
+
+		scrollView->ScrollBar(B_VERTICAL)->ResizeBy(0, -B_H_SCROLL_BAR_HEIGHT);
 	}
 	
 	virtual ~AboutView()
@@ -494,7 +534,6 @@ public:
 	}
 
 private:
-	BGroupLayout*	fLayout;
 	BTextView*		fDescriptionView;
 
 	SharedBitmap	fEmailIcon;
@@ -525,12 +564,16 @@ public:
 		fTextView = new BTextView("ratings view");
 		fTextView->SetViewColor(ViewColor());
 		fTextView->MakeEditable(false);
-		fTextView->SetInsets(0.0f, be_plain_font->Size(), 0.0f, 0.0f);
+		const float textInset = be_plain_font->Size();
+		fTextView->SetInsets(textInset, textInset, textInset, 0.0f);
+		
+		BScrollView* scrollView = new CustomScrollView(
+			"ratings scroll view", fTextView);
 		
 		BLayoutBuilder::Group<>(fLayout)
 			.Add(BSpaceLayoutItem::CreateHorizontalStrut(32.0f))
-			.Add(fTextView, 1.0f)
-			.SetInsets(B_USE_DEFAULT_SPACING, 0.0f, 0.0f, 0.0f)
+			.Add(scrollView, 1.0f)
+			.SetInsets(B_USE_DEFAULT_SPACING, -1.0f, -1.0f, -1.0f)
 		;
 	}
 	
@@ -594,12 +637,16 @@ public:
 		fTextView = new BTextView("changelog view");
 		fTextView->SetViewColor(ViewColor());
 		fTextView->MakeEditable(false);
-		fTextView->SetInsets(0.0f, be_plain_font->Size(), 0.0f, 0.0f);
+		const float textInset = be_plain_font->Size();
+		fTextView->SetInsets(textInset, textInset, textInset, 0.0f);
+		
+		BScrollView* scrollView = new CustomScrollView(
+			"changelog scroll view", fTextView);
 		
 		BLayoutBuilder::Group<>(fLayout)
 			.Add(BSpaceLayoutItem::CreateHorizontalStrut(32.0f))
-			.Add(fTextView, 1.0f)
-			.SetInsets(B_USE_DEFAULT_SPACING, 0.0f, 0.0f, 0.0f)
+			.Add(scrollView, 1.0f)
+			.SetInsets(B_USE_DEFAULT_SPACING, -1.0f, -1.0f, -1.0f)
 		;
 	}
 	
