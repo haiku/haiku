@@ -135,6 +135,10 @@ if [ "$HAIKU_USE_GCC_GRAPHITE" = 1 ]; then
 		--with-host-libstdcxx=\"-lstdc++\""
 fi
 
+if [ -n "$SECONDARY_ARCH" ]; then
+	gccConfigureArgs="$gccConfigureArgs --enable-hybrid-secondary"
+fi
+
 # force the POSIX locale, as the build (makeinfo) might choke otherwise
 export LC_ALL=POSIX
 

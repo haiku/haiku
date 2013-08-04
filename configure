@@ -649,6 +649,7 @@ else
 		set_default_value HAIKU_STRIP_$targetArch		strip
 	fi
 
+	isPrimaryArch=1
 	for targetArch in $targetArchs; do
 		# Note: targetArch is "unknown<n>" at this point, if a cross-tools
 		# prefix was specified. The standard_gcc_settings call below will get
@@ -664,6 +665,11 @@ else
 			if [ $targetArch != x86_gcc2 ]; then
 				script="${script}_gcc4 $targetMachine"
 			fi
+			secondaryArch=
+			if [ -z "$isPrimaryArch" ]; then
+				secondaryArch=$targetArch
+			fi
+			SECONDARY_ARCH=$secondaryArch \
 			HAIKU_USE_GCC_GRAPHITE=`get_variable \
 				HAIKU_USE_GCC_GRAPHITE_$targetArch` \
 			$script "$sourceDir" "$buildCrossTools" "$crossToolsDir" \
@@ -726,6 +732,7 @@ else
 		esac
 
 		HAIKU_PACKAGING_ARCHS="$HAIKU_PACKAGING_ARCHS $targetArch"
+		isPrimaryArch=
 	done
 fi
 
