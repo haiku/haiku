@@ -20,13 +20,11 @@ BootstrapPackageRepository HaikuPortsCross
 	libtool_bootstrap_libltdl-2.4-8
 	m4_bootstrap-1.4.16-1
 	make_bootstrap-3.82-1
-	makeinfo_bootstrap-4.13a-1
 	ncurses_bootstrap-5.9-1
 	ncurses_bootstrap_devel-5.9-1
 	python_bootstrap-2.6.8-1
 	sed_bootstrap-4.2.1-1
-# Available, but probably not needed:
-#	texinfo_bootstrap-4.13a-1
+	texinfo_bootstrap-4.13a-1
 	zlib_bootstrap-1.2.8-2
 	zlib_bootstrap_devel-1.2.8-2
 	:
@@ -48,7 +46,6 @@ BootstrapPackageRepository HaikuPortsCross
 	libtool_bootstrap
 	m4_bootstrap
 	make_bootstrap
-	makeinfo_bootstrap
 	ncurses_bootstrap
 	python_bootstrap
 	sed_bootstrap
