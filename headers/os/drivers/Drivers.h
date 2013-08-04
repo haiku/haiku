@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2011, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2013, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _DRIVERS_DRIVERS_H
@@ -106,6 +106,7 @@ enum {
 	B_GET_ICON_NAME,				/* get an icon name identifier */
 	B_GET_VECTOR_ICON,				/* retrieves the device's vector icon */
 	B_GET_DEVICE_NAME,				/* get name, string buffer */
+	B_TRIM_DEVICE,					/* trims blocks, see fs_trim_data */
 
 	B_GET_NEXT_OPEN_DEVICE = 1000,	/* obsolete, will be removed */
 	B_ADD_FIXED_DRIVER,				/* obsolete, will be removed */
@@ -167,6 +168,14 @@ typedef struct {
 		/* B_GET_ICON: size of the icon in pixels */
 	void	*icon_data;
 } device_icon;
+
+
+/* B_TRIM_DEVICE data structure */
+typedef struct {
+	off_t	offset;					/* offset (in bytes) */
+	off_t	size;
+	off_t	trimmed_size;			/* filled on return */
+} fs_trim_data;
 
 
 #ifdef __cplusplus

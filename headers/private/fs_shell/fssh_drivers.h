@@ -60,7 +60,7 @@ fssh_status_t		fssh_init_hardware(void);
 const char		  **fssh_publish_devices(void);
 fssh_device_hooks	*fssh_find_device(const char *name);
 fssh_status_t		fssh_init_driver(void);
-void				fssh_uninit_driver(void);	
+void				fssh_uninit_driver(void);
 
 extern int32_t	fssh_api_version;
 
@@ -111,17 +111,20 @@ enum {
 										/* B_DEV_MEDIA_CHANGE_REQUESTED: user */
 										/*  pressed button on drive */
 										/* B_DEV_DOOR_OPEN: door open */
-	
+
 	FSSH_B_LOAD_MEDIA,					/* load the media if supported */
-	
+
 	FSSH_B_GET_BIOS_DRIVE_ID,			/* get bios id for this device */
 
 	FSSH_B_SET_UNINTERRUPTABLE_IO,		/* prevent cntl-C from interrupting i/o */
 	FSSH_B_SET_INTERRUPTABLE_IO,		/* allow cntl-C to interrupt i/o */
 
 	FSSH_B_FLUSH_DRIVE_CACHE,			/* flush drive cache */
-
 	FSSH_B_GET_PATH_FOR_DEVICE,			/* get the absolute path of the device */
+	FSSH_B_GET_ICON_NAME,				/* get an icon name identifier */
+	FSSH_B_GET_VECTOR_ICON,				/* retrieves the device's vector icon */
+	FSSH_B_GET_DEVICE_NAME,				/* get name, string buffer */
+	FSSH_B_TRIM_DEVICE,					/* trims blocks, see fs_trim_data */
 
 	FSSH_B_GET_NEXT_OPEN_DEVICE = 1000,	/* iterate through open devices */
 	FSSH_B_ADD_FIXED_DRIVER,			/* private */
@@ -196,7 +199,7 @@ typedef char	fssh_driver_path[256];
 
 typedef struct {
 	uint32_t	cookie;			/* must be set to 0 before iterating */
-	char		device[256];	/* device path */	
+	char		device[256];	/* device path */
 } fssh_open_device_iterator;
 
 
@@ -208,6 +211,14 @@ typedef struct {
 	int32_t	icon_size;			/* icon size requested */
 	void	*icon_data;			/* where to put 'em (usually BBitmap->Bits()) */
 } fssh_device_icon;
+
+
+/* B_TRIM_DEVICE data structure */
+typedef struct {
+	fssh_off_t	offset;					/* offset (in bytes) */
+	fssh_off_t	size;
+	fssh_off_t	trimmed_size;			/* filled on return */
+} fssh_fs_trim_data;
 
 
 #ifdef __cplusplus
