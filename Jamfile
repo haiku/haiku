@@ -22,7 +22,7 @@ if ! $(HAIKU_BOOTSTRAP_BUILD) {
 }
 
 # If enabled, make sure that OpenSSL is added to the image.
-if $(HAIKU_BUILD_FEATURE_OPENSSL_ENABLED) {
+if [ FIsBuildFeatureEnabled openssl ] {
 	AddHaikuImagePackages openssl ;
 }
 
