@@ -42,6 +42,7 @@ private:
 
 
 typedef BReference<SharedBitmap> BitmapRef;
+typedef List<BitmapRef, false> BitmapList;
 
 
 class UserInfo {
@@ -181,6 +182,11 @@ public:
 
 			RatingSummary		CalculateRatingSummary() const;
 
+			bool				AddScreenshot(const BitmapRef& screenshot);
+
+			const BitmapList&	Screenshots() const
+									{ return fScreenshots; }
+
 private:
 			BitmapRef			fIcon;
 			BString				fTitle;
@@ -190,6 +196,7 @@ private:
 			BString				fFullDescription;
 			BString				fChangelog;
 			UserRatingList		fUserRatings;
+			BitmapList			fScreenshots;
 };
 
 

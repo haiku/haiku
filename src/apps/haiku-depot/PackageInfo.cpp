@@ -373,7 +373,8 @@ PackageInfo::PackageInfo()
 	fShortDescription(),
 	fFullDescription(),
 	fChangelog(),
-	fUserRatings()
+	fUserRatings(),
+	fScreenshots()
 {
 }
 
@@ -390,7 +391,8 @@ PackageInfo::PackageInfo(const BitmapRef& icon, const BString& title,
 	fShortDescription(shortDescription),
 	fFullDescription(fullDescription),
 	fChangelog(changelog),
-	fUserRatings()
+	fUserRatings(),
+	fScreenshots()
 {
 }
 
@@ -404,7 +406,8 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 	fShortDescription(other.fShortDescription),
 	fFullDescription(other.fFullDescription),
 	fChangelog(other.fChangelog),
-	fUserRatings(other.fUserRatings)
+	fUserRatings(other.fUserRatings),
+	fScreenshots(other.fScreenshots)
 {
 }
 
@@ -420,6 +423,7 @@ PackageInfo::operator=(const PackageInfo& other)
 	fFullDescription = other.fFullDescription;
 	fChangelog = other.fChangelog;
 	fUserRatings = other.fUserRatings;
+	fScreenshots = other.fScreenshots;
 	return *this;
 }
 
@@ -434,7 +438,8 @@ PackageInfo::operator==(const PackageInfo& other) const
 		&& fShortDescription == other.fShortDescription
 		&& fFullDescription == other.fFullDescription
 		&& fChangelog == other.fChangelog
-		&& fUserRatings == other.fUserRatings;
+		&& fUserRatings == other.fUserRatings
+		&& fScreenshots == other.fScreenshots;
 }
 
 
@@ -491,6 +496,13 @@ PackageInfo::CalculateRatingSummary() const
 
 	summary.averageRating = ratingSum / summary.ratingCount;
 	return summary;
+}
+
+
+bool
+PackageInfo::AddScreenshot(const BitmapRef& screenshot)
+{
+	return fScreenshots.Add(screenshot);
 }
 
 
