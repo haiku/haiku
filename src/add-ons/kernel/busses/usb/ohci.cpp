@@ -217,7 +217,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	// interrupts during handover. Therefore we disable interrupts before
 	// requesting ownership. We have to keep the ownership change interrupt
 	// enabled though, as otherwise the SMM will not be notified of the
-	// ownership change request we trigger below.	
+	// ownership change request we trigger below.
 	_WriteReg(OHCI_INTERRUPT_DISABLE, OHCI_ALL_INTERRUPTS &
 		~OHCI_OWNERSHIP_CHANGE) ;
 
@@ -234,7 +234,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 
 		if ((control & OHCI_INTERRUPT_ROUTING) != 0) {
 			TRACE_ERROR("smm does not respond.\n");
-			
+
 			// TODO: Enable this reset as soon as the non-specified
 			// reset a few lines later is replaced by a better solution.
 			//_WriteReg(OHCI_CONTROL, OHCI_HC_FUNCTIONAL_STATE_RESET);
@@ -1040,7 +1040,9 @@ OHCI::_FinishTransfers()
 			MutexLocker endpointLocker(endpoint->lock);
 
 			if ((endpoint->head_physical_descriptor & OHCI_ENDPOINT_HEAD_MASK)
-					!= endpoint->tail_physical_descriptor) {
+					!= endpoint->tail_physical_descriptor
+						&& (endpoint->head_physical_descriptor
+							& OHCI_ENDPOINT_HALTED) == 0) {
 				// there are still active transfers on this endpoint, we need
 				// to wait for all of them to complete, otherwise we'd read
 				// a potentially bogus data toggle value below
