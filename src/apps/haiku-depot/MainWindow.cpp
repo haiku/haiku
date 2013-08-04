@@ -173,6 +173,9 @@ MainWindow::_InitDummyModel()
 		UserRating(UserInfo("bonefish"), 5.0f,
 		"The best!", "en", "2.1.2")
 	);
+	wonderbrush.AddScreenshot(
+		BitmapRef(new SharedBitmap(603), true));
+	
 	depot.AddPackage(wonderbrush);
 
 	PackageInfo paladin(
@@ -205,6 +208,8 @@ MainWindow::_InitDummyModel()
 		"It just needs to use my jam-rewrite 'ham' and it will be great.",
 		"en", "1.1.0")
 	);
+	paladin.AddScreenshot(
+		BitmapRef(new SharedBitmap(604), true));
 	depot.AddPackage(paladin);
 
 	fModel.AddDepot(depot);
