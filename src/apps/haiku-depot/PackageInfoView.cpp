@@ -90,6 +90,30 @@ public:
 		BSize size = MinSize();
 		return BLayoutUtils::ComposeSize(ExplicitMaxSize(), size);
 	}
+
+	virtual	bool HasHeightForWidth()
+	{
+		return fBitmap != NULL;
+	}
+
+	virtual void GetHeightForWidth(float width, float* min, float* max,
+		float* preferred)
+	{
+		float height = width;
+		
+		if (fBitmap != NULL) {
+			BRect bounds = fBitmap->Bounds();
+			if (bounds.Width() > 0.0f && bounds.Height() > 0.0f)
+				height = (width / bounds.Width()) * bounds.Height();
+		}
+
+		if (min != NULL)
+			*min = height;
+		if (max != NULL)
+			*max = height;
+		if (preferred != NULL)
+			*preferred = height;
+	}
 	
 	void SetBitmap(const BBitmap* bitmap)
 	{
