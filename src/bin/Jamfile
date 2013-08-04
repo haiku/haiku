@@ -35,6 +35,7 @@ StdBinCommands
 	error.c
 	fortune.c
 	finddir.c
+	fstrim.cpp
 	hd.c
 	idestatus.c
 	listarea.c
