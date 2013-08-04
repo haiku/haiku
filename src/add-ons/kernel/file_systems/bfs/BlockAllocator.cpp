@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2012, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2013, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -1190,6 +1190,62 @@ BlockAllocator::_CheckGroup(int32 groupIndex) const
 #endif	// DEBUG_ALLOCATION_GROUPS
 
 
+status_t
+BlockAllocator::Trim(off_t offset, off_t size, off_t& trimmedSize)
+{
+	RecursiveLocker locker(fLock);
+
+	// TODO: take given offset and size into account!
+	int32 lastGroup = fNumGroups - 1;
+	uint32 firstBlock = 0;
+	uint32 firstBit = 0;
+	off_t currentBlock = 0;
+	uint32 blockShift = fVolume->BlockShift();
+
+	off_t firstFree = -1;
+	size_t freeLength = 0;
+	trimmedSize = 0;
+
+	AllocationBlock cached(fVolume);
+	for (int32 groupIndex = 0; groupIndex <= lastGroup; groupIndex++) {
+		AllocationGroup& group = fGroups[groupIndex];
+
+		for (uint32 block = firstBlock; block < group.NumBlocks(); block++) {
+			cached.SetTo(group, block);
+
+			for (uint32 i = firstBit; i < cached.NumBlockBits(); i++) {
+				if (cached.IsUsed(i)) {
+					// Block is in use
+					if (freeLength > 0) {
+						status_t status = _TrimNext(firstFree << blockShift,
+							freeLength << blockShift, trimmedSize);
+						if (status != B_OK)
+							return status;
+
+						freeLength = 0;
+					}
+				} else if (freeLength++ == 0) {
+					// Block is free, start new free range
+					firstFree = currentBlock;
+				}
+
+				currentBlock++;
+			}
+		}
+
+		firstBlock = 0;
+		firstBit = 0;
+	}
+
+	if (freeLength > 0) {
+		return _TrimNext(firstFree << blockShift, freeLength << blockShift,
+			trimmedSize);
+	}
+
+	return B_OK;
+}
+
+
 //	#pragma mark - Bitmap validity checking
 
 // TODO: implement new FS checking API
@@ -2121,6 +2177,26 @@ BlockAllocator::_AddInodeToIndex(Inode* inode)
 	}
 
 	return transaction.Done();
+}
+
+
+status_t
+BlockAllocator::_TrimNext(off_t offset, off_t size, off_t& trimmedSize)
+{
+	PRINT(("_TrimNext(offset %lld, size %lld)\n", offset, size));
+
+	fs_trim_data trimData;
+	trimData.offset = offset;
+	trimData.size = size;
+	trimData.trimmed_size = 0;
+
+	if (ioctl(fVolume->Device(), B_TRIM_DEVICE, &trimData,
+			sizeof(fs_trim_data)) != 0) {
+		return errno;
+	}
+
+	trimmedSize += trimData.trimmed_size;
+	return B_OK;
 }
 
 

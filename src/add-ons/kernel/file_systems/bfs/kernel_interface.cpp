@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2013, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -623,6 +623,20 @@ bfs_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 cmd,
 	Volume* volume = (Volume*)_volume->private_volume;
 
 	switch (cmd) {
+		case B_TRIM_DEVICE:
+		{
+			fs_trim_data trimData;
+			if (user_memcpy(&trimData, buffer, sizeof(fs_trim_data)) != B_OK)
+				return B_BAD_ADDRESS;
+
+			status_t status = volume->Allocator().Trim(trimData.offset,
+				trimData.size, trimData.trimmed_size);
+			if (status != B_OK)
+				return status;
+
+			return user_memcpy(buffer, &trimData, sizeof(fs_trim_data));
+		}
+
 		case BFS_IOCTL_VERSION:
 		{
 			uint32 version = 0x10000;

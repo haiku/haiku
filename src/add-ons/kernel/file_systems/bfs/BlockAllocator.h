@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2012, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2013, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef BLOCK_ALLOCATOR_H
@@ -46,6 +46,8 @@ public:
 								int32 group, uint16 start, uint16 numBlocks,
 								uint16 minimum, block_run& run);
 
+			status_t		Trim(off_t offset, off_t size, off_t& trimmedSize);
+
 			status_t		StartChecking(const check_control* control);
 			status_t		StopChecking(check_control* control);
 			status_t		CheckNextNode(check_control* control);
@@ -81,6 +83,8 @@ private:
 			void			_FreeIndices();
 			status_t		_AddInodeToIndex(Inode* inode);
 			status_t		_WriteBackCheckBitmap();
+			status_t		_TrimNext(off_t offset, off_t size,
+								off_t& trimmedSize);
 
 	static	status_t		_Initialize(BlockAllocator* self);
 
