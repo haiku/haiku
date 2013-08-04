@@ -331,13 +331,19 @@ public:
 		fPublisherView->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
 			B_ALIGN_VERTICAL_UNSET));
 
+		// slightly bigger font
+		GetFont(&font);
+		font.SetSize(ceilf(font.Size() * 1.2f));
+
+		// Version info
+		fVersionInfo = new BStringView("package version info", "");
+		fVersionInfo->SetFont(&font);
+		fVersionInfo->SetHighColor(kLightBlack);
+
 		// Rating view
 		fRatingView = new RatingView();
 
 		fAvgRating = new BStringView("package average rating", "");
-		// small font
-		GetFont(&font);
-		font.SetSize(ceilf(font.Size() * 1.2f));
 		fAvgRating->SetFont(&font);
 		fAvgRating->SetHighColor(kLightBlack);
 
@@ -354,6 +360,8 @@ public:
 				.Add(fTitleView)
 				.Add(fPublisherView)
 			.End()
+			.AddGlue(0.1f)
+			.Add(fVersionInfo)
 			.AddGlue(0.2f)
 			.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
 				.Add(fRatingView)
@@ -383,6 +391,8 @@ public:
 		publisher.ReplaceAll("%Publisher%", package.Publisher().Name());
 		fPublisherView->SetText(publisher);
 
+		fVersionInfo->SetText(package.Version());
+
 		RatingSummary ratingSummary = package.CalculateRatingSummary();
 
 		fRatingView->SetRating(ratingSummary.averageRating);
@@ -408,6 +418,7 @@ public:
 		fIconView->SetBitmap(NULL);
 		fTitleView->SetText("");
 		fPublisherView->SetText("");
+		fVersionInfo->SetText("");
 		fRatingView->SetRating(-1.0f);
 		fAvgRating->SetText("");
 		fVoteInfo->SetText("");
@@ -418,6 +429,8 @@ private:
 
 	BStringView*	fTitleView;
 	BStringView*	fPublisherView;
+
+	BStringView*	fVersionInfo;
 
 	RatingView*		fRatingView;
 	BStringView*	fAvgRating;
@@ -590,7 +603,11 @@ public:
 
 	void SetPackage(const PackageInfo& package)
 	{
-		fDescriptionView->SetText(package.FullDescription());
+		fDescriptionView->SetText(package.ShortDescription());
+		fDescriptionView->Insert(fDescriptionView->TextLength(), "\n\n", 2);
+		fDescriptionView->Insert(fDescriptionView->TextLength(),
+			package.FullDescription(), package.FullDescription().Length());
+
 		fEmailIconView->SetBitmap(fEmailIcon.Bitmap(SharedBitmap::SIZE_16));
 		fEmailLinkView->SetText(package.Publisher().Email());
 		fWebsiteIconView->SetBitmap(fWebsiteIcon.Bitmap(SharedBitmap::SIZE_16));
