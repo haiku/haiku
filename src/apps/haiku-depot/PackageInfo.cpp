@@ -9,6 +9,7 @@
 
 #include <Application.h>
 #include <Bitmap.h>
+#include <DataIO.h>
 #include <IconUtils.h>
 #include <MimeType.h>
 #include <Resources.h>
@@ -106,22 +107,45 @@ SharedBitmap::_CreateBitmapFromResource(int32 size) const
 	size_t dataSize;
 	const void* data = resources.LoadResource(B_VECTOR_ICON_TYPE, fResourceID,
 		&dataSize);
-	if (data == NULL)
-		return NULL;
-
-	BBitmap* bitmap = new BBitmap(BRect(0, 0, size - 1, size - 1), 0, B_RGBA32);
-	status = bitmap->InitCheck();
-	if (status == B_OK) {
-		status = BIconUtils::GetVectorIcon(
-			reinterpret_cast<const uint8*>(data), dataSize, bitmap);
-	};
-
-	if (status != B_OK) {
-		delete bitmap;
-		bitmap = NULL;
+	if (data != NULL) {
+		BBitmap* bitmap = new BBitmap(BRect(0, 0, size - 1, size - 1), 0,
+			B_RGBA32);
+		status = bitmap->InitCheck();
+		if (status == B_OK) {
+			status = BIconUtils::GetVectorIcon(
+				reinterpret_cast<const uint8*>(data), dataSize, bitmap);
+		};
+	
+		if (status != B_OK) {
+			delete bitmap;
+			bitmap = NULL;
+		}
+	
+		return bitmap;
 	}
 	
-	return bitmap;
+	data = resources.LoadResource(B_MESSAGE_TYPE, fResourceID, &dataSize);
+	if (data != NULL) {
+		BMemoryIO stream(data, dataSize);
+	
+		// Try to read as an archived bitmap.
+		BMessage archive;
+		status = archive.Unflatten(&stream);
+		if (status != B_OK)
+			return NULL;
+	
+		BBitmap* bitmap = new BBitmap(&archive);
+	
+		status = bitmap->InitCheck();
+		if (status != B_OK) {
+			delete bitmap;
+			bitmap = NULL;
+		}
+		
+		return bitmap;
+	}
+	
+	return NULL;
 }
 
 
