@@ -14,6 +14,7 @@
 #include <Catalog.h>
 #include <Font.h>
 #include <LayoutBuilder.h>
+#include <LayoutUtils.h>
 #include <Message.h>
 #include <TabView.h>
 #include <SpaceLayoutItem.h>
@@ -74,12 +75,19 @@ public:
 			size.height = bounds.Height();
 		}
 		
-		return size;
+		return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
 	}
 
+	virtual BSize PreferredSize()
+	{
+		BSize size = MinSize();
+		return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), size);
+	}
+	
 	virtual BSize MaxSize()
 	{
-		return MinSize();
+		BSize size = MinSize();
+		return BLayoutUtils::ComposeSize(ExplicitMaxSize(), size);
 	}
 	
 	void SetBitmap(const BBitmap* bitmap)
