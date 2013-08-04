@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2013, Haiku, Inc. All Rights Reserved.
  * Copyright 2002, Thomas Kurschel. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -77,6 +77,8 @@ status_t periph_handle_free(scsi_periph_handle_info *handle);
 // block.c
 
 status_t periph_check_capacity(scsi_periph_device_info *device, scsi_ccb *ccb);
+status_t periph_trim_device(scsi_periph_device_info *device, scsi_ccb *request,
+	uint64 offset, uint64 numBlocks);
 
 
 // device.c

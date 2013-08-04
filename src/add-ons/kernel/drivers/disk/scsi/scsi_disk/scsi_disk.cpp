@@ -1,8 +1,9 @@
 /*
- * Copyright 2008-2012, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2013, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
+
 
 /*!	Peripheral driver to handle any kind of SCSI disks,
 	i.e. hard disk and floopy disks (ZIP etc.)
@@ -93,7 +94,6 @@ get_geometry(das_handle* handle, device_geometry* geometry)
 	if (status != B_OK)
 		return status;
 
-
 	devfs_compute_geometry_size(geometry, info->capacity, info->block_size);
 
 	geometry->device_type = B_DISK;
@@ -150,6 +150,24 @@ synchronize_cache(das_driver_info *device)
 	device->scsi->free_ccb(ccb);
 
 	return result.error_code;
+}
+
+
+static status_t
+trim_device(das_driver_info* device, off_t offset, off_t size)
+{
+	TRACE("trim_device()\n");
+
+	scsi_ccb* request = device->scsi->alloc_ccb(device->scsi_device);
+	if (request == NULL)
+		return B_NO_MEMORY;
+
+	status_t status = sSCSIPeripheral->trim_device(device->scsi_periph_device,
+		request, offset / device->block_size, size / device->block_size);
+
+	device->scsi->free_ccb(request);
+
+	return status;
 }
 
 
@@ -384,6 +402,21 @@ das_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 
 		case B_FLUSH_DRIVE_CACHE:
 			return synchronize_cache(info);
+
+		case B_TRIM_DEVICE:
+		{
+			fs_trim_data trimData;
+			if (user_memcpy(&trimData, buffer, sizeof(fs_trim_data)) != B_OK)
+				return B_BAD_ADDRESS;
+
+			status_t status = trim_device(info, trimData.offset, trimData.size);
+			if (status != B_OK)
+				return status;
+
+			trimData.trimmed_size = trimData.size;
+
+			return user_memcpy(buffer, &trimData, sizeof(fs_trim_data));
+		}
 
 		default:
 			return sSCSIPeripheral->ioctl(handle->scsi_periph_handle, op,
@@ -649,7 +682,7 @@ struct driver_module_info sSCSIDiskDriver = {
 	das_init_driver,
 	das_uninit_driver,
 	das_register_child_devices,
-	das_rescan_child_devices,	
+	das_rescan_child_devices,
 	NULL,	// removed
 };
 

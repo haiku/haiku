@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Haiku, Inc. All RightsReserved.
+ * Copyright 2004-2013, Haiku, Inc. All RightsReserved.
  * Copyright 2002-2003, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -135,12 +135,13 @@ static scsi_periph_interface sSCSIPeripheralModule = {
 	periph_io,
 	periph_ioctl,
 	periph_check_capacity,
+	periph_synchronize_cache,
+	periph_trim_device,
 
 	periph_media_changed_public,
 	periph_check_error,
 	periph_send_start_stop,
 	periph_get_media_status,
-	periph_synchronize_cache,
 
 	periph_compose_device_name
 };
