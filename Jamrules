@@ -41,6 +41,7 @@ include [ FDirName $(HAIKU_BUILD_RULES_DIR) HelperRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) MathRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) ArchitectureRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) BeOSRules ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) BuildFeatureRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) LocaleRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) CommandLineArguments ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) ConfigRules ] ;
