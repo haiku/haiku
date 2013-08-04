@@ -18,6 +18,7 @@ class BBitmap;
 class SharedBitmap : public BReferenceable {
 public:
 		enum Size {
+			SIZE_ANY = -1,
 			SIZE_16 = 0,
 			SIZE_32 = 1,
 			SIZE_64 = 2

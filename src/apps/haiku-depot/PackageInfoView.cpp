@@ -36,7 +36,7 @@ class BitmapView : public BView {
 public:
 	BitmapView(const char* name)
 		:
-		BView(name, B_WILL_DRAW),
+		BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
 		fBitmap(NULL)
 	{
 		SetViewColor(B_TRANSPARENT_COLOR);
@@ -63,7 +63,47 @@ public:
 		if (fBitmap == NULL)
 			return;
 
-		DrawBitmap(fBitmap, fBitmap->Bounds(), bounds);
+		BRect bitmapBounds = fBitmap->Bounds();
+		if (bitmapBounds.Width() <= 0.0f || bitmapBounds.Height() <= 0.0f)
+			return;
+		
+		float hScale = bounds.Width() / bitmapBounds.Width();
+		float vScale = bounds.Height() / bitmapBounds.Height();
+		
+		float scale = std::min(hScale, vScale);
+		
+		float width = bitmapBounds.Width() * scale;
+		float height = bitmapBounds.Height() * scale;
+		
+		switch (LayoutAlignment().horizontal) {
+			case B_ALIGN_LEFT:
+				break;
+			case B_ALIGN_RIGHT:
+				bounds.left = floorf(bounds.right - width);
+				break;
+			default:
+			case B_ALIGN_HORIZONTAL_CENTER:
+				bounds.left = floorf(bounds.left
+					+ (bounds.Width() - width) / 2.0f);
+				break;
+		}
+		switch (LayoutAlignment().vertical) {
+			case B_ALIGN_TOP:
+				break;
+			case B_ALIGN_BOTTOM:
+				bounds.top = floorf(bounds.bottom - height);
+				break;
+			default:
+			case B_ALIGN_VERTICAL_CENTER:
+				bounds.top = floorf(bounds.top
+					+ (bounds.Height() - height) / 2.0f);
+				break;
+		}
+		
+		bounds.right = ceilf(bounds.left + width);
+		bounds.bottom = ceilf(bounds.top + height);
+
+		DrawBitmap(fBitmap, bitmapBounds, bounds, B_FILTER_BITMAP_BILINEAR);
 	}
 
 	virtual BSize MinSize()
@@ -91,29 +131,29 @@ public:
 		return BLayoutUtils::ComposeSize(ExplicitMaxSize(), size);
 	}
 
-	virtual	bool HasHeightForWidth()
-	{
-		return fBitmap != NULL;
-	}
-
-	virtual void GetHeightForWidth(float width, float* min, float* max,
-		float* preferred)
-	{
-		float height = width;
-		
-		if (fBitmap != NULL) {
-			BRect bounds = fBitmap->Bounds();
-			if (bounds.Width() > 0.0f && bounds.Height() > 0.0f)
-				height = (width / bounds.Width()) * bounds.Height();
-		}
-
-		if (min != NULL)
-			*min = height;
-		if (max != NULL)
-			*max = height;
-		if (preferred != NULL)
-			*preferred = height;
-	}
+//	virtual	bool HasHeightForWidth()
+//	{
+//		return true;
+//	}
+//
+//	virtual void GetHeightForWidth(float width, float* min, float* max,
+//		float* preferred)
+//	{
+//		float height = width;
+//		
+//		if (fBitmap != NULL) {
+//			BRect bounds = fBitmap->Bounds();
+//			if (bounds.Width() > 0.0f && bounds.Height() > 0.0f)
+//				height = (width / bounds.Width()) * bounds.Height();
+//		}
+//
+//		if (min != NULL)
+//			*min = height;
+//		if (max != NULL)
+//			*max = height;
+//		if (preferred != NULL)
+//			*preferred = height;
+//	}
 	
 	void SetBitmap(const BBitmap* bitmap)
 	{
@@ -500,6 +540,13 @@ public:
 		GetFont(&smallFont);
 		smallFont.SetSize(std::max(9.0f, ceilf(smallFont.Size() * 0.85f)));
 		
+		fScreenshotView = new BitmapView("screenshot view");
+		fScreenshotView->SetExplicitMinSize(BSize(64.0f, 64.0f));
+		fScreenshotView->SetExplicitMaxSize(
+			BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+		fScreenshotView->SetExplicitAlignment(
+			BAlignment(B_ALIGN_CENTER, B_ALIGN_TOP));
+		
 		fEmailIconView = new BitmapView("email icon view");
 		fEmailLinkView = new BStringView("email link view", "");
 		fEmailLinkView->SetFont(&smallFont);
@@ -510,10 +557,14 @@ public:
 		fWebsiteLinkView->SetFont(&smallFont);
 		fWebsiteLinkView->SetHighColor(kLightBlack);
 		
+		BGroupView* leftGroup = new BGroupView(B_VERTICAL,
+			B_USE_DEFAULT_SPACING);
+		leftGroup->SetViewColor(ViewColor());
+		
 		BLayoutBuilder::Group<>(this, B_HORIZONTAL, 0.0f)
 //			.Add(BSpaceLayoutItem::CreateHorizontalStrut(32.0f))
-			.AddGroup(B_VERTICAL, 0.0f)
-				.AddGlue()
+			.AddGroup(leftGroup)
+				.Add(fScreenshotView)
 				.AddGroup(B_HORIZONTAL)
 //					.AddGlue()
 					.AddGrid(B_USE_HALF_ITEM_SPACING, B_USE_HALF_ITEM_SPACING)
@@ -521,17 +572,15 @@ public:
 						.Add(fEmailLinkView, 1, 0)
 						.Add(fWebsiteIconView, 0, 1)
 						.Add(fWebsiteLinkView, 1, 1)
-						.SetInsets(B_USE_DEFAULT_SPACING)
 					.End()
 				.End()
+				.SetInsets(B_USE_DEFAULT_SPACING)
 			.End()
 			.Add(scrollView, 1.0f)
 
 			.SetExplicitMaxSize(BSize(B_SIZE_UNSET, B_SIZE_UNLIMITED))
-			.SetInsets(B_USE_DEFAULT_SPACING, -1.0f, -1.0f, -1.0f)
+			.SetInsets(0.0f, -1.0f, -1.0f, -1.0f)
 		;
-
-		scrollView->ScrollBar(B_VERTICAL)->ResizeBy(0, -B_H_SCROLL_BAR_HEIGHT);
 	}
 	
 	virtual ~AboutView()
@@ -546,6 +595,15 @@ public:
 		fEmailLinkView->SetText(package.Publisher().Email());
 		fWebsiteIconView->SetBitmap(fWebsiteIcon.Bitmap(SharedBitmap::SIZE_16));
 		fWebsiteLinkView->SetText(package.Publisher().Website());
+
+		const BBitmap* screenshot = NULL;
+		const BitmapList& screenShots = package.Screenshots();
+		if (screenShots.CountItems() > 0) {
+			const BitmapRef& bitmapRef = screenShots.ItemAtFast(0);
+			if (bitmapRef.Get() != NULL)
+				screenshot = bitmapRef->Bitmap(SharedBitmap::SIZE_ANY);
+		}
+		fScreenshotView->SetBitmap(screenshot);
 	}
 
 	void Clear()
@@ -555,10 +613,14 @@ public:
 		fEmailLinkView->SetText("");
 		fWebsiteIconView->SetBitmap(NULL);
 		fWebsiteLinkView->SetText("");
+
+		fScreenshotView->SetBitmap(NULL);
 	}
 
 private:
 	BTextView*		fDescriptionView;
+
+	BitmapView*		fScreenshotView;
 
 	SharedBitmap	fEmailIcon;
 	BitmapView*		fEmailIconView;
