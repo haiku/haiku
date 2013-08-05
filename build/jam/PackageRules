@@ -30,6 +30,7 @@ rule HaikuPackage package
 
 
 rule PreprocessPackageInfo source : directory : architecture
+	: secondaryArchitecture
 {
 	source = $(source:G=package-info-source) ;
 	SEARCH on $(source) +=
@@ -43,6 +44,9 @@ rule PreprocessPackageInfo source : directory : architecture
 	if $(HAIKU_BOOTSTRAP_BUILD) {
 		defines += HAIKU_BOOTSTRAP_BUILD ;
 		target = $(target)-bootstrap ;
+	}
+	if $(secondaryArchitecture) {
+		defines += HAIKU_SECONDARY_PACKAGING_ARCH=$(secondaryArchitecture) ;
 	}
 
 	MakeLocate $(target) : $(directory) ;
@@ -65,6 +69,11 @@ actions PreprocessPackageInfo1
 rule BuildHaikuPackage package : packageInfo
 {
 	local architecture = $(HAIKU_PACKAGING_ARCH) ;
+	local secondaryArchitecture ;
+	if $(TARGET_PACKAGING_ARCH) != $(architecture) {
+		secondaryArchitecture = $(TARGET_PACKAGING_ARCH) ;
+	}
+
 	local grist = [ FHaikuPackageGrist $(package) ] ;
 
 	local tempDir
@@ -73,7 +82,7 @@ rule BuildHaikuPackage package : packageInfo
 
 	#  build the package info and locate the package
 	packageInfo = [ PreprocessPackageInfo $(packageInfo) : $(tempDir)
-		: $(architecture) ] ;
+		: $(architecture) : $(secondaryArchitecture) ] ;
 	MakeLocate $(package) : $(HAIKU_PACKAGES_DIR_$(architecture)) ;
 	Depends $(package) : $(packageInfo) ;
 
