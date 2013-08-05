@@ -1,3 +1,14 @@
+rule FQualifiedBuildFeatureName features
+{
+	# FQualifiedBuildFeatureName <features>
+	#
+	# Prepends the name of the current target packaging architecture to the
+	# given feature names.
+
+	return $(TARGET_PACKAGING_ARCH):$(features) ;
+}
+
+
 rule FIsBuildFeatureEnabled feature
 {
 	# FIsBuildFeatureEnabled <feature> ;
@@ -6,11 +17,8 @@ rule FIsBuildFeatureEnabled feature
 	#
 	# <feature> - The name of the build feature (all lower case).
 
-	if $(feature) in $(HAIKU_BUILD_FEATURES) {
-		return 1 ;
-	}
-
-	return ;
+	feature = [ FQualifiedBuildFeatureName $(feature) ] ;
+	return $(HAIKU_BUILD_FEATURE_$(feature:U)_ENABLED) ;
 }
 
 
@@ -39,8 +47,7 @@ rule FMatchesBuildFeatures specification
 	for element in $(specification) {
 		splitSpecification += [ FSplitString $(element) : "," ] ;
 	}
-	return [ FSetConditionsHold $(splitSpecification)
-		: $(HAIKU_BUILD_FEATURES) ] ;
+	return [ FConditionsHold $(splitSpecification) : FIsBuildFeatureEnabled ] ;
 }
 
 
@@ -146,9 +153,10 @@ rule EnableBuildFeatures features : specification
 	# <specification> - An optional build features specification (cf.
 	#	FMatchesBuildFeatures).
 
+	features = [ FQualifiedBuildFeatureName $(features) ] ;
+
 	if ! $(specification)
-		|| [ FMatchesBuildFeatures $(specification)
-			: $(HAIKU_BUILD_FEATURES) ] {
+		|| [ FMatchesBuildFeatures $(specification) ] {
 		local feature ;
 		for feature in $(features) {
 			HAIKU_BUILD_FEATURES += $(feature) ;
@@ -163,6 +171,8 @@ rule BuildFeatureObject feature
 	# BuildFeatureObject <feature> ;
 	# Returns a unique object for the given build feature. It is used for
 	# attaching attribute values to it.
+
+	feature = [ FQualifiedBuildFeatureName $(feature) ] ;
 
 	local featureObject = $(HAIKU_BUILD_FEATURE_$(feature:U)) ;
 	if ! $(featureObject) {
@@ -286,14 +296,8 @@ rule ExtractBuildFeatureArchivesExpandValue value : fileName
 					}
 
 					# get the port name from the package name
-					splitName = [ Match "(.*)_([^_]*)" : $(%packageName%) ] ;
-					local knownPackageSuffixes = devel doc source debuginfo ;
-					if $(splitName[2])
-						&& $(splitName[2]) in $(knownPackageSuffixes) {
-						%portName% = $(splitName[1]) ;
-					} else {
-						%portName% = $(%packageName%) ;
-					}
+					splitName = [ FSplitPackageName $(%packageName%) ] ;
+					%portName% = $(splitName[1]) ;
 				}
 
 				value = "$(value)$($(component):E=)" ;
@@ -348,6 +352,9 @@ rule ExtractBuildFeatureArchives feature : list
 	#
 	# The rule also sets the build feature attribute "<packageAlias>:directory"
 	# to the extraction directory for each package.
+
+	local qualifiedFeature = [ FQualifiedBuildFeatureName $(feature) ] ;
+	list = [ FFilterByBuildFeatures $(list) ] ;
 
 	while $(list) {
 		if $(list[1]) != file: {
@@ -405,7 +412,7 @@ rule ExtractBuildFeatureArchives feature : list
 				SetBuildFeatureAttribute $(feature) : $(attribute)
 					: [ ExtractArchive $(directory)
 						: $(values) : $(file)
-						: extracted-$(feature)-$(package) ] ;
+						: extracted-$(qualifiedFeature)-$(package) ] ;
 				SetBuildFeatureAttribute $(feature) : $(attribute):package
 					: $(package) ;
 			}
@@ -414,4 +421,34 @@ rule ExtractBuildFeatureArchives feature : list
 		SetBuildFeatureAttribute $(feature) : $(package):directory
 			: $(directory:G=) ;
 	}
+}
+
+
+rule InitArchitectureBuildFeatures architecture
+{
+	# InitArchitectureBuildFeatures <architecture> ;
+	#
+	# Enable the build features that can be derived directly from the
+	# architecture.
+
+	# The build feature rule use TARGET_PACKAGING_ARCH, so set that temporarily.
+	local savedArchitecture = $(TARGET_PACKAGING_ARCH) ;
+	TARGET_PACKAGING_ARCH = $(architecture) ;
+
+	# Add the target architecture as a build feature.
+	EnableBuildFeatures $(TARGET_ARCH_$(architecture)) ;
+
+	# For the primary architecture add the "primary" build feature.
+	if $(architecture) = $(TARGET_PACKAGING_ARCHS[1]) {
+		EnableBuildFeatures primary ;
+	}
+
+	# Add all secondary architectures as build features (with prefix).
+	EnableBuildFeatures secondary_$(TARGET_PACKAGING_ARCHS[2-]) ;
+
+	if $(TARGET_GCC_VERSION_$(architecture)[1]) = 2 {
+		EnableBuildFeatures gcc2 ;
+	}
+
+	TARGET_PACKAGING_ARCH = $(savedArchitecture) ;
 }

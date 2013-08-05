@@ -900,6 +900,13 @@ for architecture in $(TARGET_PACKAGING_ARCHS) {
 }
 
 
+# set up architecture build features
+local architecture ;
+for architecture in $(TARGET_PACKAGING_ARCHS) {
+	InitArchitectureBuildFeatures $(architecture) ;
+}
+
+
 # The following directories cannot currently be compiled with DEBUG=1
 SetConfigVar DEBUG : HAIKU_TOP src add-ons disk_systems bfs : 0 : local ;
 SetConfigVar DEBUG : HAIKU_TOP src add-ons kernel drivers audio hda : 0 : local ;

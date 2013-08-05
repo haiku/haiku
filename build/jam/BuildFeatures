@@ -1,22 +1,12 @@
-# This file contains setup for build features that are not available for all
-# architectures/setups or that are optional for the build. For features that
-# require downloading a zip file from somewhere it is likely the same file used
-# for an optional package.
+# This file contains setup for build features that require external packages. It
+# is included once for each configured packaging architecture (with
+# TARGET_PACKAGING_ARCH set accordingly).
 
 
 local architecture = $(TARGET_PACKAGING_ARCH) ;
-
-
-# Add the target architecture as a build feature.
-EnableBuildFeatures $(TARGET_ARCH_$(architecture)) ;
-
-if $(TARGET_GCC_VERSION_$(architecture)[1]) = 2 {
-	EnableBuildFeatures gcc2 ;
-}
-
-
-local baseURL = http://www.haiku-files.org/files/optional-packages ;
-local hpkgBaseURL = http://haiku-files.org/files/hpkg ;
+local secondaryArchSubDir = [ MultiArchIfPrimary "" : /$(architecture) ] ;
+local developLibDir = develop/lib$(secondaryArchSubDir) ;
+local developHeadersDir = develop/headers$(secondaryArchSubDir) ;
 
 
 # SSL
@@ -33,8 +23,10 @@ if $(HAIKU_BUILD_FEATURE_SSL) {
 				runtime: lib
 			file: devel openssl_devel
 				depends: base
-				libraries: develop/lib/libcrypto.so develop/lib/libssl.so
-				headers: develop/headers
+				libraries:
+					$(developLibDir)/libcrypto.so
+					$(developLibDir)/libssl.so
+				headers: $(developHeadersDir)
 			;
 
 		EnableBuildFeatures openssl ;
@@ -54,14 +46,14 @@ if [ IsPackageAvailable icu_devel ] {
 		file: devel icu_devel
 			depends: base
 			libraries:
-				develop/lib/libicudata.so
-				develop/lib/libicui18n.so
-				develop/lib/libicuio.so
-				develop/lib/libicule.so
-				develop/lib/libiculx.so
-				develop/lib/libicutu.so
-				develop/lib/libicuuc.so
-			headers: develop/headers
+				$(developLibDir)/libicudata.so
+				$(developLibDir)/libicui18n.so
+				$(developLibDir)/libicuio.so
+				$(developLibDir)/libicule.so
+				$(developLibDir)/libiculx.so
+				$(developLibDir)/libicutu.so
+				$(developLibDir)/libicuuc.so
+			headers: $(developHeadersDir)
 		;
 
 	EnableBuildFeatures icu ;
@@ -244,8 +236,8 @@ if [ IsPackageAvailable glu_devel ] {
 			runtime: lib
 		file: devel glu_devel
 			depends: base
-			library: develop/lib/libGLU.so
-			headers: develop/headers
+			library: $(developLibDir)/libGLU.so
+			headers: $(developHeadersDir)
 		;
 
 	EnableBuildFeatures glu ;
@@ -258,19 +250,19 @@ if [ IsPackageAvailable glu_devel ] {
 if [ IsPackageAvailable mesa_devel ] {
 	ExtractBuildFeatureArchives mesa : [ FFilterByBuildFeatures
 		file: devel mesa_devel
-			mesaLibrary: develop/lib/libmesa.a
-			glapiLibrary: develop/lib/libglapi.a
-			headers: develop/headers
-			privateHeaders: develop/headers/mesa_private
+			mesaLibrary: $(developLibDir)/libmesa.a
+			glapiLibrary: $(developLibDir)/libglapi.a
+			headers: $(developHeadersDir)
+			privateHeaders: $(developHeadersDir)/mesa_private
 
 			!gcc2 @{
-				glslLibrary: develop/lib/libglsl.a
-				galliumLibrary: develop/lib/libgallium.a
+				glslLibrary: $(developLibDir)/libglsl.a
+				galliumLibrary: $(developLibDir)/libgallium.a
 				llvm @{
-					galliumLlvmpipeLibrary: develop/lib/libllvmpipe.a
+					galliumLlvmpipeLibrary: $(developLibDir)/libllvmpipe.a
 				}@
 				!llvm @{
-					galliumSoftpipeLibrary: develop/lib/libsoftpipe.a
+					galliumSoftpipeLibrary: $(developLibDir)/libsoftpipe.a
 				}@
 			}@ # !gcc2
 		] ;
@@ -301,8 +293,8 @@ if [ IsPackageAvailable ffmpeg_devel ] {
 				runtime: lib
 			file: devel $(feature)_devel
 				depends: base
-				libraries: develop/lib/$($(feature)Libs)
-				headers: develop/headers
+				libraries: $(developLibDir)/$($(feature)Libs)
+				headers: $(developHeadersDir)
 			;
 
 		EnableBuildFeatures $(feature) ;
@@ -319,8 +311,8 @@ if [ IsPackageAvailable freetype_devel ] {
 			runtime: lib
 		file: devel freetype_devel
 			depends: base
-			library: develop/lib/libfreetype.so
-			headers: develop/headers develop/headers/freetype2
+			library: $(developLibDir)/libfreetype.so
+			headers: $(developHeadersDir) $(developHeadersDir)/freetype2
 		;
 
 	EnableBuildFeatures freetype ;
@@ -442,8 +434,8 @@ if [ IsPackageAvailable libpng_devel ] {
 			runtime: lib
 		file: devel libpng_devel
 			depends: base
-			library: develop/lib/libpng.so
-			headers: develop/headers
+			library: $(developLibDir)/libpng.so
+			headers: $(developHeadersDir)
 		;
 
 	EnableBuildFeatures libpng ;
@@ -459,8 +451,8 @@ if [ IsPackageAvailable jpeg_devel ] {
 			runtime: lib
 		file: devel jpeg_devel
 			depends: base
-			library: develop/lib/libjpeg.so
-			headers: develop/headers
+			library: $(developLibDir)/libjpeg.so
+			headers: $(developHeadersDir)
 		;
 
 	EnableBuildFeatures jpeg ;
@@ -476,10 +468,13 @@ if [ IsPackageAvailable zlib_devel ] {
 			runtime: lib
 		file: devel zlib_devel
 			depends: base
-			library: develop/lib/libz.so
-			headers: develop/headers
-		file: source zlib_source
-			sources: develop/sources/%portRevisionedName%/source
+			library: $(developLibDir)/libz.so
+			headers: $(developHeadersDir)
+		# sources are required for the primary architecture only
+		primary @{
+			file: source zlib_source
+				sources: develop/sources/%portRevisionedName%/source
+		}@
 		;
 
 	EnableBuildFeatures zlib ;
@@ -495,10 +490,15 @@ if [ IsPackageAvailable libsolv_devel ] {
 			runtime: lib
 		file: devel libsolv_devel
 			depends: base
-			libraries: develop/lib/libsolv.so develop/lib/libsolvext.so
-			headers: develop/headers
-		file: source libsolv_source
-			sources: develop/sources/%portRevisionedName%/source
+			libraries:
+				$(developLibDir)/libsolv.so
+				$(developLibDir)/libsolvext.so
+			headers: $(developHeadersDir)
+		# sources are required for the primary architecture only
+		primary @{
+			file: source libsolv_source
+				sources: develop/sources/%portRevisionedName%/source
+		}@
 		;
 
 	EnableBuildFeatures libsolv ;

@@ -27,6 +27,13 @@ BootstrapPackageRepository HaikuPortsCross
 	texinfo_bootstrap-4.13a-1
 	zlib_bootstrap-1.2.8-2
 	zlib_bootstrap_devel-1.2.8-2
+
+	secondary_x86 @{
+		icu_bootstrap_x86-4.8.1.1-1
+		icu_bootstrap_x86_devel-4.8.1.1-1
+		zlib_bootstrap_x86-1.2.8-2
+		zlib_bootstrap_x86_devel-1.2.8-2
+	}@ # secondary_x86
 	:
 	# repository architecture packages (stage 2)
 	libsolv_bootstrap-0.3.0_haiku_2013_06_16-1

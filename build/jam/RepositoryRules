@@ -244,8 +244,8 @@ rule BootstrapRepositoryFetchPackage repository : package : fileName
 		= [ on $(repository) return $(HAIKU_REPOSITORY_BUILD_DIRECTORY) ] ;
 	local configFile
 		= [ on $(repository) return $(HAIKU_REPOSITORY_BUILD_CONFIG_FILE) ] ;
-	local haikuCrossDevelPackage = [ on $(package)
-		return $(HAIKU_REPOSITORY_HAIKU_CROSS_DEVEL_PACKAGE) ] ;
+	local haikuCrossDevelPackages = [ on $(package)
+		return $(HAIKU_REPOSITORY_HAIKU_CROSS_DEVEL_PACKAGES) ] ;
 
 	local packageFile = <cross-built>$(fileName) ;
 	if [ on $(packageFile) return $(HAIKU_REPOSITORY_BUILD_DIRECTORY) ] {
@@ -261,9 +261,9 @@ rule BootstrapRepositoryFetchPackage repository : package : fileName
 		# a dependency and is updated always, this package would otherwise be
 		# rebuilt always as well.
 
-	Depends $(packageFile) : $(haikuCrossDevelPackage) $(configFile) ;
+	Depends $(packageFile) : $(haikuCrossDevelPackages) $(configFile) ;
 	BootstrapRepositoryFetchPackage1 $(packageFile)
-		: $(haikuCrossDevelPackage) ;
+		: $(haikuCrossDevelPackages) ;
 
 	return $(packageFile) ;
 }
@@ -278,9 +278,24 @@ actions BootstrapRepositoryFetchPackage1
 	fi
 
 	# make Haiku cross devel package path absolute
-	haikuCrossDevelPackage="$(2)"
+	haikuCrossDevelPackage="$(2[1])"
 	if [[ "$haikuCrossDevelPackage" != /* ]]; then
 		haikuCrossDevelPackage="`pwd`/$haikuCrossDevelPackage"
+	fi
+
+	# make secondary Haiku cross devel packages path absolute
+	secondaryCrossDevelPackages=
+	if [ -n "$(2[2-]:J)" ]; then
+		for secondaryCrossDevelPackage in "$(2[2-])" ; do
+			if [[ "$secondaryCrossDevelPackage" != /* ]]; then
+				secondaryCrossDevelPackage="`pwd`/$secondaryCrossDevelPackage"
+			fi
+			if [ -n "$secondaryCrossDevelPackages" ]; then
+				secondaryCrossDevelPackages="secondaryCrossDevelPackages,$secondaryCrossDevelPackage"
+			else
+				secondaryCrossDevelPackages="--secondary-cross-devel-package=$secondaryCrossDevelPackage"
+			fi
+		done
 	fi
 
 	# determine the portName
@@ -295,7 +310,7 @@ actions BootstrapRepositoryFetchPackage1
 
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 	$(HOST_HAIKU_PORTER) --cross-devel-package "$haikuCrossDevelPackage" \
-		$portName
+		"$secondaryCrossDevelPackages" $portName
 }
 
 
@@ -321,8 +336,26 @@ EOF
 				$(HAIKU_GCC_MACHINE_$(HAIKU_PACKAGING_ARCH))-gcc ]; then
 			dir=`dirname $gcc`
 			dir=`dirname $dir`
-			echo CROSS_TOOLS="$dir" >> $(1)
+			echo CROSS_TOOLS=\"$dir\" >> $(1)
 		fi
+	fi
+
+	# Add secondary architectures and cross tools.
+	secondaryArchs="$(HAIKU_PACKAGING_ARCHS[2-]:E=)"
+	if [ -n "$secondaryArchs" ]; then
+		echo SECONDARY_TARGET_ARCHITECTURES=\" >> $(1)
+		for arch in $secondaryArchs; do
+			echo "  $arch" >> $(1)
+		done
+		echo \" >> $(1)
+
+		echo SECONDARY_CROSS_TOOLS=\" >> $(1)
+		for gcc in $(HAIKU_CC_$(HAIKU_PACKAGING_ARCHS[2-])); do
+			dir=`dirname $gcc`
+			dir=`dirname $dir`
+			echo "  $dir" >> $(1)
+		done
+		echo \" >> $(1)
 	fi
 }
 
@@ -332,6 +365,10 @@ rule BootstrapPackageRepository repository : architecture
 	: debugInfoPackages
 {
 	repository = $(repository:G=repository) ;
+	packagesStage1 = [ FFilterByBuildFeatures $(packagesStage1) ] ;
+	packagesStage2 = [ FFilterByBuildFeatures $(packagesStage2) ] ;
+	sourcePackages = [ FFilterByBuildFeatures $(sourcePackages) ] ;
+	debugInfoPackages = [ FFilterByBuildFeatures $(debugInfoPackages) ] ;
 
 	SetRepositoryMethod $(repository) : PackageFamily
 		: BootstrapRepositoryPackageFamily ;
@@ -345,15 +382,17 @@ rule BootstrapPackageRepository repository : architecture
 	if ! $(stage1PackageTargets) {
 		return ;
 	}
-	HAIKU_REPOSITORY_HAIKU_CROSS_DEVEL_PACKAGE on $(stage1PackageTargets)
-		= haiku_cross_devel_sysroot_stage1_$(architecture).hpkg ;
+	local crossDevelPackageSuffixes = $(architecture)
+		$(architecture)_$(HAIKU_PACKAGING_ARCHS[2-]) ;
+	HAIKU_REPOSITORY_HAIKU_CROSS_DEVEL_PACKAGES on $(stage1PackageTargets)
+		= haiku_cross_devel_sysroot_stage1_$(crossDevelPackageSuffixes).hpkg ;
 
 	# add stage 2 packages
 	local stage2PackageTargets = [ AddRepositoryPackages $(repository)
 		: $(architecture) : $(packagesStage2) : $(sourcePackages)
 		: $(debugInfoPackages) ] ;
-	HAIKU_REPOSITORY_HAIKU_CROSS_DEVEL_PACKAGE on $(stage2PackageTargets)
-		= haiku_cross_devel_sysroot_$(architecture).hpkg ;
+	HAIKU_REPOSITORY_HAIKU_CROSS_DEVEL_PACKAGES on $(stage2PackageTargets)
+		= haiku_cross_devel_sysroot_$(crossDevelPackageSuffixes).hpkg ;
 
 	# prepare the config file for the HaikuPorts cross build
 	local outputDir = [ FDirName
@@ -391,10 +430,29 @@ rule BootstrapPackageRepository repository : architecture
 #pragma mark - Public
 
 
+rule FSplitPackageName packageName
+{
+	local splitName = [ Match "(.*)_([^_]*)" : $(packageName) ] ;
+	local knownPackageSuffixes = devel doc source debuginfo ;
+	if $(splitName[2]) && $(splitName[2]) in $(knownPackageSuffixes) {
+		return $(splitName) ;
+	}
+
+	return $(packageName) ;
+}
+
+
 rule IsPackageAvailable package
 {
+	# for a secondary architecture adjust the package name
+	if $(TARGET_PACKAGING_ARCH) != $(TARGET_PACKAGING_ARCHS[1]) {
+		local splitName = [ FSplitPackageName $(package) ] ;
+		splitName = $(splitName[1]) $(TARGET_PACKAGING_ARCH) $(splitName[2-]) ;
+		package = $(splitName:J=_) ;
+	}
+
 	if $(package) in $(HAIKU_AVAILABLE_PACKAGES) {
-		return 1 ;
+		return $(package) ;
 	}
 
 	return ;
@@ -403,10 +461,12 @@ rule IsPackageAvailable package
 
 rule FetchPackage packageName
 {
-	if ! [ IsPackageAvailable $(packageName) ] {
+	local foundPackageName = [ IsPackageAvailable $(packageName) ] ;
+	if ! $(foundPackageName) {
 		Exit "DownloadPackage: package" $(packageName) "not available!" ;
 		return ;
 	}
+	packageName = $(foundPackageName) ;
 
 	# TODO: We should support explicitly specified versions (or partial/minimum
 	# versions like gcc-2 or gcc-4).
