@@ -649,15 +649,17 @@ rule ArchitectureSetupWarnings architecture
 }
 
 
-rule MultiArchIfPrimary ifValue : elseValue
+rule MultiArchIfPrimary ifValue : elseValue : architecture
 {
-	# MultiArchIfPrimary <ifValue> : <elseValue> ;
+	# MultiArchIfPrimary <ifValue> : <elseValue>
+	#	[ : <architecture> = $(TARGET_PACKAGING_ARCH) ] ;
 	#
 	# Returns one of the two given values depending on whether
-	# TARGET_PACKAGING_ARCH is currently set to the primary packaging
-	# architecture.
+	# <architecture> is the primary packaging architecture.
 
-	if $(TARGET_PACKAGING_ARCH) = $(TARGET_PACKAGING_ARCHS[1]) {
+	architecture ?= $(TARGET_PACKAGING_ARCH) ;
+
+	if $(architecture) = $(TARGET_PACKAGING_ARCHS[1]) {
 		return $(ifValue) ;
 	}
 	return $(elseValue) ;
@@ -665,37 +667,44 @@ rule MultiArchIfPrimary ifValue : elseValue
 
 
 rule MultiArchConditionalGristFiles files : primaryGrist : secondaryGrist
+	: architecture
 {
 	# MultiArchConditionalGristFiles <files> : <primaryGrist>
-	#	: <secondaryGrist> ;
+	#	: <secondaryGrist> [ : <architecture> = $(TARGET_PACKAGING_ARCH) ] ;
 	#
 	# Returns <files> with their grist set to either <primaryGrist> or
-	# <secondaryGrist> depending on whether TARGET_PACKAGING_ARCH is currently
-	# set to the primary packaging architecture.
+	# <secondaryGrist> depending on whether <architecture> is the primary
+	# packaging architecture.
 
-	local grist = [ MultiArchIfPrimary $(primaryGrist) : $(secondaryGrist) ] ;
+	architecture ?= $(TARGET_PACKAGING_ARCH) ;
+
+	local grist = [ MultiArchIfPrimary $(primaryGrist) : $(secondaryGrist)
+		: $(architecture) ] ;
 	return $(files:G=$(grist:E=)) ;
 }
 
 
-rule MultiArchDefaultGristFiles files : gristPrefix
+rule MultiArchDefaultGristFiles files : gristPrefix : architecture
 {
-	# MultiArchDefaultGristFiles <files> : <gristPrefix> ;
+	# MultiArchDefaultGristFiles <files> : <gristPrefix>
+	#	[ : <architecture> = $(TARGET_PACKAGING_ARCH) ] ;
 	#
 	# Convenient shorthand for MultiArchConditionalGristFiles for the common
 	# case that for a secondary packaging architecture the packaging
 	# architecture name shall be appended to the grist while it shall be omitted
-	# for the primary packaging architecture. IOW, if TARGET_PACKAGING_ARCH is
-	# currently set to the primary packaging architecture <files> are returned
-	# with their grist set to <gristPrefix>, otherwise <files> are returned with
-	# their grist set to <gristPrefix>!<arch> (<arch> being the name of the
-	# packaging architecture) respectively <arch> (if <gristPrefix> is empty).
+	# for the primary packaging architecture. IOW, if architecture is the
+	# primary packaging architecture, <files> are returned with their grist set
+	# to <gristPrefix>, otherwise <files> are returned with their grist set to
+	# <gristPrefix>!<architecture> respectively <architecture> (if <gristPrefix>
+	# is empty).
 
-	local secondaryGrist = $(gristPrefix)!$(TARGET_PACKAGING_ARCH) ;
-	secondaryGrist ?= $(TARGET_PACKAGING_ARCH) ;
+	architecture ?= $(TARGET_PACKAGING_ARCH) ;
+
+	local secondaryGrist = $(gristPrefix)!$(architecture) ;
+	secondaryGrist ?= $(architecture) ;
 
 	return [ MultiArchConditionalGristFiles $(files) : $(gristPrefix) :
-		$(secondaryGrist) ] ;
+		$(secondaryGrist) : $(architecture) ] ;
 }
 
 
