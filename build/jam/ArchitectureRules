@@ -231,22 +231,31 @@ rule ArchitectureSetup architecture
 		= $(HAIKU_GCC_LIB_DIR_$(architecture)) ;
 
 	# init library name map
+	local libraryGrist = "" ;
+	if $(architecture) != $(HAIKU_PACKAGING_ARCHS[1]) {
+		libraryGrist = $(architecture) ;
+	}
 	local i ;
 	for i in be bnetapi debug device game GL locale mail media midi midi2
 			network opengl package root screensaver textencoding tracker
 			translation z {
+		local library = lib$(i).so ;
 		HAIKU_LIBRARY_NAME_MAP_$(architecture)_$(i)
-			= [ MultiArchDefaultGristFiles lib$(i).so : : $(architecture) ] ;
+			= $(library:G=$(libraryGrist)) ;
 	}
 	HAIKU_LIBRARY_NAME_MAP_$(architecture)_libstdc++
 		= $(HAIKU_LIBSTDC++_$(architecture)) ;
 	HAIKU_LIBRARY_NAME_MAP_$(architecture)_libsupc++
 		= $(HAIKU_LIBSUPC++_$(architecture)) ;
-	HAIKU_LIBRARY_NAME_MAP_$(architecture)_input_server
-		= [ MultiArchIfPrimary <nogrist>input_server
-			: <$(architecture)>input_server : $(architecture) ] ;
 	HAIKU_LIBRARY_NAME_MAP_$(architecture)_localestub
 		= <$(architecture)>liblocalestub.a ;
+	if $(architecture) != $(HAIKU_PACKAGING_ARCHS[1]) {
+		HAIKU_LIBRARY_NAME_MAP_$(architecture)_input_server
+			= <nogrist>input_server ;
+	} else {
+		HAIKU_LIBRARY_NAME_MAP_$(architecture)_input_server
+			= <$(architecture)>input_server ;
+	}
 }
 
 
