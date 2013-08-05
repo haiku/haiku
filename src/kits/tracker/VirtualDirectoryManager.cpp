@@ -35,15 +35,6 @@ static const char* const kTemporaryDefinitionFileBaseDirectoryPath
 	= "/tmp/tracker/virtual-directories";
 
 
-static bool
-operator<(const node_ref& a, const node_ref& b)
-{
-	if (a.device != b.device)
-		return a.device < b.device;
-	return a.node < b.node;
-}
-
-
 // #pragma mark - Info
 
 

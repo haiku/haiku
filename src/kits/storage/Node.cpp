@@ -68,6 +68,16 @@ node_ref::operator!=(const node_ref &ref) const
 	return !(*this == ref);
 }
 
+
+bool
+node_ref::operator<(const node_ref& other) const
+{
+	if (this->device != other.device)
+		return this->device < other.device;
+	return this->node < other.node;
+}
+
+
 // =
 node_ref&
 node_ref::operator=(const node_ref &ref)
