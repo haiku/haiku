@@ -677,7 +677,7 @@ VirtualDirectoryManager::_RemoveDirectory(Info* info)
 {
 	// recursively remove the subdirectories
 	for (int32 i = 0; Info* child = info->Children().ItemAt(i); i++)
-		_RemoveDirectory(info);
+		_RemoveDirectory(child);
 
 	// remove the directory for the child definition file
 	if (!info->Id().IsEmpty()) {
