@@ -309,8 +309,13 @@ actions BootstrapRepositoryFetchPackage1
 	cd $(HAIKU_REPOSITORY_BUILD_DIRECTORY)
 
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-	$(HOST_HAIKU_PORTER) --cross-devel-package "$haikuCrossDevelPackage" \
-		"$secondaryCrossDevelPackages" $portName
+	if [ -n "$secondaryCrossDevelPackages" ]; then
+		$(HOST_HAIKU_PORTER) --cross-devel-package "$haikuCrossDevelPackage" \
+			"$secondaryCrossDevelPackages" $portName
+	else
+		$(HOST_HAIKU_PORTER) --cross-devel-package "$haikuCrossDevelPackage" \
+			$portName
+	fi
 }
 
 
@@ -350,7 +355,7 @@ EOF
 		echo \" >> $(1)
 
 		echo SECONDARY_CROSS_TOOLS=\" >> $(1)
-		for gcc in $(HAIKU_CC_$(HAIKU_PACKAGING_ARCHS[2-])); do
+		for gcc in $(HAIKU_CC_$(HAIKU_PACKAGING_ARCHS[2-])) ; do
 			dir=`dirname $gcc`
 			dir=`dirname $dir`
 			echo "  $dir" >> $(1)
