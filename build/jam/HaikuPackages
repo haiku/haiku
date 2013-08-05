@@ -18,10 +18,18 @@ local archDependentPackages =
 	HaikuCrossDevel
 	;
 
+local secondaryArchPackages ;
+if $(HAIKU_BOOTSTRAP_BUILD) {
+	secondaryArchPackages += HaikuSecondaryBootstrap ;
+} else {
+	secondaryArchPackages += HaikuSecondary ;
+}
+
 
 packages = $(packages:G=package-rules) ;
 archDependentPackages = $(archDependentPackages:G=package-rules) ;
-SEARCH on $(packages) $(archDependentPackages)
+secondaryArchPackages = $(secondaryArchPackages:G=package-rules) ;
+SEARCH on $(packages) $(archDependentPackages) $(secondaryArchPackages)
 	= [ FDirName $(HAIKU_BUILD_RULES_DIR) packages ] ;
 
 local package ;
@@ -32,6 +40,16 @@ for package in $(packages) {
 for package in $(archDependentPackages) {
 	local architectureObject ;
 	for architectureObject in [ MultiArchSubDirSetup ] {
+		on $(architectureObject) {
+			include $(package) ;
+		}
+	}
+}
+
+for package in $(secondaryArchPackages) {
+	local architectureObject ;
+	for architectureObject in
+			[ MultiArchSubDirSetup $(TARGET_PACKAGING_ARCHS[2-]) ] {
 		on $(architectureObject) {
 			include $(package) ;
 		}

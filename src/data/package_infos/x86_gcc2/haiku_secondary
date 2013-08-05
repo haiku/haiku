@@ -1,0 +1,38 @@
+#define DO_CONCAT(a, b)	a ## b
+#define CONCAT(a, b)	DO_CONCAT(a, b)
+#define DO_TO_STRING(x)	#x
+#define TO_STRING(x)	DO_TO_STRING(x)
+
+name 			CONCAT(haiku_, HAIKU_SECONDARY_PACKAGING_ARCH)
+version			R1~alpha4_pm-1
+architecture	x86_gcc2
+summary			"The Haiku base system "TO_STRING(HAIKU_SECONDARY_PACKAGING_ARCH)" secondary architecture support"
+
+description		"The Haiku base system "TO_STRING(HAIKU_SECONDARY_PACKAGING_ARCH)"
+secondary architecture support includes all system libraries, add-ons, and
+other files required to run programs build for architecture
+"TO_STRING(HAIKU_SECONDARY_PACKAGING_ARCH)"."
+
+packager		"The Haiku build system"
+vendor			"Haiku Project"
+
+copyrights		"2001-2013 Haiku, Inc. et al"
+licenses {
+	MIT
+	"GNU LGPL v2.1"
+}
+
+provides {
+	CONCAT(haiku_, HAIKU_SECONDARY_PACKAGING_ARCH) = R1~alpha4_pm-1 compat>=R1~alpha1
+}
+
+requires {
+	CONCAT(lib:libfreetype_, HAIKU_SECONDARY_PACKAGING_ARCH)
+#ifndef HAIKU_BOOTSTRAP_BUILD
+	CONCAT(lib:libjpeg_, HAIKU_SECONDARY_PACKAGING_ARCH)
+	CONCAT(lib:libpng_, HAIKU_SECONDARY_PACKAGING_ARCH)
+#endif
+	CONCAT(lib:libsolv_, HAIKU_SECONDARY_PACKAGING_ARCH)
+	CONCAT(lib:libsolvext_, HAIKU_SECONDARY_PACKAGING_ARCH)
+	CONCAT(lib:libz_, HAIKU_SECONDARY_PACKAGING_ARCH)
+}
