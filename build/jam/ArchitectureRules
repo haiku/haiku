@@ -235,14 +235,16 @@ rule ArchitectureSetup architecture
 	for i in be bnetapi debug device game GL locale mail media midi midi2
 			network opengl package root screensaver textencoding tracker
 			translation z {
-		HAIKU_LIBRARY_NAME_MAP_$(architecture)_$(i) = lib$(i).so ;
+		HAIKU_LIBRARY_NAME_MAP_$(architecture)_$(i)
+			= [ MultiArchDefaultGristFiles lib$(i).so : : $(architecture) ] ;
 	}
 	HAIKU_LIBRARY_NAME_MAP_$(architecture)_libstdc++
 		= $(HAIKU_LIBSTDC++_$(architecture)) ;
 	HAIKU_LIBRARY_NAME_MAP_$(architecture)_libsupc++
 		= $(HAIKU_LIBSUPC++_$(architecture)) ;
 	HAIKU_LIBRARY_NAME_MAP_$(architecture)_input_server
-		= <nogrist>input_server ;
+		= [ MultiArchIfPrimary <nogrist>input_server
+			: <$(architecture)>input_server : $(architecture) ] ;
 	HAIKU_LIBRARY_NAME_MAP_$(architecture)_localestub
 		= <$(architecture)>liblocalestub.a ;
 }
