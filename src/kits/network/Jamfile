@@ -1,29 +1,33 @@
 SubDir HAIKU_TOP src kits network ;
 
 UsePrivateHeaders app libroot net shared ;
-UsePrivateSystemHeaders ;
-
-SharedLibrary libnetwork.so :
-	init.cpp
-	interfaces.cpp
-	notifications.cpp
-	socket.cpp
-	r5_compatibility.cpp
-	:
-	be
-	<libbind>libbind_dst.o
-	<libbind>libbind_inet.o
-	<libbind>libbind_irs.o
-	<libbind>libbind_isc.o
-	<libbind>libbind_nameser.o
-	<libbind>libbind_resolv.o
-	<libbind>libbind_private.o
-	$(TARGET_LIBSUPC++)
-;
 
 local services = [ FGristFiles services ] ;
 SEARCH on $(services) = [ FDirName $(SUBDIR) libbind defaults ] ;
-AddFileDataAttribute libnetwork.so : services : string : $(services) ;
+
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		UsePrivateSystemHeaders ;
+
+		local libnetwork = [ MultiArchDefaultGristFiles libnetwork.so ] ;
+		SharedLibrary $(libnetwork) :
+			init.cpp
+			interfaces.cpp
+			notifications.cpp
+			socket.cpp
+			r5_compatibility.cpp
+			:
+			be
+			<libbind!$(architecture)>libbind.o
+			$(TARGET_LIBSUPC++)
+			;
+
+		AddFileDataAttribute $(libnetwork) : services : string : $(services) ;
+	}
+}
 
 SubInclude HAIKU_TOP src kits network libbind ;
 SubInclude HAIKU_TOP src kits network libnetapi ;
