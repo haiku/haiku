@@ -249,7 +249,7 @@ rule ArchitectureSetup architecture
 		= $(HAIKU_LIBSUPC++_$(architecture)) ;
 	HAIKU_LIBRARY_NAME_MAP_$(architecture)_localestub
 		= <$(architecture)>liblocalestub.a ;
-	if $(architecture) != $(HAIKU_PACKAGING_ARCHS[1]) {
+	if $(architecture) = $(HAIKU_PACKAGING_ARCHS[1]) {
 		HAIKU_LIBRARY_NAME_MAP_$(architecture)_input_server
 			= <nogrist>input_server ;
 	} else {
