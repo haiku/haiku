@@ -91,22 +91,16 @@ AddLibrariesToPackage lib
 	: [ HaikuImageGetSystemLibs ] [ HaikuImageGetPrivateSystemLibs ] ;
 
 # libnetwork.so replaces quite a few libraries
-SYSTEM_LIBS_LIBNETWORK_ALIASES = libsocket.so libbind.so libnet.so ;
-
 if $(HAIKU_GCC_VERSION_$(architecture)[1]) = 2 {
+	local libNetworkAliases = libsocket.so libbind.so libnet.so ;
 	local lib ;
-	for lib in $(SYSTEM_LIBS_LIBNETWORK_ALIASES) {
+	for lib in $(libNetworkAliases) {
 		AddSymlinkToPackage lib : libnetwork.so : $(lib) ;
 	}
 
 	AddSymlinkToPackage lib : libbnetapi.so : libnetapi.so ;
 }
 
-
-SYSTEM_LIBS_ALIASES =
-	$(SYSTEM_LIBS_LIBNETWORK_ALIASES)
-	libnetapi.so
-;
 
 # TODO: Remove when the packages have been rebuilt!
 AddSymlinkToPackage lib : libbe.so : liblocale.so ;
