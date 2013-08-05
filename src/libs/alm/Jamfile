@@ -3,19 +3,25 @@ SubDir HAIKU_TOP src libs alm ;
 
 UseLibraryHeaders linprog alm ;
 UsePrivateHeaders shared ;
-UseHeaders [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) kits interface ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src kits interface ] ;
 
 
-SharedLibrary libalm.so :
-	ALMGroup.cpp
-	ALMLayout.cpp
-	ALMLayoutBuilder.cpp
-	Area.cpp
-	Column.cpp
-	Row.cpp
-	RowColumnManager.cpp
-	SharedSolver.cpp
-	Tab.cpp
-	:
-	liblinprog.a be $(TARGET_LIBSTDC++)
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		SharedLibrary [ MultiArchDefaultGristFiles libalm.so ] :
+			ALMGroup.cpp
+			ALMLayout.cpp
+			ALMLayoutBuilder.cpp
+			Area.cpp
+			Column.cpp
+			Row.cpp
+			RowColumnManager.cpp
+			SharedSolver.cpp
+			Tab.cpp
+			:
+			[ MultiArchDefaultGristFiles liblinprog.a ]
+			be $(TARGET_LIBSTDC++)
+			;
+	}
+}

@@ -12,24 +12,28 @@ SubDirSysHdrs $(SUBDIR) ;
 
 
 if $(TARGET_PLATFORM) = haiku {
+	local architectureObject ;
+	for architectureObject in [ MultiArchSubDirSetup ] {
+		on $(architectureObject) {
+			SharedLibrary [ MultiArchDefaultGristFiles libgame.so ] :
+				# Public Game Kit
+				DirectWindow.cpp
+				WindowScreen.cpp
+				GameSound.cpp
+				SimpleGameSound.cpp
+				FileGameSound.cpp
+				PushGameSound.cpp
+				StreamingGameSound.cpp
 
-	SharedLibrary libgame.so :
-		# Public Game Kit
-		DirectWindow.cpp
-		WindowScreen.cpp
-		GameSound.cpp
-		SimpleGameSound.cpp
-		FileGameSound.cpp
-		PushGameSound.cpp
-		StreamingGameSound.cpp
-	
-		# Internal Functionality
-		GameProducer.cpp
-		GameSoundBuffer.cpp
-		GameSoundDevice.cpp
-		GSUtility.cpp
-		: be media $(TARGET_LIBSUPC++)
-	;
+				# Internal Functionality
+				GameProducer.cpp
+				GameSoundBuffer.cpp
+				GameSoundDevice.cpp
+				GSUtility.cpp
+				: be media $(TARGET_LIBSUPC++)
+				;
+		}
+	}
 } else if $(TARGET_PLATFORM) = libbe_test {
 
 	SharedLibrary libgame.so :

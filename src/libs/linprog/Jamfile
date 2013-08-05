@@ -6,12 +6,16 @@ UseLibraryHeaders linprog ;
 UsePrivateHeaders shared ;
 
 
-StaticLibrary liblinprog.a :
-	ActiveSetSolver.cpp
-	Constraint.cpp
-	LayoutOptimizer.cpp
-	LinearSpec.cpp
-	Summand.cpp
-	Variable.cpp
-;
-
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		StaticLibrary [ MultiArchDefaultGristFiles liblinprog.a ] :
+			ActiveSetSolver.cpp
+			Constraint.cpp
+			LayoutOptimizer.cpp
+			LinearSpec.cpp
+			Summand.cpp
+			Variable.cpp
+			;
+	}
+}
