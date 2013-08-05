@@ -59,26 +59,38 @@ SYSTEM_PREFERENCES = [ FFilterByBuildFeatures
 	Shortcuts Time Touchpad <preference>Tracker VirtualMemory
 ] ;
 SYSTEM_DEMOS = ;
-SYSTEM_LIBS = [ FFilterByBuildFeatures
-	libbe.so libbsd.so libbnetapi.so
-	libdebug.so libdevice.so
-	libgame.so
-	libgnu.so libmail.so libmedia.so libmidi.so libmidi2.so
-	libnetwork.so
-	libpackage.so
-	<revisioned>libroot.so
-	libscreensaver.so
-	libtextencoding.so libtracker.so libtranslation.so
-	$(HAIKU_SHARED_LIBSTDC++_$(HAIKU_PACKAGING_ARCH))
-	$(HAIKU_SHARED_LIBSUPC++_$(HAIKU_PACKAGING_ARCH))
-] ;
-PRIVATE_SYSTEM_LIBS = [ FFilterByBuildFeatures
-	libalm.so
-#	libfluidsynth.so
-#	libilmimf.so
-	libpackage-add-on-libsolv.so
-	libroot-addon-icu.so
-] ;
+
+
+rule HaikuImageGetSystemLibs
+{
+	return [ FFilterByBuildFeatures
+		libbe.so libbsd.so libbnetapi.so
+		libdebug.so libdevice.so
+		libgame.so
+		libgnu.so libmail.so libmedia.so libmidi.so libmidi2.so
+		libnetwork.so
+		libpackage.so
+		<revisioned>libroot.so
+		libscreensaver.so
+		libtextencoding.so libtracker.so libtranslation.so
+		$(HAIKU_SHARED_LIBSTDC++_$(HAIKU_PACKAGING_ARCH))
+		$(HAIKU_SHARED_LIBSUPC++_$(HAIKU_PACKAGING_ARCH))
+	] ;
+}
+
+
+rule HaikuImageGetPrivateSystemLibs
+{
+	return [ FFilterByBuildFeatures
+		libalm.so
+#		libfluidsynth.so
+#		libilmimf.so
+		libpackage-add-on-libsolv.so
+		libroot-addon-icu.so
+	] ;
+}
+
+
 SYSTEM_SERVERS = [ FFilterByBuildFeatures
 	app_server debug_server dns_resolver_server input_server
 	keystore_server media_addon_server

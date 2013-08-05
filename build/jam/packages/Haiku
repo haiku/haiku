@@ -87,7 +87,8 @@ AddDriversToPackage power			: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
 AddFilesToPackage : <revisioned>kernel_$(TARGET_ARCH) ;
 
 # libs
-AddLibrariesToPackage lib : $(SYSTEM_LIBS) $(PRIVATE_SYSTEM_LIBS) ;
+AddLibrariesToPackage lib
+	: [ HaikuImageGetSystemLibs ] [ HaikuImageGetPrivateSystemLibs ] ;
 
 # libnetwork.so replaces quite a few libraries
 SYSTEM_LIBS_LIBNETWORK_ALIASES = libsocket.so libbind.so libnet.so ;

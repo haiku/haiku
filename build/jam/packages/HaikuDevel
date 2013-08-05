@@ -25,7 +25,7 @@ AddFilesToPackage lib : $(developmentLibs) ;
 
 # library symlinks
 local lib ;
-for lib in $(SYSTEM_LIBS) $(developmentLibs) {
+for lib in [ HaikuImageGetSystemLibs ] $(developmentLibs) {
 	AddSymlinkToPackage $(developDirTokens) lib : /system/lib $(lib:BS) ;
 	local abiVersion = [ on $(lib) return $(HAIKU_LIB_ABI_VERSION) ] ;
 	if $(abiVersion) {

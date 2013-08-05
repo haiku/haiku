@@ -63,26 +63,38 @@ SYSTEM_DEMOS = [ FFilterByBuildFeatures
 	$(HAIKU_INCLUDE_TRADEMARKS)Haiku3d@x86 Mandelbrot OverlayImage Pairs
 	Playground Pulse Sudoku
 ] ;
-SYSTEM_LIBS = [ FFilterByBuildFeatures
-	libbe.so libbsd.so libbnetapi.so
-	libdebug.so libdevice.so
-	libgame.so libGL.so@x86 libglut.so@x86
-	libgnu.so libmail.so libmedia.so libmidi.so libmidi2.so
-	libnetwork.so
-	libpackage.so
-	<revisioned>libroot.so
-	libscreensaver.so
-	libtextencoding.so libtiff.so libtracker.so libtranslation.so
-	$(HAIKU_SHARED_LIBSTDC++_$(HAIKU_PACKAGING_ARCH))
-	$(HAIKU_SHARED_LIBSUPC++_$(HAIKU_PACKAGING_ARCH))
-] ;
-PRIVATE_SYSTEM_LIBS = [ FFilterByBuildFeatures
-	libalm.so
-	libfluidsynth.so
-	libilmimf.so
-	libpackage-add-on-libsolv.so
-	libroot-addon-icu.so
-] ;
+
+
+rule HaikuImageGetSystemLibs
+{
+	return [ FFilterByBuildFeatures
+		libbe.so libbsd.so libbnetapi.so
+		libdebug.so libdevice.so
+		libgame.so libGL.so@x86 libglut.so@x86
+		libgnu.so libmail.so libmedia.so libmidi.so libmidi2.so
+		libnetwork.so
+		libpackage.so
+		<revisioned>libroot.so
+		libscreensaver.so
+		libtextencoding.so libtiff.so libtracker.so libtranslation.so
+		$(HAIKU_SHARED_LIBSTDC++_$(HAIKU_PACKAGING_ARCH))
+		$(HAIKU_SHARED_LIBSUPC++_$(HAIKU_PACKAGING_ARCH))
+	] ;
+}
+
+
+rule HaikuImageGetPrivateSystemLibs
+{
+	return [ FFilterByBuildFeatures
+		libalm.so
+		libfluidsynth.so
+		libilmimf.so
+		libpackage-add-on-libsolv.so
+		libroot-addon-icu.so
+	] ;
+}
+
+
 SYSTEM_SERVERS = [ FFilterByBuildFeatures
 	app_server cddb_daemon debug_server dns_resolver_server input_server
 	keystore_server mail_daemon media_addon_server media_server midi_server
