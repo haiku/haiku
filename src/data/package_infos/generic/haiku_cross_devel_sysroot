@@ -1,6 +1,3 @@
-#define DO_CONCAT(a, b) a ## b
-#define CONCAT(a, b) DO_CONCAT(a, b)
-
 name			haiku_cross_devel_sysroot
 version			R1~alpha4_pm-1
 architecture	any
@@ -17,5 +14,5 @@ copyrights		"2001-2013 Haiku, Inc. et al"
 licenses		"MIT"
 
 provides {
-	CONCAT(haiku_cross_devel_sysroot_, HAIKU_PACKAGING_ARCH) = R1~alpha4_pm-1
+	haiku_cross_devel_sysroot_%HAIKU_PACKAGING_ARCH% = R1~alpha4_pm-1
 }

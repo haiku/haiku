@@ -1,6 +1,6 @@
 name			haiku_devel
 version			R1~alpha4_pm-1
-architecture	HAIKU_PACKAGING_ARCH
+architecture	%HAIKU_PACKAGING_ARCH%
 summary			"The Haiku base system development files"
 
 description		"The package contains all files associated with the base system

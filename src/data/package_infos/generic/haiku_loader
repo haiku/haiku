@@ -1,6 +1,6 @@
 name			haiku_loader
 version			R1~alpha4_pm-1
-architecture	HAIKU_PACKAGING_ARCH
+architecture	%HAIKU_PACKAGING_ARCH%
 summary			"The Haiku boot loader"
 description		"The Haiku boot loader."
 

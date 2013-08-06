@@ -1,15 +1,10 @@
-#define DO_CONCAT(a, b)	a ## b
-#define CONCAT(a, b)	DO_CONCAT(a, b)
-#define DO_TO_STRING(x)	#x
-#define TO_STRING(x)	DO_TO_STRING(x)
-
-name			CONCAT(CONCAT(haiku_, HAIKU_SECONDARY_PACKAGING_ARCH), _devel)
+name			haiku_%HAIKU_SECONDARY_PACKAGING_ARCH%_devel
 version			R1~alpha4_pm-1
 architecture	HAIKU_PACKAGING_ARCH
-summary			"The Haiku base system "TO_STRING(HAIKU_SECONDARY_PACKAGING_ARCH)" secondary architecture development files"
+summary			"The Haiku base system %HAIKU_SECONDARY_PACKAGING_ARCH% secondary architecture development files"
 
 description		"The package contains all files associated with the base system
-needed for development for the secondary architecture "TO_STRING(HAIKU_SECONDARY_PACKAGING_ARCH)",
+needed for development for the secondary architecture %HAIKU_SECONDARY_PACKAGING_ARCH%,
 like static libraries, glue code, library symlinks, header files, etc."
 
 packager		"The Haiku build system"
@@ -19,9 +14,9 @@ copyrights		"2001-2013 Haiku, Inc. et al"
 licenses		"MIT"
 
 provides {
-	CONCAT(haiku_devel_, HAIKU_SECONDARY_PACKAGING_ARCH) = R1~alpha4_pm-1
+	haiku_devel_%HAIKU_SECONDARY_PACKAGING_ARCH% = R1~alpha4_pm-1
 }
 
 requires {
-	CONCAT(haiku_, HAIKU_SECONDARY_PACKAGING_ARCH) == R1~alpha4_pm-1
+	haiku_%HAIKU_SECONDARY_PACKAGING_ARCH% == R1~alpha4_pm-1
 }

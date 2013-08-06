@@ -41,18 +41,22 @@ rule PreprocessPackageInfo source : directory : architecture
 
 	local target = $(source:BSG=package-info)-package-info ;
 	local defines = HAIKU_PACKAGING_ARCH=$(architecture) ;
+	local sedReplacements = %HAIKU_PACKAGING_ARCH%,$(architecture) ;
 	if $(HAIKU_BOOTSTRAP_BUILD) {
 		defines += HAIKU_BOOTSTRAP_BUILD ;
 		target = $(target)-bootstrap ;
 	}
 	if $(secondaryArchitecture) {
 		defines += HAIKU_SECONDARY_PACKAGING_ARCH=$(secondaryArchitecture) ;
+		sedReplacements
+			+= %HAIKU_SECONDARY_PACKAGING_ARCH%,$(secondaryArchitecture) ;
 	}
 
 	MakeLocate $(target) : $(directory) ;
 	Depends $(target) : $(source) ;
 
 	CCDEFS on $(target) = [ FDefines $(defines) ] ;
+	HAIKU_SED_REPLACEMENTS on $(target) = "-e s,$(sedReplacements),g" ;
 
 	PreprocessPackageInfo1 $(target) : $(source) ;
 
@@ -62,7 +66,7 @@ rule PreprocessPackageInfo source : directory : architecture
 
 actions PreprocessPackageInfo1
 {
-	$(HOST_CC) -E -w $(CCDEFS) - -o $(1) < $(2)
+	sed $(HAIKU_SED_REPLACEMENTS) < $(2) | $(HOST_CC) -E -w $(CCDEFS) - -o $(1)
 }
 
 
