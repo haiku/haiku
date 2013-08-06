@@ -5,10 +5,9 @@ local haikuDevelPackage = haiku_devel.hpkg ;
 HaikuPackage $(haikuDevelPackage) ;
 
 local arch = $(TARGET_ARCH) ;
-local developDirTokens = develop ;
 
 # glue code
-AddFilesToPackage $(developDirTokens) lib :
+AddFilesToPackage develop lib :
 	<src!system!glue!arch!$(arch)!$(architecture)>crti.o
 	<src!system!glue!arch!$(arch)!$(architecture)>crtn.o
 	<src!system!glue!$(architecture)>init_term_dyn.o
@@ -17,7 +16,7 @@ AddFilesToPackage $(developDirTokens) lib :
 	;
 
 # kernel
-AddFilesToPackage $(developDirTokens) lib : kernel.so : _KERNEL_ ;
+AddFilesToPackage develop lib : kernel.so : _KERNEL_ ;
 
 # additional libraries
 local developmentLibs = <revisioned>libroot_debug.so ;
@@ -26,20 +25,20 @@ AddFilesToPackage lib : $(developmentLibs) ;
 # library symlinks
 local lib ;
 for lib in [ HaikuImageGetSystemLibs ] $(developmentLibs) {
-	AddSymlinkToPackage $(developDirTokens) lib : /system/lib $(lib:BS) ;
+	AddSymlinkToPackage develop lib : /system/lib $(lib:BS) ;
 	local abiVersion = [ on $(lib) return $(HAIKU_LIB_ABI_VERSION) ] ;
 	if $(abiVersion) {
 		local abiVersionedLib = $(lib:BS).$(abiVersion) ;
-		AddSymlinkToPackage $(developDirTokens) lib
+		AddSymlinkToPackage develop lib
 			: /system/lib $(abiVersionedLib) ;
 	}
 }
 
 # static libraries
-AddFilesToPackage $(developDirTokens) lib : <$(architecture)>liblocalestub.a ;
+AddFilesToPackage develop lib : <$(architecture)>liblocalestub.a ;
 
 # the POSIX error code mapper library
-AddFilesToPackage $(developDirTokens) lib : libposix_error_mapper.a ;
+AddFilesToPackage develop lib : libposix_error_mapper.a ;
 
 # ABI independent stuff
 
@@ -64,7 +63,7 @@ CopyDirectoryToPackage develop headers private libs compat
 	: : -x *.c -x Jamfile ;
 
 # create be -> os symlink for now
-AddSymlinkToPackage $(developDirTokens) headers : os : be ;
+AddSymlinkToPackage develop headers : os : be ;
 
 # BSD and GNU compatibility headers
 AddHeaderDirectoryToPackage compatibility bsd : bsd ;
@@ -77,8 +76,8 @@ if ! $(HAIKU_BOOTSTRAP_BUILD) {
 
 # cpp headers
 if $(HAIKU_GCC_VERSION_$(architecture)[1]) = 2 {
-	# GCC 2 only -- for GCC 4 they come with the DevelopmentBase package
-	CopyDirectoryToPackage $(developDirTokens) headers c++
+	# GCC 2 only -- for GCC 4 they come with the gcc package
+	CopyDirectoryToPackage develop headers c++
 		: [ FDirName $(HAIKU_TOP) headers cpp ] : 2.95.3 ;
 }
 
@@ -89,7 +88,7 @@ if $(TARGET_ARCH) = x86 && ! $(HAIKU_BOOTSTRAP_BUILD) {
 	local mesaGlHeadersDependency = [ BuildFeatureAttribute mesa : headers ] ;
 	mesaGlHeaders = $(mesaGlHeaders:G=$(mesaGlHeadersDependency:G)) ;
 	Depends $(mesaGlHeaders) : $(mesaGlHeadersDependency) ;
-	CopyDirectoryToPackage $(developDirTokens) headers os opengl
+	CopyDirectoryToPackage develop headers os opengl
 		: $(mesaGlHeaders) : : : isTarget ;
 }
 
