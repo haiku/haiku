@@ -48,7 +48,7 @@ ASInterfaceDescriptor::ASInterfaceDescriptor(
 	fDelay(0),
 	fFormatTag(0)
 {
-// TODO: what aboput rev 2???????	
+// TODO: what aboput rev 2???????
 	fTerminalLink = Descriptor->terminal_link;
 	fDelay = Descriptor->r1.delay;
 	fFormatTag = Descriptor->r1.format_tag;
@@ -119,18 +119,13 @@ _ASFormatDescriptor::GetSamFreq(const usb_audio_sampling_freq& freq)
 	return freq.bytes[0] | freq.bytes[1] << 8 | freq.bytes[2] << 16;
 }
 
-// TODO: beautify!!!
+
 usb_audio_sampling_freq
 _ASFormatDescriptor::GetSamFreq(uint32 samplingRate)
 {
 	usb_audio_sampling_freq freq;
 	for (size_t i = 0; i < 3; i++)
 		freq.bytes[i] = 0xFF & samplingRate >> 8 * i;
-
-//	return freq.bytes[0] | freq.bytes[1] << 8 | freq.bytes[2] << 16;
-/*	data[0]	= 0xFF & samplingRate;
-	data[1]	= 0xFF & samplingRate >> 8;
-	data[2]	= 0xFF & samplingRate >> 16; */
 	return freq;
 }
 
@@ -244,10 +239,10 @@ AudioStreamAlternate::SetSamplingRate(uint32 newRate)
 		TRACE(ERR, "Format not set for active alternate\n");
 		return B_NO_INIT;
 	}
-	
+
 	Vector<uint32>& frequencies = format->fSampleFrequencies;
 	bool continuous = format->fSampleFrequencyType == 0;
-	
+
 	if (newRate == 0) { // by default select max available
 		fSamplingRate = 0;
 		if (continuous)
@@ -305,7 +300,7 @@ AudioStreamAlternate::GetSamplingRateIds()
 		TRACE(ERR, "Format not set for active alternate\n");
 		return 0;
 	}
-	
+
 	uint32 rates = 0;
 	Vector<uint32>& frequencies = format->fSampleFrequencies;
 	if (format->fSampleFrequencyType == 0) { // continuous frequencies
@@ -366,7 +361,7 @@ AudioStreamAlternate::GetFormatId()
 				Interface()->fFormatTag);
 			break;
 	}
-	
+
 	return formats;
 }
 
@@ -425,14 +420,15 @@ AudioStreamingInterface::AudioStreamingInterface(
 				switch(Header->descriptor_subtype) {
 					case USB_AUDIO_AS_GENERAL:
 						if (ASInterface == 0)
-							ASInterface = new ASInterfaceDescriptor(
+							ASInterface = new(std::nothrow)
+								ASInterfaceDescriptor(
 								(usb_audio_streaming_interface_descriptor*)Header);
 						else
 							TRACE(ERR, "Duplicate AStream interface ignored.\n");
 						break;
 					case USB_AUDIO_AS_FORMAT_TYPE:
 						if (ASFormat == 0)
-							ASFormat = new TypeIFormatDescriptor(
+							ASFormat = new(std::nothrow) TypeIFormatDescriptor(
 								(usb_audio_format_descriptor*) Header);
 						else
 							TRACE(ERR, "Duplicate AStream format ignored.\n");
@@ -449,7 +445,7 @@ AudioStreamingInterface::AudioStreamingInterface(
 				if (ASEndpoint == 0) {
 					usb_endpoint_descriptor* Endpoint
 						= Interface->endpoint[0].descr;
-					ASEndpoint = new ASEndpointDescriptor(Endpoint,
+					ASEndpoint = new(std::nothrow) ASEndpointDescriptor(Endpoint,
 						(usb_audio_streaming_endpoint_descriptor*)Header);
 				} else
 					TRACE(ERR, "Duplicate AStream endpoint ignored.\n");
@@ -460,7 +456,7 @@ AudioStreamingInterface::AudioStreamingInterface(
 				"unknown descriptor type %#04x.\n",	Header->descriptor_type);
 		}
 
-		fAlternates.Add(new AudioStreamAlternate(alt, ASInterface,
+		fAlternates.Add(new(std::nothrow) AudioStreamAlternate(alt, ASInterface,
 			ASEndpoint, ASFormat));
 	}
 }

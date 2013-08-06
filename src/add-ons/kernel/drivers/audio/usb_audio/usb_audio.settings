@@ -15,9 +15,9 @@
 ## 0x40 - USB audio control parsing
 ## default value: 0x01
 
-#trace 0x7F 
+#trace 0x7F
 
-## logfile [full path to private log file] 
+## logfile [full path to private log file]
 ## default path value: /var/log/usb_asix.log
 ## if disabled - all output goes to syslog
 

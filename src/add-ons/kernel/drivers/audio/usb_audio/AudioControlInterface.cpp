@@ -380,7 +380,7 @@ MixerUnit::MixerUnit(AudioControlInterface*	interface,
 		mixerControlsSize = Mixer->length - 10 - Mixer->num_input_pins;
 		fStringIndex = *(mixerControlsData + mixerControlsSize);
 
-#if 1 // TEST
+#if 0 // TEST
 		if (fOutChannelsNumber > 2) {
 		//	fOutChannelsNumber = 2;
 		//	fChannelsConfig = 0x03;
@@ -397,7 +397,7 @@ MixerUnit::MixerUnit(AudioControlInterface*	interface,
 			mixerControlsData[10] = 0x02;
 			mixerControlsData[11] = 0x01;
 		}
-#endif		
+#endif
 
 	} else {
 		usb_audio_output_channels_descriptor* OutChannels
@@ -511,7 +511,7 @@ SelectorUnit::OutCluster()
 {
 	if (fInterface == NULL)
 		return NULL;
-	
+
 	for (int i = 0; i < fInputPins.Count(); i++) {
 		_AudioControl* control = fInterface->Find(fInputPins[i]);
 		if (control == NULL)
@@ -724,7 +724,7 @@ ProcessingUnit::ProcessingUnit(AudioControlInterface*	interface,
 
 	TRACE(UAC, "Number of input pins:%d\n", Processing->num_input_pins);
 	for (size_t i = 0; i < Processing->num_input_pins; i++) {
-		fInputPins.PushBack(Processing->input_pins[i]);	
+		fInputPins.PushBack(Processing->input_pins[i]);
 		TRACE(UAC, "Input pin #%d:%d\n", i, fInputPins[i]);
 	}
 
@@ -959,46 +959,46 @@ AudioControlInterface::Init(size_t interface, usb_interface_info* Interface)
 				InitACHeader(interface, Header);
 				break;
 			case USB_AUDIO_AC_INPUT_TERMINAL:
-				control = new InputTerminal(this, Header);
+				control = new(std::nothrow) InputTerminal(this, Header);
 				break;
 			case USB_AUDIO_AC_OUTPUT_TERMINAL:
-				control = new OutputTerminal(this, Header);
+				control = new(std::nothrow) OutputTerminal(this, Header);
 				break;
 			case USB_AUDIO_AC_MIXER_UNIT:
-				control = new MixerUnit(this, Header);
+				control = new(std::nothrow) MixerUnit(this, Header);
 				break;
 			case USB_AUDIO_AC_SELECTOR_UNIT:
-				control = new SelectorUnit(this, Header);
+				control = new(std::nothrow) SelectorUnit(this, Header);
 				break;
 			case USB_AUDIO_AC_FEATURE_UNIT:
-				control = new FeatureUnit(this, Header);
+				control = new(std::nothrow) FeatureUnit(this, Header);
 				break;
 			case USB_AUDIO_AC_PROCESSING_UNIT:
 				if (SpecReleaseNumber() < 200)
-					control = new ProcessingUnit(this, Header);
+					control = new(std::nothrow) ProcessingUnit(this, Header);
 				else
-					control = new EffectUnit(this, Header);
+					control = new(std::nothrow) EffectUnit(this, Header);
 				break;
 			case USB_AUDIO_AC_EXTENSION_UNIT:
 				if (SpecReleaseNumber() < 200)
-					control = new ExtensionUnit(this, Header);
+					control = new(std::nothrow) ExtensionUnit(this, Header);
 				else
-					control = new ProcessingUnit(this, Header);
+					control = new(std::nothrow) ProcessingUnit(this, Header);
 				break;
 			case USB_AUDIO_AC_EXTENSION_UNIT_R2:
-				control = new ExtensionUnit(this, Header);
+				control = new(std::nothrow) ExtensionUnit(this, Header);
 				break;
 			case USB_AUDIO_AC_CLOCK_SOURCE_R2:
-				control = new ClockSource(this, Header);
+				control = new(std::nothrow) ClockSource(this, Header);
 				break;
 			case USB_AUDIO_AC_CLOCK_SELECTOR_R2:
-				control = new ClockSelector(this, Header);
+				control = new(std::nothrow) ClockSelector(this, Header);
 				break;
 			case USB_AUDIO_AC_CLOCK_MULTIPLIER_R2:
-				control = new ClockMultiplier(this, Header);
+				control = new(std::nothrow) ClockMultiplier(this, Header);
 				break;
 			case USB_AUDIO_AC_SAMPLE_RATE_CONVERTER_R2:
-				control = new SampleRateConverter(this, Header);
+				control = new(std::nothrow) SampleRateConverter(this, Header);
 				break;
 		}
 
@@ -1551,7 +1551,7 @@ AudioControlInterface::_CollectMixerUnitControls(
 			else
 				count++;
 		}
-	
+
 		// take care about surround bus
 		if (inLeft == inRight)
 			break;
@@ -1628,16 +1628,16 @@ AudioControlInterface::_ListMixControlsForMixerUnit(int32& index,
 		{ 15, 17, "Top Back" },
 		{ 16, 16, "Top Back Center" }
 	};
-	
+
 	Vector<_MixPageCollector*> mixControls;
-	
-	_MixPageCollector* genericPage = new _MixPageCollector("Mixer"); 
+
+	_MixPageCollector* genericPage = new(std::nothrow) _MixPageCollector("Mixer"); 
 	mixControls.PushBack(genericPage);
-	
+
 	// page for extended in (>2) and out (>2) mixer controls
-	size_t controlsOnExMixerPage = 0; 
-	_MixPageCollector* exMixerPage = new _MixPageCollector("Mixer"); 
-	
+	size_t controlsOnExMixerPage = 0;
+	_MixPageCollector* exMixerPage = new(std::nothrow) _MixPageCollector("Mixer"); 
+
 	AudioChannelCluster* outCluster = mixer->OutCluster();
 
 	int inOffset = 0;
@@ -1659,7 +1659,7 @@ AudioControlInterface::_ListMixControlsForMixerUnit(int32& index,
 				&& inChannel < inCluster->ChannelsCount(); in++) {
 			if ((inCluster->ChannelsConfig() & (1 << in)) == 0)
 				continue;
-			
+
 			for (size_t out = 0, outChannel = 0; out < kChannels
 					&& outChannel < outCluster->ChannelsCount(); out++) {
 				if ((outCluster->ChannelsConfig() & (1 << out)) == 0)
@@ -1677,7 +1677,7 @@ AudioControlInterface::_ListMixControlsForMixerUnit(int32& index,
 							(inOffset + inChannel) * outCluster->ChannelsCount()
 							+ outChannel, mixer->ID(), fInterface);
 				}
-				
+
 				outChannel++;
 			}
 
@@ -1693,7 +1693,7 @@ AudioControlInterface::_ListMixControlsForMixerUnit(int32& index,
 						controlIds[in][out], in, out);
 
 		// second step - distribute controls on
-		// mixer pages in logical groups  
+		// mixer pages in logical groups
 		uint32 exChannelsMask = ~(B_CHANNEL_LEFT | B_CHANNEL_RIGHT);
 		bool inIsEx = (inCluster->ChannelsConfig() & exChannelsMask) != 0;
 		bool outIsEx = (outCluster->ChannelsConfig() & exChannelsMask) != 0;
@@ -1707,8 +1707,8 @@ AudioControlInterface::_ListMixControlsForMixerUnit(int32& index,
 					control->Name(), channelPairs[i].name,
 					*mixControls[0]);
 			continue; // go next input cluster
-		} 
-		
+		}
+
 		if (!outIsEx) {
 			// special case - extended (>2 channels) input cluster
 			// connected to 2-channels output - add into generic "Mixer" page
@@ -1729,9 +1729,9 @@ AudioControlInterface::_ListMixControlsForMixerUnit(int32& index,
 				if (in == out)
 					strlcpy(outName, channelPairs[out].name, sizeof(outName));
 				else
-					snprintf(outName, sizeof(outName), "%s to %s", 
+					snprintf(outName, sizeof(outName), "%s to %s",
 						channelPairs[in].name, channelPairs[out].name);
-				
+
 				controlsOnExMixerPage += _CollectMixerUnitControls(controlIds,
 					channelPairs[in].inLeft, channelPairs[out].inLeft,
 					channelPairs[in].inRight, channelPairs[out].inRight,
@@ -1740,7 +1740,7 @@ AudioControlInterface::_ListMixControlsForMixerUnit(int32& index,
 
 			if (controlsOnExMixerPage >= 6) {
 				mixControls.PushBack(exMixerPage);
-				exMixerPage = new _MixPageCollector("Mixer");
+				exMixerPage = new(std::nothrow) _MixPageCollector("Mixer");
 				controlsOnExMixerPage = 0;
 			}
 		}
@@ -1750,7 +1750,7 @@ AudioControlInterface::_ListMixControlsForMixerUnit(int32& index,
 		mixControls.PushBack(exMixerPage);
 	else
 		delete exMixerPage;
-	
+
 	// final step - fill multiaudio controls info with
 	// already structured pages/controls info arrays
 	for (Vector<_MixPageCollector*>::Iterator I = mixControls.Begin();
@@ -1808,7 +1808,7 @@ AudioControlInterface::ListMixControls(multi_mix_control_info* Info)
 	}
 
 	// separate input and output Feature units
-	// and collect mixer units that can be controlled 
+	// and collect mixer units that can be controlled
 	AudioControlsMap InputControlsMap;
 	AudioControlsMap OutputControlsMap;
 	AudioControlsMap MixerControlsMap;
@@ -1872,20 +1872,20 @@ AudioControlInterface::GetMix(multi_mix_value_info* Info)
 				ID_FROM_CTLID(Info->values[i].id));
 			continue;
 		}
-		
+
 		switch (control->SubType()) {
 			case USB_AUDIO_AC_FEATURE_UNIT:
 				switch(CS_FROM_CTLID(Info->values[i].id)) {
 					case USB_AUDIO_VOLUME_CONTROL:
 						length = 2;
 						break;
-					//case 0: // Selector Unit
 					case USB_AUDIO_MUTE_CONTROL:
 					case USB_AUDIO_AUTOMATIC_GAIN_CONTROL:
 						length = 1;
 						break;
 					default:
-						TRACE(ERR, "Unsupported control type %#02x ignored.\n",
+						TRACE(ERR, "Unsupported control id:%08x of type %#02x "
+							"ignored.\n", ID_FROM_CTLID(Info->values[i].id),
 							CS_FROM_CTLID(Info->values[i].id));
 						continue;
 				}
@@ -1897,8 +1897,8 @@ AudioControlInterface::GetMix(multi_mix_value_info* Info)
 				length = 2;
 				break;
 			default:
-				TRACE(ERR, "Control type %d is not suported\n",
-					control->SubType());
+				TRACE(ERR, "Control id:%08x of type %d is not supported\n",
+					ID_FROM_CTLID(Info->values[i].id), control->SubType());
 				continue;
 		}
 
@@ -1977,7 +1977,7 @@ AudioControlInterface::SetMix(multi_mix_value_info* Info)
 				ID_FROM_CTLID(Info->values[i].id));
 			continue;
 		}
-		
+
 		switch (control->SubType()) {
 			case USB_AUDIO_AC_FEATURE_UNIT:
 				switch(CS_FROM_CTLID(Info->values[i].id)) {
@@ -2009,7 +2009,8 @@ AudioControlInterface::SetMix(multi_mix_value_info* Info)
 							Info->values[i].enable);
 						break;
 					default:
-						TRACE(ERR, "Unsupported control type %#02x ignored.\n",
+						TRACE(ERR, "Unsupported control id:%08x of type %#02x "
+							"ignored.\n", ID_FROM_CTLID(Info->values[i].id),
 							CS_FROM_CTLID(Info->values[i].id));
 						continue;
 				}
@@ -2032,8 +2033,8 @@ AudioControlInterface::SetMix(multi_mix_value_info* Info)
 					Info->values[i].gain);
 				break;
 			default:
-				TRACE(ERR, "Control type %d is not suported\n",
-					control->SubType());
+				TRACE(ERR, "Control id:%08x of type %d is not supported\n",
+					Info->values[i].id, control->SubType());
 				continue;
 		}
 

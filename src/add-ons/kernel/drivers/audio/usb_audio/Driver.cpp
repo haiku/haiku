@@ -46,7 +46,7 @@ usb_audio_device_added(usb_device device, void** cookie)
 	}
 
 	// no such device yet, create a new one
-	Device* audioDevice = new Device(device);
+	Device* audioDevice = new(std::nothrow) Device(device);
 	if (audioDevice == 0)
 		return ENODEV;
 

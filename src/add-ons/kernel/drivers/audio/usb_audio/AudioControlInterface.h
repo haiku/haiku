@@ -29,7 +29,7 @@ public:
 
 			uint8			ChannelsCount()		{ return fOutChannelsNumber; }
 			uint32			ChannelsConfig()	{ return fChannelsConfig;	 }
-			
+
 			bool			HasChannel(uint32 location);
 
 protected:
@@ -104,7 +104,7 @@ public:
 							InputTerminal(AudioControlInterface* interface,
 								usb_audiocontrol_header_descriptor* Header);
 	virtual					~InputTerminal();
-	
+
 	virtual	const char*		Name();
 
 protected:
@@ -128,7 +128,7 @@ public:
 							MixerUnit(AudioControlInterface* interface,
 								usb_audiocontrol_header_descriptor* Header);
 	virtual					~MixerUnit();
-	
+
 	virtual	const char*		Name() { return "Mixer"; }
 			bool			HasProgrammableControls();
 			bool			IsControlProgrammable(int inChannel, int outChannel);

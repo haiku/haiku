@@ -116,8 +116,8 @@ Stream::_ChooseAlternate()
 	fIsInput = (endpoint->fEndpointAddress & USB_ENDPOINT_ADDR_DIR_IN)
 		== USB_ENDPOINT_ADDR_DIR_IN;
 
-//	if (fIsInput)
-//		fCurrentBuffer = -1;
+	if (fIsInput)
+		fCurrentBuffer = -1;
 
 	TRACE(INF, "Alternate %d EP:%x selected for %s!\n",
 		fActiveAlternate, endpoint->fEndpointAddress,
@@ -131,7 +131,6 @@ status_t
 Stream::Init()
 {
 	fStatus = _ChooseAlternate();
-	//if (fStatus != B_OK)
 	return fStatus;
 }
 
@@ -156,10 +155,10 @@ Stream::_SetupBuffers()
 	// allocate buffer for worst (maximal size) case
 	TypeIFormatDescriptor* format = static_cast<TypeIFormatDescriptor*>(
 		fAlternates[fActiveAlternate]->Format());
-	
+
 	uint32 samplingRate = fAlternates[fActiveAlternate]->GetSamplingRate();
 	uint32 sampleSize = format->fNumChannels * format->fSubframeSize;
-	
+
 	// data size pro 1 ms USB 1 frame or 1/8 ms USB 2 microframe
 	fPacketSize = samplingRate * sampleSize
 		/ (fDevice->fUSBVersion < 0x0200 ? 1000 : 8000);
@@ -178,16 +177,13 @@ Stream::_SetupBuffers()
 			: DRIVER_NAME "_playback_area", (void**)&fDescriptors,
 			B_ANY_KERNEL_ADDRESS, fAreaSize, B_CONTIGUOUS,
 			B_READ_AREA | B_WRITE_AREA);
-		
+
 		if (fArea < 0) {
 			TRACE(ERR, "Error of creating %#x - "
 				"bytes size buffer area:%#010x\n", fAreaSize, fArea);
 			fStatus = fArea;
 			return fStatus;
 		}
-
-	//	physical_entry PhysEntry;
-	//	get_memory_map(fDescriptors, fAreaSize, &PhysEntry, 1);
 
 		TRACE(INF, "Created area id:%d at addr:%#010x size:%#010lx\n",
 			fArea, fDescriptors, fAreaSize);
@@ -196,7 +192,7 @@ Stream::_SetupBuffers()
 	// descriptors count
 	fDescriptorsCount = fAreaSize
 		/ (sizeof(usb_iso_packet_descriptor) + fPacketSize);
-	
+
 	// we need same size sub-buffers. round it
 	fDescriptorsCount /= kSamplesBufferCount;
 	fDescriptorsCount *= kSamplesBufferCount;
@@ -258,11 +254,8 @@ Stream::Start()
 {
 	status_t result = B_BUSY;
 	if (!fIsRunning) {
-		//if (!fIsInput) { // TODO: recording
-			for (size_t i = 0; i < kSamplesBufferCount; i++)
-				result = _QueueNextTransfer(i, true);
-		//} else
-		//	result = B_OK;
+		for (size_t i = 0; i < kSamplesBufferCount; i++)
+			result = _QueueNextTransfer(i, true);
 		fIsRunning = result == B_OK;
 	}
 	return result;
@@ -321,10 +314,10 @@ Stream::_TransferCallback(void* cookie, int32 status, void* data,
 	if (status == B_CANCELED || stream->fDevice->fRemoved) {
 		atomic_add(&stream->fInsideNotify, -1);
 		TRACE(ERR, "Cancelled: c:%p st:%#010x, data:%#010x, len:%d\n",
-		   cookie, status, data, actualLength);
+			cookie, status, data, actualLength);
 		return;
 	}
-	
+
 	stream->fCurrentBuffer = (stream->fCurrentBuffer + 1) % kSamplesBufferCount;
 
 	stream->_DumpDescriptors();
@@ -337,7 +330,7 @@ Stream::_TransferCallback(void* cookie, int32 status, void* data,
 	release_sem_etc(stream->fDevice->fBuffersReadySem, 1, B_DO_NOT_RESCHEDULE);
 
 	TRACE(DTA, "st:%#010x, data:%#010x, len:%d\n", status, data, actualLength);
-	
+
 	atomic_add(&stream->fInsideNotify, -1);
 }
 
@@ -429,20 +422,17 @@ Stream::SetGlobalFormat(multi_format_info* Format)
 	if (status != B_OK)
 		return status;
 
-	// set endpoint speed	
+	// set endpoint speed
 	uint32 samplingRate = fAlternates[fActiveAlternate]->GetSamplingRate();
 	size_t actualLength = 0;
 	usb_audio_sampling_freq freq = _ASFormatDescriptor::GetSamFreq(samplingRate);
-/*	data[0]	= 0xFF & samplingRate;
-	data[1]	= 0xFF & samplingRate >> 8;
-	data[2]	= 0xFF & samplingRate >> 16; */
 	uint8 address = fAlternates[fActiveAlternate]->Endpoint()->fEndpointAddress;
 
 	status = gUSBModule->send_request(fDevice->fDevice,
 		USB_REQTYPE_CLASS | USB_REQTYPE_ENDPOINT_OUT,
 		USB_AUDIO_SET_CUR, USB_AUDIO_SAMPLING_FREQ_CONTROL << 8,
 		address, sizeof(freq), &freq, &actualLength);
-	
+
 	TRACE(ERR, "set_speed %02x%02x%02x for ep %#x %d: %x\n",
 		freq.bytes[0], freq.bytes[1], freq.bytes[2],
 		address, actualLength, status);
@@ -527,11 +517,8 @@ Stream::GetBuffers(multi_buffer_list* List)
 bool
 Stream::ExchangeBuffer(multi_buffer_info* Info)
 {
-	if (fProcessedBuffers <= 0) //{
-		// looks like somebody else has processed buffers but this stream
-//		release_sem_etc(fDevice->fBuffersReadySem, 1, B_DO_NOT_RESCHEDULE);
+	if (fProcessedBuffers <= 0)
 		return false;
-//	}
 
 	if (fIsInput) {
 		Info->recorded_real_time = system_time();// TODO fRealTime;
