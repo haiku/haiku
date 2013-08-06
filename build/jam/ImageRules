@@ -999,15 +999,16 @@ rule AddHaikuImagePackages packages : installationLocation
 
 	local package ;
 	for package in $(packages) {
-		if ! [ on $(package) return $(HAIKU_PACKAGE_ADDED) ] {
-			if ! [ IsPackageAvailable $(package) ] {
-				Echo "AddHaikuImagePackages: package" $(package)
-					"not available!" ;
-				continue ;
-			}
+		local resolvedPackage = [ IsPackageAvailable $(package) ] ;
+		if ! $(resolvedPackage) {
+			Echo "AddHaikuImagePackages: package" $(package)
+				"not available!" ;
+			continue ;
+		}
 
-			HAIKU_PACKAGE_ADDED on $(package) = 1 ;
-			HAIKU_ADDED_PACKAGES += $(package) ;
+		if ! [ on $(resolvedPackage) return $(HAIKU_PACKAGE_ADDED) ] {
+			HAIKU_PACKAGE_ADDED on $(resolvedPackage) = 1 ;
+			HAIKU_ADDED_PACKAGES += $(resolvedPackage) ;
 
 			# download the package file and add it to the image
 			local file = [ FetchPackage $(package) ] ;
@@ -1024,7 +1025,9 @@ rule AddHaikuImagePackages packages : installationLocation
 
 rule IsHaikuImagePackageAdded package
 {
-	if [ on $(package) return $(HAIKU_PACKAGE_ADDED) ] {
+	local resolvedPackage = [ IsPackageAvailable $(package) ] ;
+	if $(resolvedPackage)
+		&& [ on $(resolvedPackage) return $(HAIKU_PACKAGE_ADDED) ] {
 		return 1 ;
 	}
 
