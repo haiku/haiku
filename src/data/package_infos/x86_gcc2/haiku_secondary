@@ -10,8 +10,7 @@ summary			"The Haiku base system "TO_STRING(HAIKU_SECONDARY_PACKAGING_ARCH)" sec
 
 description		"The Haiku base system "TO_STRING(HAIKU_SECONDARY_PACKAGING_ARCH)"
 secondary architecture support includes all system libraries, add-ons, and
-other files required to run programs build for architecture
-"TO_STRING(HAIKU_SECONDARY_PACKAGING_ARCH)"."
+other files required to run programs build for that architecture."
 
 packager		"The Haiku build system"
 vendor			"Haiku Project"
