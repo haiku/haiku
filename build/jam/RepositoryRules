@@ -323,7 +323,7 @@ actions BuildBootstrapRepositoryConfig
 {
 cat > $(1) << EOF
 PACKAGER="The Haiku build system <build-system@haiku-os.org>"
-TREE_PATH="$(HAIKU_PORTS_CROSS)"
+TREE_PATH="$(HAIKU_REPOSITORY_TREE_PATH)"
 TARGET_ARCHITECTURE="$(HAIKU_PACKAGING_ARCH)"
 
 DOWNLOAD_IN_PORT_DIRECTORY="yes"
@@ -410,6 +410,7 @@ rule BootstrapPackageRepository repository : architecture
 	Depends $(configFile) : <build>package <build>mimeset <mimedb>mime_db ;
 	HAIKU_REPOSITORY_BUILD_DIRECTORY on $(configFile) = $(outputDir) ;
 	HAIKU_PACKAGING_ARCH on $(configFile) = $(architecture) ;
+	HAIKU_REPOSITORY_TREE_PATH on $(configFile) = $(HAIKU_PORTS_CROSS) ;
 	BuildBootstrapRepositoryConfig $(configFile)
 		: <build>package <build>mimeset <mimedb>mime_db ;
 
@@ -447,10 +448,11 @@ rule FSplitPackageName packageName
 }
 
 
-rule IsPackageAvailable package
+rule IsPackageAvailable package : flags
 {
 	# for a secondary architecture adjust the package name
-	if $(TARGET_PACKAGING_ARCH) != $(TARGET_PACKAGING_ARCHS[1]) {
+	if $(TARGET_PACKAGING_ARCH) != $(TARGET_PACKAGING_ARCHS[1])
+		&& ! nameResolved in $(flags) {
 		local splitName = [ FSplitPackageName $(package) ] ;
 		splitName = $(splitName[1]) $(TARGET_PACKAGING_ARCH) $(splitName[2-]) ;
 		package = $(splitName:J=_) ;
@@ -464,9 +466,9 @@ rule IsPackageAvailable package
 }
 
 
-rule FetchPackage packageName
+rule FetchPackage packageName : flags
 {
-	local foundPackageName = [ IsPackageAvailable $(packageName) ] ;
+	local foundPackageName = [ IsPackageAvailable $(packageName) : $(flags) ] ;
 	if ! $(foundPackageName) {
 		Exit "DownloadPackage: package" $(packageName) "not available!" ;
 		return ;
@@ -484,4 +486,124 @@ rule FetchPackage packageName
 
 	return [ InvokeRepositoryMethod $(repository) : FetchPackage : $(package)
 		: $(fileName) ] ;
+}
+
+
+rule BuildHaikuPortsSourcePackageDirectory
+{
+	local architecture = $(TARGET_PACKAGING_ARCH) ;
+	local outputDir = [ FDirName
+		$(HAIKU_PACKAGE_REPOSITORIES_DIR_$(architecture))
+		HaikuPorts-sources-build ] ;
+
+	local sourcePackageDir = <HaikuPorts-repository-source-packages>packages ;
+	MakeLocate $(sourcePackageDir) : $(outputDir) ;
+
+	# build the package list file
+	local packageList
+		= <repository-package-list-HaikuPorts-sources>package_list ;
+	MakeLocate $(packageList) : $(outputDir) ;
+	Depends $(packageList) :
+		[ FDirName $(HAIKU_BUILD_RULES_DIR) repositories HaikuPorts
+			$(architecture) ] ;
+	BuildHaikuPortsPackageList $(packageList) ;
+
+	# prepare the config file for the HaikuPorts build
+	local configFile = <repository-config-HaikuPorts-sources>haikuports.conf ;
+	MakeLocate $(configFile) : $(outputDir) ;
+	NoUpdate $(configFile) ;
+	Depends $(configFile) : <build>package <build>mimeset <mimedb>mime_db ;
+	HAIKU_REPOSITORY_BUILD_DIRECTORY on $(configFile) = $(outputDir) ;
+	HAIKU_PACKAGING_ARCH on $(configFile) = $(architecture) ;
+	HAIKU_REPOSITORY_TREE_PATH on $(configFile) = $(HAIKU_PORTS) ;
+	BuildBootstrapRepositoryConfig $(configFile)
+		: <build>package <build>mimeset <mimedb>mime_db ;
+
+	# get Haiku cross-devel packages and build the sources
+	local crossDevelPackageSuffixes = $(architecture)
+		$(architecture)_$(HAIKU_PACKAGING_ARCHS[2-]) ;
+	local haikuCrossDevelPackages
+		= haiku_cross_devel_sysroot_stage1_$(crossDevelPackageSuffixes).hpkg ;
+
+	HAIKU_REPOSITORY_BUILD_DIRECTORY on $(sourcePackageDir) = $(outputDir) ;
+
+	Depends $(sourcePackageDir) : $(packageList) $(haikuCrossDevelPackages)
+		$(configFile) ;
+	BuildHaikuPortsSourcePackageDirectory1 $(sourcePackageDir)
+		: $(packageList) $(haikuCrossDevelPackages) ;
+
+	return $(sourcePackageDir) ;
+}
+
+
+actions BuildHaikuPortsPackageList
+{
+	HAIKU_BOOTSTRAP_BUILD= $(JAM:E=jam) @alpha-raw build-package-list $(1)
+}
+
+
+actions BuildHaikuPortsSourcePackageDirectory1
+{
+	packageList="$(2[1])"
+
+	# make Haiku cross devel package path absolute
+	haikuCrossDevelPackage="$(2[2])"
+	if [[ "$haikuCrossDevelPackage" != /* ]]; then
+		haikuCrossDevelPackage="`pwd`/$haikuCrossDevelPackage"
+	fi
+
+	# make secondary Haiku cross devel packages path absolute
+	secondaryCrossDevelPackages=
+	if [ -n "$(2[3-]:J)" ]; then
+		for secondaryCrossDevelPackage in "$(2[3-])" ; do
+			if [[ "$secondaryCrossDevelPackage" != /* ]]; then
+				secondaryCrossDevelPackage="`pwd`/$secondaryCrossDevelPackage"
+			fi
+			if [ -n "$secondaryCrossDevelPackages" ]; then
+				secondaryCrossDevelPackages="secondaryCrossDevelPackages,$secondaryCrossDevelPackage"
+			else
+				secondaryCrossDevelPackages="--secondary-cross-devel-package=$secondaryCrossDevelPackage"
+			fi
+		done
+	fi
+
+	cd $(HAIKU_REPOSITORY_BUILD_DIRECTORY)
+
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	if [ -n "$secondaryCrossDevelPackages" ]; then
+		$(HOST_HAIKU_PORTER) --cross-devel-package "$haikuCrossDevelPackage" \
+			"$secondaryCrossDevelPackages" --only-source-packages \
+			--portsfile $packageList
+	else
+		$(HOST_HAIKU_PORTER) --cross-devel-package "$haikuCrossDevelPackage" \
+			--only-source-packages --portsfile $packageList
+	fi
+}
+
+
+rule BuildHaikuPortsRepositoryConfig treePath
+{
+	local architecture = $(TARGET_PACKAGING_ARCH) ;
+	local outputDir = [ FDirName
+		$(HAIKU_PACKAGE_REPOSITORIES_DIR_$(architecture))
+		HaikuPorts-bootstrap ] ;
+
+	local configFile = <repository-config-HaikuPorts-bootstrap>haikuports.conf ;
+	MakeLocate $(configFile) : $(outputDir) ;
+	NoUpdate $(configFile) ;
+
+	HAIKU_REPOSITORY_TREE_PATH on $(configFile) = $(treePath) ;
+	BuildHaikuPortsRepositoryConfig1 $(configFile) ;
+
+	return $(configFile) ;
+}
+
+
+actions BuildHaikuPortsRepositoryConfig1
+{
+cat > $(1) << EOF
+PACKAGER="The Haiku build system <build-system@haiku-os.org>"
+TREE_PATH="$(HAIKU_REPOSITORY_TREE_PATH)"
+TARGET_ARCHITECTURE="$(HAIKU_PACKAGING_ARCH)"
+EOF
 }

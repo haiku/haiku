@@ -1035,6 +1035,32 @@ rule IsHaikuImagePackageAdded package
 }
 
 
+rule BuildHaikuImagePackageList target
+{
+	if ! $(target) {
+		return ;
+	}
+
+	# get the file names of all added packages
+	local packageFiles ;
+	local package ;
+	for package in $(HAIKU_ADDED_PACKAGES) {
+		packageFiles += [ FetchPackage $(package) : nameResolved ] ;
+	}
+
+	# extract the versioned package names (without revision)
+	packageFiles = [ Match "(.*)-[^-]*-[^-]*" : $(packageFiles:B) ] ;
+
+	HAIKU_IMAGE_PACKAGES on $(target) = $(packageFiles) ;
+}
+
+
+actions BuildHaikuImagePackageList
+{
+	echo $(HAIKU_IMAGE_PACKAGES) | xargs -n 1 echo | LC_ALL=C sort -u > $(1)
+}
+
+
 rule InstallSourceArchive file : url
 {
 	if $(HAIKU_INCLUDE_SOURCES) = 1 {

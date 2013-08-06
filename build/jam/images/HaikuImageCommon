@@ -195,5 +195,10 @@ _BuildHaikuImage $(HAIKU_VMWARE_IMAGE) : true : true ;
 NotFile haiku-vmware-image ;
 Depends haiku-vmware-image : $(HAIKU_VMWARE_IMAGE) ;
 
+
+# create a package list
+BuildHaikuImagePackageList $(HAIKU_IMAGE_LIST_PACKAGES_TARGET) ;
+
+
 # Execute post-image user config rules.
 UserBuildConfigRulePostImage ;

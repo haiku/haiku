@@ -179,6 +179,14 @@ AddPackageFilesToHaikuImage system :
 AddPackageFilesToHaikuImage system : haiku_loader.hpkg ;
 
 
+# build and add the source package directory and a haikuports.config file
+CopyDirectoryToHaikuImage home haikuports
+	: [ BuildHaikuPortsSourcePackageDirectory ]
+	: input-source-packages : : isTarget ;
+AddFilesToHaikuImage home haikuports
+	: [ BuildHaikuPortsRepositoryConfig /boot/home/haikuports ] ;
+
+
 AddSymlinkToHaikuImage home Desktop : /boot/home : Home ;
 
 # global settings when a package is installed in ~/config
