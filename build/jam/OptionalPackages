@@ -130,7 +130,11 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentJava ] {
 # DevelopmentMin
 if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ]
 		&& ( $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 ) {
-	AddPackageFilesToHaikuImage system : haiku_devel.hpkg ;
+	AddPackageFilesToHaikuImage system
+		:
+		haiku_devel.hpkg
+		haiku_$(TARGET_PACKAGING_ARCHS[2-])_devel.hpkg
+		;
 	AddPackageFilesToHaikuImage common : makefile_engine.hpkg ;
 }
 
