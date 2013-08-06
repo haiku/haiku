@@ -525,39 +525,6 @@ DefaultDecorator::_DrawZoom(Decorator::Tab* _tab, bool direct, BRect rect)
 }
 
 
-void
-DefaultDecorator::_FontsChanged(DesktopSettings& settings,
-	BRegion* updateRegion)
-{
-	TabDecorator::_FontsChanged(settings, updateRegion);
-}
-
-
-void
-DefaultDecorator::_SetLook(Decorator::Tab* tab, DesktopSettings& settings,
-	window_look look, BRegion* updateRegion)
-{
-	_InvalidateBitmaps();
-
-	TabDecorator::_SetLook(tab, settings, look, updateRegion);
-}
-
-
-void
-DefaultDecorator::_SetFlags(Decorator::Tab* tab, uint32 flags,
-	BRegion* updateRegion)
-{
-	TabDecorator::_SetFlags(tab, flags, updateRegion);
-}
-
-
-void
-DefaultDecorator::_SetFocus(Decorator::Tab* tab)
-{
-	TabDecorator::_SetFocus(tab);
-}
-
-
 // #pragma mark - Private methods
 
 
@@ -609,14 +576,6 @@ DefaultDecorator::_DrawBlendedRect(DrawingEngine* engine, BRect rect,
 	// outline
 	rect.InsetBy(-1, -1);
 	engine->StrokeRect(rect, tint_color(colors[COLOR_BUTTON], B_DARKEN_2_TINT));
-}
-
-
-void
-DefaultDecorator::_GetButtonSizeAndOffset(const BRect& tabRect, float* _offset,
-	float* _size, float* _inset) const
-{
-	TabDecorator::_GetButtonSizeAndOffset(tabRect, _offset, _size, _inset);
 }
 
 
@@ -772,39 +731,4 @@ DefaultDecorator::_GetComponentColors(Component component,
 	}
 
 	return GetComponentColors(component, RegionHighlight(region), _colors, tab);
-}
-
-
-float
-DefaultDecorator::_DefaultTextOffset() const
-{
-	return (fTopTab->look == B_FLOATING_WINDOW_LOOK
-		|| fTopTab->look == kLeftTitledWindowLook) ? 10 : 18;
-}
-
-
-float
-DefaultDecorator::_SingleTabOffsetAndSize(float& tabSize)
-{
-	float maxLocation;
-	if (fTopTab->look != kLeftTitledWindowLook) {
-		tabSize = fRightBorder.right - fLeftBorder.left;
-	} else {
-		tabSize = fBottomBorder.bottom - fTopBorder.top;
-	}
-	TabDecorator::Tab* tab = static_cast<TabDecorator::Tab*>(_TabAt(0));
-	maxLocation = tabSize - tab->maxTabSize;
-	if (maxLocation < 0)
-		maxLocation = 0;
-
-	return floorf(tab->tabLocation * maxLocation);
-}
-
-
-void
-DefaultDecorator::_CalculateTabsRegion()
-{
-	fTabsRegion.MakeEmpty();
-	for (int32 i = 0; i < fTabList.CountItems(); i++)
-		fTabsRegion.Include(fTabList.ItemAt(i)->tabRect);
 }

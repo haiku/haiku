@@ -37,7 +37,6 @@
 #include "DrawState.h"
 #include "FontManager.h"
 #include "PatternHandler.h"
-#include "ServerBitmap.h"
 
 
 //#define DEBUG_DECORATOR
@@ -58,8 +57,14 @@ int_equal(float x, float y)
 TabDecorator::Tab::Tab()
 	:
 	tabOffset(0),
-	tabLocation(0.0),
-	isHighlighted(false)
+	tabLocation(0.0f),
+	textOffset(10.0f),
+	truncatedTitle(""),
+	truncatedTitleLength(0),
+	buttonFocus(false),
+	isHighlighted(false),
+	minTabSize(0.0f),
+	maxTabSize(0.0f)
 {
 	closeBitmaps[0] = closeBitmaps[1] = closeBitmaps[2] = closeBitmaps[3]
 		= zoomBitmaps[0] = zoomBitmaps[1] = zoomBitmaps[2] = zoomBitmaps[3]
@@ -79,6 +84,7 @@ static const float kResizeKnobSize = 18.0;
 TabDecorator::TabDecorator(DesktopSettings& settings, BRect rect)
 	:
 	Decorator(settings, rect),
+	fOldMovingTab(0, 0, -1, -1),
 	// focus color constants
 	kFocusFrameColor(settings.UIColor(B_WINDOW_BORDER_COLOR)),
 	kFocusTabColor(settings.UIColor(B_WINDOW_TAB_COLOR)),
@@ -96,9 +102,7 @@ TabDecorator::TabDecorator(DesktopSettings& settings, BRect rect)
 	kNonFocusTabColorBevel(tint_color(kNonFocusTabColor, B_LIGHTEN_2_TINT)),
 	kNonFocusTabColorShadow(tint_color(kNonFocusTabColor,
 		(B_DARKEN_1_TINT + B_NO_TINT) / 2)),
-	kNonFocusTextColor(settings.UIColor(B_WINDOW_INACTIVE_TEXT_COLOR)),
-
-	fOldMovingTab(0, 0, -1, -1)
+	kNonFocusTextColor(settings.UIColor(B_WINDOW_INACTIVE_TEXT_COLOR))
 {
 	// TODO: If the decorator was created with a frame too small, it should
 	// resize itself!
@@ -216,33 +220,6 @@ TabDecorator::RegionAt(BPoint where, int32& tab) const
 }
 
 
-bool
-TabDecorator::SetRegionHighlight(Region region, uint8 highlight,
-	BRegion* dirty, int32 tabIndex)
-{
-	TabDecorator::Tab* tab = _TabAt(tabIndex);
-	if (tab != NULL) {
-		tab->isHighlighted = highlight != 0;
-		// Invalidate the bitmap caches for the close/zoom button, when the
-		// highlight changes.
-		switch (region) {
-			case REGION_CLOSE_BUTTON:
-				if (highlight != RegionHighlight(region))
-					memset(&tab->closeBitmaps, 0, sizeof(tab->closeBitmaps));
-				break;
-			case REGION_ZOOM_BUTTON:
-				if (highlight != RegionHighlight(region))
-					memset(&tab->zoomBitmaps, 0, sizeof(tab->zoomBitmaps));
-				break;
-			default:
-				break;
-		}
-	}
-
-	return Decorator::SetRegionHighlight(region, highlight, dirty, tabIndex);
-}
-
-
 void
 TabDecorator::ExtendDirtyRegion(Region region, BRegion& dirty)
 {
@@ -301,6 +278,121 @@ TabDecorator::ExtendDirtyRegion(Region region, BRegion& dirty)
 		default:
 			break;
 	}
+}
+
+
+/*!	Returns the frame colors for the specified decorator component.
+
+	The meaning of the color array elements depends on the specified component.
+	For some components some array elements are unused.
+
+	\param component The component for which to return the frame colors.
+	\param highlight The highlight set for the component.
+	\param colors An array of colors to be initialized by the function.
+*/
+void
+TabDecorator::GetComponentColors(Component component, uint8 highlight,
+	ComponentColors _colors, Decorator::Tab* _tab)
+{
+	TabDecorator::Tab* tab = static_cast<TabDecorator::Tab*>(_tab);
+	switch (component) {
+		case COMPONENT_TAB:
+			if (tab && tab->buttonFocus) {
+				_colors[COLOR_TAB_FRAME_LIGHT]
+					= tint_color(kFocusFrameColor, B_DARKEN_2_TINT);
+				_colors[COLOR_TAB_FRAME_DARK]
+					= tint_color(kFocusFrameColor, B_DARKEN_3_TINT);
+				_colors[COLOR_TAB] = kFocusTabColor;
+				_colors[COLOR_TAB_LIGHT] = kFocusTabColorLight;
+				_colors[COLOR_TAB_BEVEL] = kFocusTabColorBevel;
+				_colors[COLOR_TAB_SHADOW] = kFocusTabColorShadow;
+				_colors[COLOR_TAB_TEXT] = kFocusTextColor;
+			} else {
+				_colors[COLOR_TAB_FRAME_LIGHT]
+					= tint_color(kNonFocusFrameColor, B_DARKEN_2_TINT);
+				_colors[COLOR_TAB_FRAME_DARK]
+					= tint_color(kNonFocusFrameColor, B_DARKEN_3_TINT);
+				_colors[COLOR_TAB] = kNonFocusTabColor;
+				_colors[COLOR_TAB_LIGHT] = kNonFocusTabColorLight;
+				_colors[COLOR_TAB_BEVEL] = kNonFocusTabColorBevel;
+				_colors[COLOR_TAB_SHADOW] = kNonFocusTabColorShadow;
+				_colors[COLOR_TAB_TEXT] = kNonFocusTextColor;
+			}
+			break;
+
+		case COMPONENT_CLOSE_BUTTON:
+		case COMPONENT_ZOOM_BUTTON:
+			if (tab && tab->buttonFocus) {
+				_colors[COLOR_BUTTON] = kFocusTabColor;
+				_colors[COLOR_BUTTON_LIGHT] = kFocusTabColorLight;
+			} else {
+				_colors[COLOR_BUTTON] = kNonFocusTabColor;
+				_colors[COLOR_BUTTON_LIGHT] = kNonFocusTabColorLight;
+			}
+			break;
+
+		case COMPONENT_LEFT_BORDER:
+		case COMPONENT_RIGHT_BORDER:
+		case COMPONENT_TOP_BORDER:
+		case COMPONENT_BOTTOM_BORDER:
+		case COMPONENT_RESIZE_CORNER:
+		default:
+			if (tab && tab->buttonFocus) {
+				_colors[0] = tint_color(kFocusFrameColor, B_DARKEN_2_TINT);
+				_colors[1] = tint_color(kFocusFrameColor, B_LIGHTEN_2_TINT);
+				_colors[2] = kFocusFrameColor;
+				_colors[3] = tint_color(kFocusFrameColor,
+					(B_DARKEN_1_TINT + B_NO_TINT) / 2);
+				_colors[4] = tint_color(kFocusFrameColor, B_DARKEN_2_TINT);
+				_colors[5] = tint_color(kFocusFrameColor, B_DARKEN_3_TINT);
+			} else {
+				_colors[0] = tint_color(kNonFocusFrameColor, B_DARKEN_2_TINT);
+				_colors[1] = tint_color(kNonFocusFrameColor, B_LIGHTEN_2_TINT);
+				_colors[2] = kNonFocusFrameColor;
+				_colors[3] = tint_color(kNonFocusFrameColor,
+					(B_DARKEN_1_TINT + B_NO_TINT) / 2);
+				_colors[4] = tint_color(kNonFocusFrameColor, B_DARKEN_2_TINT);
+				_colors[5] = tint_color(kNonFocusFrameColor, B_DARKEN_3_TINT);
+			}
+
+			// for the resize-border highlight dye everything bluish.
+			if (highlight == HIGHLIGHT_RESIZE_BORDER) {
+				for (int32 i = 0; i < 6; i++) {
+					_colors[i].red = std::max((int)_colors[i].red - 80, 0);
+					_colors[i].green = std::max((int)_colors[i].green - 80, 0);
+					_colors[i].blue = 255;
+				}
+			}
+			break;
+	}
+}
+
+
+bool
+TabDecorator::SetRegionHighlight(Region region, uint8 highlight,
+	BRegion* dirty, int32 tabIndex)
+{
+	TabDecorator::Tab* tab
+		= static_cast<TabDecorator::Tab*>(_TabAt(tabIndex));
+	if (tab != NULL) {
+		tab->isHighlighted = highlight != 0;
+		// Invalidate the bitmap caches for the close/zoom button, when the
+		// highlight changes.
+		switch (region) {
+			case REGION_CLOSE_BUTTON:
+				if (highlight != RegionHighlight(region))
+					memset(&tab->closeBitmaps, 0, sizeof(tab->closeBitmaps));
+				break;
+			case REGION_ZOOM_BUTTON:
+				if (highlight != RegionHighlight(region))
+					memset(&tab->zoomBitmaps, 0, sizeof(tab->zoomBitmaps));
+				break;
+			default:
+				break;
+		}
+	}
+
+	return Decorator::SetRegionHighlight(region, highlight, dirty, tabIndex);
 }
 
 
@@ -1041,93 +1133,6 @@ TabDecorator::DrawButtons(Decorator::Tab* tab, const BRect& invalid)
 		_DrawClose(tab, false, tab->closeRect);
 	if (!(tab->flags & B_NOT_ZOOMABLE) && invalid.Intersects(tab->zoomRect))
 		_DrawZoom(tab, false, tab->zoomRect);
-}
-
-
-/*!	Returns the frame colors for the specified decorator component.
-
-	The meaning of the color array elements depends on the specified component.
-	For some components some array elements are unused.
-
-	\param component The component for which to return the frame colors.
-	\param highlight The highlight set for the component.
-	\param colors An array of colors to be initialized by the function.
-*/
-void
-TabDecorator::GetComponentColors(Component component, uint8 highlight,
-	ComponentColors _colors, Decorator::Tab* _tab)
-{
-	TabDecorator::Tab* tab = static_cast<TabDecorator::Tab*>(_tab);
-	switch (component) {
-		case COMPONENT_TAB:
-			if (tab && tab->buttonFocus) {
-				_colors[COLOR_TAB_FRAME_LIGHT]
-					= tint_color(kFocusFrameColor, B_DARKEN_2_TINT);
-				_colors[COLOR_TAB_FRAME_DARK]
-					= tint_color(kFocusFrameColor, B_DARKEN_3_TINT);
-				_colors[COLOR_TAB] = kFocusTabColor;
-				_colors[COLOR_TAB_LIGHT] = kFocusTabColorLight;
-				_colors[COLOR_TAB_BEVEL] = kFocusTabColorBevel;
-				_colors[COLOR_TAB_SHADOW] = kFocusTabColorShadow;
-				_colors[COLOR_TAB_TEXT] = kFocusTextColor;
-			} else {
-				_colors[COLOR_TAB_FRAME_LIGHT]
-					= tint_color(kNonFocusFrameColor, B_DARKEN_2_TINT);
-				_colors[COLOR_TAB_FRAME_DARK]
-					= tint_color(kNonFocusFrameColor, B_DARKEN_3_TINT);
-				_colors[COLOR_TAB] = kNonFocusTabColor;
-				_colors[COLOR_TAB_LIGHT] = kNonFocusTabColorLight;
-				_colors[COLOR_TAB_BEVEL] = kNonFocusTabColorBevel;
-				_colors[COLOR_TAB_SHADOW] = kNonFocusTabColorShadow;
-				_colors[COLOR_TAB_TEXT] = kNonFocusTextColor;
-			}
-			break;
-
-		case COMPONENT_CLOSE_BUTTON:
-		case COMPONENT_ZOOM_BUTTON:
-			if (tab && tab->buttonFocus) {
-				_colors[COLOR_BUTTON] = kFocusTabColor;
-				_colors[COLOR_BUTTON_LIGHT] = kFocusTabColorLight;
-			} else {
-				_colors[COLOR_BUTTON] = kNonFocusTabColor;
-				_colors[COLOR_BUTTON_LIGHT] = kNonFocusTabColorLight;
-			}
-			break;
-
-		case COMPONENT_LEFT_BORDER:
-		case COMPONENT_RIGHT_BORDER:
-		case COMPONENT_TOP_BORDER:
-		case COMPONENT_BOTTOM_BORDER:
-		case COMPONENT_RESIZE_CORNER:
-		default:
-			if (tab && tab->buttonFocus) {
-				_colors[0] = tint_color(kFocusFrameColor, B_DARKEN_2_TINT);
-				_colors[1] = tint_color(kFocusFrameColor, B_LIGHTEN_2_TINT);
-				_colors[2] = kFocusFrameColor;
-				_colors[3] = tint_color(kFocusFrameColor,
-					(B_DARKEN_1_TINT + B_NO_TINT) / 2);
-				_colors[4] = tint_color(kFocusFrameColor, B_DARKEN_2_TINT);
-				_colors[5] = tint_color(kFocusFrameColor, B_DARKEN_3_TINT);
-			} else {
-				_colors[0] = tint_color(kNonFocusFrameColor, B_DARKEN_2_TINT);
-				_colors[1] = tint_color(kNonFocusFrameColor, B_LIGHTEN_2_TINT);
-				_colors[2] = kNonFocusFrameColor;
-				_colors[3] = tint_color(kNonFocusFrameColor,
-					(B_DARKEN_1_TINT + B_NO_TINT) / 2);
-				_colors[4] = tint_color(kNonFocusFrameColor, B_DARKEN_2_TINT);
-				_colors[5] = tint_color(kNonFocusFrameColor, B_DARKEN_3_TINT);
-			}
-
-			// for the resize-border highlight dye everything bluish.
-			if (highlight == HIGHLIGHT_RESIZE_BORDER) {
-				for (int32 i = 0; i < 6; i++) {
-					_colors[i].red = std::max((int)_colors[i].red - 80, 0);
-					_colors[i].green = std::max((int)_colors[i].green - 80, 0);
-					_colors[i].blue = 255;
-				}
-			}
-			break;
-	}
 }
 
 

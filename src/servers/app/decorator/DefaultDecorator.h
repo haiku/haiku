@@ -21,7 +21,7 @@
 
 
 class Desktop;
-class ServerBitmap;
+
 
 class DefaultDecorator: public TabDecorator {
 public:
@@ -42,21 +42,6 @@ protected:
 	virtual	void				_DrawZoom(Decorator::Tab* tab, bool direct,
 									BRect r);
 
-	virtual	void				_SetFocus(Decorator::Tab* tab);
-
-	virtual	void				_FontsChanged(DesktopSettings& settings,
-									BRegion* updateRegion);
-
-	virtual	void				_SetLook(Decorator::Tab* tab,
-									DesktopSettings& settings, window_look look,
-									BRegion* updateRegion = NULL);
-	virtual	void				_SetFlags(Decorator::Tab* tab, uint32 flags,
-									BRegion* updateRegion = NULL);
-
-	virtual	void				_GetButtonSizeAndOffset(const BRect& tabRect,
-									float* offset, float* size,
-									float* inset) const;
-
 private:
  			void				_DrawButtonBitmap(ServerBitmap* bitmap,
  									bool direct, BRect rect);
@@ -71,11 +56,6 @@ private:
 			void				_GetComponentColors(Component component,
 									ComponentColors _colors,
 									Decorator::Tab* tab = NULL);
-
-	inline	float				_DefaultTextOffset() const;
-	inline	float				_SingleTabOffsetAndSize(float& tabSize);
-
-			void				_CalculateTabsRegion();
 };
 
 
