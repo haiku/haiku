@@ -137,6 +137,31 @@ rule DefineDefaultBuildProfiles
 #				texinfo
 				;
 
+			# secondary architecture packages
+			local architectureObject ;
+			for architectureObject
+					in [ MultiArchSubDirSetup $(TARGET_PACKAGING_ARCHS[2-]) ] {
+				on $(architectureObject) {
+					AddHaikuImagePackages
+						freetype
+						freetype_devel
+						icu
+						libsolv
+						ncurses
+						ncurses_devel
+						zlib
+						zlib_devel
+						:
+						system
+						;
+
+					AddHaikuImagePackages
+						binutils
+						gcc
+						;
+				}
+			}
+
 			AddOptionalHaikuImagePackages DevelopmentMin ;
 		}
 	}
