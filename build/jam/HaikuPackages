@@ -18,7 +18,9 @@ local archDependentPackages =
 	HaikuCrossDevel
 	;
 
-local secondaryArchPackages ;
+local secondaryArchPackages =
+	HaikuDevelSecondary
+	;
 if $(HAIKU_BOOTSTRAP_BUILD) {
 	secondaryArchPackages += HaikuSecondaryBootstrap ;
 } else {
