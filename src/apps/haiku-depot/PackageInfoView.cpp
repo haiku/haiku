@@ -211,6 +211,32 @@ public:
 };
 
 
+class RatingsScrollView : public CustomScrollView {
+public:
+	RatingsScrollView(const char* name, BView* target)
+		:
+		CustomScrollView(name, target)
+	{
+	}
+
+	virtual void DoLayout()
+	{
+		CustomScrollView::DoLayout();
+		
+		BScrollBar* scrollBar = ScrollBar(B_VERTICAL);
+		BView* target = Target();
+		if (target != NULL && scrollBar != NULL) {
+			// Set the scroll steps
+			BView* item = target->ChildAt(0);
+			if (item != NULL) {
+				scrollBar->SetSteps(item->MinSize().height + 1,
+					item->MinSize().height + 1);
+			}
+		}
+	}
+};
+
+
 // #pragma mark - AboutView
 
 
@@ -228,6 +254,13 @@ public:
 	
 	virtual ~RatingView()
 	{
+	}
+
+	virtual void AttachedToWindow()
+	{
+		BView* parent = Parent();
+		if (parent != NULL)
+			SetLowColor(parent->ViewColor());
 	}
 
 	virtual void Draw(BRect updateRect)
@@ -658,29 +691,131 @@ private:
 // #pragma mark - UserRatingsView
 
 
-class UserRatingsView : public BView {
+class RatingItemView : public BGroupView {
+public:
+	RatingItemView(const UserRating& rating)
+		:
+		BGroupView(B_HORIZONTAL, 0.0f)
+	{
+		SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+			kContentTint));
+
+		fAvatarView = new BitmapView("avatar view");
+		if (rating.User().Avatar().Get() != NULL) {
+			fAvatarView->SetBitmap(
+				rating.User().Avatar()->Bitmap(SharedBitmap::SIZE_16));
+		}
+		fAvatarView->SetExplicitMinSize(BSize(16.0f, 16.0f));
+	
+		fNameView = new BStringView("user name", rating.User().NickName());
+		BFont nameFont(be_bold_font);
+		nameFont.SetSize(std::max(9.0f, floorf(nameFont.Size() * 0.9f)));
+		fNameView->SetFont(&nameFont);
+		fNameView->SetHighColor(kLightBlack);
+		fNameView->SetExplicitMaxSize(
+			BSize(nameFont.StringWidth("xxxxxxxxxxxxxxxxxxxxxx"), B_SIZE_UNSET));
+	
+		fRatingView = new RatingView();
+		fRatingView->SetRating(rating.Rating());
+
+		BString ratingLabel;
+		ratingLabel.SetToFormat("%.1f", rating.Rating());
+		fRatingLabelView = new BStringView("rating label", ratingLabel);
+
+		BString versionLabel(B_TRANSLATE("(for %Version%)"));
+		versionLabel.ReplaceAll("%Version%", rating.PackageVersion());
+		fPackageVersionView = new BStringView("package version",
+			versionLabel);
+		BFont versionFont(be_plain_font);
+		versionFont.SetSize(std::max(9.0f, floorf(versionFont.Size() * 0.85f)));
+		fPackageVersionView->SetFont(&versionFont);
+		fPackageVersionView->SetHighColor(kLightBlack);
+	
+		fTextView = new BTextView("rating text");
+		fTextView->SetViewColor(ViewColor());
+		fTextView->MakeEditable(false);
+		fTextView->SetText(rating.Comment());
+		const float textInset = be_plain_font->Size();
+		fTextView->SetInsets(0.0f, floorf(textInset / 2), textInset, 0.0f);
+
+		BLayoutBuilder::Group<>(this)
+			.Add(fAvatarView, 0.2f)
+			.AddGroup(B_VERTICAL, 0.0f)
+				.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
+					.Add(fNameView)
+					.Add(fRatingView)
+					.Add(fRatingLabelView)
+					.AddGlue(0.1f)
+					.Add(fPackageVersionView)
+					.AddGlue(5.0f)
+				.End()
+				.Add(fTextView)
+			.End()
+			.SetInsets(B_USE_DEFAULT_SPACING)
+		;
+	}
+
+private:
+	BitmapView*		fAvatarView;
+	BStringView*	fNameView;
+	RatingView*		fRatingView;
+	BStringView*	fRatingLabelView;
+	BStringView*	fPackageVersionView;
+	BTextView*		fTextView;
+};
+
+
+class RatingContainerView : public BGroupView {
+public:
+	RatingContainerView()
+		:
+		BGroupView(B_VERTICAL, 0.0)
+	{
+		SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+			kContentTint));
+		AddChild(BSpaceLayoutItem::CreateGlue());
+	}
+
+	virtual BSize MinSize()
+	{
+		BSize minSize = BGroupView::MinSize();
+		return BSize(minSize.width, 80);
+	}
+
+protected:
+	virtual void DoLayout()
+	{
+		BGroupView::DoLayout();
+		if (BScrollBar* scrollBar = ScrollBar(B_VERTICAL)) {
+			BSize minSize = BGroupView::MinSize();
+			float height = Bounds().Height();
+			float max = minSize.height - height;
+			scrollBar->SetRange(0, max);
+			if (minSize.height > 0)
+				scrollBar->SetProportion(height / minSize.height);
+			else
+				scrollBar->SetProportion(1);
+		}
+	}
+};
+
+
+class UserRatingsView : public BGroupView {
 public:
 	UserRatingsView()
 		:
-		BView("package ratings view", 0),
-		fLayout(new BGroupLayout(B_HORIZONTAL))
+		BGroupView("package ratings view", B_VERTICAL)
 	{
 		SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 			kContentTint));
 		
-		SetLayout(fLayout);
+		RatingContainerView* ratingsContainerView = new RatingContainerView();
+		fRatingContainerLayout = ratingsContainerView->GroupLayout();
+
+		BScrollView* scrollView = new RatingsScrollView(
+			"ratings scroll view", ratingsContainerView);
 		
-		fTextView = new BTextView("ratings view");
-		fTextView->SetViewColor(ViewColor());
-		fTextView->MakeEditable(false);
-		const float textInset = be_plain_font->Size();
-		fTextView->SetInsets(textInset, textInset, textInset, 0.0f);
-		
-		BScrollView* scrollView = new CustomScrollView(
-			"ratings scroll view", fTextView);
-		
-		BLayoutBuilder::Group<>(fLayout)
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(32.0f))
+		BLayoutBuilder::Group<>(this)
 			.Add(scrollView, 1.0f)
 			.SetInsets(B_USE_DEFAULT_SPACING, -1.0f, -1.0f, -1.0f)
 		;
@@ -693,7 +828,7 @@ public:
 
 	void SetPackage(const PackageInfo& package)
 	{
-		fTextView->SetText("");
+		Clear();
 
 		const UserRatingList& userRatings = package.UserRatings();
 		
@@ -702,29 +837,26 @@ public:
 		
 		for (int i = userRatings.CountItems() - 1; i >= 0; i--) {
 			const UserRating& rating = userRatings.ItemAtFast(i);
-			const BString& comment = rating.Comment();
-			if (comment.Length() == 0)
-				continue;
-			
-			int offset = fTextView->TextLength();
-			if (offset > 0) {
-				// Insert separator lines
-				fTextView->Insert(offset, "\n\n", 2);
-				offset += 2;
-			}
-			
-			fTextView->Insert(offset, comment.String(), comment.Length());
+			RatingItemView* view = new RatingItemView(rating);
+			fRatingContainerLayout->AddView(0, view);
 		}
 	}
 
 	void Clear()
 	{
-		fTextView->SetText("");
+		for (int32 i = fRatingContainerLayout->CountItems() - 1;
+				BLayoutItem* item = fRatingContainerLayout->ItemAt(i); i--) {
+			RatingItemView* view = dynamic_cast<RatingItemView*>(
+				item->View());
+			if (view != NULL) {
+				view->RemoveSelf();
+				delete view;
+			}
+		}
 	}
 
 private:
-	BGroupLayout*	fLayout;
-	BTextView*		fTextView;
+	BGroupLayout*	fRatingContainerLayout;
 };
 
 
