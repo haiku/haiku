@@ -136,7 +136,7 @@ if [ "$HAIKU_USE_GCC_GRAPHITE" = 1 ]; then
 fi
 
 if [ -n "$SECONDARY_ARCH" ]; then
-	gccConfigureArgs="$gccConfigureArgs --enable-hybrid-secondary"
+	gccConfigureArgs="$gccConfigureArgs --with-hybrid-secondary=$SECONDARY_ARCH"
 fi
 
 # force the POSIX locale, as the build (makeinfo) might choke otherwise
