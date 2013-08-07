@@ -35,6 +35,19 @@ private:
 };
 
 
+class RatingField : public BField {
+public:
+								RatingField(float rating);
+	virtual						~RatingField();
+
+			void				SetRating(float rating);
+			float				Rating() const
+									{ return fRating; }
+private:
+			float				fRating;
+};
+
+
 // BColumn for PackageListView which knows how to render
 // a BBitmapStringField
 // TODO: Code-duplication with DriveSetup PartitionList.h
@@ -48,6 +61,7 @@ public:
 
 	virtual	void				DrawField(BField* field, BRect rect,
 									BView* parent);
+	virtual	int					CompareFields(BField* field1, BField* field2);
 	virtual float				GetPreferredWidth(BField* field,
 									BView* parent) const;
 
@@ -101,6 +115,38 @@ BBitmapStringField::SetBitmap(const BBitmap* bitmap)
 }
 
 
+// #pragma mark - RatingField
+
+
+RatingField::RatingField(float rating)
+	:
+	fRating(0.0f)
+{
+	SetRating(rating);
+}
+
+
+RatingField::~RatingField()
+{
+}
+
+
+void
+RatingField::SetRating(float rating)
+{
+	if (rating < 0.0f)
+		rating = 0.0f;
+	if (rating > 5.0f)
+		rating = 5.0f;
+	
+	if (rating == fRating)
+		return;
+	
+	fRating = rating;
+	// TODO: cause a redraw?
+}
+
+
 // #pragma mark - PackageColumn
 
 
@@ -126,8 +172,9 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 	BBitmapStringField* bitmapField
 		= dynamic_cast<BBitmapStringField*>(field);
 	BStringField* stringField = dynamic_cast<BStringField*>(field);
+	RatingField* ratingField = dynamic_cast<RatingField*>(field);
 
-	if (bitmapField) {
+	if (bitmapField != NULL) {
 		const BBitmap* bitmap = bitmapField->Bitmap();
 
 		// figure out the placement
@@ -160,7 +207,7 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 		}
 
 		// draw the bitmap
-		if (bitmap) {
+		if (bitmap != NULL) {
 			parent->SetDrawingMode(B_OP_ALPHA);
 			parent->DrawBitmap(bitmap, BPoint(x, y));
 			parent->SetDrawingMode(B_OP_OVER);
@@ -169,7 +216,7 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 		// draw the string
 		DrawString(bitmapField->ClippedString(), parent, r);
 
-	} else if (stringField) {
+	} else if (stringField != NULL) {
 
 		float width = rect.Width() - (2 * sTextMargin);
 
@@ -182,8 +229,83 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 		}
 
 		DrawString(stringField->ClippedString(), parent, rect);
+
+	} else if (ratingField != NULL) {
+
+		const float kDefaultTextMargin = 8;
+
+		float width = rect.Width() - (2 * kDefaultTextMargin);
+
+		BString string = "★★★★★";
+		float stringWidth = parent->StringWidth(string);
+		bool drawOverlay = true;
+
+		if (width < stringWidth) {
+			string.SetToFormat("%.1f", ratingField->Rating());
+			drawOverlay = false;
+			stringWidth = parent->StringWidth(string);
+		}
+			
+		switch (Alignment()) {
+			default:
+			case B_ALIGN_LEFT:
+				rect.left += kDefaultTextMargin;
+				break;
+			case B_ALIGN_CENTER:
+				rect.left = rect.left + (width - stringWidth) / 2.0f;
+				break;
+
+			case B_ALIGN_RIGHT:
+				rect.left = rect.right - (stringWidth + kDefaultTextMargin);
+				break;
+		}
+
+		rect.left = floorf(rect.left);
+		rect.right = rect.left + stringWidth;
+
+		if (drawOverlay)
+			parent->SetHighColor(0, 170, 255);
+
+		font_height	fontHeight;
+		parent->GetFontHeight(&fontHeight);
+		float y = rect.top + (rect.Height()
+			- (fontHeight.ascent + fontHeight.descent)) / 2
+			+ fontHeight.ascent;
+
+		parent->DrawString(string, BPoint(rect.left, y));
+	
+		if (drawOverlay) {
+			rect.left = ceilf(rect.left
+				+ (ratingField->Rating() / 5.0f) * rect.Width());
+		
+			rgb_color color = parent->LowColor();
+			color.alpha = 190;
+			parent->SetHighColor(color);
+			
+			parent->SetDrawingMode(B_OP_ALPHA);
+			parent->FillRect(rect, B_SOLID_HIGH);
+
+		}
 	}
 }
+
+
+int
+PackageColumn::CompareFields(BField* field1, BField* field2)
+{
+	RatingField* ratingField1 = dynamic_cast<RatingField*>(field1);
+	RatingField* ratingField2 = dynamic_cast<RatingField*>(field2);
+	if (ratingField1 == NULL || ratingField2 == NULL)
+		return Inherited::CompareFields(field1, field2);
+
+	if (ratingField1->Rating() > ratingField2->Rating())
+		return -1;
+	else if (ratingField1->Rating() < ratingField2->Rating())
+		return 1;
+
+	return 0;
+}
+
 
 
 float
@@ -217,7 +339,8 @@ PackageColumn::GetPreferredWidth(BField *_field, BView* parent) const
 bool
 PackageColumn::AcceptsField(const BField* field) const
 {
-	return dynamic_cast<const BStringField*>(field) != NULL;
+	return dynamic_cast<const BStringField*>(field) != NULL
+		|| dynamic_cast<const RatingField*>(field) != NULL;
 }
 
 
@@ -255,8 +378,8 @@ PackageRow::PackageRow(const PackageInfo& package)
 	SetField(new BBitmapStringField(icon, package.Title()), kTitleColumn);
 
 	// Rating
-	// TODO: Method to compute and cache rating
-	SetField(new BStringField("n/a"), kRatingColumn);
+	RatingSummary summary = package.CalculateRatingSummary();
+	SetField(new RatingField(summary.averageRating), kRatingColumn);
 
 	// Description
 	SetField(new BStringField(package.ShortDescription()), kDescriptionColumn);

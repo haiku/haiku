@@ -553,6 +553,12 @@ public:
 		GetFont(&smallFont);
 		smallFont.SetSize(std::max(9.0f, ceilf(smallFont.Size() * 0.85f)));
 		
+		// TODO: Clicking the screen shot view should open ShowImage with the
+		// the screen shot. This could be done by writing the screen shot to
+		// a temporary folder, launching ShowImage to display it, and writing
+		// all other screenshots associated with the package to the same folder
+		// so the user can use the ShowImage navigation to view the other
+		// screenshots.
 		fScreenshotView = new BitmapView("screenshot view");
 		fScreenshotView->SetExplicitMinSize(BSize(64.0f, 64.0f));
 		fScreenshotView->SetExplicitMaxSize(
