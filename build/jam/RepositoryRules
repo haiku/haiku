@@ -572,11 +572,11 @@ actions BuildHaikuPortsSourcePackageDirectory1
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 	if [ -n "$secondaryCrossDevelPackages" ]; then
 		$(HOST_HAIKU_PORTER) --cross-devel-package "$haikuCrossDevelPackage" \
-			"$secondaryCrossDevelPackages" --only-source-packages \
-			--portsfile $packageList
+			"$secondaryCrossDevelPackages" \
+			--create-source-packages-for-bootstrap --portsfile $packageList
 	else
 		$(HOST_HAIKU_PORTER) --cross-devel-package "$haikuCrossDevelPackage" \
-			--only-source-packages --portsfile $packageList
+			--create-source-packages-for-bootstrap --portsfile $packageList
 	fi
 }
 
