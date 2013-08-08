@@ -394,13 +394,13 @@ public:
 				.Add(fPublisherView)
 			.End()
 			.AddGlue(0.1f)
-			.Add(fVersionInfo)
-			.AddGlue(0.2f)
 			.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
 				.Add(fRatingView)
 				.Add(fAvgRating)
 				.Add(fVoteInfo)
 			.End()
+			.AddGlue(0.2f)
+			.Add(fVersionInfo)
 			.AddGlue(3.0f)
 		;
 	
@@ -424,7 +424,9 @@ public:
 		publisher.ReplaceAll("%Publisher%", package.Publisher().Name());
 		fPublisherView->SetText(publisher);
 
-		fVersionInfo->SetText(package.Version());
+		BString version = B_TRANSLATE("%Version%");
+		version.ReplaceAll("%Version%", package.Version());
+		fVersionInfo->SetText(version);
 
 		RatingSummary ratingSummary = package.CalculateRatingSummary();
 
@@ -722,7 +724,7 @@ public:
 		ratingLabel.SetToFormat("%.1f", rating.Rating());
 		fRatingLabelView = new BStringView("rating label", ratingLabel);
 
-		BString versionLabel(B_TRANSLATE("(for %Version%)"));
+		BString versionLabel(B_TRANSLATE("for %Version%"));
 		versionLabel.ReplaceAll("%Version%", rating.PackageVersion());
 		fPackageVersionView = new BStringView("package version",
 			versionLabel);
