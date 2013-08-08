@@ -60,8 +60,8 @@ SYSTEM_PREFERENCES = [ FFilterByBuildFeatures
 ] ;
 SYSTEM_DEMOS = [ FFilterByBuildFeatures
 	BSnow Chart Clock Cortex FontDemo GLTeapot@x86
-	$(HAIKU_INCLUDE_TRADEMARKS)Haiku3d@x86 Mandelbrot OverlayImage Pairs
-	Playground Pulse Sudoku
+	$(HAIKU_INCLUDE_TRADEMARKS)Haiku3d@x86 Mandelbrot OverlayImage PatchBay
+	Pairs Playground Pulse Sudoku
 ] ;
 SYSTEM_LIBS = [ FFilterByBuildFeatures
 	libbe.so libbsd.so libbnetapi.so
