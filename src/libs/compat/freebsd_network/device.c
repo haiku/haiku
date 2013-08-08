@@ -60,6 +60,7 @@ compat_open(const char *name, uint32 flags, void **cookie)
 	}
 
 	ifp->if_flags |= IFF_UP;
+	ifp->flags &= ~DEVICE_CLOSED;
 	ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);
 
 	*cookie = ifp;
