@@ -293,17 +293,25 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 int
 PackageColumn::CompareFields(BField* field1, BField* field2)
 {
+	BStringField* stringField1 = dynamic_cast<BStringField*>(field1);
+	BStringField* stringField2 = dynamic_cast<BStringField*>(field2);
+	if (stringField1 != NULL && stringField2 != NULL) {
+		// TODO: Locale aware string compare... not too important if
+		// package names are not translated.
+		return strcmp(stringField1->String(), stringField2->String());
+	}
+
 	RatingField* ratingField1 = dynamic_cast<RatingField*>(field1);
 	RatingField* ratingField2 = dynamic_cast<RatingField*>(field2);
-	if (ratingField1 == NULL || ratingField2 == NULL)
-		return Inherited::CompareFields(field1, field2);
+	if (ratingField1 != NULL && ratingField2 != NULL) {
+		if (ratingField1->Rating() > ratingField2->Rating())
+			return -1;
+		else if (ratingField1->Rating() < ratingField2->Rating())
+			return 1;
+		return 0;
+	}
 
-	if (ratingField1->Rating() > ratingField2->Rating())
-		return -1;
-	else if (ratingField1->Rating() < ratingField2->Rating())
-		return 1;
-
-	return 0;
+	return Inherited::CompareFields(field1, field2);
 }
 
 
