@@ -3942,8 +3942,10 @@ BContainerWindow::ShowSelectionWindow()
 void
 BContainerWindow::ShowNavigator(bool show)
 {
-	if (PoseView()->IsDesktopWindow())
+	if (PoseView()->IsDesktopWindow() || !TargetModel()->IsDirectory()
+		|| fPoseView->IsFilePanel()) {
 		return;
+	}
 
 	if (show) {
 		if (Navigator() && !Navigator()->IsHidden())
