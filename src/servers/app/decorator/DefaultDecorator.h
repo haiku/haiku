@@ -15,12 +15,11 @@
 #define DEFAULT_DECORATOR_H
 
 
-#include <Region.h>
-
 #include "TabDecorator.h"
 
 
 class Desktop;
+class ServerBitmap;
 
 
 class DefaultDecorator: public TabDecorator {
@@ -32,13 +31,16 @@ public:
 	virtual	void				Draw(BRect updateRect);
 	virtual	void				Draw();
 
+	virtual	void				GetComponentColors(Component component,
+									uint8 highlight, ComponentColors _colors,
+									Decorator::Tab* tab = NULL);
+
 protected:
 	virtual	void				_DrawFrame(BRect r);
 	virtual	void				_DrawTab(Decorator::Tab* tab, BRect r);
-
+	virtual	void				_DrawTitle(Decorator::Tab* tab, BRect r);
 	virtual	void				_DrawClose(Decorator::Tab* tab, bool direct,
 									BRect r);
-	virtual	void				_DrawTitle(Decorator::Tab* tab, BRect r);
 	virtual	void				_DrawZoom(Decorator::Tab* tab, bool direct,
 									BRect r);
 
@@ -46,9 +48,8 @@ private:
  			void				_DrawButtonBitmap(ServerBitmap* bitmap,
  									bool direct, BRect rect);
 			void				_DrawBlendedRect(DrawingEngine *engine,
-									BRect rect, bool down,
+									const BRect rect, bool down,
 									const ComponentColors& colors);
-			void 				_InvalidateBitmaps();
 			ServerBitmap*		_GetBitmapForButton(Decorator::Tab* tab,
 									Component item, bool down, int32 width,
 									int32 height);

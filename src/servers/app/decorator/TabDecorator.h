@@ -100,10 +100,6 @@ public:
 	virtual	void				ExtendDirtyRegion(Region region,
 									BRegion& dirty);
 
-	virtual	void				GetComponentColors(Component component,
-									uint8 highlight, ComponentColors _colors,
-									Decorator::Tab* tab = NULL);
-
 	virtual	bool				SetRegionHighlight(Region region,
 									uint8 highlight, BRegion* dirty,
 									int32 tab = -1);
@@ -164,6 +160,8 @@ protected:
 	virtual	void				_GetButtonSizeAndOffset(const BRect& tabRect,
 									float* offset, float* size,
 									float* inset) const;
+	virtual	void 				_InvalidateBitmaps();
+
 
 	// TabDecorator customization points
 	virtual	void				DrawButtons(Decorator::Tab* tab,

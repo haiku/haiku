@@ -26,6 +26,7 @@
 #include <Debug.h>
 #include <GradientLinear.h>
 #include <Rect.h>
+#include <Region.h>
 #include <View.h>
 
 #include "BitmapDrawingEngine.h"
@@ -34,6 +35,7 @@
 #include "DrawState.h"
 #include "FontManager.h"
 #include "PatternHandler.h"
+#include "RGBColor.h"
 #include "ServerBitmap.h"
 
 
@@ -49,46 +51,7 @@ static const float kBorderResizeLength = 22.0;
 static const float kResizeKnobSize = 18.0;
 
 
-static inline uint8
-blend_color_value(uint8 a, uint8 b, float position)
-{
-	int16 delta = (int16)b - a;
-	int32 value = a + (int32)(position * delta);
-	if (value > 255)
-		return 255;
-	if (value < 0)
-		return 0;
-
-	return (uint8)value;
-}
-
-
-/*!	\brief Function for calculating gradient colors
-	\param colorA Start color
-	\param colorB End color
-	\param position A floating point number such that 0.0 <= position <= 1.0. 0.0 results in the
-		start color and 1.0 results in the end color.
-	\return The blended color. If an invalid position was given, {0,0,0,0} is returned.
-*/
-static rgb_color
-make_blend_color(rgb_color colorA, rgb_color colorB, float position)
-{
-	if (position < 0)
-		return colorA;
-	if (position > 1)
-		return colorB;
-
-	rgb_color blendColor;
-	blendColor.red = blend_color_value(colorA.red, colorB.red, position);
-	blendColor.green = blend_color_value(colorA.green, colorB.green, position);
-	blendColor.blue = blend_color_value(colorA.blue, colorB.blue, position);
-	blendColor.alpha = blend_color_value(colorA.alpha, colorB.alpha, position);
-
-	return blendColor;
-}
-
-
-//	#pragma mark -
+//	#pragma mark - BeDecorAddOn
 
 
 BeDecorAddOn::BeDecorAddOn(image_id id, const char* name)
@@ -105,20 +68,15 @@ BeDecorAddOn::_AllocateDecorator(DesktopSettings& settings, BRect rect)
 }
 
 
+//	#pragma mark - BeDecorator
+
+
 // TODO: get rid of DesktopSettings here, and introduce private accessor
 //	methods to the Decorator base class
 BeDecorator::BeDecorator(DesktopSettings& settings, BRect rect)
 	:
 	TabDecorator(settings, rect)
 {
-	//fFrameColors = new RGBColor[6];
-	//fFrameColors[0].SetColor(152, 152, 152);
-	//fFrameColors[1].SetColor(255, 255, 255);
-	//fFrameColors[2].SetColor(216, 216, 216);
-	//fFrameColors[3].SetColor(136, 136, 136);
-	//fFrameColors[4].SetColor(152, 152, 152);
-	//fFrameColors[5].SetColor(96, 96, 96);
-
 	STRACE(("BeDecorator:\n"));
 	STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",
 		rect.left, rect.top, rect.right, rect.bottom));
@@ -165,6 +123,120 @@ BeDecorator::Draw()
 
 	_DrawFrame(BRect(fTopBorder.LeftTop(), fBottomBorder.RightBottom()));
 	_DrawTabs(fTitleBarRect);
+}
+
+
+/*!	Returns the frame colors for the specified decorator component.
+
+	The meaning of the color array elements depends on the specified component.
+	For some components some array elements are unused.
+
+	\param component The component for which to return the frame colors.
+	\param highlight The highlight set for the component.
+	\param colors An array of colors to be initialized by the function.
+*/
+void
+BeDecorator::GetComponentColors(Component component, uint8 highlight,
+	ComponentColors _colors, Decorator::Tab* _tab)
+{
+	TabDecorator::Tab* tab = static_cast<TabDecorator::Tab*>(_tab);
+	switch (component) {
+		case COMPONENT_TAB:
+			if (tab && tab->buttonFocus) {
+				_colors[COLOR_TAB_FRAME_LIGHT]
+					= tint_color(kFocusFrameColor, B_DARKEN_2_TINT);
+				_colors[COLOR_TAB_FRAME_DARK]
+					= tint_color(kFocusFrameColor, B_DARKEN_3_TINT);
+				_colors[COLOR_TAB] = kFocusTabColor;
+				_colors[COLOR_TAB_LIGHT] = kFocusTabColorLight;
+				_colors[COLOR_TAB_BEVEL] = kFocusTabColorBevel;
+				_colors[COLOR_TAB_SHADOW] = kFocusTabColorShadow;
+				_colors[COLOR_TAB_TEXT] = kFocusTextColor;
+			} else {
+				_colors[COLOR_TAB_FRAME_LIGHT]
+					= tint_color(kNonFocusFrameColor, B_DARKEN_2_TINT);
+				_colors[COLOR_TAB_FRAME_DARK]
+					= tint_color(kNonFocusFrameColor, B_DARKEN_3_TINT);
+				_colors[COLOR_TAB] = kNonFocusTabColor;
+				_colors[COLOR_TAB_LIGHT] = kNonFocusTabColorLight;
+				_colors[COLOR_TAB_BEVEL] = kNonFocusTabColorBevel;
+				_colors[COLOR_TAB_SHADOW] = kNonFocusTabColorShadow;
+				_colors[COLOR_TAB_TEXT] = kNonFocusTextColor;
+			}
+			break;
+
+		case COMPONENT_CLOSE_BUTTON:
+		case COMPONENT_ZOOM_BUTTON:
+			if (tab && tab->buttonFocus) {
+				_colors[COLOR_BUTTON] = kFocusTabColor;
+				_colors[COLOR_BUTTON_LIGHT] = kFocusTabColorLight;
+			} else {
+				_colors[COLOR_BUTTON] = kNonFocusTabColor;
+				_colors[COLOR_BUTTON_LIGHT] = kNonFocusTabColorLight;
+			}
+			break;
+
+		case COMPONENT_LEFT_BORDER:
+		case COMPONENT_RIGHT_BORDER:
+		case COMPONENT_TOP_BORDER:
+		case COMPONENT_BOTTOM_BORDER:
+		case COMPONENT_RESIZE_CORNER:
+		default:
+		{
+			rgb_color base;
+			if (tab && tab->buttonFocus)
+				base = kFocusFrameColor;
+			else
+				base = kNonFocusFrameColor;
+
+			//_colors[0].SetColor(152, 152, 152);
+			//_colors[1].SetColor(255, 255, 255);
+			//_colors[2].SetColor(216, 216, 216);
+			//_colors[3].SetColor(136, 136, 136);
+			//_colors[4].SetColor(152, 152, 152);
+			//_colors[5].SetColor(96, 96, 96);
+
+			_colors[0].red = std::max(0, base.red - 72);
+			_colors[0].green = std::max(0, base.green - 72);
+			_colors[0].blue = std::max(0, base.blue - 72);
+			_colors[0].alpha = 255;
+
+			_colors[1].red = std::min(255, base.red + 64);
+			_colors[1].green = std::min(255, base.green  + 64);
+			_colors[1].blue = std::min(255, base.blue  + 64);
+			_colors[1].alpha = 255;
+
+			_colors[2].red = std::max(0, base.red - 8);
+			_colors[2].green = std::max(0, base.green - 8);
+			_colors[2].blue = std::max(0, base.blue - 8);
+			_colors[2].alpha = 255;
+
+			_colors[3].red = std::max(0, base.red - 88);
+			_colors[3].green = std::max(0, base.green - 88);
+			_colors[3].blue = std::max(0, base.blue - 88);
+			_colors[3].alpha = 255;
+
+			_colors[4].red = std::max(0, base.red - 72);
+			_colors[4].green = std::max(0, base.green - 72);
+			_colors[4].blue = std::max(0, base.blue - 72);
+			_colors[4].alpha = 255;
+
+			_colors[5].red = std::max(0, base.red - 128);
+			_colors[5].green = std::max(0, base.green - 128);
+			_colors[5].blue = std::max(0, base.blue - 128);
+			_colors[5].alpha = 255;
+
+			// for the resize-border highlight dye everything bluish.
+			if (highlight == HIGHLIGHT_RESIZE_BORDER) {
+				for (int32 i = 0; i < 6; i++) {
+					_colors[i].red = std::max((int)_colors[i].red - 80, 0);
+					_colors[i].green = std::max((int)_colors[i].green - 80, 0);
+					_colors[i].blue = 255;
+				}
+			}
+			break;
+		}
+	}
 }
 
 
@@ -478,16 +550,6 @@ BeDecorator::_DrawTab(Decorator::Tab* tab, BRect invalid)
 
 
 void
-BeDecorator::_DrawClose(Decorator::Tab* tab, bool direct, BRect rect)
-{
-	STRACE(("_DrawClose(%f,%f,%f,%f)\n", rect.left, rect.top, rect.right,
-		rect.bottom));
-	// Just like DrawZoom, but for a close button
-	_DrawBlendedRect(tab, rect, tab->closePressed);
-}
-
-
-void
 BeDecorator::_DrawTitle(Decorator::Tab* _tab, BRect r)
 {
 	STRACE(("_DrawTitle(%f, %f, %f, %f)\n", r.left, r.top, r.right, r.bottom));
@@ -535,117 +597,323 @@ BeDecorator::_DrawTitle(Decorator::Tab* _tab, BRect r)
 
 
 void
-BeDecorator::_DrawZoom(Decorator::Tab* tab, bool direct, BRect rect)
+BeDecorator::_DrawClose(Decorator::Tab* _tab, bool direct, BRect rect)
+{
+	STRACE(("_DrawClose(%f,%f,%f,%f)\n", rect.left, rect.top, rect.right,
+		rect.bottom));
+
+	TabDecorator::Tab* tab = static_cast<TabDecorator::Tab*>(_tab);
+
+	int32 index = (tab->buttonFocus ? 0 : 1) + (tab->closePressed ? 0 : 2);
+	ServerBitmap* bitmap = tab->closeBitmaps[index];
+	if (bitmap == NULL) {
+		bitmap = _GetBitmapForButton(tab, COMPONENT_CLOSE_BUTTON,
+			tab->closePressed, rect.IntegerWidth(), rect.IntegerHeight());
+		tab->closeBitmaps[index] = bitmap;
+	}
+
+	_DrawButtonBitmap(bitmap, direct, rect);
+}
+
+
+void
+BeDecorator::_DrawZoom(Decorator::Tab* _tab, bool direct, BRect rect)
 {
 	STRACE(("_DrawZoom(%f,%f,%f,%f)\n", rect.left, rect.top, rect.right,
 		rect.bottom));
-	// If this has been implemented, then the decorator has a Zoom button
-	// which should be drawn based on the state of the member zoomstate
 
-	BRect zoomRect(rect);
-	zoomRect.left += 3.0;
-	zoomRect.top += 3.0;
-	_DrawBlendedRect(tab, zoomRect, tab->zoomPressed);
+	TabDecorator::Tab* tab = static_cast<TabDecorator::Tab*>(_tab);
+	int32 index = (tab->buttonFocus ? 0 : 1) + (tab->zoomPressed ? 0 : 2);
+	ServerBitmap* bitmap = tab->zoomBitmaps[index];
+	if (bitmap == NULL) {
+		bitmap = _GetBitmapForButton(tab, COMPONENT_ZOOM_BUTTON,
+			tab->zoomPressed, rect.IntegerWidth(), rect.IntegerHeight());
+		tab->zoomBitmaps[index] = bitmap;
+	}
 
-	zoomRect = rect;
-	zoomRect.right -= 5.0;
-	zoomRect.bottom -= 5.0;
-	_DrawBlendedRect(tab, zoomRect, tab->zoomPressed);
+	_DrawButtonBitmap(bitmap, direct, rect);
+}
+
+
+void
+BeDecorator::_GetButtonSizeAndOffset(const BRect& tabRect, float* _offset,
+	float* _size, float* _inset) const
+{
+	float tabSize = fTopTab->look == kLeftTitledWindowLook ?
+		tabRect.Width() : tabRect.Height();
+
+	*_offset = 5.0f;
+	*_inset = 0.0f;
+
+	*_size = std::max(0.0f, tabSize - 7.0f);
+}
+
+
+// #pragma mark - Private methods
+
+
+/*!
+	\brief Draws a bevel around a rectangle.
+	\param rect The rectangular area to draw in.
+	\param down Whether or not the button is pressed down.
+	\param light The light color to use.
+	\param shadow The shadow color to use.
+*/
+void
+BeDecorator::_DrawBevelRect(DrawingEngine* engine, const BRect rect, bool down,
+	rgb_color light, rgb_color shadow)
+{
+	if (down) {
+		BRect inner(rect.InsetByCopy(1.0f, 1.0f));
+
+		engine->StrokeLine(rect.LeftBottom(), rect.LeftTop(), shadow);
+		engine->StrokeLine(rect.LeftTop(), rect.RightTop(), shadow);
+		engine->StrokeLine(inner.LeftBottom(), inner.LeftTop(), shadow);
+		engine->StrokeLine(inner.LeftTop(), inner.RightTop(), shadow);
+
+		engine->StrokeLine(rect.RightTop(), rect.RightBottom(), light);
+		engine->StrokeLine(rect.RightBottom(), rect.LeftBottom(), light);
+		engine->StrokeLine(inner.RightTop(), inner.RightBottom(), light);
+		engine->StrokeLine(inner.RightBottom(), inner.LeftBottom(), light);
+	} else {
+		BRect r1(rect);
+		r1.left += 1.0f;
+		r1.top  += 1.0f;
+
+		BRect r2(rect);
+		r2.bottom -= 1.0f;
+		r2.right  -= 1.0f;
+
+		engine->StrokeRect(r2, shadow);
+			// inner dark box
+		engine->StrokeRect(rect, shadow);
+			// outer dark box
+		engine->StrokeRect(r1, light);
+			// light box
+	}
 }
 
 
 /*!
 	\brief Draws a framed rectangle with a gradient.
-	\param tab The tab to draw on.
 	\param rect The rectangular area to draw in.
-	\param down Whether or not the button is drawn in down state.
+	\param startColor The start color of the gradient.
+	\param endColor The end color of the gradient.
 */
 void
-BeDecorator::_DrawBlendedRect(Decorator::Tab* tab, BRect rect, bool down)
+BeDecorator::_DrawBlendedRect(DrawingEngine* engine, const BRect rect,
+	bool down, rgb_color colorA, rgb_color colorB, rgb_color colorC,
+	rgb_color colorD)
 {
-	BRect r1 = rect;
-	BRect r2 = rect;
+	BRect fillRect(rect.InsetByCopy(1.0f, 1.0f));
 
-	r1.left += 1.0;
-	r1.top  += 1.0;
+	BGradientLinear gradient;
+	if (down) {
+		gradient.SetStart(fillRect.RightBottom());
+		gradient.SetEnd(fillRect.LeftTop());
+	} else {
+		gradient.SetStart(fillRect.LeftTop());
+		gradient.SetEnd(fillRect.RightBottom());
+	}
 
-	r2.bottom -= 1.0;
-	r2.right  -= 1.0;
+	gradient.AddColor(colorA, 0);
+	gradient.AddColor(colorB, 95);
+	gradient.AddColor(colorC, 159);
+	gradient.AddColor(colorD, 255);
+
+	engine->FillRect(fillRect, gradient);
+}
+
+
+void
+BeDecorator::_DrawButtonBitmap(ServerBitmap* bitmap, bool direct, BRect rect)
+{
+	if (bitmap == NULL)
+		return;
+
+	bool copyToFrontEnabled = fDrawingEngine->CopyToFrontEnabled();
+	fDrawingEngine->SetCopyToFrontEnabled(direct);
+	drawing_mode oldMode;
+	fDrawingEngine->SetDrawingMode(B_OP_OVER, oldMode);
+	fDrawingEngine->DrawBitmap(bitmap, rect.OffsetToCopy(0, 0), rect);
+	fDrawingEngine->SetDrawingMode(oldMode);
+	fDrawingEngine->SetCopyToFrontEnabled(copyToFrontEnabled);
+}
+
+
+ServerBitmap*
+BeDecorator::_GetBitmapForButton(Decorator::Tab* tab, Component item,
+	bool down, int32 width, int32 height)
+{
+	// TODO: the list of shared bitmaps is never freed
+	struct decorator_bitmap {
+		Component			item;
+		bool				down;
+		int32				width;
+		int32				height;
+		rgb_color			baseColor;
+		rgb_color			lightColor;
+		UtilityBitmap*		bitmap;
+		decorator_bitmap*	next;
+	};
+
+	static BLocker sBitmapListLock("decorator lock", true);
+	static decorator_bitmap* sBitmapList = NULL;
 
 	ComponentColors colors;
-	_GetComponentColors(COMPONENT_TAB, colors, tab);
+	_GetComponentColors(item, colors, tab);
 
-	const rgb_color tabColor(colors[COLOR_TAB]);
+	const rgb_color buttonColor(colors[COLOR_BUTTON]);
 
-	rgb_color tabColorLight(tabColor);
-	tabColorLight.red = std::min(255, tabColor.red + 64),
-	tabColorLight.green = std::min(255, tabColor.green + 64),
-	tabColorLight.blue = std::min(255, tabColor.blue + 64);
+	BAutolock locker(sBitmapListLock);
 
-	rgb_color tabColorShadow(tabColor);
-	tabColorShadow.red = std::max(0, tabColor.red - 72),
-	tabColorShadow.green = std::max(0, tabColor.green - 72),
-	tabColorShadow.blue = std::max(0, tabColor.blue - 72);
-
-	int32 w = rect.IntegerWidth();
-	int32 h = rect.IntegerHeight();
-	int32 steps = w < h ? w : h;
-
-	rgb_color startColor;
-	rgb_color endColor;
-
-	if (down) {
-		startColor = tabColorShadow;
-		endColor = tabColorLight;
-	} else {
-		startColor = tabColorLight;
-		endColor = tabColorShadow;
-	}
-
-	rgb_color halfColor(make_blend_color(startColor, endColor, 0.5));
-
-	float rstep = float(startColor.red - halfColor.red) / steps;
-	float gstep = float(startColor.green - halfColor.green) / steps;
-	float bstep = float(startColor.blue - halfColor.blue) / steps;
-
-	for (int32 i = 0; i < steps; i += steps / 3) {
-		RGBColor tempRGBCol;
-
-		tempRGBCol.SetColor(uint8(startColor.red - (i * rstep)),
-							uint8(startColor.green - (i * gstep)),
-							uint8(startColor.blue - (i * bstep)));
-
-		for (int32 j = i; j < steps && j < i + steps / 3; j++) {
-			fDrawingEngine->StrokeLine(BPoint(rect.left, rect.top + j),
-				BPoint(rect.left + j, rect.top), tempRGBCol);
+	// search our list for a matching bitmap
+	// TODO: use a hash map instead?
+	decorator_bitmap* current = sBitmapList;
+	while (current) {
+		if (current->item == item && current->down == down
+			&& current->width == width && current->height == height
+			&& current->baseColor == colors[COLOR_BUTTON]
+			&& current->lightColor == colors[COLOR_BUTTON_LIGHT]) {
+			return current->bitmap;
 		}
 
-		tempRGBCol.SetColor(uint8(halfColor.red - (i * rstep)),
-							uint8(halfColor.green - (i * gstep)),
-							uint8(halfColor.blue - (i * bstep)));
+		current = current->next;
+	}
 
-		for (int32 j = i; j < steps && j < i + steps / 3; j++) {
-			fDrawingEngine->StrokeLine(BPoint(rect.left + steps, rect.top + j),
-				BPoint(rect.left + j, rect.top + steps), tempRGBCol);
+	static BitmapDrawingEngine* sBitmapDrawingEngine = NULL;
+
+	// didn't find any bitmap, create a new one
+	if (sBitmapDrawingEngine == NULL)
+		sBitmapDrawingEngine = new(std::nothrow) BitmapDrawingEngine();
+	if (sBitmapDrawingEngine == NULL
+		|| sBitmapDrawingEngine->SetSize(width, height) != B_OK)
+		return NULL;
+
+	BRect rect(0, 0, width - 1, height - 1);
+
+	STRACE(("BeDecorator creating bitmap for %s %s at size %ldx%ld\n",
+		item == COMPONENT_CLOSE_BUTTON ? "close" : "zoom",
+		down ? "down" : "up", width, height));
+	switch (item) {
+		case COMPONENT_CLOSE_BUTTON:
+		{
+			rgb_color buttonColorLight1(buttonColor);
+			buttonColorLight1.red = std::min(255, buttonColor.red + 32),
+			buttonColorLight1.green = std::min(255, buttonColor.green + 32),
+			buttonColorLight1.blue = std::min(255, buttonColor.blue + 32);
+
+			rgb_color buttonColorLight2(buttonColor);
+			buttonColorLight2.red = std::min(255, buttonColor.red + 64),
+			buttonColorLight2.green = std::min(255, buttonColor.green + 64),
+			buttonColorLight2.blue = std::min(255, buttonColor.blue + 64);
+
+			rgb_color buttonColorShadow1(buttonColor);
+			buttonColorShadow1.red = std::max(0, buttonColor.red - 36),
+			buttonColorShadow1.green = std::max(0, buttonColor.green - 36),
+			buttonColorShadow1.blue = std::max(0, buttonColor.blue - 36);
+
+			rgb_color buttonColorShadow2(buttonColor);
+			buttonColorShadow2.red = std::max(0, buttonColor.red - 72),
+			buttonColorShadow2.green = std::max(0, buttonColor.green - 72),
+			buttonColorShadow2.blue = std::max(0, buttonColor.blue - 72);
+
+			_DrawBlendedRect(sBitmapDrawingEngine, rect, tab->closePressed,
+				buttonColorLight2, buttonColorLight1, buttonColor,
+				buttonColorShadow1);
+
+			_DrawBevelRect(sBitmapDrawingEngine, rect, tab->closePressed,
+				buttonColorLight2, buttonColorShadow2);
+
+			break;
 		}
+
+		case COMPONENT_ZOOM_BUTTON:
+		{
+			sBitmapDrawingEngine->FillRect(rect, B_TRANSPARENT_COLOR);
+				// init the background
+
+			rgb_color buttonColorLight1(buttonColor);
+			buttonColorLight1.red = std::min(255, buttonColor.red + 32),
+			buttonColorLight1.green = std::min(255, buttonColor.green + 32),
+			buttonColorLight1.blue = std::min(255, buttonColor.blue + 32);
+
+			rgb_color buttonColorLight2(buttonColor);
+			buttonColorLight2.red = std::min(255, buttonColor.red + 64),
+			buttonColorLight2.green = std::min(255, buttonColor.green + 64),
+			buttonColorLight2.blue = std::min(255, buttonColor.blue + 64);
+
+			rgb_color buttonColorShadow1(buttonColor);
+			buttonColorShadow1.red = std::max(0, buttonColor.red - 22),
+			buttonColorShadow1.green = std::max(0, buttonColor.green - 23),
+			buttonColorShadow1.blue = std::max(0, buttonColor.blue - 5);
+
+			rgb_color buttonColorShadow2(buttonColor);
+			buttonColorShadow2.red = std::max(0, buttonColor.red - 45),
+			buttonColorShadow2.green = std::max(0, buttonColor.green - 47),
+			buttonColorShadow2.blue = std::max(0, buttonColor.blue - 10);
+
+			// big rect
+
+			BRect zoomRect = rect;
+			zoomRect.left += 3.0;
+			zoomRect.top += 3.0;
+
+			_DrawBlendedRect(sBitmapDrawingEngine, zoomRect, tab->zoomPressed,
+				buttonColorLight2, buttonColorLight1, buttonColor,
+				buttonColorShadow1);
+
+			_DrawBevelRect(sBitmapDrawingEngine, zoomRect, tab->zoomPressed,
+				buttonColorLight2, buttonColorShadow2);
+
+			// small rect
+
+			zoomRect = rect;
+			zoomRect.right -= 5.0;
+			zoomRect.bottom -= 5.0;
+
+			_DrawBlendedRect(sBitmapDrawingEngine, zoomRect, tab->zoomPressed,
+				buttonColorLight2, buttonColorLight1, buttonColor,
+				buttonColorShadow1);
+
+			_DrawBevelRect(sBitmapDrawingEngine, zoomRect, tab->zoomPressed,
+				buttonColorLight2, buttonColorShadow2);
+
+			// Fill in the right top and bottom right corners with buttonColor
+			sBitmapDrawingEngine->StrokeLine(zoomRect.RightTop(),
+				zoomRect.RightTop(), buttonColor);
+			sBitmapDrawingEngine->StrokeLine(zoomRect.LeftBottom(),
+				zoomRect.LeftBottom(), buttonColor);
+
+			break;
+		}
+
+		default:
+			break;
 	}
 
-	// draw bevel effect on box
-	if (down) {
-		fDrawingEngine->StrokeRect(r2,   RGBColor(tabColorLight));
-			// inner light box
-		fDrawingEngine->StrokeRect(rect, RGBColor(tabColorLight));
-			// outer light box
-		fDrawingEngine->StrokeRect(r1,   RGBColor(tabColorShadow));
-			// dark box
-	} else {
-		fDrawingEngine->StrokeRect(r2,   RGBColor(tabColorShadow));
-			// inner dark box
-		fDrawingEngine->StrokeRect(rect, RGBColor(tabColorShadow));
-			// outer dark box
-		fDrawingEngine->StrokeRect(r1,   RGBColor(tabColorLight));
-			// light box
+	UtilityBitmap* bitmap = sBitmapDrawingEngine->ExportToBitmap(width, height,
+		B_RGB32);
+	if (bitmap == NULL)
+		return NULL;
+
+	// bitmap ready, put it into the list
+	decorator_bitmap* entry = new(std::nothrow) decorator_bitmap;
+	if (entry == NULL) {
+		delete bitmap;
+		return NULL;
 	}
+
+	entry->item = item;
+	entry->down = down;
+	entry->width = width;
+	entry->height = height;
+	entry->bitmap = bitmap;
+	entry->baseColor = colors[COLOR_BUTTON];
+	entry->lightColor = colors[COLOR_BUTTON_LIGHT];
+	entry->next = sBitmapList;
+	sBitmapList = entry;
+	return bitmap;
 }
 
 
