@@ -131,13 +131,30 @@ init_interrupt_handler(intel_info &info)
 		status = B_ERROR;
 	}
 
-	if (status == B_OK && info.pci->u.h0.interrupt_pin != 0x00
-		&& info.pci->u.h0.interrupt_line != 0xff) {
+	// Find the right interrupt vector, using MSIs if available.
+	info.irq = 0xff;
+	info.use_msi = false;	
+	if (info.pci->u.h0.interrupt_pin != 0x00)	
+		info.irq = info.pci->u.h0.interrupt_line;
+	if (gPCIx86Module != NULL && gPCIx86Module->get_msi_count(info.pci->bus,
+			info.pci->device, info.pci->function) >= 1) {
+		uint8 msiVector = 0;
+		if (gPCIx86Module->configure_msi(info.pci->bus, info.pci->device,
+				info.pci->function, 1, &msiVector) == B_OK
+			&& gPCIx86Module->enable_msi(info.pci->bus, info.pci->device,
+				info.pci->function) == B_OK) {
+			ERROR("using message signaled interrupts\n");
+			info.irq = msiVector;
+			info.use_msi = true;
+		}
+	}
+
+	if (status == B_OK && info.irq != 0xff) {
 		// we've gotten an interrupt line for us to use
 
 		info.fake_interrupts = false;
 
-		status = install_io_interrupt_handler(info.pci->u.h0.interrupt_line,
+		status = install_io_interrupt_handler(info.irq,
 			&intel_interrupt_handler, (void*)&info, 0);
 		if (status == B_OK) {
 			write32(info, INTEL_DISPLAY_A_PIPE_STATUS,
@@ -384,8 +401,14 @@ intel_extreme_uninit(intel_info &info)
 		write16(info, find_reg(info, INTEL_INTERRUPT_ENABLED), 0);
 		write16(info, find_reg(info, INTEL_INTERRUPT_MASK), ~0);
 
-		remove_io_interrupt_handler(info.pci->u.h0.interrupt_line,
-			intel_interrupt_handler, &info);
+		remove_io_interrupt_handler(info.irq, intel_interrupt_handler, &info);
+
+		if (info.use_msi && gPCIx86Module != NULL) {
+			gPCIx86Module->disable_msi(info.pci->bus,
+				info.pci->device, info.pci->function);
+			gPCIx86Module->unconfigure_msi(info.pci->bus,
+				info.pci->device, info.pci->function);
+		}
 	}
 
 	gGART->unmap_aperture(info.aperture);
