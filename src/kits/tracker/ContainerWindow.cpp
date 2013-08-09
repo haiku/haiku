@@ -177,7 +177,7 @@ CompareLabels(const BMenuItem* item1, const BMenuItem* item2)
 
 
 static bool
-AddOneAddon(const Model* model, const char* name, uint32 shortcut, 
+AddOneAddon(const Model* model, const char* name, uint32 shortcut,
 	uint32 modifiers, bool primary, void* context)
 {
 	AddOneAddonParams* params = (AddOneAddonParams*)context;
@@ -2879,7 +2879,7 @@ BContainerWindow::AddTrashContextMenus(BMenu* menu)
 
 void
 BContainerWindow::EachAddon(bool (*eachAddon)(const Model*, const char*,
-	uint32 shortcut, uint32 modifiers, bool primary, void* context), 
+	uint32 shortcut, uint32 modifiers, bool primary, void* context),
 	void* passThru, BObjectList<BString> &mimeTypes)
 {
 	AutoLock<LockingList<AddonShortcut> > lock(fAddonsList);
