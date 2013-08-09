@@ -625,6 +625,8 @@ TabDecorator::_FontsChanged(DesktopSettings& settings,
 	if (updateRegion != NULL)
 		updateRegion->Include(&GetFootprint());
 
+	_InvalidateBitmaps();
+
 	_UpdateFont(settings);
 	_DoLayout();
 
