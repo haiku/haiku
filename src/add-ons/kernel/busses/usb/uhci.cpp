@@ -1973,6 +1973,14 @@ UHCI::AddTo(Stack *stack)
 		return B_NO_MEMORY;
 	}
 
+	// Try to get the PCI x86 module as well so we can enable possible MSIs.
+	if (sPCIx86Module == NULL && get_module(B_PCI_X86_MODULE_NAME,
+			(module_info **)&sPCIx86Module) != B_OK) {
+		// If it isn't there, that's not critical though.
+		TRACE_MODULE_ERROR("failed to get pci x86 module\n");
+		sPCIx86Module = NULL;
+	}
+
 	for (int32 i = 0; sPCIModule->get_nth_pci_info(i, item) >= B_OK; i++) {
 
 		if (item->class_base == PCI_serial_bus && item->class_sub == PCI_usb
