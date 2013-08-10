@@ -1,7 +1,8 @@
-1	russian	x-vnd.Haiku-libmail	161731481
+1	russian	x-vnd.Haiku-libmail	4037525365
 Partially download messages larger than	ProtocolConfigView		Частично скачивать письма больше чем
 Password:	ProtocolConfigView		Пароль:
 Remove mail from server when deleted	ProtocolConfigView		Удалять письма с сервера при удалении
+KiB	ProtocolConfigView		КиБ
 Mail server:	ProtocolConfigView		Почтовый сервер:
 Select…	MailKit		Выбрать…
 Connection type:	ProtocolConfigView		Тип соединения:

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-WebPositive	3577331897
+1	russian	x-vnd.Haiku-WebPositive	1786411139
 Show home button	Settings Window		Показывать кнопку Домой
 Username:	Authentication Panel		Имя пользователя:
 Copy URL to clipboard	Download Window		Копировать ссылку на загрузку
@@ -16,6 +16,7 @@ Start page:	Settings Window		Начальная страница:
 History	WebPositive Window		История
 Error opening downloads folder	Download Window		Ошибка открытия каталога загрузок
 Paste	WebPositive Window		Вставить
+Double-click or middle-click to open new tab.	Tab Manager		Нажатие средней кнопки или двойной клик откроет новую вкладку.
 Proxy username:	Settings Window		Имя пользователя прокси:
 Settings	Settings Window		Настройки
 %seconds seconds left	Download Window		осталось %seconds секунд
@@ -128,7 +129,7 @@ Bookmark error	WebPositive Window		Ошибка закладки
 Do you really want to clear the browsing history?	WebPositive Window		Вы действительно хотите очистить историю посещений?
 Copy	WebPositive Window		Копировать
 Open bookmarks confirmation	WebPositive Window		Подтверждение открытия закладок
-Remove missing	Download Window		Удалить отсутствующие
+Remove missing	Download Window		Убрать отсутствующие
 Clone current page	Settings Window		Клонировать текущую страницу
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Вы хотите открыть сразу %addedCount закладок?
 OK	Authentication Panel		OK
@@ -138,4 +139,4 @@ Manage bookmarks	WebPositive Window		Изменить закладки…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Закладка для этой страницы (%bookmarkName) уже существует.
 New windows:	Settings Window		Новые окна:
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url загружен
-Remove finished	Download Window		Удалить загруженные
+Remove finished	Download Window		Убрать загруженные

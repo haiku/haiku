@@ -68,7 +68,7 @@ New tab	Terminal TermWindow		Новая вкладка
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Этот шаблон описывает заголовки вкладок.\nВозможно использовать следующие переменные:\n
 Selected background	Terminal AppearancePrefView		Выделенного фона
 Slate	Terminal colors scheme		Шифер
-Text under cursor	Terminal AppearancePrefView		Текст под под курсором
+Text under cursor	Terminal AppearancePrefView		Текст под курсором
 Midnight	Terminal colors scheme		Полночь
 Decrease	Terminal TermWindow		Уменьшить
 Default	Terminal colors scheme		По умолчанию
