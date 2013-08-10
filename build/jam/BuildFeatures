@@ -373,59 +373,24 @@ if $(HAIKU_BUILD_FEATURE_TAGLIB) {
 
 
 # WebKit
+if [ IsPackageAvailable haikuwebkit_devel ] {
+	ExtractBuildFeatureArchives webkit :
+		file: base haikuwebkit
+			runtime: lib
+		file: devel haikuwebkit_devel
+			depends: base
+			libraries:
+				$(developLibDir)/libwtf.so
+				$(developLibDir)/libjavascriptcore.so
+				$(developLibDir)/libwebcore.so
+				$(developLibDir)/libwebkit.so
+			headers: $(developHeadersDir)
+		;
 
-# TODO: Update to packages!
-if ! 1 {
-
-# Automatically install the WebKit feature, when the optional WebPositive
-# optional package is enabled.
-if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
-	HAIKU_BUILD_FEATURE_WEBKIT = 1 ;
+	EnableBuildFeatures webkit ;
+} else {
+	Echo "WebKit build feature not available for $(TARGET_PACKAGING_ARCH)" ;
 }
-
-if $(TARGET_ARCH) = x86 {
-	HAIKU_WEBKIT_FILE = haikuwebkit-1.1.3-x86-gcc4-2012-08-31a.zip ;
-} else if $(TARGET_ARCH) = x86_64 {
-	HAIKU_WEBKIT_FILE = haikuwebkit-1.1.3-x86_64-gcc4-2012-12-22.zip ;
-}
-if $(HAIKU_BUILD_FEATURE_WEBKIT) {
-	if $(TARGET_ARCH) != x86 && $(TARGET_ARCH) != x86_64 {
-		Echo "WebKit support not available on $(TARGET_ARCH)" ;
-	} else if $(TARGET_GCC_VERSION_$(architecture)[1]) < 4 {
-		if ! $(isHybridBuild) {
-			Echo "WebKit support not available on gcc"
-				"$(TARGET_GCC_VERSION_$(architecture)[1])" ;
-		} else {
-			Echo "WebKit to be utilized by gcc4 inside"
-				"$(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR)" ;
-		}
-	} else {
-		local zipFile = [ DownloadFile $(HAIKU_WEBKIT_FILE)
-			: $(baseURL)/$(HAIKU_WEBKIT_FILE) ] ;
-
-		HAIKU_WEBKIT_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
-			$(HAIKU_WEBKIT_FILE:B) ] ;
-
-		HAIKU_WEBKIT_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_WEBKIT_DIR)
-			: include/ : $(zipFile) : extracted-webkit ] ;
-
-		HAIKU_WEBKIT_LIBS = [ ExtractArchive $(HAIKU_WEBKIT_DIR)
-			:
-			lib/libwtf.so
-			lib/libjavascriptcore.so
-			lib/libwebcore.so
-			lib/libwebkit.so
-			: $(zipFile)
-			: extracted-webkit
-		] ;
-
-		HAIKU_WEBKIT_HEADERS = [ FDirName $(HAIKU_WEBKIT_DIR) include ] ;
-
-		EnableBuildFeatures webkit ;
-	}
-}
-
-} # ! 1
 
 
 # libpng
