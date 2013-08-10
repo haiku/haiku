@@ -155,8 +155,9 @@ rule EnableBuildFeatures features : specification
 
 	features = [ FQualifiedBuildFeatureName $(features) ] ;
 
-	if ! $(specification)
-		|| [ FMatchesBuildFeatures $(specification) ] {
+	if ! $(HAIKU_BUILD_FEATURE_$(feature:U)_ENABLED)
+		&& ( ! $(specification)
+			|| [ FMatchesBuildFeatures $(specification) ] ) {
 		local feature ;
 		for feature in $(features) {
 			HAIKU_BUILD_FEATURES += $(feature) ;
