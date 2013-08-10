@@ -36,7 +36,7 @@ MainWindow::MainWindow(BRect frame)
 	BMenuBar* menuBar = new BMenuBar(B_TRANSLATE("Main Menu"));
 	_BuildMenu(menuBar);
 	
-	fFilterView = new FilterView();
+	fFilterView = new FilterView(fModel);
 	fPackageListView = new PackageListView();
 	fPackageInfoView = new PackageInfoView(&fPackageManager);
 	

@@ -10,11 +10,12 @@
 
 class BMenuField;
 class BTextControl;
+class Model;
 
 
 class FilterView : public BGroupView {
 public:
-								FilterView();
+								FilterView(const Model& model);
 	virtual						~FilterView();
 
 	virtual void				AttachedToWindow();

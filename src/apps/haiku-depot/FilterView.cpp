@@ -16,6 +16,8 @@
 #include <PopUpMenu.h>
 #include <TextControl.h>
 
+#include "Model.h"
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "FilterView"
@@ -28,7 +30,7 @@ enum {
 };
 
 
-FilterView::FilterView()
+FilterView::FilterView(const Model& model)
 	:
 	BGroupView("filter view")
 {
@@ -36,21 +38,27 @@ FilterView::FilterView()
 	BPopUpMenu* categoryMenu = new BPopUpMenu(B_TRANSLATE("Show"));
 	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("All packages"), NULL));
 	categoryMenu->AddItem(new BSeparatorItem());
-	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Audio"), NULL));
-	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Games"), NULL));
-	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Graphics"), NULL));
-	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Development"), NULL));
-	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Miscellaneous"), NULL));
-	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Shell"), NULL));
-	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Video"), NULL));
+	
+	const CategoryList& categories = model.Categories();
+	for (int i = 0; i < categories.CountItems(); i++) {
+		const CategoryRef& category = categories.ItemAtFast(i);
+		BMessage* message = new BMessage(MSG_CATEGORY_SELECTED);
+		message->AddString("name", category->Name());
+		BMenuItem* item = new BMenuItem(category->Label(), message);
+		categoryMenu->AddItem(item);
+	}
+	
 	categoryMenu->AddItem(new BSeparatorItem());
+
 	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Installed packages"),
 		NULL));
 	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Uninstalled packages"),
 		NULL));
 	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("User selected packages"),
 		NULL));
+
 	categoryMenu->AddItem(new BSeparatorItem());
+
 	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Downloading"), NULL));
 	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Update available"), NULL));
 	categoryMenu->ItemAt(0)->SetMarked(true);

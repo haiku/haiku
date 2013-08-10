@@ -9,6 +9,17 @@
 #include "PackageInfo.h"
 
 
+class PackageFilter : public BReferenceable {
+public:
+	virtual						~PackageFilter();
+
+	virtual	bool				AcceptsPackage(
+									const PackageInfo& package) const = 0;
+};
+
+typedef BReference<PackageFilter> PackageFilterRef;
+
+
 class Model {
 public:
 								Model();
@@ -31,6 +42,8 @@ public:
 									{ return fCategoryDevelopment; }
 			const CategoryRef&	CategoryCommandLine() const
 									{ return fCategoryCommandLine; }
+			const CategoryRef&	CategoryGames() const
+									{ return fCategoryGames; }
 
 			const CategoryList&	Categories() const
 									{ return fCategories; }
@@ -46,9 +59,14 @@ private:
 			CategoryRef			fCategoryProductivity;
 			CategoryRef			fCategoryDevelopment;
 			CategoryRef			fCategoryCommandLine;
+			CategoryRef			fCategoryGames;
 			// TODO: More categories
 
 			CategoryList		fCategories;
+
+			PackageFilterRef	fCategoryFilter;
+			PackageFilterRef	fDepotFilter;
+			PackageFilterRef	fSearchTermsFilter;
 };
 
 

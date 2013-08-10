@@ -14,6 +14,55 @@
 #define B_TRANSLATION_CONTEXT "Model"
 
 
+// #pragma mark - PackageFilters
+
+
+PackageFilter::~PackageFilter()
+{
+}
+
+
+class AnyFilter : public PackageFilter {
+public:
+	virtual bool AcceptsPackage(const PackageInfo& package) const
+	{
+		return true;
+	}
+};
+
+
+class DepotFilter : public PackageFilter {
+public:
+	DepotFilter(const DepotInfo& depot)
+		:
+		fDepot(depot)
+	{
+	}
+	
+	virtual bool AcceptsPackage(const PackageInfo& package) const
+	{
+		// TODO: Maybe a PackageInfo ought to know the Depot it came from?
+		// But right now the same package could theoretically be provided
+		// from different depots and the filter would work correctly.
+		// Also the PackageList could actually contain references to packages
+		// instead of the packages as objects. The equal operator is quite
+		// expensive as is.
+		const PackageInfoList& packageList = fDepot.PackageList();
+		for (int i = packageList.CountItems() - 1; i >= 0; i--) {
+			if (packageList.ItemAtFast(i) == package)
+				return true;
+		}
+		return false;
+	}
+	
+private:
+	DepotInfo	fDepot;
+};
+
+
+// #pragma mark - Model
+
+
 Model::Model()
 	:
 	fSearchTerms(),
@@ -36,7 +85,14 @@ Model::Model()
 		B_TRANSLATE("Development"), "development"), true),
 	fCategoryCommandLine(new PackageCategory(
 		BitmapRef(),
-		B_TRANSLATE("Command line"), "command-line"), true)
+		B_TRANSLATE("Command line"), "command-line"), true),
+	fCategoryGames(new PackageCategory(
+		BitmapRef(),
+		B_TRANSLATE("Games"), "games"), true),
+
+	fCategoryFilter(PackageFilterRef(new AnyFilter(), true)),
+	fDepotFilter(PackageFilterRef(new AnyFilter(), true)),
+	fSearchTermsFilter(PackageFilterRef(new AnyFilter(), true))
 {
 	// Don't forget to add new categories to this list:
 	fCategories.Add(fCategoryAudio);
@@ -45,6 +101,7 @@ Model::Model()
 	fCategories.Add(fCategoryProductivity);
 	fCategories.Add(fCategoryDevelopment);
 	fCategories.Add(fCategoryCommandLine);
+	fCategories.Add(fCategoryGames);
 }
 
 
@@ -61,7 +118,12 @@ Model::CreatePackageList() const
 			= fDepots.ItemAtFast(i).PackageList();
 
 		for (int32 j = 0; j < packageList.CountItems(); j++) {
-			resultList.Add(packageList.ItemAtFast(j));
+			const PackageInfo& package = packageList.ItemAtFast(j);
+			if (fCategoryFilter->AcceptsPackage(package)
+				&& fDepotFilter->AcceptsPackage(package)
+				&& fSearchTermsFilter->AcceptsPackage(package)) {
+				resultList.Add(package);
+			}
 		}
 	}
 
