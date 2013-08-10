@@ -32,6 +32,9 @@ public:
 			const CategoryRef&	CategoryCommandLine() const
 									{ return fCategoryCommandLine; }
 
+			const CategoryList&	Categories() const
+									{ return fCategories; }
+
 private:
 			BString				fSearchTerms;
 
@@ -44,6 +47,8 @@ private:
 			CategoryRef			fCategoryDevelopment;
 			CategoryRef			fCategoryCommandLine;
 			// TODO: More categories
+
+			CategoryList		fCategories;
 };
 
 

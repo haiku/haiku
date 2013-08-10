@@ -38,6 +38,13 @@ Model::Model()
 		BitmapRef(),
 		B_TRANSLATE("Command line"), "command-line"), true)
 {
+	// Don't forget to add new categories to this list:
+	fCategories.Add(fCategoryAudio);
+	fCategories.Add(fCategoryVideo);
+	fCategories.Add(fCategoryGraphics);
+	fCategories.Add(fCategoryProductivity);
+	fCategories.Add(fCategoryDevelopment);
+	fCategories.Add(fCategoryCommandLine);
 }
 
 
