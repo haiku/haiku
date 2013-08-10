@@ -18,10 +18,32 @@ public:
 
 			bool				AddDepot(const DepotInfo& depot);
 
+			// Access to global categories
+			const CategoryRef&	CategoryAudio() const
+									{ return fCategoryAudio; }
+			const CategoryRef&	CategoryVideo() const
+									{ return fCategoryVideo; }
+			const CategoryRef&	CategoryGraphics() const
+									{ return fCategoryGraphics; }
+			const CategoryRef&	CategoryProductivity() const
+									{ return fCategoryProductivity; }
+			const CategoryRef&	CategoryDevelopment() const
+									{ return fCategoryDevelopment; }
+			const CategoryRef&	CategoryCommandLine() const
+									{ return fCategoryCommandLine; }
+
 private:
 			BString				fSearchTerms;
 
 			DepotInfoList		fDepots;
+
+			CategoryRef			fCategoryAudio;
+			CategoryRef			fCategoryVideo;
+			CategoryRef			fCategoryGraphics;
+			CategoryRef			fCategoryProductivity;
+			CategoryRef			fCategoryDevelopment;
+			CategoryRef			fCategoryCommandLine;
+			// TODO: More categories
 };
 
 

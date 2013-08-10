@@ -22,6 +22,7 @@
 
 SharedBitmap::SharedBitmap(BBitmap* bitmap)
 	:
+	BReferenceable(),
 	fResourceID(-1),
 	fMimeType()
 {
@@ -33,6 +34,7 @@ SharedBitmap::SharedBitmap(BBitmap* bitmap)
 
 SharedBitmap::SharedBitmap(int32 resourceID)
 	:
+	BReferenceable(),
 	fResourceID(resourceID),
 	fMimeType()
 {
@@ -44,6 +46,7 @@ SharedBitmap::SharedBitmap(int32 resourceID)
 
 SharedBitmap::SharedBitmap(const char* mimeType)
 	:
+	BReferenceable(),
 	fResourceID(-1),
 	fMimeType(mimeType)
 {
@@ -361,6 +364,65 @@ PublisherInfo::operator!=(const PublisherInfo& other) const
 }
 
 
+// #pragma mark - PackageCategory
+
+
+PackageCategory::PackageCategory()
+	:
+	BReferenceable(),
+	fIcon(),
+	fName()
+{
+}
+
+
+PackageCategory::PackageCategory(const BitmapRef& icon, const BString& label,
+		const BString& name)
+	:
+	BReferenceable(),
+	fIcon(icon),
+	fLabel(label),
+	fName(name)
+{
+}
+
+
+PackageCategory::PackageCategory(const PackageCategory& other)
+	:
+	BReferenceable(),
+	fIcon(other.fIcon),
+	fLabel(other.fLabel),
+	fName(other.fName)
+{
+}
+
+
+PackageCategory&
+PackageCategory::operator=(const PackageCategory& other)
+{
+	fIcon = other.fIcon;
+	fName = other.fName;
+	fLabel = other.fLabel;
+	return *this;
+}
+
+
+bool
+PackageCategory::operator==(const PackageCategory& other) const
+{
+	return fIcon == other.fIcon
+		&& fLabel == other.fLabel
+		&& fName == other.fName;
+}
+
+
+bool
+PackageCategory::operator!=(const PackageCategory& other) const
+{
+	return !(*this == other);
+}
+
+
 // #pragma mark - PackageInfo
 
 
@@ -391,6 +453,7 @@ PackageInfo::PackageInfo(const BitmapRef& icon, const BString& title,
 	fShortDescription(shortDescription),
 	fFullDescription(fullDescription),
 	fChangelog(changelog),
+	fCategories(),
 	fUserRatings(),
 	fScreenshots()
 {
@@ -406,6 +469,7 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 	fShortDescription(other.fShortDescription),
 	fFullDescription(other.fFullDescription),
 	fChangelog(other.fChangelog),
+	fCategories(other.fCategories),
 	fUserRatings(other.fUserRatings),
 	fScreenshots(other.fScreenshots)
 {
@@ -422,6 +486,7 @@ PackageInfo::operator=(const PackageInfo& other)
 	fShortDescription = other.fShortDescription;
 	fFullDescription = other.fFullDescription;
 	fChangelog = other.fChangelog;
+	fCategories = other.fCategories;
 	fUserRatings = other.fUserRatings;
 	fScreenshots = other.fScreenshots;
 	return *this;
@@ -438,6 +503,7 @@ PackageInfo::operator==(const PackageInfo& other) const
 		&& fShortDescription == other.fShortDescription
 		&& fFullDescription == other.fFullDescription
 		&& fChangelog == other.fChangelog
+		&& fCategories == other.fCategories
 		&& fUserRatings == other.fUserRatings
 		&& fScreenshots == other.fScreenshots;
 }
@@ -447,6 +513,13 @@ bool
 PackageInfo::operator!=(const PackageInfo& other) const
 {
 	return !(*this == other);
+}
+
+
+bool
+PackageInfo::AddCategory(const CategoryRef& category)
+{
+	return fCategories.Add(category);
 }
 
 

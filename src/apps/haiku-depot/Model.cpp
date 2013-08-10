@@ -7,11 +7,36 @@
 
 #include <stdio.h>
 
+#include <Catalog.h>
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Model"
+
 
 Model::Model()
 	:
 	fSearchTerms(),
-	fDepots()
+	fDepots(),
+
+	fCategoryAudio(new PackageCategory(
+		BitmapRef(),
+		B_TRANSLATE("Audio"), "audio"), true),
+	fCategoryVideo(new PackageCategory(
+		BitmapRef(),
+		B_TRANSLATE("Video"), "video"), true),
+	fCategoryGraphics(new PackageCategory(
+		BitmapRef(),
+		B_TRANSLATE("Graphics"), "graphics"), true),
+	fCategoryProductivity(new PackageCategory(
+		BitmapRef(),
+		B_TRANSLATE("Productivity"), "productivity"), true),
+	fCategoryDevelopment(new PackageCategory(
+		BitmapRef(),
+		B_TRANSLATE("Development"), "development"), true),
+	fCategoryCommandLine(new PackageCategory(
+		BitmapRef(),
+		B_TRANSLATE("Command line"), "command-line"), true)
 {
 }
 

@@ -145,6 +145,35 @@ private:
 };
 
 
+class PackageCategory : public BReferenceable {
+public:
+								PackageCategory();
+								PackageCategory(const BitmapRef& icon,
+									const BString& label,
+									const BString& name);
+								PackageCategory(const PackageCategory& other);
+
+			PackageCategory&	operator=(const PackageCategory& other);
+			bool				operator==(const PackageCategory& other) const;
+			bool				operator!=(const PackageCategory& other) const;
+
+			const BitmapRef&	Icon() const
+									{ return fIcon; }
+			const BString&		Label() const
+									{ return fLabel; }
+			const BString&		Name() const
+									{ return fName; }
+private:
+			BitmapRef			fIcon;
+			BString				fLabel;
+			BString				fName;
+};
+
+
+typedef BReference<PackageCategory> CategoryRef;
+typedef List<CategoryRef, false> CategoryList;
+
+
 class PackageInfo {
 public:
 								PackageInfo();
@@ -176,15 +205,16 @@ public:
 			const BString&		Changelog() const
 									{ return fChangelog; }
 
-			bool				AddUserRating(const UserRating& rating);
+			bool				AddCategory(const CategoryRef& category);
+			const CategoryList&	Categories() const
+									{ return fCategories; }
 
+			bool				AddUserRating(const UserRating& rating);
 			const UserRatingList& UserRatings() const
 									{ return fUserRatings; }
-
 			RatingSummary		CalculateRatingSummary() const;
 
 			bool				AddScreenshot(const BitmapRef& screenshot);
-
 			const BitmapList&	Screenshots() const
 									{ return fScreenshots; }
 
@@ -196,6 +226,7 @@ private:
 			BString				fShortDescription;
 			BString				fFullDescription;
 			BString				fChangelog;
+			CategoryList		fCategories;
 			UserRatingList		fUserRatings;
 			BitmapList			fScreenshots;
 };

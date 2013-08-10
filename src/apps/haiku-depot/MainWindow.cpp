@@ -175,6 +175,8 @@ MainWindow::_InitDummyModel()
 	);
 	wonderbrush.AddScreenshot(
 		BitmapRef(new SharedBitmap(603), true));
+	wonderbrush.AddCategory(fModel.CategoryGraphics());
+	wonderbrush.AddCategory(fModel.CategoryProductivity());
 	
 	depot.AddPackage(wonderbrush);
 
@@ -210,6 +212,8 @@ MainWindow::_InitDummyModel()
 	);
 	paladin.AddScreenshot(
 		BitmapRef(new SharedBitmap(604), true));
+	paladin.AddCategory(fModel.CategoryDevelopment());
+
 	depot.AddPackage(paladin);
 
 	fModel.AddDepot(depot);

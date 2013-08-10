@@ -24,6 +24,7 @@ DoCatalogs HaikuDepot :
 	App.cpp
 	FilterView.cpp
 	MainWindow.cpp
+	Model.cpp
 	PackageInfoView.cpp
 	PackageListView.cpp
 	PackageManager.cpp
