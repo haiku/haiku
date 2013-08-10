@@ -933,6 +933,7 @@ rule AddBootModuleSymlinksToHaikuImage targets
 
 rule AddPackageFilesToHaikuImage location : packages
 {
+	packages = [ FFilterByBuildFeatures $(packages) ] ;
 	HAIKU_PACKAGES_IN_IMAGE on $(HAIKU_IMAGE_CONTAINER_NAME)
 		= [ on $(HAIKU_IMAGE_CONTAINER_NAME) return $(HAIKU_PACKAGES_IN_IMAGE) ]
 			$(packages) ;
@@ -996,6 +997,8 @@ rule AddHaikuImagePackages packages : installationLocation
 	 # packages shall be installed.
 
 	installationLocation ?= common ;
+
+	packages = [ FFilterByBuildFeatures $(packages) ] ;
 
 	local package ;
 	for package in $(packages) {
