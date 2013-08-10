@@ -36,7 +36,6 @@ rule DefineDefaultBuildProfiles
 			HAIKU_IMAGE_SIZE = 800 ;
 
 			AddHaikuImagePackages
-				openssl
 				wpa_supplicant
 				:
 				system
@@ -58,19 +57,14 @@ rule DefineDefaultBuildProfiles
 				vision
 				wonderbrush
 				wqy_microhei
-				xz_utils
+				xz_utils@!gcc2
+				xz_utils_x86@gcc2
 				;
 
-			# secondary architectures
 			local architectureObject ;
-			for architectureObject
-					in [ MultiArchSubDirSetup $(HAIKU_PACKAGING_ARCHS[2-]) ] {
+			for architectureObject in [ MultiArchSubDirSetup ] {
 				on $(architectureObject) {
-					AddHaikuImagePackages
-						openssl
-						:
-						system
-						;
+					AddHaikuImagePackages openssl : system ;
 				}
 			}
 
