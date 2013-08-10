@@ -4,13 +4,18 @@ SubDirSysHdrs [ FDirName $(SUBDIR) ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) iex ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) config ] ;
 
-StaticLibrary libilmthread.a :
-IlmThread.cpp
-IlmThreadMutex.cpp
-IlmThreadMutexPosix.cpp
-IlmThreadPool.cpp
-IlmThreadPosix.cpp
-IlmThreadSemaphore.cpp
-IlmThreadSemaphorePosixCompat.cpp
-IlmThreadSemaphorePosix.cpp
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		StaticLibrary [ MultiArchDefaultGristFiles libilmthread.a ] :
+			IlmThread.cpp
+			IlmThreadMutex.cpp
+			IlmThreadMutexPosix.cpp
+			IlmThreadPool.cpp
+			IlmThreadPosix.cpp
+			IlmThreadSemaphore.cpp
+			IlmThreadSemaphorePosixCompat.cpp
+			IlmThreadSemaphorePosix.cpp
+			;
+	}
+}
