@@ -546,11 +546,11 @@ rule AddLibrariesToContainer container : directory : libs
 	for lib in $(libs) {
 		local abiVersion = [ on $(lib) return $(HAIKU_LIB_ABI_VERSION) ] ;
 		if $(abiVersion) {
-			local abiVersionedLib = $(lib).$(abiVersion) ;
+			local abiVersionedLib = $(lib:G=).$(abiVersion) ;
 			AddFilesToContainer $(container) : $(directory) : $(lib)
 				: $(abiVersionedLib) ;
 			AddSymlinkToContainer $(container) : $(directory)
-				: $(abiVersionedLib) : $(lib) ;
+				: $(abiVersionedLib) : $(lib:G=) ;
 		} else {
 			AddFilesToContainer $(container) : $(directory) : $(lib) ;
 		}
