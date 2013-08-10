@@ -228,4 +228,7 @@ MainWindow::_InitDummyModel()
 	depot.AddPackage(paladin);
 
 	fModel.AddDepot(depot);
+
+	fModel.SetPackageState(wonderbrush, UNINSTALLED);
+	fModel.SetPackageState(paladin, ACTIVATED);
 }

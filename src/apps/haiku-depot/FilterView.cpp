@@ -23,6 +23,19 @@
 #define B_TRANSLATION_CONTEXT "FilterView"
 
 
+static void
+add_categories_to_menu(const CategoryList& categories, BMenu* menu)
+{
+	for (int i = 0; i < categories.CountItems(); i++) {
+		const CategoryRef& category = categories.ItemAtFast(i);
+		BMessage* message = new BMessage(MSG_CATEGORY_SELECTED);
+		message->AddString("name", category->Name());
+		BMenuItem* item = new BMenuItem(category->Label(), message);
+		menu->AddItem(item);
+	}
+}
+
+
 FilterView::FilterView(const Model& model)
 	:
 	BGroupView("filter view")
@@ -32,29 +45,12 @@ FilterView::FilterView(const Model& model)
 	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("All packages"),
 		new BMessage(MSG_CATEGORY_SELECTED)));
 	categoryMenu->AddItem(new BSeparatorItem());
-	
-	const CategoryList& categories = model.Categories();
-	for (int i = 0; i < categories.CountItems(); i++) {
-		const CategoryRef& category = categories.ItemAtFast(i);
-		BMessage* message = new BMessage(MSG_CATEGORY_SELECTED);
-		message->AddString("name", category->Name());
-		BMenuItem* item = new BMenuItem(category->Label(), message);
-		categoryMenu->AddItem(item);
-	}
-	
+	add_categories_to_menu(model.Categories(), categoryMenu);
 	categoryMenu->AddItem(new BSeparatorItem());
-
-	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Installed packages"),
-		NULL));
-	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Uninstalled packages"),
-		NULL));
-	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("User selected packages"),
-		NULL));
-
+	add_categories_to_menu(model.UserCategories(), categoryMenu);
 	categoryMenu->AddItem(new BSeparatorItem());
+	add_categories_to_menu(model.ProgressCategories(), categoryMenu);
 
-	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Downloading"), NULL));
-	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Update available"), NULL));
 	categoryMenu->ItemAt(0)->SetMarked(true);
 
 	fShowField = new BMenuField("category", B_TRANSLATE("Show:"),

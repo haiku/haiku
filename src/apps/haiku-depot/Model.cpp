@@ -86,6 +86,46 @@ private:
 };
 
 
+class ContainedInFilter : public PackageFilter {
+public:
+	ContainedInFilter(const PackageList& packageList)
+		:
+		fPackageList(packageList)
+	{
+	}
+	
+	virtual bool AcceptsPackage(const PackageInfo& package) const
+	{
+		return fPackageList.Contains(package);
+	}
+
+private:
+	const PackageList&	fPackageList;
+};
+
+
+class ContainedInEitherFilter : public PackageFilter {
+public:
+	ContainedInEitherFilter(const PackageList& packageListA,
+		const PackageList& packageListB)
+		:
+		fPackageListA(packageListA),
+		fPackageListB(packageListB)
+	{
+	}
+	
+	virtual bool AcceptsPackage(const PackageInfo& package) const
+	{
+		return fPackageListA.Contains(package)
+			|| fPackageListB.Contains(package);
+	}
+
+private:
+	const PackageList&	fPackageListA;
+	const PackageList&	fPackageListB;
+};
+
+
 // #pragma mark - Model
 
 
@@ -128,6 +168,34 @@ Model::Model()
 	fCategories.Add(fCategoryDevelopment);
 	fCategories.Add(fCategoryCommandLine);
 	fCategories.Add(fCategoryGames);
+
+	// A category for packages that the user installed.
+	fUserCategories.Add(CategoryRef(new PackageCategory(
+		BitmapRef(),
+		B_TRANSLATE("Installed packages"), "installed"), true));
+
+	// A category for packages that the user specifically uninstalled.
+	// For example, a user may have removed packages from a default
+	// Haiku installation
+	fUserCategories.Add(CategoryRef(new PackageCategory(
+		BitmapRef(),
+		B_TRANSLATE("Uninstalled packages"), "uninstalled"), true));
+
+	// A category for all packages that the user has installed or uninstalled.
+	// Those packages resemble what makes their system different from a 
+	// fresh Haiku installation.
+	fUserCategories.Add(CategoryRef(new PackageCategory(
+		BitmapRef(),
+		B_TRANSLATE("User modified packages"), "modified"), true));
+
+	// Two categories to see just the packages which are downloading or
+	// have updates available
+	fProgressCategories.Add(CategoryRef(new PackageCategory(
+		BitmapRef(),
+		B_TRANSLATE("Downloading"), "downloading"), true));
+	fProgressCategories.Add(CategoryRef(new PackageCategory(
+		BitmapRef(),
+		B_TRANSLATE("Update available"), "updates"), true));
 }
 
 
@@ -198,9 +266,24 @@ Model::SetPackageState(const PackageInfo& package, PackageState state)
 void
 Model::SetCategory(const BString& category)
 {
+	PackageFilter* filter;
+	
 	if (category.Length() == 0)
-		fCategoryFilter.SetTo(new AnyFilter(), true);
+		filter = new AnyFilter();
+	else if (category == "installed")
+		filter = new ContainedInFilter(fInstalledPackages);
+	else if (category == "uninstalled")
+		filter = new ContainedInFilter(fUninstalledPackages);
+	else if (category == "modified") {
+		filter = new ContainedInEitherFilter(fInstalledPackages,
+			fUninstalledPackages);
+	} else if (category == "downloading")
+		filter = new ContainedInFilter(fDownloadingPackages);
+	else if (category == "updates")
+		filter = new ContainedInFilter(fUpdateablePackages);
 	else
-		fCategoryFilter.SetTo(new CategoryFilter(category), true);
+		filter = new CategoryFilter(category);
+
+	fCategoryFilter.SetTo(filter, true);
 }
 

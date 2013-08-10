@@ -49,6 +49,10 @@ public:
 
 			const CategoryList&	Categories() const
 									{ return fCategories; }
+			const CategoryList&	UserCategories() const
+									{ return fUserCategories; }
+			const CategoryList&	ProgressCategories() const
+									{ return fProgressCategories; }
 
 			void				SetPackageState(
 									const PackageInfo& package,
@@ -72,10 +76,14 @@ private:
 			// TODO: More categories
 
 			CategoryList		fCategories;
+			CategoryList		fUserCategories;
+			CategoryList		fProgressCategories;
 
 			PackageList			fInstalledPackages;
 			PackageList			fActivatedPackages;
 			PackageList			fUninstalledPackages;
+			PackageList			fDownloadingPackages;
+			PackageList			fUpdateablePackages;
 
 			PackageFilterRef	fCategoryFilter;
 			PackageFilterRef	fDepotFilter;
