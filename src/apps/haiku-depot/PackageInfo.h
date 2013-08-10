@@ -232,7 +232,15 @@ private:
 };
 
 
-typedef List<PackageInfo, false> PackageInfoList;
+typedef List<PackageInfo, false> PackageList;
+
+
+enum PackageState {
+	NONE		= 0,
+	INSTALLED	= 1,
+	ACTIVATED	= 2,
+	UNINSTALLED	= 3,
+};
 
 
 class DepotInfo {
@@ -248,14 +256,14 @@ public:
 			const BString&		Name() const
 									{ return fName; }
 
-			const PackageInfoList& PackageList() const
+			const PackageList&	Packages() const
 									{ return fPackages; }
 
 			bool				AddPackage(const PackageInfo& package);
 
 private:
 			BString				fName;
-			PackageInfoList		fPackages;
+			PackageList			fPackages;
 };
 
 

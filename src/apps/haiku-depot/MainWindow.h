@@ -47,7 +47,7 @@ private:
 			BSplitView*			fSplitView;
 
 			Model				fModel;
-			PackageInfoList		fVisiblePackages;
+			PackageList			fVisiblePackages;
 
 			PackageManager		fPackageManager;
 };

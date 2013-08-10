@@ -25,7 +25,7 @@ public:
 								Model();
 
 			// !Returns new PackageInfoList from current parameters
-			PackageInfoList		CreatePackageList() const;
+			PackageList			CreatePackageList() const;
 
 			bool				AddDepot(const DepotInfo& depot);
 			const DepotList&	Depots() const
@@ -50,6 +50,10 @@ public:
 			const CategoryList&	Categories() const
 									{ return fCategories; }
 
+			void				SetPackageState(
+									const PackageInfo& package,
+									PackageState state);
+
 			// Configure PackageFilters
 			void				SetCategory(const BString& category);
 
@@ -68,6 +72,10 @@ private:
 			// TODO: More categories
 
 			CategoryList		fCategories;
+
+			PackageList			fInstalledPackages;
+			PackageList			fActivatedPackages;
+			PackageList			fUninstalledPackages;
 
 			PackageFilterRef	fCategoryFilter;
 			PackageFilterRef	fDepotFilter;

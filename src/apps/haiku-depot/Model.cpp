@@ -47,9 +47,9 @@ public:
 		// Also the PackageList could actually contain references to packages
 		// instead of the packages as objects. The equal operator is quite
 		// expensive as is.
-		const PackageInfoList& packageList = fDepot.PackageList();
-		for (int i = packageList.CountItems() - 1; i >= 0; i--) {
-			if (packageList.ItemAtFast(i) == package)
+		const PackageList& packages = fDepot.Packages();
+		for (int i = packages.CountItems() - 1; i >= 0; i--) {
+			if (packages.ItemAtFast(i) == package)
 				return true;
 		}
 		return false;
@@ -131,20 +131,19 @@ Model::Model()
 }
 
 
-PackageInfoList
+PackageList
 Model::CreatePackageList() const
 {
 	// TODO: Allow to restrict depot, filter by search terms, ...
 
 	// Return all packages from all depots.
-	PackageInfoList resultList;
+	PackageList resultList;
 
 	for (int32 i = 0; i < fDepots.CountItems(); i++) {
-		const PackageInfoList& packageList
-			= fDepots.ItemAtFast(i).PackageList();
+		const PackageList& packages = fDepots.ItemAtFast(i).Packages();
 
-		for (int32 j = 0; j < packageList.CountItems(); j++) {
-			const PackageInfo& package = packageList.ItemAtFast(j);
+		for (int32 j = 0; j < packages.CountItems(); j++) {
+			const PackageInfo& package = packages.ItemAtFast(j);
 			if (fCategoryFilter->AcceptsPackage(package)
 				&& fDepotFilter->AcceptsPackage(package)
 				&& fSearchTermsFilter->AcceptsPackage(package)) {
@@ -161,6 +160,38 @@ bool
 Model::AddDepot(const DepotInfo& depot)
 {
 	return fDepots.Add(depot);
+}
+
+
+void
+Model::SetPackageState(const PackageInfo& package, PackageState state)
+{
+	switch (state) {
+		default:
+		case NONE:
+			fInstalledPackages.Remove(package);
+			fActivatedPackages.Remove(package);
+			fUninstalledPackages.Remove(package);
+			break;
+		case INSTALLED:
+			if (!fInstalledPackages.Contains(package))
+				fInstalledPackages.Add(package);
+			fActivatedPackages.Remove(package);
+			fUninstalledPackages.Remove(package);
+			break;
+		case ACTIVATED:
+			if (!fInstalledPackages.Contains(package))
+				fInstalledPackages.Add(package);
+			if (!fActivatedPackages.Contains(package))
+				fActivatedPackages.Add(package);
+			fUninstalledPackages.Remove(package);
+			break;
+		case UNINSTALLED:
+			fInstalledPackages.Remove(package);
+			fActivatedPackages.Remove(package);
+			fUninstalledPackages.Add(package);
+			break;
+	}
 }
 
 
