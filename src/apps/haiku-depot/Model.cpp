@@ -154,7 +154,7 @@ public:
 			if (!_TextContains(package.Title(), term)
 				&& !_TextContains(package.Publisher().Name(), term)
 				&& !_TextContains(package.ShortDescription(), term)
-				/*&& !_TextContains(package.FullDescription(), term)*/) {
+				&& !_TextContains(package.FullDescription(), term)) {
 				return false;
 			}
 		}
