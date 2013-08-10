@@ -419,6 +419,8 @@ public:
 		
 		SetViewColor(B_TRANSPARENT_COLOR);
 		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	
+		SetHighColor(tint_color(LowColor(), B_DARKEN_4_TINT));
 	}
 	
 	virtual BSize MinSize()
