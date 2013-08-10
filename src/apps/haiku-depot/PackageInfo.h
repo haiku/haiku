@@ -238,15 +238,15 @@ typedef List<PackageInfo, false> PackageInfoList;
 class DepotInfo {
 public:
 								DepotInfo();
-								DepotInfo(const BString& title);
+								DepotInfo(const BString& name);
 								DepotInfo(const DepotInfo& other);
 
 			DepotInfo&			operator=(const DepotInfo& other);
 			bool				operator==(const DepotInfo& other) const;
 			bool				operator!=(const DepotInfo& other) const;
 
-			const BString&		Title() const
-									{ return fTitle; }
+			const BString&		Name() const
+									{ return fName; }
 
 			const PackageInfoList& PackageList() const
 									{ return fPackages; }
@@ -254,12 +254,12 @@ public:
 			bool				AddPackage(const PackageInfo& package);
 
 private:
-			BString				fTitle;
+			BString				fName;
 			PackageInfoList		fPackages;
 };
 
 
-typedef List<DepotInfo, false> DepotInfoList;
+typedef List<DepotInfo, false> DepotList;
 
 
 #endif // PACKAGE_INFO_H

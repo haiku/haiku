@@ -60,6 +60,32 @@ private:
 };
 
 
+class CategoryFilter : public PackageFilter {
+public:
+	CategoryFilter(const BString& category)
+		:
+		fCategory(category)
+	{
+	}
+	
+	virtual bool AcceptsPackage(const PackageInfo& package) const
+	{
+		const CategoryList& categories = package.Categories();
+		for (int i = categories.CountItems() - 1; i >= 0; i--) {
+			const CategoryRef& category = categories.ItemAtFast(i);
+			if (category.Get() == NULL)
+				continue;
+			if (category->Name() == fCategory)
+				return true;
+		}
+		return false;
+	}
+
+private:
+	BString		fCategory;
+};
+
+
 // #pragma mark - Model
 
 
@@ -135,5 +161,15 @@ bool
 Model::AddDepot(const DepotInfo& depot)
 {
 	return fDepots.Add(depot);
+}
+
+
+void
+Model::SetCategory(const BString& category)
+{
+	if (category.Length() == 0)
+		fCategoryFilter.SetTo(new AnyFilter(), true);
+	else
+		fCategoryFilter.SetTo(new CategoryFilter(category), true);
 }
 

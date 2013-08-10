@@ -33,6 +33,8 @@ MainWindow::MainWindow(BRect frame)
 		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
+	_InitDummyModel();
+
 	BMenuBar* menuBar = new BMenuBar(B_TRANSLATE("Main Menu"));
 	_BuildMenu(menuBar);
 	
@@ -59,7 +61,6 @@ MainWindow::MainWindow(BRect frame)
 	fSplitView->SetCollapsible(0, false);
 	fSplitView->SetCollapsible(1, false);
 
-	_InitDummyModel();
 	_AdoptModel();
 }
 
@@ -97,6 +98,16 @@ MainWindow::MessageReceived(BMessage* message)
 			} else {
 				_ClearPackage();
 			}
+			break;
+		}
+		
+		case MSG_CATEGORY_SELECTED:
+		{
+			BString name;
+			if (message->FindString("name", &name) != B_OK)
+				name = "";
+			fModel.SetCategory(name);
+			_AdoptModel();
 			break;
 		}
 		

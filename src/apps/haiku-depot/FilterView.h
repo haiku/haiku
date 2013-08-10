@@ -13,6 +13,13 @@ class BTextControl;
 class Model;
 
 
+enum {
+	MSG_CATEGORY_SELECTED		= 'ctsl',
+	MSG_DEPOT_SELECTED			= 'dpsl',
+	MSG_SEARCH_TERMS_MODIFIED	= 'stmd',
+};
+
+
 class FilterView : public BGroupView {
 public:
 								FilterView(const Model& model);

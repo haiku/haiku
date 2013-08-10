@@ -23,20 +23,14 @@
 #define B_TRANSLATION_CONTEXT "FilterView"
 
 
-enum {
-	MSG_CATEGORY_SELECTED		= 'ctsl',
-	MSG_REPOSITORY_SELECTED		= 'rpsl',
-	MSG_SEARCH_TERMS_MODIFIED	= 'stmd',
-};
-
-
 FilterView::FilterView(const Model& model)
 	:
 	BGroupView("filter view")
 {
 	// Contruct category popup
 	BPopUpMenu* categoryMenu = new BPopUpMenu(B_TRANSLATE("Show"));
-	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("All packages"), NULL));
+	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("All packages"),
+		new BMessage(MSG_CATEGORY_SELECTED)));
 	categoryMenu->AddItem(new BSeparatorItem());
 	
 	const CategoryList& categories = model.Categories();
@@ -68,8 +62,21 @@ FilterView::FilterView(const Model& model)
 
 	// Construct repository popup
 	BPopUpMenu* repositoryMenu = new BPopUpMenu(B_TRANSLATE("Depot"));
-	repositoryMenu->AddItem(new BMenuItem(B_TRANSLATE("All depots"), NULL));
+	repositoryMenu->AddItem(new BMenuItem(B_TRANSLATE("All depots"),
+		new BMessage(MSG_DEPOT_SELECTED)));
 	repositoryMenu->ItemAt(0)->SetMarked(true);
+
+	repositoryMenu->AddItem(new BSeparatorItem());
+
+	const DepotList& depots = model.Depots();
+	for (int i = 0; i < depots.CountItems(); i++) {
+		const DepotInfo& depot = depots.ItemAtFast(i);
+		BMessage* message = new BMessage(MSG_DEPOT_SELECTED);
+		message->AddString("name", depot.Name());
+		BMenuItem* item = new BMenuItem(depot.Name(), message);
+		repositoryMenu->AddItem(item);
+	}
+
 	fRepositoryField = new BMenuField("repository", B_TRANSLATE("Depot:"),
 		repositoryMenu);
 

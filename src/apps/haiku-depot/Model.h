@@ -28,6 +28,8 @@ public:
 			PackageInfoList		CreatePackageList() const;
 
 			bool				AddDepot(const DepotInfo& depot);
+			const DepotList&	Depots() const
+									{ return fDepots; }
 
 			// Access to global categories
 			const CategoryRef&	CategoryAudio() const
@@ -48,10 +50,13 @@ public:
 			const CategoryList&	Categories() const
 									{ return fCategories; }
 
+			// Configure PackageFilters
+			void				SetCategory(const BString& category);
+
 private:
 			BString				fSearchTerms;
 
-			DepotInfoList		fDepots;
+			DepotList			fDepots;
 
 			CategoryRef			fCategoryAudio;
 			CategoryRef			fCategoryVideo;

@@ -584,15 +584,15 @@ PackageInfo::AddScreenshot(const BitmapRef& screenshot)
 
 DepotInfo::DepotInfo()
 	:
-	fTitle(),
+	fName(),
 	fPackages()
 {
 }
 
 
-DepotInfo::DepotInfo(const BString& title)
+DepotInfo::DepotInfo(const BString& name)
 	:
-	fTitle(title),
+	fName(name),
 	fPackages()
 {
 }
@@ -600,7 +600,7 @@ DepotInfo::DepotInfo(const BString& title)
 
 DepotInfo::DepotInfo(const DepotInfo& other)
 	:
-	fTitle(other.fTitle),
+	fName(other.fName),
 	fPackages(other.fPackages)
 {
 }
@@ -609,7 +609,7 @@ DepotInfo::DepotInfo(const DepotInfo& other)
 DepotInfo&
 DepotInfo::operator=(const DepotInfo& other)
 {
-	fTitle = other.fTitle;
+	fName = other.fName;
 	fPackages = other.fPackages;
 	return *this;
 }
@@ -618,7 +618,7 @@ DepotInfo::operator=(const DepotInfo& other)
 bool
 DepotInfo::operator==(const DepotInfo& other) const
 {
-	return fTitle == other.fTitle
+	return fName == other.fName
 		&& fPackages == other.fPackages;
 }
 
