@@ -60,10 +60,10 @@ public:
 
 			// Configure PackageFilters
 			void				SetCategory(const BString& category);
+			void				SetDepot(const BString& depot);
+			void				SetSearchTerms(const BString& searchTerms);
 
 private:
-			BString				fSearchTerms;
-
 			DepotList			fDepots;
 
 			CategoryRef			fCategoryAudio;
@@ -86,7 +86,7 @@ private:
 			PackageList			fUpdateablePackages;
 
 			PackageFilterRef	fCategoryFilter;
-			PackageFilterRef	fDepotFilter;
+			BString				fDepotFilter;
 			PackageFilterRef	fSearchTermsFilter;
 };
 

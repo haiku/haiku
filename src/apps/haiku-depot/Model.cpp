@@ -126,12 +126,59 @@ private:
 };
 
 
+class SearchTermsFilter : public PackageFilter {
+public:
+	SearchTermsFilter(const BString& searchTerms)
+	{
+		// Separate the string into terms at spaces
+		int32 index = 0;
+		while (index < searchTerms.Length()) {
+			int32 nextSpace = searchTerms.FindFirst(" ", index);
+			if (nextSpace < 0)
+				nextSpace = searchTerms.Length();
+			if (nextSpace > index) {
+				BString term;
+				searchTerms.CopyInto(term, index, nextSpace - index);
+				term.ToLower();
+				fSearchTerms.Add(term);
+			}
+			index = nextSpace + 1;
+		}
+	}
+	
+	virtual bool AcceptsPackage(const PackageInfo& package) const
+	{
+		// Every search term must be found in one of the package texts
+		for (int32 i = fSearchTerms.CountItems() - 1; i >= 0; i--) {
+			const BString& term = fSearchTerms.ItemAtFast(i);
+			if (!_TextContains(package.Title(), term)
+				&& !_TextContains(package.Publisher().Name(), term)
+				&& !_TextContains(package.ShortDescription(), term)
+				/*&& !_TextContains(package.FullDescription(), term)*/) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+private:
+	bool _TextContains(BString text, const BString& string) const
+	{
+		text.ToLower();
+		int32 index = text.FindFirst(string);
+		return index >= 0;
+	}
+
+private:
+	List<BString, false>	fSearchTerms;
+};
+
+
 // #pragma mark - Model
 
 
 Model::Model()
 	:
-	fSearchTerms(),
 	fDepots(),
 
 	fCategoryAudio(new PackageCategory(
@@ -157,7 +204,7 @@ Model::Model()
 		B_TRANSLATE("Games"), "games"), true),
 
 	fCategoryFilter(PackageFilterRef(new AnyFilter(), true)),
-	fDepotFilter(PackageFilterRef(new AnyFilter(), true)),
+	fDepotFilter(""),
 	fSearchTermsFilter(PackageFilterRef(new AnyFilter(), true))
 {
 	// Don't forget to add new categories to this list:
@@ -208,12 +255,16 @@ Model::CreatePackageList() const
 	PackageList resultList;
 
 	for (int32 i = 0; i < fDepots.CountItems(); i++) {
-		const PackageList& packages = fDepots.ItemAtFast(i).Packages();
+		const DepotInfo& depot = fDepots.ItemAtFast(i);
+		
+		if (fDepotFilter.Length() > 0 && fDepotFilter != depot.Name())
+			continue;
+		
+		const PackageList& packages = depot.Packages();
 
 		for (int32 j = 0; j < packages.CountItems(); j++) {
 			const PackageInfo& package = packages.ItemAtFast(j);
 			if (fCategoryFilter->AcceptsPackage(package)
-				&& fDepotFilter->AcceptsPackage(package)
 				&& fSearchTermsFilter->AcceptsPackage(package)) {
 				resultList.Add(package);
 			}
@@ -263,6 +314,9 @@ Model::SetPackageState(const PackageInfo& package, PackageState state)
 }
 
 
+// #pragma mark - filters
+
+
 void
 Model::SetCategory(const BString& category)
 {
@@ -285,5 +339,26 @@ Model::SetCategory(const BString& category)
 		filter = new CategoryFilter(category);
 
 	fCategoryFilter.SetTo(filter, true);
+}
+
+
+void
+Model::SetDepot(const BString& depot)
+{
+	fDepotFilter = depot;
+}
+
+
+void
+Model::SetSearchTerms(const BString& searchTerms)
+{
+	PackageFilter* filter;
+	
+	if (searchTerms.Length() == 0)
+		filter = new AnyFilter();
+	else
+		filter = new SearchTermsFilter(searchTerms);
+
+	fSearchTermsFilter.SetTo(filter, true);
 }
 

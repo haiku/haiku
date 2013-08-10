@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2009-2013, Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef LIST_H

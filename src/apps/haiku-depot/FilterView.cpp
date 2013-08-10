@@ -112,8 +112,8 @@ FilterView::~FilterView()
 void
 FilterView::AttachedToWindow()
 {
-	fShowField->Menu()->SetTargetForItems(this);
-	fRepositoryField->Menu()->SetTargetForItems(this);
+	fShowField->Menu()->SetTargetForItems(Window());
+	fRepositoryField->Menu()->SetTargetForItems(Window());
 	fSearchTermsText->SetTarget(this);
 }
 
@@ -122,6 +122,14 @@ void
 FilterView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case MSG_SEARCH_TERMS_MODIFIED:
+		{
+			BMessage searchTerms(MSG_SEARCH_TERMS_MODIFIED);
+			searchTerms.AddString("search terms", fSearchTermsText->Text());
+			Window()->PostMessage(&searchTerms);
+			break;
+		}
+		
 		default:
 			BGroupView::MessageReceived(message);
 			break;

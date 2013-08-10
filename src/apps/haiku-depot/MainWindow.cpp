@@ -111,6 +111,26 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 		}
 		
+		case MSG_DEPOT_SELECTED:
+		{
+			BString name;
+			if (message->FindString("name", &name) != B_OK)
+				name = "";
+			fModel.SetDepot(name);
+			_AdoptModel();
+			break;
+		}
+		
+		case MSG_SEARCH_TERMS_MODIFIED:
+		{
+			// TODO: Do this with a delay!
+			BString searchTerms;
+			if (message->FindString("search terms", &searchTerms) != B_OK)
+				searchTerms = "";
+			fModel.SetSearchTerms(searchTerms);
+			_AdoptModel();
+		}
+		
 		default:
 			BWindow::MessageReceived(message);
 			break;
