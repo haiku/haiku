@@ -1,0 +1,11 @@
+if [ FIsBuildFeatureEnabled webpositive ] {
+	local architecture = $(TARGET_PACKAGING_ARCH) ;
+	local webpositivePackage = webpositive.hpkg ;
+	HaikuPackage $(webpositivePackage) ;
+
+	AddFilesToPackage apps : WebPositive ;
+	AddSymlinkToPackage data deskbar menu Applications
+		: ../../../../apps/WebPositive : WebPositive ;
+
+	BuildHaikuPackage $(webpositivePackage) : webpositive ;
+}

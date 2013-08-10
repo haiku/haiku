@@ -16,6 +16,7 @@ if $(HAIKU_BOOTSTRAP_BUILD) {
 
 local archDependentPackages =
 	HaikuCrossDevel
+	WebPositive
 	;
 
 local secondaryArchPackages =

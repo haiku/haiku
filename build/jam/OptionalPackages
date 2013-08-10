@@ -16,7 +16,6 @@
 #	NetFS					- the native networked file system components
 #	UserlandFS				- aids native file system development (like FUSE)
 #	WebPositive				- native, WebKit-based web browser
-#	WebPositiveBookmarks	- bookmarks for WebPositive
 #	Welcome					- introductory documentation to Haiku
 #	WifiFirmwareScriptData	- data files needed by install-wifi-firmwares.sh
 
@@ -26,7 +25,6 @@ OptionalPackageDependencies Development : DevelopmentBase ;
 OptionalPackageDependencies DevelopmentBase : DevelopmentMin ;
 OptionalPackageDependencies DevelopmentPowerPC : DevelopmentMin ;
 OptionalPackageDependencies NetFS : UserlandFS ;
-OptionalPackageDependencies WebPositive : WebPositiveBookmarks ;
 
 
 local baseURL = http://haiku-files.org/files/optional-packages ;
@@ -256,30 +254,18 @@ if [ IsOptionalHaikuImagePackageAdded UserlandFS ] {
 
 # WebPositive
 if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
-# TODO: Make this an actual package!
-# 	if $(TARGET_ARCH) != x86  && $(TARGET_ARCH) != x86_64 {
-# 		Echo "No optional package WebPositive available for $(TARGET_ARCH)" ;
-# 	} else if $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) < 4 {
-# 		Echo "No optional package WebPositive available for gcc2" ;
-# 	} else if $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) >= 4 {
-# 		# TODO: Either we build a separate package for WebPositive or we
-# 		# incorporate it in haiku.hpkg.
-# 		AddFilesToHaikuHybridImage apps : WebPositive ;
-# 		AddSymlinkToHaikuHybridImage
-# 			home config settings deskbar menu Applications
-# 			: /boot/common/apps/WebPositive ;
-# 	}
-#
-# AddHaikuImagePackages curl libxml2 sqlite webkit ;
-	# TODO: Should be properly declared requires in the webpositive package.
-}
-
-
-# WebPositiveBookmarks
-if [ IsOptionalHaikuImagePackageAdded WebPositiveBookmarks ] {
-	InstallOptionalHaikuImagePackage
-		$(baseURL)/WebPositiveBookmarks-2012-02-18.zip
-		: home config settings WebPositive ;
+	local architectureObject ;
+	for architectureObject in [ MultiArchSubDirSetup ] {
+		on $(architectureObject) {
+			if [ FIsBuildFeatureEnabled webpositive ] {
+				AddPackageFilesToHaikuImage system : webpositive.hpkg ;
+				InstallOptionalHaikuImagePackage
+					$(baseURL)/WebPositiveBookmarks-2012-02-18.zip
+					: home config settings WebPositive ;
+				break ;
+			}
+		}
+	}
 }
 
 
