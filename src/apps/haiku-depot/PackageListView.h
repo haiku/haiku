@@ -34,6 +34,10 @@ public:
 private:
 			PackageRow*			_FindRow(const PackageInfo& package,
 									PackageRow* parent = NULL);
+private:
+			class ItemCountView;
+			
+			ItemCountView*		fItemCountView;
 };
 
 #endif // PACKAGE_LIST_VIEW_H

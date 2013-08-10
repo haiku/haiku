@@ -9,6 +9,7 @@
 #include <stdio.h>
 
 #include <Catalog.h>
+#include <ScrollBar.h>
 #include <Window.h>
 
 
@@ -402,6 +403,85 @@ PackageRow::PackageRow(const PackageInfo& package)
 }
 
 
+// #pragma mark - ItemCountView
+
+
+class PackageListView::ItemCountView : public BView {
+public:
+	ItemCountView()
+		:
+		BView("item count view", B_WILL_DRAW),
+		fItemCount(0)
+	{
+		BFont font(be_plain_font);
+		font.SetSize(9.0f);
+		SetFont(&font);
+		
+		SetViewColor(B_TRANSPARENT_COLOR);
+		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	}
+	
+	virtual BSize MinSize()
+	{
+		BString label(_GetLabel());
+		return BSize(StringWidth(label) + 10, B_H_SCROLL_BAR_HEIGHT);
+	}
+
+	virtual BSize PreferredSize()
+	{
+		return MinSize();
+	}
+
+	virtual BSize MaxSize()
+	{
+		return MinSize();
+	}
+
+	virtual void Draw(BRect updateRect)
+	{
+		FillRect(updateRect, B_SOLID_LOW);
+		
+		BString label(_GetLabel());
+	
+		font_height fontHeight;
+		GetFontHeight(&fontHeight);
+		
+		BRect bounds(Bounds());
+		float width = StringWidth(label);
+		
+		BPoint offset;
+		offset.x = bounds.left + (bounds.Width() - width) / 2.0f;
+		offset.y = bounds.top + (bounds.Height()
+			- (fontHeight.ascent + fontHeight.descent)) / 2.0f
+			+ fontHeight.ascent;
+
+		DrawString(label, offset);
+	}
+
+	void SetItemCount(int32 count)
+	{
+		if (count == fItemCount)
+			return;
+		fItemCount = count;
+		InvalidateLayout();
+		Invalidate();
+	}
+
+private:
+	BString _GetLabel() const
+	{
+		BString label;
+		if (fItemCount == 1)
+			label = B_TRANSLATE("1 item");
+		else
+			label.SetToFormat(B_TRANSLATE("%ld items"), fItemCount);
+		return label;
+	}
+
+	int32		fItemCount;
+};
+
+
 // #pragma mark - PackageListView
 
 
@@ -421,6 +501,9 @@ PackageListView::PackageListView()
 		B_TRUNCATE_END), kStatusColumn);
 
 	SetSortingEnabled(true);
+	
+	fItemCountView = new ItemCountView();
+	AddStatusView(fItemCountView);
 }
 
 
@@ -481,6 +564,8 @@ PackageListView::AddPackage(const PackageInfo& package)
 
 	// make sure the row is initially expanded
 	ExpandOrCollapse(packageRow, true);
+
+	fItemCountView->SetItemCount(CountRows());
 }
 
 
