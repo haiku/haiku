@@ -1779,6 +1779,15 @@ BColumnListView::Draw(BRect updateRect)
 			verticalScrollBarFrame, horizontalScrollBarFrame,
 			base, fBorderStyle, flags);
 
+		if (fStatusView != NULL) {
+			rect = Bounds();
+			BRegion region(rect & fStatusView->Frame().InsetByCopy(-2, -2));
+			ConstrainClippingRegion(&region);
+			rect.bottom = fStatusView->Frame().top - 1;
+			be_control_look->DrawScrollViewFrame(this, rect, updateRect,
+				BRect(), BRect(), base, fBorderStyle, flags);
+		}
+
 		return;
 	}
 
@@ -1958,7 +1967,7 @@ BColumnListView::LayoutInvalidated(bool descendants)
 void
 BColumnListView::DoLayout()
 {
-	if (!(Flags() & B_SUPPORTS_LAYOUT))
+	if ((Flags() & B_SUPPORTS_LAYOUT) == 0)
 		return;
 
 	BRect titleRect;
@@ -1977,6 +1986,27 @@ BColumnListView::DoLayout()
 	fVerticalScrollBar->MoveTo(vScrollBarRect.LeftTop());
 	fVerticalScrollBar->ResizeTo(vScrollBarRect.Width(),
 		vScrollBarRect.Height());
+
+	if (fStatusView != NULL) {
+		BSize size = fStatusView->MinSize();
+		if (size.height > B_H_SCROLL_BAR_HEIGHT);
+			size.height = B_H_SCROLL_BAR_HEIGHT;
+		if (size.width > Bounds().Width() / 2)
+			size.width = floorf(Bounds().Width() / 2);
+
+		BPoint offset(hScrollBarRect.LeftTop());
+
+		if (fBorderStyle == B_PLAIN_BORDER) {
+			offset += BPoint(0, 1);
+		} else if (fBorderStyle == B_FANCY_BORDER) {
+			offset += BPoint(-1, 2);
+			size.height -= 1;
+		}
+
+		fStatusView->MoveTo(offset);
+		fStatusView->ResizeTo(size.width, size.height);
+		hScrollBarRect.left = offset.x + size.width + 1;
+	}
 
 	fHorizontalScrollBar->MoveTo(hScrollBarRect.LeftTop());
 	fHorizontalScrollBar->ResizeTo(hScrollBarRect.Width(),
