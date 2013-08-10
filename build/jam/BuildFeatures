@@ -31,7 +31,7 @@ if $(HAIKU_BUILD_FEATURE_SSL) {
 
 		EnableBuildFeatures openssl ;
 	} else {
-		Echo "SSL build feature not available for $(TARGET_ARCH)" ;
+		Echo "SSL build feature not available for $(TARGET_PACKAGING_ARCH)" ;
 	}
 }
 
@@ -58,7 +58,7 @@ if [ IsPackageAvailable icu_devel ] {
 
 	EnableBuildFeatures icu ;
 } else  {
-	Echo "ICU not available for $(TARGET_ARCH)" ;
+	Echo "ICU not available for $(TARGET_PACKAGING_ARCH)" ;
 }
 
 
@@ -79,7 +79,8 @@ HAIKU_CLUCENE_URL = $(baseURL)/$(HAIKU_CLUCENE_PACKAGE) ;
 
 if $(HAIKU_BUILD_FEATURE_CLUCENE) {
 	if $(TARGET_ARCH) != x86 {
-		Echo "CLucene build feature not available for $(TARGET_ARCH)" ;
+		Echo "CLucene build feature not available for"
+			"$(TARGET_PACKAGING_ARCH)" ;
 	} else {
 		# Download the zip archive.
 		local zipFile = [ DownloadFile $(HAIKU_CLUCENE_PACKAGE)
@@ -223,7 +224,7 @@ if $(TARGET_ARCH) = x86 {
 		Echo "LLVM not available on GCC2" ;
 	}
 } else {
-	Echo "LLVM not yet available on $(TARGET_ARCH)" ;
+	Echo "LLVM not yet available on $(TARGET_PACKAGING_ARCH)" ;
 }
 
 } # ! 1
@@ -242,7 +243,7 @@ if [ IsPackageAvailable glu_devel ] {
 
 	EnableBuildFeatures glu ;
 } else {
-	Echo "GLU not yet available on $(TARGET_ARCH)" ;
+	Echo "GLU not yet available on $(TARGET_PACKAGING_ARCH)" ;
 }
 
 
@@ -272,7 +273,7 @@ if [ IsPackageAvailable mesa_devel ] {
 
 	EnableBuildFeatures mesa ;
 } else {
-	Echo "Mesa 3D rendering support not available on $(TARGET_ARCH)" ;
+	Echo "Mesa 3D rendering support not available on $(TARGET_PACKAGING_ARCH)" ;
 }
 
 
@@ -300,7 +301,7 @@ if [ IsPackageAvailable ffmpeg_devel ] {
 		EnableBuildFeatures $(feature) ;
 	}
 } else {
-	Echo "FFMpeg support not available on $(TARGET_ARCH)" ;
+	Echo "FFMpeg support not available on $(TARGET_PACKAGING_ARCH)" ;
 }
 
 
@@ -317,7 +318,7 @@ if [ IsPackageAvailable freetype_devel ] {
 
 	EnableBuildFeatures freetype ;
 } else {
-	Echo "Freetype support not available on $(TARGET_ARCH)" ;
+	Echo "Freetype support not available on $(TARGET_PACKAGING_ARCH)" ;
 }
 
 
@@ -337,7 +338,7 @@ HAIKU_TAGLIB_URL = $(baseURL)/$(HAIKU_TAGLIB_PACKAGE) ;
 
 if $(HAIKU_BUILD_FEATURE_TAGLIB) {
 	if $(TARGET_ARCH) != x86 {
-		Echo "TagLib build feature not available for $(TARGET_ARCH)" ;
+		Echo "TagLib build feature not available for $(TARGET_PACKAGING_ARCH)" ;
 	} else {
 		# Download the zip archive.
 		local zipFile = [ DownloadFile $(HAIKU_TAGLIB_PACKAGE)
@@ -440,7 +441,7 @@ if [ IsPackageAvailable libpng_devel ] {
 
 	EnableBuildFeatures libpng ;
 } else {
-	Echo "libpng support not available on $(TARGET_ARCH)" ;
+	Echo "libpng support not available on $(TARGET_PACKAGING_ARCH)" ;
 }
 
 
@@ -457,7 +458,7 @@ if [ IsPackageAvailable jpeg_devel ] {
 
 	EnableBuildFeatures jpeg ;
 } else {
-	Echo "jpeg support not available on $(TARGET_ARCH)" ;
+	Echo "jpeg support not available on $(TARGET_PACKAGING_ARCH)" ;
 }
 
 
@@ -479,7 +480,7 @@ if [ IsPackageAvailable zlib_devel ] {
 
 	EnableBuildFeatures zlib ;
 } else {
-	Echo "zlib support not available on $(TARGET_ARCH)" ;
+	Echo "zlib support not available on $(TARGET_PACKAGING_ARCH)" ;
 }
 
 
@@ -503,7 +504,7 @@ if [ IsPackageAvailable libsolv_devel ] {
 
 	EnableBuildFeatures libsolv ;
 } else {
-	Echo "libsolv package not available for $(TARGET_ARCH)" ;
+	Echo "libsolv package not available for $(TARGET_PACKAGING_ARCH)" ;
 }
 
 
