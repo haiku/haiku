@@ -126,6 +126,8 @@ RemotePackageRepository HaikuPorts
 	gettext_x86_libintl-0.18.1.1-5
 	glu_x86-9.0.0-2
 	glu_x86_devel-9.0.0-2
+	haikuwebkit_x86-1.1.3_2013_08_09-1
+	haikuwebkit_x86_devel-1.1.3_2013_08_09-1
 	icu_x86-4.8.1.1-4
 	icu_x86_devel-4.8.1.1-4
 	jpeg_x86-9-3
@@ -156,6 +158,7 @@ RemotePackageRepository HaikuPorts
 	speex_x86_devel-1.2~rc1-2
 	sqlite_x86-3.7.13-4
 	sqlite_x86_devel-3.7.13-4
+	xz_utils_x86-5.0.4-1
 	zlib_x86-1.2.8-3
 	zlib_x86_devel-1.2.8-3
 	:
@@ -184,6 +187,7 @@ RemotePackageRepository HaikuPorts
 	gperf
 	grep
 	groff
+	haikuwebkit_x86
 	htmldoc
 	icu
 	jam
@@ -229,6 +233,7 @@ RemotePackageRepository HaikuPorts
 	vision
 	wpa_supplicant
 	yasm
+	xz_utils_x86
 	zlib
 	:
 	# debuginfo packages
