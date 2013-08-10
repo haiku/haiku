@@ -61,6 +61,19 @@ rule DefineDefaultBuildProfiles
 				xz_utils
 				;
 
+			# secondary architectures
+			local architectureObject ;
+			for architectureObject
+					in [ MultiArchSubDirSetup $(HAIKU_PACKAGING_ARCHS[2-]) ] {
+				on $(architectureObject) {
+					AddHaikuImagePackages
+						openssl
+						:
+						system
+						;
+				}
+			}
+
 			AddOptionalHaikuImagePackages BeBook Development Git WebPositive
 				Welcome ;
 		}

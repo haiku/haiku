@@ -13,12 +13,26 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 # Include packages that are required by all images.
 if ! $(HAIKU_BOOTSTRAP_BUILD) {
+	# primary architecture
 	AddHaikuImagePackages
 		bzip2 ctags ffmpeg freetype glu grep icu jpeg libpng libsolv mesa sed
 		tar zlib
 		:
 		system
 		;
+
+	# secondary architectures
+	local architectureObject ;
+	for architectureObject
+			in [ MultiArchSubDirSetup $(HAIKU_PACKAGING_ARCHS[2-]) ] {
+		on $(architectureObject) {
+			AddHaikuImagePackages
+				ffmpeg freetype glu icu jpeg libpng libsolv mesa zlib
+				:
+				system
+				;
+		}
+	}
 }
 
 # If enabled, make sure that OpenSSL is added to the image.
