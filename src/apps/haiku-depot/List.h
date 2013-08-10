@@ -142,6 +142,12 @@ public:
 		fCount--;
 	}
 
+	inline void Remove(const ItemType& item)
+	{
+		Remove(IndexOf(item));
+		
+	}
+
 	inline const ItemType& ItemAt(int32 index) const
 	{
 		if (index >= (int32)fCount)
@@ -157,6 +163,20 @@ public:
 	inline const ItemType& LastItem() const
 	{
 		return ItemAt((int32)fCount - 1);
+	}
+
+	inline int32 IndexOf(const ItemType& item) const
+	{
+		for (uint32 i = 0; i < fCount; i++) {
+			if (ItemAtFast(i) == item)
+				return i;
+		}
+		return -1;
+	}
+
+	inline bool Contains(const ItemType& item) const
+	{
+		return IndexOf(item) >= 0;
 	}
 
 private:
