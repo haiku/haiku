@@ -50,6 +50,11 @@ rule PreprocessPackageInfo source : directory : architecture
 		defines += HAIKU_SECONDARY_PACKAGING_ARCH=$(secondaryArchitecture) ;
 		sedReplacements
 			+= %HAIKU_SECONDARY_PACKAGING_ARCH%,$(secondaryArchitecture) ;
+		sedReplacements +=
+			%HAIKU_SECONDARY_PACKAGING_ARCH_SUFFIX%,_$(secondaryArchitecture) ;
+	} else {
+		sedReplacements
+			+= %HAIKU_SECONDARY_PACKAGING_ARCH_SUFFIX%, ;
 	}
 
 	MakeLocate $(target) : $(directory) ;
