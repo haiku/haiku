@@ -1,0 +1,87 @@
+/*
+ * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
+ */
+
+#include "TextView.h"
+
+
+TextView::TextView(const char* name)
+	:
+	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
+{
+}
+
+
+TextView::~TextView()
+{
+}
+
+
+void
+TextView::Draw(BRect updateRect)
+{
+	FillRect(updateRect, B_SOLID_LOW);
+	fTextLayout.Draw(this, B_ORIGIN);
+}
+
+
+void
+TextView::FrameResized(float width, float height)
+{
+	fTextLayout.SetWidth(width);
+}
+
+
+BSize
+TextView::MinSize()
+{
+	return BSize(fTextLayout.Width(), fTextLayout.Height());
+}
+
+
+BSize
+TextView::MaxSize()
+{
+	return MinSize();
+}
+
+
+BSize
+TextView::PreferredSize()
+{
+	return MinSize();
+}
+
+
+bool
+TextView::HasHeightForWidth()
+{
+	return true;
+}
+
+
+void
+TextView::GetHeightForWidth(float width, float* min,
+	float* max, float* preferred)
+{
+	TextLayout layout(fTextLayout);
+	layout.SetWidth(width);
+
+	float height = layout.Height();
+
+	if (min != NULL)
+		*min = height;
+	if (max != NULL)
+		*max = height;
+	if (preferred != NULL)
+		*preferred = height;
+}
+
+
+void
+TextView::SetText(const BString& text)
+{
+	fTextLayout.SetText(text);
+}
+

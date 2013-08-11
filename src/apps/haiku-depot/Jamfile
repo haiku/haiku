@@ -2,6 +2,16 @@ SubDir HAIKU_TOP src apps haiku-depot ;
 
 UsePrivateHeaders interface shared ;
 
+# source directories
+local sourceDirs =
+	textview
+;
+
+local sourceDir ;
+for sourceDir in $(sourceDirs) {
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps haiku-depot $(sourceDir) ] ;
+}
+
 Application HaikuDepot :
 	App.cpp
 	FilterView.cpp
@@ -13,6 +23,10 @@ Application HaikuDepot :
 	PackageListView.cpp
 	PackageManager.cpp
 	support.cpp
+
+	TextLayout.cpp
+	TextView.cpp
+	
 	: be translation libcolumnlistview.a libshared.a $(TARGET_LIBSUPC++)
 		$(HAIKU_LOCALE_LIBS)
 	: HaikuDepot.rdef
