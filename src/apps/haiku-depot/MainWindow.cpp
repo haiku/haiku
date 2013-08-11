@@ -182,6 +182,7 @@ MainWindow::_InitDummyModel()
 	
 	DepotInfo depot(B_TRANSLATE("Default"));
 
+	// WonderBrush
 	PackageInfo wonderbrush(
 		BitmapRef(new SharedBitmap(601), true),
 		"WonderBrush",
@@ -211,6 +212,7 @@ MainWindow::_InitDummyModel()
 	
 	depot.AddPackage(wonderbrush);
 
+	// Paladin
 	PackageInfo paladin(
 		BitmapRef(new SharedBitmap(602), true),
 		"Paladin",
@@ -242,11 +244,90 @@ MainWindow::_InitDummyModel()
 		"en", "1.1.0")
 	);
 	paladin.AddScreenshot(
-		BitmapRef(new SharedBitmap(604), true));
+		BitmapRef(new SharedBitmap(605), true));
 	paladin.AddCategory(fModel.CategoryDevelopment());
 
 	depot.AddPackage(paladin);
 
+	// Sequitur
+	PackageInfo sequitur(
+		BitmapRef(new SharedBitmap(604), true),
+		"Sequitur",
+		"2.1.0",
+		PublisherInfo(
+			BitmapRef(),
+			"Angry Red Planet",
+			"hackborn@angryredplanet.com",
+			"http://www.angryredplanet.com"),
+		"BeOS-native MIDI sequencer.",
+		"Sequitur is a BeOS-native MIDI sequencer with a MIDI processing "
+		"add-on architecture. It allows you to record, compose, store, "
+		"and play back music from your computer. Sequitur is designed for "
+		"people who like to tinker with their music. It facilitates rapid, "
+		"dynamic, and radical processing of your performance.",
+		"2.1.0 - 04 August 2002.\n\n"
+		" * Important fix to file IO that prevents data corruption.\n\n"
+		" * Dissolve filter could cause crash when operating on notes "
+		"with extremely short durations. (thanks to David Shipman)\n\n"
+		" * New tool bar ARP Curves (select Tool Bars->Show->ARP Curves "
+		"in a track window) contains new tools for shaping events. Each "
+		"tool is documented in the Tool Guide, but in general they are "
+		"used to shape control change, pitch bend, tempo and velocity "
+		"events (and notes if you're feeling creative), and the curve "
+		"can be altered by pressing the 'z' and 'x' keys.\n\n"
+		"All curve tools make use of a new tool seed for drawing "
+		"bezier curves; see section 6.3.2. of the user's guide for an "
+		"explanation of the Curve seed.\n\n"
+		" * New menu items in the Song window: Edit->Expand Marked Range "
+		"and Edit->Contract Marked Range. These items are only active if "
+		"the loop markers are on. The Expand command shifts everything "
+		"from the left marker to the end of the song over by the total "
+		"loop range. The Contract command deletes the area within the "
+		"loop markers, then shifts everything after the right marker "
+		"left by the total loop range. If no tracks are selected, the "
+		"entire song is shifted. Otherwise, only the selected tracks are "
+		"affected.\n\n"
+		" * System exclusive commands can now be added to devices. There "
+		"is no user interface for doing so, although developer tools are "
+		"provided here. Currently, the E-mu Proteus 2000 and E-mu EOS "
+		"devices include sysex commands for controlling the FX.\n\n"
+		" * A new page has been added to the Preferences window, Views. "
+		"This page lets you set the height for the various views in "
+		"Sequitur, such as pitch bend, control change, etc.\n\n"
+		" * Multiple instances of the same MIDI device are given unique "
+		"names. For example, two instances of SynC Modular will be "
+		"named \"SynC Modular 1\" and \"SynC Modular 2\" so they can be "
+		"accessed independently. (thanks to David Shipman)\n\n"
+		" * In the track window, holding down the CTRL key now accesses "
+		"an alternate set of active tools. (Assign these tools by "
+		"holding down the CTRL key and clicking on the desired tool)\n\n"
+		" * Right mouse button can now be mapped to any tool. (thanks "
+		"to David Shipman)\n\n"
+		" * The Vaccine.P and Vaccine.V filters have been deprecated "
+		"(although they are still available here). They are replaced by "
+		"the Vaccine filter. In addition to injecting a motion into the "
+		"pitch and velocity of notes, this new filter can inject it "
+		"into control change, pitch bend, tempo change and channel "
+		"pressure events. The new tool Broken Down Line uses this "
+		"filter.\n\n"
+		" * Note to filter developers: The filter API has changed. You "
+		"will need to recompile your filters.");
+	sequitur.AddUserRating(
+		UserRating(UserInfo("pete"), 4.5f,
+		"I can weave a web of sound!", "en", "2.1.0")
+	);
+	sequitur.AddUserRating(
+		UserRating(UserInfo("stippi"), 3.5f,
+		"It seems very capable. Still runs fine on Haiku. The interface "
+		"is composed of many small, hard to click items. But you can "
+		"configure a tool for each mouse button, which is great for the "
+		"work flow.", "en", "2.1.0")
+	);
+	sequitur.AddCategory(fModel.CategoryAudio());
+	
+	depot.AddPackage(sequitur);
+
+	// Finish off
 	fModel.AddDepot(depot);
 
 	fModel.SetPackageState(wonderbrush, UNINSTALLED);
