@@ -107,7 +107,7 @@ rule DefineDefaultBuildProfiles
 		case "bootstrap-*" : {
 			Echo Building Haiku Bootstrap ;
 			HAIKU_IMAGE_HOST_NAME = shredder ;
-			HAIKU_IMAGE_SIZE = 1000 ;
+			HAIKU_IMAGE_SIZE = 4000 ;
 
 			AddHaikuImagePackages
 				freetype
