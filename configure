@@ -75,6 +75,14 @@ options:
   --target=TARGET             Select build target platform.
                               [default=${TARGET_PLATFORM}]
                               valid targets=r5,bone,dano,haiku
+  --target-arch <arch>        Haiku only: Specify the target architecture to
+                              build for. Must be one of the architectures of the
+                              host system. The installed build tools for that
+                              architecture will be used.
+                              This option can be specified multiple times. The
+                              first occurrence specifies the primary
+                              architecture of the Haiku to build, subsequent
+                              ones the secondary architectures.
   --update                    re-runs last configure invocation [must be given
                               as first option!]
   --use-gcc-pipe              Build with GCC option -pipe. Speeds up the build
@@ -409,6 +417,17 @@ get_build_tool_path()
 	eval "$var=$path"
 }
 
+is_in_list()
+{
+	local element
+	for element in $2; do
+		if [ "$1" = "$element" ]; then
+			return 0
+		fi
+	done
+	return 1
+}
+
 # get cwd and the source directory
 currentDir=`pwd`
 cd `dirname "$0"`
@@ -428,6 +447,7 @@ buildCrossToolsScript="$sourceDir/build/scripts/build_cross_tools"
 buildCrossToolsJobs=
 useGccGraphiteDefault=0
 unknownArchIndex=1
+haikuTargetArchs=
 
 # exported (BuildSetup) default parameter values
 #
@@ -467,9 +487,18 @@ else
 	exit 1
 fi
 
-haikuRequiredLegacyGCCVersion="2.95.3-haiku-2013_07_15"
+haikuRequiredLegacyGCCVersion="2.95.3-haiku-2013_08_12"
 export haikuRequiredLegacyGCCVersion
 	# version of legacy gcc required to build haiku
+supportedTargetArchs="
+	arm
+	m68k
+	mipsel
+	ppc
+	x86
+	x86_64
+	x86_gcc2
+	"
 
 # determine output directory
 if [ "$currentDir" = "$sourceDir" ]; then
@@ -570,6 +599,20 @@ while [ $# -gt 0 ] ; do
 		--include-3rdparty)	HAIKU_INCLUDE_3RDPARTY=1; shift 1;;
         -j*)				buildCrossToolsJobs="$1"; shift 1;;
 		--target=*)     TARGET_PLATFORM=`echo $1 | cut -d'=' -f2-`; shift 1;;
+		--target-arch)
+			assertparam "$1" $#
+			targetArch=$2
+			shift 2
+			if [ ! "$platform" = Haiku ]; then
+				echo "--target-arch can only be specified on Haiku." >&2
+				exit 1
+			fi
+			is_in_list "$targetArch" "$supportedTargetArchs" || (
+				echo "Unsupported target architecture: \"$targetArch\"" >&2
+				exit 1
+			)
+			haikuTargetArchs="$haikuTargetArchs $targetArch"
+			;;
 		--use-gcc-pipe)	HAIKU_USE_GCC_PIPE=1; shift 1;;
 		--use-gcc-graphite)	useGccGraphiteDefault=1; shift 1;;
 		--use-32bit)	HAIKU_HOST_USE_32BIT=1; shift 1;;
@@ -637,9 +680,24 @@ else
 	fi
 	HAIKU_PACKAGING_ARCHS=
 
+	# On Haiku determine target architectures and tools automatically.
 	if [ -z "$targetArchs" ]; then
-		targetArch=x86_gcc2
+		if [ $HOST_PLATFORM != haiku_host ]; then
+			echo "Please specify the build tools to use or build (via" \
+				"--cross-tools-prefix or --build-cross-tools) or specify a"
+				"host-only build (--host-only)." >&2
+			exit 1
+		fi
+
+		# determine primary architecture
+		targetArch=`package list -i /system/packages/haiku.hpkg \
+			| sed '/^\s*architecture:/!d; s,^\s*architecture:\s*,,'`
+		is_in_list "$targetArch" "$supportedTargetArchs" || (
+			echo "Unsupported target architecture: \"$targetArch\"" >&2
+			exit 1
+		)
 		targetArchs=$targetArch
+
 		set_default_value HAIKU_AR_$targetArch			ar
 		set_default_value HAIKU_CC_$targetArch			gcc
 		set_default_value HAIKU_LD_$targetArch			ld
@@ -647,6 +705,33 @@ else
 		set_default_value HAIKU_RANLIB_$targetArch		ranlib
 		set_default_value HAIKU_ELFEDIT_$targetArch		elfedit
 		set_default_value HAIKU_STRIP_$targetArch		strip
+
+		# determine secondary architectures
+		for targetArch in $supportedTargetArchs; do
+			if [ -e /system/packages/haiku_$targetArch.hpkg ]; then
+				targetArchs="$targetArchs $targetArch"
+				set_default_value HAIKU_AR_$targetArch		ar-$targetArch
+				set_default_value HAIKU_CC_$targetArch		gcc-$targetArch
+				set_default_value HAIKU_LD_$targetArch		ld-$targetArch
+				set_default_value HAIKU_OBJCOPY_$targetArch	objcopy-$targetArch
+				set_default_value HAIKU_RANLIB_$targetArch	ranlib-$targetArch
+				set_default_value HAIKU_ELFEDIT_$targetArch	elfedit-$targetArch
+				set_default_value HAIKU_STRIP_$targetArch	strip-$targetArch
+			fi
+		done
+
+		# The target architectures might have been specified explicitly.
+		if [ -n "$haikuTargetArchs" ]; then
+			for targetArch in $haikuTargetArchs; do
+				is_in_list "$targetArch" "$targetArchs" || (
+					echo "Unsupported target architecture: \"$targetArch\"." \
+						"Only native architectures of the host platform can" \
+						"be specified." >&2
+					exit 1
+				)
+			done
+			targetArchs="$haikuTargetArchs"
+		fi
 	fi
 
 	isPrimaryArch=1
