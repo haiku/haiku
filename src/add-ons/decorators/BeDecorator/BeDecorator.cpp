@@ -856,8 +856,8 @@ BeDecorator::_GetBitmapForButton(Decorator::Tab* tab, Component item,
 			// big rect
 
 			BRect zoomRect = rect;
-			zoomRect.left += 3.0;
-			zoomRect.top += 3.0;
+			zoomRect.left += floorf(width * 3.0f / 14.0f);
+			zoomRect.top += floorf(height * 3.0f / 14.0f);
 
 			_DrawBlendedRect(sBitmapDrawingEngine, zoomRect, tab->zoomPressed,
 				buttonColorLight2, buttonColorLight1, buttonColor,
@@ -869,8 +869,8 @@ BeDecorator::_GetBitmapForButton(Decorator::Tab* tab, Component item,
 			// small rect
 
 			zoomRect = rect;
-			zoomRect.right -= 5.0;
-			zoomRect.bottom -= 5.0;
+			zoomRect.right -= floorf(width * 5.0f / 14.0f);
+			zoomRect.bottom -= floorf(height * 5.0f / 14.0f);
 
 			_DrawBlendedRect(sBitmapDrawingEngine, zoomRect, tab->zoomPressed,
 				buttonColorLight2, buttonColorLight1, buttonColor,
