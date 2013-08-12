@@ -96,15 +96,25 @@ if [ IsOptionalHaikuImagePackageAdded Development ] {
 	AddHaikuImagePackages autoconf automake libtool perl texinfo ;
 
 	# devel packages for mandatory packages
-	AddHaikuImagePackages ffmpeg_devel freetype_devel glu_devel jpeg_devel
-		libpng_devel zlib_devel : system ;
+	local architectureObject ;
+	for architectureObject in [ MultiArchSubDirSetup ] {
+		on $(architectureObject) {
+			AddHaikuImagePackages ffmpeg_devel freetype_devel glu_devel
+				jpeg_devel libpng_devel zlib_devel : system ;
+		}
+	}
 }
 
 
 # DevelopmentBase
 if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ] {
-	# gcc and binutils
-	AddHaikuImagePackages binutils gcc ;
+	# gcc and binutils (for all target architectures)
+	local architectureObject ;
+	for architectureObject in [ MultiArchSubDirSetup ] {
+		on $(architectureObject) {
+			AddHaikuImagePackages binutils gcc ;
+		}
+	}
 
 	# other commonly used tools
 	AddHaikuImagePackages bison cdrtools flex jam m4 make mkdepend yasm ;
