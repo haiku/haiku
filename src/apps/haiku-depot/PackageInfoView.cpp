@@ -22,6 +22,7 @@
 #include <StringView.h>
 
 #include "PackageManager.h"
+#include "TextView.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -733,12 +734,11 @@ public:
 		fPackageVersionView->SetFont(&versionFont);
 		fPackageVersionView->SetHighColor(kLightBlack);
 	
-		fTextView = new BTextView("rating text");
+		fTextView = new TextView("rating text");
 		fTextView->SetViewColor(ViewColor());
-		fTextView->MakeEditable(false);
 		fTextView->SetText(rating.Comment());
-		const float textInset = be_plain_font->Size();
-		fTextView->SetInsets(0.0f, floorf(textInset / 2), textInset, 0.0f);
+//		const float textInset = be_plain_font->Size();
+//		fTextView->SetInsets(0.0f, floorf(textInset / 2), textInset, 0.0f);
 
 		BLayoutBuilder::Group<>(this)
 			.Add(fAvatarView, 0.2f)
@@ -763,7 +763,7 @@ private:
 	RatingView*		fRatingView;
 	BStringView*	fRatingLabelView;
 	BStringView*	fPackageVersionView;
-	BTextView*		fTextView;
+	TextView*		fTextView;
 };
 
 

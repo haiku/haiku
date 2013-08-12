@@ -25,6 +25,7 @@ Application HaikuDepot :
 	support.cpp
 
 	TextLayout.cpp
+	TextStyle.cpp
 	TextView.cpp
 	
 	: be translation libcolumnlistview.a libshared.a $(TARGET_LIBSUPC++)

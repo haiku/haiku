@@ -34,4 +34,4 @@ private:
 			TextLayout			fTextLayout;
 };
 
-#endif // FILTER_VIEW_H
+#endif // TEXT_VIEW_H

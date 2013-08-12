@@ -36,21 +36,21 @@ TextView::FrameResized(float width, float height)
 BSize
 TextView::MinSize()
 {
-	return BSize(fTextLayout.Width(), fTextLayout.Height());
+	return BSize(0.0f, 0.0f);
 }
 
 
 BSize
 TextView::MaxSize()
 {
-	return MinSize();
+	return BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED);
 }
 
 
 BSize
 TextView::PreferredSize()
 {
-	return MinSize();
+	return BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED);
 }
 
 
@@ -62,8 +62,8 @@ TextView::HasHeightForWidth()
 
 
 void
-TextView::GetHeightForWidth(float width, float* min,
-	float* max, float* preferred)
+TextView::GetHeightForWidth(float width, float* min, float* max,
+	float* preferred)
 {
 	TextLayout layout(fTextLayout);
 	layout.SetWidth(width);

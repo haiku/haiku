@@ -9,6 +9,9 @@
 #include <Referenceable.h>
 #include <String.h>
 
+#include "GlyphInfo.h"
+#include "LineInfo.h"
+
 
 class BView;
 
@@ -27,6 +30,18 @@ public:
 			const BFont&		Font() const
 									{ return fDefaultFont; }
 
+			void				SetGlyphSpacing(float glyphSpacing);
+			float				GlyphSpacing() const
+									{ return fGlyphSpacing; }
+
+			void				SetFirstLineInset(float inset);
+			float				FirstLineInset() const
+									{ return fFirstLineInset; }
+
+			void				SetLineInset(float inset);
+			float				LineInset() const
+									{ return fLineInset; }
+
 			void				SetWidth(float width);
 			float				Width() const
 									{ return fWidth; }
@@ -35,19 +50,32 @@ public:
 			void				Draw(BView* view, const BPoint& offset);
 
 private:
-			bool				_ValidateLayout();
-
+			void				_ValidateLayout();
+			void				_Layout();
+			void				_GetGlyphAdvance(int offset,
+									float& advanceX, float& advanceY,
+									float escapementArray[]) const;
+			
+			void				_FinalizeLine(int lineStart, int lineEnd,
+									int lineIndex, float y, float& lineHeight);
 private:
-			class Layout;
-			friend class Layout;
-
 			BString				fText;
 
 			BFont				fDefaultFont;
+			float				fAscent;
+			float				fDescent;
 			float				fWidth;
+			float				fGlyphSpacing;
+			float				fFirstLineInset;
+			float				fLineInset;
+			float				fLineSpacing;
 			
 			bool				fLayoutValid;
-			Layout*				fLayout;
+
+			GlyphInfo*			fGlyphInfoBuffer;
+			int					fGlyphInfoCount;
+			LineInfoList		fLineInfos;
+
 };
 
 #endif // FILTER_VIEW_H
