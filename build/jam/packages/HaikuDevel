@@ -42,11 +42,6 @@ AddFilesToPackage develop lib : libposix_error_mapper.a ;
 
 # ABI independent stuff
 
-# scripts: setgcc
-local scripts = setgcc ;
-SEARCH on $(scripts) = [ FDirName $(HAIKU_TOP) data bin ] ;
-AddFilesToPackage bin : $(scripts) ;
-
 # headers
 AddHeaderDirectoryToPackage config ;
 AddHeaderDirectoryToPackage glibc ;
