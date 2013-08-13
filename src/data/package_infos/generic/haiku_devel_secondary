@@ -14,9 +14,9 @@ copyrights		"2001-2013 Haiku, Inc. et al"
 licenses		"MIT"
 
 provides {
-	haiku_%HAIKU_SECONDARY_PACKAGING_ARCH%_devel = R1~alpha4_pm-1
+	haiku_%HAIKU_SECONDARY_PACKAGING_ARCH%_devel = R1~alpha4_pm-1 compat >= R1~alpha1
 }
 
 requires {
-	haiku_%HAIKU_SECONDARY_PACKAGING_ARCH% == R1~alpha4_pm-1
+	haiku_%HAIKU_SECONDARY_PACKAGING_ARCH% == R1~alpha4_pm-1 base
 }
