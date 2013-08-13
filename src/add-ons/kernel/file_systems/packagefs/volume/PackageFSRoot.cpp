@@ -249,7 +249,8 @@ PackageFSRoot::_AddPackage(Package* package)
 	for (ResolvableList::ConstIterator it
 				= package->Resolvables().GetIterator();
 			Resolvable* resolvable = it.Next();) {
-		TRACE_DEPENDENCIES("  adding resolvable \"%s\"\n", resolvable->Name());
+		TRACE_DEPENDENCIES("  adding resolvable \"%s\"\n",
+			resolvable->Name().Data());
 
 		if (ResolvableFamily* family
 				= fResolvables.Lookup(resolvable->Name())) {
@@ -274,7 +275,8 @@ PackageFSRoot::_AddPackage(Package* package)
 	for (DependencyList::ConstIterator it
 				= package->Dependencies().GetIterator();
 			Dependency* dependency = it.Next();) {
-		TRACE_DEPENDENCIES("  adding dependency \"%s\"\n", dependency->Name());
+		TRACE_DEPENDENCIES("  adding dependency \"%s\"\n",
+			dependency->Name().Data());
 
 		if (DependencyFamily* family
 				= fDependencies.Lookup(dependency->Name())) {
@@ -314,7 +316,7 @@ PackageFSRoot::_RemovePackage(Package* package)
 			Dependency* dependency = it.Next();) {
 		if (DependencyFamily* family = dependency->Family()) {
 			TRACE_DEPENDENCIES("  removing dependency \"%s\"\n",
-				dependency->Name());
+				dependency->Name().Data());
 
 			if (family->IsLastDependency(dependency)) {
 				fDependencies.Remove(family);
@@ -336,7 +338,7 @@ PackageFSRoot::_RemovePackage(Package* package)
 			Resolvable* resolvable = it.Next();) {
 		if (ResolvableFamily* family = resolvable->Family()) {
 			TRACE_DEPENDENCIES("  removing resolvable \"%s\"\n",
-				resolvable->Name());
+				resolvable->Name().Data());
 
 			if (family->IsLastResolvable(resolvable)) {
 				fResolvables.Remove(family);
@@ -378,16 +380,23 @@ PackageFSRoot::_ResolveDependencies(ResolvableDependencyList& dependencies)
 void
 PackageFSRoot::_ResolveDependency(Dependency* dependency)
 {
-	TRACE_DEPENDENCIES("  resolving dependency \"%s\"\n", dependency->Name());
+	TRACE_DEPENDENCIES("  resolving dependency \"%s\" (package \"%s\")\n",
+		dependency->Name().Data(), dependency->Package()->Name().Data());
 
 	// get the resolvable family for the dependency
 	ResolvableFamily* resolvableFamily
 		= fResolvables.Lookup(dependency->Name());
-	if (resolvableFamily == NULL)
+	if (resolvableFamily == NULL) {
+		TRACE_DEPENDENCIES("    -> dependency \"%s\" unresolved\n",
+			dependency->Name().Data());
 		return;
+	}
 
 	// let the family resolve the dependency
-	resolvableFamily->ResolveDependency(dependency);
+	if (!resolvableFamily->ResolveDependency(dependency)) {
+		TRACE_DEPENDENCIES("    -> dependency \"%s\" unresolved (version "
+			"mismatch)\n", dependency->Name().Data());
+	}
 }
 
 
