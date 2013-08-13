@@ -147,6 +147,18 @@ else
 fi
 
 
+is_in_list()
+{
+	local element
+	for element in $2; do
+		if [ "$1" = "$element" ]; then
+			return 0
+		fi
+	done
+	return 1
+}
+
+
 extractFile()
 {
 	# extractFile <archive> <directory> <extractedSubDir>
@@ -277,6 +289,18 @@ if [ -n "$resolvePackageDependencies" ]; then
 		downloadFile $packageUrl "$packageFilePath"
 		$cp "${sPrefix}$packageFilePath" "${tPrefix}system/packages"
 		systemPackages="$systemPackages $packageFilePath"
+	done
+
+	# Remove packages from the list for common, that are already in the package
+	# list for system.
+	unfilteredCommonPackages="$commonPackages"
+	commonPackages=
+	for packageFile in $unfilteredCommonPackages; do
+		if is_in_list "$packageFile" "$systemPackages"; then
+			:
+		else
+			commonPackages="$commonPackages $packageFile"
+		fi
 	done
 
 	# additional packages for common
