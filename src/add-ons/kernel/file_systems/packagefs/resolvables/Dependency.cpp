@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <AutoDeleter.h>
+
 #include "Version.h"
 
 
@@ -18,6 +20,7 @@ Dependency::Dependency(::Package* package)
 	fFamily(NULL),
 	fResolvable(NULL),
 	fName(),
+	fFileName(),
 	fVersion(NULL),
 	fVersionOperator(B_PACKAGE_RESOLVABLE_OP_EQUAL)
 {
@@ -35,6 +38,26 @@ Dependency::Init(const char* name)
 {
 	if (!fName.SetTo(name))
 		return B_NO_MEMORY;
+
+	// If the name contains a ':', replace it with '~' in the file name. We do
+	// that so that a path containing the symlink can be used in colon-separated
+	// search paths.
+	if (strchr(name, ':') != NULL) {
+		char* fileName = strdup(name);
+		if (fileName == NULL)
+			return B_NO_MEMORY;
+		MemoryDeleter fileNameDeleter(fileName);
+
+		char* remainder = fileName;
+		while (char* colon = strchr(remainder, ':')) {
+			*colon = '~';
+			remainder = colon + 1;
+		}
+
+		if (!fFileName.SetTo(fileName))
+			return B_NO_MEMORY;
+	} else
+		fFileName = fName;
 
 	return B_OK;
 }

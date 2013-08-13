@@ -208,7 +208,7 @@ PackageLinkDirectory::_UpdateDependencies(PackageLinksListener* listener)
 		Package* resolvablePackage = resolvable != NULL
 			? resolvable->Package() : NULL;
 
-		Node* node = FindChild(dependency->Name());
+		Node* node = FindChild(dependency->FileName());
 		if (node != NULL) {
 			// link already exists -- update
 			DependencyLink* link = static_cast<DependencyLink*>(node);
@@ -222,7 +222,7 @@ PackageLinkDirectory::_UpdateDependencies(PackageLinksListener* listener)
 			if (link == NULL)
 				return B_NO_MEMORY;
 
-			status_t error = link->Init(this, dependency->Name());
+			status_t error = link->Init(this, dependency->FileName());
 			if (error != B_OK) {
 				delete link;
 				RETURN_ERROR(error);

@@ -54,13 +54,16 @@ public:
 			bool				ResolvableCompatibleVersionMatches(
 									Version* resolvableVersion) const;
 
-			const String&		Name() const	{ return fName; }
+			const String&		Name() const		{ return fName; }
+			const String&		FileName() const	{ return fFileName; }
 
 private:
 			::Package*			fPackage;
 			DependencyFamily*	fFamily;
 			::Resolvable*		fResolvable;
 			String				fName;
+			String				fFileName;
+									// fName with ':' replaced by '~'
 			Version*			fVersion;
 			BPackageResolvableOperator fVersionOperator;
 
