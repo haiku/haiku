@@ -1,7 +1,7 @@
-/* 
-** Copyright 2001, Manuel J. Petit. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+/*
+ * Copyright 2001, Manuel J. Petit. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 #include <sys/types.h>
 #include <string.h>
@@ -10,14 +10,13 @@
 char *
 strrchr(char const *s, int c)
 {
-	char const *last = c ? 0 : s;
+	char const *last = NULL;
 
-
-	while (*s) {
-		if (*s == c)
+	for (;; s++) {
+		if (*s == (char)c)
 			last = s;
-
-		s += 1;
+		if (*s == '\0')
+			break;
 	}
 
 	return (char *)last;
