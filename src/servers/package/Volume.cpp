@@ -1721,8 +1721,8 @@ packagesToActivate.size(), packagesToDeactivate.size());
 		fChangeCount++;
 	}
 
-	for (PackageSet::iterator it = fPackagesToBeDeactivated.begin();
-		it != fPackagesToBeDeactivated.end(); ++it) {
+	for (PackageSet::iterator it = packagesToDeactivate.begin();
+		it != packagesToDeactivate.end(); ++it) {
 		Package* package = *it;
 		_RemovePackage(package);
 		delete package;
