@@ -404,6 +404,7 @@ Decorator::Title(int32 tab) const
 	Decorator::Tab* decoratorTab = fTabList.ItemAt(tab);
 	if (decoratorTab == NULL)
 		return "";
+
 	return decoratorTab->title;
 }
 
