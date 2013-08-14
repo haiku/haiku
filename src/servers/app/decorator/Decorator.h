@@ -22,219 +22,269 @@
 
 class DesktopSettings;
 class DrawingEngine;
+class ServerBitmap;
 class ServerFont;
 class BRegion;
 
 
 class Decorator {
 public:
-			class Tab {
-			public:
-								Tab();
-				virtual			~Tab() {}
+	struct Tab {
+							Tab();
+		virtual				~Tab() {}
 
-				BRect			zoomRect;
-				BRect			closeRect;
-				BRect			minimizeRect;
-				BRect			tabRect;
+		BRect				tabRect;
 
-				bool			closePressed : 1;
-				bool			zoomPressed : 1;
-				bool			minimizePressed : 1;
+		BRect				zoomRect;
+		BRect				closeRect;
+		BRect				minimizeRect;
 
-				window_look		look;
-				uint32			flags;
-				bool			isFocused : 1;
+		bool				closePressed : 1;
+		bool				zoomPressed : 1;
+		bool				minimizePressed : 1;
 
-				BString			title;
-			};
+		window_look			look;
+		uint32				flags;
+		bool				isFocused : 1;
 
-			enum Region {
-				REGION_NONE,
+		BString				title;
 
-				REGION_TAB,
+		uint32				tabOffset;
+		float				tabLocation;
+		float				textOffset;
 
-				REGION_CLOSE_BUTTON,
-				REGION_ZOOM_BUTTON,
-				REGION_MINIMIZE_BUTTON,
+		BString				truncatedTitle;
+		int32				truncatedTitleLength;
 
-				REGION_LEFT_BORDER,
-				REGION_RIGHT_BORDER,
-				REGION_TOP_BORDER,
-				REGION_BOTTOM_BORDER,
+		bool				buttonFocus : 1;
 
-				REGION_LEFT_TOP_CORNER,
-				REGION_LEFT_BOTTOM_CORNER,
-				REGION_RIGHT_TOP_CORNER,
-				REGION_RIGHT_BOTTOM_CORNER,
+		bool				isHighlighted : 1;
 
-				REGION_COUNT
-			};
+		float				minTabSize;
+		float				maxTabSize;
 
-			enum {
-				HIGHLIGHT_NONE,
-				HIGHLIGHT_RESIZE_BORDER,
+		ServerBitmap*		closeBitmaps[4];
+		ServerBitmap*		minimizeBitmaps[4];
+		ServerBitmap*		zoomBitmaps[4];
+	};
 
-				HIGHLIGHT_USER_DEFINED
-			};
+	enum Region {
+		REGION_NONE,
 
-public:
-							Decorator(DesktopSettings& settings, BRect rect);
-	virtual					~Decorator();
+		REGION_TAB,
 
-	virtual	Decorator::Tab*	AddTab(DesktopSettings& settings, const char* title,
-								window_look look, uint32 flags,
-								int32 index = -1, BRegion* updateRegion = NULL);
-	virtual	bool			RemoveTab(int32 index,
-								BRegion* updateRegion = NULL);
-	virtual	bool			MoveTab(int32 from, int32 to, bool isMoving,
-								BRegion* updateRegion = NULL);
-	virtual int32			TabAt(const BPoint& where) const;
-			Decorator::Tab*	TabAt(int32 index) const
-								{ return fTabList.ItemAt(index); }
-			int32			CountTabs() const
-								{ return fTabList.CountItems(); }
-			void			SetTopTab(int32 tab);
+		REGION_CLOSE_BUTTON,
+		REGION_ZOOM_BUTTON,
+		REGION_MINIMIZE_BUTTON,
 
-			void			SetDrawingEngine(DrawingEngine *driver);
-	inline	DrawingEngine*	GetDrawingEngine() const
-								{ return fDrawingEngine; }
+		REGION_LEFT_BORDER,
+		REGION_RIGHT_BORDER,
+		REGION_TOP_BORDER,
+		REGION_BOTTOM_BORDER,
 
-			void			FontsChanged(DesktopSettings& settings,
-								BRegion* updateRegion = NULL);
-			void			SetLook(int32 tab, DesktopSettings& settings,
-								window_look look, BRegion* updateRegion = NULL);
-			void			SetFlags(int32 tab, uint32 flags,
-								BRegion* updateRegion = NULL);
+		REGION_LEFT_TOP_CORNER,
+		REGION_LEFT_BOTTOM_CORNER,
+		REGION_RIGHT_TOP_CORNER,
+		REGION_RIGHT_BOTTOM_CORNER,
 
-			window_look		Look(int32 tab) const;
-			uint32			Flags(int32 tab) const;
+		REGION_COUNT
+	};
 
-			BRect			BorderRect() const;
-			BRect			TitleBarRect() const;
-			BRect			TabRect(int32 tab) const;
-			BRect			TabRect(Decorator::Tab* tab) const;
+	enum {
+		HIGHLIGHT_NONE,
+		HIGHLIGHT_RESIZE_BORDER,
 
-			void			SetClose(int32 tab, bool pressed);
-			void			SetMinimize(int32 tab, bool pressed);
-			void			SetZoom(int32 tab, bool pressed);
+		HIGHLIGHT_USER_DEFINED
+	};
 
-			const char*		Title(int32 tab) const;
-			const char*		Title(Decorator::Tab* tab) const;
-			void			SetTitle(int32 tab, const char* string,
-								BRegion* updateRegion = NULL);
+								Decorator(DesktopSettings& settings,
+									BRect frame);
+	virtual						~Decorator();
 
-			void			SetFocus(int32 tab, bool focussed);
-			bool			IsFocus(int32 tab) const;
-			bool			IsFocus(Decorator::Tab* tab) const;
+	virtual	Decorator::Tab*		AddTab(DesktopSettings& settings,
+									const char* title, window_look look,
+									uint32 flags, int32 index = -1,
+									BRegion* updateRegion = NULL);
+	virtual	bool				RemoveTab(int32 index,
+									BRegion* updateRegion = NULL);
+	virtual	bool				MoveTab(int32 from, int32 to, bool isMoving,
+									BRegion* updateRegion = NULL);
 
-			/*! \return true if tab location updated, false if out of bounds
-			or unsupported */
-			bool			SetTabLocation(int32 tab, float location,
-								bool isShifting, BRegion* updateRegion = NULL);
-	virtual	float			TabLocation(int32 tab) const
-								{ return 0.0; }
+	virtual int32				TabAt(const BPoint& where) const;
+			Decorator::Tab*		TabAt(int32 index) const
+									{ return fTabList.ItemAt(index); }
+			int32				CountTabs() const
+									{ return fTabList.CountItems(); }
+			void				SetTopTab(int32 tab);
 
-	virtual	Region			RegionAt(BPoint where, int32& tab) const;
+			void				SetDrawingEngine(DrawingEngine *driver);
+	inline	DrawingEngine*		GetDrawingEngine() const
+									{ return fDrawingEngine; }
 
-	virtual	void			GetSizeLimits(int32* minWidth, int32* minHeight,
-								int32* maxWidth, int32* maxHeight) const;
+			void				FontsChanged(DesktopSettings& settings,
+									BRegion* updateRegion = NULL);
+			void				SetLook(int32 tab, DesktopSettings& settings,
+									window_look look,
+									BRegion* updateRegion = NULL);
+			void				SetFlags(int32 tab, uint32 flags,
+									BRegion* updateRegion = NULL);
 
-			const BRegion&	GetFootprint();
+			window_look			Look(int32 tab) const;
+			uint32				Flags(int32 tab) const;
 
-			void			MoveBy(float x, float y);
-			void			MoveBy(BPoint offset);
-			void			ResizeBy(float x, float y, BRegion* dirty);
-			void			ResizeBy(BPoint offset, BRegion* dirty);
+			BRect				BorderRect() const;
+			BRect				TitleBarRect() const;
+			BRect				TabRect(int32 tab) const;
+			BRect				TabRect(Decorator::Tab* tab) const;
 
-	virtual	bool			SetRegionHighlight(Region region, uint8 highlight,
-								BRegion* dirty, int32 tab = -1);
-	inline	uint8			RegionHighlight(Region region,
-								int32 tab = -1) const;
+			void				SetClose(int32 tab, bool pressed);
+			void				SetMinimize(int32 tab, bool pressed);
+			void				SetZoom(int32 tab, bool pressed);
 
-			bool			SetSettings(const BMessage& settings,
-								BRegion* updateRegion = NULL);
-	virtual	bool			GetSettings(BMessage* settings) const;
+			const char*			Title(int32 tab) const;
+			const char*			Title(Decorator::Tab* tab) const;
+			void				SetTitle(int32 tab, const char* string,
+									BRegion* updateRegion = NULL);
 
-	virtual	void			Draw(BRect updateRect);
-	virtual	void			Draw();
-	virtual	void			DrawClose(int32 tab);
-	virtual	void			DrawMinimize(int32 tab);
-	virtual	void			DrawTab(int32 tab);
-	virtual	void			DrawTitle(int32 tab);
-	virtual	void			DrawZoom(int32 tab);
-	virtual	void			DrawFrame();
+			void				SetFocus(int32 tab, bool focussed);
+			bool				IsFocus(int32 tab) const;
+			bool				IsFocus(Decorator::Tab* tab) const;
 
-			rgb_color		UIColor(color_which which);
+	virtual	float				TabLocation(int32 tab) const;
+			bool				SetTabLocation(int32 tab, float location,
+									bool isShifting,
+									BRegion* updateRegion = NULL);
+				/*! \return true if tab location updated, false if out of
+					bounds or unsupported */
 
-	virtual	void			ExtendDirtyRegion(Region region, BRegion& dirty);
+	virtual	Region				RegionAt(BPoint where, int32& tab) const;
+
+			const BRegion&		GetFootprint();
+
+			void				MoveBy(float x, float y);
+			void				MoveBy(BPoint offset);
+			void				ResizeBy(float x, float y, BRegion* dirty);
+			void				ResizeBy(BPoint offset, BRegion* dirty);
+
+	virtual	bool				SetRegionHighlight(Region region,
+									uint8 highlight, BRegion* dirty,
+									int32 tab = -1);
+	inline	uint8				RegionHighlight(Region region,
+									int32 tab = -1) const;
+
+			bool				SetSettings(const BMessage& settings,
+									BRegion* updateRegion = NULL);
+	virtual	bool				GetSettings(BMessage* settings) const;
+
+	virtual	void				GetSizeLimits(int32* minWidth, int32* minHeight,
+									int32* maxWidth, int32* maxHeight) const;
+	virtual	void				ExtendDirtyRegion(Region region, BRegion& dirty);
+
+	virtual	void				Draw(BRect updateRect) = 0;
+	virtual	void				Draw() = 0;
+
+	virtual	void				DrawTab(int32 tab);
+	virtual	void				DrawTitle(int32 tab);
+
+	virtual	void				DrawClose(int32 tab);
+	virtual	void				DrawMinimize(int32 tab);
+	virtual	void				DrawZoom(int32 tab);
+
+			rgb_color			UIColor(color_which which);
+
+			float				BorderWidth();
+			float				TabHeight();
 
 protected:
-	virtual	void			_DoLayout();
+	virtual	Decorator::Tab*		_AllocateNewTab();
 
-	virtual	void			_DrawFrame(BRect rect);
+	virtual	void				_DoLayout() = 0;
+		//! method for calculating layout for the decorator
 
-	virtual	void			_DrawTabs(BRect rect);
-	virtual	void			_DrawTab(Decorator::Tab* tab, BRect rect);
-	virtual	void			_DrawTitle(Decorator::Tab* tab, BRect rect);
-	//! direct means drawing without double buffering
-	virtual	void			_DrawClose(Decorator::Tab* tab, bool direct,
-								BRect rect);
-	virtual	void			_DrawZoom(Decorator::Tab* tab, bool direct,
-								BRect rect);
-	virtual	void			_DrawMinimize(Decorator::Tab* tab, bool direct,
-								BRect rect);
+	virtual	void				_DrawFrame(BRect rect) = 0;
+	virtual	void				_DrawTabs(BRect rect);
 
-	virtual	Decorator::Tab*	_AllocateNewTab() = 0;
+	virtual	void				_DrawTab(Decorator::Tab* tab, BRect rect) = 0;
+	virtual	void				_DrawTitle(Decorator::Tab* tab,
+									BRect rect) = 0;
 
-	virtual	void			_SetTitle(Decorator::Tab* tab, const char* string,
-								BRegion* updateRegion = NULL) = 0;
-			int32			_TitleWidth(Decorator::Tab* tab) const
-								{ return tab->title.CountChars(); }
+	virtual	void				_DrawButtons(Decorator::Tab* tab,
+									const BRect& invalid) = 0;
+	virtual	void				_DrawClose(Decorator::Tab* tab, bool direct,
+									BRect rect) = 0;
+	virtual	void				_DrawMinimize(Decorator::Tab* tab, bool direct,
+									BRect rect) = 0;
+	virtual	void				_DrawZoom(Decorator::Tab* tab, bool direct,
+									BRect rect) = 0;
 
-	virtual	bool			_SetTabLocation(Decorator::Tab* tab, float location,
-								bool isShifting, BRegion* updateRegion = NULL);
-	virtual	void			_SetFocus(Decorator::Tab* tab);
+	virtual	void				_SetTitle(Decorator::Tab* tab,
+									const char* string,
+									BRegion* updateRegion = NULL) = 0;
+			int32				_TitleWidth(Decorator::Tab* tab) const
+									{ return tab->title.CountChars(); }
 
-	virtual void			_FontsChanged(DesktopSettings& settings,
-								BRegion* updateRegion = NULL);
-	virtual void			_SetLook(Decorator::Tab* tab, DesktopSettings& settings,
-								window_look look, BRegion* updateRegion = NULL);
-	virtual void			_SetFlags(Decorator::Tab* tab, uint32 flags,
-								BRegion* updateRegion = NULL);
+	virtual	void				_SetFocus(Decorator::Tab* tab);
+	virtual	bool				_SetTabLocation(Decorator::Tab* tab,
+									float location, bool isShifting,
+									BRegion* updateRegion = NULL);
 
-	virtual void			_MoveBy(BPoint offset);
-	virtual	void			_ResizeBy(BPoint offset, BRegion* dirty) = 0;
+	virtual	Decorator::Tab*		_TabAt(int32 index) const;
 
-	virtual bool			_SetSettings(const BMessage& settings,
-								BRegion* updateRegion = NULL);
+	virtual void				_FontsChanged(DesktopSettings& settings,
+									BRegion* updateRegion = NULL);
+	virtual	void				_UpdateFont(DesktopSettings& settings) = 0;
 
-	virtual	bool			_AddTab(DesktopSettings& settings,
-								int32 index = -1,
-								BRegion* updateRegion = NULL) = 0;
-	virtual	bool			_RemoveTab(int32 index,
-								BRegion* updateRegion = NULL) = 0;
-	virtual	bool			_MoveTab(int32 from, int32 to, bool isMoving,
-								BRegion* updateRegion = NULL) = 0;
+	virtual void				_SetLook(Decorator::Tab* tab,
+									DesktopSettings& settings,
+									window_look look,
+									BRegion* updateRegion = NULL);
+	virtual void				_SetFlags(Decorator::Tab* tab, uint32 flags,
+									BRegion* updateRegion = NULL);
 
-	virtual	void			_GetFootprint(BRegion *region);
-			void			_InvalidateFootprint();
+	virtual void				_MoveBy(BPoint offset);
+	virtual	void				_ResizeBy(BPoint offset, BRegion* dirty) = 0;
 
-			DrawingEngine*	fDrawingEngine;
-			DrawState		fDrawState;
+	virtual bool				_SetSettings(const BMessage& settings,
+									BRegion* updateRegion = NULL);
 
-			BRect			fTitleBarRect;
-			BRect			fFrame;
-			BRect			fResizeRect;
-			BRect			fBorderRect;
+	virtual	bool				_AddTab(DesktopSettings& settings,
+									int32 index = -1,
+									BRegion* updateRegion = NULL) = 0;
+	virtual	bool				_RemoveTab(int32 index,
+									BRegion* updateRegion = NULL) = 0;
+	virtual	bool				_MoveTab(int32 from, int32 to, bool isMoving,
+									BRegion* updateRegion = NULL) = 0;
 
-			Decorator::Tab*	fTopTab;
+	virtual	void				_GetFootprint(BRegion *region);
+			void				_InvalidateFootprint();
+
+			void 				_InvalidateBitmaps();
+
+			DrawingEngine*		fDrawingEngine;
+			DrawState			fDrawState;
+
+			// Individual rects for handling window frame
+			// rendering the proper way
+			BRect				fTitleBarRect;
+			BRect				fFrame;
+			BRect				fResizeRect;
+			BRect				fBorderRect;
+
+			BRect				fLeftBorder;
+			BRect				fTopBorder;
+			BRect				fBottomBorder;
+			BRect				fRightBorder;
+
+			int32				fBorderWidth;
+
+			Decorator::Tab*		fTopTab;
 			BObjectList<Decorator::Tab>	fTabList;
-private:
-			BRegion			fFootprint;
-			bool			fFootprintValid : 1;
 
-			uint8			fRegionHighlights[REGION_COUNT - 1];
+private:
+			BRegion				fFootprint;
+			bool				fFootprintValid : 1;
+
+			uint8				fRegionHighlights[REGION_COUNT - 1];
 };
 
 

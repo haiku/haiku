@@ -91,36 +91,7 @@ DefaultDecorator::~DefaultDecorator()
 }
 
 
-// #pragma mark -
-
-
-void
-DefaultDecorator::Draw(BRect updateRect)
-{
-	STRACE(("DefaultDecorator: Draw(%.1f,%.1f,%.1f,%.1f)\n",
-		updateRect.left, updateRect.top, updateRect.right, updateRect.bottom));
-
-	// We need to draw a few things: the tab, the resize knob, the borders,
-	// and the buttons
-	fDrawingEngine->SetDrawState(&fDrawState);
-
-	_DrawFrame(updateRect);
-	_DrawTabs(updateRect);
-}
-
-
-void
-DefaultDecorator::Draw()
-{
-	STRACE(("DefaultDecorator: Draw()"));
-
-	// Easy way to draw everything - no worries about drawing only certain
-	// things
-	fDrawingEngine->SetDrawState(&fDrawState);
-
-	_DrawFrame(BRect(fTopBorder.LeftTop(), fBottomBorder.RightBottom()));
-	_DrawTabs(fTitleBarRect);
-}
+// #pragma mark - Public methods
 
 
 /*!	Returns the frame colors for the specified decorator component.
@@ -136,7 +107,7 @@ void
 DefaultDecorator::GetComponentColors(Component component, uint8 highlight,
 	ComponentColors _colors, Decorator::Tab* _tab)
 {
-	TabDecorator::Tab* tab = static_cast<TabDecorator::Tab*>(_tab);
+	Decorator::Tab* tab = static_cast<Decorator::Tab*>(_tab);
 	switch (component) {
 		case COMPONENT_TAB:
 			if (tab && tab->buttonFocus) {
@@ -214,10 +185,10 @@ DefaultDecorator::GetComponentColors(Component component, uint8 highlight,
 
 
 void
-DefaultDecorator::_DrawFrame(BRect invalid)
+DefaultDecorator::_DrawFrame(BRect rect)
 {
-	STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
-		invalid.right, invalid.bottom));
+	STRACE(("_DrawFrame(%f,%f,%f,%f)\n", rect.left, rect.top,
+		rect.right, rect.bottom));
 
 	// NOTE: the DrawingEngine needs to be locked for the entire
 	// time for the clipping to stay valid for this decorator
@@ -225,7 +196,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 	if (fTopTab->look == B_NO_BORDER_WINDOW_LOOK)
 		return;
 
-	if (BorderWidth() <= 0)
+	if (fBorderWidth <= 0)
 		return;
 
 	// Draw the border frame
@@ -236,7 +207,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 		case B_MODAL_WINDOW_LOOK:
 		{
 			// top
-			if (invalid.Intersects(fTopBorder)) {
+			if (rect.Intersects(fTopBorder)) {
 				ComponentColors colors;
 				_GetComponentColors(COMPONENT_TOP_BORDER, colors, fTopTab);
 
@@ -256,7 +227,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 				}
 			}
 			// left
-			if (invalid.Intersects(fLeftBorder.InsetByCopy(0, -BorderWidth()))) {
+			if (rect.Intersects(fLeftBorder.InsetByCopy(0, -fBorderWidth))) {
 				ComponentColors colors;
 				_GetComponentColors(COMPONENT_LEFT_BORDER, colors, fTopTab);
 
@@ -266,7 +237,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 				}
 			}
 			// bottom
-			if (invalid.Intersects(fBottomBorder)) {
+			if (rect.Intersects(fBottomBorder)) {
 				ComponentColors colors;
 				_GetComponentColors(COMPONENT_BOTTOM_BORDER, colors, fTopTab);
 
@@ -277,7 +248,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 				}
 			}
 			// right
-			if (invalid.Intersects(fRightBorder.InsetByCopy(0, -BorderWidth()))) {
+			if (rect.Intersects(fRightBorder.InsetByCopy(0, -fBorderWidth))) {
 				ComponentColors colors;
 				_GetComponentColors(COMPONENT_RIGHT_BORDER, colors, fTopTab);
 
@@ -294,7 +265,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 		case kLeftTitledWindowLook:
 		{
 			// top
-			if (invalid.Intersects(fTopBorder)) {
+			if (rect.Intersects(fTopBorder)) {
 				ComponentColors colors;
 				_GetComponentColors(COMPONENT_TOP_BORDER, colors, fTopTab);
 
@@ -313,7 +284,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 				}
 			}
 			// left
-			if (invalid.Intersects(fLeftBorder.InsetByCopy(0, -BorderWidth()))) {
+			if (rect.Intersects(fLeftBorder.InsetByCopy(0, -fBorderWidth))) {
 				ComponentColors colors;
 				_GetComponentColors(COMPONENT_LEFT_BORDER, colors, fTopTab);
 
@@ -333,7 +304,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 				}
 			}
 			// bottom
-			if (invalid.Intersects(fBottomBorder)) {
+			if (rect.Intersects(fBottomBorder)) {
 				ComponentColors colors;
 				_GetComponentColors(COMPONENT_BOTTOM_BORDER, colors, fTopTab);
 
@@ -344,7 +315,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 				}
 			}
 			// right
-			if (invalid.Intersects(fRightBorder.InsetByCopy(0, -BorderWidth()))) {
+			if (rect.Intersects(fRightBorder.InsetByCopy(0, -fBorderWidth))) {
 				ComponentColors colors;
 				_GetComponentColors(COMPONENT_RIGHT_BORDER, colors, fTopTab);
 
@@ -382,7 +353,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 		switch ((int)fTopTab->look) {
 			case B_DOCUMENT_WINDOW_LOOK:
 			{
-				if (!invalid.Intersects(r))
+				if (!rect.Intersects(r))
 					break;
 
 				float x = r.right - 3;
@@ -428,7 +399,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 			case B_MODAL_WINDOW_LOOK:
 			case kLeftTitledWindowLook:
 			{
-				if (!invalid.Intersects(BRect(fRightBorder.right - kBorderResizeLength,
+				if (!rect.Intersects(BRect(fRightBorder.right - kBorderResizeLength,
 					fBottomBorder.bottom - kBorderResizeLength, fRightBorder.right - 1,
 					fBottomBorder.bottom - 1)))
 					break;
@@ -452,6 +423,14 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 }
 
 
+/*!	\brief Actually draws the tab
+
+	This function is called when the tab itself needs drawn. Other items,
+	like the window title or buttons, should not be drawn here.
+
+	\param tab The \a tab to update.
+	\param rect The area of the \a tab to update.
+*/
 void
 DefaultDecorator::_DrawTab(Decorator::Tab* tab, BRect invalid)
 {
@@ -522,17 +501,27 @@ DefaultDecorator::_DrawTab(Decorator::Tab* tab, BRect invalid)
 
 	_DrawTitle(tab, tabRect);
 
-	DrawButtons(tab, invalid);
+	_DrawButtons(tab, invalid);
 }
 
 
+/*!	\brief Actually draws the title
+
+	The main tasks for this function are to ensure that the decorator draws
+	the title only in its own area and drawing the title itself.
+	Using B_OP_COPY for drawing the title is recommended because of the marked
+	performance hit of the other drawing modes, but it is not a requirement.
+
+	\param tab The \a tab to update.
+	\param rect area of the title to update.
+*/
 void
 DefaultDecorator::_DrawTitle(Decorator::Tab* _tab, BRect rect)
 {
 	STRACE(("_DrawTitle(%f,%f,%f,%f)\n", rect.left, rect.top, rect.right,
 		rect.bottom));
 
-	TabDecorator::Tab* tab = static_cast<TabDecorator::Tab*>(_tab);
+	Decorator::Tab* tab = static_cast<Decorator::Tab*>(_tab);
 
 	const BRect& tabRect = tab->tabRect;
 	const BRect& closeRect = tab->closeRect;
@@ -571,13 +560,22 @@ DefaultDecorator::_DrawTitle(Decorator::Tab* _tab, BRect rect)
 }
 
 
+/*!	\brief Actually draws the close button
+
+	Unless a subclass has a particularly large button, it is probably
+	unnecessary to check the update rectangle.
+
+	\param _tab The \a tab to update.
+	\param direct Draw without double buffering.
+	\param rect The area of the button to update.
+*/
 void
 DefaultDecorator::_DrawClose(Decorator::Tab* _tab, bool direct, BRect rect)
 {
 	STRACE(("_DrawClose(%f,%f,%f,%f)\n", rect.left, rect.top, rect.right,
 		rect.bottom));
 
-	TabDecorator::Tab* tab = static_cast<TabDecorator::Tab*>(_tab);
+	Decorator::Tab* tab = static_cast<Decorator::Tab*>(_tab);
 
 	int32 index = (tab->buttonFocus ? 0 : 1) + (tab->closePressed ? 0 : 2);
 	ServerBitmap* bitmap = tab->closeBitmaps[index];
@@ -591,6 +589,15 @@ DefaultDecorator::_DrawClose(Decorator::Tab* _tab, bool direct, BRect rect)
 }
 
 
+/*!	\brief Actually draws the zoom button
+
+	Unless a subclass has a particularly large button, it is probably
+	unnecessary to check the update rectangle.
+
+	\param _tab The \a tab to update.
+	\param direct Draw without double buffering.
+	\param rect The area of the button to update.
+*/
 void
 DefaultDecorator::_DrawZoom(Decorator::Tab* _tab, bool direct, BRect rect)
 {
@@ -600,7 +607,7 @@ DefaultDecorator::_DrawZoom(Decorator::Tab* _tab, bool direct, BRect rect)
 	if (rect.IntegerWidth() < 1)
 		return;
 
-	TabDecorator::Tab* tab = static_cast<TabDecorator::Tab*>(_tab);
+	Decorator::Tab* tab = static_cast<Decorator::Tab*>(_tab);
 	int32 index = (tab->buttonFocus ? 0 : 1) + (tab->zoomPressed ? 0 : 2);
 	ServerBitmap* bitmap = tab->zoomBitmaps[index];
 	if (bitmap == NULL) {
@@ -610,6 +617,13 @@ DefaultDecorator::_DrawZoom(Decorator::Tab* _tab, bool direct, BRect rect)
 	}
 
 	_DrawButtonBitmap(bitmap, direct, rect);
+}
+
+
+void
+DefaultDecorator::_DrawMinimize(Decorator::Tab* tab, bool direct, BRect rect)
+{
+	// This decorator doesn't have this button
 }
 
 

@@ -28,21 +28,21 @@ public:
 									BRect frame);
 	virtual						~DefaultDecorator();
 
-	virtual	void				Draw(BRect updateRect);
-	virtual	void				Draw();
-
 	virtual	void				GetComponentColors(Component component,
 									uint8 highlight, ComponentColors _colors,
 									Decorator::Tab* tab = NULL);
 
 protected:
-	virtual	void				_DrawFrame(BRect r);
+	virtual	void				_DrawFrame(BRect rect);
+
 	virtual	void				_DrawTab(Decorator::Tab* tab, BRect r);
 	virtual	void				_DrawTitle(Decorator::Tab* tab, BRect r);
 	virtual	void				_DrawClose(Decorator::Tab* tab, bool direct,
-									BRect r);
+									BRect rect);
 	virtual	void				_DrawZoom(Decorator::Tab* tab, bool direct,
-									BRect r);
+									BRect rect);
+	virtual	void				_DrawMinimize(Decorator::Tab* tab, bool direct,
+									BRect rect);
 
 private:
  			void				_DrawButtonBitmap(ServerBitmap* bitmap,

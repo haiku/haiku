@@ -21,33 +21,10 @@
 
 
 class Desktop;
-class ServerBitmap;
 
 
 class TabDecorator: public Decorator {
 public:
-	class Tab : public TabDecorator::Tab {
-	public:
-								Tab();
-
-			uint32				tabOffset;
-			float				tabLocation;
-			float				textOffset;
-
-			BString				truncatedTitle;
-			int32				truncatedTitleLength;
-
-			bool				buttonFocus : 1;
-
-			bool				isHighlighted : 1;
-
-			float				minTabSize;
-			float				maxTabSize;
-
-			ServerBitmap*		closeBitmaps[4];
-			ServerBitmap*		zoomBitmaps[4];
-	};
-
 								TabDecorator(DesktopSettings& settings,
 									BRect frame);
 	virtual						~TabDecorator();
@@ -85,39 +62,25 @@ protected:
 			typedef rgb_color ComponentColors[7];
 
 public:
-	virtual float				TabLocation(int32 tab) const;
-
-	virtual	bool				GetSettings(BMessage* settings) const;
-
-	virtual	void				Draw(BRect updateRect) = 0;
-	virtual	void				Draw() = 0;
-
-	virtual	void				GetSizeLimits(int32* minWidth, int32* minHeight,
-									int32* maxWidth, int32* maxHeight) const;
+	virtual	void				Draw(BRect updateRect);
+	virtual	void				Draw();
 
 	virtual	Region				RegionAt(BPoint where, int32& tab) const;
-
-	virtual	void				ExtendDirtyRegion(Region region,
-									BRegion& dirty);
 
 	virtual	bool				SetRegionHighlight(Region region,
 									uint8 highlight, BRegion* dirty,
 									int32 tab = -1);
-
-			float				BorderWidth();
-			float				TabHeight();
 
 protected:
 	virtual	void				_DoLayout();
 	virtual	void				_DoTabLayout();
 			void				_DistributeTabSize(float delta);
 
-	virtual	Decorator::Tab*		_AllocateNewTab();
-			TabDecorator::Tab*	_TabAt(int32 index) const;
-
-	virtual	void				_DrawFrame(BRect r) = 0;
+	virtual	void				_DrawFrame(BRect rect) = 0;
 	virtual	void				_DrawTab(Decorator::Tab* tab, BRect r) = 0;
 
+	virtual	void				_DrawButtons(Decorator::Tab* tab,
+									const BRect& invalid);
 	virtual	void				_DrawClose(Decorator::Tab* tab, bool direct,
 									BRect r) = 0;
 	virtual	void				_DrawTitle(Decorator::Tab* tab, BRect r) = 0;
@@ -127,19 +90,11 @@ protected:
 	virtual	void				_SetTitle(Decorator::Tab* tab,
 									const char* string,
 									BRegion* updateRegion = NULL);
-	virtual	void				_SetFocus(Decorator::Tab* tab);
-
-	virtual	void				_FontsChanged(DesktopSettings& settings,
-									BRegion* updateRegion);
-	virtual	void				_SetLook(Decorator::Tab* tab,
-									DesktopSettings& settings, window_look look,
-									BRegion* updateRegion = NULL);
-	virtual	void				_SetFlags(Decorator::Tab* tab, uint32 flags,
-									BRegion* updateRegion = NULL);
 
 	virtual	void				_MoveBy(BPoint offset);
 	virtual	void				_ResizeBy(BPoint offset, BRegion* dirty);
 
+	virtual	void				_SetFocus(Decorator::Tab* tab);
 	virtual	bool				_SetTabLocation(Decorator::Tab* tab,
 									float location, bool isShifting,
 									BRegion* updateRegion = NULL);
@@ -160,12 +115,6 @@ protected:
 	virtual	void				_GetButtonSizeAndOffset(const BRect& tabRect,
 									float* offset, float* size,
 									float* inset) const;
-	virtual	void 				_InvalidateBitmaps();
-
-
-	// TabDecorator customization points
-	virtual	void				DrawButtons(Decorator::Tab* tab,
-									const BRect& invalid);
 
 	virtual	void				_UpdateFont(DesktopSettings& settings);
 
@@ -180,15 +129,6 @@ protected:
 			void				_CalculateTabsRegion();
 
 protected:
-			// Individual rects for handling window frame
-			// rendering the proper way
-			BRect				fRightBorder;
-			BRect				fLeftBorder;
-			BRect				fTopBorder;
-			BRect				fBottomBorder;
-
-			int32				fBorderWidth;
-
 			BRegion				fTabsRegion;
 			BRect				fOldMovingTab;
 

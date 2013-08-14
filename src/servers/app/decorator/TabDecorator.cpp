@@ -54,24 +54,6 @@ int_equal(float x, float y)
 }
 
 
-TabDecorator::Tab::Tab()
-	:
-	tabOffset(0),
-	tabLocation(0.0f),
-	textOffset(10.0f),
-	truncatedTitle(""),
-	truncatedTitleLength(0),
-	buttonFocus(false),
-	isHighlighted(false),
-	minTabSize(0.0f),
-	maxTabSize(0.0f)
-{
-	closeBitmaps[0] = closeBitmaps[1] = closeBitmaps[2] = closeBitmaps[3]
-		= zoomBitmaps[0] = zoomBitmaps[1] = zoomBitmaps[2] = zoomBitmaps[3]
-		= NULL;
-}
-
-
 static const float kBorderResizeLength = 22.0;
 static const float kResizeKnobSize = 18.0;
 
@@ -81,9 +63,9 @@ static const float kResizeKnobSize = 18.0;
 
 // TODO: get rid of DesktopSettings here, and introduce private accessor
 //	methods to the Decorator base class
-TabDecorator::TabDecorator(DesktopSettings& settings, BRect rect)
+TabDecorator::TabDecorator(DesktopSettings& settings, BRect frame)
 	:
-	Decorator(settings, rect),
+	Decorator(settings, frame),
 	fOldMovingTab(0, 0, -1, -1),
 	// focus color constants
 	kFocusFrameColor(settings.UIColor(B_WINDOW_BORDER_COLOR)),
@@ -104,12 +86,12 @@ TabDecorator::TabDecorator(DesktopSettings& settings, BRect rect)
 		(B_DARKEN_1_TINT + B_NO_TINT) / 2)),
 	kNonFocusTextColor(settings.UIColor(B_WINDOW_INACTIVE_TEXT_COLOR))
 {
-	// TODO: If the decorator was created with a frame too small, it should
-	// resize itself!
-
 	STRACE(("TabDecorator:\n"));
 	STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",
-		rect.left, rect.top, rect.right, rect.bottom));
+		frame.left, frame.top, frame.right, frame.bottom));
+
+	// TODO: If the decorator was created with a frame too small, it should
+	// resize itself!
 }
 
 
@@ -119,60 +101,38 @@ TabDecorator::~TabDecorator()
 }
 
 
-float
-TabDecorator::TabLocation(int32 tab) const
-{
-	TabDecorator::Tab* decoratorTab = _TabAt(tab);
-	if (decoratorTab == NULL)
-		return 0.0f;
-
-	return (float)decoratorTab->tabOffset;
-}
+// #pragma mark - Public methods
 
 
-bool
-TabDecorator::GetSettings(BMessage* settings) const
-{
-	if (!fTitleBarRect.IsValid())
-		return false;
+/*!	\brief Updates the decorator in the rectangular area \a updateRect.
 
-	if (settings->AddRect("tab frame", fTitleBarRect) != B_OK)
-		return false;
+	Updates all areas which intersect the frame and tab.
 
-	if (settings->AddFloat("border width", fBorderWidth) != B_OK)
-		return false;
-
-	// TODO only add the location of the tab of the window who requested the
-	// settings
-	for (int32 i = 0; i < fTabList.CountItems(); i++) {
-		TabDecorator::Tab* tab = _TabAt(i);
-		if (settings->AddFloat("tab location", (float)tab->tabOffset) != B_OK)
-			return false;
-	}
-
-	return true;
-}
-
-
-// #pragma mark -
-
-
+	\param updateRect The rectangular area to update.
+*/
 void
-TabDecorator::GetSizeLimits(int32* minWidth, int32* minHeight,
-	int32* maxWidth, int32* maxHeight) const
+TabDecorator::Draw(BRect updateRect)
 {
-	float minTabSize = 0;
-	if (CountTabs() > 0)
-		minTabSize = _TabAt(0)->minTabSize;
+	STRACE(("TabDecorator::Draw(BRect updateRect): "));
+	updateRect.PrintToStream();
 
-	if (fTitleBarRect.IsValid()) {
-		*minWidth = (int32)roundf(max_c(*minWidth,
-			minTabSize - 2 * fBorderWidth));
-	}
-	if (fResizeRect.IsValid()) {
-		*minHeight = (int32)roundf(max_c(*minHeight,
-			fResizeRect.Height() - fBorderWidth));
-	}
+	fDrawingEngine->SetDrawState(&fDrawState);
+
+	_DrawFrame(updateRect & fBorderRect);
+	_DrawTabs(updateRect & fTitleBarRect);
+}
+
+
+//! Forces a complete decorator update
+void
+TabDecorator::Draw()
+{
+	STRACE(("TabDecorator: Draw()"));
+
+	fDrawingEngine->SetDrawState(&fDrawState);
+
+	_DrawFrame(fBorderRect);
+	_DrawTabs(fTitleBarRect);
 }
 
 
@@ -220,73 +180,12 @@ TabDecorator::RegionAt(BPoint where, int32& tab) const
 }
 
 
-void
-TabDecorator::ExtendDirtyRegion(Region region, BRegion& dirty)
-{
-	switch (region) {
-		case REGION_TAB:
-			dirty.Include(fTitleBarRect);
-			break;
-
-		case REGION_CLOSE_BUTTON:
-			if ((fTopTab->flags & B_NOT_CLOSABLE) == 0)
-				for (int32 i = 0; i < fTabList.CountItems(); i++)
-					dirty.Include(fTabList.ItemAt(i)->closeRect);
-			break;
-
-		case REGION_ZOOM_BUTTON:
-			if ((fTopTab->flags & B_NOT_ZOOMABLE) == 0)
-				for (int32 i = 0; i < fTabList.CountItems(); i++)
-					dirty.Include(fTabList.ItemAt(i)->zoomRect);
-			break;
-
-		case REGION_LEFT_BORDER:
-			if (fLeftBorder.IsValid()) {
-				// fLeftBorder doesn't include the corners, so we have to add
-				// them manually.
-				BRect rect(fLeftBorder);
-				rect.top = fTopBorder.top;
-				rect.bottom = fBottomBorder.bottom;
-				dirty.Include(rect);
-			}
-			break;
-
-		case REGION_RIGHT_BORDER:
-			if (fRightBorder.IsValid()) {
-				// fRightBorder doesn't include the corners, so we have to add
-				// them manually.
-				BRect rect(fRightBorder);
-				rect.top = fTopBorder.top;
-				rect.bottom = fBottomBorder.bottom;
-				dirty.Include(rect);
-			}
-			break;
-
-		case REGION_TOP_BORDER:
-			dirty.Include(fTopBorder);
-			break;
-
-		case REGION_BOTTOM_BORDER:
-			dirty.Include(fBottomBorder);
-			break;
-
-		case REGION_RIGHT_BOTTOM_CORNER:
-			if ((fTopTab->flags & B_NOT_RESIZABLE) == 0)
-				dirty.Include(fResizeRect);
-			break;
-
-		default:
-			break;
-	}
-}
-
-
 bool
 TabDecorator::SetRegionHighlight(Region region, uint8 highlight,
 	BRegion* dirty, int32 tabIndex)
 {
-	TabDecorator::Tab* tab
-		= static_cast<TabDecorator::Tab*>(_TabAt(tabIndex));
+	Decorator::Tab* tab
+		= static_cast<Decorator::Tab*>(_TabAt(tabIndex));
 	if (tab != NULL) {
 		tab->isHighlighted = highlight != 0;
 		// Invalidate the bitmap caches for the close/zoom button, when the
@@ -306,23 +205,6 @@ TabDecorator::SetRegionHighlight(Region region, uint8 highlight,
 	}
 
 	return Decorator::SetRegionHighlight(region, highlight, dirty, tabIndex);
-}
-
-
-float
-TabDecorator::BorderWidth()
-{
-	return fBorderWidth;
-}
-
-
-float
-TabDecorator::TabHeight()
-{
-	if (fTitleBarRect.IsValid())
-		return fTitleBarRect.Height();
-
-	return BorderWidth();
 }
 
 
@@ -382,6 +264,8 @@ TabDecorator::_DoLayout()
 		fBottomBorder.Set(0.0, 0.0, -1.0, -1.0);
 	}
 
+	fBorderRect = BRect(fTopBorder.LeftTop(), fBottomBorder.RightBottom());
+
 	// calculate resize rect
 	if (fBorderWidth > 1) {
 		fResizeRect.Set(fBottomBorder.right - kResizeKnobSize,
@@ -419,7 +303,7 @@ TabDecorator::_DoTabLayout()
 	float sumTabWidth = 0;
 	// calculate our tab rect
 	for (int32 i = 0; i < fTabList.CountItems(); i++) {
-		TabDecorator::Tab* tab = _TabAt(i);
+		Decorator::Tab* tab = _TabAt(i);
 
 		BRect& tabRect = tab->tabRect;
 		// distance from one item of the tab bar to another.
@@ -568,30 +452,9 @@ TabDecorator::_DistributeTabSize(float delta)
 	prevTab->tabRect.right = floor(fFrame.right + fBorderWidth);
 
 	for (int32 i = 0; i < fTabList.CountItems(); i++) {
-		TabDecorator::Tab* tab = _TabAt(i);
+		Decorator::Tab* tab = _TabAt(i);
 		tab->tabOffset = uint32(tab->tabRect.left - fLeftBorder.left);
 	}
-}
-
-
-Decorator::Tab*
-TabDecorator::_AllocateNewTab()
-{
-	Decorator::Tab* tab = new(std::nothrow) TabDecorator::Tab;
-	if (tab == NULL)
-		return NULL;
-
-	// Set appropriate colors based on the current focus value. In this case,
-	// each decorator defaults to not having the focus.
-	_SetFocus(tab);
-	return tab;
-}
-
-
-TabDecorator::Tab*
-TabDecorator::_TabAt(int32 index) const
-{
-	return static_cast<TabDecorator::Tab*>(fTabList.ItemAt(index));
 }
 
 
@@ -614,78 +477,6 @@ TabDecorator::_SetTitle(Decorator::Tab* tab, const char* string,
 		// the border will look differently when the title is adjacent
 
 	updateRegion->Include(rect);
-}
-
-
-void
-TabDecorator::_FontsChanged(DesktopSettings& settings,
-	BRegion* updateRegion)
-{
-	// get previous extent
-	if (updateRegion != NULL)
-		updateRegion->Include(&GetFootprint());
-
-	_InvalidateBitmaps();
-
-	_UpdateFont(settings);
-	_DoLayout();
-
-	_InvalidateFootprint();
-	if (updateRegion != NULL)
-		updateRegion->Include(&GetFootprint());
-}
-
-
-void
-TabDecorator::_SetLook(Decorator::Tab* tab, DesktopSettings& settings,
-	window_look look, BRegion* updateRegion)
-{
-	// TODO: we could be much smarter about the update region
-
-	// get previous extent
-	if (updateRegion != NULL)
-		updateRegion->Include(&GetFootprint());
-
-	tab->look = look;
-
-	_UpdateFont(settings);
-	_DoLayout();
-
-	_InvalidateFootprint();
-	if (updateRegion != NULL)
-		updateRegion->Include(&GetFootprint());
-}
-
-
-void
-TabDecorator::_SetFlags(Decorator::Tab* tab, uint32 flags,
-	BRegion* updateRegion)
-{
-	// TODO: we could be much smarter about the update region
-
-	// get previous extent
-	if (updateRegion != NULL)
-		updateRegion->Include(&GetFootprint());
-
-	tab->flags = flags;
-	_DoLayout();
-
-	_InvalidateFootprint();
-	if (updateRegion != NULL)
-		updateRegion->Include(&GetFootprint());
-}
-
-
-void
-TabDecorator::_SetFocus(Decorator::Tab* _tab)
-{
-	TabDecorator::Tab* tab = static_cast<TabDecorator::Tab*>(_tab);
-	tab->buttonFocus = IsFocus(tab)
-		|| ((tab->look == B_FLOATING_WINDOW_LOOK
-			|| tab->look == kLeftTitledWindowLook)
-			&& (tab->flags & B_AVOID_FOCUS) != 0);
-	if (CountTabs() > 1)
-		_LayoutTabItems(tab, tab->tabRect);
 }
 
 
@@ -725,7 +516,7 @@ TabDecorator::_ResizeBy(BPoint offset, BRegion* dirty)
 	fFrame.bottom += offset.y;
 
 	// Handle invalidation of resize rect
-	if (dirty && !(fTopTab->flags & B_NOT_RESIZABLE)) {
+	if (dirty != NULL && !(fTopTab->flags & B_NOT_RESIZABLE)) {
 		BRect realResizeRect;
 		switch ((int)fTopTab->look) {
 			case B_DOCUMENT_WINDOW_LOOK:
@@ -818,7 +609,7 @@ TabDecorator::_ResizeBy(BPoint offset, BRegion* dirty)
 			return;
 		}
 
-		TabDecorator::Tab* tab = _TabAt(0);
+		Decorator::Tab* tab = _TabAt(0);
 		BRect& tabRect = tab->tabRect;
 		BRect oldTabRect(tabRect);
 
@@ -870,6 +661,20 @@ TabDecorator::_ResizeBy(BPoint offset, BRegion* dirty)
 }
 
 
+void
+TabDecorator::_SetFocus(Decorator::Tab* tab)
+{
+	Decorator::Tab* decoratorTab = static_cast<Decorator::Tab*>(tab);
+
+	decoratorTab->buttonFocus = IsFocus(tab)
+		|| ((decoratorTab->look == B_FLOATING_WINDOW_LOOK
+			|| decoratorTab->look == kLeftTitledWindowLook)
+			&& (decoratorTab->flags & B_AVOID_FOCUS) != 0);
+	if (CountTabs() > 1)
+		_LayoutTabItems(decoratorTab, decoratorTab->tabRect);
+}
+
+
 bool
 TabDecorator::_SetTabLocation(Decorator::Tab* _tab, float location,
 	bool isShifting, BRegion* updateRegion)
@@ -890,7 +695,7 @@ TabDecorator::_SetTabLocation(Decorator::Tab* _tab, float location,
 		}
 	}
 
-	TabDecorator::Tab* tab = static_cast<TabDecorator::Tab*>(_tab);
+	Decorator::Tab* tab = static_cast<Decorator::Tab*>(_tab);
 	BRect& tabRect = tab->tabRect;
 	if (tabRect.IsValid() == false)
 		return false;
@@ -980,7 +785,7 @@ bool
 TabDecorator::_MoveTab(int32 from, int32 to, bool isMoving,
 	BRegion* updateRegion)
 {
-	TabDecorator::Tab* toTab = _TabAt(to);
+	Decorator::Tab* toTab = _TabAt(to);
 	if (toTab == NULL)
 		return false;
 
@@ -1039,9 +844,9 @@ TabDecorator::_GetFootprint(BRegion *region)
 
 
 void
-TabDecorator::DrawButtons(Decorator::Tab* tab, const BRect& invalid)
+TabDecorator::_DrawButtons(Decorator::Tab* tab, const BRect& invalid)
 {
-	STRACE(("TabDecorator: DrawButtons\n"));
+	STRACE(("TabDecorator: _DrawButtons\n"));
 
 	// Draw the buttons if we're supposed to
 	if (!(tab->flags & B_NOT_CLOSABLE) && invalid.Intersects(tab->closeRect))
@@ -1091,22 +896,9 @@ TabDecorator::_GetButtonSizeAndOffset(const BRect& tabRect, float* _offset,
 
 
 void
-TabDecorator::_InvalidateBitmaps()
-{
-	for (int32 i = 0; i < fTabList.CountItems(); i++) {
-		TabDecorator::Tab* tab = static_cast<TabDecorator::Tab*>(_TabAt(i));
-		for (int32 index = 0; index < 4; index++) {
-			tab->closeBitmaps[index] = NULL;
-			tab->zoomBitmaps[index] = NULL;
-		}
-	}
-}
-
-
-void
 TabDecorator::_LayoutTabItems(Decorator::Tab* _tab, const BRect& tabRect)
 {
-	TabDecorator::Tab* tab = static_cast<TabDecorator::Tab*>(_tab);
+	Decorator::Tab* tab = static_cast<Decorator::Tab*>(_tab);
 
 	float offset;
 	float size;
@@ -1200,7 +992,7 @@ TabDecorator::_SingleTabOffsetAndSize(float& tabSize)
 	} else {
 		tabSize = fBottomBorder.bottom - fTopBorder.top;
 	}
-	TabDecorator::Tab* tab = _TabAt(0);
+	Decorator::Tab* tab = _TabAt(0);
 	maxLocation = tabSize - tab->maxTabSize;
 	if (maxLocation < 0)
 		maxLocation = 0;
