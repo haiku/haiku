@@ -78,7 +78,7 @@ SearchCommand::Execute(int argc, const char* const* argv)
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "hu", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "hiu", sLongOptions, NULL);
 		if (c == -1)
 			break;
 
