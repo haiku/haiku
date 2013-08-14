@@ -789,12 +789,24 @@ protected:
 	{
 		BGroupView::DoLayout();
 		if (BScrollBar* scrollBar = ScrollBar(B_VERTICAL)) {
-			BSize minSize = BGroupView::MinSize();
-			float height = Bounds().Height();
-			float max = minSize.height - height;
+			BRect layoutArea = GroupLayout()->LayoutArea();
+			float layoutHeight = layoutArea.Height();			
+			// Min size is not reliable with HasHeightForWidth() children,
+			// since it does not reflect how thos children are currently
+			// laid out, but what their theoretical minimum size would be.
+
+			BLayoutItem* lastItem = GroupLayout()->ItemAt(
+				GroupLayout()->CountItems() - 1);
+			if (lastItem != NULL) {
+				layoutHeight = lastItem->Frame().bottom;
+			}
+
+			float viewHeight = Bounds().Height();
+
+			float max = layoutHeight- viewHeight;
 			scrollBar->SetRange(0, max);
-			if (minSize.height > 0)
-				scrollBar->SetProportion(height / minSize.height);
+			if (layoutHeight > 0)
+				scrollBar->SetProportion(viewHeight / layoutHeight);
 			else
 				scrollBar->SetProportion(1);
 		}

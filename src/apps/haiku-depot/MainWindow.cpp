@@ -314,7 +314,14 @@ MainWindow::_InitDummyModel()
 		"will need to recompile your filters.");
 	sequitur.AddUserRating(
 		UserRating(UserInfo("pete"), 4.5f,
-		"I can weave a web of sound!", "en", "2.1.0")
+		"I can weave a web of sound! And it connects to PatchBay. Check "
+		"it out, I can wholeheartly recommend this app!! This rating "
+		"comment is of course only so long, because the new TextView "
+		"layout needs some testing. Oh, and did I mention it works with "
+		"custom installed sound fonts? Reading through this comment I find "
+		"that I did not until now. Hopefully there are enough lines now to "
+		"please the programmer with the text layouting and scrolling of "
+		"long ratings!", "en", "2.1.0")
 	);
 	sequitur.AddUserRating(
 		UserRating(UserInfo("stippi"), 3.5f,
