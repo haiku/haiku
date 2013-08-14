@@ -1,6 +1,13 @@
 /*
- * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Copyright 2001-2013, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		Stefano Ceccherini, stefano.ceccherini@gmail.com
+ *		Marc Flerackers, mflerackers@androme.be
+ *		Hiroshi Lockheimer (BTextView is based on his STEEngine)
+ *		Oliver Tappe, zooey@hirschkaefer.de
  */
 
 #include "TextLayout.h"
