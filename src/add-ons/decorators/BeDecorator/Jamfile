@@ -19,4 +19,4 @@ Addon BeDecorator :
 	BeDecorator.cpp
 	: be <nogrist>app_server $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
 	: resources.rdef
-;
+	;

@@ -35,21 +35,22 @@ public:
 								BeDecorator(DesktopSettings& settings, BRect frame);
 	virtual						~BeDecorator();
 
-	virtual	void				Draw(BRect updateRect);
-	virtual	void				Draw();
-
 	virtual	void				GetComponentColors(Component component,
 									uint8 highlight, ComponentColors _colors,
 									Decorator::Tab* tab = NULL);
 
 protected:
 	virtual	void				_DrawFrame(BRect rect);
+
 	virtual	void				_DrawTab(Decorator::Tab* tab, BRect rect);
 	virtual	void				_DrawTitle(Decorator::Tab* tab, BRect rect);
 	virtual	void				_DrawClose(Decorator::Tab* tab, bool direct,
 									BRect rect);
 	virtual	void				_DrawZoom(Decorator::Tab* tab, bool direct,
 									BRect rect);
+	virtual	void				_DrawMinimize(Decorator::Tab* tab, bool direct,
+									BRect rect);
+
 	virtual	void				_GetButtonSizeAndOffset(const BRect& tabRect,
 									float* offset, float* size,
 									float* inset) const;
