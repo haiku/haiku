@@ -39,12 +39,12 @@ RemotePackageRepository HaikuPorts
 	gcc-2.95.3_2013_08_12-1
 	gettext-0.18.1.1-5
 	gettext_libintl-0.18.1.1-5
-	git-1.7.10.2-2
-	git_arch-1.7.10.2-2
-	git_cvs-1.7.10.2-2
-	git_daemon-1.7.10.2-2
-	git_email-1.7.10.2-2
-	git_svn-1.7.10.2-2
+	git-1.8.3.4-1
+	git_arch-1.8.3.4-1
+	git_cvs-1.8.3.4-1
+	git_daemon-1.8.3.4-1
+	git_email-1.8.3.4-1
+	git_svn-1.8.3.4-1
 	glu-9.0.0-2
 	glu_devel-9.0.0-2
 	gperf-3.0.4-1
