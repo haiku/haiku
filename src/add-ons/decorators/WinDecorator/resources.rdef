@@ -1,6 +1,6 @@
 resource("be:decor:info") message('deco') {
 	"name"				= "Windows 95",
-	"authors"			= "Adrien Destugues",
+	"authors"			= "DarkWyrm, Adrien Destugues",
 	"short_descr"		= "Decorator resembling Windows 95",
 	"long_descr"		= "",
 	"lic_url"			= "",

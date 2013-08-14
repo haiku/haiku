@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		DarkWyrm, bpmagic@columbus.rr.com
  *		Adrien Destugues, pulkomandy@gmail.com
  *		John Scipione, jscipione@gmail.com
  */
