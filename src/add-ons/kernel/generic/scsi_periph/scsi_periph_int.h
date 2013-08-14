@@ -78,7 +78,7 @@ status_t periph_handle_free(scsi_periph_handle_info *handle);
 
 status_t periph_check_capacity(scsi_periph_device_info *device, scsi_ccb *ccb);
 status_t periph_trim_device(scsi_periph_device_info *device, scsi_ccb *request,
-	uint64 offset, uint64 numBlocks);
+	scsi_block_range* ranges, uint32 rangeCount);
 
 
 // device.c

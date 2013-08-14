@@ -7,7 +7,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <getopt.h>
-#include <limits.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -66,8 +66,9 @@ main(int argc, char** argv)
 	FileDescriptorCloser closer(fd);
 
 	fs_trim_data trimData;
-	trimData.offset = 0;
-	trimData.size = OFF_MAX;
+	trimData.range_count = 1;
+	trimData.ranges[0].offset = 0;
+	trimData.ranges[0].size = UINT64_MAX;
 	trimData.trimmed_size = 0;
 
 	if (ioctl(fd, B_TRIM_DEVICE, &trimData, sizeof(fs_trim_data)) != 0) {

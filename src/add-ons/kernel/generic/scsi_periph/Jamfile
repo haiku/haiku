@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel generic scsi_periph ;
 
-UsePrivateHeaders drivers kernel ;
+UsePrivateHeaders drivers kernel shared ;
 SubDirHdrs $(HAIKU_TOP) src system kernel device_manager ;
 
 # disable debug output, if debugging is disabled

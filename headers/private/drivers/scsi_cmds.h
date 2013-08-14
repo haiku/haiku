@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2010, Haiku, Inc. All RightsReserved.
+ * Copyright 2004-2013, Haiku, Inc. All RightsReserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -185,6 +185,8 @@
 #define SCSI_OP_WRITE_BUFFER				0x3b
 #define SCSI_OP_READ_BUFFER					0x3c
 #define SCSI_OP_CHANGE_DEFINITION			0x40
+#define SCSI_OP_WRITE_SAME_10				0x41
+#define SCSI_OP_UNMAP						0x42
 #define SCSI_OP_READ_SUB_CHANNEL			0x42
 #define SCSI_OP_READ_TOC					0x43
 #define SCSI_OP_PLAY_MSF					0x47
@@ -457,7 +459,38 @@ typedef struct scsi_cmd_wsame_16 {
 	);
 	uint8	control;
 } _PACKED scsi_cmd_wsame_16;
-	
+
+
+// UNMAP
+
+typedef struct scsi_cmd_unmap {
+	uint8	opcode;
+	LBITFIELD8_2(
+		anchor : 1,
+		_reserved1_7 : 7
+	);
+	uint32	_reserved1;
+	LBITFIELD8_2(
+		group_number : 5,
+		_reserved5_7 : 3
+	);
+	uint16	length;
+	uint8	control;
+} _PACKED scsi_cmd_unmap;
+
+struct scsi_unmap_block_descriptor {
+	uint64	lba;
+	uint32	block_count;
+	uint32	_reserved1;
+} _PACKED;
+
+struct scsi_unmap_parameter_list {
+	uint16	data_length;
+	uint16	block_data_length;
+	uint32	_reserved1;
+	struct scsi_unmap_block_descriptor blocks[1];
+} _PACKED;
+
 
 // REQUEST SENSE
 

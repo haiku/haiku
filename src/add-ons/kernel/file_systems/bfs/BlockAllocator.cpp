@@ -1191,19 +1191,28 @@ BlockAllocator::_CheckGroup(int32 groupIndex) const
 
 
 status_t
-BlockAllocator::Trim(off_t offset, off_t size, off_t& trimmedSize)
+BlockAllocator::Trim(uint64 offset, uint64 size, uint64& trimmedSize)
 {
+	const uint32 kTrimRanges = 128;
+	fs_trim_data* trimData = (fs_trim_data*)malloc(sizeof(fs_trim_data)
+		+ sizeof(uint64) * kTrimRanges);
+	if (trimData == NULL)
+		return B_NO_MEMORY;
+
+	MemoryDeleter deleter(trimData);
 	RecursiveLocker locker(fLock);
 
 	// TODO: take given offset and size into account!
 	int32 lastGroup = fNumGroups - 1;
 	uint32 firstBlock = 0;
 	uint32 firstBit = 0;
-	off_t currentBlock = 0;
+	uint64 currentBlock = 0;
 	uint32 blockShift = fVolume->BlockShift();
 
-	off_t firstFree = -1;
+	uint64 firstFree = 0;
 	size_t freeLength = 0;
+
+	trimData->range_count = 0;
 	trimmedSize = 0;
 
 	AllocationBlock cached(fVolume);
@@ -1217,8 +1226,9 @@ BlockAllocator::Trim(off_t offset, off_t size, off_t& trimmedSize)
 				if (cached.IsUsed(i)) {
 					// Block is in use
 					if (freeLength > 0) {
-						status_t status = _TrimNext(firstFree << blockShift,
-							freeLength << blockShift, trimmedSize);
+						status_t status = _TrimNext(*trimData, kTrimRanges,
+							firstFree << blockShift, freeLength << blockShift,
+							false, trimmedSize);
 						if (status != B_OK)
 							return status;
 
@@ -1237,12 +1247,8 @@ BlockAllocator::Trim(off_t offset, off_t size, off_t& trimmedSize)
 		firstBit = 0;
 	}
 
-	if (freeLength > 0) {
-		return _TrimNext(firstFree << blockShift, freeLength << blockShift,
-			trimmedSize);
-	}
-
-	return B_OK;
+	return _TrimNext(*trimData, kTrimRanges, firstFree << blockShift,
+		freeLength << blockShift, true, trimmedSize);
 }
 
 
@@ -2181,21 +2187,44 @@ BlockAllocator::_AddInodeToIndex(Inode* inode)
 
 
 status_t
-BlockAllocator::_TrimNext(off_t offset, off_t size, off_t& trimmedSize)
+BlockAllocator::_AddTrim(fs_trim_data& trimData, uint32 maxRanges,
+	uint64 offset, uint64 size)
 {
-	PRINT(("_TrimNext(offset %lld, size %lld)\n", offset, size));
-
-	fs_trim_data trimData;
-	trimData.offset = offset;
-	trimData.size = size;
-	trimData.trimmed_size = 0;
-
-	if (ioctl(fVolume->Device(), B_TRIM_DEVICE, &trimData,
-			sizeof(fs_trim_data)) != 0) {
-		return errno;
+	if (trimData.range_count < maxRanges && size > 0) {
+		trimData.ranges[trimData.range_count].offset = offset;
+		trimData.ranges[trimData.range_count].size = size;
+		trimData.range_count++;
+		return true;
 	}
 
-	trimmedSize += trimData.trimmed_size;
+	return false;
+}
+
+
+status_t
+BlockAllocator::_TrimNext(fs_trim_data& trimData, uint32 maxRanges,
+	uint64 offset, uint64 size, bool force, uint64& trimmedSize)
+{
+	PRINT(("_TrimNext(index %" B_PRIu32 ", offset %" B_PRIu64 ", size %"
+		B_PRIu64 ")\n", trimData.range_count, offset, size));
+
+	bool pushed = _AddTrim(trimData, maxRanges, offset, size);
+
+	if (!pushed || force) {
+		// Trim now
+		trimData.trimmed_size = 0;
+		if (ioctl(fVolume->Device(), B_TRIM_DEVICE, &trimData,
+				sizeof(fs_trim_data)) != 0) {
+			return errno;
+		}
+
+		trimmedSize += trimData.trimmed_size;
+		trimData.range_count = 0;
+	}
+
+	if (!pushed)
+		_AddTrim(trimData, maxRanges, offset, size);
+
 	return B_OK;
 }
 

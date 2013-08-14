@@ -172,9 +172,12 @@ typedef struct {
 
 /* B_TRIM_DEVICE data structure */
 typedef struct {
-	off_t	offset;					/* offset (in bytes) */
-	off_t	size;
-	off_t	trimmed_size;			/* filled on return */
+	uint32	range_count;
+	uint64	trimmed_size;			/* filled on return */
+	struct range {
+		uint64	offset;				/* offset (in bytes) */
+		uint64	size;
+	} ranges[1];
 } fs_trim_data;
 
 

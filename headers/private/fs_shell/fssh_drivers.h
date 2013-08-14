@@ -215,9 +215,12 @@ typedef struct {
 
 /* B_TRIM_DEVICE data structure */
 typedef struct {
-	fssh_off_t	offset;					/* offset (in bytes) */
-	fssh_off_t	size;
-	fssh_off_t	trimmed_size;			/* filled on return */
+	uint32_t	range_count;
+	uint64_t	trimmed_size;			/* filled on return */
+	struct range {
+		uint64_t	offset;				/* offset (in bytes) */
+		uint64_t	size;
+	} ranges[1];
 } fssh_fs_trim_data;
 
 

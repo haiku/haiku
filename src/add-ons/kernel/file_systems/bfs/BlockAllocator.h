@@ -46,7 +46,8 @@ public:
 								int32 group, uint16 start, uint16 numBlocks,
 								uint16 minimum, block_run& run);
 
-			status_t		Trim(off_t offset, off_t size, off_t& trimmedSize);
+			status_t		Trim(uint64 offset, uint64 size,
+								uint64& trimmedSize);
 
 			status_t		StartChecking(const check_control* control);
 			status_t		StopChecking(check_control* control);
@@ -83,8 +84,11 @@ private:
 			void			_FreeIndices();
 			status_t		_AddInodeToIndex(Inode* inode);
 			status_t		_WriteBackCheckBitmap();
-			status_t		_TrimNext(off_t offset, off_t size,
-								off_t& trimmedSize);
+			status_t		_AddTrim(fs_trim_data& trimData, uint32 maxRanges,
+								uint64 offset, uint64 size);
+			status_t		_TrimNext(fs_trim_data& trimData, uint32 maxRanges,
+								uint64 offset, uint64 size, bool force,
+								uint64& trimmedSize);
 
 	static	status_t		_Initialize(BlockAllocator* self);
 

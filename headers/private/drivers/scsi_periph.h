@@ -72,6 +72,10 @@ typedef struct scsi_periph_callbacks {
 	void (*media_changed)(periph_device_cookie cookie, scsi_ccb *request);
 } scsi_periph_callbacks;
 
+typedef struct scsi_block_range {
+	uint64	offset;
+	uint64	size;
+} scsi_block_range;
 
 // functions provided by this module
 typedef struct scsi_periph_interface {
@@ -119,7 +123,7 @@ typedef struct scsi_periph_interface {
 	err_res (*synchronize_cache)(scsi_periph_device device, scsi_ccb *request);
 
 	status_t (*trim_device)(scsi_periph_device_info *device, scsi_ccb *request,
-		uint64 offset, uint64 numBlocks);
+		scsi_block_range* ranges, uint32 rangeCount);
 
 	// *** removable media ***
 	// to be called when a medium change is detected to block subsequent commands

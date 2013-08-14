@@ -21,7 +21,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <AutoDeleter.h>
+
 #include <fs/devfs.h>
+#include <util/fs_trim_support.h>
 
 #include "dma_resources.h"
 #include "IORequest.h"
@@ -154,7 +157,7 @@ synchronize_cache(das_driver_info *device)
 
 
 static status_t
-trim_device(das_driver_info* device, off_t offset, off_t size)
+trim_device(das_driver_info* device, fs_trim_data* trimData)
 {
 	TRACE("trim_device()\n");
 
@@ -162,10 +165,17 @@ trim_device(das_driver_info* device, off_t offset, off_t size)
 	if (request == NULL)
 		return B_NO_MEMORY;
 
+	uint64 trimmedSize = 0;
+	for (uint32 i = 0; i < trimData->range_count; i++) {
+		trimmedSize += trimData->ranges[i].size;
+	}
 	status_t status = sSCSIPeripheral->trim_device(device->scsi_periph_device,
-		request, offset / device->block_size, size / device->block_size);
+		request, (scsi_block_range*)&trimData->ranges[0],
+		trimData->range_count);
 
 	device->scsi->free_ccb(request);
+	if (status == B_OK)
+		trimData->trimmed_size = trimmedSize;
 
 	return status;
 }
@@ -405,17 +415,19 @@ das_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 
 		case B_TRIM_DEVICE:
 		{
-			fs_trim_data trimData;
-			if (user_memcpy(&trimData, buffer, sizeof(fs_trim_data)) != B_OK)
-				return B_BAD_ADDRESS;
-
-			status_t status = trim_device(info, trimData.offset, trimData.size);
+			fs_trim_data* trimData;
+			status_t status = copy_trim_data_from_user(buffer, length,
+				trimData);
 			if (status != B_OK)
 				return status;
 
-			trimData.trimmed_size = trimData.size;
+			MemoryDeleter deleter(trimData);
 
-			return user_memcpy(buffer, &trimData, sizeof(fs_trim_data));
+			status = trim_device(info, trimData);
+			if (status != B_OK)
+				return status;
+
+			return copy_trim_data_to_user(buffer, trimData);
 		}
 
 		default:
