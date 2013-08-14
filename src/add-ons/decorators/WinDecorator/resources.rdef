@@ -1,10 +1,10 @@
 resource("be:decor:info") message('deco') {
 	"name"				= "Windows 95",
-	"authors"			= "",
-	"short_descr"		= "Windows 95",
+	"authors"			= "Adrien Destugues",
+	"short_descr"		= "Decorator resembling Windows 95",
 	"long_descr"		= "",
 	"lic_url"			= "",
 	"lic_name"			= "MIT",
 	"support_url"		= "http://www.haiku-os.org/",
-	float "version"		= 1.0
+	float "version"		= 1.1
 };

@@ -48,27 +48,24 @@ WinDecorAddOn::_AllocateDecorator(DesktopSettings& settings, BRect rect)
 }
 
 
-WinDecorator::WinDecorator(DesktopSettings& settings, BRect rect)
+WinDecorator::WinDecorator(DesktopSettings& settings, BRect frame)
 	:
-	Decorator(settings, rect)
-{
+	Decorator(settings, frame),
 	// common colors to both focus and non focus state
-	frame_highcol = (rgb_color){ 255, 255, 255, 255 };
-	frame_midcol = (rgb_color){ 216, 216, 216, 255 };
-	frame_lowcol = (rgb_color){ 110, 110, 110, 255 };
-	frame_lowercol = (rgb_color){ 0, 0, 0, 255 };
+	fFrameHighColor((rgb_color){ 255, 255, 255, 255 }),
+	fFrameMidColor((rgb_color){ 216, 216, 216, 255 }),
+	fFrameLowColor((rgb_color){ 110, 110, 110, 255 }),
+	fFrameLowerColor((rgb_color){ 0, 0, 0, 255 }),
 
 	// state based colors
-	fFocusTabColor = settings.UIColor(B_WINDOW_TAB_COLOR);
-	fFocusTextColor = settings.UIColor(B_WINDOW_TEXT_COLOR);
-	fNonFocusTabColor = settings.UIColor(B_WINDOW_INACTIVE_TAB_COLOR);
-	fNonFocusTextColor = settings.UIColor(B_WINDOW_INACTIVE_TEXT_COLOR);
-
-	//_UpdateFont(settings);
-
+	fFocusTabColor(settings.UIColor(B_WINDOW_TAB_COLOR)),
+	fFocusTextColor(settings.UIColor(B_WINDOW_TEXT_COLOR)),
+	fNonFocusTabColor(settings.UIColor(B_WINDOW_INACTIVE_TAB_COLOR)),
+	fNonFocusTextColor(settings.UIColor(B_WINDOW_INACTIVE_TEXT_COLOR))
+{
 	STRACE(("WinDecorator:\n"));
 	STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",
-		rect.left, rect.top, rect.right, rect.bottom));
+		frame.left, frame.top, frame.right, frame.bottom));
 }
 
 
@@ -78,12 +75,9 @@ WinDecorator::~WinDecorator()
 }
 
 
-// TODO : Add GetSettings
-
-
 /*!	\brief Updates the decorator in the rectangular area \a updateRect.
 
-	The default version updates all areas which intersect the frame and tab.
+	Updates all areas which intersect the frame and tab.
 
 	\param updateRect The rectangular area to update.
 */
@@ -97,19 +91,22 @@ WinDecorator::Draw(BRect updateRect)
 	// and the buttons
 	fDrawingEngine->SetDrawState(&fDrawState);
 
-	_DrawFrame(fFrame & updateRect);
-	_DrawTabs(fTitleBarRect & updateRect);
+	_DrawFrame(updateRect & fBorderRect);
+	_DrawTabs(updateRect & fTitleBarRect);
 }
 
 
+//! Forces a complete decorator update
 void
 WinDecorator::Draw()
 {
+	STRACE(("WinDecorator: Draw()"));
+
 	// Easy way to draw everything - no worries about drawing only certain
 	// things
 	fDrawingEngine->SetDrawState(&fDrawState);
 
-	_DrawFrame(fFrame);
+	_DrawFrame(fBorderRect);
 	_DrawTabs(fTitleBarRect);
 }
 
@@ -140,6 +137,40 @@ WinDecorator::RegionAt(BPoint where, int32& tab) const
 	}
 
 	return REGION_NONE;
+}
+
+
+bool
+WinDecorator::SetRegionHighlight(Region region, uint8 highlight,
+	BRegion* dirty, int32 tabIndex)
+{
+	Decorator::Tab* tab
+		= static_cast<Decorator::Tab*>(_TabAt(tabIndex));
+	if (tab != NULL) {
+		tab->isHighlighted = highlight != 0;
+		// Invalidate the bitmap caches for the close/minimize/zoom button
+		// when the highlight changes.
+		switch (region) {
+			case REGION_CLOSE_BUTTON:
+				if (highlight != RegionHighlight(region))
+					memset(&tab->closeBitmaps, 0, sizeof(tab->closeBitmaps));
+				break;
+			case REGION_MINIMIZE_BUTTON:
+				if (highlight != RegionHighlight(region)) {
+					memset(&tab->minimizeBitmaps, 0,
+						sizeof(tab->minimizeBitmaps));
+				}
+				break;
+			case REGION_ZOOM_BUTTON:
+				if (highlight != RegionHighlight(region))
+					memset(&tab->zoomBitmaps, 0, sizeof(tab->zoomBitmaps));
+				break;
+			default:
+				break;
+		}
+	}
+
+	return Decorator::SetRegionHighlight(region, highlight, dirty, tabIndex);
 }
 
 
@@ -197,33 +228,13 @@ WinDecorator::_DoLayout()
 	} else {
 		for (int32 i = 0; i < fTabList.CountItems(); i++) {
 			Decorator::Tab* tab = fTabList.ItemAt(i);
+
 			tab->tabRect.Set(0.0, 0.0, -1.0, -1.0);
 			tab->closeRect.Set(0.0, 0.0, -1.0, -1.0);
 			tab->zoomRect.Set(0.0, 0.0, -1.0, -1.0);
 			tab->minimizeRect.Set(0.0, 0.0, -1.0, -1.0);
 		}
 	}
-}
-
-
-Decorator::Tab*
-WinDecorator::_AllocateNewTab()
-{
-	Decorator::Tab* tab = new(std::nothrow) WinDecorator::Tab;
-	if (tab == NULL)
-		return NULL;
-	// Set appropriate colors based on the current focus value. In this case,
-	// each decorator defaults to not having the focus.
-	_SetFocus(tab);
-	return tab;
-}
-
-
-WinDecorator::Tab*
-WinDecorator::_TabAt(int32 index) const
-{
-	// TODO stub
-	return static_cast<WinDecorator::Tab*>(fTabList.ItemAt(index));
 }
 
 
@@ -238,7 +249,7 @@ WinDecorator::_DrawFrame(BRect rect)
 
 	BRect r = fBorderRect;
 
-	fDrawingEngine->SetHighColor(frame_lowercol);
+	fDrawingEngine->SetHighColor(fFrameLowerColor);
 	fDrawingEngine->StrokeRect(r);
 
 	if (fTopTab->look == B_BORDERED_WINDOW_LOOK)
@@ -248,32 +259,40 @@ WinDecorator::_DrawFrame(BRect rect)
 
 	pt = r.RightTop();
 	pt.x--;
-	fDrawingEngine->StrokeLine(r.LeftTop(), pt, frame_midcol);
+	fDrawingEngine->StrokeLine(r.LeftTop(), pt, fFrameMidColor);
 	pt = r.LeftBottom();
 	pt.y--;
-	fDrawingEngine->StrokeLine(r.LeftTop(), pt, frame_midcol);
+	fDrawingEngine->StrokeLine(r.LeftTop(), pt, fFrameMidColor);
 
-	fDrawingEngine->StrokeLine(r.RightTop(), r.RightBottom(), frame_lowercol);
-	fDrawingEngine->StrokeLine(r.LeftBottom(), r.RightBottom(), frame_lowercol);
+	fDrawingEngine->StrokeLine(r.RightTop(), r.RightBottom(), fFrameLowerColor);
+	fDrawingEngine->StrokeLine(r.LeftBottom(), r.RightBottom(), fFrameLowerColor);
 
-	r.InsetBy(1,1);
+	r.InsetBy(1, 1);
 	pt = r.RightTop();
 	pt.x--;
-	fDrawingEngine->StrokeLine(r.LeftTop(),pt,frame_highcol);
+	fDrawingEngine->StrokeLine(r.LeftTop(),pt,fFrameHighColor);
 	pt = r.LeftBottom();
 	pt.y--;
-	fDrawingEngine->StrokeLine(r.LeftTop(),pt,frame_highcol);
+	fDrawingEngine->StrokeLine(r.LeftTop(),pt,fFrameHighColor);
 
-	fDrawingEngine->StrokeLine(r.RightTop(), r.RightBottom(), frame_lowcol);
-	fDrawingEngine->StrokeLine(r.LeftBottom(), r.RightBottom(), frame_lowcol);
+	fDrawingEngine->StrokeLine(r.RightTop(), r.RightBottom(), fFrameLowColor);
+	fDrawingEngine->StrokeLine(r.LeftBottom(), r.RightBottom(), fFrameLowColor);
 
 	r.InsetBy(1, 1);
-	fDrawingEngine->StrokeRect(r, frame_midcol);
+	fDrawingEngine->StrokeRect(r, fFrameMidColor);
 	r.InsetBy(1, 1);
-	fDrawingEngine->StrokeRect(r, frame_midcol);
+	fDrawingEngine->StrokeRect(r, fFrameMidColor);
 }
 
 
+/*!	\brief Actually draws the tab
+
+	This function is called when the tab itself needs drawn. Other items,
+	like the window title or buttons, should not be drawn here.
+
+	\param tab The \a tab to update.
+	\param rect The area of the \a tab to update.
+*/
 void
 WinDecorator::_DrawTab(Decorator::Tab* tab, BRect rect)
 {
@@ -285,16 +304,26 @@ WinDecorator::_DrawTab(Decorator::Tab* tab, BRect rect)
 		return;
 	}
 
-	fDrawingEngine->FillRect(tabRect, tab_highcol);
+	fDrawingEngine->FillRect(tabRect, fTabColor);
 
 	_DrawTitle(tab, tabRect);
 
 	// Draw the buttons if we're supposed to
 	// TODO : we should still draw the buttons if they are disabled, but grey them out
-	DrawButtons(tab, rect);
+	_DrawButtons(tab, rect);
 }
 
 
+/*!	\brief Actually draws the title
+
+	The main tasks for this function are to ensure that the decorator draws
+	the title only in its own area and drawing the title itself.
+	Using B_OP_COPY for drawing the title is recommended because of the marked
+	performance hit of the other drawing modes, but it is not a requirement.
+
+	\param tab The \a tab to update.
+	\param rect area of the title to update.
+*/
 void
 WinDecorator::_DrawTitle(Decorator::Tab* tab, BRect rect)
 {
@@ -303,27 +332,110 @@ WinDecorator::_DrawTitle(Decorator::Tab* tab, BRect rect)
 	const BRect& zoomRect = tab->zoomRect;
 	const BRect& closeRect = tab->closeRect;
 
-	//fDrawingEngine->SetDrawingMode(B_OP_OVER);
-	fDrawingEngine->SetHighColor(textcol);
+	fDrawingEngine->SetHighColor(fTextColor);
 	fDrawingEngine->SetLowColor(IsFocus(tab)
 		? fFocusTabColor : fNonFocusTabColor);
 
-	fTruncatedTitle = Title(tab);
-	fDrawState.Font().TruncateString(&fTruncatedTitle, B_TRUNCATE_END,
+	tab->truncatedTitle = Title(tab);
+	fDrawState.Font().TruncateString(&tab->truncatedTitle, B_TRUNCATE_END,
 		((minimizeRect.IsValid() ? minimizeRect.left :
 			zoomRect.IsValid() ? zoomRect.left :
 			closeRect.IsValid() ? closeRect.left : tabRect.right) - 5)
 		- (tabRect.left + 5));
-	fTruncatedTitleLength = fTruncatedTitle.Length();
+	tab->truncatedTitleLength = tab->truncatedTitle.Length();
 	fDrawingEngine->SetFont(fDrawState.Font());
 
-	fDrawingEngine->DrawString(fTruncatedTitle, fTruncatedTitleLength,
+	fDrawingEngine->DrawString(tab->truncatedTitle, tab->truncatedTitleLength,
 		BPoint(tabRect.left + 5, closeRect.bottom - 1));
-
-	fDrawingEngine->SetDrawingMode(B_OP_COPY);
 }
 
 
+void
+WinDecorator::_DrawButtons(Decorator::Tab* tab, const BRect& invalid)
+{
+	if ((tab->flags & B_NOT_MINIMIZABLE) == 0
+		&& invalid.Intersects(tab->minimizeRect)) {
+		_DrawMinimize(tab, false, tab->minimizeRect);
+	}
+	if ((tab->flags & B_NOT_ZOOMABLE) == 0
+		&& invalid.Intersects(tab->zoomRect)) {
+		_DrawZoom(tab, false, tab->zoomRect);
+	}
+	if ((tab->flags & B_NOT_CLOSABLE) == 0
+		&& invalid.Intersects(tab->closeRect)) {
+		_DrawClose(tab, false, tab->closeRect);
+	}
+}
+
+
+/*!
+	\brief Actually draws the minimize button
+
+	Unless a subclass has a particularly large button, it is probably
+	unnecessary to check the update rectangle.
+
+	\param tab The \a tab to update.
+	\param direct Draw without double buffering.
+	\param rect The area of the button to update.
+*/
+void
+WinDecorator::_DrawMinimize(Decorator::Tab* tab, bool direct, BRect rect)
+{
+	// Just like DrawZoom, but for a Minimize button
+	_DrawBeveledRect(rect, true);
+
+	fDrawingEngine->SetHighColor(fTextColor);
+	BRect minimizeBox(rect.left + 5, rect.bottom - 4, rect.right - 5,
+		rect.bottom - 3);
+	if (true)
+		minimizeBox.OffsetBy(1, 1);
+
+	fDrawingEngine->SetHighColor(RGBColor(0, 0, 0));
+	fDrawingEngine->StrokeRect(minimizeBox);
+}
+
+
+/*!	\brief Actually draws the zoom button
+
+	Unless a subclass has a particularly large button, it is probably
+	unnecessary to check the update rectangle.
+
+	\param tab The \a tab to update.
+	\param direct Draw without double buffering.
+	\param rect The area of the button to update.
+*/
+void
+WinDecorator::_DrawZoom(Decorator::Tab* tab, bool direct, BRect rect)
+{
+	_DrawBeveledRect(rect, true);
+
+	// Draw the Zoom box
+
+	BRect zoomBox(rect);
+	zoomBox.InsetBy(2, 2);
+	zoomBox.InsetBy(1, 0);
+	zoomBox.bottom--;
+	zoomBox.right--;
+
+	if (true)
+		zoomBox.OffsetBy(1, 1);
+
+	fDrawingEngine->SetHighColor(RGBColor(0,0,0));
+	fDrawingEngine->StrokeRect(zoomBox);
+	zoomBox.InsetBy(1, 1);
+	fDrawingEngine->StrokeLine(zoomBox.LeftTop(), zoomBox.RightTop());
+}
+
+
+/*!	\brief Actually draws the close button
+
+	Unless a subclass has a particularly large button, it is probably
+	unnecessary to check the update rectangle.
+
+	\param tab The \a tab to update.
+	\param direct Draw without double buffering.
+	\param rect The area of the button to update.
+*/
 void
 WinDecorator::_DrawClose(Decorator::Tab* tab, bool direct, BRect rect)
 {
@@ -353,46 +465,6 @@ WinDecorator::_DrawClose(Decorator::Tab* tab, bool direct, BRect rect)
 
 
 void
-WinDecorator::_DrawZoom(Decorator::Tab* tab, bool direct, BRect rect)
-{
-	_DrawBeveledRect(rect, true);
-
-	// Draw the Zoom box
-
-	BRect zoomBox(rect);
-	zoomBox.InsetBy(2, 2);
-	zoomBox.InsetBy(1, 0);
-	zoomBox.bottom--;
-	zoomBox.right--;
-
-	if (true)
-		zoomBox.OffsetBy(1, 1);
-
-	fDrawingEngine->SetHighColor(RGBColor(0,0,0));
-	fDrawingEngine->StrokeRect(zoomBox);
-	zoomBox.InsetBy(1, 1);
-	fDrawingEngine->StrokeLine(zoomBox.LeftTop(), zoomBox.RightTop());
-}
-
-
-void
-WinDecorator::_DrawMinimize(Decorator::Tab* tab, bool direct, BRect rect)
-{
-	// Just like DrawZoom, but for a Minimize button
-	_DrawBeveledRect(rect, true);
-
-	fDrawingEngine->SetHighColor(textcol);
-	BRect minimizeBox(rect.left + 5, rect.bottom - 4, rect.right - 5,
-		rect.bottom - 3);
-	if (true)
-		minimizeBox.OffsetBy(1, 1);
-
-	fDrawingEngine->SetHighColor(RGBColor(0, 0, 0));
-	fDrawingEngine->StrokeRect(minimizeBox);
-}
-
-
-void
 WinDecorator::_SetTitle(Decorator::Tab* tab, const char* string,
 	BRegion* updateRegion)
 {
@@ -414,65 +486,6 @@ WinDecorator::_SetTitle(Decorator::Tab* tab, const char* string,
 
 
 void
-WinDecorator::_FontsChanged(DesktopSettings& settings,
-	BRegion* updateRegion)
-{
-	// get previous extent
-	if (updateRegion != NULL)
-		updateRegion->Include(&GetFootprint());
-
-	_UpdateFont(settings);
-	_DoLayout();
-
-	_InvalidateFootprint();
-	if (updateRegion != NULL)
-		updateRegion->Include(&GetFootprint());
-}
-
-
-void
-WinDecorator::_SetLook(Decorator::Tab* tab, DesktopSettings& settings,
-	window_look look, BRegion* updateRegion)
-{
-	tab->look = look;
-
-	// TODO we could be much smarter about the update region
-
-	// get previous extent
-	if (updateRegion != NULL)
-		updateRegion->Include(&GetFootprint());
-
-	fTopTab->look = look;
-
-	_UpdateFont(settings);
-	_DoLayout();
-
-	_InvalidateFootprint();
-	if (updateRegion != NULL)
-		updateRegion->Include(&GetFootprint());
-}
-
-
-void
-WinDecorator::_SetFlags(Decorator::Tab* tab, uint32 flags, BRegion* updateRegion)
-{
-	tab->flags = flags;
-
-	// TODO we could be much smarter about the update region
-
-	// get previous extent
-	if (updateRegion != NULL)
-		updateRegion->Include(&GetFootprint());
-
-	_DoLayout();
-
-	_InvalidateFootprint();
-	if (updateRegion != NULL)
-		updateRegion->Include(&GetFootprint());
-}
-
-
-void
 WinDecorator::_SetFocus(Decorator::Tab* tab)
 {
 	// TODO stub
@@ -481,15 +494,11 @@ WinDecorator::_SetFocus(Decorator::Tab* tab)
 	// other things when a window is deactivated or activated.
 
 	if (IsFocus(tab)) {
-//		tab_highcol.SetColor(100, 100, 255);
-//		tab_lowcol.SetColor(40, 0, 255);
-		tab_highcol = fFocusTabColor;
-		textcol = fFocusTextColor;
+		fTabColor = fFocusTabColor;
+		fTextColor = fFocusTextColor;
 	} else {
-//		tab_highcol.SetColor(220, 220, 220);
-//		tab_lowcol.SetColor(128, 128, 128);
-		tab_highcol = fNonFocusTabColor;
-		textcol = fNonFocusTextColor;
+		fTabColor = fNonFocusTabColor;
+		fTextColor = fNonFocusTextColor;
 	}
 }
 
@@ -509,6 +518,8 @@ WinDecorator::_MoveBy(BPoint offset)
 
 	// Move all internal rectangles over
 	fFrame.OffsetBy(offset);
+	fTitleBarRect.OffsetBy(offset);
+	fResizeRect.OffsetBy(offset);
 	fBorderRect.OffsetBy(offset);
 }
 
@@ -519,6 +530,10 @@ WinDecorator::_ResizeBy(BPoint offset, BRegion* dirty)
 	// Move all internal rectangles the appropriate amount
 	fFrame.right += offset.x;
 	fFrame.bottom += offset.y;
+	fTitleBarRect.right += offset.x;
+	fTitleBarRect.bottom += offset.y;
+	fResizeRect.right += offset.x;
+	fResizeRect.bottom += offset.y;
 	fBorderRect.right += offset.x;
 	fBorderRect.bottom += offset.y;
 
@@ -543,20 +558,44 @@ WinDecorator::_ResizeBy(BPoint offset, BRegion* dirty)
 // TODO : _SetSettings
 
 
+Decorator::Tab*
+WinDecorator::_AllocateNewTab()
+{
+	Decorator::Tab* tab = new(std::nothrow) Decorator::Tab;
+	if (tab == NULL)
+		return NULL;
+
+	// Set appropriate colors based on the current focus value. In this case,
+	// each decorator defaults to not having the focus.
+	_SetFocus(tab);
+	return tab;
+}
+
+
 bool
 WinDecorator::_AddTab(DesktopSettings& settings, int32 index,
 	BRegion* updateRegion)
 {
-	// TODO stub
-	return false;
+	_UpdateFont(settings);
+
+	_DoLayout();
+	if (updateRegion != NULL)
+		updateRegion->Include(fTitleBarRect);
+
+	return true;
 }
 
 
 bool
 WinDecorator::_RemoveTab(int32 index, BRegion* updateRegion)
 {
-	// TODO stub
-	return false;
+	BRect oldTitle = fTitleBarRect;
+	_DoLayout();
+	if (updateRegion != NULL) {
+		updateRegion->Include(oldTitle);
+		updateRegion->Include(fTitleBarRect);
+	}
+	return true;
 }
 
 
@@ -589,18 +628,6 @@ WinDecorator::_GetFootprint(BRegion* region)
 		region->Include(tab->tabRect);
 	}
 	region->Exclude(fFrame);
-}
-
-
-void
-WinDecorator::DrawButtons(Decorator::Tab* tab, const BRect& invalid)
-{
-	if (!(tab->flags & B_NOT_MINIMIZABLE) && invalid.Intersects(tab->minimizeRect))
-		_DrawMinimize(tab, false, tab->minimizeRect);
-	if (!(tab->flags & B_NOT_ZOOMABLE) && invalid.Intersects(tab->zoomRect))
-		_DrawZoom(tab, false, tab->zoomRect);
-	if (!(tab->flags & B_NOT_CLOSABLE) && invalid.Intersects(tab->closeRect))
-		_DrawClose(tab, false, tab->closeRect);
 }
 
 
@@ -682,11 +709,11 @@ WinDecorator::_DrawBeveledRect(BRect r, bool down)
 
 	rect.InsetBy(1,1);
 
-	fDrawingEngine->FillRect(rect,mid);
+	fDrawingEngine->FillRect(rect, mid);
 }
 
 
-// #pragma mark -
+// #pragma mark - DecorAddOn
 
 
 extern "C" DecorAddOn*
