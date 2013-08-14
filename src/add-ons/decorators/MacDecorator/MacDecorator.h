@@ -36,62 +36,61 @@ public:
 
 	virtual	Region				RegionAt(BPoint where, int32& tab) const;
 
+	virtual	bool				SetRegionHighlight(Region region,
+									uint8 highlight, BRegion* dirty,
+									int32 tab = -1);
+
 protected:
 			void				_DoLayout();
 
-			void				_DrawFrame(BRect r);
-			void				_DrawTab(BRect r);
+	virtual	void				_DrawFrame(BRect invalid);
 
-			void				_DrawClose(BRect r);
-			void				_DrawTitle(BRect r);
-			void				_DrawZoom(BRect r);
-			void				_DrawMinimize(BRect r);
+	virtual	void				_DrawTab(Decorator::Tab* tab, BRect invalid);
+	virtual	void				_DrawButtons(Decorator::Tab* tab,
+									const BRect& invalid);
+	virtual	void				_DrawTitle(Decorator::Tab* tab, BRect rect);
 
-			void				_SetTitle(Tab* tab, const char* string,
+	virtual	void				_DrawMinimize(Decorator::Tab* tab, bool direct,
+									BRect rect);
+	virtual	void				_DrawZoom(Decorator::Tab* tab, bool direct,
+									BRect rect);
+	virtual	void				_DrawClose(Decorator::Tab* tab, bool direct,
+									BRect rect);
+
+	virtual	void				_SetTitle(Tab* tab, const char* string,
 									BRegion* updateRegion = NULL);
 
-			void				_FontsChanged(DesktopSettings& settings,
-									BRegion* updateRegion);
-			void				_SetLook(DesktopSettings& settings,
-									window_look look,
+	virtual	void				_MoveBy(BPoint offset);
+	virtual	void				_ResizeBy(BPoint offset, BRegion* dirty);
+
+			Decorator::Tab*		_AllocateNewTab();
+
+	virtual	bool				_AddTab(DesktopSettings& settings,
+									int32 index = -1,
 									BRegion* updateRegion = NULL);
-			void				_SetFlags(uint32 flags,
+	virtual	bool				_RemoveTab(int32 index,
+									BRegion* updateRegion = NULL);
+	virtual	bool				_MoveTab(int32 from, int32 to, bool isMoving,
 									BRegion* updateRegion = NULL);
 
-			void				_MoveBy(BPoint offset);
-			void				_ResizeBy(BPoint offset, BRegion* dirty);
+	virtual	void				_GetFootprint(BRegion *region);
 
-			void				_GetFootprint(BRegion *region);
+	virtual	void				_UpdateFont(DesktopSettings& settings);
 
-			// TODO
-			Tab*				_AllocateNewTab();
-			bool				_AddTab(DesktopSettings&, long int, BRegion*);
-			bool				_RemoveTab(long int, BRegion*);
-			bool				_MoveTab(long int, long int, bool, BRegion*);
 private:
-			void				_UpdateFont(DesktopSettings& settings);
 			void				_DrawBlendedRect(DrawingEngine* engine,
 									BRect r, bool down);
 
 			rgb_color			fButtonHighColor;
 			rgb_color			fButtonLowColor;
-			rgb_color			frame_highcol;
-			rgb_color			frame_midcol;
-			rgb_color			frame_lowcol;
-			rgb_color			frame_lowercol;
+
+			rgb_color			fFrameHighColor;
+			rgb_color			fFrameMidColor;
+			rgb_color			fFrameLowColor;
+			rgb_color			fFrameLowerColor;
+
 			rgb_color			fFocusTextColor;
 			rgb_color			fNonFocusTextColor;
-
-			uint64 solidhigh, solidlow;
-
-			BString				fTruncatedTitle;
-			int32				fTruncatedTitleLength;
-
-			int32 				fBorderWidth;
-
-			bool slidetab;
-			int textoffset;
-			float titlepixelwidth;
 };
 
 #endif
