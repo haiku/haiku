@@ -51,7 +51,7 @@ AHCIPort::AHCIPort(AHCIController *controller, int index)
 	fTestUnitReadyActive(false),
 	fResetPort(false),
 	fError(false),
-	fTrim(false)
+	fTrimSupported(false)
 {
 	B_INITIALIZE_SPINLOCK(&fSpinlock);
 	fRequestSem = create_sem(1, "ahci request");
@@ -604,7 +604,7 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 	if (!fIsATAPI) {
 		fSectorCount = ataData.SectorCount(fUse48BitCommands, true);
 		fSectorSize = ataData.SectorSize();
-		fTrim = ataData.data_set_management_support;
+		fTrimSupported = ataData.data_set_management_support;
 		TRACE("lba %d, lba48 %d, fUse48BitCommands %d, sectors %" B_PRIu32
 			", sectors48 %" B_PRIu64 ", size %" B_PRIu64 "\n",
 			ataData.dma_supported != 0, ataData.lba48_supported != 0,
@@ -634,7 +634,7 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 	TRACE("model number: %s\n", modelNumber);
 	TRACE("serial number: %s\n", serialNumber);
 	TRACE("firmware rev.: %s\n", firmwareRev);
-	TRACE("trim support: %s\n", fTrim ? "yes" : "no");
+	TRACE("trim support: %s\n", fTrimSupported ? "yes" : "no");
 
 	// There's not enough space to fit all of the data in. ATA has 40 bytes for
 	// the model number, 20 for the serial number and another 8 for the
@@ -783,6 +783,23 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 lba, size_t sectorCount,
 	}
 
 	ExecuteSataRequest(sreq, isWrite);
+}
+
+
+void
+AHCIPort::ScsiUnmap(scsi_ccb* request, scsi_unmap_parameter_list* unmapBlocks)
+{
+	TRACE("%s unimplemented: TRIM call\n", __func__);
+
+	sata_request* sreq = new(std::nothrow) sata_request(request);
+	if (sreq == NULL) {
+		TRACE("out of memory when allocating unmap request\n");
+		request->subsys_status = SCSI_REQ_ABORTED;
+		gSCSI->finished(request, 1);
+		return;
+	}
+
+	delete sreq;
 }
 
 
@@ -1018,12 +1035,11 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 			}
 			break;
 		}
-		case SCSI_OP_WRITE_SAME_16:
+		case SCSI_OP_UNMAP:
 		{
-			const scsi_cmd_wsame_16 *cmd = (const scsi_cmd_wsame_16 *)request->cdb;
+			const scsi_cmd_unmap* cmd = (const scsi_cmd_unmap*)request->cdb;
 
-			// SCSI unmap is used for trim, otherwise we don't support it
-			if (!cmd->unmap) {
+			if (!fTrimSupported) {
 				TRACE("%s port %d: unsupported request opcode 0x%02x\n",
 					__func__, fIndex, request->cdb[0]);
 				request->subsys_status = SCSI_REQ_ABORTED;
@@ -1031,16 +1047,19 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 				break;
 			}
 
-			if (!fTrim) {
-				// Drive doesn't support trim (or atapi)
-				// Just say it was successful and quit
-				request->subsys_status = SCSI_REQ_CMP;
-			} else {
-				TRACE("%s unimplemented: TRIM call\n", __func__);
-				// TODO: Make Serial ATA (sata_request?) trim call here.
+			scsi_unmap_parameter_list* unmapBlocks
+				= (scsi_unmap_parameter_list*)request->data;
+			if (unmapBlocks == NULL
+				|| B_BENDIAN_TO_HOST_INT16(cmd->length) != request->data_length
+				|| B_BENDIAN_TO_HOST_INT16(unmapBlocks->data_length)
+					!= request->data_length - 1) {
+				TRACE("%s port %d: invalid unmap parameter data length\n",
+					__func__, fIndex);
 				request->subsys_status = SCSI_REQ_ABORTED;
+				gSCSI->finished(request, 1);
+			} else {
+				ScsiUnmap(request, unmapBlocks);
 			}
-			gSCSI->finished(request, 1);
 			break;
 		}
 		default:

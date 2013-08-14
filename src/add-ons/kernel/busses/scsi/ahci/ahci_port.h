@@ -36,6 +36,8 @@ private:
 	void		ScsiReadCapacity16(scsi_ccb *request);
 	void		ScsiReadWrite(scsi_ccb *request, uint64 lba, size_t sectorCount, bool isWrite);
 	void		ScsiSynchronizeCache(scsi_ccb *request);
+	void		ScsiUnmap(scsi_ccb* request,
+					struct scsi_unmap_parameter_list* unmapBlocks);
 
 	void		ExecuteSataRequest(sata_request *request, bool isWrite = false);
 
@@ -71,7 +73,7 @@ private:
 	bool							fTestUnitReadyActive;
 	bool							fResetPort;
 	bool							fError;
-	bool							fTrim;
+	bool							fTrimSupported;
 
 	volatile fis *					fFIS;
 	volatile command_list_entry *	fCommandList;
