@@ -42,6 +42,10 @@ public:
 			float				LineInset() const
 									{ return fLineInset; }
 
+			void				SetLineSpacing(float spacing);
+			float				LineSpacing() const
+									{ return fLineSpacing; }
+
 			void				SetWidth(float width);
 			float				Width() const
 									{ return fWidth; }

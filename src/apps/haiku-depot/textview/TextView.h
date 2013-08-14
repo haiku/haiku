@@ -18,6 +18,7 @@ public:
 
 	virtual void				Draw(BRect updateRect);
 
+	virtual void				AttachedToWindow();
 	virtual void				FrameResized(float width, float height);
 
 	virtual	BSize				MinSize();

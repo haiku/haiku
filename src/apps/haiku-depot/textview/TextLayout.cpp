@@ -217,7 +217,7 @@ TextLayout::SetText(const BString& text)
 void
 TextLayout::SetFont(const BFont& font)
 {
-	if (fDefaultFont != font) {
+	if (fDefaultFont != font || fAscent == 0.0f) {
 		fDefaultFont = font;
 
 		font_height fontHeight;
@@ -256,6 +256,16 @@ TextLayout::SetLineInset(float inset)
 {
 	if (fLineInset != inset) {
 		fLineInset = inset;
+		fLayoutValid = false;
+	}
+}
+
+
+void
+TextLayout::SetLineSpacing(float spacing)
+{
+	if (fLineSpacing != spacing) {
+		fLineSpacing = spacing;
 		fLayoutValid = false;
 	}
 }
@@ -313,7 +323,9 @@ TextLayout::Draw(BView* view, const BPoint& offset)
 		fText.CopyCharsInto(string, startOffset, endOffset - startOffset);
 		
 		float x = fGlyphInfoBuffer[startOffset].x;
-		float y = fGlyphInfoBuffer[startOffset].y + line.maxAscent;
+		float y = fGlyphInfoBuffer[startOffset].y;
+
+//printf("%p->%.1f,%.1f: '%s'\n", this, x, y, string.String());
 		view->DrawString(string, BPoint(x, y));
 	}
 }
@@ -510,8 +522,6 @@ void
 TextLayout::_FinalizeLine(int lineStart, int lineEnd, int lineIndex, float y,
 	float& lineHeight)
 {
-printf("_FinalizeLine(%d, %d, %d, %.1f)\n", lineStart, lineEnd, lineIndex,
-y);
 	lineHeight = 0.0f;
 	float maxAscent = 0.0f;
 	float maxDescent = 0.0f;

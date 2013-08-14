@@ -8,8 +8,13 @@
 
 TextView::TextView(const char* name)
 	:
-	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
+	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS)
 {
+	fTextLayout.SetWidth(Bounds().Width());
+	fTextLayout.SetLineSpacing(ceilf(fTextLayout.Font().Size() * 0.2));
+
+	SetViewColor(B_TRANSPARENT_COLOR);
+	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
 
@@ -22,7 +27,18 @@ void
 TextView::Draw(BRect updateRect)
 {
 	FillRect(updateRect, B_SOLID_LOW);
+
+	fTextLayout.SetWidth(Bounds().Width());
 	fTextLayout.Draw(this, B_ORIGIN);
+}
+
+
+void
+TextView::AttachedToWindow()
+{
+	BView* parent = Parent();
+	if (parent != NULL)
+		SetLowColor(parent->ViewColor());
 }
 
 
@@ -36,7 +52,7 @@ TextView::FrameResized(float width, float height)
 BSize
 TextView::MinSize()
 {
-	return BSize(0.0f, 0.0f);
+	return BSize(50.0f, 0.0f);
 }
 
 
@@ -68,7 +84,7 @@ TextView::GetHeightForWidth(float width, float* min, float* max,
 	TextLayout layout(fTextLayout);
 	layout.SetWidth(width);
 
-	float height = layout.Height();
+	float height = layout.Height() + 1;
 
 	if (min != NULL)
 		*min = height;
