@@ -245,8 +245,14 @@ SettingsWindow::_CreateGeneralPage(float spacing)
 		new BMessage(MSG_SEARCH_PAGE_CHANGED));
 	fSearchPageControl->SetModificationMessage(
 		new BMessage(MSG_SEARCH_PAGE_CHANGED));
-	fSearchPageControl->SetText(
-		fSettings->GetValue(kSettingsKeySearchPageURL, kDefaultSearchPageURL));
+	BString searchURL = fSettings->GetValue(kSettingsKeySearchPageURL,
+		kDefaultSearchPageURL);
+	if (searchURL == "http://www.google.com") {
+		// Migrate old settings files.
+		searchURL = kDefaultSearchPageURL;
+		fSettings->SetValue(kSettingsKeySearchPageURL, kDefaultSearchPageURL);
+	}
+	fSearchPageControl->SetText(searchURL);
 
 	fDownloadFolderControl = new BTextControl("download folder",
 		B_TRANSLATE("Download folder:"), "",

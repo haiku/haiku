@@ -2259,6 +2259,9 @@ BrowserWindow::_NewTabURL(bool isNewWindow) const
 BString
 BrowserWindow::_EncodeURIComponent(const BString& search)
 {
+	// We have to take care of some of the escaping before we hand over the
+	// search string to WebKit, if we want queries like "4+3" to not be
+	// searched as "4 3".
 	const BString escCharList = " $&`:<>[]{}\"+#%@/;=?\\^|~\',";
 	BString result = search;
 	char hexcode[4];
@@ -2287,15 +2290,10 @@ BrowserWindow::_VisitURL(const BString& url)
 void
 BrowserWindow::_VisitSearchEngine(const BString& search)
 {
-	// TODO: Google Code-In Task to make default search
-	//			engine modifiable from Settings? :)
-
-	BString engine = "http://www.google.com/search?q=";
-	engine += _EncodeURIComponent(search);
-		// We have to take care of some of the escaping before
-		// we hand over the string to WebKit, if we want queries
-		// like "4+3" to not be searched as "4 3".
-
+	BString engine = "";
+	engine.SetToFormat(fSearchPageURL, 
+		_EncodeURIComponent(search).String());
+	
 	_VisitURL(engine);
 }
 
@@ -2303,11 +2301,9 @@ BrowserWindow::_VisitSearchEngine(const BString& search)
 inline bool
 BrowserWindow::_IsValidDomainChar(char ch)
 {
-	// TODO: Currenlty, only a whitespace character
-	//			breaks a domain name. It might be
-	//			a good idea (or a bad one) to make
-	//			character filtering based on the
-	//			IDNA 2008 standard.
+	// TODO: Currenlty, only a whitespace character breaks a domain name. It
+	// might be a good idea (or a bad one) to make character filtering based on
+	// the IDNA 2008 standard.
 
 	return ch != ' ';
 }
