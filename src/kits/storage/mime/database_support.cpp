@@ -97,12 +97,15 @@ static const directory_which kBaseDirectoryConstants[] = {
 };
 
 static pthread_once_t sDefaultDatabaseLocationInitOnce = PTHREAD_ONCE_INIT;
-static DatabaseLocation sDefaultDatabaseLocation;
+static DatabaseLocation* sDefaultDatabaseLocation = NULL;
 
 
 static void
 init_default_database_location()
 {
+	static DatabaseLocation databaseLocation;
+	sDefaultDatabaseLocation = &databaseLocation;
+
 	for (size_t i = 0;
 		i < sizeof(kBaseDirectoryConstants)
 			/ sizeof(kBaseDirectoryConstants[0]); i++) {
@@ -116,7 +119,7 @@ init_default_database_location()
 			continue;
 
 		directoryPath += "/mime_db";
-		sDefaultDatabaseLocation.AddDirectory(directoryPath);
+		databaseLocation.AddDirectory(directoryPath);
 	}
 }
 
@@ -126,7 +129,7 @@ default_database_location()
 {
 	pthread_once(&sDefaultDatabaseLocationInitOnce,
 		&init_default_database_location);
-	return &sDefaultDatabaseLocation;
+	return sDefaultDatabaseLocation;
 }
 
 
