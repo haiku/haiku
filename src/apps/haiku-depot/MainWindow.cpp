@@ -199,11 +199,11 @@ MainWindow::_InitDummyModel()
 		"2.1.2 - Initial Haiku release.");
 	wonderbrush.AddUserRating(
 		UserRating(UserInfo("humdinger"), 4.5f,
-		"Awesome!", "en", "2.1.2")
+		"Awesome!", "en", "2.1.2", 0, 0)
 	);
 	wonderbrush.AddUserRating(
 		UserRating(UserInfo("bonefish"), 5.0f,
-		"The best!", "en", "2.1.2")
+		"The best!", "en", "2.1.2", 3, 1)
 	);
 	wonderbrush.AddScreenshot(
 		BitmapRef(new SharedBitmap(603), true));
@@ -231,17 +231,17 @@ MainWindow::_InitDummyModel()
 	paladin.AddUserRating(
 		UserRating(UserInfo("stippi"), 3.5f,
 		"Could be more integrated from the sounds of it.",
-		"en", "1.2.0")
+		"en", "1.2.0", 0, 1)
 	);
 	paladin.AddUserRating(
 		UserRating(UserInfo("mmadia"), 5.0f,
 		"It rocks! Give a try",
-		"en", "1.1.0")
+		"en", "1.1.0", 1, 0)
 	);
 	paladin.AddUserRating(
 		UserRating(UserInfo("bonefish"), 2.0f,
 		"It just needs to use my jam-rewrite 'ham' and it will be great.",
-		"en", "1.1.0")
+		"en", "1.1.0", 3, 1)
 	);
 	paladin.AddScreenshot(
 		BitmapRef(new SharedBitmap(605), true));
@@ -321,14 +321,14 @@ MainWindow::_InitDummyModel()
 		"custom installed sound fonts? Reading through this comment I find "
 		"that I did not until now. Hopefully there are enough lines now to "
 		"please the programmer with the text layouting and scrolling of "
-		"long ratings!", "en", "2.1.0")
+		"long ratings!", "en", "2.1.0", 4, 1)
 	);
 	sequitur.AddUserRating(
 		UserRating(UserInfo("stippi"), 3.5f,
 		"It seems very capable. Still runs fine on Haiku. The interface "
 		"is composed of many small, hard to click items. But you can "
 		"configure a tool for each mouse button, which is great for the "
-		"work flow.", "en", "2.1.0")
+		"work flow.", "en", "2.1.0", 2, 1)
 	);
 	sequitur.AddCategory(fModel.CategoryAudio());
 	

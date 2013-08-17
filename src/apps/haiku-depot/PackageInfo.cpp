@@ -242,21 +242,24 @@ UserRating::UserRating()
 	fRating(0.0f),
 	fComment(),
 	fLanguage(),
-	fPackageVersion()
+	fPackageVersion(),
+	fUpVotes(0),
+	fDownVotes(0)
 {
 }
 
 
 UserRating::UserRating(const UserInfo& userInfo, float rating,
 		const BString& comment, const BString& language,
-		const BString& packageVersion)
+		const BString& packageVersion, int32 upVotes, int32 downVotes)
 	:
 	fUserInfo(userInfo),
 	fRating(rating),
 	fComment(comment),
 	fLanguage(language),
-	fPackageVersion(packageVersion)
-	
+	fPackageVersion(packageVersion),
+	fUpVotes(upVotes),
+	fDownVotes(downVotes)
 {
 }
 
@@ -267,7 +270,9 @@ UserRating::UserRating(const UserRating& other)
 	fRating(other.fRating),
 	fComment(other.fComment),
 	fLanguage(other.fLanguage),
-	fPackageVersion(other.fPackageVersion)
+	fPackageVersion(other.fPackageVersion),
+	fUpVotes(other.fUpVotes),
+	fDownVotes(other.fDownVotes)
 {
 }
 
@@ -280,6 +285,8 @@ UserRating::operator=(const UserRating& other)
 	fComment = other.fComment;
 	fLanguage = other.fLanguage;
 	fPackageVersion = other.fPackageVersion;
+	fUpVotes = other.fUpVotes;
+	fDownVotes = other.fDownVotes;
 	return *this;
 }
 
@@ -291,7 +298,9 @@ UserRating::operator==(const UserRating& other) const
 		&& fRating == other.fRating
 		&& fComment == other.fComment
 		&& fLanguage == other.fLanguage
-		&& fPackageVersion == other.fPackageVersion;
+		&& fPackageVersion == other.fPackageVersion
+		&& fUpVotes == other.fUpVotes
+		&& fDownVotes == other.fDownVotes;
 }
 
 

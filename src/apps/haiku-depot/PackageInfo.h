@@ -76,7 +76,8 @@ public:
 									float rating,
 									const BString& comment,
 									const BString& language,
-									const BString& packageVersion);
+									const BString& packageVersion,
+									int32 upVotes, int32 downVotes);
 								UserRating(const UserRating& other);
 
 			UserRating&			operator=(const UserRating& other);
@@ -94,12 +95,18 @@ public:
 			const BString&		PackageVersion() const
 									{ return fPackageVersion; }
 
+			int32				UpVotes() const
+									{ return fUpVotes; }
+			int32				DownVotes() const
+									{ return fDownVotes; }
 private:
 			UserInfo			fUserInfo;
 			float				fRating;
 			BString				fComment;
 			BString				fLanguage;
 			BString				fPackageVersion;
+			int32				fUpVotes;
+			int32				fDownVotes;
 };
 
 
