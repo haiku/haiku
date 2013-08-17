@@ -9,9 +9,9 @@
 #include <algorithm>
 #include <new>
 
-#include <AutoDeleter.h>
-
 #include <fs_cache.h>
+
+#include <AutoDeleter.h>
 #include <util/AutoLock.h>
 
 #include <package/hpkg/DataOutput.h>
