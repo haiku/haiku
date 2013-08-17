@@ -310,11 +310,12 @@ actions BootstrapRepositoryFetchPackage1
 
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 	if [ -n "$secondaryCrossDevelPackages" ]; then
-		$(HOST_HAIKU_PORTER) --cross-devel-package "$haikuCrossDevelPackage" \
+		$(HOST_HAIKU_PORTER) -j$(HAIKU_PORTER_CONCURRENT_JOBS) \
+			--cross-devel-package "$haikuCrossDevelPackage" \
 			"$secondaryCrossDevelPackages" $portName
 	else
-		$(HOST_HAIKU_PORTER) --cross-devel-package "$haikuCrossDevelPackage" \
-			$portName
+		$(HOST_HAIKU_PORTER) -j$(HAIKU_PORTER_CONCURRENT_JOBS) \
+			--cross-devel-package "$haikuCrossDevelPackage" $portName
 	fi
 }
 
