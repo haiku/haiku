@@ -10,6 +10,7 @@
 #include "Command.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 
 static int
