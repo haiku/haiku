@@ -95,6 +95,9 @@ if [ IsOptionalHaikuImagePackageAdded Development ] {
 	# auto tools and perl
 	AddHaikuImagePackages autoconf automake libtool perl texinfo ;
 
+	# some other build tools
+	AddHaikuImagePackages cmake pkgconfig scons ;
+
 	# devel packages for mandatory packages
 	local architectureObject ;
 	for architectureObject in [ MultiArchSubDirSetup ] {
