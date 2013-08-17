@@ -13,6 +13,7 @@
 #include <CardLayout.h>
 #include <Catalog.h>
 #include <Font.h>
+#include <GridView.h>
 #include <LayoutBuilder.h>
 #include <LayoutUtils.h>
 #include <Message.h>
@@ -325,6 +326,72 @@ public:
 private:
 	SharedBitmap	fStarBitmap;
 	float			fRating;
+};
+
+
+class DiagramBarView : public BView {
+public:
+	DiagramBarView()
+		:
+		BView("diagram bar view", B_WILL_DRAW),
+		fValue(0.0f)
+	{
+		SetViewColor(B_TRANSPARENT_COLOR);
+		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetHighColor(tint_color(LowColor(), B_DARKEN_2_TINT));
+	}
+	
+	virtual ~DiagramBarView()
+	{
+	}
+
+	virtual void AttachedToWindow()
+	{
+		BView* parent = Parent();
+		if (parent != NULL) {
+			SetLowColor(parent->ViewColor());
+			SetHighColor(tint_color(LowColor(), B_DARKEN_2_TINT));
+		}
+	}
+
+	virtual void Draw(BRect updateRect)
+	{
+		FillRect(updateRect, B_SOLID_LOW);
+		
+		if (fValue <= 0.0f)
+			return;
+		
+		BRect rect(Bounds());
+		rect.right = ceilf(rect.left + fValue * rect.Width());
+		
+		FillRect(rect, B_SOLID_HIGH);
+	}
+
+	virtual BSize MinSize()
+	{
+		return BSize(64, 10);
+	}
+
+	virtual BSize PreferredSize()
+	{
+		return MinSize();
+	}
+
+	virtual BSize MaxSize()
+	{
+		return BSize(64, 10);
+	}
+
+	void SetValue(float value)
+	{
+		if (fValue != value) {
+			fValue = value;
+			Invalidate();
+		}
+	}
+
+private:
+	float			fValue;
 };
 
 
@@ -814,14 +881,82 @@ protected:
 };
 
 
+class RatingSummaryView : public BGridView {
+public:
+	RatingSummaryView()
+		:
+		BGridView("rating summary view", B_USE_HALF_ITEM_SPACING, 0.0f)
+	{
+		SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+			kContentTint - 0.1));
+		
+		BLayoutBuilder::Grid<> layoutBuilder(this);
+		
+		BFont smallFont;
+		GetFont(&smallFont);
+		smallFont.SetSize(std::max(9.0f, floorf(smallFont.Size() * 0.85f)));
+		
+		for (int32 i = 0; i < 5; i++) {
+			BString label;
+			label.SetToFormat("%ld", 5 - i);
+			fLabelViews[i] = new BStringView("", label);
+			fLabelViews[i]->SetFont(&smallFont);
+			fLabelViews[i]->SetHighColor(kLightBlack);
+			layoutBuilder.Add(fLabelViews[i], 0, i);
+
+			fDiagramBarViews[i] = new DiagramBarView();
+			layoutBuilder.Add(fDiagramBarViews[i], 1, i);
+			
+			fCountViews[i] = new BStringView("", "");
+			fCountViews[i]->SetFont(&smallFont);
+			fCountViews[i]->SetHighColor(kLightBlack);
+			fCountViews[i]->SetAlignment(B_ALIGN_RIGHT);
+			layoutBuilder.Add(fCountViews[i], 2, i);
+		}
+		
+		layoutBuilder.SetInsets(5);
+	}
+
+	void SetToSummary(const RatingSummary& summary) {
+		for (int32 i = 0; i < 5; i++) {
+			int count = summary.ratingCountByStar[4 - i];
+
+			BString label;
+			label.SetToFormat("%ld", count);
+			fCountViews[i]->SetText(label);
+			
+			if (summary.ratingCount > 0) {
+				fDiagramBarViews[i]->SetValue(
+					(float)count / summary.ratingCount);
+			} else
+				fDiagramBarViews[i]->SetValue(0.0f);
+		}
+	}
+
+	void Clear() {
+		for (int32 i = 0; i < 5; i++) {
+			fCountViews[i]->SetText("");
+			fDiagramBarViews[i]->SetValue(0.0f);
+		}
+	}
+
+private:
+	BStringView*	fLabelViews[5];
+	DiagramBarView*	fDiagramBarViews[5];
+	BStringView*	fCountViews[5];
+};
+
+
 class UserRatingsView : public BGroupView {
 public:
 	UserRatingsView()
 		:
-		BGroupView("package ratings view", B_VERTICAL)
+		BGroupView("package ratings view", B_HORIZONTAL)
 	{
 		SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 			kContentTint));
+		
+		fRatingSummaryView = new RatingSummaryView();
 		
 		RatingContainerView* ratingsContainerView = new RatingContainerView();
 		fRatingContainerLayout = ratingsContainerView->GroupLayout();
@@ -830,6 +965,11 @@ public:
 			"ratings scroll view", ratingsContainerView);
 		
 		BLayoutBuilder::Group<>(this)
+			.AddGroup(B_VERTICAL)
+				.Add(fRatingSummaryView, 0.0f)
+				.AddGlue()
+				.SetInsets(0.0f, B_USE_DEFAULT_SPACING, 0.0f, 0.0f)
+			.End()
 			.Add(scrollView, 1.0f)
 			.SetInsets(B_USE_DEFAULT_SPACING, -1.0f, -1.0f, -1.0f)
 		;
@@ -842,7 +982,10 @@ public:
 
 	void SetPackage(const PackageInfo& package)
 	{
-		Clear();
+		ClearRatings();
+
+		// TODO: Re-use rating summary already used for TitleView...
+		fRatingSummaryView->SetToSummary(package.CalculateRatingSummary());
 
 		const UserRatingList& userRatings = package.UserRatings();
 		
@@ -858,6 +1001,12 @@ public:
 
 	void Clear()
 	{
+		fRatingSummaryView->Clear();
+		ClearRatings();
+	}
+
+	void ClearRatings()
+	{
 		for (int32 i = fRatingContainerLayout->CountItems() - 1;
 				BLayoutItem* item = fRatingContainerLayout->ItemAt(i); i--) {
 			RatingItemView* view = dynamic_cast<RatingItemView*>(
@@ -870,7 +1019,8 @@ public:
 	}
 
 private:
-	BGroupLayout*	fRatingContainerLayout;
+	BGroupLayout*			fRatingContainerLayout;
+	RatingSummaryView*		fRatingSummaryView;
 };
 
 
