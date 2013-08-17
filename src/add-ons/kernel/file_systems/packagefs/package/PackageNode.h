@@ -73,7 +73,8 @@ public:
 	inline	void*				IndexCookieForAttribute(const StringKey& name)
 									const;
 
-protected:
+			// conceptually protected, but actually declaring it so causes
+			// compilation issues when used with MethodDeleter in subclasses
 			void				NonVirtualVFSUninit()
 									{ PackageNode::VFSUninit(); }
 									// service for derived classes, e.g. for use
