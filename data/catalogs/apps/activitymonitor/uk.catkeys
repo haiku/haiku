@@ -1,10 +1,12 @@
-1	ukrainian	x-vnd.Haiku-ActivityMonitor	234995750
+1	ukrainian	x-vnd.Haiku-ActivityMonitor	2372331429
 P-faults	DataSource		Р-помилки
 Media nodes	DataSource		Мультимедійні вузли
 Threads	DataSource		Потоки
+Always on top	ActivityWindow		Завжди зверху
 Add graph	ActivityWindow		Додати графік
 Teams	DataSource		Команди
 Hide legend	ActivityView		Сховати легенду
+MiB	DataSource		МіБ
 Network send	DataSource		Відправлено по мережі
 CPU usage (combined)	DataSource		Використання СPU (загальне)
 CPU	DataSource		CPU
@@ -25,6 +27,7 @@ Update time interval:	SettingsWindow		Інтервал часу поновлен
 TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		Вийти
 Block cache memory	DataSource		Блок кеш пам'яті
+%.1f KiB/s	DataSource		%.1f KіB/с
 Remove graph	ActivityView		Видалити графік
 %lld sec.	SettingsWindow		%lld сек.
 %lld ms	SettingsWindow		%lld мілісек.
