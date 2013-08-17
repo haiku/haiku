@@ -40,6 +40,9 @@ if [ FIsBuildFeatureEnabled openssl ] {
 	AddHaikuImagePackages openssl ;
 }
 
+# add additionally requested packages
+AddHaikuImagePackages $(HAIKU_IMAGE_ADDITIONAL_PACKAGES) ;
+
 # Optionally we allow not to include the "src" subdirectory.
 if $(HAIKU_DONT_INCLUDE_SRC) {
 	# Don't include "src", but at least include the stuff needed for the
