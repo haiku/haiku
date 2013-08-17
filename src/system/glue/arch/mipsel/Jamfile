@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src system glue arch mipsel ;
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup mipsel ] {
 	on $(architectureObject) {
-		KernelObjects
+		Objects
 			crti.S
 			crtn.S
 			;

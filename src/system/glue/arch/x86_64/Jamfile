@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src system glue arch x86_64 ;
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup x86_64 ] {
 	on $(architectureObject) {
-		KernelObjects
+		Objects
 			crti.S
 			crtn.S
 			;

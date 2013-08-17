@@ -5,7 +5,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		UsePrivateSystemHeaders ;
 
-		KernelObjects
+		Objects
 			init_term_dyn.c
 			start_dyn.c
 			haiku_version_glue.c
