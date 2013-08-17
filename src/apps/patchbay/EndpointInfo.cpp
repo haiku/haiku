@@ -49,7 +49,7 @@ EndpointInfo::EndpointInfo(int32 id)
 	if (roster != NULL) {
 		BMidiEndpoint* endpoint = roster->FindEndpoint(id);
 		if (endpoint != NULL) {
-			printf("endpoint %ld = %p\n", id, endpoint);
+			printf("endpoint %" B_PRId32 " = %p\n", id, endpoint);
 			BMessage msg;
 			if (endpoint->GetProperties(&msg) == B_OK) {
 				fIcon = CreateIcon(&msg, DISPLAY_ICON_SIZE);
