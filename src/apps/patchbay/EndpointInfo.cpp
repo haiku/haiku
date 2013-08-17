@@ -56,7 +56,7 @@ EndpointInfo::EndpointInfo(int32 id)
 			}
 			endpoint->Release();
 		}
-	}	
+	}
 }
 
 
@@ -64,7 +64,7 @@ EndpointInfo::EndpointInfo(const EndpointInfo& info)
 	:
 	fId(info.fId)
 {
-	fIcon = (info.fIcon) ? new BBitmap(info.fIcon) : NULL;	
+	fIcon = (info.fIcon) ? new BBitmap(info.fIcon) : NULL;
 }
 
 
@@ -102,16 +102,16 @@ CreateIcon(const BMessage* msg, icon_size which)
 	ssize_t size;
 	BBitmap* bitmap = NULL;
 
-	// See if a Haiku Vector Icon available	
-	if (msg->FindData(VECTOR_ICON_NAME, VECTOR_ICON_TYPE, &data, 
+	// See if a Haiku Vector Icon available
+	if (msg->FindData(VECTOR_ICON_NAME, VECTOR_ICON_TYPE, &data,
 		&size) == B_OK)  {
 		BRect r(0, 0, LARGE_ICON_SIZE - 1, LARGE_ICON_SIZE - 1);
 		bitmap = new BBitmap(r, B_RGBA32);
-		if (BIconUtils::GetVectorIcon((const uint8*)data, size, 
+		if (BIconUtils::GetVectorIcon((const uint8*)data, size,
 			bitmap) == B_OK) {
 			printf("Created vector icon bitmap\n");
 			return bitmap;
-		} else 
+		} else
 			delete bitmap;
 	}
 
@@ -119,7 +119,7 @@ CreateIcon(const BMessage* msg, icon_size which)
 	float bmapSize;
 	uint32 iconType;
 	const char* iconName;
-	
+
 	if (which == B_LARGE_ICON) {
 		bmapSize = LARGE_ICON_SIZE - 1;
 		iconType = LARGE_ICON_TYPE;
@@ -131,7 +131,7 @@ CreateIcon(const BMessage* msg, icon_size which)
 	} else {
 		return NULL;
 	}
-							
+
 	if (msg->FindData(iconName, iconType, &data, &size) == B_OK) {
 		bitmap = new BBitmap(BRect(0, 0, bmapSize, bmapSize),
 			ICON_COLOR_SPACE);
