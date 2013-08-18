@@ -660,9 +660,15 @@ public:
 		fPackageVersionView->SetFont(&versionFont);
 		fPackageVersionView->SetHighColor(kLightBlack);
 
-		fVoteUpIconView = new BitmapView("vote up icon");
+		// TODO: User rating IDs to identify which rating to vote up or down
+		BMessage* voteUpMessage = new BMessage(MSG_VOTE_UP);
+		voteUpMessage->AddInt32("rating id", -1);
+		BMessage* voteDownMessage = new BMessage(MSG_VOTE_DOWN);
+		voteDownMessage->AddInt32("rating id", -1);
+
+		fVoteUpIconView = new BitmapButton("vote up icon", voteUpMessage);
 		fUpVoteCountView = new BStringView("up vote count", "");
-		fVoteDownIconView = new BitmapView("vote down icon");
+		fVoteDownIconView = new BitmapButton("vote down icon", voteDownMessage);
 		fDownVoteCountView = new BStringView("up vote count", "");
 		
 		fVoteUpIconView->SetBitmap(

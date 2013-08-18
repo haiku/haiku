@@ -15,6 +15,11 @@ class PackageActionView;
 class PackageManager;
 class PagesView;
 
+enum {
+	MSG_VOTE_UP			= 'vtup',
+	MSG_VOTE_DOWN		= 'vtdn',
+};
+
 
 class PackageInfoView : public BGroupView {
 public:
