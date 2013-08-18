@@ -37,6 +37,7 @@ TextSpan&
 TextSpan::operator=(const TextSpan& other)
 {
 	fText = other.fText;
+	fCharCount = other.fCharCount;
 	fStyle = other.fStyle;
 
 	return *this;
@@ -46,8 +47,9 @@ TextSpan::operator=(const TextSpan& other)
 bool
 TextSpan::operator==(const TextSpan& other) const
 {
-	return fText == other.fText
-		&& fStyle == other.fStyle;
+	return fCharCount == other.fCharCount
+		&& fStyle == other.fStyle
+		&& fText == other.fText;
 }
 
 
@@ -62,6 +64,7 @@ void
 TextSpan::SetText(const BString& text)
 {
 	fText = text;
+	fCharCount = fText.CountChars();
 }
 
 
