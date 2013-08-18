@@ -7,6 +7,10 @@
 
 #include "List.h"
 #include "ParagraphStyle.h"
+#include "TextSpan.h"
+
+
+typedef List<TextSpan, false>	TextSpanList;
 
 
 class Paragraph {
@@ -23,8 +27,14 @@ public:
 	inline	const ParagraphStyle& Style() const
 									{ return fStyle; }
 
+	inline	const TextSpanList&	TextSpans() const
+									{ return fTextSpans; }
+
+			bool				Append(const TextSpan& span);
+
 private:
 			ParagraphStyle		fStyle;
+			TextSpanList		fTextSpans;
 };
 
 

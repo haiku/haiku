@@ -15,14 +15,16 @@ Paragraph::Paragraph()
 
 Paragraph::Paragraph(const ParagraphStyle& style)
 	:
-	fStyle(style)
+	fStyle(style),
+	fTextSpans()
 {
 }
 
 
 Paragraph::Paragraph(const Paragraph& other)
 	:
-	fStyle(other.fStyle)
+	fStyle(other.fStyle),
+	fTextSpans(other.fTextSpans)
 {
 }
 
@@ -31,6 +33,7 @@ Paragraph&
 Paragraph::operator=(const Paragraph& other)
 {
 	fStyle = other.fStyle;
+	fTextSpans = other.fTextSpans;
 
 	return *this;
 }
@@ -39,7 +42,11 @@ Paragraph::operator=(const Paragraph& other)
 bool
 Paragraph::operator==(const Paragraph& other) const
 {
-	return fStyle == other.fStyle;
+	if (this == &other)
+		return true;
+
+	return fStyle == other.fStyle
+		&& fTextSpans == other.fTextSpans;
 }
 
 
@@ -56,3 +63,19 @@ Paragraph::SetStyle(const ParagraphStyle& style)
 	fStyle = style;
 }
 
+
+bool
+Paragraph::Append(const TextSpan& span)
+{
+	// Try to merge with last span if the TextStyles are equal
+	if (fTextSpans.CountItems() > 0) {
+		const TextSpan& lastSpan = fTextSpans.LastItem();
+		if (lastSpan.Style() == span.Style()) {
+			BString text(lastSpan.Text());
+			text.Append(span.Text());
+			fTextSpans.Remove();
+			return fTextSpans.Add(TextSpan(text, span.Style()));
+		}
+	}
+	return fTextSpans.Add(span);
+}
