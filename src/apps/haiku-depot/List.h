@@ -118,6 +118,30 @@ public:
 		return false;
 	}
 
+	inline bool Add(const ItemType& copyFrom, int32 index)
+	{
+		if (index < 0)
+			index = 0;
+		if (index > (int32)fCount)
+			index = fCount;
+
+		if (!_Resize(fCount + 1))
+			return false;
+
+		int32 nextIndex = index + 1;
+		if ((int32)fCount > nextIndex)
+			memmove(fItems + nextIndex, fItems + index,
+				(fCount - nextIndex) * sizeof(ItemType));
+
+		ItemType* item = fItems + index;
+		if (!PlainOldData)
+			new (item) ItemType(copyFrom);
+		else
+			*item = copyFrom;
+
+		return true;
+	}
+
 	inline void Remove()
 	{
 		if (fCount > 0)
@@ -146,6 +170,21 @@ public:
 	{
 		Remove(IndexOf(item));
 		
+	}
+
+	inline bool Replace(const ItemType& copyFrom, int32 index)
+	{
+		if (index < 0 || index >= (int32)fCount)
+			return false;
+		
+		ItemType* item = fItems + index;
+		// Initialize the new object from the original.
+		if (!PlainOldData) {
+			item->~ItemType();
+			new (item) ItemType(copyFrom);
+		} else
+			*item = copyFrom;
+		return true;
 	}
 
 	inline const ItemType& ItemAt(int32 index) const
