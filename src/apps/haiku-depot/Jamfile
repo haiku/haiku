@@ -31,6 +31,7 @@ Application HaikuDepot :
 	ParagraphStyle.cpp
 	ParagraphStyleData.cpp
 	TextLayout.cpp
+	TextSpan.cpp
 	TextStyle.cpp
 	TextView.cpp
 	
