@@ -31,6 +31,7 @@ public:
 									{ return fTextSpans; }
 
 			bool				Append(const TextSpan& span);
+			bool				Insert(int32 offset, const TextSpan& span);
 
 private:
 			ParagraphStyle		fStyle;
