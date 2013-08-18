@@ -23,9 +23,15 @@ public:
 	virtual	BSize				MaxSize();
 	
 			void				SetBitmap(const BBitmap* bitmap);
+			void				SetScaleBitmap(bool scaleBitmap);
+
+protected:
+	virtual void				DrawBackground(BRect& bounds,
+									BRect updateRect);
 
 private:
 			const BBitmap*		fBitmap;
+			bool				fScaleBitmap;
 };
 
 

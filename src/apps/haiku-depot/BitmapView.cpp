@@ -15,11 +15,11 @@
 BitmapView::BitmapView(const char* name)
 	:
 	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
-	fBitmap(NULL)
+	fBitmap(NULL),
+	fScaleBitmap(true)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetDrawingMode(B_OP_OVER);
 }
 
 
@@ -45,7 +45,7 @@ void
 BitmapView::Draw(BRect updateRect)
 {
 	BRect bounds(Bounds());
-	FillRect(updateRect, B_SOLID_LOW);
+	DrawBackground(bounds, updateRect);
 	
 	if (fBitmap == NULL)
 		return;
@@ -54,10 +54,14 @@ BitmapView::Draw(BRect updateRect)
 	if (bitmapBounds.Width() <= 0.0f || bitmapBounds.Height() <= 0.0f)
 		return;
 	
-	float hScale = bounds.Width() / bitmapBounds.Width();
-	float vScale = bounds.Height() / bitmapBounds.Height();
-	
-	float scale = std::min(hScale, vScale);
+	float scale = 1.0f;
+
+	if (fScaleBitmap) {
+		float hScale = bounds.Width() / bitmapBounds.Width();
+		float vScale = bounds.Height() / bitmapBounds.Height();
+		
+		scale = std::min(hScale, vScale);
+	}
 	
 	float width = bitmapBounds.Width() * scale;
 	float height = bitmapBounds.Height() * scale;
@@ -90,6 +94,7 @@ BitmapView::Draw(BRect updateRect)
 	bounds.right = ceilf(bounds.left + width);
 	bounds.bottom = ceilf(bounds.top + height);
 
+	SetDrawingMode(B_OP_OVER);
 	DrawBitmap(fBitmap, bitmapBounds, bounds, B_FILTER_BITMAP_BILINEAR);
 }
 
@@ -140,4 +145,23 @@ BitmapView::SetBitmap(const BBitmap* bitmap)
 		InvalidateLayout();
 	
 	Invalidate();
+}
+
+
+void
+BitmapView::SetScaleBitmap(bool scaleBitmap)
+{
+	if (scaleBitmap == fScaleBitmap)
+		return;
+
+	fScaleBitmap = scaleBitmap;
+
+	Invalidate();
+}
+
+
+void
+BitmapView::DrawBackground(BRect& bounds, BRect updateRect)
+{
+	FillRect(updateRect, B_SOLID_LOW);
 }

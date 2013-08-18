@@ -13,7 +13,8 @@
 
 class BitmapButton : public BitmapView, public BInvoker {
 public:
-								BitmapButton(const char* name);
+								BitmapButton(const char* name,
+									BMessage* message = NULL);
 	virtual						~BitmapButton();
 
 	virtual	void				AttachedToWindow();
@@ -26,6 +27,10 @@ public:
 	virtual	BSize				MinSize();
 	virtual	BSize				PreferredSize();
 	virtual	BSize				MaxSize();
+
+protected:
+	virtual void				DrawBackground(BRect& bounds,
+									BRect updateRect);
 
 private:
 			void				_SetMouseInside(bool inside);

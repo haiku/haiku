@@ -6,16 +6,19 @@
 
 #include "BitmapButton.h"
 
+#include <ControlLook.h>
 #include <LayoutUtils.h>
 #include <Window.h>
 
 
-BitmapButton::BitmapButton(const char* name)
+BitmapButton::BitmapButton(const char* name, BMessage* message)
 	:
 	BitmapView(name),
+	BInvoker(message, NULL, NULL),
 	fMouseInside(false),
 	fMouseDown(false)
 {
+	SetScaleBitmap(false);
 }
 
 
@@ -48,7 +51,10 @@ BitmapButton::MouseMoved(BPoint where, uint32 transit,
 void
 BitmapButton::MouseDown(BPoint where)
 {
-	_SetMouseDown(true);
+	if (fMouseInside) {
+		_SetMouseDown(true);
+		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
+	}
 }
 
 
@@ -56,6 +62,8 @@ void
 BitmapButton::MouseUp(BPoint where)
 {
 	_SetMouseDown(false);
+	if (fMouseInside)
+		Invoke();
 }
 
 
@@ -63,6 +71,8 @@ BSize
 BitmapButton::MinSize()
 {
 	BSize size = BitmapView::MinSize();
+	size.width += 6;
+	size.height += 6;
 	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
 }
 
@@ -80,6 +90,28 @@ BitmapButton::MaxSize()
 {
 	BSize size = MinSize();
 	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), size);
+}
+
+
+// #pragma mark -
+
+
+void
+BitmapButton::DrawBackground(BRect& bounds, BRect updateRect)
+{
+	if (Message() != NULL && (fMouseInside || fMouseDown)) {
+		rgb_color color = LowColor();
+		uint32 flags = 0;
+		if (fMouseDown)
+			flags |= BControlLook::B_ACTIVATED;
+		
+		be_control_look->DrawButtonFrame(this, bounds, updateRect,
+			color, color, flags);
+		be_control_look->DrawButtonBackground(this, bounds, updateRect,
+			color, flags);
+	} else {
+		BitmapView::DrawBackground(bounds, updateRect);
+	}
 }
 
 
