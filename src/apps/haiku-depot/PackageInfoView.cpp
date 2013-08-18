@@ -22,6 +22,8 @@
 #include <SpaceLayoutItem.h>
 #include <StringView.h>
 
+#include "BitmapButton.h"
+#include "BitmapView.h"
 #include "PackageManager.h"
 #include "TextView.h"
 
@@ -32,150 +34,6 @@
 
 static const rgb_color kLightBlack = (rgb_color){ 60, 60, 60, 255 };
 static const float kContentTint = (B_NO_TINT + B_LIGHTEN_1_TINT) / 2.0f;
-
-
-class BitmapView : public BView {
-public:
-	BitmapView(const char* name)
-		:
-		BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
-		fBitmap(NULL)
-	{
-		SetViewColor(B_TRANSPARENT_COLOR);
-		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-		SetDrawingMode(B_OP_OVER);
-	}
-	
-	virtual ~BitmapView()
-	{
-	}
-
-	virtual void AttachedToWindow()
-	{
-		BView* parent = Parent();
-		if (parent != NULL)
-			SetLowColor(parent->ViewColor());
-	}
-
-	virtual void Draw(BRect updateRect)
-	{
-		BRect bounds(Bounds());
-		FillRect(updateRect, B_SOLID_LOW);
-		
-		if (fBitmap == NULL)
-			return;
-
-		BRect bitmapBounds = fBitmap->Bounds();
-		if (bitmapBounds.Width() <= 0.0f || bitmapBounds.Height() <= 0.0f)
-			return;
-		
-		float hScale = bounds.Width() / bitmapBounds.Width();
-		float vScale = bounds.Height() / bitmapBounds.Height();
-		
-		float scale = std::min(hScale, vScale);
-		
-		float width = bitmapBounds.Width() * scale;
-		float height = bitmapBounds.Height() * scale;
-		
-		switch (LayoutAlignment().horizontal) {
-			case B_ALIGN_LEFT:
-				break;
-			case B_ALIGN_RIGHT:
-				bounds.left = floorf(bounds.right - width);
-				break;
-			default:
-			case B_ALIGN_HORIZONTAL_CENTER:
-				bounds.left = floorf(bounds.left
-					+ (bounds.Width() - width) / 2.0f);
-				break;
-		}
-		switch (LayoutAlignment().vertical) {
-			case B_ALIGN_TOP:
-				break;
-			case B_ALIGN_BOTTOM:
-				bounds.top = floorf(bounds.bottom - height);
-				break;
-			default:
-			case B_ALIGN_VERTICAL_CENTER:
-				bounds.top = floorf(bounds.top
-					+ (bounds.Height() - height) / 2.0f);
-				break;
-		}
-		
-		bounds.right = ceilf(bounds.left + width);
-		bounds.bottom = ceilf(bounds.top + height);
-
-		DrawBitmap(fBitmap, bitmapBounds, bounds, B_FILTER_BITMAP_BILINEAR);
-	}
-
-	virtual BSize MinSize()
-	{
-		BSize size(0.0f, 0.0f);
-		
-		if (fBitmap != NULL) {
-			BRect bounds = fBitmap->Bounds();
-			size.width = bounds.Width();
-			size.height = bounds.Height();
-		}
-		
-		return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
-	}
-
-	virtual BSize PreferredSize()
-	{
-		BSize size = MinSize();
-		return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), size);
-	}
-	
-	virtual BSize MaxSize()
-	{
-		BSize size = MinSize();
-		return BLayoutUtils::ComposeSize(ExplicitMaxSize(), size);
-	}
-
-//	virtual	bool HasHeightForWidth()
-//	{
-//		return true;
-//	}
-//
-//	virtual void GetHeightForWidth(float width, float* min, float* max,
-//		float* preferred)
-//	{
-//		float height = width;
-//		
-//		if (fBitmap != NULL) {
-//			BRect bounds = fBitmap->Bounds();
-//			if (bounds.Width() > 0.0f && bounds.Height() > 0.0f)
-//				height = (width / bounds.Width()) * bounds.Height();
-//		}
-//
-//		if (min != NULL)
-//			*min = height;
-//		if (max != NULL)
-//			*max = height;
-//		if (preferred != NULL)
-//			*preferred = height;
-//	}
-	
-	void SetBitmap(const BBitmap* bitmap)
-	{
-		if (bitmap == fBitmap)
-			return;
-
-		BSize size = MinSize();
-
-		fBitmap = bitmap;
-		
-		BSize newSize = MinSize();
-		if (size != newSize)
-			InvalidateLayout();
-		
-		Invalidate();
-	}
-
-private:
-	const BBitmap*	fBitmap;
-};
 
 
 //! Layouts the scrollbar so it looks nice with no border and the document

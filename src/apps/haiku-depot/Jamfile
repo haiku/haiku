@@ -14,6 +14,8 @@ for sourceDir in $(sourceDirs) {
 
 Application HaikuDepot :
 	App.cpp
+	BitmapButton.cpp
+	BitmapView.cpp
 	FilterView.cpp
 	main.cpp
 	MainWindow.cpp
