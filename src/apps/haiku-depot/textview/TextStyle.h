@@ -12,11 +12,16 @@
 
 class TextStyle : public BReferenceable {
 public:
+	TextStyle();
 	TextStyle(const BFont& font, float ascent, float descent, float width,
 		float glyphSpacing,
 		rgb_color fgColor, rgb_color bgColor, bool strikeOut,
 		rgb_color strikeOutColor, bool underline,
 		uint32 underlineStyle, rgb_color underlineColor);
+
+	TextStyle(const TextStyle& other);
+
+	bool operator==(const TextStyle& other) const;
 
 public:
 	BFont					font;
