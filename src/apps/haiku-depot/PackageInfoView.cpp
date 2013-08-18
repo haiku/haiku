@@ -763,7 +763,8 @@ private:
 
 class RatingItemView : public BGroupView {
 public:
-	RatingItemView(const UserRating& rating)
+	RatingItemView(const UserRating& rating, const BitmapRef& voteUpIcon,
+		const BitmapRef& voteDownIcon)
 		:
 		BGroupView(B_HORIZONTAL, 0.0f)
 	{
@@ -800,7 +801,28 @@ public:
 		versionFont.SetSize(std::max(9.0f, floorf(versionFont.Size() * 0.85f)));
 		fPackageVersionView->SetFont(&versionFont);
 		fPackageVersionView->SetHighColor(kLightBlack);
-	
+
+		fVoteUpIconView = new BitmapView("vote up icon");
+		fUpVoteCountView = new BStringView("up vote count", "");
+		fVoteDownIconView = new BitmapView("vote down icon");
+		fDownVoteCountView = new BStringView("up vote count", "");
+		
+		fVoteUpIconView->SetBitmap(
+			voteUpIcon->Bitmap(SharedBitmap::SIZE_16));
+		fVoteDownIconView->SetBitmap(
+			voteDownIcon->Bitmap(SharedBitmap::SIZE_16));
+
+		fUpVoteCountView->SetFont(&versionFont);
+		fUpVoteCountView->SetHighColor(kLightBlack);
+		fDownVoteCountView->SetFont(&versionFont);
+		fDownVoteCountView->SetHighColor(kLightBlack);
+
+		BString voteCountLabel;
+		voteCountLabel.SetToFormat("%ld", rating.UpVotes());
+		fUpVoteCountView->SetText(voteCountLabel);
+		voteCountLabel.SetToFormat("%ld", rating.DownVotes());
+		fDownVoteCountView->SetText(voteCountLabel);
+
 		fTextView = new TextView("rating text");
 		fTextView->SetViewColor(ViewColor());
 		fTextView->SetText(rating.Comment());
@@ -817,6 +839,13 @@ public:
 					.AddGlue(0.1f)
 					.Add(fPackageVersionView)
 					.AddGlue(5.0f)
+					.AddGroup(B_HORIZONTAL, 0.0f, 0.0f)
+						.Add(fVoteUpIconView)
+						.Add(fUpVoteCountView)
+						.AddStrut(B_USE_HALF_ITEM_SPACING)
+						.Add(fVoteDownIconView)
+						.Add(fDownVoteCountView)
+					.End()
 				.End()
 				.Add(fTextView)
 			.End()
@@ -830,6 +859,12 @@ private:
 	RatingView*		fRatingView;
 	BStringView*	fRatingLabelView;
 	BStringView*	fPackageVersionView;
+
+	BitmapView*		fVoteUpIconView;
+	BStringView*	fUpVoteCountView;
+	BitmapView*		fVoteDownIconView;
+	BStringView*	fDownVoteCountView;
+
 	TextView*		fTextView;
 };
 
@@ -951,7 +986,9 @@ class UserRatingsView : public BGroupView {
 public:
 	UserRatingsView()
 		:
-		BGroupView("package ratings view", B_HORIZONTAL)
+		BGroupView("package ratings view", B_HORIZONTAL),
+		fThumbsUpIcon(BitmapRef(new SharedBitmap(502), true)),
+		fThumbsDownIcon(BitmapRef(new SharedBitmap(503), true))
 	{
 		SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 			kContentTint));
@@ -994,7 +1031,8 @@ public:
 		
 		for (int i = userRatings.CountItems() - 1; i >= 0; i--) {
 			const UserRating& rating = userRatings.ItemAtFast(i);
-			RatingItemView* view = new RatingItemView(rating);
+			RatingItemView* view = new RatingItemView(rating, fThumbsUpIcon,
+				fThumbsDownIcon);
 			fRatingContainerLayout->AddView(0, view);
 		}
 	}
@@ -1021,6 +1059,8 @@ public:
 private:
 	BGroupLayout*			fRatingContainerLayout;
 	RatingSummaryView*		fRatingSummaryView;
+	BitmapRef				fThumbsUpIcon;
+	BitmapRef				fThumbsDownIcon;
 };
 
 
