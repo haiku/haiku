@@ -30,10 +30,22 @@ public:
 	inline	const TextStyle&	Style() const
 									{ return fStyle; }
 
+	inline	int32				CharCount() const
+									{ return fCharCount; }
+
+			bool				Insert(int32 offset, const BString& text);
+			bool				Remove(int32 start, int32 count);
+
 			TextSpan			SubSpan(int32 start, int32 count) const;
 
 private:
+			void				_TruncateInsert(int32& start) const;
+			void				_TruncateRemove(int32& start,
+									int32& count) const;
+
+private:
 			BString				fText;
+			int32				fCharCount;
 			TextStyle			fStyle;
 };
 

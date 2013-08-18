@@ -9,6 +9,7 @@
 TextSpan::TextSpan()
 	:
 	fText(),
+	fCharCount(0),
 	fStyle()
 {
 }
@@ -17,6 +18,7 @@ TextSpan::TextSpan()
 TextSpan::TextSpan(const BString& text, const TextStyle& style)
 	:
 	fText(text),
+	fCharCount(text.CountChars()),
 	fStyle(style)
 {
 }
@@ -25,6 +27,7 @@ TextSpan::TextSpan(const BString& text, const TextStyle& style)
 TextSpan::TextSpan(const TextSpan& other)
 	:
 	fText(other.fText),
+	fCharCount(other.fCharCount),
 	fStyle(other.fStyle)
 {
 }
@@ -69,24 +72,83 @@ TextSpan::SetStyle(const TextStyle& style)
 }
 
 
+bool
+TextSpan::Insert(int32 offset, const BString& text)
+{
+	_TruncateInsert(offset);
+
+	fText.InsertChars(text, offset);
+
+	int32 charCount = fText.CountChars();
+	bool success = charCount > fCharCount;
+	fCharCount = charCount;
+
+	return success;
+}
+
+
+bool
+TextSpan::Remove(int32 start, int32 count)
+{
+	_TruncateRemove(start, count);
+
+	if (count > 0) {
+		fText.RemoveChars(start, count);
+
+		int32 charCount = fText.CountChars();
+		bool success = charCount < fCharCount;
+		fCharCount = charCount;
+
+		return success;
+	}
+	return true;
+}
+
+
 TextSpan
 TextSpan::SubSpan(int32 start, int32 count) const
 {
+	_TruncateRemove(start, count);
+
+	BString subString;
+	if (count > 0)
+		fText.CopyCharsInto(subString, start, count);
+
+	return TextSpan(subString, fStyle);
+}
+
+
+// #pragma mark - private
+
+
+void
+TextSpan::_TruncateInsert(int32& start) const
+{
+	if (start < 0)
+		start = 0;
+
+	if (start >= fCharCount)
+		start = fCharCount;
+}
+
+
+void
+TextSpan::_TruncateRemove(int32& start, int32& count) const
+{
+	if (count < 0) {
+		count = 0;
+		return;
+	}
+	
 	if (start < 0) {
 		count += start;
 		start = 0;
 	}
 
-	BString subString;
-	
-	int32 charCount = fText.CountChars();
-	if (start < charCount) {
-		if (start + count > charCount)
-			count = charCount - start;
-
-		fText.CopyCharsInto(subString, start, count);
+	if (start < fCharCount) {
+		if (start + count > fCharCount)
+			count = fCharCount - start;
+	} else {
+		count = 0;
 	}
-
-	return TextSpan(subString, fStyle);
 }
-
