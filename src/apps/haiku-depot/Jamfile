@@ -26,6 +26,10 @@ Application HaikuDepot :
 	PackageManager.cpp
 	support.cpp
 
+	# textview stuff
+	Paragraph.cpp
+	ParagraphStyle.cpp
+	ParagraphStyleData.cpp
 	TextLayout.cpp
 	TextStyle.cpp
 	TextView.cpp
