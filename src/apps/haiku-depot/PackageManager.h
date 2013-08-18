@@ -6,9 +6,6 @@
 #define PACKAGE_MANAGER_H
 
 
-#include <Referenceable.h>
-
-#include "List.h"
 #include "PackageInfo.h"
 
 
@@ -41,6 +38,7 @@ public:
 								PackageManager();
 	virtual						~PackageManager();
 
+	virtual	PackageState		GetPackageState(const PackageInfo& package);
 	virtual	PackageActionList	GetPackageActions(const PackageInfo& package);
 };
 

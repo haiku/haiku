@@ -66,6 +66,14 @@ PackageManager::~PackageManager()
 }
 
 
+PackageState
+PackageManager::GetPackageState(const PackageInfo& package)
+{
+	// TODO: Fetch information from the PackageKit
+	return NONE;
+}
+
+
 PackageActionList
 PackageManager::GetPackageActions(const PackageInfo& package)
 {
@@ -84,5 +92,3 @@ PackageManager::GetPackageActions(const PackageInfo& package)
 
 	return actionList;
 }
-
-
