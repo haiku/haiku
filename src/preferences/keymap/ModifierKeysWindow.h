@@ -41,7 +41,7 @@ public:
 
 	virtual	void					MessageReceived(BMessage* message);
 
-protected:
+private:
 			BMenuField*				_CreateShiftMenuField();
 			BMenuField*				_CreateControlMenuField();
 			BMenuField*				_CreateOptionMenuField();
@@ -54,12 +54,6 @@ protected:
 			int32					_LastKey();
 			void					_ValidateDuplicateKeys();
 			uint32					_DuplicateKeys();
-
-private:
-			BStringView*			fShiftStringView;
-			BStringView*			fControlStringView;
-			BStringView*			fOptionStringView;
-			BStringView*			fCommandStringView;
 
 			BPopUpMenu*				fShiftMenu;
 			BPopUpMenu*				fControlMenu;

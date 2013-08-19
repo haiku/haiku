@@ -18,9 +18,6 @@
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <FindDirectory.h>
-#include <GroupLayout.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayoutBuilder.h>
 #include <IconUtils.h>
 #include <InterfaceDefs.h>
 #include <LayoutBuilder.h>
@@ -42,10 +39,6 @@
 #else
 #	define FTRACE(x) /* nothing */
 #endif
-
-
-const rgb_color disabledColor = (rgb_color){128, 128, 128, 255};
-const rgb_color normalColor = (rgb_color){0, 0, 0, 255};
 
 
 enum {
@@ -225,21 +218,17 @@ ModifierKeysWindow::ModifierKeysWindow()
 	keyLabel->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	keyLabel->SetFont(be_bold_font);
 
-	fShiftStringView = new BStringView("shift",
-		B_TRANSLATE_COMMENT("Shift:", "Shift key role name"));
-	fShiftStringView->SetAlignment(B_ALIGN_RIGHT);
+	BMenuField* shiftMenuField = _CreateShiftMenuField();
+	shiftMenuField->SetAlignment(B_ALIGN_RIGHT);
 
-	fControlStringView = new BStringView("control",
-		B_TRANSLATE_COMMENT("Control:", "Control key role name"));
-	fControlStringView->SetAlignment(B_ALIGN_RIGHT);
+	BMenuField* controlMenuField = _CreateControlMenuField();
+	controlMenuField->SetAlignment(B_ALIGN_RIGHT);
 
-	fOptionStringView = new BStringView("option",
-		B_TRANSLATE_COMMENT("Option:", "Option key role name"));
-	fOptionStringView->SetAlignment(B_ALIGN_RIGHT);
+	BMenuField* optionMenuField = _CreateOptionMenuField();
+	optionMenuField->SetAlignment(B_ALIGN_RIGHT);
 
-	fCommandStringView = new BStringView("command",
-		B_TRANSLATE_COMMENT("Command:", "Command key role name"));
-	fCommandStringView->SetAlignment(B_ALIGN_RIGHT);
+	BMenuField* commandMenuField = _CreateCommandMenuField();
+	commandMenuField->SetAlignment(B_ALIGN_RIGHT);
 
 	fShiftConflictView = new ConflictView("shift warning view");
 	fShiftConflictView->SetExplicitMaxSize(BSize(15, 15));
@@ -267,35 +256,35 @@ ModifierKeysWindow::ModifierKeysWindow()
 	// Build the layout
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
-		.Add(BGridLayoutBuilder(10, 10)
+	AddChild(BLayoutBuilder::Group<>(B_VERTICAL)
+		.AddGrid(B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING)
 			.Add(keyRole, 0, 0)
-			.Add(keyLabel, 1, 0)
+			.Add(keyLabel, 1, 0, 2, 1)
 
-			.Add(fShiftStringView, 0, 1)
-			.Add(_CreateShiftMenuField(), 1, 1)
+			.Add(shiftMenuField->CreateLabelLayoutItem(), 0, 1)
+			.Add(shiftMenuField->CreateMenuBarLayoutItem(), 1, 1)
 			.Add(fShiftConflictView, 2, 1)
 
-			.Add(fControlStringView, 0, 2)
-			.Add(_CreateControlMenuField(), 1, 2)
+			.Add(controlMenuField->CreateLabelLayoutItem(), 0, 2)
+			.Add(controlMenuField->CreateMenuBarLayoutItem(), 1, 2)
 			.Add(fControlConflictView, 2, 2)
 
-			.Add(fOptionStringView, 0, 3)
-			.Add(_CreateOptionMenuField(), 1, 3)
+			.Add(optionMenuField->CreateLabelLayoutItem(), 0, 3)
+			.Add(optionMenuField->CreateMenuBarLayoutItem(), 1, 3)
 			.Add(fOptionConflictView, 2, 3)
 
-			.Add(fCommandStringView, 0, 4)
-			.Add(_CreateCommandMenuField(), 1, 4)
+			.Add(commandMenuField->CreateLabelLayoutItem(), 0, 4)
+			.Add(commandMenuField->CreateMenuBarLayoutItem(), 1, 4)
 			.Add(fCommandConflictView, 2, 4)
-		)
+			.End()
 		.AddGlue()
-		.AddGroup(B_HORIZONTAL, 10)
+		.AddGroup(B_HORIZONTAL)
 			.Add(fCancelButton)
 			.AddGlue()
 			.Add(fRevertButton)
 			.Add(fOkButton)
-		.End()
-		.SetInsets(10, 10, 10, 10)
+			.End()
+		.SetInsets(B_USE_DEFAULT_SPACING)
 	);
 
 	_MarkMenuItems();
@@ -437,7 +426,7 @@ ModifierKeysWindow::MessageReceived(BMessage* message)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - ModifierKeysWindow Private Methods
 
 
 BMenuField*
@@ -465,7 +454,8 @@ ModifierKeysWindow::_CreateShiftMenuField()
 	fShiftMenu->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
 		B_ALIGN_VERTICAL_UNSET));
 
-	return new BMenuField(NULL, fShiftMenu);
+	return new BMenuField(B_TRANSLATE_COMMENT("Shift:", "Shift key role name"),
+		fShiftMenu);
 }
 
 
@@ -494,7 +484,8 @@ ModifierKeysWindow::_CreateControlMenuField()
 	fControlMenu->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
 		B_ALIGN_VERTICAL_UNSET));
 
-	return new BMenuField(NULL, fControlMenu);
+	return new BMenuField(B_TRANSLATE_COMMENT("Control:",
+		"Control key role name"), fControlMenu);
 }
 
 
@@ -523,7 +514,8 @@ ModifierKeysWindow::_CreateOptionMenuField()
 	fOptionMenu->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
 		B_ALIGN_VERTICAL_UNSET));
 
-	return new BMenuField(NULL, fOptionMenu);
+	return new BMenuField(B_TRANSLATE_COMMENT("Option:", "Option key role name"),
+		fOptionMenu);
 }
 
 
@@ -551,7 +543,8 @@ ModifierKeysWindow::_CreateCommandMenuField()
 	fCommandMenu->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
 		B_ALIGN_VERTICAL_UNSET));
 
-	return new BMenuField(NULL, fCommandMenu);
+	return new BMenuField(B_TRANSLATE_COMMENT("Command:",
+		"Command key role name"), fCommandMenu);
 }
 
 
@@ -565,49 +558,21 @@ ModifierKeysWindow::_MarkMenuItems()
 		if (fCurrentMap->left_shift_key == _KeyToKeyCode(key)
 			&& fCurrentMap->right_shift_key == _KeyToKeyCode(key, true)) {
 			fShiftMenu->ItemAt(key)->SetMarked(true);
-
-			if (key == MENU_ITEM_DISABLED)
-				fShiftStringView->SetHighColor(disabledColor);
-			else
-				fShiftStringView->SetHighColor(normalColor);
-
-			fShiftStringView->Invalidate();
 		}
 
 		if (fCurrentMap->left_control_key == _KeyToKeyCode(key)
 			&& fCurrentMap->right_control_key == _KeyToKeyCode(key, true)) {
 			fControlMenu->ItemAt(key)->SetMarked(true);
-
-			if (key == MENU_ITEM_DISABLED)
-				fControlStringView->SetHighColor(disabledColor);
-			else
-				fControlStringView->SetHighColor(normalColor);
-
-			fControlStringView->Invalidate();
 		}
 
 		if (fCurrentMap->left_option_key == _KeyToKeyCode(key)
 			&& fCurrentMap->right_option_key == _KeyToKeyCode(key, true)) {
 			fOptionMenu->ItemAt(key)->SetMarked(true);
-
-			if (key == MENU_ITEM_DISABLED)
-				fOptionStringView->SetHighColor(disabledColor);
-			else
-				fOptionStringView->SetHighColor(normalColor);
-
-			fOptionStringView->Invalidate();
 		}
 
 		if (fCurrentMap->left_command_key == _KeyToKeyCode(key)
 			&& fCurrentMap->right_command_key == _KeyToKeyCode(key, true)) {
 			fCommandMenu->ItemAt(key)->SetMarked(true);
-
-			if (key == MENU_ITEM_DISABLED)
-				fCommandStringView->SetHighColor(disabledColor);
-			else
-				fCommandStringView->SetHighColor(normalColor);
-
-			fCommandStringView->Invalidate();
 		}
 	}
 }
