@@ -117,7 +117,7 @@ Stream::_ChooseAlternate()
 		== USB_ENDPOINT_ADDR_DIR_IN;
 
 	if (fIsInput)
-		fCurrentBuffer = -1;
+		fCurrentBuffer = (size_t)-1;
 
 	TRACE(INF, "Alternate %d EP:%x selected for %s!\n",
 		fActiveAlternate, endpoint->fEndpointAddress,
@@ -306,8 +306,8 @@ Stream::_QueueNextTransfer(size_t queuedBuffer, bool start)
 
 
 void
-Stream::_TransferCallback(void* cookie, int32 status, void* data,
-	uint32 actualLength)
+Stream::_TransferCallback(void* cookie, status_t status, void* data,
+	size_t actualLength)
 {
 	Stream* stream = (Stream*)cookie;
 	atomic_add(&stream->fInsideNotify, 1);
@@ -371,10 +371,11 @@ Stream::SetEnabledChannels(uint32& offset, multi_channel_enable* Enable)
 	if (cluster == 0)
 		return B_ERROR;
 
-	for (size_t i = 0; i < cluster->ChannelsCount(); i++)
+	for (size_t i = 0; i < cluster->ChannelsCount(); i++, offset++) {
 		TRACE(INF, "%s channel %d.\n",
-			(B_TEST_CHANNEL(Enable->enable_bits, offset++)
+			(B_TEST_CHANNEL(Enable->enable_bits, offset)
 			? "Enable" : "Disable"), offset + 1);
+	}
 
 	return B_OK;
 }

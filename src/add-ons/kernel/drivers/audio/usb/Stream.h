@@ -64,8 +64,8 @@ private:
 			status_t		_ChooseAlternate();
 			status_t		_SetupBuffers();
 			status_t		_QueueNextTransfer(size_t buffer, bool start);
-	static	void			_TransferCallback(void* cookie, int32 status,
-								void* data, uint32 actualLength);
+	static	void			_TransferCallback(void* cookie, status_t status,
+								void* data, size_t actualLength);
 			void			_DumpDescriptors();
 };
 

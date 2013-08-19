@@ -254,7 +254,7 @@ publish_devices()
 	MutexLocker driverLock;
 
 	int32 deviceCount = 0;
-	for (int32 i = 0; i < MAX_DEVICES; i++) {
+	for (size_t i = 0; i < MAX_DEVICES; i++) {
 		if (gDevices[i] == NULL)
 			continue;
 
