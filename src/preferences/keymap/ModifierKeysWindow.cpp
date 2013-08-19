@@ -47,6 +47,7 @@
 const rgb_color disabledColor = (rgb_color){128, 128, 128, 255};
 const rgb_color normalColor = (rgb_color){0, 0, 0, 255};
 
+
 enum {
 	SHIFT_KEY = 0x00000001,
 	CONTROL_KEY = 0x00000002,
@@ -62,6 +63,7 @@ enum {
 	MENU_ITEM_SEPERATOR,
 	MENU_ITEM_DISABLED
 };
+
 
 static const uint32 kMsgUpdateModifier		= 'upmd';
 static const uint32 kMsgApplyModifiers 		= 'apmd';
@@ -459,6 +461,7 @@ ModifierKeysWindow::_CreateShiftMenuField()
 
 		fShiftMenu->AddItem(item, key);
 	}
+
 	fShiftMenu->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
 		B_ALIGN_VERTICAL_UNSET));
 
@@ -487,6 +490,7 @@ ModifierKeysWindow::_CreateControlMenuField()
 
 		fControlMenu->AddItem(item, key);
 	}
+
 	fControlMenu->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
 		B_ALIGN_VERTICAL_UNSET));
 
@@ -515,6 +519,7 @@ ModifierKeysWindow::_CreateOptionMenuField()
 
 		fOptionMenu->AddItem(item, key);
 	}
+
 	fOptionMenu->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
 		B_ALIGN_VERTICAL_UNSET));
 
@@ -542,6 +547,7 @@ ModifierKeysWindow::_CreateCommandMenuField()
 			B_TRANSLATE_NOCOLLECT(_KeyToString(key)), message);
 		fCommandMenu->AddItem(item, key);
 	}
+
 	fCommandMenu->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
 		B_ALIGN_VERTICAL_UNSET));
 
@@ -713,7 +719,7 @@ ModifierKeysWindow::_ValidateDuplicateKeys()
 
 
 // return a mask marking which keys are duplicates of each other for
-// validation. Control = 1, Option = 2, Command = 3
+// validation. Shift = 0, Control = 1, Option = 2, Command = 3
 uint32
 ModifierKeysWindow::_DuplicateKeys()
 {
