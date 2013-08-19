@@ -13,19 +13,26 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <Bitmap.h>
+#include <Button.h>
 #include <Catalog.h>
+#include <CheckBox.h>
 #include <FindDirectory.h>
 #include <GroupLayout.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
 #include <IconUtils.h>
-#include <Locale.h>
+#include <InterfaceDefs.h>
 #include <LayoutBuilder.h>
+#include <Locale.h>
+#include <MenuField.h>
 #include <MenuItem.h>
 #include <Message.h>
 #include <Path.h>
+#include <PopUpMenu.h>
 #include <Resources.h>
 #include <Size.h>
+#include <StringView.h>
 
 #include "KeymapApplication.h"
 
@@ -63,6 +70,138 @@ static const uint32 kMsgRevertModifiers		= 'rvmd';
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Modifier keys window"
+
+
+//	#pragma mark - ConflictView
+
+
+ConflictView::ConflictView(const char* name)
+	:
+	BView(BRect(0, 0, 15, 15), name, B_FOLLOW_NONE, B_WILL_DRAW),
+	fIcon(NULL),
+	fSavedIcon(NULL)
+{
+	_FillSavedIcon();
+}
+
+
+ConflictView::~ConflictView()
+{
+	delete fSavedIcon;
+}
+
+
+void
+ConflictView::Draw(BRect updateRect)
+{
+	// Draw background
+
+	if (Parent())
+		SetLowColor(Parent()->ViewColor());
+	else
+		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	FillRect(updateRect, B_SOLID_LOW);
+
+	// Draw icon
+	if (fIcon == NULL)
+		return;
+
+	SetDrawingMode(B_OP_ALPHA);
+	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+	DrawBitmapAsync(fIcon, BPoint(0, 0));
+}
+
+
+// get the icon
+BBitmap*
+ConflictView::Icon()
+{
+	return fIcon;
+}
+
+
+// show or hide the icon
+void
+ConflictView::ShowIcon(bool show)
+{
+	if (show)
+		fIcon = fSavedIcon;
+	else
+		fIcon = NULL;
+}
+
+
+//	#pragma mark - ConflictView Private Methods
+
+
+// fill out the icon with the stop symbol from app_server
+void
+ConflictView::_FillSavedIcon()
+{
+	// return if the fSavedIcon has already been filled out
+	if (fSavedIcon != NULL && fSavedIcon->InitCheck() == B_OK)
+		return;
+
+	BPath path;
+	status_t status = find_directory(B_BEOS_SERVERS_DIRECTORY, &path);
+	if (status < B_OK) {
+		FTRACE((stderr,
+			"_FillWarningIcon() - find_directory failed: %s\n",
+			strerror(status)));
+		delete fSavedIcon;
+		fSavedIcon = NULL;
+		return;
+	}
+
+	path.Append("app_server");
+	BFile file;
+	status = file.SetTo(path.Path(), B_READ_ONLY);
+	if (status < B_OK) {
+		FTRACE((stderr,
+			"_FillWarningIcon() - BFile init failed: %s\n",
+			strerror(status)));
+		delete fSavedIcon;
+		fSavedIcon = NULL;
+		return;
+	}
+
+	BResources resources;
+	status = resources.SetTo(&file);
+	if (status < B_OK) {
+		FTRACE((stderr,
+			"_WarningIcon() - BResources init failed: %s\n",
+			strerror(status)));
+		delete fSavedIcon;
+		fSavedIcon = NULL;
+		return;
+	}
+
+	// Allocate the fSavedIcon bitmap
+	fSavedIcon = new(std::nothrow) BBitmap(BRect(0, 0, 15, 15), 0, B_RGBA32);
+	if (fSavedIcon->InitCheck() < B_OK) {
+		FTRACE((stderr, "_WarningIcon() - No memory for warning bitmap\n"));
+		delete fSavedIcon;
+		fSavedIcon = NULL;
+		return;
+	}
+
+	// Load the raw stop icon data
+	size_t size = 0;
+	const uint8* rawIcon;
+	rawIcon = (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE,
+		"stop", &size);
+
+	// load vector warning icon into fSavedIcon
+	if (rawIcon == NULL
+		|| BIconUtils::GetVectorIcon(rawIcon, size, fSavedIcon) < B_OK) {
+			delete fSavedIcon;
+			fSavedIcon = NULL;
+	}
+}
+
+
+//	#pragma mark - ModifierKeysWindow
 
 
 ModifierKeysWindow::ModifierKeysWindow()
@@ -652,133 +791,4 @@ ModifierKeysWindow::_DuplicateKeys()
 	}
 
 	return duplicateMask;
-}
-
-
-//	#pragma mark - ConflictView
-
-
-ConflictView::ConflictView(const char* name)
-	:
-	BView(BRect(0, 0, 15, 15), name, B_FOLLOW_NONE, B_WILL_DRAW),
-	fIcon(NULL),
-	fSavedIcon(NULL)
-{
-	_FillSavedIcon();
-}
-
-
-ConflictView::~ConflictView()
-{
-	delete fSavedIcon;
-}
-
-
-void
-ConflictView::Draw(BRect updateRect)
-{
-	// Draw background
-
-	if (Parent())
-		SetLowColor(Parent()->ViewColor());
-	else
-		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	FillRect(updateRect, B_SOLID_LOW);
-
-	// Draw icon
-	if (fIcon == NULL)
-		return;
-
-	SetDrawingMode(B_OP_ALPHA);
-	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-	DrawBitmapAsync(fIcon, BPoint(0, 0));
-}
-
-
-// get the icon
-BBitmap*
-ConflictView::Icon()
-{
-	return fIcon;
-}
-
-
-// show or hide the icon
-void
-ConflictView::ShowIcon(bool show)
-{
-	if (show)
-		fIcon = fSavedIcon;
-	else
-		fIcon = NULL;
-}
-
-
-//	#pragma mark - 
-
-
-// fill out the icon with the stop symbol from app_server
-void
-ConflictView::_FillSavedIcon()
-{
-	// return if the fSavedIcon has already been filled out
-	if (fSavedIcon != NULL && fSavedIcon->InitCheck() == B_OK)
-		return;
-
-	BPath path;
-	status_t status = find_directory(B_BEOS_SERVERS_DIRECTORY, &path);
-	if (status < B_OK) {
-		FTRACE((stderr,
-			"_FillWarningIcon() - find_directory failed: %s\n",
-			strerror(status)));
-		delete fSavedIcon;
-		fSavedIcon = NULL;
-		return;
-	}
-
-	path.Append("app_server");
-	BFile file;
-	status = file.SetTo(path.Path(), B_READ_ONLY);
-	if (status < B_OK) {
-		FTRACE((stderr,
-			"_FillWarningIcon() - BFile init failed: %s\n",
-			strerror(status)));
-		delete fSavedIcon;
-		fSavedIcon = NULL;
-		return;
-	}
-
-	BResources resources;
-	status = resources.SetTo(&file);
-	if (status < B_OK) {
-		FTRACE((stderr,
-			"_WarningIcon() - BResources init failed: %s\n",
-			strerror(status)));
-		delete fSavedIcon;
-		fSavedIcon = NULL;
-		return;
-	}
-
-	// Allocate the fSavedIcon bitmap
-	fSavedIcon = new(std::nothrow) BBitmap(BRect(0, 0, 15, 15), 0, B_RGBA32);
-	if (fSavedIcon->InitCheck() < B_OK) {
-		FTRACE((stderr, "_WarningIcon() - No memory for warning bitmap\n"));
-		delete fSavedIcon;
-		fSavedIcon = NULL;
-		return;
-	}
-
-	// Load the raw stop icon data
-	size_t size = 0;
-	const uint8* rawIcon;
-	rawIcon = (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE,
-		"stop", &size);
-
-	// load vector warning icon into fSavedIcon
-	if (rawIcon == NULL
-		|| BIconUtils::GetVectorIcon(rawIcon, size, fSavedIcon) < B_OK) {
-			delete fSavedIcon;
-			fSavedIcon = NULL;
-	}
 }

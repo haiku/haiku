@@ -9,17 +9,30 @@
 #define MODIFIER_KEYS_WINDOW_H
 
 
-#include <Bitmap.h>
-#include <Button.h>
-#include <CheckBox.h>
-#include <InterfaceDefs.h>
-#include <MenuField.h>
-#include <PopUpMenu.h>
-#include <StringView.h>
 #include <Window.h>
 
 
-class ConflictView;
+class BMenuField;
+class BPopUpMenu;
+
+
+class ConflictView : public BView {
+public:
+								ConflictView(const char* name);
+								~ConflictView();
+
+	virtual	void				Draw(BRect updateRect);
+
+			BBitmap*			Icon();
+			void				ShowIcon(bool show);
+
+private:
+	void						_FillSavedIcon();
+
+	BBitmap*					fIcon;
+	BBitmap*					fSavedIcon;
+};
+
 
 class ModifierKeysWindow : public BWindow {
 public:
@@ -67,23 +80,6 @@ private:
 
 			char*					fCurrentBuffer;
 			char*					fSavedBuffer;
-};
-
-
-class ConflictView : public BView {
-	public:
-									ConflictView(const char* name);
-									~ConflictView();
-				BBitmap*			Icon();
-				void				ShowIcon(bool show);
-
-	protected:
-		virtual void				Draw(BRect updateRect);
-		void						_FillSavedIcon();
-
-	private:
-		BBitmap*					fIcon;
-		BBitmap*					fSavedIcon;
 };
 
 
