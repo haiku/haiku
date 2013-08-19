@@ -3,15 +3,18 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Marc Flerackers (mflerackers@androme.be)
- *		Stephan Aßmus <superstippi@gmx.de>
- *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		Marc Flerackers, mflerackers@androme.be
+ *		John Scipione, jscipione@gmail.com
+ *		Ingo Weinhold, bonefish@cs.tu-berlin.de
  */
 
 
 #include <MenuField.h>
 
 #include <algorithm>
+#include <stdio.h>
+	// for printf in TRACE
 #include <stdlib.h>
 #include <string.h>
 
