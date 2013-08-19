@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Haiku Inc. All rights reserved.
+ * Copyright 2011-2013 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -754,7 +754,7 @@ ModifierKeysWindow::_DuplicateKeys()
 			if (left == 0 && right == 0)
 				continue;
 
-			if (left == testLeft && right == testRight) {
+			if (left == testLeft || right == testRight) {
 				duplicateMask |= 1 << testKey;
 				duplicateMask |= 1 << key;
 			}
