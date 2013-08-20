@@ -272,8 +272,9 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 
 	BBox* controlsBox = new BBox("controls box");
 	controlsBox->SetLabel(workspaceMenuField);
-	BGroupView* outerControlsView = new BGroupView(B_VERTICAL, 10.0);
-	outerControlsView->GroupLayout()->SetInsets(10, 10, 10, 10);
+	BGroupView* outerControlsView = new BGroupView(B_VERTICAL);
+	outerControlsView->GroupLayout()->SetInsets(B_USE_DEFAULT_SPACING,
+		B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
 	controlsBox->AddChild(outerControlsView);
 
 	fResolutionMenu = new BPopUpMenu("resolution", true, true);
@@ -309,6 +310,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 
 	fResolutionField = new BMenuField("ResolutionMenu",
 		B_TRANSLATE("Resolution:"), fResolutionMenu);
+	fResolutionField->SetAlignment(B_ALIGN_RIGHT);
 
 	fColorsMenu = new BPopUpMenu("colors", true, false);
 
@@ -329,6 +331,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 
 	fColorsField = new BMenuField("ColorsMenu", B_TRANSLATE("Colors:"),
 		fColorsMenu);
+	fColorsField->SetAlignment(B_ALIGN_RIGHT);
 
 	fRefreshMenu = new BPopUpMenu("refresh rate", true, true);
 
@@ -378,6 +381,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 
 	fRefreshField = new BMenuField("RefreshMenu", B_TRANSLATE("Refresh rate:"),
 		fRefreshMenu);
+	fRefreshField->SetAlignment(B_ALIGN_RIGHT);
 
 	if (_IsVesa())
 		fRefreshField->Hide();
@@ -410,6 +414,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 
 		fCombineField = new BMenuField("CombineMenu",
 			B_TRANSLATE("Combine displays:"), fCombineMenu);
+		fCombineField->SetAlignment(B_ALIGN_RIGHT);
 
 		if (!multiMonSupport)
 			fCombineField->Hide();
@@ -428,6 +433,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 
 		fSwapDisplaysField = new BMenuField("SwapMenu",
 			B_TRANSLATE("Swap displays:"), fSwapDisplaysMenu);
+		fSwapDisplaysField->SetAlignment(B_ALIGN_RIGHT);
 
 		if (!multiMonSupport)
 			fSwapDisplaysField->Hide();
@@ -448,6 +454,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 
 		fUseLaptopPanelField = new BMenuField("UseLaptopPanel",
 			B_TRANSLATE("Use laptop panel:"), fUseLaptopPanelMenu);
+		fUseLaptopPanelField->SetAlignment(B_ALIGN_RIGHT);
 
 		if (!useLaptopPanelSupport)
 			fUseLaptopPanelField->Hide();
@@ -478,14 +485,21 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 	}
 
 	BLayoutBuilder::Group<>(outerControlsView)
-		.AddGrid(5.0, 5.0)
-			.AddMenuField(fResolutionField, 0, 0, B_ALIGN_RIGHT)
-			.AddMenuField(fColorsField, 0, 1, B_ALIGN_RIGHT)
-			.AddMenuField(fRefreshField, 0, 2, B_ALIGN_RIGHT)
-			.AddMenuField(fCombineField, 0, 3, B_ALIGN_RIGHT)
-			.AddMenuField(fSwapDisplaysField, 0, 4, B_ALIGN_RIGHT)
-			.AddMenuField(fUseLaptopPanelField, 0, 5, B_ALIGN_RIGHT)
-			.AddMenuField(fTVStandardField, 0, 6, B_ALIGN_RIGHT)
+		.AddGrid(B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING)
+			.Add(fResolutionField->CreateLabelLayoutItem(), 0, 0)
+			.Add(fResolutionField->CreateMenuBarLayoutItem(), 1, 0)
+			.Add(fColorsField->CreateLabelLayoutItem(), 0, 1)
+			.Add(fColorsField->CreateMenuBarLayoutItem(), 1, 1)
+			.Add(fRefreshField->CreateLabelLayoutItem(), 0, 2)
+			.Add(fRefreshField->CreateMenuBarLayoutItem(), 1, 2)
+			.Add(fCombineField->CreateLabelLayoutItem(), 0, 3)
+			.Add(fCombineField->CreateMenuBarLayoutItem(), 1, 3)
+			.Add(fSwapDisplaysField->CreateLabelLayoutItem(), 0, 4)
+			.Add(fSwapDisplaysField->CreateMenuBarLayoutItem(), 1, 4)
+			.Add(fUseLaptopPanelField->CreateLabelLayoutItem(), 0, 5)
+			.Add(fUseLaptopPanelField->CreateMenuBarLayoutItem(), 1, 5)
+			.Add(fTVStandardField->CreateLabelLayoutItem(), 0, 6)
+			.Add(fTVStandardField->CreateMenuBarLayoutItem(), 1, 6)
 		.End();
 
 	// TODO: we don't support getting the screen's preferred settings
