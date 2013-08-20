@@ -1021,6 +1021,9 @@ BMenu::SetEnabled(bool enabled)
 
 	fEnabled = enabled;
 
+	if (dynamic_cast<_BMCMenuBar_*>(Supermenu()) != NULL)
+		Supermenu()->SetEnabled(enabled);
+
 	if (fSuperitem)
 		fSuperitem->SetEnabled(enabled);
 }

@@ -276,6 +276,15 @@ _BMCMenuBar_::SetMaxContentWidth(float width)
 }
 
 
+void
+_BMCMenuBar_::SetEnabled(bool enabled)
+{
+	fMenuField->SetEnabled(enabled);
+
+	BMenuBar::SetEnabled(enabled);
+}
+
+
 BSize
 _BMCMenuBar_::MinSize()
 {

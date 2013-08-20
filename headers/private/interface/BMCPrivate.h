@@ -52,6 +52,7 @@ public:
 	virtual	void				MessageReceived(BMessage* msg);
 	virtual	void				MakeFocus(bool focused = true);
 	virtual	void				SetMaxContentWidth(float width);
+	virtual	void				SetEnabled(bool enabled);
 
 			void				TogglePopUpMarker(bool show)
 									{ fShowPopUpMarker = show; }
