@@ -2528,7 +2528,7 @@ BMenu::_HitTestItems(BPoint where, BPoint slop) const
 	int32 itemCount = CountItems();
 	for (int32 i = 0; i < itemCount; i++) {
 		BMenuItem* item = ItemAt(i);
-		if (item->IsEnabled() && item->Frame().Contains(where))
+		if (item->Frame().Contains(where))
 			return item;
 	}
 
