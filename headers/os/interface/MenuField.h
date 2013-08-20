@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2011, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2013, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _MENU_FIELD_H
@@ -121,9 +121,12 @@ private:
 								BMenuField(const char* label,
 									BMenu* menu, BMessage* message);
 
+			void				_DrawLabel(BRect updateRect);
+			void				_DrawMenuBar(BRect updateRect);
+
 			void				InitObject(const char* label);
 			void				InitObject2();
-			void				DrawLabel(BRect updateRect);
+
 	static	void				InitMenu(BMenu* menu);
 
 			int32				_MenuTask();

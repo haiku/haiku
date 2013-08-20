@@ -23,6 +23,7 @@
 #include <LayoutUtils.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
+#include <MenuPrivate.h>
 #include <Message.h>
 #include <BMCPrivate.h>
 #include <Window.h>
@@ -138,6 +139,8 @@ struct BMenuField::LayoutData {
 static const float kMinMenuBarWidth = 20.0f;
 	// found by experimenting on BeOS R5
 
+
+using BPrivate::MenuPrivate;
 
 BMenuField::BMenuField(BRect frame, const char* name, const char* label,
 	BMenu* menu, uint32 resizingMode, uint32 flags)
@@ -361,20 +364,8 @@ BMenuField::AllUnarchived(const BMessage* from)
 void
 BMenuField::Draw(BRect updateRect)
 {
-	DrawLabel(updateRect);
-
-	BRect rect(fMenuBar->Frame());
-	rect.InsetBy(-kVMargin, -kVMargin);
-	rgb_color base = fMenuBar->LowColor();
-	rgb_color background = LowColor();
-	uint32 flags = 0;
-	if (!fMenuBar->IsEnabled())
-		flags |= BControlLook::B_DISABLED;
-	if (IsFocus() && Window()->IsActive())
-		flags |= BControlLook::B_FOCUSED;
-
-	be_control_look->DrawMenuFieldFrame(this, rect, updateRect, base,
-		background, flags);
+	_DrawLabel(updateRect);
+	_DrawMenuBar(updateRect);
 }
 
 
@@ -425,9 +416,6 @@ BMenuField::AllAttached()
 void
 BMenuField::MouseDown(BPoint where)
 {
-	if (!fMenuBar->Frame().Contains(where))
-		return;
-
 	BRect bounds = fMenuBar->ConvertFromParent(Bounds());
 
 	fMenuBar->StartMenuBar(-1, false, true, &bounds);
@@ -995,9 +983,14 @@ BMenuField::InitObject2()
 
 
 void
-BMenuField::DrawLabel(BRect updateRect)
+BMenuField::_DrawLabel(BRect updateRect)
 {
 	CALLED();
+
+	BRect rect(Bounds());
+	rect.right = fDivider;
+	if (!rect.IsValid() || !rect.Intersects(updateRect))
+		return;
 
 	_ValidateLayoutData();
 	font_height& fh = fLayoutData->font_info;
@@ -1006,17 +999,15 @@ BMenuField::DrawLabel(BRect updateRect)
 	if (label == NULL)
 		return;
 
-	SetLowColor(ViewColor());
-
 	// horizontal alignment
 	float x;
 	switch (fAlign) {
 		case B_ALIGN_RIGHT:
-			x = fDivider - fLayoutData->label_width - 3.0;
+			x = fDivider - fLayoutData->label_width - 3.0f;
 			break;
 
 		case B_ALIGN_CENTER:
-			x = fDivider - fLayoutData->label_width / 2.0;
+			x = fDivider - roundf(fLayoutData->label_width / 2.0f);
 			break;
 
 		default:
@@ -1025,14 +1016,47 @@ BMenuField::DrawLabel(BRect updateRect)
 	}
 
 	// vertical alignment
-	float y = Bounds().top
-		+ (Bounds().Height() + 1 - fh.ascent - fh.descent) / 2
+	float y = rect.top
+		+ roundf((rect.Height() + 1 - fh.ascent - fh.descent) / 2.0f)
 		+ fh.ascent;
-	y = floor(y + 0.5);
 
-	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-		IsEnabled() ? B_DARKEN_MAX_TINT : B_DISABLED_LABEL_TINT));
-	DrawString(label, BPoint(x, y));
+	const rgb_color lowColor = LowColor();
+
+	MenuPrivate menuPrivate(fMenuBar);
+	if (menuPrivate.State() != MENU_STATE_CLOSED)
+		SetLowColor(ui_color(B_MENU_SELECTED_BACKGROUND_COLOR));
+
+	BRect fillRect(rect.InsetByCopy(0, kVMargin));
+	fillRect.right -= kVMargin * 2;
+	FillRect(fillRect, B_SOLID_LOW);
+
+	uint32 flags = 0;
+	if (!IsEnabled())
+		flags |= BControlLook::B_DISABLED;
+
+	be_control_look->DrawLabel(this, label, LowColor(), flags, BPoint(x, y));
+
+	SetLowColor(lowColor);
+}
+
+
+void
+BMenuField::_DrawMenuBar(BRect updateRect)
+{
+	CALLED();
+
+	BRect rect(fMenuBar->Frame().InsetByCopy(-kVMargin, -kVMargin));
+	if (!rect.IsValid() || !rect.Intersects(updateRect))
+		return;
+
+	uint32 flags = 0;
+	if (!IsEnabled())
+		flags |= BControlLook::B_DISABLED;
+	if (IsFocus() && Window()->IsActive())
+		flags |= BControlLook::B_FOCUSED;
+
+	be_control_look->DrawMenuFieldFrame(this, rect, updateRect,
+		fMenuBar->LowColor(), LowColor(), flags);
 }
 
 
