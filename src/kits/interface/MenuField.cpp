@@ -428,9 +428,6 @@ BMenuField::MouseDown(BPoint where)
 	if (!fMenuBar->Frame().Contains(where))
 		return;
 
-	if (!fMenuBar->IsEnabled())
-		return;
-
 	BRect bounds = fMenuBar->ConvertFromParent(Bounds());
 
 	fMenuBar->StartMenuBar(-1, false, true, &bounds);
