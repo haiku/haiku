@@ -58,8 +58,16 @@ rule DefineDefaultBuildProfiles
 				wonderbrush
 				wqy_microhei
 				xz_utils@!gcc2
-				xz_utils_x86@gcc2
 				;
+
+			# xz_utils can't be built with gcc2, so a mere gcc2 system doesn't
+			# have it. However, xz_utils does exist for the secondary (gcc4)
+			# architecture of a gcc2 hybrid.
+			if $(HAIKU_PACKAGING_ARCHS) != x86_gcc2 {
+				AddHaikuImagePackages
+					xz_utils_x86@gcc2
+					;
+			}
 
 			local architectureObject ;
 			for architectureObject in [ MultiArchSubDirSetup ] {
