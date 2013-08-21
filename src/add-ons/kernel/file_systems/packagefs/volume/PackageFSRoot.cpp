@@ -256,7 +256,7 @@ PackageFSRoot::_AddPackage(Package* package)
 				= fResolvables.Lookup(resolvable->Name())) {
 			family->AddResolvable(resolvable, dependenciesToUpdate);
 		} else {
-			ResolvableFamily* family = new(std::nothrow) ResolvableFamily;
+			family = new(std::nothrow) ResolvableFamily;
 			if (family == NULL)
 				return B_NO_MEMORY;
 
@@ -282,7 +282,7 @@ PackageFSRoot::_AddPackage(Package* package)
 				= fDependencies.Lookup(dependency->Name())) {
 			family->AddDependency(dependency);
 		} else {
-			DependencyFamily* family = new(std::nothrow) DependencyFamily;
+			family = new(std::nothrow) DependencyFamily;
 			if (family == NULL)
 				return B_NO_MEMORY;
 
