@@ -9,6 +9,7 @@
 #define MODIFIER_KEYS_WINDOW_H
 
 
+#include <View.h>
 #include <Window.h>
 
 
@@ -24,13 +25,15 @@ public:
 	virtual	void				Draw(BRect updateRect);
 
 			BBitmap*			Icon();
-			void				ShowIcon(bool show);
+			void				SetStopIcon(bool show);
+			void				SetWarnIcon(bool show);
 
 private:
-	void						_FillSavedIcon();
+			void				_FillIcons();
 
-	BBitmap*					fIcon;
-	BBitmap*					fSavedIcon;
+			BBitmap*			fIcon;
+			BBitmap*			fStopIcon;
+			BBitmap*			fWarnIcon;
 };
 
 

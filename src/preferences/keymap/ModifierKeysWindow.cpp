@@ -58,6 +58,7 @@ enum {
 };
 
 
+static const uint32 kMsgHideShowIcons		= 'icon';
 static const uint32 kMsgUpdateModifier		= 'upmd';
 static const uint32 kMsgApplyModifiers 		= 'apmd';
 static const uint32 kMsgRevertModifiers		= 'rvmd';
@@ -74,15 +75,17 @@ ConflictView::ConflictView(const char* name)
 	:
 	BView(BRect(0, 0, 15, 15), name, B_FOLLOW_NONE, B_WILL_DRAW),
 	fIcon(NULL),
-	fSavedIcon(NULL)
+	fStopIcon(NULL),
+	fWarnIcon(NULL)
 {
-	_FillSavedIcon();
+	_FillIcons();
 }
 
 
 ConflictView::~ConflictView()
 {
-	delete fSavedIcon;
+	delete fStopIcon;
+	delete fWarnIcon;
 }
 
 
@@ -90,7 +93,6 @@ void
 ConflictView::Draw(BRect updateRect)
 {
 	// Draw background
-
 	if (Parent())
 		SetLowColor(Parent()->ViewColor());
 	else
@@ -98,10 +100,10 @@ ConflictView::Draw(BRect updateRect)
 
 	FillRect(updateRect, B_SOLID_LOW);
 
-	// Draw icon
 	if (fIcon == NULL)
 		return;
 
+	// Draw icon
 	SetDrawingMode(B_OP_ALPHA);
 	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
 	DrawBitmapAsync(fIcon, BPoint(0, 0));
@@ -116,36 +118,48 @@ ConflictView::Icon()
 }
 
 
-// show or hide the icon
+// show or hide the stop icon
 void
-ConflictView::ShowIcon(bool show)
+ConflictView::SetStopIcon(bool show)
 {
-	if (show)
-		fIcon = fSavedIcon;
-	else
-		fIcon = NULL;
+	fIcon = show ? fStopIcon : NULL;
+	const char* tip = show ? B_TRANSLATE("Error: duplicate keys")
+		: NULL;
+	SetToolTip(tip);
+}
+
+
+// show or hide the warn icon
+void
+ConflictView::SetWarnIcon(bool show)
+{
+	fIcon = show ? fWarnIcon : NULL;
+	const char* tip = show
+		? B_TRANSLATE("Warning: left and right key roles do not match")
+		: NULL;
+	SetToolTip(tip);
 }
 
 
 //	#pragma mark - ConflictView Private Methods
 
 
-// fill out the icon with the stop symbol from app_server
+// fill out the icons with the stop and warn symbols from app_server
 void
-ConflictView::_FillSavedIcon()
+ConflictView::_FillIcons()
 {
-	// return if the fSavedIcon has already been filled out
-	if (fSavedIcon != NULL && fSavedIcon->InitCheck() == B_OK)
+	// return if the icons have already been filled out
+	if (fStopIcon != NULL && fStopIcon->InitCheck() == B_OK
+		&& fWarnIcon != NULL && fWarnIcon->InitCheck() == B_OK) {
 		return;
+	}
 
 	BPath path;
 	status_t status = find_directory(B_BEOS_SERVERS_DIRECTORY, &path);
 	if (status < B_OK) {
 		FTRACE((stderr,
-			"_FillWarningIcon() - find_directory failed: %s\n",
+			"_FillIcons() - find_directory failed: %s\n",
 			strerror(status)));
-		delete fSavedIcon;
-		fSavedIcon = NULL;
 		return;
 	}
 
@@ -154,10 +168,8 @@ ConflictView::_FillSavedIcon()
 	status = file.SetTo(path.Path(), B_READ_ONLY);
 	if (status < B_OK) {
 		FTRACE((stderr,
-			"_FillWarningIcon() - BFile init failed: %s\n",
+			"_FillIcons() - BFile init failed: %s\n",
 			strerror(status)));
-		delete fSavedIcon;
-		fSavedIcon = NULL;
 		return;
 	}
 
@@ -165,33 +177,57 @@ ConflictView::_FillSavedIcon()
 	status = resources.SetTo(&file);
 	if (status < B_OK) {
 		FTRACE((stderr,
-			"_WarningIcon() - BResources init failed: %s\n",
+			"_FillIcons() - BResources init failed: %s\n",
 			strerror(status)));
-		delete fSavedIcon;
-		fSavedIcon = NULL;
 		return;
 	}
 
-	// Allocate the fSavedIcon bitmap
-	fSavedIcon = new(std::nothrow) BBitmap(BRect(0, 0, 15, 15), 0, B_RGBA32);
-	if (fSavedIcon->InitCheck() < B_OK) {
-		FTRACE((stderr, "_WarningIcon() - No memory for warning bitmap\n"));
-		delete fSavedIcon;
-		fSavedIcon = NULL;
-		return;
-	}
-
-	// Load the raw stop icon data
 	size_t size = 0;
-	const uint8* rawIcon;
-	rawIcon = (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE,
-		"stop", &size);
 
-	// load vector warning icon into fSavedIcon
-	if (rawIcon == NULL
-		|| BIconUtils::GetVectorIcon(rawIcon, size, fSavedIcon) < B_OK) {
-			delete fSavedIcon;
-			fSavedIcon = NULL;
+	if (fStopIcon == NULL) {
+		// Allocate the fStopIcon bitmap
+		fStopIcon = new (std::nothrow) BBitmap(BRect(0, 0, 15, 15), 0,
+			B_RGBA32);
+		if (fStopIcon->InitCheck() != B_OK) {
+			FTRACE((stderr, "_FillIcons() - No memory for stop bitmap\n"));
+			delete fStopIcon;
+			fStopIcon = NULL;
+			return;
+		}
+
+		// load stop icon bitmap from app_server
+		const uint8* stopVector
+			= (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE, "stop",
+				&size);
+		if (stopVector == NULL
+			|| BIconUtils::GetVectorIcon(stopVector, size, fStopIcon)
+				!= B_OK) {
+			delete fStopIcon;
+			fStopIcon = NULL;
+		}
+	}
+
+	if (fWarnIcon == NULL) {
+		// Allocate the fWarnIcon bitmap
+		fWarnIcon = new (std::nothrow) BBitmap(BRect(0, 0, 15, 15), 0,
+			B_RGBA32);
+		if (fWarnIcon->InitCheck() != B_OK) {
+			FTRACE((stderr, "_FillIcons() - No memory for warn bitmap\n"));
+			delete fWarnIcon;
+			fWarnIcon = NULL;
+			return;
+		}
+
+		// load warn icon bitmap from app_server
+		const uint8* warnVector
+			= (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE, "warn",
+				&size);
+		if (warnVector == NULL
+			|| BIconUtils::GetVectorIcon(warnVector, size, fWarnIcon)
+				!= B_OK) {
+			delete fWarnIcon;
+			fWarnIcon = NULL;
+		}
 	}
 }
 
@@ -256,26 +292,42 @@ ModifierKeysWindow::ModifierKeysWindow()
 	// Build the layout
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	AddChild(BLayoutBuilder::Group<>(B_VERTICAL)
-		.AddGrid(B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING)
-			.Add(keyRole, 0, 0)
-			.Add(keyLabel, 1, 0, 2, 1)
+	float forcedMinWidth = be_plain_font->StringWidth("XXX") * 4;
+	keyRole->SetExplicitMinSize(BSize(forcedMinWidth, B_SIZE_UNSET));
 
-			.Add(shiftMenuField->CreateLabelLayoutItem(), 0, 1)
-			.Add(shiftMenuField->CreateMenuBarLayoutItem(), 1, 1)
-			.Add(fShiftConflictView, 2, 1)
+	BLayoutItem* shiftLabel = shiftMenuField->CreateLabelLayoutItem();
+	shiftLabel->SetExplicitMinSize(BSize(forcedMinWidth, B_SIZE_UNSET));
+	BLayoutItem* controlLabel = controlMenuField->CreateLabelLayoutItem();
+	controlLabel->SetExplicitMinSize(BSize(forcedMinWidth, B_SIZE_UNSET));
+	BLayoutItem* optionLabel = optionMenuField->CreateLabelLayoutItem();
+	optionLabel->SetExplicitMinSize(BSize(forcedMinWidth, B_SIZE_UNSET));
+	BLayoutItem* commandLabel = commandMenuField->CreateLabelLayoutItem();
+	commandLabel->SetExplicitMinSize(BSize(forcedMinWidth, B_SIZE_UNSET));
 
-			.Add(controlMenuField->CreateLabelLayoutItem(), 0, 2)
-			.Add(controlMenuField->CreateMenuBarLayoutItem(), 1, 2)
-			.Add(fControlConflictView, 2, 2)
-
-			.Add(optionMenuField->CreateLabelLayoutItem(), 0, 3)
-			.Add(optionMenuField->CreateMenuBarLayoutItem(), 1, 3)
-			.Add(fOptionConflictView, 2, 3)
-
-			.Add(commandMenuField->CreateLabelLayoutItem(), 0, 4)
-			.Add(commandMenuField->CreateMenuBarLayoutItem(), 1, 4)
-			.Add(fCommandConflictView, 2, 4)
+	AddChild(BLayoutBuilder::Group<>(B_VERTICAL, B_USE_SMALL_SPACING)
+		.AddGroup(B_HORIZONTAL)
+			.Add(keyRole)
+			.Add(keyLabel)
+			.End()
+		.AddGroup(B_HORIZONTAL)
+			.Add(shiftLabel)
+			.Add(shiftMenuField->CreateMenuBarLayoutItem())
+			.Add(fShiftConflictView)
+			.End()
+		.AddGroup(B_HORIZONTAL)
+			.Add(controlLabel)
+			.Add(controlMenuField->CreateMenuBarLayoutItem())
+			.Add(fControlConflictView)
+			.End()
+		.AddGroup(B_HORIZONTAL)
+			.Add(optionLabel)
+			.Add(optionMenuField->CreateMenuBarLayoutItem())
+			.Add(fOptionConflictView)
+			.End()
+		.AddGroup(B_HORIZONTAL)
+			.Add(commandLabel)
+			.Add(commandMenuField->CreateMenuBarLayoutItem())
+			.Add(fCommandConflictView)
 			.End()
 		.AddGlue()
 		.AddGroup(B_HORIZONTAL)
@@ -304,6 +356,10 @@ void
 ModifierKeysWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case kMsgHideShowIcons:
+			_HideShowIcons();
+			break;
+
 		case kMsgUpdateModifier:
 		{
 			int32 menuitem = MENU_ITEM_SHIFT;
@@ -575,6 +631,30 @@ ModifierKeysWindow::_MarkMenuItems()
 			fCommandMenu->ItemAt(key)->SetMarked(true);
 		}
 	}
+
+	// Set the warning icon if not marked
+	BBitmap* shiftIcon = fShiftConflictView->Icon();
+	BBitmap* controlIcon = fControlConflictView->Icon();
+	BBitmap* optionIcon = fOptionConflictView->Icon();
+	BBitmap* commandIcon = fCommandConflictView->Icon();
+
+	fShiftConflictView->SetWarnIcon(fShiftMenu->FindMarked() == NULL);
+	fControlConflictView->SetWarnIcon(fControlMenu->FindMarked() == NULL);
+	fOptionConflictView->SetWarnIcon(fOptionMenu->FindMarked() == NULL);
+	fCommandConflictView->SetWarnIcon(fCommandMenu->FindMarked() == NULL);
+
+	// if there was a change invalidate the view
+	if (shiftIcon != fShiftConflictView->Icon())
+		fShiftConflictView->Invalidate();
+
+	if (controlIcon != fControlConflictView->Icon())
+		fControlConflictView->Invalidate();
+
+	if (optionIcon != fOptionConflictView->Icon())
+		fOptionConflictView->Invalidate();
+
+	if (commandIcon != fCommandConflictView->Icon())
+		fCommandConflictView->Invalidate();
 }
 
 
@@ -652,21 +732,19 @@ ModifierKeysWindow::_ValidateDuplicateKeys()
 	BBitmap* optionIcon = fOptionConflictView->Icon();
 	BBitmap* commandIcon = fCommandConflictView->Icon();
 
-	if (dupMask != 0) {
-		fShiftConflictView->ShowIcon((dupMask & SHIFT_KEY) != 0);
-		fControlConflictView->ShowIcon((dupMask & CONTROL_KEY) != 0);
-		fOptionConflictView->ShowIcon((dupMask & OPTION_KEY) != 0);
-		fCommandConflictView->ShowIcon((dupMask & COMMAND_KEY) != 0);
+	if ((dupMask & SHIFT_KEY) != 0)
+		fShiftConflictView->SetStopIcon(true);
 
-		fOkButton->SetEnabled(false);
-	} else {
-		fShiftConflictView->ShowIcon(false);
-		fControlConflictView->ShowIcon(false);
-		fOptionConflictView->ShowIcon(false);
-		fCommandConflictView->ShowIcon(false);
+	if ((dupMask & CONTROL_KEY) != 0)
+		fControlConflictView->SetStopIcon(true);
 
-		fOkButton->SetEnabled(true);
-	}
+	if ((dupMask & OPTION_KEY) != 0)
+		fOptionConflictView->SetStopIcon(true);
+
+	if ((dupMask & COMMAND_KEY) != 0)
+		fCommandConflictView->SetStopIcon(true);
+
+	fOkButton->SetEnabled(dupMask == 0);
 
 	// if there was a change invalidate the view
 	if (shiftIcon != fShiftConflictView->Icon())
