@@ -1,0 +1,32 @@
+name 			haiku_%HAIKU_SECONDARY_PACKAGING_ARCH%
+version			R1~alpha4_pm-1
+architecture	x86
+summary			"The Haiku base system %HAIKU_SECONDARY_PACKAGING_ARCH% secondary architecture support"
+
+description		"The Haiku base system %HAIKU_SECONDARY_PACKAGING_ARCH%
+secondary architecture support includes all system libraries, add-ons, and
+other files required to run programs build for that architecture."
+
+packager		"The Haiku build system"
+vendor			"Haiku Project"
+
+copyrights		"2001-2013 Haiku, Inc. et al"
+licenses {
+	MIT
+	"GNU LGPL v2.1"
+}
+
+provides {
+	haiku_%HAIKU_SECONDARY_PACKAGING_ARCH% = R1~alpha4_pm-1 compat>=R1~alpha1
+}
+
+requires {
+	lib:libfreetype_%HAIKU_SECONDARY_PACKAGING_ARCH%
+#ifndef HAIKU_BOOTSTRAP_BUILD
+	lib:libjpeg_%HAIKU_SECONDARY_PACKAGING_ARCH%
+	lib:libpng_%HAIKU_SECONDARY_PACKAGING_ARCH%
+#endif
+	lib:libsolv_%HAIKU_SECONDARY_PACKAGING_ARCH%
+	lib:libsolvext_%HAIKU_SECONDARY_PACKAGING_ARCH%
+	lib:libz_%HAIKU_SECONDARY_PACKAGING_ARCH%
+}
