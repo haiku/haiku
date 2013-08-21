@@ -316,6 +316,8 @@ BMenuBar::MouseDown(BPoint where)
 		if ((mouse_mode() == B_FOCUS_FOLLOWS_MOUSE)
 			|| ((mouse_mode() == B_CLICK_TO_FOCUS_MOUSE)
 				&& ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0))) {
+			// right-click to bring-to-front and send-to-back
+			// (might cause some regressions in FFM)
 			window->Activate();
 			window->UpdateIfNeeded();
 		}

@@ -2485,7 +2485,7 @@ BMenu::_OverSubmenu(BMenuItem* item, BPoint loc)
 	if (subMenu == NULL || subMenu->Window() == NULL)
 		return false;
 
-	// we assume that loc is in screen coords {
+	// assume that loc is in screen coordinates
 	if (subMenu->Window()->Frame().Contains(loc))
 		return true;
 
