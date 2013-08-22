@@ -2050,6 +2050,7 @@ BrowserWindow::_UpdateHistoryMenu()
 	addOrDeleteMenu(todayMenu, fHistoryMenu);
 	addOrDeleteMenu(yesterdayMenu, fHistoryMenu);
 	addOrDeleteMenu(twoDaysAgoMenu, fHistoryMenu);
+	addOrDeleteMenu(threeDaysAgoMenu, fHistoryMenu);
 	addOrDeleteMenu(fourDaysAgoMenu, fHistoryMenu);
 	addOrDeleteMenu(fiveDaysAgoMenu, fHistoryMenu);
 	addOrDeleteMenu(earlierMenu, fHistoryMenu);
