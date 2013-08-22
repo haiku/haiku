@@ -16,16 +16,6 @@ installDir=$4
 shift 4
 additionalMakeArgs=$*
 
-case `uname` in
-FreeBSD|OpenBSD)
-	MAKE=gmake
-	;;
-*)
-	MAKE=make
-	;;
-esac
-export MAKE
-
 case $haikuMachine in
 x86_64-*)
 	# GCC's default is to enable multilib, but there is a bug when

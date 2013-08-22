@@ -754,6 +754,13 @@ else
 			if [ -z "$isPrimaryArch" ]; then
 				secondaryArch=$targetArch
 			fi
+
+			case $HOST_PLATFORM in
+				freebsd|openbsd)	MAKE=gmake;;
+				*)					MAKE=make;;
+			esac
+
+			MAKE=$MAKE \
 			SECONDARY_ARCH=$secondaryArch \
 			HAIKU_USE_GCC_GRAPHITE=`get_variable \
 				HAIKU_USE_GCC_GRAPHITE_$targetArch` \

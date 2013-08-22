@@ -113,8 +113,8 @@ cd $binutilsObjDir
 CFLAGS="-O2" CXXFLAGS="-O2" $buildToolsDir/binutils/configure \
 	--prefix=$installDir $buildHostSpec --target=i586-pc-haiku \
 	--disable-nls --enable-shared=yes --disable-werror || exit 1
-make $additionalMakeArgs || exit 1
-make $additionalMakeArgs install || exit 1
+$MAKE $additionalMakeArgs || exit 1
+$MAKE $additionalMakeArgs install || exit 1
 
 PATH=$PATH:$installDir/bin
 export PATH
@@ -173,13 +173,13 @@ eval "sed $sedExpr Makefile.bak > Makefile" || exit 1
 rm Makefile.bak
 
 # make gcc
-make cross || {
+$MAKE cross || {
 	echo "ERROR: Building gcc failed." >&2
 	exit 1
 }
 
 # install gcc
-make install-gcc-cross || {
+$MAKE install-gcc-cross || {
 	echo "ERROR: Installing the cross compiler failed." >&2
 	exit 1
 }
