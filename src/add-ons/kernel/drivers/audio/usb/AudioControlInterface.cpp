@@ -1855,6 +1855,8 @@ AudioControlInterface::ListMixControls(multi_mix_control_info* Info)
 			I != MixerControlsMap.End(); I++)
 		_ListMixControlsForMixerUnit(index, Info, I->Value());
 
+	Info->control_count = index;
+
 	return B_OK;
 }
 
