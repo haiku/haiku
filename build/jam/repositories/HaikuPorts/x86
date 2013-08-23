@@ -172,8 +172,8 @@ RemotePackageRepository HaikuPorts
 	autoconf
 	automake
 #	bepdf
-#	binutils
-#	binutils_x86_gcc2
+	binutils
+	binutils_x86_gcc2
 	bison
 	bzip2
 	cdrtools
@@ -186,8 +186,8 @@ RemotePackageRepository HaikuPorts
 	ffmpeg
 	flex
 	freetype
-#	gcc
-#	gcc_x86_gcc2
+	gcc
+	gcc_x86_gcc2
 	gettext
 	git
 	glu
@@ -215,7 +215,7 @@ RemotePackageRepository HaikuPorts
 	make
 	man
 	mercurial
-#	mesa
+	mesa
 	mesa_x86_gcc2
 	mkdepend
 	nano
