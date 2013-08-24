@@ -268,6 +268,7 @@ private:
 
 			int					_State(BMenuItem** _item = NULL) const;
 			void				_InvokeItem(BMenuItem* item, bool now = false);
+			void				_InvokeTrigger(const char* bytes);
 			void				_QuitTracking(bool onlyThis = true);
 
 	static	menu_info			sMenuInfo;
