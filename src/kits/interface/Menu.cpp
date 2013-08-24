@@ -1685,8 +1685,7 @@ BMenu::_Track(int* action, long start)
 		} else if ((item = _HitTestItems(location, B_ORIGIN)) != NULL) {
 			_UpdateStateOpenSelect(item, location, navAreaRectAbove,
 				navAreaRectBelow, selectedTime, navigationAreaTime);
-			if (!releasedOnce)
-				releasedOnce = true;
+			releasedOnce = true;
 		} else if (_OverSuper(screenLocation) && fSuper->fState != MENU_STATE_KEY_TO_SUBMENU) {
 			fState = MENU_STATE_TRACKING;
 			UnlockLooper();
