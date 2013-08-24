@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ActivityMonitor	2739021859
+1	swedish	x-vnd.Haiku-ActivityMonitor	1211510241
 P-faults	DataSource		P-fel
 Media nodes	DataSource		Medianoder
 Threads	DataSource		Trådar
@@ -6,6 +6,7 @@ Always on top	ActivityWindow		Alltid överst
 Add graph	ActivityWindow		Lägg till graf
 Teams	DataSource		Processer
 Hide legend	ActivityView		Göm graftext
+MiB	DataSource		MiB
 Network send	DataSource		Nätverk sändning
 CPU usage (combined)	DataSource		CPU användning (kombinerad)
 CPU	DataSource		CPU
@@ -26,12 +27,14 @@ Update time interval:	SettingsWindow		Uppdateringsintervall:
 TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		Avsluta
 Block cache memory	DataSource		Blockcacheminne
+%.1f KiB/s	DataSource		%.1f KiB/s
 Remove graph	ActivityView		Ta bort graf
 %lld sec.	SettingsWindow		%lld sek.
 %lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		CPU användning
 Raw clipboard	DataSource		Urklipp rådata
 Sems	DataSource		Semaforer
+%.1f MiB	DataSource		%.1f MiB
 ActivityMonitor	System name		AktivitetsÖvervakare
 Running applications	DataSource		Aktiva program
 Semaphores	DataSource		Semaforer

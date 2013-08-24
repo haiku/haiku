@@ -1,7 +1,8 @@
-1	swedish	x-vnd.Haiku-libmail	161731481
+1	swedish	x-vnd.Haiku-libmail	4037525365
 Partially download messages larger than	ProtocolConfigView		Ladda ner meddelanden delvis som är större än
 Password:	ProtocolConfigView		Lösenord:
 Remove mail from server when deleted	ProtocolConfigView		Ta bort meddelanden från servern när dom raderas
+KiB	ProtocolConfigView		KiB
 Mail server:	ProtocolConfigView		E-postserver:
 Select…	MailKit		Välj...
 Connection type:	ProtocolConfigView		Anslutningstyp:

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Terminal	328707356
+1	swedish	x-vnd.Haiku-Terminal	2967760334
 Not found.	Terminal TermWindow		Hittades ej.
 Switch Terminals	Terminal TermWindow		Växla terminal
 Change directory	Terminal TermView		Byt katalog
@@ -79,6 +79,7 @@ Clear all	Terminal TermWindow		Rensa allt
 Text encoding	Terminal TermWindow		Teckenuppsättning
 size	Terminal TermView		storlek
 Close window	Terminal TermWindow		Stäng fönster
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDen aktiva processens arbetskatalog i denna tab.\n\t\t\Teller maximalt antal sökvägskomponenter\n\t\t\tkan anges som. '%2d' för som mest två komponenter.\n\t%T\t-\tTerminal programmets namn på det valda språket för Os:et.\n\t%e\t-\tEnkodingen av den valda tabben . Visad i UTF-8.\n\t%i\t-\tIndexet för fönstret.\n\t%p\t-\tNamnet på den aktiva processen i den valda tabben.\n\t%t\t-\tNamnet på den valda tabben.\n\t%%\t-\tTecknet '%'.
 Save as default	Terminal TermWindow		Spara som förvald
 Set tab title	Terminal TermWindow		Ange fliktitel
 Settings…	Terminal TermWindow		Inställningar...
