@@ -148,8 +148,6 @@ private:
 			alignment			fAlign;
 			float				fDivider;
 			bool				fEnabled;
-			bool				fSelected;
-			bool				fTransition;
 			bool				fFixedSizeMB;
 			thread_id			fMenuTaskID;
 

@@ -456,9 +456,6 @@ BMenuField::KeyDown(const char* bytes, int32 numBytes)
 
 			fMenuBar->StartMenuBar(0, true, true, &bounds);
 
-			fSelected = true;
-			fTransition = true;
-
 			bounds = Bounds();
 			bounds.right = fDivider;
 
@@ -961,8 +958,6 @@ BMenuField::InitObject(const char* label)
 	fMenuBar = NULL;
 	fAlign = B_ALIGN_LEFT;
 	fEnabled = true;
-	fSelected = false;
-	fTransition = false;
 	fFixedSizeMB = false;
 	fMenuTaskID = -1;
 	fLayoutData = new LayoutData;
@@ -1100,8 +1095,6 @@ BMenuField::_MenuTask()
 	if (!LockLooper())
 		return 0;
 
-	fSelected = true;
-	fTransition = true;
 	Invalidate();
 	UnlockLooper();
 
@@ -1117,8 +1110,6 @@ BMenuField::_MenuTask()
 	} while (tracking);
 
 	if (LockLooper()) {
-		fSelected = false;
-		fTransition = true;
 		Invalidate();
 		UnlockLooper();
 	}
