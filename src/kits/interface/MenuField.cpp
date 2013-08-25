@@ -439,11 +439,6 @@ BMenuField::MouseDown(BPoint where)
 void
 BMenuField::KeyDown(const char* bytes, int32 numBytes)
 {
-	if (numBytes != 1) {
-		BView::KeyDown(bytes, numBytes);
-		return;
-	}
-
 	switch (bytes[0]) {
 		case B_SPACE:
 		case B_RIGHT_ARROW:
