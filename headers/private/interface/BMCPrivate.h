@@ -19,9 +19,6 @@
 static const float kVMargin = 2.0f;
 
 
-class BMessageRunner;
-
-
 class _BMCFilter_ : public BMessageFilter {
 public:
 								_BMCFilter_(BMenuField* menuField, uint32 what);
@@ -49,8 +46,8 @@ public:
 	virtual	void				AttachedToWindow();
 	virtual	void				Draw(BRect updateRect);
 	virtual	void				FrameResized(float width, float height);
-	virtual	void				MessageReceived(BMessage* msg);
 	virtual	void				MakeFocus(bool focused = true);
+	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				SetMaxContentWidth(float width);
 	virtual	void				SetEnabled(bool enabled);
 
@@ -69,7 +66,6 @@ private:
 
 			BMenuField*			fMenuField;
 			bool				fFixedSize;	
-			BMessageRunner*		fRunner;
 			bool				fShowPopUpMarker;
 			float				fPreviousWidth;
 };

@@ -67,7 +67,6 @@ _BMCMenuBar_::_BMCMenuBar_(BRect frame, bool fixedSize, BMenuField* menuField)
 		!fixedSize),
 	fMenuField(menuField),
 	fFixedSize(fixedSize),
-	fRunner(NULL),
 	fShowPopUpMarker(true)
 {
 	_Init();
@@ -79,7 +78,6 @@ _BMCMenuBar_::_BMCMenuBar_(BMenuField* menuField)
 	BMenuBar("_mc_mb_", B_ITEMS_IN_ROW),
 	fMenuField(menuField),
 	fFixedSize(true),
-	fRunner(NULL),
 	fShowPopUpMarker(true)
 {
 	_Init();
@@ -91,7 +89,6 @@ _BMCMenuBar_::_BMCMenuBar_(BMessage* data)
 	BMenuBar(data),
 	fMenuField(NULL),
 	fFixedSize(true),
-	fRunner(NULL),
 	fShowPopUpMarker(true)
 {
 	SetFlags(Flags() | B_FRAME_EVENTS);
@@ -104,7 +101,6 @@ _BMCMenuBar_::_BMCMenuBar_(BMessage* data)
 
 _BMCMenuBar_::~_BMCMenuBar_()
 {
-	delete fRunner;
 }
 
 
@@ -215,9 +211,19 @@ _BMCMenuBar_::FrameResized(float width, float height)
 
 
 void
-_BMCMenuBar_::MessageReceived(BMessage* msg)
+_BMCMenuBar_::MakeFocus(bool focused)
 {
-	switch (msg->what) {
+	if (IsFocus() == focused)
+		return;
+
+	BMenuBar::MakeFocus(focused);
+}
+
+
+void
+_BMCMenuBar_::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
 		case 'TICK':
 		{
 			BMenuItem* item = ItemAt(0);
@@ -235,39 +241,9 @@ _BMCMenuBar_::MessageReceived(BMessage* msg)
 		}
 		// fall through
 		default:
-			BMenuBar::MessageReceived(msg);
+			BMenuBar::MessageReceived(message);
 			break;
 	}
-}
-
-
-void
-_BMCMenuBar_::MakeFocus(bool focused)
-{
-	if (IsFocus() == focused)
-		return;
-
-	BMenuBar::MakeFocus(focused);
-
-	if (focused) {
-		BMessage message('TICK');
-		//fRunner = new BMessageRunner(BMessenger(this, NULL, NULL), &message,
-		//	50000, -1);
-	} else if (fRunner) {
-		//delete fRunner;
-		fRunner = NULL;
-	}
-
-	if (focused)
-		return;
-
-	fMenuField->fSelected = false;
-	fMenuField->fTransition = true;
-
-	BRect bounds(fMenuField->Bounds());
-
-	fMenuField->Invalidate(BRect(bounds.left, bounds.top, fMenuField->fDivider,
-		bounds.bottom));
 }
 
 
