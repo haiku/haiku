@@ -17,6 +17,7 @@
 #include <ctype.h>
 #include <string.h>
 
+#include <Application.h>
 #include <Bitmap.h>
 #include <ControlLook.h>
 #include <Debug.h>
@@ -2646,6 +2647,11 @@ BMenu::_SelectNextItem(BMenuItem* item, bool forward)
 
 	_SelectItem(nextItem, dynamic_cast<BMenuBar*>(this) != NULL);
 
+	if (LockLooper()) {
+		be_app->ObscureCursor();
+		UnlockLooper();
+	}
+
 	return true;
 }
 
@@ -2986,9 +2992,19 @@ BMenu::_QuitTracking(bool onlyThis)
 
 	fState = MENU_STATE_CLOSED;
 
-	// Close the whole menu hierarchy
-	if (!onlyThis && _IsStickyMode())
-		_SetStickyMode(false);
+	if (!onlyThis) {
+		// Close the whole menu hierarchy
+		if (Supermenu() != NULL)
+			Supermenu()->fState = MENU_STATE_CLOSED;
+
+		if (_IsStickyMode())
+			_SetStickyMode(false);
+
+		if (LockLooper()) {
+			be_app->ShowCursor();
+			UnlockLooper();
+		}
+	}
 
 	_Hide();
 }
