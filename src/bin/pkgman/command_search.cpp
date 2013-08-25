@@ -32,14 +32,16 @@ using namespace BPackageKit;
 
 
 static const char* const kShortUsage =
-	"  %command% <search-string>\n"
+	"  %command% ( <search-string> | --all | -a )\n"
 	"    Searches for packages matching <search-string>.\n";
 
 static const char* const kLongUsage =
-	"Usage: %program% %command% <search-string>\n"
+	"Usage: %program% %command% ( <search-string> | --all | -a )\n"
 	"Searches for packages matching <search-string>.\n"
 	"\n"
 	"Options:\n"
+	"  -a, --all\n"
+	"    List all packages. Specified instead of <search-string>.\n"
 	"  -i, --installed-only\n"
 	"    Only find installed packages.\n"
 	"  -u, --uninstalled-only\n"
@@ -68,9 +70,11 @@ SearchCommand::Execute(int argc, const char* const* argv)
 {
 	bool installedOnly = false;
 	bool uninstalledOnly = false;
+	bool listAll = false;
 
 	while (true) {
 		static struct option sLongOptions[] = {
+			{ "all", no_argument, 0, 'a' },
 			{ "help", no_argument, 0, 'h' },
 			{ "installed-only", no_argument, 0, 'i' },
 			{ "uninstalled-only", no_argument, 0, 'u' },
@@ -78,11 +82,15 @@ SearchCommand::Execute(int argc, const char* const* argv)
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "hiu", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "ahiu", sLongOptions, NULL);
 		if (c == -1)
 			break;
 
 		switch (c) {
+			case 'a':
+				listAll = true;
+				break;
+
 			case 'h':
 				PrintUsageAndExit(false);
 				break;
@@ -103,11 +111,12 @@ SearchCommand::Execute(int argc, const char* const* argv)
 		}
 	}
 
-	// The remaining argument is the search string.
-	if (argc != optind + 1)
+	// The remaining argument is the search string. Ignored when --all has been
+	// specified.
+	if (!listAll && argc != optind + 1)
 		PrintUsageAndExit(true);
 
-	const char* searchString = argv[optind++];
+	const char* searchString = listAll ? "" : argv[optind++];
 
 	// create the solver
 	PackageManager packageManager(B_PACKAGE_INSTALLATION_LOCATION_COMMON,
