@@ -119,9 +119,8 @@ SearchCommand::Execute(int argc, const char* const* argv)
 	const char* searchString = listAll ? "" : argv[optind++];
 
 	// create the solver
-	PackageManager packageManager(B_PACKAGE_INSTALLATION_LOCATION_COMMON,
+	PackageManager packageManager(B_PACKAGE_INSTALLATION_LOCATION_HOME,
 		!uninstalledOnly, !installedOnly);
-// TODO: Use B_PACKAGE_INSTALLATION_LOCATION_HOME once we actually mount it.
 
 	// search
 	BObjectList<BSolverPackage> packages;
