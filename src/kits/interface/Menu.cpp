@@ -477,11 +477,6 @@ BMenu::MessageReceived(BMessage* msg)
 void
 BMenu::KeyDown(const char* bytes, int32 numBytes)
 {
-	if (numBytes != 1) {
-		_InvokeTrigger(bytes);
-		return;
-	}
-
 	// TODO: Test how it works on BeOS R5 and implement this correctly
 	switch (bytes[0]) {
 		case B_UP_ARROW:
@@ -580,7 +575,19 @@ BMenu::KeyDown(const char* bytes, int32 numBytes)
 			break;
 
 		default:
-			_InvokeTrigger(bytes);
+		{
+			uint32 trigger = UTF8ToCharCode(&bytes);
+
+			for (uint32 i = CountItems(); i-- > 0;) {
+				BMenuItem* item = ItemAt(i);
+				if (item->fTriggerIndex < 0 || item->fTrigger != trigger)
+					continue;
+
+				_InvokeItem(item);
+				break;
+			}
+			break;
+		}
 	}
 }
 
@@ -2457,22 +2464,6 @@ BMenu::_InvokeItem(BMenuItem* item, bool now)
 	if (rootMenu->LockLooper()) {
 		item->Invoke();
 		rootMenu->UnlockLooper();
-	}
-}
-
-
-void
-BMenu::_InvokeTrigger(const char* bytes)
-{
-	uint32 trigger = UTF8ToCharCode(&bytes);
-
-	for (uint32 i = CountItems(); i-- > 0;) {
-		BMenuItem* item = ItemAt(i);
-		if (item->fTriggerIndex < 0 || item->fTrigger != trigger)
-			continue;
-
-		_InvokeItem(item);
-		break;
 	}
 }
 
