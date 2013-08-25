@@ -518,22 +518,28 @@ vfs_mount_boot_file_system(kernel_args* args)
 	if (bootVolume.GetBool(BOOT_VOLUME_PACKAGED, false)) {
 		static const char* const kPackageFSName = "packagefs";
 
-		dev_t systemPackageMount = _kern_mount("/boot/system",
-			NULL, kPackageFSName, 0,
-			"packages /boot/system/packages; type system",
+		dev_t packageMount = _kern_mount("/boot/system", NULL, kPackageFSName,
+			0, "packages /boot/system/packages; type system",
 			0 /* unused argument length */);
-		if (systemPackageMount < 0) {
+		if (packageMount < 0) {
 			panic("Failed to mount system packagefs: %s",
-				strerror(systemPackageMount));
+				strerror(packageMount));
 		}
 
-		dev_t commonPackageMount = _kern_mount("/boot/common",
-			NULL, kPackageFSName, 0,
+		packageMount = _kern_mount("/boot/common", NULL, kPackageFSName, 0,
 			"packages /boot/common/packages; type common",
 			0 /* unused argument length */);
-		if (commonPackageMount < 0) {
+		if (packageMount < 0) {
 			dprintf("Failed to mount common packagefs: %s\n",
-				strerror(commonPackageMount));
+				strerror(packageMount));
+		}
+
+		packageMount = _kern_mount("/boot/home/config", NULL, kPackageFSName, 0,
+			"packages /boot/home/config/packages; type home",
+			0 /* unused argument length */);
+		if (packageMount < 0) {
+			dprintf("Failed to mount home packagefs: %s\n",
+				strerror(packageMount));
 		}
 	}
 

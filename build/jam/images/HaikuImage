@@ -304,7 +304,7 @@ AddDirectoryToHaikuImage common var empty ;
 AddDirectoryToHaikuImage common var log ;
 AddDirectoryToHaikuImage home Desktop ;
 AddDirectoryToHaikuImage home mail ;
-
+AddDirectoryToHaikuImage home config packages ;
 AddDirectoryToHaikuImage home config non-packaged bin ;
 AddDirectoryToHaikuImage home config non-packaged lib ;
 AddDirectoryToHaikuImage home config non-packaged add-ons kernel drivers bin ;
