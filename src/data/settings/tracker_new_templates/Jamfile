@@ -7,8 +7,7 @@ rule PrepareTrackerNewTemplates source : mimeType
 	local target = $(source:G=tracker-new-templates) ;
 	MakeLocateCommonPlatform $(target) ;
 	File $(target) : $(source) ;
-	TARGET_EXECUTABLE_MIME_TYPE on $(target) = $(mimeType) ;
-	SetType $(target) ;
+	SetType $(target) : $(mimeType) ;
 }
 
 
