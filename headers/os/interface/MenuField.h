@@ -42,7 +42,7 @@ public:
 	virtual	void				AllAttached();
 	virtual	void				MouseDown(BPoint where);
 	virtual	void				KeyDown(const char* bytes, int32 numBytes);
-	virtual	void				MakeFocus(bool state);
+	virtual	void				MakeFocus(bool focused);
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				WindowActivated(bool state);
 	virtual	void				MouseUp(BPoint where);

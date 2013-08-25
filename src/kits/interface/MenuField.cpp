@@ -47,11 +47,18 @@
 #endif
 
 
+static const float kMinMenuBarWidth = 20.0f;
+	// found by experimenting on BeOS R5
+
+
 namespace {
 	const char* const kFrameField = "BMenuField:layoutItem:frame";
 	const char* const kMenuBarItemField = "BMenuField:barItem";
 	const char* const kLabelItemField = "BMenuField:labelItem";
 }
+
+
+//	#pragma mark - LabelLayoutItem
 
 
 class BMenuField::LabelLayoutItem : public BAbstractLayoutItem {
@@ -82,6 +89,9 @@ private:
 };
 
 
+//	#pragma mark - MenuBarLayoutItem
+
+
 class BMenuField::MenuBarLayoutItem : public BAbstractLayoutItem {
 public:
 								MenuBarLayoutItem(BMenuField* parent);
@@ -110,6 +120,9 @@ private:
 };
 
 
+//	#pragma mark - LayoutData
+
+
 struct BMenuField::LayoutData {
 	LayoutData()
 		:
@@ -133,11 +146,7 @@ struct BMenuField::LayoutData {
 };
 
 
-// #pragma mark -
-
-
-static const float kMinMenuBarWidth = 20.0f;
-	// found by experimenting on BeOS R5
+// #pragma mark - BMenuField
 
 
 using BPrivate::MenuPrivate;
@@ -463,14 +472,14 @@ BMenuField::KeyDown(const char* bytes, int32 numBytes)
 
 
 void
-BMenuField::MakeFocus(bool state)
+BMenuField::MakeFocus(bool focused)
 {
-	if (IsFocus() == state)
+	if (IsFocus() == focused)
 		return;
 
-	BView::MakeFocus(state);
+	BView::MakeFocus(focused);
 
-	if (Window())
+	if (Window() != NULL)
 		Invalidate(); // TODO: use fLayoutData->label_width
 }
 

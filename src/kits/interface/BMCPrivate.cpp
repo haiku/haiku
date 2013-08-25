@@ -22,6 +22,12 @@
 #include <Window.h>
 
 
+static const float kPopUpIndicatorWidth = 13.0f;
+
+
+//	#pragma mark - _BMCFilter_
+
+
 _BMCFilter_::_BMCFilter_(BMenuField* menuField, uint32 what)
 	:
 	BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, what),
@@ -52,10 +58,7 @@ _BMCFilter_::Filter(BMessage* message, BHandler** handler)
 }
 
 
-// #pragma mark -
-
-
-static const float kPopUpIndicatorWidth = 13.0f;
+//	#pragma mark - _BMCMenuBar_
 
 
 _BMCMenuBar_::_BMCMenuBar_(BRect frame, bool fixedSize, BMenuField* menuField)
@@ -103,6 +106,9 @@ _BMCMenuBar_::~_BMCMenuBar_()
 {
 	delete fRunner;
 }
+
+
+//	#pragma mark - _BMCMenuBar_ public methods
 
 
 BArchivable*
@@ -309,6 +315,9 @@ _BMCMenuBar_::MaxSize()
 	BMenuBar::GetPreferredSize(&size.width, &size.height);
 	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), size);
 }
+
+
+//	#pragma mark - _BMCMenuBar_ private methods
 
 
 void
