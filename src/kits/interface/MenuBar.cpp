@@ -571,8 +571,9 @@ BMenuBar::_Track(int32* action, int32 startIndex, bool showMenu)
 			// where to store the current mouse position ?
 			// (Or just use the BView mouse hooks)
 			BPoint newWhere;
+			uint32 newButtons;
 			if (LockLooper()) {
-				GetMouse(&newWhere, &buttons);
+				GetMouse(&newWhere, &newButtons);
 				UnlockLooper();
 			}
 
@@ -630,7 +631,9 @@ BMenuBar::_Track(int32* action, int32 startIndex, bool showMenu)
 			} while (newWhere == where && newButtons == buttons
 				&& fState == MENU_STATE_TRACKING);
 
-			if (newButtons != 0 && _IsStickyMode()) {
+			uint32 test = newWhere == where ? 0 : buttons;
+
+			if (newButtons != test && _IsStickyMode()) {
 				if (item == NULL || (item->Submenu() != NULL
 						&& item->Submenu()->Window() != NULL)) {
 					// clicked outside the menu bar or on item with already
@@ -638,7 +641,7 @@ BMenuBar::_Track(int32* action, int32 startIndex, bool showMenu)
 					fState = MENU_STATE_CLOSED;
 				} else
 					_SetStickyMode(false);
-			} else if (newButtons == 0 && !_IsStickyMode()) {
+			} else if (newButtons == test && !_IsStickyMode()) {
 				if ((fSelected != NULL && fSelected->Submenu() == NULL)
 					|| item == NULL) {
 					// clicked on an item without a submenu or clicked and
