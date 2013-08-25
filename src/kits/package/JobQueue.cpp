@@ -159,8 +159,9 @@ JobQueue::Pop()
 			if (head == fQueuedJobs->end())
 				return NULL;
 		}
+		BJob* job = *head;
 		fQueuedJobs->erase(head);
-		return *head;
+		return job;
 	}
 
 	return NULL;
