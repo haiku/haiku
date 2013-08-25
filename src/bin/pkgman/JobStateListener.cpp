@@ -13,6 +13,13 @@
 using BPackageKit::BJob;
 
 
+JobStateListener::JobStateListener(uint32 flags)
+	:
+	fFlags(flags)
+{
+}
+
+
 void
 JobStateListener::JobStarted(BJob* job)
 {
@@ -34,12 +41,14 @@ JobStateListener::JobFailed(BJob* job)
 		error.ReplaceAll("\n", "\n*** ");
 		fprintf(stderr, "%s", error.String());
 	}
-	DIE(job->Result(), "failed!");
+	if ((fFlags & EXIT_ON_ERROR) != 0)
+		DIE(job->Result(), "failed!");
 }
 
 
 void
 JobStateListener::JobAborted(BJob* job)
 {
-	DIE(job->Result(), "aborted");
+	if ((fFlags & EXIT_ON_ABORT) != 0)
+		DIE(job->Result(), "aborted");
 }

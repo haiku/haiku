@@ -9,11 +9,26 @@
 #include <package/Job.h>
 
 
-struct JobStateListener : public BPackageKit::BJobStateListener {
-	virtual	void JobStarted(BPackageKit::BJob* job);
-	virtual	void JobSucceeded(BPackageKit::BJob* job);
-	virtual	void JobFailed(BPackageKit::BJob* job);
-	virtual	void JobAborted(BPackageKit::BJob* job);
+class JobStateListener : public BPackageKit::BJobStateListener {
+public:
+			enum {
+				EXIT_ON_ERROR	= 0x01,
+				EXIT_ON_ABORT	= 0x02,
+			};
+
+
+public:
+								JobStateListener(
+									uint32 flags = EXIT_ON_ERROR
+										| EXIT_ON_ABORT);
+
+	virtual	void				JobStarted(BPackageKit::BJob* job);
+	virtual	void				JobSucceeded(BPackageKit::BJob* job);
+	virtual	void				JobFailed(BPackageKit::BJob* job);
+	virtual	void				JobAborted(BPackageKit::BJob* job);
+
+private:
+			uint32				fFlags;
 };
 
 
