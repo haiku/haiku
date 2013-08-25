@@ -83,7 +83,7 @@ PackageManager::PackageManager(BPackageInstallationLocation location,
 	fInstalledRepositories(10),
 	fOtherRepositories(10, true),
 	fDecisionProvider(),
-	fJobStateListener(),
+	fJobStateListener(JobStateListener::EXIT_ON_ABORT),
 	fContext(fDecisionProvider, fJobStateListener)
 {
 	// create the solver
