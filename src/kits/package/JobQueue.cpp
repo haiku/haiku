@@ -236,7 +236,8 @@ JobQueue::_RemoveDependantJobsOf(BJob* job)
 		} catch (...) {
 		}
 		_RemoveDependantJobsOf(dependantJob);
-		delete job;
+		dependantJob->RemoveDependency(job);
+		delete dependantJob;
 	}
 }
 
