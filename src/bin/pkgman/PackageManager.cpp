@@ -42,7 +42,7 @@ PackageManager::Repository::Repository()
 
 status_t
 PackageManager::Repository::Init(BPackageRoster& roster, BContext& context,
-	const char* name)
+	const char* name, bool refresh)
 {
 	// get the repository config
 	status_t error = roster.GetRepositoryConfig(name, &fConfig);
@@ -50,6 +50,9 @@ PackageManager::Repository::Init(BPackageRoster& roster, BContext& context,
 		return error;
 
 	// refresh
+	if (!refresh)
+		return B_OK;
+
 	BRefreshRepositoryRequest refreshRequest(context, fConfig);
 	error = refreshRequest.Process();
 	if (error != B_OK) {
@@ -143,7 +146,8 @@ PackageManager::PackageManager(BPackageInstallationLocation location,
 				DIE(B_NO_MEMORY, "failed to create/add repository object");
 	
 			const BString& name = repositoryNames.StringAt(i);
-			error = repository->Init(roster, fContext, name);
+			error = repository->Init(roster, fContext, name,
+				(flags & REFRESH_REPOSITORIES) != 0);
 			if (error != B_OK) {
 				WARN(error,
 					"failed to get config for repository \"%s\". Skipping.",

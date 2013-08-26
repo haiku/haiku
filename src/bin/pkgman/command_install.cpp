@@ -87,7 +87,8 @@ InstallCommand::Execute(int argc, const char* const* argv)
 		: B_PACKAGE_INSTALLATION_LOCATION_COMMON;
 	PackageManager packageManager(location,
 		PackageManager::ADD_INSTALLED_REPOSITORIES
-			| PackageManager::ADD_REMOTE_REPOSITORIES);
+			| PackageManager::ADD_REMOTE_REPOSITORIES
+			| PackageManager::REFRESH_REPOSITORIES);
 	packageManager.Install(packages, packageCount);
 
 	return 0;

@@ -32,6 +32,7 @@ public:
 			enum {
 				ADD_INSTALLED_REPOSITORIES	= 0x01,
 				ADD_REMOTE_REPOSITORIES		= 0x02,
+				REFRESH_REPOSITORIES		= 0x04,
 			};
 
 public:
@@ -90,7 +91,7 @@ struct PackageManager::Repository : public BSolverRepository {
 								Repository();
 
 			status_t			Init(BPackageRoster& roster, BContext& context,
-									const char* name);
+									const char* name, bool refresh);
 
 			const BRepositoryConfig& Config() const;
 
