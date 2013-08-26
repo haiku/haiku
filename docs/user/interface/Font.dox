@@ -916,6 +916,28 @@
 	- \c B_ISO_8859_10 aka Latin 6 aka "Nordic".
 	- \c B_MACINTOSH_ROMAN
 
+	UTF-8 is the standard encoding used by classes in the Interface Kit. It
+	is part of the Unicode® standard and allows Haiku to represent characters
+	from all over the world while maintaining backwards compatibility with
+	7-bit ASCII codes.
+
+	Each of the encodings extend the ASCII codes and differ from each other
+	only when the highest bit is set to 1, in other words, the value is
+	greater than 127. Furthermore each of the encodings except for UTF-8
+	are represented by a single byte and consequently encompass a limited set
+	of characters. Most of the encodings are in the ISO/IEC 8859 family of
+	character codes with the notable exception of Macintosh Roman which is
+	the standard encoding used by the classic Mac OS®.
+
+	If the value of the first byte of a UTF-8 character is greater than 127
+	it indicates that the character is a multibyte character and therefore you
+	must look at the next byte (and possibly the third byte, or rarely even
+	forth byte) to get the whole character.
+
+	Setting the character encoding on a view determines how BView::DrawString()
+	interprets the values passed to it and also how BView::KeyDown() interprets
+	the values representing the keys that the user presses.
+
 	\param encoding The character encoding to set the font to.
 */
 
