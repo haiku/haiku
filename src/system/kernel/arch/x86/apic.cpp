@@ -142,8 +142,10 @@ void
 apic_set_intr_command_1(uint32 config)
 {
 	if (sX2APIC) {
+		uint64 value = x86_read_msr(IA32_MSR_APIC_INTR_COMMAND);
+		arch_cpu_memory_read_write_barrier();
 		x86_write_msr(IA32_MSR_APIC_INTR_COMMAND,
-			(x86_read_msr(IA32_MSR_APIC_INTR_COMMAND) & 0xffffffff00000000LL) | config);
+			(value & 0xffffffff00000000LL) | config);
 	} else
 		apic_write(APIC_INTR_COMMAND_1, config);
 }
@@ -163,9 +165,10 @@ void
 apic_set_intr_command_2(uint32 config)
 {
 	if (sX2APIC) {
+		uint64 value = x86_read_msr(IA32_MSR_APIC_INTR_COMMAND);
+		arch_cpu_memory_read_write_barrier();
 		x86_write_msr(IA32_MSR_APIC_INTR_COMMAND,
-			(x86_read_msr(IA32_MSR_APIC_INTR_COMMAND) & 0xffffffff)
-				| ((uint64)config << 32));
+			(value & 0xffffffff) | ((uint64)config << 32));
 	} else
 		apic_write(APIC_INTR_COMMAND_2, config);
 }
