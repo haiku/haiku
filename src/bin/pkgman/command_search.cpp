@@ -120,7 +120,8 @@ SearchCommand::Execute(int argc, const char* const* argv)
 
 	// create the solver
 	PackageManager packageManager(B_PACKAGE_INSTALLATION_LOCATION_HOME,
-		!uninstalledOnly, !installedOnly);
+		(!uninstalledOnly ? PackageManager::ADD_INSTALLED_REPOSITORIES : 0)
+			| (!installedOnly ? PackageManager::ADD_REMOTE_REPOSITORIES : 0));
 
 	// search
 	BObjectList<BSolverPackage> packages;

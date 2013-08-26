@@ -85,7 +85,9 @@ InstallCommand::Execute(int argc, const char* const* argv)
 	BPackageInstallationLocation location = installInHome
 		? B_PACKAGE_INSTALLATION_LOCATION_HOME
 		: B_PACKAGE_INSTALLATION_LOCATION_COMMON;
-	PackageManager packageManager(location, true, true);
+	PackageManager packageManager(location,
+		PackageManager::ADD_INSTALLED_REPOSITORIES
+			| PackageManager::ADD_REMOTE_REPOSITORIES);
 	packageManager.Install(packages, packageCount);
 
 	return 0;

@@ -29,11 +29,15 @@ public:
 			struct Repository;
 			typedef BObjectList<Repository> RepositoryList;
 
+			enum {
+				ADD_INSTALLED_REPOSITORIES	= 0x01,
+				ADD_REMOTE_REPOSITORIES		= 0x02,
+			};
+
 public:
 								PackageManager(
 									BPackageInstallationLocation location,
-									bool addInstalledRepositories,
-									bool addOtherRepositories);
+									uint32 flags);
 								~PackageManager();
 
 			BSolver*			Solver() const

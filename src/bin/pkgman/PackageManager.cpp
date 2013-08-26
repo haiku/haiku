@@ -73,7 +73,7 @@ PackageManager::Repository::Config() const
 
 
 PackageManager::PackageManager(BPackageInstallationLocation location,
-	bool addInstalledRepositories, bool addOtherRepositories)
+	uint32 flags)
 	:
 	fLocation(location),
 	fSolver(NULL),
@@ -92,7 +92,7 @@ PackageManager::PackageManager(BPackageInstallationLocation location,
 		DIE(error, "failed to create solver");
 
 	// add installation location repositories
-	if (addInstalledRepositories) {
+	if ((flags & ADD_INSTALLED_REPOSITORIES) != 0) {
 		// We add only the repository of our actual installation location as the
 		// "installed" repository. The repositories for the more general
 		// installation locations are added as regular repositories, but with
@@ -129,7 +129,7 @@ PackageManager::PackageManager(BPackageInstallationLocation location,
 	}
 
 	// add other repositories
-	if (addOtherRepositories) {
+	if ((flags & ADD_REMOTE_REPOSITORIES) != 0) {
 		BPackageRoster roster;
 		BStringList repositoryNames;
 		error = roster.GetRepositoryNames(repositoryNames);
